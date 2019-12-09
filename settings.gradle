@@ -69,4 +69,6 @@ findProject(':casier-all:cashier-account')?.name = 'cashier-account'
 include 'casier-all:cashier-api'
 findProject(':casier-all:cashier-api')?.name = 'cashier-api'
 include 'admin-api'
+include 'util-all:order-commons'
+findProject(':util-all:order-commons')?.name = 'order-commons'
 
