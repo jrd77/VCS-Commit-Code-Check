@@ -17,5 +17,9 @@ public class CashierBindCardService {
     @Autowired
     private CashierBindCardMapper cashierBindCardMapper;
 
+    public String test(){
+        return  "www";
+    }
+
 
 }
