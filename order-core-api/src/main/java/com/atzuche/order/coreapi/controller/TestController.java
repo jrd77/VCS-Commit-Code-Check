@@ -1,6 +1,7 @@
 package com.atzuche.order.coreapi.controller;
 
 import com.atzuche.order.config.oilprice.OilAverageCostCacheConfig;
+import com.atzuche.order.service.CashierBindCardService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -14,9 +15,12 @@ public class TestController {
 
     @Autowired
     OilAverageCostCacheConfig oilAverageCostCacheConfig;
-
+    @Autowired
+    CashierBindCardService cashierBindCardService;
     @GetMapping(path = "/test")
     public String test(){
+
+        System.out.println(cashierBindCardService.test());
         System.out.println(oilAverageCostCacheConfig.findOilPriceByEngineTypeAndCity(0,310100));
         return "test";
     }

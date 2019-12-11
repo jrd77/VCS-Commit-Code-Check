@@ -34,5 +34,6 @@ dependencies {
         }
 
     compile project(":config")
+    compile project(":casier-all:cashier-account")
 
 }
