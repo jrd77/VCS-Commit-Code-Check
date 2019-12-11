@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import com.autoyol.platformcost.model.AbatementConfig;
 import com.autoyol.platformcost.model.OilAverageCostBO;
 import com.autoyol.platformcost.model.SphericalDistanceCoefficient;
 
@@ -33,6 +34,31 @@ public class CommonUtils {
     public static final Integer MULTIPLY=1000;
     // 修改地址距离原地址>1公里需要收费
     private static final Integer MODIFY_ADDR_NEED_CHARGE_DISTANCE = 1;
+    /**
+               * 初始化全面保障费单价配置
+     */
+    public static final List<AbatementConfig> ABATEMENTCONFIG_List = new ArrayList<AbatementConfig>() {
+    	/**
+		 * 
+		 */
+		private static final long serialVersionUID = -7734039511976536462L;
+
+	{
+        add(new AbatementConfig(0, 250000, 40, 30, 25, 20));
+        add(new AbatementConfig(250000, 400000, 50, 40, 35, 30));
+        add(new AbatementConfig(400000, 600000, 90, 70, 60, 50));
+        add(new AbatementConfig(600000, 800000, 100, 80, 70, 60));
+        add(new AbatementConfig(800000, 1000000, 120, 100, 80, 70));
+        add(new AbatementConfig(1000000, 1500000, 225, 180, 144, 115));
+        add(new AbatementConfig(1500000, 2000000, 300, 240, 192, 154));
+        add(new AbatementConfig(2000000, 2500000, 375, 300, 240, 192));
+        add(new AbatementConfig(2500000, 3000000, 450, 360, 288, 230));
+        add(new AbatementConfig(3000000, 3500000, 525, 420, 336, 269));
+        add(new AbatementConfig(3500000, 4000000, 600, 480, 384, 307));
+        add(new AbatementConfig(4000000, 4500000, 675, 540, 432, 346));
+        add(new AbatementConfig(4500000, Integer.MAX_VALUE, 750, 600, 480, 384));
+    }};
+
 	/**
 	 * 获取向上取整天数
 	 *
@@ -209,7 +235,7 @@ public class CommonUtils {
 	
 	
 	/**
-	 * 根据起租时间和还车时间得到日期列表  MAIN   huangjing 150826
+	 * 根据起租时间和还车时间得到日期列表  MAIN
 	 * //列表只有1个，代表的是当天。
 	   //列表只有2个，代表的是两天都是不完整的。
 	   //列表大于3个，中间才有完整的一天
