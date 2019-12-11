@@ -2,11 +2,13 @@ package com.autoyol.platformcost;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import com.autoyol.platformcost.model.AbatementConfig;
 import com.autoyol.platformcost.model.CarDepositAmtVO;
 import com.autoyol.platformcost.model.CarPriceOfDay;
 import com.autoyol.platformcost.model.DepositText;
@@ -23,28 +25,6 @@ public class RenterFeeCalculatorUtils {
 	
 	/** 车辆购置价 25W */
 	private static final int CARPURCHASEPRICE_250000 = 250000;
-	/** 车辆购置价 40W */
-	private static final int CARPURCHASEPRICE_400000 = 400000;
-	/** 车辆购置价 60W */
-	private static final int CARPURCHASEPRICE_600000 = 600000;
-	/** 车辆购置价 80W */
-	private static final int CARPURCHASEPRICE_800000 = 800000;
-	/** 车辆购置价 100W */
-	private static final int CARPURCHASEPRICE_1000000 = 1000000;
-	/** 车辆购置价 150W */
-	private static final int CARPURCHASEPRICE_1500000 = 1500000;
-	/** 车辆购置价 200W */
-	private static final int CARPURCHASEPRICE_2000000 = 2000000;
-	/** 车辆购置价 250W */
-	private static final int CARPURCHASEPRICE_2500000 = 2500000;
-	/** 车辆购置价 300W */
-	private static final int CARPURCHASEPRICE_3000000 = 3000000;
-	/** 车辆购置价 350W */
-	private static final int CARPURCHASEPRICE_3500000 = 3500000;
-	/** 车辆购置价 400W */
-	private static final int CARPURCHASEPRICE_4000000 = 4000000;
-	/** 车辆购置价 450W */
-	private static final int CARPURCHASEPRICE_4500000 = 4500000;
 	
 	//1亿表示100万以上区间
 	private static final int[] TOTAL_AMT_RANGE = {80000, 100000, 120000, 140000 ,160000, 180000, 200000, 250000,300000,400000,1000000,100000000};
@@ -161,7 +141,7 @@ public class RenterFeeCalculatorUtils {
 	 * @param easyCoefficient
 	 * @return
 	 */
-	public static Integer calcAbatementAmt(LocalDateTime rentTime, LocalDateTime revertTime, Integer getCarBeforeTime,Integer returnCarAfterTime, Integer configHours, Integer guidPrice, Double coefficient, Double easyCoefficient) {
+	public static List<FeeResult> calcAbatementAmt(LocalDateTime rentTime, LocalDateTime revertTime, Integer getCarBeforeTime,Integer returnCarAfterTime, Integer configHours, Integer guidPrice, Double coefficient, Double easyCoefficient) {
 		// 计算提前延后时间
 		rentTime = CommonUtils.calBeforeTime(rentTime, getCarBeforeTime);
 		revertTime = CommonUtils.calAfterTime(revertTime, returnCarAfterTime);
@@ -171,133 +151,50 @@ public class RenterFeeCalculatorUtils {
 			guidPrice = CARPURCHASEPRICE_250000;
 		}
 		int purchasePrice = guidPrice.intValue();
-		Integer result = null;
-		if (abatementDay.doubleValue() <= 7) {
-			if (purchasePrice <= CARPURCHASEPRICE_250000) {
-				result = (int) Math.ceil(40 * abatementDay.doubleValue());
-			} else if(CARPURCHASEPRICE_250000 < purchasePrice && purchasePrice <= CARPURCHASEPRICE_400000) {
-				result = (int) Math.ceil(50 * abatementDay.doubleValue());
-			} else if(CARPURCHASEPRICE_400000 < purchasePrice && purchasePrice <= CARPURCHASEPRICE_600000) {
-				result = (int) Math.ceil(90 * abatementDay.doubleValue());
-			} else if(CARPURCHASEPRICE_600000 < purchasePrice && purchasePrice <= CARPURCHASEPRICE_800000) {
-				result = (int) Math.ceil(100 * abatementDay.doubleValue());
-			} else if(CARPURCHASEPRICE_800000 < purchasePrice && purchasePrice <= CARPURCHASEPRICE_1000000) {
-				result = (int) Math.ceil(120 * abatementDay.doubleValue());
-			} else if(CARPURCHASEPRICE_1000000 < purchasePrice && purchasePrice <= CARPURCHASEPRICE_1500000) {
-				result = (int) Math.ceil(225 * abatementDay.doubleValue());
-			} else if(CARPURCHASEPRICE_1500000 < purchasePrice && purchasePrice <= CARPURCHASEPRICE_2000000) {
-				result = (int) Math.ceil(300 * abatementDay.doubleValue());
-			} else if(CARPURCHASEPRICE_2000000 < purchasePrice && purchasePrice <= CARPURCHASEPRICE_2500000) {
-				result = (int) Math.ceil(375 * abatementDay.doubleValue());
-			} else if(CARPURCHASEPRICE_2500000 < purchasePrice && purchasePrice <= CARPURCHASEPRICE_3000000) {
-				result = (int) Math.ceil(450 * abatementDay.doubleValue());
-			} else if(CARPURCHASEPRICE_3000000 < purchasePrice && purchasePrice <= CARPURCHASEPRICE_3500000) {
-				result = (int) Math.ceil(525 * abatementDay.doubleValue());
-			} else if(CARPURCHASEPRICE_3500000 < purchasePrice && purchasePrice <= CARPURCHASEPRICE_4000000) {
-				result = (int) Math.ceil(600 * abatementDay.doubleValue());
-			} else if(CARPURCHASEPRICE_4000000 < purchasePrice && purchasePrice <= CARPURCHASEPRICE_4500000) {
-				result = (int) Math.ceil(675 * abatementDay.doubleValue());
-			} else {
-				// 150万≤车辆购置价
-				result = (int) Math.ceil(750 * abatementDay.doubleValue());
-			}
-
-		// 7天<租期<=15天的部分
-		} else if (7 < abatementDay.doubleValue() 
-				&& abatementDay.doubleValue() <= 15) {
-			if (purchasePrice <= CARPURCHASEPRICE_250000) {
-				result = (int) Math.ceil(40 * 7 + 30 * (abatementDay.doubleValue() - 7));
-			} else if(CARPURCHASEPRICE_250000 < purchasePrice && purchasePrice <= CARPURCHASEPRICE_400000) {
-				result = (int) Math.ceil(50 * 7 + 40 * (abatementDay.doubleValue() - 7));
-			} else if(CARPURCHASEPRICE_400000 < purchasePrice && purchasePrice <= CARPURCHASEPRICE_600000) {
-				result = (int) Math.ceil(90 * 7 + 70 * (abatementDay.doubleValue() - 7));
-			} else if(CARPURCHASEPRICE_600000 < purchasePrice && purchasePrice <= CARPURCHASEPRICE_800000) {
-				result = (int) Math.ceil(100 * 7 + 80 * (abatementDay.doubleValue() - 7));
-			} else if(CARPURCHASEPRICE_800000 < purchasePrice && purchasePrice <= CARPURCHASEPRICE_1000000) {
-				result = (int) Math.ceil(120 * 7 + 100 * (abatementDay.doubleValue() - 7));
-			} else if(CARPURCHASEPRICE_1000000 < purchasePrice && purchasePrice <= CARPURCHASEPRICE_1500000) {
-				result = (int) Math.ceil(225 * 7 + 180 * (abatementDay.doubleValue() - 7));
-			} else if(CARPURCHASEPRICE_1500000 < purchasePrice && purchasePrice <= CARPURCHASEPRICE_2000000) {
-				result = (int) Math.ceil(300 * 7 + 240 * (abatementDay.doubleValue() - 7));
-			} else if(CARPURCHASEPRICE_2000000 < purchasePrice && purchasePrice <= CARPURCHASEPRICE_2500000) {
-				result = (int) Math.ceil(375 * 7 + 300 * (abatementDay.doubleValue() - 7));
-			} else if(CARPURCHASEPRICE_2500000 < purchasePrice && purchasePrice <= CARPURCHASEPRICE_3000000) {
-				result = (int) Math.ceil(450 * 7 + 360 * (abatementDay.doubleValue() - 7));
-			} else if(CARPURCHASEPRICE_3000000 < purchasePrice && purchasePrice <= CARPURCHASEPRICE_3500000) {
-				result = (int) Math.ceil(525 * 7 + 420 * (abatementDay.doubleValue() - 7));
-			} else if(CARPURCHASEPRICE_3500000 < purchasePrice && purchasePrice <= CARPURCHASEPRICE_4000000) {
-				result = (int) Math.ceil(600 * 7 + 480 * (abatementDay.doubleValue() - 7));
-			} else if(CARPURCHASEPRICE_4000000 < purchasePrice && purchasePrice <= CARPURCHASEPRICE_4500000) {
-				result = (int) Math.ceil(675 * 7 + 540 * (abatementDay.doubleValue() - 7));
-			} else {
-				// 150万≤车辆购置价
-				result = (int) Math.ceil(750 * 7 + 600 * (abatementDay.doubleValue() - 7));
-			}
-		// 15<租期<=25天的部分
-		} else if (15 < abatementDay.doubleValue() 
-				&& abatementDay.doubleValue() <= 25) {
-			if (purchasePrice <= CARPURCHASEPRICE_250000) {
-				result = (int) Math.ceil((40 * 7) + (30 * 8) + (25 * (abatementDay.doubleValue() - 15)));
-			} else if(CARPURCHASEPRICE_250000 < purchasePrice && purchasePrice <= CARPURCHASEPRICE_400000) {
-				result = (int) Math.ceil((50 * 7) + (40 * 8) + (35 * (abatementDay.doubleValue() - 15)));
-			} else if(CARPURCHASEPRICE_400000 < purchasePrice && purchasePrice <= CARPURCHASEPRICE_600000) {
-				result = (int) Math.ceil((90 * 7) + (70 * 8) + (60 * (abatementDay.doubleValue() - 15)));
-			} else if(CARPURCHASEPRICE_600000 < purchasePrice && purchasePrice <= CARPURCHASEPRICE_800000) {
-				result = (int) Math.ceil((100 * 7) + (80 * 8) + (70 * (abatementDay.doubleValue() - 15)));
-			} else if(CARPURCHASEPRICE_800000 < purchasePrice && purchasePrice <= CARPURCHASEPRICE_1000000) {
-				result = (int) Math.ceil((120 * 7) + (100 * 8) + (80 * (abatementDay.doubleValue() - 15)));
-			} else if(CARPURCHASEPRICE_1000000 < purchasePrice && purchasePrice <= CARPURCHASEPRICE_1500000) {
-				result = (int) Math.ceil((225 * 7) + (180 * 8) + (144 * (abatementDay.doubleValue() - 15)));
-			} else if(CARPURCHASEPRICE_1500000 < purchasePrice && purchasePrice <= CARPURCHASEPRICE_2000000) {
-				result = (int) Math.ceil((300 * 7) + (240 * 8) + (192 * (abatementDay.doubleValue() - 15)));
-			} else if(CARPURCHASEPRICE_2000000 < purchasePrice && purchasePrice <= CARPURCHASEPRICE_2500000) {
-				result = (int) Math.ceil((375 * 7) + (300 * 8) + (240 * (abatementDay.doubleValue() - 15)));
-			} else if(CARPURCHASEPRICE_2500000 < purchasePrice && purchasePrice <= CARPURCHASEPRICE_3000000) {
-				result = (int) Math.ceil((450 * 7) + (360 * 8) + (288 * (abatementDay.doubleValue() - 15)));
-			} else if(CARPURCHASEPRICE_3000000 < purchasePrice && purchasePrice <= CARPURCHASEPRICE_3500000) {
-				result = (int) Math.ceil((525 * 7) + (420 * 8) + (336 * (abatementDay.doubleValue() - 15)));
-			} else if(CARPURCHASEPRICE_3500000 < purchasePrice && purchasePrice <= CARPURCHASEPRICE_4000000) {
-				result = (int) Math.ceil((600 * 7) + (480 * 8) + (384 * (abatementDay.doubleValue() - 15)));
-			} else if(CARPURCHASEPRICE_4000000 < purchasePrice && purchasePrice <= CARPURCHASEPRICE_4500000) {
-				result = (int) Math.ceil((675 * 7) + (540 * 8) + (432 * (abatementDay.doubleValue() - 15)));
-			} else {
-				// 150万≤车辆购置价
-				result = (int) Math.ceil((750 * 7) + (600 * 8) + (480 * (abatementDay.doubleValue() - 15)));
-			}
-			
-			
-		// 租期>25天部分
-		} else {
-			if (purchasePrice <= CARPURCHASEPRICE_250000) {
-				result = (int) Math.ceil((40 * 7) + (30 * 8) + (25 * 10) + (20 * (abatementDay.doubleValue() - 25)));
-			} else if(CARPURCHASEPRICE_250000 < purchasePrice && purchasePrice <= CARPURCHASEPRICE_400000) {
-				result = (int) Math.ceil((50 * 7) + (40 * 8) + (35 * 10) + (30 * (abatementDay.doubleValue() - 25)));
-			} else if(CARPURCHASEPRICE_400000 < purchasePrice && purchasePrice <= CARPURCHASEPRICE_600000) {
-				result = (int) Math.ceil((90 * 7) + (70 * 8) + (60 * 10) + (50 * (abatementDay.doubleValue() - 25)));
-			} else if(CARPURCHASEPRICE_600000 < purchasePrice && purchasePrice <= CARPURCHASEPRICE_800000) {
-				result = (int) Math.ceil((100 * 7) + (80 * 8) + (70 * 10) + (60 * (abatementDay.doubleValue() - 25)));
-			} else if(CARPURCHASEPRICE_800000 < purchasePrice && purchasePrice <= CARPURCHASEPRICE_1000000) {
-				result = (int) Math.ceil((120 * 7) + (100 * 8) + (80 * 10) + (70 * (abatementDay.doubleValue() - 25)));
-			} else if(CARPURCHASEPRICE_1000000 < purchasePrice && purchasePrice <= CARPURCHASEPRICE_1500000) {
-				result = (int) Math.ceil((225 * 7) + (180 * 8) + (144 * 10) + (115 * (abatementDay.doubleValue() - 25)));
-			} else if(CARPURCHASEPRICE_1500000 < purchasePrice && purchasePrice <= CARPURCHASEPRICE_2000000) {
-				result = (int) Math.ceil((300 * 7) + (240 * 8) + (192 * 10) + (154 * (abatementDay.doubleValue() - 25)));
-			} else if(CARPURCHASEPRICE_2000000 < purchasePrice && purchasePrice <= CARPURCHASEPRICE_2500000) {
-				result = (int) Math.ceil((375 * 7) + (300 * 8) + (240 * 10) + (192 * (abatementDay.doubleValue() - 25)));
-			} else if(CARPURCHASEPRICE_2500000 < purchasePrice && purchasePrice <= CARPURCHASEPRICE_3000000) {
-				result = (int) Math.ceil((450 * 7) + (360 * 8) + (288 * 10) + (230 * (abatementDay.doubleValue() - 25)));
-			} else if(CARPURCHASEPRICE_3000000 < purchasePrice && purchasePrice <= CARPURCHASEPRICE_3500000) {
-				result = (int) Math.ceil((525 * 7) + (420 * 8) + (336 * 10) + (269 * (abatementDay.doubleValue() - 25)));
-			} else if(CARPURCHASEPRICE_3500000 < purchasePrice && purchasePrice <= CARPURCHASEPRICE_4000000) {
-				result = (int) Math.ceil((600 * 7) + (480 * 8) + (384 * 10) + (307 * (abatementDay.doubleValue() - 25)));
-			} else if(CARPURCHASEPRICE_4000000 < purchasePrice && purchasePrice <= CARPURCHASEPRICE_4500000) {
-				result = (int) Math.ceil((675 * 7) + (540 * 8) + (432 * 10) + (346 * (abatementDay.doubleValue() - 25)));
-			} else {
-				// 150万≤车辆购置价
-				result = (int) Math.ceil((750 * 7) + (600 * 8) + (480 * 10) + (384 * (abatementDay.doubleValue() - 25)));
+		AbatementConfig abatementConfig = null;
+		for (AbatementConfig ac:CommonUtils.ABATEMENTCONFIG_List) {
+			if (ac.getGuidPriceBegin() < purchasePrice && purchasePrice <= ac.getGuidPriceEnd()) {
+				abatementConfig = ac;
+				break;
 			}
 		}
-		return (int) Math.ceil(result*coefficient*easyCoefficient);
+		if (abatementDay.doubleValue() <= 7) {
+			return getFeeResultList(abatementConfig, abatementDay, coefficient, easyCoefficient, 1);
+		} else if (7 < abatementDay.doubleValue() && abatementDay.doubleValue() <= 15) {
+			return getFeeResultList(abatementConfig, abatementDay, coefficient, easyCoefficient, 2);
+		} else if (15 < abatementDay.doubleValue() && abatementDay.doubleValue() <= 25) {
+			return getFeeResultList(abatementConfig, abatementDay, coefficient, easyCoefficient, 3);
+		} else {
+			return getFeeResultList(abatementConfig, abatementDay, coefficient, easyCoefficient, 4);
+		}
+	}
+	
+	
+	public static List<FeeResult> getFeeResultList(AbatementConfig abatementConfig, Double abatementDay, Double coefficient, Double easyCoefficient, Integer size) {
+		List<FeeResult> feeResultList = new ArrayList<FeeResult>();
+		for (int i=0; i<size; i++) {
+			Integer curPrice = null;
+			Double curDays = null;
+			if (i == 0) {
+				curPrice = abatementConfig.getAbatementUnitPrice7();
+				curDays = abatementDay <= 7 ? abatementDay:7.0;
+			} else if (i == 1) {
+				curPrice = abatementConfig.getAbatementUnitPrice15();
+				curDays = abatementDay <= 15 ? abatementDay - 7:8.0;
+			} else if (i == 2) {
+				curPrice = abatementConfig.getAbatementUnitPrice25();
+				curDays = abatementDay <= 25 ? abatementDay - 15:10.0;
+			} else {
+				curPrice = abatementConfig.getAbatementUnitPriceOther();
+				curDays = abatementDay - 25;
+			}
+			Integer unitPrice = (int) Math.ceil(curPrice*coefficient*easyCoefficient);
+			Double unitCount = curDays;
+			Integer totalFee = (int) Math.ceil(unitPrice*unitCount);
+			FeeResult feeResult = new FeeResult(unitPrice, unitCount, totalFee);
+			feeResultList.add(feeResult);
+		}
+		return feeResultList;
 	}
 	
 	

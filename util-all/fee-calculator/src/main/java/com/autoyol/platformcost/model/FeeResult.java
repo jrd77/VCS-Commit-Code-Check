@@ -7,6 +7,14 @@ public class FeeResult {
 	private Double unitCount;
 	// 总价
 	private Integer totalFee;
+	
+	public FeeResult() {}
+	
+	public FeeResult(Integer unitPrice, Double unitCount, Integer totalFee) {
+		this.unitPrice = unitPrice;
+		this.unitCount = unitCount;
+		this.totalFee = totalFee;
+	}
 	public Integer getUnitPrice() {
 		return unitPrice;
 	}
