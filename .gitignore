@@ -240,9 +240,7 @@ order-core-all/renter-all/renter-mem/build/
 order-core-all/renter-all/renter-order/build/
 order-core-all/renter-all/renter-penalty/build/
 order-core-all/renter-all/renter-wz/build/
-order-core-api/build/classes/
-order-core-api/build/generated/
-order-core-api/build/resources/
+order-core-api/build/
 order-openapi/build/
 util-all/build/
 util-all/fee-calculator/build/
