@@ -1,4 +1,4 @@
-import com.atzuche.order.config.CacheConfigTemplate;
+import com.atzuche.order.config.CacheConfigServiceTemplate;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
@@ -9,7 +9,7 @@ import java.util.List;
  * @date 2019/12/9 4:45 下午
  **/
 @Resource
-public class TestCacheConfig extends CacheConfigTemplate<List<String>> {
+public class TestCacheConfig extends CacheConfigServiceTemplate<List<String>> {
     @Override
     protected List<String> loadConfigData() {
         System.out.println("loadConfigData");

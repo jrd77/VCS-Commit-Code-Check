@@ -1,6 +1,6 @@
-package com.atzuche.order.config.oilprice;
+package com.atzuche.order.config.oilpriceconfig;
 
-import com.atzuche.order.config.CacheConfigTemplate;
+import com.atzuche.order.config.CacheConfigServiceTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,8 +13,8 @@ import java.util.List;
  * @date 2019/12/9 3:48 下午
  **/
 @Service
-public class OilAverageCostCacheConfig extends CacheConfigTemplate<List<OilAverageCostEntity>> {
-    private final static Logger logger = LoggerFactory.getLogger(OilAverageCostCacheConfig.class);
+public class OilAverageCostCacheConfigService extends CacheConfigServiceTemplate<List<OilAverageCostEntity>> {
+    private final static Logger logger = LoggerFactory.getLogger(OilAverageCostCacheConfigService.class);
     
 
     @Autowired
