@@ -71,4 +71,8 @@ findProject(':casier-all:cashier-api')?.name = 'cashier-api'
 include 'admin-api'
 include 'util-all:order-commons'
 findProject(':util-all:order-commons')?.name = 'order-commons'
+include 'order-core-all:carowner-all:carowner-delivery'
+findProject(':order-core-all:carowner-all:carowner-delivery')?.name = 'carowner-delivery'
+include 'order-log'
+include 'order-flow'
 
