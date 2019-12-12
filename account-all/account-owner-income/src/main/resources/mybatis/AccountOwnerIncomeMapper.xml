@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.atzuche.order.mapper.AccountOwnerIncomeMapper">
+
+    <resultMap type="com.atzuche.order.entity.AccountOwnerIncomeEntity" id="BaseResultMap">
+        <result property="id" column="id"/>
+        <result property="memNo" column="mem_no"/>
+        <result property="incomeAmt" column="income_amt"/>
+        <result property="version" column="version"/>
+        <result property="createTime" column="create_time"/>
+    </resultMap>
+
+
+	<sql id="Base_Column_List">
+	`id`, 	
+	`mem_no`, 	
+	`income_amt`, 	
+	`version`, 	
+	`create_time`	
+
+	</sql>
+
+
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap">
+		select <include refid="Base_Column_List" /> from account_owner_income where id = #{value}
+	</select>
+
+	<select id="selectALL" resultMap="BaseResultMap">
+		select  <include refid="Base_Column_List" /> from account_owner_income order by id desc
+	</select>
+
+	 
+	<insert id="insert" parameterType="com.atzuche.order.entity.AccountOwnerIncomeEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into account_owner_income
+		(
+				`mem_no`,		
+				`income_amt`,		
+				`version`,		
+				`create_time`		
+			)
+		values
+		(
+				#{memNo}, 		
+				#{incomeAmt}, 		
+				#{version}, 		
+				#{createTime}		
+			)
+	</insert>
+	
+	<insert id="insertSelective" parameterType="com.atzuche.order.entity.AccountOwnerIncomeEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into account_owner_income
+		(
+				<if test="memNo != null">`mem_no`, </if>
+				<if test="incomeAmt != null">`income_amt`, </if>
+				<if test="version != null">`version`, </if>
+				<if test="createTime != null">`create_time` </if>
+			)
+		values
+		(
+				<if test="memNo != null">#{memNo},  </if>
+				<if test="incomeAmt != null">#{incomeAmt},  </if>
+				<if test="version != null">#{version},  </if>
+				<if test="createTime != null">#{createTime} </if>
+			)
+	</insert>
+	
+	 
+	<update id="updateByPrimaryKeySelective" parameterType="com.atzuche.order.entity.AccountOwnerIncomeEntity">
+		update account_owner_income 
+		<set>
+				<if test="memNo != null">`mem_no` = #{memNo}, </if>
+				<if test="incomeAmt != null">`income_amt` = #{incomeAmt}, </if>
+				<if test="version != null">`version` = #{version}, </if>
+				<if test="createTime != null">`create_time` = #{createTime}</if>
+			</set>
+		where id = #{id}
+	</update>
+	
+	<update id="updateByPrimaryKey" parameterType="com.atzuche.order.entity.AccountOwnerIncomeEntity">
+		update account_owner_income 
+		<set>
+				`mem_no` = #{memNo}, 		
+				`income_amt` = #{incomeAmt}, 		
+				`version` = #{version}, 		
+				`create_time` = #{createTime}		
+	
+		</set>
+		where id = #{id}
+	</update>
+  	
+</mapper>
