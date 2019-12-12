@@ -1,0 +1,28 @@
+package com.atzuche.order.mapper;
+
+import com.atzuche.order.entity.OrderEntity;
+import org.apache.ibatis.annotations.Mapper;
+import java.util.List;
+
+/**
+ * 主订单表
+ * 
+ * @author ZhangBin
+ * @date 2019-12-12 14:41:07
+ */
+@Mapper
+public interface OrderMapper{
+
+    OrderEntity selectByPrimaryKey(Integer id);
+
+    List<OrderEntity> selectALL();
+
+    int insert(OrderEntity record);
+    
+    int insertSelective(OrderEntity record);
+
+    int updateByPrimaryKey(OrderEntity record);
+    
+    int updateByPrimaryKeySelective(OrderEntity record);
+
+}
