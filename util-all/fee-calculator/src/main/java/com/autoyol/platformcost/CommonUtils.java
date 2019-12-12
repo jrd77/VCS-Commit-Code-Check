@@ -515,7 +515,7 @@ public class CommonUtils {
         SphericalDistanceCoefficient defaultCoefficient=new SphericalDistanceCoefficient();
         defaultCoefficient.setCoefficient(100);
         //获取系数
-        SphericalDistanceCoefficient sphericalDistanceCoefficient = coefficients.parallelStream().filter(coefficien -> rangeDistance(distance, coefficien)).findFirst().orElse(defaultCoefficient);
+        SphericalDistanceCoefficient sphericalDistanceCoefficient = coefficients.stream().filter(coefficien -> rangeDistance(distance, coefficien)).findFirst().orElse(defaultCoefficient);
         return BigDecimal.valueOf(sphericalDistanceCoefficient.getCoefficient()).divide(BigDecimal.valueOf(100)).doubleValue();
     }
     

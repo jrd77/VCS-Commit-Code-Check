@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import com.autoyol.platformcost.enums.ExceptionCodeEnum;
+import com.autoyol.platformcost.exception.OwnerFeeCostException;
 import com.autoyol.platformcost.model.CarGpsRule;
 import com.autoyol.platformcost.model.CarPriceOfDay;
 import com.autoyol.platformcost.model.FeeResult;
@@ -34,13 +36,22 @@ public class OwnerFeeCalculatorUtils {
 	 * @return
 	 */
 	public static FeeResult calRentAmt(LocalDateTime rentTime, LocalDateTime revertTime, Integer configHours, List<CarPriceOfDay> carPriceOfDayList) {
+		if (rentTime == null) {
+			throw new OwnerFeeCostException(ExceptionCodeEnum.RENT_TIME_IS_NULL);
+		}
+		if (revertTime == null) {
+			throw new OwnerFeeCostException(ExceptionCodeEnum.REVERT_TIME_IS_NULL);
+		}
+		if (carPriceOfDayList == null || carPriceOfDayList.isEmpty()) {
+			throw new OwnerFeeCostException(ExceptionCodeEnum.CAR_DAY_PRICE_LIST_IS_EMPTY);
+		}
 		// 计算日均价
 		Integer holidayAverage = RenterFeeCalculatorUtils.getHolidayAverageRentAMT(rentTime, revertTime, carPriceOfDayList);
 		// 计算总租期
 		Double rentDays = CommonUtils.getRentDays(rentTime, revertTime, configHours);
 		// 总租金
 		Integer rentAmt = new BigDecimal(holidayAverage*rentDays).setScale(0, BigDecimal.ROUND_HALF_UP).intValue();
-		rentAmt = rentAmt < 1 ? 1 : rentAmt;
+		rentAmt = (rentAmt == null || rentAmt < 1) ? 1 : rentAmt;
 		FeeResult feeResult = new FeeResult();
 		feeResult.setTotalFee(rentAmt);
 		feeResult.setUnitCount(rentDays);
@@ -60,6 +71,12 @@ public class OwnerFeeCalculatorUtils {
 	 * @return
 	 */
 	public static Integer calMileageAmt(Integer carOwnerType, Integer dayMileage, Integer guideDayPrice, Integer getmileage, Integer returnMileage, LocalDateTime rentTime, LocalDateTime revertTime, Integer configHours) {
+		if (rentTime == null) {
+			throw new OwnerFeeCostException(ExceptionCodeEnum.RENT_TIME_IS_NULL);
+		}
+		if (revertTime == null) {
+			throw new OwnerFeeCostException(ExceptionCodeEnum.REVERT_TIME_IS_NULL);
+		}
 		if (getmileage == null || returnMileage == null || (getmileage >= returnMileage)) {
 			return 0;
 		}
@@ -101,6 +118,9 @@ public class OwnerFeeCalculatorUtils {
 	public static Integer calOilAmt(Integer carOwnerType, Integer cityCode, Integer oilVolume, Integer engineType, Integer getOilScale, Integer returnOilScale, List<OilAverageCostBO> oilAverageList, Integer oilScaleDenominator) {
 		//动力类型，1：92号汽油、2：95号汽油、3：0号柴油、4：纯电动、5
 		if (engineType==null||oilVolume==null||oilVolume==0||getOilScale==null||returnOilScale==null) {
+			return 0;
+		}
+		if (oilScaleDenominator == null || oilScaleDenominator == 0) {
 			return 0;
 		}
 		Integer oilVolumeChange = getOilScale - returnOilScale;
