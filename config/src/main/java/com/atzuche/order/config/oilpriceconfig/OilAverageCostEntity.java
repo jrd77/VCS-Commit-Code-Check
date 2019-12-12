@@ -1,4 +1,4 @@
-package com.atzuche.order.config.oilprice;
+package com.atzuche.order.config.oilpriceconfig;
 
 import java.io.Serializable;
 

@@ -10,9 +10,9 @@ import javax.cache.Cache;
  * @author <a href="mailto:lianglin.sjtu@gmail.com">AndySjtu</a>
  * @date 2019/12/9 3:20 下午
  **/
-public abstract class CacheConfigTemplate<T> {
+public abstract class CacheConfigServiceTemplate<T> {
      
-     private final static Logger logger = LoggerFactory.getLogger(CacheConfigTemplate.class);
+     private final static Logger logger = LoggerFactory.getLogger(CacheConfigServiceTemplate.class);
      
      @Autowired
      private Cache cache;
