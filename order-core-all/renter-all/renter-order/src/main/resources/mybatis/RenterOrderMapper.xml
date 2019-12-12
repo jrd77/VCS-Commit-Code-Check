@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.atzuche.order.mapper.RenterOrderMapper">
+
+    <resultMap type="com.atzuche.order.entity.RenterOrderEntity" id="BaseResultMap">
+        <result property="id" column="id"/>
+        <result property="orderNo" column="order_no"/>
+        <result property="renterOrderNo" column="renter_order_no"/>
+        <result property="expRentStartTime" column="exp_rent_start_time"/>
+        <result property="expRentEndTime" column="exp_rent_end_time"/>
+        <result property="actRentStartTime" column="act_rent_start_time"/>
+        <result property="actRentEndTime" column="act_rent_end_time"/>
+        <result property="goodsCode" column="goods_code"/>
+        <result property="goodsType" column="goods_type"/>
+        <result property="childStatus" column="child_status"/>
+        <result property="isCancle" column="is_cancle"/>
+        <result property="createTime" column="create_time"/>
+        <result property="createOp" column="create_op"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="updateOp" column="update_op"/>
+        <result property="isDelete" column="is_delete"/>
+    </resultMap>
+
+
+	<sql id="Base_Column_List">
+	`id`, 	
+	`order_no`, 	
+	`renter_order_no`, 	
+	`exp_rent_start_time`, 	
+	`exp_rent_end_time`, 	
+	`act_rent_start_time`, 	
+	`act_rent_end_time`, 	
+	`goods_code`, 	
+	`goods_type`, 	
+	`child_status`, 	
+	`is_cancle`, 	
+	`create_time`, 	
+	`create_op`, 	
+	`update_time`, 	
+	`update_op`, 	
+	`is_delete`	
+
+	</sql>
+
+
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap">
+		select <include refid="Base_Column_List" /> from renter_order where id = #{value}
+	</select>
+
+	<select id="selectALL" resultMap="BaseResultMap">
+		select  <include refid="Base_Column_List" /> from renter_order order by id desc
+	</select>
+
+	 
+	<insert id="insert" parameterType="com.atzuche.order.entity.RenterOrderEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into renter_order
+		(
+				`order_no`,		
+				`renter_order_no`,		
+				`exp_rent_start_time`,		
+				`exp_rent_end_time`,		
+				`act_rent_start_time`,		
+				`act_rent_end_time`,		
+				`goods_code`,		
+				`goods_type`,		
+				`child_status`,		
+				`is_cancle`,		
+				`create_time`,		
+				`create_op`,		
+				`update_time`,		
+				`update_op`,		
+				`is_delete`		
+			)
+		values
+		(
+				#{orderNo}, 		
+				#{renterOrderNo}, 		
+				#{expRentStartTime}, 		
+				#{expRentEndTime}, 		
+				#{actRentStartTime}, 		
+				#{actRentEndTime}, 		
+				#{goodsCode}, 		
+				#{goodsType}, 		
+				#{childStatus}, 		
+				#{isCancle}, 		
+				#{createTime}, 		
+				#{createOp}, 		
+				#{updateTime}, 		
+				#{updateOp}, 		
+				#{isDelete}		
+			)
+	</insert>
+	
+	<insert id="insertSelective" parameterType="com.atzuche.order.entity.RenterOrderEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into renter_order
+		(
+				<if test="orderNo != null">`order_no`, </if>
+				<if test="renterOrderNo != null">`renter_order_no`, </if>
+				<if test="expRentStartTime != null">`exp_rent_start_time`, </if>
+				<if test="expRentEndTime != null">`exp_rent_end_time`, </if>
+				<if test="actRentStartTime != null">`act_rent_start_time`, </if>
+				<if test="actRentEndTime != null">`act_rent_end_time`, </if>
+				<if test="goodsCode != null">`goods_code`, </if>
+				<if test="goodsType != null">`goods_type`, </if>
+				<if test="childStatus != null">`child_status`, </if>
+				<if test="isCancle != null">`is_cancle`, </if>
+				<if test="createTime != null">`create_time`, </if>
+				<if test="createOp != null">`create_op`, </if>
+				<if test="updateTime != null">`update_time`, </if>
+				<if test="updateOp != null">`update_op`, </if>
+				<if test="isDelete != null">`is_delete` </if>
+			)
+		values
+		(
+				<if test="orderNo != null">#{orderNo},  </if>
+				<if test="renterOrderNo != null">#{renterOrderNo},  </if>
+				<if test="expRentStartTime != null">#{expRentStartTime},  </if>
+				<if test="expRentEndTime != null">#{expRentEndTime},  </if>
+				<if test="actRentStartTime != null">#{actRentStartTime},  </if>
+				<if test="actRentEndTime != null">#{actRentEndTime},  </if>
+				<if test="goodsCode != null">#{goodsCode},  </if>
+				<if test="goodsType != null">#{goodsType},  </if>
+				<if test="childStatus != null">#{childStatus},  </if>
+				<if test="isCancle != null">#{isCancle},  </if>
+				<if test="createTime != null">#{createTime},  </if>
+				<if test="createOp != null">#{createOp},  </if>
+				<if test="updateTime != null">#{updateTime},  </if>
+				<if test="updateOp != null">#{updateOp},  </if>
+				<if test="isDelete != null">#{isDelete} </if>
+			)
+	</insert>
+	
+	 
+	<update id="updateByPrimaryKeySelective" parameterType="com.atzuche.order.entity.RenterOrderEntity">
+		update renter_order 
+		<set>
+				<if test="orderNo != null">`order_no` = #{orderNo}, </if>
+				<if test="renterOrderNo != null">`renter_order_no` = #{renterOrderNo}, </if>
+				<if test="expRentStartTime != null">`exp_rent_start_time` = #{expRentStartTime}, </if>
+				<if test="expRentEndTime != null">`exp_rent_end_time` = #{expRentEndTime}, </if>
+				<if test="actRentStartTime != null">`act_rent_start_time` = #{actRentStartTime}, </if>
+				<if test="actRentEndTime != null">`act_rent_end_time` = #{actRentEndTime}, </if>
+				<if test="goodsCode != null">`goods_code` = #{goodsCode}, </if>
+				<if test="goodsType != null">`goods_type` = #{goodsType}, </if>
+				<if test="childStatus != null">`child_status` = #{childStatus}, </if>
+				<if test="isCancle != null">`is_cancle` = #{isCancle}, </if>
+				<if test="createTime != null">`create_time` = #{createTime}, </if>
+				<if test="createOp != null">`create_op` = #{createOp}, </if>
+				<if test="updateTime != null">`update_time` = #{updateTime}, </if>
+				<if test="updateOp != null">`update_op` = #{updateOp}, </if>
+				<if test="isDelete != null">`is_delete` = #{isDelete}</if>
+			</set>
+		where id = #{id}
+	</update>
+	
+	<update id="updateByPrimaryKey" parameterType="com.atzuche.order.entity.RenterOrderEntity">
+		update renter_order 
+		<set>
+				`order_no` = #{orderNo}, 		
+				`renter_order_no` = #{renterOrderNo}, 		
+				`exp_rent_start_time` = #{expRentStartTime}, 		
+				`exp_rent_end_time` = #{expRentEndTime}, 		
+				`act_rent_start_time` = #{actRentStartTime}, 		
+				`act_rent_end_time` = #{actRentEndTime}, 		
+				`goods_code` = #{goodsCode}, 		
+				`goods_type` = #{goodsType}, 		
+				`child_status` = #{childStatus}, 		
+				`is_cancle` = #{isCancle}, 		
+				`create_time` = #{createTime}, 		
+				`create_op` = #{createOp}, 		
+				`update_time` = #{updateTime}, 		
+				`update_op` = #{updateOp}, 		
+				`is_delete` = #{isDelete}		
+	
+		</set>
+		where id = #{id}
+	</update>
+  	
+</mapper>
