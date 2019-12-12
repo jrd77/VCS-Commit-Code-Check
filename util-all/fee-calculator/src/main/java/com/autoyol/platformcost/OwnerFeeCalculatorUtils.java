@@ -29,11 +29,11 @@ public class OwnerFeeCalculatorUtils {
 	
 	/**
 	 * 计算租金
-	 * @param rentTime
-	 * @param revertTime
-	 * @param configHours
-	 * @param carPriceOfDayList
-	 * @return
+	 * @param rentTime 取车时间
+	 * @param revertTime 还车时间
+	 * @param configHours 配置小时数
+	 * @param carPriceOfDayList 车辆天对应价格列表
+	 * @return FeeResult
 	 */
 	public static FeeResult calRentAmt(LocalDateTime rentTime, LocalDateTime revertTime, Integer configHours, List<CarPriceOfDay> carPriceOfDayList) {
 		if (rentTime == null) {
@@ -61,14 +61,15 @@ public class OwnerFeeCalculatorUtils {
 
 	/**
 	 * 计算超里程费用
-	 * @param dayMileage
-	 * @param guideDayPrice
-	 * @param getmileage
-	 * @param returnMileage
-	 * @param rentTime
-	 * @param revertTime
-	 * @param configHours
-	 * @return
+	 * @param carOwnerType 车辆类型
+	 * @param dayMileage 日均限里程数
+	 * @param guideDayPrice 车辆日租金指导价
+	 * @param getmileage 取车里程数
+	 * @param returnMileage 还车里程数
+	 * @param rentTime 取车时间
+	 * @param revertTime 还车时间
+	 * @param configHours 配置小时数
+	 * @return Integer
 	 */
 	public static Integer calMileageAmt(Integer carOwnerType, Integer dayMileage, Integer guideDayPrice, Integer getmileage, Integer returnMileage, LocalDateTime rentTime, LocalDateTime revertTime, Integer configHours) {
 		if (rentTime == null) {
@@ -106,14 +107,15 @@ public class OwnerFeeCalculatorUtils {
 	
 	/**
 	 * 计算油费
-	 * @param cityCode
-	 * @param oilVolume
-	 * @param engineType
-	 * @param getOilScale
-	 * @param returnOilScale
-	 * @param oilAverageList
-	 * @param oilScaleDenominator
-	 * @return
+	 * @param carOwnerType 车辆类型
+	 * @param cityCode 城市编号
+	 * @param oilVolume 油箱容量
+	 * @param engineType 油品类型
+	 * @param getOilScale 取车油表刻度
+	 * @param returnOilScale 还车油表刻度
+	 * @param oilAverageList 油费配置列表
+	 * @param oilScaleDenominator 总刻度数
+	 * @return Integer
 	 */
 	public static Integer calOilAmt(Integer carOwnerType, Integer cityCode, Integer oilVolume, Integer engineType, Integer getOilScale, Integer returnOilScale, List<OilAverageCostBO> oilAverageList, Integer oilScaleDenominator) {
 		//动力类型，1：92号汽油、2：95号汽油、3：0号柴油、4：纯电动、5
@@ -143,11 +145,11 @@ public class OwnerFeeCalculatorUtils {
 	
 	/**
 	 * 计算gps服务费
-	 * @param lsRules
-	 * @param lsGpsSerialNumber
-	 * @param rentTime
-	 * @param revertTime
-	 * @return
+	 * @param lsRules gps服务费计费规则信息
+	 * @param lsGpsSerialNumber 车辆安装gps序列号列表
+	 * @param rentTime 取车时间
+	 * @param revertTime 还车时间
+	 * @return Integer
 	 */
 	public static Integer calGpsServiceAmt(List<CarGpsRule> lsRules, List<Integer> lsGpsSerialNumber, LocalDateTime rentTime, LocalDateTime revertTime) {
 		if (rentTime == null || revertTime == null) {
@@ -173,10 +175,10 @@ public class OwnerFeeCalculatorUtils {
 	
 	/**
 	 * 按配置规则获取gps服务费
-	 * @param lsGps
-	 * @param lsRules
-	 * @param rentDays
-	 * @return
+	 * @param lsGps 车辆安装gps序列号列表
+	 * @param lsRules gps服务费计费规则信息
+	 * @param rentDays 租期
+	 * @return int
 	 */
 	public static int calcGpsAmtAndSaveLogMap(List<Integer> lsGps, List<CarGpsRule> lsRules, Integer rentDays) {
 		if (lsGps == null || lsGps.isEmpty()) {
@@ -222,9 +224,9 @@ public class OwnerFeeCalculatorUtils {
 	
 	/**
 	 * 计算车主取车服务费
-	 * @param carOwnerType
-	 * @param srvGetFlag
-	 * @return
+	 * @param carOwnerType 车辆类型
+	 * @param srvGetFlag 取车标志
+	 * @return Integer
 	 */
 	public static Integer calOwnerSrvGetAmt(Integer carOwnerType, Integer srvGetFlag) {
 		if (srvGetFlag == null || srvGetFlag == 0) {
@@ -239,9 +241,9 @@ public class OwnerFeeCalculatorUtils {
 	
 	/**
 	 * 获取车主还车服务费
-	 * @param carOwnerType
-	 * @param srvReturnFlag
-	 * @return
+	 * @param carOwnerType 车辆类型
+	 * @param srvReturnFlag 还车标志
+	 * @return Integer
 	 */
 	public static Integer calOwnerSrvReturnAmt(Integer carOwnerType, Integer srvReturnFlag) {
 		if (srvReturnFlag == null || srvReturnFlag == 0) {
@@ -255,35 +257,23 @@ public class OwnerFeeCalculatorUtils {
 	
 	
 	/**
-     * 兼容长租平台服务费
-     * @param service_proportion
-     * @param service_max_value
-     * @param service_min_value
-     * @param rentAmt
-     * @param modifyPrice
-     * @param proxy_proportion
-     * @return
-     */
-    public ServiceExpenseInfo calServiceExpenseLongRent(Integer isLongRent,Integer longServiceAmt,Integer serviceProportion, Integer rentAmt, Integer proxyProportion){
+	 * 收取车主端平台服务费
+	 * @param rentAmt 租金
+	 * @param serviceProportion 服务费比例
+	 * @param proxyProportion 代管车比例
+	 * @return ServiceExpenseInfo
+	 */
+    public ServiceExpenseInfo calServiceExpenseLongRent(Integer rentAmt, Integer serviceProportion, Integer proxyProportion){
 		Integer serviceExpense = 0 ;
 	    ServiceExpenseInfo serviceExpenseInfo = new ServiceExpenseInfo();
-	    isLongRent = isLongRent == null ? 0:isLongRent;
 		Integer proxyExpense = 0 ;
-	    if(isLongRent == 0){
-			//取车辆的服务费收取比例，服务费的最大最小限额
-	    	if(serviceProportion != null && serviceProportion != 0 && rentAmt != null){
-                //改成向上取整
-                serviceExpense = new BigDecimal(rentAmt).multiply(new BigDecimal(serviceProportion)).divide(new BigDecimal(100),0,RoundingMode.UP).intValue();
-	    	}else{
-	    		serviceExpense = 0 ;//收费比例为0，不收取平台服务费
-	    	}
-	    }else{
-	    	if(longServiceAmt == null || longServiceAmt < 0){
-	    		longServiceAmt = 0;  //如果平台服务费小于0，默认为0
-	    	}
-	    	serviceExpense = longServiceAmt;
-	    	
-	    }
+		//取车辆的服务费收取比例，服务费的最大最小限额
+    	if(serviceProportion != null && serviceProportion != 0 && rentAmt != null){
+            //改成向上取整
+            serviceExpense = new BigDecimal(rentAmt).multiply(new BigDecimal(serviceProportion)).divide(new BigDecimal(100),0,RoundingMode.UP).intValue();
+    	}else{
+    		serviceExpense = 0 ;//收费比例为0，不收取平台服务费
+    	}
 		//收取代管车服务费
     	if(proxyProportion != null && proxyProportion != 0 && rentAmt != null){
             //改成向上取整
