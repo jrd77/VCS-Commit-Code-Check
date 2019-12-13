@@ -4,11 +4,15 @@ import com.atzuche.order.dto.AccountDeductDebtDTO;
 import com.atzuche.order.entity.AccountDebtDetailEntity;
 import com.atzuche.order.exception.AccountDebtException;
 import com.atzuche.order.mapper.AccountDebtDetailMapper;
+import com.atzuche.order.vo.req.AccountInsertDebtReqVO;
 import com.autoyol.commons.web.ErrorCode;
+import org.apache.commons.lang3.math.NumberUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 
@@ -44,5 +48,21 @@ public class AccountDebtDetailNoTService {
               throw new AccountDebtException(ErrorCode.FAILED);
           }
        }
+    }
+
+
+    public void insertDebtDetail(AccountInsertDebtReqVO accountInsertDebt) {
+        AccountDebtDetailEntity accountDebtDetail = new AccountDebtDetailEntity();
+        BeanUtils.copyProperties(accountInsertDebt,accountDebtDetail);
+        LocalDateTime now = LocalDateTime.now();
+        accountDebtDetail.setUpdateTime(now);
+        accountDebtDetail.setCreateTime(now);
+        accountDebtDetail.setCurrentDebtAmt(accountInsertDebt.getAmt());
+        accountDebtDetail.setOrderDebtAmt(accountInsertDebt.getAmt());
+        accountDebtDetail.setRepaidDebtAmt(NumberUtils.INTEGER_ZERO);
+        int result = accountDebtDetailMapper.insert(accountDebtDetail);
+        if(result==0){
+            throw new AccountDebtException(ErrorCode.FAILED);
+        }
     }
 }

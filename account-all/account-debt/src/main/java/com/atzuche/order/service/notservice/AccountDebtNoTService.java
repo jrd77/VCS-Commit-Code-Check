@@ -4,6 +4,7 @@ import com.atzuche.order.dto.AccountDeductDebtDTO;
 import com.atzuche.order.entity.AccountDebtEntity;
 import com.atzuche.order.exception.AccountDebtException;
 import com.atzuche.order.mapper.AccountDebtMapper;
+import com.atzuche.order.vo.req.AccountInsertDebtReqVO;
 import com.atzuche.order.vo.res.AccountDebtResVO;
 import com.autoyol.commons.web.ErrorCode;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -59,17 +60,34 @@ public class AccountDebtNoTService {
      * 抵扣还款  欠款表记录更新
      * @param accountDeductDebt
      */
-    public void updateAccountDebt(AccountDeductDebtDTO accountDeductDebt) {
+    public void deductAccountDebt(AccountDeductDebtDTO accountDeductDebt) {
         //1 查询用户欠款总和
         AccountDebtEntity accountDebtEntity =  accountDebtMapper.getAccountDebtByMemNo(accountDeductDebt.getMemNo());
         if(Objects.isNull(accountDebtEntity) || Objects.isNull(accountDebtEntity.getId())){
             throw new AccountDebtException(ErrorCode.FAILED);
         }
         accountDebtEntity.setDebtAmt(accountDebtEntity.getDebtAmt()-Math.abs(accountDeductDebt.getAmtReal()));
-        int result = accountDebtMapper.updateByPrimaryKey(accountDebtEntity);
+        int result = accountDebtMapper.updateByPrimaryKeySelective(accountDebtEntity);
         if(result==0){
             throw new AccountDebtException(ErrorCode.FAILED);
         }
+    }
 
+    /**
+     *  新产生欠款  更新总欠款
+     * @param accountInsertDebt
+     */
+    public void productAccountDebt(AccountInsertDebtReqVO accountInsertDebt) {
+        //1 查询用户欠款总和
+        AccountDebtEntity accountDebtEntity =  accountDebtMapper.getAccountDebtByMemNo(accountInsertDebt.getMemNo());
+        if(Objects.isNull(accountDebtEntity) || Objects.isNull(accountDebtEntity.getId())){
+            throw new AccountDebtException(ErrorCode.FAILED);
+        }
+        int amt = accountDebtEntity.getDebtAmt()+Math.abs(accountInsertDebt.getAmt());
+        accountDebtEntity.setDebtAmt(amt);
+        int result = accountDebtMapper.updateByPrimaryKeySelective(accountDebtEntity);
+        if(result==0){
+            throw new AccountDebtException(ErrorCode.FAILED);
+        }
     }
 }

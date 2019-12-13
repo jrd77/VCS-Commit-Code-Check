@@ -21,8 +21,6 @@ public interface AccountDebtMapper{
     
     int insertSelective(AccountDebtEntity record);
 
-    int updateByPrimaryKey(AccountDebtEntity record);
-    
     int updateByPrimaryKeySelective(AccountDebtEntity record);
 
     /**根据会员号查询个人总欠款信息

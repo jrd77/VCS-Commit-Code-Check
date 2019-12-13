@@ -73,17 +73,20 @@ public class AccountDeductDebtDTO {
             amt = amt - Math.abs(accountDebtDetailAll.getCurrentDebtAmt());
             if(amt>0){
                 accountDebtDetailAll.setCurrentDebtAmt(NumberUtils.INTEGER_ZERO);
+                accountDebtDetailAll.setRepaidDebtAmt(Math.abs(accountDebtDetailAll.getOrderDebtAmt()));
                 accountDebtDetailTodos.add(accountDebtDetailAll);
                 amtReal = amtReal + Math.abs(accountDebtDetailAll.getCurrentDebtAmt());
             }
             if(amt==0){
                 accountDebtDetailAll.setCurrentDebtAmt(NumberUtils.INTEGER_ZERO);
+                accountDebtDetailAll.setRepaidDebtAmt(Math.abs(accountDebtDetailAll.getOrderDebtAmt()));
                 accountDebtDetailTodos.add(accountDebtDetailAll);
                 amtReal = amtReal + Math.abs(accountDebtDetailAll.getCurrentDebtAmt());
                 break;
             }
             if(amt<0){
                 accountDebtDetailAll.setCurrentDebtAmt(-Math.abs(amt));
+                accountDebtDetailAll.setRepaidDebtAmt(accountDebtDetailAll.getCurrentDebtAmt()-accountDebtDetailAll.getOrderDebtAmt());
                 accountDebtDetailTodos.add(accountDebtDetailAll);
                 amtReal = amtReal + (Math.abs(accountDebtDetailAll.getCurrentDebtAmt()) - Math.abs(amt));
                 break;
@@ -94,7 +97,7 @@ public class AccountDeductDebtDTO {
         setAccountDebtDetailTodos(accountDebtDetailTodos);
         setAmtReal(amtReal);
         //3 记录收款数据
-        List<AccountDebtReceivableaDetailEntity>  accountDebtReceivableaDetails = new ArrayList<>();
+        List<AccountDebtReceivableaDetailEntity> accountDebtReceivableaDetails = new ArrayList<>();
         for(int i =0;i<accountDebtDetailTodos.size();i++){
             AccountDebtDetailEntity accountDebtDetailEntity = accountDebtDetailTodos.get(i);
             AccountDebtReceivableaDetailEntity accountDebtReceivableaDetail = new AccountDebtReceivableaDetailEntity();
