@@ -20,7 +20,7 @@ public class SubmitOrderController {
      *
      **/
     @PostMapping("/")
-    public void submitOrder(@RequestBody @Validated SubmitReqDto submitReqDto, BindingResult bindingResult){
+    public void submitOrder(@RequestBody SubmitReqDto submitReqDto){
 
         submitOrderService.submitOrder(submitReqDto);
 

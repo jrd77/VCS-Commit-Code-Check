@@ -32,7 +32,8 @@ dependencies {
 	compile("com.autoyol:auto-doc:1.0-SNAPSHOT"){
             exclude module:'servlet-api'
         }
-
+    compile "com.autoyol:memberDetailService-api:1.0.0-SNAPSHOT"
+    
     compile project(":config")
     compile project(":casier-all:cashier-account")
     compile project(":account-all:account-debt")

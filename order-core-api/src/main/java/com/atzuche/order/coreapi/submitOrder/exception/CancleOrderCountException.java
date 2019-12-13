@@ -1,6 +1,5 @@
 package com.atzuche.order.coreapi.submitOrder.exception;
 
-import com.atzuche.order.coreapi.exception.SubmitOrderException;
 import com.autoyol.commons.web.ErrorCode;
 /*
  * @Author ZhangBin
