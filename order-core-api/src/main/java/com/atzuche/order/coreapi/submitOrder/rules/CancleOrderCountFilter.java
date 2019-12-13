@@ -2,7 +2,7 @@ package com.atzuche.order.coreapi.submitOrder.rules;
 
 import com.atzuche.order.coreapi.dto.OrderContextDto;
 import com.atzuche.order.coreapi.dto.SubmitReqDto;
-import com.atzuche.order.coreapi.exception.SubmitOrderException;
+import com.atzuche.order.coreapi.submitOrder.exception.SubmitOrderException;
 import com.atzuche.order.coreapi.submitOrder.exception.CancleOrderCountException;
 import com.atzuche.order.coreapi.submitOrder.filter.BaseFilter;
 import com.autoyol.commons.web.ErrorCode;

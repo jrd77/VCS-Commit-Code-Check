@@ -1,4 +1,4 @@
-package com.atzuche.order.coreapi.exception;
+package com.atzuche.order.coreapi.submitOrder.exception;
 
 import com.autoyol.commons.web.ErrorCode;
 
