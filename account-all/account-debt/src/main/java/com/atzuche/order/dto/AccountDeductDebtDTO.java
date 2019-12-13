@@ -103,6 +103,7 @@ public class AccountDeductDebtDTO {
             accountDebtReceivableaDetail.setUpdateTime(now);
             accountDebtReceivableaDetail.setTime(now);
             accountDebtReceivableaDetail.setDebtDetailId(accountDebtDetailEntity.getId());
+            accountDebtReceivableaDetail.setOrderNo(accountDebtDetailEntity.getOrderNo());
             accountDebtReceivableaDetails.add(accountDebtReceivableaDetail);
         }
         //  set记录收款数据
