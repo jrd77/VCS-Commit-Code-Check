@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import com.autoyol.platformcost.enums.ExceptionCodeEnum;
+import com.autoyol.platformcost.exception.RenterFeeCostException;
 import com.autoyol.platformcost.model.AbatementConfig;
 import com.autoyol.platformcost.model.CarDepositAmtVO;
 import com.autoyol.platformcost.model.CarPriceOfDay;
@@ -35,28 +37,43 @@ public class RenterFeeCalculatorUtils {
 	public static final Integer RENT_ADJUST_AMT_INNER = 300; //内部员工调价金额支付300元。  租车预授权=租金+保险+去送车+不计免赔+300
 	public static final Map<Integer, Integer> ILLEGAL_DEPOSIT = new HashMap<Integer, Integer>() {
         private static final long serialVersionUID = 1L;
-
         {
             put(0, 2000);  //非内部员工。2000
             put(1, 1);  //内部员工，1
         }
     };
+    
 	/**
 	 * 计算租金
-	 * @param rentTime
-	 * @param revertTime
-	 * @param configHours
-	 * @param carPriceOfDayList
-	 * @return
+	 * @param rentTime 取车时间
+	 * @param revertTime 还车时间
+	 * @param configHours 配置小时数
+	 * @param carPriceOfDayList 车辆日期价格列表
+	 * @return FeeResult
 	 */
 	public static FeeResult calRentAmt(LocalDateTime rentTime, LocalDateTime revertTime, Integer configHours, List<CarPriceOfDay> carPriceOfDayList) {
+		if (rentTime == null) {
+			throw new RenterFeeCostException(ExceptionCodeEnum.RENT_TIME_IS_NULL);
+		}
+		if (revertTime == null) {
+			throw new RenterFeeCostException(ExceptionCodeEnum.REVERT_TIME_IS_NULL);
+		}
+		if (carPriceOfDayList == null || carPriceOfDayList.isEmpty()) {
+			throw new RenterFeeCostException(ExceptionCodeEnum.CAR_DAY_PRICE_LIST_IS_EMPTY);
+		}
 		// 计算日均价
 		Integer holidayAverage = getHolidayAverageRentAMT(rentTime, revertTime, carPriceOfDayList);
+		if (holidayAverage == null) {
+			throw new RenterFeeCostException(ExceptionCodeEnum.CAL_HOLIDAY_AVERAGE_PRICE_EXCEPTION);
+		}
 		// 计算总租期
 		Double rentDays = CommonUtils.getRentDays(rentTime, revertTime, configHours);
+		if (rentDays == null) {
+			throw new RenterFeeCostException(ExceptionCodeEnum.COUNT_RENT_DAY_EXCEPTION);
+		}
 		// 总租金
 		Integer rentAmt = new BigDecimal(holidayAverage*rentDays).setScale(0, BigDecimal.ROUND_HALF_UP).intValue();
-		rentAmt = rentAmt < 1 ? 1 : rentAmt;
+		rentAmt = (rentAmt == null || rentAmt < 1) ? 1 : rentAmt;
 		FeeResult feeResult = new FeeResult();
 		feeResult.setTotalFee(rentAmt);
 		feeResult.setUnitCount(rentDays);
@@ -67,13 +84,22 @@ public class RenterFeeCalculatorUtils {
 	
 	/**
 	 * 计算日均价
-	 * @param rentTime
-	 * @param revertTime
-	 * @param configHours
-	 * @param carPriceOfDayList
-	 * @return
+	 * @param rentTime 取车时间
+	 * @param revertTime 还车时间
+	 * @param configHours 配置小时数
+	 * @param carPriceOfDayList 车辆日期价格列表
+	 * @return Integer
 	 */
 	public static Integer getHolidayAverageRentAMT(LocalDateTime rentTime, LocalDateTime revertTime, List<CarPriceOfDay> carPriceOfDayList) {
+		if (rentTime == null) {
+			throw new RenterFeeCostException(ExceptionCodeEnum.RENT_TIME_IS_NULL);
+		}
+		if (revertTime == null) {
+			throw new RenterFeeCostException(ExceptionCodeEnum.REVERT_TIME_IS_NULL);
+		}
+		if (carPriceOfDayList == null || carPriceOfDayList.isEmpty()) {
+			throw new RenterFeeCostException(ExceptionCodeEnum.CAR_DAY_PRICE_LIST_IS_EMPTY);
+		}
 		List<String> days = CommonUtils.getHolidayRentDays(rentTime, revertTime);
 		float totalHours = CommonUtils.getTotalHoursByRentAveragePrice(rentTime, revertTime);
 		if (days != null && !days.isEmpty()) {
@@ -131,22 +157,33 @@ public class RenterFeeCalculatorUtils {
 	
 	/**
 	 * 计算总的全面保障费
-	 * @param rentTime
-	 * @param revertTime
-	 * @param getCarBeforeTime
-	 * @param returnCarAfterTime
-	 * @param configHours
-	 * @param guidPrice
-	 * @param coefficient
-	 * @param easyCoefficient
-	 * @return
+	 * @param rentTime 取车时间
+	 * @param revertTime 还车时间
+	 * @param getCarBeforeTime 提前时间（分钟数）
+	 * @param returnCarAfterTime 延后时间（分钟数）
+	 * @param configHours 配置小时数
+	 * @param guidPrice 车辆指导价
+	 * @param coefficient 会员系数
+	 * @param easyCoefficient 车辆标签系数
+	 * @return List<FeeResult>
 	 */
 	public static List<FeeResult> calcAbatementAmt(LocalDateTime rentTime, LocalDateTime revertTime, Integer getCarBeforeTime,Integer returnCarAfterTime, Integer configHours, Integer guidPrice, Double coefficient, Double easyCoefficient) {
+		if (rentTime == null) {
+			throw new RenterFeeCostException(ExceptionCodeEnum.RENT_TIME_IS_NULL);
+		}
+		if (revertTime == null) {
+			throw new RenterFeeCostException(ExceptionCodeEnum.REVERT_TIME_IS_NULL);
+		}
+		coefficient = coefficient == null ? 1.0:coefficient;
+		easyCoefficient = easyCoefficient == null ? 1.0:easyCoefficient;
 		// 计算提前延后时间
 		rentTime = CommonUtils.calBeforeTime(rentTime, getCarBeforeTime);
 		revertTime = CommonUtils.calAfterTime(revertTime, returnCarAfterTime);
 		// 计算租期
 		Double abatementDay = CommonUtils.getRentDays(rentTime, revertTime, configHours);
+		if (abatementDay == null) {
+			throw new RenterFeeCostException(ExceptionCodeEnum.COUNT_RENT_DAY_EXCEPTION);
+		}
 		if (guidPrice == null) {
 			guidPrice = CARPURCHASEPRICE_250000;
 		}
@@ -170,6 +207,15 @@ public class RenterFeeCalculatorUtils {
 	}
 	
 	
+	/**
+	 * 获取全面保障费阶梯价格
+	 * @param abatementConfig 价格配置
+	 * @param abatementDay 租期
+	 * @param coefficient 会员系数
+	 * @param easyCoefficient 车辆标签系数
+	 * @param size 大小
+	 * @return List<FeeResult>
+	 */
 	public static List<FeeResult> getFeeResultList(AbatementConfig abatementConfig, Double abatementDay, Double coefficient, Double easyCoefficient, Integer size) {
 		List<FeeResult> feeResultList = new ArrayList<FeeResult>();
 		for (int i=0; i<size; i++) {
@@ -200,25 +246,42 @@ public class RenterFeeCalculatorUtils {
 	
 	/**
 	 * 计算平台保障费
-	 * @param rentTime
-	 * @param revertTime
-	 * @param getCarBeforeTime
-	 * @param returnCarAfterTime
-	 * @param configHours
-	 * @param guidPrice
-	 * @param coefficient
-	 * @param easyCoefficient
-	 * @param insuranceConfigs
-	 * @return
+	 * @param rentTime 取车时间
+	 * @param revertTime 还车时间
+	 * @param getCarBeforeTime 提前时间（分钟数）
+	 * @param returnCarAfterTime 延后时间（分钟数）
+	 * @param configHours 配置小时数
+	 * @param guidPrice 车辆指导价
+	 * @param coefficient 会员系数
+	 * @param easyCoefficient 车辆标签系数
+	 * @param insuranceConfigs 平台保障费配置列表
+	 * @return FeeResult
 	 */
 	public static FeeResult calInsurAmt(LocalDateTime rentTime, LocalDateTime revertTime, Integer getCarBeforeTime,Integer returnCarAfterTime, Integer configHours, Integer guidPrice, Double coefficient, Double easyCoefficient, List<InsuranceConfig> insuranceConfigs) {
+		if (rentTime == null) {
+			throw new RenterFeeCostException(ExceptionCodeEnum.RENT_TIME_IS_NULL);
+		}
+		if (revertTime == null) {
+			throw new RenterFeeCostException(ExceptionCodeEnum.REVERT_TIME_IS_NULL);
+		}
+		if (insuranceConfigs == null || insuranceConfigs.isEmpty()) {
+			throw new RenterFeeCostException(ExceptionCodeEnum.INSURE_CONFIG_LIST_IS_EMPTY);
+		}
+		coefficient = coefficient == null ? 1.0:coefficient;
+		easyCoefficient = easyCoefficient == null ? 1.0:easyCoefficient;
 		// 计算提前延后时间
 		rentTime = CommonUtils.calBeforeTime(rentTime, getCarBeforeTime);
 		revertTime = CommonUtils.calAfterTime(revertTime, returnCarAfterTime);
 		// 计算租期
 		Double insurDays = CommonUtils.getRentDays(rentTime, revertTime, configHours);
+		if (insurDays == null) {
+			throw new RenterFeeCostException(ExceptionCodeEnum.COUNT_RENT_DAY_EXCEPTION);
+		}
 		// 计算单价
 		Integer unitInsurance = getUnitInsurance(guidPrice, insuranceConfigs);
+		if (unitInsurance == null) {
+			throw new RenterFeeCostException(ExceptionCodeEnum.INSURE_UNIT_PRICE_EXCEPTION);
+		}
 		// 经过系数后的单价
 		unitInsurance = (int) Math.ceil(unitInsurance*coefficient*easyCoefficient);
 		// 总价
@@ -233,11 +296,9 @@ public class RenterFeeCalculatorUtils {
 	
 	/**
 	 * 根据车辆的购置价和购买年月(计算出折旧后的价格)，获得保费（单价）/天(普通订单)
-	 * @param purchasePrice
-	 * @param boughtYear
-	 * @param boughtMonth
-	 * @param insuranceConfigs
-	 * @return
+	 * @param purchasePrice 车辆指导价
+	 * @param insuranceConfigs 平台保障费配置列表
+	 * @return Integer
 	 */
 	public static Integer getUnitInsurance(Integer purchasePrice, List<InsuranceConfig> insuranceConfigs) {
 		Integer unitInsurAmt = UNIT_INSUR_AMT_INIT;
@@ -271,13 +332,21 @@ public class RenterFeeCalculatorUtils {
 	
 	/**
 	 * 计算附加驾驶人保障费用
-	 * @param unitExtraDriverInsure
-	 * @param extraDriverCount
-	 * @param rentTime
-	 * @param revertTime
-	 * @return
+	 * @param unitExtraDriverInsure 附加险单价
+	 * @param extraDriverCount 附加驾驶人数
+	 * @param rentTime 取车时间
+	 * @param revertTime 还车时间
+	 * @return FeeResult
 	 */
 	public static FeeResult calExtraDriverInsureAmt(Integer unitExtraDriverInsure,Integer extraDriverCount, LocalDateTime rentTime, LocalDateTime revertTime) {
+		if (rentTime == null) {
+			throw new RenterFeeCostException(ExceptionCodeEnum.RENT_TIME_IS_NULL);
+		}
+		if (revertTime == null) {
+			throw new RenterFeeCostException(ExceptionCodeEnum.REVERT_TIME_IS_NULL);
+		}
+		unitExtraDriverInsure = unitExtraDriverInsure == null ? 20:unitExtraDriverInsure;
+		extraDriverCount = extraDriverCount == null ? 0:extraDriverCount;
 		long totalDays = CommonUtils.getDaysUpCeil(rentTime, revertTime);
 		Integer totalFee = (int) (unitExtraDriverInsure*totalDays*extraDriverCount);
 		FeeResult feeResult = new FeeResult();
@@ -289,14 +358,14 @@ public class RenterFeeCalculatorUtils {
 	
 	/**
 	 * 计算车辆押金
-	 * @param InternalStaff
-	 * @param cityCode
-	 * @param guidPrice
-	 * @param carBrandTypeRadio
-	 * @param carYearRadio
-	 * @param depositList
-	 * @param reliefPercetage
-	 * @return
+	 * @param InternalStaff 是否内部员工（1是，其他否）
+	 * @param cityCode 城市编号
+	 * @param guidPrice 车辆残值
+	 * @param carBrandTypeRadio 车型品牌系数
+	 * @param carYearRadio 车辆年份系数
+	 * @param depositList 押金配置列表
+	 * @param reliefPercetage 减免比例
+	 * @return CarDepositAmtVO
 	 */
 	public static CarDepositAmtVO calCarDepositAmt(Integer InternalStaff, Integer cityCode, Integer guidPrice, Double carBrandTypeRadio, Double carYearRadio, List<DepositText> depositList, Double reliefPercetage) {
 		if (INTERNAL_STAFF_FLAG.equals(InternalStaff)) {
@@ -308,7 +377,7 @@ public class RenterFeeCalculatorUtils {
 	
 	/**
 	 * 计算车辆押金(内部员工)
-	 * @return
+	 * @return CarDepositAmtVO
 	 */
 	public static CarDepositAmtVO calCarDepositAmt() {
 		CarDepositAmtVO carDepositAmtVO = new CarDepositAmtVO();
@@ -322,15 +391,19 @@ public class RenterFeeCalculatorUtils {
 	
 	/**
 	 * 计算车辆押金(外部员工)
-	 * @param cityCode
-	 * @param guidPrice
-	 * @param carBrandTypeRadio
-	 * @param carYearRadio
-	 * @param depositList
-	 * @param reliefPercetage
-	 * @return
+	 * @param cityCode 城市编号
+	 * @param guidPrice 车辆残值
+	 * @param carBrandTypeRadio 车型品牌系数
+	 * @param carYearRadio 车辆年份系数
+	 * @param depositList 押金配置列表
+	 * @param reliefPercetage 减免比例
+	 * @return CarDepositAmtVO
 	 */
 	public static CarDepositAmtVO calCarDepositAmt(Integer cityCode, Integer guidPrice, Double carBrandTypeRadio, Double carYearRadio, List<DepositText> depositList, Double reliefPercetage) {
+		if (guidPrice == null) {
+			throw new RenterFeeCostException(ExceptionCodeEnum.GUID_PRICE_IS_NULL);
+		}
+		reliefPercetage = reliefPercetage == null ? 0.0:reliefPercetage;
 		//初始化车辆押金
 		Integer suggestTotal = getSuggestTotalAmt(guidPrice);
 		Boolean carbool = true;
@@ -396,8 +469,8 @@ public class RenterFeeCalculatorUtils {
 	
 	/**
 	 * 根据车辆的购买价格计算建议的租车押金（预授权额度）
-	 * @param surplusPrice
-	 * @return
+	 * @param purchasePrice 车辆残值
+	 * @return Integer
 	 */
 	public static Integer getSuggestTotalAmt(Integer purchasePrice){
 		int minPrice = 0;
@@ -415,22 +488,22 @@ public class RenterFeeCalculatorUtils {
 	
 	/**
 	 * 计算违章押金
-	 * @param internalStaff
-	 * @param cityCode
-	 * @param carPlateNum
-	 * @param specialCityCodes
-	 * @param specialIllegalDepositAmt
-	 * @param illegalDepositList
-	 * @param rentTime
-	 * @param revertTime
-	 * @return
+	 * @param internalStaff 是否内部员工（1是，其他否）
+	 * @param cityCode 城市编号
+	 * @param carPlateNum 车牌号
+	 * @param specialCityCodes 特殊城市（逗号分隔的城市编码）
+	 * @param specialIllegalDepositAmt 特殊车牌合特殊城市对应的特殊押金值
+	 * @param illegalDepositList 违章押金配置
+	 * @param rentTime 取车时间
+	 * @param revertTime 还车时间
+	 * @return Integer
 	 */
 	public static Integer calIllegalDepositAmt(Integer internalStaff, Integer cityCode, String carPlateNum, String specialCityCodes, Integer specialIllegalDepositAmt,
 			List<IllegalDepositConfig> illegalDepositList, LocalDateTime rentTime, LocalDateTime revertTime) {
 		internalStaff = internalStaff == null ? 0:internalStaff;
 		Integer illegalDepositAmt = ILLEGAL_DEPOSIT.get(0);
 		if (carPlateNum != null && !"".equals(carPlateNum) && specialCityCodes != null && !"".equals(specialCityCodes)) {
-			if("粤".equals(carPlateNum.substring(0,1)) && specialCityCodes.contains(String.valueOf(cityCode))){
+			if("粤".equals(carPlateNum.substring(0,1)) && cityCode != null && specialCityCodes.contains(String.valueOf(cityCode))){
 				illegalDepositAmt = specialIllegalDepositAmt == null ? illegalDepositAmt:specialIllegalDepositAmt;
 				return illegalDepositAmt;
 	        }
@@ -445,11 +518,11 @@ public class RenterFeeCalculatorUtils {
 	
 	/**
 	 * 通过配置获取对应的违章押金
-	 * @param cityCode
-	 * @param illegalDepositList
-	 * @param rentTime
-	 * @param revertTime
-	 * @return
+	 * @param cityCode 城市编号
+	 * @param illegalDepositList 违章押金配置列表
+	 * @param rentTime 取车时间
+	 * @param revertTime 还车时间
+	 * @return Integer
 	 */
 	public static Integer getIllegalDepositAmt(Integer cityCode, List<IllegalDepositConfig> illegalDepositList, LocalDateTime rentTime, LocalDateTime revertTime) {
 		Integer illegalDepositAmt = ILLEGAL_DEPOSIT.get(0);
@@ -480,16 +553,22 @@ public class RenterFeeCalculatorUtils {
 	
 	/**
 	 * 计算超里程费用
-	 * @param dayMileage
-	 * @param guideDayPrice
-	 * @param getmileage
-	 * @param returnMileage
-	 * @param rentTime
-	 * @param revertTime
-	 * @param configHours
-	 * @return
+	 * @param dayMileage 日均限里程数
+	 * @param guideDayPrice 车辆日租金指导价
+	 * @param getmileage 取车里程数
+	 * @param returnMileage 还车里程数
+	 * @param rentTime 取车时间
+	 * @param revertTime 还车时间
+	 * @param configHours 配置小时数
+	 * @return Integer
 	 */
 	public static Integer calMileageAmt(Integer dayMileage, Integer guideDayPrice, Integer getmileage, Integer returnMileage, LocalDateTime rentTime, LocalDateTime revertTime, Integer configHours) {
+		if (rentTime == null) {
+			throw new RenterFeeCostException(ExceptionCodeEnum.RENT_TIME_IS_NULL);
+		}
+		if (revertTime == null) {
+			throw new RenterFeeCostException(ExceptionCodeEnum.REVERT_TIME_IS_NULL);
+		}
 		if (getmileage == null || returnMileage == null || (getmileage >= returnMileage)) {
 			return 0;
 		}
@@ -515,18 +594,21 @@ public class RenterFeeCalculatorUtils {
 	
 	/**
 	 * 计算油费
-	 * @param cityCode
-	 * @param oilVolume
-	 * @param engineType
-	 * @param getOilScale
-	 * @param returnOilScale
-	 * @param oilAverageList
-	 * @param oilScaleDenominator
-	 * @return
+	 * @param cityCode 城市编号
+	 * @param oilVolume 油箱容量
+	 * @param engineType 油品类型
+	 * @param getOilScale 取车油表刻度
+	 * @param returnOilScale 还车油表刻度
+	 * @param oilAverageList 油费单价配置列表
+	 * @param oilScaleDenominator 总油表刻度
+	 * @return Integer
 	 */
 	public static Integer calOilAmt(Integer cityCode, Integer oilVolume, Integer engineType, Integer getOilScale, Integer returnOilScale, List<OilAverageCostBO> oilAverageList, Integer oilScaleDenominator) {
 		//动力类型，1：92号汽油、2：95号汽油、3：0号柴油、4：纯电动、5
 		if (engineType==null||oilVolume==null||oilVolume==0||getOilScale==null||returnOilScale==null) {
+			return 0;
+		}
+		if (oilScaleDenominator == null || oilScaleDenominator == 0) {
 			return 0;
 		}
 		Integer oilVolumeChange = getOilScale - returnOilScale;

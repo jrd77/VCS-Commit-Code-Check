@@ -61,12 +61,10 @@ public class CommonUtils {
 
 	/**
 	 * 获取向上取整天数
-	 *
 	 * 总小时/24 有余数加1天
-	 * @param rentTime
-	 * @param revertTime
-	 * @return
-	 * @throws ParseException
+	 * @param rentTime 取车时间
+	 * @param revertTime 还车时间
+	 * @return long
 	 */
 	public static long getDaysUpCeil(LocalDateTime rentTime, LocalDateTime revertTime) {
 		Duration duration = Duration.between(rentTime, revertTime);
@@ -85,10 +83,10 @@ public class CommonUtils {
 	
 	/**
 	   * 计算租期
-	 * @param rentTime
-	 * @param revertTime
-	 * @param configHours
-	 * @return
+	 * @param rentTime 取车时间
+	 * @param revertTime 还车时间
+	 * @param configHours 配置小时
+	 * @return Double
 	 */
 	public static Double getRentDays(LocalDateTime rentTime, LocalDateTime revertTime, Integer configHours) {
 		if (configHours == null) {
@@ -114,9 +112,9 @@ public class CommonUtils {
 	
 	/**
 	 * 计算提前时间
-	 * @param rentTime
-	 * @param getCarBeforeTime
-	 * @return
+	 * @param rentTime 取车时间
+	 * @param getCarBeforeTime 提前时间（单位分钟）
+	 * @return LocalDateTime
 	 */
 	public static LocalDateTime calBeforeTime(LocalDateTime rentTime, Integer getCarBeforeTime){
 		if (rentTime == null) {
@@ -131,9 +129,9 @@ public class CommonUtils {
 	
 	/**
 	 * 计算延后时间
-	 * @param revertTime
-	 * @param returnCarAfterTime
-	 * @return
+	 * @param revertTime 还车时间
+	 * @param returnCarAfterTime 延后时间（单位分钟）
+	 * @return LocalDateTime
 	 */
 	public static LocalDateTime calAfterTime(LocalDateTime revertTime, Integer returnCarAfterTime){
 		if (revertTime == null) {
@@ -149,9 +147,9 @@ public class CommonUtils {
 	
 	/**
 	 * 计算总小时数（计算日均价用）
-	 * @param rentTime
-	 * @param revertTime
-	 * @return
+	 * @param rentTime 取车时间
+	 * @param revertTime 还车时间
+	 * @return float
 	 */
 	public static float getTotalHoursByRentAveragePrice(LocalDateTime rentTime, LocalDateTime revertTime) {
 		Duration duration = Duration.between(rentTime, revertTime);
@@ -176,10 +174,9 @@ public class CommonUtils {
 	
 	/**
 	 * 计算起租时间到这一天的24点的小时数
-	 * @param rentTime
-	 * @param day
-	 * @return
-	 * @throws ParseException
+	 * @param rentTime 取车时间
+	 * @param endDay 截止日期
+	 * @return float
 	 */
 	public static float getHolidayTopHours(LocalDateTime rentTime,String endDay) {
 		// 59:59:59  ---> 23:59:59  24小时制
@@ -206,10 +203,9 @@ public class CommonUtils {
 	
 	/**
 	 * 计算起租时间到这一天的24点的小时数
-	 * @param rentTime
-	 * @param day
-	 * @return
-	 * @throws ParseException
+	 * @param revertTime 还车时间
+	 * @param beginDay 开始日期
+	 * @return float
 	 */
 	public static float getHolidayFootHours(LocalDateTime revertTime,String beginDay) {
 		// 59:59:59  ---> 23:59:59  24小时制
@@ -239,10 +235,9 @@ public class CommonUtils {
 	 * //列表只有1个，代表的是当天。
 	   //列表只有2个，代表的是两天都是不完整的。
 	   //列表大于3个，中间才有完整的一天
-	 * @param rentTime
-	 * @param revertTime
-	 * @return
-	 * @throws ParseException 
+	 * @param rentTime 取车时间
+	 * @param revertTime 还车时间
+	 * @return List<String>
 	 */
 	public static List<String> getHolidayRentDays(LocalDateTime rentTime,LocalDateTime revertTime) {
 		List<String> dateList = new ArrayList<String>();
@@ -252,9 +247,9 @@ public class CommonUtils {
 	
 	/**
 	 * 获取天数
-	 * @param calendar
-	 * @param revertTime
-	 * @param dateList
+	 * @param rentTime 取车时间
+	 * @param revertTime 还车时间
+	 * @param dateList 日期列表
 	 */
 	private static void addHolidayRentDays(LocalDateTime rentTime, LocalDateTime revertTime, List<String> dateList) {
 		dateList.add(rentTime.toLocalDate().toString());
@@ -279,10 +274,8 @@ public class CommonUtils {
 	 * 根据车辆购置年份获取当年末残值比例
 	 * 车龄超过8年的车，残值按8年算；
 	 * 不满一年的按一年算，比如3年5个月按4年算；
-	 * @return 
-	 * Map<String,Object> 
-	 * key(lastCutCurYearSurPro : 上年末残值比例-当年末残值比例)
-	 * key(SurplusPricePro : 当年末残值比例)
+	 * @param carYear 车辆年份
+	 * @return Integer
 	 */
 	public static Integer getSurplusPriceProYear(Double carYear){
 		if (carYear == null) {
@@ -301,8 +294,10 @@ public class CommonUtils {
 	
 	/**
 	 * 获取新车押金系数
-	 * @param year
-	 * @return
+	 * @param year 车辆年份
+	 * @param twoYearRatio 小于等于两年的系数
+	 * @param twoYearLaterRatio 大于两年的系数
+	 * @return Double
 	 */
 	public Double getNewCarCoefficient(Integer year, Double twoYearRatio, Double twoYearLaterRatio) {
 		if (year == null) {
@@ -317,11 +312,8 @@ public class CommonUtils {
 	
 	/**
 	 * 提供精确的减法运算。
-	 * 
-	 * @param v1
-	 *            被减数
-	 * @param v2
-	 *            减数
+	 * @param v1 被减数
+	 * @param v2 减数
 	 * @return 两个参数的差
 	 */
 
@@ -333,11 +325,8 @@ public class CommonUtils {
 
 	/**
 	 * 提供精确的乘法运算。
-	 * 
-	 * @param v1
-	 *            被乘数
-	 * @param v2
-	 *            乘数
+	 * @param v1 被乘数
+	 * @param v2 乘数
 	 * @return 两个参数的积
 	 */
 
@@ -353,13 +342,9 @@ public class CommonUtils {
 	
 	/**
 	 * 提供（相对）精确的除法运算。当发生除不尽的情况时，由scale参数指 定精度，以后的数字四舍五入。
-	 * 
-	 * @param v1
-	 *            被除数
-	 * @param v2
-	 *            除数
-	 * @param scale
-	 *            表示表示需要精确到小数点以后几位。
+	 * @param v1 被除数
+	 * @param v2 除数
+	 * @param scale 表示表示需要精确到小数点以后几位。
 	 * @return 两个参数的商
 	 */
 
@@ -372,6 +357,13 @@ public class CommonUtils {
 		return b1.divide(b2, scale, BigDecimal.ROUND_HALF_UP).doubleValue();
 	}
 	
+	/**
+	 * 获取油费单价
+	 * @param engineType 油品
+	 * @param cityCode 城市编号
+	 * @param oilAverageList 油费单价配置列表
+	 * @return Double
+	 */
 	public static Double getAverageCost(Integer engineType, Integer cityCode, List<OilAverageCostBO> oilAverageList) {
 		if (engineType == null) {
 			return 0.0;
@@ -399,8 +391,8 @@ public class CommonUtils {
 	
 	/**
 	 * 是否托管车管车
-	 * @param ownerType
-	 * @return
+	 * @param ownerType 车辆类型
+	 * @return boolean
 	 */
 	public static boolean isEscrowCar(Integer ownerType) {
 		if (ownerType == null) {
@@ -414,14 +406,17 @@ public class CommonUtils {
 	
 	
 	/**
-               * 计算本次修改是否需要收费
-     *
-     * @param localDateTime
-     * @param now
-     * @param serviceLon
-     * @param serviceLat
-     * @return
-     */
+	 * 计算本次修改是否需要收费
+	 * @param localDateTime 待确认时间
+	 * @param now 当前时间
+	 * @param beforeHour 提前小时数
+	 * @param serviceLon 修改经度
+	 * @param serviceLat 修改纬度
+	 * @param currentServiceLon 当前经度
+	 * @param currentServiceLat 当前纬度
+	 * @param sphericalDistanceCoefficients 系数配置列表
+	 * @return boolean
+	 */
     public static boolean isNeedCharge(LocalDateTime localDateTime, LocalDateTime now, Integer beforeHour,
                                  String serviceLon, String serviceLat, String currentServiceLon, String currentServiceLat,List<SphericalDistanceCoefficient> sphericalDistanceCoefficients) {
         return isTimeNeedCharge(localDateTime, now, beforeHour)
@@ -430,12 +425,11 @@ public class CommonUtils {
 	
 	
 	/**
-              * 时间是否命中收费规则,4小时前免费，4小时内收费。
-     *
-     * @param localDateTime
-     * @param now
-     * @param beforeHour
-     * @return
+     * 时间是否命中收费规则,4小时前免费，4小时内收费。
+     * @param localDateTime 待确认时间
+     * @param now 当前时间
+     * @param beforeHour 提前小时数
+     * @return boolean
      */
     public static boolean isTimeNeedCharge(LocalDateTime localDateTime, LocalDateTime now, Integer beforeHour) {
         return now.isAfter(localDateTime.minusHours(beforeHour)) || now.isAfter(localDateTime) ;
@@ -443,13 +437,14 @@ public class CommonUtils {
 	
 	
 	/**
-     * 地址是否命中收费规则
-     * @param serviceLon
-     * @param serviceLat
-     * @param currentServiceLon
-     * @param currentServiceLat
-     * @return
-     */
+	 * 地址是否命中收费规则
+	 * @param serviceLon 修改经度
+	 * @param serviceLat 修改纬度
+	 * @param currentServiceLon 当前经度
+	 * @param currentServiceLat 当前纬度
+	 * @param sphericalDistanceCoefficients 系数配置列表
+	 * @return boolean
+	 */
     public static boolean isAddressNeedCharge(String serviceLon, String serviceLat, String currentServiceLon, String currentServiceLat, List<SphericalDistanceCoefficient> sphericalDistanceCoefficients) {
         if (serviceLon == null || "".equals(serviceLon)) {
         	return false;
@@ -473,13 +468,14 @@ public class CommonUtils {
 	
 	
 	/**
-               * 计算获取实际距离（以米为单位）
-     * @param carLon
-     * @param carLat
-     * @param origionCarLon
-     * @param originCarLat
-     * @return
-     */
+	 * 计算获取实际距离（以米为单位
+	 * @param carLon 车辆经度
+	 * @param carLat 车辆纬度
+	 * @param origionCarLon 原来经度
+	 * @param originCarLat 原来纬度
+	 * @param sphericalDistanceCoefficients 系数配置列表
+	 * @return Long
+	 */
     public static Long getRealMDistance(double carLon,double carLat,double origionCarLon,double originCarLat, List<SphericalDistanceCoefficient> sphericalDistanceCoefficients){
         float realDistance = getRealDistance(carLon, carLat, origionCarLon, originCarLat, sphericalDistanceCoefficients);
         BigDecimal bigDecimal = BigDecimal.valueOf(realDistance);
@@ -488,14 +484,14 @@ public class CommonUtils {
 	
 	
 	/**
-               * 计算获取实际距离
-     * @param carLon
-     * @param carLat
-     * @param origionCarLon
-     * @param originCarLat
-     * @param sphericalDistanceCoefficients 距离系数配置
-     * @return
-     */
+	 * 计算获取实际距离
+	 * @param carLon 车辆经度
+	 * @param carLat 车辆纬度
+	 * @param origionCarLon 原来经度
+	 * @param originCarLat 原来纬度
+	 * @param sphericalDistanceCoefficients 系数配置列表
+	 * @return float
+	 */
     public static float getRealDistance(double carLon, double carLat, double origionCarLon, double originCarLat, List<SphericalDistanceCoefficient> sphericalDistanceCoefficients) {
         double distance = calcDistance(carLon, carLat, origionCarLon, originCarLat);
         //获取系数
@@ -505,25 +501,25 @@ public class CommonUtils {
     }
     
     /**
-             * 计算系数
+     * 计算系数
      * @param distance 球面距离（单位:公里）
      * @param coefficients 系数配置
-     * @return
+     * @return double
      */
     public static double calcCoefficient(double distance, List<SphericalDistanceCoefficient> coefficients){
         //设置默认值
         SphericalDistanceCoefficient defaultCoefficient=new SphericalDistanceCoefficient();
         defaultCoefficient.setCoefficient(100);
         //获取系数
-        SphericalDistanceCoefficient sphericalDistanceCoefficient = coefficients.parallelStream().filter(coefficien -> rangeDistance(distance, coefficien)).findFirst().orElse(defaultCoefficient);
+        SphericalDistanceCoefficient sphericalDistanceCoefficient = coefficients.stream().filter(coefficien -> rangeDistance(distance, coefficien)).findFirst().orElse(defaultCoefficient);
         return BigDecimal.valueOf(sphericalDistanceCoefficient.getCoefficient()).divide(BigDecimal.valueOf(100)).doubleValue();
     }
     
     /**
-             * 比较距离
-     * @param distance
-     * @param conf
-     * @return
+     * 比较距离
+     * @param distance 距离
+     * @param conf 配置
+     * @return boolean
      */
     public static boolean rangeDistance(double distance,SphericalDistanceCoefficient conf){
         Optional<Integer> minDistance=Optional.ofNullable(conf.getMinDistance());
@@ -536,11 +532,11 @@ public class CommonUtils {
 	
 	/**
 	 * 计算距离 (和数据库算法统一)
-	 * @param originCarLat
-	 * @param origionCarLon
-	 * @param carLat
-	 * @param carLon
-	 * @return
+	 * @param carLon 车辆经度
+	 * @param carLat 车辆纬度
+	 * @param origionCarLon 原来经度
+	 * @param originCarLat 原来纬度
+	 * @return double
 	 */
 	public static double calcDistance(double carLon,double carLat,double origionCarLon,double originCarLat){
 		return new BigDecimal(
