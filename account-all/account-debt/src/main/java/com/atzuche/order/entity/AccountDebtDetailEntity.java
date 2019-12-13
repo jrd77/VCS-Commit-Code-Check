@@ -29,11 +29,11 @@ public class AccountDebtDetailEntity implements Serializable {
 	 */
 	private Integer orderNo;
 	/**
-	 * 
+	 * 租客子订单号
 	 */
 	private String renterOrderNo;
 	/**
-	 * 
+	 * 车主子订单号
 	 */
 	private String ownerOrderNo;
 	/**

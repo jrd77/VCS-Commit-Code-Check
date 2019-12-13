@@ -22,8 +22,9 @@ public class TestController {
     @GetMapping(path = "/test")
     public String test(){
 
-        System.out.println(cashierBindCardService.test());
-        System.out.println(oilAverageCostCacheConfig.findOilPriceByEngineTypeAndCity(0,310100));
-        return "test";
+        String result = cashierBindCardService.test();
+        System.out.println(result);
+//        System.out.println(oilAverageCostCacheConfig.findOilPriceByEngineTypeAndCity(0,310100));
+        return result;
     }
 }
