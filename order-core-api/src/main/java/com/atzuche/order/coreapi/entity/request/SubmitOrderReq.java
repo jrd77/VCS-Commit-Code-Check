@@ -14,7 +14,7 @@ import java.util.List;
  * 
  **/
 @Data
-public class SubmitReq {
+public class SubmitOrderReq {
     private String useSpecialPrice;
     private String srvGetAddr;
     private String srvReturnAddr;

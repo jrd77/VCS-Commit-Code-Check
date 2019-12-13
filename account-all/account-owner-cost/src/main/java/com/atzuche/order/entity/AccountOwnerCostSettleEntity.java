@@ -23,7 +23,7 @@ public class AccountOwnerCostSettleEntity implements Serializable {
 	/**
 	 * 车主订单号
 	 */
-	private Integer orderNo;
+	private Long orderNo;
 	/**
 	 * 车主子订单号
 	 */
