@@ -27,7 +27,7 @@ public class AccountDebtReceivableaDetailEntity implements Serializable {
 	/**
 	 * 主订单号
 	 */
-	private Integer orderNo;
+	private Long orderNo;
 	/**
 	 * 入账金额
 	 */

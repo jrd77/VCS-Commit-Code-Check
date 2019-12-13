@@ -27,7 +27,7 @@ public class AccountOwnerIncomeDetailEntity implements Serializable {
 	/**
 	 * 主订单号
 	 */
-	private Integer orderNo;
+	private Long orderNo;
 	/**
 	 * 收益金额
 	 */

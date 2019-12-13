@@ -23,7 +23,7 @@ public class OrderStatusEntity implements Serializable {
 	/**
 	 * 主订单号
 	 */
-	private Integer orderNo;
+	private Long orderNo;
 	/**
 	 * 租车费用支付状态（待支付、已支付）
 	 */

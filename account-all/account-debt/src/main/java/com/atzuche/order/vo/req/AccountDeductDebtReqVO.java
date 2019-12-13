@@ -18,7 +18,7 @@ public class AccountDeductDebtReqVO {
     /**
      * 主订单号
      */
-    private Integer orderNo;
+    private Long orderNo;
     /**
      * 抵扣金额
      */
