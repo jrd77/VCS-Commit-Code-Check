@@ -1,4 +1,4 @@
-package com.atzuche.order.service;
+package com.atzuche.order.service.notservice;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,7 +14,7 @@ import com.atzuche.order.entity.AccountRenterCostDetailEntity;
  * @date 2019-12-13 16:49:57
  */
 @Service
-public class AccountRenterCostDetailService{
+public class AccountRenterCostDetailNoTService {
     @Autowired
     private AccountRenterCostDetailMapper accountRenterCostDetailMapper;
 
