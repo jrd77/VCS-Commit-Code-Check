@@ -1,8 +1,9 @@
 package com.atzuche.order.coreapi.service;
 
 import com.atzuche.order.coreapi.dto.SubmitReqDto;
+import com.autoyol.commons.web.ResponseData;
 
 public interface SubmitOrderService {
 
-    void submitOrder(SubmitReqDto submitReqDto);
+    ResponseData submitOrder(SubmitReqDto submitReqDto);
 }
