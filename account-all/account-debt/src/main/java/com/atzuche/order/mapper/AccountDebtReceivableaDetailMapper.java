@@ -2,6 +2,8 @@ package com.atzuche.order.mapper;
 
 import com.atzuche.order.entity.AccountDebtReceivableaDetailEntity;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
 import java.util.List;
 
 /**
@@ -19,10 +21,7 @@ public interface AccountDebtReceivableaDetailMapper{
 
     int insert(AccountDebtReceivableaDetailEntity record);
     
-    int insertSelective(AccountDebtReceivableaDetailEntity record);
-
-    int updateByPrimaryKey(AccountDebtReceivableaDetailEntity record);
-    
     int updateByPrimaryKeySelective(AccountDebtReceivableaDetailEntity record);
 
+    AccountDebtReceivableaDetailEntity selectByUniqueAndSourceCode(@Param("sourceCode") Integer sourceCode, @Param("uniqueNo")String uniqueNo);
 }

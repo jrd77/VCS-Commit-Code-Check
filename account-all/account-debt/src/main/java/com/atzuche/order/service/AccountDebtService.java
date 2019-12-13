@@ -2,6 +2,7 @@ package com.atzuche.order.service;
 
 import com.atzuche.order.dto.AccountDeductDebtDTO;
 import com.atzuche.order.entity.AccountDebtDetailEntity;
+import com.atzuche.order.entity.AccountDebtReceivableaDetailEntity;
 import com.atzuche.order.exception.AccountDebtException;
 import com.atzuche.order.service.notservice.AccountDebtDetailNoTService;
 import com.atzuche.order.service.notservice.AccountDebtNoTService;
@@ -66,6 +67,11 @@ public class AccountDebtService{
         // 1 参数校验
         Assert.notNull(accountDeductDebt, ErrorCode.PARAMETER_ERROR.getText());
         accountDeductDebt.check();
+        //1.1幂等支持
+//        boolean isSuccess = accountDebtReceivableaDetailNoTService.idempotentByUniqueAndSourceCode(accountDeductDebt.getSourceCode(),accountDeductDebt.getUniqueNo());
+//        if(isSuccess){
+//            return;
+//        }
         // 2 查询用户所以代还的记录
         List<AccountDebtDetailEntity> accountDebtDetails =  accountDebtDetailNoTService.getDebtListByMemNo(accountDeductDebt.getMemNo());
         //3 清洗包装数据

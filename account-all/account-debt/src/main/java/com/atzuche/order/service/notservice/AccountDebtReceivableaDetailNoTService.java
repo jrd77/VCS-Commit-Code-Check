@@ -8,6 +8,8 @@ import com.autoyol.commons.web.ErrorCode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Objects;
+
 
 /**
  * 个人历史欠款收款记录
@@ -29,5 +31,16 @@ public class AccountDebtReceivableaDetailNoTService {
                 throw new AccountDebtException(ErrorCode.FAILED);
             }
         }
+    }
+
+    /**
+     * 幂等校验
+     * @param sourceCode
+     * @param uniqueNo
+     * @return
+     */
+    public boolean idempotentByUniqueAndSourceCode(Integer sourceCode, String uniqueNo) {
+        AccountDebtReceivableaDetailEntity accountDebtReceivableaDetail = accountDebtReceivableaDetailMapper.selectByUniqueAndSourceCode(sourceCode,uniqueNo);
+        return Objects.nonNull(accountDebtReceivableaDetail) && Objects.nonNull(accountDebtReceivableaDetail.getId());
     }
 }
