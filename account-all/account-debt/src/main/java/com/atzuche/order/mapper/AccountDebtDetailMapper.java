@@ -2,6 +2,8 @@ package com.atzuche.order.mapper;
 
 import com.atzuche.order.entity.AccountDebtDetailEntity;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
 import java.util.List;
 
 /**
@@ -15,14 +17,9 @@ public interface AccountDebtDetailMapper{
 
     AccountDebtDetailEntity selectByPrimaryKey(Integer id);
 
-    List<AccountDebtDetailEntity> selectALL();
-
     int insert(AccountDebtDetailEntity record);
-    
-    int insertSelective(AccountDebtDetailEntity record);
-
-    int updateByPrimaryKey(AccountDebtDetailEntity record);
     
     int updateByPrimaryKeySelective(AccountDebtDetailEntity record);
 
+    List<AccountDebtDetailEntity> getDebtListByMemNo(@Param("memNo") int memNo);
 }

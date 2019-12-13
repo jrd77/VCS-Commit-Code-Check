@@ -1,9 +1,10 @@
 package com.atzuche.order.service;
 
+import com.atzuche.order.exception.AccountDebtException;
+import com.atzuche.order.service.notservice.AccountDebtNoTService;
+import com.atzuche.order.vo.res.AccountDebtResVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.atzuche.order.mapper.AccountDebtMapper;
-import com.atzuche.order.entity.AccountDebtEntity;
 
 
 
@@ -16,7 +17,16 @@ import com.atzuche.order.entity.AccountDebtEntity;
 @Service
 public class AccountDebtService{
     @Autowired
-    private AccountDebtMapper accountDebtMapper;
+    private AccountDebtNoTService accountDebtNoTService;
 
 
+    /**
+     * 根据会员号查询用户总欠款信息
+     * @param memNo
+     * @return
+     * @throws AccountDebtException
+     */
+    public AccountDebtResVO getAccountDebtByMemNo(Integer memNo) throws AccountDebtException {
+        return accountDebtNoTService.getAccountDebtByMemNo(memNo);
+    }
 }

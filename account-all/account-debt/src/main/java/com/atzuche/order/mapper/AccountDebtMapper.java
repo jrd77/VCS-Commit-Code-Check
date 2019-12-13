@@ -2,6 +2,8 @@ package com.atzuche.order.mapper;
 
 import com.atzuche.order.entity.AccountDebtEntity;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
 import java.util.List;
 
 /**
@@ -15,8 +17,6 @@ public interface AccountDebtMapper{
 
     AccountDebtEntity selectByPrimaryKey(Integer id);
 
-    List<AccountDebtEntity> selectALL();
-
     int insert(AccountDebtEntity record);
     
     int insertSelective(AccountDebtEntity record);
@@ -25,4 +25,9 @@ public interface AccountDebtMapper{
     
     int updateByPrimaryKeySelective(AccountDebtEntity record);
 
+    /**根据会员号查询个人总欠款信息
+     * @param memNo
+     * @return
+     */
+    AccountDebtEntity getAccountDebtByMemNo(@Param("memNo")Integer memNo);
 }

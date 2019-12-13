@@ -1,9 +1,12 @@
 package com.atzuche.order.service;
 
+import com.atzuche.order.entity.CashierBindCardEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.atzuche.order.mapper.CashierBindCardMapper;
+
+import java.util.Objects;
 
 
 /**
@@ -18,7 +21,8 @@ public class CashierBindCardService {
     private CashierBindCardMapper cashierBindCardMapper;
 
     public String test(){
-        return  "www";
+        CashierBindCardEntity result = cashierBindCardMapper.selectByPrimaryKey(1);
+        return Objects.nonNull(result)?result.getName():"";
     }
 
 
