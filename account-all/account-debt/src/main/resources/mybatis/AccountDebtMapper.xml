@@ -88,35 +88,21 @@
 	
 	 
 	<update id="updateByPrimaryKeySelective" parameterType="com.atzuche.order.entity.AccountDebtEntity">
-		update account_debt 
+		update account_debt
 		<set>
 				<if test="memNo != null">`mem_no` = #{memNo}, </if>
 				<if test="debtAmt != null">`debt_amt` = #{debtAmt}, </if>
-				<if test="version != null">`version` = #{version}, </if>
+				version = version+1,
 				<if test="createTime != null">`create_time` = #{createTime}, </if>
 				<if test="createOp != null">`create_op` = #{createOp}, </if>
 				<if test="updateTime != null">`update_time` = #{updateTime}, </if>
 				<if test="updateOp != null">`update_op` = #{updateOp}, </if>
 				<if test="isDelete != null">`is_delete` = #{isDelete}</if>
 			</set>
-		where id = #{id}
+		where id = #{id} and version = #{version}
 	</update>
 	
-	<update id="updateByPrimaryKey" parameterType="com.atzuche.order.entity.AccountDebtEntity">
-		update account_debt 
-		<set>
-				`mem_no` = #{memNo}, 		
-				`debt_amt` = #{debtAmt}, 		
-				`version` = #{version}, 		
-				`create_time` = #{createTime}, 		
-				`create_op` = #{createOp}, 		
-				`update_time` = #{updateTime}, 		
-				`update_op` = #{updateOp}, 		
-				`is_delete` = #{isDelete}		
-	
-		</set>
-		where id = #{id}
-	</update>
+
     <!-- 根据会员号查询个人总欠款信息 -->
     <select id="getAccountDebtByMemNo" resultMap="BaseResultMap">
         select <include refid="Base_Column_List" /> from account_debt where mem_no = #{memNo}

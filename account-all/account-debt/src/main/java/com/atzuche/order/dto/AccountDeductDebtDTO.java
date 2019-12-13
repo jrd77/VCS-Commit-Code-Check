@@ -24,6 +24,11 @@ public class AccountDeductDebtDTO {
      * 本次实际要还欠款总和
      */
     private Integer amtReal;
+
+    /**
+     *  会员号
+     */
+    private Integer memNo;
     /**
      * 个人所以代还  欠款记录
      */
@@ -55,6 +60,7 @@ public class AccountDeductDebtDTO {
         Assert.notNull(accountDeductDebtReqVO, ErrorCode.PARAMETER_ERROR.getText());
         Assert.isTrue(!CollectionUtils.isEmpty(accountDebtDetailAlls),ErrorCode.PARAMETER_ERROR.getText());
         //2 计算本次要抵扣欠款记录 存入accountDebtDetailTodos 中去
+        setMemNo(accountDeductDebtReqVO.getMemNo());
         List<AccountDebtDetailEntity>  accountDebtDetailTodos = new ArrayList<>();
         int amt = Math.abs(accountDeductDebtReqVO.getAmt());
         int amtReal = NumberUtils.INTEGER_ZERO;

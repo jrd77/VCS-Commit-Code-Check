@@ -41,7 +41,7 @@ public class AccountDebtDetailNoTService {
        for(int i=0;i<accountDeductDebtDTO.getAccountDebtDetailTodos().size();i++){
           int result = accountDebtDetailMapper.updateByPrimaryKeySelective(accountDeductDebtDTO.getAccountDebtDetailTodos().get(i));
           if(result==0){
-              throw new AccountDebtException(ErrorCode.PARAMETER_ERROR);
+              throw new AccountDebtException(ErrorCode.FAILED);
           }
        }
     }
