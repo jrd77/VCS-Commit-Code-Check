@@ -5,11 +5,10 @@ package com.atzuche.order.coreapi.submitOrder.filter;
 
 import com.atzuche.order.coreapi.dto.OrderContextDto;
 import com.atzuche.order.coreapi.dto.SubmitReqDto;
-import com.atzuche.order.coreapi.exception.SubmitOrderException;
+import com.atzuche.order.coreapi.submitOrder.exception.SubmitOrderException;
 import com.atzuche.order.coreapi.submitOrder.rules.CancleOrderCountFilter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;

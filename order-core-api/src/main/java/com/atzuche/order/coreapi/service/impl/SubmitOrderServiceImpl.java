@@ -3,19 +3,26 @@ package com.atzuche.order.coreapi.service.impl;
 import com.alibaba.fastjson.JSON;
 import com.atzuche.order.coreapi.dto.OrderContextDto;
 import com.atzuche.order.coreapi.dto.SubmitReqDto;
-import com.atzuche.order.coreapi.exception.SubmitOrderException;
+import com.atzuche.order.coreapi.submitOrder.exception.SubmitOrderException;
 import com.atzuche.order.coreapi.submitOrder.filter.SubmitOrderFilterService;
 import com.atzuche.order.coreapi.service.SubmitOrderService;
 import com.autoyol.commons.web.ErrorCode;
+import com.autoyol.member.detail.api.MemberDetailFeignService;
+import com.autoyol.member.detail.enums.MemberSelectKeyEnum;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.Arrays;
+import java.util.List;
 
 @Slf4j
 @Service
 public class SubmitOrderServiceImpl implements SubmitOrderService {
     @Autowired
     private SubmitOrderFilterService submitOrderFilterService;
+    @Autowired
+    private MemberDetailFeignService memberDetailFeignService;
 
     @Override
     public void submitOrder(SubmitReqDto submitReqDto) {
@@ -24,7 +31,9 @@ public class SubmitOrderServiceImpl implements SubmitOrderService {
         //获取车辆信息
 
         //获取车主会员信息
-
+        List<String> selectKey = Arrays.asList(MemberSelectKeyEnum.MEMBER_AUTH_INFO.getKey(),
+                MemberSelectKeyEnum.MEMBER_BASE_INFO.getKey());
+        memberDetailFeignService.getMemberSelectInfo(submitReqDto.getMemNo(),selectKey);
         //获取租客会员信息
 
         //组装数据
