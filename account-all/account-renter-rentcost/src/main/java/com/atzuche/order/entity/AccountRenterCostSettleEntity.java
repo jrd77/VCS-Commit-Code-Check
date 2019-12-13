@@ -9,7 +9,7 @@ import lombok.Data;
  * 租客费用及其结算总表
  * 
  * @author ZhangBin
- * @date 2019-12-11 17:53:40
+ * @date 2019-12-13 16:49:57
  * @Description:
  */
 @Data
@@ -33,7 +33,7 @@ public class AccountRenterCostSettleEntity implements Serializable {
 	 */
 	private Integer rentAmt;
 	/**
-	 * 佣金
+	 * 手续费
 	 */
 	private Integer yongjinAmt;
 	/**
@@ -61,17 +61,9 @@ public class AccountRenterCostSettleEntity implements Serializable {
 	 */
 	private Integer carOwnerSubsidyAmount;
 	/**
-	 * 应付费用
-	 */
-	private Integer yingfuAmt;
-	/**
 	 * 实付费用
 	 */
 	private Integer shifuAmt;
-	/**
-	 * 欠款费用
-	 */
-	private Integer debtAmt;
 	/**
 	 * 更新版本号
 	 */

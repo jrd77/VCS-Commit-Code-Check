@@ -91,46 +91,6 @@
 				#{isDelete}		
 			)
 	</insert>
-	
-	<insert id="insertSelective" parameterType="com.atzuche.order.entity.AccountDebtReceivableaDetailEntity" useGeneratedKeys="true" keyProperty="id">
-		insert into account_debt_receivablea_detail
-		(
-				<if test="memNo != null">`mem_no`, </if>
-				<if test="orderNo != null">`order_no`, </if>
-				<if test="amt != null">`amt`, </if>
-				<if test="time != null">`time`, </if>
-				<if test="sourceCode != null">`source_code`, </if>
-				<if test="sourceDetail != null">`source_detail`, </if>
-				<if test="uniqueNo != null">`unique_no`, </if>
-				<if test="debtDetailId != null">`debt_detail_id`, </if>
-				<if test="deptName != null">`dept_name`, </if>
-				<if test="remark != null">`remark`, </if>
-				<if test="createTime != null">`create_time`, </if>
-				<if test="createOp != null">`create_op`, </if>
-				<if test="updateTime != null">`update_time`, </if>
-				<if test="updateOp != null">`update_op`, </if>
-				<if test="isDelete != null">`is_delete` </if>
-			)
-		values
-		(
-				<if test="memNo != null">#{memNo},  </if>
-				<if test="orderNo != null">#{orderNo},  </if>
-				<if test="amt != null">#{amt},  </if>
-				<if test="time != null">#{time},  </if>
-				<if test="sourceCode != null">#{sourceCode},  </if>
-				<if test="sourceDetail != null">#{sourceDetail},  </if>
-				<if test="uniqueNo != null">#{uniqueNo},  </if>
-				<if test="debtDetailId != null">#{debtDetailId},  </if>
-				<if test="deptName != null">#{deptName},  </if>
-				<if test="remark != null">#{remark},  </if>
-				<if test="createTime != null">#{createTime},  </if>
-				<if test="createOp != null">#{createOp},  </if>
-				<if test="updateTime != null">#{updateTime},  </if>
-				<if test="updateOp != null">#{updateOp},  </if>
-				<if test="isDelete != null">#{isDelete} </if>
-			)
-	</insert>
-	
 	 
 	<update id="updateByPrimaryKeySelective" parameterType="com.atzuche.order.entity.AccountDebtReceivableaDetailEntity">
 		update account_debt_receivablea_detail 
@@ -153,28 +113,10 @@
 			</set>
 		where id = #{id}
 	</update>
-	
-	<update id="updateByPrimaryKey" parameterType="com.atzuche.order.entity.AccountDebtReceivableaDetailEntity">
-		update account_debt_receivablea_detail 
-		<set>
-				`mem_no` = #{memNo}, 		
-				`order_no` = #{orderNo}, 		
-				`amt` = #{amt}, 		
-				`time` = #{time}, 		
-				`source_code` = #{sourceCode}, 		
-				`source_detail` = #{sourceDetail}, 		
-				`unique_no` = #{uniqueNo}, 		
-				`debt_detail_id` = #{debtDetailId}, 		
-				`dept_name` = #{deptName}, 		
-				`remark` = #{remark}, 		
-				`create_time` = #{createTime}, 		
-				`create_op` = #{createOp}, 		
-				`update_time` = #{updateTime}, 		
-				`update_op` = #{updateOp}, 		
-				`is_delete` = #{isDelete}		
-	
-		</set>
-		where id = #{id}
-	</update>
-  	
+
+    <select id="selectByUniqueAndSourceCode" resultMap="BaseResultMap">
+        select  <include refid="Base_Column_List" /> from account_debt_receivablea_detail
+             where source_code = #{sourceCode} and unique_no  = #{uniqueNo} limit 1
+    </select>
+
 </mapper>
