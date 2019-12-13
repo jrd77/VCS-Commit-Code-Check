@@ -24,6 +24,11 @@ public class AccountDeductDebtDTO {
      * 本次实际要还欠款总和
      */
     private Integer amtReal;
+
+    /**
+     *  会员号
+     */
+    private Integer memNo;
     /**
      * 个人所以代还  欠款记录
      */
@@ -55,6 +60,7 @@ public class AccountDeductDebtDTO {
         Assert.notNull(accountDeductDebtReqVO, ErrorCode.PARAMETER_ERROR.getText());
         Assert.isTrue(!CollectionUtils.isEmpty(accountDebtDetailAlls),ErrorCode.PARAMETER_ERROR.getText());
         //2 计算本次要抵扣欠款记录 存入accountDebtDetailTodos 中去
+        setMemNo(accountDeductDebtReqVO.getMemNo());
         List<AccountDebtDetailEntity>  accountDebtDetailTodos = new ArrayList<>();
         int amt = Math.abs(accountDeductDebtReqVO.getAmt());
         int amtReal = NumberUtils.INTEGER_ZERO;
@@ -67,17 +73,20 @@ public class AccountDeductDebtDTO {
             amt = amt - Math.abs(accountDebtDetailAll.getCurrentDebtAmt());
             if(amt>0){
                 accountDebtDetailAll.setCurrentDebtAmt(NumberUtils.INTEGER_ZERO);
+                accountDebtDetailAll.setRepaidDebtAmt(Math.abs(accountDebtDetailAll.getOrderDebtAmt()));
                 accountDebtDetailTodos.add(accountDebtDetailAll);
                 amtReal = amtReal + Math.abs(accountDebtDetailAll.getCurrentDebtAmt());
             }
             if(amt==0){
                 accountDebtDetailAll.setCurrentDebtAmt(NumberUtils.INTEGER_ZERO);
+                accountDebtDetailAll.setRepaidDebtAmt(Math.abs(accountDebtDetailAll.getOrderDebtAmt()));
                 accountDebtDetailTodos.add(accountDebtDetailAll);
                 amtReal = amtReal + Math.abs(accountDebtDetailAll.getCurrentDebtAmt());
                 break;
             }
             if(amt<0){
                 accountDebtDetailAll.setCurrentDebtAmt(-Math.abs(amt));
+                accountDebtDetailAll.setRepaidDebtAmt(accountDebtDetailAll.getCurrentDebtAmt()-accountDebtDetailAll.getOrderDebtAmt());
                 accountDebtDetailTodos.add(accountDebtDetailAll);
                 amtReal = amtReal + (Math.abs(accountDebtDetailAll.getCurrentDebtAmt()) - Math.abs(amt));
                 break;
@@ -88,7 +97,7 @@ public class AccountDeductDebtDTO {
         setAccountDebtDetailTodos(accountDebtDetailTodos);
         setAmtReal(amtReal);
         //3 记录收款数据
-        List<AccountDebtReceivableaDetailEntity>  accountDebtReceivableaDetails = new ArrayList<>();
+        List<AccountDebtReceivableaDetailEntity> accountDebtReceivableaDetails = new ArrayList<>();
         for(int i =0;i<accountDebtDetailTodos.size();i++){
             AccountDebtDetailEntity accountDebtDetailEntity = accountDebtDetailTodos.get(i);
             AccountDebtReceivableaDetailEntity accountDebtReceivableaDetail = new AccountDebtReceivableaDetailEntity();
@@ -97,6 +106,7 @@ public class AccountDeductDebtDTO {
             accountDebtReceivableaDetail.setUpdateTime(now);
             accountDebtReceivableaDetail.setTime(now);
             accountDebtReceivableaDetail.setDebtDetailId(accountDebtDetailEntity.getId());
+            accountDebtReceivableaDetail.setOrderNo(accountDebtDetailEntity.getOrderNo());
             accountDebtReceivableaDetails.add(accountDebtReceivableaDetail);
         }
         //  set记录收款数据

@@ -26,7 +26,7 @@ public class AccountDebtReceivableaDetailNoTService {
             AccountDebtReceivableaDetailEntity accountDebtReceivableaDetail =  accountDeductDebtDTO.getAccountDebtReceivableaDetails().get(i);
             int result = accountDebtReceivableaDetailMapper.insert(accountDebtReceivableaDetail);
             if(result==0){
-                throw new AccountDebtException(ErrorCode.PARAMETER_ERROR);
+                throw new AccountDebtException(ErrorCode.FAILED);
             }
         }
     }

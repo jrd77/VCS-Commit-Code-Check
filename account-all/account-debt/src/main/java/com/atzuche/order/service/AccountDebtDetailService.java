@@ -6,10 +6,14 @@ import com.atzuche.order.service.notservice.AccountDebtDetailNoTService;
 import com.atzuche.order.service.notservice.AccountDebtNoTService;
 import com.atzuche.order.service.notservice.AccountDebtReceivableaDetailNoTService;
 import com.atzuche.order.vo.req.AccountDeductDebtReqVO;
+import com.atzuche.order.vo.req.AccountInsertDebtReqVO;
+import com.atzuche.order.vo.res.AccountDebtResVO;
+import com.autoyol.commons.web.ErrorCode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.atzuche.order.mapper.AccountDebtDetailMapper;
 import com.atzuche.order.entity.AccountDebtDetailEntity;
+import org.springframework.util.Assert;
 
 import java.util.List;
 
@@ -34,16 +38,33 @@ public class AccountDebtDetailService{
      * @return
      */
     public void deductDebt(AccountDeductDebtReqVO accountDeductDebt) {
-        // 1 查询用户所以代还的记录
+        // 1 参数校验
+        Assert.notNull(accountDeductDebt, ErrorCode.PARAMETER_ERROR.getText());
+        accountDeductDebt.check();
+        // 2 查询用户所以代还的记录
         List<AccountDebtDetailEntity> accountDebtDetails =  accountDebtDetailNoTService.getDebtListByMemNo(accountDeductDebt.getMemNo());
-        //2 清洗包装数据
+        //3 清洗包装数据
         AccountDeductDebtDTO accountDeductDebtDTO = new AccountDeductDebtDTO(accountDeductDebt,accountDebtDetails);
-        //3更新欠款表 当前欠款数
+        //4更新欠款表 当前欠款数
         accountDebtDetailNoTService.updateAlreadyDeductDebt(accountDeductDebtDTO);
-        //3 记录欠款收款详情
+        //5 记录欠款收款详情
         accountDebtReceivableaDetailNoTService.insertAlreadyReceivablea(accountDeductDebtDTO);
-        //4 更新总欠款表
-        accountDebtNoTService.updateAccountDebt(accountDeductDebtDTO);
+        //6 更新总欠款表
+        accountDebtNoTService.deductAccountDebt(accountDeductDebtDTO);
+    }
+
+    /**
+     * 记录用户历史欠款
+     */
+    public void insertDebt(AccountInsertDebtReqVO accountInsertDebt){
+        //1校验
+        Assert.notNull(accountInsertDebt, ErrorCode.PARAMETER_ERROR.getText());
+        accountInsertDebt.check();
+        //2 查询账户欠款
+        accountDebtNoTService.productAccountDebt(accountInsertDebt);
+        //3 新增欠款明细
+        accountDebtDetailNoTService.insertDebtDetail(accountInsertDebt);
+
     }
 
 }
