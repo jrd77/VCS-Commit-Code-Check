@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.atzuche.order.mapper.OrderStatusMapper">
+<mapper namespace="com.atzuche.parentorder.mapper.OrderStatusMapper">
 
-    <resultMap type="com.atzuche.order.entity.OrderStatusEntity" id="BaseResultMap">
+    <resultMap type="com.atzuche.parentorder.entity.OrderStatusEntity" id="BaseResultMap">
         <result property="id" column="id"/>
         <result property="orderNo" column="order_no"/>
         <result property="rentCarPayStatus" column="rent_car_pay_status"/>
@@ -51,7 +51,7 @@
 	</select>
 
 	 
-	<insert id="insert" parameterType="com.atzuche.order.entity.OrderStatusEntity" useGeneratedKeys="true" keyProperty="id">
+	<insert id="insert" parameterType="com.atzuche.parentorder.entity.OrderStatusEntity" useGeneratedKeys="true" keyProperty="id">
 		insert into order_status
 		(
 				`order_no`,		
@@ -88,7 +88,7 @@
 			)
 	</insert>
 	
-	<insert id="insertSelective" parameterType="com.atzuche.order.entity.OrderStatusEntity" useGeneratedKeys="true" keyProperty="id">
+	<insert id="insertSelective" parameterType="com.atzuche.parentorder.entity.OrderStatusEntity" useGeneratedKeys="true" keyProperty="id">
 		insert into order_status
 		(
 				<if test="orderNo != null">`order_no`, </if>
@@ -126,7 +126,7 @@
 	</insert>
 	
 	 
-	<update id="updateByPrimaryKeySelective" parameterType="com.atzuche.order.entity.OrderStatusEntity">
+	<update id="updateByPrimaryKeySelective" parameterType="com.atzuche.parentorder.entity.OrderStatusEntity">
 		update order_status 
 		<set>
 				<if test="orderNo != null">`order_no` = #{orderNo}, </if>
@@ -147,7 +147,7 @@
 		where id = #{id}
 	</update>
 	
-	<update id="updateByPrimaryKey" parameterType="com.atzuche.order.entity.OrderStatusEntity">
+	<update id="updateByPrimaryKey" parameterType="com.atzuche.parentorder.entity.OrderStatusEntity">
 		update order_status 
 		<set>
 				`order_no` = #{orderNo}, 		
@@ -169,7 +169,4 @@
 		where id = #{id}
 	</update>
   	
-  	<select id="getOrderStatusByOrderNo" resultMap="BaseResultMap">
-		select <include refid="Base_Column_List" /> from order_status where order_no = #{orderNo}
-	</select>
 </mapper>

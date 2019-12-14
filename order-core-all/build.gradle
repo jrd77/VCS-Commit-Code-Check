@@ -16,7 +16,6 @@ dependencies {
 }
 subprojects {
     dependencies {
-        compile project(":order-core-api")
         compile project(":util-all:order-commons")
 
     }

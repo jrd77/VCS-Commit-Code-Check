@@ -33,6 +33,7 @@ dependencies {
             exclude module:'servlet-api'
         }
     compile "com.autoyol:memberDetailService-api:1.0.0-SNAPSHOT"
+    compile "com.autoyol.car:auto-car-service-api:2019121401-SNAPSHOT"
     
     compile project(":config")
     compile project(":casier-all:cashier-account")
@@ -55,5 +56,6 @@ dependencies {
     compile project(":order-core-all:renter-all:renter-order")
     compile project(":order-core-all:renter-all:renter-penalty")
     compile project(":order-core-all:renter-all:renter-wz")
+    compile project(":util-all:order-commons")
 
 }

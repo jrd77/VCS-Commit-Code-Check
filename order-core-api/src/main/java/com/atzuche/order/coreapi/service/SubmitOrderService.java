@@ -2,7 +2,10 @@ package com.atzuche.order.coreapi.service;
 
 import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.GlobalConstant;
-import com.atzuche.order.coreapi.entity.dto.OrderContextDto;
+import com.atzuche.order.commons.entity.dto.CarDetailDto;
+import com.atzuche.order.commons.entity.dto.OrderContextDto;
+import com.atzuche.order.commons.entity.dto.OwnerMemberDto;
+import com.atzuche.order.commons.entity.dto.RenterMemberDto;
 import com.atzuche.order.coreapi.entity.request.SubmitOrderReq;
 import com.atzuche.order.coreapi.submitOrder.exception.CarDetailByFeignException;
 import com.atzuche.order.coreapi.submitOrder.exception.RenterMemberException;
@@ -42,18 +45,18 @@ public class SubmitOrderService {
         try{
 
             //获取车辆信息
-            CarDetailVO carDetail = getCarDetail(submitReqDto);
+            CarDetailDto carDetail = getCarDetail(submitReqDto);
             //获取车主会员信息
-            MemberTotalInfo ownerMemberInfo = getRenterMemberInfo(submitReqDto);
+            OwnerMemberDto ownerMemberDto = getOwnerMemberInfo(submitReqDto);
 
             //获取租客会员信息
-            MemberTotalInfo renterMemberInfo = getRenterMemberInfo(submitReqDto);
+            RenterMemberDto renterMemberDto = getRenterMemberInfo(submitReqDto);
 
             //组装数据
             OrderContextDto orderContextDto = new OrderContextDto();
-            orderContextDto.setOwnerMemberInfo(ownerMemberInfo);
-            orderContextDto.setRenterMemberInfo(renterMemberInfo);
-            orderContextDto.setCarDetailVO(carDetail);
+            orderContextDto.setOwnerMemberDto(ownerMemberDto);
+            orderContextDto.setRenterMemberDto(renterMemberDto);
+            orderContextDto.setCarDetailDto(carDetail);
 
 
             //开始校验规则 （前置校验 + 风控）TODO
@@ -93,7 +96,7 @@ public class SubmitOrderService {
         return null;
     }
 
-    public MemberTotalInfo getRenterMemberInfo(SubmitOrderReq submitReqDto) throws RenterMemberException {
+    public RenterMemberDto getRenterMemberInfo(SubmitOrderReq submitReqDto) throws RenterMemberException {
         List<String> selectKey = Arrays.asList(
                 MemberSelectKeyEnum.MEMBER_CORE_INFO.getKey(),
                 MemberSelectKeyEnum.MEMBER_AUTH_INFO.getKey(),
@@ -128,10 +131,11 @@ public class SubmitOrderService {
         renterMemberDto.setCertificationTime(LocalDateTime.parse(memberAuthInfo.getDriLicFirstTime()), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
         renterMemberDto.setOrderSuccessCount();*/
 
-        return responseData.getData();
+         responseData.getData();
+        return new RenterMemberDto();
     }
 
-    public MemberTotalInfo getOwnerMemberInfo(SubmitOrderReq submitReqDto) throws RenterMemberException {
+    public OwnerMemberDto getOwnerMemberInfo(SubmitOrderReq submitReqDto) throws RenterMemberException {
         List<String> selectKey = Arrays.asList(
                 MemberSelectKeyEnum.MEMBER_CORE_INFO.getKey(),
                 MemberSelectKeyEnum.MEMBER_AUTH_INFO.getKey(),
@@ -154,11 +158,13 @@ public class SubmitOrderService {
             throw new RenterMemberException(ErrorCode.FAILED,"获取会员信息失败");
         }
         //TODO  日志记录
-        return responseData.getData();
+       responseData.getData();
+
+        return new OwnerMemberDto();
     }
 
 
-    public CarDetailVO getCarDetail(SubmitOrderReq submitReqDto) throws CarDetailByFeignException, RenterMemberException {
+    public CarDetailDto getCarDetail(SubmitOrderReq submitReqDto) throws CarDetailByFeignException, RenterMemberException {
         OrderCarInfoParamDTO orderCarInfoParamDTO = new OrderCarInfoParamDTO();
         orderCarInfoParamDTO.setCarNo(submitReqDto.getCarNo());
         orderCarInfoParamDTO.setCarAddressIndex(Integer.valueOf(submitReqDto.getCarAddrIndex()));
@@ -180,8 +186,9 @@ public class SubmitOrderService {
             throw new RenterMemberException(ErrorCode.FAILED,"获取车辆信息失败");
         }
         //TODO 日志记录
-        return responseObject.getData();
+        CarDetailVO data = responseObject.getData();
 
+        return new CarDetailDto();
     }
 
 

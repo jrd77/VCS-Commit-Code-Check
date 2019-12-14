@@ -1,8 +1,6 @@
 package com.atzuche.order.coreapi.entity.request;
 
-import com.atzuche.order.coreapi.entity.dto.ItemList;
-import com.atzuche.order.coreapi.entity.dto.MemBaseInfoVo;
-import com.atzuche.order.coreapi.entity.dto.MemInfoCache;
+import com.atzuche.order.commons.entity.request.ItemList;
 import lombok.Data;
 
 import java.util.List;
