@@ -1,11 +1,20 @@
 package com.atzuche.order.coreapi.service;
 
 import com.alibaba.fastjson.JSON;
-import com.atzuche.order.coreapi.entity.dto.OrderContextDto;
+import com.atzuche.order.commons.GlobalConstant;
+import com.atzuche.order.commons.entity.dto.CarDetailDto;
+import com.atzuche.order.commons.entity.dto.OrderContextDto;
+import com.atzuche.order.commons.entity.dto.OwnerMemberDto;
+import com.atzuche.order.commons.entity.dto.RenterMemberDto;
 import com.atzuche.order.coreapi.entity.request.SubmitOrderReq;
+import com.atzuche.order.coreapi.submitOrder.exception.CarDetailByFeignException;
 import com.atzuche.order.coreapi.submitOrder.exception.RenterMemberException;
 import com.atzuche.order.coreapi.submitOrder.exception.SubmitOrderException;
 import com.atzuche.order.coreapi.submitOrder.filter.SubmitOrderFilterService;
+import com.autoyol.car.api.feign.api.CarDetailQueryFeignApi;
+import com.autoyol.car.api.model.dto.OrderCarInfoParamDTO;
+import com.autoyol.car.api.model.vo.CarDetailVO;
+import com.autoyol.car.api.model.vo.ResponseObject;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.member.detail.api.MemberDetailFeignService;
@@ -21,10 +30,14 @@ import java.util.List;
 @Slf4j
 @Service
 public class SubmitOrderService {
+
+
     @Autowired
     private SubmitOrderFilterService submitOrderFilterService;
     @Autowired
     private MemberDetailFeignService memberDetailFeignService;
+    @Autowired
+    private CarDetailQueryFeignApi carDetailQueryFeignApi;
 
     public ResponseData submitOrder(SubmitOrderReq submitReqDto) {
         //调用日志模块 TODO
@@ -32,17 +45,18 @@ public class SubmitOrderService {
         try{
 
             //获取车辆信息
-
+            CarDetailDto carDetail = getCarDetail(submitReqDto);
             //获取车主会员信息
-            MemberTotalInfo ownerMemberInfo = getRenterMemberInfo(submitReqDto);
+            OwnerMemberDto ownerMemberDto = getOwnerMemberInfo(submitReqDto);
 
             //获取租客会员信息
-            MemberTotalInfo renterMemberInfo = getRenterMemberInfo(submitReqDto);
+            RenterMemberDto renterMemberDto = getRenterMemberInfo(submitReqDto);
 
             //组装数据
             OrderContextDto orderContextDto = new OrderContextDto();
-            orderContextDto.setOwnerMemberInfo(ownerMemberInfo);
-            orderContextDto.setRenterMemberInfo(renterMemberInfo);
+            orderContextDto.setOwnerMemberDto(ownerMemberDto);
+            orderContextDto.setRenterMemberDto(renterMemberDto);
+            orderContextDto.setCarDetailDto(carDetail);
 
 
             //开始校验规则 （前置校验 + 风控）TODO
@@ -82,7 +96,7 @@ public class SubmitOrderService {
         return null;
     }
 
-    public MemberTotalInfo getRenterMemberInfo(SubmitOrderReq submitReqDto) throws RenterMemberException {
+    public RenterMemberDto getRenterMemberInfo(SubmitOrderReq submitReqDto) throws RenterMemberException {
         List<String> selectKey = Arrays.asList(
                 MemberSelectKeyEnum.MEMBER_CORE_INFO.getKey(),
                 MemberSelectKeyEnum.MEMBER_AUTH_INFO.getKey(),
@@ -117,10 +131,11 @@ public class SubmitOrderService {
         renterMemberDto.setCertificationTime(LocalDateTime.parse(memberAuthInfo.getDriLicFirstTime()), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
         renterMemberDto.setOrderSuccessCount();*/
 
-        return responseData.getData();
+         responseData.getData();
+        return new RenterMemberDto();
     }
 
-    public MemberTotalInfo getOwnerMemberInfo(SubmitOrderReq submitReqDto) throws RenterMemberException {
+    public OwnerMemberDto getOwnerMemberInfo(SubmitOrderReq submitReqDto) throws RenterMemberException {
         List<String> selectKey = Arrays.asList(
                 MemberSelectKeyEnum.MEMBER_CORE_INFO.getKey(),
                 MemberSelectKeyEnum.MEMBER_AUTH_INFO.getKey(),
@@ -143,10 +158,38 @@ public class SubmitOrderService {
             throw new RenterMemberException(ErrorCode.FAILED,"获取会员信息失败");
         }
         //TODO  日志记录
-        return responseData.getData();
+       responseData.getData();
+
+        return new OwnerMemberDto();
     }
 
 
+    public CarDetailDto getCarDetail(SubmitOrderReq submitReqDto) throws CarDetailByFeignException, RenterMemberException {
+        OrderCarInfoParamDTO orderCarInfoParamDTO = new OrderCarInfoParamDTO();
+        orderCarInfoParamDTO.setCarNo(submitReqDto.getCarNo());
+        orderCarInfoParamDTO.setCarAddressIndex(Integer.valueOf(submitReqDto.getCarAddrIndex()));
+        orderCarInfoParamDTO.setRentTime(submitReqDto.getRentTime());
+        orderCarInfoParamDTO.setRevertTime(submitReqDto.getRevertTime());
+        orderCarInfoParamDTO.setUseSpecialPrice(GlobalConstant.USE_SPECIAL_PRICE.equals(submitReqDto.getUseSpecialPrice()));
+        ResponseObject<CarDetailVO> responseObject = null;
+        try{
+            log.info("Feign 开始获取车辆信息,orderCarInfoParamDTO={}",JSON.toJSONString(orderCarInfoParamDTO));
+            responseObject = carDetailQueryFeignApi.getCarDetailOfTransByCarNo(orderCarInfoParamDTO);
+        }catch (Exception e){
+            log.error("Feign 获取车辆信息异常,responseObject={},orderCarInfoParamDTO={}",JSON.toJSONString(responseObject),JSON.toJSONString(orderCarInfoParamDTO),e);
+            //TODO  日志记录
+            throw new CarDetailByFeignException(ErrorCode.FAILED,"调用会员服务异常");
+        }
+        if(responseObject == null || !ErrorCode.SUCCESS.getCode().equals(responseObject.getResCode())){
+            log.error("Feign 获取车辆信息失败,responseObject={},orderCarInfoParamDTO={}",JSON.toJSONString(responseObject),JSON.toJSONString(orderCarInfoParamDTO));
+            //TODO  日志记录
+            throw new RenterMemberException(ErrorCode.FAILED,"获取车辆信息失败");
+        }
+        //TODO 日志记录
+        CarDetailVO data = responseObject.getData();
+
+        return new CarDetailDto();
+    }
 
 
 

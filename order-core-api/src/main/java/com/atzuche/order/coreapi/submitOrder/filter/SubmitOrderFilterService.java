@@ -3,7 +3,7 @@
  */
 package com.atzuche.order.coreapi.submitOrder.filter;
 
-import com.atzuche.order.coreapi.entity.dto.OrderContextDto;
+import com.atzuche.order.commons.entity.dto.OrderContextDto;
 import com.atzuche.order.coreapi.entity.request.SubmitOrderReq;
 import com.atzuche.order.coreapi.submitOrder.exception.SubmitOrderException;
 import com.atzuche.order.coreapi.submitOrder.rules.CancleOrderCountFilter;

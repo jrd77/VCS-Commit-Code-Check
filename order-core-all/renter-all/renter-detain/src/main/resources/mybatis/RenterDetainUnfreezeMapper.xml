@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.atzuche.order.mapper.RenterDetainUnfreezeMapper">
+<mapper namespace="com.atzuche.order.renterdetain.mapper.RenterDetainUnfreezeMapper">
 
-    <resultMap type="com.atzuche.order.entity.RenterDetainUnfreezeEntity" id="BaseResultMap">
+    <resultMap type="com.atzuche.order.renterdetain.entity.RenterDetainUnfreezeEntity" id="BaseResultMap">
         <result property="id" column="id"/>
         <result property="memNo" column="mem_no"/>
         <result property="orderNo" column="order_no"/>
@@ -43,7 +43,7 @@
 	</select>
 
 	 
-	<insert id="insert" parameterType="com.atzuche.order.entity.RenterDetainUnfreezeEntity" useGeneratedKeys="true" keyProperty="id">
+	<insert id="insert" parameterType="com.atzuche.order.renterdetain.entity.RenterDetainUnfreezeEntity" useGeneratedKeys="true" keyProperty="id">
 		insert into renter_detain_unfreeze
 		(
 				`mem_no`,		
@@ -72,7 +72,7 @@
 			)
 	</insert>
 	
-	<insert id="insertSelective" parameterType="com.atzuche.order.entity.RenterDetainUnfreezeEntity" useGeneratedKeys="true" keyProperty="id">
+	<insert id="insertSelective" parameterType="com.atzuche.order.renterdetain.entity.RenterDetainUnfreezeEntity" useGeneratedKeys="true" keyProperty="id">
 		insert into renter_detain_unfreeze
 		(
 				<if test="memNo != null">`mem_no`, </if>
@@ -102,7 +102,7 @@
 	</insert>
 	
 	 
-	<update id="updateByPrimaryKeySelective" parameterType="com.atzuche.order.entity.RenterDetainUnfreezeEntity">
+	<update id="updateByPrimaryKeySelective" parameterType="com.atzuche.order.renterdetain.entity.RenterDetainUnfreezeEntity">
 		update renter_detain_unfreeze 
 		<set>
 				<if test="memNo != null">`mem_no` = #{memNo}, </if>
@@ -119,7 +119,7 @@
 		where id = #{id}
 	</update>
 	
-	<update id="updateByPrimaryKey" parameterType="com.atzuche.order.entity.RenterDetainUnfreezeEntity">
+	<update id="updateByPrimaryKey" parameterType="com.atzuche.order.renterdetain.entity.RenterDetainUnfreezeEntity">
 		update renter_detain_unfreeze 
 		<set>
 				`mem_no` = #{memNo}, 		

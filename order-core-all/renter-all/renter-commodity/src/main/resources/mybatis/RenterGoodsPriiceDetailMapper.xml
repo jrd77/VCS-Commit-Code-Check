@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.atzuche.order.mapper.RenterGoodsPriiceDetailMapper">
+<mapper namespace="com.atzuche.rentercommodity.mapper.RenterGoodsPriiceDetailMapper">
 
-    <resultMap type="com.atzuche.order.entity.RenterGoodsPriiceDetailEntity" id="BaseResultMap">
+    <resultMap type="com.atzuche.rentercommodity.entity.RenterGoodsPriiceDetailEntity" id="BaseResultMap">
         <result property="id" column="id"/>
         <result property="orderNo" column="order_no"/>
         <result property="renterOrderNo" column="renter_order_no"/>
@@ -45,7 +45,7 @@
 	</select>
 
 	 
-	<insert id="insert" parameterType="com.atzuche.order.entity.RenterGoodsPriiceDetailEntity" useGeneratedKeys="true" keyProperty="id">
+	<insert id="insert" parameterType="com.atzuche.rentercommodity.entity.RenterGoodsPriiceDetailEntity" useGeneratedKeys="true" keyProperty="id">
 		insert into renter_goods_price_detail
 		(
 				`order_no`,		
@@ -76,7 +76,7 @@
 			)
 	</insert>
 	
-	<insert id="insertSelective" parameterType="com.atzuche.order.entity.RenterGoodsPriiceDetailEntity" useGeneratedKeys="true" keyProperty="id">
+	<insert id="insertSelective" parameterType="com.atzuche.rentercommodity.entity.RenterGoodsPriiceDetailEntity" useGeneratedKeys="true" keyProperty="id">
 		insert into renter_goods_price_detail
 		(
 				<if test="orderNo != null">`order_no`, </if>
@@ -108,7 +108,7 @@
 	</insert>
 	
 	 
-	<update id="updateByPrimaryKeySelective" parameterType="com.atzuche.order.entity.RenterGoodsPriiceDetailEntity">
+	<update id="updateByPrimaryKeySelective" parameterType="com.atzuche.rentercommodity.entity.RenterGoodsPriiceDetailEntity">
 		update renter_goods_price_detail 
 		<set>
 				<if test="orderNo != null">`order_no` = #{orderNo}, </if>
@@ -126,7 +126,7 @@
 		where id = #{id}
 	</update>
 	
-	<update id="updateByPrimaryKey" parameterType="com.atzuche.order.entity.RenterGoodsPriiceDetailEntity">
+	<update id="updateByPrimaryKey" parameterType="com.atzuche.rentercommodity.entity.RenterGoodsPriiceDetailEntity">
 		update renter_goods_price_detail 
 		<set>
 				`order_no` = #{orderNo}, 		

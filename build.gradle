@@ -56,7 +56,7 @@ subprojects {
         // 单元测试
         testCompile("org.springframework.boot:spring-boot-starter-test:$springBootVersion")
         testCompile("junit:junit:4.12")
-
+        
 
 
         compile "com.autoyol:auto-web-starter:1.0-SNAPSHOT"
