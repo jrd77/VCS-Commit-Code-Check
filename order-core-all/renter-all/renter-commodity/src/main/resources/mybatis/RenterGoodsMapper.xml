@@ -7,6 +7,7 @@
         <result property="id" column="id"/>
         <result property="orderNo" column="order_no"/>
         <result property="renterOrderNo" column="renter_order_no"/>
+        <result property="replyFlag" column="reply_flag"/>
         <result property="carNo" column="car_no"/>
         <result property="carPlateNum" column="car_plate_num"/>
         <result property="carBrand" column="car_brand"/>
@@ -30,6 +31,7 @@
         <result property="carDesc" column="car_desc"/>
         <result property="carStewardPhone" column="car_steward_phone"/>
         <result property="carCheckStatus" column="car_check_status"/>
+        <result property="carShowAddr" column="car_show_addr"/>
         <result property="carShowLon" column="car_show_lon"/>
         <result property="carShowLat" column="car_show_lat"/>
         <result property="carRealAddr" column="car_real_addr"/>
@@ -48,6 +50,7 @@
 	`id`, 	
 	`order_no`, 	
 	`renter_order_no`, 	
+	`reply_flag`, 	
 	`car_no`, 	
 	`car_plate_num`, 	
 	`car_brand`, 	
@@ -71,6 +74,7 @@
 	`car_desc`, 	
 	`car_steward_phone`, 	
 	`car_check_status`, 	
+	`car_show_addr`, 	
 	`car_show_lon`, 	
 	`car_show_lat`, 	
 	`car_real_addr`, 	
@@ -100,6 +104,7 @@
 		(
 				`order_no`,		
 				`renter_order_no`,		
+				`reply_flag`,		
 				`car_no`,		
 				`car_plate_num`,		
 				`car_brand`,		
@@ -123,6 +128,7 @@
 				`car_desc`,		
 				`car_steward_phone`,		
 				`car_check_status`,		
+				`car_show_addr`,		
 				`car_show_lon`,		
 				`car_show_lat`,		
 				`car_real_addr`,		
@@ -139,6 +145,7 @@
 		(
 				#{orderNo}, 		
 				#{renterOrderNo}, 		
+				#{replyFlag}, 		
 				#{carNo}, 		
 				#{carPlateNum}, 		
 				#{carBrand}, 		
@@ -162,6 +169,7 @@
 				#{carDesc}, 		
 				#{carStewardPhone}, 		
 				#{carCheckStatus}, 		
+				#{carShowAddr}, 		
 				#{carShowLon}, 		
 				#{carShowLat}, 		
 				#{carRealAddr}, 		
@@ -181,6 +189,7 @@
 		(
 				<if test="orderNo != null">`order_no`, </if>
 				<if test="renterOrderNo != null">`renter_order_no`, </if>
+				<if test="replyFlag != null">`reply_flag`, </if>
 				<if test="carNo != null">`car_no`, </if>
 				<if test="carPlateNum != null">`car_plate_num`, </if>
 				<if test="carBrand != null">`car_brand`, </if>
@@ -204,6 +213,7 @@
 				<if test="carDesc != null">`car_desc`, </if>
 				<if test="carStewardPhone != null">`car_steward_phone`, </if>
 				<if test="carCheckStatus != null">`car_check_status`, </if>
+				<if test="carShowAddr != null">`car_show_addr`, </if>
 				<if test="carShowLon != null">`car_show_lon`, </if>
 				<if test="carShowLat != null">`car_show_lat`, </if>
 				<if test="carRealAddr != null">`car_real_addr`, </if>
@@ -220,6 +230,7 @@
 		(
 				<if test="orderNo != null">#{orderNo},  </if>
 				<if test="renterOrderNo != null">#{renterOrderNo},  </if>
+				<if test="replyFlag != null">#{replyFlag},  </if>
 				<if test="carNo != null">#{carNo},  </if>
 				<if test="carPlateNum != null">#{carPlateNum},  </if>
 				<if test="carBrand != null">#{carBrand},  </if>
@@ -243,6 +254,7 @@
 				<if test="carDesc != null">#{carDesc},  </if>
 				<if test="carStewardPhone != null">#{carStewardPhone},  </if>
 				<if test="carCheckStatus != null">#{carCheckStatus},  </if>
+				<if test="carShowAddr != null">#{carShowAddr},  </if>
 				<if test="carShowLon != null">#{carShowLon},  </if>
 				<if test="carShowLat != null">#{carShowLat},  </if>
 				<if test="carRealAddr != null">#{carRealAddr},  </if>
@@ -263,6 +275,7 @@
 		<set>
 				<if test="orderNo != null">`order_no` = #{orderNo}, </if>
 				<if test="renterOrderNo != null">`renter_order_no` = #{renterOrderNo}, </if>
+				<if test="replyFlag != null">`reply_flag` = #{replyFlag}, </if>
 				<if test="carNo != null">`car_no` = #{carNo}, </if>
 				<if test="carPlateNum != null">`car_plate_num` = #{carPlateNum}, </if>
 				<if test="carBrand != null">`car_brand` = #{carBrand}, </if>
@@ -286,6 +299,7 @@
 				<if test="carDesc != null">`car_desc` = #{carDesc}, </if>
 				<if test="carStewardPhone != null">`car_steward_phone` = #{carStewardPhone}, </if>
 				<if test="carCheckStatus != null">`car_check_status` = #{carCheckStatus}, </if>
+				<if test="carShowAddr != null">`car_show_addr` = #{carShowAddr}, </if>
 				<if test="carShowLon != null">`car_show_lon` = #{carShowLon}, </if>
 				<if test="carShowLat != null">`car_show_lat` = #{carShowLat}, </if>
 				<if test="carRealAddr != null">`car_real_addr` = #{carRealAddr}, </if>
@@ -306,6 +320,7 @@
 		<set>
 				`order_no` = #{orderNo}, 		
 				`renter_order_no` = #{renterOrderNo}, 		
+				`reply_flag` = #{replyFlag}, 		
 				`car_no` = #{carNo}, 		
 				`car_plate_num` = #{carPlateNum}, 		
 				`car_brand` = #{carBrand}, 		
@@ -329,6 +344,7 @@
 				`car_desc` = #{carDesc}, 		
 				`car_steward_phone` = #{carStewardPhone}, 		
 				`car_check_status` = #{carCheckStatus}, 		
+				`car_show_addr` = #{carShowAddr}, 		
 				`car_show_lon` = #{carShowLon}, 		
 				`car_show_lat` = #{carShowLat}, 		
 				`car_real_addr` = #{carRealAddr}, 		

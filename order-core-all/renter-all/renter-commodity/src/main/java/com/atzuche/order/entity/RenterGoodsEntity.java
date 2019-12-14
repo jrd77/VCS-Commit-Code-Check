@@ -9,7 +9,7 @@ import lombok.Data;
  * 租客商品概览表
  * 
  * @author ZhangBin
- * @date 2019-12-11 18:06:32
+ * @date 2019-12-14 15:14:44
  * @Description:
  */
 @Data
@@ -28,6 +28,10 @@ public class RenterGoodsEntity implements Serializable {
 	 * 子订单号
 	 */
 	private String renterOrderNo;
+	/**
+	 * 应答标识位，0未设置，1已设置
+	 */
+	private Integer replyFlag;
 	/**
 	 * 车辆号
 	 */
@@ -95,7 +99,7 @@ public class RenterGoodsEntity implements Serializable {
 	/**
 	 * 车辆类型，代管车..
 	 */
-	private String carOwnerType;
+	private Integer carOwnerType;
 	/**
 	 * 功能类型 1:MPV，2：SUV,3:中型车，4：中大型车，5：其它，6：客车，7：小型车，8：微型车，9：房车，10：皮卡，11：紧凑型车，12：豪华车，13：跑车，14：面包车 
 	 */
@@ -120,6 +124,10 @@ public class RenterGoodsEntity implements Serializable {
 	 * 车辆检测状态
 	 */
 	private Integer carCheckStatus;
+	/**
+	 * 车辆显示地址
+	 */
+	private String carShowAddr;
 	/**
 	 * 车辆显示经度
 	 */

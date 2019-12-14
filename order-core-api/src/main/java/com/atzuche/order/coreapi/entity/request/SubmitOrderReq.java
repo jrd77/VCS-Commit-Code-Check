@@ -40,9 +40,6 @@ public class SubmitOrderReq {
     private String conPhone;
     private Long rentTime;
     private String srvGetLon;
-    private String abatement;
-    private MemInfoCache memInfoCache;
-    private MemBaseInfoVo tokenMemInfo;
     private Integer memNo;
     private Integer reqSource;
     private String reqOs;
@@ -77,6 +74,5 @@ public class SubmitOrderReq {
     private String mac;
     private String AppChannelId;
     private String appName;
-    private String AndroidId;
     private String androidID;
 }
