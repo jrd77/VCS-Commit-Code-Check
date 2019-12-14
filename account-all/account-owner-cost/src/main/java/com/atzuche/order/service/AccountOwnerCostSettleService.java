@@ -3,7 +3,9 @@ package com.atzuche.order.service;
 import com.atzuche.order.service.notservice.AccountOwnerCostSettleDetailNoTService;
 import com.atzuche.order.service.notservice.AccountOwnerCostSettleNoTService;
 import com.atzuche.order.vo.req.AccountOwnerCostSettleReqVO;
+import com.autoyol.commons.utils.GsonUtils;
 import com.autoyol.commons.web.ErrorCode;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
@@ -16,6 +18,7 @@ import org.springframework.util.Assert;
  * @date 2019-12-11 17:41:37
  */
 @Service
+@Slf4j
 public class AccountOwnerCostSettleService{
     @Autowired
     private AccountOwnerCostSettleNoTService accountOwnerCostSettleNoTService;
@@ -28,6 +31,7 @@ public class AccountOwnerCostSettleService{
      * @param accountOwnerCostSettleReqVO
      */
     public void insertAccountOwnerCostSettle(AccountOwnerCostSettleReqVO accountOwnerCostSettleReqVO){
+        log.info("AccountOwnerCostSettleService insertAccountOwnerCostSettle param", GsonUtils.toJson(accountOwnerCostSettleReqVO));
         //1 校验
         Assert.notNull(accountOwnerCostSettleReqVO, ErrorCode.PARAMETER_ERROR.getText());
         accountOwnerCostSettleReqVO.check();
