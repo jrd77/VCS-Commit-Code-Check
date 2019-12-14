@@ -35,6 +35,9 @@ public class AccountOwnerIncomeNoTService {
     }
 
     public AccountOwnerIncomeEntity getOwnerIncome(Integer memNo) {
+        if(Objects.isNull(memNo)){
+            throw new AccountOwnerIncomeException(ErrorCode.FAILED);
+        }
         AccountOwnerIncomeEntity accountOwnerIncome = accountOwnerIncomeMapper.selectByMemNo(memNo);
         if(Objects.isNull(accountOwnerIncome) || Objects.isNull(accountOwnerIncome.getId())){
             accountOwnerIncome = new AccountOwnerIncomeEntity();
