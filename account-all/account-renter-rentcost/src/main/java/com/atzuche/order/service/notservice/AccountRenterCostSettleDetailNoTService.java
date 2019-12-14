@@ -3,7 +3,6 @@ package com.atzuche.order.service.notservice;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.atzuche.order.mapper.AccountRenterCostSettleDetailMapper;
-import com.atzuche.order.entity.AccountRenterCostSettleDetailEntity;
 
 
 

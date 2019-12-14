@@ -4,15 +4,14 @@ import com.autoyol.commons.web.ErrorCode;
 import lombok.Data;
 import org.springframework.util.Assert;
 
-import java.time.LocalDateTime;
-
 /**
- * 租客费用落库 请求参数
+ * 租客费用总表落库 请求参数
  * @author haibao.yan
  */
 @Data
 public class AccountRenterCostReqVO {
 
+    //租客费用及其结算总表
     /**
      * 主订单号
      */
@@ -21,60 +20,6 @@ public class AccountRenterCostReqVO {
      * 会员号
      */
     private Integer memNo;
-    /**
-     * 支付来源code
-     */
-    private Integer paySourceCode;
-    /**
-     * 支付来源
-     */
-    private String paySource;
-    /**
-     * 支付方式code
-     */
-    private Integer paymentCode;
-    /**
-     * 支付方式
-     */
-    private String payment;
-    /**
-     * 支付渠道code
-     */
-    private Integer payChannelCode;
-    /**
-     * 支付渠道
-     */
-    private String payChannel;
-    /**
-     * 入账金额
-     */
-    private Integer amt;
-    /**
-     * 入账来源编码
-     */
-    private Integer sourceCode;
-    /**
-     * 入账来源编码描述
-     */
-    private String sourceDetail;
-    /**
-     * 交易时间
-     */
-    private LocalDateTime transTime;
-
-    /**
-     * 创建人
-     */
-    private String createOp;
-
-    /**
-     * 修改人
-     */
-    private String updateOp;
-
-
-
-    //777
     /**
      * 租车费用
      */
@@ -112,18 +57,37 @@ public class AccountRenterCostReqVO {
      */
     private Integer shifuAmt;
 
+    /**
+     * 创建人
+     */
+    private String createOp;
+
+    /**
+     * 修改人
+     */
+    private String updateOp;
 
 
-
+    /**
+     * 费用明细
+     */
+    private AccountRenterCostDetailReqVO accountRenterCostDetailReqVO;
     /**
      * 参数校验
      */
     public void check() {
-        Assert.notNull(getAmt(), ErrorCode.PARAMETER_ERROR.getText());
         Assert.notNull(getOrderNo(), ErrorCode.PARAMETER_ERROR.getText());
-        Assert.notNull(getPaymentCode(), ErrorCode.PARAMETER_ERROR.getText());
-        Assert.notNull(getPayChannelCode(), ErrorCode.PARAMETER_ERROR.getText());
-        Assert.notNull(getSourceCode(), ErrorCode.PARAMETER_ERROR.getText());
-        Assert.notNull(getPaySourceCode(), ErrorCode.PARAMETER_ERROR.getText());
+        Assert.notNull(getMemNo(), ErrorCode.PARAMETER_ERROR.getText());
+        Assert.notNull(getAdditionalDrivingEnsureAmount(), ErrorCode.PARAMETER_ERROR.getText());
+        Assert.notNull(getBasicEnsureAmount(), ErrorCode.PARAMETER_ERROR.getText());
+        Assert.notNull(getCarOwnerSubsidyAmount(), ErrorCode.PARAMETER_ERROR.getText());
+        Assert.notNull(getComprehensiveEnsureAmount(), ErrorCode.PARAMETER_ERROR.getText());
+        Assert.notNull(getOtherAmt(), ErrorCode.PARAMETER_ERROR.getText());
+        Assert.notNull(getPlatformSubsidyAmount(), ErrorCode.PARAMETER_ERROR.getText());
+        Assert.notNull(getRentAmt(), ErrorCode.PARAMETER_ERROR.getText());
+        Assert.notNull(getShifuAmt(), ErrorCode.PARAMETER_ERROR.getText());
+        Assert.notNull(getYongjinAmt(), ErrorCode.PARAMETER_ERROR.getText());
+        Assert.notNull(getAccountRenterCostDetailReqVO(), ErrorCode.PARAMETER_ERROR.getText());
+        getAccountRenterCostDetailReqVO().check();
     }
 }

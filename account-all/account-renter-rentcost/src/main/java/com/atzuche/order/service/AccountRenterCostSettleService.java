@@ -29,8 +29,10 @@ public class AccountRenterCostSettleService{
         //1 参数校验
         Assert.notNull(accountRenterCost, ErrorCode.PARAMETER_ERROR.getText());
         accountRenterCost.check();
-        //2
-
+        //2费用明细落库
+        accountRenterCostDetailNoTService.insertAccountRenterCostDetail(accountRenterCost.getAccountRenterCostDetailReqVO());
+        //3费用信息落库
+        accountRenterCostSettleNoTService.insertOrUpdateRenterCostSettle(accountRenterCost);
 
     }
 
