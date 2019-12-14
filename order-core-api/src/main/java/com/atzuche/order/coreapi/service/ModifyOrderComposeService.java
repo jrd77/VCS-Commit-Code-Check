@@ -9,9 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.atzuche.order.coreapi.entity.bo.RenterGoodsPriceBO;
-import com.atzuche.rentercommodity.entity.RenterGoodsPriiceDetailEntity;
+import com.atzuche.order.rentercommodity.entity.RenterGoodsPriiceDetailEntity;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
-import com.atzuche.rentercommodity.service.RenterGoodsPriiceDetailService;
+import com.atzuche.order.rentercommodity.service.RenterGoodsPriiceDetailService;
 
 @Service
 public class ModifyOrderComposeService {
