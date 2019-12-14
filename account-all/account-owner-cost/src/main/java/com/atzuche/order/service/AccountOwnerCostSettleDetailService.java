@@ -1,5 +1,6 @@
 package com.atzuche.order.service;
 
+import com.atzuche.order.service.notservice.AccountOwnerCostSettleDetailNoTService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.atzuche.order.mapper.AccountOwnerCostSettleDetailMapper;
@@ -16,7 +17,7 @@ import com.atzuche.order.entity.AccountOwnerCostSettleDetailEntity;
 @Service
 public class AccountOwnerCostSettleDetailService{
     @Autowired
-    private AccountOwnerCostSettleDetailMapper accountOwnerCostSettleDetailMapper;
+    private AccountOwnerCostSettleDetailNoTService accountOwnerCostSettleDetailNoTService;
 
 
 }

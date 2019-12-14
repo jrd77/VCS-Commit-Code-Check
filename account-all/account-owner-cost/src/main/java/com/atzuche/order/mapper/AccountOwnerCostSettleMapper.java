@@ -15,14 +15,7 @@ public interface AccountOwnerCostSettleMapper{
 
     AccountOwnerCostSettleEntity selectByPrimaryKey(Integer id);
 
-    List<AccountOwnerCostSettleEntity> selectALL();
-
     int insert(AccountOwnerCostSettleEntity record);
-    
-    int insertSelective(AccountOwnerCostSettleEntity record);
 
-    int updateByPrimaryKey(AccountOwnerCostSettleEntity record);
-    
-    int updateByPrimaryKeySelective(AccountOwnerCostSettleEntity record);
 
 }
