@@ -1,9 +1,9 @@
 package com.atzuche.order.accountdebt.service.notservice;
 
-import com.atzuche.order.accountdebt.dto.AccountDeductDebtDTO;
 import com.atzuche.order.accountdebt.entity.AccountDebtEntity;
 import com.atzuche.order.accountdebt.exception.AccountDebtException;
 import com.atzuche.order.accountdebt.mapper.AccountDebtMapper;
+import com.atzuche.order.accountdebt.vo.req.AccountDeductDebtReqVO;
 import com.atzuche.order.accountdebt.vo.req.AccountInsertDebtReqVO;
 import com.atzuche.order.accountdebt.vo.res.AccountDebtResVO;
 import com.autoyol.commons.web.ErrorCode;
@@ -60,13 +60,13 @@ public class AccountDebtNoTService {
      * 抵扣还款  欠款表记录更新
      * @param accountDeductDebt
      */
-    public void deductAccountDebt(AccountDeductDebtDTO accountDeductDebt) {
+    public void deductAccountDebt(AccountDeductDebtReqVO accountDeductDebt) {
         //1 查询用户欠款总和
         AccountDebtEntity accountDebtEntity =  accountDebtMapper.getAccountDebtByMemNo(accountDeductDebt.getMemNo());
         if(Objects.isNull(accountDebtEntity) || Objects.isNull(accountDebtEntity.getId())){
             throw new AccountDebtException(ErrorCode.FAILED);
         }
-        accountDebtEntity.setDebtAmt(accountDebtEntity.getDebtAmt()-Math.abs(accountDeductDebt.getAmtReal()));
+        accountDebtEntity.setDebtAmt(accountDebtEntity.getDebtAmt()-Math.abs(accountDeductDebt.getAmt()));
         int result = accountDebtMapper.updateByPrimaryKeySelective(accountDebtEntity);
         if(result==0){
             throw new AccountDebtException(ErrorCode.FAILED);

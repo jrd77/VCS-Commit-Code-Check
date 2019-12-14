@@ -90,7 +90,7 @@ public class AccountDebtService{
 //        //5 记录欠款收款详情
         accountDebtReceivableaDetailNoTService.insertAlreadyReceivablea(accountDebtReceivableaDetails);
 //        //6 更新总欠款表
-//        accountDebtNoTService.deductAccountDebt(accountDeductDebtDTO);
+        accountDebtNoTService.deductAccountDebt(accountDeductDebt);
     }
 
     /**
