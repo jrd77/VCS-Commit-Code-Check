@@ -1,6 +1,6 @@
 package com.atzuche.order.renterpenalty.mapper;
 
-import com.atzuche.rentercost.entity.RenterOrderFineDeatailEntity;
+import com.atzuche.order.renterpenalty.entity.RenterOrderFineDeatailEntity;
 import org.apache.ibatis.annotations.Mapper;
 import java.util.List;
 

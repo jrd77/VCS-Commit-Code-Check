@@ -8,11 +8,11 @@
         <result property="orderNo" column="order_no"/>
         <result property="ownerOrderNo" column="owner_order_no"/>
         <result property="renterOrderNo" column="renter_order_no"/>
-        <result property="memNoOwner" column="mem_no_owner"/>
+        <result property="memnerNoOwner" column="memner_no_owner"/>
         <result property="memNoRenter" column="mem_no_renter"/>
         <result property="orderNoDelivery" column="order_no_delivery"/>
-        <result property="category" column="category"/>
-        <result property="entryCode" column="entry_code"/>
+        <result property="orderInsideType" column="order_inside_type"/>
+        <result property="orderSceneCode" column="order_scene_code"/>
         <result property="expRentStartTime" column="exp_rent_start_time"/>
         <result property="expRentEndTime" column="exp_rent_end_time"/>
         <result property="actRentStartTime" column="act_rent_start_time"/>
@@ -26,7 +26,6 @@
         <result property="isClaims" column="is_claims"/>
         <result property="isFreeDeposit" column="is_free_deposit"/>
         <result property="isWz" column="is_wz"/>
-        <result property="isUseAirPortService" column="is_use_air_port_Service"/>
         <result property="isDetain" column="is_detain"/>
         <result property="reqTime" column="req_time"/>
         <result property="riskAuditId" column="risk_audit_id"/>
@@ -44,11 +43,11 @@
 	`order_no`, 	
 	`owner_order_no`, 	
 	`renter_order_no`, 	
-	`mem_no_owner`, 	
+	`memner_no_owner`, 	
 	`mem_no_renter`, 	
 	`order_no_delivery`, 	
-	`category`, 	
-	`entry_code`, 	
+	`order_inside_type`, 	
+	`order_scene_code`, 	
 	`exp_rent_start_time`, 	
 	`exp_rent_end_time`, 	
 	`act_rent_start_time`, 	
@@ -62,7 +61,6 @@
 	`is_claims`, 	
 	`is_free_deposit`, 	
 	`is_wz`, 	
-	`is_use_air_port_Service`, 	
 	`is_detain`, 	
 	`req_time`, 	
 	`risk_audit_id`, 	
@@ -91,11 +89,11 @@
 				`order_no`,		
 				`owner_order_no`,		
 				`renter_order_no`,		
-				`mem_no_owner`,		
+				`memner_no_owner`,		
 				`mem_no_renter`,		
 				`order_no_delivery`,		
-				`category`,		
-				`entry_code`,		
+				`order_inside_type`,		
+				`order_scene_code`,		
 				`exp_rent_start_time`,		
 				`exp_rent_end_time`,		
 				`act_rent_start_time`,		
@@ -109,7 +107,6 @@
 				`is_claims`,		
 				`is_free_deposit`,		
 				`is_wz`,		
-				`is_use_air_port_Service`,		
 				`is_detain`,		
 				`req_time`,		
 				`risk_audit_id`,		
@@ -125,11 +122,11 @@
 				#{orderNo}, 		
 				#{ownerOrderNo}, 		
 				#{renterOrderNo}, 		
-				#{memNoOwner}, 		
+				#{memnerNoOwner}, 		
 				#{memNoRenter}, 		
 				#{orderNoDelivery}, 		
-				#{category}, 		
-				#{entryCode}, 		
+				#{orderInsideType}, 		
+				#{orderSceneCode}, 		
 				#{expRentStartTime}, 		
 				#{expRentEndTime}, 		
 				#{actRentStartTime}, 		
@@ -143,7 +140,6 @@
 				#{isClaims}, 		
 				#{isFreeDeposit}, 		
 				#{isWz}, 		
-				#{isUseAirPortService}, 		
 				#{isDetain}, 		
 				#{reqTime}, 		
 				#{riskAuditId}, 		
@@ -162,11 +158,11 @@
 				<if test="orderNo != null">`order_no`, </if>
 				<if test="ownerOrderNo != null">`owner_order_no`, </if>
 				<if test="renterOrderNo != null">`renter_order_no`, </if>
-				<if test="memNoOwner != null">`mem_no_owner`, </if>
+				<if test="memnerNoOwner != null">`memner_no_owner`, </if>
 				<if test="memNoRenter != null">`mem_no_renter`, </if>
 				<if test="orderNoDelivery != null">`order_no_delivery`, </if>
-				<if test="category != null">`category`, </if>
-				<if test="entryCode != null">`entry_code`, </if>
+				<if test="orderInsideType != null">`order_inside_type`, </if>
+				<if test="orderSceneCode != null">`order_scene_code`, </if>
 				<if test="expRentStartTime != null">`exp_rent_start_time`, </if>
 				<if test="expRentEndTime != null">`exp_rent_end_time`, </if>
 				<if test="actRentStartTime != null">`act_rent_start_time`, </if>
@@ -180,7 +176,6 @@
 				<if test="isClaims != null">`is_claims`, </if>
 				<if test="isFreeDeposit != null">`is_free_deposit`, </if>
 				<if test="isWz != null">`is_wz`, </if>
-				<if test="isUseAirPortService != null">`is_use_air_port_Service`, </if>
 				<if test="isDetain != null">`is_detain`, </if>
 				<if test="reqTime != null">`req_time`, </if>
 				<if test="riskAuditId != null">`risk_audit_id`, </if>
@@ -196,11 +191,11 @@
 				<if test="orderNo != null">#{orderNo},  </if>
 				<if test="ownerOrderNo != null">#{ownerOrderNo},  </if>
 				<if test="renterOrderNo != null">#{renterOrderNo},  </if>
-				<if test="memNoOwner != null">#{memNoOwner},  </if>
+				<if test="memnerNoOwner != null">#{memnerNoOwner},  </if>
 				<if test="memNoRenter != null">#{memNoRenter},  </if>
 				<if test="orderNoDelivery != null">#{orderNoDelivery},  </if>
-				<if test="category != null">#{category},  </if>
-				<if test="entryCode != null">#{entryCode},  </if>
+				<if test="orderInsideType != null">#{orderInsideType},  </if>
+				<if test="orderSceneCode != null">#{orderSceneCode},  </if>
 				<if test="expRentStartTime != null">#{expRentStartTime},  </if>
 				<if test="expRentEndTime != null">#{expRentEndTime},  </if>
 				<if test="actRentStartTime != null">#{actRentStartTime},  </if>
@@ -214,7 +209,6 @@
 				<if test="isClaims != null">#{isClaims},  </if>
 				<if test="isFreeDeposit != null">#{isFreeDeposit},  </if>
 				<if test="isWz != null">#{isWz},  </if>
-				<if test="isUseAirPortService != null">#{isUseAirPortService},  </if>
 				<if test="isDetain != null">#{isDetain},  </if>
 				<if test="reqTime != null">#{reqTime},  </if>
 				<if test="riskAuditId != null">#{riskAuditId},  </if>
@@ -234,11 +228,11 @@
 				<if test="orderNo != null">`order_no` = #{orderNo}, </if>
 				<if test="ownerOrderNo != null">`owner_order_no` = #{ownerOrderNo}, </if>
 				<if test="renterOrderNo != null">`renter_order_no` = #{renterOrderNo}, </if>
-				<if test="memNoOwner != null">`mem_no_owner` = #{memNoOwner}, </if>
+				<if test="memnerNoOwner != null">`memner_no_owner` = #{memnerNoOwner}, </if>
 				<if test="memNoRenter != null">`mem_no_renter` = #{memNoRenter}, </if>
 				<if test="orderNoDelivery != null">`order_no_delivery` = #{orderNoDelivery}, </if>
-				<if test="category != null">`category` = #{category}, </if>
-				<if test="entryCode != null">`entry_code` = #{entryCode}, </if>
+				<if test="orderInsideType != null">`order_inside_type` = #{orderInsideType}, </if>
+				<if test="orderSceneCode != null">`order_scene_code` = #{orderSceneCode}, </if>
 				<if test="expRentStartTime != null">`exp_rent_start_time` = #{expRentStartTime}, </if>
 				<if test="expRentEndTime != null">`exp_rent_end_time` = #{expRentEndTime}, </if>
 				<if test="actRentStartTime != null">`act_rent_start_time` = #{actRentStartTime}, </if>
@@ -252,7 +246,6 @@
 				<if test="isClaims != null">`is_claims` = #{isClaims}, </if>
 				<if test="isFreeDeposit != null">`is_free_deposit` = #{isFreeDeposit}, </if>
 				<if test="isWz != null">`is_wz` = #{isWz}, </if>
-				<if test="isUseAirPortService != null">`is_use_air_port_Service` = #{isUseAirPortService}, </if>
 				<if test="isDetain != null">`is_detain` = #{isDetain}, </if>
 				<if test="reqTime != null">`req_time` = #{reqTime}, </if>
 				<if test="riskAuditId != null">`risk_audit_id` = #{riskAuditId}, </if>
@@ -272,11 +265,11 @@
 				`order_no` = #{orderNo}, 		
 				`owner_order_no` = #{ownerOrderNo}, 		
 				`renter_order_no` = #{renterOrderNo}, 		
-				`mem_no_owner` = #{memNoOwner}, 		
+				`memner_no_owner` = #{memnerNoOwner}, 		
 				`mem_no_renter` = #{memNoRenter}, 		
 				`order_no_delivery` = #{orderNoDelivery}, 		
-				`category` = #{category}, 		
-				`entry_code` = #{entryCode}, 		
+				`order_inside_type` = #{orderInsideType}, 		
+				`order_scene_code` = #{orderSceneCode}, 		
 				`exp_rent_start_time` = #{expRentStartTime}, 		
 				`exp_rent_end_time` = #{expRentEndTime}, 		
 				`act_rent_start_time` = #{actRentStartTime}, 		
@@ -290,7 +283,6 @@
 				`is_claims` = #{isClaims}, 		
 				`is_free_deposit` = #{isFreeDeposit}, 		
 				`is_wz` = #{isWz}, 		
-				`is_use_air_port_Service` = #{isUseAirPortService}, 		
 				`is_detain` = #{isDetain}, 		
 				`req_time` = #{reqTime}, 		
 				`risk_audit_id` = #{riskAuditId}, 		
@@ -304,5 +296,9 @@
 		</set>
 		where id = #{id}
 	</update>
+	
+	<select id="getParentOrderDetailByOrderNo" resultMap="BaseResultMap">
+		select <include refid="Base_Column_List" /> from order where order_no = #{orderNo}
+	</select>
   	
 </mapper>

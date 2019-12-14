@@ -2,13 +2,15 @@ package com.atzuche.order.parentorder.mapper;
 
 import com.atzuche.order.parentorder.entity.OrderStatusEntity;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
 import java.util.List;
 
 /**
  * 主订单表状态
  * 
  * @author ZhangBin
- * @date 2019-12-14 17:52:41
+ * @date 2019-12-12 14:41:07
  */
 @Mapper
 public interface OrderStatusMapper{
@@ -24,5 +26,7 @@ public interface OrderStatusMapper{
     int updateByPrimaryKey(OrderStatusEntity record);
     
     int updateByPrimaryKeySelective(OrderStatusEntity record);
+    
+    OrderStatusEntity getOrderStatusByOrderNo(@Param("orderNo") Long orderNo);
 
 }
