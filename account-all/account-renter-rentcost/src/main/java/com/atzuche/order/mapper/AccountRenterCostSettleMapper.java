@@ -2,6 +2,8 @@ package com.atzuche.order.mapper;
 
 import com.atzuche.order.entity.AccountRenterCostSettleEntity;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
 import java.util.List;
 
 /**
@@ -19,10 +21,7 @@ public interface AccountRenterCostSettleMapper{
 
     int insert(AccountRenterCostSettleEntity record);
     
-    int insertSelective(AccountRenterCostSettleEntity record);
-
-    int updateByPrimaryKey(AccountRenterCostSettleEntity record);
-    
     int updateByPrimaryKeySelective(AccountRenterCostSettleEntity record);
 
+    AccountRenterCostSettleEntity selectByOrderNo(@Param("orderNo") Long orderNo, @Param("memNo")Integer memNo);
 }
