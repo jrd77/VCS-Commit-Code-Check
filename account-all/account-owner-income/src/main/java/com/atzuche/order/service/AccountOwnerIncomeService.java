@@ -10,8 +10,6 @@ import com.atzuche.order.vo.req.AccountOwnerIncomeExamineReqVO;
 import com.autoyol.commons.web.ErrorCode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.atzuche.order.mapper.AccountOwnerIncomeMapper;
-import com.atzuche.order.entity.AccountOwnerIncomeEntity;
 import org.springframework.util.Assert;
 
 
@@ -50,7 +48,7 @@ public class AccountOwnerIncomeService{
     }
 
     /**
-     * 审核收益
+     * 收益审核通过 更新车主收益信息
      */
     public void examineOwnerIncomeExamine(AccountOwnerIncomeExamineOpReqVO accountOwnerIncomeExamineOpReq){
         //1参数校验

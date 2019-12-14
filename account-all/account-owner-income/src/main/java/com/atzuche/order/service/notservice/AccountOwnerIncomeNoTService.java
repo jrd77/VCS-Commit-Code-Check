@@ -2,10 +2,10 @@ package com.atzuche.order.service.notservice;
 
 import com.atzuche.order.entity.AccountOwnerIncomeDetailEntity;
 import com.atzuche.order.entity.AccountOwnerIncomeEntity;
+import com.atzuche.order.exception.AccountOwnerIncomeException;
 import com.atzuche.order.mapper.AccountOwnerIncomeMapper;
-import com.atzuche.order.vo.res.AccountOwnerIncomeResVO;
+import com.autoyol.commons.web.ErrorCode;
 import org.apache.commons.lang3.math.NumberUtils;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -52,6 +52,15 @@ public class AccountOwnerIncomeNoTService {
      * @param accountOwnerIncomeDetail
      */
     public void updateOwnerIncomeAmt(AccountOwnerIncomeDetailEntity accountOwnerIncomeDetail) {
-
+        AccountOwnerIncomeEntity accountOwnerIncome = getOwnerIncome(accountOwnerIncomeDetail.getMemNo());
+        int amt = accountOwnerIncome.getIncomeAmt() + accountOwnerIncomeDetail.getAmt();
+        if(amt<0){
+            throw new AccountOwnerIncomeException(ErrorCode.GREATER_THAN_WITHDRAWAL_AMOUNT);
+        }
+        accountOwnerIncome.setIncomeAmt(amt);
+        int result = accountOwnerIncomeMapper.updateByPrimaryKey(accountOwnerIncome);
+        if(result==0){
+            throw new AccountOwnerIncomeException(ErrorCode.FAILED);
+        }
     }
 }
