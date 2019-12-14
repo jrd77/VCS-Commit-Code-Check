@@ -1,6 +1,6 @@
-package com.atzuche.rentercommodity.mapper;
+package com.atzuche.order.rentercommodity.mapper;
 
-import com.atzuche.rentercommodity.entity.RenterGoodsEntity;
+import com.atzuche.order.rentercommodity.entity.RenterGoodsEntity;
 import org.apache.ibatis.annotations.Mapper;
 import java.util.List;
 

@@ -1,6 +1,6 @@
-package com.atzuche.parentorder.service;
+package com.atzuche.order.parentorder.service;
 
-import com.atzuche.parentorder.mapper.OrderMapper;
+import com.atzuche.order.parentorder.mapper.OrderMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

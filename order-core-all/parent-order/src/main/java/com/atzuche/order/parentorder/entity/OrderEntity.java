@@ -1,4 +1,4 @@
-package com.atzuche.parentorder.entity;
+package com.atzuche.order.parentorder.entity;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;

@@ -1,4 +1,4 @@
-package com.atzuche.rentercommodity.entity;
+package com.atzuche.order.rentercommodity.entity;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;

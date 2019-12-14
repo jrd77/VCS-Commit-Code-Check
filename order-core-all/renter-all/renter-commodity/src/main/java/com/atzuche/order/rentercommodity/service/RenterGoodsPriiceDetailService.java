@@ -1,12 +1,11 @@
-package com.atzuche.rentercommodity.service;
+package com.atzuche.order.rentercommodity.service;
 
 import java.util.List;
 
+import com.atzuche.order.rentercommodity.entity.RenterGoodsPriiceDetailEntity;
+import com.atzuche.order.rentercommodity.mapper.RenterGoodsPriiceDetailMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.atzuche.rentercommodity.mapper.RenterGoodsPriiceDetailMapper;
-import com.atzuche.rentercommodity.entity.RenterGoodsPriiceDetailEntity;
-
 
 
 /**
