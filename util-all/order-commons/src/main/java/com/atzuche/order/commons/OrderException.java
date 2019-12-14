@@ -6,27 +6,27 @@ package com.atzuche.order.commons;
  **/
 public abstract class OrderException extends RuntimeException {
 
-    private int errorCode;
+    private String errorCode;
 
     private String errorMsg;
 
-    public OrderException(int errorCode, String errorMsg,Throwable cause) {
+    public OrderException(String errorCode, String errorMsg,Throwable cause) {
         super(cause);
         this.errorCode = errorCode;
         this.errorMsg = errorMsg;
     }
 
-    public OrderException(int errorCode, String errorMsg) {
+    public OrderException(String errorCode, String errorMsg) {
         super();
         this.errorCode = errorCode;
         this.errorMsg = errorMsg;
     }
 
-    public int getErrorCode() {
+    public String getErrorCode() {
         return errorCode;
     }
 
-    public void setErrorCode(int errorCode) {
+    public void setErrorCode(String errorCode) {
         this.errorCode = errorCode;
     }
 
