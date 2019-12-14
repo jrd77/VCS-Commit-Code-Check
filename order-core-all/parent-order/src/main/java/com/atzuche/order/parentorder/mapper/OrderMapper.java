@@ -1,6 +1,6 @@
-package com.atzuche.parentorder.mapper;
+package com.atzuche.order.parentorder.mapper;
 
-import com.atzuche.parentorder.entity.OrderEntity;
+import com.atzuche.order.parentorder.entity.OrderEntity;
 import org.apache.ibatis.annotations.Mapper;
 import java.util.List;
 
