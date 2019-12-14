@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.atzuche.order.mapper.RenterOrderCostDetailMapper">
+<mapper namespace="com.atzuche.order.rentercost.mapper.RenterOrderCostDetailMapper">
 
-    <resultMap type="com.atzuche.order.entity.RenterOrderCostDetailEntity" id="BaseResultMap">
+    <resultMap type="com.atzuche.order.rentercost.entity.RenterOrderCostDetailEntity" id="BaseResultMap">
         <result property="id" column="id"/>
         <result property="orderNo" column="order_no"/>
         <result property="renterOrderNo" column="renter_order_no"/>
@@ -63,7 +63,7 @@
 	</select>
 
 	 
-	<insert id="insert" parameterType="com.atzuche.order.entity.RenterOrderCostDetailEntity" useGeneratedKeys="true" keyProperty="id">
+	<insert id="insert" parameterType="com.atzuche.order.rentercost.entity.RenterOrderCostDetailEntity" useGeneratedKeys="true" keyProperty="id">
 		insert into renter_order_cost_detail
 		(
 				`order_no`,		
@@ -112,7 +112,7 @@
 			)
 	</insert>
 	
-	<insert id="insertSelective" parameterType="com.atzuche.order.entity.RenterOrderCostDetailEntity" useGeneratedKeys="true" keyProperty="id">
+	<insert id="insertSelective" parameterType="com.atzuche.order.rentercost.entity.RenterOrderCostDetailEntity" useGeneratedKeys="true" keyProperty="id">
 		insert into renter_order_cost_detail
 		(
 				<if test="orderNo != null">`order_no`, </if>
@@ -162,7 +162,7 @@
 	</insert>
 	
 	 
-	<update id="updateByPrimaryKeySelective" parameterType="com.atzuche.order.entity.RenterOrderCostDetailEntity">
+	<update id="updateByPrimaryKeySelective" parameterType="com.atzuche.order.rentercost.entity.RenterOrderCostDetailEntity">
 		update renter_order_cost_detail 
 		<set>
 				<if test="orderNo != null">`order_no` = #{orderNo}, </if>
@@ -189,7 +189,7 @@
 		where id = #{id}
 	</update>
 	
-	<update id="updateByPrimaryKey" parameterType="com.atzuche.order.entity.RenterOrderCostDetailEntity">
+	<update id="updateByPrimaryKey" parameterType="com.atzuche.order.rentercost.entity.RenterOrderCostDetailEntity">
 		update renter_order_cost_detail 
 		<set>
 				`order_no` = #{orderNo}, 		
@@ -217,7 +217,4 @@
 		where id = #{id}
 	</update>
   	
-  	<select id="getRenterOrderCostDetailByRenterOrderNo" resultMap="BaseResultMap">
-		select <include refid="Base_Column_List" /> from renter_order_cost_detail where renter_order_no = #{renterOrderNo}
-	</select>
 </mapper>

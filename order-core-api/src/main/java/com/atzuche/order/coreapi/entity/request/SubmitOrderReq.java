@@ -1,8 +1,6 @@
 package com.atzuche.order.coreapi.entity.request;
 
-import com.atzuche.order.coreapi.entity.dto.ItemList;
-import com.atzuche.order.coreapi.entity.dto.MemBaseInfoVo;
-import com.atzuche.order.coreapi.entity.dto.MemInfoCache;
+import com.atzuche.order.commons.entity.request.ItemList;
 import lombok.Data;
 
 import java.util.List;
@@ -40,9 +38,6 @@ public class SubmitOrderReq {
     private String conPhone;
     private Long rentTime;
     private String srvGetLon;
-    private String abatement;
-    private MemInfoCache memInfoCache;
-    private MemBaseInfoVo tokenMemInfo;
     private Integer memNo;
     private Integer reqSource;
     private String reqOs;
@@ -77,6 +72,5 @@ public class SubmitOrderReq {
     private String mac;
     private String AppChannelId;
     private String appName;
-    private String AndroidId;
     private String androidID;
 }

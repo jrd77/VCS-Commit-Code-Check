@@ -1,10 +1,9 @@
 package com.atzuche.order.coreapi.entity.bo;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import com.atzuche.order.entity.RenterGoodsPriiceDetailEntity;
+import com.atzuche.rentercommodity.entity.RenterGoodsPriiceDetailEntity;
 
 import lombok.Data;
 

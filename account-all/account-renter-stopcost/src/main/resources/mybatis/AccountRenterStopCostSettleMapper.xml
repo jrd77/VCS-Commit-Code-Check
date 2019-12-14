@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.atzuche.order.mapper.AccountRenterStopCostSettleMapper">
+<mapper namespace="com.atzuche.order.accountrenterstopcost.mapper.AccountRenterStopCostSettleMapper">
 
-    <resultMap type="com.atzuche.order.entity.AccountRenterStopCostSettleEntity" id="BaseResultMap">
+    <resultMap type="com.atzuche.order.accountrenterstopcost.entity.AccountRenterStopCostSettleEntity" id="BaseResultMap">
         <result property="id" column="id"/>
         <result property="memNo" column="mem_no"/>
         <result property="yingfuAmt" column="yingfu_amt"/>
@@ -45,7 +45,7 @@
 	</select>
 
 	 
-	<insert id="insert" parameterType="com.atzuche.order.entity.AccountRenterStopCostSettleEntity" useGeneratedKeys="true" keyProperty="id">
+	<insert id="insert" parameterType="com.atzuche.order.accountrenterstopcost.entity.AccountRenterStopCostSettleEntity" useGeneratedKeys="true" keyProperty="id">
 		insert into account_renter_stop_cost_settle
 		(
 				`mem_no`,		
@@ -76,7 +76,7 @@
 			)
 	</insert>
 	
-	<insert id="insertSelective" parameterType="com.atzuche.order.entity.AccountRenterStopCostSettleEntity" useGeneratedKeys="true" keyProperty="id">
+	<insert id="insertSelective" parameterType="com.atzuche.order.accountrenterstopcost.entity.AccountRenterStopCostSettleEntity" useGeneratedKeys="true" keyProperty="id">
 		insert into account_renter_stop_cost_settle
 		(
 				<if test="memNo != null">`mem_no`, </if>
@@ -108,7 +108,7 @@
 	</insert>
 	
 	 
-	<update id="updateByPrimaryKeySelective" parameterType="com.atzuche.order.entity.AccountRenterStopCostSettleEntity">
+	<update id="updateByPrimaryKeySelective" parameterType="com.atzuche.order.accountrenterstopcost.entity.AccountRenterStopCostSettleEntity">
 		update account_renter_stop_cost_settle 
 		<set>
 				<if test="memNo != null">`mem_no` = #{memNo}, </if>
@@ -126,7 +126,7 @@
 		where id = #{id}
 	</update>
 	
-	<update id="updateByPrimaryKey" parameterType="com.atzuche.order.entity.AccountRenterStopCostSettleEntity">
+	<update id="updateByPrimaryKey" parameterType="com.atzuche.order.accountrenterstopcost.entity.AccountRenterStopCostSettleEntity">
 		update account_renter_stop_cost_settle 
 		<set>
 				`mem_no` = #{memNo}, 		

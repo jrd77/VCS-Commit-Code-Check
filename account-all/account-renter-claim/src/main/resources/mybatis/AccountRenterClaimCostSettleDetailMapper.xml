@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.atzuche.order.mapper.AccountRenterClaimCostSettleDetailMapper">
+<mapper namespace="com.atzuche.order.accountrenterclaim.mapper.AccountRenterClaimCostSettleDetailMapper">
 
-    <resultMap type="com.atzuche.order.entity.AccountRenterClaimCostSettleDetailEntity" id="BaseResultMap">
+    <resultMap type="com.atzuche.order.accountrenterclaim.entity.AccountRenterClaimCostSettleDetailEntity" id="BaseResultMap">
         <result property="id" column="id"/>
         <result property="orderNo" column="order_no"/>
         <result property="renterOrderNo" column="renter_order_no"/>
@@ -45,7 +45,7 @@
 	</select>
 
 	 
-	<insert id="insert" parameterType="com.atzuche.order.entity.AccountRenterClaimCostSettleDetailEntity">
+	<insert id="insert" parameterType="com.atzuche.order.accountrenterclaim.entity.AccountRenterClaimCostSettleDetailEntity">
 		insert into account_renter_claim_cost_settle_detail
 		(
 			`id`,		
@@ -78,7 +78,7 @@
 			)
 	</insert>
 	
-	<insert id="insertSelective" parameterType="com.atzuche.order.entity.AccountRenterClaimCostSettleDetailEntity">
+	<insert id="insertSelective" parameterType="com.atzuche.order.accountrenterclaim.entity.AccountRenterClaimCostSettleDetailEntity">
 		insert into account_renter_claim_cost_settle_detail
 		(
 			<if test="id != null">`id`, </if>
@@ -112,7 +112,7 @@
 	</insert>
 	
 	 
-	<update id="updateByPrimaryKeySelective" parameterType="com.atzuche.order.entity.AccountRenterClaimCostSettleDetailEntity">
+	<update id="updateByPrimaryKeySelective" parameterType="com.atzuche.order.accountrenterclaim.entity.AccountRenterClaimCostSettleDetailEntity">
 		update account_renter_claim_cost_settle_detail 
 		<set>
 				<if test="orderNo != null">`order_no` = #{orderNo}, </if>
@@ -130,7 +130,7 @@
 		where id = #{id}
 	</update>
 	
-	<update id="updateByPrimaryKey" parameterType="com.atzuche.order.entity.AccountRenterClaimCostSettleDetailEntity">
+	<update id="updateByPrimaryKey" parameterType="com.atzuche.order.accountrenterclaim.entity.AccountRenterClaimCostSettleDetailEntity">
 		update account_renter_claim_cost_settle_detail 
 		<set>
 				`order_no` = #{orderNo}, 		
