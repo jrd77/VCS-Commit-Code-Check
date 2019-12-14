@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.atzuche.order.mapper.AccountRenterWzDepositMapper">
+<mapper namespace="com.atzuche.order.accountrenterwzdepost.mapper.AccountRenterWzDepositMapper">
 
-    <resultMap type="com.atzuche.order.entity.AccountRenterWzDepositEntity" id="BaseResultMap">
+    <resultMap type="com.atzuche.order.accountrenterwzdepost.entity.AccountRenterWzDepositEntity" id="BaseResultMap">
         <result property="id" column="id"/>
         <result property="orderNo" column="order_no"/>
         <result property="memNo" column="mem_no"/>
@@ -55,7 +55,7 @@
 	</select>
 
 	 
-	<insert id="insert" parameterType="com.atzuche.order.entity.AccountRenterWzDepositEntity" useGeneratedKeys="true" keyProperty="id">
+	<insert id="insert" parameterType="com.atzuche.order.accountrenterwzdepost.entity.AccountRenterWzDepositEntity" useGeneratedKeys="true" keyProperty="id">
 		insert into account_renter_wz_deposit
 		(
 				`order_no`,		
@@ -96,7 +96,7 @@
 			)
 	</insert>
 	
-	<insert id="insertSelective" parameterType="com.atzuche.order.entity.AccountRenterWzDepositEntity" useGeneratedKeys="true" keyProperty="id">
+	<insert id="insertSelective" parameterType="com.atzuche.order.accountrenterwzdepost.entity.AccountRenterWzDepositEntity" useGeneratedKeys="true" keyProperty="id">
 		insert into account_renter_wz_deposit
 		(
 				<if test="orderNo != null">`order_no`, </if>
@@ -138,7 +138,7 @@
 	</insert>
 	
 	 
-	<update id="updateByPrimaryKeySelective" parameterType="com.atzuche.order.entity.AccountRenterWzDepositEntity">
+	<update id="updateByPrimaryKeySelective" parameterType="com.atzuche.order.accountrenterwzdepost.entity.AccountRenterWzDepositEntity">
 		update account_renter_wz_deposit 
 		<set>
 				<if test="orderNo != null">`order_no` = #{orderNo}, </if>
@@ -161,7 +161,7 @@
 		where id = #{id}
 	</update>
 	
-	<update id="updateByPrimaryKey" parameterType="com.atzuche.order.entity.AccountRenterWzDepositEntity">
+	<update id="updateByPrimaryKey" parameterType="com.atzuche.order.accountrenterwzdepost.entity.AccountRenterWzDepositEntity">
 		update account_renter_wz_deposit 
 		<set>
 				`order_no` = #{orderNo}, 		

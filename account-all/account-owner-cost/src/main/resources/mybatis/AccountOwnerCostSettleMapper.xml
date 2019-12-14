@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.atzuche.order.mapper.AccountOwnerCostSettleMapper">
+<mapper namespace="com.atzuche.order.accountownercost.mapper.AccountOwnerCostSettleMapper">
 
-    <resultMap type="com.atzuche.order.entity.AccountOwnerCostSettleEntity" id="BaseResultMap">
+    <resultMap type="com.atzuche.order.accountownercost.entity.AccountOwnerCostSettleEntity" id="BaseResultMap">
         <result property="id" column="id"/>
         <result property="memNo" column="mem_no"/>
         <result property="orderNo" column="order_no"/>
@@ -45,7 +45,7 @@
 		select <include refid="Base_Column_List" /> from account_owner_cost_settle where id = #{value}
 	</select>
 
-	<insert id="insert" parameterType="com.atzuche.order.entity.AccountOwnerCostSettleEntity" useGeneratedKeys="true" keyProperty="id">
+	<insert id="insert" parameterType="com.atzuche.order.accountownercost.entity.AccountOwnerCostSettleEntity" useGeneratedKeys="true" keyProperty="id">
 		insert into account_owner_cost_settle
 		(
 				`mem_no`,		

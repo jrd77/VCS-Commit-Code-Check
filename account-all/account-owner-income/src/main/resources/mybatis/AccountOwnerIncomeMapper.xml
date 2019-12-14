@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.atzuche.order.mapper.AccountOwnerIncomeMapper">
+<mapper namespace="com.atzuche.order.accountownerincome.mapper.AccountOwnerIncomeMapper">
 
-    <resultMap type="com.atzuche.order.entity.AccountOwnerIncomeEntity" id="BaseResultMap">
+    <resultMap type="com.atzuche.order.accountownerincome.entity.AccountOwnerIncomeEntity" id="BaseResultMap">
         <result property="id" column="id"/>
         <result property="memNo" column="mem_no"/>
         <result property="incomeAmt" column="income_amt"/>
@@ -25,7 +25,7 @@
 		select <include refid="Base_Column_List" /> from account_owner_income where id = #{value}
 	</select>
 
-	<insert id="insert" parameterType="com.atzuche.order.entity.AccountOwnerIncomeEntity" useGeneratedKeys="true" keyProperty="id">
+	<insert id="insert" parameterType="com.atzuche.order.accountownerincome.entity.AccountOwnerIncomeEntity" useGeneratedKeys="true" keyProperty="id">
 		insert into account_owner_income
 		(
 				`mem_no`,		
@@ -43,7 +43,7 @@
 	</insert>
 
 	
-	<update id="updateByPrimaryKey" parameterType="com.atzuche.order.entity.AccountOwnerIncomeEntity">
+	<update id="updateByPrimaryKey" parameterType="com.atzuche.order.accountownerincome.entity.AccountOwnerIncomeEntity">
 		update account_owner_income 
 		<set>
 				`income_amt` = #{incomeAmt},
