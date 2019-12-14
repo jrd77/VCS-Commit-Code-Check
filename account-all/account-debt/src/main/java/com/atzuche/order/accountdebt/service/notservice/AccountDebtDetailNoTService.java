@@ -1,9 +1,9 @@
 package com.atzuche.order.accountdebt.service.notservice;
 
-import com.atzuche.order.accountdebt.dto.AccountDeductDebtDTO;
 import com.atzuche.order.accountdebt.entity.AccountDebtDetailEntity;
 import com.atzuche.order.accountdebt.exception.AccountDebtException;
 import com.atzuche.order.accountdebt.mapper.AccountDebtDetailMapper;
+import com.atzuche.order.accountdebt.vo.req.AccountDeductDebtReqVO;
 import com.atzuche.order.accountdebt.vo.req.AccountInsertDebtReqVO;
 import com.autoyol.commons.web.ErrorCode;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -41,9 +42,9 @@ public class AccountDebtDetailNoTService {
         return result;
     }
 
-    public void updateAlreadyDeductDebt(AccountDeductDebtDTO accountDeductDebtDTO) {
-       for(int i=0;i<accountDeductDebtDTO.getAccountDebtDetailTodos().size();i++){
-          int result = accountDebtDetailMapper.updateByPrimaryKeySelective(accountDeductDebtDTO.getAccountDebtDetailTodos().get(i));
+    public void updateAlreadyDeductDebt(List<AccountDebtDetailEntity> accountDebtDetails) {
+       for(int i=0;i<accountDebtDetails.size();i++){
+          int result = accountDebtDetailMapper.updateByPrimaryKeySelective(accountDebtDetails.get(i));
           if(result==0){
               throw new AccountDebtException(ErrorCode.FAILED);
           }
@@ -64,5 +65,39 @@ public class AccountDebtDetailNoTService {
         if(result==0){
             throw new AccountDebtException(ErrorCode.FAILED);
         }
+    }
+
+    /**
+     * 根据租客抵扣总金额 过滤待还 欠款记录
+     * @param accountDebtDetailAlls  个人所有欠款
+     * @param accountDeductDebt  本次租客 要还欠款总金额 和更新人
+     */
+    public  List<AccountDebtDetailEntity> getDebtListByDebtAll(List<AccountDebtDetailEntity> accountDebtDetailAlls, AccountDeductDebtReqVO accountDeductDebt) {
+        int amt = accountDeductDebt.getAmt();
+        List<AccountDebtDetailEntity>  accountDebtDetailTodos = new ArrayList<>();
+        for(int i =0;i<accountDebtDetailAlls.size();i++){
+            AccountDebtDetailEntity accountDebtDetailAll = accountDebtDetailAlls.get(i);
+            accountDebtDetailAll.setUpdateOp(accountDeductDebt.getUpdateOp());
+            //  amt >0 表示 租客还款总金额 还有剩余   =0表示欠款记录欠款金额 刚好抵扣完  <0 表示最后一条 欠款信息 存在部分还款
+            amt = amt - Math.abs(accountDebtDetailAll.getCurrentDebtAmt());
+            if(amt>0){
+                accountDebtDetailAll.setCurrentDebtAmt(NumberUtils.INTEGER_ZERO);
+                accountDebtDetailAll.setRepaidDebtAmt(Math.abs(accountDebtDetailAll.getOrderDebtAmt()));
+                accountDebtDetailTodos.add(accountDebtDetailAll);
+            }
+            if(amt==0){
+                accountDebtDetailAll.setCurrentDebtAmt(NumberUtils.INTEGER_ZERO);
+                accountDebtDetailAll.setRepaidDebtAmt(Math.abs(accountDebtDetailAll.getOrderDebtAmt()));
+                accountDebtDetailTodos.add(accountDebtDetailAll);
+                break;
+            }
+            if(amt<0){
+                accountDebtDetailAll.setCurrentDebtAmt(-Math.abs(amt));
+                accountDebtDetailAll.setRepaidDebtAmt(accountDebtDetailAll.getCurrentDebtAmt()-accountDebtDetailAll.getOrderDebtAmt());
+                accountDebtDetailTodos.add(accountDebtDetailAll);
+                break;
+            }
+        }
+        return accountDebtDetailTodos;
     }
 }

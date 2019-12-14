@@ -1,8 +1,11 @@
 package com.atzuche.order.renterorder.service;
 
+import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.atzuche.order.renterorder.mapper.RenterOrderMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 
 /**
@@ -17,4 +20,7 @@ public class RenterOrderService{
     private RenterOrderMapper renterOrderMapper;
 
 
+    public List<RenterOrderEntity> listAgreeRenterOrderByOrderNo(Long orderNo) {
+        return null;
+    }
 }

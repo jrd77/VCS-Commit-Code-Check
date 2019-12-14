@@ -1,13 +1,18 @@
 package com.atzuche.order.accountdebt.service.notservice;
 
-import com.atzuche.order.accountdebt.dto.AccountDeductDebtDTO;
+import com.atzuche.order.accountdebt.entity.AccountDebtDetailEntity;
 import com.atzuche.order.accountdebt.entity.AccountDebtReceivableaDetailEntity;
 import com.atzuche.order.accountdebt.exception.AccountDebtException;
 import com.atzuche.order.accountdebt.mapper.AccountDebtReceivableaDetailMapper;
+import com.atzuche.order.accountdebt.vo.req.AccountDeductDebtReqVO;
 import com.autoyol.commons.web.ErrorCode;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 
@@ -23,9 +28,9 @@ public class AccountDebtReceivableaDetailNoTService {
     private AccountDebtReceivableaDetailMapper accountDebtReceivableaDetailMapper;
 
 
-    public void insertAlreadyReceivablea(AccountDeductDebtDTO accountDeductDebtDTO) {
-        for(int i=0;i<accountDeductDebtDTO.getAccountDebtReceivableaDetails().size();i++){
-            AccountDebtReceivableaDetailEntity accountDebtReceivableaDetail =  accountDeductDebtDTO.getAccountDebtReceivableaDetails().get(i);
+    public void insertAlreadyReceivablea(List<AccountDebtReceivableaDetailEntity> accountDebtReceivableaDetails) {
+        for(int i=0;i<accountDebtReceivableaDetails.size();i++){
+            AccountDebtReceivableaDetailEntity accountDebtReceivableaDetail =  accountDebtReceivableaDetails.get(i);
             int result = accountDebtReceivableaDetailMapper.insert(accountDebtReceivableaDetail);
             if(result==0){
                 throw new AccountDebtException(ErrorCode.FAILED);
@@ -42,5 +47,25 @@ public class AccountDebtReceivableaDetailNoTService {
     public boolean idempotentByUniqueAndSourceCode(Integer sourceCode, String uniqueNo) {
         AccountDebtReceivableaDetailEntity accountDebtReceivableaDetail = accountDebtReceivableaDetailMapper.selectByUniqueAndSourceCode(sourceCode,uniqueNo);
         return Objects.nonNull(accountDebtReceivableaDetail) && Objects.nonNull(accountDebtReceivableaDetail.getId());
+    }
+
+    /**
+     * 根据 历史待还详情  返回 欠款收款信息
+     *
+     * @param accountDebtDetails 本次待还 欠款信息
+     * @return
+     */
+    public List<AccountDebtReceivableaDetailEntity> getDebtReceivableaDetailsByDebtDetails(List<AccountDebtDetailEntity> accountDebtDetails,AccountDeductDebtReqVO accountDeductDebt) {
+        List<AccountDebtReceivableaDetailEntity> accountDebtReceivableaDetails = new ArrayList<>();
+        for(int i =0;i<accountDebtDetails.size();i++){
+            AccountDebtDetailEntity accountDebtDetailEntity = accountDebtDetails.get(i);
+            AccountDebtReceivableaDetailEntity accountDebtReceivableaDetail = new AccountDebtReceivableaDetailEntity();
+            BeanUtils.copyProperties(accountDeductDebt,accountDebtReceivableaDetail);
+            accountDebtReceivableaDetail.setTime(LocalDateTime.now());
+            accountDebtReceivableaDetail.setDebtDetailId(accountDebtDetailEntity.getId());
+            accountDebtReceivableaDetail.setOrderNo(accountDebtDetailEntity.getOrderNo());
+            accountDebtReceivableaDetails.add(accountDebtReceivableaDetail);
+        }
+        return accountDebtReceivableaDetails;
     }
 }
