@@ -217,4 +217,7 @@
 		where id = #{id}
 	</update>
   	
+  	<select id="getRenterOrderCostDetailByRenterOrderNo" resultMap="BaseResultMap">
+		select <include refid="Base_Column_List" /> from renter_order_cost_detail where renter_order_no = #{renterOrderNo}
+	</select>
 </mapper>

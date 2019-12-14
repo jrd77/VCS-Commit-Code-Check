@@ -176,5 +176,12 @@
 		</set>
 		where id = #{id}
 	</update>
+	
+	<select id="listAgreeRenterOrderByOrderNo" resultMap="BaseResultMap">
+		select <include refid="Base_Column_List" /> from renter_order where order_no = #{orderNo} 
+		and agree_flag = 1
+		and is_delete = 0
+		order by id asc
+	</select>
   	
 </mapper>
