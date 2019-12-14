@@ -15,14 +15,8 @@ public interface AccountOwnerIncomeDetailMapper{
 
     AccountOwnerIncomeDetailEntity selectByPrimaryKey(Integer id);
 
-    List<AccountOwnerIncomeDetailEntity> selectALL();
-
     int insert(AccountOwnerIncomeDetailEntity record);
     
-    int insertSelective(AccountOwnerIncomeDetailEntity record);
 
-    int updateByPrimaryKey(AccountOwnerIncomeDetailEntity record);
-    
-    int updateByPrimaryKeySelective(AccountOwnerIncomeDetailEntity record);
 
 }

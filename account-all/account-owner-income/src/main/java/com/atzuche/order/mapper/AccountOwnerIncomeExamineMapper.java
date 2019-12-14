@@ -15,14 +15,11 @@ public interface AccountOwnerIncomeExamineMapper{
 
     AccountOwnerIncomeExamineEntity selectByPrimaryKey(Integer id);
 
-    List<AccountOwnerIncomeExamineEntity> selectALL();
 
     int insert(AccountOwnerIncomeExamineEntity record);
     
-    int insertSelective(AccountOwnerIncomeExamineEntity record);
 
-    int updateByPrimaryKey(AccountOwnerIncomeExamineEntity record);
-    
+
     int updateByPrimaryKeySelective(AccountOwnerIncomeExamineEntity record);
 
 }

@@ -21,16 +21,10 @@
 
 	</sql>
 
-
 	<select id="selectByPrimaryKey" resultMap="BaseResultMap">
 		select <include refid="Base_Column_List" /> from account_owner_income where id = #{value}
 	</select>
 
-	<select id="selectALL" resultMap="BaseResultMap">
-		select  <include refid="Base_Column_List" /> from account_owner_income order by id desc
-	</select>
-
-	 
 	<insert id="insert" parameterType="com.atzuche.order.entity.AccountOwnerIncomeEntity" useGeneratedKeys="true" keyProperty="id">
 		insert into account_owner_income
 		(
@@ -47,46 +41,19 @@
 				#{createTime}		
 			)
 	</insert>
-	
-	<insert id="insertSelective" parameterType="com.atzuche.order.entity.AccountOwnerIncomeEntity" useGeneratedKeys="true" keyProperty="id">
-		insert into account_owner_income
-		(
-				<if test="memNo != null">`mem_no`, </if>
-				<if test="incomeAmt != null">`income_amt`, </if>
-				<if test="version != null">`version`, </if>
-				<if test="createTime != null">`create_time` </if>
-			)
-		values
-		(
-				<if test="memNo != null">#{memNo},  </if>
-				<if test="incomeAmt != null">#{incomeAmt},  </if>
-				<if test="version != null">#{version},  </if>
-				<if test="createTime != null">#{createTime} </if>
-			)
-	</insert>
-	
-	 
-	<update id="updateByPrimaryKeySelective" parameterType="com.atzuche.order.entity.AccountOwnerIncomeEntity">
-		update account_owner_income 
-		<set>
-				<if test="memNo != null">`mem_no` = #{memNo}, </if>
-				<if test="incomeAmt != null">`income_amt` = #{incomeAmt}, </if>
-				<if test="version != null">`version` = #{version}, </if>
-				<if test="createTime != null">`create_time` = #{createTime}</if>
-			</set>
-		where id = #{id}
-	</update>
+
 	
 	<update id="updateByPrimaryKey" parameterType="com.atzuche.order.entity.AccountOwnerIncomeEntity">
 		update account_owner_income 
 		<set>
-				`mem_no` = #{memNo}, 		
-				`income_amt` = #{incomeAmt}, 		
-				`version` = #{version}, 		
-				`create_time` = #{createTime}		
-	
+				`income_amt` = #{incomeAmt},
+				`version` = #{version}
+
 		</set>
-		where id = #{id}
+		where id = #{id} and version = #{version}
 	</update>
-  	
+    <select id="selectByMemNo" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List" /> from account_owner_income where mem_no = #{memNo} limit 1
+    </select>
+
 </mapper>
