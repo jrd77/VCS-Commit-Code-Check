@@ -16,10 +16,6 @@ public class AccountDeductDebtReqVO {
      */
     private Integer memNo;
     /**
-     * 主订单号
-     */
-    private Long orderNo;
-    /**
      * 抵扣金额
      */
     private Integer amt;
@@ -60,7 +56,6 @@ public class AccountDeductDebtReqVO {
      */
     public void check() {
         Assert.notNull(getMemNo(), ErrorCode.PARAMETER_ERROR.getText());
-        Assert.notNull(getOrderNo(), ErrorCode.PARAMETER_ERROR.getText());
         Assert.notNull(getAmt(), ErrorCode.PARAMETER_ERROR.getText());
         Assert.isTrue(getAmt()==0, ErrorCode.PARAMETER_ERROR.getText());
         Assert.notNull(getSourceCode(), ErrorCode.PARAMETER_ERROR.getText());

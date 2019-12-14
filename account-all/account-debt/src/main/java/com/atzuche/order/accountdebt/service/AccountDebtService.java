@@ -1,7 +1,7 @@
 package com.atzuche.order.accountdebt.service;
 
-import com.atzuche.order.accountdebt.dto.AccountDeductDebtDTO;
 import com.atzuche.order.accountdebt.entity.AccountDebtDetailEntity;
+import com.atzuche.order.accountdebt.entity.AccountDebtReceivableaDetailEntity;
 import com.atzuche.order.accountdebt.exception.AccountDebtException;
 import com.atzuche.order.accountdebt.service.notservice.AccountDebtDetailNoTService;
 import com.atzuche.order.accountdebt.service.notservice.AccountDebtNoTService;
@@ -77,16 +77,20 @@ public class AccountDebtService{
 //            return;
 //        }
         // 2 查询用户所以代还的记录
-        List<AccountDebtDetailEntity> accountDebtDetails =  accountDebtDetailNoTService.getDebtListByMemNo(accountDeductDebt.getMemNo());
+        List<AccountDebtDetailEntity> accountDebtDetailAlls =  accountDebtDetailNoTService.getDebtListByMemNo(accountDeductDebt.getMemNo());
         //3 从用户所有待还款记录中 过滤本次 待还款的记录
-        //3 清洗包装数据
-        AccountDeductDebtDTO accountDeductDebtDTO = new AccountDeductDebtDTO(accountDeductDebt,accountDebtDetails);
-        //4更新欠款表 当前欠款数
-        accountDebtDetailNoTService.updateAlreadyDeductDebt(accountDeductDebtDTO);
-        //5 记录欠款收款详情
-        accountDebtReceivableaDetailNoTService.insertAlreadyReceivablea(accountDeductDebtDTO);
-        //6 更新总欠款表
-        accountDebtNoTService.deductAccountDebt(accountDeductDebtDTO);
+        List<AccountDebtDetailEntity> accountDebtDetails = accountDebtDetailNoTService.getDebtListByDebtAll(accountDebtDetailAlls,accountDeductDebt);
+        // 4 根据 用户 本次待还记录 返回 欠款收款记录
+        List<AccountDebtReceivableaDetailEntity>  accountDebtReceivableaDetails = accountDebtReceivableaDetailNoTService.getDebtReceivableaDetailsByDebtDetails(accountDebtDetails,accountDeductDebt);
+
+//        //3 清洗包装数据
+//        AccountDeductDebtDTO accountDeductDebtDTO = new AccountDeductDebtDTO(accountDeductDebt,accountDebtDetails);
+//        //4更新欠款表 当前欠款数
+        accountDebtDetailNoTService.updateAlreadyDeductDebt(accountDebtDetails);
+//        //5 记录欠款收款详情
+        accountDebtReceivableaDetailNoTService.insertAlreadyReceivablea(accountDebtReceivableaDetails);
+//        //6 更新总欠款表
+//        accountDebtNoTService.deductAccountDebt(accountDeductDebtDTO);
     }
 
     /**
