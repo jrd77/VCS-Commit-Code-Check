@@ -37,16 +37,16 @@
 
 
 	<select id="selectByPrimaryKey" resultMap="BaseResultMap">
-		select <include refid="Base_Column_List" /> from renter_goods_priice_detail where id = #{value}
+		select <include refid="Base_Column_List" /> from renter_goods_price_detail where id = #{value}
 	</select>
 
 	<select id="selectALL" resultMap="BaseResultMap">
-		select  <include refid="Base_Column_List" /> from renter_goods_priice_detail order by id desc
+		select  <include refid="Base_Column_List" /> from renter_goods_price_detail order by id desc
 	</select>
 
 	 
 	<insert id="insert" parameterType="com.atzuche.order.entity.RenterGoodsPriiceDetailEntity" useGeneratedKeys="true" keyProperty="id">
-		insert into renter_goods_priice_detail
+		insert into renter_goods_price_detail
 		(
 				`order_no`,		
 				`renter_order_no`,		
@@ -77,7 +77,7 @@
 	</insert>
 	
 	<insert id="insertSelective" parameterType="com.atzuche.order.entity.RenterGoodsPriiceDetailEntity" useGeneratedKeys="true" keyProperty="id">
-		insert into renter_goods_priice_detail
+		insert into renter_goods_price_detail
 		(
 				<if test="orderNo != null">`order_no`, </if>
 				<if test="renterOrderNo != null">`renter_order_no`, </if>
@@ -109,7 +109,7 @@
 	
 	 
 	<update id="updateByPrimaryKeySelective" parameterType="com.atzuche.order.entity.RenterGoodsPriiceDetailEntity">
-		update renter_goods_priice_detail 
+		update renter_goods_price_detail 
 		<set>
 				<if test="orderNo != null">`order_no` = #{orderNo}, </if>
 				<if test="renterOrderNo != null">`renter_order_no` = #{renterOrderNo}, </if>
@@ -127,7 +127,7 @@
 	</update>
 	
 	<update id="updateByPrimaryKey" parameterType="com.atzuche.order.entity.RenterGoodsPriiceDetailEntity">
-		update renter_goods_priice_detail 
+		update renter_goods_price_detail 
 		<set>
 				`order_no` = #{orderNo}, 		
 				`renter_order_no` = #{renterOrderNo}, 		
@@ -145,4 +145,8 @@
 		where id = #{id}
 	</update>
   	
+  	<select id="listRenterGoodsPriceByOrderNo" resultMap="BaseResultMap">
+		select <include refid="Base_Column_List" /> from renter_goods_price_detail where order_no = #{orderNo} 
+		and is_delete = 0
+	</select>
 </mapper>

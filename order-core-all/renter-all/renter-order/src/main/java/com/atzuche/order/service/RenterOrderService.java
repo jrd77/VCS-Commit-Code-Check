@@ -1,5 +1,7 @@
 package com.atzuche.order.service;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.atzuche.order.mapper.RenterOrderMapper;
@@ -18,5 +20,12 @@ public class RenterOrderService{
     @Autowired
     private RenterOrderMapper renterOrderMapper;
 
-
+    /**
+     * 获取已同意的租客子单
+     * @param orderNo 主订单号
+     * @return List<RenterOrderEntity>
+     */
+    public List<RenterOrderEntity> listAgreeRenterOrderByOrderNo(Long orderNo) {
+    	return renterOrderMapper.listAgreeRenterOrderByOrderNo(orderNo);
+    }
 }

@@ -18,5 +18,7 @@ public class RenterOrderSubsidyDetailService{
     @Autowired
     private RenterOrderSubsidyDetailMapper renterOrderSubsidyDetailMapper;
 
-
+    public RenterOrderSubsidyDetailEntity getRenterOrderSubsidyDetail(String renterOrderNo) {
+    	return renterOrderSubsidyDetailMapper.getRenterOrderSubsidyDetail(renterOrderNo);
+    }
 }

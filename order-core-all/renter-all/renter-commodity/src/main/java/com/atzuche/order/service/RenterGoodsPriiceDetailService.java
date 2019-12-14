@@ -1,15 +1,12 @@
 package com.atzuche.order.service;
 
-import com.atzuche.order.commons.LocalDateTimeUtils;
-import com.atzuche.order.coreapi.entity.dto.OrderContextDto;
-import com.autoyol.car.api.model.vo.CarPriceOfDayVO;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.atzuche.order.mapper.RenterGoodsPriiceDetailMapper;
 import com.atzuche.order.entity.RenterGoodsPriiceDetailEntity;
 
-import java.util.ArrayList;
-import java.util.List;
 
 
 /**
@@ -23,18 +20,12 @@ public class RenterGoodsPriiceDetailService{
     @Autowired
     private RenterGoodsPriiceDetailMapper renterGoodsPriiceDetailMapper;
 
-    public void insert(OrderContextDto orderContextDto,Integer goodsId){
-        List<CarPriceOfDayVO> daysPrice = orderContextDto.getCarDetailVO().getDaysPrice();
-        List<RenterGoodsPriiceDetailEntity> list = new ArrayList<>();
-        daysPrice.stream().forEach(x->{
-            RenterGoodsPriiceDetailEntity renterGoodsPriiceDetailEntity = new RenterGoodsPriiceDetailEntity();
-            renterGoodsPriiceDetailEntity.setOrderNo(orderContextDto.getOrderNo());
-            renterGoodsPriiceDetailEntity.setRenterOrderNo("");
-            renterGoodsPriiceDetailEntity.setGoodsId(goodsId);
-            renterGoodsPriiceDetailEntity.setCarDay(LocalDateTimeUtils.parseStringToLocalDate(x.getDateStr()));
-            renterGoodsPriiceDetailEntity.setCarUnitPrice(x.getPrice());
-            list.add(renterGoodsPriiceDetailEntity);
-        });
-
+    /**
+     * 获取租客价格列表
+     * @param orderNo 主订单号
+     * @return List<RenterGoodsPriiceDetailEntity>
+     */
+    public List<RenterGoodsPriiceDetailEntity> listRenterGoodsPriceByOrderNo(Long orderNo) {
+    	return renterGoodsPriiceDetailMapper.listRenterGoodsPriceByOrderNo(orderNo);
     }
 }

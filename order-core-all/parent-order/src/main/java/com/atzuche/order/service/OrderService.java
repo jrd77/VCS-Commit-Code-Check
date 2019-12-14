@@ -18,5 +18,12 @@ public class OrderService{
     @Autowired
     private OrderMapper orderMapper;
 
-
+    /**
+     * 获取主订单详情
+     * @param orderNo 主订单号
+     * @return OrderEntity
+     */
+    public OrderEntity getParentOrderDetailByOrderNo(Long orderNo) {
+    	return orderMapper.getParentOrderDetailByOrderNo(orderNo);
+    }
 }

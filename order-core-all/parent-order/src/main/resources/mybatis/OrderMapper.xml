@@ -296,5 +296,9 @@
 		</set>
 		where id = #{id}
 	</update>
+	
+	<select id="getParentOrderDetailByOrderNo" resultMap="BaseResultMap">
+		select <include refid="Base_Column_List" /> from order where order_no = #{orderNo}
+	</select>
   	
 </mapper>

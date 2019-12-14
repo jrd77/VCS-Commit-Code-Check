@@ -2,6 +2,8 @@ package com.atzuche.order.mapper;
 
 import com.atzuche.order.entity.OrderStatusEntity;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
 import java.util.List;
 
 /**
@@ -24,5 +26,7 @@ public interface OrderStatusMapper{
     int updateByPrimaryKey(OrderStatusEntity record);
     
     int updateByPrimaryKeySelective(OrderStatusEntity record);
+    
+    OrderStatusEntity getOrderStatusByOrderNo(@Param("orderNo") Long orderNo);
 
 }
