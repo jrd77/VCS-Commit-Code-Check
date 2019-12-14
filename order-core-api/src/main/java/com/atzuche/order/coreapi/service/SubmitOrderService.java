@@ -31,7 +31,6 @@ public class SubmitOrderService {
 
         try{
 
-
             //获取车辆信息
 
             //获取车主会员信息

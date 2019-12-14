@@ -1,5 +1,7 @@
 package com.atzuche.order.service;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.atzuche.order.mapper.RenterGoodsPriiceDetailMapper;
@@ -18,5 +20,12 @@ public class RenterGoodsPriiceDetailService{
     @Autowired
     private RenterGoodsPriiceDetailMapper renterGoodsPriiceDetailMapper;
 
-
+    /**
+     * 获取租客价格列表
+     * @param orderNo 主订单号
+     * @return List<RenterGoodsPriiceDetailEntity>
+     */
+    public List<RenterGoodsPriiceDetailEntity> listRenterGoodsPriceByOrderNo(Long orderNo) {
+    	return renterGoodsPriiceDetailMapper.listRenterGoodsPriceByOrderNo(orderNo);
+    }
 }

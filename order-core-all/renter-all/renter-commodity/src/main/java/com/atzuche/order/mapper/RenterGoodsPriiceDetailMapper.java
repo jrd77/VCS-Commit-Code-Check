@@ -2,6 +2,8 @@ package com.atzuche.order.mapper;
 
 import com.atzuche.order.entity.RenterGoodsPriiceDetailEntity;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
 import java.util.List;
 
 /**
@@ -25,4 +27,5 @@ public interface RenterGoodsPriiceDetailMapper{
     
     int updateByPrimaryKeySelective(RenterGoodsPriiceDetailEntity record);
 
+    List<RenterGoodsPriiceDetailEntity> listRenterGoodsPriceByOrderNo(@Param("orderNo") Long orderNo);
 }

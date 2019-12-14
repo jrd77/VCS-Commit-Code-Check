@@ -169,4 +169,7 @@
 		where id = #{id}
 	</update>
   	
+  	<select id="getOrderStatusByOrderNo" resultMap="BaseResultMap">
+		select <include refid="Base_Column_List" /> from order_status where order_no = #{orderNo}
+	</select>
 </mapper>

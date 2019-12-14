@@ -18,5 +18,8 @@ public class RenterOrderCostDetailService{
     @Autowired
     private RenterOrderCostDetailMapper renterOrderCostDetailMapper;
 
+    public RenterOrderCostDetailEntity getRenterOrderCostDetailByRenterOrderNo(String renterOrderNo) {
+    	return renterOrderCostDetailMapper.getRenterOrderCostDetailByRenterOrderNo(renterOrderNo);
+    }
 
 }
