@@ -78,6 +78,7 @@ public class AccountDebtService{
 //        }
         // 2 查询用户所以代还的记录
         List<AccountDebtDetailEntity> accountDebtDetails =  accountDebtDetailNoTService.getDebtListByMemNo(accountDeductDebt.getMemNo());
+        //3 从用户所有待还款记录中 过滤本次 待还款的记录
         //3 清洗包装数据
         AccountDeductDebtDTO accountDeductDebtDTO = new AccountDeductDebtDTO(accountDeductDebt,accountDebtDetails);
         //4更新欠款表 当前欠款数
