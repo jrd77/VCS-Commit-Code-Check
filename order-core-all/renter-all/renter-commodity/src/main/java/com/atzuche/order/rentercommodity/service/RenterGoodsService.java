@@ -1,6 +1,6 @@
-package com.atzuche.rentercommodity.service;
+package com.atzuche.order.rentercommodity.service;
 
-import com.atzuche.rentercommodity.mapper.RenterGoodsMapper;
+import com.atzuche.order.rentercommodity.mapper.RenterGoodsMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

@@ -3,7 +3,7 @@ package com.atzuche.order.coreapi.entity.bo;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import com.atzuche.rentercommodity.entity.RenterGoodsPriiceDetailEntity;
+import com.atzuche.order.rentercommodity.entity.RenterGoodsPriiceDetailEntity;
 
 import lombok.Data;
 
