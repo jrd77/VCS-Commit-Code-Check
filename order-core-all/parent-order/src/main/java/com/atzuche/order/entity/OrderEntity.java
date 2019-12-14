@@ -35,7 +35,7 @@ public class OrderEntity implements Serializable {
 	/**
 	 * 在途车主会员号
 	 */
-	private Integer memnerNoOwner;
+	private Integer memNoOwner;
 	/**
 	 * 在途租客会员号
 	 */
