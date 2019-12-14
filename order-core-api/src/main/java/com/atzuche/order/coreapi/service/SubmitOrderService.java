@@ -2,6 +2,7 @@ package com.atzuche.order.coreapi.service;
 
 import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.GlobalConstant;
+import com.atzuche.order.commons.LocalDateTimeUtils;
 import com.atzuche.order.commons.entity.dto.CarDetailDto;
 import com.atzuche.order.commons.entity.dto.OrderContextDto;
 import com.atzuche.order.commons.entity.dto.OwnerMemberDto;
@@ -168,8 +169,8 @@ public class SubmitOrderService {
         OrderCarInfoParamDTO orderCarInfoParamDTO = new OrderCarInfoParamDTO();
         orderCarInfoParamDTO.setCarNo(submitReqDto.getCarNo());
         orderCarInfoParamDTO.setCarAddressIndex(Integer.valueOf(submitReqDto.getCarAddrIndex()));
-        orderCarInfoParamDTO.setRentTime(submitReqDto.getRentTime());
-        orderCarInfoParamDTO.setRevertTime(submitReqDto.getRevertTime());
+        orderCarInfoParamDTO.setRentTime(LocalDateTimeUtils.localDateTimeToLong(submitReqDto.getRentTime()));
+        orderCarInfoParamDTO.setRevertTime(LocalDateTimeUtils.localDateTimeToLong(submitReqDto.getRevertTime()));
         orderCarInfoParamDTO.setUseSpecialPrice(GlobalConstant.USE_SPECIAL_PRICE.equals(submitReqDto.getUseSpecialPrice()));
         ResponseObject<CarDetailVO> responseObject = null;
         try{

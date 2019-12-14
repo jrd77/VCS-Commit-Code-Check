@@ -317,6 +317,21 @@ public class LocalDateTimeUtils {
         return instant.toEpochMilli();
     }
 
+    /**
+     * 将localdate转化为  年月日时分秒格式的long格式
+     * @param localDateTime
+     * @return
+     */
+    public static long localDateTimeToLong(LocalDateTime localDateTime){
+        String longDateTime = String.valueOf(localDateTime.getYear()) +
+                localDateTime.getMonthValue() +
+                localDateTime.getDayOfMonth() +
+                localDateTime.getHour() +
+                localDateTime.getMinute() +
+                localDateTime.getSecond() + "00";
+        return Long.valueOf(longDateTime);
+    }
+
 
     /**
      * 按照给定的格式获取昨天这个时候的时间日期字符串
@@ -395,6 +410,8 @@ public class LocalDateTimeUtils {
 
         LocalDate localDate = parseStringToLocalDate("2019-12-14");
         System.out.println(localDate);
+
+        System.out.println(localDateTimeToLong(LocalDateTime.now()));;
     }
 
 }
