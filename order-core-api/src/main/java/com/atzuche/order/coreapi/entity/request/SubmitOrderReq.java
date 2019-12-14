@@ -1,5 +1,8 @@
-package com.atzuche.order.coreapi.dto;
+package com.atzuche.order.coreapi.entity.request;
 
+import com.atzuche.order.coreapi.entity.dto.ItemList;
+import com.atzuche.order.coreapi.entity.dto.MemBaseInfoVo;
+import com.atzuche.order.coreapi.entity.dto.MemInfoCache;
 import lombok.Data;
 
 import java.util.List;
@@ -11,7 +14,7 @@ import java.util.List;
  * 
  **/
 @Data
-public class SubmitReqDto {
+public class SubmitOrderReq {
     private String useSpecialPrice;
     private String srvGetAddr;
     private String srvReturnAddr;

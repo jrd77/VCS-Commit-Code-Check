@@ -1,7 +1,7 @@
 package com.atzuche.order.coreapi.submitOrder.rules;
 
-import com.atzuche.order.coreapi.dto.OrderContextDto;
-import com.atzuche.order.coreapi.dto.SubmitReqDto;
+import com.atzuche.order.coreapi.entity.dto.OrderContextDto;
+import com.atzuche.order.coreapi.entity.request.SubmitOrderReq;
 import com.atzuche.order.coreapi.submitOrder.exception.SubmitOrderException;
 import com.atzuche.order.coreapi.submitOrder.exception.CancleOrderCountException;
 import com.atzuche.order.coreapi.submitOrder.filter.BaseFilter;
@@ -19,7 +19,7 @@ import org.springframework.stereotype.Component;
 public class CancleOrderCountFilter extends BaseFilter {
 
     @Override
-    public boolean validator(SubmitReqDto submitReqDto, OrderContextDto orderContextDto) throws SubmitOrderException {
+    public boolean validator(SubmitOrderReq submitReqDto, OrderContextDto orderContextDto) throws SubmitOrderException {
         if(true){
             throw new CancleOrderCountException(ErrorCode.FAILED,"由于你当前内取消订单超过三次，禁止下单！");
         }

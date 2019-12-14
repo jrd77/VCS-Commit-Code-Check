@@ -23,7 +23,7 @@ public class AccountRenterDepositDetailEntity implements Serializable {
 	/**
 	 * 
 	 */
-	private Integer orderNo;
+	private Long orderNo;
 	/**
 	 * 会员号
 	 */

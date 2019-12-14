@@ -3,13 +3,13 @@
  */
 package com.atzuche.order.coreapi.submitOrder.filter;
 
-import com.atzuche.order.coreapi.dto.OrderContextDto;
-import com.atzuche.order.coreapi.dto.SubmitReqDto;
+import com.atzuche.order.coreapi.entity.dto.OrderContextDto;
+import com.atzuche.order.coreapi.entity.request.SubmitOrderReq;
 import com.atzuche.order.coreapi.submitOrder.exception.SubmitOrderException;
 
 public interface SubmitOrderFilter {
 
-	void doFilter(SubmitReqDto submitReqDto, OrderContextDto orderContextDto, FilterChain chain, int index) throws SubmitOrderException;
+	void doFilter(SubmitOrderReq submitReqDto, OrderContextDto orderContextDto, FilterChain chain, int index) throws SubmitOrderException;
 
-	boolean validator(SubmitReqDto submitReqDto, OrderContextDto orderContextDto) throws SubmitOrderException;
+	boolean validator(SubmitOrderReq submitReqDto, OrderContextDto orderContextDto) throws SubmitOrderException;
 }

@@ -1,10 +1,9 @@
 package com.atzuche.order.coreapi.controller;
 
-import com.atzuche.order.coreapi.dto.SubmitReqDto;
+import com.atzuche.order.coreapi.entity.request.SubmitOrderReq;
 import com.atzuche.order.coreapi.service.SubmitOrderService;
+import com.autoyol.commons.web.ResponseData;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RequestMapping("/submitOrder")
@@ -20,10 +19,9 @@ public class SubmitOrderController {
      *
      **/
     @PostMapping("/")
-    public void submitOrder(@RequestBody SubmitReqDto submitReqDto){
-
-        submitOrderService.submitOrder(submitReqDto);
-
+    public ResponseData submitOrder(@RequestBody SubmitOrderReq submitReqDto){
+        ResponseData responseData = submitOrderService.submitOrder(submitReqDto);
+        return responseData;
     }
 
 }

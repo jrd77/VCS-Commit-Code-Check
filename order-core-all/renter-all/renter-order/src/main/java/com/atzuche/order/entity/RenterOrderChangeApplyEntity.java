@@ -23,7 +23,7 @@ public class RenterOrderChangeApplyEntity implements Serializable {
 	/**
 	 * 主订单号
 	 */
-	private Integer orderNo;
+	private Long orderNo;
 	/**
 	 * 租客子订单号
 	 */

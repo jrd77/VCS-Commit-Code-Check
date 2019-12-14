@@ -3,8 +3,8 @@
  */
 package com.atzuche.order.coreapi.submitOrder.filter;
 
-import com.atzuche.order.coreapi.dto.OrderContextDto;
-import com.atzuche.order.coreapi.dto.SubmitReqDto;
+import com.atzuche.order.coreapi.entity.dto.OrderContextDto;
+import com.atzuche.order.coreapi.entity.request.SubmitOrderReq;
 import com.atzuche.order.coreapi.submitOrder.exception.SubmitOrderException;
 import com.atzuche.order.coreapi.submitOrder.rules.CancleOrderCountFilter;
 import lombok.extern.slf4j.Slf4j;
@@ -36,7 +36,7 @@ public class SubmitOrderFilterService {
 		filterChain.addFilterAll(list);
 	}
 	
-	public void checkRules(SubmitReqDto submitReqDto, OrderContextDto orderContextDto) throws SubmitOrderException {
+	public void checkRules(SubmitOrderReq submitReqDto, OrderContextDto orderContextDto) throws SubmitOrderException {
         //添加校验规则
         this.addCheckRules();
 		
