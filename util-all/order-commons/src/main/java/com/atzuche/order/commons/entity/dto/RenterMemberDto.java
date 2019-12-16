@@ -2,6 +2,7 @@ package com.atzuche.order.commons.entity.dto;
 
 import lombok.Data;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -38,7 +39,7 @@ public class RenterMemberDto {
     /**
      * 驾驶证初次领证日期
      */
-    private LocalDateTime certificationTime;
+    private LocalDate certificationTime;
     /**
      * 成功下单次数
      */

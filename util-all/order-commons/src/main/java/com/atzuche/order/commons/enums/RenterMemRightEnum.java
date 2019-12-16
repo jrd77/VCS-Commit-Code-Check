@@ -1,9 +1,12 @@
 package com.atzuche.order.commons.enums;
 
+import lombok.Getter;
+
 /**
  * @author <a href="mailto:lianglin.sjtu@gmail.com">AndySjtu</a>
  * @date 2019/12/14 3:20 下午
  **/
+@Getter
 public enum RenterMemRightEnum {
 
     VIP(1,"VIP客户"),
@@ -26,4 +29,6 @@ public enum RenterMemRightEnum {
         this.rightCode = rightCode;
         this.rightName = rightName;
     }
+
+
 }
