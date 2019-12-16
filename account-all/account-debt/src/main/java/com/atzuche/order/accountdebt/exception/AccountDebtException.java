@@ -1,4 +1,4 @@
-package com.atzuche.order.account.debt.exception;
+package com.atzuche.order.accountdebt.exception;
 
 import com.atzuche.order.commons.OrderException;
 import com.autoyol.commons.web.ErrorCode;

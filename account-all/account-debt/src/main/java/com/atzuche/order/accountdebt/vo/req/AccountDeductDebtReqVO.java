@@ -1,4 +1,4 @@
-package com.atzuche.order.account.debt.vo.req;
+package com.atzuche.order.accountdebt.vo.req;
 
 import com.autoyol.commons.web.ErrorCode;
 import lombok.Data;
