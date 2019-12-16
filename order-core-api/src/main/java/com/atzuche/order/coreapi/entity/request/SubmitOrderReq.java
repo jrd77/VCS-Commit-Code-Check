@@ -1,10 +1,9 @@
 package com.atzuche.order.coreapi.entity.request;
 
-import com.atzuche.order.coreapi.entity.dto.ItemList;
-import com.atzuche.order.coreapi.entity.dto.MemBaseInfoVo;
-import com.atzuche.order.coreapi.entity.dto.MemInfoCache;
+import com.atzuche.order.commons.entity.request.ItemList;
 import lombok.Data;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 /*
@@ -35,14 +34,11 @@ public class SubmitOrderReq {
     private String srvReturnLon;
     private String offlineOrderStatus;
     private Integer srvReturnFlag;
-    private Long revertTime;
+    private LocalDateTime revertTime;
     private Integer oilType;
     private String conPhone;
-    private Long rentTime;
+    private LocalDateTime rentTime;
     private String srvGetLon;
-    private String abatement;
-    private MemInfoCache memInfoCache;
-    private MemBaseInfoVo tokenMemInfo;
     private Integer memNo;
     private Integer reqSource;
     private String reqOs;
@@ -58,25 +54,21 @@ public class SubmitOrderReq {
     private String ModuleName;
     private String FunctionName;
     private String publicCityCode;
-    private String IMEI;
     private String OsVersion;
     private String limitRedStatus;
     private String AppVersion;
     private String OS;
     private String PublicLatitude;
-    private String mem_no;
     private String freeDoubleTypeId;
     private String rentCity;
     private String deviceName;
     private String publicToken;
     private String carAddrIndex;
     private String PublicLongitude;
-    private String queryId;
     private List<ItemList> itemList;
     private String reqIp;
     private String mac;
     private String AppChannelId;
     private String appName;
-    private String AndroidId;
     private String androidID;
 }

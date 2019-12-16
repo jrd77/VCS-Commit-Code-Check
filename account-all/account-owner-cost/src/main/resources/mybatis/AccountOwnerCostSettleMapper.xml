@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.atzuche.order.mapper.AccountOwnerCostSettleMapper">
+<mapper namespace="com.atzuche.order.accountownercost.mapper.AccountOwnerCostSettleMapper">
 
-    <resultMap type="com.atzuche.order.entity.AccountOwnerCostSettleEntity" id="BaseResultMap">
+    <resultMap type="com.atzuche.order.accountownercost.entity.AccountOwnerCostSettleEntity" id="BaseResultMap">
         <result property="id" column="id"/>
+        <result property="memNo" column="mem_no"/>
         <result property="orderNo" column="order_no"/>
         <result property="ownerOrderNo" column="owner_order_no"/>
         <result property="subsidyAmt" column="subsidy_amt"/>
@@ -23,6 +24,7 @@
 
 	<sql id="Base_Column_List">
 	`id`, 	
+	`mem_no`, 	
 	`order_no`, 	
 	`owner_order_no`, 	
 	`subsidy_amt`, 	
@@ -39,19 +41,14 @@
 
 	</sql>
 
-
 	<select id="selectByPrimaryKey" resultMap="BaseResultMap">
 		select <include refid="Base_Column_List" /> from account_owner_cost_settle where id = #{value}
 	</select>
 
-	<select id="selectALL" resultMap="BaseResultMap">
-		select  <include refid="Base_Column_List" /> from account_owner_cost_settle order by id desc
-	</select>
-
-	 
-	<insert id="insert" parameterType="com.atzuche.order.entity.AccountOwnerCostSettleEntity" useGeneratedKeys="true" keyProperty="id">
+	<insert id="insert" parameterType="com.atzuche.order.accountownercost.entity.AccountOwnerCostSettleEntity" useGeneratedKeys="true" keyProperty="id">
 		insert into account_owner_cost_settle
 		(
+				`mem_no`,		
 				`order_no`,		
 				`owner_order_no`,		
 				`subsidy_amt`,		
@@ -68,6 +65,7 @@
 			)
 		values
 		(
+				#{memNo}, 		
 				#{orderNo}, 		
 				#{ownerOrderNo}, 		
 				#{subsidyAmt}, 		
@@ -84,81 +82,4 @@
 			)
 	</insert>
 	
-	<insert id="insertSelective" parameterType="com.atzuche.order.entity.AccountOwnerCostSettleEntity" useGeneratedKeys="true" keyProperty="id">
-		insert into account_owner_cost_settle
-		(
-				<if test="orderNo != null">`order_no`, </if>
-				<if test="ownerOrderNo != null">`owner_order_no`, </if>
-				<if test="subsidyAmt != null">`subsidy_amt`, </if>
-				<if test="purchaseAmt != null">`purchase_amt`, </if>
-				<if test="incrementAmt != null">`increment_amt`, </if>
-				<if test="yingshouAmt != null">`yingshou_amt`, </if>
-				<if test="shishouAmt != null">`shishou_amt`, </if>
-				<if test="version != null">`version`, </if>
-				<if test="createTime != null">`create_time`, </if>
-				<if test="createOp != null">`create_op`, </if>
-				<if test="updateTime != null">`update_time`, </if>
-				<if test="updateOp != null">`update_op`, </if>
-				<if test="isDelete != null">`is_delete` </if>
-			)
-		values
-		(
-				<if test="orderNo != null">#{orderNo},  </if>
-				<if test="ownerOrderNo != null">#{ownerOrderNo},  </if>
-				<if test="subsidyAmt != null">#{subsidyAmt},  </if>
-				<if test="purchaseAmt != null">#{purchaseAmt},  </if>
-				<if test="incrementAmt != null">#{incrementAmt},  </if>
-				<if test="yingshouAmt != null">#{yingshouAmt},  </if>
-				<if test="shishouAmt != null">#{shishouAmt},  </if>
-				<if test="version != null">#{version},  </if>
-				<if test="createTime != null">#{createTime},  </if>
-				<if test="createOp != null">#{createOp},  </if>
-				<if test="updateTime != null">#{updateTime},  </if>
-				<if test="updateOp != null">#{updateOp},  </if>
-				<if test="isDelete != null">#{isDelete} </if>
-			)
-	</insert>
-	
-	 
-	<update id="updateByPrimaryKeySelective" parameterType="com.atzuche.order.entity.AccountOwnerCostSettleEntity">
-		update account_owner_cost_settle 
-		<set>
-				<if test="orderNo != null">`order_no` = #{orderNo}, </if>
-				<if test="ownerOrderNo != null">`owner_order_no` = #{ownerOrderNo}, </if>
-				<if test="subsidyAmt != null">`subsidy_amt` = #{subsidyAmt}, </if>
-				<if test="purchaseAmt != null">`purchase_amt` = #{purchaseAmt}, </if>
-				<if test="incrementAmt != null">`increment_amt` = #{incrementAmt}, </if>
-				<if test="yingshouAmt != null">`yingshou_amt` = #{yingshouAmt}, </if>
-				<if test="shishouAmt != null">`shishou_amt` = #{shishouAmt}, </if>
-				<if test="version != null">`version` = #{version}, </if>
-				<if test="createTime != null">`create_time` = #{createTime}, </if>
-				<if test="createOp != null">`create_op` = #{createOp}, </if>
-				<if test="updateTime != null">`update_time` = #{updateTime}, </if>
-				<if test="updateOp != null">`update_op` = #{updateOp}, </if>
-				<if test="isDelete != null">`is_delete` = #{isDelete}</if>
-			</set>
-		where id = #{id}
-	</update>
-	
-	<update id="updateByPrimaryKey" parameterType="com.atzuche.order.entity.AccountOwnerCostSettleEntity">
-		update account_owner_cost_settle 
-		<set>
-				`order_no` = #{orderNo}, 		
-				`owner_order_no` = #{ownerOrderNo}, 		
-				`subsidy_amt` = #{subsidyAmt}, 		
-				`purchase_amt` = #{purchaseAmt}, 		
-				`increment_amt` = #{incrementAmt}, 		
-				`yingshou_amt` = #{yingshouAmt}, 		
-				`shishou_amt` = #{shishouAmt}, 		
-				`version` = #{version}, 		
-				`create_time` = #{createTime}, 		
-				`create_op` = #{createOp}, 		
-				`update_time` = #{updateTime}, 		
-				`update_op` = #{updateOp}, 		
-				`is_delete` = #{isDelete}		
-	
-		</set>
-		where id = #{id}
-	</update>
-  	
 </mapper>

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.atzuche.order.mapper.RenterEventClaimMapper">
+<mapper namespace="com.atzuche.order.renterclaim.mapper.RenterEventClaimMapper">
 
-    <resultMap type="com.atzuche.order.entity.RenterEventClaimEntity" id="BaseResultMap">
+    <resultMap type="com.atzuche.order.renterclaim.entity.RenterEventClaimEntity" id="BaseResultMap">
         <result property="id" column="id"/>
         <result property="orderNo" column="order_no"/>
         <result property="renterOrderNo" column="renter_order_no"/>
@@ -43,7 +43,7 @@
 	</select>
 
 	 
-	<insert id="insert" parameterType="com.atzuche.order.entity.RenterEventClaimEntity" useGeneratedKeys="true" keyProperty="id">
+	<insert id="insert" parameterType="com.atzuche.order.renterclaim.entity.RenterEventClaimEntity" useGeneratedKeys="true" keyProperty="id">
 		insert into renter_event_claim
 		(
 				`order_no`,		
@@ -72,7 +72,7 @@
 			)
 	</insert>
 	
-	<insert id="insertSelective" parameterType="com.atzuche.order.entity.RenterEventClaimEntity" useGeneratedKeys="true" keyProperty="id">
+	<insert id="insertSelective" parameterType="com.atzuche.order.renterclaim.entity.RenterEventClaimEntity" useGeneratedKeys="true" keyProperty="id">
 		insert into renter_event_claim
 		(
 				<if test="orderNo != null">`order_no`, </if>
@@ -102,7 +102,7 @@
 	</insert>
 	
 	 
-	<update id="updateByPrimaryKeySelective" parameterType="com.atzuche.order.entity.RenterEventClaimEntity">
+	<update id="updateByPrimaryKeySelective" parameterType="com.atzuche.order.renterclaim.entity.RenterEventClaimEntity">
 		update renter_event_claim 
 		<set>
 				<if test="orderNo != null">`order_no` = #{orderNo}, </if>
@@ -119,7 +119,7 @@
 		where id = #{id}
 	</update>
 	
-	<update id="updateByPrimaryKey" parameterType="com.atzuche.order.entity.RenterEventClaimEntity">
+	<update id="updateByPrimaryKey" parameterType="com.atzuche.order.renterclaim.entity.RenterEventClaimEntity">
 		update renter_event_claim 
 		<set>
 				`order_no` = #{orderNo}, 		
@@ -136,5 +136,5 @@
 		</set>
 		where id = #{id}
 	</update>
-  	
+
 </mapper>

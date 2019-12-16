@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.atzuche.order.mapper.RenterEventWzStatusMapper">
+<mapper namespace="com.atzuche.order.renterwz.mapper.RenterEventWzStatusMapper">
 
-    <resultMap type="com.atzuche.order.entity.RenterEventWzStatusEntity" id="BaseResultMap">
+    <resultMap type="com.atzuche.order.renterwz.entity.RenterEventWzStatusEntity" id="BaseResultMap">
         <result property="id" column="id"/>
         <result property="orderNo" column="order_no"/>
         <result property="renterOrderNo" column="renter_order_no"/>
@@ -41,7 +41,7 @@
 	</select>
 
 	 
-	<insert id="insert" parameterType="com.atzuche.order.entity.RenterEventWzStatusEntity" useGeneratedKeys="true" keyProperty="id">
+	<insert id="insert" parameterType="com.atzuche.order.renterwz.entity.RenterEventWzStatusEntity" useGeneratedKeys="true" keyProperty="id">
 		insert into renter_event_wz_status
 		(
 				`order_no`,		
@@ -68,7 +68,7 @@
 			)
 	</insert>
 	
-	<insert id="insertSelective" parameterType="com.atzuche.order.entity.RenterEventWzStatusEntity" useGeneratedKeys="true" keyProperty="id">
+	<insert id="insertSelective" parameterType="com.atzuche.order.renterwz.entity.RenterEventWzStatusEntity" useGeneratedKeys="true" keyProperty="id">
 		insert into renter_event_wz_status
 		(
 				<if test="orderNo != null">`order_no`, </if>
@@ -96,7 +96,7 @@
 	</insert>
 	
 	 
-	<update id="updateByPrimaryKeySelective" parameterType="com.atzuche.order.entity.RenterEventWzStatusEntity">
+	<update id="updateByPrimaryKeySelective" parameterType="com.atzuche.order.renterwz.entity.RenterEventWzStatusEntity">
 		update renter_event_wz_status 
 		<set>
 				<if test="orderNo != null">`order_no` = #{orderNo}, </if>
@@ -112,7 +112,7 @@
 		where id = #{id}
 	</update>
 	
-	<update id="updateByPrimaryKey" parameterType="com.atzuche.order.entity.RenterEventWzStatusEntity">
+	<update id="updateByPrimaryKey" parameterType="com.atzuche.order.renterwz.entity.RenterEventWzStatusEntity">
 		update renter_event_wz_status 
 		<set>
 				`order_no` = #{orderNo}, 		

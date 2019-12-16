@@ -1,7 +1,8 @@
 package com.atzuche.order.coreapi.submitOrder.rules;
 
-import com.atzuche.order.coreapi.entity.dto.OrderContextDto;
+import com.atzuche.order.commons.entity.dto.OrderContextDto;
 import com.atzuche.order.coreapi.entity.request.SubmitOrderReq;
+import com.atzuche.order.coreapi.enums.SubmitOrderErrorEnum;
 import com.atzuche.order.coreapi.submitOrder.exception.SubmitOrderException;
 import com.atzuche.order.coreapi.submitOrder.exception.CancleOrderCountException;
 import com.atzuche.order.coreapi.submitOrder.filter.BaseFilter;
@@ -21,7 +22,7 @@ public class CancleOrderCountFilter extends BaseFilter {
     @Override
     public boolean validator(SubmitOrderReq submitReqDto, OrderContextDto orderContextDto) throws SubmitOrderException {
         if(true){
-            throw new CancleOrderCountException(ErrorCode.FAILED,"由于你当前内取消订单超过三次，禁止下单！");
+            throw new CancleOrderCountException(SubmitOrderErrorEnum.CANCLE_ORDER_COUNT_ERROR.getCode(), SubmitOrderErrorEnum.CANCLE_ORDER_COUNT_ERROR.getText());
         }
         return true;
     }
