@@ -1,14 +1,14 @@
-package com.atzuche.order.accountdebt.service;
+package com.atzuche.order.account.debt.service;
 
-import com.atzuche.order.accountdebt.entity.AccountDebtDetailEntity;
-import com.atzuche.order.accountdebt.entity.AccountDebtReceivableaDetailEntity;
-import com.atzuche.order.accountdebt.exception.AccountDebtException;
-import com.atzuche.order.accountdebt.service.notservice.AccountDebtDetailNoTService;
-import com.atzuche.order.accountdebt.service.notservice.AccountDebtNoTService;
-import com.atzuche.order.accountdebt.service.notservice.AccountDebtReceivableaDetailNoTService;
-import com.atzuche.order.accountdebt.vo.req.AccountDeductDebtReqVO;
-import com.atzuche.order.accountdebt.vo.req.AccountInsertDebtReqVO;
-import com.atzuche.order.accountdebt.vo.res.AccountDebtResVO;
+import com.atzuche.order.account.debt.entity.AccountDebtDetailEntity;
+import com.atzuche.order.account.debt.entity.AccountDebtReceivableaDetailEntity;
+import com.atzuche.order.account.debt.exception.AccountDebtException;
+import com.atzuche.order.account.debt.service.notservice.AccountDebtDetailNoTService;
+import com.atzuche.order.account.debt.service.notservice.AccountDebtNoTService;
+import com.atzuche.order.account.debt.service.notservice.AccountDebtReceivableaDetailNoTService;
+import com.atzuche.order.account.debt.vo.req.AccountDeductDebtReqVO;
+import com.atzuche.order.account.debt.vo.req.AccountInsertDebtReqVO;
+import com.atzuche.order.account.debt.vo.res.AccountDebtResVO;
 import com.autoyol.commons.utils.GsonUtils;
 import com.autoyol.commons.web.ErrorCode;
 import lombok.extern.slf4j.Slf4j;

@@ -11,8 +11,8 @@ import lombok.Data;
  **/
 @Data
 public class OrderContextDto {
-    private OwnerMemberDto ownerMemberDto;//车主会员信息
-    private RenterMemberDto renterMemberDto;//租客会员信息
+//    private OwnerMemberDto ownerMemberDto;//车主会员信息
+////    private RenterMemberDto renterMemberDto;//租客会员信息
     private CarDetailDto carDetailDto;//车辆信息
     private SubmitOrderReq submitOrderReq;//订单信息
     private long orderNo;//主订单号

@@ -1,4 +1,4 @@
-package com.atzuche.order.accountdebt.vo.res;
+package com.atzuche.order.account.debt.vo.res;
 
 import lombok.Data;
 
