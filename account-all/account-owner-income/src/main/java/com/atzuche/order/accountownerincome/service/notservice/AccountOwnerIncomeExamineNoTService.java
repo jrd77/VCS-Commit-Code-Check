@@ -1,8 +1,10 @@
 package com.atzuche.order.accountownerincome.service.notservice;
 
+import com.atzuche.order.accountownerincome.exception.AccountOwnerIncomeExamineException;
 import com.atzuche.order.accountownerincome.exception.AccountOwnerIncomeException;
 import com.atzuche.order.accountownerincome.entity.AccountOwnerIncomeExamineEntity;
 import com.atzuche.order.accountownerincome.enums.AccountOwnerIncomeExamineStatus;
+import com.atzuche.order.accountownerincome.exception.AccountOwnerIncomeSettleException;
 import com.atzuche.order.accountownerincome.mapper.AccountOwnerIncomeExamineMapper;
 import com.atzuche.order.accountownerincome.vo.req.AccountOwnerIncomeExamineOpReqVO;
 import com.atzuche.order.accountownerincome.vo.req.AccountOwnerIncomeExamineReqVO;
@@ -43,7 +45,7 @@ public class AccountOwnerIncomeExamineNoTService {
 
         int result = accountOwnerIncomeExamineMapper.insert(accountOwnerIncomeExamineEntity);
         if(result==0){
-            throw new AccountOwnerIncomeException(ErrorCode.FAILED);
+            throw new AccountOwnerIncomeSettleException();
         }
     }
 
@@ -66,7 +68,7 @@ public class AccountOwnerIncomeExamineNoTService {
         accountOwnerIncomeExamineUpdate.setTime(now);
         int result = accountOwnerIncomeExamineMapper.updateByPrimaryKeySelective(accountOwnerIncomeExamineUpdate);
         if(result==0){
-            throw new AccountOwnerIncomeException(ErrorCode.FAILED);
+            throw new AccountOwnerIncomeExamineException();
         }
     }
 

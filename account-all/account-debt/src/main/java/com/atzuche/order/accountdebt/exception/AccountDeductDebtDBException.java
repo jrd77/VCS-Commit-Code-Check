@@ -7,9 +7,6 @@ import lombok.Data;
 @Data
 public class AccountDeductDebtDBException extends OrderException {
 
-    public AccountDeductDebtDBException(ErrorCode errorCode) {
-        super(errorCode.getCode(),errorCode.getText());
-    }
 
     public AccountDeductDebtDBException() {
         super(ErrorCode.ACCOUT_DEBT_DEDUCT_DEBT.getCode(),ErrorCode.ACCOUT_DEBT_DEDUCT_DEBT.getCode());

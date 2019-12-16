@@ -1,5 +1,6 @@
 package com.atzuche.order.accountownerincome.service.notservice;
 
+import com.atzuche.order.accountownerincome.exception.AccountOwnerIncomeExamineException;
 import com.atzuche.order.accountownerincome.exception.AccountOwnerIncomeException;
 import com.atzuche.order.accountownerincome.entity.AccountOwnerIncomeDetailEntity;
 import com.atzuche.order.accountownerincome.entity.AccountOwnerIncomeEntity;
@@ -58,12 +59,12 @@ public class AccountOwnerIncomeNoTService {
         AccountOwnerIncomeEntity accountOwnerIncome = getOwnerIncome(accountOwnerIncomeDetail.getMemNo());
         int amt = accountOwnerIncome.getIncomeAmt() + accountOwnerIncomeDetail.getAmt();
         if(amt<0){
-            throw new AccountOwnerIncomeException(ErrorCode.GREATER_THAN_WITHDRAWAL_AMOUNT);
+            throw new AccountOwnerIncomeExamineException();
         }
         accountOwnerIncome.setIncomeAmt(amt);
         int result = accountOwnerIncomeMapper.updateByPrimaryKey(accountOwnerIncome);
         if(result==0){
-            throw new AccountOwnerIncomeException(ErrorCode.FAILED);
+            throw new AccountOwnerIncomeExamineException();
         }
     }
 }

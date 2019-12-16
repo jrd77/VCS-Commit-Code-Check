@@ -1,6 +1,6 @@
 package com.atzuche.order.accountownercost.service.notservice;
 
-import com.atzuche.order.accountownercost.exception.AccountOwnerCostException;
+import com.atzuche.order.accountownercost.exception.AccountOwnerCostSettleException;
 import com.atzuche.order.accountownercost.entity.AccountOwnerCostSettleDetailEntity;
 import com.atzuche.order.accountownercost.mapper.AccountOwnerCostSettleDetailMapper;
 import com.atzuche.order.accountownercost.vo.req.AccountOwnerCostSettleDetailReqVO;
@@ -28,7 +28,7 @@ public class AccountOwnerCostSettleDetailNoTService {
 
     public void insertAccountOwnerCostSettleDetail(List<AccountOwnerCostSettleDetailReqVO> accountOwnerCostSettleDetails) {
         if(CollectionUtils.isEmpty(accountOwnerCostSettleDetails)){
-            throw new AccountOwnerCostException(ErrorCode.FAILED);
+            throw new AccountOwnerCostSettleException();
         }
         LocalDateTime now =  LocalDateTime.now();
         for(int i=0;i<accountOwnerCostSettleDetails.size();i ++){
@@ -40,7 +40,7 @@ public class AccountOwnerCostSettleDetailNoTService {
             accountOwnerCostSettleDetailEntity.setCreateTime(now);
             int result = accountOwnerCostSettleDetailMapper.insert(accountOwnerCostSettleDetailEntity);
             if(result==0){
-                throw new AccountOwnerCostException(ErrorCode.FAILED);
+                throw new AccountOwnerCostSettleException();
             }
         }
     }
