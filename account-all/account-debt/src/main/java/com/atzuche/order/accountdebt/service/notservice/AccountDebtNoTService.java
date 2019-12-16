@@ -34,7 +34,7 @@ public class AccountDebtNoTService {
      * @return
      * @throws AccountDebtException
      */
-    public AccountDebtResVO getAccountDebtByMemNo(Integer memNo) throws AccountDebtException {
+    public AccountDebtResVO getAccountDebtByMemNo(Integer memNo) {
         if(Objects.isNull(memNo)){
             throw new AccountDebtException(ErrorCode.PARAMETER_ERROR);
         }

@@ -2,7 +2,6 @@ package com.atzuche.order.accountdebt.service;
 
 import com.atzuche.order.accountdebt.entity.AccountDebtDetailEntity;
 import com.atzuche.order.accountdebt.entity.AccountDebtReceivableaDetailEntity;
-import com.atzuche.order.accountdebt.exception.AccountDebtException;
 import com.atzuche.order.accountdebt.service.notservice.AccountDebtDetailNoTService;
 import com.atzuche.order.accountdebt.service.notservice.AccountDebtNoTService;
 import com.atzuche.order.accountdebt.service.notservice.AccountDebtReceivableaDetailNoTService;
@@ -42,9 +41,8 @@ public class AccountDebtService{
      * 根据会员号查询用户总欠款信息
      * @param memNo
      * @return
-     * @throws AccountDebtException
      */
-    public AccountDebtResVO getAccountDebtByMemNo(Integer memNo) throws AccountDebtException {
+    public AccountDebtResVO getAccountDebtByMemNo(Integer memNo) {
         return accountDebtNoTService.getAccountDebtByMemNo(memNo);
     }
 
