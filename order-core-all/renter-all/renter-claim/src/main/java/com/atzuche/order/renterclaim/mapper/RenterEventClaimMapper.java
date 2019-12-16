@@ -24,5 +24,5 @@ public interface RenterEventClaimMapper{
     int updateByPrimaryKey(RenterEventClaimEntity record);
     
     int updateByPrimaryKeySelective(RenterEventClaimEntity record);
-
+    
 }
