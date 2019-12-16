@@ -1,6 +1,7 @@
 package com.autoyol.platformcost;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -100,13 +101,13 @@ public class RenterFeeCalculatorUtils {
 		if (carPriceOfDayList == null || carPriceOfDayList.isEmpty()) {
 			throw new RenterFeeCostException(ExceptionCodeEnum.CAR_DAY_PRICE_LIST_IS_EMPTY);
 		}
-		List<String> days = CommonUtils.getHolidayRentDays(rentTime, revertTime);
+		List<LocalDate> days = CommonUtils.getHolidayRentDays(rentTime, revertTime);
 		float totalHours = CommonUtils.getTotalHoursByRentAveragePrice(rentTime, revertTime);
 		if (days != null && !days.isEmpty()) {
-			Map<String, Integer> dayPrices = carPriceOfDayList.stream()
-					.collect(Collectors.toMap(CarPriceOfDay::getDateStr, CarPriceOfDay::getDayPrice));
+			Map<LocalDate, Integer> dayPrices = carPriceOfDayList.stream()
+					.collect(Collectors.toMap(CarPriceOfDay::getCurDate, CarPriceOfDay::getDayPrice));
 			if (days.size() == 1) { // 就是当天的价格，平日价或节假日价格
-				String date = days.get(0).replaceAll("-", "");
+				LocalDate date = days.get(0);
 				int price = dayPrices.get(date);
 				return price;
 			} else { // 含2天的情况。
@@ -118,24 +119,24 @@ public class RenterFeeCalculatorUtils {
 				// 最后一天
 				float HLast = 0.00f;
 				// 第一天
-				String dateFirst = days.get(0);
-				HFirst = CommonUtils.getHolidayTopHours(rentTime, dateFirst);
-				int priceFirst = dayPrices.get(dateFirst.replaceAll("-", ""));
+				LocalDate dateFirst = days.get(0);
+				HFirst = CommonUtils.getHolidayTopHours(rentTime, dateFirst.toString());
+				int priceFirst = dayPrices.get(dateFirst);
 				// 计算公式
 				top = priceFirst * (HFirst / totalHours);
 				// 中间
 				if (days.size() > 2) {
 					for (int i = 1; i < days.size() - 1; i++) {
-						String date = days.get(i).replaceAll("-", "");
+						LocalDate date = days.get(i);
 						int price = dayPrices.get(date);
 						// 计算公式
 						middle = middle + price * (24 / totalHours); // 累加
 					}
 				}
 				// 最后一天
-				String dateLast = days.get(days.size() - 1);
-				HLast = CommonUtils.getHolidayFootHours(revertTime, dateLast);
-				int priceLast = dayPrices.get(dateLast.replaceAll("-", ""));
+				LocalDate dateLast = days.get(days.size() - 1);
+				HLast = CommonUtils.getHolidayFootHours(revertTime, dateLast.toString());
+				int priceLast = dayPrices.get(dateLast);
 				// 计算公式
 				foot = priceLast * (HLast / totalHours);
 				// 调整为四舍五入取整 150828

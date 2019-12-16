@@ -1,6 +1,5 @@
 package com.atzuche.order.coreapi.entity.bo;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -10,6 +9,10 @@ import lombok.Data;
 
 @Data
 public class RenterGoodsPriceBO {
+	/**
+	 * 排序使用
+	 */
+	private Integer id;
 
 	/**
 	 * 主订单号
