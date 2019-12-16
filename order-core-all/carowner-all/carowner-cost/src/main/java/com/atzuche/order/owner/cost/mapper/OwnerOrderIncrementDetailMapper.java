@@ -1,6 +1,6 @@
-package com.atzuche.order.mapper;
+package com.atzuche.order.owner.cost.mapper;
 
-import com.atzuche.order.entity.OwnerOrderIncrementDetailEntity;
+import com.atzuche.order.owner.cost.entity.OwnerOrderIncrementDetailEntity;
 import org.apache.ibatis.annotations.Mapper;
 import java.util.List;
 

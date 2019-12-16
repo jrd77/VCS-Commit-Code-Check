@@ -1,19 +1,20 @@
-package com.atzuche.order.entity;
+package com.atzuche.order.owner.goods.entity;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import lombok.Data;
 
 
 /**
- * 车主会员权益表
+ * 车主端商品概览价格明细表
  * 
  * @author ZhangBin
- * @date 2019-12-11 18:09:46
+ * @date 2019-12-11 18:12:50
  * @Description:
  */
 @Data
-public class OwnerMemberRightEntity implements Serializable {
+public class OwnerGoodsPriceDetailEntity implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
 	/**
@@ -29,25 +30,21 @@ public class OwnerMemberRightEntity implements Serializable {
 	 */
 	private String ownerOrderNo;
 	/**
-	 * 会员号
+	 * 商品概览id
 	 */
-	private Integer memNo;
+	private Integer goodsId;
 	/**
-	 * 权益编码
+	 * 天
 	 */
-	private String rightCode;
+	private LocalDate carDay;
 	/**
-	 * 权益名称（会员等级、是否内部员工、vip等）
+	 * 天单价
 	 */
-	private String rightName;
+	private Integer carUnitPrice;
 	/**
-	 * 权益值
+	 * 小时数
 	 */
-	private String rightValue;
-	/**
-	 * 权益描述
-	 */
-	private String rightDesc;
+	private Integer carHourCount;
 	/**
 	 * 创建时间
 	 */

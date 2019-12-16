@@ -1,20 +1,19 @@
-package com.atzuche.order.entity;
+package com.atzuche.order.owner.cost.entity;
 
 import java.io.Serializable;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import lombok.Data;
 
 
 /**
- * 车主端商品概览价格明细表
+ * 车主端采购费用明细表
  * 
  * @author ZhangBin
- * @date 2019-12-11 18:12:50
+ * @date 2019-12-11 17:37:50
  * @Description:
  */
 @Data
-public class OwnerGoodsPriceDetailEntity implements Serializable {
+public class OwnerOrderPurchaseDetailEntity implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
 	/**
@@ -30,21 +29,29 @@ public class OwnerGoodsPriceDetailEntity implements Serializable {
 	 */
 	private String ownerOrderNo;
 	/**
-	 * 商品概览id
+	 * 会员号
 	 */
-	private Integer goodsId;
+	private Integer memNo;
 	/**
-	 * 天
+	 * 费用编码费用编码（包含罚款、租金、佣金、取还车费、GPS服务费等）
 	 */
-	private LocalDate carDay;
+	private String costCode;
 	/**
-	 * 天单价
+	 * 费用描述
 	 */
-	private Integer carUnitPrice;
+	private String costCodeDesc;
 	/**
-	 * 小时数
+	 * 单价
 	 */
-	private Integer carHourCount;
+	private Integer unitPrice;
+	/**
+	 * 份数
+	 */
+	private Integer count;
+	/**
+	 * 金额
+	 */
+	private Integer totalAmount;
 	/**
 	 * 创建时间
 	 */
