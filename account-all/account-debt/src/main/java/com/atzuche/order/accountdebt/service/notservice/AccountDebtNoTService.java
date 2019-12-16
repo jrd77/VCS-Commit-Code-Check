@@ -1,11 +1,11 @@
-package com.atzuche.order.account.debt.service.notservice;
+package com.atzuche.order.accountdebt.service.notservice;
 
-import com.atzuche.order.account.debt.exception.AccountDebtException;
-import com.atzuche.order.account.debt.vo.req.AccountDeductDebtReqVO;
-import com.atzuche.order.account.debt.vo.req.AccountInsertDebtReqVO;
-import com.atzuche.order.account.debt.vo.res.AccountDebtResVO;
-import com.atzuche.order.account.debt.entity.AccountDebtEntity;
-import com.atzuche.order.account.debt.mapper.AccountDebtMapper;
+import com.atzuche.order.accountdebt.exception.AccountDebtException;
+import com.atzuche.order.accountdebt.vo.req.AccountDeductDebtReqVO;
+import com.atzuche.order.accountdebt.vo.req.AccountInsertDebtReqVO;
+import com.atzuche.order.accountdebt.vo.res.AccountDebtResVO;
+import com.atzuche.order.accountdebt.entity.AccountDebtEntity;
+import com.atzuche.order.accountdebt.mapper.AccountDebtMapper;
 import com.autoyol.commons.web.ErrorCode;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.BeanUtils;

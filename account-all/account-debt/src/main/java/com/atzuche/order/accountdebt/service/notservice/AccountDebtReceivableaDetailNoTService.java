@@ -1,10 +1,10 @@
-package com.atzuche.order.account.debt.service.notservice;
+package com.atzuche.order.accountdebt.service.notservice;
 
-import com.atzuche.order.account.debt.exception.AccountDebtException;
-import com.atzuche.order.account.debt.vo.req.AccountDeductDebtReqVO;
-import com.atzuche.order.account.debt.entity.AccountDebtDetailEntity;
-import com.atzuche.order.account.debt.entity.AccountDebtReceivableaDetailEntity;
-import com.atzuche.order.account.debt.mapper.AccountDebtReceivableaDetailMapper;
+import com.atzuche.order.accountdebt.exception.AccountDebtException;
+import com.atzuche.order.accountdebt.vo.req.AccountDeductDebtReqVO;
+import com.atzuche.order.accountdebt.entity.AccountDebtDetailEntity;
+import com.atzuche.order.accountdebt.entity.AccountDebtReceivableaDetailEntity;
+import com.atzuche.order.accountdebt.mapper.AccountDebtReceivableaDetailMapper;
 import com.autoyol.commons.web.ErrorCode;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
