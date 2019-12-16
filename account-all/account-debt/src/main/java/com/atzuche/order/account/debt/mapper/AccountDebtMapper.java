@@ -1,6 +1,6 @@
-package com.atzuche.order.accountdebt.mapper;
+package com.atzuche.order.account.debt.mapper;
 
-import com.atzuche.order.accountdebt.entity.AccountDebtEntity;
+import com.atzuche.order.account.debt.entity.AccountDebtEntity;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
