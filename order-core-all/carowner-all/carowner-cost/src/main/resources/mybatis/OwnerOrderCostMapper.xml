@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.atzuche.order.mapper.OwnerOrderCostMapper">
+<mapper namespace="com.atzuche.order.owner.cost.mapper.OwnerOrderCostMapper">
 
-    <resultMap type="com.atzuche.order.entity.OwnerOrderCostEntity" id="BaseResultMap">
+    <resultMap type="com.atzuche.order.owner.cost.entity.OwnerOrderCostEntity" id="BaseResultMap">
         <result property="id" column="id"/>
         <result property="orderNo" column="order_no"/>
         <result property="ownerOrderNo" column="owner_order_no"/>
@@ -47,7 +47,7 @@
 	</select>
 
 	 
-	<insert id="insert" parameterType="com.atzuche.order.entity.OwnerOrderCostEntity" useGeneratedKeys="true" keyProperty="id">
+	<insert id="insert" parameterType="com.atzuche.order.owner.cost.entity.OwnerOrderCostEntity" useGeneratedKeys="true" keyProperty="id">
 		insert into owner_order_cost
 		(
 				`order_no`,		
@@ -80,7 +80,7 @@
 			)
 	</insert>
 	
-	<insert id="insertSelective" parameterType="com.atzuche.order.entity.OwnerOrderCostEntity" useGeneratedKeys="true" keyProperty="id">
+	<insert id="insertSelective" parameterType="com.atzuche.order.owner.cost.entity.OwnerOrderCostEntity" useGeneratedKeys="true" keyProperty="id">
 		insert into owner_order_cost
 		(
 				<if test="orderNo != null">`order_no`, </if>
@@ -114,7 +114,7 @@
 	</insert>
 	
 	 
-	<update id="updateByPrimaryKeySelective" parameterType="com.atzuche.order.entity.OwnerOrderCostEntity">
+	<update id="updateByPrimaryKeySelective" parameterType="com.atzuche.order.owner.cost.entity.OwnerOrderCostEntity">
 		update owner_order_cost 
 		<set>
 				<if test="orderNo != null">`order_no` = #{orderNo}, </if>
@@ -133,7 +133,7 @@
 		where id = #{id}
 	</update>
 	
-	<update id="updateByPrimaryKey" parameterType="com.atzuche.order.entity.OwnerOrderCostEntity">
+	<update id="updateByPrimaryKey" parameterType="com.atzuche.order.owner.cost.entity.OwnerOrderCostEntity">
 		update owner_order_cost 
 		<set>
 				`order_no` = #{orderNo}, 		
