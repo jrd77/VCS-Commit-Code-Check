@@ -1,4 +1,4 @@
-package com.atzuche.order.entity;
+package com.atzuche.order.owner.mem.entity;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -6,14 +6,14 @@ import lombok.Data;
 
 
 /**
- * 车主会员概览表
+ * 车主会员权益表
  * 
  * @author ZhangBin
  * @date 2019-12-11 18:09:46
  * @Description:
  */
 @Data
-public class OwnerMemberEntity implements Serializable {
+public class OwnerMemberRightEntity implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
 	/**
@@ -33,29 +33,21 @@ public class OwnerMemberEntity implements Serializable {
 	 */
 	private Integer memNo;
 	/**
-	 * 会员类型
+	 * 权益编码
 	 */
-	private Integer memType;
+	private String rightCode;
 	/**
-	 * 手机号
+	 * 权益名称（会员等级、是否内部员工、vip等）
 	 */
-	private String phone;
+	private String rightName;
 	/**
-	 * 头像
+	 * 权益值
 	 */
-	private String headerUrl;
+	private String rightValue;
 	/**
-	 * 真实姓名
+	 * 权益描述
 	 */
-	private String realName;
-	/**
-	 * 昵称
-	 */
-	private String nickName;
-	/**
-	 * 成功下单次数
-	 */
-	private Integer orderSuccessCount;
+	private String rightDesc;
 	/**
 	 * 创建时间
 	 */

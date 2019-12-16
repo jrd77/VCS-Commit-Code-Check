@@ -1,6 +1,6 @@
-package com.atzuche.order.mapper;
+package com.atzuche.order.owner.mem.mapper;
 
-import com.atzuche.order.entity.OwnerMemberRightEntity;
+import com.atzuche.order.owner.mem.entity.OwnerMemberRightEntity;
 import org.apache.ibatis.annotations.Mapper;
 import java.util.List;
 
