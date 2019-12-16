@@ -1,6 +1,7 @@
 package com.atzuche.order.accountdebt.service.notservice;
 
-import com.atzuche.order.accountdebt.exception.AccountDebtException;
+import com.atzuche.order.accountdebt.exception.AccountDeductDebtDBException;
+import com.atzuche.order.accountdebt.exception.AccountInsertDebtDBException;
 import com.atzuche.order.accountdebt.vo.req.AccountDeductDebtReqVO;
 import com.atzuche.order.accountdebt.vo.req.AccountInsertDebtReqVO;
 import com.atzuche.order.accountdebt.vo.res.AccountDebtResVO;
@@ -32,11 +33,11 @@ public class AccountDebtNoTService {
      * 根据会员号查询用户总欠款信息
      * @param memNo
      * @return
-     * @throws AccountDebtException
+     * @throws AccountDeductDebtDBException
      */
     public AccountDebtResVO getAccountDebtByMemNo(Integer memNo) {
         if(Objects.isNull(memNo)){
-            throw new AccountDebtException(ErrorCode.PARAMETER_ERROR);
+            throw new AccountDeductDebtDBException();
         }
         LocalDateTime now = LocalDateTime.now();
         AccountDebtEntity accountDebtEntity =  accountDebtMapper.getAccountDebtByMemNo(memNo);
@@ -64,12 +65,12 @@ public class AccountDebtNoTService {
         //1 查询用户欠款总和
         AccountDebtEntity accountDebtEntity =  accountDebtMapper.getAccountDebtByMemNo(accountDeductDebt.getMemNo());
         if(Objects.isNull(accountDebtEntity) || Objects.isNull(accountDebtEntity.getId())){
-            throw new AccountDebtException(ErrorCode.FAILED);
+            throw new AccountDeductDebtDBException();
         }
         accountDebtEntity.setDebtAmt(accountDebtEntity.getDebtAmt()-Math.abs(accountDeductDebt.getAmt()));
         int result = accountDebtMapper.updateByPrimaryKeySelective(accountDebtEntity);
         if(result==0){
-            throw new AccountDebtException(ErrorCode.FAILED);
+            throw new AccountDeductDebtDBException();
         }
     }
 
@@ -81,13 +82,13 @@ public class AccountDebtNoTService {
         //1 查询用户欠款总和
         AccountDebtEntity accountDebtEntity =  accountDebtMapper.getAccountDebtByMemNo(accountInsertDebt.getMemNo());
         if(Objects.isNull(accountDebtEntity) || Objects.isNull(accountDebtEntity.getId())){
-            throw new AccountDebtException(ErrorCode.FAILED);
+            throw new AccountInsertDebtDBException();
         }
         int amt = accountDebtEntity.getDebtAmt()+Math.abs(accountInsertDebt.getAmt());
         accountDebtEntity.setDebtAmt(amt);
         int result = accountDebtMapper.updateByPrimaryKeySelective(accountDebtEntity);
         if(result==0){
-            throw new AccountDebtException(ErrorCode.FAILED);
+            throw new AccountInsertDebtDBException();
         }
     }
 }

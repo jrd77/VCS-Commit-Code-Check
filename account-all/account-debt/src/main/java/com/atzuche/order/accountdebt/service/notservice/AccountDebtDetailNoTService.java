@@ -1,6 +1,7 @@
 package com.atzuche.order.accountdebt.service.notservice;
 
-import com.atzuche.order.accountdebt.exception.AccountDebtException;
+import com.atzuche.order.accountdebt.exception.AccountDeductDebtDBException;
+import com.atzuche.order.accountdebt.exception.AccountInsertDebtDBException;
 import com.atzuche.order.accountdebt.vo.req.AccountDeductDebtReqVO;
 import com.atzuche.order.accountdebt.vo.req.AccountInsertDebtReqVO;
 import com.atzuche.order.accountdebt.entity.AccountDebtDetailEntity;
@@ -46,7 +47,7 @@ public class AccountDebtDetailNoTService {
        for(int i=0;i<accountDebtDetails.size();i++){
           int result = accountDebtDetailMapper.updateByPrimaryKeySelective(accountDebtDetails.get(i));
           if(result==0){
-              throw new AccountDebtException(ErrorCode.FAILED);
+              throw new AccountDeductDebtDBException();
           }
        }
     }
@@ -63,7 +64,7 @@ public class AccountDebtDetailNoTService {
         accountDebtDetail.setRepaidDebtAmt(NumberUtils.INTEGER_ZERO);
         int result = accountDebtDetailMapper.insert(accountDebtDetail);
         if(result==0){
-            throw new AccountDebtException(ErrorCode.FAILED);
+            throw new AccountInsertDebtDBException();
         }
     }
 
