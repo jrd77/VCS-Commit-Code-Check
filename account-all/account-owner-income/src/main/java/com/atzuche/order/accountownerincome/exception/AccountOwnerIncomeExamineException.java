@@ -1,6 +1,6 @@
 package com.atzuche.order.accountownerincome.exception;
 
-import com.atzuche.order.accountownercost.enums.ErrorCode;
+import com.atzuche.order.accountownerincome.enums.ErrorCode;
 import com.atzuche.order.commons.OrderException;
 import lombok.Data;
 

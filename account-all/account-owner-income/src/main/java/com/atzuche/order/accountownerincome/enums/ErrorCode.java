@@ -4,7 +4,8 @@ import lombok.Getter;
 
 @Getter
 public enum ErrorCode {
-    ACCOUT_OWNER_COST_SETTLE("941001","车主收益结算出错"),
+    ACCOUT_OWNER_INCOME_SETTLE("931001","车主收益结算出错"),
+    ACCOUT_OWNER_INCOME_EXAMINE("931002","车主收益审核出错"),
     ;
 
     private String code;
