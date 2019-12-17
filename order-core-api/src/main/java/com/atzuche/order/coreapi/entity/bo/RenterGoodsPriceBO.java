@@ -3,8 +3,7 @@ package com.atzuche.order.coreapi.entity.bo;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import com.atzuche.order.rentercommodity.entity.RenterGoodsPriiceDetailEntity;
-
+import com.atzuche.order.rentercommodity.entity.RenterGoodsPriceDetailEntity;
 import lombok.Data;
 
 @Data
@@ -33,6 +32,6 @@ public class RenterGoodsPriceBO {
 	/**
 	 * 商品价格列表
 	 */
-	private List<RenterGoodsPriiceDetailEntity> renterGoodsPriceList;
+	private List<RenterGoodsPriceDetailEntity> renterGoodsPriceList;
 	
 }

@@ -8,14 +8,14 @@ import java.util.List;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
+import com.atzuche.order.rentercommodity.service.RenterGoodsPriceDetailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.atzuche.order.coreapi.entity.bo.RentAmtResultBO;
 import com.atzuche.order.coreapi.entity.bo.RenterGoodsPriceBO;
 import com.atzuche.order.coreapi.entity.bo.RenterModifyGetReturnTimeBO;
-import com.atzuche.order.rentercommodity.entity.RenterGoodsPriiceDetailEntity;
-import com.atzuche.order.rentercommodity.service.RenterGoodsPriiceDetailService;
+import com.atzuche.order.rentercommodity.entity.RenterGoodsPriceDetailEntity;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.atzuche.order.renterorder.service.RenterOrderService;
 import com.autoyol.platformcost.RenterFeeCalculatorUtils;
@@ -28,7 +28,7 @@ public class ModifyOrderComposeService {
 	@Autowired
 	private RenterOrderService renterOrderService;
 	@Autowired
-	private RenterGoodsPriiceDetailService renterGoodsPriiceDetailService;
+	private RenterGoodsPriceDetailService renterGoodsPriceDetailService;
 	
 	
 	/**
@@ -60,7 +60,7 @@ public class ModifyOrderComposeService {
 				break;
 			}
 			// 日期价格列表转化
-			List<RenterGoodsPriiceDetailEntity> renterGoodsPriceList = renterGoodsPriceBO.getRenterGoodsPriceList();
+			List<RenterGoodsPriceDetailEntity> renterGoodsPriceList = renterGoodsPriceBO.getRenterGoodsPriceList();
 			carPriceOfDayAfterList = handCarPriceOfDayList(renterGoodsPriceList, getReturnTimeBO.getRevertTime());
 			// 去重
 			carPriceOfDayAfterList = distinctCarPriceOfDayList(carPriceOfDayAfterList);
@@ -129,7 +129,7 @@ public class ModifyOrderComposeService {
             }
 		}
 		// 获取租客价格列表
-		List<RenterGoodsPriiceDetailEntity> renterGoodsPriceAllList = renterGoodsPriiceDetailService.listRenterGoodsPriceByOrderNo(orderNo);
+		List<RenterGoodsPriceDetailEntity> renterGoodsPriceAllList = renterGoodsPriceDetailService.listRenterGoodsPriceByOrderNo(orderNo);
 		if (renterGoodsPriceAllList == null) {
 			return null;
 		}
@@ -144,7 +144,7 @@ public class ModifyOrderComposeService {
 	 * @param renterGoodsPriceAllList
 	 * @return RenterGoodsPriceBO
 	 */
-	public RenterGoodsPriceBO getRenterOrderPrice(RenterOrderEntity renterOrder, List<RenterGoodsPriiceDetailEntity> renterGoodsPriceAllList) {
+	public RenterGoodsPriceBO getRenterOrderPrice(RenterOrderEntity renterOrder, List<RenterGoodsPriceDetailEntity> renterGoodsPriceAllList) {
 		if (renterOrder == null) {
 			return null;
 		}
@@ -157,8 +157,8 @@ public class ModifyOrderComposeService {
 		if (renterGoodsPriceAllList == null || renterGoodsPriceAllList.isEmpty()) {
 			return null;
 		}
-		List<RenterGoodsPriiceDetailEntity> renterGoodsPriceList = new ArrayList<>();
-		for (RenterGoodsPriiceDetailEntity renterGoodsPrice:renterGoodsPriceAllList) {
+		List<RenterGoodsPriceDetailEntity> renterGoodsPriceList = new ArrayList<>();
+		for (RenterGoodsPriceDetailEntity renterGoodsPrice:renterGoodsPriceAllList) {
 			if (renterOrder.getRenterOrderNo() != null && renterOrder.getRenterOrderNo().equals(renterGoodsPrice.getRenterOrderNo())) {
 				renterGoodsPriceList.add(renterGoodsPrice);
 			}
@@ -234,7 +234,7 @@ public class ModifyOrderComposeService {
 	 * @param endTime
 	 * @return List<CarPriceOfDay>
 	 */
-	public List<CarPriceOfDay> handCarPriceOfDayList(List<RenterGoodsPriiceDetailEntity> renterGoodsPriceList, LocalDateTime endTime) {
+	public List<CarPriceOfDay> handCarPriceOfDayList(List<RenterGoodsPriceDetailEntity> renterGoodsPriceList, LocalDateTime endTime) {
 		if (renterGoodsPriceList == null || renterGoodsPriceList.isEmpty()) {
 			return null;
 		}
@@ -259,7 +259,7 @@ public class ModifyOrderComposeService {
 	 * @param endTime
 	 * @return List<CarPriceOfDay>
 	 */
-	public List<CarPriceOfDay> handCarPriceOfDayList(List<RenterGoodsPriiceDetailEntity> renterGoodsPriceList, List<CarPriceOfDay> carPriceOfDayList, LocalDateTime startTime, LocalDateTime endTime) {
+	public List<CarPriceOfDay> handCarPriceOfDayList(List<RenterGoodsPriceDetailEntity> renterGoodsPriceList, List<CarPriceOfDay> carPriceOfDayList, LocalDateTime startTime, LocalDateTime endTime) {
 		if (renterGoodsPriceList == null || renterGoodsPriceList.isEmpty()) {
 			return null;
 		}

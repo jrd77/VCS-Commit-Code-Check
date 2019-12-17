@@ -1,20 +1,21 @@
 package com.atzuche.order.rentercommodity.entity;
 
+import lombok.Data;
+
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import lombok.Data;
 
 
 /**
  * 商品概览价格明细表
  * 
  * @author ZhangBin
- * @date 2019-12-11 18:06:32
+ * @date 2019-12-17 11:43:15
  * @Description:
  */
 @Data
-public class RenterGoodsPriiceDetailEntity implements Serializable {
+public class RenterGoodsPriceDetailEntity implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
 	/**
@@ -45,6 +46,10 @@ public class RenterGoodsPriiceDetailEntity implements Serializable {
 	 * 小时数
 	 */
 	private Integer carHourCount;
+	/**
+	 * 分组id
+	 */
+	private LocalDateTime revertTime;
 	/**
 	 * 创建时间
 	 */

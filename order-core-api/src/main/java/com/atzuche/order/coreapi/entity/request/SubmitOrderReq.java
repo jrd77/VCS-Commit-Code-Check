@@ -29,7 +29,6 @@ public class SubmitOrderReq {
     private String specialConsole;
     private Integer useBal;
     private String srvReturnLat;
-    private String token;
     private String rentReason;
     private String srvReturnLon;
     private String offlineOrderStatus;
