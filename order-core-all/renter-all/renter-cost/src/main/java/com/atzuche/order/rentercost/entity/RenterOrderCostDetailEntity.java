@@ -103,7 +103,7 @@ public class RenterOrderCostDetailEntity implements Serializable {
 	
 	public RenterOrderCostDetailEntity() {}
 	
-	public RenterOrderCostDetailEntity(Long orderNo, String renterOrderNo, Integer memNo, String costCode,
+	public RenterOrderCostDetailEntity(String orderNo, String renterOrderNo, String memNo, String costCode,
 			String costDesc, LocalDateTime startTime, LocalDateTime endTime, Integer unitPrice, Double count,
 			Integer totalAmount) {
 		this.orderNo = orderNo;

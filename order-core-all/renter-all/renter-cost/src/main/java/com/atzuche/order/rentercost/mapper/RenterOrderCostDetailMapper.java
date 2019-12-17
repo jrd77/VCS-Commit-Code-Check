@@ -2,6 +2,8 @@ package com.atzuche.order.rentercost.mapper;
 
 import com.atzuche.order.rentercost.entity.RenterOrderCostDetailEntity;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
 import java.util.List;
 
 /**
@@ -25,4 +27,5 @@ public interface RenterOrderCostDetailMapper{
     
     int updateByPrimaryKeySelective(RenterOrderCostDetailEntity record);
 
+    int saveRenterOrderCostDetailBatch(@Param("costList") List<RenterOrderCostDetailEntity> costList);
 }

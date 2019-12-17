@@ -19,7 +19,7 @@ public class CostBaseDTO {
 	/**
 	 * 会员号
 	 */
-	private Integer memNo;
+	private String memNo;
 	/**
 	 * 开始时间
 	 */

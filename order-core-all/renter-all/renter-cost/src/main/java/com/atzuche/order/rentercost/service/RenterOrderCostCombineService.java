@@ -1,10 +1,15 @@
 package com.atzuche.order.rentercost.service;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
+import com.atzuche.order.commons.entity.dto.RenterGoodsPriceDetailDto;
 import com.atzuche.order.commons.enums.RenterCashCodeEnum;
 import com.atzuche.order.rentercost.entity.RenterOrderCostDetailEntity;
 import com.atzuche.order.rentercost.entity.dto.AbatementAmtDTO;
@@ -18,6 +23,7 @@ import com.atzuche.order.rentercost.exception.RenterCostParameterException;
 import com.autoyol.platformcost.CommonUtils;
 import com.autoyol.platformcost.RenterFeeCalculatorUtils;
 import com.autoyol.platformcost.model.CarDepositAmtVO;
+import com.autoyol.platformcost.model.CarPriceOfDay;
 import com.autoyol.platformcost.model.DepositText;
 import com.autoyol.platformcost.model.FeeResult;
 import com.autoyol.platformcost.model.IllegalDepositConfig;
@@ -30,11 +36,62 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class RenterOrderCostCombineService {
 
-	public RenterOrderCostDetailEntity getRentAmtEntity(RentAmtDTO rentAmtDTO) {
-		RenterOrderCostDetailEntity rentAmtObj = null;
+	/**
+	 * 获取租金对象列表
+	 * @param rentAmtDTO
+	 * @return List<RenterOrderCostDetailEntity>
+	 */
+	public List<RenterOrderCostDetailEntity> listRentAmtEntity(RentAmtDTO rentAmtDTO) {
+		log.info("getRentAmtEntity rentAmtDTO=[{}]",rentAmtDTO);
+		if (rentAmtDTO == null) {
+			log.error("getRentAmtEntity 获取租金对象列表rentAmtDTO对象为空");
+			Cat.logError("获取租金对象列表rentAmtDTO对象为空", new RenterCostParameterException());
+			throw new RenterCostParameterException();
+		}
+		CostBaseDTO costBaseDTO = rentAmtDTO.getCostBaseDTO();
+		if (costBaseDTO == null) {
+			log.error("getRentAmtEntity 获取租金对象列表rentAmtDTO.costBaseDTO对象为空");
+			Cat.logError("获取租金对象列表rentAmtDTO.costBaseDTO对象为空", new RenterCostParameterException());
+			throw new RenterCostParameterException();
+		}
 		
-		return rentAmtObj;
+		List<RenterGoodsPriceDetailDto> dayPriceList = rentAmtDTO.getRenterGoodsPriceDetailDtoList();
+		// 按还车时间分组
+		Map<LocalDateTime, List<RenterGoodsPriceDetailDto>> dayPriceMap = dayPriceList.stream().collect(Collectors.groupingBy(RenterGoodsPriceDetailDto::getRevertTime));
+		dayPriceMap = dayPriceMap.entrySet().stream().sorted(Map.Entry.comparingByKey()).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue,
+                        (oldValue, newValue) -> oldValue, LinkedHashMap::new));
+		int i = 1;
+		List<RenterOrderCostDetailEntity> renterOrderCostDetailEntityList = new ArrayList<RenterOrderCostDetailEntity>();
+		for(Map.Entry<LocalDateTime, List<RenterGoodsPriceDetailDto>> it : dayPriceMap.entrySet()){
+			if (i == 1) {
+				costBaseDTO.setEndTime(it.getKey());
+			} else {
+				costBaseDTO.setStartTime(costBaseDTO.getEndTime());
+				costBaseDTO.setEndTime(it.getKey());
+			}
+			renterOrderCostDetailEntityList.add(getRentAmtEntity(costBaseDTO, it.getValue()));
+			i++;
+		}
+		return renterOrderCostDetailEntityList;
 	}
+	
+	public RenterOrderCostDetailEntity getRentAmtEntity(CostBaseDTO costBaseDTO, List<RenterGoodsPriceDetailDto> dayPrices) {
+		// TODO 走配置中心获取
+		Integer configHours = 8;
+		// 数据转化
+		List<CarPriceOfDay> carPriceOfDayList = dayPrices.stream().map(dayPrice -> {
+			CarPriceOfDay carPriceOfDay = new CarPriceOfDay();
+			carPriceOfDay.setCurDate(dayPrice.getCarDay());
+			carPriceOfDay.setDayPrice(dayPrice.getCarUnitPrice());
+			return carPriceOfDay;
+		}).collect(Collectors.toList());
+		// 计算租金
+		FeeResult feeResult = RenterFeeCalculatorUtils.calRentAmt(costBaseDTO.getStartTime(), costBaseDTO.getEndTime(), configHours, carPriceOfDayList);
+		RenterOrderCostDetailEntity result = costBaseConvert(costBaseDTO, feeResult, RenterCashCodeEnum.RENT_AMT);
+		return result;
+	}
+	
+	
 	
 	/**
 	 * 获取平台手续费返回结果
