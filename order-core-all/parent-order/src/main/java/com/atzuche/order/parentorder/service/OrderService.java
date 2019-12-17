@@ -23,8 +23,9 @@ public class OrderService{
      * @param orderNo 主订单号
      * @return OrderEntity
      */
-    public OrderEntity getParentOrderDetailByOrderNo(Long orderNo) {
+    public OrderEntity getParentOrderDetailByOrderNo(String orderNo) {
     	return orderMapper.getParentOrderDetailByOrderNo(orderNo);
     }
+
 
 }

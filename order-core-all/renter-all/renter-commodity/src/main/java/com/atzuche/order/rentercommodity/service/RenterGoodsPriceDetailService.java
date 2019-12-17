@@ -18,6 +18,7 @@ import com.atzuche.order.commons.entity.dto.RenterGoodsPriceDetailDto;
 import com.atzuche.order.commons.entity.request.SubmitOrderReq;
 import com.atzuche.order.parentorder.entity.OrderEntity;
 import com.atzuche.order.parentorder.mapper.OrderMapper;
+import com.atzuche.order.parentorder.service.OrderService;
 import com.atzuche.order.rentercommodity.entity.RenterGoodsPriceDetailEntity;
 import com.atzuche.order.rentercommodity.mapper.RenterGoodsPriceDetailMapper;
 import com.autoyol.platformcost.CommonUtils;
@@ -36,7 +37,7 @@ public class RenterGoodsPriceDetailService {
     @Autowired
     private RenterGoodsPriceDetailMapper renterGoodsPriceDetailMapper;
     @Autowired
-    private OrderMapper orderMapper;
+    private OrderService orderService;
     /**
      * 获取租客价格列表
      * @param orderNo 主订单号
@@ -55,7 +56,7 @@ public class RenterGoodsPriceDetailService {
 
     //组合
     public void combination(OrderContextDto orderContextDto){
-        OrderEntity orderEntity = orderMapper.getParentOrderDetailByOrderNo(orderContextDto.getOrderNo());
+        OrderEntity orderEntity = orderService.getParentOrderDetailByOrderNo(orderContextDto.getOrderNo());
         if(orderEntity == null || orderEntity.getRenterOrderNo() == null){//没有订单
             return;
         }
@@ -84,26 +85,20 @@ public class RenterGoodsPriceDetailService {
                 }
                 renterGoodsPriceDetailDto.setCarHourCount(dbGoodsPriceList.get(i).getCarHourCount());
             }
-
             //租期不重叠部分 中间部分init中已经处理
-
             //租期不重叠部分 最后一天 init中已经处理
-
         }else{//时间提前
             List<RenterGoodsPriceDetailDto> renterGoodsPriceDetailDtoList = orderContextDto.getRenterGoodsDetailDto().getRenterGoodsPriceDetailDtoList();
             //租期重叠部分- 使用数据库的 价格/小时数
             for (int i = 0;i<dbGoodsPriceList.size();i++){
                 RenterGoodsPriceDetailDto renterGoodsPriceDetailDto = renterGoodsPriceDetailDtoList.get(i);
                 renterGoodsPriceDetailDto.setCarUnitPrice(dbGoodsPriceList.get(i).getCarUnitPrice());
+                renterGoodsPriceDetailDto.setRevertTime(dbGoodsPriceList.get(i).getRevertTime());
+                if(i == (dbGoodsPriceList.size()-1)){//最后一天不使用数据库的小时数
+                    continue;
+                }
                 renterGoodsPriceDetailDto.setCarHourCount(dbGoodsPriceList.get(i).getCarHourCount());
-                renterGoodsPriceDetailDto.setRevertTime(revertTime);
             }
-            // 最后一天
-            RenterGoodsPriceDetailDto renterGoodsPriceDetailDto = renterGoodsPriceDetailDtoList.get(renterGoodsPriceDetailDtoList.size() - 1);
-            float HLast = CommonUtils.getHolidayFootHours(revertTime, LocalDateTimeUtils.localdateToString(renterGoodsPriceDetailDto.getCarDay()));
-            RenterGoodsPriceDetailDto renterGoodsPrice = renterGoodsPriceDetailDtoList.get(renterGoodsPriceDetailDtoList.size() - 1);
-            renterGoodsPrice.setRevertTime(revertTime);
-            renterGoodsPrice.setCarHourCount(HLast);
         }
     }
 
