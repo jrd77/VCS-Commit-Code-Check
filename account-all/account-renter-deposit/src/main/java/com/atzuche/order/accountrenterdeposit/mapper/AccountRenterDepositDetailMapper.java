@@ -8,14 +8,12 @@ import java.util.List;
  * 租车押金资金进出明细表
  * 
  * @author ZhangBin
- * @date 2019-12-11 17:48:32
+ * @date 2019-12-17 17:09:45
  */
 @Mapper
 public interface AccountRenterDepositDetailMapper{
 
     AccountRenterDepositDetailEntity selectByPrimaryKey(Integer id);
-
-    List<AccountRenterDepositDetailEntity> selectALL();
 
     int insert(AccountRenterDepositDetailEntity record);
     

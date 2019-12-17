@@ -9,7 +9,7 @@ import lombok.Data;
  * 租车押金状态及其总表
  * 
  * @author ZhangBin
- * @date 2019-12-11 17:48:32
+ * @date 2019-12-17 17:09:45
  * @Description:
  */
 @Data
@@ -23,11 +23,11 @@ public class AccountRenterDepositEntity implements Serializable {
 	/**
 	 * 主订单号
 	 */
-	private Long orderNo;
+	private String orderNo;
 	/**
 	 * 会员号
 	 */
-	private Integer memNo;
+	private String memNo;
 	/**
 	 * 支付状态
 	 */

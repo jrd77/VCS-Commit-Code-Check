@@ -9,7 +9,7 @@ import lombok.Data;
  * 租车押金资金进出明细表
  * 
  * @author ZhangBin
- * @date 2019-12-11 17:48:32
+ * @date 2019-12-17 17:09:45
  * @Description:
  */
 @Data
@@ -23,11 +23,11 @@ public class AccountRenterDepositDetailEntity implements Serializable {
 	/**
 	 * 
 	 */
-	private Long orderNo;
+	private String orderNo;
 	/**
 	 * 会员号
 	 */
-	private Integer memNo;
+	private String memNo;
 	/**
 	 * 支付方式
 	 */
@@ -48,6 +48,14 @@ public class AccountRenterDepositDetailEntity implements Serializable {
 	 * 预授权到期时间
 	 */
 	private LocalDateTime authorizeExpireTime;
+	/**
+	 * 信用支付金额
+	 */
+	private Integer creditPayAmt;
+	/**
+	 * 信用支付到期时间
+	 */
+	private LocalDateTime creditPayExpireTime;
 	/**
 	 * 押金来源编码
 	 */

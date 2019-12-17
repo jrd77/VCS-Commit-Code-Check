@@ -12,6 +12,8 @@
         <result property="amt" column="amt"/>
         <result property="authorizeDepositAmt" column="authorize_deposit_amt"/>
         <result property="authorizeExpireTime" column="authorize_expire_time"/>
+        <result property="creditPayAmt" column="credit_pay_amt"/>
+        <result property="creditPayExpireTime" column="credit_pay_expire_time"/>
         <result property="sourceCode" column="source_code"/>
         <result property="sourceDetail" column="source_detail"/>
         <result property="uniqueNo" column="unique_no"/>
@@ -32,6 +34,8 @@
 	`amt`, 	
 	`authorize_deposit_amt`, 	
 	`authorize_expire_time`, 	
+	`credit_pay_amt`, 	
+	`credit_pay_expire_time`, 	
 	`source_code`, 	
 	`source_detail`, 	
 	`unique_no`, 	
@@ -48,11 +52,6 @@
 		select <include refid="Base_Column_List" /> from account_renter_deposit_detail where id = #{value}
 	</select>
 
-	<select id="selectALL" resultMap="BaseResultMap">
-		select  <include refid="Base_Column_List" /> from account_renter_deposit_detail order by id desc
-	</select>
-
-	 
 	<insert id="insert" parameterType="com.atzuche.order.accountrenterdeposit.entity.AccountRenterDepositDetailEntity">
 		insert into account_renter_deposit_detail
 		(
@@ -64,6 +63,8 @@
 				`amt`,		
 				`authorize_deposit_amt`,		
 				`authorize_expire_time`,		
+				`credit_pay_amt`,		
+				`credit_pay_expire_time`,		
 				`source_code`,		
 				`source_detail`,		
 				`unique_no`,		
@@ -83,6 +84,8 @@
 				#{amt}, 		
 				#{authorizeDepositAmt}, 		
 				#{authorizeExpireTime}, 		
+				#{creditPayAmt}, 		
+				#{creditPayExpireTime}, 		
 				#{sourceCode}, 		
 				#{sourceDetail}, 		
 				#{uniqueNo}, 		
@@ -105,6 +108,8 @@
 				<if test="amt != null">`amt`, </if>
 				<if test="authorizeDepositAmt != null">`authorize_deposit_amt`, </if>
 				<if test="authorizeExpireTime != null">`authorize_expire_time`, </if>
+				<if test="creditPayAmt != null">`credit_pay_amt`, </if>
+				<if test="creditPayExpireTime != null">`credit_pay_expire_time`, </if>
 				<if test="sourceCode != null">`source_code`, </if>
 				<if test="sourceDetail != null">`source_detail`, </if>
 				<if test="uniqueNo != null">`unique_no`, </if>
@@ -124,6 +129,8 @@
 				<if test="amt != null">#{amt},  </if>
 				<if test="authorizeDepositAmt != null">#{authorizeDepositAmt},  </if>
 				<if test="authorizeExpireTime != null">#{authorizeExpireTime},  </if>
+				<if test="creditPayAmt != null">#{creditPayAmt},  </if>
+				<if test="creditPayExpireTime != null">#{creditPayExpireTime},  </if>
 				<if test="sourceCode != null">#{sourceCode},  </if>
 				<if test="sourceDetail != null">#{sourceDetail},  </if>
 				<if test="uniqueNo != null">#{uniqueNo},  </if>
@@ -146,6 +153,8 @@
 				<if test="amt != null">`amt` = #{amt}, </if>
 				<if test="authorizeDepositAmt != null">`authorize_deposit_amt` = #{authorizeDepositAmt}, </if>
 				<if test="authorizeExpireTime != null">`authorize_expire_time` = #{authorizeExpireTime}, </if>
+				<if test="creditPayAmt != null">`credit_pay_amt` = #{creditPayAmt}, </if>
+				<if test="creditPayExpireTime != null">`credit_pay_expire_time` = #{creditPayExpireTime}, </if>
 				<if test="sourceCode != null">`source_code` = #{sourceCode}, </if>
 				<if test="sourceDetail != null">`source_detail` = #{sourceDetail}, </if>
 				<if test="uniqueNo != null">`unique_no` = #{uniqueNo}, </if>
@@ -168,6 +177,8 @@
 				`amt` = #{amt}, 		
 				`authorize_deposit_amt` = #{authorizeDepositAmt}, 		
 				`authorize_expire_time` = #{authorizeExpireTime}, 		
+				`credit_pay_amt` = #{creditPayAmt}, 		
+				`credit_pay_expire_time` = #{creditPayExpireTime}, 		
 				`source_code` = #{sourceCode}, 		
 				`source_detail` = #{sourceDetail}, 		
 				`unique_no` = #{uniqueNo}, 		
