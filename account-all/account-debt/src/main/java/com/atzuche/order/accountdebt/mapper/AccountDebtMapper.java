@@ -17,7 +17,6 @@ public interface AccountDebtMapper{
 
     int insert(AccountDebtEntity record);
     
-    int insertSelective(AccountDebtEntity record);
 
     int updateByPrimaryKeySelective(AccountDebtEntity record);
 
@@ -25,5 +24,5 @@ public interface AccountDebtMapper{
      * @param memNo
      * @return
      */
-    AccountDebtEntity getAccountDebtByMemNo(@Param("memNo") Integer memNo);
+    AccountDebtEntity getAccountDebtByMemNo(@Param("memNo") String memNo);
 }

@@ -25,7 +25,7 @@ public class RenterGoodsPriceDetailEntity implements Serializable {
 	/**
 	 * 主订单号
 	 */
-	private Long orderNo;
+	private String orderNo;
 	/**
 	 * 子订单号
 	 */
@@ -45,7 +45,7 @@ public class RenterGoodsPriceDetailEntity implements Serializable {
 	/**
 	 * 小时数
 	 */
-	private Integer carHourCount;
+	private Float carHourCount;
 	/**
 	 * 分组id
 	 */

@@ -133,5 +133,12 @@
 		</set>
 		where id = #{id}
 	</update>
-  	
+
+    <select id="selectByRenterOrderNo" resultType="com.atzuche.order.rentercommodity.entity.RenterGoodsPriceDetailEntity">
+        select
+        <include refid="Base_Column_List"/>
+        from renter_goods_price_detail
+        where renter_order_no=#{renterOrderNo} and is_delete=0 order by car_day asc
+    </select>
+
 </mapper>

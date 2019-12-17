@@ -14,11 +14,11 @@ public class AccountInsertDebtReqVO {
     /**
      * 会员号
      */
-    private Integer memNo;
+    private String memNo;
     /**
      * 主订单号
      */
-    private Long orderNo;
+    private String orderNo;
     /**
      * 租客子订单号
      */

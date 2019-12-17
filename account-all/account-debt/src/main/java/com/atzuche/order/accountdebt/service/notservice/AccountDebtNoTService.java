@@ -1,6 +1,7 @@
 package com.atzuche.order.accountdebt.service.notservice;
 
-import com.atzuche.order.accountdebt.exception.AccountDebtException;
+import com.atzuche.order.accountdebt.exception.AccountDeductDebtDBException;
+import com.atzuche.order.accountdebt.exception.AccountInsertDebtDBException;
 import com.atzuche.order.accountdebt.vo.req.AccountDeductDebtReqVO;
 import com.atzuche.order.accountdebt.vo.req.AccountInsertDebtReqVO;
 import com.atzuche.order.accountdebt.vo.res.AccountDebtResVO;
@@ -11,6 +12,7 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -32,19 +34,14 @@ public class AccountDebtNoTService {
      * 根据会员号查询用户总欠款信息
      * @param memNo
      * @return
-     * @throws AccountDebtException
+     * @throws AccountDeductDebtDBException
      */
-    public AccountDebtResVO getAccountDebtByMemNo(Integer memNo) throws AccountDebtException {
-        if(Objects.isNull(memNo)){
-            throw new AccountDebtException(ErrorCode.PARAMETER_ERROR);
-        }
-        LocalDateTime now = LocalDateTime.now();
+    public AccountDebtResVO getAccountDebtByMemNo(String memNo) {
+        Assert.notNull(memNo, ErrorCode.PARAMETER_ERROR.getText());
         AccountDebtEntity accountDebtEntity =  accountDebtMapper.getAccountDebtByMemNo(memNo);
         if(Objects.isNull(accountDebtEntity) || Objects.isNull(accountDebtEntity.getId())){
             accountDebtEntity = new AccountDebtEntity();
             accountDebtEntity.setMemNo(memNo);
-            accountDebtEntity.setCreateTime(now);
-            accountDebtEntity.setUpdateTime(now);
             accountDebtEntity.setDebtAmt(NumberUtils.INTEGER_ZERO);
             accountDebtEntity.setVersion(NumberUtils.INTEGER_ONE);
             accountDebtMapper.insert(accountDebtEntity);
@@ -64,12 +61,12 @@ public class AccountDebtNoTService {
         //1 查询用户欠款总和
         AccountDebtEntity accountDebtEntity =  accountDebtMapper.getAccountDebtByMemNo(accountDeductDebt.getMemNo());
         if(Objects.isNull(accountDebtEntity) || Objects.isNull(accountDebtEntity.getId())){
-            throw new AccountDebtException(ErrorCode.FAILED);
+            throw new AccountDeductDebtDBException();
         }
         accountDebtEntity.setDebtAmt(accountDebtEntity.getDebtAmt()-Math.abs(accountDeductDebt.getAmt()));
         int result = accountDebtMapper.updateByPrimaryKeySelective(accountDebtEntity);
         if(result==0){
-            throw new AccountDebtException(ErrorCode.FAILED);
+            throw new AccountDeductDebtDBException();
         }
     }
 
@@ -81,13 +78,13 @@ public class AccountDebtNoTService {
         //1 查询用户欠款总和
         AccountDebtEntity accountDebtEntity =  accountDebtMapper.getAccountDebtByMemNo(accountInsertDebt.getMemNo());
         if(Objects.isNull(accountDebtEntity) || Objects.isNull(accountDebtEntity.getId())){
-            throw new AccountDebtException(ErrorCode.FAILED);
+            throw new AccountInsertDebtDBException();
         }
         int amt = accountDebtEntity.getDebtAmt()+Math.abs(accountInsertDebt.getAmt());
         accountDebtEntity.setDebtAmt(amt);
         int result = accountDebtMapper.updateByPrimaryKeySelective(accountDebtEntity);
         if(result==0){
-            throw new AccountDebtException(ErrorCode.FAILED);
+            throw new AccountInsertDebtDBException();
         }
     }
 }

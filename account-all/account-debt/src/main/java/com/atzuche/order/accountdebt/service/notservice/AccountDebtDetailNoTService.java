@@ -1,18 +1,17 @@
 package com.atzuche.order.accountdebt.service.notservice;
 
-import com.atzuche.order.accountdebt.exception.AccountDebtException;
+import com.atzuche.order.accountdebt.exception.AccountDeductDebtDBException;
+import com.atzuche.order.accountdebt.exception.AccountInsertDebtDBException;
 import com.atzuche.order.accountdebt.vo.req.AccountDeductDebtReqVO;
 import com.atzuche.order.accountdebt.vo.req.AccountInsertDebtReqVO;
 import com.atzuche.order.accountdebt.entity.AccountDebtDetailEntity;
 import com.atzuche.order.accountdebt.mapper.AccountDebtDetailMapper;
-import com.autoyol.commons.web.ErrorCode;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -34,7 +33,7 @@ public class AccountDebtDetailNoTService {
      * 查询待抵扣历史欠款
      * @return
      */
-    public List<AccountDebtDetailEntity> getDebtListByMemNo(int memNo){
+    public List<AccountDebtDetailEntity> getDebtListByMemNo(String memNo){
         List<AccountDebtDetailEntity> result = accountDebtDetailMapper.getDebtListByMemNo(memNo);
         if(CollectionUtils.isEmpty(result)){
             return Collections.emptyList();
@@ -46,7 +45,7 @@ public class AccountDebtDetailNoTService {
        for(int i=0;i<accountDebtDetails.size();i++){
           int result = accountDebtDetailMapper.updateByPrimaryKeySelective(accountDebtDetails.get(i));
           if(result==0){
-              throw new AccountDebtException(ErrorCode.FAILED);
+              throw new AccountDeductDebtDBException();
           }
        }
     }
@@ -55,15 +54,12 @@ public class AccountDebtDetailNoTService {
     public void insertDebtDetail(AccountInsertDebtReqVO accountInsertDebt) {
         AccountDebtDetailEntity accountDebtDetail = new AccountDebtDetailEntity();
         BeanUtils.copyProperties(accountInsertDebt,accountDebtDetail);
-        LocalDateTime now = LocalDateTime.now();
-        accountDebtDetail.setUpdateTime(now);
-        accountDebtDetail.setCreateTime(now);
         accountDebtDetail.setCurrentDebtAmt(accountInsertDebt.getAmt());
         accountDebtDetail.setOrderDebtAmt(accountInsertDebt.getAmt());
         accountDebtDetail.setRepaidDebtAmt(NumberUtils.INTEGER_ZERO);
         int result = accountDebtDetailMapper.insert(accountDebtDetail);
         if(result==0){
-            throw new AccountDebtException(ErrorCode.FAILED);
+            throw new AccountInsertDebtDBException();
         }
     }
 

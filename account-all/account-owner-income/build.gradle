@@ -12,5 +12,6 @@ repositories {
 }
 
 dependencies {
+    compile project(":util-all:order-commons")
 
 }

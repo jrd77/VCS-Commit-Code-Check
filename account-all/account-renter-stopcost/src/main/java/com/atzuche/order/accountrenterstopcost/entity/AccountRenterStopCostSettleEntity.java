@@ -23,7 +23,7 @@ public class AccountRenterStopCostSettleEntity implements Serializable {
 	/**
 	 * 会员号
 	 */
-	private Integer memNo;
+	private String memNo;
 	/**
 	 * 应付金额
 	 */

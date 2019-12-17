@@ -9,7 +9,7 @@ import lombok.Data;
  * 车主收益总表
  * 
  * @author ZhangBin
- * @date 2019-12-11 17:44:19
+ * @date 2019-12-17 16:44:06
  * @Description:
  */
 @Data
@@ -23,7 +23,7 @@ public class AccountOwnerIncomeEntity implements Serializable {
 	/**
 	 * 会员号
 	 */
-	private Integer memNo;
+	private String memNo;
 	/**
 	 * 收益总金额
 	 */

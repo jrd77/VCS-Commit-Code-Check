@@ -2,7 +2,6 @@ package com.atzuche.order.accountdebt.service;
 
 import com.atzuche.order.accountdebt.entity.AccountDebtDetailEntity;
 import com.atzuche.order.accountdebt.entity.AccountDebtReceivableaDetailEntity;
-import com.atzuche.order.accountdebt.exception.AccountDebtException;
 import com.atzuche.order.accountdebt.service.notservice.AccountDebtDetailNoTService;
 import com.atzuche.order.accountdebt.service.notservice.AccountDebtNoTService;
 import com.atzuche.order.accountdebt.service.notservice.AccountDebtReceivableaDetailNoTService;
@@ -28,7 +27,6 @@ import java.util.Objects;
  * @date 2019-12-11 17:34:34
  */
 @Service
-@Slf4j
 public class AccountDebtService{
     @Autowired
     private AccountDebtNoTService accountDebtNoTService;
@@ -42,9 +40,8 @@ public class AccountDebtService{
      * 根据会员号查询用户总欠款信息
      * @param memNo
      * @return
-     * @throws AccountDebtException
      */
-    public AccountDebtResVO getAccountDebtByMemNo(Integer memNo) throws AccountDebtException {
+    public AccountDebtResVO getAccountDebtByMemNo(String memNo) {
         return accountDebtNoTService.getAccountDebtByMemNo(memNo);
     }
 
@@ -53,7 +50,7 @@ public class AccountDebtService{
      * @param memNo
      * @return
      */
-    public Integer getAccountDebtNumByMemNo(Integer memNo){
+    public Integer getAccountDebtNumByMemNo(String memNo){
         AccountDebtResVO res = getAccountDebtByMemNo(memNo);
         if(Objects.isNull(res) || Objects.isNull(res.getDebtAmt())){
             return NumberUtils.INTEGER_ZERO;
@@ -66,7 +63,6 @@ public class AccountDebtService{
      * @return
      */
     public void deductDebt(AccountDeductDebtReqVO accountDeductDebt) {
-        log.info("AccountOwnerCostSettleService insertAccountOwnerCostSettle param", GsonUtils.toJson(accountDeductDebt));
         // 1 参数校验
         Assert.notNull(accountDeductDebt, ErrorCode.PARAMETER_ERROR.getText());
         accountDeductDebt.check();
@@ -88,7 +84,6 @@ public class AccountDebtService{
      * 记录用户历史欠款
      */
     public void insertDebt(AccountInsertDebtReqVO accountInsertDebt){
-        log.info("AccountOwnerCostSettleService insertAccountOwnerCostSettle param", GsonUtils.toJson(accountInsertDebt));
         //1校验
         Assert.notNull(accountInsertDebt, ErrorCode.PARAMETER_ERROR.getText());
         accountInsertDebt.check();

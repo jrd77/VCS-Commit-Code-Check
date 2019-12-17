@@ -23,11 +23,11 @@ public class CashierEntity implements Serializable {
 	/**
 	 * 
 	 */
-	private Long orderNo;
+	private String orderNo;
 	/**
 	 * 会员号
 	 */
-	private Integer memNo;
+	private String memNo;
 	/**
 	 * 费用类型
 	 */

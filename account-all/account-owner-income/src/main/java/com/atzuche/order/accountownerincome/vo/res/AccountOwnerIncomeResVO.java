@@ -14,7 +14,7 @@ public class AccountOwnerIncomeResVO {
     /**
      * 会员号
      */
-    private Integer memNo;
+    private String memNo;
     /**
      * 收益总金额
      */

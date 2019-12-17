@@ -52,11 +52,6 @@
 		select <include refid="Base_Column_List" /> from account_renter_cost_settle where id = #{value}
 	</select>
 
-	<select id="selectALL" resultMap="BaseResultMap">
-		select  <include refid="Base_Column_List" /> from account_renter_cost_settle order by id desc
-	</select>
-
-	 
 	<insert id="insert" parameterType="com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostSettleEntity">
 		insert into account_renter_cost_settle
 		(
@@ -102,7 +97,52 @@
 			)
 	</insert>
 	
-
+	<insert id="insertSelective" parameterType="com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostSettleEntity">
+		insert into account_renter_cost_settle
+		(
+			<if test="id != null">`id`, </if>
+				<if test="orderNo != null">`order_no`, </if>
+				<if test="memNo != null">`mem_no`, </if>
+				<if test="rentAmt != null">`rent_amt`, </if>
+				<if test="yongjinAmt != null">`yongjin_amt`, </if>
+				<if test="basicEnsureAmount != null">`basic_ensure_amount`, </if>
+				<if test="comprehensiveEnsureAmount != null">`comprehensive_ensure_amount`, </if>
+				<if test="additionalDrivingEnsureAmount != null">`additional_driving_ensure_amount`, </if>
+				<if test="otherAmt != null">`other_amt`, </if>
+				<if test="platformSubsidyAmount != null">`platform_subsidy_amount`, </if>
+				<if test="carOwnerSubsidyAmount != null">`car_owner_subsidy_amount`, </if>
+				<if test="shifuAmt != null">`shifu_amt`, </if>
+				<if test="version != null">`version`, </if>
+				<if test="createTime != null">`create_time`, </if>
+				<if test="createOp != null">`create_op`, </if>
+				<if test="updateTime != null">`update_time`, </if>
+				<if test="updateOp != null">`update_op`, </if>
+				<if test="isDelete != null">`is_delete` </if>
+			)
+		values
+		(
+			<if test="id != null">#{id},  </if>
+				<if test="orderNo != null">#{orderNo},  </if>
+				<if test="memNo != null">#{memNo},  </if>
+				<if test="rentAmt != null">#{rentAmt},  </if>
+				<if test="yongjinAmt != null">#{yongjinAmt},  </if>
+				<if test="basicEnsureAmount != null">#{basicEnsureAmount},  </if>
+				<if test="comprehensiveEnsureAmount != null">#{comprehensiveEnsureAmount},  </if>
+				<if test="additionalDrivingEnsureAmount != null">#{additionalDrivingEnsureAmount},  </if>
+				<if test="otherAmt != null">#{otherAmt},  </if>
+				<if test="platformSubsidyAmount != null">#{platformSubsidyAmount},  </if>
+				<if test="carOwnerSubsidyAmount != null">#{carOwnerSubsidyAmount},  </if>
+				<if test="shifuAmt != null">#{shifuAmt},  </if>
+				<if test="version != null">#{version},  </if>
+				<if test="createTime != null">#{createTime},  </if>
+				<if test="createOp != null">#{createOp},  </if>
+				<if test="updateTime != null">#{updateTime},  </if>
+				<if test="updateOp != null">#{updateOp},  </if>
+				<if test="isDelete != null">#{isDelete} </if>
+			)
+	</insert>
+	
+	 
 	<update id="updateByPrimaryKeySelective" parameterType="com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostSettleEntity">
 		update account_renter_cost_settle 
 		<set>
@@ -117,16 +157,43 @@
 				<if test="platformSubsidyAmount != null">`platform_subsidy_amount` = #{platformSubsidyAmount}, </if>
 				<if test="carOwnerSubsidyAmount != null">`car_owner_subsidy_amount` = #{carOwnerSubsidyAmount}, </if>
 				<if test="shifuAmt != null">`shifu_amt` = #{shifuAmt}, </if>
-                 version = version + 1,
+				<if test="version != null">`version` = #{version}, </if>
 				<if test="createTime != null">`create_time` = #{createTime}, </if>
 				<if test="createOp != null">`create_op` = #{createOp}, </if>
 				<if test="updateTime != null">`update_time` = #{updateTime}, </if>
 				<if test="updateOp != null">`update_op` = #{updateOp}, </if>
 				<if test="isDelete != null">`is_delete` = #{isDelete}</if>
 			</set>
-		where id = #{id} and version = #{version}
+		where id = #{id}
+	</update>
+	
+	<update id="updateByPrimaryKey" parameterType="com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostSettleEntity">
+		update account_renter_cost_settle 
+		<set>
+				`order_no` = #{orderNo}, 		
+				`mem_no` = #{memNo}, 		
+				`rent_amt` = #{rentAmt}, 		
+				`yongjin_amt` = #{yongjinAmt}, 		
+				`basic_ensure_amount` = #{basicEnsureAmount}, 		
+				`comprehensive_ensure_amount` = #{comprehensiveEnsureAmount}, 		
+				`additional_driving_ensure_amount` = #{additionalDrivingEnsureAmount}, 		
+				`other_amt` = #{otherAmt}, 		
+				`platform_subsidy_amount` = #{platformSubsidyAmount}, 		
+				`car_owner_subsidy_amount` = #{carOwnerSubsidyAmount}, 		
+				`shifu_amt` = #{shifuAmt}, 		
+				`version` = #{version}, 		
+				`create_time` = #{createTime}, 		
+				`create_op` = #{createOp}, 		
+				`update_time` = #{updateTime}, 		
+				`update_op` = #{updateOp}, 		
+				`is_delete` = #{isDelete}		
+	
+		</set>
+		where id = #{id}
 	</update>
 
-    <select id="selectByOrderNo" resultMap="BaseResultMap"></select>
-
+    <!-- 根据订单号 会员号查询用户支付记录 -->
+    <select id="selectByOrderNo" resultMap="BaseResultMap">
+        select  <include refid="Base_Column_List" /> from account_renter_cost_settle where order_no  = #{orderNo} and mem_no = #{memNo} order by id desc
+    </select>
 </mapper>

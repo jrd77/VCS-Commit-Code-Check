@@ -9,7 +9,7 @@ import lombok.Data;
  * 车主费用结算明细表
  * 
  * @author ZhangBin
- * @date 2019-12-11 17:41:36
+ * @date 2019-12-17 16:33:28
  * @Description:
  */
 @Data
@@ -23,7 +23,7 @@ public class AccountOwnerCostSettleDetailEntity implements Serializable {
 	/**
 	 * 主订单号
 	 */
-	private Long orderNo;
+	private String orderNo;
 	/**
 	 * 子订单号
 	 */
@@ -31,7 +31,7 @@ public class AccountOwnerCostSettleDetailEntity implements Serializable {
 	/**
 	 * 会员号
 	 */
-	private Integer memNo;
+	private String memNo;
 	/**
 	 * 金额
 	 */

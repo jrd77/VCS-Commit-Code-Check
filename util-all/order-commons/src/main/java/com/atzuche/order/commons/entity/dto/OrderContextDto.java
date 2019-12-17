@@ -16,5 +16,5 @@ public class OrderContextDto {
     private OwnerGoodsDetailDto ownerGoodsDetailDto;//车主商品信息
     private RenterGoodsDetailDto renterGoodsDetailDto;//租客商品信息
     private SubmitOrderReq submitOrderReq;//订单信息
-    private long orderNo;//主订单号
+    private String orderNo;//主订单号
 }
