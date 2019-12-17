@@ -8,18 +8,14 @@ import java.util.List;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
-import com.atzuche.order.rentercommodity.entity.RenterGoodsPriceDetailEntity;
-import com.atzuche.order.renterorder.service.RenterOrderService;
+import com.atzuche.order.rentercommodity.service.RenterGoodsPriceDetailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.atzuche.order.coreapi.entity.bo.RentAmtResultBO;
 import com.atzuche.order.coreapi.entity.bo.RenterGoodsPriceBO;
-import com.atzuche.order.renterorder.entity.RenterOrderEntity;
-import com.atzuche.order.rentercommodity.service.RenterGoodsPriceDetailService;
 import com.atzuche.order.coreapi.entity.bo.RenterModifyGetReturnTimeBO;
-import com.atzuche.order.rentercommodity.entity.RenterGoodsPriiceDetailEntity;
-import com.atzuche.order.rentercommodity.service.RenterGoodsPriiceDetailService;
+import com.atzuche.order.rentercommodity.entity.RenterGoodsPriceDetailEntity;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.atzuche.order.renterorder.service.RenterOrderService;
 import com.autoyol.platformcost.RenterFeeCalculatorUtils;
@@ -32,9 +28,9 @@ public class ModifyOrderComposeService {
 	@Autowired
 	private RenterOrderService renterOrderService;
 	@Autowired
-	private RenterGoodsPriceDetailService renterGoodsPriiceDetailService;
+	private RenterGoodsPriceDetailService renterGoodsPriceDetailService;
 	
-
+	
 	/**
 	 * 计算租金获取租金对象
 	 * @param orderNo
@@ -57,14 +53,14 @@ public class ModifyOrderComposeService {
 				lastRenterGoodsPriceBO = renterGoodsPriceBO;
 			}
 			// 组织开始结束时间
-			RenterModifyGetReturnTimeBO getReturnTimeBO = handGetReturnTime(renterGoodsPriceBO.getExpRentStartTime(), renterGoodsPriceBO.getExpRentEndTime(),
-					lastRenterGoodsPriceBO.getExpRentStartTime(), lastRenterGoodsPriceBO.getExpRentEndTime(),
+			RenterModifyGetReturnTimeBO getReturnTimeBO = handGetReturnTime(renterGoodsPriceBO.getExpRentStartTime(), renterGoodsPriceBO.getExpRentEndTime(), 
+					lastRenterGoodsPriceBO.getExpRentStartTime(), lastRenterGoodsPriceBO.getExpRentEndTime(), 
 					updateRentTime, updateRevertTime);
 			if (getReturnTimeBO == null) {
 				break;
 			}
 			// 日期价格列表转化
-			List<RenterGoodsPriiceDetailEntity> renterGoodsPriceList = renterGoodsPriceBO.getRenterGoodsPriceList();
+			List<RenterGoodsPriceDetailEntity> renterGoodsPriceList = renterGoodsPriceBO.getRenterGoodsPriceList();
 			carPriceOfDayAfterList = handCarPriceOfDayList(renterGoodsPriceList, getReturnTimeBO.getRevertTime());
 			// 去重
 			carPriceOfDayAfterList = distinctCarPriceOfDayList(carPriceOfDayAfterList);
@@ -84,13 +80,13 @@ public class ModifyOrderComposeService {
 			FeeResult curFeeResult = RenterFeeCalculatorUtils.calRentAmt(getReturnTimeAfterBO.getRentTime(), getReturnTimeAfterBO.getRevertTime(), configHours, carPriceOfDayAfterList);
 			rentAmt += curFeeResult.getTotalFee();
 		}
-
+		
 		RentAmtResultBO rentAmtResultBO = new RentAmtResultBO();
 		rentAmtResultBO.setCarPriceOfDayList(carPriceOfDayAfterList);
 		rentAmtResultBO.setTotalFee(rentAmt);
 		return rentAmtResultBO;
 	}
-
+	
 	/**
 	 * 获取已同意的租客子订单列表含商品价格列表
 	 * @param orderNo 车主订单号
@@ -133,9 +129,7 @@ public class ModifyOrderComposeService {
             }
 		}
 		// 获取租客价格列表
-		List<RenterGoodsPriceDetailEntity> renterGoodsPriceAllList = renterGoodsPriiceDetailService.listRenterGoodsPriceByOrderNo(orderNo);
-		List<RenterGoodsPriceBO> renterGoodsPriceBOList = renterOrderList.stream().map(renterOrder -> getRenterOrderPrice(renterOrder,renterGoodsPriceAllList)).collect(Collectors.toList());
-		List<RenterGoodsPriiceDetailEntity> renterGoodsPriceAllList = renterGoodsPriiceDetailService.listRenterGoodsPriceByOrderNo(orderNo);
+		List<RenterGoodsPriceDetailEntity> renterGoodsPriceAllList = renterGoodsPriceDetailService.listRenterGoodsPriceByOrderNo(orderNo);
 		if (renterGoodsPriceAllList == null) {
 			return null;
 		}
@@ -144,14 +138,13 @@ public class ModifyOrderComposeService {
 		return renterGoodsPriceBOList;
 	}
 	
-	public RenterGoodsPriceBO getRenterOrderPrice(RenterOrderEntity renterOrder, List<RenterGoodsPriceDetailEntity> renterGoodsPriceAllList) {
 	/**
 	 * 获取租客子订单和商品价格列表
 	 * @param renterOrder
 	 * @param renterGoodsPriceAllList
 	 * @return RenterGoodsPriceBO
 	 */
-	public RenterGoodsPriceBO getRenterOrderPrice(RenterOrderEntity renterOrder, List<RenterGoodsPriiceDetailEntity> renterGoodsPriceAllList) {
+	public RenterGoodsPriceBO getRenterOrderPrice(RenterOrderEntity renterOrder, List<RenterGoodsPriceDetailEntity> renterGoodsPriceAllList) {
 		if (renterOrder == null) {
 			return null;
 		}
@@ -164,8 +157,8 @@ public class ModifyOrderComposeService {
 		if (renterGoodsPriceAllList == null || renterGoodsPriceAllList.isEmpty()) {
 			return null;
 		}
-		List<RenterGoodsPriiceDetailEntity> renterGoodsPriceList = new ArrayList<>();
-		for (RenterGoodsPriiceDetailEntity renterGoodsPrice:renterGoodsPriceAllList) {
+		List<RenterGoodsPriceDetailEntity> renterGoodsPriceList = new ArrayList<>();
+		for (RenterGoodsPriceDetailEntity renterGoodsPrice:renterGoodsPriceAllList) {
 			if (renterOrder.getRenterOrderNo() != null && renterOrder.getRenterOrderNo().equals(renterGoodsPrice.getRenterOrderNo())) {
 				renterGoodsPriceList.add(renterGoodsPrice);
 			}
@@ -173,8 +166,8 @@ public class ModifyOrderComposeService {
 		renterGoodsPriceBO.setRenterGoodsPriceList(renterGoodsPriceList);
 		return renterGoodsPriceBO;
 	}
-
-
+	
+	
 	/**
 	 * 计算使用当前修改记录价格计算的取还车时间
 	 * @param orderRentTime    修改记录当前取车时间
@@ -201,7 +194,7 @@ public class ModifyOrderComposeService {
 				// 还车时间提前
 				renterModifyGetReturnTimeBO = new RenterModifyGetReturnTimeBO(orderRentTime, updateRevertTime);
 			}
-		} else if ((updateRevertTime.isAfter(orderRevertTime) || updateRevertTime.isEqual(orderRevertTime))
+		} else if ((updateRevertTime.isAfter(orderRevertTime) || updateRevertTime.isEqual(orderRevertTime)) 
 				&& orderRevertTime.isAfter(lastRevertTime)) {
 			// 还车时间延后,计算后续修改订单的每一段
 			renterModifyGetReturnTimeBO = new RenterModifyGetReturnTimeBO(lastRevertTime, orderRevertTime);
@@ -234,14 +227,14 @@ public class ModifyOrderComposeService {
 		}
 		return renterModifyGetReturnTimeBO;
 	}
-
+	
 	/**
 	 * 组织日期价格
 	 * @param renterGoodsPriceList
 	 * @param endTime
 	 * @return List<CarPriceOfDay>
 	 */
-	public List<CarPriceOfDay> handCarPriceOfDayList(List<RenterGoodsPriiceDetailEntity> renterGoodsPriceList, LocalDateTime endTime) {
+	public List<CarPriceOfDay> handCarPriceOfDayList(List<RenterGoodsPriceDetailEntity> renterGoodsPriceList, LocalDateTime endTime) {
 		if (renterGoodsPriceList == null || renterGoodsPriceList.isEmpty()) {
 			return null;
 		}
@@ -256,8 +249,8 @@ public class ModifyOrderComposeService {
 			return carPriceOfDay;
 		}).collect(Collectors.toList());
 	}
-
-
+	
+	
 	/**
 	 * 组织日期价格
 	 * @param renterGoodsPriceList
@@ -266,7 +259,7 @@ public class ModifyOrderComposeService {
 	 * @param endTime
 	 * @return List<CarPriceOfDay>
 	 */
-	public List<CarPriceOfDay> handCarPriceOfDayList(List<RenterGoodsPriiceDetailEntity> renterGoodsPriceList, List<CarPriceOfDay> carPriceOfDayList, LocalDateTime startTime, LocalDateTime endTime) {
+	public List<CarPriceOfDay> handCarPriceOfDayList(List<RenterGoodsPriceDetailEntity> renterGoodsPriceList, List<CarPriceOfDay> carPriceOfDayList, LocalDateTime startTime, LocalDateTime endTime) {
 		if (renterGoodsPriceList == null || renterGoodsPriceList.isEmpty()) {
 			return null;
 		}
@@ -280,7 +273,7 @@ public class ModifyOrderComposeService {
 		carPriceOfDayFist.addAll(carPriceOfDayList);
 		return carPriceOfDayFist;
 	}
-
+	
 	/**
 	 * 日期价格列表去重
 	 * @param carPriceOfDayList
