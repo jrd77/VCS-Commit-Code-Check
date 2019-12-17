@@ -2,14 +2,20 @@ package com.autoyol.platformcost;
 
 import java.math.BigDecimal;
 import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 import com.autoyol.platformcost.model.AbatementConfig;
+import com.autoyol.platformcost.model.CarPriceOfDay;
 import com.autoyol.platformcost.model.OilAverageCostBO;
 import com.autoyol.platformcost.model.SphericalDistanceCoefficient;
 
@@ -239,8 +245,8 @@ public class CommonUtils {
 	 * @param revertTime 还车时间
 	 * @return List<String>
 	 */
-	public static List<String> getHolidayRentDays(LocalDateTime rentTime,LocalDateTime revertTime) {
-		List<String> dateList = new ArrayList<String>();
+	public static List<LocalDate> getHolidayRentDays(LocalDateTime rentTime,LocalDateTime revertTime) {
+		List<LocalDate> dateList = new ArrayList<LocalDate>();
 		addHolidayRentDays(rentTime, revertTime, dateList);
 		return dateList;
 	}
@@ -251,8 +257,8 @@ public class CommonUtils {
 	 * @param revertTime 还车时间
 	 * @param dateList 日期列表
 	 */
-	private static void addHolidayRentDays(LocalDateTime rentTime, LocalDateTime revertTime, List<String> dateList) {
-		dateList.add(rentTime.toLocalDate().toString());
+	private static void addHolidayRentDays(LocalDateTime rentTime, LocalDateTime revertTime, List<LocalDate> dateList) {
+		dateList.add(rentTime.toLocalDate());
 
 		int rentMonth = rentTime.getMonthValue();
 		int revertMonth = revertTime.getMonthValue();
@@ -546,9 +552,39 @@ public class CommonUtils {
 				.doubleValue();
 	}
 	
+	/**
+	 * 日期价格列表去重
+	 * @param carPriceOfDayList
+	 * @return List<CarPriceOfDay>
+	 */
+	public static List<CarPriceOfDay> distinctCarPriceOfDayList(List<CarPriceOfDay> carPriceOfDayList) {
+		if (carPriceOfDayList == null || carPriceOfDayList.isEmpty()) {
+			return null;
+		}
+		return carPriceOfDayList.stream().collect(Collectors.collectingAndThen(
+	                    Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(CarPriceOfDay::getCurDate))), ArrayList::new));
+	}
+	
 	public static void main(String[] args) {
 		LocalDateTime rentTime = LocalDateTime.of(2019, 12, 9, 15, 15, 0);
 		LocalDateTime revertTime = LocalDateTime.of(2019, 12, 10, 19, 16, 0);
-		System.out.println(getTotalHoursByRentAveragePrice(rentTime, revertTime));
+		List<CarPriceOfDay> a = new ArrayList<>();
+		CarPriceOfDay c1 = new CarPriceOfDay();
+		c1.setCurDate(LocalDate.of(2019, 12, 15));
+		c1.setDayPrice(1);
+		a.add(c1);
+		CarPriceOfDay c2 = new CarPriceOfDay();
+		c2.setCurDate(LocalDate.of(2019, 12, 14));
+		c2.setDayPrice(2);
+		a.add(c2);
+		CarPriceOfDay c3 = new CarPriceOfDay();
+		c3.setCurDate(LocalDate.of(2019, 12, 15));
+		c3.setDayPrice(3);
+		a.add(c3);
+		a = distinctCarPriceOfDayList(a);
+		Map<LocalDate, Integer> dayPrices = a.stream()
+				.collect(Collectors.toMap(CarPriceOfDay::getCurDate, CarPriceOfDay::getDayPrice));
+		System.out.println(dayPrices);
+		System.out.println(dayPrices.get(LocalDate.of(2019, 12, 14)));
 	}
 }

@@ -8,6 +8,10 @@ import lombok.Data;
 
 @Data
 public class RenterGoodsPriceBO {
+	/**
+	 * 排序使用
+	 */
+	private Integer id;
 
 	/**
 	 * 主订单号
