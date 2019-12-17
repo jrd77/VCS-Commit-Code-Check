@@ -18,7 +18,6 @@ import org.springframework.util.Assert;
  * @date 2019-12-11 17:41:37
  */
 @Service
-@Slf4j
 public class AccountOwnerCostSettleService{
     @Autowired
     private AccountOwnerCostSettleNoTService accountOwnerCostSettleNoTService;
@@ -31,7 +30,6 @@ public class AccountOwnerCostSettleService{
      * @param accountOwnerCostSettleReqVO
      */
     public void insertAccountOwnerCostSettle(AccountOwnerCostSettleReqVO accountOwnerCostSettleReqVO){
-        log.info("AccountOwnerCostSettleService insertAccountOwnerCostSettle param", GsonUtils.toJson(accountOwnerCostSettleReqVO));
         //1 校验
         Assert.notNull(accountOwnerCostSettleReqVO, ErrorCode.PARAMETER_ERROR.getText());
         accountOwnerCostSettleReqVO.check();

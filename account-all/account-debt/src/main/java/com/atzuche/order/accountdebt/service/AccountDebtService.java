@@ -27,7 +27,6 @@ import java.util.Objects;
  * @date 2019-12-11 17:34:34
  */
 @Service
-@Slf4j
 public class AccountDebtService{
     @Autowired
     private AccountDebtNoTService accountDebtNoTService;
@@ -64,7 +63,6 @@ public class AccountDebtService{
      * @return
      */
     public void deductDebt(AccountDeductDebtReqVO accountDeductDebt) {
-        log.info("AccountOwnerCostSettleService insertAccountOwnerCostSettle param", GsonUtils.toJson(accountDeductDebt));
         // 1 参数校验
         Assert.notNull(accountDeductDebt, ErrorCode.PARAMETER_ERROR.getText());
         accountDeductDebt.check();
@@ -86,7 +84,6 @@ public class AccountDebtService{
      * 记录用户历史欠款
      */
     public void insertDebt(AccountInsertDebtReqVO accountInsertDebt){
-        log.info("AccountOwnerCostSettleService insertAccountOwnerCostSettle param", GsonUtils.toJson(accountInsertDebt));
         //1校验
         Assert.notNull(accountInsertDebt, ErrorCode.PARAMETER_ERROR.getText());
         accountInsertDebt.check();

@@ -8,9 +8,6 @@ import com.atzuche.order.accountownerincome.enums.AccountOwnerIncomeExamineStatu
 import com.atzuche.order.accountownerincome.vo.req.AccountOwnerIncomeExamineOpReqVO;
 import com.atzuche.order.accountownerincome.vo.req.AccountOwnerIncomeExamineReqVO;
 import com.autoyol.commons.web.ErrorCode;
-import com.dianping.cat.Cat;
-import com.dianping.cat.message.Event;
-import com.dianping.cat.message.Transaction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
@@ -46,22 +43,8 @@ public class AccountOwnerIncomeService{
      */
     public void insertOwnerIncomeExamine(AccountOwnerIncomeExamineReqVO accountOwnerIncomeExamineReq){
         Assert.notNull(accountOwnerIncomeExamineReq, ErrorCode.PARAMETER_ERROR.getText());
-        Transaction t = Cat.newTransaction("URL", "pageName");
-        try {
-            Cat.logEvent("URL.Server", "serverIp", Event.SUCCESS, "ip=${serverIp}");
-            Cat.logMetricForCount("metric.key");
-            Cat.logMetricForDuration("metric.key", 5);
-
-            accountOwnerIncomeExamineReq.check();
-            accountOwnerIncomeExamineNoTService.insertOwnerIncomeExamine(accountOwnerIncomeExamineReq);
-
-            t.setStatus(Transaction.SUCCESS);
-        } catch (Exception e) {
-            t.setStatus(e);
-            Cat.logError(e);
-        } finally {
-            t.complete();
-        }
+        accountOwnerIncomeExamineReq.check();
+        accountOwnerIncomeExamineNoTService.insertOwnerIncomeExamine(accountOwnerIncomeExamineReq);
     }
 
     /**
