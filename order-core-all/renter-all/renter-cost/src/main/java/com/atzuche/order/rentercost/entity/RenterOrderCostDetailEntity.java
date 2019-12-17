@@ -55,7 +55,7 @@ public class RenterOrderCostDetailEntity implements Serializable {
 	/**
 	 * 份数
 	 */
-	private Integer count;
+	private Double count;
 	/**
 	 * 总价
 	 */
@@ -100,5 +100,21 @@ public class RenterOrderCostDetailEntity implements Serializable {
 	 * 0-正常，1-已逻辑删除
 	 */
 	private Integer isDelete;
-
+	
+	public RenterOrderCostDetailEntity() {}
+	
+	public RenterOrderCostDetailEntity(String orderNo, String renterOrderNo, String memNo, String costCode,
+			String costDesc, LocalDateTime startTime, LocalDateTime endTime, Integer unitPrice, Double count,
+			Integer totalAmount) {
+		this.orderNo = orderNo;
+		this.renterOrderNo = renterOrderNo;
+		this.memNo = memNo;
+		this.costCode = costCode;
+		this.costDesc = costDesc;
+		this.startTime = startTime;
+		this.endTime = endTime;
+		this.unitPrice = unitPrice;
+		this.count = count;
+		this.totalAmount = totalAmount;
+	}
 }

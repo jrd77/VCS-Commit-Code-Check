@@ -1,6 +1,10 @@
 package com.atzuche.order.rentercost.service;
 
+import com.atzuche.order.rentercost.entity.RenterOrderCostDetailEntity;
 import com.atzuche.order.rentercost.mapper.RenterOrderCostDetailMapper;
+
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,4 +21,12 @@ public class RenterOrderCostDetailService{
     private RenterOrderCostDetailMapper renterOrderCostDetailMapper;
 
 
+    /**
+     * 批量保存费用明细
+     * @param costList
+     * @return Integer
+     */
+    public Integer saveRenterOrderCostDetailBatch(List<RenterOrderCostDetailEntity> costList) {
+    	return renterOrderCostDetailMapper.saveRenterOrderCostDetailBatch(costList);
+    }
 }
