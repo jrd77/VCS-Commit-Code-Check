@@ -32,9 +32,6 @@ public class AccountOwnerCostSettleNoTService {
     public void insertAccountOwnerCostSettle(AccountOwnerCostSettleReqVO accountOwnerCostSettleReqVO) {
         AccountOwnerCostSettleEntity accountOwnerCostSettle = new AccountOwnerCostSettleEntity();
         BeanUtils.copyProperties(accountOwnerCostSettleReqVO,accountOwnerCostSettle);
-        LocalDateTime now = LocalDateTime.now();
-        accountOwnerCostSettle.setCreateTime(now);
-        accountOwnerCostSettle.setUpdateTime(now);
         accountOwnerCostSettle.setIsDelete(NumberUtils.INTEGER_ZERO);
         int result = accountOwnerCostSettleMapper.insert(accountOwnerCostSettle);
         if(result==0){

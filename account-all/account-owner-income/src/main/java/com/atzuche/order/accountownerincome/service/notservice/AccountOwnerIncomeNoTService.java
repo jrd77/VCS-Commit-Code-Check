@@ -1,7 +1,6 @@
 package com.atzuche.order.accountownerincome.service.notservice;
 
 import com.atzuche.order.accountownerincome.exception.AccountOwnerIncomeExamineException;
-import com.atzuche.order.accountownerincome.exception.AccountOwnerIncomeException;
 import com.atzuche.order.accountownerincome.entity.AccountOwnerIncomeDetailEntity;
 import com.atzuche.order.accountownerincome.entity.AccountOwnerIncomeEntity;
 import com.atzuche.order.accountownerincome.mapper.AccountOwnerIncomeMapper;
@@ -9,6 +8,7 @@ import com.autoyol.commons.web.ErrorCode;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -37,7 +37,7 @@ public class AccountOwnerIncomeNoTService {
 
     public AccountOwnerIncomeEntity getOwnerIncome(Integer memNo) {
         if(Objects.isNull(memNo)){
-            throw new AccountOwnerIncomeException(ErrorCode.FAILED);
+            Assert.notNull(memNo, ErrorCode.PARAMETER_ERROR.getText());
         }
         AccountOwnerIncomeEntity accountOwnerIncome = accountOwnerIncomeMapper.selectByMemNo(memNo);
         if(Objects.isNull(accountOwnerIncome) || Objects.isNull(accountOwnerIncome.getId())){
@@ -45,7 +45,6 @@ public class AccountOwnerIncomeNoTService {
             accountOwnerIncome.setMemNo(memNo);
             accountOwnerIncome.setVersion(NumberUtils.INTEGER_ONE);
             accountOwnerIncome.setIncomeAmt(NumberUtils.INTEGER_ZERO);
-            accountOwnerIncome.setCreateTime(LocalDateTime.now());
             accountOwnerIncomeMapper.insert(accountOwnerIncome);
         }
         return accountOwnerIncome;

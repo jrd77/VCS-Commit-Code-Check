@@ -12,6 +12,7 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -36,16 +37,11 @@ public class AccountDebtNoTService {
      * @throws AccountDeductDebtDBException
      */
     public AccountDebtResVO getAccountDebtByMemNo(Integer memNo) {
-        if(Objects.isNull(memNo)){
-            throw new AccountDeductDebtDBException();
-        }
-        LocalDateTime now = LocalDateTime.now();
+        Assert.notNull(memNo, ErrorCode.PARAMETER_ERROR.getText());
         AccountDebtEntity accountDebtEntity =  accountDebtMapper.getAccountDebtByMemNo(memNo);
         if(Objects.isNull(accountDebtEntity) || Objects.isNull(accountDebtEntity.getId())){
             accountDebtEntity = new AccountDebtEntity();
             accountDebtEntity.setMemNo(memNo);
-            accountDebtEntity.setCreateTime(now);
-            accountDebtEntity.setUpdateTime(now);
             accountDebtEntity.setDebtAmt(NumberUtils.INTEGER_ZERO);
             accountDebtEntity.setVersion(NumberUtils.INTEGER_ONE);
             accountDebtMapper.insert(accountDebtEntity);

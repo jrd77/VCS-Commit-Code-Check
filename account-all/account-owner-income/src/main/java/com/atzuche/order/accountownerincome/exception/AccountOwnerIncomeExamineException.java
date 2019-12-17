@@ -4,6 +4,9 @@ import com.atzuche.order.accountownerincome.enums.ErrorCode;
 import com.atzuche.order.commons.OrderException;
 import lombok.Data;
 
+/**
+ * 收益审核失败异常
+ */
 @Data
 public class AccountOwnerIncomeExamineException extends OrderException {
     public AccountOwnerIncomeExamineException() {

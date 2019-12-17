@@ -4,13 +4,11 @@ import com.atzuche.order.accountownercost.exception.AccountOwnerCostSettleExcept
 import com.atzuche.order.accountownercost.entity.AccountOwnerCostSettleDetailEntity;
 import com.atzuche.order.accountownercost.mapper.AccountOwnerCostSettleDetailMapper;
 import com.atzuche.order.accountownercost.vo.req.AccountOwnerCostSettleDetailReqVO;
-import com.autoyol.commons.web.ErrorCode;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 
@@ -30,14 +28,11 @@ public class AccountOwnerCostSettleDetailNoTService {
         if(CollectionUtils.isEmpty(accountOwnerCostSettleDetails)){
             throw new AccountOwnerCostSettleException();
         }
-        LocalDateTime now =  LocalDateTime.now();
         for(int i=0;i<accountOwnerCostSettleDetails.size();i ++){
             AccountOwnerCostSettleDetailReqVO accountOwnerCostSettleDetail = accountOwnerCostSettleDetails.get(i);
             accountOwnerCostSettleDetail.check();
             AccountOwnerCostSettleDetailEntity accountOwnerCostSettleDetailEntity = new AccountOwnerCostSettleDetailEntity();
             BeanUtils.copyProperties(accountOwnerCostSettleDetail,accountOwnerCostSettleDetailEntity);
-            accountOwnerCostSettleDetailEntity.setUpdateTime(now);
-            accountOwnerCostSettleDetailEntity.setCreateTime(now);
             int result = accountOwnerCostSettleDetailMapper.insert(accountOwnerCostSettleDetailEntity);
             if(result==0){
                 throw new AccountOwnerCostSettleException();

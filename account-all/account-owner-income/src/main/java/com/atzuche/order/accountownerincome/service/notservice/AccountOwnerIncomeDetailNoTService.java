@@ -6,10 +6,8 @@ import com.atzuche.order.accountownerincome.enums.AccountOwnerIncomeDetailType;
 import com.atzuche.order.accountownerincome.enums.AccountOwnerIncomeExamineStatus;
 import com.atzuche.order.accountownerincome.enums.OrderCoseSourceCode;
 import com.atzuche.order.accountownerincome.exception.AccountOwnerIncomeExamineException;
-import com.atzuche.order.accountownerincome.exception.AccountOwnerIncomeException;
 import com.atzuche.order.accountownerincome.mapper.AccountOwnerIncomeDetailMapper;
 import com.atzuche.order.accountownerincome.vo.req.AccountOwnerIncomeExamineOpReqVO;
-import com.autoyol.commons.web.ErrorCode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -46,7 +44,6 @@ public class AccountOwnerIncomeDetailNoTService {
         accountOwnerIncomeDetail.setAmt(accountOwnerIncomeExamine.getAmt());
         accountOwnerIncomeDetail.setIncomeExamineId(accountOwnerIncomeExamine.getId());
         accountOwnerIncomeDetail.setCreateOp(accountOwnerIncomeExamineOpReq.getOpName());
-        accountOwnerIncomeDetail.setCreateTime(now);
         accountOwnerIncomeDetail.setDetail(accountOwnerIncomeExamineOpReq.getDetail());
         accountOwnerIncomeDetail.setMemNo(accountOwnerIncomeExamine.getMemNo());
         accountOwnerIncomeDetail.setOrderNo(accountOwnerIncomeExamine.getOrderNo());
