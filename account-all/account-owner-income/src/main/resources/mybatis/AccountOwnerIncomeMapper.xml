@@ -10,8 +10,6 @@
         <result property="version" column="version"/>
         <result property="createTime" column="create_time"/>
     </resultMap>
-
-
 	<sql id="Base_Column_List">
 	`id`, 	
 	`mem_no`, 	
@@ -42,18 +40,20 @@
 			)
 	</insert>
 
+
 	
 	<update id="updateByPrimaryKey" parameterType="com.atzuche.order.accountownerincome.entity.AccountOwnerIncomeEntity">
 		update account_owner_income 
 		<set>
+				`mem_no` = #{memNo}, 		
 				`income_amt` = #{incomeAmt},
-				`version` = #{version}
-
+                 version = version +1
 		</set>
 		where id = #{id} and version = #{version}
-	</update>
+    </update>
+
     <select id="selectByMemNo" resultMap="BaseResultMap">
         select <include refid="Base_Column_List" /> from account_owner_income where mem_no = #{memNo} limit 1
     </select>
-
+  	
 </mapper>

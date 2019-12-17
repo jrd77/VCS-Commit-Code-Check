@@ -30,7 +30,7 @@ public class AccountOwnerIncomeCatService {
      * @param memNo
      * @return
      */
-    public int getOwnerIncomeAmt(Integer memNo){
+    public int getOwnerIncomeAmt(String memNo){
         return accountOwnerIncomeService.getOwnerIncomeAmt(memNo);
     }
 
