@@ -23,7 +23,7 @@ public class CashierBindCardEntity implements Serializable {
 	/**
 	 * 会员号
 	 */
-	private Integer memNo;
+	private String memNo;
 	/**
 	 * 银行卡号
 	 */

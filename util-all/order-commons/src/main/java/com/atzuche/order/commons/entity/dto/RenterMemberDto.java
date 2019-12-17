@@ -11,7 +11,7 @@ public class RenterMemberDto {
     /**
      * 主订单号
      */
-    private Long orderNo;
+    private String orderNo;
     /**
      * 子订单号
      */
@@ -19,7 +19,7 @@ public class RenterMemberDto {
     /**
      * 会员号
      */
-    private Integer memNo;
+    private String memNo;
     /**
      * 手机号
      */

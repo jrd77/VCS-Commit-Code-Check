@@ -23,7 +23,7 @@ public class OwnerOrderOperateLogEntity implements Serializable {
 	/**
 	 * 主订单号
 	 */
-	private Long orderNo;
+	private String orderNo;
 	/**
 	 * 子订单号
 	 */
@@ -31,7 +31,7 @@ public class OwnerOrderOperateLogEntity implements Serializable {
 	/**
 	 * 操作人会员号
 	 */
-	private Integer memNo;
+	private String memNo;
 	/**
 	 * 操作类型
 	 */

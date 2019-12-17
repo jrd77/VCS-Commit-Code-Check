@@ -23,11 +23,11 @@ public class AccountRenterWzDepositDetailEntity implements Serializable {
 	/**
 	 * 主订单号
 	 */
-	private Long orderNo;
+	private String orderNo;
 	/**
 	 * 
 	 */
-	private Integer memNo;
+	private String memNo;
 	/**
 	 * 支付方式
 	 */

@@ -23,7 +23,7 @@ public class OrderEntity implements Serializable {
 	/**
 	 * 主订单号
 	 */
-	private Long orderNo;
+	private String orderNo;
 	/**
 	 * 在途车主子订单号
 	 */

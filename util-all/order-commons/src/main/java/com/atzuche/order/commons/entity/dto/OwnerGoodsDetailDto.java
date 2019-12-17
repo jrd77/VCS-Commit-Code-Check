@@ -2,6 +2,8 @@ package com.atzuche.order.commons.entity.dto;
 
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 public class OwnerGoodsDetailDto {
     /**
@@ -128,4 +130,9 @@ public class OwnerGoodsDetailDto {
      * 选择的车辆地址序号
      */
     private Integer carAddrIndex;
+
+    /**
+     * 一天一价
+     */
+    List<OwnerGoodsPriceDetailDto> ownerGoodsPriceDetailDtoList;
 }
