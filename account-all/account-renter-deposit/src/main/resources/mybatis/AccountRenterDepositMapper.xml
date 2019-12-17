@@ -105,56 +105,6 @@
 			)
 	</insert>
 	
-	<insert id="insertSelective" parameterType="com.atzuche.order.accountrenterdeposit.entity.AccountRenterDepositEntity">
-		insert into account_renter_deposit
-		(
-			<if test="id != null">`id`, </if>
-				<if test="orderNo != null">`order_no`, </if>
-				<if test="memNo != null">`mem_no`, </if>
-				<if test="payStatus != null">`pay_status`, </if>
-				<if test="payTime != null">`pay_time`, </if>
-				<if test="settleStatus != null">`settle_status`, </if>
-				<if test="settleTime != null">`settle_time`, </if>
-				<if test="yingfuDepositAmt != null">`yingfu_deposit_amt`, </if>
-				<if test="shifuDepositAmt != null">`shifu_deposit_amt`, </if>
-				<if test="authorizeDepositAmt != null">`authorize_deposit_amt`, </if>
-				<if test="creditPayAmt != null">`credit_pay_amt`, </if>
-				<if test="surplusDepositAmt != null">`surplus_deposit_amt`, </if>
-				<if test="surplusAuthorizeDepositAmt != null">`surplus_authorize_deposit_amt`, </if>
-				<if test="isFreeDeposit != null">`is_free_deposit`, </if>
-				<if test="version != null">`version`, </if>
-				<if test="createTime != null">`create_time`, </if>
-				<if test="createOp != null">`create_op`, </if>
-				<if test="updateTime != null">`update_time`, </if>
-				<if test="updateOp != null">`update_op`, </if>
-				<if test="isDelete != null">`is_delete` </if>
-			)
-		values
-		(
-			<if test="id != null">#{id},  </if>
-				<if test="orderNo != null">#{orderNo},  </if>
-				<if test="memNo != null">#{memNo},  </if>
-				<if test="payStatus != null">#{payStatus},  </if>
-				<if test="payTime != null">#{payTime},  </if>
-				<if test="settleStatus != null">#{settleStatus},  </if>
-				<if test="settleTime != null">#{settleTime},  </if>
-				<if test="yingfuDepositAmt != null">#{yingfuDepositAmt},  </if>
-				<if test="shifuDepositAmt != null">#{shifuDepositAmt},  </if>
-				<if test="authorizeDepositAmt != null">#{authorizeDepositAmt},  </if>
-				<if test="creditPayAmt != null">#{creditPayAmt},  </if>
-				<if test="surplusDepositAmt != null">#{surplusDepositAmt},  </if>
-				<if test="surplusAuthorizeDepositAmt != null">#{surplusAuthorizeDepositAmt},  </if>
-				<if test="isFreeDeposit != null">#{isFreeDeposit},  </if>
-				<if test="version != null">#{version},  </if>
-				<if test="createTime != null">#{createTime},  </if>
-				<if test="createOp != null">#{createOp},  </if>
-				<if test="updateTime != null">#{updateTime},  </if>
-				<if test="updateOp != null">#{updateOp},  </if>
-				<if test="isDelete != null">#{isDelete} </if>
-			)
-	</insert>
-	
-	 
 	<update id="updateByPrimaryKeySelective" parameterType="com.atzuche.order.accountrenterdeposit.entity.AccountRenterDepositEntity">
 		update account_renter_deposit 
 		<set>
@@ -171,41 +121,18 @@
 				<if test="surplusDepositAmt != null">`surplus_deposit_amt` = #{surplusDepositAmt}, </if>
 				<if test="surplusAuthorizeDepositAmt != null">`surplus_authorize_deposit_amt` = #{surplusAuthorizeDepositAmt}, </if>
 				<if test="isFreeDeposit != null">`is_free_deposit` = #{isFreeDeposit}, </if>
-				<if test="version != null">`version` = #{version}, </if>
+                version = version + 1,
 				<if test="createTime != null">`create_time` = #{createTime}, </if>
 				<if test="createOp != null">`create_op` = #{createOp}, </if>
 				<if test="updateTime != null">`update_time` = #{updateTime}, </if>
 				<if test="updateOp != null">`update_op` = #{updateOp}, </if>
 				<if test="isDelete != null">`is_delete` = #{isDelete}</if>
 			</set>
-		where id = #{id}
+		where id = #{id} and version = #{version}
 	</update>
 	
-	<update id="updateByPrimaryKey" parameterType="com.atzuche.order.accountrenterdeposit.entity.AccountRenterDepositEntity">
-		update account_renter_deposit 
-		<set>
-				`order_no` = #{orderNo}, 		
-				`mem_no` = #{memNo}, 		
-				`pay_status` = #{payStatus}, 		
-				`pay_time` = #{payTime}, 		
-				`settle_status` = #{settleStatus}, 		
-				`settle_time` = #{settleTime}, 		
-				`yingfu_deposit_amt` = #{yingfuDepositAmt}, 		
-				`shifu_deposit_amt` = #{shifuDepositAmt}, 		
-				`authorize_deposit_amt` = #{authorizeDepositAmt}, 		
-				`credit_pay_amt` = #{creditPayAmt}, 		
-				`surplus_deposit_amt` = #{surplusDepositAmt}, 		
-				`surplus_authorize_deposit_amt` = #{surplusAuthorizeDepositAmt}, 		
-				`is_free_deposit` = #{isFreeDeposit}, 		
-				`version` = #{version}, 		
-				`create_time` = #{createTime}, 		
-				`create_op` = #{createOp}, 		
-				`update_time` = #{updateTime}, 		
-				`update_op` = #{updateOp}, 		
-				`is_delete` = #{isDelete}		
-	
-		</set>
-		where id = #{id}
-	</update>
-  	
+    <select id="selectByOrderAndMemNo" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List" /> from account_renter_deposit where order_no = #{orderNo} and mem_no = #{memNo} order by id desc limit 1
+    </select>
+
 </mapper>
