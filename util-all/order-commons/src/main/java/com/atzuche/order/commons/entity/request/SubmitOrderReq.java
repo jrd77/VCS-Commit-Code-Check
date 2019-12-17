@@ -2,6 +2,7 @@ package com.atzuche.order.commons.entity.request;
 
 import lombok.Data;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 /*
@@ -27,15 +28,14 @@ public class SubmitOrderReq {
     private String specialConsole;
     private Integer useBal;
     private String srvReturnLat;
-    private String token;
     private String rentReason;
     private String srvReturnLon;
     private String offlineOrderStatus;
     private Integer srvReturnFlag;
-    private Long revertTime;
+    private LocalDateTime revertTime;
     private Integer oilType;
     private String conPhone;
-    private Long rentTime;
+    private LocalDateTime rentTime;
     private String srvGetLon;
     private Integer memNo;
     private Integer reqSource;
@@ -58,11 +58,9 @@ public class SubmitOrderReq {
     private String AppVersion;
     private String OS;
     private String PublicLatitude;
-    private String mem_no;
     private String freeDoubleTypeId;
     private String rentCity;
     private String deviceName;
-    private String publicToken;
     private String carAddrIndex;
     private String PublicLongitude;
     private String queryId;

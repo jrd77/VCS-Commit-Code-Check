@@ -68,7 +68,7 @@ subprojects {
         compile("com.autoyol.tools:prop-encrypt-spring-boot-starter:0.0.1-SNAPSHOT")
         /* compile('mysql:mysql-connector-java')*/
         compile('com.ctrip.framework.apollo:apollo-client:0.11.0-SNAPSHOT')
-	    compile("com.autoyol:cat-starter:0.0.1-SNAPSHOT")
+    	compile("com.autoyol:cat-starter:0.0.1-SNAPSHOT")
 //	compile('org.springframework.boot:spring-boot-starter-data-redis')
         /*testCompile 'org.springframework.boot:spring-boot-starter-test'
         compile("com.autoyol:auto-doc:1.0-SNAPSHOT"){

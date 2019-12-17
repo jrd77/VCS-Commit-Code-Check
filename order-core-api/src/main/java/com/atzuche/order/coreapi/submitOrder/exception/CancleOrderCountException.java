@@ -1,5 +1,6 @@
 package com.atzuche.order.coreapi.submitOrder.exception;
 
+import com.atzuche.order.coreapi.enums.SubmitOrderErrorEnum;
 import com.autoyol.commons.web.ErrorCode;
 /*
  * @Author ZhangBin
@@ -8,15 +9,9 @@ import com.autoyol.commons.web.ErrorCode;
  *
  **/
 public class CancleOrderCountException extends SubmitOrderException {
-    public CancleOrderCountException(String msg) {
-        super(msg);
+
+    public CancleOrderCountException(String errorCode, String errorMsg) {
+        super(errorCode,errorMsg);
     }
 
-    public CancleOrderCountException(ErrorCode errorCode) {
-        super(errorCode);
-    }
-
-    public CancleOrderCountException(ErrorCode errorCode, String msg) {
-        super(errorCode, msg);
-    }
 }
