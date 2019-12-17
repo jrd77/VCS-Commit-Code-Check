@@ -22,6 +22,8 @@
         <result property="carSurplusPrice" column="car_surplus_price"/>
         <result property="carUseSpecialPrice" column="car_use_special_price"/>
         <result property="carGuidePrice" column="car_guide_price"/>
+        <result property="carInmsrp" column="car_inmsrp"/>
+        <result property="carTag" column="car_tag"/>
         <result property="carStatus" column="car_status"/>
         <result property="carImageUrl" column="car_image_url"/>
         <result property="carOwnerType" column="car_owner_type"/>
@@ -65,6 +67,8 @@
 	`car_surplus_price`, 	
 	`car_use_special_price`, 	
 	`car_guide_price`, 	
+	`car_inmsrp`, 	
+	`car_tag`, 	
 	`car_status`, 	
 	`car_image_url`, 	
 	`car_owner_type`, 	
@@ -94,9 +98,6 @@
 		select <include refid="Base_Column_List" /> from renter_goods where id = #{value}
 	</select>
 
-	<select id="selectALL" resultMap="BaseResultMap">
-		select  <include refid="Base_Column_List" /> from renter_goods order by id desc
-	</select>
 
 	 
 	<insert id="insert" parameterType="com.atzuche.order.rentercommodity.entity.RenterGoodsEntity" useGeneratedKeys="true" keyProperty="id">
@@ -119,6 +120,8 @@
 				`car_surplus_price`,		
 				`car_use_special_price`,		
 				`car_guide_price`,		
+				`car_inmsrp`,		
+				`car_tag`,		
 				`car_status`,		
 				`car_image_url`,		
 				`car_owner_type`,		
@@ -135,53 +138,49 @@
 				`car_real_lon`,		
 				`car_real_lat`,		
 				`car_addr_index`,		
-				`create_time`,		
-				`create_op`,		
-				`update_time`,		
-				`update_op`,		
-				`is_delete`		
-			)
+				`create_op`,
+				`update_op`
+				)
 		values
 		(
-				#{orderNo}, 		
-				#{renterOrderNo}, 		
-				#{replyFlag}, 		
-				#{carNo}, 		
-				#{carPlateNum}, 		
-				#{carBrand}, 		
-				#{carBrandTxt}, 		
-				#{carRating}, 		
-				#{carType}, 		
-				#{carTypeTxt}, 		
-				#{carDisplacement}, 		
-				#{carGearboxType}, 		
-				#{carDayMileage}, 		
-				#{carIntrod}, 		
-				#{carSurplusPrice}, 		
-				#{carUseSpecialPrice}, 		
-				#{carGuidePrice}, 		
-				#{carStatus}, 		
-				#{carImageUrl}, 		
-				#{carOwnerType}, 		
-				#{carUseType}, 		
-				#{carOilVolume}, 		
-				#{carEngineType}, 		
-				#{carDesc}, 		
-				#{carStewardPhone}, 		
-				#{carCheckStatus}, 		
-				#{carShowAddr}, 		
-				#{carShowLon}, 		
-				#{carShowLat}, 		
-				#{carRealAddr}, 		
-				#{carRealLon}, 		
-				#{carRealLat}, 		
-				#{carAddrIndex}, 		
-				#{createTime}, 		
-				#{createOp}, 		
-				#{updateTime}, 		
-				#{updateOp}, 		
-				#{isDelete}		
-			)
+                		#{orderNo}, 		
+	        		#{renterOrderNo}, 		
+	        		#{replyFlag}, 		
+	        		#{carNo}, 		
+	        		#{carPlateNum}, 		
+	        		#{carBrand}, 		
+	        		#{carBrandTxt}, 		
+	        		#{carRating}, 		
+	        		#{carType}, 		
+	        		#{carTypeTxt}, 		
+	        		#{carDisplacement}, 		
+	        		#{carGearboxType}, 		
+	        		#{carDayMileage}, 		
+	        		#{carIntrod}, 		
+	        		#{carSurplusPrice}, 		
+	        		#{carUseSpecialPrice}, 		
+	        		#{carGuidePrice}, 		
+	        		#{carInmsrp}, 		
+	        		#{carTag}, 		
+	        		#{carStatus}, 		
+	        		#{carImageUrl}, 		
+	        		#{carOwnerType}, 		
+	        		#{carUseType}, 		
+	        		#{carOilVolume}, 		
+	        		#{carEngineType}, 		
+	        		#{carDesc}, 		
+	        		#{carStewardPhone}, 		
+	        		#{carCheckStatus}, 		
+	        		#{carShowAddr}, 		
+	        		#{carShowLon}, 		
+	        		#{carShowLat}, 		
+	        		#{carRealAddr}, 		
+	        		#{carRealLon}, 		
+	        		#{carRealLat}, 		
+	        		#{carAddrIndex}, 		
+	                #{createOp},
+	                #{updateOp}
+	        		)
 	</insert>
 	
 	<insert id="insertSelective" parameterType="com.atzuche.order.rentercommodity.entity.RenterGoodsEntity" useGeneratedKeys="true" keyProperty="id">
@@ -204,6 +203,8 @@
 				<if test="carSurplusPrice != null">`car_surplus_price`, </if>
 				<if test="carUseSpecialPrice != null">`car_use_special_price`, </if>
 				<if test="carGuidePrice != null">`car_guide_price`, </if>
+				<if test="carInmsrp != null">`car_inmsrp`, </if>
+				<if test="carTag != null">`car_tag`, </if>
 				<if test="carStatus != null">`car_status`, </if>
 				<if test="carImageUrl != null">`car_image_url`, </if>
 				<if test="carOwnerType != null">`car_owner_type`, </if>
@@ -220,12 +221,9 @@
 				<if test="carRealLon != null">`car_real_lon`, </if>
 				<if test="carRealLat != null">`car_real_lat`, </if>
 				<if test="carAddrIndex != null">`car_addr_index`, </if>
-				<if test="createTime != null">`create_time`, </if>
 				<if test="createOp != null">`create_op`, </if>
-				<if test="updateTime != null">`update_time`, </if>
-				<if test="updateOp != null">`update_op`, </if>
-				<if test="isDelete != null">`is_delete` </if>
-			)
+				<if test="updateOp != null">`update_op`</if>
+				)
 		values
 		(
 				<if test="orderNo != null">#{orderNo},  </if>
@@ -245,6 +243,8 @@
 				<if test="carSurplusPrice != null">#{carSurplusPrice},  </if>
 				<if test="carUseSpecialPrice != null">#{carUseSpecialPrice},  </if>
 				<if test="carGuidePrice != null">#{carGuidePrice},  </if>
+				<if test="carInmsrp != null">#{carInmsrp},  </if>
+				<if test="carTag != null">#{carTag},  </if>
 				<if test="carStatus != null">#{carStatus},  </if>
 				<if test="carImageUrl != null">#{carImageUrl},  </if>
 				<if test="carOwnerType != null">#{carOwnerType},  </if>
@@ -261,12 +261,9 @@
 				<if test="carRealLon != null">#{carRealLon},  </if>
 				<if test="carRealLat != null">#{carRealLat},  </if>
 				<if test="carAddrIndex != null">#{carAddrIndex},  </if>
-				<if test="createTime != null">#{createTime},  </if>
 				<if test="createOp != null">#{createOp},  </if>
-				<if test="updateTime != null">#{updateTime},  </if>
-				<if test="updateOp != null">#{updateOp},  </if>
-				<if test="isDelete != null">#{isDelete} </if>
-			)
+				<if test="updateOp != null">#{updateOp} </if>
+				)
 	</insert>
 	
 	 
@@ -290,6 +287,8 @@
 				<if test="carSurplusPrice != null">`car_surplus_price` = #{carSurplusPrice}, </if>
 				<if test="carUseSpecialPrice != null">`car_use_special_price` = #{carUseSpecialPrice}, </if>
 				<if test="carGuidePrice != null">`car_guide_price` = #{carGuidePrice}, </if>
+				<if test="carInmsrp != null">`car_inmsrp` = #{carInmsrp}, </if>
+				<if test="carTag != null">`car_tag` = #{carTag}, </if>
 				<if test="carStatus != null">`car_status` = #{carStatus}, </if>
 				<if test="carImageUrl != null">`car_image_url` = #{carImageUrl}, </if>
 				<if test="carOwnerType != null">`car_owner_type` = #{carOwnerType}, </if>
@@ -306,9 +305,7 @@
 				<if test="carRealLon != null">`car_real_lon` = #{carRealLon}, </if>
 				<if test="carRealLat != null">`car_real_lat` = #{carRealLat}, </if>
 				<if test="carAddrIndex != null">`car_addr_index` = #{carAddrIndex}, </if>
-				<if test="createTime != null">`create_time` = #{createTime}, </if>
 				<if test="createOp != null">`create_op` = #{createOp}, </if>
-				<if test="updateTime != null">`update_time` = #{updateTime}, </if>
 				<if test="updateOp != null">`update_op` = #{updateOp}, </if>
 				<if test="isDelete != null">`is_delete` = #{isDelete}</if>
 			</set>
@@ -335,6 +332,8 @@
 				`car_surplus_price` = #{carSurplusPrice}, 		
 				`car_use_special_price` = #{carUseSpecialPrice}, 		
 				`car_guide_price` = #{carGuidePrice}, 		
+				`car_inmsrp` = #{carInmsrp}, 		
+				`car_tag` = #{carTag}, 		
 				`car_status` = #{carStatus}, 		
 				`car_image_url` = #{carImageUrl}, 		
 				`car_owner_type` = #{carOwnerType}, 		
@@ -351,10 +350,8 @@
 				`car_real_lon` = #{carRealLon}, 		
 				`car_real_lat` = #{carRealLat}, 		
 				`car_addr_index` = #{carAddrIndex}, 		
-				`create_time` = #{createTime}, 		
-				`create_op` = #{createOp}, 		
-				`update_time` = #{updateTime}, 		
-				`update_op` = #{updateOp}, 		
+				`create_op` = #{createOp},
+				`update_op` = #{updateOp},
 				`is_delete` = #{isDelete}		
 	
 		</set>

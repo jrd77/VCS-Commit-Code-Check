@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.atzuche.order.rentercommodity.mapper.RenterGoodsPriiceDetailMapper">
+<mapper namespace="com.atzuche.order.rentercommodity.mapper.RenterGoodsPriceDetailMapper">
 
-    <resultMap type="com.atzuche.order.rentercommodity.entity.RenterGoodsPriiceDetailEntity" id="BaseResultMap">
+    <resultMap type="com.atzuche.order.rentercommodity.entity.RenterGoodsPriceDetailEntity" id="BaseResultMap">
         <result property="id" column="id"/>
         <result property="orderNo" column="order_no"/>
         <result property="renterOrderNo" column="renter_order_no"/>
@@ -11,6 +11,7 @@
         <result property="carDay" column="car_day"/>
         <result property="carUnitPrice" column="car_unit_price"/>
         <result property="carHourCount" column="car_hour_count"/>
+        <result property="revertTime" column="revert_time"/>
         <result property="createTime" column="create_time"/>
         <result property="createOp" column="create_op"/>
         <result property="updateTime" column="update_time"/>
@@ -27,6 +28,7 @@
 	`car_day`, 	
 	`car_unit_price`, 	
 	`car_hour_count`, 	
+	`revert_time`,
 	`create_time`, 	
 	`create_op`, 	
 	`update_time`, 	
@@ -40,12 +42,9 @@
 		select <include refid="Base_Column_List" /> from renter_goods_price_detail where id = #{value}
 	</select>
 
-	<select id="selectALL" resultMap="BaseResultMap">
-		select  <include refid="Base_Column_List" /> from renter_goods_price_detail order by id desc
-	</select>
 
 	 
-	<insert id="insert" parameterType="com.atzuche.order.rentercommodity.entity.RenterGoodsPriiceDetailEntity" useGeneratedKeys="true" keyProperty="id">
+	<insert id="insert" parameterType="com.atzuche.order.rentercommodity.entity.RenterGoodsPriceDetailEntity" useGeneratedKeys="true" keyProperty="id">
 		insert into renter_goods_price_detail
 		(
 				`order_no`,		
@@ -54,29 +53,25 @@
 				`car_day`,		
 				`car_unit_price`,		
 				`car_hour_count`,		
-				`create_time`,		
-				`create_op`,		
-				`update_time`,		
-				`update_op`,		
-				`is_delete`		
-			)
+				`revert_time`,
+				`create_op`,
+				`update_op`
+				)
 		values
 		(
-				#{orderNo}, 		
-				#{renterOrderNo}, 		
-				#{goodsId}, 		
-				#{carDay}, 		
-				#{carUnitPrice}, 		
-				#{carHourCount}, 		
-				#{createTime}, 		
-				#{createOp}, 		
-				#{updateTime}, 		
-				#{updateOp}, 		
-				#{isDelete}		
-			)
+                		#{orderNo}, 		
+	        		#{renterOrderNo}, 		
+	        		#{goodsId}, 		
+	        		#{carDay}, 		
+	        		#{carUnitPrice}, 		
+	        		#{carHourCount}, 		
+	        		#{revertTime},
+	                #{createOp},
+	                #{updateOp}
+	        		)
 	</insert>
 	
-	<insert id="insertSelective" parameterType="com.atzuche.order.rentercommodity.entity.RenterGoodsPriiceDetailEntity" useGeneratedKeys="true" keyProperty="id">
+	<insert id="insertSelective" parameterType="com.atzuche.order.rentercommodity.entity.RenterGoodsPriceDetailEntity" useGeneratedKeys="true" keyProperty="id">
 		insert into renter_goods_price_detail
 		(
 				<if test="orderNo != null">`order_no`, </if>
@@ -85,12 +80,10 @@
 				<if test="carDay != null">`car_day`, </if>
 				<if test="carUnitPrice != null">`car_unit_price`, </if>
 				<if test="carHourCount != null">`car_hour_count`, </if>
-				<if test="createTime != null">`create_time`, </if>
+				<if test="revertTime != null">`revert_time`, </if>
 				<if test="createOp != null">`create_op`, </if>
-				<if test="updateTime != null">`update_time`, </if>
-				<if test="updateOp != null">`update_op`, </if>
-				<if test="isDelete != null">`is_delete` </if>
-			)
+				<if test="updateOp != null">`update_op`</if>
+				)
 		values
 		(
 				<if test="orderNo != null">#{orderNo},  </if>
@@ -99,16 +92,14 @@
 				<if test="carDay != null">#{carDay},  </if>
 				<if test="carUnitPrice != null">#{carUnitPrice},  </if>
 				<if test="carHourCount != null">#{carHourCount},  </if>
-				<if test="createTime != null">#{createTime},  </if>
+				<if test="revertTime != null">#{revertTime},  </if>
 				<if test="createOp != null">#{createOp},  </if>
-				<if test="updateTime != null">#{updateTime},  </if>
-				<if test="updateOp != null">#{updateOp},  </if>
-				<if test="isDelete != null">#{isDelete} </if>
-			)
+				<if test="updateOp != null">#{updateOp} </if>
+				)
 	</insert>
 	
 	 
-	<update id="updateByPrimaryKeySelective" parameterType="com.atzuche.order.rentercommodity.entity.RenterGoodsPriiceDetailEntity">
+	<update id="updateByPrimaryKeySelective" parameterType="com.atzuche.order.rentercommodity.entity.RenterGoodsPriceDetailEntity">
 		update renter_goods_price_detail 
 		<set>
 				<if test="orderNo != null">`order_no` = #{orderNo}, </if>
@@ -117,16 +108,15 @@
 				<if test="carDay != null">`car_day` = #{carDay}, </if>
 				<if test="carUnitPrice != null">`car_unit_price` = #{carUnitPrice}, </if>
 				<if test="carHourCount != null">`car_hour_count` = #{carHourCount}, </if>
-				<if test="createTime != null">`create_time` = #{createTime}, </if>
+				<if test="revertTime != null">`revert_time` = #{revertTime}, </if>
 				<if test="createOp != null">`create_op` = #{createOp}, </if>
-				<if test="updateTime != null">`update_time` = #{updateTime}, </if>
 				<if test="updateOp != null">`update_op` = #{updateOp}, </if>
 				<if test="isDelete != null">`is_delete` = #{isDelete}</if>
 			</set>
 		where id = #{id}
 	</update>
 	
-	<update id="updateByPrimaryKey" parameterType="com.atzuche.order.rentercommodity.entity.RenterGoodsPriiceDetailEntity">
+	<update id="updateByPrimaryKey" parameterType="com.atzuche.order.rentercommodity.entity.RenterGoodsPriceDetailEntity">
 		update renter_goods_price_detail 
 		<set>
 				`order_no` = #{orderNo}, 		
@@ -135,18 +125,13 @@
 				`car_day` = #{carDay}, 		
 				`car_unit_price` = #{carUnitPrice}, 		
 				`car_hour_count` = #{carHourCount}, 		
-				`create_time` = #{createTime}, 		
-				`create_op` = #{createOp}, 		
-				`update_time` = #{updateTime}, 		
-				`update_op` = #{updateOp}, 		
+				`revert_time` = #{revertTime},
+				`create_op` = #{createOp},
+				`update_op` = #{updateOp},
 				`is_delete` = #{isDelete}		
 	
 		</set>
 		where id = #{id}
 	</update>
   	
-  	<select id="listRenterGoodsPriceByOrderNo" resultMap="BaseResultMap">
-		select <include refid="Base_Column_List" /> from renter_goods_price_detail where order_no = #{orderNo} 
-		and is_delete = 0
-	</select>
 </mapper>

@@ -5,14 +5,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.atzuche.order.rentercommodity.entity.RenterGoodsPriceDetailEntity;
 import com.atzuche.order.renterorder.service.RenterOrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.atzuche.order.coreapi.entity.bo.RenterGoodsPriceBO;
-import com.atzuche.order.rentercommodity.entity.RenterGoodsPriiceDetailEntity;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
-import com.atzuche.order.rentercommodity.service.RenterGoodsPriiceDetailService;
+import com.atzuche.order.rentercommodity.service.RenterGoodsPriceDetailService;
 
 @Service
 public class ModifyOrderComposeService {
@@ -20,7 +20,7 @@ public class ModifyOrderComposeService {
 	@Autowired
 	private RenterOrderService renterOrderService;
 	@Autowired
-	private RenterGoodsPriiceDetailService renterGoodsPriiceDetailService;
+	private RenterGoodsPriceDetailService renterGoodsPriiceDetailService;
 	
 	/**
 	 * 获取已同意的租客子订单列表含商品价格列表
@@ -64,12 +64,12 @@ public class ModifyOrderComposeService {
             }
 		}
 		// 获取租客价格列表
-		List<RenterGoodsPriiceDetailEntity> renterGoodsPriceAllList = renterGoodsPriiceDetailService.listRenterGoodsPriceByOrderNo(orderNo);
+		List<RenterGoodsPriceDetailEntity> renterGoodsPriceAllList = renterGoodsPriiceDetailService.listRenterGoodsPriceByOrderNo(orderNo);
 		List<RenterGoodsPriceBO> renterGoodsPriceBOList = renterOrderList.stream().map(renterOrder -> getRenterOrderPrice(renterOrder,renterGoodsPriceAllList)).collect(Collectors.toList());
 		return renterGoodsPriceBOList;
 	}
 	
-	public RenterGoodsPriceBO getRenterOrderPrice(RenterOrderEntity renterOrder, List<RenterGoodsPriiceDetailEntity> renterGoodsPriceAllList) {
+	public RenterGoodsPriceBO getRenterOrderPrice(RenterOrderEntity renterOrder, List<RenterGoodsPriceDetailEntity> renterGoodsPriceAllList) {
 		RenterGoodsPriceBO renterGoodsPriceBO = new RenterGoodsPriceBO();
 		renterGoodsPriceBO.setExpRentStartTime(renterOrder.getExpRentStartTime());
 		renterGoodsPriceBO.setExpRentEndTime(renterOrder.getExpRentEndTime());
