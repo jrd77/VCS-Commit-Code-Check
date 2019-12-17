@@ -1,4 +1,4 @@
-package com.atzuche.accountrenterdeposit.entity;
+package com.atzuche.order.accountrenterdeposit.entity;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -9,7 +9,7 @@ import lombok.Data;
  * 租车押金状态及其总表
  * 
  * @author ZhangBin
- * @date 2019-12-11 17:48:32
+ * @date 2019-12-17 17:09:45
  * @Description:
  */
 @Data

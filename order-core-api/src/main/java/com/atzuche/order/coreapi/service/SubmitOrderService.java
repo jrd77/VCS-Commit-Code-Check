@@ -4,7 +4,6 @@ import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.GlobalConstant;
 import com.atzuche.order.commons.LocalDateTimeUtils;
 import com.atzuche.order.commons.entity.dto.*;
-import com.atzuche.order.commons.enums.RenterMemRightEnum;
 import com.atzuche.order.coreapi.entity.request.SubmitOrderReq;
 import com.atzuche.order.coreapi.enums.SubmitOrderErrorEnum;
 import com.atzuche.order.coreapi.submitOrder.exception.CarDetailByFeignException;
@@ -19,7 +18,10 @@ import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.member.detail.api.MemberDetailFeignService;
 import com.autoyol.member.detail.enums.MemberSelectKeyEnum;
-import com.autoyol.member.detail.vo.res.*;
+import com.autoyol.member.detail.vo.res.MemberAuthInfo;
+import com.autoyol.member.detail.vo.res.MemberCoreInfo;
+import com.autoyol.member.detail.vo.res.MemberRoleInfo;
+import com.autoyol.member.detail.vo.res.MemberTotalInfo;
 import com.dianping.cat.Cat;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -111,7 +113,7 @@ public class SubmitOrderService {
         ResponseData<MemberTotalInfo> responseData = null;
         log.info("Feign 开始获取租客会员信息,submitReqDto={}",JSON.toJSONString(submitReqDto));
         try{
-            responseData = memberDetailFeignService.getMemberSelectInfo(submitReqDto.getMemNo(), selectKey);
+            responseData = memberDetailFeignService.getMemberSelectInfo(Integer.valueOf(submitReqDto.getMemNo()), selectKey);
 
         }catch (Exception e){
             log.error("Feign 获取租客会员信息失败,submitReqDto={},responseData={}",JSON.toJSONString(submitReqDto),null,e);
@@ -164,7 +166,7 @@ public class SubmitOrderService {
         ResponseData<MemberTotalInfo> responseData = null;
         log.info("Feign 开始获取车主会员信息,submitReqDto={}",JSON.toJSONString(submitReqDto));
         try{
-            responseData = memberDetailFeignService.getMemberSelectInfo(submitReqDto.getMemNo(), selectKey);
+            responseData = memberDetailFeignService.getMemberSelectInfo(Integer.valueOf(submitReqDto.getMemNo()), selectKey);
 
         }catch (Exception e){
             log.error("Feign 获取车主会员信息失败,submitReqDto={},responseData={}",JSON.toJSONString(submitReqDto),null,e);
