@@ -1,6 +1,6 @@
-package com.atzuche.accountrenterdeposit.mapper;
+package com.atzuche.order.accountrenterdeposit.mapper;
 
-import com.atzuche.accountrenterdeposit.entity.AccountRenterDepositEntity;
+import com.atzuche.order.accountrenterdeposit.entity.AccountRenterDepositEntity;
 import org.apache.ibatis.annotations.Mapper;
 import java.util.List;
 

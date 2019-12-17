@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.atzuche.accountrenterdeposit.mapper.AccountRenterDepositMapper">
+<mapper namespace="com.atzuche.order.accountrenterdeposit.mapper.AccountRenterDepositMapper">
 
-    <resultMap type="com.atzuche.accountrenterdeposit.entity.AccountRenterDepositEntity" id="BaseResultMap">
+    <resultMap type="com.atzuche.order.accountrenterdeposit.entity.AccountRenterDepositEntity" id="BaseResultMap">
         <result property="id" column="id"/>
         <result property="orderNo" column="order_no"/>
         <result property="memNo" column="mem_no"/>
@@ -61,7 +61,7 @@
 	</select>
 
 	 
-	<insert id="insert" parameterType="com.atzuche.accountrenterdeposit.entity.AccountRenterDepositEntity">
+	<insert id="insert" parameterType="com.atzuche.order.accountrenterdeposit.entity.AccountRenterDepositEntity">
 		insert into account_renter_deposit
 		(
 			`id`,		
@@ -110,7 +110,7 @@
 			)
 	</insert>
 	
-	<insert id="insertSelective" parameterType="com.atzuche.accountrenterdeposit.entity.AccountRenterDepositEntity">
+	<insert id="insertSelective" parameterType="com.atzuche.order.accountrenterdeposit.entity.AccountRenterDepositEntity">
 		insert into account_renter_deposit
 		(
 			<if test="id != null">`id`, </if>
@@ -160,7 +160,7 @@
 	</insert>
 	
 	 
-	<update id="updateByPrimaryKeySelective" parameterType="com.atzuche.accountrenterdeposit.entity.AccountRenterDepositEntity">
+	<update id="updateByPrimaryKeySelective" parameterType="com.atzuche.order.accountrenterdeposit.entity.AccountRenterDepositEntity">
 		update account_renter_deposit 
 		<set>
 				<if test="orderNo != null">`order_no` = #{orderNo}, </if>
@@ -186,7 +186,7 @@
 		where id = #{id}
 	</update>
 	
-	<update id="updateByPrimaryKey" parameterType="com.atzuche.accountrenterdeposit.entity.AccountRenterDepositEntity">
+	<update id="updateByPrimaryKey" parameterType="com.atzuche.order.accountrenterdeposit.entity.AccountRenterDepositEntity">
 		update account_renter_deposit 
 		<set>
 				`order_no` = #{orderNo}, 		

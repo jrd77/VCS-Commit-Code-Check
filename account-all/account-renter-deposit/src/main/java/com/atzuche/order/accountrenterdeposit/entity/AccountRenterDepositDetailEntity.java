@@ -1,4 +1,4 @@
-package com.atzuche.accountrenterdeposit.entity;
+package com.atzuche.order.accountrenterdeposit.entity;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;

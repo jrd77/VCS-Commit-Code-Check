@@ -1,8 +1,8 @@
-package com.atzuche.accountrenterdeposit.service;
+package com.atzuche.order.accountrenterdeposit.service;
 
+import com.atzuche.order.accountrenterdeposit.mapper.AccountRenterDepositMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.atzuche.accountrenterdeposit.mapper.AccountRenterDepositMapper;
 
 
 /**
