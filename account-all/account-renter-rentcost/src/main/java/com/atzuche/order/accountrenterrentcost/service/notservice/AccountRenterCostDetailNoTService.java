@@ -1,8 +1,7 @@
 package com.atzuche.order.accountrenterrentcost.service.notservice;
 
-import com.atzuche.order.accountrenterrentcost.exception.AccountRenterRentCostException;
+import com.atzuche.order.accountrenterrentcost.exception.AccountRenterRentCostDetailException;
 import com.atzuche.order.accountrenterrentcost.vo.req.AccountRenterCostDetailReqVO;
-import com.autoyol.commons.web.ErrorCode;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +9,6 @@ import org.springframework.stereotype.Service;
 import com.atzuche.order.accountrenterrentcost.mapper.AccountRenterCostDetailMapper;
 import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostDetailEntity;
 
-import java.time.LocalDateTime;
 
 
 /**
@@ -32,13 +30,10 @@ public class AccountRenterCostDetailNoTService {
     public void insertAccountRenterCostDetail(AccountRenterCostDetailReqVO accountRenterCostDetailReqVO) {
         AccountRenterCostDetailEntity accountRenterCostDetail = new AccountRenterCostDetailEntity();
         BeanUtils.copyProperties(accountRenterCostDetailReqVO,accountRenterCostDetail);
-        LocalDateTime now = LocalDateTime.now();
-        accountRenterCostDetail.setCreateTime(now);
-        accountRenterCostDetail.setUpdateTime(now);
         accountRenterCostDetail.setIsDelete(NumberUtils.INTEGER_ZERO);
         int result = accountRenterCostDetailMapper.insert(accountRenterCostDetail);
         if(result==0){
-            throw new AccountRenterRentCostException(ErrorCode.FAILED);
+            throw new AccountRenterRentCostDetailException();
         }
     }
 }

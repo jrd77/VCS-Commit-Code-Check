@@ -15,7 +15,6 @@ public interface AccountRenterCostDetailMapper{
 
     AccountRenterCostDetailEntity selectByPrimaryKey(Integer id);
 
-    List<AccountRenterCostDetailEntity> selectALL();
 
     int insert(AccountRenterCostDetailEntity record);
     

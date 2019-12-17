@@ -44,11 +44,6 @@
 		select <include refid="Base_Column_List" /> from account_renter_cost_settle_detail where id = #{value}
 	</select>
 
-	<select id="selectALL" resultMap="BaseResultMap">
-		select  <include refid="Base_Column_List" /> from account_renter_cost_settle_detail order by id desc
-	</select>
-
-	 
 	<insert id="insert" parameterType="com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostSettleDetailEntity">
 		insert into account_renter_cost_settle_detail
 		(

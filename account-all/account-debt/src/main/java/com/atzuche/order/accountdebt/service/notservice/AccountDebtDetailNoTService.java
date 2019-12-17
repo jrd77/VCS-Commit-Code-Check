@@ -33,7 +33,7 @@ public class AccountDebtDetailNoTService {
      * 查询待抵扣历史欠款
      * @return
      */
-    public List<AccountDebtDetailEntity> getDebtListByMemNo(int memNo){
+    public List<AccountDebtDetailEntity> getDebtListByMemNo(String memNo){
         List<AccountDebtDetailEntity> result = accountDebtDetailMapper.getDebtListByMemNo(memNo);
         if(CollectionUtils.isEmpty(result)){
             return Collections.emptyList();

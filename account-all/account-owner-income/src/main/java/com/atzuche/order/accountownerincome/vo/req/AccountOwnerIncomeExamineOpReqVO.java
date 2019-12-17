@@ -15,7 +15,7 @@ public class AccountOwnerIncomeExamineOpReqVO {
     /**
      * 会员号
      */
-    private Integer memNo;
+    private String memNo;
 
     /**
      * 车主审核收益信息

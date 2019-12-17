@@ -94,14 +94,15 @@
 				<if test="opName != null">`op_name` = #{opName}, </if>
 				<if test="time != null">`time` = #{time}, </if>
 				<if test="remark != null">`remark` = #{remark}, </if>
-                `version` = version + 1 ,
+                version = version + 1,
 				<if test="createTime != null">`create_time` = #{createTime}, </if>
 				<if test="createOp != null">`create_op` = #{createOp}, </if>
 				<if test="updateTime != null">`update_time` = #{updateTime}, </if>
 				<if test="updateOp != null">`update_op` = #{updateOp}, </if>
 				<if test="isDelete != null">`is_delete` = #{isDelete}</if>
 			</set>
-		where id = #{id} and version = #{version}
+		where id = #{id} and  version = #{version}
 	</update>
-  	
+	
+
 </mapper>

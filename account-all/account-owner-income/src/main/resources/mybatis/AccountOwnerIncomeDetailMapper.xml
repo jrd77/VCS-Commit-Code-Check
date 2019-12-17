@@ -50,7 +50,6 @@
 		select <include refid="Base_Column_List" /> from account_owner_income_detail where id = #{value}
 	</select>
 
-
 	<insert id="insert" parameterType="com.atzuche.order.accountownerincome.entity.AccountOwnerIncomeDetailEntity" useGeneratedKeys="true" keyProperty="id">
 		insert into account_owner_income_detail
 		(
@@ -92,4 +91,5 @@
 			)
 	</insert>
 	
+
 </mapper>

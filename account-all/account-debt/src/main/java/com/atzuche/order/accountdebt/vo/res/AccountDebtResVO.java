@@ -14,7 +14,7 @@ public class AccountDebtResVO {
     /**
      * 会员号
      */
-    private Integer memNo;
+    private String memNo;
     /**
      * 总欠款
      */

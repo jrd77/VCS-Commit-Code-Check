@@ -21,5 +21,5 @@ public interface AccountDebtDetailMapper{
     
     int updateByPrimaryKeySelective(AccountDebtDetailEntity record);
 
-    List<AccountDebtDetailEntity> getDebtListByMemNo(@Param("memNo") int memNo);
+    List<AccountDebtDetailEntity> getDebtListByMemNo(@Param("memNo") String memNo);
 }

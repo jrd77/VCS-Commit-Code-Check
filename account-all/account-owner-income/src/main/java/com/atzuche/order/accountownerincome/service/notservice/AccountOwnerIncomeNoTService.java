@@ -30,12 +30,12 @@ public class AccountOwnerIncomeNoTService {
      * @param memNo
      * @return
      */
-    public int getOwnerIncomeAmt(Integer memNo) {
+    public int getOwnerIncomeAmt(String memNo) {
         AccountOwnerIncomeEntity accountOwnerIncome = getOwnerIncome(memNo);
         return accountOwnerIncome.getIncomeAmt();
     }
 
-    public AccountOwnerIncomeEntity getOwnerIncome(Integer memNo) {
+    public AccountOwnerIncomeEntity getOwnerIncome(String memNo) {
         if(Objects.isNull(memNo)){
             Assert.notNull(memNo, ErrorCode.PARAMETER_ERROR.getText());
         }
