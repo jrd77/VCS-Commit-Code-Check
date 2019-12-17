@@ -332,6 +332,26 @@ public class LocalDateTimeUtils {
         return Long.valueOf(longDateTime);
     }
 
+    /**
+     * 将LocalDateTime转为自定义的时间格式的字符串
+     * @param localDateTime
+     * @param format
+     * @return
+     */
+    public static String localdateToString(LocalDateTime localDateTime, String format) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(format);
+        return localDateTime.format(formatter);
+    }
+    /**
+     * 将LocalDate转为自定义的时间格式的字符串
+     * @param localDateTime
+     * @param format
+     * @return
+     */
+    public static String localdateToString(LocalDate localDate) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_PATTERN);
+        return localDate.format(formatter);
+    }
 
     /**
      * 按照给定的格式获取昨天这个时候的时间日期字符串
@@ -412,6 +432,8 @@ public class LocalDateTimeUtils {
         System.out.println(localDate);
 
         System.out.println(localDateTimeToLong(LocalDateTime.now()));;
+
+        System.out.println(getLocaldateAsString(LocalDate.now()));
     }
 
 }

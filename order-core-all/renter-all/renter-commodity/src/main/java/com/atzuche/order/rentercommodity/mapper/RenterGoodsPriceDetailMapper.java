@@ -1,4 +1,6 @@
 package com.atzuche.order.rentercommodity.mapper;
+import org.apache.ibatis.annotations.Param;
+import java.util.List;
 
 import com.atzuche.order.rentercommodity.entity.RenterGoodsPriceDetailEntity;
 import org.apache.ibatis.annotations.Mapper;
@@ -21,5 +23,8 @@ public interface RenterGoodsPriceDetailMapper{
     int updateByPrimaryKey(RenterGoodsPriceDetailEntity record);
     
     int updateByPrimaryKeySelective(RenterGoodsPriceDetailEntity record);
+
+    List<RenterGoodsPriceDetailEntity> selectByRenterOrderNo(@Param("renterOrderNo")String renterOrderNo);
+
 
 }

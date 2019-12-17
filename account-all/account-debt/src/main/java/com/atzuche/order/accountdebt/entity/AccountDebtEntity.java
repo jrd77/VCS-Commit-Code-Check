@@ -24,7 +24,7 @@ public class AccountDebtEntity implements Serializable {
 	/**
 	 * 会员号
 	 */
-	private Integer memNo;
+	private String memNo;
 	/**
 	 * 总欠款
 	 */

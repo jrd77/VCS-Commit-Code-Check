@@ -23,7 +23,7 @@ public class OwnerOrderCostEntity implements Serializable {
 	/**
 	 * 主订单号
 	 */
-	private Long orderNo;
+	private String orderNo;
 	/**
 	 * 子订单号
 	 */
@@ -31,7 +31,7 @@ public class OwnerOrderCostEntity implements Serializable {
 	/**
 	 * 会员号
 	 */
-	private Integer memNo;
+	private String memNo;
 	/**
 	 * 增值费用
 	 */

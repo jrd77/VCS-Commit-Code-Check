@@ -23,7 +23,7 @@ public class OwnerOrderPurchaseDetailEntity implements Serializable {
 	/**
 	 * 主订单号
 	 */
-	private Long orderNo;
+	private String orderNo;
 	/**
 	 * 子订单号
 	 */
@@ -31,7 +31,7 @@ public class OwnerOrderPurchaseDetailEntity implements Serializable {
 	/**
 	 * 会员号
 	 */
-	private Integer memNo;
+	private String memNo;
 	/**
 	 * 费用编码费用编码（包含罚款、租金、佣金、取还车费、GPS服务费等）
 	 */

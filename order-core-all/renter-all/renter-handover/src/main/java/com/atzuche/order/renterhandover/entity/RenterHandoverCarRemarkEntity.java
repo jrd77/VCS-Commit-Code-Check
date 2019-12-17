@@ -23,7 +23,7 @@ public class RenterHandoverCarRemarkEntity implements Serializable {
 	/**
 	 * 主订单号
 	 */
-	private Long orderNo;
+	private String orderNo;
 	/**
 	 * 子订单号
 	 */
@@ -43,7 +43,7 @@ public class RenterHandoverCarRemarkEntity implements Serializable {
 	/**
 	 * 备注人会员号
 	 */
-	private Integer memNo;
+	private String memNo;
 	/**
 	 * 备注人姓名
 	 */

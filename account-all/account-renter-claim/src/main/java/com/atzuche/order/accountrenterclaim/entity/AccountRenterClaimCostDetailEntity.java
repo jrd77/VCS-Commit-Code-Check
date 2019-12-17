@@ -23,11 +23,11 @@ public class AccountRenterClaimCostDetailEntity implements Serializable {
 	/**
 	 * 主订单号
 	 */
-	private Long orderNo;
+	private String orderNo;
 	/**
 	 * 会员号
 	 */
-	private Integer memNo;
+	private String memNo;
 	/**
 	 * 费用来源编码
 	 */
