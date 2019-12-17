@@ -433,7 +433,6 @@ public class LocalDateTimeUtils {
 
         System.out.println(localDateTimeToLong(LocalDateTime.now()));;
 
-        System.out.println(getLocaldateAsString(LocalDate.now()));
     }
 
 }
