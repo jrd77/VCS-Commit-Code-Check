@@ -11,7 +11,6 @@ import org.springframework.util.Assert;
 @Data
 public class AccountRenterCostReqVO {
 
-    //租客费用及其结算总表
     /**
      * 主订单号
      */
@@ -66,7 +65,6 @@ public class AccountRenterCostReqVO {
      * 修改人
      */
     private String updateOp;
-
 
     /**
      * 费用明细

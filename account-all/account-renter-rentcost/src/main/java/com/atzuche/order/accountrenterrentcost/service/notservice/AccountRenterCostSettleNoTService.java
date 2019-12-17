@@ -1,16 +1,16 @@
 package com.atzuche.order.accountrenterrentcost.service.notservice;
 
-import com.atzuche.order.accountrenterrentcost.exception.AccountRenterRentCostException;
 import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostSettleEntity;
+import com.atzuche.order.accountrenterrentcost.exception.AccountRenterRentCostSettleException;
 import com.atzuche.order.accountrenterrentcost.mapper.AccountRenterCostSettleMapper;
 import com.atzuche.order.accountrenterrentcost.vo.req.AccountRenterCostReqVO;
-import com.autoyol.commons.web.ErrorCode;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
-import java.time.LocalDateTime;
-import java.util.Objects;
+import java.util.List;
 
 
 /**
@@ -24,20 +24,29 @@ public class AccountRenterCostSettleNoTService {
     @Autowired
     private AccountRenterCostSettleMapper accountRenterCostSettleMapper;
 
+    /**
+     * 查询订单 已付租车费用
+     */
+    public int getCostPaidRent(Long orderNo,Integer memNo) {
+        List<AccountRenterCostSettleEntity> accountRenterCostSettles = accountRenterCostSettleMapper.selectByOrderNo(orderNo,memNo);
+        if(CollectionUtils.isEmpty(accountRenterCostSettles)){
+           return NumberUtils.INTEGER_ZERO;
+        }
+        int result = accountRenterCostSettles.stream().mapToInt(AccountRenterCostSettleEntity::getRentAmt).sum();
+        return result;
+    }
+
 
     /**
-     * 租车费用计算总表落库、g更新
+     * 租车费用计算总表落库、更新
      * @param accountRenterCost
      */
     public void insertOrUpdateRenterCostSettle(AccountRenterCostReqVO accountRenterCost) {
         AccountRenterCostSettleEntity accountRenterCostSettle = new AccountRenterCostSettleEntity();
         BeanUtils.copyProperties(accountRenterCost,accountRenterCostSettle);
-        LocalDateTime now = LocalDateTime.now();
-        accountRenterCostSettle.setCreateTime(now);
-        accountRenterCostSettle.setCreateTime(now);
-        AccountRenterCostSettleEntity accountRenterCostSettleExit = accountRenterCostSettleMapper.selectByOrderNo(accountRenterCost.getOrderNo(),accountRenterCost.getMemNo());
+        List<AccountRenterCostSettleEntity> accountRenterCostSettleExits = accountRenterCostSettleMapper.selectByOrderNo(accountRenterCost.getOrderNo(),accountRenterCost.getMemNo());
         int result;
-        if(Objects.isNull(accountRenterCostSettleExit) || Objects.isNull(accountRenterCostSettleExit.getId())){
+        if(CollectionUtils.isEmpty(accountRenterCostSettleExits)){
             //不存在插入
             result = accountRenterCostSettleMapper.insert(accountRenterCostSettle);
         }else{
@@ -45,7 +54,7 @@ public class AccountRenterCostSettleNoTService {
             result = accountRenterCostSettleMapper.updateByPrimaryKeySelective(accountRenterCostSettle);
         }
         if(result==0){
-            throw new AccountRenterRentCostException(ErrorCode.FAILED);
+            throw new AccountRenterRentCostSettleException() ;
         }
     }
 }
