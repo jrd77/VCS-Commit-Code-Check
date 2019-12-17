@@ -16,11 +16,11 @@ public class AccountRenterCostDetailReqVO {
     /**
      * 主订单号
      */
-    private Long orderNo;
+    private String orderNo;
     /**
      * 会员号
      */
-    private Integer memNo;
+    private String memNo;
     /**
      * 支付来源code
      */

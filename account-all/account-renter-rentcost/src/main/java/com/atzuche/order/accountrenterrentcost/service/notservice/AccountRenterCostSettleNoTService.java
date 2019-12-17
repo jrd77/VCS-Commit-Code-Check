@@ -27,7 +27,7 @@ public class AccountRenterCostSettleNoTService {
     /**
      * 查询订单 已付租车费用
      */
-    public int getCostPaidRent(Long orderNo,Integer memNo) {
+    public int getCostPaidRent(String orderNo,String memNo) {
         List<AccountRenterCostSettleEntity> accountRenterCostSettles = accountRenterCostSettleMapper.selectByOrderNo(orderNo,memNo);
         if(CollectionUtils.isEmpty(accountRenterCostSettles)){
            return NumberUtils.INTEGER_ZERO;

@@ -24,7 +24,7 @@ public class AccountRenterCostSettleService{
     /**
      * 查询订单 已付租车费用
      */
-    public int getCostPaidRent(Long orderNo,Integer memNo) {
+    public int getCostPaidRent(String orderNo,String memNo) {
         Assert.notNull(orderNo, ErrorCode.PARAMETER_ERROR.getText());
         Assert.notNull(memNo, ErrorCode.PARAMETER_ERROR.getText());
         return accountRenterCostSettleNoTService.getCostPaidRent(orderNo,memNo);

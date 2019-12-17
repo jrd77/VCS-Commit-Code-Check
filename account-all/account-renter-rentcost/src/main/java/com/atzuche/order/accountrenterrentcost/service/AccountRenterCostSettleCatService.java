@@ -25,7 +25,7 @@ public class AccountRenterCostSettleCatService {
     /**
      * 查询订单 已付租车费用
      */
-    public int getCostPaidRent(Long orderNo,Integer memNo) {
+    public int getCostPaidRent(String orderNo,String memNo) {
         return accountRenterCostSettleService.getCostPaidRent(orderNo,memNo);
     }
 
