@@ -9,7 +9,7 @@ public class OwnerMemberDto {
     /**
      * 会员号
      */
-    private Integer memNo;
+    private String memNo;
     /**
      * 会员类型
      */

@@ -23,7 +23,7 @@ public class AccountPlatformProfitDetailEntity implements Serializable {
 	/**
 	 * 主订单号
 	 */
-	private Long orderNo;
+	private String orderNo;
 	/**
 	 * 费用
 	 */

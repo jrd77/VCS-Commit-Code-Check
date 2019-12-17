@@ -28,7 +28,7 @@
 //    /**
 //     *  会员号
 //     */
-//    private Integer memNo;
+//    private String memNo;
 //    /**
 //     * 个人所以代还  欠款记录
 //     */

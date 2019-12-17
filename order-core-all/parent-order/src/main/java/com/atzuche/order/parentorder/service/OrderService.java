@@ -26,4 +26,5 @@ public class OrderService{
     public OrderEntity getParentOrderDetailByOrderNo(Long orderNo) {
     	return orderMapper.getParentOrderDetailByOrderNo(orderNo);
     }
+
 }

@@ -23,7 +23,7 @@ public class CashierRefundApplyEntity implements Serializable {
 	/**
 	 * 主订单号
 	 */
-	private Long orderNo;
+	private String orderNo;
 	/**
 	 * 退款类型来源code
 	 */

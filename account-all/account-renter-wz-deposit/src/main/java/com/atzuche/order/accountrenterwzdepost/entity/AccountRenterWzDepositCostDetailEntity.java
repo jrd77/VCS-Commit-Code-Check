@@ -23,7 +23,7 @@ public class AccountRenterWzDepositCostDetailEntity implements Serializable {
 	/**
 	 * 主订单号
 	 */
-	private Long orderNo;
+	private String orderNo;
 	/**
 	 * 车主子订单
 	 */
@@ -31,7 +31,7 @@ public class AccountRenterWzDepositCostDetailEntity implements Serializable {
 	/**
 	 * 会员号
 	 */
-	private Integer memNo;
+	private String memNo;
 	/**
 	 * 支付方式code
 	 */

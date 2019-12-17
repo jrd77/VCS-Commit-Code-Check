@@ -38,7 +38,7 @@ public class SubmitOrderReq {
     private String conPhone;
     private LocalDateTime rentTime;
     private String srvGetLon;
-    private Integer memNo;
+    private String memNo;
     private Integer reqSource;
     private String reqOs;
     private Integer longitude;
