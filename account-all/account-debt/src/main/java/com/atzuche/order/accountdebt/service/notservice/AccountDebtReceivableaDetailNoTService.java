@@ -1,11 +1,10 @@
 package com.atzuche.order.accountdebt.service.notservice;
 
-import com.atzuche.order.accountdebt.exception.AccountDebtException;
+import com.atzuche.order.accountdebt.exception.AccountDeductDebtDBException;
 import com.atzuche.order.accountdebt.vo.req.AccountDeductDebtReqVO;
 import com.atzuche.order.accountdebt.entity.AccountDebtDetailEntity;
 import com.atzuche.order.accountdebt.entity.AccountDebtReceivableaDetailEntity;
 import com.atzuche.order.accountdebt.mapper.AccountDebtReceivableaDetailMapper;
-import com.autoyol.commons.web.ErrorCode;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -33,7 +32,7 @@ public class AccountDebtReceivableaDetailNoTService {
             AccountDebtReceivableaDetailEntity accountDebtReceivableaDetail =  accountDebtReceivableaDetails.get(i);
             int result = accountDebtReceivableaDetailMapper.insert(accountDebtReceivableaDetail);
             if(result==0){
-                throw new AccountDebtException(ErrorCode.FAILED);
+                throw new AccountDeductDebtDBException();
             }
         }
     }

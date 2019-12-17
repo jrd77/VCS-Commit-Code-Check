@@ -1,7 +1,7 @@
 package com.atzuche.order.accountownercost.service.notservice;
 
 import com.atzuche.order.accountownercost.entity.AccountOwnerCostSettleEntity;
-import com.atzuche.order.accountownercost.exception.AccountOwnerCostException;
+import com.atzuche.order.accountownercost.exception.AccountOwnerCostSettleException;
 import com.atzuche.order.accountownercost.mapper.AccountOwnerCostSettleMapper;
 import com.atzuche.order.accountownercost.vo.req.AccountOwnerCostSettleReqVO;
 import com.autoyol.commons.web.ErrorCode;
@@ -32,13 +32,10 @@ public class AccountOwnerCostSettleNoTService {
     public void insertAccountOwnerCostSettle(AccountOwnerCostSettleReqVO accountOwnerCostSettleReqVO) {
         AccountOwnerCostSettleEntity accountOwnerCostSettle = new AccountOwnerCostSettleEntity();
         BeanUtils.copyProperties(accountOwnerCostSettleReqVO,accountOwnerCostSettle);
-        LocalDateTime now = LocalDateTime.now();
-        accountOwnerCostSettle.setCreateTime(now);
-        accountOwnerCostSettle.setUpdateTime(now);
         accountOwnerCostSettle.setIsDelete(NumberUtils.INTEGER_ZERO);
         int result = accountOwnerCostSettleMapper.insert(accountOwnerCostSettle);
         if(result==0){
-            throw new AccountOwnerCostException(ErrorCode.FAILED);
+            throw new AccountOwnerCostSettleException();
         }
     }
 }
