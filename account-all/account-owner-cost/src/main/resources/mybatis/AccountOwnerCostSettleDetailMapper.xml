@@ -44,11 +44,6 @@
 		select <include refid="Base_Column_List" /> from account_owner_cost_settle_detail where id = #{value}
 	</select>
 
-	<select id="selectALL" resultMap="BaseResultMap">
-		select  <include refid="Base_Column_List" /> from account_owner_cost_settle_detail order by id desc
-	</select>
-
-	 
 	<insert id="insert" parameterType="com.atzuche.order.accountownercost.entity.AccountOwnerCostSettleDetailEntity" useGeneratedKeys="true" keyProperty="id">
 		insert into account_owner_cost_settle_detail
 		(
@@ -84,81 +79,5 @@
 			)
 	</insert>
 	
-	<insert id="insertSelective" parameterType="com.atzuche.order.accountownercost.entity.AccountOwnerCostSettleDetailEntity" useGeneratedKeys="true" keyProperty="id">
-		insert into account_owner_cost_settle_detail
-		(
-				<if test="orderNo != null">`order_no`, </if>
-				<if test="ownerOrderNo != null">`owner_order_no`, </if>
-				<if test="memNo != null">`mem_no`, </if>
-				<if test="amt != null">`amt`, </if>
-				<if test="sourceCode != null">`source_code`, </if>
-				<if test="sourceDetail != null">`source_detail`, </if>
-				<if test="uniqueNo != null">`unique_no`, </if>
-				<if test="costType != null">`cost_type`, </if>
-				<if test="createTime != null">`create_time`, </if>
-				<if test="createOp != null">`create_op`, </if>
-				<if test="updateTime != null">`update_time`, </if>
-				<if test="updateOp != null">`update_op`, </if>
-				<if test="isDelete != null">`is_delete` </if>
-			)
-		values
-		(
-				<if test="orderNo != null">#{orderNo},  </if>
-				<if test="ownerOrderNo != null">#{ownerOrderNo},  </if>
-				<if test="memNo != null">#{memNo},  </if>
-				<if test="amt != null">#{amt},  </if>
-				<if test="sourceCode != null">#{sourceCode},  </if>
-				<if test="sourceDetail != null">#{sourceDetail},  </if>
-				<if test="uniqueNo != null">#{uniqueNo},  </if>
-				<if test="costType != null">#{costType},  </if>
-				<if test="createTime != null">#{createTime},  </if>
-				<if test="createOp != null">#{createOp},  </if>
-				<if test="updateTime != null">#{updateTime},  </if>
-				<if test="updateOp != null">#{updateOp},  </if>
-				<if test="isDelete != null">#{isDelete} </if>
-			)
-	</insert>
-	
-	 
-	<update id="updateByPrimaryKeySelective" parameterType="com.atzuche.order.accountownercost.entity.AccountOwnerCostSettleDetailEntity">
-		update account_owner_cost_settle_detail 
-		<set>
-				<if test="orderNo != null">`order_no` = #{orderNo}, </if>
-				<if test="ownerOrderNo != null">`owner_order_no` = #{ownerOrderNo}, </if>
-				<if test="memNo != null">`mem_no` = #{memNo}, </if>
-				<if test="amt != null">`amt` = #{amt}, </if>
-				<if test="sourceCode != null">`source_code` = #{sourceCode}, </if>
-				<if test="sourceDetail != null">`source_detail` = #{sourceDetail}, </if>
-				<if test="uniqueNo != null">`unique_no` = #{uniqueNo}, </if>
-				<if test="costType != null">`cost_type` = #{costType}, </if>
-				<if test="createTime != null">`create_time` = #{createTime}, </if>
-				<if test="createOp != null">`create_op` = #{createOp}, </if>
-				<if test="updateTime != null">`update_time` = #{updateTime}, </if>
-				<if test="updateOp != null">`update_op` = #{updateOp}, </if>
-				<if test="isDelete != null">`is_delete` = #{isDelete}</if>
-			</set>
-		where id = #{id}
-	</update>
-	
-	<update id="updateByPrimaryKey" parameterType="com.atzuche.order.accountownercost.entity.AccountOwnerCostSettleDetailEntity">
-		update account_owner_cost_settle_detail 
-		<set>
-				`order_no` = #{orderNo}, 		
-				`owner_order_no` = #{ownerOrderNo}, 		
-				`mem_no` = #{memNo}, 		
-				`amt` = #{amt}, 		
-				`source_code` = #{sourceCode}, 		
-				`source_detail` = #{sourceDetail}, 		
-				`unique_no` = #{uniqueNo}, 		
-				`cost_type` = #{costType}, 		
-				`create_time` = #{createTime}, 		
-				`create_op` = #{createOp}, 		
-				`update_time` = #{updateTime}, 		
-				`update_op` = #{updateOp}, 		
-				`is_delete` = #{isDelete}		
-	
-		</set>
-		where id = #{id}
-	</update>
-  	
+
 </mapper>

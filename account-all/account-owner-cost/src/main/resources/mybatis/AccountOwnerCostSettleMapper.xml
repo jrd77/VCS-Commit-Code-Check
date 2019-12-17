@@ -41,6 +41,7 @@
 
 	</sql>
 
+
 	<select id="selectByPrimaryKey" resultMap="BaseResultMap">
 		select <include refid="Base_Column_List" /> from account_owner_cost_settle where id = #{value}
 	</select>

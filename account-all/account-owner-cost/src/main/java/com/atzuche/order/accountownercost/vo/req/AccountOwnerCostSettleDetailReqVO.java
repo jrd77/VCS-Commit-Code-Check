@@ -15,7 +15,7 @@ public class AccountOwnerCostSettleDetailReqVO {
     /**
      * 主订单号
      */
-    private Long orderNo;
+    private String orderNo;
     /**
      * 子订单号
      */
@@ -23,7 +23,7 @@ public class AccountOwnerCostSettleDetailReqVO {
     /**
      * 会员号
      */
-    private Integer memNo;
+    private String memNo;
     /**
      * 金额
      */
