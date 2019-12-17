@@ -27,6 +27,6 @@ public interface OrderMapper{
     
     int updateByPrimaryKeySelective(OrderEntity record);
     
-    OrderEntity getParentOrderDetailByOrderNo(@Param("orderNo") Long orderNo);
+    OrderEntity getParentOrderDetailByOrderNo(@Param("orderNo") String orderNo);
 
 }
