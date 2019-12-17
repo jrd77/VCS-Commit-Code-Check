@@ -1,16 +1,15 @@
 package com.atzuche.order.accountdebt.entity;
 
-import lombok.Data;
-
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import lombok.Data;
 
 
 /**
  * 个人历史总额表
  * 
  * @author ZhangBin
- * @date 2019-12-11 17:34:34
+ * @date 2019-12-17 16:13:27
  * @Description:
  */
 @Data
@@ -24,7 +23,7 @@ public class AccountDebtEntity implements Serializable {
 	/**
 	 * 会员号
 	 */
-	private Integer memNo;
+	private String memNo;
 	/**
 	 * 总欠款
 	 */

@@ -14,7 +14,7 @@ public class AccountDeductDebtReqVO {
     /**
      * 会员号
      */
-    private Integer memNo;
+    private String memNo;
     /**
      * 抵扣金额
      */

@@ -30,7 +30,7 @@ public class AccountDebtCatService {
      * @param memNo
      * @return
      */
-    public AccountDebtResVO getAccountDebtByMemNo(Integer memNo) {
+    public AccountDebtResVO getAccountDebtByMemNo(String memNo) {
         log.info("AccountDebtCatService getAccountDebtByMemNo start param [{}]", memNo);
         AccountDebtResVO result = accountDebtService.getAccountDebtByMemNo(memNo);
         log.info("AccountDebtCatService getAccountDebtByMemNo end  param [{}] ，result [{}]", memNo,result);
@@ -42,7 +42,7 @@ public class AccountDebtCatService {
      * @param memNo
      * @return
      */
-    public Integer getAccountDebtNumByMemNo(Integer memNo){
+    public Integer getAccountDebtNumByMemNo(String memNo){
         log.info("AccountDebtCatService getAccountDebtNumByMemNo start param [{}]", memNo);
         Integer result = accountDebtService.getAccountDebtNumByMemNo(memNo);
         log.info("AccountDebtCatService getAccountDebtNumByMemNo end  param [{}] ，result [{}]", memNo,result);

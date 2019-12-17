@@ -4,125 +4,128 @@
 <mapper namespace="com.atzuche.order.accountdebt.mapper.AccountDebtDetailMapper">
 
     <resultMap type="com.atzuche.order.accountdebt.entity.AccountDebtDetailEntity" id="BaseResultMap">
-        <result property="id" column="id"/>
-        <result property="memNo" column="mem_no"/>
-        <result property="orderNo" column="order_no"/>
-        <result property="renterOrderNo" column="renter_order_no"/>
-        <result property="ownerOrderNo" column="owner_order_no"/>
-        <result property="type" column="type"/>
-        <result property="currentDebtAmt" column="current_debt_amt"/>
-        <result property="orderDebtAmt" column="order_debt_amt"/>
-        <result property="repaidDebtAmt" column="repaid_debt_amt"/>
-        <result property="sourceCode" column="source_code"/>
-        <result property="sourceDetail" column="source_detail"/>
-        <result property="version" column="version"/>
-        <result property="deptName" column="dept_name"/>
-        <result property="createTime" column="create_time"/>
-        <result property="createOp" column="create_op"/>
-        <result property="updateTime" column="update_time"/>
-        <result property="updateOp" column="update_op"/>
-        <result property="isDelete" column="is_delete"/>
-    </resultMap>
+                    <result property="id" column="id"/>
+                    <result property="memNo" column="mem_no"/>
+                    <result property="orderNo" column="order_no"/>
+                    <result property="renterOrderNo" column="renter_order_no"/>
+                    <result property="ownerOrderNo" column="owner_order_no"/>
+                    <result property="type" column="type"/>
+                    <result property="currentDebtAmt" column="current_debt_amt"/>
+                    <result property="orderDebtAmt" column="order_debt_amt"/>
+                    <result property="repaidDebtAmt" column="repaid_debt_amt"/>
+                    <result property="sourceCode" column="source_code"/>
+                    <result property="sourceDetail" column="source_detail"/>
+                    <result property="version" column="version"/>
+                    <result property="deptName" column="dept_name"/>
+                    <result property="createTime" column="create_time"/>
+                    <result property="createOp" column="create_op"/>
+                    <result property="updateTime" column="update_time"/>
+                    <result property="updateOp" column="update_op"/>
+                    <result property="isDelete" column="is_delete"/>
+            </resultMap>
 
 
-	<sql id="Base_Column_List">
-	`id`, 	
-	`mem_no`, 	
-	`order_no`, 	
-	`renter_order_no`, 	
-	`owner_order_no`, 	
-	`type`, 	
-	`current_debt_amt`, 	
-	`order_debt_amt`, 	
-	`repaid_debt_amt`, 	
-	`source_code`, 	
-	`source_detail`, 	
-	`version`, 	
-	`dept_name`, 	
-	`create_time`, 	
-	`create_op`, 	
-	`update_time`, 	
-	`update_op`, 	
-	`is_delete`	
-
+    <sql id="Base_Column_List">
+	`id`, 
+    	`mem_no`, 
+    	`order_no`, 
+    	`renter_order_no`, 
+    	`owner_order_no`, 
+    	`type`, 
+    	`current_debt_amt`, 
+    	`order_debt_amt`, 
+    	`repaid_debt_amt`, 
+    	`source_code`, 
+    	`source_detail`, 
+    	`version`, 
+    	`dept_name`, 
+    	`create_time`, 
+    	`create_op`, 
+    	`update_time`, 
+    	`update_op`, 
+    	`is_delete`
+    
 	</sql>
 
 
-	<select id="selectByPrimaryKey" resultMap="BaseResultMap">
-		select <include refid="Base_Column_List" /> from account_debt_detail where id = #{value}
-	</select>
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List" /> from account_debt_detail where id = #{value}
+    </select>
 
-
-	<insert id="insert" parameterType="com.atzuche.order.accountdebt.entity.AccountDebtDetailEntity" useGeneratedKeys="true" keyProperty="id">
+    <insert id="insert" parameterType="com.atzuche.order.accountdebt.entity.AccountDebtDetailEntity" useGeneratedKeys="true" keyProperty="id">
 		insert into account_debt_detail
 		(
-				`mem_no`,		
-				`order_no`,		
-				`renter_order_no`,		
-				`owner_order_no`,		
-				`type`,		
-				`current_debt_amt`,		
-				`order_debt_amt`,		
-				`repaid_debt_amt`,		
-				`source_code`,		
-				`source_detail`,		
-				`version`,		
-				`dept_name`,		
-				`create_time`,		
-				`create_op`,		
-				`update_time`,		
-				`update_op`,		
-				`is_delete`		
-			)
+                    		`mem_no`,
+                    		`order_no`,
+                    		`renter_order_no`,
+                    		`owner_order_no`,
+                    		`type`,
+                    		`current_debt_amt`,
+                    		`order_debt_amt`,
+                    		`repaid_debt_amt`,
+                    		`source_code`,
+                    		`source_detail`,
+                    		`version`,
+                    		`dept_name`,
+                    		`create_time`,
+                    		`create_op`,
+                    		`update_time`,
+                    		`update_op`,
+                    		`is_delete`
+            		)
 		values
 		(
-				#{memNo}, 		
-				#{orderNo}, 		
-				#{renterOrderNo}, 		
-				#{ownerOrderNo}, 		
-				#{type}, 		
-				#{currentDebtAmt}, 		
-				#{orderDebtAmt}, 		
-				#{repaidDebtAmt}, 		
-				#{sourceCode}, 		
-				#{sourceDetail}, 		
-				#{version}, 		
-				#{deptName}, 		
-				#{createTime}, 		
-				#{createOp}, 		
-				#{updateTime}, 		
-				#{updateOp}, 		
-				#{isDelete}		
-			)
+                    		#{memNo}, 
+                    		#{orderNo}, 
+                    		#{renterOrderNo}, 
+                    		#{ownerOrderNo}, 
+                    		#{type}, 
+                    		#{currentDebtAmt}, 
+                    		#{orderDebtAmt}, 
+                    		#{repaidDebtAmt}, 
+                    		#{sourceCode}, 
+                    		#{sourceDetail}, 
+                    		#{version}, 
+                    		#{deptName}, 
+                    		#{createTime}, 
+                    		#{createOp}, 
+                    		#{updateTime}, 
+                    		#{updateOp}, 
+                    		#{isDelete}
+            		)
 	</insert>
-	
-	<update id="updateByPrimaryKeySelective" parameterType="com.atzuche.order.accountdebt.entity.AccountDebtDetailEntity">
-		update account_debt_detail 
-		<set>
-				<if test="memNo != null">`mem_no` = #{memNo}, </if>
-				<if test="orderNo != null">`order_no` = #{orderNo}, </if>
-				<if test="renterOrderNo != null">`renter_order_no` = #{renterOrderNo}, </if>
-				<if test="ownerOrderNo != null">`owner_order_no` = #{ownerOrderNo}, </if>
-				<if test="type != null">`type` = #{type}, </if>
-				<if test="currentDebtAmt != null">`current_debt_amt` = #{currentDebtAmt}, </if>
-				<if test="orderDebtAmt != null">`order_debt_amt` = #{orderDebtAmt}, </if>
-				<if test="repaidDebtAmt != null">`repaid_debt_amt` = #{repaidDebtAmt}, </if>
-				<if test="sourceCode != null">`source_code` = #{sourceCode}, </if>
-				<if test="sourceDetail != null">`source_detail` = #{sourceDetail}, </if>
-				<if test="version != null">`version` = version+1, </if>
-				<if test="deptName != null">`dept_name` = #{deptName}, </if>
-				<if test="createTime != null">`create_time` = #{createTime}, </if>
-				<if test="createOp != null">`create_op` = #{createOp}, </if>
-				<if test="updateTime != null">`update_time` = #{updateTime}, </if>
-				<if test="updateOp != null">`update_op` = #{updateOp}, </if>
-				<if test="isDelete != null">`is_delete` = #{isDelete}</if>
-			</set>
-		where id = #{id} and version = #{version}
-	</update>
+
+
+
+
+    <update id="updateByPrimaryKeySelective" parameterType="com.atzuche.order.accountdebt.entity.AccountDebtDetailEntity">
+        update account_debt_detail
+        <set>
+                     <if test="memNo != null">`mem_no` = #{memNo}, </if>
+                                                                <if test="orderNo != null">`order_no` = #{orderNo}, </if>
+                                                                <if test="renterOrderNo != null">`renter_order_no` = #{renterOrderNo}, </if>
+                                                                <if test="ownerOrderNo != null">`owner_order_no` = #{ownerOrderNo}, </if>
+                                                                <if test="type != null">`type` = #{type}, </if>
+                                                                <if test="currentDebtAmt != null">`current_debt_amt` = #{currentDebtAmt}, </if>
+                                                                <if test="orderDebtAmt != null">`order_debt_amt` = #{orderDebtAmt}, </if>
+                                                                <if test="repaidDebtAmt != null">`repaid_debt_amt` = #{repaidDebtAmt}, </if>
+                                                                <if test="sourceCode != null">`source_code` = #{sourceCode}, </if>
+                                                                <if test="sourceDetail != null">`source_detail` = #{sourceDetail}, </if>
+                       version = #{version},
+                                                                <if test="deptName != null">`dept_name` = #{deptName}, </if>
+                                                                <if test="createTime != null">`create_time` = #{createTime}, </if>
+                                                                <if test="createOp != null">`create_op` = #{createOp}, </if>
+                                                                <if test="updateTime != null">`update_time` = #{updateTime}, </if>
+                                                                <if test="updateOp != null">`update_op` = #{updateOp}, </if>
+                                                                <if test="isDelete != null">`is_delete` = #{isDelete}</if>
+                                    </set>
+        where id = #{id}
+    </update>
 
     <select id="getDebtListByMemNo" resultMap="BaseResultMap">
         select <include refid="Base_Column_List" /> from account_debt_detail where mem_no = #{memNo}
-         and <![CDATA[ order_debt_amt + repaid_debt_amt <>0 ]]>
+        and <![CDATA[ order_debt_amt + repaid_debt_amt <>0 ]]>
     </select>
+
 
 </mapper>

@@ -36,7 +36,7 @@ public class AccountDebtNoTService {
      * @return
      * @throws AccountDeductDebtDBException
      */
-    public AccountDebtResVO getAccountDebtByMemNo(Integer memNo) {
+    public AccountDebtResVO getAccountDebtByMemNo(String memNo) {
         Assert.notNull(memNo, ErrorCode.PARAMETER_ERROR.getText());
         AccountDebtEntity accountDebtEntity =  accountDebtMapper.getAccountDebtByMemNo(memNo);
         if(Objects.isNull(accountDebtEntity) || Objects.isNull(accountDebtEntity.getId())){

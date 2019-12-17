@@ -41,7 +41,7 @@ public class AccountDebtService{
      * @param memNo
      * @return
      */
-    public AccountDebtResVO getAccountDebtByMemNo(Integer memNo) {
+    public AccountDebtResVO getAccountDebtByMemNo(String memNo) {
         return accountDebtNoTService.getAccountDebtByMemNo(memNo);
     }
 
@@ -50,7 +50,7 @@ public class AccountDebtService{
      * @param memNo
      * @return
      */
-    public Integer getAccountDebtNumByMemNo(Integer memNo){
+    public Integer getAccountDebtNumByMemNo(String memNo){
         AccountDebtResVO res = getAccountDebtByMemNo(memNo);
         if(Objects.isNull(res) || Objects.isNull(res.getDebtAmt())){
             return NumberUtils.INTEGER_ZERO;
