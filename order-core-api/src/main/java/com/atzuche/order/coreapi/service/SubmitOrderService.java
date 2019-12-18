@@ -4,6 +4,9 @@ import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.GlobalConstant;
 import com.atzuche.order.commons.LocalDateTimeUtils;
 import com.atzuche.order.commons.entity.dto.*;
+import com.atzuche.order.commons.enums.InternalStaffEnum;
+import com.atzuche.order.commons.enums.OwnerMemRightEnum;
+import com.atzuche.order.commons.enums.RenterMemRightEnum;
 import com.atzuche.order.coreapi.entity.request.SubmitOrderReq;
 import com.atzuche.order.coreapi.enums.SubmitOrderErrorEnum;
 import com.atzuche.order.coreapi.submitOrder.exception.CarDetailByFeignException;
@@ -18,10 +21,7 @@ import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.member.detail.api.MemberDetailFeignService;
 import com.autoyol.member.detail.enums.MemberSelectKeyEnum;
-import com.autoyol.member.detail.vo.res.MemberAuthInfo;
-import com.autoyol.member.detail.vo.res.MemberCoreInfo;
-import com.autoyol.member.detail.vo.res.MemberRoleInfo;
-import com.autoyol.member.detail.vo.res.MemberTotalInfo;
+import com.autoyol.member.detail.vo.res.*;
 import com.dianping.cat.Cat;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -55,7 +55,7 @@ public class SubmitOrderService {
             //获取车主商品信息
             OwnerGoodsDetailDto ownerGoodsDetailDto = getOwnerGoodsDetail(renterGoodsDetailDto);
             //获取车主会员信息
-            OwnerMemberDto ownerMemberDto = getOwnerMemberInfo(submitReqDto);
+            OwnerMemberDto ownerMemberDto = getOwnerMemberInfo(orderContextDto);
             //获取租客会员信息
             RenterMemberDto renterMemberDto = getRenterMemberInfo(submitReqDto);
 
@@ -103,8 +103,8 @@ public class SubmitOrderService {
         //调用车主模块（子订单模块、商品、会员）
         return null;
     }
-
-    public RenterMemberDto getRenterMemberInfo(SubmitOrderReq submitReqDto) throws RenterMemberByFeignException {
+    //获取租客会员信息
+    private RenterMemberDto getRenterMemberInfo(SubmitOrderReq submitReqDto) throws RenterMemberByFeignException {
         List<String> selectKey = Arrays.asList(
                 MemberSelectKeyEnum.MEMBER_CORE_INFO.getKey(),
                 MemberSelectKeyEnum.MEMBER_AUTH_INFO.getKey(),
@@ -114,7 +114,6 @@ public class SubmitOrderService {
         log.info("Feign 开始获取租客会员信息,submitReqDto={}",JSON.toJSONString(submitReqDto));
         try{
             responseData = memberDetailFeignService.getMemberSelectInfo(Integer.valueOf(submitReqDto.getMemNo()), selectKey);
-
         }catch (Exception e){
             log.error("Feign 获取租客会员信息失败,submitReqDto={},responseData={}",JSON.toJSONString(submitReqDto),null,e);
             RenterMemberByFeignException renterMemberByFeignException = new RenterMemberByFeignException(SubmitOrderErrorEnum.FEIGN_GET_RENTER_MEMBER_ERROR.getCode(), SubmitOrderErrorEnum.FEIGN_GET_RENTER_MEMBER_ERROR.getText());
@@ -139,55 +138,102 @@ public class SubmitOrderService {
         renterMemberDto.setCertificationTime(LocalDateTimeUtils.parseStringToLocalDate(memberAuthInfo.getDriLicFirstTime()));
         //renterMemberDto.setOrderSuccessCount();
         List<RenterMemberRightDto> rights = new ArrayList<>();
-
         MemberRoleInfo memberRoleInfo = memberTotalInfo.getMemberRoleInfo();
         if(memberRoleInfo != null){
-            if(memberRoleInfo.getInternalStaff()!=null && memberRoleInfo.getInternalStaff().equals(1)){
-               /* RenterMemberRightDto internalStaff = new RenterMemberRightDto();
+            if(memberRoleInfo.getInternalStaff()!=null){
+                RenterMemberRightDto internalStaff = new RenterMemberRightDto();
                 internalStaff.setRightCode(RenterMemRightEnum.STAFF.getRightCode());
-                internalStaff.setRightName();
-                internalStaff.setRightValue();
-                internalStaff.setRightDesc();
-                rights.add();*/
+                internalStaff.setRightName(RenterMemRightEnum.STAFF.getRightName());
+                //internalStaff.setRightValue(String.valueOf(memberRoleInfo.getInternalStaff()));
+                internalStaff.setRightDesc("是否是内部员工");
+                rights.add(internalStaff);
             }
+            if(memberRoleInfo.getMemberFlag() != null){
+                RenterMemberRightDto internalStaff = new RenterMemberRightDto();
+                internalStaff.setRightCode(RenterMemRightEnum.VIP.getRightCode());
+                internalStaff.setRightName(RenterMemRightEnum.VIP.getRightName());
+                //internalStaff.setRightValue(String.valueOf(memberRoleInfo.getMemberFlag()));
+                internalStaff.setRightDesc("会员标识");
+                rights.add(internalStaff);
+            }
+            if(memberRoleInfo.getCpicMemberFlag() != null){
+                RenterMemberRightDto internalStaff = new RenterMemberRightDto();
+                internalStaff.setRightCode(RenterMemRightEnum.CPIC_MEM.getRightCode());
+                internalStaff.setRightName(RenterMemRightEnum.CPIC_MEM.getRightName());
+                //internalStaff.setRightValue(String.valueOf(memberRoleInfo.getCpicMemberFlag()));
+                internalStaff.setRightDesc("是否太保会员");
+                rights.add(internalStaff);
+            }
+
         }
-
-
-         responseData.getData();
-        return new RenterMemberDto();
+        renterMemberDto.setRenterMemberRightDtoList(rights);
+        return renterMemberDto;
     }
-
-    public OwnerMemberDto getOwnerMemberInfo(SubmitOrderReq submitReqDto) throws RenterMemberByFeignException {
+    //获取车主会员信息
+    private OwnerMemberDto getOwnerMemberInfo(OrderContextDto orderContextDto) throws RenterMemberByFeignException {
         List<String> selectKey = Arrays.asList(
                 MemberSelectKeyEnum.MEMBER_CORE_INFO.getKey(),
-                MemberSelectKeyEnum.MEMBER_AUTH_INFO.getKey(),
                 MemberSelectKeyEnum.MEMBER_BASE_INFO.getKey(),
                 MemberSelectKeyEnum.MEMBER_ROLE_INFO.getKey());
         ResponseData<MemberTotalInfo> responseData = null;
-        log.info("Feign 开始获取车主会员信息,submitReqDto={}",JSON.toJSONString(submitReqDto));
+        log.info("Feign 开始获取车主会员信息,orderContextDto={}",JSON.toJSONString(orderContextDto));
+        String memNo = orderContextDto.getOwnerGoodsDetailDto().getMemNo();
         try{
-            responseData = memberDetailFeignService.getMemberSelectInfo(Integer.valueOf(submitReqDto.getMemNo()), selectKey);
+            responseData = memberDetailFeignService.getMemberSelectInfo(Integer.valueOf(memNo), selectKey);
 
         }catch (Exception e){
-            log.error("Feign 获取车主会员信息失败,submitReqDto={},responseData={}",JSON.toJSONString(submitReqDto),null,e);
+            log.error("Feign 获取车主会员信息失败,orderContextDto={},responseData={}",JSON.toJSONString(orderContextDto),null,e);
             Cat.logError("Feign 获取车主会员信息失败",e);
             throw new OwnerberByFeignException(SubmitOrderErrorEnum.FEIGN_GET_OWNER_MEMBER_ERROR.getCode(),SubmitOrderErrorEnum.FEIGN_GET_OWNER_MEMBER_ERROR.getText());
         }
         if(responseData == null || !ErrorCode.SUCCESS.getCode().equals(responseData.getResCode())){
-            log.error("Feign 获取车主会员信息失败,submitReqDto={},responseData={}",JSON.toJSONString(submitReqDto),JSON.toJSONString(responseData));
+            log.error("Feign 获取车主会员信息失败,orderContextDto={},responseData={}",JSON.toJSONString(orderContextDto),JSON.toJSONString(responseData));
             OwnerberByFeignException ownerberByFeignException = new OwnerberByFeignException(SubmitOrderErrorEnum.FEIGN_GET_OWNER_MEMBER_FAIL.getCode(), SubmitOrderErrorEnum.FEIGN_GET_OWNER_MEMBER_FAIL.getText());
             Cat.logError("Feign 获取车主会员信息失败",ownerberByFeignException);
             throw ownerberByFeignException;
         }
-        responseData.getData();
-
-
-
-        return new OwnerMemberDto();
+        MemberTotalInfo memberTotalInfo = responseData.getData();
+        MemberCoreInfo memberCoreInfo = memberTotalInfo.getMemberCoreInfo();
+        OwnerMemberDto ownerMemberDto = new OwnerMemberDto();
+        ownerMemberDto.setMemNo(memNo);
+        ownerMemberDto.setPhone(memberCoreInfo.getPhone());
+        ownerMemberDto.setHeaderUrl(memberCoreInfo.getPortraitPath());
+        ownerMemberDto.setRealName(memberCoreInfo.getRealName());
+        ownerMemberDto.setNickName(memberCoreInfo.getNickName());
+        //ownerMemberDto.setOrderSuccessCount();
+        List<OwnerMemberRightDto> rights = new ArrayList<>();
+        MemberRoleInfo memberRoleInfo = memberTotalInfo.getMemberRoleInfo();
+        if(memberRoleInfo != null){
+            if(memberRoleInfo.getInternalStaff()!=null){
+                OwnerMemberRightDto internalStaff = new OwnerMemberRightDto();
+                internalStaff.setRightCode(OwnerMemRightEnum.STAFF.getRightCode());
+                internalStaff.setRightName(OwnerMemRightEnum.STAFF.getRightName());
+                //internalStaff.setRightValue(String.valueOf(memberRoleInfo.getInternalStaff()));
+                internalStaff.setRightDesc("是否是内部员工");
+                rights.add(internalStaff);
+            }
+            if(memberRoleInfo.getMemberFlag() != null){
+                OwnerMemberRightDto internalStaff = new OwnerMemberRightDto();
+                internalStaff.setRightCode(OwnerMemRightEnum.VIP.getRightCode());
+                internalStaff.setRightName(OwnerMemRightEnum.VIP.getRightName());
+                //internalStaff.setRightValue(String.valueOf(memberRoleInfo.getMemberFlag()));
+                internalStaff.setRightDesc("会员标识");
+                rights.add(internalStaff);
+            }
+            if(memberRoleInfo.getCpicMemberFlag() != null){
+                OwnerMemberRightDto internalStaff = new OwnerMemberRightDto();
+                internalStaff.setRightCode(OwnerMemRightEnum.CPIC_MEM.getRightCode());
+                internalStaff.setRightName(OwnerMemRightEnum.CPIC_MEM.getRightName());
+                //internalStaff.setRightValue(String.valueOf(memberRoleInfo.getCpicMemberFlag()));
+                internalStaff.setRightDesc("是否太保会员");
+                rights.add(internalStaff);
+            }
+        }
+        ownerMemberDto.setOwnerMemberRightDtoList(rights);
+        return ownerMemberDto;
     }
-
-
-    public RenterGoodsDetailDto getRenterGoodsDetail(SubmitOrderReq submitOrderReq){
+    //获取租客商品信息
+    private RenterGoodsDetailDto getRenterGoodsDetail(SubmitOrderReq submitOrderReq){
         OrderCarInfoParamDTO orderCarInfoParamDTO = new OrderCarInfoParamDTO();
         orderCarInfoParamDTO.setCarNo(submitOrderReq.getCarNo());
         orderCarInfoParamDTO.setCarAddressIndex(Integer.valueOf(submitOrderReq.getCarAddrIndex()));
@@ -249,13 +295,12 @@ public class SubmitOrderService {
         renterGoodsDetailDto.setCarRealLat(carAddressOfTransVO.getRealAddressLat()==null?"":String.valueOf(carAddressOfTransVO.getRealAddressLat()));
         return renterGoodsDetailDto;
     }
-
+    //获取车主商品信息
     private OwnerGoodsDetailDto getOwnerGoodsDetail(RenterGoodsDetailDto renterGoodsDetailDto) throws CarDetailByFeignException, RenterMemberByFeignException {
         OwnerGoodsDetailDto ownerGoodsDetailDto = new OwnerGoodsDetailDto();
         BeanUtils.copyProperties(renterGoodsDetailDto, ownerGoodsDetailDto);
         return ownerGoodsDetailDto;
     }
-
     //获取车辆封面图片路径
     private String getCoverPic(CarDetailImageVO detailImageVO){
         String coverPic = "";
