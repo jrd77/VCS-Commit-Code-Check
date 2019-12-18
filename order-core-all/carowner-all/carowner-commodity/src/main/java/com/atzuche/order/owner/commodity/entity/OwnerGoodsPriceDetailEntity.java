@@ -1,4 +1,4 @@
-package com.atzuche.order.owner.goods.entity;
+package com.atzuche.order.owner.commodity.entity;
 
 import java.io.Serializable;
 import java.time.LocalDate;
@@ -10,7 +10,7 @@ import lombok.Data;
  * 车主端商品概览价格明细表
  * 
  * @author ZhangBin
- * @date 2019-12-11 18:12:50
+ * @date 2019-12-17 20:30:11
  * @Description:
  */
 @Data
@@ -44,7 +44,11 @@ public class OwnerGoodsPriceDetailEntity implements Serializable {
 	/**
 	 * 小时数
 	 */
-	private Integer carHourCount;
+	private Float carHourCount;
+	/**
+	 * 还车时间
+	 */
+	private LocalDateTime revertTime;
 	/**
 	 * 创建时间
 	 */

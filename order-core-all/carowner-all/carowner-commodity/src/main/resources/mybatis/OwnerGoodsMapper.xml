@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.atzuche.order.owner.goods.mapper.OwnerGoodsMapper">
+<mapper namespace="com.atzuche.order.owner.commodity.mapper.OwnerGoodsMapper">
 
-    <resultMap type="com.atzuche.order.owner.goods.entity.OwnerGoodsEntity" id="BaseResultMap">
+    <resultMap type="com.atzuche.order.owner.commodity.entity.OwnerGoodsEntity" id="BaseResultMap">
         <result property="id" column="id"/>
         <result property="orderNo" column="order_no"/>
         <result property="ownerOrderNo" column="owner_order_no"/>
+        <result property="replyFlag" column="reply_flag"/>
         <result property="carNo" column="car_no"/>
         <result property="carPlateNum" column="car_plate_num"/>
         <result property="carBrand" column="car_brand"/>
@@ -21,6 +22,8 @@
         <result property="carSurplusPrice" column="car_surplus_price"/>
         <result property="carUseSpecialPrice" column="car_use_special_price"/>
         <result property="carGuidePrice" column="car_guide_price"/>
+        <result property="carInmsrp" column="car_inmsrp"/>
+        <result property="carTag" column="car_tag"/>
         <result property="carStatus" column="car_status"/>
         <result property="carImageUrl" column="car_image_url"/>
         <result property="carOwnerType" column="car_owner_type"/>
@@ -30,6 +33,7 @@
         <result property="carDesc" column="car_desc"/>
         <result property="carStewardPhone" column="car_steward_phone"/>
         <result property="carCheckStatus" column="car_check_status"/>
+        <result property="carShowAddr" column="car_show_addr"/>
         <result property="carShowLon" column="car_show_lon"/>
         <result property="carShowLat" column="car_show_lat"/>
         <result property="carRealAddr" column="car_real_addr"/>
@@ -48,6 +52,7 @@
 	`id`, 	
 	`order_no`, 	
 	`owner_order_no`, 	
+	`reply_flag`, 	
 	`car_no`, 	
 	`car_plate_num`, 	
 	`car_brand`, 	
@@ -62,6 +67,8 @@
 	`car_surplus_price`, 	
 	`car_use_special_price`, 	
 	`car_guide_price`, 	
+	`car_inmsrp`, 	
+	`car_tag`, 	
 	`car_status`, 	
 	`car_image_url`, 	
 	`car_owner_type`, 	
@@ -71,6 +78,7 @@
 	`car_desc`, 	
 	`car_steward_phone`, 	
 	`car_check_status`, 	
+	`car_show_addr`, 	
 	`car_show_lon`, 	
 	`car_show_lat`, 	
 	`car_real_addr`, 	
@@ -90,16 +98,12 @@
 		select <include refid="Base_Column_List" /> from owner_goods where id = #{value}
 	</select>
 
-	<select id="selectALL" resultMap="BaseResultMap">
-		select  <include refid="Base_Column_List" /> from owner_goods order by id desc
-	</select>
-
-	 
-	<insert id="insert" parameterType="com.atzuche.order.owner.goods.entity.OwnerGoodsEntity" useGeneratedKeys="true" keyProperty="id">
+	<insert id="insert" parameterType="com.atzuche.order.owner.commodity.entity.OwnerGoodsEntity" useGeneratedKeys="true" keyProperty="id">
 		insert into owner_goods
 		(
 				`order_no`,		
 				`owner_order_no`,		
+				`reply_flag`,		
 				`car_no`,		
 				`car_plate_num`,		
 				`car_brand`,		
@@ -114,6 +118,8 @@
 				`car_surplus_price`,		
 				`car_use_special_price`,		
 				`car_guide_price`,		
+				`car_inmsrp`,		
+				`car_tag`,		
 				`car_status`,		
 				`car_image_url`,		
 				`car_owner_type`,		
@@ -123,22 +129,22 @@
 				`car_desc`,		
 				`car_steward_phone`,		
 				`car_check_status`,		
+				`car_show_addr`,		
 				`car_show_lon`,		
 				`car_show_lat`,		
 				`car_real_addr`,		
 				`car_real_lon`,		
 				`car_real_lat`,		
 				`car_addr_index`,		
-				`create_time`,		
-				`create_op`,		
-				`update_time`,		
-				`update_op`,		
-				`is_delete`		
+				`create_op`,
+				`update_op`
+
 			)
 		values
 		(
 				#{orderNo}, 		
 				#{ownerOrderNo}, 		
+				#{replyFlag}, 		
 				#{carNo}, 		
 				#{carPlateNum}, 		
 				#{carBrand}, 		
@@ -153,6 +159,8 @@
 				#{carSurplusPrice}, 		
 				#{carUseSpecialPrice}, 		
 				#{carGuidePrice}, 		
+				#{carInmsrp}, 		
+				#{carTag}, 		
 				#{carStatus}, 		
 				#{carImageUrl}, 		
 				#{carOwnerType}, 		
@@ -162,25 +170,24 @@
 				#{carDesc}, 		
 				#{carStewardPhone}, 		
 				#{carCheckStatus}, 		
+				#{carShowAddr}, 		
 				#{carShowLon}, 		
 				#{carShowLat}, 		
 				#{carRealAddr}, 		
 				#{carRealLon}, 		
 				#{carRealLat}, 		
 				#{carAddrIndex}, 		
-				#{createTime}, 		
-				#{createOp}, 		
-				#{updateTime}, 		
-				#{updateOp}, 		
-				#{isDelete}		
+				#{createOp},
+				#{updateOp}
 			)
 	</insert>
 	
-	<insert id="insertSelective" parameterType="com.atzuche.order.owner.goods.entity.OwnerGoodsEntity" useGeneratedKeys="true" keyProperty="id">
+	<insert id="insertSelective" parameterType="com.atzuche.order.owner.commodity.entity.OwnerGoodsEntity" useGeneratedKeys="true" keyProperty="id">
 		insert into owner_goods
 		(
 				<if test="orderNo != null">`order_no`, </if>
 				<if test="ownerOrderNo != null">`owner_order_no`, </if>
+				<if test="replyFlag != null">`reply_flag`, </if>
 				<if test="carNo != null">`car_no`, </if>
 				<if test="carPlateNum != null">`car_plate_num`, </if>
 				<if test="carBrand != null">`car_brand`, </if>
@@ -195,6 +202,8 @@
 				<if test="carSurplusPrice != null">`car_surplus_price`, </if>
 				<if test="carUseSpecialPrice != null">`car_use_special_price`, </if>
 				<if test="carGuidePrice != null">`car_guide_price`, </if>
+				<if test="carInmsrp != null">`car_inmsrp`, </if>
+				<if test="carTag != null">`car_tag`, </if>
 				<if test="carStatus != null">`car_status`, </if>
 				<if test="carImageUrl != null">`car_image_url`, </if>
 				<if test="carOwnerType != null">`car_owner_type`, </if>
@@ -204,6 +213,7 @@
 				<if test="carDesc != null">`car_desc`, </if>
 				<if test="carStewardPhone != null">`car_steward_phone`, </if>
 				<if test="carCheckStatus != null">`car_check_status`, </if>
+				<if test="carShowAddr != null">`car_show_addr`, </if>
 				<if test="carShowLon != null">`car_show_lon`, </if>
 				<if test="carShowLat != null">`car_show_lat`, </if>
 				<if test="carRealAddr != null">`car_real_addr`, </if>
@@ -220,6 +230,7 @@
 		(
 				<if test="orderNo != null">#{orderNo},  </if>
 				<if test="ownerOrderNo != null">#{ownerOrderNo},  </if>
+				<if test="replyFlag != null">#{replyFlag},  </if>
 				<if test="carNo != null">#{carNo},  </if>
 				<if test="carPlateNum != null">#{carPlateNum},  </if>
 				<if test="carBrand != null">#{carBrand},  </if>
@@ -234,6 +245,8 @@
 				<if test="carSurplusPrice != null">#{carSurplusPrice},  </if>
 				<if test="carUseSpecialPrice != null">#{carUseSpecialPrice},  </if>
 				<if test="carGuidePrice != null">#{carGuidePrice},  </if>
+				<if test="carInmsrp != null">#{carInmsrp},  </if>
+				<if test="carTag != null">#{carTag},  </if>
 				<if test="carStatus != null">#{carStatus},  </if>
 				<if test="carImageUrl != null">#{carImageUrl},  </if>
 				<if test="carOwnerType != null">#{carOwnerType},  </if>
@@ -243,6 +256,7 @@
 				<if test="carDesc != null">#{carDesc},  </if>
 				<if test="carStewardPhone != null">#{carStewardPhone},  </if>
 				<if test="carCheckStatus != null">#{carCheckStatus},  </if>
+				<if test="carShowAddr != null">#{carShowAddr},  </if>
 				<if test="carShowLon != null">#{carShowLon},  </if>
 				<if test="carShowLat != null">#{carShowLat},  </if>
 				<if test="carRealAddr != null">#{carRealAddr},  </if>
@@ -258,11 +272,12 @@
 	</insert>
 	
 	 
-	<update id="updateByPrimaryKeySelective" parameterType="com.atzuche.order.owner.goods.entity.OwnerGoodsEntity">
+	<update id="updateByPrimaryKeySelective" parameterType="com.atzuche.order.owner.commodity.entity.OwnerGoodsEntity">
 		update owner_goods 
 		<set>
 				<if test="orderNo != null">`order_no` = #{orderNo}, </if>
 				<if test="ownerOrderNo != null">`owner_order_no` = #{ownerOrderNo}, </if>
+				<if test="replyFlag != null">`reply_flag` = #{replyFlag}, </if>
 				<if test="carNo != null">`car_no` = #{carNo}, </if>
 				<if test="carPlateNum != null">`car_plate_num` = #{carPlateNum}, </if>
 				<if test="carBrand != null">`car_brand` = #{carBrand}, </if>
@@ -277,6 +292,8 @@
 				<if test="carSurplusPrice != null">`car_surplus_price` = #{carSurplusPrice}, </if>
 				<if test="carUseSpecialPrice != null">`car_use_special_price` = #{carUseSpecialPrice}, </if>
 				<if test="carGuidePrice != null">`car_guide_price` = #{carGuidePrice}, </if>
+				<if test="carInmsrp != null">`car_inmsrp` = #{carInmsrp}, </if>
+				<if test="carTag != null">`car_tag` = #{carTag}, </if>
 				<if test="carStatus != null">`car_status` = #{carStatus}, </if>
 				<if test="carImageUrl != null">`car_image_url` = #{carImageUrl}, </if>
 				<if test="carOwnerType != null">`car_owner_type` = #{carOwnerType}, </if>
@@ -286,6 +303,7 @@
 				<if test="carDesc != null">`car_desc` = #{carDesc}, </if>
 				<if test="carStewardPhone != null">`car_steward_phone` = #{carStewardPhone}, </if>
 				<if test="carCheckStatus != null">`car_check_status` = #{carCheckStatus}, </if>
+				<if test="carShowAddr != null">`car_show_addr` = #{carShowAddr}, </if>
 				<if test="carShowLon != null">`car_show_lon` = #{carShowLon}, </if>
 				<if test="carShowLat != null">`car_show_lat` = #{carShowLat}, </if>
 				<if test="carRealAddr != null">`car_real_addr` = #{carRealAddr}, </if>
@@ -301,11 +319,12 @@
 		where id = #{id}
 	</update>
 	
-	<update id="updateByPrimaryKey" parameterType="com.atzuche.order.owner.goods.entity.OwnerGoodsEntity">
+	<update id="updateByPrimaryKey" parameterType="com.atzuche.order.owner.commodity.entity.OwnerGoodsEntity">
 		update owner_goods 
 		<set>
 				`order_no` = #{orderNo}, 		
 				`owner_order_no` = #{ownerOrderNo}, 		
+				`reply_flag` = #{replyFlag}, 		
 				`car_no` = #{carNo}, 		
 				`car_plate_num` = #{carPlateNum}, 		
 				`car_brand` = #{carBrand}, 		
@@ -320,6 +339,8 @@
 				`car_surplus_price` = #{carSurplusPrice}, 		
 				`car_use_special_price` = #{carUseSpecialPrice}, 		
 				`car_guide_price` = #{carGuidePrice}, 		
+				`car_inmsrp` = #{carInmsrp}, 		
+				`car_tag` = #{carTag}, 		
 				`car_status` = #{carStatus}, 		
 				`car_image_url` = #{carImageUrl}, 		
 				`car_owner_type` = #{carOwnerType}, 		
@@ -329,6 +350,7 @@
 				`car_desc` = #{carDesc}, 		
 				`car_steward_phone` = #{carStewardPhone}, 		
 				`car_check_status` = #{carCheckStatus}, 		
+				`car_show_addr` = #{carShowAddr}, 		
 				`car_show_lon` = #{carShowLon}, 		
 				`car_show_lat` = #{carShowLat}, 		
 				`car_real_addr` = #{carRealAddr}, 		
@@ -344,5 +366,13 @@
 		</set>
 		where id = #{id}
 	</update>
-  	
+
+<!--auto generated by MybatisCodeHelper on 2019-12-18-->
+    <select id="selectByOwnerOrderNo" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from owner_goods
+        where owner_order_no=#{ownerOrderNo} and is_delete = 0 limit 1
+    </select>
+
 </mapper>

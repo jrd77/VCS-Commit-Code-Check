@@ -1,21 +1,21 @@
-package com.atzuche.order.owner.goods.mapper;
+package com.atzuche.order.owner.commodity.mapper;
 
-import com.atzuche.order.owner.goods.entity.OwnerGoodsPriceDetailEntity;
+import com.atzuche.order.owner.commodity.entity.OwnerGoodsPriceDetailEntity;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
 import java.util.List;
 
 /**
  * 车主端商品概览价格明细表
  * 
  * @author ZhangBin
- * @date 2019-12-11 18:12:50
+ * @date 2019-12-17 20:30:11
  */
 @Mapper
 public interface OwnerGoodsPriceDetailMapper{
 
     OwnerGoodsPriceDetailEntity selectByPrimaryKey(Integer id);
-
-    List<OwnerGoodsPriceDetailEntity> selectALL();
 
     int insert(OwnerGoodsPriceDetailEntity record);
     
@@ -24,5 +24,10 @@ public interface OwnerGoodsPriceDetailMapper{
     int updateByPrimaryKey(OwnerGoodsPriceDetailEntity record);
     
     int updateByPrimaryKeySelective(OwnerGoodsPriceDetailEntity record);
+
+    List<OwnerGoodsPriceDetailEntity> selectByOwnerOrderNo(@Param("ownerOrderNo") String ownerOrderNo);
+
+    int insertList(@Param("list")List<OwnerGoodsPriceDetailEntity> list);
+
 
 }

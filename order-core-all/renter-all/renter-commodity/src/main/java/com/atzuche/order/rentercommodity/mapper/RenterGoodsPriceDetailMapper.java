@@ -26,5 +26,7 @@ public interface RenterGoodsPriceDetailMapper{
 
     List<RenterGoodsPriceDetailEntity> selectByRenterOrderNo(@Param("renterOrderNo")String renterOrderNo);
 
+    int insertList(@Param("list")List<RenterGoodsPriceDetailEntity> list);
+
 
 }

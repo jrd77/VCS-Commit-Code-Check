@@ -15,8 +15,6 @@ dependencies {
 }
 subprojects {
     dependencies {
-        compile project(":util-all:order-commons")
-        compile project(":util-all:fee-calculator")
         compile project(":order-core-all:parent-order")
     }
 }

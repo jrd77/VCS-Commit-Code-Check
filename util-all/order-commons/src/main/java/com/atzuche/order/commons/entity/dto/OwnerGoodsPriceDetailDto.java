@@ -14,7 +14,7 @@ public class OwnerGoodsPriceDetailDto {
     /**
      * 子订单号
      */
-    private String renterOrderNo;
+    private String ownerOrderNo;
     /**
      * 商品概览id
      */

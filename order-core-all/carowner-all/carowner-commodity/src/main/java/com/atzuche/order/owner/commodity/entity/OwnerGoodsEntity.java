@@ -1,4 +1,4 @@
-package com.atzuche.order.owner.goods.entity;
+package com.atzuche.order.owner.commodity.entity;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -9,7 +9,7 @@ import lombok.Data;
  * 车主端商品概览表
  * 
  * @author ZhangBin
- * @date 2019-12-11 18:12:50
+ * @date 2019-12-17 20:30:11
  * @Description:
  */
 @Data
@@ -28,6 +28,10 @@ public class OwnerGoodsEntity implements Serializable {
 	 * 子订单号
 	 */
 	private String ownerOrderNo;
+	/**
+	 * 应答标识位，0未设置，1已设置
+	 */
+	private Integer replyFlag;
 	/**
 	 * 车辆号
 	 */
@@ -85,6 +89,14 @@ public class OwnerGoodsEntity implements Serializable {
 	 */
 	private Integer carGuidePrice;
 	/**
+	 * 保费计算用购置价
+	 */
+	private Integer carInmsrp;
+	/**
+	 * 车辆标签
+	 */
+	private String carTag;
+	/**
 	 * 车辆状态
 	 */
 	private Integer carStatus;
@@ -120,6 +132,10 @@ public class OwnerGoodsEntity implements Serializable {
 	 * 车辆检测状态
 	 */
 	private Integer carCheckStatus;
+	/**
+	 * 车辆显示地址
+	 */
+	private String carShowAddr;
 	/**
 	 * 车辆显示经度
 	 */
