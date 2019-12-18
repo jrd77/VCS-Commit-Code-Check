@@ -1,4 +1,4 @@
-package com.atzuche.order.accountrenterdeposit.vo.req;
+package com.atzuche.order.accountrenterwzdepost.vo.req;
 
 import com.autoyol.commons.web.ErrorCode;
 import lombok.Data;
@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
  * 支付成功 回调 记录实付付车俩押金
  */
 @Data
-public class PayedOrderRenterDepositReqVO {
+public class PayedOrderRenterWZDepositReqVO {
     /**
      * 主订单号
      */
@@ -19,37 +19,17 @@ public class PayedOrderRenterDepositReqVO {
      * 会员号
      */
     private String memNo;
-    /**
-     * 支付状态
-     */
-    private Integer payStatus;
-    /**
-     * 支付时间
-     */
-    private LocalDateTime payTime;
 
     /**
-     * 实付押金总金额
+     * 实收违章押金
      */
-    private Integer shifuDepositAmt;
+    private Integer shishouDeposit;
     /**
-     * 预授权金额
+     * 是否预授权
      */
-    private Integer authorizeDepositAmt;
+    private Integer isAuthorize;
     /**
-     * 信用支付金额
-     */
-    private Integer creditPayAmt;
-    /**
-     * 剩余押金总额
-     */
-    private Integer surplusDepositAmt;
-    /**
-     * 剩余预授权金额
-     */
-    private Integer surplusAuthorizeDepositAmt;
-    /**
-     * 开启免押
+     * 是否免押
      */
     private Integer isFreeDeposit;
 
@@ -64,9 +44,9 @@ public class PayedOrderRenterDepositReqVO {
     private String updateOp;
 
     /**
-     * 车辆押金进出明细
+     * 违章押金进出明细
      */
-    private PayedOrderRenterDepositDetailReqVO payedOrderRenterDepositDetailReqVO;
+    private PayedOrderRenterDepositWZDetailReqVO payedOrderRenterDepositDetailReqVO;
 
     /**
      * 参数校验
@@ -75,8 +55,6 @@ public class PayedOrderRenterDepositReqVO {
         Assert.notNull(getMemNo(), ErrorCode.PARAMETER_ERROR.getText());
         Assert.notNull(getOrderNo(), ErrorCode.PARAMETER_ERROR.getText());
         Assert.notNull(getIsFreeDeposit(), ErrorCode.PARAMETER_ERROR.getText());
-        Assert.notNull(getPayStatus(), ErrorCode.PARAMETER_ERROR.getText());
-        Assert.notNull(getPayTime(), ErrorCode.PARAMETER_ERROR.getText());
         Assert.notNull(getPayedOrderRenterDepositDetailReqVO(), ErrorCode.PARAMETER_ERROR.getText());
         getPayedOrderRenterDepositDetailReqVO().check();
     }

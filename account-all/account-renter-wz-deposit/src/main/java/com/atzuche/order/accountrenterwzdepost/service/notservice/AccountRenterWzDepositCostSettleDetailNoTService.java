@@ -1,4 +1,4 @@
-package com.atzuche.order.accountrenterwzdepost.service;
+package com.atzuche.order.accountrenterwzdepost.service.notservice;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -12,7 +12,7 @@ import com.atzuche.order.accountrenterwzdepost.mapper.AccountRenterWzDepositCost
  * @date 2019-12-11 17:58:17
  */
 @Service
-public class AccountRenterWzDepositCostSettleDetailService{
+public class AccountRenterWzDepositCostSettleDetailNoTService {
     @Autowired
     private AccountRenterWzDepositCostSettleDetailMapper accountRenterWzDepositCostSettleDetailMapper;
 

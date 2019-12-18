@@ -1,4 +1,4 @@
-package com.atzuche.order.accountrenterdeposit.vo.req;
+package com.atzuche.order.accountrenterwzdepost.vo.req;
 
 import com.autoyol.commons.web.ErrorCode;
 import lombok.Data;
@@ -10,14 +10,15 @@ import java.time.LocalDateTime;
  * 支付成功 回调 押金进出明细
  */
 @Data
-public class PayedOrderRenterDepositDetailReqVO {
+public class PayedOrderRenterDepositWZDetailReqVO {
+
 
     /**
-     *
+     * 主订单号
      */
     private String orderNo;
     /**
-     * 会员号
+     *
      */
     private String memNo;
     /**
@@ -27,48 +28,50 @@ public class PayedOrderRenterDepositDetailReqVO {
     /**
      * 支付渠道
      */
-    private Integer paymentChannel;
+    private Integer payChannel;
     /**
-     * 金额  转移出 为负
+     * 费用编码
+     */
+    private Integer costCode;
+    /**
+     * 费用描述
+     */
+    private String costDetail;
+    /**
+     * 入账金额
      */
     private Integer amt;
     /**
+     * 入账来源编码
+     */
+    private Integer sourceCode;
+    /**
+     * 入账来源编码描述
+     */
+    private String sourceDetail;
+    /**
      * 预授权金额
      */
-    private Integer authorizeDepositAmt;
+    private Integer authorizeAmt;
     /**
      * 预授权到期时间
      */
     private LocalDateTime authorizeExpireTime;
     /**
-     * 信用支付金额
-     */
-    private Integer creditPayAmt;
-    /**
-     * 信用支付到期时间
-     */
-    private LocalDateTime creditPayExpireTime;
-    /**
-     * 押金来源编码
-     */
-    private Integer sourceCode;
-    /**
-     * 押金来源编码描述
-     */
-    private String sourceDetail;
-    /**
-     * 押金凭证
+     * 收银凭证
      */
     private String uniqueNo;
+
     /**
      * 创建人
      */
     private String createOp;
 
     /**
-     *修改人
+     *
      */
     private String updateOp;
+
     /**
      * 参数校验
      */
@@ -76,7 +79,6 @@ public class PayedOrderRenterDepositDetailReqVO {
         Assert.notNull(getMemNo(), ErrorCode.PARAMETER_ERROR.getText());
         Assert.notNull(getOrderNo(), ErrorCode.PARAMETER_ERROR.getText());
         Assert.notNull(getPayment(), ErrorCode.PARAMETER_ERROR.getText());
-        Assert.notNull(getPaymentChannel(), ErrorCode.PARAMETER_ERROR.getText());
         Assert.notNull(getSourceCode(), ErrorCode.PARAMETER_ERROR.getText());
         Assert.notNull(getUniqueNo(), ErrorCode.PARAMETER_ERROR.getText());
         Assert.notNull(getSourceDetail(), ErrorCode.PARAMETER_ERROR.getText());
