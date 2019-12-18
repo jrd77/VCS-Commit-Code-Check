@@ -60,6 +60,10 @@ public class AccountRenterDepositEntity implements Serializable {
 	 * 信用支付金额
 	 */
 	private Integer creditPayAmt;
+    /**
+     * 剩余信用支付金额
+     */
+    private Integer surplusCreditPayAmt;
 	/**
 	 * 剩余押金总额
 	 */

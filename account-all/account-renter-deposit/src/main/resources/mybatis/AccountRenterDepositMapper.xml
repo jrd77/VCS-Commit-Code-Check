@@ -15,6 +15,7 @@
         <result property="shifuDepositAmt" column="shifu_deposit_amt"/>
         <result property="authorizeDepositAmt" column="authorize_deposit_amt"/>
         <result property="creditPayAmt" column="credit_pay_amt"/>
+        <result property="surplusCreditPayAmt" column="surplus_credit_pay_amt"/>
         <result property="surplusDepositAmt" column="surplus_deposit_amt"/>
         <result property="surplusAuthorizeDepositAmt" column="surplus_authorize_deposit_amt"/>
         <result property="isFreeDeposit" column="is_free_deposit"/>
@@ -38,7 +39,8 @@
 	`yingfu_deposit_amt`, 	
 	`shifu_deposit_amt`, 	
 	`authorize_deposit_amt`, 	
-	`credit_pay_amt`, 	
+	`credit_pay_amt`,
+	 surplus_credit_pay_amt,
 	`surplus_deposit_amt`, 	
 	`surplus_authorize_deposit_amt`, 	
 	`is_free_deposit`, 	
@@ -69,7 +71,8 @@
 				`yingfu_deposit_amt`,		
 				`shifu_deposit_amt`,		
 				`authorize_deposit_amt`,		
-				`credit_pay_amt`,		
+				`credit_pay_amt`,
+				 surplus_credit_pay_amt,
 				`surplus_deposit_amt`,		
 				`surplus_authorize_deposit_amt`,		
 				`is_free_deposit`,		
@@ -92,7 +95,8 @@
 				#{yingfuDepositAmt}, 		
 				#{shifuDepositAmt}, 		
 				#{authorizeDepositAmt}, 		
-				#{creditPayAmt}, 		
+				#{creditPayAmt},
+				#{surplusCreditPayAmt},
 				#{surplusDepositAmt}, 		
 				#{surplusAuthorizeDepositAmt}, 		
 				#{isFreeDeposit}, 		
@@ -118,7 +122,9 @@
 				<if test="shifuDepositAmt != null">`shifu_deposit_amt` = #{shifuDepositAmt}, </if>
 				<if test="authorizeDepositAmt != null">`authorize_deposit_amt` = #{authorizeDepositAmt}, </if>
 				<if test="creditPayAmt != null">`credit_pay_amt` = #{creditPayAmt}, </if>
-				<if test="surplusDepositAmt != null">`surplus_deposit_amt` = #{surplusDepositAmt}, </if>
+                <if test="surplusCreditPayAmt != null">`surplus_credit_pay_amt` = #{creditPayAmt}, </if>
+
+                <if test="surplusDepositAmt != null">`surplus_deposit_amt` = #{surplusDepositAmt}, </if>
 				<if test="surplusAuthorizeDepositAmt != null">`surplus_authorize_deposit_amt` = #{surplusAuthorizeDepositAmt}, </if>
 				<if test="isFreeDeposit != null">`is_free_deposit` = #{isFreeDeposit}, </if>
                 version = version + 1,

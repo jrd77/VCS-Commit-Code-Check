@@ -62,7 +62,7 @@ public class AccountDebtService{
      * 抵扣历史欠款
      * @return
      */
-    public void deductDebt(AccountDeductDebtReqVO accountDeductDebt) {
+    public int deductDebt(AccountDeductDebtReqVO accountDeductDebt) {
         // 1 参数校验
         Assert.notNull(accountDeductDebt, ErrorCode.PARAMETER_ERROR.getText());
         accountDeductDebt.check();
@@ -78,6 +78,7 @@ public class AccountDebtService{
         accountDebtReceivableaDetailNoTService.insertAlreadyReceivablea(accountDebtReceivableaDetails);
         //7 更新总欠款表
         accountDebtNoTService.deductAccountDebt(accountDeductDebt);
+        return accountDeductDebt.getRealAmt();
     }
 
     /**

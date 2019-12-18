@@ -36,7 +36,7 @@ public class AccountDebtDetailNoTService {
     public List<AccountDebtDetailEntity> getDebtListByMemNo(String memNo){
         List<AccountDebtDetailEntity> result = accountDebtDetailMapper.getDebtListByMemNo(memNo);
         if(CollectionUtils.isEmpty(result)){
-            return Collections.emptyList();
+            throw new AccountDeductDebtDBException();
         }
         return result;
     }
@@ -70,6 +70,7 @@ public class AccountDebtDetailNoTService {
      */
     public  List<AccountDebtDetailEntity> getDebtListByDebtAll(List<AccountDebtDetailEntity> accountDebtDetailAlls, AccountDeductDebtReqVO accountDeductDebt) {
         int amt = accountDeductDebt.getAmt();
+        Integer realAmt = NumberUtils.INTEGER_ZERO;
         List<AccountDebtDetailEntity>  accountDebtDetailTodos = new ArrayList<>();
         for(int i =0;i<accountDebtDetailAlls.size();i++){
             AccountDebtDetailEntity accountDebtDetailAll = accountDebtDetailAlls.get(i);
@@ -80,20 +81,24 @@ public class AccountDebtDetailNoTService {
                 accountDebtDetailAll.setCurrentDebtAmt(NumberUtils.INTEGER_ZERO);
                 accountDebtDetailAll.setRepaidDebtAmt(Math.abs(accountDebtDetailAll.getOrderDebtAmt()));
                 accountDebtDetailTodos.add(accountDebtDetailAll);
+                realAmt = realAmt + Math.abs(accountDebtDetailAll.getCurrentDebtAmt());
             }
             if(amt==0){
                 accountDebtDetailAll.setCurrentDebtAmt(NumberUtils.INTEGER_ZERO);
                 accountDebtDetailAll.setRepaidDebtAmt(Math.abs(accountDebtDetailAll.getOrderDebtAmt()));
                 accountDebtDetailTodos.add(accountDebtDetailAll);
+                realAmt = realAmt + Math.abs(accountDebtDetailAll.getCurrentDebtAmt());
                 break;
             }
             if(amt<0){
                 accountDebtDetailAll.setCurrentDebtAmt(-Math.abs(amt));
                 accountDebtDetailAll.setRepaidDebtAmt(accountDebtDetailAll.getCurrentDebtAmt()-accountDebtDetailAll.getOrderDebtAmt());
                 accountDebtDetailTodos.add(accountDebtDetailAll);
+                realAmt = realAmt + Math.abs(accountDebtDetailAll.getCurrentDebtAmt()) - Math.abs(amt);
                 break;
             }
         }
+        accountDeductDebt.setRealAmt(realAmt);
         return accountDebtDetailTodos;
     }
 }

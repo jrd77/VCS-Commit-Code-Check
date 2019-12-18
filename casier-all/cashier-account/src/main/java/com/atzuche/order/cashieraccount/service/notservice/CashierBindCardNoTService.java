@@ -1,4 +1,4 @@
-package com.atzuche.order.cashieraccount.service;
+package com.atzuche.order.cashieraccount.service.notservice;
 
 import com.atzuche.order.cashieraccount.entity.CashierBindCardEntity;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +16,7 @@ import java.util.Objects;
  * @date 2019-12-11 11:17:59
  */
 @Service
-public class CashierBindCardService {
+public class CashierBindCardNoTService {
     @Autowired
     private CashierBindCardMapper cashierBindCardMapper;
 
