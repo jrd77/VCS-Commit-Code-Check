@@ -6,6 +6,7 @@ import java.util.List;
 
 @Data
 public class RenterGoodsDetailDto {
+
     /**
      * 应答标识位，0未设置，1已设置
      */

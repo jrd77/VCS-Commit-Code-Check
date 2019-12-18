@@ -12,7 +12,9 @@ import org.springframework.stereotype.Service;
 
 import com.atzuche.order.commons.entity.dto.RenterGoodsPriceDetailDto;
 import com.atzuche.order.commons.enums.RenterCashCodeEnum;
+import com.atzuche.order.rentercost.entity.OrderConsoleCostDetailEntity;
 import com.atzuche.order.rentercost.entity.RenterOrderCostDetailEntity;
+import com.atzuche.order.rentercost.entity.RenterOrderFineDeatailEntity;
 import com.atzuche.order.rentercost.entity.RenterOrderSubsidyDetailEntity;
 import com.atzuche.order.rentercost.entity.dto.AbatementAmtDTO;
 import com.atzuche.order.rentercost.entity.dto.CostBaseDTO;
@@ -20,16 +22,20 @@ import com.atzuche.order.rentercost.entity.dto.DepositAmtDTO;
 import com.atzuche.order.rentercost.entity.dto.ExtraDriverDTO;
 import com.atzuche.order.rentercost.entity.dto.IllegalDepositAmtDTO;
 import com.atzuche.order.rentercost.entity.dto.InsurAmtDTO;
+import com.atzuche.order.rentercost.entity.dto.MileageAmtDTO;
+import com.atzuche.order.rentercost.entity.dto.OilAmtDTO;
 import com.atzuche.order.rentercost.entity.dto.RentAmtDTO;
 import com.atzuche.order.rentercost.exception.RenterCostParameterException;
 import com.autoyol.platformcost.CommonUtils;
 import com.autoyol.platformcost.RenterFeeCalculatorUtils;
+import com.autoyol.platformcost.model.AbatementConfig;
 import com.autoyol.platformcost.model.CarDepositAmtVO;
 import com.autoyol.platformcost.model.CarPriceOfDay;
 import com.autoyol.platformcost.model.DepositText;
 import com.autoyol.platformcost.model.FeeResult;
 import com.autoyol.platformcost.model.IllegalDepositConfig;
 import com.autoyol.platformcost.model.InsuranceConfig;
+import com.autoyol.platformcost.model.OilAverageCostBO;
 import com.dianping.cat.Cat;
 
 import lombok.extern.slf4j.Slf4j;
@@ -42,6 +48,24 @@ public class RenterOrderCostCombineService {
 	private RenterOrderCostDetailService renterOrderCostDetailService;
 	@Autowired
 	private RenterOrderSubsidyDetailService renterOrderSubsidyDetailService;
+	@Autowired
+	private RenterOrderFineDeatailService renterOrderFineDeatailService;
+	@Autowired
+	private OrderConsoleCostDetailService orderConsoleCostDetailService;
+	
+	public static final List<RenterCashCodeEnum> RENTERCASHCODEENUM_LIST = new ArrayList<RenterCashCodeEnum>() {
+
+	{
+        add(RenterCashCodeEnum.RENT_AMT);
+        add(RenterCashCodeEnum.INSURE_TOTAL_PRICES);
+        add(RenterCashCodeEnum.ABATEMENT_INSURE);
+        add(RenterCashCodeEnum.FEE);
+        add(RenterCashCodeEnum.SRV_GET_COST);
+        add(RenterCashCodeEnum.SRV_RETURN_COST);
+        add(RenterCashCodeEnum.MILEAGE_COST_RENTER);
+        add(RenterCashCodeEnum.OIL_COST_RENTER);
+        add(RenterCashCodeEnum.EXTRA_DRIVER_INSURE);
+    }};
 
 	/**
 	 * 获取租金对象列表
@@ -217,6 +241,67 @@ public class RenterOrderCostCombineService {
 		return result;
 	}
 	
+	/**
+	 * 获取超里程费用
+	 * @param mileageAmtDTO
+	 * @return RenterOrderCostDetailEntity
+	 */
+	public RenterOrderCostDetailEntity getMileageAmtEntity(MileageAmtDTO mileageAmtDTO) {
+		log.info("getMileageAmtEntity mileageAmtDTO=[{}]",mileageAmtDTO);
+		if (mileageAmtDTO == null) {
+			log.error("getMileageAmtEntity 获取超里程费用mileageAmtDTO对象为空");
+			Cat.logError("获取超里程费用mileageAmtDTO对象为空", new RenterCostParameterException());
+			throw new RenterCostParameterException();
+		}
+		CostBaseDTO costBaseDTO = mileageAmtDTO.getCostBaseDTO();
+		if (costBaseDTO == null) {
+			log.error("getMileageAmtEntity 获取超里程费用mileageAmtDTO.costBaseDTO对象为空");
+			Cat.logError("获取超里程费用mileageAmtDTO.costBaseDTO对象为空", new RenterCostParameterException());
+			throw new RenterCostParameterException();
+		}
+		// TODO 走配置中心获取
+		Integer configHours = 8;
+		Integer mileageAmt = RenterFeeCalculatorUtils.calMileageAmt(mileageAmtDTO.getDayMileage(), mileageAmtDTO.getGuideDayPrice(), 
+				mileageAmtDTO.getGetmileage(), mileageAmtDTO.getReturnMileage(), costBaseDTO.getStartTime(), costBaseDTO.getEndTime(), configHours);
+		FeeResult feeResult = new FeeResult();
+		feeResult.setTotalFee(mileageAmt);
+		feeResult.setUnitCount(1.0);
+		feeResult.setUnitPrice(mileageAmt);
+		RenterOrderCostDetailEntity result = costBaseConvert(costBaseDTO, feeResult, RenterCashCodeEnum.MILEAGE_COST_RENTER);
+		return result;
+	}
+	
+	
+	/**
+	 * 获取租客油费
+	 * @param mileageAmtDTO
+	 * @return RenterOrderCostDetailEntity
+	 */
+	public RenterOrderCostDetailEntity getOilAmtEntity(OilAmtDTO oilAmtDTO) {
+		log.info("getOilAmtEntity oilAmtDTO=[{}]",oilAmtDTO);
+		if (oilAmtDTO == null) {
+			log.error("getOilAmtEntity 获取租客油费oilAmtDTO对象为空");
+			Cat.logError("获取租客油费oilAmtDTO对象为空", new RenterCostParameterException());
+			throw new RenterCostParameterException();
+		}
+		CostBaseDTO costBaseDTO = oilAmtDTO.getCostBaseDTO();
+		if (costBaseDTO == null) {
+			log.error("getOilAmtEntity 获取租客油费oilAmtDTO.costBaseDTO对象为空");
+			Cat.logError("获取租客油费oilAmtDTO.costBaseDTO对象为空", new RenterCostParameterException());
+			throw new RenterCostParameterException();
+		}
+		// TODO 走配置中心获取
+		List<OilAverageCostBO> oilAverageList = null;
+		Integer oilAmt = RenterFeeCalculatorUtils.calOilAmt(oilAmtDTO.getCityCode(), oilAmtDTO.getOilVolume(), oilAmtDTO.getEngineType(), 
+				oilAmtDTO.getGetOilScale(), oilAmtDTO.getReturnOilScale(), oilAverageList, oilAmtDTO.getOilScaleDenominator());
+		FeeResult feeResult = new FeeResult();
+		feeResult.setTotalFee(oilAmt);
+		feeResult.setUnitCount(1.0);
+		feeResult.setUnitPrice(oilAmt);
+		RenterOrderCostDetailEntity result = costBaseConvert(costBaseDTO, feeResult, RenterCashCodeEnum.OIL_COST_RENTER);
+		return result;
+	}
+	
 	
 	/**
 	 * 获取车辆押金对象
@@ -270,23 +355,35 @@ public class RenterOrderCostCombineService {
 	}
 	
 	
+	
+	
 	/**
-	 * 获取应付
-	 * @param orderNo
-	 * @param renterOrderNo
+	 * 获取租客应付(正常订单流转)
+	 * @param orderNo 主订单号
+	 * @param renterOrderNo 租客订单号
 	 * @return Integer
 	 */
-	public Integer getPayable(String orderNo, String renterOrderNo) {
+	public Integer getPayable(String orderNo, String renterOrderNo, String memNo) {
 		// 获取费用明细
 		List<RenterOrderCostDetailEntity> costList = renterOrderCostDetailService.listRenterOrderCostDetail(orderNo, renterOrderNo);
 		// 获取补贴明细
 		List<RenterOrderSubsidyDetailEntity> subsidyList = renterOrderSubsidyDetailService.listRenterOrderSubsidyDetail(orderNo, renterOrderNo);
+		// 罚金
+		List<RenterOrderFineDeatailEntity> fineList = renterOrderFineDeatailService.listRenterOrderFineDeatail(orderNo, renterOrderNo);
+		// 管理后台补贴
+		List<OrderConsoleCostDetailEntity> consoleCostList = orderConsoleCostDetailService.listOrderConsoleCostDetail(orderNo,memNo);
 		Integer payable = 0;
 		if (costList != null && !costList.isEmpty()) {
 			payable += costList.stream().mapToInt(RenterOrderCostDetailEntity::getTotalAmount).sum();
 		}
 		if (subsidyList != null && !subsidyList.isEmpty()) {
 			payable += subsidyList.stream().mapToInt(RenterOrderSubsidyDetailEntity::getSubsidyAmount).sum();
+		}
+		if (fineList != null && !fineList.isEmpty()) {
+			payable += fineList.stream().mapToInt(RenterOrderFineDeatailEntity::getFineAmount).sum();
+		}
+		if (consoleCostList != null && !consoleCostList.isEmpty()) {
+			payable += consoleCostList.stream().mapToInt(OrderConsoleCostDetailEntity::getSubsidyAmount).sum();
 		}
 		return payable;
 	}
@@ -308,6 +405,10 @@ public class RenterOrderCostCombineService {
 		if (renterCashCodeEnum == null) {
 			return null;
 		}
+		Integer totalFee = feeResult.getTotalFee() == null ? 0:feeResult.getTotalFee();
+		if (RENTERCASHCODEENUM_LIST.contains(renterCashCodeEnum)) {
+			totalFee = -totalFee;
+		}
 		RenterOrderCostDetailEntity result = new RenterOrderCostDetailEntity();
 		result.setOrderNo(costBaseDTO.getOrderNo());
 		result.setRenterOrderNo(costBaseDTO.getRenterOrderNo());
@@ -316,7 +417,7 @@ public class RenterOrderCostCombineService {
 		result.setEndTime(costBaseDTO.getEndTime());
 		result.setUnitPrice(feeResult.getUnitPrice());
 		result.setCount(feeResult.getUnitCount());
-		result.setTotalAmount(-feeResult.getTotalFee());
+		result.setTotalAmount(totalFee);
 		result.setCostCode(renterCashCodeEnum.getCashNo());
 		result.setCostDesc(renterCashCodeEnum.getTxt());
 		return result;

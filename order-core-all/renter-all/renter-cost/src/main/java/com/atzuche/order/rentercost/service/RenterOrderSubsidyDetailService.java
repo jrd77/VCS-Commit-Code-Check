@@ -23,11 +23,20 @@ public class RenterOrderSubsidyDetailService{
 
     /**
      * 获取补贴明细列表
-     * @param orderNo
-     * @param renterOrderNo
+     * @param orderNo 主订单号
+     * @param renterOrderNo 租客订单号
      * @return List<RenterOrderSubsidyDetailEntity>
      */
     public List<RenterOrderSubsidyDetailEntity> listRenterOrderSubsidyDetail(String orderNo, String renterOrderNo) {
     	return renterOrderSubsidyDetailMapper.listRenterOrderSubsidyDetail(orderNo, renterOrderNo);
+    }
+    
+    /**
+     * 保存租客补贴信息
+     * @param renterOrderSubsidyDetailEntity 补贴明细
+     * @return Integer
+     */
+    public Integer saveRenterOrderSubsidyDetail(RenterOrderSubsidyDetailEntity renterOrderSubsidyDetailEntity) {
+    	return renterOrderSubsidyDetailMapper.saveRenterOrderSubsidyDetail(renterOrderSubsidyDetailEntity);
     }
 }

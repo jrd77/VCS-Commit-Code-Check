@@ -9,7 +9,7 @@ import lombok.Data;
  * 租客端会员权益表
  * 
  * @author ZhangBin
- * @date 2019-12-14 17:27:28
+ * @date 2019-12-18 16:15:16
  * @Description:
  */
 @Data
