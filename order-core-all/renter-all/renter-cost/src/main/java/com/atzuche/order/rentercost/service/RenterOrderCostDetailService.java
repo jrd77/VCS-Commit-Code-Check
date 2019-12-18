@@ -29,4 +29,14 @@ public class RenterOrderCostDetailService{
     public Integer saveRenterOrderCostDetailBatch(List<RenterOrderCostDetailEntity> costList) {
     	return renterOrderCostDetailMapper.saveRenterOrderCostDetailBatch(costList);
     }
+    
+    /**
+     * 获取费用明细列表
+     * @param orderNo
+     * @param renterOrderNo
+     * @return
+     */
+    public List<RenterOrderCostDetailEntity> listRenterOrderCostDetail(String orderNo, String renterOrderNo) {
+    	return renterOrderCostDetailMapper.listRenterOrderCostDetail(orderNo, renterOrderNo);
+    }
 }

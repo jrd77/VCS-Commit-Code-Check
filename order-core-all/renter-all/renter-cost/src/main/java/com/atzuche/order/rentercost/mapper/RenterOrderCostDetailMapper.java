@@ -28,4 +28,6 @@ public interface RenterOrderCostDetailMapper{
     int updateByPrimaryKeySelective(RenterOrderCostDetailEntity record);
 
     int saveRenterOrderCostDetailBatch(@Param("costList") List<RenterOrderCostDetailEntity> costList);
+    
+    List<RenterOrderCostDetailEntity> listRenterOrderCostDetail(@Param("orderNo") String orderNo, @Param("renterOrderNo") String renterOrderNo);
 }
