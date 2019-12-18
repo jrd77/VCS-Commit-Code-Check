@@ -120,7 +120,7 @@
 			)
 	</insert>
 	
-	<insert id="insertSelective" parameterType="com.atzuche.order.rentercost.entity.RenterOrderSubsidyDetailEntity" useGeneratedKeys="true" keyProperty="id">
+	<insert id="saveRenterOrderSubsidyDetail" parameterType="com.atzuche.order.rentercost.entity.RenterOrderSubsidyDetailEntity" useGeneratedKeys="true" keyProperty="id">
 		insert into renter_order_subsidy_detail
 		(
 				<if test="orderNo != null">`order_no`, </if>

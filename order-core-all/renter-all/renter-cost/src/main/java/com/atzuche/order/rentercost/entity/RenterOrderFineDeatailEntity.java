@@ -1,4 +1,4 @@
-package com.atzuche.order.renterpenalty.entity;
+package com.atzuche.order.rentercost.entity;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
