@@ -216,5 +216,28 @@
 		</set>
 		where id = #{id}
 	</update>
+	
+	
+	<insert id="saveRenterOrderCostDetailBatch">
+      INSERT INTO renter_order_cost_detail
+		(
+				`order_no`,		
+				`renter_order_no`,		
+				`mem_no`,		
+				`cost_code`,		
+				`cost_desc`,		
+				`start_time`,		
+				`end_time`,		
+				`unit_price`,		
+				`count`,		
+				`total_amount`	
+			)
+      VALUES
+      <foreach collection="costList" item="cost" separator=",">
+      (#{cost.orderNo},#{cost.renterOrderNo},#{cost.memNo},#{cost.costCode},
+      #{cost.costDesc},#{cost.startTime},#{cost.endTime},#{cost.unitPrice},
+      #{cost.count},#{cost.totalAmount})
+      </foreach>
+     </insert>
   	
 </mapper>

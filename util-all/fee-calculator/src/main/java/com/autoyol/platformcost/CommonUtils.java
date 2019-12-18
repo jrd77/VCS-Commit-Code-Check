@@ -40,6 +40,16 @@ public class CommonUtils {
     public static final Integer MULTIPLY=1000;
     // 修改地址距离原地址>1公里需要收费
     private static final Integer MODIFY_ADDR_NEED_CHARGE_DISTANCE = 1;
+    
+    private static final double COEFFICIENT_INIT = 1.0;
+    
+	private static final double COEFFICIENT_NOVICE = 1.2;
+	
+	private static final double EASYCOEFFICIENT_INIT = 1.0;
+    
+	private static final double EASYCOEFFICIENT_NOVICE = 1.3;
+	
+	private static final Integer[] CAR_EASY_TAG = {370,371};
     /**
                * 初始化全面保障费单价配置
      */
@@ -563,6 +573,44 @@ public class CommonUtils {
 		}
 		return carPriceOfDayList.stream().collect(Collectors.collectingAndThen(
 	                    Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(CarPriceOfDay::getCurDate))), ArrayList::new));
+	}
+	
+	
+	/**
+	 * 计算保险系数
+	 * @param driLicFirstTime 初次领证日期
+	 * @return Double
+	 */
+	public static Double getDriveAgeCoefficientByDri(LocalDate driLicFirstTime) {
+		Double coefficient = COEFFICIENT_INIT;
+		if (driLicFirstTime != null) {
+			Long begin = driLicFirstTime.toEpochDay();
+			Long end = LocalDate.now().toEpochDay();
+			if (begin != null && end != null && (end - begin) < 365) {
+				coefficient = COEFFICIENT_NOVICE;
+			}
+		}
+		return coefficient;
+	}
+	
+	/**
+	 * 获取跑车/性能车系数
+	 * @param labelIds 车辆标签
+	 * @return Double
+	 */
+	public static Double getEasyCoefficient(List<Integer> labelIds) {
+		Double easyCoefficient = EASYCOEFFICIENT_INIT;
+		if (labelIds == null || labelIds.isEmpty()) {
+			return EASYCOEFFICIENT_INIT;
+		}
+		List<Integer> carEasyTags = Arrays.asList(CAR_EASY_TAG);
+		for (Integer labelId:labelIds) {
+			if (labelId != null && carEasyTags.contains(labelId)) {
+				easyCoefficient = EASYCOEFFICIENT_NOVICE;
+				break;
+			}
+		}
+		return easyCoefficient;
 	}
 	
 	public static void main(String[] args) {

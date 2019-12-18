@@ -151,8 +151,9 @@ public class RenterFeeCalculatorUtils {
 	/**
 	 * 平台手续费
 	 */
-	public Integer calServiceChargeFee() {
-		return SERVICE_CHARGE_FEE;
+	public static FeeResult calServiceChargeFee() {
+		FeeResult feeResult = new FeeResult(SERVICE_CHARGE_FEE, 1.0, SERVICE_CHARGE_FEE);
+		return feeResult;
 	}
 	
 	
@@ -368,8 +369,8 @@ public class RenterFeeCalculatorUtils {
 	 * @param reliefPercetage 减免比例
 	 * @return CarDepositAmtVO
 	 */
-	public static CarDepositAmtVO calCarDepositAmt(Integer InternalStaff, Integer cityCode, Integer guidPrice, Double carBrandTypeRadio, Double carYearRadio, List<DepositText> depositList, Double reliefPercetage) {
-		if (INTERNAL_STAFF_FLAG.equals(InternalStaff)) {
+	public static CarDepositAmtVO calCarDepositAmt(Integer internalStaff, Integer cityCode, Integer guidPrice, Double carBrandTypeRadio, Double carYearRadio, List<DepositText> depositList, Double reliefPercetage) {
+		if (INTERNAL_STAFF_FLAG.equals(internalStaff)) {
 			return calCarDepositAmt();
 		} else {
 			return calCarDepositAmt(cityCode, guidPrice, carBrandTypeRadio, carYearRadio, depositList, reliefPercetage);
