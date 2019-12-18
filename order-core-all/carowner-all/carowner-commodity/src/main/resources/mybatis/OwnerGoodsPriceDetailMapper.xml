@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.atzuche.order.owner.goods.mapper.OwnerGoodsPriceDetailMapper">
+<mapper namespace="com.atzuche.order.owner.commodity.mapper.OwnerGoodsPriceDetailMapper">
 
-    <resultMap type="com.atzuche.order.owner.goods.entity.OwnerGoodsPriceDetailEntity" id="BaseResultMap">
+    <resultMap type="com.atzuche.order.owner.commodity.entity.OwnerGoodsPriceDetailEntity" id="BaseResultMap">
         <result property="id" column="id"/>
         <result property="orderNo" column="order_no"/>
         <result property="ownerOrderNo" column="owner_order_no"/>
@@ -11,6 +11,7 @@
         <result property="carDay" column="car_day"/>
         <result property="carUnitPrice" column="car_unit_price"/>
         <result property="carHourCount" column="car_hour_count"/>
+        <result property="revertTime" column="revert_time"/>
         <result property="createTime" column="create_time"/>
         <result property="createOp" column="create_op"/>
         <result property="updateTime" column="update_time"/>
@@ -27,6 +28,7 @@
 	`car_day`, 	
 	`car_unit_price`, 	
 	`car_hour_count`, 	
+	`revert_time`, 	
 	`create_time`, 	
 	`create_op`, 	
 	`update_time`, 	
@@ -40,12 +42,7 @@
 		select <include refid="Base_Column_List" /> from owner_goods_price_detail where id = #{value}
 	</select>
 
-	<select id="selectALL" resultMap="BaseResultMap">
-		select  <include refid="Base_Column_List" /> from owner_goods_price_detail order by id desc
-	</select>
-
-	 
-	<insert id="insert" parameterType="com.atzuche.order.owner.goods.entity.OwnerGoodsPriceDetailEntity" useGeneratedKeys="true" keyProperty="id">
+	<insert id="insert" parameterType="com.atzuche.order.owner.commodity.entity.OwnerGoodsPriceDetailEntity" useGeneratedKeys="true" keyProperty="id">
 		insert into owner_goods_price_detail
 		(
 				`order_no`,		
@@ -54,6 +51,7 @@
 				`car_day`,		
 				`car_unit_price`,		
 				`car_hour_count`,		
+				`revert_time`,		
 				`create_time`,		
 				`create_op`,		
 				`update_time`,		
@@ -68,6 +66,7 @@
 				#{carDay}, 		
 				#{carUnitPrice}, 		
 				#{carHourCount}, 		
+				#{revertTime}, 		
 				#{createTime}, 		
 				#{createOp}, 		
 				#{updateTime}, 		
@@ -76,7 +75,7 @@
 			)
 	</insert>
 	
-	<insert id="insertSelective" parameterType="com.atzuche.order.owner.goods.entity.OwnerGoodsPriceDetailEntity" useGeneratedKeys="true" keyProperty="id">
+	<insert id="insertSelective" parameterType="com.atzuche.order.owner.commodity.entity.OwnerGoodsPriceDetailEntity" useGeneratedKeys="true" keyProperty="id">
 		insert into owner_goods_price_detail
 		(
 				<if test="orderNo != null">`order_no`, </if>
@@ -85,6 +84,7 @@
 				<if test="carDay != null">`car_day`, </if>
 				<if test="carUnitPrice != null">`car_unit_price`, </if>
 				<if test="carHourCount != null">`car_hour_count`, </if>
+				<if test="revertTime != null">`revert_time`, </if>
 				<if test="createTime != null">`create_time`, </if>
 				<if test="createOp != null">`create_op`, </if>
 				<if test="updateTime != null">`update_time`, </if>
@@ -99,6 +99,7 @@
 				<if test="carDay != null">#{carDay},  </if>
 				<if test="carUnitPrice != null">#{carUnitPrice},  </if>
 				<if test="carHourCount != null">#{carHourCount},  </if>
+				<if test="revertTime != null">#{revertTime},  </if>
 				<if test="createTime != null">#{createTime},  </if>
 				<if test="createOp != null">#{createOp},  </if>
 				<if test="updateTime != null">#{updateTime},  </if>
@@ -108,7 +109,7 @@
 	</insert>
 	
 	 
-	<update id="updateByPrimaryKeySelective" parameterType="com.atzuche.order.owner.goods.entity.OwnerGoodsPriceDetailEntity">
+	<update id="updateByPrimaryKeySelective" parameterType="com.atzuche.order.owner.commodity.entity.OwnerGoodsPriceDetailEntity">
 		update owner_goods_price_detail 
 		<set>
 				<if test="orderNo != null">`order_no` = #{orderNo}, </if>
@@ -117,6 +118,7 @@
 				<if test="carDay != null">`car_day` = #{carDay}, </if>
 				<if test="carUnitPrice != null">`car_unit_price` = #{carUnitPrice}, </if>
 				<if test="carHourCount != null">`car_hour_count` = #{carHourCount}, </if>
+				<if test="revertTime != null">`revert_time` = #{revertTime}, </if>
 				<if test="createTime != null">`create_time` = #{createTime}, </if>
 				<if test="createOp != null">`create_op` = #{createOp}, </if>
 				<if test="updateTime != null">`update_time` = #{updateTime}, </if>
@@ -126,7 +128,7 @@
 		where id = #{id}
 	</update>
 	
-	<update id="updateByPrimaryKey" parameterType="com.atzuche.order.owner.goods.entity.OwnerGoodsPriceDetailEntity">
+	<update id="updateByPrimaryKey" parameterType="com.atzuche.order.owner.commodity.entity.OwnerGoodsPriceDetailEntity">
 		update owner_goods_price_detail 
 		<set>
 				`order_no` = #{orderNo}, 		
@@ -135,6 +137,7 @@
 				`car_day` = #{carDay}, 		
 				`car_unit_price` = #{carUnitPrice}, 		
 				`car_hour_count` = #{carHourCount}, 		
+				`revert_time` = #{revertTime}, 		
 				`create_time` = #{createTime}, 		
 				`create_op` = #{createOp}, 		
 				`update_time` = #{updateTime}, 		
@@ -144,5 +147,40 @@
 		</set>
 		where id = #{id}
 	</update>
-  	
+    <select id="selectByOwnerOrderNo" resultType="com.atzuche.order.owner.commodity.entity.OwnerGoodsPriceDetailEntity">
+        select
+        <include refid="Base_Column_List"/>
+        from owner_goods_price_detail
+        where owner_order_no=#{ownerOrderNo} and is_delete=0 order by car_day asc
+    </select>
+
+<!--auto generated by MybatisCodeHelper on 2019-12-18-->
+    <insert id="insertList">
+        INSERT INTO owner_goods_price_detail(
+        id,
+        order_no,
+        owner_order_no,
+        goods_id,
+        car_day,
+        car_unit_price,
+        car_hour_count,
+        revert_time,
+        create_op,
+        update_op
+        )VALUES
+        <foreach collection="list" item="element" index="index" separator=",">
+            (
+            #{element.id},
+            #{element.orderNo},
+            #{element.ownerOrderNo},
+            #{element.goodsId},
+            #{element.carDay},
+            #{element.carUnitPrice},
+            #{element.carHourCount},
+            #{element.revertTime},
+            #{element.createOp},
+            #{element.updateOp}
+            )
+        </foreach>
+    </insert>
 </mapper>
