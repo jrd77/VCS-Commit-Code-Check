@@ -1,4 +1,4 @@
-package com.atzuche.order.accountdebt.vo.req;
+package com.atzuche.order.cashieraccount.vo.req;
 
 import com.autoyol.commons.web.ErrorCode;
 import lombok.Data;
@@ -9,21 +9,16 @@ import org.springframework.util.Assert;
  * @author haibao.yan
  */
 @Data
-public class AccountDeductDebtReqVO {
+public class CashierDeductDebtReqVO {
 
     /**
      * 会员号
      */
     private String memNo;
     /**
-     * 抵扣金额
+     * 结算剩余可抵扣金额
      */
     private Integer amt;
-
-    /**
-     * 真实抵扣金额
-     */
-    private Integer realAmt;
 
     /**
      * 来源编码描述

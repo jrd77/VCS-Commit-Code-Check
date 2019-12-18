@@ -53,11 +53,12 @@ public class AccountDebtCatService {
      * 抵扣历史欠款
      * @return
      */
-    public void deductDebt(AccountDeductDebtReqVO accountDeductDebt) {
+    public int deductDebt(AccountDeductDebtReqVO accountDeductDebt) {
         log.info("AccountDebtCatService deductDebt start param [{}]", GsonUtils.toJson(accountDeductDebt));
         Transaction t = Cat.newTransaction(Constant.CAT_TRANSACTION_DEDUCT_DEBT, Constant.CAT_TRANSACTION_DEDUCT_DEBT);
+        int debtAmt = 0;
         try {
-            accountDebtService.deductDebt(accountDeductDebt);
+            debtAmt = accountDebtService.deductDebt(accountDeductDebt);
             t.setStatus(Transaction.SUCCESS);
         } catch (Exception e) {
             t.setStatus(e);
@@ -67,6 +68,7 @@ public class AccountDebtCatService {
             t.complete();
         }
         log.info("AccountDebtCatService deductDebt end param [{}]", GsonUtils.toJson(accountDeductDebt));
+        return debtAmt;
     }
 
     /**
