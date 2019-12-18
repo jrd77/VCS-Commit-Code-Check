@@ -1,6 +1,10 @@
 package com.atzuche.order.rentercost.service;
 
+import com.atzuche.order.rentercost.entity.RenterOrderSubsidyDetailEntity;
 import com.atzuche.order.rentercost.mapper.RenterOrderSubsidyDetailMapper;
+
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,4 +21,13 @@ public class RenterOrderSubsidyDetailService{
     private RenterOrderSubsidyDetailMapper renterOrderSubsidyDetailMapper;
 
 
+    /**
+     * 获取补贴明细列表
+     * @param orderNo
+     * @param renterOrderNo
+     * @return List<RenterOrderSubsidyDetailEntity>
+     */
+    public List<RenterOrderSubsidyDetailEntity> listRenterOrderSubsidyDetail(String orderNo, String renterOrderNo) {
+    	return renterOrderSubsidyDetailMapper.listRenterOrderSubsidyDetail(orderNo, renterOrderNo);
+    }
 }

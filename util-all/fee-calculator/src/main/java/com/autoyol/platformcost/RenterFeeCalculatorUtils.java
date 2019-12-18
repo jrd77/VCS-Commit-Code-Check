@@ -353,7 +353,7 @@ public class RenterFeeCalculatorUtils {
 		Integer totalFee = (int) (unitExtraDriverInsure*totalDays*extraDriverCount);
 		FeeResult feeResult = new FeeResult();
 		feeResult.setTotalFee(totalFee);
-		feeResult.setUnitCount((double)totalDays);
+		feeResult.setUnitCount((double)totalDays*extraDriverCount);
 		feeResult.setUnitPrice(unitExtraDriverInsure);
 		return feeResult;
 	}

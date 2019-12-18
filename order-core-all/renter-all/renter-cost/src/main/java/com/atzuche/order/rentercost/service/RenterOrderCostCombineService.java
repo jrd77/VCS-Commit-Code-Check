@@ -7,11 +7,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.atzuche.order.commons.entity.dto.RenterGoodsPriceDetailDto;
 import com.atzuche.order.commons.enums.RenterCashCodeEnum;
 import com.atzuche.order.rentercost.entity.RenterOrderCostDetailEntity;
+import com.atzuche.order.rentercost.entity.RenterOrderSubsidyDetailEntity;
 import com.atzuche.order.rentercost.entity.dto.AbatementAmtDTO;
 import com.atzuche.order.rentercost.entity.dto.CostBaseDTO;
 import com.atzuche.order.rentercost.entity.dto.DepositAmtDTO;
@@ -35,6 +37,11 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @Slf4j
 public class RenterOrderCostCombineService {
+	
+	@Autowired
+	private RenterOrderCostDetailService renterOrderCostDetailService;
+	@Autowired
+	private RenterOrderSubsidyDetailService renterOrderSubsidyDetailService;
 
 	/**
 	 * 获取租金对象列表
@@ -264,6 +271,28 @@ public class RenterOrderCostCombineService {
 	
 	
 	/**
+	 * 获取应付
+	 * @param orderNo
+	 * @param renterOrderNo
+	 * @return Integer
+	 */
+	public Integer getPayable(String orderNo, String renterOrderNo) {
+		// 获取费用明细
+		List<RenterOrderCostDetailEntity> costList = renterOrderCostDetailService.listRenterOrderCostDetail(orderNo, renterOrderNo);
+		// 获取补贴明细
+		List<RenterOrderSubsidyDetailEntity> subsidyList = renterOrderSubsidyDetailService.listRenterOrderSubsidyDetail(orderNo, renterOrderNo);
+		Integer payable = 0;
+		if (costList != null && !costList.isEmpty()) {
+			payable += costList.stream().mapToInt(RenterOrderCostDetailEntity::getTotalAmount).sum();
+		}
+		if (subsidyList != null && !subsidyList.isEmpty()) {
+			payable += subsidyList.stream().mapToInt(RenterOrderSubsidyDetailEntity::getSubsidyAmount).sum();
+		}
+		return payable;
+	}
+	
+	
+	/**
 	 * 数据转化
 	 * @param costBaseDTO 基本参数
 	 * @param feeResult 计算结果对象
@@ -287,7 +316,7 @@ public class RenterOrderCostCombineService {
 		result.setEndTime(costBaseDTO.getEndTime());
 		result.setUnitPrice(feeResult.getUnitPrice());
 		result.setCount(feeResult.getUnitCount());
-		result.setTotalAmount(feeResult.getTotalFee());
+		result.setTotalAmount(-feeResult.getTotalFee());
 		result.setCostCode(renterCashCodeEnum.getCashNo());
 		result.setCostDesc(renterCashCodeEnum.getTxt());
 		return result;
