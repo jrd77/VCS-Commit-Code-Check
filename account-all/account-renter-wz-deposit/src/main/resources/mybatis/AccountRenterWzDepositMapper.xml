@@ -50,10 +50,6 @@
 		select <include refid="Base_Column_List" /> from account_renter_wz_deposit where id = #{value}
 	</select>
 
-	<select id="selectALL" resultMap="BaseResultMap">
-		select  <include refid="Base_Column_List" /> from account_renter_wz_deposit order by id desc
-	</select>
-
 	 
 	<insert id="insert" parameterType="com.atzuche.order.accountrenterwzdepost.entity.AccountRenterWzDepositEntity" useGeneratedKeys="true" keyProperty="id">
 		insert into account_renter_wz_deposit
@@ -96,50 +92,8 @@
 			)
 	</insert>
 	
-	<insert id="insertSelective" parameterType="com.atzuche.order.accountrenterwzdepost.entity.AccountRenterWzDepositEntity" useGeneratedKeys="true" keyProperty="id">
-		insert into account_renter_wz_deposit
-		(
-				<if test="orderNo != null">`order_no`, </if>
-				<if test="memNo != null">`mem_no`, </if>
-				<if test="yingshouDeposit != null">`yingshou_deposit`, </if>
-				<if test="shishouDeposit != null">`shishou_deposit`, </if>
-				<if test="isAuthorize != null">`is_authorize`, </if>
-				<if test="isFreeDeposit != null">`is_free_deposit`, </if>
-				<if test="shouldReturnDeposit != null">`should_return_deposit`, </if>
-				<if test="realReturnDeposit != null">`real_return_deposit`, </if>
-				<if test="settleStatus != null">`settle_status`, </if>
-				<if test="settleTime != null">`settle_time`, </if>
-				<if test="version != null">`version`, </if>
-				<if test="createTime != null">`create_time`, </if>
-				<if test="createOp != null">`create_op`, </if>
-				<if test="updateTime != null">`update_time`, </if>
-				<if test="updateOp != null">`update_op`, </if>
-				<if test="isDelete != null">`is_delete` </if>
-			)
-		values
-		(
-				<if test="orderNo != null">#{orderNo},  </if>
-				<if test="memNo != null">#{memNo},  </if>
-				<if test="yingshouDeposit != null">#{yingshouDeposit},  </if>
-				<if test="shishouDeposit != null">#{shishouDeposit},  </if>
-				<if test="isAuthorize != null">#{isAuthorize},  </if>
-				<if test="isFreeDeposit != null">#{isFreeDeposit},  </if>
-				<if test="shouldReturnDeposit != null">#{shouldReturnDeposit},  </if>
-				<if test="realReturnDeposit != null">#{realReturnDeposit},  </if>
-				<if test="settleStatus != null">#{settleStatus},  </if>
-				<if test="settleTime != null">#{settleTime},  </if>
-				<if test="version != null">#{version},  </if>
-				<if test="createTime != null">#{createTime},  </if>
-				<if test="createOp != null">#{createOp},  </if>
-				<if test="updateTime != null">#{updateTime},  </if>
-				<if test="updateOp != null">#{updateOp},  </if>
-				<if test="isDelete != null">#{isDelete} </if>
-			)
-	</insert>
-	
-	 
 	<update id="updateByPrimaryKeySelective" parameterType="com.atzuche.order.accountrenterwzdepost.entity.AccountRenterWzDepositEntity">
-		update account_renter_wz_deposit 
+		update account_renter_wz_deposit
 		<set>
 				<if test="orderNo != null">`order_no` = #{orderNo}, </if>
 				<if test="memNo != null">`mem_no` = #{memNo}, </if>
@@ -151,38 +105,18 @@
 				<if test="realReturnDeposit != null">`real_return_deposit` = #{realReturnDeposit}, </if>
 				<if test="settleStatus != null">`settle_status` = #{settleStatus}, </if>
 				<if test="settleTime != null">`settle_time` = #{settleTime}, </if>
-				<if test="version != null">`version` = #{version}, </if>
+				version = version +1 ,
 				<if test="createTime != null">`create_time` = #{createTime}, </if>
 				<if test="createOp != null">`create_op` = #{createOp}, </if>
 				<if test="updateTime != null">`update_time` = #{updateTime}, </if>
 				<if test="updateOp != null">`update_op` = #{updateOp}, </if>
 				<if test="isDelete != null">`is_delete` = #{isDelete}</if>
 			</set>
-		where id = #{id}
+		where id = #{id} and version = #{version}
 	</update>
-	
-	<update id="updateByPrimaryKey" parameterType="com.atzuche.order.accountrenterwzdepost.entity.AccountRenterWzDepositEntity">
-		update account_renter_wz_deposit 
-		<set>
-				`order_no` = #{orderNo}, 		
-				`mem_no` = #{memNo}, 		
-				`yingshou_deposit` = #{yingshouDeposit}, 		
-				`shishou_deposit` = #{shishouDeposit}, 		
-				`is_authorize` = #{isAuthorize}, 		
-				`is_free_deposit` = #{isFreeDeposit}, 		
-				`should_return_deposit` = #{shouldReturnDeposit}, 		
-				`real_return_deposit` = #{realReturnDeposit}, 		
-				`settle_status` = #{settleStatus}, 		
-				`settle_time` = #{settleTime}, 		
-				`version` = #{version}, 		
-				`create_time` = #{createTime}, 		
-				`create_op` = #{createOp}, 		
-				`update_time` = #{updateTime}, 		
-				`update_op` = #{updateOp}, 		
-				`is_delete` = #{isDelete}		
-	
-		</set>
-		where id = #{id}
-	</update>
-  	
+    <!-- 根据订单号查询车俩租金信息 -->
+    <select id="selectByOrderAndMemNo" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List" /> from account_renter_wz_deposit where order_no = #{orderNo} and mem_no = #{memNo} order by id desc limit 1
+    </select>
+
 </mapper>

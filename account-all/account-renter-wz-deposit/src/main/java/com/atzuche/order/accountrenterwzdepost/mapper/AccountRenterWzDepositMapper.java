@@ -2,6 +2,8 @@ package com.atzuche.order.accountrenterwzdepost.mapper;
 
 import com.atzuche.order.accountrenterwzdepost.entity.AccountRenterWzDepositEntity;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
 import java.util.List;
 
 /**
@@ -15,14 +17,15 @@ public interface AccountRenterWzDepositMapper{
 
     AccountRenterWzDepositEntity selectByPrimaryKey(Integer id);
 
-    List<AccountRenterWzDepositEntity> selectALL();
-
     int insert(AccountRenterWzDepositEntity record);
-    
-    int insertSelective(AccountRenterWzDepositEntity record);
-
-    int updateByPrimaryKey(AccountRenterWzDepositEntity record);
     
     int updateByPrimaryKeySelective(AccountRenterWzDepositEntity record);
 
+    /**
+     * 根据订单号查询车俩租金信息
+     * @param orderNo
+     * @param memNo
+     * @return
+     */
+    AccountRenterWzDepositEntity selectByOrderAndMemNo(@Param("orderNo") String orderNo, @Param("memNo")String memNo);
 }

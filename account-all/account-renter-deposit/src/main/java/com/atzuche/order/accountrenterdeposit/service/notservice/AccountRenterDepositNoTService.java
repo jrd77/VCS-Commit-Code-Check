@@ -2,7 +2,6 @@ package com.atzuche.order.accountrenterdeposit.service.notservice;
 
 import com.atzuche.order.accountrenterdeposit.entity.AccountRenterDepositEntity;
 import com.atzuche.order.accountrenterdeposit.exception.AccountRenterDepositDBException;
-import com.atzuche.order.accountrenterdeposit.exception.ChangeRenterDepositDBException;
 import com.atzuche.order.accountrenterdeposit.exception.PayOrderRenterDepositDBException;
 import com.atzuche.order.accountrenterdeposit.mapper.AccountRenterDepositMapper;
 import com.atzuche.order.accountrenterdeposit.vo.req.CreateOrderRenterDepositReqVO;
@@ -78,13 +77,13 @@ public class AccountRenterDepositNoTService {
     public void updateRenterDepositChange(PayedOrderRenterDepositDetailReqVO payedOrderRenterDepositDetail) {
         AccountRenterDepositEntity accountRenterDepositEntity = accountRenterDepositMapper.selectByOrderAndMemNo(payedOrderRenterDepositDetail.getOrderNo(),payedOrderRenterDepositDetail.getMemNo());
         if(Objects.isNull(accountRenterDepositEntity)){
-            throw new ChangeRenterDepositDBException();
+            throw new PayOrderRenterDepositDBException();
         }
         if(payedOrderRenterDepositDetail.getAmt() + accountRenterDepositEntity.getSurplusAuthorizeDepositAmt()<0
            && payedOrderRenterDepositDetail.getAmt()+ accountRenterDepositEntity.getSurplusDepositAmt()<0
         ){
             //可用 剩余押金 不足
-            throw new ChangeRenterDepositDBException();
+            throw new PayOrderRenterDepositDBException();
         }
         AccountRenterDepositEntity accountRenterDeposit = new AccountRenterDepositEntity();
         accountRenterDeposit.setId(accountRenterDepositEntity.getId());
@@ -97,7 +96,7 @@ public class AccountRenterDepositNoTService {
         }
         int result =  accountRenterDepositMapper.updateByPrimaryKeySelective(accountRenterDeposit);
         if(result==0){
-            throw new ChangeRenterDepositDBException();
+            throw new PayOrderRenterDepositDBException();
         }
     }
 }
