@@ -1,7 +1,10 @@
-package com.atzuche.order.renterpenalty.mapper;
+package com.atzuche.order.rentercost.mapper;
 
-import com.atzuche.order.renterpenalty.entity.RenterOrderFineDeatailEntity;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
+import com.atzuche.order.rentercost.entity.RenterOrderFineDeatailEntity;
+
 import java.util.List;
 
 /**
@@ -19,10 +22,12 @@ public interface RenterOrderFineDeatailMapper{
 
     int insert(RenterOrderFineDeatailEntity record);
     
-    int insertSelective(RenterOrderFineDeatailEntity record);
+    int saveRenterOrderFineDeatail(RenterOrderFineDeatailEntity record);
 
     int updateByPrimaryKey(RenterOrderFineDeatailEntity record);
     
     int updateByPrimaryKeySelective(RenterOrderFineDeatailEntity record);
+    
+    List<RenterOrderFineDeatailEntity> listRenterOrderFineDeatail(@Param("orderNo") String orderNo, @Param("renterOrderNo") String renterOrderNo);
 
 }
