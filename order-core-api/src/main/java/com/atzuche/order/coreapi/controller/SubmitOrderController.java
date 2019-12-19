@@ -1,6 +1,6 @@
 package com.atzuche.order.coreapi.controller;
 
-import com.atzuche.order.coreapi.entity.request.SubmitOrderReq;
+import com.atzuche.order.coreapi.entity.request.NormalOrderReqVO;
 import com.atzuche.order.coreapi.service.SubmitOrderService;
 import com.autoyol.commons.web.ResponseData;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +19,7 @@ public class SubmitOrderController {
      *
      **/
     @PostMapping("/")
-    public ResponseData submitOrder(@RequestBody SubmitOrderReq submitReqDto){
+    public ResponseData submitOrder(@RequestBody NormalOrderReqVO submitReqDto){
         ResponseData responseData = submitOrderService.submitOrder(submitReqDto);
         return responseData;
     }

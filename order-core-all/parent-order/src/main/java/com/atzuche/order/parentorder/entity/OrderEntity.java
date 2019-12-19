@@ -9,7 +9,7 @@ import lombok.Data;
  * 主订单表
  * 
  * @author ZhangBin
- * @date 2019-12-14 17:52:41
+ * @date 2019-12-19 16:47:30
  * @Description:
  */
 @Data
@@ -41,10 +41,6 @@ public class OrderEntity implements Serializable {
 	 */
 	private Integer memNoRenter;
 	/**
-	 * 配送订单号
-	 */
-	private String orderNoDelivery;
-	/**
 	 * 订单类型（内部分类）1：短租， 2：套餐
 	 */
 	private Integer category;
@@ -55,19 +51,19 @@ public class OrderEntity implements Serializable {
 	/**
 	 * 预计起租时间
 	 */
-	private LocalDateTime expRentStartTime;
+	private LocalDateTime expRentTime;
 	/**
 	 * 预计还车时间
 	 */
-	private LocalDateTime expRentEndTime;
+	private LocalDateTime expRevertTime;
 	/**
 	 * 实际起租时间
 	 */
-	private LocalDateTime actRentStartTime;
+	private LocalDateTime actRentTime;
 	/**
 	 * 实际还车时间
 	 */
-	private LocalDateTime actRentEndTime;
+	private LocalDateTime actRevertTime;
 	/**
 	 * 城市名称
 	 */
@@ -104,6 +100,10 @@ public class OrderEntity implements Serializable {
 	 * 是否违章
 	 */
 	private Integer isWz;
+	/**
+	 * 是否有配送订单
+	 */
+	private Integer isDelivery;
 	/**
 	 * 是否使用机场服务
 	 */
