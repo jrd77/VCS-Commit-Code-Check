@@ -4,7 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.GlobalConstant;
 import com.atzuche.order.commons.LocalDateTimeUtils;
 import com.atzuche.order.commons.entity.dto.*;
-import com.atzuche.order.coreapi.entity.request.SubmitOrderReq;
+import com.atzuche.order.coreapi.entity.request.NormalOrderReqVO;
 import com.atzuche.order.coreapi.enums.SubmitOrderErrorEnum;
 import com.atzuche.order.coreapi.submitOrder.exception.CarDetailByFeignException;
 import com.atzuche.order.coreapi.submitOrder.exception.OwnerberByFeignException;
@@ -45,7 +45,7 @@ public class SubmitOrderService {
     @Autowired
     private CarDetailQueryFeignApi carDetailQueryFeignApi;
 
-    public ResponseData submitOrder(SubmitOrderReq submitReqDto) {
+    public ResponseData submitOrder(NormalOrderReqVO submitReqDto) {
         //调用日志模块 TODO
 
         try{
@@ -104,7 +104,7 @@ public class SubmitOrderService {
         return null;
     }
 
-    public RenterMemberDto getRenterMemberInfo(SubmitOrderReq submitReqDto) throws RenterMemberByFeignException {
+    public RenterMemberDto getRenterMemberInfo(NormalOrderReqVO submitReqDto) throws RenterMemberByFeignException {
         List<String> selectKey = Arrays.asList(
                 MemberSelectKeyEnum.MEMBER_CORE_INFO.getKey(),
                 MemberSelectKeyEnum.MEMBER_AUTH_INFO.getKey(),
@@ -157,7 +157,7 @@ public class SubmitOrderService {
         return new RenterMemberDto();
     }
 
-    public OwnerMemberDto getOwnerMemberInfo(SubmitOrderReq submitReqDto) throws RenterMemberByFeignException {
+    public OwnerMemberDto getOwnerMemberInfo(NormalOrderReqVO submitReqDto) throws RenterMemberByFeignException {
         List<String> selectKey = Arrays.asList(
                 MemberSelectKeyEnum.MEMBER_CORE_INFO.getKey(),
                 MemberSelectKeyEnum.MEMBER_AUTH_INFO.getKey(),
@@ -187,13 +187,14 @@ public class SubmitOrderService {
     }
 
 
-    public RenterGoodsDetailDto getRenterGoodsDetail(SubmitOrderReq submitOrderReq){
+    public RenterGoodsDetailDto getRenterGoodsDetail(NormalOrderReqVO submitOrderReq){
         OrderCarInfoParamDTO orderCarInfoParamDTO = new OrderCarInfoParamDTO();
-        orderCarInfoParamDTO.setCarNo(submitOrderReq.getCarNo());
+        orderCarInfoParamDTO.setCarNo(Integer.parseInt(submitOrderReq.getCarNo()));
         orderCarInfoParamDTO.setCarAddressIndex(Integer.valueOf(submitOrderReq.getCarAddrIndex()));
         orderCarInfoParamDTO.setRentTime(LocalDateTimeUtils.localDateTimeToLong(submitOrderReq.getRentTime()));
         orderCarInfoParamDTO.setRevertTime(LocalDateTimeUtils.localDateTimeToLong(submitOrderReq.getRevertTime()));
-        orderCarInfoParamDTO.setUseSpecialPrice(GlobalConstant.USE_SPECIAL_PRICE.equals(submitOrderReq.getUseSpecialPrice()));
+        //FIXME:
+//        orderCarInfoParamDTO.setUseSpecialPrice(GlobalConstant.USE_SPECIAL_PRICE.equals(submitOrderReq.getUseSpecialPrice()));
         ResponseObject<CarDetailVO> responseObject = null;
         try{
             log.info("Feign 开始获取车辆信息,orderCarInfoParamDTO={}",JSON.toJSONString(orderCarInfoParamDTO));
@@ -230,7 +231,8 @@ public class SubmitOrderService {
         renterGoodsDetailDto.setCarDayMileage(carBaseVO.getDayMileage());
         renterGoodsDetailDto.setCarIntrod(carBaseVO.getCarDesc());
         renterGoodsDetailDto.setCarSurplusPrice(carBaseVO.getSurplusPrice());
-        renterGoodsDetailDto.setCarUseSpecialPrice(Integer.valueOf(submitOrderReq.getUseSpecialPrice()));
+        //FIXME:
+//        renterGoodsDetailDto.setCarUseSpecialPrice(Integer.valueOf(submitOrderReq.getUseSpecialPrice()));
         renterGoodsDetailDto.setCarGuidePrice(carBaseVO.getGuidePrice());
         renterGoodsDetailDto.setCarStatus(carBaseVO.getStatus());
         renterGoodsDetailDto.setCarImageUrl(getCoverPic(detailImageVO));

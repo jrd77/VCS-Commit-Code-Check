@@ -1,12 +1,11 @@
 package com.atzuche.order.coreapi.submitOrder.rules;
 
 import com.atzuche.order.commons.entity.dto.OrderContextDto;
-import com.atzuche.order.coreapi.entity.request.SubmitOrderReq;
+import com.atzuche.order.coreapi.entity.request.NormalOrderReqVO;
 import com.atzuche.order.coreapi.enums.SubmitOrderErrorEnum;
 import com.atzuche.order.coreapi.submitOrder.exception.SubmitOrderException;
 import com.atzuche.order.coreapi.submitOrder.exception.CancleOrderCountException;
 import com.atzuche.order.coreapi.submitOrder.filter.BaseFilter;
-import com.autoyol.commons.web.ErrorCode;
 import org.springframework.stereotype.Component;
 
 /*
@@ -20,7 +19,7 @@ import org.springframework.stereotype.Component;
 public class CancleOrderCountFilter extends BaseFilter {
 
     @Override
-    public boolean validator(SubmitOrderReq submitReqDto, OrderContextDto orderContextDto) throws SubmitOrderException {
+    public boolean validator(NormalOrderReqVO submitReqDto, OrderContextDto orderContextDto) throws SubmitOrderException {
         if(true){
             throw new CancleOrderCountException(SubmitOrderErrorEnum.CANCLE_ORDER_COUNT_ERROR.getCode(), SubmitOrderErrorEnum.CANCLE_ORDER_COUNT_ERROR.getText());
         }

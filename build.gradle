@@ -9,9 +9,10 @@ allprojects {
     sourceCompatibility = 1.8
 
     repositories {
+        mavenCentral()
         maven{url "http://10.0.3.208:8081/nexus/content/groups/public/"}
         maven{url "http://maven.aliyun.com/nexus/content/groups/public/"}
-        mavenCentral()
+
     }
 
 }
@@ -19,6 +20,8 @@ allprojects {
 
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
+    implementation 'org.spockframework:spock-core'
+    implementation 'org.spockframework:spock-core'
 }
 
 // 子模块/项目的统一配置
