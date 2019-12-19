@@ -23,5 +23,6 @@ dependencies {
     compile project(":account-all:account-renter-rentcost")
     compile project(":account-all:account-renter-stopcost")
     compile project(":account-all:account-renter-wz-deposit")
+    compile project(":util-all:order-commons")
 
 }
