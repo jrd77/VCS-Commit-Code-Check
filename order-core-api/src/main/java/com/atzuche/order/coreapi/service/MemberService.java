@@ -1,6 +1,7 @@
 package com.atzuche.order.coreapi.service;
 
 import com.alibaba.fastjson.JSON;
+import com.atzuche.order.commons.CatConstants;
 import com.atzuche.order.commons.LocalDateTimeUtils;
 import com.atzuche.order.commons.entity.dto.OwnerMemberDto;
 import com.atzuche.order.commons.entity.dto.OwnerMemberRightDto;
@@ -21,7 +22,6 @@ import com.autoyol.member.detail.vo.res.MemberCoreInfo;
 import com.autoyol.member.detail.vo.res.MemberRoleInfo;
 import com.autoyol.member.detail.vo.res.MemberTotalInfo;
 import com.dianping.cat.Cat;
-import com.dianping.cat.CatConstants;
 import com.dianping.cat.message.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,8 +51,11 @@ public class MemberService {
                 MemberSelectKeyEnum.MEMBER_ROLE_INFO.getKey());
         ResponseData<MemberTotalInfo> responseData = null;
         log.info("Feign 开始获取车主会员信息,memNo={}",memNo);
-        Transaction t = Cat.newTransaction("REMOTE-METHOD", "GET-REMOTE-MEM-INFO");
+        Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "会员详情服务");
         try{
+            Cat.logEvent(CatConstants.FEIGN_METHOD,"MemberDetailFeignService.getMemberSelectInfo");
+            String parameter = "memNo="+memNo+"&selectKey"+selectKey.toString();
+            Cat.logEvent(CatConstants.FEIGN_PARAM,parameter);
             responseData = memberDetailFeignService.getMemberSelectInfo(Integer.valueOf(memNo), selectKey);
             if(responseData == null || !ErrorCode.SUCCESS.getCode().equals(responseData.getResCode())){
                 log.error("Feign 获取车主会员信息失败,orderContextDto={},memNo={}",memNo, JSON.toJSONString(responseData));
@@ -121,8 +124,11 @@ public class MemberService {
                 MemberSelectKeyEnum.MEMBER_ROLE_INFO.getKey());
         ResponseData<MemberTotalInfo> responseData = null;
         log.info("Feign 开始获取租客会员信息,memNo={}",memNo);
-        Transaction t = Cat.newTransaction("REMOTE-METHOD", "GET-REMOTE-MEM-INFO");
+        Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "会员详情服务");
         try{
+            Cat.logEvent(CatConstants.FEIGN_METHOD,"MemberDetailFeignService.getMemberSelectInfo");
+            String parameter = "memNo="+memNo+"&selectKey"+selectKey.toString();
+            Cat.logEvent(CatConstants.FEIGN_PARAM,parameter);
             responseData = memberDetailFeignService.getMemberSelectInfo(Integer.parseInt(memNo), selectKey);
             if(responseData == null || !ErrorCode.SUCCESS.getCode().equals(responseData.getResCode()) || responseData.getData() == null){
                 log.error("Feign 获取租客会员信息失败,memNo={},responseData={}",memNo,JSON.toJSONString(responseData));
@@ -180,4 +186,5 @@ public class MemberService {
         renterMemberDto.setRenterMemberRightDtoList(rights);
         return renterMemberDto;
     }
+
 }
