@@ -14,9 +14,10 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 
-
-@Service
-public class FilterChain {
+/**
+ * 订单过滤链
+ */
+public class FilterChain implements OrderFilter{
 
 	private List<OrderFilter> filterList = new ArrayList<>();
 
@@ -29,10 +30,10 @@ public class FilterChain {
 		return this;
 	}
 
-	public void doFilter(OrderReqContext context) throws OrderFilterException {
+	@Override
+	public void validate(OrderReqContext context) throws OrderFilterException {
 		for(OrderFilter orderFilter: filterList){
 			orderFilter.validate(context);
 		}
 	}
-
 }
