@@ -3,9 +3,8 @@ package com.atzuche.order.accountownercost.service;
 import com.atzuche.order.accountownercost.service.notservice.AccountOwnerCostSettleNoTService;
 import com.atzuche.order.accountownercost.service.notservice.AccountOwnerCostSettleDetailNoTService;
 import com.atzuche.order.accountownercost.vo.req.AccountOwnerCostSettleReqVO;
-import com.autoyol.commons.utils.GsonUtils;
+import com.autoyol.cat.CatAnnotation;
 import com.autoyol.commons.web.ErrorCode;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
@@ -29,6 +28,7 @@ public class AccountOwnerCostSettleService{
      * 车主结算信息插入
      * @param accountOwnerCostSettleReqVO
      */
+    @CatAnnotation
     public void insertAccountOwnerCostSettle(AccountOwnerCostSettleReqVO accountOwnerCostSettleReqVO){
         //1 校验
         Assert.notNull(accountOwnerCostSettleReqVO, ErrorCode.PARAMETER_ERROR.getText());

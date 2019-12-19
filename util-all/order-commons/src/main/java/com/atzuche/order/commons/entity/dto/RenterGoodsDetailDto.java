@@ -67,7 +67,7 @@ public class RenterGoodsDetailDto {
     /**
      * 是否使用特供价 0-否，1-是
      */
-    private Integer carUseSpecialPrice;
+    private boolean carUseSpecialPrice;
     /**
      * 车辆指导价
      */

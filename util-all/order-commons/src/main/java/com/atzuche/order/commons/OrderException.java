@@ -10,16 +10,33 @@ public abstract class OrderException extends RuntimeException {
 
     private String errorMsg;
 
+    private Object extra;
+
     public OrderException(String errorCode, String errorMsg,Throwable cause) {
         super(cause);
         this.errorCode = errorCode;
         this.errorMsg = errorMsg;
+        this.extra = null;
     }
 
-    public OrderException(String errorCode, String errorMsg) {
+    public OrderException(String errorCode, String errorMsg,Object extra,Throwable cause) {
+        super(cause);
+        this.errorCode = errorCode;
+        this.errorMsg = errorMsg;
+        this.extra = extra;
+    }
+
+    public OrderException(String errorCode, String errorMsg,Object extra) {
         super();
         this.errorCode = errorCode;
         this.errorMsg = errorMsg;
+        this.extra = extra;
+    }
+
+    public OrderException(String errorCode,String errorMsg){
+        super();
+        this.errorCode =errorCode;
+        this.errorMsg =errorMsg;
     }
 
     public String getErrorCode() {
@@ -36,5 +53,13 @@ public abstract class OrderException extends RuntimeException {
 
     public void setErrorMsg(String errorMsg) {
         this.errorMsg = errorMsg;
+    }
+
+    public Object getExtra() {
+        return extra;
+    }
+
+    public void setExtra(Object extra) {
+        this.extra = extra;
     }
 }

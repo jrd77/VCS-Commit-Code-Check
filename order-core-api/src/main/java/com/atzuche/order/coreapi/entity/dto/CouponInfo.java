@@ -6,7 +6,7 @@ package com.atzuche.order.coreapi.entity.dto;
  **/
 public class CouponInfo {
     private CouponType couponType;
-    private String couponCode;
+    private String couponId;
 
     public CouponType getCouponType() {
         return couponType;
@@ -16,19 +16,19 @@ public class CouponInfo {
         this.couponType = couponType;
     }
 
-    public String getCouponCode() {
-        return couponCode;
+    public String getCouponId() {
+        return couponId;
     }
 
-    public void setCouponCode(String couponCode) {
-        this.couponCode = couponCode;
+    public void setCouponId(String couponId) {
+        this.couponId = couponId;
     }
 
     @Override
     public String toString() {
         return "CouponInfo{" +
                 "couponType=" + couponType +
-                ", couponCode='" + couponCode + '\'' +
+                ", couponCode='" + couponId + '\'' +
                 '}';
     }
 }
