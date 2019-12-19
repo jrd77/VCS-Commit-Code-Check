@@ -9,8 +9,8 @@ import lombok.Getter;
  **/
 @Getter
 public enum InternalStaffEnum {
-    is_Staff(1,"internalStaff","是否内部员工","是否内部员工-是内部员工"),
-    NOT_Staff(0,"internalStaff","是否内部员工","是否内部员工-不是内部员工")
+    IS_STAFF(1,"internalStaff","是否内部员工","是否内部员工-是内部员工"),
+    NOT_STAFF(0,"internalStaff","是否内部员工","是否内部员工-不是内部员工")
     ;
 
     InternalStaffEnum(int index, String rightCode, String rightName, String rightDesc) {

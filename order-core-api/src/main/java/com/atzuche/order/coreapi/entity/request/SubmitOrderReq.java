@@ -54,7 +54,7 @@ public class SubmitOrderReq {
     private String FunctionName;
     private String publicCityCode;
     private String OsVersion;
-    private String limitRedStatus;
+    private String limitRedStatus;//限时红包
     private String AppVersion;
     private String OS;
     private String PublicLatitude;

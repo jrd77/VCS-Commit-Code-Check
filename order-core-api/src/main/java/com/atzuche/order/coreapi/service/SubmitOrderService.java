@@ -139,12 +139,13 @@ public class SubmitOrderService {
         //renterMemberDto.setOrderSuccessCount();
         List<RenterMemberRightDto> rights = new ArrayList<>();
         MemberRoleInfo memberRoleInfo = memberTotalInfo.getMemberRoleInfo();
+        MemberBaseInfo memberBaseInfo = memberTotalInfo.getMemberBaseInfo();
         if(memberRoleInfo != null){
             if(memberRoleInfo.getInternalStaff()!=null){
                 RenterMemberRightDto internalStaff = new RenterMemberRightDto();
                 internalStaff.setRightCode(RenterMemRightEnum.STAFF.getRightCode());
                 internalStaff.setRightName(RenterMemRightEnum.STAFF.getRightName());
-                //internalStaff.setRightValue(String.valueOf(memberRoleInfo.getInternalStaff()));
+                internalStaff.setRightValue(JSON.toJSONString(new MemberRightStaffDto(GlobalConstant.MEMBER_RIGHT_STAFF_CAR_DEPOSIT,GlobalConstant.MEMBER_RIGHT_STAFF_WZ_DEPOSIT)));
                 internalStaff.setRightDesc("是否是内部员工");
                 rights.add(internalStaff);
             }
@@ -164,7 +165,16 @@ public class SubmitOrderService {
                 internalStaff.setRightDesc("是否太保会员");
                 rights.add(internalStaff);
             }
-
+        }
+        if(memberBaseInfo != null){
+            if(memberBaseInfo.getRenterRating()!=null){
+                RenterMemberRightDto internalStaff = new RenterMemberRightDto();
+                internalStaff.setRightCode(RenterMemRightEnum.MEM_LEVEL.getRightCode());
+                internalStaff.setRightName(RenterMemRightEnum.MEM_LEVEL.getRightName());
+                internalStaff.setRightValue(String.valueOf(memberBaseInfo.getRenterRating()));
+                internalStaff.setRightDesc("作为租客时的信用评级");
+                rights.add(internalStaff);
+            }
         }
         renterMemberDto.setRenterMemberRightDtoList(rights);
         return renterMemberDto;
@@ -203,12 +213,13 @@ public class SubmitOrderService {
         //ownerMemberDto.setOrderSuccessCount();
         List<OwnerMemberRightDto> rights = new ArrayList<>();
         MemberRoleInfo memberRoleInfo = memberTotalInfo.getMemberRoleInfo();
+        MemberBaseInfo memberBaseInfo = memberTotalInfo.getMemberBaseInfo();
         if(memberRoleInfo != null){
             if(memberRoleInfo.getInternalStaff()!=null){
                 OwnerMemberRightDto internalStaff = new OwnerMemberRightDto();
                 internalStaff.setRightCode(OwnerMemRightEnum.STAFF.getRightCode());
                 internalStaff.setRightName(OwnerMemRightEnum.STAFF.getRightName());
-                //internalStaff.setRightValue(String.valueOf(memberRoleInfo.getInternalStaff()));
+                //internalStaff.setRightValue(JSON.toJSONString(new MemberRightStaffDto(GlobalConstant.MEMBER_RIGHT_STAFF_CAR_DEPOSIT,GlobalConstant.MEMBER_RIGHT_STAFF_WZ_DEPOSIT)));
                 internalStaff.setRightDesc("是否是内部员工");
                 rights.add(internalStaff);
             }
@@ -226,6 +237,16 @@ public class SubmitOrderService {
                 internalStaff.setRightName(OwnerMemRightEnum.CPIC_MEM.getRightName());
                 //internalStaff.setRightValue(String.valueOf(memberRoleInfo.getCpicMemberFlag()));
                 internalStaff.setRightDesc("是否太保会员");
+                rights.add(internalStaff);
+            }
+        }
+        if(memberBaseInfo != null){
+            if(memberBaseInfo.getRenterRating()!=null){
+                OwnerMemberRightDto internalStaff = new OwnerMemberRightDto();
+                internalStaff.setRightCode(RenterMemRightEnum.MEM_LEVEL.getRightCode());
+                internalStaff.setRightName(RenterMemRightEnum.MEM_LEVEL.getRightName());
+                internalStaff.setRightValue(String.valueOf(memberBaseInfo.getRenterRating()));
+                internalStaff.setRightDesc("作为租客时的信用评级");
                 rights.add(internalStaff);
             }
         }
