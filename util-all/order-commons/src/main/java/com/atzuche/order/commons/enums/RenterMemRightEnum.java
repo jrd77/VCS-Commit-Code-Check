@@ -1,6 +1,12 @@
 package com.atzuche.order.commons.enums;
 
+import com.atzuche.order.commons.OrderException;
+import com.atzuche.order.commons.entity.dto.OrderContextDto;
+import com.atzuche.order.commons.entity.dto.RenterMemberRightDto;
 import lombok.Getter;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author <a href="mailto:lianglin.sjtu@gmail.com">AndySjtu</a>
@@ -29,6 +35,5 @@ public enum RenterMemRightEnum {
         this.rightCode = rightCode;
         this.rightName = rightName;
     }
-
 
 }
