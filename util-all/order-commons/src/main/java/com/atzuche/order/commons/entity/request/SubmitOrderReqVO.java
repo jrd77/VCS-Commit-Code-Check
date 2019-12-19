@@ -12,7 +12,7 @@ import java.util.List;
  * 
  **/
 @Data
-public class SubmitOrderReq {
+public class SubmitOrderReqVO {
     private String useSpecialPrice;
     private String srvGetAddr;
     private String srvReturnAddr;

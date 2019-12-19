@@ -1,28 +1,18 @@
 package com.atzuche.order.commons.enums;
 
 import lombok.Getter;
-/*
- * @Author ZhangBin
- * @Date 2019/12/18 15:32
- * @Description: 会员标识枚举类
- *
- **/
+
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 @Getter
 public enum MemberFlagEnum {
-   // member_flag null comment '会员标识 1:优质车主, 2:优质租客, 3:优质租客+优质车主,4:VIP ,5.免TD用户 ',
-    high_quality_owner(1,"member_flag","会员标识","会员标识:优质车主"),
-    high_quality_renter(2,"member_flag","会员标识","会员标识:优质租客"),
-    high_quality_owner_renter(3,"member_flag","会员标识","会员标识:优质租客+优质车主"),
-    vip(4,"member_flag","会员标识","会员标识-VIP"),
-    td(5,"member_flag","会员标识","免TD用户")
-    ;
+    HIGH_QUALITY_OWNER(1,"MF_1","会员标识:优质车主"),
+    HIGH_QUALITY_RENTER(2,"MF_2","会员标识:优质租客"),
+    HIGH_QUALITY_OWNER_RENTER(3,"MF_3","会员标识:优质租客+优质车主"),
+    VIP(4,"MF_4","会员标识:VIP"),
+    TD(5,"MF_5","会员标识:免TD用户");
 
-    MemberFlagEnum(int index, String rightCode, String rightName, String rightDesc) {
-        this.index = index;
-        this.rightCode = rightCode;
-        this.rightName = rightName;
-        this.rightDesc = rightDesc;
-    }
 
     /**
      * 序号
@@ -36,10 +26,18 @@ public enum MemberFlagEnum {
      * 权益名称
      */
     private String rightName;
-    /**
-     * 权益描述
-     */
-    private String rightDesc;
 
+    MemberFlagEnum(int index, String rightCode, String rightName) {
+        this.index = index;
+        this.rightCode = rightCode;
+        this.rightName = rightName;
+    }
 
+    public MemberFlagEnum getRightByIndex(int index){
+        return Stream.of(MemberFlagEnum.values())
+                .filter(x->x.getIndex() == index)
+                .limit(1)
+                .collect(Collectors.toList())
+                .get(0);
+    }
 }

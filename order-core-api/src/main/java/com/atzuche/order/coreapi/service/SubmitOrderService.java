@@ -1,39 +1,15 @@
 package com.atzuche.order.coreapi.service;
 
-import com.alibaba.fastjson.JSON;
-import com.atzuche.order.commons.GlobalConstant;
-import com.atzuche.order.commons.LocalDateTimeUtils;
 import com.atzuche.order.commons.OrderException;
 import com.atzuche.order.commons.entity.dto.*;
-import com.atzuche.order.commons.enums.InternalStaffEnum;
-import com.atzuche.order.commons.enums.OwnerMemRightEnum;
-import com.atzuche.order.commons.enums.RenterMemRightEnum;
 import com.atzuche.order.coreapi.entity.request.SubmitOrderReq;
-import com.atzuche.order.coreapi.enums.SubmitOrderErrorEnum;
-import com.atzuche.order.coreapi.submitOrder.exception.CarDetailByFeignException;
-import com.atzuche.order.coreapi.submitOrder.exception.OwnerberByFeignException;
-import com.atzuche.order.coreapi.submitOrder.exception.RenterMemberByFeignException;
-import com.atzuche.order.coreapi.submitOrder.exception.SubmitOrderException;
 import com.atzuche.order.coreapi.submitOrder.filter.SubmitOrderFilterService;
-import com.atzuche.order.request.NormalOrderReqVO;
 import com.autoyol.car.api.feign.api.CarDetailQueryFeignApi;
-import com.autoyol.car.api.model.dto.OrderCarInfoParamDTO;
-import com.autoyol.car.api.model.vo.*;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
-import com.autoyol.member.detail.api.MemberDetailFeignService;
-import com.autoyol.member.detail.enums.MemberSelectKeyEnum;
-import com.autoyol.member.detail.vo.res.*;
-import com.dianping.cat.Cat;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -55,15 +31,15 @@ public class SubmitOrderService {
         //调用日志模块 TODO
 
         try{
-            OrderContextDto orderContextDto = new OrderContextDto();
+            OrderContextDTO orderContextDto = new OrderContextDTO();
             //获取租客商品信息
-            RenterGoodsDetailDto renterGoodsDetailDto = carService.getRenterGoodsDetail(null);
+            RenterGoodsDetailDTO renterGoodsDetailDto = carService.getRenterGoodsDetail(null);
             //获取车主商品信息
-//            OwnerGoodsDetailDto ownerGoodsDetailDto = carService.getOwnerGoodsDetail(renterGoodsDetailDto);
+//            OwnerGoodsDetailDTO ownerGoodsDetailDto = carService.getOwnerGoodsDetail(renterGoodsDetailDto);
             //获取车主会员信息
-            OwnerMemberDto ownerMemberDto = memberService.getOwnerMemberInfo(submitReqDto.getMemNo());
+            OwnerMemberDTO ownerMemberDto = memberService.getOwnerMemberInfo(submitReqDto.getMemNo());
             //获取租客会员信息
-            RenterMemberDto renterMemberDto = memberService.getRenterMemberInfo(submitReqDto.getMemNo());
+            RenterMemberDTO renterMemberDto = memberService.getRenterMemberInfo(submitReqDto.getMemNo());
 
             //组装数据
             orderContextDto.setRenterGoodsDetailDto(renterGoodsDetailDto);

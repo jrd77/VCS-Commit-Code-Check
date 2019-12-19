@@ -2,8 +2,8 @@ package com.atzuche.order.coreapi.service;
 
 import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.LocalDateTimeUtils;
-import com.atzuche.order.commons.entity.dto.OwnerGoodsDetailDto;
-import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDto;
+import com.atzuche.order.commons.entity.dto.OwnerGoodsDetailDTO;
+import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
 import com.atzuche.order.coreapi.enums.SubmitOrderErrorEnum;
 import com.atzuche.order.coreapi.submitOrder.exception.CarDetailByFeignException;
 import com.atzuche.order.coreapi.submitOrder.exception.RenterMemberByFeignException;
@@ -85,7 +85,7 @@ public class CarService {
     }
 
     //获取租客商品信息
-    public RenterGoodsDetailDto getRenterGoodsDetail(CarDetailReqVO reqVO){
+    public RenterGoodsDetailDTO getRenterGoodsDetail(CarDetailReqVO reqVO){
         OrderCarInfoParamDTO orderCarInfoParamDTO = new OrderCarInfoParamDTO();
         orderCarInfoParamDTO.setCarNo(Integer.parseInt(reqVO.getCarNo()));
         orderCarInfoParamDTO.setCarAddressIndex(Integer.valueOf(reqVO.getAddrIndex()));
@@ -113,7 +113,7 @@ public class CarService {
         CarStewardVO carSteward = data.getCarSteward();
         CarDetailImageVO detailImageVO = data.getDetailImageVO();
         CarAddressOfTransVO carAddressOfTransVO = data.getCarAddressOfTransVO();
-        RenterGoodsDetailDto renterGoodsDetailDto = new RenterGoodsDetailDto();
+        RenterGoodsDetailDTO renterGoodsDetailDto = new RenterGoodsDetailDTO();
         renterGoodsDetailDto.setReplyFlag(carBaseVO.getTransReplyVO().getReplyFlag());
         renterGoodsDetailDto.setCarAddrIndex(Integer.valueOf(reqVO.getAddrIndex()));
         renterGoodsDetailDto.setCarNo(carBaseVO.getCarNo());
@@ -123,7 +123,8 @@ public class CarService {
         renterGoodsDetailDto.setCarRating(carBaseVO.getRating());
         renterGoodsDetailDto.setCarType(Integer.valueOf(carBaseVO.getType()));
         renterGoodsDetailDto.setCarTypeTxt(carBaseVO.getTypeTxt());
-        renterGoodsDetailDto.setCarDisplacement(carBaseVO.getCc());
+        renterGoodsDetailDto.setCarCylinderCapacity(carBaseVO.getCc()==null?0D:Double.valueOf(carBaseVO.getCc()));
+        renterGoodsDetailDto.setCarCcUnit(carBaseVO.getCcUnit());
         renterGoodsDetailDto.setCarGearboxType(carBaseVO.getGbType());
         renterGoodsDetailDto.setCarDayMileage(carBaseVO.getDayMileage());
         renterGoodsDetailDto.setCarIntrod(carBaseVO.getCarDesc());
@@ -148,8 +149,8 @@ public class CarService {
         return renterGoodsDetailDto;
     }
     //获取车主商品信息
-    private OwnerGoodsDetailDto getOwnerGoodsDetail(RenterGoodsDetailDto renterGoodsDetailDto) throws CarDetailByFeignException, RenterMemberByFeignException {
-        OwnerGoodsDetailDto ownerGoodsDetailDto = new OwnerGoodsDetailDto();
+    private OwnerGoodsDetailDTO getOwnerGoodsDetail(RenterGoodsDetailDTO renterGoodsDetailDto) throws CarDetailByFeignException, RenterMemberByFeignException {
+        OwnerGoodsDetailDTO ownerGoodsDetailDto = new OwnerGoodsDetailDTO();
         BeanUtils.copyProperties(renterGoodsDetailDto, ownerGoodsDetailDto);
         return ownerGoodsDetailDto;
     }
