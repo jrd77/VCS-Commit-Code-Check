@@ -43,6 +43,8 @@ public class RenterGoodsDetailDto {
      * 排量
      */
     private String carDisplacement;
+
+
     /**
      * 变速箱类型
      */
