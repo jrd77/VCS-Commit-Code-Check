@@ -7,6 +7,7 @@ import com.atzuche.order.commons.entity.dto.OwnerMemberDTO;
 import com.atzuche.order.commons.entity.dto.OwnerMemberRightDTO;
 import com.atzuche.order.commons.entity.dto.RenterMemberDTO;
 import com.atzuche.order.commons.entity.dto.RenterMemberRightDTO;
+import com.atzuche.order.commons.enums.MemberFlagEnum;
 import com.atzuche.order.commons.enums.OwnerMemRightEnum;
 import com.atzuche.order.commons.enums.RenterMemRightEnum;
 import com.atzuche.order.coreapi.enums.SubmitOrderErrorEnum;
@@ -90,15 +91,16 @@ public class MemberService {
                 OwnerMemberRightDTO internalStaff = new OwnerMemberRightDTO();
                 internalStaff.setRightCode(OwnerMemRightEnum.STAFF.getRightCode());
                 internalStaff.setRightName(OwnerMemRightEnum.STAFF.getRightName());
-                //internalStaff.setRightValue(String.valueOf(memberRoleInfo.getInternalStaff()));
+                internalStaff.setRightValue(String.valueOf(memberRoleInfo.getInternalStaff()));
                 internalStaff.setRightDesc("是否是内部员工");
                 rights.add(internalStaff);
             }
             if(memberRoleInfo.getMemberFlag() != null){
                 OwnerMemberRightDTO internalStaff = new OwnerMemberRightDTO();
-                internalStaff.setRightCode(OwnerMemRightEnum.VIP.getRightCode());
-                internalStaff.setRightName(OwnerMemRightEnum.VIP.getRightName());
-                //internalStaff.setRightValue(String.valueOf(memberRoleInfo.getMemberFlag()));
+                MemberFlagEnum memberFlagEnum = MemberFlagEnum.getRightByIndex(memberRoleInfo.getMemberFlag());
+                internalStaff.setRightCode(memberFlagEnum.getRightCode());
+                internalStaff.setRightName(memberFlagEnum.getRightName());
+                internalStaff.setRightValue(String.valueOf(memberRoleInfo.getMemberFlag()));
                 internalStaff.setRightDesc("会员标识");
                 rights.add(internalStaff);
             }
@@ -106,7 +108,7 @@ public class MemberService {
                 OwnerMemberRightDTO internalStaff = new OwnerMemberRightDTO();
                 internalStaff.setRightCode(OwnerMemRightEnum.CPIC_MEM.getRightCode());
                 internalStaff.setRightName(OwnerMemRightEnum.CPIC_MEM.getRightName());
-                //internalStaff.setRightValue(String.valueOf(memberRoleInfo.getCpicMemberFlag()));
+                internalStaff.setRightValue(String.valueOf(memberRoleInfo.getCpicMemberFlag()));
                 internalStaff.setRightDesc("是否太保会员");
                 rights.add(internalStaff);
             }
@@ -165,13 +167,15 @@ public class MemberService {
                 RenterMemberRightDTO internalStaff = new RenterMemberRightDTO();
                 internalStaff.setRightCode(RenterMemRightEnum.STAFF.getRightCode());
                 internalStaff.setRightName(RenterMemRightEnum.STAFF.getRightName());
+                internalStaff.setRightValue(String.valueOf(memberRoleInfo.getInternalStaff()));
                 internalStaff.setRightDesc("是否是内部员工");
                 rights.add(internalStaff);
             }
             if(memberRoleInfo.getMemberFlag() != null){
+                MemberFlagEnum memberFlagEnum = MemberFlagEnum.getRightByIndex(memberRoleInfo.getMemberFlag());
                 RenterMemberRightDTO internalStaff = new RenterMemberRightDTO();
-                internalStaff.setRightCode(RenterMemRightEnum.VIP.getRightCode());
-                internalStaff.setRightName(RenterMemRightEnum.VIP.getRightName());
+                internalStaff.setRightCode(memberFlagEnum.getRightCode());
+                internalStaff.setRightName(memberFlagEnum.getRightName());
                 internalStaff.setRightDesc("会员标识");
                 rights.add(internalStaff);
             }
@@ -179,6 +183,7 @@ public class MemberService {
                 RenterMemberRightDTO internalStaff = new RenterMemberRightDTO();
                 internalStaff.setRightCode(RenterMemRightEnum.CPIC_MEM.getRightCode());
                 internalStaff.setRightName(RenterMemRightEnum.CPIC_MEM.getRightName());
+                internalStaff.setRightValue(String.valueOf(memberRoleInfo.getCpicMemberFlag()));
                 internalStaff.setRightDesc("是否太保会员");
                 rights.add(internalStaff);
             }

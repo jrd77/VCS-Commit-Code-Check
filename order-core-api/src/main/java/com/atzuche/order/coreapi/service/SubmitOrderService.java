@@ -3,7 +3,6 @@ package com.atzuche.order.coreapi.service;
 import com.atzuche.order.commons.OrderException;
 import com.atzuche.order.commons.entity.dto.*;
 import com.atzuche.order.coreapi.entity.request.SubmitOrderReq;
-import com.atzuche.order.coreapi.submitOrder.filter.SubmitOrderFilterService;
 import com.autoyol.car.api.feign.api.CarDetailQueryFeignApi;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
@@ -15,9 +14,6 @@ import org.springframework.stereotype.Service;
 @Service
 public class SubmitOrderService {
 
-
-    @Autowired
-    private SubmitOrderFilterService submitOrderFilterService;
     @Autowired
     private MemberService memberService;
     @Autowired

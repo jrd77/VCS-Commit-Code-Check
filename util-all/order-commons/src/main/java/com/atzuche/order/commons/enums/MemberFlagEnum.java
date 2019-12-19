@@ -33,7 +33,7 @@ public enum MemberFlagEnum {
         this.rightName = rightName;
     }
 
-    public MemberFlagEnum getRightByIndex(int index){
+    public static MemberFlagEnum getRightByIndex(int index){
         return Stream.of(MemberFlagEnum.values())
                 .filter(x->x.getIndex() == index)
                 .limit(1)
