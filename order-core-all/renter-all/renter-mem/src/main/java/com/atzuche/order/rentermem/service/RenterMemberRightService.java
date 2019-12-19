@@ -1,6 +1,7 @@
 package com.atzuche.order.rentermem.service;
 
 import com.alibaba.fastjson.JSON;
+import com.atzuche.order.commons.GlobalConstant;
 import com.atzuche.order.commons.entity.dto.MemberRightStaffDto;
 import com.atzuche.order.commons.entity.dto.RenterMemberRightDto;
 import com.atzuche.order.commons.enums.RenterMemRightEnum;
@@ -47,12 +48,10 @@ public class RenterMemberRightService{
                 .limit(1)
                 .collect(Collectors.toList());
         if(collect!=null && collect.size()==1){
-            String rightValue = collect.get(0).getRightValue();
-            MemberRightStaffDto memberRightStaffDto = JSON.parseObject(rightValue, MemberRightStaffDto.class);
             if(carDepositAmt != null){
-                return memberRightStaffDto.getCarDeposit();
+                return GlobalConstant.MEMBER_RIGHT_STAFF_CAR_DEPOSIT;
             }else if(wzDepositAmt != null){
-                return memberRightStaffDto.getWzDeposit();
+                return GlobalConstant.MEMBER_RIGHT_STAFF_WZ_DEPOSIT;
             }
         }else{
             if(carDepositAmt != null){

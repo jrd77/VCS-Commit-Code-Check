@@ -42,8 +42,11 @@ public class RenterGoodsDetailDto {
     /**
      * 排量
      */
-    private String carDisplacement;
-
+    private Double carCylinderCapacity;
+    /**
+     * L/T
+     */
+    private String carCcUnit;
 
     /**
      * 变速箱类型

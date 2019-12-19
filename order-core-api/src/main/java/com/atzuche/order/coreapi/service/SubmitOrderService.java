@@ -292,7 +292,8 @@ public class SubmitOrderService {
         renterGoodsDetailDto.setCarRating(carBaseVO.getRating());
         renterGoodsDetailDto.setCarType(Integer.valueOf(carBaseVO.getType()));
         renterGoodsDetailDto.setCarTypeTxt(carBaseVO.getTypeTxt());
-        renterGoodsDetailDto.setCarDisplacement(carBaseVO.getCc());
+        renterGoodsDetailDto.setCarCylinderCapacity(carBaseVO.getCc()==null?0D:Double.valueOf(carBaseVO.getCc()));
+        renterGoodsDetailDto.setCarCcUnit(carBaseVO.getCcUnit());
         renterGoodsDetailDto.setCarGearboxType(carBaseVO.getGbType());
         renterGoodsDetailDto.setCarDayMileage(carBaseVO.getDayMileage());
         renterGoodsDetailDto.setCarIntrod(carBaseVO.getCarDesc());
