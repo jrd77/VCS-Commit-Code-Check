@@ -1,17 +1,16 @@
-package com.atzuche.order.coreapi.entity.request;
+package com.atzuche.order.request;
 
-import com.atzuche.order.commons.entity.request.ItemList;
 import lombok.Data;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.List;
 
 /*
  * @Author ZhangBin
  * @Date 2019/12/12 15:14
  * @Description: 订单提交时的入参DTO
- * 
+ *
+ *  短租订单App提交的相关参数
  **/
 @Data
 public class NormalOrderReqVO implements Serializable {
@@ -54,11 +53,19 @@ public class NormalOrderReqVO implements Serializable {
     private String disCouponIds;
     private String carOwnerCouponNo;
 
-    private Integer abatement;
+    /**
+     * 是否购买补充保障
+     */
+    private Integer abatementFlag;
 
 
-
+    /**
+     * 订单还车时间
+     */
     private LocalDateTime revertTime;
+    /**
+     * 订单取车时间
+     */
     private LocalDateTime rentTime;
 
     private String memNo;
@@ -151,6 +158,19 @@ public class NormalOrderReqVO implements Serializable {
     private String utmMedium;
     private String utmTerm;
     private String utmCampaign;
+
+    /**
+     * 活动Id
+     */
+    private String activityId;
+    /**
+     * 业务渠道ID
+     */
+    private String channelId;
+
+    
+
+
 
 
 

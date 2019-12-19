@@ -9,7 +9,6 @@ import com.atzuche.order.commons.entity.dto.RenterMemberDto;
 import com.atzuche.order.commons.entity.dto.RenterMemberRightDto;
 import com.atzuche.order.commons.enums.OwnerMemRightEnum;
 import com.atzuche.order.commons.enums.RenterMemRightEnum;
-import com.atzuche.order.coreapi.entity.request.NormalOrderReqVO;
 import com.atzuche.order.coreapi.enums.SubmitOrderErrorEnum;
 import com.atzuche.order.coreapi.submitOrder.exception.OwnerberByFeignException;
 import com.atzuche.order.coreapi.submitOrder.exception.RenterMemberByFeignException;
@@ -33,6 +32,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
+ * 封装对远程会员详情服务的相关调用
  * @author <a href="mailto:lianglin.sjtu@gmail.com">AndySjtu</a>
  * @date 2019/12/19 2:18 下午
  **/

@@ -1,4 +1,4 @@
-package com.atzuche.order.coreapi.entity.request;
+package com.atzuche.order.request;
 
 import lombok.Data;
 
@@ -17,8 +17,15 @@ public class AdminOrderReqVO extends NormalOrderReqVO {
      */
     private String operator;
     /**
-     * 管理后台相关标识
+     * 管理后台相关标识，只是和老系统兼容，没有意义
      */
     private String specialConsole;
     private String offlineOrderStatus;
+
+    /**
+     *
+     */
+    private Integer orderCategory;
+
+    private Integer sourceType;
 }

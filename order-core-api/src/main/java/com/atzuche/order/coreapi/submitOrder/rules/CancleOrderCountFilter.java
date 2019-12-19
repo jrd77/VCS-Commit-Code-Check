@@ -1,11 +1,11 @@
 package com.atzuche.order.coreapi.submitOrder.rules;
 
 import com.atzuche.order.commons.entity.dto.OrderContextDto;
-import com.atzuche.order.coreapi.entity.request.NormalOrderReqVO;
 import com.atzuche.order.coreapi.enums.SubmitOrderErrorEnum;
 import com.atzuche.order.coreapi.submitOrder.exception.SubmitOrderException;
 import com.atzuche.order.coreapi.submitOrder.exception.CancleOrderCountException;
 import com.atzuche.order.coreapi.submitOrder.filter.BaseFilter;
+import com.atzuche.order.request.NormalOrderReqVO;
 import org.springframework.stereotype.Component;
 
 /*

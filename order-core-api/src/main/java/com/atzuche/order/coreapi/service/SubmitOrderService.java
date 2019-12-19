@@ -3,8 +3,8 @@ package com.atzuche.order.coreapi.service;
 import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.GlobalConstant;
 import com.atzuche.order.commons.LocalDateTimeUtils;
+import com.atzuche.order.commons.OrderException;
 import com.atzuche.order.commons.entity.dto.*;
-import com.atzuche.order.coreapi.entity.request.NormalOrderReqVO;
 import com.atzuche.order.commons.enums.InternalStaffEnum;
 import com.atzuche.order.commons.enums.OwnerMemRightEnum;
 import com.atzuche.order.commons.enums.RenterMemRightEnum;
@@ -14,6 +14,7 @@ import com.atzuche.order.coreapi.submitOrder.exception.OwnerberByFeignException;
 import com.atzuche.order.coreapi.submitOrder.exception.RenterMemberByFeignException;
 import com.atzuche.order.coreapi.submitOrder.exception.SubmitOrderException;
 import com.atzuche.order.coreapi.submitOrder.filter.SubmitOrderFilterService;
+import com.atzuche.order.request.NormalOrderReqVO;
 import com.autoyol.car.api.feign.api.CarDetailQueryFeignApi;
 import com.autoyol.car.api.model.dto.OrderCarInfoParamDTO;
 import com.autoyol.car.api.model.vo.*;
@@ -42,6 +43,8 @@ public class SubmitOrderService {
     private SubmitOrderFilterService submitOrderFilterService;
     @Autowired
     private MemberService memberService;
+    @Autowired
+    private CarService carService;
 
     @Autowired
     private CarDetailQueryFeignApi carDetailQueryFeignApi;
@@ -52,9 +55,9 @@ public class SubmitOrderService {
         try{
             OrderContextDto orderContextDto = new OrderContextDto();
             //获取租客商品信息
-            RenterGoodsDetailDto renterGoodsDetailDto = getRenterGoodsDetail(submitReqDto);
+            RenterGoodsDetailDto renterGoodsDetailDto = carService.getRenterGoodsDetail(null);
             //获取车主商品信息
-            OwnerGoodsDetailDto ownerGoodsDetailDto = getOwnerGoodsDetail(renterGoodsDetailDto);
+//            OwnerGoodsDetailDto ownerGoodsDetailDto = carService.getOwnerGoodsDetail(renterGoodsDetailDto);
             //获取车主会员信息
             OwnerMemberDto ownerMemberDto = memberService.getOwnerMemberInfo(submitReqDto.getMemNo());
             //获取租客会员信息
@@ -62,7 +65,7 @@ public class SubmitOrderService {
 
             //组装数据
             orderContextDto.setRenterGoodsDetailDto(renterGoodsDetailDto);
-            orderContextDto.setOwnerGoodsDetailDto(ownerGoodsDetailDto);
+//            orderContextDto.setOwnerGoodsDetailDto(ownerGoodsDetailDto);
             orderContextDto.setOwnerMemberDto(ownerMemberDto);
             orderContextDto.setRenterMemberDto(renterMemberDto);
 
@@ -82,7 +85,7 @@ public class SubmitOrderService {
             //凹凸比抵扣,组装数据orderContextDto TODO
 
             //钱包抵扣,组装数据orderContextDto TODO
-        }catch (SubmitOrderException ex){
+        }catch (OrderException ex){
             String errorCode = ex.getErrorCode();
             String errorMsg = ex.getErrorMsg();
             log.error("下单失败",ex);
@@ -108,89 +111,5 @@ public class SubmitOrderService {
 
 
 
-    //获取租客商品信息
-    public RenterGoodsDetailDto getRenterGoodsDetail(NormalOrderReqVO submitOrderReq){
-        OrderCarInfoParamDTO orderCarInfoParamDTO = new OrderCarInfoParamDTO();
-        orderCarInfoParamDTO.setCarNo(Integer.parseInt(submitOrderReq.getCarNo()));
-        orderCarInfoParamDTO.setCarAddressIndex(Integer.valueOf(submitOrderReq.getCarAddrIndex()));
-        orderCarInfoParamDTO.setRentTime(LocalDateTimeUtils.localDateTimeToLong(submitOrderReq.getRentTime()));
-        orderCarInfoParamDTO.setRevertTime(LocalDateTimeUtils.localDateTimeToLong(submitOrderReq.getRevertTime()));
-        //FIXME:
-//        orderCarInfoParamDTO.setUseSpecialPrice(GlobalConstant.USE_SPECIAL_PRICE.equals(submitOrderReq.getUseSpecialPrice()));
-        ResponseObject<CarDetailVO> responseObject = null;
-        try{
-            log.info("Feign 开始获取车辆信息,orderCarInfoParamDTO={}",JSON.toJSONString(orderCarInfoParamDTO));
-            responseObject = carDetailQueryFeignApi.getCarDetailOfTransByCarNo(orderCarInfoParamDTO);
-        }catch (Exception e){
-            log.error("Feign 获取车辆信息异常,responseObject={},orderCarInfoParamDTO={}",JSON.toJSONString(responseObject),JSON.toJSONString(orderCarInfoParamDTO),e);
-            CarDetailByFeignException carDetailByFeignException = new CarDetailByFeignException(SubmitOrderErrorEnum.FEIGN_GET_CAR_DETAIL_ERROR.getCode(), SubmitOrderErrorEnum.FEIGN_GET_CAR_DETAIL_ERROR.getText());
-            Cat.logError("Feign 获取车辆信息异常",carDetailByFeignException);
-            throw carDetailByFeignException;
-        }
-        if(responseObject == null || !ErrorCode.SUCCESS.getCode().equals(responseObject.getResCode())){
-            log.error("Feign 获取车辆信息失败,responseObject={},orderCarInfoParamDTO={}",JSON.toJSONString(responseObject),JSON.toJSONString(orderCarInfoParamDTO));
-            RenterMemberByFeignException renterMemberByFeignException = new RenterMemberByFeignException(SubmitOrderErrorEnum.FEIGN_GET_CAR_DETAIL_FAIL.getCode(), SubmitOrderErrorEnum.FEIGN_GET_CAR_DETAIL_FAIL.getText());
-            Cat.logError("Feign 获取车辆信息失败",renterMemberByFeignException);
-            throw renterMemberByFeignException;
-        }
-        CarDetailVO data = responseObject.getData();
-        CarBaseVO carBaseVO = data.getCarBaseVO();
-        CarStewardVO carSteward = data.getCarSteward();
-        CarDetailImageVO detailImageVO = data.getDetailImageVO();
-        CarAddressOfTransVO carAddressOfTransVO = data.getCarAddressOfTransVO();
-        RenterGoodsDetailDto renterGoodsDetailDto = new RenterGoodsDetailDto();
-        renterGoodsDetailDto.setReplyFlag(carBaseVO.getTransReplyVO().getReplyFlag());
-        renterGoodsDetailDto.setCarAddrIndex(Integer.valueOf(submitOrderReq.getCarAddrIndex()));
-        renterGoodsDetailDto.setCarNo(carBaseVO.getCarNo());
-        renterGoodsDetailDto.setCarPlateNum(carBaseVO.getPlateNum());
-        renterGoodsDetailDto.setCarBrand(carBaseVO.getBrand());
-        renterGoodsDetailDto.setCarBrandTxt(carBaseVO.getBrandTxt());
-        renterGoodsDetailDto.setCarRating(carBaseVO.getRating());
-        renterGoodsDetailDto.setCarType(Integer.valueOf(carBaseVO.getType()));
-        renterGoodsDetailDto.setCarTypeTxt(carBaseVO.getTypeTxt());
-        renterGoodsDetailDto.setCarDisplacement(carBaseVO.getCc());
-        renterGoodsDetailDto.setCarGearboxType(carBaseVO.getGbType());
-        renterGoodsDetailDto.setCarDayMileage(carBaseVO.getDayMileage());
-        renterGoodsDetailDto.setCarIntrod(carBaseVO.getCarDesc());
-        renterGoodsDetailDto.setCarSurplusPrice(carBaseVO.getSurplusPrice());
-        //FIXME:
-//        renterGoodsDetailDto.setCarUseSpecialPrice(Integer.valueOf(submitOrderReq.getUseSpecialPrice()));
-        renterGoodsDetailDto.setCarGuidePrice(carBaseVO.getGuidePrice());
-        renterGoodsDetailDto.setCarStatus(carBaseVO.getStatus());
-        renterGoodsDetailDto.setCarImageUrl(getCoverPic(detailImageVO));
-        renterGoodsDetailDto.setCarOwnerType(carBaseVO.getMajorType());
-        renterGoodsDetailDto.setCarUseType(carBaseVO.getUseType());
-        renterGoodsDetailDto.setCarOilVolume(carBaseVO.getOilVolume());
-        renterGoodsDetailDto.setCarEngineType(carBaseVO.getEngineType());
-        renterGoodsDetailDto.setCarDesc(carBaseVO.getCarDesc());
-        renterGoodsDetailDto.setCarStewardPhone(carSteward.getStewardPhone()==null?"":String.valueOf(carSteward.getStewardPhone()));
-        //renterGoodsDetailDto.setCarCheckStatus();
-        renterGoodsDetailDto.setCarShowAddr(carAddressOfTransVO.getCarVirtualAddress());
-        renterGoodsDetailDto.setCarShowLon(carAddressOfTransVO.getVirtualAddressLon()==null?"":String.valueOf(carAddressOfTransVO.getVirtualAddressLon()));
-        renterGoodsDetailDto.setCarShowLat(carAddressOfTransVO.getVirtualAddressLat()==null?"":String.valueOf(carAddressOfTransVO.getVirtualAddressLat()));
-        renterGoodsDetailDto.setCarRealAddr(carAddressOfTransVO.getCarRealAddress());
-        renterGoodsDetailDto.setCarRealLon(carAddressOfTransVO.getRealAddressLon()==null?"":String.valueOf(carAddressOfTransVO.getRealAddressLon()));
-        renterGoodsDetailDto.setCarRealLat(carAddressOfTransVO.getRealAddressLat()==null?"":String.valueOf(carAddressOfTransVO.getRealAddressLat()));
-        return renterGoodsDetailDto;
-    }
-    //获取车主商品信息
-    private OwnerGoodsDetailDto getOwnerGoodsDetail(RenterGoodsDetailDto renterGoodsDetailDto) throws CarDetailByFeignException, RenterMemberByFeignException {
-        OwnerGoodsDetailDto ownerGoodsDetailDto = new OwnerGoodsDetailDto();
-        BeanUtils.copyProperties(renterGoodsDetailDto, ownerGoodsDetailDto);
-        return ownerGoodsDetailDto;
-    }
-    //获取车辆封面图片路径
-    private String getCoverPic(CarDetailImageVO detailImageVO){
-        String coverPic = "";
-        if(detailImageVO == null || detailImageVO.getCarImages() == null || detailImageVO.getCarImages().size()<=0){
-            return coverPic;
-        }
-        List<ImageVO> collect = detailImageVO.getCarImages()
-                .stream()
-                .filter(x -> "0".equals(x.getCover()))
-                .limit(1)
-                .collect(Collectors.toList());
-        coverPic = collect.size()<=0 ?  "" : collect.get(0).getPicPath();
-        return coverPic;
-    }
+
 }
