@@ -2,24 +2,18 @@ package com.atzuche.order.commons.entity.dto;
 
 import lombok.Data;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
-public class RenterMemberDto {
-    /**
-     * 主订单号
-     */
-    private String orderNo;
-    /**
-     * 子订单号
-     */
-    private String renterOrderNo;
+public class OwnerMemberDTO {
     /**
      * 会员号
      */
     private String memNo;
+    /**
+     * 会员类型
+     */
+    private Integer memType;
     /**
      * 手机号
      */
@@ -37,13 +31,9 @@ public class RenterMemberDto {
      */
     private String nickName;
     /**
-     * 驾驶证初次领证日期
-     */
-    private LocalDate certificationTime;
-    /**
      * 成功下单次数
      */
     private Integer orderSuccessCount;
 
-    private List<RenterMemberRightDto> renterMemberRightDtoList;
+    private List<OwnerMemberRightDTO> ownerMemberRightDTOList;
 }

@@ -26,15 +26,15 @@ public class RenterGoodsService{
     @Autowired
     private RenterGoodsPriceDetailMapper renterGoodsPriceDetailMapper;
 
-    public void save(OrderContextDto orderContextDto){
-        RenterGoodsDetailDto renterGoodsDetailDto = orderContextDto.getRenterGoodsDetailDto();
+    public void save(OrderContextDTO orderContextDto){
+        RenterGoodsDetailDTO renterGoodsDetailDto = orderContextDto.getRenterGoodsDetailDto();
         RenterGoodsEntity goodsEntity = new RenterGoodsEntity();
         BeanUtils.copyProperties(renterGoodsDetailDto,goodsEntity);
         //goodsEntity.setCreateOp();
         //goodsEntity.setUpdateOp();
         renterGoodsMapper.insert(goodsEntity);
 
-        List<RenterGoodsPriceDetailDto> goodsPriceDetailDtoList = renterGoodsDetailDto.getRenterGoodsPriceDetailDtoList();
+        List<RenterGoodsPriceDetailDTO> goodsPriceDetailDtoList = renterGoodsDetailDto.getRenterGoodsPriceDetailDTOList();
         List<RenterGoodsPriceDetailEntity> goodsPriceList = new ArrayList<>();
         goodsPriceDetailDtoList.forEach(x->{
             RenterGoodsPriceDetailEntity goodsPriceDetailEntity = new RenterGoodsPriceDetailEntity();
@@ -56,21 +56,21 @@ public class RenterGoodsService{
      * @param isNeedPrice 是否需要价格信息 true-需要  false-不需要
      * @return
      */
-    public RenterGoodsDetailDto getRenterGoodsDetail(String renterOrderNo, boolean isNeedPrice){
+    public RenterGoodsDetailDTO getRenterGoodsDetail(String renterOrderNo, boolean isNeedPrice){
         RenterGoodsEntity renterGoodsEntity = renterGoodsMapper.selectByRenterOrderNo(renterOrderNo);
-        RenterGoodsDetailDto renterGoodsDetailDto  = new RenterGoodsDetailDto();
+        RenterGoodsDetailDTO renterGoodsDetailDto  = new RenterGoodsDetailDTO();
         BeanUtils.copyProperties(renterGoodsDetailDto,renterGoodsEntity);
         if(!isNeedPrice){
             return renterGoodsDetailDto;
         }
         List<RenterGoodsPriceDetailEntity> renterGoodsPriceDetailEntities = renterGoodsPriceDetailMapper.selectByRenterOrderNo(renterOrderNo);
-        List<RenterGoodsPriceDetailDto> renterGoodsPriceDetailDtoList = new ArrayList<>();
+        List<RenterGoodsPriceDetailDTO> renterGoodsPriceDetailDTOList = new ArrayList<>();
         renterGoodsPriceDetailEntities.forEach(x->{
-            RenterGoodsPriceDetailDto renterGoodsPriceDetailDto = new RenterGoodsPriceDetailDto();
+            RenterGoodsPriceDetailDTO renterGoodsPriceDetailDto = new RenterGoodsPriceDetailDTO();
             BeanUtils.copyProperties(renterGoodsPriceDetailDto,x);
-            renterGoodsPriceDetailDtoList.add(renterGoodsPriceDetailDto);
+            renterGoodsPriceDetailDTOList.add(renterGoodsPriceDetailDto);
         });
-        renterGoodsDetailDto.setRenterGoodsPriceDetailDtoList(renterGoodsPriceDetailDtoList);
+        renterGoodsDetailDto.setRenterGoodsPriceDetailDTOList(renterGoodsPriceDetailDTOList);
         return renterGoodsDetailDto;
     }
 }

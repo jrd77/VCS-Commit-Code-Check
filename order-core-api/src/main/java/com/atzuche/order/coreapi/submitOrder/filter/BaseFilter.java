@@ -3,7 +3,7 @@
  */
 package com.atzuche.order.coreapi.submitOrder.filter;
 
-import com.atzuche.order.commons.entity.dto.OrderContextDto;
+import com.atzuche.order.commons.entity.dto.OrderContextDTO;
 import com.atzuche.order.coreapi.submitOrder.exception.SubmitOrderException;
 import com.atzuche.order.request.NormalOrderReqVO;
 
@@ -16,7 +16,7 @@ import com.atzuche.order.request.NormalOrderReqVO;
 public class BaseFilter implements SubmitOrderFilter{
 
     @Override
-	public void doFilter(NormalOrderReqVO submitReqDto, OrderContextDto orderContextDto, FilterChain chain, int index) throws SubmitOrderException {
+	public void doFilter(NormalOrderReqVO submitReqDto, OrderContextDTO orderContextDto, FilterChain chain, int index) throws SubmitOrderException {
 		boolean flag = validator( submitReqDto,  orderContextDto);
         if(flag){
             //继续下一个验证
@@ -28,7 +28,7 @@ public class BaseFilter implements SubmitOrderFilter{
 	}
 
 	@Override
-	public boolean validator(NormalOrderReqVO submitReqDto, OrderContextDto orderContextDto) throws SubmitOrderException {
+	public boolean validator(NormalOrderReqVO submitReqDto, OrderContextDTO orderContextDto) throws SubmitOrderException {
 		// TODO Auto-generated method stub
 		return false;
 	}

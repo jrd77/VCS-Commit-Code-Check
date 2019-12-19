@@ -5,8 +5,11 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class RenterGoodsDetailDto {
-
+public class OwnerGoodsDetailDTO {
+    /**
+     * 车主会员号
+     */
+    private String memNo;
     /**
      * 应答标识位，0未设置，1已设置
      */
@@ -42,12 +45,7 @@ public class RenterGoodsDetailDto {
     /**
      * 排量
      */
-    private Double carCylinderCapacity;
-    /**
-     * L/T
-     */
-    private String carCcUnit;
-
+    private String carDisplacement;
     /**
      * 变速箱类型
      */
@@ -67,7 +65,7 @@ public class RenterGoodsDetailDto {
     /**
      * 是否使用特供价 0-否，1-是
      */
-    private boolean carUseSpecialPrice;
+    private Integer carUseSpecialPrice;
     /**
      * 车辆指导价
      */
@@ -136,8 +134,9 @@ public class RenterGoodsDetailDto {
      * 选择的车辆地址序号
      */
     private Integer carAddrIndex;
+
     /**
      * 一天一价
      */
-    List<RenterGoodsPriceDetailDto> renterGoodsPriceDetailDtoList;
+    List<OwnerGoodsPriceDetailDTO> ownerGoodsPriceDetailDTOList;
 }

@@ -3,7 +3,7 @@
  */
 package com.atzuche.order.coreapi.submitOrder.filter;
 
-import com.atzuche.order.commons.entity.dto.OrderContextDto;
+import com.atzuche.order.commons.entity.dto.OrderContextDTO;
 import com.atzuche.order.coreapi.submitOrder.exception.SubmitOrderException;
 import com.atzuche.order.request.NormalOrderReqVO;
 import org.springframework.stereotype.Service;
@@ -30,7 +30,7 @@ public class FilterChain {
 		return this;
 	}
 
-	public void doFilter(NormalOrderReqVO submitReqDto, OrderContextDto orderContextDto, FilterChain chain, int index) throws SubmitOrderException {
+	public void doFilter(NormalOrderReqVO submitReqDto, OrderContextDTO orderContextDto, FilterChain chain, int index) throws SubmitOrderException {
 		if (index == filters.get().size()) {
 			return;
 		}

@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.atzuche.order.commons.entity.dto.RenterGoodsPriceDetailDto;
+import com.atzuche.order.commons.entity.dto.RenterGoodsPriceDetailDTO;
 import com.atzuche.order.commons.enums.RenterCashCodeEnum;
 import com.atzuche.order.rentercost.entity.OrderConsoleCostDetailEntity;
 import com.atzuche.order.rentercost.entity.RenterOrderCostDetailEntity;
@@ -28,7 +28,6 @@ import com.atzuche.order.rentercost.entity.dto.RentAmtDTO;
 import com.atzuche.order.rentercost.exception.RenterCostParameterException;
 import com.autoyol.platformcost.CommonUtils;
 import com.autoyol.platformcost.RenterFeeCalculatorUtils;
-import com.autoyol.platformcost.model.AbatementConfig;
 import com.autoyol.platformcost.model.CarDepositAmtVO;
 import com.autoyol.platformcost.model.CarPriceOfDay;
 import com.autoyol.platformcost.model.DepositText;
@@ -86,14 +85,14 @@ public class RenterOrderCostCombineService {
 			throw new RenterCostParameterException();
 		}
 		
-		List<RenterGoodsPriceDetailDto> dayPriceList = rentAmtDTO.getRenterGoodsPriceDetailDtoList();
+		List<RenterGoodsPriceDetailDTO> dayPriceList = rentAmtDTO.getRenterGoodsPriceDetailDTOList();
 		// 按还车时间分组
-		Map<LocalDateTime, List<RenterGoodsPriceDetailDto>> dayPriceMap = dayPriceList.stream().collect(Collectors.groupingBy(RenterGoodsPriceDetailDto::getRevertTime));
+		Map<LocalDateTime, List<RenterGoodsPriceDetailDTO>> dayPriceMap = dayPriceList.stream().collect(Collectors.groupingBy(RenterGoodsPriceDetailDTO::getRevertTime));
 		dayPriceMap = dayPriceMap.entrySet().stream().sorted(Map.Entry.comparingByKey()).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue,
                         (oldValue, newValue) -> oldValue, LinkedHashMap::new));
 		int i = 1;
 		List<RenterOrderCostDetailEntity> renterOrderCostDetailEntityList = new ArrayList<RenterOrderCostDetailEntity>();
-		for(Map.Entry<LocalDateTime, List<RenterGoodsPriceDetailDto>> it : dayPriceMap.entrySet()){
+		for(Map.Entry<LocalDateTime, List<RenterGoodsPriceDetailDTO>> it : dayPriceMap.entrySet()){
 			if (i == 1) {
 				costBaseDTO.setEndTime(it.getKey());
 			} else {
@@ -106,7 +105,7 @@ public class RenterOrderCostCombineService {
 		return renterOrderCostDetailEntityList;
 	}
 	
-	public RenterOrderCostDetailEntity getRentAmtEntity(CostBaseDTO costBaseDTO, List<RenterGoodsPriceDetailDto> dayPrices) {
+	public RenterOrderCostDetailEntity getRentAmtEntity(CostBaseDTO costBaseDTO, List<RenterGoodsPriceDetailDTO> dayPrices) {
 		// TODO 走配置中心获取
 		Integer configHours = 8;
 		// 数据转化

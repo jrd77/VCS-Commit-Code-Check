@@ -1,8 +1,8 @@
 package com.atzuche.order.owner.commodity.service;
 
-import com.atzuche.order.commons.entity.dto.OrderContextDto;
-import com.atzuche.order.commons.entity.dto.OwnerGoodsDetailDto;
-import com.atzuche.order.commons.entity.dto.OwnerGoodsPriceDetailDto;
+import com.atzuche.order.commons.entity.dto.OrderContextDTO;
+import com.atzuche.order.commons.entity.dto.OwnerGoodsDetailDTO;
+import com.atzuche.order.commons.entity.dto.OwnerGoodsPriceDetailDTO;
 import com.atzuche.order.owner.commodity.entity.OwnerGoodsEntity;
 import com.atzuche.order.owner.commodity.entity.OwnerGoodsPriceDetailEntity;
 import com.atzuche.order.owner.commodity.mapper.OwnerGoodsMapper;
@@ -28,15 +28,15 @@ public class OwnerGoodsService{
     @Autowired
     private OwnerGoodsPriceDetailMapper ownerGoodsPriceDetailMapper;
 
-    public void save(OrderContextDto orderContextDto){
-        OwnerGoodsDetailDto ownerGoodsDetailDto = orderContextDto.getOwnerGoodsDetailDto();
+    public void save(OrderContextDTO orderContextDto){
+        OwnerGoodsDetailDTO ownerGoodsDetailDto = orderContextDto.getOwnerGoodsDetailDto();
         OwnerGoodsEntity goodsEntity = new OwnerGoodsEntity();
         BeanUtils.copyProperties(ownerGoodsDetailDto,goodsEntity);
         //goodsEntity.setCreateOp();
         //goodsEntity.setUpdateOp();
         ownerGoodsMapper.insert(goodsEntity);
 
-        List<OwnerGoodsPriceDetailDto> goodsPriceDetailDtoList = ownerGoodsDetailDto.getOwnerGoodsPriceDetailDtoList();
+        List<OwnerGoodsPriceDetailDTO> goodsPriceDetailDtoList = ownerGoodsDetailDto.getOwnerGoodsPriceDetailDTOList();
         List<OwnerGoodsPriceDetailEntity> goodsPriceList = new ArrayList<>();
         goodsPriceDetailDtoList.forEach(x->{
             OwnerGoodsPriceDetailEntity goodsPriceDetailEntity = new OwnerGoodsPriceDetailEntity();
@@ -58,22 +58,22 @@ public class OwnerGoodsService{
      * @param isNeedPrice 是否需要价格信息 true-需要  false-不需要
      * @return
      */
-    public OwnerGoodsDetailDto getOwnerGoodsDetail(String ownerOrderNo,boolean isNeedPrice){
+    public OwnerGoodsDetailDTO getOwnerGoodsDetail(String ownerOrderNo, boolean isNeedPrice){
         OwnerGoodsEntity ownerGoodsEntity = ownerGoodsMapper.selectByOwnerOrderNo(ownerOrderNo);
 
-        OwnerGoodsDetailDto ownerGoodsDetailDto  = new OwnerGoodsDetailDto();
+        OwnerGoodsDetailDTO ownerGoodsDetailDto  = new OwnerGoodsDetailDTO();
         BeanUtils.copyProperties(ownerGoodsDetailDto,ownerGoodsEntity);
         if(!isNeedPrice){
             return ownerGoodsDetailDto;
         }
         List<OwnerGoodsPriceDetailEntity> ownerGoodsPriceDetailEntities = ownerGoodsPriceDetailMapper.selectByOwnerOrderNo(ownerOrderNo);
-        List<OwnerGoodsPriceDetailDto> ownerGoodsPriceDetailDtoList = new ArrayList<>();
+        List<OwnerGoodsPriceDetailDTO> ownerGoodsPriceDetailDTOList = new ArrayList<>();
         ownerGoodsPriceDetailEntities.forEach(x->{
-            OwnerGoodsPriceDetailDto ownerGoodsPriceDetailDto = new OwnerGoodsPriceDetailDto();
+            OwnerGoodsPriceDetailDTO ownerGoodsPriceDetailDto = new OwnerGoodsPriceDetailDTO();
             BeanUtils.copyProperties(ownerGoodsPriceDetailDto,x);
-            ownerGoodsPriceDetailDtoList.add(ownerGoodsPriceDetailDto);
+            ownerGoodsPriceDetailDTOList.add(ownerGoodsPriceDetailDto);
         });
-        ownerGoodsDetailDto.setOwnerGoodsPriceDetailDtoList(ownerGoodsPriceDetailDtoList);
+        ownerGoodsDetailDto.setOwnerGoodsPriceDetailDTOList(ownerGoodsPriceDetailDTOList);
         return ownerGoodsDetailDto;
     }
 }

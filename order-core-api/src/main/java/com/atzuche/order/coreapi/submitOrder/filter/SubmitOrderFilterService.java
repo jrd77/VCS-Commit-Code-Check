@@ -3,7 +3,7 @@
  */
 package com.atzuche.order.coreapi.submitOrder.filter;
 
-import com.atzuche.order.commons.entity.dto.OrderContextDto;
+import com.atzuche.order.commons.entity.dto.OrderContextDTO;
 import com.atzuche.order.coreapi.submitOrder.exception.SubmitOrderException;
 import com.atzuche.order.coreapi.submitOrder.rules.CancleOrderCountFilter;
 import com.atzuche.order.request.NormalOrderReqVO;
@@ -36,7 +36,7 @@ public class SubmitOrderFilterService {
 		filterChain.addFilterAll(list);
 	}
 	
-	public void checkRules(NormalOrderReqVO submitReqDto, OrderContextDto orderContextDto) throws SubmitOrderException {
+	public void checkRules(NormalOrderReqVO submitReqDto, OrderContextDTO orderContextDto) throws SubmitOrderException {
         //添加校验规则
         this.addCheckRules();
 		
