@@ -7,6 +7,10 @@ import java.util.List;
 @Data
 public class OwnerGoodsDetailDto {
     /**
+     * 车主会员号
+     */
+    private String memNo;
+    /**
      * 应答标识位，0未设置，1已设置
      */
     private Integer replyFlag;

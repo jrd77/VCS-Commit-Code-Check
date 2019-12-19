@@ -21,7 +21,7 @@ public interface RenterOrderSubsidyDetailMapper{
 
     int insert(RenterOrderSubsidyDetailEntity record);
     
-    int insertSelective(RenterOrderSubsidyDetailEntity record);
+    int saveRenterOrderSubsidyDetail(RenterOrderSubsidyDetailEntity record);
 
     int updateByPrimaryKey(RenterOrderSubsidyDetailEntity record);
     

@@ -1,4 +1,4 @@
-package com.atzuche.order.cashieraccount.service;
+package com.atzuche.order.cashieraccount.service.notservice;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,7 +15,7 @@ import com.atzuche.order.cashieraccount.mapper.CashierRefundApplyMapper;
  * @date 2019-12-11 11:17:59
  */
 @Service
-public class CashierRefundApplyService {
+public class CashierRefundApplyNoTService {
     @Autowired
     private CashierRefundApplyMapper cashierRefundApplyMapper;
 

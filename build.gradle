@@ -7,6 +7,7 @@ allprojects {
     version '0.0.1-SNAPSHOT'
 
     sourceCompatibility = 1.8
+    targetCompatibility = 1.8
 
     repositories {
         mavenCentral()
@@ -18,23 +19,12 @@ allprojects {
 }
 
 
-dependencies {
-    testCompile group: 'junit', name: 'junit', version: '4.12'
-    implementation 'org.spockframework:spock-core'
-    implementation 'org.spockframework:spock-core'
-}
-
 // 子模块/项目的统一配置
 subprojects {
     apply plugin: 'java'
-    // 指定JDK版本
-    sourceCompatibility = 1.8
-    targetCompatibility = 1.8
+
     // 指定编码格式
     [compileJava,compileTestJava,javadoc]*.options*.encoding = 'UTF-8'
-    repositories {
-        maven{ url 'http://maven.aliyun.com/nexus/content/groups/public/'}
-    }
     ext {//依赖版本
         springBootVersion = "1.5.21.RELEASE"
         mysqlConnectorVersion = "8.0.13"

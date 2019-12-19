@@ -5,6 +5,9 @@ import com.atzuche.order.commons.GlobalConstant;
 import com.atzuche.order.commons.LocalDateTimeUtils;
 import com.atzuche.order.commons.entity.dto.*;
 import com.atzuche.order.coreapi.entity.request.NormalOrderReqVO;
+import com.atzuche.order.commons.enums.InternalStaffEnum;
+import com.atzuche.order.commons.enums.OwnerMemRightEnum;
+import com.atzuche.order.commons.enums.RenterMemRightEnum;
 import com.atzuche.order.coreapi.enums.SubmitOrderErrorEnum;
 import com.atzuche.order.coreapi.submitOrder.exception.CarDetailByFeignException;
 import com.atzuche.order.coreapi.submitOrder.exception.OwnerberByFeignException;
@@ -18,10 +21,7 @@ import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.member.detail.api.MemberDetailFeignService;
 import com.autoyol.member.detail.enums.MemberSelectKeyEnum;
-import com.autoyol.member.detail.vo.res.MemberAuthInfo;
-import com.autoyol.member.detail.vo.res.MemberCoreInfo;
-import com.autoyol.member.detail.vo.res.MemberRoleInfo;
-import com.autoyol.member.detail.vo.res.MemberTotalInfo;
+import com.autoyol.member.detail.vo.res.*;
 import com.dianping.cat.Cat;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -41,7 +41,8 @@ public class SubmitOrderService {
     @Autowired
     private SubmitOrderFilterService submitOrderFilterService;
     @Autowired
-    private MemberDetailFeignService memberDetailFeignService;
+    private MemberService memberService;
+
     @Autowired
     private CarDetailQueryFeignApi carDetailQueryFeignApi;
 
@@ -55,9 +56,9 @@ public class SubmitOrderService {
             //获取车主商品信息
             OwnerGoodsDetailDto ownerGoodsDetailDto = getOwnerGoodsDetail(renterGoodsDetailDto);
             //获取车主会员信息
-            OwnerMemberDto ownerMemberDto = getOwnerMemberInfo(submitReqDto);
+            OwnerMemberDto ownerMemberDto = memberService.getOwnerMemberInfo(submitReqDto.getMemNo());
             //获取租客会员信息
-            RenterMemberDto renterMemberDto = getRenterMemberInfo(submitReqDto);
+            RenterMemberDto renterMemberDto = memberService.getRenterMemberInfo(submitReqDto.getMemNo());
 
             //组装数据
             orderContextDto.setRenterGoodsDetailDto(renterGoodsDetailDto);
@@ -104,89 +105,10 @@ public class SubmitOrderService {
         return null;
     }
 
-    public RenterMemberDto getRenterMemberInfo(NormalOrderReqVO submitReqDto) throws RenterMemberByFeignException {
-        List<String> selectKey = Arrays.asList(
-                MemberSelectKeyEnum.MEMBER_CORE_INFO.getKey(),
-                MemberSelectKeyEnum.MEMBER_AUTH_INFO.getKey(),
-                MemberSelectKeyEnum.MEMBER_BASE_INFO.getKey(),
-                MemberSelectKeyEnum.MEMBER_ROLE_INFO.getKey());
-        ResponseData<MemberTotalInfo> responseData = null;
-        log.info("Feign 开始获取租客会员信息,submitReqDto={}",JSON.toJSONString(submitReqDto));
-        try{
-            responseData = memberDetailFeignService.getMemberSelectInfo(Integer.valueOf(submitReqDto.getMemNo()), selectKey);
-
-        }catch (Exception e){
-            log.error("Feign 获取租客会员信息失败,submitReqDto={},responseData={}",JSON.toJSONString(submitReqDto),null,e);
-            RenterMemberByFeignException renterMemberByFeignException = new RenterMemberByFeignException(SubmitOrderErrorEnum.FEIGN_GET_RENTER_MEMBER_ERROR.getCode(), SubmitOrderErrorEnum.FEIGN_GET_RENTER_MEMBER_ERROR.getText());
-            Cat.logError("Feign 获取租客会员信息失败",renterMemberByFeignException);
-            throw renterMemberByFeignException;
-        }
-        if(responseData == null || !ErrorCode.SUCCESS.getCode().equals(responseData.getResCode()) || responseData.getData() == null){
-            log.error("Feign 获取租客会员信息失败,submitReqDto={},responseData={}",JSON.toJSONString(submitReqDto),JSON.toJSONString(responseData));
-            RenterMemberByFeignException renterMemberByFeignException = new RenterMemberByFeignException(SubmitOrderErrorEnum.FEIGN_GET_RENTER_MEMBER_FAIL.getCode(), SubmitOrderErrorEnum.FEIGN_GET_RENTER_MEMBER_FAIL.getText());
-            Cat.logError("Feign 获取租客会员信息失败",renterMemberByFeignException);
-            throw renterMemberByFeignException;
-        }
-        MemberTotalInfo memberTotalInfo = responseData.getData();
-        MemberAuthInfo memberAuthInfo = memberTotalInfo.getMemberAuthInfo();
-        MemberCoreInfo memberCoreInfo = memberTotalInfo.getMemberCoreInfo();
-        RenterMemberDto renterMemberDto = new RenterMemberDto();
-        renterMemberDto.setMemNo(submitReqDto.getMemNo());
-        renterMemberDto.setPhone(memberCoreInfo.getPhone());
-        renterMemberDto.setHeaderUrl(memberCoreInfo.getPortraitPath());
-        renterMemberDto.setRealName(memberCoreInfo.getRealName());
-        renterMemberDto.setNickName(memberCoreInfo.getNickName());
-        renterMemberDto.setCertificationTime(LocalDateTimeUtils.parseStringToLocalDate(memberAuthInfo.getDriLicFirstTime()));
-        //renterMemberDto.setOrderSuccessCount();
-        List<RenterMemberRightDto> rights = new ArrayList<>();
-
-        MemberRoleInfo memberRoleInfo = memberTotalInfo.getMemberRoleInfo();
-        if(memberRoleInfo != null){
-            if(memberRoleInfo.getInternalStaff()!=null && memberRoleInfo.getInternalStaff().equals(1)){
-               /* RenterMemberRightDto internalStaff = new RenterMemberRightDto();
-                internalStaff.setRightCode(RenterMemRightEnum.STAFF.getRightCode());
-                internalStaff.setRightName();
-                internalStaff.setRightValue();
-                internalStaff.setRightDesc();
-                rights.add();*/
-            }
-        }
-
-
-         responseData.getData();
-        return new RenterMemberDto();
-    }
-
-    public OwnerMemberDto getOwnerMemberInfo(NormalOrderReqVO submitReqDto) throws RenterMemberByFeignException {
-        List<String> selectKey = Arrays.asList(
-                MemberSelectKeyEnum.MEMBER_CORE_INFO.getKey(),
-                MemberSelectKeyEnum.MEMBER_AUTH_INFO.getKey(),
-                MemberSelectKeyEnum.MEMBER_BASE_INFO.getKey(),
-                MemberSelectKeyEnum.MEMBER_ROLE_INFO.getKey());
-        ResponseData<MemberTotalInfo> responseData = null;
-        log.info("Feign 开始获取车主会员信息,submitReqDto={}",JSON.toJSONString(submitReqDto));
-        try{
-            responseData = memberDetailFeignService.getMemberSelectInfo(Integer.valueOf(submitReqDto.getMemNo()), selectKey);
-
-        }catch (Exception e){
-            log.error("Feign 获取车主会员信息失败,submitReqDto={},responseData={}",JSON.toJSONString(submitReqDto),null,e);
-            Cat.logError("Feign 获取车主会员信息失败",e);
-            throw new OwnerberByFeignException(SubmitOrderErrorEnum.FEIGN_GET_OWNER_MEMBER_ERROR.getCode(),SubmitOrderErrorEnum.FEIGN_GET_OWNER_MEMBER_ERROR.getText());
-        }
-        if(responseData == null || !ErrorCode.SUCCESS.getCode().equals(responseData.getResCode())){
-            log.error("Feign 获取车主会员信息失败,submitReqDto={},responseData={}",JSON.toJSONString(submitReqDto),JSON.toJSONString(responseData));
-            OwnerberByFeignException ownerberByFeignException = new OwnerberByFeignException(SubmitOrderErrorEnum.FEIGN_GET_OWNER_MEMBER_FAIL.getCode(), SubmitOrderErrorEnum.FEIGN_GET_OWNER_MEMBER_FAIL.getText());
-            Cat.logError("Feign 获取车主会员信息失败",ownerberByFeignException);
-            throw ownerberByFeignException;
-        }
-        responseData.getData();
 
 
 
-        return new OwnerMemberDto();
-    }
-
-
+    //获取租客商品信息
     public RenterGoodsDetailDto getRenterGoodsDetail(NormalOrderReqVO submitOrderReq){
         OrderCarInfoParamDTO orderCarInfoParamDTO = new OrderCarInfoParamDTO();
         orderCarInfoParamDTO.setCarNo(Integer.parseInt(submitOrderReq.getCarNo()));
@@ -251,13 +173,12 @@ public class SubmitOrderService {
         renterGoodsDetailDto.setCarRealLat(carAddressOfTransVO.getRealAddressLat()==null?"":String.valueOf(carAddressOfTransVO.getRealAddressLat()));
         return renterGoodsDetailDto;
     }
-
+    //获取车主商品信息
     private OwnerGoodsDetailDto getOwnerGoodsDetail(RenterGoodsDetailDto renterGoodsDetailDto) throws CarDetailByFeignException, RenterMemberByFeignException {
         OwnerGoodsDetailDto ownerGoodsDetailDto = new OwnerGoodsDetailDto();
         BeanUtils.copyProperties(renterGoodsDetailDto, ownerGoodsDetailDto);
         return ownerGoodsDetailDto;
     }
-
     //获取车辆封面图片路径
     private String getCoverPic(CarDetailImageVO detailImageVO){
         String coverPic = "";

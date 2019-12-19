@@ -51,6 +51,10 @@ public class AccountRenterDepositResVO {
      */
     private Integer creditPayAmt;
     /**
+     * 剩余信用支付金额
+     */
+    private Integer surplusCreditPayAmt;
+    /**
      * 剩余押金总额
      */
     private Integer surplusDepositAmt;

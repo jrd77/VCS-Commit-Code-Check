@@ -1,6 +1,9 @@
 package com.atzuche.order.rentermem.entity;
+import java.util.List;
+import com.atzuche.order.rentermem.entity.RenterMemberEntity;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import lombok.Data;
 
@@ -9,13 +12,13 @@ import lombok.Data;
  * 租客端会员概览表
  * 
  * @author ZhangBin
- * @date 2019-12-14 17:27:28
+ * @date 2019-12-18 16:15:16
  * @Description:
  */
 @Data
 public class RenterMemberEntity implements Serializable {
+
 	private static final long serialVersionUID = 1L;
-	
 	/**
 	 * 
 	 */
@@ -51,7 +54,7 @@ public class RenterMemberEntity implements Serializable {
 	/**
 	 * 驾驶证初次领证日期
 	 */
-	private LocalDateTime certificationTime;
+	private LocalDate certificationTime;
 	/**
 	 * 成功下单次数
 	 */
@@ -77,4 +80,6 @@ public class RenterMemberEntity implements Serializable {
 	 */
 	private Integer isDelete;
 
+    @org.springframework.beans.factory.annotation.Autowired
+    private com.atzuche.order.rentermem.mapper.RenterMemberMapper renterMemberMapper;
 }

@@ -7,8 +7,8 @@ import lombok.Getter;
  * @date 2019/12/14 3:20 下午
  **/
 @Getter
-public enum RenterMemRightEnum {
-
+public enum OwnerMemRightEnum {
+    // member_flag null comment '会员标识 1:优质车主, 2:优质租客, 3:优质租客+优质车主,4:VIP ,5.免TD用户 '
     VIP("1","会员标识"),
     STAFF("2","内部员工"),
     MEM_LEVEL("3","会员等级"),
@@ -25,9 +25,15 @@ public enum RenterMemRightEnum {
      */
     private String rightName;
 
-    RenterMemRightEnum(String rightCode, String rightName) {
+    OwnerMemRightEnum(String rightCode, String rightName) {
         this.rightCode = rightCode;
         this.rightName = rightName;
+    }
+
+    public int deposit(int depositAmt){
+        //是否免押判断
+
+        return depositAmt;
     }
 
 
