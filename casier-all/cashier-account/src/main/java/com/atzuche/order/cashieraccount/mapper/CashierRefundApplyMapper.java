@@ -19,10 +19,6 @@ public interface CashierRefundApplyMapper{
 
     int insert(CashierRefundApplyEntity record);
     
-    int insertSelective(CashierRefundApplyEntity record);
-
-    int updateByPrimaryKey(CashierRefundApplyEntity record);
-    
     int updateByPrimaryKeySelective(CashierRefundApplyEntity record);
 
 }

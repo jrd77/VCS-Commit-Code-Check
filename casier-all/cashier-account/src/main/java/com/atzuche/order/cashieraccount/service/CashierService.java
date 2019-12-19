@@ -1,20 +1,25 @@
 package com.atzuche.order.cashieraccount.service;
 
-import com.atzuche.order.accountdebt.service.AccountDebtCatService;
+import com.atzuche.order.accountdebt.service.AccountDebtService;
 import com.atzuche.order.accountdebt.vo.req.AccountDeductDebtReqVO;
-import com.atzuche.order.accountrenterdeposit.service.AccountRenterDepositCatService;
+import com.atzuche.order.accountdebt.vo.res.AccountDebtResVO;
+import com.atzuche.order.accountrenterdeposit.service.AccountRenterDepositService;
 import com.atzuche.order.accountrenterdeposit.vo.req.CreateOrderRenterDepositReqVO;
-import com.atzuche.order.accountrenterwzdepost.service.AccountRenterWzDepositCatService;
+import com.atzuche.order.accountrenterdeposit.vo.req.PayedOrderRenterDepositDetailReqVO;
+import com.atzuche.order.accountrenterwzdepost.service.AccountRenterWzDepositService;
 import com.atzuche.order.accountrenterwzdepost.vo.req.CreateOrderRenterWZDepositReqVO;
+import com.atzuche.order.accountrenterwzdepost.vo.req.PayedOrderRenterDepositWZDetailReqVO;
+import com.atzuche.order.cashieraccount.service.notservice.CashierRefundApplyNoTService;
 import com.atzuche.order.cashieraccount.vo.req.CashierDeductDebtReqVO;
+import com.atzuche.order.cashieraccount.vo.req.CashierRefundApplyReqVO;
 import com.atzuche.order.cashieraccount.vo.res.CashierDeductDebtResVO;
+import com.autoyol.cat.CatAnnotation;
 import com.autoyol.commons.web.ErrorCode;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.atzuche.order.cashieraccount.mapper.CashierMapper;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
@@ -28,9 +33,11 @@ import org.springframework.util.Assert;
 @Service
 public class CashierService {
     @Autowired
-    private AccountRenterDepositCatService accountRenterDepositCatService;
-    @Autowired AccountRenterWzDepositCatService accountRenterWzDepositCatService;
-    @Autowired AccountDebtCatService accountDebtCatService;
+    private AccountRenterDepositService accountRenterDepositService;
+    @Autowired AccountRenterWzDepositService accountRenterWzDepositService;
+    @Autowired AccountDebtService accountDebtService;
+    @Autowired CashierRefundApplyNoTService cashierRefundApplyNoTService;
+
 
     /**  ***************************************车辆押金 start****************************************************/
     /**
@@ -39,19 +46,19 @@ public class CashierService {
      */
     @Transactional(rollbackFor=Exception.class)
     public void insertRenterDeposit(CreateOrderRenterDepositReqVO createOrderRenterDepositReqVO){
-        accountRenterDepositCatService.insertRenterDeposit(createOrderRenterDepositReqVO);
+        accountRenterDepositService.insertRenterDeposit(createOrderRenterDepositReqVO);
     }
     /**
      * 查询车辆押金是否付清
      */
     public boolean isPayOffForRenterDeposit(String orderNo, String memNo){
-       return accountRenterDepositCatService.isPayOffForRenterDeposit(orderNo, memNo);
+       return accountRenterDepositService.isPayOffForRenterDeposit(orderNo, memNo);
     }
     /**
      * 查询车辆押金余额
      */
     public int getSurplusRenterDeposit(String orderNo, String memNo){
-        return accountRenterDepositCatService.getSurplusRenterDeposit(orderNo, memNo);
+        return accountRenterDepositService.getSurplusRenterDeposit(orderNo, memNo);
     }
 
     /**  ***************************************** 押金 end *************************************************     */
@@ -63,19 +70,19 @@ public class CashierService {
      */
     @Transactional(rollbackFor=Exception.class)
     public void insertRenterDeposit(CreateOrderRenterWZDepositReqVO createOrderRenterWZDepositReq){
-        accountRenterWzDepositCatService.insertRenterWZDeposit(createOrderRenterWZDepositReq);
+        accountRenterWzDepositService.insertRenterWZDeposit(createOrderRenterWZDepositReq);
     }
     /**
      * 查询违章押金是否付清
      */
     public boolean isPayOffForRenterWZDeposit(String orderNo, String memNo){
-        return accountRenterWzDepositCatService.isPayOffForRenterWZDeposit(orderNo, memNo);
+        return accountRenterWzDepositService.isPayOffForRenterWZDeposit(orderNo, memNo);
     }
     /**
      * 查询违章押金余额
      */
     public int getSurplusRenterWZDeposit(String orderNo, String memNo){
-        return accountRenterWzDepositCatService.getSurplusRenterWZDeposit(orderNo, memNo);
+        return accountRenterWzDepositService.getSurplusRenterWZDeposit(orderNo, memNo);
     }
 
     /**  ***************************************** 违章押金 end *************************************************     */
@@ -84,19 +91,56 @@ public class CashierService {
     /**
      * 7）押金/违章押金抵扣历史欠款
      */
+    @CatAnnotation
+    @Transactional(rollbackFor=Exception.class)
     public CashierDeductDebtResVO deductDebt(CashierDeductDebtReqVO cashierDeductDebtReqVO){
         Assert.notNull(cashierDeductDebtReqVO, ErrorCode.PARAMETER_ERROR.getText());
         cashierDeductDebtReqVO.check();
         //1 查询历史总欠款
-        int debtAmt = accountDebtCatService.getAccountDebtNumByMemNo(cashierDeductDebtReqVO.getMemNo());
+        int debtAmt = accountDebtService.getAccountDebtNumByMemNo(cashierDeductDebtReqVO.getMemNo());
         if(debtAmt>=0){
             return new CashierDeductDebtResVO(cashierDeductDebtReqVO, NumberUtils.INTEGER_ZERO);
         }
         AccountDeductDebtReqVO accountDeductDebt = new AccountDeductDebtReqVO();
         //2 抵扣
         BeanUtils.copyProperties(cashierDeductDebtReqVO,accountDeductDebt);
-        int debtedAmt = accountDebtCatService.deductDebt(accountDeductDebt);
+        int debtedAmt = accountDebtService.deductDebt(accountDeductDebt);
+        //3 记录费用抵扣记录
+        //TODO
+        //1 违章押金抵扣
+        PayedOrderRenterDepositWZDetailReqVO payedOrderRenterWZDepositDetail = null;
+        accountRenterWzDepositService.updateRenterWZDepositChange(payedOrderRenterWZDepositDetail);
+        //2车辆押金抵扣
+        PayedOrderRenterDepositDetailReqVO payedOrderRenterDepositDetail =null;
+        accountRenterDepositService.updateRenterDepositChange(payedOrderRenterDepositDetail);
+
         return new CashierDeductDebtResVO(cashierDeductDebtReqVO, debtedAmt);
     }
-    /**  ***************************************** 历史欠款 end *************************************************     */
+    /**
+     * 查询用户历史欠款信息
+     * @param memNo
+     * @return
+     */
+    public AccountDebtResVO getAccountDebtByMemNo(String memNo) {
+       return accountDebtService.getAccountDebtByMemNo(memNo);
+    }
+
+    /**  ***************************************** 历史欠款 end ************************************************* */
+    /**  ***************************************** 退还押金 start ************************************************* */
+
+    /**
+     * 退还车辆/违章押金押金
+     */
+    @CatAnnotation
+    @Transactional(rollbackFor=Exception.class)
+    public void refundDeposit(CashierRefundApplyReqVO cashierRefundApplyReq){
+        Assert.notNull(cashierRefundApplyReq, ErrorCode.PARAMETER_ERROR.getText());
+        cashierRefundApplyReq.check();
+        //1 记录退还记录
+        cashierRefundApplyNoTService.insertRefundDeposit(cashierRefundApplyReq);
+        //2 记录费用平账
+
+    }
+    /**  ***************************************** 退还押金 end ************************************************* */
+
 }

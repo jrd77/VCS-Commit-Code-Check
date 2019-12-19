@@ -7,10 +7,14 @@ import com.atzuche.order.accountrenterdeposit.vo.req.CreateOrderRenterDepositReq
 import com.atzuche.order.accountrenterdeposit.vo.req.PayedOrderRenterDepositDetailReqVO;
 import com.atzuche.order.accountrenterdeposit.vo.req.PayedOrderRenterDepositReqVO;
 import com.atzuche.order.accountrenterdeposit.vo.res.AccountRenterDepositResVO;
+import com.atzuche.order.commons.enums.YesNoEnum;
+import com.autoyol.cat.CatAnnotation;
 import com.autoyol.commons.web.ErrorCode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
+
+import java.util.Objects;
 
 /**
  * 租车押金状态及其总表
@@ -33,6 +37,41 @@ public class AccountRenterDepositService{
         return accountRenterDepositNoTService.getAccountRenterDepositEntity(orderNo,memNo);
     }
     /**
+     * 查询车俩押金是否付清
+     * @param orderNo
+     * @param memNo
+     * @return
+     */
+    public boolean isPayOffForRenterDeposit(String orderNo, String memNo) {
+        AccountRenterDepositResVO accountRenterDepositRes = getAccountRenterDepositEntity(orderNo,memNo);
+        // 1 记录不存在
+        if(Objects.isNull(accountRenterDepositRes) || Objects.isNull(accountRenterDepositRes.getOrderNo())){
+            return Boolean.FALSE;
+        }
+        //2开启免疫
+        if(YesNoEnum.YES.getCode()==accountRenterDepositRes.getIsFreeDeposit()){
+            return Boolean.TRUE;
+        }
+        //3 实付 可能是getShifuDepositAmt ，预授权getAuthorizeDepositAmt 或者 信用支付getCreditPayAmt（） 均不为负数
+        //应付 负数    相加大于等于0 表示 已经付过押金
+        int yingfuAmt = accountRenterDepositRes.getYingfuDepositAmt();
+        int shifuAmt = accountRenterDepositRes.getShifuDepositAmt() + accountRenterDepositRes.getAuthorizeDepositAmt()+accountRenterDepositRes.getCreditPayAmt();
+        return yingfuAmt + shifuAmt>=0;
+    }
+    /**
+     * 查询车辆押金余额
+     */
+    public int getSurplusRenterDeposit(String orderNo, String memNo) {
+        //查询车辆押金信息
+        AccountRenterDepositResVO accountRenterDepositRes = getAccountRenterDepositEntity(orderNo,memNo);
+        //1 校验 是否存在车辆押金记录
+        Assert.notNull(accountRenterDepositRes, ErrorCode.PARAMETER_ERROR.getText());
+        Assert.notNull(accountRenterDepositRes.getOrderNo(), ErrorCode.PARAMETER_ERROR.getText());
+        //2 返回计算剩余押金余额
+        int surplusRenterDeposit = accountRenterDepositRes.getSurplusDepositAmt() + accountRenterDepositRes.getSurplusAuthorizeDepositAmt() + accountRenterDepositRes.getSurplusCreditPayAmt();
+        return surplusRenterDeposit;
+    }
+    /**
      * 下单成功记录应付押金
      */
     public void insertRenterDeposit(CreateOrderRenterDepositReqVO createOrderRenterDepositReqVO){
@@ -44,6 +83,7 @@ public class AccountRenterDepositService{
     /**
      * 支付成功后记录实付押金信息 和押金资金进出信息
      */
+    @CatAnnotation
     public void updateRenterDeposit(PayedOrderRenterDepositReqVO payedOrderRenterDeposit){
         //1 参数校验
         Assert.notNull(payedOrderRenterDeposit, ErrorCode.PARAMETER_ERROR.getText());
@@ -57,6 +97,7 @@ public class AccountRenterDepositService{
     /**
      * 支户头押金资金进出 操作
      */
+    @CatAnnotation
     public void updateRenterDepositChange(PayedOrderRenterDepositDetailReqVO payedOrderRenterDepositDetail){
         //1 参数校验
         Assert.notNull(payedOrderRenterDepositDetail, ErrorCode.PARAMETER_ERROR.getText());
