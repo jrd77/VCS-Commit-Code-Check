@@ -8,6 +8,7 @@ import com.atzuche.order.accountdebt.service.notservice.AccountDebtReceivableaDe
 import com.atzuche.order.accountdebt.vo.req.AccountDeductDebtReqVO;
 import com.atzuche.order.accountdebt.vo.req.AccountInsertDebtReqVO;
 import com.atzuche.order.accountdebt.vo.res.AccountDebtResVO;
+import com.autoyol.cat.CatAnnotation;
 import com.autoyol.commons.utils.GsonUtils;
 import com.autoyol.commons.web.ErrorCode;
 import lombok.extern.slf4j.Slf4j;
@@ -41,6 +42,7 @@ public class AccountDebtService{
      * @param memNo
      * @return
      */
+    @CatAnnotation
     public AccountDebtResVO getAccountDebtByMemNo(String memNo) {
         return accountDebtNoTService.getAccountDebtByMemNo(memNo);
     }
@@ -62,6 +64,7 @@ public class AccountDebtService{
      * 抵扣历史欠款
      * @return
      */
+    @CatAnnotation
     public int deductDebt(AccountDeductDebtReqVO accountDeductDebt) {
         // 1 参数校验
         Assert.notNull(accountDeductDebt, ErrorCode.PARAMETER_ERROR.getText());
@@ -84,6 +87,7 @@ public class AccountDebtService{
     /**
      * 记录用户历史欠款
      */
+    @CatAnnotation
     public void insertDebt(AccountInsertDebtReqVO accountInsertDebt){
         //1校验
         Assert.notNull(accountInsertDebt, ErrorCode.PARAMETER_ERROR.getText());

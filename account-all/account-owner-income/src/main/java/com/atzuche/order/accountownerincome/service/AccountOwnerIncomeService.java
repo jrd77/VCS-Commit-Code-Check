@@ -7,6 +7,7 @@ import com.atzuche.order.accountownerincome.entity.AccountOwnerIncomeDetailEntit
 import com.atzuche.order.accountownerincome.enums.AccountOwnerIncomeExamineStatus;
 import com.atzuche.order.accountownerincome.vo.req.AccountOwnerIncomeExamineOpReqVO;
 import com.atzuche.order.accountownerincome.vo.req.AccountOwnerIncomeExamineReqVO;
+import com.autoyol.cat.CatAnnotation;
 import com.autoyol.commons.web.ErrorCode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -50,6 +51,7 @@ public class AccountOwnerIncomeService{
     /**
      * 收益审核通过 更新车主收益信息
      */
+    @CatAnnotation
     public void examineOwnerIncomeExamine(AccountOwnerIncomeExamineOpReqVO accountOwnerIncomeExamineOpReq){
         //1参数校验
         Assert.notNull(accountOwnerIncomeExamineOpReq, ErrorCode.PARAMETER_ERROR.getText());

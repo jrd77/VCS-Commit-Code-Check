@@ -20,6 +20,10 @@ public class CashierRefundApplyEntity implements Serializable {
 	 * id
 	 */
 	private Integer id;
+    /**
+     * 会员号
+     */
+    private String memNo;
 	/**
 	 * 主订单号
 	 */
@@ -27,11 +31,11 @@ public class CashierRefundApplyEntity implements Serializable {
 	/**
 	 * 退款类型来源code
 	 */
-	private Integer refundTypeSourceCode;
+	private Integer sourceCode;
 	/**
 	 * 退款类型来源描述
 	 */
-	private String refundTypeSourceDetail;
+	private String sourceDetail;
 	/**
 	 * 退款金额
 	 */
@@ -43,7 +47,7 @@ public class CashierRefundApplyEntity implements Serializable {
 	/**
 	 * 退款外部凭证
 	 */
-	private String refundUniqueNo;
+	private String uniqueNo;
 	/**
 	 * 备注
 	 */
@@ -72,5 +76,8 @@ public class CashierRefundApplyEntity implements Serializable {
 	 * 0-正常，1-已逻辑删除
 	 */
 	private Integer isDelete;
-
+    /**
+     * 更新版本号
+     */
+    private Integer version;
 }

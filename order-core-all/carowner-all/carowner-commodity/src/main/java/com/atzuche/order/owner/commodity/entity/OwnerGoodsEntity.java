@@ -60,10 +60,14 @@ public class OwnerGoodsEntity implements Serializable {
 	 * 车型名称
 	 */
 	private String carTypeTxt;
-	/**
-	 * 排量
-	 */
-	private String carDisplacement;
+    /**
+     * 排量
+     */
+    private Double carCylinderCapacity;
+    /**
+     * L/T
+     */
+    private String carCcUnit;
 	/**
 	 * 变速箱类型
 	 */

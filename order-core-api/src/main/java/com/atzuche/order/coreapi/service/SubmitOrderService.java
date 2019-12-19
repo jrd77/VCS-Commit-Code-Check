@@ -8,6 +8,7 @@ import com.atzuche.order.commons.entity.dto.*;
 import com.atzuche.order.commons.enums.InternalStaffEnum;
 import com.atzuche.order.commons.enums.OwnerMemRightEnum;
 import com.atzuche.order.commons.enums.RenterMemRightEnum;
+import com.atzuche.order.coreapi.entity.request.SubmitOrderReq;
 import com.atzuche.order.coreapi.enums.SubmitOrderErrorEnum;
 import com.atzuche.order.coreapi.submitOrder.exception.CarDetailByFeignException;
 import com.atzuche.order.coreapi.submitOrder.exception.OwnerberByFeignException;
@@ -46,10 +47,11 @@ public class SubmitOrderService {
     @Autowired
     private CarService carService;
 
+
     @Autowired
     private CarDetailQueryFeignApi carDetailQueryFeignApi;
 
-    public ResponseData submitOrder(NormalOrderReqVO submitReqDto) {
+    public ResponseData submitOrder(SubmitOrderReq submitReqDto) {
         //调用日志模块 TODO
 
         try{
@@ -71,7 +73,7 @@ public class SubmitOrderService {
 
 
             //开始校验规则 （前置校验 + 风控）TODO
-            submitOrderFilterService.checkRules(submitReqDto,orderContextDto);
+//            submitOrderFilterService.checkRules(submitReqDto,orderContextDto);
 
 
             //调用费用计算模块,组装数据orderContextDto TODO
@@ -107,9 +109,5 @@ public class SubmitOrderService {
         //调用车主模块（子订单模块、商品、会员）
         return null;
     }
-
-
-
-
 
 }

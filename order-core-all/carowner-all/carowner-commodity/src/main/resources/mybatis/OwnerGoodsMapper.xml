@@ -15,7 +15,8 @@
         <result property="carRating" column="car_rating"/>
         <result property="carType" column="car_type"/>
         <result property="carTypeTxt" column="car_type_txt"/>
-        <result property="carDisplacement" column="car_displacement"/>
+        <result property="carCylinderCapacity" column="car_cylinder_capacity"/>
+        <result property="carCcUnit" column="car_cc_unit"/>
         <result property="carGearboxType" column="car_gearbox_type"/>
         <result property="carDayMileage" column="car_day_mileage"/>
         <result property="carIntrod" column="car_introd"/>
@@ -60,7 +61,7 @@
 	`car_rating`, 	
 	`car_type`, 	
 	`car_type_txt`, 	
-	`car_displacement`, 	
+	`car_cylinder_capacity`,
 	`car_gearbox_type`, 	
 	`car_day_mileage`, 	
 	`car_introd`, 	
@@ -111,7 +112,8 @@
 				`car_rating`,		
 				`car_type`,		
 				`car_type_txt`,		
-				`car_displacement`,		
+				`car_cylinder_capacity`,
+                `car_cc_unit`,
 				`car_gearbox_type`,		
 				`car_day_mileage`,		
 				`car_introd`,		
@@ -152,7 +154,8 @@
 				#{carRating}, 		
 				#{carType}, 		
 				#{carTypeTxt}, 		
-				#{carDisplacement}, 		
+				#{carCylinderCapacity},
+                #{carCcUnit},
 				#{carGearboxType}, 		
 				#{carDayMileage}, 		
 				#{carIntrod}, 		
@@ -195,7 +198,8 @@
 				<if test="carRating != null">`car_rating`, </if>
 				<if test="carType != null">`car_type`, </if>
 				<if test="carTypeTxt != null">`car_type_txt`, </if>
-				<if test="carDisplacement != null">`car_displacement`, </if>
+				<if test="carCylinderCapacity != null">`car_cylinder_capacity`, </if>
+                <if test="carCcUnit != null">`car_cc_unit`,</if>
 				<if test="carGearboxType != null">`car_gearbox_type`, </if>
 				<if test="carDayMileage != null">`car_day_mileage`, </if>
 				<if test="carIntrod != null">`car_introd`, </if>
@@ -238,7 +242,8 @@
 				<if test="carRating != null">#{carRating},  </if>
 				<if test="carType != null">#{carType},  </if>
 				<if test="carTypeTxt != null">#{carTypeTxt},  </if>
-				<if test="carDisplacement != null">#{carDisplacement},  </if>
+				<if test="carCylinderCapacity != null">#{carCylinderCapacity},  </if>
+                <if test="carCcUnit != null">#{carCcUnit},  </if>
 				<if test="carGearboxType != null">#{carGearboxType},  </if>
 				<if test="carDayMileage != null">#{carDayMileage},  </if>
 				<if test="carIntrod != null">#{carIntrod},  </if>
@@ -285,7 +290,8 @@
 				<if test="carRating != null">`car_rating` = #{carRating}, </if>
 				<if test="carType != null">`car_type` = #{carType}, </if>
 				<if test="carTypeTxt != null">`car_type_txt` = #{carTypeTxt}, </if>
-				<if test="carDisplacement != null">`car_displacement` = #{carDisplacement}, </if>
+				<if test="carCylinderCapacity != null">`car_cylinder_capacity` = #{carCylinderCapacity}, </if>
+                <if test="carCcUnit != null">`car_cc_unit` = #{carCcUnit}, </if>
 				<if test="carGearboxType != null">`car_gearbox_type` = #{carGearboxType}, </if>
 				<if test="carDayMileage != null">`car_day_mileage` = #{carDayMileage}, </if>
 				<if test="carIntrod != null">`car_introd` = #{carIntrod}, </if>
@@ -332,7 +338,8 @@
 				`car_rating` = #{carRating}, 		
 				`car_type` = #{carType}, 		
 				`car_type_txt` = #{carTypeTxt}, 		
-				`car_displacement` = #{carDisplacement}, 		
+				`car_cylinder_capacity` = #{carCylinderCapacity},
+                `car_cc_unit` = #{carCcUnit},
 				`car_gearbox_type` = #{carGearboxType}, 		
 				`car_day_mileage` = #{carDayMileage}, 		
 				`car_introd` = #{carIntrod}, 		
@@ -357,10 +364,8 @@
 				`car_real_lon` = #{carRealLon}, 		
 				`car_real_lat` = #{carRealLat}, 		
 				`car_addr_index` = #{carAddrIndex}, 		
-				`create_time` = #{createTime}, 		
-				`create_op` = #{createOp}, 		
-				`update_time` = #{updateTime}, 		
-				`update_op` = #{updateOp}, 		
+				`create_op` = #{createOp},
+				`update_op` = #{updateOp},
 				`is_delete` = #{isDelete}		
 	
 		</set>
