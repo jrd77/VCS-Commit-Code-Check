@@ -10,21 +10,21 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.atzuche.order.commons.entity.dto.AbatementAmtDTO;
+import com.atzuche.order.commons.entity.dto.CostBaseDTO;
+import com.atzuche.order.commons.entity.dto.DepositAmtDTO;
+import com.atzuche.order.commons.entity.dto.ExtraDriverDTO;
+import com.atzuche.order.commons.entity.dto.IllegalDepositAmtDTO;
+import com.atzuche.order.commons.entity.dto.InsurAmtDTO;
+import com.atzuche.order.commons.entity.dto.MileageAmtDTO;
+import com.atzuche.order.commons.entity.dto.OilAmtDTO;
+import com.atzuche.order.commons.entity.dto.RentAmtDTO;
 import com.atzuche.order.commons.entity.dto.RenterGoodsPriceDetailDTO;
 import com.atzuche.order.commons.enums.RenterCashCodeEnum;
 import com.atzuche.order.rentercost.entity.OrderConsoleCostDetailEntity;
 import com.atzuche.order.rentercost.entity.RenterOrderCostDetailEntity;
 import com.atzuche.order.rentercost.entity.RenterOrderFineDeatailEntity;
 import com.atzuche.order.rentercost.entity.RenterOrderSubsidyDetailEntity;
-import com.atzuche.order.rentercost.entity.dto.AbatementAmtDTO;
-import com.atzuche.order.rentercost.entity.dto.CostBaseDTO;
-import com.atzuche.order.rentercost.entity.dto.DepositAmtDTO;
-import com.atzuche.order.rentercost.entity.dto.ExtraDriverDTO;
-import com.atzuche.order.rentercost.entity.dto.IllegalDepositAmtDTO;
-import com.atzuche.order.rentercost.entity.dto.InsurAmtDTO;
-import com.atzuche.order.rentercost.entity.dto.MileageAmtDTO;
-import com.atzuche.order.rentercost.entity.dto.OilAmtDTO;
-import com.atzuche.order.rentercost.entity.dto.RentAmtDTO;
 import com.atzuche.order.rentercost.exception.RenterCostParameterException;
 import com.autoyol.platformcost.CommonUtils;
 import com.autoyol.platformcost.RenterFeeCalculatorUtils;
@@ -53,6 +53,8 @@ public class RenterOrderCostCombineService {
 	private OrderConsoleCostDetailService orderConsoleCostDetailService;
 	
 	public static final List<RenterCashCodeEnum> RENTERCASHCODEENUM_LIST = new ArrayList<RenterCashCodeEnum>() {
+
+		private static final long serialVersionUID = 1L;
 
 	{
         add(RenterCashCodeEnum.RENT_AMT);
@@ -273,7 +275,7 @@ public class RenterOrderCostCombineService {
 	
 	/**
 	 * 获取租客油费
-	 * @param mileageAmtDTO
+	 * @param oilAmtDTO
 	 * @return RenterOrderCostDetailEntity
 	 */
 	public RenterOrderCostDetailEntity getOilAmtEntity(OilAmtDTO oilAmtDTO) {
