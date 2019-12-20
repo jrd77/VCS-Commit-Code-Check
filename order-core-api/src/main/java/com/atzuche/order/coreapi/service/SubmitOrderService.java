@@ -14,7 +14,6 @@ import com.atzuche.order.coreapi.submitOrder.exception.CarDetailByFeignException
 import com.atzuche.order.coreapi.submitOrder.exception.OwnerberByFeignException;
 import com.atzuche.order.coreapi.submitOrder.exception.RenterMemberByFeignException;
 import com.atzuche.order.coreapi.submitOrder.exception.SubmitOrderException;
-import com.atzuche.order.coreapi.submitOrder.filter.SubmitOrderFilterService;
 import com.atzuche.order.request.NormalOrderReqVO;
 import com.autoyol.car.api.feign.api.CarDetailQueryFeignApi;
 import com.autoyol.car.api.model.dto.OrderCarInfoParamDTO;
@@ -40,8 +39,7 @@ import java.util.stream.Collectors;
 public class SubmitOrderService {
 
 
-    @Autowired
-    private SubmitOrderFilterService submitOrderFilterService;
+
     @Autowired
     private MemberService memberService;
     @Autowired

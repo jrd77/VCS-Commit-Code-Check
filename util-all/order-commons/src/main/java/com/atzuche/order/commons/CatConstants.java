@@ -10,4 +10,6 @@ public class CatConstants {
     public static final String FEIGN_METHOD="Feign.Method";
 
     public static final String FEIGN_PARAM="Feign.Param";
+
+    public static final String FEIGN_RESULT ="Feign.Result" ;
 }
