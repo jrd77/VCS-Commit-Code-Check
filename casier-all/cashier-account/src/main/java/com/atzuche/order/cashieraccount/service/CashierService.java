@@ -13,6 +13,7 @@ import com.atzuche.order.cashieraccount.service.notservice.CashierRefundApplyNoT
 import com.atzuche.order.cashieraccount.vo.req.CashierDeductDebtReqVO;
 import com.atzuche.order.cashieraccount.vo.req.CashierRefundApplyReqVO;
 import com.atzuche.order.cashieraccount.vo.res.CashierDeductDebtResVO;
+import com.atzuche.order.commons.enums.RenterCashCodeEnum;
 import com.autoyol.cat.CatAnnotation;
 import com.autoyol.commons.web.ErrorCode;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -93,28 +94,50 @@ public class CashierService {
      */
     @CatAnnotation
     @Transactional(rollbackFor=Exception.class)
-    public CashierDeductDebtResVO deductDebt(CashierDeductDebtReqVO cashierDeductDebtReqVO){
+    public CashierDeductDebtResVO deductWZDebt(CashierDeductDebtReqVO cashierDeductDebtReqVO){
         Assert.notNull(cashierDeductDebtReqVO, ErrorCode.PARAMETER_ERROR.getText());
         cashierDeductDebtReqVO.check();
+        cashierDeductDebtReqVO.setSourceCode(Integer.parseInt(RenterCashCodeEnum.ACCOUNT_RENTER_WZ_DEPOSIT.getCashNo()));
+        cashierDeductDebtReqVO.setSourceDetail(RenterCashCodeEnum.ACCOUNT_RENTER_WZ_DEPOSIT.getTxt());
         //1 查询历史总欠款
         int debtAmt = accountDebtService.getAccountDebtNumByMemNo(cashierDeductDebtReqVO.getMemNo());
         if(debtAmt>=0){
             return new CashierDeductDebtResVO(cashierDeductDebtReqVO, NumberUtils.INTEGER_ZERO);
         }
-        AccountDeductDebtReqVO accountDeductDebt = new AccountDeductDebtReqVO();
         //2 抵扣
+        AccountDeductDebtReqVO accountDeductDebt = new AccountDeductDebtReqVO();
         BeanUtils.copyProperties(cashierDeductDebtReqVO,accountDeductDebt);
         int debtedAmt = accountDebtService.deductDebt(accountDeductDebt);
         //3 记录费用抵扣记录
-        //TODO
-        //1 违章押金抵扣
-        PayedOrderRenterDepositWZDetailReqVO payedOrderRenterWZDepositDetail = null;
+        PayedOrderRenterDepositWZDetailReqVO payedOrderRenterWZDepositDetail = new PayedOrderRenterDepositWZDetailReqVO();
+        BeanUtils.copyProperties(cashierDeductDebtReqVO,payedOrderRenterWZDepositDetail);
         accountRenterWzDepositService.updateRenterWZDepositChange(payedOrderRenterWZDepositDetail);
-        //2车辆押金抵扣
-        PayedOrderRenterDepositDetailReqVO payedOrderRenterDepositDetail =null;
-        accountRenterDepositService.updateRenterDepositChange(payedOrderRenterDepositDetail);
-
         return new CashierDeductDebtResVO(cashierDeductDebtReqVO, debtedAmt);
+    }
+    /**
+     * 7）押金抵扣历史欠款
+     */
+    @CatAnnotation
+    @Transactional(rollbackFor=Exception.class)
+    public CashierDeductDebtResVO deductDebt(CashierDeductDebtReqVO cashierDeductDebtReq){
+        Assert.notNull(cashierDeductDebtReq, ErrorCode.PARAMETER_ERROR.getText());
+        cashierDeductDebtReq.check();
+        cashierDeductDebtReq.setSourceCode(Integer.parseInt(RenterCashCodeEnum.ACCOUNT_RENTER_DEPOSIT.getCashNo()));
+        cashierDeductDebtReq.setSourceDetail(RenterCashCodeEnum.ACCOUNT_RENTER_DEPOSIT.getTxt());
+        //1 查询历史总欠款
+        int debtAmt = accountDebtService.getAccountDebtNumByMemNo(cashierDeductDebtReq.getMemNo());
+        if(debtAmt>=0){
+            return new CashierDeductDebtResVO(cashierDeductDebtReq, NumberUtils.INTEGER_ZERO);
+        }
+        //2 抵扣
+        AccountDeductDebtReqVO accountDeductDebt = new AccountDeductDebtReqVO();
+        BeanUtils.copyProperties(cashierDeductDebtReq,accountDeductDebt);
+        int debtedAmt = accountDebtService.deductDebt(accountDeductDebt);
+        //3 记录费用抵扣记录
+        PayedOrderRenterDepositDetailReqVO payedOrderRenterDepositDetail = new PayedOrderRenterDepositDetailReqVO();
+        BeanUtils.copyProperties(cashierDeductDebtReq,payedOrderRenterDepositDetail);
+        accountRenterDepositService.updateRenterDepositChange(payedOrderRenterDepositDetail);
+        return new CashierDeductDebtResVO(cashierDeductDebtReq, debtedAmt);
     }
     /**
      * 查询用户历史欠款信息
@@ -129,17 +152,38 @@ public class CashierService {
     /**  ***************************************** 退还押金 start ************************************************* */
 
     /**
-     * 退还车辆/违章押金押金
+     * 退还车辆押金
      */
     @CatAnnotation
     @Transactional(rollbackFor=Exception.class)
     public void refundDeposit(CashierRefundApplyReqVO cashierRefundApplyReq){
         Assert.notNull(cashierRefundApplyReq, ErrorCode.PARAMETER_ERROR.getText());
         cashierRefundApplyReq.check();
+        cashierRefundApplyReq.setSourceCode(Integer.parseInt(RenterCashCodeEnum.ACCOUNT_RENTER_DEPOSIT.getCashNo()));
+        cashierRefundApplyReq.setSourceDetail(RenterCashCodeEnum.ACCOUNT_RENTER_DEPOSIT.getTxt());
         //1 记录退还记录
         cashierRefundApplyNoTService.insertRefundDeposit(cashierRefundApplyReq);
         //2 记录费用平账
-
+        PayedOrderRenterDepositDetailReqVO payedOrderRenterDepositDetail = new PayedOrderRenterDepositDetailReqVO();
+        BeanUtils.copyProperties(cashierRefundApplyReq,payedOrderRenterDepositDetail);
+        accountRenterDepositService.updateRenterDepositChange(payedOrderRenterDepositDetail);
+    }
+    /**
+     * 退还违章押金
+     */
+    @CatAnnotation
+    @Transactional(rollbackFor=Exception.class)
+    public void refundWZDeposit(CashierRefundApplyReqVO cashierRefundApplyReq){
+        Assert.notNull(cashierRefundApplyReq, ErrorCode.PARAMETER_ERROR.getText());
+        cashierRefundApplyReq.check();
+        cashierRefundApplyReq.setSourceCode(Integer.parseInt(RenterCashCodeEnum.ACCOUNT_RENTER_WZ_DEPOSIT.getCashNo()));
+        cashierRefundApplyReq.setSourceDetail(RenterCashCodeEnum.ACCOUNT_RENTER_WZ_DEPOSIT.getTxt());
+        //1 记录退还记录
+        cashierRefundApplyNoTService.insertRefundDeposit(cashierRefundApplyReq);
+        //2 记录费用平账
+        PayedOrderRenterDepositWZDetailReqVO payedOrderRenterWZDepositDetail = new PayedOrderRenterDepositWZDetailReqVO();
+        BeanUtils.copyProperties(cashierRefundApplyReq,payedOrderRenterWZDepositDetail);
+        accountRenterWzDepositService.updateRenterWZDepositChange(payedOrderRenterWZDepositDetail);
     }
     /**  ***************************************** 退还押金 end ************************************************* */
 

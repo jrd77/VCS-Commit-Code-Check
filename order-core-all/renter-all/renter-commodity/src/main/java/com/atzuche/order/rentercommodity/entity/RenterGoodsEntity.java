@@ -1,16 +1,15 @@
 package com.atzuche.order.rentercommodity.entity;
 
-import lombok.Data;
-
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import lombok.Data;
 
 
 /**
  * 租客商品概览表
  * 
  * @author ZhangBin
- * @date 2019-12-17 11:43:16
+ * @date 2019-12-19 16:56:56
  * @Description:
  */
 @Data
@@ -65,9 +64,9 @@ public class RenterGoodsEntity implements Serializable {
 	 * 排量
 	 */
 	private Double carCylinderCapacity;
-    /**
-     * L/T
-     */
+	/**
+	 * L/T
+	 */
 	private String carCcUnit;
 	/**
 	 * 变速箱类型

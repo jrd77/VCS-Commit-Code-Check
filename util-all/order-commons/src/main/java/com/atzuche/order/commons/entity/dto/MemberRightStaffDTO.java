@@ -11,7 +11,7 @@ import lombok.Data;
  **/
 @Data
 @AllArgsConstructor
-public class MemberRightStaffDto {
+public class MemberRightStaffDTO {
     private int carDeposit;
     private int wzDeposit;
 

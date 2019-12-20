@@ -2,7 +2,7 @@ package com.atzuche.order.rentercost.entity.dto;
 
 import java.util.List;
 
-import com.atzuche.order.commons.entity.dto.RenterGoodsPriceDetailDto;
+import com.atzuche.order.commons.entity.dto.RenterGoodsPriceDetailDTO;
 
 import lombok.Data;
 import lombok.ToString;
@@ -18,5 +18,5 @@ public class RentAmtDTO {
 	/**
      * 一天一价
      */
-	private List<RenterGoodsPriceDetailDto> renterGoodsPriceDetailDtoList;
+	private List<RenterGoodsPriceDetailDTO> renterGoodsPriceDetailDTOList;
 }
