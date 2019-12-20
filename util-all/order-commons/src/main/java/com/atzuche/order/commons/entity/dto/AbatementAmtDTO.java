@@ -1,4 +1,4 @@
-package com.atzuche.order.rentercost.entity.dto;
+package com.atzuche.order.commons.entity.dto;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -8,8 +8,7 @@ import lombok.ToString;
 
 @Data
 @ToString
-public class InsurAmtDTO {
-
+public class AbatementAmtDTO {
 	/**
 	 * 基本信息
 	 */
@@ -38,5 +37,4 @@ public class InsurAmtDTO {
 	 * 车辆标签
 	 */
 	private List<Integer> carLabelIds;
-
 }

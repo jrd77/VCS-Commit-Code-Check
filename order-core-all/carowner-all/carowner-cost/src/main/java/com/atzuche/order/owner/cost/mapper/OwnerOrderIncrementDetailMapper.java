@@ -2,6 +2,8 @@ package com.atzuche.order.owner.cost.mapper;
 
 import com.atzuche.order.owner.cost.entity.OwnerOrderIncrementDetailEntity;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
 import java.util.List;
 
 /**
@@ -19,10 +21,11 @@ public interface OwnerOrderIncrementDetailMapper{
 
     int insert(OwnerOrderIncrementDetailEntity record);
     
-    int insertSelective(OwnerOrderIncrementDetailEntity record);
+    int saveOwnerOrderIncrementDetail(OwnerOrderIncrementDetailEntity record);
 
     int updateByPrimaryKey(OwnerOrderIncrementDetailEntity record);
     
     int updateByPrimaryKeySelective(OwnerOrderIncrementDetailEntity record);
 
+    List<OwnerOrderIncrementDetailEntity> listOwnerOrderIncrementDetail(@Param("orderNo") String orderNo, @Param("ownerOrderNo") String ownerOrderNo);
 }

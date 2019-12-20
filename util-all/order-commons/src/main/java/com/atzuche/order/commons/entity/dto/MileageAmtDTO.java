@@ -1,4 +1,4 @@
-package com.atzuche.order.rentercost.entity.dto;
+package com.atzuche.order.commons.entity.dto;
 
 import lombok.Data;
 import lombok.ToString;
@@ -6,11 +6,14 @@ import lombok.ToString;
 @Data
 @ToString
 public class MileageAmtDTO {
-
 	/**
 	 * 基本信息
 	 */
 	private CostBaseDTO costBaseDTO;
+	/**
+	 * 车辆类型（代管车，托管车，个人车辆等等）
+	 */
+	private Integer carOwnerType;
 	/**
 	 * 日均限里程数
 	 */
