@@ -1,12 +1,14 @@
 package com.atzuche.order.commons.entity.dto;
 
 import lombok.Data;
+import lombok.ToString;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data
-public class OwnerGoodsPriceDetailDto {
+@ToString
+public class RenterGoodsPriceDetailDTO {
     /**
      * 主订单号
      */
@@ -14,7 +16,7 @@ public class OwnerGoodsPriceDetailDto {
     /**
      * 子订单号
      */
-    private String ownerOrderNo;
+    private String renterOrderNo;
     /**
      * 商品概览id
      */

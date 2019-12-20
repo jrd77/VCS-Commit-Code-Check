@@ -3,40 +3,33 @@
  */
 package com.atzuche.order.coreapi.submitOrder.filter;
 
-import com.atzuche.order.commons.entity.dto.OrderContextDto;
-import com.atzuche.order.coreapi.entity.request.NormalOrderReqVO;
-import com.atzuche.order.coreapi.submitOrder.exception.SubmitOrderException;
-import org.springframework.stereotype.Service;
+import com.atzuche.order.commons.OrderReqContext;
+import com.atzuche.order.commons.filter.OrderFilter;
+import com.atzuche.order.commons.filter.OrderFilterException;
 
+import java.util.ArrayList;
 import java.util.List;
 
-/*
- * @Author ZhangBin
- * @Date 2019/12/12 15:29
- * @Description: 线程安全的过滤链
- * 
- **/
-@Service
-public class FilterChain {
+/**
+ * 订单过滤链
+ */
+public class FilterChain implements OrderFilter{
 
-	ThreadLocal<List<SubmitOrderFilter>> filters = new ThreadLocal<List<SubmitOrderFilter>>();
+	private List<OrderFilter> filterList = new ArrayList<>();
 
 	public FilterChain() {
 		super();
 	}
 
-	public FilterChain addFilterAll(List<SubmitOrderFilter> lst) {
-		this.filters.set(lst);
+	public FilterChain addFilterAll(List<OrderFilter> lst) {
+		this.filterList.addAll(lst);
 		return this;
 	}
 
-	public void doFilter(NormalOrderReqVO submitReqDto, OrderContextDto orderContextDto, FilterChain chain, int index) throws SubmitOrderException {
-		if (index == filters.get().size()) {
-			return;
+	@Override
+	public void validate(OrderReqContext context) throws OrderFilterException {
+		for(OrderFilter orderFilter: filterList){
+			orderFilter.validate(context);
 		}
-		SubmitOrderFilter submitOrderFilter = filters.get().get(index);
-		index++;
-        submitOrderFilter.doFilter(submitReqDto, orderContextDto, chain, index);
 	}
-
 }

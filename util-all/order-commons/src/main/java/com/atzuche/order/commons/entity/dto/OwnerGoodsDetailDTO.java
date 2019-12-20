@@ -5,8 +5,11 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class RenterGoodsDetailDto {
-
+public class OwnerGoodsDetailDTO {
+    /**
+     * 车主会员号
+     */
+    private String memNo;
     /**
      * 应答标识位，0未设置，1已设置
      */
@@ -131,8 +134,9 @@ public class RenterGoodsDetailDto {
      * 选择的车辆地址序号
      */
     private Integer carAddrIndex;
+
     /**
      * 一天一价
      */
-    List<RenterGoodsPriceDetailDto> renterGoodsPriceDetailDtoList;
+    List<OwnerGoodsPriceDetailDTO> ownerGoodsPriceDetailDTOList;
 }

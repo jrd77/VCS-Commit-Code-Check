@@ -16,6 +16,8 @@ apply plugin: 'org.springframework.boot'
 
 
 dependencies {
+    compile project(":order-openapi")
+
     compile "com.autoyol:auto-web-starter:1.0-SNAPSHOT"
     compile 'org.springframework.boot:spring-boot-starter-web'
 	compile('org.springframework.boot:spring-boot-starter-actuator')

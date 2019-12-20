@@ -9,7 +9,7 @@ import lombok.Data;
  * 车主端商品概览表
  * 
  * @author ZhangBin
- * @date 2019-12-17 20:30:11
+ * @date 2019-12-19 16:56:56
  * @Description:
  */
 @Data
@@ -60,14 +60,14 @@ public class OwnerGoodsEntity implements Serializable {
 	 * 车型名称
 	 */
 	private String carTypeTxt;
-    /**
-     * 排量
-     */
-    private Double carCylinderCapacity;
-    /**
-     * L/T
-     */
-    private String carCcUnit;
+	/**
+	 * 排量
+	 */
+	private Double carCylinderCapacity;
+	/**
+	 * L/T
+	 */
+	private String carCcUnit;
 	/**
 	 * 变速箱类型
 	 */

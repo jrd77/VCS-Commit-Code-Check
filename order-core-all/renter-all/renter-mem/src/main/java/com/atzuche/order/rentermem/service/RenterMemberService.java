@@ -1,8 +1,8 @@
 package com.atzuche.order.rentermem.service;
 
-import com.atzuche.order.commons.entity.dto.OrderContextDto;
-import com.atzuche.order.commons.entity.dto.RenterMemberDto;
-import com.atzuche.order.commons.entity.dto.RenterMemberRightDto;
+import com.atzuche.order.commons.entity.dto.OrderContextDTO;
+import com.atzuche.order.commons.entity.dto.RenterMemberDTO;
+import com.atzuche.order.commons.entity.dto.RenterMemberRightDTO;
 import com.atzuche.order.rentermem.entity.RenterMemberEntity;
 import com.atzuche.order.rentermem.entity.RenterMemberRightEntity;
 import com.atzuche.order.rentermem.mapper.RenterMemberRightMapper;
@@ -31,14 +31,14 @@ public class RenterMemberService{
     /**
      * 保存租客用户信息
      */
-    public void save(OrderContextDto orderContextDto){
-        RenterMemberDto renterMemberDto = orderContextDto.getRenterMemberDto();
+    public void save(OrderContextDTO orderContextDto){
+        RenterMemberDTO renterMemberDto = orderContextDto.getRenterMemberDto();
         RenterMemberEntity renterMemberEntity = new RenterMemberEntity();
         BeanUtils.copyProperties(renterMemberDto,renterMemberEntity);
         renterMemberMapper.insert(renterMemberEntity);
 
         List<RenterMemberRightEntity> list = new ArrayList<>();
-        renterMemberDto.getRenterMemberRightDtoList().forEach(x->{
+        renterMemberDto.getRenterMemberRightDTOList().forEach(x->{
             RenterMemberRightEntity renterMemberRightEntity = new RenterMemberRightEntity();
             BeanUtils.copyProperties(x,renterMemberRightEntity);
             list.add(renterMemberRightEntity);
@@ -51,21 +51,21 @@ public class RenterMemberService{
      * @param renterOrderNo 子订单号
      * @param isNeedRight 是否需要权益值信息
      */
-    public RenterMemberDto selectrenterMemberByMemNo(String renterOrderNo,boolean isNeedRight){
-        RenterMemberDto renterMemberDto = new RenterMemberDto();
+    public RenterMemberDTO selectrenterMemberByMemNo(String renterOrderNo, boolean isNeedRight){
+        RenterMemberDTO renterMemberDto = new RenterMemberDTO();
         RenterMemberEntity renterMemberEntity = renterMemberMapper.selectByRenterOrderNo(renterOrderNo);
         BeanUtils.copyProperties(renterMemberEntity,renterMemberDto);
         if(!isNeedRight){
             return renterMemberDto;
         }
         List<RenterMemberRightEntity> dbList = renterMemberRightMapper.selectByRenterOrderNo(renterOrderNo);
-        List<RenterMemberRightDto> list = new ArrayList<>();
+        List<RenterMemberRightDTO> list = new ArrayList<>();
         dbList.forEach(x->{
-            RenterMemberRightDto renterMemberRightDto = new RenterMemberRightDto();
+            RenterMemberRightDTO renterMemberRightDto = new RenterMemberRightDTO();
             BeanUtils.copyProperties(x,renterMemberRightDto);
             list.add(renterMemberRightDto);
         });
-        renterMemberDto.setRenterMemberRightDtoList(list);
+        renterMemberDto.setRenterMemberRightDTOList(list);
         return renterMemberDto;
     }
 

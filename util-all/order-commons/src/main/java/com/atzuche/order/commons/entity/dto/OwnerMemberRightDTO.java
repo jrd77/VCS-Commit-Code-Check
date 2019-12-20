@@ -3,7 +3,7 @@ package com.atzuche.order.commons.entity.dto;
 import lombok.Data;
 
 @Data
-public class OwnerMemberRightDto {
+public class OwnerMemberRightDTO {
     /**
      * 权益编码
      */

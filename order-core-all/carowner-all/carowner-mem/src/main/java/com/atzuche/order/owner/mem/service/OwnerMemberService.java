@@ -1,8 +1,8 @@
 package com.atzuche.order.owner.mem.service;
 
-import com.atzuche.order.commons.entity.dto.OrderContextDto;
-import com.atzuche.order.commons.entity.dto.OwnerMemberDto;
-import com.atzuche.order.commons.entity.dto.OwnerMemberRightDto;
+import com.atzuche.order.commons.entity.dto.OrderContextDTO;
+import com.atzuche.order.commons.entity.dto.OwnerMemberDTO;
+import com.atzuche.order.commons.entity.dto.OwnerMemberRightDTO;
 import com.atzuche.order.owner.mem.entity.OwnerMemberEntity;
 import com.atzuche.order.owner.mem.entity.OwnerMemberRightEntity;
 import com.atzuche.order.owner.mem.mapper.OwnerMemberMapper;
@@ -31,14 +31,14 @@ public class OwnerMemberService{
     /**
      * 保存租客用户信息
      */
-    public void save(OrderContextDto orderContextDto){
-        OwnerMemberDto ownerMemberDto = orderContextDto.getOwnerMemberDto();
+    public void save(OrderContextDTO orderContextDto){
+        OwnerMemberDTO ownerMemberDto = orderContextDto.getOwnerMemberDto();
         OwnerMemberEntity ownerMemberEntity = new OwnerMemberEntity();
         BeanUtils.copyProperties(ownerMemberDto,ownerMemberEntity);
         ownerMemberMapper.insert(ownerMemberEntity);
 
         List<OwnerMemberRightEntity> list = new ArrayList<>();
-        ownerMemberDto.getOwnerMemberRightDtoList().forEach(x->{
+        ownerMemberDto.getOwnerMemberRightDTOList().forEach(x->{
             OwnerMemberRightEntity ownerMemberRightEntity = new OwnerMemberRightEntity();
             BeanUtils.copyProperties(x,ownerMemberRightEntity);
             list.add(ownerMemberRightEntity);
@@ -51,21 +51,21 @@ public class OwnerMemberService{
      * @param ownerOrderNo 子订单号
      * @param isNeedRight 是否需要权益值信息
      */
-    public OwnerMemberDto selectownerMemberByMemNo(String ownerOrderNo,boolean isNeedRight){
-        OwnerMemberDto ownerMemberDto = new OwnerMemberDto();
+    public OwnerMemberDTO selectownerMemberByMemNo(String ownerOrderNo, boolean isNeedRight){
+        OwnerMemberDTO ownerMemberDto = new OwnerMemberDTO();
         OwnerMemberEntity ownerMemberEntity = ownerMemberMapper.selectByOwnerOrderNo(ownerOrderNo);
         BeanUtils.copyProperties(ownerMemberEntity,ownerMemberDto);
         if(!isNeedRight){
             return ownerMemberDto;
         }
         List<OwnerMemberRightEntity> dbList = ownerMemberRightMapper.selectByOwnerOrderNo(ownerOrderNo);
-        List<OwnerMemberRightDto> list = new ArrayList<>();
+        List<OwnerMemberRightDTO> list = new ArrayList<>();
         dbList.forEach(x->{
-            OwnerMemberRightDto ownerMemberRightDto = new OwnerMemberRightDto();
+            OwnerMemberRightDTO ownerMemberRightDto = new OwnerMemberRightDTO();
             BeanUtils.copyProperties(x,ownerMemberRightDto);
             list.add(ownerMemberRightDto);
         });
-        ownerMemberDto.setOwnerMemberRightDtoList(list);
+        ownerMemberDto.setOwnerMemberRightDTOList(list);
         return ownerMemberDto;
     }
 

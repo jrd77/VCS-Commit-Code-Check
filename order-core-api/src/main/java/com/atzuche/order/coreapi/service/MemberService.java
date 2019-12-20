@@ -3,13 +3,13 @@ package com.atzuche.order.coreapi.service;
 import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.CatConstants;
 import com.atzuche.order.commons.LocalDateTimeUtils;
-import com.atzuche.order.commons.entity.dto.OwnerMemberDto;
-import com.atzuche.order.commons.entity.dto.OwnerMemberRightDto;
-import com.atzuche.order.commons.entity.dto.RenterMemberDto;
-import com.atzuche.order.commons.entity.dto.RenterMemberRightDto;
+import com.atzuche.order.commons.entity.dto.OwnerMemberDTO;
+import com.atzuche.order.commons.entity.dto.OwnerMemberRightDTO;
+import com.atzuche.order.commons.entity.dto.RenterMemberDTO;
+import com.atzuche.order.commons.entity.dto.RenterMemberRightDTO;
+import com.atzuche.order.commons.enums.MemberFlagEnum;
 import com.atzuche.order.commons.enums.OwnerMemRightEnum;
 import com.atzuche.order.commons.enums.RenterMemRightEnum;
-import com.atzuche.order.coreapi.entity.request.NormalOrderReqVO;
 import com.atzuche.order.coreapi.enums.SubmitOrderErrorEnum;
 import com.atzuche.order.coreapi.submitOrder.exception.OwnerberByFeignException;
 import com.atzuche.order.coreapi.submitOrder.exception.RenterMemberByFeignException;
@@ -33,6 +33,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
+ * 封装对远程会员详情服务的相关调用
  * @author <a href="mailto:lianglin.sjtu@gmail.com">AndySjtu</a>
  * @date 2019/12/19 2:18 下午
  **/
@@ -44,7 +45,7 @@ public class MemberService {
     private MemberDetailFeignService memberDetailFeignService;
 
     //获取车主会员信息
-    public OwnerMemberDto getOwnerMemberInfo(String memNo) throws RenterMemberByFeignException {
+    public OwnerMemberDTO getOwnerMemberInfo(String memNo) throws RenterMemberByFeignException {
         List<String> selectKey = Arrays.asList(
                 MemberSelectKeyEnum.MEMBER_CORE_INFO.getKey(),
                 MemberSelectKeyEnum.MEMBER_BASE_INFO.getKey(),
@@ -77,46 +78,47 @@ public class MemberService {
 
         MemberTotalInfo memberTotalInfo = responseData.getData();
         MemberCoreInfo memberCoreInfo = memberTotalInfo.getMemberCoreInfo();
-        OwnerMemberDto ownerMemberDto = new OwnerMemberDto();
+        OwnerMemberDTO ownerMemberDto = new OwnerMemberDTO();
         ownerMemberDto.setMemNo(memNo);
         ownerMemberDto.setPhone(memberCoreInfo.getPhone());
         ownerMemberDto.setHeaderUrl(memberCoreInfo.getPortraitPath());
         ownerMemberDto.setRealName(memberCoreInfo.getRealName());
         ownerMemberDto.setNickName(memberCoreInfo.getNickName());
-        List<OwnerMemberRightDto> rights = new ArrayList<>();
+        List<OwnerMemberRightDTO> rights = new ArrayList<>();
         MemberRoleInfo memberRoleInfo = memberTotalInfo.getMemberRoleInfo();
         if(memberRoleInfo != null){
             if(memberRoleInfo.getInternalStaff()!=null){
-                OwnerMemberRightDto internalStaff = new OwnerMemberRightDto();
+                OwnerMemberRightDTO internalStaff = new OwnerMemberRightDTO();
                 internalStaff.setRightCode(OwnerMemRightEnum.STAFF.getRightCode());
                 internalStaff.setRightName(OwnerMemRightEnum.STAFF.getRightName());
-                //internalStaff.setRightValue(String.valueOf(memberRoleInfo.getInternalStaff()));
+                internalStaff.setRightValue(String.valueOf(memberRoleInfo.getInternalStaff()));
                 internalStaff.setRightDesc("是否是内部员工");
                 rights.add(internalStaff);
             }
             if(memberRoleInfo.getMemberFlag() != null){
-                OwnerMemberRightDto internalStaff = new OwnerMemberRightDto();
-                internalStaff.setRightCode(OwnerMemRightEnum.VIP.getRightCode());
-                internalStaff.setRightName(OwnerMemRightEnum.VIP.getRightName());
-                //internalStaff.setRightValue(String.valueOf(memberRoleInfo.getMemberFlag()));
+                OwnerMemberRightDTO internalStaff = new OwnerMemberRightDTO();
+                MemberFlagEnum memberFlagEnum = MemberFlagEnum.getRightByIndex(memberRoleInfo.getMemberFlag());
+                internalStaff.setRightCode(memberFlagEnum.getRightCode());
+                internalStaff.setRightName(memberFlagEnum.getRightName());
+                internalStaff.setRightValue(String.valueOf(memberRoleInfo.getMemberFlag()));
                 internalStaff.setRightDesc("会员标识");
                 rights.add(internalStaff);
             }
             if(memberRoleInfo.getCpicMemberFlag() != null){
-                OwnerMemberRightDto internalStaff = new OwnerMemberRightDto();
+                OwnerMemberRightDTO internalStaff = new OwnerMemberRightDTO();
                 internalStaff.setRightCode(OwnerMemRightEnum.CPIC_MEM.getRightCode());
                 internalStaff.setRightName(OwnerMemRightEnum.CPIC_MEM.getRightName());
-                //internalStaff.setRightValue(String.valueOf(memberRoleInfo.getCpicMemberFlag()));
+                internalStaff.setRightValue(String.valueOf(memberRoleInfo.getCpicMemberFlag()));
                 internalStaff.setRightDesc("是否太保会员");
                 rights.add(internalStaff);
             }
         }
-        ownerMemberDto.setOwnerMemberRightDtoList(rights);
+        ownerMemberDto.setOwnerMemberRightDTOList(rights);
         return ownerMemberDto;
     }
 
     //获取租客会员信息
-    public RenterMemberDto getRenterMemberInfo(String memNo) throws RenterMemberByFeignException {
+    public RenterMemberDTO getRenterMemberInfo(String memNo) throws RenterMemberByFeignException {
         List<String> selectKey = Arrays.asList(
                 MemberSelectKeyEnum.MEMBER_CORE_INFO.getKey(),
                 MemberSelectKeyEnum.MEMBER_AUTH_INFO.getKey(),
@@ -150,7 +152,7 @@ public class MemberService {
         MemberTotalInfo memberTotalInfo = responseData.getData();
         MemberAuthInfo memberAuthInfo = memberTotalInfo.getMemberAuthInfo();
         MemberCoreInfo memberCoreInfo = memberTotalInfo.getMemberCoreInfo();
-        RenterMemberDto renterMemberDto = new RenterMemberDto();
+        RenterMemberDTO renterMemberDto = new RenterMemberDTO();
         renterMemberDto.setMemNo(memNo);
         renterMemberDto.setPhone(memberCoreInfo.getPhone());
         renterMemberDto.setHeaderUrl(memberCoreInfo.getPortraitPath());
@@ -158,32 +160,35 @@ public class MemberService {
         renterMemberDto.setNickName(memberCoreInfo.getNickName());
         renterMemberDto.setCertificationTime(LocalDateTimeUtils.parseStringToLocalDate(memberAuthInfo.getDriLicFirstTime()));
         //renterMemberDto.setOrderSuccessCount();
-        List<RenterMemberRightDto> rights = new ArrayList<>();
+        List<RenterMemberRightDTO> rights = new ArrayList<>();
         MemberRoleInfo memberRoleInfo = memberTotalInfo.getMemberRoleInfo();
         if(memberRoleInfo != null){
             if(memberRoleInfo.getInternalStaff()!=null){
-                RenterMemberRightDto internalStaff = new RenterMemberRightDto();
+                RenterMemberRightDTO internalStaff = new RenterMemberRightDTO();
                 internalStaff.setRightCode(RenterMemRightEnum.STAFF.getRightCode());
                 internalStaff.setRightName(RenterMemRightEnum.STAFF.getRightName());
+                internalStaff.setRightValue(String.valueOf(memberRoleInfo.getInternalStaff()));
                 internalStaff.setRightDesc("是否是内部员工");
                 rights.add(internalStaff);
             }
             if(memberRoleInfo.getMemberFlag() != null){
-                RenterMemberRightDto internalStaff = new RenterMemberRightDto();
-                internalStaff.setRightCode(RenterMemRightEnum.VIP.getRightCode());
-                internalStaff.setRightName(RenterMemRightEnum.VIP.getRightName());
+                MemberFlagEnum memberFlagEnum = MemberFlagEnum.getRightByIndex(memberRoleInfo.getMemberFlag());
+                RenterMemberRightDTO internalStaff = new RenterMemberRightDTO();
+                internalStaff.setRightCode(memberFlagEnum.getRightCode());
+                internalStaff.setRightName(memberFlagEnum.getRightName());
                 internalStaff.setRightDesc("会员标识");
                 rights.add(internalStaff);
             }
             if(memberRoleInfo.getCpicMemberFlag() != null){
-                RenterMemberRightDto internalStaff = new RenterMemberRightDto();
+                RenterMemberRightDTO internalStaff = new RenterMemberRightDTO();
                 internalStaff.setRightCode(RenterMemRightEnum.CPIC_MEM.getRightCode());
                 internalStaff.setRightName(RenterMemRightEnum.CPIC_MEM.getRightName());
+                internalStaff.setRightValue(String.valueOf(memberRoleInfo.getCpicMemberFlag()));
                 internalStaff.setRightDesc("是否太保会员");
                 rights.add(internalStaff);
             }
         }
-        renterMemberDto.setRenterMemberRightDtoList(rights);
+        renterMemberDto.setRenterMemberRightDTOList(rights);
         return renterMemberDto;
     }
 
