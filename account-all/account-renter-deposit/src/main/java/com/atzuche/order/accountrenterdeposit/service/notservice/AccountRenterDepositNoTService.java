@@ -5,7 +5,7 @@ import com.atzuche.order.accountrenterdeposit.exception.AccountRenterDepositDBEx
 import com.atzuche.order.accountrenterdeposit.exception.PayOrderRenterDepositDBException;
 import com.atzuche.order.accountrenterdeposit.mapper.AccountRenterDepositMapper;
 import com.atzuche.order.accountrenterdeposit.vo.req.CreateOrderRenterDepositReqVO;
-import com.atzuche.order.accountrenterdeposit.vo.req.PayedOrderRenterDepositDetailReqVO;
+import com.atzuche.order.accountrenterdeposit.vo.req.DetainRenterDepositReqVO;
 import com.atzuche.order.accountrenterdeposit.vo.req.PayedOrderRenterDepositReqVO;
 import com.atzuche.order.accountrenterdeposit.vo.res.AccountRenterDepositResVO;
 import org.springframework.beans.BeanUtils;
@@ -72,27 +72,33 @@ public class AccountRenterDepositNoTService {
 
     /**
      * 更新车辆押金 剩余金额
-     * @param payedOrderRenterDepositDetail
+     * @param detainRenterDepositReqVO
      */
-    public void updateRenterDepositChange(PayedOrderRenterDepositDetailReqVO payedOrderRenterDepositDetail) {
-        AccountRenterDepositEntity accountRenterDepositEntity = accountRenterDepositMapper.selectByOrderAndMemNo(payedOrderRenterDepositDetail.getOrderNo(),payedOrderRenterDepositDetail.getMemNo());
+    public void updateRenterDepositChange(DetainRenterDepositReqVO detainRenterDepositReqVO) {
+        AccountRenterDepositEntity accountRenterDepositEntity = accountRenterDepositMapper.selectByOrderAndMemNo(detainRenterDepositReqVO.getOrderNo(),detainRenterDepositReqVO.getMemNo());
         if(Objects.isNull(accountRenterDepositEntity)){
             throw new PayOrderRenterDepositDBException();
         }
-        if(payedOrderRenterDepositDetail.getAmt() + accountRenterDepositEntity.getSurplusAuthorizeDepositAmt()<0
-           && payedOrderRenterDepositDetail.getAmt()+ accountRenterDepositEntity.getSurplusDepositAmt()<0
-        ){
+        //计算剩余可扣金额押金总和
+        int surplusAmt = accountRenterDepositEntity.getSurplusDepositAmt() + accountRenterDepositEntity.getSurplusAuthorizeDepositAmt() + accountRenterDepositEntity.getSurplusCreditPayAmt();
+        if(detainRenterDepositReqVO.getAmt() + surplusAmt<0){
             //可用 剩余押金 不足
             throw new PayOrderRenterDepositDBException();
         }
         AccountRenterDepositEntity accountRenterDeposit = new AccountRenterDepositEntity();
         accountRenterDeposit.setId(accountRenterDepositEntity.getId());
         accountRenterDeposit.setVersion(accountRenterDepositEntity.getVersion());
-        if(Objects.nonNull(accountRenterDeposit.getSurplusAuthorizeDepositAmt()) || accountRenterDeposit.getSurplusAuthorizeDepositAmt()>Math.abs(payedOrderRenterDepositDetail.getAmt())){
-            accountRenterDeposit.setSurplusAuthorizeDepositAmt(accountRenterDeposit.getSurplusAuthorizeDepositAmt() + payedOrderRenterDepositDetail.getAmt());
+        //预授权押金剩余金额
+        if(Objects.nonNull(accountRenterDeposit.getSurplusAuthorizeDepositAmt()) || accountRenterDeposit.getSurplusAuthorizeDepositAmt()>0){
+            accountRenterDeposit.setSurplusAuthorizeDepositAmt(accountRenterDeposit.getSurplusAuthorizeDepositAmt() + detainRenterDepositReqVO.getAmt());
         }
-        if(Objects.nonNull(accountRenterDeposit.getSurplusDepositAmt()) || accountRenterDeposit.getSurplusDepositAmt()>Math.abs(payedOrderRenterDepositDetail.getAmt())){
-            accountRenterDeposit.setSurplusDepositAmt(accountRenterDeposit.getSurplusDepositAmt() + payedOrderRenterDepositDetail.getAmt());
+        //押金剩余金额
+        if(Objects.nonNull(accountRenterDeposit.getSurplusDepositAmt()) || accountRenterDeposit.getSurplusDepositAmt()>0){
+            accountRenterDeposit.setSurplusDepositAmt(accountRenterDeposit.getSurplusDepositAmt() + detainRenterDepositReqVO.getAmt());
+        }
+        //信用支付押金剩余金额
+        if(Objects.nonNull(accountRenterDeposit.getSurplusCreditPayAmt()) || accountRenterDeposit.getSurplusCreditPayAmt()>0){
+            accountRenterDeposit.setSurplusCreditPayAmt(accountRenterDeposit.getSurplusCreditPayAmt() + detainRenterDepositReqVO.getAmt());
         }
         int result =  accountRenterDepositMapper.updateByPrimaryKeySelective(accountRenterDeposit);
         if(result==0){
