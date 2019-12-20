@@ -1,8 +1,8 @@
 package com.atzuche.order.accountrenterdeposit.service;
 
-import com.atzuche.order.accountrenterdeposit.entity.AccountRenterDepositEntity;
 import com.atzuche.order.accountrenterdeposit.service.notservice.AccountRenterDepositDetailNoTService;
 import com.atzuche.order.accountrenterdeposit.service.notservice.AccountRenterDepositNoTService;
+import com.atzuche.order.accountrenterdeposit.service.notservice.AccountRenterDepositRatioNotService;
 import com.atzuche.order.accountrenterdeposit.vo.req.CreateOrderRenterDepositReqVO;
 import com.atzuche.order.accountrenterdeposit.vo.req.PayedOrderRenterDepositDetailReqVO;
 import com.atzuche.order.accountrenterdeposit.vo.req.PayedOrderRenterDepositReqVO;
@@ -28,6 +28,8 @@ public class AccountRenterDepositService{
     private AccountRenterDepositDetailNoTService accountRenterDepositDetailNoTService;
     @Autowired
     private AccountRenterDepositNoTService accountRenterDepositNoTService;
+    @Autowired
+    private AccountRenterDepositRatioNotService accountRenterDepositRatioNotService;
     /**
      * 查询押金状态信息
      */
@@ -78,7 +80,13 @@ public class AccountRenterDepositService{
         //1 校验
         Assert.notNull(createOrderRenterDepositReqVO, ErrorCode.PARAMETER_ERROR.getText());
         createOrderRenterDepositReqVO.check();
+        //2 记录应付 减免押金
         accountRenterDepositNoTService.insertRenterDeposit(createOrderRenterDepositReqVO);
+        //3 记录减免押金详情
+        if(createOrderRenterDepositReqVO.getReductionAmt()>0){
+            accountRenterDepositRatioNotService.insertReductDeposit(createOrderRenterDepositReqVO.getCreateOrderRenterReductionDeposits());
+        }
+
     }
     /**
      * 支付成功后记录实付押金信息 和押金资金进出信息
