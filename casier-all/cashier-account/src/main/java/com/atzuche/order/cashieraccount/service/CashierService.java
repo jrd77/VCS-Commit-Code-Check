@@ -3,19 +3,28 @@ package com.atzuche.order.cashieraccount.service;
 import com.atzuche.order.accountdebt.service.AccountDebtService;
 import com.atzuche.order.accountdebt.vo.req.AccountDeductDebtReqVO;
 import com.atzuche.order.accountdebt.vo.res.AccountDebtResVO;
+import com.atzuche.order.accountownerincome.service.AccountOwnerIncomeService;
+import com.atzuche.order.accountownerincome.vo.req.AccountOwnerIncomeExamineOpReqVO;
+import com.atzuche.order.accountownerincome.vo.req.AccountOwnerIncomeExamineReqVO;
 import com.atzuche.order.accountrenterdeposit.service.AccountRenterDepositService;
 import com.atzuche.order.accountrenterdeposit.vo.req.CreateOrderRenterDepositReqVO;
 import com.atzuche.order.accountrenterdeposit.vo.req.PayedOrderRenterDepositDetailReqVO;
+import com.atzuche.order.accountrenterdeposit.vo.req.PayedOrderRenterDepositReqVO;
+import com.atzuche.order.accountrenterrentcost.service.AccountRenterCostSettleService;
 import com.atzuche.order.accountrenterwzdepost.service.AccountRenterWzDepositService;
 import com.atzuche.order.accountrenterwzdepost.vo.req.CreateOrderRenterWZDepositReqVO;
 import com.atzuche.order.accountrenterwzdepost.vo.req.PayedOrderRenterDepositWZDetailReqVO;
+import com.atzuche.order.accountrenterwzdepost.vo.req.PayedOrderRenterWZDepositReqVO;
 import com.atzuche.order.cashieraccount.service.notservice.CashierRefundApplyNoTService;
 import com.atzuche.order.cashieraccount.vo.req.CashierDeductDebtReqVO;
 import com.atzuche.order.cashieraccount.vo.req.CashierRefundApplyReqVO;
+import com.atzuche.order.cashieraccount.vo.res.AccountPayAbleResVO;
 import com.atzuche.order.cashieraccount.vo.res.CashierDeductDebtResVO;
+import com.atzuche.order.cashieraccount.vo.res.OrderPayableAmountResVO;
 import com.atzuche.order.commons.enums.RenterCashCodeEnum;
 import com.autoyol.cat.CatAnnotation;
 import com.autoyol.commons.web.ErrorCode;
+import com.google.common.collect.ImmutableList;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +32,9 @@ import org.springframework.stereotype.Service;
 
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -38,6 +50,8 @@ public class CashierService {
     @Autowired AccountRenterWzDepositService accountRenterWzDepositService;
     @Autowired AccountDebtService accountDebtService;
     @Autowired CashierRefundApplyNoTService cashierRefundApplyNoTService;
+    @Autowired AccountOwnerIncomeService accountOwnerIncomeService;
+    @Autowired AccountRenterCostSettleService accountRenterCostSettleService;
 
 
     /**  ***************************************车辆押金 start****************************************************/
@@ -48,6 +62,14 @@ public class CashierService {
     @Transactional(rollbackFor=Exception.class)
     public void insertRenterDeposit(CreateOrderRenterDepositReqVO createOrderRenterDepositReqVO){
         accountRenterDepositService.insertRenterDeposit(createOrderRenterDepositReqVO);
+    }
+
+    /**
+     * 车俩押金支付成功回调
+     */
+    @Transactional(rollbackFor=Exception.class)
+    public void updateRenterDeposit(PayedOrderRenterDepositReqVO payedOrderRenterDeposit){
+        accountRenterDepositService.updateRenterDeposit(payedOrderRenterDeposit);
     }
     /**
      * 查询车辆押金是否付清
@@ -74,6 +96,13 @@ public class CashierService {
         accountRenterWzDepositService.insertRenterWZDeposit(createOrderRenterWZDepositReq);
     }
     /**
+     * 支付成功后记录 实付违章押金信息 和违章押金资金进出信息
+     */
+    @Transactional(rollbackFor=Exception.class)
+    public void updateRenterWZDeposit(PayedOrderRenterWZDepositReqVO payedOrderWZRenterDeposit){
+        accountRenterWzDepositService.updateRenterWZDeposit(payedOrderWZRenterDeposit);
+    }
+    /**
      * 查询违章押金是否付清
      */
     public boolean isPayOffForRenterWZDeposit(String orderNo, String memNo){
@@ -90,7 +119,7 @@ public class CashierService {
 
     /**  ***************************************** 历史欠款 start  *************************************************    */
     /**
-     * 7）押金/违章押金抵扣历史欠款
+     * 7）违章押金抵扣历史欠款
      */
     @CatAnnotation
     @Transactional(rollbackFor=Exception.class)
@@ -187,4 +216,58 @@ public class CashierService {
     }
     /**  ***************************************** 退还押金 end ************************************************* */
 
+    /**  ***************************************** 车主收益 start ************************************************* */
+    /**
+     * 查询车主收益信息
+     */
+    public void getOwnerIncomeAmt(String memNo){
+        accountOwnerIncomeService.getOwnerIncomeAmt(memNo);
+    }
+    /**
+     * 结算产生车主待审核收益
+     */
+    public void insertOwnerIncomeExamine(AccountOwnerIncomeExamineReqVO accountOwnerIncomeExamineReq){
+        accountOwnerIncomeService.insertOwnerIncomeExamine(accountOwnerIncomeExamineReq);
+    }
+    /**
+     * 收益审核通过 更新车主收益信息
+     */
+    public void examineOwnerIncomeExamine(AccountOwnerIncomeExamineOpReqVO accountOwnerIncomeExamineOpReq){
+        accountOwnerIncomeService.examineOwnerIncomeExamine(accountOwnerIncomeExamineOpReq);
+    }
+
+    /**
+     * 收益提现
+     */
+    public void cashOwnerIncome(){
+        accountOwnerIncomeService.cashOwnerIncome();
+    }
+    /**  ***************************************** 车主收益 end ************************************************* */
+
+    /**  ***************************************** 结算租车费用（三方） start ************************************************* */
+
+
+    /**  ***************************************** 结算租车费用（三方） end ************************************************* */
+
+    /**
+     * 当前需要支付的相关信息供支付平台使用
+     */
+    @CatAnnotation
+    public OrderPayableAmountResVO getOrderPayableAmount(String orderNo,String memNo){
+        OrderPayableAmountResVO result = new OrderPayableAmountResVO();
+        int amtDeposit = accountRenterDepositService.getSurplusRenterDeposit(orderNo,memNo);
+        int amtWZDeposit = accountRenterWzDepositService.getSurplusRenterWZDeposit(orderNo,memNo);
+        //TODO 查询租车费用应收金额 海水
+        int amtRenterCost =0;
+        List<AccountPayAbleResVO> accountPayAbles = ImmutableList.of(
+                new AccountPayAbleResVO(orderNo,memNo,amtDeposit,RenterCashCodeEnum.ACCOUNT_RENTER_DEPOSIT),
+                new AccountPayAbleResVO(orderNo,memNo,amtWZDeposit,RenterCashCodeEnum.ACCOUNT_RENTER_WZ_DEPOSIT),
+                new AccountPayAbleResVO(orderNo,memNo,amtRenterCost,RenterCashCodeEnum.ACCOUNT_RENTER_RENT_COST)
+        );
+        result.setAccountPayAbles(accountPayAbles);
+        result.setAmt(amtDeposit + amtWZDeposit + amtRenterCost);
+        result.setMemNo(memNo);
+        result.setOrderNo(orderNo);
+        return result;
+    }
 }

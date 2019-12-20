@@ -68,5 +68,9 @@ public class AccountOwnerIncomeService{
 
     }
 
-
+    /**
+     * 收益提现
+     */
+    public void cashOwnerIncome() {
+    }
 }

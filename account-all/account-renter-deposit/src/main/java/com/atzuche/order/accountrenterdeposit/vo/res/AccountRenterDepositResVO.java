@@ -63,6 +63,10 @@ public class AccountRenterDepositResVO {
      */
     private Integer surplusAuthorizeDepositAmt;
     /**
+     * 免押金额
+     */
+    private Integer reductionAmt;
+    /**
      * 开启免押
      */
     private Integer isFreeDeposit;
