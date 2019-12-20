@@ -27,7 +27,7 @@ public class AccountRenterWzDepositCostDetailEntity implements Serializable {
 	/**
 	 * 车主子订单
 	 */
-	private String ownerOrderNo;
+	private String renterOrderNo;
 	/**
 	 * 会员号
 	 */

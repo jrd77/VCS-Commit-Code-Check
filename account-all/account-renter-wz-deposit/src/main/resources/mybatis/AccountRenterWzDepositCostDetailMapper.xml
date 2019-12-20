@@ -6,7 +6,7 @@
     <resultMap type="com.atzuche.order.accountrenterwzdepost.entity.AccountRenterWzDepositCostDetailEntity" id="BaseResultMap">
         <result property="id" column="id"/>
         <result property="orderNo" column="order_no"/>
-        <result property="ownerOrderNo" column="owner_order_no"/>
+        <result property="renterOrderNo" column="renter_order_no"/>
         <result property="memNo" column="mem_no"/>
         <result property="paymentCode" column="payment_code"/>
         <result property="paymentDetail" column="payment_detail"/>
@@ -28,7 +28,7 @@
 	<sql id="Base_Column_List">
 	`id`, 	
 	`order_no`, 	
-	`owner_order_no`, 	
+	`renter_order_no`,
 	`mem_no`, 	
 	`payment_code`, 	
 	`payment_detail`, 	
@@ -61,7 +61,7 @@
 		insert into account_renter_wz_deposit_cost_detail
 		(
 				`order_no`,		
-				`owner_order_no`,		
+				`renter_order_no`,
 				`mem_no`,		
 				`payment_code`,		
 				`payment_detail`,		
@@ -81,7 +81,7 @@
 		values
 		(
 				#{orderNo}, 		
-				#{ownerOrderNo}, 		
+				#{renterOrderNo},
 				#{memNo}, 		
 				#{paymentCode}, 		
 				#{paymentDetail}, 		
@@ -104,7 +104,7 @@
 		insert into account_renter_wz_deposit_cost_detail
 		(
 				<if test="orderNo != null">`order_no`, </if>
-				<if test="ownerOrderNo != null">`owner_order_no`, </if>
+				<if test="renterOrderNo != null">`renter_order_no`, </if>
 				<if test="memNo != null">`mem_no`, </if>
 				<if test="paymentCode != null">`payment_code`, </if>
 				<if test="paymentDetail != null">`payment_detail`, </if>
@@ -124,7 +124,7 @@
 		values
 		(
 				<if test="orderNo != null">#{orderNo},  </if>
-				<if test="ownerOrderNo != null">#{ownerOrderNo},  </if>
+				<if test="renterOrderNo != null">#{renterOrderNo},  </if>
 				<if test="memNo != null">#{memNo},  </if>
 				<if test="paymentCode != null">#{paymentCode},  </if>
 				<if test="paymentDetail != null">#{paymentDetail},  </if>
@@ -148,7 +148,7 @@
 		update account_renter_wz_deposit_cost_detail 
 		<set>
 				<if test="orderNo != null">`order_no` = #{orderNo}, </if>
-				<if test="ownerOrderNo != null">`owner_order_no` = #{ownerOrderNo}, </if>
+				<if test="renterOrderNo != null">`renter_order_no` = #{renterOrderNo}, </if>
 				<if test="memNo != null">`mem_no` = #{memNo}, </if>
 				<if test="paymentCode != null">`payment_code` = #{paymentCode}, </if>
 				<if test="paymentDetail != null">`payment_detail` = #{paymentDetail}, </if>
@@ -172,7 +172,7 @@
 		update account_renter_wz_deposit_cost_detail 
 		<set>
 				`order_no` = #{orderNo}, 		
-				`owner_order_no` = #{ownerOrderNo}, 		
+				`renter_order_no` = #{renterOrderNo},
 				`mem_no` = #{memNo}, 		
 				`payment_code` = #{paymentCode}, 		
 				`payment_detail` = #{paymentDetail}, 		

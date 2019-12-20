@@ -2,6 +2,8 @@ package com.atzuche.order.accountrenterwzdepost.mapper;
 
 import com.atzuche.order.accountrenterwzdepost.entity.AccountRenterWzDepositCostEntity;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
 import java.util.List;
 
 /**
@@ -15,14 +17,9 @@ public interface AccountRenterWzDepositCostMapper{
 
     AccountRenterWzDepositCostEntity selectByPrimaryKey(Integer id);
 
-    List<AccountRenterWzDepositCostEntity> selectALL();
-
     int insert(AccountRenterWzDepositCostEntity record);
-    
-    int insertSelective(AccountRenterWzDepositCostEntity record);
-
-    int updateByPrimaryKey(AccountRenterWzDepositCostEntity record);
     
     int updateByPrimaryKeySelective(AccountRenterWzDepositCostEntity record);
 
+    AccountRenterWzDepositCostEntity getWZDepositCostAmt(@Param("orderNo") String orderNo,@Param("memNo") String memNo);
 }
