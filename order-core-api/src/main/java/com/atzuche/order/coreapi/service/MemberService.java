@@ -23,6 +23,7 @@ import com.autoyol.member.detail.vo.res.MemberRoleInfo;
 import com.autoyol.member.detail.vo.res.MemberTotalInfo;
 import com.dianping.cat.Cat;
 import com.dianping.cat.message.Transaction;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,6 +59,7 @@ public class MemberService {
             String parameter = "memNo="+memNo+"&selectKey"+selectKey.toString();
             Cat.logEvent(CatConstants.FEIGN_PARAM,parameter);
             responseData = memberDetailFeignService.getMemberSelectInfo(Integer.valueOf(memNo), selectKey);
+            Cat.logEvent(CatConstants.FEIGN_RESULT,JSON.toJSONString(responseData));
             if(responseData == null || !ErrorCode.SUCCESS.getCode().equals(responseData.getResCode())){
                 log.error("Feign 获取车主会员信息失败,orderContextDto={},memNo={}",memNo, JSON.toJSONString(responseData));
                 OwnerberByFeignException ownerberByFeignException = new OwnerberByFeignException(SubmitOrderErrorEnum.FEIGN_GET_OWNER_MEMBER_FAIL.getCode(), SubmitOrderErrorEnum.FEIGN_GET_OWNER_MEMBER_FAIL.getText());
