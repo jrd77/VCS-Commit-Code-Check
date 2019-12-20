@@ -12,7 +12,6 @@ import java.time.LocalDateTime;
 @Data
 public class PayedOrderRenterDepositWZDetailReqVO {
 
-
     /**
      * 主订单号
      */
