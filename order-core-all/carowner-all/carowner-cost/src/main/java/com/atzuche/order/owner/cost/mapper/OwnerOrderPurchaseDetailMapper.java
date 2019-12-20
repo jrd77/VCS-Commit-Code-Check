@@ -2,6 +2,8 @@ package com.atzuche.order.owner.cost.mapper;
 
 import com.atzuche.order.owner.cost.entity.OwnerOrderPurchaseDetailEntity;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
 import java.util.List;
 
 /**
@@ -19,10 +21,13 @@ public interface OwnerOrderPurchaseDetailMapper{
 
     int insert(OwnerOrderPurchaseDetailEntity record);
     
-    int insertSelective(OwnerOrderPurchaseDetailEntity record);
+    int saveOwnerOrderPurchaseDetail(OwnerOrderPurchaseDetailEntity record);
 
     int updateByPrimaryKey(OwnerOrderPurchaseDetailEntity record);
     
     int updateByPrimaryKeySelective(OwnerOrderPurchaseDetailEntity record);
+    
+    List<OwnerOrderPurchaseDetailEntity> listOwnerOrderPurchaseDetail(@Param("orderNo") String orderNo, @Param("ownerOrderNo") String ownerOrderNo);
 
+    Integer saveOwnerOrderPurchaseDetailBatch(@Param("costList") List<OwnerOrderPurchaseDetailEntity> costList);
 }

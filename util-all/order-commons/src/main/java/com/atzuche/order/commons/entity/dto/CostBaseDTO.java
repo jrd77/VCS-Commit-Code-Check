@@ -1,4 +1,4 @@
-package com.atzuche.order.rentercost.entity.dto;
+package com.atzuche.order.commons.entity.dto;
 
 import java.time.LocalDateTime;
 
@@ -13,9 +13,13 @@ public class CostBaseDTO {
 	 */
 	private String orderNo;
 	/**
-	 * 子订单号
+	 * 租客子订单号
 	 */
 	private String renterOrderNo;
+	/**
+	 * 车主子订单号
+	 */
+	private String ownerOrderNo;
 	/**
 	 * 会员号
 	 */

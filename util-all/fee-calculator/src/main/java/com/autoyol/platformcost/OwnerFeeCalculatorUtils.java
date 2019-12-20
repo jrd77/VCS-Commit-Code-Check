@@ -3,6 +3,7 @@ package com.autoyol.platformcost;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -151,25 +152,29 @@ public class OwnerFeeCalculatorUtils {
 	 * @param revertTime 还车时间
 	 * @return Integer
 	 */
-	public static Integer calGpsServiceAmt(List<CarGpsRule> lsRules, List<Integer> lsGpsSerialNumber, LocalDateTime rentTime, LocalDateTime revertTime) {
+	public static List<FeeResult> calGpsServiceAmt(List<CarGpsRule> lsRules, List<Integer> lsGpsSerialNumber, LocalDateTime rentTime, LocalDateTime revertTime) {
 		if (rentTime == null || revertTime == null) {
-			return 0;
+			return null;
 		}
 		// 获取租期
 		Integer days = (int) CommonUtils.getDaysUpCeil(rentTime, revertTime);
 		Integer gpsServiceAmt = 0;
+		List<FeeResult> feeResultList = new ArrayList<FeeResult>();
 		if (lsRules == null || lsRules.isEmpty()) {
 			// 小于15天的订单为5元/天，大于（含）15天的订单为2元/天
         	if (days < 15) {
         		gpsServiceAmt = days * GPS_DAY_SERVICE_COST;
+        		feeResultList.add(new FeeResult(GPS_DAY_SERVICE_COST, (double)days, gpsServiceAmt));
         	} else {
         		int more15 = days - 14;
         		gpsServiceAmt = more15 * GPS_DAY_SERVICE_COST_15 + ((days - more15) * GPS_DAY_SERVICE_COST);
+        		feeResultList.add(new FeeResult(GPS_DAY_SERVICE_COST_15, (double)more15, more15 * GPS_DAY_SERVICE_COST_15));
+        		feeResultList.add(new FeeResult(GPS_DAY_SERVICE_COST, (double)(days - more15), (days - more15) * GPS_DAY_SERVICE_COST));
         	}
 		} else {
-			gpsServiceAmt = calcGpsAmtAndSaveLogMap(lsGpsSerialNumber, lsRules, days);
+			feeResultList = calcGpsAmtAndSaveLogMap(lsGpsSerialNumber, lsRules, days);
 		}
-		return gpsServiceAmt;
+		return feeResultList;
 	}
 	
 	
@@ -180,17 +185,17 @@ public class OwnerFeeCalculatorUtils {
 	 * @param rentDays 租期
 	 * @return int
 	 */
-	public static int calcGpsAmtAndSaveLogMap(List<Integer> lsGps, List<CarGpsRule> lsRules, Integer rentDays) {
+	public static List<FeeResult> calcGpsAmtAndSaveLogMap(List<Integer> lsGps, List<CarGpsRule> lsRules, Integer rentDays) {
 		if (lsGps == null || lsGps.isEmpty()) {
-			return 0;
+			return null;
 		}
 		if (lsRules == null || lsRules.isEmpty()) {
-			return 0;
+			return null;
 		}
 		if (rentDays == null) {
-			return 0;
+			return null;
 		}
-		int gpsAmt = 0;
+		List<FeeResult> feeResultList = new ArrayList<FeeResult>();
 		// list转map
 		Map<Integer,CarGpsRule> mapRules = lsRules.stream().collect(Collectors.toMap(CarGpsRule::getSerialNumber, carGpsRule->carGpsRule));
 		for (Iterator<Integer> iterator = lsGps.iterator(); iterator.hasNext();) {
@@ -210,16 +215,20 @@ public class OwnerFeeCalculatorUtils {
 			int pre = 0;  //上一次的累计天数
 			for (int i = 0; i < days.length; i++) {
 				if(rentDays <= Integer.valueOf(days[i]).intValue()){
-					gpsAmt += (rentDays - pre) * Integer.valueOf(fees[i]).intValue();
+					Integer curGpsAmt = (rentDays - pre) * Integer.valueOf(fees[i]).intValue();
+					//gpsAmt += (rentDays - pre) * Integer.valueOf(fees[i]).intValue();
+					feeResultList.add(new FeeResult(Integer.valueOf(fees[i]), (double)(rentDays - pre), curGpsAmt));
 					break;
 				}else{
-					gpsAmt += Integer.valueOf(days[i]).intValue() * Integer.valueOf(fees[i]).intValue();
+					Integer curGpsAmt = Integer.valueOf(days[i]).intValue() * Integer.valueOf(fees[i]).intValue();
+					//gpsAmt += Integer.valueOf(days[i]).intValue() * Integer.valueOf(fees[i]).intValue();
 					pre += Integer.valueOf(days[i]).intValue();
+					feeResultList.add(new FeeResult(Integer.valueOf(fees[i]), Double.valueOf(days[i]), curGpsAmt));
 				}
 			}
 			
 		}
-		return gpsAmt;
+		return feeResultList;
 	}
 	
 	/**
@@ -255,26 +264,35 @@ public class OwnerFeeCalculatorUtils {
 		return OWNER_SRV_RETURN_AMT;
 	}
 	
-	
-	/**
+    
+    /**
 	 * 收取车主端平台服务费
 	 * @param rentAmt 租金
 	 * @param serviceProportion 服务费比例
-	 * @param proxyProportion 代管车比例
-	 * @return ServiceExpenseInfo
+	 * @return Integer
 	 */
-    public ServiceExpenseInfo calServiceExpenseLongRent(Integer rentAmt, Integer serviceProportion, Integer proxyProportion){
-		Integer serviceExpense = 0 ;
-	    ServiceExpenseInfo serviceExpenseInfo = new ServiceExpenseInfo();
-		Integer proxyExpense = 0 ;
-		//取车辆的服务费收取比例，服务费的最大最小限额
+    public static Integer calServiceExpense(Integer rentAmt, Integer serviceProportion) {
+    	Integer serviceExpense = 0;
+    	//取车辆的服务费收取比例，服务费的最大最小限额
     	if(serviceProportion != null && serviceProportion != 0 && rentAmt != null){
             //改成向上取整
             serviceExpense = new BigDecimal(rentAmt).multiply(new BigDecimal(serviceProportion)).divide(new BigDecimal(100),0,RoundingMode.UP).intValue();
     	}else{
     		serviceExpense = 0 ;//收费比例为0，不收取平台服务费
     	}
-		//收取代管车服务费
+    	return serviceExpense;
+    }
+    
+    
+    /**
+	 * 收取车主端代步车服务费
+	 * @param rentAmt 租金
+	 * @param proxyProportion 代管车比例
+	 * @return Integer
+	 */
+    public static Integer calProxyExpense(Integer rentAmt, Integer proxyProportion) {
+    	Integer proxyExpense = 0;
+    	//收取代管车服务费
     	if(proxyProportion != null && proxyProportion != 0 && rentAmt != null){
             //改成向上取整
             BigDecimal divide = new BigDecimal(rentAmt).multiply(new BigDecimal(proxyProportion)).divide(new BigDecimal(100),0,RoundingMode.UP);
@@ -282,9 +300,7 @@ public class OwnerFeeCalculatorUtils {
     	}else{
     		proxyExpense = 0; //收费比例为0，不收取代管车服务费
     	}
-	    serviceExpenseInfo.setServiceExpense(serviceExpense);
-	    serviceExpenseInfo.setProxyExpense(proxyExpense);  //赋予值。
-		return serviceExpenseInfo;
-	}
+    	return proxyExpense;
+    }
     
 }
