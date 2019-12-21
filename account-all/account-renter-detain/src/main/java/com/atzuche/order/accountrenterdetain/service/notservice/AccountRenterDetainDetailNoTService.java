@@ -34,6 +34,5 @@ public class AccountRenterDetainDetailNoTService {
         if(result==0){
             throw new AccountRenterDetainDetailException();
         }
-
     }
 }

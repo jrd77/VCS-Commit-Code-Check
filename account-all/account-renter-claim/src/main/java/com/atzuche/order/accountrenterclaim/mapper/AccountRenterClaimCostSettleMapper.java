@@ -2,6 +2,8 @@ package com.atzuche.order.accountrenterclaim.mapper;
 
 import com.atzuche.order.accountrenterclaim.entity.AccountRenterClaimCostSettleEntity;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
 import java.util.List;
 
 /**
@@ -15,14 +17,9 @@ public interface AccountRenterClaimCostSettleMapper{
 
     AccountRenterClaimCostSettleEntity selectByPrimaryKey(Integer id);
 
-    List<AccountRenterClaimCostSettleEntity> selectALL();
-
     int insert(AccountRenterClaimCostSettleEntity record);
-    
-    int insertSelective(AccountRenterClaimCostSettleEntity record);
-
-    int updateByPrimaryKey(AccountRenterClaimCostSettleEntity record);
     
     int updateByPrimaryKeySelective(AccountRenterClaimCostSettleEntity record);
 
+    AccountRenterClaimCostSettleEntity getRenterClaimCostAmt(@Param("orderNo") String orderNo, @Param("memNo")String memNo);
 }
