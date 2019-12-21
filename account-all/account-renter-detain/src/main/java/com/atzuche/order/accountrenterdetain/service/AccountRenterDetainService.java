@@ -3,6 +3,7 @@ package com.atzuche.order.accountrenterdetain.service;
 import com.atzuche.order.accountrenterdetain.service.notservice.AccountRenterDetainCostNoTService;
 import com.atzuche.order.accountrenterdetain.service.notservice.AccountRenterDetainDetailNoTService;
 import com.atzuche.order.accountrenterdetain.vo.req.DetainRenterDepositReqVO;
+import com.autoyol.cat.CatAnnotation;
 import com.autoyol.commons.web.ErrorCode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -25,6 +26,7 @@ public class AccountRenterDetainService {
     /**
      * 查询暂扣费用总和
      */
+    @CatAnnotation
     public int getRenterDetainAmt(String orderNo ,String memNo){
         return accountRenterDetainCostNoTService.getRenterDetainAmt(orderNo,memNo);
     }
@@ -32,6 +34,7 @@ public class AccountRenterDetainService {
     /**
      * 暂扣费用资金进出
      */
+    @CatAnnotation
     public void changeRenterDetainCost(DetainRenterDepositReqVO detainRenterDeposit){
         //1校验
         Assert.notNull(detainRenterDeposit, ErrorCode.PARAMETER_ERROR.getText());
