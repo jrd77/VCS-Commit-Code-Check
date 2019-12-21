@@ -2,12 +2,13 @@ package com.atzuche.order.accountownerincome.service.notservice;
 
 import com.atzuche.order.accountownerincome.entity.AccountOwnerIncomeDetailEntity;
 import com.atzuche.order.accountownerincome.entity.AccountOwnerIncomeExamineEntity;
-import com.atzuche.order.accountownerincome.enums.AccountOwnerIncomeDetailType;
-import com.atzuche.order.accountownerincome.enums.AccountOwnerIncomeExamineStatus;
-import com.atzuche.order.accountownerincome.enums.OrderCoseSourceCode;
+
 import com.atzuche.order.accountownerincome.exception.AccountOwnerIncomeExamineException;
 import com.atzuche.order.accountownerincome.mapper.AccountOwnerIncomeDetailMapper;
 import com.atzuche.order.accountownerincome.vo.req.AccountOwnerIncomeExamineOpReqVO;
+import com.atzuche.order.commons.enums.account.income.AccountOwnerIncomeDetailType;
+import com.atzuche.order.commons.enums.account.income.AccountOwnerIncomeExamineStatus;
+import com.atzuche.order.commons.enums.account.income.OrderCoseSourceCode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

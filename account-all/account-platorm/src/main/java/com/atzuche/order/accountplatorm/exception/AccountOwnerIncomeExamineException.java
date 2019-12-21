@@ -1,4 +1,4 @@
-package com.atzuche.order.accountownerincome.exception;
+package com.atzuche.order.accountplatorm.exception;
 
 import com.atzuche.order.commons.OrderException;
 import com.atzuche.order.commons.enums.ErrorCode;

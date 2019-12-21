@@ -1,7 +1,7 @@
 package com.atzuche.order.accountrenterrentcost.exception;
 
-import com.atzuche.order.accountrenterrentcost.enums.ErrorCode;
 import com.atzuche.order.commons.OrderException;
+import com.atzuche.order.commons.enums.ErrorCode;
 import lombok.Data;
 
 @Data
