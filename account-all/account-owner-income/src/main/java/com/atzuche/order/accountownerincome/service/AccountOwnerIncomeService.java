@@ -4,9 +4,9 @@ import com.atzuche.order.accountownerincome.service.notservice.AccountOwnerIncom
 import com.atzuche.order.accountownerincome.service.notservice.AccountOwnerIncomeExamineNoTService;
 import com.atzuche.order.accountownerincome.service.notservice.AccountOwnerIncomeNoTService;
 import com.atzuche.order.accountownerincome.entity.AccountOwnerIncomeDetailEntity;
-import com.atzuche.order.accountownerincome.enums.AccountOwnerIncomeExamineStatus;
 import com.atzuche.order.accountownerincome.vo.req.AccountOwnerIncomeExamineOpReqVO;
 import com.atzuche.order.accountownerincome.vo.req.AccountOwnerIncomeExamineReqVO;
+import com.atzuche.order.commons.enums.account.income.AccountOwnerIncomeExamineStatus;
 import com.autoyol.cat.CatAnnotation;
 import com.autoyol.commons.web.ErrorCode;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,4 +1,4 @@
-package com.atzuche.order.accountownerincome.enums;
+package com.atzuche.order.commons.enums.account.income;
 
 import lombok.Getter;
 

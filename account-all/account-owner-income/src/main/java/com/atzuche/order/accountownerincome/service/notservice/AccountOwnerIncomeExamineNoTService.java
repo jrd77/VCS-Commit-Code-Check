@@ -2,11 +2,11 @@ package com.atzuche.order.accountownerincome.service.notservice;
 
 import com.atzuche.order.accountownerincome.exception.AccountOwnerIncomeExamineException;
 import com.atzuche.order.accountownerincome.entity.AccountOwnerIncomeExamineEntity;
-import com.atzuche.order.accountownerincome.enums.AccountOwnerIncomeExamineStatus;
 import com.atzuche.order.accountownerincome.exception.AccountOwnerIncomeSettleException;
 import com.atzuche.order.accountownerincome.mapper.AccountOwnerIncomeExamineMapper;
 import com.atzuche.order.accountownerincome.vo.req.AccountOwnerIncomeExamineOpReqVO;
 import com.atzuche.order.accountownerincome.vo.req.AccountOwnerIncomeExamineReqVO;
+import com.atzuche.order.commons.enums.account.income.AccountOwnerIncomeExamineStatus;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;

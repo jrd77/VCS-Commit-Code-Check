@@ -27,6 +27,8 @@ public enum RenterCashCodeEnum {
     ACCOUNT_OWNER_INCOME("21110005","车主收益"),
     ACCOUNT_RENTER_RENT_COST("21110006","租客租车费用"),
 
+    OWNER_RENT_INCOME("31110001","租车收益"),
+    OWNER_PENALTIES_INCOME("31110002","违约金收益"),
     ;
 	
 	/**

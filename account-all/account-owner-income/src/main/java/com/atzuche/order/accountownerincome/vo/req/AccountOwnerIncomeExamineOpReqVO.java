@@ -1,6 +1,6 @@
 package com.atzuche.order.accountownerincome.vo.req;
 
-import com.atzuche.order.accountownerincome.enums.AccountOwnerIncomeExamineStatus;
+import com.atzuche.order.commons.enums.account.income.AccountOwnerIncomeExamineStatus;
 import com.autoyol.commons.web.ErrorCode;
 import lombok.Data;
 import org.springframework.util.Assert;
