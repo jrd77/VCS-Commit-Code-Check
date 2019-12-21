@@ -3,6 +3,7 @@ package com.atzuche.order.accountrenterclaim.service;
 import com.atzuche.order.accountrenterclaim.service.notservice.AccountRenterClaimCostDetailNoTService;
 import com.atzuche.order.accountrenterclaim.service.notservice.AccountRenterClaimCostSettleNoTService;
 import com.atzuche.order.accountrenterclaim.vo.req.AccountRenterClaimDetailReqVO;
+import com.autoyol.cat.CatAnnotation;
 import com.autoyol.commons.web.ErrorCode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,6 +27,7 @@ public class AccountRenterClaimCostSettleService{
     /**
      * 查询理赔费用总和
      */
+    @CatAnnotation
     public int getRenterClaimCostAmt(String orderNo ,String memNo){
         return accountRenterClaimCostSettleNoTService.getRenterClaimCostAmt(orderNo,memNo);
     }
@@ -33,6 +35,7 @@ public class AccountRenterClaimCostSettleService{
     /**
      * 理赔费用资金进出
      */
+    @CatAnnotation
     public void changeRenterClaimCostCost(AccountRenterClaimDetailReqVO accountRenterClaimDetail){
         //1校验
         Assert.notNull(accountRenterClaimDetail, ErrorCode.PARAMETER_ERROR.getText());
