@@ -24,6 +24,7 @@ import com.atzuche.order.cashieraccount.vo.res.AccountPayAbleResVO;
 import com.atzuche.order.cashieraccount.vo.res.CashierDeductDebtResVO;
 import com.atzuche.order.cashieraccount.vo.res.OrderPayableAmountResVO;
 import com.atzuche.order.commons.enums.RenterCashCodeEnum;
+import com.atzuche.order.rentercost.service.RenterOrderCostCombineService;
 import com.autoyol.cat.CatAnnotation;
 import com.autoyol.commons.web.ErrorCode;
 import com.google.common.collect.ImmutableList;
@@ -53,6 +54,7 @@ public class CashierService {
     @Autowired AccountOwnerIncomeService accountOwnerIncomeService;
     @Autowired AccountRenterCostSettleService accountRenterCostSettleService;
     @Autowired AccountRenterWzDepositCostService accountRenterWzDepositCostService;
+    @Autowired RenterOrderCostCombineService renterOrderCostCombineService;
 
 
 
@@ -286,12 +288,14 @@ public class CashierService {
      * 当前需要支付的相关信息供支付平台使用
      */
     @CatAnnotation
-    public OrderPayableAmountResVO getOrderPayableAmount(String orderNo,String memNo){
+    public OrderPayableAmountResVO getOrderPayableAmount(String orderNo,String renterOrderNo,String memNo){
         OrderPayableAmountResVO result = new OrderPayableAmountResVO();
+        //车辆押金
         int amtDeposit = accountRenterDepositService.getSurplusRenterDeposit(orderNo,memNo);
+        //违章押金
         int amtWZDeposit = accountRenterWzDepositService.getSurplusRenterWZDeposit(orderNo,memNo);
-        //TODO 查询租车费用应收金额 海水
-        int amtRenterCost =0;
+        //租车费用
+        int amtRenterCost = renterOrderCostCombineService.getPayable(orderNo,renterOrderNo,memNo);
         List<AccountPayAbleResVO> accountPayAbles = ImmutableList.of(
                 new AccountPayAbleResVO(orderNo,memNo,amtDeposit,RenterCashCodeEnum.ACCOUNT_RENTER_DEPOSIT),
                 new AccountPayAbleResVO(orderNo,memNo,amtWZDeposit,RenterCashCodeEnum.ACCOUNT_RENTER_WZ_DEPOSIT),
