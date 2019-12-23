@@ -30,4 +30,5 @@ public interface RenterOrderFineDeatailMapper{
     
     List<RenterOrderFineDeatailEntity> listRenterOrderFineDeatail(@Param("orderNo") String orderNo, @Param("renterOrderNo") String renterOrderNo);
 
+    Integer saveRenterOrderFineDeatailBatch(@Param("costList") List<RenterOrderFineDeatailEntity> costList);
 }
