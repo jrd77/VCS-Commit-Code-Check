@@ -2,6 +2,8 @@ package com.atzuche.order.accountrenterdetain.mapper;
 
 import com.atzuche.order.accountrenterdetain.entity.AccountRenterDetainCostEntity;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
 import java.util.List;
 
 /**
@@ -15,14 +17,9 @@ public interface AccountRenterDetainCostMapper{
 
     AccountRenterDetainCostEntity selectByPrimaryKey(Integer id);
 
-    List<AccountRenterDetainCostEntity> selectALL();
-
     int insert(AccountRenterDetainCostEntity record);
-    
-    int insertSelective(AccountRenterDetainCostEntity record);
-
-    int updateByPrimaryKey(AccountRenterDetainCostEntity record);
     
     int updateByPrimaryKeySelective(AccountRenterDetainCostEntity record);
 
+    AccountRenterDetainCostEntity getRenterDetainAmt(@Param("orderNo") String orderNo, @Param("memNo")String memNo);
 }

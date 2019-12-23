@@ -1,8 +1,8 @@
 package com.atzuche.order.accountrenterdeposit.exception;
 
 
-import com.atzuche.order.accountrenterdeposit.enums.ErrorCode;
 import com.atzuche.order.commons.OrderException;
+import com.atzuche.order.commons.enums.ErrorCode;
 import lombok.Data;
 
 @Data

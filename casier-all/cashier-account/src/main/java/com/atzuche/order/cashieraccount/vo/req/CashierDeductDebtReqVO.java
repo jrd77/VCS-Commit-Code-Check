@@ -1,5 +1,6 @@
 package com.atzuche.order.cashieraccount.vo.req;
 
+import com.atzuche.order.commons.enums.RenterCashCodeEnum;
 import com.autoyol.commons.web.ErrorCode;
 import lombok.Data;
 import org.springframework.util.Assert;
@@ -21,13 +22,9 @@ public class CashierDeductDebtReqVO {
     private Integer amt;
 
     /**
-     * 来源编码描述
+     * 押金扣除来源
      */
-    private Integer sourceCode;
-    /**
-     * 来源编码（收银台/非收银台）
-     */
-    private String sourceDetail;
+    private RenterCashCodeEnum renterCashCodeEnum;
     /**
      * 收款凭证
      */
@@ -58,6 +55,6 @@ public class CashierDeductDebtReqVO {
         Assert.notNull(getMemNo(), ErrorCode.PARAMETER_ERROR.getText());
         Assert.notNull(getAmt(), ErrorCode.PARAMETER_ERROR.getText());
         Assert.isTrue(getAmt()==0, ErrorCode.PARAMETER_ERROR.getText());
-        Assert.notNull(getSourceCode(), ErrorCode.PARAMETER_ERROR.getText());
+        Assert.notNull(getRenterCashCodeEnum(), ErrorCode.PARAMETER_ERROR.getText());
     }
 }

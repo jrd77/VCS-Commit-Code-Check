@@ -4,7 +4,7 @@ import com.atzuche.order.accountrenterdeposit.service.notservice.AccountRenterDe
 import com.atzuche.order.accountrenterdeposit.service.notservice.AccountRenterDepositNoTService;
 import com.atzuche.order.accountrenterdeposit.service.notservice.AccountRenterDepositRatioNotService;
 import com.atzuche.order.accountrenterdeposit.vo.req.CreateOrderRenterDepositReqVO;
-import com.atzuche.order.accountrenterdeposit.vo.req.PayedOrderRenterDepositDetailReqVO;
+import com.atzuche.order.accountrenterdeposit.vo.req.DetainRenterDepositReqVO;
 import com.atzuche.order.accountrenterdeposit.vo.req.PayedOrderRenterDepositReqVO;
 import com.atzuche.order.accountrenterdeposit.vo.res.AccountRenterDepositResVO;
 import com.atzuche.order.commons.enums.YesNoEnum;
@@ -99,23 +99,20 @@ public class AccountRenterDepositService{
         //2更新押金 实付信息
         accountRenterDepositNoTService.updateRenterDeposit(payedOrderRenterDeposit);
         //添加押金资金进出明细
-        accountRenterDepositDetailNoTService.insertRenterDepositDetail(payedOrderRenterDeposit.getPayedOrderRenterDepositDetailReqVO());
+        accountRenterDepositDetailNoTService.insertRenterDepositDetail(payedOrderRenterDeposit.getDetainRenterDepositReqVO());
     }
 
     /**
-     * 支户头押金资金进出 操作
+     * 账户押金转出
+     * @param detainRenterDepositReqVO
      */
-    @CatAnnotation
-    public void updateRenterDepositChange(PayedOrderRenterDepositDetailReqVO payedOrderRenterDepositDetail){
+    public void detainRenterDeposit(DetainRenterDepositReqVO detainRenterDepositReqVO) {
         //1 参数校验
-        Assert.notNull(payedOrderRenterDepositDetail, ErrorCode.PARAMETER_ERROR.getText());
-        payedOrderRenterDepositDetail.check();
+        Assert.notNull(detainRenterDepositReqVO, ErrorCode.PARAMETER_ERROR.getText());
+        detainRenterDepositReqVO.check();
         //2更新车辆押金  剩余押金 金额
-        accountRenterDepositNoTService.updateRenterDepositChange(payedOrderRenterDepositDetail);
+        accountRenterDepositNoTService.updateRenterDepositChange(detainRenterDepositReqVO);
         //添加押金资金进出明细
-        accountRenterDepositDetailNoTService.insertRenterDepositDetail(payedOrderRenterDepositDetail);
+        accountRenterDepositDetailNoTService.insertRenterDepositDetail(detainRenterDepositReqVO);
     }
-
-
-
 }
