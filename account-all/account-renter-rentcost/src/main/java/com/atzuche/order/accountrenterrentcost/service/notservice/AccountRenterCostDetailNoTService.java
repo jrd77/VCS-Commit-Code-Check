@@ -30,7 +30,6 @@ public class AccountRenterCostDetailNoTService {
     public void insertAccountRenterCostDetail(AccountRenterCostDetailReqVO accountRenterCostDetailReqVO) {
         AccountRenterCostDetailEntity accountRenterCostDetail = new AccountRenterCostDetailEntity();
         BeanUtils.copyProperties(accountRenterCostDetailReqVO,accountRenterCostDetail);
-        accountRenterCostDetail.setIsDelete(NumberUtils.INTEGER_ZERO);
         int result = accountRenterCostDetailMapper.insert(accountRenterCostDetail);
         if(result==0){
             throw new AccountRenterRentCostDetailException();

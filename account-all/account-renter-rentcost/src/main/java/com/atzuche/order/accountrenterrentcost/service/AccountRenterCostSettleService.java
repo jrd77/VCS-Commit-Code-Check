@@ -3,6 +3,7 @@ package com.atzuche.order.accountrenterrentcost.service;
 import com.atzuche.order.accountrenterrentcost.service.notservice.AccountRenterCostDetailNoTService;
 import com.atzuche.order.accountrenterrentcost.service.notservice.AccountRenterCostSettleNoTService;
 import com.atzuche.order.accountrenterrentcost.vo.req.AccountRenterCostDetailReqVO;
+import com.atzuche.order.accountrenterrentcost.vo.req.AccountRenterCostReqVO;
 import com.autoyol.commons.web.ErrorCode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -33,12 +34,14 @@ public class AccountRenterCostSettleService{
     /**
      * 收银台支付成功  实收租车费用落库
      */
-    public void insertRenterCostDetail(AccountRenterCostDetailReqVO accountRenterCostDetailReqVO){
+    public void insertRenterCostDetail(AccountRenterCostReqVO accountRenterCostReqVO){
         //1 参数校验
-        Assert.notNull(accountRenterCostDetailReqVO, ErrorCode.PARAMETER_ERROR.getText());
-        accountRenterCostDetailReqVO.check();
-        //2租车费用明细落库
-        accountRenterCostDetailNoTService.insertAccountRenterCostDetail(accountRenterCostDetailReqVO);
+        Assert.notNull(accountRenterCostReqVO, ErrorCode.PARAMETER_ERROR.getText());
+        accountRenterCostReqVO.check();
+        //2 实付租车费用落库
+        accountRenterCostSettleNoTService.insertOrUpdateRenterCostSettle(accountRenterCostReqVO);
+        //3租车费用明细落库
+        accountRenterCostDetailNoTService.insertAccountRenterCostDetail(accountRenterCostReqVO.getAccountRenterCostDetailReqVO());
     }
 
 

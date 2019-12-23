@@ -157,14 +157,14 @@
 				<if test="platformSubsidyAmount != null">`platform_subsidy_amount` = #{platformSubsidyAmount}, </if>
 				<if test="carOwnerSubsidyAmount != null">`car_owner_subsidy_amount` = #{carOwnerSubsidyAmount}, </if>
 				<if test="shifuAmt != null">`shifu_amt` = #{shifuAmt}, </if>
-				<if test="version != null">`version` = #{version}, </if>
+				version = version + 1,
 				<if test="createTime != null">`create_time` = #{createTime}, </if>
 				<if test="createOp != null">`create_op` = #{createOp}, </if>
 				<if test="updateTime != null">`update_time` = #{updateTime}, </if>
 				<if test="updateOp != null">`update_op` = #{updateOp}, </if>
 				<if test="isDelete != null">`is_delete` = #{isDelete}</if>
 			</set>
-		where id = #{id}
+		where id = #{id} and version = #{version}
 	</update>
 	
 	<update id="updateByPrimaryKey" parameterType="com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostSettleEntity">
@@ -194,6 +194,6 @@
 
     <!-- 根据订单号 会员号查询用户支付记录 -->
     <select id="selectByOrderNo" resultMap="BaseResultMap">
-        select  <include refid="Base_Column_List" /> from account_renter_cost_settle where order_no  = #{orderNo} and mem_no = #{memNo} order by id desc
+        select  <include refid="Base_Column_List" /> from account_renter_cost_settle where order_no  = #{orderNo} and mem_no = #{memNo}  limit 1 order by id desc
     </select>
 </mapper>
