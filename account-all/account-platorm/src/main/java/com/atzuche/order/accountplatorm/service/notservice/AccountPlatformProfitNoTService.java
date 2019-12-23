@@ -1,7 +1,9 @@
 package com.atzuche.order.accountplatorm.service.notservice;
 
 import com.atzuche.order.accountplatorm.entity.AccountPlatformProfitEntity;
+import com.atzuche.order.accountplatorm.exception.AccountPlatormException;
 import com.atzuche.order.accountplatorm.mapper.AccountPlatformProfitMapper;
+import com.atzuche.order.accountplatorm.vo.req.AccountPlatformProfitReqVO;
 import com.atzuche.order.accountplatorm.vo.res.AccountPlatformProfitResVO;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,5 +36,18 @@ public class AccountPlatformProfitNoTService {
             BeanUtils.copyProperties(accountPlatformProfitEntity,result);
         }
         return result;
+    }
+
+    /**
+     * 订单结算信息 落库
+     * @param accountPlatformProfit
+     */
+    public void insertAccountPlatformProfit(AccountPlatformProfitReqVO accountPlatformProfit) {
+        AccountPlatformProfitEntity accountPlatformProfitEntity = new  AccountPlatformProfitEntity();
+        BeanUtils.copyProperties(accountPlatformProfit,accountPlatformProfitEntity);
+        int result = accountPlatformProfitMapper.insert(accountPlatformProfitEntity);
+        if(result==0){
+            throw new AccountPlatormException();
+        }
     }
 }

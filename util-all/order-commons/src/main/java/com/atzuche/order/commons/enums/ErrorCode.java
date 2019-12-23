@@ -9,8 +9,8 @@ public enum ErrorCode {
 
     ACCOUT_OWNER_COST_SETTLE("931001","车主结算出错"),
 
-    ACCOUT_OWNER_INCOME_SETTLE("931001","车主收益结算出错"),
-    ACCOUT_OWNER_INCOME_EXAMINE("931002","车主收益审核出错"),
+    ACCOUT_OWNER_INCOME_SETTLE("941001","车主收益结算出错"),
+    ACCOUT_OWNER_INCOME_EXAMINE("941002","车主收益审核出错"),
 
     ACCOUT_RENTER_CLAIM_DETAIL("881001","租客理赔费用操作失败"),
 
@@ -28,6 +28,7 @@ public enum ErrorCode {
     ACCOUT_RENTET_WZ_COST_FAIL("971002","违章费用操作失败"),
     CHANGE_ACCOUT_RENTET_WZ_DEPOSIT_FAIL("971003","违章押金资金进出操作失败"),
 
+    PLATFORM_SETTLE_SUBSIDY_AND_PROFIT("871001","结算平台费用出错"),
 
             ;
 
