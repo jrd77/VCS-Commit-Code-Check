@@ -120,7 +120,7 @@
 			)
 	</insert>
 	
-	<insert id="insertSelective" parameterType="com.atzuche.order.owner.cost.entity.OwnerOrderSubsidyDetailEntity" useGeneratedKeys="true" keyProperty="id">
+	<insert id="saveOwnerOrderSubsidyDetail" parameterType="com.atzuche.order.owner.cost.entity.OwnerOrderSubsidyDetailEntity" useGeneratedKeys="true" keyProperty="id">
 		insert into owner_order_subsidy_detail
 		(
 				<if test="orderNo != null">`order_no`, </if>
@@ -232,5 +232,40 @@
 		</set>
 		where id = #{id}
 	</update>
+	
+	<select id="listOwnerOrderSubsidyDetail" resultMap="BaseResultMap">
+		select <include refid="Base_Column_List" /> from owner_order_subsidy_detail where 
+		order_no = #{orderNo}
+		and owner_order_no = #{ownerOrderNo}
+		and is_delete = 0
+	</select>
+  	
+  	<insert id="saveOwnerOrderSubsidyDetailBatch">
+      INSERT INTO owner_order_subsidy_detail
+		(
+				`order_no`,		
+				`owner_order_no`,		
+				`mem_no`,		
+				`subsid_type`,		
+				`subsidy_source_code`,		
+				`subsidy_source`,		
+				`subsidy_code`,		
+				`subsidy_name`,
+				`subsidy_type_code`,
+				`subsidy_desc`,
+				`subsidy_amount`,
+				`subsidy_voucher`,
+				`remark`,
+				`operator`,
+				`dept_name`
+			)
+      VALUES
+      <foreach collection="costList" item="cost" separator=",">
+      (#{cost.orderNo},#{cost.ownerOrderNo},#{cost.memNo},#{cost.subsidType},
+      #{cost.subsidySourceCode},#{cost.subsidySource},#{cost.subsidyCode},#{cost.subsidyName},
+      #{cost.subsidyTypeCode},#{cost.subsidyDesc},#{cost.subsidyAmount},#{cost.subsidyVoucher},
+      #{cost.remark},#{cost.operator},#{cost.deptName})
+      </foreach>
+     </insert>
   	
 </mapper>

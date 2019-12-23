@@ -22,5 +22,5 @@ public interface AccountRenterCostSettleMapper{
     
     int updateByPrimaryKeySelective(AccountRenterCostSettleEntity record);
 
-    List<AccountRenterCostSettleEntity> selectByOrderNo(@Param("orderNo") String orderNo, @Param("memNo")String memNo);
+    AccountRenterCostSettleEntity selectByOrderNo(@Param("orderNo") String orderNo, @Param("memNo")String memNo);
 }

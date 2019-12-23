@@ -66,7 +66,7 @@ public class PayedOrderRenterDepositReqVO {
     /**
      * 车辆押金进出明细
      */
-    private PayedOrderRenterDepositDetailReqVO payedOrderRenterDepositDetailReqVO;
+    private DetainRenterDepositReqVO detainRenterDepositReqVO;
 
     /**
      * 参数校验
@@ -77,7 +77,7 @@ public class PayedOrderRenterDepositReqVO {
         Assert.notNull(getIsFreeDeposit(), ErrorCode.PARAMETER_ERROR.getText());
         Assert.notNull(getPayStatus(), ErrorCode.PARAMETER_ERROR.getText());
         Assert.notNull(getPayTime(), ErrorCode.PARAMETER_ERROR.getText());
-        Assert.notNull(getPayedOrderRenterDepositDetailReqVO(), ErrorCode.PARAMETER_ERROR.getText());
-        getPayedOrderRenterDepositDetailReqVO().check();
+        Assert.notNull(getDetainRenterDepositReqVO(), ErrorCode.PARAMETER_ERROR.getText());
+        getDetainRenterDepositReqVO().check();
     }
 }

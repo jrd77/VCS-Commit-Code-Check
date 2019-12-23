@@ -35,12 +35,6 @@
 	<select id="selectByPrimaryKey" resultMap="BaseResultMap">
 		select <include refid="Base_Column_List" /> from account_renter_detain_cost where id = #{value}
 	</select>
-
-	<select id="selectALL" resultMap="BaseResultMap">
-		select  <include refid="Base_Column_List" /> from account_renter_detain_cost order by id desc
-	</select>
-
-	 
 	<insert id="insert" parameterType="com.atzuche.order.accountrenterdetain.entity.AccountRenterDetainCostEntity">
 		insert into account_renter_detain_cost
 		(
@@ -69,36 +63,7 @@
 				#{isDelete}		
 			)
 	</insert>
-	
-	<insert id="insertSelective" parameterType="com.atzuche.order.accountrenterdetain.entity.AccountRenterDetainCostEntity">
-		insert into account_renter_detain_cost
-		(
-			<if test="id != null">`id`, </if>
-				<if test="orderNo != null">`order_no`, </if>
-				<if test="memNo != null">`mem_no`, </if>
-				<if test="amt != null">`amt`, </if>
-				<if test="version != null">`version`, </if>
-				<if test="createTime != null">`create_time`, </if>
-				<if test="createOp != null">`create_op`, </if>
-				<if test="updateTime != null">`update_time`, </if>
-				<if test="updateOp != null">`update_op`, </if>
-				<if test="isDelete != null">`is_delete` </if>
-			)
-		values
-		(
-			<if test="id != null">#{id},  </if>
-				<if test="orderNo != null">#{orderNo},  </if>
-				<if test="memNo != null">#{memNo},  </if>
-				<if test="amt != null">#{amt},  </if>
-				<if test="version != null">#{version},  </if>
-				<if test="createTime != null">#{createTime},  </if>
-				<if test="createOp != null">#{createOp},  </if>
-				<if test="updateTime != null">#{updateTime},  </if>
-				<if test="updateOp != null">#{updateOp},  </if>
-				<if test="isDelete != null">#{isDelete} </if>
-			)
-	</insert>
-	
+
 	 
 	<update id="updateByPrimaryKeySelective" parameterType="com.atzuche.order.accountrenterdetain.entity.AccountRenterDetainCostEntity">
 		update account_renter_detain_cost 
@@ -106,31 +71,19 @@
 				<if test="orderNo != null">`order_no` = #{orderNo}, </if>
 				<if test="memNo != null">`mem_no` = #{memNo}, </if>
 				<if test="amt != null">`amt` = #{amt}, </if>
-				<if test="version != null">`version` = #{version}, </if>
+				version = #{version},
 				<if test="createTime != null">`create_time` = #{createTime}, </if>
 				<if test="createOp != null">`create_op` = #{createOp}, </if>
 				<if test="updateTime != null">`update_time` = #{updateTime}, </if>
 				<if test="updateOp != null">`update_op` = #{updateOp}, </if>
 				<if test="isDelete != null">`is_delete` = #{isDelete}</if>
 			</set>
-		where id = #{id}
+		where id = #{id} and version = #{version}
 	</update>
 	
-	<update id="updateByPrimaryKey" parameterType="com.atzuche.order.accountrenterdetain.entity.AccountRenterDetainCostEntity">
-		update account_renter_detain_cost 
-		<set>
-				`order_no` = #{orderNo}, 		
-				`mem_no` = #{memNo}, 		
-				`amt` = #{amt}, 		
-				`version` = #{version}, 		
-				`create_time` = #{createTime}, 		
-				`create_op` = #{createOp}, 		
-				`update_time` = #{updateTime}, 		
-				`update_op` = #{updateOp}, 		
-				`is_delete` = #{isDelete}		
-	
-		</set>
-		where id = #{id}
-	</update>
-  	
+
+    <select id="getRenterDetainAmt" resultMap="BaseResultMap">
+
+    </select>
+
 </mapper>

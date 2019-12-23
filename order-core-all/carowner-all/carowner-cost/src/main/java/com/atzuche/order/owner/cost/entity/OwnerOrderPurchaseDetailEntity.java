@@ -47,7 +47,7 @@ public class OwnerOrderPurchaseDetailEntity implements Serializable {
 	/**
 	 * 份数
 	 */
-	private Integer count;
+	private Double count;
 	/**
 	 * 金额
 	 */

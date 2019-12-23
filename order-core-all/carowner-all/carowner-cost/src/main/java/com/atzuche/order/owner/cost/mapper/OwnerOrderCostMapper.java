@@ -19,7 +19,7 @@ public interface OwnerOrderCostMapper{
 
     int insert(OwnerOrderCostEntity record);
     
-    int insertSelective(OwnerOrderCostEntity record);
+    int saveOwnerOrderCost(OwnerOrderCostEntity record);
 
     int updateByPrimaryKey(OwnerOrderCostEntity record);
     

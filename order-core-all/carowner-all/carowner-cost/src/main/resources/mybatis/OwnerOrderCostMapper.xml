@@ -80,7 +80,7 @@
 			)
 	</insert>
 	
-	<insert id="insertSelective" parameterType="com.atzuche.order.owner.cost.entity.OwnerOrderCostEntity" useGeneratedKeys="true" keyProperty="id">
+	<insert id="saveOwnerOrderCost" parameterType="com.atzuche.order.owner.cost.entity.OwnerOrderCostEntity" useGeneratedKeys="true" keyProperty="id">
 		insert into owner_order_cost
 		(
 				<if test="orderNo != null">`order_no`, </if>

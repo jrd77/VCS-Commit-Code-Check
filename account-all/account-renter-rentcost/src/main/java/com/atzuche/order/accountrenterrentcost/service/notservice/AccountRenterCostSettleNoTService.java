@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import java.util.List;
+import java.util.Objects;
 
 
 /**
@@ -28,12 +29,11 @@ public class AccountRenterCostSettleNoTService {
      * 查询订单 已付租车费用
      */
     public int getCostPaidRent(String orderNo,String memNo) {
-        List<AccountRenterCostSettleEntity> accountRenterCostSettles = accountRenterCostSettleMapper.selectByOrderNo(orderNo,memNo);
-        if(CollectionUtils.isEmpty(accountRenterCostSettles)){
+        AccountRenterCostSettleEntity accountRenterCostSettle = accountRenterCostSettleMapper.selectByOrderNo(orderNo,memNo);
+        if(Objects.isNull(accountRenterCostSettle)){
            return NumberUtils.INTEGER_ZERO;
         }
-        int result = accountRenterCostSettles.stream().mapToInt(AccountRenterCostSettleEntity::getRentAmt).sum();
-        return result;
+        return accountRenterCostSettle.getShifuAmt()==null?0:accountRenterCostSettle.getShifuAmt();
     }
 
 
@@ -43,15 +43,16 @@ public class AccountRenterCostSettleNoTService {
      */
     public void insertOrUpdateRenterCostSettle(AccountRenterCostReqVO accountRenterCost) {
         AccountRenterCostSettleEntity accountRenterCostSettle = new AccountRenterCostSettleEntity();
-        BeanUtils.copyProperties(accountRenterCost,accountRenterCostSettle);
-        List<AccountRenterCostSettleEntity> accountRenterCostSettleExits = accountRenterCostSettleMapper.selectByOrderNo(accountRenterCost.getOrderNo(),accountRenterCost.getMemNo());
+        AccountRenterCostSettleEntity accountRenterCostSettleExits = accountRenterCostSettleMapper.selectByOrderNo(accountRenterCost.getOrderNo(),accountRenterCost.getMemNo());
         int result;
-        if(CollectionUtils.isEmpty(accountRenterCostSettleExits)){
+        if(Objects.isNull(accountRenterCostSettleExits)){
+            BeanUtils.copyProperties(accountRenterCost,accountRenterCostSettle);
             //不存在插入
             result = accountRenterCostSettleMapper.insert(accountRenterCostSettle);
         }else{
             //存在更新
-            result = accountRenterCostSettleMapper.updateByPrimaryKeySelective(accountRenterCostSettle);
+            accountRenterCostSettleExits.setShifuAmt(accountRenterCostSettleExits.getShifuAmt() + accountRenterCost.getShifuAmt());
+            result = accountRenterCostSettleMapper.updateByPrimaryKeySelective(accountRenterCostSettleExits);
         }
         if(result==0){
             throw new AccountRenterRentCostSettleException() ;

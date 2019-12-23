@@ -19,7 +19,17 @@ public enum RenterCashCodeEnum {
 	GET_BLOCKED_RAISE_AMT("11110036","取车运能加价"),
 	RETURN_BLOCKED_RAISE_AMT("11110037","还车运能加价"),
 	RENTER_PENALTY("11110039","取消订单违约金"),
-	;
+
+    ACCOUNT_RENTER_WZ_DEPOSIT("21110001","违章押金"),
+    ACCOUNT_RENTER_DEPOSIT("21110002","车俩押金"),
+    ACCOUNT_DEBT("21110003","历史欠款"),
+    ACCOUNT_OWNER_DEBT("21110004","车主费用"),
+    ACCOUNT_OWNER_INCOME("21110005","车主收益"),
+    ACCOUNT_RENTER_RENT_COST("21110006","租客租车费用"),
+
+    OWNER_RENT_INCOME("31110001","租车收益"),
+    OWNER_PENALTIES_INCOME("31110002","违约金收益"),
+    ;
 	
 	/**
 	 * 费用编码

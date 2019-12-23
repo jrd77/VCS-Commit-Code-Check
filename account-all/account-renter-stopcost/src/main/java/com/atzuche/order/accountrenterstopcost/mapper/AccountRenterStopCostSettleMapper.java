@@ -2,6 +2,8 @@ package com.atzuche.order.accountrenterstopcost.mapper;
 
 import com.atzuche.order.accountrenterstopcost.entity.AccountRenterStopCostSettleEntity;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
 import java.util.List;
 
 /**
@@ -15,14 +17,9 @@ public interface AccountRenterStopCostSettleMapper{
 
     AccountRenterStopCostSettleEntity selectByPrimaryKey(Integer id);
 
-    List<AccountRenterStopCostSettleEntity> selectALL();
-
     int insert(AccountRenterStopCostSettleEntity record);
-    
-    int insertSelective(AccountRenterStopCostSettleEntity record);
-
-    int updateByPrimaryKey(AccountRenterStopCostSettleEntity record);
     
     int updateByPrimaryKeySelective(AccountRenterStopCostSettleEntity record);
 
+    AccountRenterStopCostSettleEntity getRenterStopCostAmt(@Param("memNo") String memNo);
 }

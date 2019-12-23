@@ -1,7 +1,7 @@
 package com.atzuche.order.accountownerincome.exception;
 
-import com.atzuche.order.accountownerincome.enums.ErrorCode;
 import com.atzuche.order.commons.OrderException;
+import com.atzuche.order.commons.enums.ErrorCode;
 import lombok.Data;
 
 /**
@@ -10,6 +10,6 @@ import lombok.Data;
 @Data
 public class AccountOwnerIncomeExamineException extends OrderException {
     public AccountOwnerIncomeExamineException() {
-        super(ErrorCode.ACCOUT_OWNER_INCOME_EXAMINE.getCode(),ErrorCode.ACCOUT_OWNER_INCOME_EXAMINE.getCode());
+        super(ErrorCode.ACCOUT_OWNER_INCOME_EXAMINE.getCode(), ErrorCode.ACCOUT_OWNER_INCOME_EXAMINE.getCode());
     }
 }

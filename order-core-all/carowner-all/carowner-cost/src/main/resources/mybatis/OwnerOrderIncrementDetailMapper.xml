@@ -84,7 +84,7 @@
 			)
 	</insert>
 	
-	<insert id="insertSelective" parameterType="com.atzuche.order.owner.cost.entity.OwnerOrderIncrementDetailEntity" useGeneratedKeys="true" keyProperty="id">
+	<insert id="saveOwnerOrderIncrementDetail" parameterType="com.atzuche.order.owner.cost.entity.OwnerOrderIncrementDetailEntity" useGeneratedKeys="true" keyProperty="id">
 		insert into owner_order_increment_detail
 		(
 				<if test="orderNo != null">`order_no`, </if>
@@ -160,5 +160,12 @@
 		</set>
 		where id = #{id}
 	</update>
+  	
+  	<select id="listOwnerOrderIncrementDetail" resultMap="BaseResultMap">
+		select <include refid="Base_Column_List" /> from owner_order_increment_detail where 
+		order_no = #{orderNo}
+		and owner_order_no = #{ownerOrderNo}
+		and is_delete = 0
+	</select>
   	
 </mapper>

@@ -56,15 +56,6 @@ public class AccountRenterCostReqVO {
      */
     private Integer shifuAmt;
 
-    /**
-     * 创建人
-     */
-    private String createOp;
-
-    /**
-     * 修改人
-     */
-    private String updateOp;
 
     /**
      * 费用明细
