@@ -50,6 +50,15 @@ public class CommonUtils {
 	private static final double EASYCOEFFICIENT_NOVICE = 1.3;
 	
 	private static final Integer[] CAR_EASY_TAG = {370,371};
+	
+	public static final float FINE_AMT_RATIO_BIG = 0.3F;
+	public static final float FINE_AMT_RATIO_SMALL = 0.2F;
+	public static final double CANCEL_FINE_RATIO = 0.3;
+	public static final Integer CANCEL_FINE_LIMIT = 500;
+	public static final Integer BEFORE_TRANS_TIME_SPAN = 4;
+	public static final Integer MODIFY_GET_FINE_AMT = 50;
+	public static final Integer MODIFY_RETURN_FINE_AMT = 50;
+	
     /**
                * 初始化全面保障费单价配置
      */

@@ -239,4 +239,31 @@
 		and renter_order_no = #{renterOrderNo} and is_delete = 0
 	</select>
   	
+  	
+  	<insert id="saveRenterOrderSubsidyDetailBatch">
+      INSERT INTO renter_order_subsidy_detail
+		(
+				`order_no`,		
+				`renter_order_no`,		
+				`mem_no`,
+				`subsid_type`,		
+				`subsidy_source_code`,		
+				`subsidy_source`,		
+				`subsidy_code`,		
+				`subsidy_name`,		
+				`subsidy_type_code`,		
+				`subsidy_desc`,		
+				`subsidy_amount`,
+				`subsidy_voucher`,
+				`remark`,
+				`operator`
+			)
+      VALUES
+      <foreach collection="costList" item="cost" separator=",">
+      (#{cost.orderNo},#{cost.renterOrderNo},#{cost.memNo},#{cost.subsidType},#{cost.subsidySourceCode},
+      #{cost.subsidySource},#{cost.subsidyCode},#{cost.subsidyName},#{cost.subsidyTypeCode},
+      #{cost.subsidyDesc},#{cost.subsidyAmount},#{cost.subsidyVoucher},#{cost.remark},#{cost.operator})
+      </foreach>
+     </insert>
+  	
 </mapper>

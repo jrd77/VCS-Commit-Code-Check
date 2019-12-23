@@ -29,4 +29,5 @@ public interface RenterOrderSubsidyDetailMapper{
     
     List<RenterOrderSubsidyDetailEntity> listRenterOrderSubsidyDetail(@Param("orderNo") String orderNo, @Param("renterOrderNo") String renterOrderNo);
 
+    Integer saveRenterOrderSubsidyDetailBatch(@Param("costList") List<RenterOrderSubsidyDetailEntity> costList);
 }
