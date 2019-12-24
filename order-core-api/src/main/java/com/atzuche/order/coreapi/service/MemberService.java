@@ -56,12 +56,12 @@ public class MemberService {
         Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "会员详情服务");
         try{
             Cat.logEvent(CatConstants.FEIGN_METHOD,"MemberDetailFeignService.getMemberSelectInfo");
-            String parameter = "memNo="+memNo+"&selectKey"+selectKey.toString();
+            String parameter = "memNo="+memNo+"&selectKey"+JSON.toJSONString(selectKey);
             Cat.logEvent(CatConstants.FEIGN_PARAM,parameter);
             responseData = memberDetailFeignService.getMemberSelectInfo(Integer.valueOf(memNo), selectKey);
             Cat.logEvent(CatConstants.FEIGN_RESULT,JSON.toJSONString(responseData));
             if(responseData == null || !ErrorCode.SUCCESS.getCode().equals(responseData.getResCode())){
-                log.error("Feign 获取车主会员信息失败,orderContextDto={},memNo={}",memNo, JSON.toJSONString(responseData));
+                log.error("Feign 获取车主会员信息失败,memNo={},orderContextDto={}",memNo, JSON.toJSONString(responseData));
                 OwnerberByFeignException ownerberByFeignException = new OwnerberByFeignException(SubmitOrderErrorEnum.FEIGN_GET_OWNER_MEMBER_FAIL.getCode(), SubmitOrderErrorEnum.FEIGN_GET_OWNER_MEMBER_FAIL.getText());
                 Cat.logError("Feign 获取车主会员信息失败",ownerberByFeignException);
                 t.setStatus(ownerberByFeignException);
@@ -131,7 +131,7 @@ public class MemberService {
         Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "会员详情服务");
         try{
             Cat.logEvent(CatConstants.FEIGN_METHOD,"MemberDetailFeignService.getMemberSelectInfo");
-            String parameter = "memNo="+memNo+"&selectKey"+selectKey.toString();
+            String parameter = "memNo="+memNo+"&selectKey"+JSON.toJSONString(selectKey);
             Cat.logEvent(CatConstants.FEIGN_PARAM,parameter);
             responseData = memberDetailFeignService.getMemberSelectInfo(Integer.parseInt(memNo), selectKey);
             if(responseData == null || !ErrorCode.SUCCESS.getCode().equals(responseData.getResCode()) || responseData.getData() == null){
