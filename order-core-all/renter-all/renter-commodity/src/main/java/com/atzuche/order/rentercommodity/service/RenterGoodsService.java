@@ -1,16 +1,21 @@
 package com.atzuche.order.rentercommodity.service;
 
+import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.entity.dto.*;
 import com.atzuche.order.rentercommodity.entity.RenterGoodsEntity;
 import com.atzuche.order.rentercommodity.entity.RenterGoodsPriceDetailEntity;
 import com.atzuche.order.rentercommodity.mapper.RenterGoodsMapper;
 import com.atzuche.order.rentercommodity.mapper.RenterGoodsPriceDetailMapper;
+import lombok.Data;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 /**
@@ -72,5 +77,13 @@ public class RenterGoodsService{
         });
         renterGoodsDetailDto.setRenterGoodsPriceDetailDTOList(renterGoodsPriceDetailDTOList);
         return renterGoodsDetailDto;
+    }
+
+    @Data
+    public static class JSONStr{
+        private Integer id;
+        private String username;
+        private Integer age;
+        private String desc;
     }
 }

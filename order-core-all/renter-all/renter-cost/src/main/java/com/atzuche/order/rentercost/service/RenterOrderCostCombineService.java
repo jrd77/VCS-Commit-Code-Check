@@ -107,7 +107,7 @@ public class RenterOrderCostCombineService {
 		return renterOrderCostDetailEntityList;
 	}
 	
-	public RenterOrderCostDetailEntity getRentAmtEntity(CostBaseDTO costBaseDTO, List<RenterGoodsPriceDetailDTO> dayPrices) {
+	private RenterOrderCostDetailEntity getRentAmtEntity(CostBaseDTO costBaseDTO, List<RenterGoodsPriceDetailDTO> dayPrices) {
 		// TODO 走配置中心获取
 		Integer configHours = 8;
 		// 数据转化
@@ -423,4 +423,14 @@ public class RenterOrderCostCombineService {
 		result.setCostDesc(renterCashCodeEnum.getTxt());
 		return result;
 	}
+
+    /**
+     * 取还车费用计算
+     * @param
+     * @param
+     * @return
+     */
+	public RenterOrderCostDetailEntity srvGetReturnAmt(){
+        return null;
+    }
 }
