@@ -9,7 +9,7 @@ import lombok.Data;
 public class OrderPayAsynResVO extends OrderPayBaseResVO {
 
 
-    private String settleAmount;
+    private int settleAmount;
 
     private String orderTime;
 

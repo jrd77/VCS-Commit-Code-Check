@@ -15,7 +15,7 @@ public class LocalDateTimeUtils {
     /**
      * 默认的时间日期样式
      */
-    private static final String DEFAULT_PATTERN = "yyyy-MM-dd HH:mm:ss";
+    public static final String DEFAULT_PATTERN = "yyyy-MM-dd HH:mm:ss";
 
     /**
      * 中国时区

@@ -3,24 +3,25 @@ package com.atzuche.order.cashieraccount.vo.req.pay;
 import lombok.Data;
 
 /**
- * 支付系统退款请求请求签名参数
+ * 支付系统支付请求签名参数
  */
 @Data
-public class OrderReturnPayPeqVO extends OrderPayBasePeqVO{
+public class OrderPayReqVO extends OrderPayBaseReqVO {
+
 
     /**
-     * 退款ID
+     * 支付金额
      */
-    private String refundId;
+    private int payAmt;
     /**
      * 支付标题
      */
-    private int refundAmt;
+    private String payTitle;
 
     /**
-     * 支付流水号
+     * openid
      */
-    private String qn;
+    private String openId;
 
     /**
      * 补付第几笔

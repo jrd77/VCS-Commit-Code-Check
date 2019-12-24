@@ -12,4 +12,13 @@ public class CatConstants {
     public static final String FEIGN_PARAM="Feign.Param";
 
     public static final String FEIGN_RESULT ="Feign.Result" ;
+
+    public static final String RABBIT_MQ_CALL="RabbitMq";
+
+    public static final String RABBIT_MQ_METHOD="RabbitMq.Method";
+
+    public static final String RABBIT_MQ_PARAM="RabbitMq.Param";
+
+    public static final String RABBIT_MQ_RESULT ="RabbitMq.Result" ;
+
 }
