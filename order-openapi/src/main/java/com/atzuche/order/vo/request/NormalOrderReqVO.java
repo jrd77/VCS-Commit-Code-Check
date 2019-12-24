@@ -18,6 +18,9 @@ public class NormalOrderReqVO extends BaseVO implements Serializable {
 
     private static final long serialVersionUID = -7311434304468158415L;
 
+    @AutoDocProperty(value = "订单类型", required = true)
+    @NotBlank(message = "订单类型不能为空")
+    private String orderCategory;
 
     @AutoDocProperty(value = "城市编码", required = true)
     @NotBlank(message = "城市编码不能为空")
@@ -171,6 +174,13 @@ public class NormalOrderReqVO extends BaseVO implements Serializable {
     private Integer srcPort;
 
 
+    public String getOrderCategory() {
+        return orderCategory;
+    }
+
+    public void setOrderCategory(String orderCategory) {
+        this.orderCategory = orderCategory;
+    }
 
     public String getCityCode() {
         return cityCode;
@@ -541,10 +551,12 @@ public class NormalOrderReqVO extends BaseVO implements Serializable {
         this.srcPort = srcPort;
     }
 
+
     @Override
     public String toString() {
         return "NormalOrderReqVO{" +
-                "cityCode='" + cityCode + '\'' +
+                "orderCategory='" + orderCategory + '\'' +
+                ", cityCode='" + cityCode + '\'' +
                 ", sceneCode='" + sceneCode + '\'' +
                 ", source='" + source + '\'' +
                 ", subSource='" + subSource + '\'' +
@@ -583,11 +595,11 @@ public class NormalOrderReqVO extends BaseVO implements Serializable {
                 ", utmMedium='" + utmMedium + '\'' +
                 ", utmTerm='" + utmTerm + '\'' +
                 ", utmCampaign='" + utmCampaign + '\'' +
+                ", ModuleName='" + ModuleName + '\'' +
+                ", FunctionName='" + FunctionName + '\'' +
                 ", reqSource=" + reqSource +
                 ", reqVersion='" + reqVersion + '\'' +
                 ", reqOs='" + reqOs + '\'' +
-                ", ModuleName='" + ModuleName + '\'' +
-                ", FunctionName='" + FunctionName + '\'' +
                 ", srcIp='" + srcIp + '\'' +
                 ", srcPort=" + srcPort +
                 '}';
