@@ -2,6 +2,8 @@ package com.atzuche.order.mapper;
 
 import com.atzuche.order.entity.OwnerOrderEntity;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
 import java.util.List;
 
 /**
@@ -24,5 +26,7 @@ public interface OwnerOrderMapper{
     int updateByPrimaryKey(OwnerOrderEntity record);
     
     int updateByPrimaryKeySelective(OwnerOrderEntity record);
+    
+    OwnerOrderEntity getOwnerOrderByOrderNoAndIsEffective(@Param("orderNo") String orderNo);
 
 }

@@ -19,7 +19,7 @@ public interface RenterOrderChangeApplyMapper{
 
     int insert(RenterOrderChangeApplyEntity record);
     
-    int insertSelective(RenterOrderChangeApplyEntity record);
+    int saveRenterOrderChangeApply(RenterOrderChangeApplyEntity record);
 
     int updateByPrimaryKey(RenterOrderChangeApplyEntity record);
     

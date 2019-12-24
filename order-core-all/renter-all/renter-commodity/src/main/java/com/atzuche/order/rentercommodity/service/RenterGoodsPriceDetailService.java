@@ -20,7 +20,7 @@ public class RenterGoodsPriceDetailService {
     @Autowired
     private RenterGoodsPriceDetailMapper renterGoodsPriceDetailMapper;
 
-    public List<RenterGoodsPriceDetailEntity> listRenterGoodsPriceByOrderNo(Long orderNo) {
+    public List<RenterGoodsPriceDetailEntity> listRenterGoodsPriceByOrderNo(String orderNo) {
         return null;
     }
 }
