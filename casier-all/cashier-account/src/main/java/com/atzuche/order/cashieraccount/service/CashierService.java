@@ -59,22 +59,7 @@ public class CashierService {
 
 
     /**  ***************************************车辆押金 start****************************************************/
-    /**
-     * 记录应收车俩押金
-     * 下单成功  调收银台 记录 车俩押金应付
-     */
-    @Transactional(rollbackFor=Exception.class)
-    public void insertRenterDeposit(CreateOrderRenterDepositReqVO createOrderRenterDepositReqVO){
-        accountRenterDepositService.insertRenterDeposit(createOrderRenterDepositReqVO);
-    }
 
-    /**
-     * 车俩押金支付成功回调
-     */
-    @Transactional(rollbackFor=Exception.class)
-    public void updateRenterDeposit(PayedOrderRenterDepositReqVO payedOrderRenterDeposit){
-        accountRenterDepositService.updateRenterDeposit(payedOrderRenterDeposit);
-    }
 
     /**
      * 扣减/暂扣 车俩押金
@@ -108,13 +93,7 @@ public class CashierService {
     public void insertRenterDeposit(CreateOrderRenterWZDepositReqVO createOrderRenterWZDepositReq){
         accountRenterWzDepositService.insertRenterWZDeposit(createOrderRenterWZDepositReq);
     }
-    /**
-     * 支付成功后记录 实付违章押金信息 和违章押金资金进出信息
-     */
-    @Transactional(rollbackFor=Exception.class)
-    public void updateRenterWZDeposit(PayedOrderRenterWZDepositReqVO payedOrderWZRenterDeposit){
-        accountRenterWzDepositService.updateRenterWZDeposit(payedOrderWZRenterDeposit);
-    }
+
 
     /**
      * 扣减/暂扣 车俩押金

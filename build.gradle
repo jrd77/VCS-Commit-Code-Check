@@ -67,6 +67,9 @@ subprojects {
         compile("com.autoyol:auto-doc:1.0-SNAPSHOT"){
             exclude module:'servlet-api'
         }*/
+//        compile('org.springframework.boot:spring-boot-starter-amqp')
+        compile 'org.springframework.amqp:spring-rabbit:1.7.13.RELEASE'
+
     }
  
 }
