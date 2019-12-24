@@ -9,7 +9,7 @@ import lombok.Data;
  * 车主订单子表
  * 
  * @author ZhangBin
- * @date 2019-12-11 18:07:01
+ * @date 2019-12-24 14:23:03
  * @Description:
  */
 @Data
@@ -29,21 +29,33 @@ public class OwnerOrderEntity implements Serializable {
 	 */
 	private String ownerOrderNo;
 	/**
+	 * 会员号
+	 */
+	private String memNo;
+	/**
+	 * 显示起租时间
+	 */
+	private LocalDateTime showRentTime;
+	/**
+	 * 显示还车时间
+	 */
+	private LocalDateTime showRevertTime;
+	/**
 	 * 预计起租时间
 	 */
-	private LocalDateTime expRentStartTime;
+	private LocalDateTime expRentTime;
 	/**
 	 * 预计还车时间
 	 */
-	private LocalDateTime expRentEndTime;
+	private LocalDateTime expRevertTime;
 	/**
 	 * 实际起租时间
 	 */
-	private LocalDateTime actRentStartTime;
+	private LocalDateTime actRentTime;
 	/**
 	 * 实际还车时间
 	 */
-	private LocalDateTime actRentEndTime;
+	private LocalDateTime actRevertTime;
 	/**
 	 * 商品编码
 	 */
@@ -60,6 +72,10 @@ public class OwnerOrderEntity implements Serializable {
 	 * 是否取消 0-正常，1-取消
 	 */
 	private Integer isCancle;
+	/**
+	 * 是否使用特供价 0-否，1-是
+	 */
+	private Integer isUseSpecialPrice;
 	/**
 	 * 取消原因
 	 */
