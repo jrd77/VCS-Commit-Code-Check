@@ -6,7 +6,7 @@ import lombok.Data;
  * 支付系统请求签名参数
  */
 @Data
-public class OrderPayBasePeqVO {
+public class OrderPayBaseReqVO {
     /**
      * atappId 凹凸APPID
      */

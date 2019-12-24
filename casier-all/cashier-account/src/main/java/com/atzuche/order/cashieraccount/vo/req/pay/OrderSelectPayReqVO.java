@@ -6,7 +6,7 @@ import lombok.Data;
  * 支付系统查询请求签名参数
  */
 @Data
-public class OrderSelectPayPeqVO extends OrderPayBasePeqVO{
+public class OrderSelectPayReqVO extends OrderPayBaseReqVO {
     /**
      * paySn 补付第几笔
      */
