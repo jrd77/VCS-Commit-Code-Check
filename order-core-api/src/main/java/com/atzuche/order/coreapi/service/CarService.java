@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.LocalDateTimeUtils;
 import com.atzuche.order.commons.entity.dto.OwnerGoodsDetailDTO;
 import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
+import com.atzuche.order.commons.entity.dto.RenterGoodsPriceDetailDTO;
 import com.atzuche.order.coreapi.enums.SubmitOrderErrorEnum;
 import com.atzuche.order.coreapi.submitOrder.exception.CarDetailByFeignException;
 import com.atzuche.order.coreapi.submitOrder.exception.RenterMemberByFeignException;
@@ -19,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -146,6 +148,19 @@ public class CarService {
         renterGoodsDetailDto.setCarRealAddr(carAddressOfTransVO.getCarRealAddress());
         renterGoodsDetailDto.setCarRealLon(carAddressOfTransVO.getRealAddressLon()==null?"":String.valueOf(carAddressOfTransVO.getRealAddressLon()));
         renterGoodsDetailDto.setCarRealLat(carAddressOfTransVO.getRealAddressLat()==null?"":String.valueOf(carAddressOfTransVO.getRealAddressLat()));
+        List<RenterGoodsPriceDetailDTO> list = new ArrayList<>();
+        List<CarPriceOfDayVO> daysPrice = data.getDaysPrice();
+        if(daysPrice == null){
+            renterGoodsDetailDto.setRenterGoodsPriceDetailDTOList(list);
+            return renterGoodsDetailDto;
+        }
+        daysPrice.stream().forEach(x->{
+            RenterGoodsPriceDetailDTO dto = new RenterGoodsPriceDetailDTO();
+            dto.setCarDay(LocalDateTimeUtils.parseStringToLocalDate(x.getDateStr()));
+            dto.setCarUnitPrice(dto.getCarUnitPrice());
+            list.add(dto);
+        });
+        renterGoodsDetailDto.setRenterGoodsPriceDetailDTOList(list);
         return renterGoodsDetailDto;
     }
     //获取车主商品信息

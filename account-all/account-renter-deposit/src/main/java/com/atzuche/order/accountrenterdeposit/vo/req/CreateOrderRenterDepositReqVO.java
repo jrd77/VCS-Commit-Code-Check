@@ -1,7 +1,6 @@
 package com.atzuche.order.accountrenterdeposit.vo.req;
 
 import com.autoyol.commons.web.ErrorCode;
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import lombok.Data;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;

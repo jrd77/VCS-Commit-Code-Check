@@ -13,7 +13,8 @@
         <result property="fineSubsidyDesc" column="fine_subsidy_desc"/>
         <result property="fineSubsidySourceCode" column="fine_subsidy_source_code"/>
         <result property="fineSubsidySourceDesc" column="fine_subsidy_source_desc"/>
-        <result property="fineDesc" column="fine_desc"/>
+        <result property="fineType" column="fine_type"/>
+        <result property="fineTypeDesc" column="fine_type_desc"/>
         <result property="operatorId" column="operator_id"/>
         <result property="operator" column="operator"/>
         <result property="deptId" column="dept_id"/>
@@ -37,7 +38,8 @@
 	`fine_subsidy_desc`, 	
 	`fine_subsidy_source_code`, 	
 	`fine_subsidy_source_desc`, 	
-	`fine_desc`, 	
+	`fine_type`, 	
+	`fine_type_desc`, 	
 	`operator_id`, 	
 	`operator`, 	
 	`dept_id`, 	
@@ -56,11 +58,6 @@
 		select <include refid="Base_Column_List" /> from renter_order_fine_deatail where id = #{value}
 	</select>
 
-	<select id="selectALL" resultMap="BaseResultMap">
-		select  <include refid="Base_Column_List" /> from renter_order_fine_deatail order by id desc
-	</select>
-
-	 
 	<insert id="insert" parameterType="com.atzuche.order.rentercost.entity.RenterOrderFineDeatailEntity" useGeneratedKeys="true" keyProperty="id">
 		insert into renter_order_fine_deatail
 		(
@@ -72,7 +69,8 @@
 				`fine_subsidy_desc`,		
 				`fine_subsidy_source_code`,		
 				`fine_subsidy_source_desc`,		
-				`fine_desc`,		
+				`fine_type`,		
+				`fine_type_desc`,		
 				`operator_id`,		
 				`operator`,		
 				`dept_id`,		
@@ -94,7 +92,8 @@
 				#{fineSubsidyDesc}, 		
 				#{fineSubsidySourceCode}, 		
 				#{fineSubsidySourceDesc}, 		
-				#{fineDesc}, 		
+				#{fineType}, 		
+				#{fineTypeDesc}, 		
 				#{operatorId}, 		
 				#{operator}, 		
 				#{deptId}, 		
@@ -119,7 +118,8 @@
 				<if test="fineSubsidyDesc != null">`fine_subsidy_desc`, </if>
 				<if test="fineSubsidySourceCode != null">`fine_subsidy_source_code`, </if>
 				<if test="fineSubsidySourceDesc != null">`fine_subsidy_source_desc`, </if>
-				<if test="fineDesc != null">`fine_desc`, </if>
+				<if test="fineType != null">`fine_type`, </if>
+				<if test="fineTypeDesc != null">`fine_type_desc`, </if>
 				<if test="operatorId != null">`operator_id`, </if>
 				<if test="operator != null">`operator`, </if>
 				<if test="deptId != null">`dept_id`, </if>
@@ -141,7 +141,8 @@
 				<if test="fineSubsidyDesc != null">#{fineSubsidyDesc},  </if>
 				<if test="fineSubsidySourceCode != null">#{fineSubsidySourceCode},  </if>
 				<if test="fineSubsidySourceDesc != null">#{fineSubsidySourceDesc},  </if>
-				<if test="fineDesc != null">#{fineDesc},  </if>
+				<if test="fineType != null">#{fineType},  </if>
+				<if test="fineTypeDesc != null">#{fineTypeDesc},  </if>
 				<if test="operatorId != null">#{operatorId},  </if>
 				<if test="operator != null">#{operator},  </if>
 				<if test="deptId != null">#{deptId},  </if>
@@ -167,7 +168,8 @@
 				<if test="fineSubsidyDesc != null">`fine_subsidy_desc` = #{fineSubsidyDesc}, </if>
 				<if test="fineSubsidySourceCode != null">`fine_subsidy_source_code` = #{fineSubsidySourceCode}, </if>
 				<if test="fineSubsidySourceDesc != null">`fine_subsidy_source_desc` = #{fineSubsidySourceDesc}, </if>
-				<if test="fineDesc != null">`fine_desc` = #{fineDesc}, </if>
+				<if test="fineType != null">`fine_type` = #{fineType}, </if>
+				<if test="fineTypeDesc != null">`fine_type_desc` = #{fineTypeDesc}, </if>
 				<if test="operatorId != null">`operator_id` = #{operatorId}, </if>
 				<if test="operator != null">`operator` = #{operator}, </if>
 				<if test="deptId != null">`dept_id` = #{deptId}, </if>
@@ -193,7 +195,8 @@
 				`fine_subsidy_desc` = #{fineSubsidyDesc}, 		
 				`fine_subsidy_source_code` = #{fineSubsidySourceCode}, 		
 				`fine_subsidy_source_desc` = #{fineSubsidySourceDesc}, 		
-				`fine_desc` = #{fineDesc}, 		
+				`fine_type` = #{fineType}, 		
+				`fine_type_desc` = #{fineTypeDesc}, 		
 				`operator_id` = #{operatorId}, 		
 				`operator` = #{operator}, 		
 				`dept_id` = #{deptId}, 		
@@ -213,5 +216,30 @@
 		select <include refid="Base_Column_List" /> from renter_order_fine_deatail where order_no = #{orderNo} 
 		and renter_order_no = #{renterOrderNo} and is_delete = 0
 	</select>
+	
+	<insert id="saveRenterOrderFineDeatailBatch">
+      INSERT INTO renter_order_fine_deatail
+		(
+				`order_no`,		
+				`renter_order_no`,		
+				`mem_no`,		
+				`fine_amount`,		
+				`fine_subsidy_code`,		
+				`fine_subsidy_desc`,		
+				`fine_subsidy_source_code`,		
+				`fine_subsidy_source_desc`,		
+				`fine_type`,		
+				`fine_type_desc`,
+				`operator`,
+				`dept_name`,
+				`remark`	
+			)
+      VALUES
+      <foreach collection="costList" item="cost" separator=",">
+      (#{cost.orderNo},#{cost.renterOrderNo},#{cost.memNo},#{cost.fineAmount},
+      #{cost.fineSubsidyCode},#{cost.fineSubsidyDesc},#{cost.fineSubsidySourceCode},#{cost.fineSubsidySourceDesc},
+      #{cost.fineType},#{cost.fineTypeDesc},#{cost.operator},#{cost.deptName},#{cost.remark})
+      </foreach>
+     </insert>
   	
 </mapper>
