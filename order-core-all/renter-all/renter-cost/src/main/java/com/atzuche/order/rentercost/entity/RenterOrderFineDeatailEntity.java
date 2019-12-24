@@ -9,7 +9,7 @@ import lombok.Data;
  * 租客订单罚金明细表
  * 
  * @author ZhangBin
- * @date 2019-12-14 17:35:56
+ * @date 2019-12-23 11:44:27
  * @Description:
  */
 @Data
@@ -53,9 +53,13 @@ public class RenterOrderFineDeatailEntity implements Serializable {
 	 */
 	private String fineSubsidySourceDesc;
 	/**
-	 * 罚金描述
+	 * 罚金类型
 	 */
-	private Integer fineDesc;
+	private Integer fineType;
+	/**
+	 * 罚金类型描述
+	 */
+	private String fineTypeDesc;
 	/**
 	 * 操作人ID
 	 */
