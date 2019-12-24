@@ -107,7 +107,7 @@ public class RenterOrderCostCombineService {
 		return renterOrderCostDetailEntityList;
 	}
 	
-	public RenterOrderCostDetailEntity getRentAmtEntity(CostBaseDTO costBaseDTO, List<RenterGoodsPriceDetailDTO> dayPrices) {
+	private RenterOrderCostDetailEntity getRentAmtEntity(CostBaseDTO costBaseDTO, List<RenterGoodsPriceDetailDTO> dayPrices) {
 		// TODO 走配置中心获取
 		Integer configHours = 8;
 		// 数据转化
