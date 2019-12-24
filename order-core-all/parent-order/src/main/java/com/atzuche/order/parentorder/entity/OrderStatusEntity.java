@@ -9,15 +9,15 @@ import lombok.Data;
  * 主订单表状态
  * 
  * @author ZhangBin
- * @date 2019-12-14 17:52:41
- * @Description:
+ * @date 2019-12-24 16:19:32
  */
 @Data
 public class OrderStatusEntity implements Serializable {
-	private static final long serialVersionUID = 1L;
-	
-	/**
-	 * 
+
+    private static final long serialVersionUID = -7845653913537427412L;
+
+    /**
+	 * 主键
 	 */
 	private Integer id;
 	/**
@@ -49,11 +49,51 @@ public class OrderStatusEntity implements Serializable {
 	 */
 	private Integer wzRefundStatus;
 	/**
+	 * 违章结算状态
+	 */
+	private Integer wzSettleStatus;
+	/**
+	 * 违章结算时间
+	 */
+	private LocalDateTime wzSettleTime;
+	/**
+	 * 车辆押金结算状态
+	 */
+	private Integer carDepositSettleStatus;
+	/**
+	 * 车辆押金结算时间
+	 */
+	private LocalDateTime carDepositSettleTime;
+	/**
 	 * 费用结算状态
 	 */
 	private Integer settleStatus;
 	/**
-	 * 主状态: 待确认,修改待确认,待调度,待支付,待交车,待还车,待结算,待违章处理,待违章结算,已完结,已结束,待理赔处理
+	 * 费用结算时间
+	 */
+	private LocalDateTime settleTime;
+	/**
+	 * 是否支持调度
+	 */
+	private Integer isDispatch;
+	/**
+	 * 调度状态
+	 */
+	private Integer dispatchStatus;
+	/**
+	 * 是否理赔 0-否，1-是
+	 */
+	private Integer isClaims;
+	/**
+	 * 是否暂扣  0-否，1-是
+	 */
+	private Integer isDetain;
+	/**
+	 * 是否违章 0-否，1-是
+	 */
+	private Integer isWz;
+	/**
+	 * 主状态: 待确认,待调度,待支付,待交车,待还车,待结算,待违章处理,待违章结算,已完结,已结束,待理赔处理
 	 */
 	private Integer status;
 	/**

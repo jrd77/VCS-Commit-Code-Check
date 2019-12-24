@@ -22,9 +22,24 @@ public class NormalOrderReqVO extends BaseVO implements Serializable {
     @NotBlank(message = "订单类型不能为空")
     private String orderCategory;
 
+    @AutoDocProperty(value = "业务来源主类型,1:OTA,2代步车，3:礼品卡,4:安联,5:自有 ")
+    private String businessParentType;
+
+    @AutoDocProperty(value = "业务来源子类型 1:OTA-携程,2:OTA-同城,3:OTA-飞猪,4:OTA-租租车,5:代步车-出险代步车,6:代步车-2*2代步车,7:代步车-券码下单,8:代步车-特供车  ")
+    private String businessChildType;
+
+    @AutoDocProperty(value = "平台来源主类型 1:APP,2:小程序，3:微信,4:支付宝,5:PC页面,6:H5页面,7:管理后台,8:API ")
+    private String platformParentType;
+
+    @AutoDocProperty(value = "平台来源子类型 1:APP-IOS,2:APP-Android,3:小程序-支付宝,4:小程序-微信,5:小程序-百度")
+    private String platformChildType;
+
     @AutoDocProperty(value = "城市编码", required = true)
     @NotBlank(message = "城市编码不能为空")
     private String cityCode;
+
+    @AutoDocProperty(value = "城市名称")
+    private String cityName;
 
     @AutoDocProperty(value = "订单场景编码", required = true)
     @NotBlank(message = "订单场景编码不能为空")
@@ -188,6 +203,46 @@ public class NormalOrderReqVO extends BaseVO implements Serializable {
 
     public void setCityCode(String cityCode) {
         this.cityCode = cityCode;
+    }
+
+    public String getBusinessParentType() {
+        return businessParentType;
+    }
+
+    public void setBusinessParentType(String businessParentType) {
+        this.businessParentType = businessParentType;
+    }
+
+    public String getBusinessChildType() {
+        return businessChildType;
+    }
+
+    public void setBusinessChildType(String businessChildType) {
+        this.businessChildType = businessChildType;
+    }
+
+    public String getPlatformParentType() {
+        return platformParentType;
+    }
+
+    public void setPlatformParentType(String platformParentType) {
+        this.platformParentType = platformParentType;
+    }
+
+    public String getPlatformChildType() {
+        return platformChildType;
+    }
+
+    public void setPlatformChildType(String platformChildType) {
+        this.platformChildType = platformChildType;
+    }
+
+    public String getCityName() {
+        return cityName;
+    }
+
+    public void setCityName(String cityName) {
+        this.cityName = cityName;
     }
 
     public String getSceneCode() {
@@ -551,58 +606,5 @@ public class NormalOrderReqVO extends BaseVO implements Serializable {
         this.srcPort = srcPort;
     }
 
-
-    @Override
-    public String toString() {
-        return "NormalOrderReqVO{" +
-                "orderCategory='" + orderCategory + '\'' +
-                ", cityCode='" + cityCode + '\'' +
-                ", sceneCode='" + sceneCode + '\'' +
-                ", source='" + source + '\'' +
-                ", subSource='" + subSource + '\'' +
-                ", rentTime=" + rentTime +
-                ", revertTime=" + revertTime +
-                ", srvGetFlag=" + srvGetFlag +
-                ", srvGetAddr='" + srvGetAddr + '\'' +
-                ", srvGetLon='" + srvGetLon + '\'' +
-                ", srvGetLat='" + srvGetLat + '\'' +
-                ", srvReturnFlag=" + srvReturnFlag +
-                ", srvReturnAddr='" + srvReturnAddr + '\'' +
-                ", srvReturnLon='" + srvReturnLon + '\'' +
-                ", srvReturnLat='" + srvReturnLat + '\'' +
-                ", carNo='" + carNo + '\'' +
-                ", abatement='" + abatement + '\'' +
-                ", getCarFreeCouponId='" + getCarFreeCouponId + '\'' +
-                ", disCouponIds='" + disCouponIds + '\'' +
-                ", carOwnerCouponNo='" + carOwnerCouponNo + '\'' +
-                ", useAutoCoin=" + useAutoCoin +
-                ", useBal=" + useBal +
-                ", freeDoubleTypeId='" + freeDoubleTypeId + '\'' +
-                ", useAirportService=" + useAirportService +
-                ", flightNo='" + flightNo + '\'' +
-                ", limitRedStatus='" + limitRedStatus + '\'' +
-                ", limitReductionId='" + limitReductionId + '\'' +
-                ", driverIds='" + driverIds + '\'' +
-                ", carAddrIndex='" + carAddrIndex + '\'' +
-                ", isLeaveCity=" + isLeaveCity +
-                ", rentCity='" + rentCity + '\'' +
-                ", queryId='" + queryId + '\'' +
-                ", activityId='" + activityId + '\'' +
-                ", rentReason='" + rentReason + '\'' +
-                ", oilType='" + oilType + '\'' +
-                ", conPhone='" + conPhone + '\'' +
-                ", utmSource='" + utmSource + '\'' +
-                ", utmMedium='" + utmMedium + '\'' +
-                ", utmTerm='" + utmTerm + '\'' +
-                ", utmCampaign='" + utmCampaign + '\'' +
-                ", ModuleName='" + ModuleName + '\'' +
-                ", FunctionName='" + FunctionName + '\'' +
-                ", reqSource=" + reqSource +
-                ", reqVersion='" + reqVersion + '\'' +
-                ", reqOs='" + reqOs + '\'' +
-                ", srcIp='" + srcIp + '\'' +
-                ", srcPort=" + srcPort +
-                '}';
-    }
 }
 

@@ -30,7 +30,10 @@ public enum ErrorCode {
 
     PLATFORM_SETTLE_SUBSIDY_AND_PROFIT("871001","结算平台费用出错"),
 
-            ;
+
+    ORDER_RENTER_ORDERNO_CREATE_ERROR("600001","订单编码创建异常"),
+
+    ;
 
     private String code;
     private String text;

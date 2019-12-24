@@ -9,14 +9,14 @@ import lombok.Data;
  * 主订单表
  * 
  * @author ZhangBin
- * @date 2019-12-19 16:47:30
- * @Description:
+ * @date 2019-12-24 16:19:33
  */
 @Data
 public class OrderEntity implements Serializable {
-	private static final long serialVersionUID = 1L;
-	
-	/**
+
+    private static final long serialVersionUID = 7867901303046583923L;
+
+    /**
 	 * 
 	 */
 	private Integer id;
@@ -25,19 +25,7 @@ public class OrderEntity implements Serializable {
 	 */
 	private String orderNo;
 	/**
-	 * 在途车主子订单号
-	 */
-	private String ownerOrderNo;
-	/**
-	 * 在途租客子订单号
-	 */
-	private String renterOrderNo;
-	/**
-	 * 在途车主会员号
-	 */
-	private Integer memNoOwner;
-	/**
-	 * 在途租客会员号
+	 * 租客会员号
 	 */
 	private Integer memNoRenter;
 	/**
@@ -49,6 +37,10 @@ public class OrderEntity implements Serializable {
 	 */
 	private String entryCode;
 	/**
+	 * 来源 1：手机，2：网站，3:管理后台，4:cp b2c, 5:cp upop
+	 */
+	private Integer source;
+	/**
 	 * 预计起租时间
 	 */
 	private LocalDateTime expRentTime;
@@ -57,61 +49,25 @@ public class OrderEntity implements Serializable {
 	 */
 	private LocalDateTime expRevertTime;
 	/**
-	 * 实际起租时间
-	 */
-	private LocalDateTime actRentTime;
-	/**
-	 * 实际还车时间
-	 */
-	private LocalDateTime actRevertTime;
-	/**
-	 * 城市名称
+	 * 下单城市名称
 	 */
 	private String cityName;
 	/**
-	 * 城市code
+	 * 下单城市code
 	 */
 	private String cityCode;
 	/**
-	 * 是否出市
+	 * 是否出市 0-否，1-是
 	 */
 	private Integer isOutCity;
 	/**
-	 * 是否使用凹凸币
-	 */
-	private Integer isUseCoin;
-	/**
-	 * 是否使用优惠券
-	 */
-	private Integer isUseCoupon;
-	/**
-	 * 是否使用钱包
-	 */
-	private Integer isUseWallet;
-	/**
-	 * 是否理赔
-	 */
-	private Integer isClaims;
-	/**
-	 * 是否免押
+	 * 是否免押 0-否，1-是
 	 */
 	private Integer isFreeDeposit;
 	/**
-	 * 是否违章
-	 */
-	private Integer isWz;
-	/**
-	 * 是否有配送订单
-	 */
-	private Integer isDelivery;
-	/**
-	 * 是否使用机场服务
+	 * 是否使用机场服务 0-否，1-是
 	 */
 	private Integer isUseAirPortService;
-	/**
-	 * 是否暂扣
-	 */
-	private Integer isDetain;
 	/**
 	 * 请求时间
 	 */

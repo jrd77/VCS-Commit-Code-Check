@@ -81,14 +81,16 @@ public class CommodityService {
 
     //组合
     private void combination(OrderContextDTO orderContextDto){
-        OrderEntity orderEntity = orderService.getParentOrderDetailByOrderNo(orderContextDto.getOrderNo());
-        if(orderEntity == null || orderEntity.getRenterOrderNo() == null){//没有订单
-            return;
-        }
+//        OrderEntity orderEntity = orderService.getParentOrderDetailByOrderNo(orderContextDto.getOrderNo());
+//        if(orderEntity == null || orderEntity.getRenterOrderNo() == null){//没有订单
+//            return;
+//        }
         SubmitOrderReqVO submitOrderReqVO = orderContextDto.getSubmitOrderReqVO();
         LocalDateTime rentTime = submitOrderReqVO.getRentTime();
         LocalDateTime revertTime = submitOrderReqVO.getRevertTime();
-        String renterOrderNo = orderEntity.getRenterOrderNo();
+//      String renterOrderNo = orderEntity.getRenterOrderNo();
+        String renterOrderNo = null;
+
 
         List<RenterGoodsPriceDetailEntity> dbGoodsPriceList = renterGoodsPriceDetailMapper.selectByRenterOrderNo(renterOrderNo);
         LocalDate carDayRent = dbGoodsPriceList.get(0).getCarDay();
