@@ -24,6 +24,7 @@ import com.atzuche.order.cashieraccount.vo.res.AccountPayAbleResVO;
 import com.atzuche.order.cashieraccount.vo.res.CashierDeductDebtResVO;
 import com.atzuche.order.cashieraccount.vo.res.OrderPayableAmountResVO;
 import com.atzuche.order.commons.enums.RenterCashCodeEnum;
+import com.atzuche.order.rentercost.service.RenterOrderCostCombineService;
 import com.autoyol.cat.CatAnnotation;
 import com.autoyol.commons.web.ErrorCode;
 import com.google.common.collect.ImmutableList;
@@ -53,26 +54,12 @@ public class CashierService {
     @Autowired AccountOwnerIncomeService accountOwnerIncomeService;
     @Autowired AccountRenterCostSettleService accountRenterCostSettleService;
     @Autowired AccountRenterWzDepositCostService accountRenterWzDepositCostService;
+    @Autowired RenterOrderCostCombineService renterOrderCostCombineService;
 
 
 
     /**  ***************************************车辆押金 start****************************************************/
-    /**
-     * 记录应收车俩押金
-     * 下单成功  调收银台 记录 车俩押金应付
-     */
-    @Transactional(rollbackFor=Exception.class)
-    public void insertRenterDeposit(CreateOrderRenterDepositReqVO createOrderRenterDepositReqVO){
-        accountRenterDepositService.insertRenterDeposit(createOrderRenterDepositReqVO);
-    }
 
-    /**
-     * 车俩押金支付成功回调
-     */
-    @Transactional(rollbackFor=Exception.class)
-    public void updateRenterDeposit(PayedOrderRenterDepositReqVO payedOrderRenterDeposit){
-        accountRenterDepositService.updateRenterDeposit(payedOrderRenterDeposit);
-    }
 
     /**
      * 扣减/暂扣 车俩押金
@@ -106,13 +93,7 @@ public class CashierService {
     public void insertRenterDeposit(CreateOrderRenterWZDepositReqVO createOrderRenterWZDepositReq){
         accountRenterWzDepositService.insertRenterWZDeposit(createOrderRenterWZDepositReq);
     }
-    /**
-     * 支付成功后记录 实付违章押金信息 和违章押金资金进出信息
-     */
-    @Transactional(rollbackFor=Exception.class)
-    public void updateRenterWZDeposit(PayedOrderRenterWZDepositReqVO payedOrderWZRenterDeposit){
-        accountRenterWzDepositService.updateRenterWZDeposit(payedOrderWZRenterDeposit);
-    }
+
 
     /**
      * 扣减/暂扣 车俩押金
@@ -286,12 +267,14 @@ public class CashierService {
      * 当前需要支付的相关信息供支付平台使用
      */
     @CatAnnotation
-    public OrderPayableAmountResVO getOrderPayableAmount(String orderNo,String memNo){
+    public OrderPayableAmountResVO getOrderPayableAmount(String orderNo,String renterOrderNo,String memNo){
         OrderPayableAmountResVO result = new OrderPayableAmountResVO();
+        //车辆押金
         int amtDeposit = accountRenterDepositService.getSurplusRenterDeposit(orderNo,memNo);
+        //违章押金
         int amtWZDeposit = accountRenterWzDepositService.getSurplusRenterWZDeposit(orderNo,memNo);
-        //TODO 查询租车费用应收金额 海水
-        int amtRenterCost =0;
+        //租车费用
+        int amtRenterCost = renterOrderCostCombineService.getPayable(orderNo,renterOrderNo,memNo);
         List<AccountPayAbleResVO> accountPayAbles = ImmutableList.of(
                 new AccountPayAbleResVO(orderNo,memNo,amtDeposit,RenterCashCodeEnum.ACCOUNT_RENTER_DEPOSIT),
                 new AccountPayAbleResVO(orderNo,memNo,amtWZDeposit,RenterCashCodeEnum.ACCOUNT_RENTER_WZ_DEPOSIT),
