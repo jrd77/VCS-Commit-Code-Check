@@ -423,4 +423,14 @@ public class RenterOrderCostCombineService {
 		result.setCostDesc(renterCashCodeEnum.getTxt());
 		return result;
 	}
+
+    /**
+     * 取还车费用计算
+     * @param
+     * @param
+     * @return
+     */
+	public RenterOrderCostDetailEntity srvGetReturnAmt(){
+        return null;
+    }
 }
