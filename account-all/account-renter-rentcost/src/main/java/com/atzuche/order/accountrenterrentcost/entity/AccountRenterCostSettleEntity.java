@@ -9,7 +9,7 @@ import lombok.Data;
  * 租客费用及其结算总表
  * 
  * @author ZhangBin
- * @date 2019-12-17 16:55:40
+ * @date 2019-12-25 20:15:45
  * @Description:
  */
 @Data
@@ -64,6 +64,10 @@ public class AccountRenterCostSettleEntity implements Serializable {
 	 * 实付费用
 	 */
 	private Integer shifuAmt;
+	/**
+	 * 实退金额
+	 */
+	private Integer refundAmt;
 	/**
 	 * 更新版本号
 	 */

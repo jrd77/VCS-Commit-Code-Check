@@ -12,6 +12,7 @@ import com.atzuche.order.accountrenterdeposit.vo.req.CreateOrderRenterDepositReq
 import com.atzuche.order.accountrenterdeposit.vo.req.DetainRenterDepositReqVO;
 import com.atzuche.order.accountrenterdeposit.vo.req.PayedOrderRenterDepositReqVO;
 import com.atzuche.order.accountrenterrentcost.service.AccountRenterCostSettleService;
+import com.atzuche.order.accountrenterrentcost.vo.req.AccountRenterCostDetailReqVO;
 import com.atzuche.order.accountrenterrentcost.vo.req.AccountRenterCostReqVO;
 import com.atzuche.order.accountrenterwzdepost.service.AccountRenterWzDepositCostService;
 import com.atzuche.order.accountrenterwzdepost.service.AccountRenterWzDepositService;
@@ -20,12 +21,11 @@ import com.atzuche.order.accountrenterwzdepost.vo.req.PayedOrderRenterDepositWZD
 import com.atzuche.order.accountrenterwzdepost.vo.req.PayedOrderRenterWZDepositReqVO;
 import com.atzuche.order.accountrenterwzdepost.vo.req.RenterWZDepositCostReqVO;
 import com.atzuche.order.cashieraccount.common.DataPayKindConstant;
-import com.atzuche.order.cashieraccount.entity.CashierEntity;
+import com.atzuche.order.cashieraccount.common.DataPayTypeConstant;
 import com.atzuche.order.cashieraccount.service.notservice.CashierNoTService;
 import com.atzuche.order.cashieraccount.service.notservice.CashierRefundApplyNoTService;
 import com.atzuche.order.cashieraccount.vo.req.CashierDeductDebtReqVO;
 import com.atzuche.order.cashieraccount.vo.req.CashierRefundApplyReqVO;
-import com.atzuche.order.cashieraccount.vo.req.pay.OrderPaySignReqVO;
 import com.atzuche.order.cashieraccount.vo.res.AccountPayAbleResVO;
 import com.atzuche.order.cashieraccount.vo.res.CashierDeductDebtResVO;
 import com.atzuche.order.cashieraccount.vo.res.OrderPayableAmountResVO;
@@ -73,6 +73,7 @@ public class CashierService {
     public void insertRenterCost(CreateOrderRenterCostReqVO createOrderRenterCost){
         cashierNoTService.insertRenterCost(createOrderRenterCost);
     }
+
     /**  *************************************** 租车费用 end****************************************************/
 
     /**  *************************************** 车辆押金 start****************************************************/
@@ -214,14 +215,29 @@ public class CashierService {
     public void refundDeposit(CashierRefundApplyReqVO cashierRefundApplyReq){
         Assert.notNull(cashierRefundApplyReq, ErrorCode.PARAMETER_ERROR.getText());
         cashierRefundApplyReq.check();
-        cashierRefundApplyReq.setSourceCode(Integer.parseInt(RenterCashCodeEnum.ACCOUNT_RENTER_DEPOSIT.getCashNo()));
-        cashierRefundApplyReq.setSourceDetail(RenterCashCodeEnum.ACCOUNT_RENTER_DEPOSIT.getTxt());
         //1 记录退还记录
-        cashierRefundApplyNoTService.insertRefundDeposit(cashierRefundApplyReq);
+        Integer id = cashierRefundApplyNoTService.insertRefundDeposit(cashierRefundApplyReq);
         //2 记录费用平账
         DetainRenterDepositReqVO detainRenterDepositReqVO = new DetainRenterDepositReqVO();
         BeanUtils.copyProperties(cashierRefundApplyReq,detainRenterDepositReqVO);
+        detainRenterDepositReqVO.setUniqueNo(id.toString());
         accountRenterDepositService.detainRenterDeposit(detainRenterDepositReqVO);
+    }
+    /**
+     * 结算退还租车费用
+     */
+    @CatAnnotation
+    @Transactional(rollbackFor=Exception.class)
+    public void refundRentCost(CashierRefundApplyReqVO cashierRefundApplyReq){
+        Assert.notNull(cashierRefundApplyReq, ErrorCode.PARAMETER_ERROR.getText());
+        cashierRefundApplyReq.check();
+        //1 记录退还记录
+        Integer id = cashierRefundApplyNoTService.insertRefundDeposit(cashierRefundApplyReq);
+        //2 记录费用平账
+        AccountRenterCostDetailReqVO accountRenterCostDetail = new AccountRenterCostDetailReqVO();
+        BeanUtils.copyProperties(cashierRefundApplyReq,accountRenterCostDetail);
+        accountRenterCostDetail.setUniqueNo(id.toString());
+        accountRenterCostSettleService.refundRenterCostDetail(accountRenterCostDetail);
     }
     /**
      * 退还违章押金
@@ -231,13 +247,13 @@ public class CashierService {
     public void refundWZDeposit(CashierRefundApplyReqVO cashierRefundApplyReq){
         Assert.notNull(cashierRefundApplyReq, ErrorCode.PARAMETER_ERROR.getText());
         cashierRefundApplyReq.check();
-        cashierRefundApplyReq.setSourceCode(Integer.parseInt(RenterCashCodeEnum.ACCOUNT_RENTER_WZ_DEPOSIT.getCashNo()));
-        cashierRefundApplyReq.setSourceDetail(RenterCashCodeEnum.ACCOUNT_RENTER_WZ_DEPOSIT.getTxt());
+
         //1 记录退还记录
-        cashierRefundApplyNoTService.insertRefundDeposit(cashierRefundApplyReq);
+        Integer id = cashierRefundApplyNoTService.insertRefundDeposit(cashierRefundApplyReq);
         //2 记录费用平账
         PayedOrderRenterDepositWZDetailReqVO payedOrderRenterWZDepositDetail = new PayedOrderRenterDepositWZDetailReqVO();
         BeanUtils.copyProperties(cashierRefundApplyReq,payedOrderRenterWZDepositDetail);
+        payedOrderRenterWZDepositDetail.setUniqueNo(id.toString());
         accountRenterWzDepositService.updateRenterWZDepositChange(payedOrderRenterWZDepositDetail);
     }
     /**  ***************************************** 退还押金 end ************************************************* */
@@ -321,7 +337,12 @@ public class CashierService {
      * 退款成功异步回调
      * @param orderPayAsynVO
      */
+    @Transactional(rollbackFor=Exception.class)
     public void refundCallBackSuccess(OrderPayAsynResVO orderPayAsynVO) {
+        if(Objects.nonNull(orderPayAsynVO) && DataPayTypeConstant.PUR_RETURN.equals(orderPayAsynVO.getPayKind())){
+
+
+        }
     }
 
     /**
@@ -366,6 +387,7 @@ public class CashierService {
             //3 收银台记录更新
             cashierNoTService.updataCashier(orderPayAsynVO);
         }
+        //TODO 支付回调成功 push/或者短信 怎么处理
 
     }
 }

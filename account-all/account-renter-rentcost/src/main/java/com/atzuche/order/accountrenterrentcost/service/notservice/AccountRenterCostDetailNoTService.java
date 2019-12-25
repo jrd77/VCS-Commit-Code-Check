@@ -22,7 +22,6 @@ public class AccountRenterCostDetailNoTService {
     @Autowired
     private AccountRenterCostDetailMapper accountRenterCostDetailMapper;
 
-
     /**
      * 费用明细落库
      * @param accountRenterCostDetailReqVO
