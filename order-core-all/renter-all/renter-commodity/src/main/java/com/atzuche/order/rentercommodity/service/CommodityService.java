@@ -65,9 +65,10 @@ public class CommodityService {
      * 计算小时数 设置分组日期
      * @param orderContextDto
      */
-    public void setPriceAndGroup(RenterGoodsDetailDTO renterGoodsDetailDTO){
+    public RenterGoodsDetailDTO setPriceAndGroup(RenterGoodsDetailDTO renterGoodsDetailDTO){
         init(renterGoodsDetailDTO);
         combination(renterGoodsDetailDTO);
+        return renterGoodsDetailDTO;
     }
     /*
      * @Author ZhangBin
