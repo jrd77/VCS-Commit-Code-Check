@@ -30,8 +30,6 @@ public class CommodityService {
     @Autowired
     private RenterGoodsPriceDetailMapper renterGoodsPriceDetailMapper;
     @Autowired
-    private RenterOrderService renterOrderService;
-    @Autowired
     private RenterGoodsService renterGoodsService;
     /**
      * 获取租客价格列表

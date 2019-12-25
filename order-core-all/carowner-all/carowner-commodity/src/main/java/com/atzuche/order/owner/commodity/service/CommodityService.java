@@ -24,8 +24,6 @@ public class CommodityService {
     @Autowired
     private OwnerGoodsPriceDetailMapper ownerGoodsPriceDetailMapper;
     @Autowired
-    private OwnerOrderService ownerOrderService;
-    @Autowired
     private OwnerGoodsService ownerGoodsService;
 
 
