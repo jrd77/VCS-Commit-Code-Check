@@ -6,6 +6,8 @@ import com.atzuche.order.accountrenterdeposit.vo.req.CreateOrderRenterCostReqVO;
 import com.atzuche.order.accountrenterdeposit.vo.req.CreateOrderRenterDepositReqVO;
 import com.atzuche.order.accountrenterdeposit.vo.req.DetainRenterDepositReqVO;
 import com.atzuche.order.accountrenterdeposit.vo.req.PayedOrderRenterDepositReqVO;
+import com.atzuche.order.accountrenterrentcost.vo.req.AccountRenterCostDetailReqVO;
+import com.atzuche.order.accountrenterrentcost.vo.req.AccountRenterCostReqVO;
 import com.atzuche.order.accountrenterwzdepost.exception.AccountRenterWZDepositException;
 import com.atzuche.order.accountrenterwzdepost.vo.req.CreateOrderRenterWZDepositReqVO;
 import com.atzuche.order.accountrenterwzdepost.vo.req.PayedOrderRenterDepositWZDetailReqVO;
@@ -96,7 +98,7 @@ public class CashierNoTService {
     }
 
     /**
-     * 车俩押金参数初始化
+     * 支付成功异步回调 车俩押金参数初始化
      * @param orderPayAsynVO
      * @return
      */
@@ -133,21 +135,25 @@ public class CashierNoTService {
      * @param orderPayAsynVO
      */
     public void updataCashier(OrderPayAsynResVO orderPayAsynVO) {
-         CashierEntity cashierEntity = cashierMapper.selectByPrimaryKey(orderPayAsynVO.getPayId());
-         if(Objects.isNull(cashierEntity)){
-             throw new OrderPayCallBackAsnyException();
+        CashierEntity cashierEntity = cashierMapper.selectByPrimaryKey(orderPayAsynVO.getPayId());
+        int result =0;
+         if(Objects.nonNull(cashierEntity) && Objects.nonNull(cashierEntity.getId())){
+             CashierEntity cashier = new CashierEntity();
+             BeanUtils.copyProperties(orderPayAsynVO,cashier);
+             cashier.setId(cashierEntity.getId());
+             cashier.setVersion(cashierEntity.getVersion());
+             result = cashierMapper.updateByPrimaryKeySelective(cashier);
+         }else {
+             CashierEntity cashier = new CashierEntity();
+             BeanUtils.copyProperties(orderPayAsynVO,cashier);
+             result = cashierMapper.insert(cashier);
          }
-         CashierEntity cashier = new CashierEntity();
-         BeanUtils.copyProperties(orderPayAsynVO,cashier);
-         cashier.setId(cashierEntity.getId());
-         cashier.setVersion(cashierEntity.getVersion());
-         int result = cashierMapper.updateByPrimaryKeySelective(cashier);
-        if(result == 0){
+         if(result == 0){
             throw new OrderPayCallBackAsnyException();
-        }
+         }
     }
     /**
-     * 违章押金参数初始化
+     * 支付成功异步回调 违章押金参数初始化
      * @param orderPayAsynVO
      * @return
      */
@@ -163,6 +169,26 @@ public class CashierNoTService {
         payedOrderRenterDepositDetail.setRenterCashCodeEnum(RenterCashCodeEnum.CASHIER_RENTER_WZ_DEPOSIT);
         payedOrderRenterDepositDetail.setPayChannel(orderPayAsynVO.getPaySource());
         vo.setPayedOrderRenterDepositDetailReqVO(payedOrderRenterDepositDetail);
+        return vo;
+    }
+
+    /**
+     * 支付成功异步回调 补补租车费用回调
+     * @param orderPayAsynVO
+     * @return
+     */
+    public AccountRenterCostReqVO getAccountRenterCostReq(OrderPayAsynResVO orderPayAsynVO) {
+        AccountRenterCostReqVO vo = new AccountRenterCostReqVO();
+        BeanUtils.copyProperties(orderPayAsynVO,vo);
+        vo.setShifuAmt(orderPayAsynVO.getSettleAmount());
+        //费用明细
+        AccountRenterCostDetailReqVO accountRenterCostDetail = new AccountRenterCostDetailReqVO();
+        BeanUtils.copyProperties(orderPayAsynVO,accountRenterCostDetail);
+        accountRenterCostDetail.setPayChannel(orderPayAsynVO.getPaySource());
+        accountRenterCostDetail.setPayChannelCode(orderPayAsynVO.getPaySource());
+        accountRenterCostDetail.setPaySource(orderPayAsynVO.getPayType());
+        accountRenterCostDetail.setPaySourceCode(orderPayAsynVO.getPayType());
+        accountRenterCostDetail.setRenterCashCodeEnum(RenterCashCodeEnum.CASHIER_RENTER_AGAIN_COST);
         return vo;
     }
 }
