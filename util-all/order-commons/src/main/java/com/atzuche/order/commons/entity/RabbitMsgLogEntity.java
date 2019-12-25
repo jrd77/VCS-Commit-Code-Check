@@ -9,7 +9,7 @@ import lombok.Data;
  * rabbitmq接收消息记录
  * 
  * @author ZhangBin
- * @date 2019-12-23 19:27:14
+ * @date 2019-12-25 14:23:58
  * @Description:
  */
 @Data
@@ -37,13 +37,13 @@ public class RabbitMsgLogEntity implements Serializable {
 	 */
 	private Integer isConsume;
 	/**
-	 * 业务类型; 1下单支付收银台,2 收银台退款 。。。。。
+	 * 业务类型
 	 */
-	private Integer businessType;
+	private String businessType;
 	/**
 	 * 业务唯一流水id
 	 */
-	private Integer uniqueId;
+	private String uniqueNo;
 	/**
 	 * 消费mq内容 json字符串
 	 */
