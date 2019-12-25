@@ -186,10 +186,10 @@ public class CashierNoTService {
         //费用明细
         AccountRenterCostDetailReqVO accountRenterCostDetail = new AccountRenterCostDetailReqVO();
         BeanUtils.copyProperties(orderPayAsynVO,accountRenterCostDetail);
-        accountRenterCostDetail.setPayChannel(orderPayAsynVO.getPaySource());
-        accountRenterCostDetail.setPayChannelCode(orderPayAsynVO.getPaySource());
-        accountRenterCostDetail.setPaySource(orderPayAsynVO.getPayType());
-        accountRenterCostDetail.setPaySourceCode(orderPayAsynVO.getPayType());
+        accountRenterCostDetail.setPaySource(orderPayAsynVO.getPaySource());
+        accountRenterCostDetail.setPayType(orderPayAsynVO.getPayType());
+        accountRenterCostDetail.setTime(LocalDateTimeUtils.parseStringToDateTime(orderPayAsynVO.getOrderTime(),LocalDateTimeUtils.DEFAULT_PATTERN));
+        accountRenterCostDetail.setAmt(orderPayAsynVO.getSettleAmount());
         accountRenterCostDetail.setRenterCashCodeEnum(RenterCashCodeEnum.CASHIER_RENTER_AGAIN_COST);
         return vo;
     }

@@ -23,6 +23,14 @@ public class AccountRenterCostDetailReqVO {
      */
     private String memNo;
     /**
+     * 支付渠道code
+     */
+    private String payTypeCode;
+    /**
+     * 支付渠道
+     */
+    private String payType;
+    /**
      * 支付来源code
      */
     private String paySourceCode;
@@ -30,22 +38,6 @@ public class AccountRenterCostDetailReqVO {
      * 支付来源
      */
     private String paySource;
-    /**
-     * 支付方式code
-     */
-    private Integer paymentCode;
-    /**
-     * 支付方式
-     */
-    private String payment;
-    /**
-     * 支付渠道code
-     */
-    private String payChannelCode;
-    /**
-     * 支付渠道
-     */
-    private String payChannel;
     /**
      * 入账金额
      */
@@ -70,14 +62,19 @@ public class AccountRenterCostDetailReqVO {
     private String updateOp;
 
     /**
+     * 入账时间
+     */
+    private LocalDateTime time;
+
+
+    /**
      * 参数校验
      */
     public void check() {
         Assert.notNull(getMemNo(), ErrorCode.PARAMETER_ERROR.getText());
         Assert.notNull(getAmt(), ErrorCode.PARAMETER_ERROR.getText());
         Assert.notNull(getOrderNo(), ErrorCode.PARAMETER_ERROR.getText());
-        Assert.notNull(getPaymentCode(), ErrorCode.PARAMETER_ERROR.getText());
-        Assert.notNull(getPayChannelCode(), ErrorCode.PARAMETER_ERROR.getText());
+        Assert.notNull(getPayType(), ErrorCode.PARAMETER_ERROR.getText());
         Assert.notNull(getPaySource(), ErrorCode.PARAMETER_ERROR.getText());
         Assert.notNull(getRenterCashCodeEnum(), ErrorCode.PARAMETER_ERROR.getText());
     }
