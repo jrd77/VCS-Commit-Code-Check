@@ -28,15 +28,15 @@ public class OwnerGoodsService{
     @Autowired
     private OwnerGoodsPriceDetailMapper ownerGoodsPriceDetailMapper;
 
-    public void save(OrderContextDTO orderContextDto){
-        OwnerGoodsDetailDTO ownerGoodsDetailDto = orderContextDto.getOwnerGoodsDetailDto();
+    public void save(OwnerGoodsDetailDTO ownerGoodsDetailDTO){
+
         OwnerGoodsEntity goodsEntity = new OwnerGoodsEntity();
-        BeanUtils.copyProperties(ownerGoodsDetailDto,goodsEntity);
+        BeanUtils.copyProperties(ownerGoodsDetailDTO,goodsEntity);
         //goodsEntity.setCreateOp();
         //goodsEntity.setUpdateOp();
         ownerGoodsMapper.insert(goodsEntity);
 
-        List<OwnerGoodsPriceDetailDTO> goodsPriceDetailDtoList = ownerGoodsDetailDto.getOwnerGoodsPriceDetailDTOList();
+        List<OwnerGoodsPriceDetailDTO> goodsPriceDetailDtoList = ownerGoodsDetailDTO.getOwnerGoodsPriceDetailDTOList();
         List<OwnerGoodsPriceDetailEntity> goodsPriceList = new ArrayList<>();
         goodsPriceDetailDtoList.forEach(x->{
             OwnerGoodsPriceDetailEntity goodsPriceDetailEntity = new OwnerGoodsPriceDetailEntity();

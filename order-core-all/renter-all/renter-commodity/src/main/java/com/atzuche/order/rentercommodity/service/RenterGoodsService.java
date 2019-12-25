@@ -72,7 +72,7 @@ public class RenterGoodsService{
         List<RenterGoodsPriceDetailDTO> renterGoodsPriceDetailDTOList = new ArrayList<>();
         renterGoodsPriceDetailEntities.forEach(x->{
             RenterGoodsPriceDetailDTO renterGoodsPriceDetailDto = new RenterGoodsPriceDetailDTO();
-            BeanUtils.copyProperties(renterGoodsPriceDetailDto,x);
+            BeanUtils.copyProperties(x,renterGoodsPriceDetailDto);
             renterGoodsPriceDetailDTOList.add(renterGoodsPriceDetailDto);
         });
         renterGoodsDetailDto.setRenterGoodsPriceDetailDTOList(renterGoodsPriceDetailDTOList);

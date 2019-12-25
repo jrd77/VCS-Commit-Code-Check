@@ -43,6 +43,32 @@ public class RenterMemberDTO {
      * 成功下单次数
      */
     private Integer orderSuccessCount;
-
+    /**
+     * 是否可以租车：1：可租，0：不可租
+     */
+    private Integer rentFlag;
+    /**
+     * 姓
+     */
+    private String firstName;
+    /**
+     * 性别(1:男、2：女)
+     */
+    private Integer gender;
+    /**
+     * 身份证认证 0：未上传，1：已上传，2：已认证，3：认证不通过, 4:无效数据
+     */
+    private Integer idCardAuth;
+    /**
+     * 驾照认证 0：未上传，1：已上传，2：已认证，3：认证不通过, 4:无效数据
+     */
+    private Integer driLicAuth;
+    /**
+     * 驾驶增副页 0：未上传，1：已上传，2：已认证，3：认证不通过, 4:无效数据, 5:未上传（已认证）
+     */
+    private Integer driViceLicAuth;
+    /**
+     * 会员权益
+     */
     private List<RenterMemberRightDTO> renterMemberRightDTOList;
 }

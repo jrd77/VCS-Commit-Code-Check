@@ -148,6 +148,8 @@ public class CarService {
         renterGoodsDetailDto.setCarRealAddr(carAddressOfTransVO.getCarRealAddress());
         renterGoodsDetailDto.setCarRealLon(carAddressOfTransVO.getRealAddressLon()==null?"":String.valueOf(carAddressOfTransVO.getRealAddressLon()));
         renterGoodsDetailDto.setCarRealLat(carAddressOfTransVO.getRealAddressLat()==null?"":String.valueOf(carAddressOfTransVO.getRealAddressLat()));
+        renterGoodsDetailDto.setOwnerMemNo(String.valueOf(carBaseVO.getOwnerNo()));
+
         List<RenterGoodsPriceDetailDTO> list = new ArrayList<>();
         List<CarPriceOfDayVO> daysPrice = data.getDaysPrice();
         if(daysPrice == null){

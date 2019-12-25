@@ -5,10 +5,12 @@ import com.atzuche.order.commons.entity.dto.OrderContextDTO;
 import com.atzuche.order.commons.entity.dto.OwnerGoodsDetailDTO;
 import com.atzuche.order.commons.entity.dto.OwnerGoodsPriceDetailDTO;
 import com.atzuche.order.commons.entity.request.SubmitOrderReqVO;
+import com.atzuche.order.entity.OwnerOrderEntity;
 import com.atzuche.order.owner.commodity.entity.OwnerGoodsPriceDetailEntity;
 import com.atzuche.order.owner.commodity.mapper.OwnerGoodsPriceDetailMapper;
 import com.atzuche.order.parentorder.entity.OrderEntity;
 import com.atzuche.order.parentorder.service.OrderService;
+import com.atzuche.order.service.OwnerOrderService;
 import com.autoyol.platformcost.CommonUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,8 +23,6 @@ import java.util.List;
 public class CommodityService {
     @Autowired
     private OwnerGoodsPriceDetailMapper ownerGoodsPriceDetailMapper;
-    @Autowired
-    private OrderService orderService;
     @Autowired
     private OwnerGoodsService ownerGoodsService;
 
@@ -59,33 +59,29 @@ public class CommodityService {
      * 计算小时数 设置分组日期
      * @param orderContextDto
      */
-    public void setPriceAndGroup(OrderContextDTO orderContextDto){
-        init(orderContextDto);
-        combination(orderContextDto);
+    public OwnerGoodsDetailDTO setPriceAndGroup(OwnerGoodsDetailDTO ownerGoodsDetailDTO){
+        init(ownerGoodsDetailDTO);
+        combination(ownerGoodsDetailDTO);
+        return ownerGoodsDetailDTO;
     }
 
     /**
      * 保存商品信息
      * @param orderContextDto
      */
-    public void saveCommodity(OrderContextDTO orderContextDto){
-        ownerGoodsService.save(orderContextDto);
+    public void saveCommodity(OwnerGoodsDetailDTO ownerGoodsDetailDTO){
+        ownerGoodsService.save(ownerGoodsDetailDTO);
     }
 
 
     //组合
-    private void combination(OrderContextDTO orderContextDto){
-//        OrderEntity orderEntity = orderService.getParentOrderDetailByOrderNo(orderContextDto.getOrderNo());
-//        if(orderEntity == null || orderEntity.getOwnerOrderNo() == null){//没有订单
-//            return;
-//        }
-        SubmitOrderReqVO submitOrderReqVO = orderContextDto.getSubmitOrderReqVO();
-        LocalDateTime rentTime = submitOrderReqVO.getRentTime();
-        LocalDateTime revertTime = submitOrderReqVO.getRevertTime();
-//        String ownerOrderNo = orderEntity.getOwnerOrderNo();
-        String ownerOrderNo = null;
-
-        List<OwnerGoodsPriceDetailEntity> dbGoodsPriceList = ownerGoodsPriceDetailMapper.selectByOwnerOrderNo(ownerOrderNo);
+    private void combination(OwnerGoodsDetailDTO ownerGoodsDetailDTO){
+        if(ownerGoodsDetailDTO.getOwnerOrderNo() == null){
+            return;
+        }
+        LocalDateTime rentTime = ownerGoodsDetailDTO.getRentTime();
+        LocalDateTime revertTime = ownerGoodsDetailDTO.getRevertTime();
+        List<OwnerGoodsPriceDetailEntity> dbGoodsPriceList = ownerGoodsPriceDetailMapper.selectByOwnerOrderNo(ownerGoodsDetailDTO.getOwnerOrderNo());
         LocalDate carDayRent = dbGoodsPriceList.get(0).getCarDay();
         LocalDate carDayRevert = dbGoodsPriceList.get(dbGoodsPriceList.size()-1).getCarDay();
 
@@ -93,7 +89,7 @@ public class CommodityService {
             return;
         } if(carDayRevert.isBefore(revertTime.toLocalDate())){//时间延后
             dbGoodsPriceList.get(dbGoodsPriceList.size()-1).setCarHourCount(24F);
-            List<OwnerGoodsPriceDetailDTO> ownerGoodsPriceDetailDTOList = orderContextDto.getOwnerGoodsDetailDto().getOwnerGoodsPriceDetailDTOList();
+            List<OwnerGoodsPriceDetailDTO> ownerGoodsPriceDetailDTOList = ownerGoodsDetailDTO.getOwnerGoodsPriceDetailDTOList();
             //租期重叠部分- 使用数据库的 价格/小时数
             for (int i = 0;i<dbGoodsPriceList.size();i++){
                 OwnerGoodsPriceDetailDTO ownerGoodsPriceDetailDto = ownerGoodsPriceDetailDTOList.get(i);
@@ -108,7 +104,7 @@ public class CommodityService {
             //租期不重叠部分 中间部分init中已经处理
             //租期不重叠部分 最后一天 init中已经处理
         }else{//时间提前
-            List<OwnerGoodsPriceDetailDTO> ownerGoodsPriceDetailDTOList = orderContextDto.getOwnerGoodsDetailDto().getOwnerGoodsPriceDetailDTOList();
+            List<OwnerGoodsPriceDetailDTO> ownerGoodsPriceDetailDTOList = ownerGoodsDetailDTO.getOwnerGoodsPriceDetailDTOList();
             //租期重叠部分- 使用数据库的 价格/小时数
             for (int i = 0;i<dbGoodsPriceList.size();i++){
                 OwnerGoodsPriceDetailDTO ownerGoodsPriceDetailDto = ownerGoodsPriceDetailDTOList.get(i);
@@ -123,15 +119,10 @@ public class CommodityService {
     }
 
     //初始化设置小时数和分组日期
-    private void init(OrderContextDTO orderContextDto){
-        SubmitOrderReqVO submitOrderReqVO = orderContextDto.getSubmitOrderReqVO();
-        LocalDateTime rentTime = submitOrderReqVO.getRentTime();
-        LocalDateTime revertTime = submitOrderReqVO.getRevertTime();
-
-        OwnerGoodsDetailDTO ownerGoodsDetailDto = orderContextDto.getOwnerGoodsDetailDto();
-        List<OwnerGoodsPriceDetailDTO> ownerGoodsPriceDetailDTOList = ownerGoodsDetailDto.getOwnerGoodsPriceDetailDTOList();
-
-
+    private void init(OwnerGoodsDetailDTO ownerGoodsDetailDTO){
+        LocalDateTime rentTime = ownerGoodsDetailDTO.getRentTime();
+        LocalDateTime revertTime = ownerGoodsDetailDTO.getRevertTime();
+        List<OwnerGoodsPriceDetailDTO> ownerGoodsPriceDetailDTOList = ownerGoodsDetailDTO.getOwnerGoodsPriceDetailDTOList();
         if (ownerGoodsPriceDetailDTOList.size() == 1) {//一天的情况
             float holidayTopHours = CommonUtils.getHolidayTopHours(rentTime, LocalDateTimeUtils.localdateToString(revertTime.toLocalDate()));
             OwnerGoodsPriceDetailDTO ownerGoodsPriceDetailDto = ownerGoodsPriceDetailDTOList.get(0);

@@ -9,6 +9,8 @@ import com.atzuche.order.parentorder.entity.OrderEntity;
 import com.atzuche.order.parentorder.service.OrderService;
 import com.atzuche.order.rentercommodity.entity.RenterGoodsPriceDetailEntity;
 import com.atzuche.order.rentercommodity.mapper.RenterGoodsPriceDetailMapper;
+import com.atzuche.order.renterorder.entity.RenterOrderEntity;
+import com.atzuche.order.renterorder.service.RenterOrderService;
 import com.autoyol.platformcost.CommonUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,8 +29,6 @@ import java.util.List;
 public class CommodityService {
     @Autowired
     private RenterGoodsPriceDetailMapper renterGoodsPriceDetailMapper;
-    @Autowired
-    private OrderService orderService;
     @Autowired
     private RenterGoodsService renterGoodsService;
     /**
@@ -63,9 +63,10 @@ public class CommodityService {
      * 计算小时数 设置分组日期
      * @param orderContextDto
      */
-    public void setPriceAndGroup(RenterGoodsDetailDTO renterGoodsDetailDTO){
+    public RenterGoodsDetailDTO setPriceAndGroup(RenterGoodsDetailDTO renterGoodsDetailDTO){
         init(renterGoodsDetailDTO);
         combination(renterGoodsDetailDTO);
+        return renterGoodsDetailDTO;
     }
     /*
      * @Author ZhangBin
@@ -81,15 +82,12 @@ public class CommodityService {
 
     //组合
     private void combination(RenterGoodsDetailDTO renterGoodsDetailDTO){
-        /*OrderEntity orderEntity = orderService.getParentOrderDetailByOrderNo(orderContextDto.getOrderNo());
-        if(orderEntity == null || orderEntity.getRenterOrderNo() == null){//没有订单
+        if(renterGoodsDetailDTO.getRenterOrderNo() == null){
             return;
-        }*/
+        }
         LocalDateTime rentTime = renterGoodsDetailDTO.getRentTime();
         LocalDateTime revertTime = renterGoodsDetailDTO.getRevertTime();
-
-
-        List<RenterGoodsPriceDetailEntity> dbGoodsPriceList = renterGoodsPriceDetailMapper.selectByRenterOrderNo(null/*renterOrderNo*/);
+        List<RenterGoodsPriceDetailEntity> dbGoodsPriceList = renterGoodsPriceDetailMapper.selectByRenterOrderNo(renterGoodsDetailDTO.getRenterOrderNo());
         LocalDate carDayRent = dbGoodsPriceList.get(0).getCarDay();
         LocalDate carDayRevert = dbGoodsPriceList.get(dbGoodsPriceList.size()-1).getCarDay();
 

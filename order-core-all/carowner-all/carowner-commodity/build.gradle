@@ -12,5 +12,5 @@ repositories {
 }
 
 dependencies {
-
+    compile project(":order-core-all:carowner-all:carowner-order")
 }

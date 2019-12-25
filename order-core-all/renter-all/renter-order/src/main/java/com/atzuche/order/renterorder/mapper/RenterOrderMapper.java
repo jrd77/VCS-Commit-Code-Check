@@ -28,6 +28,6 @@ public interface RenterOrderMapper{
     int updateByPrimaryKeySelective(RenterOrderEntity record);
 
     List<RenterOrderEntity> listAgreeRenterOrderByOrderNo(@Param("orderNo") String orderNo);
-    
+
     RenterOrderEntity getRenterOrderByOrderNoAndIsEffective(@Param("orderNo") String orderNo);
 }
