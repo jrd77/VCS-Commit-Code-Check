@@ -12,6 +12,7 @@ import com.atzuche.order.accountrenterdeposit.vo.req.CreateOrderRenterDepositReq
 import com.atzuche.order.accountrenterdeposit.vo.req.DetainRenterDepositReqVO;
 import com.atzuche.order.accountrenterdeposit.vo.req.PayedOrderRenterDepositReqVO;
 import com.atzuche.order.accountrenterrentcost.service.AccountRenterCostSettleService;
+import com.atzuche.order.accountrenterrentcost.vo.req.AccountRenterCostReqVO;
 import com.atzuche.order.accountrenterwzdepost.service.AccountRenterWzDepositCostService;
 import com.atzuche.order.accountrenterwzdepost.service.AccountRenterWzDepositService;
 import com.atzuche.order.accountrenterwzdepost.vo.req.CreateOrderRenterWZDepositReqVO;
@@ -64,7 +65,7 @@ public class CashierService {
     @Autowired RenterOrderCostCombineService renterOrderCostCombineService;
     @Autowired CashierNoTService cashierNoTService;
 
-
+    /**  *************************************** 租车费用 start****************************************************/
     /**
      * 记录应收车俩费用
      * 下单成功  调收银台 记录 （z租车费用真实值从子订单费用中取）
@@ -72,6 +73,7 @@ public class CashierService {
     public void insertRenterCost(CreateOrderRenterCostReqVO createOrderRenterCost){
         cashierNoTService.insertRenterCost(createOrderRenterCost);
     }
+    /**  *************************************** 租车费用 end****************************************************/
 
     /**  *************************************** 车辆押金 start****************************************************/
     /**
@@ -323,7 +325,7 @@ public class CashierService {
     }
 
     /**
-     * 支付成功回调
+     * 支付成功回调 更新收银台及费用
      * @param orderPayAsynVO
      */
     @Transactional(rollbackFor=Exception.class)
@@ -334,6 +336,8 @@ public class CashierService {
             PayedOrderRenterDepositReqVO payedOrderRenterDeposit = cashierNoTService.getPayedOrderRenterDepositReq(orderPayAsynVO);
             //2 租车押金 更新数据
             accountRenterDepositService.updateRenterDeposit(payedOrderRenterDeposit);
+            //3 收银台记录更新
+            cashierNoTService.updataCashier(orderPayAsynVO);
         }
         //1.2 违章押金 02
         if(Objects.nonNull(orderPayAsynVO) && DataPayKindConstant.DEPOSIT.equals(orderPayAsynVO.getPayKind())){
@@ -341,17 +345,27 @@ public class CashierService {
             PayedOrderRenterWZDepositReqVO payedOrderRenterWZDeposit = cashierNoTService.getPayedOrderRenterWZDepositReq(orderPayAsynVO);
             //2 违章押金 更新数据
             accountRenterWzDepositService.updateRenterWZDeposit(payedOrderRenterWZDeposit);
-
+            //3 收银台记录更新
+            cashierNoTService.updataCashier(orderPayAsynVO);
         }
-        //1.3 租车费用/补付
-        if(Objects.nonNull(orderPayAsynVO) && DataPayKindConstant.DEPOSIT.equals(orderPayAsynVO.getPayKind())){
+        //1.3 租车费用
+        if(Objects.nonNull(orderPayAsynVO) &&  DataPayKindConstant.TK_FEE.equals(orderPayAsynVO.getPayKind()) ){
             //1 对象初始化转换
-            PayedOrderRenterWZDepositReqVO payedOrderRenterWZDeposit = cashierNoTService.getPayedOrderRenterWZDepositReq(orderPayAsynVO);
-            //2 违章押金 更新数据
-            accountRenterWzDepositService.updateRenterWZDeposit(payedOrderRenterWZDeposit);
-
+            AccountRenterCostReqVO accountRenterCostReq = cashierNoTService.getAccountRenterCostReq(orderPayAsynVO);
+            //2  实收租车费用落库 更新数据
+            accountRenterCostSettleService.insertRenterCostDetail(accountRenterCostReq);
+            //3 收银台记录更新
+            cashierNoTService.updataCashier(orderPayAsynVO);
         }
-        //2 收银台记录更新
-        cashierNoTService.updataCashier(orderPayAsynVO);
+        //1.4 补付租车费用
+        if(Objects.nonNull(orderPayAsynVO) &&  DataPayKindConstant.RENT_INCREMENT.equals(orderPayAsynVO.getPayKind()) ){
+            //1 对象初始化转换
+            AccountRenterCostReqVO accountRenterCostReq = cashierNoTService.getAccountRenterCostReq(orderPayAsynVO);
+            //2  实收租车费用落库 更新数据
+            accountRenterCostSettleService.insertRenterCostDetail(accountRenterCostReq);
+            //3 收银台记录更新
+            cashierNoTService.updataCashier(orderPayAsynVO);
+        }
+
     }
 }

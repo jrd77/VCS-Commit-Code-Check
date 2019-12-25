@@ -1,5 +1,6 @@
 package com.atzuche.order.accountrenterrentcost.vo.req;
 
+import com.atzuche.order.commons.enums.RenterCashCodeEnum;
 import com.autoyol.commons.web.ErrorCode;
 import lombok.Data;
 import org.springframework.util.Assert;
@@ -22,41 +23,29 @@ public class AccountRenterCostDetailReqVO {
      */
     private String memNo;
     /**
+     * 支付渠道code
+     */
+    private String payTypeCode;
+    /**
+     * 支付渠道
+     */
+    private String payType;
+    /**
      * 支付来源code
      */
-    private Integer paySourceCode;
+    private String paySourceCode;
     /**
      * 支付来源
      */
     private String paySource;
     /**
-     * 支付方式code
-     */
-    private Integer paymentCode;
-    /**
-     * 支付方式
-     */
-    private String payment;
-    /**
-     * 支付渠道code
-     */
-    private Integer payChannelCode;
-    /**
-     * 支付渠道
-     */
-    private String payChannel;
-    /**
      * 入账金额
      */
     private Integer amt;
     /**
-     * 入账来源编码
+     * 支付来源
      */
-    private Integer sourceCode;
-    /**
-     * 入账来源编码描述
-     */
-    private String sourceDetail;
+    private RenterCashCodeEnum renterCashCodeEnum;
     /**
      * 交易时间
      */
@@ -73,15 +62,20 @@ public class AccountRenterCostDetailReqVO {
     private String updateOp;
 
     /**
+     * 入账时间
+     */
+    private LocalDateTime time;
+
+
+    /**
      * 参数校验
      */
     public void check() {
         Assert.notNull(getMemNo(), ErrorCode.PARAMETER_ERROR.getText());
         Assert.notNull(getAmt(), ErrorCode.PARAMETER_ERROR.getText());
         Assert.notNull(getOrderNo(), ErrorCode.PARAMETER_ERROR.getText());
-        Assert.notNull(getPaymentCode(), ErrorCode.PARAMETER_ERROR.getText());
-        Assert.notNull(getPayChannelCode(), ErrorCode.PARAMETER_ERROR.getText());
-        Assert.notNull(getSourceCode(), ErrorCode.PARAMETER_ERROR.getText());
-        Assert.notNull(getPaySourceCode(), ErrorCode.PARAMETER_ERROR.getText());
+        Assert.notNull(getPayType(), ErrorCode.PARAMETER_ERROR.getText());
+        Assert.notNull(getPaySource(), ErrorCode.PARAMETER_ERROR.getText());
+        Assert.notNull(getRenterCashCodeEnum(), ErrorCode.PARAMETER_ERROR.getText());
     }
 }
