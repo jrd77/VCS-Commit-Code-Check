@@ -26,7 +26,7 @@ public class RenterMemberRightService{
      *
      * @param renterMemberRightDTOList 权益集合
      * @param carDepositAmt 车辆押金
-     * @return CarDepositAmt
+     * @return  会员权益车辆押金计算
      */
     public int carDepositAmt(List<RenterMemberRightDTO> renterMemberRightDTOList, Integer carDepositAmt){
         if(carDepositAmt == null){
