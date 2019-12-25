@@ -27,12 +27,7 @@ public class OrderPayCallBackRabbitConfig {
      * 支付系统回调
      * MQ 异步回调
      */
-    @RabbitListener(bindings = @QueueBinding(
-            value = @Queue(value = "${auto-coin-recharge}",durable = "true"),
-            exchange = @Exchange(value="${auto-coin-recharge}",durable = "true"),
-            key = "${auto-coin-recharge}"
-    )
-    )
+    @RabbitListener(queues="${xxx}")
     @RabbitHandler
     public void payCallBack(Message message, Channel channel){
         log.info("OrderPayCallBack payCallBack start param;[{}]", message);
