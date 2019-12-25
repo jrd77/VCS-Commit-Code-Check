@@ -1,5 +1,6 @@
 package com.atzuche.order.coreapi.entity.request;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import javax.validation.constraints.Pattern;
@@ -26,13 +27,11 @@ public class ModifyOrderReq {
 	
 	@AutoDocProperty(value="取车时间,必填，",required=true)
 	@NotBlank(message="rentTime不能为空")
-	@Pattern(regexp="^\\d*$",message="rentTime必须为数字")
-	private String rentTime;
+	private LocalDateTime rentTime;
 	
 	@NotBlank(message="revertTime不能为空")
-	@Pattern(regexp="^\\d*$",message="revertTime必须为数字")
 	@AutoDocProperty(value="还车时间,必填，",required=true)
-	private String revertTime;
+	private LocalDateTime revertTime;
 	
 	@AutoDocProperty(value="取车地址")
 	@NotBlank(message ="取车地址不能为空")

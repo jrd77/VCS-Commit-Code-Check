@@ -1,5 +1,6 @@
 package com.atzuche.order.renterorder.service;
 
+import com.atzuche.order.renterorder.entity.RenterOrderChangeApplyEntity;
 import com.atzuche.order.renterorder.mapper.RenterOrderChangeApplyMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,4 +18,12 @@ public class RenterOrderChangeApplyService{
     private RenterOrderChangeApplyMapper renterOrderChangeApplyMapper;
 
 
+    /**
+     * 保存租客修改申请记录
+     * @param renterOrderChangeApplyEntity 租客修改申请记录
+     * @return Integer
+     */
+    public Integer saveRenterOrderChangeApply(RenterOrderChangeApplyEntity renterOrderChangeApplyEntity) {
+    	return renterOrderChangeApplyMapper.saveRenterOrderChangeApply(renterOrderChangeApplyEntity);
+    }
 }

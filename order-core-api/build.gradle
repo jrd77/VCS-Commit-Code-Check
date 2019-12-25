@@ -49,6 +49,14 @@ dependencies {
     compile project(":order-core-all:renter-all:renter-order")
     compile project(":order-core-all:renter-all:renter-penalty")
     compile project(":order-core-all:renter-all:renter-wz")
+    
+    compile project(":order-core-all:carowner-all:carowner-commodity")
+    compile project(":order-core-all:carowner-all:carowner-cost")
+    compile project(":order-core-all:carowner-all:carowner-delivery")
+    compile project(":order-core-all:carowner-all:carowner-mem")
+    compile project(":order-core-all:carowner-all:carowner-order")
+    compile project(":order-core-all:carowner-all:carowner-penalty")
+    
 	compile project(":util-all:fee-calculator")
     compile project(":util-all:order-commons")
 
