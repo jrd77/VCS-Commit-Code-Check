@@ -5,8 +5,8 @@ import lombok.Getter;
 @Getter
 public enum YesNoEnum {
 
-    YES(0,"正常/是"),
-    NO(1,"删除/否"),
+    YES(1,"正常/是"),
+    NO(0,"删除/否"),
 
     ;
     /**

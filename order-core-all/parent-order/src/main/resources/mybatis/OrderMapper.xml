@@ -6,27 +6,17 @@
     <resultMap type="com.atzuche.order.parentorder.entity.OrderEntity" id="BaseResultMap">
         <result property="id" column="id"/>
         <result property="orderNo" column="order_no"/>
-        <result property="ownerOrderNo" column="owner_order_no"/>
-        <result property="renterOrderNo" column="renter_order_no"/>
-        <result property="memnerNoOwner" column="memner_no_owner"/>
         <result property="memNoRenter" column="mem_no_renter"/>
-        <result property="orderNoDelivery" column="order_no_delivery"/>
-        <result property="orderInsideType" column="order_inside_type"/>
-        <result property="orderSceneCode" column="order_scene_code"/>
-        <result property="expRentStartTime" column="exp_rent_start_time"/>
-        <result property="expRentEndTime" column="exp_rent_end_time"/>
-        <result property="actRentStartTime" column="act_rent_start_time"/>
-        <result property="actRentEndTime" column="act_rent_end_time"/>
+        <result property="category" column="category"/>
+        <result property="entryCode" column="entry_code"/>
+        <result property="source" column="source"/>
+        <result property="expRentTime" column="exp_rent_time"/>
+        <result property="expRevertTime" column="exp_revert_time"/>
         <result property="cityName" column="city_name"/>
         <result property="cityCode" column="city_code"/>
         <result property="isOutCity" column="is_out_city"/>
-        <result property="isUseCoin" column="is_use_coin"/>
-        <result property="isUseCoupon" column="is_use_coupon"/>
-        <result property="isUseWallet" column="is_use_wallet"/>
-        <result property="isClaims" column="is_claims"/>
         <result property="isFreeDeposit" column="is_free_deposit"/>
-        <result property="isWz" column="is_wz"/>
-        <result property="isDetain" column="is_detain"/>
+        <result property="isUseAirPortService" column="is_use_air_port_Service"/>
         <result property="reqTime" column="req_time"/>
         <result property="riskAuditId" column="risk_audit_id"/>
         <result property="version" column="version"/>
@@ -38,215 +28,134 @@
     </resultMap>
 
 
-	<sql id="Base_Column_List">
-	`id`, 	
-	`order_no`, 	
-	`owner_order_no`, 	
-	`renter_order_no`, 	
-	`memner_no_owner`, 	
-	`mem_no_renter`, 	
-	`order_no_delivery`, 	
-	`order_inside_type`, 	
-	`order_scene_code`, 	
-	`exp_rent_start_time`, 	
-	`exp_rent_end_time`, 	
-	`act_rent_start_time`, 	
-	`act_rent_end_time`, 	
-	`city_name`, 	
-	`city_code`, 	
-	`is_out_city`, 	
-	`is_use_coin`, 	
-	`is_use_coupon`, 	
-	`is_use_wallet`, 	
-	`is_claims`, 	
-	`is_free_deposit`, 	
-	`is_wz`, 	
-	`is_detain`, 	
-	`req_time`, 	
-	`risk_audit_id`, 	
-	`version`, 	
-	`create_time`, 	
-	`create_op`, 	
-	`update_time`, 	
-	`update_op`, 	
-	`is_delete`	
-
+    <sql id="Base_Column_List">
+        `id`,  `order_no`, 	`mem_no_renter`, `category`, `entry_code`,
+        `source`,  `exp_rent_time`, `exp_revert_time`,
+        `city_name`,  `city_code`, 	`is_out_city`,  `is_free_deposit`, `is_use_air_port_Service`,
+        `req_time`,  `risk_audit_id`,
+        `version`, `create_time`,  `create_op`,  `update_time`,  `update_op`, 	 `is_delete`
 	</sql>
 
 
-	<select id="selectByPrimaryKey" resultMap="BaseResultMap">
-		select <include refid="Base_Column_List" /> from order where id = #{value}
+	<select id="selectByOrderNo" resultMap="BaseResultMap">
+		select
+		    <include refid="Base_Column_List" />
+        from
+            order
+        where
+            order_no = #{value}
+            and is_delete = 0
+        limit 1
 	</select>
 
-	<select id="selectALL" resultMap="BaseResultMap">
-		select  <include refid="Base_Column_List" /> from order order by id desc
-	</select>
-
-	 
 	<insert id="insert" parameterType="com.atzuche.order.parentorder.entity.OrderEntity" useGeneratedKeys="true" keyProperty="id">
-		insert into order
-		(
-				`order_no`,		
-				`owner_order_no`,		
-				`renter_order_no`,		
-				`memner_no_owner`,		
-				`mem_no_renter`,		
-				`order_no_delivery`,		
-				`order_inside_type`,		
-				`order_scene_code`,		
-				`exp_rent_start_time`,		
-				`exp_rent_end_time`,		
-				`act_rent_start_time`,		
-				`act_rent_end_time`,		
-				`city_name`,		
-				`city_code`,		
-				`is_out_city`,		
-				`is_use_coin`,		
-				`is_use_coupon`,		
-				`is_use_wallet`,		
-				`is_claims`,		
-				`is_free_deposit`,		
-				`is_wz`,		
-				`is_detain`,		
-				`req_time`,		
-				`risk_audit_id`,		
-				`version`,		
-				`create_time`,		
-				`create_op`,		
-				`update_time`,		
-				`update_op`,		
-				`is_delete`		
-			)
-		values
-		(
-				#{orderNo}, 		
-				#{ownerOrderNo}, 		
-				#{renterOrderNo}, 		
-				#{memnerNoOwner}, 		
-				#{memNoRenter}, 		
-				#{orderNoDelivery}, 		
-				#{orderInsideType}, 		
-				#{orderSceneCode}, 		
-				#{expRentStartTime}, 		
-				#{expRentEndTime}, 		
-				#{actRentStartTime}, 		
-				#{actRentEndTime}, 		
-				#{cityName}, 		
-				#{cityCode}, 		
-				#{isOutCity}, 		
-				#{isUseCoin}, 		
-				#{isUseCoupon}, 		
-				#{isUseWallet}, 		
-				#{isClaims}, 		
-				#{isFreeDeposit}, 		
-				#{isWz}, 		
-				#{isDetain}, 		
-				#{reqTime}, 		
-				#{riskAuditId}, 		
-				#{version}, 		
-				#{createTime}, 		
-				#{createOp}, 		
-				#{updateTime}, 		
-				#{updateOp}, 		
-				#{isDelete}		
-			)
+		insert into order (
+            `order_no`,
+            `mem_no_renter`,
+            `category`,
+            `entry_code`,
+            `source`,
+            `exp_rent_time`,
+            `exp_revert_time`,
+            `city_name`,
+            `city_code`,
+            `is_out_city`,
+            `is_free_deposit`,
+            `is_use_air_port_Service`,
+            `req_time`,
+            `risk_audit_id`,
+            `version`,
+            `create_time`,
+            `create_op`,
+            `update_time`,
+            `update_op`,
+            `is_delete`
+        ) values (
+            #{orderNo},
+            #{memNoRenter},
+            #{category},
+            #{entryCode},
+            #{source},
+            #{expRentTime},
+            #{expRevertTime},
+            #{cityName},
+            #{cityCode},
+            #{isOutCity},
+            #{isFreeDeposit},
+            #{isUseAirPortService},
+            #{reqTime},
+            #{riskAuditId},
+            #{version},
+            #{createTime},
+            #{createOp},
+            #{updateTime},
+            #{updateOp},
+            #{isDelete}
+        )
 	</insert>
 	
 	<insert id="insertSelective" parameterType="com.atzuche.order.parentorder.entity.OrderEntity" useGeneratedKeys="true" keyProperty="id">
-		insert into order
-		(
-				<if test="orderNo != null">`order_no`, </if>
-				<if test="ownerOrderNo != null">`owner_order_no`, </if>
-				<if test="renterOrderNo != null">`renter_order_no`, </if>
-				<if test="memnerNoOwner != null">`memner_no_owner`, </if>
-				<if test="memNoRenter != null">`mem_no_renter`, </if>
-				<if test="orderNoDelivery != null">`order_no_delivery`, </if>
-				<if test="orderInsideType != null">`order_inside_type`, </if>
-				<if test="orderSceneCode != null">`order_scene_code`, </if>
-				<if test="expRentStartTime != null">`exp_rent_start_time`, </if>
-				<if test="expRentEndTime != null">`exp_rent_end_time`, </if>
-				<if test="actRentStartTime != null">`act_rent_start_time`, </if>
-				<if test="actRentEndTime != null">`act_rent_end_time`, </if>
-				<if test="cityName != null">`city_name`, </if>
-				<if test="cityCode != null">`city_code`, </if>
-				<if test="isOutCity != null">`is_out_city`, </if>
-				<if test="isUseCoin != null">`is_use_coin`, </if>
-				<if test="isUseCoupon != null">`is_use_coupon`, </if>
-				<if test="isUseWallet != null">`is_use_wallet`, </if>
-				<if test="isClaims != null">`is_claims`, </if>
-				<if test="isFreeDeposit != null">`is_free_deposit`, </if>
-				<if test="isWz != null">`is_wz`, </if>
-				<if test="isDetain != null">`is_detain`, </if>
-				<if test="reqTime != null">`req_time`, </if>
-				<if test="riskAuditId != null">`risk_audit_id`, </if>
-				<if test="version != null">`version`, </if>
-				<if test="createTime != null">`create_time`, </if>
-				<if test="createOp != null">`create_op`, </if>
-				<if test="updateTime != null">`update_time`, </if>
-				<if test="updateOp != null">`update_op`, </if>
-				<if test="isDelete != null">`is_delete` </if>
-			)
-		values
-		(
-				<if test="orderNo != null">#{orderNo},  </if>
-				<if test="ownerOrderNo != null">#{ownerOrderNo},  </if>
-				<if test="renterOrderNo != null">#{renterOrderNo},  </if>
-				<if test="memnerNoOwner != null">#{memnerNoOwner},  </if>
-				<if test="memNoRenter != null">#{memNoRenter},  </if>
-				<if test="orderNoDelivery != null">#{orderNoDelivery},  </if>
-				<if test="orderInsideType != null">#{orderInsideType},  </if>
-				<if test="orderSceneCode != null">#{orderSceneCode},  </if>
-				<if test="expRentStartTime != null">#{expRentStartTime},  </if>
-				<if test="expRentEndTime != null">#{expRentEndTime},  </if>
-				<if test="actRentStartTime != null">#{actRentStartTime},  </if>
-				<if test="actRentEndTime != null">#{actRentEndTime},  </if>
-				<if test="cityName != null">#{cityName},  </if>
-				<if test="cityCode != null">#{cityCode},  </if>
-				<if test="isOutCity != null">#{isOutCity},  </if>
-				<if test="isUseCoin != null">#{isUseCoin},  </if>
-				<if test="isUseCoupon != null">#{isUseCoupon},  </if>
-				<if test="isUseWallet != null">#{isUseWallet},  </if>
-				<if test="isClaims != null">#{isClaims},  </if>
-				<if test="isFreeDeposit != null">#{isFreeDeposit},  </if>
-				<if test="isWz != null">#{isWz},  </if>
-				<if test="isDetain != null">#{isDetain},  </if>
-				<if test="reqTime != null">#{reqTime},  </if>
-				<if test="riskAuditId != null">#{riskAuditId},  </if>
-				<if test="version != null">#{version},  </if>
-				<if test="createTime != null">#{createTime},  </if>
-				<if test="createOp != null">#{createOp},  </if>
-				<if test="updateTime != null">#{updateTime},  </if>
-				<if test="updateOp != null">#{updateOp},  </if>
-				<if test="isDelete != null">#{isDelete} </if>
-			)
+		insert into order (
+            <if test="orderNo != null">`order_no`, </if>
+            <if test="memNoRenter != null">`mem_no_renter`, </if>
+            <if test="category != null">`category`, </if>
+            <if test="entryCode != null">`entry_code`, </if>
+            <if test="source != null">`source`, </if>
+            <if test="expRentTime != null">`exp_rent_time`, </if>
+            <if test="expRevertTime != null">`exp_revert_time`, </if>
+            <if test="cityName != null">`city_name`, </if>
+            <if test="cityCode != null">`city_code`, </if>
+            <if test="isOutCity != null">`is_out_city`, </if>
+            <if test="isFreeDeposit != null">`is_free_deposit`, </if>
+            <if test="isUseAirPortService != null">`is_use_air_port_Service`, </if>
+            <if test="reqTime != null">`req_time`, </if>
+            <if test="riskAuditId != null">`risk_audit_id`, </if>
+            <if test="version != null">`version`, </if>
+            <if test="createTime != null">`create_time`, </if>
+            <if test="createOp != null">`create_op`, </if>
+            <if test="updateTime != null">`update_time`, </if>
+            <if test="updateOp != null">`update_op`, </if>
+            <if test="isDelete != null">`is_delete` </if>
+        ) values (
+            <if test="orderNo != null">#{orderNo},  </if>
+            <if test="memNoRenter != null">#{memNoRenter},  </if>
+            <if test="category != null">#{category},  </if>
+            <if test="entryCode != null">#{entryCode},  </if>
+            <if test="source != null">#{source},  </if>
+            <if test="expRentTime != null">#{expRentTime},  </if>
+            <if test="expRevertTime != null">#{expRevertTime},  </if>
+            <if test="cityName != null">#{cityName},  </if>
+            <if test="cityCode != null">#{cityCode},  </if>
+            <if test="isOutCity != null">#{isOutCity},  </if>
+            <if test="isFreeDeposit != null">#{isFreeDeposit},  </if>
+            <if test="isUseAirPortService != null">#{isUseAirPortService},  </if>
+            <if test="reqTime != null">#{reqTime},  </if>
+            <if test="riskAuditId != null">#{riskAuditId},  </if>
+            <if test="version != null">#{version},  </if>
+            <if test="createTime != null">#{createTime},  </if>
+            <if test="createOp != null">#{createOp},  </if>
+            <if test="updateTime != null">#{updateTime},  </if>
+            <if test="updateOp != null">#{updateOp},  </if>
+            <if test="isDelete != null">#{isDelete} </if>
+        )
 	</insert>
 	
 	 
 	<update id="updateByPrimaryKeySelective" parameterType="com.atzuche.order.parentorder.entity.OrderEntity">
 		update order 
-		<set>
+		    <set>
 				<if test="orderNo != null">`order_no` = #{orderNo}, </if>
-				<if test="ownerOrderNo != null">`owner_order_no` = #{ownerOrderNo}, </if>
-				<if test="renterOrderNo != null">`renter_order_no` = #{renterOrderNo}, </if>
-				<if test="memnerNoOwner != null">`memner_no_owner` = #{memnerNoOwner}, </if>
 				<if test="memNoRenter != null">`mem_no_renter` = #{memNoRenter}, </if>
-				<if test="orderNoDelivery != null">`order_no_delivery` = #{orderNoDelivery}, </if>
-				<if test="orderInsideType != null">`order_inside_type` = #{orderInsideType}, </if>
-				<if test="orderSceneCode != null">`order_scene_code` = #{orderSceneCode}, </if>
-				<if test="expRentStartTime != null">`exp_rent_start_time` = #{expRentStartTime}, </if>
-				<if test="expRentEndTime != null">`exp_rent_end_time` = #{expRentEndTime}, </if>
-				<if test="actRentStartTime != null">`act_rent_start_time` = #{actRentStartTime}, </if>
-				<if test="actRentEndTime != null">`act_rent_end_time` = #{actRentEndTime}, </if>
+				<if test="category != null">`category` = #{category}, </if>
+				<if test="entryCode != null">`entry_code` = #{entryCode}, </if>
+				<if test="source != null">`source` = #{source}, </if>
+				<if test="expRentTime != null">`exp_rent_time` = #{expRentTime}, </if>
+				<if test="expRevertTime != null">`exp_revert_time` = #{expRevertTime}, </if>
 				<if test="cityName != null">`city_name` = #{cityName}, </if>
 				<if test="cityCode != null">`city_code` = #{cityCode}, </if>
 				<if test="isOutCity != null">`is_out_city` = #{isOutCity}, </if>
-				<if test="isUseCoin != null">`is_use_coin` = #{isUseCoin}, </if>
-				<if test="isUseCoupon != null">`is_use_coupon` = #{isUseCoupon}, </if>
-				<if test="isUseWallet != null">`is_use_wallet` = #{isUseWallet}, </if>
-				<if test="isClaims != null">`is_claims` = #{isClaims}, </if>
 				<if test="isFreeDeposit != null">`is_free_deposit` = #{isFreeDeposit}, </if>
-				<if test="isWz != null">`is_wz` = #{isWz}, </if>
-				<if test="isDetain != null">`is_detain` = #{isDetain}, </if>
+				<if test="isUseAirPortService != null">`is_use_air_port_Service` = #{isUseAirPortService}, </if>
 				<if test="reqTime != null">`req_time` = #{reqTime}, </if>
 				<if test="riskAuditId != null">`risk_audit_id` = #{riskAuditId}, </if>
 				<if test="version != null">`version` = #{version}, </if>
@@ -261,29 +170,19 @@
 	
 	<update id="updateByPrimaryKey" parameterType="com.atzuche.order.parentorder.entity.OrderEntity">
 		update order 
-		<set>
+		    <set>
 				`order_no` = #{orderNo}, 		
-				`owner_order_no` = #{ownerOrderNo}, 		
-				`renter_order_no` = #{renterOrderNo}, 		
-				`memner_no_owner` = #{memnerNoOwner}, 		
 				`mem_no_renter` = #{memNoRenter}, 		
-				`order_no_delivery` = #{orderNoDelivery}, 		
-				`order_inside_type` = #{orderInsideType}, 		
-				`order_scene_code` = #{orderSceneCode}, 		
-				`exp_rent_start_time` = #{expRentStartTime}, 		
-				`exp_rent_end_time` = #{expRentEndTime}, 		
-				`act_rent_start_time` = #{actRentStartTime}, 		
-				`act_rent_end_time` = #{actRentEndTime}, 		
+				`category` = #{category}, 		
+				`entry_code` = #{entryCode}, 		
+				`source` = #{source}, 		
+				`exp_rent_time` = #{expRentTime}, 		
+				`exp_revert_time` = #{expRevertTime}, 		
 				`city_name` = #{cityName}, 		
 				`city_code` = #{cityCode}, 		
 				`is_out_city` = #{isOutCity}, 		
-				`is_use_coin` = #{isUseCoin}, 		
-				`is_use_coupon` = #{isUseCoupon}, 		
-				`is_use_wallet` = #{isUseWallet}, 		
-				`is_claims` = #{isClaims}, 		
 				`is_free_deposit` = #{isFreeDeposit}, 		
-				`is_wz` = #{isWz}, 		
-				`is_detain` = #{isDetain}, 		
+				`is_use_air_port_Service` = #{isUseAirPortService}, 		
 				`req_time` = #{reqTime}, 		
 				`risk_audit_id` = #{riskAuditId}, 		
 				`version` = #{version}, 		
@@ -292,13 +191,8 @@
 				`update_time` = #{updateTime}, 		
 				`update_op` = #{updateOp}, 		
 				`is_delete` = #{isDelete}		
-	
-		</set>
+		    </set>
 		where id = #{id}
 	</update>
-	
-	<select id="getParentOrderDetailByOrderNo" resultMap="BaseResultMap">
-		select <include refid="Base_Column_List" /> from order where order_no = #{orderNo}
-	</select>
   	
 </mapper>
