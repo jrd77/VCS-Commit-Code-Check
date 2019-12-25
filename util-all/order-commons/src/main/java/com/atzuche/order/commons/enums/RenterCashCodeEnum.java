@@ -32,7 +32,8 @@ public enum RenterCashCodeEnum {
 
     CASHIER_RENTER_DEPOSIT("41110001","收银台支付车俩押金"),
     CASHIER_RENTER_WZ_DEPOSIT("41110001","收银台支付违章押金"),
-
+    CASHIER_RENTER_COST("41110001","收银台支付租车费用"),
+    CASHIER_RENTER_AGAIN_COST("41110001","收银台支付补付租车费用"),
     ;
 	
 	/**

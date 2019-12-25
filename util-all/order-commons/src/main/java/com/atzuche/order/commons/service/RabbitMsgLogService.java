@@ -1,7 +1,6 @@
 package com.atzuche.order.commons.service;
 
 import com.atzuche.order.commons.entity.RabbitMsgLogEntity;
-import com.atzuche.order.commons.enums.RabbitBusinessTypeEnum;
 import com.atzuche.order.commons.mapper.RabbitMsgLogMapper;
 import org.apache.commons.lang.math.NumberUtils;
 import org.springframework.amqp.core.Message;
@@ -9,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 
 
 /**
@@ -24,22 +22,25 @@ public class RabbitMsgLogService{
     private RabbitMsgLogMapper rabbitMsgLogMapper;
 
 
-    public RabbitMsgLogEntity insertRabbitMsgLog(Message message, RabbitBusinessTypeEnum orderPayCallBack, String toJson) {
+    public RabbitMsgLogEntity insertRabbitMsgLog(Message message, String payType, String toJson,String qn) {
         RabbitMsgLogEntity rabbitMsgLog = new RabbitMsgLogEntity();
         String exchange = message.getMessageProperties().getReceivedExchange();
         String queue = message.getMessageProperties().getConsumerQueue();
         String mqKey = message.getMessageProperties().getMessageId();
-
-        rabbitMsgLog.setBusinessType(orderPayCallBack.getCode());
+        rabbitMsgLog.setBusinessType(payType);
         rabbitMsgLog.setCreateTime(LocalDateTime.now());
         rabbitMsgLog.setIsConsume(NumberUtils.INTEGER_ZERO);
         rabbitMsgLog.setMqExchange(exchange);
         rabbitMsgLog.setMqKey(mqKey);
         rabbitMsgLog.setMqQueue(queue);
         rabbitMsgLog.setMqMsg(toJson);
-        rabbitMsgLog.setUniqueId(NumberUtils.INTEGER_ZERO);
+        rabbitMsgLog.setUniqueNo(qn);
         rabbitMsgLogMapper.insert(rabbitMsgLog);
         return rabbitMsgLog;
-
     }
+
+    public void updateConsume(String businessType,String uniqueNo){
+        rabbitMsgLogMapper.updateConsume(businessType,uniqueNo);
+    }
+
 }

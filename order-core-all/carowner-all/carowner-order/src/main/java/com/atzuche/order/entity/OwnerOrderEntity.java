@@ -9,7 +9,7 @@ import lombok.Data;
  * 车主订单子表
  * 
  * @author ZhangBin
- * @date 2019-12-24 14:23:03
+ * @date 2019-12-25 10:21:14
  * @Description:
  */
 @Data
@@ -73,13 +73,13 @@ public class OwnerOrderEntity implements Serializable {
 	 */
 	private Integer isCancle;
 	/**
-	 * 是否使用特供价 0-否，1-是
-	 */
-	private Integer isUseSpecialPrice;
-	/**
 	 * 是否有效 1-有效 0-无效
 	 */
 	private Integer isEffective;
+	/**
+	 * 是否使用特供价 0-否，1-是
+	 */
+	private Integer isUseSpecialPrice;
 	/**
 	 * 取消原因
 	 */

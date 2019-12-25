@@ -42,7 +42,8 @@ public class OwnerDiscountCouponService {
      * @param mark     操作来源标示（不同地方校验规则有所不同）：1、下单 2、修改订单
      * @return BaseOutJB
      */
-    public OwnerCouponGetAndValidResultDTO getAndValidCoupon(Long orderNo, Integer rentAmt, String couponNo, Integer carNo,
+    public OwnerCouponGetAndValidResultDTO getAndValidCoupon(String orderNo, Integer rentAmt, String couponNo,
+                                                             Integer carNo,
                                                              Integer mark) {
         logger.info(
                 "Verify that the owner's coupon meet the usage rules,param is:orderNo:[{}], rentAmt:[{}],couponNo:[{}], carNo:[{}], mark:[{}]",
@@ -84,7 +85,8 @@ public class OwnerDiscountCouponService {
      * @param renterSex       租客性別
      * @return boolean true:绑定成功 false:绑定失败
      */
-    public boolean bindCoupon(Long orderNo, Integer rentAmt, String couponNo, Integer carNo, String renterName, String renterFirstName, String renterSex) {
+    public boolean bindCoupon(String orderNo, Integer rentAmt, String couponNo, Integer carNo, String renterName,
+                              String renterFirstName, String renterSex) {
         logger.info(
                 "The order is tied to the owner's coupon.param is: orderNo:[{}], rentAmt:[{}], couponNo:[{}], " +
                         "carNo:[{}],renterName:[{}], renterFirstName:[{}], renterSex:[{}]",
@@ -121,9 +123,10 @@ public class OwnerDiscountCouponService {
      *
      * @param orderNo  订单号
      * @param couponNo 车主券券编码
+     * @param recover 标识
      * @return boolean true:撤销成功 false:撤销失败
      */
-    public boolean undoCoupon(Long orderNo, String couponNo, String recover) {
+    public boolean undoCoupon(String orderNo, String couponNo, String recover) {
         logger.info("The order undo the owner's coupon,param is: orderNo:[{}], couponNo:[{}], recover:[{}]", orderNo,
                 couponNo, recover);
         Map<String, Object> params = new HashMap<>(8);

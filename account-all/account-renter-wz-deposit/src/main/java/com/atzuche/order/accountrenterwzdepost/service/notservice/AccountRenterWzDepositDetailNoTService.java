@@ -27,6 +27,10 @@ public class AccountRenterWzDepositDetailNoTService {
     public void insertRenterWZDepositDetail(PayedOrderRenterDepositWZDetailReqVO payedOrderRenterWZDepositDetailReqVO) {
         AccountRenterWzDepositDetailEntity accountRenterDepositDetailEntity = new AccountRenterWzDepositDetailEntity();
         BeanUtils.copyProperties(payedOrderRenterWZDepositDetailReqVO,accountRenterDepositDetailEntity);
+        accountRenterDepositDetailEntity.setCostCode(payedOrderRenterWZDepositDetailReqVO.getRenterCashCodeEnum().getCashNo());
+        accountRenterDepositDetailEntity.setCostDetail(payedOrderRenterWZDepositDetailReqVO.getRenterCashCodeEnum().getTxt());
+        accountRenterDepositDetailEntity.setSourceCode(payedOrderRenterWZDepositDetailReqVO.getRenterCashCodeEnum().getCashNo());
+        accountRenterDepositDetailEntity.setSourceDetail(payedOrderRenterWZDepositDetailReqVO.getRenterCashCodeEnum().getTxt());
         int result = accountRenterWzDepositDetailMapper.insert(accountRenterDepositDetailEntity);
         if(result==0){
             throw new PayOrderRenterWZDepositException();

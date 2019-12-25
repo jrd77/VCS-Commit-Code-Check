@@ -79,6 +79,9 @@ public class OrderPayBaseResVO {
 
     private String respCode;
 
+    /**
+     * 支付流水号
+     */
     private String qn;
 
     /**

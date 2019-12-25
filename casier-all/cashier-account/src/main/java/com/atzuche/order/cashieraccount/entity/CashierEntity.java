@@ -9,7 +9,7 @@ import lombok.Data;
  * 收银表
  * 
  * @author ZhangBin
- * @date 2019-12-24 14:32:35
+ * @date 2019-12-25 11:35:17
  * @Description:
  */
 @Data
@@ -88,6 +88,10 @@ public class CashierEntity implements Serializable {
 	 * 幂等字段
 	 */
 	private String payMd5;
+	/**
+	 * 支付流水号
+	 */
+	private String qn;
 	/**
 	 * 创建时间
 	 */
