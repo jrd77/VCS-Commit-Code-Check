@@ -70,13 +70,13 @@ public class CashierPayService{
                 rabbitMsgLogService.updateConsume(orderPayAsynVO.getPayType(),orderPayAsynVO.getQn());
             }
             t.setStatus(Transaction.SUCCESS);
-            log.info("OrderPayCallBack payCallBackAsyn start end;[{}]", GsonUtils.toJson(orderPayAsynVO));
         } catch (Exception e) {
             log.info("OrderPayCallBack payCallBackAsyn start param;[{}]", GsonUtils.toJson(orderPayAsynVO));
             t.setStatus(e);
             Cat.logError("异步处理支付系统回调 失败",e);
             throw new OrderPayCallBackAsnyException();
         } finally {
+            log.info("OrderPayCallBack payCallBackAsyn start end;[{}]", GsonUtils.toJson(orderPayAsynVO));
             t.complete();
         }
     }
