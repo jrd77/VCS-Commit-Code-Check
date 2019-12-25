@@ -52,7 +52,6 @@ public class RenterMemberRightService{
                                 || RenterMemRightEnum.SUCCESS_RENTCAR.getRightCode().equals(x.getRightCode())
                                 || RenterMemRightEnum.MEMBER_LEVEL.getRightCode().equals(x.getRightCode())))
                 .collect(Collectors.toList());
-
         if(taskList != null && taskList.size()>0){
             AtomicInteger rightValueTotal = new AtomicInteger(0);
             taskList.forEach(x->{
