@@ -34,7 +34,10 @@ public enum ErrorCode {
     CASHIER_REFUND_APPLY("981001","退款申请出错"),
     CASHIER_PAY_CALL_BACK_FAIL("981003","支付系统回调操作失败"),
 
-            ;
+
+    ORDER_RENTER_ORDERNO_CREATE_ERROR("600001","订单编码创建异常"),
+
+    ;
 
     private String code;
     private String text;
