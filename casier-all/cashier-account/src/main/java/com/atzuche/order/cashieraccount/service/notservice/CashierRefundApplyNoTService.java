@@ -30,14 +30,17 @@ public class CashierRefundApplyNoTService {
      * 记录待退款信息
      * @param cashierRefundApplyReq
      */
-    public void insertRefundDeposit(CashierRefundApplyReqVO cashierRefundApplyReq) {
+    public int insertRefundDeposit(CashierRefundApplyReqVO cashierRefundApplyReq) {
         CashierRefundApplyEntity cashierRefundApplyEntity = new CashierRefundApplyEntity();
         BeanUtils.copyProperties(cashierRefundApplyReq,cashierRefundApplyEntity);
         cashierRefundApplyEntity.setStatus(CashierRefundApplyStatus.RECEIVED_REFUND.getCode());
+        cashierRefundApplyEntity.setSourceCode(cashierRefundApplyReq.getRenterCashCodeEnum().getCashNo());
+        cashierRefundApplyEntity.setSourceDetail(cashierRefundApplyReq.getRenterCashCodeEnum().getTxt());
         int result = cashierRefundApplyMapper.insert(cashierRefundApplyEntity);
         if(result==0){
             throw new CashierRefundApplyException();
         }
+        return cashierRefundApplyEntity.getId();
     }
 
 

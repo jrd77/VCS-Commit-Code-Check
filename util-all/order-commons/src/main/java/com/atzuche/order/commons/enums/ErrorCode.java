@@ -22,6 +22,7 @@ public enum ErrorCode {
 
     ACCOUT_RENTER_COST_DETAIL("951001","租车费用明细操作失败"),
     ACCOUT_RENTER_COST_SETTLE("951002","租车费用操作失败"),
+    ACCOUT_RENTER_COST_SETTLE_REFUND("951003","租车费用退还操作失败"),
 
     ACCOUT_RENTER_STOP_DETAIL("871001","租客停运费用操作失败"),
 
