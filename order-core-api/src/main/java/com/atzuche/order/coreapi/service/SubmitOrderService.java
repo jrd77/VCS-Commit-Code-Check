@@ -58,7 +58,7 @@ public class SubmitOrderService {
             //获取车主商品信息
 //            OwnerGoodsDetailDTO ownerGoodsDetailDto = carService.getOwnerGoodsDetail(renterGoodsDetailDto);
             //获取车主会员信息
-            OwnerMemberDTO ownerMemberDto = memberService.getOwnerMemberInfo(submitReqDto.getMemNo());
+            OwnerMemberDTO ownerMemberDto = memberService.getOwnerMemberInfo(renterGoodsDetailDto.getOwnerMemNo());
             //获取租客会员信息
             RenterMemberDTO renterMemberDto = memberService.getRenterMemberInfo(submitReqDto.getMemNo());
 
