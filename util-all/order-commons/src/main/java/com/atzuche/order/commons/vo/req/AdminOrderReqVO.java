@@ -1,4 +1,4 @@
-package com.atzuche.order.vo.request;
+package com.atzuche.order.commons.vo.req;
 
 import com.autoyol.doc.annotation.AutoDocProperty;
 
