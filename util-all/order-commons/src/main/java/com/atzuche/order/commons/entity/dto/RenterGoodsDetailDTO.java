@@ -2,10 +2,13 @@ package com.atzuche.order.commons.entity.dto;
 
 import lombok.Data;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
 public class RenterGoodsDetailDTO {
+    private LocalDateTime rentTime;
+    private LocalDateTime revertTime;
 
     /**
      * 应答标识位，0未设置，1已设置

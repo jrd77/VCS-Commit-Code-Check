@@ -85,10 +85,6 @@ public class OwnerGoodsEntity implements Serializable {
 	 */
 	private Integer carSurplusPrice;
 	/**
-	 * 是否使用特供价 0-否，1-是
-	 */
-	private Integer carUseSpecialPrice;
-	/**
 	 * 车辆指导价
 	 */
 	private Integer carGuidePrice;

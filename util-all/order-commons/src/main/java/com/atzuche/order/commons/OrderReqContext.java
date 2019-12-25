@@ -4,7 +4,7 @@ import com.atzuche.order.commons.entity.dto.OwnerGoodsDetailDTO;
 import com.atzuche.order.commons.entity.dto.OwnerMemberDTO;
 import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
 import com.atzuche.order.commons.entity.dto.RenterMemberDTO;
-import com.atzuche.order.vo.request.NormalOrderReqVO;
+import com.atzuche.order.commons.vo.req.NormalOrderReqVO;
 import lombok.Data;
 
 /**

@@ -1,9 +1,9 @@
 package com.atzuche.order.coreapi.controller;
 
 import com.alibaba.fastjson.JSON;
+import com.atzuche.order.commons.vo.req.NormalOrderReqVO;
+import com.atzuche.order.commons.vo.res.NormalOrderResVO;
 import com.atzuche.order.coreapi.service.SubmitOrderService;
-import com.atzuche.order.vo.request.NormalOrderReqVO;
-import com.atzuche.order.vo.response.NormalOrderResVO;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.doc.annotation.AutoDocMethod;
@@ -43,6 +43,8 @@ public class SubmitOrderController {
             return new ResponseData<>(ErrorCode.NEED_LOGIN.getCode(), ErrorCode.NEED_LOGIN.getText());
         }
 
+
+        submitOrderService.submitOrder(normalOrderReqVO);
 
         return ResponseData.success(null);
     }

@@ -3,22 +3,23 @@ package com.atzuche.order.coreapi.service;
 import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.OrderException;
 import com.atzuche.order.commons.OrderReqContext;
-import com.atzuche.order.commons.OrderStatus;
 import com.atzuche.order.commons.constant.OrderConstant;
-import com.atzuche.order.commons.entity.dto.*;
+import com.atzuche.order.commons.entity.dto.OrderContextDTO;
+import com.atzuche.order.commons.entity.dto.OwnerMemberDTO;
+import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
+import com.atzuche.order.commons.entity.dto.RenterMemberDTO;
 import com.atzuche.order.commons.enums.OrderStatusEnum;
+import com.atzuche.order.commons.vo.req.NormalOrderReqVO;
+import com.atzuche.order.commons.vo.res.NormalOrderResVO;
 import com.atzuche.order.coreapi.entity.request.SubmitOrderReq;
 import com.atzuche.order.parentorder.dto.OrderDTO;
 import com.atzuche.order.parentorder.dto.OrderSourceStatDTO;
 import com.atzuche.order.parentorder.dto.OrderStatusDTO;
 import com.atzuche.order.parentorder.dto.ParentOrderDTO;
 import com.atzuche.order.parentorder.service.ParentOrderService;
-import com.atzuche.order.vo.request.NormalOrderReqVO;
-import com.atzuche.order.vo.response.NormalOrderResVO;
 import com.autoyol.car.api.feign.api.CarDetailQueryFeignApi;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,7 +30,6 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
 
-@Slf4j
 @Service
 public class SubmitOrderService {
 
@@ -88,10 +88,10 @@ public class SubmitOrderService {
         } catch (OrderException ex) {
             String errorCode = ex.getErrorCode();
             String errorMsg = ex.getErrorMsg();
-            log.error("下单失败", ex);
+            LOGGER.error("下单失败", ex);
             return ResponseData.createErrorCodeResponse(errorCode, errorMsg);
         } catch (Exception ex) {
-            log.error("下单异常", ex);
+            LOGGER.error("下单异常", ex);
             return ResponseData.createErrorCodeResponse(ErrorCode.FAILED.getCode(), ErrorCode.FAILED.getText());
         }
 

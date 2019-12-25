@@ -21,7 +21,6 @@
         <result property="carDayMileage" column="car_day_mileage"/>
         <result property="carIntrod" column="car_introd"/>
         <result property="carSurplusPrice" column="car_surplus_price"/>
-        <result property="carUseSpecialPrice" column="car_use_special_price"/>
         <result property="carGuidePrice" column="car_guide_price"/>
         <result property="carInmsrp" column="car_inmsrp"/>
         <result property="carTag" column="car_tag"/>
@@ -66,8 +65,7 @@
 	`car_day_mileage`, 	
 	`car_introd`, 	
 	`car_surplus_price`, 	
-	`car_use_special_price`, 	
-	`car_guide_price`, 	
+	`car_guide_price`,
 	`car_inmsrp`, 	
 	`car_tag`, 	
 	`car_status`, 	
@@ -118,8 +116,7 @@
 				`car_day_mileage`,		
 				`car_introd`,		
 				`car_surplus_price`,		
-				`car_use_special_price`,		
-				`car_guide_price`,		
+				`car_guide_price`,
 				`car_inmsrp`,		
 				`car_tag`,		
 				`car_status`,		
@@ -160,8 +157,7 @@
 				#{carDayMileage}, 		
 				#{carIntrod}, 		
 				#{carSurplusPrice}, 		
-				#{carUseSpecialPrice}, 		
-				#{carGuidePrice}, 		
+				#{carGuidePrice},
 				#{carInmsrp}, 		
 				#{carTag}, 		
 				#{carStatus}, 		
@@ -204,7 +200,6 @@
 				<if test="carDayMileage != null">`car_day_mileage`, </if>
 				<if test="carIntrod != null">`car_introd`, </if>
 				<if test="carSurplusPrice != null">`car_surplus_price`, </if>
-				<if test="carUseSpecialPrice != null">`car_use_special_price`, </if>
 				<if test="carGuidePrice != null">`car_guide_price`, </if>
 				<if test="carInmsrp != null">`car_inmsrp`, </if>
 				<if test="carTag != null">`car_tag`, </if>
@@ -248,7 +243,6 @@
 				<if test="carDayMileage != null">#{carDayMileage},  </if>
 				<if test="carIntrod != null">#{carIntrod},  </if>
 				<if test="carSurplusPrice != null">#{carSurplusPrice},  </if>
-				<if test="carUseSpecialPrice != null">#{carUseSpecialPrice},  </if>
 				<if test="carGuidePrice != null">#{carGuidePrice},  </if>
 				<if test="carInmsrp != null">#{carInmsrp},  </if>
 				<if test="carTag != null">#{carTag},  </if>
@@ -296,7 +290,6 @@
 				<if test="carDayMileage != null">`car_day_mileage` = #{carDayMileage}, </if>
 				<if test="carIntrod != null">`car_introd` = #{carIntrod}, </if>
 				<if test="carSurplusPrice != null">`car_surplus_price` = #{carSurplusPrice}, </if>
-				<if test="carUseSpecialPrice != null">`car_use_special_price` = #{carUseSpecialPrice}, </if>
 				<if test="carGuidePrice != null">`car_guide_price` = #{carGuidePrice}, </if>
 				<if test="carInmsrp != null">`car_inmsrp` = #{carInmsrp}, </if>
 				<if test="carTag != null">`car_tag` = #{carTag}, </if>
@@ -344,8 +337,7 @@
 				`car_day_mileage` = #{carDayMileage}, 		
 				`car_introd` = #{carIntrod}, 		
 				`car_surplus_price` = #{carSurplusPrice}, 		
-				`car_use_special_price` = #{carUseSpecialPrice}, 		
-				`car_guide_price` = #{carGuidePrice}, 		
+				`car_guide_price` = #{carGuidePrice},
 				`car_inmsrp` = #{carInmsrp}, 		
 				`car_tag` = #{carTag}, 		
 				`car_status` = #{carStatus}, 		
