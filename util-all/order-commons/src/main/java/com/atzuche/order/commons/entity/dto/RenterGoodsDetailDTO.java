@@ -7,6 +7,7 @@ import java.util.List;
 
 @Data
 public class RenterGoodsDetailDTO {
+    private String orderNo;
     private LocalDateTime rentTime;
     private LocalDateTime revertTime;
 

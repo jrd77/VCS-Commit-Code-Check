@@ -32,4 +32,5 @@ public class RenterOrderService{
     public RenterOrderEntity getRenterOrderByOrderNoAndIsEffective(String orderNo) {
     	return renterOrderMapper.getRenterOrderByOrderNoAndIsEffective(orderNo);
     }
+
 }

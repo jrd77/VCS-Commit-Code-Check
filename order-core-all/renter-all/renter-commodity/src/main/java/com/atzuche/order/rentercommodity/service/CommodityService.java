@@ -9,6 +9,8 @@ import com.atzuche.order.parentorder.entity.OrderEntity;
 import com.atzuche.order.parentorder.service.OrderService;
 import com.atzuche.order.rentercommodity.entity.RenterGoodsPriceDetailEntity;
 import com.atzuche.order.rentercommodity.mapper.RenterGoodsPriceDetailMapper;
+import com.atzuche.order.renterorder.entity.RenterOrderEntity;
+import com.atzuche.order.renterorder.service.RenterOrderService;
 import com.autoyol.platformcost.CommonUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -28,7 +30,7 @@ public class CommodityService {
     @Autowired
     private RenterGoodsPriceDetailMapper renterGoodsPriceDetailMapper;
     @Autowired
-    private OrderService orderService;
+    private RenterOrderService renterOrderService;
     @Autowired
     private RenterGoodsService renterGoodsService;
     /**
@@ -81,15 +83,13 @@ public class CommodityService {
 
     //组合
     private void combination(RenterGoodsDetailDTO renterGoodsDetailDTO){
-        /*OrderEntity orderEntity = orderService.getParentOrderDetailByOrderNo(orderContextDto.getOrderNo());
-        if(orderEntity == null || orderEntity.getRenterOrderNo() == null){//没有订单
-            return;
-        }*/
         LocalDateTime rentTime = renterGoodsDetailDTO.getRentTime();
         LocalDateTime revertTime = renterGoodsDetailDTO.getRevertTime();
-
-
-        List<RenterGoodsPriceDetailEntity> dbGoodsPriceList = renterGoodsPriceDetailMapper.selectByRenterOrderNo(null/*renterOrderNo*/);
+        RenterOrderEntity renterOrderEntity = renterOrderService.getRenterOrderByOrderNoAndIsEffective(renterGoodsDetailDTO.getOrderNo());
+        if(renterOrderEntity == null){
+            return;
+        }
+        List<RenterGoodsPriceDetailEntity> dbGoodsPriceList = renterGoodsPriceDetailMapper.selectByRenterOrderNo(renterOrderEntity.getRenterOrderNo());
         LocalDate carDayRent = dbGoodsPriceList.get(0).getCarDay();
         LocalDate carDayRevert = dbGoodsPriceList.get(dbGoodsPriceList.size()-1).getCarDay();
 

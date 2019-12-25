@@ -1,4 +1,5 @@
 package com.atzuche.order.mapper;
+import org.apache.ibatis.annotations.Param;
 
 import com.atzuche.order.entity.OwnerOrderEntity;
 import org.apache.ibatis.annotations.Mapper;
@@ -16,8 +17,6 @@ import java.util.List;
 public interface OwnerOrderMapper{
 
     OwnerOrderEntity selectByPrimaryKey(Integer id);
-
-    List<OwnerOrderEntity> selectALL();
 
     int insert(OwnerOrderEntity record);
     
