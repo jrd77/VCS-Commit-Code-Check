@@ -7,6 +7,7 @@ import com.atzuche.order.accountownerincome.service.AccountOwnerIncomeService;
 import com.atzuche.order.accountownerincome.vo.req.AccountOwnerIncomeExamineOpReqVO;
 import com.atzuche.order.accountownerincome.vo.req.AccountOwnerIncomeExamineReqVO;
 import com.atzuche.order.accountrenterdeposit.service.AccountRenterDepositService;
+import com.atzuche.order.accountrenterdeposit.vo.req.CreateOrderRenterCostReqVO;
 import com.atzuche.order.accountrenterdeposit.vo.req.CreateOrderRenterDepositReqVO;
 import com.atzuche.order.accountrenterdeposit.vo.req.DetainRenterDepositReqVO;
 import com.atzuche.order.accountrenterdeposit.vo.req.PayedOrderRenterDepositReqVO;
@@ -17,12 +18,17 @@ import com.atzuche.order.accountrenterwzdepost.vo.req.CreateOrderRenterWZDeposit
 import com.atzuche.order.accountrenterwzdepost.vo.req.PayedOrderRenterDepositWZDetailReqVO;
 import com.atzuche.order.accountrenterwzdepost.vo.req.PayedOrderRenterWZDepositReqVO;
 import com.atzuche.order.accountrenterwzdepost.vo.req.RenterWZDepositCostReqVO;
+import com.atzuche.order.cashieraccount.common.DataPayKindConstant;
+import com.atzuche.order.cashieraccount.entity.CashierEntity;
+import com.atzuche.order.cashieraccount.service.notservice.CashierNoTService;
 import com.atzuche.order.cashieraccount.service.notservice.CashierRefundApplyNoTService;
 import com.atzuche.order.cashieraccount.vo.req.CashierDeductDebtReqVO;
 import com.atzuche.order.cashieraccount.vo.req.CashierRefundApplyReqVO;
+import com.atzuche.order.cashieraccount.vo.req.pay.OrderPaySignReqVO;
 import com.atzuche.order.cashieraccount.vo.res.AccountPayAbleResVO;
 import com.atzuche.order.cashieraccount.vo.res.CashierDeductDebtResVO;
 import com.atzuche.order.cashieraccount.vo.res.OrderPayableAmountResVO;
+import com.atzuche.order.cashieraccount.vo.res.pay.OrderPayAsynResVO;
 import com.atzuche.order.commons.enums.RenterCashCodeEnum;
 import com.atzuche.order.rentercost.service.RenterOrderCostCombineService;
 import com.autoyol.cat.CatAnnotation;
@@ -37,6 +43,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
 import java.util.List;
+import java.util.Objects;
 
 
 /**
@@ -55,11 +62,29 @@ public class CashierService {
     @Autowired AccountRenterCostSettleService accountRenterCostSettleService;
     @Autowired AccountRenterWzDepositCostService accountRenterWzDepositCostService;
     @Autowired RenterOrderCostCombineService renterOrderCostCombineService;
+    @Autowired CashierNoTService cashierNoTService;
 
 
+    /**
+     * 记录应收车俩费用
+     * 下单成功  调收银台 记录 （z租车费用真实值从子订单费用中取）
+     */
+    public void insertRenterCost(CreateOrderRenterCostReqVO createOrderRenterCost){
+        cashierNoTService.insertRenterCost(createOrderRenterCost);
+    }
 
-    /**  ***************************************车辆押金 start****************************************************/
-
+    /**  *************************************** 车辆押金 start****************************************************/
+    /**
+     * 记录应收车俩押金
+     * 下单成功  调收银台 记录 车俩押金应付
+     */
+    @Transactional(rollbackFor=Exception.class)
+    public void insertRenterDeposit(CreateOrderRenterDepositReqVO createOrderRenterDepositReqVO){
+        //1 收银台记录违章押金 应付
+        cashierNoTService.insertRenterDeposit(createOrderRenterDepositReqVO);
+        //2 车俩押金记录应付
+        accountRenterDepositService.insertRenterDeposit(createOrderRenterDepositReqVO);
+    }
 
     /**
      * 扣减/暂扣 车俩押金
@@ -91,6 +116,9 @@ public class CashierService {
      */
     @Transactional(rollbackFor=Exception.class)
     public void insertRenterDeposit(CreateOrderRenterWZDepositReqVO createOrderRenterWZDepositReq){
+        //1 收银台记录违章押金 应付
+        cashierNoTService.insertRenterWZDeposit(createOrderRenterWZDepositReq);
+        //2 违章押金记录应付
         accountRenterWzDepositService.insertRenterWZDeposit(createOrderRenterWZDepositReq);
     }
 
@@ -285,5 +313,45 @@ public class CashierService {
         result.setMemNo(memNo);
         result.setOrderNo(orderNo);
         return result;
+    }
+
+    /**
+     * 退款成功异步回调
+     * @param orderPayAsynVO
+     */
+    public void refundCallBackSuccess(OrderPayAsynResVO orderPayAsynVO) {
+    }
+
+    /**
+     * 支付成功回调
+     * @param orderPayAsynVO
+     */
+    @Transactional(rollbackFor=Exception.class)
+    public void payOrderCallBackSuccess(OrderPayAsynResVO orderPayAsynVO) {
+        //1.1 租车押金 01
+        if(Objects.nonNull(orderPayAsynVO) && DataPayKindConstant.RENT.equals(orderPayAsynVO.getPayKind())){
+            //1 对象初始化转换
+            PayedOrderRenterDepositReqVO payedOrderRenterDeposit = cashierNoTService.getPayedOrderRenterDepositReq(orderPayAsynVO);
+            //2 租车押金 更新数据
+            accountRenterDepositService.updateRenterDeposit(payedOrderRenterDeposit);
+        }
+        //1.2 违章押金 02
+        if(Objects.nonNull(orderPayAsynVO) && DataPayKindConstant.DEPOSIT.equals(orderPayAsynVO.getPayKind())){
+            //1 对象初始化转换
+            PayedOrderRenterWZDepositReqVO payedOrderRenterWZDeposit = cashierNoTService.getPayedOrderRenterWZDepositReq(orderPayAsynVO);
+            //2 违章押金 更新数据
+            accountRenterWzDepositService.updateRenterWZDeposit(payedOrderRenterWZDeposit);
+
+        }
+        //1.3 租车费用/补付
+        if(Objects.nonNull(orderPayAsynVO) && DataPayKindConstant.DEPOSIT.equals(orderPayAsynVO.getPayKind())){
+            //1 对象初始化转换
+            PayedOrderRenterWZDepositReqVO payedOrderRenterWZDeposit = cashierNoTService.getPayedOrderRenterWZDepositReq(orderPayAsynVO);
+            //2 违章押金 更新数据
+            accountRenterWzDepositService.updateRenterWZDeposit(payedOrderRenterWZDeposit);
+
+        }
+        //2 收银台记录更新
+        cashierNoTService.updataCashier(orderPayAsynVO);
     }
 }

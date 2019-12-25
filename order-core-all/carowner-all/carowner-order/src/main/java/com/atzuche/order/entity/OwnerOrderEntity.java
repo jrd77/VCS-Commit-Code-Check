@@ -77,6 +77,10 @@ public class OwnerOrderEntity implements Serializable {
 	 */
 	private Integer isUseSpecialPrice;
 	/**
+	 * 是否有效 1-有效 0-无效
+	 */
+	private Integer isEffective;
+	/**
 	 * 取消原因
 	 */
 	private String cancleReason;

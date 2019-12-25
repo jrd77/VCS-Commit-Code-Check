@@ -1,8 +1,11 @@
 package com.atzuche.order.cashieraccount.config;
 
 import com.atzuche.order.cashieraccount.service.CashierPayService;
+import com.atzuche.order.commons.CatConstants;
 import com.atzuche.order.commons.enums.RabbitBusinessTypeEnum;
 import com.atzuche.order.commons.service.RabbitMsgLogService;
+import com.dianping.cat.Cat;
+import com.dianping.cat.message.Transaction;
 import com.rabbitmq.client.Channel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Message;
@@ -37,7 +40,7 @@ public class OrderPayCallBackRabbitConfig {
             rabbitMsgLogService.insertRabbitMsgLog(message,RabbitBusinessTypeEnum.ORDER_PAY_CALL_BACK,orderPayAsynStr);
             cashierPayService.payCallBackAsyn(orderPayAsynStr);
         } catch (Exception e) {
-            log.info("OrderPayCallBack payCallBackAsyn error e [{}]" ,e);
+            log.error("OrderPayCallBack payCallBackAsyn,e={},message={}",e,message);
         }
         log.info("OrderPayCallBack payCallBackAsyn end " );
     }

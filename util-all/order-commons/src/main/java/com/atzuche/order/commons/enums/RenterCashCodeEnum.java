@@ -29,6 +29,10 @@ public enum RenterCashCodeEnum {
 
     OWNER_RENT_INCOME("31110001","租车收益"),
     OWNER_PENALTIES_INCOME("31110002","违约金收益"),
+
+    CASHIER_RENTER_DEPOSIT("41110001","收银台支付车俩押金"),
+    CASHIER_RENTER_WZ_DEPOSIT("41110001","收银台支付违章押金"),
+
     ;
 	
 	/**
