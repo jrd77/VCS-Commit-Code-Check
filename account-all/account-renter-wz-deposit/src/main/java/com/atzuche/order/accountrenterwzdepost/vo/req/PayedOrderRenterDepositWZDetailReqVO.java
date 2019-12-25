@@ -24,7 +24,7 @@ public class PayedOrderRenterDepositWZDetailReqVO {
     /**
      * 支付方式
      */
-    private Integer payment;
+    private String payment;
     /**
      * 支付渠道
      */

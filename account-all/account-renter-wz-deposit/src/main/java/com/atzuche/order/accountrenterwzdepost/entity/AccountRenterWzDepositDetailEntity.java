@@ -39,7 +39,7 @@ public class AccountRenterWzDepositDetailEntity implements Serializable {
 	/**
 	 * 费用编码
 	 */
-	private Integer costCode;
+	private String costCode;
 	/**
 	 * 费用描述
 	 */
@@ -51,7 +51,7 @@ public class AccountRenterWzDepositDetailEntity implements Serializable {
 	/**
 	 * 入账来源编码
 	 */
-	private Integer sourceCode;
+	private String sourceCode;
 	/**
 	 * 入账来源编码描述
 	 */

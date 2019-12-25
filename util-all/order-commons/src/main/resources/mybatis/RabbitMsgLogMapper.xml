@@ -10,10 +10,11 @@
         <result property="mqQueue" column="mq_queue"/>
         <result property="isConsume" column="is_consume"/>
         <result property="businessType" column="business_type"/>
-        <result property="uniqueId" column="unique_id"/>
+        <result property="uniqueNo" column="unique_no"/>
         <result property="mqMsg" column="mq_msg"/>
         <result property="createTime" column="create_time"/>
     </resultMap>
+
 
 	<sql id="Base_Column_List">
 	`id`, 	
@@ -22,7 +23,7 @@
 	`mq_queue`, 	
 	`is_consume`, 	
 	`business_type`, 	
-	`unique_id`, 	
+	`unique_no`, 	
 	`mq_msg`, 	
 	`create_time`	
 
@@ -41,7 +42,7 @@
 				`mq_queue`,		
 				`is_consume`,		
 				`business_type`,		
-				`unique_id`,		
+				`unique_no`,		
 				`mq_msg`,		
 				`create_time`		
 			)
@@ -52,7 +53,7 @@
 				#{mqQueue}, 		
 				#{isConsume}, 		
 				#{businessType}, 		
-				#{uniqueId}, 		
+				#{uniqueNo}, 		
 				#{mqMsg}, 		
 				#{createTime}		
 			)
@@ -61,15 +62,11 @@
     <update id="updateConsume">
     update rabbit_msg_log
     set
-      is_consume = 1,
-      unique_id = #{uniqueId,jdbcType=INTEGER}
-    where id = #{id,jdbcType=INTEGER}
+      is_consume = 1
+    where unique_no = #{uniqueNo} and business_type = #{businessType}
   </update>
-    <select id="selectByUniqueId" resultMap="BaseResultMap">
-        select <include refid="Base_Column_List" /> from rabbit_msg_log where unique_id = #{uniqueId} and business_type = #{businessType}
-
-
+    <select id="selectByUniqueNo" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List" /> from rabbit_msg_log where unique_no = #{uniqueNo} and business_type = #{businessType} limit 1
     </select>
-
 
 </mapper>
