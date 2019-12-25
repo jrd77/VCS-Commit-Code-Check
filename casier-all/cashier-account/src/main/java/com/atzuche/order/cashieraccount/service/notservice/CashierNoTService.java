@@ -121,7 +121,7 @@ public class CashierNoTService {
         }
         //TODO 预授权到期时间
         //车辆押金进出明细
-        DetainRenterDepositReqVO  detainRenterDeposit = new DetainRenterDepositReqVO();
+        DetainRenterDepositReqVO detainRenterDeposit = new DetainRenterDepositReqVO();
         BeanUtils.copyProperties(orderPayAsynVO,detainRenterDeposit);
         detainRenterDeposit.setAmt(orderPayAsynVO.getSettleAmount());
         detainRenterDeposit.setUniqueNo(orderPayAsynVO.getQn());
@@ -168,6 +168,8 @@ public class CashierNoTService {
         payedOrderRenterDepositDetail.setUniqueNo(orderPayAsynVO.getQn());
         payedOrderRenterDepositDetail.setRenterCashCodeEnum(RenterCashCodeEnum.CASHIER_RENTER_WZ_DEPOSIT);
         payedOrderRenterDepositDetail.setPayChannel(orderPayAsynVO.getPaySource());
+        payedOrderRenterDepositDetail.setPayment(orderPayAsynVO.getPayType());
+        payedOrderRenterDepositDetail.setAmt(orderPayAsynVO.getSettleAmount());
         vo.setPayedOrderRenterDepositDetailReqVO(payedOrderRenterDepositDetail);
         return vo;
     }
