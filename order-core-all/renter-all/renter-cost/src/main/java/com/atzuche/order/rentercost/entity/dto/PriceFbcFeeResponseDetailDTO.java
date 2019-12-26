@@ -4,7 +4,7 @@ import com.autoyol.doc.annotation.AutoDocProperty;
 import lombok.Data;
 
 @Data
-public class PriceFbcFeeResponseDetail {
+public class PriceFbcFeeResponseDetailDTO {
     @AutoDocProperty("取还类型:get/return")
     private String getReturnType;
     @AutoDocProperty("预期应收费用")

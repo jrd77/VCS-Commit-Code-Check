@@ -3,7 +3,7 @@ package com.atzuche.order.rentercost.entity.dto;
 import lombok.Data;
 
 @Data
-public class GetFbcFeeRequestDetail {
+public class GetFbcFeeRequestDetailDTO {
     private String channelName;
     private String requestTime;
     private String getReturnType;

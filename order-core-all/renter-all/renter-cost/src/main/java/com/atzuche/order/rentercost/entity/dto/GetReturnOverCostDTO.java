@@ -1,0 +1,24 @@
+package com.atzuche.order.rentercost.entity.dto;
+
+import com.atzuche.order.rentercost.entity.RenterOrderCostDetailEntity;
+import lombok.Data;
+
+import java.util.List;
+/*
+ * @Author ZhangBin
+ * @Date 2019/12/26 11:40
+ * @Description: 超运能费用
+ *
+ **/
+
+@Data
+public class GetReturnOverCostDTO {
+    /**
+     * 租客取还车费用明细列表
+     */
+    private List<RenterOrderCostDetailEntity> renterOrderCostDetailEntityList;
+    /**
+     * 可能需要用到的值
+     */
+    private GetReturnOverTransportDTO getReturnOverTransportDTO;
+}
