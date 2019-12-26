@@ -1,25 +1,21 @@
-package com.atzuche.order.rentercost.entity;
+package com.atzuche.order.rentercost.entity.dto;
+
+import lombok.Data;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import lombok.Data;
-
 
 /**
- * 租客补贴明细表
- * 
- * @author ZhangBin
- * @date 2019-12-14 17:30:57
- * @Description:
+ * 租客订单费用补贴明细
+ *
+ * @author pengcheng.fu
+ * @date 2019/12/26 19:48
  */
 @Data
-public class RenterOrderSubsidyDetailEntity implements Serializable {
-	private static final long serialVersionUID = 1L;
+public class RenterOrderSubsidyDetailDTO implements Serializable {
 
-    /**
-     *
-     */
-    private Integer id;
+    private static final long serialVersionUID = 3710750452449495704L;
+
     /**
      * 主订单号
      */
@@ -33,29 +29,29 @@ public class RenterOrderSubsidyDetailEntity implements Serializable {
      */
     private String memNo;
     /**
-     * 补贴费用类型 1、租金 2、取还车费用
+     * 补贴类型
      */
-    private String subsidTypeName;
+    private Integer subsidType;
     /**
-     * 补贴费用类型编码
-     */
-    private String subsidyTypeCode;
-    /**
-     * 补贴来源方编码 1、租客 2、车主 3、平台
+     * 补贴来源方编码（租客/车主/平台）
      */
     private String subsidySourceCode;
     /**
      * 补贴来源方
      */
-    private String subsidySourceName;
+    private String subsidySource;
     /**
-     * 补贴方编码 1、租客 2、车主 3、平台
+     * 补贴方编码（租客/车主/平台）
      */
-    private String subsidyTargetCode;
+    private String subsidyCode;
     /**
      * 补贴方名称
      */
-    private String subsidyTargetName;
+    private String subsidyName;
+    /**
+     * 补贴类型编码
+     */
+    private String subsidyTypeCode;
     /**
      * 补贴描述
      */
@@ -108,5 +104,6 @@ public class RenterOrderSubsidyDetailEntity implements Serializable {
      * 0-正常，1-已逻辑删除
      */
     private Integer isDelete;
+
 
 }
