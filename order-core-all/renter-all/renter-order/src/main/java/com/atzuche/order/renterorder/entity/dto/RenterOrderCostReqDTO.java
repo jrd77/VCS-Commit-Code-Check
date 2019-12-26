@@ -33,6 +33,10 @@ public class RenterOrderCostReqDTO {
      * 超里程费用参数
      */
     private MileageAmtDTO mileageAmtDTO;
+    /**
+     * 取还车费用参数
+     */
+    private GetReturnCarCostReqDto getReturnCarCostReqDto;
 
 
 }

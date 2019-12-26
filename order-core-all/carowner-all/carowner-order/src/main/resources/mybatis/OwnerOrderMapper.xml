@@ -216,5 +216,10 @@
 		order by id desc
 		limit 1
     </select>
+    
+    <update id="updateOwnerOrderInvalidById">
+    	update owner_order set is_effective = 0
+    	where id = #{id}
+    </update>
 
 </mapper>

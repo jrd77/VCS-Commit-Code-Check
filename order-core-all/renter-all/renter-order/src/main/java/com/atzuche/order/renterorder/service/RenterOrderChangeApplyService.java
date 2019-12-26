@@ -16,6 +16,15 @@ import org.springframework.stereotype.Service;
 public class RenterOrderChangeApplyService{
     @Autowired
     private RenterOrderChangeApplyMapper renterOrderChangeApplyMapper;
+    
+    /**
+     * 获取租客申请记录根据租客订单号
+     * @param renterOrderNo
+     * @return RenterOrderChangeApplyEntity
+     */
+    public RenterOrderChangeApplyEntity getRenterOrderChangeApplyByRenterOrderNo(String renterOrderNo) {
+    	return renterOrderChangeApplyMapper.getRenterOrderChangeApplyByRenterOrderNo(renterOrderNo);
+    }
 
 
     /**
@@ -25,5 +34,15 @@ public class RenterOrderChangeApplyService{
      */
     public Integer saveRenterOrderChangeApply(RenterOrderChangeApplyEntity renterOrderChangeApplyEntity) {
     	return renterOrderChangeApplyMapper.saveRenterOrderChangeApply(renterOrderChangeApplyEntity);
+    }
+    
+    /**
+     * 修改租客申请记录状态
+     * @param id
+     * @param auditStatus
+     * @return Integer
+     */
+    public Integer updateRenterOrderChangeApplyStatus(Integer id, Integer auditStatus) {
+    	return renterOrderChangeApplyMapper.updateRenterOrderChangeApplyStatus(id, auditStatus);
     }
 }

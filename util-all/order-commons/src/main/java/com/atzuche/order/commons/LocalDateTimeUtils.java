@@ -415,6 +415,13 @@ public class LocalDateTimeUtils {
         return localDateTime.atZone(ZONE_ID).toInstant().toEpochMilli();
     }
 
+    public static String getNowDateLong() {
+        return formateLocalDateTimeStr(LocalDateTime.now(), GlobalConstant.DATE_TIME_FORMAT_2);
+    }
+    public static String formateLocalDateTimeStr(LocalDateTime localDateTime, DateTimeFormatter df) {
+        return localDateTime.format(df);
+    }
+
     public static void main(String[] args) {
         String dateTime = formatEpochSecond("yyyy-MM-dd HH:mm:ss", 1525767228);
         System.out.println(dateTime);
