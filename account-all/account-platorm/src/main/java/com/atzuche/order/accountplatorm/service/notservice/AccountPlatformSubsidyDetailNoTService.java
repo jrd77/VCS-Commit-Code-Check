@@ -34,6 +34,9 @@ public class AccountPlatformSubsidyDetailNoTService {
                 AccountPlatformSubsidyDetailReqVO vo = accountPlatformSubsidyDetails.get(i);
                 AccountPlatformSubsidyDetailEntity accountPlatformSubsidyDetail = new AccountPlatformSubsidyDetailEntity();
                 BeanUtils.copyProperties(vo,accountPlatformSubsidyDetail);
+                accountPlatformSubsidyDetail.setSubsidyName(vo.getSubsidyName().getDesc());
+                accountPlatformSubsidyDetail.setSourceCode(vo.getRenterCashCodeEnum().getCashNo());
+                accountPlatformSubsidyDetail.setSourceDesc(vo.getRenterCashCodeEnum().getTxt());
                 int result = accountPlatformSubsidyDetailMapper.insert(accountPlatformSubsidyDetail);
                 if(result==0){
                     throw new AccountPlatormException();
