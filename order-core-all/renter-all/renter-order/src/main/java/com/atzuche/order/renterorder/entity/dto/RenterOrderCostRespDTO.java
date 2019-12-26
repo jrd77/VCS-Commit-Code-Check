@@ -1,6 +1,7 @@
 package com.atzuche.order.renterorder.entity.dto;
 
 import com.atzuche.order.rentercost.entity.RenterOrderCostDetailEntity;
+import com.atzuche.order.rentercost.entity.RenterOrderSubsidyDetailEntity;
 import lombok.Data;
 
 import java.util.List;
@@ -53,9 +54,13 @@ public class RenterOrderCostRespDTO {
     private Integer carOwnerSubsidyAmount;
 
     /**
-     * 各个金额对应的明细列表
+     * 费用对应的明细列表
      */
     List<RenterOrderCostDetailEntity> renterOrderCostDetailDTOList;
+    /**
+     * 补贴对应的明细列表
+     */
+    List<RenterOrderSubsidyDetailEntity> renterOrderSubsidyDetailEntityList;
 
 
 }

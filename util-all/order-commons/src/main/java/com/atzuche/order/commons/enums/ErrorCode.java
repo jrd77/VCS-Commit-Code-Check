@@ -22,6 +22,7 @@ public enum ErrorCode {
 
     ACCOUT_RENTER_COST_DETAIL("951001","租车费用明细操作失败"),
     ACCOUT_RENTER_COST_SETTLE("951002","租车费用操作失败"),
+    ACCOUT_RENTER_COST_SETTLE_REFUND("951003","租车费用退还操作失败"),
 
     ACCOUT_RENTER_STOP_DETAIL("871001","租客停运费用操作失败"),
 
@@ -32,7 +33,8 @@ public enum ErrorCode {
     PLATFORM_SETTLE_SUBSIDY_AND_PROFIT("871001","结算平台费用出错"),
 
     CASHIER_REFUND_APPLY("981001","退款申请出错"),
-    CASHIER_PAY_CALL_BACK_FAIL("981003","支付系统回调操作失败"),
+    CASHIER_PAY_CALL_BACK_FAIL("981003","支付系统支付回调操作失败"),
+    CASHIER_PAY_REFUND_CALL_BACK_FAIL("981003","支付系统退款回调操作失败"),
 
 
     ORDER_RENTER_ORDERNO_CREATE_ERROR("600001","订单编码创建异常"),

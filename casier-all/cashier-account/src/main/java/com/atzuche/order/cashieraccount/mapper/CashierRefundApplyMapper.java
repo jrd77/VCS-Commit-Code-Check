@@ -2,6 +2,8 @@ package com.atzuche.order.cashieraccount.mapper;
 
 import com.atzuche.order.cashieraccount.entity.CashierRefundApplyEntity;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
 import java.util.List;
 
 /**
@@ -15,10 +17,10 @@ public interface CashierRefundApplyMapper{
 
     CashierRefundApplyEntity selectByPrimaryKey(Integer id);
 
-    List<CashierRefundApplyEntity> selectALL();
-
     int insert(CashierRefundApplyEntity record);
     
     int updateByPrimaryKeySelective(CashierRefundApplyEntity record);
+
+    CashierRefundApplyEntity selectRefundByQn(@Param("menNo") String menNo, @Param("orderNo")String orderNo, @Param("qn")String qn);
 
 }

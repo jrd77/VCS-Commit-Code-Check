@@ -255,4 +255,18 @@
 		order by id desc
 		limit 1
 	</select>
+	
+	<select id="getRenterOrderByRenterOrderNo" resultMap="BaseResultMap">
+		select <include refid="Base_Column_List" /> from renter_order where renter_order_no = #{renterOrderNo}
+		and is_cancle = 0
+		and is_delete = 0
+		order by id desc
+		limit 1
+	</select>
+	
+	<update id="updateRenterOrderEffective" parameterType="com.atzuche.order.renterorder.entity.RenterOrderEntity">
+		update renter_order set is_effective = #{effectiveFlag}
+		where id = #{id}
+	</update>
+	
 </mapper>

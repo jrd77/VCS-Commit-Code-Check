@@ -15,6 +15,7 @@
         <result property="sourceCode" column="source_code"/>
         <result property="sourceDetail" column="source_detail"/>
         <result property="transTime" column="trans_time"/>
+        <result property="uniqueNo" column="unique_no"/>
         <result property="time" column="time"/>
         <result property="createTime" column="create_time"/>
         <result property="createOp" column="create_op"/>
@@ -36,6 +37,7 @@
 	`source_code`, 	
 	`source_detail`, 	
 	`trans_time`, 	
+	`unique_no`, 	
 	`time`, 	
 	`create_time`, 	
 	`create_op`, 	
@@ -64,6 +66,7 @@
 				`source_code`,		
 				`source_detail`,		
 				`trans_time`,		
+				`unique_no`,		
 				`time`,		
 				`create_time`,		
 				`create_op`,		
@@ -84,6 +87,7 @@
 				#{sourceCode}, 		
 				#{sourceDetail}, 		
 				#{transTime}, 		
+				#{uniqueNo}, 		
 				#{time}, 		
 				#{createTime}, 		
 				#{createOp}, 		

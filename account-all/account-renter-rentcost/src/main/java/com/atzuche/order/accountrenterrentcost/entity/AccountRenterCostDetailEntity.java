@@ -9,7 +9,7 @@ import lombok.Data;
  * 租车费用资金进出明细表
  * 
  * @author ZhangBin
- * @date 2019-12-25 14:07:25
+ * @date 2019-12-25 20:37:23
  * @Description:
  */
 @Data
@@ -60,6 +60,10 @@ public class AccountRenterCostDetailEntity implements Serializable {
 	 * 交易时间
 	 */
 	private LocalDateTime transTime;
+	/**
+	 * 唯一标识
+	 */
+	private String uniqueNo;
 	/**
 	 * 入账时间
 	 */

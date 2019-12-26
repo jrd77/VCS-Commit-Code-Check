@@ -50,6 +50,10 @@ public class AccountRenterCostDetailReqVO {
      * 交易时间
      */
     private LocalDateTime transTime;
+    /**
+     * 唯一标识
+     */
+    private String uniqueNo;
 
     /**
      * 创建人

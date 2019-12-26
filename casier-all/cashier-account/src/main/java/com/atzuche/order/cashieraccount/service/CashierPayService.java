@@ -43,7 +43,7 @@ public class CashierPayService{
 
 
     /**
-     * 支付系统回调
+     * 支付系统回调（支付回调，退款回调到时一个）
      * MQ 异步回调
      */
     @Async
@@ -57,26 +57,22 @@ public class CashierPayService{
                 //1 退款
                 if(DataPayTypeConstant.PUR_RETURN.equals(orderPayAsynVO.getPayType())){
                     cashierService.refundCallBackSuccess(orderPayAsynVO);
-                    t.setStatus(Transaction.SUCCESS);
-                    return;
                 }
                 //2支付成功回调
                 if(DataPayTypeConstant.PAY_PUR.equals(orderPayAsynVO.getPayType()) || DataPayTypeConstant.PAY_PRE.equals(orderPayAsynVO.getPayType())){
                     cashierService.payOrderCallBackSuccess(orderPayAsynVO);
-                    t.setStatus(Transaction.SUCCESS);
-                    return;
                 }
-                //3 更新rabbitMQ 记录已消费
-                rabbitMsgLogService.updateConsume(orderPayAsynVO.getPayType(),orderPayAsynVO.getQn());
             }
+            //3 更新rabbitMQ 记录已消费
+            rabbitMsgLogService.updateConsume(orderPayAsynVO.getPayType(),orderPayAsynVO.getQn());
             t.setStatus(Transaction.SUCCESS);
-            log.info("OrderPayCallBack payCallBackAsyn start end;[{}]", GsonUtils.toJson(orderPayAsynVO));
         } catch (Exception e) {
             log.info("OrderPayCallBack payCallBackAsyn start param;[{}]", GsonUtils.toJson(orderPayAsynVO));
             t.setStatus(e);
             Cat.logError("异步处理支付系统回调 失败",e);
             throw new OrderPayCallBackAsnyException();
         } finally {
+            log.info("OrderPayCallBack payCallBackAsyn start end;[{}]", GsonUtils.toJson(orderPayAsynVO));
             t.complete();
         }
     }
@@ -91,23 +87,11 @@ public class CashierPayService{
         //1校验
         Assert.notNull(orderPaySign, ErrorCode.PARAMETER_ERROR.getText());
         orderPaySign.check();
+        //TODO
         return null;
     }
 
-    /**
-     * 车俩押金支付成功回调
-     */
-    @Transactional(rollbackFor=Exception.class)
-    public void updateRenterDeposit(PayedOrderRenterDepositReqVO payedOrderRenterDeposit){
 
-    }
-
-    /**
-     * 支付成功后记录 实付违章押金信息 和违章押金资金进出信息
-     */
-    @Transactional(rollbackFor=Exception.class)
-    public void updateRenterWZDeposit(PayedOrderRenterWZDepositReqVO payedOrderWZRenterDeposit){
-    }
 
 }
 

@@ -3,13 +3,18 @@ package com.atzuche.order.renterorder.service;
 import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.constant.OrderConstant;
 import com.atzuche.order.commons.enums.CouponTypeEnum;
+import com.atzuche.order.commons.entity.dto.GetReturnCarCostReqDto;
 import com.atzuche.order.rentercost.entity.RenterOrderCostDetailEntity;
+import com.atzuche.order.rentercost.entity.RenterOrderSubsidyDetailEntity;
+import com.atzuche.order.rentercost.entity.dto.GetReturnCostDTO;
+import com.atzuche.order.rentercost.entity.dto.GetReturnOverCostDTO;
 import com.atzuche.order.rentercost.service.RenterOrderCostCombineService;
 import com.atzuche.order.renterorder.dto.coupon.OrderCouponDTO;
 import com.atzuche.order.renterorder.dto.coupon.owner.OwnerCouponGetAndValidReqDTO;
 import com.atzuche.order.renterorder.dto.coupon.owner.OwnerCouponGetAndValidResultDTO;
 import com.atzuche.order.renterorder.dto.coupon.owner.OwnerDiscountCouponDTO;
 import com.atzuche.order.renterorder.dto.coupon.platform.MemAvailCouponRequestDTO;
+import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.atzuche.order.renterorder.entity.dto.RenterOrderCostReqDTO;
 import com.atzuche.order.renterorder.entity.dto.RenterOrderCostRespDTO;
 import com.autoyol.commons.web.ErrorCode;
@@ -20,6 +25,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cglib.beans.BeanCopier;
+import com.atzuche.order.renterorder.mapper.RenterOrderMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -41,6 +47,9 @@ public class RenterOrderCalCostService {
     private static final Logger LOGGER = LoggerFactory.getLogger(RenterOrderCalCostService.class);
 
     @Resource
+    private RenterOrderMapper renterOrderMapper;
+
+    @Resource
     private RenterOrderCostCombineService renterOrderCostCombineService;
 
     @Resource
@@ -50,8 +59,10 @@ public class RenterOrderCalCostService {
     private PlatformCouponService platformCouponService;
 
 
+
+
     /**
-     * 获取费用项和费用明细列表+落库
+     * 获取费用项和费用明细列表
      *
      * @author ZhangBin
      * @date 2019/12/24 15:21
@@ -59,6 +70,7 @@ public class RenterOrderCalCostService {
     public RenterOrderCostRespDTO getRenterOrderCostAndDeailList(RenterOrderCostReqDTO renterOrderCostReqDTO) {
         RenterOrderCostRespDTO renterOrderCostRespDTO = new RenterOrderCostRespDTO();
         List<RenterOrderCostDetailEntity> detailList = new ArrayList<>();
+        List<RenterOrderSubsidyDetailEntity> subsidyList = new ArrayList<>();
 
         //获取租金
         List<RenterOrderCostDetailEntity> renterOrderCostDetailEntities = renterOrderCostCombineService.listRentAmtEntity(renterOrderCostReqDTO.getRentAmtDTO());
@@ -67,38 +79,48 @@ public class RenterOrderCalCostService {
 
         //获取平台保障费
         RenterOrderCostDetailEntity insurAmtEntity = renterOrderCostCombineService.getInsurAmtEntity(renterOrderCostReqDTO.getInsurAmtDTO());
-        int insurAmt = insurAmtEntity.getTotalAmount();
+        Integer insurAmt = insurAmtEntity.getTotalAmount();
         renterOrderCostRespDTO.setBasicEnsureAmount(insurAmt);
         detailList.add(insurAmtEntity);
 
         //获取全面保障费
         List<RenterOrderCostDetailEntity> comprehensiveEnsureList = renterOrderCostCombineService.listAbatementAmtEntity(renterOrderCostReqDTO.getAbatementAmtDTO());
-        int comprehensiveEnsureAmount = comprehensiveEnsureList.stream().collect(Collectors.summingInt(RenterOrderCostDetailEntity::getTotalAmount));
+        Integer comprehensiveEnsureAmount = comprehensiveEnsureList.stream().collect(Collectors.summingInt(RenterOrderCostDetailEntity::getTotalAmount));
         renterOrderCostRespDTO.setComprehensiveEnsureAmount(comprehensiveEnsureAmount);
         detailList.addAll(comprehensiveEnsureList);
 
-
         //获取附加驾驶人费用
         RenterOrderCostDetailEntity extraDriverInsureAmtEntity = renterOrderCostCombineService.getExtraDriverInsureAmtEntity(renterOrderCostReqDTO.getExtraDriverDTO());
-        int totalAmount = extraDriverInsureAmtEntity.getTotalAmount();
+        Integer totalAmount = extraDriverInsureAmtEntity.getTotalAmount();
         renterOrderCostRespDTO.setAdditionalDrivingEnsureAmount(totalAmount);
         detailList.add(extraDriverInsureAmtEntity);
 
-        //获取取还车费用 TODO
-
-        //获取取还车超运能费用 TODO
-
         //获取平台手续费
         RenterOrderCostDetailEntity serviceChargeFeeEntity = renterOrderCostCombineService.getServiceChargeFeeEntity(renterOrderCostReqDTO.getCostBaseDTO());
-        int serviceAmount = serviceChargeFeeEntity.getTotalAmount();
+        Integer serviceAmount = serviceChargeFeeEntity.getTotalAmount();
         renterOrderCostRespDTO.setCommissionAmount(serviceAmount);
         detailList.add(serviceChargeFeeEntity);
 
+        //获取取还车费用
+        GetReturnCarCostReqDto getReturnCarCostReqDto = renterOrderCostReqDTO.getGetReturnCarCostReqDto();
+        getReturnCarCostReqDto.setSumJudgeFreeFee(rentAmt + insurAmt + serviceAmount);
+        GetReturnCostDTO returnCarCost = renterOrderCostCombineService.getReturnCarCost(getReturnCarCostReqDto);
+        Integer getReturnAmt = returnCarCost.getRenterOrderCostDetailEntityList().stream().collect(Collectors.summingInt(RenterOrderCostDetailEntity::getTotalAmount));
+        detailList.addAll(returnCarCost.getRenterOrderCostDetailEntityList());
+        List<RenterOrderSubsidyDetailEntity> renterOrderSubsidyDetailEntityList = returnCarCost.getRenterOrderSubsidyDetailEntityList();
+        subsidyList.addAll(renterOrderSubsidyDetailEntityList);
+
+        //获取取还车超运能费用
+        GetReturnOverCostDTO getReturnOverCost = renterOrderCostCombineService.getGetReturnOverCost(renterOrderCostReqDTO.getGetReturnCarOverCostReqDto());
+        List<RenterOrderCostDetailEntity> renterOrderCostDetailEntityList = getReturnOverCost.getRenterOrderCostDetailEntityList();
+        detailList.addAll(renterOrderCostDetailEntityList);
+
         //租车费用 = 租金+平台保障费+全面保障费+取还车费用+取还车超云能费用+附加驾驶员费用+手续费；
-        int rentCarAmount = rentAmt + insurAmt + comprehensiveEnsureAmount + totalAmount + serviceAmount;
+        int rentCarAmount = rentAmt + insurAmt + comprehensiveEnsureAmount + getReturnAmt + 0 + totalAmount + serviceAmount;
 
         renterOrderCostRespDTO.setRentCarAmount(rentCarAmount);
         renterOrderCostRespDTO.setRenterOrderCostDetailDTOList(detailList);
+        LOGGER.info("获取费用项和费用明细列表 renterOrderCostRespDTO:[{}]", JSON.toJSONString(renterOrderCostRespDTO));
         return renterOrderCostRespDTO;
     }
 
