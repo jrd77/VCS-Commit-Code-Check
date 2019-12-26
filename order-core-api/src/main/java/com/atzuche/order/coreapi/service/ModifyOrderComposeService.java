@@ -40,7 +40,7 @@ public class ModifyOrderComposeService {
 	 * @param carPriceOfDayList
 	 * @return RentAmtResultBO
 	 */
-	public RentAmtResultBO getRentAmtFeeResult(Long orderNo, Integer configHours, LocalDateTime updateRentTime, LocalDateTime updateRevertTime, List<CarPriceOfDay> carPriceOfDayList) {
+	public RentAmtResultBO getRentAmtFeeResult(String orderNo, Integer configHours, LocalDateTime updateRentTime, LocalDateTime updateRevertTime, List<CarPriceOfDay> carPriceOfDayList) {
 		List<RenterGoodsPriceBO> listRenterOrderPrice = listRenterOrderPrice(orderNo);
 		if (listRenterOrderPrice == null || listRenterOrderPrice.isEmpty()) {
 			return null;
@@ -92,7 +92,7 @@ public class ModifyOrderComposeService {
 	 * @param orderNo 车主订单号
 	 * @return List<RenterGoodsPriceBO>
 	 */
-	public List<RenterGoodsPriceBO> listRenterOrderPrice(Long orderNo) {
+	public List<RenterGoodsPriceBO> listRenterOrderPrice(String orderNo) {
 		// 获取已同意的租客子单
 		List<RenterOrderEntity> renterOrderList = renterOrderService.listAgreeRenterOrderByOrderNo(orderNo);
 		if (renterOrderList == null || renterOrderList.isEmpty()) {
@@ -101,10 +101,10 @@ public class ModifyOrderComposeService {
 		// 最后一条索引
 		Integer lastIndex = renterOrderList.size() - 1;
 		// 最后一条起租时间
-		LocalDateTime lastRentTime = renterOrderList.get(lastIndex).getExpRentStartTime();
+		LocalDateTime lastRentTime = renterOrderList.get(lastIndex).getExpRentTime();
 		List<RenterOrderEntity> renterOrderAfterList = new ArrayList<RenterOrderEntity>();
 		for (int i=lastIndex; i>=0; i--) {
-			LocalDateTime expRentStartTime = renterOrderList.get(i).getExpRentStartTime();
+			LocalDateTime expRentStartTime = renterOrderList.get(i).getExpRentTime();
 			if (lastRentTime != null && expRentStartTime != null && !lastRentTime.isEqual(expRentStartTime)) {
 				break;
 			}
@@ -115,10 +115,10 @@ public class ModifyOrderComposeService {
 		List<RenterOrderEntity> renterOrderThenList = new ArrayList<RenterOrderEntity>();
 		for (int i=0; i<renterOrderAfterList.size(); i++) {
 			curRenterOrderEntity = renterOrderAfterList.get(i);
-			LocalDateTime lastStartTime = lastRenterOrderEntity.getExpRentStartTime();
-			LocalDateTime lastEndTime = lastRenterOrderEntity.getExpRentEndTime();
-			LocalDateTime curStartTime = curRenterOrderEntity.getExpRentStartTime();
-			LocalDateTime curEndTime = curRenterOrderEntity.getExpRentEndTime();
+			LocalDateTime lastStartTime = lastRenterOrderEntity.getExpRentTime();
+			LocalDateTime lastEndTime = lastRenterOrderEntity.getExpRevertTime();
+			LocalDateTime curStartTime = curRenterOrderEntity.getExpRentTime();
+			LocalDateTime curEndTime = curRenterOrderEntity.getExpRevertTime();
 			// 顺便做了一个去重
             if ((i > 0 && curStartTime.isEqual(lastStartTime) && curEndTime.isEqual(lastEndTime))
                     || curEndTime.isAfter(lastEndTime)) {
@@ -150,8 +150,8 @@ public class ModifyOrderComposeService {
 		}
 		RenterGoodsPriceBO renterGoodsPriceBO = new RenterGoodsPriceBO();
 		renterGoodsPriceBO.setId(renterOrder.getId());
-		renterGoodsPriceBO.setExpRentStartTime(renterOrder.getExpRentStartTime());
-		renterGoodsPriceBO.setExpRentEndTime(renterOrder.getExpRentEndTime());
+		renterGoodsPriceBO.setExpRentStartTime(renterOrder.getExpRentTime());
+		renterGoodsPriceBO.setExpRentEndTime(renterOrder.getExpRevertTime());
 		renterGoodsPriceBO.setOrderNo(renterOrder.getOrderNo());
 		renterGoodsPriceBO.setRenterOrderNo(renterOrder.getRenterOrderNo());
 		if (renterGoodsPriceAllList == null || renterGoodsPriceAllList.isEmpty()) {

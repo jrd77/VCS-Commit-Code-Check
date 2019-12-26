@@ -7,14 +7,18 @@
         <result property="id" column="id"/>
         <result property="orderNo" column="order_no"/>
         <result property="ownerOrderNo" column="owner_order_no"/>
-        <result property="expRentStartTime" column="exp_rent_start_time"/>
-        <result property="expRentEndTime" column="exp_rent_end_time"/>
-        <result property="actRentStartTime" column="act_rent_start_time"/>
-        <result property="actRentEndTime" column="act_rent_end_time"/>
+        <result property="memNo" column="mem_no"/>
+        <result property="showRentTime" column="show_rent_time"/>
+        <result property="showRevertTime" column="show_revert_time"/>
+        <result property="expRentTime" column="exp_rent_time"/>
+        <result property="expRevertTime" column="exp_revert_time"/>
+        <result property="actRentTime" column="act_rent_time"/>
+        <result property="actRevertTime" column="act_revert_time"/>
         <result property="goodsCode" column="goods_code"/>
         <result property="goodsType" column="goods_type"/>
         <result property="childStatus" column="child_status"/>
         <result property="isCancle" column="is_cancle"/>
+        <result property="isUseSpecialPrice" column="is_use_special_price"/>
         <result property="cancleReason" column="cancle_reason"/>
         <result property="cancleOp" column="cancle_op"/>
         <result property="createTime" column="create_time"/>
@@ -25,172 +29,197 @@
     </resultMap>
 
 
-	<sql id="Base_Column_List">
+    <sql id="Base_Column_List">
 	`id`, 	
 	`order_no`, 	
 	`owner_order_no`, 	
-	`exp_rent_start_time`, 	
-	`exp_rent_end_time`, 	
-	`act_rent_start_time`, 	
-	`act_rent_end_time`, 	
-	`goods_code`, 	
-	`goods_type`, 	
-	`child_status`, 	
-	`is_cancle`, 	
-	`cancle_reason`, 	
-	`cancle_op`, 	
-	`create_time`, 	
-	`create_op`, 	
-	`update_time`, 	
-	`update_op`, 	
-	`is_delete`	
+	`mem_no`,
+	`show_rent_time`,
+	`show_revert_time`,
+	`exp_rent_time`,
+	`exp_revert_time`,
+	`act_rent_time`,
+	`act_revert_time`,
+	`goods_code`,
+	`goods_type`,
+	`child_status`,
+	`is_cancle`,
+	`is_use_special_price`,
+	`cancle_reason`,
+	`cancle_op`,
+	`create_time`,
+	`create_op`,
+	`update_time`,
+	`update_op`,
+	`is_delete`
 
 	</sql>
 
 
-	<select id="selectByPrimaryKey" resultMap="BaseResultMap">
-		select <include refid="Base_Column_List" /> from owner_order where id = #{value}
-	</select>
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List" /> from owner_order where id = #{value}
+    </select>
 
-	<select id="selectALL" resultMap="BaseResultMap">
-		select  <include refid="Base_Column_List" /> from owner_order order by id desc
-	</select>
+    <insert id="insert" parameterType="com.atzuche.order.entity.OwnerOrderEntity" useGeneratedKeys="true" keyProperty="id">
+        insert into owner_order
+        (
+        `order_no`,
+        `owner_order_no`,
+        `mem_no`,
+        `show_rent_time`,
+        `show_revert_time`,
+        `exp_rent_time`,
+        `exp_revert_time`,
+        `act_rent_time`,
+        `act_revert_time`,
+        `goods_code`,
+        `goods_type`,
+        `child_status`,
+        `is_cancle`,
+        `is_use_special_price`,
+        `cancle_reason`,
+        `cancle_op`,
+        `create_op`,
+        `update_op`,
+        `is_delete`
+        )
+        values
+        (
+        #{orderNo},
+        #{ownerOrderNo},
+        #{memNo},
+        #{showRentTime},
+        #{showRevertTime},
+        #{expRentTime},
+        #{expRevertTime},
+        #{actRentTime},
+        #{actRevertTime},
+        #{goodsCode},
+        #{goodsType},
+        #{childStatus},
+        #{isCancle},
+        #{isUseSpecialPrice},
+        #{cancleReason},
+        #{cancleOp},
+        #{createOp},
+        #{updateOp},
+        #{isDelete}
+        )
+    </insert>
 
-	 
-	<insert id="insert" parameterType="com.atzuche.order.entity.OwnerOrderEntity" useGeneratedKeys="true" keyProperty="id">
-		insert into owner_order
-		(
-				`order_no`,		
-				`owner_order_no`,		
-				`exp_rent_start_time`,		
-				`exp_rent_end_time`,		
-				`act_rent_start_time`,		
-				`act_rent_end_time`,		
-				`goods_code`,		
-				`goods_type`,		
-				`child_status`,		
-				`is_cancle`,		
-				`cancle_reason`,		
-				`cancle_op`,		
-				`create_time`,		
-				`create_op`,		
-				`update_time`,		
-				`update_op`,		
-				`is_delete`		
-			)
-		values
-		(
-				#{orderNo}, 		
-				#{ownerOrderNo}, 		
-				#{expRentStartTime}, 		
-				#{expRentEndTime}, 		
-				#{actRentStartTime}, 		
-				#{actRentEndTime}, 		
-				#{goodsCode}, 		
-				#{goodsType}, 		
-				#{childStatus}, 		
-				#{isCancle}, 		
-				#{cancleReason}, 		
-				#{cancleOp}, 		
-				#{createTime}, 		
-				#{createOp}, 		
-				#{updateTime}, 		
-				#{updateOp}, 		
-				#{isDelete}		
-			)
-	</insert>
-	
-	<insert id="insertSelective" parameterType="com.atzuche.order.entity.OwnerOrderEntity" useGeneratedKeys="true" keyProperty="id">
-		insert into owner_order
-		(
-				<if test="orderNo != null">`order_no`, </if>
-				<if test="ownerOrderNo != null">`owner_order_no`, </if>
-				<if test="expRentStartTime != null">`exp_rent_start_time`, </if>
-				<if test="expRentEndTime != null">`exp_rent_end_time`, </if>
-				<if test="actRentStartTime != null">`act_rent_start_time`, </if>
-				<if test="actRentEndTime != null">`act_rent_end_time`, </if>
-				<if test="goodsCode != null">`goods_code`, </if>
-				<if test="goodsType != null">`goods_type`, </if>
-				<if test="childStatus != null">`child_status`, </if>
-				<if test="isCancle != null">`is_cancle`, </if>
-				<if test="cancleReason != null">`cancle_reason`, </if>
-				<if test="cancleOp != null">`cancle_op`, </if>
-				<if test="createTime != null">`create_time`, </if>
-				<if test="createOp != null">`create_op`, </if>
-				<if test="updateTime != null">`update_time`, </if>
-				<if test="updateOp != null">`update_op`, </if>
-				<if test="isDelete != null">`is_delete` </if>
-			)
-		values
-		(
-				<if test="orderNo != null">#{orderNo},  </if>
-				<if test="ownerOrderNo != null">#{ownerOrderNo},  </if>
-				<if test="expRentStartTime != null">#{expRentStartTime},  </if>
-				<if test="expRentEndTime != null">#{expRentEndTime},  </if>
-				<if test="actRentStartTime != null">#{actRentStartTime},  </if>
-				<if test="actRentEndTime != null">#{actRentEndTime},  </if>
-				<if test="goodsCode != null">#{goodsCode},  </if>
-				<if test="goodsType != null">#{goodsType},  </if>
-				<if test="childStatus != null">#{childStatus},  </if>
-				<if test="isCancle != null">#{isCancle},  </if>
-				<if test="cancleReason != null">#{cancleReason},  </if>
-				<if test="cancleOp != null">#{cancleOp},  </if>
-				<if test="createTime != null">#{createTime},  </if>
-				<if test="createOp != null">#{createOp},  </if>
-				<if test="updateTime != null">#{updateTime},  </if>
-				<if test="updateOp != null">#{updateOp},  </if>
-				<if test="isDelete != null">#{isDelete} </if>
-			)
-	</insert>
-	
-	 
-	<update id="updateByPrimaryKeySelective" parameterType="com.atzuche.order.entity.OwnerOrderEntity">
-		update owner_order 
-		<set>
-				<if test="orderNo != null">`order_no` = #{orderNo}, </if>
-				<if test="ownerOrderNo != null">`owner_order_no` = #{ownerOrderNo}, </if>
-				<if test="expRentStartTime != null">`exp_rent_start_time` = #{expRentStartTime}, </if>
-				<if test="expRentEndTime != null">`exp_rent_end_time` = #{expRentEndTime}, </if>
-				<if test="actRentStartTime != null">`act_rent_start_time` = #{actRentStartTime}, </if>
-				<if test="actRentEndTime != null">`act_rent_end_time` = #{actRentEndTime}, </if>
-				<if test="goodsCode != null">`goods_code` = #{goodsCode}, </if>
-				<if test="goodsType != null">`goods_type` = #{goodsType}, </if>
-				<if test="childStatus != null">`child_status` = #{childStatus}, </if>
-				<if test="isCancle != null">`is_cancle` = #{isCancle}, </if>
-				<if test="cancleReason != null">`cancle_reason` = #{cancleReason}, </if>
-				<if test="cancleOp != null">`cancle_op` = #{cancleOp}, </if>
-				<if test="createTime != null">`create_time` = #{createTime}, </if>
-				<if test="createOp != null">`create_op` = #{createOp}, </if>
-				<if test="updateTime != null">`update_time` = #{updateTime}, </if>
-				<if test="updateOp != null">`update_op` = #{updateOp}, </if>
-				<if test="isDelete != null">`is_delete` = #{isDelete}</if>
-			</set>
-		where id = #{id}
-	</update>
-	
-	<update id="updateByPrimaryKey" parameterType="com.atzuche.order.entity.OwnerOrderEntity">
-		update owner_order 
-		<set>
-				`order_no` = #{orderNo}, 		
-				`owner_order_no` = #{ownerOrderNo}, 		
-				`exp_rent_start_time` = #{expRentStartTime}, 		
-				`exp_rent_end_time` = #{expRentEndTime}, 		
-				`act_rent_start_time` = #{actRentStartTime}, 		
-				`act_rent_end_time` = #{actRentEndTime}, 		
-				`goods_code` = #{goodsCode}, 		
-				`goods_type` = #{goodsType}, 		
-				`child_status` = #{childStatus}, 		
-				`is_cancle` = #{isCancle}, 		
-				`cancle_reason` = #{cancleReason}, 		
-				`cancle_op` = #{cancleOp}, 		
-				`create_time` = #{createTime}, 		
-				`create_op` = #{createOp}, 		
-				`update_time` = #{updateTime}, 		
-				`update_op` = #{updateOp}, 		
-				`is_delete` = #{isDelete}		
-	
-		</set>
-		where id = #{id}
-	</update>
-  	
+    <insert id="insertSelective" parameterType="com.atzuche.order.entity.OwnerOrderEntity" useGeneratedKeys="true" keyProperty="id">
+        insert into owner_order
+        (
+        <if test="orderNo != null">`order_no`, </if>
+        <if test="ownerOrderNo != null">`owner_order_no`, </if>
+        <if test="memNo != null">`mem_no`, </if>
+        <if test="showRentTime != null">`show_rent_time`, </if>
+        <if test="showRevertTime != null">`show_revert_time`, </if>
+        <if test="expRentTime != null">`exp_rent_time`, </if>
+        <if test="expRevertTime != null">`exp_revert_time`, </if>
+        <if test="actRentTime != null">`act_rent_time`, </if>
+        <if test="actRevertTime != null">`act_revert_time`, </if>
+        <if test="goodsCode != null">`goods_code`, </if>
+        <if test="goodsType != null">`goods_type`, </if>
+        <if test="childStatus != null">`child_status`, </if>
+        <if test="isCancle != null">`is_cancle`, </if>
+        <if test="isUseSpecialPrice != null">`is_use_special_price`, </if>
+        <if test="cancleReason != null">`cancle_reason`, </if>
+        <if test="cancleOp != null">`cancle_op`, </if>
+        <if test="createOp != null">`create_op`, </if>
+        <if test="updateOp != null">`update_op`, </if>
+        <if test="isDelete != null">`is_delete` </if>
+        )
+        values
+        (
+        <if test="orderNo != null">#{orderNo},  </if>
+        <if test="ownerOrderNo != null">#{ownerOrderNo},  </if>
+        <if test="memNo != null">#{memNo},  </if>
+        <if test="showRentTime != null">#{showRentTime},  </if>
+        <if test="showRevertTime != null">#{showRevertTime},  </if>
+        <if test="expRentTime != null">#{expRentTime},  </if>
+        <if test="expRevertTime != null">#{expRevertTime},  </if>
+        <if test="actRentTime != null">#{actRentTime},  </if>
+        <if test="actRevertTime != null">#{actRevertTime},  </if>
+        <if test="goodsCode != null">#{goodsCode},  </if>
+        <if test="goodsType != null">#{goodsType},  </if>
+        <if test="childStatus != null">#{childStatus},  </if>
+        <if test="isCancle != null">#{isCancle},  </if>
+        <if test="isUseSpecialPrice != null">#{isUseSpecialPrice},  </if>
+        <if test="cancleReason != null">#{cancleReason},  </if>
+        <if test="cancleOp != null">#{cancleOp},  </if>
+        <if test="createOp != null">#{createOp},  </if>
+        <if test="updateOp != null">#{updateOp},  </if>
+        <if test="isDelete != null">#{isDelete} </if>
+        )
+    </insert>
+
+
+    <update id="updateByPrimaryKeySelective" parameterType="com.atzuche.order.entity.OwnerOrderEntity">
+        update owner_order
+        <set>
+            <if test="orderNo != null">`order_no` = #{orderNo}, </if>
+            <if test="ownerOrderNo != null">`owner_order_no` = #{ownerOrderNo}, </if>
+            <if test="memNo != null">`mem_no` = #{memNo}, </if>
+            <if test="showRentTime != null">`show_rent_time` = #{showRentTime}, </if>
+            <if test="showRevertTime != null">`show_revert_time` = #{showRevertTime}, </if>
+            <if test="expRentTime != null">`exp_rent_time` = #{expRentTime}, </if>
+            <if test="expRevertTime != null">`exp_revert_time` = #{expRevertTime}, </if>
+            <if test="actRentTime != null">`act_rent_time` = #{actRentTime}, </if>
+            <if test="actRevertTime != null">`act_revert_time` = #{actRevertTime}, </if>
+            <if test="goodsCode != null">`goods_code` = #{goodsCode}, </if>
+            <if test="goodsType != null">`goods_type` = #{goodsType}, </if>
+            <if test="childStatus != null">`child_status` = #{childStatus}, </if>
+            <if test="isCancle != null">`is_cancle` = #{isCancle}, </if>
+            <if test="isUseSpecialPrice != null">`is_use_special_price` = #{isUseSpecialPrice}, </if>
+            <if test="cancleReason != null">`cancle_reason` = #{cancleReason}, </if>
+            <if test="cancleOp != null">`cancle_op` = #{cancleOp}, </if>
+            <if test="createOp != null">`create_op` = #{createOp}, </if>
+            <if test="updateOp != null">`update_op` = #{updateOp}, </if>
+            <if test="isDelete != null">`is_delete` = #{isDelete}</if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <update id="updateByPrimaryKey" parameterType="com.atzuche.order.entity.OwnerOrderEntity">
+        update owner_order
+        <set>
+            `order_no` = #{orderNo},
+            `owner_order_no` = #{ownerOrderNo},
+            `mem_no` = #{memNo},
+            `show_rent_time` = #{showRentTime},
+            `show_revert_time` = #{showRevertTime},
+            `exp_rent_time` = #{expRentTime},
+            `exp_revert_time` = #{expRevertTime},
+            `act_rent_time` = #{actRentTime},
+            `act_revert_time` = #{actRevertTime},
+            `goods_code` = #{goodsCode},
+            `goods_type` = #{goodsType},
+            `child_status` = #{childStatus},
+            `is_cancle` = #{isCancle},
+            `is_use_special_price` = #{isUseSpecialPrice},
+            `cancle_reason` = #{cancleReason},
+            `cancle_op` = #{cancleOp},
+            `create_op` = #{createOp},
+            `update_op` = #{updateOp},
+            `is_delete` = #{isDelete}
+
+        </set>
+        where id = #{id}
+    </update>
+
+	<select id="getOwnerOrderByOrderNoAndIsEffective" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List" /> from owner_order where order_no = #{orderNo}
+		and is_effective = 1
+		and is_cancle = 0
+		and is_delete = 0
+		order by id desc
+		limit 1
+    </select>
+    
+    <update id="updateOwnerOrderInvalidById">
+    	update owner_order set is_effective = 0
+    	where id = #{id}
+    </update>
+
 </mapper>

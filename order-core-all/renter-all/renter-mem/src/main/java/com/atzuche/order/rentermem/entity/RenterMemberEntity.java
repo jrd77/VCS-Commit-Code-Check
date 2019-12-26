@@ -1,6 +1,4 @@
 package com.atzuche.order.rentermem.entity;
-import java.util.List;
-import com.atzuche.order.rentermem.entity.RenterMemberEntity;
 
 import java.io.Serializable;
 import java.time.LocalDate;
@@ -12,13 +10,13 @@ import lombok.Data;
  * 租客端会员概览表
  * 
  * @author ZhangBin
- * @date 2019-12-18 16:15:16
+ * @date 2019-12-25 11:20:00
  * @Description:
  */
 @Data
 public class RenterMemberEntity implements Serializable {
-
 	private static final long serialVersionUID = 1L;
+	
 	/**
 	 * 
 	 */
@@ -60,6 +58,30 @@ public class RenterMemberEntity implements Serializable {
 	 */
 	private Integer orderSuccessCount;
 	/**
+	 * 是否可以租车：1：可租，0：不可租
+	 */
+	private Integer rentFlag;
+	/**
+	 * 姓
+	 */
+	private String firstName;
+	/**
+	 * 性别(1:男、2：女)
+	 */
+	private Integer gender;
+	/**
+	 * 身份证认证 0：未上传，1：已上传，2：已认证，3：认证不通过, 4:无效数据
+	 */
+	private Integer idCardAuth;
+	/**
+	 * 驾照认证 0：未上传，1：已上传，2：已认证，3：认证不通过, 4:无效数据
+	 */
+	private Integer driLicAuth;
+	/**
+	 * 驾驶增副页 0：未上传，1：已上传，2：已认证，3：认证不通过, 4:无效数据, 5:未上传（已认证）
+	 */
+	private Integer driViceLicAuth;
+	/**
 	 * 创建时间
 	 */
 	private LocalDateTime createTime;
@@ -80,6 +102,4 @@ public class RenterMemberEntity implements Serializable {
 	 */
 	private Integer isDelete;
 
-    @org.springframework.beans.factory.annotation.Autowired
-    private com.atzuche.order.rentermem.mapper.RenterMemberMapper renterMemberMapper;
 }

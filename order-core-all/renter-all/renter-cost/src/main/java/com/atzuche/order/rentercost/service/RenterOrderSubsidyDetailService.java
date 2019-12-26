@@ -11,9 +11,6 @@ import org.springframework.stereotype.Service;
 
 /**
  * 租客补贴明细表
- *
- * @author ZhangBin
- * @date 2019-12-14 17:30:57
  */
 @Service
 public class RenterOrderSubsidyDetailService{
@@ -38,5 +35,14 @@ public class RenterOrderSubsidyDetailService{
      */
     public Integer saveRenterOrderSubsidyDetail(RenterOrderSubsidyDetailEntity renterOrderSubsidyDetailEntity) {
     	return renterOrderSubsidyDetailMapper.saveRenterOrderSubsidyDetail(renterOrderSubsidyDetailEntity);
+    }
+    
+    /**
+     * 批量保存租客补贴信息
+     * @param entityList 补贴明细列表
+     * @return Integer
+     */
+    public Integer saveRenterOrderSubsidyDetailBatch(List<RenterOrderSubsidyDetailEntity> entityList) {
+    	return renterOrderSubsidyDetailMapper.saveRenterOrderSubsidyDetailBatch(entityList);
     }
 }

@@ -19,9 +19,9 @@ public class DepositAmtDTO {
 	 */
 	private Integer internalStaff;
 	/**
-	 * 车辆指导价
+	 * 车辆残值
 	 */
-	private Integer guidPrice;
+	private Integer surplusPrice;
 	/**
 	 * 减免比例
 	 */

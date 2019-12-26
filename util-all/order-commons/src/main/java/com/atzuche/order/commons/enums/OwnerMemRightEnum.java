@@ -30,6 +30,8 @@ public enum OwnerMemRightEnum {
     OTA_MEM("5","OTA会员"),
     INSURANCE_CLIENT("6","保险公司客户")
 
+
+
     ;
     /**
      * 权益编码

@@ -9,7 +9,7 @@ import lombok.Data;
  * 租车费用资金进出明细表
  * 
  * @author ZhangBin
- * @date 2019-12-17 16:55:40
+ * @date 2019-12-25 20:37:23
  * @Description:
  */
 @Data
@@ -31,27 +31,19 @@ public class AccountRenterCostDetailEntity implements Serializable {
 	/**
 	 * 支付来源code
 	 */
-	private Integer paySourceCode;
+	private String paySourceCode;
 	/**
 	 * 支付来源
 	 */
 	private String paySource;
 	/**
-	 * 支付方式code
-	 */
-	private Integer paymentCode;
-	/**
-	 * 支付方式
-	 */
-	private String payment;
-	/**
 	 * 支付渠道code
 	 */
-	private Integer payChannelCode;
+	private String payTypeCode;
 	/**
 	 * 支付渠道
 	 */
-	private String payChannel;
+	private String payType;
 	/**
 	 * 入账金额
 	 */
@@ -59,7 +51,7 @@ public class AccountRenterCostDetailEntity implements Serializable {
 	/**
 	 * 入账来源编码
 	 */
-	private Integer sourceCode;
+	private String sourceCode;
 	/**
 	 * 入账来源编码描述
 	 */
@@ -68,6 +60,10 @@ public class AccountRenterCostDetailEntity implements Serializable {
 	 * 交易时间
 	 */
 	private LocalDateTime transTime;
+	/**
+	 * 唯一标识
+	 */
+	private String uniqueNo;
 	/**
 	 * 入账时间
 	 */

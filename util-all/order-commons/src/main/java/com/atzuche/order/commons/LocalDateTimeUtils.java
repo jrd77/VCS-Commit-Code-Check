@@ -15,7 +15,7 @@ public class LocalDateTimeUtils {
     /**
      * 默认的时间日期样式
      */
-    private static final String DEFAULT_PATTERN = "yyyy-MM-dd HH:mm:ss";
+    public static final String DEFAULT_PATTERN = "yyyy-MM-dd HH:mm:ss";
 
     /**
      * 中国时区
@@ -413,6 +413,13 @@ public class LocalDateTimeUtils {
     public static long yesterday() {
         LocalDateTime localDateTime = LocalDateTime.now().plusDays(-1);
         return localDateTime.atZone(ZONE_ID).toInstant().toEpochMilli();
+    }
+
+    public static String getNowDateLong() {
+        return formateLocalDateTimeStr(LocalDateTime.now(), GlobalConstant.DATE_TIME_FORMAT_2);
+    }
+    public static String formateLocalDateTimeStr(LocalDateTime localDateTime, DateTimeFormatter df) {
+        return localDateTime.format(df);
     }
 
     public static void main(String[] args) {

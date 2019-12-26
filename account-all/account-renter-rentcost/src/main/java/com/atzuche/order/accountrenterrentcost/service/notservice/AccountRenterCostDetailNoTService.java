@@ -22,7 +22,6 @@ public class AccountRenterCostDetailNoTService {
     @Autowired
     private AccountRenterCostDetailMapper accountRenterCostDetailMapper;
 
-
     /**
      * 费用明细落库
      * @param accountRenterCostDetailReqVO
@@ -30,6 +29,8 @@ public class AccountRenterCostDetailNoTService {
     public void insertAccountRenterCostDetail(AccountRenterCostDetailReqVO accountRenterCostDetailReqVO) {
         AccountRenterCostDetailEntity accountRenterCostDetail = new AccountRenterCostDetailEntity();
         BeanUtils.copyProperties(accountRenterCostDetailReqVO,accountRenterCostDetail);
+        accountRenterCostDetail.setSourceCode(accountRenterCostDetailReqVO.getRenterCashCodeEnum().getCashNo());
+        accountRenterCostDetail.setSourceDetail(accountRenterCostDetailReqVO.getRenterCashCodeEnum().getTxt());
         int result = accountRenterCostDetailMapper.insert(accountRenterCostDetail);
         if(result==0){
             throw new AccountRenterRentCostDetailException();

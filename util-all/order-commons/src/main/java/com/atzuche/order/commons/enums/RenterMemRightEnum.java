@@ -17,7 +17,7 @@ public enum RenterMemRightEnum {
 
     //任务
     BIND_WECHAT("T_1","绑定微信"),
-    INVITE_FRIENDS("T_2","邀请还有"),
+    INVITE_FRIENDS("T_2","邀请好友"),
     SUCCESS_RENTCAR("T_3","成功租车次数"),
     MEMBER_LEVEL("T_4","会员的等级"),
 

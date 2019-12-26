@@ -85,10 +85,6 @@ public class OwnerGoodsEntity implements Serializable {
 	 */
 	private Integer carSurplusPrice;
 	/**
-	 * 是否使用特供价 0-否，1-是
-	 */
-	private Integer carUseSpecialPrice;
-	/**
 	 * 车辆指导价
 	 */
 	private Integer carGuidePrice;
@@ -109,7 +105,7 @@ public class OwnerGoodsEntity implements Serializable {
 	 */
 	private String carImageUrl;
 	/**
-	 * 车辆类型，代管车..
+	 * 车主类型:5个人车主、10租赁公司、15其他 、20托管车辆-交易用、25托管车辆-工作用、30短期托管车、35代管车辆
 	 */
 	private Integer carOwnerType;
 	/**
