@@ -28,6 +28,7 @@ public enum RenterCashCodeEnum {
     ACCOUNT_RENTER_RENT_COST("21110006","租客租车费用"),
     ACCOUNT_RENTER_RENT_COST_REFUND("21110007","租客租车费用退还"),
 
+    ACCOUNT_WALLET_COST("51110001","个人钱包"),
 
     OWNER_RENT_INCOME("31110001","租车收益"),
     OWNER_PENALTIES_INCOME("31110002","违约金收益"),

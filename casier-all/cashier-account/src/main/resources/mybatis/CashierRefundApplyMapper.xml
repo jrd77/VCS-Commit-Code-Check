@@ -148,6 +148,9 @@
 			</set>
 		where id = #{id}
 	</update>
+    <select id="selectRefundByQn" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List" /> from cashier_refund_apply where mem_no = #{memNo} and order_no = #{orderNo} and qn = #{qn} limit 1
+    </select>
 
-  	
+
 </mapper>

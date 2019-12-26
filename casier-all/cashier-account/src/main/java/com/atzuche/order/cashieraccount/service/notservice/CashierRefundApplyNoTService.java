@@ -49,6 +49,7 @@ public class CashierRefundApplyNoTService {
      */
     public void updateRefundDepositSuccess(OrderPayAsynResVO orderPayAsynVO) {
         //1 校验
+        CashierRefundApplyEntity cashierRefundApplyEntity = cashierRefundApplyMapper.selectRefundByQn(orderPayAsynVO.getMenNo(),orderPayAsynVO.getOrderNo(),orderPayAsynVO.getQn());
         //2 回调退款是否成功
         //3 更新退款成功
         //4 成功之后push 或者 短信

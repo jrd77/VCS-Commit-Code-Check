@@ -339,10 +339,8 @@ public class CashierService {
      */
     @Transactional(rollbackFor=Exception.class)
     public void refundCallBackSuccess(OrderPayAsynResVO orderPayAsynVO) {
-        if(Objects.nonNull(orderPayAsynVO) && DataPayTypeConstant.PUR_RETURN.equals(orderPayAsynVO.getPayKind())){
-            cashierRefundApplyNoTService.updateRefundDepositSuccess(orderPayAsynVO);
-
-        }
+        cashierRefundApplyNoTService.updateRefundDepositSuccess(orderPayAsynVO);
+        //TODO 支付回调成功 push/或者短信 怎么处理
     }
 
     /**
