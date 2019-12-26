@@ -59,8 +59,6 @@ public class RenterOrderCalCostService {
     private PlatformCouponService platformCouponService;
 
 
-
-
     /**
      * 获取费用项和费用明细列表
      *
@@ -257,6 +255,9 @@ public class RenterOrderCalCostService {
 
         return request;
     }
+
+
+
 
 
 }
