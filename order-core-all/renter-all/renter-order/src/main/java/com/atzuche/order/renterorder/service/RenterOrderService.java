@@ -38,20 +38,9 @@ public class RenterOrderService {
 
 
     public void saveRenterOrderInfo() {
-
         //1.租客订单处理
 
 
-        //2.租客商品信息处理
-
-
-        //3.租客订单附件驾驶人信息处理
-
-
-        //4.租客会员信息处理
-
-
-        //5.租客会员权益信息处理
 
 
     }
