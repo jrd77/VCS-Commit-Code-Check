@@ -142,6 +142,9 @@ public class SubmitOrderService {
         String renterOrderNo = uniqueOrderNoService.getRenterOrderNo(orderNo);
         //4.2.调用租客订单模块处理租客订单相关业务
         //4.3.接收租客订单返回信息
+        //4.4.租客商品信息处理
+        //4.5.租客信息处理
+        //4.6.租客权益信息处理
 
 
         //5.创建车主子订单
