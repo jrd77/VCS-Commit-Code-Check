@@ -1,6 +1,7 @@
 package com.atzuche.order.accountrenterrentcost.service.notservice;
 
 import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostSettleEntity;
+import com.atzuche.order.accountrenterrentcost.exception.AccountRenterRentCostRefundException;
 import com.atzuche.order.accountrenterrentcost.exception.AccountRenterRentCostSettleException;
 import com.atzuche.order.accountrenterrentcost.mapper.AccountRenterCostSettleMapper;
 import com.atzuche.order.accountrenterrentcost.vo.req.AccountRenterCostReqVO;
@@ -24,6 +25,17 @@ import java.util.Objects;
 public class AccountRenterCostSettleNoTService {
     @Autowired
     private AccountRenterCostSettleMapper accountRenterCostSettleMapper;
+
+    /**
+     * 查询订单 已付租车费用
+     */
+    public AccountRenterCostSettleEntity getCostPaidRentSettle(String orderNo,String memNo) {
+        AccountRenterCostSettleEntity accountRenterCostSettle = accountRenterCostSettleMapper.selectByOrderNo(orderNo,memNo);
+        if(Objects.isNull(accountRenterCostSettle)){
+            return null;
+        }
+        return accountRenterCostSettle;
+    }
 
     /**
      * 查询订单 已付租车费用
@@ -56,6 +68,15 @@ public class AccountRenterCostSettleNoTService {
         }
         if(result==0){
             throw new AccountRenterRentCostSettleException() ;
+        }
+    }
+
+    public void refundRenterCostSettle(AccountRenterCostSettleEntity accountRenterCostSettle,int amt) {
+        int refundAmt = Objects.isNull(accountRenterCostSettle.getRefundAmt())?0:accountRenterCostSettle.getRefundAmt();
+        accountRenterCostSettle.setRentAmt(refundAmt + amt);
+        int result = accountRenterCostSettleMapper.updateByPrimaryKeySelective(accountRenterCostSettle);
+        if(result==0){
+            throw new AccountRenterRentCostRefundException();
         }
     }
 }

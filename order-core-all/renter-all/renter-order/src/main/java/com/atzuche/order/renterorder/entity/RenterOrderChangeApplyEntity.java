@@ -27,11 +27,11 @@ public class RenterOrderChangeApplyEntity implements Serializable {
 	/**
 	 * 租客子订单号
 	 */
-	private Integer renterOrderNo;
+	private String renterOrderNo;
 	/**
 	 * 车主子订单号
 	 */
-	private Integer ownerOrderNo;
+	private String ownerOrderNo;
 	/**
 	 * 是否修改起租时间 0-否，1-是
 	 */

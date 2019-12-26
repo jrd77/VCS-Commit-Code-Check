@@ -326,7 +326,7 @@ public class RenterOrderCostCombineService {
 		// TODO 押金配置列表从配置中心获取
 		List<DepositText> depositList = null;
 		CarDepositAmtVO carDepositAmtVO = RenterFeeCalculatorUtils.calCarDepositAmt(depositAmtDTO.getInternalStaff(), depositAmtDTO.getCityCode(), 
-				depositAmtDTO.getGuidPrice(), depositAmtDTO.getCarBrandTypeRadio(), depositAmtDTO.getCarYearRadio(), 
+				depositAmtDTO.getSurplusPrice(), depositAmtDTO.getCarBrandTypeRadio(), depositAmtDTO.getCarYearRadio(), 
 				depositList, depositAmtDTO.getReliefPercetage());
 		return carDepositAmtVO;
 	}

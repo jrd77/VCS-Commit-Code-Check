@@ -2,16 +2,11 @@ package com.atzuche.order.service;
 
 import com.atzuche.order.entity.OwnerOrderEntity;
 import com.atzuche.order.mapper.OwnerOrderMapper;
-import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.Serializable;
-import java.time.LocalDateTime;
-
-
 @Service
-public class OwnerOrderService implements Serializable {
+public class OwnerOrderService {
     @Autowired
     private OwnerOrderMapper ownerOrderMapper;
 
@@ -23,5 +18,23 @@ public class OwnerOrderService implements Serializable {
      **/
     public OwnerOrderEntity getOwnerOrderByOrderNoAndIsEffective(String orderNo){
         return ownerOrderMapper.getOwnerOrderByOrderNoAndIsEffective(orderNo);
+    }
+    
+    /**
+     * 根据id把上笔车主子单置为无效
+     * @param id
+     * @return Integer
+     */
+    public Integer updateOwnerOrderInvalidById(Integer id) {
+    	return ownerOrderMapper.updateOwnerOrderInvalidById(id);
+    }
+    
+    /**
+     * 保存车主子订单
+     * @param ownerOrderEntity
+     * @return Integer
+     */
+    public Integer saveOwnerOrder(OwnerOrderEntity ownerOrderEntity) {
+    	return ownerOrderMapper.insertSelective(ownerOrderEntity);
     }
 }
