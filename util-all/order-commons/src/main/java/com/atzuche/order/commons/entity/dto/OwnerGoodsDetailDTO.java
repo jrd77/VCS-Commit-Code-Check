@@ -2,10 +2,15 @@ package com.atzuche.order.commons.entity.dto;
 
 import lombok.Data;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
 public class OwnerGoodsDetailDTO {
+    private String ownerOrderNo;
+    private String orderNo;
+    private LocalDateTime rentTime;
+    private LocalDateTime revertTime;
     /**
      * 车主会员号
      */

@@ -1,5 +1,6 @@
 package com.atzuche.order.accountrenterwzdepost.vo.req;
 
+import com.atzuche.order.commons.enums.RenterCashCodeEnum;
 import com.autoyol.commons.web.ErrorCode;
 import lombok.Data;
 import org.springframework.util.Assert;
@@ -23,11 +24,11 @@ public class PayedOrderRenterDepositWZDetailReqVO {
     /**
      * 支付方式
      */
-    private Integer payment;
+    private String payment;
     /**
      * 支付渠道
      */
-    private Integer payChannel;
+    private String payChannel;
     /**
      * 费用编码
      */
@@ -40,14 +41,11 @@ public class PayedOrderRenterDepositWZDetailReqVO {
      * 入账金额
      */
     private Integer amt;
+
     /**
-     * 入账来源编码
+     * 押金扣除来源
      */
-    private Integer sourceCode;
-    /**
-     * 入账来源编码描述
-     */
-    private String sourceDetail;
+    private RenterCashCodeEnum renterCashCodeEnum;
     /**
      * 预授权金额
      */
@@ -78,8 +76,7 @@ public class PayedOrderRenterDepositWZDetailReqVO {
         Assert.notNull(getMemNo(), ErrorCode.PARAMETER_ERROR.getText());
         Assert.notNull(getOrderNo(), ErrorCode.PARAMETER_ERROR.getText());
         Assert.notNull(getPayment(), ErrorCode.PARAMETER_ERROR.getText());
-        Assert.notNull(getSourceCode(), ErrorCode.PARAMETER_ERROR.getText());
+        Assert.notNull(getRenterCashCodeEnum(), ErrorCode.PARAMETER_ERROR.getText());
         Assert.notNull(getUniqueNo(), ErrorCode.PARAMETER_ERROR.getText());
-        Assert.notNull(getSourceDetail(), ErrorCode.PARAMETER_ERROR.getText());
     }
 }

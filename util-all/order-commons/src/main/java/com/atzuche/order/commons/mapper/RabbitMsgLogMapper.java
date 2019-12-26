@@ -15,11 +15,10 @@ public interface RabbitMsgLogMapper{
 
     RabbitMsgLogEntity selectByPrimaryKey(Integer id);
 
-    RabbitMsgLogEntity selectByUniqueId(@Param("uniqueId") Integer uniqueId,@Param("businessType") Integer businessType);
+    RabbitMsgLogEntity selectByUniqueNo(@Param("uniqueNo") String uniqueNo,@Param("businessType") String businessType);
 
     int insert(RabbitMsgLogEntity record);
 
-    int updateConsume(@Param("id") Integer id, @Param("uniqueId") Integer uniqueId);
-
+    int updateConsume(@Param("businessType") String businessType, @Param("uniqueNo") String uniqueNo);
 
 }

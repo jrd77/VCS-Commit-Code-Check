@@ -31,8 +31,7 @@ public class RenterMemberService{
     /**
      * 保存租客用户信息
      */
-    public void save(OrderContextDTO orderContextDto){
-        RenterMemberDTO renterMemberDto = orderContextDto.getRenterMemberDto();
+    public void save(RenterMemberDTO renterMemberDto){
         RenterMemberEntity renterMemberEntity = new RenterMemberEntity();
         BeanUtils.copyProperties(renterMemberDto,renterMemberEntity);
         renterMemberMapper.insert(renterMemberEntity);

@@ -15,7 +15,7 @@ public class OrderPayBaseResVO {
     /**
      *  支付ID
      */
-    private String payId;
+    private int payId;
 
     /**
      *  支付项目
@@ -79,6 +79,9 @@ public class OrderPayBaseResVO {
 
     private String respCode;
 
+    /**
+     * 支付流水号
+     */
     private String qn;
 
     /**

@@ -15,13 +15,7 @@ public interface CashierMapper{
 
     CashierEntity selectByPrimaryKey(Integer id);
 
-    List<CashierEntity> selectALL();
-
     int insert(CashierEntity record);
-    
-    int insertSelective(CashierEntity record);
-
-    int updateByPrimaryKey(CashierEntity record);
     
     int updateByPrimaryKeySelective(CashierEntity record);
 

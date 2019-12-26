@@ -2,6 +2,8 @@ package com.atzuche.order.renterorder.mapper;
 
 import com.atzuche.order.renterorder.entity.RenterOrderChangeApplyEntity;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
 import java.util.List;
 
 /**
@@ -19,11 +21,14 @@ public interface RenterOrderChangeApplyMapper{
 
     int insert(RenterOrderChangeApplyEntity record);
     
-    int insertSelective(RenterOrderChangeApplyEntity record);
+    int saveRenterOrderChangeApply(RenterOrderChangeApplyEntity record);
 
     int updateByPrimaryKey(RenterOrderChangeApplyEntity record);
     
     int updateByPrimaryKeySelective(RenterOrderChangeApplyEntity record);
 
+    Integer updateRenterOrderChangeApplyStatus(@Param("id") Integer id, @Param("auditStatus") Integer auditStatus);
+    
+    RenterOrderChangeApplyEntity getRenterOrderChangeApplyByRenterOrderNo(@Param("renterOrderNo") String renterOrderNo);
 
 }

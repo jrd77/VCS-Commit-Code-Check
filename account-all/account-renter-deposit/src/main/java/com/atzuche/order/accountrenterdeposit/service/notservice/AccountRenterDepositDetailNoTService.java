@@ -29,9 +29,8 @@ public class AccountRenterDepositDetailNoTService {
     public void insertRenterDepositDetail(DetainRenterDepositReqVO detainRenterDeposit) {
         AccountRenterDepositDetailEntity accountRenterDepositDetailEntity = new AccountRenterDepositDetailEntity();
         BeanUtils.copyProperties(detainRenterDeposit,accountRenterDepositDetailEntity);
-        accountRenterDepositDetailEntity.setSourceCode(Integer.parseInt(detainRenterDeposit.getRenterCashCodeEnum().getCashNo()));
+        accountRenterDepositDetailEntity.setSourceCode(detainRenterDeposit.getRenterCashCodeEnum().getCashNo());
         accountRenterDepositDetailEntity.setSourceDetail(detainRenterDeposit.getRenterCashCodeEnum().getCashNo());
-
         int result = accountRenterDepositDetailMapper.insert(accountRenterDepositDetailEntity);
         if(result==0){
             throw new PayOrderRenterDepositDBException();

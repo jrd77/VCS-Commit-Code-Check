@@ -1,0 +1,421 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.atzuche.order.parentorder.mapper.OrderSourceStatMapper">
+
+    <resultMap type="com.atzuche.order.parentorder.entity.OrderSourceStatEntity" id="BaseResultMap">
+        <result property="id" column="id"/>
+        <result property="orderNo" column="order_no"/>
+        <result property="appVersion" column="app_version"/>
+        <result property="device" column="device"/>
+        <result property="ip" column="ip"/>
+        <result property="port" column="port"/>
+        <result property="channelId" column="channel_id"/>
+        <result property="popularize" column="popularize"/>
+        <result property="cooperationCity" column="cooperation_city"/>
+        <result property="insuranceCompany" column="insurance_company"/>
+        <result property="paySource" column="pay_source"/>
+        <result property="activityId" column="activity_id"/>
+        <result property="utmSource" column="utm_source"/>
+        <result property="utmMedium" column="utm_medium"/>
+        <result property="utmCampaign" column="utm_campaign"/>
+        <result property="utmTerm" column="utm_term"/>
+        <result property="otherType" column="other_type"/>
+        <result property="entryCode" column="entry_code"/>
+        <result property="category" column="category"/>
+        <result property="businessParentType" column="business_parent_type"/>
+        <result property="businessChildType" column="business_child_type"/>
+        <result property="platformParentType" column="platform_parent_type"/>
+        <result property="platformChildType" column="platform_child_type"/>
+        <result property="source" column="source"/>
+        <result property="operator" column="operator"/>
+        <result property="useAutoCoin" column="use_auto_coin"/>
+        <result property="specialConsole" column="special_console"/>
+        <result property="reqOs" column="req_os"/>
+        <result property="reqSource" column="req_source"/>
+        <result property="reqVersion" column="req_version"/>
+        <result property="requestId" column="request_id"/>
+        <result property="schema" column="schema"/>
+        <result property="moduleName" column="module_name"/>
+        <result property="functionName" column="function_name"/>
+        <result property="subSource" column="sub_source"/>
+        <result property="srcPort" column="src_port"/>
+        <result property="srcIp" column="src_ip"/>
+        <result property="oaid" column="OAID"/>
+        <result property="rentReason" column="rent_reason"/>
+        <result property="imei" column="imei"/>
+        <result property="os" column="OS"/>
+        <result property="deviceName" column="device_name"/>
+        <result property="queryId" column="query_id"/>
+        <result property="reqIp" column="req_ip"/>
+        <result property="mac" column="mac"/>
+        <result property="appChannelId" column="app_channel_id"/>
+        <result property="androidId" column="android_id"/>
+        <result property="createTime" column="create_time"/>
+        <result property="createOp" column="create_op"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="updateOp" column="update_op"/>
+        <result property="isDelete" column="is_delete"/>
+    </resultMap>
+
+
+	<sql id="Base_Column_List">
+        `id`, `order_no`,`app_version`,`device`, `ip`,`port`,
+        `channel_id`, `popularize`,
+        `cooperation_city`, `insurance_company`,
+        `pay_source`, `activity_id`,
+        `utm_source`, `utm_medium`,`utm_campaign`, `utm_term`,
+        `other_type`, `entry_code`,`category`,
+        `business_parent_type`,`business_child_type`,`platform_parent_type`, `platform_child_type`,
+        `source`, `operator`,`use_auto_coin`,`special_console`,
+        `req_os`,`req_source`,`req_version`, `request_id`,`schema`,
+        `module_name`,`function_name`,`sub_source`,
+        `src_port`,`src_ip`,`OAID`,`rent_reason`,
+        `imei`,`OS`,`device_name`,`query_id`,
+        `req_ip`, `mac`, `app_channel_id`,`android_id`,
+        `create_time`,
+        `create_op`,
+        `update_time`,
+        `update_op`,
+        `is_delete`
+	</sql>
+
+
+	<select id="selectByOrderNo" resultMap="BaseResultMap">
+		select <include refid="Base_Column_List" /> from order_source_stat where order_no = #{value} limit 1
+	</select>
+
+	<insert id="insert" parameterType="com.atzuche.order.parentorder.entity.OrderSourceStatEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into order_source_stat (
+            `order_no`,
+            `app_version`,
+            `device`,
+            `ip`,
+            `port`,
+            `channel_id`,
+            `popularize`,
+            `cooperation_city`,
+            `insurance_company`,
+            `pay_source`,
+            `activity_id`,
+            `utm_source`,
+            `utm_medium`,
+            `utm_campaign`,
+            `utm_term`,
+            `other_type`,
+            `entry_code`,
+            `category`,
+            `business_parent_type`,
+            `business_child_type`,
+            `platform_parent_type`,
+            `platform_child_type`,
+            `source`,
+            `operator`,
+            `use_auto_coin`,
+            `special_console`,
+            `req_os`,
+            `req_source`,
+            `req_version`,
+            `request_id`,
+            `schema`,
+            `module_name`,
+            `function_name`,
+            `sub_source`,
+            `src_port`,
+            `src_ip`,
+            `OAID`,
+            `rent_reason`,
+            `imei`,
+            `OS`,
+            `device_name`,
+            `query_id`,
+            `req_ip`,
+            `mac`,
+            `app_channel_id`,
+            `android_id`,
+            `create_time`,
+            `create_op`,
+            `update_time`,
+            `update_op`,
+            `is_delete`
+        ) values (
+            #{orderNo},
+            #{appVersion},
+            #{device},
+            #{ip},
+            #{port},
+            #{channelId},
+            #{popularize},
+            #{cooperationCity},
+            #{insuranceCompany},
+            #{paySource},
+            #{activityId},
+            #{utmSource},
+            #{utmMedium},
+            #{utmCampaign},
+            #{utmTerm},
+            #{otherType},
+            #{entryCode},
+            #{category},
+            #{businessParentType},
+            #{businessChildType},
+            #{platformParentType},
+            #{platformChildType},
+            #{source},
+            #{operator},
+            #{useAutoCoin},
+            #{specialConsole},
+            #{reqOs},
+            #{reqSource},
+            #{reqVersion},
+            #{requestId},
+            #{schema},
+            #{moduleName},
+            #{functionName},
+            #{subSource},
+            #{srcPort},
+            #{srcIp},
+            #{oaid},
+            #{rentReason},
+            #{imei},
+            #{os},
+            #{deviceName},
+            #{queryId},
+            #{reqIp},
+            #{mac},
+            #{appChannelId},
+            #{androidId},
+            #{createTime},
+            #{createOp},
+            #{updateTime},
+            #{updateOp},
+            #{isDelete}
+        )
+	</insert>
+	
+	<insert id="insertSelective" parameterType="com.atzuche.order.parentorder.entity.OrderSourceStatEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into order_source_stat (
+            <if test="orderNo != null">`order_no`, </if>
+            <if test="appVersion != null">`app_version`, </if>
+            <if test="device != null">`device`, </if>
+            <if test="ip != null">`ip`, </if>
+            <if test="port != null">`port`, </if>
+            <if test="channelId != null">`channel_id`, </if>
+            <if test="popularize != null">`popularize`, </if>
+            <if test="cooperationCity != null">`cooperation_city`, </if>
+            <if test="insuranceCompany != null">`insurance_company`, </if>
+            <if test="paySource != null">`pay_source`, </if>
+            <if test="activityId != null">`activity_id`, </if>
+            <if test="utmSource != null">`utm_source`, </if>
+            <if test="utmMedium != null">`utm_medium`, </if>
+            <if test="utmCampaign != null">`utm_campaign`, </if>
+            <if test="utmTerm != null">`utm_term`, </if>
+            <if test="otherType != null">`other_type`, </if>
+            <if test="entryCode != null">`entry_code`, </if>
+            <if test="category != null">`category`, </if>
+            <if test="businessParentType != null">`business_parent_type`, </if>
+            <if test="businessChildType != null">`business_child_type`, </if>
+            <if test="platformParentType != null">`platform_parent_type`, </if>
+            <if test="platformChildType != null">`platform_child_type`, </if>
+            <if test="source != null">`source`, </if>
+            <if test="operator != null">`operator`, </if>
+            <if test="useAutoCoin != null">`use_auto_coin`, </if>
+            <if test="specialConsole != null">`special_console`, </if>
+            <if test="reqOs != null">`req_os`, </if>
+            <if test="reqSource != null">`req_source`, </if>
+            <if test="reqVersion != null">`req_version`, </if>
+            <if test="requestId != null">`request_id`, </if>
+            <if test="schema != null">`schema`, </if>
+            <if test="moduleName != null">`module_name`, </if>
+            <if test="functionName != null">`function_name`, </if>
+            <if test="subSource != null">`sub_source`, </if>
+            <if test="srcPort != null">`src_port`, </if>
+            <if test="srcIp != null">`src_ip`, </if>
+            <if test="oaid != null">`OAID`, </if>
+            <if test="rentReason != null">`rent_reason`, </if>
+            <if test="imei != null">`imei`, </if>
+            <if test="os != null">`OS`, </if>
+            <if test="deviceName != null">`device_name`, </if>
+            <if test="queryId != null">`query_id`, </if>
+            <if test="reqIp != null">`req_ip`, </if>
+            <if test="mac != null">`mac`, </if>
+            <if test="appChannelId != null">`app_channel_id`, </if>
+            <if test="androidId != null">`android_id`, </if>
+            <if test="createTime != null">`create_time`, </if>
+            <if test="createOp != null">`create_op`, </if>
+            <if test="updateTime != null">`update_time`, </if>
+            <if test="updateOp != null">`update_op`, </if>
+            <if test="isDelete != null">`is_delete` </if>
+        ) values (
+            <if test="orderNo != null">#{orderNo},  </if>
+            <if test="appVersion != null">#{appVersion},  </if>
+            <if test="device != null">#{device},  </if>
+            <if test="ip != null">#{ip},  </if>
+            <if test="port != null">#{port},  </if>
+            <if test="channelId != null">#{channelId},  </if>
+            <if test="popularize != null">#{popularize},  </if>
+            <if test="cooperationCity != null">#{cooperationCity},  </if>
+            <if test="insuranceCompany != null">#{insuranceCompany},  </if>
+            <if test="paySource != null">#{paySource},  </if>
+            <if test="activityId != null">#{activityId},  </if>
+            <if test="utmSource != null">#{utmSource},  </if>
+            <if test="utmMedium != null">#{utmMedium},  </if>
+            <if test="utmCampaign != null">#{utmCampaign},  </if>
+            <if test="utmTerm != null">#{utmTerm},  </if>
+            <if test="otherType != null">#{otherType},  </if>
+            <if test="entryCode != null">#{entryCode},  </if>
+            <if test="category != null">#{category},  </if>
+            <if test="businessParentType != null">#{businessParentType},  </if>
+            <if test="businessChildType != null">#{businessChildType},  </if>
+            <if test="platformParentType != null">#{platformParentType},  </if>
+            <if test="platformChildType != null">#{platformChildType},  </if>
+            <if test="source != null">#{source},  </if>
+            <if test="operator != null">#{operator},  </if>
+            <if test="useAutoCoin != null">#{useAutoCoin},  </if>
+            <if test="specialConsole != null">#{specialConsole},  </if>
+            <if test="reqOs != null">#{reqOs},  </if>
+            <if test="reqSource != null">#{reqSource},  </if>
+            <if test="reqVersion != null">#{reqVersion},  </if>
+            <if test="requestId != null">#{requestId},  </if>
+            <if test="schema != null">#{schema},  </if>
+            <if test="moduleName != null">#{moduleName},  </if>
+            <if test="functionName != null">#{functionName},  </if>
+            <if test="subSource != null">#{subSource},  </if>
+            <if test="srcPort != null">#{srcPort},  </if>
+            <if test="srcIp != null">#{srcIp},  </if>
+            <if test="oaid != null">#{oaid},  </if>
+            <if test="rentReason != null">#{rentReason},  </if>
+            <if test="imei != null">#{imei},  </if>
+            <if test="os != null">#{os},  </if>
+            <if test="deviceName != null">#{deviceName},  </if>
+            <if test="queryId != null">#{queryId},  </if>
+            <if test="reqIp != null">#{reqIp},  </if>
+            <if test="mac != null">#{mac},  </if>
+            <if test="appChannelId != null">#{appChannelId},  </if>
+            <if test="androidId != null">#{androidId},  </if>
+            <if test="createTime != null">#{createTime},  </if>
+            <if test="createOp != null">#{createOp},  </if>
+            <if test="updateTime != null">#{updateTime},  </if>
+            <if test="updateOp != null">#{updateOp},  </if>
+            <if test="isDelete != null">#{isDelete} </if>
+        )
+	</insert>
+	
+	 
+	<update id="updateByPrimaryKeySelective" parameterType="com.atzuche.order.parentorder.entity.OrderSourceStatEntity">
+		update order_source_stat 
+		    <set>
+				<if test="orderNo != null">`order_no` = #{orderNo}, </if>
+				<if test="appVersion != null">`app_version` = #{appVersion}, </if>
+				<if test="device != null">`device` = #{device}, </if>
+				<if test="ip != null">`ip` = #{ip}, </if>
+				<if test="port != null">`port` = #{port}, </if>
+				<if test="channelId != null">`channel_id` = #{channelId}, </if>
+				<if test="popularize != null">`popularize` = #{popularize}, </if>
+				<if test="cooperationCity != null">`cooperation_city` = #{cooperationCity}, </if>
+				<if test="insuranceCompany != null">`insurance_company` = #{insuranceCompany}, </if>
+				<if test="paySource != null">`pay_source` = #{paySource}, </if>
+				<if test="activityId != null">`activity_id` = #{activityId}, </if>
+				<if test="utmSource != null">`utm_source` = #{utmSource}, </if>
+				<if test="utmMedium != null">`utm_medium` = #{utmMedium}, </if>
+				<if test="utmCampaign != null">`utm_campaign` = #{utmCampaign}, </if>
+				<if test="utmTerm != null">`utm_term` = #{utmTerm}, </if>
+				<if test="otherType != null">`other_type` = #{otherType}, </if>
+				<if test="entryCode != null">`entry_code` = #{entryCode}, </if>
+				<if test="category != null">`category` = #{category}, </if>
+				<if test="businessParentType != null">`business_parent_type` = #{businessParentType}, </if>
+				<if test="businessChildType != null">`business_child_type` = #{businessChildType}, </if>
+				<if test="platformParentType != null">`platform_parent_type` = #{platformParentType}, </if>
+				<if test="platformChildType != null">`platform_child_type` = #{platformChildType}, </if>
+				<if test="source != null">`source` = #{source}, </if>
+				<if test="operator != null">`operator` = #{operator}, </if>
+				<if test="useAutoCoin != null">`use_auto_coin` = #{useAutoCoin}, </if>
+				<if test="specialConsole != null">`special_console` = #{specialConsole}, </if>
+				<if test="reqOs != null">`req_os` = #{reqOs}, </if>
+				<if test="reqSource != null">`req_source` = #{reqSource}, </if>
+				<if test="reqVersion != null">`req_version` = #{reqVersion}, </if>
+				<if test="requestId != null">`request_id` = #{requestId}, </if>
+				<if test="schema != null">`schema` = #{schema}, </if>
+				<if test="moduleName != null">`module_name` = #{moduleName}, </if>
+				<if test="functionName != null">`function_name` = #{functionName}, </if>
+				<if test="subSource != null">`sub_source` = #{subSource}, </if>
+				<if test="srcPort != null">`src_port` = #{srcPort}, </if>
+				<if test="srcIp != null">`src_ip` = #{srcIp}, </if>
+				<if test="oaid != null">`OAID` = #{oaid}, </if>
+				<if test="rentReason != null">`rent_reason` = #{rentReason}, </if>
+				<if test="imei != null">`imei` = #{imei}, </if>
+				<if test="os != null">`OS` = #{os}, </if>
+				<if test="deviceName != null">`device_name` = #{deviceName}, </if>
+				<if test="queryId != null">`query_id` = #{queryId}, </if>
+				<if test="reqIp != null">`req_ip` = #{reqIp}, </if>
+				<if test="mac != null">`mac` = #{mac}, </if>
+				<if test="appChannelId != null">`app_channel_id` = #{appChannelId}, </if>
+				<if test="androidId != null">`android_id` = #{androidId}, </if>
+				<if test="createTime != null">`create_time` = #{createTime}, </if>
+				<if test="createOp != null">`create_op` = #{createOp}, </if>
+				<if test="updateTime != null">`update_time` = #{updateTime}, </if>
+				<if test="updateOp != null">`update_op` = #{updateOp}, </if>
+				<if test="isDelete != null">`is_delete` = #{isDelete}</if>
+			</set>
+		where id = #{id}
+	</update>
+	
+	<update id="updateByPrimaryKey" parameterType="com.atzuche.order.parentorder.entity.OrderSourceStatEntity">
+		update order_source_stat 
+		    <set>
+				`order_no` = #{orderNo}, 		
+				`app_version` = #{appVersion}, 		
+				`device` = #{device}, 		
+				`ip` = #{ip}, 		
+				`port` = #{port}, 		
+				`channel_id` = #{channelId}, 		
+				`popularize` = #{popularize}, 		
+				`cooperation_city` = #{cooperationCity}, 		
+				`insurance_company` = #{insuranceCompany}, 		
+				`pay_source` = #{paySource}, 		
+				`activity_id` = #{activityId}, 		
+				`utm_source` = #{utmSource}, 		
+				`utm_medium` = #{utmMedium}, 		
+				`utm_campaign` = #{utmCampaign}, 		
+				`utm_term` = #{utmTerm}, 		
+				`other_type` = #{otherType}, 		
+				`entry_code` = #{entryCode}, 		
+				`category` = #{category}, 		
+				`business_parent_type` = #{businessParentType}, 		
+				`business_child_type` = #{businessChildType}, 		
+				`platform_parent_type` = #{platformParentType}, 		
+				`platform_child_type` = #{platformChildType}, 		
+				`source` = #{source}, 		
+				`operator` = #{operator}, 		
+				`use_auto_coin` = #{useAutoCoin}, 		
+				`special_console` = #{specialConsole}, 		
+				`req_os` = #{reqOs}, 		
+				`req_source` = #{reqSource}, 		
+				`req_version` = #{reqVersion}, 		
+				`request_id` = #{requestId}, 		
+				`schema` = #{schema}, 		
+				`module_name` = #{moduleName}, 		
+				`function_name` = #{functionName}, 		
+				`sub_source` = #{subSource}, 		
+				`src_port` = #{srcPort}, 		
+				`src_ip` = #{srcIp}, 		
+				`OAID` = #{oaid}, 		
+				`rent_reason` = #{rentReason}, 		
+				`imei` = #{imei}, 		
+				`OS` = #{os}, 		
+				`device_name` = #{deviceName}, 		
+				`query_id` = #{queryId}, 		
+				`req_ip` = #{reqIp}, 		
+				`mac` = #{mac}, 		
+				`app_channel_id` = #{appChannelId}, 		
+				`android_id` = #{androidId}, 		
+				`create_time` = #{createTime}, 		
+				`create_op` = #{createOp}, 		
+				`update_time` = #{updateTime}, 		
+				`update_op` = #{updateOp}, 		
+				`is_delete` = #{isDelete}		
+		</set>
+		where id = #{id}
+	</update>
+  	
+</mapper>

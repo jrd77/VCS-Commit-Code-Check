@@ -136,7 +136,7 @@
 			)
 	</insert>
 	
-	<insert id="insertSelective" parameterType="com.atzuche.order.renterorder.entity.RenterOrderChangeApplyEntity" useGeneratedKeys="true" keyProperty="id">
+	<insert id="saveRenterOrderChangeApply" parameterType="com.atzuche.order.renterorder.entity.RenterOrderChangeApplyEntity" useGeneratedKeys="true" keyProperty="id">
 		insert into renter_order_change_apply
 		(
 				<if test="orderNo != null">`order_no`, </if>
@@ -264,5 +264,17 @@
 		</set>
 		where id = #{id}
 	</update>
+	
+	<update id="updateRenterOrderChangeApplyStatus">
+		update renter_order_change_apply set audit_status = #{auditStatus}
+		where id = #{id}
+	</update>
   	
+  	<select id="getRenterOrderChangeApplyByRenterOrderNo" resultMap="BaseResultMap">
+		select <include refid="Base_Column_List" /> from renter_order_change_apply where renter_order_no = #{renterOrderNo}
+		and is_delete = 0
+		order by id desc
+		limit 1
+	</select>
+	
 </mapper>

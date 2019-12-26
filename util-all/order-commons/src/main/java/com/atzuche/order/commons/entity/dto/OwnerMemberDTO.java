@@ -30,6 +30,7 @@ public class OwnerMemberDTO {
      * 昵称
      */
     private String nickName;
+
     /**
      * 成功下单次数
      */

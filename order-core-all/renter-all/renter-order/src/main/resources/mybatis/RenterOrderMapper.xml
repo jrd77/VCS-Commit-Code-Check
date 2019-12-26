@@ -7,13 +7,23 @@
         <result property="id" column="id"/>
         <result property="orderNo" column="order_no"/>
         <result property="renterOrderNo" column="renter_order_no"/>
-        <result property="expRentStartTime" column="exp_rent_start_time"/>
-        <result property="expRentEndTime" column="exp_rent_end_time"/>
-        <result property="actRentStartTime" column="act_rent_start_time"/>
-        <result property="actRentEndTime" column="act_rent_end_time"/>
+        <result property="expRentTime" column="exp_rent_time"/>
+        <result property="expRevertTime" column="exp_revert_time"/>
+        <result property="actRentTime" column="act_rent_time"/>
+        <result property="actRevertTime" column="act_revert_time"/>
         <result property="goodsCode" column="goods_code"/>
         <result property="goodsType" column="goods_type"/>
+        <result property="agreeFlag" column="agree_flag"/>
         <result property="childStatus" column="child_status"/>
+        <result property="isUseCoin" column="is_use_coin"/>
+        <result property="isUseWallet" column="is_use_wallet"/>
+        <result property="isUseCoupon" column="is_use_coupon"/>
+        <result property="isGetCar" column="is_get_car"/>
+        <result property="isReturnCar" column="is_return_car"/>
+        <result property="addDriver" column="add_driver"/>
+        <result property="isAbatement" column="is_abatement"/>
+        <result property="isEffective" column="is_effective"/>
+        <result property="isUseSpecialPrice" column="is_use_special_price"/>
         <result property="isCancle" column="is_cancle"/>
         <result property="createTime" column="create_time"/>
         <result property="createOp" column="create_op"/>
@@ -52,130 +62,174 @@
 		select  <include refid="Base_Column_List" /> from renter_order order by id desc
 	</select>
 
-	 
-	<insert id="insert" parameterType="com.atzuche.order.renterorder.entity.RenterOrderEntity" useGeneratedKeys="true" keyProperty="id">
-		insert into renter_order
-		(
-				`order_no`,		
-				`renter_order_no`,		
-				`exp_rent_start_time`,		
-				`exp_rent_end_time`,		
-				`act_rent_start_time`,		
-				`act_rent_end_time`,		
-				`goods_code`,		
-				`goods_type`,		
-				`child_status`,		
-				`is_cancle`,		
-				`create_time`,		
-				`create_op`,		
-				`update_time`,		
-				`update_op`,		
-				`is_delete`		
-			)
-		values
-		(
-				#{orderNo}, 		
-				#{renterOrderNo}, 		
-				#{expRentStartTime}, 		
-				#{expRentEndTime}, 		
-				#{actRentStartTime}, 		
-				#{actRentEndTime}, 		
-				#{goodsCode}, 		
-				#{goodsType}, 		
-				#{childStatus}, 		
-				#{isCancle}, 		
-				#{createTime}, 		
-				#{createOp}, 		
-				#{updateTime}, 		
-				#{updateOp}, 		
-				#{isDelete}		
-			)
-	</insert>
-	
-	<insert id="insertSelective" parameterType="com.atzuche.order.renterorder.entity.RenterOrderEntity" useGeneratedKeys="true" keyProperty="id">
-		insert into renter_order
-		(
-				<if test="orderNo != null">`order_no`, </if>
-				<if test="renterOrderNo != null">`renter_order_no`, </if>
-				<if test="expRentStartTime != null">`exp_rent_start_time`, </if>
-				<if test="expRentEndTime != null">`exp_rent_end_time`, </if>
-				<if test="actRentStartTime != null">`act_rent_start_time`, </if>
-				<if test="actRentEndTime != null">`act_rent_end_time`, </if>
-				<if test="goodsCode != null">`goods_code`, </if>
-				<if test="goodsType != null">`goods_type`, </if>
-				<if test="childStatus != null">`child_status`, </if>
-				<if test="isCancle != null">`is_cancle`, </if>
-				<if test="createTime != null">`create_time`, </if>
-				<if test="createOp != null">`create_op`, </if>
-				<if test="updateTime != null">`update_time`, </if>
-				<if test="updateOp != null">`update_op`, </if>
-				<if test="isDelete != null">`is_delete` </if>
-			)
-		values
-		(
-				<if test="orderNo != null">#{orderNo},  </if>
-				<if test="renterOrderNo != null">#{renterOrderNo},  </if>
-				<if test="expRentStartTime != null">#{expRentStartTime},  </if>
-				<if test="expRentEndTime != null">#{expRentEndTime},  </if>
-				<if test="actRentStartTime != null">#{actRentStartTime},  </if>
-				<if test="actRentEndTime != null">#{actRentEndTime},  </if>
-				<if test="goodsCode != null">#{goodsCode},  </if>
-				<if test="goodsType != null">#{goodsType},  </if>
-				<if test="childStatus != null">#{childStatus},  </if>
-				<if test="isCancle != null">#{isCancle},  </if>
-				<if test="createTime != null">#{createTime},  </if>
-				<if test="createOp != null">#{createOp},  </if>
-				<if test="updateTime != null">#{updateTime},  </if>
-				<if test="updateOp != null">#{updateOp},  </if>
-				<if test="isDelete != null">#{isDelete} </if>
-			)
-	</insert>
-	
-	 
-	<update id="updateByPrimaryKeySelective" parameterType="com.atzuche.order.renterorder.entity.RenterOrderEntity">
-		update renter_order 
-		<set>
-				<if test="orderNo != null">`order_no` = #{orderNo}, </if>
-				<if test="renterOrderNo != null">`renter_order_no` = #{renterOrderNo}, </if>
-				<if test="expRentStartTime != null">`exp_rent_start_time` = #{expRentStartTime}, </if>
-				<if test="expRentEndTime != null">`exp_rent_end_time` = #{expRentEndTime}, </if>
-				<if test="actRentStartTime != null">`act_rent_start_time` = #{actRentStartTime}, </if>
-				<if test="actRentEndTime != null">`act_rent_end_time` = #{actRentEndTime}, </if>
-				<if test="goodsCode != null">`goods_code` = #{goodsCode}, </if>
-				<if test="goodsType != null">`goods_type` = #{goodsType}, </if>
-				<if test="childStatus != null">`child_status` = #{childStatus}, </if>
-				<if test="isCancle != null">`is_cancle` = #{isCancle}, </if>
-				<if test="createTime != null">`create_time` = #{createTime}, </if>
-				<if test="createOp != null">`create_op` = #{createOp}, </if>
-				<if test="updateTime != null">`update_time` = #{updateTime}, </if>
-				<if test="updateOp != null">`update_op` = #{updateOp}, </if>
-				<if test="isDelete != null">`is_delete` = #{isDelete}</if>
-			</set>
-		where id = #{id}
-	</update>
-	
-	<update id="updateByPrimaryKey" parameterType="com.atzuche.order.renterorder.entity.RenterOrderEntity">
-		update renter_order 
-		<set>
-				`order_no` = #{orderNo}, 		
-				`renter_order_no` = #{renterOrderNo}, 		
-				`exp_rent_start_time` = #{expRentStartTime}, 		
-				`exp_rent_end_time` = #{expRentEndTime}, 		
-				`act_rent_start_time` = #{actRentStartTime}, 		
-				`act_rent_end_time` = #{actRentEndTime}, 		
-				`goods_code` = #{goodsCode}, 		
-				`goods_type` = #{goodsType}, 		
-				`child_status` = #{childStatus}, 		
-				`is_cancle` = #{isCancle}, 		
-				`create_time` = #{createTime}, 		
-				`create_op` = #{createOp}, 		
-				`update_time` = #{updateTime}, 		
-				`update_op` = #{updateOp}, 		
-				`is_delete` = #{isDelete}		
-	
-		</set>
-		where id = #{id}
-	</update>
+
+    <insert id="insert" parameterType="com.atzuche.order.renterorder.entity.RenterOrderEntity" useGeneratedKeys="true" keyProperty="id">
+        insert into renter_order
+        (
+        `order_no`,
+        `renter_order_no`,
+        `exp_rent_time`,
+        `exp_revert_time`,
+        `act_rent_time`,
+        `act_revert_time`,
+        `goods_code`,
+        `goods_type`,
+        `agree_flag`,
+        `child_status`,
+        `is_use_coin`,
+        `is_use_wallet`,
+        `is_use_coupon`,
+        `is_get_car`,
+        `is_return_car`,
+        `add_driver`,
+        `is_abatement`,
+        `is_effective`,
+        `is_use_special_price`,
+        `is_cancle`,
+        `create_op`,
+        `update_op`
+        )
+        values
+        (
+        #{orderNo},
+        #{renterOrderNo},
+        #{expRentTime},
+        #{expRevertTime},
+        #{actRentTime},
+        #{actRevertTime},
+        #{goodsCode},
+        #{goodsType},
+        #{agreeFlag},
+        #{childStatus},
+        #{isUseCoin},
+        #{isUseWallet},
+        #{isUseCoupon},
+        #{isGetCar},
+        #{isReturnCar},
+        #{addDriver},
+        #{isAbatement},
+        #{isEffective},
+        #{isUseSpecialPrice},
+        #{isCancle},
+        #{createOp},
+        #{updateOp}
+        )
+    </insert>
+
+    <insert id="insertSelective" parameterType="com.atzuche.order.renterorder.entity.RenterOrderEntity" useGeneratedKeys="true" keyProperty="id">
+        insert into renter_order
+        (
+        <if test="orderNo != null">`order_no`, </if>
+        <if test="renterOrderNo != null">`renter_order_no`, </if>
+        <if test="expRentTime != null">`exp_rent_time`, </if>
+        <if test="expRevertTime != null">`exp_revert_time`, </if>
+        <if test="actRentTime != null">`act_rent_time`, </if>
+        <if test="actRevertTime != null">`act_revert_time`, </if>
+        <if test="goodsCode != null">`goods_code`, </if>
+        <if test="goodsType != null">`goods_type`, </if>
+        <if test="agreeFlag != null">`agree_flag`, </if>
+        <if test="childStatus != null">`child_status`, </if>
+        <if test="isUseCoin != null">`is_use_coin`, </if>
+        <if test="isUseWallet != null">`is_use_wallet`, </if>
+        <if test="isUseCoupon != null">`is_use_coupon`, </if>
+        <if test="isGetCar != null">`is_get_car`, </if>
+        <if test="isReturnCar != null">`is_return_car`, </if>
+        <if test="addDriver != null">`add_driver`, </if>
+        <if test="isAbatement != null">`is_abatement`, </if>
+        <if test="isEffective != null">`is_effective`, </if>
+        <if test="isUseSpecialPrice != null">`is_use_special_price`, </if>
+        <if test="isCancle != null">`is_cancle`, </if>
+        <if test="createOp != null">`create_op`, </if>
+        <if test="updateOp != null">`update_op` </if>
+        )
+        values
+        (
+        <if test="orderNo != null">#{orderNo},  </if>
+        <if test="renterOrderNo != null">#{renterOrderNo},  </if>
+        <if test="expRentTime != null">#{expRentTime},  </if>
+        <if test="expRevertTime != null">#{expRevertTime},  </if>
+        <if test="actRentTime != null">#{actRentTime},  </if>
+        <if test="actRevertTime != null">#{actRevertTime},  </if>
+        <if test="goodsCode != null">#{goodsCode},  </if>
+        <if test="goodsType != null">#{goodsType},  </if>
+        <if test="agreeFlag != null">#{agreeFlag},  </if>
+        <if test="childStatus != null">#{childStatus},  </if>
+        <if test="isUseCoin != null">#{isUseCoin},  </if>
+        <if test="isUseWallet != null">#{isUseWallet},  </if>
+        <if test="isUseCoupon != null">#{isUseCoupon},  </if>
+        <if test="isGetCar != null">#{isGetCar},  </if>
+        <if test="isReturnCar != null">#{isReturnCar},  </if>
+        <if test="addDriver != null">#{addDriver},  </if>
+        <if test="isAbatement != null">#{isAbatement},  </if>
+        <if test="isEffective != null">#{isEffective},  </if>
+        <if test="isUseSpecialPrice != null">#{isUseSpecialPrice},  </if>
+        <if test="isCancle != null">#{isCancle},  </if>
+        <if test="createOp != null">#{createOp},  </if>
+        <if test="updateOp != null">#{updateOp}  </if>
+        )
+    </insert>
+
+
+    <update id="updateByPrimaryKeySelective" parameterType="com.atzuche.order.renterorder.entity.RenterOrderEntity">
+        update renter_order
+        <set>
+            <if test="orderNo != null">`order_no` = #{orderNo}, </if>
+            <if test="renterOrderNo != null">`renter_order_no` = #{renterOrderNo}, </if>
+            <if test="expRentTime != null">`exp_rent_time` = #{expRentTime}, </if>
+            <if test="expRevertTime != null">`exp_revert_time` = #{expRevertTime}, </if>
+            <if test="actRentTime != null">`act_rent_time` = #{actRentTime}, </if>
+            <if test="actRevertTime != null">`act_revert_time` = #{actRevertTime}, </if>
+            <if test="goodsCode != null">`goods_code` = #{goodsCode}, </if>
+            <if test="goodsType != null">`goods_type` = #{goodsType}, </if>
+            <if test="agreeFlag != null">`agree_flag` = #{agreeFlag}, </if>
+            <if test="childStatus != null">`child_status` = #{childStatus}, </if>
+            <if test="isUseCoin != null">`is_use_coin` = #{isUseCoin}, </if>
+            <if test="isUseWallet != null">`is_use_wallet` = #{isUseWallet}, </if>
+            <if test="isUseCoupon != null">`is_use_coupon` = #{isUseCoupon}, </if>
+            <if test="isGetCar != null">`is_get_car` = #{isGetCar}, </if>
+            <if test="isReturnCar != null">`is_return_car` = #{isReturnCar}, </if>
+            <if test="addDriver != null">`add_driver` = #{addDriver}, </if>
+            <if test="isAbatement != null">`is_abatement` = #{isAbatement}, </if>
+            <if test="isEffective != null">`is_effective` = #{isEffective}, </if>
+            <if test="isUseSpecialPrice != null">`is_use_special_price` = #{isUseSpecialPrice}, </if>
+            <if test="isCancle != null">`is_cancle` = #{isCancle}, </if>
+            <if test="createOp != null">`create_op` = #{createOp}, </if>
+            <if test="updateOp != null">`update_op` = #{updateOp}, </if>
+            <if test="isDelete != null">`is_delete` = #{isDelete}</if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <update id="updateByPrimaryKey" parameterType="com.atzuche.order.renterorder.entity.RenterOrderEntity">
+        update renter_order
+        <set>
+            `order_no` = #{orderNo},
+            `renter_order_no` = #{renterOrderNo},
+            `exp_rent_time` = #{expRentTime},
+            `exp_revert_time` = #{expRevertTime},
+            `act_rent_time` = #{actRentTime},
+            `act_revert_time` = #{actRevertTime},
+            `goods_code` = #{goodsCode},
+            `goods_type` = #{goodsType},
+            `agree_flag` = #{agreeFlag},
+            `child_status` = #{childStatus},
+            `is_use_coin` = #{isUseCoin},
+            `is_use_wallet` = #{isUseWallet},
+            `is_use_coupon` = #{isUseCoupon},
+            `is_get_car` = #{isGetCar},
+            `is_return_car` = #{isReturnCar},
+            `add_driver` = #{addDriver},
+            `is_abatement` = #{isAbatement},
+            `is_effective` = #{isEffective},
+            `is_use_special_price` = #{isUseSpecialPrice},
+            `is_cancle` = #{isCancle},
+            `create_op` = #{createOp},
+            `update_op` = #{updateOp},
+            `is_delete` = #{isDelete}
+
+        </set>
+        where id = #{id}
+    </update>
 	
 	<select id="listAgreeRenterOrderByOrderNo" resultMap="BaseResultMap">
 		select <include refid="Base_Column_List" /> from renter_order where order_no = #{orderNo} 
@@ -183,5 +237,36 @@
 		and is_delete = 0
 		order by id asc
 	</select>
-  	
+
+<!--auto generated by MybatisCodeHelper on 2019-12-25-->
+    <select id="selectEffectiveOrder" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from renter_order
+        where is_effective=1 and is_delete = 0 limit 1
+    </select>
+
+
+  	<select id="getRenterOrderByOrderNoAndIsEffective" resultMap="BaseResultMap">
+		select <include refid="Base_Column_List" /> from renter_order where order_no = #{orderNo}
+		and is_effective = 1
+		and is_cancle = 0
+		and is_delete = 0
+		order by id desc
+		limit 1
+	</select>
+	
+	<select id="getRenterOrderByRenterOrderNo" resultMap="BaseResultMap">
+		select <include refid="Base_Column_List" /> from renter_order where renter_order_no = #{renterOrderNo}
+		and is_cancle = 0
+		and is_delete = 0
+		order by id desc
+		limit 1
+	</select>
+	
+	<update id="updateRenterOrderEffective" parameterType="com.atzuche.order.renterorder.entity.RenterOrderEntity">
+		update renter_order set is_effective = #{effectiveFlag}
+		where id = #{id}
+	</update>
+	
 </mapper>

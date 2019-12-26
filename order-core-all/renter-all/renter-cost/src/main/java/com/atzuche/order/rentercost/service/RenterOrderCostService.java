@@ -1,6 +1,5 @@
 package com.atzuche.order.rentercost.service;
 
-import com.atzuche.order.rentercost.entity.RenterOrderCostEntity;
 import com.atzuche.order.rentercost.mapper.RenterOrderCostMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,13 +15,11 @@ import org.springframework.stereotype.Service;
 public class RenterOrderCostService{
     @Autowired
     private RenterOrderCostMapper renterOrderCostMapper;
+    @Autowired
+    private RenterOrderCostCombineService renterOrderCostCombineService;
+    @Autowired
+    private RenterOrderCostDetailService renterOrderCostDetailService;
 
-    /**
-     * 保存费用总表
-     * @param renterOrderCostEntity
-     * @return Integer
-     */
-    public Integer saveRenterOrderCost(RenterOrderCostEntity renterOrderCostEntity) {
-    	return renterOrderCostMapper.saveRenterOrderCost(renterOrderCostEntity);
-    }
+
+
 }
