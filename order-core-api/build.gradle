@@ -42,6 +42,7 @@ dependencies {
     
     compile('com.autoyol.coupon:coupon-api:2019121301-SNAPSHOT')
     
+
     compile project(":config")
     compile project(":casier-all:cashier-account")
 
