@@ -1,4 +1,4 @@
-package com.atzuche.order.cashieraccount.enums;
+package com.atzuche.order.commons.enums.cashier;
 
 import lombok.Getter;
 

@@ -57,18 +57,14 @@ public class CashierPayService{
                 //1 退款
                 if(DataPayTypeConstant.PUR_RETURN.equals(orderPayAsynVO.getPayType())){
                     cashierService.refundCallBackSuccess(orderPayAsynVO);
-                    t.setStatus(Transaction.SUCCESS);
-                    return;
                 }
                 //2支付成功回调
                 if(DataPayTypeConstant.PAY_PUR.equals(orderPayAsynVO.getPayType()) || DataPayTypeConstant.PAY_PRE.equals(orderPayAsynVO.getPayType())){
                     cashierService.payOrderCallBackSuccess(orderPayAsynVO);
-                    t.setStatus(Transaction.SUCCESS);
-                    return;
                 }
-                //3 更新rabbitMQ 记录已消费
-                rabbitMsgLogService.updateConsume(orderPayAsynVO.getPayType(),orderPayAsynVO.getQn());
             }
+            //3 更新rabbitMQ 记录已消费
+            rabbitMsgLogService.updateConsume(orderPayAsynVO.getPayType(),orderPayAsynVO.getQn());
             t.setStatus(Transaction.SUCCESS);
         } catch (Exception e) {
             log.info("OrderPayCallBack payCallBackAsyn start param;[{}]", GsonUtils.toJson(orderPayAsynVO));
