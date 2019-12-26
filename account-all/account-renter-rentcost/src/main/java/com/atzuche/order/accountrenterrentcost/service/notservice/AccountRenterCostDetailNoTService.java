@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import com.atzuche.order.accountrenterrentcost.mapper.AccountRenterCostDetailMapper;
 import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostDetailEntity;
 
+import java.util.List;
 
 
 /**
@@ -35,5 +36,9 @@ public class AccountRenterCostDetailNoTService {
         if(result==0){
             throw new AccountRenterRentCostDetailException();
         }
+    }
+
+    public List<AccountRenterCostDetailEntity> getAccountRenterCostDetailsByOrderNo(String orderNo) {
+        return accountRenterCostDetailMapper.getAccountRenterCostDetailsByOrderNo(orderNo);
     }
 }

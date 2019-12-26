@@ -1,8 +1,8 @@
 package com.atzuche.order.cashieraccount.service;
 
-import com.atzuche.order.accountdebt.service.AccountDebtService;
-import com.atzuche.order.accountdebt.vo.req.AccountDeductDebtReqVO;
-import com.atzuche.order.accountdebt.vo.res.AccountDebtResVO;
+import com.atzuche.order.settle.service.AccountDebtService;
+import com.atzuche.order.settle.vo.req.AccountDeductDebtReqVO;
+import com.atzuche.order.settle.vo.res.AccountDebtResVO;
 import com.atzuche.order.accountownerincome.service.AccountOwnerIncomeService;
 import com.atzuche.order.accountownerincome.vo.req.AccountOwnerIncomeExamineOpReqVO;
 import com.atzuche.order.accountownerincome.vo.req.AccountOwnerIncomeExamineReqVO;

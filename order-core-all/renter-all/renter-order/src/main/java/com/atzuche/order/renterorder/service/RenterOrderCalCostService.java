@@ -111,10 +111,11 @@ public class RenterOrderCalCostService {
         //获取取还车超运能费用
         GetReturnOverCostDTO getReturnOverCost = renterOrderCostCombineService.getGetReturnOverCost(renterOrderCostReqDTO.getGetReturnCarOverCostReqDto());
         List<RenterOrderCostDetailEntity> renterOrderCostDetailEntityList = getReturnOverCost.getRenterOrderCostDetailEntityList();
+        Integer getReturnOverCostAmount = renterOrderCostDetailEntityList.stream().collect(Collectors.summingInt(RenterOrderCostDetailEntity::getTotalAmount));
         detailList.addAll(renterOrderCostDetailEntityList);
 
         //租车费用 = 租金+平台保障费+全面保障费+取还车费用+取还车超云能费用+附加驾驶员费用+手续费；
-        int rentCarAmount = rentAmt + insurAmt + comprehensiveEnsureAmount + getReturnAmt + 0 + totalAmount + serviceAmount;
+        int rentCarAmount = rentAmt + insurAmt + comprehensiveEnsureAmount + getReturnAmt + getReturnOverCostAmount + totalAmount + serviceAmount;
 
         renterOrderCostRespDTO.setRentCarAmount(rentCarAmount);
         renterOrderCostRespDTO.setRenterOrderCostDetailDTOList(detailList);
