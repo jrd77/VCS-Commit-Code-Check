@@ -66,9 +66,9 @@ public class CashierPayService{
                     t.setStatus(Transaction.SUCCESS);
                     return;
                 }
-                //3 更新rabbitMQ 记录已消费
-                rabbitMsgLogService.updateConsume(orderPayAsynVO.getPayType(),orderPayAsynVO.getQn());
             }
+            //3 更新rabbitMQ 记录已消费
+            rabbitMsgLogService.updateConsume(orderPayAsynVO.getPayType(),orderPayAsynVO.getQn());
             t.setStatus(Transaction.SUCCESS);
         } catch (Exception e) {
             log.info("OrderPayCallBack payCallBackAsyn start param;[{}]", GsonUtils.toJson(orderPayAsynVO));
