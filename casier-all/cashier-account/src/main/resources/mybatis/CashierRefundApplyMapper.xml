@@ -20,6 +20,7 @@
         <result property="flag" column="flag"/>
         <result property="type" column="type"/>
         <result property="num" column="num"/>
+        <result property="payMd5" column="pay_md5"/>
         <result property="remake" column="remake"/>
         <result property="deptName" column="dept_name"/>
         <result property="createTime" column="create_time"/>
@@ -48,6 +49,7 @@
 	`flag`, 	
 	`type`, 	
 	`num`, 	
+	`pay_md5`, 	
 	`remake`, 	
 	`dept_name`, 	
 	`create_time`, 	
@@ -82,6 +84,7 @@
 				`flag`,		
 				`type`,		
 				`num`,		
+				`pay_md5`,		
 				`remake`,		
 				`dept_name`,		
 				`create_time`,		
@@ -108,6 +111,7 @@
 				#{flag}, 		
 				#{type}, 		
 				#{num}, 		
+				#{payMd5}, 		
 				#{remake}, 		
 				#{deptName}, 		
 				#{createTime}, 		
@@ -119,6 +123,7 @@
 			)
 	</insert>
 
+	 
 	<update id="updateByPrimaryKeySelective" parameterType="com.atzuche.order.cashieraccount.entity.CashierRefundApplyEntity">
 		update cashier_refund_apply 
 		<set>
@@ -137,16 +142,17 @@
 				<if test="flag != null">`flag` = #{flag}, </if>
 				<if test="type != null">`type` = #{type}, </if>
 				<if test="num != null">`num` = #{num}, </if>
+				<if test="payMd5 != null">`pay_md5` = #{payMd5}, </if>
 				<if test="remake != null">`remake` = #{remake}, </if>
 				<if test="deptName != null">`dept_name` = #{deptName}, </if>
 				<if test="createTime != null">`create_time` = #{createTime}, </if>
 				<if test="createOp != null">`create_op` = #{createOp}, </if>
 				<if test="updateTime != null">`update_time` = #{updateTime}, </if>
 				<if test="updateOp != null">`update_op` = #{updateOp}, </if>
-				<if test="version != null">`version` = #{version}, </if>
+				version = version +1 ,
 				<if test="isDelete != null">`is_delete` = #{isDelete}</if>
 			</set>
-		where id = #{id}
+		where id = #{id} and version = #{version}
 	</update>
     <select id="selectRefundByQn" resultMap="BaseResultMap">
         select <include refid="Base_Column_List" /> from cashier_refund_apply where mem_no = #{memNo} and order_no = #{orderNo} and qn = #{qn} limit 1
