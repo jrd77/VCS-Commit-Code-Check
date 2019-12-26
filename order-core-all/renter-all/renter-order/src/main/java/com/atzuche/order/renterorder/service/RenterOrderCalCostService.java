@@ -1,5 +1,6 @@
 package com.atzuche.order.renterorder.service;
 
+import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.entity.dto.GetReturnCarCostReqDto;
 import com.atzuche.order.rentercost.entity.RenterOrderCostDetailEntity;
 import com.atzuche.order.rentercost.entity.RenterOrderSubsidyDetailEntity;
@@ -9,6 +10,7 @@ import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.atzuche.order.renterorder.entity.dto.RenterOrderCostReqDTO;
 import com.atzuche.order.renterorder.entity.dto.RenterOrderCostRespDTO;
 import com.atzuche.order.renterorder.mapper.RenterOrderMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 public class RenterOrderCalCostService {
     @Autowired
@@ -39,7 +42,7 @@ public class RenterOrderCalCostService {
     /*
      * @Author ZhangBin
      * @Date 2019/12/24 15:21
-     * @Description: 获取费用项和费用明细列表+落库
+     * @Description: 获取费用项和费用明细列表
      *
      **/
     public RenterOrderCostRespDTO getRenterOrderCostAndDeailList(RenterOrderCostReqDTO renterOrderCostReqDTO){
@@ -64,14 +67,11 @@ public class RenterOrderCalCostService {
         renterOrderCostRespDTO.setComprehensiveEnsureAmount(comprehensiveEnsureAmount);
         detailList.addAll(comprehensiveEnsureList);
 
-
         //获取附加驾驶人费用
         RenterOrderCostDetailEntity extraDriverInsureAmtEntity = renterOrderCostCombineService.getExtraDriverInsureAmtEntity(renterOrderCostReqDTO.getExtraDriverDTO());
         Integer totalAmount = extraDriverInsureAmtEntity.getTotalAmount();
         renterOrderCostRespDTO.setAdditionalDrivingEnsureAmount(totalAmount);
         detailList.add(extraDriverInsureAmtEntity);
-
-
 
         //获取平台手续费
         RenterOrderCostDetailEntity serviceChargeFeeEntity = renterOrderCostCombineService.getServiceChargeFeeEntity(renterOrderCostReqDTO.getCostBaseDTO());
@@ -95,6 +95,7 @@ public class RenterOrderCalCostService {
 
         renterOrderCostRespDTO.setRentCarAmount(rentCarAmount);
         renterOrderCostRespDTO.setRenterOrderCostDetailDTOList(detailList);
+        log.info("获取费用项和费用明细列表 renterOrderCostRespDTO={}", JSON.toJSONString(renterOrderCostRespDTO));
         return renterOrderCostRespDTO;
     }
 }
