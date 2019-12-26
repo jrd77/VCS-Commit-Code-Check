@@ -10,7 +10,7 @@ import java.util.Date;
  * @author xuyi
  * @version 创建时间：2014年7月22日
  */
-public class City {
+public class CityDTO {
     
 	private int id;// 主键
 	@ApiModelProperty("城市编码")
@@ -351,7 +351,7 @@ public class City {
 
 	@Override
 	public String toString() {
-		return "City [id=" + id + ", code=" + code + ", name=" + name
+		return "CityDTO [id=" + id + ", code=" + code + ", name=" + name
 				+ ", detail=" + detail + ", lat=" + lat + ", lon=" + lon
 				+ ", telPrefix=" + telPrefix + ", platePrefix=" + platePrefix
 				+ ", type=" + type + ", isSupport=" + isSupport + ", isOpen="

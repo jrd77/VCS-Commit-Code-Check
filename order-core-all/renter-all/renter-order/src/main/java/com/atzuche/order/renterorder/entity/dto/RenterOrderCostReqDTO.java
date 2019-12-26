@@ -37,6 +37,9 @@ public class RenterOrderCostReqDTO {
      * 取还车费用参数
      */
     private GetReturnCarCostReqDto getReturnCarCostReqDto;
-
+    /**
+     * 超运能费用参数
+     */
+    private GetReturnCarOverCostReqDto getReturnCarOverCostReqDto;
 
 }

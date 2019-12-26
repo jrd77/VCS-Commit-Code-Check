@@ -1,5 +1,6 @@
 package com.atzuche.order.commons.entity.dto;
 
+import com.autoyol.doc.annotation.AutoDocProperty;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -156,5 +157,8 @@ public class RenterGoodsDetailDTO {
     List<RenterGoodsPriceDetailDTO> renterGoodsPriceDetailDTOList;
 
 
-
+    /**
+     * 老标签id
+     */
+    private List<String> labelIds;
 }

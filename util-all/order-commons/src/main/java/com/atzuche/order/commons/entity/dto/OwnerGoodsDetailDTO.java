@@ -144,4 +144,9 @@ public class OwnerGoodsDetailDTO {
      * 一天一价
      */
     List<OwnerGoodsPriceDetailDTO> ownerGoodsPriceDetailDTOList;
+
+    /**
+     * 老标签id
+     */
+    private List<String> labelIds;
 }

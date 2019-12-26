@@ -4,7 +4,8 @@ import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.entity.dto.GetReturnCarCostReqDto;
 import com.atzuche.order.rentercost.entity.RenterOrderCostDetailEntity;
 import com.atzuche.order.rentercost.entity.RenterOrderSubsidyDetailEntity;
-import com.atzuche.order.rentercost.entity.dto.GetReturnCostDto;
+import com.atzuche.order.rentercost.entity.dto.GetReturnCostDTO;
+import com.atzuche.order.rentercost.entity.dto.GetReturnOverCostDTO;
 import com.atzuche.order.rentercost.service.RenterOrderCostCombineService;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.atzuche.order.renterorder.entity.dto.RenterOrderCostReqDTO;
@@ -82,13 +83,16 @@ public class RenterOrderCalCostService {
         //获取取还车费用
         GetReturnCarCostReqDto getReturnCarCostReqDto = renterOrderCostReqDTO.getGetReturnCarCostReqDto();
         getReturnCarCostReqDto.setSumJudgeFreeFee(rentAmt + insurAmt + serviceAmount);
-        GetReturnCostDto returnCarCost = renterOrderCostCombineService.getReturnCarCost(getReturnCarCostReqDto);
+        GetReturnCostDTO returnCarCost = renterOrderCostCombineService.getReturnCarCost(getReturnCarCostReqDto);
         Integer getReturnAmt = returnCarCost.getRenterOrderCostDetailEntityList().stream().collect(Collectors.summingInt(RenterOrderCostDetailEntity::getTotalAmount));
         detailList.addAll(returnCarCost.getRenterOrderCostDetailEntityList());
-        subsidyList.addAll(returnCarCost.getRenterOrderSubsidyDetailEntityList());
+        List<RenterOrderSubsidyDetailEntity> renterOrderSubsidyDetailEntityList = returnCarCost.getRenterOrderSubsidyDetailEntityList();
+        subsidyList.addAll(renterOrderSubsidyDetailEntityList);
 
-
-        //获取取还车超运能费用 TODO
+        //获取取还车超运能费用
+        GetReturnOverCostDTO getReturnOverCost = renterOrderCostCombineService.getGetReturnOverCost(renterOrderCostReqDTO.getGetReturnCarOverCostReqDto());
+        List<RenterOrderCostDetailEntity> renterOrderCostDetailEntityList = getReturnOverCost.getRenterOrderCostDetailEntityList();
+        detailList.addAll(renterOrderCostDetailEntityList);
 
         //租车费用 = 租金+平台保障费+全面保障费+取还车费用+取还车超云能费用+附加驾驶员费用+手续费；
         int rentCarAmount = rentAmt + insurAmt + comprehensiveEnsureAmount + getReturnAmt + 0 + totalAmount + serviceAmount;
