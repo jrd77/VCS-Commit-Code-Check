@@ -39,6 +39,10 @@ public enum ErrorCode {
 
     ORDER_RENTER_ORDERNO_CREATE_ERROR("600001","订单编码创建异常"),
 
+
+    COST_GET_RETUIRN_ERROR("700001","获取取还车费用系统异常"),
+    COST_GET_RETUIRN_FAIL("700002","获取取还车费用失败")
+
     ;
 
     private String code;
