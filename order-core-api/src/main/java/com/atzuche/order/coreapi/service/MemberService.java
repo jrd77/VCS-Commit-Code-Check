@@ -3,6 +3,7 @@ package com.atzuche.order.coreapi.service;
 import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.CatConstants;
 import com.atzuche.order.commons.LocalDateTimeUtils;
+import com.atzuche.order.commons.OrderException;
 import com.atzuche.order.commons.entity.dto.OwnerMemberDTO;
 import com.atzuche.order.commons.entity.dto.OwnerMemberRightDTO;
 import com.atzuche.order.commons.entity.dto.RenterMemberDTO;
@@ -63,12 +64,15 @@ public class MemberService {
             if(responseData == null || !ErrorCode.SUCCESS.getCode().equals(responseData.getResCode())){
                 log.error("Feign 获取车主会员信息失败,orderContextDto={},memNo={}",memNo, JSON.toJSONString(responseData));
                 OwnerberByFeignException ownerberByFeignException = new OwnerberByFeignException(SubmitOrderErrorEnum.FEIGN_GET_OWNER_MEMBER_FAIL.getCode(), SubmitOrderErrorEnum.FEIGN_GET_OWNER_MEMBER_FAIL.getText());
-                Cat.logError("Feign 获取车主会员信息失败",ownerberByFeignException);
-                t.setStatus(ownerberByFeignException);
                 throw ownerberByFeignException;
             }
             t.setStatus(Transaction.SUCCESS);
-        }catch (Exception e){
+        }catch (OrderException oe){
+            Cat.logError("Feign 获取车主会员信息失败",oe);
+            t.setStatus(oe);
+            throw oe;
+        }
+        catch (Exception e){
             t.setStatus(e);
             Cat.logError("Feign 获取车主会员信息失败",e);
             log.error("Feign 获取车主会员信息失败,orderContextDto={},memNo={}",memNo,e);
