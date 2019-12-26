@@ -3,12 +3,12 @@ package com.atzuche.order.coreapi.service;
 import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.OrderException;
 import com.atzuche.order.commons.OrderReqContext;
+import com.atzuche.order.commons.OrderStatus;
 import com.atzuche.order.commons.constant.OrderConstant;
 import com.atzuche.order.commons.entity.dto.OrderContextDTO;
 import com.atzuche.order.commons.entity.dto.OwnerMemberDTO;
 import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
 import com.atzuche.order.commons.entity.dto.RenterMemberDTO;
-import com.atzuche.order.commons.enums.OrderStatusEnum;
 import com.atzuche.order.commons.vo.req.NormalOrderReqVO;
 import com.atzuche.order.commons.vo.res.NormalOrderResVO;
 import com.atzuche.order.coreapi.entity.request.SubmitOrderReq;
@@ -142,6 +142,9 @@ public class SubmitOrderService {
         String renterOrderNo = uniqueOrderNoService.getRenterOrderNo(orderNo);
         //4.2.调用租客订单模块处理租客订单相关业务
         //4.3.接收租客订单返回信息
+        //4.4.租客商品信息处理
+        //4.5.租客信息处理
+        //4.6.租客权益信息处理
 
 
         //5.创建车主子订单
@@ -172,9 +175,9 @@ public class SubmitOrderService {
         orderStatusDTO.setIsDispatch(OrderConstant.NO);
         orderStatusDTO.setDispatchStatus(OrderConstant.NO);
         if (null == renterGoodsDetailDTO.getReplyFlag() || renterGoodsDetailDTO.getReplyFlag() == OrderConstant.NO) {
-            orderStatusDTO.setStatus(OrderStatusEnum.ORDER_STATUS_AWAIT_AFFIRM.getCode());
+            orderStatusDTO.setStatus(OrderStatus.TO_CONFIRM.getStatus());
         } else {
-            orderStatusDTO.setStatus(OrderStatusEnum.ORDER_STATUS_AWAIT_PAY.getCode());
+            orderStatusDTO.setStatus(OrderStatus.TO_PAY.getStatus());
         }
         parentOrderDTO.setOrderStatusDTO(orderStatusDTO);
         parentOrderService.saveParentOrderInfo(parentOrderDTO);

@@ -25,4 +25,6 @@ dependencies {
     compile project(":account-all:account-renter-wz-deposit")
     compile project(":util-all:order-commons")
     compile project(":order-core-all:renter-all:renter-cost")
+
+    compile 'com.autoyol:autoPayGatewaySecondary-api:1.0.4-SNAPSHOT'
 }

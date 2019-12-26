@@ -1,7 +1,7 @@
 package com.atzuche.order.accountplatorm.vo.req;
 
 import com.atzuche.order.commons.enums.RenterCashCodeEnum;
-import com.atzuche.order.commons.enums.account.SubsidyEnum;
+import com.atzuche.order.commons.enums.SubsidySourceCodeEnum;
 import com.autoyol.commons.web.ErrorCode;
 import lombok.Data;
 import org.springframework.util.Assert;
@@ -32,7 +32,7 @@ public class AccountPlatformSubsidyDetailReqVO {
     /**
      * 补贴方（车主/租客）
      */
-    private SubsidyEnum subsidyName;
+    private SubsidySourceCodeEnum subsidyName;
 
     /**
      * 创建人

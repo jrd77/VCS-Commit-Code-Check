@@ -3,11 +3,10 @@ package com.atzuche.order.rentermem.service;
 import com.atzuche.order.commons.GlobalConstant;
 import com.atzuche.order.commons.entity.dto.RenterMemberRightDTO;
 import com.atzuche.order.commons.enums.RenterMemRightEnum;
-import com.atzuche.order.rentermem.exception.CalDepositAmtException;
+import com.atzuche.order.rentermem.exception.CalCarDepositAmtException;
+import com.atzuche.order.rentermem.exception.CalWzDepositAmtException;
 import com.dianping.cat.Cat;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.atzuche.order.rentermem.mapper.RenterMemberRightMapper;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -22,18 +21,16 @@ import java.util.stream.Collectors;
  */
 @Service
 public class RenterMemberRightService{
-    @Autowired
-    private RenterMemberRightMapper renterMemberRightMapper;
 
     /**
      *
      * @param renterMemberRightDTOList 权益集合
      * @param carDepositAmt 车辆押金
-     * @return 如果CarDepositAmt和wzDepositAmt都不为null，优先选择车辆押金计算
+     * @return  会员权益车辆押金计算
      */
     public int carDepositAmt(List<RenterMemberRightDTO> renterMemberRightDTOList, Integer carDepositAmt){
         if(carDepositAmt == null){
-            CalDepositAmtException calDepositAmtException = new CalDepositAmtException();
+            CalCarDepositAmtException calDepositAmtException = new CalCarDepositAmtException();
             Cat.logError(calDepositAmtException);
             throw calDepositAmtException;
         }
@@ -55,7 +52,6 @@ public class RenterMemberRightService{
                                 || RenterMemRightEnum.SUCCESS_RENTCAR.getRightCode().equals(x.getRightCode())
                                 || RenterMemRightEnum.MEMBER_LEVEL.getRightCode().equals(x.getRightCode())))
                 .collect(Collectors.toList());
-
         if(taskList != null && taskList.size()>0){
             AtomicInteger rightValueTotal = new AtomicInteger(0);
             taskList.forEach(x->{
@@ -78,9 +74,9 @@ public class RenterMemberRightService{
      */
     public int wzDepositAmt(List<RenterMemberRightDTO> renterMemberRightDTOList, Integer wzDepositAmt){
         if(wzDepositAmt == null){
-            CalDepositAmtException calDepositAmtException = new CalDepositAmtException();
-            Cat.logError(calDepositAmtException);
-            throw calDepositAmtException;
+            CalWzDepositAmtException calWzDepositAmtException = new CalWzDepositAmtException();
+            Cat.logError(calWzDepositAmtException);
+            throw calWzDepositAmtException;
         }
         List<RenterMemberRightDTO> staff = renterMemberRightDTOList
                 .stream()

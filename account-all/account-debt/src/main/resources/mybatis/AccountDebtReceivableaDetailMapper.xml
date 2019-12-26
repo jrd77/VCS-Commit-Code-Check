@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.atzuche.order.accountdebt.mapper.AccountDebtReceivableaDetailMapper">
+<mapper namespace="com.atzuche.order.settle.mapper.AccountDebtReceivableaDetailMapper">
 
-    <resultMap type="com.atzuche.order.accountdebt.entity.AccountDebtReceivableaDetailEntity" id="BaseResultMap">
+    <resultMap type="com.atzuche.order.settle.entity.AccountDebtReceivableaDetailEntity" id="BaseResultMap">
                     <result property="id" column="id"/>
                     <result property="memNo" column="mem_no"/>
                     <result property="orderNo" column="order_no"/>
@@ -48,7 +48,7 @@
         select <include refid="Base_Column_List" /> from account_debt_receivablea_detail where id = #{value}
     </select>
 
-    <insert id="insert" parameterType="com.atzuche.order.accountdebt.entity.AccountDebtReceivableaDetailEntity" useGeneratedKeys="true" keyProperty="id">
+    <insert id="insert" parameterType="com.atzuche.order.settle.entity.AccountDebtReceivableaDetailEntity" useGeneratedKeys="true" keyProperty="id">
 		insert into account_debt_receivablea_detail
 		(
                     		`mem_no`,

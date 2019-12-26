@@ -1,5 +1,7 @@
 package com.atzuche.order.commons;
 
+import java.time.format.DateTimeFormatter;
+
 public class GlobalConstant {
     //是否使用特供价、1：使用特供价 0：不使用特供价
     public static final String USE_SPECIAL_PRICE = "1";
@@ -9,4 +11,9 @@ public class GlobalConstant {
     public static final int MEMBER_RIGHT_STAFF_CAR_DEPOSIT = 300;
     //会员权益-内部员工-违章押金
     public static final int MEMBER_RIGHT_STAFF_WZ_DEPOSIT = 1;
+
+    public static final int GET_RETURN_OVER_COST = 50;
+
+    public static final DateTimeFormatter DATE_TIME_FORMAT_2 = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
+
 }

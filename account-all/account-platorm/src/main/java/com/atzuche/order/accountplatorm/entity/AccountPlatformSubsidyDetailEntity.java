@@ -31,7 +31,7 @@ public class AccountPlatformSubsidyDetailEntity implements Serializable {
 	/**
 	 * 补贴科目来源编码
 	 */
-	private Integer sourceCode;
+	private String sourceCode;
 	/**
 	 * 补贴科目来源描述
 	 */

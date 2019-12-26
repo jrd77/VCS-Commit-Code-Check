@@ -1,8 +1,8 @@
 package com.atzuche.order.cashieraccount.service;
 
-import com.atzuche.order.accountdebt.service.AccountDebtService;
-import com.atzuche.order.accountdebt.vo.req.AccountDeductDebtReqVO;
-import com.atzuche.order.accountdebt.vo.res.AccountDebtResVO;
+import com.atzuche.order.settle.service.AccountDebtService;
+import com.atzuche.order.settle.vo.req.AccountDeductDebtReqVO;
+import com.atzuche.order.settle.vo.res.AccountDebtResVO;
 import com.atzuche.order.accountownerincome.service.AccountOwnerIncomeService;
 import com.atzuche.order.accountownerincome.vo.req.AccountOwnerIncomeExamineOpReqVO;
 import com.atzuche.order.accountownerincome.vo.req.AccountOwnerIncomeExamineReqVO;
@@ -21,7 +21,6 @@ import com.atzuche.order.accountrenterwzdepost.vo.req.PayedOrderRenterDepositWZD
 import com.atzuche.order.accountrenterwzdepost.vo.req.PayedOrderRenterWZDepositReqVO;
 import com.atzuche.order.accountrenterwzdepost.vo.req.RenterWZDepositCostReqVO;
 import com.atzuche.order.cashieraccount.common.DataPayKindConstant;
-import com.atzuche.order.cashieraccount.common.DataPayTypeConstant;
 import com.atzuche.order.cashieraccount.service.notservice.CashierNoTService;
 import com.atzuche.order.cashieraccount.service.notservice.CashierRefundApplyNoTService;
 import com.atzuche.order.cashieraccount.vo.req.CashierDeductDebtReqVO;
@@ -339,10 +338,8 @@ public class CashierService {
      */
     @Transactional(rollbackFor=Exception.class)
     public void refundCallBackSuccess(OrderPayAsynResVO orderPayAsynVO) {
-        if(Objects.nonNull(orderPayAsynVO) && DataPayTypeConstant.PUR_RETURN.equals(orderPayAsynVO.getPayKind())){
-            cashierRefundApplyNoTService.updateRefundDepositSuccess(orderPayAsynVO);
-
-        }
+        cashierRefundApplyNoTService.updateRefundDepositSuccess(orderPayAsynVO);
+        //TODO 支付回调成功 push/或者短信 怎么处理
     }
 
     /**
