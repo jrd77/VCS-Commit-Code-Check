@@ -27,5 +27,7 @@ public interface OwnerOrderMapper{
     int updateByPrimaryKeySelective(OwnerOrderEntity record);
     
     OwnerOrderEntity getOwnerOrderByOrderNoAndIsEffective(@Param("orderNo") String orderNo);
+    
+    Integer updateOwnerOrderInvalidById(@Param("id") Integer id);
 
 }

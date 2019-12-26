@@ -166,7 +166,7 @@ public class CarService {
         return renterGoodsDetailDto;
     }
     //获取车主商品信息
-    private OwnerGoodsDetailDTO getOwnerGoodsDetail(RenterGoodsDetailDTO renterGoodsDetailDto) throws CarDetailByFeignException, RenterMemberByFeignException {
+    public OwnerGoodsDetailDTO getOwnerGoodsDetail(RenterGoodsDetailDTO renterGoodsDetailDto) throws CarDetailByFeignException, RenterMemberByFeignException {
         OwnerGoodsDetailDTO ownerGoodsDetailDto = new OwnerGoodsDetailDTO();
         BeanUtils.copyProperties(renterGoodsDetailDto, ownerGoodsDetailDto);
         return ownerGoodsDetailDto;
