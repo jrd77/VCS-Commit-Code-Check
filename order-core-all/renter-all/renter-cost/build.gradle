@@ -15,4 +15,5 @@ dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
     compile project(":util-all:fee-calculator")
     compile project(":util-all:order-commons")
+    compile "com.autoyol:fetchBackCarFeeService-api:feign-1.0.0-SNAPSHOT"
 }
