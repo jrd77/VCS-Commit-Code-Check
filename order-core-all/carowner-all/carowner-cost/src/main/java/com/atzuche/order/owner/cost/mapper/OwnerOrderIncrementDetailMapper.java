@@ -28,4 +28,7 @@ public interface OwnerOrderIncrementDetailMapper{
     int updateByPrimaryKeySelective(OwnerOrderIncrementDetailEntity record);
 
     List<OwnerOrderIncrementDetailEntity> listOwnerOrderIncrementDetail(@Param("orderNo") String orderNo, @Param("ownerOrderNo") String ownerOrderNo);
+
+    Integer saveOwnerOrderIncrementDetailBatch(@Param("costList") List<OwnerOrderIncrementDetailEntity> costList);
+
 }

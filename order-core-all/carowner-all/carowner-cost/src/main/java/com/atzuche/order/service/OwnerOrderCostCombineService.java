@@ -15,6 +15,7 @@ import com.atzuche.order.commons.entity.dto.OilAmtDTO;
 import com.atzuche.order.commons.entity.dto.OwnerGoodsPriceDetailDTO;
 import com.atzuche.order.commons.enums.OwnerCashCodeEnum;
 import com.atzuche.order.commons.enums.RenterCashCodeEnum;
+import com.atzuche.order.owner.cost.entity.OwnerOrderIncrementDetailEntity;
 import com.atzuche.order.owner.cost.entity.OwnerOrderPurchaseDetailEntity;
 import com.atzuche.order.owner.cost.exception.OwnerCostParameterException;
 import com.autoyol.platformcost.OwnerFeeCalculatorUtils;
@@ -179,10 +180,10 @@ public class OwnerOrderCostCombineService {
 	 * @param srvGetFlag 取车标志
 	 * @return OwnerOrderPurchaseDetailEntity
 	 */
-	public OwnerOrderPurchaseDetailEntity getOwnerSrvGetAmtEntity(CostBaseDTO costBaseDTO, Integer carOwnerType, Integer srvGetFlag) {
+	public OwnerOrderIncrementDetailEntity getOwnerSrvGetAmtEntity(CostBaseDTO costBaseDTO, Integer carOwnerType, Integer srvGetFlag) {
 		Integer ownerSrvGetAmt = OwnerFeeCalculatorUtils.calOwnerSrvGetAmt(carOwnerType, srvGetFlag);
 		FeeResult feeResult = new FeeResult(ownerSrvGetAmt, 1.0, ownerSrvGetAmt);
-		OwnerOrderPurchaseDetailEntity result = costBaseConvert(costBaseDTO, feeResult, OwnerCashCodeEnum.SRV_GET_COST_OWNER);
+		OwnerOrderIncrementDetailEntity result = costBaseConvertIncrement(costBaseDTO, feeResult, OwnerCashCodeEnum.SRV_GET_COST_OWNER);
 		return result;
 	}
 	
@@ -194,10 +195,10 @@ public class OwnerOrderCostCombineService {
 	 * @param srvReturnFlag 还车标志
 	 * @return OwnerOrderPurchaseDetailEntity
 	 */
-	public OwnerOrderPurchaseDetailEntity getOwnerSrvReturnAmtEntity(CostBaseDTO costBaseDTO, Integer carOwnerType, Integer srvReturnFlag) {
+	public OwnerOrderIncrementDetailEntity getOwnerSrvReturnAmtEntity(CostBaseDTO costBaseDTO, Integer carOwnerType, Integer srvReturnFlag) {
 		Integer ownerSrvReturnAmt = OwnerFeeCalculatorUtils.calOwnerSrvReturnAmt(carOwnerType, srvReturnFlag);
 		FeeResult feeResult = new FeeResult(ownerSrvReturnAmt, 1.0, ownerSrvReturnAmt);
-		OwnerOrderPurchaseDetailEntity result = costBaseConvert(costBaseDTO, feeResult, OwnerCashCodeEnum.SRV_RETURN_COST_OWNER);
+		OwnerOrderIncrementDetailEntity result = costBaseConvertIncrement(costBaseDTO, feeResult, OwnerCashCodeEnum.SRV_RETURN_COST_OWNER);
 		return result;
 	}
 	
@@ -217,7 +218,7 @@ public class OwnerOrderCostCombineService {
 	}
 	
 	/**
-	 * 车主端代步车服务费
+	 * 车主端代管车服务费
 	 * @param costBaseDTO 基本信息
 	 * @param rentAmt 租金
 	 * @param proxyProportion 代管车服务费比例
@@ -257,6 +258,36 @@ public class OwnerOrderCostCombineService {
 		result.setTotalAmount(totalFee);
 		result.setCostCode(ownerCashCodeEnum.getCashNo());
 		result.setCostCodeDesc(ownerCashCodeEnum.getTxt());
+		return result;
+	}
+	
+	
+	/**
+	 * 数据转化（增值服务）
+	 * @param costBaseDTO 基本参数
+	 * @param feeResult 计算结果对象
+	 * @return OwnerOrderPurchaseDetailEntity
+	 */
+	public OwnerOrderIncrementDetailEntity costBaseConvertIncrement(CostBaseDTO costBaseDTO, FeeResult feeResult, OwnerCashCodeEnum ownerCashCodeEnum) {
+		if (costBaseDTO == null) {
+			return null;
+		}
+		if (feeResult == null) {
+			return null;
+		}
+		if (ownerCashCodeEnum == null) {
+			return null;
+		}
+		Integer totalFee = feeResult.getTotalFee() == null ? 0:feeResult.getTotalFee();
+		OwnerOrderIncrementDetailEntity result = new OwnerOrderIncrementDetailEntity();
+		result.setOrderNo(costBaseDTO.getOrderNo());
+		result.setOwnerOrderNo(costBaseDTO.getOwnerOrderNo());
+		result.setMemNo(costBaseDTO.getMemNo());
+		result.setUnitPrice(feeResult.getUnitPrice());
+		result.setCount(feeResult.getUnitCount());
+		result.setTotalAmount(-totalFee);
+		result.setCostCode(ownerCashCodeEnum.getCashNo());
+		result.setCostDesc(ownerCashCodeEnum.getTxt());
 		return result;
 	}
 }

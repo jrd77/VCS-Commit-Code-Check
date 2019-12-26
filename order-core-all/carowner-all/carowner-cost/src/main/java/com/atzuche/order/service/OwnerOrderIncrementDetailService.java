@@ -32,4 +32,13 @@ public class OwnerOrderIncrementDetailService {
 	public Integer saveOwnerOrderIncrementDetail(OwnerOrderIncrementDetailEntity ownerOrderIncrementDetailEntity) {
 		return ownerOrderIncrementDetailMapper.saveOwnerOrderIncrementDetail(ownerOrderIncrementDetailEntity);
 	}
+	
+	/**
+	 * 批量保存车主增值服务费用
+	 * @param costList 车主增值服务费用列表
+	 * @return Integer
+	 */
+	public Integer saveOwnerOrderIncrementDetailBatch(List<OwnerOrderIncrementDetailEntity> costList) {
+		return ownerOrderIncrementDetailMapper.saveOwnerOrderIncrementDetailBatch(costList);
+	}
 }

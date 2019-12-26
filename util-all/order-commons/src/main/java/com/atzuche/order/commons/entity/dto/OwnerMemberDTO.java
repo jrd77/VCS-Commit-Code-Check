@@ -6,6 +6,14 @@ import java.util.List;
 
 @Data
 public class OwnerMemberDTO {
+	/**
+	 * 主订单号
+	 */
+	private String orderNo;
+	/**
+	 * 子订单号
+	 */
+	private String ownerOrderNo;
     /**
      * 会员号
      */

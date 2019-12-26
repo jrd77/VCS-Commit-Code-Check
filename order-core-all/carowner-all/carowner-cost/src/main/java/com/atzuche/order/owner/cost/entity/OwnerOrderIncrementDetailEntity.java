@@ -47,7 +47,7 @@ public class OwnerOrderIncrementDetailEntity implements Serializable {
 	/**
 	 * 份数
 	 */
-	private Integer count;
+	private Double count;
 	/**
 	 * 总价
 	 */
