@@ -59,8 +59,6 @@ public class RenterOrderCalCostService {
     private PlatformCouponService platformCouponService;
 
 
-
-
     /**
      * 获取费用项和费用明细列表
      *
@@ -241,6 +239,18 @@ public class RenterOrderCalCostService {
     }
 
 
+
+    public void calAutoCoinDeductInfo() {
+
+
+
+
+    }
+
+
+
+
+
     /**
      * 优惠券服务请求参数处理
      *
@@ -258,6 +268,7 @@ public class RenterOrderCalCostService {
 
         return request;
     }
+
 
 
 }
