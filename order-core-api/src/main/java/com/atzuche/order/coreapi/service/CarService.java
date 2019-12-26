@@ -115,6 +115,8 @@ public class CarService {
         CarStewardVO carSteward = data.getCarSteward();
         CarDetailImageVO detailImageVO = data.getDetailImageVO();
         CarAddressOfTransVO carAddressOfTransVO = data.getCarAddressOfTransVO();
+        CarTagListVO carTagVO = data.getCarTagVO();
+
         RenterGoodsDetailDTO renterGoodsDetailDto = new RenterGoodsDetailDTO();
         renterGoodsDetailDto.setReplyFlag(carBaseVO.getTransReplyVO().getReplyFlag());
         renterGoodsDetailDto.setCarAddrIndex(Integer.valueOf(reqVO.getAddrIndex()));
@@ -149,7 +151,7 @@ public class CarService {
         renterGoodsDetailDto.setCarRealLon(carAddressOfTransVO.getRealAddressLon()==null?"":String.valueOf(carAddressOfTransVO.getRealAddressLon()));
         renterGoodsDetailDto.setCarRealLat(carAddressOfTransVO.getRealAddressLat()==null?"":String.valueOf(carAddressOfTransVO.getRealAddressLat()));
         renterGoodsDetailDto.setOwnerMemNo(String.valueOf(carBaseVO.getOwnerNo()));
-
+        renterGoodsDetailDto.setLabelIds(carTagVO == null?new ArrayList<>():carTagVO.getLabelIds());
         List<RenterGoodsPriceDetailDTO> list = new ArrayList<>();
         List<CarPriceOfDayVO> daysPrice = data.getDaysPrice();
         if(daysPrice == null){

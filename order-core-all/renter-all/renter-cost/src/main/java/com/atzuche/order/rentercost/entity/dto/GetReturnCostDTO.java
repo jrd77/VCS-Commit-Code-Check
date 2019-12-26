@@ -15,7 +15,7 @@ import java.util.List;
  **/
 
 @Data
-public class GetReturnCostDto {
+public class GetReturnCostDTO {
     /**
      * 租客取还车费用明细列表
      */

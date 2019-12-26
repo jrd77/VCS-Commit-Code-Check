@@ -5,6 +5,6 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class GetFbcFeeRequest {
-    private List<GetFbcFeeRequestDetail> req;
+public class GetFbcFeeRequestDTO {
+    private List<GetFbcFeeRequestDetailDTO> req;
 }
