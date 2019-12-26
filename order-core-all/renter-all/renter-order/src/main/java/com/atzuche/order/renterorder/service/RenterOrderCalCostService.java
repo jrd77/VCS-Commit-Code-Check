@@ -1,6 +1,9 @@
 package com.atzuche.order.renterorder.service;
 
+import com.atzuche.order.commons.entity.dto.GetReturnCarCostReqDto;
 import com.atzuche.order.rentercost.entity.RenterOrderCostDetailEntity;
+import com.atzuche.order.rentercost.entity.RenterOrderSubsidyDetailEntity;
+import com.atzuche.order.rentercost.entity.dto.GetReturnCostDto;
 import com.atzuche.order.rentercost.service.RenterOrderCostCombineService;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.atzuche.order.renterorder.entity.dto.RenterOrderCostReqDTO;
@@ -42,6 +45,7 @@ public class RenterOrderCalCostService {
     public RenterOrderCostRespDTO getRenterOrderCostAndDeailList(RenterOrderCostReqDTO renterOrderCostReqDTO){
         RenterOrderCostRespDTO renterOrderCostRespDTO = new RenterOrderCostRespDTO();
         List<RenterOrderCostDetailEntity> detailList = new ArrayList<>();
+        List<RenterOrderSubsidyDetailEntity> subsidyList = new ArrayList<>();
 
         //获取租金
         List<RenterOrderCostDetailEntity> renterOrderCostDetailEntities = renterOrderCostCombineService.listRentAmtEntity(renterOrderCostReqDTO.getRentAmtDTO());
@@ -67,15 +71,23 @@ public class RenterOrderCalCostService {
         renterOrderCostRespDTO.setAdditionalDrivingEnsureAmount(totalAmount);
         detailList.add(extraDriverInsureAmtEntity);
 
-        //获取取还车费用 TODO
 
-        //获取取还车超运能费用 TODO
 
         //获取平台手续费
         RenterOrderCostDetailEntity serviceChargeFeeEntity = renterOrderCostCombineService.getServiceChargeFeeEntity(renterOrderCostReqDTO.getCostBaseDTO());
         Integer serviceAmount = serviceChargeFeeEntity.getTotalAmount();
         renterOrderCostRespDTO.setCommissionAmount(serviceAmount);
         detailList.add(serviceChargeFeeEntity);
+
+        //获取取还车费用
+        GetReturnCarCostReqDto getReturnCarCostReqDto = renterOrderCostReqDTO.getGetReturnCarCostReqDto();
+        getReturnCarCostReqDto.setSumJudgeFreeFee(rentAmt + insurAmt + serviceAmount);
+        GetReturnCostDto returnCarCost = renterOrderCostCombineService.getReturnCarCost(getReturnCarCostReqDto);
+        detailList.addAll(returnCarCost.getRenterOrderCostDetailEntityList());
+        subsidyList.addAll(returnCarCost.getRenterOrderSubsidyDetailEntityList());
+
+
+        //获取取还车超运能费用 TODO
 
         //租车费用 = 租金+平台保障费+全面保障费+取还车费用+取还车超云能费用+附加驾驶员费用+手续费；
         int rentCarAmount = rentAmt + insurAmt + comprehensiveEnsureAmount + 0 + 0 + totalAmount + serviceAmount;
