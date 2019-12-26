@@ -22,6 +22,7 @@
         <result property="internalNo" column="internal_no"/>
         <result property="transStatus" column="trans_status"/>
         <result property="payMd5" column="pay_md5"/>
+        <result property="qn" column="qn"/>
         <result property="createTime" column="create_time"/>
         <result property="createOp" column="create_op"/>
         <result property="updateTime" column="update_time"/>
@@ -50,6 +51,7 @@
 	`internal_no`, 	
 	`trans_status`, 	
 	`pay_md5`, 	
+	`qn`, 	
 	`create_time`, 	
 	`create_op`, 	
 	`update_time`, 	
@@ -84,6 +86,7 @@
 				`internal_no`,		
 				`trans_status`,		
 				`pay_md5`,		
+				`qn`,		
 				`create_time`,		
 				`create_op`,		
 				`update_time`,		
@@ -110,6 +113,7 @@
 				#{internalNo}, 		
 				#{transStatus}, 		
 				#{payMd5}, 		
+				#{qn}, 		
 				#{createTime}, 		
 				#{createOp}, 		
 				#{updateTime}, 		
@@ -118,7 +122,7 @@
 				#{isDelete}		
 			)
 	</insert>
-	 
+
 	<update id="updateByPrimaryKeySelective" parameterType="com.atzuche.order.cashieraccount.entity.CashierEntity">
 		update cashier 
 		<set>
@@ -139,6 +143,7 @@
 				<if test="internalNo != null">`internal_no` = #{internalNo}, </if>
 				<if test="transStatus != null">`trans_status` = #{transStatus}, </if>
 				<if test="payMd5 != null">`pay_md5` = #{payMd5}, </if>
+				<if test="qn != null">`qn` = #{qn}, </if>
 				<if test="createTime != null">`create_time` = #{createTime}, </if>
 				<if test="createOp != null">`create_op` = #{createOp}, </if>
 				<if test="updateTime != null">`update_time` = #{updateTime}, </if>

@@ -26,13 +26,16 @@ public enum RenterCashCodeEnum {
     ACCOUNT_OWNER_DEBT("21110004","车主费用"),
     ACCOUNT_OWNER_INCOME("21110005","车主收益"),
     ACCOUNT_RENTER_RENT_COST("21110006","租客租车费用"),
+    ACCOUNT_RENTER_RENT_COST_REFUND("21110007","租客租车费用退还"),
+
 
     OWNER_RENT_INCOME("31110001","租车收益"),
     OWNER_PENALTIES_INCOME("31110002","违约金收益"),
 
     CASHIER_RENTER_DEPOSIT("41110001","收银台支付车俩押金"),
     CASHIER_RENTER_WZ_DEPOSIT("41110001","收银台支付违章押金"),
-
+    CASHIER_RENTER_COST("41110001","收银台支付租车费用"),
+    CASHIER_RENTER_AGAIN_COST("41110001","收银台支付补付租车费用"),
     ;
 	
 	/**

@@ -59,7 +59,7 @@ public class AccountRenterDepositDetailEntity implements Serializable {
 	/**
 	 * 押金来源编码
 	 */
-	private Integer sourceCode;
+	private String sourceCode;
 	/**
 	 * 押金来源编码描述
 	 */

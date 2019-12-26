@@ -9,14 +9,13 @@
         <result property="memNo" column="mem_no"/>
         <result property="paySourceCode" column="pay_source_code"/>
         <result property="paySource" column="pay_source"/>
-        <result property="paymentCode" column="payment_code"/>
-        <result property="payment" column="payment"/>
-        <result property="payChannelCode" column="pay_channel_code"/>
-        <result property="payChannel" column="pay_channel"/>
+        <result property="payTypeCode" column="pay_type_code"/>
+        <result property="payType" column="pay_type"/>
         <result property="amt" column="amt"/>
         <result property="sourceCode" column="source_code"/>
         <result property="sourceDetail" column="source_detail"/>
         <result property="transTime" column="trans_time"/>
+        <result property="uniqueNo" column="unique_no"/>
         <result property="time" column="time"/>
         <result property="createTime" column="create_time"/>
         <result property="createOp" column="create_op"/>
@@ -32,14 +31,13 @@
 	`mem_no`, 	
 	`pay_source_code`, 	
 	`pay_source`, 	
-	`payment_code`, 	
-	`payment`, 	
-	`pay_channel_code`, 	
-	`pay_channel`, 	
+	`pay_type_code`, 	
+	`pay_type`, 	
 	`amt`, 	
 	`source_code`, 	
 	`source_detail`, 	
 	`trans_time`, 	
+	`unique_no`, 	
 	`time`, 	
 	`create_time`, 	
 	`create_op`, 	
@@ -62,14 +60,13 @@
 				`mem_no`,		
 				`pay_source_code`,		
 				`pay_source`,		
-				`payment_code`,		
-				`payment`,		
-				`pay_channel_code`,		
-				`pay_channel`,		
+				`pay_type_code`,		
+				`pay_type`,		
 				`amt`,		
 				`source_code`,		
 				`source_detail`,		
 				`trans_time`,		
+				`unique_no`,		
 				`time`,		
 				`create_time`,		
 				`create_op`,		
@@ -84,14 +81,13 @@
 				#{memNo}, 		
 				#{paySourceCode}, 		
 				#{paySource}, 		
-				#{paymentCode}, 		
-				#{payment}, 		
-				#{payChannelCode}, 		
-				#{payChannel}, 		
+				#{payTypeCode}, 		
+				#{payType}, 		
 				#{amt}, 		
 				#{sourceCode}, 		
 				#{sourceDetail}, 		
 				#{transTime}, 		
+				#{uniqueNo}, 		
 				#{time}, 		
 				#{createTime}, 		
 				#{createOp}, 		
@@ -100,104 +96,5 @@
 				#{isDelete}		
 			)
 	</insert>
-	
-	<insert id="insertSelective" parameterType="com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostDetailEntity">
-		insert into account_renter_cost_detail
-		(
-			<if test="id != null">`id`, </if>
-				<if test="orderNo != null">`order_no`, </if>
-				<if test="memNo != null">`mem_no`, </if>
-				<if test="paySourceCode != null">`pay_source_code`, </if>
-				<if test="paySource != null">`pay_source`, </if>
-				<if test="paymentCode != null">`payment_code`, </if>
-				<if test="payment != null">`payment`, </if>
-				<if test="payChannelCode != null">`pay_channel_code`, </if>
-				<if test="payChannel != null">`pay_channel`, </if>
-				<if test="amt != null">`amt`, </if>
-				<if test="sourceCode != null">`source_code`, </if>
-				<if test="sourceDetail != null">`source_detail`, </if>
-				<if test="transTime != null">`trans_time`, </if>
-				<if test="time != null">`time`, </if>
-				<if test="createTime != null">`create_time`, </if>
-				<if test="createOp != null">`create_op`, </if>
-				<if test="updateTime != null">`update_time`, </if>
-				<if test="updateOp != null">`update_op`, </if>
-				<if test="isDelete != null">`is_delete` </if>
-			)
-		values
-		(
-			<if test="id != null">#{id},  </if>
-				<if test="orderNo != null">#{orderNo},  </if>
-				<if test="memNo != null">#{memNo},  </if>
-				<if test="paySourceCode != null">#{paySourceCode},  </if>
-				<if test="paySource != null">#{paySource},  </if>
-				<if test="paymentCode != null">#{paymentCode},  </if>
-				<if test="payment != null">#{payment},  </if>
-				<if test="payChannelCode != null">#{payChannelCode},  </if>
-				<if test="payChannel != null">#{payChannel},  </if>
-				<if test="amt != null">#{amt},  </if>
-				<if test="sourceCode != null">#{sourceCode},  </if>
-				<if test="sourceDetail != null">#{sourceDetail},  </if>
-				<if test="transTime != null">#{transTime},  </if>
-				<if test="time != null">#{time},  </if>
-				<if test="createTime != null">#{createTime},  </if>
-				<if test="createOp != null">#{createOp},  </if>
-				<if test="updateTime != null">#{updateTime},  </if>
-				<if test="updateOp != null">#{updateOp},  </if>
-				<if test="isDelete != null">#{isDelete} </if>
-			)
-	</insert>
-	
-	 
-	<update id="updateByPrimaryKeySelective" parameterType="com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostDetailEntity">
-		update account_renter_cost_detail 
-		<set>
-				<if test="orderNo != null">`order_no` = #{orderNo}, </if>
-				<if test="memNo != null">`mem_no` = #{memNo}, </if>
-				<if test="paySourceCode != null">`pay_source_code` = #{paySourceCode}, </if>
-				<if test="paySource != null">`pay_source` = #{paySource}, </if>
-				<if test="paymentCode != null">`payment_code` = #{paymentCode}, </if>
-				<if test="payment != null">`payment` = #{payment}, </if>
-				<if test="payChannelCode != null">`pay_channel_code` = #{payChannelCode}, </if>
-				<if test="payChannel != null">`pay_channel` = #{payChannel}, </if>
-				<if test="amt != null">`amt` = #{amt}, </if>
-				<if test="sourceCode != null">`source_code` = #{sourceCode}, </if>
-				<if test="sourceDetail != null">`source_detail` = #{sourceDetail}, </if>
-				<if test="transTime != null">`trans_time` = #{transTime}, </if>
-				<if test="time != null">`time` = #{time}, </if>
-				<if test="createTime != null">`create_time` = #{createTime}, </if>
-				<if test="createOp != null">`create_op` = #{createOp}, </if>
-				<if test="updateTime != null">`update_time` = #{updateTime}, </if>
-				<if test="updateOp != null">`update_op` = #{updateOp}, </if>
-				<if test="isDelete != null">`is_delete` = #{isDelete}</if>
-			</set>
-		where id = #{id}
-	</update>
-	
-	<update id="updateByPrimaryKey" parameterType="com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostDetailEntity">
-		update account_renter_cost_detail 
-		<set>
-				`order_no` = #{orderNo}, 		
-				`mem_no` = #{memNo}, 		
-				`pay_source_code` = #{paySourceCode}, 		
-				`pay_source` = #{paySource}, 		
-				`payment_code` = #{paymentCode}, 		
-				`payment` = #{payment}, 		
-				`pay_channel_code` = #{payChannelCode}, 		
-				`pay_channel` = #{payChannel}, 		
-				`amt` = #{amt}, 		
-				`source_code` = #{sourceCode}, 		
-				`source_detail` = #{sourceDetail}, 		
-				`trans_time` = #{transTime}, 		
-				`time` = #{time}, 		
-				`create_time` = #{createTime}, 		
-				`create_op` = #{createOp}, 		
-				`update_time` = #{updateTime}, 		
-				`update_op` = #{updateOp}, 		
-				`is_delete` = #{isDelete}		
-	
-		</set>
-		where id = #{id}
-	</update>
-  	
+
 </mapper>

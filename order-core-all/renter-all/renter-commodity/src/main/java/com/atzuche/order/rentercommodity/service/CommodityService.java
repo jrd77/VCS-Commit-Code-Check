@@ -30,8 +30,6 @@ public class CommodityService {
     @Autowired
     private RenterGoodsPriceDetailMapper renterGoodsPriceDetailMapper;
     @Autowired
-    private RenterOrderService renterOrderService;
-    @Autowired
     private RenterGoodsService renterGoodsService;
     /**
      * 获取租客价格列表
@@ -84,13 +82,12 @@ public class CommodityService {
 
     //组合
     private void combination(RenterGoodsDetailDTO renterGoodsDetailDTO){
-        LocalDateTime rentTime = renterGoodsDetailDTO.getRentTime();
-        LocalDateTime revertTime = renterGoodsDetailDTO.getRevertTime();
-        RenterOrderEntity renterOrderEntity = renterOrderService.getRenterOrderByOrderNoAndIsEffective(renterGoodsDetailDTO.getOrderNo());
-        if(renterOrderEntity == null){
+        if(renterGoodsDetailDTO.getRenterOrderNo() == null){
             return;
         }
-        List<RenterGoodsPriceDetailEntity> dbGoodsPriceList = renterGoodsPriceDetailMapper.selectByRenterOrderNo(renterOrderEntity.getRenterOrderNo());
+        LocalDateTime rentTime = renterGoodsDetailDTO.getRentTime();
+        LocalDateTime revertTime = renterGoodsDetailDTO.getRevertTime();
+        List<RenterGoodsPriceDetailEntity> dbGoodsPriceList = renterGoodsPriceDetailMapper.selectByRenterOrderNo(renterGoodsDetailDTO.getRenterOrderNo());
         LocalDate carDayRent = dbGoodsPriceList.get(0).getCarDay();
         LocalDate carDayRevert = dbGoodsPriceList.get(dbGoodsPriceList.size()-1).getCarDay();
 

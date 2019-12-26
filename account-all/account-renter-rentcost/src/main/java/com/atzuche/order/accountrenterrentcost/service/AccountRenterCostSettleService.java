@@ -1,5 +1,7 @@
 package com.atzuche.order.accountrenterrentcost.service;
 
+import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostSettleEntity;
+import com.atzuche.order.accountrenterrentcost.exception.AccountRenterRentCostRefundException;
 import com.atzuche.order.accountrenterrentcost.service.notservice.AccountRenterCostDetailNoTService;
 import com.atzuche.order.accountrenterrentcost.service.notservice.AccountRenterCostSettleNoTService;
 import com.atzuche.order.accountrenterrentcost.vo.req.AccountRenterCostDetailReqVO;
@@ -8,6 +10,8 @@ import com.autoyol.commons.web.ErrorCode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
+
+import java.util.Objects;
 
 /**
  * 租客费用及其结算总表
@@ -44,6 +48,22 @@ public class AccountRenterCostSettleService{
         accountRenterCostDetailNoTService.insertAccountRenterCostDetail(accountRenterCostReqVO.getAccountRenterCostDetailReqVO());
     }
 
-
-
+    /**
+     * 退还多付的费用
+     * @param accountRenterCostDetail
+     */
+    public void refundRenterCostDetail(AccountRenterCostDetailReqVO accountRenterCostDetail) {
+        //1 校验
+        //1 参数校验
+        Assert.notNull(accountRenterCostDetail, ErrorCode.PARAMETER_ERROR.getText());
+        accountRenterCostDetail.check();
+        AccountRenterCostSettleEntity accountRenterCostSettle = accountRenterCostSettleNoTService.getCostPaidRentSettle(accountRenterCostDetail.getOrderNo(),accountRenterCostDetail.getMemNo());
+       if(Objects.isNull(accountRenterCostSettle)){
+            throw new AccountRenterRentCostRefundException();
+       }
+       //2 更新已退还金额
+        accountRenterCostSettleNoTService.refundRenterCostSettle(accountRenterCostSettle,accountRenterCostDetail.getAmt());
+       //3 记录退款费用记录
+        accountRenterCostDetailNoTService.insertAccountRenterCostDetail(accountRenterCostDetail);
+    }
 }

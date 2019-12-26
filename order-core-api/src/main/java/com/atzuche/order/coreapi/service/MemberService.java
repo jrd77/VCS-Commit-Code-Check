@@ -136,6 +136,7 @@ public class MemberService {
             InvitationTaskInfo invitationTaskInfo = memberReliefInfo.getInvitationTaskInfo();
             if(invitationTaskInfo != null){
                 OwnerMemberRightDTO internalStaff = new OwnerMemberRightDTO();
+<<<<<<< HEAD
                 internalStaff.setRightCode(OwnerMemRightEnum.BIND_WECHAT.getRightCode());
                 internalStaff.setRightName(OwnerMemRightEnum.BIND_WECHAT.getRightName());
                 internalStaff.setRightValue(invitationTaskInfo.getReliefPercentage()==null?"0":String.valueOf(invitationTaskInfo.getReliefPercentage()));
@@ -147,6 +148,19 @@ public class MemberService {
                 OwnerMemberRightDTO internalStaff = new OwnerMemberRightDTO();
                 internalStaff.setRightCode(OwnerMemRightEnum.BIND_WECHAT.getRightCode());
                 internalStaff.setRightName(OwnerMemRightEnum.BIND_WECHAT.getRightName());
+=======
+                internalStaff.setRightCode(OwnerMemRightEnum.INVITE_FRIENDS.getRightCode());
+                internalStaff.setRightName(OwnerMemRightEnum.INVITE_FRIENDS.getRightName());
+                internalStaff.setRightValue(invitationTaskInfo.getReliefPercentage()==null?"0":String.valueOf(invitationTaskInfo.getReliefPercentage()));
+                internalStaff.setRightDesc(invitationTaskInfo.getTitle());
+                rights.add(internalStaff);
+            }
+            RentCarTaskInfo rentCarTaskInfo = memberReliefInfo.getRentCarTaskInfo();
+            if(rentCarTaskInfo != null){
+                OwnerMemberRightDTO internalStaff = new OwnerMemberRightDTO();
+                internalStaff.setRightCode(OwnerMemRightEnum.SUCCESS_RENTCAR.getRightCode());
+                internalStaff.setRightName(OwnerMemRightEnum.SUCCESS_RENTCAR.getRightName());
+>>>>>>> refs/remotes/origin/pre-release
                 internalStaff.setRightValue(rentCarTaskInfo.getReliefPercentage()==null?"0":String.valueOf(rentCarTaskInfo.getReliefPercentage()));
                 internalStaff.setRightDesc(rentCarTaskInfo.getTitle());
                 rights.add(internalStaff);
@@ -191,6 +205,7 @@ public class MemberService {
         MemberTotalInfo memberTotalInfo = responseData.getData();
         MemberAuthInfo memberAuthInfo = memberTotalInfo.getMemberAuthInfo();
         MemberCoreInfo memberCoreInfo = memberTotalInfo.getMemberCoreInfo();
+        MemberBaseInfo memberBaseInfo = memberTotalInfo.getMemberBaseInfo();
         RenterMemberDTO renterMemberDto = new RenterMemberDTO();
         renterMemberDto.setMemNo(memNo);
         renterMemberDto.setPhone(memberCoreInfo.getPhone());
@@ -198,6 +213,12 @@ public class MemberService {
         renterMemberDto.setRealName(memberCoreInfo.getRealName());
         renterMemberDto.setNickName(memberCoreInfo.getNickName());
         renterMemberDto.setCertificationTime(LocalDateTimeUtils.parseStringToLocalDate(memberAuthInfo.getDriLicFirstTime()));
+        renterMemberDto.setRentFlag(memberCoreInfo.getRentFlag());
+        renterMemberDto.setFirstName(memberBaseInfo.getFirstName());
+        renterMemberDto.setGender(memberBaseInfo.getGender());
+        renterMemberDto.setIdCardAuth(memberAuthInfo.getIdCardAuth());
+        renterMemberDto.setDriLicAuth(memberAuthInfo.getDriLicAuth());
+        renterMemberDto.setDriViceLicAuth(memberAuthInfo.getDriViceLicAuth());
         //renterMemberDto.setOrderSuccessCount();
         List<RenterMemberRightDTO> rights = new ArrayList<>();
         MemberRoleInfo memberRoleInfo = memberTotalInfo.getMemberRoleInfo();
@@ -250,6 +271,7 @@ public class MemberService {
             InvitationTaskInfo invitationTaskInfo = memberReliefInfo.getInvitationTaskInfo();
             if(invitationTaskInfo != null){
                 RenterMemberRightDTO internalStaff = new RenterMemberRightDTO();
+<<<<<<< HEAD
                 internalStaff.setRightCode(RenterMemRightEnum.BIND_WECHAT.getRightCode());
                 internalStaff.setRightName(RenterMemRightEnum.BIND_WECHAT.getRightName());
                 internalStaff.setRightValue(invitationTaskInfo.getReliefPercentage()==null?"0":String.valueOf(invitationTaskInfo.getReliefPercentage()));
@@ -261,6 +283,19 @@ public class MemberService {
                 RenterMemberRightDTO internalStaff = new RenterMemberRightDTO();
                 internalStaff.setRightCode(RenterMemRightEnum.BIND_WECHAT.getRightCode());
                 internalStaff.setRightName(RenterMemRightEnum.BIND_WECHAT.getRightName());
+=======
+                internalStaff.setRightCode(RenterMemRightEnum.INVITE_FRIENDS.getRightCode());
+                internalStaff.setRightName(RenterMemRightEnum.INVITE_FRIENDS.getRightName());
+                internalStaff.setRightValue(invitationTaskInfo.getReliefPercentage()==null?"0":String.valueOf(invitationTaskInfo.getReliefPercentage()));
+                internalStaff.setRightDesc(invitationTaskInfo.getTitle());
+                rights.add(internalStaff);
+            }
+            RentCarTaskInfo rentCarTaskInfo = memberReliefInfo.getRentCarTaskInfo();
+            if(rentCarTaskInfo != null){
+                RenterMemberRightDTO internalStaff = new RenterMemberRightDTO();
+                internalStaff.setRightCode(RenterMemRightEnum.SUCCESS_RENTCAR.getRightCode());
+                internalStaff.setRightName(RenterMemRightEnum.SUCCESS_RENTCAR.getRightName());
+>>>>>>> refs/remotes/origin/pre-release
                 internalStaff.setRightValue(rentCarTaskInfo.getReliefPercentage()==null?"0":String.valueOf(rentCarTaskInfo.getReliefPercentage()));
                 internalStaff.setRightDesc(rentCarTaskInfo.getTitle());
                 rights.add(internalStaff);

@@ -11,6 +11,7 @@ import com.atzuche.order.cashieraccount.service.notservice.CashierNoTService;
 import com.atzuche.order.cashieraccount.vo.req.pay.OrderPaySignReqVO;
 import com.atzuche.order.cashieraccount.vo.res.pay.OrderPayAsynResVO;
 import com.atzuche.order.commons.CatConstants;
+import com.atzuche.order.commons.service.RabbitMsgLogService;
 import com.autoyol.commons.utils.GsonUtils;
 import com.autoyol.commons.web.ErrorCode;
 import com.dianping.cat.Cat;
@@ -38,7 +39,7 @@ public class CashierPayService{
     @Autowired AccountRenterDepositService accountRenterDepositService;
     @Autowired AccountRenterWzDepositService accountRenterWzDepositService;
     @Autowired CashierService cashierService;
-
+    @Autowired RabbitMsgLogService rabbitMsgLogService;
 
 
     /**
@@ -46,12 +47,11 @@ public class CashierPayService{
      * MQ 异步回调
      */
     @Async
-    public void payCallBackAsyn(String orderPayAsynStr){
-        Transaction t = Cat.getProducer().newTransaction(CatConstants.RABBIT_MQ_CALL, "支付系统rabbitMQ异步回调");
+    public void payCallBackAsyn(OrderPayAsynResVO orderPayAsynVO){
+        Transaction t = Cat.getProducer().newTransaction(CatConstants.RABBIT_MQ_CALL, "支付系统rabbitMQ异步回调payCallBackAsyn");
         try {
             Cat.logEvent(CatConstants.RABBIT_MQ_METHOD,"OrderPayCallBackRabbitConfig.payCallBackAsyn");
-            Cat.logEvent(CatConstants.RABBIT_MQ_PARAM,orderPayAsynStr);
-            OrderPayAsynResVO orderPayAsynVO = GsonUtils.convertObj(orderPayAsynStr, OrderPayAsynResVO.class);
+            Cat.logEvent(CatConstants.RABBIT_MQ_PARAM,GsonUtils.toJson(orderPayAsynVO));
             //1 校验是否 支付/退款成功
             if(Objects.nonNull(orderPayAsynVO) && "".equals(orderPayAsynVO.getTransStatus())){
                 //1 退款
@@ -60,25 +60,25 @@ public class CashierPayService{
                     t.setStatus(Transaction.SUCCESS);
                     return;
                 }
-                //支付成功回调
+                //2支付成功回调
                 if(DataPayTypeConstant.PAY_PUR.equals(orderPayAsynVO.getPayType()) || DataPayTypeConstant.PAY_PRE.equals(orderPayAsynVO.getPayType())){
                     cashierService.payOrderCallBackSuccess(orderPayAsynVO);
                     t.setStatus(Transaction.SUCCESS);
                     return;
                 }
+                //3 更新rabbitMQ 记录已消费
+                rabbitMsgLogService.updateConsume(orderPayAsynVO.getPayType(),orderPayAsynVO.getQn());
             }
             t.setStatus(Transaction.SUCCESS);
-            log.info("OrderPayCallBack payCallBackAsyn start end;[{}]", orderPayAsynStr);
         } catch (Exception e) {
-            log.info("OrderPayCallBack payCallBackAsyn start param;[{}]", orderPayAsynStr);
+            log.info("OrderPayCallBack payCallBackAsyn start param;[{}]", GsonUtils.toJson(orderPayAsynVO));
             t.setStatus(e);
-            Cat.logError("Feign 获取车主会员信息失败",e);
+            Cat.logError("异步处理支付系统回调 失败",e);
             throw new OrderPayCallBackAsnyException();
         } finally {
+            log.info("OrderPayCallBack payCallBackAsyn start end;[{}]", GsonUtils.toJson(orderPayAsynVO));
             t.complete();
         }
-
-
     }
 
 
