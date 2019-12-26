@@ -3,6 +3,7 @@ package com.atzuche.order.cashieraccount.config;
 import com.atzuche.order.cashieraccount.service.CashierPayService;
 import com.atzuche.order.cashieraccount.vo.res.pay.OrderPayAsynResVO;
 import com.atzuche.order.commons.CatConstants;
+import com.atzuche.order.commons.enums.RabbitBusinessTypeEnum;
 import com.atzuche.order.commons.service.RabbitMsgLogService;
 import com.autoyol.commons.utils.GsonUtils;
 import com.dianping.cat.Cat;
@@ -39,13 +40,13 @@ public class OrderPayCallBackRabbitConfig {
             Cat.logEvent(CatConstants.RABBIT_MQ_PARAM,orderPayAsynStr);
 
             OrderPayAsynResVO orderPayAsynVO = GsonUtils.convertObj(orderPayAsynStr, OrderPayAsynResVO.class);
-            rabbitMsgLogService.insertRabbitMsgLog(message,orderPayAsynVO.getPayType(),orderPayAsynStr,orderPayAsynVO.getQn());
+            rabbitMsgLogService.insertRabbitMsgLog(message, RabbitBusinessTypeEnum.ORDER_PAY_CALL_BACK,orderPayAsynStr,orderPayAsynVO.getQn());
             cashierPayService.payCallBackAsyn(orderPayAsynVO);
             t.setStatus(Transaction.SUCCESS);
         } catch (Exception e) {
             log.error("OrderPayCallBack payCallBack,e={},message={}",e,message);
             t.setStatus(e);
-            Cat.logError("MQ 接收 支付系统回调 失败",e);
+            Cat.logError("MQ 接收 支付系统回调 失败 ,e :{}",e);
         } finally {
             t.complete();
         }

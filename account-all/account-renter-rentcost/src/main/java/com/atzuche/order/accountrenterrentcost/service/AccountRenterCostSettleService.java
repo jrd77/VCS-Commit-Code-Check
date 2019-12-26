@@ -1,5 +1,6 @@
 package com.atzuche.order.accountrenterrentcost.service;
 
+import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostDetailEntity;
 import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostSettleEntity;
 import com.atzuche.order.accountrenterrentcost.exception.AccountRenterRentCostRefundException;
 import com.atzuche.order.accountrenterrentcost.service.notservice.AccountRenterCostDetailNoTService;
@@ -11,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -65,5 +67,9 @@ public class AccountRenterCostSettleService{
         accountRenterCostSettleNoTService.refundRenterCostSettle(accountRenterCostSettle,accountRenterCostDetail.getAmt());
        //3 记录退款费用记录
         accountRenterCostDetailNoTService.insertAccountRenterCostDetail(accountRenterCostDetail);
+    }
+
+    public List<AccountRenterCostDetailEntity> getAccountRenterCostDetailsByOrderNo(String orderNo){
+        return accountRenterCostDetailNoTService.getAccountRenterCostDetailsByOrderNo(orderNo);
     }
 }

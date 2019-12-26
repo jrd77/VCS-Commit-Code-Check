@@ -76,4 +76,4 @@ findProject(':order-core-all:carowner-all:carowner-delivery')?.name = 'carowner-
 include 'order-log'
 include 'order-flow'
 include 'order-delivery'
-
+include 'order-settle'

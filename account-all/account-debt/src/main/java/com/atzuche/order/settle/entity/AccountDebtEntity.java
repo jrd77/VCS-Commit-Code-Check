@@ -1,4 +1,4 @@
-package com.atzuche.order.accountplatorm.entity;
+package com.atzuche.order.settle.entity;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -6,44 +6,32 @@ import lombok.Data;
 
 
 /**
- * 平台结算补贴明细表
+ * 个人历史总额表
  * 
  * @author ZhangBin
- * @date 2019-12-11 17:45:24
+ * @date 2019-12-17 16:13:27
  * @Description:
  */
 @Data
-public class AccountPlatformSubsidyDetailEntity implements Serializable {
+public class AccountDebtEntity implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
 	/**
-	 * 
+	 * id
 	 */
 	private Integer id;
 	/**
-	 * 主订单号
+	 * 会员号
 	 */
-	private String orderNo;
+	private String memNo;
 	/**
-	 * 费用
+	 * 总欠款
 	 */
-	private Integer amt;
+	private Integer debtAmt;
 	/**
-	 * 补贴科目来源编码
+	 * 更新版本号
 	 */
-	private String sourceCode;
-	/**
-	 * 补贴科目来源描述
-	 */
-	private String sourceDesc;
-	/**
-	 * 补贴产生凭证
-	 */
-	private String uniqueNo;
-	/**
-	 * 补贴方（车主/租客）
-	 */
-	private String subsidyName;
+	private Integer version;
 	/**
 	 * 创建时间
 	 */
@@ -57,7 +45,7 @@ public class AccountPlatformSubsidyDetailEntity implements Serializable {
 	 */
 	private LocalDateTime updateTime;
 	/**
-	 * 修改人
+	 * 更新人
 	 */
 	private String updateOp;
 	/**

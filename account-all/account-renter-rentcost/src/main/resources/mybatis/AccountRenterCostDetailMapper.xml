@@ -96,5 +96,10 @@
 				#{isDelete}		
 			)
 	</insert>
+    <select id="getAccountRenterCostDetailsByOrderNo" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List" /> from account_renter_cost_detail where order_no = #{orderNo}
+
+
+    </select>
 
 </mapper>
