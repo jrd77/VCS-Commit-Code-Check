@@ -14,7 +14,6 @@ import com.atzuche.order.renterorder.dto.coupon.owner.OwnerCouponGetAndValidReqD
 import com.atzuche.order.renterorder.dto.coupon.owner.OwnerCouponGetAndValidResultDTO;
 import com.atzuche.order.renterorder.dto.coupon.owner.OwnerDiscountCouponDTO;
 import com.atzuche.order.renterorder.dto.coupon.platform.MemAvailCouponRequestDTO;
-import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.atzuche.order.renterorder.entity.dto.RenterOrderCostReqDTO;
 import com.atzuche.order.renterorder.entity.dto.RenterOrderCostRespDTO;
 import com.autoyol.commons.web.ErrorCode;
@@ -237,17 +236,6 @@ public class RenterOrderCalCostService {
 
         return null;
     }
-
-
-
-    public void calAutoCoinDeductInfo() {
-
-
-
-
-    }
-
-
 
 
 
