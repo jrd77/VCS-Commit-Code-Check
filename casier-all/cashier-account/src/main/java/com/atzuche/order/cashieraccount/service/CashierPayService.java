@@ -43,7 +43,7 @@ public class CashierPayService{
 
 
     /**
-     * 支付系统回调
+     * 支付系统回调（支付回调，退款回调到时一个）
      * MQ 异步回调
      */
     @Async
@@ -87,23 +87,11 @@ public class CashierPayService{
         //1校验
         Assert.notNull(orderPaySign, ErrorCode.PARAMETER_ERROR.getText());
         orderPaySign.check();
+        //TODO
         return null;
     }
 
-    /**
-     * 车俩押金支付成功回调
-     */
-    @Transactional(rollbackFor=Exception.class)
-    public void updateRenterDeposit(PayedOrderRenterDepositReqVO payedOrderRenterDeposit){
 
-    }
-
-    /**
-     * 支付成功后记录 实付违章押金信息 和违章押金资金进出信息
-     */
-    @Transactional(rollbackFor=Exception.class)
-    public void updateRenterWZDeposit(PayedOrderRenterWZDepositReqVO payedOrderWZRenterDeposit){
-    }
 
 }
 
