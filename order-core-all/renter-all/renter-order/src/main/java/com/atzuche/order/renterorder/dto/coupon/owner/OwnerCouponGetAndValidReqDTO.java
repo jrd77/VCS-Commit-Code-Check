@@ -1,4 +1,4 @@
-package com.atzuche.order.renterorder.dto.coupon;
+package com.atzuche.order.renterorder.dto.coupon.owner;
 
 import lombok.Data;
 
