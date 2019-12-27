@@ -1,7 +1,9 @@
 package com.atzuche.order.rentercost.service;
 
 import com.atzuche.order.commons.constant.OrderConstant;
+import com.atzuche.order.commons.enums.RenterCashCodeEnum;
 import com.atzuche.order.commons.enums.SubsidySourceCodeEnum;
+import com.atzuche.order.commons.enums.SubsidyTypeCodeEnum;
 import com.atzuche.order.rentercost.entity.dto.CrmCustPointDTO;
 import com.atzuche.order.rentercost.entity.dto.RenterOrderSubsidyDetailDTO;
 import org.springframework.stereotype.Service;
@@ -49,14 +51,17 @@ public class AutoCoinCostCalService {
 
         if (pointValueDeducExchange > 0) {
             RenterOrderSubsidyDetailDTO renterOrderSubsidyDetailDTO = new RenterOrderSubsidyDetailDTO();
-
             renterOrderSubsidyDetailDTO.setMemNo(crmCustPoint.getMemNo());
             renterOrderSubsidyDetailDTO.setSubsidyAmount(pointValueDeducExchange);
+            renterOrderSubsidyDetailDTO.setSubsidyTypeCode(SubsidyTypeCodeEnum.RENT_AMT.getCode());
+            renterOrderSubsidyDetailDTO.setSubsidTypeName(SubsidyTypeCodeEnum.RENT_AMT.getDesc());
             renterOrderSubsidyDetailDTO.setSubsidySourceCode(SubsidySourceCodeEnum.PLATFORM.getCode());
             renterOrderSubsidyDetailDTO.setSubsidySourceName(SubsidySourceCodeEnum.PLATFORM.getDesc());
 
             renterOrderSubsidyDetailDTO.setSubsidyTargetCode(SubsidySourceCodeEnum.RENTER.getCode());
             renterOrderSubsidyDetailDTO.setSubsidTypeName(SubsidySourceCodeEnum.RENTER.getDesc());
+            renterOrderSubsidyDetailDTO.setSubsidyCostCode(RenterCashCodeEnum.AUTO_COIN_DEDUCT.getCashNo());
+            renterOrderSubsidyDetailDTO.setSubsidyCostName(RenterCashCodeEnum.AUTO_COIN_DEDUCT.getTxt());
             renterOrderSubsidyDetailDTO.setSubsidyDesc("使用凹凸币抵扣租金");
             return renterOrderSubsidyDetailDTO;
         }

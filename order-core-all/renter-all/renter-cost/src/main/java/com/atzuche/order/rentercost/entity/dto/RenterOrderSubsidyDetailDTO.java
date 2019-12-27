@@ -57,6 +57,14 @@ public class RenterOrderSubsidyDetailDTO implements Serializable {
      */
     private String subsidyDesc;
     /**
+     * 补贴费用项名称 如：凹凸比、优惠券等
+     */
+    private String subsidyCostName;
+    /**
+     * 补贴费用项编码
+     */
+    private String subsidyCostCode;
+    /**
      * 补贴金额
      */
     private Integer subsidyAmount;
