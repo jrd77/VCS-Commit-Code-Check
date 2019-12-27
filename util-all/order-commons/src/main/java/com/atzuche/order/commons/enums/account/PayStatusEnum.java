@@ -15,14 +15,14 @@ public enum PayStatusEnum {
 	/**
 	 * 支付状态code
 	 */
-	private int code;
+	private Integer code;
 
 	/**
 	 * 支付状态描述
 	 */
 	private String text;
 
-	PayStatusEnum(int code, String text) {
+	PayStatusEnum(Integer code, String text) {
 		this.code = code;
 		this.text = text;
 	}

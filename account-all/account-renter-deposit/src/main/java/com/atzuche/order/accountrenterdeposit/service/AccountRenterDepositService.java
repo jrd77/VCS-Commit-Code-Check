@@ -50,7 +50,7 @@ public class AccountRenterDepositService{
         if(Objects.isNull(accountRenterDepositRes) || Objects.isNull(accountRenterDepositRes.getOrderNo())){
             return Boolean.FALSE;
         }
-        //2开启免疫
+        //2开启免押
         if(YesNoEnum.YES.getCode()==accountRenterDepositRes.getIsFreeDeposit()){
             return Boolean.TRUE;
         }

@@ -1,13 +1,20 @@
 package com.atzuche.order.cashieraccount.service;
 
 import com.atzuche.order.accountrenterdeposit.service.AccountRenterDepositService;
+import com.atzuche.order.accountrenterrentcost.service.AccountRenterCostSettleService;
 import com.atzuche.order.accountrenterwzdepost.service.AccountRenterWzDepositService;
 import com.atzuche.order.cashieraccount.exception.OrderPayCallBackAsnyException;
+import com.atzuche.order.cashieraccount.service.notservice.CashierNoTService;
 import com.atzuche.order.cashieraccount.vo.req.pay.OrderPaySignReqVO;
+import com.atzuche.order.cashieraccount.vo.res.OrderPayableAmountResVO;
 import com.atzuche.order.cashieraccount.vo.res.pay.OrderPayAsynResVO;
 import com.atzuche.order.commons.CatConstants;
 import com.atzuche.order.commons.service.RabbitMsgLogService;
+import com.atzuche.order.rentercost.entity.vo.PayableVO;
+import com.atzuche.order.rentercost.service.RenterOrderCostCombineService;
+import com.autoyol.autopay.gateway.constant.DataPayKindConstant;
 import com.autoyol.autopay.gateway.constant.DataPayTypeConstant;
+import com.autoyol.cat.CatAnnotation;
 import com.autoyol.commons.utils.GsonUtils;
 import com.autoyol.commons.web.ErrorCode;
 import com.dianping.cat.Cat;
@@ -16,9 +23,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
+import java.util.List;
 import java.util.Objects;
 
 
@@ -36,6 +43,12 @@ public class CashierPayService{
     @Autowired AccountRenterWzDepositService accountRenterWzDepositService;
     @Autowired CashierService cashierService;
     @Autowired RabbitMsgLogService rabbitMsgLogService;
+    @Autowired
+    AccountRenterCostSettleService accountRenterCostSettleService;
+    @Autowired
+    RenterOrderCostCombineService renterOrderCostCombineService;
+    @Autowired
+    CashierNoTService cashierNoTService;
 
 
     /**
@@ -83,10 +96,51 @@ public class CashierPayService{
         //1校验
         Assert.notNull(orderPaySign, ErrorCode.PARAMETER_ERROR.getText());
         orderPaySign.check();
+        //2 查询子单号//TODO fupengcheng 提供
+        String rentOrderNo = "";
+        //3 是否使用钱包//TODO fupengcheng 提供
+        Boolean isUseWallet = Boolean.FALSE ;
+        //4 查询应付
+        OrderPayableAmountResVO payVO = getOrderPayableAmount(orderPaySign.getOrderNo(),rentOrderNo,orderPaySign.getMenNo());
+        //5 抵扣钱包
+        if(isUseWallet){
 
+        }
+        //6 抵扣钱包落库 （收银台落库、费用落库）
+
+        //7 签名串
         //TODO
         return null;
     }
+
+
+
+    /**
+     * 当前需要支付的相关信息供支付平台使用
+     */
+    @CatAnnotation
+    public OrderPayableAmountResVO getOrderPayableAmount(String orderNo, String renterOrderNo, String memNo){
+        OrderPayableAmountResVO result = new OrderPayableAmountResVO();
+        //车辆押金
+        int amtDeposit = cashierNoTService.getPayDeposit(orderNo,memNo, DataPayKindConstant.RENT);
+        //违章押金
+        int amtWZDeposit =  cashierNoTService.getPayDeposit(orderNo,memNo,DataPayKindConstant.DEPOSIT);
+        //应付租车费用
+        List<PayableVO> payableVOs = renterOrderCostCombineService.listPayableVO(orderNo,renterOrderNo,memNo);
+        int rentAmt = cashierNoTService.sumRentOrderCost(payableVOs);
+
+        //已付租车费用
+        int rentAmtPayed = accountRenterCostSettleService.getCostPaidRent(orderNo,memNo);
+        int amtTotal = amtDeposit + amtWZDeposit + rentAmt;
+        result.setAmtTotal(amtTotal);
+        result.setAmtPay(rentAmtPayed);
+        result.setAmt(amtTotal + rentAmtPayed);
+        result.setMemNo(memNo);
+        result.setOrderNo(orderNo);
+        result.setAccountPayAbleRes(payableVOs,amtDeposit,amtWZDeposit,rentAmt);
+        return result;
+    }
+
 
 
 
