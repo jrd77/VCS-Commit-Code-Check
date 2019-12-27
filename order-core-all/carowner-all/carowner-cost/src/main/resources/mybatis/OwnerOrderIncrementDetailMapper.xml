@@ -168,4 +168,23 @@
 		and is_delete = 0
 	</select>
   	
+  	<insert id="saveOwnerOrderIncrementDetailBatch">
+      INSERT INTO owner_order_increment_detail
+		(
+				`order_no`,		
+				`owner_order_no`,		
+				`mem_no`,		
+				`cost_code`,		
+				`cost_desc`,		
+				`unit_price`,		
+				`count`,		
+				`total_amount`
+			)
+      VALUES
+      <foreach collection="costList" item="cost" separator=",">
+      (#{cost.orderNo},#{cost.ownerOrderNo},#{cost.memNo},#{cost.costCode},
+      #{cost.costDesc},#{cost.unitPrice},#{cost.count},#{cost.totalAmount})
+      </foreach>
+     </insert>
+  	
 </mapper>
