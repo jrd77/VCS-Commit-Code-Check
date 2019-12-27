@@ -573,7 +573,7 @@ public class RenterOrderCostCombineService {
                 renterOrderCostDetailEntity.setCostCode(RenterCashCodeEnum.SRV_GET_COST.getCashNo());
                 renterOrderCostDetailEntity.setCostDesc(RenterCashCodeEnum.SRV_GET_COST.getTxt());
                 renterOrderCostDetailEntity.setCount(1D);
-                renterOrderCostDetailEntity.setTotalAmount(Integer.valueOf(fbcFeeResponse.getBaseFee()));
+                renterOrderCostDetailEntity.setTotalAmount(-Integer.valueOf(fbcFeeResponse.getExpectedRealFee()));
                 listCostDetail.add(renterOrderCostDetailEntity);
 
                 RenterOrderSubsidyDetailEntity renterOrderSubsidyDetailEntity = new RenterOrderSubsidyDetailEntity();
@@ -602,7 +602,7 @@ public class RenterOrderCostCombineService {
                 renterOrderCostDetailEntity.setCostCode(RenterCashCodeEnum.SRV_RETURN_COST.getCashNo());
                 renterOrderCostDetailEntity.setCostDesc(RenterCashCodeEnum.SRV_RETURN_COST.getTxt());
                 renterOrderCostDetailEntity.setCount(1D);
-                renterOrderCostDetailEntity.setTotalAmount(Integer.valueOf(fbcFeeResponse.getBaseFee()));
+                renterOrderCostDetailEntity.setTotalAmount(-Integer.valueOf(fbcFeeResponse.getExpectedRealFee()));
                 listCostDetail.add(renterOrderCostDetailEntity);
 
                 RenterOrderSubsidyDetailEntity renterOrderSubsidyDetailEntity = new RenterOrderSubsidyDetailEntity();
