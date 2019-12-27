@@ -10,6 +10,7 @@ import com.atzuche.order.ownercost.entity.dto.OwnerOrderCostReqDTO;
 import com.atzuche.order.ownercost.entity.dto.OwnerOrderCostRespDTO;
 import com.atzuche.order.rentercost.entity.RenterOrderCostDetailEntity;
 import com.atzuche.order.rentercost.entity.RenterOrderSubsidyDetailEntity;
+import com.atzuche.order.rentercost.entity.dto.RenterOrderSubsidyDetailDTO;
 import com.atzuche.order.renterorder.entity.dto.RenterOrderCostRespDTO;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +39,7 @@ public class OwnerOrderCalCostService {
         String ownerOrderNo = ownerOrderCostReqDTO.getOwnerOrderNo();
         String memNo = ownerOrderCostReqDTO.getMemNo();
         List<RenterOrderCostDetailEntity> renterOrderCostDetailDTOList = ownerOrderCostReqDTO.getRenterOrderCostDetailDTOList();
-        List<RenterOrderSubsidyDetailEntity> renterOrderSubsidyDetailEntityList = ownerOrderCostReqDTO.getRenterOrderSubsidyDetailEntityList();
+        List<RenterOrderSubsidyDetailDTO> renterOrderSubsidyDetailDTOList = ownerOrderCostReqDTO.getRenterOrderSubsidyDetailDTOList();
 
 
         //过滤租金
@@ -60,7 +61,7 @@ public class OwnerOrderCalCostService {
                 .collect(Collectors.toList());
 
         //过滤车主相关的补贴(来源方属于车主)
-        List<OwnerOrderSubsidyDetailEntity> ownerSubsidyDetailList = renterOrderSubsidyDetailEntityList
+        List<OwnerOrderSubsidyDetailEntity> ownerSubsidyDetailList = renterOrderSubsidyDetailDTOList
                 .stream()
                 .filter(x -> SubsidySourceCodeEnum.OWNER.getCode().equals(x.getSubsidySourceCode()))
                 .map(x -> {
