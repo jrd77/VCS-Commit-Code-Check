@@ -18,8 +18,11 @@ dependencies {
     compile("com.autoyol.aliyunmq:auto-aliyunmq-core:0.0.2")
     compile('org.springframework.boot:spring-boot-starter-amqp')
     compile "com.autoyol:auto-web-starter:1.0-SNAPSHOT"
+    compile group: 'org.springframework.retry', name: 'spring-retry', version: '1.2.4.RELEASE'
+    compile group: 'org.aspectj', name: 'aspectjweaver', version: '1.9.4'
     compile('org.mybatis.spring.boot:mybatis-spring-boot-starter:1.1.1')
     compile 'commons-io:commons-io:2.4'
     compile 'net.sf.json-lib:json-lib:2.4:jdk15'
+
 
 }
