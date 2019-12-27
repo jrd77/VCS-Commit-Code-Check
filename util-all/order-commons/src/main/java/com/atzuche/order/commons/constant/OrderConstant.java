@@ -19,4 +19,10 @@ public class OrderConstant {
      */
     public static final int NO = 0;
 
+
+    /**
+     * 凹凸币抵扣租金系数
+     */
+    public static final Integer AUTO_COIN_DEDUCT_RATIO = 5;
+
 }

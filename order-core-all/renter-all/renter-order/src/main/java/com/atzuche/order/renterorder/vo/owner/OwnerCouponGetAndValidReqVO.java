@@ -1,4 +1,4 @@
-package com.atzuche.order.renterorder.dto.coupon.owner;
+package com.atzuche.order.renterorder.vo.owner;
 
 import lombok.Data;
 
@@ -9,7 +9,7 @@ import lombok.Data;
  * @date 2019/12/2516:11
  */
 @Data
-public class OwnerCouponGetAndValidReqDTO {
+public class OwnerCouponGetAndValidReqVO {
 
     private String orderNo;
 

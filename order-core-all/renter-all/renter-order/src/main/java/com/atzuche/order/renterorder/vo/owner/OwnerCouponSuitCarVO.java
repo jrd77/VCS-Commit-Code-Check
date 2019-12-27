@@ -1,4 +1,4 @@
-package com.atzuche.order.renterorder.dto.coupon.owner;
+package com.atzuche.order.renterorder.vo.owner;
 
 import lombok.Data;
 
@@ -12,7 +12,7 @@ import java.io.Serializable;
  */
 
 @Data
-public class OwnerCouponSuitCarDTO implements Serializable {
+public class OwnerCouponSuitCarVO implements Serializable {
 
     private static final long serialVersionUID = 6479368910546774667L;
 
