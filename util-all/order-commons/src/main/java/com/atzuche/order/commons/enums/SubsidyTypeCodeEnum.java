@@ -10,15 +10,15 @@ import lombok.Getter;
  **/
 @Getter
 public enum SubsidyTypeCodeEnum {
-    GET_CAR(1,"取车"),
-    RETURN_CAR(2,"还车")
+    GET_CAR("1","取车"),
+    RETURN_CAR("2","还车")
 
             ;
 
-    private Integer code;
+    private String code;
     private String desc;
 
-    SubsidyTypeCodeEnum(Integer code, String desc) {
+    SubsidyTypeCodeEnum(String code, String desc) {
         this.code = code;
         this.desc = desc;
     }

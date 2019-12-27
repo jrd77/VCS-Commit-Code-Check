@@ -577,12 +577,12 @@ public class RenterOrderCostCombineService {
                 listCostDetail.add(renterOrderCostDetailEntity);
 
                 RenterOrderSubsidyDetailEntity renterOrderSubsidyDetailEntity = new RenterOrderSubsidyDetailEntity();
-                renterOrderSubsidyDetailEntity.setSubsidType(SubsidyTypeCodeEnum.GET_CAR.getCode());
-                renterOrderSubsidyDetailEntity.setSubsidyTypeCode(SubsidyTypeCodeEnum.GET_CAR.getDesc());
+                renterOrderSubsidyDetailEntity.setSubsidTypeName(SubsidyTypeCodeEnum.GET_CAR.getDesc());
+                renterOrderSubsidyDetailEntity.setSubsidyTypeCode(SubsidyTypeCodeEnum.GET_CAR.getCode());
                 renterOrderSubsidyDetailEntity.setSubsidySourceCode(SubsidySourceCodeEnum.PLATFORM.getCode());
-                renterOrderSubsidyDetailEntity.setSubsidySource(SubsidySourceCodeEnum.PLATFORM.getDesc());
-                renterOrderSubsidyDetailEntity.setSubsidyCode(SubsidySourceCodeEnum.RENTER.getCode());
-                renterOrderSubsidyDetailEntity.setSubsidyName(SubsidySourceCodeEnum.RENTER.getDesc());
+                renterOrderSubsidyDetailEntity.setSubsidySourceName(SubsidySourceCodeEnum.PLATFORM.getDesc());
+                renterOrderSubsidyDetailEntity.setSubsidyTargetCode(SubsidySourceCodeEnum.RENTER.getCode());
+                renterOrderSubsidyDetailEntity.setSubsidyTargetName(SubsidySourceCodeEnum.RENTER.getDesc());
                 renterOrderSubsidyDetailEntity.setSubsidyDesc("平台补贴给租客的取车费用！");
                 renterOrderSubsidyDetailEntity.setSubsidyAmount(Integer.valueOf(fbcFeeResponse.getExpectedRealFee()) - Integer.valueOf(fbcFeeResponse.getBaseFee()));
                 renterOrderSubsidyDetailEntity.setSubsidyVoucher("");
@@ -606,12 +606,12 @@ public class RenterOrderCostCombineService {
                 listCostDetail.add(renterOrderCostDetailEntity);
 
                 RenterOrderSubsidyDetailEntity renterOrderSubsidyDetailEntity = new RenterOrderSubsidyDetailEntity();
-                renterOrderSubsidyDetailEntity.setSubsidType(SubsidyTypeCodeEnum.RETURN_CAR.getCode());
-                renterOrderSubsidyDetailEntity.setSubsidyTypeCode(SubsidyTypeCodeEnum.RETURN_CAR.getDesc());
+                renterOrderSubsidyDetailEntity.setSubsidTypeName(SubsidyTypeCodeEnum.RETURN_CAR.getDesc());
+                renterOrderSubsidyDetailEntity.setSubsidyTypeCode(SubsidyTypeCodeEnum.RETURN_CAR.getCode());
                 renterOrderSubsidyDetailEntity.setSubsidySourceCode(SubsidySourceCodeEnum.PLATFORM.getCode());
-                renterOrderSubsidyDetailEntity.setSubsidySource(SubsidySourceCodeEnum.PLATFORM.getDesc());
-                renterOrderSubsidyDetailEntity.setSubsidyCode(SubsidySourceCodeEnum.RENTER.getCode());
-                renterOrderSubsidyDetailEntity.setSubsidyName(SubsidySourceCodeEnum.RENTER.getDesc());
+                renterOrderSubsidyDetailEntity.setSubsidySourceName(SubsidySourceCodeEnum.PLATFORM.getDesc());
+                renterOrderSubsidyDetailEntity.setSubsidyTargetCode(SubsidySourceCodeEnum.RENTER.getCode());
+                renterOrderSubsidyDetailEntity.setSubsidyTargetName(SubsidySourceCodeEnum.RENTER.getDesc());
                 renterOrderSubsidyDetailEntity.setSubsidyDesc("平台补贴给租客的还车费用！");
                 renterOrderSubsidyDetailEntity.setSubsidyAmount(Integer.valueOf(fbcFeeResponse.getExpectedRealFee()) - Integer.valueOf(fbcFeeResponse.getBaseFee()));
                 renterOrderSubsidyDetailEntity.setSubsidyVoucher("");

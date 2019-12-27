@@ -17,8 +17,6 @@ public interface OwnerOrderSubsidyDetailMapper{
 
     OwnerOrderSubsidyDetailEntity selectByPrimaryKey(Integer id);
 
-    List<OwnerOrderSubsidyDetailEntity> selectALL();
-
     int insert(OwnerOrderSubsidyDetailEntity record);
     
     int saveOwnerOrderSubsidyDetail(OwnerOrderSubsidyDetailEntity record);

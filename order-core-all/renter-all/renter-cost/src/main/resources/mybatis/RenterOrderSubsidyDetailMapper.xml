@@ -8,12 +8,12 @@
         <result property="orderNo" column="order_no"/>
         <result property="renterOrderNo" column="renter_order_no"/>
         <result property="memNo" column="mem_no"/>
-        <result property="subsidType" column="subsid_type"/>
-        <result property="subsidySourceCode" column="subsidy_source_code"/>
-        <result property="subsidySource" column="subsidy_source"/>
-        <result property="subsidyCode" column="subsidy_code"/>
-        <result property="subsidyName" column="subsidy_name"/>
+        <result property="subsidTypeName" column="subsid_type_name"/>
         <result property="subsidyTypeCode" column="subsidy_type_code"/>
+        <result property="subsidySourceCode" column="subsidy_source_code"/>
+        <result property="subsidySourceName" column="subsidy_source_name"/>
+        <result property="subsidyTargetCode" column="subsidy_target_code"/>
+        <result property="subsidyTargetName" column="subsidy_target_name"/>
         <result property="subsidyDesc" column="subsidy_desc"/>
         <result property="subsidyAmount" column="subsidy_amount"/>
         <result property="subsidyVoucher" column="subsidy_voucher"/>
@@ -30,211 +30,208 @@
     </resultMap>
 
 
-	<sql id="Base_Column_List">
-	`id`, 	
-	`order_no`, 	
-	`renter_order_no`, 	
-	`mem_no`, 	
-	`subsid_type`, 	
-	`subsidy_source_code`, 	
-	`subsidy_source`, 	
-	`subsidy_code`, 	
-	`subsidy_name`, 	
-	`subsidy_type_code`, 	
-	`subsidy_desc`, 	
-	`subsidy_amount`, 	
-	`subsidy_voucher`, 	
-	`remark`, 	
-	`operator_id`, 	
-	`operator`, 	
-	`dept_id`, 	
-	`dept_name`, 	
-	`create_time`, 	
-	`create_op`, 	
-	`update_time`, 	
-	`update_op`, 	
-	`is_delete`	
+    <sql id="Base_Column_List">
+	`id`,
+	`order_no`,
+	`renter_order_no`,
+	`mem_no`,
+	`subsid_type_name`,
+	`subsidy_type_code`,
+	`subsidy_source_code`,
+	`subsidy_source_name`,
+	`subsidy_target_code`,
+	`subsidy_target_name`,
+	`subsidy_desc`,
+	`subsidy_amount`,
+	`subsidy_voucher`,
+	`remark`,
+	`operator_id`,
+	`operator`,
+	`dept_id`,
+	`dept_name`,
+	`create_time`,
+	`create_op`,
+	`update_time`,
+	`update_op`,
+	`is_delete`
 
 	</sql>
 
 
-	<select id="selectByPrimaryKey" resultMap="BaseResultMap">
-		select <include refid="Base_Column_List" /> from renter_order_subsidy_detail where id = #{value}
-	</select>
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List" /> from renter_order_subsidy_detail where id = #{value}
+    </select>
 
-	<select id="selectALL" resultMap="BaseResultMap">
-		select  <include refid="Base_Column_List" /> from renter_order_subsidy_detail order by id desc
-	</select>
+    <insert id="insert" parameterType="com.atzuche.order.rentercost.entity.RenterOrderSubsidyDetailEntity" useGeneratedKeys="true" keyProperty="id">
+        insert into renter_order_subsidy_detail
+        (
+        `order_no`,
+        `renter_order_no`,
+        `mem_no`,
+        `subsid_type_name`,
+        `subsidy_type_code`,
+        `subsidy_source_code`,
+        `subsidy_source_name`,
+        `subsidy_target_code`,
+        `subsidy_target_name`,
+        `subsidy_desc`,
+        `subsidy_amount`,
+        `subsidy_voucher`,
+        `remark`,
+        `operator_id`,
+        `operator`,
+        `dept_id`,
+        `dept_name`,
+        `create_time`,
+        `create_op`,
+        `update_time`,
+        `update_op`,
+        `is_delete`
+        )
+        values
+        (
+        #{orderNo},
+        #{renterOrderNo},
+        #{memNo},
+        #{subsidTypeName},
+        #{subsidyTypeCode},
+        #{subsidySourceCode},
+        #{subsidySourceName},
+        #{subsidyTargetCode},
+        #{subsidyTargetName},
+        #{subsidyDesc},
+        #{subsidyAmount},
+        #{subsidyVoucher},
+        #{remark},
+        #{operatorId},
+        #{operator},
+        #{deptId},
+        #{deptName},
+        #{createTime},
+        #{createOp},
+        #{updateTime},
+        #{updateOp},
+        #{isDelete}
+        )
+    </insert>
 
-	 
-	<insert id="insert" parameterType="com.atzuche.order.rentercost.entity.RenterOrderSubsidyDetailEntity" useGeneratedKeys="true" keyProperty="id">
-		insert into renter_order_subsidy_detail
-		(
-				`order_no`,		
-				`renter_order_no`,		
-				`mem_no`,		
-				`subsid_type`,		
-				`subsidy_source_code`,		
-				`subsidy_source`,		
-				`subsidy_code`,		
-				`subsidy_name`,		
-				`subsidy_type_code`,		
-				`subsidy_desc`,		
-				`subsidy_amount`,		
-				`subsidy_voucher`,		
-				`remark`,		
-				`operator_id`,		
-				`operator`,		
-				`dept_id`,		
-				`dept_name`,		
-				`create_time`,		
-				`create_op`,		
-				`update_time`,		
-				`update_op`,		
-				`is_delete`		
-			)
-		values
-		(
-				#{orderNo}, 		
-				#{renterOrderNo}, 		
-				#{memNo}, 		
-				#{subsidType}, 		
-				#{subsidySourceCode}, 		
-				#{subsidySource}, 		
-				#{subsidyCode}, 		
-				#{subsidyName}, 		
-				#{subsidyTypeCode}, 		
-				#{subsidyDesc}, 		
-				#{subsidyAmount}, 		
-				#{subsidyVoucher}, 		
-				#{remark}, 		
-				#{operatorId}, 		
-				#{operator}, 		
-				#{deptId}, 		
-				#{deptName}, 		
-				#{createTime}, 		
-				#{createOp}, 		
-				#{updateTime}, 		
-				#{updateOp}, 		
-				#{isDelete}		
-			)
-	</insert>
-	
-	<insert id="saveRenterOrderSubsidyDetail" parameterType="com.atzuche.order.rentercost.entity.RenterOrderSubsidyDetailEntity" useGeneratedKeys="true" keyProperty="id">
-		insert into renter_order_subsidy_detail
-		(
-				<if test="orderNo != null">`order_no`, </if>
-				<if test="renterOrderNo != null">`renter_order_no`, </if>
-				<if test="memNo != null">`mem_no`, </if>
-				<if test="subsidType != null">`subsid_type`, </if>
-				<if test="subsidySourceCode != null">`subsidy_source_code`, </if>
-				<if test="subsidySource != null">`subsidy_source`, </if>
-				<if test="subsidyCode != null">`subsidy_code`, </if>
-				<if test="subsidyName != null">`subsidy_name`, </if>
-				<if test="subsidyTypeCode != null">`subsidy_type_code`, </if>
-				<if test="subsidyDesc != null">`subsidy_desc`, </if>
-				<if test="subsidyAmount != null">`subsidy_amount`, </if>
-				<if test="subsidyVoucher != null">`subsidy_voucher`, </if>
-				<if test="remark != null">`remark`, </if>
-				<if test="operatorId != null">`operator_id`, </if>
-				<if test="operator != null">`operator`, </if>
-				<if test="deptId != null">`dept_id`, </if>
-				<if test="deptName != null">`dept_name`, </if>
-				<if test="createTime != null">`create_time`, </if>
-				<if test="createOp != null">`create_op`, </if>
-				<if test="updateTime != null">`update_time`, </if>
-				<if test="updateOp != null">`update_op`, </if>
-				<if test="isDelete != null">`is_delete` </if>
-			)
-		values
-		(
-				<if test="orderNo != null">#{orderNo},  </if>
-				<if test="renterOrderNo != null">#{renterOrderNo},  </if>
-				<if test="memNo != null">#{memNo},  </if>
-				<if test="subsidType != null">#{subsidType},  </if>
-				<if test="subsidySourceCode != null">#{subsidySourceCode},  </if>
-				<if test="subsidySource != null">#{subsidySource},  </if>
-				<if test="subsidyCode != null">#{subsidyCode},  </if>
-				<if test="subsidyName != null">#{subsidyName},  </if>
-				<if test="subsidyTypeCode != null">#{subsidyTypeCode},  </if>
-				<if test="subsidyDesc != null">#{subsidyDesc},  </if>
-				<if test="subsidyAmount != null">#{subsidyAmount},  </if>
-				<if test="subsidyVoucher != null">#{subsidyVoucher},  </if>
-				<if test="remark != null">#{remark},  </if>
-				<if test="operatorId != null">#{operatorId},  </if>
-				<if test="operator != null">#{operator},  </if>
-				<if test="deptId != null">#{deptId},  </if>
-				<if test="deptName != null">#{deptName},  </if>
-				<if test="createTime != null">#{createTime},  </if>
-				<if test="createOp != null">#{createOp},  </if>
-				<if test="updateTime != null">#{updateTime},  </if>
-				<if test="updateOp != null">#{updateOp},  </if>
-				<if test="isDelete != null">#{isDelete} </if>
-			)
-	</insert>
-	
-	 
-	<update id="updateByPrimaryKeySelective" parameterType="com.atzuche.order.rentercost.entity.RenterOrderSubsidyDetailEntity">
-		update renter_order_subsidy_detail 
-		<set>
-				<if test="orderNo != null">`order_no` = #{orderNo}, </if>
-				<if test="renterOrderNo != null">`renter_order_no` = #{renterOrderNo}, </if>
-				<if test="memNo != null">`mem_no` = #{memNo}, </if>
-				<if test="subsidType != null">`subsid_type` = #{subsidType}, </if>
-				<if test="subsidySourceCode != null">`subsidy_source_code` = #{subsidySourceCode}, </if>
-				<if test="subsidySource != null">`subsidy_source` = #{subsidySource}, </if>
-				<if test="subsidyCode != null">`subsidy_code` = #{subsidyCode}, </if>
-				<if test="subsidyName != null">`subsidy_name` = #{subsidyName}, </if>
-				<if test="subsidyTypeCode != null">`subsidy_type_code` = #{subsidyTypeCode}, </if>
-				<if test="subsidyDesc != null">`subsidy_desc` = #{subsidyDesc}, </if>
-				<if test="subsidyAmount != null">`subsidy_amount` = #{subsidyAmount}, </if>
-				<if test="subsidyVoucher != null">`subsidy_voucher` = #{subsidyVoucher}, </if>
-				<if test="remark != null">`remark` = #{remark}, </if>
-				<if test="operatorId != null">`operator_id` = #{operatorId}, </if>
-				<if test="operator != null">`operator` = #{operator}, </if>
-				<if test="deptId != null">`dept_id` = #{deptId}, </if>
-				<if test="deptName != null">`dept_name` = #{deptName}, </if>
-				<if test="createTime != null">`create_time` = #{createTime}, </if>
-				<if test="createOp != null">`create_op` = #{createOp}, </if>
-				<if test="updateTime != null">`update_time` = #{updateTime}, </if>
-				<if test="updateOp != null">`update_op` = #{updateOp}, </if>
-				<if test="isDelete != null">`is_delete` = #{isDelete}</if>
-			</set>
-		where id = #{id}
-	</update>
-	
-	<update id="updateByPrimaryKey" parameterType="com.atzuche.order.rentercost.entity.RenterOrderSubsidyDetailEntity">
-		update renter_order_subsidy_detail 
-		<set>
-				`order_no` = #{orderNo}, 		
-				`renter_order_no` = #{renterOrderNo}, 		
-				`mem_no` = #{memNo}, 		
-				`subsid_type` = #{subsidType}, 		
-				`subsidy_source_code` = #{subsidySourceCode}, 		
-				`subsidy_source` = #{subsidySource}, 		
-				`subsidy_code` = #{subsidyCode}, 		
-				`subsidy_name` = #{subsidyName}, 		
-				`subsidy_type_code` = #{subsidyTypeCode}, 		
-				`subsidy_desc` = #{subsidyDesc}, 		
-				`subsidy_amount` = #{subsidyAmount}, 		
-				`subsidy_voucher` = #{subsidyVoucher}, 		
-				`remark` = #{remark}, 		
-				`operator_id` = #{operatorId}, 		
-				`operator` = #{operator}, 		
-				`dept_id` = #{deptId}, 		
-				`dept_name` = #{deptName}, 		
-				`create_time` = #{createTime}, 		
-				`create_op` = #{createOp}, 		
-				`update_time` = #{updateTime}, 		
-				`update_op` = #{updateOp}, 		
-				`is_delete` = #{isDelete}		
-	
-		</set>
-		where id = #{id}
-	</update>
-	
-	
-	<select id="listRenterOrderSubsidyDetail" resultMap="BaseResultMap">
+
+    <insert id="saveRenterOrderSubsidyDetail" parameterType="com.atzuche.order.rentercost.entity.RenterOrderSubsidyDetailEntity" useGeneratedKeys="true" keyProperty="id">
+        insert into renter_order_subsidy_detail
+        (
+        <if test="orderNo != null">`order_no`, </if>
+        <if test="renterOrderNo != null">`renter_order_no`, </if>
+        <if test="memNo != null">`mem_no`, </if>
+        <if test="subsidTypeName != null">`subsid_type_name`, </if>
+        <if test="subsidyTypeCode != null">`subsidy_type_code`, </if>
+        <if test="subsidySourceCode != null">`subsidy_source_code`, </if>
+        <if test="subsidySourceName != null">`subsidy_source_name`, </if>
+        <if test="subsidyTargetCode != null">`subsidy_target_code`, </if>
+        <if test="subsidyTargetName != null">`subsidy_target_name`, </if>
+        <if test="subsidyDesc != null">`subsidy_desc`, </if>
+        <if test="subsidyAmount != null">`subsidy_amount`, </if>
+        <if test="subsidyVoucher != null">`subsidy_voucher`, </if>
+        <if test="remark != null">`remark`, </if>
+        <if test="operatorId != null">`operator_id`, </if>
+        <if test="operator != null">`operator`, </if>
+        <if test="deptId != null">`dept_id`, </if>
+        <if test="deptName != null">`dept_name`, </if>
+        <if test="createTime != null">`create_time`, </if>
+        <if test="createOp != null">`create_op`, </if>
+        <if test="updateTime != null">`update_time`, </if>
+        <if test="updateOp != null">`update_op`, </if>
+        <if test="isDelete != null">`is_delete` </if>
+        )
+        values
+        (
+        <if test="orderNo != null">#{orderNo},  </if>
+        <if test="renterOrderNo != null">#{renterOrderNo},  </if>
+        <if test="memNo != null">#{memNo},  </if>
+        <if test="subsidTypeName != null">#{subsidTypeName},  </if>
+        <if test="subsidyTypeCode != null">#{subsidyTypeCode},  </if>
+        <if test="subsidySourceCode != null">#{subsidySourceCode},  </if>
+        <if test="subsidySourceName != null">#{subsidySourceName},  </if>
+        <if test="subsidyTargetCode != null">#{subsidyTargetCode},  </if>
+        <if test="subsidyTargetName != null">#{subsidyTargetName},  </if>
+        <if test="subsidyDesc != null">#{subsidyDesc},  </if>
+        <if test="subsidyAmount != null">#{subsidyAmount},  </if>
+        <if test="subsidyVoucher != null">#{subsidyVoucher},  </if>
+        <if test="remark != null">#{remark},  </if>
+        <if test="operatorId != null">#{operatorId},  </if>
+        <if test="operator != null">#{operator},  </if>
+        <if test="deptId != null">#{deptId},  </if>
+        <if test="deptName != null">#{deptName},  </if>
+        <if test="createTime != null">#{createTime},  </if>
+        <if test="createOp != null">#{createOp},  </if>
+        <if test="updateTime != null">#{updateTime},  </if>
+        <if test="updateOp != null">#{updateOp},  </if>
+        <if test="isDelete != null">#{isDelete} </if>
+        )
+    </insert>
+
+
+    <update id="updateByPrimaryKeySelective" parameterType="com.atzuche.order.rentercost.entity.RenterOrderSubsidyDetailEntity">
+        update renter_order_subsidy_detail
+        <set>
+            <if test="orderNo != null">`order_no` = #{orderNo}, </if>
+            <if test="renterOrderNo != null">`renter_order_no` = #{renterOrderNo}, </if>
+            <if test="memNo != null">`mem_no` = #{memNo}, </if>
+            <if test="subsidTypeName != null">`subsid_type_name` = #{subsidTypeName}, </if>
+            <if test="subsidyTypeCode != null">`subsidy_type_code` = #{subsidyTypeCode}, </if>
+            <if test="subsidySourceCode != null">`subsidy_source_code` = #{subsidySourceCode}, </if>
+            <if test="subsidySourceName != null">`subsidy_source_name` = #{subsidySourceName}, </if>
+            <if test="subsidyTargetCode != null">`subsidy_target_code` = #{subsidyTargetCode}, </if>
+            <if test="subsidyTargetName != null">`subsidy_target_name` = #{subsidyTargetName}, </if>
+            <if test="subsidyDesc != null">`subsidy_desc` = #{subsidyDesc}, </if>
+            <if test="subsidyAmount != null">`subsidy_amount` = #{subsidyAmount}, </if>
+            <if test="subsidyVoucher != null">`subsidy_voucher` = #{subsidyVoucher}, </if>
+            <if test="remark != null">`remark` = #{remark}, </if>
+            <if test="operatorId != null">`operator_id` = #{operatorId}, </if>
+            <if test="operator != null">`operator` = #{operator}, </if>
+            <if test="deptId != null">`dept_id` = #{deptId}, </if>
+            <if test="deptName != null">`dept_name` = #{deptName}, </if>
+            <if test="createTime != null">`create_time` = #{createTime}, </if>
+            <if test="createOp != null">`create_op` = #{createOp}, </if>
+            <if test="updateTime != null">`update_time` = #{updateTime}, </if>
+            <if test="updateOp != null">`update_op` = #{updateOp}, </if>
+            <if test="isDelete != null">`is_delete` = #{isDelete}</if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <update id="updateByPrimaryKey" parameterType="com.atzuche.order.rentercost.entity.RenterOrderSubsidyDetailEntity">
+        update renter_order_subsidy_detail
+        <set>
+            `order_no` = #{orderNo},
+            `renter_order_no` = #{renterOrderNo},
+            `mem_no` = #{memNo},
+            `subsid_type_name` = #{subsidTypeName},
+            `subsidy_type_code` = #{subsidyTypeCode},
+            `subsidy_source_code` = #{subsidySourceCode},
+            `subsidy_source_name` = #{subsidySourceName},
+            `subsidy_target_code` = #{subsidyTargetCode},
+            `subsidy_target_name` = #{subsidyTargetName},
+            `subsidy_desc` = #{subsidyDesc},
+            `subsidy_amount` = #{subsidyAmount},
+            `subsidy_voucher` = #{subsidyVoucher},
+            `remark` = #{remark},
+            `operator_id` = #{operatorId},
+            `operator` = #{operator},
+            `dept_id` = #{deptId},
+            `dept_name` = #{deptName},
+            `create_time` = #{createTime},
+            `create_op` = #{createOp},
+            `update_time` = #{updateTime},
+            `update_op` = #{updateOp},
+            `is_delete` = #{isDelete}
+
+        </set>
+        where id = #{id}
+    </update>
+
+
+
+    <select id="listRenterOrderSubsidyDetail" resultMap="BaseResultMap">
 		select <include refid="Base_Column_List" /> from renter_order_subsidy_detail where order_no = #{orderNo} 
 		and renter_order_no = #{renterOrderNo} and is_delete = 0
 	</select>
@@ -243,26 +240,37 @@
   	<insert id="saveRenterOrderSubsidyDetailBatch">
       INSERT INTO renter_order_subsidy_detail
 		(
-				`order_no`,		
-				`renter_order_no`,		
-				`mem_no`,
-				`subsid_type`,		
-				`subsidy_source_code`,		
-				`subsidy_source`,		
-				`subsidy_code`,		
-				`subsidy_name`,		
-				`subsidy_type_code`,		
-				`subsidy_desc`,		
-				`subsidy_amount`,
-				`subsidy_voucher`,
-				`remark`,
-				`operator`
+        `order_no`,
+        `renter_order_no`,
+        `mem_no`,
+        `subsid_type_name`,
+        `subsidy_type_code`,
+        `subsidy_source_code`,
+        `subsidy_source_name`,
+        `subsidy_target_code`,
+        `subsidy_target_name`,
+        `subsidy_desc`,
+        `subsidy_amount`,
+        `subsidy_voucher`,
+        `remark`,
+		`operator`
 			)
       VALUES
       <foreach collection="costList" item="cost" separator=",">
-      (#{cost.orderNo},#{cost.renterOrderNo},#{cost.memNo},#{cost.subsidType},#{cost.subsidySourceCode},
-      #{cost.subsidySource},#{cost.subsidyCode},#{cost.subsidyName},#{cost.subsidyTypeCode},
-      #{cost.subsidyDesc},#{cost.subsidyAmount},#{cost.subsidyVoucher},#{cost.remark},#{cost.operator})
+      (#{cost.orderNo},
+          #{cost.renterOrderNo},
+          #{cost.memNo},
+          #{cost.subsidTypeName},
+          #{cost.subsidyTypeCode},
+          #{cost.subsidySourceCode},
+          #{cost.subsidySourceName},
+          #{cost.subsidyTargetCode},
+          #{cost.subsidyTargetName},
+          #{cost.subsidyDesc},
+          #{cost.subsidyAmount},
+          #{cost.subsidyVoucher},
+          #{cost.remark},
+          #{cost.operator})
       </foreach>
      </insert>
   	
