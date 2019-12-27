@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import com.atzuche.order.ownercost.entity.OwnerOrderPurchaseDetailEntity;
 import com.atzuche.order.ownercost.mapper.OwnerOrderPurchaseDetailMapper;
 
+
 @Service
 public class OwnerOrderPurchaseDetailService {
 
@@ -39,6 +40,9 @@ public class OwnerOrderPurchaseDetailService {
 	 * @return Integer
 	 */
 	public Integer saveOwnerOrderPurchaseDetailBatch(List<OwnerOrderPurchaseDetailEntity> costList) {
+		if (costList == null || costList.isEmpty()) {
+			return 1;
+		}
 		return ownerOrderPurchaseDetailMapper.saveOwnerOrderPurchaseDetailBatch(costList);
 	}
 }

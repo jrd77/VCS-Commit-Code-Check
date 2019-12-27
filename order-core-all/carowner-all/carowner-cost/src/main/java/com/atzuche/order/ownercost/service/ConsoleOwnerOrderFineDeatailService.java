@@ -1,9 +1,9 @@
-package com.atzuche.order.service;
+package com.atzuche.order.ownercost.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.atzuche.order.owner.cost.mapper.ConsoleOwnerOrderFineDeatailMapper;
+import com.atzuche.order.ownercost.mapper.ConsoleOwnerOrderFineDeatailMapper;
 
 
 
