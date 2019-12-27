@@ -12,10 +12,7 @@ import com.atzuche.order.accountrenterwzdepost.exception.AccountRenterWZDepositE
 import com.atzuche.order.accountrenterwzdepost.vo.req.CreateOrderRenterWZDepositReqVO;
 import com.atzuche.order.accountrenterwzdepost.vo.req.PayedOrderRenterDepositWZDetailReqVO;
 import com.atzuche.order.accountrenterwzdepost.vo.req.PayedOrderRenterWZDepositReqVO;
-import com.atzuche.order.cashieraccount.common.DataAppIdConstant;
-import com.atzuche.order.cashieraccount.common.DataPayEnvConstant;
-import com.atzuche.order.cashieraccount.common.DataPayKindConstant;
-import com.atzuche.order.cashieraccount.common.DataPayTypeConstant;
+
 import com.atzuche.order.cashieraccount.entity.CashierEntity;
 import com.atzuche.order.cashieraccount.exception.OrderPayCallBackAsnyException;
 import com.atzuche.order.cashieraccount.mapper.CashierMapper;
@@ -23,6 +20,7 @@ import com.atzuche.order.cashieraccount.vo.res.pay.OrderPayAsynResVO;
 import com.atzuche.order.commons.LocalDateTimeUtils;
 import com.atzuche.order.commons.enums.RenterCashCodeEnum;
 import com.atzuche.order.commons.enums.account.PayStatusEnum;
+import com.autoyol.autopay.gateway.constant.DataPayTypeConstant;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.doc.util.StringUtil;
 import org.apache.commons.lang3.math.NumberUtils;

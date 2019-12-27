@@ -6,8 +6,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
 import com.atzuche.order.commons.CatConstants;
 import com.atzuche.order.commons.DateUtils;
 import com.atzuche.order.commons.GlobalConstant;
@@ -20,24 +18,22 @@ import com.atzuche.order.rentercost.entity.*;
 import com.atzuche.order.rentercost.entity.dto.*;
 import com.atzuche.order.rentercost.entity.dto.GetReturnOverTransportDTO;
 import com.atzuche.order.rentercost.entity.vo.GetReturnResponseVO;
-import com.atzuche.order.rentercost.exception.GetReturnCostErrorException;
-import com.atzuche.order.rentercost.exception.GetReturnCostException;
-import com.autoyol.commons.utils.GsonUtils;
+import com.atzuche.order.rentercost.exception.*;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.feeservice.api.FetchBackCarFeeFeignService;
+import com.autoyol.feeservice.api.request.GetFbcFeeConfigRequest;
 import com.autoyol.feeservice.api.request.GetFbcFeeRequest;
 import com.autoyol.feeservice.api.request.GetFbcFeeRequestDetail;
 import com.autoyol.feeservice.api.response.PriceFbcFeeResponseDetail;
 import com.autoyol.feeservice.api.response.PriceGetFbcFeeResponse;
+import com.autoyol.feeservice.api.vo.pricefetchback.PriceCarHumanFeeRule;
 import com.dianping.cat.message.Transaction;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.atzuche.order.commons.enums.RenterCashCodeEnum;
-import com.atzuche.order.rentercost.exception.RenterCostParameterException;
 import com.autoyol.platformcost.CommonUtils;
 import com.autoyol.platformcost.RenterFeeCalculatorUtils;
 import com.autoyol.platformcost.model.CarDepositAmtVO;
@@ -50,7 +46,6 @@ import com.autoyol.platformcost.model.OilAverageCostBO;
 import com.dianping.cat.Cat;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.RestTemplate;
 
 @Service
@@ -347,7 +342,7 @@ public class RenterOrderCostCombineService {
 	
 	/**
 	 * 获取违章押金
-	 * @param illDTO 參數
+	 * @param illegalDepositAmtDTO
 	 * @return Integer
 	 */
 	public Integer getIllegalDepositAmt(IllegalDepositAmtDTO illDTO) {
@@ -549,20 +544,20 @@ public class RenterOrderCostCombineService {
         Transaction t = Cat.newTransaction(com.atzuche.order.commons.CatConstants.FEIGN_CALL, "取还车费用");
         try{
             log.info("Feign 获取取还车费用入参:[{}]",JSON.toJSONString(getFbcFeeRequest));
-            Cat.logEvent(CatConstants.FEIGN_METHOD,"RenterOrderCostCombineService.getFbcFee");
+            Cat.logEvent(CatConstants.FEIGN_METHOD,"FetchBackCarFeeFeignService.getFbcFee");
             Cat.logEvent(CatConstants.FEIGN_PARAM,JSON.toJSONString(getFbcFeeRequest));
             responseData = fetchBackCarFeeFeignService.getFbcFee(getFbcFeeRequest);
             log.info("Feign 获取取还车费用结果:[{}],获取取还车费用入参:[{}]",JSON.toJSONString(responseData),JSON.toJSONString(getFbcFeeRequest));
             if(responseData == null || responseData.getResCode()==null || !responseData.getResCode().equals(ErrorCode.SUCCESS.getCode())){
-                GetReturnCostException getReturnCostException = new GetReturnCostException();
-                throw getReturnCostException;
+                GetReturnCostFailException getReturnCostFailException = new GetReturnCostFailException();
+                throw getReturnCostFailException;
             }
             Cat.logEvent(CatConstants.FEIGN_RESULT,JSON.toJSONString(responseData));
             t.setStatus(Transaction.SUCCESS);
-        }catch (GetReturnCostException getReturnCostException){
-            Cat.logError("Feign 获取取还车费用失败！",getReturnCostException);
-            t.setStatus(getReturnCostException);
-            throw getReturnCostException;
+        }catch (GetReturnCostFailException getReturnCostFailException){
+            Cat.logError("Feign 获取取还车费用失败！", getReturnCostFailException);
+            t.setStatus(getReturnCostFailException);
+            throw getReturnCostFailException;
         }catch (Exception e){
             GetReturnCostErrorException getReturnCostErrorException = new GetReturnCostErrorException();
             Cat.logError("Feign 获取取还车费用接口异常",getReturnCostErrorException);
@@ -582,8 +577,8 @@ public class RenterOrderCostCombineService {
                 listCostDetail.add(renterOrderCostDetailEntity);
 
                 RenterOrderSubsidyDetailEntity renterOrderSubsidyDetailEntity = new RenterOrderSubsidyDetailEntity();
-                renterOrderSubsidyDetailEntity.setSubsidTypeName(SubsidyTypeCodeEnum.GET_CAR.getDesc());
-                renterOrderSubsidyDetailEntity.setSubsidyTypeCode(SubsidyTypeCodeEnum.GET_CAR.getCode().toString());
+                renterOrderSubsidyDetailEntity.setSubsidyTypeName(SubsidyTypeCodeEnum.GET_CAR.getDesc());
+                renterOrderSubsidyDetailEntity.setSubsidyTypeCode(SubsidyTypeCodeEnum.GET_CAR.getCode());
                 renterOrderSubsidyDetailEntity.setSubsidySourceCode(SubsidySourceCodeEnum.PLATFORM.getCode());
                 renterOrderSubsidyDetailEntity.setSubsidySourceName(SubsidySourceCodeEnum.PLATFORM.getDesc());
                 renterOrderSubsidyDetailEntity.setSubsidyTargetCode(SubsidySourceCodeEnum.RENTER.getCode());
@@ -611,11 +606,11 @@ public class RenterOrderCostCombineService {
                 listCostDetail.add(renterOrderCostDetailEntity);
 
                 RenterOrderSubsidyDetailEntity renterOrderSubsidyDetailEntity = new RenterOrderSubsidyDetailEntity();
-                renterOrderSubsidyDetailEntity.setSubsidTypeName(SubsidyTypeCodeEnum.RETURN_CAR.getDesc());
-                renterOrderSubsidyDetailEntity.setSubsidyTypeCode(SubsidyTypeCodeEnum.RETURN_CAR.getCode().toString());
+                renterOrderSubsidyDetailEntity.setSubsidyTypeName(SubsidyTypeCodeEnum.RETURN_CAR.getDesc());
+                renterOrderSubsidyDetailEntity.setSubsidyTypeCode(SubsidyTypeCodeEnum.RETURN_CAR.getCode());
                 renterOrderSubsidyDetailEntity.setSubsidySourceCode(SubsidySourceCodeEnum.PLATFORM.getCode());
                 renterOrderSubsidyDetailEntity.setSubsidySourceName(SubsidySourceCodeEnum.PLATFORM.getDesc());
-                renterOrderSubsidyDetailEntity.setSubsidyTargetName(SubsidySourceCodeEnum.RENTER.getCode());
+                renterOrderSubsidyDetailEntity.setSubsidyTargetCode(SubsidySourceCodeEnum.RENTER.getCode());
                 renterOrderSubsidyDetailEntity.setSubsidyTargetName(SubsidySourceCodeEnum.RENTER.getDesc());
                 renterOrderSubsidyDetailEntity.setSubsidyDesc("平台补贴给租客的还车费用！");
                 renterOrderSubsidyDetailEntity.setSubsidyAmount(Integer.valueOf(fbcFeeResponse.getExpectedRealFee()) - Integer.valueOf(fbcFeeResponse.getBaseFee()));
@@ -736,8 +731,11 @@ public class RenterOrderCostCombineService {
 
     /**
      * 获取取还车超运能信息
-     * @param getReturnCarOverCostReqDto 參數
-     * @return GetReturnOverCostDTO
+     * @param cityCode
+     * @param rentTime
+     * @param revertTime
+     * @param orderType 订单类型:1,短租订单 2,平台套餐订单
+     * @return
      */
     public GetReturnOverCostDTO getGetReturnOverCost(GetReturnCarOverCostReqDto getReturnCarOverCostReqDto) {
         GetReturnOverCostDTO getReturnOverCostDTO = new GetReturnOverCostDTO();
@@ -833,37 +831,44 @@ public class RenterOrderCostCombineService {
      */
     @SuppressWarnings("unchecked")
     private Integer getGetReturnOverTransportFee(Integer cityCode) {
-        log.info("GetReturnCarFeeV55Service.getGetReturnOverTransportFee .param is :cityCode = {}", cityCode);
         String premiumAmt = null;
         //调用取还车服务接口获取城市对应的超能溢价金额
-        try {
-            //TODO apollo中获取费用
-            //String url = apolloCostConfig.getGetfbcfeeUrl() + "/upPricefetchbackCarFee/getFbcHumanUpFeeConfig?cityId=" + cityCode + "&requestTime=" + DateUtils.formateLocalDateTimeStr(LocalDateTime.now(), df);
-            String url =  "/upPricefetchbackCarFee/getFbcHumanUpFeeConfig?cityId=" + cityCode + "&requestTime=" +LocalDateTimeUtils.localDateTimeToLong(LocalDateTime.now());
-            ResponseEntity<HttpResult> responseEntity = restTemplate.getForEntity(url, HttpResult.class);
-            log.info("url = {}",url);
-            if (null != responseEntity) {
-                HttpResult httpResult = responseEntity.getBody();
-                log.info("httpResult = {}",httpResult);
-                if (httpResult.getResCode().equals(ErrorCode.SUCCESS.getCode())) {
-                    Map<String,Object> dataMap = (Map<String, Object>) httpResult.getData();
-                    if(null != dataMap.get("humanFee")) {
-                        premiumAmt = dataMap.get("humanFee").toString();
-                        return Double.valueOf(premiumAmt).intValue();
-                    }
-                }
+        GetFbcFeeConfigRequest reqParam  = new GetFbcFeeConfigRequest();
+        reqParam.setCityId(String.valueOf(cityCode));
+        reqParam.setRequestTime(String.valueOf(LocalDateTimeUtils.localDateTimeToLong(LocalDateTime.now())));
+        ResponseData<PriceCarHumanFeeRule> responseData = null;
+        Transaction t = Cat.newTransaction(com.atzuche.order.commons.CatConstants.FEIGN_CALL, "取还车超出运能附加金额配置");
+        try{
+            log.info("Feign 获取取还车超出运能附加金额入参:[{}]",JSON.toJSONString(reqParam));
+            Cat.logEvent(CatConstants.FEIGN_METHOD,"FetchBackCarFeeFeignService.getPriceCarHumanFeeRuleConfig");
+            Cat.logEvent(CatConstants.FEIGN_PARAM,JSON.toJSONString(reqParam));
+            responseData = fetchBackCarFeeFeignService.getPriceCarHumanFeeRuleConfig(reqParam);
+            log.info("Feign 获取取还车超出运能附加金额结果:[{}],获取取还车超出运能附加金额入参:[{}]",JSON.toJSONString(responseData),JSON.toJSONString(reqParam));
+            if(responseData == null || responseData.getResCode()==null){
+                GetReturnOverCostFailException fail = new GetReturnOverCostFailException();
+                throw fail;
             }
-        } catch (Exception e) {
-            log.error("获取城市超运能溢价金额异常：",e);
+            Cat.logEvent(CatConstants.FEIGN_RESULT,JSON.toJSONString(responseData));
+            t.setStatus(Transaction.SUCCESS);
+        }catch (GetReturnCostFailException e){
+            Cat.logError("Feign 获取取还车超出运能附加金额失败！", e);
+            t.setStatus(e);
+            throw e;
+        }catch (Exception e){
+            GetReturnOverCostErrorException error = new GetReturnOverCostErrorException();
+            Cat.logError("Feign 获取取还车超出运能附加金额接口异常",error);
+            t.setStatus(error);
+            throw error;
         }
-
+        if(ErrorCode.SUCCESS.getCode().equals(responseData.getResCode())){
+            return responseData.getData().getHumanFee().intValue();
+        }
         try {
             //TODO  apollo获取配置信息
            // return Integer.valueOf(apolloCostConfig.getGetReturnOverTransportFee());
         } catch (Exception e) {
             log.error("获取取还车超运能溢价默认值异常：", e);
         }
-
         return GlobalConstant.GET_RETURN_OVER_COST;
     }
 

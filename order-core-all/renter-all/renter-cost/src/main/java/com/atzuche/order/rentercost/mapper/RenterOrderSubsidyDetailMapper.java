@@ -17,8 +17,6 @@ public interface RenterOrderSubsidyDetailMapper{
 
     RenterOrderSubsidyDetailEntity selectByPrimaryKey(Integer id);
 
-    List<RenterOrderSubsidyDetailEntity> selectALL();
-
     int insert(RenterOrderSubsidyDetailEntity record);
     
     int saveRenterOrderSubsidyDetail(RenterOrderSubsidyDetailEntity record);

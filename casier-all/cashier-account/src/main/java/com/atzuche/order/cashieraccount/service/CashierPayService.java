@@ -1,17 +1,13 @@
 package com.atzuche.order.cashieraccount.service;
 
 import com.atzuche.order.accountrenterdeposit.service.AccountRenterDepositService;
-import com.atzuche.order.accountrenterdeposit.vo.req.CreateOrderRenterDepositReqVO;
-import com.atzuche.order.accountrenterdeposit.vo.req.PayedOrderRenterDepositReqVO;
 import com.atzuche.order.accountrenterwzdepost.service.AccountRenterWzDepositService;
-import com.atzuche.order.accountrenterwzdepost.vo.req.PayedOrderRenterWZDepositReqVO;
-import com.atzuche.order.cashieraccount.common.DataPayTypeConstant;
 import com.atzuche.order.cashieraccount.exception.OrderPayCallBackAsnyException;
-import com.atzuche.order.cashieraccount.service.notservice.CashierNoTService;
 import com.atzuche.order.cashieraccount.vo.req.pay.OrderPaySignReqVO;
 import com.atzuche.order.cashieraccount.vo.res.pay.OrderPayAsynResVO;
 import com.atzuche.order.commons.CatConstants;
 import com.atzuche.order.commons.service.RabbitMsgLogService;
+import com.autoyol.autopay.gateway.constant.DataPayTypeConstant;
 import com.autoyol.commons.utils.GsonUtils;
 import com.autoyol.commons.web.ErrorCode;
 import com.dianping.cat.Cat;
