@@ -65,7 +65,7 @@ public class RenterOrderCalCostService {
      * @author ZhangBin
      * @date 2019/12/24 15:21
      **/
-    public RenterOrderCostRespDTO getRenterOrderCostAndDeailList(RenterOrderCostReqDTO renterOrderCostReqDTO) {
+    public RenterOrderCostRespDTO getOrderCostAndDeailList(RenterOrderCostReqDTO renterOrderCostReqDTO) {
         RenterOrderCostRespDTO renterOrderCostRespDTO = new RenterOrderCostRespDTO();
         List<RenterOrderCostDetailEntity> detailList = new ArrayList<>();
         List<RenterOrderSubsidyDetailEntity> subsidyList = new ArrayList<>();

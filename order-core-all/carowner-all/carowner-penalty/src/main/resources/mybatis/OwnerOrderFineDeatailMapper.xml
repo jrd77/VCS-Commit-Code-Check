@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.atzuche.order.mapper.OwnerOrderFineDeatailMapper">
+<mapper namespace="com.atzuche.order.ownercost.mapper.OwnerOrderFineDeatailMapper">
 
-    <resultMap type="com.atzuche.order.entity.OwnerOrderFineDeatailEntity" id="BaseResultMap">
+    <resultMap type="com.atzuche.order.ownercost.entity.OwnerOrderFineDeatailEntity" id="BaseResultMap">
         <result property="id" column="id"/>
         <result property="orderNo" column="order_no"/>
         <result property="ownerOrderNo" column="owner_order_no"/>
@@ -61,7 +61,7 @@
 	</select>
 
 	 
-	<insert id="insert" parameterType="com.atzuche.order.entity.OwnerOrderFineDeatailEntity" useGeneratedKeys="true" keyProperty="id">
+	<insert id="insert" parameterType="com.atzuche.order.ownercost.entity.OwnerOrderFineDeatailEntity" useGeneratedKeys="true" keyProperty="id">
 		insert into owner_order_fine_deatail
 		(
 				`order_no`,		
@@ -108,7 +108,7 @@
 			)
 	</insert>
 	
-	<insert id="insertSelective" parameterType="com.atzuche.order.entity.OwnerOrderFineDeatailEntity" useGeneratedKeys="true" keyProperty="id">
+	<insert id="insertSelective" parameterType="com.atzuche.order.ownercost.entity.OwnerOrderFineDeatailEntity" useGeneratedKeys="true" keyProperty="id">
 		insert into owner_order_fine_deatail
 		(
 				<if test="orderNo != null">`order_no`, </if>
@@ -156,7 +156,7 @@
 	</insert>
 	
 	 
-	<update id="updateByPrimaryKeySelective" parameterType="com.atzuche.order.entity.OwnerOrderFineDeatailEntity">
+	<update id="updateByPrimaryKeySelective" parameterType="com.atzuche.order.ownercost.entity.OwnerOrderFineDeatailEntity">
 		update owner_order_fine_deatail 
 		<set>
 				<if test="orderNo != null">`order_no` = #{orderNo}, </if>
@@ -182,7 +182,7 @@
 		where id = #{id}
 	</update>
 	
-	<update id="updateByPrimaryKey" parameterType="com.atzuche.order.entity.OwnerOrderFineDeatailEntity">
+	<update id="updateByPrimaryKey" parameterType="com.atzuche.order.ownercost.entity.OwnerOrderFineDeatailEntity">
 		update owner_order_fine_deatail 
 		<set>
 				`order_no` = #{orderNo}, 		
