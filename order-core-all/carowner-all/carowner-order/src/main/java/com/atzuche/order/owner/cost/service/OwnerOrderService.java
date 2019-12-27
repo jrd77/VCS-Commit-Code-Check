@@ -1,4 +1,4 @@
-package com.atzuche.order.service;
+package com.atzuche.order.owner.cost.service;
 
 import com.atzuche.order.entity.OwnerOrderEntity;
 import com.atzuche.order.mapper.OwnerOrderMapper;

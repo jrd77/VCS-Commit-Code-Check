@@ -5,11 +5,10 @@ import org.springframework.stereotype.Service;
 
 import com.atzuche.order.commons.entity.dto.RenterMemberDTO;
 import com.atzuche.order.coreapi.entity.request.ModifyOrderReq;
-import com.atzuche.order.owner.mem.service.OwnerMemberService;
 import com.atzuche.order.rentermem.service.RenterMemberService;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.atzuche.order.renterorder.service.RenterOrderService;
-import com.atzuche.order.service.OwnerOrderService;
+import com.atzuche.order.owner.cost.service.OwnerOrderService;
 import com.autoyol.commons.web.ResponseData;
 
 import lombok.extern.slf4j.Slf4j;
