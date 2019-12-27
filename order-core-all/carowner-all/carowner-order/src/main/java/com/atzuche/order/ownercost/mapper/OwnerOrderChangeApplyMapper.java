@@ -1,5 +1,6 @@
 package com.atzuche.order.ownercost.mapper;
 
+import com.atzuche.order.ownercost.entity.OwnerOrderChangeApplyEntity;
 import org.apache.ibatis.annotations.Mapper;
 import java.util.List;
 
