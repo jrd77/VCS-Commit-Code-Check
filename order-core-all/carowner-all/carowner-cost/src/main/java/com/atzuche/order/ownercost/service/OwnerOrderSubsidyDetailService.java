@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import com.atzuche.order.ownercost.entity.OwnerOrderSubsidyDetailEntity;
 import com.atzuche.order.ownercost.mapper.OwnerOrderSubsidyDetailMapper;
 
+
 @Service
 public class OwnerOrderSubsidyDetailService {
 
@@ -30,6 +31,9 @@ public class OwnerOrderSubsidyDetailService {
 	 * @return Integer
 	 */
 	public Integer saveOwnerOrderSubsidyDetail(OwnerOrderSubsidyDetailEntity ownerOrderSubsidyDetailEntity) {
+		if (ownerOrderSubsidyDetailEntity == null) {
+			return 1;
+		}
 		return ownerOrderSubsidyDetailMapper.saveOwnerOrderSubsidyDetail(ownerOrderSubsidyDetailEntity);
 	}
 	
