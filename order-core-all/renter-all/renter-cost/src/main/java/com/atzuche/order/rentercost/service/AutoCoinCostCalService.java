@@ -54,12 +54,12 @@ public class AutoCoinCostCalService {
             renterOrderSubsidyDetailDTO.setMemNo(crmCustPoint.getMemNo());
             renterOrderSubsidyDetailDTO.setSubsidyAmount(pointValueDeducExchange);
             renterOrderSubsidyDetailDTO.setSubsidyTypeCode(SubsidyTypeCodeEnum.RENT_AMT.getCode());
-            renterOrderSubsidyDetailDTO.setSubsidTypeName(SubsidyTypeCodeEnum.RENT_AMT.getDesc());
+            renterOrderSubsidyDetailDTO.setSubsidyTypeName(SubsidyTypeCodeEnum.RENT_AMT.getDesc());
             renterOrderSubsidyDetailDTO.setSubsidySourceCode(SubsidySourceCodeEnum.PLATFORM.getCode());
             renterOrderSubsidyDetailDTO.setSubsidySourceName(SubsidySourceCodeEnum.PLATFORM.getDesc());
 
             renterOrderSubsidyDetailDTO.setSubsidyTargetCode(SubsidySourceCodeEnum.RENTER.getCode());
-            renterOrderSubsidyDetailDTO.setSubsidTypeName(SubsidySourceCodeEnum.RENTER.getDesc());
+            renterOrderSubsidyDetailDTO.setSubsidyTypeName(SubsidySourceCodeEnum.RENTER.getDesc());
             renterOrderSubsidyDetailDTO.setSubsidyCostCode(RenterCashCodeEnum.AUTO_COIN_DEDUCT.getCashNo());
             renterOrderSubsidyDetailDTO.setSubsidyCostName(RenterCashCodeEnum.AUTO_COIN_DEDUCT.getTxt());
             renterOrderSubsidyDetailDTO.setSubsidyDesc("使用凹凸币抵扣租金");
