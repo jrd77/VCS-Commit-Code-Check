@@ -1,5 +1,6 @@
 package com.atzuche.order.rentercost.service;
 
+import com.atzuche.order.rentercost.entity.RenterOrderCostEntity;
 import com.atzuche.order.rentercost.mapper.RenterOrderCostMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,11 +16,8 @@ import org.springframework.stereotype.Service;
 public class RenterOrderCostService{
     @Autowired
     private RenterOrderCostMapper renterOrderCostMapper;
-    @Autowired
-    private RenterOrderCostCombineService renterOrderCostCombineService;
-    @Autowired
-    private RenterOrderCostDetailService renterOrderCostDetailService;
 
-
-
+    public void saveRenterOrderCost(RenterOrderCostEntity renterOrderCostEntity){
+        int insert = renterOrderCostMapper.insert(renterOrderCostEntity);
+    }
 }
