@@ -1,8 +1,8 @@
 package com.atzuche.order.cashieraccount.service;
 
-import com.atzuche.order.accountdebt.service.AccountDebtService;
-import com.atzuche.order.accountdebt.vo.req.AccountDeductDebtReqVO;
-import com.atzuche.order.accountdebt.vo.res.AccountDebtResVO;
+import com.atzuche.order.settle.service.AccountDebtService;
+import com.atzuche.order.settle.vo.req.AccountDeductDebtReqVO;
+import com.atzuche.order.settle.vo.res.AccountDebtResVO;
 import com.atzuche.order.accountownerincome.service.AccountOwnerIncomeService;
 import com.atzuche.order.accountownerincome.vo.req.AccountOwnerIncomeExamineOpReqVO;
 import com.atzuche.order.accountownerincome.vo.req.AccountOwnerIncomeExamineReqVO;
@@ -20,7 +20,6 @@ import com.atzuche.order.accountrenterwzdepost.vo.req.CreateOrderRenterWZDeposit
 import com.atzuche.order.accountrenterwzdepost.vo.req.PayedOrderRenterDepositWZDetailReqVO;
 import com.atzuche.order.accountrenterwzdepost.vo.req.PayedOrderRenterWZDepositReqVO;
 import com.atzuche.order.accountrenterwzdepost.vo.req.RenterWZDepositCostReqVO;
-import com.atzuche.order.cashieraccount.common.DataPayKindConstant;
 import com.atzuche.order.cashieraccount.service.notservice.CashierNoTService;
 import com.atzuche.order.cashieraccount.service.notservice.CashierRefundApplyNoTService;
 import com.atzuche.order.cashieraccount.vo.req.CashierDeductDebtReqVO;
@@ -31,6 +30,7 @@ import com.atzuche.order.cashieraccount.vo.res.OrderPayableAmountResVO;
 import com.atzuche.order.cashieraccount.vo.res.pay.OrderPayAsynResVO;
 import com.atzuche.order.commons.enums.RenterCashCodeEnum;
 import com.atzuche.order.rentercost.service.RenterOrderCostCombineService;
+import com.autoyol.autopay.gateway.constant.DataPayKindConstant;
 import com.autoyol.cat.CatAnnotation;
 import com.autoyol.commons.web.ErrorCode;
 import com.google.common.collect.ImmutableList;

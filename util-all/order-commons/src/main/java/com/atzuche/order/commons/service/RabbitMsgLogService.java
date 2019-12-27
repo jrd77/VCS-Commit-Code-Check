@@ -1,6 +1,7 @@
 package com.atzuche.order.commons.service;
 
 import com.atzuche.order.commons.entity.RabbitMsgLogEntity;
+import com.atzuche.order.commons.enums.RabbitBusinessTypeEnum;
 import com.atzuche.order.commons.mapper.RabbitMsgLogMapper;
 import org.apache.commons.lang.math.NumberUtils;
 import org.springframework.amqp.core.Message;
@@ -22,12 +23,12 @@ public class RabbitMsgLogService{
     private RabbitMsgLogMapper rabbitMsgLogMapper;
 
 
-    public RabbitMsgLogEntity insertRabbitMsgLog(Message message, String payType, String toJson,String qn) {
+    public RabbitMsgLogEntity insertRabbitMsgLog(Message message, RabbitBusinessTypeEnum businessType, String toJson, String qn) {
         RabbitMsgLogEntity rabbitMsgLog = new RabbitMsgLogEntity();
         String exchange = message.getMessageProperties().getReceivedExchange();
         String queue = message.getMessageProperties().getConsumerQueue();
         String mqKey = message.getMessageProperties().getMessageId();
-        rabbitMsgLog.setBusinessType(payType);
+        rabbitMsgLog.setBusinessType(businessType.getCode());
         rabbitMsgLog.setCreateTime(LocalDateTime.now());
         rabbitMsgLog.setIsConsume(NumberUtils.INTEGER_ZERO);
         rabbitMsgLog.setMqExchange(exchange);

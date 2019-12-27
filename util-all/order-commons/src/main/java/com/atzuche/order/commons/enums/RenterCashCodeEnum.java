@@ -20,6 +20,15 @@ public enum RenterCashCodeEnum {
 	RETURN_BLOCKED_RAISE_AMT("11110037","还车运能加价"),
 	RENTER_PENALTY("11110039","取消订单违约金"),
 
+    REAL_COUPON_OFFSET("12120010", "优惠券抵扣金额"),
+    GETCARFEE_COUPON_OFFSET("12120013", "取送服务券抵扣金额"),
+    OWNER_COUPON_OFFSET_COST("12120051", "车主券抵扣金额"),
+    WALLET_DEDUCT("12120011", "钱包抵扣金额"),
+    AUTO_COIN_DEDUCT("12120012", "凹凸币抵扣金额"),
+    REAL_LIMIT_REDUCTI("12120028", "限时立减抵扣金额"),
+
+
+
     ACCOUNT_RENTER_WZ_DEPOSIT("21110001","违章押金"),
     ACCOUNT_RENTER_DEPOSIT("21110002","车俩押金"),
     ACCOUNT_DEBT("21110003","历史欠款"),
