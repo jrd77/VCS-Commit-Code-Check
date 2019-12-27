@@ -109,7 +109,7 @@ public class RenterOrderCalCostService {
 
         //获取取还车费用
         GetReturnCarCostReqDto getReturnCarCostReqDto = renterOrderCostReqDTO.getGetReturnCarCostReqDto();
-        getReturnCarCostReqDto.setSumJudgeFreeFee(rentAmt + insurAmt + serviceAmount);
+        getReturnCarCostReqDto.setSumJudgeFreeFee(Math.abs(rentAmt + insurAmt + serviceAmount + comprehensiveEnsureAmount));
         GetReturnCostDTO returnCarCost = renterOrderCostCombineService.getReturnCarCost(getReturnCarCostReqDto);
         int getReturnAmt = returnCarCost.getRenterOrderCostDetailEntityList().stream().collect(Collectors.summingInt(RenterOrderCostDetailEntity::getTotalAmount));
         detailList.addAll(returnCarCost.getRenterOrderCostDetailEntityList());

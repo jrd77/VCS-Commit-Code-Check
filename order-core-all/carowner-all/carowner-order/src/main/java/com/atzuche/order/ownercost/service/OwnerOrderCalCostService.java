@@ -15,6 +15,8 @@ import java.util.stream.Collectors;
 @Service
 public class OwnerOrderCalCostService {
 
+    private OwnerOrderPurchaseDetailService ownerOrderPurchaseDetailService;
+
     public OwnerOrderCostRespDTO getOrderCostAndDeailList(RenterOrderCostRespDTO renterOrderCostRespDTO){
         List<RenterOrderCostDetailEntity> renterOrderCostDetailDTOList = renterOrderCostRespDTO.getRenterOrderCostDetailDTOList();
         List<RenterOrderSubsidyDetailEntity> renterOrderSubsidyDetailEntityList = renterOrderCostRespDTO.getRenterOrderSubsidyDetailEntityList();
@@ -28,6 +30,7 @@ public class OwnerOrderCalCostService {
                 .stream()
                 .filter(x -> SubsidySourceCodeEnum.OWNER.getCode().equals(x.getSubsidySourceCode()))
                 .collect(Collectors.toList());
+
 
             return null;
 
