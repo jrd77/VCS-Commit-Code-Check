@@ -20,6 +20,7 @@ import com.atzuche.order.cashieraccount.vo.res.pay.OrderPayAsynResVO;
 import com.atzuche.order.commons.LocalDateTimeUtils;
 import com.atzuche.order.commons.enums.RenterCashCodeEnum;
 import com.atzuche.order.commons.enums.account.PayStatusEnum;
+import com.atzuche.order.rentercost.entity.vo.PayableVO;
 import com.autoyol.autopay.gateway.constant.DataPayTypeConstant;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.doc.util.StringUtil;
@@ -28,7 +29,9 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
+import org.springframework.util.CollectionUtils;
 
+import java.util.List;
 import java.util.Objects;
 
 
@@ -43,6 +46,19 @@ public class CashierNoTService {
     @Autowired
     private CashierMapper cashierMapper;
 
+    /**
+     * 收银台记录应收金额
+     */
+    public int getPayDeposit(String orderNo,String memNo,String payKind){
+        CashierEntity cashierEntity = cashierMapper.getPayDeposit(orderNo,memNo,payKind);
+        if(Objects.isNull(cashierEntity) || Objects.isNull(cashierEntity.getId())){
+            return 0;
+        }
+        if(PayStatusEnum.PAYED.getCode().equals(cashierEntity.getTransStatus())){
+            return 0;
+        }
+        return cashierEntity.getPayAmt() ;
+    }
 
     /**
      * 收银台记录应收违章押金
@@ -191,4 +207,18 @@ public class CashierNoTService {
         accountRenterCostDetail.setRenterCashCodeEnum(RenterCashCodeEnum.CASHIER_RENTER_AGAIN_COST);
         return vo;
     }
+    /**
+     * 计算租车费用应付
+     * @param payableVOs
+     * @return
+     */
+    public int sumRentOrderCost(List<PayableVO> payableVOs) {
+        int amt = NumberUtils.INTEGER_ZERO;
+        if(!CollectionUtils.isEmpty(payableVOs)){
+            return payableVOs.stream().mapToInt(PayableVO::getAmt).sum();
+        }
+        return amt;
+    }
+
+
 }
