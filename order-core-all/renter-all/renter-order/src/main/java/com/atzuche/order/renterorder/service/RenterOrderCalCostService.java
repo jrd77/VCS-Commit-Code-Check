@@ -5,11 +5,13 @@ import com.atzuche.order.commons.constant.OrderConstant;
 import com.atzuche.order.commons.enums.CouponTypeEnum;
 import com.atzuche.order.commons.entity.dto.GetReturnCarCostReqDto;
 import com.atzuche.order.rentercost.entity.RenterOrderCostDetailEntity;
+import com.atzuche.order.rentercost.entity.RenterOrderCostEntity;
 import com.atzuche.order.rentercost.entity.RenterOrderSubsidyDetailEntity;
 import com.atzuche.order.rentercost.entity.dto.GetReturnCostDTO;
 import com.atzuche.order.rentercost.entity.dto.GetReturnOverCostDTO;
 import com.atzuche.order.rentercost.service.RenterOrderCostCombineService;
 import com.atzuche.order.rentercost.service.RenterOrderCostDetailService;
+import com.atzuche.order.rentercost.service.RenterOrderCostService;
 import com.atzuche.order.rentercost.service.RenterOrderSubsidyDetailService;
 import com.atzuche.order.renterorder.dto.coupon.OrderCouponDTO;
 import com.atzuche.order.renterorder.entity.dto.RenterOrderCostReqDTO;
@@ -25,6 +27,7 @@ import com.autoyol.coupon.api.MemAvailCouponResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cglib.beans.BeanCopier;
 import com.atzuche.order.renterorder.mapper.RenterOrderMapper;
@@ -66,6 +69,9 @@ public class RenterOrderCalCostService {
     @Autowired
     private RenterOrderSubsidyDetailService renterOrderSubsidyDetailService;
 
+    @Autowired
+    private RenterOrderCostService renterOrderCostService;
+
 
     /**
      * 获取费用项和费用明细列表 + 落库
@@ -74,6 +80,7 @@ public class RenterOrderCalCostService {
      * @date 2019/12/24 15:21
      **/
     public RenterOrderCostRespDTO getOrderCostAndDeailList(RenterOrderCostReqDTO renterOrderCostReqDTO) {
+
         RenterOrderCostRespDTO renterOrderCostRespDTO = new RenterOrderCostRespDTO();
         List<RenterOrderCostDetailEntity> detailList = new ArrayList<>();
         List<RenterOrderSubsidyDetailEntity> subsidyList = new ArrayList<>();
@@ -133,6 +140,12 @@ public class RenterOrderCalCostService {
         renterOrderCostDetailService.saveRenterOrderCostDetailBatch(detailList);
         //保存补贴明细
         renterOrderSubsidyDetailService.saveRenterOrderSubsidyDetailBatch(subsidyList);
+        //保存费用统计信息
+
+        RenterOrderCostEntity renterOrderCostEntity = new RenterOrderCostEntity();
+        BeanUtils.copyProperties(renterOrderCostRespDTO,renterOrderCostEntity);
+        //保存费用统计信息
+        renterOrderCostService.saveRenterOrderCost(renterOrderCostEntity);
         return renterOrderCostRespDTO;
     }
 

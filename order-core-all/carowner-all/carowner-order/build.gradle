@@ -21,5 +21,4 @@ dependencies {
 
     compile project(":order-core-all:carowner-all:carowner-cost")
 
-    compile project(":order-core-all:renter-all:renter-order")
 }
