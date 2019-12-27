@@ -110,7 +110,6 @@ public class ModifyOrderForOwnerService {
 		// 上笔车主子订单置为无效
 		ownerOrderService.updateOwnerOrderInvalidById(ownerOrderEntity.getId());
 		
-		
 		return ResponseData.success();
 	}
 	
@@ -163,12 +162,12 @@ public class ModifyOrderForOwnerService {
 		subsidyEntity.setMemNo(ownerMemberDTO.getMemNo());
 		subsidyEntity.setOrderNo(modifyOrderOwnerDTO.getOrderNo());
 		subsidyEntity.setOwnerOrderNo(modifyOrderOwnerDTO.getOwnerOrderNo());
-		subsidyEntity.setSubsidType(renterSubsidy.getSubsidType());
+		//subsidyEntity.setSubsidType(renterSubsidy.getSubsidTypeName());
 		subsidyEntity.setSubsidyAmount(-renterSubsidy.getSubsidyAmount());
-		subsidyEntity.setSubsidyCode(renterSubsidy.getSubsidyCode());
+		subsidyEntity.setSubsidyCode(renterSubsidy.getSubsidyTargetCode());
 		subsidyEntity.setSubsidyDesc(renterSubsidy.getSubsidyDesc());
-		subsidyEntity.setSubsidyName(renterSubsidy.getSubsidyName());
-		subsidyEntity.setSubsidySource(renterSubsidy.getSubsidySource());
+		subsidyEntity.setSubsidyName(renterSubsidy.getSubsidyTargetName());
+		subsidyEntity.setSubsidySource(renterSubsidy.getSubsidySourceName());
 		subsidyEntity.setSubsidySourceCode(renterSubsidy.getSubsidySourceCode());
 		subsidyEntity.setSubsidyTypeCode(renterSubsidy.getSubsidyTypeCode());
 		subsidyEntity.setSubsidyVoucher(String.valueOf(renterSubsidy.getId()));

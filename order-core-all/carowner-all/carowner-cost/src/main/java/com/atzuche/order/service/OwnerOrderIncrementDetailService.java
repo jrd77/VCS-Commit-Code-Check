@@ -39,6 +39,9 @@ public class OwnerOrderIncrementDetailService {
 	 * @return Integer
 	 */
 	public Integer saveOwnerOrderIncrementDetailBatch(List<OwnerOrderIncrementDetailEntity> costList) {
+		if (costList == null || costList.isEmpty()) {
+			return 1;
+		}
 		return ownerOrderIncrementDetailMapper.saveOwnerOrderIncrementDetailBatch(costList);
 	}
 }

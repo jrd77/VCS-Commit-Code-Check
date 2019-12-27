@@ -62,7 +62,15 @@ public class RenterOrderService {
     public Integer saveRenterOrder(RenterOrderEntity renterOrderEntity) {
     	return renterOrderMapper.insertSelective(renterOrderEntity);
     }
-
+    
+    /**
+     * 获取待支付的租客子订单
+     * @param orderNo 主订单号
+     * @return RenterOrderEntity
+     */
+    public RenterOrderEntity getRenterOrderByOrderNoAndWaitPay(String orderNo) {
+    	return renterOrderMapper.getRenterOrderByOrderNoAndWaitPay(orderNo);
+    }
 
 
 

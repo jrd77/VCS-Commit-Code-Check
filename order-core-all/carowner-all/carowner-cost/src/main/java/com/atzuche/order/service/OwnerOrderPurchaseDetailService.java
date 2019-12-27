@@ -39,6 +39,9 @@ public class OwnerOrderPurchaseDetailService {
 	 * @return Integer
 	 */
 	public Integer saveOwnerOrderPurchaseDetailBatch(List<OwnerOrderPurchaseDetailEntity> costList) {
+		if (costList == null || costList.isEmpty()) {
+			return 1;
+		}
 		return ownerOrderPurchaseDetailMapper.saveOwnerOrderPurchaseDetailBatch(costList);
 	}
 }

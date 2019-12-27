@@ -20,6 +20,7 @@ import com.atzuche.order.rentercost.entity.*;
 import com.atzuche.order.rentercost.entity.dto.*;
 import com.atzuche.order.rentercost.entity.dto.GetReturnOverTransportDTO;
 import com.atzuche.order.rentercost.entity.vo.GetReturnResponseVO;
+import com.atzuche.order.rentercost.entity.vo.PayableVO;
 import com.atzuche.order.rentercost.exception.GetReturnCostErrorException;
 import com.atzuche.order.rentercost.exception.GetReturnCostException;
 import com.autoyol.commons.utils.GsonUtils;
@@ -69,6 +70,10 @@ public class RenterOrderCostCombineService {
     private RestTemplate restTemplate;
     @Autowired
     private FetchBackCarFeeFeignService fetchBackCarFeeFeignService;
+    @Autowired
+    private ConsoleRenterOrderFineDeatailService consoleRenterOrderFineDeatailService;
+    @Autowired
+    private OrderSupplementDetailService orderSupplementDetailService;
 
     private static final Integer [] ORDER_TYPES = {1,2};
 	
@@ -376,6 +381,33 @@ public class RenterOrderCostCombineService {
 	}
 	
 	
+	/**
+	 * 获取应付记录
+	 * @param orderNo 主订单号
+	 * @param renterOrderNo 租客子订单号
+	 * @param memNo 会员号
+	 * @return List<PayableVO>
+	 */
+	public List<PayableVO> listPayableVO(String orderNo, String renterOrderNo, String memNo) {
+		List<PayableVO> payableList = new ArrayList<PayableVO>();
+		if (StringUtils.isNotBlank(renterOrderNo)) {
+			payableList.add(getPayable(orderNo, renterOrderNo, memNo));
+		}
+		List<OrderSupplementDetailEntity> supplementList = orderSupplementDetailService.listOrderSupplementDetailByOrderNoAndMemNo(orderNo, memNo);
+		if (supplementList != null && !supplementList.isEmpty()) {
+			List<PayableVO> suppList = supplementList.stream().map(supplement -> {
+				PayableVO payableVO = new PayableVO();
+				payableVO.setAmt(supplement.getAmt());
+				payableVO.setOrderNo(orderNo);
+				payableVO.setTitle(supplement.getTitle());
+				payableVO.setType(2);
+				payableVO.setUniqueNo(String.valueOf(supplement.getId()));
+				return payableVO;
+			}).collect(Collectors.toList());
+			payableList.addAll(suppList);
+		}
+		return payableList;
+	}
 	
 	
 	/**
@@ -384,7 +416,7 @@ public class RenterOrderCostCombineService {
 	 * @param renterOrderNo 租客订单号
 	 * @return Integer
 	 */
-	public Integer getPayable(String orderNo, String renterOrderNo, String memNo) {
+	public PayableVO getPayable(String orderNo, String renterOrderNo, String memNo) {
 		// 获取费用明细
 		List<RenterOrderCostDetailEntity> costList = renterOrderCostDetailService.listRenterOrderCostDetail(orderNo, renterOrderNo);
 		// 获取补贴明细
@@ -393,6 +425,8 @@ public class RenterOrderCostCombineService {
 		List<RenterOrderFineDeatailEntity> fineList = renterOrderFineDeatailService.listRenterOrderFineDeatail(orderNo, renterOrderNo);
 		// 管理后台补贴
 		List<OrderConsoleCostDetailEntity> consoleCostList = orderConsoleCostDetailService.listOrderConsoleCostDetail(orderNo,memNo);
+		// 获取租客全局罚金
+		List<ConsoleRenterOrderFineDeatailEntity> consoleFineList = consoleRenterOrderFineDeatailService.listConsoleRenterOrderFineDeatail(orderNo, memNo);
 		Integer payable = 0;
 		if (costList != null && !costList.isEmpty()) {
 			payable += costList.stream().mapToInt(RenterOrderCostDetailEntity::getTotalAmount).sum();
@@ -406,7 +440,16 @@ public class RenterOrderCostCombineService {
 		if (consoleCostList != null && !consoleCostList.isEmpty()) {
 			payable += consoleCostList.stream().mapToInt(OrderConsoleCostDetailEntity::getSubsidyAmount).sum();
 		}
-		return payable;
+		if (consoleFineList != null && !consoleFineList.isEmpty()) {
+			payable += consoleFineList.stream().mapToInt(ConsoleRenterOrderFineDeatailEntity::getFineAmount).sum();
+		}
+		PayableVO payableVO = new PayableVO();
+		payableVO.setAmt(payable);
+		payableVO.setOrderNo(orderNo);
+		payableVO.setTitle("修改订单补付");
+		payableVO.setType(1);
+		payableVO.setUniqueNo(renterOrderNo);
+		return payableVO;
 	}
 	
 	

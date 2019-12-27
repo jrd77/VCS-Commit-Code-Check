@@ -30,6 +30,9 @@ public class OwnerOrderSubsidyDetailService {
 	 * @return Integer
 	 */
 	public Integer saveOwnerOrderSubsidyDetail(OwnerOrderSubsidyDetailEntity ownerOrderSubsidyDetailEntity) {
+		if (ownerOrderSubsidyDetailEntity == null) {
+			return 1;
+		}
 		return ownerOrderSubsidyDetailMapper.saveOwnerOrderSubsidyDetail(ownerOrderSubsidyDetailEntity);
 	}
 	
