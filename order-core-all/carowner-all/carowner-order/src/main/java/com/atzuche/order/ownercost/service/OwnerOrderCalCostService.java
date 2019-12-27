@@ -38,7 +38,6 @@ public class OwnerOrderCalCostService {
         List<RenterOrderCostDetailEntity> renterOrderCostDetailDTOList = ownerOrderCostReqDTO.getRenterOrderCostDetailDTOList();
         List<RenterOrderSubsidyDetailDTO> renterOrderSubsidyDetailDTOList = ownerOrderCostReqDTO.getRenterOrderSubsidyDetailDTOList();
 
-
         //过滤租金
         List<OwnerOrderPurchaseDetailEntity> ownerDetailList = renterOrderCostDetailDTOList
                 .stream()
