@@ -36,5 +36,5 @@ public class AbatementAmtDTO {
 	/**
 	 * 车辆标签
 	 */
-	private List<Integer> carLabelIds;
+	private List<String> carLabelIds;
 }

@@ -1,5 +1,6 @@
 package com.atzuche.order.cashieraccount.service;
 
+import com.atzuche.order.rentercost.entity.vo.PayableVO;
 import com.atzuche.order.settle.service.AccountDebtService;
 import com.atzuche.order.settle.vo.req.AccountDeductDebtReqVO;
 import com.atzuche.order.settle.vo.res.AccountDebtResVO;
@@ -319,14 +320,14 @@ public class CashierService {
         //违章押金
         int amtWZDeposit = accountRenterWzDepositService.getSurplusRenterWZDeposit(orderNo,memNo);
         //租车费用
-        int amtRenterCost = renterOrderCostCombineService.getPayable(orderNo,renterOrderNo,memNo);
+        PayableVO payableVO = renterOrderCostCombineService.getPayable(orderNo,renterOrderNo,memNo);
         List<AccountPayAbleResVO> accountPayAbles = ImmutableList.of(
                 new AccountPayAbleResVO(orderNo,memNo,amtDeposit,RenterCashCodeEnum.ACCOUNT_RENTER_DEPOSIT),
-                new AccountPayAbleResVO(orderNo,memNo,amtWZDeposit,RenterCashCodeEnum.ACCOUNT_RENTER_WZ_DEPOSIT),
-                new AccountPayAbleResVO(orderNo,memNo,amtRenterCost,RenterCashCodeEnum.ACCOUNT_RENTER_RENT_COST)
+                new AccountPayAbleResVO(orderNo,memNo,amtWZDeposit,RenterCashCodeEnum.ACCOUNT_RENTER_WZ_DEPOSIT)
+//                new AccountPayAbleResVO(orderNo,memNo,amtRenterCost,RenterCashCodeEnum.ACCOUNT_RENTER_RENT_COST)
         );
         result.setAccountPayAbles(accountPayAbles);
-        result.setAmt(amtDeposit + amtWZDeposit + amtRenterCost);
+//        result.setAmt(amtDeposit + amtWZDeposit + amtRenterCost);
         result.setMemNo(memNo);
         result.setOrderNo(orderNo);
         return result;

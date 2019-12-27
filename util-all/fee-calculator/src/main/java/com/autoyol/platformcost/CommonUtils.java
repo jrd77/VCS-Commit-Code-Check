@@ -49,7 +49,7 @@ public class CommonUtils {
     
 	private static final double EASYCOEFFICIENT_NOVICE = 1.3;
 	
-	private static final Integer[] CAR_EASY_TAG = {370,371};
+	private static final String[] CAR_EASY_TAG = {"370","371"};
 	
 	public static final float FINE_AMT_RATIO_BIG = 0.3F;
 	public static final float FINE_AMT_RATIO_SMALL = 0.2F;
@@ -607,13 +607,13 @@ public class CommonUtils {
 	 * @param labelIds 车辆标签
 	 * @return Double
 	 */
-	public static Double getEasyCoefficient(List<Integer> labelIds) {
+	public static Double getEasyCoefficient(List<String> labelIds) {
 		Double easyCoefficient = EASYCOEFFICIENT_INIT;
 		if (labelIds == null || labelIds.isEmpty()) {
 			return EASYCOEFFICIENT_INIT;
 		}
-		List<Integer> carEasyTags = Arrays.asList(CAR_EASY_TAG);
-		for (Integer labelId:labelIds) {
+		List<String> carEasyTags = Arrays.asList(CAR_EASY_TAG);
+		for (String labelId:labelIds) {
 			if (labelId != null && carEasyTags.contains(labelId)) {
 				easyCoefficient = EASYCOEFFICIENT_NOVICE;
 				break;
