@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.atzuche.order.mapper.OwnerHandoverCarInfoMapper">
+<mapper namespace="com.atzuche.order.ownercost.mapper.OwnerHandoverCarInfoMapper">
 
-    <resultMap type="com.atzuche.order.entity.OwnerHandoverCarInfoEntity" id="BaseResultMap">
+    <resultMap type="com.atzuche.order.ownercost.entity.OwnerHandoverCarInfoEntity" id="BaseResultMap">
         <result property="id" column="id"/>
         <result property="orderNo" column="order_no"/>
         <result property="ownerOrderNo" column="owner_order_no"/>
@@ -65,7 +65,7 @@
 	</select>
 
 	 
-	<insert id="insert" parameterType="com.atzuche.order.entity.OwnerHandoverCarInfoEntity" useGeneratedKeys="true" keyProperty="id">
+	<insert id="insert" parameterType="com.atzuche.order.ownercost.entity.OwnerHandoverCarInfoEntity" useGeneratedKeys="true" keyProperty="id">
 		insert into owner_handover_car_info
 		(
 				`order_no`,		
@@ -116,7 +116,7 @@
 			)
 	</insert>
 	
-	<insert id="insertSelective" parameterType="com.atzuche.order.entity.OwnerHandoverCarInfoEntity" useGeneratedKeys="true" keyProperty="id">
+	<insert id="insertSelective" parameterType="com.atzuche.order.ownercost.entity.OwnerHandoverCarInfoEntity" useGeneratedKeys="true" keyProperty="id">
 		insert into owner_handover_car_info
 		(
 				<if test="orderNo != null">`order_no`, </if>
@@ -168,7 +168,7 @@
 	</insert>
 	
 	 
-	<update id="updateByPrimaryKeySelective" parameterType="com.atzuche.order.entity.OwnerHandoverCarInfoEntity">
+	<update id="updateByPrimaryKeySelective" parameterType="com.atzuche.order.ownercost.entity.OwnerHandoverCarInfoEntity">
 		update owner_handover_car_info 
 		<set>
 				<if test="orderNo != null">`order_no` = #{orderNo}, </if>
@@ -196,7 +196,7 @@
 		where id = #{id}
 	</update>
 	
-	<update id="updateByPrimaryKey" parameterType="com.atzuche.order.entity.OwnerHandoverCarInfoEntity">
+	<update id="updateByPrimaryKey" parameterType="com.atzuche.order.ownercost.entity.OwnerHandoverCarInfoEntity">
 		update owner_handover_car_info 
 		<set>
 				`order_no` = #{orderNo}, 		

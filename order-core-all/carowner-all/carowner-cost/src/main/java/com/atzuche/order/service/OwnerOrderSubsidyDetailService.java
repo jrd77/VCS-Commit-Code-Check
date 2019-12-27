@@ -5,8 +5,9 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.atzuche.order.owner.cost.entity.OwnerOrderSubsidyDetailEntity;
-import com.atzuche.order.owner.cost.mapper.OwnerOrderSubsidyDetailMapper;
+import com.atzuche.order.ownercost.entity.OwnerOrderSubsidyDetailEntity;
+import com.atzuche.order.ownercost.mapper.OwnerOrderSubsidyDetailMapper;
+
 
 @Service
 public class OwnerOrderSubsidyDetailService {
