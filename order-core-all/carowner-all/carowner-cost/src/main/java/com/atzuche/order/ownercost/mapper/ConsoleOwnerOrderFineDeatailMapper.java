@@ -1,8 +1,8 @@
-package com.atzuche.order.owner.cost.mapper;
+package com.atzuche.order.ownercost.mapper;
 
 import org.apache.ibatis.annotations.Mapper;
 
-import com.atzuche.order.owner.cost.entity.ConsoleOwnerOrderFineDeatailEntity;
+import com.atzuche.order.ownercost.entity.ConsoleOwnerOrderFineDeatailEntity;
 
 
 /**

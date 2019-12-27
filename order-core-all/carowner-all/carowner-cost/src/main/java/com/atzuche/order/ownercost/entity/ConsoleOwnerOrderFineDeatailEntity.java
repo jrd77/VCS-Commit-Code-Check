@@ -1,4 +1,4 @@
-package com.atzuche.order.owner.cost.entity;
+package com.atzuche.order.ownercost.entity;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
