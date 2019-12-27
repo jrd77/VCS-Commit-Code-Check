@@ -5,11 +5,9 @@ import org.springframework.stereotype.Service;
 
 import com.atzuche.order.commons.entity.dto.RenterMemberDTO;
 import com.atzuche.order.coreapi.entity.request.ModifyOrderReq;
-import com.atzuche.order.owner.mem.service.OwnerMemberService;
 import com.atzuche.order.rentermem.service.RenterMemberService;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.atzuche.order.renterorder.service.RenterOrderService;
-import com.atzuche.order.service.OwnerOrderService;
 import com.autoyol.commons.web.ResponseData;
 
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +15,8 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @Slf4j
 public class ModifyOrderService {
+	@Autowired
+	private UniqueOrderNoService uniqueOrderNoService;
 	@Autowired
 	private RenterOrderService renterOrderService;
 	@Autowired
@@ -29,14 +29,20 @@ public class ModifyOrderService {
 	 */
 	public ResponseData<?> modifyOrder(ModifyOrderReq modifyOrderReq) {
 		log.info("modifyOrder修改订单主逻辑入参modifyOrderReq=[{}]", modifyOrderReq);
+		// 主单号
+		String orderNo = modifyOrderReq.getOrderNo();
 		// 获取修改前有效租客子订单信息
-		RenterOrderEntity renterOrderEntity = renterOrderService.getRenterOrderByOrderNoAndIsEffective(modifyOrderReq.getOrderNo());
+		RenterOrderEntity renterOrderEntity = renterOrderService.getRenterOrderByOrderNoAndIsEffective(orderNo);
 		// 获取租客会员信息
 		RenterMemberDTO renterMemberDTO = renterMemberService.selectrenterMemberByMemNo(renterOrderEntity.getRenterOrderNo(), true);
+		// 获取租客商品信息
 		
 		// TODO DTO包装
 		
 		// TODO 前置校验
+		
+		// 获取租客订单号
+		String renterOrderNo = uniqueOrderNoService.getRenterOrderNo(orderNo);
 		
 		// TODO 风控校验
 		

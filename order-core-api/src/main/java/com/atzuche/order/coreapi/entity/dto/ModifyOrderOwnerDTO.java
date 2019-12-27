@@ -18,6 +18,14 @@ public class ModifyOrderOwnerDTO {
 	 */
 	private String ownerOrderNo;
 	/**
+	 * 取车标志
+	 */
+	private Integer srvGetFlag;
+	/**
+	 * 还车标志
+	 */
+	private Integer srvReturnFlag;
+	/**
 	 * 起租时间
 	 */
 	private LocalDateTime rentTime;
@@ -49,4 +57,9 @@ public class ModifyOrderOwnerDTO {
 	 * 还车地址经度
 	 */
     private String revertCarLon; 
+    /**
+     * 车主券抵扣金额
+     */
+    private Integer carOwnerCouponDeducAmt;
+    
 }

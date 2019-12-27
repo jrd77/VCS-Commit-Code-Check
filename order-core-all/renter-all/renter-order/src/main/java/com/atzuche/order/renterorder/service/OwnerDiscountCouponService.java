@@ -1,6 +1,6 @@
 package com.atzuche.order.renterorder.service;
 
-import com.atzuche.order.renterorder.dto.coupon.owner.OwnerCouponGetAndValidResultDTO;
+import com.atzuche.order.renterorder.vo.owner.OwnerCouponGetAndValidResultVO;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
 import com.google.gson.Gson;
@@ -42,9 +42,9 @@ public class OwnerDiscountCouponService {
      * @param mark     操作来源标示（不同地方校验规则有所不同）：1、下单 2、修改订单
      * @return BaseOutJB
      */
-    public OwnerCouponGetAndValidResultDTO getAndValidCoupon(String orderNo, Integer rentAmt, String couponNo,
-                                                             Integer carNo,
-                                                             Integer mark) {
+    public OwnerCouponGetAndValidResultVO getAndValidCoupon(String orderNo, Integer rentAmt, String couponNo,
+                                                            Integer carNo,
+                                                            Integer mark) {
         logger.info(
                 "Verify that the owner's coupon meet the usage rules,param is:orderNo:[{}], rentAmt:[{}],couponNo:[{}], carNo:[{}], mark:[{}]",
                 orderNo, rentAmt, couponNo, carNo, mark);
@@ -64,7 +64,7 @@ public class OwnerDiscountCouponService {
             String json = restTemplate.getForObject(urlStr, String.class);
             logger.info("Invoke ownerCouponService api to verify coupon information. result is:[{}]", json);
             if (StringUtils.isNotBlank(json)) {
-                return new Gson().fromJson(json, OwnerCouponGetAndValidResultDTO.class);
+                return new Gson().fromJson(json, OwnerCouponGetAndValidResultVO.class);
             }
         } catch (Exception e) {
             logger.info("OwnerDiscountCouponService.getAndValidCoupon error. url is:[{}]", urlStr, e);

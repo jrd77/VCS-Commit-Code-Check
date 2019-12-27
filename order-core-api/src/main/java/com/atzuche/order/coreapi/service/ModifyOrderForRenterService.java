@@ -47,7 +47,9 @@ public class ModifyOrderForRenterService {
 		renterOrderService.updateRenterOrderEffective(agreeRenterOrderEntity.getId(), EFFECTIVE_FLAG);
 		// 获取申请记录
 		RenterOrderChangeApplyEntity renterOrderChangeApplyEntity = renterOrderChangeApplyService.getRenterOrderChangeApplyByRenterOrderNo(renterOrderNo);
-		// 修改租客申请状态为已同意
-		renterOrderChangeApplyService.updateRenterOrderChangeApplyStatus(renterOrderChangeApplyEntity.getId(), AUDIT_STATUS_AGREE);
+		if (renterOrderChangeApplyEntity != null) {
+			// 修改租客申请状态为已同意
+			renterOrderChangeApplyService.updateRenterOrderChangeApplyStatus(renterOrderChangeApplyEntity.getId(), AUDIT_STATUS_AGREE);
+		}
 	}
 }
