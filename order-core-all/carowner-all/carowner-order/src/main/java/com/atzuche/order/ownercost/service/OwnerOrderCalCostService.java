@@ -39,6 +39,8 @@ public class OwnerOrderCalCostService {
         String memNo = ownerOrderCostReqDTO.getMemNo();
         List<RenterOrderCostDetailEntity> renterOrderCostDetailDTOList = ownerOrderCostReqDTO.getRenterOrderCostDetailDTOList();
         List<RenterOrderSubsidyDetailEntity> renterOrderSubsidyDetailEntityList = ownerOrderCostReqDTO.getRenterOrderSubsidyDetailEntityList();
+
+
         //过滤租金
         List<OwnerOrderPurchaseDetailEntity> ownerDetailList = renterOrderCostDetailDTOList
                 .stream()
