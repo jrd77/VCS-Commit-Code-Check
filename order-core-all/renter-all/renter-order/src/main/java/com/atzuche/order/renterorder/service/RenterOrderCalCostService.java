@@ -3,23 +3,24 @@ package com.atzuche.order.renterorder.service;
 import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.constant.OrderConstant;
 import com.atzuche.order.commons.entity.dto.CostBaseDTO;
-import com.atzuche.order.commons.enums.CouponTypeEnum;
 import com.atzuche.order.commons.entity.dto.GetReturnCarCostReqDto;
+import com.atzuche.order.commons.enums.CouponTypeEnum;
 import com.atzuche.order.commons.enums.RenterCashCodeEnum;
 import com.atzuche.order.rentercost.entity.RenterOrderCostDetailEntity;
 import com.atzuche.order.rentercost.entity.RenterOrderCostEntity;
 import com.atzuche.order.rentercost.entity.RenterOrderSubsidyDetailEntity;
 import com.atzuche.order.rentercost.entity.dto.GetReturnCostDTO;
 import com.atzuche.order.rentercost.entity.dto.GetReturnOverCostDTO;
+import com.atzuche.order.rentercost.entity.dto.OrderCouponDTO;
 import com.atzuche.order.rentercost.entity.dto.RenterOrderSubsidyDetailDTO;
 import com.atzuche.order.rentercost.entity.vo.GetReturnResponseVO;
 import com.atzuche.order.rentercost.service.RenterOrderCostCombineService;
 import com.atzuche.order.rentercost.service.RenterOrderCostDetailService;
 import com.atzuche.order.rentercost.service.RenterOrderCostService;
 import com.atzuche.order.rentercost.service.RenterOrderSubsidyDetailService;
-import com.atzuche.order.renterorder.dto.coupon.OrderCouponDTO;
 import com.atzuche.order.renterorder.entity.dto.RenterOrderCostReqDTO;
 import com.atzuche.order.renterorder.entity.dto.RenterOrderCostRespDTO;
+import com.atzuche.order.renterorder.mapper.RenterOrderMapper;
 import com.atzuche.order.renterorder.vo.owner.OwnerCouponGetAndValidReqVO;
 import com.atzuche.order.renterorder.vo.owner.OwnerCouponGetAndValidResultVO;
 import com.atzuche.order.renterorder.vo.owner.OwnerDiscountCouponVO;
@@ -32,9 +33,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cglib.beans.BeanCopier;
-import com.atzuche.order.renterorder.mapper.RenterOrderMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -67,14 +66,15 @@ public class RenterOrderCalCostService {
     @Resource
     private PlatformCouponService platformCouponService;
 
-    @Autowired
+    @Resource
     private RenterOrderCostDetailService renterOrderCostDetailService;
 
-    @Autowired
+    @Resource
     private RenterOrderSubsidyDetailService renterOrderSubsidyDetailService;
 
-    @Autowired
+    @Resource
     private RenterOrderCostService renterOrderCostService;
+
 
 
     /**

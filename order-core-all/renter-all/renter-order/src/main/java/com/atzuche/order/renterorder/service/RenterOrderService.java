@@ -1,7 +1,10 @@
 package com.atzuche.order.renterorder.service;
 
+import com.atzuche.order.commons.entity.dto.*;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
+import com.atzuche.order.renterorder.entity.dto.RenterOrderCostReqDTO;
 import com.atzuche.order.renterorder.mapper.RenterOrderMapper;
+import com.atzuche.order.renterorder.vo.RenterOrderReqVO;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -19,6 +22,9 @@ public class RenterOrderService {
 
     @Resource
     private RenterOrderMapper renterOrderMapper;
+
+    @Resource
+    private RenterOrderCalCostService renterOrderCalCostService;
 
 
     public List<RenterOrderEntity> listAgreeRenterOrderByOrderNo(String orderNo) {
@@ -73,12 +79,75 @@ public class RenterOrderService {
     }
 
 
-
-    public void saveRenterOrderInfo() {
+    /**
+     * 生成租客订单
+     *
+     * @param renterOrderReqVO 请求参数
+     */
+    public void generateRenterOrderInfo(RenterOrderReqVO renterOrderReqVO) {
         //1.租客订单处理
+        //1.1租车费用计算
+        RenterOrderCostReqDTO renterOrderCostReqDTO = new RenterOrderCostReqDTO();
+
+        //1.2车主券抵扣
+
+        //1.3限时红包抵扣
+
+        //1.4
+
+
+    }
+
+
+    /**
+     * 租车费用计算相关参数封装
+     *
+     * @param renterOrderReqVO 生成租客订单请求参数
+     * @return RenterOrderCostReqDTO
+     */
+    private RenterOrderCostReqDTO buildRenterOrderCostReqDTO(RenterOrderReqVO renterOrderReqVO) {
+        RenterOrderCostReqDTO renterOrderCostReqDTO = new RenterOrderCostReqDTO();
+
+        CostBaseDTO costBaseDTO = new CostBaseDTO();
+        costBaseDTO.setStartTime(renterOrderReqVO.getRentTime());
+        costBaseDTO.setStartTime(renterOrderReqVO.getRevertTime());
+        costBaseDTO.setOrderNo(renterOrderReqVO.getOrderNo());
+        costBaseDTO.setRenterOrderNo(renterOrderReqVO.getRenterOrderNo());
+        costBaseDTO.setMemNo(renterOrderReqVO.getMemNo());
+
+
+        RentAmtDTO rentAmtDTO = new RentAmtDTO();
+        rentAmtDTO.setCostBaseDTO(costBaseDTO);
+        rentAmtDTO.setRenterGoodsPriceDetailDTOList(renterOrderReqVO.getRenterGoodsPriceDetailDTOList());
+
+
+        InsurAmtDTO insurAmtDTO = new InsurAmtDTO();
+        insurAmtDTO.setCostBaseDTO(costBaseDTO);
+        insurAmtDTO.setCarLabelIds(null);
+        insurAmtDTO.setCertificationTime(null);
+        insurAmtDTO.setGetCarBeforeTime(null);
+        insurAmtDTO.setInmsrp(null);
 
 
 
+        AbatementAmtDTO abatementAmtDTO = new AbatementAmtDTO();
+        abatementAmtDTO.setCostBaseDTO(costBaseDTO);
 
+
+        ExtraDriverDTO extraDriverDTO = new ExtraDriverDTO();
+        extraDriverDTO.setCostBaseDTO(costBaseDTO);
+
+
+
+        GetReturnCarCostReqDto getReturnCarCostReqDto = new GetReturnCarCostReqDto();
+        getReturnCarCostReqDto.setCostBaseDTO(costBaseDTO);
+
+
+        GetReturnCarOverCostReqDto getReturnCarOverCostReqDto = new GetReturnCarOverCostReqDto();
+        getReturnCarOverCostReqDto.setCostBaseDTO(costBaseDTO);
+
+
+
+        return null;
     }
 }
