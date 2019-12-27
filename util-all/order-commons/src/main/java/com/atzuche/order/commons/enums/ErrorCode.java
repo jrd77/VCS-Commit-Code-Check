@@ -41,8 +41,9 @@ public enum ErrorCode {
 
 
     COST_GET_RETUIRN_ERROR("700001","获取取还车费用系统异常"),
-    COST_GET_RETUIRN_FAIL("700002","获取取还车费用失败")
-
+    COST_GET_RETUIRN_FAIL("700002","获取取还车费用失败"),
+    COST_GET_RETUIRN_OVER_ERROR("700003","获取取还车费用异常"),
+    COST_GET_RETUIRN_OVER_FAIL("700004","获取取还车费用失败"),
     ;
 
     private String code;
