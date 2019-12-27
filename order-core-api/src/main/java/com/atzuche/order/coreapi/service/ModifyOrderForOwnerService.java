@@ -6,6 +6,8 @@ import java.util.List;
 
 import com.atzuche.order.ownercost.entity.OwnerOrderCostEntity;
 import com.atzuche.order.ownercost.entity.OwnerOrderEntity;
+import com.atzuche.order.ownercost.entity.OwnerOrderIncrementDetailEntity;
+
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,18 +23,17 @@ import com.atzuche.order.coreapi.entity.dto.ModifyOrderOwnerDTO;
 import com.atzuche.order.coreapi.modifyorder.exception.ModifyOrderParameterException;
 import com.atzuche.order.coreapi.service.CarService.CarDetailReqVO;
 import com.atzuche.order.owner.commodity.service.CommodityService;
-import com.atzuche.order.owner.cost.entity.OwnerOrderIncrementDetailEntity;
 import com.atzuche.order.ownercost.entity.OwnerOrderPurchaseDetailEntity;
 import com.atzuche.order.ownercost.entity.OwnerOrderSubsidyDetailEntity;
 import com.atzuche.order.owner.mem.service.OwnerMemberService;
 import com.atzuche.order.rentercost.entity.RenterOrderSubsidyDetailEntity;
 import com.atzuche.order.rentercost.service.RenterOrderSubsidyDetailService;
-import com.atzuche.order.service.OwnerOrderCostCombineService;
-import com.atzuche.order.service.OwnerOrderIncrementDetailService;
-import com.atzuche.order.service.OwnerOrderPurchaseDetailService;
-import com.atzuche.order.service.OwnerOrderSubsidyDetailService;
+import com.atzuche.order.ownercost.service.OwnerOrderCostCombineService;
 import com.atzuche.order.ownercost.service.OwnerOrderCostService;
+import com.atzuche.order.ownercost.service.OwnerOrderIncrementDetailService;
+import com.atzuche.order.ownercost.service.OwnerOrderPurchaseDetailService;
 import com.atzuche.order.ownercost.service.OwnerOrderService;
+import com.atzuche.order.ownercost.service.OwnerOrderSubsidyDetailService;
 import com.autoyol.commons.web.ResponseData;
 import com.dianping.cat.Cat;
 import com.dianping.cat.message.Transaction;
@@ -172,6 +173,8 @@ public class ModifyOrderForOwnerService {
 		subsidyEntity.setSubsidyTypeCode(renterSubsidy.getSubsidyTypeCode());
 		subsidyEntity.setSubsidyVoucher(renterSubsidy.getSubsidyVoucher());
 		subsidyEntity.setSubsidyDesc(renterSubsidy.getSubsidyDesc());
+		subsidyEntity.setSubsidyCostCode(renterSubsidy.getSubsidyCostCode());
+		subsidyEntity.setSubsidyCostName(renterSubsidy.getSubsidyCostName());
 		return subsidyEntity;
 	}
 	
