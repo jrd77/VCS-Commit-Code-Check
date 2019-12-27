@@ -60,11 +60,11 @@ public class CarService {
         ResponseObject<CarDetailVO> responseObject = null;
         Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "租客商品信息");
         try{
-
             Cat.logEvent(CatConstants.FEIGN_METHOD,"CarDetailQueryFeignApi.getCarDetailOfTransByCarNo");
             log.info("Feign 开始获取车辆信息,orderCarInfoParamDTO={}", JSON.toJSONString(orderCarInfoParamDTO));
             Cat.logEvent(CatConstants.FEIGN_PARAM,JSON.toJSONString(orderCarInfoParamDTO));
             responseObject = carDetailQueryFeignApi.getCarDetailOfTransByCarNo(orderCarInfoParamDTO);
+            Cat.logEvent(CatConstants.FEIGN_RESULT,JSON.toJSONString(responseObject));
             if(responseObject == null || !ErrorCode.SUCCESS.getCode().equals(responseObject.getResCode())){
                 log.error("Feign 获取车辆信息失败,responseObject={},orderCarInfoParamDTO={}",JSON.toJSONString(responseObject),JSON.toJSONString(orderCarInfoParamDTO));
                 RenterMemberByFeignException renterMemberByFeignException = new RenterMemberByFeignException(SubmitOrderErrorEnum.FEIGN_GET_CAR_DETAIL_FAIL.getCode(), SubmitOrderErrorEnum.FEIGN_GET_CAR_DETAIL_FAIL.getText());
