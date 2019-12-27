@@ -1,4 +1,4 @@
-package com.atzuche.order.renterorder.dto.coupon.owner;
+package com.atzuche.order.renterorder.vo.owner;
 
 import lombok.Data;
 
@@ -12,7 +12,7 @@ import java.util.List;
  * @date 2019/12/25 14:20
  */
 @Data
-public class OwnerDiscountCouponDTO implements Serializable {
+public class OwnerDiscountCouponVO implements Serializable {
 
     private static final long serialVersionUID = 2201136204690443787L;
 
@@ -51,7 +51,7 @@ public class OwnerDiscountCouponDTO implements Serializable {
     /**
      * 适用车辆
      */
-    private List<OwnerCouponSuitCarDTO> carDTOList;
+    private List<OwnerCouponSuitCarVO> carDTOList;
     /**
      * 优惠券类型 例如:车主优惠券
      */
