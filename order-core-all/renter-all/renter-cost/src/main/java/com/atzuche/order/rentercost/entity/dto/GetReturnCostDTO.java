@@ -23,7 +23,7 @@ public class GetReturnCostDTO {
     /**
      * 租客补贴明细列表
      */
-    private List<RenterOrderSubsidyDetailEntity> renterOrderSubsidyDetailEntityList;
+    private List<RenterOrderSubsidyDetailDTO> renterOrderSubsidyDetailDTOList;
     /**
      * 取还车费用原始值
      */

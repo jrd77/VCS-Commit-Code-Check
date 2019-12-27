@@ -78,15 +78,16 @@ public class MemberService {
             t.complete();
         }
 
-
         MemberTotalInfo memberTotalInfo = responseData.getData();
         MemberCoreInfo memberCoreInfo = memberTotalInfo.getMemberCoreInfo();
+        MemberStatisticsInfo memberStatisticsInfo = memberTotalInfo.getMemberStatisticsInfo();
         OwnerMemberDTO ownerMemberDto = new OwnerMemberDTO();
         ownerMemberDto.setMemNo(memNo);
         ownerMemberDto.setPhone(memberCoreInfo.getPhone());
         ownerMemberDto.setHeaderUrl(memberCoreInfo.getPortraitPath());
         ownerMemberDto.setRealName(memberCoreInfo.getRealName());
         ownerMemberDto.setNickName(memberCoreInfo.getNickName());
+        ownerMemberDto.setOrderSuccessCount(memberStatisticsInfo.getSuccessOrderNum());
         List<OwnerMemberRightDTO> rights = new ArrayList<>();
         MemberRoleInfo memberRoleInfo = memberTotalInfo.getMemberRoleInfo();
 

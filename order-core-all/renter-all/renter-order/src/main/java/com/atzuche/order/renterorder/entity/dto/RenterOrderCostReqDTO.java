@@ -25,7 +25,7 @@ public class RenterOrderCostReqDTO {
     private AbatementAmtDTO abatementAmtDTO;
 
     /**
-     * 全面保障费参数
+     * 附加驾驶人险
      */
     private ExtraDriverDTO extraDriverDTO;
 

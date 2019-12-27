@@ -11,6 +11,10 @@ import lombok.Getter;
 @Getter
 public enum SubsidyTypeCodeEnum {
     /**
+     * 补贴类型,取还车费用(用于像送取服务券抵扣等)
+     */
+    GET_RETURN_CAR("0","取还车费用"),
+    /**
      * 补贴类型,取车费用
      */
     GET_CAR("1","取车费用"),
