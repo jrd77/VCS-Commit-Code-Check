@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-
 <mapper namespace="com.atzuche.order.rentercost.mapper.RenterOrderSubsidyDetailMapper">
 
     <resultMap type="com.atzuche.order.rentercost.entity.RenterOrderSubsidyDetailEntity" id="BaseResultMap">
@@ -8,12 +7,14 @@
         <result property="orderNo" column="order_no"/>
         <result property="renterOrderNo" column="renter_order_no"/>
         <result property="memNo" column="mem_no"/>
-        <result property="subsidTypeName" column="subsid_type_name"/>
+        <result property="subsidyTypeName" column="subsidy_type_name"/>
         <result property="subsidyTypeCode" column="subsidy_type_code"/>
-        <result property="subsidySourceCode" column="subsidy_source_code"/>
         <result property="subsidySourceName" column="subsidy_source_name"/>
-        <result property="subsidyTargetCode" column="subsidy_target_code"/>
+        <result property="subsidySourceCode" column="subsidy_source_code"/>
         <result property="subsidyTargetName" column="subsidy_target_name"/>
+        <result property="subsidyTargetCode" column="subsidy_target_code"/>
+        <result property="subsidyCostName" column="subsidy_cost_name"/>
+        <result property="subsidyCostCode" column="subsidy_cost_code"/>
         <result property="subsidyDesc" column="subsidy_desc"/>
         <result property="subsidyAmount" column="subsidy_amount"/>
         <result property="subsidyVoucher" column="subsidy_voucher"/>
@@ -35,12 +36,14 @@
 	`order_no`,
 	`renter_order_no`,
 	`mem_no`,
-	`subsid_type_name`,
+	`subsidy_type_name`,
 	`subsidy_type_code`,
-	`subsidy_source_code`,
 	`subsidy_source_name`,
-	`subsidy_target_code`,
+	`subsidy_source_code`,
 	`subsidy_target_name`,
+	`subsidy_target_code`,
+	`subsidy_cost_name`,
+	`subsidy_cost_code`,
 	`subsidy_desc`,
 	`subsidy_amount`,
 	`subsidy_voucher`,
@@ -68,12 +71,14 @@
         `order_no`,
         `renter_order_no`,
         `mem_no`,
-        `subsid_type_name`,
+        `subsidy_type_name`,
         `subsidy_type_code`,
-        `subsidy_source_code`,
         `subsidy_source_name`,
-        `subsidy_target_code`,
+        `subsidy_source_code`,
         `subsidy_target_name`,
+        `subsidy_target_code`,
+        `subsidy_cost_name`,
+        `subsidy_cost_code`,
         `subsidy_desc`,
         `subsidy_amount`,
         `subsidy_voucher`,
@@ -93,12 +98,14 @@
         #{orderNo},
         #{renterOrderNo},
         #{memNo},
-        #{subsidTypeName},
+        #{subsidyTypeName},
         #{subsidyTypeCode},
-        #{subsidySourceCode},
         #{subsidySourceName},
-        #{subsidyTargetCode},
+        #{subsidySourceCode},
         #{subsidyTargetName},
+        #{subsidyTargetCode},
+        #{subsidyCostName},
+        #{subsidyCostCode},
         #{subsidyDesc},
         #{subsidyAmount},
         #{subsidyVoucher},
@@ -115,19 +122,20 @@
         )
     </insert>
 
-
     <insert id="saveRenterOrderSubsidyDetail" parameterType="com.atzuche.order.rentercost.entity.RenterOrderSubsidyDetailEntity" useGeneratedKeys="true" keyProperty="id">
         insert into renter_order_subsidy_detail
         (
         <if test="orderNo != null">`order_no`, </if>
         <if test="renterOrderNo != null">`renter_order_no`, </if>
         <if test="memNo != null">`mem_no`, </if>
-        <if test="subsidTypeName != null">`subsid_type_name`, </if>
+        <if test="subsidyTypeName != null">`subsidy_type_name`, </if>
         <if test="subsidyTypeCode != null">`subsidy_type_code`, </if>
-        <if test="subsidySourceCode != null">`subsidy_source_code`, </if>
         <if test="subsidySourceName != null">`subsidy_source_name`, </if>
-        <if test="subsidyTargetCode != null">`subsidy_target_code`, </if>
+        <if test="subsidySourceCode != null">`subsidy_source_code`, </if>
         <if test="subsidyTargetName != null">`subsidy_target_name`, </if>
+        <if test="subsidyTargetCode != null">`subsidy_target_code`, </if>
+        <if test="subsidyCostName != null">`subsidy_cost_name`, </if>
+        <if test="subsidyCostCode != null">`subsidy_cost_code`, </if>
         <if test="subsidyDesc != null">`subsidy_desc`, </if>
         <if test="subsidyAmount != null">`subsidy_amount`, </if>
         <if test="subsidyVoucher != null">`subsidy_voucher`, </if>
@@ -147,12 +155,14 @@
         <if test="orderNo != null">#{orderNo},  </if>
         <if test="renterOrderNo != null">#{renterOrderNo},  </if>
         <if test="memNo != null">#{memNo},  </if>
-        <if test="subsidTypeName != null">#{subsidTypeName},  </if>
+        <if test="subsidyTypeName != null">#{subsidyTypeName},  </if>
         <if test="subsidyTypeCode != null">#{subsidyTypeCode},  </if>
-        <if test="subsidySourceCode != null">#{subsidySourceCode},  </if>
         <if test="subsidySourceName != null">#{subsidySourceName},  </if>
-        <if test="subsidyTargetCode != null">#{subsidyTargetCode},  </if>
+        <if test="subsidySourceCode != null">#{subsidySourceCode},  </if>
         <if test="subsidyTargetName != null">#{subsidyTargetName},  </if>
+        <if test="subsidyTargetCode != null">#{subsidyTargetCode},  </if>
+        <if test="subsidyCostName != null">#{subsidyCostName},  </if>
+        <if test="subsidyCostCode != null">#{subsidyCostCode},  </if>
         <if test="subsidyDesc != null">#{subsidyDesc},  </if>
         <if test="subsidyAmount != null">#{subsidyAmount},  </if>
         <if test="subsidyVoucher != null">#{subsidyVoucher},  </if>
@@ -176,12 +186,14 @@
             <if test="orderNo != null">`order_no` = #{orderNo}, </if>
             <if test="renterOrderNo != null">`renter_order_no` = #{renterOrderNo}, </if>
             <if test="memNo != null">`mem_no` = #{memNo}, </if>
-            <if test="subsidTypeName != null">`subsid_type_name` = #{subsidTypeName}, </if>
+            <if test="subsidyTypeName != null">`subsidy_type_name` = #{subsidyTypeName}, </if>
             <if test="subsidyTypeCode != null">`subsidy_type_code` = #{subsidyTypeCode}, </if>
-            <if test="subsidySourceCode != null">`subsidy_source_code` = #{subsidySourceCode}, </if>
             <if test="subsidySourceName != null">`subsidy_source_name` = #{subsidySourceName}, </if>
-            <if test="subsidyTargetCode != null">`subsidy_target_code` = #{subsidyTargetCode}, </if>
+            <if test="subsidySourceCode != null">`subsidy_source_code` = #{subsidySourceCode}, </if>
             <if test="subsidyTargetName != null">`subsidy_target_name` = #{subsidyTargetName}, </if>
+            <if test="subsidyTargetCode != null">`subsidy_target_code` = #{subsidyTargetCode}, </if>
+            <if test="subsidyCostName != null">`subsidy_cost_name` = #{subsidyCostName}, </if>
+            <if test="subsidyCostCode != null">`subsidy_cost_code` = #{subsidyCostCode}, </if>
             <if test="subsidyDesc != null">`subsidy_desc` = #{subsidyDesc}, </if>
             <if test="subsidyAmount != null">`subsidy_amount` = #{subsidyAmount}, </if>
             <if test="subsidyVoucher != null">`subsidy_voucher` = #{subsidyVoucher}, </if>
@@ -205,12 +217,14 @@
             `order_no` = #{orderNo},
             `renter_order_no` = #{renterOrderNo},
             `mem_no` = #{memNo},
-            `subsid_type_name` = #{subsidTypeName},
+            `subsidy_type_name` = #{subsidyTypeName},
             `subsidy_type_code` = #{subsidyTypeCode},
-            `subsidy_source_code` = #{subsidySourceCode},
             `subsidy_source_name` = #{subsidySourceName},
-            `subsidy_target_code` = #{subsidyTargetCode},
+            `subsidy_source_code` = #{subsidySourceCode},
             `subsidy_target_name` = #{subsidyTargetName},
+            `subsidy_target_code` = #{subsidyTargetCode},
+            `subsidy_cost_name` = #{subsidyCostName},
+            `subsidy_cost_code` = #{subsidyCostCode},
             `subsidy_desc` = #{subsidyDesc},
             `subsidy_amount` = #{subsidyAmount},
             `subsidy_voucher` = #{subsidyVoucher},
@@ -232,7 +246,7 @@
 
 
     <select id="listRenterOrderSubsidyDetail" resultMap="BaseResultMap">
-		select <include refid="Base_Column_List" /> from renter_order_subsidy_detail where order_no = #{orderNo} 
+		select <include refid="Base_Column_List" /> from renter_order_subsidy_detail where order_no = #{orderNo}
 		and renter_order_no = #{renterOrderNo} and is_delete = 0
 	</select>
   	
@@ -243,12 +257,14 @@
         `order_no`,
         `renter_order_no`,
         `mem_no`,
-        `subsid_type_name`,
+        `subsidy_type_name`,
         `subsidy_type_code`,
-        `subsidy_source_code`,
         `subsidy_source_name`,
-        `subsidy_target_code`,
+        `subsidy_source_code`,
         `subsidy_target_name`,
+        `subsidy_target_code`,
+        `subsidy_cost_name`,
+        `subsidy_cost_code`,
         `subsidy_desc`,
         `subsidy_amount`,
         `subsidy_voucher`,
@@ -257,15 +273,17 @@
 			)
       VALUES
       <foreach collection="costList" item="cost" separator=",">
-      (#{cost.orderNo},
+      ( #{cost.orderNo},
           #{cost.renterOrderNo},
           #{cost.memNo},
-          #{cost.subsidTypeName},
+          #{cost.subsidyTypeName},
           #{cost.subsidyTypeCode},
-          #{cost.subsidySourceCode},
           #{cost.subsidySourceName},
-          #{cost.subsidyTargetCode},
+          #{cost.subsidySourceCode},
           #{cost.subsidyTargetName},
+          #{cost.subsidyTargetCode},
+          #{cost.subsidyCostName},
+          #{cost.subsidyCostCode},
           #{cost.subsidyDesc},
           #{cost.subsidyAmount},
           #{cost.subsidyVoucher},
