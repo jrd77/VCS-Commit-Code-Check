@@ -1,4 +1,4 @@
-package com.atzuche.order.renterorder.dto.coupon.platform;
+package com.atzuche.order.renterorder.vo.platform;
 
 import lombok.Data;
 
@@ -12,7 +12,7 @@ import java.util.List;
  * @date 2019/12/26 14:41
  */
 @Data
-public class MemAvailCouponRequestDTO implements Serializable {
+public class MemAvailCouponRequestVO implements Serializable {
 
     private static final long serialVersionUID = -5149532041298618909L;
     /**

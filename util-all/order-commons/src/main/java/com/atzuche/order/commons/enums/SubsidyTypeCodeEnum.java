@@ -10,10 +10,20 @@ import lombok.Getter;
  **/
 @Getter
 public enum SubsidyTypeCodeEnum {
-    GET_CAR("1","取车"),
-    RETURN_CAR("2","还车")
+    /**
+     * 补贴类型,取车费用
+     */
+    GET_CAR("1","取车费用"),
+    /**
+     * 补贴类型,还车费用
+     */
+    RETURN_CAR("2","还车费用"),
+    /**
+     * 补贴类型,租金
+     */
+    RENT_AMT("3","租金")
 
-            ;
+    ;
 
     private String code;
     private String desc;
