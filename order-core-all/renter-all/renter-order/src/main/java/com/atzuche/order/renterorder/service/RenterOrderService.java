@@ -1,6 +1,8 @@
 package com.atzuche.order.renterorder.service;
 
+import com.atzuche.order.commons.entity.dto.*;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
+import com.atzuche.order.renterorder.entity.dto.RenterOrderCostReqDTO;
 import com.atzuche.order.renterorder.mapper.RenterOrderMapper;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +21,9 @@ public class RenterOrderService {
 
     @Resource
     private RenterOrderMapper renterOrderMapper;
+
+    @Resource
+    private RenterOrderCalCostService renterOrderCalCostService;
 
 
     public List<RenterOrderEntity> listAgreeRenterOrderByOrderNo(String orderNo) {
@@ -74,11 +79,42 @@ public class RenterOrderService {
 
 
 
-    public void saveRenterOrderInfo() {
+
+
+
+    public void generateRenterOrderInfo(String orderNo,String renterOrderNo) {
         //1.租客订单处理
+        //1.1租车费用计算
+        RenterOrderCostReqDTO renterOrderCostReqDTO = new RenterOrderCostReqDTO();
+
+        //1.2车主券抵扣
+
+        //1.3限时红包抵扣
+
+        //1.4
+
+
+    }
 
 
 
+    private RenterOrderCostReqDTO buildRenterOrderCostReqDTO() {
+        RenterOrderCostReqDTO renterOrderCostReqDTO = new RenterOrderCostReqDTO();
 
+        CostBaseDTO costBaseDTO = new CostBaseDTO();
+
+
+        RentAmtDTO rentAmtDTO = new RentAmtDTO();
+
+
+        InsurAmtDTO insurAmtDTO = new InsurAmtDTO();
+
+
+        AbatementAmtDTO abatementAmtDTO = new AbatementAmtDTO();
+
+        ExtraDriverDTO extraDriverDTO = new ExtraDriverDTO();
+
+
+        return null;
     }
 }

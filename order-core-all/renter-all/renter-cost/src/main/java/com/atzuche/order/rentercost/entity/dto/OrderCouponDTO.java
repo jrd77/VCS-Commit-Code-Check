@@ -18,6 +18,11 @@ public class OrderCouponDTO {
      */
     private String orderNo;
     /**
+     * 子订单号
+     */
+    private String renterOrderNo;
+
+    /**
      * 优惠券id
      */
     private String couponId;

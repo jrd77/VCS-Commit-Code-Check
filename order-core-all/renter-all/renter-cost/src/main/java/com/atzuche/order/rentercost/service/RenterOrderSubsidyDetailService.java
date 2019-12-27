@@ -62,14 +62,16 @@ public class RenterOrderSubsidyDetailService {
 
 
     /**
-     * 计算限时红包补贴信息
+     * 限时红包补贴信息
      *
      * @param memNo          租客会员注册号
      * @param surplusRentAmt 抵扣后剩余租金
      * @param reductiAmt     限时红包面额
-     * @return RenterOrderSubsidyDetailDTO 抵扣限时红包信息
+     * @return RenterOrderSubsidyDetailDTO 限时红包补贴信息
      */
-    public RenterOrderSubsidyDetailDTO calLimitRedSubsidyInfo(int memNo, int surplusRentAmt, Integer reductiAmt) {
+    public RenterOrderSubsidyDetailDTO calLimitRedSubsidyInfo(Integer memNo,
+                                                              int surplusRentAmt,
+                                                              Integer reductiAmt) {
 
         if (null == reductiAmt || reductiAmt == 0) {
             return null;
@@ -94,13 +96,13 @@ public class RenterOrderSubsidyDetailService {
 
 
     /**
-     * 计算会员凹凸币抵扣信息
+     * 凹凸币补贴信息
      *
      * @param crmCustPoint    租客凹凸信息
      * @param originalRentAmt 原始租金
      * @param surplusRentAmt  抵扣后剩余租金
      * @param useAutoCoin     使用凹凸币标识
-     * @return RenterOrderSubsidyDetailDTO 抵扣凹凸币信息
+     * @return RenterOrderSubsidyDetailDTO 补贴凹凸币信息
      */
     public RenterOrderSubsidyDetailDTO calAutoCoinSubsidyInfo(CrmCustPointDTO crmCustPoint,
                                                               int originalRentAmt,
@@ -113,27 +115,86 @@ public class RenterOrderSubsidyDetailService {
     }
 
 
-    public RenterOrderSubsidyDetailDTO calOwnerCouponSubsidyInfo(OrderCouponDTO ownerCoupon) {
+    /**
+     * 租客端车主券补贴明细
+     *
+     * @param memNo       租客会员注册号
+     * @param ownerCoupon 车主券抵扣信息
+     * @return RenterOrderSubsidyDetailDTO 补贴明细
+     */
+    public RenterOrderSubsidyDetailDTO calOwnerCouponSubsidyInfo(Integer memNo, OrderCouponDTO ownerCoupon) {
+        if (null == ownerCoupon) {
+            return null;
+        }
+        RenterOrderSubsidyDetailDTO renterOrderSubsidyDetailDTO = new RenterOrderSubsidyDetailDTO();
+        renterOrderSubsidyDetailDTO.setMemNo(String.valueOf(memNo));
+        renterOrderSubsidyDetailDTO.setSubsidyAmount(ownerCoupon.getAmount());
+        renterOrderSubsidyDetailDTO.setSubsidyTypeCode(SubsidyTypeCodeEnum.RENT_AMT.getCode());
+        renterOrderSubsidyDetailDTO.setSubsidTypeName(SubsidyTypeCodeEnum.RENT_AMT.getDesc());
+        renterOrderSubsidyDetailDTO.setSubsidySourceCode(SubsidySourceCodeEnum.OWNER.getCode());
+        renterOrderSubsidyDetailDTO.setSubsidySourceName(SubsidySourceCodeEnum.OWNER.getDesc());
 
-
-
-        return null;
+        renterOrderSubsidyDetailDTO.setSubsidyTargetCode(SubsidySourceCodeEnum.RENTER.getCode());
+        renterOrderSubsidyDetailDTO.setSubsidTypeName(SubsidySourceCodeEnum.RENTER.getDesc());
+        renterOrderSubsidyDetailDTO.setSubsidyCostCode(RenterCashCodeEnum.OWNER_COUPON_OFFSET_COST.getCashNo());
+        renterOrderSubsidyDetailDTO.setSubsidyCostName(RenterCashCodeEnum.OWNER_COUPON_OFFSET_COST.getTxt());
+        renterOrderSubsidyDetailDTO.setSubsidyDesc("使用车主券抵扣租金");
+        return renterOrderSubsidyDetailDTO;
     }
 
 
-    public RenterOrderSubsidyDetailDTO calGetCarFeeCouponSubsidyInfo(OrderCouponDTO getCarFeeCoupon) {
+    /**
+     * 租客端送取服务券补贴明细
+     *
+     * @param memNo           租客会员注册号
+     * @param getCarFeeCoupon 送取服务券抵扣信息
+     * @return RenterOrderSubsidyDetailDTO 补贴明细
+     */
+    public RenterOrderSubsidyDetailDTO calGetCarFeeCouponSubsidyInfo(Integer memNo, OrderCouponDTO getCarFeeCoupon) {
+        if (null == getCarFeeCoupon) {
+            return null;
+        }
+        RenterOrderSubsidyDetailDTO renterOrderSubsidyDetailDTO = new RenterOrderSubsidyDetailDTO();
+        renterOrderSubsidyDetailDTO.setMemNo(String.valueOf(memNo));
+        renterOrderSubsidyDetailDTO.setSubsidyAmount(getCarFeeCoupon.getAmount());
+        renterOrderSubsidyDetailDTO.setSubsidyTypeCode(SubsidyTypeCodeEnum.GET_RETURN_CAR.getCode());
+        renterOrderSubsidyDetailDTO.setSubsidTypeName(SubsidyTypeCodeEnum.GET_RETURN_CAR.getDesc());
+        renterOrderSubsidyDetailDTO.setSubsidySourceCode(SubsidySourceCodeEnum.PLATFORM.getCode());
+        renterOrderSubsidyDetailDTO.setSubsidySourceName(SubsidySourceCodeEnum.PLATFORM.getDesc());
 
-
-
-        return null;
+        renterOrderSubsidyDetailDTO.setSubsidyTargetCode(SubsidySourceCodeEnum.RENTER.getCode());
+        renterOrderSubsidyDetailDTO.setSubsidTypeName(SubsidySourceCodeEnum.RENTER.getDesc());
+        renterOrderSubsidyDetailDTO.setSubsidyCostCode(RenterCashCodeEnum.GETCARFEE_COUPON_OFFSET.getCashNo());
+        renterOrderSubsidyDetailDTO.setSubsidyCostName(RenterCashCodeEnum.GETCARFEE_COUPON_OFFSET.getTxt());
+        renterOrderSubsidyDetailDTO.setSubsidyDesc("使用送取服务券抵扣取还车费用(包含对应的运能溢价金额)");
+        return renterOrderSubsidyDetailDTO;
     }
 
+    /**
+     * 租客端平台优惠券补贴明细
+     *
+     * @param memNo          租客会员注册号
+     * @param platformCoupon 平台优惠券抵扣信息
+     * @return RenterOrderSubsidyDetailDTO 补贴明细
+     */
+    public RenterOrderSubsidyDetailDTO calPlatformCouponSubsidyInfo(Integer memNo, OrderCouponDTO platformCoupon) {
+        if (null == platformCoupon) {
+            return null;
+        }
+        RenterOrderSubsidyDetailDTO renterOrderSubsidyDetailDTO = new RenterOrderSubsidyDetailDTO();
+        renterOrderSubsidyDetailDTO.setMemNo(String.valueOf(memNo));
+        renterOrderSubsidyDetailDTO.setSubsidyAmount(platformCoupon.getAmount());
+        renterOrderSubsidyDetailDTO.setSubsidyTypeCode(SubsidyTypeCodeEnum.RENT_AMT.getCode());
+        renterOrderSubsidyDetailDTO.setSubsidTypeName(SubsidyTypeCodeEnum.RENT_AMT.getDesc());
+        renterOrderSubsidyDetailDTO.setSubsidySourceCode(SubsidySourceCodeEnum.PLATFORM.getCode());
+        renterOrderSubsidyDetailDTO.setSubsidySourceName(SubsidySourceCodeEnum.PLATFORM.getDesc());
 
-    public RenterOrderSubsidyDetailDTO calPlatformCouponSubsidyInfo(OrderCouponDTO platformCoupon) {
-
-
-
-        return null;
+        renterOrderSubsidyDetailDTO.setSubsidyTargetCode(SubsidySourceCodeEnum.RENTER.getCode());
+        renterOrderSubsidyDetailDTO.setSubsidTypeName(SubsidySourceCodeEnum.RENTER.getDesc());
+        renterOrderSubsidyDetailDTO.setSubsidyCostCode(RenterCashCodeEnum.REAL_COUPON_OFFSET.getCashNo());
+        renterOrderSubsidyDetailDTO.setSubsidyCostName(RenterCashCodeEnum.REAL_COUPON_OFFSET.getTxt());
+        renterOrderSubsidyDetailDTO.setSubsidyDesc("使用优惠券抵扣租车费用(目前只抵扣租金)");
+        return renterOrderSubsidyDetailDTO;
     }
 
 }
