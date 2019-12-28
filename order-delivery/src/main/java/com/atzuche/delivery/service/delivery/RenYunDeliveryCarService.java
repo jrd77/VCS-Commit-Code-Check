@@ -3,9 +3,11 @@ package com.atzuche.delivery.service.delivery;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.atzuche.delivery.common.DeliveryConstants;
+import com.atzuche.delivery.common.DeliveryErrorCode;
 import com.atzuche.delivery.config.RestTemplateConfig;
 import com.atzuche.delivery.entity.DeliveryHttpLogEntity;
 import com.atzuche.delivery.enums.DeliveryTypeEnum;
+import com.atzuche.delivery.exception.DeliveryBusinessException;
 import com.atzuche.delivery.utils.DeliveryLogUtil;
 import com.atzuche.delivery.vo.delivery.CancelFlowOrderDTO;
 import com.atzuche.delivery.vo.delivery.RenYunFlowOrderDTO;
@@ -47,7 +49,6 @@ public class RenYunDeliveryCarService {
     /**
      * 添加订单到仁云流程系统
      */
-    @Retryable(value = Exception.class, maxAttempts = DeliveryConstants.REN_YUN_HTTP_RETRY_TIMES, backoff = @Backoff(delay = 1000L, multiplier = 1))
     public String addRenYunFlowOrderInfo(RenYunFlowOrderDTO renYunFlowOrderVO) {
         String result = sendHttpToRenYun(DeliveryConstants.ADD_FLOW_ORDER, renYunFlowOrderVO, DeliveryTypeEnum.ADD_TYPE.getValue().intValue());
         return result;
@@ -56,7 +57,6 @@ public class RenYunDeliveryCarService {
     /**
      * 更新订单到仁云流程系统
      */
-    @Retryable(value = Exception.class, maxAttempts = DeliveryConstants.REN_YUN_HTTP_RETRY_TIMES, backoff = @Backoff(delay = 1000L, multiplier = 1))
     public String updateRenYunFlowOrderInfo(RenYunFlowOrderDTO renYunFlowOrderVO) {
         String result = sendHttpToRenYun(DeliveryConstants.CHANGE_FLOW_ORDER, renYunFlowOrderVO, DeliveryTypeEnum.UPDATE_TYPE.getValue().intValue());
         return result;
@@ -65,7 +65,6 @@ public class RenYunDeliveryCarService {
     /**
      * 取消订单到仁云流程系统
      */
-    @Retryable(value = Exception.class, maxAttempts = DeliveryConstants.REN_YUN_HTTP_RETRY_TIMES, backoff = @Backoff(delay = 1000L, multiplier = 1))
     public String cancelRenYunFlowOrderInfo(CancelFlowOrderDTO cancelFlowOrderVO) {
         String result = sendHttpToRenYun(DeliveryConstants.CANCEL_FLOW_ORDER, cancelFlowOrderVO, DeliveryTypeEnum.CANCEL_TYPE.getValue().intValue());
         return result;
@@ -76,8 +75,9 @@ public class RenYunDeliveryCarService {
      *
      * @return
      */
+    @Retryable(value = Exception.class, maxAttempts = DeliveryConstants.REN_YUN_HTTP_RETRY_TIMES, backoff = @Backoff(delay = 1000L, multiplier = 1))
     public String sendHttpToRenYun(String url, Serializable object, Integer requestCode) {
-        ResponseData responseData = null;
+        ResponseData responseData;
         DeliveryHttpLogEntity deliveryHttpLogEntity = new DeliveryHttpLogEntity();
         deliveryHttpLogEntity.setRequestParams(JSONObject.toJSONString(object));
         deliveryHttpLogEntity.setRequestUrl(url);
@@ -121,6 +121,7 @@ public class RenYunDeliveryCarService {
             deliveryLogUtil.addDeliveryLog(deliveryHttpLogEntity);
             log.info("请求仁云失败，失败原因：case:{}", e.getMessage());
             Cat.logError("请求仁云失败，失败原因：case:" + e.getMessage(), e);
+            throw new DeliveryBusinessException(DeliveryErrorCode.SEND_REN_YUN_HTTP_ERROR);
         } finally {
             t.complete();
         }
