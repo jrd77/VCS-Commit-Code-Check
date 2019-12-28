@@ -123,31 +123,45 @@ public class RenterOrderService {
 
         InsurAmtDTO insurAmtDTO = new InsurAmtDTO();
         insurAmtDTO.setCostBaseDTO(costBaseDTO);
-        insurAmtDTO.setCarLabelIds(null);
-        insurAmtDTO.setCertificationTime(null);
-        insurAmtDTO.setGetCarBeforeTime(null);
-        insurAmtDTO.setInmsrp(null);
-
+        insurAmtDTO.setCarLabelIds(renterOrderReqVO.getLabelIds());
+        insurAmtDTO.setCertificationTime(renterOrderReqVO.getCertificationTime());
+        insurAmtDTO.setGetCarBeforeTime(renterOrderReqVO.getGetCarBeforeTime());
+        insurAmtDTO.setReturnCarAfterTime(renterOrderReqVO.getReturnCarAfterTime());
+        insurAmtDTO.setInmsrp(renterOrderReqVO.getInmsrp());
+        insurAmtDTO.setGuidPrice(renterOrderReqVO.getGuidPrice());
 
 
         AbatementAmtDTO abatementAmtDTO = new AbatementAmtDTO();
         abatementAmtDTO.setCostBaseDTO(costBaseDTO);
+        abatementAmtDTO.setCarLabelIds(renterOrderReqVO.getLabelIds());
+        abatementAmtDTO.setCertificationTime(renterOrderReqVO.getCertificationTime());
+        abatementAmtDTO.setGetCarBeforeTime(renterOrderReqVO.getGetCarBeforeTime());
+        abatementAmtDTO.setReturnCarAfterTime(renterOrderReqVO.getReturnCarAfterTime());
+        abatementAmtDTO.setInmsrp(renterOrderReqVO.getInmsrp());
+        abatementAmtDTO.setGuidPrice(renterOrderReqVO.getGuidPrice());
 
 
         ExtraDriverDTO extraDriverDTO = new ExtraDriverDTO();
         extraDriverDTO.setCostBaseDTO(costBaseDTO);
-
+        extraDriverDTO.setDriverIds(renterOrderReqVO.getDriverIds());
 
 
         GetReturnCarCostReqDto getReturnCarCostReqDto = new GetReturnCarCostReqDto();
         getReturnCarCostReqDto.setCostBaseDTO(costBaseDTO);
 
 
+
+
+
+
+
         GetReturnCarOverCostReqDto getReturnCarOverCostReqDto = new GetReturnCarOverCostReqDto();
         getReturnCarOverCostReqDto.setCostBaseDTO(costBaseDTO);
+        getReturnCarOverCostReqDto.setCityCode(Integer.valueOf(renterOrderReqVO.getCityCode()));
+        getReturnCarOverCostReqDto.setOrderType(1);
 
 
-
-        return null;
+        renterOrderCostReqDTO.setCostBaseDTO(costBaseDTO);
+        return renterOrderCostReqDTO;
     }
 }
