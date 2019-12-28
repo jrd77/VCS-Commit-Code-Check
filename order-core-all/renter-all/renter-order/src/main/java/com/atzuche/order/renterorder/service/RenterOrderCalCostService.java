@@ -307,6 +307,4 @@ public class RenterOrderCalCostService {
 
         return request;
     }
-
-
 }

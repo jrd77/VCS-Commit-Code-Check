@@ -1,6 +1,7 @@
 package com.atzuche.order.coreapi.service;
 
 import com.alibaba.fastjson.JSON;
+import com.atzuche.order.commons.CatConstants;
 import com.atzuche.order.commons.LocalDateTimeUtils;
 import com.atzuche.order.commons.entity.dto.OwnerGoodsDetailDTO;
 import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
@@ -13,6 +14,8 @@ import com.autoyol.car.api.model.dto.OrderCarInfoParamDTO;
 import com.autoyol.car.api.model.vo.*;
 import com.autoyol.commons.web.ErrorCode;
 import com.dianping.cat.Cat;
+import com.dianping.cat.message.Transaction;
+import lombok.Data;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -37,53 +40,13 @@ public class CarService {
     @Autowired
     private CarDetailQueryFeignApi carDetailQueryFeignApi;
 
-
+    @Data
     public static class CarDetailReqVO {
         private String carNo;
         private int addrIndex;
         private boolean useSpecialPrice;
         private LocalDateTime rentTime;
         private LocalDateTime revertTime;
-
-        public String getCarNo() {
-            return carNo;
-        }
-
-        public void setCarNo(String carNo) {
-            this.carNo = carNo;
-        }
-
-        public int getAddrIndex() {
-            return addrIndex;
-        }
-
-        public void setAddrIndex(int addrIndex) {
-            this.addrIndex = addrIndex;
-        }
-
-        public boolean isUseSpecialPrice() {
-            return useSpecialPrice;
-        }
-
-        public void setUseSpecialPrice(boolean useSpecialPrice) {
-            this.useSpecialPrice = useSpecialPrice;
-        }
-
-        public LocalDateTime getRentTime() {
-            return rentTime;
-        }
-
-        public void setRentTime(LocalDateTime rentTime) {
-            this.rentTime = rentTime;
-        }
-
-        public LocalDateTime getRevertTime() {
-            return revertTime;
-        }
-
-        public void setRevertTime(LocalDateTime revertTime) {
-            this.revertTime = revertTime;
-        }
     }
 
     //获取租客商品信息
@@ -95,23 +58,36 @@ public class CarService {
         orderCarInfoParamDTO.setRevertTime(LocalDateTimeUtils.localDateTimeToLong(reqVO.getRevertTime()));
         orderCarInfoParamDTO.setUseSpecialPrice(reqVO.useSpecialPrice);
         ResponseObject<CarDetailVO> responseObject = null;
+        Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "租客商品信息");
         try{
+            Cat.logEvent(CatConstants.FEIGN_METHOD,"CarDetailQueryFeignApi.getCarDetailOfTransByCarNo");
             log.info("Feign 开始获取车辆信息,orderCarInfoParamDTO={}", JSON.toJSONString(orderCarInfoParamDTO));
+            Cat.logEvent(CatConstants.FEIGN_PARAM,JSON.toJSONString(orderCarInfoParamDTO));
             responseObject = carDetailQueryFeignApi.getCarDetailOfTransByCarNo(orderCarInfoParamDTO);
+            Cat.logEvent(CatConstants.FEIGN_RESULT,JSON.toJSONString(responseObject));
+            if(responseObject == null || !ErrorCode.SUCCESS.getCode().equals(responseObject.getResCode())){
+                log.error("Feign 获取车辆信息失败,responseObject={},orderCarInfoParamDTO={}",JSON.toJSONString(responseObject),JSON.toJSONString(orderCarInfoParamDTO));
+                RenterMemberByFeignException renterMemberByFeignException = new RenterMemberByFeignException(SubmitOrderErrorEnum.FEIGN_GET_CAR_DETAIL_FAIL.getCode(), SubmitOrderErrorEnum.FEIGN_GET_CAR_DETAIL_FAIL.getText());
+                Cat.logError("Feign 获取车辆信息失败",renterMemberByFeignException);
+                throw renterMemberByFeignException;
+            }
+            t.setStatus(Transaction.SUCCESS);
+        }catch (RenterMemberByFeignException e){
+            Cat.logError("Feign 获取车辆信息失败",e);
+            t.setStatus(e);
+            throw e;
         }catch (Exception e){
             log.error("Feign 获取车辆信息异常,responseObject={},orderCarInfoParamDTO={}",JSON.toJSONString(responseObject),JSON.toJSONString(orderCarInfoParamDTO),e);
             CarDetailByFeignException carDetailByFeignException = new CarDetailByFeignException(SubmitOrderErrorEnum.FEIGN_GET_CAR_DETAIL_ERROR.getCode(), SubmitOrderErrorEnum.FEIGN_GET_CAR_DETAIL_ERROR.getText());
             Cat.logError("Feign 获取车辆信息异常",carDetailByFeignException);
             throw carDetailByFeignException;
+        }finally {
+            t.complete();
         }
-        if(responseObject == null || !ErrorCode.SUCCESS.getCode().equals(responseObject.getResCode())){
-            log.error("Feign 获取车辆信息失败,responseObject={},orderCarInfoParamDTO={}",JSON.toJSONString(responseObject),JSON.toJSONString(orderCarInfoParamDTO));
-            RenterMemberByFeignException renterMemberByFeignException = new RenterMemberByFeignException(SubmitOrderErrorEnum.FEIGN_GET_CAR_DETAIL_FAIL.getCode(), SubmitOrderErrorEnum.FEIGN_GET_CAR_DETAIL_FAIL.getText());
-            Cat.logError("Feign 获取车辆信息失败",renterMemberByFeignException);
-            throw renterMemberByFeignException;
-        }
+
         CarDetailVO data = responseObject.getData();
         CarBaseVO carBaseVO = data.getCarBaseVO();
+        CarDetectVO carDetect = data.getCarDetect();
         CarStewardVO carSteward = data.getCarSteward();
         CarDetailImageVO detailImageVO = data.getDetailImageVO();
         CarAddressOfTransVO carAddressOfTransVO = data.getCarAddressOfTransVO();
@@ -143,7 +119,7 @@ public class CarService {
         renterGoodsDetailDto.setCarEngineType(carBaseVO.getEngineType());
         renterGoodsDetailDto.setCarDesc(carBaseVO.getCarDesc());
         renterGoodsDetailDto.setCarStewardPhone(carSteward.getStewardPhone()==null?"":String.valueOf(carSteward.getStewardPhone()));
-        //renterGoodsDetailDto.setCarCheckStatus();
+        renterGoodsDetailDto.setCarCheckStatus(carDetect.getDetectStatus());
         renterGoodsDetailDto.setCarShowAddr(carAddressOfTransVO.getCarVirtualAddress());
         renterGoodsDetailDto.setCarShowLon(carAddressOfTransVO.getVirtualAddressLon()==null?"":String.valueOf(carAddressOfTransVO.getVirtualAddressLon()));
         renterGoodsDetailDto.setCarShowLat(carAddressOfTransVO.getVirtualAddressLat()==null?"":String.valueOf(carAddressOfTransVO.getVirtualAddressLat()));

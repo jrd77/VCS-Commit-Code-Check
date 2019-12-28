@@ -25,16 +25,13 @@ import com.atzuche.order.cashieraccount.service.notservice.CashierNoTService;
 import com.atzuche.order.cashieraccount.service.notservice.CashierRefundApplyNoTService;
 import com.atzuche.order.cashieraccount.vo.req.CashierDeductDebtReqVO;
 import com.atzuche.order.cashieraccount.vo.req.CashierRefundApplyReqVO;
-import com.atzuche.order.cashieraccount.vo.res.AccountPayAbleResVO;
 import com.atzuche.order.cashieraccount.vo.res.CashierDeductDebtResVO;
 import com.atzuche.order.cashieraccount.vo.res.OrderPayableAmountResVO;
 import com.atzuche.order.cashieraccount.vo.res.pay.OrderPayAsynResVO;
-import com.atzuche.order.commons.enums.RenterCashCodeEnum;
 import com.atzuche.order.rentercost.service.RenterOrderCostCombineService;
 import com.autoyol.autopay.gateway.constant.DataPayKindConstant;
 import com.autoyol.cat.CatAnnotation;
 import com.autoyol.commons.web.ErrorCode;
-import com.google.common.collect.ImmutableList;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -309,29 +306,7 @@ public class CashierService {
 
     /**  ***************************************** 结算租车费用（三方） end ************************************************* */
 
-    /**
-     * 当前需要支付的相关信息供支付平台使用
-     */
-    @CatAnnotation
-    public OrderPayableAmountResVO getOrderPayableAmount(String orderNo,String renterOrderNo,String memNo){
-        OrderPayableAmountResVO result = new OrderPayableAmountResVO();
-        //车辆押金
-        int amtDeposit = accountRenterDepositService.getSurplusRenterDeposit(orderNo,memNo);
-        //违章押金
-        int amtWZDeposit = accountRenterWzDepositService.getSurplusRenterWZDeposit(orderNo,memNo);
-        //租车费用
-        PayableVO payableVO = renterOrderCostCombineService.getPayable(orderNo,renterOrderNo,memNo);
-        List<AccountPayAbleResVO> accountPayAbles = ImmutableList.of(
-                new AccountPayAbleResVO(orderNo,memNo,amtDeposit,RenterCashCodeEnum.ACCOUNT_RENTER_DEPOSIT),
-                new AccountPayAbleResVO(orderNo,memNo,amtWZDeposit,RenterCashCodeEnum.ACCOUNT_RENTER_WZ_DEPOSIT)
-//                new AccountPayAbleResVO(orderNo,memNo,amtRenterCost,RenterCashCodeEnum.ACCOUNT_RENTER_RENT_COST)
-        );
-        result.setAccountPayAbles(accountPayAbles);
-//        result.setAmt(amtDeposit + amtWZDeposit + amtRenterCost);
-        result.setMemNo(memNo);
-        result.setOrderNo(orderNo);
-        return result;
-    }
+
 
     /**
      * 退款成功异步回调
