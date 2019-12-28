@@ -1,6 +1,5 @@
 package com.atzuche.order.coreapi.service;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -10,20 +9,20 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.atzuche.order.commons.entity.dto.OwnerGoodsDetailDTO;
+import com.atzuche.delivery.entity.RenterOrderDeliveryEntity;
+import com.atzuche.delivery.service.RenterOrderDeliveryService;
 import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
 import com.atzuche.order.commons.entity.dto.RenterGoodsPriceDetailDTO;
 import com.atzuche.order.commons.entity.dto.RenterMemberDTO;
 import com.atzuche.order.commons.entity.dto.RenterMemberRightDTO;
 import com.atzuche.order.commons.enums.CouponTypeEnum;
 import com.atzuche.order.commons.enums.RenterOrderStatusEnum;
+import com.atzuche.order.commons.enums.SrvGetReturnEnum;
 import com.atzuche.order.coreapi.entity.dto.ModifyOrderDTO;
-import com.atzuche.order.coreapi.entity.dto.ModifyOrderOwnerDTO;
 import com.atzuche.order.coreapi.entity.request.ModifyOrderReq;
 import com.atzuche.order.coreapi.modifyorder.exception.ModifyOrderParameterException;
 import com.atzuche.order.coreapi.service.CarService.CarDetailReqVO;
 import com.atzuche.order.coreapi.utils.ModifyOrderUtils;
-import com.atzuche.order.ownercost.entity.OwnerOrderEntity;
 import com.atzuche.order.rentercommodity.service.CommodityService;
 import com.atzuche.order.rentermem.service.RenterMemberService;
 import com.atzuche.order.renterorder.entity.OrderCouponEntity;
@@ -50,6 +49,8 @@ public class ModifyOrderService {
 	private CommodityService commodityService;
 	@Autowired
 	private OrderCouponService orderCouponService;
+	@Autowired
+	private RenterOrderDeliveryService renterOrderDeliveryService;
 
 	/**
 	 * 修改订单主逻辑
@@ -172,23 +173,25 @@ public class ModifyOrderService {
 		if (modifyOrderReq.getDriverIds() == null || modifyOrderReq.getDriverIds().isEmpty()) {
 			
 		}
-		if (StringUtils.isBlank(modifyOrderReq.getGetCarAddress())) {
-			
+		// 获取配送信息
+		List<RenterOrderDeliveryEntity> deliveryList = renterOrderDeliveryService.listRenterOrderDeliveryByRenterOrderNo(initRenterOrder.getRenterOrderNo());
+		Map<Integer, RenterOrderDeliveryEntity> deliveryMap = null;
+		if (deliveryList != null && !deliveryList.isEmpty()) {
+			deliveryMap = deliveryList.stream().collect(Collectors.toMap(RenterOrderDeliveryEntity::getType, deliver -> {return deliver;}));
 		}
-		if (StringUtils.isBlank(modifyOrderReq.getGetCarLat())) {
-			
-		}
-		if (StringUtils.isBlank(modifyOrderReq.getGetCarLon())) {
-			
-		}
-		if (StringUtils.isBlank(modifyOrderReq.getRevertCarAddress())) {
-			
-		}
-		if (StringUtils.isBlank(modifyOrderReq.getRevertCarLat())) {
-			
-		}
-		if (StringUtils.isBlank(modifyOrderReq.getRevertCarLon())) {
-			
+		if (deliveryMap != null) {
+			RenterOrderDeliveryEntity srvGetDelivery = deliveryMap.get(SrvGetReturnEnum.SRV_GET_TYPE.getCode());
+			RenterOrderDeliveryEntity srvReturnDelivery = deliveryMap.get(SrvGetReturnEnum.SRV_RETURN_TYPE.getCode());
+			if (StringUtils.isBlank(modifyOrderReq.getGetCarAddress()) && srvGetDelivery != null) {
+				modifyOrderDTO.setGetCarAddress(srvGetDelivery.getRenterGetReturnAddr());
+				modifyOrderDTO.setGetCarLat(srvGetDelivery.getRenterGetReturnAddrLat());
+				modifyOrderDTO.setGetCarLon(srvGetDelivery.getRenterGetReturnAddrLon());
+			}
+			if (StringUtils.isBlank(modifyOrderReq.getRevertCarAddress()) && srvReturnDelivery != null) {
+				modifyOrderDTO.setRevertCarAddress(srvGetDelivery.getRenterGetReturnAddr());
+				modifyOrderDTO.setRevertCarLat(srvGetDelivery.getRenterGetReturnAddrLat());
+				modifyOrderDTO.setRevertCarLon(srvGetDelivery.getRenterGetReturnAddrLon());
+			}
 		}
 		if (modifyOrderReq.getSrvGetFlag() == null) {
 			modifyOrderDTO.setSrvGetFlag(initRenterOrder.getIsGetCar());
