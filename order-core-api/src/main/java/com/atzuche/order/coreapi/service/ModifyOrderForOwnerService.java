@@ -277,6 +277,11 @@ public class ModifyOrderForOwnerService {
 			// 调远程获取
 			renterGoodsDetailDTO = carService.getRenterGoodsDetail(convertToCarDetailReqVO(modifyOrderOwnerDTO, ownerOrderEntity));
 		}
+		if (renterGoodsDetailDTO == null) {
+			log.error("getOwnerGoodsDetailDTO renterGoodsDetailDTO为空");
+			Cat.logError("getOwnerGoodsDetailDTO renterGoodsDetailDTO为空",new ModifyOrderParameterException());
+			throw new ModifyOrderParameterException();
+		}
 		// 获取经过组装的商品信息
 		OwnerGoodsDetailDTO ownerGoodsDetailDTO = carService.getOwnerGoodsDetail(renterGoodsDetailDTO);
 		ownerGoodsDetailDTO.setOrderNo(modifyOrderOwnerDTO.getOrderNo());
