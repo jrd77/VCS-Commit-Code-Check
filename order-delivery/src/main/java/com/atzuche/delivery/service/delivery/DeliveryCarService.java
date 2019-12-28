@@ -1,7 +1,10 @@
 package com.atzuche.delivery.service.delivery;
 
 import com.atzuche.delivery.common.DeliveryCarTask;
+import com.atzuche.delivery.common.DeliveryErrorCode;
+import com.atzuche.delivery.exception.DeliveryOrderException;
 import com.atzuche.delivery.vo.delivery.CancelFlowOrderDTO;
+import com.atzuche.delivery.vo.delivery.OrderDeliveryVO;
 import com.atzuche.delivery.vo.delivery.RenYunFlowOrderDTO;
 import com.atzuche.delivery.vo.delivery.UpdateFlowOrderDTO;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,22 +23,32 @@ public class DeliveryCarService {
     /**
      * 添加订单到仁云流程系统
      */
-    public void addRenYunFlowOrderInfo(RenYunFlowOrderDTO renYunFlowOrderDTO) {
-        deliveryCarTask.addRenYunFlowOrderInfo(null);
+    public void addRenYunFlowOrderInfo(OrderDeliveryVO orderDeliveryVO) {
+
+        if(null == orderDeliveryVO || orderDeliveryVO.getOrderDeliveryDTO() == null)
+        {
+            throw new DeliveryOrderException(DeliveryErrorCode.DELIVERY_PARAMS_ERROR);
+        }
+        if(orderDeliveryVO.getOrderDeliveryDTO().getIsNotifyRenyun().intValue() == 0)
+        {
+            return;
+        }
+        RenYunFlowOrderDTO renYunFlowOrder = orderDeliveryVO.getRenYunFlowOrderDTO();
+        deliveryCarTask.addRenYunFlowOrderInfo(renYunFlowOrder);
     }
 
     /**
      * 更新订单到仁云流程系统
      */
     public void updateRenYunFlowOrderInfo(UpdateFlowOrderDTO updateFlowOrderDTO) {
-        deliveryCarTask.updateRenYunFlowOrderInfo(null);
+        deliveryCarTask.updateRenYunFlowOrderInfo(updateFlowOrderDTO);
     }
 
     /**
      * 取消订单到仁云流程系统
      */
     public void cancelRenYunFlowOrderInfo(CancelFlowOrderDTO cancelFlowOrderDTO) {
-        deliveryCarTask.cancelRenYunFlowOrderInfo(null);
+        deliveryCarTask.cancelRenYunFlowOrderInfo(cancelFlowOrderDTO);
     }
 
 
