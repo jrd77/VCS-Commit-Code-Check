@@ -9,18 +9,18 @@ import com.atzuche.order.commons.OrderException;
  *
  * @author 胡春林
  **/
-public class DeliveryBusinessException extends OrderException {
+public class DeliveryOrderException extends OrderException {
 
     private String errorCode;
     private String message;
 
-    public DeliveryBusinessException(String errorCode, String message) {
+    public DeliveryOrderException(String errorCode, String message) {
         super(errorCode, message);
         this.errorCode = errorCode;
         this.message = message;
     }
 
-    public DeliveryBusinessException(DeliveryErrorCode deliveryErrorCode) {
+    public DeliveryOrderException(DeliveryErrorCode deliveryErrorCode) {
         super(deliveryErrorCode.getName(), deliveryErrorCode.getValue());
         this.errorCode = deliveryErrorCode.getName();
         this.message = deliveryErrorCode.getValue();

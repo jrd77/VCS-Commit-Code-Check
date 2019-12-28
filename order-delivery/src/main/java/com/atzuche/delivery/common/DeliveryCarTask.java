@@ -4,6 +4,7 @@ import com.atzuche.delivery.enums.ServiceTypeEnum;
 import com.atzuche.delivery.service.MailSendService;
 import com.atzuche.delivery.service.delivery.RenYunDeliveryCarService;
 import com.atzuche.delivery.utils.EmailConstants;
+import com.atzuche.delivery.vo.delivery.UpdateFlowOrderDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,10 +42,10 @@ public class DeliveryCarTask {
      * 更新订单到仁云流程系统
      */
     @Async
-    public void updateRenYunFlowOrderInfo(RenYunFlowOrderDTO renYunFlowOrderDTO) {
-        String result = renyunDeliveryCarService.updateRenYunFlowOrderInfo(renYunFlowOrderDTO);
+    public void updateRenYunFlowOrderInfo(UpdateFlowOrderDTO updateFlowOrderDTO) {
+        String result = renyunDeliveryCarService.updateRenYunFlowOrderInfo(updateFlowOrderDTO);
         if (StringUtils.isBlank(result)) {
-            sendMailByType(renYunFlowOrderDTO.getServicetype(), DeliveryConstants.CHANGE_TYPE, DeliveryConstants.CHANGE_FLOW_ORDER, renYunFlowOrderDTO.getOrdernumber());
+            sendMailByType(updateFlowOrderDTO.getServicetype(), DeliveryConstants.CHANGE_TYPE, DeliveryConstants.CHANGE_FLOW_ORDER, updateFlowOrderDTO.getOrdernumber());
         }
     }
 

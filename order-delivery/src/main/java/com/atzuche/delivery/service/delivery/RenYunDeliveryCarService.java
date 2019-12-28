@@ -7,10 +7,11 @@ import com.atzuche.delivery.common.DeliveryErrorCode;
 import com.atzuche.delivery.config.RestTemplateConfig;
 import com.atzuche.delivery.entity.DeliveryHttpLogEntity;
 import com.atzuche.delivery.enums.DeliveryTypeEnum;
-import com.atzuche.delivery.exception.DeliveryBusinessException;
+import com.atzuche.delivery.exception.DeliveryOrderException;
 import com.atzuche.delivery.utils.DeliveryLogUtil;
 import com.atzuche.delivery.vo.delivery.CancelFlowOrderDTO;
 import com.atzuche.delivery.vo.delivery.RenYunFlowOrderDTO;
+import com.atzuche.delivery.vo.delivery.UpdateFlowOrderDTO;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
 import com.dianping.cat.Cat;
@@ -57,8 +58,8 @@ public class RenYunDeliveryCarService {
     /**
      * 更新订单到仁云流程系统
      */
-    public String updateRenYunFlowOrderInfo(RenYunFlowOrderDTO renYunFlowOrderVO) {
-        String result = sendHttpToRenYun(DeliveryConstants.CHANGE_FLOW_ORDER, renYunFlowOrderVO, DeliveryTypeEnum.UPDATE_TYPE.getValue().intValue());
+    public String updateRenYunFlowOrderInfo(UpdateFlowOrderDTO updateFlowOrderDTO) {
+        String result = sendHttpToRenYun(DeliveryConstants.CHANGE_FLOW_ORDER, updateFlowOrderDTO, DeliveryTypeEnum.UPDATE_TYPE.getValue().intValue());
         return result;
     }
 
@@ -121,7 +122,7 @@ public class RenYunDeliveryCarService {
             deliveryLogUtil.addDeliveryLog(deliveryHttpLogEntity);
             log.info("请求仁云失败，失败原因：case:{}", e.getMessage());
             Cat.logError("请求仁云失败，失败原因：case:" + e.getMessage(), e);
-            throw new DeliveryBusinessException(DeliveryErrorCode.SEND_REN_YUN_HTTP_ERROR);
+            throw new DeliveryOrderException(DeliveryErrorCode.SEND_REN_YUN_HTTP_ERROR);
         } finally {
             t.complete();
         }
