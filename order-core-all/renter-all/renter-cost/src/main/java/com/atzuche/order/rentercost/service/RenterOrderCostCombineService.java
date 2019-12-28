@@ -613,6 +613,8 @@ public class RenterOrderCostCombineService {
             Cat.logError("Feign 获取取还车费用接口异常",getReturnCostErrorException);
             t.setStatus(getReturnCostErrorException);
             throw getReturnCostErrorException;
+        }finally {
+            t.complete();
         }
         List<PriceFbcFeeResponseDetail> fbcFeeResults = responseData.getData().getFbcFeeResults();
 
@@ -815,21 +817,38 @@ public class RenterOrderCostCombineService {
             Integer nightEnd = 0/*Integer.valueOf(apolloCostConfig.getNightEndStr())*/;
             Integer overTransportFee = this.getGetReturnOverTransportFee(cityCode);
             String rentTimeLongStr = String.valueOf(LocalDateTimeUtils.localDateTimeToLong(rentTime));
+
             if (rentTime != null) {
-                //TODO feign 调用 获取是否有取车超云能
-                ResponseObject<Boolean> getFlgResp = null;
-                Cat.newTransaction(CatConstants.FEIGN_CALL,"取车是否超运能");
+                ResponseObject<Boolean> getFlgResponse = null;
+                Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "取车是否超运能");
                 try{
                     Cat.logEvent(CatConstants.FEIGN_METHOD,"GetBackCityLimitFeignApi.isCityServiceLimit");
-
-                    getFlgResp = getBackCityLimitFeignApi.isCityServiceLimit(cityCode, Long.valueOf(rentTimeLongStr.substring(0, 12)));
-
+                    Long rentTimeLong = Long.valueOf(rentTimeLongStr.substring(0, 12));
+                    Cat.logEvent(CatConstants.FEIGN_PARAM,"cityCode="+cityCode+"&rentTimeLong="+rentTimeLong);
+                    getFlgResponse = getBackCityLimitFeignApi.isCityServiceLimit(cityCode, rentTimeLong);
+                    Cat.logEvent(CatConstants.FEIGN_RESULT,JSON.toJSONString(getFlgResponse));
+                    if(getFlgResponse == null || getFlgResponse.getResCode() == null || !ErrorCode.SUCCESS.getCode().equals(getFlgResponse.getResCode())){
+                        GetCarOverCostFailException getCarOverCostFailException = new GetCarOverCostFailException();
+                        log.error("取车超运能获取失败",getCarOverCostFailException);
+                        throw getCarOverCostFailException;
+                    }
+                    t.setStatus(Transaction.SUCCESS);
+                }catch (GetCarOverCostFailException oe){
+                    Cat.logError("Feign 取车超运能获取失败",oe);
+                    t.setStatus(oe);
+                    throw oe;
                 }catch (Exception e){
-
+                    GetCarOverCostErrorException getCarOverCostErrorException = new GetCarOverCostErrorException();
+                    log.error("Feign 取车超运能接口异常",getCarOverCostErrorException);
+                    Cat.logError("Feign 取车超运能接口异常",getCarOverCostErrorException);
+                    t.setStatus(getCarOverCostErrorException);
+                    throw getCarOverCostErrorException;
+                }finally {
+                    t.complete();
                 }
 
-                Boolean getFlag = true;//getBackCityLimitService.checkGetBackSrvCityLimit(cityCode, rentServiceDate, rentServiceHour, rentServiceMinute);
-                if (getFlag != null && !getFlag) {
+                boolean getFlag = getFlgResponse.getData();
+                if (getFlag) {
                     // 取还车超出运能附加金额
                     if (isAddFee) {
                         getReturnOverTransport.setGetOverTransportFee(overTransportFee);
@@ -853,9 +872,34 @@ public class RenterOrderCostCombineService {
                 }
             }
             if (revertTime != null) {
-                //TODO feign 调用 获取是否有取车超云能
-                Boolean returnFlag = true;/*getBackCityLimitService.checkGetBackSrvCityLimit(cityCode, revertServiceDate, revertServiceHour, revertServiceMinute)*/;
-                if (returnFlag != null && !returnFlag) {
+                String revertTimeLongStr = String.valueOf(LocalDateTimeUtils.localDateTimeToLong(revertTime));
+                ResponseObject<Boolean>  returnFlgResponse = null;
+                Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL,"还车是否超运能");
+                try{
+                    Cat.logEvent(CatConstants.FEIGN_METHOD,"GetBackCityLimitFeignApi.isCityServiceLimit");
+                    long revertTimeLong = Long.valueOf(revertTimeLongStr.substring(0, 12));
+                    Cat.logEvent(CatConstants.FEIGN_PARAM,"cityCode="+cityCode+"&revertTimeLong="+revertTimeLong);
+                    returnFlgResponse = getBackCityLimitFeignApi.isCityServiceLimit(cityCode, revertTimeLong);
+                    Cat.logEvent(CatConstants.FEIGN_RESULT,JSON.toJSONString(returnFlgResponse));
+                    if(returnFlgResponse == null || returnFlgResponse.getResCode() == null || !ErrorCode.SUCCESS.getCode().equals(returnFlgResponse.getResCode())){
+                        throw new ReturnCarOverCostFailException();
+                    }
+                    t.setStatus(Transaction.SUCCESS);
+                }catch (ReturnCarOverCostFailException oe){
+                    Cat.logError("还车是否超运能获取失败",oe);
+                    t.setStatus(oe);
+                    throw oe;
+                }catch (Exception e){
+                    ReturnCarOverCostErrorException returnCarOverCostErrorException = new ReturnCarOverCostErrorException();
+                    Cat.logError("还车是否超运能接口异常",returnCarOverCostErrorException);
+                    t.setStatus(returnCarOverCostErrorException);
+                    throw returnCarOverCostErrorException;
+                }finally {
+                    t.complete();
+                }
+
+                Boolean returnFlag = returnFlgResponse.getData();
+                if (returnFlag) {
                     // 取还车超出运能附加金额
                     if (isAddFee) {
                         getReturnOverTransport.setReturnOverTransportFee(overTransportFee);
