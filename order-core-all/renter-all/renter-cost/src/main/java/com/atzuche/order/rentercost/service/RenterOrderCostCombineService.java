@@ -21,6 +21,8 @@ import com.atzuche.order.rentercost.entity.vo.GetReturnResponseVO;
 import com.atzuche.order.rentercost.entity.vo.PayableVO;
 import com.atzuche.order.rentercost.exception.GetReturnCostErrorException;
 import com.atzuche.order.rentercost.exception.*;
+import com.autoyol.car.api.feign.api.GetBackCityLimitFeignApi;
+import com.autoyol.car.api.model.vo.ResponseObject;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.feeservice.api.FetchBackCarFeeFeignService;
@@ -70,6 +72,10 @@ public class RenterOrderCostCombineService {
     private ConsoleRenterOrderFineDeatailService consoleRenterOrderFineDeatailService;
     @Autowired
     private OrderSupplementDetailService orderSupplementDetailService;
+
+    @Autowired
+    private GetBackCityLimitFeignApi getBackCityLimitFeignApi;
+
 
     private static final Integer [] ORDER_TYPES = {1,2};
 	
@@ -808,14 +814,26 @@ public class RenterOrderCostCombineService {
             Integer nightBegin = 0/*Integer.valueOf(apolloCostConfig.getNightBeginStr())*/;
             Integer nightEnd = 0/*Integer.valueOf(apolloCostConfig.getNightEndStr())*/;
             Integer overTransportFee = this.getGetReturnOverTransportFee(cityCode);
+            String rentTimeLongStr = String.valueOf(LocalDateTimeUtils.localDateTimeToLong(rentTime));
             if (rentTime != null) {
                 //TODO feign 调用 获取是否有取车超云能
+                ResponseObject<Boolean> getFlgResp = null;
+                Cat.newTransaction(CatConstants.FEIGN_CALL,"取车是否超运能");
+                try{
+                    Cat.logEvent(CatConstants.FEIGN_METHOD,"GetBackCityLimitFeignApi.isCityServiceLimit");
+
+                    getFlgResp = getBackCityLimitFeignApi.isCityServiceLimit(cityCode, Long.valueOf(rentTimeLongStr.substring(0, 12)));
+
+                }catch (Exception e){
+
+                }
+
                 Boolean getFlag = true;//getBackCityLimitService.checkGetBackSrvCityLimit(cityCode, rentServiceDate, rentServiceHour, rentServiceMinute);
                 if (getFlag != null && !getFlag) {
                     // 取还车超出运能附加金额
                     if (isAddFee) {
                         getReturnOverTransport.setGetOverTransportFee(overTransportFee);
-                        if(DateUtils.isNight(String.valueOf(LocalDateTimeUtils.localDateTimeToLong(rentTime)), nightBegin, nightEnd)) {
+                        if(DateUtils.isNight(rentTimeLongStr, nightBegin, nightEnd)) {
                             //夜间
                             getReturnOverTransport.setNightGetOverTransportFee(overTransportFee);
                         }
