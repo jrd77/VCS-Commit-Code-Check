@@ -61,13 +61,13 @@ public class ModifyOrderService {
 		String renterOrderNo = uniqueOrderNoService.getRenterOrderNo(orderNo);
 		// 获取修改前有效租客子订单信息
 		RenterOrderEntity initRenterOrder = renterOrderService.getRenterOrderByOrderNoAndIsEffective(orderNo);
-		// 获取修改前租客使用的优惠券列表
-		List<OrderCouponEntity> orderCouponList = orderCouponService.listOrderCouponByRenterOrderNo(initRenterOrder.getRenterOrderNo());
-		// 获取修改前租客租客端配送列表
 		
 		// 获取修改前
 		// TODO DTO包装
 		ModifyOrderDTO modifyOrderDTO = getModifyOrderDTO(modifyOrderReq, renterOrderNo, initRenterOrder);
+		// TODO 获取修改前租客租客端配送列表
+		
+		// TODO 获取修改前租客使用的优惠券列表
 		// 获取租客会员信息
 		RenterMemberDTO renterMemberDTO = getRenterMemberDTO(initRenterOrder.getRenterOrderNo());
 		// 获取租客商品信息
@@ -160,6 +160,8 @@ public class ModifyOrderService {
 		}
 		// 
 		LocalDateTime rentTime = modifyOrderReq.getRentTime();
+		// 获取修改前租客使用的优惠券列表
+		List<OrderCouponEntity> orderCouponList = orderCouponService.listOrderCouponByRenterOrderNo(initRenterOrder.getRenterOrderNo());
 		return modifyOrderDTO;
 	}
 	

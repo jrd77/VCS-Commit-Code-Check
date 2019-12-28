@@ -1,13 +1,19 @@
 package com.atzuche.order.coreapi.utils;
 
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringUtils;
 
+import com.atzuche.order.commons.enums.CouponTypeEnum;
 import com.atzuche.order.coreapi.entity.dto.ModifyFlagDTO;
 import com.atzuche.order.coreapi.entity.request.ModifyOrderReq;
+import com.atzuche.order.renterorder.entity.OrderCouponEntity;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 
 public class ModifyOrderUtils {
@@ -92,14 +98,30 @@ public class ModifyOrderUtils {
 	}
 	
 	
-	public static ModifyFlagDTO getModifyFlagDTO(RenterOrderEntity initRenterOrder, ModifyOrderReq updModifyOrder) {
+	public static ModifyFlagDTO getModifyFlagDTO(RenterOrderEntity initRenterOrder, ModifyOrderReq updModifyOrder, List<OrderCouponEntity> orderCouponList) {
 		if (updModifyOrder == null || initRenterOrder == null) {
 			return null;
 		}
 		ModifyFlagDTO modifyFlagDTO = new ModifyFlagDTO();
 		modifyFlagDTO.setModifyAbatementFlag(getModifyFlag(initRenterOrder.getIsAbatement(), updModifyOrder.getAbatementFlag()));
 		modifyFlagDTO.setModifyDriverFlag(getModifyDriverFlag(updModifyOrder.getDriverIds()));
-		modifyFlagDTO.setModifyGetAddrFlag(getModifyGetReturnAddrFlag(initRenterOrder, initLat, updLon, updLat));
+		//modifyFlagDTO.setModifyGetAddrFlag(getModifyGetReturnAddrFlag(initRenterOrder, initLat, updLon, updLat));
+		String initCarOwnerCouponId = null;
+		String initGetReturnCouponId = null;
+		String initPlatformCouponId = null;
+		if (orderCouponList != null && !orderCouponList.isEmpty()) {
+			Map<Integer, String> orderCouponMap = orderCouponList.stream().collect(Collectors.toMap(OrderCouponEntity::getCouponType, OrderCouponEntity::getCouponId));
+			initCarOwnerCouponId = orderCouponMap.get(CouponTypeEnum.ORDER_COUPON_TYPE_OWNER.getCode()); 
+			initGetReturnCouponId = orderCouponMap.get(CouponTypeEnum.ORDER_COUPON_TYPE_GET_RETURN_SRV.getCode());
+			initPlatformCouponId = orderCouponMap.get(CouponTypeEnum.ORDER_COUPON_TYPE_PLATFORM.getCode());
+		}
+		modifyFlagDTO.setModifyCarOwnerCouponFlag(getModifyStrFlag(initCarOwnerCouponId, updModifyOrder.getCarOwnerCouponId()));
+		modifyFlagDTO.setModifyPlatformCouponFlag(getModifyStrFlag(initPlatformCouponId, updModifyOrder.getPlatformCouponId()));
+		modifyFlagDTO.setModifyGetReturnCouponFlag(getModifyStrFlag(initGetReturnCouponId, updModifyOrder.getSrvGetReturnCouponId()));
+		modifyFlagDTO.setModifyUserCoinFlag(getModifyFlag(initRenterOrder.getIsUseCoin(), updModifyOrder.getUserCoinFlag()));
+		modifyFlagDTO.setModifySrvGetFlag(getModifyFlag(initRenterOrder.getIsGetCar(), updModifyOrder.getSrvGetFlag()));
+		modifyFlagDTO.setModifySrvReturnFlag(getModifyFlag(initRenterOrder.getIsReturnCar(), updModifyOrder.getSrvReturnFlag()));
+		return modifyFlagDTO;
 	}
 	
 }
