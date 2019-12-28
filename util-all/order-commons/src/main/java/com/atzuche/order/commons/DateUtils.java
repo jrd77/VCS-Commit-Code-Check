@@ -72,4 +72,24 @@ public class DateUtils {
     public static LocalDateTime parseLocalDateTime(String str, String format){
         return LocalDateTime.parse(str, DateTimeFormatter.ofPattern(format));
     }
+
+    /**
+     * 字符串转时间
+     * @param localDateTime
+     * @param format
+     * @return
+     */
+    public static String formate(LocalDateTime localDateTime, String format){
+        return DateTimeFormatter.ofPattern(format).format(localDateTime);
+    }
+
+    /**
+     * 字符串转时间
+     * @param localDateTime 日期
+     * @param format 指定格式
+     * @return long
+     */
+    public static long formateLong(LocalDateTime localDateTime, String format){
+        return Long.parseLong(formate(localDateTime, format));
+    }
 }

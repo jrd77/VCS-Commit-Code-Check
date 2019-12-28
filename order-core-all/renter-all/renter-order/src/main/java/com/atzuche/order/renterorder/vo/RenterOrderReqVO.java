@@ -36,6 +36,11 @@ public class RenterOrderReqVO implements Serializable {
     private String memNo;
 
     /**
+     * 车辆注册号
+     */
+    private Integer carNo;
+
+    /**
      * 城市编码
      */
     private String cityCode;
@@ -158,6 +163,16 @@ public class RenterOrderReqVO implements Serializable {
      * 驾驶证初次领证日期
      */
     private LocalDate certificationTime;
+
+    /**
+     * 是否是新用戶
+     */
+    private Boolean isNew;
+
+    /**
+     * 限时红包面额(管理后台)
+     */
+    private Integer reductiAmt;
 
     /**
      * 车辆标签
