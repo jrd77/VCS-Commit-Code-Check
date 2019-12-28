@@ -1,18 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.atzuche.order.renterorder.mapper.OrderCouponMapper">
+<mapper namespace="com.atzuche.order.renterorder.mapper.RenterAdditionalDriverMapper">
 
-    <resultMap type="com.atzuche.order.renterorder.entity.OrderCouponEntity" id="BaseResultMap">
+    <resultMap type="com.atzuche.order.renterorder.entity.RenterAdditionalDriverEntity" id="BaseResultMap">
         <result property="id" column="id"/>
         <result property="orderNo" column="order_no"/>
         <result property="renterOrderNo" column="renter_order_no"/>
-        <result property="couponId" column="coupon_id"/>
-        <result property="couponName" column="coupon_name"/>
-        <result property="couponType" column="coupon_type"/>
-        <result property="status" column="status"/>
-        <result property="couponDesc" column="coupon_desc"/>
-        <result property="amount" column="amount"/>
+        <result property="realName" column="real_name"/>
+        <result property="phone" column="phone"/>
+        <result property="isUse" column="is_use"/>
         <result property="createTime" column="create_time"/>
         <result property="createOp" column="create_op"/>
         <result property="updateTime" column="update_time"/>
@@ -25,12 +22,9 @@
 	`id`, 	
 	`order_no`, 	
 	`renter_order_no`, 	
-	`coupon_id`, 	
-	`coupon_name`, 	
-	`coupon_type`, 	
-	`status`, 	
-	`coupon_desc`, 	
-	`amount`, 	
+	`real_name`, 	
+	`phone`, 	
+	`is_use`, 	
 	`create_time`, 	
 	`create_op`, 	
 	`update_time`, 	
@@ -41,20 +35,17 @@
 
 
 	<select id="selectByPrimaryKey" resultMap="BaseResultMap">
-		select <include refid="Base_Column_List" /> from order_coupon where id = #{value}
+		select <include refid="Base_Column_List" /> from renter_additional_driver where id = #{value}
 	</select>
 
-	<insert id="insert" parameterType="com.atzuche.order.renterorder.entity.OrderCouponEntity" useGeneratedKeys="true" keyProperty="id">
-		insert into order_coupon
+	<insert id="insert" parameterType="com.atzuche.order.renterorder.entity.RenterAdditionalDriverEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into renter_additional_driver
 		(
 				`order_no`,		
 				`renter_order_no`,		
-				`coupon_id`,		
-				`coupon_name`,		
-				`coupon_type`,		
-				`status`,		
-				`coupon_desc`,		
-				`amount`,		
+				`real_name`,		
+				`phone`,		
+				`is_use`,		
 				`create_time`,		
 				`create_op`,		
 				`update_time`,		
@@ -65,12 +56,9 @@
 		(
 				#{orderNo}, 		
 				#{renterOrderNo}, 		
-				#{couponId}, 		
-				#{couponName}, 		
-				#{couponType}, 		
-				#{status}, 		
-				#{couponDesc}, 		
-				#{amount}, 		
+				#{realName}, 		
+				#{phone}, 		
+				#{isUse}, 		
 				#{createTime}, 		
 				#{createOp}, 		
 				#{updateTime}, 		
@@ -79,17 +67,14 @@
 			)
 	</insert>
 	
-	<insert id="insertSelective" parameterType="com.atzuche.order.renterorder.entity.OrderCouponEntity" useGeneratedKeys="true" keyProperty="id">
-		insert into order_coupon
+	<insert id="insertSelective" parameterType="com.atzuche.order.renterorder.entity.RenterAdditionalDriverEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into renter_additional_driver
 		(
 				<if test="orderNo != null">`order_no`, </if>
 				<if test="renterOrderNo != null">`renter_order_no`, </if>
-				<if test="couponId != null">`coupon_id`, </if>
-				<if test="couponName != null">`coupon_name`, </if>
-				<if test="couponType != null">`coupon_type`, </if>
-				<if test="status != null">`status`, </if>
-				<if test="couponDesc != null">`coupon_desc`, </if>
-				<if test="amount != null">`amount`, </if>
+				<if test="realName != null">`real_name`, </if>
+				<if test="phone != null">`phone`, </if>
+				<if test="isUse != null">`is_use`, </if>
 				<if test="createTime != null">`create_time`, </if>
 				<if test="createOp != null">`create_op`, </if>
 				<if test="updateTime != null">`update_time`, </if>
@@ -100,12 +85,9 @@
 		(
 				<if test="orderNo != null">#{orderNo},  </if>
 				<if test="renterOrderNo != null">#{renterOrderNo},  </if>
-				<if test="couponId != null">#{couponId},  </if>
-				<if test="couponName != null">#{couponName},  </if>
-				<if test="couponType != null">#{couponType},  </if>
-				<if test="status != null">#{status},  </if>
-				<if test="couponDesc != null">#{couponDesc},  </if>
-				<if test="amount != null">#{amount},  </if>
+				<if test="realName != null">#{realName},  </if>
+				<if test="phone != null">#{phone},  </if>
+				<if test="isUse != null">#{isUse},  </if>
 				<if test="createTime != null">#{createTime},  </if>
 				<if test="createOp != null">#{createOp},  </if>
 				<if test="updateTime != null">#{updateTime},  </if>
@@ -115,17 +97,14 @@
 	</insert>
 	
 	 
-	<update id="updateByPrimaryKeySelective" parameterType="com.atzuche.order.renterorder.entity.OrderCouponEntity">
-		update order_coupon 
+	<update id="updateByPrimaryKeySelective" parameterType="com.atzuche.order.renterorder.entity.RenterAdditionalDriverEntity">
+		update renter_additional_driver 
 		<set>
 				<if test="orderNo != null">`order_no` = #{orderNo}, </if>
 				<if test="renterOrderNo != null">`renter_order_no` = #{renterOrderNo}, </if>
-				<if test="couponId != null">`coupon_id` = #{couponId}, </if>
-				<if test="couponName != null">`coupon_name` = #{couponName}, </if>
-				<if test="couponType != null">`coupon_type` = #{couponType}, </if>
-				<if test="status != null">`status` = #{status}, </if>
-				<if test="couponDesc != null">`coupon_desc` = #{couponDesc}, </if>
-				<if test="amount != null">`amount` = #{amount}, </if>
+				<if test="realName != null">`real_name` = #{realName}, </if>
+				<if test="phone != null">`phone` = #{phone}, </if>
+				<if test="isUse != null">`is_use` = #{isUse}, </if>
 				<if test="createTime != null">`create_time` = #{createTime}, </if>
 				<if test="createOp != null">`create_op` = #{createOp}, </if>
 				<if test="updateTime != null">`update_time` = #{updateTime}, </if>
@@ -135,17 +114,14 @@
 		where id = #{id}
 	</update>
 	
-	<update id="updateByPrimaryKey" parameterType="com.atzuche.order.renterorder.entity.OrderCouponEntity">
-		update order_coupon 
+	<update id="updateByPrimaryKey" parameterType="com.atzuche.order.renterorder.entity.RenterAdditionalDriverEntity">
+		update renter_additional_driver 
 		<set>
 				`order_no` = #{orderNo}, 		
 				`renter_order_no` = #{renterOrderNo}, 		
-				`coupon_id` = #{couponId}, 		
-				`coupon_name` = #{couponName}, 		
-				`coupon_type` = #{couponType}, 		
-				`status` = #{status}, 		
-				`coupon_desc` = #{couponDesc}, 		
-				`amount` = #{amount}, 		
+				`real_name` = #{realName}, 		
+				`phone` = #{phone}, 		
+				`is_use` = #{isUse}, 		
 				`create_time` = #{createTime}, 		
 				`create_op` = #{createOp}, 		
 				`update_time` = #{updateTime}, 		

@@ -6,14 +6,14 @@ import lombok.Data;
 
 
 /**
- * 订单券表
+ * 租客端交易流程表
  * 
  * @author ZhangBin
- * @date 2019-12-28 15:45:08
+ * @date 2019-12-28 15:46:44
  * @Description:
  */
 @Data
-public class OrderCouponEntity implements Serializable {
+public class RenterTransFlowEntity implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
 	/**
@@ -25,33 +25,17 @@ public class OrderCouponEntity implements Serializable {
 	 */
 	private String orderNo;
 	/**
-	 * 租客子订单号
+	 * 子订单号
 	 */
 	private String renterOrderNo;
 	/**
-	 * 优惠券id
+	 * 交易状态
 	 */
-	private String couponId;
+	private Integer transStatus;
 	/**
-	 * 优惠券名称
+	 * 状态描述
 	 */
-	private String couponName;
-	/**
-	 * 优惠券类型
-	 */
-	private Integer couponType;
-	/**
-	 * 状态 0：未使用 1：已使用
-	 */
-	private Integer status;
-	/**
-	 * 描述信息
-	 */
-	private String couponDesc;
-	/**
-	 * 抵扣的金额
-	 */
-	private Integer amount;
+	private String transDesc;
 	/**
 	 * 创建时间
 	 */
