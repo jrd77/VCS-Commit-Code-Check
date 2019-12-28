@@ -2,7 +2,10 @@ package com.atzuche.order.coreapi.service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -12,12 +15,14 @@ import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
 import com.atzuche.order.commons.entity.dto.RenterGoodsPriceDetailDTO;
 import com.atzuche.order.commons.entity.dto.RenterMemberDTO;
 import com.atzuche.order.commons.entity.dto.RenterMemberRightDTO;
+import com.atzuche.order.commons.enums.CouponTypeEnum;
 import com.atzuche.order.commons.enums.RenterOrderStatusEnum;
 import com.atzuche.order.coreapi.entity.dto.ModifyOrderDTO;
 import com.atzuche.order.coreapi.entity.dto.ModifyOrderOwnerDTO;
 import com.atzuche.order.coreapi.entity.request.ModifyOrderReq;
 import com.atzuche.order.coreapi.modifyorder.exception.ModifyOrderParameterException;
 import com.atzuche.order.coreapi.service.CarService.CarDetailReqVO;
+import com.atzuche.order.coreapi.utils.ModifyOrderUtils;
 import com.atzuche.order.ownercost.entity.OwnerOrderEntity;
 import com.atzuche.order.rentercommodity.service.CommodityService;
 import com.atzuche.order.rentermem.service.RenterMemberService;
@@ -157,11 +162,64 @@ public class ModifyOrderService {
 		Integer abatementFlag = modifyOrderReq.getAbatementFlag();
 		if (abatementFlag == null) {
 			modifyOrderDTO.setAbatementFlag(initRenterOrder.getIsAbatement());
+		} 
+		if (modifyOrderReq.getRentTime() == null) {
+			modifyOrderDTO.setRentTime(initRenterOrder.getExpRentTime());
 		}
-		// 
-		LocalDateTime rentTime = modifyOrderReq.getRentTime();
+		if (modifyOrderReq.getRevertTime() == null) {
+			modifyOrderDTO.setRevertTime(initRenterOrder.getExpRevertTime());
+		}
+		if (modifyOrderReq.getDriverIds() == null || modifyOrderReq.getDriverIds().isEmpty()) {
+			
+		}
+		if (StringUtils.isBlank(modifyOrderReq.getGetCarAddress())) {
+			
+		}
+		if (StringUtils.isBlank(modifyOrderReq.getGetCarLat())) {
+			
+		}
+		if (StringUtils.isBlank(modifyOrderReq.getGetCarLon())) {
+			
+		}
+		if (StringUtils.isBlank(modifyOrderReq.getRevertCarAddress())) {
+			
+		}
+		if (StringUtils.isBlank(modifyOrderReq.getRevertCarLat())) {
+			
+		}
+		if (StringUtils.isBlank(modifyOrderReq.getRevertCarLon())) {
+			
+		}
+		if (modifyOrderReq.getSrvGetFlag() == null) {
+			modifyOrderDTO.setSrvGetFlag(initRenterOrder.getIsGetCar());
+		}
+		if (modifyOrderReq.getSrvReturnFlag() == null) {
+			modifyOrderDTO.setSrvGetFlag(initRenterOrder.getIsReturnCar());
+		}
+		if (modifyOrderReq.getUserCoinFlag() == null) {
+			modifyOrderDTO.setUserCoinFlag(initRenterOrder.getIsUseCoin());
+		}
 		// 获取修改前租客使用的优惠券列表
 		List<OrderCouponEntity> orderCouponList = orderCouponService.listOrderCouponByRenterOrderNo(initRenterOrder.getRenterOrderNo());
+		String initCarOwnerCouponId = null;
+		String initGetReturnCouponId = null;
+		String initPlatformCouponId = null;
+		if (orderCouponList != null && !orderCouponList.isEmpty()) {
+			Map<Integer, String> orderCouponMap = orderCouponList.stream().collect(Collectors.toMap(OrderCouponEntity::getCouponType, OrderCouponEntity::getCouponId));
+			initCarOwnerCouponId = orderCouponMap.get(CouponTypeEnum.ORDER_COUPON_TYPE_OWNER.getCode()); 
+			initGetReturnCouponId = orderCouponMap.get(CouponTypeEnum.ORDER_COUPON_TYPE_GET_RETURN_SRV.getCode());
+			initPlatformCouponId = orderCouponMap.get(CouponTypeEnum.ORDER_COUPON_TYPE_PLATFORM.getCode());
+		}
+		if (StringUtils.isBlank(modifyOrderReq.getCarOwnerCouponId())) {
+			modifyOrderDTO.setCarOwnerCouponId(initCarOwnerCouponId);
+		}
+		if (StringUtils.isBlank(modifyOrderReq.getSrvGetReturnCouponId())) {
+			modifyOrderDTO.setSrvGetReturnCouponId(initGetReturnCouponId);
+		}
+		if (StringUtils.isBlank(modifyOrderReq.getPlatformCouponId())) {
+			modifyOrderDTO.setPlatformCouponId(initPlatformCouponId);
+		}
+		modifyOrderDTO.setModifyFlagDTO(ModifyOrderUtils.getModifyFlagDTO(initRenterOrder, modifyOrderReq, orderCouponList));
 		return modifyOrderDTO;
 	}
 	

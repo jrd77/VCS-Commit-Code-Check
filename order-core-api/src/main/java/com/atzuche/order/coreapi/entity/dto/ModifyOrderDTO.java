@@ -3,8 +3,6 @@ package com.atzuche.order.coreapi.entity.dto;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import com.atzuche.order.renterorder.dto.coupon.OrderCouponDTO;
-
 import lombok.Data;
 import lombok.ToString;
 @Data
@@ -80,9 +78,17 @@ public class ModifyOrderDTO {
 	 */
 	private Integer userCoinFlag;
 	/**
-	 * 订单使用优惠券列表
+	 * 车主券id
 	 */
-	private List<OrderCouponDTO> orderCouponList;
+	private String carOwnerCouponId;
+	/**
+	 * 取还车优惠券id
+	 */
+	private String srvGetReturnCouponId;
+	/**
+	 * 平台优惠券id
+	 */
+	private String platformCouponId;
 	/**
 	 * 修改哪种操作标记
 	 */
