@@ -24,7 +24,9 @@ import java.util.stream.Collectors;
 @Service
 public class RenterMemberRightService{
 
-    private static final int guidePrice = 1500000;
+    private static final int GUIDE_PRICE = 1500000;
+
+    private static final int REDUCTION_RATE_MAX = 70;
 
     /**
      *
@@ -69,9 +71,9 @@ public class RenterMemberRightService{
                 rightValueTotal.addAndGet(Integer.valueOf(x.getRightValue() == null ? "0" : x.getRightValue()));
             });
             Integer guidPrice = memRightCarDepositAmtReqDTO.getGuidPrice();
-            if(guidPrice != null && guidPrice > guidePrice){
+            if(guidPrice != null && guidPrice > GUIDE_PRICE){
                 reductionRate = 0;
-            }else if(rightValueTotal.get() >= 70){
+            }else if(rightValueTotal.get() >= REDUCTION_RATE_MAX){
                 reductionRate = 0.7;
             }else{
                 reductionRate = rightValueTotal.get()/100;
