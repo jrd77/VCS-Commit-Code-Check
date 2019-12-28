@@ -17,6 +17,5 @@ public class MemberService {
     public String getMemNoByMobile(String memNo)
     {
         return null;
-
     }
 }

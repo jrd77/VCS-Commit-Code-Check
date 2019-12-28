@@ -12,6 +12,9 @@ import com.atzuche.delivery.vo.delivery.RenYunFlowOrderDTO;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
 import com.dianping.cat.Cat;
+import com.dianping.cat.CatConstants;
+import com.dianping.cat.message.Event;
+import com.dianping.cat.message.Transaction;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
@@ -46,7 +49,7 @@ public class RenYunDeliveryCarService {
      */
     @Retryable(value = Exception.class, maxAttempts = DeliveryConstants.REN_YUN_HTTP_RETRY_TIMES, backoff = @Backoff(delay = 1000L, multiplier = 1))
     public String addRenYunFlowOrderInfo(RenYunFlowOrderDTO renYunFlowOrderVO) {
-        String result = sendHttpToRenYun(DeliveryConstants.ADD_FLOW_ORDER,renYunFlowOrderVO);
+        String result = sendHttpToRenYun(DeliveryConstants.ADD_FLOW_ORDER, renYunFlowOrderVO, DeliveryTypeEnum.ADD_TYPE.getValue().intValue());
         return result;
     }
 
@@ -55,7 +58,7 @@ public class RenYunDeliveryCarService {
      */
     @Retryable(value = Exception.class, maxAttempts = DeliveryConstants.REN_YUN_HTTP_RETRY_TIMES, backoff = @Backoff(delay = 1000L, multiplier = 1))
     public String updateRenYunFlowOrderInfo(RenYunFlowOrderDTO renYunFlowOrderVO) {
-        String result = sendHttpToRenYun(DeliveryConstants.CHANGE_FLOW_ORDER,renYunFlowOrderVO);
+        String result = sendHttpToRenYun(DeliveryConstants.CHANGE_FLOW_ORDER, renYunFlowOrderVO, DeliveryTypeEnum.UPDATE_TYPE.getValue().intValue());
         return result;
     }
 
@@ -64,7 +67,7 @@ public class RenYunDeliveryCarService {
      */
     @Retryable(value = Exception.class, maxAttempts = DeliveryConstants.REN_YUN_HTTP_RETRY_TIMES, backoff = @Backoff(delay = 1000L, multiplier = 1))
     public String cancelRenYunFlowOrderInfo(CancelFlowOrderDTO cancelFlowOrderVO) {
-        String result = sendHttpToRenYun(DeliveryConstants.CANCEL_FLOW_ORDER,cancelFlowOrderVO);
+        String result = sendHttpToRenYun(DeliveryConstants.CANCEL_FLOW_ORDER, cancelFlowOrderVO, DeliveryTypeEnum.CANCEL_TYPE.getValue().intValue());
         return result;
     }
 
@@ -73,17 +76,21 @@ public class RenYunDeliveryCarService {
      *
      * @return
      */
-    public String sendHttpToRenYun(String url, Serializable object) {
+    public String sendHttpToRenYun(String url, Serializable object, Integer requestCode) {
         ResponseData responseData = null;
         DeliveryHttpLogEntity deliveryHttpLogEntity = new DeliveryHttpLogEntity();
         deliveryHttpLogEntity.setRequestParams(JSONObject.toJSONString(object));
         deliveryHttpLogEntity.setRequestUrl(url);
-        deliveryHttpLogEntity.setRequestCode(DeliveryTypeEnum.ADD_TYPE.getValue().intValue());
+        deliveryHttpLogEntity.setRequestCode(requestCode);
         deliveryHttpLogEntity.setCreateTime(LocalDateTime.now());
         deliveryHttpLogEntity.setRequestMethodType(HttpMethod.POST.ordinal());
         deliveryHttpLogEntity.setSendTime(LocalDateTime.now());
         deliveryHttpLogEntity.setUpdateTime(LocalDateTime.now());
+        Transaction t = Cat.newTransaction(CatConstants.TYPE_URL, DeliveryConstants.REQUEST_REN_YUN_TYPE_PREFIX);
         try {
+            Cat.logEvent(DeliveryConstants.REQUEST_REN_YUN_TYPE_PREFIX + requestCode + ":order:param", "requestParam",
+                    Event.SUCCESS, "params=" + JSONObject.toJSONString(object) + "...");
+            Cat.logMetricForCount(DeliveryConstants.REQUEST_REN_YUN_TYPE_PREFIX);
             HttpHeaders httpHeaders = new HttpHeaders();
             httpHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
             httpHeaders.set("user-agent", DeliveryConstants.USER_AGENT_OPERATECENTER);
@@ -104,7 +111,9 @@ public class RenYunDeliveryCarService {
                 deliveryLogUtil.addDeliveryLog(deliveryHttpLogEntity);
                 log.error("请求仁云失败，各参数返回值,url:{},params:{},result:{}", url, JSON.toJSONString(object), JSON.toJSONString(responseData));
             }
+            t.setStatus(Transaction.SUCCESS);
         } catch (Exception e) {
+            t.setStatus(e);
             deliveryHttpLogEntity.setReturnStatusCode(ErrorCode.SYS_ERROR.getCode());
             deliveryHttpLogEntity.setReturnContext(e.getMessage());
             deliveryHttpLogEntity.setReturnStatusType("请求仁云出现问题");
@@ -112,6 +121,8 @@ public class RenYunDeliveryCarService {
             deliveryLogUtil.addDeliveryLog(deliveryHttpLogEntity);
             log.info("请求仁云失败，失败原因：case:{}", e.getMessage());
             Cat.logError("请求仁云失败，失败原因：case:" + e.getMessage(), e);
+        } finally {
+            t.complete();
         }
         return JSONObject.toJSONString(responseData);
     }
