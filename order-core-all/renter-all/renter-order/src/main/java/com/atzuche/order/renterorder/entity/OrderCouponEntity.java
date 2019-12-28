@@ -25,6 +25,10 @@ public class OrderCouponEntity implements Serializable {
 	 */
 	private String orderNo;
 	/**
+	 * 租客子订单号
+	 */
+	private String renterOrderNo;
+	/**
 	 * 优惠券id
 	 */
 	private String couponId;

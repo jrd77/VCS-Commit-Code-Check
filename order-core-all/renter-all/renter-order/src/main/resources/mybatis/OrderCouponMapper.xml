@@ -132,5 +132,10 @@
 		</set>
 		where id = #{id}
 	</update>
+	
+	<select id="listOrderCouponByRenterOrderNo" resultMap="BaseResultMap">
+		select <include refid="Base_Column_List" /> from order_coupon where renter_order_no = #{renterOrderNo}
+		and is_delete = 0
+	</select>
   	
 </mapper>
