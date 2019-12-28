@@ -836,10 +836,11 @@ public class RenterOrderCostCombineService {
                     t.setStatus(oe);
                     throw oe;
                 }catch (Exception e){
-                    log.error("Feign 取车超运能接口异常",e);
-                    Cat.logError("Feign 取车超运能接口异常",e);
-                    t.setStatus(e);
-                    throw e;
+                    GetCarOverCostErrorException getCarOverCostErrorException = new GetCarOverCostErrorException();
+                    log.error("Feign 取车超运能接口异常",getCarOverCostErrorException);
+                    Cat.logError("Feign 取车超运能接口异常",getCarOverCostErrorException);
+                    t.setStatus(getCarOverCostErrorException);
+                    throw getCarOverCostErrorException;
                 }finally {
                     t.complete();
                 }
@@ -887,9 +888,10 @@ public class RenterOrderCostCombineService {
                     t.setStatus(oe);
                     throw oe;
                 }catch (Exception e){
-                    Cat.logError("还车是否超运能接口异常",e);
-                    t.setStatus(e);
-                    throw  e;
+                    ReturnCarOverCostErrorException returnCarOverCostErrorException = new ReturnCarOverCostErrorException();
+                    Cat.logError("还车是否超运能接口异常",returnCarOverCostErrorException);
+                    t.setStatus(returnCarOverCostErrorException);
+                    throw returnCarOverCostErrorException;
                 }finally {
                     t.complete();
                 }
