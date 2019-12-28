@@ -65,8 +65,6 @@ public class RenterOrderCostCombineService {
 	@Autowired
 	private OrderConsoleCostDetailService orderConsoleCostDetailService;
     @Autowired
-    private RestTemplate restTemplate;
-    @Autowired
     private FetchBackCarFeeFeignService fetchBackCarFeeFeignService;
     @Autowired
     private ConsoleRenterOrderFineDeatailService consoleRenterOrderFineDeatailService;
