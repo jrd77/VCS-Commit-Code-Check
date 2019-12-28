@@ -212,7 +212,7 @@
 		where id = #{id}
 	</update>
 	
-	<update id="updateByPrimaryKey" parameterType="com.atzuche.order.entity.OwnerHandoverCarInfoEntity">
+	<update id="updateByPrimaryKey" parameterType="com.atzuche.delivery.entity.OwnerHandoverCarInfoEntity">
 		update owner_handover_car_info 
 		<set>
 				`order_no` = #{orderNo}, 		
