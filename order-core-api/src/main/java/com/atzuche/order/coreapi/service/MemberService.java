@@ -48,7 +48,9 @@ public class MemberService {
         List<String> selectKey = Arrays.asList(
                 MemberSelectKeyEnum.MEMBER_CORE_INFO.getKey(),
                 MemberSelectKeyEnum.MEMBER_BASE_INFO.getKey(),
-                MemberSelectKeyEnum.MEMBER_ROLE_INFO.getKey());
+                MemberSelectKeyEnum.MEMBER_ROLE_INFO.getKey(),
+                MemberSelectKeyEnum.MEMBER_ADDITION_INFO.getKey(),
+                MemberSelectKeyEnum.MEMBER_STATISTICS_INFO.getKey());
         ResponseData<MemberTotalInfo> responseData = null;
         log.info("Feign 开始获取车主会员信息,memNo={}",memNo);
         Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "会员详情服务");
@@ -167,7 +169,9 @@ public class MemberService {
                 MemberSelectKeyEnum.MEMBER_CORE_INFO.getKey(),
                 MemberSelectKeyEnum.MEMBER_AUTH_INFO.getKey(),
                 MemberSelectKeyEnum.MEMBER_BASE_INFO.getKey(),
-                MemberSelectKeyEnum.MEMBER_ROLE_INFO.getKey());
+                MemberSelectKeyEnum.MEMBER_ROLE_INFO.getKey(),
+                MemberSelectKeyEnum.MEMBER_ADDITION_INFO.getKey(),
+                MemberSelectKeyEnum.MEMBER_STATISTICS_INFO.getKey());
         ResponseData<MemberTotalInfo> responseData = null;
         log.info("Feign 开始获取租客会员信息,memNo={}",memNo);
         Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "会员详情服务");
@@ -197,6 +201,9 @@ public class MemberService {
         MemberAuthInfo memberAuthInfo = memberTotalInfo.getMemberAuthInfo();
         MemberCoreInfo memberCoreInfo = memberTotalInfo.getMemberCoreInfo();
         MemberBaseInfo memberBaseInfo = memberTotalInfo.getMemberBaseInfo();
+        MemberAdditionInfo memberAdditionInfo = memberTotalInfo.getMemberAdditionInfo();
+        MemberStatisticsInfo memberStatisticsInfo = memberTotalInfo.getMemberStatisticsInfo();
+        MemberRoleInfo memberRoleInfo = memberTotalInfo.getMemberRoleInfo();
         RenterMemberDTO renterMemberDto = new RenterMemberDTO();
         renterMemberDto.setMemNo(memNo);
         renterMemberDto.setPhone(memberCoreInfo.getPhone());
@@ -210,9 +217,11 @@ public class MemberService {
         renterMemberDto.setIdCardAuth(memberAuthInfo.getIdCardAuth());
         renterMemberDto.setDriLicAuth(memberAuthInfo.getDriLicAuth());
         renterMemberDto.setDriViceLicAuth(memberAuthInfo.getDriViceLicAuth());
-        //renterMemberDto.setOrderSuccessCount();
+        renterMemberDto.setOrderSuccessCount(memberStatisticsInfo.getSuccessOrderNum());
+        renterMemberDto.setCommUseDriverList(memberAdditionInfo.getCommUseDriverList());
+        renterMemberDto.setIsNew(memberRoleInfo.getIsNew());
         List<RenterMemberRightDTO> rights = new ArrayList<>();
-        MemberRoleInfo memberRoleInfo = memberTotalInfo.getMemberRoleInfo();
+
         if(memberRoleInfo != null){
             if(memberRoleInfo.getInternalStaff()!=null){
                 RenterMemberRightDTO internalStaff = new RenterMemberRightDTO();

@@ -9,14 +9,14 @@ import lombok.Data;
  * 主订单表
  * 
  * @author ZhangBin
- * @date 2019-12-24 16:19:33
+ * @date 2019-12-28 15:37:56
+ * @Description:
  */
 @Data
 public class OrderEntity implements Serializable {
-
-    private static final long serialVersionUID = 7867901303046583923L;
-
-    /**
+	private static final long serialVersionUID = 1L;
+	
+	/**
 	 * 
 	 */
 	private Integer id;
@@ -69,9 +69,17 @@ public class OrderEntity implements Serializable {
 	 */
 	private Integer isUseAirPortService;
 	/**
+	 * 航班号
+	 */
+	private String flightId;
+	/**
 	 * 请求时间
 	 */
 	private LocalDateTime reqTime;
+	/**
+	 * 限时立减金额（面额）
+	 */
+	private Integer limitAmt;
 	/**
 	 * 风控审核id
 	 */
@@ -80,6 +88,10 @@ public class OrderEntity implements Serializable {
 	 * 版本号
 	 */
 	private Integer version;
+	/**
+	 * 订单图片存储目录
+	 */
+	private String basePath;
 	/**
 	 * 创建时间
 	 */

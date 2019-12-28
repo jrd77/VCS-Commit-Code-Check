@@ -93,6 +93,7 @@ public class RenterOrderCalCostService {
         List<RenterOrderCostDetailEntity> renterOrderCostDetailEntities = renterOrderCostCombineService.listRentAmtEntity(renterOrderCostReqDTO.getRentAmtDTO());
         int rentAmt = renterOrderCostDetailEntities.stream().collect(Collectors.summingInt(RenterOrderCostDetailEntity::getTotalAmount));
         detailList.addAll(renterOrderCostDetailEntities);
+        renterOrderCostRespDTO.setRentAmount(rentAmt);
 
         //获取平台保障费
         RenterOrderCostDetailEntity insurAmtEntity = renterOrderCostCombineService.getInsurAmtEntity(renterOrderCostReqDTO.getInsurAmtDTO());
@@ -151,27 +152,36 @@ public class RenterOrderCalCostService {
         renterOrderCostRespDTO.setRenterOrderCostDetailDTOList(detailList);
         LOGGER.info("获取费用项和费用明细列表 renterOrderCostRespDTO:[{}]", JSON.toJSONString(renterOrderCostRespDTO));
 
+
+        return renterOrderCostRespDTO;
+    }
+
+    /*
+     * @Author ZhangBin
+     * @Date 2019/12/28 17:37
+     * @Description: 保存费用及其费用明细
+     * 
+     **/
+    public void saveOrderCostAndDeailList(RenterOrderCostRespDTO renterOrderCostRespDTO){
+        List<RenterOrderSubsidyDetailDTO> renterOrderSubsidyDetailDTOList = renterOrderCostRespDTO.getRenterOrderSubsidyDetailDTOList();
         //数据转化
-        List<RenterOrderSubsidyDetailEntity> subsidyListEntity = subsidyList.stream().map(x -> {
+        List<RenterOrderSubsidyDetailEntity> subsidyListEntity = renterOrderSubsidyDetailDTOList.stream().map(x -> {
             RenterOrderSubsidyDetailEntity renterOrderSubsidyDetailEntity = new RenterOrderSubsidyDetailEntity();
             BeanUtils.copyProperties(x, renterOrderSubsidyDetailEntity);
-            renterOrderSubsidyDetailEntity.setOrderNo(costBaseDTO.getOrderNo());
-            renterOrderSubsidyDetailEntity.setRenterOrderNo(costBaseDTO.getRenterOrderNo());
+            renterOrderSubsidyDetailEntity.setOrderNo(renterOrderCostRespDTO.getOrderNo());
+            renterOrderSubsidyDetailEntity.setRenterOrderNo(renterOrderCostRespDTO.getRenterOrderNo());
             return renterOrderSubsidyDetailEntity;
         }).collect(Collectors.toList());
-
-
         //保存费用明细
-        renterOrderCostDetailService.saveRenterOrderCostDetailBatch(detailList);
+        renterOrderCostDetailService.saveRenterOrderCostDetailBatch(renterOrderCostRespDTO.getRenterOrderCostDetailDTOList());
         //保存补贴明细
         renterOrderSubsidyDetailService.saveRenterOrderSubsidyDetailBatch(subsidyListEntity);
         //保存费用统计信息
         RenterOrderCostEntity renterOrderCostEntity = new RenterOrderCostEntity();
         BeanUtils.copyProperties(renterOrderCostRespDTO,renterOrderCostEntity);
-        renterOrderCostEntity.setOrderNo(costBaseDTO.getOrderNo());
-        renterOrderCostEntity.setRenterOrderNo(costBaseDTO.getRenterOrderNo());
+        renterOrderCostEntity.setOrderNo(renterOrderCostRespDTO.getOrderNo());
+        renterOrderCostEntity.setRenterOrderNo(renterOrderCostRespDTO.getRenterOrderNo());
         renterOrderCostService.saveRenterOrderCost(renterOrderCostEntity);
-        return renterOrderCostRespDTO;
     }
 
 
