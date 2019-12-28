@@ -613,6 +613,8 @@ public class RenterOrderCostCombineService {
             Cat.logError("Feign 获取取还车费用接口异常",getReturnCostErrorException);
             t.setStatus(getReturnCostErrorException);
             throw getReturnCostErrorException;
+        }finally {
+            t.complete();
         }
         List<PriceFbcFeeResponseDetail> fbcFeeResults = responseData.getData().getFbcFeeResults();
 
