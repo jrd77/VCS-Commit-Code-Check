@@ -9,7 +9,7 @@ import lombok.Data;
  * 车主端商品概览表
  * 
  * @author ZhangBin
- * @date 2019-12-19 16:56:56
+ * @date 2019-12-28 10:14:35
  * @Description:
  */
 @Data
@@ -160,6 +160,26 @@ public class OwnerGoodsEntity implements Serializable {
 	 * 选择的车辆地址序号
 	 */
 	private Integer carAddrIndex;
+	/**
+	 * 停运费比例
+	 */
+	private Double stopCostRate;
+	/**
+	 * 动力源：1-纯电动，2-汽油，3-油电混动，4-柴油，5-天然气，6-石油气
+	 */
+	private Integer engineSource;
+	/**
+	 * 车架号
+	 */
+	private String frameNo;
+	/**
+	 * 发动机号
+	 */
+	private String engineNum;
+	/**
+	 * 平台服务费比例/代官车服务费比例（仅车主端有）
+	 */
+	private Double serviceRate;
 	/**
 	 * 创建时间
 	 */
