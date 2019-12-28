@@ -72,10 +72,11 @@ public class AccountRenterDepositEntity implements Serializable {
 	 * 剩余预授权金额
 	 */
 	private Integer surplusAuthorizeDepositAmt;
-	/**
-	 * 开启免押
-	 */
-	private Integer isFreeDeposit;
+
+    /**
+     * 免押方式
+     */
+    private Integer freeDepositType;
 	/**
 	 * 更新版本号
 	 */
