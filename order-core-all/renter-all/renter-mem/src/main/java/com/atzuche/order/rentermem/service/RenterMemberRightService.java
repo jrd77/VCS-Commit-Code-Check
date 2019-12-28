@@ -28,7 +28,7 @@ public class RenterMemberRightService{
      * @param carDepositAmt 车辆押金
      * @return  会员权益车辆押金计算
      */
-    public int carDepositAmt(List<RenterMemberRightDTO> renterMemberRightDTOList, Integer carDepositAmt){
+    public int carDepositAmt(List<RenterMemberRightDTO> renterMemberRightDTOList, Integer carDepositAmt,Integer guidPrice){
         if(carDepositAmt == null){
             CalCarDepositAmtException calDepositAmtException = new CalCarDepositAmtException();
             Cat.logError(calDepositAmtException);

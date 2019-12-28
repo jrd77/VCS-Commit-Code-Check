@@ -54,5 +54,13 @@ public class GetReturnCarCostReqDto {
      * 租金+保险+不计免赔+手续费（不需要传递）
      */
     private Integer sumJudgeFreeFee;
+    /**
+     * 是否计算取车费用
+     */
+    private Boolean isGetCarCost;
+    /**
+     * 是否计算还车费用
+     */
+    private Boolean isReturnCarCost;
 
 }

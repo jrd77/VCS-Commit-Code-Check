@@ -203,6 +203,7 @@ public class MemberService {
         MemberBaseInfo memberBaseInfo = memberTotalInfo.getMemberBaseInfo();
         MemberAdditionInfo memberAdditionInfo = memberTotalInfo.getMemberAdditionInfo();
         MemberStatisticsInfo memberStatisticsInfo = memberTotalInfo.getMemberStatisticsInfo();
+        MemberRoleInfo memberRoleInfo = memberTotalInfo.getMemberRoleInfo();
         RenterMemberDTO renterMemberDto = new RenterMemberDTO();
         renterMemberDto.setMemNo(memNo);
         renterMemberDto.setPhone(memberCoreInfo.getPhone());
@@ -218,8 +219,9 @@ public class MemberService {
         renterMemberDto.setDriViceLicAuth(memberAuthInfo.getDriViceLicAuth());
         renterMemberDto.setOrderSuccessCount(memberStatisticsInfo.getSuccessOrderNum());
         renterMemberDto.setCommUseDriverList(memberAdditionInfo.getCommUseDriverList());
+        renterMemberDto.setIsNew(memberRoleInfo.getIsNew());
         List<RenterMemberRightDTO> rights = new ArrayList<>();
-        MemberRoleInfo memberRoleInfo = memberTotalInfo.getMemberRoleInfo();
+
         if(memberRoleInfo != null){
             if(memberRoleInfo.getInternalStaff()!=null){
                 RenterMemberRightDTO internalStaff = new RenterMemberRightDTO();
