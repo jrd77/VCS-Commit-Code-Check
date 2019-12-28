@@ -17,6 +17,10 @@ public class AccountPayAbleResVO {
      * 会员号
      */
     private String memNo;
+    /**
+     * 名称
+     */
+    private String title;
 
     /**
      * 代付款项
@@ -29,10 +33,18 @@ public class AccountPayAbleResVO {
 
     private AccountPayAbleResVO(){}
 
-    public AccountPayAbleResVO(String orderNo, String memNo, Integer amt, RenterCashCodeEnum renterCashCode) {
+    public AccountPayAbleResVO(String orderNo, String memNo, Integer amt, RenterCashCodeEnum renterCashCode,String title) {
         this.orderNo = orderNo;
         this.memNo = memNo;
         this.amt = amt;
         this.renterCashCode = renterCashCode;
+        this.title = title;
+    }
+
+    public AccountPayAbleResVO(String orderNo, String memNo, Integer amt, String title) {
+        this.orderNo = orderNo;
+        this.memNo = memNo;
+        this.amt = amt;
+        this.title = title;
     }
 }
