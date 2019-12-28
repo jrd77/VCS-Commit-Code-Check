@@ -9,7 +9,7 @@ import lombok.Data;
  * 租客商品概览表
  * 
  * @author ZhangBin
- * @date 2019-12-19 16:56:56
+ * @date 2019-12-28 10:14:35
  * @Description:
  */
 @Data
@@ -105,7 +105,7 @@ public class RenterGoodsEntity implements Serializable {
 	 */
 	private String carImageUrl;
 	/**
-	 * 车辆类型，代管车..
+	 * 车主类型:5个人车主、10租赁公司、15其他 、20托管车辆-交易用、25托管车辆-工作用、30短期托管车、35代管车辆
 	 */
 	private Integer carOwnerType;
 	/**
@@ -160,6 +160,22 @@ public class RenterGoodsEntity implements Serializable {
 	 * 选择的车辆地址序号
 	 */
 	private Integer carAddrIndex;
+	/**
+	 * 停运费比例
+	 */
+	private Double stopCostRate;
+	/**
+	 * 动力源：1-纯电动，2-汽油，3-油电混动，4-柴油，5-天然气，6-石油气
+	 */
+	private Integer engineSource;
+	/**
+	 * 车架号
+	 */
+	private String frameNo;
+	/**
+	 * 发动机号
+	 */
+	private String engineNum;
 	/**
 	 * 创建时间
 	 */
