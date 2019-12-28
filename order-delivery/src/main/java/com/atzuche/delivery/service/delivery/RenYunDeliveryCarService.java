@@ -11,6 +11,7 @@ import com.atzuche.delivery.exception.DeliveryBusinessException;
 import com.atzuche.delivery.utils.DeliveryLogUtil;
 import com.atzuche.delivery.vo.delivery.CancelFlowOrderDTO;
 import com.atzuche.delivery.vo.delivery.RenYunFlowOrderDTO;
+import com.atzuche.delivery.vo.delivery.UpdateFlowOrderDTO;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
 import com.dianping.cat.Cat;
@@ -57,8 +58,8 @@ public class RenYunDeliveryCarService {
     /**
      * 更新订单到仁云流程系统
      */
-    public String updateRenYunFlowOrderInfo(RenYunFlowOrderDTO renYunFlowOrderVO) {
-        String result = sendHttpToRenYun(DeliveryConstants.CHANGE_FLOW_ORDER, renYunFlowOrderVO, DeliveryTypeEnum.UPDATE_TYPE.getValue().intValue());
+    public String updateRenYunFlowOrderInfo(UpdateFlowOrderDTO updateFlowOrderDTO) {
+        String result = sendHttpToRenYun(DeliveryConstants.CHANGE_FLOW_ORDER, updateFlowOrderDTO, DeliveryTypeEnum.UPDATE_TYPE.getValue().intValue());
         return result;
     }
 

@@ -3,6 +3,7 @@ package com.atzuche.delivery.service.delivery;
 import com.atzuche.delivery.common.DeliveryCarTask;
 import com.atzuche.delivery.vo.delivery.CancelFlowOrderDTO;
 import com.atzuche.delivery.vo.delivery.RenYunFlowOrderDTO;
+import com.atzuche.delivery.vo.delivery.UpdateFlowOrderDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -26,7 +27,7 @@ public class DeliveryCarService {
     /**
      * 更新订单到仁云流程系统
      */
-    public void updateRenYunFlowOrderInfo(RenYunFlowOrderDTO renYunFlowOrderDTO) {
+    public void updateRenYunFlowOrderInfo(UpdateFlowOrderDTO updateFlowOrderDTO) {
         deliveryCarTask.updateRenYunFlowOrderInfo(null);
     }
 
