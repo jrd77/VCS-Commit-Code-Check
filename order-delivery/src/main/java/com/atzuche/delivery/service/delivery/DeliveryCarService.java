@@ -2,12 +2,11 @@ package com.atzuche.delivery.service.delivery;
 
 import com.atzuche.delivery.common.DeliveryCarTask;
 import com.atzuche.delivery.common.DeliveryErrorCode;
-import com.atzuche.delivery.exception.DeliveryBusinessException;
+import com.atzuche.delivery.exception.DeliveryOrderException;
 import com.atzuche.delivery.vo.delivery.CancelFlowOrderDTO;
 import com.atzuche.delivery.vo.delivery.OrderDeliveryVO;
 import com.atzuche.delivery.vo.delivery.RenYunFlowOrderDTO;
 import com.atzuche.delivery.vo.delivery.UpdateFlowOrderDTO;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -28,7 +27,7 @@ public class DeliveryCarService {
 
         if(null == orderDeliveryVO || orderDeliveryVO.getOrderDeliveryDTO() == null)
         {
-            throw new DeliveryBusinessException(DeliveryErrorCode.DELIVERY_PARAMS_ERROR);
+            throw new DeliveryOrderException(DeliveryErrorCode.DELIVERY_PARAMS_ERROR);
         }
         if(orderDeliveryVO.getOrderDeliveryDTO().getIsNotifyRenyun().intValue() == 0)
         {
