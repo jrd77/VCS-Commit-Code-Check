@@ -6,29 +6,34 @@ import com.atzuche.order.commons.CatConstants;
 import com.atzuche.order.commons.enums.RabbitBusinessTypeEnum;
 import com.atzuche.order.commons.service.RabbitMsgLogService;
 import com.autoyol.commons.utils.GsonUtils;
+import com.autoyol.event.rabbit.pay.PayRabbitMQEventEnum;
 import com.dianping.cat.Cat;
 import com.dianping.cat.message.Transaction;
 import com.rabbitmq.client.Channel;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.amqp.core.Message;
-import org.springframework.amqp.rabbit.annotation.*;
+import org.springframework.amqp.core.*;
+import org.springframework.amqp.rabbit.annotation.RabbitHandler;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
 
 /**
  * 支付系统回调
+ * @author haibao.yan
  */
 @Component
 @Slf4j
 public class OrderPayCallBackRabbitConfig {
     @Autowired RabbitMsgLogService rabbitMsgLogService;
     @Autowired CashierPayService cashierPayService;
+
     /**
      * 支付系统回调
      * MQ 异步回调
      */
-    @RabbitListener(queues="${xxx}")
+    @RabbitListener(queues="auto-pay-queue")
     @RabbitHandler
     public void payCallBack(Message message, Channel channel){
         log.info("OrderPayCallBack payCallBack start param;[{}]", message);
@@ -53,5 +58,19 @@ public class OrderPayCallBackRabbitConfig {
         log.info("OrderPayCallBack payCallBack end " );
     }
 
+    @Bean
+    public Queue TestDirectQueue() {
+        return new Queue("auto-pay-queue",true);
+    }
+
+    @Bean
+    DirectExchange TestDirectExchange() {
+        return new DirectExchange(PayRabbitMQEventEnum.AUTO_PAY.exchange);
+    }
+
+    @Bean
+    Binding bindingDirect() {
+        return BindingBuilder.bind(TestDirectQueue()).to(TestDirectExchange()).with(PayRabbitMQEventEnum.AUTO_PAY.exchange);
+    }
 
 }

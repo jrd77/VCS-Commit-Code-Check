@@ -24,10 +24,7 @@ public class CreateOrderRenterReductionDepositReqVO {
      * 减免金额
      */
     private Integer amt;
-    /**
-     * 减免类型
-     */
-    private Integer type;
+
     /**
      * 减免类型名称
      */
@@ -57,7 +54,6 @@ public class CreateOrderRenterReductionDepositReqVO {
         Assert.notNull(getOrderNo(), ErrorCode.PARAMETER_ERROR.getText());
         Assert.notNull(getMemNo(), ErrorCode.PARAMETER_ERROR.getText());
         Assert.notNull(getAmt(), ErrorCode.PARAMETER_ERROR.getText());
-        Assert.notNull(getType(), ErrorCode.PARAMETER_ERROR.getText());
         Assert.notNull(getRatio(), ErrorCode.PARAMETER_ERROR.getText());
         Assert.notNull(getName(), ErrorCode.PARAMETER_ERROR.getText());
 
