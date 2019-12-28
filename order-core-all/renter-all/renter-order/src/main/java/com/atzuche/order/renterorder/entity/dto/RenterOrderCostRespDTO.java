@@ -26,15 +26,15 @@ public class RenterOrderCostRespDTO {
      */
     private Integer rentCarAmount;
     /**
-     * 佣金费用
+     * 佣金费用(手续费)
      */
     private Integer commissionAmount;
     /**
-     * 基础保障费用
+     * 基础保障费用(保险费)
      */
     private Integer basicEnsureAmount;
     /**
-     * 全面保障费用
+     * 全面保障费用(不计免赔)
      */
     private Integer comprehensiveEnsureAmount;
     /**
