@@ -109,7 +109,7 @@ public class CarService {
         renterGoodsDetailDto.setCarDayMileage(carBaseVO.getDayMileage());
         renterGoodsDetailDto.setCarIntrod(carBaseVO.getCarDesc());
         renterGoodsDetailDto.setCarSurplusPrice(carBaseVO.getSurplusPrice());
-        renterGoodsDetailDto.setCarUseSpecialPrice(reqVO.useSpecialPrice);
+        //renterGoodsDetailDto.setCarUseSpecialPrice(reqVO.useSpecialPrice);
         renterGoodsDetailDto.setCarGuidePrice(carBaseVO.getGuidePrice());
         renterGoodsDetailDto.setCarStatus(carBaseVO.getStatus());
         renterGoodsDetailDto.setCarImageUrl(getCoverPic(detailImageVO));
@@ -128,6 +128,14 @@ public class CarService {
         renterGoodsDetailDto.setCarRealLat(carAddressOfTransVO.getRealAddressLat()==null?"":String.valueOf(carAddressOfTransVO.getRealAddressLat()));
         renterGoodsDetailDto.setOwnerMemNo(String.valueOf(carBaseVO.getOwnerNo()));
         renterGoodsDetailDto.setLabelIds(carTagVO == null?new ArrayList<>():carTagVO.getLabelIds());
+        renterGoodsDetailDto.setEngineSource(carBaseVO.getEngineSource());
+        renterGoodsDetailDto.setFrameNo(carBaseVO.getFrameNo());
+        renterGoodsDetailDto.setEngineNum(carBaseVO.getEngineNum());
+        renterGoodsDetailDto.setCarTag(carTagVO == null?"":String.join(",",carTagVO.getLabelIds()));
+       // renterGoodsDetailDto.setCarInmsrp();
+       // renterGoodsDetailDto.setStopCostRate();
+       // renterGoodsDetailDto.setServiceRate();
+
         List<RenterGoodsPriceDetailDTO> list = new ArrayList<>();
         List<CarPriceOfDayVO> daysPrice = data.getDaysPrice();
         if(daysPrice == null){

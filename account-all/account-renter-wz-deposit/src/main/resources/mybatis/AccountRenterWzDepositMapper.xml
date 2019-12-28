@@ -10,7 +10,7 @@
         <result property="yingshouDeposit" column="yingshou_deposit"/>
         <result property="shishouDeposit" column="shishou_deposit"/>
         <result property="isAuthorize" column="is_authorize"/>
-        <result property="isFreeDeposit" column="is_free_deposit"/>
+        <result property="freeDepositType" column="free_deposit_type"/>
         <result property="shouldReturnDeposit" column="should_return_deposit"/>
         <result property="realReturnDeposit" column="real_return_deposit"/>
         <result property="settleStatus" column="settle_status"/>
@@ -31,7 +31,7 @@
 	`yingshou_deposit`, 	
 	`shishou_deposit`, 	
 	`is_authorize`, 	
-	`is_free_deposit`, 	
+	`free_deposit_type`,
 	`should_return_deposit`, 	
 	`real_return_deposit`, 	
 	`settle_status`, 	
@@ -59,7 +59,7 @@
 				`yingshou_deposit`,		
 				`shishou_deposit`,		
 				`is_authorize`,		
-				`is_free_deposit`,		
+				`free_deposit_type`,
 				`should_return_deposit`,		
 				`real_return_deposit`,		
 				`settle_status`,		
@@ -78,7 +78,7 @@
 				#{yingshouDeposit}, 		
 				#{shishouDeposit}, 		
 				#{isAuthorize}, 		
-				#{isFreeDeposit}, 		
+				#{freeDepositType},
 				#{shouldReturnDeposit}, 		
 				#{realReturnDeposit}, 		
 				#{settleStatus}, 		
@@ -100,7 +100,7 @@
 				<if test="yingshouDeposit != null">`yingshou_deposit` = #{yingshouDeposit}, </if>
 				<if test="shishouDeposit != null">`shishou_deposit` = #{shishouDeposit}, </if>
 				<if test="isAuthorize != null">`is_authorize` = #{isAuthorize}, </if>
-				<if test="isFreeDeposit != null">`is_free_deposit` = #{isFreeDeposit}, </if>
+				<if test="freeDepositType != null">`free_deposit_type` = #{freeDepositType}, </if>
 				<if test="shouldReturnDeposit != null">`should_return_deposit` = #{shouldReturnDeposit}, </if>
 				<if test="realReturnDeposit != null">`real_return_deposit` = #{realReturnDeposit}, </if>
 				<if test="settleStatus != null">`settle_status` = #{settleStatus}, </if>

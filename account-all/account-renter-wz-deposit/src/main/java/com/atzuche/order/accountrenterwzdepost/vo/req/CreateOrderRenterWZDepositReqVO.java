@@ -1,5 +1,6 @@
 package com.atzuche.order.accountrenterwzdepost.vo.req;
 
+import com.atzuche.order.commons.enums.account.FreeDepositTypeEnum;
 import com.autoyol.commons.web.ErrorCode;
 import lombok.Data;
 import org.springframework.util.Assert;
@@ -28,6 +29,11 @@ public class CreateOrderRenterWZDepositReqVO {
     private String payKind;
 
     /**
+     * 免押方式
+     */
+    private FreeDepositTypeEnum freeDepositType;
+
+    /**
      * 支付业务，只对接业务的APPID 短租：20,长租：21,PMS：22,套餐：23
      */
     private String atappId;
@@ -40,5 +46,7 @@ public class CreateOrderRenterWZDepositReqVO {
         Assert.notNull(getMemNo(), ErrorCode.PARAMETER_ERROR.getText());
         Assert.notNull(getYingfuDepositAmt(), ErrorCode.PARAMETER_ERROR.getText());
         Assert.isTrue(getYingfuDepositAmt()==0, ErrorCode.PARAMETER_ERROR.getText());
+        Assert.notNull(getFreeDepositType(), ErrorCode.PARAMETER_ERROR.getText());
+
     }
 }
