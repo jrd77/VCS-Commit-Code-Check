@@ -93,4 +93,12 @@ public class ModifyOrderDTO {
 	 * 修改哪种操作标记
 	 */
 	private ModifyFlagDTO modifyFlagDTO;
+	/**
+     * 提前时间（分钟数）
+     */
+    private Integer getCarBeforeTime;
+    /**
+     * 延后时间（分钟数）
+     */
+    private Integer returnCarAfterTime;
 }
