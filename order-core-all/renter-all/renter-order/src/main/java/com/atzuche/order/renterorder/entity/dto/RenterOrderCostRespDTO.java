@@ -22,6 +22,10 @@ public class RenterOrderCostRespDTO {
      */
     private String memNo;
     /**
+     * 租金
+     */
+    private Integer rentAmount;
+    /**
      * 租车费用
      */
     private Integer rentCarAmount;
