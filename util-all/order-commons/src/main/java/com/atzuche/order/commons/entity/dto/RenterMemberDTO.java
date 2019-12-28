@@ -1,5 +1,6 @@
 package com.atzuche.order.commons.entity.dto;
 
+import com.autoyol.doc.annotation.AutoDocProperty;
 import com.autoyol.member.detail.vo.res.CommUseDriverInfo;
 import lombok.Data;
 
@@ -76,4 +77,9 @@ public class RenterMemberDTO {
      * 常用驾驶人列表
      */
     private List<CommUseDriverInfo> commUseDriverList;
+
+    /**
+     * 是否是新用户:0，否;1，是，定义没有已结算订单的用户为新用户
+     */
+    private Integer isNew;
 }

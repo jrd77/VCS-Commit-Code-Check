@@ -93,6 +93,7 @@ public class RenterOrderCalCostService {
         List<RenterOrderCostDetailEntity> renterOrderCostDetailEntities = renterOrderCostCombineService.listRentAmtEntity(renterOrderCostReqDTO.getRentAmtDTO());
         int rentAmt = renterOrderCostDetailEntities.stream().collect(Collectors.summingInt(RenterOrderCostDetailEntity::getTotalAmount));
         detailList.addAll(renterOrderCostDetailEntities);
+        renterOrderCostRespDTO.setRentAmount(rentAmt);
 
         //获取平台保障费
         RenterOrderCostDetailEntity insurAmtEntity = renterOrderCostCombineService.getInsurAmtEntity(renterOrderCostReqDTO.getInsurAmtDTO());
@@ -101,6 +102,7 @@ public class RenterOrderCalCostService {
         detailList.add(insurAmtEntity);
 
         //获取全面保障费
+
         List<RenterOrderCostDetailEntity> comprehensiveEnsureList = renterOrderCostCombineService.listAbatementAmtEntity(renterOrderCostReqDTO.getAbatementAmtDTO());
         int comprehensiveEnsureAmount = comprehensiveEnsureList.stream().collect(Collectors.summingInt(RenterOrderCostDetailEntity::getTotalAmount));
         renterOrderCostRespDTO.setComprehensiveEnsureAmount(comprehensiveEnsureAmount);
