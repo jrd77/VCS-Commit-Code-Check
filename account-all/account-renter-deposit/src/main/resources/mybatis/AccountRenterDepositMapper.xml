@@ -18,7 +18,7 @@
         <result property="surplusCreditPayAmt" column="surplus_credit_pay_amt"/>
         <result property="surplusDepositAmt" column="surplus_deposit_amt"/>
         <result property="surplusAuthorizeDepositAmt" column="surplus_authorize_deposit_amt"/>
-        <result property="isFreeDeposit" column="is_free_deposit"/>
+        <result property="freeDepositType" column="free_deposit_type"/>
         <result property="version" column="version"/>
         <result property="createTime" column="create_time"/>
         <result property="createOp" column="create_op"/>
@@ -43,7 +43,7 @@
 	 surplus_credit_pay_amt,
 	`surplus_deposit_amt`, 	
 	`surplus_authorize_deposit_amt`, 	
-	`is_free_deposit`, 	
+	`free_deposit_type`,
 	`version`, 	
 	`create_time`, 	
 	`create_op`, 	
@@ -75,7 +75,7 @@
 				 surplus_credit_pay_amt,
 				`surplus_deposit_amt`,		
 				`surplus_authorize_deposit_amt`,		
-				`is_free_deposit`,		
+				`free_deposit_type`,
 				`version`,		
 				`create_time`,		
 				`create_op`,		
@@ -99,7 +99,7 @@
 				#{surplusCreditPayAmt},
 				#{surplusDepositAmt}, 		
 				#{surplusAuthorizeDepositAmt}, 		
-				#{isFreeDeposit}, 		
+				#{freeDepositType},
 				#{version}, 		
 				#{createTime}, 		
 				#{createOp}, 		
@@ -126,7 +126,7 @@
 
                 <if test="surplusDepositAmt != null">`surplus_deposit_amt` = #{surplusDepositAmt}, </if>
 				<if test="surplusAuthorizeDepositAmt != null">`surplus_authorize_deposit_amt` = #{surplusAuthorizeDepositAmt}, </if>
-				<if test="isFreeDeposit != null">`is_free_deposit` = #{isFreeDeposit}, </if>
+				<if test="freeDepositType != null">`free_deposit_type` = #{freeDepositType}, </if>
                 version = version + 1,
 				<if test="createTime != null">`create_time` = #{createTime}, </if>
 				<if test="createOp != null">`create_op` = #{createOp}, </if>

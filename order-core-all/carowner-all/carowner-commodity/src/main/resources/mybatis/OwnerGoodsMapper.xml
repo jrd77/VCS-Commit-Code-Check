@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
+
 <mapper namespace="com.atzuche.order.owner.commodity.mapper.OwnerGoodsMapper">
 
     <resultMap type="com.atzuche.order.owner.commodity.entity.OwnerGoodsEntity" id="BaseResultMap">
@@ -40,6 +41,11 @@
         <result property="carRealLon" column="car_real_lon"/>
         <result property="carRealLat" column="car_real_lat"/>
         <result property="carAddrIndex" column="car_addr_index"/>
+        <result property="stopCostRate" column="stop_cost_rate"/>
+        <result property="engineSource" column="engine_source"/>
+        <result property="frameNo" column="frame_no"/>
+        <result property="engineNum" column="engine_num"/>
+        <result property="serviceRate" column="service_rate"/>
         <result property="createTime" column="create_time"/>
         <result property="createOp" column="create_op"/>
         <result property="updateTime" column="update_time"/>
@@ -48,321 +54,364 @@
     </resultMap>
 
 
-	<sql id="Base_Column_List">
-	`id`, 	
-	`order_no`, 	
-	`owner_order_no`, 	
-	`reply_flag`, 	
-	`car_no`, 	
-	`car_plate_num`, 	
-	`car_brand`, 	
-	`car_brand_txt`, 	
-	`car_rating`, 	
-	`car_type`, 	
-	`car_type_txt`, 	
+    <sql id="Base_Column_List">
+	`id`,
+	`order_no`,
+	`owner_order_no`,
+	`reply_flag`,
+	`car_no`,
+	`car_plate_num`,
+	`car_brand`,
+	`car_brand_txt`,
+	`car_rating`,
+	`car_type`,
+	`car_type_txt`,
 	`car_cylinder_capacity`,
-	`car_gearbox_type`, 	
-	`car_day_mileage`, 	
-	`car_introd`, 	
-	`car_surplus_price`, 	
+	`car_cc_unit`,
+	`car_gearbox_type`,
+	`car_day_mileage`,
+	`car_introd`,
+	`car_surplus_price`,
 	`car_guide_price`,
-	`car_inmsrp`, 	
-	`car_tag`, 	
-	`car_status`, 	
-	`car_image_url`, 	
-	`car_owner_type`, 	
-	`car_use_type`, 	
-	`car_oil_volume`, 	
-	`car_engine_type`, 	
-	`car_desc`, 	
-	`car_steward_phone`, 	
-	`car_check_status`, 	
-	`car_show_addr`, 	
-	`car_show_lon`, 	
-	`car_show_lat`, 	
-	`car_real_addr`, 	
-	`car_real_lon`, 	
-	`car_real_lat`, 	
-	`car_addr_index`, 	
-	`create_time`, 	
-	`create_op`, 	
-	`update_time`, 	
-	`update_op`, 	
-	`is_delete`	
+	`car_inmsrp`,
+	`car_tag`,
+	`car_status`,
+	`car_image_url`,
+	`car_owner_type`,
+	`car_use_type`,
+	`car_oil_volume`,
+	`car_engine_type`,
+	`car_desc`,
+	`car_steward_phone`,
+	`car_check_status`,
+	`car_show_addr`,
+	`car_show_lon`,
+	`car_show_lat`,
+	`car_real_addr`,
+	`car_real_lon`,
+	`car_real_lat`,
+	`car_addr_index`,
+	`stop_cost_rate`,
+	`engine_source`,
+	`frame_no`,
+	`engine_num`,
+	`service_rate`,
+	`create_time`,
+	`create_op`,
+	`update_time`,
+	`update_op`,
+	`is_delete`
 
 	</sql>
 
 
-	<select id="selectByPrimaryKey" resultMap="BaseResultMap">
-		select <include refid="Base_Column_List" /> from owner_goods where id = #{value}
-	</select>
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List" /> from owner_goods where id = #{value}
+    </select>
 
-	<insert id="insert" parameterType="com.atzuche.order.owner.commodity.entity.OwnerGoodsEntity" useGeneratedKeys="true" keyProperty="id">
-		insert into owner_goods
-		(
-				`order_no`,		
-				`owner_order_no`,		
-				`reply_flag`,		
-				`car_no`,		
-				`car_plate_num`,		
-				`car_brand`,		
-				`car_brand_txt`,		
-				`car_rating`,		
-				`car_type`,		
-				`car_type_txt`,		
-				`car_cylinder_capacity`,
-                `car_cc_unit`,
-				`car_gearbox_type`,		
-				`car_day_mileage`,		
-				`car_introd`,		
-				`car_surplus_price`,		
-				`car_guide_price`,
-				`car_inmsrp`,		
-				`car_tag`,		
-				`car_status`,		
-				`car_image_url`,		
-				`car_owner_type`,		
-				`car_use_type`,		
-				`car_oil_volume`,		
-				`car_engine_type`,		
-				`car_desc`,		
-				`car_steward_phone`,		
-				`car_check_status`,		
-				`car_show_addr`,		
-				`car_show_lon`,		
-				`car_show_lat`,		
-				`car_real_addr`,		
-				`car_real_lon`,		
-				`car_real_lat`,		
-				`car_addr_index`,		
-				`create_op`,
-				`update_op`
+    <insert id="insert" parameterType="com.atzuche.order.owner.commodity.entity.OwnerGoodsEntity" useGeneratedKeys="true" keyProperty="id">
+        insert into owner_goods
+        (
+        `order_no`,
+        `owner_order_no`,
+        `reply_flag`,
+        `car_no`,
+        `car_plate_num`,
+        `car_brand`,
+        `car_brand_txt`,
+        `car_rating`,
+        `car_type`,
+        `car_type_txt`,
+        `car_cylinder_capacity`,
+        `car_cc_unit`,
+        `car_gearbox_type`,
+        `car_day_mileage`,
+        `car_introd`,
+        `car_surplus_price`,
+        `car_guide_price`,
+        `car_inmsrp`,
+        `car_tag`,
+        `car_status`,
+        `car_image_url`,
+        `car_owner_type`,
+        `car_use_type`,
+        `car_oil_volume`,
+        `car_engine_type`,
+        `car_desc`,
+        `car_steward_phone`,
+        `car_check_status`,
+        `car_show_addr`,
+        `car_show_lon`,
+        `car_show_lat`,
+        `car_real_addr`,
+        `car_real_lon`,
+        `car_real_lat`,
+        `car_addr_index`,
+        `stop_cost_rate`,
+        `engine_source`,
+        `frame_no`,
+        `engine_num`,
+        `service_rate`,
+        `create_time`,
+        `create_op`,
+        `update_time`,
+        `update_op`,
+        `is_delete`
+        )
+        values
+        (
+        #{orderNo},
+        #{ownerOrderNo},
+        #{replyFlag},
+        #{carNo},
+        #{carPlateNum},
+        #{carBrand},
+        #{carBrandTxt},
+        #{carRating},
+        #{carType},
+        #{carTypeTxt},
+        #{carCylinderCapacity},
+        #{carCcUnit},
+        #{carGearboxType},
+        #{carDayMileage},
+        #{carIntrod},
+        #{carSurplusPrice},
+        #{carGuidePrice},
+        #{carInmsrp},
+        #{carTag},
+        #{carStatus},
+        #{carImageUrl},
+        #{carOwnerType},
+        #{carUseType},
+        #{carOilVolume},
+        #{carEngineType},
+        #{carDesc},
+        #{carStewardPhone},
+        #{carCheckStatus},
+        #{carShowAddr},
+        #{carShowLon},
+        #{carShowLat},
+        #{carRealAddr},
+        #{carRealLon},
+        #{carRealLat},
+        #{carAddrIndex},
+        #{stopCostRate},
+        #{engineSource},
+        #{frameNo},
+        #{engineNum},
+        #{serviceRate},
+        #{createTime},
+        #{createOp},
+        #{updateTime},
+        #{updateOp},
+        #{isDelete}
+        )
+    </insert>
 
-			)
-		values
-		(
-				#{orderNo}, 		
-				#{ownerOrderNo}, 		
-				#{replyFlag}, 		
-				#{carNo}, 		
-				#{carPlateNum}, 		
-				#{carBrand}, 		
-				#{carBrandTxt}, 		
-				#{carRating}, 		
-				#{carType}, 		
-				#{carTypeTxt}, 		
-				#{carCylinderCapacity},
-                #{carCcUnit},
-				#{carGearboxType}, 		
-				#{carDayMileage}, 		
-				#{carIntrod}, 		
-				#{carSurplusPrice}, 		
-				#{carGuidePrice},
-				#{carInmsrp}, 		
-				#{carTag}, 		
-				#{carStatus}, 		
-				#{carImageUrl}, 		
-				#{carOwnerType}, 		
-				#{carUseType}, 		
-				#{carOilVolume}, 		
-				#{carEngineType}, 		
-				#{carDesc}, 		
-				#{carStewardPhone}, 		
-				#{carCheckStatus}, 		
-				#{carShowAddr}, 		
-				#{carShowLon}, 		
-				#{carShowLat}, 		
-				#{carRealAddr}, 		
-				#{carRealLon}, 		
-				#{carRealLat}, 		
-				#{carAddrIndex}, 		
-				#{createOp},
-				#{updateOp}
-			)
-	</insert>
-	
-	<insert id="insertSelective" parameterType="com.atzuche.order.owner.commodity.entity.OwnerGoodsEntity" useGeneratedKeys="true" keyProperty="id">
-		insert into owner_goods
-		(
-				<if test="orderNo != null">`order_no`, </if>
-				<if test="ownerOrderNo != null">`owner_order_no`, </if>
-				<if test="replyFlag != null">`reply_flag`, </if>
-				<if test="carNo != null">`car_no`, </if>
-				<if test="carPlateNum != null">`car_plate_num`, </if>
-				<if test="carBrand != null">`car_brand`, </if>
-				<if test="carBrandTxt != null">`car_brand_txt`, </if>
-				<if test="carRating != null">`car_rating`, </if>
-				<if test="carType != null">`car_type`, </if>
-				<if test="carTypeTxt != null">`car_type_txt`, </if>
-				<if test="carCylinderCapacity != null">`car_cylinder_capacity`, </if>
-                <if test="carCcUnit != null">`car_cc_unit`,</if>
-				<if test="carGearboxType != null">`car_gearbox_type`, </if>
-				<if test="carDayMileage != null">`car_day_mileage`, </if>
-				<if test="carIntrod != null">`car_introd`, </if>
-				<if test="carSurplusPrice != null">`car_surplus_price`, </if>
-				<if test="carGuidePrice != null">`car_guide_price`, </if>
-				<if test="carInmsrp != null">`car_inmsrp`, </if>
-				<if test="carTag != null">`car_tag`, </if>
-				<if test="carStatus != null">`car_status`, </if>
-				<if test="carImageUrl != null">`car_image_url`, </if>
-				<if test="carOwnerType != null">`car_owner_type`, </if>
-				<if test="carUseType != null">`car_use_type`, </if>
-				<if test="carOilVolume != null">`car_oil_volume`, </if>
-				<if test="carEngineType != null">`car_engine_type`, </if>
-				<if test="carDesc != null">`car_desc`, </if>
-				<if test="carStewardPhone != null">`car_steward_phone`, </if>
-				<if test="carCheckStatus != null">`car_check_status`, </if>
-				<if test="carShowAddr != null">`car_show_addr`, </if>
-				<if test="carShowLon != null">`car_show_lon`, </if>
-				<if test="carShowLat != null">`car_show_lat`, </if>
-				<if test="carRealAddr != null">`car_real_addr`, </if>
-				<if test="carRealLon != null">`car_real_lon`, </if>
-				<if test="carRealLat != null">`car_real_lat`, </if>
-				<if test="carAddrIndex != null">`car_addr_index`, </if>
-				<if test="createTime != null">`create_time`, </if>
-				<if test="createOp != null">`create_op`, </if>
-				<if test="updateTime != null">`update_time`, </if>
-				<if test="updateOp != null">`update_op`, </if>
-				<if test="isDelete != null">`is_delete` </if>
-			)
-		values
-		(
-				<if test="orderNo != null">#{orderNo},  </if>
-				<if test="ownerOrderNo != null">#{ownerOrderNo},  </if>
-				<if test="replyFlag != null">#{replyFlag},  </if>
-				<if test="carNo != null">#{carNo},  </if>
-				<if test="carPlateNum != null">#{carPlateNum},  </if>
-				<if test="carBrand != null">#{carBrand},  </if>
-				<if test="carBrandTxt != null">#{carBrandTxt},  </if>
-				<if test="carRating != null">#{carRating},  </if>
-				<if test="carType != null">#{carType},  </if>
-				<if test="carTypeTxt != null">#{carTypeTxt},  </if>
-				<if test="carCylinderCapacity != null">#{carCylinderCapacity},  </if>
-                <if test="carCcUnit != null">#{carCcUnit},  </if>
-				<if test="carGearboxType != null">#{carGearboxType},  </if>
-				<if test="carDayMileage != null">#{carDayMileage},  </if>
-				<if test="carIntrod != null">#{carIntrod},  </if>
-				<if test="carSurplusPrice != null">#{carSurplusPrice},  </if>
-				<if test="carGuidePrice != null">#{carGuidePrice},  </if>
-				<if test="carInmsrp != null">#{carInmsrp},  </if>
-				<if test="carTag != null">#{carTag},  </if>
-				<if test="carStatus != null">#{carStatus},  </if>
-				<if test="carImageUrl != null">#{carImageUrl},  </if>
-				<if test="carOwnerType != null">#{carOwnerType},  </if>
-				<if test="carUseType != null">#{carUseType},  </if>
-				<if test="carOilVolume != null">#{carOilVolume},  </if>
-				<if test="carEngineType != null">#{carEngineType},  </if>
-				<if test="carDesc != null">#{carDesc},  </if>
-				<if test="carStewardPhone != null">#{carStewardPhone},  </if>
-				<if test="carCheckStatus != null">#{carCheckStatus},  </if>
-				<if test="carShowAddr != null">#{carShowAddr},  </if>
-				<if test="carShowLon != null">#{carShowLon},  </if>
-				<if test="carShowLat != null">#{carShowLat},  </if>
-				<if test="carRealAddr != null">#{carRealAddr},  </if>
-				<if test="carRealLon != null">#{carRealLon},  </if>
-				<if test="carRealLat != null">#{carRealLat},  </if>
-				<if test="carAddrIndex != null">#{carAddrIndex},  </if>
-				<if test="createTime != null">#{createTime},  </if>
-				<if test="createOp != null">#{createOp},  </if>
-				<if test="updateTime != null">#{updateTime},  </if>
-				<if test="updateOp != null">#{updateOp},  </if>
-				<if test="isDelete != null">#{isDelete} </if>
-			)
-	</insert>
-	
-	 
-	<update id="updateByPrimaryKeySelective" parameterType="com.atzuche.order.owner.commodity.entity.OwnerGoodsEntity">
-		update owner_goods 
-		<set>
-				<if test="orderNo != null">`order_no` = #{orderNo}, </if>
-				<if test="ownerOrderNo != null">`owner_order_no` = #{ownerOrderNo}, </if>
-				<if test="replyFlag != null">`reply_flag` = #{replyFlag}, </if>
-				<if test="carNo != null">`car_no` = #{carNo}, </if>
-				<if test="carPlateNum != null">`car_plate_num` = #{carPlateNum}, </if>
-				<if test="carBrand != null">`car_brand` = #{carBrand}, </if>
-				<if test="carBrandTxt != null">`car_brand_txt` = #{carBrandTxt}, </if>
-				<if test="carRating != null">`car_rating` = #{carRating}, </if>
-				<if test="carType != null">`car_type` = #{carType}, </if>
-				<if test="carTypeTxt != null">`car_type_txt` = #{carTypeTxt}, </if>
-				<if test="carCylinderCapacity != null">`car_cylinder_capacity` = #{carCylinderCapacity}, </if>
-                <if test="carCcUnit != null">`car_cc_unit` = #{carCcUnit}, </if>
-				<if test="carGearboxType != null">`car_gearbox_type` = #{carGearboxType}, </if>
-				<if test="carDayMileage != null">`car_day_mileage` = #{carDayMileage}, </if>
-				<if test="carIntrod != null">`car_introd` = #{carIntrod}, </if>
-				<if test="carSurplusPrice != null">`car_surplus_price` = #{carSurplusPrice}, </if>
-				<if test="carGuidePrice != null">`car_guide_price` = #{carGuidePrice}, </if>
-				<if test="carInmsrp != null">`car_inmsrp` = #{carInmsrp}, </if>
-				<if test="carTag != null">`car_tag` = #{carTag}, </if>
-				<if test="carStatus != null">`car_status` = #{carStatus}, </if>
-				<if test="carImageUrl != null">`car_image_url` = #{carImageUrl}, </if>
-				<if test="carOwnerType != null">`car_owner_type` = #{carOwnerType}, </if>
-				<if test="carUseType != null">`car_use_type` = #{carUseType}, </if>
-				<if test="carOilVolume != null">`car_oil_volume` = #{carOilVolume}, </if>
-				<if test="carEngineType != null">`car_engine_type` = #{carEngineType}, </if>
-				<if test="carDesc != null">`car_desc` = #{carDesc}, </if>
-				<if test="carStewardPhone != null">`car_steward_phone` = #{carStewardPhone}, </if>
-				<if test="carCheckStatus != null">`car_check_status` = #{carCheckStatus}, </if>
-				<if test="carShowAddr != null">`car_show_addr` = #{carShowAddr}, </if>
-				<if test="carShowLon != null">`car_show_lon` = #{carShowLon}, </if>
-				<if test="carShowLat != null">`car_show_lat` = #{carShowLat}, </if>
-				<if test="carRealAddr != null">`car_real_addr` = #{carRealAddr}, </if>
-				<if test="carRealLon != null">`car_real_lon` = #{carRealLon}, </if>
-				<if test="carRealLat != null">`car_real_lat` = #{carRealLat}, </if>
-				<if test="carAddrIndex != null">`car_addr_index` = #{carAddrIndex}, </if>
-				<if test="createTime != null">`create_time` = #{createTime}, </if>
-				<if test="createOp != null">`create_op` = #{createOp}, </if>
-				<if test="updateTime != null">`update_time` = #{updateTime}, </if>
-				<if test="updateOp != null">`update_op` = #{updateOp}, </if>
-				<if test="isDelete != null">`is_delete` = #{isDelete}</if>
-			</set>
-		where id = #{id}
-	</update>
-	
-	<update id="updateByPrimaryKey" parameterType="com.atzuche.order.owner.commodity.entity.OwnerGoodsEntity">
-		update owner_goods 
-		<set>
-				`order_no` = #{orderNo}, 		
-				`owner_order_no` = #{ownerOrderNo}, 		
-				`reply_flag` = #{replyFlag}, 		
-				`car_no` = #{carNo}, 		
-				`car_plate_num` = #{carPlateNum}, 		
-				`car_brand` = #{carBrand}, 		
-				`car_brand_txt` = #{carBrandTxt}, 		
-				`car_rating` = #{carRating}, 		
-				`car_type` = #{carType}, 		
-				`car_type_txt` = #{carTypeTxt}, 		
-				`car_cylinder_capacity` = #{carCylinderCapacity},
-                `car_cc_unit` = #{carCcUnit},
-				`car_gearbox_type` = #{carGearboxType}, 		
-				`car_day_mileage` = #{carDayMileage}, 		
-				`car_introd` = #{carIntrod}, 		
-				`car_surplus_price` = #{carSurplusPrice}, 		
-				`car_guide_price` = #{carGuidePrice},
-				`car_inmsrp` = #{carInmsrp}, 		
-				`car_tag` = #{carTag}, 		
-				`car_status` = #{carStatus}, 		
-				`car_image_url` = #{carImageUrl}, 		
-				`car_owner_type` = #{carOwnerType}, 		
-				`car_use_type` = #{carUseType}, 		
-				`car_oil_volume` = #{carOilVolume}, 		
-				`car_engine_type` = #{carEngineType}, 		
-				`car_desc` = #{carDesc}, 		
-				`car_steward_phone` = #{carStewardPhone}, 		
-				`car_check_status` = #{carCheckStatus}, 		
-				`car_show_addr` = #{carShowAddr}, 		
-				`car_show_lon` = #{carShowLon}, 		
-				`car_show_lat` = #{carShowLat}, 		
-				`car_real_addr` = #{carRealAddr}, 		
-				`car_real_lon` = #{carRealLon}, 		
-				`car_real_lat` = #{carRealLat}, 		
-				`car_addr_index` = #{carAddrIndex}, 		
-				`create_op` = #{createOp},
-				`update_op` = #{updateOp},
-				`is_delete` = #{isDelete}		
-	
-		</set>
-		where id = #{id}
-	</update>
+    <insert id="insertSelective" parameterType="com.atzuche.order.owner.commodity.entity.OwnerGoodsEntity" useGeneratedKeys="true" keyProperty="id">
+        insert into owner_goods
+        (
+        <if test="orderNo != null">`order_no`, </if>
+        <if test="ownerOrderNo != null">`owner_order_no`, </if>
+        <if test="replyFlag != null">`reply_flag`, </if>
+        <if test="carNo != null">`car_no`, </if>
+        <if test="carPlateNum != null">`car_plate_num`, </if>
+        <if test="carBrand != null">`car_brand`, </if>
+        <if test="carBrandTxt != null">`car_brand_txt`, </if>
+        <if test="carRating != null">`car_rating`, </if>
+        <if test="carType != null">`car_type`, </if>
+        <if test="carTypeTxt != null">`car_type_txt`, </if>
+        <if test="carCylinderCapacity != null">`car_cylinder_capacity`, </if>
+        <if test="carCcUnit != null">`car_cc_unit`, </if>
+        <if test="carGearboxType != null">`car_gearbox_type`, </if>
+        <if test="carDayMileage != null">`car_day_mileage`, </if>
+        <if test="carIntrod != null">`car_introd`, </if>
+        <if test="carSurplusPrice != null">`car_surplus_price`, </if>
+        <if test="carGuidePrice != null">`car_guide_price`, </if>
+        <if test="carInmsrp != null">`car_inmsrp`, </if>
+        <if test="carTag != null">`car_tag`, </if>
+        <if test="carStatus != null">`car_status`, </if>
+        <if test="carImageUrl != null">`car_image_url`, </if>
+        <if test="carOwnerType != null">`car_owner_type`, </if>
+        <if test="carUseType != null">`car_use_type`, </if>
+        <if test="carOilVolume != null">`car_oil_volume`, </if>
+        <if test="carEngineType != null">`car_engine_type`, </if>
+        <if test="carDesc != null">`car_desc`, </if>
+        <if test="carStewardPhone != null">`car_steward_phone`, </if>
+        <if test="carCheckStatus != null">`car_check_status`, </if>
+        <if test="carShowAddr != null">`car_show_addr`, </if>
+        <if test="carShowLon != null">`car_show_lon`, </if>
+        <if test="carShowLat != null">`car_show_lat`, </if>
+        <if test="carRealAddr != null">`car_real_addr`, </if>
+        <if test="carRealLon != null">`car_real_lon`, </if>
+        <if test="carRealLat != null">`car_real_lat`, </if>
+        <if test="carAddrIndex != null">`car_addr_index`, </if>
+        <if test="stopCostRate != null">`stop_cost_rate`, </if>
+        <if test="engineSource != null">`engine_source`, </if>
+        <if test="frameNo != null">`frame_no`, </if>
+        <if test="engineNum != null">`engine_num`, </if>
+        <if test="serviceRate != null">`service_rate`, </if>
+        <if test="createTime != null">`create_time`, </if>
+        <if test="createOp != null">`create_op`, </if>
+        <if test="updateTime != null">`update_time`, </if>
+        <if test="updateOp != null">`update_op`, </if>
+        <if test="isDelete != null">`is_delete` </if>
+        )
+        values
+        (
+        <if test="orderNo != null">#{orderNo},  </if>
+        <if test="ownerOrderNo != null">#{ownerOrderNo},  </if>
+        <if test="replyFlag != null">#{replyFlag},  </if>
+        <if test="carNo != null">#{carNo},  </if>
+        <if test="carPlateNum != null">#{carPlateNum},  </if>
+        <if test="carBrand != null">#{carBrand},  </if>
+        <if test="carBrandTxt != null">#{carBrandTxt},  </if>
+        <if test="carRating != null">#{carRating},  </if>
+        <if test="carType != null">#{carType},  </if>
+        <if test="carTypeTxt != null">#{carTypeTxt},  </if>
+        <if test="carCylinderCapacity != null">#{carCylinderCapacity},  </if>
+        <if test="carCcUnit != null">#{carCcUnit},  </if>
+        <if test="carGearboxType != null">#{carGearboxType},  </if>
+        <if test="carDayMileage != null">#{carDayMileage},  </if>
+        <if test="carIntrod != null">#{carIntrod},  </if>
+        <if test="carSurplusPrice != null">#{carSurplusPrice},  </if>
+        <if test="carGuidePrice != null">#{carGuidePrice},  </if>
+        <if test="carInmsrp != null">#{carInmsrp},  </if>
+        <if test="carTag != null">#{carTag},  </if>
+        <if test="carStatus != null">#{carStatus},  </if>
+        <if test="carImageUrl != null">#{carImageUrl},  </if>
+        <if test="carOwnerType != null">#{carOwnerType},  </if>
+        <if test="carUseType != null">#{carUseType},  </if>
+        <if test="carOilVolume != null">#{carOilVolume},  </if>
+        <if test="carEngineType != null">#{carEngineType},  </if>
+        <if test="carDesc != null">#{carDesc},  </if>
+        <if test="carStewardPhone != null">#{carStewardPhone},  </if>
+        <if test="carCheckStatus != null">#{carCheckStatus},  </if>
+        <if test="carShowAddr != null">#{carShowAddr},  </if>
+        <if test="carShowLon != null">#{carShowLon},  </if>
+        <if test="carShowLat != null">#{carShowLat},  </if>
+        <if test="carRealAddr != null">#{carRealAddr},  </if>
+        <if test="carRealLon != null">#{carRealLon},  </if>
+        <if test="carRealLat != null">#{carRealLat},  </if>
+        <if test="carAddrIndex != null">#{carAddrIndex},  </if>
+        <if test="stopCostRate != null">#{stopCostRate},  </if>
+        <if test="engineSource != null">#{engineSource},  </if>
+        <if test="frameNo != null">#{frameNo},  </if>
+        <if test="engineNum != null">#{engineNum},  </if>
+        <if test="serviceRate != null">#{serviceRate},  </if>
+        <if test="createTime != null">#{createTime},  </if>
+        <if test="createOp != null">#{createOp},  </if>
+        <if test="updateTime != null">#{updateTime},  </if>
+        <if test="updateOp != null">#{updateOp},  </if>
+        <if test="isDelete != null">#{isDelete} </if>
+        )
+    </insert>
+
+
+    <update id="updateByPrimaryKeySelective" parameterType="com.atzuche.order.owner.commodity.entity.OwnerGoodsEntity">
+        update owner_goods
+        <set>
+            <if test="orderNo != null">`order_no` = #{orderNo}, </if>
+            <if test="ownerOrderNo != null">`owner_order_no` = #{ownerOrderNo}, </if>
+            <if test="replyFlag != null">`reply_flag` = #{replyFlag}, </if>
+            <if test="carNo != null">`car_no` = #{carNo}, </if>
+            <if test="carPlateNum != null">`car_plate_num` = #{carPlateNum}, </if>
+            <if test="carBrand != null">`car_brand` = #{carBrand}, </if>
+            <if test="carBrandTxt != null">`car_brand_txt` = #{carBrandTxt}, </if>
+            <if test="carRating != null">`car_rating` = #{carRating}, </if>
+            <if test="carType != null">`car_type` = #{carType}, </if>
+            <if test="carTypeTxt != null">`car_type_txt` = #{carTypeTxt}, </if>
+            <if test="carCylinderCapacity != null">`car_cylinder_capacity` = #{carCylinderCapacity}, </if>
+            <if test="carCcUnit != null">`car_cc_unit` = #{carCcUnit}, </if>
+            <if test="carGearboxType != null">`car_gearbox_type` = #{carGearboxType}, </if>
+            <if test="carDayMileage != null">`car_day_mileage` = #{carDayMileage}, </if>
+            <if test="carIntrod != null">`car_introd` = #{carIntrod}, </if>
+            <if test="carSurplusPrice != null">`car_surplus_price` = #{carSurplusPrice}, </if>
+            <if test="carGuidePrice != null">`car_guide_price` = #{carGuidePrice}, </if>
+            <if test="carInmsrp != null">`car_inmsrp` = #{carInmsrp}, </if>
+            <if test="carTag != null">`car_tag` = #{carTag}, </if>
+            <if test="carStatus != null">`car_status` = #{carStatus}, </if>
+            <if test="carImageUrl != null">`car_image_url` = #{carImageUrl}, </if>
+            <if test="carOwnerType != null">`car_owner_type` = #{carOwnerType}, </if>
+            <if test="carUseType != null">`car_use_type` = #{carUseType}, </if>
+            <if test="carOilVolume != null">`car_oil_volume` = #{carOilVolume}, </if>
+            <if test="carEngineType != null">`car_engine_type` = #{carEngineType}, </if>
+            <if test="carDesc != null">`car_desc` = #{carDesc}, </if>
+            <if test="carStewardPhone != null">`car_steward_phone` = #{carStewardPhone}, </if>
+            <if test="carCheckStatus != null">`car_check_status` = #{carCheckStatus}, </if>
+            <if test="carShowAddr != null">`car_show_addr` = #{carShowAddr}, </if>
+            <if test="carShowLon != null">`car_show_lon` = #{carShowLon}, </if>
+            <if test="carShowLat != null">`car_show_lat` = #{carShowLat}, </if>
+            <if test="carRealAddr != null">`car_real_addr` = #{carRealAddr}, </if>
+            <if test="carRealLon != null">`car_real_lon` = #{carRealLon}, </if>
+            <if test="carRealLat != null">`car_real_lat` = #{carRealLat}, </if>
+            <if test="carAddrIndex != null">`car_addr_index` = #{carAddrIndex}, </if>
+            <if test="stopCostRate != null">`stop_cost_rate` = #{stopCostRate}, </if>
+            <if test="engineSource != null">`engine_source` = #{engineSource}, </if>
+            <if test="frameNo != null">`frame_no` = #{frameNo}, </if>
+            <if test="engineNum != null">`engine_num` = #{engineNum}, </if>
+            <if test="serviceRate != null">`service_rate` = #{serviceRate}, </if>
+            <if test="createTime != null">`create_time` = #{createTime}, </if>
+            <if test="createOp != null">`create_op` = #{createOp}, </if>
+            <if test="updateTime != null">`update_time` = #{updateTime}, </if>
+            <if test="updateOp != null">`update_op` = #{updateOp}, </if>
+            <if test="isDelete != null">`is_delete` = #{isDelete}</if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <update id="updateByPrimaryKey" parameterType="com.atzuche.order.owner.commodity.entity.OwnerGoodsEntity">
+        update owner_goods
+        <set>
+            `order_no` = #{orderNo},
+            `owner_order_no` = #{ownerOrderNo},
+            `reply_flag` = #{replyFlag},
+            `car_no` = #{carNo},
+            `car_plate_num` = #{carPlateNum},
+            `car_brand` = #{carBrand},
+            `car_brand_txt` = #{carBrandTxt},
+            `car_rating` = #{carRating},
+            `car_type` = #{carType},
+            `car_type_txt` = #{carTypeTxt},
+            `car_cylinder_capacity` = #{carCylinderCapacity},
+            `car_cc_unit` = #{carCcUnit},
+            `car_gearbox_type` = #{carGearboxType},
+            `car_day_mileage` = #{carDayMileage},
+            `car_introd` = #{carIntrod},
+            `car_surplus_price` = #{carSurplusPrice},
+            `car_guide_price` = #{carGuidePrice},
+            `car_inmsrp` = #{carInmsrp},
+            `car_tag` = #{carTag},
+            `car_status` = #{carStatus},
+            `car_image_url` = #{carImageUrl},
+            `car_owner_type` = #{carOwnerType},
+            `car_use_type` = #{carUseType},
+            `car_oil_volume` = #{carOilVolume},
+            `car_engine_type` = #{carEngineType},
+            `car_desc` = #{carDesc},
+            `car_steward_phone` = #{carStewardPhone},
+            `car_check_status` = #{carCheckStatus},
+            `car_show_addr` = #{carShowAddr},
+            `car_show_lon` = #{carShowLon},
+            `car_show_lat` = #{carShowLat},
+            `car_real_addr` = #{carRealAddr},
+            `car_real_lon` = #{carRealLon},
+            `car_real_lat` = #{carRealLat},
+            `car_addr_index` = #{carAddrIndex},
+            `stop_cost_rate` = #{stopCostRate},
+            `engine_source` = #{engineSource},
+            `frame_no` = #{frameNo},
+            `engine_num` = #{engineNum},
+            `service_rate` = #{serviceRate},
+            `create_time` = #{createTime},
+            `create_op` = #{createOp},
+            `update_time` = #{updateTime},
+            `update_op` = #{updateOp},
+            `is_delete` = #{isDelete}
+
+        </set>
+        where id = #{id}
+    </update>
 
 <!--auto generated by MybatisCodeHelper on 2019-12-18-->
     <select id="selectByOwnerOrderNo" resultMap="BaseResultMap">

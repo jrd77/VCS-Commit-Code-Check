@@ -2,16 +2,25 @@ package com.atzuche.order.renterorder.service;
 
 import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.constant.OrderConstant;
-import com.atzuche.order.commons.enums.CouponTypeEnum;
+import com.atzuche.order.commons.entity.dto.CostBaseDTO;
 import com.atzuche.order.commons.entity.dto.GetReturnCarCostReqDto;
+import com.atzuche.order.commons.enums.CouponTypeEnum;
+import com.atzuche.order.commons.enums.RenterCashCodeEnum;
 import com.atzuche.order.rentercost.entity.RenterOrderCostDetailEntity;
+import com.atzuche.order.rentercost.entity.RenterOrderCostEntity;
 import com.atzuche.order.rentercost.entity.RenterOrderSubsidyDetailEntity;
 import com.atzuche.order.rentercost.entity.dto.GetReturnCostDTO;
 import com.atzuche.order.rentercost.entity.dto.GetReturnOverCostDTO;
+import com.atzuche.order.rentercost.entity.dto.OrderCouponDTO;
+import com.atzuche.order.rentercost.entity.dto.RenterOrderSubsidyDetailDTO;
+import com.atzuche.order.rentercost.entity.vo.GetReturnResponseVO;
 import com.atzuche.order.rentercost.service.RenterOrderCostCombineService;
-import com.atzuche.order.renterorder.dto.coupon.OrderCouponDTO;
+import com.atzuche.order.rentercost.service.RenterOrderCostDetailService;
+import com.atzuche.order.rentercost.service.RenterOrderCostService;
+import com.atzuche.order.rentercost.service.RenterOrderSubsidyDetailService;
 import com.atzuche.order.renterorder.entity.dto.RenterOrderCostReqDTO;
 import com.atzuche.order.renterorder.entity.dto.RenterOrderCostRespDTO;
+import com.atzuche.order.renterorder.mapper.RenterOrderMapper;
 import com.atzuche.order.renterorder.vo.owner.OwnerCouponGetAndValidReqVO;
 import com.atzuche.order.renterorder.vo.owner.OwnerCouponGetAndValidResultVO;
 import com.atzuche.order.renterorder.vo.owner.OwnerDiscountCouponVO;
@@ -23,8 +32,8 @@ import com.autoyol.coupon.api.MemAvailCouponResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.cglib.beans.BeanCopier;
-import com.atzuche.order.renterorder.mapper.RenterOrderMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -57,17 +66,28 @@ public class RenterOrderCalCostService {
     @Resource
     private PlatformCouponService platformCouponService;
 
+    @Resource
+    private RenterOrderCostDetailService renterOrderCostDetailService;
+
+    @Resource
+    private RenterOrderSubsidyDetailService renterOrderSubsidyDetailService;
+
+    @Resource
+    private RenterOrderCostService renterOrderCostService;
+
+
 
     /**
-     * 获取费用项和费用明细列表
+     * 获取费用项和费用明细列表 + 落库
      *
      * @author ZhangBin
      * @date 2019/12/24 15:21
      **/
     public RenterOrderCostRespDTO getOrderCostAndDeailList(RenterOrderCostReqDTO renterOrderCostReqDTO) {
+        CostBaseDTO costBaseDTO = renterOrderCostReqDTO.getCostBaseDTO();
         RenterOrderCostRespDTO renterOrderCostRespDTO = new RenterOrderCostRespDTO();
         List<RenterOrderCostDetailEntity> detailList = new ArrayList<>();
-        List<RenterOrderSubsidyDetailEntity> subsidyList = new ArrayList<>();
+        List<RenterOrderSubsidyDetailDTO> subsidyList = new ArrayList<>();
 
         //获取租金
         List<RenterOrderCostDetailEntity> renterOrderCostDetailEntities = renterOrderCostCombineService.listRentAmtEntity(renterOrderCostReqDTO.getRentAmtDTO());
@@ -76,49 +96,81 @@ public class RenterOrderCalCostService {
 
         //获取平台保障费
         RenterOrderCostDetailEntity insurAmtEntity = renterOrderCostCombineService.getInsurAmtEntity(renterOrderCostReqDTO.getInsurAmtDTO());
-        Integer insurAmt = insurAmtEntity.getTotalAmount();
+        int insurAmt = insurAmtEntity.getTotalAmount();
         renterOrderCostRespDTO.setBasicEnsureAmount(insurAmt);
         detailList.add(insurAmtEntity);
 
         //获取全面保障费
         List<RenterOrderCostDetailEntity> comprehensiveEnsureList = renterOrderCostCombineService.listAbatementAmtEntity(renterOrderCostReqDTO.getAbatementAmtDTO());
-        Integer comprehensiveEnsureAmount = comprehensiveEnsureList.stream().collect(Collectors.summingInt(RenterOrderCostDetailEntity::getTotalAmount));
+        int comprehensiveEnsureAmount = comprehensiveEnsureList.stream().collect(Collectors.summingInt(RenterOrderCostDetailEntity::getTotalAmount));
         renterOrderCostRespDTO.setComprehensiveEnsureAmount(comprehensiveEnsureAmount);
         detailList.addAll(comprehensiveEnsureList);
 
         //获取附加驾驶人费用
         RenterOrderCostDetailEntity extraDriverInsureAmtEntity = renterOrderCostCombineService.getExtraDriverInsureAmtEntity(renterOrderCostReqDTO.getExtraDriverDTO());
-        Integer totalAmount = extraDriverInsureAmtEntity.getTotalAmount();
+        int totalAmount = extraDriverInsureAmtEntity.getTotalAmount();
         renterOrderCostRespDTO.setAdditionalDrivingEnsureAmount(totalAmount);
         detailList.add(extraDriverInsureAmtEntity);
 
         //获取平台手续费
-        RenterOrderCostDetailEntity serviceChargeFeeEntity = renterOrderCostCombineService.getServiceChargeFeeEntity(renterOrderCostReqDTO.getCostBaseDTO());
-        Integer serviceAmount = serviceChargeFeeEntity.getTotalAmount();
+        RenterOrderCostDetailEntity serviceChargeFeeEntity = renterOrderCostCombineService.getServiceChargeFeeEntity(costBaseDTO);
+        int serviceAmount = serviceChargeFeeEntity.getTotalAmount();
         renterOrderCostRespDTO.setCommissionAmount(serviceAmount);
         detailList.add(serviceChargeFeeEntity);
 
         //获取取还车费用
         GetReturnCarCostReqDto getReturnCarCostReqDto = renterOrderCostReqDTO.getGetReturnCarCostReqDto();
-        getReturnCarCostReqDto.setSumJudgeFreeFee(rentAmt + insurAmt + serviceAmount);
+        getReturnCarCostReqDto.setSumJudgeFreeFee(Math.abs(rentAmt + insurAmt + serviceAmount + comprehensiveEnsureAmount));
         GetReturnCostDTO returnCarCost = renterOrderCostCombineService.getReturnCarCost(getReturnCarCostReqDto);
-        Integer getReturnAmt = returnCarCost.getRenterOrderCostDetailEntityList().stream().collect(Collectors.summingInt(RenterOrderCostDetailEntity::getTotalAmount));
+        int getReturnAmt = returnCarCost.getRenterOrderCostDetailEntityList().stream().collect(Collectors.summingInt(RenterOrderCostDetailEntity::getTotalAmount));
         detailList.addAll(returnCarCost.getRenterOrderCostDetailEntityList());
-        List<RenterOrderSubsidyDetailEntity> renterOrderSubsidyDetailEntityList = returnCarCost.getRenterOrderSubsidyDetailEntityList();
-        subsidyList.addAll(renterOrderSubsidyDetailEntityList);
+        List<RenterOrderSubsidyDetailDTO> renterOrderSubsidyDetailDTOList = returnCarCost.getRenterOrderSubsidyDetailDTOList();
+        subsidyList.addAll(renterOrderSubsidyDetailDTOList);
+        GetReturnResponseVO getReturnResponseVO = returnCarCost.getGetReturnResponseVO();
+        renterOrderCostRespDTO.setGetRealAmt(getReturnResponseVO.getGetFee());
+        renterOrderCostRespDTO.setReturnRealAmt(getReturnResponseVO.getReturnFee());
 
         //获取取还车超运能费用
         GetReturnOverCostDTO getReturnOverCost = renterOrderCostCombineService.getGetReturnOverCost(renterOrderCostReqDTO.getGetReturnCarOverCostReqDto());
         List<RenterOrderCostDetailEntity> renterOrderCostDetailEntityList = getReturnOverCost.getRenterOrderCostDetailEntityList();
-        Integer getReturnOverCostAmount = renterOrderCostDetailEntityList.stream().collect(Collectors.summingInt(RenterOrderCostDetailEntity::getTotalAmount));
+        Integer getOverAmt = renterOrderCostDetailEntityList.stream()
+                .filter(x -> RenterCashCodeEnum.GET_BLOCKED_RAISE_AMT.getCashNo().equals(x.getCostCode()))
+                .collect(Collectors.summingInt(RenterOrderCostDetailEntity::getTotalAmount));
+        Integer returnOverAmt = renterOrderCostDetailEntityList.stream()
+                .filter(x -> RenterCashCodeEnum.RETURN_BLOCKED_RAISE_AMT.getCashNo().equals(x.getCostCode()))
+                .collect(Collectors.summingInt(RenterOrderCostDetailEntity::getTotalAmount));
+        int getReturnOverCostAmount = getOverAmt + returnOverAmt;
         detailList.addAll(renterOrderCostDetailEntityList);
+        renterOrderCostRespDTO.setGetOverAmt(getOverAmt);
+        renterOrderCostRespDTO.setReturnOverAmt(returnOverAmt);
 
-        //租车费用 = 租金+平台保障费+全面保障费+取还车费用+取还车超云能费用+附加驾驶员费用+手续费；
+        //租车费用 = 租金+平台保障费+全面保障费+取还车费用+取还车超运能费用+附加驾驶员费用+手续费；
         int rentCarAmount = rentAmt + insurAmt + comprehensiveEnsureAmount + getReturnAmt + getReturnOverCostAmount + totalAmount + serviceAmount;
 
         renterOrderCostRespDTO.setRentCarAmount(rentCarAmount);
         renterOrderCostRespDTO.setRenterOrderCostDetailDTOList(detailList);
         LOGGER.info("获取费用项和费用明细列表 renterOrderCostRespDTO:[{}]", JSON.toJSONString(renterOrderCostRespDTO));
+
+        //数据转化
+        List<RenterOrderSubsidyDetailEntity> subsidyListEntity = subsidyList.stream().map(x -> {
+            RenterOrderSubsidyDetailEntity renterOrderSubsidyDetailEntity = new RenterOrderSubsidyDetailEntity();
+            BeanUtils.copyProperties(x, renterOrderSubsidyDetailEntity);
+            renterOrderSubsidyDetailEntity.setOrderNo(costBaseDTO.getOrderNo());
+            renterOrderSubsidyDetailEntity.setRenterOrderNo(costBaseDTO.getRenterOrderNo());
+            return renterOrderSubsidyDetailEntity;
+        }).collect(Collectors.toList());
+
+
+        //保存费用明细
+        renterOrderCostDetailService.saveRenterOrderCostDetailBatch(detailList);
+        //保存补贴明细
+        renterOrderSubsidyDetailService.saveRenterOrderSubsidyDetailBatch(subsidyListEntity);
+        //保存费用统计信息
+        RenterOrderCostEntity renterOrderCostEntity = new RenterOrderCostEntity();
+        BeanUtils.copyProperties(renterOrderCostRespDTO,renterOrderCostEntity);
+        renterOrderCostEntity.setOrderNo(costBaseDTO.getOrderNo());
+        renterOrderCostEntity.setRenterOrderNo(costBaseDTO.getRenterOrderNo());
+        renterOrderCostService.saveRenterOrderCost(renterOrderCostEntity);
         return renterOrderCostRespDTO;
     }
 
@@ -255,6 +307,4 @@ public class RenterOrderCalCostService {
 
         return request;
     }
-
-
 }

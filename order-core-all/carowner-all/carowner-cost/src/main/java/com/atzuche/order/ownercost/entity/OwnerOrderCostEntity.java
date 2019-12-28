@@ -41,7 +41,7 @@ public class OwnerOrderCostEntity implements Serializable {
 	 */
 	private Integer subsidyAmount;
 	/**
-	 * 采购费用
+	 * 采购费用(代收代付的租金)
 	 */
 	private Integer purchaseAmount;
 	/**

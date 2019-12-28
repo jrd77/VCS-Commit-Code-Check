@@ -37,6 +37,6 @@ public class InsurAmtDTO {
 	/**
 	 * 车辆标签
 	 */
-	private List<Integer> carLabelIds;
+	private List<String> carLabelIds;
 
 }
