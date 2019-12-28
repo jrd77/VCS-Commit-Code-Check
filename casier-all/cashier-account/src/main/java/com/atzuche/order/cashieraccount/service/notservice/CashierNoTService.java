@@ -16,14 +16,22 @@ import com.atzuche.order.accountrenterwzdepost.vo.req.PayedOrderRenterWZDepositR
 import com.atzuche.order.cashieraccount.entity.CashierEntity;
 import com.atzuche.order.cashieraccount.exception.OrderPayCallBackAsnyException;
 import com.atzuche.order.cashieraccount.mapper.CashierMapper;
+import com.atzuche.order.cashieraccount.vo.req.pay.OrderPaySignReqVO;
+import com.atzuche.order.cashieraccount.vo.res.OrderPayableAmountResVO;
 import com.atzuche.order.cashieraccount.vo.res.pay.OrderPayAsynResVO;
+import com.atzuche.order.commons.IpUtil;
 import com.atzuche.order.commons.LocalDateTimeUtils;
 import com.atzuche.order.commons.enums.RenterCashCodeEnum;
 import com.atzuche.order.commons.enums.account.PayStatusEnum;
+import com.atzuche.order.commons.enums.cashier.PlatformEnum;
+import com.atzuche.order.commons.enums.cashier.WalletFlagEnum;
 import com.atzuche.order.rentercost.entity.vo.PayableVO;
+import com.atzuche.order.renterorder.entity.RenterOrderEntity;
+import com.atzuche.order.renterorder.service.RenterOrderService;
 import com.autoyol.autopay.gateway.constant.DataPayTypeConstant;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.doc.util.StringUtil;
+import com.autoyol.vo.req.WalletDeductionReqVO;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +39,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -45,12 +54,27 @@ import java.util.Objects;
 public class CashierNoTService {
     @Autowired
     private CashierMapper cashierMapper;
+    @Autowired
+    RenterOrderService renterOrderService;
+
+    /**
+     * 收银台根据主单号 向订单模块查询子单号
+     * @param orderNo
+     * @return
+     */
+    public String getRenterOrderNoByOrderNo(String orderNo){
+        RenterOrderEntity renterOrderEntity =  renterOrderService.getRenterOrderByOrderNoAndWaitPay(orderNo);
+        if(Objects.isNull(renterOrderEntity) || StringUtil.isBlank(renterOrderEntity.getRenterOrderNo())){
+            throw new AccountRenterWZDepositException();
+        }
+        return renterOrderEntity.getRenterOrderNo();
+    }
 
     /**
      * 收银台记录应收金额
      */
     public int getPayDeposit(String orderNo,String memNo,String payKind){
-        CashierEntity cashierEntity = cashierMapper.getPayDeposit(orderNo,memNo,payKind);
+        CashierEntity cashierEntity = cashierMapper.getPayDeposit(orderNo,memNo,payKind,DataPayTypeConstant.PAY_PUR);
         if(Objects.isNull(cashierEntity) || Objects.isNull(cashierEntity.getId())){
             return 0;
         }
@@ -220,5 +244,44 @@ public class CashierNoTService {
         return amt;
     }
 
+    /**
+     * 构造远程扣减钱包参数
+     */
+    public WalletDeductionReqVO getWalletDeductionReqVO(OrderPaySignReqVO orderPaySign, OrderPayableAmountResVO payVO,int payBalanceDeduct) {
+        WalletDeductionReqVO vo = new WalletDeductionReqVO();
+        vo.setIp(IpUtil.getLocalIp());
+        vo.setAmt(payBalanceDeduct);
+        vo.setOrderNo(Long.parseLong(orderPaySign.getOrderNo()));
+        vo.setMemNo(Integer.valueOf(orderPaySign.getMenNo()));
+        vo.setFlag(WalletFlagEnum.RENTER_CONSUME.getCode());
+        vo.setFlagTxt(WalletFlagEnum.RENTER_CONSUME.getText());
+        vo.setServiceName("order-center");
+        vo.setPlatform(PlatformEnum.OPERATION_TERMINAL.name());
+        vo.setOperator(orderPaySign.getOperator());
+        vo.setOperatorName(orderPaySign.getOperatorName());
+        return vo;
+    }
 
+    /**
+     *  钱包支付落库 收银台 记录总金额/  租客 记录 流水（分为 租车消费 租车消费补付）
+     * @param payBalance
+     * @param orderPaySign
+     * @return
+     */
+    public int payOrderByWallet(int payBalance, OrderPaySignReqVO orderPaySign,OrderPayableAmountResVO payVO) {
+       //取出所有户头 钱包支付款项
+        List<String> payKinds = orderPaySign.getPayKind();
+        List<CashierEntity> cashierEntitys = new ArrayList<>();
+       if(!CollectionUtils.isEmpty(payKinds)){
+           for(int i=0;i<payKinds.size();i++){
+               CashierEntity cashierEntity = cashierMapper.getPayDeposit(orderPaySign.getOrderNo(),orderPaySign.getMenNo(),payKinds.get(i),"00");
+               if(Objects.nonNull(cashierEntity) && Objects.nonNull(cashierEntity.getId())){
+                   cashierEntitys.add(cashierEntity);
+               }
+           }
+       }
+       //循环优先扣减 消费
+
+        return 0;
+    }
 }

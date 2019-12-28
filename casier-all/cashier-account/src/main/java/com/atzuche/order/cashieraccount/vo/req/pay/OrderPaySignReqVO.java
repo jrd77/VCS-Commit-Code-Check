@@ -33,6 +33,19 @@ public class OrderPaySignReqVO {
      */
     private String orderNo;
 
+    /**
+     * 是否使用钱包支付
+     */
+    private String isUseWallet;
+    /**
+     * 操作人
+     */
+    private Integer operator;
+
+    /**
+     * 操作人名称
+     */
+    private String operatorName;
 
 
     /**

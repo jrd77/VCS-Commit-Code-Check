@@ -28,5 +28,5 @@ public interface CashierMapper{
      * @param payKind (押金、违章押金)
      * @return
      */
-    CashierEntity getPayDeposit(@Param("orderNo") String orderNo, @Param("memNo")String memNo, @Param("payKind")String payKind);
+    CashierEntity getPayDeposit(@Param("orderNo") String orderNo, @Param("memNo")String memNo, @Param("payKind")String payKind,@Param("payType")String payType);
 }
