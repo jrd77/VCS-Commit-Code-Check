@@ -2,6 +2,8 @@ package com.atzuche.delivery.mapper;
 
 import com.atzuche.delivery.entity.RenterOrderDeliveryEntity;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
 import java.util.List;
 
 /**
@@ -22,5 +24,7 @@ public interface RenterOrderDeliveryMapper{
     int updateByPrimaryKey(RenterOrderDeliveryEntity record);
     
     int updateByPrimaryKeySelective(RenterOrderDeliveryEntity record);
+    
+    List<RenterOrderDeliveryEntity> listRenterOrderDeliveryByRenterOrderNo(@Param("renterOrderNo") String renterOrderNo);
 
 }
