@@ -1,11 +1,10 @@
 package com.atzuche.order.accountrenterdeposit.vo.req;
 
+import com.atzuche.order.commons.enums.account.FreeDepositTypeEnum;
 import com.autoyol.commons.web.ErrorCode;
 import lombok.Data;
 import org.springframework.util.Assert;
-import org.springframework.util.CollectionUtils;
 
-import java.util.List;
 
 /**
  * 下单成功 记录应付车俩押金
@@ -31,6 +30,16 @@ public class CreateOrderRenterDepositReqVO {
     private Integer reductionAmt;
 
     /**
+     * 减免金额比例
+     */
+    private String amt;
+
+    /**
+     * 免押方式
+     */
+    private FreeDepositTypeEnum freeDepositType;
+
+    /**
      * 租车押金:01,违章押金:02,补付租车押金:03,坦客-租车费用:04,坦客-押金费用:05,充值:06,欠款:07,补付租车押金,管理后台v5.11:08,长租线上费用支付:09,PMS:10,默认:99
      */
     private String payKind;
@@ -40,10 +49,7 @@ public class CreateOrderRenterDepositReqVO {
      */
     private String atappId;
 
-    /**
-     * 减免详情
-     */
-    List<CreateOrderRenterReductionDepositReqVO> createOrderRenterReductionDeposits;
+
 
     /**
      * 参数校验
@@ -54,9 +60,7 @@ public class CreateOrderRenterDepositReqVO {
         Assert.notNull(getYingfuDepositAmt(), ErrorCode.PARAMETER_ERROR.getText());
         Assert.isTrue(getYingfuDepositAmt()==0, ErrorCode.PARAMETER_ERROR.getText());
         //是否存在减免
-        Assert.notNull(getReductionAmt(), ErrorCode.PARAMETER_ERROR.getText());
-        boolean isReduction = getReductionAmt()>0 && !CollectionUtils.isEmpty(createOrderRenterReductionDeposits);
-        Assert.isTrue(isReduction, ErrorCode.PARAMETER_ERROR.getText());
+        Assert.notNull(getFreeDepositType(), ErrorCode.PARAMETER_ERROR.getText());
 
     }
 }

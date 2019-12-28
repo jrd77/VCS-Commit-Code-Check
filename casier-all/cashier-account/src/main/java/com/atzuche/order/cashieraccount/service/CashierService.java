@@ -80,6 +80,9 @@ public class CashierService {
      */
     @Transactional(rollbackFor=Exception.class)
     public void insertRenterDeposit(CreateOrderRenterDepositReqVO createOrderRenterDepositReqVO){
+        Assert.notNull(createOrderRenterDepositReqVO, ErrorCode.PARAMETER_ERROR.getText());
+        createOrderRenterDepositReqVO.check();
+        createOrderRenterDepositReqVO.setPayKind(DataPayKindConstant.RENT);
         //1 收银台记录违章押金 应付
         cashierNoTService.insertRenterDeposit(createOrderRenterDepositReqVO);
         //2 车俩押金记录应付
@@ -115,7 +118,10 @@ public class CashierService {
      * 下单成功  调收银台 记录 违章押金应付
      */
     @Transactional(rollbackFor=Exception.class)
-    public void insertRenterDeposit(CreateOrderRenterWZDepositReqVO createOrderRenterWZDepositReq){
+    public void insertRenterWZDeposit(CreateOrderRenterWZDepositReqVO createOrderRenterWZDepositReq){
+        Assert.notNull(createOrderRenterWZDepositReq, ErrorCode.PARAMETER_ERROR.getText());
+        createOrderRenterWZDepositReq.check();
+        createOrderRenterWZDepositReq.setPayKind(DataPayKindConstant.RENT);
         //1 收银台记录违章押金 应付
         cashierNoTService.insertRenterWZDeposit(createOrderRenterWZDepositReq);
         //2 违章押金记录应付
