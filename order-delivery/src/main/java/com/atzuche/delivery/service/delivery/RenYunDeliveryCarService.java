@@ -7,7 +7,7 @@ import com.atzuche.delivery.common.DeliveryErrorCode;
 import com.atzuche.delivery.config.RestTemplateConfig;
 import com.atzuche.delivery.entity.DeliveryHttpLogEntity;
 import com.atzuche.delivery.enums.DeliveryTypeEnum;
-import com.atzuche.delivery.exception.DeliveryBusinessException;
+import com.atzuche.delivery.exception.DeliveryOrderException;
 import com.atzuche.delivery.utils.DeliveryLogUtil;
 import com.atzuche.delivery.vo.delivery.CancelFlowOrderDTO;
 import com.atzuche.delivery.vo.delivery.RenYunFlowOrderDTO;
@@ -122,7 +122,7 @@ public class RenYunDeliveryCarService {
             deliveryLogUtil.addDeliveryLog(deliveryHttpLogEntity);
             log.info("请求仁云失败，失败原因：case:{}", e.getMessage());
             Cat.logError("请求仁云失败，失败原因：case:" + e.getMessage(), e);
-            throw new DeliveryBusinessException(DeliveryErrorCode.SEND_REN_YUN_HTTP_ERROR);
+            throw new DeliveryOrderException(DeliveryErrorCode.SEND_REN_YUN_HTTP_ERROR);
         } finally {
             t.complete();
         }
