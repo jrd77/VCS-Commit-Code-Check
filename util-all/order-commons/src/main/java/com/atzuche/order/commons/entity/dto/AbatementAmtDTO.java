@@ -37,4 +37,8 @@ public class AbatementAmtDTO {
 	 * 车辆标签
 	 */
 	private List<String> carLabelIds;
+    /**
+     * 是否计算全面保障费
+     */
+	private Boolean isAbatement;
 }

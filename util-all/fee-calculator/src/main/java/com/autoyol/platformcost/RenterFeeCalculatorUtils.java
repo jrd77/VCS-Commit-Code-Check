@@ -370,11 +370,12 @@ public class RenterFeeCalculatorUtils {
 	 * @return CarDepositAmtVO
 	 */
 	public static CarDepositAmtVO calCarDepositAmt(Integer internalStaff, Integer cityCode, Integer guidPrice, Double carBrandTypeRadio, Double carYearRadio, List<DepositText> depositList, Double reliefPercetage) {
-		if (INTERNAL_STAFF_FLAG.equals(internalStaff)) {
+		/*if (INTERNAL_STAFF_FLAG.equals(internalStaff)) {
 			return calCarDepositAmt();
 		} else {
-			return calCarDepositAmt(cityCode, guidPrice, carBrandTypeRadio, carYearRadio, depositList, reliefPercetage);
-		}
+			return calCarDepositAmt(cityCode, guidPrice, carBrandTypeRadio, carYearRadio, depositList);
+		}*/
+        return calCarDepositAmt(cityCode, guidPrice, carBrandTypeRadio, carYearRadio, depositList);
 	}
 	
 	/**
@@ -401,11 +402,10 @@ public class RenterFeeCalculatorUtils {
 	 * @param reliefPercetage 减免比例
 	 * @return CarDepositAmtVO
 	 */
-	public static CarDepositAmtVO calCarDepositAmt(Integer cityCode, Integer guidPrice, Double carBrandTypeRadio, Double carYearRadio, List<DepositText> depositList, Double reliefPercetage) {
+	public static CarDepositAmtVO calCarDepositAmt(Integer cityCode, Integer guidPrice, Double carBrandTypeRadio, Double carYearRadio, List<DepositText> depositList) {
 		if (guidPrice == null) {
 			throw new RenterFeeCostException(ExceptionCodeEnum.GUID_PRICE_IS_NULL);
 		}
-		reliefPercetage = reliefPercetage == null ? 0.0:reliefPercetage;
 		//初始化车辆押金
 		Integer suggestTotal = getSuggestTotalAmt(guidPrice);
 		Boolean carbool = true;
@@ -456,16 +456,15 @@ public class RenterFeeCalculatorUtils {
 		double carDepositAmt = 0.0;
 		if(guidPrice > 1500000) {
 			coefficient = 1.0;
-			reliefPercetage = 0.0;
 			carDepositAmt = suggestTotal;
 		} else {
-			carDepositAmt = suggestTotal * (1-reliefPercetage) * coefficient;
+			carDepositAmt = suggestTotal * coefficient;
 		}
 		CarDepositAmtVO carDepositAmtVO = new CarDepositAmtVO();
 		carDepositAmtVO.setCarDepositAmt((int) carDepositAmt);
 		carDepositAmtVO.setCarDepositRadio(coefficient);
-		carDepositAmtVO.setReliefPercetage(reliefPercetage);
-		carDepositAmtVO.setReliefAmt((int) (reliefPercetage*suggestTotal*coefficient));
+		carDepositAmtVO.setReliefPercetage(null);
+		carDepositAmtVO.setReliefAmt((int) (suggestTotal*coefficient));
 		return carDepositAmtVO;
 	}
 	
