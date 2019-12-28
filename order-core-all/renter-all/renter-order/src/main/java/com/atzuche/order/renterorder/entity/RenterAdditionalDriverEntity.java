@@ -6,14 +6,14 @@ import lombok.Data;
 
 
 /**
- * 订单券表
+ * 租客端附加驾驶人信息表
  * 
  * @author ZhangBin
- * @date 2019-12-28 15:45:08
+ * @date 2019-12-28 15:51:58
  * @Description:
  */
 @Data
-public class OrderCouponEntity implements Serializable {
+public class RenterAdditionalDriverEntity implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
 	/**
@@ -25,33 +25,21 @@ public class OrderCouponEntity implements Serializable {
 	 */
 	private String orderNo;
 	/**
-	 * 租客子订单号
+	 * 子订单号
 	 */
 	private String renterOrderNo;
 	/**
-	 * 优惠券id
+	 * 附加驾驶人姓名
 	 */
-	private String couponId;
+	private String realName;
 	/**
-	 * 优惠券名称
+	 * 附加驾驶人电话号码
 	 */
-	private String couponName;
+	private String phone;
 	/**
-	 * 优惠券类型
+	 * 是否有效
 	 */
-	private Integer couponType;
-	/**
-	 * 状态 0：未使用 1：已使用
-	 */
-	private Integer status;
-	/**
-	 * 描述信息
-	 */
-	private String couponDesc;
-	/**
-	 * 抵扣的金额
-	 */
-	private Integer amount;
+	private Integer isUse;
 	/**
 	 * 创建时间
 	 */

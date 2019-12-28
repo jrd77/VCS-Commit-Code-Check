@@ -6,14 +6,14 @@ import lombok.Data;
 
 
 /**
- * 订单券表
+ * 车辆押金详情
  * 
  * @author ZhangBin
- * @date 2019-12-28 15:45:08
+ * @date 2019-12-28 15:50:13
  * @Description:
  */
 @Data
-public class OrderCouponEntity implements Serializable {
+public class RenterDepositDetailEntity implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
 	/**
@@ -23,35 +23,39 @@ public class OrderCouponEntity implements Serializable {
 	/**
 	 * 主订单号
 	 */
-	private String orderNo;
+	private String orderNoParent;
 	/**
-	 * 租客子订单号
+	 * 子订单号
 	 */
-	private String renterOrderNo;
+	private String orderNoChild;
 	/**
-	 * 优惠券id
+	 * X系数（押金计算使用）
 	 */
-	private String couponId;
+	private Integer suggestTotal;
 	/**
-	 * 优惠券名称
+	 * 新车押金系数（押金计算使用）
 	 */
-	private String couponName;
+	private Double newCarCoefficient;
 	/**
-	 * 优惠券类型
+	 * 品牌车押金系数（押金计算使用）
 	 */
-	private Integer couponType;
+	private Double carSpecialCoefficient;
 	/**
-	 * 状态 0：未使用 1：已使用
+	 * 年份系数
 	 */
-	private Integer status;
+	private Double yearCoefficient;
 	/**
-	 * 描述信息
+	 * 原始租车押金
 	 */
-	private String couponDesc;
+	private Integer originalDepositAmt;
 	/**
-	 * 抵扣的金额
+	 * 减免比例
 	 */
-	private Integer amount;
+	private Integer reductionRate;
+	/**
+	 * 减免押金金额
+	 */
+	private Integer reductionDepositAmt;
 	/**
 	 * 创建时间
 	 */

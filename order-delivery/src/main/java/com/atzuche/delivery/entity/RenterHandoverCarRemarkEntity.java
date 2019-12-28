@@ -1,4 +1,4 @@
-package com.atzuche.order.renterorder.entity;
+package com.atzuche.delivery.entity;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -6,14 +6,14 @@ import lombok.Data;
 
 
 /**
- * 订单券表
- * 
- * @author ZhangBin
- * @date 2019-12-28 15:45:08
+ * 租客端交车备注表
+ *
+ * @author 胡春林
+ * @date 2019-12-28 15:56:17
  * @Description:
  */
 @Data
-public class OrderCouponEntity implements Serializable {
+public class RenterHandoverCarRemarkEntity implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
 	/**
@@ -25,33 +25,29 @@ public class OrderCouponEntity implements Serializable {
 	 */
 	private String orderNo;
 	/**
-	 * 租客子订单号
+	 * 子订单号
 	 */
 	private String renterOrderNo;
 	/**
-	 * 优惠券id
+	 * 交车类型 1-车主向租客交车、2-租客向车主交车、3-车管家向租客交车、4-租客向车管家交车
 	 */
-	private String couponId;
+	private Integer type;
 	/**
-	 * 优惠券名称
+	 * 备注内容
 	 */
-	private String couponName;
+	private String remark;
 	/**
-	 * 优惠券类型
+	 * 备注人手机号
 	 */
-	private Integer couponType;
+	private String phone;
 	/**
-	 * 状态 0：未使用 1：已使用
+	 * 备注人会员号
 	 */
-	private Integer status;
+	private String memNo;
 	/**
-	 * 描述信息
+	 * 备注人姓名
 	 */
-	private String couponDesc;
-	/**
-	 * 抵扣的金额
-	 */
-	private Integer amount;
+	private String realName;
 	/**
 	 * 创建时间
 	 */

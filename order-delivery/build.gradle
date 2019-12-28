@@ -16,7 +16,8 @@ dependencies {
     compile 'com.aliyun.mns:aliyun-sdk-mns:1.1.4'
     compile("commons-configuration:commons-configuration:1.8")
     compile("com.autoyol.aliyunmq:auto-aliyunmq-core:0.0.2")
-    compile('org.springframework.boot:spring-boot-starter-amqp')
+    compile 'org.springframework.amqp:spring-rabbit:1.7.5.RELEASE'
+    compile 'com.rabbitmq:amqp-client:4.0.3'
     compile "com.autoyol:auto-web-starter:1.0-SNAPSHOT"
     compile group: 'org.springframework.retry', name: 'spring-retry', version: '1.2.4.RELEASE'
     compile group: 'org.aspectj', name: 'aspectjweaver', version: '1.9.4'

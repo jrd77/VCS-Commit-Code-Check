@@ -133,6 +133,10 @@ public class SubmitOrderService {
         reqContext.setOwnerGoodsDetailDto(null);
         reqContext.setOwnerMemberDto(memberService.getOwnerMemberInfo(""));
         //2.下单校验
+        //2.1库存
+        //2.2风控
+        //2.3校验链
+
 
 
         //3.生成主订单号
@@ -143,6 +147,8 @@ public class SubmitOrderService {
         //4.2.调用租客订单模块处理租客订单相关业务
         //4.3.接收租客订单返回信息
         //4.4.租客商品信息处理
+
+
         //4.5.租客信息处理
         //4.6.租客权益信息处理
 
@@ -181,6 +187,10 @@ public class SubmitOrderService {
         }
         parentOrderDTO.setOrderStatusDTO(orderStatusDTO);
         parentOrderService.saveParentOrderInfo(parentOrderDTO);
+
+        //6.4 order_flow
+
+
         //7.订单完成事件发送
 
         //8.组装接口返回

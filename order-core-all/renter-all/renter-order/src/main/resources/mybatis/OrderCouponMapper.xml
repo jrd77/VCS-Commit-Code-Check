@@ -6,6 +6,7 @@
     <resultMap type="com.atzuche.order.renterorder.entity.OrderCouponEntity" id="BaseResultMap">
         <result property="id" column="id"/>
         <result property="orderNo" column="order_no"/>
+        <result property="renterOrderNo" column="renter_order_no"/>
         <result property="couponId" column="coupon_id"/>
         <result property="couponName" column="coupon_name"/>
         <result property="couponType" column="coupon_type"/>
@@ -21,8 +22,21 @@
 
 
 	<sql id="Base_Column_List">
-        `id`,`order_no`, `coupon_id`, `coupon_name`, `coupon_type`, `status`, `coupon_desc`,`amount`,
-        `create_time`, `create_op`, `update_time`, `update_op`, `is_delete`
+	`id`, 	
+	`order_no`, 	
+	`renter_order_no`, 	
+	`coupon_id`, 	
+	`coupon_name`, 	
+	`coupon_type`, 	
+	`status`, 	
+	`coupon_desc`, 	
+	`amount`, 	
+	`create_time`, 	
+	`create_op`, 	
+	`update_time`, 	
+	`update_op`, 	
+	`is_delete`	
+
 	</sql>
 
 
@@ -30,74 +44,82 @@
 		select <include refid="Base_Column_List" /> from order_coupon where id = #{value}
 	</select>
 
-    <select id="selectByOrderNo" resultMap="BaseResultMap">
-        select <include refid="Base_Column_List" /> from order_coupon where order_no = #{orderNo}
-    </select>
-
 	<insert id="insert" parameterType="com.atzuche.order.renterorder.entity.OrderCouponEntity" useGeneratedKeys="true" keyProperty="id">
-		insert into order_coupon (
-            `order_no`,
-            `coupon_id`,
-            `coupon_name`,
-            `coupon_type`,
-            `status`,
-            `coupon_desc`,
-            `amount`,
-            `create_time`,
-            `create_op`,
-            `update_time`,
-            `update_op`,
-            `is_delete`
-        ) values (
-            #{orderNo},
-            #{couponId},
-            #{couponName},
-            #{couponType},
-            #{status},
-            #{couponDesc},
-            #{amount},
-            #{createTime},
-            #{createOp},
-            #{updateTime},
-            #{updateOp},
-            #{isDelete}
-        )
+		insert into order_coupon
+		(
+				`order_no`,		
+				`renter_order_no`,		
+				`coupon_id`,		
+				`coupon_name`,		
+				`coupon_type`,		
+				`status`,		
+				`coupon_desc`,		
+				`amount`,		
+				`create_time`,		
+				`create_op`,		
+				`update_time`,		
+				`update_op`,		
+				`is_delete`		
+			)
+		values
+		(
+				#{orderNo}, 		
+				#{renterOrderNo}, 		
+				#{couponId}, 		
+				#{couponName}, 		
+				#{couponType}, 		
+				#{status}, 		
+				#{couponDesc}, 		
+				#{amount}, 		
+				#{createTime}, 		
+				#{createOp}, 		
+				#{updateTime}, 		
+				#{updateOp}, 		
+				#{isDelete}		
+			)
 	</insert>
 	
 	<insert id="insertSelective" parameterType="com.atzuche.order.renterorder.entity.OrderCouponEntity" useGeneratedKeys="true" keyProperty="id">
-		insert into order_coupon (
-            <if test="orderNo != null">`order_no`, </if>
-            <if test="couponId != null">`coupon_id`, </if>
-            <if test="couponName != null">`coupon_name`, </if>
-            <if test="couponType != null">`coupon_type`, </if>
-            <if test="status != null">`status`, </if>
-            <if test="couponDesc != null">`coupon_desc`, </if>
-            <if test="amount != null">`amount`, </if>
-            <if test="createTime != null">`create_time`, </if>
-            <if test="createOp != null">`create_op`, </if>
-            <if test="updateTime != null">`update_time`, </if>
-            <if test="updateOp != null">`update_op`, </if>
-            <if test="isDelete != null">`is_delete` </if>
-        ) values (
-            <if test="orderNo != null">#{orderNo},  </if>
-            <if test="couponId != null">#{couponId},  </if>
-            <if test="couponName != null">#{couponName},  </if>
-            <if test="couponType != null">#{couponType},  </if>
-            <if test="status != null">#{status},  </if>
-            <if test="couponDesc != null">#{couponDesc},  </if>
-            <if test="amount != null">#{amount},  </if>
-            <if test="createTime != null">#{createTime},  </if>
-            <if test="createOp != null">#{createOp},  </if>
-            <if test="updateTime != null">#{updateTime},  </if>
-            <if test="updateOp != null">#{updateOp},  </if>
-            <if test="isDelete != null">#{isDelete} </if>
-        )
+		insert into order_coupon
+		(
+				<if test="orderNo != null">`order_no`, </if>
+				<if test="renterOrderNo != null">`renter_order_no`, </if>
+				<if test="couponId != null">`coupon_id`, </if>
+				<if test="couponName != null">`coupon_name`, </if>
+				<if test="couponType != null">`coupon_type`, </if>
+				<if test="status != null">`status`, </if>
+				<if test="couponDesc != null">`coupon_desc`, </if>
+				<if test="amount != null">`amount`, </if>
+				<if test="createTime != null">`create_time`, </if>
+				<if test="createOp != null">`create_op`, </if>
+				<if test="updateTime != null">`update_time`, </if>
+				<if test="updateOp != null">`update_op`, </if>
+				<if test="isDelete != null">`is_delete` </if>
+			)
+		values
+		(
+				<if test="orderNo != null">#{orderNo},  </if>
+				<if test="renterOrderNo != null">#{renterOrderNo},  </if>
+				<if test="couponId != null">#{couponId},  </if>
+				<if test="couponName != null">#{couponName},  </if>
+				<if test="couponType != null">#{couponType},  </if>
+				<if test="status != null">#{status},  </if>
+				<if test="couponDesc != null">#{couponDesc},  </if>
+				<if test="amount != null">#{amount},  </if>
+				<if test="createTime != null">#{createTime},  </if>
+				<if test="createOp != null">#{createOp},  </if>
+				<if test="updateTime != null">#{updateTime},  </if>
+				<if test="updateOp != null">#{updateOp},  </if>
+				<if test="isDelete != null">#{isDelete} </if>
+			)
 	</insert>
-
+	
+	 
 	<update id="updateByPrimaryKeySelective" parameterType="com.atzuche.order.renterorder.entity.OrderCouponEntity">
 		update order_coupon 
-		    <set>
+		<set>
 				<if test="orderNo != null">`order_no` = #{orderNo}, </if>
+				<if test="renterOrderNo != null">`renter_order_no` = #{renterOrderNo}, </if>
 				<if test="couponId != null">`coupon_id` = #{couponId}, </if>
 				<if test="couponName != null">`coupon_name` = #{couponName}, </if>
 				<if test="couponType != null">`coupon_type` = #{couponType}, </if>
@@ -115,8 +137,9 @@
 	
 	<update id="updateByPrimaryKey" parameterType="com.atzuche.order.renterorder.entity.OrderCouponEntity">
 		update order_coupon 
-		    <set>
+		<set>
 				`order_no` = #{orderNo}, 		
+				`renter_order_no` = #{renterOrderNo}, 		
 				`coupon_id` = #{couponId}, 		
 				`coupon_name` = #{couponName}, 		
 				`coupon_type` = #{couponType}, 		
