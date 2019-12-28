@@ -7,6 +7,7 @@ package com.atzuche.delivery.common;
 public enum  DeliveryErrorCode{
 
     SEND_REN_YUN_HTTP_ERROR("30001","请求仁云接口出错"),
+    DELIVERY_PARAMS_ERROR("30002","配送接口接受参数出错"),
     ;
 
     private String code;
