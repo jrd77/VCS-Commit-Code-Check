@@ -1,23 +1,17 @@
 package com.autoyol.platformcost;
 
+import com.autoyol.platformcost.model.AbatementConfig;
+import com.autoyol.platformcost.model.CarPriceOfDay;
+import com.autoyol.platformcost.model.OilAverageCostBO;
+import com.autoyol.platformcost.model.SphericalDistanceCoefficient;
+
 import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.TreeSet;
+import java.util.*;
 import java.util.stream.Collectors;
-
-import com.autoyol.platformcost.model.AbatementConfig;
-import com.autoyol.platformcost.model.CarPriceOfDay;
-import com.autoyol.platformcost.model.OilAverageCostBO;
-import com.autoyol.platformcost.model.SphericalDistanceCoefficient;
 
 public class CommonUtils {
 	/**
@@ -316,7 +310,7 @@ public class CommonUtils {
 		}
 		return newCarYear;
 	}
-	
+
 	/**
 	 * 获取新车押金系数
 	 * @param year 车辆年份

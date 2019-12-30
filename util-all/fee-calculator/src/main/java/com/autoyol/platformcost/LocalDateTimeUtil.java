@@ -1,7 +1,6 @@
 package com.autoyol.platformcost;
 
 import java.time.*;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -96,6 +95,17 @@ public class LocalDateTimeUtil {
      */
     public static float computeDayElapsedHours(LocalDateTime now){
         return computeDayElapsedMinutes(now)/1.0f/MINUTES_OF_HOUR;
+    }
+
+    /**
+     * 日期相隔天数
+     *
+     * @param startDateInclusive
+     * @param endDateExclusive
+     * @return
+     */
+    public static int periodDays(LocalDate startDateInclusive, LocalDate endDateExclusive) {
+        return Period.between(startDateInclusive, endDateExclusive).getDays();
     }
 
     /**

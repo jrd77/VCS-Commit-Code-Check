@@ -1,19 +1,20 @@
-package com.atzuche.order.renterorder.entity;
+package com.atzuche.order.parentorder.entity;
+
+import lombok.Data;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import lombok.Data;
 
 
 /**
  * 租客端交易流程表
  * 
  * @author ZhangBin
- * @date 2019-12-28 15:46:44
+ * @date 2019-12-30 11:16:42
  * @Description:
  */
 @Data
-public class RenterTransFlowEntity implements Serializable {
+public class OrderFlowEntity implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
 	/**
@@ -25,17 +26,13 @@ public class RenterTransFlowEntity implements Serializable {
 	 */
 	private String orderNo;
 	/**
-	 * 子订单号
-	 */
-	private String renterOrderNo;
-	/**
 	 * 交易状态
 	 */
-	private Integer transStatus;
+	private Integer orderStatus;
 	/**
 	 * 状态描述
 	 */
-	private String transDesc;
+	private String orderStatusDesc;
 	/**
 	 * 创建时间
 	 */
