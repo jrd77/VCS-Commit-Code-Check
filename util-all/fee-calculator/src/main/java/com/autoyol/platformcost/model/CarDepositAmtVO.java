@@ -10,10 +10,6 @@ public class CarDepositAmtVO {
 	 */
 	private Integer carDepositAmt;
 	/**
-	 * 减免比例
-	 */
-	//private Double reliefPercetage;
-	/**
 	 * 押金系数
 	 */
 	private Double carDepositRadio;

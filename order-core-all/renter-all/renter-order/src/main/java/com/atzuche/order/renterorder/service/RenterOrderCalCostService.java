@@ -1,11 +1,17 @@
 package com.atzuche.order.renterorder.service;
 
 import com.alibaba.fastjson.JSON;
+import com.atzuche.order.accountrenterdeposit.vo.req.CreateOrderRenterDepositReqVO;
+import com.atzuche.order.accountrenterwzdepost.vo.req.CreateOrderRenterWZDepositReqVO;
+import com.atzuche.order.cashieraccount.service.CashierService;
 import com.atzuche.order.commons.constant.OrderConstant;
 import com.atzuche.order.commons.entity.dto.CostBaseDTO;
+import com.atzuche.order.commons.entity.dto.DepositAmtDTO;
 import com.atzuche.order.commons.entity.dto.GetReturnCarCostReqDto;
+import com.atzuche.order.commons.entity.dto.IllegalDepositAmtDTO;
 import com.atzuche.order.commons.enums.CouponTypeEnum;
 import com.atzuche.order.commons.enums.RenterCashCodeEnum;
+import com.atzuche.order.commons.enums.account.FreeDepositTypeEnum;
 import com.atzuche.order.rentercost.entity.RenterOrderCostDetailEntity;
 import com.atzuche.order.rentercost.entity.RenterOrderCostEntity;
 import com.atzuche.order.rentercost.entity.RenterOrderSubsidyDetailEntity;
@@ -18,9 +24,16 @@ import com.atzuche.order.rentercost.service.RenterOrderCostCombineService;
 import com.atzuche.order.rentercost.service.RenterOrderCostDetailService;
 import com.atzuche.order.rentercost.service.RenterOrderCostService;
 import com.atzuche.order.rentercost.service.RenterOrderSubsidyDetailService;
+import com.atzuche.order.rentermem.entity.dto.MemRightCarDepositAmtReqDTO;
+import com.atzuche.order.rentermem.entity.dto.MemRightCarDepositAmtRespDTO;
+import com.atzuche.order.rentermem.service.RenterMemberRightService;
+import com.atzuche.order.renterorder.entity.RenterDepositDetailEntity;
+import com.atzuche.order.renterorder.entity.dto.DeductAndSubsidyContextDTO;
 import com.atzuche.order.renterorder.entity.dto.RenterOrderCostReqDTO;
 import com.atzuche.order.renterorder.entity.dto.RenterOrderCostRespDTO;
+import com.atzuche.order.renterorder.mapper.RenterDepositDetailMapper;
 import com.atzuche.order.renterorder.mapper.RenterOrderMapper;
+import com.atzuche.order.renterorder.vo.RenterOrderReqVO;
 import com.atzuche.order.renterorder.vo.owner.OwnerCouponGetAndValidReqVO;
 import com.atzuche.order.renterorder.vo.owner.OwnerCouponGetAndValidResultVO;
 import com.atzuche.order.renterorder.vo.owner.OwnerDiscountCouponVO;
@@ -29,6 +42,7 @@ import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.coupon.api.MemAvailCoupon;
 import com.autoyol.coupon.api.MemAvailCouponRequest;
 import com.autoyol.coupon.api.MemAvailCouponResponse;
+import com.autoyol.platformcost.model.CarDepositAmtVO;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,13 +90,13 @@ public class RenterOrderCalCostService {
     private RenterOrderCostService renterOrderCostService;
 
 
-    /*
-     * @Author ZhangBin
-     * @Date 2019/12/28 19:19
-     * @Description: 计算费用明细并保存费用
-     * 
+    /**
+     * 计算费用明细并保存费用
+     *
+     * @author ZhangBin
+     * @date 2019/12/28 19:19
      **/
-    public void  getAndSAveOrderCostAndDeailList(RenterOrderCostReqDTO renterOrderCostReqDTO){
+    public void getAndSaveOrderCostAndDeailList(RenterOrderCostReqDTO renterOrderCostReqDTO) {
         RenterOrderCostRespDTO renterOrderCostRespDTO = this.getOrderCostAndDeailList(renterOrderCostReqDTO);
         this.saveOrderCostAndDeailList(renterOrderCostRespDTO);
     }
@@ -164,13 +178,14 @@ public class RenterOrderCalCostService {
         LOGGER.info("获取费用项和费用明细列表 renterOrderCostRespDTO:[{}]", JSON.toJSONString(renterOrderCostRespDTO));
         return renterOrderCostRespDTO;
     }
-    /*
-     * @Author ZhangBin
-     * @Date 2019/12/28 17:37
-     * @Description: 保存费用及其费用明细
-     * 
+
+    /**
+     * 保存费用及其费用明细
+     *
+     * @author ZhangBin
+     * @date 2019/12/28 17:37
      **/
-    private void saveOrderCostAndDeailList(RenterOrderCostRespDTO renterOrderCostRespDTO){
+    private void saveOrderCostAndDeailList(RenterOrderCostRespDTO renterOrderCostRespDTO) {
         List<RenterOrderSubsidyDetailDTO> renterOrderSubsidyDetailDTOList = renterOrderCostRespDTO.getRenterOrderSubsidyDetailDTOList();
         //数据转化
         List<RenterOrderSubsidyDetailEntity> subsidyListEntity = renterOrderSubsidyDetailDTOList.stream().map(x -> {
@@ -186,7 +201,7 @@ public class RenterOrderCalCostService {
         renterOrderSubsidyDetailService.saveRenterOrderSubsidyDetailBatch(subsidyListEntity);
         //保存费用统计信息
         RenterOrderCostEntity renterOrderCostEntity = new RenterOrderCostEntity();
-        BeanUtils.copyProperties(renterOrderCostRespDTO,renterOrderCostEntity);
+        BeanUtils.copyProperties(renterOrderCostRespDTO, renterOrderCostEntity);
         renterOrderCostEntity.setOrderNo(renterOrderCostRespDTO.getOrderNo());
         renterOrderCostEntity.setRenterOrderNo(renterOrderCostRespDTO.getRenterOrderNo());
         renterOrderCostService.saveRenterOrderCost(renterOrderCostEntity);
@@ -306,7 +321,6 @@ public class RenterOrderCalCostService {
 
         return null;
     }
-
 
     /**
      * 优惠券服务请求参数处理
