@@ -459,18 +459,14 @@ public class RenterFeeCalculatorUtils {
 	 * @param revertTime 还车时间
 	 * @return Integer
 	 */
-	public static Integer calIllegalDepositAmt(Integer internalStaff, Integer cityCode, String carPlateNum, String specialCityCodes, Integer specialIllegalDepositAmt,
+	public static Integer calIllegalDepositAmt(Integer cityCode, String carPlateNum, String specialCityCodes, Integer specialIllegalDepositAmt,
 			List<IllegalDepositConfig> illegalDepositList, LocalDateTime rentTime, LocalDateTime revertTime) {
-		internalStaff = internalStaff == null ? 0:internalStaff;
 		Integer illegalDepositAmt = ILLEGAL_DEPOSIT.get(0);
 		if (carPlateNum != null && !"".equals(carPlateNum) && specialCityCodes != null && !"".equals(specialCityCodes)) {
 			if("粤".equals(carPlateNum.substring(0,1)) && cityCode != null && specialCityCodes.contains(String.valueOf(cityCode))){
 				illegalDepositAmt = specialIllegalDepositAmt == null ? illegalDepositAmt:specialIllegalDepositAmt;
 				return illegalDepositAmt;
 	        }
-		}
-		if (internalStaff == 1) {
-			return ILLEGAL_DEPOSIT.get(internalStaff);
 		}
 		illegalDepositAmt = getIllegalDepositAmt(cityCode, illegalDepositList, rentTime, revertTime);
 		return illegalDepositAmt;
