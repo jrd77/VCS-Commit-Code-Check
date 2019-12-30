@@ -126,13 +126,14 @@ public class CashierPayService{
                WalletDeductionReqVO walletDeduction = cashierNoTService.getWalletDeductionReqVO(orderPaySign,payVO,num);
                //5 抵扣钱包落库 （收银台落库、费用落库）
                walletRemoteService.updateWalletByDeduct(walletDeduction);
+               //6收银台 钱包支付落库
+               cashierNoTService.insertRenterCostByWallet(orderPaySign,payVO.getAmtWallet());
            }
         }
-        //6 签名串
+        //7 签名串
         List<PayVo> payVo = getOrderPayVO(orderPaySign,payVO, rentOrderNo);
-
-        //TODO
-        return null;
+        String signStr = cashierNoTService.getPaySignByPayVos(payVo);
+        return signStr;
     }
 
 
@@ -206,6 +207,8 @@ public class CashierPayService{
           CashierEntity cashierEntity = cashierNoTService.getCashierEntity(orderPaySign.getOrderNo(),orderPaySign.getMenNo(), DataPayKindConstant.RENT);
           if(Objects.nonNull(cashierEntity)){
               PayVo vo = cashierNoTService.getPayVO(cashierEntity,orderPaySign,payVO,DataPayKindConstant.RENT);
+              String payMd5 = cashierNoTService.getPayMd5ByPayVo(vo);
+              vo.setPayMd5(payMd5);
               payVo.add(vo);
           }
         }
@@ -215,6 +218,8 @@ public class CashierPayService{
             CashierEntity cashierEntity = cashierNoTService.getCashierEntity(orderPaySign.getOrderNo(),orderPaySign.getMenNo(), DataPayKindConstant.DEPOSIT);
             if(Objects.nonNull(cashierEntity)){
                 PayVo vo = cashierNoTService.getPayVO(cashierEntity,orderPaySign,payVO,DataPayKindConstant.DEPOSIT);
+                String payMd5 = cashierNoTService.getPayMd5ByPayVo(vo);
+                vo.setPayMd5(payMd5);
                 payVo.add(vo);
             }
 
@@ -226,8 +231,17 @@ public class CashierPayService{
             //待付租车费用
             int amt = payVO.getAmt();
             if(amt<0){
-                PayVo vo = cashierNoTService.getPayVOByRentCost(orderPaySign,payVO);
-                payVo.add(vo);
+                CashierEntity cashierEntity = cashierNoTService.getCashierEntity(orderPaySign.getOrderNo(),orderPaySign.getMenNo(), DataPayKindConstant.TK_FEE);
+                if(Objects.nonNull(cashierEntity)){
+                    PayVo vo = cashierNoTService.getPayVO(cashierEntity,orderPaySign,payVO,DataPayKindConstant.TK_FEE);
+                    String paySn = cashierNoTService.getCashierRentCostPaySn(orderPaySign.getOrderNo(),orderPaySign.getMenNo());
+                    vo.setPaySn(paySn);
+                    vo.setExtendParams(GsonUtils.toJson(payableVOs));
+                    String payMd5 = cashierNoTService.getPayMd5ByPayVo(vo);
+                    vo.setPayMd5(payMd5);
+                    payVo.add(vo);
+
+                }
             }
         }
         return payVo;
