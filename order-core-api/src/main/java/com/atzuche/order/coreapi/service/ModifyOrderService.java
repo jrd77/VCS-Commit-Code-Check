@@ -35,6 +35,7 @@ import com.atzuche.order.rentercommodity.service.CommodityService;
 import com.atzuche.order.rentercost.entity.RenterOrderCostDetailEntity;
 import com.atzuche.order.rentercost.entity.RenterOrderFineDeatailEntity;
 import com.atzuche.order.rentercost.entity.RenterOrderSubsidyDetailEntity;
+import com.atzuche.order.rentercost.entity.dto.OrderCouponDTO;
 import com.atzuche.order.rentercost.entity.dto.RenterOrderSubsidyDetailDTO;
 import com.atzuche.order.rentercost.service.RenterOrderCostCombineService;
 import com.atzuche.order.rentercost.service.RenterOrderCostDetailService;
@@ -49,6 +50,7 @@ import com.atzuche.order.renterorder.service.OrderCouponService;
 import com.atzuche.order.renterorder.service.RenterOrderCalCostService;
 import com.atzuche.order.renterorder.service.RenterOrderService;
 import com.atzuche.order.renterorder.vo.RenterOrderReqVO;
+import com.atzuche.order.renterorder.vo.owner.OwnerCouponGetAndValidReqVO;
 import com.autoyol.commons.web.ResponseData;
 import com.dianping.cat.Cat;
 
@@ -118,6 +120,9 @@ public class ModifyOrderService {
 		
 		// TODO 库存校验
 		
+		
+		// 获取主订单信息
+		OrderEntity orderEntity = orderService.getOrderEntity(modifyOrderDTO.getOrderNo());
 		// 获取修改前租客费用明细
 		List<RenterOrderCostDetailEntity> initCostList = renterOrderCostDetailService.listRenterOrderCostDetail(modifyOrderDTO.getOrderNo(), initRenterOrder.getRenterOrderNo());
 		// 获取修改前补贴信息
@@ -125,7 +130,7 @@ public class ModifyOrderService {
 		// 计算平台保障费和全面保障费补贴
 		List<RenterOrderSubsidyDetailDTO> renterSubsidyList = modifyOrderReq.getRenterSubsidyList();
 		// 基础费用计算包含租金，手续费，基础保障费用，全面保障费用，附加驾驶人保障费用，取还车费用计算和超运能费用计算
-		RenterOrderCostRespDTO renterOrderCostRespDTO = getRenterOrderCostRespDTO(modifyOrderDTO, renterMemberDTO, renterGoodsDetailDTO, initCostList, initSubsidyList);
+		RenterOrderCostRespDTO renterOrderCostRespDTO = getRenterOrderCostRespDTO(modifyOrderDTO, renterMemberDTO, renterGoodsDetailDTO, initCostList, initSubsidyList, orderEntity);
 		
 		// 获取修改订单违约金
 		List<RenterOrderFineDeatailEntity> renterFineList = getRenterFineList(modifyOrderDTO, initRenterOrder, deliveryList, renterOrderCostRespDTO);
@@ -329,14 +334,13 @@ public class ModifyOrderService {
 	 * @param renterGoodsDetailDTO
 	 * @return RenterOrderCostRespDTO
 	 */
-	public RenterOrderCostRespDTO getRenterOrderCostRespDTO(ModifyOrderDTO modifyOrderDTO, RenterMemberDTO renterMemberDTO, RenterGoodsDetailDTO renterGoodsDetailDTO, List<RenterOrderCostDetailEntity> initCostList, List<RenterOrderSubsidyDetailEntity> initSubsidyList) {
-		// 获取主订单信息
-		OrderEntity orderEntity = orderService.getOrderEntity(modifyOrderDTO.getOrderNo());
+	public RenterOrderCostRespDTO getRenterOrderCostRespDTO(ModifyOrderDTO modifyOrderDTO, RenterMemberDTO renterMemberDTO, RenterGoodsDetailDTO renterGoodsDetailDTO, List<RenterOrderCostDetailEntity> initCostList, List<RenterOrderSubsidyDetailEntity> initSubsidyList, OrderEntity orderEntity) {
+		
 		RenterOrderReqVO renterOrderReqVO = convertToRenterOrderReqVO(modifyOrderDTO, renterMemberDTO, renterGoodsDetailDTO, orderEntity);
 		RenterOrderCostReqDTO renterOrderCostReqDTO = renterOrderService.buildRenterOrderCostReqDTO(renterOrderReqVO);
 		// 获取费用补贴列表
 		List<RenterOrderSubsidyDetailDTO> subsidyList = getRenterSubsidyList(renterOrderCostReqDTO, modifyOrderDTO.getRenterSubsidyList(), initCostList, initSubsidyList);
-		renterOrderCostReqDTO.setSubsidyList(subsidyList);
+		renterOrderCostReqDTO.setSubsidyOutList(subsidyList);
 		// 获取计算好的费用信息
 		return renterOrderCalCostService.getOrderCostAndDeailList(renterOrderCostReqDTO);
 	}
@@ -504,9 +508,64 @@ public class ModifyOrderService {
 		Integer updAmt = renterOrderCostRespDTO.getRentAmount();
 		// 计算提前还车违约金
 		CostBaseDTO updBase = new CostBaseDTO(modifyOrderDTO.getOrderNo(), modifyOrderDTO.getRenterOrderNo(), modifyOrderDTO.getMemNo(), modifyOrderDTO.getRentTime(), modifyOrderDTO.getRevertTime());
-		RenterOrderFineDeatailEntity renterFine = renterOrderFineDeatailService.calcFineAmt(updBase, initAmt, updAmt, initRenterOrder.getExpRevertTime());
+		RenterOrderFineDeatailEntity renterFine = renterOrderFineDeatailService.calcFineAmt(updBase, Math.abs(initAmt), Math.abs(updAmt), initRenterOrder.getExpRevertTime());
 		return renterFine;
 	}
+	
+	/**
+	 * 获取车主券抵扣
+	 * @param renterOrderReqVO
+	 * @param surplusRentAmt
+	 * @return OrderCouponDTO
+	 */
+	public OrderCouponDTO getOwnerCoupon(RenterOrderReqVO renterOrderReqVO, Integer surplusRentAmt) {
+		OwnerCouponGetAndValidReqVO ownerCouponGetAndValidReqVO = renterOrderService.buildOwnerCouponGetAndValidReqVO(renterOrderReqVO,
+				surplusRentAmt);
+        OrderCouponDTO ownerCoupon = renterOrderCalCostService.calOwnerCouponDeductInfo(ownerCouponGetAndValidReqVO);
+        return ownerCoupon;
+	}
+	
+	/**
+	 * 获取车主券补贴
+	 * @param renterOrderReqVO
+	 * @return RenterOrderSubsidyDetailDTO
+	 */
+	public RenterOrderSubsidyDetailDTO getOwnerCouponSubsidy(CostBaseDTO costBaseDTO, OrderCouponDTO ownerCoupon) {
+        if(null != ownerCoupon) {
+            int disAmt = null == ownerCoupon.getAmount() ? 0 : ownerCoupon.getAmount();
+            //补贴明细
+            RenterOrderSubsidyDetailDTO ownerCouponSubsidyInfo =
+                    renterOrderSubsidyDetailService.calOwnerCouponSubsidyInfo(Integer.valueOf(costBaseDTO.getMemNo()),
+                    ownerCoupon);
+            return ownerCouponSubsidyInfo;
+        }
+        return null;
+	}
+	
+	/**
+	 * 限时立减补贴
+	 * @param costBaseDTO
+	 * @param orderEntity
+	 * @param surplusRentAmt
+	 * @return RenterOrderSubsidyDetailDTO
+	 */
+	public RenterOrderSubsidyDetailDTO getLimitRedSubsidy(CostBaseDTO costBaseDTO, OrderEntity orderEntity, Integer surplusRentAmt) {
+		if (orderEntity == null) {
+			return null;
+		}
+		// 限时红包limit_amt
+        Integer reductiAmt = orderEntity.getLimitAmt() == null ? 0:orderEntity.getLimitAmt();
+        if (reductiAmt == null || reductiAmt == 0) {
+        	return null;
+        }
+        RenterOrderSubsidyDetailDTO limitRedSubsidyInfo =
+                renterOrderSubsidyDetailService.calLimitRedSubsidyInfo(Integer.valueOf(costBaseDTO.getMemNo()),
+                        surplusRentAmt,reductiAmt);
+        return limitRedSubsidyInfo;
+	}
+	
+	
+	//public RenterOrderSubsidyDetailDTO get
 	
 	
 	/**
