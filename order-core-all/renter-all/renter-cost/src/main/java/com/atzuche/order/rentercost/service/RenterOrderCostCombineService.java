@@ -1,10 +1,5 @@
 package com.atzuche.order.rentercost.service;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.*;
-import java.util.stream.Collectors;
-
 import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.CatConstants;
 import com.atzuche.order.commons.DateUtils;
@@ -12,14 +7,13 @@ import com.atzuche.order.commons.GlobalConstant;
 import com.atzuche.order.commons.LocalDateTimeUtils;
 import com.atzuche.order.commons.entity.dto.*;
 import com.atzuche.order.commons.enums.ChannelNameTypeEnum;
+import com.atzuche.order.commons.enums.RenterCashCodeEnum;
 import com.atzuche.order.commons.enums.SubsidySourceCodeEnum;
 import com.atzuche.order.commons.enums.SubsidyTypeCodeEnum;
 import com.atzuche.order.rentercost.entity.*;
 import com.atzuche.order.rentercost.entity.dto.*;
-import com.atzuche.order.rentercost.entity.dto.GetReturnOverTransportDTO;
 import com.atzuche.order.rentercost.entity.vo.GetReturnResponseVO;
 import com.atzuche.order.rentercost.entity.vo.PayableVO;
-import com.atzuche.order.rentercost.exception.GetReturnCostErrorException;
 import com.atzuche.order.rentercost.exception.*;
 import com.autoyol.car.api.feign.api.GetBackCityLimitFeignApi;
 import com.autoyol.car.api.model.vo.ResponseObject;
@@ -32,25 +26,20 @@ import com.autoyol.feeservice.api.request.GetFbcFeeRequestDetail;
 import com.autoyol.feeservice.api.response.PriceFbcFeeResponseDetail;
 import com.autoyol.feeservice.api.response.PriceGetFbcFeeResponse;
 import com.autoyol.feeservice.api.vo.pricefetchback.PriceCarHumanFeeRule;
+import com.autoyol.platformcost.CommonUtils;
+import com.autoyol.platformcost.RenterFeeCalculatorUtils;
+import com.autoyol.platformcost.model.*;
+import com.dianping.cat.Cat;
 import com.dianping.cat.message.Transaction;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.atzuche.order.commons.enums.RenterCashCodeEnum;
-import com.autoyol.platformcost.CommonUtils;
-import com.autoyol.platformcost.RenterFeeCalculatorUtils;
-import com.autoyol.platformcost.model.CarDepositAmtVO;
-import com.autoyol.platformcost.model.CarPriceOfDay;
-import com.autoyol.platformcost.model.DepositText;
-import com.autoyol.platformcost.model.FeeResult;
-import com.autoyol.platformcost.model.IllegalDepositConfig;
-import com.autoyol.platformcost.model.InsuranceConfig;
-import com.autoyol.platformcost.model.OilAverageCostBO;
-import com.dianping.cat.Cat;
-
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.client.RestTemplate;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -347,10 +336,14 @@ public class RenterOrderCostCombineService {
 		}
 		// TODO 押金配置列表从配置中心获取
 		List<DepositText> depositList = null;
-		CarDepositAmtVO carDepositAmtVO = RenterFeeCalculatorUtils.calCarDepositAmt(depositAmtDTO.getInternalStaff(), depositAmtDTO.getCityCode(), 
-				depositAmtDTO.getSurplusPrice(), depositAmtDTO.getCarBrandTypeRadio(), depositAmtDTO.getCarYearRadio(), 
-				depositList, depositAmtDTO.getReliefPercetage());
-		return carDepositAmtVO;
+		/*CarDepositAmtVO carDepositAmtVO = RenterFeeCalculatorUtils.calCarDepositAmt(depositAmtDTO.getCityCode(),
+				depositAmtDTO.getSurplusPrice(),
+                depositAmtDTO.getCarBrandTypeRadio(),
+                depositAmtDTO.getCarYearRadio(),
+				depositList,
+                depositAmtDTO.getReliefPercetage()
+        );*/
+		return null;
 	}
 	
 	
