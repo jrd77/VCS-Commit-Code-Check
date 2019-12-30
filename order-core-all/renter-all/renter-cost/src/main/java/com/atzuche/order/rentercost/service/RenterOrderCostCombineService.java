@@ -1,10 +1,5 @@
 package com.atzuche.order.rentercost.service;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.*;
-import java.util.stream.Collectors;
-
 import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.CatConstants;
 import com.atzuche.order.commons.DateUtils;
@@ -12,14 +7,13 @@ import com.atzuche.order.commons.GlobalConstant;
 import com.atzuche.order.commons.LocalDateTimeUtils;
 import com.atzuche.order.commons.entity.dto.*;
 import com.atzuche.order.commons.enums.ChannelNameTypeEnum;
+import com.atzuche.order.commons.enums.RenterCashCodeEnum;
 import com.atzuche.order.commons.enums.SubsidySourceCodeEnum;
 import com.atzuche.order.commons.enums.SubsidyTypeCodeEnum;
 import com.atzuche.order.rentercost.entity.*;
 import com.atzuche.order.rentercost.entity.dto.*;
-import com.atzuche.order.rentercost.entity.dto.GetReturnOverTransportDTO;
 import com.atzuche.order.rentercost.entity.vo.GetReturnResponseVO;
 import com.atzuche.order.rentercost.entity.vo.PayableVO;
-import com.atzuche.order.rentercost.exception.GetReturnCostErrorException;
 import com.atzuche.order.rentercost.exception.*;
 import com.autoyol.car.api.feign.api.GetBackCityLimitFeignApi;
 import com.autoyol.car.api.model.vo.ResponseObject;
@@ -32,25 +26,22 @@ import com.autoyol.feeservice.api.request.GetFbcFeeRequestDetail;
 import com.autoyol.feeservice.api.response.PriceFbcFeeResponseDetail;
 import com.autoyol.feeservice.api.response.PriceGetFbcFeeResponse;
 import com.autoyol.feeservice.api.vo.pricefetchback.PriceCarHumanFeeRule;
+import com.autoyol.platformcost.CommonUtils;
+import com.autoyol.platformcost.LocalDateTimeUtil;
+import com.autoyol.platformcost.RenterFeeCalculatorUtils;
+import com.autoyol.platformcost.model.*;
+import com.dianping.cat.Cat;
 import com.dianping.cat.message.Transaction;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.atzuche.order.commons.enums.RenterCashCodeEnum;
-import com.autoyol.platformcost.CommonUtils;
-import com.autoyol.platformcost.RenterFeeCalculatorUtils;
-import com.autoyol.platformcost.model.CarDepositAmtVO;
-import com.autoyol.platformcost.model.CarPriceOfDay;
-import com.autoyol.platformcost.model.DepositText;
-import com.autoyol.platformcost.model.FeeResult;
-import com.autoyol.platformcost.model.IllegalDepositConfig;
-import com.autoyol.platformcost.model.InsuranceConfig;
-import com.autoyol.platformcost.model.OilAverageCostBO;
-import com.dianping.cat.Cat;
-
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.client.RestTemplate;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -347,12 +338,61 @@ public class RenterOrderCostCombineService {
 		}
 		// TODO 押金配置列表从配置中心获取
 		List<DepositText> depositList = null;
-		CarDepositAmtVO carDepositAmtVO = RenterFeeCalculatorUtils.calCarDepositAmt(depositAmtDTO.getInternalStaff(), depositAmtDTO.getCityCode(), 
-				depositAmtDTO.getSurplusPrice(), depositAmtDTO.getCarBrandTypeRadio(), depositAmtDTO.getCarYearRadio(), 
-				depositList, depositAmtDTO.getReliefPercetage());
+        double years = LocalDateTimeUtil.periodDays(depositAmtDTO.getLicenseDay(), LocalDate.now())/356D;
+        int surplusPriceProYear = CommonUtils.getSurplusPriceProYear(years);
+        CarDepositAmtVO carDepositAmtVO = RenterFeeCalculatorUtils.calCarDepositAmt(depositAmtDTO.getCityCode(),
+				depositAmtDTO.getSurplusPrice(),
+                getCarSpecialCoefficientNew(depositAmtDTO.getBrand(),depositAmtDTO.getType()),
+                getNewCarCoefficient(surplusPriceProYear),
+				depositList
+        );
 		return carDepositAmtVO;
 	}
-	
+    /*
+     * @Author ZhangBin
+     * @Date 2019/12/30 11:58
+     * @Description: 取车辆品牌系数
+     *
+     **/
+    public double getCarSpecialCoefficientNew(String brand, String type) {
+        double carSpecialCoefficient = 0.0d;
+        try {
+            if(StringUtils.isNotBlank(brand) && StringUtils.isNotBlank(type)){
+                if(StringUtils.isNumeric(brand) && StringUtils.isNumeric(type)){
+                  //TODO 配置中获取车辆品牌系数
+                    //  carSpecialCoefficient = transExtV36Service.getHotConfigValue(Integer.valueOf(brand), Integer.valueOf(type));
+                }
+            }
+        } catch (Exception e) {
+            log.error("getCarSpecialCoefficientNew ex:",e);
+        }
+        log.info("calc result carSpecialCoefficient={},brandId={},typeId={}",carSpecialCoefficient,brand,type);
+        return carSpecialCoefficient;
+    }
+
+    /**
+     * 获取新车押金系数 (年份系数)
+     * @param year
+     * @return
+     */
+    public double getNewCarCoefficient(int year) {
+        if (year <= 2) {
+            //TODO 配置中获取 请在配置sys_constant表配置c_code:"+code+"相关数据
+            Map<String, Object> map = null;//sysConstantService.getSysConstantByCode("car_year_neqtwo");
+            if (map != null && map.size()>0) {
+                return map.get("c_value")!=null ?Double.parseDouble(map.get("c_value").toString()):1.4;
+            }
+        }else{
+            //TODO 配置中获取 请在配置sys_constant表配置c_code:"+code+"相关数据
+            Map<String, Object> map = null;//sysConstantService.getSysConstantByCode("car_year_lttwo");
+            if (map != null && map.size()>0) {
+                return map.get("c_value")!=null ?Double.parseDouble(map.get("c_value").toString()):1;
+            }
+        }
+        return 1;
+    }
+
+
 	
 	/**
 	 * 获取违章押金
@@ -646,6 +686,8 @@ public class RenterOrderCostCombineService {
                 renterOrderSubsidy.setSubsidySourceName(SubsidySourceCodeEnum.PLATFORM.getDesc());
                 renterOrderSubsidy.setSubsidyTargetCode(SubsidySourceCodeEnum.RENTER.getCode());
                 renterOrderSubsidy.setSubsidyTargetName(SubsidySourceCodeEnum.RENTER.getDesc());
+                renterOrderSubsidy.setSubsidyCostCode(RenterCashCodeEnum.SRV_GET_COST.getCashNo());
+                renterOrderSubsidy.setSubsidyCostName(RenterCashCodeEnum.SRV_GET_COST.getTxt());
                 renterOrderSubsidy.setSubsidyDesc("平台补贴给租客的取车费用！");
                 int expectedRealFee = Integer.valueOf(fbcFeeResponse.getExpectedRealFee());
 
@@ -677,6 +719,8 @@ public class RenterOrderCostCombineService {
                renterOrderSubsidy.setSubsidySourceName(SubsidySourceCodeEnum.PLATFORM.getDesc());
                renterOrderSubsidy.setSubsidyTargetCode(SubsidySourceCodeEnum.RENTER.getCode());
                renterOrderSubsidy.setSubsidyTargetName(SubsidySourceCodeEnum.RENTER.getDesc());
+                renterOrderSubsidy.setSubsidyCostCode(RenterCashCodeEnum.SRV_RETURN_COST.getCashNo());
+                renterOrderSubsidy.setSubsidyCostName(RenterCashCodeEnum.SRV_RETURN_COST.getTxt());
                renterOrderSubsidy.setSubsidyDesc("平台补贴给租客的还车费用！");
                int expectedRealFee = Integer.valueOf(fbcFeeResponse.getExpectedRealFee());
                renterOrderSubsidy.setSubsidyAmount(expectedShouldFee - expectedRealFee);

@@ -76,7 +76,7 @@ public class RenYunDeliveryCarService {
      *
      * @return
      */
-    @Retryable(value = Exception.class, maxAttempts = DeliveryConstants.REN_YUN_HTTP_RETRY_TIMES, backoff = @Backoff(delay = 1000L, multiplier = 1))
+    @Retryable(value = Exception.class, maxAttempts = 5, backoff = @Backoff(delay = 1000L, multiplier = 1))
     public String sendHttpToRenYun(String url, Serializable object, Integer requestCode) {
         ResponseData responseData;
         DeliveryHttpLogEntity deliveryHttpLogEntity = new DeliveryHttpLogEntity();
