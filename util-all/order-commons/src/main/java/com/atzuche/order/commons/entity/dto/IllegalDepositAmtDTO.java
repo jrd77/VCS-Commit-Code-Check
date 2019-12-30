@@ -15,10 +15,6 @@ public class IllegalDepositAmtDTO {
 	 */
 	private Integer cityCode;
 	/**
-	 * 是否内部员工 1是，其他否
-	 */
-	private Integer internalStaff;
-	/**
 	 * 车牌号
 	 */
 	private String carPlateNum;

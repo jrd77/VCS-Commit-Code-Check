@@ -418,7 +418,7 @@ public class RenterOrderCostCombineService {
 		Integer specialIllegalDepositAmt = null;
 		// TODO 违章押金配置从配置中心获取
 		List<IllegalDepositConfig> illegalDepositList = null;
-		Integer illegalDepositAmt = RenterFeeCalculatorUtils.calIllegalDepositAmt(illDTO.getInternalStaff(), illDTO.getCityCode(), illDTO.getCarPlateNum(), 
+		Integer illegalDepositAmt = RenterFeeCalculatorUtils.calIllegalDepositAmt(illDTO.getCityCode(), illDTO.getCarPlateNum(),
 				specialCityCodes, specialIllegalDepositAmt, illegalDepositList, 
 				costBaseDTO.getStartTime(), costBaseDTO.getEndTime());
 		return illegalDepositAmt;
