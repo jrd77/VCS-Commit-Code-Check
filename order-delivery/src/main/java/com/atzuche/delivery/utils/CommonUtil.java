@@ -2,7 +2,6 @@ package com.atzuche.delivery.utils;
 
 import com.atzuche.delivery.common.DeliveryConstants;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.beanutils.BeanMap;
 import org.apache.commons.beanutils.BeanUtils;
 
 import java.io.UnsupportedEncodingException;

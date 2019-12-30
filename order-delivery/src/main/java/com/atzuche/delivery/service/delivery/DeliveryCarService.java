@@ -4,6 +4,7 @@ import com.atzuche.delivery.common.DeliveryCarTask;
 import com.atzuche.delivery.common.DeliveryErrorCode;
 import com.atzuche.delivery.entity.RenterDeliveryAddrEntity;
 import com.atzuche.delivery.entity.RenterOrderDeliveryEntity;
+import com.atzuche.delivery.enums.ServiceTypeEnum;
 import com.atzuche.delivery.enums.UsedDeliveryTypeEnum;
 import com.atzuche.delivery.enums.UserTypeEnum;
 import com.atzuche.delivery.exception.DeliveryOrderException;
@@ -69,7 +70,8 @@ public class DeliveryCarService {
         if (null == cancelOrderDeliveryVO || cancelOrderDeliveryVO.getCancelFlowOrderDTO() == null || StringUtils.isBlank(cancelOrderDeliveryVO.getRenterOrderNo())) {
             throw new DeliveryOrderException(DELIVERY_PARAMS_ERROR);
         }
-        cancelOrderDelivery(cancelOrderDeliveryVO.getRenterOrderNo());
+        int serviceType = cancelOrderDeliveryVO.getCancelFlowOrderDTO().getServicetype().equals(ServiceTypeEnum.TAKE_TYPE.getValue()) ? 1 : 2;
+        cancelOrderDelivery(cancelOrderDeliveryVO.getRenterOrderNo(),serviceType);
         deliveryCarTask.cancelRenYunFlowOrderInfo(cancelOrderDeliveryVO.getCancelFlowOrderDTO());
     }
 
@@ -86,8 +88,8 @@ public class DeliveryCarService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public void cancelOrderDelivery(String renterOrderNo) {
-        RenterOrderDeliveryEntity orderDeliveryEntity = orderDeliveryMapper.findRenterOrderByRenterOrderNo(renterOrderNo);
+    public void cancelOrderDelivery(String renterOrderNo,Integer serviceType) {
+        RenterOrderDeliveryEntity orderDeliveryEntity = orderDeliveryMapper.findRenterOrderByRenterOrderNo(renterOrderNo,serviceType);
         if (null == orderDeliveryEntity) {
             throw new DeliveryOrderException(DELIVERY_PARAMS_ERROR.getValue(), "没有找到该配送订单信息");
         }
