@@ -1,14 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.atzuche.order.renterorder.mapper.RenterTransFlowMapper">
+<mapper namespace="com.atzuche.order.parentorder.mapper.OrderFlowMapper">
 
-    <resultMap type="com.atzuche.order.renterorder.entity.RenterTransFlowEntity" id="BaseResultMap">
+    <resultMap type="com.atzuche.order.parentorder.entity.OrderFlowEntity" id="BaseResultMap">
         <result property="id" column="id"/>
         <result property="orderNo" column="order_no"/>
-        <result property="renterOrderNo" column="renter_order_no"/>
-        <result property="transStatus" column="trans_status"/>
-        <result property="transDesc" column="trans_desc"/>
+        <result property="orderStatus" column="order_status"/>
+        <result property="orderStatusDesc" column="order_status_desc"/>
         <result property="createTime" column="create_time"/>
         <result property="createOp" column="create_op"/>
         <result property="updateTime" column="update_time"/>
@@ -20,9 +19,8 @@
 	<sql id="Base_Column_List">
 	`id`, 	
 	`order_no`, 	
-	`renter_order_no`, 	
-	`trans_status`, 	
-	`trans_desc`, 	
+	`order_status`, 	
+	`order_status_desc`, 	
 	`create_time`, 	
 	`create_op`, 	
 	`update_time`, 	
@@ -33,16 +31,15 @@
 
 
 	<select id="selectByPrimaryKey" resultMap="BaseResultMap">
-		select <include refid="Base_Column_List" /> from renter_trans_flow where id = #{value}
+		select <include refid="Base_Column_List" /> from order_flow where id = #{value}
 	</select>
 
-	<insert id="insert" parameterType="com.atzuche.order.renterorder.entity.RenterTransFlowEntity" useGeneratedKeys="true" keyProperty="id">
-		insert into renter_trans_flow
+	<insert id="insert" parameterType="com.atzuche.order.parentorder.entity.OrderFlowEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into order_flow
 		(
 				`order_no`,		
-				`renter_order_no`,		
-				`trans_status`,		
-				`trans_desc`,		
+				`order_status`,		
+				`order_status_desc`,		
 				`create_time`,		
 				`create_op`,		
 				`update_time`,		
@@ -52,9 +49,8 @@
 		values
 		(
 				#{orderNo}, 		
-				#{renterOrderNo}, 		
-				#{transStatus}, 		
-				#{transDesc}, 		
+				#{orderStatus}, 		
+				#{orderStatusDesc}, 		
 				#{createTime}, 		
 				#{createOp}, 		
 				#{updateTime}, 		
@@ -63,13 +59,12 @@
 			)
 	</insert>
 	
-	<insert id="insertSelective" parameterType="com.atzuche.order.renterorder.entity.RenterTransFlowEntity" useGeneratedKeys="true" keyProperty="id">
-		insert into renter_trans_flow
+	<insert id="insertSelective" parameterType="com.atzuche.order.parentorder.entity.OrderFlowEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into order_flow
 		(
 				<if test="orderNo != null">`order_no`, </if>
-				<if test="renterOrderNo != null">`renter_order_no`, </if>
-				<if test="transStatus != null">`trans_status`, </if>
-				<if test="transDesc != null">`trans_desc`, </if>
+				<if test="orderStatus != null">`order_status`, </if>
+				<if test="orderStatusDesc != null">`order_status_desc`, </if>
 				<if test="createTime != null">`create_time`, </if>
 				<if test="createOp != null">`create_op`, </if>
 				<if test="updateTime != null">`update_time`, </if>
@@ -79,9 +74,8 @@
 		values
 		(
 				<if test="orderNo != null">#{orderNo},  </if>
-				<if test="renterOrderNo != null">#{renterOrderNo},  </if>
-				<if test="transStatus != null">#{transStatus},  </if>
-				<if test="transDesc != null">#{transDesc},  </if>
+				<if test="orderStatus != null">#{orderStatus},  </if>
+				<if test="orderStatusDesc != null">#{orderStatusDesc},  </if>
 				<if test="createTime != null">#{createTime},  </if>
 				<if test="createOp != null">#{createOp},  </if>
 				<if test="updateTime != null">#{updateTime},  </if>
@@ -91,13 +85,12 @@
 	</insert>
 	
 	 
-	<update id="updateByPrimaryKeySelective" parameterType="com.atzuche.order.renterorder.entity.RenterTransFlowEntity">
-		update renter_trans_flow 
+	<update id="updateByPrimaryKeySelective" parameterType="com.atzuche.order.parentorder.entity.OrderFlowEntity">
+		update order_flow 
 		<set>
 				<if test="orderNo != null">`order_no` = #{orderNo}, </if>
-				<if test="renterOrderNo != null">`renter_order_no` = #{renterOrderNo}, </if>
-				<if test="transStatus != null">`trans_status` = #{transStatus}, </if>
-				<if test="transDesc != null">`trans_desc` = #{transDesc}, </if>
+				<if test="orderStatus != null">`order_status` = #{orderStatus}, </if>
+				<if test="orderStatusDesc != null">`order_status_desc` = #{orderStatusDesc}, </if>
 				<if test="createTime != null">`create_time` = #{createTime}, </if>
 				<if test="createOp != null">`create_op` = #{createOp}, </if>
 				<if test="updateTime != null">`update_time` = #{updateTime}, </if>
@@ -107,13 +100,12 @@
 		where id = #{id}
 	</update>
 	
-	<update id="updateByPrimaryKey" parameterType="com.atzuche.order.renterorder.entity.RenterTransFlowEntity">
-		update renter_trans_flow 
+	<update id="updateByPrimaryKey" parameterType="com.atzuche.order.parentorder.entity.OrderFlowEntity">
+		update order_flow 
 		<set>
 				`order_no` = #{orderNo}, 		
-				`renter_order_no` = #{renterOrderNo}, 		
-				`trans_status` = #{transStatus}, 		
-				`trans_desc` = #{transDesc}, 		
+				`order_status` = #{orderStatus}, 		
+				`order_status_desc` = #{orderStatusDesc}, 		
 				`create_time` = #{createTime}, 		
 				`create_op` = #{createOp}, 		
 				`update_time` = #{updateTime}, 		
