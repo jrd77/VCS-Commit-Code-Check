@@ -1,8 +1,8 @@
 package com.atzuche.order.commons.entity.dto;
 
-import com.autoyol.doc.annotation.AutoDocProperty;
 import lombok.Data;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -190,5 +190,19 @@ public class RenterGoodsDetailDTO {
      * 车主会员号
      */
     private String ownerMemNo;
+
+    /**
+     * 车辆品牌
+     */
+    private String brand;
+    /**
+     * 车型
+     */
+    private String type;
+
+    /**
+     * 行驶证注册年月
+     */
+    private LocalDate licenseDay;
 
 }

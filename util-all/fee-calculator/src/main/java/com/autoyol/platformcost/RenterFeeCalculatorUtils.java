@@ -357,7 +357,7 @@ public class RenterFeeCalculatorUtils {
 	 * @param cityCode 城市编号
 	 * @param guidPrice 车辆残值
 	 * @param carBrandTypeRadio 车型品牌系数
-	 * @param carYearRadio 车辆年份系数
+	 * @param carYearRadio 新车押金系数
 	 * @param depositList 押金配置列表
 	 * @param reliefPercetage 减免比例
 	 * @return CarDepositAmtVO
@@ -421,8 +421,12 @@ public class RenterFeeCalculatorUtils {
             carDepositAmt = suggestTotal * coefficient;
         }
         CarDepositAmtVO carDepositAmtVO = new CarDepositAmtVO();
+        carDepositAmtVO.setCarSpecialCoefficient(carBrandTypeRadio);
+        carDepositAmtVO.setNewCarCoefficient(carYearRadio);
         carDepositAmtVO.setCarDepositAmt((int) carDepositAmt);
+        carDepositAmtVO.setSuggestTotal((int)suggestTotal);
         carDepositAmtVO.setCarDepositRadio(coefficient);
+
         return carDepositAmtVO;
 	}
 	
@@ -458,18 +462,14 @@ public class RenterFeeCalculatorUtils {
 	 * @param revertTime 还车时间
 	 * @return Integer
 	 */
-	public static Integer calIllegalDepositAmt(Integer internalStaff, Integer cityCode, String carPlateNum, String specialCityCodes, Integer specialIllegalDepositAmt,
+	public static Integer calIllegalDepositAmt(Integer cityCode, String carPlateNum, String specialCityCodes, Integer specialIllegalDepositAmt,
 			List<IllegalDepositConfig> illegalDepositList, LocalDateTime rentTime, LocalDateTime revertTime) {
-		internalStaff = internalStaff == null ? 0:internalStaff;
 		Integer illegalDepositAmt = ILLEGAL_DEPOSIT.get(0);
 		if (carPlateNum != null && !"".equals(carPlateNum) && specialCityCodes != null && !"".equals(specialCityCodes)) {
 			if("粤".equals(carPlateNum.substring(0,1)) && cityCode != null && specialCityCodes.contains(String.valueOf(cityCode))){
 				illegalDepositAmt = specialIllegalDepositAmt == null ? illegalDepositAmt:specialIllegalDepositAmt;
 				return illegalDepositAmt;
 	        }
-		}
-		if (internalStaff == 1) {
-			return ILLEGAL_DEPOSIT.get(internalStaff);
 		}
 		illegalDepositAmt = getIllegalDepositAmt(cityCode, illegalDepositList, rentTime, revertTime);
 		return illegalDepositAmt;
