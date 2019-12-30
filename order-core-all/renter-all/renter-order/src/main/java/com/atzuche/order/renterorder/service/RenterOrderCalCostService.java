@@ -20,7 +20,6 @@ import com.atzuche.order.rentercost.service.RenterOrderCostService;
 import com.atzuche.order.rentercost.service.RenterOrderSubsidyDetailService;
 import com.atzuche.order.renterorder.entity.dto.RenterOrderCostReqDTO;
 import com.atzuche.order.renterorder.entity.dto.RenterOrderCostRespDTO;
-import com.atzuche.order.renterorder.mapper.RenterOrderMapper;
 import com.atzuche.order.renterorder.vo.owner.OwnerCouponGetAndValidReqVO;
 import com.atzuche.order.renterorder.vo.owner.OwnerCouponGetAndValidResultVO;
 import com.atzuche.order.renterorder.vo.owner.OwnerDiscountCouponVO;
@@ -41,6 +40,7 @@ import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -53,9 +53,6 @@ import java.util.stream.Collectors;
 public class RenterOrderCalCostService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RenterOrderCalCostService.class);
-
-    @Resource
-    private RenterOrderMapper renterOrderMapper;
 
     @Resource
     private RenterOrderCostCombineService renterOrderCostCombineService;
@@ -99,45 +96,78 @@ public class RenterOrderCalCostService {
         RenterOrderCostRespDTO renterOrderCostRespDTO = new RenterOrderCostRespDTO();
         List<RenterOrderCostDetailEntity> detailList = new ArrayList<>();
         List<RenterOrderSubsidyDetailDTO> subsidyList = new ArrayList<>();
+        List<RenterOrderSubsidyDetailDTO> subsidyOutList = renterOrderCostReqDTO.getSubsidyOutList();
+        Map<String, List<RenterOrderSubsidyDetailDTO>> subsidyOutGroup = Optional
+                .ofNullable(subsidyOutList)
+                .orElseGet(ArrayList :: new)
+                .stream()
+                .collect(Collectors.groupingBy(RenterOrderSubsidyDetailDTO::getSubsidyCostCode));
 
         //获取租金
         List<RenterOrderCostDetailEntity> renterOrderCostDetailEntities = renterOrderCostCombineService.listRentAmtEntity(renterOrderCostReqDTO.getRentAmtDTO());
+        List<RenterOrderSubsidyDetailDTO> rentAmtSubSidy = subsidyOutGroup.get(RenterCashCodeEnum.RENT_AMT.getCashNo());
+        int rentAmtSubsidyAmt = rentAmtSubSidy == null ? 0 : rentAmtSubSidy.get(0).getSubsidyAmount();
         int rentAmt = renterOrderCostDetailEntities.stream().collect(Collectors.summingInt(RenterOrderCostDetailEntity::getTotalAmount));
+        rentAmt = rentAmt + rentAmtSubsidyAmt;
         detailList.addAll(renterOrderCostDetailEntities);
+        subsidyList.addAll(rentAmtSubSidy);
         renterOrderCostRespDTO.setRentAmount(rentAmt);
-        
+
         //获取平台保障费
         RenterOrderCostDetailEntity insurAmtEntity = renterOrderCostCombineService.getInsurAmtEntity(renterOrderCostReqDTO.getInsurAmtDTO());
+        List<RenterOrderSubsidyDetailDTO> insurAmtSubSidy = subsidyOutGroup.get(RenterCashCodeEnum.INSURE_TOTAL_PRICES.getCashNo());
+        int insurAmtSubSidyAmt = insurAmtSubSidy == null ? 0:insurAmtSubSidy.get(0).getSubsidyAmount();
         int insurAmt = insurAmtEntity.getTotalAmount();
+        insurAmt = insurAmt + insurAmtSubSidyAmt;
         renterOrderCostRespDTO.setBasicEnsureAmount(insurAmt);
         detailList.add(insurAmtEntity);
+        subsidyList.addAll(insurAmtSubSidy);
 
         //获取全面保障费
         List<RenterOrderCostDetailEntity> comprehensiveEnsureList = renterOrderCostCombineService.listAbatementAmtEntity(renterOrderCostReqDTO.getAbatementAmtDTO());
+        List<RenterOrderSubsidyDetailDTO> comprehensiveEnsureSubsidy = subsidyOutGroup.get(RenterCashCodeEnum.ABATEMENT_INSURE.getCashNo());
+        int comprehensiveEnsureSubsidyAmount = comprehensiveEnsureSubsidy == null ? 0:comprehensiveEnsureSubsidy.get(0).getSubsidyAmount();
         int comprehensiveEnsureAmount = comprehensiveEnsureList.stream().collect(Collectors.summingInt(RenterOrderCostDetailEntity::getTotalAmount));
+        comprehensiveEnsureAmount = comprehensiveEnsureAmount + comprehensiveEnsureSubsidyAmount;
         renterOrderCostRespDTO.setComprehensiveEnsureAmount(comprehensiveEnsureAmount);
         detailList.addAll(comprehensiveEnsureList);
+        subsidyList.addAll(comprehensiveEnsureSubsidy);
 
-        //获取附加驾驶人费用
+        //获取附加驾驶人保险金额
         RenterOrderCostDetailEntity extraDriverInsureAmtEntity = renterOrderCostCombineService.getExtraDriverInsureAmtEntity(renterOrderCostReqDTO.getExtraDriverDTO());
+        List<RenterOrderSubsidyDetailDTO> totalAmountSubsidy = subsidyOutGroup.get(RenterCashCodeEnum.EXTRA_DRIVER_INSURE.getCashNo());
+        int totalAmountSubsidyAmount = totalAmountSubsidy == null ? 0:totalAmountSubsidy.get(0).getSubsidyAmount();
         int totalAmount = extraDriverInsureAmtEntity.getTotalAmount();
+        totalAmount = totalAmount + totalAmountSubsidyAmount;
         renterOrderCostRespDTO.setAdditionalDrivingEnsureAmount(totalAmount);
         detailList.add(extraDriverInsureAmtEntity);
+        subsidyList.addAll(totalAmountSubsidy);
 
         //获取平台手续费
         RenterOrderCostDetailEntity serviceChargeFeeEntity = renterOrderCostCombineService.getServiceChargeFeeEntity(costBaseDTO);
+        List<RenterOrderSubsidyDetailDTO> serviceSubsidy = subsidyOutGroup.get(RenterCashCodeEnum.FEE.getCashNo());
+        int serviceSubsidyAmount = serviceSubsidy == null ? 0 : serviceSubsidy.get(0).getSubsidyAmount();
         int serviceAmount = serviceChargeFeeEntity.getTotalAmount();
+        serviceAmount = serviceAmount + serviceSubsidyAmount;
         renterOrderCostRespDTO.setCommissionAmount(serviceAmount);
         detailList.add(serviceChargeFeeEntity);
+        subsidyList.addAll(serviceSubsidy);
 
         //获取取还车费用
         GetReturnCarCostReqDto getReturnCarCostReqDto = renterOrderCostReqDTO.getGetReturnCarCostReqDto();
         getReturnCarCostReqDto.setSumJudgeFreeFee(Math.abs(rentAmt + insurAmt + serviceAmount + comprehensiveEnsureAmount));
         GetReturnCostDTO returnCarCost = renterOrderCostCombineService.getReturnCarCost(getReturnCarCostReqDto);
-        int getReturnAmt = returnCarCost.getRenterOrderCostDetailEntityList().stream().collect(Collectors.summingInt(RenterOrderCostDetailEntity::getTotalAmount));
-        detailList.addAll(returnCarCost.getRenterOrderCostDetailEntityList());
         List<RenterOrderSubsidyDetailDTO> renterOrderSubsidyDetailDTOList = returnCarCost.getRenterOrderSubsidyDetailDTOList();
+        List<RenterOrderSubsidyDetailDTO> getSubsidy= subsidyOutGroup.get(RenterCashCodeEnum.SRV_GET_COST.getCashNo());
+        List<RenterOrderSubsidyDetailDTO> returnSubsidy = subsidyOutGroup.get(RenterCashCodeEnum.SRV_RETURN_COST.getCashNo());
+        int getSubsidyAmt = getSubsidy == null ? 0 : getSubsidy.get(0).getSubsidyAmount();
+        int returnSubsidyAmt = returnSubsidy == null ? 0: returnSubsidy.get(0).getSubsidyAmount();
+        int getReturnAmt = returnCarCost.getRenterOrderCostDetailEntityList().stream().collect(Collectors.summingInt(RenterOrderCostDetailEntity::getTotalAmount));
+        getReturnAmt = getReturnAmt + getSubsidyAmt + returnSubsidyAmt;
+        detailList.addAll(returnCarCost.getRenterOrderCostDetailEntityList());
         subsidyList.addAll(renterOrderSubsidyDetailDTOList);
+        subsidyList.addAll(getSubsidy);
+        subsidyList.addAll(returnSubsidy);
         GetReturnResponseVO getReturnResponseVO = returnCarCost.getGetReturnResponseVO();
         renterOrderCostRespDTO.setGetRealAmt(getReturnResponseVO.getGetFee());
         renterOrderCostRespDTO.setReturnRealAmt(getReturnResponseVO.getReturnFee());
@@ -145,6 +175,10 @@ public class RenterOrderCalCostService {
         //获取取还车超运能费用
         GetReturnOverCostDTO getReturnOverCost = renterOrderCostCombineService.getGetReturnOverCost(renterOrderCostReqDTO.getGetReturnCarOverCostReqDto());
         List<RenterOrderCostDetailEntity> renterOrderCostDetailEntityList = getReturnOverCost.getRenterOrderCostDetailEntityList();
+        List<RenterOrderSubsidyDetailDTO> getOverSubsidy = subsidyOutGroup.get(RenterCashCodeEnum.GET_BLOCKED_RAISE_AMT.getCashNo());
+        List<RenterOrderSubsidyDetailDTO> returnOverSubsidy = subsidyOutGroup.get(RenterCashCodeEnum.RETURN_BLOCKED_RAISE_AMT.getCashNo());
+        int getOverSubsidyAmt = getOverSubsidy == null ? 0 : getOverSubsidy.get(0).getSubsidyAmount();
+        int returnOverSubsidyAmt = returnOverSubsidy == null ? 0 : returnOverSubsidy.get(0).getSubsidyAmount();
         Integer getOverAmt = renterOrderCostDetailEntityList.stream()
                 .filter(x -> RenterCashCodeEnum.GET_BLOCKED_RAISE_AMT.getCashNo().equals(x.getCostCode()))
                 .collect(Collectors.summingInt(RenterOrderCostDetailEntity::getTotalAmount));
@@ -152,9 +186,12 @@ public class RenterOrderCalCostService {
                 .filter(x -> RenterCashCodeEnum.RETURN_BLOCKED_RAISE_AMT.getCashNo().equals(x.getCostCode()))
                 .collect(Collectors.summingInt(RenterOrderCostDetailEntity::getTotalAmount));
         int getReturnOverCostAmount = getOverAmt + returnOverAmt;
+        getReturnOverCostAmount = getReturnOverCostAmount + getOverSubsidyAmt + returnOverSubsidyAmt;
         detailList.addAll(renterOrderCostDetailEntityList);
         renterOrderCostRespDTO.setGetOverAmt(getOverAmt);
         renterOrderCostRespDTO.setReturnOverAmt(returnOverAmt);
+        subsidyList.addAll(getOverSubsidy);
+        subsidyList.addAll(returnOverSubsidy);
 
         //租车费用 = 租金+平台保障费+全面保障费+取还车费用+取还车超运能费用+附加驾驶员费用+手续费；
         int rentCarAmount = rentAmt + insurAmt + comprehensiveEnsureAmount + getReturnAmt + getReturnOverCostAmount + totalAmount + serviceAmount;
