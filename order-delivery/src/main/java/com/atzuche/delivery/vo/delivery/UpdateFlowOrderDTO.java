@@ -52,7 +52,7 @@ public class UpdateFlowOrderDTO implements Serializable{
     private String newbeforeTime;
 
     /**
-     * 预计取车时间（YYYYMMDDHHmmss)
+     * 预计还车时间（YYYYMMDDHHmmss)
      **/
     private String newafterTime;
 

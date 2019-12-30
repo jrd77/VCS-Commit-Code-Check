@@ -23,11 +23,7 @@ public class RenterDepositDetailEntity implements Serializable {
 	/**
 	 * 主订单号
 	 */
-	private String orderNoParent;
-	/**
-	 * 子订单号
-	 */
-	private String orderNoChild;
+	private String orderNo;
 	/**
 	 * X系数（押金计算使用）
 	 */
@@ -41,17 +37,13 @@ public class RenterDepositDetailEntity implements Serializable {
 	 */
 	private Double carSpecialCoefficient;
 	/**
-	 * 年份系数
-	 */
-	private Double yearCoefficient;
-	/**
 	 * 原始租车押金
 	 */
 	private Integer originalDepositAmt;
 	/**
 	 * 减免比例
 	 */
-	private Integer reductionRate;
+	private Double reductionRate;
 	/**
 	 * 减免押金金额
 	 */

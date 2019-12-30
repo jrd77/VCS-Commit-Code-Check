@@ -1,6 +1,7 @@
 package com.atzuche.order.renterorder.vo;
 
 import com.atzuche.order.commons.entity.dto.RenterGoodsPriceDetailDTO;
+import com.atzuche.order.commons.entity.dto.RenterMemberRightDTO;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -36,9 +37,19 @@ public class RenterOrderReqVO implements Serializable {
     private String memNo;
 
     /**
+     * 内部员工标识
+     */
+    private Integer internalStaff;
+
+    /**
      * 车辆注册号
      */
     private Integer carNo;
+
+    /**
+     * 车牌号
+     */
+    private String plateNum;
 
     /**
      * 城市编码
@@ -155,9 +166,29 @@ public class RenterOrderReqVO implements Serializable {
     private Integer guidPrice;
 
     /**
+     * 车辆残值
+     */
+    private Integer carSurplusPrice;
+
+    /**
      * 保费计算用购置价（保费购置价为空取车辆指导价算）
      */
     private Integer inmsrp;
+
+    /**
+     * 车辆品牌
+     */
+    private String brandId;
+
+    /**
+     * 车型
+     */
+    private String typeId;
+
+    /**
+     * 行驶证注册年月
+     */
+    private LocalDate licenseDay;
 
     /**
      * 驾驶证初次领证日期
@@ -188,6 +219,11 @@ public class RenterOrderReqVO implements Serializable {
      * 租期内每天价格
      */
     private List<RenterGoodsPriceDetailDTO> renterGoodsPriceDetailDTOList;
+
+    /**
+     * 租客权益列表
+     */
+    private List<RenterMemberRightDTO> renterMemberRightDTOList;
 
 
 }
