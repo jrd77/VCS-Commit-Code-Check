@@ -132,7 +132,10 @@ public class CarService {
         renterGoodsDetailDto.setFrameNo(carBaseVO.getFrameNo());
         renterGoodsDetailDto.setEngineNum(carBaseVO.getEngineNum());
         renterGoodsDetailDto.setCarTag(carTagVO == null?"":String.join(",",carTagVO.getLabelIds()));
-       // renterGoodsDetailDto.setCarInmsrp();
+        renterGoodsDetailDto.setType(carBaseVO.getType());
+        renterGoodsDetailDto.setBrand(String.valueOf(carBaseVO.getBrand()));
+        renterGoodsDetailDto.setLicenseDay(LocalDateTimeUtils.parseStringToLocalDate(carBaseVO.getLicenseDay()));
+        //renterGoodsDetailDto.setCarInmsrp();
        // renterGoodsDetailDto.setStopCostRate();
        // renterGoodsDetailDto.setServiceRate();
 

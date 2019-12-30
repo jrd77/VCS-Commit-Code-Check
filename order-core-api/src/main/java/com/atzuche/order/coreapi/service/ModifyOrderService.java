@@ -1,5 +1,6 @@
 package com.atzuche.order.coreapi.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -11,11 +12,14 @@ import org.springframework.stereotype.Service;
 
 import com.atzuche.delivery.entity.RenterOrderDeliveryEntity;
 import com.atzuche.delivery.service.RenterOrderDeliveryService;
+import com.atzuche.order.commons.entity.dto.CostBaseDTO;
+import com.atzuche.order.commons.entity.dto.GetReturnAddressInfoDTO;
 import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
 import com.atzuche.order.commons.entity.dto.RenterGoodsPriceDetailDTO;
 import com.atzuche.order.commons.entity.dto.RenterMemberDTO;
 import com.atzuche.order.commons.entity.dto.RenterMemberRightDTO;
 import com.atzuche.order.commons.enums.CouponTypeEnum;
+import com.atzuche.order.commons.enums.RenterCashCodeEnum;
 import com.atzuche.order.commons.enums.RenterOrderStatusEnum;
 import com.atzuche.order.commons.enums.SrvGetReturnEnum;
 import com.atzuche.order.coreapi.entity.dto.ModifyOrderDTO;
@@ -26,6 +30,10 @@ import com.atzuche.order.coreapi.utils.ModifyOrderUtils;
 import com.atzuche.order.parentorder.entity.OrderEntity;
 import com.atzuche.order.parentorder.service.OrderService;
 import com.atzuche.order.rentercommodity.service.CommodityService;
+import com.atzuche.order.rentercost.entity.RenterOrderCostDetailEntity;
+import com.atzuche.order.rentercost.entity.RenterOrderFineDeatailEntity;
+import com.atzuche.order.rentercost.service.RenterOrderCostDetailService;
+import com.atzuche.order.rentercost.service.RenterOrderFineDeatailService;
 import com.atzuche.order.rentermem.service.RenterMemberService;
 import com.atzuche.order.renterorder.entity.OrderCouponEntity;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
@@ -61,6 +69,10 @@ public class ModifyOrderService {
 	private OrderService orderService;
 	@Autowired
 	private RenterOrderCalCostService renterOrderCalCostService;
+	@Autowired
+	private RenterOrderFineDeatailService renterOrderFineDeatailService;
+	@Autowired
+	private RenterOrderCostDetailService renterOrderCostDetailService;
 
 	/**
 	 * 修改订单主逻辑
@@ -77,8 +89,10 @@ public class ModifyOrderService {
 		String renterOrderNo = uniqueOrderNoService.getRenterOrderNo(orderNo);
 		// 获取修改前有效租客子订单信息
 		RenterOrderEntity initRenterOrder = renterOrderService.getRenterOrderByOrderNoAndIsEffective(orderNo);
+		// 获取租客配送订单信息
+		List<RenterOrderDeliveryEntity> deliveryList = renterOrderDeliveryService.listRenterOrderDeliveryByRenterOrderNo(initRenterOrder.getRenterOrderNo());
 		// DTO包装
-		ModifyOrderDTO modifyOrderDTO = getModifyOrderDTO(modifyOrderReq, renterOrderNo, initRenterOrder);
+		ModifyOrderDTO modifyOrderDTO = getModifyOrderDTO(modifyOrderReq, renterOrderNo, initRenterOrder, deliveryList);
 		// TODO 获取修改前租客租客端配送列表
 		
 		// TODO 获取修改前租客使用的优惠券列表
@@ -97,7 +111,8 @@ public class ModifyOrderService {
 		// 基础费用计算包含租金，手续费，基础保障费用，全面保障费用，附加驾驶人保障费用，取还车费用计算和超运能费用计算
 		RenterOrderCostRespDTO renterOrderCostRespDTO = getRenterOrderCostRespDTO(modifyOrderDTO, renterMemberDTO, renterGoodsDetailDTO);
 		
-		// 违约金计算
+		// 获取修改订单违约金
+		List<RenterOrderFineDeatailEntity> renterFineList = getRenterFineList(modifyOrderDTO, initRenterOrder, deliveryList, renterOrderCostRespDTO);
 		
 		// TODO 车主券
 		
@@ -160,7 +175,7 @@ public class ModifyOrderService {
 	 * @param modifyOrderReq
 	 * @return ModifyOrderDTO
 	 */
-	public ModifyOrderDTO getModifyOrderDTO(ModifyOrderReq modifyOrderReq, String renterOrderNo, RenterOrderEntity initRenterOrder) {
+	public ModifyOrderDTO getModifyOrderDTO(ModifyOrderReq modifyOrderReq, String renterOrderNo, RenterOrderEntity initRenterOrder, List<RenterOrderDeliveryEntity> deliveryList) {
 		ModifyOrderDTO modifyOrderDTO = new ModifyOrderDTO();
 		BeanUtils.copyProperties(modifyOrderReq, modifyOrderDTO);
 		// 设置租客子单号
@@ -179,8 +194,6 @@ public class ModifyOrderService {
 		if (modifyOrderReq.getDriverIds() == null || modifyOrderReq.getDriverIds().isEmpty()) {
 			
 		}
-		// 获取配送信息
-		List<RenterOrderDeliveryEntity> deliveryList = renterOrderDeliveryService.listRenterOrderDeliveryByRenterOrderNo(initRenterOrder.getRenterOrderNo());
 		Map<Integer, RenterOrderDeliveryEntity> deliveryMap = null;
 		if (deliveryList != null && !deliveryList.isEmpty()) {
 			deliveryMap = deliveryList.stream().collect(Collectors.toMap(RenterOrderDeliveryEntity::getType, deliver -> {return deliver;}));
@@ -307,6 +320,88 @@ public class ModifyOrderService {
 		RenterOrderCostReqDTO renterOrderCostReqDTO = renterOrderService.buildRenterOrderCostReqDTO(renterOrderReqVO);
 		// 获取计算好的费用信息
 		return renterOrderCalCostService.getOrderCostAndDeailList(renterOrderCostReqDTO);
+	}
+	
+	
+	/**
+	 * 获取修改订单违约金
+	 * @param modifyOrderDTO
+	 * @param initRenterOrder
+	 * @param deliveryList
+	 * @param renterOrderCostRespDTO
+	 * @return List<RenterOrderFineDeatailEntity>
+	 */
+	public List<RenterOrderFineDeatailEntity> getRenterFineList(ModifyOrderDTO modifyOrderDTO, RenterOrderEntity initRenterOrder, List<RenterOrderDeliveryEntity> deliveryList, RenterOrderCostRespDTO renterOrderCostRespDTO) {
+		// 获取取还车违约金
+		List<RenterOrderFineDeatailEntity> renterFineList = getRenterGetReturnFineList(modifyOrderDTO, initRenterOrder, deliveryList);
+		// 获取提前还车违约金
+		RenterOrderFineDeatailEntity renterFine = getRenterFineEntity(modifyOrderDTO, renterOrderCostRespDTO, initRenterOrder);
+		if (renterFineList == null) {
+			renterFineList = new ArrayList<RenterOrderFineDeatailEntity>();
+		}
+		if (renterFine != null) {
+			renterFineList.add(renterFine);
+		}
+		return renterFineList;
+	}
+	
+	
+	/**
+	 * 获取取还车违约金
+	 * @param modifyOrderDTO
+	 * @param initRenterOrder
+	 * @param deliveryList
+	 * @return List<RenterOrderFineDeatailEntity>
+	 */
+	public List<RenterOrderFineDeatailEntity> getRenterGetReturnFineList(ModifyOrderDTO modifyOrderDTO, RenterOrderEntity initRenterOrder, List<RenterOrderDeliveryEntity> deliveryList) {
+		// 封装修改前对象
+		Map<Integer, RenterOrderDeliveryEntity> deliveryMap = null;
+		if (deliveryList != null && !deliveryList.isEmpty()) {
+			deliveryMap = deliveryList.stream().collect(Collectors.toMap(RenterOrderDeliveryEntity::getType, deliver -> {return deliver;}));
+		}
+		String getLon = null,getLat = null,returnLon = null,returnLat = null;
+		if (deliveryMap != null) {
+			RenterOrderDeliveryEntity srvGetDelivery = deliveryMap.get(SrvGetReturnEnum.SRV_GET_TYPE.getCode());
+			RenterOrderDeliveryEntity srvReturnDelivery = deliveryMap.get(SrvGetReturnEnum.SRV_RETURN_TYPE.getCode());
+			if (srvGetDelivery != null) {
+				getLon = srvGetDelivery.getRenterGetReturnAddrLon();
+				getLat = srvGetDelivery.getRenterGetReturnAddrLat();
+			}
+			if (srvReturnDelivery != null) {
+				returnLon = srvGetDelivery.getRenterGetReturnAddrLon();
+				returnLat = srvGetDelivery.getRenterGetReturnAddrLat();
+			}
+		}
+		GetReturnAddressInfoDTO initInfo = new GetReturnAddressInfoDTO(initRenterOrder.getIsGetCar(), initRenterOrder.getIsReturnCar(), getLon, getLat, returnLon, returnLat);
+		CostBaseDTO initBase = new CostBaseDTO(modifyOrderDTO.getOrderNo(), modifyOrderDTO.getRenterOrderNo(), modifyOrderDTO.getMemNo(), initRenterOrder.getExpRentTime(), initRenterOrder.getExpRevertTime());
+		initInfo.setCostBaseDTO(initBase);
+		// 封装修改后对象
+		GetReturnAddressInfoDTO updateInfo = new GetReturnAddressInfoDTO(modifyOrderDTO.getGetCarLon(), modifyOrderDTO.getGetCarLat(), modifyOrderDTO.getRevertCarLon(), modifyOrderDTO.getRevertCarLat());
+		CostBaseDTO updBase = new CostBaseDTO(modifyOrderDTO.getOrderNo(), modifyOrderDTO.getRenterOrderNo(), modifyOrderDTO.getMemNo(), modifyOrderDTO.getRentTime(), modifyOrderDTO.getRevertTime());
+		updateInfo.setCostBaseDTO(updBase);
+		// 取还车违约金
+		List<RenterOrderFineDeatailEntity> renterFineList = renterOrderFineDeatailService.calculateGetOrReturnFineAmt(initInfo, updateInfo);
+		return renterFineList;
+	}
+	
+	/**
+	 * 计算提前还车违约金
+	 * @param modifyOrderDTO
+	 * @param renterOrderCostRespDTO
+	 * @param initRenterOrder
+	 * @return RenterOrderFineDeatailEntity
+	 */
+	public RenterOrderFineDeatailEntity getRenterFineEntity(ModifyOrderDTO modifyOrderDTO, RenterOrderCostRespDTO renterOrderCostRespDTO, RenterOrderEntity initRenterOrder) {
+		// 获取修改前租客费用明细
+		List<RenterOrderCostDetailEntity> initCostList = renterOrderCostDetailService.listRenterOrderCostDetail(modifyOrderDTO.getOrderNo(), initRenterOrder.getRenterOrderNo());
+		// 修改前租金
+		Integer initAmt = initCostList.stream().filter(cost -> {return RenterCashCodeEnum.RENT_AMT.getCashNo().equals(cost.getCostCode());}).mapToInt(RenterOrderCostDetailEntity::getTotalAmount).sum();
+		// 修改后租金
+		Integer updAmt = renterOrderCostRespDTO.getRentAmount();
+		// 计算提前还车违约金
+		CostBaseDTO updBase = new CostBaseDTO(modifyOrderDTO.getOrderNo(), modifyOrderDTO.getRenterOrderNo(), modifyOrderDTO.getMemNo(), modifyOrderDTO.getRentTime(), modifyOrderDTO.getRevertTime());
+		RenterOrderFineDeatailEntity renterFine = renterOrderFineDeatailService.calcFineAmt(updBase, initAmt, updAmt, initRenterOrder.getExpRevertTime());
+		return renterFine;
 	}
 	
 	
