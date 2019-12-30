@@ -2,13 +2,16 @@ package com.atzuche.order.cashieraccount.service.notservice;
 
 import com.atzuche.order.accountrenterdeposit.exception.AccountRenterCostException;
 import com.atzuche.order.accountrenterdeposit.exception.AccountRenterDepositDBException;
+import com.atzuche.order.accountrenterdeposit.service.AccountRenterDepositService;
 import com.atzuche.order.accountrenterdeposit.vo.req.CreateOrderRenterCostReqVO;
 import com.atzuche.order.accountrenterdeposit.vo.req.CreateOrderRenterDepositReqVO;
 import com.atzuche.order.accountrenterdeposit.vo.req.DetainRenterDepositReqVO;
 import com.atzuche.order.accountrenterdeposit.vo.req.PayedOrderRenterDepositReqVO;
+import com.atzuche.order.accountrenterrentcost.service.AccountRenterCostSettleService;
 import com.atzuche.order.accountrenterrentcost.vo.req.AccountRenterCostDetailReqVO;
 import com.atzuche.order.accountrenterrentcost.vo.req.AccountRenterCostReqVO;
 import com.atzuche.order.accountrenterwzdepost.exception.AccountRenterWZDepositException;
+import com.atzuche.order.accountrenterwzdepost.service.AccountRenterWzDepositService;
 import com.atzuche.order.accountrenterwzdepost.vo.req.CreateOrderRenterWZDepositReqVO;
 import com.atzuche.order.accountrenterwzdepost.vo.req.PayedOrderRenterDepositWZDetailReqVO;
 import com.atzuche.order.accountrenterwzdepost.vo.req.PayedOrderRenterWZDepositReqVO;
@@ -61,6 +64,13 @@ public class CashierNoTService {
     private CashierMapper cashierMapper;
     @Autowired
     RenterOrderService renterOrderService;
+    @Autowired
+    AccountRenterDepositService accountRenterDepositService;
+    @Autowired
+    AccountRenterWzDepositService accountRenterWzDepositService;
+    @Autowired
+    AccountRenterCostSettleService accountRenterCostSettleService;
+
 
     /**
      * 收银台根据主单号 向订单模块查询子单号
@@ -194,7 +204,10 @@ public class CashierNoTService {
              cashier.setId(cashierEntity.getId());
              cashier.setVersion(cashierEntity.getVersion());
              cashier.setPaySn(cashierEntity.getPaySn()+1);
-             result = cashierMapper.updateByPrimaryKeySelective(cashier);
+             if("00".equals(orderPayAsynVO.getTransStatus()) && cashierEntity.getTransStatus().equals(orderPayAsynVO.getTransStatus())){
+                 result = cashierMapper.updateByPrimaryKeySelective(cashier);
+             }
+
          }else {
              CashierEntity cashier = new CashierEntity();
              BeanUtils.copyProperties(orderPayAsynVO,cashier);
@@ -227,11 +240,11 @@ public class CashierNoTService {
     }
 
     /**
-     * 支付成功异步回调 补补租车费用回调
+     * 支付成功异步回调 补付租车费用回调
      * @param orderPayAsynVO
      * @return
      */
-    public AccountRenterCostReqVO getAccountRenterCostReq(OrderPayAsynResVO orderPayAsynVO) {
+    public AccountRenterCostReqVO getAccountRenterCostReq(OrderPayAsynResVO orderPayAsynVO,RenterCashCodeEnum renterCashCodeEnum) {
         AccountRenterCostReqVO vo = new AccountRenterCostReqVO();
         BeanUtils.copyProperties(orderPayAsynVO,vo);
         vo.setShifuAmt(orderPayAsynVO.getSettleAmount());
@@ -242,7 +255,7 @@ public class CashierNoTService {
         accountRenterCostDetail.setPayType(orderPayAsynVO.getPayType());
         accountRenterCostDetail.setTime(LocalDateTimeUtils.parseStringToDateTime(orderPayAsynVO.getOrderTime(),LocalDateTimeUtils.DEFAULT_PATTERN));
         accountRenterCostDetail.setAmt(orderPayAsynVO.getSettleAmount());
-        accountRenterCostDetail.setRenterCashCodeEnum(RenterCashCodeEnum.CASHIER_RENTER_AGAIN_COST);
+        accountRenterCostDetail.setRenterCashCodeEnum(renterCashCodeEnum);
         return vo;
     }
     /**
@@ -350,5 +363,41 @@ public class CashierNoTService {
     public PayVo getPayVOByRentCost(OrderPaySignReqVO orderPaySign, OrderPayableAmountResVO payVO) {
         PayVo vo = new PayVo();
         return vo;
+    }
+
+    /**
+     * 租车押金 收银台回调
+     * @param orderPayAsynVO
+     * @param payedOrderRenterDeposit
+     */
+    public void updataCashierAndRenterDeposit(OrderPayAsynResVO orderPayAsynVO, PayedOrderRenterDepositReqVO payedOrderRenterDeposit) {
+        //1更新收银台
+        updataCashier(orderPayAsynVO);
+        //2 租车押金 更新数据
+        accountRenterDepositService.updateRenterDeposit(payedOrderRenterDeposit);
+
+    }
+    /**
+     * 违章押金 收银台回调
+     * @param orderPayAsynVO
+     * @param payedOrderRenterWZDeposit
+     */
+    public void updataCashierAndRenterWzDeposit(OrderPayAsynResVO orderPayAsynVO, PayedOrderRenterWZDepositReqVO payedOrderRenterWZDeposit) {
+        //1更新收银台
+        updataCashier(orderPayAsynVO);
+        //2 违章押金 更新数据
+        accountRenterWzDepositService.updateRenterWZDeposit(payedOrderRenterWZDeposit);
+    }
+
+    /**
+     * 租车费用/补付租车费用
+     * @param orderPayAsynVO
+     * @param accountRenterCostReq
+     */
+    public void updataCashierAndRenterCost(OrderPayAsynResVO orderPayAsynVO,AccountRenterCostReqVO accountRenterCostReq) {
+        //1更新收银台
+        updataCashier(orderPayAsynVO);
+        //2  实收租车费用落库 更新数据
+        accountRenterCostSettleService.insertRenterCostDetail(accountRenterCostReq);
     }
 }
