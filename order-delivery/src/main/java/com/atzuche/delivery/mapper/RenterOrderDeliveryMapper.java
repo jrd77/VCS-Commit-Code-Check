@@ -27,10 +27,8 @@ public interface RenterOrderDeliveryMapper {
 
     List<RenterOrderDeliveryEntity> listRenterOrderDeliveryByRenterOrderNo(@Param("renterOrderNo") String renterOrderNo);
 
-    int updateByOrderNo(@Param("renterOrderNo") String renterOrderNo);
-
     int updateById(@Param("id") Integer id);
 
-    RenterOrderDeliveryEntity findRenterOrderByRenterOrderNo(@Param("renterOrderNo") String renterOrderNo);
+    RenterOrderDeliveryEntity findRenterOrderByRenterOrderNo(@Param("renterOrderNo") String renterOrderNo,@Param("type") Integer type);
 
 }
