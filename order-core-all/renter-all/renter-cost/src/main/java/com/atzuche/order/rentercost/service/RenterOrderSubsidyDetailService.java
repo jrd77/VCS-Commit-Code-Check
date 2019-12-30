@@ -11,6 +11,7 @@ import com.atzuche.order.rentercost.mapper.RenterOrderSubsidyDetailMapper;
 
 import java.util.List;
 
+import com.autoyol.auto.coin.service.vo.res.AutoCoinResponseVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -104,7 +105,7 @@ public class RenterOrderSubsidyDetailService {
      * @param useAutoCoin     使用凹凸币标识
      * @return RenterOrderSubsidyDetailDTO 补贴凹凸币信息
      */
-    public RenterOrderSubsidyDetailDTO calAutoCoinSubsidyInfo(CrmCustPointDTO crmCustPoint,
+    public RenterOrderSubsidyDetailDTO calAutoCoinSubsidyInfo(AutoCoinResponseVO crmCustPoint,
                                                               int originalRentAmt,
                                                               int surplusRentAmt,
                                                               Integer useAutoCoin) {

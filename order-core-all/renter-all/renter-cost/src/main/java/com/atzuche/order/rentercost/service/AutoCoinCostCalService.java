@@ -6,6 +6,7 @@ import com.atzuche.order.commons.enums.SubsidySourceCodeEnum;
 import com.atzuche.order.commons.enums.SubsidyTypeCodeEnum;
 import com.atzuche.order.rentercost.entity.dto.CrmCustPointDTO;
 import com.atzuche.order.rentercost.entity.dto.RenterOrderSubsidyDetailDTO;
+import com.autoyol.auto.coin.service.vo.res.AutoCoinResponseVO;
 import org.springframework.stereotype.Service;
 
 /**
@@ -29,7 +30,7 @@ public class AutoCoinCostCalService {
      * @return RenterOrderSubsidyDetailDTO 凹凸币抵扣信息
      */
     public RenterOrderSubsidyDetailDTO calAutoCoinDeductInfo(int originalRentAmt, int surplusRentAmt,
-                                                             CrmCustPointDTO crmCustPoint) {
+                                                             AutoCoinResponseVO crmCustPoint) {
 
         if (0 == originalRentAmt || 0 == surplusRentAmt || null == crmCustPoint || 0 == crmCustPoint.getPointValue()) {
             return null;
@@ -51,7 +52,7 @@ public class AutoCoinCostCalService {
 
         if (pointValueDeducExchange > 0) {
             RenterOrderSubsidyDetailDTO renterOrderSubsidyDetailDTO = new RenterOrderSubsidyDetailDTO();
-            renterOrderSubsidyDetailDTO.setMemNo(crmCustPoint.getMemNo());
+            renterOrderSubsidyDetailDTO.setMemNo(String.valueOf(crmCustPoint.getMemNo()));
             renterOrderSubsidyDetailDTO.setSubsidyAmount(pointValueDeducExchange);
             renterOrderSubsidyDetailDTO.setSubsidyTypeCode(SubsidyTypeCodeEnum.RENT_AMT.getCode());
             renterOrderSubsidyDetailDTO.setSubsidyTypeName(SubsidyTypeCodeEnum.RENT_AMT.getDesc());

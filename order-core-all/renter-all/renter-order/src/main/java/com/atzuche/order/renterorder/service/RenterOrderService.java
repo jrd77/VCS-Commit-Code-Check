@@ -16,6 +16,7 @@ import com.atzuche.order.renterorder.mapper.RenterOrderMapper;
 import com.atzuche.order.renterorder.vo.RenterOrderReqVO;
 import com.atzuche.order.renterorder.vo.owner.OwnerCouponGetAndValidReqVO;
 import com.atzuche.order.renterorder.vo.platform.MemAvailCouponRequestVO;
+import com.autoyol.auto.coin.service.vo.res.AutoCoinResponseVO;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
@@ -178,7 +179,7 @@ public class RenterOrderService {
         }
 
         //6.凹凸币补贴明细
-        CrmCustPointDTO crmCustPoint = autoCoinService.getCrmCustPoint(Integer.valueOf(renterOrderReqVO.getMemNo()));
+        AutoCoinResponseVO crmCustPoint = autoCoinService.getCrmCustPoint(Integer.valueOf(renterOrderReqVO.getMemNo()));
         RenterOrderSubsidyDetailDTO autoCoinSubsidyInfo =  renterOrderSubsidyDetailService.calAutoCoinSubsidyInfo(crmCustPoint,
                 getCarFeeCouponReqVO.getOriginalRentAmt(),
                 surplusRentAmt,renterOrderReqVO.getUseAutoCoin());
