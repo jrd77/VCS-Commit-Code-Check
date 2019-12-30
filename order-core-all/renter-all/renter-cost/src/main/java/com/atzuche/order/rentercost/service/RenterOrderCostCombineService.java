@@ -672,7 +672,11 @@ public class RenterOrderCostCombineService {
         fbcFeeResults.forEach(fbcFeeResponse -> {
             if ("get".equalsIgnoreCase(fbcFeeResponse.getGetReturnType()) && getReturnCarCostReqDto.getIsGetCarCost()) {
                 int expectedShouldFee = Integer.valueOf(fbcFeeResponse.getExpectedShouldFee());
+
                 RenterOrderCostDetailEntity renterOrderCostDetailEntity = new RenterOrderCostDetailEntity();
+                renterOrderCostDetailEntity.setOrderNo(costBaseDTO.getOrderNo());
+                renterOrderCostDetailEntity.setRenterOrderNo(costBaseDTO.getRenterOrderNo());
+                renterOrderCostDetailEntity.setMemNo(costBaseDTO.getMemNo());
                 renterOrderCostDetailEntity.setCostCode(RenterCashCodeEnum.SRV_GET_COST.getCashNo());
                 renterOrderCostDetailEntity.setCostDesc(RenterCashCodeEnum.SRV_GET_COST.getTxt());
                 renterOrderCostDetailEntity.setCount(1D);
@@ -680,6 +684,9 @@ public class RenterOrderCostCombineService {
                 listCostDetail.add(renterOrderCostDetailEntity);
 
                 RenterOrderSubsidyDetailDTO renterOrderSubsidy = new RenterOrderSubsidyDetailDTO();
+                renterOrderSubsidy.setOrderNo(costBaseDTO.getOrderNo());
+                renterOrderSubsidy.setRenterOrderNo(costBaseDTO.getRenterOrderNo());
+                renterOrderSubsidy.setMemNo(costBaseDTO.getMemNo());
                 renterOrderSubsidy.setSubsidyTypeName(SubsidyTypeCodeEnum.GET_CAR.getDesc());
                 renterOrderSubsidy.setSubsidyTypeCode(SubsidyTypeCodeEnum.GET_CAR.getCode());
                 renterOrderSubsidy.setSubsidySourceCode(SubsidySourceCodeEnum.PLATFORM.getCode());
@@ -706,6 +713,9 @@ public class RenterOrderCostCombineService {
             } else if ("return".equalsIgnoreCase(fbcFeeResponse.getGetReturnType()) && getReturnCarCostReqDto.getIsReturnCarCost()) {
                int expectedShouldFee = Integer.valueOf(fbcFeeResponse.getExpectedShouldFee());
                RenterOrderCostDetailEntity renterOrderCostDetailEntity = new RenterOrderCostDetailEntity();
+                renterOrderCostDetailEntity.setOrderNo(costBaseDTO.getOrderNo());
+                renterOrderCostDetailEntity.setRenterOrderNo(costBaseDTO.getRenterOrderNo());
+                renterOrderCostDetailEntity.setMemNo(costBaseDTO.getMemNo());
                renterOrderCostDetailEntity.setCostCode(RenterCashCodeEnum.SRV_RETURN_COST.getCashNo());
                renterOrderCostDetailEntity.setCostDesc(RenterCashCodeEnum.SRV_RETURN_COST.getTxt());
                renterOrderCostDetailEntity.setCount(1D);
@@ -713,6 +723,9 @@ public class RenterOrderCostCombineService {
                listCostDetail.add(renterOrderCostDetailEntity);
 
                RenterOrderSubsidyDetailDTO renterOrderSubsidy = new RenterOrderSubsidyDetailDTO();
+               renterOrderSubsidy.setOrderNo(costBaseDTO.getOrderNo());
+               renterOrderSubsidy.setRenterOrderNo(costBaseDTO.getRenterOrderNo());
+               renterOrderSubsidy.setMemNo(costBaseDTO.getMemNo());
                renterOrderSubsidy.setSubsidyTypeName(SubsidyTypeCodeEnum.RETURN_CAR.getDesc());
                renterOrderSubsidy.setSubsidyTypeCode(SubsidyTypeCodeEnum.RETURN_CAR.getCode());
                renterOrderSubsidy.setSubsidySourceCode(SubsidySourceCodeEnum.PLATFORM.getCode());
@@ -847,9 +860,9 @@ public class RenterOrderCostCombineService {
     public GetReturnOverCostDTO getGetReturnOverCost(GetReturnCarOverCostReqDto getReturnCarOverCostReqDto) {
         GetReturnOverCostDTO getReturnOverCostDTO = new GetReturnOverCostDTO();
         List<RenterOrderCostDetailEntity> renterOrderCostDetailEntityList = new ArrayList<>();
-
-        LocalDateTime rentTime = getReturnCarOverCostReqDto.getCostBaseDTO().getStartTime();
-        LocalDateTime revertTime = getReturnCarOverCostReqDto.getCostBaseDTO().getEndTime();
+        CostBaseDTO costBaseDTO = getReturnCarOverCostReqDto.getCostBaseDTO();
+        LocalDateTime rentTime = costBaseDTO.getStartTime();
+        LocalDateTime revertTime = costBaseDTO.getEndTime();
         Integer cityCode = getReturnCarOverCostReqDto.getCityCode();
 
         // 初始化数据
@@ -910,6 +923,9 @@ public class RenterOrderCostCombineService {
                             getReturnOverTransport.setNightGetOverTransportFee(overTransportFee);
                         }
                         RenterOrderCostDetailEntity renterOrderCostDetailEntity = new RenterOrderCostDetailEntity();
+                        renterOrderCostDetailEntity.setOrderNo(costBaseDTO.getOrderNo());
+                        renterOrderCostDetailEntity.setRenterOrderNo(costBaseDTO.getRenterOrderNo());
+                        renterOrderCostDetailEntity.setMemNo(costBaseDTO.getMemNo());
                         renterOrderCostDetailEntity.setTotalAmount(overTransportFee);
                         renterOrderCostDetailEntity.setCount(1D);
                         renterOrderCostDetailEntity.setCostCode(RenterCashCodeEnum.GET_BLOCKED_RAISE_AMT.getCashNo());
@@ -961,6 +977,9 @@ public class RenterOrderCostCombineService {
                             getReturnOverTransport.setNightReturnOverTransportFee(overTransportFee);;
                         }
                         RenterOrderCostDetailEntity renterOrderCostDetailEntity = new RenterOrderCostDetailEntity();
+                        renterOrderCostDetailEntity.setOrderNo(costBaseDTO.getOrderNo());
+                        renterOrderCostDetailEntity.setRenterOrderNo(costBaseDTO.getRenterOrderNo());
+                        renterOrderCostDetailEntity.setMemNo(costBaseDTO.getMemNo());
                         renterOrderCostDetailEntity.setTotalAmount(overTransportFee);
                         renterOrderCostDetailEntity.setCount(1D);
                         renterOrderCostDetailEntity.setCostCode(RenterCashCodeEnum.RETURN_BLOCKED_RAISE_AMT.getCashNo());
