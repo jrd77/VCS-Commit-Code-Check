@@ -686,6 +686,8 @@ public class RenterOrderCostCombineService {
                 renterOrderSubsidy.setSubsidySourceName(SubsidySourceCodeEnum.PLATFORM.getDesc());
                 renterOrderSubsidy.setSubsidyTargetCode(SubsidySourceCodeEnum.RENTER.getCode());
                 renterOrderSubsidy.setSubsidyTargetName(SubsidySourceCodeEnum.RENTER.getDesc());
+                renterOrderSubsidy.setSubsidyCostCode(RenterCashCodeEnum.SRV_GET_COST.getCashNo());
+                renterOrderSubsidy.setSubsidyCostName(RenterCashCodeEnum.SRV_GET_COST.getTxt());
                 renterOrderSubsidy.setSubsidyDesc("平台补贴给租客的取车费用！");
                 int expectedRealFee = Integer.valueOf(fbcFeeResponse.getExpectedRealFee());
 
@@ -717,6 +719,8 @@ public class RenterOrderCostCombineService {
                renterOrderSubsidy.setSubsidySourceName(SubsidySourceCodeEnum.PLATFORM.getDesc());
                renterOrderSubsidy.setSubsidyTargetCode(SubsidySourceCodeEnum.RENTER.getCode());
                renterOrderSubsidy.setSubsidyTargetName(SubsidySourceCodeEnum.RENTER.getDesc());
+                renterOrderSubsidy.setSubsidyCostCode(RenterCashCodeEnum.SRV_RETURN_COST.getCashNo());
+                renterOrderSubsidy.setSubsidyCostName(RenterCashCodeEnum.SRV_RETURN_COST.getTxt());
                renterOrderSubsidy.setSubsidyDesc("平台补贴给租客的还车费用！");
                int expectedRealFee = Integer.valueOf(fbcFeeResponse.getExpectedRealFee());
                renterOrderSubsidy.setSubsidyAmount(expectedShouldFee - expectedRealFee);

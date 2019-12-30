@@ -161,6 +161,7 @@ public class RenterOrderCalCostService {
 
         renterOrderCostRespDTO.setRentCarAmount(rentCarAmount);
         renterOrderCostRespDTO.setRenterOrderCostDetailDTOList(detailList);
+        renterOrderCostRespDTO.setRenterOrderSubsidyDetailDTOList(subsidyList);
         LOGGER.info("获取费用项和费用明细列表 renterOrderCostRespDTO:[{}]", JSON.toJSONString(renterOrderCostRespDTO));
         return renterOrderCostRespDTO;
     }
