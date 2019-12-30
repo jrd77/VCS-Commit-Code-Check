@@ -101,7 +101,6 @@ public class RenterOrderCalCostService {
         }
         Map<String, List<RenterOrderSubsidyDetailDTO>> subsidyOutGroup = subsidyOutList.stream().collect(Collectors.groupingBy(RenterOrderSubsidyDetailDTO::getSubsidyCostCode));
 
-
         //获取租金
         List<RenterOrderCostDetailEntity> renterOrderCostDetailEntities = renterOrderCostCombineService.listRentAmtEntity(renterOrderCostReqDTO.getRentAmtDTO());
         List<RenterOrderSubsidyDetailDTO> rentAmtSubSidy = subsidyOutGroup.get(RenterCashCodeEnum.RENT_AMT.getCashNo());
@@ -112,7 +111,6 @@ public class RenterOrderCalCostService {
         subsidyList.addAll(rentAmtSubSidy);
         renterOrderCostRespDTO.setRentAmount(rentAmt);
 
-        
         //获取平台保障费
         RenterOrderCostDetailEntity insurAmtEntity = renterOrderCostCombineService.getInsurAmtEntity(renterOrderCostReqDTO.getInsurAmtDTO());
         List<RenterOrderSubsidyDetailDTO> insurAmtSubSidy = subsidyOutGroup.get(RenterCashCodeEnum.INSURE_TOTAL_PRICES.getCashNo());
