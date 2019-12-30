@@ -18,16 +18,16 @@ public class CarDepositAmtVO {
 	 */
 	private Double carDepositRadio;
     /**
-     * 车型品牌系数
+     * 品牌车押金系数（押金计算使用）
      */
-    private Double carBrandTypeRadio;
+    private Double carSpecialCoefficient;
     /**
-     * 车辆年份系数
+     * 新车押金系数（押金计算使用）
      */
-    private Double carYearRadio;
+    private Double newCarCoefficient;
     /**
-     *  X系数
+     *  X系数(基数)
      */
     private Integer suggestTotal;
-	
+
 }
