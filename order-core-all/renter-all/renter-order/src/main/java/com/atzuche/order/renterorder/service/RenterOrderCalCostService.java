@@ -99,7 +99,7 @@ public class RenterOrderCalCostService {
         List<RenterOrderSubsidyDetailDTO> subsidyOutList = renterOrderCostReqDTO.getSubsidyOutList();
         Map<String, List<RenterOrderSubsidyDetailDTO>> subsidyOutGroup = Optional
                 .ofNullable(subsidyOutList)
-                .orElse(new ArrayList<>())
+                .orElseGet(ArrayList :: new)
                 .stream()
                 .collect(Collectors.groupingBy(RenterOrderSubsidyDetailDTO::getSubsidyCostCode));
 
