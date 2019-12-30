@@ -27,6 +27,7 @@ import com.autoyol.feeservice.api.response.PriceFbcFeeResponseDetail;
 import com.autoyol.feeservice.api.response.PriceGetFbcFeeResponse;
 import com.autoyol.feeservice.api.vo.pricefetchback.PriceCarHumanFeeRule;
 import com.autoyol.platformcost.CommonUtils;
+import com.autoyol.platformcost.LocalDateTimeUtil;
 import com.autoyol.platformcost.RenterFeeCalculatorUtils;
 import com.autoyol.platformcost.model.*;
 import com.dianping.cat.Cat;
@@ -37,6 +38,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -336,16 +338,61 @@ public class RenterOrderCostCombineService {
 		}
 		// TODO 押金配置列表从配置中心获取
 		List<DepositText> depositList = null;
-		/*CarDepositAmtVO carDepositAmtVO = RenterFeeCalculatorUtils.calCarDepositAmt(depositAmtDTO.getCityCode(),
+        double years = LocalDateTimeUtil.periodDays(depositAmtDTO.getLicenseDay(), LocalDate.now())/356D;
+        int surplusPriceProYear = CommonUtils.getSurplusPriceProYear(years);
+        CarDepositAmtVO carDepositAmtVO = RenterFeeCalculatorUtils.calCarDepositAmt(depositAmtDTO.getCityCode(),
 				depositAmtDTO.getSurplusPrice(),
-                depositAmtDTO.getCarBrandTypeRadio(),
-                depositAmtDTO.getCarYearRadio(),
-				depositList,
-                depositAmtDTO.getReliefPercetage()
-        );*/
-		return null;
+                getCarSpecialCoefficientNew(depositAmtDTO.getBrand(),depositAmtDTO.getType()),
+                getNewCarCoefficient(surplusPriceProYear),
+				depositList
+        );
+		return carDepositAmtVO;
 	}
-	
+    /*
+     * @Author ZhangBin
+     * @Date 2019/12/30 11:58
+     * @Description: 取车辆品牌系数
+     *
+     **/
+    public double getCarSpecialCoefficientNew(String brand, String type) {
+        double carSpecialCoefficient = 0.0d;
+        try {
+            if(StringUtils.isNotBlank(brand) && StringUtils.isNotBlank(type)){
+                if(StringUtils.isNumeric(brand) && StringUtils.isNumeric(type)){
+                  //TODO 配置中获取车辆品牌系数
+                    //  carSpecialCoefficient = transExtV36Service.getHotConfigValue(Integer.valueOf(brand), Integer.valueOf(type));
+                }
+            }
+        } catch (Exception e) {
+            log.error("getCarSpecialCoefficientNew ex:",e);
+        }
+        log.info("calc result carSpecialCoefficient={},brandId={},typeId={}",carSpecialCoefficient,brand,type);
+        return carSpecialCoefficient;
+    }
+
+    /**
+     * 获取新车押金系数 (年份系数)
+     * @param year
+     * @return
+     */
+    public double getNewCarCoefficient(int year) {
+        if (year <= 2) {
+            //TODO 配置中获取 请在配置sys_constant表配置c_code:"+code+"相关数据
+            Map<String, Object> map = null;//sysConstantService.getSysConstantByCode("car_year_neqtwo");
+            if (map != null && map.size()>0) {
+                return map.get("c_value")!=null ?Double.parseDouble(map.get("c_value").toString()):1.4;
+            }
+        }else{
+            //TODO 配置中获取 请在配置sys_constant表配置c_code:"+code+"相关数据
+            Map<String, Object> map = null;//sysConstantService.getSysConstantByCode("car_year_lttwo");
+            if (map != null && map.size()>0) {
+                return map.get("c_value")!=null ?Double.parseDouble(map.get("c_value").toString()):1;
+            }
+        }
+        return 1;
+    }
+
+
 	
 	/**
 	 * 获取违章押金

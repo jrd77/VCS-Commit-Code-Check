@@ -25,5 +25,9 @@ public class CarDepositAmtVO {
      * 车辆年份系数
      */
     private Double carYearRadio;
+    /**
+     *  X系数
+     */
+    private Integer suggestTotal;
 	
 }

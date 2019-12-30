@@ -24,18 +24,15 @@ public class DepositAmtDTO {
 	 * 车辆残值
 	 */
 	private Integer surplusPrice;
-	/**
-	 * 减免比例
-	 */
-	//private Double reliefPercetage;
+
 	/**
 	 * 车型品牌系数
 	 */
-	//private Double carBrandTypeRadio;
+	private Double carBrandTypeRadio;
 	/**
 	 * 车辆年份系数
 	 */
-	//private Double carYearRadio;
+	private Double carYearRadio;
     /**
      * 车辆品牌
      */

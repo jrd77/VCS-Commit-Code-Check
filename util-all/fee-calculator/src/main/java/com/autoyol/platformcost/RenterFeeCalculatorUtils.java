@@ -423,6 +423,7 @@ public class RenterFeeCalculatorUtils {
         CarDepositAmtVO carDepositAmtVO = new CarDepositAmtVO();
         carDepositAmtVO.setCarDepositAmt((int) carDepositAmt);
         carDepositAmtVO.setCarDepositRadio(coefficient);
+        carDepositAmtVO.setSuggestTotal((int)carDepositAmt);
         return carDepositAmtVO;
 	}
 	
