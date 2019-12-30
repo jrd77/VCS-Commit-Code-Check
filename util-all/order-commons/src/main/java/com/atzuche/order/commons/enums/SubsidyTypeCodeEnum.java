@@ -25,7 +25,11 @@ public enum SubsidyTypeCodeEnum {
     /**
      * 补贴类型,租金
      */
-    RENT_AMT("3","租金")
+    RENT_AMT("3","租金"),
+    
+    INSURE_AMT("4","平台保障费"),
+    
+    ABATEMENT_INSURE("5","全面保障费")
 
     ;
 
