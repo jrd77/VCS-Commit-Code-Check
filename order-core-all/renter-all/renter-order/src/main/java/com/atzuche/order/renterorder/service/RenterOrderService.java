@@ -112,6 +112,8 @@ public class RenterOrderService {
         //租车费用补贴记录
         List<RenterOrderSubsidyDetailDTO> renterOrderSubsidyDetails =
                 renterOrderCostRespDTO.getRenterOrderSubsidyDetailDTOList();
+
+
         //2.送取服务券抵扣信息及补贴明细
         MemAvailCouponRequestVO getCarFeeCouponReqVO = buildMemAvailCouponRequestVO(renterOrderCostRespDTO,
                 renterOrderReqVO);
