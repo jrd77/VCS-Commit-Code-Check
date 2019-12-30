@@ -73,13 +73,13 @@ public class RenterOrderCalCostService {
     private RenterOrderCostService renterOrderCostService;
 
 
-    /*
-     * @Author ZhangBin
-     * @Date 2019/12/28 19:19
-     * @Description: 计算费用明细并保存费用
-     * 
+    /**
+     * 计算费用明细并保存费用
+     *
+     * @author ZhangBin
+     * @date 2019/12/28 19:19
      **/
-    public void  getAndSAveOrderCostAndDeailList(RenterOrderCostReqDTO renterOrderCostReqDTO){
+    public void getAndSaveOrderCostAndDeailList(RenterOrderCostReqDTO renterOrderCostReqDTO) {
         RenterOrderCostRespDTO renterOrderCostRespDTO = this.getOrderCostAndDeailList(renterOrderCostReqDTO);
         this.saveOrderCostAndDeailList(renterOrderCostRespDTO);
     }
@@ -202,13 +202,14 @@ public class RenterOrderCalCostService {
         LOGGER.info("获取费用项和费用明细列表 renterOrderCostRespDTO:[{}]", JSON.toJSONString(renterOrderCostRespDTO));
         return renterOrderCostRespDTO;
     }
-    /*
-     * @Author ZhangBin
-     * @Date 2019/12/28 17:37
-     * @Description: 保存费用及其费用明细
-     * 
+
+    /**
+     * 保存费用及其费用明细
+     *
+     * @author ZhangBin
+     * @date 2019/12/28 17:37
      **/
-    private void saveOrderCostAndDeailList(RenterOrderCostRespDTO renterOrderCostRespDTO){
+    private void saveOrderCostAndDeailList(RenterOrderCostRespDTO renterOrderCostRespDTO) {
         List<RenterOrderSubsidyDetailDTO> renterOrderSubsidyDetailDTOList = renterOrderCostRespDTO.getRenterOrderSubsidyDetailDTOList();
         //数据转化
         List<RenterOrderSubsidyDetailEntity> subsidyListEntity = renterOrderSubsidyDetailDTOList.stream().map(x -> {
@@ -344,7 +345,6 @@ public class RenterOrderCalCostService {
 
         return null;
     }
-
 
     /**
      * 优惠券服务请求参数处理
