@@ -14,7 +14,7 @@ import java.util.List;
 @Data
 public class GetReturnOverCostDTO {
     /**
-     * 租客取还车费用明细列表
+     * 租客取还车超运能费用明细列表
      */
     private List<RenterOrderCostDetailEntity> renterOrderCostDetailEntityList;
     /**

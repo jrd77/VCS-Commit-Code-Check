@@ -281,5 +281,19 @@
 		select <include refid="Base_Column_List" /> from renter_order_delivery where renter_order_no = #{renterOrderNo}
 		and is_delete = 0
 	</select>
-  	
+
+	<update id="updateByOrderNo" parameterType="java.lang.String">
+		update renter_order_delivery set status = 2
+		where renter_order_no = #{renterOrderNo} and is_delete = 0
+	</update>
+
+	<update id="updateById" parameterType="java.lang.Integer">
+		update renter_order_delivery set status = 2
+		where id = #{id} and is_delete = 0
+	</update>
+
+	<update id="findRenterOrderByRenterOrderNo" parameterType="java.lang.String">
+		select <include refid="Base_Column_List" /> from renter_order_delivery where renter_order_no = #{renterOrderNo}
+		and is_delete = 0 order by id limit 1
+	</update>
 </mapper>

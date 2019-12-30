@@ -1,11 +1,10 @@
 package com.atzuche.order.renterorder.entity.dto;
 
-import java.util.List;
-
 import com.atzuche.order.commons.entity.dto.*;
 import com.atzuche.order.rentercost.entity.dto.RenterOrderSubsidyDetailDTO;
-
 import lombok.Data;
+
+import java.util.List;
 
 @Data
 public class RenterOrderCostReqDTO {
@@ -49,6 +48,6 @@ public class RenterOrderCostReqDTO {
     /**
      * 费用对应的补贴记录
      */
-    private List<RenterOrderSubsidyDetailDTO> subsidyList;
+    private List<RenterOrderSubsidyDetailDTO> subsidyOutList;
 
 }

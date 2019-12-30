@@ -357,7 +357,7 @@ public class RenterFeeCalculatorUtils {
 	 * @param cityCode 城市编号
 	 * @param guidPrice 车辆残值
 	 * @param carBrandTypeRadio 车型品牌系数
-	 * @param carYearRadio 车辆年份系数
+	 * @param carYearRadio 新车押金系数
 	 * @param depositList 押金配置列表
 	 * @param reliefPercetage 减免比例
 	 * @return CarDepositAmtVO
@@ -421,9 +421,12 @@ public class RenterFeeCalculatorUtils {
             carDepositAmt = suggestTotal * coefficient;
         }
         CarDepositAmtVO carDepositAmtVO = new CarDepositAmtVO();
+        carDepositAmtVO.setCarSpecialCoefficient(carBrandTypeRadio);
+        carDepositAmtVO.setNewCarCoefficient(carYearRadio);
         carDepositAmtVO.setCarDepositAmt((int) carDepositAmt);
+        carDepositAmtVO.setSuggestTotal((int)suggestTotal);
         carDepositAmtVO.setCarDepositRadio(coefficient);
-        carDepositAmtVO.setSuggestTotal((int)carDepositAmt);
+
         return carDepositAmtVO;
 	}
 	
