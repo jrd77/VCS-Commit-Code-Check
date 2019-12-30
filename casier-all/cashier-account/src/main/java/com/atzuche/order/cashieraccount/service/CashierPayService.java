@@ -4,8 +4,10 @@ import com.atzuche.order.accountrenterdeposit.service.AccountRenterDepositServic
 import com.atzuche.order.accountrenterrentcost.service.AccountRenterCostSettleService;
 import com.atzuche.order.accountrenterwzdepost.service.AccountRenterWzDepositService;
 import com.atzuche.order.cashieraccount.entity.CashierEntity;
+import com.atzuche.order.cashieraccount.entity.CashierRefundApplyEntity;
 import com.atzuche.order.cashieraccount.exception.OrderPayCallBackAsnyException;
 import com.atzuche.order.cashieraccount.service.notservice.CashierNoTService;
+import com.atzuche.order.cashieraccount.service.remote.RefundRemoteService;
 import com.atzuche.order.cashieraccount.service.remote.WalletRemoteService;
 import com.atzuche.order.cashieraccount.vo.req.pay.OrderPaySignReqVO;
 import com.atzuche.order.cashieraccount.vo.res.AccountPayAbleResVO;
@@ -18,11 +20,15 @@ import com.atzuche.order.commons.service.RabbitMsgLogService;
 import com.atzuche.order.rentercost.entity.vo.PayableVO;
 import com.atzuche.order.rentercost.service.RenterOrderCostCombineService;
 import com.autoyol.api.WalletFeignService;
+import com.autoyol.autopay.gateway.api.AutoPayGatewaySecondaryService;
 import com.autoyol.autopay.gateway.constant.DataAppIdConstant;
 import com.autoyol.autopay.gateway.constant.DataPayEnvConstant;
 import com.autoyol.autopay.gateway.constant.DataPayKindConstant;
 import com.autoyol.autopay.gateway.constant.DataPayTypeConstant;
+import com.autoyol.autopay.gateway.vo.Response;
 import com.autoyol.autopay.gateway.vo.req.PayVo;
+import com.autoyol.autopay.gateway.vo.req.RefundVo;
+import com.autoyol.autopay.gateway.vo.res.AutoPayResultVo;
 import com.autoyol.cat.CatAnnotation;
 import com.autoyol.commons.utils.GsonUtils;
 import com.autoyol.commons.utils.IPUtil;
@@ -32,6 +38,7 @@ import com.autoyol.vo.req.WalletDeductionReqVO;
 import com.dianping.cat.Cat;
 import com.dianping.cat.message.Transaction;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -63,7 +70,7 @@ public class CashierPayService{
     @Autowired RenterOrderCostCombineService renterOrderCostCombineService;
     @Autowired CashierNoTService cashierNoTService;
     @Autowired WalletRemoteService walletRemoteService;
-
+    @Autowired RefundRemoteService refundRemoteService;
 
     /**
      * 支付系统回调（支付回调，退款回调到时一个）
@@ -135,8 +142,6 @@ public class CashierPayService{
         String signStr = cashierNoTService.getPaySignByPayVos(payVo);
         return signStr;
     }
-
-
 
     /**
      * 当前需要支付的相关信息
@@ -248,6 +253,18 @@ public class CashierPayService{
     }
 
 
+    /**
+     * 退款操作
+     * @param cashierRefundApply
+     */
+    public void refundOrderPay(CashierRefundApplyEntity cashierRefundApply){
+        RefundVo model = new RefundVo();
+        BeanUtils.copyProperties(cashierRefundApply,model);
+        AutoPayResultVo vo = refundRemoteService.refundOrderPay(model);
+        if(Objects.nonNull(vo)){
+
+        }
+    }
 
 }
 
