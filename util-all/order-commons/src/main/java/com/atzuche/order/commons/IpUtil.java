@@ -15,8 +15,8 @@ public class IpUtil {
     private static final Logger logger = LoggerFactory.getLogger(IpUtil.class);
     private IpUtil(){}
 
-    public  static String getLocalIp(){String ip = "";
-
+    public  static String getLocalIp(){
+        String ip = "";
         try {
             ip = InetAddress.getLocalHost().getHostAddress();
         } catch (UnknownHostException e) {
