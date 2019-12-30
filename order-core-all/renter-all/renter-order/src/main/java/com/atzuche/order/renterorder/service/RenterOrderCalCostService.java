@@ -40,6 +40,7 @@ import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -96,10 +97,11 @@ public class RenterOrderCalCostService {
         List<RenterOrderCostDetailEntity> detailList = new ArrayList<>();
         List<RenterOrderSubsidyDetailDTO> subsidyList = new ArrayList<>();
         List<RenterOrderSubsidyDetailDTO> subsidyOutList = renterOrderCostReqDTO.getSubsidyOutList();
-        if(subsidyOutList == null){
-            subsidyOutList = new ArrayList<>();
-        }
-        Map<String, List<RenterOrderSubsidyDetailDTO>> subsidyOutGroup = subsidyOutList.stream().collect(Collectors.groupingBy(RenterOrderSubsidyDetailDTO::getSubsidyCostCode));
+        Map<String, List<RenterOrderSubsidyDetailDTO>> subsidyOutGroup = Optional
+                .ofNullable(subsidyOutList)
+                .orElse(new ArrayList<>())
+                .stream()
+                .collect(Collectors.groupingBy(RenterOrderSubsidyDetailDTO::getSubsidyCostCode));
 
         //获取租金
         List<RenterOrderCostDetailEntity> renterOrderCostDetailEntities = renterOrderCostCombineService.listRentAmtEntity(renterOrderCostReqDTO.getRentAmtDTO());
