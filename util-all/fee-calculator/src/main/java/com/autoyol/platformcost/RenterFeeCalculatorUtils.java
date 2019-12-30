@@ -1,5 +1,9 @@
 package com.autoyol.platformcost;
 
+import com.autoyol.platformcost.enums.ExceptionCodeEnum;
+import com.autoyol.platformcost.exception.RenterFeeCostException;
+import com.autoyol.platformcost.model.*;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -8,17 +12,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
-import com.autoyol.platformcost.enums.ExceptionCodeEnum;
-import com.autoyol.platformcost.exception.RenterFeeCostException;
-import com.autoyol.platformcost.model.AbatementConfig;
-import com.autoyol.platformcost.model.CarDepositAmtVO;
-import com.autoyol.platformcost.model.CarPriceOfDay;
-import com.autoyol.platformcost.model.DepositText;
-import com.autoyol.platformcost.model.FeeResult;
-import com.autoyol.platformcost.model.IllegalDepositConfig;
-import com.autoyol.platformcost.model.InsuranceConfig;
-import com.autoyol.platformcost.model.OilAverageCostBO;
 
 public class RenterFeeCalculatorUtils {
 	//private static Logger logger = LoggerFactory.getLogger(FeeCalculatorUtils.class);
@@ -364,110 +357,80 @@ public class RenterFeeCalculatorUtils {
 	 * @param cityCode 城市编号
 	 * @param guidPrice 车辆残值
 	 * @param carBrandTypeRadio 车型品牌系数
-	 * @param carYearRadio 车辆年份系数
-	 * @param depositList 押金配置列表
-	 * @param reliefPercetage 减免比例
-	 * @return CarDepositAmtVO
-	 */
-	public static CarDepositAmtVO calCarDepositAmt(Integer internalStaff, Integer cityCode, Integer guidPrice, Double carBrandTypeRadio, Double carYearRadio, List<DepositText> depositList, Double reliefPercetage) {
-		/*if (INTERNAL_STAFF_FLAG.equals(internalStaff)) {
-			return calCarDepositAmt();
-		} else {
-			return calCarDepositAmt(cityCode, guidPrice, carBrandTypeRadio, carYearRadio, depositList);
-		}*/
-        return calCarDepositAmt(cityCode, guidPrice, carBrandTypeRadio, carYearRadio, depositList);
-	}
-	
-	/**
-	 * 计算车辆押金(内部员工)
-	 * @return CarDepositAmtVO
-	 */
-	public static CarDepositAmtVO calCarDepositAmt() {
-		CarDepositAmtVO carDepositAmtVO = new CarDepositAmtVO();
-		carDepositAmtVO.setCarDepositAmt(RENT_ADJUST_AMT_INNER);
-		carDepositAmtVO.setCarDepositRadio(1.0);
-		carDepositAmtVO.setReliefPercetage(0.0);
-		carDepositAmtVO.setReliefAmt(0);
-		return carDepositAmtVO;
-	}
-	
-	
-	/**
-	 * 计算车辆押金(外部员工)
-	 * @param cityCode 城市编号
-	 * @param guidPrice 车辆残值
-	 * @param carBrandTypeRadio 车型品牌系数
-	 * @param carYearRadio 车辆年份系数
+	 * @param carYearRadio 新车押金系数
 	 * @param depositList 押金配置列表
 	 * @param reliefPercetage 减免比例
 	 * @return CarDepositAmtVO
 	 */
 	public static CarDepositAmtVO calCarDepositAmt(Integer cityCode, Integer guidPrice, Double carBrandTypeRadio, Double carYearRadio, List<DepositText> depositList) {
-		if (guidPrice == null) {
-			throw new RenterFeeCostException(ExceptionCodeEnum.GUID_PRICE_IS_NULL);
-		}
-		//初始化车辆押金
-		Integer suggestTotal = getSuggestTotalAmt(guidPrice);
-		Boolean carbool = true;
-		String cityCodeStr = cityCode == null ? "":String.valueOf(cityCode);
-		if(null!=depositList&&depositList.size()>0){
-			for (DepositText dt : depositList) {
-				if(CAREEPOSIT.equals(dt.getDepositType())
-					&&cityCodeStr.equals(dt.getCityCode())
-					&&guidPrice>Integer.valueOf(dt.getPurchasePriceBegin())
-					&&guidPrice<=Integer.valueOf(dt.getPurchasePriceEnd())){
-					suggestTotal = Integer.valueOf(dt.getDepositValue());
-					carbool = false;
-					break;
-				}
-				//处理购置价为0的情况
-				if (CAREEPOSIT.equals(dt.getDepositType())
-					&& cityCodeStr.equals(dt.getCityCode())
-					&& guidPrice==0 && guidPrice == Integer.valueOf(dt.getPurchasePriceBegin())) {
-					suggestTotal = Integer.valueOf(dt.getDepositValue());
-					carbool = false;
-					break;
-				}
-			}
-		
-			//此处代表默认设置
-			if(carbool){
-				for (DepositText dt : depositList) {
-					if(CAREEPOSITDEFULT.equals(dt.getDepositType())
-						&& guidPrice>Integer.valueOf(dt.getPurchasePriceBegin())
-						&& guidPrice<=Integer.valueOf(dt.getPurchasePriceEnd())){
-						suggestTotal = Integer.valueOf(dt.getDepositValue());
-						break;
-					}
-					//处理购置价为0的情况
-					if (CAREEPOSITDEFULT.equals(dt.getDepositType())
-							&& guidPrice == 0 
-							&& guidPrice == Integer.valueOf(dt.getPurchasePriceBegin())) {
-						suggestTotal = Integer.valueOf(dt.getDepositValue());
-						break;
-					}
-				}
-			}
-		}
-		double coefficient = 1.0;
-		if((carBrandTypeRadio != null && carBrandTypeRadio != 0) || (carYearRadio != null && carYearRadio > 1)) {
-			coefficient = 1.3; 
-		} 
-		double carDepositAmt = 0.0;
-		if(guidPrice > 1500000) {
-			coefficient = 1.0;
-			carDepositAmt = suggestTotal;
-		} else {
-			carDepositAmt = suggestTotal * coefficient;
-		}
-		CarDepositAmtVO carDepositAmtVO = new CarDepositAmtVO();
-		carDepositAmtVO.setCarDepositAmt((int) carDepositAmt);
-		carDepositAmtVO.setCarDepositRadio(coefficient);
-		carDepositAmtVO.setReliefPercetage(null);
-		carDepositAmtVO.setReliefAmt((int) (suggestTotal*coefficient));
-		return carDepositAmtVO;
+        if (guidPrice == null) {
+            throw new RenterFeeCostException(ExceptionCodeEnum.GUID_PRICE_IS_NULL);
+        }
+        //初始化车辆押金
+        Integer suggestTotal = getSuggestTotalAmt(guidPrice);
+        Boolean carbool = true;
+        String cityCodeStr = cityCode == null ? "":String.valueOf(cityCode);
+        if(null!=depositList&&depositList.size()>0){
+            for (DepositText dt : depositList) {
+                if(CAREEPOSIT.equals(dt.getDepositType())
+                        &&cityCodeStr.equals(dt.getCityCode())
+                        &&guidPrice>Integer.valueOf(dt.getPurchasePriceBegin())
+                        &&guidPrice<=Integer.valueOf(dt.getPurchasePriceEnd())){
+                    suggestTotal = Integer.valueOf(dt.getDepositValue());
+                    carbool = false;
+                    break;
+                }
+                //处理购置价为0的情况
+                if (CAREEPOSIT.equals(dt.getDepositType())
+                        && cityCodeStr.equals(dt.getCityCode())
+                        && guidPrice==0 && guidPrice == Integer.valueOf(dt.getPurchasePriceBegin())) {
+                    suggestTotal = Integer.valueOf(dt.getDepositValue());
+                    carbool = false;
+                    break;
+                }
+            }
+
+            //此处代表默认设置
+            if(carbool){
+                for (DepositText dt : depositList) {
+                    if(CAREEPOSITDEFULT.equals(dt.getDepositType())
+                            && guidPrice>Integer.valueOf(dt.getPurchasePriceBegin())
+                            && guidPrice<=Integer.valueOf(dt.getPurchasePriceEnd())){
+                        suggestTotal = Integer.valueOf(dt.getDepositValue());
+                        break;
+                    }
+                    //处理购置价为0的情况
+                    if (CAREEPOSITDEFULT.equals(dt.getDepositType())
+                            && guidPrice == 0
+                            && guidPrice == Integer.valueOf(dt.getPurchasePriceBegin())) {
+                        suggestTotal = Integer.valueOf(dt.getDepositValue());
+                        break;
+                    }
+                }
+            }
+        }
+        double coefficient = 1.0;
+        if((carBrandTypeRadio != null && carBrandTypeRadio != 0) || (carYearRadio != null && carYearRadio > 1)) {
+            coefficient = 1.3;
+        }
+        double carDepositAmt = 0.0;
+        if(guidPrice > 1500000) {
+            coefficient = 1.0;
+            carDepositAmt = suggestTotal;
+        } else {
+            carDepositAmt = suggestTotal * coefficient;
+        }
+        CarDepositAmtVO carDepositAmtVO = new CarDepositAmtVO();
+        carDepositAmtVO.setCarSpecialCoefficient(carBrandTypeRadio);
+        carDepositAmtVO.setNewCarCoefficient(carYearRadio);
+        carDepositAmtVO.setCarDepositAmt((int) carDepositAmt);
+        carDepositAmtVO.setSuggestTotal((int)suggestTotal);
+        carDepositAmtVO.setCarDepositRadio(coefficient);
+
+        return carDepositAmtVO;
 	}
 	
+
 	/**
 	 * 根据车辆的购买价格计算建议的租车押金（预授权额度）
 	 * @param purchasePrice 车辆残值
@@ -499,18 +462,14 @@ public class RenterFeeCalculatorUtils {
 	 * @param revertTime 还车时间
 	 * @return Integer
 	 */
-	public static Integer calIllegalDepositAmt(Integer internalStaff, Integer cityCode, String carPlateNum, String specialCityCodes, Integer specialIllegalDepositAmt,
+	public static Integer calIllegalDepositAmt(Integer cityCode, String carPlateNum, String specialCityCodes, Integer specialIllegalDepositAmt,
 			List<IllegalDepositConfig> illegalDepositList, LocalDateTime rentTime, LocalDateTime revertTime) {
-		internalStaff = internalStaff == null ? 0:internalStaff;
 		Integer illegalDepositAmt = ILLEGAL_DEPOSIT.get(0);
 		if (carPlateNum != null && !"".equals(carPlateNum) && specialCityCodes != null && !"".equals(specialCityCodes)) {
 			if("粤".equals(carPlateNum.substring(0,1)) && cityCode != null && specialCityCodes.contains(String.valueOf(cityCode))){
 				illegalDepositAmt = specialIllegalDepositAmt == null ? illegalDepositAmt:specialIllegalDepositAmt;
 				return illegalDepositAmt;
 	        }
-		}
-		if (internalStaff == 1) {
-			return ILLEGAL_DEPOSIT.get(internalStaff);
 		}
 		illegalDepositAmt = getIllegalDepositAmt(cityCode, illegalDepositList, rentTime, revertTime);
 		return illegalDepositAmt;

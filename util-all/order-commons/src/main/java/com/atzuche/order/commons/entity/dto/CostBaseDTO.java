@@ -32,4 +32,18 @@ public class CostBaseDTO {
 	 * 结束时间
 	 */
 	private LocalDateTime endTime;
+	public CostBaseDTO(String orderNo, String renterOrderNo, String memNo, LocalDateTime startTime,
+			LocalDateTime endTime) {
+		this.orderNo = orderNo;
+		this.renterOrderNo = renterOrderNo;
+		this.memNo = memNo;
+		this.startTime = startTime;
+		this.endTime = endTime;
+	}
+	public CostBaseDTO(LocalDateTime startTime, LocalDateTime endTime) {
+		this.startTime = startTime;
+		this.endTime = endTime;
+	}
+	public CostBaseDTO() {}
+	
 }
