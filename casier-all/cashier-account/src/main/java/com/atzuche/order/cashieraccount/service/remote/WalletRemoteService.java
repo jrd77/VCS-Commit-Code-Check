@@ -94,6 +94,9 @@ public class WalletRemoteService {
                 throw new DeductWalletRemoteException();
             }
             t.setStatus(Transaction.SUCCESS);
+           if(Math.abs(vo.getAmt()) != Math.abs(walletDeduction.getAmt())){
+               throw new DeductWalletRemoteException();
+           }
             return vo.getAmt();
         }catch (Exception e){
             t.setStatus(e);

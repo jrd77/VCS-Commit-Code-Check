@@ -28,7 +28,12 @@ import com.atzuche.order.commons.enums.cashier.WalletFlagEnum;
 import com.atzuche.order.rentercost.entity.vo.PayableVO;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.atzuche.order.renterorder.service.RenterOrderService;
+import com.autoyol.autopay.gateway.constant.DataAppIdConstant;
+import com.autoyol.autopay.gateway.constant.DataPayEnvConstant;
+import com.autoyol.autopay.gateway.constant.DataPayKindConstant;
 import com.autoyol.autopay.gateway.constant.DataPayTypeConstant;
+import com.autoyol.autopay.gateway.vo.req.PayVo;
+import com.autoyol.commons.utils.GsonUtils;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.doc.util.StringUtil;
 import com.autoyol.vo.req.WalletDeductionReqVO;
@@ -82,6 +87,14 @@ public class CashierNoTService {
             return 0;
         }
         return cashierEntity.getPayAmt() ;
+    }
+
+    /**
+     * 收银台记录
+     */
+    public CashierEntity getCashierEntity(String orderNo,String memNo,String payKind){
+        CashierEntity cashierEntity = cashierMapper.getPayDeposit(orderNo,memNo,payKind,DataPayTypeConstant.PAY_PUR);
+        return cashierEntity;
     }
 
     /**
@@ -180,6 +193,7 @@ public class CashierNoTService {
              BeanUtils.copyProperties(orderPayAsynVO,cashier);
              cashier.setId(cashierEntity.getId());
              cashier.setVersion(cashierEntity.getVersion());
+             cashier.setPaySn(cashierEntity.getPaySn()+1);
              result = cashierMapper.updateByPrimaryKeySelective(cashier);
          }else {
              CashierEntity cashier = new CashierEntity();
@@ -247,10 +261,10 @@ public class CashierNoTService {
     /**
      * 构造远程扣减钱包参数
      */
-    public WalletDeductionReqVO getWalletDeductionReqVO(OrderPaySignReqVO orderPaySign, OrderPayableAmountResVO payVO,int payBalanceDeduct) {
+    public WalletDeductionReqVO getWalletDeductionReqVO(OrderPaySignReqVO orderPaySign, OrderPayableAmountResVO payVO,int num) {
         WalletDeductionReqVO vo = new WalletDeductionReqVO();
         vo.setIp(IpUtil.getLocalIp());
-        vo.setAmt(payBalanceDeduct);
+        vo.setAmt(payVO.getAmtWallet());
         vo.setOrderNo(Long.parseLong(orderPaySign.getOrderNo()));
         vo.setMemNo(Integer.valueOf(orderPaySign.getMenNo()));
         vo.setFlag(WalletFlagEnum.RENTER_CONSUME.getCode());
@@ -259,6 +273,7 @@ public class CashierNoTService {
         vo.setPlatform(PlatformEnum.OPERATION_TERMINAL.name());
         vo.setOperator(orderPaySign.getOperator());
         vo.setOperatorName(orderPaySign.getOperatorName());
+        vo.setNum(num);
         return vo;
     }
 
@@ -268,20 +283,72 @@ public class CashierNoTService {
      * @param orderPaySign
      * @return
      */
-    public int payOrderByWallet(int payBalance, OrderPaySignReqVO orderPaySign,OrderPayableAmountResVO payVO) {
-       //取出所有户头 钱包支付款项
+    public int payOrderByWallet(int payBalance, OrderPaySignReqVO orderPaySign, OrderPayableAmountResVO payVO) {
+        //取出所有户头 钱包支付款项
         List<String> payKinds = orderPaySign.getPayKind();
-        List<CashierEntity> cashierEntitys = new ArrayList<>();
-       if(!CollectionUtils.isEmpty(payKinds)){
-           for(int i=0;i<payKinds.size();i++){
-               CashierEntity cashierEntity = cashierMapper.getPayDeposit(orderPaySign.getOrderNo(),orderPaySign.getMenNo(),payKinds.get(i),"00");
-               if(Objects.nonNull(cashierEntity) && Objects.nonNull(cashierEntity.getId())){
-                   cashierEntitys.add(cashierEntity);
-               }
-           }
-       }
-       //循环优先扣减 消费
+        int num = 0;
+        if (!CollectionUtils.isEmpty(payKinds)) {
+            //1 钱包 优先抵扣  支付租车费用
+            if (payKinds.contains(DataPayKindConstant.TK_FEE)) {
+                CashierEntity cashierEntity = cashierMapper.getPayDeposit(orderPaySign.getOrderNo(),orderPaySign.getMenNo(),DataPayKindConstant.TK_FEE,"00");
+                if(Objects.nonNull(cashierEntity) && Objects.nonNull(cashierEntity.getPaySn())){
+                    num = cashierEntity.getPaySn() + 1;
+                    CashierEntity cashier = new CashierEntity ();
+                    cashier.setId(cashierEntity.getId());
+                    cashier.setPaySn(num);
+                    int result = cashierMapper.updateByPrimaryKeySelective(cashier);
+                    if(result ==0){
+                        throw new AccountRenterDepositDBException();
+                    }
+                }
+                //计算抵扣钱包金额 amt 负值
+                int amt = payVO.getAmtRent() + payBalance < 0 ? -payBalance : payVO.getAmtRent();
+                //计算剩余待支付租车费用 amtRent 负值
+                int amtRent = payVO.getAmtRent() + payBalance < 0 ? payVO.getAmtRent() + payBalance : 0;
+                payVO.setAmtRent(amtRent);
+                payVO.setAmt(payVO.getAmt() + amt);
+                payVO.setAmtWallet(amt);
+            }
+        }
+        return num;
+    }
 
-        return 0;
+    /**
+     * 构造参数 PayVo (押金、违章押金)
+     * @param cashierEntity
+     * @param orderPaySign
+     * @param payVO
+     * @return
+     */
+    public PayVo getPayVO(CashierEntity cashierEntity,OrderPaySignReqVO orderPaySign,OrderPayableAmountResVO payVO,String payKind) {
+        PayVo vo = new PayVo();
+        vo.setInternalNo(String.valueOf(cashierEntity.getPaySn()));
+        vo.setExtendParams(GsonUtils.toJson(cashierEntity));
+        vo.setAtappId(DataAppIdConstant.APPID_SHORTRENT);
+        vo.setMemNo(orderPaySign.getMenNo());
+        vo.setOrderNo(orderPaySign.getOrderNo());
+        vo.setOpenId(orderPaySign.getOpenId());
+        vo.setOS(orderPaySign.getOS());
+        vo.setPayAmt(String.valueOf(Math.abs(payVO.getAmt())));
+        vo.setPayEnv(StringUtil.isBlank(orderPaySign.getPayEnv())? DataPayEnvConstant.PRO:orderPaySign.getPayEnv());
+        vo.setPayId(cashierEntity.getId().toString());
+        vo.setPayKind(payKind);
+        vo.setPaySn(cashierEntity.getPaySn().toString());
+        vo.setPaySource(orderPaySign.getPaySource());
+        vo.setPayTitle(payVO.getTitle());
+        vo.setPayType(orderPaySign.getPayType());
+        vo.setReqIp(IpUtil.getLocalIp());
+        return vo;
+    }
+
+    /**
+     *  租车费用
+     * @param orderPaySign
+     * @param payVO
+     * @return
+     */
+    public PayVo getPayVOByRentCost(OrderPaySignReqVO orderPaySign, OrderPayableAmountResVO payVO) {
+        PayVo vo = new PayVo();
+        return vo;
     }
 }
