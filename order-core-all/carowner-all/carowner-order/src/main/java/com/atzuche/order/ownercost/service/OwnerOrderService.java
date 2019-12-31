@@ -1,9 +1,12 @@
 package com.atzuche.order.ownercost.service;
 
 
+import com.atzuche.order.commons.entity.dto.CostBaseDTO;
 import com.atzuche.order.ownercost.entity.OwnerOrderEntity;
+import com.atzuche.order.ownercost.entity.dto.OwnerOrderCostReqDTO;
 import com.atzuche.order.ownercost.entity.dto.OwnerOrderReqDTO;
 import com.atzuche.order.ownercost.mapper.OwnerOrderMapper;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -52,11 +55,27 @@ public class OwnerOrderService {
     public void generateRenterOrderInfo(OwnerOrderReqDTO ownerOrderReqDTO){
         //1、生成车主子订单
         OwnerOrderEntity ownerOrderEntity = new OwnerOrderEntity();
-
-
-        saveOwnerOrder(null);
+        BeanUtils.copyProperties(ownerOrderReqDTO,ownerOrderEntity);
+        ownerOrderEntity.setGoodsCode(ownerOrderReqDTO.getCarNo());
+        ownerOrderEntity.setGoodsType(String.valueOf(ownerOrderReqDTO.getCategory()));
+        ownerOrderMapper.insert(ownerOrderEntity);
         //2、生成费用信息
-        ownerOrderCalCostService.getOrderCostAndDeailList(null);
+
+        OwnerOrderCostReqDTO ownerOrderCostReqDTO = new OwnerOrderCostReqDTO();
+
+        ownerOrderCostReqDTO.setCarOwnerType(ownerOrderReqDTO.getCarOwnerType());
+        ownerOrderCostReqDTO.setSrvGetFlag(ownerOrderReqDTO.getSrvGetFlag());
+        ownerOrderCostReqDTO.setSrvReturnFlag(ownerOrderReqDTO.getSrvReturnFlag());
+        ownerOrderCostReqDTO.setOwnerOrderPurchaseDetailEntity(ownerOrderReqDTO.getOwnerOrderPurchaseDetailEntity());
+        ownerOrderCostReqDTO.setOwnerOrderSubsidyDetailEntity(ownerOrderReqDTO.getOwnerOrderSubsidyDetailEntity());
+
+        CostBaseDTO costBaseDTO = new CostBaseDTO();
+        costBaseDTO.setOrderNo(ownerOrderReqDTO.getOrderNo());
+        costBaseDTO.setOwnerOrderNo(ownerOrderReqDTO.getOwnerOrderNo());
+        costBaseDTO.setMemNo(ownerOrderReqDTO.getMemNo());
+        ownerOrderCostReqDTO.setCostBaseDTO(costBaseDTO);
+
+        ownerOrderCalCostService.getOrderCostAndDeailList(ownerOrderCostReqDTO);
 
     }
 
