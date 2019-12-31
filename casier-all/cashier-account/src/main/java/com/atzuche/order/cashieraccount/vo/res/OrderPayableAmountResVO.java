@@ -1,5 +1,6 @@
 package com.atzuche.order.cashieraccount.vo.res;
 
+import com.atzuche.order.rentercost.entity.vo.PayableVO;
 import lombok.Data;
 
 import java.util.List;
@@ -22,13 +23,44 @@ public class OrderPayableAmountResVO {
     /**
      * 总待付款项
      */
+    private Integer amtTotal;
+    /**
+     * 已付款项
+     */
+    private Integer amtPay;
+    /**
+     * 实际待款项
+     */
     private Integer amt;
     /**
-     * 代付费用明细
+     * 名称
+     */
+    private String title;
+    /**
+     * 待付费用明细
      */
     private List<AccountPayAbleResVO> accountPayAbles;
 
+    /**
+     * 应付租车费用明细
+     */
+    List<PayableVO> payableVOs;
 
+    /**
+     * 应付租车费用
+     */
+    private Integer amtRent;
+    /**
+     * 应付租车车俩押金
+     */
+    private Integer amtDeposit;
+    /**
+     * 应付租车违章押金
+     */
+    private Integer amtWzDeposit;
 
-
+    /**
+     * 钱包抵扣金额
+     */
+    private int amtWallet;
 }

@@ -3,6 +3,9 @@ package com.atzuche.order.cashieraccount.vo.req.pay;
 import com.autoyol.commons.web.ErrorCode;
 import lombok.Data;
 import org.springframework.util.Assert;
+import org.springframework.util.CollectionUtils;
+
+import java.util.List;
 
 /**
  * 支付系统查询请求签名参数
@@ -10,24 +13,16 @@ import org.springframework.util.Assert;
 @Data
 public class OrderPaySignReqVO {
 
-    /**
-     * atappId 凹凸APPID
-     */
-    private String atappId;
+
 
     /**
-     *  支付ID
+     * 选择的支付款项支付款项
+     * 支付款项，01：租车押金，02：违章押金， 03补付租车押金
+     支付款项，06：充值,07:支付欠款
+     坦客支付款项，04:行程费用，05:押金费用
+     来自配置DataPayKindConstant.class
      */
-    private String payId;
-
-    /**
-     *  支付项目
-     */
-    private String payKind;
-    /**
-     *  支付类型
-     */
-    private String payType         ;
+    private List<String> payKind         ;
 
     /**
      * 会员号
@@ -39,31 +34,52 @@ public class OrderPaySignReqVO {
     private String orderNo;
 
     /**
-     * 支付金额
+     * 是否使用钱包支付
      */
-    private int payAmt;
+    private Boolean isUseWallet;
     /**
-     * 支付标题
+     * 操作人
      */
-    private String payTitle;
+    private Integer operator;
 
     /**
-     * 补付第几笔
+     * 操作人名称
      */
-    private String paySn;
+    private String operatorName;
+
+    /**
+     * 支付方式：transType "01"：消费，"02"：预授权， 消费方式："31"：消费撤销，"32"：预授权撤销，"03"：预授权完成，"04"：退货
+     */
+    private String payType;
+
+    /**
+     * 微信公众号openid
+     */
+    String openId;
+
+    /**
+     * 来源系统
+     */
+    String OS;
+    /**
+     * 支付环境
+     */
+    String payEnv;
+    /**
+     * 支付来源
+     */
+    String paySource;
 
     /**
      * 参数校验
      */
     public void check() {
-        Assert.notNull(getAtappId(), ErrorCode.PARAMETER_ERROR.getText());
-        Assert.notNull(getPayAmt(), ErrorCode.PARAMETER_ERROR.getText());
         Assert.notNull(getMenNo(), ErrorCode.PARAMETER_ERROR.getText());
         Assert.notNull(getOrderNo(), ErrorCode.PARAMETER_ERROR.getText());
-        Assert.notNull(getPayId(), ErrorCode.PARAMETER_ERROR.getText());
-        Assert.notNull(getPayKind(), ErrorCode.PARAMETER_ERROR.getText());
-        Assert.notNull(getPaySn(), ErrorCode.PARAMETER_ERROR.getText());
-        Assert.notNull(getPayTitle(), ErrorCode.PARAMETER_ERROR.getText());
         Assert.notNull(getPayType(), ErrorCode.PARAMETER_ERROR.getText());
+        Assert.notNull(getOS(), ErrorCode.PARAMETER_ERROR.getText());
+        Assert.notNull(getPaySource(), ErrorCode.PARAMETER_ERROR.getText());
+
+        Assert.isTrue(!CollectionUtils.isEmpty(getPayKind()), ErrorCode.PARAMETER_ERROR.getText());
     }
 }

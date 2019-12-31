@@ -3,6 +3,8 @@ package com.atzuche.order.rentermem.service;
 import com.atzuche.order.commons.GlobalConstant;
 import com.atzuche.order.commons.entity.dto.RenterMemberRightDTO;
 import com.atzuche.order.commons.enums.RenterMemRightEnum;
+import com.atzuche.order.rentermem.entity.dto.MemRightCarDepositAmtReqDTO;
+import com.atzuche.order.rentermem.entity.dto.MemRightCarDepositAmtRespDTO;
 import com.atzuche.order.rentermem.exception.CalCarDepositAmtException;
 import com.atzuche.order.rentermem.exception.CalWzDepositAmtException;
 import com.dianping.cat.Cat;
@@ -22,29 +24,38 @@ import java.util.stream.Collectors;
 @Service
 public class RenterMemberRightService{
 
+    private static final int GUIDE_PRICE = 1500000;
+
+    private static final int REDUCTION_RATE_MAX = 70;
+
     /**
      *
      * @param renterMemberRightDTOList 权益集合
      * @param carDepositAmt 车辆押金
      * @return  会员权益车辆押金计算
      */
-    public int carDepositAmt(List<RenterMemberRightDTO> renterMemberRightDTOList, Integer carDepositAmt){
-        if(carDepositAmt == null){
+    public MemRightCarDepositAmtRespDTO carDepositAmt(MemRightCarDepositAmtReqDTO memRightCarDepositAmtReqDTO){
+        Integer originalDepositAmt = memRightCarDepositAmtReqDTO.getOriginalDepositAmt();
+        if(memRightCarDepositAmtReqDTO == null || originalDepositAmt == null){
             CalCarDepositAmtException calDepositAmtException = new CalCarDepositAmtException();
             Cat.logError(calDepositAmtException);
             throw calDepositAmtException;
         }
-        List<RenterMemberRightDTO> staff = renterMemberRightDTOList
+        MemRightCarDepositAmtRespDTO memRightCarDepositAmtRespDTO = new MemRightCarDepositAmtRespDTO();
+        memRightCarDepositAmtRespDTO.setOriginalDepositAmt(originalDepositAmt);
+        List<RenterMemberRightDTO> staff = memRightCarDepositAmtReqDTO.getRenterMemberRightDTOList()
                 .stream()
                 .filter(x -> RenterMemRightEnum.STAFF.getRightCode().equals(x.getRightCode()))
                 .limit(1)
                 .collect(Collectors.toList());
-
+        //内部员工
         if(staff!=null && staff.size()==1){
-           return GlobalConstant.MEMBER_RIGHT_STAFF_CAR_DEPOSIT;
+            memRightCarDepositAmtRespDTO.setReductionDepositAmt(originalDepositAmt - GlobalConstant.MEMBER_RIGHT_STAFF_CAR_DEPOSIT);
+            memRightCarDepositAmtRespDTO.setReductionRate(0D);
+           return memRightCarDepositAmtRespDTO;
         }
 
-        List<RenterMemberRightDTO> taskList = renterMemberRightDTOList
+        List<RenterMemberRightDTO> taskList = memRightCarDepositAmtReqDTO.getRenterMemberRightDTOList()
                 .stream()
                 .filter(x -> (
                         RenterMemRightEnum.BIND_WECHAT.getRightCode().equals(x.getRightCode())
@@ -52,24 +63,31 @@ public class RenterMemberRightService{
                                 || RenterMemRightEnum.SUCCESS_RENTCAR.getRightCode().equals(x.getRightCode())
                                 || RenterMemRightEnum.MEMBER_LEVEL.getRightCode().equals(x.getRightCode())))
                 .collect(Collectors.toList());
+        //外部员工
+        double reductionRate = 0;
         if(taskList != null && taskList.size()>0){
             AtomicInteger rightValueTotal = new AtomicInteger(0);
             taskList.forEach(x->{
                 rightValueTotal.addAndGet(Integer.valueOf(x.getRightValue() == null ? "0" : x.getRightValue()));
             });
-            if(rightValueTotal.get() >= 70){
-                return (int) (carDepositAmt*0.7);
+            Integer guidPrice = memRightCarDepositAmtReqDTO.getGuidPrice();
+            if(guidPrice != null && guidPrice > GUIDE_PRICE){
+                reductionRate = 0;
+            }else if(rightValueTotal.get() >= REDUCTION_RATE_MAX){
+                reductionRate = 0.7;
             }else{
-                return (int)(rightValueTotal.get()/100*carDepositAmt);
+                reductionRate = rightValueTotal.get()/100;
             }
         }
-        return carDepositAmt;
+        memRightCarDepositAmtRespDTO.setReductionRate(reductionRate);
+        memRightCarDepositAmtRespDTO.setReductionDepositAmt((int)(originalDepositAmt*reductionRate));
+        return memRightCarDepositAmtRespDTO;
     }
 
     /**
      *
      * @param renterMemberRightDTOList 权益集合
-     * @param wzDepositAmt 车辆押金
+     * @param wzDepositAmt 违章押金
      * @return 会员权益违章押金计算
      */
     public int wzDepositAmt(List<RenterMemberRightDTO> renterMemberRightDTOList, Integer wzDepositAmt){

@@ -1,6 +1,5 @@
 package com.atzuche.order.owner.mem.service;
 
-import com.atzuche.order.commons.entity.dto.OrderContextDTO;
 import com.atzuche.order.commons.entity.dto.OwnerMemberDTO;
 import com.atzuche.order.commons.entity.dto.OwnerMemberRightDTO;
 import com.atzuche.order.owner.mem.entity.OwnerMemberEntity;
@@ -40,6 +39,9 @@ public class OwnerMemberService{
         ownerMemberDto.getOwnerMemberRightDTOList().forEach(x->{
             OwnerMemberRightEntity ownerMemberRightEntity = new OwnerMemberRightEntity();
             BeanUtils.copyProperties(x,ownerMemberRightEntity);
+            ownerMemberRightEntity.setOrderNo(ownerMemberDto.getOrderNo());
+            ownerMemberRightEntity.setOwnerOrderNo(ownerMemberDto.getOwnerOrderNo());
+            ownerMemberRightEntity.setMemNo(ownerMemberDto.getMemNo());
             list.add(ownerMemberRightEntity);
         });
         ownerMemberRightMapper.insertList(list);

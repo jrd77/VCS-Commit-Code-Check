@@ -1,0 +1,305 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.atzuche.order.renterwz.mapper.RenterOrderWzDetailMapper">
+	<sql id="select_column">
+		id,order_no,car_plate_num,order_flag,illegal_time,illegal_addr,illegal_reason,illegal_amt,illegal_deduct,illegal_fine,illegal_dys_fine,illegal_service_cost,is_valid,is_sms,illegal_status,code,ry_wz_code,owner_is_sms,illegal_supercer_cost,delete_operate,delete_time,create_op,create_time,update_time,update_op,is_delete
+	</sql>
+
+	<resultMap id = "selectColumnMap" type="com.atzuche.order.renterwz.entity.RenterOrderWzDetailEntity">
+		<result property="id" column="id"/>
+		<result property="orderNo" column="order_no"/>
+		<result property="carPlateNum" column="car_plate_num"/>
+		<result property="orderFlag" column="order_flag"/>
+		<result property="illegalTime" column="illegal_time"/>
+		<result property="illegalAddr" column="illegal_addr"/>
+		<result property="illegalReason" column="illegal_reason"/>
+		<result property="illegalAmt" column="illegal_amt"/>
+		<result property="illegalDeduct" column="illegal_deduct"/>
+		<result property="illegalFine" column="illegal_fine"/>
+		<result property="illegalDysFine" column="illegal_dys_fine"/>
+		<result property="illegalServiceCost" column="illegal_service_cost"/>
+		<result property="isValid" column="is_valid"/>
+		<result property="isSms" column="is_sms"/>
+		<result property="illegalStatus" column="illegal_status"/>
+		<result property="code" column="code"/>
+		<result property="ryWzCode" column="ry_wz_code"/>
+		<result property="ownerIsSms" column="owner_is_sms"/>
+		<result property="illegalSupercerCost" column="illegal_supercer_cost"/>
+		<result property="deleteOperate" column="delete_operate"/>
+		<result property="deleteTime" column="delete_time"/>
+		<result property="createOp" column="create_op"/>
+		<result property="createTime" column="create_time"/>
+		<result property="updateTime" column="update_time"/>
+		<result property="updateOp" column="update_op"/>
+		<result property="isDelete" column="is_delete"/>
+	</resultMap>
+
+	<insert id="saveRenterOrderWzDetail" parameterType="com.atzuche.order.renterwz.entity.RenterOrderWzDetailEntity" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+		insert into renter_order_wz_detail(
+			<if test="orderNo != null">
+				order_no,
+			</if>
+			<if test="carPlateNum != null">
+				car_plate_num,
+			</if>
+			<if test="orderFlag != null">
+				order_flag,
+			</if>
+			<if test="illegalTime != null">
+				illegal_time,
+			</if>
+			<if test="illegalAddr != null">
+				illegal_addr,
+			</if>
+			<if test="illegalReason != null">
+				illegal_reason,
+			</if>
+			<if test="illegalAmt != null">
+				illegal_amt,
+			</if>
+			<if test="illegalDeduct != null">
+				illegal_deduct,
+			</if>
+			<if test="illegalFine != null">
+				illegal_fine,
+			</if>
+			<if test="illegalDysFine != null">
+				illegal_dys_fine,
+			</if>
+			<if test="illegalServiceCost != null">
+				illegal_service_cost,
+			</if>
+			<if test="isValid != null">
+				is_valid,
+			</if>
+			<if test="isSms != null">
+				is_sms,
+			</if>
+			<if test="illegalStatus != null">
+				illegal_status,
+			</if>
+			<if test="code != null">
+				code,
+			</if>
+			<if test="ryWzCode != null">
+				ry_wz_code,
+			</if>
+			<if test="ownerIsSms != null">
+				owner_is_sms,
+			</if>
+			<if test="illegalSupercerCost != null">
+				illegal_supercer_cost,
+			</if>
+			<if test="deleteOperate != null">
+				delete_operate,
+			</if>
+			<if test="deleteTime != null">
+				delete_time,
+			</if>
+			<if test="createOp != null">
+				create_op,
+			</if>
+			<if test="updateTime != null">
+				update_time,
+			</if>
+			<if test="updateOp != null">
+				update_op,
+			</if>
+			<if test="isDelete != null">
+				is_delete,
+			</if>
+			create_time
+		) values (
+			<if test="orderNo != null">
+				#{orderNo},
+			</if>
+			<if test="carPlateNum != null">
+				#{carPlateNum},
+			</if>
+			<if test="orderFlag != null">
+				#{orderFlag},
+			</if>
+			<if test="illegalTime != null">
+				#{illegalTime},
+			</if>
+			<if test="illegalAddr != null">
+				#{illegalAddr},
+			</if>
+			<if test="illegalReason != null">
+				#{illegalReason},
+			</if>
+			<if test="illegalAmt != null">
+				#{illegalAmt},
+			</if>
+			<if test="illegalDeduct != null">
+				#{illegalDeduct},
+			</if>
+			<if test="illegalFine != null">
+				#{illegalFine},
+			</if>
+			<if test="illegalDysFine != null">
+				#{illegalDysFine},
+			</if>
+			<if test="illegalServiceCost != null">
+				#{illegalServiceCost},
+			</if>
+			<if test="isValid != null">
+				#{isValid},
+			</if>
+			<if test="isSms != null">
+				#{isSms},
+			</if>
+			<if test="illegalStatus != null">
+				#{illegalStatus},
+			</if>
+			<if test="code != null">
+				#{code},
+			</if>
+			<if test="ryWzCode != null">
+				#{ryWzCode},
+			</if>
+			<if test="ownerIsSms != null">
+				#{ownerIsSms},
+			</if>
+			<if test="illegalSupercerCost != null">
+				#{illegalSupercerCost},
+			</if>
+			<if test="deleteOperate != null">
+				#{deleteOperate},
+			</if>
+			<if test="deleteTime != null">
+				#{deleteTime},
+			</if>
+			<if test="createOp != null">
+				#{createOp},
+			</if>
+			<if test="updateTime != null">
+				#{updateTime},
+			</if>
+			<if test="updateOp != null">
+				#{updateOp},
+			</if>
+			<if test="isDelete != null">
+				#{isDelete},
+			</if>
+			NOW())
+	</insert>
+
+	<select id="queryRenterOrderWzDetailById" resultType="com.atzuche.order.renterwz.entity.RenterOrderWzDetailEntity">
+		select <include refid="select_column" />
+		from renter_order_wz_detail
+		where id = #{id} and is_delete = 0
+	</select>
+
+	<select id="queryList" resultType="com.atzuche.order.renterwz.entity.RenterOrderWzDetailEntity">
+		select <include refid="select_column" />
+		from renter_order_wz_detail
+		where is_delete = 0
+	</select>
+
+	 <update id="updateRenterOrderWzDetail" parameterType="com.atzuche.order.renterwz.entity.RenterOrderWzDetailEntity">
+		update renter_order_wz_detail set
+		<if test="orderNo != null">
+			order_no = #{orderNo},
+		</if>
+		<if test="carPlateNum != null">
+			car_plate_num = #{carPlateNum},
+		</if>
+		<if test="orderFlag != null">
+			order_flag = #{orderFlag},
+		</if>
+		<if test="illegalTime != null">
+			illegal_time = #{illegalTime},
+		</if>
+		<if test="illegalAddr != null">
+			illegal_addr = #{illegalAddr},
+		</if>
+		<if test="illegalReason != null">
+			illegal_reason = #{illegalReason},
+		</if>
+		<if test="illegalAmt != null">
+			illegal_amt = #{illegalAmt},
+		</if>
+		<if test="illegalDeduct != null">
+			illegal_deduct = #{illegalDeduct},
+		</if>
+		<if test="illegalFine != null">
+			illegal_fine = #{illegalFine},
+		</if>
+		<if test="illegalDysFine != null">
+			illegal_dys_fine = #{illegalDysFine},
+		</if>
+		<if test="illegalServiceCost != null">
+			illegal_service_cost = #{illegalServiceCost},
+		</if>
+		<if test="isValid != null">
+			is_valid = #{isValid},
+		</if>
+		<if test="isSms != null">
+			is_sms = #{isSms},
+		</if>
+		<if test="illegalStatus != null">
+			illegal_status = #{illegalStatus},
+		</if>
+		<if test="code != null">
+			code = #{code},
+		</if>
+		<if test="ryWzCode != null">
+			ry_wz_code = #{ryWzCode},
+		</if>
+		<if test="ownerIsSms != null">
+			owner_is_sms = #{ownerIsSms},
+		</if>
+		<if test="illegalSupercerCost != null">
+			illegal_supercer_cost = #{illegalSupercerCost},
+		</if>
+		<if test="deleteOperate != null">
+			delete_operate = #{deleteOperate},
+		</if>
+		<if test="deleteTime != null">
+			delete_time = #{deleteTime},
+		</if>
+		<if test="createOp != null">
+			create_op = #{createOp},
+		</if>
+		<if test="createTime != null">
+			create_time = #{createTime},
+		</if>
+		<if test="updateOp != null">
+			update_op = #{updateOp},
+		</if>
+		<if test="isDelete != null">
+			is_delete = #{isDelete},
+		</if>
+		update_time = NOW()
+		where id = #{id} and is_delete = 0
+	</update>
+
+	 <update id="deleteRenterOrderWzDetailById" parameterType="java.lang.Long">
+		update renter_order_wz_detail set
+		is_delete = 1,
+		update_time = NOW()
+		where id = #{id} and is_delete = 0
+	</update>
+
+	<update id="updateIsValid" parameterType="java.lang.String">
+		update renter_order_wz_detail set is_valid = 0 where order_no=#{orderNo} and car_plate_num = #{carNum}
+	</update>
+
+	<insert id ="addIllegalDetailFromRenyun" parameterType= "com.atzuche.order.renterwz.entity.RenterOrderWzDetailEntity">
+		INSERT INTO renter_order_wz_detail (order_no,car_plate_num,illegal_time,illegal_addr,illegal_reason,illegal_amt,illegal_deduct,create_time,
+		order_flag,is_sms,ry_wz_code)
+		VALUES (#{orderNo},#{carPlateNum},#{illegalTime},#{illegalAddr},#{illegalReason},#{illegalAmt},#{illegalDeduct},#{createTime},#{orderFlag},#{isSms},#{ryWzCode})
+	</insert >
+
+	<update id="updateFeeByWzCode" parameterType= "com.atzuche.order.renterwz.entity.RenterOrderWzDetailEntity">
+		UPDATE renter_order_wz_detail
+		SET illegal_fine=#{illegalFine},
+		illegal_dys_fine=#{illegalDysFine},
+		illegal_service_cost=#{illegalServiceCost}
+		<if test="illegalSupercerCost != null" >
+			,illegal_supercer_cost=#{illegalSupercerCost}
+		</if>
+		where ry_wz_code=#{ryWzCode}
+	</update>
+</mapper>

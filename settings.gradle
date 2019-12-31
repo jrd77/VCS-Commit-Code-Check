@@ -82,4 +82,6 @@ include 'config:config-server'
 findProject(':config:config-server')?.name = 'config-server'
 include 'config:config-common'
 findProject(':config:config-common')?.name = 'config-common'
+include 'order-settle'
+include 'order-log'
 

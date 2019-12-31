@@ -71,12 +71,9 @@
 				`other_amount`,		
 				`platform_subsidy_amount`,		
 				`car_owner_subsidy_amount`,		
-				`version`,		
-				`create_time`,		
-				`create_op`,		
-				`update_time`,		
-				`update_op`,		
-				`is_delete`		
+				`create_op`,
+				`update_op`
+
 			)
 		values
 		(
@@ -91,12 +88,8 @@
 				#{otherAmount}, 		
 				#{platformSubsidyAmount}, 		
 				#{carOwnerSubsidyAmount}, 		
-				#{version}, 		
-				#{createTime}, 		
-				#{createOp}, 		
-				#{updateTime}, 		
-				#{updateOp}, 		
-				#{isDelete}		
+				#{createOp},
+				#{updateOp}
 			)
 	</insert>
 	

@@ -9,21 +9,25 @@ import lombok.Data;
  * 订单券表
  * 
  * @author ZhangBin
- * @date 2019-12-25 15:32:31
+ * @date 2019-12-28 15:45:08
+ * @Description:
  */
 @Data
 public class OrderCouponEntity implements Serializable {
-
-    private static final long serialVersionUID = 7853964706210733978L;
-
-    /**
-	 * 主键
+	private static final long serialVersionUID = 1L;
+	
+	/**
+	 * 
 	 */
 	private Integer id;
 	/**
 	 * 主订单号
 	 */
 	private String orderNo;
+	/**
+	 * 租客子订单号
+	 */
+	private String renterOrderNo;
 	/**
 	 * 优惠券id
 	 */

@@ -3,11 +3,11 @@ package com.atzuche.order.coreapi.service;
 import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.CatConstants;
 import com.atzuche.order.coreapi.submitOrder.exception.UniqueOrderNoException;
+import com.autoyol.api.UniqueNoFeignClient;
 import com.autoyol.commons.web.ErrorCode;
+import com.autoyol.commons.web.ResponseData;
 import com.autoyol.enums.OrderNoTypeEnum;
 import com.autoyol.enums.UniqueNoTypeEnum;
-import com.autoyol.feign.UniqueNoFeignClient;
-import com.autoyol.vo.Response;
 import com.dianping.cat.Cat;
 import com.dianping.cat.message.Transaction;
 import org.apache.commons.lang3.StringUtils;
@@ -43,7 +43,7 @@ public class UniqueOrderNoService {
         Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "订单号创建服务");
         try {
             Cat.logEvent(CatConstants.FEIGN_PARAM, "ORDER_CENTER_RENTER_ORDER_NO");
-            Response response = uniqueNoFeignClient.getUniqueNo(UniqueNoTypeEnum.ORDER_CENTER_RENTER_ORDER_NO);
+            ResponseData<Object> response = uniqueNoFeignClient.getUniqueNo(UniqueNoTypeEnum.ORDER_CENTER_RENTER_ORDER_NO);
             LOGGER.info("Invoke UniqueOrderNoService.getOrderNo. result is,response:[{}]", JSON.toJSONString(response));
             Cat.logEvent(CatConstants.FEIGN_RESULT, JSON.toJSONString(response));
             if (null != response && StringUtils.equals(ErrorCode.SUCCESS.getCode(), response.getResCode())) {
@@ -71,7 +71,7 @@ public class UniqueOrderNoService {
         Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "订单号创建服务");
         try {
             Cat.logEvent(CatConstants.FEIGN_PARAM, "orderNo=" + orderNo + "&orderNoType=RENTER_NO");
-            Response response = uniqueNoFeignClient.getChildOrderNoByOrderNo(orderNo, OrderNoTypeEnum.RENTER_NO);
+            ResponseData<Object> response = uniqueNoFeignClient.getChildOrderNoByOrderNo(orderNo, OrderNoTypeEnum.RENTER_NO);
             LOGGER.info("Invoke UniqueOrderNoService.getRenterOrderNo. result is,response:[{}]", JSON.toJSONString(response));
             Cat.logEvent(CatConstants.FEIGN_RESULT, JSON.toJSONString(response));
             if (null != response && StringUtils.equals(ErrorCode.SUCCESS.getCode(), response.getResCode())) {
@@ -99,7 +99,7 @@ public class UniqueOrderNoService {
         Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "订单号创建服务");
         try {
             Cat.logEvent(CatConstants.FEIGN_PARAM, "orderNo=" + orderNo + "&orderNoType=OWNER_NO");
-            Response response = uniqueNoFeignClient.getChildOrderNoByOrderNo(orderNo, OrderNoTypeEnum.OWNER_NO);
+            ResponseData<Object> response = uniqueNoFeignClient.getChildOrderNoByOrderNo(orderNo, OrderNoTypeEnum.OWNER_NO);
             LOGGER.info("Invoke UniqueOrderNoService.getOwnerOrderNo. result is,response:[{}]", JSON.toJSONString(response));
             Cat.logEvent(CatConstants.FEIGN_RESULT, JSON.toJSONString(response));
             if (null != response && StringUtils.equals(ErrorCode.SUCCESS.getCode(), response.getResCode())) {

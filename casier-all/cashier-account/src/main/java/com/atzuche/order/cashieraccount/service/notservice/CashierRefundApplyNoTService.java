@@ -1,10 +1,11 @@
 package com.atzuche.order.cashieraccount.service.notservice;
 
 import com.atzuche.order.cashieraccount.entity.CashierRefundApplyEntity;
-import com.atzuche.order.cashieraccount.enums.CashierRefundApplyStatus;
 import com.atzuche.order.cashieraccount.exception.CashierRefundApplyException;
+import com.atzuche.order.cashieraccount.exception.OrderPayRefundCallBackAsnyException;
 import com.atzuche.order.cashieraccount.vo.req.CashierRefundApplyReqVO;
 import com.atzuche.order.cashieraccount.vo.res.pay.OrderPayAsynResVO;
+import com.atzuche.order.commons.enums.cashier.CashierRefundApplyStatus;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import com.atzuche.order.cashieraccount.mapper.CashierRefundApplyMapper;
 
+import java.util.Objects;
 
 
 /**
@@ -49,8 +51,19 @@ public class CashierRefundApplyNoTService {
      */
     public void updateRefundDepositSuccess(OrderPayAsynResVO orderPayAsynVO) {
         //1 校验
-        //2 回调退款是否成功
-        //3 更新退款成功
-        //4 成功之后push 或者 短信
+        CashierRefundApplyEntity cashierRefundApplyEntity = cashierRefundApplyMapper.selectRefundByQn(orderPayAsynVO.getMenNo(),orderPayAsynVO.getOrderNo(),orderPayAsynVO.getQn());
+        //2 回调退款是否成功判断 TODOD
+        if(Objects.nonNull(cashierRefundApplyEntity) && "".equals(orderPayAsynVO.getPayKind())){
+            //3 更新退款成功
+            CashierRefundApplyEntity cashierRefundApplyUpdate = new CashierRefundApplyEntity();
+            cashierRefundApplyUpdate.setStatus(CashierRefundApplyStatus.RECEIVED_REFUND.getCode());
+            cashierRefundApplyUpdate.setVersion(cashierRefundApplyEntity.getVersion());
+            cashierRefundApplyUpdate.setId(cashierRefundApplyEntity.getId());
+            int result = cashierRefundApplyMapper.updateByPrimaryKeySelective(cashierRefundApplyUpdate);
+            if(result==0){
+                throw new OrderPayRefundCallBackAsnyException();
+            }
+            //4 成功之后push 或者 短信
+        }
     }
 }

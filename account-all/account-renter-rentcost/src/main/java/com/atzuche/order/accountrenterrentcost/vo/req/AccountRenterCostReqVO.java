@@ -66,16 +66,16 @@ public class AccountRenterCostReqVO {
      */
     public void check() {
         Assert.notNull(getOrderNo(), ErrorCode.PARAMETER_ERROR.getText());
-        Assert.notNull(getMemNo(), ErrorCode.PARAMETER_ERROR.getText());
-        Assert.notNull(getAdditionalDrivingEnsureAmount(), ErrorCode.PARAMETER_ERROR.getText());
-        Assert.notNull(getBasicEnsureAmount(), ErrorCode.PARAMETER_ERROR.getText());
-        Assert.notNull(getCarOwnerSubsidyAmount(), ErrorCode.PARAMETER_ERROR.getText());
-        Assert.notNull(getComprehensiveEnsureAmount(), ErrorCode.PARAMETER_ERROR.getText());
-        Assert.notNull(getOtherAmt(), ErrorCode.PARAMETER_ERROR.getText());
-        Assert.notNull(getPlatformSubsidyAmount(), ErrorCode.PARAMETER_ERROR.getText());
-        Assert.notNull(getRentAmt(), ErrorCode.PARAMETER_ERROR.getText());
+//        Assert.notNull(getMemNo(), ErrorCode.PARAMETER_ERROR.getText());
+//        Assert.notNull(getAdditionalDrivingEnsureAmount(), ErrorCode.PARAMETER_ERROR.getText());
+//        Assert.notNull(getBasicEnsureAmount(), ErrorCode.PARAMETER_ERROR.getText());
+//        Assert.notNull(getCarOwnerSubsidyAmount(), ErrorCode.PARAMETER_ERROR.getText());
+//        Assert.notNull(getComprehensiveEnsureAmount(), ErrorCode.PARAMETER_ERROR.getText());
+//        Assert.notNull(getOtherAmt(), ErrorCode.PARAMETER_ERROR.getText());
+//        Assert.notNull(getPlatformSubsidyAmount(), ErrorCode.PARAMETER_ERROR.getText());
+//        Assert.notNull(getRentAmt(), ErrorCode.PARAMETER_ERROR.getText());
         Assert.notNull(getShifuAmt(), ErrorCode.PARAMETER_ERROR.getText());
-        Assert.notNull(getYongjinAmt(), ErrorCode.PARAMETER_ERROR.getText());
+//        Assert.notNull(getYongjinAmt(), ErrorCode.PARAMETER_ERROR.getText());
         Assert.notNull(getAccountRenterCostDetailReqVO(), ErrorCode.PARAMETER_ERROR.getText());
         getAccountRenterCostDetailReqVO().check();
     }

@@ -23,7 +23,7 @@ public class ModifyOrderReq {
 	private String memNo;
 	
 	@AutoDocProperty(value="补充全险是否开启，0：否，1：是")
-	private String abatementFlag;
+	private Integer abatementFlag;
 	
 	@AutoDocProperty(value="取车时间,必填，",required=true)
 	@NotBlank(message="rentTime不能为空")
@@ -59,4 +59,32 @@ public class ModifyOrderReq {
 	
 	@AutoDocProperty(value="【增加附加驾驶员】附加驾驶员ID列表")
 	private List<String> driverIds;
+	/**
+	 * 是否是管理后台操作 true是，其他否
+	 */
+	private Boolean consoleFlag;
+	/**
+	 * 使用取车服务标志 0-不使用，1-使用
+	 */
+	private Integer srvGetFlag;
+	/**
+	 * 使用还车服务标志0-不使用，1-使用
+	 */
+	private Integer srvReturnFlag;
+	/**
+	 * 是否使用凹凸币0-否，1-是
+	 */
+	private Integer userCoinFlag;
+	/**
+	 * 车主券id
+	 */
+	private String carOwnerCouponId;
+	/**
+	 * 取还车优惠券id
+	 */
+	private String srvGetReturnCouponId;
+	/**
+	 * 平台优惠券id
+	 */
+	private String platformCouponId;
 }

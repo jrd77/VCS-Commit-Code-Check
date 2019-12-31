@@ -33,6 +33,7 @@ public class AccountRenterDepositNoTService {
     public void insertRenterDeposit(CreateOrderRenterDepositReqVO createOrderRenterDepositReqVO) {
         AccountRenterDepositEntity accountRenterDepositEntity = new AccountRenterDepositEntity ();
         BeanUtils.copyProperties(createOrderRenterDepositReqVO,accountRenterDepositEntity);
+        accountRenterDepositEntity.setFreeDepositType(createOrderRenterDepositReqVO.getFreeDepositType().getCode());
         int result = accountRenterDepositMapper.insert(accountRenterDepositEntity);
         if(result==0){
             throw new AccountRenterDepositDBException();
@@ -62,6 +63,9 @@ public class AccountRenterDepositNoTService {
         AccountRenterDepositEntity accountRenterDepositEntity = accountRenterDepositMapper.selectByOrderAndMemNo(payedOrderRenterDeposit.getOrderNo(),payedOrderRenterDeposit.getMemNo());
         if(Objects.isNull(accountRenterDepositEntity)){
             throw new PayOrderRenterDepositDBException();
+        }
+        if("00".equals(accountRenterDepositEntity.getPayStatus())){
+            return;
         }
         BeanUtils.copyProperties(payedOrderRenterDeposit,accountRenterDepositEntity);
         int result = accountRenterDepositMapper.updateByPrimaryKeySelective(accountRenterDepositEntity);

@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.atzuche.order.delivery.mapper.DeliveryHttpLogMapper">
+
+    <resultMap type="com.atzuche.order.delivery.entity.DeliveryHttpLogEntity" id="BaseResultMap">
+        <result property="id" column="id"/>
+        <result property="requestUrl" column="request_url"/>
+        <result property="requestMethodType" column="request_method_type"/>
+        <result property="requestParams" column="request_params"/>
+        <result property="requestCode" column="request_code"/>
+        <result property="returnStatusCode" column="return_status_code"/>
+        <result property="returnStatusType" column="return_status_type"/>
+        <result property="returnContext" column="return_context"/>
+        <result property="sendTime" column="send_time"/>
+        <result property="returnTime" column="return_time"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="isDelete" column="is_delete"/>
+    </resultMap>
+
+
+	<sql id="Base_Column_List">
+	`id`, 	
+	`request_url`, 	
+	`request_method_type`, 	
+	`request_params`, 	
+	`request_code`, 	
+	`return_status_code`, 	
+	`return_status_type`, 	
+	`return_context`, 	
+	`send_time`, 	
+	`return_time`, 	
+	`create_time`, 	
+	`update_time`, 	
+	`is_delete`	
+
+	</sql>
+
+
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap">
+		select <include refid="Base_Column_List" /> from delivery_http_log where id = #{value}
+	</select>
+
+	<insert id="insert" parameterType="com.atzuche.order.delivery.entity.DeliveryHttpLogEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into delivery_http_log
+		(
+				`request_url`,		
+				`request_method_type`,		
+				`request_params`,		
+				`request_code`,		
+				`return_status_code`,		
+				`return_status_type`,		
+				`return_context`,		
+				`send_time`,		
+				`return_time`,		
+				`create_time`,		
+				`update_time`,		
+				`is_delete`		
+			)
+		values
+		(
+				#{requestUrl}, 		
+				#{requestMethodType}, 		
+				#{requestParams}, 		
+				#{requestCode}, 		
+				#{returnStatusCode}, 		
+				#{returnStatusType}, 		
+				#{returnContext}, 		
+				#{sendTime}, 		
+				#{returnTime}, 		
+				#{createTime}, 		
+				#{updateTime}, 		
+				#{isDelete}		
+			)
+	</insert>
+	
+	<insert id="insertSelective" parameterType="com.atzuche.order.delivery.entity.DeliveryHttpLogEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into delivery_http_log
+		(
+				<if test="requestUrl != null">`request_url`, </if>
+				<if test="requestMethodType != null">`request_method_type`, </if>
+				<if test="requestParams != null">`request_params`, </if>
+				<if test="requestCode != null">`request_code`, </if>
+				<if test="returnStatusCode != null">`return_status_code`, </if>
+				<if test="returnStatusType != null">`return_status_type`, </if>
+				<if test="returnContext != null">`return_context`, </if>
+				<if test="sendTime != null">`send_time`, </if>
+				<if test="returnTime != null">`return_time`, </if>
+				<if test="createTime != null">`create_time`, </if>
+				<if test="updateTime != null">`update_time`, </if>
+				<if test="isDelete != null">`is_delete` </if>
+			)
+		values
+		(
+				<if test="requestUrl != null">#{requestUrl},  </if>
+				<if test="requestMethodType != null">#{requestMethodType},  </if>
+				<if test="requestParams != null">#{requestParams},  </if>
+				<if test="requestCode != null">#{requestCode},  </if>
+				<if test="returnStatusCode != null">#{returnStatusCode},  </if>
+				<if test="returnStatusType != null">#{returnStatusType},  </if>
+				<if test="returnContext != null">#{returnContext},  </if>
+				<if test="sendTime != null">#{sendTime},  </if>
+				<if test="returnTime != null">#{returnTime},  </if>
+				<if test="createTime != null">#{createTime},  </if>
+				<if test="updateTime != null">#{updateTime},  </if>
+				<if test="isDelete != null">#{isDelete} </if>
+			)
+	</insert>
+	
+	 
+	<update id="updateByPrimaryKeySelective" parameterType="com.atzuche.order.delivery.entity.DeliveryHttpLogEntity">
+		update delivery_http_log 
+		<set>
+				<if test="requestUrl != null">`request_url` = #{requestUrl}, </if>
+				<if test="requestMethodType != null">`request_method_type` = #{requestMethodType}, </if>
+				<if test="requestParams != null">`request_params` = #{requestParams}, </if>
+				<if test="requestCode != null">`request_code` = #{requestCode}, </if>
+				<if test="returnStatusCode != null">`return_status_code` = #{returnStatusCode}, </if>
+				<if test="returnStatusType != null">`return_status_type` = #{returnStatusType}, </if>
+				<if test="returnContext != null">`return_context` = #{returnContext}, </if>
+				<if test="sendTime != null">`send_time` = #{sendTime}, </if>
+				<if test="returnTime != null">`return_time` = #{returnTime}, </if>
+				<if test="createTime != null">`create_time` = #{createTime}, </if>
+				<if test="updateTime != null">`update_time` = #{updateTime}, </if>
+				<if test="isDelete != null">`is_delete` = #{isDelete}</if>
+			</set>
+		where id = #{id}
+	</update>
+	
+	<update id="updateByPrimaryKey" parameterType="com.atzuche.order.delivery.entity.DeliveryHttpLogEntity">
+		update delivery_http_log 
+		<set>
+				`request_url` = #{requestUrl}, 		
+				`request_method_type` = #{requestMethodType}, 		
+				`request_params` = #{requestParams}, 		
+				`request_code` = #{requestCode}, 		
+				`return_status_code` = #{returnStatusCode}, 		
+				`return_status_type` = #{returnStatusType}, 		
+				`return_context` = #{returnContext}, 		
+				`send_time` = #{sendTime}, 		
+				`return_time` = #{returnTime}, 		
+				`create_time` = #{createTime}, 		
+				`update_time` = #{updateTime}, 		
+				`is_delete` = #{isDelete}		
+	
+		</set>
+		where id = #{id}
+	</update>
+  	
+</mapper>

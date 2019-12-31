@@ -4,6 +4,14 @@ import lombok.Data;
 
 @Data
 public class OwnerMemberRightDTO {
+	/**
+	 * 主订单号
+	 */
+	private String orderNo;
+	/**
+	 * 子订单号
+	 */
+	private String ownerOrderNo;
     /**
      * 权益编码
      */

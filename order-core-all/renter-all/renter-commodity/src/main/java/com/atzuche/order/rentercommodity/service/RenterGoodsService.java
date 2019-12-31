@@ -1,7 +1,7 @@
 package com.atzuche.order.rentercommodity.service;
 
-import com.alibaba.fastjson.JSON;
-import com.atzuche.order.commons.entity.dto.*;
+import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
+import com.atzuche.order.commons.entity.dto.RenterGoodsPriceDetailDTO;
 import com.atzuche.order.rentercommodity.entity.RenterGoodsEntity;
 import com.atzuche.order.rentercommodity.entity.RenterGoodsPriceDetailEntity;
 import com.atzuche.order.rentercommodity.mapper.RenterGoodsMapper;
@@ -11,11 +11,8 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 
 /**
@@ -31,8 +28,7 @@ public class RenterGoodsService{
     @Autowired
     private RenterGoodsPriceDetailMapper renterGoodsPriceDetailMapper;
 
-    public void save(OrderContextDTO orderContextDto){
-        RenterGoodsDetailDTO renterGoodsDetailDto = orderContextDto.getRenterGoodsDetailDto();
+    public void save(RenterGoodsDetailDTO renterGoodsDetailDto){
         RenterGoodsEntity goodsEntity = new RenterGoodsEntity();
         BeanUtils.copyProperties(renterGoodsDetailDto,goodsEntity);
         //goodsEntity.setCreateOp();

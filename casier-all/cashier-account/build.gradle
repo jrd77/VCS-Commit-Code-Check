@@ -25,4 +25,10 @@ dependencies {
     compile project(":account-all:account-renter-wz-deposit")
     compile project(":util-all:order-commons")
     compile project(":order-core-all:renter-all:renter-cost")
+
+    compile project(":order-core-all:renter-all:renter-order")
+
+    compile 'com.autoyol:autoPayGatewaySecondary-api:1.0.5-SNAPSHOT'
+    compile 'com.autoframework:auto-mq-event:1.0-SNAPSHOT'
+    compile 'com.autoyol:auto-wallet-service-api:1.0.2-SNAPSHOT'
 }

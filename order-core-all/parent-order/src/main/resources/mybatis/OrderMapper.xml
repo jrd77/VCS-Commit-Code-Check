@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
+
+
 <mapper namespace="com.atzuche.order.parentorder.mapper.OrderMapper">
 
     <resultMap type="com.atzuche.order.parentorder.entity.OrderEntity" id="BaseResultMap">
@@ -17,9 +19,12 @@
         <result property="isOutCity" column="is_out_city"/>
         <result property="isFreeDeposit" column="is_free_deposit"/>
         <result property="isUseAirPortService" column="is_use_air_port_Service"/>
+        <result property="flightId" column="flight_id"/>
         <result property="reqTime" column="req_time"/>
+        <result property="limitAmt" column="limit_amt"/>
         <result property="riskAuditId" column="risk_audit_id"/>
         <result property="version" column="version"/>
+        <result property="basePath" column="base_path"/>
         <result property="createTime" column="create_time"/>
         <result property="createOp" column="create_op"/>
         <result property="updateTime" column="update_time"/>
@@ -29,170 +34,221 @@
 
 
     <sql id="Base_Column_List">
-        `id`,  `order_no`, 	`mem_no_renter`, `category`, `entry_code`,
-        `source`,  `exp_rent_time`, `exp_revert_time`,
-        `city_name`,  `city_code`, 	`is_out_city`,  `is_free_deposit`, `is_use_air_port_Service`,
-        `req_time`,  `risk_audit_id`,
-        `version`, `create_time`,  `create_op`,  `update_time`,  `update_op`, 	 `is_delete`
+	`id`,
+	`order_no`,
+	`mem_no_renter`,
+	`category`,
+	`entry_code`,
+	`source`,
+	`exp_rent_time`,
+	`exp_revert_time`,
+	`city_name`,
+	`city_code`,
+	`is_out_city`,
+	`is_free_deposit`,
+	`is_use_air_port_Service`,
+	`flight_id`,
+	`req_time`,
+	`limit_amt`,
+	`risk_audit_id`,
+	`version`,
+	`base_path`,
+	`create_time`,
+	`create_op`,
+	`update_time`,
+	`update_op`,
+	`is_delete`
+
 	</sql>
 
 
-	<select id="selectByOrderNo" resultMap="BaseResultMap">
-		select
-		    <include refid="Base_Column_List" />
-        from
-            order
-        where
-            order_no = #{value}
-            and is_delete = 0
-        limit 1
-	</select>
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List" /> from order where id = #{value}
+    </select>
 
-	<insert id="insert" parameterType="com.atzuche.order.parentorder.entity.OrderEntity" useGeneratedKeys="true" keyProperty="id">
-		insert into order (
-            `order_no`,
-            `mem_no_renter`,
-            `category`,
-            `entry_code`,
-            `source`,
-            `exp_rent_time`,
-            `exp_revert_time`,
-            `city_name`,
-            `city_code`,
-            `is_out_city`,
-            `is_free_deposit`,
-            `is_use_air_port_Service`,
-            `req_time`,
-            `risk_audit_id`,
-            `version`,
-            `create_time`,
-            `create_op`,
-            `update_time`,
-            `update_op`,
-            `is_delete`
-        ) values (
-            #{orderNo},
-            #{memNoRenter},
-            #{category},
-            #{entryCode},
-            #{source},
-            #{expRentTime},
-            #{expRevertTime},
-            #{cityName},
-            #{cityCode},
-            #{isOutCity},
-            #{isFreeDeposit},
-            #{isUseAirPortService},
-            #{reqTime},
-            #{riskAuditId},
-            #{version},
-            #{createTime},
-            #{createOp},
-            #{updateTime},
-            #{updateOp},
-            #{isDelete}
+    <insert id="insert" parameterType="com.atzuche.order.parentorder.entity.OrderEntity" useGeneratedKeys="true" keyProperty="id">
+        insert into order
+        (
+        `order_no`,
+        `mem_no_renter`,
+        `category`,
+        `entry_code`,
+        `source`,
+        `exp_rent_time`,
+        `exp_revert_time`,
+        `city_name`,
+        `city_code`,
+        `is_out_city`,
+        `is_free_deposit`,
+        `is_use_air_port_Service`,
+        `flight_id`,
+        `req_time`,
+        `limit_amt`,
+        `risk_audit_id`,
+        `version`,
+        `base_path`,
+        `create_time`,
+        `create_op`,
+        `update_time`,
+        `update_op`,
+        `is_delete`
         )
-	</insert>
-	
-	<insert id="insertSelective" parameterType="com.atzuche.order.parentorder.entity.OrderEntity" useGeneratedKeys="true" keyProperty="id">
-		insert into order (
-            <if test="orderNo != null">`order_no`, </if>
-            <if test="memNoRenter != null">`mem_no_renter`, </if>
-            <if test="category != null">`category`, </if>
-            <if test="entryCode != null">`entry_code`, </if>
-            <if test="source != null">`source`, </if>
-            <if test="expRentTime != null">`exp_rent_time`, </if>
-            <if test="expRevertTime != null">`exp_revert_time`, </if>
-            <if test="cityName != null">`city_name`, </if>
-            <if test="cityCode != null">`city_code`, </if>
-            <if test="isOutCity != null">`is_out_city`, </if>
-            <if test="isFreeDeposit != null">`is_free_deposit`, </if>
-            <if test="isUseAirPortService != null">`is_use_air_port_Service`, </if>
-            <if test="reqTime != null">`req_time`, </if>
-            <if test="riskAuditId != null">`risk_audit_id`, </if>
-            <if test="version != null">`version`, </if>
-            <if test="createTime != null">`create_time`, </if>
-            <if test="createOp != null">`create_op`, </if>
-            <if test="updateTime != null">`update_time`, </if>
-            <if test="updateOp != null">`update_op`, </if>
-            <if test="isDelete != null">`is_delete` </if>
-        ) values (
-            <if test="orderNo != null">#{orderNo},  </if>
-            <if test="memNoRenter != null">#{memNoRenter},  </if>
-            <if test="category != null">#{category},  </if>
-            <if test="entryCode != null">#{entryCode},  </if>
-            <if test="source != null">#{source},  </if>
-            <if test="expRentTime != null">#{expRentTime},  </if>
-            <if test="expRevertTime != null">#{expRevertTime},  </if>
-            <if test="cityName != null">#{cityName},  </if>
-            <if test="cityCode != null">#{cityCode},  </if>
-            <if test="isOutCity != null">#{isOutCity},  </if>
-            <if test="isFreeDeposit != null">#{isFreeDeposit},  </if>
-            <if test="isUseAirPortService != null">#{isUseAirPortService},  </if>
-            <if test="reqTime != null">#{reqTime},  </if>
-            <if test="riskAuditId != null">#{riskAuditId},  </if>
-            <if test="version != null">#{version},  </if>
-            <if test="createTime != null">#{createTime},  </if>
-            <if test="createOp != null">#{createOp},  </if>
-            <if test="updateTime != null">#{updateTime},  </if>
-            <if test="updateOp != null">#{updateOp},  </if>
-            <if test="isDelete != null">#{isDelete} </if>
+        values
+        (
+        #{orderNo},
+        #{memNoRenter},
+        #{category},
+        #{entryCode},
+        #{source},
+        #{expRentTime},
+        #{expRevertTime},
+        #{cityName},
+        #{cityCode},
+        #{isOutCity},
+        #{isFreeDeposit},
+        #{isUseAirPortService},
+        #{flightId},
+        #{reqTime},
+        #{limitAmt},
+        #{riskAuditId},
+        #{version},
+        #{basePath},
+        #{createTime},
+        #{createOp},
+        #{updateTime},
+        #{updateOp},
+        #{isDelete}
         )
-	</insert>
-	
-	 
-	<update id="updateByPrimaryKeySelective" parameterType="com.atzuche.order.parentorder.entity.OrderEntity">
-		update order 
-		    <set>
-				<if test="orderNo != null">`order_no` = #{orderNo}, </if>
-				<if test="memNoRenter != null">`mem_no_renter` = #{memNoRenter}, </if>
-				<if test="category != null">`category` = #{category}, </if>
-				<if test="entryCode != null">`entry_code` = #{entryCode}, </if>
-				<if test="source != null">`source` = #{source}, </if>
-				<if test="expRentTime != null">`exp_rent_time` = #{expRentTime}, </if>
-				<if test="expRevertTime != null">`exp_revert_time` = #{expRevertTime}, </if>
-				<if test="cityName != null">`city_name` = #{cityName}, </if>
-				<if test="cityCode != null">`city_code` = #{cityCode}, </if>
-				<if test="isOutCity != null">`is_out_city` = #{isOutCity}, </if>
-				<if test="isFreeDeposit != null">`is_free_deposit` = #{isFreeDeposit}, </if>
-				<if test="isUseAirPortService != null">`is_use_air_port_Service` = #{isUseAirPortService}, </if>
-				<if test="reqTime != null">`req_time` = #{reqTime}, </if>
-				<if test="riskAuditId != null">`risk_audit_id` = #{riskAuditId}, </if>
-				<if test="version != null">`version` = #{version}, </if>
-				<if test="createTime != null">`create_time` = #{createTime}, </if>
-				<if test="createOp != null">`create_op` = #{createOp}, </if>
-				<if test="updateTime != null">`update_time` = #{updateTime}, </if>
-				<if test="updateOp != null">`update_op` = #{updateOp}, </if>
-				<if test="isDelete != null">`is_delete` = #{isDelete}</if>
-			</set>
-		where id = #{id}
-	</update>
-	
-	<update id="updateByPrimaryKey" parameterType="com.atzuche.order.parentorder.entity.OrderEntity">
-		update order 
-		    <set>
-				`order_no` = #{orderNo}, 		
-				`mem_no_renter` = #{memNoRenter}, 		
-				`category` = #{category}, 		
-				`entry_code` = #{entryCode}, 		
-				`source` = #{source}, 		
-				`exp_rent_time` = #{expRentTime}, 		
-				`exp_revert_time` = #{expRevertTime}, 		
-				`city_name` = #{cityName}, 		
-				`city_code` = #{cityCode}, 		
-				`is_out_city` = #{isOutCity}, 		
-				`is_free_deposit` = #{isFreeDeposit}, 		
-				`is_use_air_port_Service` = #{isUseAirPortService}, 		
-				`req_time` = #{reqTime}, 		
-				`risk_audit_id` = #{riskAuditId}, 		
-				`version` = #{version}, 		
-				`create_time` = #{createTime}, 		
-				`create_op` = #{createOp}, 		
-				`update_time` = #{updateTime}, 		
-				`update_op` = #{updateOp}, 		
-				`is_delete` = #{isDelete}		
-		    </set>
-		where id = #{id}
-	</update>
+    </insert>
+
+    <insert id="insertSelective" parameterType="com.atzuche.order.parentorder.entity.OrderEntity" useGeneratedKeys="true" keyProperty="id">
+        insert into order
+        (
+        <if test="orderNo != null">`order_no`, </if>
+        <if test="memNoRenter != null">`mem_no_renter`, </if>
+        <if test="category != null">`category`, </if>
+        <if test="entryCode != null">`entry_code`, </if>
+        <if test="source != null">`source`, </if>
+        <if test="expRentTime != null">`exp_rent_time`, </if>
+        <if test="expRevertTime != null">`exp_revert_time`, </if>
+        <if test="cityName != null">`city_name`, </if>
+        <if test="cityCode != null">`city_code`, </if>
+        <if test="isOutCity != null">`is_out_city`, </if>
+        <if test="isFreeDeposit != null">`is_free_deposit`, </if>
+        <if test="isUseAirPortService != null">`is_use_air_port_Service`, </if>
+        <if test="flightId != null">`flight_id`, </if>
+        <if test="reqTime != null">`req_time`, </if>
+        <if test="limitAmt != null">`limit_amt`, </if>
+        <if test="riskAuditId != null">`risk_audit_id`, </if>
+        <if test="version != null">`version`, </if>
+        <if test="basePath != null">`base_path`, </if>
+        <if test="createTime != null">`create_time`, </if>
+        <if test="createOp != null">`create_op`, </if>
+        <if test="updateTime != null">`update_time`, </if>
+        <if test="updateOp != null">`update_op`, </if>
+        <if test="isDelete != null">`is_delete` </if>
+        )
+        values
+        (
+        <if test="orderNo != null">#{orderNo},  </if>
+        <if test="memNoRenter != null">#{memNoRenter},  </if>
+        <if test="category != null">#{category},  </if>
+        <if test="entryCode != null">#{entryCode},  </if>
+        <if test="source != null">#{source},  </if>
+        <if test="expRentTime != null">#{expRentTime},  </if>
+        <if test="expRevertTime != null">#{expRevertTime},  </if>
+        <if test="cityName != null">#{cityName},  </if>
+        <if test="cityCode != null">#{cityCode},  </if>
+        <if test="isOutCity != null">#{isOutCity},  </if>
+        <if test="isFreeDeposit != null">#{isFreeDeposit},  </if>
+        <if test="isUseAirPortService != null">#{isUseAirPortService},  </if>
+        <if test="flightId != null">#{flightId},  </if>
+        <if test="reqTime != null">#{reqTime},  </if>
+        <if test="limitAmt != null">#{limitAmt},  </if>
+        <if test="riskAuditId != null">#{riskAuditId},  </if>
+        <if test="version != null">#{version},  </if>
+        <if test="basePath != null">#{basePath},  </if>
+        <if test="createTime != null">#{createTime},  </if>
+        <if test="createOp != null">#{createOp},  </if>
+        <if test="updateTime != null">#{updateTime},  </if>
+        <if test="updateOp != null">#{updateOp},  </if>
+        <if test="isDelete != null">#{isDelete} </if>
+        )
+    </insert>
+
+
+    <update id="updateByPrimaryKeySelective" parameterType="com.atzuche.order.parentorder.entity.OrderEntity">
+        update order
+        <set>
+            <if test="orderNo != null">`order_no` = #{orderNo}, </if>
+            <if test="memNoRenter != null">`mem_no_renter` = #{memNoRenter}, </if>
+            <if test="category != null">`category` = #{category}, </if>
+            <if test="entryCode != null">`entry_code` = #{entryCode}, </if>
+            <if test="source != null">`source` = #{source}, </if>
+            <if test="expRentTime != null">`exp_rent_time` = #{expRentTime}, </if>
+            <if test="expRevertTime != null">`exp_revert_time` = #{expRevertTime}, </if>
+            <if test="cityName != null">`city_name` = #{cityName}, </if>
+            <if test="cityCode != null">`city_code` = #{cityCode}, </if>
+            <if test="isOutCity != null">`is_out_city` = #{isOutCity}, </if>
+            <if test="isFreeDeposit != null">`is_free_deposit` = #{isFreeDeposit}, </if>
+            <if test="isUseAirPortService != null">`is_use_air_port_Service` = #{isUseAirPortService}, </if>
+            <if test="flightId != null">`flight_id` = #{flightId}, </if>
+            <if test="reqTime != null">`req_time` = #{reqTime}, </if>
+            <if test="limitAmt != null">`limit_amt` = #{limitAmt}, </if>
+            <if test="riskAuditId != null">`risk_audit_id` = #{riskAuditId}, </if>
+            <if test="version != null">`version` = #{version}, </if>
+            <if test="basePath != null">`base_path` = #{basePath}, </if>
+            <if test="createTime != null">`create_time` = #{createTime}, </if>
+            <if test="createOp != null">`create_op` = #{createOp}, </if>
+            <if test="updateTime != null">`update_time` = #{updateTime}, </if>
+            <if test="updateOp != null">`update_op` = #{updateOp}, </if>
+            <if test="isDelete != null">`is_delete` = #{isDelete}</if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <update id="updateByPrimaryKey" parameterType="com.atzuche.order.parentorder.entity.OrderEntity">
+        update order
+        <set>
+            `order_no` = #{orderNo},
+            `mem_no_renter` = #{memNoRenter},
+            `category` = #{category},
+            `entry_code` = #{entryCode},
+            `source` = #{source},
+            `exp_rent_time` = #{expRentTime},
+            `exp_revert_time` = #{expRevertTime},
+            `city_name` = #{cityName},
+            `city_code` = #{cityCode},
+            `is_out_city` = #{isOutCity},
+            `is_free_deposit` = #{isFreeDeposit},
+            `is_use_air_port_Service` = #{isUseAirPortService},
+            `flight_id` = #{flightId},
+            `req_time` = #{reqTime},
+            `limit_amt` = #{limitAmt},
+            `risk_audit_id` = #{riskAuditId},
+            `version` = #{version},
+            `base_path` = #{basePath},
+            `create_time` = #{createTime},
+            `create_op` = #{createOp},
+            `update_time` = #{updateTime},
+            `update_op` = #{updateOp},
+            `is_delete` = #{isDelete}
+
+        </set>
+        where id = #{id}
+    </update>
+
+
+
+    <select id="selectByOrderNo" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from
+        order
+        where
+        order_no = #{value}
+        and is_delete = 0
+        limit 1
+    </select>
   	
 </mapper>

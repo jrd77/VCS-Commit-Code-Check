@@ -9,7 +9,7 @@ import lombok.Data;
  * 退款申请表
  * 
  * @author ZhangBin
- * @date 2019-12-25 16:33:44
+ * @date 2019-12-26 14:12:04
  * @Description:
  */
 @Data
@@ -80,6 +80,10 @@ public class CashierRefundApplyEntity implements Serializable {
 	 * 退款发起次数
 	 */
 	private Integer num;
+	/**
+	 * 
+	 */
+	private String payMd5;
 	/**
 	 * 备注
 	 */

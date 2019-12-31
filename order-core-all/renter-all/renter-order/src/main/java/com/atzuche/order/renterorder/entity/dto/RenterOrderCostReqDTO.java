@@ -1,7 +1,10 @@
 package com.atzuche.order.renterorder.entity.dto;
 
 import com.atzuche.order.commons.entity.dto.*;
+import com.atzuche.order.rentercost.entity.dto.RenterOrderSubsidyDetailDTO;
 import lombok.Data;
+
+import java.util.List;
 
 @Data
 public class RenterOrderCostReqDTO {
@@ -25,7 +28,7 @@ public class RenterOrderCostReqDTO {
     private AbatementAmtDTO abatementAmtDTO;
 
     /**
-     * 全面保障费参数
+     * 附加驾驶人险
      */
     private ExtraDriverDTO extraDriverDTO;
 
@@ -37,6 +40,14 @@ public class RenterOrderCostReqDTO {
      * 取还车费用参数
      */
     private GetReturnCarCostReqDto getReturnCarCostReqDto;
-
+    /**
+     * 超运能费用参数
+     */
+    private GetReturnCarOverCostReqDto getReturnCarOverCostReqDto;
+    
+    /**
+     * 费用对应的补贴记录
+     */
+    private List<RenterOrderSubsidyDetailDTO> subsidyOutList;
 
 }

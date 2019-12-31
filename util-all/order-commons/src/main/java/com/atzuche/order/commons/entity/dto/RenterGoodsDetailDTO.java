@@ -2,16 +2,28 @@ package com.atzuche.order.commons.entity.dto;
 
 import lombok.Data;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
 public class RenterGoodsDetailDTO {
-    private String renterOrderNo;
-    private String orderNo;
+    /**
+     * 起租日期
+     */
     private LocalDateTime rentTime;
+    /**
+     * 还车日期
+     */
     private LocalDateTime revertTime;
-
+    /**
+     * 主订单号
+     */
+    private String orderNo;
+    /**
+     * 子订单号
+     */
+    private String renterOrderNo;
     /**
      * 应答标识位，0未设置，1已设置
      */
@@ -52,7 +64,6 @@ public class RenterGoodsDetailDTO {
      * L/T
      */
     private String carCcUnit;
-
     /**
      * 变速箱类型
      */
@@ -70,13 +81,17 @@ public class RenterGoodsDetailDTO {
      */
     private Integer carSurplusPrice;
     /**
-     * 是否使用特供价 0-否，1-是
-     */
-    private boolean carUseSpecialPrice;
-    /**
      * 车辆指导价
      */
     private Integer carGuidePrice;
+    /**
+     * 保费计算用购置价
+     */
+    private Integer carInmsrp;
+    /**
+     * 车辆标签
+     */
+    private String carTag;
     /**
      * 车辆状态
      */
@@ -87,15 +102,8 @@ public class RenterGoodsDetailDTO {
     private String carImageUrl;
     /**
      * 车主类型:5个人车主、10租赁公司、15其他 、20托管车辆-交易用、25托管车辆-工作用、30短期托管车、35代管车辆
-     * （车主端用）
      */
     private Integer carOwnerType;
-    /**
-     * 车主会员号
-     * （车主端用）
-     */
-    private String ownerMemNo;
-
     /**
      * 功能类型 1:MPV，2：SUV,3:中型车，4：中大型车，5：其它，6：客车，7：小型车，8：微型车，9：房车，10：皮卡，11：紧凑型车，12：豪华车，13：跑车，14：面包车
      */
@@ -148,13 +156,53 @@ public class RenterGoodsDetailDTO {
      * 选择的车辆地址序号
      */
     private Integer carAddrIndex;
-
+    /**
+     * 停运费比例
+     */
+    private Double stopCostRate;
+    /**
+     * 动力源：1-纯电动，2-汽油，3-油电混动，4-柴油，5-天然气，6-石油气
+     */
+    private Integer engineSource;
+    /**
+     * 车架号
+     */
+    private String frameNo;
+    /**
+     * 发动机号
+     */
+    private String engineNum;
+    /**
+     * 平台服务费比例/代官车服务费比例（仅车主端有）
+     */
+    private Double serviceRate;
 
     /**
      * 一天一价
      */
     List<RenterGoodsPriceDetailDTO> renterGoodsPriceDetailDTOList;
 
+    /**
+     * 老标签id
+     */
+    private List<String> labelIds;
+    /**
+     * 车主会员号
+     */
+    private String ownerMemNo;
 
+    /**
+     * 车辆品牌
+     */
+    private String brand;
+    /**
+     * 车型
+     */
+    private String type;
+
+    /**
+     * 行驶证注册年月
+     */
+    private LocalDate licenseDay;
 
 }

@@ -40,10 +40,11 @@ public class AccountRenterWzDepositEntity implements Serializable {
 	 * 是否预授权
 	 */
 	private Integer isAuthorize;
-	/**
-	 * 是否免押
-	 */
-	private Integer isFreeDeposit;
+
+    /**
+     * 免押方式
+     */
+    private Integer freeDepositType;
 	/**
 	 * 应退押金
 	 */

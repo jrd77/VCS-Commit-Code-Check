@@ -1,46 +1,47 @@
 package com.atzuche.order.rentercost.service;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.*;
-import java.util.stream.Collectors;
-
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
+import com.atzuche.order.commons.CatConstants;
+import com.atzuche.order.commons.DateUtils;
+import com.atzuche.order.commons.GlobalConstant;
 import com.atzuche.order.commons.LocalDateTimeUtils;
 import com.atzuche.order.commons.entity.dto.*;
 import com.atzuche.order.commons.enums.ChannelNameTypeEnum;
+import com.atzuche.order.commons.enums.RenterCashCodeEnum;
 import com.atzuche.order.commons.enums.SubsidySourceCodeEnum;
 import com.atzuche.order.commons.enums.SubsidyTypeCodeEnum;
 import com.atzuche.order.rentercost.entity.*;
 import com.atzuche.order.rentercost.entity.dto.*;
 import com.atzuche.order.rentercost.entity.vo.GetReturnResponseVO;
-import com.autoyol.commons.utils.GsonUtils;
+import com.atzuche.order.rentercost.entity.vo.PayableVO;
+import com.atzuche.order.rentercost.exception.*;
+import com.autoyol.car.api.feign.api.GetBackCityLimitFeignApi;
+import com.autoyol.car.api.model.vo.ResponseObject;
 import com.autoyol.commons.web.ErrorCode;
-import com.dianping.cat.CatConstants;
+import com.autoyol.commons.web.ResponseData;
+import com.autoyol.feeservice.api.FetchBackCarFeeFeignService;
+import com.autoyol.feeservice.api.request.GetFbcFeeConfigRequest;
+import com.autoyol.feeservice.api.request.GetFbcFeeRequest;
+import com.autoyol.feeservice.api.request.GetFbcFeeRequestDetail;
+import com.autoyol.feeservice.api.response.PriceFbcFeeResponseDetail;
+import com.autoyol.feeservice.api.response.PriceGetFbcFeeResponse;
+import com.autoyol.feeservice.api.vo.pricefetchback.PriceCarHumanFeeRule;
+import com.autoyol.platformcost.CommonUtils;
+import com.autoyol.platformcost.LocalDateTimeUtil;
+import com.autoyol.platformcost.RenterFeeCalculatorUtils;
+import com.autoyol.platformcost.model.*;
+import com.dianping.cat.Cat;
 import com.dianping.cat.message.Transaction;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import com.atzuche.order.commons.enums.RenterCashCodeEnum;
-import com.atzuche.order.rentercost.exception.RenterCostParameterException;
-import com.autoyol.platformcost.CommonUtils;
-import com.autoyol.platformcost.RenterFeeCalculatorUtils;
-import com.autoyol.platformcost.model.CarDepositAmtVO;
-import com.autoyol.platformcost.model.CarPriceOfDay;
-import com.autoyol.platformcost.model.DepositText;
-import com.autoyol.platformcost.model.FeeResult;
-import com.autoyol.platformcost.model.IllegalDepositConfig;
-import com.autoyol.platformcost.model.InsuranceConfig;
-import com.autoyol.platformcost.model.OilAverageCostBO;
-import com.dianping.cat.Cat;
-
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.util.CollectionUtils;
-import org.springframework.web.client.RestTemplate;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -55,9 +56,17 @@ public class RenterOrderCostCombineService {
 	@Autowired
 	private OrderConsoleCostDetailService orderConsoleCostDetailService;
     @Autowired
-    private RestTemplate restTemplate;
+    private FetchBackCarFeeFeignService fetchBackCarFeeFeignService;
+    @Autowired
+    private ConsoleRenterOrderFineDeatailService consoleRenterOrderFineDeatailService;
+    @Autowired
+    private OrderSupplementDetailService orderSupplementDetailService;
 
-    private static final String [] ORDER_TYPES = {"1","3"};
+    @Autowired
+    private GetBackCityLimitFeignApi getBackCityLimitFeignApi;
+
+
+    private static final Integer [] ORDER_TYPES = {1,2};
 	
 	public static final List<RenterCashCodeEnum> RENTERCASHCODEENUM_LIST = new ArrayList<RenterCashCodeEnum>() {
 
@@ -194,12 +203,16 @@ public class RenterOrderCostCombineService {
 	 * @return List<RenterOrderCostDetailEntity>
 	 */
 	public List<RenterOrderCostDetailEntity> listAbatementAmtEntity(AbatementAmtDTO abatementAmtDTO) {
-		log.info("listAbatementAmtEntity abatementAmtDTO=[{}]",abatementAmtDTO);
+		log.info("listAbatementAmtEntity abatementAmtDTO=[{}]",JSON.toJSONString(abatementAmtDTO));
 		if (abatementAmtDTO == null) {
 			log.error("listAbatementAmtEntity 获取全面保障费abatementAmtDTO对象为空");
 			Cat.logError("获取全面保障费abatementAmtDTO对象为空", new RenterCostParameterException());
 			throw new RenterCostParameterException();
 		}
+		if(!abatementAmtDTO.getIsAbatement()){
+		    log.info("不需要计算全面保障费！abatementAmtDTO={}",JSON.toJSONString(abatementAmtDTO));
+            return new ArrayList<>();
+        }
 		CostBaseDTO costBaseDTO = abatementAmtDTO.getCostBaseDTO();
 		if (costBaseDTO == null) {
 			log.error("listAbatementAmtEntity 获取全面保障费abatementAmtDTO.costBaseDTO对象为空");
@@ -325,16 +338,65 @@ public class RenterOrderCostCombineService {
 		}
 		// TODO 押金配置列表从配置中心获取
 		List<DepositText> depositList = null;
-		CarDepositAmtVO carDepositAmtVO = RenterFeeCalculatorUtils.calCarDepositAmt(depositAmtDTO.getInternalStaff(), depositAmtDTO.getCityCode(), 
-				depositAmtDTO.getSurplusPrice(), depositAmtDTO.getCarBrandTypeRadio(), depositAmtDTO.getCarYearRadio(), 
-				depositList, depositAmtDTO.getReliefPercetage());
+        double years = LocalDateTimeUtil.periodDays(depositAmtDTO.getLicenseDay(), LocalDate.now())/356D;
+        int surplusPriceProYear = CommonUtils.getSurplusPriceProYear(years);
+        CarDepositAmtVO carDepositAmtVO = RenterFeeCalculatorUtils.calCarDepositAmt(depositAmtDTO.getCityCode(),
+				depositAmtDTO.getSurplusPrice(),
+                getCarSpecialCoefficientNew(depositAmtDTO.getBrand(),depositAmtDTO.getType()),
+                getNewCarCoefficient(surplusPriceProYear),
+				depositList
+        );
 		return carDepositAmtVO;
 	}
-	
+    /*
+     * @Author ZhangBin
+     * @Date 2019/12/30 11:58
+     * @Description: 取车辆品牌系数
+     *
+     **/
+    public double getCarSpecialCoefficientNew(String brand, String type) {
+        double carSpecialCoefficient = 0.0d;
+        try {
+            if(StringUtils.isNotBlank(brand) && StringUtils.isNotBlank(type)){
+                if(StringUtils.isNumeric(brand) && StringUtils.isNumeric(type)){
+                  //TODO 配置中获取车辆品牌系数
+                    //  carSpecialCoefficient = transExtV36Service.getHotConfigValue(Integer.valueOf(brand), Integer.valueOf(type));
+                }
+            }
+        } catch (Exception e) {
+            log.error("getCarSpecialCoefficientNew ex:",e);
+        }
+        log.info("calc result carSpecialCoefficient={},brandId={},typeId={}",carSpecialCoefficient,brand,type);
+        return carSpecialCoefficient;
+    }
+
+    /**
+     * 获取新车押金系数 (年份系数)
+     * @param year
+     * @return
+     */
+    public double getNewCarCoefficient(int year) {
+        if (year <= 2) {
+            //TODO 配置中获取 请在配置sys_constant表配置c_code:"+code+"相关数据
+            Map<String, Object> map = null;//sysConstantService.getSysConstantByCode("car_year_neqtwo");
+            if (map != null && map.size()>0) {
+                return map.get("c_value")!=null ?Double.parseDouble(map.get("c_value").toString()):1.4;
+            }
+        }else{
+            //TODO 配置中获取 请在配置sys_constant表配置c_code:"+code+"相关数据
+            Map<String, Object> map = null;//sysConstantService.getSysConstantByCode("car_year_lttwo");
+            if (map != null && map.size()>0) {
+                return map.get("c_value")!=null ?Double.parseDouble(map.get("c_value").toString()):1;
+            }
+        }
+        return 1;
+    }
+
+
 	
 	/**
 	 * 获取违章押金
-	 * @param illegalDepositAmtDTO
+	 * @param illDTO
 	 * @return Integer
 	 */
 	public Integer getIllegalDepositAmt(IllegalDepositAmtDTO illDTO) {
@@ -356,13 +418,40 @@ public class RenterOrderCostCombineService {
 		Integer specialIllegalDepositAmt = null;
 		// TODO 违章押金配置从配置中心获取
 		List<IllegalDepositConfig> illegalDepositList = null;
-		Integer illegalDepositAmt = RenterFeeCalculatorUtils.calIllegalDepositAmt(illDTO.getInternalStaff(), illDTO.getCityCode(), illDTO.getCarPlateNum(), 
+		Integer illegalDepositAmt = RenterFeeCalculatorUtils.calIllegalDepositAmt(illDTO.getCityCode(), illDTO.getCarPlateNum(),
 				specialCityCodes, specialIllegalDepositAmt, illegalDepositList, 
 				costBaseDTO.getStartTime(), costBaseDTO.getEndTime());
 		return illegalDepositAmt;
 	}
 	
 	
+	/**
+	 * 获取应付记录
+	 * @param orderNo 主订单号
+	 * @param renterOrderNo 租客子订单号
+	 * @param memNo 会员号
+	 * @return List<PayableVO>
+	 */
+	public List<PayableVO> listPayableVO(String orderNo, String renterOrderNo, String memNo) {
+		List<PayableVO> payableList = new ArrayList<PayableVO>();
+		if (StringUtils.isNotBlank(renterOrderNo)) {
+			payableList.add(getPayable(orderNo, renterOrderNo, memNo));
+		}
+		List<OrderSupplementDetailEntity> supplementList = orderSupplementDetailService.listOrderSupplementDetailByOrderNoAndMemNo(orderNo, memNo);
+		if (supplementList != null && !supplementList.isEmpty()) {
+			List<PayableVO> suppList = supplementList.stream().map(supplement -> {
+				PayableVO payableVO = new PayableVO();
+				payableVO.setAmt(supplement.getAmt());
+				payableVO.setOrderNo(orderNo);
+				payableVO.setTitle(supplement.getTitle());
+				payableVO.setType(2);
+				payableVO.setUniqueNo(String.valueOf(supplement.getId()));
+				return payableVO;
+			}).collect(Collectors.toList());
+			payableList.addAll(suppList);
+		}
+		return payableList;
+	}
 	
 	
 	/**
@@ -371,7 +460,7 @@ public class RenterOrderCostCombineService {
 	 * @param renterOrderNo 租客订单号
 	 * @return Integer
 	 */
-	public Integer getPayable(String orderNo, String renterOrderNo, String memNo) {
+	public PayableVO getPayable(String orderNo, String renterOrderNo, String memNo) {
 		// 获取费用明细
 		List<RenterOrderCostDetailEntity> costList = renterOrderCostDetailService.listRenterOrderCostDetail(orderNo, renterOrderNo);
 		// 获取补贴明细
@@ -380,6 +469,8 @@ public class RenterOrderCostCombineService {
 		List<RenterOrderFineDeatailEntity> fineList = renterOrderFineDeatailService.listRenterOrderFineDeatail(orderNo, renterOrderNo);
 		// 管理后台补贴
 		List<OrderConsoleCostDetailEntity> consoleCostList = orderConsoleCostDetailService.listOrderConsoleCostDetail(orderNo,memNo);
+		// 获取租客全局罚金
+		List<ConsoleRenterOrderFineDeatailEntity> consoleFineList = consoleRenterOrderFineDeatailService.listConsoleRenterOrderFineDeatail(orderNo, memNo);
 		Integer payable = 0;
 		if (costList != null && !costList.isEmpty()) {
 			payable += costList.stream().mapToInt(RenterOrderCostDetailEntity::getTotalAmount).sum();
@@ -393,7 +484,16 @@ public class RenterOrderCostCombineService {
 		if (consoleCostList != null && !consoleCostList.isEmpty()) {
 			payable += consoleCostList.stream().mapToInt(OrderConsoleCostDetailEntity::getSubsidyAmount).sum();
 		}
-		return payable;
+		if (consoleFineList != null && !consoleFineList.isEmpty()) {
+			payable += consoleFineList.stream().mapToInt(ConsoleRenterOrderFineDeatailEntity::getFineAmount).sum();
+		}
+		PayableVO payableVO = new PayableVO();
+		payableVO.setAmt(payable);
+		payableVO.setOrderNo(orderNo);
+		payableVO.setTitle("修改订单补付");
+		payableVO.setType(1);
+		payableVO.setUniqueNo(renterOrderNo);
+		return payableVO;
 	}
 	
 	
@@ -438,11 +538,19 @@ public class RenterOrderCostCombineService {
      * @Description: 计算取还车费用
      *
      **/
-    public GetReturnCostDto getReturnCarCost(GetReturnCarCostReqDto getReturnCarCostReqDto) {
-        GetReturnCostDto getReturnCostDto = new GetReturnCostDto();
+    public GetReturnCostDTO getReturnCarCost(GetReturnCarCostReqDto getReturnCarCostReqDto) {
+        GetReturnCostDTO getReturnCostDto = new GetReturnCostDTO();
         List<RenterOrderCostDetailEntity> listCostDetail = new ArrayList<>();
-        List<RenterOrderSubsidyDetailEntity> listCostSubsidy = new ArrayList<>();
+        List<RenterOrderSubsidyDetailDTO> listCostSubsidy = new ArrayList<>();
         GetReturnResponseVO getReturnResponse = new GetReturnResponseVO();
+
+        if(getReturnCarCostReqDto == null || (!getReturnCarCostReqDto.getIsGetCarCost() && !getReturnCarCostReqDto.getIsReturnCarCost())){
+            log.info("不需要计算取还车费用getReturnCarCostReqDto=[{}]",JSON.toJSONString(getReturnCarCostReqDto));
+            getReturnCostDto.setRenterOrderCostDetailEntityList(listCostDetail);
+            getReturnCostDto.setRenterOrderSubsidyDetailDTOList(listCostSubsidy);
+            getReturnCostDto.setGetReturnResponseVO(getReturnResponse);
+            return getReturnCostDto;
+        }
 
         CostBaseDTO costBaseDTO = getReturnCarCostReqDto.getCostBaseDTO();
         // 城市编码
@@ -465,18 +573,21 @@ public class RenterOrderCostCombineService {
         String carLat = getReturnCarCostReqDto.getCarLat();
         boolean getFlag = StringUtils.isBlank(srvGetLon) || StringUtils.isBlank(srvGetLat) || "0.0".equalsIgnoreCase(srvGetLon) || "0.0".equalsIgnoreCase(srvGetLat);
         boolean returnFlag = StringUtils.isBlank(srvReturnLon) || StringUtils.isBlank(srvReturnLat) || "0.0".equalsIgnoreCase(srvReturnLon) || "0.0".equalsIgnoreCase(srvReturnLat);
-        City city = null;
+        CityDTO cityDTO = null;
         if (getFlag || returnFlag) {
             //TODO 配置中获取
-            //city = cityMapper.getCityLonAndLatByCode(cityCode);
+            //cityDTO = cityMapper.getCityLonAndLatByCode(cityCode);
+            //TODO 给一个citycode=310100(上海)默认的经纬度值用于测试，测试后需要删除
+            cityDTO.setLon(String.valueOf(121.491121));
+            cityDTO.setLat(String.valueOf(31.243466));
         }
-        if (getFlag && city != null) {
-            srvGetLon = city.getLon();
-            srvGetLat = city.getLat();
+        if (getFlag && cityDTO != null) {
+            srvGetLon = cityDTO.getLon();
+            srvGetLat = cityDTO.getLat();
         }
-        if (returnFlag && city != null) {
-            srvReturnLon = city.getLon();
-            srvReturnLat = city.getLat();
+        if (returnFlag && cityDTO != null) {
+            srvReturnLon = cityDTO.getLon();
+            srvReturnLat = cityDTO.getLat();
         }
         //获取取车的距离
         Float getDistance = this.getRealDistance(srvGetLon, srvGetLat, carLon, carLat);
@@ -493,158 +604,159 @@ public class RenterOrderCostCombineService {
         String sumJudgeFreeFeeStr = String.valueOf(sumJudgeFreeFee);
         log.info("取还车费用计算，租金+保险+不计免赔+手续费 sumJudgeFreeFee=[{}]", sumJudgeFreeFee);
 
-        List<GetFbcFeeRequestDetail> reqVOList = new ArrayList<>();
-        GetFbcFeeRequestDetail getReqVO = new GetFbcFeeRequestDetail();
-        getReqVO.setChannelName(channelCode);
-        getReqVO.setRequestTime(LocalDateTimeUtils.getNowDateLong());
-        getReqVO.setGetReturnType("get");
-        getReqVO.setGetReturnTime(String.valueOf(LocalDateTimeUtils.localDateTimeToLong(costBaseDTO.getStartTime())));
-        getReqVO.setCityId(String.valueOf(cityCode));
-        getReqVO.setOrderType(this.getIsPackageOrder(getReturnCarCostReqDto.getIsPackageOrder()));
-        getReqVO.setDistance(String.valueOf(getDistance));
-        if(getFlag && city!=null) {
-            getReqVO.setRenterLocation(city.getLon()+","+city.getLat());
-        } else {
-            getReqVO.setRenterLocation(srvGetLon+","+srvGetLat);
-        }
-        getReqVO.setSumJudgeFreeFee(sumJudgeFreeFeeStr);
-        reqVOList.add(getReqVO);
 
-        GetFbcFeeRequestDetail returnReqVO = new GetFbcFeeRequestDetail();
-        returnReqVO.setChannelName(channelCode);
-        returnReqVO.setRequestTime(LocalDateTimeUtils.getNowDateLong());
-        returnReqVO.setGetReturnType("return");
-        returnReqVO.setGetReturnTime(String.valueOf(LocalDateTimeUtils.localDateTimeToLong(costBaseDTO.getEndTime())));
-        returnReqVO.setCityId(String.valueOf(cityCode));
-        returnReqVO.setOrderType(this.getIsPackageOrder(getReturnCarCostReqDto.getIsPackageOrder()));
-        returnReqVO.setDistance(String.valueOf(returnDistance));
-        if(returnFlag && city!=null) {
-            returnReqVO.setRenterLocation(city.getLon()+","+city.getLat());
-        } else {
-            returnReqVO.setRenterLocation(srvReturnLon+","+srvReturnLat);
-        }
-        returnReqVO.setSumJudgeFreeFee(sumJudgeFreeFeeStr);
-        reqVOList.add(returnReqVO);
 
         GetFbcFeeRequest getFbcFeeRequest = new GetFbcFeeRequest();
-        getFbcFeeRequest.setReq(reqVOList);
-        com.dianping.cat.message.Transaction t = null;
-        try {
-            log.info("始请求取还车费用计算服务，请求参数为：{}", GsonUtils.toJson(reqVOList));
-            t = Cat.newTransaction(CatConstants.TYPE_URL, "");
-            //TODO apollo获取参数
-            ResponseEntity<HttpResult> responseEntity = restTemplate.postForEntity(/*apolloCostConfig.getGetfbcfeeUrl() + */"/upPricefetchbackCarFee/getFbcFee", reqVOList, HttpResult.class);
+        List<GetFbcFeeRequestDetail> reqList = new ArrayList<>();
 
-            if (null != responseEntity) {
-                HttpResult httpResult = responseEntity.getBody();
-                if (!httpResult.getResCode().equals(ErrorCode.SUCCESS.getCode())) {
-                    log.error("警告:GetReturnCarFeeV55Service---请求取还车费用计算服务失败,错误码:{},错误信息:{}", httpResult.getData(), httpResult.getResMsg());
-                    Cat.logError("警告:GetReturnCarFeeV55Service---请求取还车费用计算服务失败", new Exception(httpResult.getResMsg()));
-                    t.setStatus("-2");
-                    Cat.logEvent("getGetReturnFee", "调用取还车费用计算服务失败，错误码 :" + httpResult.getData() + ",错误信息:" + httpResult.getResMsg());
-                    return null;
-                }
-                List<PriceFbcFeeResponseDetail> fbcFeeResults = this.convertPriceResponseJson(JSON.toJSONString(httpResult.getData()));
-                if (CollectionUtils.isEmpty(fbcFeeResults)) {
-                    log.info("GetReturnCarFeeV55Service---请求取还车费用计算服务返回结果为空：getFbcFeeResponse={null}");
-                    t.setStatus("-3");
-                    Cat.logEvent("getGetReturnFee", "调用取还车费用计算失败，返回空");
-                    return null;
-                }
-                log.info("GetReturnCarFeeV55Service---请求取还车费用计算服务返回参数：getFbcFeeResponse={}", fbcFeeResults);
-                getReturnResponse.setSumJudgeFreeFee(sumJudgeFreeFee);
-                fbcFeeResults.forEach(fbcFeeResponse -> {
-                    if ("get".equalsIgnoreCase(fbcFeeResponse.getGetReturnType())) {
-                        RenterOrderCostDetailEntity renterOrderCostDetailEntity = new RenterOrderCostDetailEntity();
-                        renterOrderCostDetailEntity.setCostCode(RenterCashCodeEnum.SRV_GET_COST.getCashNo());
-                        renterOrderCostDetailEntity.setCostDesc(RenterCashCodeEnum.SRV_GET_COST.getTxt());
-                        renterOrderCostDetailEntity.setCount(1D);
-                        renterOrderCostDetailEntity.setTotalAmount(Integer.valueOf(fbcFeeResponse.getBaseFee()));
-                        listCostDetail.add(renterOrderCostDetailEntity);
-
-                        RenterOrderSubsidyDetailEntity renterOrderSubsidyDetailEntity = new RenterOrderSubsidyDetailEntity();
-                        renterOrderSubsidyDetailEntity.setSubsidType(SubsidyTypeCodeEnum.GET_CAR.getCode());
-                        renterOrderSubsidyDetailEntity.setSubsidyTypeCode(SubsidyTypeCodeEnum.GET_CAR.getDesc());
-                        renterOrderSubsidyDetailEntity.setSubsidySourceCode(SubsidySourceCodeEnum.PLATFORM.getCode());
-                        renterOrderSubsidyDetailEntity.setSubsidySource(SubsidySourceCodeEnum.PLATFORM.getDesc());
-                        renterOrderSubsidyDetailEntity.setSubsidyCode(SubsidySourceCodeEnum.RENTER.getCode());
-                        renterOrderSubsidyDetailEntity.setSubsidyName(SubsidySourceCodeEnum.RENTER.getDesc());
-                        renterOrderSubsidyDetailEntity.setSubsidyDesc("平台补贴给租客的取车费用！");
-                        renterOrderSubsidyDetailEntity.setSubsidyAmount(Integer.valueOf(fbcFeeResponse.getExpectedRealFee()) - Integer.valueOf(fbcFeeResponse.getBaseFee()));
-                        renterOrderSubsidyDetailEntity.setSubsidyVoucher("");
-                        listCostSubsidy.add(renterOrderSubsidyDetailEntity);
-
-                        getReturnResponse.setGetFee(Integer.valueOf(fbcFeeResponse.getExpectedRealFee()));
-                        getReturnResponse.setGetShouldFee(Integer.valueOf(fbcFeeResponse.getExpectedShouldFee()));
-                        getReturnResponse.setGetInitFee(Integer.valueOf(fbcFeeResponse.getBaseFee()));
-                        getReturnResponse.setGetTimePeriodUpPrice(fbcFeeResponse.getTimePeriodUpPrice());
-                        getReturnResponse.setGetDistanceUpPrice(fbcFeeResponse.getDistanceUpPrice());
-                        getReturnResponse.setGetCicrleUpPrice(fbcFeeResponse.getCicrleUpPrice());
-                        getReturnResponse.setGetShowDistance(Double.valueOf(fbcFeeResponse.getShowDistance()));
-
-
-                    } else if ("return".equalsIgnoreCase(fbcFeeResponse.getGetReturnType())) {
-                        RenterOrderCostDetailEntity renterOrderCostDetailEntity = new RenterOrderCostDetailEntity();
-                        renterOrderCostDetailEntity.setCostCode(RenterCashCodeEnum.SRV_RETURN_COST.getCashNo());
-                        renterOrderCostDetailEntity.setCostDesc(RenterCashCodeEnum.SRV_RETURN_COST.getTxt());
-                        renterOrderCostDetailEntity.setCount(1D);
-                        renterOrderCostDetailEntity.setTotalAmount(Integer.valueOf(fbcFeeResponse.getBaseFee()));
-                        listCostDetail.add(renterOrderCostDetailEntity);
-
-                        RenterOrderSubsidyDetailEntity renterOrderSubsidyDetailEntity = new RenterOrderSubsidyDetailEntity();
-                        renterOrderSubsidyDetailEntity.setSubsidType(SubsidyTypeCodeEnum.RETURN_CAR.getCode());
-                        renterOrderSubsidyDetailEntity.setSubsidyTypeCode(SubsidyTypeCodeEnum.RETURN_CAR.getDesc());
-                        renterOrderSubsidyDetailEntity.setSubsidySourceCode(SubsidySourceCodeEnum.PLATFORM.getCode());
-                        renterOrderSubsidyDetailEntity.setSubsidySource(SubsidySourceCodeEnum.PLATFORM.getDesc());
-                        renterOrderSubsidyDetailEntity.setSubsidyCode(SubsidySourceCodeEnum.RENTER.getCode());
-                        renterOrderSubsidyDetailEntity.setSubsidyName(SubsidySourceCodeEnum.RENTER.getDesc());
-                        renterOrderSubsidyDetailEntity.setSubsidyDesc("平台补贴给租客的还车费用！");
-                        renterOrderSubsidyDetailEntity.setSubsidyAmount(Integer.valueOf(fbcFeeResponse.getExpectedRealFee()) - Integer.valueOf(fbcFeeResponse.getBaseFee()));
-                        renterOrderSubsidyDetailEntity.setSubsidyVoucher("");
-                        listCostSubsidy.add(renterOrderSubsidyDetailEntity);
-
-                        getReturnResponse.setReturnFee(Integer.valueOf(fbcFeeResponse.getExpectedRealFee()));
-                        getReturnResponse.setReturnShouldFee(Integer.valueOf(fbcFeeResponse.getExpectedShouldFee()));
-                        getReturnResponse.setReturnInitFee(Integer.valueOf(fbcFeeResponse.getBaseFee()));
-                        getReturnResponse.setReturnTimePeriodUpPrice(fbcFeeResponse.getTimePeriodUpPrice());
-                        getReturnResponse.setReturnDistanceUpPrice(fbcFeeResponse.getDistanceUpPrice());
-                        getReturnResponse.setReturnCicrleUpPrice(fbcFeeResponse.getCicrleUpPrice());
-                        getReturnResponse.setReturnShowDistance(Double.valueOf(fbcFeeResponse.getShowDistance()));
-                    }
-                });
-                t.setStatus(Transaction.SUCCESS);
-                Cat.logEvent("getGetReturnFee", "调用取还车费用计算服务成功");
-            }
-        } catch (Exception e) {
-            if (t != null) {
-                t.setStatus("-4");
-                Cat.logEvent("getGetReturnFee", "调用取还车费用计算服务异常：" + e.getMessage());
-                Cat.logError("警告:GetReturnCarFeeV55Service---请求取还车费用计算服务异常", e);
-            }
-            log.error("警告:GetReturnCarFeeV55Service---请求取还车费用计算服务异常,{}", e);
-        } finally {
-            if (t != null) {
-                t.complete();
-            }
+        GetFbcFeeRequestDetail getCost = new GetFbcFeeRequestDetail();
+        getCost.setChannelName(channelCode);
+        getCost.setRequestTime(LocalDateTimeUtils.getNowDateLong());
+        getCost.setGetReturnType("return");
+        getCost.setGetReturnTime(String.valueOf(LocalDateTimeUtils.localDateTimeToLong(costBaseDTO.getEndTime())));
+        getCost.setCityId(String.valueOf(cityCode));
+        getCost.setOrderType(this.getIsPackageOrder(getReturnCarCostReqDto.getIsPackageOrder()));
+        getCost.setDistance(String.valueOf(returnDistance));
+        if(returnFlag && cityDTO !=null) {
+            getCost.setRenterLocation(cityDTO.getLon()+","+ cityDTO.getLat());
+        } else {
+            getCost.setRenterLocation(srvReturnLon+","+srvReturnLat);
         }
+        getCost.setSumJudgeFreeFee(sumJudgeFreeFeeStr);
+        reqList.add(getCost);
+
+
+        GetFbcFeeRequestDetail returnCost = new GetFbcFeeRequestDetail();
+        returnCost.setChannelName(channelCode);
+        returnCost.setRequestTime(LocalDateTimeUtils.getNowDateLong());
+        returnCost.setGetReturnType("return");
+        returnCost.setGetReturnTime(String.valueOf(LocalDateTimeUtils.localDateTimeToLong(costBaseDTO.getEndTime())));
+        returnCost.setCityId(String.valueOf(cityCode));
+        returnCost.setOrderType(this.getIsPackageOrder(getReturnCarCostReqDto.getIsPackageOrder()));
+        returnCost.setDistance(String.valueOf(returnDistance));
+        if(returnFlag && cityDTO !=null) {
+            returnCost.setRenterLocation(cityDTO.getLon()+","+ cityDTO.getLat());
+        } else {
+            returnCost.setRenterLocation(srvReturnLon+","+srvReturnLat);
+        }
+        returnCost.setSumJudgeFreeFee(sumJudgeFreeFeeStr);
+        reqList.add(returnCost);
+
+        getFbcFeeRequest.setReq(reqList);
+        ResponseData<PriceGetFbcFeeResponse> responseData = null;
+        Transaction t = Cat.newTransaction(com.atzuche.order.commons.CatConstants.FEIGN_CALL, "取还车费用");
+        try{
+            log.info("Feign 获取取还车费用入参:[{}]",JSON.toJSONString(getFbcFeeRequest));
+            Cat.logEvent(CatConstants.FEIGN_METHOD,"FetchBackCarFeeFeignService.getFbcFee");
+            Cat.logEvent(CatConstants.FEIGN_PARAM,JSON.toJSONString(getFbcFeeRequest));
+            responseData = fetchBackCarFeeFeignService.getFbcFee(getFbcFeeRequest);
+            log.info("Feign 获取取还车费用结果:[{}],获取取还车费用入参:[{}]",JSON.toJSONString(responseData),JSON.toJSONString(getFbcFeeRequest));
+            if(responseData == null || responseData.getResCode()==null || !responseData.getResCode().equals(ErrorCode.SUCCESS.getCode())){
+                GetReturnCostFailException getReturnCostFailException = new GetReturnCostFailException();
+                throw getReturnCostFailException;
+            }
+            Cat.logEvent(CatConstants.FEIGN_RESULT,JSON.toJSONString(responseData));
+            t.setStatus(Transaction.SUCCESS);
+        }catch (GetReturnCostFailException getReturnCostFailException){
+            Cat.logError("Feign 获取取还车费用失败！", getReturnCostFailException);
+            t.setStatus(getReturnCostFailException);
+            throw getReturnCostFailException;
+        }catch (Exception e){
+            GetReturnCostErrorException getReturnCostErrorException = new GetReturnCostErrorException();
+            Cat.logError("Feign 获取取还车费用接口异常",getReturnCostErrorException);
+            t.setStatus(getReturnCostErrorException);
+            throw getReturnCostErrorException;
+        }finally {
+            t.complete();
+        }
+        List<PriceFbcFeeResponseDetail> fbcFeeResults = responseData.getData().getFbcFeeResults();
+
+        getReturnResponse.setSumJudgeFreeFee(sumJudgeFreeFee);
+        fbcFeeResults.forEach(fbcFeeResponse -> {
+            if ("get".equalsIgnoreCase(fbcFeeResponse.getGetReturnType()) && getReturnCarCostReqDto.getIsGetCarCost()) {
+                int expectedShouldFee = Integer.valueOf(fbcFeeResponse.getExpectedShouldFee());
+
+                RenterOrderCostDetailEntity renterOrderCostDetailEntity = new RenterOrderCostDetailEntity();
+                renterOrderCostDetailEntity.setOrderNo(costBaseDTO.getOrderNo());
+                renterOrderCostDetailEntity.setRenterOrderNo(costBaseDTO.getRenterOrderNo());
+                renterOrderCostDetailEntity.setMemNo(costBaseDTO.getMemNo());
+                renterOrderCostDetailEntity.setCostCode(RenterCashCodeEnum.SRV_GET_COST.getCashNo());
+                renterOrderCostDetailEntity.setCostDesc(RenterCashCodeEnum.SRV_GET_COST.getTxt());
+                renterOrderCostDetailEntity.setCount(1D);
+                renterOrderCostDetailEntity.setTotalAmount(-expectedShouldFee);
+                listCostDetail.add(renterOrderCostDetailEntity);
+
+                RenterOrderSubsidyDetailDTO renterOrderSubsidy = new RenterOrderSubsidyDetailDTO();
+                renterOrderSubsidy.setOrderNo(costBaseDTO.getOrderNo());
+                renterOrderSubsidy.setRenterOrderNo(costBaseDTO.getRenterOrderNo());
+                renterOrderSubsidy.setMemNo(costBaseDTO.getMemNo());
+                renterOrderSubsidy.setSubsidyTypeName(SubsidyTypeCodeEnum.GET_CAR.getDesc());
+                renterOrderSubsidy.setSubsidyTypeCode(SubsidyTypeCodeEnum.GET_CAR.getCode());
+                renterOrderSubsidy.setSubsidySourceCode(SubsidySourceCodeEnum.PLATFORM.getCode());
+                renterOrderSubsidy.setSubsidySourceName(SubsidySourceCodeEnum.PLATFORM.getDesc());
+                renterOrderSubsidy.setSubsidyTargetCode(SubsidySourceCodeEnum.RENTER.getCode());
+                renterOrderSubsidy.setSubsidyTargetName(SubsidySourceCodeEnum.RENTER.getDesc());
+                renterOrderSubsidy.setSubsidyCostCode(RenterCashCodeEnum.SRV_GET_COST.getCashNo());
+                renterOrderSubsidy.setSubsidyCostName(RenterCashCodeEnum.SRV_GET_COST.getTxt());
+                renterOrderSubsidy.setSubsidyDesc("平台补贴给租客的取车费用！");
+                int expectedRealFee = Integer.valueOf(fbcFeeResponse.getExpectedRealFee());
+
+                renterOrderSubsidy.setSubsidyAmount(expectedShouldFee - expectedRealFee);
+                renterOrderSubsidy.setSubsidyVoucher("");
+                listCostSubsidy.add(renterOrderSubsidy);
+
+                getReturnResponse.setGetFee(Integer.valueOf(fbcFeeResponse.getExpectedRealFee()));
+                getReturnResponse.setGetShouldFee(Integer.valueOf(fbcFeeResponse.getExpectedShouldFee()));
+                getReturnResponse.setGetInitFee(Integer.valueOf(fbcFeeResponse.getBaseFee()));
+                getReturnResponse.setGetTimePeriodUpPrice(fbcFeeResponse.getTimePeriodUpPrice());
+                getReturnResponse.setGetDistanceUpPrice(fbcFeeResponse.getDistanceUpPrice());
+                getReturnResponse.setGetCicrleUpPrice(fbcFeeResponse.getCicrleUpPrice());
+                getReturnResponse.setGetShowDistance(Double.valueOf(fbcFeeResponse.getShowDistance()));
+
+            } else if ("return".equalsIgnoreCase(fbcFeeResponse.getGetReturnType()) && getReturnCarCostReqDto.getIsReturnCarCost()) {
+               int expectedShouldFee = Integer.valueOf(fbcFeeResponse.getExpectedShouldFee());
+               RenterOrderCostDetailEntity renterOrderCostDetailEntity = new RenterOrderCostDetailEntity();
+                renterOrderCostDetailEntity.setOrderNo(costBaseDTO.getOrderNo());
+                renterOrderCostDetailEntity.setRenterOrderNo(costBaseDTO.getRenterOrderNo());
+                renterOrderCostDetailEntity.setMemNo(costBaseDTO.getMemNo());
+               renterOrderCostDetailEntity.setCostCode(RenterCashCodeEnum.SRV_RETURN_COST.getCashNo());
+               renterOrderCostDetailEntity.setCostDesc(RenterCashCodeEnum.SRV_RETURN_COST.getTxt());
+               renterOrderCostDetailEntity.setCount(1D);
+               renterOrderCostDetailEntity.setTotalAmount(-expectedShouldFee);
+               listCostDetail.add(renterOrderCostDetailEntity);
+
+               RenterOrderSubsidyDetailDTO renterOrderSubsidy = new RenterOrderSubsidyDetailDTO();
+               renterOrderSubsidy.setOrderNo(costBaseDTO.getOrderNo());
+               renterOrderSubsidy.setRenterOrderNo(costBaseDTO.getRenterOrderNo());
+               renterOrderSubsidy.setMemNo(costBaseDTO.getMemNo());
+               renterOrderSubsidy.setSubsidyTypeName(SubsidyTypeCodeEnum.RETURN_CAR.getDesc());
+               renterOrderSubsidy.setSubsidyTypeCode(SubsidyTypeCodeEnum.RETURN_CAR.getCode());
+               renterOrderSubsidy.setSubsidySourceCode(SubsidySourceCodeEnum.PLATFORM.getCode());
+               renterOrderSubsidy.setSubsidySourceName(SubsidySourceCodeEnum.PLATFORM.getDesc());
+               renterOrderSubsidy.setSubsidyTargetCode(SubsidySourceCodeEnum.RENTER.getCode());
+               renterOrderSubsidy.setSubsidyTargetName(SubsidySourceCodeEnum.RENTER.getDesc());
+                renterOrderSubsidy.setSubsidyCostCode(RenterCashCodeEnum.SRV_RETURN_COST.getCashNo());
+                renterOrderSubsidy.setSubsidyCostName(RenterCashCodeEnum.SRV_RETURN_COST.getTxt());
+               renterOrderSubsidy.setSubsidyDesc("平台补贴给租客的还车费用！");
+               int expectedRealFee = Integer.valueOf(fbcFeeResponse.getExpectedRealFee());
+               renterOrderSubsidy.setSubsidyAmount(expectedShouldFee - expectedRealFee);
+               renterOrderSubsidy.setSubsidyVoucher("");
+               listCostSubsidy.add(renterOrderSubsidy);
+
+               getReturnResponse.setReturnFee(Integer.valueOf(fbcFeeResponse.getExpectedRealFee()));
+               getReturnResponse.setReturnShouldFee(Integer.valueOf(fbcFeeResponse.getExpectedShouldFee()));
+               getReturnResponse.setReturnInitFee(Integer.valueOf(fbcFeeResponse.getBaseFee()));
+               getReturnResponse.setReturnTimePeriodUpPrice(fbcFeeResponse.getTimePeriodUpPrice());
+               getReturnResponse.setReturnDistanceUpPrice(fbcFeeResponse.getDistanceUpPrice());
+               getReturnResponse.setReturnCicrleUpPrice(fbcFeeResponse.getCicrleUpPrice());
+               getReturnResponse.setReturnShowDistance(Double.valueOf(fbcFeeResponse.getShowDistance()));
+            }
+        });
         getReturnCostDto.setGetReturnResponseVO(getReturnResponse);
         getReturnCostDto.setRenterOrderCostDetailEntityList(listCostDetail);
-        getReturnCostDto.setRenterOrderSubsidyDetailEntityList(listCostSubsidy);
+        getReturnCostDto.setRenterOrderSubsidyDetailDTOList(listCostSubsidy);
         return getReturnCostDto;
     }
-
-    private List<PriceFbcFeeResponseDetail> convertPriceResponseJson(String result) {
-        if (StringUtils.isEmpty(result)) {
-            return null;
-        }
-        JSONObject jsonObject = JSON.parseObject(result);
-        if (!StringUtils.isBlank(jsonObject.getString("fbcFeeResults"))) {
-            List<PriceFbcFeeResponseDetail> fbcFeeResults = JSONArray.parseArray(jsonObject.getString("fbcFeeResults"), PriceFbcFeeResponseDetail.class);
-            return fbcFeeResults;
-        }
-        return null;
-    }
-
 
     /**
      *
@@ -741,4 +853,208 @@ public class RenterOrderCostCombineService {
 
         return ChannelNameTypeEnum.APP;
     }
+
+
+    /**
+     * 获取取还车超运能信息
+     * @param getReturnCarOverCostReqDto
+     * @return GetReturnOverCostDTO
+     */
+    public GetReturnOverCostDTO getGetReturnOverCost(GetReturnCarOverCostReqDto getReturnCarOverCostReqDto) {
+        GetReturnOverCostDTO getReturnOverCostDTO = new GetReturnOverCostDTO();
+        List<RenterOrderCostDetailEntity> renterOrderCostDetailEntityList = new ArrayList<>();
+        CostBaseDTO costBaseDTO = getReturnCarOverCostReqDto.getCostBaseDTO();
+        LocalDateTime rentTime = costBaseDTO.getStartTime();
+        LocalDateTime revertTime = costBaseDTO.getEndTime();
+        Integer cityCode = getReturnCarOverCostReqDto.getCityCode();
+
+        // 初始化数据
+        GetReturnOverTransportDTO getReturnOverTransport = new GetReturnOverTransportDTO(false, 0, false, 0);
+        getReturnOverTransport.setIsUpdateRentTime(true);
+        getReturnOverTransport.setIsUpdateRevertTime(true);
+        if (cityCode == null || (rentTime == null && revertTime == null)) {
+            getReturnOverCostDTO.setRenterOrderCostDetailEntityList(renterOrderCostDetailEntityList);
+            return getReturnOverCostDTO;
+        }
+        try {
+            // 超运能后计算附加费的订单类型列表1-短租订单和3-平台套餐订单
+            List<Integer> orderTypeList = Arrays.asList(ORDER_TYPES);
+            // 超运能后计算附加费标志
+            Boolean isAddFee = orderTypeList.contains(getReturnCarOverCostReqDto.getOrderType());
+            //TODO apollo中获取配置参数
+            Integer nightBegin = 20/*Integer.valueOf(apolloCostConfig.getNightBeginStr())*/;
+            Integer nightEnd = 23/*Integer.valueOf(apolloCostConfig.getNightEndStr())*/;
+            Integer overTransportFee = this.getGetReturnOverTransportFee(cityCode);
+            String rentTimeLongStr = String.valueOf(LocalDateTimeUtils.localDateTimeToLong(rentTime));
+
+            if (rentTime != null) {
+                ResponseObject<Boolean> getFlgResponse = null;
+                Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "取车是否超运能");
+                try{
+                    Cat.logEvent(CatConstants.FEIGN_METHOD,"GetBackCityLimitFeignApi.isCityServiceLimit");
+                    Long rentTimeLong = Long.valueOf(rentTimeLongStr.substring(0, 12));
+                    Cat.logEvent(CatConstants.FEIGN_PARAM,"cityCode="+cityCode+"&rentTimeLong="+rentTimeLong);
+                    getFlgResponse = getBackCityLimitFeignApi.isCityServiceLimit(cityCode, rentTimeLong);
+                    Cat.logEvent(CatConstants.FEIGN_RESULT,JSON.toJSONString(getFlgResponse));
+                    if(getFlgResponse == null || getFlgResponse.getResCode() == null || !ErrorCode.SUCCESS.getCode().equals(getFlgResponse.getResCode())){
+                        GetCarOverCostFailException getCarOverCostFailException = new GetCarOverCostFailException();
+                        log.error("取车超运能获取失败",getCarOverCostFailException);
+                        throw getCarOverCostFailException;
+                    }
+                    t.setStatus(Transaction.SUCCESS);
+                }catch (GetCarOverCostFailException oe){
+                    Cat.logError("Feign 取车超运能获取失败",oe);
+                    t.setStatus(oe);
+                    throw oe;
+                }catch (Exception e){
+                    GetCarOverCostErrorException getCarOverCostErrorException = new GetCarOverCostErrorException();
+                    log.error("Feign 取车超运能接口异常",getCarOverCostErrorException);
+                    Cat.logError("Feign 取车超运能接口异常",getCarOverCostErrorException);
+                    t.setStatus(getCarOverCostErrorException);
+                    throw getCarOverCostErrorException;
+                }finally {
+                    t.complete();
+                }
+
+                boolean getFlag = getFlgResponse.getData();
+                if (getFlag) {
+                    // 取还车超出运能附加金额
+                    if (isAddFee) {
+                        getReturnOverTransport.setGetOverTransportFee(overTransportFee);
+                        if(DateUtils.isNight(rentTimeLongStr, nightBegin, nightEnd)) {
+                            //夜间
+                            getReturnOverTransport.setNightGetOverTransportFee(overTransportFee);
+                        }
+                        RenterOrderCostDetailEntity renterOrderCostDetailEntity = new RenterOrderCostDetailEntity();
+                        renterOrderCostDetailEntity.setOrderNo(costBaseDTO.getOrderNo());
+                        renterOrderCostDetailEntity.setRenterOrderNo(costBaseDTO.getRenterOrderNo());
+                        renterOrderCostDetailEntity.setMemNo(costBaseDTO.getMemNo());
+                        renterOrderCostDetailEntity.setTotalAmount(overTransportFee);
+                        renterOrderCostDetailEntity.setCount(1D);
+                        renterOrderCostDetailEntity.setCostCode(RenterCashCodeEnum.GET_BLOCKED_RAISE_AMT.getCashNo());
+                        renterOrderCostDetailEntity.setCostDesc(RenterCashCodeEnum.GET_BLOCKED_RAISE_AMT.getTxt());
+                        renterOrderCostDetailEntity.setUnitPrice(overTransportFee);
+                        renterOrderCostDetailEntityList.add(renterOrderCostDetailEntity);
+                    }
+                    // 标记取车时间超出运能
+                    getReturnOverTransport.setIsGetOverTransport(true);
+                } else {
+                    getReturnOverTransport.setGetOverTransportFee(0);
+                    getReturnOverTransport.setIsGetOverTransport(false);
+                }
+            }
+            if (revertTime != null) {
+                String revertTimeLongStr = String.valueOf(LocalDateTimeUtils.localDateTimeToLong(revertTime));
+                ResponseObject<Boolean>  returnFlgResponse = null;
+                Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL,"还车是否超运能");
+                try{
+                    Cat.logEvent(CatConstants.FEIGN_METHOD,"GetBackCityLimitFeignApi.isCityServiceLimit");
+                    long revertTimeLong = Long.valueOf(revertTimeLongStr.substring(0, 12));
+                    Cat.logEvent(CatConstants.FEIGN_PARAM,"cityCode="+cityCode+"&revertTimeLong="+revertTimeLong);
+                    returnFlgResponse = getBackCityLimitFeignApi.isCityServiceLimit(cityCode, revertTimeLong);
+                    Cat.logEvent(CatConstants.FEIGN_RESULT,JSON.toJSONString(returnFlgResponse));
+                    if(returnFlgResponse == null || returnFlgResponse.getResCode() == null || !ErrorCode.SUCCESS.getCode().equals(returnFlgResponse.getResCode())){
+                        throw new ReturnCarOverCostFailException();
+                    }
+                    t.setStatus(Transaction.SUCCESS);
+                }catch (ReturnCarOverCostFailException oe){
+                    Cat.logError("还车是否超运能获取失败",oe);
+                    t.setStatus(oe);
+                    throw oe;
+                }catch (Exception e){
+                    ReturnCarOverCostErrorException returnCarOverCostErrorException = new ReturnCarOverCostErrorException();
+                    Cat.logError("还车是否超运能接口异常",returnCarOverCostErrorException);
+                    t.setStatus(returnCarOverCostErrorException);
+                    throw returnCarOverCostErrorException;
+                }finally {
+                    t.complete();
+                }
+
+                Boolean returnFlag = returnFlgResponse.getData();
+                if (returnFlag) {
+                    // 取还车超出运能附加金额
+                    if (isAddFee) {
+                        getReturnOverTransport.setReturnOverTransportFee(overTransportFee);
+                        if(DateUtils.isNight(String.valueOf(LocalDateTimeUtils.localDateTimeToLong(revertTime)), nightBegin, nightEnd)) {
+                            //夜间
+                            getReturnOverTransport.setNightReturnOverTransportFee(overTransportFee);;
+                        }
+                        RenterOrderCostDetailEntity renterOrderCostDetailEntity = new RenterOrderCostDetailEntity();
+                        renterOrderCostDetailEntity.setOrderNo(costBaseDTO.getOrderNo());
+                        renterOrderCostDetailEntity.setRenterOrderNo(costBaseDTO.getRenterOrderNo());
+                        renterOrderCostDetailEntity.setMemNo(costBaseDTO.getMemNo());
+                        renterOrderCostDetailEntity.setTotalAmount(overTransportFee);
+                        renterOrderCostDetailEntity.setCount(1D);
+                        renterOrderCostDetailEntity.setCostCode(RenterCashCodeEnum.RETURN_BLOCKED_RAISE_AMT.getCashNo());
+                        renterOrderCostDetailEntity.setCostDesc(RenterCashCodeEnum.RETURN_BLOCKED_RAISE_AMT.getTxt());
+                        renterOrderCostDetailEntity.setUnitPrice(overTransportFee);
+                        renterOrderCostDetailEntityList.add(renterOrderCostDetailEntity);
+                    }
+                    // 标记还车时间超出运能
+                    getReturnOverTransport.setIsReturnOverTransport(true);
+                } else {
+                    getReturnOverTransport.setIsReturnOverTransport(false);
+                    getReturnOverTransport.setReturnOverTransportFee(0);
+                }
+            }
+
+        } catch (Exception e) {
+            log.error("获取取还车超运能信息出错：",e);
+        }
+        getReturnOverCostDTO.setGetReturnOverTransportDTO(getReturnOverTransport);
+        getReturnOverCostDTO.setRenterOrderCostDetailEntityList(renterOrderCostDetailEntityList);
+        return getReturnOverCostDTO;
+    }
+
+
+    /**
+     * 	取还车超出运能附加金额
+     * @param cityCode 城市编码
+     * @return
+     */
+    @SuppressWarnings("unchecked")
+    private Integer getGetReturnOverTransportFee(Integer cityCode) {
+        String premiumAmt = null;
+        //调用取还车服务接口获取城市对应的超能溢价金额
+        GetFbcFeeConfigRequest reqParam  = new GetFbcFeeConfigRequest();
+        reqParam.setCityId(String.valueOf(cityCode));
+        reqParam.setRequestTime(String.valueOf(LocalDateTimeUtils.localDateTimeToLong(LocalDateTime.now())));
+        ResponseData<PriceCarHumanFeeRule> responseData = null;
+        Transaction t = Cat.newTransaction(com.atzuche.order.commons.CatConstants.FEIGN_CALL, "取还车超出运能附加金额配置");
+        try{
+            log.info("Feign 获取取还车超出运能附加金额入参:[{}]",JSON.toJSONString(reqParam));
+            Cat.logEvent(CatConstants.FEIGN_METHOD,"FetchBackCarFeeFeignService.getPriceCarHumanFeeRuleConfig");
+            Cat.logEvent(CatConstants.FEIGN_PARAM,JSON.toJSONString(reqParam));
+            responseData = fetchBackCarFeeFeignService.getPriceCarHumanFeeRuleConfig(reqParam);
+            log.info("Feign 获取取还车超出运能附加金额结果:[{}],获取取还车超出运能附加金额入参:[{}]",JSON.toJSONString(responseData),JSON.toJSONString(reqParam));
+            if(responseData == null || responseData.getResCode()==null){
+                GetReturnOverCostFailException fail = new GetReturnOverCostFailException();
+                throw fail;
+            }
+            Cat.logEvent(CatConstants.FEIGN_RESULT,JSON.toJSONString(responseData));
+            t.setStatus(Transaction.SUCCESS);
+        }catch (GetReturnCostFailException e){
+            Cat.logError("Feign 获取取还车超出运能附加金额失败！", e);
+            t.setStatus(e);
+            throw e;
+        }catch (Exception e){
+            GetReturnOverCostErrorException error = new GetReturnOverCostErrorException();
+            Cat.logError("Feign 获取取还车超出运能附加金额接口异常",error);
+            t.setStatus(error);
+            throw error;
+        }
+        if(ErrorCode.SUCCESS.getCode().equals(responseData.getResCode())){
+            return responseData.getData().getHumanFee().intValue();
+        }
+        try {
+            //TODO  apollo获取配置信息
+           // return Integer.valueOf(apolloCostConfig.getGetReturnOverTransportFee());
+            //TODO 给一个默认值，用于测试，测试后需要删除
+            return 50;
+        } catch (Exception e) {
+            log.error("获取取还车超运能溢价默认值异常：", e);
+        }
+        return GlobalConstant.GET_RETURN_OVER_COST;
+    }
+
 }

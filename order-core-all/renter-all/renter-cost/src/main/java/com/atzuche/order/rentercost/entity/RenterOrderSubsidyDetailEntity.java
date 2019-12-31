@@ -9,7 +9,7 @@ import lombok.Data;
  * 租客补贴明细表
  * 
  * @author ZhangBin
- * @date 2019-12-14 17:30:57
+ * @date 2019-12-27 11:02:47
  * @Description:
  */
 @Data
@@ -33,29 +33,37 @@ public class RenterOrderSubsidyDetailEntity implements Serializable {
 	 */
 	private String memNo;
 	/**
-	 * 补贴类型
+	 * 补贴费用类型名称 如：租金 、取还车费用
 	 */
-	private Integer subsidType;
+	private String subsidyTypeName;
 	/**
-	 * 补贴来源方编码（租客/车主/平台）
+	 * 补贴费用类型编码
+	 */
+	private String subsidyTypeCode;
+	/**
+	 * 补贴来源方 1、租客 2、车主 3、平台
+	 */
+	private String subsidySourceName;
+	/**
+	 * 补贴来源方编码
 	 */
 	private String subsidySourceCode;
 	/**
-	 * 补贴来源方
+	 * 补贴方名称 1、租客 2、车主 3、平台
 	 */
-	private String subsidySource;
+	private String subsidyTargetName;
 	/**
-	 * 补贴方编码（租客/车主/平台）
+	 * 补贴方编码
 	 */
-	private String subsidyCode;
+	private String subsidyTargetCode;
 	/**
-	 * 补贴方名称
+	 * 补贴费用项名称 如：凹凸比、优惠券等
 	 */
-	private String subsidyName;
+	private String subsidyCostName;
 	/**
-	 * 补贴类型编码
+	 * 补贴费用项编码
 	 */
-	private String subsidyTypeCode;
+	private String subsidyCostCode;
 	/**
 	 * 补贴描述
 	 */
