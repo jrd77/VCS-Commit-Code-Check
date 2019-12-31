@@ -136,8 +136,8 @@ public class CarService {
         renterGoodsDetailDto.setBrand(String.valueOf(carBaseVO.getBrand()));
         renterGoodsDetailDto.setLicenseDay(LocalDateTimeUtils.parseStringToLocalDate(carBaseVO.getLicenseDay()));
         //renterGoodsDetailDto.setCarInmsrp();
-       // renterGoodsDetailDto.setStopCostRate();
-       // renterGoodsDetailDto.setServiceRate();
+        //renterGoodsDetailDto.setStopCostRate();
+        //renterGoodsDetailDto.setServiceRate();
 
         List<RenterGoodsPriceDetailDTO> list = new ArrayList<>();
         List<CarPriceOfDayVO> daysPrice = data.getDaysPrice();

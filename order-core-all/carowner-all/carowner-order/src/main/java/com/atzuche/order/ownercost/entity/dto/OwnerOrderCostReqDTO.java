@@ -1,8 +1,6 @@
 package com.atzuche.order.ownercost.entity.dto;
 
-import com.atzuche.order.rentercost.entity.RenterOrderCostDetailEntity;
-import com.atzuche.order.rentercost.entity.RenterOrderSubsidyDetailEntity;
-import com.atzuche.order.rentercost.entity.dto.RenterOrderSubsidyDetailDTO;
+import com.atzuche.order.ownercost.entity.OwnerOrderPurchaseDetailEntity;
 import lombok.Data;
 
 import java.util.List;
@@ -25,11 +23,11 @@ public class OwnerOrderCostReqDTO {
     /**
      * 租客端费用对应的明细列表
      */
-    List<RenterOrderCostDetailEntity> renterOrderCostDetailDTOList;
+    List<OwnerOrderPurchaseDetailEntity> ownerOrderPurchaseDetailList;
     /**
      * 租客端补贴对应的明细列表
      */
-    List<RenterOrderSubsidyDetailDTO> renterOrderSubsidyDetailDTOList;
+    List<OwnerOrderSubsidyDetailDTO> ownerOrderSubsidyDetailDTOList;
 
 
 }

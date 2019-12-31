@@ -1,5 +1,6 @@
 package com.atzuche.order.renterorder.service;
 
+import com.alibaba.fastjson.JSON;
 import com.atzuche.order.accountrenterdeposit.vo.req.CreateOrderRenterDepositReqVO;
 import com.atzuche.order.accountrenterwzdepost.vo.req.CreateOrderRenterWZDepositReqVO;
 import com.atzuche.order.cashieraccount.service.CashierService;
@@ -22,6 +23,8 @@ import com.atzuche.order.renterorder.vo.owner.OwnerCouponGetAndValidReqVO;
 import com.atzuche.order.renterorder.vo.platform.MemAvailCouponRequestVO;
 import com.autoyol.auto.coin.service.vo.res.AutoCoinResponseVO;
 import com.autoyol.platformcost.model.CarDepositAmtVO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -35,6 +38,8 @@ import javax.annotation.Resource;
 
 @Service
 public class RenterOrderCostHandleService {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(RenterOrderCostHandleService.class);
 
     @Resource
     private RenterDepositDetailMapper renterDepositDetailMapper;
@@ -69,14 +74,18 @@ public class RenterOrderCostHandleService {
         depositAmtDTO.setBrand(renterOrderReqVO.getBrandId());
         depositAmtDTO.setType(renterOrderReqVO.getTypeId());
         depositAmtDTO.setLicenseDay(renterOrderReqVO.getLicenseDay());
+        LOGGER.info("车辆押金计算.param is,depositAmtDTO:[{}]", JSON.toJSONString(depositAmtDTO));
         CarDepositAmtVO carDepositAmt = renterOrderCostCombineService.getCarDepositAmtVO(depositAmtDTO);
+        LOGGER.info("车辆押金计算.result is,carDepositAmt:[{}]", JSON.toJSONString(carDepositAmt));
 
         MemRightCarDepositAmtReqDTO memRightCarDepositAmtReqDTO = new MemRightCarDepositAmtReqDTO();
         memRightCarDepositAmtReqDTO.setGuidPrice(renterOrderReqVO.getGuidPrice());
         memRightCarDepositAmtReqDTO.setOriginalDepositAmt(carDepositAmt.getCarDepositAmt());
         memRightCarDepositAmtReqDTO.setRenterMemberRightDTOList(renterOrderReqVO.getRenterMemberRightDTOList());
+        LOGGER.info("车辆押金减免计算.param is,memRightCarDepositAmtReqDTO:[{}]", JSON.toJSONString(memRightCarDepositAmtReqDTO));
         MemRightCarDepositAmtRespDTO memRightCarDepositAmtRespDTO =
                 renterMemberRightService.carDepositAmt(memRightCarDepositAmtReqDTO);
+        LOGGER.info("车辆押金减免计算.result is,memRightCarDepositAmtRespDTO:[{}]", JSON.toJSONString(memRightCarDepositAmtRespDTO));
 
         CreateOrderRenterDepositReqVO createOrderRenterDepositReqVO = new CreateOrderRenterDepositReqVO();
         createOrderRenterDepositReqVO.setYingfuDepositAmt(carDepositAmt.getCarDepositAmt());
@@ -89,9 +98,9 @@ public class RenterOrderCostHandleService {
         //车辆押金明细入库
         RenterDepositDetailEntity record = new RenterDepositDetailEntity();
         record.setOrderNo(renterOrderReqVO.getOrderNo());
-        record.setSuggestTotal(0);
-        record.setCarSpecialCoefficient(carDepositAmt.getCarYearRadio());
-        record.setNewCarCoefficient(carDepositAmt.getCarBrandTypeRadio());
+        record.setSuggestTotal(carDepositAmt.getSuggestTotal());
+        record.setCarSpecialCoefficient(carDepositAmt.getCarSpecialCoefficient());
+        record.setNewCarCoefficient(carDepositAmt.getNewCarCoefficient());
         record.setOriginalDepositAmt(carDepositAmt.getCarDepositAmt());
         record.setReductionDepositAmt(memRightCarDepositAmtRespDTO.getReductionDepositAmt());
         record.setReductionRate(memRightCarDepositAmtRespDTO.getReductionRate());

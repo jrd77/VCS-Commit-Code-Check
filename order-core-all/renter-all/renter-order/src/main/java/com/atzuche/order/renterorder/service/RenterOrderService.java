@@ -6,8 +6,6 @@ import com.atzuche.order.commons.enums.RenterCashCodeEnum;
 import com.atzuche.order.rentercost.entity.RenterOrderCostDetailEntity;
 import com.atzuche.order.rentercost.entity.dto.OrderCouponDTO;
 import com.atzuche.order.rentercost.entity.dto.RenterOrderSubsidyDetailDTO;
-import com.atzuche.order.rentercost.service.RenterOrderCostCombineService;
-import com.atzuche.order.rentercost.service.RenterOrderSubsidyDetailService;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.atzuche.order.renterorder.entity.dto.DeductAndSubsidyContextDTO;
 import com.atzuche.order.renterorder.entity.dto.RenterOrderCostReqDTO;
@@ -42,12 +40,6 @@ public class RenterOrderService {
     private RenterOrderCalCostService renterOrderCalCostService;
 
     @Resource
-    private RenterOrderSubsidyDetailService renterOrderSubsidyDetailService;
-
-    @Resource
-    private RenterOrderCostCombineService renterOrderCostCombineService;
-
-    @Resource
     private RenterOrderCostHandleService renterOrderCostHandleService;
 
 
@@ -79,8 +71,8 @@ public class RenterOrderService {
     /**
      * 修改租客子订单是否有效状态
      *
-     * @param id
-     * @param effectiveFlag
+     * @param id 主键
+     * @param effectiveFlag 否有效状态
      * @return Integer
      */
     public Integer updateRenterOrderEffective(Integer id, Integer effectiveFlag) {
@@ -90,7 +82,7 @@ public class RenterOrderService {
     /**
      * 保存租客子订单
      *
-     * @param renterOrderEntity
+     * @param renterOrderEntity 租客订单信息
      * @return Integer
      */
     public Integer saveRenterOrder(RenterOrderEntity renterOrderEntity) {
@@ -154,6 +146,14 @@ public class RenterOrderService {
 
 
         //9. 落库操作
+        RenterOrderEntity record = new RenterOrderEntity();
+        renterOrderMapper.insertSelective(record);
+
+//        renterOrderCostRespDTO.setRenterOrderSubsidyDetailDTOList();
+//
+//        context.getOrderCouponList();
+//
+//        context.getOrderSubsidyDetailList();
 
 
 
@@ -255,7 +255,7 @@ public class RenterOrderService {
         memAvailCouponRequestVO.setCarNo(renterOrderReqVO.getCarNo());
         memAvailCouponRequestVO.setCityCode(Integer.valueOf(renterOrderReqVO.getCityCode()));
         memAvailCouponRequestVO.setIsNew(renterOrderReqVO.getIsNew());
-        memAvailCouponRequestVO.setRentAmt(0);
+        memAvailCouponRequestVO.setRentAmt(renterOrderCostRespDTO.getRentAmount());
         memAvailCouponRequestVO.setInsureTotalPrices(renterOrderCostRespDTO.getBasicEnsureAmount());
         memAvailCouponRequestVO.setAbatement(renterOrderCostRespDTO.getComprehensiveEnsureAmount());
         memAvailCouponRequestVO.setSrvGetCost(renterOrderCostRespDTO.getGetRealAmt() + renterOrderCostRespDTO.getGetOverAmt());
@@ -272,7 +272,7 @@ public class RenterOrderService {
         memAvailCouponRequestVO.setRevertTime(DateUtils.formateLong(renterOrderReqVO.getRevertTime(), DateUtils.DATE_DEFAUTE));
 
         memAvailCouponRequestVO.setCounterFee(renterOrderCostRespDTO.getCommissionAmount());
-        memAvailCouponRequestVO.setOriginalRentAmt(0);
+        memAvailCouponRequestVO.setOriginalRentAmt(renterOrderCostRespDTO.getRentAmount());
 
         return memAvailCouponRequestVO;
     }
