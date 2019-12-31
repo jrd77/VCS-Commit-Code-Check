@@ -429,7 +429,7 @@ public class ModifyOrderService {
 		renterOrderReqVO.setGuidPrice(renterGoodsDetailDTO.getCarGuidePrice());
 		renterOrderReqVO.setInmsrp(renterGoodsDetailDTO.getCarInmsrp());
 		renterOrderReqVO.setLabelIds(renterGoodsDetailDTO.getLabelIds());
-		renterOrderReqVO.setMemNo(modifyOrderDTO.getMemNo());
+		renterOrderReqVO.setMemNo(Integer.valueOf(modifyOrderDTO.getMemNo()));
 		renterOrderReqVO.setOrderNo(modifyOrderDTO.getOrderNo());
 		renterOrderReqVO.setRenterGoodsPriceDetailDTOList(renterGoodsDetailDTO.getRenterGoodsPriceDetailDTOList());
 		renterOrderReqVO.setRenterOrderNo(modifyOrderDTO.getRenterOrderNo());
