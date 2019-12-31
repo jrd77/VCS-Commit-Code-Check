@@ -26,6 +26,7 @@ import com.atzuche.order.commons.enums.SubsidySourceCodeEnum;
 import com.atzuche.order.commons.enums.SubsidyTypeCodeEnum;
 import com.atzuche.order.coreapi.entity.dto.ModifyOrderDTO;
 import com.atzuche.order.coreapi.entity.request.ModifyOrderReq;
+import com.atzuche.order.coreapi.entity.vo.CostDeductVO;
 import com.atzuche.order.coreapi.modifyorder.exception.ModifyOrderParameterException;
 import com.atzuche.order.coreapi.service.CarService.CarDetailReqVO;
 import com.atzuche.order.coreapi.utils.ModifyOrderUtils;
@@ -51,6 +52,7 @@ import com.atzuche.order.renterorder.service.RenterOrderCalCostService;
 import com.atzuche.order.renterorder.service.RenterOrderService;
 import com.atzuche.order.renterorder.vo.RenterOrderReqVO;
 import com.atzuche.order.renterorder.vo.owner.OwnerCouponGetAndValidReqVO;
+import com.atzuche.order.renterorder.vo.platform.MemAvailCouponRequestVO;
 import com.autoyol.commons.web.ResponseData;
 import com.dianping.cat.Cat;
 
@@ -127,22 +129,16 @@ public class ModifyOrderService {
 		List<RenterOrderCostDetailEntity> initCostList = renterOrderCostDetailService.listRenterOrderCostDetail(modifyOrderDTO.getOrderNo(), initRenterOrder.getRenterOrderNo());
 		// 获取修改前补贴信息
 		List<RenterOrderSubsidyDetailEntity> initSubsidyList = renterOrderSubsidyDetailService.listRenterOrderSubsidyDetail(modifyOrderDTO.getOrderNo(), initRenterOrder.getRenterOrderNo());
-		// 计算平台保障费和全面保障费补贴
-		List<RenterOrderSubsidyDetailDTO> renterSubsidyList = modifyOrderReq.getRenterSubsidyList();
+		// 封装计算用对象
+		RenterOrderReqVO renterOrderReqVO = convertToRenterOrderReqVO(modifyOrderDTO, renterMemberDTO, renterGoodsDetailDTO, orderEntity);
 		// 基础费用计算包含租金，手续费，基础保障费用，全面保障费用，附加驾驶人保障费用，取还车费用计算和超运能费用计算
-		RenterOrderCostRespDTO renterOrderCostRespDTO = getRenterOrderCostRespDTO(modifyOrderDTO, renterMemberDTO, renterGoodsDetailDTO, initCostList, initSubsidyList, orderEntity);
-		
+		RenterOrderCostRespDTO renterOrderCostRespDTO = getRenterOrderCostRespDTO(modifyOrderDTO, renterOrderReqVO, initCostList, initSubsidyList);
 		// 获取修改订单违约金
 		List<RenterOrderFineDeatailEntity> renterFineList = getRenterFineList(modifyOrderDTO, initRenterOrder, deliveryList, renterOrderCostRespDTO);
-		
-		// TODO 车主券
-		
-		// TODO 限时立减
-		
-		// TODO 取还车券
-		
-		// TODO 平台券
-		
+		// 封装基础信息对象
+		CostBaseDTO costBaseDTO = new CostBaseDTO(modifyOrderDTO.getOrderNo(), modifyOrderDTO.getRenterOrderNo(), modifyOrderDTO.getMemNo(), modifyOrderDTO.getRentTime(), modifyOrderDTO.getRevertTime());
+		// 获取抵扣补贴
+		CostDeductVO costDeductVO = getCostDeductVO(costBaseDTO, renterOrderCostRespDTO, renterOrderReqVO, orderEntity);
 		// TODO 凹凸币
 		
 		// 修改前费用
@@ -151,7 +147,7 @@ public class ModifyOrderService {
 		
 		// 入库
 		
-		
+		// TODO 发送MQ
 		
 		return null;
 	}
@@ -334,9 +330,8 @@ public class ModifyOrderService {
 	 * @param renterGoodsDetailDTO
 	 * @return RenterOrderCostRespDTO
 	 */
-	public RenterOrderCostRespDTO getRenterOrderCostRespDTO(ModifyOrderDTO modifyOrderDTO, RenterMemberDTO renterMemberDTO, RenterGoodsDetailDTO renterGoodsDetailDTO, List<RenterOrderCostDetailEntity> initCostList, List<RenterOrderSubsidyDetailEntity> initSubsidyList, OrderEntity orderEntity) {
-		
-		RenterOrderReqVO renterOrderReqVO = convertToRenterOrderReqVO(modifyOrderDTO, renterMemberDTO, renterGoodsDetailDTO, orderEntity);
+	public RenterOrderCostRespDTO getRenterOrderCostRespDTO(ModifyOrderDTO modifyOrderDTO, RenterOrderReqVO renterOrderReqVO, List<RenterOrderCostDetailEntity> initCostList, List<RenterOrderSubsidyDetailEntity> initSubsidyList) {
+		// 构建参数
 		RenterOrderCostReqDTO renterOrderCostReqDTO = renterOrderService.buildRenterOrderCostReqDTO(renterOrderReqVO);
 		// 获取费用补贴列表
 		List<RenterOrderSubsidyDetailDTO> subsidyList = getRenterSubsidyList(renterOrderCostReqDTO, modifyOrderDTO.getRenterSubsidyList(), initCostList, initSubsidyList);
@@ -512,34 +507,107 @@ public class ModifyOrderService {
 		return renterFine;
 	}
 	
+	
+	/**
+	 * 抵扣补贴
+	 * @param costBaseDTO
+	 * @param renterOrderCostRespDTO
+	 * @param renterOrderReqVO
+	 * @param orderEntity
+	 * @return CostDeductVO
+	 */
+	public CostDeductVO getCostDeductVO(CostBaseDTO costBaseDTO, RenterOrderCostRespDTO renterOrderCostRespDTO, RenterOrderReqVO renterOrderReqVO, OrderEntity orderEntity) {
+		// 抵扣列表
+		List<OrderCouponDTO> orderCouponList = new ArrayList<OrderCouponDTO>();
+		// 补贴列表
+		List<RenterOrderSubsidyDetailDTO> renterSubsidyList = new ArrayList<RenterOrderSubsidyDetailDTO>();
+		// 剩余抵扣的租金
+		Integer surplusRentAmt = Math.abs(renterOrderCostRespDTO.getRentAmount());
+		// 获取车主券抵扣
+		OrderCouponDTO ownerCoupon = getOwnerCoupon(costBaseDTO, renterOrderReqVO, surplusRentAmt);
+		if (ownerCoupon != null) {
+			orderCouponList.add(ownerCoupon);
+			int ownerCouponAmt = ownerCoupon.getAmount() == null ? 0:ownerCoupon.getAmount();
+			surplusRentAmt = surplusRentAmt - ownerCouponAmt;
+		}
+		// 获取车主券补贴
+		RenterOrderSubsidyDetailDTO ownerCouponSubsidy = getOwnerCouponSubsidy(costBaseDTO, ownerCoupon);
+		if (ownerCouponSubsidy != null) {
+			renterSubsidyList.add(ownerCouponSubsidy);
+		}
+		// 获取限时立减补贴
+		RenterOrderSubsidyDetailDTO limitRedSubsidy = getLimitRedSubsidy(costBaseDTO, orderEntity, surplusRentAmt);
+		if (limitRedSubsidy != null) {
+			renterSubsidyList.add(limitRedSubsidy);
+			int limitRedAmt = limitRedSubsidy.getSubsidyAmount() == null ? 0:limitRedSubsidy.getSubsidyAmount();
+			surplusRentAmt = surplusRentAmt - limitRedAmt;
+		}
+		// 获取取还车券抵扣
+		OrderCouponDTO getCarFeeCoupon = getGetCarFeeCoupon(costBaseDTO, renterOrderCostRespDTO, renterOrderReqVO);
+		if (getCarFeeCoupon != null) {
+			orderCouponList.add(getCarFeeCoupon);
+		}
+		// 获取取还车补贴
+		RenterOrderSubsidyDetailDTO getCarFeeCouponSubsidy = getGetCarFeeCouponSubsidy(costBaseDTO, getCarFeeCoupon);
+		if (getCarFeeCouponSubsidy != null) {
+			renterSubsidyList.add(getCarFeeCouponSubsidy);
+		}
+		// 获取平台券抵扣
+		OrderCouponDTO platformCoupon = getPlatformCoupon(costBaseDTO, renterOrderCostRespDTO, renterOrderReqVO, getCarFeeCoupon, surplusRentAmt);
+		if (platformCoupon != null) {
+			orderCouponList.add(platformCoupon);
+		}
+		// 获取平台券补贴
+		RenterOrderSubsidyDetailDTO platformCouponSubsidy = getPlatformCouponSubsidy(costBaseDTO, platformCoupon);
+		if (platformCouponSubsidy != null) {
+			renterSubsidyList.add(platformCouponSubsidy);
+		}
+		CostDeductVO costDeductVO = new CostDeductVO();
+		costDeductVO.setOrderCouponList(orderCouponList);
+		costDeductVO.setRenterSubsidyList(renterSubsidyList);
+		return costDeductVO;
+	}
+	
+	
 	/**
 	 * 获取车主券抵扣
+	 * @param costBaseDTO
 	 * @param renterOrderReqVO
 	 * @param surplusRentAmt
 	 * @return OrderCouponDTO
 	 */
-	public OrderCouponDTO getOwnerCoupon(RenterOrderReqVO renterOrderReqVO, Integer surplusRentAmt) {
+	public OrderCouponDTO getOwnerCoupon(CostBaseDTO costBaseDTO, RenterOrderReqVO renterOrderReqVO, Integer surplusRentAmt) {
 		OwnerCouponGetAndValidReqVO ownerCouponGetAndValidReqVO = renterOrderService.buildOwnerCouponGetAndValidReqVO(renterOrderReqVO,
 				surplusRentAmt);
+		// 修改标识
+		ownerCouponGetAndValidReqVO.setMark(2);
         OrderCouponDTO ownerCoupon = renterOrderCalCostService.calOwnerCouponDeductInfo(ownerCouponGetAndValidReqVO);
+        if (ownerCoupon != null) {
+        	ownerCoupon.setOrderNo(costBaseDTO.getOrderNo());
+            ownerCoupon.setRenterOrderNo(costBaseDTO.getRenterOrderNo());
+        }
         return ownerCoupon;
 	}
 	
 	/**
 	 * 获取车主券补贴
+	 * @param costBaseDTO
 	 * @param renterOrderReqVO
 	 * @return RenterOrderSubsidyDetailDTO
 	 */
 	public RenterOrderSubsidyDetailDTO getOwnerCouponSubsidy(CostBaseDTO costBaseDTO, OrderCouponDTO ownerCoupon) {
-        if(null != ownerCoupon) {
-            int disAmt = null == ownerCoupon.getAmount() ? 0 : ownerCoupon.getAmount();
-            //补贴明细
-            RenterOrderSubsidyDetailDTO ownerCouponSubsidyInfo =
-                    renterOrderSubsidyDetailService.calOwnerCouponSubsidyInfo(Integer.valueOf(costBaseDTO.getMemNo()),
-                    ownerCoupon);
-            return ownerCouponSubsidyInfo;
+        if(ownerCoupon == null) {
+        	return null;
         }
-        return null;
+        //补贴明细
+        RenterOrderSubsidyDetailDTO ownerCouponSubsidyInfo =
+                renterOrderSubsidyDetailService.calOwnerCouponSubsidyInfo(Integer.valueOf(costBaseDTO.getMemNo()),
+                ownerCoupon);
+        if (ownerCouponSubsidyInfo != null) {
+        	ownerCouponSubsidyInfo.setOrderNo(costBaseDTO.getOrderNo());
+        	ownerCouponSubsidyInfo.setRenterOrderNo(costBaseDTO.getRenterOrderNo());
+        }
+        return ownerCouponSubsidyInfo;
 	}
 	
 	/**
@@ -561,11 +629,101 @@ public class ModifyOrderService {
         RenterOrderSubsidyDetailDTO limitRedSubsidyInfo =
                 renterOrderSubsidyDetailService.calLimitRedSubsidyInfo(Integer.valueOf(costBaseDTO.getMemNo()),
                         surplusRentAmt,reductiAmt);
+        if (limitRedSubsidyInfo != null) {
+        	limitRedSubsidyInfo.setOrderNo(costBaseDTO.getOrderNo());
+            limitRedSubsidyInfo.setRenterOrderNo(costBaseDTO.getRenterOrderNo());
+        }
         return limitRedSubsidyInfo;
 	}
 	
 	
-	//public RenterOrderSubsidyDetailDTO get
+	/**
+	 * 获取车主券抵扣
+	 * @param costBaseDTO
+	 * @param renterOrderCostRespDTO
+	 * @param renterOrderReqVO
+	 * @return OrderCouponDTO
+	 */
+	public OrderCouponDTO getGetCarFeeCoupon(CostBaseDTO costBaseDTO, RenterOrderCostRespDTO renterOrderCostRespDTO, RenterOrderReqVO renterOrderReqVO) {
+		MemAvailCouponRequestVO getCarFeeCouponReqVO = renterOrderService.buildMemAvailCouponRequestVO(renterOrderCostRespDTO, renterOrderReqVO);
+		getCarFeeCouponReqVO.setDisCouponId(renterOrderReqVO.getGetCarFreeCouponId());
+		OrderCouponDTO getCarFeeCoupon = renterOrderCalCostService.calGetAndReturnSrvCouponDeductInfo(getCarFeeCouponReqVO);
+		if (getCarFeeCoupon != null) {
+			getCarFeeCoupon.setOrderNo(costBaseDTO.getOrderNo());
+			getCarFeeCoupon.setRenterOrderNo(costBaseDTO.getRenterOrderNo());
+		}
+		return getCarFeeCoupon;
+	}
+	
+	
+	/**
+	 * 获取取还车优惠券补贴
+	 * @param costBaseDTO
+	 * @param getCarFeeCoupon
+	 * @return RenterOrderSubsidyDetailDTO
+	 */
+	public RenterOrderSubsidyDetailDTO getGetCarFeeCouponSubsidy(CostBaseDTO costBaseDTO, OrderCouponDTO getCarFeeCoupon) {
+		if (getCarFeeCoupon == null) {
+			return null;
+		}
+        //记录送取服务券
+        getCarFeeCoupon.setOrderNo(costBaseDTO.getOrderNo());
+        getCarFeeCoupon.setRenterOrderNo(costBaseDTO.getRenterOrderNo());
+        //补贴明细
+        RenterOrderSubsidyDetailDTO getCarFeeCouponSubsidyInfo =
+                renterOrderSubsidyDetailService.calGetCarFeeCouponSubsidyInfo(Integer.valueOf(costBaseDTO.getMemNo())
+                        , getCarFeeCoupon);
+        if (getCarFeeCouponSubsidyInfo != null) {
+        	getCarFeeCouponSubsidyInfo.setOrderNo(costBaseDTO.getOrderNo());
+            getCarFeeCouponSubsidyInfo.setRenterOrderNo(costBaseDTO.getRenterOrderNo());
+        }
+        return getCarFeeCouponSubsidyInfo;
+	}
+	
+	
+	/**
+	 * 获取平台券抵扣
+	 * @param costBaseDTO
+	 * @param renterOrderCostRespDTO
+	 * @param renterOrderReqVO
+	 * @param getCarFeeCoupon
+	 * @param surplusRentAmt
+	 * @return OrderCouponDTO
+	 */
+	public OrderCouponDTO getPlatformCoupon(CostBaseDTO costBaseDTO, RenterOrderCostRespDTO renterOrderCostRespDTO, RenterOrderReqVO renterOrderReqVO, OrderCouponDTO getCarFeeCoupon, Integer surplusRentAmt) {
+		MemAvailCouponRequestVO platformCouponReqVO = renterOrderService.buildMemAvailCouponRequestVO(renterOrderCostRespDTO,
+                renterOrderReqVO);
+        platformCouponReqVO.setDisCouponId(renterOrderReqVO.getDisCouponIds());
+        if (getCarFeeCoupon != null) {
+        	platformCouponReqVO.setSrvGetCost(0);
+        	platformCouponReqVO.setSrvReturnCost(0);
+        }
+        platformCouponReqVO.setRentAmt(surplusRentAmt);
+        OrderCouponDTO platfromCoupon = renterOrderCalCostService.calPlatformCouponDeductInfo(platformCouponReqVO);
+        if (platfromCoupon != null) {
+        	platfromCoupon.setOrderNo(costBaseDTO.getOrderNo());
+        	platfromCoupon.setRenterOrderNo(costBaseDTO.getRenterOrderNo());
+        }
+        return platfromCoupon;
+	}
+	
+	/**
+	 * 获取平台券补贴
+	 * @param costBaseDTO
+	 * @param platfromCoupon
+	 * @return RenterOrderSubsidyDetailDTO
+	 */
+	public RenterOrderSubsidyDetailDTO getPlatformCouponSubsidy(CostBaseDTO costBaseDTO, OrderCouponDTO platformCoupon) {
+		//补贴明细
+        RenterOrderSubsidyDetailDTO platformCouponSubsidyInfo =
+                renterOrderSubsidyDetailService.calPlatformCouponSubsidyInfo(Integer.valueOf(costBaseDTO.getMemNo()), platformCoupon);
+        if (platformCouponSubsidyInfo == null) {
+        	return null;
+        }
+        platformCouponSubsidyInfo.setOrderNo(costBaseDTO.getOrderNo());
+        platformCouponSubsidyInfo.setRenterOrderNo(costBaseDTO.getRenterOrderNo());
+        return platformCouponSubsidyInfo;
+	}
 	
 	
 	/**
@@ -607,6 +765,7 @@ public class ModifyOrderService {
 		renterOrderReqVO.setSrvReturnLat(modifyOrderDTO.getRevertCarLat());
 		renterOrderReqVO.setSrvReturnLon(modifyOrderDTO.getRevertCarLon());
 		renterOrderReqVO.setUseAutoCoin(modifyOrderDTO.getUserCoinFlag());
+		renterOrderReqVO.setIsNew((renterMemberDTO.getIsNew() != null && renterMemberDTO.getIsNew() == 1) ? true:false);
 		return renterOrderReqVO;
 	}
 	
