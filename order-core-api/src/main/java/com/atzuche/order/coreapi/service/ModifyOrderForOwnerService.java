@@ -12,7 +12,6 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.atzuche.order.commons.CatConstants;
 import com.atzuche.order.commons.entity.dto.CostBaseDTO;
 import com.atzuche.order.commons.entity.dto.OwnerGoodsDetailDTO;
 import com.atzuche.order.commons.entity.dto.OwnerGoodsPriceDetailDTO;
@@ -22,12 +21,11 @@ import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
 import com.atzuche.order.coreapi.entity.dto.ModifyOrderOwnerDTO;
 import com.atzuche.order.coreapi.modifyorder.exception.ModifyOrderParameterException;
 import com.atzuche.order.coreapi.service.CarService.CarDetailReqVO;
-import com.atzuche.order.owner.commodity.service.CommodityService;
+import com.atzuche.order.owner.commodity.service.OwnerCommodityService;
 import com.atzuche.order.ownercost.entity.OwnerOrderPurchaseDetailEntity;
 import com.atzuche.order.ownercost.entity.OwnerOrderSubsidyDetailEntity;
 import com.atzuche.order.owner.mem.service.OwnerMemberService;
 import com.atzuche.order.rentercost.entity.RenterOrderSubsidyDetailEntity;
-import com.atzuche.order.rentercost.service.RenterOrderSubsidyDetailService;
 import com.atzuche.order.ownercost.service.OwnerOrderCostCombineService;
 import com.atzuche.order.ownercost.service.OwnerOrderCostService;
 import com.atzuche.order.ownercost.service.OwnerOrderIncrementDetailService;
@@ -36,7 +34,6 @@ import com.atzuche.order.ownercost.service.OwnerOrderService;
 import com.atzuche.order.ownercost.service.OwnerOrderSubsidyDetailService;
 import com.autoyol.commons.web.ResponseData;
 import com.dianping.cat.Cat;
-import com.dianping.cat.message.Transaction;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -51,7 +48,7 @@ public class ModifyOrderForOwnerService {
 	@Autowired
 	private CarService carService;
 	@Autowired
-	private CommodityService commodityService;
+	private OwnerCommodityService ownerCommodityService;
 	@Autowired
 	private OwnerOrderCostCombineService ownerOrderCostCombineService;
 	@Autowired
@@ -95,7 +92,7 @@ public class ModifyOrderForOwnerService {
 		OwnerOrderCostEntity ownerOrderCostEntity = getOwnerOrderCostEntity(costBaseDTO, purchaseList, incrementList, subsidyEntity);
 		
 		// 保存商品信息
-		commodityService.saveCommodity(ownerGoodsDetailDTO);
+		ownerCommodityService.saveCommodity(ownerGoodsDetailDTO);
 		// 保存会员信息
 		ownerMemberService.save(ownerMemberDTO);
 		// 保存采购信息
@@ -223,7 +220,7 @@ public class ModifyOrderForOwnerService {
 		// 车主子订单号
 		String ownerOrderNo = ownerOrderEntity.getOwnerOrderNo();
 		// 获取车主商品信息
-		OwnerGoodsDetailDTO ownerGoodsDetailDTO = commodityService.getOwnerGoodsDetail(ownerOrderNo, false);
+		OwnerGoodsDetailDTO ownerGoodsDetailDTO = ownerCommodityService.getOwnerGoodsDetail(ownerOrderNo, false);
 		CarDetailReqVO carDetailReqVO = new CarDetailReqVO(); 
 		carDetailReqVO.setAddrIndex(ownerGoodsDetailDTO.getCarAddrIndex());
 		carDetailReqVO.setCarNo(String.valueOf(ownerGoodsDetailDTO.getCarNo()));
@@ -289,7 +286,7 @@ public class ModifyOrderForOwnerService {
 		ownerGoodsDetailDTO.setMemNo(ownerOrderEntity.getMemNo());
 		ownerGoodsDetailDTO.setRentTime(modifyOrderOwnerDTO.getRentTime());
 		ownerGoodsDetailDTO.setRevertTime(modifyOrderOwnerDTO.getRevertTime());
-		ownerGoodsDetailDTO = commodityService.setPriceAndGroup(ownerGoodsDetailDTO);
+		ownerGoodsDetailDTO = ownerCommodityService.setPriceAndGroup(ownerGoodsDetailDTO);
 		List<OwnerGoodsPriceDetailDTO> ownerGoodsPriceDetailDTOList = ownerGoodsDetailDTO.getOwnerGoodsPriceDetailDTOList();
 		if (ownerGoodsPriceDetailDTOList == null || ownerGoodsPriceDetailDTOList.isEmpty()) {
 			log.error("getOwnerGoodsDetailDTO ownerGoodsPriceDetailDTOList为空");

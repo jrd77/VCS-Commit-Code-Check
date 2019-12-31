@@ -1,67 +1,47 @@
 package com.atzuche.order.coreapi.service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
-import com.atzuche.order.delivery.entity.RenterOrderDeliveryEntity;
-import com.atzuche.order.delivery.service.RenterOrderDeliveryService;
-import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import com.atzuche.order.commons.entity.dto.CostBaseDTO;
-import com.atzuche.order.commons.entity.dto.GetReturnAddressInfoDTO;
-import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
-import com.atzuche.order.commons.entity.dto.RenterGoodsPriceDetailDTO;
-import com.atzuche.order.commons.entity.dto.RenterMemberDTO;
-import com.atzuche.order.commons.entity.dto.RenterMemberRightDTO;
-import com.atzuche.order.commons.enums.CouponTypeEnum;
-import com.atzuche.order.commons.enums.RenterCashCodeEnum;
-import com.atzuche.order.commons.enums.RenterOrderStatusEnum;
-import com.atzuche.order.commons.enums.SrvGetReturnEnum;
-import com.atzuche.order.commons.enums.SubsidySourceCodeEnum;
-import com.atzuche.order.commons.enums.SubsidyTypeCodeEnum;
+import com.atzuche.order.commons.entity.dto.*;
+import com.atzuche.order.commons.enums.*;
 import com.atzuche.order.coreapi.entity.dto.ModifyOrderDTO;
 import com.atzuche.order.coreapi.entity.request.ModifyOrderReq;
 import com.atzuche.order.coreapi.entity.vo.CostDeductVO;
 import com.atzuche.order.coreapi.modifyorder.exception.ModifyOrderParameterException;
 import com.atzuche.order.coreapi.service.CarService.CarDetailReqVO;
 import com.atzuche.order.coreapi.utils.ModifyOrderUtils;
+import com.atzuche.order.delivery.entity.RenterOrderDeliveryEntity;
+import com.atzuche.order.delivery.service.RenterOrderDeliveryService;
 import com.atzuche.order.parentorder.entity.OrderEntity;
 import com.atzuche.order.parentorder.service.OrderService;
-import com.atzuche.order.rentercommodity.service.CommodityService;
+import com.atzuche.order.rentercommodity.service.RenterCommodityService;
 import com.atzuche.order.rentercommodity.service.RenterGoodsService;
 import com.atzuche.order.rentercost.entity.RenterOrderCostDetailEntity;
 import com.atzuche.order.rentercost.entity.RenterOrderFineDeatailEntity;
 import com.atzuche.order.rentercost.entity.RenterOrderSubsidyDetailEntity;
 import com.atzuche.order.rentercost.entity.dto.OrderCouponDTO;
 import com.atzuche.order.rentercost.entity.dto.RenterOrderSubsidyDetailDTO;
-import com.atzuche.order.rentercost.service.AutoCoinCostCalService;
-import com.atzuche.order.rentercost.service.RenterOrderCostCombineService;
-import com.atzuche.order.rentercost.service.RenterOrderCostDetailService;
-import com.atzuche.order.rentercost.service.RenterOrderFineDeatailService;
-import com.atzuche.order.rentercost.service.RenterOrderSubsidyDetailService;
+import com.atzuche.order.rentercost.service.*;
 import com.atzuche.order.rentermem.service.RenterMemberService;
 import com.atzuche.order.renterorder.entity.OrderCouponEntity;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.atzuche.order.renterorder.entity.dto.RenterOrderCostReqDTO;
 import com.atzuche.order.renterorder.entity.dto.RenterOrderCostRespDTO;
-import com.atzuche.order.renterorder.service.AutoCoinService;
-import com.atzuche.order.renterorder.service.OrderCouponService;
-import com.atzuche.order.renterorder.service.RenterAdditionalDriverService;
-import com.atzuche.order.renterorder.service.RenterOrderCalCostService;
-import com.atzuche.order.renterorder.service.RenterOrderService;
+import com.atzuche.order.renterorder.service.*;
 import com.atzuche.order.renterorder.vo.RenterOrderReqVO;
 import com.atzuche.order.renterorder.vo.owner.OwnerCouponGetAndValidReqVO;
 import com.atzuche.order.renterorder.vo.platform.MemAvailCouponRequestVO;
 import com.autoyol.auto.coin.service.vo.res.AutoCoinResponseVO;
 import com.autoyol.commons.web.ResponseData;
 import com.dianping.cat.Cat;
-
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -75,7 +55,7 @@ public class ModifyOrderService {
 	@Autowired
 	private CarService carService;
 	@Autowired
-	private CommodityService commodityService;
+	private RenterCommodityService commodityService;
 	@Autowired
 	private OrderCouponService orderCouponService;
 	@Autowired

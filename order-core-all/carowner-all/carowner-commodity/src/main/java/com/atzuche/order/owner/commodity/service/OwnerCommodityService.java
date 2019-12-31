@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
-public class CommodityService {
+public class OwnerCommodityService {
     @Autowired
     private OwnerGoodsPriceDetailMapper ownerGoodsPriceDetailMapper;
     @Autowired
