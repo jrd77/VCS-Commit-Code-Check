@@ -13,6 +13,6 @@ repositories {
 
 subprojects {
     dependencies {
-        compile project(":order-core-all:parent-order")
+
     }
 }
