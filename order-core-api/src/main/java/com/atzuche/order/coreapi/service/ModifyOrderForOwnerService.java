@@ -20,7 +20,7 @@ import com.atzuche.order.commons.entity.dto.OwnerMemberRightDTO;
 import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
 import com.atzuche.order.coreapi.entity.dto.ModifyOrderOwnerDTO;
 import com.atzuche.order.coreapi.modifyorder.exception.ModifyOrderParameterException;
-import com.atzuche.order.coreapi.service.CarService.CarDetailReqVO;
+import com.atzuche.order.coreapi.service.GoodsService.CarDetailReqVO;
 import com.atzuche.order.owner.commodity.service.OwnerCommodityService;
 import com.atzuche.order.ownercost.entity.OwnerOrderPurchaseDetailEntity;
 import com.atzuche.order.ownercost.entity.OwnerOrderSubsidyDetailEntity;
@@ -46,7 +46,7 @@ public class ModifyOrderForOwnerService {
 	@Autowired
 	private OwnerMemberService ownerMemberService;
 	@Autowired
-	private CarService carService;
+	private GoodsService goodsService;
 	@Autowired
 	private OwnerCommodityService ownerCommodityService;
 	@Autowired
@@ -272,7 +272,7 @@ public class ModifyOrderForOwnerService {
 		// 获取车主端商品详情
 		if (renterGoodsDetailDTO == null) {
 			// 调远程获取
-			renterGoodsDetailDTO = carService.getRenterGoodsDetail(convertToCarDetailReqVO(modifyOrderOwnerDTO, ownerOrderEntity));
+			renterGoodsDetailDTO = goodsService.getRenterGoodsDetail(convertToCarDetailReqVO(modifyOrderOwnerDTO, ownerOrderEntity));
 		}
 		if (renterGoodsDetailDTO == null) {
 			log.error("getOwnerGoodsDetailDTO renterGoodsDetailDTO为空");
@@ -280,7 +280,7 @@ public class ModifyOrderForOwnerService {
 			throw new ModifyOrderParameterException();
 		}
 		// 获取经过组装的商品信息
-		OwnerGoodsDetailDTO ownerGoodsDetailDTO = carService.getOwnerGoodsDetail(renterGoodsDetailDTO);
+		OwnerGoodsDetailDTO ownerGoodsDetailDTO = goodsService.getOwnerGoodsDetail(renterGoodsDetailDTO);
 		ownerGoodsDetailDTO.setOrderNo(modifyOrderOwnerDTO.getOrderNo());
 		ownerGoodsDetailDTO.setOwnerOrderNo(modifyOrderOwnerDTO.getOwnerOrderNo());
 		ownerGoodsDetailDTO.setMemNo(ownerOrderEntity.getMemNo());

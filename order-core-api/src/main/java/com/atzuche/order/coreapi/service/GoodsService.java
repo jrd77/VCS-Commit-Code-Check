@@ -40,9 +40,9 @@ import java.util.stream.Collectors;
  * @date 2019/12/19 4:55 下午
  **/
 @Service
-public class CarService {
+public class GoodsService {
     
-    private final static Logger log = LoggerFactory.getLogger(CarService.class);
+    private final static Logger log = LoggerFactory.getLogger(GoodsService.class);
     
     @Autowired
     private CarDetailQueryFeignApi carDetailQueryFeignApi;

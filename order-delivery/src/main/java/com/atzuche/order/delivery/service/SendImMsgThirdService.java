@@ -22,7 +22,7 @@ public class SendImMsgThirdService {
     CarService carService;
 
     @Autowired
-    MemberService memberService;
+    DeliveryMemberService deliveryMemberService;
 
     @Autowired
     private DelegationCarAdminMapper delegationCarAdminMapper;
@@ -125,7 +125,7 @@ public class SendImMsgThirdService {
             if (ownerType == 35 || ownerType == 30) {
                 Long delegatMobile = delegationCarAdminMapper.getAdminMobileByCarNo(carNo != null ? Integer.parseInt(carNo) : 0);
                 if (delegatMobile != null) {
-                    memNo = memberService.getMemNoByMobile(delegatMobile.toString()) + "";
+                    memNo = deliveryMemberService.getMemNoByMobile(delegatMobile.toString()) + "";
                 }
             }
         }

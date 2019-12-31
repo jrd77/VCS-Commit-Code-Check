@@ -11,8 +11,8 @@ import com.atzuche.order.delivery.enums.UserTypeEnum;
 import com.atzuche.order.delivery.exception.HandoverCarOrderException;
 import com.atzuche.order.delivery.mapper.*;
 import com.atzuche.order.delivery.service.CarService;
-import com.atzuche.order.delivery.service.MemberService;
-import com.atzuche.order.delivery.service.OrderService;
+import com.atzuche.order.delivery.service.DeliveryMemberService;
+import com.atzuche.order.delivery.service.DeliveryOrderService;
 import com.atzuche.order.delivery.service.SendImMsgThirdService;
 import com.atzuche.order.delivery.vo.CarBO;
 import com.atzuche.order.delivery.vo.HandoverCarRenYunVO;
@@ -45,10 +45,10 @@ public class HandoverCarService {
     DelegationCarAdminMapper delegationCarAdminMapper;
 
     @Autowired
-    MemberService memberService;
+    DeliveryMemberService deliveryMemberService;
 
     @Autowired
-    OrderService orderService;
+    DeliveryOrderService deliveryOrderService;
     @Resource
     RenterHandoverCarInfoMapper renterHandoverCarInfoMapper;
     @Resource
@@ -96,7 +96,7 @@ public class HandoverCarService {
                     //查询代管车管理员
                     Long delegatMobile = delegationCarAdminMapper.getAdminMobileByCarNo(orderInfoVO.getCarNo());
                     if (delegatMobile != null) {
-                        toMemNo = memberService.getMemNoByMobile(delegatMobile.toString()).toString();
+                        toMemNo = deliveryMemberService.getMemNoByMobile(delegatMobile.toString()).toString();
                     }
                 }
                 if (handoverCarVO.getServiceType().equals(ServiceTypeEnum.TAKE_TYPE.getValue())) {
