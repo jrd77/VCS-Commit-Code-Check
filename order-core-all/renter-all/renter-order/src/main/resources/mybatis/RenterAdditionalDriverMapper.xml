@@ -7,6 +7,7 @@
         <result property="id" column="id"/>
         <result property="orderNo" column="order_no"/>
         <result property="renterOrderNo" column="renter_order_no"/>
+        <result property="driverId" column="driver_id"/>
         <result property="realName" column="real_name"/>
         <result property="phone" column="phone"/>
         <result property="isUse" column="is_use"/>
@@ -19,18 +20,18 @@
 
 
 	<sql id="Base_Column_List">
-	`id`, 	
-	`order_no`, 	
-	`renter_order_no`, 	
-	`real_name`, 	
-	`phone`, 	
-	`is_use`, 	
-	`create_time`, 	
-	`create_op`, 	
-	`update_time`, 	
-	`update_op`, 	
-	`is_delete`	
-
+        `id`,
+        `order_no`,
+        `renter_order_no`,
+        `driver_id`,
+        `real_name`,
+        `phone`,
+        `is_use`,
+        `create_time`,
+        `create_op`,
+        `update_time`,
+        `update_op`,
+        `is_delete`
 	</sql>
 
 
@@ -39,69 +40,70 @@
 	</select>
 
 	<insert id="insert" parameterType="com.atzuche.order.renterorder.entity.RenterAdditionalDriverEntity" useGeneratedKeys="true" keyProperty="id">
-		insert into renter_additional_driver
-		(
-				`order_no`,		
-				`renter_order_no`,		
-				`real_name`,		
-				`phone`,		
-				`is_use`,		
-				`create_time`,		
-				`create_op`,		
-				`update_time`,		
-				`update_op`,		
-				`is_delete`		
-			)
-		values
-		(
-				#{orderNo}, 		
-				#{renterOrderNo}, 		
-				#{realName}, 		
-				#{phone}, 		
-				#{isUse}, 		
-				#{createTime}, 		
-				#{createOp}, 		
-				#{updateTime}, 		
-				#{updateOp}, 		
-				#{isDelete}		
-			)
+		insert into renter_additional_driver (
+            `order_no`,
+            `renter_order_no`,
+            `driver_id`,
+            `real_name`,
+            `phone`,
+            `is_use`,
+            `create_time`,
+            `create_op`,
+            `update_time`,
+            `update_op`,
+            `is_delete`
+        ) values (
+            #{orderNo},
+            #{renterOrderNo},
+            #{driverId},
+            #{realName},
+            #{phone},
+            #{isUse},
+            #{createTime},
+            #{createOp},
+            #{updateTime},
+            #{updateOp},
+            #{isDelete}
+        )
 	</insert>
 	
 	<insert id="insertSelective" parameterType="com.atzuche.order.renterorder.entity.RenterAdditionalDriverEntity" useGeneratedKeys="true" keyProperty="id">
-		insert into renter_additional_driver
-		(
-				<if test="orderNo != null">`order_no`, </if>
-				<if test="renterOrderNo != null">`renter_order_no`, </if>
-				<if test="realName != null">`real_name`, </if>
-				<if test="phone != null">`phone`, </if>
-				<if test="isUse != null">`is_use`, </if>
-				<if test="createTime != null">`create_time`, </if>
-				<if test="createOp != null">`create_op`, </if>
-				<if test="updateTime != null">`update_time`, </if>
-				<if test="updateOp != null">`update_op`, </if>
-				<if test="isDelete != null">`is_delete` </if>
-			)
+		insert into renter_additional_driver (
+            <if test="orderNo != null">`order_no`, </if>
+            <if test="renterOrderNo != null">`renter_order_no`, </if>
+            <if test="driverId != null">`driver_id`, </if>
+            <if test="realName != null">`real_name`, </if>
+            <if test="phone != null">`phone`, </if>
+            <if test="isUse != null">`is_use`, </if>
+            <if test="createTime != null">`create_time`, </if>
+            <if test="createOp != null">`create_op`, </if>
+            <if test="updateTime != null">`update_time`, </if>
+            <if test="updateOp != null">`update_op`, </if>
+            <if test="isDelete != null">`is_delete` </if>
+        )
 		values
 		(
-				<if test="orderNo != null">#{orderNo},  </if>
-				<if test="renterOrderNo != null">#{renterOrderNo},  </if>
-				<if test="realName != null">#{realName},  </if>
-				<if test="phone != null">#{phone},  </if>
-				<if test="isUse != null">#{isUse},  </if>
-				<if test="createTime != null">#{createTime},  </if>
-				<if test="createOp != null">#{createOp},  </if>
-				<if test="updateTime != null">#{updateTime},  </if>
-				<if test="updateOp != null">#{updateOp},  </if>
-				<if test="isDelete != null">#{isDelete} </if>
-			)
+            <if test="orderNo != null">#{orderNo},  </if>
+            <if test="renterOrderNo != null">#{renterOrderNo},  </if>
+            <if test="driverId != null">#{driverId}, </if>
+            <if test="realName != null">#{realName},  </if>
+            <if test="phone != null">#{phone},  </if>
+            <if test="isUse != null">#{isUse},  </if>
+            <if test="createTime != null">#{createTime},  </if>
+            <if test="createOp != null">#{createOp},  </if>
+            <if test="updateTime != null">#{updateTime},  </if>
+            <if test="updateOp != null">#{updateOp},  </if>
+            <if test="isDelete != null">#{isDelete} </if>
+        )
 	</insert>
 	
 	 
 	<update id="updateByPrimaryKeySelective" parameterType="com.atzuche.order.renterorder.entity.RenterAdditionalDriverEntity">
 		update renter_additional_driver 
-		<set>
+		    <set>
 				<if test="orderNo != null">`order_no` = #{orderNo}, </if>
 				<if test="renterOrderNo != null">`renter_order_no` = #{renterOrderNo}, </if>
+                <if test="driverId != null">`driver_id` = #{driverId}, </if>
 				<if test="realName != null">`real_name` = #{realName}, </if>
 				<if test="phone != null">`phone` = #{phone}, </if>
 				<if test="isUse != null">`is_use` = #{isUse}, </if>
@@ -116,9 +118,10 @@
 	
 	<update id="updateByPrimaryKey" parameterType="com.atzuche.order.renterorder.entity.RenterAdditionalDriverEntity">
 		update renter_additional_driver 
-		<set>
+		    <set>
 				`order_no` = #{orderNo}, 		
-				`renter_order_no` = #{renterOrderNo}, 		
+				`renter_order_no` = #{renterOrderNo},
+                `driver_id` = #{driverId},
 				`real_name` = #{realName}, 		
 				`phone` = #{phone}, 		
 				`is_use` = #{isUse}, 		
@@ -127,8 +130,7 @@
 				`update_time` = #{updateTime}, 		
 				`update_op` = #{updateOp}, 		
 				`is_delete` = #{isDelete}		
-	
-		</set>
+		    </set>
 		where id = #{id}
 	</update>
   	
