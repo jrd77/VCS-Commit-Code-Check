@@ -293,7 +293,7 @@ public class RenterOrderService {
      * @param renterOrderReqVO       租客订单请求信息
      * @return MemAvailCouponRequestVO 优惠券请求信息
      */
-    private MemAvailCouponRequestVO buildMemAvailCouponRequestVO(RenterOrderCostRespDTO renterOrderCostRespDTO,
+    public MemAvailCouponRequestVO buildMemAvailCouponRequestVO(RenterOrderCostRespDTO renterOrderCostRespDTO,
                                                                  RenterOrderReqVO renterOrderReqVO) {
 
         MemAvailCouponRequestVO memAvailCouponRequestVO = new MemAvailCouponRequestVO();
@@ -331,7 +331,7 @@ public class RenterOrderService {
      * @param rentAmt          原始租金(车主券优先级最高)
      * @return OwnerCouponGetAndValidReqVO 车主券请求参数
      */
-    private OwnerCouponGetAndValidReqVO buildOwnerCouponGetAndValidReqVO(RenterOrderReqVO renterOrderReqVO,
+    public OwnerCouponGetAndValidReqVO buildOwnerCouponGetAndValidReqVO(RenterOrderReqVO renterOrderReqVO,
                                                                          int rentAmt) {
         OwnerCouponGetAndValidReqVO ownerCouponGetAndValidReqVO = new OwnerCouponGetAndValidReqVO();
         ownerCouponGetAndValidReqVO.setCarNo(Integer.valueOf(renterOrderReqVO.getCarNo()));
