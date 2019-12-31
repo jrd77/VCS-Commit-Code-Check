@@ -1,7 +1,7 @@
 package com.atzuche.order.coreapi.enums;
 
 public enum  SubmitOrderErrorEnum {
-    FEIGN_GET_MEMBER_ERROR("500100","获取会员信息异常"),
+
     FEIGN_GET_RENTER_MEMBER_ERROR("500101","获取租客会员信息异常"),
     FEIGN_GET_RENTER_MEMBER_FAIL("500102","获取租客会员信息失败"),
     FEIGN_GET_OWNER_MEMBER_ERROR("500103","获取车主会员信息异常"),
