@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.atzuche.delivery.mapper.DeliveryHttpLogMapper">
+<mapper namespace="com.atzuche.order.delivery.mapper.DeliveryHttpLogMapper">
 
-    <resultMap type="com.atzuche.delivery.entity.DeliveryHttpLogEntity" id="BaseResultMap">
+    <resultMap type="com.atzuche.order.delivery.entity.DeliveryHttpLogEntity" id="BaseResultMap">
         <result property="id" column="id"/>
         <result property="requestUrl" column="request_url"/>
         <result property="requestMethodType" column="request_method_type"/>
@@ -42,7 +42,7 @@
 		select <include refid="Base_Column_List" /> from delivery_http_log where id = #{value}
 	</select>
 
-	<insert id="insert" parameterType="com.atzuche.delivery.entity.DeliveryHttpLogEntity" useGeneratedKeys="true" keyProperty="id">
+	<insert id="insert" parameterType="com.atzuche.order.delivery.entity.DeliveryHttpLogEntity" useGeneratedKeys="true" keyProperty="id">
 		insert into delivery_http_log
 		(
 				`request_url`,		
@@ -75,7 +75,7 @@
 			)
 	</insert>
 	
-	<insert id="insertSelective" parameterType="com.atzuche.delivery.entity.DeliveryHttpLogEntity" useGeneratedKeys="true" keyProperty="id">
+	<insert id="insertSelective" parameterType="com.atzuche.order.delivery.entity.DeliveryHttpLogEntity" useGeneratedKeys="true" keyProperty="id">
 		insert into delivery_http_log
 		(
 				<if test="requestUrl != null">`request_url`, </if>
@@ -109,7 +109,7 @@
 	</insert>
 	
 	 
-	<update id="updateByPrimaryKeySelective" parameterType="com.atzuche.delivery.entity.DeliveryHttpLogEntity">
+	<update id="updateByPrimaryKeySelective" parameterType="com.atzuche.order.delivery.entity.DeliveryHttpLogEntity">
 		update delivery_http_log 
 		<set>
 				<if test="requestUrl != null">`request_url` = #{requestUrl}, </if>
@@ -128,7 +128,7 @@
 		where id = #{id}
 	</update>
 	
-	<update id="updateByPrimaryKey" parameterType="com.atzuche.delivery.entity.DeliveryHttpLogEntity">
+	<update id="updateByPrimaryKey" parameterType="com.atzuche.order.delivery.entity.DeliveryHttpLogEntity">
 		update delivery_http_log 
 		<set>
 				`request_url` = #{requestUrl}, 		

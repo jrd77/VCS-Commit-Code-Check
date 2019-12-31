@@ -1,8 +1,9 @@
 package com.atzuche.order.renterorder.entity;
 
+import lombok.Data;
+
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import lombok.Data;
 
 
 /**
@@ -57,7 +58,7 @@ public class RenterOrderEntity implements Serializable {
 	 */
 	private Integer agreeFlag;
 	/**
-	 * 子单状态
+	 * 租客子单状态，1：进行中，2：已完结，3：已结束
 	 */
 	private Integer childStatus;
 	/**

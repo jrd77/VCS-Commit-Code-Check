@@ -15,6 +15,7 @@ import com.atzuche.order.commons.entity.dto.RenterMemberDTO;
 import com.atzuche.order.commons.enums.account.FreeDepositTypeEnum;
 import com.atzuche.order.commons.vo.req.NormalOrderReqVO;
 import com.atzuche.order.commons.vo.res.NormalOrderResVO;
+import com.atzuche.order.delivery.service.delivery.DeliveryCarService;
 import com.atzuche.order.owner.commodity.service.OwnerGoodsService;
 import com.atzuche.order.owner.mem.service.OwnerMemberService;
 import com.atzuche.order.ownercost.entity.dto.OwnerOrderReqDTO;
@@ -71,6 +72,8 @@ public class SubmitOrderService {
     private OwnerOrderService ownerOrderService;
     @Autowired
     private CashierService cashierService;
+    @Autowired
+    private DeliveryCarService deliveryCarService;
 
     /**
      * 提交订单
@@ -160,6 +163,7 @@ public class SubmitOrderService {
         ownerMemberService.save(ownerMemberDTO);
 
         //配送订单处理..............
+        deliveryCarService.addRenYunFlowOrderInfo(null);
 
 
         //6.主订单相关信息处理
@@ -226,6 +230,7 @@ public class SubmitOrderService {
         orderDTO.setIsOutCity(normalOrderReqVO.getIsLeaveCity());
         orderDTO.setReqTime(LocalDateTime.now());
         orderDTO.setIsUseAirPortService(normalOrderReqVO.getUseAirportService());
+
         LOGGER.info("Build order dto,result is ,orderDTO:[{}]", JSON.toJSONString(orderDTO));
         return orderDTO;
     }
