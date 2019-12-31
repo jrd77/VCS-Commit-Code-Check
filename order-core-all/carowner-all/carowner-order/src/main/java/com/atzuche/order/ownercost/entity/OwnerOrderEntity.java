@@ -66,7 +66,7 @@ public class OwnerOrderEntity implements Serializable {
 	 */
 	private String goodsType;
 	/**
-	 * 车主子单状态，1：进行中，2：已完成，3：已取消
+	 * 租客子单状态，1：进行中，2：已完结，3：已结束
 	 */
 	private Integer childStatus;
 	/**
