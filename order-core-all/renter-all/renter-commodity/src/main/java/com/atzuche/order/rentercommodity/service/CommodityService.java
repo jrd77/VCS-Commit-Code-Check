@@ -68,16 +68,6 @@ public class CommodityService {
         combination(renterGoodsDetailDTO);
         return renterGoodsDetailDTO;
     }
-    /*
-     * @Author ZhangBin
-     * @Date 2019/12/18 10:16
-     * @Description: 保存商品信息
-     * 
-     **/
-    public void saveCommodity(OrderContextDTO orderContextDto){
-        renterGoodsService.save(orderContextDto);
-    }
-
 
 
     //组合

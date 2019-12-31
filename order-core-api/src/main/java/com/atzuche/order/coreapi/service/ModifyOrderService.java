@@ -33,6 +33,7 @@ import com.atzuche.order.coreapi.utils.ModifyOrderUtils;
 import com.atzuche.order.parentorder.entity.OrderEntity;
 import com.atzuche.order.parentorder.service.OrderService;
 import com.atzuche.order.rentercommodity.service.CommodityService;
+import com.atzuche.order.rentercommodity.service.RenterGoodsService;
 import com.atzuche.order.rentercost.entity.RenterOrderCostDetailEntity;
 import com.atzuche.order.rentercost.entity.RenterOrderFineDeatailEntity;
 import com.atzuche.order.rentercost.entity.RenterOrderSubsidyDetailEntity;
@@ -97,6 +98,8 @@ public class ModifyOrderService {
 	private AutoCoinService autoCoinService;
 	@Autowired
 	private AutoCoinCostCalService autoCoinCostCalService;
+	@Autowired
+	private RenterGoodsService renterGoodsService;
 
 	/**
 	 * 修改订单主逻辑
@@ -149,18 +152,49 @@ public class ModifyOrderService {
 		CostBaseDTO costBaseDTO = new CostBaseDTO(modifyOrderDTO.getOrderNo(), modifyOrderDTO.getRenterOrderNo(), modifyOrderDTO.getMemNo(), modifyOrderDTO.getRentTime(), modifyOrderDTO.getRevertTime());
 		// 获取抵扣补贴(含车主券，限时立减，取还车券，平台券和凹凸币)
 		CostDeductVO costDeductVO = getCostDeductVO(modifyOrderDTO, costBaseDTO, renterOrderCostRespDTO, renterOrderReqVO, orderEntity, initSubsidyList);
-		
+		// 聚合租客补贴
+		renterOrderCostRespDTO.setRenterOrderSubsidyDetailDTOList(getPolymerizationSubsidy(renterOrderCostRespDTO, costDeductVO));
+		// 
 		// 修改前费用
 		
 		// 修改后费用
 		
 		// 入库
 		// 保存租客商品信息
-		//commodityService.saveCommodity(orderContextDto);
+		renterGoodsService.save(renterGoodsDetailDTO);
+		// 保存租客会员信息
+		renterMemberService.save(renterMemberDTO);
+		// 保存租客子单信息
+		renterOrderService.saveRenterOrder(renterOrderNew);
+		// 保存基本费用和补贴
+		renterOrderCalCostService.saveOrderCostAndDeailList(renterOrderCostRespDTO);
+		// 保存罚金
+		renterOrderFineDeatailService.saveRenterOrderFineDeatailBatch(renterFineList);
+		// 
 		
 		// TODO 发送MQ
 		
 		return null;
+	}
+	
+	/**
+	 * 聚合租客补贴
+	 * @param renterOrderCostRespDTO
+	 * @param costDeductVO
+	 * @return List<RenterOrderSubsidyDetailDTO>
+	 */
+	public List<RenterOrderSubsidyDetailDTO> getPolymerizationSubsidy(RenterOrderCostRespDTO renterOrderCostRespDTO, CostDeductVO costDeductVO) {
+		// 补贴
+		List<RenterOrderSubsidyDetailDTO> renterOrderSubsidyDetailDTOList = renterOrderCostRespDTO.getRenterOrderSubsidyDetailDTOList();
+		List<RenterOrderSubsidyDetailDTO> renterSubsidyList = costDeductVO.getRenterSubsidyList();
+		List<RenterOrderSubsidyDetailDTO> rosdList = new ArrayList<RenterOrderSubsidyDetailDTO>();
+		if (renterOrderSubsidyDetailDTOList != null && !renterOrderSubsidyDetailDTOList.isEmpty()) {
+			rosdList.addAll(renterOrderSubsidyDetailDTOList);
+		}
+		if (renterSubsidyList != null && !renterSubsidyList.isEmpty()) {
+			rosdList.addAll(renterSubsidyList);
+		}
+		return rosdList;
 	}
 	
 	
@@ -342,6 +376,25 @@ public class ModifyOrderService {
 		renterOrderNew.setRenterOrderNo(modifyOrderDTO.getRenterOrderNo());
 		renterOrderNew.setId(null);
 		renterOrderNew.setChildStatus(RenterOrderStatusEnum.WAIT_PAY.getCode());
+		renterOrderNew.setIsUseCoin(modifyOrderDTO.getUserCoinFlag());
+		if (StringUtils.isNotBlank(modifyOrderDTO.getCarOwnerCouponId()) || 
+				StringUtils.isNotBlank(modifyOrderDTO.getPlatformCouponId()) || 
+				StringUtils.isNotBlank(modifyOrderDTO.getSrvGetReturnCouponId())) {
+			renterOrderNew.setIsUseCoupon(1);
+		} else {
+			renterOrderNew.setIsUseCoupon(0);
+		}
+		renterOrderNew.setIsGetCar(modifyOrderDTO.getSrvGetFlag());
+		renterOrderNew.setIsReturnCar(modifyOrderDTO.getSrvReturnFlag());
+		int addDriver = modifyOrderDTO.getDriverIds() == null ? 0:modifyOrderDTO.getDriverIds().size();
+		renterOrderNew.setAddDriver(addDriver);
+		renterOrderNew.setIsAbatement(modifyOrderDTO.getAbatementFlag());
+		renterOrderNew.setIsEffective(0);
+		renterOrderNew.setAgreeFlag(0);
+		renterOrderNew.setCreateOp(null);
+		renterOrderNew.setCreateTime(null);
+		renterOrderNew.setUpdateOp(null);
+		renterOrderNew.setUpdateTime(null);
 		return renterOrderNew;
 	}
 	
@@ -360,7 +413,11 @@ public class ModifyOrderService {
 		List<RenterOrderSubsidyDetailDTO> subsidyList = getRenterSubsidyList(renterOrderCostReqDTO, modifyOrderDTO.getRenterSubsidyList(), initCostList, initSubsidyList);
 		renterOrderCostReqDTO.setSubsidyOutList(subsidyList);
 		// 获取计算好的费用信息
-		return renterOrderCalCostService.getOrderCostAndDeailList(renterOrderCostReqDTO);
+		RenterOrderCostRespDTO renterOrderCostRespDTO = renterOrderCalCostService.getOrderCostAndDeailList(renterOrderCostReqDTO);
+		renterOrderCostRespDTO.setOrderNo(modifyOrderDTO.getOrderNo());
+		renterOrderCostRespDTO.setRenterOrderNo(modifyOrderDTO.getRenterOrderNo());
+		renterOrderCostRespDTO.setMemNo(modifyOrderDTO.getMemNo());
+		return renterOrderCostRespDTO;
 	}
 	
 	/**
