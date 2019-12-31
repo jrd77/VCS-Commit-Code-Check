@@ -1,15 +1,18 @@
 package com.atzuche.order.ownercost.service;
 
 
+import com.atzuche.order.ownercost.entity.OwnerOrderEntity;
+import com.atzuche.order.ownercost.entity.dto.OwnerOrderReqDTO;
 import com.atzuche.order.ownercost.mapper.OwnerOrderMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.atzuche.order.ownercost.entity.*;
 
 @Service
 public class OwnerOrderService {
     @Autowired
     private OwnerOrderMapper ownerOrderMapper;
+    @Autowired
+    private OwnerOrderCalCostService ownerOrderCalCostService;
 
     /*
      * @Author ZhangBin
@@ -40,5 +43,18 @@ public class OwnerOrderService {
     }
 
 
+    /*
+     * @Author ZhangBin
+     * @Date 2019/12/31 14:45
+     * @Description: 生成车主订单
+     * 
+     **/
+    public void generateRenterOrderInfo(OwnerOrderReqDTO ownerOrderReqDTO){
+        //1、生成车主子订单
+        saveOwnerOrder(null);
+        //2、生成费用信息
+        ownerOrderCalCostService.getOrderCostAndDeailList(null);
+
+    }
 
 }

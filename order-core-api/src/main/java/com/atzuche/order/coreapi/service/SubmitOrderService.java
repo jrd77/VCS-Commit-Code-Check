@@ -13,6 +13,7 @@ import com.atzuche.order.commons.vo.res.NormalOrderResVO;
 import com.atzuche.order.coreapi.entity.request.SubmitOrderReq;
 import com.atzuche.order.owner.commodity.service.OwnerGoodsService;
 import com.atzuche.order.owner.mem.service.OwnerMemberService;
+import com.atzuche.order.ownercost.service.OwnerOrderService;
 import com.atzuche.order.parentorder.dto.OrderDTO;
 import com.atzuche.order.parentorder.dto.OrderSourceStatDTO;
 import com.atzuche.order.parentorder.dto.OrderStatusDTO;
@@ -61,6 +62,8 @@ public class SubmitOrderService {
     private OwnerMemberService ownerMemberService;
     @Autowired
     private OwnerGoodsService ownerGoodsService;
+    @Autowired
+    private OwnerOrderService ownerOrderService;
 
     public ResponseData submitOrder(SubmitOrderReq submitReqDto) {
         //调用日志模块 TODO
@@ -173,7 +176,7 @@ public class SubmitOrderService {
         //5.1.生成车主子订单号
         String ownerOrderNo = uniqueOrderNoService.getOwnerOrderNo(orderNo);
         //5.2.调用车主订单模块处理车主订单相关业务
-
+        ownerOrderService.generateRenterOrderInfo(null);
         //5.3.接收车主订单返回信息
 
         //5.4.车主商品
