@@ -1,7 +1,5 @@
 package com.atzuche.order.coreapi.submitOrder.exception;
 
-import com.atzuche.order.coreapi.enums.SubmitOrderErrorEnum;
-import com.autoyol.commons.web.ErrorCode;
 /*
  * @Author ZhangBin
  * @Date 2019/12/12 16:20

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.atzuche.delivery.mapper.OwnerHandoverCarInfoMapper">
+<mapper namespace="com.atzuche.order.delivery.mapper.OwnerHandoverCarInfoMapper">
 
-    <resultMap type="com.atzuche.delivery.entity.OwnerHandoverCarInfoEntity" id="BaseResultMap">
+    <resultMap type="com.atzuche.order.delivery.entity.OwnerHandoverCarInfoEntity" id="BaseResultMap">
         <result property="id" column="id"/>
         <result property="orderNo" column="order_no"/>
         <result property="ownerOrderNo" column="owner_order_no"/>
@@ -29,6 +29,7 @@
         <result property="updateTime" column="update_time"/>
         <result property="updateOp" column="update_op"/>
         <result property="isDelete" column="is_delete"/>
+        <result property="msgId" column="msg_id"/>
     </resultMap>
 
 
@@ -57,7 +58,8 @@
 	`create_op`, 	
 	`update_time`, 	
 	`update_op`, 	
-	`is_delete`	
+	`is_delete`, 	
+	`msg_id`	
 
 	</sql>
 
@@ -66,7 +68,7 @@
 		select <include refid="Base_Column_List" /> from owner_handover_car_info where id = #{value}
 	</select>
 
-	<insert id="insert" parameterType="com.atzuche.delivery.entity.OwnerHandoverCarInfoEntity" useGeneratedKeys="true" keyProperty="id">
+	<insert id="insert" parameterType="com.atzuche.order.delivery.entity.OwnerHandoverCarInfoEntity" useGeneratedKeys="true" keyProperty="id">
 		insert into owner_handover_car_info
 		(
 				`order_no`,		
@@ -92,7 +94,8 @@
 				`create_op`,		
 				`update_time`,		
 				`update_op`,		
-				`is_delete`		
+				`is_delete`,		
+				`msg_id`		
 			)
 		values
 		(
@@ -119,11 +122,12 @@
 				#{createOp}, 		
 				#{updateTime}, 		
 				#{updateOp}, 		
-				#{isDelete}		
+				#{isDelete}, 		
+				#{msgId}		
 			)
 	</insert>
 	
-	<insert id="insertSelective" parameterType="com.atzuche.delivery.entity.OwnerHandoverCarInfoEntity" useGeneratedKeys="true" keyProperty="id">
+	<insert id="insertSelective" parameterType="com.atzuche.order.delivery.entity.OwnerHandoverCarInfoEntity" useGeneratedKeys="true" keyProperty="id">
 		insert into owner_handover_car_info
 		(
 				<if test="orderNo != null">`order_no`, </if>
@@ -149,7 +153,8 @@
 				<if test="createOp != null">`create_op`, </if>
 				<if test="updateTime != null">`update_time`, </if>
 				<if test="updateOp != null">`update_op`, </if>
-				<if test="isDelete != null">`is_delete` </if>
+				<if test="isDelete != null">`is_delete`, </if>
+				<if test="msgId != null">`msg_id` </if>
 			)
 		values
 		(
@@ -176,12 +181,13 @@
 				<if test="createOp != null">#{createOp},  </if>
 				<if test="updateTime != null">#{updateTime},  </if>
 				<if test="updateOp != null">#{updateOp},  </if>
-				<if test="isDelete != null">#{isDelete} </if>
+				<if test="isDelete != null">#{isDelete},  </if>
+				<if test="msgId != null">#{msgId} </if>
 			)
 	</insert>
 	
 	 
-	<update id="updateByPrimaryKeySelective" parameterType="com.atzuche.delivery.entity.OwnerHandoverCarInfoEntity">
+	<update id="updateByPrimaryKeySelective" parameterType="com.atzuche.order.delivery.entity.OwnerHandoverCarInfoEntity">
 		update owner_handover_car_info 
 		<set>
 				<if test="orderNo != null">`order_no` = #{orderNo}, </if>
@@ -207,12 +213,13 @@
 				<if test="createOp != null">`create_op` = #{createOp}, </if>
 				<if test="updateTime != null">`update_time` = #{updateTime}, </if>
 				<if test="updateOp != null">`update_op` = #{updateOp}, </if>
-				<if test="isDelete != null">`is_delete` = #{isDelete}</if>
+				<if test="isDelete != null">`is_delete` = #{isDelete}, </if>
+				<if test="msgId != null">`msg_id` = #{msgId}</if>
 			</set>
 		where id = #{id}
 	</update>
 	
-	<update id="updateByPrimaryKey" parameterType="com.atzuche.delivery.entity.OwnerHandoverCarInfoEntity">
+	<update id="updateByPrimaryKey" parameterType="com.atzuche.order.delivery.entity.OwnerHandoverCarInfoEntity">
 		update owner_handover_car_info 
 		<set>
 				`order_no` = #{orderNo}, 		
@@ -238,10 +245,16 @@
 				`create_op` = #{createOp}, 		
 				`update_time` = #{updateTime}, 		
 				`update_op` = #{updateOp}, 		
-				`is_delete` = #{isDelete}		
+				`is_delete` = #{isDelete}, 		
+				`msg_id` = #{msgId}		
 	
 		</set>
 		where id = #{id}
 	</update>
+
+	<select id="queryObjectByMsgId" parameterType="string" resultType="string">
+		select msg_id from owner_handover_car_info
+		where msg_id = #{msgId} and is_delete = 0
+	</select>
   	
 </mapper>

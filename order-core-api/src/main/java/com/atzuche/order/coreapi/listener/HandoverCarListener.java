@@ -1,13 +1,16 @@
 package com.atzuche.order.coreapi.listener;
 
 import com.aliyun.mns.model.Message;
-import com.atzuche.delivery.common.DeliveryConstants;
-import com.atzuche.delivery.common.event.handler.HandoverCarAsyncEventPublish;
+import com.atzuche.order.delivery.common.DeliveryConstants;
+import com.atzuche.order.delivery.common.event.handler.HandoverCarAsyncEventPublish;
+import com.atzuche.order.delivery.service.handover.HandoverCarService;
 import com.autoyol.aliyunmq.annotations.AliyunMnsListener;
 import com.dianping.cat.Cat;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.stereotype.Component;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 
@@ -15,27 +18,29 @@ import javax.annotation.Resource;
  * @author 胡春林(所有listener走这包)
  * HandoverCarListener 监听交接车数据
  */
-@Slf4j
-@Component
+@Service
 public class HandoverCarListener {
 
-    @Resource
+    private static final Logger LOGGER = LoggerFactory.getLogger(HandoverCarListener.class);
+
+    @Autowired
     HandoverCarAsyncEventPublish handoverCarAsyncEventPublish;
+    @Autowired
+    HandoverCarService handoverCarService;
 
     @AliyunMnsListener(queueKey = DeliveryConstants.REN_YUN_QUEUE_KEY)
     public void onMessage(Message message) {
 
         if (null == message || StringUtils.isBlank(message.getMessageId())) {
-            log.info("任云返回数据出错-------->>>>>>message={}", message);
+            LOGGER.info("任云返回数据出错-------->>>>>>message={}", message);
         }
-        String msgId = "";
         try {
-            // todo 查询数据库是否存在mesId transProgressService.queryByMesId(messageIdPre);
+            String msgId = handoverCarService.getHandoverCarInfoByMsgId(message.getMessageId());
             if (StringUtils.isBlank(msgId)) {
                 handoverCarAsyncEventPublish.push(message);
             }
         } catch (Exception e) {
-            log.error("任云返回数据出错-------->>>>>>message={}", message.toString(), e);
+            LOGGER.error("任云返回数据出错-------->>>>>>message={}", message.toString(), e);
             Cat.logError("任云返回数据出错-------->>>>>>message={}" + message.toString(), e);
         }
     }
