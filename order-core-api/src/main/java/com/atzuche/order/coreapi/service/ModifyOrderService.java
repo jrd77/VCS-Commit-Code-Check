@@ -155,6 +155,8 @@ public class ModifyOrderService {
 		// 修改后费用
 		
 		// 入库
+		// 保存租客商品信息
+		//commodityService.saveCommodity(orderContextDto);
 		
 		// TODO 发送MQ
 		
