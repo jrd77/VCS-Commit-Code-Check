@@ -68,7 +68,7 @@ public class SubmitOrderService {
         //1.请求参数处理
         OrderReqContext reqContext = new OrderReqContext();
         reqContext.setNormalOrderReqVO(normalOrderReqVO);
-        reqContext.setRenterMemberDto(memberService.getRenterMemberInfo(String.valueOf(normalOrderReqVO.getMemNo())));
+        reqContext.setRenterMemberDto(memberService.getRenterMemberInfo(normalOrderReqVO.getMemNo()));
 
         CarService.CarDetailReqVO carDetailReqVO = new CarService.CarDetailReqVO();
         carDetailReqVO.setAddrIndex(StringUtils.isBlank(normalOrderReqVO.getCarAddrIndex()) ? 0 : Integer.parseInt(normalOrderReqVO.getCarAddrIndex()));

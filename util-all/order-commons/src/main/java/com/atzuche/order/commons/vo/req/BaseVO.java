@@ -89,7 +89,7 @@ public class BaseVO implements Serializable {
     private String androidID;
 
     @AutoDocProperty(value = "【公用参数】用户注册号,拦截器里注入", hidden = true)
-    private Integer memNo;
+    private String memNo;
 
     @JsonProperty(value = "schema")
     @AutoDocProperty(value = "【公用参数】,abTest分类，A或B", hidden = true)
@@ -223,11 +223,11 @@ public class BaseVO implements Serializable {
         this.androidID = androidID;
     }
 
-    public Integer getMemNo() {
+    public String getMemNo() {
         return memNo;
     }
 
-    public void setMemNo(Integer memNo) {
+    public void setMemNo(String memNo) {
         this.memNo = memNo;
     }
 
