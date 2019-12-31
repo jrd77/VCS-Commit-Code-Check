@@ -1,5 +1,6 @@
 package com.atzuche.order.coreapi.service;
 
+import com.atzuche.order.renterorder.entity.dto.DeductAndSubsidyContextDTO;
 import org.springframework.stereotype.Service;
 
 /*
@@ -11,5 +12,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class OwnerSubmitOrderService {
 
+    public void generateOwnerOrderInfo(DeductAndSubsidyContextDTO context){
+
+    }
 
 }
