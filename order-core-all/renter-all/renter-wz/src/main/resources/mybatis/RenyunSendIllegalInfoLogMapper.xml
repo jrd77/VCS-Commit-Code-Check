@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.atzuche.order.renterwz.mapper.RenyunSendIllegalInfoLogMapper">
+	<sql id="select_column">
+		id,wzcode,order_no,car_plate_num,data_type,jsondata,create_time,update_time,is_delete
+	</sql>
+
+	<resultMap id = "selectColumnMap" type="com.atzuche.order.renterwz.entity.RenyunSendIllegalInfoLogEntity">
+		<result property="id" column="id"/>
+		<result property="wzcode" column="wzcode"/>
+		<result property="orderno" column="order_no"/>
+		<result property="carPlateNum" column="car_plate_num"/>
+		<result property="dataType" column="data_type"/>
+		<result property="jsonData" column="jsondata"/>
+		<result property="createTime" column="create_time"/>
+		<result property="updateTime" column="update_time"/>
+		<result property="isDelete" column="is_delete"/>
+	</resultMap>
+
+	<insert id="saveRenyunSendIllegalInfoLog" parameterType="com.atzuche.order.renterwz.entity.RenyunSendIllegalInfoLogEntity" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+		insert into renyun_send_illegal_info_log(
+			wzcode,
+			order_no,
+			car_plate_num,
+			data_type,
+			jsondata,
+			is_delete,
+			create_time
+		) values (
+			#{wzcode},
+			#{orderno},
+			#{carPlateNum},
+			#{dataType},
+			#{jsonData},
+			#{isDelete},
+			#{createTime})
+	</insert>
+
+	<select id="queryRenyunSendIllegalInfoLogById" resultType="com.atzuche.order.renterwz.entity.RenyunSendIllegalInfoLogEntity">
+		select <include refid="select_column" />
+		from renyun_send_illegal_info_log
+		where id = #{id} and is_delete = 0
+	</select>
+
+	<select id="queryList" resultType="com.atzuche.order.renterwz.entity.RenyunSendIllegalInfoLogEntity">
+		select <include refid="select_column" />
+		from renyun_send_illegal_info_log
+		where is_delete = 0
+	</select>
+
+	 <update id="updateRenyunSendIllegalInfoLog" parameterType="com.atzuche.order.renterwz.entity.RenyunSendIllegalInfoLogEntity">
+		update renyun_send_illegal_info_log set
+		<if test="wzcode != null">
+			wzcode = #{wzcode},
+		</if>
+		<if test="orderNo != null">
+			order_no = #{orderNo},
+		</if>
+		<if test="carPlateNum != null">
+			car_plate_num = #{carPlateNum},
+		</if>
+		<if test="dataType != null">
+			data_type = #{dataType},
+		</if>
+		<if test="jsondata != null">
+			jsondata = #{jsondata},
+		</if>
+		<if test="createTime != null">
+			create_time = #{createTime},
+		</if>
+		<if test="isDelete != null">
+			is_delete = #{isDelete},
+		</if>
+		update_time = NOW()
+		where id = #{id} and is_delete = 0
+	</update>
+
+	 <update id="deleteRenyunSendIllegalInfoLogById" parameterType="java.lang.Long">
+		update renyun_send_illegal_info_log set
+		is_delete = 1,
+		update_time = NOW()
+		where id = #{id} and is_delete = 0
+	</update>
+
+	<select id="count" resultType="java.lang.Integer" >
+		select
+		count(*)
+		from renyun_send_illegal_info_log
+		where wzcode = #{wzcode} and data_type = #{dataType} and car_plate_num = #{carNum}
+  </select>
+
+</mapper>

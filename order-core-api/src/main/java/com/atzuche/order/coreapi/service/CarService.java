@@ -6,9 +6,10 @@ import com.atzuche.order.commons.LocalDateTimeUtils;
 import com.atzuche.order.commons.entity.dto.OwnerGoodsDetailDTO;
 import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
 import com.atzuche.order.commons.entity.dto.RenterGoodsPriceDetailDTO;
-import com.atzuche.order.coreapi.enums.SubmitOrderErrorEnum;
 import com.atzuche.order.coreapi.submitOrder.exception.CarDetailByFeignException;
-import com.atzuche.order.coreapi.submitOrder.exception.RenterMemberByFeignException;
+import com.atzuche.order.coreapi.submitOrder.exception.RenterCarDetailErrException;
+import com.atzuche.order.coreapi.submitOrder.exception.RenterCarDetailFailException;
+import com.atzuche.order.coreapi.submitOrder.exception.RenterMemberFailException;
 import com.autoyol.car.api.feign.api.CarDetailQueryFeignApi;
 import com.autoyol.car.api.model.dto.OrderCarInfoParamDTO;
 import com.autoyol.car.api.model.vo.*;
@@ -67,18 +68,18 @@ public class CarService {
             Cat.logEvent(CatConstants.FEIGN_RESULT,JSON.toJSONString(responseObject));
             if(responseObject == null || !ErrorCode.SUCCESS.getCode().equals(responseObject.getResCode())){
                 log.error("Feign 获取车辆信息失败,responseObject={},orderCarInfoParamDTO={}",JSON.toJSONString(responseObject),JSON.toJSONString(orderCarInfoParamDTO));
-                RenterMemberByFeignException renterMemberByFeignException = new RenterMemberByFeignException(SubmitOrderErrorEnum.FEIGN_GET_CAR_DETAIL_FAIL.getCode(), SubmitOrderErrorEnum.FEIGN_GET_CAR_DETAIL_FAIL.getText());
-                Cat.logError("Feign 获取车辆信息失败",renterMemberByFeignException);
-                throw renterMemberByFeignException;
+                RenterCarDetailFailException failException = new RenterCarDetailFailException();
+                Cat.logError("Feign 获取车辆信息失败",failException);
+                throw failException;
             }
             t.setStatus(Transaction.SUCCESS);
-        }catch (RenterMemberByFeignException e){
+        }catch (RenterCarDetailFailException e){
             Cat.logError("Feign 获取车辆信息失败",e);
             t.setStatus(e);
             throw e;
         }catch (Exception e){
             log.error("Feign 获取车辆信息异常,responseObject={},orderCarInfoParamDTO={}",JSON.toJSONString(responseObject),JSON.toJSONString(orderCarInfoParamDTO),e);
-            CarDetailByFeignException carDetailByFeignException = new CarDetailByFeignException(SubmitOrderErrorEnum.FEIGN_GET_CAR_DETAIL_ERROR.getCode(), SubmitOrderErrorEnum.FEIGN_GET_CAR_DETAIL_ERROR.getText());
+            RenterCarDetailErrException carDetailByFeignException = new RenterCarDetailErrException();
             Cat.logError("Feign 获取车辆信息异常",carDetailByFeignException);
             throw carDetailByFeignException;
         }finally {
@@ -109,7 +110,6 @@ public class CarService {
         renterGoodsDetailDto.setCarDayMileage(carBaseVO.getDayMileage());
         renterGoodsDetailDto.setCarIntrod(carBaseVO.getCarDesc());
         renterGoodsDetailDto.setCarSurplusPrice(carBaseVO.getSurplusPrice());
-        //renterGoodsDetailDto.setCarUseSpecialPrice(reqVO.useSpecialPrice);
         renterGoodsDetailDto.setCarGuidePrice(carBaseVO.getGuidePrice());
         renterGoodsDetailDto.setCarStatus(carBaseVO.getStatus());
         renterGoodsDetailDto.setCarImageUrl(getCoverPic(detailImageVO));
@@ -155,7 +155,7 @@ public class CarService {
         return renterGoodsDetailDto;
     }
     //获取车主商品信息
-    public OwnerGoodsDetailDTO getOwnerGoodsDetail(RenterGoodsDetailDTO renterGoodsDetailDto) throws CarDetailByFeignException, RenterMemberByFeignException {
+    public OwnerGoodsDetailDTO getOwnerGoodsDetail(RenterGoodsDetailDTO renterGoodsDetailDto) throws CarDetailByFeignException, RenterMemberFailException {
         OwnerGoodsDetailDTO ownerGoodsDetailDto = new OwnerGoodsDetailDTO();
         BeanUtils.copyProperties(renterGoodsDetailDto, ownerGoodsDetailDto);
         return ownerGoodsDetailDto;
