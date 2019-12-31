@@ -11,6 +11,6 @@ import com.atzuche.order.commons.enums.ErrorCode;
 public class RenterMemberErrException extends SubmitOrderException  {
 
     public RenterMemberErrException() {
-        super(ErrorCode.FEIGN_GET_MEMBER_ERROR.getCode(),ErrorCode.FEIGN_GET_MEMBER_ERROR.getText());
+        super(ErrorCode.FEIGN_RENTER_MEMBER_ERROR.getCode(),ErrorCode.FEIGN_RENTER_MEMBER_ERROR.getText());
     }
 }

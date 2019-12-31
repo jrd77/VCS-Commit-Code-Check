@@ -3,7 +3,6 @@ package com.atzuche.order.coreapi.service;
 import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.CatConstants;
 import com.atzuche.order.commons.LocalDateTimeUtils;
-import com.atzuche.order.commons.OrderException;
 import com.atzuche.order.commons.entity.dto.OwnerMemberDTO;
 import com.atzuche.order.commons.entity.dto.OwnerMemberRightDTO;
 import com.atzuche.order.commons.entity.dto.RenterMemberDTO;
@@ -11,7 +10,6 @@ import com.atzuche.order.commons.entity.dto.RenterMemberRightDTO;
 import com.atzuche.order.commons.enums.MemberFlagEnum;
 import com.atzuche.order.commons.enums.OwnerMemRightEnum;
 import com.atzuche.order.commons.enums.RenterMemRightEnum;
-import com.atzuche.order.coreapi.enums.SubmitOrderErrorEnum;
 import com.atzuche.order.coreapi.submitOrder.exception.*;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
@@ -60,11 +58,11 @@ public class MemberService {
             Cat.logEvent(CatConstants.FEIGN_RESULT,JSON.toJSONString(responseData));
             if(responseData == null || !ErrorCode.SUCCESS.getCode().equals(responseData.getResCode())){
                 log.error("Feign 获取车主会员信息失败,memNo={},orderContextDto={}",memNo, JSON.toJSONString(responseData));
-                OwnerberByFeignException ownerberByFeignException = new OwnerberByFeignException(SubmitOrderErrorEnum.FEIGN_GET_OWNER_MEMBER_FAIL.getCode(), SubmitOrderErrorEnum.FEIGN_GET_OWNER_MEMBER_FAIL.getText());
-                throw ownerberByFeignException;
+                OwnerMemberFailException failException = new OwnerMemberFailException();
+                throw failException;
             }
             t.setStatus(Transaction.SUCCESS);
-        }catch (OrderException oe){
+        }catch (OwnerMemberFailException oe){
             Cat.logError("Feign 获取车主会员信息失败",oe);
             t.setStatus(oe);
             throw oe;
@@ -73,7 +71,7 @@ public class MemberService {
             t.setStatus(e);
             Cat.logError("Feign 获取车主会员信息失败",e);
             log.error("Feign 获取车主会员信息失败,orderContextDto={},memNo={}",memNo,e);
-            throw new OwnerberByFeignException(SubmitOrderErrorEnum.FEIGN_GET_OWNER_MEMBER_ERROR.getCode(),SubmitOrderErrorEnum.FEIGN_GET_OWNER_MEMBER_ERROR.getText());
+            throw new OwnerMemberErrException();
         }finally {
             t.complete();
         }
@@ -181,7 +179,6 @@ public class MemberService {
             if(responseData == null || !ErrorCode.SUCCESS.getCode().equals(responseData.getResCode()) || responseData.getData() == null){
                 log.error("Feign 获取租客会员信息失败,memNo={},responseData={}",memNo,JSON.toJSONString(responseData));
                 RenterMemberFailException renterMemberByFeignException = new RenterMemberFailException();
-
                 throw renterMemberByFeignException;
             }
             t.setStatus(Transaction.SUCCESS);

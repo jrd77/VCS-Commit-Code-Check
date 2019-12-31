@@ -53,6 +53,10 @@ public class OwnerOrderReqDTO {
      */
     private Integer replyFlag;
     /**
+     * 是否使用特供价 0-否，1-是
+     */
+    private Integer isUseSpecialPrice;
+    /**
      * 车辆号
      */
     private String carNo;

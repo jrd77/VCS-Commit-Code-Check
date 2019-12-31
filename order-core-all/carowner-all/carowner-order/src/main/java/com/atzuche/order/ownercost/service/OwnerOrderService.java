@@ -51,6 +51,9 @@ public class OwnerOrderService {
      **/
     public void generateRenterOrderInfo(OwnerOrderReqDTO ownerOrderReqDTO){
         //1、生成车主子订单
+        OwnerOrderEntity ownerOrderEntity = new OwnerOrderEntity();
+
+
         saveOwnerOrder(null);
         //2、生成费用信息
         ownerOrderCalCostService.getOrderCostAndDeailList(null);
