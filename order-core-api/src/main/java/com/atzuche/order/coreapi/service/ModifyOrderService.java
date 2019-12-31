@@ -6,7 +6,7 @@ import com.atzuche.order.coreapi.entity.dto.ModifyOrderDTO;
 import com.atzuche.order.coreapi.entity.request.ModifyOrderReq;
 import com.atzuche.order.coreapi.entity.vo.CostDeductVO;
 import com.atzuche.order.coreapi.modifyorder.exception.ModifyOrderParameterException;
-import com.atzuche.order.coreapi.service.CarService.CarDetailReqVO;
+import com.atzuche.order.coreapi.service.GoodsService.CarDetailReqVO;
 import com.atzuche.order.coreapi.utils.ModifyOrderUtils;
 import com.atzuche.order.delivery.entity.RenterOrderDeliveryEntity;
 import com.atzuche.order.delivery.service.RenterOrderDeliveryService;
@@ -53,7 +53,7 @@ public class ModifyOrderService {
 	@Autowired
 	private RenterMemberService renterMemberService;
 	@Autowired
-	private CarService carService;
+	private GoodsService goodsService;
 	@Autowired
 	private RenterCommodityService commodityService;
 	@Autowired
@@ -186,7 +186,7 @@ public class ModifyOrderService {
 	 */
 	public RenterGoodsDetailDTO getRenterGoodsDetailDTO(ModifyOrderDTO modifyOrderDTO, RenterOrderEntity renterOrderEntity) {
 		// 调远程获取最新租客商品详情
-		RenterGoodsDetailDTO renterGoodsDetailDTO = carService.getRenterGoodsDetail(convertToCarDetailReqVO(modifyOrderDTO, renterOrderEntity));
+		RenterGoodsDetailDTO renterGoodsDetailDTO = goodsService.getRenterGoodsDetail(convertToCarDetailReqVO(modifyOrderDTO, renterOrderEntity));
 		if (renterGoodsDetailDTO == null) {
 			log.error("getRenterGoodsDetailDTO renterGoodsDetailDTO为空");
 			Cat.logError("getRenterGoodsDetailDTO renterGoodsDetailDTO为空",new ModifyOrderParameterException());

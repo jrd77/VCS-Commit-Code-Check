@@ -3,7 +3,7 @@ package com.atzuche.order.delivery.service;
 import org.springframework.stereotype.Service;
 
 @Service
-public class OrderService {
+public class DeliveryOrderService {
 
     /**
      * 获取订单图片数据

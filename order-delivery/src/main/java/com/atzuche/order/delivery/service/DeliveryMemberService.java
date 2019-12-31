@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
  * 调取会员服务
  */
 @Service
-public class MemberService {
+public class DeliveryMemberService {
 
     /**
      * 根据手机号获取会员信息

@@ -2,7 +2,7 @@ package com.atzuche.order.delivery.common.platform;
 
 import com.alibaba.fastjson.JSON;
 import com.atzuche.order.delivery.model.PlatformModel;
-import com.atzuche.order.delivery.service.OrderService;
+import com.atzuche.order.delivery.service.DeliveryOrderService;
 import com.autoyol.aliyunmq.AliyunMnsService;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -31,7 +31,7 @@ public class PlatformMessageService {
     @Autowired
     private AliyunMnsService aliyunMnsService;
     @Autowired
-    private OrderService transService;
+    private DeliveryOrderService transService;
 
     /**车主了接受了您的订单，查看详情*/
     private static List<String> OWNER_ACCEPT_TRANS_EVENT = Arrays.asList("53");
