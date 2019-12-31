@@ -62,7 +62,6 @@ public class OwnerOrderService {
         //2、生成费用信息
 
         OwnerOrderCostReqDTO ownerOrderCostReqDTO = new OwnerOrderCostReqDTO();
-
         ownerOrderCostReqDTO.setCarOwnerType(ownerOrderReqDTO.getCarOwnerType());
         ownerOrderCostReqDTO.setSrvGetFlag(ownerOrderReqDTO.getSrvGetFlag());
         ownerOrderCostReqDTO.setSrvReturnFlag(ownerOrderReqDTO.getSrvReturnFlag());

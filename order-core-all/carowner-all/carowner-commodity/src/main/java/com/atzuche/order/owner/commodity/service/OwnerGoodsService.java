@@ -1,6 +1,5 @@
 package com.atzuche.order.owner.commodity.service;
 
-import com.atzuche.order.commons.entity.dto.OrderContextDTO;
 import com.atzuche.order.commons.entity.dto.OwnerGoodsDetailDTO;
 import com.atzuche.order.commons.entity.dto.OwnerGoodsPriceDetailDTO;
 import com.atzuche.order.owner.commodity.entity.OwnerGoodsEntity;
@@ -32,16 +31,14 @@ public class OwnerGoodsService{
 
         OwnerGoodsEntity goodsEntity = new OwnerGoodsEntity();
         BeanUtils.copyProperties(ownerGoodsDetailDTO,goodsEntity);
-        //goodsEntity.setCreateOp();
-        //goodsEntity.setUpdateOp();
         ownerGoodsMapper.insert(goodsEntity);
 
         List<OwnerGoodsPriceDetailDTO> goodsPriceDetailDtoList = ownerGoodsDetailDTO.getOwnerGoodsPriceDetailDTOList();
         List<OwnerGoodsPriceDetailEntity> goodsPriceList = new ArrayList<>();
         goodsPriceDetailDtoList.forEach(x->{
             OwnerGoodsPriceDetailEntity goodsPriceDetailEntity = new OwnerGoodsPriceDetailEntity();
-            goodsPriceDetailEntity.setOrderNo(x.getOrderNo());
-            goodsPriceDetailEntity.setOwnerOrderNo(x.getOwnerOrderNo());
+            goodsPriceDetailEntity.setOrderNo(ownerGoodsDetailDTO.getOrderNo());
+            goodsPriceDetailEntity.setOwnerOrderNo(ownerGoodsDetailDTO.getOwnerOrderNo());
             goodsPriceDetailEntity.setGoodsId(goodsEntity.getId());
             goodsPriceDetailEntity.setCarDay(x.getCarDay());
             goodsPriceDetailEntity.setCarUnitPrice(x.getCarUnitPrice());
