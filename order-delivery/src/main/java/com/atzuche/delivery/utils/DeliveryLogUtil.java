@@ -22,7 +22,7 @@ public class DeliveryLogUtil {
 
     public void addDeliveryLog(DeliveryHttpLogEntity deliveryHttpLogEntity) {
         deliveryHttpLogMapper.insert(deliveryHttpLogEntity);
-        logger.info("记录司机修改日志" + JSON.toJSONString(deliveryHttpLogEntity));
+        logger.info("记录发送到仁云日志" + JSON.toJSONString(deliveryHttpLogEntity));
     }
 
 }

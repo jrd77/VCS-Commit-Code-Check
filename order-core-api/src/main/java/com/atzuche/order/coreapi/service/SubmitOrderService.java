@@ -8,7 +8,6 @@ import com.atzuche.order.commons.constant.OrderConstant;
 import com.atzuche.order.commons.entity.dto.OrderContextDTO;
 import com.atzuche.order.commons.entity.dto.OwnerMemberDTO;
 import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
-import com.atzuche.order.commons.entity.dto.RenterMemberDTO;
 import com.atzuche.order.commons.vo.req.NormalOrderReqVO;
 import com.atzuche.order.commons.vo.res.NormalOrderResVO;
 import com.atzuche.order.coreapi.entity.request.SubmitOrderReq;
@@ -60,13 +59,13 @@ public class SubmitOrderService {
             //获取车主会员信息
             OwnerMemberDTO ownerMemberDto = memberService.getOwnerMemberInfo(renterGoodsDetailDto.getOwnerMemNo());
             //获取租客会员信息
-            RenterMemberDTO renterMemberDto = memberService.getRenterMemberInfo(submitReqDto.getMemNo());
+            //RenterMemberDTO renterMemberDto = memberService.getRenterMemberInfo(submitReqDto.getMemNo());
 
             //组装数据
             orderContextDto.setRenterGoodsDetailDto(renterGoodsDetailDto);
 //            orderContextDto.setOwnerGoodsDetailDto(ownerGoodsDetailDto);
             orderContextDto.setOwnerMemberDto(ownerMemberDto);
-            orderContextDto.setRenterMemberDto(renterMemberDto);
+           // orderContextDto.setRenterMemberDto(renterMemberDto);
 
 
             //开始校验规则 （前置校验 + 风控）TODO

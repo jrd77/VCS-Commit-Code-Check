@@ -64,6 +64,9 @@ public class AccountRenterDepositNoTService {
         if(Objects.isNull(accountRenterDepositEntity)){
             throw new PayOrderRenterDepositDBException();
         }
+        if("00".equals(accountRenterDepositEntity.getPayStatus())){
+            return;
+        }
         BeanUtils.copyProperties(payedOrderRenterDeposit,accountRenterDepositEntity);
         int result = accountRenterDepositMapper.updateByPrimaryKeySelective(accountRenterDepositEntity);
         if(result==0){

@@ -36,7 +36,7 @@ public class OrderPaySignReqVO {
     /**
      * 是否使用钱包支付
      */
-    private String isUseWallet;
+    private Boolean isUseWallet;
     /**
      * 操作人
      */
@@ -47,6 +47,28 @@ public class OrderPaySignReqVO {
      */
     private String operatorName;
 
+    /**
+     * 支付方式：transType "01"：消费，"02"：预授权， 消费方式："31"：消费撤销，"32"：预授权撤销，"03"：预授权完成，"04"：退货
+     */
+    private String payType;
+
+    /**
+     * 微信公众号openid
+     */
+    String openId;
+
+    /**
+     * 来源系统
+     */
+    String OS;
+    /**
+     * 支付环境
+     */
+    String payEnv;
+    /**
+     * 支付来源
+     */
+    String paySource;
 
     /**
      * 参数校验
@@ -54,6 +76,10 @@ public class OrderPaySignReqVO {
     public void check() {
         Assert.notNull(getMenNo(), ErrorCode.PARAMETER_ERROR.getText());
         Assert.notNull(getOrderNo(), ErrorCode.PARAMETER_ERROR.getText());
-        Assert.isTrue(!CollectionUtils.isEmpty(payKind), ErrorCode.PARAMETER_ERROR.getText());
+        Assert.notNull(getPayType(), ErrorCode.PARAMETER_ERROR.getText());
+        Assert.notNull(getOS(), ErrorCode.PARAMETER_ERROR.getText());
+        Assert.notNull(getPaySource(), ErrorCode.PARAMETER_ERROR.getText());
+
+        Assert.isTrue(!CollectionUtils.isEmpty(getPayKind()), ErrorCode.PARAMETER_ERROR.getText());
     }
 }

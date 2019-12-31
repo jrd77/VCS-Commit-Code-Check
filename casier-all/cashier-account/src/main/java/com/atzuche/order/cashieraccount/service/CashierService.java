@@ -1,6 +1,7 @@
 package com.atzuche.order.cashieraccount.service;
 
 import com.atzuche.order.cashieraccount.vo.req.pay.OrderPaySignReqVO;
+import com.atzuche.order.commons.enums.RenterCashCodeEnum;
 import com.atzuche.order.rentercost.entity.vo.PayableVO;
 import com.atzuche.order.settle.service.AccountDebtService;
 import com.atzuche.order.settle.vo.req.AccountDeductDebtReqVO;
@@ -335,37 +336,29 @@ public class CashierService {
         if(Objects.nonNull(orderPayAsynVO) && DataPayKindConstant.RENT.equals(orderPayAsynVO.getPayKind())){
             //1 对象初始化转换
             PayedOrderRenterDepositReqVO payedOrderRenterDeposit = cashierNoTService.getPayedOrderRenterDepositReq(orderPayAsynVO);
-            //2 租车押金 更新数据
-            accountRenterDepositService.updateRenterDeposit(payedOrderRenterDeposit);
-            //3 收银台记录更新
-            cashierNoTService.updataCashier(orderPayAsynVO);
+            //2 收银台记录更新
+            cashierNoTService.updataCashierAndRenterDeposit(orderPayAsynVO,payedOrderRenterDeposit);
         }
         //1.2 违章押金 02
         if(Objects.nonNull(orderPayAsynVO) && DataPayKindConstant.DEPOSIT.equals(orderPayAsynVO.getPayKind())){
             //1 对象初始化转换
             PayedOrderRenterWZDepositReqVO payedOrderRenterWZDeposit = cashierNoTService.getPayedOrderRenterWZDepositReq(orderPayAsynVO);
-            //2 违章押金 更新数据
-            accountRenterWzDepositService.updateRenterWZDeposit(payedOrderRenterWZDeposit);
-            //3 收银台记录更新
-            cashierNoTService.updataCashier(orderPayAsynVO);
+            //2 收银台记录更新
+            cashierNoTService.updataCashierAndRenterWzDeposit(orderPayAsynVO,payedOrderRenterWZDeposit);
         }
         //1.3 租车费用
-        if(Objects.nonNull(orderPayAsynVO) &&  DataPayKindConstant.TK_FEE.equals(orderPayAsynVO.getPayKind()) ){
+        if(Objects.nonNull(orderPayAsynVO) && DataPayKindConstant.TK_FEE.equals(orderPayAsynVO.getPayKind()) ){
             //1 对象初始化转换
-            AccountRenterCostReqVO accountRenterCostReq = cashierNoTService.getAccountRenterCostReq(orderPayAsynVO);
-            //2  实收租车费用落库 更新数据
-            accountRenterCostSettleService.insertRenterCostDetail(accountRenterCostReq);
-            //3 收银台记录更新
-            cashierNoTService.updataCashier(orderPayAsynVO);
+            AccountRenterCostReqVO accountRenterCostReq = cashierNoTService.getAccountRenterCostReq(orderPayAsynVO, RenterCashCodeEnum.ACCOUNT_RENTER_RENT_COST);
+            //2 收银台记录更新
+            cashierNoTService.updataCashierAndRenterCost(orderPayAsynVO,accountRenterCostReq);
         }
         //1.4 补付租车费用
-        if(Objects.nonNull(orderPayAsynVO) &&  DataPayKindConstant.RENT_INCREMENT.equals(orderPayAsynVO.getPayKind()) ){
+        if(Objects.nonNull(orderPayAsynVO) && DataPayKindConstant.RENT_INCREMENT.equals(orderPayAsynVO.getPayKind()) ){
             //1 对象初始化转换
-            AccountRenterCostReqVO accountRenterCostReq = cashierNoTService.getAccountRenterCostReq(orderPayAsynVO);
-            //2  实收租车费用落库 更新数据
-            accountRenterCostSettleService.insertRenterCostDetail(accountRenterCostReq);
-            //3 收银台记录更新
-            cashierNoTService.updataCashier(orderPayAsynVO);
+            AccountRenterCostReqVO accountRenterCostReq = cashierNoTService.getAccountRenterCostReq(orderPayAsynVO, RenterCashCodeEnum.ACCOUNT_RENTER_RENT_COST_AGAIN);
+            //2 收银台记录更新
+            cashierNoTService.updataCashierAndRenterCost(orderPayAsynVO,accountRenterCostReq);
         }
         //TODO 支付回调成功 push/或者短信 怎么处理
 

@@ -1,10 +1,7 @@
 package com.atzuche.order.cashieraccount.vo.res;
 
-import com.atzuche.order.commons.enums.RenterCashCodeEnum;
 import com.atzuche.order.rentercost.entity.vo.PayableVO;
-import com.google.common.collect.ImmutableList;
 import lombok.Data;
-import org.springframework.util.CollectionUtils;
 
 import java.util.List;
 
@@ -44,13 +41,26 @@ public class OrderPayableAmountResVO {
      */
     private List<AccountPayAbleResVO> accountPayAbles;
 
+    /**
+     * 应付租车费用明细
+     */
+    List<PayableVO> payableVOs;
 
     /**
-     * 钱包抵扣计算 最终支付金额及款项
+     * 应付租车费用
      */
-    public void useWalletPay(int payBalance){
-        setAmt(getAmt()>=payBalance?getAmt()-payBalance:0);
+    private Integer amtRent;
+    /**
+     * 应付租车车俩押金
+     */
+    private Integer amtDeposit;
+    /**
+     * 应付租车违章押金
+     */
+    private Integer amtWzDeposit;
 
-    }
-
+    /**
+     * 钱包抵扣金额
+     */
+    private int amtWallet;
 }

@@ -154,7 +154,15 @@
 		where id = #{id} and version = #{version}
 	</update>
     <select id="getPayDeposit" resultMap="BaseResultMap">
-        select <include refid="Base_Column_List" /> from cashier where order_no = #{orderNo} and mem_no = #{memNo} and pay_kind = #{payKind} and pay_type = #{payType} limit 1
+        select <include refid="Base_Column_List" /> from cashier where order_no = #{orderNo} and mem_no = #{memNo} and pay_kind = #{payKind} and pay_type = #{payType} order by id desc limit 1
+    </select>
+    <select id="getCashierRentCosts" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List" /> from cashier where order_no = #{orderNo} and mem_no = #{memNo} and pay_kind = #{payKind} and pay_type = #{payType}
+    </select>
+    <select id="getPayDetail" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List" /> from cashier where order_no = #{orderNo} and mem_no = #{memNo} and pay_kind = #{payKind} and pay_type = #{payType} and pay_source = #{paySource} order by id desc limit 1
+
+
     </select>
 
 

@@ -13,18 +13,22 @@ import java.util.List;
  * @date 2019-12-28 15:55:26
  */
 @Mapper
-public interface RenterOrderDeliveryMapper{
+public interface RenterOrderDeliveryMapper {
 
     RenterOrderDeliveryEntity selectByPrimaryKey(Integer id);
 
     int insert(RenterOrderDeliveryEntity record);
-    
+
     int insertSelective(RenterOrderDeliveryEntity record);
 
     int updateByPrimaryKey(RenterOrderDeliveryEntity record);
-    
+
     int updateByPrimaryKeySelective(RenterOrderDeliveryEntity record);
-    
+
     List<RenterOrderDeliveryEntity> listRenterOrderDeliveryByRenterOrderNo(@Param("renterOrderNo") String renterOrderNo);
+
+    int updateById(@Param("id") Integer id);
+
+    RenterOrderDeliveryEntity findRenterOrderByRenterOrderNo(@Param("renterOrderNo") String renterOrderNo,@Param("type") Integer type);
 
 }
