@@ -61,6 +61,8 @@ dependencies {
     compile project(":order-core-all:carowner-all:carowner-mem")
     compile project(":order-core-all:carowner-all:carowner-order")
     compile project(":order-core-all:carowner-all:carowner-penalty")
+
+    compile project(":order-core-all:parent-order")
     
 	compile project(":util-all:fee-calculator")
     compile project(":util-all:order-commons")
