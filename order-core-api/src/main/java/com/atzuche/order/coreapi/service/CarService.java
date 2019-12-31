@@ -142,11 +142,11 @@ public class CarService {
         renterGoodsDetailDto.setEngineNum(carBaseVO.getEngineNum());
         renterGoodsDetailDto.setCarTag(carTagVO == null?"":String.join(",",carTagVO.getLabelIds()));
         renterGoodsDetailDto.setType(carBaseVO.getType());
-        renterGoodsDetailDto.setBrand(String.valueOf(carBaseVO.getBrand()));
+        renterGoodsDetailDto.setBrand(carBaseVO.getBrand()==null?null:String.valueOf(carBaseVO.getBrand()));
         renterGoodsDetailDto.setLicenseDay(LocalDateTimeUtils.parseStringToLocalDate(carBaseVO.getLicenseDay()));
-        //renterGoodsDetailDto.setCarInmsrp();
-        //renterGoodsDetailDto.setStopCostRate();
-        //renterGoodsDetailDto.setServiceRate();
+        renterGoodsDetailDto.setCarInmsrp(data.getCarModelParam().getInmsrp());
+        renterGoodsDetailDto.setStopCostRate(data.getStopCostRate()==null?0D:Double.valueOf(data.getStopCostRate()));
+        renterGoodsDetailDto.setServiceRate(data.getServerRate()==null?0D:Double.valueOf(data.getServerRate()));
 
         List<RenterGoodsPriceDetailDTO> list = new ArrayList<>();
         List<CarPriceOfDayVO> daysPrice = data.getDaysPrice();
