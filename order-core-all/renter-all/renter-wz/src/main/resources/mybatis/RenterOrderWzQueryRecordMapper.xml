@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.atzuche.order.renterwz.mapper.RenterOrderWzQueryRecordMapper">
+	<sql id="select_column">
+		id,order_no,car_plate_num,result_json,return_code,error_msg,illegal_flag,city,create_time,update_time
+	</sql>
+
+	<resultMap id = "selectColumnMap" type="com.atzuche.order.renterwz.entity.RenterOrderWzQueryRecordEntity">
+		<result property="id" column="id"/>
+		<result property="orderNo" column="order_no"/>
+		<result property="carPlateNum" column="car_plate_num"/>
+		<result property="resultJson" column="result_json"/>
+		<result property="returnCode" column="return_code"/>
+		<result property="errorMsg" column="error_msg"/>
+		<result property="illegalFlag" column="illegal_flag"/>
+		<result property="city" column="city"/>
+		<result property="createTime" column="create_time"/>
+		<result property="updateTime" column="update_time"/>
+	</resultMap>
+
+	<insert id="saveRenterOrderWzQueryRecord" parameterType="com.atzuche.order.renterwz.entity.RenterOrderWzQueryRecordEntity" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+		insert into renter_order_wz_query_record(
+			<if test="orderNo != null">
+				order_no,
+			</if>
+			<if test="carPlateNum != null">
+				car_plate_num,
+			</if>
+			<if test="resultJson != null">
+				result_json,
+			</if>
+			<if test="returnCode != null">
+				return_code,
+			</if>
+			<if test="errorMsg != null">
+				error_msg,
+			</if>
+			<if test="illegalFlag != null">
+				illegal_flag,
+			</if>
+			<if test="city != null">
+				city,
+			</if>
+			<if test="updateTime != null">
+				update_time,
+			</if>
+			create_time
+		) values (
+			<if test="orderNo != null">
+				#{orderNo},
+			</if>
+			<if test="carPlateNum != null">
+				#{carPlateNum},
+			</if>
+			<if test="resultJson != null">
+				#{resultJson},
+			</if>
+			<if test="returnCode != null">
+				#{returnCode},
+			</if>
+			<if test="errorMsg != null">
+				#{errorMsg},
+			</if>
+			<if test="illegalFlag != null">
+				#{illegalFlag},
+			</if>
+			<if test="city != null">
+				#{city},
+			</if>
+			<if test="updateTime != null">
+				#{updateTime},
+			</if>
+			NOW())
+	</insert>
+
+	<select id="queryRenterOrderWzQueryRecordById" resultType="com.atzuche.order.renterwz.entity.RenterOrderWzQueryRecordEntity">
+		select <include refid="select_column" />
+		from renter_order_wz_query_record
+		where id = #{id} and is_delete = 0
+	</select>
+
+	<select id="queryList" resultType="com.atzuche.order.renterwz.entity.RenterOrderWzQueryRecordEntity">
+		select <include refid="select_column" />
+		from renter_order_wz_query_record
+		where is_delete = 0
+	</select>
+
+	 <update id="updateRenterOrderWzQueryRecord" parameterType="com.atzuche.order.renterwz.entity.RenterOrderWzQueryRecordEntity">
+		update renter_order_wz_query_record set
+		<if test="orderNo != null">
+			order_no = #{orderNo},
+		</if>
+		<if test="carPlateNum != null">
+			car_plate_num = #{carPlateNum},
+		</if>
+		<if test="resultJson != null">
+			result_json = #{resultJson},
+		</if>
+		<if test="returnCode != null">
+			return_code = #{returnCode},
+		</if>
+		<if test="errorMsg != null">
+			error_msg = #{errorMsg},
+		</if>
+		<if test="illegalFlag != null">
+			illegal_flag = #{illegalFlag},
+		</if>
+		<if test="city != null">
+			city = #{city},
+		</if>
+		<if test="createTime != null">
+			create_time = #{createTime},
+		</if>
+		update_time = NOW()
+		where id = #{id} and is_delete = 0
+	</update>
+
+	 <update id="deleteRenterOrderWzQueryRecordById" parameterType="java.lang.Long">
+		update renter_order_wz_query_record set
+		is_delete = 1,
+		update_time = NOW()
+		where id = #{id} and is_delete = 0
+	</update>
+
+</mapper>
