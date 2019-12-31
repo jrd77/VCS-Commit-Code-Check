@@ -17,8 +17,13 @@ import org.springframework.stereotype.Service;
 public class OwnerOrderOperateLogService{
     @Autowired
     private OwnerOrderOperateLogMapper ownerOrderOperateLogMapper;
-
-    public void saveOrderOperateLog(OwnerOrderOperateLogEntity ownerOrderOperateLogEntity){
-        ownerOrderOperateLogMapper.insert(ownerOrderOperateLogEntity);
+    /*
+     * @Author ZhangBin
+     * @Date 2019/12/31 10:44 
+     * @Description:
+     * 
+     **/
+    public Integer saveOrderOperateLog(OwnerOrderOperateLogEntity ownerOrderOperateLogEntity){
+        return ownerOrderOperateLogMapper.insert(ownerOrderOperateLogEntity);
     }
 }
