@@ -2,6 +2,8 @@ package com.atzuche.order.renterorder.mapper;
 
 import com.atzuche.order.renterorder.entity.RenterAdditionalDriverEntity;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
 import java.util.List;
 
 /**
@@ -22,5 +24,7 @@ public interface RenterAdditionalDriverMapper{
     int updateByPrimaryKey(RenterAdditionalDriverEntity record);
     
     int updateByPrimaryKeySelective(RenterAdditionalDriverEntity record);
+    
+    List<String> listDriverIdByRenterOrderNo(@Param("renterOrderNo") String renterOrderNo);
 
 }

@@ -1,6 +1,7 @@
 package com.atzuche.order.rentercost.entity.dto;
 
 import lombok.Data;
+import lombok.ToString;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -12,6 +13,7 @@ import java.time.LocalDateTime;
  * @date 2019/12/26 19:48
  */
 @Data
+@ToString
 public class RenterOrderSubsidyDetailDTO implements Serializable {
 
     private static final long serialVersionUID = 3710750452449495704L;

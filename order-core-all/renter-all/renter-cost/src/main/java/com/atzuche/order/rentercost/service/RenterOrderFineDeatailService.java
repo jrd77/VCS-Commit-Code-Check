@@ -61,6 +61,9 @@ public class RenterOrderFineDeatailService{
      * @return Integer
      */
     public Integer saveRenterOrderFineDeatailBatch(List<RenterOrderFineDeatailEntity> entityList) {
+    	if (entityList == null || entityList.isEmpty()) {
+    		return 1;
+    	}
     	return renterOrderFineDeatailMapper.saveRenterOrderFineDeatailBatch(entityList);
     }
     
