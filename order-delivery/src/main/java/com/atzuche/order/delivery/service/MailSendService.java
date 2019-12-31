@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 
 /**
- * @author yi.liu
+ * @author 胡春林
  */
 @Service
 public class MailSendService {
