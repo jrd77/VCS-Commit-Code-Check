@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
+
 /**
  * @author yi.liu
  */
@@ -17,12 +19,11 @@ public class MailSendService {
     /** logger */
     private static final Logger logger = LoggerFactory.getLogger(MailSendService.class);
 
-    @Autowired
-    @Qualifier("smsExecutor")
-    private ThreadPoolTaskExecutor taskExecutor;
+   // @Resource("smsExecutor")
+    private ThreadPoolTaskExecutor smsExecutor;
 
     public void sendSimpleEmail(String[] tos, String subject, String content) {
-        taskExecutor.execute(() -> {
+        smsExecutor.execute(() -> {
             try {
                 Email.sendSimpleEmail(tos, subject, content);
             } catch (Exception e) {

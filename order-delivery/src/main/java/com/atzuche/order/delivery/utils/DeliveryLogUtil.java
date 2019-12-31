@@ -8,6 +8,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
+
 /**
  * @author 胡春林
  * 请求仁云数据log
@@ -17,7 +19,7 @@ public class DeliveryLogUtil {
 
     public static Logger logger = LoggerFactory.getLogger(DeliveryLogUtil.class);
 
-    @Autowired
+    @Resource
     DeliveryHttpLogMapper deliveryHttpLogMapper;
 
     public void addDeliveryLog(DeliveryHttpLogEntity deliveryHttpLogEntity) {

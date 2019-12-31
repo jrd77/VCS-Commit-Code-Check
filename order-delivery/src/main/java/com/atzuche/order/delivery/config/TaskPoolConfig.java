@@ -28,4 +28,15 @@ class TaskPoolConfig {
         executor.setAwaitTerminationSeconds(60);
         return executor;
     }
+
+    @Bean("smsExecutor")
+    public Executor smsExecutor() {
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(3);
+        executor.setMaxPoolSize(6);
+        executor.setQueueCapacity(3000);
+        executor.setKeepAliveSeconds(300);
+        executor.setThreadNamePrefix("smsExecutor-");
+        return executor;
+    }
 }
