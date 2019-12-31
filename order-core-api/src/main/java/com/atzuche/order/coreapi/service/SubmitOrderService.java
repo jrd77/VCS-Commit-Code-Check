@@ -7,6 +7,7 @@ import com.atzuche.order.commons.constant.OrderConstant;
 import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
 import com.atzuche.order.commons.vo.req.NormalOrderReqVO;
 import com.atzuche.order.commons.vo.res.NormalOrderResVO;
+import com.atzuche.order.delivery.service.delivery.DeliveryCarService;
 import com.atzuche.order.owner.commodity.service.OwnerGoodsService;
 import com.atzuche.order.owner.mem.service.OwnerMemberService;
 import com.atzuche.order.ownercost.service.OwnerOrderService;
@@ -54,6 +55,8 @@ public class SubmitOrderService {
     private OwnerGoodsService ownerGoodsService;
     @Autowired
     private OwnerOrderService ownerOrderService;
+    @Autowired
+    private DeliveryCarService deliveryCarService;
 
     /**
      * 提交订单
@@ -115,7 +118,7 @@ public class SubmitOrderService {
         ownerMemberService.save(null);
 
         //配送订单处理..............
-
+        deliveryCarService.addRenYunFlowOrderInfo(null);
 
         //6.主订单相关信息处理
         ParentOrderDTO parentOrderDTO = new ParentOrderDTO();
