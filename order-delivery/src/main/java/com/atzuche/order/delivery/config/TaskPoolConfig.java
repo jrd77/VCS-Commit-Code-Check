@@ -30,7 +30,7 @@ class TaskPoolConfig {
     }
 
     @Bean("smsExecutor")
-    public Executor smsExecutor() {
+    public ThreadPoolTaskExecutor smsExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
         executor.setCorePoolSize(3);
         executor.setMaxPoolSize(6);

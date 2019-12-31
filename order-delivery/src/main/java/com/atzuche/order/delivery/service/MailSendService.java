@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 
 /**
- * @author yi.liu
+ * @author 胡春林
  */
 @Service
 public class MailSendService {
@@ -19,7 +19,7 @@ public class MailSendService {
     /** logger */
     private static final Logger logger = LoggerFactory.getLogger(MailSendService.class);
 
-   // @Resource("smsExecutor")
+    @Resource(name = "smsExecutor")
     private ThreadPoolTaskExecutor smsExecutor;
 
     public void sendSimpleEmail(String[] tos, String subject, String content) {
