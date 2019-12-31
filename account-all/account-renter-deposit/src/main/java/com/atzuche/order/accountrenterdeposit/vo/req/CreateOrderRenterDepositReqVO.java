@@ -29,10 +29,6 @@ public class CreateOrderRenterDepositReqVO {
      */
     private Integer reductionAmt;
 
-    /**
-     * 减免金额比例
-     */
-    private String amt;
 
     /**
      * 免押方式

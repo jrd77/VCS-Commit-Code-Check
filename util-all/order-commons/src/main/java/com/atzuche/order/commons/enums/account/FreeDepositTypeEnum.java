@@ -24,4 +24,20 @@ public enum FreeDepositTypeEnum {
         this.code = code;
         this.text = text;
     }
+
+    /**
+     * 根据免押方式编码获取对应枚举信息
+     *
+     * @param code 免押方式编码
+     * @return FreeDepositTypeEnum
+     */
+    public static FreeDepositTypeEnum getFreeDepositTypeEnumByCode(Integer code) {
+
+        for (FreeDepositTypeEnum freeDepositTypeEnum : FreeDepositTypeEnum.values()) {
+            if(freeDepositTypeEnum.getCode() == code) {
+                return freeDepositTypeEnum;
+            }
+        }
+        return FreeDepositTypeEnum.CONSUME;
+    }
 }

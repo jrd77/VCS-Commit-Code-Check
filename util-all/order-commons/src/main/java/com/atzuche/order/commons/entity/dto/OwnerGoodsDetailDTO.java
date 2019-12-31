@@ -2,6 +2,7 @@ package com.atzuche.order.commons.entity.dto;
 
 import lombok.Data;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -189,6 +190,20 @@ public class OwnerGoodsDetailDTO {
      * 老标签id
      */
     private List<String> labelIds;
+
+    /**
+     * 车辆品牌
+     */
+    private String brand;
+    /**
+     * 车型
+     */
+    private String type;
+
+    /**
+     * 行驶证注册年月
+     */
+    private LocalDate licenseDay;
 
 
 }

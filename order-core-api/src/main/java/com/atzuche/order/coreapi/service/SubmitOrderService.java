@@ -8,15 +8,20 @@ import com.atzuche.order.commons.constant.OrderConstant;
 import com.atzuche.order.commons.entity.dto.OrderContextDTO;
 import com.atzuche.order.commons.entity.dto.OwnerMemberDTO;
 import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
-import com.atzuche.order.commons.entity.dto.RenterMemberDTO;
 import com.atzuche.order.commons.vo.req.NormalOrderReqVO;
 import com.atzuche.order.commons.vo.res.NormalOrderResVO;
 import com.atzuche.order.coreapi.entity.request.SubmitOrderReq;
+import com.atzuche.order.owner.commodity.service.OwnerGoodsService;
+import com.atzuche.order.owner.mem.service.OwnerMemberService;
 import com.atzuche.order.parentorder.dto.OrderDTO;
 import com.atzuche.order.parentorder.dto.OrderSourceStatDTO;
 import com.atzuche.order.parentorder.dto.OrderStatusDTO;
 import com.atzuche.order.parentorder.dto.ParentOrderDTO;
 import com.atzuche.order.parentorder.service.ParentOrderService;
+import com.atzuche.order.rentercommodity.service.RenterGoodsService;
+import com.atzuche.order.rentermem.service.RenterMemberService;
+import com.atzuche.order.renterorder.service.RenterOrderService;
+import com.atzuche.order.renterorder.vo.RenterOrderResVO;
 import com.autoyol.car.api.feign.api.CarDetailQueryFeignApi;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
@@ -46,7 +51,16 @@ public class SubmitOrderService {
     private UniqueOrderNoService uniqueOrderNoService;
     @Resource
     private ParentOrderService parentOrderService;
-
+    @Autowired
+    private RenterOrderService renterOrderService;
+    @Autowired
+    private RenterGoodsService renterGoodsService;
+    @Autowired
+    private RenterMemberService renterMemberService;
+    @Autowired
+    private OwnerMemberService ownerMemberService;
+    @Autowired
+    private OwnerGoodsService ownerGoodsService;
 
     public ResponseData submitOrder(SubmitOrderReq submitReqDto) {
         //调用日志模块 TODO
@@ -60,13 +74,13 @@ public class SubmitOrderService {
             //获取车主会员信息
             OwnerMemberDTO ownerMemberDto = memberService.getOwnerMemberInfo(renterGoodsDetailDto.getOwnerMemNo());
             //获取租客会员信息
-            RenterMemberDTO renterMemberDto = memberService.getRenterMemberInfo(submitReqDto.getMemNo());
+            //RenterMemberDTO renterMemberDto = memberService.getRenterMemberInfo(submitReqDto.getMemNo());
 
             //组装数据
             orderContextDto.setRenterGoodsDetailDto(renterGoodsDetailDto);
 //            orderContextDto.setOwnerGoodsDetailDto(ownerGoodsDetailDto);
             orderContextDto.setOwnerMemberDto(ownerMemberDto);
-            orderContextDto.setRenterMemberDto(renterMemberDto);
+           // orderContextDto.setRenterMemberDto(renterMemberDto);
 
 
             //开始校验规则 （前置校验 + 风控）TODO
@@ -133,6 +147,10 @@ public class SubmitOrderService {
         reqContext.setOwnerGoodsDetailDto(null);
         reqContext.setOwnerMemberDto(memberService.getOwnerMemberInfo(""));
         //2.下单校验
+        //2.1库存
+        //2.2风控
+        //2.3校验链
+
 
 
         //3.生成主订单号
@@ -141,20 +159,31 @@ public class SubmitOrderService {
         //4.1.生成租客子订单号
         String renterOrderNo = uniqueOrderNoService.getRenterOrderNo(orderNo);
         //4.2.调用租客订单模块处理租客订单相关业务
+        RenterOrderResVO renterOrderResVO = renterOrderService.generateRenterOrderInfo(null);
         //4.3.接收租客订单返回信息
+
         //4.4.租客商品信息处理
+        renterGoodsService.save(null);
+
         //4.5.租客信息处理
         //4.6.租客权益信息处理
-
+        renterMemberService.save(null);
 
         //5.创建车主子订单
         //5.1.生成车主子订单号
         String ownerOrderNo = uniqueOrderNoService.getOwnerOrderNo(orderNo);
         //5.2.调用车主订单模块处理车主订单相关业务
+
         //5.3.接收车主订单返回信息
 
+        //5.4.车主商品
+        ownerGoodsService.save(null);
+
+        //5.5.车主会员
+        ownerMemberService.save(null);
 
         //配送订单处理..............
+
 
         //6.主订单相关信息处理
         ParentOrderDTO parentOrderDTO = new ParentOrderDTO();
@@ -181,6 +210,10 @@ public class SubmitOrderService {
         }
         parentOrderDTO.setOrderStatusDTO(orderStatusDTO);
         parentOrderService.saveParentOrderInfo(parentOrderDTO);
+
+        //6.4 order_flow
+
+
         //7.订单完成事件发送
 
         //8.组装接口返回

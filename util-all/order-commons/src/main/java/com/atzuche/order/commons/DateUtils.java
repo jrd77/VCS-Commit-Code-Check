@@ -81,6 +81,26 @@ public class DateUtils {
 
     /**
      * 字符串转时间
+     * @param localDateTime
+     * @param format
+     * @return
+     */
+    public static String formate(LocalDateTime localDateTime, String format){
+        return DateTimeFormatter.ofPattern(format).format(localDateTime);
+    }
+
+    /**
+     * 字符串转时间
+     * @param localDateTime 日期
+     * @param format 指定格式
+     * @return long
+     */
+    public static long formateLong(LocalDateTime localDateTime, String format){
+        return Long.parseLong(formate(localDateTime, format));
+    }
+
+    /**
+     * 字符串转时间
      * @param str
      * @param format
      * @return

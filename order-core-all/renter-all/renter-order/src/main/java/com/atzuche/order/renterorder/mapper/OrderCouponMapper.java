@@ -1,7 +1,11 @@
 package com.atzuche.order.renterorder.mapper;
 
 import com.atzuche.order.renterorder.entity.OrderCouponEntity;
+
+import java.util.List;
+
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * 订单券表
@@ -14,8 +18,6 @@ public interface OrderCouponMapper{
 
     OrderCouponEntity selectByPrimaryKey(Integer id);
 
-    OrderCouponEntity selectByOrderNo(String orderNo);
-
     int insert(OrderCouponEntity record);
     
     int insertSelective(OrderCouponEntity record);
@@ -23,5 +25,7 @@ public interface OrderCouponMapper{
     int updateByPrimaryKey(OrderCouponEntity record);
     
     int updateByPrimaryKeySelective(OrderCouponEntity record);
+    
+    List<OrderCouponEntity> listOrderCouponByRenterOrderNo(@Param("renterOrderNo") String renterOrderNo);
 
 }

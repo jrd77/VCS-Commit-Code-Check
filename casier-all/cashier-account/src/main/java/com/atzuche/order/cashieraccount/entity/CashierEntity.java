@@ -45,7 +45,7 @@ public class CashierEntity implements Serializable {
 	 */
 	private String payKind;
 	/**
-	 *  01：手机银联 02.:新银联（含银联和applepay统一商户号） 06:支付宝支付， 07:微信支付(App),  08:快捷支付（快钱） 11.快捷支付（H5）     仅仅是source值不同。 12:Apple Pay 13. 微信支付(公众号) 14.连连支付 15. 微信支付(H5)
+	 *  00：钱包 ，01：手机银联 02.:新银联（含银联和applepay统一商户号） 06:支付宝支付， 07:微信支付(App),  08:快捷支付（快钱） 11.快捷支付（H5）     仅仅是source值不同。 12:Apple Pay 13. 微信支付(公众号) 14.连连支付 15. 微信支付(H5)
 	 */
 	private String paySource;
 	/**

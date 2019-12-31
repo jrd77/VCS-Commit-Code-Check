@@ -33,8 +33,12 @@ public enum ErrorCode {
     PLATFORM_SETTLE_SUBSIDY_AND_PROFIT("871001","结算平台费用出错"),
 
     CASHIER_REFUND_APPLY("981001","退款申请出错"),
-    CASHIER_PAY_CALL_BACK_FAIL("981003","支付系统支付回调操作失败"),
     CASHIER_PAY_REFUND_CALL_BACK_FAIL("981003","支付系统退款回调操作失败"),
+    CASHIER_PAY_CALL_BACK_FAIL("981004","支付系统支付回调操作失败"),
+    CASHIER_PAY_SIGN_PARAM_ERRER("981007","支付参数签名失败"),
+
+    GET_WALLETR_MSG("981005","查询钱包信息出错"),
+    DEDUCT_WALLETR_MSG("981006","扣减钱包信息出错"),
 
 
     ORDER_RENTER_ORDERNO_CREATE_ERROR("600001","订单编码创建异常"),
@@ -44,6 +48,10 @@ public enum ErrorCode {
     COST_GET_RETUIRN_FAIL("700002","获取取还车费用失败"),
     COST_GET_RETUIRN_OVER_ERROR("700003","获取取还车费用异常"),
     COST_GET_RETUIRN_OVER_FAIL("700004","获取取还车费用失败"),
+    IS_GET_CAR_OVER_FAIL("700005","取车是否超运能获取失败"),
+    IS_GET_CAR_OVER_ERROR("700006","取车是否超运能接口异常"),
+    IS_RETURN_CAR_OVER_FAIL("700007","还车是否超运能获取失败"),
+    IS_RETURN_CAR_OVER_ERROR("700008","还车是否超运能接口异常")
     ;
 
     private String code;

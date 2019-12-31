@@ -22,19 +22,23 @@ public class RenterOrderCostRespDTO {
      */
     private String memNo;
     /**
+     * 租金
+     */
+    private Integer rentAmount;
+    /**
      * 租车费用
      */
     private Integer rentCarAmount;
     /**
-     * 佣金费用
+     * 佣金费用(手续费)
      */
     private Integer commissionAmount;
     /**
-     * 基础保障费用
+     * 基础保障费用(保险费)
      */
     private Integer basicEnsureAmount;
     /**
-     * 全面保障费用
+     * 全面保障费用(不计免赔)
      */
     private Integer comprehensiveEnsureAmount;
     /**

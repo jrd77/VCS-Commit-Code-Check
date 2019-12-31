@@ -4,6 +4,14 @@ import lombok.Data;
 
 @Data
 public class RenterMemberRightDTO {
+	/**
+	 * 主订单号
+	 */
+	private String orderNo;
+	/**
+	 * 租客子订单号
+	 */
+	private String renterOrderNo;
     /**
      * 权益编码
      */

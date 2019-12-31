@@ -1,10 +1,7 @@
 package com.atzuche.order.cashieraccount.vo.res;
 
-import com.atzuche.order.commons.enums.RenterCashCodeEnum;
 import com.atzuche.order.rentercost.entity.vo.PayableVO;
-import com.google.common.collect.ImmutableList;
 import lombok.Data;
-import org.springframework.util.CollectionUtils;
 
 import java.util.List;
 
@@ -44,26 +41,26 @@ public class OrderPayableAmountResVO {
      */
     private List<AccountPayAbleResVO> accountPayAbles;
 
-    public void setAccountPayAbleRes(List<PayableVO> payableVOs, int amtDeposit, int amtWZDeposit, int rentAmt) {
-
-        List<AccountPayAbleResVO> accountPayAbles = ImmutableList.of(
-                new AccountPayAbleResVO(orderNo,memNo,amtDeposit,RenterCashCodeEnum.ACCOUNT_RENTER_DEPOSIT,RenterCashCodeEnum.ACCOUNT_RENTER_DEPOSIT.getTxt()),
-                new AccountPayAbleResVO(orderNo,memNo,amtWZDeposit, RenterCashCodeEnum.ACCOUNT_RENTER_WZ_DEPOSIT,RenterCashCodeEnum.ACCOUNT_RENTER_WZ_DEPOSIT.getTxt())
-        );
-        if(!CollectionUtils.isEmpty(payableVOs)){
-            payableVOs.stream().forEach(obj ->{
-                RenterCashCodeEnum type = getAmtPay()>0?RenterCashCodeEnum.ACCOUNT_RENTER_RENT_COST_AGAIN:RenterCashCodeEnum.ACCOUNT_RENTER_RENT_COST;
-                accountPayAbles.add(new AccountPayAbleResVO(orderNo,memNo,obj.getAmt(),type,obj.getTitle()));
-            });
-        }
-        setAccountPayAbles(accountPayAbles);
-        setTitle("待支付金额：" +amt + "，订单号："  + orderNo);
-    }
-
+    /**
+     * 应付租车费用明细
+     */
+    List<PayableVO> payableVOs;
 
     /**
-     * 初始化待支付费用明细
-     * @param payableVOs
+     * 应付租车费用
      */
+    private Integer amtRent;
+    /**
+     * 应付租车车俩押金
+     */
+    private Integer amtDeposit;
+    /**
+     * 应付租车违章押金
+     */
+    private Integer amtWzDeposit;
 
+    /**
+     * 钱包抵扣金额
+     */
+    private int amtWallet;
 }

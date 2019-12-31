@@ -66,5 +66,14 @@ public class OrderService {
         LOGGER.info("Build master order information. result is, record:[{}]", JSON.toJSONString(record));
         return record;
     }
+    
+    /**
+     * 根据主订单号获取主订单信息
+     * @param orderNo 主订单号
+     * @return OrderEntity
+     */
+    public OrderEntity getOrderEntity(String orderNo) {
+    	return orderMapper.selectByOrderNo(orderNo);
+    }
 
 }
