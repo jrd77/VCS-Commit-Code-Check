@@ -43,6 +43,9 @@ public enum ErrorCode {
 
     ORDER_RENTER_ORDERNO_CREATE_ERROR("600001","订单编码创建异常"),
 
+    FEIGN_GET_MEMBER_ERROR("500100","获取会员信息异常"),
+    FEIGN_GET_MEMBER_FAIL("500100","获取会员信息失败"),
+
 
     COST_GET_RETUIRN_ERROR("700001","获取取还车费用系统异常"),
     COST_GET_RETUIRN_FAIL("700002","获取取还车费用失败"),
@@ -51,7 +54,12 @@ public enum ErrorCode {
     IS_GET_CAR_OVER_FAIL("700005","取车是否超运能获取失败"),
     IS_GET_CAR_OVER_ERROR("700006","取车是否超运能接口异常"),
     IS_RETURN_CAR_OVER_FAIL("700007","还车是否超运能获取失败"),
-    IS_RETURN_CAR_OVER_ERROR("700008","还车是否超运能接口异常")
+    IS_RETURN_CAR_OVER_ERROR("700008","还车是否超运能接口异常"),
+
+
+
+    MEMBER_DRIVER_fAIL("700100","获取附加驾驶人信息失败"),
+    MEMBER_DRIVER_ERROR("700101","获取附加驾驶人信息异常"),
     ;
 
     private String code;
