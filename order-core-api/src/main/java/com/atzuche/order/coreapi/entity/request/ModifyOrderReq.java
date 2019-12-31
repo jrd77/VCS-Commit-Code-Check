@@ -7,11 +7,14 @@ import javax.validation.constraints.Pattern;
 
 import org.hibernate.validator.constraints.NotBlank;
 
+import com.atzuche.order.rentercost.entity.dto.RenterOrderSubsidyDetailDTO;
 import com.autoyol.doc.annotation.AutoDocProperty;
 
 import lombok.Data;
+import lombok.ToString;
 
 @Data
+@ToString
 public class ModifyOrderReq {
 	@NotBlank(message="订单编号不能为空")
 	@Pattern(regexp="^\\d*$",message="订单编号必须为数字")
@@ -87,4 +90,8 @@ public class ModifyOrderReq {
 	 * 平台优惠券id
 	 */
 	private String platformCouponId;
+	/**
+	 * 租客费用补贴
+	 */
+	private List<RenterOrderSubsidyDetailDTO> renterSubsidyList;
 }

@@ -20,7 +20,7 @@ import java.util.List;
  * 
  **/
 @Service
-public class CommodityService {
+public class RenterCommodityService {
     @Autowired
     private RenterGoodsPriceDetailMapper renterGoodsPriceDetailMapper;
     @Autowired
