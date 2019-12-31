@@ -38,7 +38,7 @@ public class SubmitOrderController {
         if (bindingResult.hasErrors()) {
             return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), ErrorCode.INPUT_ERROR.getText());
         }
-        Integer memNo = normalOrderReqVO.getMemNo();
+        String memNo = normalOrderReqVO.getMemNo();
         if (null == memNo) {
             return new ResponseData<>(ErrorCode.NEED_LOGIN.getCode(), ErrorCode.NEED_LOGIN.getText());
         }
