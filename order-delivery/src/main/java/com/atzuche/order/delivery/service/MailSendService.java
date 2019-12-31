@@ -19,7 +19,7 @@ public class MailSendService {
     /** logger */
     private static final Logger logger = LoggerFactory.getLogger(MailSendService.class);
 
-   // @Resource("smsExecutor")
+    @Resource(name = "smsExecutor")
     private ThreadPoolTaskExecutor smsExecutor;
 
     public void sendSimpleEmail(String[] tos, String subject, String content) {
