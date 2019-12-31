@@ -209,7 +209,7 @@ public class RenterOrderCalCostService {
      * @author ZhangBin
      * @date 2019/12/28 17:37
      **/
-    private void saveOrderCostAndDeailList(RenterOrderCostRespDTO renterOrderCostRespDTO) {
+    public void saveOrderCostAndDeailList(RenterOrderCostRespDTO renterOrderCostRespDTO) {
         List<RenterOrderSubsidyDetailDTO> renterOrderSubsidyDetailDTOList = renterOrderCostRespDTO.getRenterOrderSubsidyDetailDTOList();
         //数据转化
         List<RenterOrderSubsidyDetailEntity> subsidyListEntity = renterOrderSubsidyDetailDTOList.stream().map(x -> {

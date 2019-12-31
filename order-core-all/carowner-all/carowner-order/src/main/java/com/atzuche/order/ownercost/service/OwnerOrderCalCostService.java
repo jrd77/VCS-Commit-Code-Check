@@ -1,18 +1,17 @@
 package com.atzuche.order.ownercost.service;
 
-import com.atzuche.order.commons.enums.OwnerCashCodeEnum;
-import com.atzuche.order.commons.enums.RenterCashCodeEnum;
-import com.atzuche.order.commons.enums.SubsidySourceCodeEnum;
+import com.atzuche.order.commons.entity.dto.CostBaseDTO;
 import com.atzuche.order.ownercost.entity.OwnerOrderCostEntity;
+import com.atzuche.order.ownercost.entity.OwnerOrderIncrementDetailEntity;
 import com.atzuche.order.ownercost.entity.OwnerOrderPurchaseDetailEntity;
 import com.atzuche.order.ownercost.entity.OwnerOrderSubsidyDetailEntity;
 import com.atzuche.order.ownercost.entity.dto.OwnerOrderCostReqDTO;
-import com.atzuche.order.rentercost.entity.RenterOrderCostDetailEntity;
-import com.atzuche.order.rentercost.entity.dto.RenterOrderSubsidyDetailDTO;
+import com.atzuche.order.ownercost.entity.dto.OwnerOrderSubsidyDetailDTO;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -24,68 +23,62 @@ public class OwnerOrderCalCostService {
     private OwnerOrderSubsidyDetailService ownerOrderSubsidyDetailService;
     @Autowired
     private OwnerOrderCostService ownerOrderCostService;
+    @Autowired
+    private OwnerOrderCostCombineService ownerOrderCostCombineService;
+    @Autowired
+    private OwnerOrderIncrementDetailService ownerOrderIncrementDetailService;
     
     /*
      * @Author ZhangBin
      * @Date 2019/12/27 16:12
-     * @Description: 车主端费用及其明细入库
+     * @Description: 车主端租车费用+明细+补贴 落库
      * 
      **/
     public void getOrderCostAndDeailList(OwnerOrderCostReqDTO ownerOrderCostReqDTO){
-        String orderNo = ownerOrderCostReqDTO.getOrderNo();
-        String ownerOrderNo = ownerOrderCostReqDTO.getOwnerOrderNo();
-        String memNo = ownerOrderCostReqDTO.getMemNo();
-        List<RenterOrderCostDetailEntity> renterOrderCostDetailDTOList = ownerOrderCostReqDTO.getRenterOrderCostDetailDTOList();
-        List<RenterOrderSubsidyDetailDTO> renterOrderSubsidyDetailDTOList = ownerOrderCostReqDTO.getRenterOrderSubsidyDetailDTOList();
+        CostBaseDTO costBaseDTO = ownerOrderCostReqDTO.getCostBaseDTO();
+        String orderNo = costBaseDTO.getOrderNo();
+        String ownerOrderNo = costBaseDTO.getOwnerOrderNo();
+        String memNo = costBaseDTO.getMemNo();
+        Integer carOwnerType = ownerOrderCostReqDTO.getCarOwnerType();
+        Integer srvGetFlag = ownerOrderCostReqDTO.getSrvGetFlag();
+        Integer srvReturnFlag = ownerOrderCostReqDTO.getSrvReturnFlag();
 
-        //过滤租金
-        List<OwnerOrderPurchaseDetailEntity> ownerDetailList = renterOrderCostDetailDTOList
-                .stream()
-                .filter(x -> RenterCashCodeEnum.RENT_AMT.getCashNo().equals(x.getCostCode()))
-                .map(x -> {
-                    OwnerOrderPurchaseDetailEntity ownerDetail = new OwnerOrderPurchaseDetailEntity();
-                    ownerDetail.setOrderNo(orderNo);
-                    ownerDetail.setOwnerOrderNo(ownerOrderNo);
-                    ownerDetail.setMemNo(memNo);
-                    ownerDetail.setCostCode(OwnerCashCodeEnum.RENT_AMT.getCashNo());
-                    ownerDetail.setCostCodeDesc(OwnerCashCodeEnum.RENT_AMT.getTxt());
-                    ownerDetail.setUnitPrice(x.getUnitPrice());
-                    ownerDetail.setCount(x.getCount());
-                    ownerDetail.setTotalAmount(x.getTotalAmount());
-                    return ownerDetail;
-                })
-                .collect(Collectors.toList());
+        List<OwnerOrderPurchaseDetailEntity> ownerOrderPurchaseDetailList = ownerOrderCostReqDTO.getOwnerOrderPurchaseDetailList();
+        List<OwnerOrderSubsidyDetailDTO> ownerOrderSubsidyDetailDTOList = ownerOrderCostReqDTO.getOwnerOrderSubsidyDetailDTOList();
 
-        //过滤车主相关的补贴(来源方属于车主)
-        List<OwnerOrderSubsidyDetailEntity> ownerSubsidyDetailList = renterOrderSubsidyDetailDTOList
+        List<OwnerOrderSubsidyDetailEntity> ownerSubsidyDetailList = ownerOrderSubsidyDetailDTOList
                 .stream()
-                .filter(x -> SubsidySourceCodeEnum.OWNER.getCode().equals(x.getSubsidySourceCode()))
                 .map(x -> {
                     OwnerOrderSubsidyDetailEntity ownerSubsidyDetail = new OwnerOrderSubsidyDetailEntity();
                     BeanUtils.copyProperties(x,ownerSubsidyDetail);
-                    ownerSubsidyDetail.setOrderNo(orderNo);
-                    ownerSubsidyDetail.setOwnerOrderNo(ownerOrderNo);
-                    ownerSubsidyDetail.setMemNo(memNo);
-                    ownerSubsidyDetail.setSubsidyAmount(-x.getSubsidyAmount());
                     return ownerSubsidyDetail;
                 })
                 .collect(Collectors.toList());
+        //计算租金和补贴
+        int rentAmt = ownerOrderPurchaseDetailList.stream().collect(Collectors.summingInt(OwnerOrderPurchaseDetailEntity::getTotalAmount));
+        int subsidyAmt = ownerOrderSubsidyDetailDTOList.stream().collect(Collectors.summingInt(OwnerOrderSubsidyDetailDTO::getSubsidyAmount));
 
-        //费用统计
-        int rentAmt = ownerDetailList.stream().collect(Collectors.summingInt(OwnerOrderPurchaseDetailEntity::getTotalAmount));
-        int subsidyAmt = ownerSubsidyDetailList.stream().collect(Collectors.summingInt(OwnerOrderSubsidyDetailEntity::getSubsidyAmount));
+        //计算取还车增值费用费用
+        OwnerOrderIncrementDetailEntity ownerSrvGetAmtEntity = ownerOrderCostCombineService.getOwnerSrvGetAmtEntity(costBaseDTO, carOwnerType, srvGetFlag);
+        OwnerOrderIncrementDetailEntity ownerSrvReturnAmtEntity = ownerOrderCostCombineService.getOwnerSrvReturnAmtEntity(costBaseDTO, carOwnerType, srvReturnFlag);
+        int getTotalAmt = ownerSrvGetAmtEntity==null?0:ownerSrvGetAmtEntity.getTotalAmount();
+        int returnAmt = ownerSrvReturnAmtEntity ==null ? 0:ownerSrvReturnAmtEntity.getTotalAmount();
+        int incrementAmt = getTotalAmt + returnAmt;
+
         OwnerOrderCostEntity ownerOrderCostEntity = new OwnerOrderCostEntity();
         ownerOrderCostEntity.setOrderNo(orderNo);
         ownerOrderCostEntity.setOwnerOrderNo(ownerOrderNo);
         ownerOrderCostEntity.setMemNo(memNo);
-        ownerOrderCostEntity.setIncrementAmount(0);
+        ownerOrderCostEntity.setIncrementAmount(incrementAmt);
         ownerOrderCostEntity.setSubsidyAmount(subsidyAmt);
         ownerOrderCostEntity.setPurchaseAmount(rentAmt);
         ownerOrderCostEntity.setVersion(0);
 
-        ownerOrderPurchaseDetailService.saveOwnerOrderPurchaseDetailBatch(ownerDetailList);
+        ownerOrderIncrementDetailService.saveOwnerOrderIncrementDetailBatch(Arrays.asList(ownerSrvGetAmtEntity,ownerSrvReturnAmtEntity));
+        ownerOrderPurchaseDetailService.saveOwnerOrderPurchaseDetailBatch(ownerOrderPurchaseDetailList);
         ownerOrderSubsidyDetailService.saveOwnerOrderSubsidyDetailBatch(ownerSubsidyDetailList);
         ownerOrderCostService.saveOwnerOrderCost(ownerOrderCostEntity);
     }
+
 
 }

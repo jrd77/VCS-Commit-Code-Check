@@ -281,14 +281,5 @@
 		select <include refid="Base_Column_List" /> from renter_order_delivery where renter_order_no = #{renterOrderNo}
 		and is_delete = 0
 	</select>
-
-	<update id="updateById" parameterType="java.lang.Integer">
-		update renter_order_delivery set status = 2
-		where id = #{id} and is_delete = 0
-	</update>
-
-	<select id="findRenterOrderByRenterOrderNo" resultMap="BaseResultMap">
-		select <include refid="Base_Column_List" /> from renter_order_delivery where renter_order_no = #{renterOrderNo}
-		and type = #{type} and is_delete = 0
-	</select>
+  	
 </mapper>

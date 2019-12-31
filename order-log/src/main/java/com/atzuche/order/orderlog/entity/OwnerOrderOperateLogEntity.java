@@ -1,19 +1,20 @@
-package com.atzuche.order.renterorder.entity;
+package com.atzuche.order.orderlog.entity;
+
+import lombok.Data;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import lombok.Data;
 
 
 /**
- * 租客端附加驾驶人信息表
+ * 车主订单操作记录表
  * 
  * @author ZhangBin
- * @date 2019-12-28 15:51:58
+ * @date 2019-12-30 20:31:55
  * @Description:
  */
 @Data
-public class RenterAdditionalDriverEntity implements Serializable {
+public class OwnerOrderOperateLogEntity implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
 	/**
@@ -27,23 +28,23 @@ public class RenterAdditionalDriverEntity implements Serializable {
 	/**
 	 * 子订单号
 	 */
-	private String renterOrderNo;
-    /**
-     * 附加驾驶人ID
-     */
-	private String driverId;
+	private String ownerOrderNo;
 	/**
-	 * 附加驾驶人姓名
+	 * 操作人会员号
 	 */
-	private String realName;
+	private String memNo;
 	/**
-	 * 附加驾驶人电话号码
+	 * 操作类型
 	 */
-	private String phone;
+	private Integer operateType;
 	/**
-	 * 是否有效
+	 * 参数
 	 */
-	private Integer isUse;
+	private String param;
+	/**
+	 * 操作描述
+	 */
+	private String operateDesc;
 	/**
 	 * 创建时间
 	 */

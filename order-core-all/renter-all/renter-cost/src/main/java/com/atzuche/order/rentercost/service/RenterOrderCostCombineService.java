@@ -577,6 +577,9 @@ public class RenterOrderCostCombineService {
         if (getFlag || returnFlag) {
             //TODO 配置中获取
             //cityDTO = cityMapper.getCityLonAndLatByCode(cityCode);
+            //TODO 给一个citycode=310100(上海)默认的经纬度值用于测试，测试后需要删除
+            cityDTO.setLon(String.valueOf(121.491121));
+            cityDTO.setLat(String.valueOf(31.243466));
         }
         if (getFlag && cityDTO != null) {
             srvGetLon = cityDTO.getLon();
@@ -672,7 +675,11 @@ public class RenterOrderCostCombineService {
         fbcFeeResults.forEach(fbcFeeResponse -> {
             if ("get".equalsIgnoreCase(fbcFeeResponse.getGetReturnType()) && getReturnCarCostReqDto.getIsGetCarCost()) {
                 int expectedShouldFee = Integer.valueOf(fbcFeeResponse.getExpectedShouldFee());
+
                 RenterOrderCostDetailEntity renterOrderCostDetailEntity = new RenterOrderCostDetailEntity();
+                renterOrderCostDetailEntity.setOrderNo(costBaseDTO.getOrderNo());
+                renterOrderCostDetailEntity.setRenterOrderNo(costBaseDTO.getRenterOrderNo());
+                renterOrderCostDetailEntity.setMemNo(costBaseDTO.getMemNo());
                 renterOrderCostDetailEntity.setCostCode(RenterCashCodeEnum.SRV_GET_COST.getCashNo());
                 renterOrderCostDetailEntity.setCostDesc(RenterCashCodeEnum.SRV_GET_COST.getTxt());
                 renterOrderCostDetailEntity.setCount(1D);
@@ -680,6 +687,9 @@ public class RenterOrderCostCombineService {
                 listCostDetail.add(renterOrderCostDetailEntity);
 
                 RenterOrderSubsidyDetailDTO renterOrderSubsidy = new RenterOrderSubsidyDetailDTO();
+                renterOrderSubsidy.setOrderNo(costBaseDTO.getOrderNo());
+                renterOrderSubsidy.setRenterOrderNo(costBaseDTO.getRenterOrderNo());
+                renterOrderSubsidy.setMemNo(costBaseDTO.getMemNo());
                 renterOrderSubsidy.setSubsidyTypeName(SubsidyTypeCodeEnum.GET_CAR.getDesc());
                 renterOrderSubsidy.setSubsidyTypeCode(SubsidyTypeCodeEnum.GET_CAR.getCode());
                 renterOrderSubsidy.setSubsidySourceCode(SubsidySourceCodeEnum.PLATFORM.getCode());
@@ -706,6 +716,9 @@ public class RenterOrderCostCombineService {
             } else if ("return".equalsIgnoreCase(fbcFeeResponse.getGetReturnType()) && getReturnCarCostReqDto.getIsReturnCarCost()) {
                int expectedShouldFee = Integer.valueOf(fbcFeeResponse.getExpectedShouldFee());
                RenterOrderCostDetailEntity renterOrderCostDetailEntity = new RenterOrderCostDetailEntity();
+                renterOrderCostDetailEntity.setOrderNo(costBaseDTO.getOrderNo());
+                renterOrderCostDetailEntity.setRenterOrderNo(costBaseDTO.getRenterOrderNo());
+                renterOrderCostDetailEntity.setMemNo(costBaseDTO.getMemNo());
                renterOrderCostDetailEntity.setCostCode(RenterCashCodeEnum.SRV_RETURN_COST.getCashNo());
                renterOrderCostDetailEntity.setCostDesc(RenterCashCodeEnum.SRV_RETURN_COST.getTxt());
                renterOrderCostDetailEntity.setCount(1D);
@@ -713,6 +726,9 @@ public class RenterOrderCostCombineService {
                listCostDetail.add(renterOrderCostDetailEntity);
 
                RenterOrderSubsidyDetailDTO renterOrderSubsidy = new RenterOrderSubsidyDetailDTO();
+               renterOrderSubsidy.setOrderNo(costBaseDTO.getOrderNo());
+               renterOrderSubsidy.setRenterOrderNo(costBaseDTO.getRenterOrderNo());
+               renterOrderSubsidy.setMemNo(costBaseDTO.getMemNo());
                renterOrderSubsidy.setSubsidyTypeName(SubsidyTypeCodeEnum.RETURN_CAR.getDesc());
                renterOrderSubsidy.setSubsidyTypeCode(SubsidyTypeCodeEnum.RETURN_CAR.getCode());
                renterOrderSubsidy.setSubsidySourceCode(SubsidySourceCodeEnum.PLATFORM.getCode());
@@ -847,9 +863,9 @@ public class RenterOrderCostCombineService {
     public GetReturnOverCostDTO getGetReturnOverCost(GetReturnCarOverCostReqDto getReturnCarOverCostReqDto) {
         GetReturnOverCostDTO getReturnOverCostDTO = new GetReturnOverCostDTO();
         List<RenterOrderCostDetailEntity> renterOrderCostDetailEntityList = new ArrayList<>();
-
-        LocalDateTime rentTime = getReturnCarOverCostReqDto.getCostBaseDTO().getStartTime();
-        LocalDateTime revertTime = getReturnCarOverCostReqDto.getCostBaseDTO().getEndTime();
+        CostBaseDTO costBaseDTO = getReturnCarOverCostReqDto.getCostBaseDTO();
+        LocalDateTime rentTime = costBaseDTO.getStartTime();
+        LocalDateTime revertTime = costBaseDTO.getEndTime();
         Integer cityCode = getReturnCarOverCostReqDto.getCityCode();
 
         // 初始化数据
@@ -866,8 +882,8 @@ public class RenterOrderCostCombineService {
             // 超运能后计算附加费标志
             Boolean isAddFee = orderTypeList.contains(getReturnCarOverCostReqDto.getOrderType());
             //TODO apollo中获取配置参数
-            Integer nightBegin = 0/*Integer.valueOf(apolloCostConfig.getNightBeginStr())*/;
-            Integer nightEnd = 0/*Integer.valueOf(apolloCostConfig.getNightEndStr())*/;
+            Integer nightBegin = 20/*Integer.valueOf(apolloCostConfig.getNightBeginStr())*/;
+            Integer nightEnd = 23/*Integer.valueOf(apolloCostConfig.getNightEndStr())*/;
             Integer overTransportFee = this.getGetReturnOverTransportFee(cityCode);
             String rentTimeLongStr = String.valueOf(LocalDateTimeUtils.localDateTimeToLong(rentTime));
 
@@ -910,6 +926,9 @@ public class RenterOrderCostCombineService {
                             getReturnOverTransport.setNightGetOverTransportFee(overTransportFee);
                         }
                         RenterOrderCostDetailEntity renterOrderCostDetailEntity = new RenterOrderCostDetailEntity();
+                        renterOrderCostDetailEntity.setOrderNo(costBaseDTO.getOrderNo());
+                        renterOrderCostDetailEntity.setRenterOrderNo(costBaseDTO.getRenterOrderNo());
+                        renterOrderCostDetailEntity.setMemNo(costBaseDTO.getMemNo());
                         renterOrderCostDetailEntity.setTotalAmount(overTransportFee);
                         renterOrderCostDetailEntity.setCount(1D);
                         renterOrderCostDetailEntity.setCostCode(RenterCashCodeEnum.GET_BLOCKED_RAISE_AMT.getCashNo());
@@ -961,6 +980,9 @@ public class RenterOrderCostCombineService {
                             getReturnOverTransport.setNightReturnOverTransportFee(overTransportFee);;
                         }
                         RenterOrderCostDetailEntity renterOrderCostDetailEntity = new RenterOrderCostDetailEntity();
+                        renterOrderCostDetailEntity.setOrderNo(costBaseDTO.getOrderNo());
+                        renterOrderCostDetailEntity.setRenterOrderNo(costBaseDTO.getRenterOrderNo());
+                        renterOrderCostDetailEntity.setMemNo(costBaseDTO.getMemNo());
                         renterOrderCostDetailEntity.setTotalAmount(overTransportFee);
                         renterOrderCostDetailEntity.setCount(1D);
                         renterOrderCostDetailEntity.setCostCode(RenterCashCodeEnum.RETURN_BLOCKED_RAISE_AMT.getCashNo());
@@ -1027,6 +1049,8 @@ public class RenterOrderCostCombineService {
         try {
             //TODO  apollo获取配置信息
            // return Integer.valueOf(apolloCostConfig.getGetReturnOverTransportFee());
+            //TODO 给一个默认值，用于测试，测试后需要删除
+            return 50;
         } catch (Exception e) {
             log.error("获取取还车超运能溢价默认值异常：", e);
         }
