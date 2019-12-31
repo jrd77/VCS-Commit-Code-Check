@@ -43,9 +43,6 @@ public enum ErrorCode {
 
     ORDER_RENTER_ORDERNO_CREATE_ERROR("600001","订单编码创建异常"),
 
-    FEIGN_GET_MEMBER_ERROR("500100","获取会员信息异常"),
-    FEIGN_GET_MEMBER_FAIL("500100","获取会员信息失败"),
-
 
     COST_GET_RETUIRN_ERROR("700001","获取取还车费用系统异常"),
     COST_GET_RETUIRN_FAIL("700002","获取取还车费用失败"),
@@ -57,9 +54,16 @@ public enum ErrorCode {
     IS_RETURN_CAR_OVER_ERROR("700008","还车是否超运能接口异常"),
 
 
+    FEIGN_MEMBER_DRIVER_fAIL("700100","获取附加驾驶人信息失败"),
+    FEIGN_MEMBER_DRIVER_ERROR("700101","获取附加驾驶人信息异常"),
+    FEIGN_RENTER_CAR_ERROR("700102","获取租客车辆信息异常"),
+    FEIGN_RENTER_CAR_FAIL("700102","获取租客车辆信息失败"),
+    FEIGN_OWNER_MEMBER_ERROR("700103","获取车主会员信息异常"),
+    FEIGN_OWNER_MEMBER_FAIL("700104","获取车主会员信息失败"),
+    FEIGN_RENTER_MEMBER_ERROR("500100","获取租客会员信息异常"),
+    FEIGN_RENTER_MEMBER_FAIL("500100","获取租客会员信息失败"),
 
-    MEMBER_DRIVER_fAIL("700100","获取附加驾驶人信息失败"),
-    MEMBER_DRIVER_ERROR("700101","获取附加驾驶人信息异常"),
+
     ;
 
     private String code;
