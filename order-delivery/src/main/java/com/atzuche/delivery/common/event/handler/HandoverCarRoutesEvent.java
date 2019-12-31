@@ -12,7 +12,7 @@ import com.atzuche.delivery.utils.CommonUtil;
 import com.atzuche.delivery.utils.DateUtils;
 import com.atzuche.delivery.utils.MD5Util;
 import com.atzuche.delivery.utils.ZipUtils;
-import com.atzuche.delivery.vo.HandoverCarVO;
+import com.atzuche.delivery.vo.HandoverCarRenYunVO;
 import com.autoyol.aliyunmq.AliyunMnsService;
 import com.google.common.collect.Maps;
 import com.google.common.eventbus.AllowConcurrentEvents;
@@ -49,13 +49,13 @@ public class HandoverCarRoutesEvent {
         Message message = (Message)object;
         byte[] messageBody = message.getMessageBodyAsBytes();
         String json = ZipUtils.uncompress(messageBody);
-        HandoverCarVO handoverCarVO = JSONObject.parseObject(json, HandoverCarVO.class);
+        HandoverCarRenYunVO handoverCarVO = JSONObject.parseObject(json, HandoverCarRenYunVO.class);
         handoverCarVO.setMessageId(message.getMessageId());
         // todo 插入记录数据
         sendMessageToAliMnsQueue(handoverCarVO);
     }
 
-    public void sendMessageToAliMnsQueue(HandoverCarVO handoverCarVO)
+    public void sendMessageToAliMnsQueue(HandoverCarRenYunVO handoverCarVO)
     {
             // 携程套餐订单完成进行回执
             String description = handoverCarVO.getDescription();
