@@ -21,18 +21,6 @@ public class OwnerOrderReqDTO {
      */
     private String memNo;
     /**
-     * 车辆类型
-     */
-    private Integer carOwnerType;
-    /**
-     * 取车标志
-     */
-    private Integer srvGetFlag;
-    /**
-     * 还车标志
-     */
-    private Integer srvReturnFlag;
-    /**
      * 显示起租时间
      */
     private LocalDateTime showRentTime;
@@ -56,6 +44,18 @@ public class OwnerOrderReqDTO {
      * 是否使用特供价 0-否，1-是
      */
     private Integer isUseSpecialPrice;
+    /**
+     * 车辆类型
+     */
+    private Integer carOwnerType;
+    /**
+     * 取车标志
+     */
+    private Integer srvGetFlag;
+    /**
+     * 还车标志
+     */
+    private Integer srvReturnFlag;
     /**
      * 车辆号
      */
