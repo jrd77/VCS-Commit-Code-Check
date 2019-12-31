@@ -50,7 +50,7 @@
 				`param`,		
 				`operate_desc`,		
 				`create_op`,
-				`update_op`,
+				`update_op`
 			)
 		values
 		(
@@ -61,7 +61,7 @@
 				#{param}, 		
 				#{operateDesc}, 		
 				#{createOp},
-				#{updateOp},
+				#{updateOp}
 			)
 	</insert>
 	
