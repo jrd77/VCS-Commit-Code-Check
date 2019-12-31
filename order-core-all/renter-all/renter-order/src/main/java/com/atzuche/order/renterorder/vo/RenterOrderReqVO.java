@@ -33,19 +33,19 @@ public class RenterOrderReqVO implements Serializable {
     private String renterOrderNo;
 
     /**
-     * 会员号
+     * 订单类型
      */
-    private String memNo;
+    private String orderCategory;
 
     /**
-     * 内部员工标识
+     * 会员号
      */
-    private Integer internalStaff;
+    private Integer memNo;
 
     /**
      * 车辆注册号
      */
-    private Integer carNo;
+    private String carNo;
 
     /**
      * 车牌号

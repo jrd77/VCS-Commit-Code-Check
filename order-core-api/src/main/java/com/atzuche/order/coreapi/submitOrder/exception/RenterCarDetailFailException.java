@@ -7,4 +7,9 @@ public class RenterCarDetailFailException extends SubmitOrderException {
     public RenterCarDetailFailException() {
         super(ErrorCode.FEIGN_RENTER_CAR_FAIL.getCode(),ErrorCode.FEIGN_RENTER_CAR_FAIL.getText());
     }
+
+
+    public RenterCarDetailFailException(String errorCode, String errorMsg) {
+        super(errorCode, errorMsg);
+    }
 }
