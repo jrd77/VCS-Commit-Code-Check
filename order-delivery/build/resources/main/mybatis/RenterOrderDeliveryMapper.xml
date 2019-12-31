@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.atzuche.delivery.mapper.RenterOrderDeliveryMapper">
+<mapper namespace="com.atzuche.order.delivery.mapper.RenterOrderDeliveryMapper">
 
-    <resultMap type="com.atzuche.delivery.entity.RenterOrderDeliveryEntity" id="BaseResultMap">
+    <resultMap type="com.atzuche.order.delivery.entity.RenterOrderDeliveryEntity" id="BaseResultMap">
         <result property="id" column="id"/>
         <result property="orderNo" column="order_no"/>
         <result property="renterOrderNo" column="renter_order_no"/>
@@ -74,7 +74,7 @@
 		select <include refid="Base_Column_List" /> from renter_order_delivery where id = #{value}
 	</select>
 
-	<insert id="insert" parameterType="com.atzuche.delivery.entity.RenterOrderDeliveryEntity" useGeneratedKeys="true" keyProperty="id">
+	<insert id="insert" parameterType="com.atzuche.order.delivery.entity.RenterOrderDeliveryEntity" useGeneratedKeys="true" keyProperty="id">
 		insert into renter_order_delivery
 		(
 				`order_no`,		
@@ -139,7 +139,7 @@
 			)
 	</insert>
 	
-	<insert id="insertSelective" parameterType="com.atzuche.delivery.entity.RenterOrderDeliveryEntity" useGeneratedKeys="true" keyProperty="id">
+	<insert id="insertSelective" parameterType="com.atzuche.order.delivery.entity.RenterOrderDeliveryEntity" useGeneratedKeys="true" keyProperty="id">
 		insert into renter_order_delivery
 		(
 				<if test="orderNo != null">`order_no`, </if>
@@ -205,7 +205,7 @@
 	</insert>
 	
 	 
-	<update id="updateByPrimaryKeySelective" parameterType="com.atzuche.delivery.entity.RenterOrderDeliveryEntity">
+	<update id="updateByPrimaryKeySelective" parameterType="com.atzuche.order.delivery.entity.RenterOrderDeliveryEntity">
 		update renter_order_delivery 
 		<set>
 				<if test="orderNo != null">`order_no` = #{orderNo}, </if>
@@ -240,7 +240,7 @@
 		where id = #{id}
 	</update>
 	
-	<update id="updateByPrimaryKey" parameterType="com.atzuche.delivery.entity.RenterOrderDeliveryEntity">
+	<update id="updateByPrimaryKey" parameterType="com.atzuche.order.delivery.entity.RenterOrderDeliveryEntity">
 		update renter_order_delivery 
 		<set>
 				`order_no` = #{orderNo}, 		
@@ -275,11 +275,25 @@
 		</set>
 		where id = #{id}
 	</update>
-	
-	
+
+
 	<select id="listRenterOrderDeliveryByRenterOrderNo" resultMap="BaseResultMap">
-		select <include refid="Base_Column_List" /> from renter_order_delivery where renter_order_no = #{renterOrderNo}
+		select
+		<include refid="Base_Column_List"/>
+		from renter_order_delivery where renter_order_no = #{renterOrderNo}
 		and is_delete = 0
 	</select>
-  	
+
+	<update id="updateById" parameterType="java.lang.Integer">
+		UPDATE renter_order_delivery
+		SET status = 2
+		WHERE id = #{id} AND is_delete = 0
+	</update>
+
+	<select id="findRenterOrderByRenterOrderNo" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List"/>
+		from renter_order_delivery where renter_order_no = #{renterOrderNo}
+		and type = #{type} and is_delete = 0
+	</select>
 </mapper>
