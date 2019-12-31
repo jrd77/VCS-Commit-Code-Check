@@ -252,7 +252,7 @@
 		where id = #{id}
 	</update>
 
-	<select id="queryObjectByMsgId" parameterType="string" resultType="string">
+	<select id="queryObjectByMsgId" parameterType="string" resultType="java.lang.String">
 		select msg_id from owner_handover_car_info
 		where msg_id = #{msgId} and is_delete = 0
 	</select>

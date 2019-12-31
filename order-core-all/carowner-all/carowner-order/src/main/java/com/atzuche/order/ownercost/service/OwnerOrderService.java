@@ -2,6 +2,7 @@ package com.atzuche.order.ownercost.service;
 
 
 import com.atzuche.order.commons.entity.dto.CostBaseDTO;
+import com.atzuche.order.commons.enums.OwnerChildStatusEnum;
 import com.atzuche.order.ownercost.entity.OwnerOrderEntity;
 import com.atzuche.order.ownercost.entity.dto.OwnerOrderCostReqDTO;
 import com.atzuche.order.ownercost.entity.dto.OwnerOrderReqDTO;
@@ -58,11 +59,11 @@ public class OwnerOrderService {
         BeanUtils.copyProperties(ownerOrderReqDTO,ownerOrderEntity);
         ownerOrderEntity.setGoodsCode(ownerOrderReqDTO.getCarNo());
         ownerOrderEntity.setGoodsType(String.valueOf(ownerOrderReqDTO.getCategory()));
+        ownerOrderEntity.setChildStatus(OwnerChildStatusEnum.PROCESS_ING.getCode());
         ownerOrderMapper.insert(ownerOrderEntity);
         //2、生成费用信息
 
         OwnerOrderCostReqDTO ownerOrderCostReqDTO = new OwnerOrderCostReqDTO();
-
         ownerOrderCostReqDTO.setCarOwnerType(ownerOrderReqDTO.getCarOwnerType());
         ownerOrderCostReqDTO.setSrvGetFlag(ownerOrderReqDTO.getSrvGetFlag());
         ownerOrderCostReqDTO.setSrvReturnFlag(ownerOrderReqDTO.getSrvReturnFlag());

@@ -86,11 +86,10 @@ public class RenterOrderCostHandleService {
 
         RenterOrderCarDepositResVO renterOrderCarDepositResVO = new RenterOrderCarDepositResVO();
         renterOrderCarDepositResVO.setYingfuDepositAmt(carDepositAmt.getCarDepositAmt());
-        renterOrderCarDepositResVO.setMemNo(renterOrderReqVO.getMemNo());
+        renterOrderCarDepositResVO.setMemNo(renterOrderReqVO.getMemNo().toString());
         renterOrderCarDepositResVO.setOrderNo(renterOrderReqVO.getOrderNo());
         renterOrderCarDepositResVO.setReductionAmt(memRightCarDepositAmtRespDTO.getReductionDepositAmt());
         renterOrderCarDepositResVO.setFreeDepositType(FreeDepositTypeEnum.getFreeDepositTypeEnumByCode(Integer.valueOf(renterOrderReqVO.getFreeDoubleTypeId())));
-        //cashierService.insertRenterDeposit(createOrderRenterDepositReqVO);
 
         //车辆押金明细入库
         RenterDepositDetailEntity record = new RenterDepositDetailEntity();
@@ -128,9 +127,8 @@ public class RenterOrderCostHandleService {
         RenterOrderIllegalResVO renterOrderIllegalResVO = new RenterOrderIllegalResVO();
         renterOrderIllegalResVO.setOrderNo(renterOrderReqVO.getOrderNo());
         renterOrderIllegalResVO.setFreeDepositType(FreeDepositTypeEnum.getFreeDepositTypeEnumByCode(Integer.valueOf(renterOrderReqVO.getFreeDoubleTypeId())));
-        renterOrderIllegalResVO.setMemNo(renterOrderReqVO.getMemNo());
+        renterOrderIllegalResVO.setMemNo(renterOrderReqVO.getMemNo().toString());
         renterOrderIllegalResVO.setYingfuDepositAmt(realIllegalDepositAmt);
-        //cashierService.insertRenterWZDeposit(createOrderRenterIllegalDepositReqVO);
         return renterOrderIllegalResVO;
     }
 
