@@ -3,17 +3,11 @@ package com.atzuche.order.ownercost.service;
 import com.atzuche.order.commons.entity.dto.CostBaseDTO;
 import com.atzuche.order.ownercost.entity.OwnerOrderCostEntity;
 import com.atzuche.order.ownercost.entity.OwnerOrderIncrementDetailEntity;
-import com.atzuche.order.ownercost.entity.OwnerOrderPurchaseDetailEntity;
-import com.atzuche.order.ownercost.entity.OwnerOrderSubsidyDetailEntity;
 import com.atzuche.order.ownercost.entity.dto.OwnerOrderCostReqDTO;
-import com.atzuche.order.ownercost.entity.dto.OwnerOrderSubsidyDetailDTO;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class OwnerOrderCalCostService {
@@ -43,20 +37,9 @@ public class OwnerOrderCalCostService {
         Integer srvGetFlag = ownerOrderCostReqDTO.getSrvGetFlag();
         Integer srvReturnFlag = ownerOrderCostReqDTO.getSrvReturnFlag();
 
-        List<OwnerOrderPurchaseDetailEntity> ownerOrderPurchaseDetailList = ownerOrderCostReqDTO.getOwnerOrderPurchaseDetailList();
-        List<OwnerOrderSubsidyDetailDTO> ownerOrderSubsidyDetailDTOList = ownerOrderCostReqDTO.getOwnerOrderSubsidyDetailDTOList();
-
-        List<OwnerOrderSubsidyDetailEntity> ownerSubsidyDetailList = ownerOrderSubsidyDetailDTOList
-                .stream()
-                .map(x -> {
-                    OwnerOrderSubsidyDetailEntity ownerSubsidyDetail = new OwnerOrderSubsidyDetailEntity();
-                    BeanUtils.copyProperties(x,ownerSubsidyDetail);
-                    return ownerSubsidyDetail;
-                })
-                .collect(Collectors.toList());
         //计算租金和补贴
-        int rentAmt = ownerOrderPurchaseDetailList.stream().collect(Collectors.summingInt(OwnerOrderPurchaseDetailEntity::getTotalAmount));
-        int subsidyAmt = ownerOrderSubsidyDetailDTOList.stream().collect(Collectors.summingInt(OwnerOrderSubsidyDetailDTO::getSubsidyAmount));
+        int rentAmt = ownerOrderCostReqDTO.getOwnerOrderPurchaseDetailEntity().getTotalAmount();
+        int subsidyAmt = ownerOrderCostReqDTO.getOwnerOrderSubsidyDetailEntity().getSubsidyAmount();
 
         //计算取还车增值费用费用
         OwnerOrderIncrementDetailEntity ownerSrvGetAmtEntity = ownerOrderCostCombineService.getOwnerSrvGetAmtEntity(costBaseDTO, carOwnerType, srvGetFlag);
@@ -75,8 +58,8 @@ public class OwnerOrderCalCostService {
         ownerOrderCostEntity.setVersion(0);
 
         ownerOrderIncrementDetailService.saveOwnerOrderIncrementDetailBatch(Arrays.asList(ownerSrvGetAmtEntity,ownerSrvReturnAmtEntity));
-        ownerOrderPurchaseDetailService.saveOwnerOrderPurchaseDetailBatch(ownerOrderPurchaseDetailList);
-        ownerOrderSubsidyDetailService.saveOwnerOrderSubsidyDetailBatch(ownerSubsidyDetailList);
+        ownerOrderPurchaseDetailService.saveOwnerOrderPurchaseDetail(ownerOrderCostReqDTO.getOwnerOrderPurchaseDetailEntity());
+        ownerOrderSubsidyDetailService.saveOwnerOrderSubsidyDetail(ownerOrderCostReqDTO.getOwnerOrderSubsidyDetailEntity());
         ownerOrderCostService.saveOwnerOrderCost(ownerOrderCostEntity);
     }
 

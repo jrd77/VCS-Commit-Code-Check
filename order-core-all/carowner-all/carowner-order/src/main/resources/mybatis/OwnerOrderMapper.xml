@@ -75,13 +75,11 @@
         `goods_code`,
         `goods_type`,
         `child_status`,
-        `is_cancle`,
         `is_use_special_price`,
         `cancle_reason`,
         `cancle_op`,
         `create_op`,
-        `update_op`,
-        `is_delete`
+        `update_op`
         )
         values
         (
@@ -97,13 +95,11 @@
         #{goodsCode},
         #{goodsType},
         #{childStatus},
-        #{isCancle},
         #{isUseSpecialPrice},
         #{cancleReason},
         #{cancleOp},
         #{createOp},
-        #{updateOp},
-        #{isDelete}
+        #{updateOp}
         )
     </insert>
 
