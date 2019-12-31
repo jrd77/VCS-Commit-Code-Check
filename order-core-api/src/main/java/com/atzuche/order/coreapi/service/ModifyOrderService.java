@@ -38,6 +38,7 @@ import com.atzuche.order.rentercost.entity.RenterOrderFineDeatailEntity;
 import com.atzuche.order.rentercost.entity.RenterOrderSubsidyDetailEntity;
 import com.atzuche.order.rentercost.entity.dto.OrderCouponDTO;
 import com.atzuche.order.rentercost.entity.dto.RenterOrderSubsidyDetailDTO;
+import com.atzuche.order.rentercost.service.AutoCoinCostCalService;
 import com.atzuche.order.rentercost.service.RenterOrderCostCombineService;
 import com.atzuche.order.rentercost.service.RenterOrderCostDetailService;
 import com.atzuche.order.rentercost.service.RenterOrderFineDeatailService;
@@ -47,12 +48,15 @@ import com.atzuche.order.renterorder.entity.OrderCouponEntity;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.atzuche.order.renterorder.entity.dto.RenterOrderCostReqDTO;
 import com.atzuche.order.renterorder.entity.dto.RenterOrderCostRespDTO;
+import com.atzuche.order.renterorder.service.AutoCoinService;
 import com.atzuche.order.renterorder.service.OrderCouponService;
+import com.atzuche.order.renterorder.service.RenterAdditionalDriverService;
 import com.atzuche.order.renterorder.service.RenterOrderCalCostService;
 import com.atzuche.order.renterorder.service.RenterOrderService;
 import com.atzuche.order.renterorder.vo.RenterOrderReqVO;
 import com.atzuche.order.renterorder.vo.owner.OwnerCouponGetAndValidReqVO;
 import com.atzuche.order.renterorder.vo.platform.MemAvailCouponRequestVO;
+import com.autoyol.auto.coin.service.vo.res.AutoCoinResponseVO;
 import com.autoyol.commons.web.ResponseData;
 import com.dianping.cat.Cat;
 
@@ -87,6 +91,12 @@ public class ModifyOrderService {
 	private RenterOrderCostCombineService renterOrderCostCombineService;
 	@Autowired
 	private RenterOrderSubsidyDetailService renterOrderSubsidyDetailService;
+	@Autowired
+	private RenterAdditionalDriverService renterAdditionalDriverService;
+	@Autowired
+	private AutoCoinService autoCoinService;
+	@Autowired
+	private AutoCoinCostCalService autoCoinCostCalService;
 
 	/**
 	 * 修改订单主逻辑
@@ -137,9 +147,8 @@ public class ModifyOrderService {
 		List<RenterOrderFineDeatailEntity> renterFineList = getRenterFineList(modifyOrderDTO, initRenterOrder, deliveryList, renterOrderCostRespDTO);
 		// 封装基础信息对象
 		CostBaseDTO costBaseDTO = new CostBaseDTO(modifyOrderDTO.getOrderNo(), modifyOrderDTO.getRenterOrderNo(), modifyOrderDTO.getMemNo(), modifyOrderDTO.getRentTime(), modifyOrderDTO.getRevertTime());
-		// 获取抵扣补贴
-		CostDeductVO costDeductVO = getCostDeductVO(costBaseDTO, renterOrderCostRespDTO, renterOrderReqVO, orderEntity);
-		// TODO 凹凸币
+		// 获取抵扣补贴(含车主券，限时立减，取还车券，平台券和凹凸币)
+		CostDeductVO costDeductVO = getCostDeductVO(modifyOrderDTO, costBaseDTO, renterOrderCostRespDTO, renterOrderReqVO, orderEntity, initSubsidyList);
 		
 		// 修改前费用
 		
@@ -208,9 +217,21 @@ public class ModifyOrderService {
 		if (modifyOrderReq.getRevertTime() == null) {
 			modifyOrderDTO.setRevertTime(initRenterOrder.getExpRevertTime());
 		}
-		if (modifyOrderReq.getDriverIds() == null || modifyOrderReq.getDriverIds().isEmpty()) {
-			
+		// 获取修改前的附加驾驶人列表
+		List<String> drivers = renterAdditionalDriverService.listDriverIdByRenterOrderNo(initRenterOrder.getRenterOrderNo());
+		// 本次修改新增的附加驾驶人列表
+		List<String> addDrivers = modifyOrderReq.getDriverIds();
+		// 汇总后的附加驾驶人
+		List<String> afterDrivers = new ArrayList<String>();
+		if (drivers != null && !drivers.isEmpty()) {
+			afterDrivers.addAll(drivers); 
 		}
+		if (addDrivers != null && !addDrivers.isEmpty()) {
+			afterDrivers.addAll(addDrivers);
+		}
+		// 去重处理
+		afterDrivers = afterDrivers.stream().distinct().collect(Collectors.toList());
+		modifyOrderDTO.setDriverIds(afterDrivers);
 		Map<Integer, RenterOrderDeliveryEntity> deliveryMap = null;
 		if (deliveryList != null && !deliveryList.isEmpty()) {
 			deliveryMap = deliveryList.stream().collect(Collectors.toMap(RenterOrderDeliveryEntity::getType, deliver -> {return deliver;}));
@@ -516,7 +537,7 @@ public class ModifyOrderService {
 	 * @param orderEntity
 	 * @return CostDeductVO
 	 */
-	public CostDeductVO getCostDeductVO(CostBaseDTO costBaseDTO, RenterOrderCostRespDTO renterOrderCostRespDTO, RenterOrderReqVO renterOrderReqVO, OrderEntity orderEntity) {
+	public CostDeductVO getCostDeductVO(ModifyOrderDTO modifyOrderDTO, CostBaseDTO costBaseDTO, RenterOrderCostRespDTO renterOrderCostRespDTO, RenterOrderReqVO renterOrderReqVO, OrderEntity orderEntity, List<RenterOrderSubsidyDetailEntity> initSubsidyList) {
 		// 抵扣列表
 		List<OrderCouponDTO> orderCouponList = new ArrayList<OrderCouponDTO>();
 		// 补贴列表
@@ -561,6 +582,13 @@ public class ModifyOrderService {
 		RenterOrderSubsidyDetailDTO platformCouponSubsidy = getPlatformCouponSubsidy(costBaseDTO, platformCoupon);
 		if (platformCouponSubsidy != null) {
 			renterSubsidyList.add(platformCouponSubsidy);
+			int platformCouponAmt = platformCouponSubsidy.getSubsidyAmount() == null ? 0:platformCouponSubsidy.getSubsidyAmount();
+			surplusRentAmt = surplusRentAmt - platformCouponAmt;
+		}
+		// 凹凸币补贴
+		RenterOrderSubsidyDetailDTO autoCoinSubsidy = getAutoCoinSubsidy(costBaseDTO, modifyOrderDTO, initSubsidyList, renterOrderCostRespDTO.getRentAmount(), surplusRentAmt);
+		if (autoCoinSubsidy != null) {
+			renterSubsidyList.add(autoCoinSubsidy);
 		}
 		CostDeductVO costDeductVO = new CostDeductVO();
 		costDeductVO.setOrderCouponList(orderCouponList);
@@ -723,6 +751,33 @@ public class ModifyOrderService {
         platformCouponSubsidyInfo.setOrderNo(costBaseDTO.getOrderNo());
         platformCouponSubsidyInfo.setRenterOrderNo(costBaseDTO.getRenterOrderNo());
         return platformCouponSubsidyInfo;
+	}
+	
+	/**
+	 * 获取凹凸币补贴
+	 * @param costBaseDTO
+	 * @param modifyOrderDTO
+	 * @param initSubsidyList
+	 * @param rentAmt
+	 * @param surplusRentAmt
+	 * @return RenterOrderSubsidyDetailDTO
+	 */
+	public RenterOrderSubsidyDetailDTO getAutoCoinSubsidy(CostBaseDTO costBaseDTO, ModifyOrderDTO modifyOrderDTO, List<RenterOrderSubsidyDetailEntity> initSubsidyList, Integer rentAmt, Integer surplusRentAmt) {
+		// 是否使用凹凸币
+		Integer userAutoCoinFlag = modifyOrderDTO.getUserCoinFlag();
+		if (userAutoCoinFlag == null || !userAutoCoinFlag.equals(1)) {
+			return null;
+		}
+		// 修改前凹凸币抵扣金额
+		Integer initAutoCoinAmt = 0;
+		if (initSubsidyList != null && !initSubsidyList.isEmpty()) {
+			initAutoCoinAmt = initSubsidyList.stream().filter(subsid -> {
+				return RenterCashCodeEnum.AUTO_COIN_DEDUCT.getCashNo().equals(subsid.getSubsidyCostCode());
+				}).mapToInt(RenterOrderSubsidyDetailEntity::getSubsidyAmount).sum();
+		}
+		AutoCoinResponseVO crmCustPoint = autoCoinService.getCrmCustPoint(Integer.valueOf(costBaseDTO.getMemNo()));
+		RenterOrderSubsidyDetailDTO autoCoinSubsidy = autoCoinCostCalService.calAutoCoinDeductInfo(rentAmt, surplusRentAmt, crmCustPoint, initAutoCoinAmt);
+		return autoCoinSubsidy;
 	}
 	
 	
