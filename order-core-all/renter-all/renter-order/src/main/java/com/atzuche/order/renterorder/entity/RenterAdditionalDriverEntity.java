@@ -28,6 +28,10 @@ public class RenterAdditionalDriverEntity implements Serializable {
 	 * 子订单号
 	 */
 	private String renterOrderNo;
+    /**
+     * 附加驾驶人ID
+     */
+	private String driverId;
 	/**
 	 * 附加驾驶人姓名
 	 */
