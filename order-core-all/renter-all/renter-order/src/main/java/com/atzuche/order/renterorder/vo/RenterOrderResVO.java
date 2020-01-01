@@ -33,4 +33,11 @@ public class RenterOrderResVO {
      * 违章押金
      */
     private RenterOrderIllegalResVO renterOrderIllegalResVO;
+
+
+    /**
+     * 优惠券、凹凸币返回信息(用于绑定券、扣除币等)
+     */
+    private CouponAndAutoCoinResVO couponAndAutoCoinResVO;
+
 }
