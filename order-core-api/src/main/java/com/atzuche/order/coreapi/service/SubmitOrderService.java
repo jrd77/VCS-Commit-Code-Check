@@ -16,7 +16,6 @@ import com.atzuche.order.commons.enums.RenterCashCodeEnum;
 import com.atzuche.order.commons.enums.SubsidySourceCodeEnum;
 import com.atzuche.order.commons.enums.SubsidyTypeCodeEnum;
 import com.atzuche.order.commons.enums.account.FreeDepositTypeEnum;
-import com.atzuche.order.commons.vo.req.AdminOrderReqVO;
 import com.atzuche.order.commons.vo.req.NormalOrderReqVO;
 import com.atzuche.order.commons.vo.res.NormalOrderResVO;
 import com.atzuche.order.coreapi.entity.vo.req.CarRentTimeRangeReqVO;
@@ -117,7 +116,7 @@ public class SubmitOrderService {
         //2.3校验链
 
         //提前延后时间计算
-        CarRentTimeRangeResVO carRentTimeRangeResVO = carService.getCarRentTimeRange(buildCarRentTimeRangeReqVO(normalOrderReqVO));
+        CarRentTimeRangeResVO carRentTimeRangeResVO = goodsService.getCarRentTimeRange(buildCarRentTimeRangeReqVO(normalOrderReqVO));
         //3.生成主订单号
         String orderNo = uniqueOrderNoService.getOrderNo();
         //4.创建租客子订单
