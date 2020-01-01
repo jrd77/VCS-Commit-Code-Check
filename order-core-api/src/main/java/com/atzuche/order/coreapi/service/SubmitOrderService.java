@@ -201,11 +201,7 @@ public class SubmitOrderService {
         orderStatusDTO.setOrderNo(orderNo);
         orderStatusDTO.setIsDispatch(OrderConstant.NO);
         orderStatusDTO.setDispatchStatus(OrderConstant.NO);
-        if (null == renterGoodsDetailDTO.getReplyFlag() || renterGoodsDetailDTO.getReplyFlag() == OrderConstant.NO) {
-            orderStatusDTO.setStatus(OrderStatus.TO_CONFIRM.getStatus());
-        } else {
-            orderStatusDTO.setStatus(OrderStatus.TO_PAY.getStatus());
-        }
+        orderStatusDTO.setStatus(OrderStatus.TO_CONFIRM.getStatus());
         parentOrderDTO.setOrderStatusDTO(orderStatusDTO);
         parentOrderService.saveParentOrderInfo(parentOrderDTO);
 
