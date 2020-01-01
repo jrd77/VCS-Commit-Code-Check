@@ -7,6 +7,7 @@ import com.atzuche.order.cashieraccount.entity.CashierEntity;
 import com.atzuche.order.cashieraccount.entity.CashierRefundApplyEntity;
 import com.atzuche.order.cashieraccount.exception.OrderPayCallBackAsnyException;
 import com.atzuche.order.cashieraccount.service.notservice.CashierNoTService;
+import com.atzuche.order.cashieraccount.service.notservice.CashierRefundApplyNoTService;
 import com.atzuche.order.cashieraccount.service.remote.RefundRemoteService;
 import com.atzuche.order.cashieraccount.service.remote.WalletRemoteService;
 import com.atzuche.order.cashieraccount.vo.req.pay.OrderPaySignReqVO;
@@ -71,6 +72,7 @@ public class CashierPayService{
     @Autowired CashierNoTService cashierNoTService;
     @Autowired WalletRemoteService walletRemoteService;
     @Autowired RefundRemoteService refundRemoteService;
+    @Autowired CashierRefundApplyNoTService cashierRefundApplyNoTService;
 
     /**
      * 支付系统回调（支付回调，退款回调到时一个）
@@ -106,7 +108,6 @@ public class CashierPayService{
             t.complete();
         }
     }
-
 
     /**
      * 获取支付验签数据
@@ -252,17 +253,19 @@ public class CashierPayService{
         return payVo;
     }
 
-
     /**
      * 退款操作
      * @param cashierRefundApply
      */
     public void refundOrderPay(CashierRefundApplyEntity cashierRefundApply){
+        cashierRefundApplyNoTService.updateCashierRefundApplyEntity(cashierRefundApply);
         RefundVo model = new RefundVo();
         BeanUtils.copyProperties(cashierRefundApply,model);
         AutoPayResultVo vo = refundRemoteService.refundOrderPay(model);
         if(Objects.nonNull(vo)){
-
+            OrderPayAsynResVO orderPayAsynRes = new OrderPayAsynResVO();
+            BeanUtils.copyProperties(vo,orderPayAsynRes);
+            cashierRefundApplyNoTService.updateRefundDepositSuccess(orderPayAsynRes);
         }
     }
 
