@@ -7,8 +7,11 @@ import com.atzuche.order.delivery.common.mq.handover.HandoverRabbitMQEventEnum;
 import com.atzuche.order.delivery.enums.ServiceTypeEnum;
 import com.atzuche.order.delivery.enums.UserTypeEnum;
 import com.atzuche.order.delivery.service.handover.HandoverCarService;
+import com.atzuche.order.delivery.utils.CommonUtil;
 import com.atzuche.order.delivery.utils.ZipUtils;
 import com.atzuche.order.delivery.vo.HandoverCarRenYunVO;
+import com.atzuche.order.delivery.vo.handover.HandoverCarInfoDTO;
+import com.atzuche.order.delivery.vo.handover.HandoverCarRemarkDTO;
 import com.atzuche.order.delivery.vo.handover.HandoverCarVO;
 import com.autoyol.commons.utils.DateUtil;
 import com.autoyol.commons.utils.GsonUtils;
@@ -16,6 +19,7 @@ import com.dianping.cat.Cat;
 import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.Subscribe;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,11 +49,13 @@ public class HandoverCarRoutesEvent {
             log.info("仁云推送过来的消息数据存在问题：object:{}", object);
             return;
         }
-        Message message = (Message)object;
-        byte[] messageBody = message.getMessageBodyAsBytes();
-        String json = ZipUtils.uncompress(messageBody);
-        HandoverCarRenYunVO handoverCarRenYunVO = JSONObject.parseObject(json, HandoverCarRenYunVO.class);
-        handoverCarRenYunVO.setMessageId(message.getMessageId());
+        HashMap message = (HashMap) object;
+        HandoverCarRenYunVO handoverCarRenYunVO = new HandoverCarRenYunVO();
+        try {
+            BeanUtils.populate(handoverCarRenYunVO, message);
+        } catch (Exception e) {
+            log.error("map转换失败，message：{}", JSONObject.toJSONString(message));
+        }
         //发送mq event
         sendMessageToQueue(handoverCarRenYunVO);
     }
@@ -70,6 +76,7 @@ public class HandoverCarRoutesEvent {
         if (userType == UserTypeEnum.RENTER_TYPE.getValue().intValue()) {
             log.info("发送租客端事件,OrderNo:{}", handoverCarVO.getOrderNo());
             if (handoverCarVO.getServiceType().equals(ServiceTypeEnum.TAKE_TYPE.getValue())) {
+
                 handoverCarMq.setRouteKey(HandoverRabbitMQEventEnum.RENTER_TAKE.routingKey);
                 String handoverCarMqJson = GsonUtils.toJson(handoverCarMq);
                 rabbitTemplate.convertAndSend(HandoverRabbitMQEventEnum.RENTER_TAKE.exchange,HandoverRabbitMQEventEnum.RENTER_TAKE.routingKey,handoverCarMqJson);
@@ -95,4 +102,31 @@ public class HandoverCarRoutesEvent {
             Cat.logError("没有合适的交接车类型接受的数据 handoverCarVO" + handoverCarVO.toString(),null);
         }
     }
+
+//    /**
+//     * 构造数据
+//     * @return
+//     */
+//    public HandoverCarVO createhandoverCar(HandoverCarRenYunVO handoverCarRenYunVO,Integer type,String serviceType){
+//        HandoverCarVO handoverCarVO = new HandoverCarVO();
+//        HandoverCarInfoDTO handoverCarInfoDTO = new HandoverCarInfoDTO();
+//        handoverCarInfoDTO.setOrderNo(handoverCarRenYunVO.getOrderNo());
+//        handoverCarInfoDTO.setType(type);
+//        if(serviceType.equals(ServiceTypeEnum.TAKE_TYPE.getValue())) {
+//            handoverCarInfoDTO.setRealReturnAddr(handoverCarRenYunVO.get);
+//        }
+//        handoverCarInfoDTO.setCreateOp("");
+//        handoverCarInfoDTO.setRealReturnUserName();
+//        handoverCarInfoDTO.setMsgId(handoverCarRenYunVO.getMessageId());
+//        if(handoverCarRenYunVO.getDescription() != null) {
+//            HandoverCarRemarkDTO handoverCarRemarkDTO = new HandoverCarRemarkDTO();
+//            handoverCarRemarkDTO.setOrderNo(handoverCarRenYunVO.getOrderNo());
+//            handoverCarRemarkDTO.setRemark(handoverCarRenYunVO.getDescription());
+//
+//        }
+//    }
+
+
+
+
 }
