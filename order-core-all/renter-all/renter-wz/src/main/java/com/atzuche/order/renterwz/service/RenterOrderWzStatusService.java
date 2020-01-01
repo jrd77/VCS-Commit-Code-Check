@@ -3,6 +3,7 @@ package com.atzuche.order.renterwz.service;
 import com.atzuche.order.renterwz.entity.RenterOrderWzStatusEntity;
 import com.atzuche.order.renterwz.enums.WzStatusEnums;
 import com.atzuche.order.renterwz.mapper.RenterOrderWzStatusMapper;
+import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 
@@ -12,6 +13,7 @@ import javax.annotation.Resource;
  * @author shisong
  * @date 2019/12/30
  */
+@Service
 public class RenterOrderWzStatusService {
 
     @Resource

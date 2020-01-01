@@ -8,6 +8,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.Resource;
@@ -21,6 +22,7 @@ import java.util.Map;
  * @author pengcheng.fu
  * @date 2019/12/25 14:10
  */
+@Service
 public class OwnerDiscountCouponService {
 
     private static final Logger logger = LoggerFactory.getLogger(OwnerDiscountCouponService.class);

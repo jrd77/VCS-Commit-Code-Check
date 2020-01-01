@@ -1,8 +1,9 @@
 package com.atzuche.order.ownercost.entity;
 
+import lombok.Data;
+
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import lombok.Data;
 
 
 /**
@@ -33,7 +34,7 @@ public class OwnerOrderPurchaseDetailEntity implements Serializable {
 	 */
 	private String memNo;
 	/**
-	 * 费用编码费用编码（包含罚款、租金、佣金、取还车费、GPS服务费等）
+	 * 费用编码费用编码（租金）
 	 */
 	private String costCode;
 	/**

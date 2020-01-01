@@ -7,6 +7,7 @@ import com.aliyun.mns.client.MNSClient;
 import com.aliyun.mns.model.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
 import java.io.ByteArrayOutputStream;
@@ -17,7 +18,7 @@ import java.util.zip.GZIPOutputStream;
 /**
  * Created by andy on 16/6/16.
  */
-
+@Service
 public class AliyunMnsService  {
     private final static Logger logger = LoggerFactory.getLogger(AliyunMnsService.class);
 

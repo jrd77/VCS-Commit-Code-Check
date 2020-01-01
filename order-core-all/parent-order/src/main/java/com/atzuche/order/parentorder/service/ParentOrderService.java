@@ -5,6 +5,7 @@ import com.atzuche.order.commons.OrderStatus;
 import com.atzuche.order.parentorder.dto.ParentOrderDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 
@@ -15,6 +16,7 @@ import javax.annotation.Resource;
  * @author pengcheng.fu
  * @date 2019/12/24 17:34
  */
+@Service
 public class ParentOrderService {
 
 
