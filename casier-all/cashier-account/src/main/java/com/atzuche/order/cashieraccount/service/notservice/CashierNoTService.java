@@ -471,7 +471,7 @@ public class CashierNoTService {
             cashier.setPayKind(DataPayKindConstant.TK_FEE);
             cashier.setPayType(DataPayTypeConstant.PAY_PUR);
             cashier.setAtappId(DataAppIdConstant.APPID_SHORTRENT);
-            cashier.setTransStatus(00);
+            cashier.setTransStatus("00");
             result = cashierMapper.insert(cashier);
             cashierId = cashier.getId();
         }
