@@ -53,4 +53,15 @@ public class SysConfigEntity implements Serializable {
     public void setValueType(String valueType) {
         this.valueType = valueType;
     }
+
+    @Override
+    public String toString() {
+        return "SysConfigEntity{" +
+                "appType='" + appType + '\'' +
+                ", itemKey='" + itemKey + '\'' +
+                ", itemName='" + itemName + '\'' +
+                ", itemValue='" + itemValue + '\'' +
+                ", valueType='" + valueType + '\'' +
+                '}';
+    }
 }
