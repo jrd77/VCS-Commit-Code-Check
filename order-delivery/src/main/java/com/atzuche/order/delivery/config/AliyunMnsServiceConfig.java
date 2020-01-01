@@ -15,8 +15,8 @@ import java.util.concurrent.Executors;
 /**
  * Created by andy on 16/6/16.
  */
-@ConfigurationProperties(prefix = "com.aliyun.mns")
-@Configuration
+//@ConfigurationProperties(prefix = "com.aliyun.mns")
+//@Configuration
 public class AliyunMnsServiceConfig {
     private final static Logger logger = LoggerFactory.getLogger(AliyunMnsServiceConfig.class);
     

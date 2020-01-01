@@ -28,8 +28,8 @@ public class PlatformMessageService {
     @Value("${com.autoyol.mns.queue.auto-platform-message-queue}")
     private String PLATFORM_MESSAGE_QUEUE_NAME;
 
-    @Autowired
-    private AliyunMnsService aliyunMnsService;
+//    @Autowired
+//    private AliyunMnsService aliyunMnsService;
     @Autowired
     private DeliveryOrderService transService;
 
@@ -164,6 +164,6 @@ public class PlatformMessageService {
             logger.error("send platform message error,message body is empty!");
             return;
         }
-        aliyunMnsService.asyncSend̨MessageToQueue(messageBody, PLATFORM_MESSAGE_QUEUE_NAME);
+//        aliyunMnsService.asyncSend̨MessageToQueue(messageBody, PLATFORM_MESSAGE_QUEUE_NAME);
     }
 }
