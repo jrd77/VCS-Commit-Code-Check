@@ -1,18 +1,19 @@
 package com.atzuche.order.delivery.service.delivery;
 
+import com.atzuche.order.commons.OrderReqContext;
+import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
+import com.atzuche.order.commons.vo.req.NormalOrderReqVO;
 import com.atzuche.order.delivery.common.DeliveryCarTask;
 import com.atzuche.order.delivery.common.DeliveryErrorCode;
 import com.atzuche.order.delivery.entity.RenterDeliveryAddrEntity;
 import com.atzuche.order.delivery.entity.RenterOrderDeliveryEntity;
+import com.atzuche.order.delivery.enums.DeliveryTypeEnum;
 import com.atzuche.order.delivery.enums.ServiceTypeEnum;
 import com.atzuche.order.delivery.enums.UsedDeliveryTypeEnum;
 import com.atzuche.order.delivery.exception.DeliveryOrderException;
 import com.atzuche.order.delivery.mapper.RenterDeliveryAddrMapper;
 import com.atzuche.order.delivery.mapper.RenterOrderDeliveryMapper;
-import com.atzuche.order.delivery.vo.delivery.CancelOrderDeliveryVO;
-import com.atzuche.order.delivery.vo.delivery.OrderDeliveryVO;
-import com.atzuche.order.delivery.vo.delivery.RenYunFlowOrderDTO;
-import com.atzuche.order.delivery.vo.delivery.UpdateOrderDeliveryVO;
+import com.atzuche.order.delivery.vo.delivery.*;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,8 +39,8 @@ public class DeliveryCarService {
     /**
      * 添加配送相关信息(是否下单，是否推送仁云)
      */
-    public void addRenYunFlowOrderInfo(OrderDeliveryVO orderDeliveryVO) {
-
+    public void addRenYunFlowOrderInfo(OrderReqContext orderReqContext) {
+        OrderDeliveryVO orderDeliveryVO = createOrderDeliveryParams(orderReqContext);
         if (null == orderDeliveryVO || orderDeliveryVO.getRenterDeliveryAddrDTO() == null) {
             throw new DeliveryOrderException(DeliveryErrorCode.DELIVERY_PARAMS_ERROR);
         }
@@ -105,5 +106,46 @@ public class DeliveryCarService {
         }
         orderDeliveryMapper.updateById(orderDeliveryEntity.getId());
     }
+
+    /**
+     * 构造配送订单数据
+     * @param orderReqContext
+     * @return
+     */
+    public OrderDeliveryVO createOrderDeliveryParams(OrderReqContext orderReqContext) {
+        if (null == orderReqContext) {
+            throw new DeliveryOrderException(DeliveryErrorCode.DELIVERY_PARAMS_ERROR);
+        }
+        OrderDeliveryVO orderDeliveryVO = new OrderDeliveryVO();
+        RenterDeliveryAddrDTO renterDeliveryAddrDTO = new RenterDeliveryAddrDTO();
+        NormalOrderReqVO normalOrderReqVO = orderReqContext.getNormalOrderReqVO();
+        RenterGoodsDetailDTO renterGoodsDetailDTO = orderReqContext.getRenterGoodsDetailDto();
+        //不使用还车服务（一定不使用取车服务）
+        if(normalOrderReqVO.getSrvReturnFlag().intValue() == UsedDeliveryTypeEnum.NO_USED.getValue().intValue())
+        {
+
+            String carShowAddr = renterGoodsDetailDTO.getCarShowAddr() == null ? renterGoodsDetailDTO.getCarRealAddr() : renterGoodsDetailDTO.getCarShowAddr();
+
+            //入库取送地址数据
+            if(StringUtils.isNotBlank(renterGoodsDetailDTO.getCarShowAddr()))
+            {
+                renterDeliveryAddrDTO.setActGetCarAddr(renterGoodsDetailDTO.getCarShowAddr());
+                renterDeliveryAddrDTO.setActGetCarLat(renterGoodsDetailDTO.getCarShowLat());
+                renterDeliveryAddrDTO.setActGetCarLon(renterGoodsDetailDTO.getCarShowLon());
+                renterDeliveryAddrDTO.setActReturnCarAddr(renterGoodsDetailDTO.getCarShowAddr());
+                renterDeliveryAddrDTO.setActReturnCarLat(renterGoodsDetailDTO.getCarShowLat());
+                renterDeliveryAddrDTO.setActReturnCarLon(renterGoodsDetailDTO.getCarShowAddr());
+                renterDeliveryAddrDTO.setExpGetCarAddr(renterGoodsDetailDTO.getCarShowAddr());
+
+            }
+        }
+
+
+
+        return null;
+
+    }
+
+
 
 }
