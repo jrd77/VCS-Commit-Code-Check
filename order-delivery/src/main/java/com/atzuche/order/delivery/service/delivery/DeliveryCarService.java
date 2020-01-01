@@ -17,6 +17,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 
@@ -79,6 +80,7 @@ public class DeliveryCarService {
      * 插入配送地址/配送订单信息
      * @param orderDeliveryVO
      */
+    @Transactional(rollbackFor = Exception.class)
     public void insertDeliveryAddress(OrderDeliveryVO orderDeliveryVO) {
         RenterDeliveryAddrEntity deliveryAddrEntity = new RenterDeliveryAddrEntity();
         BeanUtils.copyProperties(orderDeliveryVO.getRenterDeliveryAddrDTO(), deliveryAddrEntity);
@@ -95,6 +97,7 @@ public class DeliveryCarService {
      * @param renterOrderNo
      * @param serviceType
      */
+    @Transactional(rollbackFor = Exception.class)
     public void cancelOrderDelivery(String renterOrderNo,Integer serviceType) {
         RenterOrderDeliveryEntity orderDeliveryEntity = orderDeliveryMapper.findRenterOrderByRenterOrderNo(renterOrderNo,serviceType);
         if (null == orderDeliveryEntity) {
