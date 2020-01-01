@@ -34,9 +34,9 @@ public class OrderPaySignReqVO {
     private String orderNo;
 
     /**
-     * 是否使用钱包支付
+     * 是否使用钱包 0-否，1-是
      */
-    private Boolean isUseWallet;
+    private Integer isUseWallet;
     /**
      * 操作人
      */

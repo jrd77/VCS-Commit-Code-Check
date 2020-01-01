@@ -63,4 +63,9 @@ public class OrderPayableAmountResVO {
      * 钱包抵扣金额
      */
     private int amtWallet;
+
+    /**
+     * 是否使用钱包 0-否，1-是
+     */
+    private Integer isUseWallet;
 }

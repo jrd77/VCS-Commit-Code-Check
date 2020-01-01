@@ -35,7 +35,7 @@ public class CashierRefundApplyNoTService {
     public int insertRefundDeposit(CashierRefundApplyReqVO cashierRefundApplyReq) {
         CashierRefundApplyEntity cashierRefundApplyEntity = new CashierRefundApplyEntity();
         BeanUtils.copyProperties(cashierRefundApplyReq,cashierRefundApplyEntity);
-        cashierRefundApplyEntity.setStatus(CashierRefundApplyStatus.RECEIVED_REFUND.getCode());
+        cashierRefundApplyEntity.setStatus(CashierRefundApplyStatus.WAITING_FOR_REFUND.getCode());
         cashierRefundApplyEntity.setSourceCode(cashierRefundApplyReq.getRenterCashCodeEnum().getCashNo());
         cashierRefundApplyEntity.setSourceDetail(cashierRefundApplyReq.getRenterCashCodeEnum().getTxt());
         int result = cashierRefundApplyMapper.insert(cashierRefundApplyEntity);
@@ -53,7 +53,7 @@ public class CashierRefundApplyNoTService {
         //1 校验
         CashierRefundApplyEntity cashierRefundApplyEntity = cashierRefundApplyMapper.selectRefundByQn(orderPayAsynVO.getMenNo(),orderPayAsynVO.getOrderNo(),orderPayAsynVO.getQn());
         //2 回调退款是否成功判断 TODOD
-        if(Objects.nonNull(cashierRefundApplyEntity) && "".equals(orderPayAsynVO.getPayKind())){
+        if(Objects.nonNull(cashierRefundApplyEntity) && CashierRefundApplyStatus.RECEIVED_REFUND.getCode().equals(orderPayAsynVO.getTransStatus())){
             //3 更新退款成功
             CashierRefundApplyEntity cashierRefundApplyUpdate = new CashierRefundApplyEntity();
             cashierRefundApplyUpdate.setStatus(CashierRefundApplyStatus.RECEIVED_REFUND.getCode());
@@ -65,5 +65,17 @@ public class CashierRefundApplyNoTService {
             }
             //4 成功之后push 或者 短信
         }
+    }
+
+    /**
+     * 更新发起退款次数
+     * @param cashierRefundApply
+     */
+    public void updateCashierRefundApplyEntity(CashierRefundApplyEntity cashierRefundApply) {
+        CashierRefundApplyEntity cashierRefundApplyEntity = new CashierRefundApplyEntity();
+        cashierRefundApplyEntity.setId(cashierRefundApply.getId());
+        cashierRefundApplyEntity.setNum(cashierRefundApply.getNum()+1);
+        cashierRefundApplyEntity.setVersion(cashierRefundApply.getVersion());
+        cashierRefundApplyMapper.updateByPrimaryKeySelective(cashierRefundApplyEntity);
     }
 }
