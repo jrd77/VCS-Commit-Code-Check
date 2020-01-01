@@ -7,14 +7,14 @@ import lombok.Getter;
  */
 @Getter
 public enum CashierRefundApplyStatus {
-    WAITING_FOR_REFUND(0,"待退款"),
-    RECEIVED_REFUND(1,"已退款"),
+    RECEIVED_REFUND("00","已退款"),
+    WAITING_FOR_REFUND("01","待退款"),
             ;
 
-    private int code;
+    private String code;
     private String text;
 
-    private CashierRefundApplyStatus(int code, String text) {
+    private CashierRefundApplyStatus(String code, String text) {
         this.code = code;
         this.text = text;
     }

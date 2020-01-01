@@ -97,4 +97,9 @@ public class HandoverCarInfoDTO {
      * 创建人
      */
     private String createOp;
+
+    /**
+     * 消息ID
+     */
+    private String msgId;
 }

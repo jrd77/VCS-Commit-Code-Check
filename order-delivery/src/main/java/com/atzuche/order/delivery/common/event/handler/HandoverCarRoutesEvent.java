@@ -1,27 +1,32 @@
 package com.atzuche.order.delivery.common.event.handler;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.aliyun.mns.model.Message;
-import com.atzuche.order.delivery.common.DeliveryConstants;
-import com.atzuche.order.delivery.model.ctrip.CtripStatusTransFinishVo;
-import com.atzuche.order.delivery.model.ctrip.SDActualFee;
-import com.atzuche.order.delivery.model.ctrip.TransDistributeBO;
+import com.atzuche.order.delivery.common.mq.handover.HandoverCarMq;
+import com.atzuche.order.delivery.common.mq.handover.HandoverRabbitMQEventEnum;
+import com.atzuche.order.delivery.enums.HandoverCarTypeEnum;
+import com.atzuche.order.delivery.enums.ServiceTypeEnum;
+import com.atzuche.order.delivery.enums.UserTypeEnum;
 import com.atzuche.order.delivery.service.handover.HandoverCarService;
 import com.atzuche.order.delivery.utils.CommonUtil;
-import com.atzuche.order.delivery.utils.DateUtils;
-import com.atzuche.order.delivery.utils.MD5Util;
 import com.atzuche.order.delivery.utils.ZipUtils;
 import com.atzuche.order.delivery.vo.HandoverCarRenYunVO;
-import com.autoyol.aliyunmq.AliyunMnsService;
-import com.google.common.collect.Maps;
+import com.atzuche.order.delivery.vo.handover.HandoverCarInfoDTO;
+import com.atzuche.order.delivery.vo.handover.HandoverCarRemarkDTO;
+import com.atzuche.order.delivery.vo.handover.HandoverCarVO;
+import com.autoyol.commons.utils.DateUtil;
+import com.autoyol.commons.utils.GsonUtils;
+import com.dianping.cat.Cat;
 import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.Subscribe;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -32,10 +37,10 @@ import java.util.*;
 @Slf4j
 public class HandoverCarRoutesEvent {
 
-
-
-//    @Autowired
-//    HandoverCarService handoverCarService;
+    @Autowired
+    HandoverCarService handoverCarService;
+    @Autowired
+    RabbitTemplate rabbitTemplate;
 
     @Subscribe
     @AllowConcurrentEvents
@@ -45,141 +50,92 @@ public class HandoverCarRoutesEvent {
             log.info("仁云推送过来的消息数据存在问题：object:{}", object);
             return;
         }
-        Message message = (Message)object;
-        byte[] messageBody = message.getMessageBodyAsBytes();
-        String json = ZipUtils.uncompress(messageBody);
-        HandoverCarRenYunVO handoverCarRenYunVO = JSONObject.parseObject(json, HandoverCarRenYunVO.class);
-        handoverCarRenYunVO.setMessageId(message.getMessageId());
-        // todo 插入记录数据
-        sendMessageToAliMnsQueue(handoverCarRenYunVO);
-    }
-
-    public void sendMessageToAliMnsQueue(HandoverCarRenYunVO handoverCarVO)
-    {
-            // 携程套餐订单完成进行回执
-            String description = handoverCarVO.getDescription();
-            String proId = handoverCarVO.getProId();
-            String orderNo = handoverCarVO.getOrderNo();
-            if (StringUtils.isNotBlank(description) && DeliveryConstants.CAR_ON_ROAD_WAITING.equals(description) && StringUtils.isNotBlank(proId) && "7".equals(proId)) {
-                long orderNum = orderNo != null ? Long.parseLong(orderNo) : 0L;
-                int count = 0;
-                //todo Integer count = partnerReturnMessageMapper.isExistReturnMessage(orderNum);
-                if (count < 1) {
-                    sendCtripTransFinish(orderNum);
-                }
-//                handoverCarService.handlerHandoverCarStepByTransInfo(handoverCarVO);
-            }
-    }
-
-    public void sendCtripTransFinish(long orderNo) {
-
-            log.info("订单状态完成回执前的订单号：" + orderNo);
-            // todo TransDistributeBO transDistributeBO = transMapper.selectDataByOrderId(orderNo);
-            TransDistributeBO transDistributeBO = null;
-            if (transDistributeBO != null) {
-                log.info("订单所属渠道:{}", transDistributeBO.getPartnerCode());
-                if (DeliveryConstants.CTRIP.equalsIgnoreCase(transDistributeBO.getPartnerCode())) {
-                    log.info("进入订单状态完成回执的订单号：" + orderNo);
-                    log.info("进入订单状态完成回执的transDistributeBO：" + JSON.toJSONString(transDistributeBO));
-                    sendMessage(transDistributeBO);
-                }
-            }
+        HashMap message = (HashMap) object;
+        HandoverCarRenYunVO handoverCarRenYunVO = new HandoverCarRenYunVO();
+        try {
+            BeanUtils.populate(handoverCarRenYunVO, message);
+        } catch (Exception e) {
+            log.error("map转换失败，message：{}", JSONObject.toJSONString(message));
+        }
+        sendMessageToQueue(handoverCarRenYunVO);
     }
 
     /**
-     * @param transDistributeBO
+     * 发送消息到MQ
+     * @param handoverCarVO
      */
-    private void sendMessage(TransDistributeBO transDistributeBO) {
-
-        CtripStatusTransFinishVo vo = new CtripStatusTransFinishVo();
-        vo.setOperateSerialNumber(DateUtils.getNowDateLong() + CommonUtil.getUUID().substring(0, 8));
-        vo.setVendorCode(DeliveryConstants.VENDOR_CODE);
-        vo.setCtripOrderId(Long.parseLong(transDistributeBO.getPartnerOrderNo()));
-        vo.setVendorOrderStatus(1);
-        try {
-            vo.setActualPickupTime(DateUtils.formatTime(transDistributeBO.getRentTime()));
-        } catch (Exception e) {
-            log.info("转换还车时间格式出错：RentTime:{}", transDistributeBO.getRentTime());
+    public void sendMessageToQueue(HandoverCarRenYunVO handoverCarVO)
+    {
+        if (StringUtils.isBlank(handoverCarVO.getProId()) || !handoverCarVO.isUserType()) {
+            return;
         }
-        vo.setActualReturnTime(DateUtils.parseDateDefaute(new Date(), DateUtils.DATE_DEFAUTE_3));
-        vo.setPeccancyDepositAmount(0);
-        vo.setPeccancyDepositReturnTime(DateUtils.parseDateDefaute(new Date(), DateUtils.DATE_DEFAUTE_3));
-        vo.setBackFeeList(new String[]{});
+        int userType = Integer.valueOf(handoverCarVO.getUserType());
+        HandoverCarMq handoverCarMq = new HandoverCarMq();
+        handoverCarMq.setMessageId(UUID.randomUUID().toString().replaceAll("-", ""));
+        handoverCarMq.setMsgCreateTime(DateUtil.formatDate(new Date(),"yyyyMMddHHmmss"));
+        if (userType == UserTypeEnum.RENTER_TYPE.getValue().intValue()) {
+            log.info("发送租客端事件,OrderNo:{}", handoverCarVO.getOrderNo());
+            if (handoverCarVO.getServiceType().equals(ServiceTypeEnum.TAKE_TYPE.getValue())) {
+                HandoverCarVO handoverCar = createHandoverParams(handoverCarVO, HandoverCarTypeEnum.RENYUN_TO_RENTER.getValue().intValue(),handoverCarVO.getServiceType());
+                handoverCarService.addHandoverCarInfo(handoverCar,userType);
+                handoverCarMq.setRouteKey(HandoverRabbitMQEventEnum.RENTER_TAKE.routingKey);
+                String handoverCarMqJson = GsonUtils.toJson(handoverCarMq);
+                rabbitTemplate.convertAndSend(HandoverRabbitMQEventEnum.RENTER_TAKE.exchange,HandoverRabbitMQEventEnum.RENTER_TAKE.routingKey,handoverCarMqJson);
+            } else if (handoverCarVO.getServiceType().equals(ServiceTypeEnum.BACK_TYPE.getValue())) {
+                HandoverCarVO handoverCar = createHandoverParams(handoverCarVO, HandoverCarTypeEnum.RENTER_TO_RENYUN.getValue().intValue(),handoverCarVO.getServiceType());
+                handoverCarService.addHandoverCarInfo(handoverCar,userType);
+                handoverCarMq.setRouteKey(HandoverRabbitMQEventEnum.RENTER_BACK.routingKey);
+                String handoverCarMqJson = GsonUtils.toJson(handoverCarMq);
+                rabbitTemplate.convertAndSend(HandoverRabbitMQEventEnum.RENTER_BACK.exchange,HandoverRabbitMQEventEnum.RENTER_BACK.routingKey,handoverCarMqJson);
+            }
+        }
+        else if (userType == UserTypeEnum.OWNER_TYPE.getValue().intValue()) {
+            log.info("发送车主端事件,OrderNo:{}", handoverCarVO.getOrderNo());
+            if (handoverCarVO.getServiceType().equals(ServiceTypeEnum.TAKE_TYPE.getValue())) {
+                HandoverCarVO handoverCar = createHandoverParams(handoverCarVO, HandoverCarTypeEnum.RENYUN_TO_RENTER.getValue().intValue(),handoverCarVO.getServiceType());
+                handoverCarService.addHandoverCarInfo(handoverCar,userType);
+                handoverCarMq.setRouteKey(HandoverRabbitMQEventEnum.OWNER_TAKE.routingKey);
+                String handoverCarMqJson = GsonUtils.toJson(handoverCarMq);
+                rabbitTemplate.convertAndSend(HandoverRabbitMQEventEnum.OWNER_TAKE.exchange,HandoverRabbitMQEventEnum.OWNER_TAKE.routingKey,handoverCarMqJson);
+            } else if (handoverCarVO.getServiceType().equals(ServiceTypeEnum.BACK_TYPE.getValue())) {
+                HandoverCarVO handoverCar = createHandoverParams(handoverCarVO, HandoverCarTypeEnum.RENYUN_TO_RENTER.getValue().intValue(),handoverCarVO.getServiceType());
+                handoverCarService.addHandoverCarInfo(handoverCar,userType);
+                handoverCarMq.setRouteKey(HandoverRabbitMQEventEnum.OWNER_BACK.routingKey);
+                String handoverCarMqJson = GsonUtils.toJson(handoverCarMq);
+                rabbitTemplate.convertAndSend(HandoverRabbitMQEventEnum.OWNER_BACK.exchange,HandoverRabbitMQEventEnum.OWNER_BACK.routingKey,handoverCarMqJson);
+            }
+        }else {
+            log.info("没有合适的交接车类型接受的数据 handoverCarVO：[{}]",handoverCarVO.toString());
+            Cat.logError("没有合适的交接车类型接受的数据 handoverCarVO" + handoverCarVO.toString(),null);
+        }
+    }
 
-        List<SDActualFee> list = new ArrayList<>();
-        SDActualFee rentFee = new SDActualFee();
-
-        rentFee.setType(1);
-        rentFee.setQuantity(Float.parseFloat(transDistributeBO.getHolidayRentDays()));
-        rentFee.setUnitPrice(Double.parseDouble(transDistributeBO.getHolidayAverage()));
-        rentFee.setTotalPrice(Double.parseDouble(transDistributeBO.getRentAmt()));
-        rentFee.setName("租车费");
-        rentFee.setDescription(transDistributeBO.getHolidayAverage() + " *" + Float.parseFloat(transDistributeBO.getHolidayRentDays()));
-        rentFee.setIsOffline(false);
-        list.add(rentFee);
-
-        SDActualFee abatementFee = new SDActualFee();
-        abatementFee.setType(12);
-        abatementFee.setQuantity(Float.parseFloat(transDistributeBO.getHolidayRentDays()));
-        abatementFee.setUnitPrice(Double.parseDouble(transDistributeBO.getAbatementInsure()));
-        abatementFee.setTotalPrice(Double.parseDouble(transDistributeBO.getAbatementTotalInsure()));
-        abatementFee.setName("全面保障服务");
-        abatementFee.setDescription(transDistributeBO.getAbatementInsure() + "*" + transDistributeBO.getHolidayRentDays());
-        abatementFee.setIsOffline(false);
-        list.add(abatementFee);
-
-        SDActualFee insureFee = new SDActualFee();
-        insureFee.setType(2);
-        insureFee.setQuantity(Float.parseFloat(transDistributeBO.getHolidayRentDays()));
-        insureFee.setUnitPrice(Double.parseDouble(transDistributeBO.getInsure()));
-        insureFee.setTotalPrice(Double.parseDouble(transDistributeBO.getInsureTotalPrices()));
-        insureFee.setName("基础保障费");
-        insureFee.setDescription(transDistributeBO.getInsure() + "*" + transDistributeBO.getHolidayRentDays());
-        insureFee.setIsOffline(false);
-        list.add(insureFee);
-        vo.setSDActualFeeList(list);
-
-        SDActualFee fee = new SDActualFee();
-        fee.setType(15);
-        fee.setQuantity(1);
-        fee.setUnitPrice(35);
-        fee.setTotalPrice(35);
-        fee.setName("手续费");
-        fee.setDescription(transDistributeBO.getInsure() + "*" + 1);
-        fee.setIsOffline(false);
-        list.add(fee);
-
-        SDActualFee nightGetService = new SDActualFee();
-        nightGetService.setType(6);
-        nightGetService.setQuantity(1);
-        nightGetService.setUnitPrice(Double.parseDouble(transDistributeBO.getSrvNightGetCost()));
-        nightGetService.setTotalPrice(Double.parseDouble(transDistributeBO.getSrvNightGetCost()));
-        nightGetService.setName("夜间取车服务费");
-        nightGetService.setDescription(transDistributeBO.getSrvNightGetCost() + "*" + 1);
-        nightGetService.setIsOffline(false);
-        list.add(nightGetService);
-
-        SDActualFee nightReturnService = new SDActualFee();
-        nightReturnService.setType(7);
-        nightReturnService.setQuantity(1);
-        nightReturnService.setUnitPrice(Double.parseDouble(transDistributeBO.getSrvNightReturnCost()));
-        nightReturnService.setTotalPrice(Double.parseDouble(transDistributeBO.getSrvNightReturnCost()));
-        nightReturnService.setName("夜间还车服务费");
-        nightReturnService.setDescription(transDistributeBO.getSrvNightReturnCost() + "*" + 1);
-        nightReturnService.setIsOffline(false);
-        list.add(nightReturnService);
-
-        vo.setSDActualFeeList(list);
-        vo.setActualAmount(rentFee.getTotalPrice() + abatementFee.getTotalPrice() + insureFee.getTotalPrice() + fee.getTotalPrice() + nightGetService.getTotalPrice() + nightReturnService.getTotalPrice());
-
-        Map<String, Object> map = Maps.newHashMap();
-        map.put("payload", JSON.toJSONString(vo));
-        String now = String.valueOf(System.currentTimeMillis());
-        map.put("timestamp", now);
-        map.put("sign", MD5Util.getMD5(now + DeliveryConstants.CTRIP_CODE + JSON.toJSONString(vo) + DeliveryConstants.CTRIP_CODE));
-        map.put("orderNo", transDistributeBO.getOrderNo());
-        log.info("进入订单状态完成回执的订单参数：" + JSON.toJSONString(map));
-//        aliyunMnsService.asyncSend̨MessageToQueue(JSON.toJSONString(map), DeliveryConstants.CTRIP_STATUS_TRANS_FINISH);
+    /**
+     * 构造数据
+     * @return
+     */
+    public HandoverCarVO createHandoverParams(HandoverCarRenYunVO handoverCarRenYunVO, Integer type, String serviceType) {
+        HandoverCarVO handoverCarVO = new HandoverCarVO();
+        HandoverCarInfoDTO handoverCarInfoDTO = new HandoverCarInfoDTO();
+        handoverCarInfoDTO.setOrderNo(handoverCarRenYunVO.getOrderNo());
+        handoverCarInfoDTO.setType(type);
+        if (serviceType.equals(ServiceTypeEnum.TAKE_TYPE.getValue())) {
+            handoverCarInfoDTO.setRealReturnUserName(handoverCarRenYunVO.getHeadName());
+            handoverCarInfoDTO.setRealReturnUserPhone(handoverCarRenYunVO.getHeadPhone());
+        } else if (serviceType.equals(ServiceTypeEnum.BACK_TYPE.getValue())) {
+            handoverCarInfoDTO.setRealGetUserName(handoverCarRenYunVO.getHeadName());
+            handoverCarInfoDTO.setRealGetUserPhone(handoverCarRenYunVO.getHeadPhone());
+        }
+        handoverCarInfoDTO.setCreateOp("");
+        handoverCarInfoDTO.setMsgId(handoverCarRenYunVO.getMessageId());
+        if (handoverCarRenYunVO.getDescription() != null) {
+            HandoverCarRemarkDTO handoverCarRemarkDTO = new HandoverCarRemarkDTO();
+            handoverCarRemarkDTO.setOrderNo(handoverCarRenYunVO.getOrderNo());
+            handoverCarRemarkDTO.setRemark(handoverCarRenYunVO.getDescription());
+            handoverCarVO.setHandoverCarRemarkDTO(handoverCarRemarkDTO);
+        }
+        handoverCarVO.setHandoverCarInfoDTO(handoverCarInfoDTO);
+        return handoverCarVO;
     }
 
 }

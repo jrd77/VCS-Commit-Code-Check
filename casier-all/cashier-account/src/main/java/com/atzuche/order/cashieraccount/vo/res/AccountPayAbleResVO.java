@@ -41,10 +41,4 @@ public class AccountPayAbleResVO {
         this.title = title;
     }
 
-    public AccountPayAbleResVO(String orderNo, String memNo, Integer amt, String title) {
-        this.orderNo = orderNo;
-        this.memNo = memNo;
-        this.amt = amt;
-        this.title = title;
-    }
 }
