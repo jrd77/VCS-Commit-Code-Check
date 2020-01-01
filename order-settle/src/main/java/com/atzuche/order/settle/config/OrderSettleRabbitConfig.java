@@ -1,11 +1,9 @@
 package com.atzuche.order.settle.config;
 
-import com.atzuche.order.cashieraccount.vo.res.pay.OrderPayAsynResVO;
 import com.atzuche.order.commons.CatConstants;
 import com.atzuche.order.commons.enums.RabbitBusinessTypeEnum;
 import com.atzuche.order.commons.service.RabbitMsgLogService;
 import com.atzuche.order.settle.service.OrderSettleService;
-import com.autoyol.commons.utils.GsonUtils;
 import com.dianping.cat.Cat;
 import com.dianping.cat.message.Transaction;
 import com.rabbitmq.client.Channel;

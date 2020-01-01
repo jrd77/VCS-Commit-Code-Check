@@ -19,6 +19,6 @@ public interface RabbitMsgLogMapper{
 
     int insert(RabbitMsgLogEntity record);
 
-    int updateConsume(@Param("businessType") String businessType, @Param("uniqueNo") String uniqueNo);
+    int updateConsume(@Param("uniqueNo") String uniqueNo);
 
 }

@@ -91,7 +91,7 @@ public class SubmitOrderService {
      * @param normalOrderReqVO 下单请求信息
      * @return NormalOrderResVO 下单返回结果
      */
-    public NormalOrderResVO submitOrder(NormalOrderReqVO normalOrderReqVO) {
+    public NormalOrderResVO submitOrder(NormalOrderReqVO normalOrderReqVO) throws Exception {
         //1.请求参数处理
         OrderReqContext reqContext = new OrderReqContext();
         reqContext.setNormalOrderReqVO(normalOrderReqVO);

@@ -1,16 +1,19 @@
 package com.atzuche.order.ownercost.service;
 
 
+import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.entity.dto.CostBaseDTO;
 import com.atzuche.order.commons.enums.OwnerChildStatusEnum;
 import com.atzuche.order.ownercost.entity.OwnerOrderEntity;
 import com.atzuche.order.ownercost.entity.dto.OwnerOrderCostReqDTO;
 import com.atzuche.order.ownercost.entity.dto.OwnerOrderReqDTO;
 import com.atzuche.order.ownercost.mapper.OwnerOrderMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 public class OwnerOrderService {
     @Autowired
@@ -60,7 +63,9 @@ public class OwnerOrderService {
         ownerOrderEntity.setGoodsCode(ownerOrderReqDTO.getCarNo());
         ownerOrderEntity.setGoodsType(String.valueOf(ownerOrderReqDTO.getCategory()));
         ownerOrderEntity.setChildStatus(OwnerChildStatusEnum.PROCESS_ING.getCode());
-        ownerOrderMapper.insert(ownerOrderEntity);
+        log.info("下单-车主端-生成车主子订单ownerOrderEntity=[{}]",JSON.toJSONString(ownerOrderEntity));
+        int result = ownerOrderMapper.insert(ownerOrderEntity);
+        log.info("下单-车主端-生成车主子订单结果result=[{}],ownerOrderEntity=[{}]",result,JSON.toJSONString(ownerOrderEntity));
 
         //2、生成费用信息
         OwnerOrderCostReqDTO ownerOrderCostReqDTO = new OwnerOrderCostReqDTO();
@@ -75,7 +80,7 @@ public class OwnerOrderService {
         costBaseDTO.setOwnerOrderNo(ownerOrderReqDTO.getOwnerOrderNo());
         costBaseDTO.setMemNo(ownerOrderReqDTO.getMemNo());
         ownerOrderCostReqDTO.setCostBaseDTO(costBaseDTO);
-
+        log.info("下单-车主端-准备保存车主费用明细 ownerOrderNo=[{}],ownerOrderCostReqDTO=[{}]", ownerOrderReqDTO.getOwnerOrderNo(),JSON.toJSONString(ownerOrderCostReqDTO));
         ownerOrderCalCostService.getOrderCostAndDeailList(ownerOrderCostReqDTO);
 
     }

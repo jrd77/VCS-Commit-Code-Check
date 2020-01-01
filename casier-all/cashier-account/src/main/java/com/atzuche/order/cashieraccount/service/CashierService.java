@@ -1,8 +1,6 @@
 package com.atzuche.order.cashieraccount.service;
 
-import com.atzuche.order.cashieraccount.vo.req.pay.OrderPaySignReqVO;
 import com.atzuche.order.commons.enums.RenterCashCodeEnum;
-import com.atzuche.order.rentercost.entity.vo.PayableVO;
 import com.atzuche.order.settle.service.AccountDebtService;
 import com.atzuche.order.settle.vo.req.AccountDeductDebtReqVO;
 import com.atzuche.order.settle.vo.res.AccountDebtResVO;
@@ -28,10 +26,10 @@ import com.atzuche.order.cashieraccount.service.notservice.CashierRefundApplyNoT
 import com.atzuche.order.cashieraccount.vo.req.CashierDeductDebtReqVO;
 import com.atzuche.order.cashieraccount.vo.req.CashierRefundApplyReqVO;
 import com.atzuche.order.cashieraccount.vo.res.CashierDeductDebtResVO;
-import com.atzuche.order.cashieraccount.vo.res.OrderPayableAmountResVO;
-import com.atzuche.order.cashieraccount.vo.res.pay.OrderPayAsynResVO;
 import com.atzuche.order.rentercost.service.RenterOrderCostCombineService;
 import com.autoyol.autopay.gateway.constant.DataPayKindConstant;
+import com.autoyol.autopay.gateway.constant.DataPayTypeConstant;
+import com.autoyol.autopay.gateway.vo.req.NotifyDataVo;
 import com.autoyol.cat.CatAnnotation;
 import com.autoyol.commons.web.ErrorCode;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -41,6 +39,7 @@ import org.springframework.stereotype.Service;
 
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
+import org.springframework.util.CollectionUtils;
 
 import java.util.List;
 import java.util.Objects;
@@ -314,51 +313,70 @@ public class CashierService {
 
     /**  ***************************************** 结算租车费用（三方） end ************************************************* */
 
-
+    /**
+     * MQ成功异步回调
+     * @param lstNotifyDataVo
+     */
+    @Transactional(rollbackFor=Exception.class)
+    public void callBackSuccess(List<NotifyDataVo> lstNotifyDataVo) {
+        if(!CollectionUtils.isEmpty(lstNotifyDataVo)){
+            for(int i=0;i<lstNotifyDataVo.size();i++){
+                NotifyDataVo notifyDataVo = lstNotifyDataVo.get(i);
+                //1 退款
+                if(DataPayTypeConstant.PUR_RETURN.equals(notifyDataVo.getPayType())){
+                    refundCallBackSuccess(notifyDataVo);
+                }
+                //2支付成功回调
+                if(DataPayTypeConstant.PAY_PUR.equals(notifyDataVo.getPayType()) || DataPayTypeConstant.PAY_PRE.equals(notifyDataVo.getPayType())){
+                    payOrderCallBackSuccess(notifyDataVo);
+                }
+            }
+        }
+    }
 
     /**
      * 退款成功异步回调
-     * @param orderPayAsynVO
+     * @param notifyDataVo
      */
     @Transactional(rollbackFor=Exception.class)
-    public void refundCallBackSuccess(OrderPayAsynResVO orderPayAsynVO) {
-        cashierRefundApplyNoTService.updateRefundDepositSuccess(orderPayAsynVO);
+    public void refundCallBackSuccess(NotifyDataVo notifyDataVo) {
+        cashierRefundApplyNoTService.updateRefundDepositSuccess(notifyDataVo);
         //TODO 支付回调成功 push/或者短信 怎么处理
     }
 
     /**
      * 支付成功回调 更新收银台及费用
-     * @param orderPayAsynVO
+     * @param notifyDataVo
      */
     @Transactional(rollbackFor=Exception.class)
-    public void payOrderCallBackSuccess(OrderPayAsynResVO orderPayAsynVO) {
+    public void payOrderCallBackSuccess(NotifyDataVo notifyDataVo) {
         //1.1 租车押金 01
-        if(Objects.nonNull(orderPayAsynVO) && DataPayKindConstant.RENT.equals(orderPayAsynVO.getPayKind())){
+        if(Objects.nonNull(notifyDataVo) && DataPayKindConstant.RENT.equals(notifyDataVo.getPayKind())){
             //1 对象初始化转换
-            PayedOrderRenterDepositReqVO payedOrderRenterDeposit = cashierNoTService.getPayedOrderRenterDepositReq(orderPayAsynVO);
+            PayedOrderRenterDepositReqVO payedOrderRenterDeposit = cashierNoTService.getPayedOrderRenterDepositReq(notifyDataVo);
             //2 收银台记录更新
-            cashierNoTService.updataCashierAndRenterDeposit(orderPayAsynVO,payedOrderRenterDeposit);
+            cashierNoTService.updataCashierAndRenterDeposit(notifyDataVo,payedOrderRenterDeposit);
         }
         //1.2 违章押金 02
-        if(Objects.nonNull(orderPayAsynVO) && DataPayKindConstant.DEPOSIT.equals(orderPayAsynVO.getPayKind())){
+        if(Objects.nonNull(notifyDataVo) && DataPayKindConstant.DEPOSIT.equals(notifyDataVo.getPayKind())){
             //1 对象初始化转换
-            PayedOrderRenterWZDepositReqVO payedOrderRenterWZDeposit = cashierNoTService.getPayedOrderRenterWZDepositReq(orderPayAsynVO);
+            PayedOrderRenterWZDepositReqVO payedOrderRenterWZDeposit = cashierNoTService.getPayedOrderRenterWZDepositReq(notifyDataVo);
             //2 收银台记录更新
-            cashierNoTService.updataCashierAndRenterWzDeposit(orderPayAsynVO,payedOrderRenterWZDeposit);
+            cashierNoTService.updataCashierAndRenterWzDeposit(notifyDataVo,payedOrderRenterWZDeposit);
         }
         //1.3 租车费用
-        if(Objects.nonNull(orderPayAsynVO) && DataPayKindConstant.TK_FEE.equals(orderPayAsynVO.getPayKind()) ){
+        if(Objects.nonNull(notifyDataVo) && DataPayKindConstant.TK_FEE.equals(notifyDataVo.getPayKind()) ){
             //1 对象初始化转换
-            AccountRenterCostReqVO accountRenterCostReq = cashierNoTService.getAccountRenterCostReq(orderPayAsynVO, RenterCashCodeEnum.ACCOUNT_RENTER_RENT_COST);
+            AccountRenterCostReqVO accountRenterCostReq = cashierNoTService.getAccountRenterCostReq(notifyDataVo, RenterCashCodeEnum.ACCOUNT_RENTER_RENT_COST);
             //2 收银台记录更新
-            cashierNoTService.updataCashierAndRenterCost(orderPayAsynVO,accountRenterCostReq);
+            cashierNoTService.updataCashierAndRenterCost(notifyDataVo,accountRenterCostReq);
         }
         //1.4 补付租车费用
-        if(Objects.nonNull(orderPayAsynVO) && DataPayKindConstant.RENT_INCREMENT.equals(orderPayAsynVO.getPayKind()) ){
+        if(Objects.nonNull(notifyDataVo) && DataPayKindConstant.RENT_INCREMENT.equals(notifyDataVo.getPayKind()) ){
             //1 对象初始化转换
-            AccountRenterCostReqVO accountRenterCostReq = cashierNoTService.getAccountRenterCostReq(orderPayAsynVO, RenterCashCodeEnum.ACCOUNT_RENTER_RENT_COST_AGAIN);
+            AccountRenterCostReqVO accountRenterCostReq = cashierNoTService.getAccountRenterCostReq(notifyDataVo, RenterCashCodeEnum.ACCOUNT_RENTER_RENT_COST_AGAIN);
             //2 收银台记录更新
-            cashierNoTService.updataCashierAndRenterCost(orderPayAsynVO,accountRenterCostReq);
+            cashierNoTService.updataCashierAndRenterCost(notifyDataVo,accountRenterCostReq);
         }
         //TODO 支付回调成功 push/或者短信 怎么处理
 
