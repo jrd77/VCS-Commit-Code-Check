@@ -116,14 +116,14 @@ public class CashierPayService{
         //3 查询应付
         OrderPayableAmountResVO payVO = getOrderPayableAmount(orderPaySign);
         //4 抵扣钱包
-        if(Boolean.TRUE.equals(orderPaySign.getIsUseWallet())){
+        if(YesNoEnum.YES.getCode()==payVO.getIsUseWallet()){
            int payBalance = walletRemoteService.getWalletPayBalanceByMemNo(orderPaySign.getMenNo());
            //判断余额大于0
            if(payBalance>0){
-               //计算钱包 抵扣租车费用后的 待支付信息 并返回待支付次数
-               int paySn = cashierNoTService.payOrderByWallet(payBalance,orderPaySign);
-               WalletDeductionReqVO walletDeduction = cashierNoTService.getWalletDeductionReqVO(orderPaySign,payVO,paySn);
+               //返回待支付次数
+               int paySn = cashierNoTService.payOrderByWallet(orderPaySign);
                //5 抵扣钱包落库 （收银台落库、费用落库）
+               WalletDeductionReqVO walletDeduction = cashierNoTService.getWalletDeductionReqVO(orderPaySign,payVO,paySn);
                walletRemoteService.updateWalletByDeduct(walletDeduction);
                //6收银台 钱包支付落库
                cashierNoTService.insertRenterCostByWallet(orderPaySign,payVO.getAmtWallet());
@@ -191,7 +191,7 @@ public class CashierPayService{
         Integer amtRent = rentAmt+rentAmtPayed;
         // 计算钱包 支付
         int amtWallet =0;
-        if(YesNoEnum.YES.getCode()==renterOrderEntity.getIsUseWallet()){
+        if(YesNoEnum.YES.getCode()==result.getIsUseWallet()){
             int payBalance = walletRemoteService.getWalletPayBalanceByMemNo(orderPaySign.getMenNo());
             //预计钱包抵扣金额 = amtWallet
             amtWallet = amtRent + payBalance < 0 ? -payBalance : amtRent;

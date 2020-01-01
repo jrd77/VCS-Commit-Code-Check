@@ -301,12 +301,11 @@ public class CashierNoTService {
     }
 
     /**
-     *  钱包支付落库 收银台 记录总金额/  租客 记录 流水（分为 租车消费 租车消费补付）
-     * @param payBalance
+     *  获取租车费用支付次数
      * @param orderPaySign
      * @return
      */
-    public int payOrderByWallet(int payBalance, OrderPaySignReqVO orderPaySign) {
+    public int payOrderByWallet(OrderPaySignReqVO orderPaySign) {
         //取出所有户头 钱包支付款项
         List<String> payKinds = orderPaySign.getPayKind();
         int num = 1;
