@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
  * 车主订单子表
  * 
  * @author ZhangBin
- * @date 2019-12-25 10:21:14
+ * @date 2020-01-01 17:08:51
  * @Description:
  */
 @Data
@@ -66,13 +66,17 @@ public class OwnerOrderEntity implements Serializable {
 	 */
 	private String goodsType;
 	/**
-	 * 租客子单状态，1：进行中，2：已完结，3：已结束
+	 * 车主子单状态，1-待补付,2-修改待确认,3-进行中,4-已完结,5-已结束
 	 */
 	private Integer childStatus;
 	/**
+	 * 修改方 1、后台管理 2、租客 3、车主
+	 */
+	private String changeSource;
+	/**
 	 * 是否取消 0-正常，1-取消
 	 */
-	private Integer isCancle;
+	private Integer isCancel;
 	/**
 	 * 是否有效 1-有效 0-无效
 	 */
@@ -82,9 +86,9 @@ public class OwnerOrderEntity implements Serializable {
 	 */
 	private Integer isUseSpecialPrice;
 	/**
-	 * 取消原因
+	 * 取消原因 1、车主主动拒单 2、超时拒单 3、车主取消订单
 	 */
-	private String cancleReason;
+	private String cancelReason;
 	/**
 	 * 取消者
 	 */
