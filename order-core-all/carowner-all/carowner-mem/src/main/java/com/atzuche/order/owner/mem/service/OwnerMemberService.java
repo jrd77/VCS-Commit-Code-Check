@@ -28,7 +28,7 @@ public class OwnerMemberService{
     private OwnerMemberRightMapper ownerMemberRightMapper;
 
     /**
-     * 保存租客用户信息
+     * 保存车主用户信息
      */
     public void save(OwnerMemberDTO ownerMemberDto){
         OwnerMemberEntity ownerMemberEntity = new OwnerMemberEntity();

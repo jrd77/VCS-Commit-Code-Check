@@ -4,8 +4,8 @@ import com.atzuche.order.cashieraccount.entity.CashierRefundApplyEntity;
 import com.atzuche.order.cashieraccount.exception.CashierRefundApplyException;
 import com.atzuche.order.cashieraccount.exception.OrderPayRefundCallBackAsnyException;
 import com.atzuche.order.cashieraccount.vo.req.CashierRefundApplyReqVO;
-import com.atzuche.order.cashieraccount.vo.res.pay.OrderPayAsynResVO;
 import com.atzuche.order.commons.enums.cashier.CashierRefundApplyStatus;
+import com.autoyol.autopay.gateway.vo.req.NotifyDataVo;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -35,7 +35,7 @@ public class CashierRefundApplyNoTService {
     public int insertRefundDeposit(CashierRefundApplyReqVO cashierRefundApplyReq) {
         CashierRefundApplyEntity cashierRefundApplyEntity = new CashierRefundApplyEntity();
         BeanUtils.copyProperties(cashierRefundApplyReq,cashierRefundApplyEntity);
-        cashierRefundApplyEntity.setStatus(CashierRefundApplyStatus.RECEIVED_REFUND.getCode());
+        cashierRefundApplyEntity.setStatus(CashierRefundApplyStatus.WAITING_FOR_REFUND.getCode());
         cashierRefundApplyEntity.setSourceCode(cashierRefundApplyReq.getRenterCashCodeEnum().getCashNo());
         cashierRefundApplyEntity.setSourceDetail(cashierRefundApplyReq.getRenterCashCodeEnum().getTxt());
         int result = cashierRefundApplyMapper.insert(cashierRefundApplyEntity);
@@ -49,11 +49,11 @@ public class CashierRefundApplyNoTService {
     /**
      * 退款回调信息
      */
-    public void updateRefundDepositSuccess(OrderPayAsynResVO orderPayAsynVO) {
+    public void updateRefundDepositSuccess(NotifyDataVo notifyDataVo) {
         //1 校验
-        CashierRefundApplyEntity cashierRefundApplyEntity = cashierRefundApplyMapper.selectRefundByQn(orderPayAsynVO.getMenNo(),orderPayAsynVO.getOrderNo(),orderPayAsynVO.getQn());
+        CashierRefundApplyEntity cashierRefundApplyEntity = cashierRefundApplyMapper.selectRefundByQn(notifyDataVo.getMemNo(),notifyDataVo.getOrderNo(),notifyDataVo.getQn());
         //2 回调退款是否成功判断 TODOD
-        if(Objects.nonNull(cashierRefundApplyEntity) && "".equals(orderPayAsynVO.getPayKind())){
+        if(Objects.nonNull(cashierRefundApplyEntity) && CashierRefundApplyStatus.RECEIVED_REFUND.getCode().equals(notifyDataVo.getTransStatus())){
             //3 更新退款成功
             CashierRefundApplyEntity cashierRefundApplyUpdate = new CashierRefundApplyEntity();
             cashierRefundApplyUpdate.setStatus(CashierRefundApplyStatus.RECEIVED_REFUND.getCode());
@@ -65,5 +65,17 @@ public class CashierRefundApplyNoTService {
             }
             //4 成功之后push 或者 短信
         }
+    }
+
+    /**
+     * 更新发起退款次数
+     * @param cashierRefundApply
+     */
+    public void updateCashierRefundApplyEntity(CashierRefundApplyEntity cashierRefundApply) {
+        CashierRefundApplyEntity cashierRefundApplyEntity = new CashierRefundApplyEntity();
+        cashierRefundApplyEntity.setId(cashierRefundApply.getId());
+        cashierRefundApplyEntity.setNum(cashierRefundApply.getNum()+1);
+        cashierRefundApplyEntity.setVersion(cashierRefundApply.getVersion());
+        cashierRefundApplyMapper.updateByPrimaryKeySelective(cashierRefundApplyEntity);
     }
 }

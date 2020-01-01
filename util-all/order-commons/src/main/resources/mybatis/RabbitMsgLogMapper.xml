@@ -63,7 +63,7 @@
     update rabbit_msg_log
     set
       is_consume = 1
-    where unique_no = #{uniqueNo} and business_type = #{businessType}
+    where unique_no = #{uniqueNo}
   </update>
     <select id="selectByUniqueNo" resultMap="BaseResultMap">
         select <include refid="Base_Column_List" /> from rabbit_msg_log where unique_no = #{uniqueNo} and business_type = #{businessType} limit 1

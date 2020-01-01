@@ -11,10 +11,7 @@ import com.atzuche.order.renterorder.entity.dto.DeductAndSubsidyContextDTO;
 import com.atzuche.order.renterorder.entity.dto.RenterOrderCostReqDTO;
 import com.atzuche.order.renterorder.entity.dto.RenterOrderCostRespDTO;
 import com.atzuche.order.renterorder.mapper.RenterOrderMapper;
-import com.atzuche.order.renterorder.vo.RenterOrderCarDepositResVO;
-import com.atzuche.order.renterorder.vo.RenterOrderIllegalResVO;
-import com.atzuche.order.renterorder.vo.RenterOrderReqVO;
-import com.atzuche.order.renterorder.vo.RenterOrderResVO;
+import com.atzuche.order.renterorder.vo.*;
 import com.atzuche.order.renterorder.vo.owner.OwnerCouponGetAndValidReqVO;
 import com.atzuche.order.renterorder.vo.platform.MemAvailCouponRequestVO;
 import org.apache.commons.lang3.StringUtils;
@@ -126,25 +123,28 @@ public class RenterOrderService {
         MemAvailCouponRequestVO getCarFeeCouponReqVO = buildMemAvailCouponRequestVO(renterOrderCostRespDTO,
                 renterOrderReqVO);
         getCarFeeCouponReqVO.setDisCouponId(renterOrderReqVO.getGetCarFreeCouponId());
-        renterOrderCostHandleService.handleGetCarFeeCoupon(context, getCarFeeCouponReqVO);
+        boolean isUseGetCarFeeCoupon = renterOrderCostHandleService.handleGetCarFeeCoupon(context,
+                getCarFeeCouponReqVO);
 
         //3. 车主券抵扣信息及补贴明细
         OwnerCouponGetAndValidReqVO ownerCouponGetAndValidReqVO = buildOwnerCouponGetAndValidReqVO(renterOrderReqVO,
                 getCarFeeCouponReqVO.getRentAmt());
-        renterOrderCostHandleService.handleOwnerCoupon(context, ownerCouponGetAndValidReqVO, renterOrderResVO);
+        boolean isUseOwnerCoupon = renterOrderCostHandleService.handleOwnerCoupon(context, ownerCouponGetAndValidReqVO,
+                renterOrderResVO);
 
         //4. 限时红包补贴明细
         int reductiAmt = null == renterOrderReqVO.getReductiAmt() ? 0 : renterOrderReqVO.getReductiAmt();
-        renterOrderCostHandleService.handleLimitRed(context, reductiAmt);
+        boolean isUseLimitRed = renterOrderCostHandleService.handleLimitRed(context, reductiAmt);
 
         //5. 平台优惠券抵扣及补贴明细
         MemAvailCouponRequestVO platformCouponReqVO = buildMemAvailCouponRequestVO(renterOrderCostRespDTO,
                 renterOrderReqVO);
         platformCouponReqVO.setDisCouponId(renterOrderReqVO.getDisCouponIds());
-        renterOrderCostHandleService.handlePlatformCoupon(context, platformCouponReqVO);
+        boolean isUsePlatformCoupon = renterOrderCostHandleService.handlePlatformCoupon(context, platformCouponReqVO);
 
         //6. 凹凸币补贴明细
-        renterOrderCostHandleService.handleAutoCoin(context, Integer.valueOf(renterOrderReqVO.getMemNo()),
+        int chargeAutoCoin = renterOrderCostHandleService.handleAutoCoin(context,
+               renterOrderReqVO.getMemNo(),
                 renterOrderReqVO.getUseAutoCoin());
 
         //7. 车辆押金
@@ -198,6 +198,16 @@ public class RenterOrderService {
         Optional<RenterOrderCostDetailEntity> renterOrderCostDetailEntityOptional =
                 renterOrderCostRespDTO.getRenterOrderCostDetailDTOList().stream().filter(costDetail -> StringUtils.equals(costDetail.getCostCode(),RenterCashCodeEnum.RENT_AMT.getCashNo())).findFirst();
         renterOrderResVO.setRentAmtEntity(renterOrderCostDetailEntityOptional.orElse(null));
+
+        //凹凸币、优惠券使用情况返回
+        CouponAndAutoCoinResVO couponAndAutoCoinResVO = new CouponAndAutoCoinResVO();
+        couponAndAutoCoinResVO.setChargeAutoCoin(chargeAutoCoin);
+        couponAndAutoCoinResVO.setIsUseGetCarFeeCoupon(isUseGetCarFeeCoupon);
+        couponAndAutoCoinResVO.setIsUseOwnerCoupon(isUseOwnerCoupon);
+        couponAndAutoCoinResVO.setIsUsePlatformCoupon(isUsePlatformCoupon);
+        couponAndAutoCoinResVO.setRentAmt(renterOrderCostRespDTO.getRentAmount());
+
+        renterOrderResVO.setCouponAndAutoCoinResVO(couponAndAutoCoinResVO);
         return renterOrderResVO;
     }
 
@@ -380,4 +390,5 @@ public class RenterOrderService {
     public Integer updateRenterOrderChildStatus(Integer id, Integer childStatus) {
     	return renterOrderMapper.updateRenterOrderChildStatus(id, childStatus);
     }
+
 }
