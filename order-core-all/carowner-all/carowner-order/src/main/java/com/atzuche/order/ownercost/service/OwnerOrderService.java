@@ -61,8 +61,8 @@ public class OwnerOrderService {
         ownerOrderEntity.setGoodsType(String.valueOf(ownerOrderReqDTO.getCategory()));
         ownerOrderEntity.setChildStatus(OwnerChildStatusEnum.PROCESS_ING.getCode());
         ownerOrderMapper.insert(ownerOrderEntity);
-        //2、生成费用信息
 
+        //2、生成费用信息
         OwnerOrderCostReqDTO ownerOrderCostReqDTO = new OwnerOrderCostReqDTO();
         ownerOrderCostReqDTO.setCarOwnerType(ownerOrderReqDTO.getCarOwnerType());
         ownerOrderCostReqDTO.setSrvGetFlag(ownerOrderReqDTO.getSrvGetFlag());
