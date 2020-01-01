@@ -15,6 +15,7 @@ public enum CancelReasonEnum {
     TEST("9","测试订单（交易）"),
     MECHANICAL_FAILURE("10","机械故障结束订单（交易）"),
     DISPATCH_SUC_NEW_ORDER("11","调度成功重新成单（交易）"),
+    OWNER_REFUSE("12","车主拒绝")
     ;
 
     private String code;
