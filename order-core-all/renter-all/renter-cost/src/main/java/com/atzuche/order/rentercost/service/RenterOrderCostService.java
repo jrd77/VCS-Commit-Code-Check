@@ -17,7 +17,7 @@ public class RenterOrderCostService{
     @Autowired
     private RenterOrderCostMapper renterOrderCostMapper;
 
-    public void saveRenterOrderCost(RenterOrderCostEntity renterOrderCostEntity){
-        int insert = renterOrderCostMapper.insert(renterOrderCostEntity);
+    public Integer saveRenterOrderCost(RenterOrderCostEntity renterOrderCostEntity){
+        return renterOrderCostMapper.insert(renterOrderCostEntity);
     }
 }
