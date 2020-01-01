@@ -19,6 +19,7 @@ import com.atzuche.order.rentercost.entity.RenterOrderFineDeatailEntity;
 import com.atzuche.order.rentercost.entity.RenterOrderSubsidyDetailEntity;
 import com.atzuche.order.rentercost.entity.dto.OrderCouponDTO;
 import com.atzuche.order.rentercost.entity.dto.RenterOrderSubsidyDetailDTO;
+import com.atzuche.order.rentercost.entity.vo.PayableVO;
 import com.atzuche.order.rentercost.service.*;
 import com.atzuche.order.rentermem.service.RenterMemberService;
 import com.atzuche.order.renterorder.entity.OrderCouponEntity;
@@ -31,12 +32,14 @@ import com.atzuche.order.renterorder.vo.owner.OwnerCouponGetAndValidReqVO;
 import com.atzuche.order.renterorder.vo.platform.MemAvailCouponRequestVO;
 import com.autoyol.auto.coin.service.vo.res.AutoCoinResponseVO;
 import com.autoyol.commons.web.ResponseData;
+import com.autoyol.member.detail.vo.res.CommUseDriverInfo;
 import com.dianping.cat.Cat;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -80,12 +83,15 @@ public class ModifyOrderService {
 	private AutoCoinCostCalService autoCoinCostCalService;
 	@Autowired
 	private RenterGoodsService renterGoodsService;
+	@Autowired
+	private MemberService memberService;
 
 	/**
 	 * 修改订单主逻辑
 	 * @param modifyOrderReq
 	 * @return ResponseData
 	 */
+	@Transactional(rollbackFor=Exception.class)
 	public ResponseData<?> modifyOrder(ModifyOrderReq modifyOrderReq) {
 		log.info("modifyOrder修改订单主逻辑入参modifyOrderReq=[{}]", modifyOrderReq);
 		// TODO 前置校验
@@ -134,9 +140,9 @@ public class ModifyOrderService {
 		CostDeductVO costDeductVO = getCostDeductVO(modifyOrderDTO, costBaseDTO, renterOrderCostRespDTO, renterOrderReqVO, orderEntity, initSubsidyList);
 		// 聚合租客补贴
 		renterOrderCostRespDTO.setRenterOrderSubsidyDetailDTOList(getPolymerizationSubsidy(renterOrderCostRespDTO, costDeductVO));
-		// 
-		// 修改前费用
 		
+		// 修改前费用
+		PayableVO payableVO = renterOrderCostCombineService.getPayable(orderNo, initRenterOrder.getRenterOrderNo(), modifyOrderDTO.getMemNo());
 		// 修改后费用
 		
 		// 入库
@@ -150,6 +156,8 @@ public class ModifyOrderService {
 		renterOrderCalCostService.saveOrderCostAndDeailList(renterOrderCostRespDTO);
 		// 保存罚金
 		renterOrderFineDeatailService.saveRenterOrderFineDeatailBatch(renterFineList);
+		// 保存附加驾驶人信息
+		saveAdditionalDriver(modifyOrderDTO);
 		// 
 		
 		// TODO 发送MQ
@@ -175,6 +183,23 @@ public class ModifyOrderService {
 			rosdList.addAll(renterSubsidyList);
 		}
 		return rosdList;
+	}
+	
+	
+	/**
+	 * 保存附加驾驶人信息
+	 * @param modifyOrderDTO
+	 */
+	public void saveAdditionalDriver(ModifyOrderDTO modifyOrderDTO) {
+		// 附加驾驶人列表
+		List<String> driverIds = modifyOrderDTO.getDriverIds();
+		if (driverIds == null || driverIds.isEmpty()) {
+			return;
+		}
+		// 获取附加驾驶人信息
+		List<CommUseDriverInfo> useDriverList = memberService.getCommUseDriverList(modifyOrderDTO.getMemNo());
+		// 保存
+		renterAdditionalDriverService.insertBatchAdditionalDriver(modifyOrderDTO.getOrderNo(), modifyOrderDTO.getRenterOrderNo(), driverIds, useDriverList);
 	}
 	
 	
