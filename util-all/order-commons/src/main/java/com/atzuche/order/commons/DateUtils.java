@@ -1,11 +1,17 @@
 package com.atzuche.order.commons;
 
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.text.ParseException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Date;
 
 public class DateUtils {
+
+    private static final Logger logger = LoggerFactory.getLogger(DateUtils.class);
 
     public static final String DATE_DEFAUTE = "yyyyMMddHHmmss";
 
@@ -91,5 +97,20 @@ public class DateUtils {
      */
     public static long formateLong(LocalDateTime localDateTime, String format){
         return Long.parseLong(formate(localDateTime, format));
+    }
+
+    /**
+     * 字符串转时间
+     * @param str
+     * @param format
+     * @return
+     */
+    public static Date parseDate(String str, String format) {
+        try {
+            return org.apache.commons.lang.time.DateUtils.parseDate(str, new String[]{format});
+        } catch (ParseException e) {
+            logger.error("parse date error.", e);
+        }
+        return null;
     }
 }

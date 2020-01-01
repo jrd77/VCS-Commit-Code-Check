@@ -1,9 +1,6 @@
 package com.atzuche.order.renterorder.service;
 
 import com.alibaba.fastjson.JSON;
-import com.atzuche.order.accountrenterdeposit.vo.req.CreateOrderRenterDepositReqVO;
-import com.atzuche.order.accountrenterwzdepost.vo.req.CreateOrderRenterWZDepositReqVO;
-import com.atzuche.order.cashieraccount.service.CashierService;
 import com.atzuche.order.commons.entity.dto.CostBaseDTO;
 import com.atzuche.order.commons.entity.dto.DepositAmtDTO;
 import com.atzuche.order.commons.entity.dto.IllegalDepositAmtDTO;
@@ -18,7 +15,10 @@ import com.atzuche.order.rentermem.service.RenterMemberRightService;
 import com.atzuche.order.renterorder.entity.RenterDepositDetailEntity;
 import com.atzuche.order.renterorder.entity.dto.DeductAndSubsidyContextDTO;
 import com.atzuche.order.renterorder.mapper.RenterDepositDetailMapper;
+import com.atzuche.order.renterorder.vo.RenterOrderCarDepositResVO;
+import com.atzuche.order.renterorder.vo.RenterOrderIllegalResVO;
 import com.atzuche.order.renterorder.vo.RenterOrderReqVO;
+import com.atzuche.order.renterorder.vo.RenterOrderResVO;
 import com.atzuche.order.renterorder.vo.owner.OwnerCouponGetAndValidReqVO;
 import com.atzuche.order.renterorder.vo.platform.MemAvailCouponRequestVO;
 import com.autoyol.auto.coin.service.vo.res.AutoCoinResponseVO;
@@ -48,9 +48,6 @@ public class RenterOrderCostHandleService {
     private RenterMemberRightService renterMemberRightService;
 
     @Resource
-    private CashierService cashierService;
-
-    @Resource
     private RenterOrderCostCombineService renterOrderCostCombineService;
 
     @Resource
@@ -67,7 +64,7 @@ public class RenterOrderCostHandleService {
      *
      * @param renterOrderReqVO 租客订单请求信息
      */
-    public void handleCarDepositAmt(RenterOrderReqVO renterOrderReqVO) {
+    public RenterOrderCarDepositResVO handleCarDepositAmt(RenterOrderReqVO renterOrderReqVO) {
         DepositAmtDTO depositAmtDTO = new DepositAmtDTO();
         depositAmtDTO.setSurplusPrice(renterOrderReqVO.getCarSurplusPrice());
         depositAmtDTO.setCityCode(Integer.valueOf(renterOrderReqVO.getCityCode()));
@@ -87,13 +84,12 @@ public class RenterOrderCostHandleService {
                 renterMemberRightService.carDepositAmt(memRightCarDepositAmtReqDTO);
         LOGGER.info("车辆押金减免计算.result is,memRightCarDepositAmtRespDTO:[{}]", JSON.toJSONString(memRightCarDepositAmtRespDTO));
 
-        CreateOrderRenterDepositReqVO createOrderRenterDepositReqVO = new CreateOrderRenterDepositReqVO();
-        createOrderRenterDepositReqVO.setYingfuDepositAmt(carDepositAmt.getCarDepositAmt());
-        createOrderRenterDepositReqVO.setMemNo(renterOrderReqVO.getMemNo());
-        createOrderRenterDepositReqVO.setOrderNo(renterOrderReqVO.getOrderNo());
-        createOrderRenterDepositReqVO.setReductionAmt(memRightCarDepositAmtRespDTO.getReductionDepositAmt());
-        createOrderRenterDepositReqVO.setFreeDepositType(FreeDepositTypeEnum.getFreeDepositTypeEnumByCode(Integer.valueOf(renterOrderReqVO.getFreeDoubleTypeId())));
-        cashierService.insertRenterDeposit(createOrderRenterDepositReqVO);
+        RenterOrderCarDepositResVO renterOrderCarDepositResVO = new RenterOrderCarDepositResVO();
+        renterOrderCarDepositResVO.setYingfuDepositAmt(carDepositAmt.getCarDepositAmt());
+        renterOrderCarDepositResVO.setMemNo(renterOrderReqVO.getMemNo().toString());
+        renterOrderCarDepositResVO.setOrderNo(renterOrderReqVO.getOrderNo());
+        renterOrderCarDepositResVO.setReductionAmt(memRightCarDepositAmtRespDTO.getReductionDepositAmt());
+        renterOrderCarDepositResVO.setFreeDepositType(FreeDepositTypeEnum.getFreeDepositTypeEnumByCode(Integer.valueOf(renterOrderReqVO.getFreeDoubleTypeId())));
 
         //车辆押金明细入库
         RenterDepositDetailEntity record = new RenterDepositDetailEntity();
@@ -105,6 +101,10 @@ public class RenterOrderCostHandleService {
         record.setReductionDepositAmt(memRightCarDepositAmtRespDTO.getReductionDepositAmt());
         record.setReductionRate(memRightCarDepositAmtRespDTO.getReductionRate());
         renterDepositDetailMapper.insertSelective(record);
+
+        LOGGER.info("租客车辆押金.result is,renterOrderCarDepositResVO:[{}]",
+                JSON.toJSONString(renterOrderCarDepositResVO));
+        return renterOrderCarDepositResVO;
     }
 
 
@@ -114,7 +114,7 @@ public class RenterOrderCostHandleService {
      * @param costBaseDTO      基础数据
      * @param renterOrderReqVO 租客订单请求信息
      */
-    public void handleIllegalDepositAmt(CostBaseDTO costBaseDTO, RenterOrderReqVO renterOrderReqVO) {
+    public RenterOrderIllegalResVO handleIllegalDepositAmt(CostBaseDTO costBaseDTO, RenterOrderReqVO renterOrderReqVO) {
         IllegalDepositAmtDTO illDTO = new IllegalDepositAmtDTO();
         illDTO.setCostBaseDTO(costBaseDTO);
         illDTO.setCarPlateNum(renterOrderReqVO.getPlateNum());
@@ -124,12 +124,12 @@ public class RenterOrderCostHandleService {
                 renterMemberRightService.wzDepositAmt(renterOrderReqVO.getRenterMemberRightDTOList(),
                         illegalDepositAmt);
 
-        CreateOrderRenterWZDepositReqVO createOrderRenterIllegalDepositReqVO = new CreateOrderRenterWZDepositReqVO();
-        createOrderRenterIllegalDepositReqVO.setOrderNo(renterOrderReqVO.getOrderNo());
-        createOrderRenterIllegalDepositReqVO.setFreeDepositType(FreeDepositTypeEnum.getFreeDepositTypeEnumByCode(Integer.valueOf(renterOrderReqVO.getFreeDoubleTypeId())));
-        createOrderRenterIllegalDepositReqVO.setMemNo(renterOrderReqVO.getMemNo());
-        createOrderRenterIllegalDepositReqVO.setYingfuDepositAmt(realIllegalDepositAmt);
-        cashierService.insertRenterWZDeposit(createOrderRenterIllegalDepositReqVO);
+        RenterOrderIllegalResVO renterOrderIllegalResVO = new RenterOrderIllegalResVO();
+        renterOrderIllegalResVO.setOrderNo(renterOrderReqVO.getOrderNo());
+        renterOrderIllegalResVO.setFreeDepositType(FreeDepositTypeEnum.getFreeDepositTypeEnumByCode(Integer.valueOf(renterOrderReqVO.getFreeDoubleTypeId())));
+        renterOrderIllegalResVO.setMemNo(renterOrderReqVO.getMemNo().toString());
+        renterOrderIllegalResVO.setYingfuDepositAmt(realIllegalDepositAmt);
+        return renterOrderIllegalResVO;
     }
 
     /**
@@ -166,13 +166,15 @@ public class RenterOrderCostHandleService {
      * 车主券处理
      *
      * @param context                     公共参数
+     * @param renterOrderResVO            租客订单返回信息
      * @param ownerCouponGetAndValidReqVO 车主券请求参数
      */
     public void handleOwnerCoupon(DeductAndSubsidyContextDTO context,
-                                  OwnerCouponGetAndValidReqVO ownerCouponGetAndValidReqVO) {
+                                  OwnerCouponGetAndValidReqVO ownerCouponGetAndValidReqVO, RenterOrderResVO renterOrderResVO) {
 
         OrderCouponDTO ownerCoupon = renterOrderCalCostService.calOwnerCouponDeductInfo(ownerCouponGetAndValidReqVO);
         if (null != ownerCoupon) {
+            renterOrderResVO.setOwnerCoupon(ownerCoupon);
             //重置剩余租金
             int disAmt = null == ownerCoupon.getAmount() ? 0 : ownerCoupon.getAmount();
             context.setSurplusRentAmt(context.getSurplusRentAmt() - disAmt);

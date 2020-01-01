@@ -72,21 +72,8 @@ public class RenterOrderCalCostService {
     @Resource
     private RenterOrderCostService renterOrderCostService;
 
-
     /**
-     * 计算费用明细并保存费用
-     *
-     * @author ZhangBin
-     * @date 2019/12/28 19:19
-     **/
-    public void getAndSaveOrderCostAndDeailList(RenterOrderCostReqDTO renterOrderCostReqDTO) {
-        RenterOrderCostRespDTO renterOrderCostRespDTO = this.getOrderCostAndDeailList(renterOrderCostReqDTO);
-        this.saveOrderCostAndDeailList(renterOrderCostRespDTO);
-    }
-
-
-    /**
-     * 获取费用项和费用明细列表 + 落库
+     * 获取费用项和费用明细列表
      *
      * @author ZhangBin
      * @date 2019/12/24 15:21
@@ -209,7 +196,7 @@ public class RenterOrderCalCostService {
      * @author ZhangBin
      * @date 2019/12/28 17:37
      **/
-    private void saveOrderCostAndDeailList(RenterOrderCostRespDTO renterOrderCostRespDTO) {
+    public void saveOrderCostAndDeailList(RenterOrderCostRespDTO renterOrderCostRespDTO) {
         List<RenterOrderSubsidyDetailDTO> renterOrderSubsidyDetailDTOList = renterOrderCostRespDTO.getRenterOrderSubsidyDetailDTOList();
         //数据转化
         List<RenterOrderSubsidyDetailEntity> subsidyListEntity = renterOrderSubsidyDetailDTOList.stream().map(x -> {

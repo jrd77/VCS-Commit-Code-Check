@@ -2,6 +2,7 @@ package com.atzuche.order.renterorder.vo;
 
 import com.atzuche.order.commons.entity.dto.RenterGoodsPriceDetailDTO;
 import com.atzuche.order.commons.entity.dto.RenterMemberRightDTO;
+import com.autoyol.member.detail.vo.res.CommUseDriverInfo;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -32,24 +33,29 @@ public class RenterOrderReqVO implements Serializable {
     private String renterOrderNo;
 
     /**
-     * 会员号
+     * 订单类型
      */
-    private String memNo;
+    private String orderCategory;
 
     /**
-     * 内部员工标识
+     * 会员号
      */
-    private Integer internalStaff;
+    private Integer memNo;
 
     /**
      * 车辆注册号
      */
-    private Integer carNo;
+    private String carNo;
 
     /**
      * 车牌号
      */
     private String plateNum;
+
+    /**
+     * 应答标识位，0未设置，1已设置
+     */
+    private Integer replyFlag;
 
     /**
      * 城市编码
@@ -201,9 +207,15 @@ public class RenterOrderReqVO implements Serializable {
     private Boolean isNew;
 
     /**
-     * 限时红包面额(管理后台)
+     * 限时红包面额(管理后台，前端传值转换后的金额)
      */
     private Integer reductiAmt;
+
+    /**
+     * 是否使用特供价
+     */
+    private String useSpecialPrice;
+
 
     /**
      * 车辆标签
@@ -224,6 +236,11 @@ public class RenterOrderReqVO implements Serializable {
      * 租客权益列表
      */
     private List<RenterMemberRightDTO> renterMemberRightDTOList;
+
+    /**
+     * 常用驾驶人列表
+     */
+    private List<CommUseDriverInfo> commUseDriverList;
 
 
 }

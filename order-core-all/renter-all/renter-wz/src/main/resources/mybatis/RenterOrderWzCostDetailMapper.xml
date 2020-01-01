@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.atzuche.order.renterwz.mapper.RenterOrderWzCostDetailMapper">
+	<sql id="select_column">
+		id,order_no,car_plate_num,mem_no,cost_code,cost_desc,amount,note,source_type,operator_id,operator_name,cost_status,remark,create_time,create_op,update_time,update_op,is_delete
+	</sql>
+
+	<resultMap id = "selectColumnMap" type="com.atzuche.order.renterwz.entity.RenterOrderWzCostDetailEntity">
+		<result property="id" column="id"/>
+		<result property="orderNo" column="order_no"/>
+		<result property="carPlateNum" column="car_plate_num"/>
+		<result property="memNo" column="mem_no"/>
+		<result property="costCode" column="cost_code"/>
+		<result property="costDesc" column="cost_desc"/>
+		<result property="amount" column="amount"/>
+		<result property="note" column="note"/>
+		<result property="sourceType" column="source_type"/>
+		<result property="operatorId" column="operator_id"/>
+		<result property="operatorName" column="operator_name"/>
+		<result property="costStatus" column="cost_status"/>
+		<result property="remark" column="remark"/>
+		<result property="createTime" column="create_time"/>
+		<result property="createOp" column="create_op"/>
+		<result property="updateTime" column="update_time"/>
+		<result property="updateOp" column="update_op"/>
+		<result property="isDelete" column="is_delete"/>
+	</resultMap>
+
+	<insert id="saveRenterOrderWzCostDetail" parameterType="com.atzuche.order.renterwz.entity.RenterOrderWzCostDetailEntity" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+		insert into renter_order_wz_cost_detail(
+				order_no,
+				car_plate_num,
+				mem_no,
+				cost_code,
+				cost_desc,
+				amount,
+				source_type,
+			<if test="operatorId != null">
+				operator_id,
+			</if>
+			<if test="operatorName != null">
+				operator_name,
+			</if>
+				cost_status,
+			<if test="remark != null">
+				remark,
+			</if>
+			<if test="createOp != null">
+				create_op,
+			</if>
+				is_delete,
+			create_time
+		) values (
+				#{orderNo},
+				#{carPlateNum},
+				#{memNo},
+				#{costCode},
+				#{costDesc},
+				#{amount},
+				#{sourceType},
+			<if test="operatorId != null">
+				#{operatorId},
+			</if>
+			<if test="operatorName != null">
+				#{operatorName},
+			</if>
+				0,
+			<if test="remark != null">
+				#{remark},
+			</if>
+			<if test="createOp != null">
+				#{createOp},
+			</if>
+				0,
+		#{createTime})
+	</insert>
+
+	<select id="queryRenterOrderWzCostDetailById" resultType="com.atzuche.order.renterwz.entity.RenterOrderWzCostDetailEntity">
+		select <include refid="select_column" />
+		from renter_order_wz_cost_detail
+		where id = #{id} and is_delete = 0
+	</select>
+
+	<select id="queryList" resultType="com.atzuche.order.renterwz.entity.RenterOrderWzCostDetailEntity">
+		select <include refid="select_column" />
+		from renter_order_wz_cost_detail
+		where is_delete = 0
+	</select>
+
+	 <update id="updateRenterOrderWzCostDetail" parameterType="com.atzuche.order.renterwz.entity.RenterOrderWzCostDetailEntity">
+		update renter_order_wz_cost_detail set
+		<if test="orderNo != null">
+			order_no = #{orderNo},
+		</if>
+		<if test="carPlateNum != null">
+			car_plate_num = #{carPlateNum},
+		</if>
+		<if test="memNo != null">
+			mem_no = #{memNo},
+		</if>
+		<if test="costCode != null">
+			cost_code = #{costCode},
+		</if>
+		<if test="costDesc != null">
+			cost_desc = #{costDesc},
+		</if>
+		<if test="amount != null">
+			amount = #{amount},
+		</if>
+		<if test="note != null">
+			note = #{note},
+		</if>
+		<if test="sourceType != null">
+			source_type = #{sourceType},
+		</if>
+		<if test="operatorId != null">
+			operator_id = #{operatorId},
+		</if>
+		<if test="operatorName != null">
+			operator_name = #{operatorName},
+		</if>
+		<if test="costStatus != null">
+			cost_status = #{costStatus},
+		</if>
+		<if test="remark != null">
+			remark = #{remark},
+		</if>
+		<if test="createTime != null">
+			create_time = #{createTime},
+		</if>
+		<if test="createOp != null">
+			create_op = #{createOp},
+		</if>
+		<if test="updateOp != null">
+			update_op = #{updateOp},
+		</if>
+		<if test="isDelete != null">
+			is_delete = #{isDelete},
+		</if>
+		update_time = NOW()
+		where id = #{id} and is_delete = 0
+	</update>
+
+	 <update id="deleteRenterOrderWzCostDetailById" parameterType="java.lang.Long">
+		update renter_order_wz_cost_detail set
+		is_delete = 1,
+		update_time = NOW()
+		where id = #{id} and is_delete = 0
+	</update>
+	
+	<update id="updateCostStatusByOrderNoAndCarNumAndMemNoAndCostCode">
+		update renter_order_wz_cost_detail set
+		cost_status = #{costStatus},
+		update_time = NOW()
+		where order_no = #{orderNo} and car_plate_num = #{carNum} and mem_no = #{memNo} and cost_code = #{code}
+	</update>
+
+</mapper>

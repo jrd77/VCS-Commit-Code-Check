@@ -1,8 +1,9 @@
 package com.atzuche.order.ownercost.entity;
 
+import lombok.Data;
+
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import lombok.Data;
 
 
 /**
@@ -65,7 +66,7 @@ public class OwnerOrderEntity implements Serializable {
 	 */
 	private String goodsType;
 	/**
-	 * 子单状态
+	 * 租客子单状态，1：进行中，2：已完结，3：已结束
 	 */
 	private Integer childStatus;
 	/**

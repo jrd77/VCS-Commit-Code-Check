@@ -18,8 +18,6 @@ public interface OrderCouponMapper{
 
     OrderCouponEntity selectByPrimaryKey(Integer id);
 
-    OrderCouponEntity selectByOrderNo(String orderNo);
-
     int insert(OrderCouponEntity record);
     
     int insertSelective(OrderCouponEntity record);

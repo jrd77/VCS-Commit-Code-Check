@@ -1,35 +1,36 @@
 package com.atzuche.order.ownercost.entity.dto;
 
-import com.atzuche.order.rentercost.entity.RenterOrderCostDetailEntity;
-import com.atzuche.order.rentercost.entity.RenterOrderSubsidyDetailEntity;
-import com.atzuche.order.rentercost.entity.dto.RenterOrderSubsidyDetailDTO;
+import com.atzuche.order.commons.entity.dto.CostBaseDTO;
+import com.atzuche.order.ownercost.entity.OwnerOrderPurchaseDetailEntity;
+import com.atzuche.order.ownercost.entity.OwnerOrderSubsidyDetailEntity;
 import lombok.Data;
-
-import java.util.List;
 
 @Data
 public class OwnerOrderCostReqDTO {
     /**
-     * 主订单号
+     * 基础数据
      */
-    private String orderNo;
+    private CostBaseDTO costBaseDTO;
     /**
-     * 车主子订单号
+     * 车辆类型
      */
-    private String ownerOrderNo;
+    private Integer carOwnerType;
     /**
-     * 车主会员号
+     * 取车标志
      */
-    private String memNo;
-
+    private Integer srvGetFlag;
     /**
-     * 租客端费用对应的明细列表
+     * 还车标志
      */
-    List<RenterOrderCostDetailEntity> renterOrderCostDetailDTOList;
+    private Integer srvReturnFlag;
     /**
-     * 租客端补贴对应的明细列表
+     * 租客端费用对应的明细
      */
-    List<RenterOrderSubsidyDetailDTO> renterOrderSubsidyDetailDTOList;
+    private OwnerOrderPurchaseDetailEntity ownerOrderPurchaseDetailEntity;
+    /**
+     * 租客端补贴对应的明细
+     */
+    private OwnerOrderSubsidyDetailEntity ownerOrderSubsidyDetailEntity;
 
 
 }

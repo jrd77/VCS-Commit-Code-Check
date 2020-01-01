@@ -20,7 +20,7 @@ public class OrderDTO {
     /**
      * 租客会员号
      */
-    private Integer memNoRenter;
+    private String memNoRenter;
     /**
      * 订单类型（内部分类）1：短租， 2：套餐
      */
