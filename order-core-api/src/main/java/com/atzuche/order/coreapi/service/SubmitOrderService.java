@@ -61,7 +61,7 @@ public class SubmitOrderService {
     @Autowired
     private MemberService memberService;
     @Autowired
-    private CarService carService;
+    private GoodsService goodsService;
     @Autowired
     private CarDetailQueryFeignApi carDetailQueryFeignApi;
     @Resource
@@ -99,15 +99,15 @@ public class SubmitOrderService {
         RenterMemberDTO renterMemberDTO =
                 memberService.getRenterMemberInfo(String.valueOf(normalOrderReqVO.getMemNo()));
         reqContext.setRenterMemberDto(renterMemberDTO);
-        CarService.CarDetailReqVO carDetailReqVO = new CarService.CarDetailReqVO();
+        GoodsService.CarDetailReqVO carDetailReqVO = new GoodsService.CarDetailReqVO();
         carDetailReqVO.setAddrIndex(StringUtils.isBlank(normalOrderReqVO.getCarAddrIndex()) ? 0 : Integer.parseInt(normalOrderReqVO.getCarAddrIndex()));
         carDetailReqVO.setCarNo(normalOrderReqVO.getCarNo());
         carDetailReqVO.setRentTime(normalOrderReqVO.getRentTime());
         carDetailReqVO.setRevertTime(normalOrderReqVO.getRevertTime());
         carDetailReqVO.setUseSpecialPrice(false);
-        RenterGoodsDetailDTO renterGoodsDetailDTO = carService.getRenterGoodsDetail(carDetailReqVO);
+        RenterGoodsDetailDTO renterGoodsDetailDTO = goodsService.getRenterGoodsDetail(carDetailReqVO);
         reqContext.setRenterGoodsDetailDto(renterGoodsDetailDTO);
-        OwnerGoodsDetailDTO ownerGoodsDetailDTO = carService.getOwnerGoodsDetail(renterGoodsDetailDTO);
+        OwnerGoodsDetailDTO ownerGoodsDetailDTO = goodsService.getOwnerGoodsDetail(renterGoodsDetailDTO);
         reqContext.setOwnerGoodsDetailDto(ownerGoodsDetailDTO);
         OwnerMemberDTO ownerMemberDTO = memberService.getOwnerMemberInfo(renterGoodsDetailDTO.getOwnerMemNo());
         reqContext.setOwnerMemberDto(ownerMemberDTO);

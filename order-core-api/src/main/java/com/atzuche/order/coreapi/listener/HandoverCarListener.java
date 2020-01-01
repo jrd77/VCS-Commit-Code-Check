@@ -28,7 +28,6 @@ public class HandoverCarListener {
     @Autowired
     HandoverCarService handoverCarService;
 
-    @AliyunMnsListener(queueKey = DeliveryConstants.REN_YUN_QUEUE_KEY)
     public void onMessage(Message message) {
 
         if (null == message || StringUtils.isBlank(message.getMessageId())) {
