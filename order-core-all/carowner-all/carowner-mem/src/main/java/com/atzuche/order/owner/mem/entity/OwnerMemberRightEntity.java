@@ -1,15 +1,16 @@
 package com.atzuche.order.owner.mem.entity;
 
+import lombok.Data;
+
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import lombok.Data;
 
 
 /**
  * 车主会员权益表
  * 
  * @author ZhangBin
- * @date 2019-12-18 16:15:16
+ * @date 2020-01-01 11:30:57
  * @Description:
  */
 @Data
@@ -44,6 +45,10 @@ public class OwnerMemberRightEntity implements Serializable {
 	 * 权益值
 	 */
 	private String rightValue;
+	/**
+	 * 权益类别 1-内部员工类别，2-会员标志类别，3-太保会员类别，4-任务类别
+	 */
+	private Integer rightType;
 	/**
 	 * 权益描述
 	 */

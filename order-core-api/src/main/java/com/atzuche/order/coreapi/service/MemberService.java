@@ -10,6 +10,7 @@ import com.atzuche.order.commons.entity.dto.RenterMemberRightDTO;
 import com.atzuche.order.commons.enums.MemberFlagEnum;
 import com.atzuche.order.commons.enums.OwnerMemRightEnum;
 import com.atzuche.order.commons.enums.RenterMemRightEnum;
+import com.atzuche.order.commons.enums.RightTypeEnum;
 import com.atzuche.order.coreapi.submitOrder.exception.*;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
@@ -95,6 +96,7 @@ public class MemberService {
                 internalStaff.setRightCode(OwnerMemRightEnum.STAFF.getRightCode());
                 internalStaff.setRightName(OwnerMemRightEnum.STAFF.getRightName());
                 internalStaff.setRightValue(String.valueOf(memberRoleInfo.getInternalStaff()));
+                internalStaff.setRightType(RightTypeEnum.STAFF.getCode());
                 internalStaff.setRightDesc("是否是内部员工");
                 rights.add(internalStaff);
             }
@@ -104,6 +106,7 @@ public class MemberService {
                 internalStaff.setRightCode(memberFlagEnum.getRightCode());
                 internalStaff.setRightName(memberFlagEnum.getRightName());
                 internalStaff.setRightValue(String.valueOf(memberRoleInfo.getMemberFlag()));
+                internalStaff.setRightType(RightTypeEnum.MEMBER_FLAG.getCode());
                 internalStaff.setRightDesc("会员标识");
                 rights.add(internalStaff);
             }
@@ -112,6 +115,7 @@ public class MemberService {
                 internalStaff.setRightCode(OwnerMemRightEnum.CPIC_MEM.getRightCode());
                 internalStaff.setRightName(OwnerMemRightEnum.CPIC_MEM.getRightName());
                 internalStaff.setRightValue(String.valueOf(memberRoleInfo.getCpicMemberFlag()));
+                internalStaff.setRightType(RightTypeEnum.CPIC.getCode());
                 internalStaff.setRightDesc("是否太保会员");
                 rights.add(internalStaff);
             }
@@ -125,6 +129,7 @@ public class MemberService {
                 internalStaff.setRightName(OwnerMemRightEnum.BIND_WECHAT.getRightName());
                 internalStaff.setRightValue(wxBindingTaskInfo.getReliefPercentage()==null?"0":String.valueOf(wxBindingTaskInfo.getReliefPercentage()));
                 internalStaff.setRightDesc(wxBindingTaskInfo.getTitle());
+                internalStaff.setRightType(RightTypeEnum.TASK.getCode());
                 rights.add(internalStaff);
             }
             MemberLevelTaskInfo memberLevelTaskInfo = memberReliefInfo.getMemberLevelTaskInfo();
@@ -134,6 +139,7 @@ public class MemberService {
                 internalStaff.setRightName(OwnerMemRightEnum.MEMBER_LEVEL.getRightName());
                 internalStaff.setRightValue(memberLevelTaskInfo.getReliefPercentage()==null?"0":String.valueOf(memberLevelTaskInfo.getReliefPercentage()));
                 internalStaff.setRightDesc(memberLevelTaskInfo.getTitle());
+                internalStaff.setRightType(RightTypeEnum.TASK.getCode());
                 rights.add(internalStaff);
             }
             InvitationTaskInfo invitationTaskInfo = memberReliefInfo.getInvitationTaskInfo();
@@ -143,6 +149,7 @@ public class MemberService {
                 internalStaff.setRightName(OwnerMemRightEnum.INVITE_FRIENDS.getRightName());
                 internalStaff.setRightValue(invitationTaskInfo.getReliefPercentage()==null?"0":String.valueOf(invitationTaskInfo.getReliefPercentage()));
                 internalStaff.setRightDesc(invitationTaskInfo.getTitle());
+                internalStaff.setRightType(RightTypeEnum.TASK.getCode());
                 rights.add(internalStaff);
             }
             RentCarTaskInfo rentCarTaskInfo = memberReliefInfo.getRentCarTaskInfo();
@@ -152,6 +159,7 @@ public class MemberService {
                 internalStaff.setRightName(OwnerMemRightEnum.SUCCESS_RENTCAR.getRightName());
                 internalStaff.setRightValue(rentCarTaskInfo.getReliefPercentage()==null?"0":String.valueOf(rentCarTaskInfo.getReliefPercentage()));
                 internalStaff.setRightDesc(rentCarTaskInfo.getTitle());
+                internalStaff.setRightType(RightTypeEnum.TASK.getCode());
                 rights.add(internalStaff);
             }
         }
@@ -226,6 +234,7 @@ public class MemberService {
                 RenterMemberRightDTO internalStaff = new RenterMemberRightDTO();
                 internalStaff.setRightCode(RenterMemRightEnum.STAFF.getRightCode());
                 internalStaff.setRightName(RenterMemRightEnum.STAFF.getRightName());
+                internalStaff.setRightType(RightTypeEnum.STAFF.getCode());
                 internalStaff.setRightValue(String.valueOf(memberRoleInfo.getInternalStaff()));
                 internalStaff.setRightDesc("是否是内部员工");
                 rights.add(internalStaff);
@@ -235,6 +244,7 @@ public class MemberService {
                 RenterMemberRightDTO internalStaff = new RenterMemberRightDTO();
                 internalStaff.setRightCode(memberFlagEnum.getRightCode());
                 internalStaff.setRightName(memberFlagEnum.getRightName());
+                internalStaff.setRightType(RightTypeEnum.MEMBER_FLAG.getCode());
                 internalStaff.setRightDesc("会员标识");
                 rights.add(internalStaff);
             }
@@ -243,6 +253,7 @@ public class MemberService {
                 internalStaff.setRightCode(RenterMemRightEnum.CPIC_MEM.getRightCode());
                 internalStaff.setRightName(RenterMemRightEnum.CPIC_MEM.getRightName());
                 internalStaff.setRightValue(String.valueOf(memberRoleInfo.getCpicMemberFlag()));
+                internalStaff.setRightType(RightTypeEnum.CPIC.getCode());
                 internalStaff.setRightDesc("是否太保会员");
                 rights.add(internalStaff);
             }
@@ -255,6 +266,7 @@ public class MemberService {
                 internalStaff.setRightCode(RenterMemRightEnum.BIND_WECHAT.getRightCode());
                 internalStaff.setRightName(RenterMemRightEnum.BIND_WECHAT.getRightName());
                 internalStaff.setRightValue(wxBindingTaskInfo.getReliefPercentage()==null?"0":String.valueOf(wxBindingTaskInfo.getReliefPercentage()));
+                internalStaff.setRightType(RightTypeEnum.TASK.getCode());
                 internalStaff.setRightDesc(wxBindingTaskInfo.getTitle());
                 rights.add(internalStaff);
             }
@@ -264,6 +276,7 @@ public class MemberService {
                 internalStaff.setRightCode(RenterMemRightEnum.MEMBER_LEVEL.getRightCode());
                 internalStaff.setRightName(RenterMemRightEnum.MEMBER_LEVEL.getRightName());
                 internalStaff.setRightValue(memberLevelTaskInfo.getReliefPercentage()==null?"0":String.valueOf(memberLevelTaskInfo.getReliefPercentage()));
+                internalStaff.setRightType(RightTypeEnum.TASK.getCode());
                 internalStaff.setRightDesc(memberLevelTaskInfo.getTitle());
                 rights.add(internalStaff);
             }
@@ -273,6 +286,7 @@ public class MemberService {
                 internalStaff.setRightCode(RenterMemRightEnum.INVITE_FRIENDS.getRightCode());
                 internalStaff.setRightName(RenterMemRightEnum.INVITE_FRIENDS.getRightName());
                 internalStaff.setRightValue(invitationTaskInfo.getReliefPercentage()==null?"0":String.valueOf(invitationTaskInfo.getReliefPercentage()));
+                internalStaff.setRightType(RightTypeEnum.TASK.getCode());
                 internalStaff.setRightDesc(invitationTaskInfo.getTitle());
                 rights.add(internalStaff);
             }
@@ -282,6 +296,7 @@ public class MemberService {
                 internalStaff.setRightCode(RenterMemRightEnum.SUCCESS_RENTCAR.getRightCode());
                 internalStaff.setRightName(RenterMemRightEnum.SUCCESS_RENTCAR.getRightName());
                 internalStaff.setRightValue(rentCarTaskInfo.getReliefPercentage()==null?"0":String.valueOf(rentCarTaskInfo.getReliefPercentage()));
+                internalStaff.setRightType(RightTypeEnum.TASK.getCode());
                 internalStaff.setRightDesc(rentCarTaskInfo.getTitle());
                 rights.add(internalStaff);
             }
