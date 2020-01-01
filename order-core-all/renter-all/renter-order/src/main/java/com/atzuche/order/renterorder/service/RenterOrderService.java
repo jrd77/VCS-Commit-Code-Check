@@ -370,4 +370,14 @@ public class RenterOrderService {
         context.setOrderSubsidyDetailList(subsidyList);
         return context;
     }
+    
+    /**
+     * 修改租客子单子状态
+     * @param id
+     * @param childStatus
+     * @return Integer
+     */
+    public Integer updateRenterOrderChildStatus(Integer id, Integer childStatus) {
+    	return renterOrderMapper.updateRenterOrderChildStatus(id, childStatus);
+    }
 }
