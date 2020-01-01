@@ -66,7 +66,7 @@ public class ConfigSDKFactory implements ConfigService {
     }
 
 
-    private void init(){
+    public void init(){
         List<String> configNames = getAllConfigNames();
 
         for(String configName:configNames){
