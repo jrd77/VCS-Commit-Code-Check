@@ -141,13 +141,12 @@ public class HandoverCarService {
      * @param handoverCarVO
      */
     @Transactional(rollbackFor = Exception.class)
-    public void addHandoverCarInfo(HandoverCarVO handoverCarVO) {
+    public void addHandoverCarInfo(HandoverCarVO handoverCarVO,int userType) {
         if (Objects.isNull(handoverCarVO) || handoverCarVO.getHandoverCarInfoDTO().getType() == null) {
             throw new HandoverCarOrderException(DeliveryErrorCode.DELIVERY_PARAMS_ERROR);
         }
-        int type = handoverCarVO.getHandoverCarInfoDTO().getType().intValue();
         //向租客交车
-        if (type == HandoverCarTypeEnum.OWNER_TO_RENTER.getValue().intValue() || type == HandoverCarTypeEnum.RENYUN_TO_RENTER.getValue().intValue()) {
+        if (userType == UserTypeEnum.RENTER_TYPE.getValue().intValue()) {
 
             RenterHandoverCarInfoEntity renterHandoverCarInfoEntity = new RenterHandoverCarInfoEntity();
             BeanUtils.copyProperties(handoverCarVO.getHandoverCarInfoDTO(), renterHandoverCarInfoEntity);
@@ -157,7 +156,7 @@ public class HandoverCarService {
                 BeanUtils.copyProperties(handoverCarVO.getHandoverCarRemarkDTO(), renterHandoverCarRemarkEntity);
                 renterHandoverCarRemarkMapper.insertSelective(renterHandoverCarRemarkEntity);
             }
-        } else if (type == HandoverCarTypeEnum.RENTER_TO_RENYUN.getValue().intValue() || type == HandoverCarTypeEnum.RENTER_TO_OWNER.getValue().intValue()) {
+        } else if (userType == UserTypeEnum.OWNER_TYPE.getValue().intValue()) {
             OwnerHandoverCarInfoEntity ownerHandoverCarInfoEntity = new OwnerHandoverCarInfoEntity();
             BeanUtils.copyProperties(handoverCarVO.getHandoverCarInfoDTO(), ownerHandoverCarInfoEntity);
             ownerHandoverCarInfoMapper.insertSelective(ownerHandoverCarInfoEntity);

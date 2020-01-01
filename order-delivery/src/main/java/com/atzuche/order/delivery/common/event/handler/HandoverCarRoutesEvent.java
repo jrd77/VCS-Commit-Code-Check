@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.aliyun.mns.model.Message;
 import com.atzuche.order.delivery.common.mq.handover.HandoverCarMq;
 import com.atzuche.order.delivery.common.mq.handover.HandoverRabbitMQEventEnum;
+import com.atzuche.order.delivery.enums.HandoverCarTypeEnum;
 import com.atzuche.order.delivery.enums.ServiceTypeEnum;
 import com.atzuche.order.delivery.enums.UserTypeEnum;
 import com.atzuche.order.delivery.service.handover.HandoverCarService;
@@ -56,7 +57,6 @@ public class HandoverCarRoutesEvent {
         } catch (Exception e) {
             log.error("map转换失败，message：{}", JSONObject.toJSONString(message));
         }
-        //发送mq event
         sendMessageToQueue(handoverCarRenYunVO);
     }
 
@@ -76,26 +76,33 @@ public class HandoverCarRoutesEvent {
         if (userType == UserTypeEnum.RENTER_TYPE.getValue().intValue()) {
             log.info("发送租客端事件,OrderNo:{}", handoverCarVO.getOrderNo());
             if (handoverCarVO.getServiceType().equals(ServiceTypeEnum.TAKE_TYPE.getValue())) {
-
+                HandoverCarVO handoverCar = createHandoverParams(handoverCarVO, HandoverCarTypeEnum.RENYUN_TO_RENTER.getValue().intValue(),handoverCarVO.getServiceType());
+                handoverCarService.addHandoverCarInfo(handoverCar,userType);
                 handoverCarMq.setRouteKey(HandoverRabbitMQEventEnum.RENTER_TAKE.routingKey);
                 String handoverCarMqJson = GsonUtils.toJson(handoverCarMq);
                 rabbitTemplate.convertAndSend(HandoverRabbitMQEventEnum.RENTER_TAKE.exchange,HandoverRabbitMQEventEnum.RENTER_TAKE.routingKey,handoverCarMqJson);
             } else if (handoverCarVO.getServiceType().equals(ServiceTypeEnum.BACK_TYPE.getValue())) {
-                handoverCarMq.setRouteKey(HandoverRabbitMQEventEnum.RENTER_TAKE.routingKey);
+                HandoverCarVO handoverCar = createHandoverParams(handoverCarVO, HandoverCarTypeEnum.RENTER_TO_RENYUN.getValue().intValue(),handoverCarVO.getServiceType());
+                handoverCarService.addHandoverCarInfo(handoverCar,userType);
+                handoverCarMq.setRouteKey(HandoverRabbitMQEventEnum.RENTER_BACK.routingKey);
                 String handoverCarMqJson = GsonUtils.toJson(handoverCarMq);
-                rabbitTemplate.convertAndSend(HandoverRabbitMQEventEnum.RENTER_TAKE.exchange,HandoverRabbitMQEventEnum.RENTER_BACK.routingKey,handoverCarMqJson);
+                rabbitTemplate.convertAndSend(HandoverRabbitMQEventEnum.RENTER_BACK.exchange,HandoverRabbitMQEventEnum.RENTER_BACK.routingKey,handoverCarMqJson);
             }
         }
         else if (userType == UserTypeEnum.OWNER_TYPE.getValue().intValue()) {
             log.info("发送车主端事件,OrderNo:{}", handoverCarVO.getOrderNo());
             if (handoverCarVO.getServiceType().equals(ServiceTypeEnum.TAKE_TYPE.getValue())) {
-                handoverCarMq.setRouteKey(HandoverRabbitMQEventEnum.RENTER_TAKE.routingKey);
+                HandoverCarVO handoverCar = createHandoverParams(handoverCarVO, HandoverCarTypeEnum.RENYUN_TO_RENTER.getValue().intValue(),handoverCarVO.getServiceType());
+                handoverCarService.addHandoverCarInfo(handoverCar,userType);
+                handoverCarMq.setRouteKey(HandoverRabbitMQEventEnum.OWNER_TAKE.routingKey);
                 String handoverCarMqJson = GsonUtils.toJson(handoverCarMq);
-                rabbitTemplate.convertAndSend(HandoverRabbitMQEventEnum.RENTER_TAKE.exchange,HandoverRabbitMQEventEnum.OWNER_TAKE.routingKey,handoverCarMqJson);
+                rabbitTemplate.convertAndSend(HandoverRabbitMQEventEnum.OWNER_TAKE.exchange,HandoverRabbitMQEventEnum.OWNER_TAKE.routingKey,handoverCarMqJson);
             } else if (handoverCarVO.getServiceType().equals(ServiceTypeEnum.BACK_TYPE.getValue())) {
-                handoverCarMq.setRouteKey(HandoverRabbitMQEventEnum.RENTER_TAKE.routingKey);
+                HandoverCarVO handoverCar = createHandoverParams(handoverCarVO, HandoverCarTypeEnum.RENYUN_TO_RENTER.getValue().intValue(),handoverCarVO.getServiceType());
+                handoverCarService.addHandoverCarInfo(handoverCar,userType);
+                handoverCarMq.setRouteKey(HandoverRabbitMQEventEnum.OWNER_BACK.routingKey);
                 String handoverCarMqJson = GsonUtils.toJson(handoverCarMq);
-                rabbitTemplate.convertAndSend(HandoverRabbitMQEventEnum.RENTER_TAKE.exchange,HandoverRabbitMQEventEnum.OWNER_BACK.routingKey,handoverCarMqJson);
+                rabbitTemplate.convertAndSend(HandoverRabbitMQEventEnum.OWNER_BACK.exchange,HandoverRabbitMQEventEnum.OWNER_BACK.routingKey,handoverCarMqJson);
             }
         }else {
             log.info("没有合适的交接车类型接受的数据 handoverCarVO：[{}]",handoverCarVO.toString());
@@ -103,30 +110,32 @@ public class HandoverCarRoutesEvent {
         }
     }
 
-//    /**
-//     * 构造数据
-//     * @return
-//     */
-//    public HandoverCarVO createhandoverCar(HandoverCarRenYunVO handoverCarRenYunVO,Integer type,String serviceType){
-//        HandoverCarVO handoverCarVO = new HandoverCarVO();
-//        HandoverCarInfoDTO handoverCarInfoDTO = new HandoverCarInfoDTO();
-//        handoverCarInfoDTO.setOrderNo(handoverCarRenYunVO.getOrderNo());
-//        handoverCarInfoDTO.setType(type);
-//        if(serviceType.equals(ServiceTypeEnum.TAKE_TYPE.getValue())) {
-//            handoverCarInfoDTO.setRealReturnAddr(handoverCarRenYunVO.get);
-//        }
-//        handoverCarInfoDTO.setCreateOp("");
-//        handoverCarInfoDTO.setRealReturnUserName();
-//        handoverCarInfoDTO.setMsgId(handoverCarRenYunVO.getMessageId());
-//        if(handoverCarRenYunVO.getDescription() != null) {
-//            HandoverCarRemarkDTO handoverCarRemarkDTO = new HandoverCarRemarkDTO();
-//            handoverCarRemarkDTO.setOrderNo(handoverCarRenYunVO.getOrderNo());
-//            handoverCarRemarkDTO.setRemark(handoverCarRenYunVO.getDescription());
-//
-//        }
-//    }
-
-
-
+    /**
+     * 构造数据
+     * @return
+     */
+    public HandoverCarVO createHandoverParams(HandoverCarRenYunVO handoverCarRenYunVO, Integer type, String serviceType) {
+        HandoverCarVO handoverCarVO = new HandoverCarVO();
+        HandoverCarInfoDTO handoverCarInfoDTO = new HandoverCarInfoDTO();
+        handoverCarInfoDTO.setOrderNo(handoverCarRenYunVO.getOrderNo());
+        handoverCarInfoDTO.setType(type);
+        if (serviceType.equals(ServiceTypeEnum.TAKE_TYPE.getValue())) {
+            handoverCarInfoDTO.setRealReturnUserName(handoverCarRenYunVO.getHeadName());
+            handoverCarInfoDTO.setRealReturnUserPhone(handoverCarRenYunVO.getHeadPhone());
+        } else if (serviceType.equals(ServiceTypeEnum.BACK_TYPE.getValue())) {
+            handoverCarInfoDTO.setRealGetUserName(handoverCarRenYunVO.getHeadName());
+            handoverCarInfoDTO.setRealGetUserPhone(handoverCarRenYunVO.getHeadPhone());
+        }
+        handoverCarInfoDTO.setCreateOp("");
+        handoverCarInfoDTO.setMsgId(handoverCarRenYunVO.getMessageId());
+        if (handoverCarRenYunVO.getDescription() != null) {
+            HandoverCarRemarkDTO handoverCarRemarkDTO = new HandoverCarRemarkDTO();
+            handoverCarRemarkDTO.setOrderNo(handoverCarRenYunVO.getOrderNo());
+            handoverCarRemarkDTO.setRemark(handoverCarRenYunVO.getDescription());
+            handoverCarVO.setHandoverCarRemarkDTO(handoverCarRemarkDTO);
+        }
+        handoverCarVO.setHandoverCarInfoDTO(handoverCarInfoDTO);
+        return handoverCarVO;
+    }
 
 }
