@@ -264,7 +264,7 @@
 		limit 1
 	</select>
 	
-	<update id="updateRenterOrderEffective" parameterType="com.atzuche.order.renterorder.entity.RenterOrderEntity">
+	<update id="updateRenterOrderEffective" >
 		update renter_order set is_effective = #{effectiveFlag}
 		where id = #{id}
 	</update>
@@ -277,5 +277,10 @@
 		order by id desc
 		limit 1
 	</select>
+	
+	<update id="updateRenterOrderChildStatus">
+		update renter_order set child_status = #{childStatus}
+		where id = #{id}
+	</update>
 	
 </mapper>

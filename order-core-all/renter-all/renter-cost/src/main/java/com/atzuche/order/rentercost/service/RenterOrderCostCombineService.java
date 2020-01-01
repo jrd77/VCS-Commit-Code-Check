@@ -35,6 +35,7 @@ import com.dianping.cat.message.Transaction;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -64,6 +65,13 @@ public class RenterOrderCostCombineService {
 
     @Autowired
     private GetBackCityLimitFeignApi getBackCityLimitFeignApi;
+
+    @Value("${auto.cost.getReturnOverTransportFee}")
+    private Integer getReturnOverTransportFee;
+    @Value("${auto.cost.nightBegin}")
+    private Integer nightBegin;
+    @Value("${auto.cost.nightEnd}")
+    private Integer nightEnd;
 
 
     private static final Integer [] ORDER_TYPES = {1,2};
@@ -917,9 +925,6 @@ public class RenterOrderCostCombineService {
             List<Integer> orderTypeList = Arrays.asList(ORDER_TYPES);
             // 超运能后计算附加费标志
             Boolean isAddFee = orderTypeList.contains(getReturnCarOverCostReqDto.getOrderType());
-            //TODO apollo中获取配置参数
-            Integer nightBegin = 20/*Integer.valueOf(apolloCostConfig.getNightBeginStr())*/;
-            Integer nightEnd = 23/*Integer.valueOf(apolloCostConfig.getNightEndStr())*/;
             Integer overTransportFee = this.getGetReturnOverTransportFee(cityCode);
             String rentTimeLongStr = String.valueOf(LocalDateTimeUtils.localDateTimeToLong(rentTime));
 
@@ -1083,10 +1088,8 @@ public class RenterOrderCostCombineService {
             return responseData.getData().getHumanFee().intValue();
         }
         try {
-            //TODO  apollo获取配置信息
            // return Integer.valueOf(apolloCostConfig.getGetReturnOverTransportFee());
-            //TODO 给一个默认值，用于测试，测试后需要删除
-            return 50;
+            return getReturnOverTransportFee;
         } catch (Exception e) {
             log.error("获取取还车超运能溢价默认值异常：", e);
         }

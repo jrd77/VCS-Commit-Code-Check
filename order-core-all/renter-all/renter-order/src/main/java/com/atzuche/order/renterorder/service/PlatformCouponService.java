@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.Date;
 
 /**
  * 平台优惠券+取送服务券业务处理
@@ -64,7 +65,7 @@ public class PlatformCouponService {
      */
     public MemAvailCouponResponse findAvailMemGetAndReturnSrvCoupons(MemAvailCouponRequest request) {
         logger.info("获取会员有效的取送服务优惠券信息(平台券+取还车券).request:[{}]", JSON.toJSONString(request));
-        Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "平台优惠券服务");
+        Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "youhuiqia");
         try {
             Cat.logEvent(CatConstants.FEIGN_METHOD, "CouponServiceApi.findAvailMemCouponsV2");
             Cat.logEvent(CatConstants.FEIGN_PARAM, JSON.toJSONString(request));
@@ -82,6 +83,69 @@ public class PlatformCouponService {
         }
         return null;
     }
+
+
+    /**
+     * 使用平台券
+     *
+     * @param disCoupondId 平台优惠券ID
+     * @param orderNo 主订单号
+     * @param useDate 使用日期
+     */
+    public int usePlatformCoupon(String disCoupondId, Long orderNo, Date useDate) {
+        logger.info("使用平台券.param is, disCoupondId:[{}],orderNo:[{}],useDate:[{}]", disCoupondId, orderNo, useDate);
+        Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "平台优惠券服务");
+        int result = 0;
+        try{
+            Cat.logEvent(CatConstants.FEIGN_METHOD,"couponServiceApi.useCoupon");
+            Cat.logEvent(CatConstants.FEIGN_PARAM,"disCoupondId="+disCoupondId+"&orderNo="+orderNo+"&useDate="+useDate);
+            result = couponServiceApi.useCoupon(disCoupondId, orderNo, useDate);
+
+            logger.info("使用平台券.result is, result:[{}]", result);
+            Cat.logEvent(CatConstants.FEIGN_RESULT,String.valueOf(result));
+            t.setStatus(Transaction.SUCCESS);
+        } catch (Exception e) {
+            logger.error("使用平台券异常.result:[{}]", result, e);
+            t.setStatus(e);
+            Cat.logError("使用平台券异常.", e);
+        } finally {
+            t.complete();
+        }
+
+        return result;
+    }
+
+
+    /**
+     * 使用送取服务券
+     *
+     * @param disCoupondId 送取服务惠券ID
+     * @param orderNo 主订单号
+     * @param useDate 使用日期
+     */
+    public int useGetCarFreeCoupon(String disCoupondId, Long orderNo, Date useDate) {
+
+        logger.info("使用送取服务券.param is, disCoupondId:[{}],orderNo:[{}],useDate:[{}]", disCoupondId, orderNo, useDate);
+        Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "平台优惠券服务");
+        int result = 0;
+        try{
+            Cat.logEvent(CatConstants.FEIGN_METHOD,"couponServiceApi.useGetCarFreeCoupon");
+            Cat.logEvent(CatConstants.FEIGN_PARAM,"disCoupondId="+disCoupondId+"&orderNo="+orderNo+"&useDate="+useDate);
+            result = couponServiceApi.useGetCarFreeCoupon(disCoupondId, orderNo, useDate);
+
+            logger.info("使用送取服务券.result is, result:[{}]", result);
+            Cat.logEvent(CatConstants.FEIGN_RESULT,String.valueOf(result));
+            t.setStatus(Transaction.SUCCESS);
+        } catch (Exception e) {
+            logger.error("使用送取服务券异常.result:[{}]", result, e);
+            t.setStatus(e);
+            Cat.logError("使用送取服务券异常.", e);
+        } finally {
+            t.complete();
+        }
+        return result;
+    }
+
 
 
 
