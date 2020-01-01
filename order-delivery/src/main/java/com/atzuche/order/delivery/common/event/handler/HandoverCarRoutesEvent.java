@@ -32,11 +32,10 @@ import java.util.*;
 @Slf4j
 public class HandoverCarRoutesEvent {
 
-    @Autowired
-    private AliyunMnsService aliyunMnsService;
 
-    @Autowired
-    HandoverCarService handoverCarService;
+
+//    @Autowired
+//    HandoverCarService handoverCarService;
 
     @Subscribe
     @AllowConcurrentEvents
@@ -68,7 +67,7 @@ public class HandoverCarRoutesEvent {
                 if (count < 1) {
                     sendCtripTransFinish(orderNum);
                 }
-                handoverCarService.handlerHandoverCarStepByTransInfo(handoverCarVO);
+//                handoverCarService.handlerHandoverCarStepByTransInfo(handoverCarVO);
             }
     }
 
@@ -180,7 +179,7 @@ public class HandoverCarRoutesEvent {
         map.put("sign", MD5Util.getMD5(now + DeliveryConstants.CTRIP_CODE + JSON.toJSONString(vo) + DeliveryConstants.CTRIP_CODE));
         map.put("orderNo", transDistributeBO.getOrderNo());
         log.info("进入订单状态完成回执的订单参数：" + JSON.toJSONString(map));
-        aliyunMnsService.asyncSend̨MessageToQueue(JSON.toJSONString(map), DeliveryConstants.CTRIP_STATUS_TRANS_FINISH);
+//        aliyunMnsService.asyncSend̨MessageToQueue(JSON.toJSONString(map), DeliveryConstants.CTRIP_STATUS_TRANS_FINISH);
     }
 
 }
