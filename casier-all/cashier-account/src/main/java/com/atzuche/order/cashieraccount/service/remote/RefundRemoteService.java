@@ -22,16 +22,16 @@ public class RefundRemoteService {
 
     /**
      * 收银支付系统退款
-     * @param model
+     * @param refundVo
      */
-    public AutoPayResultVo refundOrderPay(RefundVo model) {
-        log.info("RefundRemoteService  refundOrderPay start 支付退款,walletDeduction：[{}]",GsonUtils.toJson(model));
+    public AutoPayResultVo refundOrderPay(RefundVo refundVo) {
+        log.info("RefundRemoteService  refundOrderPay start 支付退款,walletDeduction：[{}]",GsonUtils.toJson(refundVo));
         Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "支付退款服务");
         try{
             Cat.logEvent(CatConstants.FEIGN_METHOD,"RefundRemoteService.refundOrderPay");
-            String parameter = "model="+GsonUtils.toJson(model);
+            String parameter = "model="+GsonUtils.toJson(refundVo);
             Cat.logEvent(CatConstants.FEIGN_PARAM,parameter);
-            Response<AutoPayResultVo> responseData =  autoPayGatewaySecondaryService.routingRulesRefund(model);
+            Response<AutoPayResultVo> responseData =  autoPayGatewaySecondaryService.routingRulesRefund(refundVo);
             log.info("RefundRemoteService  refundOrderPay end 支付退款,responseData：[{}]", GsonUtils.toJson(responseData));
             Cat.logEvent(CatConstants.FEIGN_RESULT, GsonUtils.toJson(responseData));
             if(responseData == null || !ErrorCode.SUCCESS.getCode().equals(responseData.getResCode())){
@@ -42,7 +42,7 @@ public class RefundRemoteService {
         }catch (Exception e){
             t.setStatus(e);
             Cat.logError("Feign 支付退款,e：[{}]",e);
-            log.error("RefundRemoteService refundOrderPay Feign 支付退款,model：[{}],e：[{}]",GsonUtils.toJson(model),e);
+            log.error("RefundRemoteService refundOrderPay Feign 支付退款,model：[{}],e：[{}]",GsonUtils.toJson(refundVo),e);
             throw new DeductWalletRemoteException();
         }finally {
             t.complete();
