@@ -29,4 +29,6 @@ public class SysConfigSDK {
 
         return JSON.parseObject(itemDTO.getConfigValue(),new TypeReference<List<SysConfigEntity>>(){});
     }
+
+
 }
