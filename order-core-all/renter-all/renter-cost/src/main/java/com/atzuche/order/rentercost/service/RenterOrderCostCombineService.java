@@ -54,7 +54,7 @@ public class RenterOrderCostCombineService {
 	@Autowired
 	private RenterOrderFineDeatailService renterOrderFineDeatailService;
 	@Autowired
-	private OrderConsoleCostDetailService orderConsoleCostDetailService;
+	private OrderConsoleSubsidyDetailService orderConsoleSubsidyDetailService;
     @Autowired
     private FetchBackCarFeeFeignService fetchBackCarFeeFeignService;
     @Autowired
@@ -458,19 +458,45 @@ public class RenterOrderCostCombineService {
 	 * 获取租客应付(正常订单流转)
 	 * @param orderNo 主订单号
 	 * @param renterOrderNo 租客订单号
+	 * @param memNo 会员号
 	 * @return Integer
 	 */
 	public PayableVO getPayable(String orderNo, String renterOrderNo, String memNo) {
+		// 租客应付
+		Integer payable = 0;
+		// 获取租客正常费用
+		Integer normalCost = getRenterNormalCost(orderNo, renterOrderNo);
+		if (normalCost != null) {
+			payable += normalCost;
+		}
+		// 获取全局费用
+		Integer globalCost = getRenterGlobalCost(orderNo, memNo);
+		if (globalCost != null) {
+			payable += globalCost;
+		}
+		PayableVO payableVO = new PayableVO();
+		payableVO.setAmt(payable);
+		payableVO.setOrderNo(orderNo);
+		payableVO.setTitle("修改订单补付");
+		payableVO.setType(1);
+		payableVO.setUniqueNo(renterOrderNo);
+		return payableVO;
+	}
+	
+	
+	/**
+	 * 获取租客正常应付
+	 * @param orderNo 主订单号
+	 * @param renterOrderNo 租客订单号
+	 * @return Integer
+	 */
+	public Integer getRenterNormalCost(String orderNo, String renterOrderNo) {
 		// 获取费用明细
 		List<RenterOrderCostDetailEntity> costList = renterOrderCostDetailService.listRenterOrderCostDetail(orderNo, renterOrderNo);
 		// 获取补贴明细
 		List<RenterOrderSubsidyDetailEntity> subsidyList = renterOrderSubsidyDetailService.listRenterOrderSubsidyDetail(orderNo, renterOrderNo);
 		// 罚金
 		List<RenterOrderFineDeatailEntity> fineList = renterOrderFineDeatailService.listRenterOrderFineDeatail(orderNo, renterOrderNo);
-		// 管理后台补贴
-		List<OrderConsoleCostDetailEntity> consoleCostList = orderConsoleCostDetailService.listOrderConsoleCostDetail(orderNo,memNo);
-		// 获取租客全局罚金
-		List<ConsoleRenterOrderFineDeatailEntity> consoleFineList = consoleRenterOrderFineDeatailService.listConsoleRenterOrderFineDeatail(orderNo, memNo);
 		Integer payable = 0;
 		if (costList != null && !costList.isEmpty()) {
 			payable += costList.stream().mapToInt(RenterOrderCostDetailEntity::getTotalAmount).sum();
@@ -481,19 +507,29 @@ public class RenterOrderCostCombineService {
 		if (fineList != null && !fineList.isEmpty()) {
 			payable += fineList.stream().mapToInt(RenterOrderFineDeatailEntity::getFineAmount).sum();
 		}
-		if (consoleCostList != null && !consoleCostList.isEmpty()) {
-			payable += consoleCostList.stream().mapToInt(OrderConsoleCostDetailEntity::getSubsidyAmount).sum();
+		return payable;
+	}
+	
+	
+	/**
+	 * 获取租客全局应付
+	 * @param orderNo 主订单号
+	 * @param memNo 会员号
+	 * @return Integer
+	 */
+	public Integer getRenterGlobalCost(String orderNo, String memNo) {
+		// 管理后台补贴
+		List<OrderConsoleSubsidyDetailEntity> consoleSubsidyList = orderConsoleSubsidyDetailService.listOrderConsoleSubsidyDetailByOrderNoAndMemNo(orderNo, memNo);
+		// 获取租客全局罚金
+		List<ConsoleRenterOrderFineDeatailEntity> consoleFineList = consoleRenterOrderFineDeatailService.listConsoleRenterOrderFineDeatail(orderNo, memNo);
+		Integer payable = 0;
+		if (consoleSubsidyList != null && !consoleSubsidyList.isEmpty()) {
+			payable += consoleSubsidyList.stream().mapToInt(OrderConsoleSubsidyDetailEntity::getSubsidyAmount).sum();
 		}
 		if (consoleFineList != null && !consoleFineList.isEmpty()) {
 			payable += consoleFineList.stream().mapToInt(ConsoleRenterOrderFineDeatailEntity::getFineAmount).sum();
 		}
-		PayableVO payableVO = new PayableVO();
-		payableVO.setAmt(payable);
-		payableVO.setOrderNo(orderNo);
-		payableVO.setTitle("修改订单补付");
-		payableVO.setType(1);
-		payableVO.setUniqueNo(renterOrderNo);
-		return payableVO;
+		return payable;
 	}
 	
 	

@@ -1,8 +1,9 @@
 package com.atzuche.order.rentermem.entity;
 
+import lombok.Data;
+
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import lombok.Data;
 
 
 /**
@@ -44,6 +45,10 @@ public class RenterMemberRightEntity implements Serializable {
 	 * 权益值
 	 */
 	private String rightValue;
+    /**
+     * 权益类别
+     */
+    private Integer rightType;
 	/**
 	 * 权益描述
 	 */

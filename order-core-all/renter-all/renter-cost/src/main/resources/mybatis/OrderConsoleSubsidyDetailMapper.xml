@@ -227,5 +227,11 @@
 		</set>
 		where id = #{id}
 	</update>
+	
+	<select id="listOrderConsoleSubsidyDetailByOrderNoAndMemNo" resultMap="BaseResultMap">
+		select <include refid="Base_Column_List" /> from order_console_subsidy_detail where order_no = #{orderNo}
+		and mem_no = #{memNo}
+		and is_delete = 0
+	</select>
   	
 </mapper>
