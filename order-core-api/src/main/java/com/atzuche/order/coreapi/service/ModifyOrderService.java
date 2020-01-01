@@ -141,10 +141,6 @@ public class ModifyOrderService {
 		// 聚合租客补贴
 		renterOrderCostRespDTO.setRenterOrderSubsidyDetailDTOList(getPolymerizationSubsidy(renterOrderCostRespDTO, costDeductVO));
 		
-		// 修改前费用
-		PayableVO payableVO = renterOrderCostCombineService.getPayable(orderNo, initRenterOrder.getRenterOrderNo(), modifyOrderDTO.getMemNo());
-		// 修改后费用
-		
 		// 入库
 		// 保存租客商品信息
 		renterGoodsService.save(renterGoodsDetailDTO);
@@ -160,10 +156,46 @@ public class ModifyOrderService {
 		saveAdditionalDriver(modifyOrderDTO);
 		// 
 		
-		// TODO 发送MQ
+		// 计算补贴金额
+		Integer supplementAmt = getRenterSupplementAmt(modifyOrderDTO, initRenterOrder, renterOrderCostRespDTO, renterFineList);
+		
+		
 		
 		return null;
 	}
+	
+	
+	/**
+	 * 计算本次修改补付
+	 * @param modifyOrderDTO
+	 * @param initRenterOrder
+	 * @param renterOrderCostRespDTO
+	 * @param renterFineList
+	 * @return Integer
+	 */
+	public Integer getRenterSupplementAmt(ModifyOrderDTO modifyOrderDTO, RenterOrderEntity initRenterOrder, RenterOrderCostRespDTO renterOrderCostRespDTO, List<RenterOrderFineDeatailEntity> renterFineList) {
+		// 修改前费用
+		Integer initCost = renterOrderCostCombineService.getRenterNormalCost(modifyOrderDTO.getOrderNo(), initRenterOrder.getRenterOrderNo());
+		// 修改后费用
+		Integer updCost = 0;
+		// 租车费用
+		List<RenterOrderCostDetailEntity> renterOrderCostDetailDTOList = renterOrderCostRespDTO.getRenterOrderCostDetailDTOList();
+		if (renterOrderCostDetailDTOList != null && !renterOrderCostDetailDTOList.isEmpty()) {
+			updCost += renterOrderCostDetailDTOList.stream().mapToInt(RenterOrderCostDetailEntity::getTotalAmount).sum();
+		}
+		// 补贴
+		List<RenterOrderSubsidyDetailDTO> renterOrderSubsidyDetailDTOList = renterOrderCostRespDTO.getRenterOrderSubsidyDetailDTOList();
+		if (renterOrderSubsidyDetailDTOList != null && !renterOrderSubsidyDetailDTOList.isEmpty()) {
+			updCost += renterOrderSubsidyDetailDTOList.stream().mapToInt(RenterOrderSubsidyDetailDTO::getSubsidyAmount).sum();
+		}
+		// 罚金
+		if (renterFineList != null && !renterFineList.isEmpty()) {
+			updCost += renterFineList.stream().mapToInt(RenterOrderFineDeatailEntity::getFineAmount).sum();
+		}
+		Integer supplementAmt = Math.abs(updCost) - Math.abs(initCost);
+		return supplementAmt;
+	}
+	
 	
 	/**
 	 * 聚合租客补贴
