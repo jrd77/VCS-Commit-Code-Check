@@ -1,4 +1,4 @@
-package com.atzuche.order.rentermem.entity;
+package com.atzuche.order.parentorder.entity;
 
 import lombok.Data;
 
@@ -7,14 +7,14 @@ import java.time.LocalDateTime;
 
 
 /**
- * 租客端会员权益表
+ * 下单记录表
  * 
  * @author ZhangBin
- * @date 2019-12-18 16:15:16
+ * @date 2020-01-01 15:06:16
  * @Description:
  */
 @Data
-public class RenterMemberRightEntity implements Serializable {
+public class OrderRecordEntity implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
 	/**
@@ -26,33 +26,25 @@ public class RenterMemberRightEntity implements Serializable {
 	 */
 	private String orderNo;
 	/**
-	 * 子订单号
-	 */
-	private String renterOrderNo;
-	/**
 	 * 会员号
 	 */
 	private String memNo;
 	/**
-	 * 权益编码
+	 * 下单时的入参
 	 */
-	private String rightCode;
+	private String param;
 	/**
-	 * 权益名称（会员等级、是否内部员工、vip等）
+	 * 下单结束产生结果
 	 */
-	private String rightName;
+	private String result;
 	/**
-	 * 权益值
+	 * errorCode枚举对应的code
 	 */
-	private String rightValue;
-    /**
-     * 权益类别
-     */
-    private Integer rightType;
+	private String errorCode;
 	/**
-	 * 权益描述
+	 * errorCode枚举对应的txt
 	 */
-	private String rightDesc;
+	private String errorTxt;
 	/**
 	 * 创建时间
 	 */
@@ -62,7 +54,7 @@ public class RenterMemberRightEntity implements Serializable {
 	 */
 	private String createOp;
 	/**
-	 * 修改时间
+	 * 更新时间
 	 */
 	private LocalDateTime updateTime;
 	/**
