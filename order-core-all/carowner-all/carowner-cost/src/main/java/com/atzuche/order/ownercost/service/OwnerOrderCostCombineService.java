@@ -1,5 +1,28 @@
 package com.atzuche.order.ownercost.service;
 
+import com.alibaba.fastjson.JSON;
+import com.atzuche.config.client.api.CarGpsRuleConfigSDK;
+import com.atzuche.config.client.api.DefaultConfigContext;
+import com.atzuche.config.client.api.OilAverageCostConfigSDK;
+import com.atzuche.config.common.entity.CarGpsRuleEntity;
+import com.atzuche.config.common.entity.OilAverageCostEntity;
+import com.atzuche.order.commons.entity.dto.CostBaseDTO;
+import com.atzuche.order.commons.entity.dto.MileageAmtDTO;
+import com.atzuche.order.commons.entity.dto.OilAmtDTO;
+import com.atzuche.order.commons.entity.dto.OwnerGoodsPriceDetailDTO;
+import com.atzuche.order.commons.enums.OwnerCashCodeEnum;
+import com.atzuche.order.ownercost.entity.OwnerOrderIncrementDetailEntity;
+import com.atzuche.order.ownercost.entity.OwnerOrderPurchaseDetailEntity;
+import com.atzuche.order.ownercost.exception.OwnerCostParameterException;
+import com.autoyol.platformcost.OwnerFeeCalculatorUtils;
+import com.autoyol.platformcost.model.CarPriceOfDay;
+import com.autoyol.platformcost.model.FeeResult;
+import com.dianping.cat.Cat;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -7,30 +30,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.springframework.stereotype.Service;
-
-import com.atzuche.order.commons.entity.dto.CostBaseDTO;
-import com.atzuche.order.commons.entity.dto.MileageAmtDTO;
-import com.atzuche.order.commons.entity.dto.OilAmtDTO;
-import com.atzuche.order.commons.entity.dto.OwnerGoodsPriceDetailDTO;
-import com.atzuche.order.commons.enums.OwnerCashCodeEnum;
-import com.atzuche.order.commons.enums.RenterCashCodeEnum;
-import com.atzuche.order.ownercost.entity.OwnerOrderIncrementDetailEntity;
-import com.atzuche.order.ownercost.entity.OwnerOrderPurchaseDetailEntity;
-import com.atzuche.order.ownercost.exception.OwnerCostParameterException;
-import com.autoyol.platformcost.OwnerFeeCalculatorUtils;
-import com.autoyol.platformcost.model.CarGpsRule;
-import com.autoyol.platformcost.model.CarPriceOfDay;
-import com.autoyol.platformcost.model.FeeResult;
-import com.autoyol.platformcost.model.OilAverageCostBO;
-import com.dianping.cat.Cat;
-
-import lombok.extern.slf4j.Slf4j;
-
 @Service
 @Slf4j
 public class OwnerOrderCostCombineService {
-	
+    @Autowired
+    private OilAverageCostConfigSDK oilAverageCostConfigSDK;
+
+    @Value("${auto.cost.configHours}")
+    private Integer configHours;
+    @Autowired
+    private CarGpsRuleConfigSDK carGpsRuleConfigSDK;
+
 	/**
 	 * 获取租金对象列表
 	 * @param rentAmtDTO 租金对象
@@ -72,8 +82,6 @@ public class OwnerOrderCostCombineService {
 	 * 获取租金
 	 */
 	public OwnerOrderPurchaseDetailEntity getRentAmtEntity(CostBaseDTO costBaseDTO, List<OwnerGoodsPriceDetailDTO> dayPrices) {
-		// TODO 走配置中心获取
-		Integer configHours = 8;
 		// 数据转化
 		List<CarPriceOfDay> carPriceOfDayList = dayPrices.stream().map(dayPrice -> {
 			CarPriceOfDay carPriceOfDay = new CarPriceOfDay();
@@ -106,9 +114,7 @@ public class OwnerOrderCostCombineService {
 			Cat.logError("获取超里程费用mileageAmtDTO.costBaseDTO对象为空", new OwnerCostParameterException());
 			throw new OwnerCostParameterException();
 		}
-		// TODO 走配置中心获取
-		Integer configHours = 8;
-		Integer mileageAmt = OwnerFeeCalculatorUtils.calMileageAmt(mileageAmtDTO.getCarOwnerType(), mileageAmtDTO.getDayMileage(), mileageAmtDTO.getGuideDayPrice(), 
+		Integer mileageAmt = OwnerFeeCalculatorUtils.calMileageAmt(mileageAmtDTO.getCarOwnerType(), mileageAmtDTO.getDayMileage(), mileageAmtDTO.getGuideDayPrice(),
 				mileageAmtDTO.getGetmileage(), mileageAmtDTO.getReturnMileage(), costBaseDTO.getStartTime(), costBaseDTO.getEndTime(), configHours);
 		FeeResult feeResult = new FeeResult();
 		feeResult.setTotalFee(mileageAmt);
@@ -137,9 +143,8 @@ public class OwnerOrderCostCombineService {
 			Cat.logError("获取租客油费oilAmtDTO.costBaseDTO对象为空", new OwnerCostParameterException());
 			throw new OwnerCostParameterException();
 		}
-		// TODO 走配置中心获取
-		List<OilAverageCostBO> oilAverageList = null;
-		Integer oilAmt = OwnerFeeCalculatorUtils.calOilAmt(oilAmtDTO.getCarOwnerType(), oilAmtDTO.getCityCode(), oilAmtDTO.getOilVolume(), oilAmtDTO.getEngineType(), 
+        List<OilAverageCostEntity> oilAverageList = oilAverageCostConfigSDK.getConfig(new DefaultConfigContext());
+        Integer oilAmt = OwnerFeeCalculatorUtils.calOilAmt(oilAmtDTO.getCarOwnerType(), oilAmtDTO.getCityCode(), oilAmtDTO.getOilVolume(), oilAmtDTO.getEngineType(),
 				oilAmtDTO.getGetOilScale(), oilAmtDTO.getReturnOilScale(), oilAverageList, oilAmtDTO.getOilScaleDenominator());
 		FeeResult feeResult = new FeeResult();
 		feeResult.setTotalFee(oilAmt);
@@ -163,8 +168,8 @@ public class OwnerOrderCostCombineService {
 			Cat.logError("获取gps服务费costBaseDTO对象为空", new OwnerCostParameterException());
 			throw new OwnerCostParameterException();
 		}
-		// TODO gps服务费计费规则信息 走配置中心获取
-		List<CarGpsRule> lsRules = null;
+        List<CarGpsRuleEntity> lsRules = carGpsRuleConfigSDK.getConfig(new DefaultConfigContext());
+		log.info("config-gps服务费计费规则信息lsRules={}", JSON.toJSONString(lsRules));
 		List<FeeResult> feeList = OwnerFeeCalculatorUtils.calGpsServiceAmt(lsRules, lsGpsSerialNumber, costBaseDTO.getStartTime(), costBaseDTO.getEndTime());
 		if (feeList == null || feeList.isEmpty()) {
 			return null;
