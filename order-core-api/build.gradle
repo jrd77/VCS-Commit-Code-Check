@@ -12,6 +12,7 @@ buildscript {
 
 apply plugin: 'dependency-management'
 apply plugin: 'org.springframework.boot'
+apply plugin: 'war'
 
 
 
