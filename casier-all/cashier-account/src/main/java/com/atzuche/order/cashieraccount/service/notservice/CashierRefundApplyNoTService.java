@@ -6,6 +6,7 @@ import com.atzuche.order.cashieraccount.exception.OrderPayRefundCallBackAsnyExce
 import com.atzuche.order.cashieraccount.vo.req.CashierRefundApplyReqVO;
 import com.atzuche.order.commons.enums.cashier.CashierRefundApplyStatus;
 import com.autoyol.autopay.gateway.vo.req.NotifyDataVo;
+import com.autoyol.autopay.gateway.vo.res.AutoPayResultVo;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -49,7 +50,7 @@ public class CashierRefundApplyNoTService {
     /**
      * 退款回调信息
      */
-    public void updateRefundDepositSuccess(NotifyDataVo notifyDataVo) {
+    public void updateRefundDepositSuccess(AutoPayResultVo notifyDataVo) {
         //1 校验
         CashierRefundApplyEntity cashierRefundApplyEntity = cashierRefundApplyMapper.selectRefundByQn(notifyDataVo.getMemNo(),notifyDataVo.getOrderNo(),notifyDataVo.getQn());
         //2 回调退款是否成功判断 TODOD
@@ -63,7 +64,6 @@ public class CashierRefundApplyNoTService {
             if(result==0){
                 throw new OrderPayRefundCallBackAsnyException();
             }
-            //4 成功之后push 或者 短信
         }
     }
 
