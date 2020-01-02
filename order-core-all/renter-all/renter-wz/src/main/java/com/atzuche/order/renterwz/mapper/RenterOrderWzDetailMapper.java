@@ -5,6 +5,7 @@ import org.apache.ibatis.annotations.Param;
 
 import com.atzuche.order.renterwz.entity.RenterOrderWzDetailEntity;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -71,4 +72,28 @@ public interface RenterOrderWzDetailMapper{
 	 */
 	int updateFeeByWzCode(RenterOrderWzDetailEntity illegal);
 
+	/**
+	 * 查询数量
+	 * @param orderNo 订单号
+	 * @param illegalTime 违章时间
+	 * @param illegalAddr 违章地址
+	 * @param code 违章号
+	 * @param plateNum 车牌号
+	 * @return 数量
+	 */
+    Integer countIllegalDetailByOrderNo(@Param("orderNo") String orderNo,@Param("illegalTime") Date illegalTime,@Param("illegalAddr") String illegalAddr,@Param("code") String code,@Param("plateNum") String plateNum);
+
+	/**
+	 * 批量插入
+	 * @param list 数据实体
+	 */
+	void batchInsert(@Param("list") List<RenterOrderWzDetailEntity> list);
+
+	/**
+	 * 根据条件 查询数据
+	 * @param orderNo 订单号
+	 * @param plateNum 车牌号
+	 * @return 查询到的数据
+	 */
+	List<RenterOrderWzDetailEntity> findDetailByOrderNo(@Param("orderNo") String orderNo,@Param("plateNum")  String plateNum);
 }

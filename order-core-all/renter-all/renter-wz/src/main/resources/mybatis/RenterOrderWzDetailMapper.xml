@@ -303,5 +303,58 @@
 		where ry_wz_code=#{ryWzCode}
 	</update>
 
+	<select id="countIllegalDetailByOrderNo" parameterType="map" resultType="int">
+		SELECT
+		count(1)
+		FROM renter_order_wz_detail
+		WHERE order_no = #{orderNo}
+		AND illegal_time = #{illegalTime}
+		AND illegal_addr = #{illegalAddr}
+		AND code = #{code}
+		and car_plate_num = #{plateNum}
+		and is_valid=1
+	</select>
+
+	<insert id="batchInsert" parameterType="list">
+		INSERT INTO renter_order_wz_detail (
+		code,
+		order_no,
+		car_plate_num,
+		order_flag,
+		illegal_time,
+		illegal_addr,
+		illegal_reason,
+		illegal_amt,
+		illegal_deduct,
+		is_sms
+		) VALUES
+		<foreach collection="list" item="param" index="index" separator=",">
+			(
+			#{param.code},
+			#{param.orderNo},
+			#{param.carPlateNum},
+			#{param.orderFlag},
+			#{param.illegalTime},
+			#{param.illegalAddr},
+			#{param.illegalReason},
+			#{param.illegalAmt},
+			#{param.illegalDeduct},
+			#{param.isSms}
+			)
+		</foreach>
+	</insert>
+
+	<select id="findDetailByOrderNo" resultMap="selectColumnMap">
+		select code,order_no,
+			order_flag,
+			illegal_time,
+			illegal_addr,
+			illegal_reason,
+			illegal_amt,
+			illegal_deduct,
+			is_sms
+		from renter_order_wz_detail where order_flag = 1 and order_no = #{orderNo} and car_plate_num = #{plateNum} and is_valid=1
+	</select>
+
 
 </mapper>

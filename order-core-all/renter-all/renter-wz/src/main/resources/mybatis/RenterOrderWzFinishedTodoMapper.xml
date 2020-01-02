@@ -202,4 +202,8 @@
 		where id = #{id} and is_delete = 0
 	</update>
 
+	<update id="updateStatus" parameterType="java.lang.Integer">
+		UPDATE renter_order_wz_finished_todo set status = 1 where id = #{id}
+	</update>
+
 </mapper>

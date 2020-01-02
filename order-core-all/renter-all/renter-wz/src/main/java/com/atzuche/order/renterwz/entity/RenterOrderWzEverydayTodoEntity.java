@@ -23,7 +23,7 @@ public class RenterOrderWzEverydayTodoEntity{
 	/**
 	*车辆编号
 	*/
-	private Integer carNo;
+	private String carNo;
 	/**
 	*车牌
 	*/
@@ -39,7 +39,7 @@ public class RenterOrderWzEverydayTodoEntity{
 	/**
 	*租客编号
 	*/
-	private Integer renterNo;
+	private String renterNo;
 	/**
 	*租客手机号
 	*/

@@ -44,9 +44,9 @@ public interface RenterOrderWzRecordMapper{
 	Integer updateRenterOrderWzRecord(RenterOrderWzRecordEntity renterOrderWzRecord);
 
 	/**
-	 * 根据主键删除
-	 * @param id 主键
-	 * @return 删除的数量
+	 * 删除不是今天的数据
+	 * @return 删除数量
 	 */
-	Integer deleteRenterOrderWzRecordById(@Param("id") Long id);
+	int deleteNotToday();
+
 }

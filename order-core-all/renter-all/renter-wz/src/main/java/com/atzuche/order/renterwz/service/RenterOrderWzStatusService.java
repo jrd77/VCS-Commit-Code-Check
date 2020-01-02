@@ -38,4 +38,12 @@ public class RenterOrderWzStatusService {
     public void updateStatusByOrderNoAndCarNum(String orderNo, Integer status, String carNum) {
         renterOrderWzStatusMapper.updateStatusByOrderNoAndCarNum(orderNo,status,carNum,WzStatusEnums.getStatusDesc(status));
     }
+
+    public Integer getTransWzDisposeStatusByOrderNo(String orderNo, String plateNum) {
+        return renterOrderWzStatusMapper.getTransWzDisposeStatusByOrderNo(orderNo,plateNum);
+    }
+
+    public void updateTransWzDisposeStatus(String orderNo, String carNumber, int wzDisposeStatus) {
+        renterOrderWzStatusMapper.updateTransWzDisposeStatus(orderNo,carNumber,wzDisposeStatus);
+    }
 }

@@ -5,7 +5,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.text.ParseException;
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
@@ -112,5 +114,11 @@ public class DateUtils {
             logger.error("parse date error.", e);
         }
         return null;
+    }
+
+    public static Date formateLocalDateTime(LocalDateTime time){
+        ZoneId zone = ZoneId.systemDefault();
+        Instant instant = time.atZone(zone).toInstant();
+        return Date.from(instant);
     }
 }

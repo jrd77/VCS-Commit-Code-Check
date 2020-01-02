@@ -5,6 +5,8 @@ import com.atzuche.order.renterwz.mapper.RenterOrderWzDetailMapper;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.Date;
+import java.util.List;
 
 /**
  * RenterOrderWzDetailService
@@ -30,4 +32,16 @@ public class RenterOrderWzDetailService {
         return renterOrderWzDetailMapper.updateFeeByWzCode(illegal);
     }
 
+    public int countIllegalDetailByOrderNo(String orderNo, Date illegalTime, String illegalAddr, String code, String plateNum) {
+        Integer count = renterOrderWzDetailMapper.countIllegalDetailByOrderNo(orderNo,illegalTime,illegalAddr,code,plateNum);
+        return count == null ? 0 : count;
+    }
+
+    public void batchInsert(List<RenterOrderWzDetailEntity> temps) {
+        renterOrderWzDetailMapper.batchInsert(temps);
+    }
+
+    public List<RenterOrderWzDetailEntity> findDetailByOrderNo(String orderNo, String plateNum) {
+        return renterOrderWzDetailMapper.findDetailByOrderNo(orderNo,plateNum);
+    }
 }

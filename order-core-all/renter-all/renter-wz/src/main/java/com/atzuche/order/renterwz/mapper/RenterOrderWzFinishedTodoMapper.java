@@ -49,4 +49,10 @@ public interface RenterOrderWzFinishedTodoMapper{
 	 * @return 删除的数量
 	 */
 	Integer deleteRenterOrderWzFinishedTodoById(@Param("id") Long id);
+
+	/**
+	 * 根据主键修改状态
+	 * @param id 主键
+	 */
+	void updateStatus(Integer id);
 }
