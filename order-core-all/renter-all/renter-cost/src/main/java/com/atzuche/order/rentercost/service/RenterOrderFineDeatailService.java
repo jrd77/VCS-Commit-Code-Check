@@ -1,14 +1,15 @@
 package com.atzuche.order.rentercost.service;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
+import com.alibaba.fastjson.JSON;
+import com.atzuche.config.client.api.CityConfigSDK;
+import com.atzuche.config.client.api.DefaultConfigContext;
+import com.atzuche.config.client.api.HolidaySettingSDK;
+import com.atzuche.config.client.api.SysConfigSDK;
+import com.atzuche.config.common.entity.CityEntity;
+import com.atzuche.config.common.entity.HolidaySettingEntity;
+import com.atzuche.config.common.entity.SysConfigEntity;
+import com.atzuche.order.commons.GlobalConstant;
+import com.atzuche.order.commons.LocalDateTimeUtils;
 import com.atzuche.order.commons.entity.dto.CancelFineAmtDTO;
 import com.atzuche.order.commons.entity.dto.CostBaseDTO;
 import com.atzuche.order.commons.entity.dto.GetReturnAddressInfoDTO;
@@ -21,8 +22,17 @@ import com.atzuche.order.rentercost.exception.RenterCostParameterException;
 import com.atzuche.order.rentercost.mapper.RenterOrderFineDeatailMapper;
 import com.autoyol.platformcost.CommonUtils;
 import com.dianping.cat.Cat;
-
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 
 /**
@@ -34,7 +44,12 @@ import lombok.extern.slf4j.Slf4j;
 public class RenterOrderFineDeatailService{
     @Autowired
     private RenterOrderFineDeatailMapper renterOrderFineDeatailMapper;
-
+    @Autowired
+    private CityConfigSDK cityConfigSDK;
+    @Autowired
+    private SysConfigSDK sysConfigSDK;
+    @Autowired
+    private HolidaySettingSDK holidaySettingSDK;
 
     /**
      * 获取罚金明细列表
@@ -66,15 +81,15 @@ public class RenterOrderFineDeatailService{
     	}
     	return renterOrderFineDeatailMapper.saveRenterOrderFineDeatailBatch(entityList);
     }
-    
-    
+
+
     /**
 	 * 计算取还车违约金
 	 * @param initInfo 原始数据
 	 * @param updateInfo 修改数据
 	 * @return List<RenterOrderFineDeatailEntity>
 	 */
-	public List<RenterOrderFineDeatailEntity> calculateGetOrReturnFineAmt(GetReturnAddressInfoDTO initInfo,GetReturnAddressInfoDTO updateInfo) {
+	public List<RenterOrderFineDeatailEntity> calculateGetOrReturnFineAmt(GetReturnAddressInfoDTO initInfo,GetReturnAddressInfoDTO updateInfo,Integer cityCode) {
 		log.info("calculateGetOrReturnFineAmt initInfo=[{}],updateInfo=[{}]",initInfo,updateInfo);
 		if(initInfo == null) {
 			log.error("calculateGetOrReturnFineAmt 计算取还车违约金initInfo对象为空");
@@ -88,12 +103,24 @@ public class RenterOrderFineDeatailService{
 		}
 		CostBaseDTO initBase = initInfo.getCostBaseDTO();
 		CostBaseDTO updateBase = updateInfo.getCostBaseDTO();
-		// TODO 从城市配置中获取
-		Integer beforeTransTimeSpan = CommonUtils.BEFORE_TRANS_TIME_SPAN;
-		// TODO 取车违约金 从城市配置中获取 
-		Integer getCost = CommonUtils.MODIFY_GET_FINE_AMT;
-		// TODO 还车违约金 从城市配置中获取 
-		Integer returnCost = CommonUtils.MODIFY_RETURN_FINE_AMT;
+        log.info("config-从城市配置中获取beforeTransTimeSpan,cityCode=[{}]", cityCode);
+        CityEntity configByCityCode = cityConfigSDK.getConfigByCityCode(new DefaultConfigContext(),cityCode);
+        log.info("config-从城市配置中获取beforeTransTimeSpan,configByCityCode=[{}]", JSON.toJSONString(configByCityCode));
+        Integer beforeTransTimeSpan = configByCityCode.getBeforeTransTimeSpan()==null?CommonUtils.BEFORE_TRANS_TIME_SPAN:configByCityCode.getBeforeTransTimeSpan();
+
+        List<SysConfigEntity> sysConfigSDKConfig = sysConfigSDK.getConfig(new DefaultConfigContext());
+        Stream<SysConfigEntity> sysConfigEntityStream = Optional.ofNullable(sysConfigSDKConfig)
+                .orElseGet(ArrayList::new)
+                .stream()
+                .filter(x -> GlobalConstant.GET_RETURN_FINE_AMT.equals(x.getAppType()));
+
+        SysConfigEntity sysGetFineAmt = sysConfigEntityStream.filter(x -> GlobalConstant.GET_FINE_AMT.equals(x.getItemKey())).findFirst().get();
+        log.info("config-从配置中获取取车违约金getFineAmt=[{}]",JSON.toJSONString(sysGetFineAmt));
+        Integer getCost = (sysGetFineAmt==null||sysGetFineAmt.getItemValue()==null) ? CommonUtils.MODIFY_GET_FINE_AMT : Integer.valueOf(sysGetFineAmt.getItemValue());
+
+        SysConfigEntity sysReturnFineAmt = sysConfigEntityStream.filter(x -> GlobalConstant.RETURN_FINE_AMT.equals(x.getItemKey())).findFirst().get();
+		log.info("config-从配置中获取还车违约金returnFineAmt=[{}]",JSON.toJSONString(sysReturnFineAmt));
+        Integer returnCost = (sysReturnFineAmt==null||sysReturnFineAmt.getItemValue()==null) ? CommonUtils.MODIFY_RETURN_FINE_AMT : Integer.valueOf(sysReturnFineAmt.getItemValue());;
 		//取车开关
 		Integer getFlag = initInfo.getGetFlag();
 		//还车开关
@@ -223,8 +250,23 @@ public class RenterOrderFineDeatailService{
         if (revertTime == null || initRevertTime == null || revertTime.isEqual(initRevertTime) || revertTime.isAfter(initRevertTime)) {
         	return null;
         }
-        // TODO 是否包含节假日,需要节假日服务
-        boolean rentTimeInHolidayFlag = false;  
+        int rentDate = Integer.valueOf(String.valueOf(LocalDateTimeUtils.localDateTimeToLong(rentTime)).substring(0,8));
+        int revertDate = Integer.valueOf(String.valueOf(LocalDateTimeUtils.localDateTimeToLong(revertTime)).substring(0,8));
+
+        List<HolidaySettingEntity> holidayConfigList = holidaySettingSDK.getConfig(new DefaultConfigContext());
+        log.info("config-获取节假日配置信息holidayConfigList=[{}]",JSON.toJSONString(holidayConfigList));
+        boolean rentTimeInHolidayFlag = Optional.ofNullable(holidayConfigList).orElseGet(ArrayList::new).stream().anyMatch(x -> {
+            int realStartDate = x.getRealStartDate();
+            int realEndDate = x.getRealEndDate();
+            if ((rentDate >= realStartDate && rentDate <= realEndDate)) {
+                return true;
+            }
+            if (revertDate >= realStartDate && revertDate <= realEndDate) {
+                return true;
+            }
+            return false;
+        });
+        log.info("判断是否包含节假日rentTimeInHolidayFlag=[{}]",rentTimeInHolidayFlag);
         if (rentTimeInHolidayFlag) {
             fineAmt = Math.round((initRentAmt - updRentAmt) * CommonUtils.FINE_AMT_RATIO_BIG);
         } else {
