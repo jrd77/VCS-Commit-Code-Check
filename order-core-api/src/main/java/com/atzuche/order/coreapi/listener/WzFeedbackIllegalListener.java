@@ -2,7 +2,7 @@ package com.atzuche.order.coreapi.listener;
 
 import com.atzuche.order.commons.CatConstants;
 import com.atzuche.order.renterwz.service.TransIllegalMqService;
-import com.atzuche.order.renterwz.service.TransIllegalSendAliyunMq;
+import com.atzuche.order.renterwz.service.TransIllegalSendAliYunMq;
 import com.dianping.cat.Cat;
 import com.dianping.cat.message.Transaction;
 import org.slf4j.Logger;
@@ -32,7 +32,7 @@ public class WzFeedbackIllegalListener extends RenYunListener{
     private TransIllegalMqService transIllegalMqService;
 
     @Resource
-    private TransIllegalSendAliyunMq transIllegalSendAliyunMq;
+    private TransIllegalSendAliYunMq transIllegalSendAliYunMq;
 
     @RabbitListener(queues = ORDER_CENTER_WZ_FEED_BACK_QUEUE , containerFactory="rabbitListenerContainerFactory")
     public void process(Message message) {
@@ -58,7 +58,7 @@ public class WzFeedbackIllegalListener extends RenYunListener{
             resMap.put("resMsg","mq处理失败：{}"+e.getMessage());
         }finally {
             t.complete();
-            transIllegalSendAliyunMq.renyunReceiveQueueResultFeedbackQueue(resMap);
+            transIllegalSendAliYunMq.renyunReceiveQueueResultFeedbackQueue(resMap);
         }
         logger.info("WzFeedbackIllegalListener process end " );
     }

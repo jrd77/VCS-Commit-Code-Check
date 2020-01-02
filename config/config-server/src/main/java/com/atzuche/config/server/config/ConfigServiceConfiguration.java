@@ -71,5 +71,12 @@ public class ConfigServiceConfiguration {
         return service;
     }
 
+    @Bean
+    public CityService registerCityService(@Autowired ConfigRegisterFactory factory,
+                                           CityService service){
+        factory.register(service);
+        return service;
+    }
+
 
 }

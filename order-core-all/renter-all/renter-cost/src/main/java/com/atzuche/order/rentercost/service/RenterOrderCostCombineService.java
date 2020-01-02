@@ -1,6 +1,8 @@
 package com.atzuche.order.rentercost.service;
 
 import com.alibaba.fastjson.JSON;
+import com.atzuche.config.client.api.*;
+import com.atzuche.config.common.entity.*;
 import com.atzuche.order.commons.CatConstants;
 import com.atzuche.order.commons.DateUtils;
 import com.atzuche.order.commons.GlobalConstant;
@@ -62,6 +64,22 @@ public class RenterOrderCostCombineService {
     private ConsoleRenterOrderFineDeatailService consoleRenterOrderFineDeatailService;
     @Autowired
     private OrderSupplementDetailService orderSupplementDetailService;
+    @Autowired
+    private CityConfigSDK cityConfigSDK;
+    @Autowired
+    private InsuranceConfigSDK insuranceConfigSDK;
+    @Autowired
+    private OilAverageCostConfigSDK oilAverageCostConfigSDK;
+    @Autowired
+    private DepositConfigSDK depositConfigSDK;
+    @Autowired
+    private SysConfigSDK sysConfigSDK;
+    @Autowired
+    private SysConstantSDK sysConstantSDK;
+    @Autowired
+    private CarParamHotBrandDepositSDK carParamHotBrandDepositSDK;
+    @Autowired
+    private IllegalDepositConfigSDK illegalDepositConfigSDK;
 
     @Autowired
     private GetBackCityLimitFeignApi getBackCityLimitFeignApi;
@@ -72,6 +90,10 @@ public class RenterOrderCostCombineService {
     private Integer nightBegin;
     @Value("${auto.cost.nightEnd}")
     private Integer nightEnd;
+    @Value("${auto.cost.configHours}")
+    private Integer configHours;
+    @Value("${auto.cost.unitExtraDriverInsure}")
+    private Integer unitExtraDriverInsure;
 
 
     private static final Integer [] ORDER_TYPES = {1,2};
@@ -132,8 +154,6 @@ public class RenterOrderCostCombineService {
 	}
 	
 	private RenterOrderCostDetailEntity getRentAmtEntity(CostBaseDTO costBaseDTO, List<RenterGoodsPriceDetailDTO> dayPrices) {
-		// TODO 走配置中心获取
-		Integer configHours = 8;
 		// 数据转化
 		List<CarPriceOfDay> carPriceOfDayList = dayPrices.stream().map(dayPrice -> {
 			CarPriceOfDay carPriceOfDay = new CarPriceOfDay();
@@ -185,10 +205,7 @@ public class RenterOrderCostCombineService {
 			Cat.logError("获取平台保障费insurAmtDTO.costBaseDTO对象为空", new RenterCostParameterException());
 			throw new RenterCostParameterException();
 		}
-		// TODO 走配置中心获取
-		Integer configHours = 8;
-		// TODO 走配置中心获取
-		List<InsuranceConfig> insuranceConfigs = null;
+        List<InsuranceConfigEntity> insuranceConfigs = insuranceConfigSDK.getConfig(new DefaultConfigContext());
 		// 指导价
 		Integer guidPrice = insurAmtDTO.getGuidPrice();
 		if (insurAmtDTO.getInmsrp() != null && insurAmtDTO.getInmsrp() != 0) {
@@ -218,7 +235,7 @@ public class RenterOrderCostCombineService {
 			throw new RenterCostParameterException();
 		}
 		if(!abatementAmtDTO.getIsAbatement()){
-		    log.info("不需要计算全面保障费！abatementAmtDTO={}",JSON.toJSONString(abatementAmtDTO));
+		    log.info("不需要计算全面保障费！abatementAmtDTO=[{}]",JSON.toJSONString(abatementAmtDTO));
             return new ArrayList<>();
         }
 		CostBaseDTO costBaseDTO = abatementAmtDTO.getCostBaseDTO();
@@ -227,8 +244,6 @@ public class RenterOrderCostCombineService {
 			Cat.logError("获取全面保障费abatementAmtDTO.costBaseDTO对象为空", new RenterCostParameterException());
 			throw new RenterCostParameterException();
 		}
-		// TODO 走配置中心获取
-		Integer configHours = 8;
 		// 指导价
 		Integer guidPrice = abatementAmtDTO.getGuidPrice();
 		if (abatementAmtDTO.getInmsrp() != null && abatementAmtDTO.getInmsrp() != 0) {
@@ -261,8 +276,6 @@ public class RenterOrderCostCombineService {
 			Cat.logError("获取附加驾驶人费用extraDriverDTO.costBaseDTO对象为空", new RenterCostParameterException());
 			throw new RenterCostParameterException();
 		}
-		// TODO 走配置中心取单价
-		Integer unitExtraDriverInsure = 20;
 		List<String> driverIds = extraDriverDTO.getDriverIds();
 		Integer extraDriverCount = (driverIds == null || driverIds.isEmpty()) ? 0:driverIds.size();
 		FeeResult feeResult = RenterFeeCalculatorUtils.calExtraDriverInsureAmt(unitExtraDriverInsure, extraDriverCount, costBaseDTO.getStartTime(), costBaseDTO.getEndTime());
@@ -288,8 +301,6 @@ public class RenterOrderCostCombineService {
 			Cat.logError("获取超里程费用mileageAmtDTO.costBaseDTO对象为空", new RenterCostParameterException());
 			throw new RenterCostParameterException();
 		}
-		// TODO 走配置中心获取
-		Integer configHours = 8;
 		Integer mileageAmt = RenterFeeCalculatorUtils.calMileageAmt(mileageAmtDTO.getDayMileage(), mileageAmtDTO.getGuideDayPrice(), 
 				mileageAmtDTO.getGetmileage(), mileageAmtDTO.getReturnMileage(), costBaseDTO.getStartTime(), costBaseDTO.getEndTime(), configHours);
 		FeeResult feeResult = new FeeResult();
@@ -319,9 +330,8 @@ public class RenterOrderCostCombineService {
 			Cat.logError("获取租客油费oilAmtDTO.costBaseDTO对象为空", new RenterCostParameterException());
 			throw new RenterCostParameterException();
 		}
-		// TODO 走配置中心获取
-		List<OilAverageCostBO> oilAverageList = null;
-		Integer oilAmt = RenterFeeCalculatorUtils.calOilAmt(oilAmtDTO.getCityCode(), oilAmtDTO.getOilVolume(), oilAmtDTO.getEngineType(), 
+        List<OilAverageCostEntity> oilAverageList = oilAverageCostConfigSDK.getConfig(new DefaultConfigContext());
+        Integer oilAmt = RenterFeeCalculatorUtils.calOilAmt(oilAmtDTO.getCityCode(), oilAmtDTO.getOilVolume(), oilAmtDTO.getEngineType(),
 				oilAmtDTO.getGetOilScale(), oilAmtDTO.getReturnOilScale(), oilAverageList, oilAmtDTO.getOilScaleDenominator());
 		FeeResult feeResult = new FeeResult();
 		feeResult.setTotalFee(oilAmt);
@@ -344,8 +354,8 @@ public class RenterOrderCostCombineService {
 			Cat.logError("获取车辆押金对象depositAmtDTO对象为空", new RenterCostParameterException());
 			throw new RenterCostParameterException();
 		}
-		// TODO 押金配置列表从配置中心获取
-		List<DepositText> depositList = null;
+        List<DepositConfigEntity> depositList = depositConfigSDK.getConfig(new DefaultConfigContext());
+
         double years = LocalDateTimeUtil.periodDays(depositAmtDTO.getLicenseDay(), LocalDate.now())/356D;
         int surplusPriceProYear = CommonUtils.getSurplusPriceProYear(years);
         CarDepositAmtVO carDepositAmtVO = RenterFeeCalculatorUtils.calCarDepositAmt(depositAmtDTO.getCityCode(),
@@ -367,14 +377,17 @@ public class RenterOrderCostCombineService {
         try {
             if(StringUtils.isNotBlank(brand) && StringUtils.isNotBlank(type)){
                 if(StringUtils.isNumeric(brand) && StringUtils.isNumeric(type)){
-                  //TODO 配置中获取车辆品牌系数
-                    //  carSpecialCoefficient = transExtV36Service.getHotConfigValue(Integer.valueOf(brand), Integer.valueOf(type));
+                    Integer brandId = Integer.valueOf(brand);
+                    Integer typeId = Integer.valueOf(type);
+                    CarParamHotBrandDepositEntity carParamHotBrandDepositEntity = carParamHotBrandDepositSDK.getConfigByBrandIdAndTypeId(new DefaultConfigContext(), brandId, typeId);
+                    log.info("config-获取车辆品牌系数carParamHotBrandDepositEntity=[{}]",JSON.toJSONString(carParamHotBrandDepositEntity));
+                    carSpecialCoefficient = Double.valueOf(carParamHotBrandDepositEntity.getConfigValue());
                 }
             }
         } catch (Exception e) {
             log.error("getCarSpecialCoefficientNew ex:",e);
         }
-        log.info("calc result carSpecialCoefficient={},brandId={},typeId={}",carSpecialCoefficient,brand,type);
+        log.info("calc result carSpecialCoefficient=[{}],brandId=[{}],typeId=[{}]",carSpecialCoefficient,brand,type);
         return carSpecialCoefficient;
     }
 
@@ -384,20 +397,31 @@ public class RenterOrderCostCombineService {
      * @return
      */
     public double getNewCarCoefficient(int year) {
+        List<SysConfigEntity> sysConfigSDKConfig = sysConfigSDK.getConfig(new DefaultConfigContext());
         if (year <= 2) {
-            //TODO 配置中获取 请在配置sys_constant表配置c_code:"+code+"相关数据
-            Map<String, Object> map = null;//sysConstantService.getSysConstantByCode("car_year_neqtwo");
-            if (map != null && map.size()>0) {
-                return map.get("c_value")!=null ?Double.parseDouble(map.get("c_value").toString()):1.4;
+            SysConfigEntity sysConfigEntity = Optional.ofNullable(sysConfigSDKConfig)
+                    .orElse(new ArrayList<>())
+                    .stream()
+                    .filter(x -> GlobalConstant.CAR_YEAR_NEQTWO.equals(x.getItemKey()))
+                    .findFirst()
+                    .get();
+            if (sysConfigEntity != null) {
+                String itemValue = sysConfigEntity.getItemValue();
+                return itemValue!=null?Double.valueOf(itemValue):GlobalConstant.CAR_YEAR_NEQTWO_DEFAULT_VALUE;
             }
         }else{
-            //TODO 配置中获取 请在配置sys_constant表配置c_code:"+code+"相关数据
-            Map<String, Object> map = null;//sysConstantService.getSysConstantByCode("car_year_lttwo");
-            if (map != null && map.size()>0) {
-                return map.get("c_value")!=null ?Double.parseDouble(map.get("c_value").toString()):1;
+            SysConfigEntity sysConfigEntity = Optional.ofNullable(sysConfigSDKConfig)
+                    .orElse(new ArrayList<>())
+                    .stream()
+                    .filter(x -> GlobalConstant.CAR_YEAR_LTTWO.equals(x.getItemKey()))
+                    .findFirst()
+                    .get();
+            if (sysConfigEntity!=null) {
+                String itemValue = sysConfigEntity.getItemValue();
+                return itemValue!=null ?Double.valueOf(itemValue):GlobalConstant.CAR_YEAR_LTTWO_DEFAULT_VALUE;
             }
         }
-        return 1;
+        return GlobalConstant.NEW_CAR_COEFFICIENT_DEFAULT_VALUE;
     }
 
 
@@ -420,13 +444,19 @@ public class RenterOrderCostCombineService {
 			Cat.logError("获取违章押金illegalDepositAmtDTO.costBaseDTO对象为空", new RenterCostParameterException());
 			throw new RenterCostParameterException();
 		}
-		// TODO 特殊城市（逗号分隔的城市编码）从配置中心获取
-		String specialCityCodes = null;
-		// TODO 特殊车牌合特殊城市对应的特殊押金值从配置中心获取
-		Integer specialIllegalDepositAmt = null;
-		// TODO 违章押金配置从配置中心获取
-		List<IllegalDepositConfig> illegalDepositList = null;
-		Integer illegalDepositAmt = RenterFeeCalculatorUtils.calIllegalDepositAmt(illDTO.getCityCode(), illDTO.getCarPlateNum(),
+
+        SysContantEntity specialCity = sysConstantSDK.getConfigByCode(new DefaultConfigContext(), GlobalConstant.SPECIAL_CITY_CODE);
+        log.info("config-获取特殊城市specialCity=[{}]",JSON.toJSONString(specialCity));
+		String specialCityCodes = specialCity.getValue();
+
+        SysContantEntity specialCityDeposit = sysConstantSDK.getConfigByCode(new DefaultConfigContext(), GlobalConstant.SPECIAL_ILLEGAL_DEPOSIT_AMT_CODE);
+        log.info("config-获取特殊城市押金specialCityDeposit=[{}]",JSON.toJSONString(specialCityDeposit));
+        Integer specialIllegalDepositAmt = Integer.valueOf(specialCityDeposit.getValue());
+
+        List<IllegalDepositConfigEntity> illegalDepositList = illegalDepositConfigSDK.getConfig(new DefaultConfigContext());
+        log.info("config-获取城市押金列表illegalDepositList=[{}]",JSON.toJSONString(illegalDepositList));
+
+        Integer illegalDepositAmt = RenterFeeCalculatorUtils.calIllegalDepositAmt(illDTO.getCityCode(), illDTO.getCarPlateNum(),
 				specialCityCodes, specialIllegalDepositAmt, illegalDepositList, 
 				costBaseDTO.getStartTime(), costBaseDTO.getEndTime());
 		return illegalDepositAmt;
@@ -619,11 +649,13 @@ public class RenterOrderCostCombineService {
         boolean returnFlag = StringUtils.isBlank(srvReturnLon) || StringUtils.isBlank(srvReturnLat) || "0.0".equalsIgnoreCase(srvReturnLon) || "0.0".equalsIgnoreCase(srvReturnLat);
         CityDTO cityDTO = null;
         if (getFlag || returnFlag) {
-            //TODO 配置中获取
-            //cityDTO = cityMapper.getCityLonAndLatByCode(cityCode);
-            //TODO 给一个citycode=310100(上海)默认的经纬度值用于测试，测试后需要删除
-            cityDTO.setLon(String.valueOf(121.491121));
-            cityDTO.setLat(String.valueOf(31.243466));
+
+            CityEntity configByCityCode = cityConfigSDK.getConfigByCityCode(new DefaultConfigContext(), cityCode);
+            log.info("计算取还车费用-配置服务中获取配置信息configByCityCode=[{}]",configByCityCode);
+            String lat = configByCityCode.getLat();
+            String lon = configByCityCode.getLon();
+            cityDTO.setLon(lon);
+            cityDTO.setLat(lat);
         }
         if (getFlag && cityDTO != null) {
             srvGetLon = cityDTO.getLon();

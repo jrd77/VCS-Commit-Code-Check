@@ -46,6 +46,11 @@ public class DetainRenterDepositReqVO {
     private RenterCashCodeEnum renterCashCodeEnum;
 
     /**
+     * 预授权到期时间
+     */
+    private LocalDateTime authorizeExpireTime;
+
+    /**
      * 参数校验
      */
     public void check() {

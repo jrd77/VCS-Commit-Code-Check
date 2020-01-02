@@ -1,5 +1,6 @@
 package com.atzuche.order.renterwz.mapper;
 
+import com.atzuche.order.renterwz.vo.PhotoPath;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -37,20 +38,6 @@ public interface RenterOrderWzIllegalPhotoMapper{
 	List<RenterOrderWzIllegalPhotoEntity> queryList();
 
 	/**
-	 * 修改
-	 * @param renterOrderWzIllegalPhoto 修改实体
-	 * @return 成功条数
-	 */
-	Integer updateRenterOrderWzIllegalPhoto(RenterOrderWzIllegalPhotoEntity renterOrderWzIllegalPhoto);
-
-	/**
-	 * 根据主键删除
-	 * @param id 主键
-	 * @return 删除的数量
-	 */
-	Integer deleteRenterOrderWzIllegalPhotoById(@Param("id") Long id);
-
-	/**
 	 * 获取最大的序列号
 	 * @param orderNo 订单号
 	 * @param userType 操作类型
@@ -67,4 +54,38 @@ public interface RenterOrderWzIllegalPhotoMapper{
 	 * @return 数量
 	 */
 	Integer countPhoto(@Param("orderNo")String orderNo,@Param("path") String img,@Param("carPlateNum") String carPlateNum);
+
+	/**
+	 * 根据条件 查询数量
+	 * @param orderNo 订单号
+	 * @param userType 操作类型
+	 * @param carPlateNum 车牌号
+	 * @return 总数
+	 */
+    Integer countIllegalPhoto(@Param("orderNo") String orderNo,@Param("userType") Integer userType,@Param("carPlateNum") String carPlateNum);
+
+	/**
+	 * 查询dto
+	 * @param orderNo 订单号
+	 * @param userType 操作类型
+	 * @param serialNumber 序列号
+	 * @param carNum 车牌号
+	 * @return 返回实体
+	 */
+	RenterOrderWzIllegalPhotoEntity getIllegalPhotoBy(@Param("orderNo") String orderNo,@Param("userType") int userType,@Param("serialNumber") int serialNumber,@Param("carNum") String carNum);
+
+	/**
+	 * 按条件 修改信息
+	 * @param photo 实体
+	 * @return 修改成功的数量
+	 */
+	int update(RenterOrderWzIllegalPhotoEntity photo);
+
+	/**
+	 * 根据条件查询
+	 * @param orderNo 订单号
+	 * @param carPlateNum 车牌号
+	 * @return 列表
+	 */
+    List<PhotoPath> queryIllegalPhotoByOrderNo(@Param("orderNo") String orderNo,@Param("carPlateNum")  String carPlateNum);
 }

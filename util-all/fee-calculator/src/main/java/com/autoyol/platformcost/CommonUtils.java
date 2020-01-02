@@ -1,8 +1,8 @@
 package com.autoyol.platformcost;
 
+import com.atzuche.config.common.entity.OilAverageCostEntity;
 import com.autoyol.platformcost.model.AbatementConfig;
 import com.autoyol.platformcost.model.CarPriceOfDay;
-import com.autoyol.platformcost.model.OilAverageCostBO;
 import com.autoyol.platformcost.model.SphericalDistanceCoefficient;
 
 import java.math.BigDecimal;
@@ -383,7 +383,7 @@ public class CommonUtils {
 	 * @param oilAverageList 油费单价配置列表
 	 * @return Double
 	 */
-	public static Double getAverageCost(Integer engineType, Integer cityCode, List<OilAverageCostBO> oilAverageList) {
+	public static Double getAverageCost(Integer engineType, Integer cityCode, List<OilAverageCostEntity> oilAverageList) {
 		if (engineType == null) {
 			return 0.0;
 		}
@@ -392,7 +392,7 @@ public class CommonUtils {
 		}
 		cityCode = cityCode == null ? 0:cityCode;
 		Double oilAverageCost = 0.0;
-		for (OilAverageCostBO oilAverage:oilAverageList) {
+		for (OilAverageCostEntity oilAverage:oilAverageList) {
 			if (cityCode.equals(oilAverage.getCityCode()) && 
 					engineType.equals(oilAverage.getEngineType())) {
 				Integer molecule = oilAverage.getMolecule();//分子

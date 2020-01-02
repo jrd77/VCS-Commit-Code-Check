@@ -71,4 +71,7 @@ public class OwnerMemberService{
     }
 
 
+    public String getOwnerNoByOrderNo(String orderNo) {
+        return ownerMemberMapper.getOwnerNoByOrderNo(orderNo);
+    }
 }

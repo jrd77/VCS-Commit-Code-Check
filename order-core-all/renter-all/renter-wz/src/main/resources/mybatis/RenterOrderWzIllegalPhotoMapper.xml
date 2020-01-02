@@ -52,55 +52,41 @@
 		where is_delete = 0
 	</select>
 
-	 <update id="updateRenterOrderWzIllegalPhoto" parameterType="com.atzuche.order.renterwz.entity.RenterOrderWzIllegalPhotoEntity">
-		update renter_order_wz_illegal_photo set
-		<if test="path != null">
-			path = #{path},
-		</if>
-		<if test="userType != null">
-			user_type = #{userType},
-		</if>
-		<if test="orderNo != null">
-			order_no = #{orderNo},
-		</if>
-		<if test="carPlateNum != null">
-			car_plate_num = #{carPlateNum},
-		</if>
-		<if test="serialNumber != null">
-			serial_number = #{serialNumber},
-		</if>
-		<if test="createOp != null">
-			create_op = #{createOp},
-		</if>
-		<if test="createTime != null">
-			create_time = #{createTime},
-		</if>
-		<if test="updateOp != null">
-			update_op = #{updateOp},
-		</if>
-		<if test="isDelete != null">
-			is_delete = #{isDelete},
-		</if>
-		update_time = NOW()
-		where id = #{id} and is_delete = 0
-	</update>
-
-	 <update id="deleteRenterOrderWzIllegalPhotoById" parameterType="java.lang.Long">
-		update renter_order_wz_illegal_photo set
-		is_delete = 1,
-		update_time = NOW()
-		where id = #{id} and is_delete = 0
-	</update>
-
 	<select id="getMaxSerialNum" resultType="Integer">
 		select
-		max(serial_number) from renter_order_wz_illegal_photo where order_no=#{orderNo} and car_plate_num = #{carPlateNum}
-		and user_type=#{userType}
+		max(serial_number) from renter_order_wz_illegal_photo where order_no = #{orderNo} and car_plate_num = #{carPlateNum}
+		and user_type = #{userType}  and is_delete = 0
 	</select>
 
 	<select id="countPhoto" resultType="java.lang.Integer">
 		select count(*)  from renter_order_wz_illegal_photo
-		where order_no=#{orderNo} and path=#{path} and car_plate_num = #{carPlateNum}
+		where order_no = #{orderNo} and path = #{path} and car_plate_num = #{carPlateNum}  and is_delete = 0
 	</select>
 
+	<select id="countIllegalPhoto" resultType="int">
+		select count(*) from
+		renter_order_wz_illegal_photo where order_no = #{orderNo}  and car_plate_num = #{carPlateNum}
+		and user_type = #{userType}  and is_delete = 0
+	</select>
+
+	<select id="getIllegalPhotoBy" resultMap="selectColumnMap">
+		select * from
+		renter_order_wz_illegal_photo where order_no = #{orderNo} and
+		user_type = #{userType} and serial_number = #{serialNumber} and car_plate_num = #{carPlateNum}  and is_delete = 0
+	</select>
+
+	<update id="update" parameterType="com.atzuche.order.renterwz.entity.RenterOrderWzIllegalPhotoEntity">
+        update renter_order_wz_illegal_photo set
+        path = #{path},
+        update_time = #{updateTime},
+        update_op = #{updateOp}
+        where  order_no = #{orderNo} and car_plate_num = #{carPlateNum} and
+		user_type = #{userType} and serial_number = #{serialNumber}  and is_delete = 0
+    </update>
+
+	<select id="queryIllegalPhotoByOrderNo" resultType="com.atzuche.order.renterwz.vo.PhotoPath">
+		select user_type userType,path img,car_plate_num carNum
+		from renter_order_wz_illegal_photo
+		where order_no=#{orderNo} and car_plate_num = #{carPlateNum} and is_delete = 0
+	</select>
 </mapper>
