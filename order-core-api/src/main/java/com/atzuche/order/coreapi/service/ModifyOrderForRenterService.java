@@ -5,14 +5,22 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.atzuche.order.commons.enums.FineTypeEnum;
 import com.atzuche.order.commons.enums.SrvGetReturnEnum;
 import com.atzuche.order.coreapi.entity.dto.ModifyCompareDTO;
+import com.atzuche.order.coreapi.entity.dto.ModifyOrderDTO;
 import com.atzuche.order.coreapi.utils.ModifyOrderUtils;
 import com.atzuche.order.delivery.entity.RenterOrderDeliveryEntity;
 import com.atzuche.order.delivery.service.RenterOrderDeliveryService;
+import com.atzuche.order.rentercost.entity.ConsoleRenterOrderFineDeatailEntity;
+import com.atzuche.order.rentercost.entity.RenterOrderFineDeatailEntity;
+import com.atzuche.order.rentercost.entity.dto.RenterOrderSubsidyDetailDTO;
+import com.atzuche.order.rentercost.service.ConsoleRenterOrderFineDeatailService;
+import com.atzuche.order.rentercost.service.RenterOrderFineDeatailService;
 import com.atzuche.order.renterorder.entity.RenterOrderChangeApplyEntity;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.atzuche.order.renterorder.service.RenterOrderChangeApplyService;
@@ -31,17 +39,31 @@ public class ModifyOrderForRenterService {
 	@Autowired
 	private RenterOrderDeliveryService renterOrderDeliveryService;
 	@Autowired
-	private ModifyOrderForOwnerService modifyOrderForOwnerService;
-	
-	public Integer INVALID_FLAG = 0;
-	
-	public Integer EFFECTIVE_FLAG = 1;
-	
-	public Integer AUDIT_STATUS_WAIT = 0;
-	
-	public Integer AUDIT_STATUS_AGREE = 1;
-	
-	public Integer AUDIT_STATUS_REFUSE = 2;
+	private ModifyOrderConfirmService modifyOrderConfirmService;
+	@Autowired
+	private RenterOrderFineDeatailService renterOrderFineDeatailService;
+	@Autowired
+	private ConsoleRenterOrderFineDeatailService consoleRenterOrderFineDeatailService;
+	/**
+	 * 无效
+	 */
+	public static final Integer INVALID_FLAG = 0;
+	/**
+	 * 有效
+	 */
+	public static final Integer EFFECTIVE_FLAG = 1;
+	/**
+	 * 未处理
+	 */
+	public static final Integer AUDIT_STATUS_WAIT = 0;
+	/**
+	 * 已同意
+	 */
+	public static final Integer AUDIT_STATUS_AGREE = 1;
+	/**
+	 * 已拒绝
+	 */
+	public static final Integer AUDIT_STATUS_REFUSE = 2;
 	
 	/**
 	 * 车主同意后修改租客子单状态
@@ -51,27 +73,52 @@ public class ModifyOrderForRenterService {
 	 */
 	public void updateRenterOrderStatus(String orderNo, String renterOrderNo, RenterOrderEntity initRenterOrderEntity) {
 		log.info("车主同意后修改租客子单状态orderNo=[{}],renterOrderNo=[{}],renterOrderEntity=[{}]",orderNo, renterOrderNo, initRenterOrderEntity);
-		// 获取当前有效的子订单
-		if (initRenterOrderEntity == null) {
-			initRenterOrderEntity = renterOrderService.getRenterOrderByOrderNoAndIsEffective(orderNo);
-		}
 		// 获取租客修改申请表中已同意的租客子订单
 		RenterOrderEntity agreeRenterOrderEntity = renterOrderService.getRenterOrderByRenterOrderNo(renterOrderNo);
 		// 修改租客上笔子单状态失效
 		renterOrderService.updateRenterOrderEffective(initRenterOrderEntity.getId(), INVALID_FLAG);
 		// 修改租客待确认的子单状态为有效
 		renterOrderService.updateRenterOrderEffective(agreeRenterOrderEntity.getId(), EFFECTIVE_FLAG);
-		// 修改订单子状态:1-待补付,2-修改待确认,3-进行中,4-已完结,5-已结束 
-		renterOrderService.updateRenterOrderChildStatus(agreeRenterOrderEntity.getId(), 3);
 		// 获取申请记录
 		RenterOrderChangeApplyEntity renterOrderChangeApplyEntity = renterOrderChangeApplyService.getRenterOrderChangeApplyByRenterOrderNo(renterOrderNo);
 		if (renterOrderChangeApplyEntity != null) {
 			// 修改租客申请状态为已同意
 			renterOrderChangeApplyService.updateRenterOrderChangeApplyStatus(renterOrderChangeApplyEntity.getId(), AUDIT_STATUS_AGREE);
 		}
-		
-		// TODO 生成车主子订单
+		// 对取还车违约金进行处理
+		transferRenterFine(orderNo, renterOrderNo);
 	}
+	
+	/**
+	 * 同意后对租客取还车违约金进行处理
+	 * @param orderNo
+	 * @param renterOrderNo
+	 */
+	public void transferRenterFine(String orderNo, String renterOrderNo) {
+		// 获取违约金列表
+		List<RenterOrderFineDeatailEntity> fineList = renterOrderFineDeatailService.listRenterOrderFineDeatail(orderNo, renterOrderNo);
+		if (fineList == null || fineList.isEmpty()) {
+			return;
+		}
+		for (RenterOrderFineDeatailEntity fine:fineList) {
+			if (FineTypeEnum.MODIFY_GET_FINE.getFineType().equals(fine.getFineType()) || 
+					FineTypeEnum.MODIFY_RETURN_FINE.getFineType().equals(fine.getFineType())) {
+				// 先删
+				renterOrderFineDeatailService.deleteGetReturnFineAfterAgree(fine.getId(), "转移到租客全局罚金表中");
+				// 后转移到租客全局罚金表中
+				ConsoleRenterOrderFineDeatailEntity consoleFine = new ConsoleRenterOrderFineDeatailEntity();
+				BeanUtils.copyProperties(fine, consoleFine);
+				consoleFine.setId(null);
+				consoleFine.setCreateTime(null);
+				consoleFine.setUpdateTime(null);
+				consoleFine.setIsDelete(0);
+				consoleFine.setRemark("由租客罚金表转移过来");
+				consoleRenterOrderFineDeatailService.saveConsoleRenterOrderFineDeatail(consoleFine);
+			}
+		}
+		
+	}
+	
 	
 	/**
 	 * 保存修改记录
@@ -118,7 +165,7 @@ public class ModifyOrderForRenterService {
 	 * @param orderNo 主订单号
 	 * @param renterOrderNo 最新修改租客子订单号
 	 */
-	public void supplementPayPostProcess(String orderNo, String renterOrderNo) {
+	public void supplementPayPostProcess(String orderNo, String renterOrderNo, ModifyOrderDTO modifyOrderDTO, List<RenterOrderSubsidyDetailDTO> renterOrderSubsidyDetailDTOList) {
 		// 获取当前有效的子订单
 		RenterOrderEntity initRenterOrderEntity = renterOrderService.getRenterOrderByOrderNoAndIsEffective(orderNo);
 		// 获取租客配送订单信息
@@ -134,7 +181,7 @@ public class ModifyOrderForRenterService {
 		boolean autoAgree = !checkAutoAgree(initRenterOrderEntity.getExpRentTime(), initRenterOrderEntity.getExpRevertTime(), updRenterOrderEntity.getExpRentTime(), updRenterOrderEntity.getExpRevertTime());
 		if (autoAgree) {
 			// 自动同意
-			updateRenterOrderStatus(orderNo, renterOrderNo, initRenterOrderEntity);
+			modifyOrderConfirmService.agreeModifyOrder(modifyOrderDTO, updRenterOrderEntity, initRenterOrderEntity, renterOrderSubsidyDetailDTOList);
 		} else {
 			// 保存修改申请记录
 			addRenterOrderChangeApply(orderNo, renterOrderNo, before, after);

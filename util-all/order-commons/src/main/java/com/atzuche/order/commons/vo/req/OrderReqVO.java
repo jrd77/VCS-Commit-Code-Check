@@ -19,7 +19,7 @@ public class OrderReqVO extends BaseVO {
     private static final long serialVersionUID = 7876123343997657265L;
 
 
-    @AutoDocProperty(value = "订单类型", required = true)
+    @AutoDocProperty(value = "订单类型")
     @NotBlank(message = "订单类型不能为空")
     private String orderCategory;
 
@@ -35,67 +35,67 @@ public class OrderReqVO extends BaseVO {
     @AutoDocProperty(value = "平台来源子类型 1:APP-IOS,2:APP-Android,3:小程序-支付宝,4:小程序-微信,5:小程序-百度")
     private String platformChildType;
 
-    @AutoDocProperty(value = "城市编码", required = true)
+    @AutoDocProperty(value = "城市编码")
     @NotBlank(message = "城市编码不能为空")
     private String cityCode;
 
     @AutoDocProperty(value = "城市名称")
     private String cityName;
 
-    @AutoDocProperty(value = "订单场景编码", required = true)
+    @AutoDocProperty(value = "订单场景编码")
     @NotBlank(message = "订单场景编码不能为空")
     private String sceneCode;
 
-    @AutoDocProperty(value = "订单来源", required = true)
+    @AutoDocProperty(value = "订单来源")
     @NotBlank(message = "订单来源不能为空")
     private String source;
 
     @AutoDocProperty(value = "细分订单来源")
     private String subSource;
 
-    @AutoDocProperty(value = "订单取车时间(yyyy-MM-dd HH:mm:ss)", required = true)
+    @AutoDocProperty(value = "订单取车时间(yyyy-MM-dd HH:mm:ss)")
     private LocalDateTime rentTime;
 
-    @AutoDocProperty(value = "订单还车时间(yyyy-MM-dd HH:mm:ss)", required = true)
+    @AutoDocProperty(value = "订单还车时间(yyyy-MM-dd HH:mm:ss)")
     private LocalDateTime revertTime;
 
-    @AutoDocProperty(value = "是否使用取车服务:0.否 1.是", required = true)
+    @AutoDocProperty(value = "是否使用取车服务:0.否 1.是")
     @NotNull(message = "是否使用取车服务标识不能为空")
     private Integer srvGetFlag;
 
-    @AutoDocProperty(value = "取车服务-取车地址", required = true)
+    @AutoDocProperty(value = "取车服务-取车地址")
     @NotBlank(message = "取车地址不能为空")
     private String srvGetAddr;
 
-    @AutoDocProperty(value = "取车服务-取车地址-地址经度", required = true)
+    @AutoDocProperty(value = "取车服务-取车地址-地址经度")
     @NotBlank(message = "取车地址经度不能为空")
     private String srvGetLon;
 
-    @AutoDocProperty(value = "取车服务-取车地址-地址维度", required = true)
+    @AutoDocProperty(value = "取车服务-取车地址-地址维度")
     @NotBlank(message = "取车地址维度不能为空")
     private String srvGetLat;
 
-    @AutoDocProperty(value = "是否使用还车服务:0.否 1.是", required = true)
+    @AutoDocProperty(value = "是否使用还车服务:0.否 1.是")
     @NotNull(message = "是否使用还车服务标识不能为空")
     private Integer srvReturnFlag;
 
-    @AutoDocProperty(value = "还车服务-还车地址", required = true)
+    @AutoDocProperty(value = "还车服务-还车地址")
     @NotBlank(message = "还车地址不能为空")
     private String srvReturnAddr;
 
-    @AutoDocProperty(value = "还车服务-还车地址-地址经度", required = true)
+    @AutoDocProperty(value = "还车服务-还车地址-地址经度")
     @NotBlank(message = "还车地址经度不能为空")
     private String srvReturnLon;
 
-    @AutoDocProperty(value = "还车服务-还车地址-地址维度", required = true)
+    @AutoDocProperty(value = "还车服务-还车地址-地址维度")
     @NotBlank(message = "还车地址维度不能为空")
     private String srvReturnLat;
 
-    @AutoDocProperty(value = "车辆注册号", required = true)
+    @AutoDocProperty(value = "车辆注册号")
     @NotBlank(message = "车辆注册号不能为空")
     private String carNo;
 
-    @AutoDocProperty(value = "是否购买补充保障", required = true)
+    @AutoDocProperty(value = "是否购买补充保障")
     @NotBlank(message = "是否购买补充保障不能为空")
     private String abatement;
 
@@ -123,11 +123,11 @@ public class OrderReqVO extends BaseVO {
     @AutoDocProperty(value = "航班号")
     private String flightNo;
 
-    @AutoDocProperty(value = "限时立减红包状态")
-    private String limitRedStatus;
-
-    @AutoDocProperty(value = "限时立减红包ID")
-    private String limitReductionId;
+//    @AutoDocProperty(value = "限时立减红包状态")
+//    private String limitRedStatus;
+//
+//    @AutoDocProperty(value = "限时立减红包ID")
+//    private String limitReductionId;
 
     @AutoDocProperty(value = "附加驾驶人ID,多个以逗号分隔")
     private String driverIds;
@@ -190,18 +190,29 @@ public class OrderReqVO extends BaseVO {
     private Integer srcPort;
 
 
-    @AutoDocProperty(value = "是否使用特供价(管理后台)", required = true)
+    @AutoDocProperty(value = "是否使用特供价(管理后台)")
     private String useSpecialPrice;
 
-    @AutoDocProperty(value = "操作人(管理后台)", required = true)
+    @AutoDocProperty(value = "操作人(管理后台)")
     private String operator;
 
-    @AutoDocProperty(value = "管理后台下单特殊处理标识(管理后台)", required = true)
+    @AutoDocProperty(value = "管理后台下单特殊处理标识(管理后台)")
     private String specialConsole;
 
-    @AutoDocProperty(value = "线下订单类型(管理后台)", required = true)
+    @AutoDocProperty(value = "线下订单类型(管理后台)")
     private String offlineOrderStatus;
 
+    @AutoDocProperty(value = "限时红包面额(管理后台)")
+    private String reductiAmt;
+
+
+    public String getReductiAmt() {
+        return reductiAmt;
+    }
+
+    public void setReductiAmt(String reductiAmt) {
+        this.reductiAmt = reductiAmt;
+    }
 
     public String getOrderCategory() {
         return orderCategory;
@@ -441,22 +452,6 @@ public class OrderReqVO extends BaseVO {
 
     public void setFlightNo(String flightNo) {
         this.flightNo = flightNo;
-    }
-
-    public String getLimitRedStatus() {
-        return limitRedStatus;
-    }
-
-    public void setLimitRedStatus(String limitRedStatus) {
-        this.limitRedStatus = limitRedStatus;
-    }
-
-    public String getLimitReductionId() {
-        return limitReductionId;
-    }
-
-    public void setLimitReductionId(String limitReductionId) {
-        this.limitReductionId = limitReductionId;
     }
 
     public String getDriverIds() {

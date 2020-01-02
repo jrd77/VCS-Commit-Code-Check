@@ -8,7 +8,7 @@ import lombok.ToString;
 public class ModifyFlagDTO {
 
 	/**
-	 * 是否修改不急免赔
+	 * 是否修改不计免赔
 	 */
 	private boolean modifyAbatementFlag;
 	/**
