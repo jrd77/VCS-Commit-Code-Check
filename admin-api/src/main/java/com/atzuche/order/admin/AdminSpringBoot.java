@@ -9,7 +9,7 @@ import org.springframework.boot.web.support.SpringBootServletInitializer;
  * @author <a href="mailto:lianglin.sjtu@gmail.com">AndySjtu</a>
  * @date 2020/1/2 1:57 下午
  **/
-@SpringBootApplication(scanBasePackages = {"com.atzuche.order.admin"})
+@SpringBootApplication(scanBasePackages = {"com.atzuche.order.admin","com.atzuche.order"})
 public class AdminSpringBoot extends SpringBootServletInitializer {
 
     public static void main(String[] args) {
