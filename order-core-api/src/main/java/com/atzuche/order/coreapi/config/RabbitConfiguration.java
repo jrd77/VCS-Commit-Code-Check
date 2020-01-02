@@ -121,4 +121,19 @@ public class RabbitConfiguration {
 		return BindingBuilder.bind(wzFeedBackQueue()).to(wzFeedBackExchange()).with(RabbitMqEnums.WZ_FEEDBACK.getRoutingKey());
 	}
 
+	@Bean
+	public Queue wzResultFeedBackQueue() {
+		return new Queue(RabbitMqEnums.WZ_RESULT_FEEDBACK.getQueueName(), true);
+	}
+
+	@Bean
+	public DirectExchange wzResultFeedBackExchange() {
+		return new DirectExchange(RabbitMqEnums.WZ_RESULT_FEEDBACK.getExchange());
+	}
+
+	@Bean
+	public Binding wzResultFeedBackBind() {
+		return BindingBuilder.bind(wzResultFeedBackQueue()).to(wzResultFeedBackExchange()).with(RabbitMqEnums.WZ_RESULT_FEEDBACK.getRoutingKey());
+	}
+
 }
