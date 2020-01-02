@@ -1,8 +1,11 @@
 package com.atzuche.order.coreapi.controller;
 
+import com.alibaba.fastjson.JSON;
+import com.atzuche.config.client.api.CityConfigSDK;
 import com.atzuche.config.client.api.DefaultConfigContext;
 import com.atzuche.config.client.api.SysConfigSDK;
 import com.atzuche.config.client.api.SysConstantSDK;
+import com.atzuche.config.common.entity.CityEntity;
 import com.atzuche.config.common.entity.SysContantEntity;
 import com.atzuche.order.cashieraccount.service.CashierService;
 import com.atzuche.order.cashieraccount.vo.req.CashierDeductDebtReqVO;
@@ -32,6 +35,8 @@ public class TestController {
     CashierService cashierService;
     @Autowired
     private SysConstantSDK sysConstantSDK;
+    @Autowired
+    private CityConfigSDK cityConfigSDK;
     @GetMapping(path = "/test")
     public String test(){
         CashierDeductDebtReqVO vo = new CashierDeductDebtReqVO();
@@ -54,6 +59,9 @@ public class TestController {
     }
     @GetMapping("city")
     public Object city(){
-        return null;
+        CityEntity configByCityCode = cityConfigSDK.getConfigByCityCode(new DefaultConfigContext(), 310100);
+        List<CityEntity> config = cityConfigSDK.getConfig(new DefaultConfigContext());
+        logger.info("config={}",JSON.toJSONString(config));
+        return configByCityCode;
     }
 }
