@@ -35,15 +35,15 @@ public class ParentOrderService {
 
     public void saveParentOrderInfo(ParentOrderDTO parentOrderDTO) {
         LOGGER.info("Save parent order info ,param is, parentOrderDTO:[{}]", JSON.toJSONString(parentOrderDTO));
-
         //1、主订单信息处理
         int saveOrderResult = orderService.saveOrderInfo(parentOrderDTO.getOrderDTO());
-
+        LOGGER.info("Save order info. result is,saveOrderResult:[{}]", saveOrderResult);
         //2、主订单状态信息处理
         int saveOrderStatusResult =  orderStatusService.saveOrderStatusInfo(parentOrderDTO.getOrderStatusDTO());
-
+        LOGGER.info("Save order status info. result is,saveOrderStatusResult:[{}]", saveOrderStatusResult);
         //3、主订单来源统计信息处理
         int saveOrderSourceStatResult = orderSourceStatService.saveOrderSourceStatInfo(parentOrderDTO.getOrderSourceStatDTO());
+        LOGGER.info("Save order sorce stat info. result is,saveOrderSourceStatResult:[{}]", saveOrderSourceStatResult);
     }
 
 

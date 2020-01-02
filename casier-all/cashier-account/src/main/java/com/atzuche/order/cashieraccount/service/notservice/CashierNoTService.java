@@ -24,15 +24,11 @@ import com.atzuche.order.cashieraccount.exception.OrderPaySignParamException;
 import com.atzuche.order.cashieraccount.mapper.CashierMapper;
 import com.atzuche.order.cashieraccount.vo.req.pay.OrderPaySignReqVO;
 import com.atzuche.order.cashieraccount.vo.res.OrderPayableAmountResVO;
-import com.atzuche.order.cashieraccount.vo.res.pay.OrderPayAsynResVO;
 import com.atzuche.order.commons.IpUtil;
 import com.atzuche.order.commons.LocalDateTimeUtils;
 import com.atzuche.order.commons.enums.RenterCashCodeEnum;
 import com.atzuche.order.commons.enums.account.PayStatusEnum;
-import com.atzuche.order.commons.enums.cashier.PaySourceEnum;
-import com.atzuche.order.commons.enums.cashier.PayTypeEnum;
-import com.atzuche.order.commons.enums.cashier.PlatformEnum;
-import com.atzuche.order.commons.enums.cashier.WalletFlagEnum;
+import com.atzuche.order.commons.enums.cashier.*;
 import com.atzuche.order.rentercost.entity.vo.PayableVO;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.atzuche.order.renterorder.service.RenterOrderService;
@@ -41,6 +37,7 @@ import com.autoyol.autopay.gateway.util.AESSecurityUtils;
 import com.autoyol.autopay.gateway.util.MD5;
 import com.autoyol.autopay.gateway.util.RSASecurityUtils;
 import com.autoyol.autopay.gateway.vo.req.BatchPayVo;
+import com.autoyol.autopay.gateway.vo.req.NotifyDataVo;
 import com.autoyol.autopay.gateway.vo.req.PayVo;
 import com.autoyol.autopay.gateway.vo.req.RefundVo;
 import com.autoyol.commons.utils.GsonUtils;
@@ -170,32 +167,35 @@ public class CashierNoTService {
 
     /**
      * 支付成功异步回调 车俩押金参数初始化
-     * @param orderPayAsynVO
+     * @param notifyDataVo
      * @return
      */
-    public PayedOrderRenterDepositReqVO getPayedOrderRenterDepositReq(OrderPayAsynResVO orderPayAsynVO) {
+    public PayedOrderRenterDepositReqVO getPayedOrderRenterDepositReq(NotifyDataVo notifyDataVo) {
         PayedOrderRenterDepositReqVO vo = new PayedOrderRenterDepositReqVO();
-        BeanUtils.copyProperties(orderPayAsynVO,vo);
+        BeanUtils.copyProperties(notifyDataVo,vo);
         vo.setPayStatus(PayStatusEnum.PAYED.getCode());
-        int transStatus = StringUtil.isBlank(orderPayAsynVO.getTransStatus())?0:Integer.parseInt(orderPayAsynVO.getTransStatus());
+        int transStatus = StringUtil.isBlank(notifyDataVo.getTransStatus())?0:Integer.parseInt(notifyDataVo.getTransStatus());
         vo.setPayStatus(transStatus);
-        vo.setPayTime(LocalDateTimeUtils.parseStringToDateTime(orderPayAsynVO.getOrderTime(),LocalDateTimeUtils.DEFAULT_PATTERN));
+        vo.setPayTime(LocalDateTimeUtils.parseStringToDateTime(notifyDataVo.getOrderTime(),LocalDateTimeUtils.DEFAULT_PATTERN));
         //"01"：消费
-        if(DataPayTypeConstant.PAY_PUR.equals(orderPayAsynVO.getPayType())){
-            vo.setShifuDepositAmt(orderPayAsynVO.getSettleAmount());
-            vo.setSurplusDepositAmt(orderPayAsynVO.getSettleAmount());
+        if(DataPayTypeConstant.PAY_PUR.equals(notifyDataVo.getPayType())){
+            Integer settleAmount = notifyDataVo.getSettleAmount()==null?0:Integer.parseInt(notifyDataVo.getSettleAmount());
+            vo.setShifuDepositAmt(settleAmount);
+            vo.setSurplusDepositAmt(settleAmount);
         }
         //"02"：预授权
-        if(DataPayTypeConstant.PAY_PRE.equals(orderPayAsynVO.getPayType())){
-            vo.setAuthorizeDepositAmt(orderPayAsynVO.getSettleAmount());
-            vo.setSurplusAuthorizeDepositAmt(orderPayAsynVO.getSettleAmount());
+        if(DataPayTypeConstant.PAY_PRE.equals(notifyDataVo.getPayType())){
+            Integer settleAmount = notifyDataVo.getSettleAmount()==null?0:Integer.parseInt(notifyDataVo.getSettleAmount());
+            vo.setAuthorizeDepositAmt(settleAmount);
+            vo.setSurplusAuthorizeDepositAmt(settleAmount);
         }
         //TODO 预授权到期时间
         //车辆押金进出明细
         DetainRenterDepositReqVO detainRenterDeposit = new DetainRenterDepositReqVO();
-        BeanUtils.copyProperties(orderPayAsynVO,detainRenterDeposit);
-        detainRenterDeposit.setAmt(orderPayAsynVO.getSettleAmount());
-        detainRenterDeposit.setUniqueNo(orderPayAsynVO.getQn());
+        BeanUtils.copyProperties(notifyDataVo,detainRenterDeposit);
+        Integer settleAmount = notifyDataVo.getSettleAmount()==null?0:Integer.parseInt(notifyDataVo.getSettleAmount());
+        detainRenterDeposit.setAmt(settleAmount);
+        detainRenterDeposit.setUniqueNo(notifyDataVo.getQn());
         detainRenterDeposit.setRenterCashCodeEnum(RenterCashCodeEnum.CASHIER_RENTER_DEPOSIT);
         vo.setDetainRenterDepositReqVO(detainRenterDeposit);
         return vo;
@@ -203,24 +203,24 @@ public class CashierNoTService {
 
     /**
      * 更新收银台租车押金已支付
-     * @param orderPayAsynVO
+     * @param notifyDataVo
      */
-    public void updataCashier(OrderPayAsynResVO orderPayAsynVO) {
-        CashierEntity cashierEntity = cashierMapper.selectByPrimaryKey(orderPayAsynVO.getPayId());
+    public void updataCashier(NotifyDataVo notifyDataVo) {
+        CashierEntity cashierEntity = cashierMapper.selectByPrimaryKey(Integer.parseInt(notifyDataVo.getPayId()));
         int result =0;
          if(Objects.nonNull(cashierEntity) && Objects.nonNull(cashierEntity.getId())){
              CashierEntity cashier = new CashierEntity();
-             BeanUtils.copyProperties(orderPayAsynVO,cashier);
+             BeanUtils.copyProperties(notifyDataVo,cashier);
              cashier.setId(cashierEntity.getId());
              cashier.setVersion(cashierEntity.getVersion());
              cashier.setPaySn(cashierEntity.getPaySn()+1);
-             if("00".equals(orderPayAsynVO.getTransStatus()) && cashierEntity.getTransStatus().equals(orderPayAsynVO.getTransStatus())){
+             if(TransStatusEnum.PAY_SUCCESS.getCode().equals(notifyDataVo.getTransStatus()) && cashierEntity.getTransStatus().equals(notifyDataVo.getTransStatus())){
                  result = cashierMapper.updateByPrimaryKeySelective(cashier);
              }
 
          }else {
              CashierEntity cashier = new CashierEntity();
-             BeanUtils.copyProperties(orderPayAsynVO,cashier);
+             BeanUtils.copyProperties(notifyDataVo,cashier);
              result = cashierMapper.insert(cashier);
          }
          if(result == 0){
@@ -229,42 +229,44 @@ public class CashierNoTService {
     }
     /**
      * 支付成功异步回调 违章押金参数初始化
-     * @param orderPayAsynVO
+     * @param notifyDataVo
      * @return
      */
-    public PayedOrderRenterWZDepositReqVO getPayedOrderRenterWZDepositReq(OrderPayAsynResVO orderPayAsynVO) {
+    public PayedOrderRenterWZDepositReqVO getPayedOrderRenterWZDepositReq(NotifyDataVo notifyDataVo) {
         PayedOrderRenterWZDepositReqVO vo = new PayedOrderRenterWZDepositReqVO();
-        BeanUtils.copyProperties(orderPayAsynVO,vo);
-        vo.setShishouDeposit(orderPayAsynVO.getSettleAmount());
+        BeanUtils.copyProperties(notifyDataVo,vo);
+        Integer settleAmount = notifyDataVo.getSettleAmount()==null?0:Integer.parseInt(notifyDataVo.getSettleAmount());
+        vo.setShishouDeposit(settleAmount);
 
         //违章押金进出明细
         PayedOrderRenterDepositWZDetailReqVO payedOrderRenterDepositDetail = new PayedOrderRenterDepositWZDetailReqVO();
-        BeanUtils.copyProperties(orderPayAsynVO,payedOrderRenterDepositDetail);
-        payedOrderRenterDepositDetail.setUniqueNo(orderPayAsynVO.getQn());
+        BeanUtils.copyProperties(notifyDataVo,payedOrderRenterDepositDetail);
+        payedOrderRenterDepositDetail.setUniqueNo(notifyDataVo.getQn());
         payedOrderRenterDepositDetail.setRenterCashCodeEnum(RenterCashCodeEnum.CASHIER_RENTER_WZ_DEPOSIT);
-        payedOrderRenterDepositDetail.setPayChannel(orderPayAsynVO.getPaySource());
-        payedOrderRenterDepositDetail.setPayment(orderPayAsynVO.getPayType());
-        payedOrderRenterDepositDetail.setAmt(orderPayAsynVO.getSettleAmount());
+        payedOrderRenterDepositDetail.setPayChannel(notifyDataVo.getPaySource());
+        payedOrderRenterDepositDetail.setPayment(notifyDataVo.getPayType());
+        payedOrderRenterDepositDetail.setAmt(settleAmount);
         vo.setPayedOrderRenterDepositDetailReqVO(payedOrderRenterDepositDetail);
         return vo;
     }
 
     /**
      * 支付成功异步回调 补付租车费用回调
-     * @param orderPayAsynVO
+     * @param notifyDataVo
      * @return
      */
-    public AccountRenterCostReqVO getAccountRenterCostReq(OrderPayAsynResVO orderPayAsynVO,RenterCashCodeEnum renterCashCodeEnum) {
+    public AccountRenterCostReqVO getAccountRenterCostReq(NotifyDataVo notifyDataVo,RenterCashCodeEnum renterCashCodeEnum) {
         AccountRenterCostReqVO vo = new AccountRenterCostReqVO();
-        BeanUtils.copyProperties(orderPayAsynVO,vo);
-        vo.setShifuAmt(orderPayAsynVO.getSettleAmount());
+        BeanUtils.copyProperties(notifyDataVo,vo);
+        Integer settleAmount = notifyDataVo.getSettleAmount()==null?0:Integer.parseInt(notifyDataVo.getSettleAmount());
+        vo.setShifuAmt(settleAmount);
         //费用明细
         AccountRenterCostDetailReqVO accountRenterCostDetail = new AccountRenterCostDetailReqVO();
-        BeanUtils.copyProperties(orderPayAsynVO,accountRenterCostDetail);
-        accountRenterCostDetail.setPaySource(orderPayAsynVO.getPaySource());
-        accountRenterCostDetail.setPayType(orderPayAsynVO.getPayType());
-        accountRenterCostDetail.setTime(LocalDateTimeUtils.parseStringToDateTime(orderPayAsynVO.getOrderTime(),LocalDateTimeUtils.DEFAULT_PATTERN));
-        accountRenterCostDetail.setAmt(orderPayAsynVO.getSettleAmount());
+        BeanUtils.copyProperties(notifyDataVo,accountRenterCostDetail);
+        accountRenterCostDetail.setPaySource(notifyDataVo.getPaySource());
+        accountRenterCostDetail.setPayType(notifyDataVo.getPayType());
+        accountRenterCostDetail.setTime(LocalDateTimeUtils.parseStringToDateTime(notifyDataVo.getOrderTime(),LocalDateTimeUtils.DEFAULT_PATTERN));
+        accountRenterCostDetail.setAmt(settleAmount);
         accountRenterCostDetail.setRenterCashCodeEnum(renterCashCodeEnum);
         return vo;
     }
@@ -353,36 +355,36 @@ public class CashierNoTService {
 
     /**
      * 租车押金 收银台回调
-     * @param orderPayAsynVO
+     * @param notifyDataVo
      * @param payedOrderRenterDeposit
      */
-    public void updataCashierAndRenterDeposit(OrderPayAsynResVO orderPayAsynVO, PayedOrderRenterDepositReqVO payedOrderRenterDeposit) {
+    public void updataCashierAndRenterDeposit(NotifyDataVo notifyDataVo, PayedOrderRenterDepositReqVO payedOrderRenterDeposit) {
         //1更新收银台
-        updataCashier(orderPayAsynVO);
+        updataCashier(notifyDataVo);
         //2 租车押金 更新数据
         accountRenterDepositService.updateRenterDeposit(payedOrderRenterDeposit);
 
     }
     /**
      * 违章押金 收银台回调
-     * @param orderPayAsynVO
+     * @param notifyDataVo
      * @param payedOrderRenterWZDeposit
      */
-    public void updataCashierAndRenterWzDeposit(OrderPayAsynResVO orderPayAsynVO, PayedOrderRenterWZDepositReqVO payedOrderRenterWZDeposit) {
+    public void updataCashierAndRenterWzDeposit(NotifyDataVo notifyDataVo, PayedOrderRenterWZDepositReqVO payedOrderRenterWZDeposit) {
         //1更新收银台
-        updataCashier(orderPayAsynVO);
+        updataCashier(notifyDataVo);
         //2 违章押金 更新数据
         accountRenterWzDepositService.updateRenterWZDeposit(payedOrderRenterWZDeposit);
     }
 
     /**
      * 租车费用/补付租车费用
-     * @param orderPayAsynVO
+     * @param notifyDataVo
      * @param accountRenterCostReq
      */
-    public void updataCashierAndRenterCost(OrderPayAsynResVO orderPayAsynVO,AccountRenterCostReqVO accountRenterCostReq) {
+    public void updataCashierAndRenterCost(NotifyDataVo notifyDataVo,AccountRenterCostReqVO accountRenterCostReq) {
         //1更新收银台
-        updataCashier(orderPayAsynVO);
+        updataCashier(notifyDataVo);
         //2  实收租车费用落库 更新数据
         accountRenterCostSettleService.insertRenterCostDetail(accountRenterCostReq);
     }

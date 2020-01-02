@@ -105,7 +105,7 @@ public class MemberService {
                 MemberFlagEnum memberFlagEnum = MemberFlagEnum.getRightByIndex(memberRoleInfo.getMemberFlag());
                 internalStaff.setRightCode(memberFlagEnum.getRightCode());
                 internalStaff.setRightName(memberFlagEnum.getRightName());
-                internalStaff.setRightValue(String.valueOf(memberRoleInfo.getMemberFlag()));
+                internalStaff.setRightValue("1");
                 internalStaff.setRightType(RightTypeEnum.MEMBER_FLAG.getCode());
                 internalStaff.setRightDesc("会员标识");
                 rights.add(internalStaff);
@@ -245,6 +245,7 @@ public class MemberService {
                 internalStaff.setRightCode(memberFlagEnum.getRightCode());
                 internalStaff.setRightName(memberFlagEnum.getRightName());
                 internalStaff.setRightType(RightTypeEnum.MEMBER_FLAG.getCode());
+                internalStaff.setRightValue("1");
                 internalStaff.setRightDesc("会员标识");
                 rights.add(internalStaff);
             }

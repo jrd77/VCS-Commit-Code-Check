@@ -137,8 +137,9 @@ public class RenterOrderCostHandleService {
      *
      * @param context              公共参数
      * @param getCarFeeCouponReqVO 送取服务券请求参数
+     * @return boolean
      */
-    public void handleGetCarFeeCoupon(DeductAndSubsidyContextDTO context,
+    public boolean handleGetCarFeeCoupon(DeductAndSubsidyContextDTO context,
                                       MemAvailCouponRequestVO getCarFeeCouponReqVO) {
         OrderCouponDTO getCarFeeCoupon =
                 renterOrderCalCostService.calGetAndReturnSrvCouponDeductInfo(getCarFeeCouponReqVO);
@@ -158,8 +159,11 @@ public class RenterOrderCostHandleService {
             getCarFeeCouponSubsidyInfo.setOrderNo(context.getOrderNo());
             getCarFeeCouponSubsidyInfo.setRenterOrderNo(context.getRenterOrderNo());
             context.getOrderSubsidyDetailList().add(getCarFeeCouponSubsidyInfo);
+
+            return true;
         }
 
+        return false;
     }
 
     /**
@@ -168,8 +172,9 @@ public class RenterOrderCostHandleService {
      * @param context                     公共参数
      * @param renterOrderResVO            租客订单返回信息
      * @param ownerCouponGetAndValidReqVO 车主券请求参数
+     * @return boolean
      */
-    public void handleOwnerCoupon(DeductAndSubsidyContextDTO context,
+    public boolean handleOwnerCoupon(DeductAndSubsidyContextDTO context,
                                   OwnerCouponGetAndValidReqVO ownerCouponGetAndValidReqVO, RenterOrderResVO renterOrderResVO) {
 
         OrderCouponDTO ownerCoupon = renterOrderCalCostService.calOwnerCouponDeductInfo(ownerCouponGetAndValidReqVO);
@@ -189,8 +194,11 @@ public class RenterOrderCostHandleService {
             ownerCouponSubsidyInfo.setOrderNo(context.getOrderNo());
             ownerCouponSubsidyInfo.setRenterOrderNo(context.getRenterOrderNo());
             context.getOrderSubsidyDetailList().add(ownerCouponSubsidyInfo);
+
+            return true;
         }
 
+        return false;
     }
 
     /**
@@ -198,8 +206,9 @@ public class RenterOrderCostHandleService {
      *
      * @param context    公共参数
      * @param reductiAmt 限时红包面额
+     * @return boolean
      */
-    public void handleLimitRed(DeductAndSubsidyContextDTO context, int reductiAmt) {
+    public boolean handleLimitRed(DeductAndSubsidyContextDTO context, int reductiAmt) {
         RenterOrderSubsidyDetailDTO limitRedSubsidyInfo =
                 renterOrderSubsidyDetailService.calLimitRedSubsidyInfo(Integer.valueOf(context.getMemNo()),
                         context.getSurplusRentAmt(), reductiAmt);
@@ -211,7 +220,11 @@ public class RenterOrderCostHandleService {
             limitRedSubsidyInfo.setOrderNo(context.getOrderNo());
             limitRedSubsidyInfo.setRenterOrderNo(context.getRenterOrderNo());
             context.getOrderSubsidyDetailList().add(limitRedSubsidyInfo);
+
+            return true;
         }
+
+        return false;
     }
 
     /**
@@ -219,8 +232,9 @@ public class RenterOrderCostHandleService {
      *
      * @param context             公共参数
      * @param platformCouponReqVO 平台优惠券请求参数
+     * @return boolean
      */
-    public void handlePlatformCoupon(DeductAndSubsidyContextDTO context, MemAvailCouponRequestVO platformCouponReqVO) {
+    public boolean handlePlatformCoupon(DeductAndSubsidyContextDTO context, MemAvailCouponRequestVO platformCouponReqVO) {
         platformCouponReqVO.setRentAmt(context.getSurplusRentAmt());
         platformCouponReqVO.setSrvReturnCost(context.getSrvGetCost());
         platformCouponReqVO.setSrvGetCost(context.getSrvReturnCost());
@@ -239,8 +253,11 @@ public class RenterOrderCostHandleService {
             platformCouponSubsidyInfo.setOrderNo(context.getOrderNo());
             platformCouponSubsidyInfo.setRenterOrderNo(context.getRenterOrderNo());
             context.getOrderSubsidyDetailList().add(platformCouponSubsidyInfo);
+
+            return true;
         }
 
+        return false;
     }
 
     /**
@@ -249,8 +266,9 @@ public class RenterOrderCostHandleService {
      * @param context     公共参数
      * @param memNo       租客会员注册号
      * @param useAutoCoin 使用凹凸币标识
+     * @return int
      */
-    public void handleAutoCoin(DeductAndSubsidyContextDTO context, Integer memNo, Integer useAutoCoin) {
+    public int handleAutoCoin(DeductAndSubsidyContextDTO context, Integer memNo, Integer useAutoCoin) {
         AutoCoinResponseVO crmCustPoint = autoCoinService.getCrmCustPoint(memNo);
         RenterOrderSubsidyDetailDTO autoCoinSubsidyInfo = renterOrderSubsidyDetailService.calAutoCoinSubsidyInfo(crmCustPoint,
                 context.getOriginalRentAmt(), context.getSurplusRentAmt(), useAutoCoin);
@@ -258,8 +276,11 @@ public class RenterOrderCostHandleService {
             autoCoinSubsidyInfo.setOrderNo(context.getOrderNo());
             autoCoinSubsidyInfo.setRenterOrderNo(context.getRenterOrderNo());
             context.getOrderSubsidyDetailList().add(autoCoinSubsidyInfo);
+
+            return null == autoCoinSubsidyInfo.getSubsidyAmount() ? 0 : autoCoinSubsidyInfo.getSubsidyAmount();
         }
 
+        return 0;
     }
 
 }
