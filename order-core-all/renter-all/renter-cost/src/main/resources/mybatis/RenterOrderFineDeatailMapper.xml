@@ -242,4 +242,10 @@
       </foreach>
      </insert>
   	
+  	<update id="deleteGetReturnFineAfterAgree" >
+		update renter_order_fine_deatail 
+		set `remark` = #{remark},
+		`is_delete` = 1
+		where id = #{id}
+	</update>
 </mapper>

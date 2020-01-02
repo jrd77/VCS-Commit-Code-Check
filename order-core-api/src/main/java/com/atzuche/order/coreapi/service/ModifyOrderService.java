@@ -88,6 +88,8 @@ public class ModifyOrderService {
 	private ModifyOrderForRenterService modifyOrderForRenterService;
 	@Autowired
 	private OrderSupplementDetailService orderSupplementDetailService;
+	@Autowired
+	private ModifyOrderConfirmService modifyOrderConfirmService;
 
 	/**
 	 * 修改订单主逻辑
@@ -158,7 +160,7 @@ public class ModifyOrderService {
 		// 计算补付金额
 		Integer supplementAmt = getRenterSupplementAmt(modifyOrderDTO, initRenterOrder, renterOrderCostRespDTO, renterFineList);
 		// 修改后处理方法
-		modifyPostProcess(modifyOrderDTO, initRenterOrder, supplementAmt);
+		modifyPostProcess(modifyOrderDTO, renterOrderNew, initRenterOrder, supplementAmt, renterOrderCostRespDTO.getRenterOrderSubsidyDetailDTOList());
 		
 		return ResponseData.success();
 	}
@@ -170,20 +172,16 @@ public class ModifyOrderService {
 	 * @param initRenterOrder
 	 * @param supplementAmt
 	 */
-	public void modifyPostProcess(ModifyOrderDTO modifyOrderDTO, RenterOrderEntity initRenterOrder, Integer supplementAmt) {
+	public void modifyPostProcess(ModifyOrderDTO modifyOrderDTO, RenterOrderEntity renterOrderNew, RenterOrderEntity initRenterOrder, Integer supplementAmt, List<RenterOrderSubsidyDetailDTO> renterOrderSubsidyDetailDTOList) {
 		// 管理后台操作标记
 		Boolean consoleFlag = modifyOrderDTO.getConsoleFlag();
 		if (consoleFlag != null && consoleFlag) {
 			// 直接同意
-			modifyOrderForRenterService.updateRenterOrderStatus(modifyOrderDTO.getOrderNo(), modifyOrderDTO.getRenterOrderNo(), initRenterOrder);
-			/*
-			 * if (supplementAmt != null && supplementAmt > 0) { // 增加管理后台修改订单补付
-			 * orderSupplementDetailService.saveOrderSupplementDetail(supplementEntity); }
-			 */
+			modifyOrderConfirmService.agreeModifyOrder(modifyOrderDTO, renterOrderNew, initRenterOrder, renterOrderSubsidyDetailDTOList);
 		} else {
 			if (supplementAmt != null && supplementAmt <= 0) {
 				// 不需要补付
-				modifyOrderForRenterService.supplementPayPostProcess(modifyOrderDTO.getOrderNo(), modifyOrderDTO.getRenterOrderNo());
+				modifyOrderForRenterService.supplementPayPostProcess(modifyOrderDTO.getOrderNo(), modifyOrderDTO.getRenterOrderNo(), modifyOrderDTO, renterOrderSubsidyDetailDTOList);
 			}
 		}
 	}
@@ -437,7 +435,7 @@ public class ModifyOrderService {
 		renterOrderNew.setExpRevertTime(modifyOrderDTO.getRevertTime());
 		renterOrderNew.setRenterOrderNo(modifyOrderDTO.getRenterOrderNo());
 		renterOrderNew.setId(null);
-		renterOrderNew.setChildStatus(RenterOrderStatusEnum.WAIT_PAY.getCode());
+		renterOrderNew.setChildStatus(RenterChildStatusEnum.PROCESS_ING.getCode());
 		renterOrderNew.setIsUseCoin(modifyOrderDTO.getUserCoinFlag());
 		if (StringUtils.isNotBlank(modifyOrderDTO.getCarOwnerCouponId()) || 
 				StringUtils.isNotBlank(modifyOrderDTO.getPlatformCouponId()) || 
