@@ -29,4 +29,5 @@ public class RenterOrderWzDetailService {
     int updateFeeByWzCode(RenterOrderWzDetailEntity illegal){
         return renterOrderWzDetailMapper.updateFeeByWzCode(illegal);
     }
+
 }

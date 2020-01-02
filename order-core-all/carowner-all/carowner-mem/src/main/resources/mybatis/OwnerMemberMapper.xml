@@ -172,4 +172,11 @@
         where owner_order_no=#{ownerOrderNo} and is_delete = 0 limit 1
     </select>
 
+    <select id="getOwnerNoByOrderNo" resultType="java.lang.String" parameterType="java.lang.String">
+        select
+            mem_no
+        from owner_member
+        where order_no = #{orderNo} and is_delete = 0 order by id desc limit 1
+    </select>
+
 </mapper>

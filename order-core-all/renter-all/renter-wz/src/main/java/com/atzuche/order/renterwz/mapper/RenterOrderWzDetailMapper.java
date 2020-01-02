@@ -70,4 +70,5 @@ public interface RenterOrderWzDetailMapper{
 	 * @return 修改成功的数量
 	 */
 	int updateFeeByWzCode(RenterOrderWzDetailEntity illegal);
+
 }
