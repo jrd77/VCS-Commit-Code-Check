@@ -109,7 +109,7 @@
 	
 	<insert id="saveRenterOrderFineDeatail" parameterType="com.atzuche.order.rentercost.entity.RenterOrderFineDeatailEntity" useGeneratedKeys="true" keyProperty="id">
 		insert into renter_order_fine_deatail
-		(
+        <trim prefix="(" suffix=")" suffixOverrides="," >
 				<if test="orderNo != null">`order_no`, </if>
 				<if test="renterOrderNo != null">`renter_order_no`, </if>
 				<if test="memNo != null">`mem_no`, </if>
@@ -130,9 +130,8 @@
 				<if test="updateTime != null">`update_time`, </if>
 				<if test="updateOp != null">`update_op`, </if>
 				<if test="isDelete != null">`is_delete` </if>
-			)
-		values
-		(
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides="," >
 				<if test="orderNo != null">#{orderNo},  </if>
 				<if test="renterOrderNo != null">#{renterOrderNo},  </if>
 				<if test="memNo != null">#{memNo},  </if>
@@ -153,7 +152,7 @@
 				<if test="updateTime != null">#{updateTime},  </if>
 				<if test="updateOp != null">#{updateOp},  </if>
 				<if test="isDelete != null">#{isDelete} </if>
-			)
+        </trim>
 	</insert>
 	
 	 

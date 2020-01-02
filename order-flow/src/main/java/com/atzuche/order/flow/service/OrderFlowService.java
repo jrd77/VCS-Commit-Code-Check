@@ -1,6 +1,6 @@
 package com.atzuche.order.flow.service;
 
-import com.atzuche.order.commons.OrderStatus;
+import com.atzuche.order.commons.enums.OrderStatusEnum;
 import com.atzuche.order.flow.entity.OrderFlowEntity;
 import com.atzuche.order.flow.mapper.OrderFlowMapper;
 import org.slf4j.Logger;
@@ -25,7 +25,7 @@ public class OrderFlowService {
     private OrderFlowMapper orderFlowMapper;
 
 
-    public void inserOrderStatusChangeProcessInfo(String orderNo, OrderStatus orderStatus) {
+    public void inserOrderStatusChangeProcessInfo(String orderNo, OrderStatusEnum orderStatus) {
         LOGGER.info("Add order status change records. param is >> orderNo:[{}],orderStatus:[{}]", orderNo, orderStatus);
         OrderFlowEntity record = new OrderFlowEntity();
         record.setOrderNo(orderNo);
