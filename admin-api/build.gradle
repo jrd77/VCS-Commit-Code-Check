@@ -12,7 +12,10 @@ buildscript {
 
 apply plugin: 'dependency-management'
 apply plugin: 'org.springframework.boot'
+apply plugin: 'application'
 apply plugin: 'war'
+
+mainClassName = 'com.autoyol.doc.parser.autodoc.AutoDocParser'
 
 group 'com.atzuche'
 version '0.0.1-SNAPSHOT'

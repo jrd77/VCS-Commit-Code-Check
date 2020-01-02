@@ -16,9 +16,6 @@ apply plugin: 'application'
 apply plugin: 'war'
 
 mainClassName = 'com.autoyol.doc.parser.autodoc.AutoDocParser'
-springBoot {
-    mainClass = "com.autoyol.member.detail.MemberDetailServiceApplication"
-}
 
 
 
