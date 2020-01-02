@@ -8,6 +8,7 @@ import com.atzuche.config.common.entity.CarGpsRuleEntity;
 import com.atzuche.config.common.entity.OilAverageCostEntity;
 import com.atzuche.config.common.entity.SysConfigEntity;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,6 +17,7 @@ import java.util.List;
  * @author <a href="mailto:lianglin.sjtu@gmail.com">AndySjtu</a>
  * @date 2020/1/1 3:36 下午
  **/
+@Service
 public class OilAverageCostConfigSDK {
     @Autowired
     private ConfigSDKFactory sdkFactory;

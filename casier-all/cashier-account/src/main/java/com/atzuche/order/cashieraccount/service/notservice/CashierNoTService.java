@@ -172,6 +172,7 @@ public class CashierNoTService {
      */
     public PayedOrderRenterDepositReqVO getPayedOrderRenterDepositReq(NotifyDataVo notifyDataVo) {
         PayedOrderRenterDepositReqVO vo = new PayedOrderRenterDepositReqVO();
+        DetainRenterDepositReqVO detainRenterDeposit = new DetainRenterDepositReqVO();
         BeanUtils.copyProperties(notifyDataVo,vo);
         vo.setPayStatus(PayStatusEnum.PAYED.getCode());
         int transStatus = StringUtil.isBlank(notifyDataVo.getTransStatus())?0:Integer.parseInt(notifyDataVo.getTransStatus());
@@ -183,15 +184,15 @@ public class CashierNoTService {
             vo.setShifuDepositAmt(settleAmount);
             vo.setSurplusDepositAmt(settleAmount);
         }
-        //"02"：预授权
+        //"02"：预授权 TODO 预授权到期时间 （分为信用 和 芝麻）
         if(DataPayTypeConstant.PAY_PRE.equals(notifyDataVo.getPayType())){
             Integer settleAmount = notifyDataVo.getSettleAmount()==null?0:Integer.parseInt(notifyDataVo.getSettleAmount());
             vo.setAuthorizeDepositAmt(settleAmount);
             vo.setSurplusAuthorizeDepositAmt(settleAmount);
+            detainRenterDeposit.setAuthorizeExpireTime(LocalDateTimeUtils.getDateAfter(vo.getPayTime(),30));
         }
         //TODO 预授权到期时间
         //车辆押金进出明细
-        DetainRenterDepositReqVO detainRenterDeposit = new DetainRenterDepositReqVO();
         BeanUtils.copyProperties(notifyDataVo,detainRenterDeposit);
         Integer settleAmount = notifyDataVo.getSettleAmount()==null?0:Integer.parseInt(notifyDataVo.getSettleAmount());
         detainRenterDeposit.setAmt(settleAmount);
@@ -313,8 +314,8 @@ public class CashierNoTService {
         int num = 1;
         if (!CollectionUtils.isEmpty(payKinds)) {
             //1 钱包 优先抵扣  支付租车费用
-            if (payKinds.contains(DataPayKindConstant.TK_FEE)) {
-                CashierEntity cashierEntity = cashierMapper.getPayDetail(orderPaySign.getOrderNo(),orderPaySign.getMenNo(),DataPayKindConstant.TK_FEE,DataPayTypeConstant.PAY_PUR,"00");
+            if (payKinds.contains(DataPayKindConstant.RENT_AMOUNT)) {
+                CashierEntity cashierEntity = cashierMapper.getPayDetail(orderPaySign.getOrderNo(),orderPaySign.getMenNo(),DataPayKindConstant.RENT_AMOUNT,DataPayTypeConstant.PAY_PUR,"00");
                 if(Objects.nonNull(cashierEntity) && Objects.nonNull(cashierEntity.getPaySn())){
                     num = cashierEntity.getPaySn() + 1;
                 }
@@ -338,9 +339,9 @@ public class CashierNoTService {
         vo.setMemNo(orderPaySign.getMenNo());
         vo.setOrderNo(orderPaySign.getOrderNo());
         vo.setOpenId(orderPaySign.getOpenId());
-        vo.setOS(orderPaySign.getOS());
+        vo.setReqOs(orderPaySign.getReqOs());
         vo.setPayAmt(String.valueOf(Math.abs(payVO.getAmt())));
-        vo.setPayEnv(StringUtil.isBlank(orderPaySign.getPayEnv())? DataPayEnvConstant.PRO:orderPaySign.getPayEnv());
+        vo.setPayEnv(getPayEnv());
         vo.setPayId(cashierEntity.getId().toString());
         vo.setPayKind(payKind);
         vo.setPaySn(String.valueOf(cashierEntity.getPaySn()+1));
@@ -352,6 +353,15 @@ public class CashierNoTService {
         return vo;
     }
 
+    /**
+     * 获取支付环境
+     * @return
+     */
+    public String getPayEnv(){
+        String m_env = System.getProperty("env");
+        m_env = StringUtil.isBlank(m_env)?System.getProperty("ENV"):m_env;
+        return m_env;
+    }
 
     /**
      * 租车押金 收银台回调
@@ -396,33 +406,11 @@ public class CashierNoTService {
      * @return
      */
     public String getCashierRentCostPaySn(String orderNo, String menNo) {
-        List<CashierEntity> sashierEntitys = cashierMapper.getCashierRentCosts(orderNo,menNo,DataPayKindConstant.TK_FEE,DataPayTypeConstant.PAY_PUR);
+        List<CashierEntity> sashierEntitys = cashierMapper.getCashierRentCosts(orderNo,menNo,DataPayKindConstant.RENT_AMOUNT,DataPayTypeConstant.PAY_PUR);
         if(CollectionUtils.isEmpty(sashierEntitys)){
             return "1";
         }
         return String.valueOf(sashierEntitys.size()+1);
-    }
-
-    /**
-     * 支付参数MD5加密作为 幂等字段
-     * @param vo
-     * @return
-     */
-    public String getPayMd5ByPayVo(PayVo vo) {
-        String reqContent = FasterJsonUtil.toJson(vo);
-        String md5 =  MD5.MD5Encode(reqContent);
-        return md5;
-    }
-
-    /**
-     *  退款参数MD5加密作为 幂等字段
-     * @param refundVo
-     * @return
-     */
-    public String getPayMd5ByRefundVo(RefundVo refundVo) {
-        String reqContent = FasterJsonUtil.toJson(refundVo);
-        String md5 =  MD5.MD5Encode(reqContent);
-        return md5;
     }
 
     /**
@@ -438,16 +426,16 @@ public class CashierNoTService {
                 for(int i=0;i<payVos.size();i++){
                     PayVo payVo = payVos.get(i);
                     String reqContent = FasterJsonUtil.toJson(payVo);
-                    //TODO 签名串
-                    String sign = RSASecurityUtils.privateKeySignature(PublicKeySignConstants.AUTO_TRANS_PUBLIC_KEY,reqContent);
+                    //公钥加密
+                    String sign = RSASecurityUtils.privateKeySignature(PublicKeySignConstants.AUTO_PAYSYS_PUBLIC_KEY,reqContent);
                     payVo.setAtpaySign(sign);
                 }
             }
             BatchPayVo bpv = new BatchPayVo();
             bpv.setLstPayVo(payVos);
             String reqContents = FasterJsonUtil.toJson(bpv);
-            //TODO 私钥 串
-            signs = AESSecurityUtils.encrypt(PublicKeySignConstants.AUTO_TRANS_PUBLIC_KEY,reqContents);
+            //公钥加密
+            signs = AESSecurityUtils.encrypt(PublicKeySignConstants.AUTO_PAYSYS_PUBLIC_KEY,reqContents);
         } catch (Exception e) {
             log.error("getPaySignByPayVos 支付验签数据失败 ，param ;[{}],e:[{}]",FasterJsonUtil.toJson(payVos),e);
             throw new OrderPaySignParamException();
@@ -462,7 +450,7 @@ public class CashierNoTService {
      */
     public void insertRenterCostByWallet(OrderPaySignReqVO orderPaySign, int amtWallet) {
        //1查询 收银台保存 钱包支付信息
-        CashierEntity cashierEntity = cashierMapper.getPayDeposit(orderPaySign.getOrderNo(),orderPaySign.getMenNo(),DataPayKindConstant.TK_FEE,DataPayTypeConstant.PAY_PUR);
+        CashierEntity cashierEntity = cashierMapper.getPayDeposit(orderPaySign.getOrderNo(),orderPaySign.getMenNo(),DataPayKindConstant.RENT_AMOUNT,DataPayTypeConstant.PAY_PUR);
         int result = 0;
         int cashierId=0;
         RenterCashCodeEnum renterCashCodeEnum = RenterCashCodeEnum.ACCOUNT_RENTER_RENT_COST;
@@ -481,7 +469,7 @@ public class CashierNoTService {
             cashier.setPayAmt(amtWallet);
             cashier.setPaySource(PaySourceEnum.WALLET_PAY.getCode());
             cashier.setPayTitle("订单号：" + orderPaySign.getOrderNo() + "钱包支付金额：" + amtWallet + "元");
-            cashier.setPayKind(DataPayKindConstant.TK_FEE);
+            cashier.setPayKind(DataPayKindConstant.RENT_AMOUNT);
             cashier.setPayType(DataPayTypeConstant.PAY_PUR);
             cashier.setAtappId(DataAppIdConstant.APPID_SHORTRENT);
             cashier.setTransStatus("00");
@@ -524,7 +512,7 @@ public class CashierNoTService {
         refundVo.setPaySn(String.valueOf(cashierRefundApply.getNum()+1));
         refundVo.setExtendParams(GsonUtils.toJson(cashierRefundApply));
         refundVo.setAtpaySign(StringUtils.EMPTY);
-        String payMd5 = getPayMd5ByRefundVo(refundVo);
+        String payMd5 =  MD5.MD5Encode(FasterJsonUtil.toJson(refundVo));
         refundVo.setPayMd5(payMd5);
         String reqContent = FasterJsonUtil.toJson(refundVo);
         //TODO 签名串
