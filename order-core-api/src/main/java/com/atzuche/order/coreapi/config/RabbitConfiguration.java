@@ -136,4 +136,9 @@ public class RabbitConfiguration {
 		return BindingBuilder.bind(wzResultFeedBackQueue()).to(wzResultFeedBackExchange()).with(RabbitMqEnums.WZ_RESULT_FEEDBACK.getRoutingKey());
 	}
 
+	@Bean
+	public Queue handoverCarQueue() {
+		return new Queue("handover_car_queue", true);
+	}
+
 }

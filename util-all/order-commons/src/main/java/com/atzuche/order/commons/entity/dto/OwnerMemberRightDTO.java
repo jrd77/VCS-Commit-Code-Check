@@ -28,4 +28,8 @@ public class OwnerMemberRightDTO {
      * 权益描述
      */
     private String rightDesc;
+    /**
+     * 权益类别
+     */
+    private Integer rightType;
 }

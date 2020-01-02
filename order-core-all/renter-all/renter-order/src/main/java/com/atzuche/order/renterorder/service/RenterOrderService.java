@@ -11,10 +11,7 @@ import com.atzuche.order.renterorder.entity.dto.DeductAndSubsidyContextDTO;
 import com.atzuche.order.renterorder.entity.dto.RenterOrderCostReqDTO;
 import com.atzuche.order.renterorder.entity.dto.RenterOrderCostRespDTO;
 import com.atzuche.order.renterorder.mapper.RenterOrderMapper;
-import com.atzuche.order.renterorder.vo.RenterOrderCarDepositResVO;
-import com.atzuche.order.renterorder.vo.RenterOrderIllegalResVO;
-import com.atzuche.order.renterorder.vo.RenterOrderReqVO;
-import com.atzuche.order.renterorder.vo.RenterOrderResVO;
+import com.atzuche.order.renterorder.vo.*;
 import com.atzuche.order.renterorder.vo.owner.OwnerCouponGetAndValidReqVO;
 import com.atzuche.order.renterorder.vo.platform.MemAvailCouponRequestVO;
 import org.apache.commons.lang3.StringUtils;
@@ -126,25 +123,28 @@ public class RenterOrderService {
         MemAvailCouponRequestVO getCarFeeCouponReqVO = buildMemAvailCouponRequestVO(renterOrderCostRespDTO,
                 renterOrderReqVO);
         getCarFeeCouponReqVO.setDisCouponId(renterOrderReqVO.getGetCarFreeCouponId());
-        renterOrderCostHandleService.handleGetCarFeeCoupon(context, getCarFeeCouponReqVO);
+        boolean isUseGetCarFeeCoupon = renterOrderCostHandleService.handleGetCarFeeCoupon(context,
+                getCarFeeCouponReqVO);
 
         //3. 车主券抵扣信息及补贴明细
         OwnerCouponGetAndValidReqVO ownerCouponGetAndValidReqVO = buildOwnerCouponGetAndValidReqVO(renterOrderReqVO,
                 getCarFeeCouponReqVO.getRentAmt());
-        renterOrderCostHandleService.handleOwnerCoupon(context, ownerCouponGetAndValidReqVO, renterOrderResVO);
+        boolean isUseOwnerCoupon = renterOrderCostHandleService.handleOwnerCoupon(context, ownerCouponGetAndValidReqVO,
+                renterOrderResVO);
 
         //4. 限时红包补贴明细
         int reductiAmt = null == renterOrderReqVO.getReductiAmt() ? 0 : renterOrderReqVO.getReductiAmt();
-        renterOrderCostHandleService.handleLimitRed(context, reductiAmt);
+        boolean isUseLimitRed = renterOrderCostHandleService.handleLimitRed(context, reductiAmt);
 
         //5. 平台优惠券抵扣及补贴明细
         MemAvailCouponRequestVO platformCouponReqVO = buildMemAvailCouponRequestVO(renterOrderCostRespDTO,
                 renterOrderReqVO);
         platformCouponReqVO.setDisCouponId(renterOrderReqVO.getDisCouponIds());
-        renterOrderCostHandleService.handlePlatformCoupon(context, platformCouponReqVO);
+        boolean isUsePlatformCoupon = renterOrderCostHandleService.handlePlatformCoupon(context, platformCouponReqVO);
 
         //6. 凹凸币补贴明细
-        renterOrderCostHandleService.handleAutoCoin(context, Integer.valueOf(renterOrderReqVO.getMemNo()),
+        int chargeAutoCoin = renterOrderCostHandleService.handleAutoCoin(context,
+               renterOrderReqVO.getMemNo(),
                 renterOrderReqVO.getUseAutoCoin());
 
         //7. 车辆押金
@@ -198,6 +198,16 @@ public class RenterOrderService {
         Optional<RenterOrderCostDetailEntity> renterOrderCostDetailEntityOptional =
                 renterOrderCostRespDTO.getRenterOrderCostDetailDTOList().stream().filter(costDetail -> StringUtils.equals(costDetail.getCostCode(),RenterCashCodeEnum.RENT_AMT.getCashNo())).findFirst();
         renterOrderResVO.setRentAmtEntity(renterOrderCostDetailEntityOptional.orElse(null));
+
+        //凹凸币、优惠券使用情况返回
+        CouponAndAutoCoinResVO couponAndAutoCoinResVO = new CouponAndAutoCoinResVO();
+        couponAndAutoCoinResVO.setChargeAutoCoin(chargeAutoCoin);
+        couponAndAutoCoinResVO.setIsUseGetCarFeeCoupon(isUseGetCarFeeCoupon);
+        couponAndAutoCoinResVO.setIsUseOwnerCoupon(isUseOwnerCoupon);
+        couponAndAutoCoinResVO.setIsUsePlatformCoupon(isUsePlatformCoupon);
+        couponAndAutoCoinResVO.setRentAmt(renterOrderCostRespDTO.getRentAmount());
+
+        renterOrderResVO.setCouponAndAutoCoinResVO(couponAndAutoCoinResVO);
         return renterOrderResVO;
     }
 
@@ -215,7 +225,7 @@ public class RenterOrderService {
         costBaseDTO.setStartTime(renterOrderReqVO.getRevertTime());
         costBaseDTO.setOrderNo(renterOrderReqVO.getOrderNo());
         costBaseDTO.setRenterOrderNo(renterOrderReqVO.getRenterOrderNo());
-        costBaseDTO.setMemNo(renterOrderReqVO.getMemNo());
+        costBaseDTO.setMemNo(renterOrderReqVO.getMemNo().toString());
 
         //租金计算相关信息
         RentAmtDTO rentAmtDTO = new RentAmtDTO();
@@ -241,6 +251,7 @@ public class RenterOrderService {
         abatementAmtDTO.setReturnCarAfterTime(renterOrderReqVO.getReturnCarAfterTime());
         abatementAmtDTO.setInmsrp(renterOrderReqVO.getInmsrp());
         abatementAmtDTO.setGuidPrice(renterOrderReqVO.getGuidPrice());
+        abatementAmtDTO.setIsAbatement(StringUtils.equals(renterOrderReqVO.getAbatement(),"1"));
 
         //附加驾驶人险计算相关信息
         ExtraDriverDTO extraDriverDTO = new ExtraDriverDTO();
@@ -259,13 +270,17 @@ public class RenterOrderService {
         getReturnCarCostReqDto.setSrvGetLon(renterOrderReqVO.getSrvGetLon());
         getReturnCarCostReqDto.setSrvReturnLon(renterOrderReqVO.getSrvReturnLon());
         getReturnCarCostReqDto.setSrvReturnLat(renterOrderReqVO.getSrvReturnLat());
-        getReturnCarCostReqDto.setIsPackageOrder(false);
+        getReturnCarCostReqDto.setIsPackageOrder(StringUtils.equals("2",renterOrderReqVO.getOrderCategory()));
+        getReturnCarCostReqDto.setIsGetCarCost(null != renterOrderReqVO.getSrvGetFlag() && StringUtils.equals("1",
+                renterOrderReqVO.getSrvGetFlag().toString()));
+        getReturnCarCostReqDto.setIsReturnCarCost(null != renterOrderReqVO.getSrvReturnFlag() && StringUtils.equals("1",
+                renterOrderReqVO.getSrvReturnFlag().toString()));
 
         //超运能溢价计算相关信息
         GetReturnCarOverCostReqDto getReturnCarOverCostReqDto = new GetReturnCarOverCostReqDto();
         getReturnCarOverCostReqDto.setCostBaseDTO(costBaseDTO);
         getReturnCarOverCostReqDto.setCityCode(Integer.valueOf(renterOrderReqVO.getCityCode()));
-        getReturnCarOverCostReqDto.setOrderType(1);
+        getReturnCarOverCostReqDto.setOrderType(Integer.valueOf(renterOrderReqVO.getOrderCategory()));
 
         //租车费用计算相关参数
         RenterOrderCostReqDTO renterOrderCostReqDTO = new RenterOrderCostReqDTO();
@@ -288,13 +303,13 @@ public class RenterOrderService {
      * @param renterOrderReqVO       租客订单请求信息
      * @return MemAvailCouponRequestVO 优惠券请求信息
      */
-    private MemAvailCouponRequestVO buildMemAvailCouponRequestVO(RenterOrderCostRespDTO renterOrderCostRespDTO,
+    public MemAvailCouponRequestVO buildMemAvailCouponRequestVO(RenterOrderCostRespDTO renterOrderCostRespDTO,
                                                                  RenterOrderReqVO renterOrderReqVO) {
 
         MemAvailCouponRequestVO memAvailCouponRequestVO = new MemAvailCouponRequestVO();
 
-        memAvailCouponRequestVO.setMemNo(Integer.valueOf(renterOrderReqVO.getMemNo()));
-        memAvailCouponRequestVO.setCarNo(renterOrderReqVO.getCarNo());
+        memAvailCouponRequestVO.setMemNo(renterOrderReqVO.getMemNo());
+        memAvailCouponRequestVO.setCarNo(Integer.valueOf(renterOrderReqVO.getCarNo()));
         memAvailCouponRequestVO.setCityCode(Integer.valueOf(renterOrderReqVO.getCityCode()));
         memAvailCouponRequestVO.setIsNew(renterOrderReqVO.getIsNew());
         memAvailCouponRequestVO.setRentAmt(renterOrderCostRespDTO.getRentAmount());
@@ -326,10 +341,10 @@ public class RenterOrderService {
      * @param rentAmt          原始租金(车主券优先级最高)
      * @return OwnerCouponGetAndValidReqVO 车主券请求参数
      */
-    private OwnerCouponGetAndValidReqVO buildOwnerCouponGetAndValidReqVO(RenterOrderReqVO renterOrderReqVO,
+    public OwnerCouponGetAndValidReqVO buildOwnerCouponGetAndValidReqVO(RenterOrderReqVO renterOrderReqVO,
                                                                          int rentAmt) {
         OwnerCouponGetAndValidReqVO ownerCouponGetAndValidReqVO = new OwnerCouponGetAndValidReqVO();
-        ownerCouponGetAndValidReqVO.setCarNo(renterOrderReqVO.getCarNo());
+        ownerCouponGetAndValidReqVO.setCarNo(Integer.valueOf(renterOrderReqVO.getCarNo()));
         ownerCouponGetAndValidReqVO.setCouponNo(renterOrderReqVO.getCarOwnerCouponNo());
         ownerCouponGetAndValidReqVO.setRentAmt(rentAmt);
         ownerCouponGetAndValidReqVO.setMark(1);
@@ -358,11 +373,22 @@ public class RenterOrderService {
         DeductAndSubsidyContextDTO context = new DeductAndSubsidyContextDTO();
         context.setOrderNo(renterOrderReqVO.getOrderNo());
         context.setRenterOrderNo(renterOrderReqVO.getRenterOrderNo());
-        context.setMemNo(renterOrderReqVO.getMemNo());
+        context.setMemNo(renterOrderReqVO.getMemNo().toString());
         context.setOriginalRentAmt(renterOrderCostRespDTO.getRentAmount());
         context.setSurplusRentAmt(renterOrderCostRespDTO.getRentAmount());
         context.setOrderCouponList(couponList);
         context.setOrderSubsidyDetailList(subsidyList);
         return context;
     }
+    
+    /**
+     * 修改租客子单子状态
+     * @param id
+     * @param childStatus
+     * @return Integer
+     */
+    public Integer updateRenterOrderChildStatus(Integer id, Integer childStatus) {
+    	return renterOrderMapper.updateRenterOrderChildStatus(id, childStatus);
+    }
+
 }

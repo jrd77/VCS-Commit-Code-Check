@@ -224,6 +224,8 @@ config/build/resources/main/mybatis/
 config/build/
 config/out/
 
+config/config-server/build/
+order-log/build/
 order-core-all/build/
 order-core-all/carowner-all/build/
 order-core-all/carowner-all/carowner-commodity/build/

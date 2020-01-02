@@ -83,7 +83,7 @@ public class CashierEntity implements Serializable {
 	/**
 	 * 状态
 	 */
-	private Integer transStatus;
+	private String transStatus;
 	/**
 	 * 幂等字段
 	 */

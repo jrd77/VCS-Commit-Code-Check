@@ -35,6 +35,7 @@ import com.dianping.cat.message.Transaction;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -54,7 +55,7 @@ public class RenterOrderCostCombineService {
 	@Autowired
 	private RenterOrderFineDeatailService renterOrderFineDeatailService;
 	@Autowired
-	private OrderConsoleCostDetailService orderConsoleCostDetailService;
+	private OrderConsoleSubsidyDetailService orderConsoleSubsidyDetailService;
     @Autowired
     private FetchBackCarFeeFeignService fetchBackCarFeeFeignService;
     @Autowired
@@ -64,6 +65,13 @@ public class RenterOrderCostCombineService {
 
     @Autowired
     private GetBackCityLimitFeignApi getBackCityLimitFeignApi;
+
+    @Value("${auto.cost.getReturnOverTransportFee}")
+    private Integer getReturnOverTransportFee;
+    @Value("${auto.cost.nightBegin}")
+    private Integer nightBegin;
+    @Value("${auto.cost.nightEnd}")
+    private Integer nightEnd;
 
 
     private static final Integer [] ORDER_TYPES = {1,2};
@@ -458,19 +466,45 @@ public class RenterOrderCostCombineService {
 	 * 获取租客应付(正常订单流转)
 	 * @param orderNo 主订单号
 	 * @param renterOrderNo 租客订单号
+	 * @param memNo 会员号
 	 * @return Integer
 	 */
 	public PayableVO getPayable(String orderNo, String renterOrderNo, String memNo) {
+		// 租客应付
+		Integer payable = 0;
+		// 获取租客正常费用
+		Integer normalCost = getRenterNormalCost(orderNo, renterOrderNo);
+		if (normalCost != null) {
+			payable += normalCost;
+		}
+		// 获取全局费用
+		Integer globalCost = getRenterGlobalCost(orderNo, memNo);
+		if (globalCost != null) {
+			payable += globalCost;
+		}
+		PayableVO payableVO = new PayableVO();
+		payableVO.setAmt(payable);
+		payableVO.setOrderNo(orderNo);
+		payableVO.setTitle("修改订单补付");
+		payableVO.setType(1);
+		payableVO.setUniqueNo(renterOrderNo);
+		return payableVO;
+	}
+	
+	
+	/**
+	 * 获取租客正常应付
+	 * @param orderNo 主订单号
+	 * @param renterOrderNo 租客订单号
+	 * @return Integer
+	 */
+	public Integer getRenterNormalCost(String orderNo, String renterOrderNo) {
 		// 获取费用明细
 		List<RenterOrderCostDetailEntity> costList = renterOrderCostDetailService.listRenterOrderCostDetail(orderNo, renterOrderNo);
 		// 获取补贴明细
 		List<RenterOrderSubsidyDetailEntity> subsidyList = renterOrderSubsidyDetailService.listRenterOrderSubsidyDetail(orderNo, renterOrderNo);
 		// 罚金
 		List<RenterOrderFineDeatailEntity> fineList = renterOrderFineDeatailService.listRenterOrderFineDeatail(orderNo, renterOrderNo);
-		// 管理后台补贴
-		List<OrderConsoleCostDetailEntity> consoleCostList = orderConsoleCostDetailService.listOrderConsoleCostDetail(orderNo,memNo);
-		// 获取租客全局罚金
-		List<ConsoleRenterOrderFineDeatailEntity> consoleFineList = consoleRenterOrderFineDeatailService.listConsoleRenterOrderFineDeatail(orderNo, memNo);
 		Integer payable = 0;
 		if (costList != null && !costList.isEmpty()) {
 			payable += costList.stream().mapToInt(RenterOrderCostDetailEntity::getTotalAmount).sum();
@@ -481,19 +515,29 @@ public class RenterOrderCostCombineService {
 		if (fineList != null && !fineList.isEmpty()) {
 			payable += fineList.stream().mapToInt(RenterOrderFineDeatailEntity::getFineAmount).sum();
 		}
-		if (consoleCostList != null && !consoleCostList.isEmpty()) {
-			payable += consoleCostList.stream().mapToInt(OrderConsoleCostDetailEntity::getSubsidyAmount).sum();
+		return payable;
+	}
+	
+	
+	/**
+	 * 获取租客全局应付
+	 * @param orderNo 主订单号
+	 * @param memNo 会员号
+	 * @return Integer
+	 */
+	public Integer getRenterGlobalCost(String orderNo, String memNo) {
+		// 管理后台补贴
+		List<OrderConsoleSubsidyDetailEntity> consoleSubsidyList = orderConsoleSubsidyDetailService.listOrderConsoleSubsidyDetailByOrderNoAndMemNo(orderNo, memNo);
+		// 获取租客全局罚金
+		List<ConsoleRenterOrderFineDeatailEntity> consoleFineList = consoleRenterOrderFineDeatailService.listConsoleRenterOrderFineDeatail(orderNo, memNo);
+		Integer payable = 0;
+		if (consoleSubsidyList != null && !consoleSubsidyList.isEmpty()) {
+			payable += consoleSubsidyList.stream().mapToInt(OrderConsoleSubsidyDetailEntity::getSubsidyAmount).sum();
 		}
 		if (consoleFineList != null && !consoleFineList.isEmpty()) {
 			payable += consoleFineList.stream().mapToInt(ConsoleRenterOrderFineDeatailEntity::getFineAmount).sum();
 		}
-		PayableVO payableVO = new PayableVO();
-		payableVO.setAmt(payable);
-		payableVO.setOrderNo(orderNo);
-		payableVO.setTitle("修改订单补付");
-		payableVO.setType(1);
-		payableVO.setUniqueNo(renterOrderNo);
-		return payableVO;
+		return payable;
 	}
 	
 	
@@ -881,9 +925,6 @@ public class RenterOrderCostCombineService {
             List<Integer> orderTypeList = Arrays.asList(ORDER_TYPES);
             // 超运能后计算附加费标志
             Boolean isAddFee = orderTypeList.contains(getReturnCarOverCostReqDto.getOrderType());
-            //TODO apollo中获取配置参数
-            Integer nightBegin = 20/*Integer.valueOf(apolloCostConfig.getNightBeginStr())*/;
-            Integer nightEnd = 23/*Integer.valueOf(apolloCostConfig.getNightEndStr())*/;
             Integer overTransportFee = this.getGetReturnOverTransportFee(cityCode);
             String rentTimeLongStr = String.valueOf(LocalDateTimeUtils.localDateTimeToLong(rentTime));
 
@@ -1047,10 +1088,8 @@ public class RenterOrderCostCombineService {
             return responseData.getData().getHumanFee().intValue();
         }
         try {
-            //TODO  apollo获取配置信息
            // return Integer.valueOf(apolloCostConfig.getGetReturnOverTransportFee());
-            //TODO 给一个默认值，用于测试，测试后需要删除
-            return 50;
+            return getReturnOverTransportFee;
         } catch (Exception e) {
             log.error("获取取还车超运能溢价默认值异常：", e);
         }

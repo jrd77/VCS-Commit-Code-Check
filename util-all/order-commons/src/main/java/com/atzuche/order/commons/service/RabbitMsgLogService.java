@@ -40,8 +40,8 @@ public class RabbitMsgLogService{
         return rabbitMsgLog;
     }
 
-    public void updateConsume(String businessType,String uniqueNo){
-        rabbitMsgLogMapper.updateConsume(businessType,uniqueNo);
+    public void updateConsume(String uniqueNo){
+        rabbitMsgLogMapper.updateConsume(uniqueNo);
     }
 
 }

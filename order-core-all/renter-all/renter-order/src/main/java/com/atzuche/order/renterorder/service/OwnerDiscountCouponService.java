@@ -1,13 +1,18 @@
 package com.atzuche.order.renterorder.service;
 
+import com.alibaba.fastjson.JSON;
+import com.atzuche.order.commons.CatConstants;
 import com.atzuche.order.renterorder.vo.owner.OwnerCouponGetAndValidResultVO;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
+import com.dianping.cat.Cat;
+import com.dianping.cat.message.Transaction;
 import com.google.gson.Gson;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.Resource;
@@ -21,6 +26,7 @@ import java.util.Map;
  * @author pengcheng.fu
  * @date 2019/12/25 14:10
  */
+@Service
 public class OwnerDiscountCouponService {
 
     private static final Logger logger = LoggerFactory.getLogger(OwnerDiscountCouponService.class);
@@ -100,9 +106,14 @@ public class OwnerDiscountCouponService {
         params.put("renterName", renterName);
         params.put("renterFirstName", renterFirstName);
         params.put("renterSex", renterSex);
+
+        Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL,"车主券服务");
         try {
+            Cat.logEvent(CatConstants.FEIGN_METHOD,"ownerCoupon/trans/req");
+            Cat.logEvent(CatConstants.FEIGN_PARAM, JSON.toJSONString(params));
             String json = restTemplate.postForObject(ownerCouponUrl + "/ownerCoupon/trans/req", params, String.class);
             logger.info("ownerCoupon/trans/req. result is:[{}]", json);
+            Cat.logEvent(CatConstants.FEIGN_RESULT, json);
             if (StringUtils.isNotBlank(json)) {
                 ResponseData responseData = new Gson().fromJson(json, ResponseData.class);
                 if (null != responseData) {
@@ -111,8 +122,13 @@ public class OwnerDiscountCouponService {
                     }
                 }
             }
+            t.setStatus(Transaction.SUCCESS);
         } catch (Exception e) {
             logger.info("bindCoupon error . url:[{}],params:[{}]", ownerCouponUrl + "/ownerCoupon/trans/req", params, e);
+            Cat.logError("下单绑定车主券失败. url:/ownerCoupon/trans/req,params:"+JSON.toJSONString(params), e);
+            t.setStatus(e);
+        } finally {
+            t.complete();
         }
         return false;
     }

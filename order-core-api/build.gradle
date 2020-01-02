@@ -17,8 +17,9 @@ apply plugin: 'org.springframework.boot'
 
 dependencies {
     compile project(":order-openapi")
+    compile project(":config:config-client")
 
-    compile "com.autoyol:auto-web-starter:1.0-SNAPSHOT"
+    implementation "com.autoyol:auto-web-starter:1.0-SNAPSHOT"
     compile 'org.springframework.boot:spring-boot-starter-web'
 	compile('org.springframework.boot:spring-boot-starter-actuator')
 	compile('org.springframework.boot:spring-boot-starter-aop')
@@ -38,7 +39,7 @@ dependencies {
 
     compile('com.autoyol:memberDetailService-api:1.0.1-SNAPSHOT')
     compile('com.autoyol.unique:unique-no-feign:3.0-SNAPSHOT')
-    compile('com.autoyol.car:auto-car-service-api:2019122801-SNAPSHOT')
+    compile('com.autoyol.car:auto-car-service-api:2019123101-SNAPSHOT')
     compile('com.autoyol.coupon:coupon-api:2019121301-SNAPSHOT')
 
 
@@ -61,6 +62,8 @@ dependencies {
     compile project(":order-core-all:carowner-all:carowner-mem")
     compile project(":order-core-all:carowner-all:carowner-order")
     compile project(":order-core-all:carowner-all:carowner-penalty")
+
+    compile project(":order-core-all:parent-order")
     
 	compile project(":util-all:fee-calculator")
     compile project(":util-all:order-commons")
