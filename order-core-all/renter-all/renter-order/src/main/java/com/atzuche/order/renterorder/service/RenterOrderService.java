@@ -3,6 +3,7 @@ package com.atzuche.order.renterorder.service;
 import com.atzuche.order.commons.DateUtils;
 import com.atzuche.order.commons.entity.dto.*;
 import com.atzuche.order.commons.enums.RenterCashCodeEnum;
+import com.atzuche.order.commons.enums.RenterChildStatusEnum;
 import com.atzuche.order.rentercost.entity.RenterOrderCostDetailEntity;
 import com.atzuche.order.rentercost.entity.dto.OrderCouponDTO;
 import com.atzuche.order.rentercost.entity.dto.RenterOrderSubsidyDetailDTO;
@@ -155,8 +156,6 @@ public class RenterOrderService {
         RenterOrderIllegalResVO renterOrderIllegalResVO =
                 renterOrderCostHandleService.handleIllegalDepositAmt(renterOrderCostReqDTO.getCostBaseDTO(), renterOrderReqVO);
 
-
-
         //9. 落库操作
         //租客订单
         RenterOrderEntity record = new RenterOrderEntity();
@@ -180,7 +179,7 @@ public class RenterOrderService {
         record.setIsAbatement(Integer.valueOf(renterOrderReqVO.getAbatement()));
         record.setIsUseSpecialPrice(Integer.valueOf(renterOrderReqVO.getUseSpecialPrice()));
         record.setIsEffective(1);
-        record.setChildStatus(1);
+        record.setChildStatus(RenterChildStatusEnum.PROCESS_ING.getCode());
         record.setIsCancle(0);
         renterOrderMapper.insertSelective(record);
         //保存租客订单费用、费用明细、补贴明细等

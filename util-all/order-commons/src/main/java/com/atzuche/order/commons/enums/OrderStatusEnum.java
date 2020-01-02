@@ -1,4 +1,4 @@
-package com.atzuche.order.commons;
+package com.atzuche.order.commons.enums;
 
 import lombok.Getter;
 
@@ -19,7 +19,7 @@ import lombok.Getter;
  * @date 2019/12/9 2:19 下午
  **/
 @Getter
-public enum OrderStatus {
+public enum OrderStatusEnum {
     /**
      * 订单状态-待确认
      **/
@@ -70,7 +70,7 @@ public enum OrderStatus {
      * @param status status value
      * @param desc  status description
      */
-    OrderStatus(int status,String desc){
+    OrderStatusEnum(int status, String desc){
         this.status = status;
         this.desc = desc;
     }
@@ -80,9 +80,9 @@ public enum OrderStatus {
      * @param status int value
      * @return
      */
-    public OrderStatus from(int status){
-        OrderStatus[] statuses = values();
-        for(OrderStatus s:statuses){
+    public OrderStatusEnum from(int status){
+        OrderStatusEnum[] statuses = values();
+        for(OrderStatusEnum s:statuses){
             if(status==s.status){
                 return s;
             }

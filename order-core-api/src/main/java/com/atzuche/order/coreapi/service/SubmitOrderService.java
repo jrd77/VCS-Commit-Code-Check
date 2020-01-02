@@ -4,9 +4,9 @@ import com.alibaba.fastjson.JSON;
 import com.atzuche.order.accountrenterdeposit.vo.req.CreateOrderRenterDepositReqVO;
 import com.atzuche.order.accountrenterwzdepost.vo.req.CreateOrderRenterWZDepositReqVO;
 import com.atzuche.order.cashieraccount.service.CashierService;
+import com.atzuche.order.commons.CommonUtils;
 import com.atzuche.order.commons.ListUtil;
 import com.atzuche.order.commons.OrderReqContext;
-import com.atzuche.order.commons.OrderStatus;
 import com.atzuche.order.commons.constant.OrderConstant;
 import com.atzuche.order.commons.entity.dto.OwnerGoodsDetailDTO;
 import com.atzuche.order.commons.entity.dto.OwnerMemberDTO;
@@ -17,7 +17,7 @@ import com.atzuche.order.commons.enums.SubsidySourceCodeEnum;
 import com.atzuche.order.commons.enums.SubsidyTypeCodeEnum;
 import com.atzuche.order.commons.enums.account.FreeDepositTypeEnum;
 import com.atzuche.order.commons.vo.req.OrderReqVO;
-import com.atzuche.order.commons.vo.res.NormalOrderResVO;
+import com.atzuche.order.commons.vo.res.OrderResVO;
 import com.atzuche.order.coreapi.entity.vo.req.AutoCoinDeductReqVO;
 import com.atzuche.order.coreapi.entity.vo.req.CarRentTimeRangeReqVO;
 import com.atzuche.order.coreapi.entity.vo.req.OwnerCouponBindReqVO;
@@ -99,24 +99,23 @@ public class SubmitOrderService {
      * 提交订单
      *
      * @param orderReqVO 下单请求信息
-     * @return NormalOrderResVO 下单返回结果
+     * @return OrderResVO 下单返回结果
      */
-    public NormalOrderResVO submitOrder(OrderReqVO orderReqVO) {
+    public OrderResVO submitOrder(OrderReqVO orderReqVO) {
         //1.请求参数处理
         OrderReqContext reqContext = new OrderReqContext();
         reqContext.setOrderReqVO(orderReqVO);
-
+        //租客会员信息
         RenterMemberDTO renterMemberDTO =
                 memberService.getRenterMemberInfo(String.valueOf(orderReqVO.getMemNo()));
         reqContext.setRenterMemberDto(renterMemberDTO);
-
-        GoodsService.CarDetailReqVO carDetailReqVO = buildCarDetailReqVO(orderReqVO);
-        RenterGoodsDetailDTO renterGoodsDetailDTO = goodsService.getRenterGoodsDetail(carDetailReqVO);
+        //租客商品明细
+        RenterGoodsDetailDTO renterGoodsDetailDTO = goodsService.getRenterGoodsDetail(buildCarDetailReqVO(orderReqVO));
         reqContext.setRenterGoodsDetailDto(renterGoodsDetailDTO);
-
+        //车主商品明细
         OwnerGoodsDetailDTO ownerGoodsDetailDTO = goodsService.getOwnerGoodsDetail(renterGoodsDetailDTO);
         reqContext.setOwnerGoodsDetailDto(ownerGoodsDetailDTO);
-
+        //车主会员信息
         OwnerMemberDTO ownerMemberDTO = memberService.getOwnerMemberInfo(renterGoodsDetailDTO.getOwnerMemNo());
         reqContext.setOwnerMemberDto(ownerMemberDTO);
         //2.下单校验
@@ -136,14 +135,13 @@ public class SubmitOrderService {
         //4.3.接收租客订单返回信息
         //4.3.1 车辆押金处理
         BeanCopier beanCopierCarDeposit = BeanCopier.create(RenterOrderCarDepositResVO.class,
-                CreateOrderRenterDepositReqVO.class
-                , false);
+                CreateOrderRenterDepositReqVO.class , false);
         CreateOrderRenterDepositReqVO createOrderRenterDepositReqVO = new CreateOrderRenterDepositReqVO();
         beanCopierCarDeposit.copy(renterOrderResVO.getRenterOrderCarDepositResVO(), createOrderRenterDepositReqVO, null);
         cashierService.insertRenterDeposit(createOrderRenterDepositReqVO);
         //4.3.2 违章押金处理
-        BeanCopier beanCopierIllegal = BeanCopier.create(RenterOrderIllegalResVO.class, CreateOrderRenterWZDepositReqVO.class
-                , false);
+        BeanCopier beanCopierIllegal = BeanCopier.create(RenterOrderIllegalResVO.class,
+                CreateOrderRenterWZDepositReqVO.class, false);
         CreateOrderRenterWZDepositReqVO renterOrderIllegalDepositReq = new CreateOrderRenterWZDepositReqVO();
         beanCopierIllegal.copy(renterOrderResVO.getRenterOrderIllegalResVO(), renterOrderIllegalDepositReq, null);
         cashierService.insertRenterWZDeposit(renterOrderIllegalDepositReq);
@@ -157,7 +155,6 @@ public class SubmitOrderService {
         //4.6.租客权益信息处理
         renterMemberDTO.setOrderNo(orderNo);
         renterMemberDTO.setRenterOrderNo(renterOrderNo);
-        renterMemberDTO.setMemNo(orderReqVO.getMemNo());
         renterMemberService.save(renterMemberDTO);
 
         //5.创建车主子订单
@@ -188,27 +185,19 @@ public class SubmitOrderService {
         ownerMemberService.save(ownerMemberDTO);
 
         //配送订单处理..............
-        deliveryCarService.addRenYunFlowOrderInfo(null);
-
+        deliveryCarService.addRenYunFlowOrderInfo(reqContext);
 
         //6.主订单相关信息处理
         ParentOrderDTO parentOrderDTO = new ParentOrderDTO();
         //6.1主订单信息处理
-        OrderDTO orderDTO = buildOrderDTO(orderReqVO);
-        orderDTO.setOrderNo(orderNo);
-        orderDTO.setRiskAuditId(null);
-        parentOrderDTO.setOrderDTO(orderDTO);
+        parentOrderDTO.setOrderDTO(buildOrderDTO(orderNo, null, orderReqVO));
 
         //6.2主订单扩展信息(统计信息)处理
-        OrderSourceStatDTO orderSourceStatDTO = buildOrderSourceStatDTO(orderReqVO);
-        orderSourceStatDTO.setOrderNo(orderNo);
-        parentOrderDTO.setOrderSourceStatDTO(orderSourceStatDTO);
+        parentOrderDTO.setOrderSourceStatDTO(buildOrderSourceStatDTO(orderNo, orderReqVO));
 
         //6.3主订单状态信息(统计信息)处理
         OrderStatusDTO orderStatusDTO = new OrderStatusDTO();
         orderStatusDTO.setOrderNo(orderNo);
-        orderStatusDTO.setIsDispatch(OrderConstant.NO);
-        orderStatusDTO.setDispatchStatus(OrderConstant.NO);
         if (null == renterGoodsDetailDTO.getReplyFlag() || renterGoodsDetailDTO.getReplyFlag() == OrderConstant.NO) {
             orderStatusDTO.setStatus(OrderStatus.TO_CONFIRM.getStatus());
         } else {
@@ -243,10 +232,12 @@ public class SubmitOrderService {
         //8.订单完成事件发送
         //todo
 
-        //end 组装接口返回
-        //todo
 
-        return new NormalOrderResVO();
+
+        //end 组装接口返回
+        OrderResVO orderResVO = new OrderResVO();
+        orderResVO.setOrderNo(orderNo);
+        return orderResVO;
     }
 
     private GoodsService.CarDetailReqVO buildCarDetailReqVO(OrderReqVO orderReqVO) {
@@ -263,10 +254,12 @@ public class SubmitOrderService {
     /**
      * 组装主订单基本信息
      *
+     * @param orderNo 主订单号
+     * @param riskAuditId 风控审核结果ID
      * @param orderReqVO 下单请求参数
      * @return OrderDTO 主订单基本信息
      */
-    private OrderDTO buildOrderDTO(OrderReqVO orderReqVO) {
+    private OrderDTO buildOrderDTO(String orderNo, Integer riskAuditId, OrderReqVO orderReqVO) {
         OrderDTO orderDTO = new OrderDTO();
         orderDTO.setMemNoRenter(orderReqVO.getMemNo());
         orderDTO.setCategory(Integer.valueOf(orderReqVO.getOrderCategory()));
@@ -282,6 +275,10 @@ public class SubmitOrderService {
         orderDTO.setIsOutCity(orderReqVO.getIsLeaveCity());
         orderDTO.setReqTime(LocalDateTime.now());
         orderDTO.setIsUseAirPortService(orderReqVO.getUseAirportService());
+        orderDTO.setFlightId(orderReqVO.getFlightNo());
+        orderDTO.setRiskAuditId(riskAuditId);
+        orderDTO.setLimitAmt(StringUtils.isBlank(orderReqVO.getReductiAmt()) ? 0 : Integer.valueOf(orderReqVO.getReductiAmt()));
+        orderDTO.setBasePath(CommonUtils.createTransBasePath(orderNo));
 
         LOGGER.info("Build order dto,result is ,orderDTO:[{}]", JSON.toJSONString(orderDTO));
         return orderDTO;
@@ -291,10 +288,11 @@ public class SubmitOrderService {
     /**
      * 组装主订单来源统计信息
      *
+     * @param orderNo 主订单号
      * @param orderReqVO 下单请求参数
      * @return OrderSourceStatDTO 主订单来源统计信息
      */
-    private OrderSourceStatDTO buildOrderSourceStatDTO(OrderReqVO orderReqVO) {
+    private OrderSourceStatDTO buildOrderSourceStatDTO(String orderNo, OrderReqVO orderReqVO) {
         OrderSourceStatDTO orderSourceStatDTO = new OrderSourceStatDTO();
         BeanCopier beanCopier = BeanCopier.create(OrderReqVO.class, OrderSourceStatDTO.class, false);
         beanCopier.copy(orderReqVO, orderSourceStatDTO, null);
@@ -310,6 +308,7 @@ public class SubmitOrderService {
         orderSourceStatDTO.setOs(orderReqVO.getOS());
         orderSourceStatDTO.setAppChannelId(orderReqVO.getAppChannelId());
         orderSourceStatDTO.setAndroidId(orderReqVO.getAndroidID());
+        orderSourceStatDTO.setOrderNo(orderNo);
 
         LOGGER.info("Build order source stat dto,result is ,orderSourceStatDTO:[{}]", JSON.toJSONString(orderSourceStatDTO));
         return orderSourceStatDTO;
@@ -354,6 +353,7 @@ public class SubmitOrderService {
         renterOrderReqVO.setLabelIds(goodsDetail.getLabelIds());
         renterOrderReqVO.setRenterGoodsPriceDetailDTOList(goodsDetail.getRenterGoodsPriceDetailDTOList());
 
+
         RenterMemberDTO renterMember = reqContext.getRenterMemberDto();
         renterOrderReqVO.setCertificationTime(renterMember.getCertificationTime());
         renterOrderReqVO.setIsNew(null == renterMember.getIsNew() || renterMember.getIsNew() == 0);
@@ -381,7 +381,7 @@ public class SubmitOrderService {
         ownerOrderReqDTO.setOwnerOrderNo(ownerOrderNo);
         ownerOrderReqDTO.setExpRentTime(reqContext.getOrderReqVO().getRentTime());
         ownerOrderReqDTO.setExpRevertTime(reqContext.getOrderReqVO().getRevertTime());
-        ownerOrderReqDTO.setIsUseSpecialPrice(0);
+        ownerOrderReqDTO.setIsUseSpecialPrice(null == reqContext.getOrderReqVO().getUseSpecialPrice() ? 0 : Integer.valueOf(reqContext.getOrderReqVO().getUseSpecialPrice()));
         ownerOrderReqDTO.setSrvGetFlag(reqContext.getOrderReqVO().getSrvGetFlag());
         ownerOrderReqDTO.setSrvReturnFlag(reqContext.getOrderReqVO().getSrvReturnFlag());
         ownerOrderReqDTO.setCarNo(reqContext.getOrderReqVO().getCarNo());
