@@ -68,4 +68,7 @@ public class RenterMemberService{
         return renterMemberDto;
     }
 
+    public String getRenterNoByOrderNo(String orderNo) {
+        return renterMemberMapper.getRenterNoByOrderNo(orderNo);
+    }
 }

@@ -303,4 +303,5 @@
 		where ry_wz_code=#{ryWzCode}
 	</update>
 
+
 </mapper>

@@ -37,11 +37,13 @@ public class RenterWzPhotoController {
         if (result.hasErrors()) {
             return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), ErrorCode.INPUT_ERROR.getText());
         }
-        PhotoUploadVO photoUploadVO = new PhotoUploadVO();
-        BeanUtils.copyProperties(photoUploadReqVo, photoUploadVO,PhotoUploadVO.class);
-        renterOrderWzService.upload(photoUploadVO);
-
-
+        try {
+            PhotoUploadVO photoUploadVO = new PhotoUploadVO();
+            BeanUtils.copyProperties(photoUploadReqVo, photoUploadVO,PhotoUploadVO.class);
+            renterOrderWzService.upload(photoUploadVO);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return new ResponseData(ErrorCode.SUCCESS.getCode(),ErrorCode.SUCCESS.getText());
     }
 

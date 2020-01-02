@@ -1,6 +1,8 @@
 package com.atzuche.order.coreapi.service;
 
 import com.atzuche.order.commons.CommonUtils;
+import com.atzuche.order.owner.mem.service.OwnerMemberService;
+import com.atzuche.order.rentermem.service.RenterMemberService;
 import com.atzuche.order.renterwz.entity.RenterOrderWzIllegalPhotoEntity;
 import com.atzuche.order.renterwz.service.OssService;
 import com.atzuche.order.renterwz.service.RenterOrderWzIllegalPhotoService;
@@ -36,6 +38,12 @@ public class RenterOrderWzService {
 
     @Resource
     private OssService ossService;
+
+    @Resource
+    private OwnerMemberService ownerMemberService;
+
+    @Resource
+    private RenterMemberService renterMemberService;
 
     private static final Integer SUCCESS_STATUS = 200;
     private static final Integer FAILED_STATUS = 500;
@@ -130,8 +138,8 @@ public class RenterOrderWzService {
     }
 
     private Integer validateOrderInfo(Integer memNo, String orderNo, int userType) {
-        String renterNo = transMapper.getOrderInfoByOrderNo(orderNo);
-        String ownerNo = transMapper.getOrderInfoByOrderNo(orderNo);
+        String renterNo = renterMemberService.getRenterNoByOrderNo(orderNo);
+        String ownerNo = ownerMemberService.getOwnerNoByOrderNo(orderNo);
         if (StringUtils.isBlank(renterNo) && StringUtils.isBlank(ownerNo)) {
             return -3;
         }else {
