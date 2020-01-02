@@ -7,6 +7,7 @@ import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -17,6 +18,7 @@ import java.io.InputStream;
  * @author shisong
  * @date 2019/12/31
  */
+@Service
 public class OssService implements AutoCloseable {
     private static Logger logger = LoggerFactory.getLogger(OssService.class);
 
