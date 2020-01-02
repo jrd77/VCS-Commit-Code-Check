@@ -25,4 +25,8 @@ public class RenyunSendIllegalInfoLogService {
     public Integer count(String wzCode, String dataType, String carNum) {
         return renyunSendIllegalInfoLogMapper.count(wzCode,dataType,carNum);
     }
+
+    public String queryWzCodeByOrderNo(String orderNo, String carPlateNum) {
+        return renyunSendIllegalInfoLogMapper.queryWzCodeByOrderNo(orderNo,carPlateNum);
+    }
 }

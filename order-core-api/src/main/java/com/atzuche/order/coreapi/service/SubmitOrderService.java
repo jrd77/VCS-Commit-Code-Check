@@ -99,16 +99,14 @@ public class SubmitOrderService {
         RenterMemberDTO renterMemberDTO =
                 memberService.getRenterMemberInfo(String.valueOf(normalOrderReqVO.getMemNo()));
         reqContext.setRenterMemberDto(renterMemberDTO);
-        GoodsService.CarDetailReqVO carDetailReqVO = new GoodsService.CarDetailReqVO();
-        carDetailReqVO.setAddrIndex(StringUtils.isBlank(normalOrderReqVO.getCarAddrIndex()) ? 0 : Integer.parseInt(normalOrderReqVO.getCarAddrIndex()));
-        carDetailReqVO.setCarNo(normalOrderReqVO.getCarNo());
-        carDetailReqVO.setRentTime(normalOrderReqVO.getRentTime());
-        carDetailReqVO.setRevertTime(normalOrderReqVO.getRevertTime());
-        carDetailReqVO.setUseSpecialPrice(false);
+
+        GoodsService.CarDetailReqVO carDetailReqVO = buildCarDetailReqVO(normalOrderReqVO);
         RenterGoodsDetailDTO renterGoodsDetailDTO = goodsService.getRenterGoodsDetail(carDetailReqVO);
         reqContext.setRenterGoodsDetailDto(renterGoodsDetailDTO);
+
         OwnerGoodsDetailDTO ownerGoodsDetailDTO = goodsService.getOwnerGoodsDetail(renterGoodsDetailDTO);
         reqContext.setOwnerGoodsDetailDto(ownerGoodsDetailDTO);
+
         OwnerMemberDTO ownerMemberDTO = memberService.getOwnerMemberInfo(renterGoodsDetailDTO.getOwnerMemNo());
         reqContext.setOwnerMemberDto(ownerMemberDTO);
         //2.下单校验
@@ -233,6 +231,16 @@ public class SubmitOrderService {
         //todo
 
         return new NormalOrderResVO();
+    }
+
+    private GoodsService.CarDetailReqVO buildCarDetailReqVO(NormalOrderReqVO normalOrderReqVO) {
+        GoodsService.CarDetailReqVO carDetailReqVO = new GoodsService.CarDetailReqVO();
+        carDetailReqVO.setAddrIndex(StringUtils.isBlank(normalOrderReqVO.getCarAddrIndex()) ? 0 : Integer.parseInt(normalOrderReqVO.getCarAddrIndex()));
+        carDetailReqVO.setCarNo(normalOrderReqVO.getCarNo());
+        carDetailReqVO.setRentTime(normalOrderReqVO.getRentTime());
+        carDetailReqVO.setRevertTime(normalOrderReqVO.getRevertTime());
+        carDetailReqVO.setUseSpecialPrice(false);
+        return carDetailReqVO;
     }
 
 
