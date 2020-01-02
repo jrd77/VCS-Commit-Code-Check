@@ -82,14 +82,6 @@ public class CashierPayService{
             //1 校验是否 为空
             if(Objects.nonNull(batchNotifyDataVo) && !CollectionUtils.isEmpty(batchNotifyDataVo.getLstNotifyDataVo())){
                 cashierService.callBackSuccess(batchNotifyDataVo.getLstNotifyDataVo());
-//                //1 退款
-//                if(DataPayTypeConstant.PUR_RETURN.equals(orderPayAsynVO.getPayType())){
-//                    cashierService.refundCallBackSuccess(orderPayAsynVO);
-//                }
-//                //2支付成功回调
-//                if(DataPayTypeConstant.PAY_PUR.equals(orderPayAsynVO.getPayType()) || DataPayTypeConstant.PAY_PRE.equals(orderPayAsynVO.getPayType())){
-//                    cashierService.payOrderCallBackSuccess(orderPayAsynVO);
-//                }
             }
             //3 更新rabbitMQ 记录已消费
             String reqContent = FasterJsonUtil.toJson(batchNotifyDataVo);
@@ -174,7 +166,7 @@ public class CashierPayService{
         int rentAmt =0;
         //已付租车费用
         int rentAmtPayed = 0;
-        if(orderPaySign.getPayKind().contains(DataPayKindConstant.TK_FEE)){
+        if(orderPaySign.getPayKind().contains(DataPayKindConstant.RENT_AMOUNT)){
             List<PayableVO> payableVOs = renterOrderCostCombineService.listPayableVO(orderPaySign.getOrderNo(),renterOrderEntity.getRenterOrderNo(),orderPaySign.getMenNo());
             result.setPayableVOs(payableVOs);
             //应付租车费用
@@ -230,7 +222,7 @@ public class CashierPayService{
           CashierEntity cashierEntity = cashierNoTService.getCashierEntity(orderPaySign.getOrderNo(),orderPaySign.getMenNo(), DataPayKindConstant.RENT);
           if(Objects.nonNull(cashierEntity)){
               PayVo vo = cashierNoTService.getPayVO(cashierEntity,orderPaySign,payVO,DataPayKindConstant.RENT);
-              String payMd5 = cashierNoTService.getPayMd5ByPayVo(vo);
+              String payMd5 = MD5.MD5Encode(FasterJsonUtil.toJson(vo));
               vo.setPayMd5(payMd5);
               payVo.add(vo);
           }
@@ -241,7 +233,7 @@ public class CashierPayService{
             CashierEntity cashierEntity = cashierNoTService.getCashierEntity(orderPaySign.getOrderNo(),orderPaySign.getMenNo(), DataPayKindConstant.DEPOSIT);
             if(Objects.nonNull(cashierEntity)){
                 PayVo vo = cashierNoTService.getPayVO(cashierEntity,orderPaySign,payVO,DataPayKindConstant.DEPOSIT);
-                String payMd5 = cashierNoTService.getPayMd5ByPayVo(vo);
+                String payMd5 = MD5.MD5Encode(FasterJsonUtil.toJson(vo));
                 vo.setPayMd5(payMd5);
                 payVo.add(vo);
             }
@@ -249,18 +241,18 @@ public class CashierPayService{
         }
 
         //待付租车费用
-        if(orderPaySign.getPayKind().contains(DataPayKindConstant.TK_FEE)){
+        if(orderPaySign.getPayKind().contains(DataPayKindConstant.RENT_AMOUNT)){
             List<PayableVO> payableVOs = payVO.getPayableVOs();
             //待付租车费用
             int amt = payVO.getAmt();
             if(amt<0){
-                CashierEntity cashierEntity = cashierNoTService.getCashierEntity(orderPaySign.getOrderNo(),orderPaySign.getMenNo(), DataPayKindConstant.TK_FEE);
+                CashierEntity cashierEntity = cashierNoTService.getCashierEntity(orderPaySign.getOrderNo(),orderPaySign.getMenNo(), DataPayKindConstant.RENT_AMOUNT);
                 if(Objects.nonNull(cashierEntity)){
-                    PayVo vo = cashierNoTService.getPayVO(cashierEntity,orderPaySign,payVO,DataPayKindConstant.TK_FEE);
+                    PayVo vo = cashierNoTService.getPayVO(cashierEntity,orderPaySign,payVO,DataPayKindConstant.RENT_AMOUNT);
                     String paySn = cashierNoTService.getCashierRentCostPaySn(orderPaySign.getOrderNo(),orderPaySign.getMenNo());
                     vo.setPaySn(paySn);
                     vo.setExtendParams(GsonUtils.toJson(payableVOs));
-                    String payMd5 = cashierNoTService.getPayMd5ByPayVo(vo);
+                    String payMd5 = MD5.MD5Encode(FasterJsonUtil.toJson(vo));
                     vo.setPayMd5(payMd5);
                     payVo.add(vo);
 
@@ -287,8 +279,9 @@ public class CashierPayService{
         if(Objects.nonNull(vo)){
             NotifyDataVo notifyDataVo = new NotifyDataVo();
             BeanUtils.copyProperties(vo,notifyDataVo);
+            notifyDataVo.setSettleAmount(vo.getRefundAmt());
             //退款成功操作
-            cashierService.refundCallBackSuccess(notifyDataVo);
+            cashierService.refundCallBackSuccess(vo);
         }
     }
 

@@ -1,7 +1,11 @@
 package com.atzuche.order.cashieraccount.vo.res;
 
 import com.atzuche.order.commons.enums.RenterCashCodeEnum;
+import com.atzuche.order.commons.enums.cashier.PayTypeEnum;
+import com.google.common.collect.ImmutableList;
 import lombok.Data;
+
+import java.util.List;
 
 /**
  * 个人代付信息
@@ -31,6 +35,11 @@ public class AccountPayAbleResVO {
      */
     private RenterCashCodeEnum renterCashCode;
 
+    /**
+     * 支持的支付方式   默认暂不支持预授权支付
+     */
+    private List<String> payTypes;
+
     private AccountPayAbleResVO(){}
 
     public AccountPayAbleResVO(String orderNo, String memNo, Integer amt, RenterCashCodeEnum renterCashCode,String title) {
@@ -39,6 +48,7 @@ public class AccountPayAbleResVO {
         this.amt = amt;
         this.renterCashCode = renterCashCode;
         this.title = title;
+        this.payTypes = ImmutableList.of(PayTypeEnum.PAY_PUR.getCode());
     }
 
 }

@@ -1,6 +1,7 @@
 package com.atzuche.order.cashieraccount.service;
 
 import com.atzuche.order.commons.enums.RenterCashCodeEnum;
+import com.atzuche.order.commons.enums.cashier.TransStatusEnum;
 import com.atzuche.order.settle.service.AccountDebtService;
 import com.atzuche.order.settle.vo.req.AccountDeductDebtReqVO;
 import com.atzuche.order.settle.vo.res.AccountDebtResVO;
@@ -30,8 +31,11 @@ import com.atzuche.order.rentercost.service.RenterOrderCostCombineService;
 import com.autoyol.autopay.gateway.constant.DataPayKindConstant;
 import com.autoyol.autopay.gateway.constant.DataPayTypeConstant;
 import com.autoyol.autopay.gateway.vo.req.NotifyDataVo;
+import com.autoyol.autopay.gateway.vo.res.AutoPayResultVo;
 import com.autoyol.cat.CatAnnotation;
+import com.autoyol.commons.utils.GsonUtils;
 import com.autoyol.commons.web.ErrorCode;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,6 +56,7 @@ import java.util.Objects;
  * @date 2019-12-11 11:17:59
  */
 @Service
+@Slf4j
 public class CashierService {
     @Autowired AccountRenterDepositService accountRenterDepositService;
     @Autowired AccountRenterWzDepositService accountRenterWzDepositService;
@@ -323,9 +328,9 @@ public class CashierService {
             for(int i=0;i<lstNotifyDataVo.size();i++){
                 NotifyDataVo notifyDataVo = lstNotifyDataVo.get(i);
                 //1 退款
-                if(DataPayTypeConstant.PUR_RETURN.equals(notifyDataVo.getPayType())){
-                    refundCallBackSuccess(notifyDataVo);
-                }
+//                if(DataPayTypeConstant.PUR_RETURN.equals(notifyDataVo.getPayType())){
+//                    refundCallBackSuccess(notifyDataVo);
+//                }
                 //2支付成功回调
                 if(DataPayTypeConstant.PAY_PUR.equals(notifyDataVo.getPayType()) || DataPayTypeConstant.PAY_PRE.equals(notifyDataVo.getPayType())){
                     payOrderCallBackSuccess(notifyDataVo);
@@ -339,7 +344,12 @@ public class CashierService {
      * @param notifyDataVo
      */
     @Transactional(rollbackFor=Exception.class)
-    public void refundCallBackSuccess(NotifyDataVo notifyDataVo) {
+    public void refundCallBackSuccess(AutoPayResultVo notifyDataVo) {
+        log.info("refundCallBackSuccess param :[{}]", GsonUtils.toJson(notifyDataVo));
+        //没有成功的 不处理
+        if(Objects.isNull(notifyDataVo) || !TransStatusEnum.PAY_SUCCESS.getCode().equals(notifyDataVo.getTransStatus())){
+            return;
+        }
         cashierRefundApplyNoTService.updateRefundDepositSuccess(notifyDataVo);
         //TODO 支付回调成功 push/或者短信 怎么处理
     }
@@ -350,6 +360,11 @@ public class CashierService {
      */
     @Transactional(rollbackFor=Exception.class)
     public void payOrderCallBackSuccess(NotifyDataVo notifyDataVo) {
+        log.info("payOrderCallBackSuccess param :[{}]", GsonUtils.toJson(notifyDataVo));
+        //没有成功的 不处理
+        if(Objects.isNull(notifyDataVo) || !TransStatusEnum.PAY_SUCCESS.getCode().equals(notifyDataVo.getTransStatus())){
+            return;
+        }
         //1.1 租车押金 01
         if(Objects.nonNull(notifyDataVo) && DataPayKindConstant.RENT.equals(notifyDataVo.getPayKind())){
             //1 对象初始化转换
@@ -365,7 +380,7 @@ public class CashierService {
             cashierNoTService.updataCashierAndRenterWzDeposit(notifyDataVo,payedOrderRenterWZDeposit);
         }
         //1.3 租车费用
-        if(Objects.nonNull(notifyDataVo) && DataPayKindConstant.TK_FEE.equals(notifyDataVo.getPayKind()) ){
+        if(Objects.nonNull(notifyDataVo) && DataPayKindConstant.RENT_AMOUNT.equals(notifyDataVo.getPayKind()) ){
             //1 对象初始化转换
             AccountRenterCostReqVO accountRenterCostReq = cashierNoTService.getAccountRenterCostReq(notifyDataVo, RenterCashCodeEnum.ACCOUNT_RENTER_RENT_COST);
             //2 收银台记录更新

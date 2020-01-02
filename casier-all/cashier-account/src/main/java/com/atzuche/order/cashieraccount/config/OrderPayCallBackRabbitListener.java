@@ -26,7 +26,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Slf4j
-public class OrderPayCallBackRabbitConfig {
+public class OrderPayCallBackRabbitListener {
     @Autowired RabbitMsgLogService rabbitMsgLogService;
     @Autowired CashierPayService cashierPayService;
 
