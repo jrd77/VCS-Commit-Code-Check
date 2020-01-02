@@ -12,8 +12,10 @@ buildscript {
 
 apply plugin: 'dependency-management'
 apply plugin: 'org.springframework.boot'
+apply plugin: 'application'
+apply plugin: 'war'
 
-
+mainClassName = 'com.autoyol.doc.parser.autodoc.AutoDocParser'
 
 dependencies {
     compile project(":order-openapi")
@@ -68,5 +70,7 @@ dependencies {
 	compile project(":util-all:fee-calculator")
     compile project(":util-all:order-commons")
     compile project(":order-delivery")
+    compile project(":order-flow")
+
 
 }

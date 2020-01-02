@@ -1,8 +1,10 @@
 package com.atzuche.order.renterorder.service;
 
+import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.DateUtils;
 import com.atzuche.order.commons.entity.dto.*;
 import com.atzuche.order.commons.enums.RenterCashCodeEnum;
+import com.atzuche.order.commons.enums.RenterChildStatusEnum;
 import com.atzuche.order.rentercost.entity.RenterOrderCostDetailEntity;
 import com.atzuche.order.rentercost.entity.dto.OrderCouponDTO;
 import com.atzuche.order.rentercost.entity.dto.RenterOrderSubsidyDetailDTO;
@@ -15,6 +17,8 @@ import com.atzuche.order.renterorder.vo.*;
 import com.atzuche.order.renterorder.vo.owner.OwnerCouponGetAndValidReqVO;
 import com.atzuche.order.renterorder.vo.platform.MemAvailCouponRequestVO;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -32,6 +36,8 @@ import java.util.Optional;
  */
 @Service
 public class RenterOrderService {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(RenterOrderService.class);
 
     @Resource
     private RenterOrderMapper renterOrderMapper;
@@ -112,12 +118,13 @@ public class RenterOrderService {
      * @param renterOrderReqVO 请求参数
      */
     public RenterOrderResVO generateRenterOrderInfo(RenterOrderReqVO renterOrderReqVO) {
+        LOGGER.info("生成租客订单.param is,renterOrderReqVO:[{}]",JSON.toJSONString(renterOrderReqVO));
         RenterOrderResVO renterOrderResVO = new RenterOrderResVO();
         //1. 租车费用计算
         RenterOrderCostReqDTO renterOrderCostReqDTO = buildRenterOrderCostReqDTO(renterOrderReqVO);
         RenterOrderCostRespDTO renterOrderCostRespDTO =
                 renterOrderCalCostService.getOrderCostAndDeailList(renterOrderCostReqDTO);
-
+        LOGGER.info("租客订单租车费用计算.result is, renterOrderCostRespDTO:[{}]", JSON.toJSONString(renterOrderCostRespDTO));
         DeductAndSubsidyContextDTO context = initDeductAndSubsidyContextDTO(renterOrderCostRespDTO, renterOrderReqVO);
         //2. 送取服务券抵扣信息及补贴明细
         MemAvailCouponRequestVO getCarFeeCouponReqVO = buildMemAvailCouponRequestVO(renterOrderCostRespDTO,
@@ -155,8 +162,6 @@ public class RenterOrderService {
         RenterOrderIllegalResVO renterOrderIllegalResVO =
                 renterOrderCostHandleService.handleIllegalDepositAmt(renterOrderCostReqDTO.getCostBaseDTO(), renterOrderReqVO);
 
-
-
         //9. 落库操作
         //租客订单
         RenterOrderEntity record = new RenterOrderEntity();
@@ -179,9 +184,7 @@ public class RenterOrderService {
         record.setIsReturnCar(renterOrderReqVO.getSrvReturnFlag());
         record.setIsAbatement(Integer.valueOf(renterOrderReqVO.getAbatement()));
         record.setIsUseSpecialPrice(Integer.valueOf(renterOrderReqVO.getUseSpecialPrice()));
-        record.setIsEffective(1);
-        record.setChildStatus(1);
-        record.setIsCancle(0);
+        record.setChildStatus(RenterChildStatusEnum.PROCESS_ING.getCode());
         renterOrderMapper.insertSelective(record);
         //保存租客订单费用、费用明细、补贴明细等
         renterOrderCostRespDTO.setRenterOrderSubsidyDetailDTOList(context.getOrderSubsidyDetailList());

@@ -76,7 +76,8 @@
 	</insert>
 	
 	<insert id="insertSelective" parameterType="com.atzuche.order.renterorder.entity.OrderCouponEntity" useGeneratedKeys="true" keyProperty="id">
-		insert into order_coupon (
+		insert into order_coupon
+        <trim prefix="(" suffix=")" suffixOverrides="," >
             <if test="orderNo != null">`order_no`, </if>
             <if test="renterOrderNo != null">`renter_order_no`, </if>
             <if test="couponId != null">`coupon_id`, </if>
@@ -90,7 +91,8 @@
             <if test="updateTime != null">`update_time`, </if>
             <if test="updateOp != null">`update_op`, </if>
             <if test="isDelete != null">`is_delete` </if>
-        ) values (
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides="," >
             <if test="orderNo != null">#{orderNo},  </if>
             <if test="renterOrderNo != null">#{renterOrderNo},  </if>
             <if test="couponId != null">#{couponId},  </if>
@@ -104,7 +106,7 @@
             <if test="updateTime != null">#{updateTime},  </if>
             <if test="updateOp != null">#{updateOp},  </if>
             <if test="isDelete != null">#{isDelete} </if>
-        )
+        </trim>
 	</insert>
 	
 	 

@@ -223,6 +223,7 @@ config/build/generated/
 config/build/resources/main/mybatis/
 config/build/
 config/out/
+order-flow/build/
 
 config/config-server/build/
 order-log/build/
@@ -246,6 +247,7 @@ order-core-all/renter-all/renter-penalty/build/
 order-core-all/renter-all/renter-wz/build/
 order-core-api/build/
 order-openapi/build/
+admin-api/doc/
 util-all/build/
 util-all/fee-calculator/build/
 util-all/order-commons/build/

@@ -69,6 +69,21 @@ public class OrderDTO {
      * 风控审核id
      */
     private Integer riskAuditId;
+    /**
+     * 航班号
+     */
+    private String flightId;
+
+    /**
+     * 订单图片存储目录
+     */
+    private String basePath;
+
+    /**
+     * 限时立减金额（面额）
+     */
+    private Integer limitAmt;
+
 
 
 }

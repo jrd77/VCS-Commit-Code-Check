@@ -1,5 +1,6 @@
 package com.atzuche.order.coreapi.controller;
 
+
 import com.alibaba.fastjson.JSON;
 import com.atzuche.config.client.api.CityConfigSDK;
 import com.atzuche.config.client.api.DefaultConfigContext;
@@ -27,7 +28,7 @@ public class TestController {
     private final static Logger logger = LoggerFactory.getLogger(TestController.class);
 
     @Autowired
-    private SysConfigSDK configFeignService;
+    private CityConfigSDK configSDK;
 
     @Autowired
     OilAverageCostCacheConfigService oilAverageCostCacheConfig;
@@ -48,7 +49,7 @@ public class TestController {
     @GetMapping(path = "/test2/pp")
     public String xx()  {
         logger.info("xxxxxxxxxxxxx");
-        logger.info("{}",configFeignService.getConfig(new DefaultConfigContext()));
+        logger.info("{}",configSDK.getConfigByCityCode(new DefaultConfigContext(),310100));
         return "xx";
     }
 

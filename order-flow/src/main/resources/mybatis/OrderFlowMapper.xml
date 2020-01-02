@@ -46,7 +46,8 @@
 	</insert>
 	
 	<insert id="insertSelective" parameterType="com.atzuche.order.flow.entity.OrderFlowEntity" useGeneratedKeys="true" keyProperty="id">
-		insert into order_flow (
+		insert into order_flow
+        <trim prefix="(" suffix=")" suffixOverrides="," >
             <if test="orderNo != null">`order_no`, </if>
             <if test="orderStatus != null">`order_status`, </if>
             <if test="orderStatusDesc != null">`order_status_desc`, </if>
@@ -55,7 +56,8 @@
             <if test="updateTime != null">`update_time`, </if>
             <if test="updateOp != null">`update_op`, </if>
             <if test="isDelete != null">`is_delete` </if>
-        ) values (
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides="," >
             <if test="orderNo != null">#{orderNo},  </if>
             <if test="orderStatus != null">#{orderStatus},  </if>
             <if test="orderStatusDesc != null">#{orderStatusDesc},  </if>
@@ -64,7 +66,7 @@
             <if test="updateTime != null">#{updateTime},  </if>
             <if test="updateOp != null">#{updateOp},  </if>
             <if test="isDelete != null">#{isDelete} </if>
-        )
+        </trim>
 	</insert>
 	
 	 
