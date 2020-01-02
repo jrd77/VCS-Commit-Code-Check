@@ -33,12 +33,12 @@ public class CommonUtil {
      * @param obj
      * @return
      */
-    public static Map<String, String> javaBeanToMap(Object obj) {
+    public static Map<String, Object> javaBeanToMap(Object obj) {
         if (obj == null) {
             return null;
         }
         try {
-            Map<String, String> map = BeanUtils.describe(obj);
+            Map<String, Object> map = BeanUtils.describe(obj);
             return map;
         } catch (Exception e) {
             log.info("转换成map失败");
@@ -77,7 +77,7 @@ public class CommonUtil {
      * @param map
      * @return
      */
-    public static String getSign(Map map) {
+    public static String getSign(Map<String,Object> map) {
         try {
             StringBuffer sbff = new StringBuffer();
             TreeMap<String, Object> treeMap = new TreeMap<String, Object>();
