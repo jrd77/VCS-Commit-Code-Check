@@ -2,7 +2,10 @@ package com.atzuche.order.coreapi.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.OrderException;
+import com.atzuche.order.commons.vo.req.AdminOrderReqVO;
 import com.atzuche.order.commons.vo.req.NormalOrderReqVO;
+import com.atzuche.order.commons.vo.req.OrderReqVO;
+import com.atzuche.order.commons.vo.res.AdminOrderResVO;
 import com.atzuche.order.commons.vo.res.NormalOrderResVO;
 import com.atzuche.order.coreapi.service.SubmitOrderService;
 import com.atzuche.order.parentorder.entity.OrderRecordEntity;
@@ -14,6 +17,7 @@ import com.autoyol.doc.annotation.AutoDocVersion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cglib.beans.BeanCopier;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -41,7 +45,7 @@ public class SubmitOrderController {
 
 
     @AutoDocMethod(description = "提交订单", value = "提交订单", response = NormalOrderResVO.class)
-    @PostMapping("/req")
+    @PostMapping("/normal/req")
     public ResponseData<NormalOrderResVO> submitOrder(@RequestBody NormalOrderReqVO normalOrderReqVO, BindingResult bindingResult) throws Exception {
         LOGGER.info("Submit order.param is,normalOrderReqVO:[{}]", JSON.toJSONString(normalOrderReqVO));
         if (bindingResult.hasErrors()) {
@@ -53,7 +57,10 @@ public class SubmitOrderController {
         }
         NormalOrderResVO normalOrderResVO = null;
         try{
-            normalOrderResVO = submitOrderService.submitOrder(normalOrderReqVO);
+            BeanCopier beanCopier = BeanCopier.create(NormalOrderReqVO.class, OrderReqVO.class, false);
+            OrderReqVO orderReqVO = new OrderReqVO();
+            beanCopier.copy(normalOrderReqVO, orderReqVO, null);
+            normalOrderResVO = submitOrderService.submitOrder(orderReqVO);
             OrderRecordEntity orderRecordEntity = new OrderRecordEntity();
             orderRecordEntity.setErrorCode(ErrorCode.SUCCESS.getCode());
             orderRecordEntity.setErrorTxt(ErrorCode.SUCCESS.getText());
@@ -85,6 +92,19 @@ public class SubmitOrderController {
         }
         return ResponseData.success(normalOrderResVO);
     }
+
+
+
+    @AutoDocMethod(description = "管理后台提交订单", value = "管理后台提交订单", response = AdminOrderResVO.class)
+    @PostMapping("/admin/req")
+    public ResponseData<AdminOrderResVO> submitOrder(@RequestBody AdminOrderReqVO adminOrderReqVO, BindingResult bindingResult) {
+
+
+
+
+        return ResponseData.success(null);
+    }
+
 
 
 }
