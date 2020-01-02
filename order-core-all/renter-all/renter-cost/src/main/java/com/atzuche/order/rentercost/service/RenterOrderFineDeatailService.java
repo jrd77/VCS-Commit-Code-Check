@@ -81,8 +81,18 @@ public class RenterOrderFineDeatailService{
     	}
     	return renterOrderFineDeatailMapper.saveRenterOrderFineDeatailBatch(entityList);
     }
-
-
+    
+    /**
+     * 车主同意后删除取还车违约金，而后转入全局的违约金中
+     * @param id
+     * @param remark
+     * @return
+     */
+    public Integer deleteGetReturnFineAfterAgree(Integer id, String remark) {
+    	return renterOrderFineDeatailMapper.deleteGetReturnFineAfterAgree(id, remark);
+    }
+    
+    
     /**
 	 * 计算取还车违约金
 	 * @param initInfo 原始数据
