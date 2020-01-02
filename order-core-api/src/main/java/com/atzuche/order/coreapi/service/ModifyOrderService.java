@@ -19,7 +19,6 @@ import com.atzuche.order.rentercost.entity.RenterOrderFineDeatailEntity;
 import com.atzuche.order.rentercost.entity.RenterOrderSubsidyDetailEntity;
 import com.atzuche.order.rentercost.entity.dto.OrderCouponDTO;
 import com.atzuche.order.rentercost.entity.dto.RenterOrderSubsidyDetailDTO;
-import com.atzuche.order.rentercost.entity.vo.PayableVO;
 import com.atzuche.order.rentercost.service.*;
 import com.atzuche.order.rentermem.service.RenterMemberService;
 import com.atzuche.order.renterorder.entity.OrderCouponEntity;
@@ -85,6 +84,10 @@ public class ModifyOrderService {
 	private RenterGoodsService renterGoodsService;
 	@Autowired
 	private MemberService memberService;
+	@Autowired
+	private ModifyOrderForRenterService modifyOrderForRenterService;
+	@Autowired
+	private OrderSupplementDetailService orderSupplementDetailService;
 
 	/**
 	 * 修改订单主逻辑
@@ -106,10 +109,6 @@ public class ModifyOrderService {
 		List<RenterOrderDeliveryEntity> deliveryList = renterOrderDeliveryService.listRenterOrderDeliveryByRenterOrderNo(initRenterOrder.getRenterOrderNo());
 		// DTO包装
 		ModifyOrderDTO modifyOrderDTO = getModifyOrderDTO(modifyOrderReq, renterOrderNo, initRenterOrder, deliveryList);
-		// TODO 获取修改前租客租客端配送列表
-		
-		// TODO 获取修改前租客使用的优惠券列表
-		
 		// 获取租客会员信息
 		RenterMemberDTO renterMemberDTO = getRenterMemberDTO(initRenterOrder.getRenterOrderNo());
 		// 获取租客商品信息
@@ -154,15 +153,41 @@ public class ModifyOrderService {
 		renterOrderFineDeatailService.saveRenterOrderFineDeatailBatch(renterFineList);
 		// 保存附加驾驶人信息
 		saveAdditionalDriver(modifyOrderDTO);
-		// 
+		// TODO 保存配送订单信息
 		
-		// 计算补贴金额
+		// 计算补付金额
 		Integer supplementAmt = getRenterSupplementAmt(modifyOrderDTO, initRenterOrder, renterOrderCostRespDTO, renterFineList);
+		// 修改后处理方法
+		modifyPostProcess(modifyOrderDTO, initRenterOrder, supplementAmt);
 		
-		
-		
-		return null;
+		return ResponseData.success();
 	}
+	
+	
+	/**
+	 * 修改后处理方法
+	 * @param modifyOrderDTO
+	 * @param initRenterOrder
+	 * @param supplementAmt
+	 */
+	public void modifyPostProcess(ModifyOrderDTO modifyOrderDTO, RenterOrderEntity initRenterOrder, Integer supplementAmt) {
+		// 管理后台操作标记
+		Boolean consoleFlag = modifyOrderDTO.getConsoleFlag();
+		if (consoleFlag != null && consoleFlag) {
+			// 直接同意
+			modifyOrderForRenterService.updateRenterOrderStatus(modifyOrderDTO.getOrderNo(), modifyOrderDTO.getRenterOrderNo(), initRenterOrder);
+			/*
+			 * if (supplementAmt != null && supplementAmt > 0) { // 增加管理后台修改订单补付
+			 * orderSupplementDetailService.saveOrderSupplementDetail(supplementEntity); }
+			 */
+		} else {
+			if (supplementAmt != null && supplementAmt <= 0) {
+				// 不需要补付
+				modifyOrderForRenterService.supplementPayPostProcess(modifyOrderDTO.getOrderNo(), modifyOrderDTO.getRenterOrderNo());
+			}
+		}
+	}
+	
 	
 	
 	/**
@@ -318,9 +343,9 @@ public class ModifyOrderService {
 				modifyOrderDTO.setGetCarLon(srvGetDelivery.getRenterGetReturnAddrLon());
 			}
 			if (StringUtils.isBlank(modifyOrderReq.getRevertCarAddress()) && srvReturnDelivery != null) {
-				modifyOrderDTO.setRevertCarAddress(srvGetDelivery.getRenterGetReturnAddr());
-				modifyOrderDTO.setRevertCarLat(srvGetDelivery.getRenterGetReturnAddrLat());
-				modifyOrderDTO.setRevertCarLon(srvGetDelivery.getRenterGetReturnAddrLon());
+				modifyOrderDTO.setRevertCarAddress(srvReturnDelivery.getRenterGetReturnAddr());
+				modifyOrderDTO.setRevertCarLat(srvReturnDelivery.getRenterGetReturnAddrLat());
+				modifyOrderDTO.setRevertCarLon(srvReturnDelivery.getRenterGetReturnAddrLon());
 			}
 		}
 		if (modifyOrderReq.getSrvGetFlag() == null) {
@@ -588,8 +613,8 @@ public class ModifyOrderService {
 				getLat = srvGetDelivery.getRenterGetReturnAddrLat();
 			}
 			if (srvReturnDelivery != null) {
-				returnLon = srvGetDelivery.getRenterGetReturnAddrLon();
-				returnLat = srvGetDelivery.getRenterGetReturnAddrLat();
+				returnLon = srvReturnDelivery.getRenterGetReturnAddrLon();
+				returnLat = srvReturnDelivery.getRenterGetReturnAddrLat();
 			}
 		}
 		GetReturnAddressInfoDTO initInfo = new GetReturnAddressInfoDTO(initRenterOrder.getIsGetCar(), initRenterOrder.getIsReturnCar(), getLon, getLat, returnLon, returnLat);

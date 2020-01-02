@@ -10,9 +10,11 @@ import lombok.Getter;
  **/
 @Getter
 public enum OwnerChildStatusEnum {
-    PROCESS_ING(1,"进行中"),
-    END(2,"已完结"),
-    FINISH(3,"已结束");
+    WAIT_PAY(1,"待补付"),
+    UPDATE_WAIT_CONFIRM(2,"修改待确认"),
+    PROCESS_ING(3,"进行中"),
+    END(4,"已完结"),
+    FINISH(5,"已结束");
 
     private int code;
     private String name;
