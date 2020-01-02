@@ -93,5 +93,6 @@ public class ModifyOrderReq {
 	/**
 	 * 租客费用补贴
 	 */
+    @AutoDocProperty(value="租客费用补贴", hidden = true)
 	private List<RenterOrderSubsidyDetailDTO> renterSubsidyList;
 }
