@@ -339,9 +339,9 @@ public class CashierNoTService {
         vo.setMemNo(orderPaySign.getMenNo());
         vo.setOrderNo(orderPaySign.getOrderNo());
         vo.setOpenId(orderPaySign.getOpenId());
-        vo.setOS(orderPaySign.getOS());
+        vo.setReqOs(orderPaySign.getReqOs());
         vo.setPayAmt(String.valueOf(Math.abs(payVO.getAmt())));
-        vo.setPayEnv(StringUtil.isBlank(orderPaySign.getPayEnv())? DataPayEnvConstant.PRO:orderPaySign.getPayEnv());
+        vo.setPayEnv(getPayEnv());
         vo.setPayId(cashierEntity.getId().toString());
         vo.setPayKind(payKind);
         vo.setPaySn(String.valueOf(cashierEntity.getPaySn()+1));
@@ -353,6 +353,15 @@ public class CashierNoTService {
         return vo;
     }
 
+    /**
+     * 获取支付环境
+     * @return
+     */
+    public String getPayEnv(){
+        String m_env = System.getProperty("env");
+        m_env = StringUtil.isBlank(m_env)?System.getProperty("ENV"):m_env;
+        return m_env;
+    }
 
     /**
      * 租车押金 收银台回调

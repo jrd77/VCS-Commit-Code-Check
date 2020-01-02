@@ -28,7 +28,7 @@ dependencies {
 
     compile project(":order-core-all:renter-all:renter-order")
 
-    compile 'com.autoyol:autoPayGatewaySecondary-api:1.0.6-SNAPSHOT'
+    compile 'com.autoyol:autoPayGatewaySecondary-api:1.0.7-SNAPSHOT'
     compile 'com.autoframework:auto-mq-event:1.0-SNAPSHOT'
     compile 'com.autoyol:auto-wallet-service-api:1.0.2-SNAPSHOT'
 }

@@ -11,6 +11,7 @@ import com.atzuche.order.cashieraccount.service.notservice.CashierNoTService;
 import com.atzuche.order.cashieraccount.service.notservice.CashierRefundApplyNoTService;
 import com.atzuche.order.cashieraccount.service.remote.RefundRemoteService;
 import com.atzuche.order.cashieraccount.service.remote.WalletRemoteService;
+import com.atzuche.order.cashieraccount.vo.req.pay.OrderPayReqVO;
 import com.atzuche.order.cashieraccount.vo.req.pay.OrderPaySignReqVO;
 import com.atzuche.order.cashieraccount.vo.res.AccountPayAbleResVO;
 import com.atzuche.order.cashieraccount.vo.res.OrderPayableAmountResVO;
@@ -111,7 +112,9 @@ public class CashierPayService{
         orderPaySign.check();
 
         //3 查询应付
-        OrderPayableAmountResVO payVO = getOrderPayableAmount(orderPaySign);
+        OrderPayReqVO orderPayReqVO = new OrderPayReqVO();
+        BeanUtils.copyProperties(orderPaySign,orderPayReqVO);
+        OrderPayableAmountResVO payVO = getOrderPayableAmount(orderPayReqVO);
         //4 抵扣钱包
         if(YesNoEnum.YES.getCode()==payVO.getIsUseWallet()){
            int payBalance = walletRemoteService.getWalletPayBalanceByMemNo(orderPaySign.getMenNo());
@@ -133,52 +136,52 @@ public class CashierPayService{
     }
 
     /**
-     * 当前需要支付的相关信息
+     * 查询支付款项信息
      */
     @CatAnnotation
-    public OrderPayableAmountResVO getOrderPayableAmount(OrderPaySignReqVO orderPaySign){
-        Assert.notNull(orderPaySign, ErrorCode.PARAMETER_ERROR.getText());
-        orderPaySign.check();
+    public OrderPayableAmountResVO getOrderPayableAmount(OrderPayReqVO orderPayReqVO){
+        Assert.notNull(orderPayReqVO, ErrorCode.PARAMETER_ERROR.getText());
+        orderPayReqVO.check();
         //1 查询子单号
-        RenterOrderEntity renterOrderEntity = cashierNoTService.getRenterOrderNoByOrderNo(orderPaySign.getOrderNo());
+        RenterOrderEntity renterOrderEntity = cashierNoTService.getRenterOrderNoByOrderNo(orderPayReqVO.getOrderNo());
         OrderPayableAmountResVO result = new OrderPayableAmountResVO();
         // 判断是否支持 钱包支付 、页面传入是否使用钱包标记 优先
-        Integer isUseWallet = Objects.isNull(orderPaySign.getIsUseWallet())?renterOrderEntity.getIsUseWallet():orderPaySign.getIsUseWallet();
+        Integer isUseWallet = Objects.isNull(orderPayReqVO.getIsUseWallet())?renterOrderEntity.getIsUseWallet():orderPayReqVO.getIsUseWallet();
         result.setIsUseWallet(isUseWallet);
 
         //待支付金额明细
         List<AccountPayAbleResVO> accountPayAbles = new ArrayList<>();
         //车辆押金 是否选择车辆押金
         int amtDeposit = 0;
-        if(orderPaySign.getPayKind().contains(DataPayKindConstant.RENT)){
-            amtDeposit = cashierNoTService.getPayDeposit(orderPaySign.getOrderNo(),orderPaySign.getMenNo(), DataPayKindConstant.RENT);
-            accountPayAbles.add(new AccountPayAbleResVO(orderPaySign.getOrderNo(),orderPaySign.getMenNo(),amtDeposit, RenterCashCodeEnum.ACCOUNT_RENTER_DEPOSIT,RenterCashCodeEnum.ACCOUNT_RENTER_DEPOSIT.getTxt()));
+        if(orderPayReqVO.getPayKind().contains(DataPayKindConstant.RENT)){
+            amtDeposit = cashierNoTService.getPayDeposit(orderPayReqVO.getOrderNo(),orderPayReqVO.getMenNo(), DataPayKindConstant.RENT);
+            accountPayAbles.add(new AccountPayAbleResVO(orderPayReqVO.getOrderNo(),orderPayReqVO.getMenNo(),amtDeposit, RenterCashCodeEnum.ACCOUNT_RENTER_DEPOSIT,RenterCashCodeEnum.ACCOUNT_RENTER_DEPOSIT.getTxt()));
         }
 
         //违章押金 是否选择违章押金
         int amtWZDeposit = 0;
-        if(orderPaySign.getPayKind().contains(DataPayKindConstant.DEPOSIT)){
-            amtWZDeposit =  cashierNoTService.getPayDeposit(orderPaySign.getOrderNo(),orderPaySign.getMenNo(),DataPayKindConstant.DEPOSIT);
-            accountPayAbles.add(new AccountPayAbleResVO(orderPaySign.getOrderNo(),orderPaySign.getMenNo(),amtWZDeposit, RenterCashCodeEnum.ACCOUNT_RENTER_DEPOSIT,RenterCashCodeEnum.ACCOUNT_RENTER_DEPOSIT.getTxt()));
+        if(orderPayReqVO.getPayKind().contains(DataPayKindConstant.DEPOSIT)){
+            amtWZDeposit =  cashierNoTService.getPayDeposit(orderPayReqVO.getOrderNo(),orderPayReqVO.getMenNo(),DataPayKindConstant.DEPOSIT);
+            accountPayAbles.add(new AccountPayAbleResVO(orderPayReqVO.getOrderNo(),orderPayReqVO.getMenNo(),amtWZDeposit, RenterCashCodeEnum.ACCOUNT_RENTER_DEPOSIT,RenterCashCodeEnum.ACCOUNT_RENTER_DEPOSIT.getTxt()));
         }
 
         //应付租车费用
         int rentAmt =0;
         //已付租车费用
         int rentAmtPayed = 0;
-        if(orderPaySign.getPayKind().contains(DataPayKindConstant.RENT_AMOUNT)){
-            List<PayableVO> payableVOs = renterOrderCostCombineService.listPayableVO(orderPaySign.getOrderNo(),renterOrderEntity.getRenterOrderNo(),orderPaySign.getMenNo());
+        if(orderPayReqVO.getPayKind().contains(DataPayKindConstant.RENT_AMOUNT)){
+            List<PayableVO> payableVOs = renterOrderCostCombineService.listPayableVO(orderPayReqVO.getOrderNo(),renterOrderEntity.getRenterOrderNo(),orderPayReqVO.getMenNo());
             result.setPayableVOs(payableVOs);
             //应付租车费用
             rentAmt = cashierNoTService.sumRentOrderCost(payableVOs);
             //已付租车费用
-            rentAmtPayed = accountRenterCostSettleService.getCostPaidRent(orderPaySign.getOrderNo(),orderPaySign.getMenNo());
+            rentAmtPayed = accountRenterCostSettleService.getCostPaidRent(orderPayReqVO.getOrderNo(),orderPayReqVO.getMenNo());
             if(!CollectionUtils.isEmpty(payableVOs)){
                 for(int i=0;i<payableVOs.size();i++){
                     PayableVO payableVO = payableVOs.get(i);
                     //判断是租车费用、还是补付 租车费用 并记录 详情
                     RenterCashCodeEnum type = rentAmtPayed>0?RenterCashCodeEnum.ACCOUNT_RENTER_RENT_COST_AGAIN:RenterCashCodeEnum.ACCOUNT_RENTER_RENT_COST;
-                    accountPayAbles.add(new AccountPayAbleResVO(orderPaySign.getOrderNo(),orderPaySign.getMenNo(),payableVO.getAmt(),type,payableVO.getTitle()));
+                    accountPayAbles.add(new AccountPayAbleResVO(orderPayReqVO.getOrderNo(),orderPayReqVO.getMenNo(),payableVO.getAmt(),type,payableVO.getTitle()));
                 }
             }
         }
@@ -189,12 +192,12 @@ public class CashierPayService{
         // 计算钱包 支付
         int amtWallet =0;
         if(YesNoEnum.YES.getCode()==result.getIsUseWallet()){
-            int payBalance = walletRemoteService.getWalletPayBalanceByMemNo(orderPaySign.getMenNo());
+            int payBalance = walletRemoteService.getWalletPayBalanceByMemNo(orderPayReqVO.getMenNo());
             //预计钱包抵扣金额 = amtWallet
             amtWallet = amtRent + payBalance < 0 ? -payBalance : amtRent;
             // 抵扣钱包后  应付金额
             amtRent =  amtRent + payBalance < 0 ? amtRent + payBalance : 0;
-            accountPayAbles.add(new AccountPayAbleResVO(orderPaySign.getOrderNo(),orderPaySign.getMenNo(),amtRent,RenterCashCodeEnum.ACCOUNT_WALLET_COST,RenterCashCodeEnum.ACCOUNT_WALLET_COST.getTxt()));
+            accountPayAbles.add(new AccountPayAbleResVO(orderPayReqVO.getOrderNo(),orderPayReqVO.getMenNo(),amtRent,RenterCashCodeEnum.ACCOUNT_WALLET_COST,RenterCashCodeEnum.ACCOUNT_WALLET_COST.getTxt()));
         }
         result.setAmtWallet(amtWallet);
         result.setAmtRent(amtRent);
@@ -203,8 +206,8 @@ public class CashierPayService{
         result.setAmtTotal(amtTotal);
         result.setAmtPay(rentAmtPayed);
         result.setAmt(amtTotal + rentAmtPayed);
-        result.setMemNo(orderPaySign.getMenNo());
-        result.setOrderNo(orderPaySign.getOrderNo());
+        result.setMemNo(orderPayReqVO.getMenNo());
+        result.setOrderNo(orderPayReqVO.getOrderNo());
         result.setTitle("待支付金额：" +result.getAmt() + "，订单号："  + result.getOrderNo());
         result.setAccountPayAbles(accountPayAbles);
         return result;
