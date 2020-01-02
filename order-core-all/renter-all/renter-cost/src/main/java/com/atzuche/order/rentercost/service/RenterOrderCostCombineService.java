@@ -397,28 +397,28 @@ public class RenterOrderCostCombineService {
      * @return
      */
     public double getNewCarCoefficient(int year) {
-        List<SysConfigEntity> sysConfigSDKConfig = sysConfigSDK.getConfig(new DefaultConfigContext());
+        List<SysContantEntity> sysConstantSDKConfig = sysConstantSDK.getConfig(new DefaultConfigContext());
         if (year <= 2) {
-            SysConfigEntity sysConfigEntity = Optional.ofNullable(sysConfigSDKConfig)
+            SysContantEntity sysContantEntity = Optional.ofNullable(sysConstantSDKConfig)
                     .orElse(new ArrayList<>())
                     .stream()
-                    .filter(x -> GlobalConstant.CAR_YEAR_NEQTWO.equals(x.getItemKey()))
+                    .filter(x -> GlobalConstant.CAR_YEAR_NEQTWO.equals(x.getCode()))
                     .findFirst()
                     .get();
-            if (sysConfigEntity != null) {
-                String itemValue = sysConfigEntity.getItemValue();
-                return itemValue!=null?Double.valueOf(itemValue):GlobalConstant.CAR_YEAR_NEQTWO_DEFAULT_VALUE;
+            if (sysContantEntity != null) {
+                String value = sysContantEntity.getValue();
+                return value!=null?Double.valueOf(value):GlobalConstant.CAR_YEAR_NEQTWO_DEFAULT_VALUE;
             }
         }else{
-            SysConfigEntity sysConfigEntity = Optional.ofNullable(sysConfigSDKConfig)
+            SysContantEntity sysContantEntity = Optional.ofNullable(sysConstantSDKConfig)
                     .orElse(new ArrayList<>())
                     .stream()
-                    .filter(x -> GlobalConstant.CAR_YEAR_LTTWO.equals(x.getItemKey()))
+                    .filter(x -> GlobalConstant.CAR_YEAR_LTTWO.equals(x.getCode()))
                     .findFirst()
                     .get();
-            if (sysConfigEntity!=null) {
-                String itemValue = sysConfigEntity.getItemValue();
-                return itemValue!=null ?Double.valueOf(itemValue):GlobalConstant.CAR_YEAR_LTTWO_DEFAULT_VALUE;
+            if (sysContantEntity!=null) {
+                String value = sysContantEntity.getValue();
+                return value!=null ?Double.valueOf(value):GlobalConstant.CAR_YEAR_LTTWO_DEFAULT_VALUE;
             }
         }
         return GlobalConstant.NEW_CAR_COEFFICIENT_DEFAULT_VALUE;

@@ -120,57 +120,56 @@
 
     <insert id="insertSelective" parameterType="com.atzuche.order.renterorder.entity.RenterOrderEntity" useGeneratedKeys="true" keyProperty="id">
         insert into renter_order
-        (
-        <if test="orderNo != null">`order_no`, </if>
-        <if test="renterOrderNo != null">`renter_order_no`, </if>
-        <if test="expRentTime != null">`exp_rent_time`, </if>
-        <if test="expRevertTime != null">`exp_revert_time`, </if>
-        <if test="actRentTime != null">`act_rent_time`, </if>
-        <if test="actRevertTime != null">`act_revert_time`, </if>
-        <if test="goodsCode != null">`goods_code`, </if>
-        <if test="goodsType != null">`goods_type`, </if>
-        <if test="agreeFlag != null">`agree_flag`, </if>
-        <if test="childStatus != null">`child_status`, </if>
-        <if test="isUseCoin != null">`is_use_coin`, </if>
-        <if test="isUseWallet != null">`is_use_wallet`, </if>
-        <if test="isUseCoupon != null">`is_use_coupon`, </if>
-        <if test="isGetCar != null">`is_get_car`, </if>
-        <if test="isReturnCar != null">`is_return_car`, </if>
-        <if test="addDriver != null">`add_driver`, </if>
-        <if test="isAbatement != null">`is_abatement`, </if>
-        <if test="isEffective != null">`is_effective`, </if>
-        <if test="isUseSpecialPrice != null">`is_use_special_price`, </if>
-        <if test="changeSource != null">`change_source`, </if>
-        <if test="isCancle != null">`is_cancle`, </if>
-        <if test="createOp != null">`create_op`, </if>
-        <if test="updateOp != null">`update_op` </if>
-        )
-        values
-        (
-        <if test="orderNo != null">#{orderNo},  </if>
-        <if test="renterOrderNo != null">#{renterOrderNo},  </if>
-        <if test="expRentTime != null">#{expRentTime},  </if>
-        <if test="expRevertTime != null">#{expRevertTime},  </if>
-        <if test="actRentTime != null">#{actRentTime},  </if>
-        <if test="actRevertTime != null">#{actRevertTime},  </if>
-        <if test="goodsCode != null">#{goodsCode},  </if>
-        <if test="goodsType != null">#{goodsType},  </if>
-        <if test="agreeFlag != null">#{agreeFlag},  </if>
-        <if test="childStatus != null">#{childStatus},  </if>
-        <if test="isUseCoin != null">#{isUseCoin},  </if>
-        <if test="isUseWallet != null">#{isUseWallet},  </if>
-        <if test="isUseCoupon != null">#{isUseCoupon},  </if>
-        <if test="isGetCar != null">#{isGetCar},  </if>
-        <if test="isReturnCar != null">#{isReturnCar},  </if>
-        <if test="addDriver != null">#{addDriver},  </if>
-        <if test="isAbatement != null">#{isAbatement},  </if>
-        <if test="isEffective != null">#{isEffective},  </if>
-        <if test="isUseSpecialPrice != null">#{isUseSpecialPrice},  </if>
-        <if test="changeSource != null">#{changeSource},  </if>
-        <if test="isCancle != null">#{isCancle},  </if>
-        <if test="createOp != null">#{createOp},  </if>
-        <if test="updateOp != null">#{updateOp}  </if>
-        )
+        <trim prefix="(" suffix=")" suffixOverrides="," >
+            <if test="orderNo != null">`order_no`, </if>
+            <if test="renterOrderNo != null">`renter_order_no`, </if>
+            <if test="expRentTime != null">`exp_rent_time`, </if>
+            <if test="expRevertTime != null">`exp_revert_time`, </if>
+            <if test="actRentTime != null">`act_rent_time`, </if>
+            <if test="actRevertTime != null">`act_revert_time`, </if>
+            <if test="goodsCode != null">`goods_code`, </if>
+            <if test="goodsType != null">`goods_type`, </if>
+            <if test="agreeFlag != null">`agree_flag`, </if>
+            <if test="childStatus != null">`child_status`, </if>
+            <if test="isUseCoin != null">`is_use_coin`, </if>
+            <if test="isUseWallet != null">`is_use_wallet`, </if>
+            <if test="isUseCoupon != null">`is_use_coupon`, </if>
+            <if test="isGetCar != null">`is_get_car`, </if>
+            <if test="isReturnCar != null">`is_return_car`, </if>
+            <if test="addDriver != null">`add_driver`, </if>
+            <if test="isAbatement != null">`is_abatement`, </if>
+            <if test="isEffective != null">`is_effective`, </if>
+            <if test="isUseSpecialPrice != null">`is_use_special_price`, </if>
+            <if test="changeSource != null">`change_source`, </if>
+            <if test="isCancle != null">`is_cancle`, </if>
+            <if test="createOp != null">`create_op`, </if>
+            <if test="updateOp != null">`update_op` </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides="," >
+            <if test="orderNo != null">#{orderNo},  </if>
+            <if test="renterOrderNo != null">#{renterOrderNo},  </if>
+            <if test="expRentTime != null">#{expRentTime},  </if>
+            <if test="expRevertTime != null">#{expRevertTime},  </if>
+            <if test="actRentTime != null">#{actRentTime},  </if>
+            <if test="actRevertTime != null">#{actRevertTime},  </if>
+            <if test="goodsCode != null">#{goodsCode},  </if>
+            <if test="goodsType != null">#{goodsType},  </if>
+            <if test="agreeFlag != null">#{agreeFlag},  </if>
+            <if test="childStatus != null">#{childStatus},  </if>
+            <if test="isUseCoin != null">#{isUseCoin},  </if>
+            <if test="isUseWallet != null">#{isUseWallet},  </if>
+            <if test="isUseCoupon != null">#{isUseCoupon},  </if>
+            <if test="isGetCar != null">#{isGetCar},  </if>
+            <if test="isReturnCar != null">#{isReturnCar},  </if>
+            <if test="addDriver != null">#{addDriver},  </if>
+            <if test="isAbatement != null">#{isAbatement},  </if>
+            <if test="isEffective != null">#{isEffective},  </if>
+            <if test="isUseSpecialPrice != null">#{isUseSpecialPrice},  </if>
+            <if test="changeSource != null">#{changeSource},  </if>
+            <if test="isCancle != null">#{isCancle},  </if>
+            <if test="createOp != null">#{createOp},  </if>
+            <if test="updateOp != null">#{updateOp}  </if>
+        </trim>
     </insert>
 
 
