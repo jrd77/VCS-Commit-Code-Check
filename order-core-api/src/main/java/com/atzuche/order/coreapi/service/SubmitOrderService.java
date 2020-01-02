@@ -12,6 +12,7 @@ import com.atzuche.order.commons.entity.dto.OwnerGoodsDetailDTO;
 import com.atzuche.order.commons.entity.dto.OwnerMemberDTO;
 import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
 import com.atzuche.order.commons.entity.dto.RenterMemberDTO;
+import com.atzuche.order.commons.enums.OrderStatusEnum;
 import com.atzuche.order.commons.enums.RenterCashCodeEnum;
 import com.atzuche.order.commons.enums.SubsidySourceCodeEnum;
 import com.atzuche.order.commons.enums.SubsidyTypeCodeEnum;
@@ -199,17 +200,17 @@ public class SubmitOrderService {
         OrderStatusDTO orderStatusDTO = new OrderStatusDTO();
         orderStatusDTO.setOrderNo(orderNo);
         if (null == renterGoodsDetailDTO.getReplyFlag() || renterGoodsDetailDTO.getReplyFlag() == OrderConstant.NO) {
-            orderStatusDTO.setStatus(OrderStatus.TO_CONFIRM.getStatus());
+            orderStatusDTO.setStatus(OrderStatusEnum.TO_CONFIRM.getStatus());
         } else {
-            orderStatusDTO.setStatus(OrderStatus.TO_PAY.getStatus());
+            orderStatusDTO.setStatus(OrderStatusEnum.TO_PAY.getStatus());
         }
         parentOrderDTO.setOrderStatusDTO(orderStatusDTO);
         parentOrderService.saveParentOrderInfo(parentOrderDTO);
 
         //6.4 order_flow
-        orderFlowService.inserOrderStatusChangeProcessInfo(orderNo,OrderStatus.TO_CONFIRM);
+        orderFlowService.inserOrderStatusChangeProcessInfo(orderNo,OrderStatusEnum.TO_CONFIRM);
         if(null != renterGoodsDetailDTO.getReplyFlag() && renterGoodsDetailDTO.getReplyFlag() == OrderConstant.YES){
-            orderFlowService.inserOrderStatusChangeProcessInfo(orderNo,OrderStatus.TO_PAY);
+            orderFlowService.inserOrderStatusChangeProcessInfo(orderNo,OrderStatusEnum.TO_PAY);
         }
 
         //7. 优惠券绑定、凹凸币扣除等
