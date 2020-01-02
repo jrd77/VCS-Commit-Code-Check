@@ -1,9 +1,7 @@
 package com.atzuche.order.delivery.service.delivery;
 
 import com.atzuche.order.commons.OrderReqContext;
-import com.atzuche.order.commons.entity.dto.OwnerMemberDTO;
-import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
-import com.atzuche.order.commons.entity.dto.RenterMemberDTO;
+import com.atzuche.order.commons.entity.dto.*;
 import com.atzuche.order.commons.vo.req.NormalOrderReqVO;
 import com.atzuche.order.delivery.common.DeliveryCarTask;
 import com.atzuche.order.delivery.common.DeliveryErrorCode;
@@ -26,6 +24,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 /**
  * @author 胡春林
@@ -129,6 +129,7 @@ public class DeliveryCarService {
         OwnerMemberDTO ownerMemberDTO = orderReqContext.getOwnerMemberDto();
         RenYunFlowOrderDTO renYunFlowOrderDTO = new RenYunFlowOrderDTO();
         RenterGoodsDetailDTO renterGoodsDetailDTO = orderReqContext.getRenterGoodsDetailDto();
+        OwnerGoodsDetailDTO ownerGoodsDetailDTO = orderReqContext.getOwnerGoodsDetailDto();
         //不使用还车服务（一定不使用取车服务）
         if (normalOrderReqVO.getSrvReturnFlag().intValue() == UsedDeliveryTypeEnum.NO_USED.getValue().intValue()) {
 
@@ -172,7 +173,7 @@ public class DeliveryCarService {
             orderDeliveryDTO.setRenterName(renterMemberDTO.getRealName());
             orderDeliveryDTO.setRenterPhone(renterMemberDTO.getPhone());
             orderDeliveryDTO.setOrderNo(renterGoodsDetailDTO.getOrderNo());
-            orderDeliveryDTO.setCityCode(normalOrderReqVO.getCityCode());
+            orderDeliveryDTO.setRenterDealCount(renterMemberDTO.getOrderSuccessCount());
             orderDeliveryDTO.setIsNotifyRenyun(UsedDeliveryTypeEnum.USED.getValue().intValue());
             orderDeliveryDTO.setOwnerGetReturnAddr(normalOrderReqVO.getSrvReturnAddr());
             orderDeliveryDTO.setOwnerGetReturnAddrLat(normalOrderReqVO.getSrvReturnLat());
@@ -196,6 +197,29 @@ public class DeliveryCarService {
             renYunFlowOrderDTO.setCarLat(orderDeliveryDTO.getRenterGetReturnAddrLat());
             renYunFlowOrderDTO.setCarLon(orderDeliveryDTO.getRenterGetReturnAddrLon());
             renYunFlowOrderDTO.setCarno(String.valueOf(renterGoodsDetailDTO.getCarNo()));
+            renYunFlowOrderDTO.setChannelType("10");
+            renYunFlowOrderDTO.setDayMileage(String.valueOf(renterGoodsDetailDTO.getCarDayMileage()));
+            List<RenterGoodsPriceDetailDTO> renterGoodsPriceDetailDTOList = renterGoodsDetailDTO.getRenterGoodsPriceDetailDTOList();
+            renYunFlowOrderDTO.setDayUnitPrice(String.valueOf(renterGoodsPriceDetailDTOList.get(0).getCarUnitPrice()));
+            renYunFlowOrderDTO.setDefaultpickupcaraddr(orderDeliveryDTO.getRenterGetReturnAddr());
+            renYunFlowOrderDTO.setDeliverycarcity(normalOrderReqVO.getCityName());
+            renYunFlowOrderDTO.setDelegaAdmin(ownerMemberDTO.getNickName());
+            renYunFlowOrderDTO.setDelegaAdminPhone(ownerGoodsDetailDTO.getCarStewardPhone());
+            renYunFlowOrderDTO.setDetectStatus(String.valueOf(ownerGoodsDetailDTO.getCarStatus()));
+            renYunFlowOrderDTO.setGuideDayPrice(String.valueOf(renterGoodsPriceDetailDTOList.get(0).getCarUnitPrice()));
+            renYunFlowOrderDTO.setGetKilometre("0");
+            renYunFlowOrderDTO.setReturnKilometre("0");
+            renYunFlowOrderDTO.setFlightNo(renYunFlowOrderDTO.getFlightNo());
+            renYunFlowOrderDTO.setEmerContact(renterMemberDTO.getRealName());
+            renYunFlowOrderDTO.setEmerContactPhone(renterMemberDTO.getPhone());
+            renYunFlowOrderDTO.setDisplacement(String.valueOf(ownerGoodsDetailDTO.getCarCylinderCapacity()));
+            renYunFlowOrderDTO.setHolidayAverage(String.valueOf(renterGoodsPriceDetailDTOList.get(0).getCarUnitPrice()));
+            renYunFlowOrderDTO.setHolidayPrice(String.valueOf(renterGoodsPriceDetailDTOList.get(0).getCarUnitPrice()));
+            renYunFlowOrderDTO.setDepositPayTime(DateUtils.formate(renterGoodsDetailDTO.getRentTime(),"yyyyMMddHHmmss"));
+            renYunFlowOrderDTO.setOrdernumber(renterGoodsDetailDTO.getOrderNo());
+            renYunFlowOrderDTO.setOrderType("0");
+            renYunFlowOrderDTO.setOfflineOrderType("2");
+            renYunFlowOrderDTO.setSource(normalOrderReqVO.getSource());
         }
         orderDeliveryVO.setOrderDeliveryDTO(orderDeliveryDTO);
         orderDeliveryVO.setRenterDeliveryAddrDTO(renterDeliveryAddrDTO);
