@@ -104,6 +104,10 @@ public class RenterOrderEntity implements Serializable {
 	 */
 	private Integer isCancle;
 	/**
+	 * 修改方 1、后台管理 2、租客 3、车主
+	 */
+	private String changeSource;
+	/**
 	 * 创建时间
 	 */
 	private LocalDateTime createTime;
