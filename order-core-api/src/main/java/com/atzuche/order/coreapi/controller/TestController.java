@@ -2,21 +2,18 @@ package com.atzuche.order.coreapi.controller;
 
 import com.atzuche.config.client.api.DefaultConfigContext;
 import com.atzuche.config.client.api.SysConfigSDK;
-import com.atzuche.config.common.api.ConfigFeignService;
+import com.atzuche.config.client.api.SysConstantSDK;
+import com.atzuche.config.common.entity.SysContantEntity;
 import com.atzuche.order.cashieraccount.service.CashierService;
 import com.atzuche.order.cashieraccount.vo.req.CashierDeductDebtReqVO;
-import com.atzuche.order.commons.OrderException;
 import com.atzuche.order.config.oilpriceconfig.OilAverageCostCacheConfigService;
-import com.atzuche.order.cashieraccount.service.notservice.CashierBindCardNoTService;
-import com.atzuche.order.coreapi.submitOrder.exception.SubmitOrderException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.validation.BindException;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.io.IOException;
+import java.util.List;
 
 /**
  * @author <a href="mailto:lianglin.sjtu@gmail.com">AndySjtu</a>
@@ -33,6 +30,8 @@ public class TestController {
     OilAverageCostCacheConfigService oilAverageCostCacheConfig;
     @Autowired
     CashierService cashierService;
+    @Autowired
+    private SysConstantSDK sysConstantSDK;
     @GetMapping(path = "/test")
     public String test(){
         CashierDeductDebtReqVO vo = new CashierDeductDebtReqVO();
@@ -46,5 +45,15 @@ public class TestController {
         logger.info("xxxxxxxxxxxxx");
         logger.info("{}",configFeignService.getConfig(new DefaultConfigContext()));
         return "xx";
+    }
+
+    @GetMapping("/aa")
+    public Object aa(){
+        List<SysContantEntity> config = sysConstantSDK.getConfig(new DefaultConfigContext());
+        return config;
+    }
+    @GetMapping("city")
+    public Object city(){
+        return null;
     }
 }
