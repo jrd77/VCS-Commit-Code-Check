@@ -1,36 +1,58 @@
 package com.atzuche.order.cashieraccount.vo.req.pay;
 
+import com.autoyol.commons.web.ErrorCode;
+import com.autoyol.doc.annotation.AutoDocProperty;
 import lombok.Data;
+import org.springframework.util.Assert;
+import org.springframework.util.CollectionUtils;
+
+import javax.validation.constraints.NotNull;
+import java.util.List;
 
 /**
- * 支付系统支付请求签名参数
+ * 查询支付款项信息
  */
 @Data
-public class OrderPayReqVO extends OrderPayBaseReqVO {
+public class OrderPayReqVO {
 
 
     /**
-     * 支付金额
+     * 选择的支付款项支付款项
+     * 支付款项，01：租车押金，02：违章押金， 03补付租车押金
+     支付款项，06：充值,07:支付欠款
+     坦客支付款项，04:行程费用，05:押金费用
+     来自配置DataPayKindConstant.class
      */
-    private int payAmt;
-    /**
-     * 支付标题
-     */
-    private String payTitle;
+    @AutoDocProperty("支付款项")
+    @NotNull
+    private List<String> payKind         ;
 
     /**
-     * openid
+     * 会员号
      */
-    private String openId;
+    @AutoDocProperty("会员号")
+    @NotNull
+    private String menNo;
+    /**
+     * orderNo
+     */
+    @AutoDocProperty("主订单号")
+    @NotNull
+    private String orderNo;
 
     /**
-     * 补付第几笔
+     * 是否使用钱包 0-否，1-是
      */
-    private String paySn;
+    @AutoDocProperty("是否使用钱包 0-否，1-是")
+    private Integer isUseWallet;
 
     /**
-     * 加密字段
+     * 参数校验
      */
-    private String payMd5;
+    public void check() {
+        Assert.notNull(getMenNo(), ErrorCode.PARAMETER_ERROR.getText());
+        Assert.notNull(getOrderNo(), ErrorCode.PARAMETER_ERROR.getText());
+        Assert.isTrue(!CollectionUtils.isEmpty(getPayKind()), ErrorCode.PARAMETER_ERROR.getText());
+    }
 
 }

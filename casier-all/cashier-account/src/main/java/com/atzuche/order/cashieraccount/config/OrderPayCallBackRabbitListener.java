@@ -26,7 +26,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Slf4j
-public class OrderPayCallBackRabbitConfig {
+public class OrderPayCallBackRabbitListener {
     @Autowired RabbitMsgLogService rabbitMsgLogService;
     @Autowired CashierPayService cashierPayService;
 
@@ -62,18 +62,18 @@ public class OrderPayCallBackRabbitConfig {
     }
 
     @Bean
-    public Queue TestDirectQueue() {
+    public Queue payDirectQueue() {
         return new Queue("auto-pay-queue",true);
     }
 
     @Bean
-    DirectExchange TestDirectExchange() {
+    DirectExchange payDirectExchange() {
         return new DirectExchange(PayRabbitMQEventEnum.AUTO_PAY.exchange);
     }
 
     @Bean
     Binding bindingDirect() {
-        return BindingBuilder.bind(TestDirectQueue()).to(TestDirectExchange()).with(PayRabbitMQEventEnum.AUTO_PAY.exchange);
+        return BindingBuilder.bind(payDirectQueue()).to(payDirectExchange()).with(PayRabbitMQEventEnum.AUTO_PAY.exchange);
     }
 
 }
