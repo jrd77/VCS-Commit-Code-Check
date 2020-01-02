@@ -1,6 +1,9 @@
 package com.atzuche.order.rentercost.service;
 
 import com.alibaba.fastjson.JSON;
+import com.atzuche.config.client.api.CityConfigSDK;
+import com.atzuche.config.client.api.DefaultConfigContext;
+import com.atzuche.config.common.entity.CityEntity;
 import com.atzuche.order.commons.CatConstants;
 import com.atzuche.order.commons.DateUtils;
 import com.atzuche.order.commons.GlobalConstant;
@@ -62,6 +65,8 @@ public class RenterOrderCostCombineService {
     private ConsoleRenterOrderFineDeatailService consoleRenterOrderFineDeatailService;
     @Autowired
     private OrderSupplementDetailService orderSupplementDetailService;
+    @Autowired
+    private CityConfigSDK cityConfigSDK;
 
     @Autowired
     private GetBackCityLimitFeignApi getBackCityLimitFeignApi;
@@ -72,6 +77,8 @@ public class RenterOrderCostCombineService {
     private Integer nightBegin;
     @Value("${auto.cost.nightEnd}")
     private Integer nightEnd;
+    @Value("${auto.cost.configHours}")
+    private Integer configHours;
 
 
     private static final Integer [] ORDER_TYPES = {1,2};
@@ -132,8 +139,6 @@ public class RenterOrderCostCombineService {
 	}
 	
 	private RenterOrderCostDetailEntity getRentAmtEntity(CostBaseDTO costBaseDTO, List<RenterGoodsPriceDetailDTO> dayPrices) {
-		// TODO 走配置中心获取
-		Integer configHours = 8;
 		// 数据转化
 		List<CarPriceOfDay> carPriceOfDayList = dayPrices.stream().map(dayPrice -> {
 			CarPriceOfDay carPriceOfDay = new CarPriceOfDay();
@@ -186,8 +191,6 @@ public class RenterOrderCostCombineService {
 			throw new RenterCostParameterException();
 		}
 		// TODO 走配置中心获取
-		Integer configHours = 8;
-		// TODO 走配置中心获取
 		List<InsuranceConfig> insuranceConfigs = null;
 		// 指导价
 		Integer guidPrice = insurAmtDTO.getGuidPrice();
@@ -227,8 +230,6 @@ public class RenterOrderCostCombineService {
 			Cat.logError("获取全面保障费abatementAmtDTO.costBaseDTO对象为空", new RenterCostParameterException());
 			throw new RenterCostParameterException();
 		}
-		// TODO 走配置中心获取
-		Integer configHours = 8;
 		// 指导价
 		Integer guidPrice = abatementAmtDTO.getGuidPrice();
 		if (abatementAmtDTO.getInmsrp() != null && abatementAmtDTO.getInmsrp() != 0) {
@@ -288,8 +289,6 @@ public class RenterOrderCostCombineService {
 			Cat.logError("获取超里程费用mileageAmtDTO.costBaseDTO对象为空", new RenterCostParameterException());
 			throw new RenterCostParameterException();
 		}
-		// TODO 走配置中心获取
-		Integer configHours = 8;
 		Integer mileageAmt = RenterFeeCalculatorUtils.calMileageAmt(mileageAmtDTO.getDayMileage(), mileageAmtDTO.getGuideDayPrice(), 
 				mileageAmtDTO.getGetmileage(), mileageAmtDTO.getReturnMileage(), costBaseDTO.getStartTime(), costBaseDTO.getEndTime(), configHours);
 		FeeResult feeResult = new FeeResult();
@@ -619,11 +618,13 @@ public class RenterOrderCostCombineService {
         boolean returnFlag = StringUtils.isBlank(srvReturnLon) || StringUtils.isBlank(srvReturnLat) || "0.0".equalsIgnoreCase(srvReturnLon) || "0.0".equalsIgnoreCase(srvReturnLat);
         CityDTO cityDTO = null;
         if (getFlag || returnFlag) {
-            //TODO 配置中获取
-            //cityDTO = cityMapper.getCityLonAndLatByCode(cityCode);
-            //TODO 给一个citycode=310100(上海)默认的经纬度值用于测试，测试后需要删除
-            cityDTO.setLon(String.valueOf(121.491121));
-            cityDTO.setLat(String.valueOf(31.243466));
+
+            CityEntity configByCityCode = cityConfigSDK.getConfigByCityCode(new DefaultConfigContext(), cityCode);
+            log.info("计算取还车费用-配置服务中获取配置信息configByCityCode={}",configByCityCode);
+            String lat = configByCityCode.getLat();
+            String lon = configByCityCode.getLon();
+            cityDTO.setLon(lon);
+            cityDTO.setLat(lat);
         }
         if (getFlag && cityDTO != null) {
             srvGetLon = cityDTO.getLon();
