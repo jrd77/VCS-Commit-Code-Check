@@ -27,7 +27,7 @@ public class RenterOrderDeliveryEntity implements Serializable {
 	/**
 	 * 子订单号
 	 */
-	private Integer renterOrderNo;
+	private String renterOrderNo;
 	/**
 	 * 配送订单号
 	 */
