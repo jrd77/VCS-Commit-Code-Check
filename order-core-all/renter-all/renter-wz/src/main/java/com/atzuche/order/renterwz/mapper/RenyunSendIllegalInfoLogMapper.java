@@ -58,4 +58,12 @@ public interface RenyunSendIllegalInfoLogMapper{
 	 * @return
 	 */
 	int count(@Param("wzCode") String wzCode,@Param("dataType") String dataType,@Param("carNum") String carNum);
+
+	/**
+	 * 查询任云 唯一码
+	 * @param orderNo 订单号
+	 * @param carPlateNum 车牌号
+	 * @return 唯一码
+	 */
+	String queryWzCodeByOrderNo(@Param("orderNo") String orderNo,@Param("carPlateNum") String carPlateNum);
 }

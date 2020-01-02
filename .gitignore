@@ -223,6 +223,7 @@ config/build/generated/
 config/build/resources/main/mybatis/
 config/build/
 config/out/
+order-flow/build/
 
 config/config-server/build/
 order-log/build/
