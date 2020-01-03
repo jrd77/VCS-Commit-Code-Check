@@ -77,7 +77,7 @@
 	
 	<insert id="insertSelective" parameterType="com.atzuche.order.delivery.entity.DeliveryHttpLogEntity" useGeneratedKeys="true" keyProperty="id">
 		insert into delivery_http_log
-		(
+        <trim prefix="(" suffix=")" suffixOverrides="," >
 				<if test="requestUrl != null">`request_url`, </if>
 				<if test="requestMethodType != null">`request_method_type`, </if>
 				<if test="requestParams != null">`request_params`, </if>
@@ -90,9 +90,8 @@
 				<if test="createTime != null">`create_time`, </if>
 				<if test="updateTime != null">`update_time`, </if>
 				<if test="isDelete != null">`is_delete` </if>
-			)
-		values
-		(
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides="," >
 				<if test="requestUrl != null">#{requestUrl},  </if>
 				<if test="requestMethodType != null">#{requestMethodType},  </if>
 				<if test="requestParams != null">#{requestParams},  </if>
@@ -105,7 +104,7 @@
 				<if test="createTime != null">#{createTime},  </if>
 				<if test="updateTime != null">#{updateTime},  </if>
 				<if test="isDelete != null">#{isDelete} </if>
-			)
+        </trim>
 	</insert>
 	
 	 
