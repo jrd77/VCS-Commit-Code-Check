@@ -41,7 +41,7 @@ public class DeliveryCarService {
     /**
      * 添加配送相关信息(是否下单，是否推送仁云)
      */
-    public void addRenYunFlowOrderInfo(OrderReqContext orderReqContext) {
+    public void addRenYunFlowOrderInfo(Integer getMinutes, Integer returnMinutes, OrderReqContext orderReqContext) {
         OrderDeliveryVO orderDeliveryVO = createOrderDeliveryParams(orderReqContext);
         if (null == orderDeliveryVO || orderDeliveryVO.getRenterDeliveryAddrDTO() == null) {
             throw new DeliveryOrderException(DeliveryErrorCode.DELIVERY_PARAMS_ERROR);
