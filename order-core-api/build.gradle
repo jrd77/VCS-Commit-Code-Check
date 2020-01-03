@@ -1,6 +1,5 @@
 buildscript {
     repositories {
-        mavenLocal()
         maven{url "http://10.0.3.208:8081/nexus/content/groups/public/"}
         maven{url "http://maven.aliyun.com/nexus/content/groups/public/"}
         mavenCentral()
@@ -41,7 +40,7 @@ dependencies {
 
     compile('com.autoyol:memberDetailService-api:1.0.1-SNAPSHOT')
     compile('com.autoyol.unique:unique-no-feign:3.0-SNAPSHOT')
-    compile('com.autoyol.car:auto-car-service-api:2019123101-SNAPSHOT')
+    compile('com.autoyol.car:auto-car-service-api:2019010202-SNAPSHOT')
     compile('com.autoyol.coupon:coupon-api:2019121301-SNAPSHOT')
 
 
@@ -73,4 +72,9 @@ dependencies {
     compile project(":order-flow")
 
 
+    /*compile("com.fasterxml.jackson.module:jackson-module-parameter-names")
+
+    compile("com.fasterxml.jackson.datatype:jackson-datatype-jdk8")
+
+    compile("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")*/
 }

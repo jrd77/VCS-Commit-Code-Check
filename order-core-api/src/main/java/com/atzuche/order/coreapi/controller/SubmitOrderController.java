@@ -5,8 +5,6 @@ import com.atzuche.order.commons.OrderException;
 import com.atzuche.order.commons.vo.req.AdminOrderReqVO;
 import com.atzuche.order.commons.vo.req.NormalOrderReqVO;
 import com.atzuche.order.commons.vo.req.OrderReqVO;
-import com.atzuche.order.commons.vo.res.AdminOrderResVO;
-import com.atzuche.order.commons.vo.res.NormalOrderResVO;
 import com.atzuche.order.commons.vo.res.OrderResVO;
 import com.atzuche.order.coreapi.service.SubmitOrderService;
 import com.atzuche.order.parentorder.entity.OrderRecordEntity;
@@ -26,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import javax.validation.Valid;
 
 /**
  * 下单
@@ -47,13 +46,13 @@ public class SubmitOrderController {
 
     @AutoDocMethod(description = "提交订单", value = "提交订单", response = OrderResVO.class)
     @PostMapping("/normal/req")
-    public ResponseData<OrderResVO> submitOrder(@RequestBody NormalOrderReqVO normalOrderReqVO, BindingResult bindingResult) throws Exception {
+    public ResponseData<OrderResVO> submitOrder(@Valid @RequestBody NormalOrderReqVO normalOrderReqVO, BindingResult bindingResult) throws Exception {
         LOGGER.info("Submit order.param is,normalOrderReqVO:[{}]", JSON.toJSONString(normalOrderReqVO));
         if (bindingResult.hasErrors()) {
             return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), ErrorCode.INPUT_ERROR.getText());
         }
         String memNo = normalOrderReqVO.getMemNo();
-        if (null == memNo) {
+        if (null == memNo && memNo.trim().length()<=0) {
             return new ResponseData<>(ErrorCode.NEED_LOGIN.getCode(), ErrorCode.NEED_LOGIN.getText());
         }
         OrderResVO orderResVO = null;
@@ -75,7 +74,7 @@ public class SubmitOrderController {
             orderRecordEntity.setErrorCode(orderException.getErrorCode());
             orderRecordEntity.setErrorTxt(orderException.getErrorMsg());
             orderRecordEntity.setMemNo(normalOrderReqVO.getMemNo());
-            orderRecordEntity.setOrderNo(orderResVO.getOrderNo());
+            orderRecordEntity.setOrderNo(orderResVO==null?"":orderResVO.getOrderNo());
             orderRecordEntity.setParam(JSON.toJSONString(normalOrderReqVO));
             orderRecordEntity.setResult(JSON.toJSONString(orderResVO));
             orderRecordService.save(orderRecordEntity);
@@ -85,7 +84,7 @@ public class SubmitOrderController {
             orderRecordEntity.setErrorCode(ErrorCode.SYS_ERROR.getCode());
             orderRecordEntity.setErrorTxt(ErrorCode.SYS_ERROR.getText());
             orderRecordEntity.setMemNo(normalOrderReqVO.getMemNo());
-            orderRecordEntity.setOrderNo(orderResVO.getOrderNo());
+            orderRecordEntity.setOrderNo(orderResVO==null?"":orderResVO.getOrderNo());
             orderRecordEntity.setParam(JSON.toJSONString(normalOrderReqVO));
             orderRecordEntity.setResult(JSON.toJSONString(orderResVO));
             orderRecordService.save(orderRecordEntity);
@@ -128,7 +127,7 @@ public class SubmitOrderController {
             orderRecordEntity.setErrorCode(orderException.getErrorCode());
             orderRecordEntity.setErrorTxt(orderException.getErrorMsg());
             orderRecordEntity.setMemNo(adminOrderReqVO.getMemNo());
-            orderRecordEntity.setOrderNo(orderResVO.getOrderNo());
+            orderRecordEntity.setOrderNo(orderResVO==null?"":orderResVO.getOrderNo());
             orderRecordEntity.setParam(JSON.toJSONString(adminOrderReqVO));
             orderRecordEntity.setResult(JSON.toJSONString(orderResVO));
             orderRecordService.save(orderRecordEntity);
@@ -138,7 +137,7 @@ public class SubmitOrderController {
             orderRecordEntity.setErrorCode(ErrorCode.SYS_ERROR.getCode());
             orderRecordEntity.setErrorTxt(ErrorCode.SYS_ERROR.getText());
             orderRecordEntity.setMemNo(adminOrderReqVO.getMemNo());
-            orderRecordEntity.setOrderNo(orderResVO.getOrderNo());
+            orderRecordEntity.setOrderNo(orderResVO==null?"":orderResVO.getOrderNo());
             orderRecordEntity.setParam(JSON.toJSONString(adminOrderReqVO));
             orderRecordEntity.setResult(JSON.toJSONString(orderResVO));
             orderRecordService.save(orderRecordEntity);

@@ -2,6 +2,7 @@ package com.atzuche.order.commons.vo.req;
 
 import com.autoyol.doc.annotation.AutoDocProperty;
 import org.hibernate.validator.constraints.NotBlank;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
@@ -52,9 +53,11 @@ public class NormalOrderReqVO extends BaseVO implements Serializable {
     @AutoDocProperty(value = "细分订单来源")
     private String subSource;
 
+    @DateTimeFormat(pattern="yyyy-MM-dd'T'HH:mm:ss")
     @AutoDocProperty(value = "订单取车时间(yyyy-MM-dd HH:mm:ss)", required = true)
     private LocalDateTime rentTime;
 
+    @DateTimeFormat(pattern="yyyy-MM-dd'T'HH:mm:ss")
     @AutoDocProperty(value = "订单还车时间(yyyy-MM-dd HH:mm:ss)", required = true)
     private LocalDateTime revertTime;
 

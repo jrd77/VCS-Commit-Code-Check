@@ -66,7 +66,7 @@
 
 	<insert id="insert" parameterType="com.atzuche.order.delivery.entity.RenterDeliveryAddrEntity" useGeneratedKeys="true" keyProperty="id">
 		insert into renter_delivery_addr
-		(
+        <trim prefix="(" suffix=")" suffixOverrides="," >
 				`order_no`,		
 				`renter_order_no`,		
 				`exp_get_car_addr`,		
@@ -89,10 +89,9 @@
 				`create_op`,		
 				`update_time`,		
 				`update_op`,		
-				`is_delete`		
-			)
-		values
-		(
+				`is_delete`
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides="," >
 				#{orderNo}, 		
 				#{renterOrderNo}, 		
 				#{expGetCarAddr}, 		
@@ -115,8 +114,8 @@
 				#{createOp}, 		
 				#{updateTime}, 		
 				#{updateOp}, 		
-				#{isDelete}		
-			)
+				#{isDelete}
+        </trim>
 	</insert>
 	
 	<insert id="insertSelective" parameterType="com.atzuche.order.delivery.entity.RenterDeliveryAddrEntity" useGeneratedKeys="true" keyProperty="id">

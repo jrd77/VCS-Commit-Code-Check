@@ -129,7 +129,7 @@
 	
 	<insert id="insertSelective" parameterType="com.atzuche.order.delivery.entity.OwnerHandoverCarInfoEntity" useGeneratedKeys="true" keyProperty="id">
 		insert into owner_handover_car_info
-		(
+        <trim prefix="(" suffix=")" suffixOverrides="," >
 				<if test="orderNo != null">`order_no`, </if>
 				<if test="ownerOrderNo != null">`owner_order_no`, </if>
 				<if test="type != null">`type`, </if>
@@ -155,9 +155,8 @@
 				<if test="updateOp != null">`update_op`, </if>
 				<if test="isDelete != null">`is_delete`, </if>
 				<if test="msgId != null">`msg_id` </if>
-			)
-		values
-		(
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides="," >
 				<if test="orderNo != null">#{orderNo},  </if>
 				<if test="ownerOrderNo != null">#{ownerOrderNo},  </if>
 				<if test="type != null">#{type},  </if>
@@ -183,7 +182,7 @@
 				<if test="updateOp != null">#{updateOp},  </if>
 				<if test="isDelete != null">#{isDelete},  </if>
 				<if test="msgId != null">#{msgId} </if>
-			)
+        </trim>
 	</insert>
 	
 	 
