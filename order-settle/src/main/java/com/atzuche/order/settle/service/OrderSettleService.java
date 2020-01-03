@@ -19,8 +19,9 @@ public class OrderSettleService {
     @Async
     @Transactional(rollbackFor=Exception.class)
     public void settleOrder(String orderNo) {
-        //1 查询租客所有费用（包含：租车费用，租客补贴费用，罚金费用，交接车产生费用）
-        //2 查询车主费用 （包含 车主补贴明细表，车主罚金 车主订单采购费用，增值订单费用）
-        //3
+        //1 根据订单号校验是否可以结算  ，订单状态 已交车待结算，没有暂扣违章
+        //2 查询租客所有费用（包含：租车费用，租客补贴费用，罚金费用，交接车产生费用）
+        //3 查询车主费用 （包含: 车主补贴明细表，车主罚金 车主订单采购费用，增值订单费用）
+        //4
     }
 }
