@@ -5,7 +5,7 @@ import com.autoyol.doc.annotation.AutoDocProperty;
 /**
  * Created by qincai.lin on 2019/12/30.
  */
-public class AdditionOrderInsuranceRequestVO {
+public class OrderInsuranceAdditionRequestVO {
     @AutoDocProperty(value = "订单号")
     private String orderNo;
 
