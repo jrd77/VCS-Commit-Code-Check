@@ -87,7 +87,10 @@ public class DeliveryCarService {
     public void insertDeliveryAddress(OrderDeliveryVO orderDeliveryVO) {
         RenterDeliveryAddrEntity deliveryAddrEntity = new RenterDeliveryAddrEntity();
         BeanUtils.copyProperties(orderDeliveryVO.getRenterDeliveryAddrDTO(), deliveryAddrEntity);
-        deliveryAddrMapper.insertSelective(deliveryAddrEntity);
+        RenterDeliveryAddrEntity renterDeliveryAddrEntity = deliveryAddrMapper.selectByRenterOrderNo(deliveryAddrEntity.getRenterOrderNo());
+        if (renterDeliveryAddrEntity != null) {
+            deliveryAddrMapper.insertSelective(deliveryAddrEntity);
+        }
         if (orderDeliveryVO.getOrderDeliveryDTO() != null) {
             RenterOrderDeliveryEntity orderDeliveryEntity = new RenterOrderDeliveryEntity();
             BeanUtils.copyProperties(orderDeliveryVO.getOrderDeliveryDTO(), orderDeliveryEntity);

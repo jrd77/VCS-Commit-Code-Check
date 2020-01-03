@@ -26,7 +26,6 @@ public class CommonUtil {
         return uuid.replaceAll("-", "");
     }
 
-
     /**
      * 转换成map
      *
