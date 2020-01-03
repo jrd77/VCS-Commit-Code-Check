@@ -177,7 +177,7 @@ public class GoodsService {
         }
         List<ImageVO> collect = detailImageVO.getCarImages()
                 .stream()
-                .filter(x -> "0".equals(x.getCover()))
+                .filter(x -> "1".equals(x.getCover()))
                 .limit(1)
                 .collect(Collectors.toList());
         coverPic = collect.size()<=0 ?  "" : collect.get(0).getPicPath();
