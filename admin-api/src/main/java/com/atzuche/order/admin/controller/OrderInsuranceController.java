@@ -17,19 +17,19 @@ public class OrderInsuranceController {
 
 	@AutoDocMethod(description = "购买保险列表", value = "购买保险列表", response = OrderInsuranceResponseVO.class)
 	@GetMapping("/list")
-	public ResponseData<?> list(@RequestBody OrderInsuranceRequestVO orderInsuranceRequestVO, BindingResult bindingResult) {
+	public ResponseData<OrderInsuranceResponseVO> list(@RequestBody OrderInsuranceRequestVO orderInsuranceRequestVO, BindingResult bindingResult) {
 		return ResponseData.success(null);
 	}
 
     @AutoDocMethod(description = "手工录入保险信息", value = "手工录入保险信息", response = ResponseData.class)
     @PostMapping("/add")
-    public ResponseData<?> add(@RequestBody OrderInsuranceAdditionRequestVO additionOrderInsuranceRequestVO, BindingResult bindingResult) {
+    public ResponseData<ResponseData> add(@RequestBody OrderInsuranceAdditionRequestVO additionOrderInsuranceRequestVO, BindingResult bindingResult) {
         return ResponseData.success(null);
     }
 
     @AutoDocMethod(description = "导入保险信息excel", value = "导入保险信息excel", response = ResponseData.class)
     @PostMapping("/import")
-    public ResponseData<?> importExcel(@RequestParam("batchFile") MultipartFile file, BindingResult bindingResult) {
+    public ResponseData<ResponseData> importExcel(@RequestParam("batchFile") MultipartFile file, BindingResult bindingResult) {
         return ResponseData.success(null);
     }
 }

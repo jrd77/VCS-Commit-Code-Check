@@ -16,19 +16,19 @@ public class OrderOtherInformationController {
 
 	@AutoDocMethod(description = "修改租车城市", value = "修改租车城市", response = ResponseData.class)
 	@PutMapping("/rent/city/update")
-	public ResponseData<?> updateRentCity(@RequestBody OrderRentCityRequestVO orderRentCityRequestVO, BindingResult bindingResult) {
+	public ResponseData<ResponseData> updateRentCity(@RequestBody OrderRentCityRequestVO orderRentCityRequestVO, BindingResult bindingResult) {
 		return ResponseData.success(null);
 	}
 
     @AutoDocMethod(description = "是否风控事故修改", value = "是否风控事故修改", response = ResponseData.class)
     @PutMapping("/risk/status/update")
-    public ResponseData<?> updateRiskStatus(@RequestBody OrderRiskStatusRequestVO orderRiskStatusRequestVO, BindingResult bindingResult) {
+    public ResponseData<ResponseData> updateRiskStatus(@RequestBody OrderRiskStatusRequestVO orderRiskStatusRequestVO, BindingResult bindingResult) {
         return ResponseData.success(null);
     }
 
     @AutoDocMethod(description = "取送车备注修改", value = "取送车备注修改", response = ResponseData.class)
     @PutMapping("/get/return/car/update")
-    public ResponseData<?> updateGetReturnCarRemark(@RequestBody OrderGetReturnCarRemarkRequestVO orderGetReturnCarRemarkRequestVO, BindingResult bindingResult) {
+    public ResponseData<ResponseData> updateGetReturnCarRemark(@RequestBody OrderGetReturnCarRemarkRequestVO orderGetReturnCarRemarkRequestVO, BindingResult bindingResult) {
         return ResponseData.success(null);
     }
 
