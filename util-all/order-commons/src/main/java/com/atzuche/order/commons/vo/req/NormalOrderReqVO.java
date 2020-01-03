@@ -53,13 +53,13 @@ public class NormalOrderReqVO extends BaseVO implements Serializable {
     @AutoDocProperty(value = "细分订单来源")
     private String subSource;
 
-    @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
     @AutoDocProperty(value = "订单取车时间(yyyy-MM-dd HH:mm:ss)", required = true)
-    private LocalDateTime rentTime;
+    @NotBlank(message = "订单取车时间不能为空")
+    private String rentTime;
 
-    @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
     @AutoDocProperty(value = "订单还车时间(yyyy-MM-dd HH:mm:ss)", required = true)
-    private LocalDateTime revertTime;
+    @NotBlank(message = "订单还车时间不能为空")
+    private String revertTime;
 
     @AutoDocProperty(value = "是否使用取车服务:0.否 1.是", required = true)
     @NotNull(message = "是否使用取车服务标识不能为空")

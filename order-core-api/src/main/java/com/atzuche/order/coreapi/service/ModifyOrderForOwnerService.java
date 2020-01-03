@@ -3,6 +3,8 @@ package com.atzuche.order.coreapi.service;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import com.atzuche.order.ownercost.entity.OwnerOrderCostEntity;
 import com.atzuche.order.ownercost.entity.OwnerOrderEntity;
@@ -18,14 +20,17 @@ import com.atzuche.order.commons.entity.dto.OwnerGoodsPriceDetailDTO;
 import com.atzuche.order.commons.entity.dto.OwnerMemberDTO;
 import com.atzuche.order.commons.entity.dto.OwnerMemberRightDTO;
 import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
+import com.atzuche.order.commons.enums.SrvGetReturnEnum;
 import com.atzuche.order.coreapi.entity.dto.ModifyOrderOwnerDTO;
 import com.atzuche.order.coreapi.modifyorder.exception.ModifyOrderParameterException;
 import com.atzuche.order.coreapi.service.GoodsService.CarDetailReqVO;
+import com.atzuche.order.delivery.entity.RenterOrderDeliveryEntity;
 import com.atzuche.order.owner.commodity.service.OwnerCommodityService;
 import com.atzuche.order.ownercost.entity.OwnerOrderPurchaseDetailEntity;
 import com.atzuche.order.ownercost.entity.OwnerOrderSubsidyDetailEntity;
 import com.atzuche.order.owner.mem.service.OwnerMemberService;
 import com.atzuche.order.rentercost.entity.RenterOrderSubsidyDetailEntity;
+import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.atzuche.order.ownercost.service.OwnerOrderCostCombineService;
 import com.atzuche.order.ownercost.service.OwnerOrderCostService;
 import com.atzuche.order.ownercost.service.OwnerOrderIncrementDetailService;
@@ -59,27 +64,33 @@ public class ModifyOrderForOwnerService {
 	private OwnerOrderIncrementDetailService ownerOrderIncrementDetailService;
 	@Autowired
 	private OwnerOrderCostService ownerOrderCostService;
+	@Autowired
+	private UniqueOrderNoService uniqueOrderNoService;
 
 	/**
 	 * 租客修改订单重新下车主订单逻辑(相当于车主同意)
 	 * @param orderNo 主订单号
 	 * @return ResponseData
 	 */
-	public ResponseData<?> modifyOrderForOwner(ModifyOrderOwnerDTO modifyOrderOwnerDTO, RenterGoodsDetailDTO renterGoodsDetailDTO, RenterOrderSubsidyDetailEntity renterSubsidy) {
-		log.info("租客修改订单重新下车主订单modifyOrderOwnerDTO=[{}], renterGoodsDetailDTO=[{}]",modifyOrderOwnerDTO,renterGoodsDetailDTO);
+	public void modifyOrderForOwner(ModifyOrderOwnerDTO modifyOrderOwnerDTO, RenterOrderSubsidyDetailEntity renterSubsidy) {
+		log.info("租客修改订单重新下车主订单modifyOrderOwnerDTO=[{}], renterSubsidy=[{}]", modifyOrderOwnerDTO, renterSubsidy);
 		if (modifyOrderOwnerDTO == null) {
 			throw new ModifyOrderParameterException();
 		}
 		// 主订单号
 		String orderNo = modifyOrderOwnerDTO.getOrderNo();
+		// 生成车主订单号
+		String ownerOrderNo = uniqueOrderNoService.getOwnerOrderNo(orderNo);
+		// 赋值车主订单号
+		modifyOrderOwnerDTO.setOwnerOrderNo(ownerOrderNo);
 		// 获取修改前有效车主订单信息
 		OwnerOrderEntity ownerOrderEntity = ownerOrderService.getOwnerOrderByOrderNoAndIsEffective(orderNo);
 		// 获取车主会员信息
 		OwnerMemberDTO ownerMemberDTO = getOwnerMemberDTO(ownerOrderEntity.getOwnerOrderNo());
 		// 获取车主端商品详情
-		OwnerGoodsDetailDTO ownerGoodsDetailDTO = getOwnerGoodsDetailDTO(modifyOrderOwnerDTO, renterGoodsDetailDTO, ownerOrderEntity);
+		OwnerGoodsDetailDTO ownerGoodsDetailDTO = getOwnerGoodsDetailDTO(modifyOrderOwnerDTO, ownerOrderEntity);
 		// 封装新的车主子订单对象
-		OwnerOrderEntity ownerOrderEffective =  convertToOwnerOrderEntity(modifyOrderOwnerDTO, ownerOrderEntity, renterGoodsDetailDTO.getCarRealLon(), renterGoodsDetailDTO.getCarRealLat());
+		OwnerOrderEntity ownerOrderEffective =  convertToOwnerOrderEntity(modifyOrderOwnerDTO, ownerOrderEntity, ownerGoodsDetailDTO.getCarRealLon(), ownerGoodsDetailDTO.getCarRealLat());
 		// 封装基本对象
 		CostBaseDTO costBaseDTO = convertToCostBaseDTO(modifyOrderOwnerDTO, ownerMemberDTO);
 		// 获取租金费用信息
@@ -108,7 +119,43 @@ public class ModifyOrderForOwnerService {
 		// 上笔车主子订单置为无效
 		ownerOrderService.updateOwnerOrderInvalidById(ownerOrderEntity.getId());
 		
-		return ResponseData.success();
+	}
+	
+	
+	/**
+	 * 对象转换
+	 * @param renterOrder
+	 * @param deliveryList
+	 * @return ModifyOrderOwnerDTO
+	 */
+	public ModifyOrderOwnerDTO getModifyOrderOwnerDTO(RenterOrderEntity renterOrder, List<RenterOrderDeliveryEntity> deliveryList) {
+		ModifyOrderOwnerDTO modifyOwner = new ModifyOrderOwnerDTO();
+		if (renterOrder != null) {
+			modifyOwner.setOrderNo(renterOrder.getOrderNo());
+			modifyOwner.setRentTime(renterOrder.getExpRentTime());
+			modifyOwner.setRevertTime(renterOrder.getExpRevertTime());
+			modifyOwner.setSrvGetFlag(renterOrder.getIsGetCar());
+			modifyOwner.setSrvReturnFlag(renterOrder.getIsReturnCar());
+		}
+		Map<Integer, RenterOrderDeliveryEntity> deliveryMap = null;
+		if (deliveryList != null && !deliveryList.isEmpty()) {
+			deliveryMap = deliveryList.stream().collect(Collectors.toMap(RenterOrderDeliveryEntity::getType, deliver -> {return deliver;}));
+		}
+		if (deliveryMap != null) {
+			RenterOrderDeliveryEntity srvGetDelivery = deliveryMap.get(SrvGetReturnEnum.SRV_GET_TYPE.getCode());
+			RenterOrderDeliveryEntity srvReturnDelivery = deliveryMap.get(SrvGetReturnEnum.SRV_RETURN_TYPE.getCode());
+			if (srvGetDelivery != null) {
+				modifyOwner.setGetCarAddress(srvGetDelivery.getRenterGetReturnAddr());
+				modifyOwner.setGetCarLat(srvGetDelivery.getRenterGetReturnAddrLat());
+				modifyOwner.setGetCarLon(srvGetDelivery.getRenterGetReturnAddrLon());
+			}
+			if (srvReturnDelivery != null) {
+				modifyOwner.setRevertCarAddress(srvReturnDelivery.getRenterGetReturnAddr());
+				modifyOwner.setRevertCarLat(srvReturnDelivery.getRenterGetReturnAddrLat());
+				modifyOwner.setRevertCarLon(srvReturnDelivery.getRenterGetReturnAddrLon());
+			}
+		}
+		return modifyOwner;
 	}
 	
 	
@@ -268,12 +315,10 @@ public class ModifyOrderForOwnerService {
 	 * @param ownerOrderEntity
 	 * @return OwnerGoodsDetailDTO
 	 */
-	public OwnerGoodsDetailDTO getOwnerGoodsDetailDTO(ModifyOrderOwnerDTO modifyOrderOwnerDTO, RenterGoodsDetailDTO renterGoodsDetailDTO, OwnerOrderEntity ownerOrderEntity) {
+	public OwnerGoodsDetailDTO getOwnerGoodsDetailDTO(ModifyOrderOwnerDTO modifyOrderOwnerDTO, OwnerOrderEntity ownerOrderEntity) {
 		// 获取车主端商品详情
-		if (renterGoodsDetailDTO == null) {
-			// 调远程获取
-			renterGoodsDetailDTO = goodsService.getRenterGoodsDetail(convertToCarDetailReqVO(modifyOrderOwnerDTO, ownerOrderEntity));
-		}
+		// 调远程获取
+		RenterGoodsDetailDTO renterGoodsDetailDTO = goodsService.getRenterGoodsDetail(convertToCarDetailReqVO(modifyOrderOwnerDTO, ownerOrderEntity));
 		if (renterGoodsDetailDTO == null) {
 			log.error("getOwnerGoodsDetailDTO renterGoodsDetailDTO为空");
 			Cat.logError("getOwnerGoodsDetailDTO renterGoodsDetailDTO为空",new ModifyOrderParameterException());

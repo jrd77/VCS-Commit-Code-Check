@@ -1,6 +1,8 @@
 package com.atzuche.order.coreapi.entity.dto;
 
 import com.atzuche.order.rentercost.entity.dto.RenterOrderSubsidyDetailDTO;
+import com.atzuche.order.renterorder.entity.dto.OrderChangeItemDTO;
+
 import lombok.Data;
 import lombok.ToString;
 
@@ -91,9 +93,9 @@ public class ModifyOrderDTO {
 	 */
 	private String platformCouponId;
 	/**
-	 * 修改哪种操作标记
+	 * 修改哪种操作
 	 */
-	private ModifyFlagDTO modifyFlagDTO;
+	private List<OrderChangeItemDTO> changeItemList;
 	/**
      * 提前时间（分钟数）
      */
