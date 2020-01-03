@@ -53,11 +53,11 @@ public class NormalOrderReqVO extends BaseVO implements Serializable {
     @AutoDocProperty(value = "细分订单来源")
     private String subSource;
 
-    @DateTimeFormat(pattern="yyyy-MM-dd'T'HH:mm:ss")
+    @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
     @AutoDocProperty(value = "订单取车时间(yyyy-MM-dd HH:mm:ss)", required = true)
     private LocalDateTime rentTime;
 
-    @DateTimeFormat(pattern="yyyy-MM-dd'T'HH:mm:ss")
+    @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
     @AutoDocProperty(value = "订单还车时间(yyyy-MM-dd HH:mm:ss)", required = true)
     private LocalDateTime revertTime;
 
