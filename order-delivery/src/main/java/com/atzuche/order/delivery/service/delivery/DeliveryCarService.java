@@ -109,7 +109,7 @@ public class DeliveryCarService {
                     throw new DeliveryOrderException(DeliveryErrorCode.DELIVERY_MOUDLE_ERROR.getValue(), "没有找到最近的一笔配送订单记录");
                 }
                 CommonUtil.copyPropertiesIgnoreNull(orderDeliveryEntity, lastOrderDeliveryEntity);
-                orderDeliveryMapper.updateByPrimaryKeySelective(lastOrderDeliveryEntity);
+                orderDeliveryMapper.insert(lastOrderDeliveryEntity);
             }
         }
     }
