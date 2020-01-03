@@ -96,4 +96,11 @@ public interface RenterOrderWzDetailMapper{
 	 * @return 查询到的数据
 	 */
 	List<RenterOrderWzDetailEntity> findDetailByOrderNo(@Param("orderNo") String orderNo,@Param("plateNum")  String plateNum);
+
+	/**
+	 * 查询需要发送短信的数据
+	 * @return 列表
+	 */
+    List<RenterOrderWzDetailEntity> findSendSmsIllegalRecord();
+
 }

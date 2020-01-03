@@ -1,5 +1,6 @@
 package com.atzuche.order.renterwz.mapper;
 
+import com.atzuche.order.renterwz.vo.IllegalToDO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -55,4 +56,23 @@ public interface RenterOrderWzFinishedTodoMapper{
 	 * @param id 主键
 	 */
 	void updateStatus(Integer id);
+
+	/**
+	 * 查询当天的数据
+	 * @return 查询当天的数据
+	 */
+	List<IllegalToDO> queryToday();
+
+	/**
+	 * 批量保存
+	 * @param list 需要保存的数据
+	 */
+	void batchInsert(@Param("list") List<IllegalToDO> list);
+
+	/**
+	 * 查询未执行的数据
+	 * @return 未执行的数据
+	 */
+	List<IllegalToDO> queryFinishedToDo();
+
 }

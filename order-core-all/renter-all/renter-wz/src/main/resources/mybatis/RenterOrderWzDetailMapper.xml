@@ -356,5 +356,17 @@
 		from renter_order_wz_detail where order_flag = 1 and order_no = #{orderNo} and car_plate_num = #{plateNum} and is_valid=1
 	</select>
 
+	<select id="findSendSmsIllegalRecord" resultMap="selectColumnMap">
+		select code,order_no,
+			order_flag,
+			illegal_time,
+			illegal_addr,
+			illegal_reason,
+			illegal_amt,
+			illegal_deduct,
+			is_sms,
+			car_plate_num
+		from renter_order_wz_detail where order_flag = 1 and is_sms=0 and is_valid=1
+	</select>
 
 </mapper>

@@ -44,4 +44,8 @@ public class RenterOrderWzDetailService {
     public List<RenterOrderWzDetailEntity> findDetailByOrderNo(String orderNo, String plateNum) {
         return renterOrderWzDetailMapper.findDetailByOrderNo(orderNo,plateNum);
     }
+
+    public List<RenterOrderWzDetailEntity> findSendSmsIllegalRecord() {
+        return renterOrderWzDetailMapper.findSendSmsIllegalRecord();
+    }
 }

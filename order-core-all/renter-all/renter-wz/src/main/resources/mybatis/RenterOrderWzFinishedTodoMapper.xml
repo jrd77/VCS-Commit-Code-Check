@@ -206,4 +206,66 @@
 		UPDATE renter_order_wz_finished_todo set status = 1 where id = #{id}
 	</update>
 
+	<resultMap id="BaseResultMap" type="com.atzuche.order.renterwz.vo.IllegalToDO">
+		<id column="id" property="id"/>
+		<result column="order_no" property="orderNo"/>
+		<result column="car_no" property="regNo"/>
+		<result column="car_plate_num" property="plateNum"/>
+		<result column="rent_time" property="rentTime"/>
+		<result column="renter_no" property="rentNo"/>
+		<result column="renter_phone" property="renterPhone"/>
+		<result column="revert_time" property="revertTime"/>
+		<result column="frame_no" property="frameNo"/>
+		<result column="engine_num" property="engineNum"/>
+		<result column="status" property="status"/>
+		<result column="city_name" property="cityName"/>
+		<result column="cities" property="cities"/>
+	</resultMap>
+
+	<insert id="batchInsert" parameterType="list">
+		insert into renter_order_wz_finished_todo (
+		order_no,
+		car_no,
+		car_plate_num,
+		rent_time,
+		renter_no,
+		renter_phone,
+		revert_time,
+		frame_no,
+		engine_num,
+		status,
+		city_name,
+		cities,
+		is_delete,
+		create_time
+		) values
+		<foreach collection="list" item="param" index="index" separator=",">
+			(
+			#{param.orderNo},
+			#{param.regNo},
+			#{param.plateNum},
+			#{param.rentTime},
+			#{param.rentNo},
+			#{param.renterPhone},
+			#{param.revertTime},
+			#{param.frameNo},
+			#{param.engineNum},
+			#{param.status},
+			#{param.cityName},
+			#{param.cities},
+			0,
+			NOW()
+			)
+		</foreach>
+	</insert>
+
+	<select id="queryFinishedToDo" resultMap="BaseResultMap">
+		SELECT * FROM renter_order_wz_finished_todo WHERE status = 0 or status is null AND is_delete = 0
+	</select>
+
+	<select id="queryToday" resultMap="BaseResultMap">
+		SELECT * FROM renter_order_wz_finished_todo WHERE to_days(create_time) = to_days(now()) AND is_delete = 0
+	</select>
+
+
 </mapper>

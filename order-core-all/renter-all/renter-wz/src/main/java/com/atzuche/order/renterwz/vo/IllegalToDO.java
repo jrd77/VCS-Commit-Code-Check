@@ -67,6 +67,10 @@ public class IllegalToDO implements Serializable {
      * 调用车乐行 返回的数据
      */
     private String resStr;
+    /**
+     * 城市code
+     **/
+    private Integer cityCode;
 
     public Integer getId() {
         return id;
@@ -204,6 +208,14 @@ public class IllegalToDO implements Serializable {
         this.resStr = resStr;
     }
 
+    public Integer getCityCode() {
+        return cityCode;
+    }
+
+    public void setCityCode(Integer cityCode) {
+        this.cityCode = cityCode;
+    }
+
     @Override
     public String toString() {
         return "IllegalToDO{" +
@@ -224,6 +236,7 @@ public class IllegalToDO implements Serializable {
                 ", sendSms=" + sendSms +
                 ", type='" + type + '\'' +
                 ", resStr='" + resStr + '\'' +
+                ", cityCode=" + cityCode +
                 '}';
     }
 }

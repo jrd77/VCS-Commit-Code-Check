@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 
 import java.text.ParseException;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -16,6 +17,9 @@ public class DateUtils {
     private static final Logger logger = LoggerFactory.getLogger(DateUtils.class);
 
     public static final String DATE_DEFAUTE = "yyyyMMddHHmmss";
+
+    public static long  START_TIME = 20191001000000L;
+    public static long  END_TIME = 20191007235959L;
 
     /**
      *	 判断是否是夜间
@@ -91,6 +95,20 @@ public class DateUtils {
         return DateTimeFormatter.ofPattern(format).format(localDateTime);
     }
 
+
+    /**
+     * 字符串转时间
+     * @param date
+     * @param format
+     * @return
+     */
+    public static String formate(Date date, String format){
+        Instant instant = date.toInstant();
+        ZoneId zone = ZoneId.systemDefault();
+        LocalDateTime localDateTime = LocalDateTime.ofInstant(instant, zone);
+        return DateTimeFormatter.ofPattern(format).format(localDateTime);
+    }
+
     /**
      * 字符串转时间
      * @param localDateTime 日期
@@ -120,5 +138,23 @@ public class DateUtils {
         ZoneId zone = ZoneId.systemDefault();
         Instant instant = time.atZone(zone).toInstant();
         return Date.from(instant);
+    }
+
+    public static LocalDate minDays(Integer days) {
+        LocalDate now = LocalDate.now();
+        return now.minusDays(days);
+    }
+
+    public static boolean isFestival(long startTime, long endTime) {
+        //国庆
+        long springFestivalStartTime = START_TIME;
+        long springFestivalEndTime = END_TIME;
+        if (endTime <= startTime) {
+            return false;
+        }
+        if (startTime > springFestivalEndTime || endTime < springFestivalStartTime) {
+            return false;
+        }
+        return true;
     }
 }

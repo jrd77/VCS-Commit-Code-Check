@@ -27,7 +27,7 @@ import java.util.List;
  * @author shisong
  * @date 2020/1/2
  */
-@Component
+@Component("illegalInOrderQueryTask")
 public class IllegalInOrderQueryTask extends IJobHandler{
 
     private Logger logger = LoggerFactory.getLogger(IllegalInOrderQueryTask.class);
