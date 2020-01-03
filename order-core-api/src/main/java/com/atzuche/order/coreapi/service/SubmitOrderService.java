@@ -193,7 +193,10 @@ public class SubmitOrderService {
         ownerMemberService.save(ownerMemberDTO);
 
         //配送订单处理..............
-        deliveryCarService.addRenYunFlowOrderInfo(reqContext);
+        deliveryCarService.addRenYunFlowOrderInfo(null == carRentTimeRangeResVO ? null :
+                        carRentTimeRangeResVO.getGetMinutes(),null == carRentTimeRangeResVO ? null :
+                        carRentTimeRangeResVO.getReturnMinutes(),
+                reqContext);
 
         //6.主订单相关信息处理
         ParentOrderDTO parentOrderDTO = new ParentOrderDTO();
