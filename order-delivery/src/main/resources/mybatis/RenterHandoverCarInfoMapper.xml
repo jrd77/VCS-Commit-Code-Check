@@ -252,7 +252,7 @@
 	</update>
 
 	<select id="selectByRenterOrderNo" resultMap="BaseResultMap">
-		select <include refid="Base_Column_List" /> from renter_handover_car_info where
+		select oil_num,mileage_num,delay_time,ahead_time,type from renter_handover_car_info where
 		renter_order_no = #{renterOrderNo} and is_delete = 0
 	</select>
 
