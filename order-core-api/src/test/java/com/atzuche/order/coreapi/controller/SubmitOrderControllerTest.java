@@ -88,7 +88,7 @@ public class SubmitOrderControllerTest {
         param.setSrcPort(7777);
         String paramStr = JSON.toJSONString(param);
         System.out.println("paramStr---->"+paramStr);
-        HttpResult httpResult = HttpUtil.doPostNotGzip("order/req", paramStr);
+        HttpResult httpResult = HttpUtil.doPostNotGzip("order/normal/req", paramStr);
         System.out.println(httpResult);
     }
 }

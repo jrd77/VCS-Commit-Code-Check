@@ -1,6 +1,7 @@
 package com.atzuche.order.commons.vo.req;
 
 import com.autoyol.doc.annotation.AutoDocProperty;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import org.hibernate.validator.constraints.NotBlank;
 
 import javax.validation.constraints.NotNull;
@@ -52,9 +53,11 @@ public class NormalOrderReqVO extends BaseVO implements Serializable {
     @AutoDocProperty(value = "细分订单来源")
     private String subSource;
 
+    @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy-MM-dd HH:mm:ss")
     @AutoDocProperty(value = "订单取车时间(yyyy-MM-dd HH:mm:ss)", required = true)
     private LocalDateTime rentTime;
 
+    @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy-MM-dd HH:mm:ss")
     @AutoDocProperty(value = "订单还车时间(yyyy-MM-dd HH:mm:ss)", required = true)
     private LocalDateTime revertTime;
 
