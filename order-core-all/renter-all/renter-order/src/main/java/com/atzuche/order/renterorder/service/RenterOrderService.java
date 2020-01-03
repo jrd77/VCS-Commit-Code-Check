@@ -124,6 +124,7 @@ public class RenterOrderService {
         RenterOrderCostReqDTO renterOrderCostReqDTO = buildRenterOrderCostReqDTO(renterOrderReqVO);
         RenterOrderCostRespDTO renterOrderCostRespDTO =
                 renterOrderCalCostService.getOrderCostAndDeailList(renterOrderCostReqDTO);
+        renterOrderCostRespDTO.setMemNo(renterOrderReqVO.getMemNo());
         LOGGER.info("租客订单租车费用计算.result is, renterOrderCostRespDTO:[{}]", JSON.toJSONString(renterOrderCostRespDTO));
         DeductAndSubsidyContextDTO context = initDeductAndSubsidyContextDTO(renterOrderCostRespDTO, renterOrderReqVO);
         //2. 送取服务券抵扣信息及补贴明细
@@ -183,11 +184,13 @@ public class RenterOrderService {
         record.setIsGetCar(renterOrderReqVO.getSrvGetFlag());
         record.setIsReturnCar(renterOrderReqVO.getSrvReturnFlag());
         record.setIsAbatement(Integer.valueOf(renterOrderReqVO.getAbatement()));
-        record.setIsUseSpecialPrice(Integer.valueOf(renterOrderReqVO.getUseSpecialPrice()));
+        record.setIsUseSpecialPrice(Integer.valueOf(renterOrderReqVO.getUseSpecialPrice()==null?"0":renterOrderReqVO.getUseSpecialPrice()));
         record.setChildStatus(RenterChildStatusEnum.PROCESS_ING.getCode());
         renterOrderMapper.insertSelective(record);
         //保存租客订单费用、费用明细、补贴明细等
         renterOrderCostRespDTO.setRenterOrderSubsidyDetailDTOList(context.getOrderSubsidyDetailList());
+        renterOrderCostRespDTO.setOrderNo(renterOrderReqVO.getOrderNo());
+        renterOrderCostRespDTO.setRenterOrderNo(renterOrderReqVO.getRenterOrderNo());
         renterOrderCalCostService.saveOrderCostAndDeailList(renterOrderCostRespDTO);
         //保存订单优惠券信息
         orderCouponService.insertBatch(context.getOrderCouponList());
@@ -311,7 +314,7 @@ public class RenterOrderService {
 
         MemAvailCouponRequestVO memAvailCouponRequestVO = new MemAvailCouponRequestVO();
 
-        memAvailCouponRequestVO.setMemNo(renterOrderReqVO.getMemNo());
+        memAvailCouponRequestVO.setMemNo(Integer.valueOf(renterOrderReqVO.getMemNo()));
         memAvailCouponRequestVO.setCarNo(Integer.valueOf(renterOrderReqVO.getCarNo()));
         memAvailCouponRequestVO.setCityCode(Integer.valueOf(renterOrderReqVO.getCityCode()));
         memAvailCouponRequestVO.setIsNew(renterOrderReqVO.getIsNew());

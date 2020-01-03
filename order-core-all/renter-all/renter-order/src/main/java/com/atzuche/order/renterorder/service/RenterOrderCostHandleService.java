@@ -66,7 +66,7 @@ public class RenterOrderCostHandleService {
      */
     public RenterOrderCarDepositResVO handleCarDepositAmt(RenterOrderReqVO renterOrderReqVO) {
         DepositAmtDTO depositAmtDTO = new DepositAmtDTO();
-        depositAmtDTO.setSurplusPrice(renterOrderReqVO.getCarSurplusPrice());
+        depositAmtDTO.setSurplusPrice(renterOrderReqVO.getCarSurplusPrice()==null ? renterOrderReqVO.getGuidPrice():renterOrderReqVO.getCarSurplusPrice());
         depositAmtDTO.setCityCode(Integer.valueOf(renterOrderReqVO.getCityCode()));
         depositAmtDTO.setBrand(renterOrderReqVO.getBrandId());
         depositAmtDTO.setType(renterOrderReqVO.getTypeId());
@@ -286,7 +286,7 @@ public class RenterOrderCostHandleService {
      * @param useAutoCoin 使用凹凸币标识
      * @return int
      */
-    public int handleAutoCoin(DeductAndSubsidyContextDTO context, Integer memNo, Integer useAutoCoin) {
+    public int handleAutoCoin(DeductAndSubsidyContextDTO context, String memNo, Integer useAutoCoin) {
         LOGGER.info("凹凸币处理.param is, context:[{}],memNo:[{}],useAutoCoin:[{}]", JSON.toJSONString(context), memNo, useAutoCoin);
         AutoCoinResponseVO crmCustPoint = autoCoinService.getCrmCustPoint(memNo);
         RenterOrderSubsidyDetailDTO autoCoinSubsidyInfo = renterOrderSubsidyDetailService.calAutoCoinSubsidyInfo(crmCustPoint,

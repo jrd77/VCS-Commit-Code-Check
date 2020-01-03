@@ -189,6 +189,11 @@ public class LocalDateTimeUtils {
         return LocalDate.parse(date, DateTimeFormatter.ofPattern(DATE_PATTERN));
     }
 
+    public static LocalDate parseStringToLocalDate(String date,String format) {
+        return LocalDate.parse(date, DateTimeFormatter.ofPattern(format));
+    }
+
+
     /**
      * 按照默认的模板将时间戳转换为时间日期的字符串形式
      * 
@@ -323,13 +328,7 @@ public class LocalDateTimeUtils {
      * @return
      */
     public static long localDateTimeToLong(LocalDateTime localDateTime){
-        String longDateTime = String.valueOf(localDateTime.getYear()) +
-                localDateTime.getMonthValue() +
-                localDateTime.getDayOfMonth() +
-                localDateTime.getHour() +
-                localDateTime.getMinute() +
-                localDateTime.getSecond() + "00";
-        return Long.valueOf(longDateTime);
+        return Long.valueOf(localdateToString(localDateTime,GlobalConstant.FORMAT_STR));
     }
 
     /**
@@ -451,6 +450,9 @@ public class LocalDateTimeUtils {
 //        System.out.println(localDate);
 //
 //        System.out.println(localDateTimeToLong(LocalDateTime.now()));;
+        LocalDateTime rentTime = LocalDateTime.of(2020,1,2,12,1,1);
+        long l = localDateTimeToLong(rentTime);
+
 
     }
 
