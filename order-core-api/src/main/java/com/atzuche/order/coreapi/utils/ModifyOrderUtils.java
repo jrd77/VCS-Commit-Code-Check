@@ -3,6 +3,7 @@ package com.atzuche.order.coreapi.utils;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -10,10 +11,14 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang.StringUtils;
 
 import com.atzuche.order.commons.enums.CouponTypeEnum;
+import com.atzuche.order.commons.enums.OrderChangeItemEnum;
+import com.atzuche.order.commons.enums.SrvGetReturnEnum;
 import com.atzuche.order.coreapi.entity.dto.ModifyFlagDTO;
 import com.atzuche.order.coreapi.entity.request.ModifyOrderReq;
+import com.atzuche.order.delivery.entity.RenterOrderDeliveryEntity;
 import com.atzuche.order.renterorder.entity.OrderCouponEntity;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
+import com.atzuche.order.renterorder.entity.dto.OrderChangeItemDTO;
 
 public class ModifyOrderUtils {
 
@@ -97,30 +102,68 @@ public class ModifyOrderUtils {
 	}
 	
 	
-	public static ModifyFlagDTO getModifyFlagDTO(RenterOrderEntity initRenterOrder, ModifyOrderReq updModifyOrder, List<OrderCouponEntity> orderCouponList) {
+	public static List<OrderChangeItemDTO> listOrderChangeItemDTO(String renterOrderNo, RenterOrderEntity initRenterOrder, ModifyOrderReq updModifyOrder, List<OrderCouponEntity> orderCouponList, Map<Integer, RenterOrderDeliveryEntity> deliveryMap) {
 		if (updModifyOrder == null || initRenterOrder == null) {
 			return null;
 		}
-		ModifyFlagDTO modifyFlagDTO = new ModifyFlagDTO();
-		modifyFlagDTO.setModifyAbatementFlag(getModifyFlag(initRenterOrder.getIsAbatement(), updModifyOrder.getAbatementFlag()));
-		modifyFlagDTO.setModifyDriverFlag(getModifyDriverFlag(updModifyOrder.getDriverIds()));
-		//modifyFlagDTO.setModifyGetAddrFlag(getModifyGetReturnAddrFlag(initRenterOrder, initLat, updLon, updLat));
-		String initCarOwnerCouponId = null;
-		String initGetReturnCouponId = null;
-		String initPlatformCouponId = null;
+		List<OrderChangeItemDTO> changeItemList = new ArrayList<OrderChangeItemDTO>();
+		if (getModifyRentTimeFlag(initRenterOrder.getExpRentTime(), updModifyOrder.getRentTime())) {
+			changeItemList.add(new OrderChangeItemDTO(initRenterOrder.getOrderNo(), renterOrderNo, OrderChangeItemEnum.MODIFY_RENTTIME.getCode(), OrderChangeItemEnum.MODIFY_RENTTIME.getName()));
+		}
+		if (getModifyRentTimeFlag(initRenterOrder.getExpRevertTime(), updModifyOrder.getRevertTime())) {
+			changeItemList.add(new OrderChangeItemDTO(initRenterOrder.getOrderNo(), renterOrderNo, OrderChangeItemEnum.MODIFY_REVERTTIME.getCode(), OrderChangeItemEnum.MODIFY_REVERTTIME.getName()));
+		}
+		if (getModifyFlag(initRenterOrder.getIsAbatement(), updModifyOrder.getAbatementFlag())) {
+			changeItemList.add(new OrderChangeItemDTO(initRenterOrder.getOrderNo(), renterOrderNo, OrderChangeItemEnum.MODIFY_ABATEMENT.getCode(), OrderChangeItemEnum.MODIFY_ABATEMENT.getName()));
+		}
+		if (getModifyDriverFlag(updModifyOrder.getDriverIds())) {
+			changeItemList.add(new OrderChangeItemDTO(initRenterOrder.getOrderNo(), renterOrderNo, OrderChangeItemEnum.MODIFY_DRIVER.getCode(), OrderChangeItemEnum.MODIFY_DRIVER.getName()));
+		}
+		String initGetLon = null,initGetLat = null,initReturnLon = null,initReturnLat = null;
+		if (deliveryMap != null) {
+			RenterOrderDeliveryEntity srvGetDelivery = deliveryMap.get(SrvGetReturnEnum.SRV_GET_TYPE.getCode());
+			RenterOrderDeliveryEntity srvReturnDelivery = deliveryMap.get(SrvGetReturnEnum.SRV_RETURN_TYPE.getCode());
+			if (srvGetDelivery != null) {
+				initGetLon = srvGetDelivery.getRenterGetReturnAddrLon();
+				initGetLat = srvGetDelivery.getRenterGetReturnAddrLat();
+			}
+			if (srvReturnDelivery != null) {
+				initReturnLon = srvReturnDelivery.getRenterGetReturnAddrLon();
+				initReturnLat = srvReturnDelivery.getRenterGetReturnAddrLat();
+			}
+		}
+		if (getModifyGetReturnAddrFlag(initGetLon, initGetLat, updModifyOrder.getGetCarLon(), updModifyOrder.getGetCarLat())) {
+			changeItemList.add(new OrderChangeItemDTO(initRenterOrder.getOrderNo(), renterOrderNo, OrderChangeItemEnum.MODIFY_GETADDR.getCode(), OrderChangeItemEnum.MODIFY_GETADDR.getName()));
+		}
+		if (getModifyGetReturnAddrFlag(initReturnLon, initReturnLat, updModifyOrder.getRevertCarLon(), updModifyOrder.getRevertCarLat())) {
+			changeItemList.add(new OrderChangeItemDTO(initRenterOrder.getOrderNo(), renterOrderNo, OrderChangeItemEnum.MODIFY_GETADDR.getCode(), OrderChangeItemEnum.MODIFY_GETADDR.getName()));
+		}
+		String initCarOwnerCouponId = null,initGetReturnCouponId = null,initPlatformCouponId = null;
 		if (orderCouponList != null && !orderCouponList.isEmpty()) {
 			Map<Integer, String> orderCouponMap = orderCouponList.stream().collect(Collectors.toMap(OrderCouponEntity::getCouponType, OrderCouponEntity::getCouponId));
 			initCarOwnerCouponId = orderCouponMap.get(CouponTypeEnum.ORDER_COUPON_TYPE_OWNER.getCode()); 
 			initGetReturnCouponId = orderCouponMap.get(CouponTypeEnum.ORDER_COUPON_TYPE_GET_RETURN_SRV.getCode());
 			initPlatformCouponId = orderCouponMap.get(CouponTypeEnum.ORDER_COUPON_TYPE_PLATFORM.getCode());
 		}
-		modifyFlagDTO.setModifyCarOwnerCouponFlag(getModifyStrFlag(initCarOwnerCouponId, updModifyOrder.getCarOwnerCouponId()));
-		modifyFlagDTO.setModifyPlatformCouponFlag(getModifyStrFlag(initPlatformCouponId, updModifyOrder.getPlatformCouponId()));
-		modifyFlagDTO.setModifyGetReturnCouponFlag(getModifyStrFlag(initGetReturnCouponId, updModifyOrder.getSrvGetReturnCouponId()));
-		modifyFlagDTO.setModifyUserCoinFlag(getModifyFlag(initRenterOrder.getIsUseCoin(), updModifyOrder.getUserCoinFlag()));
-		modifyFlagDTO.setModifySrvGetFlag(getModifyFlag(initRenterOrder.getIsGetCar(), updModifyOrder.getSrvGetFlag()));
-		modifyFlagDTO.setModifySrvReturnFlag(getModifyFlag(initRenterOrder.getIsReturnCar(), updModifyOrder.getSrvReturnFlag()));
-		return modifyFlagDTO;
+		if (getModifyStrFlag(initCarOwnerCouponId, updModifyOrder.getCarOwnerCouponId())) {
+			changeItemList.add(new OrderChangeItemDTO(initRenterOrder.getOrderNo(), renterOrderNo, OrderChangeItemEnum.MODIFY_CAROWNERCOUPON.getCode(), OrderChangeItemEnum.MODIFY_CAROWNERCOUPON.getName()));
+		}
+		if (getModifyStrFlag(initPlatformCouponId, updModifyOrder.getPlatformCouponId())) {
+			changeItemList.add(new OrderChangeItemDTO(initRenterOrder.getOrderNo(), renterOrderNo, OrderChangeItemEnum.MODIFY_PLATFORMCOUPON.getCode(), OrderChangeItemEnum.MODIFY_PLATFORMCOUPON.getName()));
+		}
+		if (getModifyStrFlag(initGetReturnCouponId, updModifyOrder.getSrvGetReturnCouponId())) {
+			changeItemList.add(new OrderChangeItemDTO(initRenterOrder.getOrderNo(), renterOrderNo, OrderChangeItemEnum.MODIFY_GETRETURNCOUPON.getCode(), OrderChangeItemEnum.MODIFY_GETRETURNCOUPON.getName()));
+		}
+		if (getModifyFlag(initRenterOrder.getIsUseCoin(), updModifyOrder.getUserCoinFlag())) {
+			changeItemList.add(new OrderChangeItemDTO(initRenterOrder.getOrderNo(), renterOrderNo, OrderChangeItemEnum.MODIFY_USERCOINFLAG.getCode(), OrderChangeItemEnum.MODIFY_USERCOINFLAG.getName()));
+		}
+		if (getModifyFlag(initRenterOrder.getIsGetCar(), updModifyOrder.getSrvGetFlag())) {
+			changeItemList.add(new OrderChangeItemDTO(initRenterOrder.getOrderNo(), renterOrderNo, OrderChangeItemEnum.MODIFY_SRVGETFLAG.getCode(), OrderChangeItemEnum.MODIFY_SRVGETFLAG.getName()));
+		}
+		if (getModifyFlag(initRenterOrder.getIsReturnCar(), updModifyOrder.getSrvReturnFlag())) {
+			changeItemList.add(new OrderChangeItemDTO(initRenterOrder.getOrderNo(), renterOrderNo, OrderChangeItemEnum.MODIFY_SRVRETURNFLAG.getCode(), OrderChangeItemEnum.MODIFY_SRVRETURNFLAG.getName()));
+		}
+		return changeItemList;
 	}
 	
 }

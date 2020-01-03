@@ -1,6 +1,7 @@
 package com.atzuche.order.renterorder.entity;
 
 import lombok.Data;
+import lombok.ToString;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -14,6 +15,7 @@ import java.time.LocalDateTime;
  * @Description:
  */
 @Data
+@ToString
 public class RenterOrderEntity implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
@@ -101,6 +103,10 @@ public class RenterOrderEntity implements Serializable {
 	 * 是否取消 0-正常，1-取消
 	 */
 	private Integer isCancle;
+	/**
+	 * 修改方 1、后台管理 2、租客 3、车主
+	 */
+	private String changeSource;
 	/**
 	 * 创建时间
 	 */

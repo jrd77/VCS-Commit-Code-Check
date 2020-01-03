@@ -30,6 +30,7 @@
         <result property="updateTime" column="update_time"/>
         <result property="updateOp" column="update_op"/>
         <result property="isDelete" column="is_delete"/>
+        <result property="changeSource" column="change_source"/>
     </resultMap>
 
 
@@ -49,7 +50,8 @@
 	`create_op`, 	
 	`update_time`, 	
 	`update_op`, 	
-	`is_delete`	
+	`is_delete`,
+	`change_source`	
 
 	</sql>
 
@@ -138,6 +140,7 @@
             <if test="isAbatement != null">`is_abatement`, </if>
             <if test="isEffective != null">`is_effective`, </if>
             <if test="isUseSpecialPrice != null">`is_use_special_price`, </if>
+            <if test="changeSource != null">`change_source`, </if>
             <if test="isCancle != null">`is_cancle`, </if>
             <if test="createOp != null">`create_op`, </if>
             <if test="updateOp != null">`update_op` </if>
@@ -162,6 +165,7 @@
             <if test="isAbatement != null">#{isAbatement},  </if>
             <if test="isEffective != null">#{isEffective},  </if>
             <if test="isUseSpecialPrice != null">#{isUseSpecialPrice},  </if>
+            <if test="changeSource != null">#{changeSource},  </if>
             <if test="isCancle != null">#{isCancle},  </if>
             <if test="createOp != null">#{createOp},  </if>
             <if test="updateOp != null">#{updateOp}  </if>
@@ -270,7 +274,7 @@
 	
 	<select id="getRenterOrderByOrderNoAndWaitPay" resultMap="BaseResultMap">
 		select <include refid="Base_Column_List" /> from renter_order where order_no = #{orderNo}
-		and child_status = 2
+		and child_status = 3
 		and is_cancle = 0
 		and is_delete = 0
 		order by id desc
