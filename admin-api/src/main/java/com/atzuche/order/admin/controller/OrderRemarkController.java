@@ -46,7 +46,7 @@ public class OrderRemarkController {
     }
 
     @AutoDocMethod(description = "编辑备注", value = "编辑备注", response = ResponseData.class)
-    @PutMapping("/update")
+    @RequestMapping(value = "/update", method = RequestMethod.PUT)
     public ResponseData<ResponseData> update(@RequestBody OrderRemarkUpdateRequestVO orderRemarkUpdateRequestVO, BindingResult bindingResult) {
         return ResponseData.success(null);
     }
