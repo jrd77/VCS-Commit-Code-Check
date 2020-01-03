@@ -2,11 +2,9 @@ package com.atzuche.order.commons.vo.req;
 
 import com.autoyol.doc.annotation.AutoDocProperty;
 import org.hibernate.validator.constraints.NotBlank;
-import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
-import java.time.LocalDateTime;
 
 /**
  * 短租订单App提交的相关参数
@@ -272,19 +270,19 @@ public class NormalOrderReqVO extends BaseVO implements Serializable {
         this.subSource = subSource;
     }
 
-    public LocalDateTime getRentTime() {
+    public String getRentTime() {
         return rentTime;
     }
 
-    public void setRentTime(LocalDateTime rentTime) {
+    public void setRentTime(String rentTime) {
         this.rentTime = rentTime;
     }
 
-    public LocalDateTime getRevertTime() {
+    public String getRevertTime() {
         return revertTime;
     }
 
-    public void setRevertTime(LocalDateTime revertTime) {
+    public void setRevertTime(String revertTime) {
         this.revertTime = revertTime;
     }
 

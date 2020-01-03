@@ -42,7 +42,6 @@ import com.atzuche.order.rentercost.entity.dto.OrderCouponDTO;
 import com.atzuche.order.rentermem.service.RenterMemberService;
 import com.atzuche.order.renterorder.service.RenterOrderService;
 import com.atzuche.order.renterorder.vo.*;
-import com.autoyol.car.api.feign.api.CarDetailQueryFeignApi;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,8 +67,6 @@ public class SubmitOrderService {
     private MemberService memberService;
     @Autowired
     private GoodsService goodsService;
-    @Autowired
-    private CarDetailQueryFeignApi carDetailQueryFeignApi;
     @Resource
     private UniqueOrderNoService uniqueOrderNoService;
     @Resource
