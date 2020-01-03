@@ -77,7 +77,6 @@ public class RenYunDeliveryCarService {
         return result;
     }
 
-
     /**
      * 获取参数Map
      *
@@ -96,7 +95,6 @@ public class RenYunDeliveryCarService {
                 params.remove();
             }
         }
-
         String sign = CommonUtil.getSign(flowOrderMap);
         if (StringUtils.isBlank(sign)) {
             throw new DeliveryOrderException(DeliveryErrorCode.DELIVERY_PARAMS_ERROR.getValue(), "获取sign失败");
