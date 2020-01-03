@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.CatConstants;
 import com.autoyol.auto.coin.service.api.AutoCoinFeignService;
 import com.autoyol.auto.coin.service.vo.req.AutoCoiChargeRequestVO;
+import com.autoyol.auto.coin.service.vo.req.AutoCoinAgainDeductRequestVO;
 import com.autoyol.auto.coin.service.vo.res.AutoCoinResponseVO;
 import com.autoyol.commons.utils.GsonUtils;
 import com.autoyol.commons.web.ResponseData;
@@ -111,6 +112,35 @@ public class AutoCoinService {
             LOGGER.error("同步充值凹凸币信息异常.vo:[{}]", vo, e);
             t.setStatus(e);
             Cat.logError("同步充值凹凸币信息异常.", e);
+        } finally {
+            t.complete();
+        }
+        return false;
+
+    }
+    
+    
+    /**
+     * 补扣凹凸币
+     *
+     * @param autoCoinRechange 请求参数
+     * @return Boolean
+     */
+    public Boolean againDeduct(AutoCoinAgainDeductRequestVO autoCoinRechange) {
+        LOGGER.info("AutoRemoteCoinService againDeduct remote call start param vo:[{}]", autoCoinRechange);
+        Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "凹凸币服务");
+        try {
+            Cat.logEvent(CatConstants.FEIGN_METHOD, "autoCoinFeignService.againDeduct(vo)");
+            Cat.logEvent(CatConstants.FEIGN_PARAM, "vo=" + JSON.toJSONString(autoCoinRechange));
+            ResponseData<Boolean> result = autoCoinFeignService.againDeduct(autoCoinRechange);
+            LOGGER.info("AutoRemoteCoinService againDeduct remote call end result result: [{}]", GsonUtils.toJson(result));
+            Cat.logEvent(CatConstants.FEIGN_RESULT, JSON.toJSONString(result));
+            t.setStatus(Transaction.SUCCESS);
+            return result.getData();
+        } catch (Exception e) {
+            LOGGER.error("补扣凹凸币异常.vo:[{}]", autoCoinRechange, e);
+            t.setStatus(e);
+            Cat.logError("补扣凹凸币异常.", e);
         } finally {
             t.complete();
         }

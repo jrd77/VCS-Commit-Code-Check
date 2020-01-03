@@ -1,5 +1,6 @@
 package com.atzuche.order.coreapi.entity.dto;
 
+import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
 import com.atzuche.order.rentercost.entity.dto.RenterOrderSubsidyDetailDTO;
 import com.atzuche.order.renterorder.entity.dto.OrderChangeItemDTO;
 
@@ -112,4 +113,8 @@ public class ModifyOrderDTO {
 	 * 租客费用补贴
 	 */
 	private List<RenterOrderSubsidyDetailDTO> renterSubsidyList;
+	/**
+	 * 租客商品信息
+	 */
+	private RenterGoodsDetailDTO renterGoodsDetailDTO;
 }

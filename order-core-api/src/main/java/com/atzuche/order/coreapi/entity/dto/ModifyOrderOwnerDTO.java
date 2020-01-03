@@ -2,6 +2,8 @@ package com.atzuche.order.coreapi.entity.dto;
 
 import java.time.LocalDateTime;
 
+import com.atzuche.order.commons.entity.dto.OwnerGoodsDetailDTO;
+
 import lombok.Data;
 import lombok.ToString;
 
@@ -17,6 +19,10 @@ public class ModifyOrderOwnerDTO {
 	 * 车主子订单号
 	 */
 	private String ownerOrderNo;
+	/**
+	 * 城市编号
+	 */
+	private String cityCode;
 	/**
 	 * 取车标志
 	 */
@@ -57,5 +63,9 @@ public class ModifyOrderOwnerDTO {
 	 * 还车地址经度
 	 */
     private String revertCarLon; 
+    /**
+     * 车主商品信息
+     */
+    private OwnerGoodsDetailDTO ownerGoodsDetailDTO; 
     
 }

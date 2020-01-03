@@ -21,7 +21,10 @@ import com.atzuche.order.commons.entity.dto.OwnerMemberDTO;
 import com.atzuche.order.commons.entity.dto.OwnerMemberRightDTO;
 import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
 import com.atzuche.order.commons.enums.SrvGetReturnEnum;
+import com.atzuche.order.coreapi.entity.dto.ModifyOrderDTO;
 import com.atzuche.order.coreapi.entity.dto.ModifyOrderOwnerDTO;
+import com.atzuche.order.coreapi.entity.vo.req.CarRentTimeRangeReqVO;
+import com.atzuche.order.coreapi.entity.vo.res.CarRentTimeRangeResVO;
 import com.atzuche.order.coreapi.modifyorder.exception.ModifyOrderParameterException;
 import com.atzuche.order.coreapi.service.GoodsService.CarDetailReqVO;
 import com.atzuche.order.delivery.entity.RenterOrderDeliveryEntity;
@@ -37,6 +40,8 @@ import com.atzuche.order.ownercost.service.OwnerOrderIncrementDetailService;
 import com.atzuche.order.ownercost.service.OwnerOrderPurchaseDetailService;
 import com.atzuche.order.ownercost.service.OwnerOrderService;
 import com.atzuche.order.ownercost.service.OwnerOrderSubsidyDetailService;
+import com.atzuche.order.parentorder.entity.OrderEntity;
+import com.atzuche.order.parentorder.service.OrderService;
 import com.autoyol.commons.web.ResponseData;
 import com.dianping.cat.Cat;
 
@@ -66,6 +71,8 @@ public class ModifyOrderForOwnerService {
 	private OwnerOrderCostService ownerOrderCostService;
 	@Autowired
 	private UniqueOrderNoService uniqueOrderNoService;
+	@Autowired
+	private OrderService orderService;
 
 	/**
 	 * 租客修改订单重新下车主订单逻辑(相当于车主同意)
@@ -83,14 +90,20 @@ public class ModifyOrderForOwnerService {
 		String ownerOrderNo = uniqueOrderNoService.getOwnerOrderNo(orderNo);
 		// 赋值车主订单号
 		modifyOrderOwnerDTO.setOwnerOrderNo(ownerOrderNo);
+		// 获取主订单信息
+		OrderEntity orderEntity = orderService.getOrderEntity(orderNo);
+		// 设置城市编号
+		modifyOrderOwnerDTO.setCityCode(orderEntity.getCityCode());
 		// 获取修改前有效车主订单信息
 		OwnerOrderEntity ownerOrderEntity = ownerOrderService.getOwnerOrderByOrderNoAndIsEffective(orderNo);
 		// 获取车主会员信息
 		OwnerMemberDTO ownerMemberDTO = getOwnerMemberDTO(ownerOrderEntity.getOwnerOrderNo());
 		// 获取车主端商品详情
 		OwnerGoodsDetailDTO ownerGoodsDetailDTO = getOwnerGoodsDetailDTO(modifyOrderOwnerDTO, ownerOrderEntity);
+		// 设置商品信息后续通知仁云需要
+		modifyOrderOwnerDTO.setOwnerGoodsDetailDTO(ownerGoodsDetailDTO);
 		// 封装新的车主子订单对象
-		OwnerOrderEntity ownerOrderEffective =  convertToOwnerOrderEntity(modifyOrderOwnerDTO, ownerOrderEntity, ownerGoodsDetailDTO.getCarRealLon(), ownerGoodsDetailDTO.getCarRealLat());
+		OwnerOrderEntity ownerOrderEffective = convertToOwnerOrderEntity(modifyOrderOwnerDTO, ownerOrderEntity);
 		// 封装基本对象
 		CostBaseDTO costBaseDTO = convertToCostBaseDTO(modifyOrderOwnerDTO, ownerMemberDTO);
 		// 获取租金费用信息
@@ -118,7 +131,6 @@ public class ModifyOrderForOwnerService {
 		ownerOrderService.saveOwnerOrder(ownerOrderEffective);
 		// 上笔车主子订单置为无效
 		ownerOrderService.updateOwnerOrderInvalidById(ownerOrderEntity.getId());
-		
 	}
 	
 	
@@ -288,11 +300,12 @@ public class ModifyOrderForOwnerService {
 	 * @param carLat
 	 * @return OwnerOrderEntity
 	 */
-	public OwnerOrderEntity convertToOwnerOrderEntity(ModifyOrderOwnerDTO modifyOrderOwnerDTO, OwnerOrderEntity ownerOrderEntity, String carLon, String carLat) {
+	public OwnerOrderEntity convertToOwnerOrderEntity(ModifyOrderOwnerDTO modifyOrderOwnerDTO, OwnerOrderEntity ownerOrderEntity) {
+		CarRentTimeRangeResVO carRentTimeRangeResVO =  getCarRentTimeRangeResVO(modifyOrderOwnerDTO);
 		// TODO 计算提前时间
-		LocalDateTime showRentTime = null;
+		LocalDateTime showRentTime = carRentTimeRangeResVO.getAdvanceStartDate();
 		// TODO 计算延后时间
-		LocalDateTime showRevertTime = null;
+		LocalDateTime showRevertTime = carRentTimeRangeResVO.getDelayEndDate();
 		// 封装新的车主子订单
 		OwnerOrderEntity ownerOrderEntityEffective = new OwnerOrderEntity();
 		// 数据拷贝
@@ -305,6 +318,57 @@ public class ModifyOrderForOwnerService {
 		ownerOrderEntityEffective.setExpRentTime(modifyOrderOwnerDTO.getRentTime());
 		ownerOrderEntityEffective.setExpRevertTime(modifyOrderOwnerDTO.getRevertTime());
 		return ownerOrderEntityEffective;
+	}
+	
+	
+	/**
+	 * 计算提前延后时间
+	 * @param modifyOrderDTO
+	 * @return CarRentTimeRangeResVO
+	 */
+	public CarRentTimeRangeResVO getCarRentTimeRangeResVO(ModifyOrderOwnerDTO modifyOrderDTO) {
+		if (modifyOrderDTO == null) {
+			return null;
+		}
+		if ((modifyOrderDTO.getSrvGetFlag() == null || modifyOrderDTO.getSrvGetFlag() == 0) &&
+				(modifyOrderDTO.getSrvReturnFlag() == null || modifyOrderDTO.getSrvReturnFlag() == 0)) {
+			return null;
+		}
+		CarRentTimeRangeReqVO carRentTimeRangeReqVO = getCarRentTimeRangeReqVO(modifyOrderDTO);
+		if (carRentTimeRangeReqVO == null) {
+			return null;
+		}
+		CarRentTimeRangeResVO carRentTimeRangeResVO = goodsService.getCarRentTimeRange(carRentTimeRangeReqVO);
+		return carRentTimeRangeResVO;
+	}
+	
+	/**
+	 * 封装获取提前延后的对象
+	 * @param modifyOrderDTO
+	 * @return CarRentTimeRangeReqVO
+	 */
+	public CarRentTimeRangeReqVO getCarRentTimeRangeReqVO(ModifyOrderOwnerDTO modifyOrderDTO) {
+		if (modifyOrderDTO == null) {
+			return null;
+		}
+		OwnerGoodsDetailDTO ownerGoodsDetailDTO = modifyOrderDTO.getOwnerGoodsDetailDTO();
+		if (ownerGoodsDetailDTO == null || ownerGoodsDetailDTO.getCarNo() == null) {
+			return null;
+		}
+		CarRentTimeRangeReqVO carRentTimeRangeReqVO = new CarRentTimeRangeReqVO();
+		carRentTimeRangeReqVO.setCarNo(String.valueOf(ownerGoodsDetailDTO.getCarNo()));
+		carRentTimeRangeReqVO.setCityCode(modifyOrderDTO.getCityCode()+"");
+		carRentTimeRangeReqVO.setRentTime(modifyOrderDTO.getRentTime());
+		carRentTimeRangeReqVO.setRevertTime(modifyOrderDTO.getRevertTime());
+		carRentTimeRangeReqVO.setSrvGetAddr(modifyOrderDTO.getGetCarAddress());
+		carRentTimeRangeReqVO.setSrvGetFlag(modifyOrderDTO.getSrvGetFlag());
+		carRentTimeRangeReqVO.setSrvGetLat(modifyOrderDTO.getGetCarLat());
+		carRentTimeRangeReqVO.setSrvGetLon(modifyOrderDTO.getGetCarLon());
+		carRentTimeRangeReqVO.setSrvReturnAddr(modifyOrderDTO.getRevertCarAddress());
+		carRentTimeRangeReqVO.setSrvReturnFlag(modifyOrderDTO.getSrvReturnFlag());
+		carRentTimeRangeReqVO.setSrvReturnLat(modifyOrderDTO.getRevertCarLat());
+		carRentTimeRangeReqVO.setSrvReturnLon(modifyOrderDTO.getRevertCarLon());
+		return carRentTimeRangeReqVO;
 	}
 	
 	
