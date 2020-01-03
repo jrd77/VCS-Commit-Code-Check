@@ -5,6 +5,7 @@ import com.atzuche.order.commons.entity.dto.OwnerMemberDTO;
 import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
 import com.atzuche.order.commons.entity.dto.RenterMemberDTO;
 import com.atzuche.order.commons.vo.req.NormalOrderReqVO;
+import com.atzuche.order.commons.vo.req.OrderReqVO;
 import lombok.Data;
 
 /**
@@ -34,6 +35,6 @@ public class OrderReqContext {
     /**
      * 提交订单请求信息
      */
-    private NormalOrderReqVO normalOrderReqVO;
+    private OrderReqVO orderReqVO;
 
 }

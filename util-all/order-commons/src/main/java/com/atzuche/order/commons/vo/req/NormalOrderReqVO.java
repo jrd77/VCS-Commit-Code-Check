@@ -5,7 +5,6 @@ import org.hibernate.validator.constraints.NotBlank;
 
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
-import java.time.LocalDateTime;
 
 /**
  * 短租订单App提交的相关参数
@@ -53,10 +52,12 @@ public class NormalOrderReqVO extends BaseVO implements Serializable {
     private String subSource;
 
     @AutoDocProperty(value = "订单取车时间(yyyy-MM-dd HH:mm:ss)", required = true)
-    private LocalDateTime rentTime;
+    @NotBlank(message = "订单取车时间不能为空")
+    private String rentTime;
 
     @AutoDocProperty(value = "订单还车时间(yyyy-MM-dd HH:mm:ss)", required = true)
-    private LocalDateTime revertTime;
+    @NotBlank(message = "订单还车时间不能为空")
+    private String revertTime;
 
     @AutoDocProperty(value = "是否使用取车服务:0.否 1.是", required = true)
     @NotNull(message = "是否使用取车服务标识不能为空")
@@ -269,19 +270,19 @@ public class NormalOrderReqVO extends BaseVO implements Serializable {
         this.subSource = subSource;
     }
 
-    public LocalDateTime getRentTime() {
+    public String getRentTime() {
         return rentTime;
     }
 
-    public void setRentTime(LocalDateTime rentTime) {
+    public void setRentTime(String rentTime) {
         this.rentTime = rentTime;
     }
 
-    public LocalDateTime getRevertTime() {
+    public String getRevertTime() {
         return revertTime;
     }
 
-    public void setRevertTime(LocalDateTime revertTime) {
+    public void setRevertTime(String revertTime) {
         this.revertTime = revertTime;
     }
 

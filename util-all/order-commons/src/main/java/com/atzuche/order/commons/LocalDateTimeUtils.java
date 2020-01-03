@@ -422,23 +422,35 @@ public class LocalDateTimeUtils {
         return localDateTime.format(df);
     }
 
+    /**
+     * 获取 localDateTime n天之后的日期
+     * @param localDateTime
+     * @param n
+     * @return
+     */
+    public static LocalDateTime getDateAfter(LocalDateTime localDateTime,int n) {
+        localDateTime = LocalDateTime.now().plusDays(n);
+        return localDateTime;
+    }
+
     public static void main(String[] args) {
-        String dateTime = formatEpochSecond("yyyy-MM-dd HH:mm:ss", 1525767228);
-        System.out.println(dateTime);
-        String parseStrToNewStr = parseStrToNewStr("yyyy-MM-dd HH:mm:ss", "2018-05-08 16:13:48", "MM-dd");
-        System.out.println(parseStrToNewStr);
-        long parseDateTime = parseDateTime("yyyy-MM-dd HH:mm:ss", "2018-05-08 16:13:48");
-        System.out.println(parseDateTime);
-        long parseDateTime2 = DefaultParseDateTime("2018-05-08 16:13:48");
-        System.out.println(parseDateTime2);
-        String yesterdayStr = yesterdayStr(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-        System.out.println(yesterdayStr);
-        System.out.println(ZoneId.getAvailableZoneIds());
-
-        LocalDate localDate = parseStringToLocalDate("2019-12-14");
-        System.out.println(localDate);
-
-        System.out.println(localDateTimeToLong(LocalDateTime.now()));;
+//        System.out.println(getDateAfter(LocalDateTime.now(),10));
+//        String dateTime = formatEpochSecond("yyyy-MM-dd HH:mm:ss", 1525767228);
+//        System.out.println(dateTime);
+//        String parseStrToNewStr = parseStrToNewStr("yyyy-MM-dd HH:mm:ss", "2018-05-08 16:13:48", "MM-dd");
+//        System.out.println(parseStrToNewStr);
+//        long parseDateTime = parseDateTime("yyyy-MM-dd HH:mm:ss", "2018-05-08 16:13:48");
+//        System.out.println(parseDateTime);
+//        long parseDateTime2 = DefaultParseDateTime("2018-05-08 16:13:48");
+//        System.out.println(parseDateTime2);
+//        String yesterdayStr = yesterdayStr(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+//        System.out.println(yesterdayStr);
+//        System.out.println(ZoneId.getAvailableZoneIds());
+//
+//        LocalDate localDate = parseStringToLocalDate("2019-12-14");
+//        System.out.println(localDate);
+//
+//        System.out.println(localDateTimeToLong(LocalDateTime.now()));;
 
     }
 

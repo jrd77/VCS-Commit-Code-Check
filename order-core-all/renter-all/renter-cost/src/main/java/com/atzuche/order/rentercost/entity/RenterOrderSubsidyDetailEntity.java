@@ -3,6 +3,7 @@ package com.atzuche.order.rentercost.entity;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import lombok.Data;
+import lombok.ToString;
 
 
 /**
@@ -13,6 +14,7 @@ import lombok.Data;
  * @Description:
  */
 @Data
+@ToString
 public class RenterOrderSubsidyDetailEntity implements Serializable {
 	private static final long serialVersionUID = 1L;
 	

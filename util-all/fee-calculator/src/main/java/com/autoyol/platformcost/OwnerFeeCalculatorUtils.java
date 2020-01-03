@@ -1,5 +1,12 @@
 package com.autoyol.platformcost;
 
+import com.atzuche.config.common.entity.CarGpsRuleEntity;
+import com.atzuche.config.common.entity.OilAverageCostEntity;
+import com.autoyol.platformcost.enums.ExceptionCodeEnum;
+import com.autoyol.platformcost.exception.OwnerFeeCostException;
+import com.autoyol.platformcost.model.CarPriceOfDay;
+import com.autoyol.platformcost.model.FeeResult;
+
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
@@ -8,14 +15,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
-import com.autoyol.platformcost.enums.ExceptionCodeEnum;
-import com.autoyol.platformcost.exception.OwnerFeeCostException;
-import com.autoyol.platformcost.model.CarGpsRule;
-import com.autoyol.platformcost.model.CarPriceOfDay;
-import com.autoyol.platformcost.model.FeeResult;
-import com.autoyol.platformcost.model.OilAverageCostBO;
-import com.autoyol.platformcost.model.ServiceExpenseInfo;
 
 public class OwnerFeeCalculatorUtils {
 	
@@ -118,7 +117,7 @@ public class OwnerFeeCalculatorUtils {
 	 * @param oilScaleDenominator 总刻度数
 	 * @return Integer
 	 */
-	public static Integer calOilAmt(Integer carOwnerType, Integer cityCode, Integer oilVolume, Integer engineType, Integer getOilScale, Integer returnOilScale, List<OilAverageCostBO> oilAverageList, Integer oilScaleDenominator) {
+	public static Integer calOilAmt(Integer carOwnerType, Integer cityCode, Integer oilVolume, Integer engineType, Integer getOilScale, Integer returnOilScale, List<OilAverageCostEntity> oilAverageList, Integer oilScaleDenominator) {
 		//动力类型，1：92号汽油、2：95号汽油、3：0号柴油、4：纯电动、5
 		if (engineType==null||oilVolume==null||oilVolume==0||getOilScale==null||returnOilScale==null) {
 			return 0;
@@ -152,7 +151,7 @@ public class OwnerFeeCalculatorUtils {
 	 * @param revertTime 还车时间
 	 * @return Integer
 	 */
-	public static List<FeeResult> calGpsServiceAmt(List<CarGpsRule> lsRules, List<Integer> lsGpsSerialNumber, LocalDateTime rentTime, LocalDateTime revertTime) {
+	public static List<FeeResult> calGpsServiceAmt(List<CarGpsRuleEntity> lsRules, List<Integer> lsGpsSerialNumber, LocalDateTime rentTime, LocalDateTime revertTime) {
 		if (rentTime == null || revertTime == null) {
 			return null;
 		}
@@ -185,7 +184,7 @@ public class OwnerFeeCalculatorUtils {
 	 * @param rentDays 租期
 	 * @return int
 	 */
-	public static List<FeeResult> calcGpsAmtAndSaveLogMap(List<Integer> lsGps, List<CarGpsRule> lsRules, Integer rentDays) {
+	public static List<FeeResult> calcGpsAmtAndSaveLogMap(List<Integer> lsGps, List<CarGpsRuleEntity> lsRules, Integer rentDays) {
 		if (lsGps == null || lsGps.isEmpty()) {
 			return null;
 		}
@@ -197,10 +196,10 @@ public class OwnerFeeCalculatorUtils {
 		}
 		List<FeeResult> feeResultList = new ArrayList<FeeResult>();
 		// list转map
-		Map<Integer,CarGpsRule> mapRules = lsRules.stream().collect(Collectors.toMap(CarGpsRule::getSerialNumber, carGpsRule->carGpsRule));
+		Map<Integer,CarGpsRuleEntity> mapRules = lsRules.stream().collect(Collectors.toMap(CarGpsRuleEntity::getSerialNumber, carGpsRule->carGpsRule));
 		for (Iterator<Integer> iterator = lsGps.iterator(); iterator.hasNext();) {
 			Integer serialNumber = iterator.next();
-			CarGpsRule carGpsRule = mapRules.get(serialNumber);
+            CarGpsRuleEntity carGpsRule = mapRules.get(serialNumber);
 			if(carGpsRule == null){
 				continue;
 			}

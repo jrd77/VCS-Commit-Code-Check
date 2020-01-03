@@ -20,6 +20,7 @@
         <result property="idCardAuth" column="id_card_auth"/>
         <result property="driLicAuth" column="dri_lic_auth"/>
         <result property="driViceLicAuth" column="dri_vice_lic_auth"/>
+        <result property="renterCheck" column="renter_check"/>
         <result property="createTime" column="create_time"/>
         <result property="createOp" column="create_op"/>
         <result property="updateTime" column="update_time"/>
@@ -45,6 +46,7 @@
 	`id_card_auth`,
 	`dri_lic_auth`,
 	`dri_vice_lic_auth`,
+	`renter_check`,
 	`create_time`,
 	`create_op`,
 	`update_time`,
@@ -76,6 +78,7 @@
         `id_card_auth`,
         `dri_lic_auth`,
         `dri_vice_lic_auth`,
+        `renter_check`,
         `create_time`,
         `create_op`,
         `update_time`,
@@ -99,6 +102,7 @@
         #{idCardAuth},
         #{driLicAuth},
         #{driViceLicAuth},
+        #{renterCheck},
         #{createTime},
         #{createOp},
         #{updateTime},
@@ -109,51 +113,52 @@
 
     <insert id="insertSelective" parameterType="com.atzuche.order.rentermem.entity.RenterMemberEntity" useGeneratedKeys="true" keyProperty="id">
         insert into renter_member
-        (
-        <if test="orderNo != null">`order_no`, </if>
-        <if test="renterOrderNo != null">`renter_order_no`, </if>
-        <if test="memNo != null">`mem_no`, </if>
-        <if test="phone != null">`phone`, </if>
-        <if test="headerUrl != null">`header_url`, </if>
-        <if test="realName != null">`real_name`, </if>
-        <if test="nickName != null">`nick_name`, </if>
-        <if test="certificationTime != null">`certification_time`, </if>
-        <if test="orderSuccessCount != null">`order_success_count`, </if>
-        <if test="rentFlag != null">`rent_flag`, </if>
-        <if test="firstName != null">`first_name`, </if>
-        <if test="gender != null">`gender`, </if>
-        <if test="idCardAuth != null">`id_card_auth`, </if>
-        <if test="driLicAuth != null">`dri_lic_auth`, </if>
-        <if test="driViceLicAuth != null">`dri_vice_lic_auth`, </if>
-        <if test="createTime != null">`create_time`, </if>
-        <if test="createOp != null">`create_op`, </if>
-        <if test="updateTime != null">`update_time`, </if>
-        <if test="updateOp != null">`update_op`, </if>
-        <if test="isDelete != null">`is_delete` </if>
-        )
-        values
-        (
-        <if test="orderNo != null">#{orderNo},  </if>
-        <if test="renterOrderNo != null">#{renterOrderNo},  </if>
-        <if test="memNo != null">#{memNo},  </if>
-        <if test="phone != null">#{phone},  </if>
-        <if test="headerUrl != null">#{headerUrl},  </if>
-        <if test="realName != null">#{realName},  </if>
-        <if test="nickName != null">#{nickName},  </if>
-        <if test="certificationTime != null">#{certificationTime},  </if>
-        <if test="orderSuccessCount != null">#{orderSuccessCount},  </if>
-        <if test="rentFlag != null">#{rentFlag},  </if>
-        <if test="firstName != null">#{firstName},  </if>
-        <if test="gender != null">#{gender},  </if>
-        <if test="idCardAuth != null">#{idCardAuth},  </if>
-        <if test="driLicAuth != null">#{driLicAuth},  </if>
-        <if test="driViceLicAuth != null">#{driViceLicAuth},  </if>
-        <if test="createTime != null">#{createTime},  </if>
-        <if test="createOp != null">#{createOp},  </if>
-        <if test="updateTime != null">#{updateTime},  </if>
-        <if test="updateOp != null">#{updateOp},  </if>
-        <if test="isDelete != null">#{isDelete} </if>
-        )
+        <trim prefix="(" suffix=")" suffixOverrides="," >
+            <if test="orderNo != null">`order_no`, </if>
+            <if test="renterOrderNo != null">`renter_order_no`, </if>
+            <if test="memNo != null">`mem_no`, </if>
+            <if test="phone != null">`phone`, </if>
+            <if test="headerUrl != null">`header_url`, </if>
+            <if test="realName != null">`real_name`, </if>
+            <if test="nickName != null">`nick_name`, </if>
+            <if test="certificationTime != null">`certification_time`, </if>
+            <if test="orderSuccessCount != null">`order_success_count`, </if>
+            <if test="rentFlag != null">`rent_flag`, </if>
+            <if test="firstName != null">`first_name`, </if>
+            <if test="gender != null">`gender`, </if>
+            <if test="idCardAuth != null">`id_card_auth`, </if>
+            <if test="driLicAuth != null">`dri_lic_auth`, </if>
+            <if test="driViceLicAuth != null">`dri_vice_lic_auth`, </if>
+            <if test="renterCheck != null">`renter_check`, </if>
+            <if test="createTime != null">`create_time`, </if>
+            <if test="createOp != null">`create_op`, </if>
+            <if test="updateTime != null">`update_time`, </if>
+            <if test="updateOp != null">`update_op`, </if>
+            <if test="isDelete != null">`is_delete` </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides="," >
+            <if test="orderNo != null">#{orderNo},  </if>
+            <if test="renterOrderNo != null">#{renterOrderNo},  </if>
+            <if test="memNo != null">#{memNo},  </if>
+            <if test="phone != null">#{phone},  </if>
+            <if test="headerUrl != null">#{headerUrl},  </if>
+            <if test="realName != null">#{realName},  </if>
+            <if test="nickName != null">#{nickName},  </if>
+            <if test="certificationTime != null">#{certificationTime},  </if>
+            <if test="orderSuccessCount != null">#{orderSuccessCount},  </if>
+            <if test="rentFlag != null">#{rentFlag},  </if>
+            <if test="firstName != null">#{firstName},  </if>
+            <if test="gender != null">#{gender},  </if>
+            <if test="idCardAuth != null">#{idCardAuth},  </if>
+            <if test="driLicAuth != null">#{driLicAuth},  </if>
+            <if test="driViceLicAuth != null">#{driViceLicAuth},  </if>
+            <if test="renterCheck != null">#{renterCheck}, </if>
+            <if test="createTime != null">#{createTime},  </if>
+            <if test="createOp != null">#{createOp},  </if>
+            <if test="updateTime != null">#{updateTime},  </if>
+            <if test="updateOp != null">#{updateOp},  </if>
+            <if test="isDelete != null">#{isDelete} </if>
+        </trim>
     </insert>
 
 
@@ -175,6 +180,7 @@
             <if test="idCardAuth != null">`id_card_auth` = #{idCardAuth}, </if>
             <if test="driLicAuth != null">`dri_lic_auth` = #{driLicAuth}, </if>
             <if test="driViceLicAuth != null">`dri_vice_lic_auth` = #{driViceLicAuth}, </if>
+            <if test="renterCheck != null">`renter_check` = #{renterCheck}, </if>
             <if test="createTime != null">`create_time` = #{createTime}, </if>
             <if test="createOp != null">`create_op` = #{createOp}, </if>
             <if test="updateTime != null">`update_time` = #{updateTime}, </if>
@@ -202,6 +208,7 @@
             `id_card_auth` = #{idCardAuth},
             `dri_lic_auth` = #{driLicAuth},
             `dri_vice_lic_auth` = #{driViceLicAuth},
+            `renter_check` = #{renterCheck},
             `create_time` = #{createTime},
             `create_op` = #{createOp},
             `update_time` = #{updateTime},

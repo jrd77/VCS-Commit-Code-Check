@@ -1,9 +1,12 @@
 package com.atzuche.order.coreapi.controller;
 
 import com.alibaba.fastjson.JSON;
+import com.atzuche.order.commons.LocalDateTimeUtils;
 import com.atzuche.order.commons.OrderException;
+import com.atzuche.order.commons.vo.req.AdminOrderReqVO;
 import com.atzuche.order.commons.vo.req.NormalOrderReqVO;
-import com.atzuche.order.commons.vo.res.NormalOrderResVO;
+import com.atzuche.order.commons.vo.req.OrderReqVO;
+import com.atzuche.order.commons.vo.res.OrderResVO;
 import com.atzuche.order.coreapi.service.SubmitOrderService;
 import com.atzuche.order.parentorder.entity.OrderRecordEntity;
 import com.atzuche.order.parentorder.service.OrderRecordService;
@@ -11,16 +14,21 @@ import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.doc.annotation.AutoDocMethod;
 import com.autoyol.doc.annotation.AutoDocVersion;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cglib.beans.BeanCopier;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import javax.validation.Valid;
+import java.util.Optional;
 
 /**
  * 下单
@@ -40,36 +48,46 @@ public class SubmitOrderController {
     private OrderRecordService orderRecordService;
 
 
-    @AutoDocMethod(description = "提交订单", value = "提交订单", response = NormalOrderResVO.class)
-    @PostMapping("/req")
-    public ResponseData<NormalOrderResVO> submitOrder(@RequestBody NormalOrderReqVO normalOrderReqVO, BindingResult bindingResult) throws Exception {
+    @AutoDocMethod(description = "提交订单", value = "提交订单", response = OrderResVO.class)
+    @PostMapping("/normal/req")
+    public ResponseData<OrderResVO> submitOrder(@Valid @RequestBody NormalOrderReqVO normalOrderReqVO, BindingResult bindingResult) throws Exception {
         LOGGER.info("Submit order.param is,normalOrderReqVO:[{}]", JSON.toJSONString(normalOrderReqVO));
         if (bindingResult.hasErrors()) {
-            return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), ErrorCode.INPUT_ERROR.getText());
+            Optional<FieldError> error = bindingResult.getFieldErrors().stream().findFirst();
+            return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), error.isPresent() ?
+                    error.get().getDefaultMessage() : ErrorCode.INPUT_ERROR.getText());
         }
         String memNo = normalOrderReqVO.getMemNo();
-        if (null == memNo) {
+        if (StringUtils.isBlank(memNo)) {
             return new ResponseData<>(ErrorCode.NEED_LOGIN.getCode(), ErrorCode.NEED_LOGIN.getText());
         }
-        NormalOrderResVO normalOrderResVO = null;
+        OrderResVO orderResVO = null;
         try{
-            normalOrderResVO = submitOrderService.submitOrder(normalOrderReqVO);
+            BeanCopier beanCopier = BeanCopier.create(NormalOrderReqVO.class, OrderReqVO.class, false);
+            OrderReqVO orderReqVO = new OrderReqVO();
+            beanCopier.copy(normalOrderReqVO, orderReqVO, null);
+            orderReqVO.setRentTime(LocalDateTimeUtils.parseStringToDateTime(normalOrderReqVO.getRentTime(),
+                    LocalDateTimeUtils.DEFAULT_PATTERN));
+            orderReqVO.setRevertTime(LocalDateTimeUtils.parseStringToDateTime(normalOrderReqVO.getRevertTime(),
+                    LocalDateTimeUtils.DEFAULT_PATTERN));
+
+            orderResVO = submitOrderService.submitOrder(orderReqVO);
             OrderRecordEntity orderRecordEntity = new OrderRecordEntity();
             orderRecordEntity.setErrorCode(ErrorCode.SUCCESS.getCode());
             orderRecordEntity.setErrorTxt(ErrorCode.SUCCESS.getText());
             orderRecordEntity.setMemNo(normalOrderReqVO.getMemNo());
-            orderRecordEntity.setOrderNo(normalOrderResVO.getOrderNo());
+            orderRecordEntity.setOrderNo(orderResVO.getOrderNo());
             orderRecordEntity.setParam(JSON.toJSONString(normalOrderReqVO));
-            orderRecordEntity.setResult(JSON.toJSONString(normalOrderResVO));
+            orderRecordEntity.setResult(JSON.toJSONString(orderResVO));
             orderRecordService.save(orderRecordEntity);
         }catch(OrderException orderException){
             OrderRecordEntity orderRecordEntity = new OrderRecordEntity();
             orderRecordEntity.setErrorCode(orderException.getErrorCode());
             orderRecordEntity.setErrorTxt(orderException.getErrorMsg());
             orderRecordEntity.setMemNo(normalOrderReqVO.getMemNo());
-            orderRecordEntity.setOrderNo(normalOrderResVO.getOrderNo());
+            orderRecordEntity.setOrderNo(orderResVO==null?"":orderResVO.getOrderNo());
             orderRecordEntity.setParam(JSON.toJSONString(normalOrderReqVO));
-            orderRecordEntity.setResult(JSON.toJSONString(normalOrderResVO));
+            orderRecordEntity.setResult(JSON.toJSONString(orderResVO));
             orderRecordService.save(orderRecordEntity);
             throw orderException;
         }catch (Exception e){
@@ -77,14 +95,76 @@ public class SubmitOrderController {
             orderRecordEntity.setErrorCode(ErrorCode.SYS_ERROR.getCode());
             orderRecordEntity.setErrorTxt(ErrorCode.SYS_ERROR.getText());
             orderRecordEntity.setMemNo(normalOrderReqVO.getMemNo());
-            orderRecordEntity.setOrderNo(normalOrderResVO.getOrderNo());
+            orderRecordEntity.setOrderNo(orderResVO==null?"":orderResVO.getOrderNo());
             orderRecordEntity.setParam(JSON.toJSONString(normalOrderReqVO));
-            orderRecordEntity.setResult(JSON.toJSONString(normalOrderResVO));
+            orderRecordEntity.setResult(JSON.toJSONString(orderResVO));
             orderRecordService.save(orderRecordEntity);
             throw e;
         }
-        return ResponseData.success(normalOrderResVO);
+        return ResponseData.success(orderResVO);
     }
+
+
+
+    @AutoDocMethod(description = "管理后台提交订单", value = "管理后台提交订单", response = OrderResVO.class)
+    @PostMapping("/admin/req")
+    public ResponseData<OrderResVO> submitOrder(@RequestBody AdminOrderReqVO adminOrderReqVO, BindingResult bindingResult) {
+
+
+        LOGGER.info("Submit order.param is,adminOrderReqVO:[{}]", JSON.toJSONString(adminOrderReqVO));
+        if (bindingResult.hasErrors()) {
+            Optional<FieldError> error = bindingResult.getFieldErrors().stream().findFirst();
+            return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), error.isPresent() ?
+                    error.get().getDefaultMessage() : ErrorCode.INPUT_ERROR.getText());
+        }
+        String memNo = adminOrderReqVO.getMemNo();
+        if (StringUtils.isBlank(memNo)) {
+            return new ResponseData<>(ErrorCode.NEED_LOGIN.getCode(), ErrorCode.NEED_LOGIN.getText());
+        }
+        OrderResVO orderResVO = null;
+        try{
+            BeanCopier beanCopier = BeanCopier.create(AdminOrderReqVO.class, OrderReqVO.class, false);
+            OrderReqVO orderReqVO = new OrderReqVO();
+            beanCopier.copy(adminOrderReqVO, orderReqVO, null);
+            orderReqVO.setRentTime(LocalDateTimeUtils.parseStringToDateTime(adminOrderReqVO.getRentTime(),
+                    LocalDateTimeUtils.DEFAULT_PATTERN));
+            orderReqVO.setRevertTime(LocalDateTimeUtils.parseStringToDateTime(adminOrderReqVO.getRevertTime(),
+                    LocalDateTimeUtils.DEFAULT_PATTERN));
+
+            orderResVO = submitOrderService.submitOrder(orderReqVO);
+            OrderRecordEntity orderRecordEntity = new OrderRecordEntity();
+            orderRecordEntity.setErrorCode(ErrorCode.SUCCESS.getCode());
+            orderRecordEntity.setErrorTxt(ErrorCode.SUCCESS.getText());
+            orderRecordEntity.setMemNo(adminOrderReqVO.getMemNo());
+            orderRecordEntity.setOrderNo(orderResVO.getOrderNo());
+            orderRecordEntity.setParam(JSON.toJSONString(adminOrderReqVO));
+            orderRecordEntity.setResult(JSON.toJSONString(orderResVO));
+            orderRecordService.save(orderRecordEntity);
+        }catch(OrderException orderException){
+            OrderRecordEntity orderRecordEntity = new OrderRecordEntity();
+            orderRecordEntity.setErrorCode(orderException.getErrorCode());
+            orderRecordEntity.setErrorTxt(orderException.getErrorMsg());
+            orderRecordEntity.setMemNo(adminOrderReqVO.getMemNo());
+            orderRecordEntity.setOrderNo(orderResVO==null?"":orderResVO.getOrderNo());
+            orderRecordEntity.setParam(JSON.toJSONString(adminOrderReqVO));
+            orderRecordEntity.setResult(JSON.toJSONString(orderResVO));
+            orderRecordService.save(orderRecordEntity);
+            throw orderException;
+        }catch (Exception e){
+            OrderRecordEntity orderRecordEntity = new OrderRecordEntity();
+            orderRecordEntity.setErrorCode(ErrorCode.SYS_ERROR.getCode());
+            orderRecordEntity.setErrorTxt(ErrorCode.SYS_ERROR.getText());
+            orderRecordEntity.setMemNo(adminOrderReqVO.getMemNo());
+            orderRecordEntity.setOrderNo(orderResVO==null?"":orderResVO.getOrderNo());
+            orderRecordEntity.setParam(JSON.toJSONString(adminOrderReqVO));
+            orderRecordEntity.setResult(JSON.toJSONString(orderResVO));
+            orderRecordService.save(orderRecordEntity);
+            throw e;
+        }
+
+        return ResponseData.success(orderResVO);
+    }
+
 
 
 }

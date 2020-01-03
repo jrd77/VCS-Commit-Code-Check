@@ -227,6 +227,7 @@ public class MemberService {
         renterMemberDto.setOrderSuccessCount(memberStatisticsInfo.getSuccessOrderNum());
         renterMemberDto.setCommUseDriverList(memberAdditionInfo.getCommUseDriverList());
         renterMemberDto.setIsNew(memberRoleInfo.getIsNew());
+        renterMemberDto.setRenterCheck(memberAuthInfo.getRenterCheck());
         List<RenterMemberRightDTO> rights = new ArrayList<>();
 
         if(memberRoleInfo != null){

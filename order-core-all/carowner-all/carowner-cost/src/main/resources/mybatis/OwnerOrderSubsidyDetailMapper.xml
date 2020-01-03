@@ -125,59 +125,58 @@
 
     <insert id="saveOwnerOrderSubsidyDetail" parameterType="com.atzuche.order.ownercost.entity.OwnerOrderSubsidyDetailEntity" useGeneratedKeys="true" keyProperty="id">
         insert into owner_order_subsidy_detail
-        (
-        <if test="orderNo != null">`order_no`, </if>
-        <if test="ownerOrderNo != null">`owner_order_no`, </if>
-        <if test="memNo != null">`mem_no`, </if>
-        <if test="subsidyTypeName != null">`subsidy_type_name`, </if>
-        <if test="subsidyTypeCode != null">`subsidy_type_code`, </if>
-        <if test="subsidySourceName != null">`subsidy_source_name`, </if>
-        <if test="subsidySourceCode != null">`subsidy_source_code`, </if>
-        <if test="subsidyTargetName != null">`subsidy_target_name`, </if>
-        <if test="subsidyTargetCode != null">`subsidy_target_code`, </if>
-        <if test="subsidyCostName != null">`subsidy_cost_name`, </if>
-        <if test="subsidyCostCode != null">`subsidy_cost_code`, </if>
-        <if test="subsidyDesc != null">`subsidy_desc`, </if>
-        <if test="subsidyAmount != null">`subsidy_amount`, </if>
-        <if test="subsidyVoucher != null">`subsidy_voucher`, </if>
-        <if test="remark != null">`remark`, </if>
-        <if test="operatorId != null">`operator_id`, </if>
-        <if test="operator != null">`operator`, </if>
-        <if test="deptId != null">`dept_id`, </if>
-        <if test="deptName != null">`dept_name`, </if>
-        <if test="createTime != null">`create_time`, </if>
-        <if test="createOp != null">`create_op`, </if>
-        <if test="updateTime != null">`update_time`, </if>
-        <if test="updateOp != null">`update_op`, </if>
-        <if test="isDelete != null">`is_delete` </if>
-        )
-        values
-        (
-        <if test="orderNo != null">#{orderNo},  </if>
-        <if test="ownerOrderNo != null">#{ownerOrderNo},  </if>
-        <if test="memNo != null">#{memNo},  </if>
-        <if test="subsidyTypeName != null">#{subsidyTypeName},  </if>
-        <if test="subsidyTypeCode != null">#{subsidyTypeCode},  </if>
-        <if test="subsidySourceName != null">#{subsidySourceName},  </if>
-        <if test="subsidySourceCode != null">#{subsidySourceCode},  </if>
-        <if test="subsidyTargetName != null">#{subsidyTargetName},  </if>
-        <if test="subsidyTargetCode != null">#{subsidyTargetCode},  </if>
-        <if test="subsidyCostName != null">#{subsidyCostName},  </if>
-        <if test="subsidyCostCode != null">#{subsidyCostCode},  </if>
-        <if test="subsidyDesc != null">#{subsidyDesc},  </if>
-        <if test="subsidyAmount != null">#{subsidyAmount},  </if>
-        <if test="subsidyVoucher != null">#{subsidyVoucher},  </if>
-        <if test="remark != null">#{remark},  </if>
-        <if test="operatorId != null">#{operatorId},  </if>
-        <if test="operator != null">#{operator},  </if>
-        <if test="deptId != null">#{deptId},  </if>
-        <if test="deptName != null">#{deptName},  </if>
-        <if test="createTime != null">#{createTime},  </if>
-        <if test="createOp != null">#{createOp},  </if>
-        <if test="updateTime != null">#{updateTime},  </if>
-        <if test="updateOp != null">#{updateOp},  </if>
-        <if test="isDelete != null">#{isDelete} </if>
-        )
+        <trim prefix="(" suffix=")" suffixOverrides="," >
+            <if test="orderNo != null">`order_no`, </if>
+            <if test="ownerOrderNo != null">`owner_order_no`, </if>
+            <if test="memNo != null">`mem_no`, </if>
+            <if test="subsidyTypeName != null">`subsidy_type_name`, </if>
+            <if test="subsidyTypeCode != null">`subsidy_type_code`, </if>
+            <if test="subsidySourceName != null">`subsidy_source_name`, </if>
+            <if test="subsidySourceCode != null">`subsidy_source_code`, </if>
+            <if test="subsidyTargetName != null">`subsidy_target_name`, </if>
+            <if test="subsidyTargetCode != null">`subsidy_target_code`, </if>
+            <if test="subsidyCostName != null">`subsidy_cost_name`, </if>
+            <if test="subsidyCostCode != null">`subsidy_cost_code`, </if>
+            <if test="subsidyDesc != null">`subsidy_desc`, </if>
+            <if test="subsidyAmount != null">`subsidy_amount`, </if>
+            <if test="subsidyVoucher != null">`subsidy_voucher`, </if>
+            <if test="remark != null">`remark`, </if>
+            <if test="operatorId != null">`operator_id`, </if>
+            <if test="operator != null">`operator`, </if>
+            <if test="deptId != null">`dept_id`, </if>
+            <if test="deptName != null">`dept_name`, </if>
+            <if test="createTime != null">`create_time`, </if>
+            <if test="createOp != null">`create_op`, </if>
+            <if test="updateTime != null">`update_time`, </if>
+            <if test="updateOp != null">`update_op`, </if>
+            <if test="isDelete != null">`is_delete` </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides="," >
+            <if test="orderNo != null">#{orderNo},  </if>
+            <if test="ownerOrderNo != null">#{ownerOrderNo},  </if>
+            <if test="memNo != null">#{memNo},  </if>
+            <if test="subsidyTypeName != null">#{subsidyTypeName},  </if>
+            <if test="subsidyTypeCode != null">#{subsidyTypeCode},  </if>
+            <if test="subsidySourceName != null">#{subsidySourceName},  </if>
+            <if test="subsidySourceCode != null">#{subsidySourceCode},  </if>
+            <if test="subsidyTargetName != null">#{subsidyTargetName},  </if>
+            <if test="subsidyTargetCode != null">#{subsidyTargetCode},  </if>
+            <if test="subsidyCostName != null">#{subsidyCostName},  </if>
+            <if test="subsidyCostCode != null">#{subsidyCostCode},  </if>
+            <if test="subsidyDesc != null">#{subsidyDesc},  </if>
+            <if test="subsidyAmount != null">#{subsidyAmount},  </if>
+            <if test="subsidyVoucher != null">#{subsidyVoucher},  </if>
+            <if test="remark != null">#{remark},  </if>
+            <if test="operatorId != null">#{operatorId},  </if>
+            <if test="operator != null">#{operator},  </if>
+            <if test="deptId != null">#{deptId},  </if>
+            <if test="deptName != null">#{deptName},  </if>
+            <if test="createTime != null">#{createTime},  </if>
+            <if test="createOp != null">#{createOp},  </if>
+            <if test="updateTime != null">#{updateTime},  </if>
+            <if test="updateOp != null">#{updateOp},  </if>
+            <if test="isDelete != null">#{isDelete} </if>
+        </trim>
     </insert>
 
 
