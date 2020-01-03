@@ -61,8 +61,7 @@
 	<insert id="insert" parameterType="com.atzuche.order.accountrenterdeposit.entity.AccountRenterDepositEntity">
 		insert into account_renter_deposit
 		(
-			`id`,		
-				`order_no`,		
+				`order_no`,
 				`mem_no`,		
 				`pay_status`,		
 				`pay_time`,		
@@ -85,8 +84,7 @@
 			)
 		values
 		(
-			#{id}, 		
-				#{orderNo}, 		
+				#{orderNo},
 				#{memNo}, 		
 				#{payStatus}, 		
 				#{payTime}, 		

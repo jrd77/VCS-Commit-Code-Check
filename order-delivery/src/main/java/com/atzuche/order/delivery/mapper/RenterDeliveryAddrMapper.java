@@ -22,4 +22,6 @@ public interface RenterDeliveryAddrMapper{
     
     int updateByPrimaryKeySelective(RenterDeliveryAddrEntity record);
 
+    RenterDeliveryAddrEntity selectByRenterOrderNo(String renterOrderNo);
+
 }

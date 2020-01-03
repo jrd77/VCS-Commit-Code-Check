@@ -13,8 +13,8 @@ public class SubmitOrderControllerTest {
 
     @Test
     public void SubmitOrderController() throws Exception {
-        LocalDateTime rentTime = LocalDateTime.of(2020,1,2,12,1,1);
-        LocalDateTime revertTime = LocalDateTime.of(2020,1,3,12,1,1);
+//        LocalDateTime rentTime = LocalDateTime.of(2020,1,2,12,1,1);
+//        LocalDateTime revertTime = LocalDateTime.of(2020,1,3,12,1,1);
         NormalOrderReqVO param = new NormalOrderReqVO();
         param.setRequestId(UUID.randomUUID().toString());
         param.setOS("PC");
@@ -31,7 +31,7 @@ public class SubmitOrderControllerTest {
         param.setAppChannelId("");
         param.setMac("");
         param.setAndroidID("xxxxxxx");
-        param.setMemNo("");
+        param.setMemNo("985856422");
         param.setSchema("");
 
         param.setOrderCategory("1");
@@ -44,8 +44,8 @@ public class SubmitOrderControllerTest {
         param.setSceneCode("EX007");
         param.setSource("3");
         param.setSubSource("");
-        param.setRentTime(rentTime);
-        param.setRevertTime(revertTime);
+        param.setRentTime("2020-01-03 12:30:00");
+        param.setRevertTime("2020-01-08 12:30:00");
         param.setSrvGetFlag(1);
         param.setSrvGetAddr("上海市徐家汇xxx路");
         param.setSrvGetLon("114.047754");
@@ -54,7 +54,7 @@ public class SubmitOrderControllerTest {
         param.setSrvReturnAddr("上海市徐家汇xxx路");
         param.setSrvReturnLon("114.047754");
         param.setSrvReturnLat("22.521016");
-        param.setCarNo("57091975");
+        param.setCarNo("791332363");
         param.setAbatement("1");
         param.setGetCarFreeCouponId("");
         param.setDisCouponIds("");
