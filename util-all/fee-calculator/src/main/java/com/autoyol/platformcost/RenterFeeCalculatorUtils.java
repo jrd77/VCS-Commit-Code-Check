@@ -308,7 +308,7 @@ public class RenterFeeCalculatorUtils {
 			return unitInsurAmt;
 		}
 		for(InsuranceConfigEntity config:insuranceConfigs){
-			int minPrice = config.getGuidPriceBegin();
+			int minPrice = config.getGuidPriceBegin()==null?0:config.getGuidPriceBegin();
 			int maxPrice = config.getGuidPriceEnd();
 			if (purchasePrice.intValue() == 0 && purchasePrice.intValue() == minPrice) {
 				unitInsurAmt =  config.getInsuranceValue();

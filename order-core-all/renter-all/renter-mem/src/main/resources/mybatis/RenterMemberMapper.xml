@@ -20,6 +20,7 @@
         <result property="idCardAuth" column="id_card_auth"/>
         <result property="driLicAuth" column="dri_lic_auth"/>
         <result property="driViceLicAuth" column="dri_vice_lic_auth"/>
+        <result property="renterCheck" column="renter_check"/>
         <result property="createTime" column="create_time"/>
         <result property="createOp" column="create_op"/>
         <result property="updateTime" column="update_time"/>
@@ -45,6 +46,7 @@
 	`id_card_auth`,
 	`dri_lic_auth`,
 	`dri_vice_lic_auth`,
+	`renter_check`,
 	`create_time`,
 	`create_op`,
 	`update_time`,
@@ -76,6 +78,7 @@
         `id_card_auth`,
         `dri_lic_auth`,
         `dri_vice_lic_auth`,
+        `renter_check`,
         `create_time`,
         `create_op`,
         `update_time`,
@@ -99,6 +102,7 @@
         #{idCardAuth},
         #{driLicAuth},
         #{driViceLicAuth},
+        #{renterCheck},
         #{createTime},
         #{createOp},
         #{updateTime},
@@ -125,6 +129,7 @@
             <if test="idCardAuth != null">`id_card_auth`, </if>
             <if test="driLicAuth != null">`dri_lic_auth`, </if>
             <if test="driViceLicAuth != null">`dri_vice_lic_auth`, </if>
+            <if test="renterCheck != null">`renter_check`, </if>
             <if test="createTime != null">`create_time`, </if>
             <if test="createOp != null">`create_op`, </if>
             <if test="updateTime != null">`update_time`, </if>
@@ -147,6 +152,7 @@
             <if test="idCardAuth != null">#{idCardAuth},  </if>
             <if test="driLicAuth != null">#{driLicAuth},  </if>
             <if test="driViceLicAuth != null">#{driViceLicAuth},  </if>
+            <if test="renterCheck != null">#{renterCheck}, </if>
             <if test="createTime != null">#{createTime},  </if>
             <if test="createOp != null">#{createOp},  </if>
             <if test="updateTime != null">#{updateTime},  </if>
@@ -174,6 +180,7 @@
             <if test="idCardAuth != null">`id_card_auth` = #{idCardAuth}, </if>
             <if test="driLicAuth != null">`dri_lic_auth` = #{driLicAuth}, </if>
             <if test="driViceLicAuth != null">`dri_vice_lic_auth` = #{driViceLicAuth}, </if>
+            <if test="renterCheck != null">`renter_check` = #{renterCheck}, </if>
             <if test="createTime != null">`create_time` = #{createTime}, </if>
             <if test="createOp != null">`create_op` = #{createOp}, </if>
             <if test="updateTime != null">`update_time` = #{updateTime}, </if>
@@ -201,6 +208,7 @@
             `id_card_auth` = #{idCardAuth},
             `dri_lic_auth` = #{driLicAuth},
             `dri_vice_lic_auth` = #{driViceLicAuth},
+            `renter_check` = #{renterCheck},
             `create_time` = #{createTime},
             `create_op` = #{createOp},
             `update_time` = #{updateTime},

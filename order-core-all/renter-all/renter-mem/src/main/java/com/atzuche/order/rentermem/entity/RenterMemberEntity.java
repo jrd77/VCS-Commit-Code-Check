@@ -1,9 +1,10 @@
 package com.atzuche.order.rentermem.entity;
 
+import lombok.Data;
+
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import lombok.Data;
 
 
 /**
@@ -81,6 +82,10 @@ public class RenterMemberEntity implements Serializable {
 	 * 驾驶增副页 0：未上传，1：已上传，2：已认证，3：认证不通过, 4:无效数据, 5:未上传（已认证）
 	 */
 	private Integer driViceLicAuth;
+    /**
+     * 核查状态 0-未查核 1-核查通过 2-核查不通过 3-核查已通过，有劣迹
+     */
+    private Integer renterCheck;
 	/**
 	 * 创建时间
 	 */
