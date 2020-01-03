@@ -3,13 +3,13 @@ package com.atzuche.order.delivery.utils;
 import com.atzuche.order.delivery.common.DeliveryConstants;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.beanutils.BeanUtils;
+import org.springframework.beans.BeanWrapper;
+import org.springframework.beans.BeanWrapperImpl;
 
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Map;
-import java.util.TreeMap;
-import java.util.UUID;
+import java.util.*;
 
 
 @Slf4j
@@ -25,7 +25,6 @@ public class CommonUtil {
         //去掉“-”符号 
         return uuid.replaceAll("-", "");
     }
-
 
     /**
      * 转换成map
@@ -93,5 +92,27 @@ public class CommonUtil {
             log.info("配送参数获取sign失败");
         }
         return null;
+    }
+
+    /**
+     * 获取为null的属性
+     * @param source
+     * @return
+     */
+    public static String[] getNullPropertyNames (Object source) {
+        final BeanWrapper src = new BeanWrapperImpl(source);
+        java.beans.PropertyDescriptor[] pds = src.getPropertyDescriptors();
+
+        Set<String> emptyNames = new HashSet<String>();
+        for(java.beans.PropertyDescriptor pd : pds) {
+            Object srcValue = src.getPropertyValue(pd.getName());
+            if (srcValue == null) emptyNames.add(pd.getName());
+        }
+        String[] result = new String[emptyNames.size()];
+        return emptyNames.toArray(result);
+    }
+
+    public static void copyPropertiesIgnoreNull(Object src, Object target){
+        org.springframework.beans.BeanUtils.copyProperties(src, target, getNullPropertyNames(src));
     }
 }

@@ -40,7 +40,7 @@ public class RenterOrderReqVO implements Serializable {
     /**
      * 会员号
      */
-    private Integer memNo;
+    private String memNo;
 
     /**
      * 车辆注册号
