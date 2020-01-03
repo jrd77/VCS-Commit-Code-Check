@@ -1,10 +1,7 @@
 package com.atzuche.order.admin.controller;
 
 import com.atzuche.order.admin.vo.request.*;
-import com.atzuche.order.admin.vo.response.OrderRemarkListResponseVO;
-import com.atzuche.order.admin.vo.response.OrderRemarkLogListResponseVO;
-import com.atzuche.order.admin.vo.response.OrderRemarkLogPageListResponseVO;
-import com.atzuche.order.admin.vo.response.OrderRemarkOverviewResponseVO;
+import com.atzuche.order.admin.vo.response.*;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.doc.annotation.AutoDocMethod;
 import com.autoyol.doc.annotation.AutoDocVersion;
@@ -22,7 +19,7 @@ public class OrderRemarkController {
 		return ResponseData.success(null);
 	}
 
-    @AutoDocMethod(description = "备注查询列表", value = "备注查询列表", response = OrderRemarkListResponseVO.class)
+    @AutoDocMethod(description = "备注查询列表", value = "备注查询列表", response = OrderRemarkPageListResponseVO.class)
     @PostMapping("/list")
     public ResponseData<?> list(@RequestBody OrderRemarkListRequestVO orderRemarkListRequestVO, BindingResult bindingResult) {
         return ResponseData.success(null);
@@ -52,4 +49,6 @@ public class OrderRemarkController {
     public ResponseData<?> update(@RequestBody OrderRemarkUpdateRequestVO orderRemarkUpdateRequestVO, BindingResult bindingResult) {
         return ResponseData.success(null);
     }
+
+
 }
