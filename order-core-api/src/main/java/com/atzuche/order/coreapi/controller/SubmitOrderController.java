@@ -74,7 +74,7 @@ public class SubmitOrderController {
             orderRecordEntity.setErrorCode(orderException.getErrorCode());
             orderRecordEntity.setErrorTxt(orderException.getErrorMsg());
             orderRecordEntity.setMemNo(normalOrderReqVO.getMemNo());
-            orderRecordEntity.setOrderNo(orderResVO.getOrderNo());
+            orderRecordEntity.setOrderNo(orderResVO==null?"":orderResVO.getOrderNo());
             orderRecordEntity.setParam(JSON.toJSONString(normalOrderReqVO));
             orderRecordEntity.setResult(JSON.toJSONString(orderResVO));
             orderRecordService.save(orderRecordEntity);
@@ -84,7 +84,7 @@ public class SubmitOrderController {
             orderRecordEntity.setErrorCode(ErrorCode.SYS_ERROR.getCode());
             orderRecordEntity.setErrorTxt(ErrorCode.SYS_ERROR.getText());
             orderRecordEntity.setMemNo(normalOrderReqVO.getMemNo());
-            orderRecordEntity.setOrderNo(orderResVO.getOrderNo());
+            orderRecordEntity.setOrderNo(orderResVO==null?"":orderResVO.getOrderNo());
             orderRecordEntity.setParam(JSON.toJSONString(normalOrderReqVO));
             orderRecordEntity.setResult(JSON.toJSONString(orderResVO));
             orderRecordService.save(orderRecordEntity);
