@@ -59,9 +59,9 @@ public class DeliveryCarService {
     }
 
     /**
-     * 更新配送订单到仁云流程系统
+     * 更新配送订单
      */
-    public void updateRenYunFlowOrderInfo(UpdateOrderDeliveryVO updateFlowOrderVO) {
+    public void updateFlowOrderInfo(UpdateOrderDeliveryVO updateFlowOrderVO) {
         if (null == updateFlowOrderVO || updateFlowOrderVO.getRenterDeliveryAddrDTO() == null) {
             throw new DeliveryOrderException(DeliveryErrorCode.DELIVERY_PARAMS_ERROR);
         }
@@ -70,6 +70,16 @@ public class DeliveryCarService {
         orderDeliveryVO.setRenterDeliveryAddrDTO(updateFlowOrderVO.getRenterDeliveryAddrDTO());
         insertDeliveryAddress(orderDeliveryVO, DeliveryTypeEnum.UPDATE_TYPE.getValue().intValue());
         deliveryCarTask.updateRenYunFlowOrderInfo(updateFlowOrderVO.getUpdateFlowOrderDTO());
+    }
+
+    /**
+     * 更新配送订单到仁云流程系统
+     */
+    public void updateRenYunFlowOrderInfo(UpdateFlowOrderDTO updateFlowOrderDTO) {
+        if (null == updateFlowOrderDTO) {
+            throw new DeliveryOrderException(DeliveryErrorCode.DELIVERY_PARAMS_ERROR);
+        }
+        deliveryCarTask.updateRenYunFlowOrderInfo(updateFlowOrderDTO);
     }
 
     /**
@@ -91,11 +101,14 @@ public class DeliveryCarService {
      */
     @Transactional(rollbackFor = Exception.class)
     public void insertDeliveryAddress(OrderDeliveryVO orderDeliveryVO, Integer type) {
-        RenterDeliveryAddrEntity deliveryAddrEntity = new RenterDeliveryAddrEntity();
-        BeanUtils.copyProperties(orderDeliveryVO.getRenterDeliveryAddrDTO(), deliveryAddrEntity);
-        RenterDeliveryAddrEntity renterDeliveryAddrEntity = deliveryAddrMapper.selectByRenterOrderNo(deliveryAddrEntity.getRenterOrderNo());
-        if (renterDeliveryAddrEntity != null) {
-            deliveryAddrMapper.insertSelective(deliveryAddrEntity);
+
+        if (orderDeliveryVO.getRenterDeliveryAddrDTO() != null) {
+            RenterDeliveryAddrEntity deliveryAddrEntity = new RenterDeliveryAddrEntity();
+            BeanUtils.copyProperties(orderDeliveryVO.getRenterDeliveryAddrDTO(), deliveryAddrEntity);
+            RenterDeliveryAddrEntity renterDeliveryAddrEntity = deliveryAddrMapper.selectByRenterOrderNo(deliveryAddrEntity.getRenterOrderNo());
+            if (renterDeliveryAddrEntity != null) {
+                deliveryAddrMapper.insertSelective(deliveryAddrEntity);
+            }
         }
         if (orderDeliveryVO.getOrderDeliveryDTO() != null) {
             RenterOrderDeliveryEntity orderDeliveryEntity = new RenterOrderDeliveryEntity();
@@ -240,5 +253,12 @@ public class DeliveryCarService {
         orderDeliveryVO.setRenYunFlowOrderDTO(renYunFlowOrderDTO);
         return orderDeliveryVO;
     }
+
+
+
+
+
+
+
 
 }
