@@ -31,38 +31,40 @@
     </resultMap>
 
 
-	<sql id="Base_Column_List">
-	`id`, 	
-	`order_no`, 	
-	`renter_order_no`, 	
-	`exp_get_car_addr`, 	
-	`exp_return_car_addr`, 	
-	`exp_get_car_lon`, 	
-	`exp_get_car_lat`, 	
-	`exp_return_car_lon`, 	
-	`exp_return_car_lat`, 	
-	`act_get_car_addr`, 	
-	`act_return_car_addr`, 	
-	`act_get_car_lon`, 	
-	`act_get_car_lat`, 	
-	`act_return_car_lon`, 	
-	`act_return_car_lat`, 	
-	`get_car_user_name`, 	
-	`get_car_user_phone`, 	
-	`return_car_user_name`, 	
-	`return_car_user_phone`, 	
-	`create_time`, 	
-	`create_op`, 	
-	`update_time`, 	
-	`update_op`, 	
-	`is_delete`	
+    <sql id="Base_Column_List">
+        `id`,
+        `order_no`,
+        `renter_order_no`,
+        `exp_get_car_addr`,
+        `exp_return_car_addr`,
+        `exp_get_car_lon`,
+        `exp_get_car_lat`,
+        `exp_return_car_lon`,
+        `exp_return_car_lat`,
+        `act_get_car_addr`,
+        `act_return_car_addr`,
+        `act_get_car_lon`,
+        `act_get_car_lat`,
+        `act_return_car_lon`,
+        `act_return_car_lat`,
+        `get_car_user_name`,
+        `get_car_user_phone`,
+        `return_car_user_name`,
+        `return_car_user_phone`,
+        `create_time`,
+        `create_op`,
+        `update_time`,
+        `update_op`,
+        `is_delete`
 
-	</sql>
+    </sql>
 
 
-	<select id="selectByPrimaryKey" resultMap="BaseResultMap">
-		select <include refid="Base_Column_List" /> from renter_delivery_addr where id = #{value}
-	</select>
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from renter_delivery_addr where id = #{value}
+    </select>
 
 	<insert id="insert" parameterType="com.atzuche.order.delivery.entity.RenterDeliveryAddrEntity" useGeneratedKeys="true" keyProperty="id">
 		insert into renter_delivery_addr
@@ -227,5 +229,9 @@
 		</set>
 		where id = #{id}
 	</update>
+
+    <select id="selectByRenterOrderNo" resultMap="BaseResultMap">
+        select id,order_no,renter_order_no from renter_delivery_addr where renter_order_no = #{renterOrderNo} and is_delete = 0
+    </select>
   	
 </mapper>
