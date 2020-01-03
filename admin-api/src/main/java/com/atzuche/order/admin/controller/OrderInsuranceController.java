@@ -16,7 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class OrderInsuranceController {
 
 	@AutoDocMethod(description = "购买保险列表", value = "购买保险列表", response = OrderInsuranceResponseVO.class)
-	@PostMapping("/list")
+	@GetMapping("/list")
 	public ResponseData<?> list(@RequestBody OrderInsuranceRequestVO orderInsuranceRequestVO, BindingResult bindingResult) {
 		return ResponseData.success(null);
 	}

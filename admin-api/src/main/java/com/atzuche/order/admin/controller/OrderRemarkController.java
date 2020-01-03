@@ -5,6 +5,7 @@ import com.atzuche.order.admin.vo.response.*;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.doc.annotation.AutoDocMethod;
 import com.autoyol.doc.annotation.AutoDocVersion;
+import org.apache.ibatis.annotations.Delete;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,19 +15,19 @@ import org.springframework.web.bind.annotation.*;
 public class OrderRemarkController {
 
 	@AutoDocMethod(description = "备注总览", value = "备注总览", response = OrderRemarkOverviewResponseVO.class)
-	@PostMapping("/overview")
+	@GetMapping("/overview")
 	public ResponseData<?> overview(@RequestBody OrderRemarkRequestVO orderRemarkRequestVO, BindingResult bindingResult) {
 		return ResponseData.success(null);
 	}
 
     @AutoDocMethod(description = "备注查询列表", value = "备注查询列表", response = OrderRemarkPageListResponseVO.class)
-    @PostMapping("/list")
+    @GetMapping("/list")
     public ResponseData<?> list(@RequestBody OrderRemarkListRequestVO orderRemarkListRequestVO, BindingResult bindingResult) {
         return ResponseData.success(null);
     }
 
     @AutoDocMethod(description = "备注日志查询列表", value = "备注日志查询列表", response = OrderRemarkLogPageListResponseVO.class)
-    @PostMapping("/log/list")
+    @GetMapping("/log/list")
     public ResponseData<?> logList(@RequestBody OrderRemarkLogListRequestVO orderRemarkLogListRequestVO, BindingResult bindingResult) {
         return ResponseData.success(null);
     }
@@ -39,13 +40,13 @@ public class OrderRemarkController {
     }
 
     @AutoDocMethod(description = "删除备注", value = "删除备注", response = ResponseData.class)
-    @PostMapping("/del")
+    @DeleteMapping("/del")
     public ResponseData<?> del(@RequestBody OrderRemarkDeleteRequestVO orderRemarkDeleteRequestVO, BindingResult bindingResult) {
         return ResponseData.success(null);
     }
 
     @AutoDocMethod(description = "编辑备注", value = "编辑备注", response = ResponseData.class)
-    @PostMapping("/update")
+    @PutMapping("/update")
     public ResponseData<?> update(@RequestBody OrderRemarkUpdateRequestVO orderRemarkUpdateRequestVO, BindingResult bindingResult) {
         return ResponseData.success(null);
     }
