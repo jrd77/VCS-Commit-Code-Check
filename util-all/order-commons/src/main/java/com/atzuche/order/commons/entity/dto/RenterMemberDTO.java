@@ -1,6 +1,5 @@
 package com.atzuche.order.commons.entity.dto;
 
-import com.autoyol.doc.annotation.AutoDocProperty;
 import com.autoyol.member.detail.vo.res.CommUseDriverInfo;
 import lombok.Data;
 
@@ -82,4 +81,8 @@ public class RenterMemberDTO {
      * 是否是新用户:0，否;1，是，定义没有已结算订单的用户为新用户
      */
     private Integer isNew;
+    /**
+     * 核查状态 0-未查核 1-核查通过 2-核查不通过 3-核查已通过，有劣迹
+     */
+    private Integer renterCheck;
 }

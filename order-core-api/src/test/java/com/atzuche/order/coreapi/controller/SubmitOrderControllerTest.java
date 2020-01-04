@@ -31,7 +31,7 @@ public class SubmitOrderControllerTest {
         param.setAppChannelId("");
         param.setMac("");
         param.setAndroidID("xxxxxxx");
-        param.setMemNo("118454045");
+        param.setMemNo("985856422");
         param.setSchema("");
 
         param.setOrderCategory("1");
@@ -54,7 +54,7 @@ public class SubmitOrderControllerTest {
         param.setSrvReturnAddr("上海市徐家汇xxx路");
         param.setSrvReturnLon("114.047754");
         param.setSrvReturnLat("22.521016");
-        param.setCarNo("57091975");
+        param.setCarNo("791332363");
         param.setAbatement("1");
         param.setGetCarFreeCouponId("");
         param.setDisCouponIds("");

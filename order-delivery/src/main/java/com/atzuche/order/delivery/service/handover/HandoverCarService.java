@@ -8,6 +8,9 @@ import com.atzuche.order.delivery.entity.RenterHandoverCarRemarkEntity;
 import com.atzuche.order.delivery.enums.UserTypeEnum;
 import com.atzuche.order.delivery.exception.HandoverCarOrderException;
 import com.atzuche.order.delivery.mapper.*;
+import com.atzuche.order.delivery.utils.CommonUtil;
+import com.atzuche.order.delivery.vo.handover.HandoverCarRepVO;
+import com.atzuche.order.delivery.vo.handover.HandoverCarReqVO;
 import com.atzuche.order.delivery.vo.handover.HandoverCarVO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -16,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -47,10 +51,16 @@ public class HandoverCarService {
         }
         //向租客交车
         if (userType == UserTypeEnum.RENTER_TYPE.getValue().intValue()) {
-
             RenterHandoverCarInfoEntity renterHandoverCarInfoEntity = new RenterHandoverCarInfoEntity();
             BeanUtils.copyProperties(handoverCarVO.getHandoverCarInfoDTO(), renterHandoverCarInfoEntity);
-            renterHandoverCarInfoMapper.insertSelective(renterHandoverCarInfoEntity);
+            //获取交接车数据
+            RenterHandoverCarInfoEntity handoverCarInfoEntity = renterHandoverCarInfoMapper.selectObjectByRenterOrderNo(handoverCarVO.getHandoverCarInfoDTO().getRenterOrderNo(), handoverCarVO.getHandoverCarInfoDTO().getType());
+            if (handoverCarInfoEntity != null) {
+                CommonUtil.copyPropertiesIgnoreNull(renterHandoverCarInfoEntity, handoverCarInfoEntity);
+                renterHandoverCarInfoMapper.updateByPrimaryKey(handoverCarInfoEntity);
+            } else {
+                renterHandoverCarInfoMapper.insertSelective(renterHandoverCarInfoEntity);
+            }
             if (handoverCarVO.getHandoverCarRemarkDTO() != null) {
                 RenterHandoverCarRemarkEntity renterHandoverCarRemarkEntity = new RenterHandoverCarRemarkEntity();
                 BeanUtils.copyProperties(handoverCarVO.getHandoverCarRemarkDTO(), renterHandoverCarRemarkEntity);
@@ -86,6 +96,25 @@ public class HandoverCarService {
             handoverMsgId = ownerHandoverCarInfoMapper.queryObjectByMsgId(msgId);
         }
         return handoverMsgId;
+    }
+
+
+    /**
+     * 根据子订单号查询(油耗 里程)需要的数据
+     *
+     * @param handoverCarReqVO
+     * @return
+     */
+    public HandoverCarRepVO getRenterHandover(HandoverCarReqVO handoverCarReqVO) {
+        if (null == handoverCarReqVO) {
+            throw new HandoverCarOrderException(DeliveryErrorCode.DELIVERY_PARAMS_ERROR.getValue(), "参数错误");
+        }
+        List<RenterHandoverCarInfoEntity> renterHandoverCarInfoEntities = renterHandoverCarInfoMapper.selectByRenterOrderNo(handoverCarReqVO.getRenterOrderNo());
+        List<OwnerHandoverCarInfoEntity> ownerHandoverCarInfoEntities = ownerHandoverCarInfoMapper.selectByOwnerOrderNo(handoverCarReqVO.getRenterOrderNo());
+        HandoverCarRepVO handoverCarRepVO = new HandoverCarRepVO();
+        handoverCarRepVO.setOwnerHandoverCarInfoEntities(ownerHandoverCarInfoEntities);
+        handoverCarRepVO.setRenterHandoverCarInfoEntities(renterHandoverCarInfoEntities);
+        return handoverCarRepVO;
     }
 
 

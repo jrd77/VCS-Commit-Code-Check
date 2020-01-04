@@ -86,10 +86,6 @@ public class OwnerOrderEntity implements Serializable {
 	 */
 	private Integer isUseSpecialPrice;
 	/**
-	 * 取消原因 1、车主主动拒单 2、超时拒单 3、车主取消订单
-	 */
-	private String cancelReason;
-	/**
 	 * 取消者
 	 */
 	private String cancleOp;

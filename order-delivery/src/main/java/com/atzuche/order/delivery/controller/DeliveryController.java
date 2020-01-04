@@ -26,7 +26,6 @@ public class DeliveryController {
     public ResponseData<?> add() {
         RenYunFlowOrderDTO renYunFlowOrderDTO = new RenYunFlowOrderDTO();
 
-
         renYunFlowOrderDTO.setOrdernumber("65656565");
         renYunFlowOrderDTO.setOrderType("0");
         renYunFlowOrderDTO.setServicetype("back");

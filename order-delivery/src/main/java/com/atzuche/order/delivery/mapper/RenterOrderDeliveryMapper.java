@@ -28,8 +28,16 @@ public interface RenterOrderDeliveryMapper {
 
     List<RenterOrderDeliveryEntity> listRenterOrderDeliveryByRenterOrderNo(@Param("renterOrderNo") String renterOrderNo);
 
-    int updateById(@Param("id") Integer id);
+    int updateStatusById(@Param("id") Integer id);
 
     RenterOrderDeliveryEntity findRenterOrderByRenterOrderNo(@Param("renterOrderNo") String renterOrderNo,@Param("type") Integer type);
+
+    /**
+     * 查找最近一笔配送订单信息
+     * @param orderNo
+     * @param type
+     * @return
+     */
+    RenterOrderDeliveryEntity findRenterOrderByrOrderNo(@Param("orderNo") String orderNo,@Param("type") Integer type);
 
 }

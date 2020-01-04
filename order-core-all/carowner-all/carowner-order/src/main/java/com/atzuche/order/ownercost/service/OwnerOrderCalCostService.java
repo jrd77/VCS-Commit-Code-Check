@@ -44,7 +44,7 @@ public class OwnerOrderCalCostService {
 
         //计算租金和补贴
         int rentAmt = ownerOrderCostReqDTO.getOwnerOrderPurchaseDetailEntity().getTotalAmount();
-        int subsidyAmt = ownerOrderCostReqDTO.getOwnerOrderSubsidyDetailEntity().getSubsidyAmount();
+        int subsidyAmt = ownerOrderCostReqDTO.getOwnerOrderSubsidyDetailEntity()==null?0:ownerOrderCostReqDTO.getOwnerOrderSubsidyDetailEntity().getSubsidyAmount();
 
         //计算取还车增值费用费用
         log.info("下单-车主端-获取取车费用，入参costBaseDTO=[{}],carOwnerType=[{}],srvGetFlag=[{}]",JSON.toJSONString(costBaseDTO),carOwnerType,srvGetFlag);
