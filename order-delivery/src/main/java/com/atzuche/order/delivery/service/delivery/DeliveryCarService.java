@@ -114,6 +114,8 @@ public class DeliveryCarService {
             BeanUtils.copyProperties(orderDeliveryVO.getOrderDeliveryDTO(), orderDeliveryEntity);
             if (type == DeliveryTypeEnum.ADD_TYPE.getValue().intValue()) {
                 orderDeliveryEntity.setOrderNoDelivery(codeUtils.createDeliveryNumber());
+                int aheadOrDelayTime = getMinutes == null ? returnMinutes : getMinutes;
+                //orderDeliveryEntity.setAh
                 orderDeliveryMapper.insertSelective(orderDeliveryEntity);
             } else {
                 RenterOrderDeliveryEntity lastOrderDeliveryEntity = orderDeliveryMapper.findRenterOrderByrOrderNo(orderDeliveryEntity.getOrderNo(), orderDeliveryEntity.getType());
@@ -127,6 +129,7 @@ public class DeliveryCarService {
         //处理交接车信息
         if(type == DeliveryTypeEnum.ADD_TYPE.getValue().intValue())
         {
+            //提前或延后时间(取车:提前时间, 还车：延后时间
             if(getMinutes != null)
             {
 
