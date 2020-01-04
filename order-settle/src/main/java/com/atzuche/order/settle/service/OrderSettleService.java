@@ -58,7 +58,6 @@ public class OrderSettleService {
         orderSettleNoTService.getRenterCostSettleDetail(settleOrders,renterOrder);
         //3.5 查询所有车主费用明细
         orderSettleNoTService.getOwnerCostSettleDetail(settleOrders,ownerOrder);
-
         //4 计算费用统计  资金统计
         SettleOrdersDefinition settleOrdersDefinition = orderSettleNoTService.settleOrdersDefinition(settleOrders);
 
