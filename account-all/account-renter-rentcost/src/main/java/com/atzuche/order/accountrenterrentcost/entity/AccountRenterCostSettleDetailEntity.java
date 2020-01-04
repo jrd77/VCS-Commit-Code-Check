@@ -39,7 +39,7 @@ public class AccountRenterCostSettleDetailEntity implements Serializable {
 	/**
 	 * 费用编码
 	 */
-	private Integer costCode;
+	private String costCode;
 	/**
 	 * 费用描述
 	 */

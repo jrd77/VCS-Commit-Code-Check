@@ -31,7 +31,7 @@ public class SettleOrders {
     private String ownerMemNo;
 
     /**
-     * 租车费用明细
+     * 租车费用
      */
     private int renterOrderCost;
 
