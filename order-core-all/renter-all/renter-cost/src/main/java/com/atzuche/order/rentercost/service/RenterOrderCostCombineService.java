@@ -686,7 +686,7 @@ public class RenterOrderCostCombineService {
         GetFbcFeeRequestDetail getCost = new GetFbcFeeRequestDetail();
         getCost.setChannelName(channelCode);
         getCost.setRequestTime(LocalDateTimeUtils.getNowDateLong());
-        getCost.setGetReturnType("return");
+        getCost.setGetReturnType("get");
         getCost.setGetReturnTime(String.valueOf(LocalDateTimeUtils.localDateTimeToLong(costBaseDTO.getEndTime())));
         getCost.setCityId(String.valueOf(cityCode));
         getCost.setOrderType(this.getIsPackageOrder(getReturnCarCostReqDto.getIsPackageOrder()));
@@ -759,26 +759,26 @@ public class RenterOrderCostCombineService {
                 renterOrderCostDetailEntity.setCount(1D);
                 renterOrderCostDetailEntity.setTotalAmount(-expectedShouldFee);
                 listCostDetail.add(renterOrderCostDetailEntity);
-
-                RenterOrderSubsidyDetailDTO renterOrderSubsidy = new RenterOrderSubsidyDetailDTO();
-                renterOrderSubsidy.setOrderNo(costBaseDTO.getOrderNo());
-                renterOrderSubsidy.setRenterOrderNo(costBaseDTO.getRenterOrderNo());
-                renterOrderSubsidy.setMemNo(costBaseDTO.getMemNo());
-                renterOrderSubsidy.setSubsidyTypeName(SubsidyTypeCodeEnum.GET_CAR.getDesc());
-                renterOrderSubsidy.setSubsidyTypeCode(SubsidyTypeCodeEnum.GET_CAR.getCode());
-                renterOrderSubsidy.setSubsidySourceCode(SubsidySourceCodeEnum.PLATFORM.getCode());
-                renterOrderSubsidy.setSubsidySourceName(SubsidySourceCodeEnum.PLATFORM.getDesc());
-                renterOrderSubsidy.setSubsidyTargetCode(SubsidySourceCodeEnum.RENTER.getCode());
-                renterOrderSubsidy.setSubsidyTargetName(SubsidySourceCodeEnum.RENTER.getDesc());
-                renterOrderSubsidy.setSubsidyCostCode(RenterCashCodeEnum.SRV_GET_COST.getCashNo());
-                renterOrderSubsidy.setSubsidyCostName(RenterCashCodeEnum.SRV_GET_COST.getTxt());
-                renterOrderSubsidy.setSubsidyDesc("平台补贴给租客的取车费用！");
                 int expectedRealFee = Integer.valueOf(fbcFeeResponse.getExpectedRealFee());
-
-                renterOrderSubsidy.setSubsidyAmount(expectedShouldFee - expectedRealFee);
-                renterOrderSubsidy.setSubsidyVoucher("");
-                listCostSubsidy.add(renterOrderSubsidy);
-
+                int diffe = expectedShouldFee - expectedRealFee;
+                if(diffe != 0){
+                    RenterOrderSubsidyDetailDTO renterOrderSubsidy = new RenterOrderSubsidyDetailDTO();
+                    renterOrderSubsidy.setOrderNo(costBaseDTO.getOrderNo());
+                    renterOrderSubsidy.setRenterOrderNo(costBaseDTO.getRenterOrderNo());
+                    renterOrderSubsidy.setMemNo(costBaseDTO.getMemNo());
+                    renterOrderSubsidy.setSubsidyTypeName(SubsidyTypeCodeEnum.GET_CAR.getDesc());
+                    renterOrderSubsidy.setSubsidyTypeCode(SubsidyTypeCodeEnum.GET_CAR.getCode());
+                    renterOrderSubsidy.setSubsidySourceCode(SubsidySourceCodeEnum.PLATFORM.getCode());
+                    renterOrderSubsidy.setSubsidySourceName(SubsidySourceCodeEnum.PLATFORM.getDesc());
+                    renterOrderSubsidy.setSubsidyTargetCode(SubsidySourceCodeEnum.RENTER.getCode());
+                    renterOrderSubsidy.setSubsidyTargetName(SubsidySourceCodeEnum.RENTER.getDesc());
+                    renterOrderSubsidy.setSubsidyCostCode(RenterCashCodeEnum.SRV_GET_COST.getCashNo());
+                    renterOrderSubsidy.setSubsidyCostName(RenterCashCodeEnum.SRV_GET_COST.getTxt());
+                    renterOrderSubsidy.setSubsidyDesc("平台补贴给租客的取车费用！");
+                    renterOrderSubsidy.setSubsidyAmount(diffe);
+                    renterOrderSubsidy.setSubsidyVoucher("");
+                    listCostSubsidy.add(renterOrderSubsidy);
+                }
                 getReturnResponse.setGetFee(Integer.valueOf(fbcFeeResponse.getExpectedRealFee()));
                 getReturnResponse.setGetShouldFee(Integer.valueOf(fbcFeeResponse.getExpectedShouldFee()));
                 getReturnResponse.setGetInitFee(Integer.valueOf(fbcFeeResponse.getBaseFee()));
@@ -788,42 +788,44 @@ public class RenterOrderCostCombineService {
                 getReturnResponse.setGetShowDistance(Double.valueOf(fbcFeeResponse.getShowDistance()));
 
             } else if ("return".equalsIgnoreCase(fbcFeeResponse.getGetReturnType()) && getReturnCarCostReqDto.getIsReturnCarCost()) {
-               int expectedShouldFee = Integer.valueOf(fbcFeeResponse.getExpectedShouldFee());
-               RenterOrderCostDetailEntity renterOrderCostDetailEntity = new RenterOrderCostDetailEntity();
+                int expectedShouldFee = Integer.valueOf(fbcFeeResponse.getExpectedShouldFee());
+                RenterOrderCostDetailEntity renterOrderCostDetailEntity = new RenterOrderCostDetailEntity();
                 renterOrderCostDetailEntity.setOrderNo(costBaseDTO.getOrderNo());
                 renterOrderCostDetailEntity.setRenterOrderNo(costBaseDTO.getRenterOrderNo());
                 renterOrderCostDetailEntity.setMemNo(costBaseDTO.getMemNo());
-               renterOrderCostDetailEntity.setCostCode(RenterCashCodeEnum.SRV_RETURN_COST.getCashNo());
-               renterOrderCostDetailEntity.setCostDesc(RenterCashCodeEnum.SRV_RETURN_COST.getTxt());
-               renterOrderCostDetailEntity.setCount(1D);
-               renterOrderCostDetailEntity.setTotalAmount(-expectedShouldFee);
-               listCostDetail.add(renterOrderCostDetailEntity);
+                renterOrderCostDetailEntity.setCostCode(RenterCashCodeEnum.SRV_RETURN_COST.getCashNo());
+                renterOrderCostDetailEntity.setCostDesc(RenterCashCodeEnum.SRV_RETURN_COST.getTxt());
+                renterOrderCostDetailEntity.setCount(1D);
+                renterOrderCostDetailEntity.setTotalAmount(-expectedShouldFee);
+                listCostDetail.add(renterOrderCostDetailEntity);
 
-               RenterOrderSubsidyDetailDTO renterOrderSubsidy = new RenterOrderSubsidyDetailDTO();
-               renterOrderSubsidy.setOrderNo(costBaseDTO.getOrderNo());
-               renterOrderSubsidy.setRenterOrderNo(costBaseDTO.getRenterOrderNo());
-               renterOrderSubsidy.setMemNo(costBaseDTO.getMemNo());
-               renterOrderSubsidy.setSubsidyTypeName(SubsidyTypeCodeEnum.RETURN_CAR.getDesc());
-               renterOrderSubsidy.setSubsidyTypeCode(SubsidyTypeCodeEnum.RETURN_CAR.getCode());
-               renterOrderSubsidy.setSubsidySourceCode(SubsidySourceCodeEnum.PLATFORM.getCode());
-               renterOrderSubsidy.setSubsidySourceName(SubsidySourceCodeEnum.PLATFORM.getDesc());
-               renterOrderSubsidy.setSubsidyTargetCode(SubsidySourceCodeEnum.RENTER.getCode());
-               renterOrderSubsidy.setSubsidyTargetName(SubsidySourceCodeEnum.RENTER.getDesc());
-                renterOrderSubsidy.setSubsidyCostCode(RenterCashCodeEnum.SRV_RETURN_COST.getCashNo());
-                renterOrderSubsidy.setSubsidyCostName(RenterCashCodeEnum.SRV_RETURN_COST.getTxt());
-               renterOrderSubsidy.setSubsidyDesc("平台补贴给租客的还车费用！");
-               int expectedRealFee = Integer.valueOf(fbcFeeResponse.getExpectedRealFee());
-               renterOrderSubsidy.setSubsidyAmount(expectedShouldFee - expectedRealFee);
-               renterOrderSubsidy.setSubsidyVoucher("");
-               listCostSubsidy.add(renterOrderSubsidy);
-
-               getReturnResponse.setReturnFee(Integer.valueOf(fbcFeeResponse.getExpectedRealFee()));
-               getReturnResponse.setReturnShouldFee(Integer.valueOf(fbcFeeResponse.getExpectedShouldFee()));
-               getReturnResponse.setReturnInitFee(Integer.valueOf(fbcFeeResponse.getBaseFee()));
-               getReturnResponse.setReturnTimePeriodUpPrice(fbcFeeResponse.getTimePeriodUpPrice());
-               getReturnResponse.setReturnDistanceUpPrice(fbcFeeResponse.getDistanceUpPrice());
-               getReturnResponse.setReturnCicrleUpPrice(fbcFeeResponse.getCicrleUpPrice());
-               getReturnResponse.setReturnShowDistance(Double.valueOf(fbcFeeResponse.getShowDistance()));
+                int expectedRealFee = Integer.valueOf(fbcFeeResponse.getExpectedRealFee());
+                int diff = expectedShouldFee - expectedRealFee;
+                if(diff != 0){
+                    RenterOrderSubsidyDetailDTO renterOrderSubsidy = new RenterOrderSubsidyDetailDTO();
+                    renterOrderSubsidy.setOrderNo(costBaseDTO.getOrderNo());
+                    renterOrderSubsidy.setRenterOrderNo(costBaseDTO.getRenterOrderNo());
+                    renterOrderSubsidy.setMemNo(costBaseDTO.getMemNo());
+                    renterOrderSubsidy.setSubsidyTypeName(SubsidyTypeCodeEnum.RETURN_CAR.getDesc());
+                    renterOrderSubsidy.setSubsidyTypeCode(SubsidyTypeCodeEnum.RETURN_CAR.getCode());
+                    renterOrderSubsidy.setSubsidySourceCode(SubsidySourceCodeEnum.PLATFORM.getCode());
+                    renterOrderSubsidy.setSubsidySourceName(SubsidySourceCodeEnum.PLATFORM.getDesc());
+                    renterOrderSubsidy.setSubsidyTargetCode(SubsidySourceCodeEnum.RENTER.getCode());
+                    renterOrderSubsidy.setSubsidyTargetName(SubsidySourceCodeEnum.RENTER.getDesc());
+                    renterOrderSubsidy.setSubsidyCostCode(RenterCashCodeEnum.SRV_RETURN_COST.getCashNo());
+                    renterOrderSubsidy.setSubsidyCostName(RenterCashCodeEnum.SRV_RETURN_COST.getTxt());
+                    renterOrderSubsidy.setSubsidyDesc("平台补贴给租客的还车费用！");
+                    renterOrderSubsidy.setSubsidyAmount(diff);
+                    renterOrderSubsidy.setSubsidyVoucher("");
+                    listCostSubsidy.add(renterOrderSubsidy);
+                }
+                getReturnResponse.setReturnFee(Integer.valueOf(fbcFeeResponse.getExpectedRealFee()));
+                getReturnResponse.setReturnShouldFee(Integer.valueOf(fbcFeeResponse.getExpectedShouldFee()));
+                getReturnResponse.setReturnInitFee(Integer.valueOf(fbcFeeResponse.getBaseFee()));
+                getReturnResponse.setReturnTimePeriodUpPrice(fbcFeeResponse.getTimePeriodUpPrice());
+                getReturnResponse.setReturnDistanceUpPrice(fbcFeeResponse.getDistanceUpPrice());
+                getReturnResponse.setReturnCicrleUpPrice(fbcFeeResponse.getCicrleUpPrice());
+                getReturnResponse.setReturnShowDistance(Double.valueOf(fbcFeeResponse.getShowDistance()));
             }
         });
         getReturnCostDto.setGetReturnResponseVO(getReturnResponse);

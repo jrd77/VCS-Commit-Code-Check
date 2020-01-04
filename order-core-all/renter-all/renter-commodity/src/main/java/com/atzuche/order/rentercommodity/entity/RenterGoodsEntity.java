@@ -9,7 +9,7 @@ import lombok.Data;
  * 租客商品概览表
  * 
  * @author ZhangBin
- * @date 2019-12-28 10:14:35
+ * @date 2020-01-04 14:44:30
  * @Description:
  */
 @Data
@@ -157,9 +157,21 @@ public class RenterGoodsEntity implements Serializable {
 	 */
 	private String carRealLat;
 	/**
+	 * 油表总刻度
+	 */
+	private Integer oilTotalCalibration;
+	/**
+	 * GPS序号
+	 */
+	private String gpsSerialNumber;
+	/**
 	 * 选择的车辆地址序号
 	 */
 	private Integer carAddrIndex;
+	/**
+	 * 车辆日均指导价
+	 */
+	private Integer carGuideDayPrice;
 	/**
 	 * 停运费比例
 	 */
@@ -176,6 +188,10 @@ public class RenterGoodsEntity implements Serializable {
 	 * 发动机号
 	 */
 	private String engineNum;
+	/**
+	 * 年份
+	 */
+	private String year;
 	/**
 	 * 创建时间
 	 */

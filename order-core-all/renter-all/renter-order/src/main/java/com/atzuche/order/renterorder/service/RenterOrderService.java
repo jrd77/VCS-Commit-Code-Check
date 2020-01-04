@@ -228,10 +228,10 @@ public class RenterOrderService {
         //基础信息
         CostBaseDTO costBaseDTO = new CostBaseDTO();
         costBaseDTO.setStartTime(renterOrderReqVO.getRentTime());
-        costBaseDTO.setStartTime(renterOrderReqVO.getRevertTime());
+        costBaseDTO.setEndTime(renterOrderReqVO.getRevertTime());
         costBaseDTO.setOrderNo(renterOrderReqVO.getOrderNo());
         costBaseDTO.setRenterOrderNo(renterOrderReqVO.getRenterOrderNo());
-        costBaseDTO.setMemNo(renterOrderReqVO.getMemNo().toString());
+        costBaseDTO.setMemNo(renterOrderReqVO.getMemNo());
 
         //租金计算相关信息
         RentAmtDTO rentAmtDTO = new RentAmtDTO();
