@@ -48,10 +48,10 @@ public class DeliveryCarService {
      */
     public void addRenYunFlowOrderInfo(Integer getMinutes, Integer returnMinutes, OrderReqContext orderReqContext) {
         OrderDeliveryVO orderDeliveryVO = createOrderDeliveryParams(orderReqContext);
-        if (null == orderDeliveryVO || orderDeliveryVO.getRenterDeliveryAddrDTO() == null) {
+        if (null == orderDeliveryVO) {
             throw new DeliveryOrderException(DeliveryErrorCode.DELIVERY_PARAMS_ERROR);
         }
-        insertDeliveryAddress(orderDeliveryVO, DeliveryTypeEnum.ADD_TYPE.getValue().intValue());
+        insertDeliveryAddress(getMinutes,returnMinutes,orderDeliveryVO, DeliveryTypeEnum.ADD_TYPE.getValue().intValue());
         if (orderDeliveryVO.getOrderDeliveryDTO() != null && orderDeliveryVO.getOrderDeliveryDTO().getIsNotifyRenyun().intValue() == UsedDeliveryTypeEnum.USED.getValue().intValue()) {
             RenYunFlowOrderDTO renYunFlowOrder = orderDeliveryVO.getRenYunFlowOrderDTO();
             deliveryCarTask.addRenYunFlowOrderInfo(renYunFlowOrder);
@@ -62,14 +62,13 @@ public class DeliveryCarService {
      * 更新配送订单
      */
     public void updateFlowOrderInfo(UpdateOrderDeliveryVO updateFlowOrderVO) {
-        if (null == updateFlowOrderVO || updateFlowOrderVO.getRenterDeliveryAddrDTO() == null) {
+        if (null == updateFlowOrderVO) {
             throw new DeliveryOrderException(DeliveryErrorCode.DELIVERY_PARAMS_ERROR);
         }
         OrderDeliveryVO orderDeliveryVO = new OrderDeliveryVO();
         orderDeliveryVO.setOrderDeliveryDTO(updateFlowOrderVO.getOrderDeliveryDTO());
         orderDeliveryVO.setRenterDeliveryAddrDTO(updateFlowOrderVO.getRenterDeliveryAddrDTO());
-        insertDeliveryAddress(orderDeliveryVO, DeliveryTypeEnum.UPDATE_TYPE.getValue().intValue());
-        deliveryCarTask.updateRenYunFlowOrderInfo(updateFlowOrderVO.getUpdateFlowOrderDTO());
+        insertDeliveryAddress(null,null,orderDeliveryVO, DeliveryTypeEnum.UPDATE_TYPE.getValue().intValue());
     }
 
     /**
@@ -100,7 +99,7 @@ public class DeliveryCarService {
      * @param orderDeliveryVO
      */
     @Transactional(rollbackFor = Exception.class)
-    public void insertDeliveryAddress(OrderDeliveryVO orderDeliveryVO, Integer type) {
+    public void insertDeliveryAddress(Integer getMinutes, Integer returnMinutes,OrderDeliveryVO orderDeliveryVO, Integer type) {
 
         if (orderDeliveryVO.getRenterDeliveryAddrDTO() != null) {
             RenterDeliveryAddrEntity deliveryAddrEntity = new RenterDeliveryAddrEntity();
@@ -125,6 +124,22 @@ public class DeliveryCarService {
                 orderDeliveryMapper.insert(lastOrderDeliveryEntity);
             }
         }
+        //处理交接车信息
+        if(type == DeliveryTypeEnum.ADD_TYPE.getValue().intValue())
+        {
+            if(getMinutes != null)
+            {
+
+            }
+
+
+
+
+        }
+
+
+
+
     }
 
     /**

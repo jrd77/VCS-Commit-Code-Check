@@ -255,5 +255,10 @@
 		select msg_id from owner_handover_car_info
 		where msg_id = #{msgId} and is_delete = 0
 	</select>
+
+	<select id="selectByOwnerOrderNo" resultMap="BaseResultMap">
+		select oil_num,mileage_num,delay_time,ahead_time,type from renter_handover_car_info where
+		renter_order_no = #{renterOrderNo} and is_delete = 0
+	</select>
   	
 </mapper>
