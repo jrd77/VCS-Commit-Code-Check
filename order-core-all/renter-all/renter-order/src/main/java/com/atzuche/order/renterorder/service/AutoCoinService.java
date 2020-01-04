@@ -37,13 +37,13 @@ public class AutoCoinService {
      * @param memNo 租客注册号
      * @return CrmCustPointDTO 凹凸币信息
      */
-    public AutoCoinResponseVO getCrmCustPoint(int memNo) {
+    public AutoCoinResponseVO getCrmCustPoint(String memNo) {
         LOGGER.info("AutoCoinService.getCrmCustPoint remote call start param memNo: [{}]", memNo);
         Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "凹凸币服务");
         try {
             Cat.logEvent(CatConstants.FEIGN_METHOD, "autoCoinFeignService.getCoinByMemNo");
             Cat.logEvent(CatConstants.FEIGN_PARAM, "memNo=" + memNo);
-            ResponseData<AutoCoinResponseVO> result = autoCoinFeignService.getCoinByMemNo(memNo);
+            ResponseData<AutoCoinResponseVO> result = autoCoinFeignService.getCoinByMemNo(Integer.valueOf(memNo));
             LOGGER.info("AutoRemoteCoinService.getCrmCustPoint remote call end result result: [{}]", JSON.toJSONString(result));
             Cat.logEvent(CatConstants.FEIGN_RESULT, JSON.toJSONString(result));
             t.setStatus(Transaction.SUCCESS);

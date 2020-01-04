@@ -28,7 +28,6 @@ import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.coupon.api.MemAvailCoupon;
 import com.autoyol.coupon.api.MemAvailCouponRequest;
 import com.autoyol.coupon.api.MemAvailCouponResponse;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -80,6 +79,7 @@ public class RenterOrderCalCostService {
      * @date 2019/12/24 15:21
      **/
     public RenterOrderCostRespDTO getOrderCostAndDeailList(RenterOrderCostReqDTO renterOrderCostReqDTO) {
+
         LOGGER.info("租客费用-费用聚合开始renterOrderCostReqDTO=[{}]",JSON.toJSONString(renterOrderCostReqDTO));
         CostBaseDTO costBaseDTO = renterOrderCostReqDTO.getCostBaseDTO();
         RenterOrderCostRespDTO renterOrderCostRespDTO = new RenterOrderCostRespDTO();
@@ -100,7 +100,9 @@ public class RenterOrderCalCostService {
         int rentAmt = renterOrderCostDetailEntities.stream().collect(Collectors.summingInt(RenterOrderCostDetailEntity::getTotalAmount));
         rentAmt = rentAmt + rentAmtSubsidyAmt;
         detailList.addAll(renterOrderCostDetailEntities);
-        subsidyList.addAll(rentAmtSubSidy);
+        if(rentAmtSubSidy !=null){
+            subsidyList.addAll(rentAmtSubSidy);
+        }
         renterOrderCostRespDTO.setRentAmount(rentAmt);
         LOGGER.info("租客费用-获取租金-rentAmt=[{}]",rentAmt);
 
@@ -112,7 +114,9 @@ public class RenterOrderCalCostService {
         insurAmt = insurAmt + insurAmtSubSidyAmt;
         renterOrderCostRespDTO.setBasicEnsureAmount(insurAmt);
         detailList.add(insurAmtEntity);
-        subsidyList.addAll(insurAmtSubSidy);
+        if(insurAmtSubSidy != null){
+            subsidyList.addAll(insurAmtSubSidy);
+        }
         LOGGER.info("租客费用-获取平台保障费-insurAmt=[{}]",insurAmt);
 
         //获取全面保障费
@@ -123,7 +127,9 @@ public class RenterOrderCalCostService {
         comprehensiveEnsureAmount = comprehensiveEnsureAmount + comprehensiveEnsureSubsidyAmount;
         renterOrderCostRespDTO.setComprehensiveEnsureAmount(comprehensiveEnsureAmount);
         detailList.addAll(comprehensiveEnsureList);
-        subsidyList.addAll(comprehensiveEnsureSubsidy);
+        if(comprehensiveEnsureSubsidy != null){
+            subsidyList.addAll(comprehensiveEnsureSubsidy);
+        }
         LOGGER.info("租客费用-获取全面保障费-comprehensiveEnsureAmount=[{}]",comprehensiveEnsureAmount);
 
         //获取附加驾驶人保险金额
@@ -134,7 +140,9 @@ public class RenterOrderCalCostService {
         extraDriverAmount = extraDriverAmount + totalAmountSubsidyAmount;
         renterOrderCostRespDTO.setAdditionalDrivingEnsureAmount(extraDriverAmount);
         detailList.add(extraDriverInsureAmtEntity);
-        subsidyList.addAll(totalAmountSubsidy);
+        if(totalAmountSubsidy != null){
+            subsidyList.addAll(totalAmountSubsidy);
+        }
         LOGGER.info("租客费用-获取附加驾驶人保险金额extraDriverAmount=[{}]",extraDriverAmount);
 
         //获取平台手续费
@@ -145,7 +153,9 @@ public class RenterOrderCalCostService {
         serviceAmount = serviceAmount + serviceSubsidyAmount;
         renterOrderCostRespDTO.setCommissionAmount(serviceAmount);
         detailList.add(serviceChargeFeeEntity);
-        subsidyList.addAll(serviceSubsidy);
+        if(serviceSubsidy != null){
+            subsidyList.addAll(serviceSubsidy);
+        }
         LOGGER.info("租客费用-获取平台手续费serviceAmount=[{}]",serviceAmount);
 
         //获取取还车费用
@@ -161,8 +171,12 @@ public class RenterOrderCalCostService {
         getReturnAmt = getReturnAmt + getSubsidyAmt + returnSubsidyAmt;
         detailList.addAll(returnCarCost.getRenterOrderCostDetailEntityList());
         subsidyList.addAll(renterOrderSubsidyDetailDTOList);
-        subsidyList.addAll(getSubsidy);
-        subsidyList.addAll(returnSubsidy);
+        if(getSubsidy != null){
+            subsidyList.addAll(getSubsidy);
+        }
+        if(returnSubsidy != null){
+            subsidyList.addAll(returnSubsidy);
+        }
         GetReturnResponseVO getReturnResponseVO = returnCarCost.getGetReturnResponseVO();
         renterOrderCostRespDTO.setGetRealAmt(getReturnResponseVO.getGetFee());
         renterOrderCostRespDTO.setReturnRealAmt(getReturnResponseVO.getReturnFee());
@@ -186,8 +200,12 @@ public class RenterOrderCalCostService {
         detailList.addAll(renterOrderCostDetailEntityList);
         renterOrderCostRespDTO.setGetOverAmt(getOverAmt);
         renterOrderCostRespDTO.setReturnOverAmt(returnOverAmt);
-        subsidyList.addAll(getOverSubsidy);
-        subsidyList.addAll(returnOverSubsidy);
+        if(getOverSubsidy != null){
+            subsidyList.addAll(getOverSubsidy);
+        }
+        if(returnOverSubsidy != null){
+            subsidyList.addAll(returnOverSubsidy);
+        }
         LOGGER.info("租客费用-获取取还车超运能费用getReturnOverCostAmount=[{}]",getReturnOverCostAmount);
 
         //租车费用 = 租金+平台保障费+全面保障费+取还车费用+取还车超运能费用+附加驾驶员费用+手续费；
@@ -369,5 +387,13 @@ public class RenterOrderCalCostService {
         request.setLabelIds(memAvailCouponRequestVO.getLabelIds());
 
         return request;
+    }
+
+    public static void main(String[] args) {
+        List<String> list = new ArrayList<>();
+        list.add("a");
+        List<String> list1 = new ArrayList<>();
+        list.addAll(list1);
+        System.out.println(JSON.toJSONString(list));
     }
 }

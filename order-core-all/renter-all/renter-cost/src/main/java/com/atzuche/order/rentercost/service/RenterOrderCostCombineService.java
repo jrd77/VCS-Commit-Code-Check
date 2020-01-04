@@ -73,8 +73,6 @@ public class RenterOrderCostCombineService {
     @Autowired
     private DepositConfigSDK depositConfigSDK;
     @Autowired
-    private SysConfigSDK sysConfigSDK;
-    @Autowired
     private SysConstantSDK sysConstantSDK;
     @Autowired
     private CarParamHotBrandDepositSDK carParamHotBrandDepositSDK;
