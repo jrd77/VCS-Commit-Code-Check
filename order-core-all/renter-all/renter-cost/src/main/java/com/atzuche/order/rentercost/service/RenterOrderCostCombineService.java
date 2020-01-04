@@ -362,6 +362,7 @@ public class RenterOrderCostCombineService {
                 getNewCarCoefficient(surplusPriceProYear),
 				depositList
         );
+        log.info("getCarDepositAmtVO carDepositAmtVO=[{}]",carDepositAmtVO);
 		return carDepositAmtVO;
 	}
     /*

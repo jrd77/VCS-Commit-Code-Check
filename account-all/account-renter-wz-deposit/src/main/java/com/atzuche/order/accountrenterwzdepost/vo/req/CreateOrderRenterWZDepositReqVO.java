@@ -45,7 +45,7 @@ public class CreateOrderRenterWZDepositReqVO {
         Assert.notNull(getOrderNo(), ErrorCode.PARAMETER_ERROR.getText());
         Assert.notNull(getMemNo(), ErrorCode.PARAMETER_ERROR.getText());
         Assert.notNull(getYingfuDepositAmt(), ErrorCode.PARAMETER_ERROR.getText());
-        Assert.isTrue(getYingfuDepositAmt()>0, ErrorCode.PARAMETER_ERROR.getText());
+        Assert.isTrue(Math.abs(getYingfuDepositAmt()) > 0, ErrorCode.PARAMETER_ERROR.getText());
         Assert.notNull(getFreeDepositType(), ErrorCode.PARAMETER_ERROR.getText());
 
     }

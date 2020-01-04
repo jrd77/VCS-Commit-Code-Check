@@ -258,7 +258,8 @@ public class SubmitOrderService {
         carDetailReqVO.setCarNo(orderReqVO.getCarNo());
         carDetailReqVO.setRentTime(orderReqVO.getRentTime());
         carDetailReqVO.setRevertTime(orderReqVO.getRevertTime());
-        carDetailReqVO.setUseSpecialPrice(false);
+        carDetailReqVO.setUseSpecialPrice(StringUtils.equals("0",
+                orderReqVO.getUseSpecialPrice()));
         return carDetailReqVO;
     }
 
@@ -365,6 +366,7 @@ public class SubmitOrderService {
         renterOrderReqVO.setLicenseDay(goodsDetail.getLicenseDay());
         renterOrderReqVO.setLabelIds(goodsDetail.getLabelIds());
         renterOrderReqVO.setRenterGoodsPriceDetailDTOList(goodsDetail.getRenterGoodsPriceDetailDTOList());
+        renterOrderReqVO.setPlateNum(goodsDetail.getCarPlateNum());
 
 
         RenterMemberDTO renterMember = reqContext.getRenterMemberDto();
