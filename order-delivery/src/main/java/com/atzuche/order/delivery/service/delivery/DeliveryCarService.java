@@ -50,7 +50,8 @@ public class DeliveryCarService {
         }
         if (orderReqContext.getOrderReqVO().getSrvReturnFlag().intValue() == UsedDeliveryTypeEnum.USED.getValue().intValue()) {
             addRenYunFlowOrderInfo(getMinutes,returnMinutes,orderReqContext);
-        } else if (orderReqContext.getOrderReqVO().getSrvGetFlag().intValue() == UsedDeliveryTypeEnum.USED.getValue().intValue()) {
+        } 
+        if (orderReqContext.getOrderReqVO().getSrvGetFlag().intValue() == UsedDeliveryTypeEnum.USED.getValue().intValue()) {
             addRenYunFlowOrderInfo(getMinutes,returnMinutes,orderReqContext);
         }
     }
