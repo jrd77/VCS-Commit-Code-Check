@@ -87,7 +87,9 @@ public class CouponAndCoinHandleService {
      */
     public boolean deductionAotuCoin(AutoCoinDeductReqVO autoCoinDeductReqVO) {
 
-        if(null == autoCoinDeductReqVO || null == autoCoinDeductReqVO.getUseAutoCoin() || autoCoinDeductReqVO.getUseAutoCoin() == 0) {
+        if (null == autoCoinDeductReqVO
+                || null == autoCoinDeductReqVO.getUseAutoCoin() || autoCoinDeductReqVO.getUseAutoCoin() == 0
+                || null == autoCoinDeductReqVO.getChargeAutoCoin() || autoCoinDeductReqVO.getChargeAutoCoin() == 0) {
             return true;
         }
         AutoCoiChargeRequestVO vo = new AutoCoiChargeRequestVO();
