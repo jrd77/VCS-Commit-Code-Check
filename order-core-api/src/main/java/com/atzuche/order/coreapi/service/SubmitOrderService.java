@@ -520,6 +520,7 @@ public class SubmitOrderService {
         ownerCouponBindReqVO.setRenterName(reqContext.getRenterMemberDto().getRealName());
         ownerCouponBindReqVO.setRenterSex(null == reqContext.getRenterMemberDto().getGender() ? "" :
                 reqContext.getRenterMemberDto().getGender().toString());
+        ownerCouponBindReqVO.setOrderNo(orderNo);
         return ownerCouponBindReqVO;
     }
 
