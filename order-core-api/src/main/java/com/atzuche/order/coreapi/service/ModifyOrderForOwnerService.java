@@ -301,10 +301,11 @@ public class ModifyOrderForOwnerService {
 	 * @return OwnerOrderEntity
 	 */
 	public OwnerOrderEntity convertToOwnerOrderEntity(ModifyOrderOwnerDTO modifyOrderOwnerDTO, OwnerOrderEntity ownerOrderEntity) {
+		// 获取提前延后时间
 		CarRentTimeRangeResVO carRentTimeRangeResVO =  getCarRentTimeRangeResVO(modifyOrderOwnerDTO);
-		// TODO 计算提前时间
+		// 提前时间
 		LocalDateTime showRentTime = carRentTimeRangeResVO.getAdvanceStartDate();
-		// TODO 计算延后时间
+		// 延后时间
 		LocalDateTime showRevertTime = carRentTimeRangeResVO.getDelayEndDate();
 		// 封装新的车主子订单
 		OwnerOrderEntity ownerOrderEntityEffective = new OwnerOrderEntity();
