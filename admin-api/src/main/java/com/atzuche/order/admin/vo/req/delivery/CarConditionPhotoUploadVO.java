@@ -1,4 +1,4 @@
-package com.atzuche.order.admin.vo.rep.delivery;
+package com.atzuche.order.admin.vo.req.delivery;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
