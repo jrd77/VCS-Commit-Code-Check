@@ -13,9 +13,12 @@ import com.atzuche.order.commons.enums.FineTypeEnum;
 import com.atzuche.order.commons.enums.SrvGetReturnEnum;
 import com.atzuche.order.coreapi.entity.dto.ModifyCompareDTO;
 import com.atzuche.order.coreapi.entity.dto.ModifyOrderDTO;
+import com.atzuche.order.coreapi.modifyorder.exception.ModifyOrderRenterOrderNotFindException;
 import com.atzuche.order.coreapi.utils.ModifyOrderUtils;
 import com.atzuche.order.delivery.entity.RenterOrderDeliveryEntity;
 import com.atzuche.order.delivery.service.RenterOrderDeliveryService;
+import com.atzuche.order.parentorder.dto.OrderDTO;
+import com.atzuche.order.parentorder.service.OrderService;
 import com.atzuche.order.rentercost.entity.ConsoleRenterOrderFineDeatailEntity;
 import com.atzuche.order.rentercost.entity.RenterOrderFineDeatailEntity;
 import com.atzuche.order.rentercost.entity.dto.RenterOrderSubsidyDetailDTO;
@@ -25,6 +28,7 @@ import com.atzuche.order.renterorder.entity.RenterOrderChangeApplyEntity;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.atzuche.order.renterorder.service.RenterOrderChangeApplyService;
 import com.atzuche.order.renterorder.service.RenterOrderService;
+import com.dianping.cat.Cat;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -44,6 +48,8 @@ public class ModifyOrderForRenterService {
 	private RenterOrderFineDeatailService renterOrderFineDeatailService;
 	@Autowired
 	private ConsoleRenterOrderFineDeatailService consoleRenterOrderFineDeatailService;
+	@Autowired
+	private OrderService orderService;
 	/**
 	 * 无效
 	 */
@@ -75,6 +81,11 @@ public class ModifyOrderForRenterService {
 		log.info("车主同意后修改租客子单状态orderNo=[{}],renterOrderNo=[{}],renterOrderEntity=[{}]",orderNo, renterOrderNo, initRenterOrderEntity);
 		// 获取租客修改申请表中已同意的租客子订单
 		RenterOrderEntity agreeRenterOrderEntity = renterOrderService.getRenterOrderByRenterOrderNo(renterOrderNo);
+		if (agreeRenterOrderEntity == null) {
+			log.error("ModifyOrderForRenterService.updateRenterOrderStatus agreeRenterOrderEntity is null orderNo=[{}],renterOrderNo=[{}]",orderNo, renterOrderNo);
+			Cat.logError("ModifyOrderForRenterService.updateRenterOrderStatus", new ModifyOrderRenterOrderNotFindException());
+			throw new ModifyOrderRenterOrderNotFindException();
+		}
 		// 修改租客上笔子单状态失效
 		renterOrderService.updateRenterOrderEffective(initRenterOrderEntity.getId(), INVALID_FLAG);
 		// 修改租客待确认的子单状态为有效
@@ -85,6 +96,8 @@ public class ModifyOrderForRenterService {
 			// 修改租客申请状态为已同意
 			renterOrderChangeApplyService.updateRenterOrderChangeApplyStatus(renterOrderChangeApplyEntity.getId(), AUDIT_STATUS_AGREE);
 		}
+		// 修改主订单取还车时间
+		orderService.saveOrderInfo(getOrderDTO(agreeRenterOrderEntity));
 		// 对取还车违约金进行处理
 		transferRenterFine(orderNo, renterOrderNo);
 	}
@@ -238,5 +251,21 @@ public class ModifyOrderForRenterService {
 			modifyCompareDTO.setRevertTime(renterOrder.getExpRevertTime());
 		}
 		return modifyCompareDTO;
+	}
+	
+	/**
+	 * 封装主订单信息
+	 * @param agreeRenterOrderEntity
+	 * @return OrderDTO
+	 */
+	public OrderDTO getOrderDTO(RenterOrderEntity agreeRenterOrderEntity) {
+		if (agreeRenterOrderEntity == null) {
+			return null;
+		}
+		OrderDTO orderDTO = new OrderDTO();
+		orderDTO.setOrderNo(agreeRenterOrderEntity.getOrderNo());
+		orderDTO.setExpRentTime(agreeRenterOrderEntity.getExpRentTime());
+		orderDTO.setExpRevertTime(agreeRenterOrderEntity.getExpRevertTime());
+		return orderDTO;
 	}
 }

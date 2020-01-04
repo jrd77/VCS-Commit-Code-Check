@@ -13,6 +13,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang.StringUtils;
+
 public class CommonUtils {
 	/**
 	 * 配置的一天小时
@@ -52,6 +54,8 @@ public class CommonUtils {
 	public static final Integer BEFORE_TRANS_TIME_SPAN = 4;
 	public static final Integer MODIFY_GET_FINE_AMT = 50;
 	public static final Integer MODIFY_RETURN_FINE_AMT = 50;
+	
+	public static final String FORMAT_STR_RENYUN = "yyyy-MM-dd HH:mm";
 	
     /**
                * 初始化全面保障费单价配置
@@ -614,6 +618,20 @@ public class CommonUtils {
 			}
 		}
 		return easyCoefficient;
+	}
+	
+	/**
+	 * 格式化LocalDateTime
+	 * @param localDateTime
+	 * @param formatStr
+	 * @return String
+	 */
+	public static String formatTime(LocalDateTime localDateTime, String formatStr) {
+		if (localDateTime == null || StringUtils.isBlank(formatStr)) {
+			return "";
+		}
+		DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(formatStr);
+		return dateTimeFormatter.format(localDateTime);
 	}
 	
 	public static void main(String[] args) {
