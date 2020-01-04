@@ -39,7 +39,7 @@ public class AccountOwnerCostSettleDetailEntity implements Serializable {
 	/**
 	 * 费用编码
 	 */
-	private Integer sourceCode;
+	private String sourceCode;
 	/**
 	 * 费用来源描述
 	 */

@@ -17,5 +17,8 @@ dependencies {
     compile project(":casier-all:cashier-account")
     compile project(":order-core-all:carowner-all:carowner-cost")
     compile project(":order-core-all:carowner-all:carowner-order")
+	compile project(":order-delivery")
+    compile project(":order-core-all:carowner-all:carowner-commodity")
+
 
 }
