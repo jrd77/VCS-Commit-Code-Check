@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.atzuche.order.commons.entity.dto.OwnerGoodsDetailDTO;
+import com.atzuche.order.commons.enums.OrderChangeItemEnum;
 import com.atzuche.order.commons.enums.RenterCashCodeEnum;
 import com.atzuche.order.commons.enums.SrvGetReturnEnum;
 import com.atzuche.order.coreapi.entity.dto.ModifyOrderDTO;
@@ -16,6 +17,7 @@ import com.atzuche.order.coreapi.entity.dto.ModifyOrderOwnerDTO;
 import com.atzuche.order.coreapi.modifyorder.exception.ModifyOrderParameterException;
 import com.atzuche.order.delivery.entity.RenterOrderDeliveryEntity;
 import com.atzuche.order.delivery.service.RenterOrderDeliveryService;
+import com.atzuche.order.delivery.service.delivery.DeliveryCarService;
 import com.atzuche.order.delivery.vo.delivery.OrderDeliveryDTO;
 import com.atzuche.order.delivery.vo.delivery.UpdateFlowOrderDTO;
 import com.atzuche.order.ownercost.entity.OwnerOrderEntity;
@@ -23,6 +25,8 @@ import com.atzuche.order.rentercost.entity.RenterOrderSubsidyDetailEntity;
 import com.atzuche.order.rentercost.entity.dto.RenterOrderSubsidyDetailDTO;
 import com.atzuche.order.rentercost.service.RenterOrderSubsidyDetailService;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
+import com.atzuche.order.renterorder.entity.dto.OrderChangeItemDTO;
+import com.atzuche.order.renterorder.service.OrderChangeItemService;
 import com.atzuche.order.renterorder.service.RenterOrderService;
 import com.autoyol.commons.web.ResponseData;
 import com.dianping.cat.Cat;
@@ -43,6 +47,10 @@ public class ModifyOrderConfirmService {
 	private ModifyOrderForRenterService modifyOrderForRenterService;
 	@Autowired
 	private RenterOrderSubsidyDetailService renterOrderSubsidyDetailService;
+	@Autowired
+	private OrderChangeItemService orderChangeItemService;
+	@Autowired
+	private DeliveryCarService deliveryCarService;
 	
 	/**
 	 * 自动同意
@@ -102,6 +110,8 @@ public class ModifyOrderConfirmService {
 		RenterOrderEntity renterOrder = renterOrderService.getRenterOrderByRenterOrderNo(renterOrderNo);
 		// 获取租客配送订单信息
 		List<RenterOrderDeliveryEntity> deliveryList = renterOrderDeliveryService.listRenterOrderDeliveryByRenterOrderNo(renterOrderNo);
+		// 获取修改项
+		List<String> changeItemList = orderChangeItemService.listChangeCodeByRenterOrderNo(renterOrderNo);
 		// 封装车主同意需要的对象
 		ModifyOrderOwnerDTO modifyOrderOwnerDTO = modifyOrderForOwnerService.getModifyOrderOwnerDTO(renterOrder, deliveryList);
 		// 获取租客车主券补贴
@@ -121,7 +131,62 @@ public class ModifyOrderConfirmService {
 		modifyOrderForOwnerService.modifyOrderForOwner(modifyOrderOwnerDTO, renterSubsidy);
 		// 处理租客订单信息
 		modifyOrderForRenterService.updateRenterOrderStatus(orderNo, renterOrderNo, initRenterOrder);
+		// 通知仁云
+		noticeRenYun(modifyOrderOwnerDTO, changeItemList);
 		return ResponseData.success();
+	}
+	
+	
+	/**
+	 * 通知仁云
+	 * @param modify
+	 * @param changeItemList
+	 */
+	public void noticeRenYun(ModifyOrderOwnerDTO modify, List<String> changeItemList) {
+		log.info("modifyorder sent to renyun modify=[{}], changeItemList=[{}]", modify, changeItemList);
+		try {
+			if (modify == null) {
+				return;
+			}
+			if (changeItemList == null || changeItemList.isEmpty()) {
+				return;
+			}
+			// 取车服务标志
+			Integer srvGetFlag = modify.getSrvGetFlag();
+			// 还车服务标志
+			Integer srvReturnFlag = modify.getSrvReturnFlag();
+			if (srvGetFlag != null && srvGetFlag == 1) {
+				if (changeItemList.contains(OrderChangeItemEnum.MODIFY_RENTTIME.getCode())
+						|| changeItemList.contains(OrderChangeItemEnum.MODIFY_REVERTTIME.getCode())) {
+					// 修改时间
+					UpdateFlowOrderDTO getUpdFlow = getUpdateFlowOrderDTO(modify, modify.getOwnerOrderEffective(), "take", "time");
+					deliveryCarService.updateRenYunFlowOrderInfo(getUpdFlow);
+				}
+				if (changeItemList.contains(OrderChangeItemEnum.MODIFY_GETADDR.getCode())
+						|| changeItemList.contains(OrderChangeItemEnum.MODIFY_RETURNADDR.getCode())) {
+					// 修改地址
+					UpdateFlowOrderDTO getUpdFlow = getUpdateFlowOrderDTO(modify, modify.getOwnerOrderEffective(), "take", "addr");
+					deliveryCarService.updateRenYunFlowOrderInfo(getUpdFlow);
+				}
+			}
+			
+			if (srvReturnFlag != null && srvReturnFlag == 1) {
+				if (changeItemList.contains(OrderChangeItemEnum.MODIFY_RENTTIME.getCode())
+						|| changeItemList.contains(OrderChangeItemEnum.MODIFY_REVERTTIME.getCode())) {
+					// 修改时间
+					UpdateFlowOrderDTO getUpdFlow = getUpdateFlowOrderDTO(modify, modify.getOwnerOrderEffective(), "back", "time");
+					deliveryCarService.updateRenYunFlowOrderInfo(getUpdFlow);
+				}
+				if (changeItemList.contains(OrderChangeItemEnum.MODIFY_GETADDR.getCode())
+						|| changeItemList.contains(OrderChangeItemEnum.MODIFY_RETURNADDR.getCode())) {
+					// 修改地址
+					UpdateFlowOrderDTO getUpdFlow = getUpdateFlowOrderDTO(modify, modify.getOwnerOrderEffective(), "back", "addr");
+					deliveryCarService.updateRenYunFlowOrderInfo(getUpdFlow);
+				}
+			}
+		} catch (Exception e) {
+			log.error("modifyorder sent to renyun exception:", e);
+		}
 	}
 	
 	

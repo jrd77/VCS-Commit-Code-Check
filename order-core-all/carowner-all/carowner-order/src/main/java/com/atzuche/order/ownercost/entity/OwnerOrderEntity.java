@@ -1,6 +1,7 @@
 package com.atzuche.order.ownercost.entity;
 
 import lombok.Data;
+import lombok.ToString;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -14,6 +15,7 @@ import java.time.LocalDateTime;
  * @Description:
  */
 @Data
+@ToString
 public class OwnerOrderEntity implements Serializable {
 	private static final long serialVersionUID = 1L;
 	

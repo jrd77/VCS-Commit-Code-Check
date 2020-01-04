@@ -11,7 +11,9 @@ import com.atzuche.order.coreapi.modifyorder.exception.ModifyOrderParameterExcep
 import com.atzuche.order.coreapi.service.GoodsService.CarDetailReqVO;
 import com.atzuche.order.coreapi.utils.ModifyOrderUtils;
 import com.atzuche.order.delivery.entity.RenterOrderDeliveryEntity;
+import com.atzuche.order.delivery.enums.DeliveryTypeEnum;
 import com.atzuche.order.delivery.service.RenterOrderDeliveryService;
+import com.atzuche.order.delivery.service.delivery.DeliveryCarService;
 import com.atzuche.order.parentorder.entity.OrderEntity;
 import com.atzuche.order.parentorder.service.OrderService;
 import com.atzuche.order.rentercommodity.service.RenterCommodityService;
@@ -93,6 +95,8 @@ public class ModifyOrderService {
 	private ModifyOrderConfirmService modifyOrderConfirmService;
 	@Autowired
 	private OrderChangeItemService orderChangeItemService;
+	@Autowired
+	private DeliveryCarService deliveryCarService;
 
 	/**
 	 * 修改订单主逻辑
@@ -165,8 +169,8 @@ public class ModifyOrderService {
 		saveAdditionalDriver(modifyOrderDTO);
 		// 保存修改项目
 		orderChangeItemService.saveOrderChangeItemBatch(modifyOrderDTO.getChangeItemList());
-		// TODO 保存配送订单信息
-		
+		// 保存配送订单信息
+		//deliveryCarService
 		// 计算补付金额
 		Integer supplementAmt = getRenterSupplementAmt(modifyOrderDTO, initRenterOrder, renterOrderCostRespDTO, renterFineList);
 		// 修改后处理方法
@@ -294,8 +298,6 @@ public class ModifyOrderService {
 				modifyOrderForRenterService.supplementPayPostProcess(modifyOrderDTO.getOrderNo(), modifyOrderDTO.getRenterOrderNo(), modifyOrderDTO, renterOrderSubsidyDetailDTOList);
 			}
 		}
-		// 补扣凹凸币
-		
 	}
 	
 	
