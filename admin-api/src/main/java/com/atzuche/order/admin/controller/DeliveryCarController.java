@@ -2,23 +2,22 @@ package com.atzuche.order.admin.controller;
 
 import com.atzuche.order.admin.service.DeliveryCarInfoService;
 import com.atzuche.order.admin.service.HandoverCarInfoService;
-import com.atzuche.order.admin.vo.rep.delivery.CarConditionPhotoUploadVO;
+import com.atzuche.order.admin.vo.rep.delivery.RenterDeliveryCarVO;
 import com.atzuche.order.admin.vo.req.DeliveryCarRepVO;
-import com.atzuche.order.commons.CommonUtils;
-import com.atzuche.order.delivery.service.delivery.DeliveryCarService;
-import com.autoyol.car.api.model.vo.ResponseObject;
+import com.atzuche.order.admin.vo.req.delivery.CarConditionPhotoUploadVO;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
+import com.autoyol.doc.annotation.AutoDocGroup;
+import com.autoyol.doc.annotation.AutoDocMethod;
+import com.autoyol.doc.annotation.AutoDocVersion;
 import com.dianping.cat.Cat;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
 
 /**
  * @author 胡春林
@@ -39,9 +38,12 @@ public class DeliveryCarController extends BaseController {
      * @param deliveryCarDTO
      * @return
      */
+    @AutoDocVersion(version = "管理后台取还车配送服务信息")
+    @AutoDocGroup(group = "管理后台取还车配送服务信息")
+    @AutoDocMethod(description = "取还车配送", value = "取还车配送",response = RenterDeliveryCarVO.class)
     @PostMapping("/delivery/list")
     public ResponseData<?> findDeliveryListByOrderNo(@RequestBody DeliveryCarRepVO deliveryCarDTO) {
-        if (null == deliveryCarDTO || StringUtils.isBlank(deliveryCarDTO.getRenterOrderNo())) {
+        if (null == deliveryCarDTO || StringUtils.isBlank(deliveryCarDTO.getOrderNo())) {
             return ResponseData.createErrorCodeResponse(ErrorCode.ORDER_NO_PARAM_ERROR.getCode(), "租客子订单编号为空");
         }
         DeliveryCarRepVO deliveryCarRepVO = deliveryCarInfoService.findDeliveryListByOrderNo(deliveryCarDTO);
@@ -52,6 +54,9 @@ public class DeliveryCarController extends BaseController {
      * 交接车照片上传
      * @return
      */
+    @AutoDocVersion(version = "管理后台交接车照片上传")
+    @AutoDocGroup(group = "管理后台交接车照片上传")
+    @AutoDocMethod(description = "交接车照片上传", value = "交接车照片上传",response = ResponseData.class)
     @RequestMapping(value = "/photo/upload", method = RequestMethod.POST)
     public ResponseData<?> upload(@RequestBody @Validated CarConditionPhotoUploadVO photoUploadReqVo, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {

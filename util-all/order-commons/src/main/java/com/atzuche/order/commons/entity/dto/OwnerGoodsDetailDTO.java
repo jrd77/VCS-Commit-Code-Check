@@ -205,5 +205,18 @@ public class OwnerGoodsDetailDTO {
      */
     private LocalDate licenseDay;
 
+    /**
+     * 车辆日均指导价
+     */
+    private Integer carGuideDayPrice;
+    /**
+     * 油表总刻度
+     */
+    private Integer oilTotalCalibration;
+    /**
+     * GPS序号
+     */
+    private String gpsSerialNumber;
+
 
 }

@@ -193,7 +193,7 @@ public class SubmitOrderService {
         ownerMemberService.save(ownerMemberDTO);
 
         //配送订单处理..............
-        deliveryCarService.addRenYunFlowOrderInfo(null == carRentTimeRangeResVO ? null :
+        deliveryCarService.addFlowOrderInfo(null == carRentTimeRangeResVO ? null :
                         carRentTimeRangeResVO.getGetMinutes(),null == carRentTimeRangeResVO ? null :
                         carRentTimeRangeResVO.getReturnMinutes(),
                 reqContext);
@@ -520,6 +520,7 @@ public class SubmitOrderService {
         ownerCouponBindReqVO.setRenterName(reqContext.getRenterMemberDto().getRealName());
         ownerCouponBindReqVO.setRenterSex(null == reqContext.getRenterMemberDto().getGender() ? "" :
                 reqContext.getRenterMemberDto().getGender().toString());
+        ownerCouponBindReqVO.setOrderNo(orderNo);
         return ownerCouponBindReqVO;
     }
 

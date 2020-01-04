@@ -15,6 +15,15 @@ public class OrderChangeItemService {
 	private OrderChangeItemMapper orderChangeItemMapper;
 	
 	/**
+	 * 获取修改项
+	 * @param renterOrderNo
+	 * @return List<OrderChangeItemDTO>
+	 */
+	public List<String> listChangeCodeByRenterOrderNo(String renterOrderNo) {
+		return orderChangeItemMapper.listChangeCodeByRenterOrderNo(renterOrderNo);
+	}
+	
+	/**
 	 * 保存修改项目
 	 * @param changeItemList
 	 * @return Integer

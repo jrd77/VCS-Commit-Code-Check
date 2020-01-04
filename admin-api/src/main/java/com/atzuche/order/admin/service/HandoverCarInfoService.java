@@ -1,6 +1,6 @@
 package com.atzuche.order.admin.service;
 
-import com.atzuche.order.admin.vo.rep.delivery.CarConditionPhotoUploadVO;
+import com.atzuche.order.admin.vo.req.delivery.CarConditionPhotoUploadVO;
 import com.atzuche.order.commons.CommonUtils;
 import com.atzuche.order.delivery.service.handover.HandoverCarService;
 import com.atzuche.order.delivery.utils.OSSUtils;

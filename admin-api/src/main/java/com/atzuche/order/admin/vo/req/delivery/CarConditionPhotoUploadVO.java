@@ -1,4 +1,4 @@
-package com.atzuche.order.admin.vo.rep.delivery;
+package com.atzuche.order.admin.vo.req.delivery;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -23,7 +23,7 @@ public class CarConditionPhotoUploadVO {
     @NotBlank(message="photoType不能为空,photoType只能为1：交车2： 取车")
     private String photoType;
     @ApiModelProperty(value="会员号",required=true)
-    @NotBlank
+    @NotBlank(message="会员号不能为空")
     private Integer memNo;
     @NotBlank(message="photoContent不能为空")
     private String photoContent;

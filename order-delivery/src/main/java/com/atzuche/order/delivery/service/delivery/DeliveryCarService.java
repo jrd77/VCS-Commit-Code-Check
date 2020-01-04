@@ -27,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author 胡春林
@@ -38,8 +39,25 @@ public class DeliveryCarService {
     @Autowired
     DeliveryCarTask deliveryCarTask;
 
+
+
     /**
      * 添加配送相关信息(是否下单，是否推送仁云)
+     */
+    public void addFlowOrderInfo(Integer getMinutes, Integer returnMinutes, OrderReqContext orderReqContext) {
+        if (null == orderReqContext || Objects.isNull(orderReqContext.getOrderReqVO())) {
+            throw new DeliveryOrderException(DeliveryErrorCode.DELIVERY_PARAMS_ERROR);
+        }
+        if (orderReqContext.getOrderReqVO().getSrvReturnFlag().intValue() == UsedDeliveryTypeEnum.USED.getValue().intValue()) {
+            addRenYunFlowOrderInfo(getMinutes,returnMinutes,orderReqContext);
+        } 
+        if (orderReqContext.getOrderReqVO().getSrvGetFlag().intValue() == UsedDeliveryTypeEnum.USED.getValue().intValue()) {
+            addRenYunFlowOrderInfo(getMinutes,returnMinutes,orderReqContext);
+        }
+    }
+
+    /**
+     * 添加配送相关信息细节(是否下单，是否推送仁云)
      */
     public void addRenYunFlowOrderInfo(Integer getMinutes, Integer returnMinutes, OrderReqContext orderReqContext) {
         OrderDeliveryVO orderDeliveryVO = createOrderDeliveryParams(orderReqContext);
@@ -124,6 +142,8 @@ public class DeliveryCarService {
                 renterDeliveryAddrDTO.setExpGetCarAddr(carShowAddr);
                 renterDeliveryAddrDTO.setExpGetCarLat(carShowLat);
                 renterDeliveryAddrDTO.setExpGetCarLon(carShowLng);
+                renterDeliveryAddrDTO.setOrderNo(renterGoodsDetailDTO.getOrderNo());
+                renterDeliveryAddrDTO.setRenterOrderNo(renterGoodsDetailDTO.getRenterOrderNo());
                 renterDeliveryAddrDTO.setCreateTime(LocalDateTime.now());
                 renterDeliveryAddrDTO.setCreateOp("");
             }
@@ -139,6 +159,8 @@ public class DeliveryCarService {
             renterDeliveryAddrDTO.setExpGetCarLat(orderReqVO.getSrvReturnLat());
             renterDeliveryAddrDTO.setExpGetCarLon(orderReqVO.getSrvReturnLon());
             renterDeliveryAddrDTO.setCreateTime(LocalDateTime.now());
+            renterDeliveryAddrDTO.setOrderNo(renterGoodsDetailDTO.getOrderNo());
+            renterDeliveryAddrDTO.setRenterOrderNo(renterGoodsDetailDTO.getRenterOrderNo());
             renterDeliveryAddrDTO.setCreateOp("");
             /**组装配送订单信息**/
             orderDeliveryDTO.setCityCode(orderReqVO.getCityCode());
