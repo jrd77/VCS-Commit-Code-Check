@@ -7,16 +7,17 @@ import com.atzuche.order.delivery.common.DeliveryCarTask;
 import com.atzuche.order.delivery.common.DeliveryErrorCode;
 import com.atzuche.order.delivery.entity.RenterDeliveryAddrEntity;
 import com.atzuche.order.delivery.entity.RenterOrderDeliveryEntity;
-import com.atzuche.order.delivery.enums.DeliveryTypeEnum;
-import com.atzuche.order.delivery.enums.ServiceTypeEnum;
-import com.atzuche.order.delivery.enums.UsedDeliveryTypeEnum;
+import com.atzuche.order.delivery.enums.*;
 import com.atzuche.order.delivery.exception.DeliveryOrderException;
 import com.atzuche.order.delivery.mapper.RenterDeliveryAddrMapper;
 import com.atzuche.order.delivery.mapper.RenterOrderDeliveryMapper;
+import com.atzuche.order.delivery.service.handover.HandoverCarService;
 import com.atzuche.order.delivery.utils.CodeUtils;
 import com.atzuche.order.delivery.utils.CommonUtil;
 import com.atzuche.order.delivery.utils.DateUtils;
 import com.atzuche.order.delivery.vo.delivery.*;
+import com.atzuche.order.delivery.vo.handover.HandoverCarInfoDTO;
+import com.atzuche.order.delivery.vo.handover.HandoverCarVO;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author 胡春林
@@ -36,22 +38,32 @@ public class DeliveryCarService {
 
     @Autowired
     DeliveryCarTask deliveryCarTask;
-    @Resource
-    RenterDeliveryAddrMapper deliveryAddrMapper;
-    @Resource
-    RenterOrderDeliveryMapper orderDeliveryMapper;
-    @Autowired
-    CodeUtils codeUtils;
+
+
 
     /**
      * 添加配送相关信息(是否下单，是否推送仁云)
+     */
+    public void addFlowOrderInfo(Integer getMinutes, Integer returnMinutes, OrderReqContext orderReqContext) {
+        if (null == orderReqContext || Objects.isNull(orderReqContext.getOrderReqVO())) {
+            throw new DeliveryOrderException(DeliveryErrorCode.DELIVERY_PARAMS_ERROR);
+        }
+        if (orderReqContext.getOrderReqVO().getSrvReturnFlag().intValue() == UsedDeliveryTypeEnum.USED.getValue().intValue()) {
+            addRenYunFlowOrderInfo(getMinutes,returnMinutes,orderReqContext);
+        } else if (orderReqContext.getOrderReqVO().getSrvGetFlag().intValue() == UsedDeliveryTypeEnum.USED.getValue().intValue()) {
+            addRenYunFlowOrderInfo(getMinutes,returnMinutes,orderReqContext);
+        }
+    }
+
+    /**
+     * 添加配送相关信息细节(是否下单，是否推送仁云)
      */
     public void addRenYunFlowOrderInfo(Integer getMinutes, Integer returnMinutes, OrderReqContext orderReqContext) {
         OrderDeliveryVO orderDeliveryVO = createOrderDeliveryParams(orderReqContext);
         if (null == orderDeliveryVO) {
             throw new DeliveryOrderException(DeliveryErrorCode.DELIVERY_PARAMS_ERROR);
         }
-        insertDeliveryAddress(getMinutes,returnMinutes,orderDeliveryVO, DeliveryTypeEnum.ADD_TYPE.getValue().intValue());
+        deliveryCarTask.insertDeliveryAddress(getMinutes,returnMinutes,orderDeliveryVO, DeliveryTypeEnum.ADD_TYPE.getValue().intValue());
         if (orderDeliveryVO.getOrderDeliveryDTO() != null && orderDeliveryVO.getOrderDeliveryDTO().getIsNotifyRenyun().intValue() == UsedDeliveryTypeEnum.USED.getValue().intValue()) {
             RenYunFlowOrderDTO renYunFlowOrder = orderDeliveryVO.getRenYunFlowOrderDTO();
             deliveryCarTask.addRenYunFlowOrderInfo(renYunFlowOrder);
@@ -68,7 +80,7 @@ public class DeliveryCarService {
         OrderDeliveryVO orderDeliveryVO = new OrderDeliveryVO();
         orderDeliveryVO.setOrderDeliveryDTO(updateFlowOrderVO.getOrderDeliveryDTO());
         orderDeliveryVO.setRenterDeliveryAddrDTO(updateFlowOrderVO.getRenterDeliveryAddrDTO());
-        insertDeliveryAddress(null,null,orderDeliveryVO, DeliveryTypeEnum.UPDATE_TYPE.getValue().intValue());
+        deliveryCarTask.insertDeliveryAddress(null,null,orderDeliveryVO, DeliveryTypeEnum.UPDATE_TYPE.getValue().intValue());
     }
 
     /**
@@ -89,75 +101,8 @@ public class DeliveryCarService {
             throw new DeliveryOrderException(DeliveryErrorCode.DELIVERY_PARAMS_ERROR);
         }
         int serviceType = cancelOrderDeliveryVO.getCancelFlowOrderDTO().getServicetype().equals(ServiceTypeEnum.TAKE_TYPE.getValue()) ? 1 : 2;
-        cancelOrderDelivery(cancelOrderDeliveryVO.getRenterOrderNo(), serviceType);
+        deliveryCarTask.cancelOrderDelivery(cancelOrderDeliveryVO.getRenterOrderNo(), serviceType);
         deliveryCarTask.cancelRenYunFlowOrderInfo(cancelOrderDeliveryVO.getCancelFlowOrderDTO());
-    }
-
-    /**
-     * 插入配送地址/配送订单信息
-     *
-     * @param orderDeliveryVO
-     */
-    @Transactional(rollbackFor = Exception.class)
-    public void insertDeliveryAddress(Integer getMinutes, Integer returnMinutes,OrderDeliveryVO orderDeliveryVO, Integer type) {
-
-        if (orderDeliveryVO.getRenterDeliveryAddrDTO() != null) {
-            RenterDeliveryAddrEntity deliveryAddrEntity = new RenterDeliveryAddrEntity();
-            BeanUtils.copyProperties(orderDeliveryVO.getRenterDeliveryAddrDTO(), deliveryAddrEntity);
-            RenterDeliveryAddrEntity renterDeliveryAddrEntity = deliveryAddrMapper.selectByRenterOrderNo(deliveryAddrEntity.getRenterOrderNo());
-            if (renterDeliveryAddrEntity != null) {
-                deliveryAddrMapper.insertSelective(deliveryAddrEntity);
-            }
-        }
-        if (orderDeliveryVO.getOrderDeliveryDTO() != null) {
-            RenterOrderDeliveryEntity orderDeliveryEntity = new RenterOrderDeliveryEntity();
-            BeanUtils.copyProperties(orderDeliveryVO.getOrderDeliveryDTO(), orderDeliveryEntity);
-            if (type == DeliveryTypeEnum.ADD_TYPE.getValue().intValue()) {
-                orderDeliveryEntity.setOrderNoDelivery(codeUtils.createDeliveryNumber());
-                int aheadOrDelayTime = getMinutes == null ? returnMinutes : getMinutes;
-                //orderDeliveryEntity.setAh
-                orderDeliveryMapper.insertSelective(orderDeliveryEntity);
-            } else {
-                RenterOrderDeliveryEntity lastOrderDeliveryEntity = orderDeliveryMapper.findRenterOrderByrOrderNo(orderDeliveryEntity.getOrderNo(), orderDeliveryEntity.getType());
-                if (null == lastOrderDeliveryEntity) {
-                    throw new DeliveryOrderException(DeliveryErrorCode.DELIVERY_MOUDLE_ERROR.getValue(), "没有找到最近的一笔配送订单记录");
-                }
-                CommonUtil.copyPropertiesIgnoreNull(orderDeliveryEntity, lastOrderDeliveryEntity);
-                orderDeliveryMapper.insert(lastOrderDeliveryEntity);
-            }
-        }
-        //处理交接车信息
-        if(type == DeliveryTypeEnum.ADD_TYPE.getValue().intValue())
-        {
-            //提前或延后时间(取车:提前时间, 还车：延后时间
-            if(getMinutes != null)
-            {
-
-            }
-
-
-
-
-        }
-
-
-
-
-    }
-
-    /**
-     * 取消配送订单
-     *
-     * @param renterOrderNo
-     * @param serviceType
-     */
-    @Transactional(rollbackFor = Exception.class)
-    public void cancelOrderDelivery(String renterOrderNo, Integer serviceType) {
-        RenterOrderDeliveryEntity orderDeliveryEntity = orderDeliveryMapper.findRenterOrderByRenterOrderNo(renterOrderNo, serviceType);
-        if (null == orderDeliveryEntity) {
-            throw new DeliveryOrderException(DeliveryErrorCode.DELIVERY_PARAMS_ERROR.getValue(), "没有找到该配送订单信息");
-        }
-        orderDeliveryMapper.updateStatusById(orderDeliveryEntity.getId());
     }
 
     /**

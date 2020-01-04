@@ -261,5 +261,19 @@
 		select msg_id from owner_handover_car_info
 		where msg_id = #{msgId} and is_delete = 0
 	</select>
+
+	<select id="selectObjectByRenterOrderNo" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List"/>
+		from renter_handover_car_info where
+		renter_order_no = #{renterOrderNo} and type = #{type} and is_delete = 0
+	</select>
+
+	<select id="selectObjectByOrderNo" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List"/>
+		from renter_handover_car_info where
+		order_no = #{orderNo} and type = #{type} and is_delete = 0 order by id limit 1
+	</select>
   	
 </mapper>

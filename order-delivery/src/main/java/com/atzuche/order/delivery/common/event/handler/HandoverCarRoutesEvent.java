@@ -120,11 +120,11 @@ public class HandoverCarRoutesEvent {
         handoverCarInfoDTO.setOrderNo(handoverCarRenYunVO.getOrderNo());
         handoverCarInfoDTO.setType(type);
         if (serviceType.equals(ServiceTypeEnum.TAKE_TYPE.getValue())) {
-            handoverCarInfoDTO.setRealReturnUserName(handoverCarRenYunVO.getHeadName());
-            handoverCarInfoDTO.setRealReturnUserPhone(handoverCarRenYunVO.getHeadPhone());
-        } else if (serviceType.equals(ServiceTypeEnum.BACK_TYPE.getValue())) {
             handoverCarInfoDTO.setRealGetUserName(handoverCarRenYunVO.getHeadName());
             handoverCarInfoDTO.setRealGetUserPhone(handoverCarRenYunVO.getHeadPhone());
+        } else if (serviceType.equals(ServiceTypeEnum.BACK_TYPE.getValue())) {
+            handoverCarInfoDTO.setRealReturnUserName(handoverCarRenYunVO.getHeadName());
+            handoverCarInfoDTO.setRealReturnUserPhone(handoverCarRenYunVO.getHeadPhone());
         }
         handoverCarInfoDTO.setCreateOp("");
         handoverCarInfoDTO.setMsgId(handoverCarRenYunVO.getMessageId());

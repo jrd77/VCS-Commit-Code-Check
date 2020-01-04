@@ -24,6 +24,9 @@ public class AdminOrderReqVO extends NormalOrderReqVO {
     @AutoDocProperty(value = "线下订单类型", required = true)
     private String offlineOrderStatus;
 
+    @AutoDocProperty(value = "限时红包面额(管理后台)")
+    private Integer reductiAmt;
+
 
 
     public String getUseSpecialPrice() {

@@ -40,4 +40,19 @@ public interface RenterHandoverCarInfoMapper{
      */
     String queryObjectByMsgId(@Param("msgId") String msgId);
 
+    /**
+     * 根据子订单号和类型查询
+     * @param renterOrderNo
+     * @param type
+     * @return
+     */
+    RenterHandoverCarInfoEntity selectObjectByRenterOrderNo(@Param("renterOrderNo") String renterOrderNo,@Param("type") Integer type);
+
+    /**
+     * 根据订单号和类型查询
+     * @param orderNo
+     * @param type
+     * @return
+     */
+    RenterHandoverCarInfoEntity selectObjectByOrderNo(@Param("orderNo") String orderNo,@Param("type") Integer type);
 }
