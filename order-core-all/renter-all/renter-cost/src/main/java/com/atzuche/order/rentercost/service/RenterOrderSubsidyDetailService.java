@@ -7,14 +7,12 @@ import com.atzuche.order.rentercost.entity.RenterOrderSubsidyDetailEntity;
 import com.atzuche.order.rentercost.entity.dto.OrderCouponDTO;
 import com.atzuche.order.rentercost.entity.dto.RenterOrderSubsidyDetailDTO;
 import com.atzuche.order.rentercost.mapper.RenterOrderSubsidyDetailMapper;
-
-import java.util.List;
-
 import com.autoyol.auto.coin.service.vo.res.AutoCoinResponseVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 
 /**
@@ -57,6 +55,9 @@ public class RenterOrderSubsidyDetailService {
      * @return Integer
      */
     public Integer saveRenterOrderSubsidyDetailBatch(List<RenterOrderSubsidyDetailEntity> entityList) {
+        if(entityList == null || entityList.size()<=0){
+            return 0;
+        }
         return renterOrderSubsidyDetailMapper.saveRenterOrderSubsidyDetailBatch(entityList);
     }
 
