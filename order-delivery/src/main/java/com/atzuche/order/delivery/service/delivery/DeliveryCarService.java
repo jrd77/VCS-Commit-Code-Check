@@ -142,6 +142,8 @@ public class DeliveryCarService {
                 renterDeliveryAddrDTO.setExpGetCarAddr(carShowAddr);
                 renterDeliveryAddrDTO.setExpGetCarLat(carShowLat);
                 renterDeliveryAddrDTO.setExpGetCarLon(carShowLng);
+                renterDeliveryAddrDTO.setOrderNo(renterGoodsDetailDTO.getOrderNo());
+                renterDeliveryAddrDTO.setRenterOrderNo(renterGoodsDetailDTO.getRenterOrderNo());
                 renterDeliveryAddrDTO.setCreateTime(LocalDateTime.now());
                 renterDeliveryAddrDTO.setCreateOp("");
             }
@@ -157,6 +159,8 @@ public class DeliveryCarService {
             renterDeliveryAddrDTO.setExpGetCarLat(orderReqVO.getSrvReturnLat());
             renterDeliveryAddrDTO.setExpGetCarLon(orderReqVO.getSrvReturnLon());
             renterDeliveryAddrDTO.setCreateTime(LocalDateTime.now());
+            renterDeliveryAddrDTO.setOrderNo(renterGoodsDetailDTO.getOrderNo());
+            renterDeliveryAddrDTO.setRenterOrderNo(renterGoodsDetailDTO.getRenterOrderNo());
             renterDeliveryAddrDTO.setCreateOp("");
             /**组装配送订单信息**/
             orderDeliveryDTO.setCityCode(orderReqVO.getCityCode());
