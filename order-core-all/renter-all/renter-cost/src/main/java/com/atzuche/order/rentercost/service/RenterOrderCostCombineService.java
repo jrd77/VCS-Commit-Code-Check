@@ -757,6 +757,7 @@ public class RenterOrderCostCombineService {
                 renterOrderCostDetailEntity.setCostCode(RenterCashCodeEnum.SRV_GET_COST.getCashNo());
                 renterOrderCostDetailEntity.setCostDesc(RenterCashCodeEnum.SRV_GET_COST.getTxt());
                 renterOrderCostDetailEntity.setCount(1D);
+                renterOrderCostDetailEntity.setUnitPrice(Math.abs(expectedShouldFee));
                 renterOrderCostDetailEntity.setTotalAmount(-expectedShouldFee);
                 listCostDetail.add(renterOrderCostDetailEntity);
                 int expectedRealFee = Integer.valueOf(fbcFeeResponse.getExpectedRealFee());
@@ -796,6 +797,7 @@ public class RenterOrderCostCombineService {
                 renterOrderCostDetailEntity.setCostCode(RenterCashCodeEnum.SRV_RETURN_COST.getCashNo());
                 renterOrderCostDetailEntity.setCostDesc(RenterCashCodeEnum.SRV_RETURN_COST.getTxt());
                 renterOrderCostDetailEntity.setCount(1D);
+                renterOrderCostDetailEntity.setUnitPrice(Math.abs(expectedShouldFee));
                 renterOrderCostDetailEntity.setTotalAmount(-expectedShouldFee);
                 listCostDetail.add(renterOrderCostDetailEntity);
 

@@ -139,7 +139,9 @@ public class RenterOrderCalCostService {
         int extraDriverAmount = extraDriverInsureAmtEntity.getTotalAmount();
         extraDriverAmount = extraDriverAmount + totalAmountSubsidyAmount;
         renterOrderCostRespDTO.setAdditionalDrivingEnsureAmount(extraDriverAmount);
-        detailList.add(extraDriverInsureAmtEntity);
+        if(extraDriverAmount != 0){
+            detailList.add(extraDriverInsureAmtEntity);
+        }
         if(totalAmountSubsidy != null){
             subsidyList.addAll(totalAmountSubsidy);
         }

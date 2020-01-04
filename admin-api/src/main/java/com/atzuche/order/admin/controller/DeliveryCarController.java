@@ -2,7 +2,6 @@ package com.atzuche.order.admin.controller;
 
 import com.atzuche.order.admin.service.DeliveryCarInfoService;
 import com.atzuche.order.admin.vo.req.DeliveryCarRepVO;
-import com.atzuche.order.delivery.service.delivery.DeliveryCarService;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
 import org.apache.commons.lang3.StringUtils;
