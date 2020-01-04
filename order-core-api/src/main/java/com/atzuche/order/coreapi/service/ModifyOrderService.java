@@ -5,11 +5,18 @@ import com.atzuche.order.commons.enums.*;
 import com.atzuche.order.coreapi.entity.dto.ModifyOrderDTO;
 import com.atzuche.order.coreapi.entity.request.ModifyOrderReq;
 import com.atzuche.order.coreapi.entity.vo.CostDeductVO;
+import com.atzuche.order.coreapi.entity.vo.req.CarRentTimeRangeReqVO;
+import com.atzuche.order.coreapi.entity.vo.res.CarRentTimeRangeResVO;
 import com.atzuche.order.coreapi.modifyorder.exception.ModifyOrderParameterException;
 import com.atzuche.order.coreapi.service.GoodsService.CarDetailReqVO;
 import com.atzuche.order.coreapi.utils.ModifyOrderUtils;
 import com.atzuche.order.delivery.entity.RenterOrderDeliveryEntity;
+import com.atzuche.order.delivery.enums.DeliveryTypeEnum;
 import com.atzuche.order.delivery.service.RenterOrderDeliveryService;
+import com.atzuche.order.delivery.service.delivery.DeliveryCarService;
+import com.atzuche.order.delivery.vo.delivery.OrderDeliveryDTO;
+import com.atzuche.order.delivery.vo.delivery.RenterDeliveryAddrDTO;
+import com.atzuche.order.delivery.vo.delivery.UpdateOrderDeliveryVO;
 import com.atzuche.order.parentorder.entity.OrderEntity;
 import com.atzuche.order.parentorder.service.OrderService;
 import com.atzuche.order.rentercommodity.service.RenterCommodityService;
@@ -23,12 +30,14 @@ import com.atzuche.order.rentercost.service.*;
 import com.atzuche.order.rentermem.service.RenterMemberService;
 import com.atzuche.order.renterorder.entity.OrderCouponEntity;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
+import com.atzuche.order.renterorder.entity.dto.OrderChangeItemDTO;
 import com.atzuche.order.renterorder.entity.dto.RenterOrderCostReqDTO;
 import com.atzuche.order.renterorder.entity.dto.RenterOrderCostRespDTO;
 import com.atzuche.order.renterorder.service.*;
 import com.atzuche.order.renterorder.vo.RenterOrderReqVO;
 import com.atzuche.order.renterorder.vo.owner.OwnerCouponGetAndValidReqVO;
 import com.atzuche.order.renterorder.vo.platform.MemAvailCouponRequestVO;
+import com.autoyol.auto.coin.service.vo.req.AutoCoinAgainDeductRequestVO;
 import com.autoyol.auto.coin.service.vo.res.AutoCoinResponseVO;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.member.detail.vo.res.CommUseDriverInfo;
@@ -41,6 +50,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -90,6 +100,8 @@ public class ModifyOrderService {
 	private ModifyOrderConfirmService modifyOrderConfirmService;
 	@Autowired
 	private OrderChangeItemService orderChangeItemService;
+	@Autowired
+	private DeliveryCarService deliveryCarService;
 
 	/**
 	 * 修改订单主逻辑
@@ -113,8 +125,12 @@ public class ModifyOrderService {
 		ModifyOrderDTO modifyOrderDTO = getModifyOrderDTO(modifyOrderReq, renterOrderNo, initRenterOrder, deliveryList);
 		// 获取租客会员信息
 		RenterMemberDTO renterMemberDTO = getRenterMemberDTO(initRenterOrder.getRenterOrderNo());
+		// 设置租客会员信息
+		modifyOrderDTO.setRenterMemberDTO(renterMemberDTO);
 		// 获取租客商品信息
 		RenterGoodsDetailDTO renterGoodsDetailDTO = getRenterGoodsDetailDTO(modifyOrderDTO, initRenterOrder);
+		// 设置商品信息
+		modifyOrderDTO.setRenterGoodsDetailDTO(renterGoodsDetailDTO);
 		// 获取组装后的新租客子单信息
 		RenterOrderEntity renterOrderNew = convertToRenterOrderEntity(modifyOrderDTO, initRenterOrder);
 		
@@ -124,14 +140,18 @@ public class ModifyOrderService {
 		
 		// 获取主订单信息
 		OrderEntity orderEntity = orderService.getOrderEntity(modifyOrderDTO.getOrderNo());
+		// 设置主订单信息
+		modifyOrderDTO.setOrderEntity(orderEntity);
 		// 设置城市编号
-		modifyOrderDTO.setCityCode(orderEntity.getCityCode() == null ? 0:Integer.valueOf(orderEntity.getCityCode()));
+		modifyOrderDTO.setCityCode(orderEntity.getCityCode());
 		// 获取修改前租客费用明细
 		List<RenterOrderCostDetailEntity> initCostList = renterOrderCostDetailService.listRenterOrderCostDetail(modifyOrderDTO.getOrderNo(), initRenterOrder.getRenterOrderNo());
 		// 获取修改前补贴信息
 		List<RenterOrderSubsidyDetailEntity> initSubsidyList = renterOrderSubsidyDetailService.listRenterOrderSubsidyDetail(modifyOrderDTO.getOrderNo(), initRenterOrder.getRenterOrderNo());
+		//提前延后时间计算
+		CarRentTimeRangeResVO carRentTimeRangeResVO = getCarRentTimeRangeResVO(modifyOrderDTO);
 		// 封装计算用对象
-		RenterOrderReqVO renterOrderReqVO = convertToRenterOrderReqVO(modifyOrderDTO, renterMemberDTO, renterGoodsDetailDTO, orderEntity);
+		RenterOrderReqVO renterOrderReqVO = convertToRenterOrderReqVO(modifyOrderDTO, renterMemberDTO, renterGoodsDetailDTO, orderEntity, carRentTimeRangeResVO);
 		// 基础费用计算包含租金，手续费，基础保障费用，全面保障费用，附加驾驶人保障费用，取还车费用计算和超运能费用计算
 		RenterOrderCostRespDTO renterOrderCostRespDTO = getRenterOrderCostRespDTO(modifyOrderDTO, renterOrderReqVO, initCostList, initSubsidyList);
 		// 获取修改订单违约金
@@ -158,14 +178,115 @@ public class ModifyOrderService {
 		saveAdditionalDriver(modifyOrderDTO);
 		// 保存修改项目
 		orderChangeItemService.saveOrderChangeItemBatch(modifyOrderDTO.getChangeItemList());
-		// TODO 保存配送订单信息
-		
+		// 保存配送订单信息
+		saveRenterDelivery(modifyOrderDTO);
 		// 计算补付金额
 		Integer supplementAmt = getRenterSupplementAmt(modifyOrderDTO, initRenterOrder, renterOrderCostRespDTO, renterFineList);
 		// 修改后处理方法
 		modifyPostProcess(modifyOrderDTO, renterOrderNew, initRenterOrder, supplementAmt, renterOrderCostRespDTO.getRenterOrderSubsidyDetailDTOList());
-		
+		// 补扣凹凸币 
+		againAutoCoinDeduct(modifyOrderDTO, costDeductVO.getRenterSubsidyList(), initSubsidyList);
 		return ResponseData.success();
+	}
+	
+	
+	/**
+	 * 计算提前延后时间
+	 * @param modifyOrderDTO
+	 * @return CarRentTimeRangeResVO
+	 */
+	public CarRentTimeRangeResVO getCarRentTimeRangeResVO(ModifyOrderDTO modifyOrderDTO) {
+		if (modifyOrderDTO == null) {
+			return null;
+		}
+		if ((modifyOrderDTO.getSrvGetFlag() == null || modifyOrderDTO.getSrvGetFlag() == 0) &&
+				(modifyOrderDTO.getSrvReturnFlag() == null || modifyOrderDTO.getSrvReturnFlag() == 0)) {
+			return null;
+		}
+		CarRentTimeRangeReqVO carRentTimeRangeReqVO = getCarRentTimeRangeReqVO(modifyOrderDTO);
+		if (carRentTimeRangeReqVO == null) {
+			return null;
+		}
+		CarRentTimeRangeResVO carRentTimeRangeResVO = goodsService.getCarRentTimeRange(carRentTimeRangeReqVO);
+		return carRentTimeRangeResVO;
+	}
+	
+	/**
+	 * 封装获取提前延后的对象
+	 * @param modifyOrderDTO
+	 * @return CarRentTimeRangeReqVO
+	 */
+	public CarRentTimeRangeReqVO getCarRentTimeRangeReqVO(ModifyOrderDTO modifyOrderDTO) {
+		if (modifyOrderDTO == null) {
+			return null;
+		}
+		RenterGoodsDetailDTO renterGoodsDetailDTO = modifyOrderDTO.getRenterGoodsDetailDTO();
+		if (renterGoodsDetailDTO == null || renterGoodsDetailDTO.getCarNo() == null) {
+			return null;
+		}
+		CarRentTimeRangeReqVO carRentTimeRangeReqVO = new CarRentTimeRangeReqVO();
+		carRentTimeRangeReqVO.setCarNo(String.valueOf(renterGoodsDetailDTO.getCarNo()));
+		carRentTimeRangeReqVO.setCityCode(modifyOrderDTO.getCityCode()+"");
+		carRentTimeRangeReqVO.setRentTime(modifyOrderDTO.getRentTime());
+		carRentTimeRangeReqVO.setRevertTime(modifyOrderDTO.getRevertTime());
+		carRentTimeRangeReqVO.setSrvGetAddr(modifyOrderDTO.getGetCarAddress());
+		carRentTimeRangeReqVO.setSrvGetFlag(modifyOrderDTO.getSrvGetFlag());
+		carRentTimeRangeReqVO.setSrvGetLat(modifyOrderDTO.getGetCarLat());
+		carRentTimeRangeReqVO.setSrvGetLon(modifyOrderDTO.getGetCarLon());
+		carRentTimeRangeReqVO.setSrvReturnAddr(modifyOrderDTO.getRevertCarAddress());
+		carRentTimeRangeReqVO.setSrvReturnFlag(modifyOrderDTO.getSrvReturnFlag());
+		carRentTimeRangeReqVO.setSrvReturnLat(modifyOrderDTO.getRevertCarLat());
+		carRentTimeRangeReqVO.setSrvReturnLon(modifyOrderDTO.getRevertCarLon());
+		return carRentTimeRangeReqVO;
+	}
+	
+	
+	/**
+	 * 补扣凹凸币
+	 * @param modifyOrderDTO
+	 * @param updSubsidyList
+	 * @param initSubsidyList
+	 */
+	public void againAutoCoinDeduct(ModifyOrderDTO modifyOrderDTO, List<RenterOrderSubsidyDetailDTO> updSubsidyList, List<RenterOrderSubsidyDetailEntity> initSubsidyList) {
+		if (modifyOrderDTO == null) {
+			return;
+		}
+		if (updSubsidyList == null || updSubsidyList.isEmpty()) {
+			return;
+		}
+		// 修改后凹凸币抵扣金额
+		Integer updAutoCoinSubsidyAmt = 0;
+		for (RenterOrderSubsidyDetailDTO subsidy:updSubsidyList) {
+			if (RenterCashCodeEnum.AUTO_COIN_DEDUCT.getCashNo().equals(subsidy.getSubsidyCostCode())) {
+				updAutoCoinSubsidyAmt = subsidy.getSubsidyAmount();
+				break;
+			}
+		}
+		if (updAutoCoinSubsidyAmt == null || updAutoCoinSubsidyAmt == 0) {
+			return;
+		}
+		// 修改前凹凸币抵扣金额
+		Integer initAutoCoinSubsidyAmt = 0;
+		for (RenterOrderSubsidyDetailEntity subsidy:initSubsidyList) {
+			if (RenterCashCodeEnum.AUTO_COIN_DEDUCT.getCashNo().equals(subsidy.getSubsidyCostCode())) {
+				initAutoCoinSubsidyAmt = subsidy.getSubsidyAmount() == null ? 0:subsidy.getSubsidyAmount();
+				break;
+			}
+		}
+		// 差价
+		Integer diffAmt = updAutoCoinSubsidyAmt - initAutoCoinSubsidyAmt;
+		if (diffAmt > 0) {
+			AutoCoinAgainDeductRequestVO autoCoinRechange = new AutoCoinAgainDeductRequestVO();
+			autoCoinRechange.setCoin(diffAmt*100);
+			autoCoinRechange.setMemNo(modifyOrderDTO.getMemNo() == null?null:Integer.valueOf(modifyOrderDTO.getMemNo()));
+			autoCoinRechange.setOperator("order-center");
+			autoCoinRechange.setOrderNo(modifyOrderDTO.getOrderNo());
+			autoCoinRechange.setOrderNoRent(modifyOrderDTO.getRenterOrderNo());
+			autoCoinRechange.setOrderType(16);
+			autoCoinRechange.setRemark("修改订单补扣凹凸币");
+			autoCoinService.againDeduct(autoCoinRechange);
+		}
+		
 	}
 	
 	
@@ -631,7 +752,8 @@ public class ModifyOrderService {
 		CostBaseDTO updBase = new CostBaseDTO(modifyOrderDTO.getOrderNo(), modifyOrderDTO.getRenterOrderNo(), modifyOrderDTO.getMemNo(), modifyOrderDTO.getRentTime(), modifyOrderDTO.getRevertTime());
 		updateInfo.setCostBaseDTO(updBase);
 		// 取还车违约金
-		List<RenterOrderFineDeatailEntity> renterFineList = renterOrderFineDeatailService.calculateGetOrReturnFineAmt(initInfo, updateInfo,modifyOrderDTO.getCityCode());
+		Integer cityCode = StringUtils.isBlank(modifyOrderDTO.getCityCode())?null:Integer.valueOf(modifyOrderDTO.getCityCode());
+		List<RenterOrderFineDeatailEntity> renterFineList = renterOrderFineDeatailService.calculateGetOrReturnFineAmt(initInfo, updateInfo, cityCode);
 		return renterFineList;
 	}
 	
@@ -917,7 +1039,7 @@ public class ModifyOrderService {
 	 * @param orderEntity
 	 * @return RenterOrderReqVO
 	 */
-	public RenterOrderReqVO convertToRenterOrderReqVO(ModifyOrderDTO modifyOrderDTO, RenterMemberDTO renterMemberDTO, RenterGoodsDetailDTO renterGoodsDetailDTO, OrderEntity orderEntity) {
+	public RenterOrderReqVO convertToRenterOrderReqVO(ModifyOrderDTO modifyOrderDTO, RenterMemberDTO renterMemberDTO, RenterGoodsDetailDTO renterGoodsDetailDTO, OrderEntity orderEntity, CarRentTimeRangeResVO carRentTimeRangeResVO) {
 		RenterOrderReqVO renterOrderReqVO = new RenterOrderReqVO();
 		renterOrderReqVO.setAbatement(modifyOrderDTO.getAbatementFlag()==null?"0":String.valueOf(modifyOrderDTO.getAbatementFlag()));
 		renterOrderReqVO.setCarLat(renterGoodsDetailDTO.getCarShowLat());
@@ -928,7 +1050,13 @@ public class ModifyOrderService {
 		renterOrderReqVO.setDisCouponIds(modifyOrderDTO.getPlatformCouponId());
 		renterOrderReqVO.setDriverIds(modifyOrderDTO.getDriverIds());
 		renterOrderReqVO.setEntryCode(orderEntity.getEntryCode());
-		renterOrderReqVO.setGetCarBeforeTime(modifyOrderDTO.getGetCarBeforeTime());
+		if (carRentTimeRangeResVO != null) {
+			// 提前分钟
+			renterOrderReqVO.setGetCarBeforeTime(carRentTimeRangeResVO.getGetMinutes());
+			// 延后分钟
+			renterOrderReqVO.setReturnCarAfterTime(carRentTimeRangeResVO.getReturnMinutes());
+		}
+		
 		renterOrderReqVO.setGetCarFreeCouponId(modifyOrderDTO.getSrvGetReturnCouponId());
 		renterOrderReqVO.setGuidPrice(renterGoodsDetailDTO.getCarGuidePrice());
 		renterOrderReqVO.setInmsrp(renterGoodsDetailDTO.getCarInmsrp());
@@ -938,7 +1066,6 @@ public class ModifyOrderService {
 		renterOrderReqVO.setRenterGoodsPriceDetailDTOList(renterGoodsDetailDTO.getRenterGoodsPriceDetailDTOList());
 		renterOrderReqVO.setRenterOrderNo(modifyOrderDTO.getRenterOrderNo());
 		renterOrderReqVO.setRentTime(modifyOrderDTO.getRentTime());
-		renterOrderReqVO.setReturnCarAfterTime(modifyOrderDTO.getReturnCarAfterTime());
 		renterOrderReqVO.setRevertTime(modifyOrderDTO.getRevertTime());
 		renterOrderReqVO.setSource(orderEntity.getSource());
 		renterOrderReqVO.setSrvGetFlag(modifyOrderDTO.getSrvGetFlag());
@@ -950,6 +1077,117 @@ public class ModifyOrderService {
 		renterOrderReqVO.setUseAutoCoin(modifyOrderDTO.getUserCoinFlag());
 		renterOrderReqVO.setIsNew((renterMemberDTO.getIsNew() != null && renterMemberDTO.getIsNew() == 1) ? true:false);
 		return renterOrderReqVO;
+	}
+	
+	
+	/**
+	 * 保存配送订单信息
+	 * @param modifyOrderDTO
+	 */
+	public void saveRenterDelivery(ModifyOrderDTO modifyOrderDTO) {
+		// 修改项
+		List<OrderChangeItemDTO> changeItemList = modifyOrderDTO.getChangeItemList();
+		List<String> changeCodeList = modifyOrderConfirmService.listChangeCode(changeItemList);
+		if (changeCodeList != null && !changeCodeList.isEmpty() && 
+				(changeCodeList.contains(OrderChangeItemEnum.MODIFY_SRVGETFLAG.getCode()) || 
+						changeCodeList.contains(OrderChangeItemEnum.MODIFY_SRVRETURNFLAG.getCode()))) {
+			return;
+		}
+		UpdateOrderDeliveryVO updateFlowOrderVO = new UpdateOrderDeliveryVO();
+		// 配送地址
+		RenterDeliveryAddrDTO deliveryAddr = getRenterDeliveryAddrDTO(modifyOrderDTO);
+		updateFlowOrderVO.setRenterDeliveryAddrDTO(deliveryAddr);
+		// 配送订单
+		Map<Integer,OrderDeliveryDTO> deliveryMap = getOrderDeliveryDTO(modifyOrderDTO);
+		if (modifyOrderDTO.getSrvGetFlag() != null && modifyOrderDTO.getSrvGetFlag() == 1) {
+			updateFlowOrderVO.setOrderDeliveryDTO(deliveryMap.get(SrvGetReturnEnum.SRV_GET_TYPE.getCode()));
+			// 保存配送订单信息
+			deliveryCarService.updateFlowOrderInfo(updateFlowOrderVO);
+		}
+		if (modifyOrderDTO.getSrvReturnFlag() != null && modifyOrderDTO.getSrvReturnFlag() == 1) {
+			updateFlowOrderVO.setOrderDeliveryDTO(deliveryMap.get(SrvGetReturnEnum.SRV_RETURN_TYPE.getCode()));
+			// 保存配送订单信息
+			deliveryCarService.updateFlowOrderInfo(updateFlowOrderVO);
+		}
+	}
+	
+	/**
+	 * 封装RenterDeliveryAddrDTO
+	 * @param modifyOrderDTO
+	 * @return RenterDeliveryAddrDTO
+	 */
+	public RenterDeliveryAddrDTO getRenterDeliveryAddrDTO(ModifyOrderDTO modifyOrderDTO) {
+		if (modifyOrderDTO == null) {
+			return null;
+		}
+		RenterGoodsDetailDTO renterGoodsDetailDTO = modifyOrderDTO.getRenterGoodsDetailDTO();
+		String getCarAddr = modifyOrderDTO.getGetCarAddress();
+		String getCarLat = modifyOrderDTO.getGetCarLat();
+		String getCarLon = modifyOrderDTO.getGetCarLon();
+		String returnCarAddr = modifyOrderDTO.getRevertCarAddress();
+		String returnCarLat = modifyOrderDTO.getRevertCarLat();
+		String returnCarLon = modifyOrderDTO.getRevertCarLon();
+		if (renterGoodsDetailDTO != null) {
+			if (modifyOrderDTO.getSrvGetFlag() == null || modifyOrderDTO.getSrvGetFlag() == 0) {
+				getCarAddr = renterGoodsDetailDTO.getCarRealAddr();
+				getCarLat = renterGoodsDetailDTO.getCarRealLat();
+				getCarLon = renterGoodsDetailDTO.getCarRealLon();
+			}
+			if (modifyOrderDTO.getSrvReturnFlag() == null || modifyOrderDTO.getSrvReturnFlag() == 0) {
+				returnCarAddr = renterGoodsDetailDTO.getCarRealAddr();
+				returnCarLat = renterGoodsDetailDTO.getCarRealLat();
+				returnCarLon = renterGoodsDetailDTO.getCarRealLon();
+			}
+		}
+		RenterDeliveryAddrDTO deliveryAddrDTO = new RenterDeliveryAddrDTO();
+		deliveryAddrDTO.setOrderNo(modifyOrderDTO.getOrderNo());
+		deliveryAddrDTO.setRenterOrderNo(modifyOrderDTO.getRenterOrderNo());
+		deliveryAddrDTO.setActGetCarAddr(getCarAddr);
+		deliveryAddrDTO.setActGetCarLat(getCarLat);
+		deliveryAddrDTO.setActGetCarLon(getCarLon);
+		deliveryAddrDTO.setActReturnCarAddr(returnCarAddr);
+		deliveryAddrDTO.setActReturnCarLat(returnCarLat);
+		deliveryAddrDTO.setActReturnCarLon(returnCarLon);
+		deliveryAddrDTO.setExpGetCarAddr(getCarAddr);
+		deliveryAddrDTO.setExpGetCarLat(getCarLat);
+		deliveryAddrDTO.setExpGetCarLon(getCarLon);
+		deliveryAddrDTO.setExpReturnCarAddr(returnCarAddr);
+		deliveryAddrDTO.setExpReturnCarLat(returnCarLat);
+		deliveryAddrDTO.setExpReturnCarLon(returnCarLon);
+		return deliveryAddrDTO;
+	}
+	
+	/**
+	 * 封装 Map<Integer,OrderDeliveryDTO>
+	 * @param modifyOrderDTO
+	 * @return Map<Integer,OrderDeliveryDTO>
+	 */
+	public Map<Integer,OrderDeliveryDTO> getOrderDeliveryDTO(ModifyOrderDTO modifyOrderDTO) {
+		Map<Integer,OrderDeliveryDTO> delivMap = new HashMap<Integer, OrderDeliveryDTO>();
+		if (modifyOrderDTO == null) {
+			return delivMap;
+		}
+		OrderDeliveryDTO getDelivery = new OrderDeliveryDTO();
+		getDelivery.setRentTime(modifyOrderDTO.getRentTime());
+		getDelivery.setRevertTime(modifyOrderDTO.getRevertTime());
+		getDelivery.setRenterGetReturnAddr(modifyOrderDTO.getGetCarAddress());
+		getDelivery.setRenterGetReturnAddrLat(modifyOrderDTO.getGetCarLat());
+		getDelivery.setRenterGetReturnAddrLon(modifyOrderDTO.getGetCarLon());
+		getDelivery.setOrderNo(modifyOrderDTO.getOrderNo());
+		getDelivery.setRenterOrderNo(modifyOrderDTO.getRenterOrderNo());
+		getDelivery.setType(SrvGetReturnEnum.SRV_GET_TYPE.getCode());
+		delivMap.put(SrvGetReturnEnum.SRV_GET_TYPE.getCode(), getDelivery);
+		OrderDeliveryDTO returnDelivery = new OrderDeliveryDTO();
+		returnDelivery.setRentTime(modifyOrderDTO.getRentTime());
+		returnDelivery.setRevertTime(modifyOrderDTO.getRevertTime());
+		returnDelivery.setRenterGetReturnAddr(modifyOrderDTO.getGetCarAddress());
+		returnDelivery.setRenterGetReturnAddrLat(modifyOrderDTO.getGetCarLat());
+		returnDelivery.setRenterGetReturnAddrLon(modifyOrderDTO.getGetCarLon());
+		returnDelivery.setOrderNo(modifyOrderDTO.getOrderNo());
+		returnDelivery.setRenterOrderNo(modifyOrderDTO.getRenterOrderNo());
+		returnDelivery.setType(SrvGetReturnEnum.SRV_RETURN_TYPE.getCode());
+		delivMap.put(SrvGetReturnEnum.SRV_RETURN_TYPE.getCode(), getDelivery);
+		return delivMap;
 	}
 	
 }

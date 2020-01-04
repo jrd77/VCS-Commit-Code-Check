@@ -11,6 +11,8 @@ import com.atzuche.order.renterorder.entity.dto.OrderChangeItemDTO;
 
 @Mapper
 public interface OrderChangeItemMapper{
+	
+	List<String> listChangeCodeByRenterOrderNo(@Param("renterOrderNo") String renterOrderNo);
     
     Integer saveOrderChangeItemBatch(@Param("changeItemList") List<OrderChangeItemDTO> changeItemList);
 

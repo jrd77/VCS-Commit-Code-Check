@@ -139,7 +139,9 @@ public class RenterOrderCalCostService {
         int extraDriverAmount = extraDriverInsureAmtEntity.getTotalAmount();
         extraDriverAmount = extraDriverAmount + totalAmountSubsidyAmount;
         renterOrderCostRespDTO.setAdditionalDrivingEnsureAmount(extraDriverAmount);
-        detailList.add(extraDriverInsureAmtEntity);
+        if(extraDriverAmount != 0){
+            detailList.add(extraDriverInsureAmtEntity);
+        }
         if(totalAmountSubsidy != null){
             subsidyList.addAll(totalAmountSubsidy);
         }
@@ -239,11 +241,11 @@ public class RenterOrderCalCostService {
         //保存费用明细
         LOGGER.info("下单-租客端-保存费用明细参数param=[{}]",JSON.toJSONString(renterOrderCostRespDTO.getRenterOrderCostDetailDTOList()));
         Integer costDetailResult = renterOrderCostDetailService.saveRenterOrderCostDetailBatch(renterOrderCostRespDTO.getRenterOrderCostDetailDTOList());
-        LOGGER.info("下单-租客端-保存费用明细参数param=[{}],结果costDetailResult=[{}]",JSON.toJSONString(renterOrderCostRespDTO.getRenterOrderCostDetailDTOList()),costDetailResult);
+        LOGGER.info("下单-租客端-保存费用明细结果costDetailResult=[{}],参数param=[{}]",costDetailResult,JSON.toJSONString(renterOrderCostRespDTO.getRenterOrderCostDetailDTOList()));
         //保存补贴明细
-        LOGGER.info("下单-租客-保存补贴明细参数param=[{}]",JSON.toJSONString(subsidyListEntity));
+        LOGGER.info("下单-租客端-保存补贴明细参数param=[{}]",JSON.toJSONString(subsidyListEntity));
         Integer subsidyResult = renterOrderSubsidyDetailService.saveRenterOrderSubsidyDetailBatch(subsidyListEntity);
-        LOGGER.info("下单-租客-保存补贴明细参数param=[{}]，结果subsidyResult=[{}]",subsidyResult);
+        LOGGER.info("下单-租客端-保存补贴明细结果subsidyResult=[{}]，参数param=[{}]",subsidyResult,JSON.toJSONString(subsidyListEntity));
 
         //保存费用统计信息
         RenterOrderCostEntity renterOrderCostEntity = new RenterOrderCostEntity();
@@ -252,7 +254,7 @@ public class RenterOrderCalCostService {
         renterOrderCostEntity.setRenterOrderNo(renterOrderCostRespDTO.getRenterOrderNo());
         LOGGER.info("下单-租客端-保存费用参数renterOrderCostEntity=[{}]",JSON.toJSONString(renterOrderCostEntity));
         Integer costResult = renterOrderCostService.saveRenterOrderCost(renterOrderCostEntity);
-        LOGGER.info("下单-租客端-保存费用renterOrderCostEntity=[{}],costResult=[{}]",JSON.toJSONString(renterOrderCostEntity),costResult);
+        LOGGER.info("下单-租客端-保存费用结果costResult=[{}]，参数renterOrderCostEntity=[{}]",costResult,JSON.toJSONString(renterOrderCostEntity));
 
     }
 

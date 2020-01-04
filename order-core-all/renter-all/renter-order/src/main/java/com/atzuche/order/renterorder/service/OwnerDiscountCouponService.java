@@ -34,7 +34,7 @@ public class OwnerDiscountCouponService {
     @Resource
     private RestTemplate restTemplate;
 
-    @Value("AUTO_OWNER_COUPON_URL")
+    @Value("${auto.owner.coupon.url}")
     private String ownerCouponUrl;
 
 
