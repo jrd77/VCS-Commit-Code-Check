@@ -46,7 +46,7 @@ public class RenterMemberRightService{
                 .limit(1)
                 .collect(Collectors.toList());
         //内部员工
-        if(staff!=null && staff.size()==1 && MemberRightValueEnum.OWN.getCode().equalsIgnoreCase(staff.get(0).getRightValue())){
+        if(staff!=null && staff.size()==1 && MemberRightValueEnum.OWN.getCode().equals(staff.get(0).getRightValue())){
             memRightCarDepositAmtRespDTO.setReductionDepositAmt(originalDepositAmt - GlobalConstant.MEMBER_RIGHT_STAFF_CAR_DEPOSIT);
             memRightCarDepositAmtRespDTO.setReductionRate(0D);
            return memRightCarDepositAmtRespDTO;
