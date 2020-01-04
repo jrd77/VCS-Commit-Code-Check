@@ -27,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author 胡春林
@@ -38,8 +39,24 @@ public class DeliveryCarService {
     @Autowired
     DeliveryCarTask deliveryCarTask;
 
+
+
     /**
      * 添加配送相关信息(是否下单，是否推送仁云)
+     */
+    public void addFlowOrderInfo(Integer getMinutes, Integer returnMinutes, OrderReqContext orderReqContext) {
+        if (null == orderReqContext || Objects.isNull(orderReqContext.getOrderReqVO())) {
+            throw new DeliveryOrderException(DeliveryErrorCode.DELIVERY_PARAMS_ERROR);
+        }
+        if (orderReqContext.getOrderReqVO().getSrvReturnFlag().intValue() == UsedDeliveryTypeEnum.USED.getValue().intValue()) {
+            addRenYunFlowOrderInfo(getMinutes,returnMinutes,orderReqContext);
+        } else if (orderReqContext.getOrderReqVO().getSrvGetFlag().intValue() == UsedDeliveryTypeEnum.USED.getValue().intValue()) {
+            addRenYunFlowOrderInfo(getMinutes,returnMinutes,orderReqContext);
+        }
+    }
+
+    /**
+     * 添加配送相关信息细节(是否下单，是否推送仁云)
      */
     public void addRenYunFlowOrderInfo(Integer getMinutes, Integer returnMinutes, OrderReqContext orderReqContext) {
         OrderDeliveryVO orderDeliveryVO = createOrderDeliveryParams(orderReqContext);
