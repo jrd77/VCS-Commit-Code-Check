@@ -43,7 +43,7 @@ public class DeliveryCarController extends BaseController {
     @AutoDocMethod(description = "取还车配送", value = "取还车配送",response = RenterDeliveryCarVO.class)
     @PostMapping("/delivery/list")
     public ResponseData<?> findDeliveryListByOrderNo(@RequestBody DeliveryCarRepVO deliveryCarDTO) {
-        if (null == deliveryCarDTO || StringUtils.isBlank(deliveryCarDTO.getRenterOrderNo())) {
+        if (null == deliveryCarDTO || StringUtils.isBlank(deliveryCarDTO.getOrderNo())) {
             return ResponseData.createErrorCodeResponse(ErrorCode.ORDER_NO_PARAM_ERROR.getCode(), "租客子订单编号为空");
         }
         DeliveryCarRepVO deliveryCarRepVO = deliveryCarInfoService.findDeliveryListByOrderNo(deliveryCarDTO);
