@@ -11,7 +11,10 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
-
+/**
+ * @author 胡春林
+ * commonUtils
+ */
 @Slf4j
 public class CommonUtil {
 
