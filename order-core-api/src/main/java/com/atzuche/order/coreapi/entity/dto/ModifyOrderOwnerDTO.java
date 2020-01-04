@@ -3,6 +3,7 @@ package com.atzuche.order.coreapi.entity.dto;
 import java.time.LocalDateTime;
 
 import com.atzuche.order.commons.entity.dto.OwnerGoodsDetailDTO;
+import com.atzuche.order.commons.entity.dto.OwnerMemberDTO;
 import com.atzuche.order.ownercost.entity.OwnerOrderEntity;
 
 import lombok.Data;
@@ -72,5 +73,9 @@ public class ModifyOrderOwnerDTO {
      * 有效车主订单信息
      */
     private OwnerOrderEntity ownerOrderEffective;
+    /**
+     * 车主会员信息
+     */
+    private OwnerMemberDTO ownerMemberDTO;
     
 }

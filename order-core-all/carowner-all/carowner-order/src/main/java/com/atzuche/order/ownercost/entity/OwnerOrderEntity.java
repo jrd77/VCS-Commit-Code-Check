@@ -111,5 +111,13 @@ public class OwnerOrderEntity implements Serializable {
 	 * 0-正常，1-已逻辑删除
 	 */
 	private Integer isDelete;
+	/**
+	 * 取车提前分钟
+	 */
+	private Integer beforeMinutes;
+	/**
+	 * 还车延后分钟
+	 */
+	private Integer afterMinutes;
 
 }

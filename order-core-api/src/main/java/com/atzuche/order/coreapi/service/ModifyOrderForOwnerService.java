@@ -98,9 +98,11 @@ public class ModifyOrderForOwnerService {
 		OwnerOrderEntity ownerOrderEntity = ownerOrderService.getOwnerOrderByOrderNoAndIsEffective(orderNo);
 		// 获取车主会员信息
 		OwnerMemberDTO ownerMemberDTO = getOwnerMemberDTO(ownerOrderEntity.getOwnerOrderNo());
+		// 设置车主会员信息
+		modifyOrderOwnerDTO.setOwnerMemberDTO(ownerMemberDTO);
 		// 获取车主端商品详情
 		OwnerGoodsDetailDTO ownerGoodsDetailDTO = getOwnerGoodsDetailDTO(modifyOrderOwnerDTO, ownerOrderEntity);
-		// 设置商品信息后续通知仁云需要
+		// 设置商品信息
 		modifyOrderOwnerDTO.setOwnerGoodsDetailDTO(ownerGoodsDetailDTO);
 		// 封装新的车主子订单对象
 		OwnerOrderEntity ownerOrderEffective = convertToOwnerOrderEntity(modifyOrderOwnerDTO, ownerOrderEntity);
@@ -304,11 +306,7 @@ public class ModifyOrderForOwnerService {
 	 */
 	public OwnerOrderEntity convertToOwnerOrderEntity(ModifyOrderOwnerDTO modifyOrderOwnerDTO, OwnerOrderEntity ownerOrderEntity) {
 		// 获取提前延后时间
-		CarRentTimeRangeResVO carRentTimeRangeResVO =  getCarRentTimeRangeResVO(modifyOrderOwnerDTO);
-		// 提前时间
-		LocalDateTime showRentTime = carRentTimeRangeResVO.getAdvanceStartDate();
-		// 延后时间
-		LocalDateTime showRevertTime = carRentTimeRangeResVO.getDelayEndDate();
+		CarRentTimeRangeResVO carRentTimeRangeResVO = getCarRentTimeRangeResVO(modifyOrderOwnerDTO);
 		// 封装新的车主子订单
 		OwnerOrderEntity ownerOrderEntityEffective = new OwnerOrderEntity();
 		// 数据拷贝
@@ -316,10 +314,20 @@ public class ModifyOrderForOwnerService {
 		ownerOrderEntityEffective.setOwnerOrderNo(modifyOrderOwnerDTO.getOwnerOrderNo());
 		ownerOrderEntityEffective.setId(null);
 		ownerOrderEntityEffective.setIsEffective(1);
-		ownerOrderEntityEffective.setShowRentTime(showRentTime);
-		ownerOrderEntityEffective.setShowRevertTime(showRevertTime);
 		ownerOrderEntityEffective.setExpRentTime(modifyOrderOwnerDTO.getRentTime());
 		ownerOrderEntityEffective.setExpRevertTime(modifyOrderOwnerDTO.getRevertTime());
+		ownerOrderEntityEffective.setShowRentTime(modifyOrderOwnerDTO.getRentTime());
+		ownerOrderEntityEffective.setShowRevertTime(modifyOrderOwnerDTO.getRevertTime());
+		if (carRentTimeRangeResVO != null) {
+			// 提前时间
+			LocalDateTime showRentTime = carRentTimeRangeResVO.getAdvanceStartDate();
+			// 延后时间
+			LocalDateTime showRevertTime = carRentTimeRangeResVO.getDelayEndDate();
+			ownerOrderEntityEffective.setShowRentTime(showRentTime);
+			ownerOrderEntityEffective.setShowRevertTime(showRevertTime);
+			ownerOrderEntityEffective.setBeforeMinutes(carRentTimeRangeResVO.getGetMinutes());
+			ownerOrderEntityEffective.setAfterMinutes(carRentTimeRangeResVO.getReturnMinutes());
+		}
 		return ownerOrderEntityEffective;
 	}
 	
