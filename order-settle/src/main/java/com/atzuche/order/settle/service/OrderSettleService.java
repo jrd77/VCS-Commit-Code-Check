@@ -6,6 +6,7 @@ import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.atzuche.order.renterorder.service.RenterOrderService;
 import com.atzuche.order.settle.service.notservice.OrderSettleNoTService;
 import com.atzuche.order.settle.vo.req.SettleOrders;
+import com.atzuche.order.settle.vo.req.SettleOrdersDefinition;
 import com.autoyol.doc.util.StringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
@@ -55,11 +56,14 @@ public class OrderSettleService {
         SettleOrders settleOrders =  orderSettleNoTService.initSettleOrders(orderNo,renterOrderNo,ownerOrderNo,renterMemNo,ownerMemNo);
         //3.4 查询所有租客费用明细
         orderSettleNoTService.getRenterCostSettleDetail(settleOrders,renterOrder);
-        //3.5 查询所有租客费用明细
+        //3.5 查询所有车主费用明细
         orderSettleNoTService.getOwnerCostSettleDetail(settleOrders,ownerOrder);
 
-        //4 计算费用统计 落库
+        //4 计算费用统计  资金统计
+        SettleOrdersDefinition settleOrdersDefinition = orderSettleNoTService.settleOrdersDefinition(settleOrders);
 
+        //5 费用明细先落库
+//        orderSettleNoTService.insertSettleOrders(settleOrders);
 
 
 
