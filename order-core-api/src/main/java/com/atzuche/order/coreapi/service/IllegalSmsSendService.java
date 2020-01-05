@@ -65,6 +65,9 @@ public class IllegalSmsSendService {
 
     private static String MSG = "您的订单产生违章，不要忘记去APP处理哟~";
 
+    public static final String SMS_TYPE_RENTER = "1";
+    public static final String SMS_TYPE_OWNER = "2";
+
 
     public void smsNotice() {
         try {
@@ -94,11 +97,11 @@ public class IllegalSmsSendService {
                     if (renterNo == null || StringUtils.isEmpty(renterPhone)) {
                         logger.error("违章短信PUSH-租客发送失败,orderNo={},renterNo={},renterPhone={}", orderNo, renterNo, renterPhone);
                     }
-                    jPushService.updateIllegalMessage(orderNo, renterNo, renterPhone, JPushService.SMS_TYPE_RENTER,isCtripOrder);
+                    jPushService.updateIllegalMessage(orderNo, renterNo, renterPhone, SMS_TYPE_RENTER,isCtripOrder);
                     if (ownerNo == null || StringUtils.isEmpty(ownerPhone)) {
                         logger.error("违章短信PUSH-车主发送失败,orderNo={},ownerNo={},ownerPhone={}", orderNo, ownerNo, ownerPhone);
                     }
-                    jPushService.updateIllegalMessage(orderNo, ownerNo, ownerPhone, JPushService.SMS_TYPE_OWNER,isCtripOrder);
+                    jPushService.updateIllegalMessage(orderNo, ownerNo, ownerPhone, SMS_TYPE_OWNER,isCtripOrder);
                     //根据AUT-2003需求增加违章微信推送
                     try {
                         if(!isCtripOrder){
