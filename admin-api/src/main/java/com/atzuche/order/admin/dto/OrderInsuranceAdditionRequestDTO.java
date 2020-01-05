@@ -86,6 +86,13 @@ public class OrderInsuranceAdditionRequestDTO {
         this.insuranceDate = insuranceDate;
     }
 
+    public String getOperator() {
+        return operator;
+    }
+
+    public void setOperator(String operator) {
+        this.operator = operator;
+    }
 
 
 }
