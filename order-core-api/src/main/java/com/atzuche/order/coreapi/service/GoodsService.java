@@ -2,8 +2,10 @@ package com.atzuche.order.coreapi.service;
 
 import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.CatConstants;
+import com.atzuche.order.commons.GlobalConstant;
 import com.atzuche.order.commons.LocalDateTimeUtils;
 import com.atzuche.order.commons.entity.dto.OwnerGoodsDetailDTO;
+import com.atzuche.order.commons.entity.dto.OwnerGoodsPriceDetailDTO;
 import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
 import com.atzuche.order.commons.entity.dto.RenterGoodsPriceDetailDTO;
 import com.atzuche.order.coreapi.entity.vo.req.CarRentTimeRangeReqVO;
@@ -32,6 +34,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -102,9 +105,12 @@ public class GoodsService {
         CarDetailImageVO detailImageVO = data.getDetailImageVO();
         CarAddressOfTransVO carAddressOfTransVO = data.getCarAddressOfTransVO();
         CarTagListVO carTagVO = data.getCarTagVO();
-
+        List<CarGpsVO> carGpsVOS = data.getCarGpsVOS();
+        TransReplyVO transReplyVO = carBaseVO.getTransReplyVO();
         RenterGoodsDetailDTO renterGoodsDetailDto = new RenterGoodsDetailDTO();
-        renterGoodsDetailDto.setReplyFlag(carBaseVO.getTransReplyVO().getReplyFlag());
+        renterGoodsDetailDto.setRentTime(reqVO.getRentTime());
+        renterGoodsDetailDto.setRevertTime(reqVO.getRevertTime());
+        renterGoodsDetailDto.setReplyFlag(transReplyVO ==null || transReplyVO.getReplyFlag() == null ? 0: transReplyVO.getReplyFlag());
         renterGoodsDetailDto.setCarAddrIndex(Integer.valueOf(reqVO.getAddrIndex()));
         renterGoodsDetailDto.setCarNo(carBaseVO.getCarNo());
         renterGoodsDetailDto.setCarPlateNum(carBaseVO.getPlateNum());
@@ -113,7 +119,7 @@ public class GoodsService {
         renterGoodsDetailDto.setCarRating(carBaseVO.getRating());
         renterGoodsDetailDto.setCarType(Integer.valueOf(carBaseVO.getType()));
         renterGoodsDetailDto.setCarTypeTxt(carBaseVO.getTypeTxt());
-        renterGoodsDetailDto.setCarCylinderCapacity(carBaseVO.getCc()==null?0D:Double.valueOf(carBaseVO.getCc()));
+        renterGoodsDetailDto.setCarCylinderCapacity(carBaseVO.getCc()==null ? 0D:Double.valueOf(carBaseVO.getCc()));
         renterGoodsDetailDto.setCarCcUnit(carBaseVO.getCcUnit());
         renterGoodsDetailDto.setCarGearboxType(carBaseVO.getGbType());
         renterGoodsDetailDto.setCarDayMileage(carBaseVO.getDayMileage());
@@ -127,26 +133,34 @@ public class GoodsService {
         renterGoodsDetailDto.setCarOilVolume(carBaseVO.getOilVolume());
         renterGoodsDetailDto.setCarEngineType(carBaseVO.getEngineType());
         renterGoodsDetailDto.setCarDesc(carBaseVO.getCarDesc());
-        renterGoodsDetailDto.setCarStewardPhone(carSteward.getStewardPhone()==null?"":String.valueOf(carSteward.getStewardPhone()));
-        renterGoodsDetailDto.setCarCheckStatus(carDetect.getDetectStatus());
-        renterGoodsDetailDto.setCarShowAddr(carAddressOfTransVO.getCarVirtualAddress());
-        renterGoodsDetailDto.setCarShowLon(carAddressOfTransVO.getVirtualAddressLon()==null?"":String.valueOf(carAddressOfTransVO.getVirtualAddressLon()));
-        renterGoodsDetailDto.setCarShowLat(carAddressOfTransVO.getVirtualAddressLat()==null?"":String.valueOf(carAddressOfTransVO.getVirtualAddressLat()));
-        renterGoodsDetailDto.setCarRealAddr(carAddressOfTransVO.getCarRealAddress());
-        renterGoodsDetailDto.setCarRealLon(carAddressOfTransVO.getRealAddressLon()==null?"":String.valueOf(carAddressOfTransVO.getRealAddressLon()));
-        renterGoodsDetailDto.setCarRealLat(carAddressOfTransVO.getRealAddressLat()==null?"":String.valueOf(carAddressOfTransVO.getRealAddressLat()));
-        renterGoodsDetailDto.setOwnerMemNo(String.valueOf(carBaseVO.getOwnerNo()));
-        renterGoodsDetailDto.setLabelIds(carTagVO == null?new ArrayList<>():carTagVO.getLabelIds());
+        renterGoodsDetailDto.setCarStewardPhone(carSteward==null||carSteward.getStewardPhone()==null ? "" : String.valueOf(carSteward.getStewardPhone()));
+        renterGoodsDetailDto.setCarCheckStatus(carDetect == null ? null : carDetect.getDetectStatus());
+        renterGoodsDetailDto.setCarShowAddr(carAddressOfTransVO==null ? "" : carAddressOfTransVO.getCarVirtualAddress());
+        renterGoodsDetailDto.setCarShowLon(carAddressOfTransVO==null || carAddressOfTransVO.getVirtualAddressLon()==null ? "" : String.valueOf(carAddressOfTransVO.getVirtualAddressLon()));
+        renterGoodsDetailDto.setCarShowLat(carAddressOfTransVO==null || carAddressOfTransVO.getVirtualAddressLat()==null ? "" : String.valueOf(carAddressOfTransVO.getVirtualAddressLat()));
+        renterGoodsDetailDto.setCarRealAddr(carAddressOfTransVO==null ? "" : carAddressOfTransVO.getCarRealAddress());
+        renterGoodsDetailDto.setCarRealLon(carAddressOfTransVO==null || carAddressOfTransVO.getRealAddressLon()==null ? "" : String.valueOf(carAddressOfTransVO.getRealAddressLon()));
+        renterGoodsDetailDto.setCarRealLat(carAddressOfTransVO==null || carAddressOfTransVO.getRealAddressLat()==null ? "" : String.valueOf(carAddressOfTransVO.getRealAddressLat()));
+        renterGoodsDetailDto.setOwnerMemNo(carAddressOfTransVO==null ? "" : String.valueOf(carBaseVO.getOwnerNo()));
+        renterGoodsDetailDto.setLabelIds(carTagVO == null ? new ArrayList<>():carTagVO.getLabelIds());
         renterGoodsDetailDto.setEngineSource(carBaseVO.getEngineSource());
         renterGoodsDetailDto.setFrameNo(carBaseVO.getFrameNo());
         renterGoodsDetailDto.setEngineNum(carBaseVO.getEngineNum());
-        renterGoodsDetailDto.setCarTag(carTagVO == null?"":String.join(",",carTagVO.getLabelIds()));
+        renterGoodsDetailDto.setCarTag(carTagVO == null ? "" : String.join(",",carTagVO.getLabelIds()));
         renterGoodsDetailDto.setType(carBaseVO.getType());
-        renterGoodsDetailDto.setBrand(carBaseVO.getBrand()==null?null:String.valueOf(carBaseVO.getBrand()));
+        renterGoodsDetailDto.setBrand(carBaseVO.getBrand()==null ? null:String.valueOf(carBaseVO.getBrand()));
         renterGoodsDetailDto.setLicenseDay(LocalDateTimeUtils.parseStringToLocalDate(carBaseVO.getLicenseDay()));
         renterGoodsDetailDto.setCarInmsrp(data.getCarModelParam().getInmsrp());
-        renterGoodsDetailDto.setStopCostRate(data.getStopCostRate()==null?0D:Double.valueOf(data.getStopCostRate()));
-        renterGoodsDetailDto.setServiceRate(data.getServerRate()==null?0D:Double.valueOf(data.getServerRate()));
+        renterGoodsDetailDto.setStopCostRate(data.getStopCostRate()==null ? 0D:Double.valueOf(data.getStopCostRate()));
+        renterGoodsDetailDto.setServiceRate(data.getServerRate()==null ? 0D:Double.valueOf(data.getServerRate()));
+        renterGoodsDetailDto.setCarGuideDayPrice(carBaseVO.getGuideDayPrice());
+        renterGoodsDetailDto.setOilTotalCalibration(carBaseVO.getOilTotalCalibration());
+        String serialNumbers = Optional.ofNullable(carGpsVOS)
+                .orElseGet(ArrayList::new)
+                .stream()
+                .map(x -> x.getSerialNumber())
+                .collect(Collectors.joining(","));
+        renterGoodsDetailDto.setGpsSerialNumber(serialNumbers);
 
         List<RenterGoodsPriceDetailDTO> list = new ArrayList<>();
         List<CarPriceOfDayVO> daysPrice = data.getDaysPrice();
@@ -156,8 +170,8 @@ public class GoodsService {
         }
         daysPrice.stream().forEach(x->{
             RenterGoodsPriceDetailDTO dto = new RenterGoodsPriceDetailDTO();
-            dto.setCarDay(LocalDateTimeUtils.parseStringToLocalDate(x.getDateStr()));
-            dto.setCarUnitPrice(dto.getCarUnitPrice());
+            dto.setCarDay(LocalDateTimeUtils.parseStringToLocalDate(x.getDateStr(), GlobalConstant.FORMAT_DATE_STR));
+            dto.setCarUnitPrice(x.getPrice());
             list.add(dto);
         });
         renterGoodsDetailDto.setRenterGoodsPriceDetailDTOList(list);
@@ -167,6 +181,15 @@ public class GoodsService {
     public OwnerGoodsDetailDTO getOwnerGoodsDetail(RenterGoodsDetailDTO renterGoodsDetailDto) throws CarDetailByFeignException, RenterMemberFailException {
         OwnerGoodsDetailDTO ownerGoodsDetailDto = new OwnerGoodsDetailDTO();
         BeanUtils.copyProperties(renterGoodsDetailDto, ownerGoodsDetailDto);
+        List<OwnerGoodsPriceDetailDTO> ownerGoodsPriceList = renterGoodsDetailDto.getRenterGoodsPriceDetailDTOList()
+                .stream()
+                .map(x -> {
+                    OwnerGoodsPriceDetailDTO ownerGoodsPriceDetailDTO = new OwnerGoodsPriceDetailDTO();
+                    BeanUtils.copyProperties(x, ownerGoodsPriceDetailDTO);
+                    return ownerGoodsPriceDetailDTO;
+                })
+                .collect(Collectors.toList());
+        ownerGoodsDetailDto.setOwnerGoodsPriceDetailDTOList(ownerGoodsPriceList);
         return ownerGoodsDetailDto;
     }
     //获取车辆封面图片路径

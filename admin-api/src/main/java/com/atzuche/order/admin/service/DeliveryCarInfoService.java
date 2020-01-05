@@ -20,13 +20,14 @@ public class DeliveryCarInfoService {
     DeliveryCarService deliveryCarService;
     @Autowired
     RenterOrderDeliveryService renterOrderDeliveryService;
+
     /**
      * 获取配送相关信息
      * @param deliveryCarDTO
      * @return
      */
     public DeliveryCarRepVO findDeliveryListByOrderNo(DeliveryCarRepVO deliveryCarDTO) {
-        List<RenterOrderDeliveryEntity> renterOrderDeliveryEntityList = renterOrderDeliveryService.listRenterOrderDeliveryByRenterOrderNo(deliveryCarDTO.getRenterOrderNo());
+        List<RenterOrderDeliveryEntity> renterOrderDeliveryEntityList = renterOrderDeliveryService.listRenterOrderDeliveryByRenterOrderNo(deliveryCarDTO.getOrderNo());
         return null;
     }
 }

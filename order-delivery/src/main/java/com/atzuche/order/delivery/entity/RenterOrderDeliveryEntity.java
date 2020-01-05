@@ -133,4 +133,6 @@ public class RenterOrderDeliveryEntity implements Serializable {
 	 */
 	private Integer isDelete;
 
+	private Integer aheadOrDelayTime;
+
 }

@@ -36,6 +36,7 @@ import com.atzuche.order.parentorder.dto.OrderSourceStatDTO;
 import com.atzuche.order.parentorder.dto.OrderStatusDTO;
 import com.atzuche.order.parentorder.dto.ParentOrderDTO;
 import com.atzuche.order.parentorder.service.ParentOrderService;
+import com.atzuche.order.rentercommodity.service.RenterCommodityService;
 import com.atzuche.order.rentercommodity.service.RenterGoodsService;
 import com.atzuche.order.rentercost.entity.RenterOrderCostDetailEntity;
 import com.atzuche.order.rentercost.entity.dto.OrderCouponDTO;
@@ -48,6 +49,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cglib.beans.BeanCopier;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
@@ -91,6 +93,8 @@ public class SubmitOrderService {
     private CouponAndCoinHandleService couponAndCoinHandleService;
     @Autowired
     private OrderFlowService orderFlowService;
+    @Autowired
+    private RenterCommodityService renterCommodityService;
 
 
     /**
@@ -99,6 +103,7 @@ public class SubmitOrderService {
      * @param orderReqVO 下单请求信息
      * @return OrderResVO 下单返回结果
      */
+    @Transactional
     public OrderResVO submitOrder(OrderReqVO orderReqVO) {
         //1.请求参数处理
         OrderReqContext reqContext = new OrderReqContext();
@@ -110,6 +115,10 @@ public class SubmitOrderService {
         //租客商品明细
         RenterGoodsDetailDTO renterGoodsDetailDTO = goodsService.getRenterGoodsDetail(buildCarDetailReqVO(orderReqVO));
         reqContext.setRenterGoodsDetailDto(renterGoodsDetailDTO);
+
+        //一天一价分组
+        renterGoodsDetailDTO = renterCommodityService.setPriceAndGroup(renterGoodsDetailDTO);
+
         //车主商品明细
         OwnerGoodsDetailDTO ownerGoodsDetailDTO = goodsService.getOwnerGoodsDetail(renterGoodsDetailDTO);
         reqContext.setOwnerGoodsDetailDto(ownerGoodsDetailDTO);
@@ -177,13 +186,17 @@ public class SubmitOrderService {
         ownerGoodsDetailDTO.setMemNo(renterGoodsDetailDTO.getOwnerMemNo());
         ownerGoodsService.save(ownerGoodsDetailDTO);
         //5.5.车主会员
-        ownerMemberDTO.setOwnerOrderNo(orderNo);
+        ownerMemberDTO.setOrderNo(orderNo);
         ownerMemberDTO.setOwnerOrderNo(ownerOrderNo);
         ownerMemberDTO.setMemNo(renterGoodsDetailDTO.getOwnerMemNo());
+
         ownerMemberService.save(ownerMemberDTO);
 
         //配送订单处理..............
-        deliveryCarService.addRenYunFlowOrderInfo(reqContext);
+        deliveryCarService.addFlowOrderInfo(null == carRentTimeRangeResVO ? null :
+                        carRentTimeRangeResVO.getGetMinutes(),null == carRentTimeRangeResVO ? null :
+                        carRentTimeRangeResVO.getReturnMinutes(),
+                reqContext);
 
         //6.主订单相关信息处理
         ParentOrderDTO parentOrderDTO = new ParentOrderDTO();
@@ -202,6 +215,7 @@ public class SubmitOrderService {
             orderStatusDTO.setStatus(OrderStatusEnum.TO_PAY.getStatus());
         }
         parentOrderDTO.setOrderStatusDTO(orderStatusDTO);
+
         parentOrderService.saveParentOrderInfo(parentOrderDTO);
 
         //6.4 order_flow
@@ -244,7 +258,8 @@ public class SubmitOrderService {
         carDetailReqVO.setCarNo(orderReqVO.getCarNo());
         carDetailReqVO.setRentTime(orderReqVO.getRentTime());
         carDetailReqVO.setRevertTime(orderReqVO.getRevertTime());
-        carDetailReqVO.setUseSpecialPrice(false);
+        carDetailReqVO.setUseSpecialPrice(StringUtils.equals("0",
+                orderReqVO.getUseSpecialPrice()));
         return carDetailReqVO;
     }
 
@@ -277,7 +292,8 @@ public class SubmitOrderService {
         orderDTO.setRiskAuditId(riskAuditId);
         orderDTO.setLimitAmt(StringUtils.isBlank(orderReqVO.getReductiAmt()) ? 0 : Integer.valueOf(orderReqVO.getReductiAmt()));
         orderDTO.setBasePath(CommonUtils.createTransBasePath(orderNo));
-
+        orderDTO.setOrderNo(orderNo);
+        orderDTO.setMemNoRenter(orderReqVO.getMemNo());
         LOGGER.info("Build order dto,result is ,orderDTO:[{}]", JSON.toJSONString(orderDTO));
         return orderDTO;
     }
@@ -350,6 +366,7 @@ public class SubmitOrderService {
         renterOrderReqVO.setLicenseDay(goodsDetail.getLicenseDay());
         renterOrderReqVO.setLabelIds(goodsDetail.getLabelIds());
         renterOrderReqVO.setRenterGoodsPriceDetailDTOList(goodsDetail.getRenterGoodsPriceDetailDTOList());
+        renterOrderReqVO.setPlateNum(goodsDetail.getCarPlateNum());
 
 
         RenterMemberDTO renterMember = reqContext.getRenterMemberDto();
@@ -503,6 +520,7 @@ public class SubmitOrderService {
         ownerCouponBindReqVO.setRenterName(reqContext.getRenterMemberDto().getRealName());
         ownerCouponBindReqVO.setRenterSex(null == reqContext.getRenterMemberDto().getGender() ? "" :
                 reqContext.getRenterMemberDto().getGender().toString());
+        ownerCouponBindReqVO.setOrderNo(orderNo);
         return ownerCouponBindReqVO;
     }
 

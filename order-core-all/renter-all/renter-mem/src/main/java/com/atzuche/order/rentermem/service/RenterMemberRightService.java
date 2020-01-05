@@ -2,6 +2,7 @@ package com.atzuche.order.rentermem.service;
 
 import com.atzuche.order.commons.GlobalConstant;
 import com.atzuche.order.commons.entity.dto.RenterMemberRightDTO;
+import com.atzuche.order.commons.enums.MemberRightValueEnum;
 import com.atzuche.order.commons.enums.RenterMemRightEnum;
 import com.atzuche.order.rentermem.entity.dto.MemRightCarDepositAmtReqDTO;
 import com.atzuche.order.rentermem.entity.dto.MemRightCarDepositAmtRespDTO;
@@ -24,10 +25,6 @@ import java.util.stream.Collectors;
 @Service
 public class RenterMemberRightService{
 
-    private static final int GUIDE_PRICE = 1500000;
-
-    private static final int REDUCTION_RATE_MAX = 70;
-
     /**
      *
      * @param renterMemberRightDTOList 权益集合
@@ -49,7 +46,7 @@ public class RenterMemberRightService{
                 .limit(1)
                 .collect(Collectors.toList());
         //内部员工
-        if(staff!=null && staff.size()==1){
+        if(staff!=null && staff.size()==1 && MemberRightValueEnum.OWN.getCode().equals(staff.get(0).getRightValue())){
             memRightCarDepositAmtRespDTO.setReductionDepositAmt(originalDepositAmt - GlobalConstant.MEMBER_RIGHT_STAFF_CAR_DEPOSIT);
             memRightCarDepositAmtRespDTO.setReductionRate(0D);
            return memRightCarDepositAmtRespDTO;
@@ -71,9 +68,9 @@ public class RenterMemberRightService{
                 rightValueTotal.addAndGet(Integer.valueOf(x.getRightValue() == null ? "0" : x.getRightValue()));
             });
             Integer guidPrice = memRightCarDepositAmtReqDTO.getGuidPrice();
-            if(guidPrice != null && guidPrice > GUIDE_PRICE){
+            if(guidPrice != null && guidPrice > GlobalConstant.GUIDE_PRICE){
                 reductionRate = 0;
-            }else if(rightValueTotal.get() >= REDUCTION_RATE_MAX){
+            }else if(rightValueTotal.get() >= GlobalConstant.REDUCTION_RATE_MAX){
                 reductionRate = 0.7;
             }else{
                 reductionRate = rightValueTotal.get()/100;
@@ -101,7 +98,7 @@ public class RenterMemberRightService{
                 .filter(x -> RenterMemRightEnum.STAFF.getRightCode().equals(x.getRightCode()))
                 .limit(1)
                 .collect(Collectors.toList());
-        if(staff!=null && staff.size()==1){
+        if(staff!=null && staff.size()==1 && MemberRightValueEnum.OWN.getCode().equals(staff.get(0).getRightValue())){
             return GlobalConstant.MEMBER_RIGHT_STAFF_WZ_DEPOSIT;
         }
         return wzDepositAmt;

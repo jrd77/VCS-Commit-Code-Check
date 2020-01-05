@@ -1,5 +1,8 @@
 package com.atzuche.order.coreapi.entity.dto;
 
+import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
+import com.atzuche.order.commons.entity.dto.RenterMemberDTO;
+import com.atzuche.order.parentorder.entity.OrderEntity;
 import com.atzuche.order.rentercost.entity.dto.RenterOrderSubsidyDetailDTO;
 import com.atzuche.order.renterorder.entity.dto.OrderChangeItemDTO;
 
@@ -107,9 +110,21 @@ public class ModifyOrderDTO {
     /**
      * 城市code
      */
-    private Integer cityCode;
+    private String cityCode;
     /**
 	 * 租客费用补贴
 	 */
 	private List<RenterOrderSubsidyDetailDTO> renterSubsidyList;
+	/**
+	 * 租客商品信息
+	 */
+	private RenterGoodsDetailDTO renterGoodsDetailDTO;
+	/**
+	 * 租客会员信息
+	 */
+	private RenterMemberDTO renterMemberDTO;
+	/**
+	 * 主订单信息
+	 */
+	private OrderEntity orderEntity;
 }

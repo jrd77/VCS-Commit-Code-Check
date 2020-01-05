@@ -4,6 +4,8 @@ import com.atzuche.order.delivery.entity.RenterHandoverCarInfoEntity;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.List;
+
 
 /**
  * 租客交车车信息表
@@ -29,7 +31,7 @@ public interface RenterHandoverCarInfoMapper{
      * @param renterOrderNo
      * @return
      */
-    RenterHandoverCarInfoEntity selectByRenterOrderNo(@Param("renterOrderNo") String renterOrderNo);
+    List<RenterHandoverCarInfoEntity> selectByRenterOrderNo(@Param("renterOrderNo") String renterOrderNo);
 
     /**
      * 根據消息ID查詢是否存在
@@ -38,4 +40,19 @@ public interface RenterHandoverCarInfoMapper{
      */
     String queryObjectByMsgId(@Param("msgId") String msgId);
 
+    /**
+     * 根据子订单号和类型查询
+     * @param renterOrderNo
+     * @param type
+     * @return
+     */
+    RenterHandoverCarInfoEntity selectObjectByRenterOrderNo(@Param("renterOrderNo") String renterOrderNo,@Param("type") Integer type);
+
+    /**
+     * 根据订单号和类型查询
+     * @param orderNo
+     * @param type
+     * @return
+     */
+    RenterHandoverCarInfoEntity selectObjectByOrderNo(@Param("orderNo") String orderNo,@Param("type") Integer type);
 }

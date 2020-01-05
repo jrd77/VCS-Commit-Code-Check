@@ -13,7 +13,8 @@ public class DeliveryCarRepVO {
 
     @NotBlank(message="订单编号不能为空")
     @Pattern(regexp="^\\d*$",message="订单编号必须为数字")
-    @AutoDocProperty(value="租客子订单编号,必填，",required=true)
-    private String renterOrderNo;
+    @AutoDocProperty(value="订单编号,必填，",required=true)
+    private String orderNo;
+
 
 }
