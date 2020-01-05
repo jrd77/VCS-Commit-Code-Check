@@ -1,17 +1,17 @@
-package com.atzuche.order.admin.vo.request;
+package com.atzuche.order.admin.dto;
 
 import com.autoyol.doc.annotation.AutoDocProperty;
 
 /**
  * Created by qincai.lin on 2019/12/30.
  */
-public class OrderInsuranceAdditionRequestVO {
+public class OrderInsuranceAdditionRequestDTO {
     @AutoDocProperty(value = "订单号")
     private String orderNo;
 
     @AutoDocProperty(value = "保险公司")
     private String insuranceCompany;
-
+    
     @AutoDocProperty(value = "保单号")
     private String insuranceNo;
 
@@ -24,6 +24,11 @@ public class OrderInsuranceAdditionRequestVO {
     @AutoDocProperty(value = "保单保费")
     private String insuranceFee;
 
+    @AutoDocProperty(value = "保险生成时间")
+    private String insuranceDate;
+
+    @AutoDocProperty(value="操作人")
+    private String operator;
 
     public String getOrderNo() {
         return orderNo;
@@ -72,6 +77,15 @@ public class OrderInsuranceAdditionRequestVO {
     public void setInsuranceFee(String insuranceFee) {
         this.insuranceFee = insuranceFee;
     }
+
+    public String getInsuranceDate() {
+        return insuranceDate;
+    }
+
+    public void setInsuranceDate(String insuranceDate) {
+        this.insuranceDate = insuranceDate;
+    }
+
 
 
 }

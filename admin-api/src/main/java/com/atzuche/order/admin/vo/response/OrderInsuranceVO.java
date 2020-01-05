@@ -13,23 +13,22 @@ public class OrderInsuranceVO {
     private String insuranceCompany;
 
     @AutoDocProperty(value = "保单号")
-    private String insuranceNumber;
+    private String insuranceNo;
 
     @AutoDocProperty(value = "保险开始时间")
-    private String startTime;
+    private String insuranceStart;
 
     @AutoDocProperty(value = "保险结束时间")
-    private String endTime;
+    private String insuranceEnd;
 
     @AutoDocProperty(value = "保单保费")
-    private String insuranceCost;
+    private String insuranceFee;
 
     @AutoDocProperty(value = "保险生成时间")
-    private String createTime;
-
+    private String insuranceDate;
 
     @AutoDocProperty(value = "录入类型")
-    private String inputType;
+    private String type;
 
     public String getOrderNo() {
         return orderNo;
@@ -43,56 +42,56 @@ public class OrderInsuranceVO {
         return insuranceCompany;
     }
 
+    public String getInsuranceNo() {
+        return insuranceNo;
+    }
+
+    public void setInsuranceNo(String insuranceNo) {
+        this.insuranceNo = insuranceNo;
+    }
+
+    public String getInsuranceStart() {
+        return insuranceStart;
+    }
+
+    public void setInsuranceStart(String insuranceStart) {
+        this.insuranceStart = insuranceStart;
+    }
+
+    public String getInsuranceDate() {
+        return insuranceDate;
+    }
+
+    public void setInsuranceDate(String insuranceDate) {
+        this.insuranceDate = insuranceDate;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public String getInsuranceFee() {
+        return insuranceFee;
+    }
+
+    public void setInsuranceFee(String insuranceFee) {
+        this.insuranceFee = insuranceFee;
+    }
+
     public void setInsuranceCompany(String insuranceCompany) {
         this.insuranceCompany = insuranceCompany;
     }
 
-    public String getInsuranceNumber() {
-        return insuranceNumber;
+    public String getInsuranceEnd() {
+        return insuranceEnd;
     }
 
-    public void setInsuranceNumber(String insuranceNumber) {
-        this.insuranceNumber = insuranceNumber;
-    }
-
-    public String getStartTime() {
-        return startTime;
-    }
-
-    public void setStartTime(String startTime) {
-        this.startTime = startTime;
-    }
-
-    public String getEndTime() {
-        return endTime;
-    }
-
-    public void setEndTime(String endTime) {
-        this.endTime = endTime;
-    }
-
-    public String getInsuranceCost() {
-        return insuranceCost;
-    }
-
-    public void setInsuranceCost(String insuranceCost) {
-        this.insuranceCost = insuranceCost;
-    }
-
-    public String getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(String createTime) {
-        this.createTime = createTime;
-    }
-
-    public String getInputType() {
-        return inputType;
-    }
-
-    public void setInputType(String inputType) {
-        this.inputType = inputType;
+    public void setInsuranceEnd(String insuranceEnd) {
+        this.insuranceEnd = insuranceEnd;
     }
 
 
