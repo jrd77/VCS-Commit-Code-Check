@@ -6,17 +6,12 @@ import com.atzuche.order.parentorder.service.OrderService;
 import com.atzuche.order.renterwz.entity.WzQueryDayConfEntity;
 import com.atzuche.order.renterwz.service.RenterOrderWzDetailService;
 import com.atzuche.order.renterwz.service.WzQueryDayConfService;
-import com.google.gson.Gson;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.Resource;
 import java.util.HashMap;
@@ -33,8 +28,7 @@ import java.util.Map;
 @Service
 public class JPushService {
 
-	public static final String SMS_TYPE_RENTER = "1";
-	public static final String SMS_TYPE_OWNER = "2";
+	private static final String SMS_TYPE_RENTER = "1";
 
 	private Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -55,7 +49,7 @@ public class JPushService {
     @Value("${com.autoyol.sms.illgalDetailAppUrl}")
     private String illgalDetailAppUrl;
 
-	@Autowired
+	@Resource
 	private ShortUrlService shortUrlService;
 
 	@Resource
