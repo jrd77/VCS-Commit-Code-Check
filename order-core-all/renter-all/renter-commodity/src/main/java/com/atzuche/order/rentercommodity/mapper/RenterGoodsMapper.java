@@ -28,4 +28,6 @@ public interface RenterGoodsMapper{
 
 
     List<String> queryOrderNosByOrderNosAndCarNo(@Param("carNo") String carNo,@Param("orderNos") List<String> orderNos);
+
+    String queryCarNumByOrderNo(@Param("orderNo") String orderNo);
 }
