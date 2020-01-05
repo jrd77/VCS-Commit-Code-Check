@@ -27,4 +27,5 @@ public interface RenterGoodsMapper{
     RenterGoodsEntity selectByRenterOrderNo(@Param("renterOrderNo")String renterOrderNo);
 
 
+    List<String> queryOrderNosByOrderNosAndCarNo(@Param("carNo") String carNo,@Param("orderNos") List<String> orderNos);
 }

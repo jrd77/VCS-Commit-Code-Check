@@ -58,7 +58,7 @@ public class WzFeedbackIllegalListener extends RenYunListener{
             resMap.put("resMsg","mq处理失败：{}"+e.getMessage());
         }finally {
             t.complete();
-            transIllegalSendAliYunMq.renyunReceiveQueueResultFeedbackQueue(resMap);
+            transIllegalSendAliYunMq.renYunReceiveQueueResultFeedbackQueue(resMap);
         }
         logger.info("WzFeedbackIllegalListener process end " );
     }

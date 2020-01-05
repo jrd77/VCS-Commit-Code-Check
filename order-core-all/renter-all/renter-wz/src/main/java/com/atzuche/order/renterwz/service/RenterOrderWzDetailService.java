@@ -48,4 +48,17 @@ public class RenterOrderWzDetailService {
     public List<RenterOrderWzDetailEntity> findSendSmsIllegalRecord() {
         return renterOrderWzDetailMapper.findSendSmsIllegalRecord();
     }
+
+    public void updateSmsStatus(String orderNo) {
+        renterOrderWzDetailMapper.updateSmsStatus(orderNo);
+    }
+
+    public void updateOwnerSmsStatus(String orderNo) {
+        renterOrderWzDetailMapper.updateOwnerSmsStatus(orderNo);
+    }
+
+    public int queryIllegalCountByCarNoAndOrders(List<String> orders, String carNo) {
+        Integer count = renterOrderWzDetailMapper.queryIllegalCountByCarNoAndOrders(orders,carNo);
+        return count == null ? 0 : count;
+    }
 }

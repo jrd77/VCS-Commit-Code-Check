@@ -103,4 +103,23 @@ public interface RenterOrderWzDetailMapper{
 	 */
     List<RenterOrderWzDetailEntity> findSendSmsIllegalRecord();
 
+	/**
+	 * 将短信设为已发送(短信)
+	 * @param orderNo 订单号
+	 */
+	void updateSmsStatus(String orderNo);
+
+	/**
+	 * 将短信设为已发送(车主)
+	 * @param orderNo 订单号
+	 */
+	void updateOwnerSmsStatus(String orderNo);
+
+	/**
+	 * 查询车辆的违章数
+	 * @param orders 订单列表
+	 * @param carNo 车牌号
+	 * @return 违章数量
+	 */
+    Integer queryIllegalCountByCarNoAndOrders(@Param("orders") List<String> orders,@Param("carNo") String carNo);
 }

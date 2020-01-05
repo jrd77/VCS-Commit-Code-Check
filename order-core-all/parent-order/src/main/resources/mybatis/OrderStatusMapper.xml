@@ -226,5 +226,9 @@
 		    </set>
 		where id = #{id}
 	</update>
+
+    <select id="queryOrderNoByStartTimeAndEndTime" resultType="java.lang.String">
+        select order_no from order_status where status = 8 and create_time BETWEEN #{startTime} AND #{endTime} and is_delete = 0
+    </select>
   	
 </mapper>

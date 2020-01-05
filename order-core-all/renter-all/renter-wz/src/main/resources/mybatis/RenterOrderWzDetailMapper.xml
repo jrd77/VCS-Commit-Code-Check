@@ -369,4 +369,23 @@
 		from renter_order_wz_detail where order_flag = 1 and is_sms=0 and is_valid=1
 	</select>
 
+	<select id="queryIllegalCountByCarNoAndOrders" resultType="java.lang.Integer">
+		select count (*)
+		from renter_order_wz_detail
+		where car_plate_num = #{carNo}
+		and is_valid=1
+		and illegal_deduct &gt; 0
+		and order_no in
+		<foreach collection="orderNos" item="orderNo" separator="," close=")" open="(">
+			#{orderNo}
+		</foreach>
+	</select>
+
+	<update id="updateSmsStatus" parameterType="java.lang.String">
+		UPDATE renter_order_wz_detail SET is_sms = 1 WHERE order_no = #{orderNo}
+	</update>
+
+	<update id="updateOwnerSmsStatus" parameterType="java.lang.String">
+		UPDATE renter_order_wz_detail SET owner_is_sms = 1 WHERE order_no = #{orderNo}
+	</update>
 </mapper>

@@ -73,4 +73,8 @@ public class OrderSourceStatService {
         return record;
     }
 
+    public boolean isCtripOrderByOrderNo(String orderNo) {
+        Integer count = orderSourceStatMapper.queryCtripOrderByOrderNo(orderNo);
+        return (count == null || count.equals(0)) ? false : true;
+    }
 }

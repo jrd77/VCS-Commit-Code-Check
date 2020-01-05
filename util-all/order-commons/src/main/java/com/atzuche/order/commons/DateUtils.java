@@ -10,6 +10,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAdjusters;
 import java.util.Date;
 
 public class DateUtils {
@@ -17,6 +18,7 @@ public class DateUtils {
     private static final Logger logger = LoggerFactory.getLogger(DateUtils.class);
 
     public static final String DATE_DEFAUTE = "yyyyMMddHHmmss";
+    public static final String DATE_DEFAUTE1 = "yyyy-MM-dd HH:mm:ss";
 
     public static long  START_TIME = 20191001000000L;
     public static long  END_TIME = 20191007235959L;
@@ -134,9 +136,14 @@ public class DateUtils {
         return null;
     }
 
-    public static Date formateLocalDateTime(LocalDateTime time){
+    public static Date localDateTimeToDate(LocalDateTime time){
         ZoneId zone = ZoneId.systemDefault();
         Instant instant = time.atZone(zone).toInstant();
+        return Date.from(instant);
+    }
+    private static Date localDateToDate(LocalDate localDate) {
+        ZoneId zone = ZoneId.systemDefault();
+        Instant instant = localDate.atStartOfDay().atZone(zone).toInstant();
         return Date.from(instant);
     }
 
@@ -157,4 +164,12 @@ public class DateUtils {
         }
         return true;
     }
+
+    public static Date firstDayOfYear(){
+        LocalDate now = LocalDate.now();
+        LocalDate firstYear = now.with(TemporalAdjusters.firstDayOfYear());
+        return localDateToDate(firstYear);
+    }
+
+
 }

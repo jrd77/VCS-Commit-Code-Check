@@ -115,6 +115,23 @@ public class AliyunMnsService  {
         }
     }
 
+    public void asyncSend̨MessageToQueue(String messageBody, String queueName,boolean compress, AsyncCallback<Message> callback) {
+        if (inited) {
+            if (client != null && !client.isOpen()) {
+                openMnsClient();
+            }
+            Message message = createMessage(messageBody,compress);
+            CloudQueue queue = client.getQueueRef(queueName);
+            try {
+                queue.asyncPutMessage(message, callback);
+            } catch (Exception e) {
+                logger.error("async send message to queueKey failure: queueName is {},messageBody is {}", queueName, messageBody, e);
+            }
+        } else {
+            throw new IllegalStateException("mns service didn't start,please check");
+        }
+    }
+
     /**
      * create mns's message object
      */

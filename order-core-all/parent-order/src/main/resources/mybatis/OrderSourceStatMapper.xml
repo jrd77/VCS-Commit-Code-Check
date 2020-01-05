@@ -419,5 +419,9 @@
 		</set>
 		where id = #{id}
 	</update>
+
+    <select id="queryCtripOrderByOrderNo" parameterType="java.lang.String" resultType="java.lang.Integer">
+        select count(*) from order_source_stat where order_no = #{orderNo} and category = 2 and business_parent_type = 1 and business_child_type = 1
+    </select>
   	
 </mapper>

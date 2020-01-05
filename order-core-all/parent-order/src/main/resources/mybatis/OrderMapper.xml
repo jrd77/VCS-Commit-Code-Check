@@ -233,8 +233,6 @@
         where id = #{id}
     </update>
 
-
-
     <select id="selectByOrderNo" resultMap="BaseResultMap">
         select
         <include refid="Base_Column_List" />
@@ -244,6 +242,13 @@
         order_no = #{value}
         and is_delete = 0
         limit 1
+    </select>
+
+    <select id="queryOrderNoByOrderNos" resultType="com.atzuche.order.parentorder.dto.SuccessOrderDTO">
+        select order_no orderNo,mem_no_renter renterNo from `order` where is_delete = 0 and order_no in
+        <foreach collection="orderNos" open="(" close=")" separator="," item="orderNo">
+            #{orderNo}
+        </foreach>
     </select>
   	
 </mapper>

@@ -178,4 +178,18 @@
         where order_no = #{orderNo} and is_delete = 0 order by id desc limit 1
     </select>
 
+    <select id="queryMemNoAndPhoneByOrderList" resultMap="BaseResultMap">
+        SELECT
+        mem_no,
+        phone
+        FROM
+        owner_member
+        <where>
+            order_no in
+            <foreach collection="orderNos" open="(" separator="," close=")" item="orderNo">
+                #{orderNo}
+            </foreach>
+        </where>
+    </select>
+
 </mapper>

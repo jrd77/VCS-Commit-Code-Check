@@ -124,7 +124,7 @@ public class RenterOrderWzService {
                 result = SUCCESS_STATUS;
                 logger.info("记录文件到数据成功。。orderNo : {},serialNumber:{},userType:{}",orderNo,serialNumber,userType);
                 //保存成功，发送上传图片给仁云
-                transIllegalSendAliYunMq.transIllegalPhotoToRenyun(photo);
+                transIllegalSendAliYunMq.transIllegalPhotoToRenYun(photo);
             }else {
                 //保证图片存储于数据库一致
                 ossService.deleteOSSObject(key);

@@ -74,4 +74,8 @@ public class OwnerMemberService{
     public String getOwnerNoByOrderNo(String orderNo) {
         return ownerMemberMapper.getOwnerNoByOrderNo(orderNo);
     }
+
+    public List<OwnerMemberEntity> queryMemNoAndPhoneByOrderList(List<String> orderNos) {
+        return ownerMemberMapper.queryMemNoAndPhoneByOrderList(orderNos);
+    }
 }

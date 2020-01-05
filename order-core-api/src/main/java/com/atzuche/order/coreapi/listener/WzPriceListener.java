@@ -58,7 +58,7 @@ public class WzPriceListener extends RenYunListener{
             resMap.put("resMsg","mq处理失败：{}"+e.getMessage());
         }finally {
             t.complete();
-            transIllegalSendAliYunMq.renyunReceiveQueueResultFeedbackQueue(resMap);
+            transIllegalSendAliYunMq.renYunReceiveQueueResultFeedbackQueue(resMap);
         }
         logger.info("WzPriceListener process end " );
     }
