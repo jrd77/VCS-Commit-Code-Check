@@ -28,7 +28,7 @@ public class RenterOrderWzDetailService {
         renterOrderWzDetailMapper.addIllegalDetailFromRenyun(illegal);
     }
 
-    int updateFeeByWzCode(RenterOrderWzDetailEntity illegal){
+    public int updateFeeByWzCode(RenterOrderWzDetailEntity illegal){
         return renterOrderWzDetailMapper.updateFeeByWzCode(illegal);
     }
 
