@@ -19,7 +19,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.Resource;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -58,6 +60,9 @@ public class JPushService {
 
 	@Resource
 	private RenterOrderWzDetailService renterOrderWzDetailService;
+
+	@Resource
+	private SendPlatformSmsService sendPlatformSmsService;
 	
 	private String contentTxt = "您的订单（订单号：#{orderNo}）查出有新的违章，立即点击查看：#{url}。";
 	
@@ -76,12 +81,12 @@ public class JPushService {
 	 * @param isCtripOrder 是否是携程订单
 	 */
 	public void updateIllegalMessage(String orderNo, String renterNo, String renterPhone, String type, boolean isCtripOrder) {
-		String smsText;
+		Map<String, Object> paramMap = new HashMap<>(4);
 		if (isCtripOrder && SMS_TYPE_RENTER.equals(type)) {
-			smsText = ctripContentTxt;
+			//paramMap.put("textCode", textCode);
 		} else {
 			if(SMS_TYPE_RENTER.equals(type)) {
-				smsText = contentTxt;
+				//paramMap.put("textCode", textCode);
 			}else {
 				String cityCode = "";
 				OrderEntity order = orderService.getOrderEntity(orderNo);
@@ -103,25 +108,27 @@ public class JPushService {
 						}
 					}
 				}
-				smsText = ownerContentTxt;
-				smsText = smsText.replace("#{dealDays}", dealDays+"");
+				//paramMap.put("textCode", textCode);
+				paramMap.put("dealDays",dealDays);
 			}
 		}
 		String url = appServerUrl + illgalUrl + "?type=1001&orderNo=" + orderNo;
-		smsText = smsText.replace("#{orderNo}", String.valueOf(orderNo));
-		smsText = smsText.replace("#{url}", shortUrlService.getShortUrlNew(url));
+		paramMap.put("orderNo",String.valueOf(orderNo));
+		paramMap.put("url",shortUrlService.getShortUrlNew(url));
 
 		String jPushText = jpushContentTxt;
 		jPushText = jPushText.replace("#{orderNo}", String.valueOf(orderNo));
 		logger.info("发送orderNo is {}违章短信成功", orderNo);
-		/*this.sendCodeContent(renterPhone, smsText, "违章短信", 3, 3);
-		this.sendCustomMsgByAlias(renterPhone, token, jPushText, orderNo + "", "63", appServerUrl+illgalDetailAppUrl);*/
+		//TODO
+		sendPlatformSmsService.sendNormalSms(new HashMap<>());
+		/*this.sendCustomMsgByAlias(renterPhone, token, jPushText, orderNo + "", "63", appServerUrl+illgalDetailAppUrl);*/
 		if (SMS_TYPE_RENTER.equals(type)) {
 			renterOrderWzDetailService.updateSmsStatus(orderNo);
 		} else {
 			renterOrderWzDetailService.updateOwnerSmsStatus(orderNo);
 		}
 	}
+
 
 	/**
 	 * 推送JPUSH违章信息事件
