@@ -1,6 +1,5 @@
 buildscript {
     repositories {
-        mavenLocal()
         maven{url "http://10.0.3.208:8081/nexus/content/groups/public/"}
         maven{url "http://maven.aliyun.com/nexus/content/groups/public/"}
         mavenCentral()
@@ -17,8 +16,6 @@ apply plugin: 'war'
 
 mainClassName = 'com.autoyol.doc.parser.autodoc.AutoDocParser'
 
-
-
 dependencies {
     compile project(":order-openapi")
     compile project(":config:config-client")
@@ -33,6 +30,9 @@ dependencies {
 	compile("com.autoyol.tools:prop-encrypt-spring-boot-starter:0.0.1-SNAPSHOT")
 	compile('mysql:mysql-connector-java')
     compile('com.ctrip.framework.apollo:apollo-client:0.11.0-SNAPSHOT')
+    compile("com.autoyol:search-order-info-api:3.2-SNAPSHOT")
+    compile('com.xuxueli:xxl-job-core:2.0.1-SNAPSHOT')
+    compile('com.autoyol.xxljob:xxljob-starter:2.0.1-SNAPSHOT')
 //	compile("com.autoyol:cat-starter:0.0.1-SNAPSHOT")
 //	compile('org.springframework.boot:spring-boot-starter-data-redis')
     testCompile 'org.springframework.boot:spring-boot-starter-test'
@@ -43,8 +43,9 @@ dependencies {
 
     compile('com.autoyol:memberDetailService-api:1.0.1-SNAPSHOT')
     compile('com.autoyol.unique:unique-no-feign:3.0-SNAPSHOT')
-    compile('com.autoyol.car:auto-car-service-api:2019123101-SNAPSHOT')
+    compile('com.autoyol.car:auto-car-service-api:2020010601-SNAPSHOT')
     compile('com.autoyol.coupon:coupon-api:2019121301-SNAPSHOT')
+    compile('com.autoyol:riskCheckService-api:1.0.0-SNAPSHOT')
 
 
     compile project(":config")
@@ -72,5 +73,10 @@ dependencies {
 	compile project(":util-all:fee-calculator")
     compile project(":util-all:order-commons")
     compile project(":order-delivery")
+    compile project(":order-flow")
 
+
+    compile("com.fasterxml.jackson.module:jackson-module-parameter-names")
+    compile("com.fasterxml.jackson.datatype:jackson-datatype-jdk8")
+    compile("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
 }

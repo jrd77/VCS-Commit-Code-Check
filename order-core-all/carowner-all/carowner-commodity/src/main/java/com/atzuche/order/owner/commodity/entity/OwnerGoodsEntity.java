@@ -1,15 +1,16 @@
 package com.atzuche.order.owner.commodity.entity;
 
+import lombok.Data;
+
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import lombok.Data;
 
 
 /**
  * 车主端商品概览表
  * 
  * @author ZhangBin
- * @date 2019-12-28 10:14:35
+ * @date 2020-01-04 14:44:30
  * @Description:
  */
 @Data
@@ -157,9 +158,21 @@ public class OwnerGoodsEntity implements Serializable {
 	 */
 	private String carRealLat;
 	/**
+	 * 油表总刻度
+	 */
+	private Integer oilTotalCalibration;
+	/**
+	 * GPS序号
+	 */
+	private String gpsSerialNumber;
+	/**
 	 * 选择的车辆地址序号
 	 */
 	private Integer carAddrIndex;
+	/**
+	 * 车辆日均指导价
+	 */
+	private Integer carGuideDayPrice;
 	/**
 	 * 停运费比例
 	 */

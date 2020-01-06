@@ -66,7 +66,7 @@ public class RenterOrderCostHandleService {
      */
     public RenterOrderCarDepositResVO handleCarDepositAmt(RenterOrderReqVO renterOrderReqVO) {
         DepositAmtDTO depositAmtDTO = new DepositAmtDTO();
-        depositAmtDTO.setSurplusPrice(renterOrderReqVO.getCarSurplusPrice());
+        depositAmtDTO.setSurplusPrice(renterOrderReqVO.getCarSurplusPrice()==null ? renterOrderReqVO.getGuidPrice():renterOrderReqVO.getCarSurplusPrice());
         depositAmtDTO.setCityCode(Integer.valueOf(renterOrderReqVO.getCityCode()));
         depositAmtDTO.setBrand(renterOrderReqVO.getBrandId());
         depositAmtDTO.setType(renterOrderReqVO.getTypeId());
@@ -77,7 +77,8 @@ public class RenterOrderCostHandleService {
 
         MemRightCarDepositAmtReqDTO memRightCarDepositAmtReqDTO = new MemRightCarDepositAmtReqDTO();
         memRightCarDepositAmtReqDTO.setGuidPrice(renterOrderReqVO.getGuidPrice());
-        memRightCarDepositAmtReqDTO.setOriginalDepositAmt(carDepositAmt.getCarDepositAmt());
+        memRightCarDepositAmtReqDTO.setOriginalDepositAmt(null == carDepositAmt.getCarDepositAmt() ? 0 :
+                Math.abs(carDepositAmt.getCarDepositAmt()));
         memRightCarDepositAmtReqDTO.setRenterMemberRightDTOList(renterOrderReqVO.getRenterMemberRightDTOList());
         LOGGER.info("车辆押金减免计算.param is,memRightCarDepositAmtReqDTO:[{}]", JSON.toJSONString(memRightCarDepositAmtReqDTO));
         MemRightCarDepositAmtRespDTO memRightCarDepositAmtRespDTO =
@@ -85,10 +86,11 @@ public class RenterOrderCostHandleService {
         LOGGER.info("车辆押金减免计算.result is,memRightCarDepositAmtRespDTO:[{}]", JSON.toJSONString(memRightCarDepositAmtRespDTO));
 
         RenterOrderCarDepositResVO renterOrderCarDepositResVO = new RenterOrderCarDepositResVO();
-        renterOrderCarDepositResVO.setYingfuDepositAmt(carDepositAmt.getCarDepositAmt());
-        renterOrderCarDepositResVO.setMemNo(renterOrderReqVO.getMemNo().toString());
+        renterOrderCarDepositResVO.setMemNo(renterOrderReqVO.getMemNo());
         renterOrderCarDepositResVO.setOrderNo(renterOrderReqVO.getOrderNo());
-        renterOrderCarDepositResVO.setReductionAmt(memRightCarDepositAmtRespDTO.getReductionDepositAmt());
+        renterOrderCarDepositResVO.setReductionAmt(null == memRightCarDepositAmtRespDTO.getReductionDepositAmt() ? 0
+                : Math.abs(memRightCarDepositAmtRespDTO.getReductionDepositAmt()));
+        renterOrderCarDepositResVO.setYingfuDepositAmt(-(memRightCarDepositAmtRespDTO.getOriginalDepositAmt() - renterOrderCarDepositResVO.getReductionAmt()));
         renterOrderCarDepositResVO.setFreeDepositType(FreeDepositTypeEnum.getFreeDepositTypeEnumByCode(Integer.valueOf(renterOrderReqVO.getFreeDoubleTypeId())));
 
         //车辆押金明细入库
@@ -109,7 +111,7 @@ public class RenterOrderCostHandleService {
 
 
     /**
-     * 违章押金计算已处理
+     * 违章押金处理
      *
      * @param costBaseDTO      基础数据
      * @param renterOrderReqVO 租客订单请求信息
@@ -124,11 +126,14 @@ public class RenterOrderCostHandleService {
                 renterMemberRightService.wzDepositAmt(renterOrderReqVO.getRenterMemberRightDTOList(),
                         illegalDepositAmt);
 
+        LOGGER.info("违章押金计算结果.result is, illegalDepositAmt:[{}],realIllegalDepositAmt:[{}]", illegalDepositAmt,
+                realIllegalDepositAmt);
         RenterOrderIllegalResVO renterOrderIllegalResVO = new RenterOrderIllegalResVO();
         renterOrderIllegalResVO.setOrderNo(renterOrderReqVO.getOrderNo());
         renterOrderIllegalResVO.setFreeDepositType(FreeDepositTypeEnum.getFreeDepositTypeEnumByCode(Integer.valueOf(renterOrderReqVO.getFreeDoubleTypeId())));
-        renterOrderIllegalResVO.setMemNo(renterOrderReqVO.getMemNo().toString());
-        renterOrderIllegalResVO.setYingfuDepositAmt(realIllegalDepositAmt);
+        renterOrderIllegalResVO.setMemNo(renterOrderReqVO.getMemNo());
+        renterOrderIllegalResVO.setYingfuDepositAmt(-Math.abs(realIllegalDepositAmt));
+        LOGGER.info("违章押金处理.result is, renterOrderIllegalResVO:[{}]", renterOrderIllegalResVO);
         return renterOrderIllegalResVO;
     }
 
@@ -140,9 +145,12 @@ public class RenterOrderCostHandleService {
      * @return boolean
      */
     public boolean handleGetCarFeeCoupon(DeductAndSubsidyContextDTO context,
-                                      MemAvailCouponRequestVO getCarFeeCouponReqVO) {
+                                         MemAvailCouponRequestVO getCarFeeCouponReqVO) {
+        LOGGER.info("送取服务券处理.param is, context:[{}],getCarFeeCouponReqVO:[{}]",
+                JSON.toJSONString(context), JSON.toJSONString(getCarFeeCouponReqVO));
         OrderCouponDTO getCarFeeCoupon =
                 renterOrderCalCostService.calGetAndReturnSrvCouponDeductInfo(getCarFeeCouponReqVO);
+        LOGGER.info("送取服务券处理-->优惠券信息.result is, getCarFeeCoupon:[{}]", JSON.toJSONString(getCarFeeCoupon));
         context.setSrvGetCost(getCarFeeCouponReqVO.getSrvGetCost());
         context.setSrvReturnCost(getCarFeeCouponReqVO.getSrvReturnCost());
         if (null != getCarFeeCoupon) {
@@ -159,7 +167,7 @@ public class RenterOrderCostHandleService {
             getCarFeeCouponSubsidyInfo.setOrderNo(context.getOrderNo());
             getCarFeeCouponSubsidyInfo.setRenterOrderNo(context.getRenterOrderNo());
             context.getOrderSubsidyDetailList().add(getCarFeeCouponSubsidyInfo);
-
+            LOGGER.info("送取服务券处理-->优惠券补贴信息.result is, getCarFeeCouponSubsidyInfo:[{}]", JSON.toJSONString(getCarFeeCouponSubsidyInfo));
             return true;
         }
 
@@ -175,9 +183,12 @@ public class RenterOrderCostHandleService {
      * @return boolean
      */
     public boolean handleOwnerCoupon(DeductAndSubsidyContextDTO context,
-                                  OwnerCouponGetAndValidReqVO ownerCouponGetAndValidReqVO, RenterOrderResVO renterOrderResVO) {
+                                     OwnerCouponGetAndValidReqVO ownerCouponGetAndValidReqVO, RenterOrderResVO renterOrderResVO) {
 
+        LOGGER.info("车主券处理.param is, context:[{}],ownerCouponGetAndValidReqVO:[{}],renterOrderResVO:[{}]",
+                JSON.toJSONString(context), JSON.toJSONString(ownerCouponGetAndValidReqVO), JSON.toJSONString(renterOrderResVO));
         OrderCouponDTO ownerCoupon = renterOrderCalCostService.calOwnerCouponDeductInfo(ownerCouponGetAndValidReqVO);
+        LOGGER.info("车主券处理-->优惠券信息.result is, ownerCoupon:[{}]", JSON.toJSONString(ownerCoupon));
         if (null != ownerCoupon) {
             renterOrderResVO.setOwnerCoupon(ownerCoupon);
             //重置剩余租金
@@ -195,6 +206,8 @@ public class RenterOrderCostHandleService {
             ownerCouponSubsidyInfo.setRenterOrderNo(context.getRenterOrderNo());
             context.getOrderSubsidyDetailList().add(ownerCouponSubsidyInfo);
 
+            LOGGER.info("车主券处理-->优惠券补贴信息.result is, ownerCouponSubsidyInfo:[{}]",
+                    JSON.toJSONString(ownerCouponSubsidyInfo));
             return true;
         }
 
@@ -209,9 +222,12 @@ public class RenterOrderCostHandleService {
      * @return boolean
      */
     public boolean handleLimitRed(DeductAndSubsidyContextDTO context, int reductiAmt) {
+        LOGGER.info("限时红包处理.param is, context:[{}],reductiAmt:[{}]", JSON.toJSONString(context), reductiAmt);
         RenterOrderSubsidyDetailDTO limitRedSubsidyInfo =
                 renterOrderSubsidyDetailService.calLimitRedSubsidyInfo(Integer.valueOf(context.getMemNo()),
                         context.getSurplusRentAmt(), reductiAmt);
+
+        LOGGER.info("限时红包处理-->优惠券补贴信息.result is, limitRedSubsidyInfo:[{}]", JSON.toJSONString(limitRedSubsidyInfo));
         if (null != limitRedSubsidyInfo) {
             //重置剩余租金
             int realLimitReductiAmt = null == limitRedSubsidyInfo.getSubsidyAmount() ? 0 : limitRedSubsidyInfo.getSubsidyAmount();
@@ -235,10 +251,13 @@ public class RenterOrderCostHandleService {
      * @return boolean
      */
     public boolean handlePlatformCoupon(DeductAndSubsidyContextDTO context, MemAvailCouponRequestVO platformCouponReqVO) {
+        LOGGER.info("平台优惠券处理.param is, context:[{}],platformCouponReqVO:[{}]", JSON.toJSONString(context), JSON.toJSONString(platformCouponReqVO));
+
         platformCouponReqVO.setRentAmt(context.getSurplusRentAmt());
         platformCouponReqVO.setSrvReturnCost(context.getSrvGetCost());
         platformCouponReqVO.setSrvGetCost(context.getSrvReturnCost());
         OrderCouponDTO platfromCoupon = renterOrderCalCostService.calPlatformCouponDeductInfo(platformCouponReqVO);
+        LOGGER.info("平台优惠券处理-->优惠券信息.result is, platfromCoupon:[{}]", JSON.toJSONString(platfromCoupon));
         if (null != platfromCoupon) {
             //重置剩余租金
             int disAmt = null == platfromCoupon.getAmount() ? 0 : platfromCoupon.getAmount();
@@ -254,6 +273,7 @@ public class RenterOrderCostHandleService {
             platformCouponSubsidyInfo.setRenterOrderNo(context.getRenterOrderNo());
             context.getOrderSubsidyDetailList().add(platformCouponSubsidyInfo);
 
+            LOGGER.info("平台优惠券处理-->优惠券补贴信息.result is, platformCouponSubsidyInfo:[{}]", JSON.toJSONString(platformCouponSubsidyInfo));
             return true;
         }
 
@@ -268,15 +288,16 @@ public class RenterOrderCostHandleService {
      * @param useAutoCoin 使用凹凸币标识
      * @return int
      */
-    public int handleAutoCoin(DeductAndSubsidyContextDTO context, Integer memNo, Integer useAutoCoin) {
+    public int handleAutoCoin(DeductAndSubsidyContextDTO context, String memNo, Integer useAutoCoin) {
+        LOGGER.info("凹凸币处理.param is, context:[{}],memNo:[{}],useAutoCoin:[{}]", JSON.toJSONString(context), memNo, useAutoCoin);
         AutoCoinResponseVO crmCustPoint = autoCoinService.getCrmCustPoint(memNo);
         RenterOrderSubsidyDetailDTO autoCoinSubsidyInfo = renterOrderSubsidyDetailService.calAutoCoinSubsidyInfo(crmCustPoint,
                 context.getOriginalRentAmt(), context.getSurplusRentAmt(), useAutoCoin);
+        LOGGER.info("凹凸币处理-->凹凸币补贴信息.result is, autoCoinSubsidyInfo:[{}]", JSON.toJSONString(autoCoinSubsidyInfo));
         if (null != autoCoinSubsidyInfo) {
             autoCoinSubsidyInfo.setOrderNo(context.getOrderNo());
             autoCoinSubsidyInfo.setRenterOrderNo(context.getRenterOrderNo());
             context.getOrderSubsidyDetailList().add(autoCoinSubsidyInfo);
-
             return null == autoCoinSubsidyInfo.getSubsidyAmount() ? 0 : autoCoinSubsidyInfo.getSubsidyAmount();
         }
 

@@ -1,12 +1,11 @@
 package com.atzuche.order.ownercost.service;
 
-import java.util.List;
-
+import com.atzuche.order.ownercost.entity.OwnerOrderSubsidyDetailEntity;
+import com.atzuche.order.ownercost.mapper.OwnerOrderSubsidyDetailMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.atzuche.order.ownercost.entity.OwnerOrderSubsidyDetailEntity;
-import com.atzuche.order.ownercost.mapper.OwnerOrderSubsidyDetailMapper;
+import java.util.List;
 
 
 @Service
@@ -32,7 +31,7 @@ public class OwnerOrderSubsidyDetailService {
 	 */
 	public Integer saveOwnerOrderSubsidyDetail(OwnerOrderSubsidyDetailEntity ownerOrderSubsidyDetailEntity) {
 		if (ownerOrderSubsidyDetailEntity == null) {
-			return 1;
+			return 0;
 		}
 		return ownerOrderSubsidyDetailMapper.saveOwnerOrderSubsidyDetail(ownerOrderSubsidyDetailEntity);
 	}

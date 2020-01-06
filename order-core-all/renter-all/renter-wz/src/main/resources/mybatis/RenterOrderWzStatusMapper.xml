@@ -129,4 +129,23 @@
 		WHERE order_no = #{orderNo} and car_plate_num = #{carNum}
 	</update>
 
+	<select id="getTransWzDisposeStatusByOrderNo" resultType="java.lang.Integer">
+        select status from renter_order_wz_status where order_no = #{orderNo} and car_plate_num = #{plateNum} limit 1
+    </select>
+
+	<update id="updateTransWzDisposeStatus">
+		UPDATE renter_order_wz_status SET
+		`status` = #{status},
+		<if test="status == 40">
+			management_mode = 2,
+		</if>
+		<if test="status == 10">
+			management_mode = 1,
+		</if>
+		<if test="status == 25">
+			management_mode = 1,
+		</if>
+		wz_dispose_status_edit_time = now()
+		WHERE order_no = #{orderNo} and car_plate_num = #{carNumber}
+	</update>
 </mapper>

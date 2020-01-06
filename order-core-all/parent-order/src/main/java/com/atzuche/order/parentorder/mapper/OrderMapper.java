@@ -1,7 +1,11 @@
 package com.atzuche.order.parentorder.mapper;
 
+import com.atzuche.order.parentorder.dto.SuccessOrderDTO;
 import com.atzuche.order.parentorder.entity.OrderEntity;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
  * 主订单表
@@ -53,4 +57,5 @@ public interface OrderMapper {
      */
     int updateByPrimaryKeySelective(OrderEntity record);
 
+    List<SuccessOrderDTO> queryOrderNoByOrderNos(@Param("orderNos") List<String> orderNos);
 }

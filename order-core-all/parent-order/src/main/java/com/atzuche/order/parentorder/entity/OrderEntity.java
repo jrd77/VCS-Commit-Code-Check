@@ -1,8 +1,9 @@
 package com.atzuche.order.parentorder.entity;
 
+import lombok.Data;
+
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import lombok.Data;
 
 
 /**
@@ -27,7 +28,7 @@ public class OrderEntity implements Serializable {
 	/**
 	 * 租客会员号
 	 */
-	private Integer memNoRenter;
+	private String memNoRenter;
 	/**
 	 * 订单类型（内部分类）1：短租， 2：套餐
 	 */
@@ -39,7 +40,7 @@ public class OrderEntity implements Serializable {
 	/**
 	 * 来源 1：手机，2：网站，3:管理后台，4:cp b2c, 5:cp upop
 	 */
-	private Integer source;
+	private String source;
 	/**
 	 * 预计起租时间
 	 */

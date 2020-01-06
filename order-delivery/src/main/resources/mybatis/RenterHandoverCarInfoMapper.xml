@@ -129,7 +129,7 @@
 	
 	<insert id="insertSelective" parameterType="com.atzuche.order.delivery.entity.RenterHandoverCarInfoEntity" useGeneratedKeys="true" keyProperty="id">
 		insert into renter_handover_car_info
-		(
+        <trim prefix="(" suffix=")" suffixOverrides="," >
 				<if test="orderNo != null">`order_no`, </if>
 				<if test="renterOrderNo != null">`renter_order_no`, </if>
 				<if test="type != null">`type`, </if>
@@ -155,9 +155,8 @@
 				<if test="updateOp != null">`update_op`, </if>
 				<if test="isDelete != null">`is_delete`, </if>
 				<if test="msgId != null">`msg_id` </if>
-			)
-		values
-		(
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides="," >
 				<if test="orderNo != null">#{orderNo},  </if>
 				<if test="renterOrderNo != null">#{renterOrderNo},  </if>
 				<if test="type != null">#{type},  </if>
@@ -183,7 +182,7 @@
 				<if test="updateOp != null">#{updateOp},  </if>
 				<if test="isDelete != null">#{isDelete},  </if>
 				<if test="msgId != null">#{msgId} </if>
-			)
+        </trim>
 	</insert>
 	
 	 
@@ -253,7 +252,7 @@
 	</update>
 
 	<select id="selectByRenterOrderNo" resultMap="BaseResultMap">
-		select <include refid="Base_Column_List" /> from renter_handover_car_info where
+		select oil_num,mileage_num,delay_time,ahead_time,type from renter_handover_car_info where
 		renter_order_no = #{renterOrderNo} and is_delete = 0
 	</select>
 
@@ -261,6 +260,20 @@
 	<select id="queryObjectByMsgId" parameterType="string" resultType="java.lang.String">
 		select msg_id from owner_handover_car_info
 		where msg_id = #{msgId} and is_delete = 0
+	</select>
+
+	<select id="selectObjectByRenterOrderNo" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List"/>
+		from renter_handover_car_info where
+		renter_order_no = #{renterOrderNo} and type = #{type} and is_delete = 0
+	</select>
+
+	<select id="selectObjectByOrderNo" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List"/>
+		from renter_handover_car_info where
+		order_no = #{orderNo} and type = #{type} and is_delete = 0 order by id limit 1
 	</select>
   	
 </mapper>

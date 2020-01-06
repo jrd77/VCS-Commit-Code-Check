@@ -1,8 +1,8 @@
 package com.autoyol.platformcost;
 
+import com.atzuche.config.common.entity.OilAverageCostEntity;
 import com.autoyol.platformcost.model.AbatementConfig;
 import com.autoyol.platformcost.model.CarPriceOfDay;
-import com.autoyol.platformcost.model.OilAverageCostBO;
 import com.autoyol.platformcost.model.SphericalDistanceCoefficient;
 
 import java.math.BigDecimal;
@@ -12,6 +12,8 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import org.apache.commons.lang.StringUtils;
 
 public class CommonUtils {
 	/**
@@ -52,6 +54,10 @@ public class CommonUtils {
 	public static final Integer BEFORE_TRANS_TIME_SPAN = 4;
 	public static final Integer MODIFY_GET_FINE_AMT = 50;
 	public static final Integer MODIFY_RETURN_FINE_AMT = 50;
+	
+	public static final String FORMAT_STR_RENYUN = "yyyy-MM-dd HH:mm";
+	
+	public static final String FORMAT_STR_DEFAULT = "yyyy-MM-dd HH:mm:ss";
 	
     /**
                * 初始化全面保障费单价配置
@@ -383,7 +389,7 @@ public class CommonUtils {
 	 * @param oilAverageList 油费单价配置列表
 	 * @return Double
 	 */
-	public static Double getAverageCost(Integer engineType, Integer cityCode, List<OilAverageCostBO> oilAverageList) {
+	public static Double getAverageCost(Integer engineType, Integer cityCode, List<OilAverageCostEntity> oilAverageList) {
 		if (engineType == null) {
 			return 0.0;
 		}
@@ -392,7 +398,7 @@ public class CommonUtils {
 		}
 		cityCode = cityCode == null ? 0:cityCode;
 		Double oilAverageCost = 0.0;
-		for (OilAverageCostBO oilAverage:oilAverageList) {
+		for (OilAverageCostEntity oilAverage:oilAverageList) {
 			if (cityCode.equals(oilAverage.getCityCode()) && 
 					engineType.equals(oilAverage.getEngineType())) {
 				Integer molecule = oilAverage.getMolecule();//分子
@@ -614,6 +620,34 @@ public class CommonUtils {
 			}
 		}
 		return easyCoefficient;
+	}
+	
+	/**
+	 * 格式化LocalDateTime
+	 * @param localDateTime
+	 * @param formatStr
+	 * @return String
+	 */
+	public static String formatTime(LocalDateTime localDateTime, String formatStr) {
+		if (localDateTime == null || StringUtils.isBlank(formatStr)) {
+			return "";
+		}
+		DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(formatStr);
+		return dateTimeFormatter.format(localDateTime);
+	}
+	
+	/**
+	 * string转LocalDateTime
+	 * @param dateTime
+	 * @param parseStr
+	 * @return LocalDateTime
+	 */
+	public static LocalDateTime parseTime(String dateTime, String parseStr) {
+		if (StringUtils.isBlank(dateTime) || StringUtils.isBlank(parseStr)) {
+			return null;
+		}
+		DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(parseStr);     
+        return LocalDateTime.parse(dateTime, dateTimeFormatter);
 	}
 	
 	public static void main(String[] args) {

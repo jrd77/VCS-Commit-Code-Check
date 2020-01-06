@@ -2,6 +2,7 @@ package com.atzuche.order.parentorder.service;
 
 import com.alibaba.fastjson.JSON;
 import com.atzuche.order.parentorder.dto.OrderDTO;
+import com.atzuche.order.parentorder.dto.SuccessOrderDTO;
 import com.atzuche.order.parentorder.entity.OrderEntity;
 import com.atzuche.order.parentorder.mapper.OrderMapper;
 import org.slf4j.Logger;
@@ -10,6 +11,7 @@ import org.springframework.cglib.beans.BeanCopier;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 
 /**
@@ -76,4 +78,7 @@ public class OrderService {
     	return orderMapper.selectByOrderNo(orderNo);
     }
 
+    public List<SuccessOrderDTO> queryOrderNoByOrderNos(List<String> orderNos) {
+        return orderMapper.queryOrderNoByOrderNos(orderNos);
+    }
 }

@@ -32,7 +32,7 @@ public class OrderDTO {
     /**
      * 来源 1：手机，2：网站，3:管理后台，4:cp b2c, 5:cp upop
      */
-    private Integer source;
+    private String source;
     /**
      * 预计起租时间
      */
@@ -69,6 +69,21 @@ public class OrderDTO {
      * 风控审核id
      */
     private Integer riskAuditId;
+    /**
+     * 航班号
+     */
+    private String flightId;
+
+    /**
+     * 订单图片存储目录
+     */
+    private String basePath;
+
+    /**
+     * 限时立减金额（面额）
+     */
+    private Integer limitAmt;
+
 
 
 }

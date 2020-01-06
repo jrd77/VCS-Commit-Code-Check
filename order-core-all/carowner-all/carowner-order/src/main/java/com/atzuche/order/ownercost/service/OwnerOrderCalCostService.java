@@ -44,12 +44,12 @@ public class OwnerOrderCalCostService {
 
         //计算租金和补贴
         int rentAmt = ownerOrderCostReqDTO.getOwnerOrderPurchaseDetailEntity().getTotalAmount();
-        int subsidyAmt = ownerOrderCostReqDTO.getOwnerOrderSubsidyDetailEntity().getSubsidyAmount();
+        int subsidyAmt = ownerOrderCostReqDTO.getOwnerOrderSubsidyDetailEntity()==null?0:ownerOrderCostReqDTO.getOwnerOrderSubsidyDetailEntity().getSubsidyAmount();
 
         //计算取还车增值费用费用
         log.info("下单-车主端-获取取车费用，入参costBaseDTO=[{}],carOwnerType=[{}],srvGetFlag=[{}]",JSON.toJSONString(costBaseDTO),carOwnerType,srvGetFlag);
         OwnerOrderIncrementDetailEntity ownerSrvGetAmtEntity = ownerOrderCostCombineService.getOwnerSrvGetAmtEntity(costBaseDTO, carOwnerType, srvGetFlag);
-        log.info("下单-车主端-获取取车费用，结果ownerOrderNo=[{}],ownerSrvGetAmtEntity",ownerOrderNo,JSON.toJSONString(ownerSrvGetAmtEntity));
+        log.info("下单-车主端-获取取车费用ownerOrderNo=[{}],ownerSrvGetAmtEntity=[{}]",ownerOrderNo,JSON.toJSONString(ownerSrvGetAmtEntity));
 
         log.info("下单-车主端-获取还车费用，入参costBaseDTO=[{}],carOwnerType=[{}],srvReturnFlag=[{}]",JSON.toJSONString(costBaseDTO),carOwnerType,srvReturnFlag);
         OwnerOrderIncrementDetailEntity ownerSrvReturnAmtEntity = ownerOrderCostCombineService.getOwnerSrvReturnAmtEntity(costBaseDTO, carOwnerType, srvReturnFlag);
@@ -64,25 +64,25 @@ public class OwnerOrderCalCostService {
         ownerOrderCostEntity.setMemNo(memNo);
         ownerOrderCostEntity.setIncrementAmount(incrementAmt);
         ownerOrderCostEntity.setSubsidyAmount(subsidyAmt);
-        ownerOrderCostEntity.setPurchaseAmount(rentAmt);
+        ownerOrderCostEntity.setPurchaseAmount(Math.abs(rentAmt));
         ownerOrderCostEntity.setVersion(0);
 
-        log.info("下单-车主端-准备保存费用ownerOrderNo=[{}]",ownerOrderNo);
+        log.info("下单-车主端-准备保存费用，入参ownerOrderNo=[{}]",ownerOrderNo);
         List<OwnerOrderIncrementDetailEntity> ownerOrderIncrementDetailList = Arrays.asList(ownerSrvGetAmtEntity, ownerSrvReturnAmtEntity);
 
-        log.info("下单-车主端-保存增值费用 ownerOrderIncrementDetailList=[{}]",JSON.toJSONString(ownerOrderIncrementDetailList));
+        log.info("下单-车主端-保存增值费用，入参ownerOrderIncrementDetailList=[{}]",JSON.toJSONString(ownerOrderIncrementDetailList));
         Integer IncrResult = ownerOrderIncrementDetailService.saveOwnerOrderIncrementDetailBatch(ownerOrderIncrementDetailList);
-        log.info("下单-车主端-保存增值费用 ownerOrderIncrementDetailList=[{}],ownerOrderNo=[{}],IncrResult=[{}]",JSON.toJSONString(ownerOrderIncrementDetailList),ownerOrderNo,IncrResult);
+        log.info("下单-车主端-保存增值费用，结果IncrResult=[{}],ownerOrderIncrementDetailList=[{}],ownerOrderNo=[{}]",IncrResult,JSON.toJSONString(ownerOrderIncrementDetailList),ownerOrderNo);
 
-        log.info("下单-车主端-保存租金明细 param=[{}],ownerOrderNo=[{}]",JSON.toJSONString(ownerOrderCostReqDTO.getOwnerOrderPurchaseDetailEntity()),ownerOrderNo);
+        log.info("下单-车主端-保存租金明细，入参param=[{}],ownerOrderNo=[{}]",JSON.toJSONString(ownerOrderCostReqDTO.getOwnerOrderPurchaseDetailEntity()),ownerOrderNo);
         Integer purchaseResult = ownerOrderPurchaseDetailService.saveOwnerOrderPurchaseDetail(ownerOrderCostReqDTO.getOwnerOrderPurchaseDetailEntity());
-        log.info("下单-车主端-保存租金明细，OwnerOrderPurchaseDetail=[{}],ownerOrderNo=[{}],purchaseResult=[{}]",JSON.toJSONString(ownerOrderCostReqDTO.getOwnerOrderPurchaseDetailEntity()),ownerOrderNo,purchaseResult);
+        log.info("下单-车主端-保存租金明细，结果purchaseResult=[{}],OwnerOrderPurchaseDetail=[{}],ownerOrderNo=[{}]",purchaseResult,JSON.toJSONString(ownerOrderCostReqDTO.getOwnerOrderPurchaseDetailEntity()),ownerOrderNo);
 
         Integer subsidyResult = ownerOrderSubsidyDetailService.saveOwnerOrderSubsidyDetail(ownerOrderCostReqDTO.getOwnerOrderSubsidyDetailEntity());
-        log.info("下单-车主端-保存补贴费用明细，paran=[{}],ownerOrderNo=[{}],subsidyResult=[{}]",JSON.toJSONString(ownerOrderCostReqDTO.getOwnerOrderSubsidyDetailEntity()),ownerOrderNo,subsidyResult);
+        log.info("下单-车主端-保存补贴费用明细结果subsidyResult=[{}]，paran=[{}],ownerOrderNo=[{}]",subsidyResult,JSON.toJSONString(ownerOrderCostReqDTO.getOwnerOrderSubsidyDetailEntity()),ownerOrderNo);
 
         Integer costResult = ownerOrderCostService.saveOwnerOrderCost(ownerOrderCostEntity);
-        log.info("下单-车主端-保存费用总表，param=[{}],ownerOrderNo=[{}],costResult=[{}]",JSON.toJSONString(ownerOrderCostEntity),ownerOrderNo,costResult);
+        log.info("下单-车主端-保存费用总表，结果costResult=[{}]，param=[{}],ownerOrderNo=[{}]",costResult,JSON.toJSONString(ownerOrderCostEntity),ownerOrderNo);
     }
 
 

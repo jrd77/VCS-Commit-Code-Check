@@ -1,6 +1,5 @@
 buildscript {
     repositories {
-        mavenLocal()
         maven{url "http://10.0.3.208:8081/nexus/content/groups/public/"}
         maven{url "http://maven.aliyun.com/nexus/content/groups/public/"}
         mavenCentral()
@@ -14,11 +13,18 @@ apply plugin: 'dependency-management'
 apply plugin: 'org.springframework.boot'
 apply plugin: 'application'
 apply plugin: 'war'
+apply plugin: 'application'
+
+mainClassName='com.autoyol.doc.parser.autodoc.AutoDocParser'
 
 mainClassName = 'com.autoyol.doc.parser.autodoc.AutoDocParser'
 
 group 'com.atzuche'
 version '0.0.1-SNAPSHOT'
+sourceCompatibility = '1.8'
+targetCompatibility = 1.8
+
+
 
 dependencies {
     compile project(":order-openapi")
@@ -45,7 +51,7 @@ dependencies {
 
 
 
-    compile project(":casier-all:cashier-account")
+//    compile project(":casier-all:cashier-account")
 
 
     compile project(":util-all:fee-calculator")

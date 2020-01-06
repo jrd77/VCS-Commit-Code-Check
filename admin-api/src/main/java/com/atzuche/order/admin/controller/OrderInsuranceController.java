@@ -8,11 +8,11 @@ import com.atzuche.order.admin.dto.OrderInsuranceAdditionRequestDTO;
 import com.atzuche.order.admin.dto.OrderInsuranceImportRequestDTO;
 import com.atzuche.order.admin.util.CommonUtils;
 import com.atzuche.order.admin.util.oss.OSSUtils;
-import com.atzuche.order.admin.vo.request.OrderInsuranceAdditionRequestVO;
-import com.atzuche.order.admin.vo.request.OrderInsuranceImportRequestVO;
-import com.atzuche.order.admin.vo.request.OrderInsuranceRequestVO;
-import com.atzuche.order.admin.vo.response.OrderInsuranceResponseVO;
-import com.atzuche.order.admin.vo.response.OrderInsuranceVO;
+import com.atzuche.order.admin.vo.req.insurance.OrderInsuranceAdditionRequestVO;
+import com.atzuche.order.admin.vo.req.insurance.OrderInsuranceImportRequestVO;
+import com.atzuche.order.admin.vo.req.insurance.OrderInsuranceRequestVO;
+import com.atzuche.order.admin.vo.resp.insurance.OrderInsuranceResponseVO;
+import com.atzuche.order.admin.vo.resp.insurance.OrderInsuranceVO;
 import com.atzuche.order.delivery.utils.DateUtils;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
@@ -34,9 +34,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @RequestMapping("/console/order/insurance")
 @RestController

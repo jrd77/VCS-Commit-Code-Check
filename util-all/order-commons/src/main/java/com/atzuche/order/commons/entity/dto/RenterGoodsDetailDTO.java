@@ -173,7 +173,7 @@ public class RenterGoodsDetailDTO {
      */
     private String engineNum;
     /**
-     * 平台服务费比例/代官车服务费比例（仅车主端有）
+     * 平台服务费比例/代管车服务费比例（仅车主端有）
      */
     private Double serviceRate;
 
@@ -204,5 +204,17 @@ public class RenterGoodsDetailDTO {
      * 行驶证注册年月
      */
     private LocalDate licenseDay;
+    /**
+     * 车辆日均指导价
+     */
+    private Integer carGuideDayPrice;
+    /**
+     * 油表总刻度
+     */
+    private Integer oilTotalCalibration;
+    /**
+     * GPS序号
+     */
+    private String gpsSerialNumber;
 
 }

@@ -33,6 +33,7 @@
         <result property="updateTime" column="update_time"/>
         <result property="updateOp" column="update_op"/>
         <result property="isDelete" column="is_delete"/>
+		<result property="aheadOrDelayTime" column="ahead_or_delay_time"/>
     </resultMap>
 
 
@@ -65,8 +66,8 @@
 	`create_op`, 	
 	`update_time`, 	
 	`update_op`, 	
-	`is_delete`	
-
+	`is_delete`,
+	`ahead_or_delay_time`
 	</sql>
 
 
@@ -104,7 +105,8 @@
 				`create_op`,		
 				`update_time`,		
 				`update_op`,		
-				`is_delete`		
+				`is_delete`	,
+				`ahead_or_delay_time`
 			)
 		values
 		(
@@ -135,13 +137,14 @@
 				#{createOp}, 		
 				#{updateTime}, 		
 				#{updateOp}, 		
-				#{isDelete}		
+				#{isDelete},
+				#{aheadOrDelayTime}
 			)
 	</insert>
 	
 	<insert id="insertSelective" parameterType="com.atzuche.order.delivery.entity.RenterOrderDeliveryEntity" useGeneratedKeys="true" keyProperty="id">
 		insert into renter_order_delivery
-		(
+        <trim prefix="(" suffix=")" suffixOverrides="," >
 				<if test="orderNo != null">`order_no`, </if>
 				<if test="renterOrderNo != null">`renter_order_no`, </if>
 				<if test="orderNoDelivery != null">`order_no_delivery`, </if>
@@ -169,10 +172,10 @@
 				<if test="createOp != null">`create_op`, </if>
 				<if test="updateTime != null">`update_time`, </if>
 				<if test="updateOp != null">`update_op`, </if>
-				<if test="isDelete != null">`is_delete` </if>
-			)
-		values
-		(
+				<if test="isDelete != null">`is_delete`, </if>
+			<if test="aheadOrDelayTime != null">`ahead_or_delay_time` </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides="," >
 				<if test="orderNo != null">#{orderNo},  </if>
 				<if test="renterOrderNo != null">#{renterOrderNo},  </if>
 				<if test="orderNoDelivery != null">#{orderNoDelivery},  </if>
@@ -200,8 +203,9 @@
 				<if test="createOp != null">#{createOp},  </if>
 				<if test="updateTime != null">#{updateTime},  </if>
 				<if test="updateOp != null">#{updateOp},  </if>
-				<if test="isDelete != null">#{isDelete} </if>
-			)
+				<if test="isDelete != null">#{isDelete}, </if>
+			<if test="aheadOrDelayTime != null">#{aheadOrDelayTime} </if>
+        </trim>
 	</insert>
 	
 	 
@@ -235,7 +239,8 @@
 				<if test="createOp != null">`create_op` = #{createOp}, </if>
 				<if test="updateTime != null">`update_time` = #{updateTime}, </if>
 				<if test="updateOp != null">`update_op` = #{updateOp}, </if>
-				<if test="isDelete != null">`is_delete` = #{isDelete}</if>
+				<if test="isDelete != null">`is_delete` = #{isDelete},</if>
+			<if test="aheadOrDelayTime != null">`ahead_or_delay_time` = #{aheadOrDelayTime} </if>
 			</set>
 		where id = #{id}
 	</update>
@@ -270,8 +275,8 @@
 				`create_op` = #{createOp}, 		
 				`update_time` = #{updateTime}, 		
 				`update_op` = #{updateOp}, 		
-				`is_delete` = #{isDelete}		
-	
+				`is_delete` = #{isDelete},
+			`ahead_or_delay_time` = #{aheadOrDelayTime}
 		</set>
 		where id = #{id}
 	</update>
@@ -284,9 +289,9 @@
 		and is_delete = 0
 	</select>
 
-	<update id="updateById" parameterType="java.lang.Integer">
+	<update id="updateStatusById" parameterType="java.lang.Integer">
 		UPDATE renter_order_delivery
-		SET status = 2
+		SET status = 3
 		WHERE id = #{id} AND is_delete = 0
 	</update>
 
@@ -296,4 +301,12 @@
 		from renter_order_delivery where renter_order_no = #{renterOrderNo}
 		and type = #{type} and is_delete = 0
 	</select>
+
+	<select id="findRenterOrderByrOrderNo" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List"/>
+		from renter_order_delivery where order_no = #{orderNo}
+		and type = #{type} and is_delete = 0 order by id desc limit 1
+	</select>
+
 </mapper>

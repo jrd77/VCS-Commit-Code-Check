@@ -3,15 +3,18 @@ package com.atzuche.order.delivery.utils;
 import com.atzuche.order.delivery.common.DeliveryConstants;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.beanutils.BeanUtils;
+import org.springframework.beans.BeanWrapper;
+import org.springframework.beans.BeanWrapperImpl;
 
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Map;
-import java.util.TreeMap;
-import java.util.UUID;
+import java.util.*;
 
-
+/**
+ * @author 胡春林
+ * commonUtils
+ */
 @Slf4j
 public class CommonUtil {
 
@@ -26,19 +29,18 @@ public class CommonUtil {
         return uuid.replaceAll("-", "");
     }
 
-
     /**
      * 转换成map
      *
      * @param obj
      * @return
      */
-    public static Map<String, String> javaBeanToMap(Object obj) {
+    public static Map<String, Object> javaBeanToMap(Object obj) {
         if (obj == null) {
             return null;
         }
         try {
-            Map<String, String> map = BeanUtils.describe(obj);
+            Map<String, Object> map = BeanUtils.describe(obj);
             return map;
         } catch (Exception e) {
             log.info("转换成map失败");
@@ -77,7 +79,7 @@ public class CommonUtil {
      * @param map
      * @return
      */
-    public static String getSign(Map map) {
+    public static String getSign(Map<String,Object> map) {
         try {
             StringBuffer sbff = new StringBuffer();
             TreeMap<String, Object> treeMap = new TreeMap<String, Object>();
@@ -93,5 +95,27 @@ public class CommonUtil {
             log.info("配送参数获取sign失败");
         }
         return null;
+    }
+
+    /**
+     * 获取为null的属性
+     * @param source
+     * @return
+     */
+    public static String[] getNullPropertyNames (Object source) {
+        final BeanWrapper src = new BeanWrapperImpl(source);
+        java.beans.PropertyDescriptor[] pds = src.getPropertyDescriptors();
+
+        Set<String> emptyNames = new HashSet<String>();
+        for(java.beans.PropertyDescriptor pd : pds) {
+            Object srcValue = src.getPropertyValue(pd.getName());
+            if (srcValue == null) emptyNames.add(pd.getName());
+        }
+        String[] result = new String[emptyNames.size()];
+        return emptyNames.toArray(result);
+    }
+
+    public static void copyPropertiesIgnoreNull(Object src, Object target){
+        org.springframework.beans.BeanUtils.copyProperties(src, target, getNullPropertyNames(src));
     }
 }

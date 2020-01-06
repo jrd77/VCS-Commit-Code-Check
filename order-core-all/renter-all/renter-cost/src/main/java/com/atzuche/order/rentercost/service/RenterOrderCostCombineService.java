@@ -1,9 +1,8 @@
 package com.atzuche.order.rentercost.service;
 
 import com.alibaba.fastjson.JSON;
-import com.atzuche.config.client.api.CityConfigSDK;
-import com.atzuche.config.client.api.DefaultConfigContext;
-import com.atzuche.config.common.entity.CityEntity;
+import com.atzuche.config.client.api.*;
+import com.atzuche.config.common.entity.*;
 import com.atzuche.order.commons.CatConstants;
 import com.atzuche.order.commons.DateUtils;
 import com.atzuche.order.commons.GlobalConstant;
@@ -67,6 +66,18 @@ public class RenterOrderCostCombineService {
     private OrderSupplementDetailService orderSupplementDetailService;
     @Autowired
     private CityConfigSDK cityConfigSDK;
+    @Autowired
+    private InsuranceConfigSDK insuranceConfigSDK;
+    @Autowired
+    private OilAverageCostConfigSDK oilAverageCostConfigSDK;
+    @Autowired
+    private DepositConfigSDK depositConfigSDK;
+    @Autowired
+    private SysConstantSDK sysConstantSDK;
+    @Autowired
+    private CarParamHotBrandDepositSDK carParamHotBrandDepositSDK;
+    @Autowired
+    private IllegalDepositConfigSDK illegalDepositConfigSDK;
 
     @Autowired
     private GetBackCityLimitFeignApi getBackCityLimitFeignApi;
@@ -79,6 +90,8 @@ public class RenterOrderCostCombineService {
     private Integer nightEnd;
     @Value("${auto.cost.configHours}")
     private Integer configHours;
+    @Value("${auto.cost.unitExtraDriverInsure}")
+    private Integer unitExtraDriverInsure;
 
 
     private static final Integer [] ORDER_TYPES = {1,2};
@@ -190,8 +203,7 @@ public class RenterOrderCostCombineService {
 			Cat.logError("获取平台保障费insurAmtDTO.costBaseDTO对象为空", new RenterCostParameterException());
 			throw new RenterCostParameterException();
 		}
-		// TODO 走配置中心获取
-		List<InsuranceConfig> insuranceConfigs = null;
+        List<InsuranceConfigEntity> insuranceConfigs = insuranceConfigSDK.getConfig(new DefaultConfigContext());
 		// 指导价
 		Integer guidPrice = insurAmtDTO.getGuidPrice();
 		if (insurAmtDTO.getInmsrp() != null && insurAmtDTO.getInmsrp() != 0) {
@@ -221,7 +233,7 @@ public class RenterOrderCostCombineService {
 			throw new RenterCostParameterException();
 		}
 		if(!abatementAmtDTO.getIsAbatement()){
-		    log.info("不需要计算全面保障费！abatementAmtDTO={}",JSON.toJSONString(abatementAmtDTO));
+		    log.info("不需要计算全面保障费！abatementAmtDTO=[{}]",JSON.toJSONString(abatementAmtDTO));
             return new ArrayList<>();
         }
 		CostBaseDTO costBaseDTO = abatementAmtDTO.getCostBaseDTO();
@@ -262,8 +274,6 @@ public class RenterOrderCostCombineService {
 			Cat.logError("获取附加驾驶人费用extraDriverDTO.costBaseDTO对象为空", new RenterCostParameterException());
 			throw new RenterCostParameterException();
 		}
-		// TODO 走配置中心取单价
-		Integer unitExtraDriverInsure = 20;
 		List<String> driverIds = extraDriverDTO.getDriverIds();
 		Integer extraDriverCount = (driverIds == null || driverIds.isEmpty()) ? 0:driverIds.size();
 		FeeResult feeResult = RenterFeeCalculatorUtils.calExtraDriverInsureAmt(unitExtraDriverInsure, extraDriverCount, costBaseDTO.getStartTime(), costBaseDTO.getEndTime());
@@ -318,9 +328,8 @@ public class RenterOrderCostCombineService {
 			Cat.logError("获取租客油费oilAmtDTO.costBaseDTO对象为空", new RenterCostParameterException());
 			throw new RenterCostParameterException();
 		}
-		// TODO 走配置中心获取
-		List<OilAverageCostBO> oilAverageList = null;
-		Integer oilAmt = RenterFeeCalculatorUtils.calOilAmt(oilAmtDTO.getCityCode(), oilAmtDTO.getOilVolume(), oilAmtDTO.getEngineType(), 
+        List<OilAverageCostEntity> oilAverageList = oilAverageCostConfigSDK.getConfig(new DefaultConfigContext());
+        Integer oilAmt = RenterFeeCalculatorUtils.calOilAmt(oilAmtDTO.getCityCode(), oilAmtDTO.getOilVolume(), oilAmtDTO.getEngineType(),
 				oilAmtDTO.getGetOilScale(), oilAmtDTO.getReturnOilScale(), oilAverageList, oilAmtDTO.getOilScaleDenominator());
 		FeeResult feeResult = new FeeResult();
 		feeResult.setTotalFee(oilAmt);
@@ -343,8 +352,8 @@ public class RenterOrderCostCombineService {
 			Cat.logError("获取车辆押金对象depositAmtDTO对象为空", new RenterCostParameterException());
 			throw new RenterCostParameterException();
 		}
-		// TODO 押金配置列表从配置中心获取
-		List<DepositText> depositList = null;
+        List<DepositConfigEntity> depositList = depositConfigSDK.getConfig(new DefaultConfigContext());
+
         double years = LocalDateTimeUtil.periodDays(depositAmtDTO.getLicenseDay(), LocalDate.now())/356D;
         int surplusPriceProYear = CommonUtils.getSurplusPriceProYear(years);
         CarDepositAmtVO carDepositAmtVO = RenterFeeCalculatorUtils.calCarDepositAmt(depositAmtDTO.getCityCode(),
@@ -353,6 +362,7 @@ public class RenterOrderCostCombineService {
                 getNewCarCoefficient(surplusPriceProYear),
 				depositList
         );
+        log.info("getCarDepositAmtVO carDepositAmtVO=[{}]",carDepositAmtVO);
 		return carDepositAmtVO;
 	}
     /*
@@ -366,14 +376,17 @@ public class RenterOrderCostCombineService {
         try {
             if(StringUtils.isNotBlank(brand) && StringUtils.isNotBlank(type)){
                 if(StringUtils.isNumeric(brand) && StringUtils.isNumeric(type)){
-                  //TODO 配置中获取车辆品牌系数
-                    //  carSpecialCoefficient = transExtV36Service.getHotConfigValue(Integer.valueOf(brand), Integer.valueOf(type));
+                    Integer brandId = Integer.valueOf(brand);
+                    Integer typeId = Integer.valueOf(type);
+                    CarParamHotBrandDepositEntity carParamHotBrandDepositEntity = carParamHotBrandDepositSDK.getConfigByBrandIdAndTypeId(new DefaultConfigContext(), brandId, typeId);
+                    log.info("config-获取车辆品牌系数carParamHotBrandDepositEntity=[{}]",JSON.toJSONString(carParamHotBrandDepositEntity));
+                    carSpecialCoefficient = Double.valueOf(carParamHotBrandDepositEntity.getConfigValue());
                 }
             }
         } catch (Exception e) {
             log.error("getCarSpecialCoefficientNew ex:",e);
         }
-        log.info("calc result carSpecialCoefficient={},brandId={},typeId={}",carSpecialCoefficient,brand,type);
+        log.info("calc result carSpecialCoefficient=[{}],brandId=[{}],typeId=[{}]",carSpecialCoefficient,brand,type);
         return carSpecialCoefficient;
     }
 
@@ -383,20 +396,31 @@ public class RenterOrderCostCombineService {
      * @return
      */
     public double getNewCarCoefficient(int year) {
+        List<SysContantEntity> sysConstantSDKConfig = sysConstantSDK.getConfig(new DefaultConfigContext());
         if (year <= 2) {
-            //TODO 配置中获取 请在配置sys_constant表配置c_code:"+code+"相关数据
-            Map<String, Object> map = null;//sysConstantService.getSysConstantByCode("car_year_neqtwo");
-            if (map != null && map.size()>0) {
-                return map.get("c_value")!=null ?Double.parseDouble(map.get("c_value").toString()):1.4;
+            SysContantEntity sysContantEntity = Optional.ofNullable(sysConstantSDKConfig)
+                    .orElse(new ArrayList<>())
+                    .stream()
+                    .filter(x -> GlobalConstant.CAR_YEAR_NEQTWO.equals(x.getCode()))
+                    .findFirst()
+                    .get();
+            if (sysContantEntity != null) {
+                String value = sysContantEntity.getValue();
+                return value!=null?Double.valueOf(value):GlobalConstant.CAR_YEAR_NEQTWO_DEFAULT_VALUE;
             }
         }else{
-            //TODO 配置中获取 请在配置sys_constant表配置c_code:"+code+"相关数据
-            Map<String, Object> map = null;//sysConstantService.getSysConstantByCode("car_year_lttwo");
-            if (map != null && map.size()>0) {
-                return map.get("c_value")!=null ?Double.parseDouble(map.get("c_value").toString()):1;
+            SysContantEntity sysContantEntity = Optional.ofNullable(sysConstantSDKConfig)
+                    .orElse(new ArrayList<>())
+                    .stream()
+                    .filter(x -> GlobalConstant.CAR_YEAR_LTTWO.equals(x.getCode()))
+                    .findFirst()
+                    .get();
+            if (sysContantEntity!=null) {
+                String value = sysContantEntity.getValue();
+                return value!=null ?Double.valueOf(value):GlobalConstant.CAR_YEAR_LTTWO_DEFAULT_VALUE;
             }
         }
-        return 1;
+        return GlobalConstant.NEW_CAR_COEFFICIENT_DEFAULT_VALUE;
     }
 
 
@@ -419,13 +443,19 @@ public class RenterOrderCostCombineService {
 			Cat.logError("获取违章押金illegalDepositAmtDTO.costBaseDTO对象为空", new RenterCostParameterException());
 			throw new RenterCostParameterException();
 		}
-		// TODO 特殊城市（逗号分隔的城市编码）从配置中心获取
-		String specialCityCodes = null;
-		// TODO 特殊车牌合特殊城市对应的特殊押金值从配置中心获取
-		Integer specialIllegalDepositAmt = null;
-		// TODO 违章押金配置从配置中心获取
-		List<IllegalDepositConfig> illegalDepositList = null;
-		Integer illegalDepositAmt = RenterFeeCalculatorUtils.calIllegalDepositAmt(illDTO.getCityCode(), illDTO.getCarPlateNum(),
+
+        SysContantEntity specialCity = sysConstantSDK.getConfigByCode(new DefaultConfigContext(), GlobalConstant.SPECIAL_CITY_CODE);
+        log.info("config-获取特殊城市specialCity=[{}]",JSON.toJSONString(specialCity));
+		String specialCityCodes = specialCity.getValue();
+
+        SysContantEntity specialCityDeposit = sysConstantSDK.getConfigByCode(new DefaultConfigContext(), GlobalConstant.SPECIAL_ILLEGAL_DEPOSIT_AMT_CODE);
+        log.info("config-获取特殊城市押金specialCityDeposit=[{}]",JSON.toJSONString(specialCityDeposit));
+        Integer specialIllegalDepositAmt = Integer.valueOf(specialCityDeposit.getValue());
+
+        List<IllegalDepositConfigEntity> illegalDepositList = illegalDepositConfigSDK.getConfig(new DefaultConfigContext());
+        log.info("config-获取城市押金列表illegalDepositList=[{}]",JSON.toJSONString(illegalDepositList));
+
+        Integer illegalDepositAmt = RenterFeeCalculatorUtils.calIllegalDepositAmt(illDTO.getCityCode(), illDTO.getCarPlateNum(),
 				specialCityCodes, specialIllegalDepositAmt, illegalDepositList, 
 				costBaseDTO.getStartTime(), costBaseDTO.getEndTime());
 		return illegalDepositAmt;
@@ -620,7 +650,7 @@ public class RenterOrderCostCombineService {
         if (getFlag || returnFlag) {
 
             CityEntity configByCityCode = cityConfigSDK.getConfigByCityCode(new DefaultConfigContext(), cityCode);
-            log.info("计算取还车费用-配置服务中获取配置信息configByCityCode={}",configByCityCode);
+            log.info("计算取还车费用-配置服务中获取配置信息configByCityCode=[{}]",configByCityCode);
             String lat = configByCityCode.getLat();
             String lon = configByCityCode.getLon();
             cityDTO.setLon(lon);
@@ -657,7 +687,7 @@ public class RenterOrderCostCombineService {
         GetFbcFeeRequestDetail getCost = new GetFbcFeeRequestDetail();
         getCost.setChannelName(channelCode);
         getCost.setRequestTime(LocalDateTimeUtils.getNowDateLong());
-        getCost.setGetReturnType("return");
+        getCost.setGetReturnType("get");
         getCost.setGetReturnTime(String.valueOf(LocalDateTimeUtils.localDateTimeToLong(costBaseDTO.getEndTime())));
         getCost.setCityId(String.valueOf(cityCode));
         getCost.setOrderType(this.getIsPackageOrder(getReturnCarCostReqDto.getIsPackageOrder()));
@@ -728,28 +758,29 @@ public class RenterOrderCostCombineService {
                 renterOrderCostDetailEntity.setCostCode(RenterCashCodeEnum.SRV_GET_COST.getCashNo());
                 renterOrderCostDetailEntity.setCostDesc(RenterCashCodeEnum.SRV_GET_COST.getTxt());
                 renterOrderCostDetailEntity.setCount(1D);
+                renterOrderCostDetailEntity.setUnitPrice(Math.abs(expectedShouldFee));
                 renterOrderCostDetailEntity.setTotalAmount(-expectedShouldFee);
                 listCostDetail.add(renterOrderCostDetailEntity);
-
-                RenterOrderSubsidyDetailDTO renterOrderSubsidy = new RenterOrderSubsidyDetailDTO();
-                renterOrderSubsidy.setOrderNo(costBaseDTO.getOrderNo());
-                renterOrderSubsidy.setRenterOrderNo(costBaseDTO.getRenterOrderNo());
-                renterOrderSubsidy.setMemNo(costBaseDTO.getMemNo());
-                renterOrderSubsidy.setSubsidyTypeName(SubsidyTypeCodeEnum.GET_CAR.getDesc());
-                renterOrderSubsidy.setSubsidyTypeCode(SubsidyTypeCodeEnum.GET_CAR.getCode());
-                renterOrderSubsidy.setSubsidySourceCode(SubsidySourceCodeEnum.PLATFORM.getCode());
-                renterOrderSubsidy.setSubsidySourceName(SubsidySourceCodeEnum.PLATFORM.getDesc());
-                renterOrderSubsidy.setSubsidyTargetCode(SubsidySourceCodeEnum.RENTER.getCode());
-                renterOrderSubsidy.setSubsidyTargetName(SubsidySourceCodeEnum.RENTER.getDesc());
-                renterOrderSubsidy.setSubsidyCostCode(RenterCashCodeEnum.SRV_GET_COST.getCashNo());
-                renterOrderSubsidy.setSubsidyCostName(RenterCashCodeEnum.SRV_GET_COST.getTxt());
-                renterOrderSubsidy.setSubsidyDesc("平台补贴给租客的取车费用！");
                 int expectedRealFee = Integer.valueOf(fbcFeeResponse.getExpectedRealFee());
-
-                renterOrderSubsidy.setSubsidyAmount(expectedShouldFee - expectedRealFee);
-                renterOrderSubsidy.setSubsidyVoucher("");
-                listCostSubsidy.add(renterOrderSubsidy);
-
+                int diffe = expectedShouldFee - expectedRealFee;
+                if(diffe != 0){
+                    RenterOrderSubsidyDetailDTO renterOrderSubsidy = new RenterOrderSubsidyDetailDTO();
+                    renterOrderSubsidy.setOrderNo(costBaseDTO.getOrderNo());
+                    renterOrderSubsidy.setRenterOrderNo(costBaseDTO.getRenterOrderNo());
+                    renterOrderSubsidy.setMemNo(costBaseDTO.getMemNo());
+                    renterOrderSubsidy.setSubsidyTypeName(SubsidyTypeCodeEnum.GET_CAR.getDesc());
+                    renterOrderSubsidy.setSubsidyTypeCode(SubsidyTypeCodeEnum.GET_CAR.getCode());
+                    renterOrderSubsidy.setSubsidySourceCode(SubsidySourceCodeEnum.PLATFORM.getCode());
+                    renterOrderSubsidy.setSubsidySourceName(SubsidySourceCodeEnum.PLATFORM.getDesc());
+                    renterOrderSubsidy.setSubsidyTargetCode(SubsidySourceCodeEnum.RENTER.getCode());
+                    renterOrderSubsidy.setSubsidyTargetName(SubsidySourceCodeEnum.RENTER.getDesc());
+                    renterOrderSubsidy.setSubsidyCostCode(RenterCashCodeEnum.SRV_GET_COST.getCashNo());
+                    renterOrderSubsidy.setSubsidyCostName(RenterCashCodeEnum.SRV_GET_COST.getTxt());
+                    renterOrderSubsidy.setSubsidyDesc("平台补贴给租客的取车费用！");
+                    renterOrderSubsidy.setSubsidyAmount(diffe);
+                    renterOrderSubsidy.setSubsidyVoucher("");
+                    listCostSubsidy.add(renterOrderSubsidy);
+                }
                 getReturnResponse.setGetFee(Integer.valueOf(fbcFeeResponse.getExpectedRealFee()));
                 getReturnResponse.setGetShouldFee(Integer.valueOf(fbcFeeResponse.getExpectedShouldFee()));
                 getReturnResponse.setGetInitFee(Integer.valueOf(fbcFeeResponse.getBaseFee()));
@@ -759,42 +790,45 @@ public class RenterOrderCostCombineService {
                 getReturnResponse.setGetShowDistance(Double.valueOf(fbcFeeResponse.getShowDistance()));
 
             } else if ("return".equalsIgnoreCase(fbcFeeResponse.getGetReturnType()) && getReturnCarCostReqDto.getIsReturnCarCost()) {
-               int expectedShouldFee = Integer.valueOf(fbcFeeResponse.getExpectedShouldFee());
-               RenterOrderCostDetailEntity renterOrderCostDetailEntity = new RenterOrderCostDetailEntity();
+                int expectedShouldFee = Integer.valueOf(fbcFeeResponse.getExpectedShouldFee());
+                RenterOrderCostDetailEntity renterOrderCostDetailEntity = new RenterOrderCostDetailEntity();
                 renterOrderCostDetailEntity.setOrderNo(costBaseDTO.getOrderNo());
                 renterOrderCostDetailEntity.setRenterOrderNo(costBaseDTO.getRenterOrderNo());
                 renterOrderCostDetailEntity.setMemNo(costBaseDTO.getMemNo());
-               renterOrderCostDetailEntity.setCostCode(RenterCashCodeEnum.SRV_RETURN_COST.getCashNo());
-               renterOrderCostDetailEntity.setCostDesc(RenterCashCodeEnum.SRV_RETURN_COST.getTxt());
-               renterOrderCostDetailEntity.setCount(1D);
-               renterOrderCostDetailEntity.setTotalAmount(-expectedShouldFee);
-               listCostDetail.add(renterOrderCostDetailEntity);
+                renterOrderCostDetailEntity.setCostCode(RenterCashCodeEnum.SRV_RETURN_COST.getCashNo());
+                renterOrderCostDetailEntity.setCostDesc(RenterCashCodeEnum.SRV_RETURN_COST.getTxt());
+                renterOrderCostDetailEntity.setCount(1D);
+                renterOrderCostDetailEntity.setUnitPrice(Math.abs(expectedShouldFee));
+                renterOrderCostDetailEntity.setTotalAmount(-expectedShouldFee);
+                listCostDetail.add(renterOrderCostDetailEntity);
 
-               RenterOrderSubsidyDetailDTO renterOrderSubsidy = new RenterOrderSubsidyDetailDTO();
-               renterOrderSubsidy.setOrderNo(costBaseDTO.getOrderNo());
-               renterOrderSubsidy.setRenterOrderNo(costBaseDTO.getRenterOrderNo());
-               renterOrderSubsidy.setMemNo(costBaseDTO.getMemNo());
-               renterOrderSubsidy.setSubsidyTypeName(SubsidyTypeCodeEnum.RETURN_CAR.getDesc());
-               renterOrderSubsidy.setSubsidyTypeCode(SubsidyTypeCodeEnum.RETURN_CAR.getCode());
-               renterOrderSubsidy.setSubsidySourceCode(SubsidySourceCodeEnum.PLATFORM.getCode());
-               renterOrderSubsidy.setSubsidySourceName(SubsidySourceCodeEnum.PLATFORM.getDesc());
-               renterOrderSubsidy.setSubsidyTargetCode(SubsidySourceCodeEnum.RENTER.getCode());
-               renterOrderSubsidy.setSubsidyTargetName(SubsidySourceCodeEnum.RENTER.getDesc());
-                renterOrderSubsidy.setSubsidyCostCode(RenterCashCodeEnum.SRV_RETURN_COST.getCashNo());
-                renterOrderSubsidy.setSubsidyCostName(RenterCashCodeEnum.SRV_RETURN_COST.getTxt());
-               renterOrderSubsidy.setSubsidyDesc("平台补贴给租客的还车费用！");
-               int expectedRealFee = Integer.valueOf(fbcFeeResponse.getExpectedRealFee());
-               renterOrderSubsidy.setSubsidyAmount(expectedShouldFee - expectedRealFee);
-               renterOrderSubsidy.setSubsidyVoucher("");
-               listCostSubsidy.add(renterOrderSubsidy);
-
-               getReturnResponse.setReturnFee(Integer.valueOf(fbcFeeResponse.getExpectedRealFee()));
-               getReturnResponse.setReturnShouldFee(Integer.valueOf(fbcFeeResponse.getExpectedShouldFee()));
-               getReturnResponse.setReturnInitFee(Integer.valueOf(fbcFeeResponse.getBaseFee()));
-               getReturnResponse.setReturnTimePeriodUpPrice(fbcFeeResponse.getTimePeriodUpPrice());
-               getReturnResponse.setReturnDistanceUpPrice(fbcFeeResponse.getDistanceUpPrice());
-               getReturnResponse.setReturnCicrleUpPrice(fbcFeeResponse.getCicrleUpPrice());
-               getReturnResponse.setReturnShowDistance(Double.valueOf(fbcFeeResponse.getShowDistance()));
+                int expectedRealFee = Integer.valueOf(fbcFeeResponse.getExpectedRealFee());
+                int diff = expectedShouldFee - expectedRealFee;
+                if(diff != 0){
+                    RenterOrderSubsidyDetailDTO renterOrderSubsidy = new RenterOrderSubsidyDetailDTO();
+                    renterOrderSubsidy.setOrderNo(costBaseDTO.getOrderNo());
+                    renterOrderSubsidy.setRenterOrderNo(costBaseDTO.getRenterOrderNo());
+                    renterOrderSubsidy.setMemNo(costBaseDTO.getMemNo());
+                    renterOrderSubsidy.setSubsidyTypeName(SubsidyTypeCodeEnum.RETURN_CAR.getDesc());
+                    renterOrderSubsidy.setSubsidyTypeCode(SubsidyTypeCodeEnum.RETURN_CAR.getCode());
+                    renterOrderSubsidy.setSubsidySourceCode(SubsidySourceCodeEnum.PLATFORM.getCode());
+                    renterOrderSubsidy.setSubsidySourceName(SubsidySourceCodeEnum.PLATFORM.getDesc());
+                    renterOrderSubsidy.setSubsidyTargetCode(SubsidySourceCodeEnum.RENTER.getCode());
+                    renterOrderSubsidy.setSubsidyTargetName(SubsidySourceCodeEnum.RENTER.getDesc());
+                    renterOrderSubsidy.setSubsidyCostCode(RenterCashCodeEnum.SRV_RETURN_COST.getCashNo());
+                    renterOrderSubsidy.setSubsidyCostName(RenterCashCodeEnum.SRV_RETURN_COST.getTxt());
+                    renterOrderSubsidy.setSubsidyDesc("平台补贴给租客的还车费用！");
+                    renterOrderSubsidy.setSubsidyAmount(diff);
+                    renterOrderSubsidy.setSubsidyVoucher("");
+                    listCostSubsidy.add(renterOrderSubsidy);
+                }
+                getReturnResponse.setReturnFee(Integer.valueOf(fbcFeeResponse.getExpectedRealFee()));
+                getReturnResponse.setReturnShouldFee(Integer.valueOf(fbcFeeResponse.getExpectedShouldFee()));
+                getReturnResponse.setReturnInitFee(Integer.valueOf(fbcFeeResponse.getBaseFee()));
+                getReturnResponse.setReturnTimePeriodUpPrice(fbcFeeResponse.getTimePeriodUpPrice());
+                getReturnResponse.setReturnDistanceUpPrice(fbcFeeResponse.getDistanceUpPrice());
+                getReturnResponse.setReturnCicrleUpPrice(fbcFeeResponse.getCicrleUpPrice());
+                getReturnResponse.setReturnShowDistance(Double.valueOf(fbcFeeResponse.getShowDistance()));
             }
         });
         getReturnCostDto.setGetReturnResponseVO(getReturnResponse);

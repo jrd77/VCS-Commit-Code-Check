@@ -1,15 +1,14 @@
 package com.atzuche.order.rentermem.service;
 
-import com.atzuche.order.commons.entity.dto.OrderContextDTO;
 import com.atzuche.order.commons.entity.dto.RenterMemberDTO;
 import com.atzuche.order.commons.entity.dto.RenterMemberRightDTO;
 import com.atzuche.order.rentermem.entity.RenterMemberEntity;
 import com.atzuche.order.rentermem.entity.RenterMemberRightEntity;
+import com.atzuche.order.rentermem.mapper.RenterMemberMapper;
 import com.atzuche.order.rentermem.mapper.RenterMemberRightMapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.atzuche.order.rentermem.mapper.RenterMemberMapper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,6 +39,9 @@ public class RenterMemberService{
         renterMemberDto.getRenterMemberRightDTOList().forEach(x->{
             RenterMemberRightEntity renterMemberRightEntity = new RenterMemberRightEntity();
             BeanUtils.copyProperties(x,renterMemberRightEntity);
+            renterMemberRightEntity.setOrderNo(renterMemberDto.getOrderNo());
+            renterMemberRightEntity.setRenterOrderNo(renterMemberDto.getRenterOrderNo());
+            renterMemberRightEntity.setMemNo(renterMemberDto.getMemNo());
             list.add(renterMemberRightEntity);
         });
         renterMemberRightMapper.insertList(list);
@@ -70,5 +72,9 @@ public class RenterMemberService{
 
     public String getRenterNoByOrderNo(String orderNo) {
         return renterMemberMapper.getRenterNoByOrderNo(orderNo);
+    }
+
+    public List<RenterMemberEntity> queryMemNoAndPhoneByOrderList(List<String> orderNos) {
+        return renterMemberMapper.queryMemNoAndPhoneByOrderList(orderNos);
     }
 }

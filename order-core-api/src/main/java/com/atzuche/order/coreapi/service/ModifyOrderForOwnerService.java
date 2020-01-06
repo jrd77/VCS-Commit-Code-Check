@@ -3,6 +3,8 @@ package com.atzuche.order.coreapi.service;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import com.atzuche.order.ownercost.entity.OwnerOrderCostEntity;
 import com.atzuche.order.ownercost.entity.OwnerOrderEntity;
@@ -18,20 +20,28 @@ import com.atzuche.order.commons.entity.dto.OwnerGoodsPriceDetailDTO;
 import com.atzuche.order.commons.entity.dto.OwnerMemberDTO;
 import com.atzuche.order.commons.entity.dto.OwnerMemberRightDTO;
 import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
+import com.atzuche.order.commons.enums.SrvGetReturnEnum;
+import com.atzuche.order.coreapi.entity.dto.ModifyOrderDTO;
 import com.atzuche.order.coreapi.entity.dto.ModifyOrderOwnerDTO;
+import com.atzuche.order.coreapi.entity.vo.req.CarRentTimeRangeReqVO;
+import com.atzuche.order.coreapi.entity.vo.res.CarRentTimeRangeResVO;
 import com.atzuche.order.coreapi.modifyorder.exception.ModifyOrderParameterException;
 import com.atzuche.order.coreapi.service.GoodsService.CarDetailReqVO;
+import com.atzuche.order.delivery.entity.RenterOrderDeliveryEntity;
 import com.atzuche.order.owner.commodity.service.OwnerCommodityService;
 import com.atzuche.order.ownercost.entity.OwnerOrderPurchaseDetailEntity;
 import com.atzuche.order.ownercost.entity.OwnerOrderSubsidyDetailEntity;
 import com.atzuche.order.owner.mem.service.OwnerMemberService;
 import com.atzuche.order.rentercost.entity.RenterOrderSubsidyDetailEntity;
+import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.atzuche.order.ownercost.service.OwnerOrderCostCombineService;
 import com.atzuche.order.ownercost.service.OwnerOrderCostService;
 import com.atzuche.order.ownercost.service.OwnerOrderIncrementDetailService;
 import com.atzuche.order.ownercost.service.OwnerOrderPurchaseDetailService;
 import com.atzuche.order.ownercost.service.OwnerOrderService;
 import com.atzuche.order.ownercost.service.OwnerOrderSubsidyDetailService;
+import com.atzuche.order.parentorder.entity.OrderEntity;
+import com.atzuche.order.parentorder.service.OrderService;
 import com.autoyol.commons.web.ResponseData;
 import com.dianping.cat.Cat;
 
@@ -59,27 +69,45 @@ public class ModifyOrderForOwnerService {
 	private OwnerOrderIncrementDetailService ownerOrderIncrementDetailService;
 	@Autowired
 	private OwnerOrderCostService ownerOrderCostService;
+	@Autowired
+	private UniqueOrderNoService uniqueOrderNoService;
+	@Autowired
+	private OrderService orderService;
 
 	/**
 	 * 租客修改订单重新下车主订单逻辑(相当于车主同意)
 	 * @param orderNo 主订单号
 	 * @return ResponseData
 	 */
-	public ResponseData<?> modifyOrderForOwner(ModifyOrderOwnerDTO modifyOrderOwnerDTO, RenterGoodsDetailDTO renterGoodsDetailDTO, RenterOrderSubsidyDetailEntity renterSubsidy) {
-		log.info("租客修改订单重新下车主订单modifyOrderOwnerDTO=[{}], renterGoodsDetailDTO=[{}]",modifyOrderOwnerDTO,renterGoodsDetailDTO);
+	public void modifyOrderForOwner(ModifyOrderOwnerDTO modifyOrderOwnerDTO, RenterOrderSubsidyDetailEntity renterSubsidy) {
+		log.info("租客修改订单重新下车主订单modifyOrderOwnerDTO=[{}], renterSubsidy=[{}]", modifyOrderOwnerDTO, renterSubsidy);
 		if (modifyOrderOwnerDTO == null) {
 			throw new ModifyOrderParameterException();
 		}
 		// 主订单号
 		String orderNo = modifyOrderOwnerDTO.getOrderNo();
+		// 生成车主订单号
+		String ownerOrderNo = uniqueOrderNoService.getOwnerOrderNo(orderNo);
+		// 赋值车主订单号
+		modifyOrderOwnerDTO.setOwnerOrderNo(ownerOrderNo);
+		// 获取主订单信息
+		OrderEntity orderEntity = orderService.getOrderEntity(orderNo);
+		// 设置城市编号
+		modifyOrderOwnerDTO.setCityCode(orderEntity.getCityCode());
 		// 获取修改前有效车主订单信息
 		OwnerOrderEntity ownerOrderEntity = ownerOrderService.getOwnerOrderByOrderNoAndIsEffective(orderNo);
 		// 获取车主会员信息
 		OwnerMemberDTO ownerMemberDTO = getOwnerMemberDTO(ownerOrderEntity.getOwnerOrderNo());
+		// 设置车主会员信息
+		modifyOrderOwnerDTO.setOwnerMemberDTO(ownerMemberDTO);
 		// 获取车主端商品详情
-		OwnerGoodsDetailDTO ownerGoodsDetailDTO = getOwnerGoodsDetailDTO(modifyOrderOwnerDTO, renterGoodsDetailDTO, ownerOrderEntity);
+		OwnerGoodsDetailDTO ownerGoodsDetailDTO = getOwnerGoodsDetailDTO(modifyOrderOwnerDTO, ownerOrderEntity);
+		// 设置商品信息
+		modifyOrderOwnerDTO.setOwnerGoodsDetailDTO(ownerGoodsDetailDTO);
 		// 封装新的车主子订单对象
-		OwnerOrderEntity ownerOrderEffective =  convertToOwnerOrderEntity(modifyOrderOwnerDTO, ownerOrderEntity, renterGoodsDetailDTO.getCarRealLon(), renterGoodsDetailDTO.getCarRealLat());
+		OwnerOrderEntity ownerOrderEffective = convertToOwnerOrderEntity(modifyOrderOwnerDTO, ownerOrderEntity);
+		// 设置车主订单信息
+		modifyOrderOwnerDTO.setOwnerOrderEffective(ownerOrderEffective);
 		// 封装基本对象
 		CostBaseDTO costBaseDTO = convertToCostBaseDTO(modifyOrderOwnerDTO, ownerMemberDTO);
 		// 获取租金费用信息
@@ -107,8 +135,43 @@ public class ModifyOrderForOwnerService {
 		ownerOrderService.saveOwnerOrder(ownerOrderEffective);
 		// 上笔车主子订单置为无效
 		ownerOrderService.updateOwnerOrderInvalidById(ownerOrderEntity.getId());
-		
-		return ResponseData.success();
+	}
+	
+	
+	/**
+	 * 对象转换
+	 * @param renterOrder
+	 * @param deliveryList
+	 * @return ModifyOrderOwnerDTO
+	 */
+	public ModifyOrderOwnerDTO getModifyOrderOwnerDTO(RenterOrderEntity renterOrder, List<RenterOrderDeliveryEntity> deliveryList) {
+		ModifyOrderOwnerDTO modifyOwner = new ModifyOrderOwnerDTO();
+		if (renterOrder != null) {
+			modifyOwner.setOrderNo(renterOrder.getOrderNo());
+			modifyOwner.setRentTime(renterOrder.getExpRentTime());
+			modifyOwner.setRevertTime(renterOrder.getExpRevertTime());
+			modifyOwner.setSrvGetFlag(renterOrder.getIsGetCar());
+			modifyOwner.setSrvReturnFlag(renterOrder.getIsReturnCar());
+		}
+		Map<Integer, RenterOrderDeliveryEntity> deliveryMap = null;
+		if (deliveryList != null && !deliveryList.isEmpty()) {
+			deliveryMap = deliveryList.stream().collect(Collectors.toMap(RenterOrderDeliveryEntity::getType, deliver -> {return deliver;}));
+		}
+		if (deliveryMap != null) {
+			RenterOrderDeliveryEntity srvGetDelivery = deliveryMap.get(SrvGetReturnEnum.SRV_GET_TYPE.getCode());
+			RenterOrderDeliveryEntity srvReturnDelivery = deliveryMap.get(SrvGetReturnEnum.SRV_RETURN_TYPE.getCode());
+			if (srvGetDelivery != null) {
+				modifyOwner.setGetCarAddress(srvGetDelivery.getRenterGetReturnAddr());
+				modifyOwner.setGetCarLat(srvGetDelivery.getRenterGetReturnAddrLat());
+				modifyOwner.setGetCarLon(srvGetDelivery.getRenterGetReturnAddrLon());
+			}
+			if (srvReturnDelivery != null) {
+				modifyOwner.setRevertCarAddress(srvReturnDelivery.getRenterGetReturnAddr());
+				modifyOwner.setRevertCarLat(srvReturnDelivery.getRenterGetReturnAddrLat());
+				modifyOwner.setRevertCarLon(srvReturnDelivery.getRenterGetReturnAddrLon());
+			}
+		}
+		return modifyOwner;
 	}
 	
 	
@@ -241,11 +304,9 @@ public class ModifyOrderForOwnerService {
 	 * @param carLat
 	 * @return OwnerOrderEntity
 	 */
-	public OwnerOrderEntity convertToOwnerOrderEntity(ModifyOrderOwnerDTO modifyOrderOwnerDTO, OwnerOrderEntity ownerOrderEntity, String carLon, String carLat) {
-		// TODO 计算提前时间
-		LocalDateTime showRentTime = null;
-		// TODO 计算延后时间
-		LocalDateTime showRevertTime = null;
+	public OwnerOrderEntity convertToOwnerOrderEntity(ModifyOrderOwnerDTO modifyOrderOwnerDTO, OwnerOrderEntity ownerOrderEntity) {
+		// 获取提前延后时间
+		CarRentTimeRangeResVO carRentTimeRangeResVO = getCarRentTimeRangeResVO(modifyOrderOwnerDTO);
 		// 封装新的车主子订单
 		OwnerOrderEntity ownerOrderEntityEffective = new OwnerOrderEntity();
 		// 数据拷贝
@@ -253,11 +314,72 @@ public class ModifyOrderForOwnerService {
 		ownerOrderEntityEffective.setOwnerOrderNo(modifyOrderOwnerDTO.getOwnerOrderNo());
 		ownerOrderEntityEffective.setId(null);
 		ownerOrderEntityEffective.setIsEffective(1);
-		ownerOrderEntityEffective.setShowRentTime(showRentTime);
-		ownerOrderEntityEffective.setShowRevertTime(showRevertTime);
 		ownerOrderEntityEffective.setExpRentTime(modifyOrderOwnerDTO.getRentTime());
 		ownerOrderEntityEffective.setExpRevertTime(modifyOrderOwnerDTO.getRevertTime());
+		ownerOrderEntityEffective.setShowRentTime(modifyOrderOwnerDTO.getRentTime());
+		ownerOrderEntityEffective.setShowRevertTime(modifyOrderOwnerDTO.getRevertTime());
+		if (carRentTimeRangeResVO != null) {
+			// 提前时间
+			LocalDateTime showRentTime = carRentTimeRangeResVO.getAdvanceStartDate();
+			// 延后时间
+			LocalDateTime showRevertTime = carRentTimeRangeResVO.getDelayEndDate();
+			ownerOrderEntityEffective.setShowRentTime(showRentTime);
+			ownerOrderEntityEffective.setShowRevertTime(showRevertTime);
+			ownerOrderEntityEffective.setBeforeMinutes(carRentTimeRangeResVO.getGetMinutes());
+			ownerOrderEntityEffective.setAfterMinutes(carRentTimeRangeResVO.getReturnMinutes());
+		}
 		return ownerOrderEntityEffective;
+	}
+	
+	
+	/**
+	 * 计算提前延后时间
+	 * @param modifyOrderDTO
+	 * @return CarRentTimeRangeResVO
+	 */
+	public CarRentTimeRangeResVO getCarRentTimeRangeResVO(ModifyOrderOwnerDTO modifyOrderDTO) {
+		if (modifyOrderDTO == null) {
+			return null;
+		}
+		if ((modifyOrderDTO.getSrvGetFlag() == null || modifyOrderDTO.getSrvGetFlag() == 0) &&
+				(modifyOrderDTO.getSrvReturnFlag() == null || modifyOrderDTO.getSrvReturnFlag() == 0)) {
+			return null;
+		}
+		CarRentTimeRangeReqVO carRentTimeRangeReqVO = getCarRentTimeRangeReqVO(modifyOrderDTO);
+		if (carRentTimeRangeReqVO == null) {
+			return null;
+		}
+		CarRentTimeRangeResVO carRentTimeRangeResVO = goodsService.getCarRentTimeRange(carRentTimeRangeReqVO);
+		return carRentTimeRangeResVO;
+	}
+	
+	/**
+	 * 封装获取提前延后的对象
+	 * @param modifyOrderDTO
+	 * @return CarRentTimeRangeReqVO
+	 */
+	public CarRentTimeRangeReqVO getCarRentTimeRangeReqVO(ModifyOrderOwnerDTO modifyOrderDTO) {
+		if (modifyOrderDTO == null) {
+			return null;
+		}
+		OwnerGoodsDetailDTO ownerGoodsDetailDTO = modifyOrderDTO.getOwnerGoodsDetailDTO();
+		if (ownerGoodsDetailDTO == null || ownerGoodsDetailDTO.getCarNo() == null) {
+			return null;
+		}
+		CarRentTimeRangeReqVO carRentTimeRangeReqVO = new CarRentTimeRangeReqVO();
+		carRentTimeRangeReqVO.setCarNo(String.valueOf(ownerGoodsDetailDTO.getCarNo()));
+		carRentTimeRangeReqVO.setCityCode(modifyOrderDTO.getCityCode()+"");
+		carRentTimeRangeReqVO.setRentTime(modifyOrderDTO.getRentTime());
+		carRentTimeRangeReqVO.setRevertTime(modifyOrderDTO.getRevertTime());
+		carRentTimeRangeReqVO.setSrvGetAddr(modifyOrderDTO.getGetCarAddress());
+		carRentTimeRangeReqVO.setSrvGetFlag(modifyOrderDTO.getSrvGetFlag());
+		carRentTimeRangeReqVO.setSrvGetLat(modifyOrderDTO.getGetCarLat());
+		carRentTimeRangeReqVO.setSrvGetLon(modifyOrderDTO.getGetCarLon());
+		carRentTimeRangeReqVO.setSrvReturnAddr(modifyOrderDTO.getRevertCarAddress());
+		carRentTimeRangeReqVO.setSrvReturnFlag(modifyOrderDTO.getSrvReturnFlag());
+		carRentTimeRangeReqVO.setSrvReturnLat(modifyOrderDTO.getRevertCarLat());
+		carRentTimeRangeReqVO.setSrvReturnLon(modifyOrderDTO.getRevertCarLon());
+		return carRentTimeRangeReqVO;
 	}
 	
 	
@@ -268,12 +390,10 @@ public class ModifyOrderForOwnerService {
 	 * @param ownerOrderEntity
 	 * @return OwnerGoodsDetailDTO
 	 */
-	public OwnerGoodsDetailDTO getOwnerGoodsDetailDTO(ModifyOrderOwnerDTO modifyOrderOwnerDTO, RenterGoodsDetailDTO renterGoodsDetailDTO, OwnerOrderEntity ownerOrderEntity) {
+	public OwnerGoodsDetailDTO getOwnerGoodsDetailDTO(ModifyOrderOwnerDTO modifyOrderOwnerDTO, OwnerOrderEntity ownerOrderEntity) {
 		// 获取车主端商品详情
-		if (renterGoodsDetailDTO == null) {
-			// 调远程获取
-			renterGoodsDetailDTO = goodsService.getRenterGoodsDetail(convertToCarDetailReqVO(modifyOrderOwnerDTO, ownerOrderEntity));
-		}
+		// 调远程获取
+		RenterGoodsDetailDTO renterGoodsDetailDTO = goodsService.getRenterGoodsDetail(convertToCarDetailReqVO(modifyOrderOwnerDTO, ownerOrderEntity));
 		if (renterGoodsDetailDTO == null) {
 			log.error("getOwnerGoodsDetailDTO renterGoodsDetailDTO为空");
 			Cat.logError("getOwnerGoodsDetailDTO renterGoodsDetailDTO为空",new ModifyOrderParameterException());
@@ -282,11 +402,13 @@ public class ModifyOrderForOwnerService {
 		// 获取经过组装的商品信息
 		OwnerGoodsDetailDTO ownerGoodsDetailDTO = goodsService.getOwnerGoodsDetail(renterGoodsDetailDTO);
 		ownerGoodsDetailDTO.setOrderNo(modifyOrderOwnerDTO.getOrderNo());
-		ownerGoodsDetailDTO.setOwnerOrderNo(modifyOrderOwnerDTO.getOwnerOrderNo());
+		ownerGoodsDetailDTO.setOwnerOrderNo(ownerOrderEntity.getOwnerOrderNo());
 		ownerGoodsDetailDTO.setMemNo(ownerOrderEntity.getMemNo());
 		ownerGoodsDetailDTO.setRentTime(modifyOrderOwnerDTO.getRentTime());
 		ownerGoodsDetailDTO.setRevertTime(modifyOrderOwnerDTO.getRevertTime());
 		ownerGoodsDetailDTO = ownerCommodityService.setPriceAndGroup(ownerGoodsDetailDTO);
+		// 设置最新的车主订单号
+		ownerGoodsDetailDTO.setOwnerOrderNo(modifyOrderOwnerDTO.getOwnerOrderNo());
 		List<OwnerGoodsPriceDetailDTO> ownerGoodsPriceDetailDTOList = ownerGoodsDetailDTO.getOwnerGoodsPriceDetailDTOList();
 		if (ownerGoodsPriceDetailDTOList == null || ownerGoodsPriceDetailDTOList.isEmpty()) {
 			log.error("getOwnerGoodsDetailDTO ownerGoodsPriceDetailDTOList为空");

@@ -1,12 +1,16 @@
 package com.atzuche.order.coreapi.entity.dto;
 
-import java.time.LocalDateTime;
-import java.util.List;
-
+import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
+import com.atzuche.order.commons.entity.dto.RenterMemberDTO;
+import com.atzuche.order.parentorder.entity.OrderEntity;
 import com.atzuche.order.rentercost.entity.dto.RenterOrderSubsidyDetailDTO;
+import com.atzuche.order.renterorder.entity.dto.OrderChangeItemDTO;
 
 import lombok.Data;
 import lombok.ToString;
+
+import java.time.LocalDateTime;
+import java.util.List;
 @Data
 @ToString
 public class ModifyOrderDTO {
@@ -92,9 +96,9 @@ public class ModifyOrderDTO {
 	 */
 	private String platformCouponId;
 	/**
-	 * 修改哪种操作标记
+	 * 修改哪种操作
 	 */
-	private ModifyFlagDTO modifyFlagDTO;
+	private List<OrderChangeItemDTO> changeItemList;
 	/**
      * 提前时间（分钟数）
      */
@@ -104,7 +108,23 @@ public class ModifyOrderDTO {
      */
     private Integer returnCarAfterTime;
     /**
+     * 城市code
+     */
+    private String cityCode;
+    /**
 	 * 租客费用补贴
 	 */
 	private List<RenterOrderSubsidyDetailDTO> renterSubsidyList;
+	/**
+	 * 租客商品信息
+	 */
+	private RenterGoodsDetailDTO renterGoodsDetailDTO;
+	/**
+	 * 租客会员信息
+	 */
+	private RenterMemberDTO renterMemberDTO;
+	/**
+	 * 主订单信息
+	 */
+	private OrderEntity orderEntity;
 }

@@ -40,7 +40,7 @@ public class RenterOrderReqVO implements Serializable {
     /**
      * 会员号
      */
-    private Integer memNo;
+    private String memNo;
 
     /**
      * 车辆注册号
@@ -65,7 +65,7 @@ public class RenterOrderReqVO implements Serializable {
     /**
      * 订单来源
      */
-    private Integer source;
+    private String source;
 
     /**
      * 场景号
@@ -85,7 +85,7 @@ public class RenterOrderReqVO implements Serializable {
     /**
      * 是否购买补充保障
      */
-    private String abatement;
+    private Integer abatement;
 
     /**
      * 取送服务优惠券ID

@@ -1,5 +1,9 @@
 package com.autoyol.platformcost;
 
+import com.atzuche.config.common.entity.DepositConfigEntity;
+import com.atzuche.config.common.entity.IllegalDepositConfigEntity;
+import com.atzuche.config.common.entity.InsuranceConfigEntity;
+import com.atzuche.config.common.entity.OilAverageCostEntity;
 import com.autoyol.platformcost.enums.ExceptionCodeEnum;
 import com.autoyol.platformcost.exception.RenterFeeCostException;
 import com.autoyol.platformcost.model.*;
@@ -252,7 +256,7 @@ public class RenterFeeCalculatorUtils {
 	 * @param insuranceConfigs 平台保障费配置列表
 	 * @return FeeResult
 	 */
-	public static FeeResult calInsurAmt(LocalDateTime rentTime, LocalDateTime revertTime, Integer getCarBeforeTime,Integer returnCarAfterTime, Integer configHours, Integer guidPrice, Double coefficient, Double easyCoefficient, List<InsuranceConfig> insuranceConfigs) {
+	public static FeeResult calInsurAmt(LocalDateTime rentTime, LocalDateTime revertTime, Integer getCarBeforeTime,Integer returnCarAfterTime, Integer configHours, Integer guidPrice, Double coefficient, Double easyCoefficient, List<InsuranceConfigEntity> insuranceConfigs) {
 		if (rentTime == null) {
 			throw new RenterFeeCostException(ExceptionCodeEnum.RENT_TIME_IS_NULL);
 		}
@@ -295,7 +299,7 @@ public class RenterFeeCalculatorUtils {
 	 * @param insuranceConfigs 平台保障费配置列表
 	 * @return Integer
 	 */
-	public static Integer getUnitInsurance(Integer purchasePrice, List<InsuranceConfig> insuranceConfigs) {
+	public static Integer getUnitInsurance(Integer purchasePrice, List<InsuranceConfigEntity> insuranceConfigs) {
 		Integer unitInsurAmt = UNIT_INSUR_AMT_INIT;
 		if (purchasePrice == null) {
 			purchasePrice = CARPURCHASEPRICE_250000;
@@ -303,8 +307,8 @@ public class RenterFeeCalculatorUtils {
 		if (insuranceConfigs == null || insuranceConfigs.isEmpty()) {
 			return unitInsurAmt;
 		}
-		for(InsuranceConfig config:insuranceConfigs){
-			int minPrice = config.getGuidPriceBegin();
+		for(InsuranceConfigEntity config:insuranceConfigs){
+			int minPrice = config.getGuidPriceBegin()==null?0:config.getGuidPriceBegin();
 			int maxPrice = config.getGuidPriceEnd();
 			if (purchasePrice.intValue() == 0 && purchasePrice.intValue() == minPrice) {
 				unitInsurAmt =  config.getInsuranceValue();
@@ -362,7 +366,7 @@ public class RenterFeeCalculatorUtils {
 	 * @param reliefPercetage 减免比例
 	 * @return CarDepositAmtVO
 	 */
-	public static CarDepositAmtVO calCarDepositAmt(Integer cityCode, Integer guidPrice, Double carBrandTypeRadio, Double carYearRadio, List<DepositText> depositList) {
+	public static CarDepositAmtVO calCarDepositAmt(Integer cityCode, Integer guidPrice, Double carBrandTypeRadio, Double carYearRadio, List<DepositConfigEntity> depositList) {
         if (guidPrice == null) {
             throw new RenterFeeCostException(ExceptionCodeEnum.GUID_PRICE_IS_NULL);
         }
@@ -371,7 +375,7 @@ public class RenterFeeCalculatorUtils {
         Boolean carbool = true;
         String cityCodeStr = cityCode == null ? "":String.valueOf(cityCode);
         if(null!=depositList&&depositList.size()>0){
-            for (DepositText dt : depositList) {
+            for (DepositConfigEntity dt : depositList) {
                 if(CAREEPOSIT.equals(dt.getDepositType())
                         &&cityCodeStr.equals(dt.getCityCode())
                         &&guidPrice>Integer.valueOf(dt.getPurchasePriceBegin())
@@ -392,7 +396,7 @@ public class RenterFeeCalculatorUtils {
 
             //此处代表默认设置
             if(carbool){
-                for (DepositText dt : depositList) {
+                for (DepositConfigEntity dt : depositList) {
                     if(CAREEPOSITDEFULT.equals(dt.getDepositType())
                             && guidPrice>Integer.valueOf(dt.getPurchasePriceBegin())
                             && guidPrice<=Integer.valueOf(dt.getPurchasePriceEnd())){
@@ -463,7 +467,7 @@ public class RenterFeeCalculatorUtils {
 	 * @return Integer
 	 */
 	public static Integer calIllegalDepositAmt(Integer cityCode, String carPlateNum, String specialCityCodes, Integer specialIllegalDepositAmt,
-			List<IllegalDepositConfig> illegalDepositList, LocalDateTime rentTime, LocalDateTime revertTime) {
+                                               List<IllegalDepositConfigEntity> illegalDepositList, LocalDateTime rentTime, LocalDateTime revertTime) {
 		Integer illegalDepositAmt = ILLEGAL_DEPOSIT.get(0);
 		if (carPlateNum != null && !"".equals(carPlateNum) && specialCityCodes != null && !"".equals(specialCityCodes)) {
 			if("粤".equals(carPlateNum.substring(0,1)) && cityCode != null && specialCityCodes.contains(String.valueOf(cityCode))){
@@ -484,7 +488,7 @@ public class RenterFeeCalculatorUtils {
 	 * @param revertTime 还车时间
 	 * @return Integer
 	 */
-	public static Integer getIllegalDepositAmt(Integer cityCode, List<IllegalDepositConfig> illegalDepositList, LocalDateTime rentTime, LocalDateTime revertTime) {
+	public static Integer getIllegalDepositAmt(Integer cityCode, List<IllegalDepositConfigEntity> illegalDepositList, LocalDateTime rentTime, LocalDateTime revertTime) {
 		Integer illegalDepositAmt = ILLEGAL_DEPOSIT.get(0);
 		if (cityCode == null) {
 			return illegalDepositAmt;
@@ -497,7 +501,7 @@ public class RenterFeeCalculatorUtils {
 		}
 		// 计算天数
 		long days = CommonUtils.getDaysUpCeil(rentTime, revertTime);
-		for (IllegalDepositConfig idc:illegalDepositList) {
+		for (IllegalDepositConfigEntity idc:illegalDepositList) {
 			if (cityCode.equals(idc.getCityCode()) && 
 					idc.getLeaseMin() != null && 
 					idc.getLeaseMax() != null && 
@@ -563,7 +567,7 @@ public class RenterFeeCalculatorUtils {
 	 * @param oilScaleDenominator 总油表刻度
 	 * @return Integer
 	 */
-	public static Integer calOilAmt(Integer cityCode, Integer oilVolume, Integer engineType, Integer getOilScale, Integer returnOilScale, List<OilAverageCostBO> oilAverageList, Integer oilScaleDenominator) {
+	public static Integer calOilAmt(Integer cityCode, Integer oilVolume, Integer engineType, Integer getOilScale, Integer returnOilScale, List<OilAverageCostEntity> oilAverageList, Integer oilScaleDenominator) {
 		//动力类型，1：92号汽油、2：95号汽油、3：0号柴油、4：纯电动、5
 		if (engineType==null||oilVolume==null||oilVolume==0||getOilScale==null||returnOilScale==null) {
 			return 0;

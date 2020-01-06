@@ -19,7 +19,7 @@ public class RenterOrderWzSettleFlagService {
     @Resource
     private RenterOrderWzSettleFlagMapper renterOrderWzSettleFlagMapper;
 
-    void updateIsIllegal(String orderNo, String carNum, int hasIllegal, String updateOp) {
+    public void updateIsIllegal(String orderNo, String carNum, int hasIllegal, String updateOp) {
         Integer count = renterOrderWzSettleFlagMapper.countByOrderNoAndCarNum(orderNo, carNum);
         if(count != null && count >0){
             renterOrderWzSettleFlagMapper.updateIsIllegal(orderNo,carNum,hasIllegal,updateOp);
@@ -44,7 +44,7 @@ public class RenterOrderWzSettleFlagService {
         return renterOrderWzSettleFlagMapper.saveRenterOrderWzSettleFlag(entity);
     }
 
-    int getIllegalSettleFlag(String orderNo, String carNum){
+    public int getIllegalSettleFlag(String orderNo, String carNum){
         Integer settleFlag=renterOrderWzSettleFlagMapper.getIllegalSettleFlag(orderNo,carNum);
         return settleFlag == null ? 0 : settleFlag;
     }
