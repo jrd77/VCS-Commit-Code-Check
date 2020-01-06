@@ -1,9 +1,13 @@
 package com.atzuche.order.admin.service;
 
 import com.atzuche.order.admin.vo.req.delivery.CarConditionPhotoUploadVO;
+import com.atzuche.order.admin.vo.req.delivery.DeliveryReqDTO;
+import com.atzuche.order.admin.vo.req.delivery.DeliveryReqVO;
+import com.atzuche.order.admin.vo.req.handover.HandoverCarInfoReqVO;
 import com.atzuche.order.commons.CommonUtils;
 import com.atzuche.order.delivery.service.handover.HandoverCarService;
 import com.atzuche.order.delivery.utils.OSSUtils;
+import com.atzuche.order.delivery.vo.handover.HandoverCarReqVO;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,4 +53,36 @@ public class HandoverCarInfoService {
         }
         return false;
     }
+
+    /**
+     * 更新交接车信息
+     * @param handoverCarReqVO
+     * @throws Exception
+     */
+    public void updateHandoverCarInfo(HandoverCarInfoReqVO handoverCarReqVO) throws Exception {
+        logger.debug("参数：{}", ToStringBuilder.reflectionToString(handoverCarReqVO));
+
+
+
+
+
+
+
+
+
+
+
+
+    }
+
+    /**
+     * 更新取还车信息 更新仁云接口
+     * @param handoverCarReqVO
+     * @throws Exception
+     */
+    public void updateDeliveryCarInfo(DeliveryReqVO handoverCarReqVO) throws Exception {
+        logger.debug("参数：{}", ToStringBuilder.reflectionToString(handoverCarReqVO));
+
+    }
+
 }

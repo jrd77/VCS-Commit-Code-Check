@@ -5,6 +5,8 @@ import com.atzuche.order.admin.service.HandoverCarInfoService;
 import com.atzuche.order.admin.vo.rep.delivery.DeliveryCarVO;
 import com.atzuche.order.admin.vo.req.DeliveryCarRepVO;
 import com.atzuche.order.admin.vo.req.delivery.CarConditionPhotoUploadVO;
+import com.atzuche.order.admin.vo.req.delivery.DeliveryReqVO;
+import com.atzuche.order.admin.vo.req.handover.HandoverCarInfoReqVO;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.doc.annotation.AutoDocGroup;
@@ -46,7 +48,7 @@ public class DeliveryCarController extends BaseController {
         if (null == deliveryCarDTO || StringUtils.isBlank(deliveryCarDTO.getOrderNo())) {
             return ResponseData.createErrorCodeResponse(ErrorCode.ORDER_NO_PARAM_ERROR.getCode(), "租客子订单编号为空");
         }
-        DeliveryCarRepVO deliveryCarRepVO = deliveryCarInfoService.findDeliveryListByOrderNo(deliveryCarDTO);
+        DeliveryCarVO deliveryCarRepVO = deliveryCarInfoService.findDeliveryListByOrderNo(deliveryCarDTO);
         return ResponseData.success(deliveryCarRepVO);
     }
 
@@ -72,7 +74,49 @@ public class DeliveryCarController extends BaseController {
         }
     }
 
+    /**
+     * 取还车（是否取还车）更新接口
+     * @return
+     */
+    @AutoDocVersion(version = "管理后台取还车更新")
+    @AutoDocGroup(group = "管理后台取还车更新")
+    @AutoDocMethod(description = "取还车更新", value = "取还车更新",response = ResponseData.class)
+    @RequestMapping(value = "/delivery/update", method = RequestMethod.POST)
+    public ResponseData<?> updateDeliveryCarInfo(@RequestBody @Validated DeliveryReqVO deliveryReqVO, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return validate(bindingResult);
+        }
+        try {
+             handoverCarInfoService.updateDeliveryCarInfo(deliveryReqVO);
+            return ResponseData.success();
+        } catch (Exception e) {
+            log.error("取还车更新接口出现异常", e);
+            Cat.logError("取还车更新出现异常", e);
+            return ResponseData.createErrorCodeResponse(ErrorCode.FAILED.getCode(), "交接车照片上传接口出现错误");
+        }
+    }
 
 
+    /**
+     * 取还车服务数据更新接口
+     * @return
+     */
+    @AutoDocVersion(version = "管理后台取还车更新")
+    @AutoDocGroup(group = "管理后台取还车更新")
+    @AutoDocMethod(description = "取还车更新", value = "取还车更新",response = ResponseData.class)
+    @RequestMapping(value = "/handover/update", method = RequestMethod.POST)
+    public ResponseData<?> updateHandoverCarInfo(@RequestBody @Validated HandoverCarInfoReqVO deliveryReqVO, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return validate(bindingResult);
+        }
+        try {
+            handoverCarInfoService.updateHandoverCarInfo(deliveryReqVO);
+            return ResponseData.success();
+        } catch (Exception e) {
+            log.error("交接车照片上传接口出现异常", e);
+            Cat.logError("交接车照片上传接口出现异常", e);
+            return ResponseData.createErrorCodeResponse(ErrorCode.FAILED.getCode(), "交接车照片上传接口出现错误");
+        }
+    }
 
 }

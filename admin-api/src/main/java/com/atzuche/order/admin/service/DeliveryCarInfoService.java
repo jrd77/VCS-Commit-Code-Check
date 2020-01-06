@@ -35,11 +35,14 @@ public class DeliveryCarInfoService {
      * @param deliveryCarDTO
      * @return
      */
-    public DeliveryCarRepVO findDeliveryListByOrderNo(DeliveryCarRepVO deliveryCarDTO) {
+    public DeliveryCarVO findDeliveryListByOrderNo(DeliveryCarRepVO deliveryCarDTO) {
 
         //1.获取租客交接车数据
         //2.获取车主交接车数据
-        //3. 组装返回数据
+        //3.获取配送订单数据
+        //4.获取租客地址备注数据(取还车)
+        //5.或者车主地址备注数据(取还车)
+        //6. 组装返回数据
         //取车
         RenterHandoverCarInfoEntity renterGetHandoverCarInfo = handoverCarService.getRenterHandoverCarInfo(deliveryCarDTO.getOrderNo(), HandoverCarTypeEnum.RENYUN_TO_RENTER.getValue());
         OwnerHandoverCarInfoEntity ownerGetHandoverCarInfo = handoverCarService.getOwnerHandoverCarInfo(deliveryCarDTO.getOrderNo(), HandoverCarTypeEnum.RENYUN_TO_RENTER.getValue());
