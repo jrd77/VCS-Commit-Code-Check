@@ -20,10 +20,13 @@ public class RenterInfoController {
      * 老后台参考:
      * com.autoyolConsole.controller.TransController.detail(String, String, HttpServletRequest)
      * /autoyolConsole/src/main/webapp/WEB-INF/view/trans/detail.jsp
+     *
+     * com.autoyolConsole.controller.TransUpgradeController.dispose(long, HttpServletRequest)
+     * /autoyolConsole/src/main/webapp/WEB-INF/view/transUpgrade/dispose.jsp
      */
     @AutoDocMethod(description = "获取租客信息接口响应信息", value = "获取租客信息接口响应信息", response = RenterInfoRespVO.class)
     @GetMapping(value = "/info")
-    public ResponseData<?> getManagedcarInfo(@Valid CarOrderReqVO reqVo, BindingResult bindingResult) {
+    public ResponseData<?> getRenterInfo(@Valid CarOrderReqVO reqVo, BindingResult bindingResult) {
         return null;
     }
 }
