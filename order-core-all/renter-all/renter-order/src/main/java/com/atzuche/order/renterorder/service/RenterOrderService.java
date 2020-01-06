@@ -16,13 +16,16 @@ import com.atzuche.order.renterorder.mapper.RenterOrderMapper;
 import com.atzuche.order.renterorder.vo.*;
 import com.atzuche.order.renterorder.vo.owner.OwnerCouponGetAndValidReqVO;
 import com.atzuche.order.renterorder.vo.platform.MemAvailCouponRequestVO;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -173,9 +176,9 @@ public class RenterOrderService {
         record.setGoodsCode(String.valueOf(renterOrderReqVO.getCarNo()));
         record.setGoodsType("1");
         record.setAgreeFlag(null == renterOrderReqVO.getReplyFlag() ? 0 : renterOrderReqVO.getReplyFlag());
+        record.setReqAcceptTime(null == renterOrderReqVO.getReplyFlag() ? null : LocalDateTime.now());
         record.setIsUseCoin(renterOrderReqVO.getUseAutoCoin());
         record.setIsUseWallet(renterOrderReqVO.getUseBal());
-
         record.setAddDriver(CollectionUtils.isEmpty(renterOrderReqVO.getDriverIds()) ? 0 :
                 renterOrderReqVO.getDriverIds().size());
         record.setIsUseCoupon(StringUtils.isNotBlank(renterOrderReqVO.getCarOwnerCouponNo())
@@ -257,7 +260,7 @@ public class RenterOrderService {
         abatementAmtDTO.setReturnCarAfterTime(renterOrderReqVO.getReturnCarAfterTime());
         abatementAmtDTO.setInmsrp(renterOrderReqVO.getInmsrp());
         abatementAmtDTO.setGuidPrice(renterOrderReqVO.getGuidPrice());
-        abatementAmtDTO.setIsAbatement(StringUtils.equals(renterOrderReqVO.getAbatement(),"1"));
+        abatementAmtDTO.setIsAbatement(null != renterOrderReqVO.getAbatement() && renterOrderReqVO.getAbatement() == 1 );
 
         //附加驾驶人险计算相关信息
         ExtraDriverDTO extraDriverDTO = new ExtraDriverDTO();
@@ -271,7 +274,7 @@ public class RenterOrderService {
         getReturnCarCostReqDto.setCarLon(renterOrderReqVO.getCarLon());
         getReturnCarCostReqDto.setCityCode(Integer.valueOf(renterOrderReqVO.getCityCode()));
         getReturnCarCostReqDto.setEntryCode(renterOrderReqVO.getEntryCode());
-        getReturnCarCostReqDto.setSource(renterOrderReqVO.getSource());
+        getReturnCarCostReqDto.setSource(Integer.valueOf(renterOrderReqVO.getSource()));
         getReturnCarCostReqDto.setSrvGetLat(renterOrderReqVO.getSrvGetLat());
         getReturnCarCostReqDto.setSrvGetLon(renterOrderReqVO.getSrvGetLon());
         getReturnCarCostReqDto.setSrvReturnLon(renterOrderReqVO.getSrvReturnLon());

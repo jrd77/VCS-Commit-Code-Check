@@ -506,7 +506,7 @@ public class ModifyOrderService {
 	/**
 	 * 数据转化为CarDetailReqVO
 	 * @param renterOrderEntity
-	 * @param modifyOrderReq
+	 * @param modifyOrderDTO
 	 * @return CarDetailReqVO
 	 */
 	public CarDetailReqVO convertToCarDetailReqVO(ModifyOrderDTO modifyOrderDTO, RenterOrderEntity renterOrderEntity) {
@@ -591,8 +591,9 @@ public class ModifyOrderService {
 	/**
 	 * 基础费用计算
 	 * @param modifyOrderDTO
-	 * @param renterMemberDTO
-	 * @param renterGoodsDetailDTO
+	 * @param renterOrderReqVO
+	 * @param initCostList
+     * @param initSubsidyList
 	 * @return RenterOrderCostRespDTO
 	 */
 	public RenterOrderCostRespDTO getRenterOrderCostRespDTO(ModifyOrderDTO modifyOrderDTO, RenterOrderReqVO renterOrderReqVO, List<RenterOrderCostDetailEntity> initCostList, List<RenterOrderSubsidyDetailEntity> initSubsidyList) {
@@ -869,7 +870,7 @@ public class ModifyOrderService {
 	/**
 	 * 获取车主券补贴
 	 * @param costBaseDTO
-	 * @param renterOrderReqVO
+	 * @param ownerCoupon
 	 * @return RenterOrderSubsidyDetailDTO
 	 */
 	public RenterOrderSubsidyDetailDTO getOwnerCouponSubsidy(CostBaseDTO costBaseDTO, OrderCouponDTO ownerCoupon) {
@@ -987,7 +988,7 @@ public class ModifyOrderService {
 	/**
 	 * 获取平台券补贴
 	 * @param costBaseDTO
-	 * @param platfromCoupon
+	 * @param platformCoupon
 	 * @return RenterOrderSubsidyDetailDTO
 	 */
 	public RenterOrderSubsidyDetailDTO getPlatformCouponSubsidy(CostBaseDTO costBaseDTO, OrderCouponDTO platformCoupon) {
@@ -1041,7 +1042,8 @@ public class ModifyOrderService {
 	 */
 	public RenterOrderReqVO convertToRenterOrderReqVO(ModifyOrderDTO modifyOrderDTO, RenterMemberDTO renterMemberDTO, RenterGoodsDetailDTO renterGoodsDetailDTO, OrderEntity orderEntity, CarRentTimeRangeResVO carRentTimeRangeResVO) {
 		RenterOrderReqVO renterOrderReqVO = new RenterOrderReqVO();
-		renterOrderReqVO.setAbatement(modifyOrderDTO.getAbatementFlag()==null?"0":String.valueOf(modifyOrderDTO.getAbatementFlag()));
+		renterOrderReqVO.setAbatement(modifyOrderDTO.getAbatementFlag() == null ? 0 :
+                modifyOrderDTO.getAbatementFlag());
 		renterOrderReqVO.setCarLat(renterGoodsDetailDTO.getCarShowLat());
 		renterOrderReqVO.setCarLon(renterGoodsDetailDTO.getCarShowLon());
 		renterOrderReqVO.setCarOwnerCouponNo(modifyOrderDTO.getCarOwnerCouponId());

@@ -53,10 +53,7 @@
 				`return_status_type`,		
 				`return_context`,		
 				`send_time`,		
-				`return_time`,		
-				`create_time`,		
-				`update_time`,		
-				`is_delete`		
+				`return_time`
 			)
 		values
 		(
@@ -68,10 +65,7 @@
 				#{returnStatusType}, 		
 				#{returnContext}, 		
 				#{sendTime}, 		
-				#{returnTime}, 		
-				#{createTime}, 		
-				#{updateTime}, 		
-				#{isDelete}		
+				#{returnTime}
 			)
 	</insert>
 	
