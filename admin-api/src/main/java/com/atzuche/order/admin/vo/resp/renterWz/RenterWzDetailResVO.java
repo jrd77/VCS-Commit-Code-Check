@@ -1,4 +1,4 @@
-package com.atzuche.order.admin.vo.res.renterWz;
+package com.atzuche.order.admin.vo.resp.renterWz;
 
 import com.autoyol.doc.annotation.AutoDocProperty;
 import lombok.Data;

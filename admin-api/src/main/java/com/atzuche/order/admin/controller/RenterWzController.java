@@ -1,11 +1,11 @@
 package com.atzuche.order.admin.controller;
 
-import com.atzuche.order.admin.vo.res.renterWz.RenterWzCostDetailVO;
+import com.atzuche.order.admin.vo.resp.renterWz.RenterWzCostDetailVO;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.doc.annotation.AutoDocMethod;
 import com.autoyol.doc.annotation.AutoDocVersion;
-import com.atzuche.order.admin.vo.res.renterWz.RenterWzDetailResVO;
+import com.atzuche.order.admin.vo.resp.renterWz.RenterWzDetailResVO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.CollectionUtils;
