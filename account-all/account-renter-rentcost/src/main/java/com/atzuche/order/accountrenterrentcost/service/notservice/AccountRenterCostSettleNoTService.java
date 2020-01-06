@@ -79,4 +79,15 @@ public class AccountRenterCostSettleNoTService {
             throw new AccountRenterRentCostRefundException();
         }
     }
+
+    /**
+     * 结算更新 租客费用总账户  费用信息
+     * @param entity
+     */
+    public void updateAccountRenterCostSettle(AccountRenterCostSettleEntity entity) {
+        int result = accountRenterCostSettleMapper.updateByPrimaryKeySelective(entity);
+        if(result==0){
+            throw new AccountRenterRentCostRefundException();
+        }
+    }
 }

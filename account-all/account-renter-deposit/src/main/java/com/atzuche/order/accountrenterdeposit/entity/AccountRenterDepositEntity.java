@@ -74,7 +74,7 @@ public class AccountRenterDepositEntity implements Serializable {
 	private Integer surplusAuthorizeDepositAmt;
 
     /**
-     * 免押方式
+     * 免押方式(1:绑卡减免,2:芝麻减免,3:消费)
      */
     private Integer freeDepositType;
 	/**

@@ -23,10 +23,8 @@ import java.util.Objects;
  */
 @Service
 public class AccountRenterCostSettleService{
-    @Autowired
-    private AccountRenterCostSettleNoTService accountRenterCostSettleNoTService;
-    @Autowired
-    private AccountRenterCostDetailNoTService accountRenterCostDetailNoTService;
+    @Autowired private AccountRenterCostSettleNoTService accountRenterCostSettleNoTService;
+    @Autowired private AccountRenterCostDetailNoTService accountRenterCostDetailNoTService;
 
     /**
      * 查询订单 已付租车费用

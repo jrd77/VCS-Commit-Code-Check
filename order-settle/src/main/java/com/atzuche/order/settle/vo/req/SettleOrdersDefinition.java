@@ -18,6 +18,7 @@ public class SettleOrdersDefinition {
 
 
 
+
     /** **************************************************************************平台端 统计费用 */
     /**
      * 平台收益总额
@@ -48,6 +49,11 @@ public class SettleOrdersDefinition {
     private int ownerSubsidyAmt;
 
     /**
+     * 车主最终收益金额
+     */
+    private int ownerCostAmtFinal;
+
+    /**
      * 车主费用明细
      */
     private List<AccountOwnerCostSettleDetailEntity> accountOwnerCostSettleDetails;
@@ -61,6 +67,19 @@ public class SettleOrdersDefinition {
      * 租客补贴
      */
     private int rentSubsidyAmt;
+
+    /**
+     * 租客最终应付费用
+     */
+    private int rentCostAmtFinal;
+    /**
+     * 租客最终实付付费用
+     */
+    private int rentCostPayAmtFinal;
+    /**
+     * 租客实付 车辆押金
+     */
+    private int depositAmt;
 
     /**
      * 租客费用明细

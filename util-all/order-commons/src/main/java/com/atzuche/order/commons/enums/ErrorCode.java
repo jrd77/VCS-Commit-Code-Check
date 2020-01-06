@@ -37,6 +37,8 @@ public enum ErrorCode {
     CASHIER_PAY_CALL_BACK_FAIL("981004","支付系统支付回调操作失败"),
     CASHIER_PAY_SIGN_PARAM_ERRER("981007","支付参数签名失败"),
 
+    ORDER_SETTLE_FLAT_ACCOUNT("811001","结算费用未平账"),
+
     GET_WALLETR_MSG("981005","查询钱包信息出错"),
     DEDUCT_WALLETR_MSG("981006","扣减钱包信息出错"),
 

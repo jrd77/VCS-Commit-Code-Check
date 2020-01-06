@@ -327,10 +327,6 @@ public class CashierService {
         if(!CollectionUtils.isEmpty(lstNotifyDataVo)){
             for(int i=0;i<lstNotifyDataVo.size();i++){
                 NotifyDataVo notifyDataVo = lstNotifyDataVo.get(i);
-                //1 退款
-//                if(DataPayTypeConstant.PUR_RETURN.equals(notifyDataVo.getPayType())){
-//                    refundCallBackSuccess(notifyDataVo);
-//                }
                 //2支付成功回调
                 if(DataPayTypeConstant.PAY_PUR.equals(notifyDataVo.getPayType()) || DataPayTypeConstant.PAY_PRE.equals(notifyDataVo.getPayType())){
                     payOrderCallBackSuccess(notifyDataVo);
@@ -358,11 +354,11 @@ public class CashierService {
      * 支付成功回调 更新收银台及费用
      * @param notifyDataVo
      */
-    @Transactional(rollbackFor=Exception.class)
     public void payOrderCallBackSuccess(NotifyDataVo notifyDataVo) {
         log.info("payOrderCallBackSuccess param :[{}]", GsonUtils.toJson(notifyDataVo));
         //没有成功的 不处理
         if(Objects.isNull(notifyDataVo) || !TransStatusEnum.PAY_SUCCESS.getCode().equals(notifyDataVo.getTransStatus())){
+            log.info("payOrderCallBackSuccess check fail :[{}]", GsonUtils.toJson(notifyDataVo));
             return;
         }
         //1.1 租车押金 01

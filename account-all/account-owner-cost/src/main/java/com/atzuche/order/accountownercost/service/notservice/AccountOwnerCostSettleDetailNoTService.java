@@ -39,4 +39,17 @@ public class AccountOwnerCostSettleDetailNoTService {
             }
         }
     }
+
+    /**
+     * 车俩结算 车主费用明细落库
+     * @param accountOwnerCostSettleDetails
+     */
+    public void insertAccountOwnerCostSettleDetails(List<AccountOwnerCostSettleDetailEntity> accountOwnerCostSettleDetails) {
+        if(!CollectionUtils.isEmpty(accountOwnerCostSettleDetails)){
+            for(int i=0;i<accountOwnerCostSettleDetails.size();i++){
+                AccountOwnerCostSettleDetailEntity entity = accountOwnerCostSettleDetails.get(i);
+                accountOwnerCostSettleDetailMapper.insert(entity);
+            }
+        }
+    }
 }
