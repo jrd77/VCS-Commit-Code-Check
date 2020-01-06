@@ -4,6 +4,7 @@ import com.atzuche.order.admin.vo.resp.car.CarBaseInfoResVo;
 import com.atzuche.order.admin.vo.req.car.CarBaseReqVO;
 import com.atzuche.order.admin.vo.req.car.CarOtherConfigReqVo;
 import com.atzuche.order.admin.vo.req.car.CarBaseInfoReqVO;
+import com.atzuche.order.admin.vo.resp.car.CarBusinessResVO;
 import com.atzuche.order.admin.vo.resp.car.CarOtherConfigResVo;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.doc.annotation.AutoDocMethod;
@@ -47,4 +48,11 @@ public class CarController {
 
         return ResponseData.success(null);
     }
+    @AutoDocMethod(description = "车辆运营信息", value = "保存车辆其他配置", response = CarBusinessResVO.class)
+    @PostMapping(value = "/car/bussiness")
+    public ResponseData<?> getCarBusiness(@Valid @RequestBody CarBaseReqVO reqVo, BindingResult bindingResult) {
+
+        return ResponseData.success(null);
+    }
+
 }
