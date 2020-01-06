@@ -8,7 +8,6 @@ import java.io.Serializable;
 import java.util.List;
 
 /**
- * @author meng.xu
  * 托管车出入库初始化响应信息
  */
 @Data
