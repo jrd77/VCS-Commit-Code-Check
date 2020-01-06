@@ -12,7 +12,7 @@ import lombok.ToString;
  */
 @Data
 @ToString
-public class RenterWzCostDetailVO {
+public class RenterWzCostDetailResVO {
 
     @AutoDocProperty("订单号")
     private String orderNo;

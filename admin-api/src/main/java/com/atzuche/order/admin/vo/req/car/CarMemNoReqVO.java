@@ -6,7 +6,7 @@ import lombok.Data;
 import javax.validation.constraints.NotNull;
 
 @Data
-public class CarOwnerInfoReqVO {
+public class CarMemNoReqVO {
 	@AutoDocProperty(value="memNo,必填")
 	@NotNull(message="会员号不能为空")
 	private Integer ownerNo;

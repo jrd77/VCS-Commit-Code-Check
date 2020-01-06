@@ -7,7 +7,6 @@ import lombok.ToString;
 import java.io.Serializable;
 
 /**
- * @author meng.xu
  * 托管车出入库响应信息-操作日志信息
  */
 @Data
