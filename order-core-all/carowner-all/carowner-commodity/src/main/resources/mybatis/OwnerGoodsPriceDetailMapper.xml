@@ -146,7 +146,7 @@
 		</set>
 		where id = #{id}
 	</update>
-    <select id="selectByOwnerOrderNo" resultType="com.atzuche.order.owner.commodity.entity.OwnerGoodsPriceDetailEntity">
+    <select id="selectByOwnerOrderNo" resultMap="BaseResultMap">
         select
         <include refid="Base_Column_List"/>
         from owner_goods_price_detail
