@@ -1,4 +1,4 @@
-package com.atzuche.order.admin.controller.car;
+package com.atzuche.order.admin.controller;
 
 import com.atzuche.order.admin.vo.req.car.CarMemNoReqVO;
 import com.atzuche.order.admin.vo.resp.car.CarOwnerInfoRespVO;
