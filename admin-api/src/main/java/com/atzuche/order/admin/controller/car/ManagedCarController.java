@@ -1,6 +1,6 @@
 package com.atzuche.order.admin.controller.car;
 
-import com.atzuche.order.admin.vo.req.car.CarBaseReqVo;
+import com.atzuche.order.admin.vo.req.car.CarBaseReqVO;
 import com.atzuche.order.admin.vo.req.car.ManagedCarUpdateReqVO;
 import com.atzuche.order.admin.vo.resp.car.ManagedCarRespVO;
 import com.autoyol.commons.web.ResponseData;
@@ -23,7 +23,7 @@ public class ManagedCarController{
      */
     @AutoDocMethod(description = "获取托管车出入库初始化响应信息", value = "获取托管车出入库初始化响应信息", response = ManagedCarRespVO.class)
     @GetMapping(value = "/info")
-    public ResponseData <?> getManagedcarInfo(@Valid CarBaseReqVo reqVo, BindingResult bindingResult) {
+    public ResponseData <?> getManagedcarInfo(@Valid CarBaseReqVO reqVo, BindingResult bindingResult) {
         return null;
     }
 
