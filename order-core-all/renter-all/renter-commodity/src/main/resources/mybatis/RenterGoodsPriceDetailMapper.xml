@@ -133,7 +133,7 @@
 		where id = #{id}
 	</update>
 
-    <select id="selectByRenterOrderNo" resultType="com.atzuche.order.rentercommodity.entity.RenterGoodsPriceDetailEntity">
+    <select id="selectByRenterOrderNo" resultMap="BaseResultMap">
         select
         <include refid="Base_Column_List"/>
         from renter_goods_price_detail
