@@ -1,6 +1,6 @@
 package com.atzuche.order.admin.controller.car;
 
-import com.atzuche.order.admin.vo.req.car.CarOwnerInfoReqVO;
+import com.atzuche.order.admin.vo.req.car.CarMemNoReqVO;
 import com.atzuche.order.admin.vo.resp.car.CarOwnerInfoRespVO;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.doc.annotation.AutoDocMethod;
@@ -24,7 +24,7 @@ public class CarOwnerInfoController {
      */
     @AutoDocMethod(description = "查看车主信息接口信息", value = "查看车主信息接口信息", response = CarOwnerInfoRespVO.class)
     @GetMapping(value = "/info")
-    public ResponseData<?> getCarOwnerInfo(@Valid CarOwnerInfoReqVO reqVo, BindingResult bindingResult) {
+    public ResponseData<?> getCarOwnerInfo(@Valid CarMemNoReqVO reqVo, BindingResult bindingResult) {
         return null;
     }
 
