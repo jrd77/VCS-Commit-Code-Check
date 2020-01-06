@@ -85,7 +85,7 @@ public class RenterOrderReqVO implements Serializable {
     /**
      * 是否购买补充保障
      */
-    private String abatement;
+    private Integer abatement;
 
     /**
      * 取送服务优惠券ID
