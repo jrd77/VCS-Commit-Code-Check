@@ -52,7 +52,7 @@ dependencies {
 
 
 
-    compile project(":casier-all:cashier-account")
+//    compile project(":casier-all:cashier-account")
 
 
     compile project(":util-all:fee-calculator")
