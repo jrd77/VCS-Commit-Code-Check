@@ -1,4 +1,4 @@
-package com.atzuche.order.admin.vo.resp.car;
+package com.atzuche.order.admin.vo.req.car;
 
 import com.autoyol.doc.annotation.AutoDocProperty;
 import lombok.Data;
@@ -6,21 +6,21 @@ import lombok.Data;
 import javax.validation.constraints.NotNull;
 
 @Data
-public class CarBaseInfoReqVo implements java.io.Serializable{
+public class CarBaseInfoReqVO implements java.io.Serializable{
 	@AutoDocProperty(value="车辆注册号,必填")
 	@NotNull(message="车辆注册号不能为空")
 	private Integer carNo;
 	@AutoDocProperty(value="品牌,必填")
 	private Integer brand;
 
-	@AutoDocProperty(value="[AUT-3787 新增]品牌文本")
-	private String brandTxt;
+//	@AutoDocProperty(value="品牌文本")
+//	private String brandTxt;
 
 	@AutoDocProperty(value="车型,必填")
 	private Integer carType;
 
-	@AutoDocProperty(value="[AUT-3787 新增] 车型文本")
-	private String carTypeTxt;
+//	@AutoDocProperty(value="车型文本")
+//	private String carTypeTxt;
 
 	@AutoDocProperty(value="年款,必填")
 	private Integer year;
@@ -72,8 +72,8 @@ public class CarBaseInfoReqVo implements java.io.Serializable{
 	@AutoDocProperty(value="是否本地")
 	private Integer isLocal;
 
-	@AutoDocProperty(value="[AUT-3787 新增] 功能记录ID 2：车辆详情品牌车型")
-	private Integer modelId;
+//	@AutoDocProperty(value="功能记录ID 2：车辆详情品牌车型")
+//	private Integer modelId;
 
 }
 

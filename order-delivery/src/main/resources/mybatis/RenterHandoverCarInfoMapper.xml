@@ -275,5 +275,5 @@
 		from renter_handover_car_info where
 		order_no = #{orderNo} and type = #{type} and is_delete = 0 order by id limit 1
 	</select>
-  	
+
 </mapper>

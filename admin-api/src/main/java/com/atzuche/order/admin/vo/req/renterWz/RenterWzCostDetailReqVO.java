@@ -1,4 +1,4 @@
-package com.atzuche.order.admin.vo.resp.renterWz;
+package com.atzuche.order.admin.vo.req.renterWz;
 
 import com.autoyol.doc.annotation.AutoDocProperty;
 import lombok.Data;
@@ -12,7 +12,7 @@ import lombok.ToString;
  */
 @Data
 @ToString
-public class RenterWzCostDetailVO {
+public class RenterWzCostDetailReqVO {
 
     @AutoDocProperty("订单号")
     private String orderNo;
