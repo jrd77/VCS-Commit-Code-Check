@@ -13,6 +13,7 @@ import com.atzuche.order.renterwz.vo.OrderInfoForIllegal;
 import com.atzuche.order.renterwz.entity.WzQueryDayConfEntity;
 import com.atzuche.order.renterwz.service.WzQueryDayConfService;
 import com.atzuche.order.renterwz.vo.IllegalToDO;
+import com.autoyol.car.api.model.enums.OwnerTypeEnum;
 import com.autoyol.search.api.OrderSearchService;
 import com.autoyol.search.entity.ErrorCode;
 import com.autoyol.search.entity.ResponseData;
@@ -358,8 +359,7 @@ public class OrderSearchRemoteService {
             dto.setActhtime(null);
         }
         //查询车辆归属类型取值
-        //TODO
-        //dto.setCartype(transMapper.queryValueByTypeCode("AUTOYOL_CAR_TYPE",ownerType==null?"0":ownerType+""));
+        dto.setCartype(OwnerTypeEnum.getRemark(ownerType));
         dto.setOwnerType(null);
         dto.setCarNo(fromBean.getCarNo());
         dto.setCzphone(fromBean.getOwnerPhone());
