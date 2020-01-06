@@ -152,11 +152,8 @@
         `frame_no`,
         `engine_num`,
         `service_rate`,
-        `create_time`,
         `create_op`,
-        `update_time`,
-        `update_op`,
-        `is_delete`
+        `update_op`
         )
         values
         (
@@ -200,11 +197,8 @@
         #{frameNo},
         #{engineNum},
         #{serviceRate},
-        #{createTime},
         #{createOp},
-        #{updateTime},
-        #{updateOp},
-        #{isDelete}
+        #{updateOp}
         )
     </insert>
 
@@ -251,11 +245,8 @@
             <if test="frameNo != null">`frame_no`, </if>
             <if test="engineNum != null">`engine_num`, </if>
             <if test="serviceRate != null">`service_rate`, </if>
-            <if test="createTime != null">`create_time`, </if>
             <if test="createOp != null">`create_op`, </if>
-            <if test="updateTime != null">`update_time`, </if>
             <if test="updateOp != null">`update_op`, </if>
-            <if test="isDelete != null">`is_delete` </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides="," >
             <if test="orderNo != null">#{orderNo},  </if>
@@ -298,11 +289,8 @@
             <if test="frameNo != null">#{frameNo},  </if>
             <if test="engineNum != null">#{engineNum},  </if>
             <if test="serviceRate != null">#{serviceRate},  </if>
-            <if test="createTime != null">#{createTime},  </if>
             <if test="createOp != null">#{createOp},  </if>
-            <if test="updateTime != null">#{updateTime},  </if>
             <if test="updateOp != null">#{updateOp},  </if>
-            <if test="isDelete != null">#{isDelete} </if>
         </trim>
     </insert>
 

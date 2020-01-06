@@ -402,11 +402,13 @@ public class ModifyOrderForOwnerService {
 		// 获取经过组装的商品信息
 		OwnerGoodsDetailDTO ownerGoodsDetailDTO = goodsService.getOwnerGoodsDetail(renterGoodsDetailDTO);
 		ownerGoodsDetailDTO.setOrderNo(modifyOrderOwnerDTO.getOrderNo());
-		ownerGoodsDetailDTO.setOwnerOrderNo(modifyOrderOwnerDTO.getOwnerOrderNo());
+		ownerGoodsDetailDTO.setOwnerOrderNo(ownerOrderEntity.getOwnerOrderNo());
 		ownerGoodsDetailDTO.setMemNo(ownerOrderEntity.getMemNo());
 		ownerGoodsDetailDTO.setRentTime(modifyOrderOwnerDTO.getRentTime());
 		ownerGoodsDetailDTO.setRevertTime(modifyOrderOwnerDTO.getRevertTime());
 		ownerGoodsDetailDTO = ownerCommodityService.setPriceAndGroup(ownerGoodsDetailDTO);
+		// 设置最新的车主订单号
+		ownerGoodsDetailDTO.setOwnerOrderNo(modifyOrderOwnerDTO.getOwnerOrderNo());
 		List<OwnerGoodsPriceDetailDTO> ownerGoodsPriceDetailDTOList = ownerGoodsDetailDTO.getOwnerGoodsPriceDetailDTOList();
 		if (ownerGoodsPriceDetailDTOList == null || ownerGoodsPriceDetailDTOList.isEmpty()) {
 			log.error("getOwnerGoodsDetailDTO ownerGoodsPriceDetailDTOList为空");
