@@ -1,7 +1,17 @@
 package com.atzuche.order.admin.service;
 
 import com.atzuche.order.admin.vo.req.delivery.CarConditionPhotoUploadVO;
+import com.atzuche.order.admin.vo.req.delivery.DeliveryReqDTO;
+import com.atzuche.order.admin.vo.req.delivery.DeliveryReqVO;
+import com.atzuche.order.admin.vo.req.handover.HandoverCarInfoReqDTO;
+import com.atzuche.order.admin.vo.req.handover.HandoverCarInfoReqVO;
 import com.atzuche.order.commons.CommonUtils;
+import com.atzuche.order.delivery.common.DeliveryErrorCode;
+import com.atzuche.order.delivery.entity.OwnerHandoverCarInfoEntity;
+import com.atzuche.order.delivery.entity.RenterHandoverCarInfoEntity;
+import com.atzuche.order.delivery.enums.HandoverCarTypeEnum;
+import com.atzuche.order.delivery.exception.DeliveryOrderException;
+import com.atzuche.order.delivery.exception.HandoverCarOrderException;
 import com.atzuche.order.delivery.service.handover.HandoverCarService;
 import com.atzuche.order.delivery.utils.OSSUtils;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -9,7 +19,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Objects;
 import java.util.UUID;
 
 import static org.bouncycastle.asn1.x500.style.RFC4519Style.serialNumber;
@@ -22,8 +34,12 @@ import static org.bouncycastle.asn1.x500.style.RFC4519Style.serialNumber;
 public class HandoverCarInfoService {
 
     protected  final Logger logger = LoggerFactory.getLogger(getClass());
+
     @Autowired
     HandoverCarService handoverCarService;
+    @Autowired
+    DeliveryCarInfoService deliveryCarInfoService;
+
 
     /**
      * 上传交接车
@@ -49,4 +65,70 @@ public class HandoverCarInfoService {
         }
         return false;
     }
+
+    /**
+     * 更新交接车信息
+     * @param handoverCarReqVO
+     * @throws Exception
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public void updateHandoverCarInfo(HandoverCarInfoReqVO handoverCarReqVO) throws Exception {
+        logger.debug("参数：{}", ToStringBuilder.reflectionToString(handoverCarReqVO));
+        if (Objects.isNull(handoverCarReqVO)) {
+            throw new HandoverCarOrderException(DeliveryErrorCode.DELIVERY_PARAMS_ERROR.getValue(), "参数错误");
+        }
+        //车主取还车
+        if (handoverCarReqVO.getOwnerHandoverCarDTO() != null) {
+            HandoverCarInfoReqDTO handoverCarInfoReqDTO = handoverCarReqVO.getOwnerHandoverCarDTO();
+            //查找车主交接车相关信息
+            OwnerHandoverCarInfoEntity ownerHandoverCarReturnInfoEntity = handoverCarService.getOwnerHandoverCarInfo(handoverCarInfoReqDTO.getOrderNo(), HandoverCarTypeEnum.RENTER_TO_RENYUN.getValue());
+            ownerHandoverCarReturnInfoEntity.setOilNum(Integer.valueOf(handoverCarInfoReqDTO.getRenterReturnOil()));
+            ownerHandoverCarReturnInfoEntity.setMileageNum(Integer.valueOf(handoverCarInfoReqDTO.getOwnReturnKM()));
+            handoverCarService.updateOwnerHandoverInfo(ownerHandoverCarReturnInfoEntity);
+            OwnerHandoverCarInfoEntity ownerHandoverCarGetInfoEntity = handoverCarService.getOwnerHandoverCarInfo(handoverCarInfoReqDTO.getOrderNo(), HandoverCarTypeEnum.RENYUN_TO_RENTER.getValue());
+            ownerHandoverCarGetInfoEntity.setOilNum(Integer.valueOf(handoverCarInfoReqDTO.getOwnReturnOil()));
+            ownerHandoverCarGetInfoEntity.setMileageNum(Integer.valueOf(handoverCarInfoReqDTO.getRenterRetrunKM()));
+            handoverCarService.updateOwnerHandoverInfo(ownerHandoverCarGetInfoEntity);
+        }
+        if(handoverCarReqVO.getRenterHandoverCarDTO() != null)
+        {
+            HandoverCarInfoReqDTO handoverCarInfoReqDTO = handoverCarReqVO.getRenterHandoverCarDTO();
+            //查找车主交接车相关信息
+            RenterHandoverCarInfoEntity renterHandoverCarReturnInfoEntity = handoverCarService.getRenterHandoverCarInfo(handoverCarInfoReqDTO.getOrderNo(), HandoverCarTypeEnum.RENTER_TO_RENYUN.getValue());
+            renterHandoverCarReturnInfoEntity.setOilNum(Integer.valueOf(handoverCarInfoReqDTO.getRenterReturnOil()));
+            renterHandoverCarReturnInfoEntity.setMileageNum(Integer.valueOf(handoverCarInfoReqDTO.getOwnReturnKM()));
+            handoverCarService.updateRenterHandoverInfo(renterHandoverCarReturnInfoEntity);
+            RenterHandoverCarInfoEntity renterHandoverCarGetInfoEntity = handoverCarService.getRenterHandoverCarInfo(handoverCarInfoReqDTO.getOrderNo(), HandoverCarTypeEnum.RENYUN_TO_RENTER.getValue());
+            renterHandoverCarGetInfoEntity.setOilNum(Integer.valueOf(handoverCarInfoReqDTO.getOwnReturnOil()));
+            renterHandoverCarGetInfoEntity.setMileageNum(Integer.valueOf(handoverCarInfoReqDTO.getRenterRetrunKM()));
+            handoverCarService.updateRenterHandoverInfo(renterHandoverCarGetInfoEntity);
+        }
+    }
+
+    /**
+     * 更新取还车信息 更新仁云接口
+     * @param deliveryReqVO
+     * @throws Exception
+     */
+    public void updateDeliveryCarInfo(DeliveryReqVO deliveryReqVO) throws Exception {
+        logger.debug("参数：{}", ToStringBuilder.reflectionToString(deliveryReqVO));
+        if (Objects.isNull(deliveryReqVO)) {
+            throw new DeliveryOrderException(DeliveryErrorCode.DELIVERY_PARAMS_ERROR.getValue(), "参数错误");
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    }
+
 }

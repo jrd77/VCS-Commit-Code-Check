@@ -291,7 +291,7 @@
 
 	<update id="updateStatusById" parameterType="java.lang.Integer">
 		UPDATE renter_order_delivery
-		SET status = 2
+		SET status = 3
 		WHERE id = #{id} AND is_delete = 0
 	</update>
 
@@ -307,5 +307,12 @@
 		<include refid="Base_Column_List"/>
 		from renter_order_delivery where order_no = #{orderNo}
 		and type = #{type} and is_delete = 0 order by id desc limit 1
+	</select>
+
+	<select id="findRenterOrdersByrOrderNo" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List"/>
+		from renter_order_delivery where order_no = #{orderNo}
+		and is_delete = 0 order by id desc limit 1
 	</select>
 </mapper>

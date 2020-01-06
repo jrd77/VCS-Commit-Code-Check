@@ -146,5 +146,9 @@
 		</set>
 		where id = #{id}
 	</update>
+
+	<select id="selectObjectByOrderNo" resultMap="BaseResultMap">
+		select a.* from owner_handover_car_remark a where id = (select max(id) from owner_handover_car_remark where type = a.type) and order_no = #{orderNo} order by a.id
+	</select>
   	
 </mapper>

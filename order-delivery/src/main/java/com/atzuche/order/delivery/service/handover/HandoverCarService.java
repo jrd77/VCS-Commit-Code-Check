@@ -124,6 +124,7 @@ public class HandoverCarService {
 
     /**
      * 更新图片数据
+     *
      * @param orderNo
      * @param userType
      * @param photoType
@@ -155,6 +156,7 @@ public class HandoverCarService {
 
     /**
      * 校验订单信息
+     *
      * @param memNO
      * @param orderNo
      * @param userType
@@ -180,5 +182,71 @@ public class HandoverCarService {
         }
         return true;
     }
+
+    /**
+     * 获取租客交接车数据
+     *
+     * @param orderNo
+     * @param type
+     * @return
+     */
+    public RenterHandoverCarInfoEntity getRenterHandoverCarInfo(String orderNo, Integer type) {
+        return renterHandoverCarInfoMapper.selectObjectByOrderNo(orderNo, type);
+    }
+
+    /**
+     * 获取车主交接车数据
+     *
+     * @param orderNo
+     * @param type
+     * @return
+     */
+    public OwnerHandoverCarInfoEntity getOwnerHandoverCarInfo(String orderNo, Integer type) {
+
+        return ownerHandoverCarInfoMapper.selectObjectByOrderNo(orderNo, type);
+    }
+
+    /**
+     * 获取车主备注信息
+     *
+     * @param orderNo
+     * @return
+     */
+    public List<OwnerHandoverCarRemarkEntity> getOwnerHandoverRemarkInfo(String orderNo) {
+
+        return ownerHandoverCarRemarkMapper.selectObjectByOrderNo(orderNo);
+    }
+
+    /**
+     * 获取租客备注信息
+     *
+     * @param orderNo
+     * @return
+     */
+    public List<RenterHandoverCarRemarkEntity> getRenterHandoverRemarkInfo(String orderNo) {
+
+        return renterHandoverCarRemarkMapper.selectObjectByOrderNo(orderNo);
+    }
+
+    /**
+     * 更新车主交接车信息
+     * @param ownerHandoverCarInfoEntity
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public Integer updateOwnerHandoverInfo(OwnerHandoverCarInfoEntity ownerHandoverCarInfoEntity) {
+
+        return ownerHandoverCarInfoMapper.updateByPrimaryKey(ownerHandoverCarInfoEntity);
+    }
+
+    /**
+     * 更新租客交接车信息
+     * @param renterHandoverCarInfoEntity
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public Integer updateRenterHandoverInfo(RenterHandoverCarInfoEntity renterHandoverCarInfoEntity) {
+
+        return renterHandoverCarInfoMapper.updateByPrimaryKey(renterHandoverCarInfoEntity);
+    }
+
 
 }
