@@ -323,7 +323,7 @@ public class OrderRentalCostController {
      */
     @AutoDocVersion(version = "管理后台附加驾驶员险")
     @AutoDocGroup(group = "管理后台附加驾驶员险")
-    @AutoDocMethod(description = "附加驾驶员险", value = "附加驾驶员险",response = ResponseData.class)
+    @AutoDocMethod(description = "新增附加驾驶员险", value = "新增附加驾驶员险",response = ResponseData.class)
     @PostMapping("/additionalDriverInsurance/add")
     public ResponseData<?> insertAdditionalDriverInsuranceByOrderNo(@RequestBody AdditionalDriverInsuranceVO additionalDriverInsuranceVO) {
         if (null == additionalDriverInsuranceVO || StringUtils.isBlank(additionalDriverInsuranceVO.getRenterOrderNo())) {
