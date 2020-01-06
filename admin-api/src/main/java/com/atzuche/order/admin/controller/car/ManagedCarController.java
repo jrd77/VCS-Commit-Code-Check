@@ -28,7 +28,7 @@ public class ManagedCarController{
     }
 
     @AutoDocMethod(description = "托管车出入库信息保存", value = "托管车出入库信息保存")
-    @PostMapping(value = "saveManagedcarInfo")
+    @PostMapping(value = "/saveManagedcarInfo")
     public ResponseData <?> saveManagedcarInfo(@Valid @RequestBody ManagedCarUpdateReqVO reqVo, BindingResult bindingResult) {
         return null;
     }

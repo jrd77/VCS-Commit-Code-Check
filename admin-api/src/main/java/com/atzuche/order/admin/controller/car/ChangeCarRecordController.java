@@ -1,7 +1,7 @@
 package com.atzuche.order.admin.controller.car;
 
-import com.atzuche.order.admin.vo.req.car.CarOwnerInfoReqVO;
-import com.atzuche.order.admin.vo.resp.car.CarOwnerInfoRespVO;
+import com.atzuche.order.admin.vo.req.car.CarOrderReqVO;
+import com.atzuche.order.admin.vo.resp.car.ChangeCarRecordRespVO;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.doc.annotation.AutoDocMethod;
 import com.autoyol.doc.annotation.AutoDocVersion;
@@ -12,19 +12,19 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 
-@RequestMapping("/console/carOwner")
+@RequestMapping("/console/changeCar")
 @RestController
-@AutoDocVersion(version = "订单详细信息 - 查看车主信息接口文档")
-public class CarOwnerInfoController {
+@AutoDocVersion(version = "订单详细信息 - 查看更换车辆记录接口文档")
+public class ChangeCarRecordController {
 
     /**
      * 老后台参考:
      * com.autoyolConsole.controller.TransController.detail(String, String, HttpServletRequest)
      * /autoyolConsole/src/main/webapp/WEB-INF/view/trans/detail.jsp
      */
-    @AutoDocMethod(description = "查看车主信息接口信息", value = "查看车主信息接口信息", response = CarOwnerInfoRespVO.class)
+    @AutoDocMethod(description = "查看更换车辆记录信息", value = "查看更换车辆记录信息", response = ChangeCarRecordRespVO.class)
     @GetMapping(value = "/info")
-    public ResponseData<?> getCarOwnerInfo(@Valid CarOwnerInfoReqVO reqVo, BindingResult bindingResult) {
+    public ResponseData<?> getChangeCarInfo(@Valid CarOrderReqVO reqVo, BindingResult bindingResult) {
         return null;
     }
 
