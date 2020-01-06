@@ -206,7 +206,7 @@
         where id = #{id}
     </update>
 
-    <select id="selectByRenterOrderNo" resultType="com.atzuche.order.rentermem.entity.RenterMemberEntity">
+    <select id="selectByRenterOrderNo" resultMap="BaseResultMap">
         select
         <include refid="Base_Column_List"/>
         from renter_member
