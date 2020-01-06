@@ -39,18 +39,19 @@ public class HandoverCarInfoService {
 
     protected  final Logger logger = LoggerFactory.getLogger(getClass());
 
-    @Autowired
+//    @Autowired
     HandoverCarService handoverCarService;
-    @Autowired
+//    @Autowired
     DeliveryCarInfoService deliveryCarInfoService;
     /**
      * 暂时放admin
      */
-    @Resource
+    //FIXME: remove -----
+//    @Resource
     RenterOrderDeliveryMapper renterOrderDeliveryMapper;
-    @Resource
+//    @Resource
     RenterHandoverCarRemarkMapper renterHandoverCarRemarkMapper;
-    @Resource
+//    @Resource
     OwnerHandoverCarRemarkMapper ownerHandoverCarRemarkMapper;
 
     /**
