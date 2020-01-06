@@ -1,4 +1,4 @@
-package com.atzuche.order.admin.vo.response;
+package com.atzuche.order.admin.vo.resp.insurance;
 
 import com.autoyol.doc.annotation.AutoDocProperty;
 

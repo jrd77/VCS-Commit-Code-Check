@@ -1,7 +1,7 @@
 package com.atzuche.order.admin.service;
 
-import com.atzuche.order.admin.vo.rep.delivery.DeliveryCarVO;
-import com.atzuche.order.admin.vo.rep.delivery.GetHandoverCarDTO;
+import com.atzuche.order.admin.vo.resp.delivery.DeliveryCarVO;
+import com.atzuche.order.admin.vo.resp.delivery.GetHandoverCarDTO;
 import com.atzuche.order.admin.vo.req.DeliveryCarRepVO;
 import com.atzuche.order.delivery.entity.*;
 import com.atzuche.order.delivery.enums.HandoverCarTypeEnum;

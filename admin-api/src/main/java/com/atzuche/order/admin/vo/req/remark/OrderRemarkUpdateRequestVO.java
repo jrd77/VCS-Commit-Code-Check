@@ -1,14 +1,14 @@
-package com.atzuche.order.admin.vo.request;
+package com.atzuche.order.admin.vo.req.remark;
 
 import com.autoyol.doc.annotation.AutoDocProperty;
 
 /**
  * Created by qincai.lin on 2019/12/30.
  */
-public class OrderRemarkAdditionRequestVO {
+public class OrderRemarkUpdateRequestVO {
 
-    @AutoDocProperty(value = "订单号")
-    private String orderNo;
+    @AutoDocProperty(value = "备注id")
+    private String remarkId;
 
     @AutoDocProperty(value = "操作人部门id")
     private String departmentId;
@@ -18,6 +18,7 @@ public class OrderRemarkAdditionRequestVO {
 
     @AutoDocProperty(value = "备注内容")
     private String remarkContent;
+
 
     public String getDepartmentId() {
         return departmentId;
@@ -43,12 +44,12 @@ public class OrderRemarkAdditionRequestVO {
         this.remarkContent = remarkContent;
     }
 
-    public String getOrderNo() {
-        return orderNo;
+    public String getRemarkId() {
+        return remarkId;
     }
 
-    public void setOrderNo(String orderNo) {
-        this.orderNo = orderNo;
+    public void setRemarkId(String remarkId) {
+        this.remarkId = remarkId;
     }
 
 }

@@ -1,11 +1,11 @@
-package com.atzuche.order.admin.vo.request;
+package com.atzuche.order.admin.vo.req.remark;
 
 import com.autoyol.doc.annotation.AutoDocProperty;
 
 /**
  * Created by qincai.lin on 2019/12/30.
  */
-public class OrderRemarkLogListRequestVO {
+public class OrderRemarkRequestVO {
 
     @AutoDocProperty(value = "订单号")
     private String orderNo;
@@ -17,6 +17,4 @@ public class OrderRemarkLogListRequestVO {
     public void setOrderNo(String orderNo) {
         this.orderNo = orderNo;
     }
-
-
 }

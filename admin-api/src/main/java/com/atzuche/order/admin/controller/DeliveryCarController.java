@@ -2,7 +2,7 @@ package com.atzuche.order.admin.controller;
 
 import com.atzuche.order.admin.service.DeliveryCarInfoService;
 import com.atzuche.order.admin.service.HandoverCarInfoService;
-import com.atzuche.order.admin.vo.rep.delivery.DeliveryCarVO;
+import com.atzuche.order.admin.vo.resp.delivery.DeliveryCarVO;
 import com.atzuche.order.admin.vo.req.DeliveryCarRepVO;
 import com.atzuche.order.admin.vo.req.delivery.CarConditionPhotoUploadVO;
 import com.atzuche.order.admin.vo.req.delivery.DeliveryReqVO;

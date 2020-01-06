@@ -1,4 +1,4 @@
-package com.atzuche.order.admin.vo.rep.delivery;
+package com.atzuche.order.admin.vo.resp.delivery;
 
 import com.autoyol.doc.annotation.AutoDocProperty;
 import lombok.Data;
@@ -6,19 +6,19 @@ import lombok.ToString;
 
 /**
  * @author 胡春林
- * 取还车信息
+ *
  */
 @Data
 @ToString
-public class OwnerGetAndReturnCarDTO {
+public class RenterGetAndReturnCarDTO {
 
-    @AutoDocProperty("实际取车时间")
+    @AutoDocProperty("实际交车时间")
     public String realGetTime;
-    @AutoDocProperty("实际还车时间")
+    @AutoDocProperty("实际收车时间")
     public String realReturnTime;
-    @AutoDocProperty("取车里程数")
+    @AutoDocProperty("交车里程数")
     public String getKM;
-    @AutoDocProperty("还车里程数")
+    @AutoDocProperty("收车里程数")
     public String returnKM;
     @AutoDocProperty("行驶里程数")
     public String drivingKM;
@@ -28,9 +28,9 @@ public class OwnerGetAndReturnCarDTO {
     public String zuQi;
     @AutoDocProperty("超里程费")
     public String overKNCrash;
-    @AutoDocProperty("取车油表刻度")
+    @AutoDocProperty("交车油表刻度")
     public String getCarOil;
-    @AutoDocProperty("还车油表刻度")
+    @AutoDocProperty("收车油表刻度")
     public String returnCarOil;
     @AutoDocProperty("燃料")
     public String ranLiao;
@@ -42,17 +42,6 @@ public class OwnerGetAndReturnCarDTO {
     public String oilDifferenceCrash;
     @AutoDocProperty("加油服务费")
     public String oilServiceCharge;
-    @AutoDocProperty("平台加油服务费")
-    public String platFormOilServiceCharge;
-    @AutoDocProperty("代管车-油量差价")
-    public String carOilDifferenceCrash;
-    @AutoDocProperty("代管车-加油服务费")
-    public String carOilServiceCharge;
-    @AutoDocProperty("代管车-车主总油费")
+    @AutoDocProperty("租客总油费")
     public String carOwnerOilCrash;
-
-
-
-
-
 }
