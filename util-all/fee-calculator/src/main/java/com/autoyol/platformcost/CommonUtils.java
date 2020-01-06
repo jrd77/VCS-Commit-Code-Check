@@ -57,6 +57,8 @@ public class CommonUtils {
 	
 	public static final String FORMAT_STR_RENYUN = "yyyy-MM-dd HH:mm";
 	
+	public static final String FORMAT_STR_DEFAULT = "yyyy-MM-dd HH:mm:ss";
+	
     /**
                * 初始化全面保障费单价配置
      */
@@ -632,6 +634,20 @@ public class CommonUtils {
 		}
 		DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(formatStr);
 		return dateTimeFormatter.format(localDateTime);
+	}
+	
+	/**
+	 * string转LocalDateTime
+	 * @param dateTime
+	 * @param parseStr
+	 * @return LocalDateTime
+	 */
+	public static LocalDateTime parseTime(String dateTime, String parseStr) {
+		if (StringUtils.isBlank(dateTime) || StringUtils.isBlank(parseStr)) {
+			return null;
+		}
+		DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(parseStr);     
+        return LocalDateTime.parse(dateTime, dateTimeFormatter);
 	}
 	
 	public static void main(String[] args) {

@@ -19,6 +19,7 @@ import com.atzuche.order.delivery.entity.RenterOrderDeliveryEntity;
 import com.atzuche.order.renterorder.entity.OrderCouponEntity;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.atzuche.order.renterorder.entity.dto.OrderChangeItemDTO;
+import com.autoyol.platformcost.CommonUtils;
 
 public class ModifyOrderUtils {
 
@@ -43,6 +44,23 @@ public class ModifyOrderUtils {
 	 */
 	public static boolean getModifyRentTimeFlag(LocalDateTime initTime, LocalDateTime updTime) {
 		if (updTime != null && !updTime.isEqual(initTime)) {
+			return true;
+		}
+		return false;
+	}
+	
+	/**
+	 * 是否修改取还车时间
+	 * @param initTime 修改前
+	 * @param updTime 修改后
+	 * @return boolean
+	 */
+	public static boolean getModifyTimeFlag(LocalDateTime initTime, String updTimeStr) {
+		LocalDateTime updTime = null;
+		if (StringUtils.isNotBlank(updTimeStr)) {
+			updTime = CommonUtils.parseTime(updTimeStr, CommonUtils.FORMAT_STR_DEFAULT);
+		}
+		if (updTime != null && !updTime.equals(initTime)) {
 			return true;
 		}
 		return false;
@@ -107,10 +125,10 @@ public class ModifyOrderUtils {
 			return null;
 		}
 		List<OrderChangeItemDTO> changeItemList = new ArrayList<OrderChangeItemDTO>();
-		if (getModifyRentTimeFlag(initRenterOrder.getExpRentTime(), updModifyOrder.getRentTime())) {
+		if (getModifyTimeFlag(initRenterOrder.getExpRentTime(), updModifyOrder.getRentTime())) {
 			changeItemList.add(new OrderChangeItemDTO(initRenterOrder.getOrderNo(), renterOrderNo, OrderChangeItemEnum.MODIFY_RENTTIME.getCode(), OrderChangeItemEnum.MODIFY_RENTTIME.getName()));
 		}
-		if (getModifyRentTimeFlag(initRenterOrder.getExpRevertTime(), updModifyOrder.getRevertTime())) {
+		if (getModifyTimeFlag(initRenterOrder.getExpRevertTime(), updModifyOrder.getRevertTime())) {
 			changeItemList.add(new OrderChangeItemDTO(initRenterOrder.getOrderNo(), renterOrderNo, OrderChangeItemEnum.MODIFY_REVERTTIME.getCode(), OrderChangeItemEnum.MODIFY_REVERTTIME.getName()));
 		}
 		if (getModifyFlag(initRenterOrder.getIsAbatement(), updModifyOrder.getAbatementFlag())) {
