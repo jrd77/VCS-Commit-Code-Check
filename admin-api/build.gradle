@@ -34,6 +34,7 @@ dependencies {
     compile("com.autoyol.tools:prop-encrypt-spring-boot-starter:0.0.1-SNAPSHOT")
     compile('mysql:mysql-connector-java')
     compile('com.ctrip.framework.apollo:apollo-client:0.11.0-SNAPSHOT')
+    compile('net.coobird:thumbnailator:0.4.8')
 //	compile("com.autoyol:cat-starter:0.0.1-SNAPSHOT")
 //	compile('org.springframework.boot:spring-boot-starter-data-redis')
     testCompile 'org.springframework.boot:spring-boot-starter-test'

@@ -2,11 +2,12 @@ package com.atzuche.order.admin.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.aliyun.oss.internal.OSSUtils;
 import com.atzuche.order.admin.dto.InsurancePurchaseDTO;
 import com.atzuche.order.admin.dto.InsurancePurchaseResultDTO;
 import com.atzuche.order.admin.dto.OrderInsuranceAdditionRequestDTO;
 import com.atzuche.order.admin.dto.OrderInsuranceImportRequestDTO;
+import com.atzuche.order.admin.util.CommonUtils;
+import com.atzuche.order.admin.util.oss.OSSUtils;
 import com.atzuche.order.admin.vo.request.OrderInsuranceAdditionRequestVO;
 import com.atzuche.order.admin.vo.request.OrderInsuranceImportRequestVO;
 import com.atzuche.order.admin.vo.request.OrderInsuranceRequestVO;
@@ -51,7 +52,9 @@ public class OrderInsuranceController {
     public static final String DATA = "data";
     public static final String CPIC_NAME = "太平洋保险";
     public static final String PICC_NAME = "中国人民保险";
-
+    public static final String SHEET_TYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+    public static final String XLS_TYPE = "application/vnd.ms-excel";
+    public static final String XLSX_TYPE = "application/x-excel";
 
     @Bean
     public RestTemplate restTemplate(RestTemplateBuilder builder) {
@@ -104,23 +107,20 @@ public class OrderInsuranceController {
 
     @AutoDocMethod(description = "导入保险信息excel", value = "导入保险信息excel", response = ResponseData.class)
     @PostMapping("/import")
-    public ResponseData<ResponseData> importExcel(@RequestParam("batchFile") MultipartFile batchFile, @RequestBody OrderInsuranceImportRequestVO orderInsuranceImportRequestVO,
-                                                  BindingResult bindingResult) {
-
+    public ResponseData<ResponseData> importExcel(@RequestParam("batchFile") MultipartFile batchFile, @RequestBody OrderInsuranceImportRequestVO orderInsuranceImportRequestVO, BindingResult bindingResult) {
         try {
             if(!batchFile.isEmpty()) {
                 String fileType = batchFile.getContentType();
-                if (!fileType.equals("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet") && !fileType.equals("application/vnd.ms-excel")
-                        && !fileType.equals("application/x-excel")) {
+                if (!fileType.equals(SHEET_TYPE) && !fileType.equals(XLS_TYPE)&& !fileType.equals(XLSX_TYPE)) {
                     return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), "上传文件类型错误，必须为xls或xlsx！");
-
                 } else {
                     String str=DateUtils.formate(LocalDateTime.now(),DateUtils.DATE_DEFAUTE);
                     String suffixes=batchFile.getOriginalFilename().substring(batchFile.getOriginalFilename().lastIndexOf("."), batchFile.getOriginalFilename().length());
-                    String random = "";//CommonUtils.getRandomNumUpChar(8);
-                    String key = "console/import/insurance/"+str.substring(0, 8)+"/"+random+suffixes;
+   ;
+                    String key = "console/import/insurance/"+str.substring(0, 8)+"/"+ CommonUtils.getRandomNumUpChar(8)+suffixes;
                     //上传文件
-                    //OSSUtils.uploadMultipartFile(key, addExcelFile);
+
+                    OSSUtils.uploadMultipartFile(key, batchFile);
                     OrderInsuranceImportRequestDTO orderInsuranceImportRequestDTO = new OrderInsuranceImportRequestDTO();
                     BeanUtils.copyProperties(orderInsuranceImportRequestVO, orderInsuranceImportRequestDTO);
                     ResponseEntity<String> responseEntity = restTemplate.postForEntity(insurancePurchaseUrl+IMPORT_PURCHASE, orderInsuranceImportRequestDTO,String.class);
