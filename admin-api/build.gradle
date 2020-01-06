@@ -1,6 +1,5 @@
 buildscript {
     repositories {
-        mavenLocal()
         maven{url "http://10.0.3.208:8081/nexus/content/groups/public/"}
         maven{url "http://maven.aliyun.com/nexus/content/groups/public/"}
         mavenCentral()
@@ -52,7 +51,7 @@ dependencies {
 
 
 
-    compile project(":casier-all:cashier-account")
+//    compile project(":casier-all:cashier-account")
 
 
     compile project(":util-all:fee-calculator")

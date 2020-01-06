@@ -5,7 +5,6 @@ import lombok.Data;
 import lombok.ToString;
 
 /**
- * @author meng.xu
  * 托管车出入库保存请求信息
  */
 @Data

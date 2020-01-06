@@ -1,6 +1,5 @@
 buildscript {
     repositories {
-        mavenLocal()
         maven{url "http://10.0.3.208:8081/nexus/content/groups/public/"}
         maven{url "http://maven.aliyun.com/nexus/content/groups/public/"}
         mavenCentral()
@@ -46,6 +45,7 @@ dependencies {
     compile('com.autoyol.unique:unique-no-feign:3.0-SNAPSHOT')
     compile('com.autoyol.car:auto-car-service-api:2020010601-SNAPSHOT')
     compile('com.autoyol.coupon:coupon-api:2019121301-SNAPSHOT')
+    compile('com.autoyol:riskCheckService-api:1.0.0-SNAPSHOT')
 
 
     compile project(":config")
