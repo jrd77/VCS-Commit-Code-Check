@@ -9,4 +9,9 @@ public class SubmitOrderException extends OrderException {
     public SubmitOrderException(String errorCode, String errorMsg) {
         super(errorCode, errorMsg);
     }
+
+
+    public SubmitOrderException(String errorCode, String errorMsg, Object extra) {
+        super(errorCode, errorMsg, extra);
+    }
 }

@@ -218,5 +218,8 @@ public class OwnerGoodsDetailDTO {
      */
     private String gpsSerialNumber;
 
-
+    /**
+     * 年份
+     */
+    private String year;
 }

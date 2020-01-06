@@ -95,9 +95,9 @@ public class OrderReqVO extends BaseVO {
     @NotBlank(message = "车辆注册号不能为空")
     private String carNo;
 
-    @AutoDocProperty(value = "是否购买补充保障")
+    @AutoDocProperty(value = "是否购买补充保障:0.否 1.是")
     @NotBlank(message = "是否购买补充保障不能为空")
-    private String abatement;
+    private Integer abatement;
 
     @AutoDocProperty(value = "取送服务优惠券ID")
     private String getCarFreeCouponId;
@@ -382,11 +382,11 @@ public class OrderReqVO extends BaseVO {
         this.carNo = carNo;
     }
 
-    public String getAbatement() {
+    public Integer getAbatement() {
         return abatement;
     }
 
-    public void setAbatement(String abatement) {
+    public void setAbatement(Integer abatement) {
         this.abatement = abatement;
     }
 

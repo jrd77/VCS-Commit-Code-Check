@@ -215,6 +215,7 @@ public class RenterOrderCalCostService {
         LOGGER.info("租客费用-租车费用rentCarAmount=[{}]",rentCarAmount);
 
         renterOrderCostRespDTO.setRentCarAmount(rentCarAmount);
+        renterOrderCostRespDTO.setRentAmount(rentAmt);
         renterOrderCostRespDTO.setRenterOrderCostDetailDTOList(detailList);
         renterOrderCostRespDTO.setRenterOrderSubsidyDetailDTOList(subsidyList);
         LOGGER.info("获取费用项和费用明细列表 renterOrderCostRespDTO:[{}]", JSON.toJSONString(renterOrderCostRespDTO));
@@ -252,6 +253,7 @@ public class RenterOrderCalCostService {
         BeanUtils.copyProperties(renterOrderCostRespDTO,renterOrderCostEntity);
         renterOrderCostEntity.setOrderNo(renterOrderCostRespDTO.getOrderNo());
         renterOrderCostEntity.setRenterOrderNo(renterOrderCostRespDTO.getRenterOrderNo());
+        renterOrderCostEntity.setRentCarAmount(renterOrderCostRespDTO.getRentAmount());
         LOGGER.info("下单-租客端-保存费用参数renterOrderCostEntity=[{}]",JSON.toJSONString(renterOrderCostEntity));
         Integer costResult = renterOrderCostService.saveRenterOrderCost(renterOrderCostEntity);
         LOGGER.info("下单-租客端-保存费用结果costResult=[{}]，参数renterOrderCostEntity=[{}]",costResult,JSON.toJSONString(renterOrderCostEntity));

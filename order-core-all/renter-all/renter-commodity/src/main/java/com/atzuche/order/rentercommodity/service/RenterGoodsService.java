@@ -31,16 +31,14 @@ public class RenterGoodsService{
     public void save(RenterGoodsDetailDTO renterGoodsDetailDto){
         RenterGoodsEntity goodsEntity = new RenterGoodsEntity();
         BeanUtils.copyProperties(renterGoodsDetailDto,goodsEntity);
-        //goodsEntity.setCreateOp();
-        //goodsEntity.setUpdateOp();
         renterGoodsMapper.insert(goodsEntity);
 
         List<RenterGoodsPriceDetailDTO> goodsPriceDetailDtoList = renterGoodsDetailDto.getRenterGoodsPriceDetailDTOList();
         List<RenterGoodsPriceDetailEntity> goodsPriceList = new ArrayList<>();
         goodsPriceDetailDtoList.forEach(x->{
             RenterGoodsPriceDetailEntity goodsPriceDetailEntity = new RenterGoodsPriceDetailEntity();
-            goodsPriceDetailEntity.setOrderNo(x.getOrderNo());
-            goodsPriceDetailEntity.setRenterOrderNo(x.getRenterOrderNo());
+            goodsPriceDetailEntity.setOrderNo(renterGoodsDetailDto.getOrderNo());
+            goodsPriceDetailEntity.setRenterOrderNo(renterGoodsDetailDto.getRenterOrderNo());
             goodsPriceDetailEntity.setGoodsId(goodsEntity.getId());
             goodsPriceDetailEntity.setCarDay(x.getCarDay());
             goodsPriceDetailEntity.setCarUnitPrice(x.getCarUnitPrice());
@@ -60,7 +58,7 @@ public class RenterGoodsService{
     public RenterGoodsDetailDTO getRenterGoodsDetail(String renterOrderNo, boolean isNeedPrice){
         RenterGoodsEntity renterGoodsEntity = renterGoodsMapper.selectByRenterOrderNo(renterOrderNo);
         RenterGoodsDetailDTO renterGoodsDetailDto  = new RenterGoodsDetailDTO();
-        BeanUtils.copyProperties(renterGoodsDetailDto,renterGoodsEntity);
+        BeanUtils.copyProperties(renterGoodsEntity,renterGoodsDetailDto);
         if(!isNeedPrice){
             return renterGoodsDetailDto;
         }
