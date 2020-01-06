@@ -224,7 +224,7 @@ public class OSSUtils {
     		key = size + key;//小图为"1"+key，中图为"2"+key
     	}
     	//修改尺寸并添加水印添加水印
-    	image = PicUtils.resizeAndPressWatermark(size, image);
+    	//image = PicUtils.resizeAndPressWatermark(size, image);
     	
     	boolean errorCode = false;
     	ObjectMetadata objectMeta = new ObjectMetadata();
