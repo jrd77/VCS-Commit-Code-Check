@@ -41,6 +41,7 @@ import com.autoyol.auto.coin.service.vo.req.AutoCoinAgainDeductRequestVO;
 import com.autoyol.auto.coin.service.vo.res.AutoCoinResponseVO;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.member.detail.vo.res.CommUseDriverInfo;
+import com.autoyol.platformcost.CommonUtils;
 import com.dianping.cat.Cat;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
@@ -397,11 +398,13 @@ public class ModifyOrderService {
 			throw new ModifyOrderParameterException();
 		}
 		renterGoodsDetailDTO.setOrderNo(modifyOrderDTO.getOrderNo());
-		renterGoodsDetailDTO.setRenterOrderNo(modifyOrderDTO.getRenterOrderNo());
+		renterGoodsDetailDTO.setRenterOrderNo(renterOrderEntity.getRenterOrderNo());
 		renterGoodsDetailDTO.setRentTime(modifyOrderDTO.getRentTime());
 		renterGoodsDetailDTO.setRevertTime(modifyOrderDTO.getRevertTime());
 		// 获取汇总后的租客商品详情
 		renterGoodsDetailDTO = commodityService.setPriceAndGroup(renterGoodsDetailDTO);
+		// 设置最新的租客订单号
+		renterGoodsDetailDTO.setRenterOrderNo(modifyOrderDTO.getRenterOrderNo());
 		// 每天价
 		List<RenterGoodsPriceDetailDTO> renterGoodsPriceDetailDTOList = renterGoodsDetailDTO.getRenterGoodsPriceDetailDTOList();
 		if (renterGoodsPriceDetailDTOList == null || renterGoodsPriceDetailDTOList.isEmpty()) {
@@ -431,11 +434,15 @@ public class ModifyOrderService {
 		if (abatementFlag == null) {
 			modifyOrderDTO.setAbatementFlag(initRenterOrder.getIsAbatement());
 		} 
-		if (modifyOrderReq.getRentTime() == null) {
+		if (StringUtils.isBlank(modifyOrderReq.getRentTime())) {
 			modifyOrderDTO.setRentTime(initRenterOrder.getExpRentTime());
+		} else {
+			modifyOrderDTO.setRentTime(CommonUtils.parseTime(modifyOrderReq.getRentTime(), CommonUtils.FORMAT_STR_DEFAULT));
 		}
-		if (modifyOrderReq.getRevertTime() == null) {
+		if (StringUtils.isBlank(modifyOrderReq.getRevertTime())) {
 			modifyOrderDTO.setRevertTime(initRenterOrder.getExpRevertTime());
+		} else {
+			modifyOrderDTO.setRevertTime(CommonUtils.parseTime(modifyOrderReq.getRevertTime(), CommonUtils.FORMAT_STR_DEFAULT));
 		}
 		// 获取修改前的附加驾驶人列表
 		List<String> drivers = renterAdditionalDriverService.listDriverIdByRenterOrderNo(initRenterOrder.getRenterOrderNo());
@@ -515,7 +522,9 @@ public class ModifyOrderService {
 		// 获取租客商品信息
 		RenterGoodsDetailDTO renterGoodsDetailDTO = commodityService.getRenterGoodsDetail(renterOrderNo, false);
 		CarDetailReqVO carDetailReqVO = new CarDetailReqVO(); 
-		carDetailReqVO.setAddrIndex(renterGoodsDetailDTO.getCarAddrIndex());
+		if (renterGoodsDetailDTO.getCarAddrIndex() != null) {
+			carDetailReqVO.setAddrIndex(renterGoodsDetailDTO.getCarAddrIndex());
+		}
 		carDetailReqVO.setCarNo(String.valueOf(renterGoodsDetailDTO.getCarNo()));
 		carDetailReqVO.setRentTime(modifyOrderDTO.getRentTime());
 		carDetailReqVO.setRevertTime(modifyOrderDTO.getRevertTime());
@@ -1076,6 +1085,9 @@ public class ModifyOrderService {
 		renterOrderReqVO.setSrvReturnLon(modifyOrderDTO.getRevertCarLon());
 		renterOrderReqVO.setUseAutoCoin(modifyOrderDTO.getUserCoinFlag());
 		renterOrderReqVO.setIsNew((renterMemberDTO.getIsNew() != null && renterMemberDTO.getIsNew() == 1) ? true:false);
+		if (orderEntity.getCategory() != null) {
+			renterOrderReqVO.setOrderCategory(String.valueOf(orderEntity.getCategory()));
+		}
 		return renterOrderReqVO;
 	}
 	
