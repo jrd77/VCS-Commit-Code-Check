@@ -216,5 +216,9 @@ public class RenterGoodsDetailDTO {
      * GPS序号
      */
     private String gpsSerialNumber;
+    /**
+     * 年份
+     */
+    private String year;
 
 }

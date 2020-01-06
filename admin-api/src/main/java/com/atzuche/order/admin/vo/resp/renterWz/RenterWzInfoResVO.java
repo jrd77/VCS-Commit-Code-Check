@@ -15,7 +15,7 @@ import java.util.Date;
  */
 @Data
 @ToString
-public class RenterWzInfoVO {
+public class RenterWzInfoResVO {
 
     @AutoDocProperty("违章押金")
     private String wzDeposit;

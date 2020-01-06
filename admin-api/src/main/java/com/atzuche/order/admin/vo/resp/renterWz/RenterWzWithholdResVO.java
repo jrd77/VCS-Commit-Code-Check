@@ -15,7 +15,7 @@ import java.util.Date;
  */
 @Data
 @ToString
-public class RenterWzWithholdVO {
+public class RenterWzWithholdResVO {
 
     @AutoDocProperty("剩余可用违章押金")
     private String shouldReturnDeposit;

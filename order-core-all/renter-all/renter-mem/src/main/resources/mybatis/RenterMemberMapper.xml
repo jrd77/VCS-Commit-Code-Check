@@ -21,6 +21,8 @@
         <result property="driLicAuth" column="dri_lic_auth"/>
         <result property="driViceLicAuth" column="dri_vice_lic_auth"/>
         <result property="renterCheck" column="renter_check"/>
+        <result property="outerSource" column="outer_source"/>
+        <result property="regTime" column="reg_time"/>
         <result property="createTime" column="create_time"/>
         <result property="createOp" column="create_op"/>
         <result property="updateTime" column="update_time"/>
@@ -47,6 +49,8 @@
 	`dri_lic_auth`,
 	`dri_vice_lic_auth`,
 	`renter_check`,
+	`outer_source`,
+	`reg_time`,
 	`create_time`,
 	`create_op`,
 	`update_time`,
@@ -79,6 +83,8 @@
         `dri_lic_auth`,
         `dri_vice_lic_auth`,
         `renter_check`,
+        `outer_source`,
+        `reg_time`,
         `create_op`,
         `update_op`
         )
@@ -100,6 +106,8 @@
         #{driLicAuth},
         #{driViceLicAuth},
         #{renterCheck},
+        #{outerSource},
+        #{regTime},
         #{createOp},
         #{updateOp}
         )
@@ -124,6 +132,8 @@
             <if test="driLicAuth != null">`dri_lic_auth`, </if>
             <if test="driViceLicAuth != null">`dri_vice_lic_auth`, </if>
             <if test="renterCheck != null">`renter_check`, </if>
+            <if test="outerSource != null">`outer_source`,</if>
+            <if test="regTime != null">`reg_time`,</if>
             <if test="createOp != null">`create_op`, </if>
             <if test="updateOp != null">`update_op`, </if>
         </trim>
@@ -144,6 +154,8 @@
             <if test="driLicAuth != null">#{driLicAuth},  </if>
             <if test="driViceLicAuth != null">#{driViceLicAuth},  </if>
             <if test="renterCheck != null">#{renterCheck}, </if>
+            <if test="outerSource != null">#{outerSource},</if>
+            <if test="regTime != null">#{regTime},</if>
             <if test="createTime != null">#{createTime},  </if>
             <if test="createOp != null">#{createOp},  </if>
             <if test="updateOp != null">#{updateOp},  </if>
@@ -170,6 +182,8 @@
             <if test="driLicAuth != null">`dri_lic_auth` = #{driLicAuth}, </if>
             <if test="driViceLicAuth != null">`dri_vice_lic_auth` = #{driViceLicAuth}, </if>
             <if test="renterCheck != null">`renter_check` = #{renterCheck}, </if>
+            <if test="outerSource != null">`outer_source` = #{outerSource}, </if>
+            <if test="regTime != null">`reg_time` = #{regTime}, </if>
             <if test="createOp != null">`create_op` = #{createOp}, </if>
             <if test="updateOp != null">`update_op` = #{updateOp}, </if>
             <if test="isDelete != null">`is_delete` = #{isDelete}</if>
@@ -196,12 +210,10 @@
             `dri_lic_auth` = #{driLicAuth},
             `dri_vice_lic_auth` = #{driViceLicAuth},
             `renter_check` = #{renterCheck},
-            `create_time` = #{createTime},
+            `outer_source` = #{outerSource},
+            `reg_time` = #{regTime},
             `create_op` = #{createOp},
-            `update_time` = #{updateTime},
-            `update_op` = #{updateOp},
-            `is_delete` = #{isDelete}
-
+            `update_op` = #{updateOp}
         </set>
         where id = #{id}
     </update>

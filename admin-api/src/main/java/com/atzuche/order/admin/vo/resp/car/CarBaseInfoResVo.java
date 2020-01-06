@@ -1,4 +1,4 @@
-package com.atzuche.order.admin.vo.req.car;
+package com.atzuche.order.admin.vo.resp.car;
 
 import com.autoyol.doc.annotation.AutoDocProperty;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -74,13 +74,13 @@ public class CarBaseInfoResVo implements java.io.Serializable{
 	@AutoDocProperty(value="车辆残值")
 	private String residualValue;
 	private Integer licenseYear;
-	@AutoDocProperty(value = "【5.9.2新增参数】最新里程数")
+	@AutoDocProperty(value = "最新里程数")
 	private String lastMileage;
 	@AutoDocProperty(value = "保费计算用购置价")
 	private String inmsrp;
 
 
-	@AutoDocProperty(value = "[liujun]【AUT-3337 新增】平台服务费")
+	@AutoDocProperty(value = "平台服务费")
 	private String serviceRate;
 
 	private Integer city;
@@ -94,9 +94,9 @@ public class CarBaseInfoResVo implements java.io.Serializable{
 	@AutoDocProperty(value="是否本地")
 	private Integer isLocal;
 
-	private String carTypeTxt;
-
-	private String brandTxt;
+//	private String carTypeTxt;
+//
+//	private String brandTxt;
 
 	@NotNull(message="油表总刻度不能为空")
 	private Integer oilTotalCalibration;

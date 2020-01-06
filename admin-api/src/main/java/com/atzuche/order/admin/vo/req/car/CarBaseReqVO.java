@@ -6,10 +6,10 @@ import lombok.Data;
 import javax.validation.constraints.NotNull;
 
 @Data
-public class CarOrderReqVo {
-	@AutoDocProperty(value="orderNo,必填")
-	@NotNull(message="订单号不能为空")
-	private Integer orderNo;
+public class CarBaseReqVO {
+	@AutoDocProperty(value="carNo,必填")
+	@NotNull(message="车辆注册号不能为空")
+	private Integer carNo;
 
 
 }

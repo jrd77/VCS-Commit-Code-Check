@@ -86,10 +86,19 @@ public class RenterMemberEntity implements Serializable {
      * 核查状态 0-未查核 1-核查通过 2-核查不通过 3-核查已通过，有劣迹
      */
     private Integer renterCheck;
+
+    /**
+     * 会员来源
+     */
+    private String outerSource;
+    /**
+     * 租客注册时间
+     */
+    private LocalDateTime regTime;
 	/**
 	 * 创建时间
 	 */
-	private LocalDateTime createTime;
+	 private LocalDateTime createTime;
 	/**
 	 * 创建人
 	 */
