@@ -128,7 +128,7 @@ public class GoodsService {
         renterGoodsDetailDto.setCarGuidePrice(carBaseVO.getGuidePrice());
         renterGoodsDetailDto.setCarStatus(carBaseVO.getStatus());
         renterGoodsDetailDto.setCarImageUrl(getCoverPic(detailImageVO));
-        renterGoodsDetailDto.setCarOwnerType(carBaseVO.getMajorType());
+        renterGoodsDetailDto.setCarOwnerType(carBaseVO.getOwnerType());
         renterGoodsDetailDto.setCarUseType(carBaseVO.getUseType());
         renterGoodsDetailDto.setCarOilVolume(carBaseVO.getOilVolume());
         renterGoodsDetailDto.setCarEngineType(carBaseVO.getEngineType());
@@ -148,6 +148,7 @@ public class GoodsService {
         renterGoodsDetailDto.setEngineNum(carBaseVO.getEngineNum());
         renterGoodsDetailDto.setCarTag(carTagVO == null ? "" : String.join(",",carTagVO.getLabelIds()));
         renterGoodsDetailDto.setType(carBaseVO.getType());
+        renterGoodsDetailDto.setYear(carBaseVO.getYear() == null ? "" : String.valueOf(carBaseVO.getYear()));
         renterGoodsDetailDto.setBrand(carBaseVO.getBrand()==null ? null:String.valueOf(carBaseVO.getBrand()));
         renterGoodsDetailDto.setLicenseDay(LocalDateTimeUtils.parseStringToLocalDate(carBaseVO.getLicenseDay()));
         if (data.getCarModelParam() != null) {

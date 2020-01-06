@@ -213,7 +213,7 @@ public class MemberService {
         MemberRoleInfo memberRoleInfo = memberTotalInfo.getMemberRoleInfo();
         RenterMemberDTO renterMemberDto = new RenterMemberDTO();
         renterMemberDto.setMemNo(memNo);
-        renterMemberDto.setPhone(memberCoreInfo.getPhone());
+        renterMemberDto.setPhone(memberCoreInfo.getMobile()==null ? "" : String.valueOf(memberCoreInfo.getMobile()));
         renterMemberDto.setHeaderUrl(memberCoreInfo.getPortraitPath());
         renterMemberDto.setRealName(memberCoreInfo.getRealName());
         renterMemberDto.setNickName(memberCoreInfo.getNickName());
