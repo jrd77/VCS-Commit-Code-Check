@@ -1,10 +1,6 @@
 package com.atzuche.order.admin.util.oss;
 
-import com.sun.image.codec.jpeg.ImageFormatException;
-import com.sun.image.codec.jpeg.JPEGCodec;
-import com.sun.image.codec.jpeg.JPEGEncodeParam;
-import com.sun.image.codec.jpeg.JPEGImageEncoder;
-import net.coobird.thumbnailator.Thumbnails;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -84,62 +80,7 @@ public class PicUtils {
 		}
     }
     
-    /**
-     * 图片缩放（高质量）
-     * @param originalFile
-     * @param resizedFile
-     * @param newWidth
-     * @param quality
-     * @throws IOException
-     */
-    public static void resize(File originalFile, File resizedFile, int newWidth, float quality) throws IOException {   
-        if (quality > 1) {   
-            throw new IllegalArgumentException("Quality has to be between 0 and 1");   
-        }   
-  
-        ImageIcon ii = new ImageIcon(originalFile.getCanonicalPath());   
-        Image i = ii.getImage();   
-        Image resizedImage = null;   
-  
-        int iWidth = i.getWidth(null);   
-        int iHeight = i.getHeight(null);   
-  
-        if (iWidth > iHeight) {   
-            resizedImage = i.getScaledInstance(newWidth, (newWidth * iHeight) / iWidth, Image.SCALE_SMOOTH);   
-        } else {   
-            resizedImage = i.getScaledInstance((newWidth * iWidth) / iHeight, newWidth, Image.SCALE_SMOOTH);   
-        }   
-  
-        // This code ensures that all the pixels in the image are loaded.   
-        Image temp = new ImageIcon(resizedImage).getImage();   
-        // Create the buffered image.   
-        BufferedImage bufferedImage = new BufferedImage(temp.getWidth(null), temp.getHeight(null), BufferedImage.TYPE_INT_RGB);   
-        // Copy image to buffered image.   
-        Graphics g = bufferedImage.createGraphics();   
-        // Clear background and paint the image.   
-        g.setColor(Color.white);   
-        g.fillRect(0, 0, temp.getWidth(null), temp.getHeight(null));   
-        g.drawImage(temp, 0, 0, null);   
-        g.dispose();   
-  
-        // Soften.   
-        float softenFactor = 0.05f;   
-        float[] softenArray = { 0, softenFactor, 0, softenFactor, 1 - (softenFactor * 4), softenFactor, 0, softenFactor, 0 };   
-        Kernel kernel = new Kernel(3, 3, softenArray);   
-        ConvolveOp cOp = new ConvolveOp(kernel, ConvolveOp.EDGE_NO_OP, null);   
-        bufferedImage = cOp.filter(bufferedImage, null);   
-  
-        // Write the jpeg to a file.   
-        FileOutputStream out = new FileOutputStream(resizedFile);   
-  
-        // Encodes image as a JPEG data stream   
-        JPEGImageEncoder encoder = JPEGCodec.createJPEGEncoder(out);   
-        JPEGEncodeParam param = encoder.getDefaultJPEGEncodeParam(bufferedImage);   
-        param.setQuality(quality, true);   
-  
-        encoder.setJPEGEncodeParam(param);   
-        encoder.encode(bufferedImage);   
-    } 
+
     
     
     /**
@@ -342,53 +283,7 @@ public class PicUtils {
 			e.printStackTrace();
 		}
 	}
-	/**
-	 * 添加水印
-	 * @param targetBufImg 目标文件
-	 * @param pressImg 水印文件
-	 * @param x
-	 * @param y
-	 * @param out
-	 */
-	public static BufferedImage pressImage(BufferedImage targetBufImg, Image watermarkImg, int y) {
-		BufferedImage newImg = null;
-		try {
-			int width = targetBufImg.getWidth(null);
-			int height = targetBufImg.getHeight(null);
-			//重新生成的图片 
-			BufferedImage newImageBuf = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-			Graphics g = newImageBuf.createGraphics();
-			g.drawImage(targetBufImg, 0, 0, width, height, null);
 
-			// 水印文件
-			int watermarkWidth = watermarkImg.getWidth(null);
-			int watermarkHeight = watermarkImg.getHeight(null);
-			//g.drawImage(watermarkImg, (width - watermarkWidth) / 2, (height - watermarkHeight) / 2, watermarkWidth, watermarkHeight, null);
-			//水印图片偏移位置
-			int x = width - watermarkWidth;//图片距离左侧距离，计算之后让水印紧贴图片右侧
-			int heightDiff = height - watermarkHeight;
-			if (y < 0) {
-				y = heightDiff / 2;
-			} else if (y > heightDiff) {
-				y = heightDiff;
-			}
-			g.drawImage(watermarkImg, x, y, watermarkWidth, watermarkHeight, null); //画 水印图片
-			g.dispose();// 水印文件结束
-
-			ByteArrayOutputStream bos = new ByteArrayOutputStream();//存储图片文件byte数组
-			
-			JPEGImageEncoder encoder = JPEGCodec.createJPEGEncoder(bos);
-			//JPEGEncodeParam param = encoder.getDefaultJPEGEncodeParam(newImage);   
-	        //param.setQuality(0.9f, true);//设置图片质量
-			encoder.encode(newImageBuf);
-			//newImg = newImageBuf;
-			InputStream input = new ByteArrayInputStream(bos.toByteArray());
-			newImg = ImageIO.read(input);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return newImg;
-	}
 
 
     
@@ -463,25 +358,6 @@ public class PicUtils {
 		return null;
 	}
 
-	public static BufferedImage resizeAndPressWatermark(int size, BufferedImage image) throws ImageFormatException, IOException {
-		BufferedImage newImage = null;
-    	switch (size) {
-		case 1:
-			newImage = Thumbnails.of(image).size(WIDTH_1, HEIGHT_1).outputQuality(0.9).asBufferedImage();
-			break;
-		case 2:
-			newImage = Thumbnails.of(image).size(WIDTH_2, HEIGHT_2).outputQuality(0.9).asBufferedImage();
-			newImage = pressImage(newImage, WATERMARK_IMG_1, 20);
-			break;
-		case 3:
-			newImage = Thumbnails.of(image).size(image.getWidth(), image.getHeight()).outputQuality(0.9).asBufferedImage();
-			newImage = pressImage(newImage, WATERMARK_IMG_2, 50);
-			break;
-		default:
-			break;
-		}
-		return newImage;
-	}
 	
 	/**
 	 * 
