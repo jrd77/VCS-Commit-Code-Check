@@ -243,7 +243,7 @@
             <if test="androidId != null">`android_id`, </if>
             <if test="reqAddr != null">`req_addr`, </if>
             <if test="publicLongitude != null">`public_longitude`, </if>
-            <if test="publicLatitude != null">`public_latitude`, </if>
+            <if test="publicLatitude != null">`public_latitude` </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides="," >
             <if test="orderNo != null">#{orderNo},  </if>
@@ -294,7 +294,7 @@
             <if test="androidId != null">#{androidId},  </if>
             <if test="reqAddr != null">#{reqAddr}, </if>
             <if test="publicLongitude != null">#{publicLongitude}, </if>
-            <if test="publicLatitude != null">#{public_latitude}, </if>
+            <if test="publicLatitude != null">#{publicLatitude} </if>
         </trim>
 	</insert>
 	

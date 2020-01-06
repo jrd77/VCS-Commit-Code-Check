@@ -23,11 +23,13 @@ import java.util.List;
 @Service
 public class DeliveryCarInfoService {
 
-    @Autowired
+    //FIXME: remove -----
+
+//    @Autowired
     DeliveryCarService deliveryCarService;
-    @Autowired
+//    @Autowired
     RenterOrderDeliveryService renterOrderDeliveryService;
-    @Autowired
+//    @Autowired
     HandoverCarService handoverCarService;
 
     /**

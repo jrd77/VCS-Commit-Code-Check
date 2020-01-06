@@ -32,7 +32,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Stream;
+import java.util.stream.Collectors;
 
 
 /**
@@ -119,16 +119,17 @@ public class RenterOrderFineDeatailService{
         Integer beforeTransTimeSpan = configByCityCode.getBeforeTransTimeSpan()==null?CommonUtils.BEFORE_TRANS_TIME_SPAN:configByCityCode.getBeforeTransTimeSpan();
 
         List<SysConfigEntity> sysConfigSDKConfig = sysConfigSDK.getConfig(new DefaultConfigContext());
-        Stream<SysConfigEntity> sysConfigEntityStream = Optional.ofNullable(sysConfigSDKConfig)
+        List<SysConfigEntity> sysConfigEntityList = Optional.ofNullable(sysConfigSDKConfig)
                 .orElseGet(ArrayList::new)
                 .stream()
-                .filter(x -> GlobalConstant.GET_RETURN_FINE_AMT.equals(x.getAppType()));
+                .filter(x -> GlobalConstant.GET_RETURN_FINE_AMT.equals(x.getAppType()))
+                .collect(Collectors.toList());
 
-        SysConfigEntity sysGetFineAmt = sysConfigEntityStream.filter(x -> GlobalConstant.GET_FINE_AMT.equals(x.getItemKey())).findFirst().get();
+        SysConfigEntity sysGetFineAmt = sysConfigEntityList.stream().filter(x -> GlobalConstant.GET_FINE_AMT.equals(x.getItemKey())).findFirst().get();
         log.info("config-从配置中获取取车违约金getFineAmt=[{}]",JSON.toJSONString(sysGetFineAmt));
         Integer getCost = (sysGetFineAmt==null||sysGetFineAmt.getItemValue()==null) ? CommonUtils.MODIFY_GET_FINE_AMT : Integer.valueOf(sysGetFineAmt.getItemValue());
 
-        SysConfigEntity sysReturnFineAmt = sysConfigEntityStream.filter(x -> GlobalConstant.RETURN_FINE_AMT.equals(x.getItemKey())).findFirst().get();
+        SysConfigEntity sysReturnFineAmt = sysConfigEntityList.stream().filter(x -> GlobalConstant.RETURN_FINE_AMT.equals(x.getItemKey())).findFirst().get();
 		log.info("config-从配置中获取还车违约金returnFineAmt=[{}]",JSON.toJSONString(sysReturnFineAmt));
         Integer returnCost = (sysReturnFineAmt==null||sysReturnFineAmt.getItemValue()==null) ? CommonUtils.MODIFY_RETURN_FINE_AMT : Integer.valueOf(sysReturnFineAmt.getItemValue());;
 		//取车开关

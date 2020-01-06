@@ -294,3 +294,4 @@ order-settle/build/
 order-settle/src/main/java/com/atzuche/order/settle/exception/
 order-settle/src/main/java/com/atzuche/order/settle/vo/res/
 renter-all/
+order-delivery/build
