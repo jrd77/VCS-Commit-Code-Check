@@ -77,7 +77,6 @@ public class AliyunMnsAnnotationBeanPostProcessor implements BeanPostProcessor,A
         AliyunMnsListenerContainerFactory factory = applictionContext.getBean(AliyunMnsListenerContainerFactory.class);
 
         AliyunMnsListenerContainer container = factory.createMessageListenerContainer(queueName);
-        //TODO
         container.setMessageListener(new AliyunMessageListener() {
             @Override
             public void onMessage(Message message) throws AliyunMessageException {

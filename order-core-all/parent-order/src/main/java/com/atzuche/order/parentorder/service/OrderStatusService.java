@@ -10,6 +10,8 @@ import org.springframework.cglib.beans.BeanCopier;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.Date;
+import java.util.List;
 
 
 /**
@@ -68,4 +70,7 @@ public class OrderStatusService {
         return record;
     }
 
+    public List<String> queryOrderNoByStartTimeAndEndTime(Date startTime, Date endTime) {
+        return orderStatusMapper.queryOrderNoByStartTimeAndEndTime(startTime,endTime);
+    }
 }

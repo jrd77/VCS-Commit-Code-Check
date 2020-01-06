@@ -19,58 +19,24 @@
 	</resultMap>
 
 	<insert id="saveRenterOrderWzQueryRecord" parameterType="com.atzuche.order.renterwz.entity.RenterOrderWzQueryRecordEntity" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
-		insert into renter_order_wz_query_record(
-			<if test="orderNo != null">
-				order_no,
-			</if>
-			<if test="carPlateNum != null">
-				car_plate_num,
-			</if>
-			<if test="resultJson != null">
-				result_json,
-			</if>
-			<if test="returnCode != null">
-				return_code,
-			</if>
-			<if test="errorMsg != null">
-				error_msg,
-			</if>
-			<if test="illegalFlag != null">
-				illegal_flag,
-			</if>
-			<if test="city != null">
+		INSERT INTO renter_order_wz_query_record (
 				city,
-			</if>
-			<if test="updateTime != null">
-				update_time,
-			</if>
-			create_time
-		) values (
-			<if test="orderNo != null">
-				#{orderNo},
-			</if>
-			<if test="carPlateNum != null">
-				#{carPlateNum},
-			</if>
-			<if test="resultJson != null">
-				#{resultJson},
-			</if>
-			<if test="returnCode != null">
-				#{returnCode},
-			</if>
-			<if test="errorMsg != null">
-				#{errorMsg},
-			</if>
-			<if test="illegalFlag != null">
-				#{illegalFlag},
-			</if>
-			<if test="city != null">
+				order_no,
+				car_plate_num,
+				result_json,
+				return_code,
+				error_msg,
+				illegal_flag,
+				create_time)
+			VALUES (
 				#{city},
-			</if>
-			<if test="updateTime != null">
-				#{updateTime},
-			</if>
-			NOW())
+				#{orderNo},
+				#{carPlateNum},
+				#{resultJson},
+				#{returnCode},
+				#{errorMsg},
+				#{illegalFlag},
+				#{createTime})
 	</insert>
 
 	<select id="queryRenterOrderWzQueryRecordById" resultType="com.atzuche.order.renterwz.entity.RenterOrderWzQueryRecordEntity">

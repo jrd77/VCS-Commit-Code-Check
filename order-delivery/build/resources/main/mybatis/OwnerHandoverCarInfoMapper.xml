@@ -255,5 +255,16 @@
 		select msg_id from owner_handover_car_info
 		where msg_id = #{msgId} and is_delete = 0
 	</select>
+
+	<select id="selectByOwnerOrderNo" resultMap="BaseResultMap">
+		select oil_num,mileage_num,delay_time,ahead_time,type from owner_handover_car_info where
+		renter_order_no = #{renterOrderNo} and is_delete = 0
+	</select>
+	<select id="selectObjectByOrderNo" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List"/>
+		from owner_handover_car_info where
+		order_no = #{orderNo} and type = #{type} and is_delete = 0 order by id limit 1
+	</select>
   	
 </mapper>

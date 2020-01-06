@@ -410,4 +410,15 @@
         where renter_order_no=#{renterOrderNo} and is_delete = 0 limit 1
     </select>
 
+    <select id="queryOrderNosByOrderNosAndCarNo" resultType="java.lang.String">
+        select order_no from renter_goods where car_no = #{carNo} and is_delete = 0 and order_no in
+        <foreach collection="orderNos" item="orderNo" separator="," close=")" open="(">
+            #{orderNo}
+        </foreach>
+    </select>
+
+    <select id="queryCarNumByOrderNo" resultType="java.lang.String" parameterType="java.lang.String">
+        select car_plate_num from renter_goods where order_no = #{orderNo} and is_delete = 0 order by id desc limit 1
+    </select>
+
 </mapper>

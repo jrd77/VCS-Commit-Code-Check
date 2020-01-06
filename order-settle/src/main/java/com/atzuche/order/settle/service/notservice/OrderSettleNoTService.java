@@ -356,23 +356,54 @@ public class OrderSettleNoTService {
      */
     public SettleOrdersDefinition settleOrdersDefinition(SettleOrders settleOrders) {
         SettleOrdersDefinition settleOrdersDefinition = new SettleOrdersDefinition();
-        //平台收益明细
-        List<AccountPlatformProfitDetailEntity> accountPlatformProfitDetails = new ArrayList<>();
-        //平台补贴
-        List<AccountPlatformSubsidyDetailEntity> accountPlatformSubsidyDetails = new ArrayList<>();
-        //车主费用明细
-        List<AccountOwnerCostSettleDetailEntity> accountOwnerCostSettleDetails = new ArrayList<>();
-        //租客费用明细
-        List<AccountRenterCostSettleDetailEntity> accountRenterCostSettleDetails = new ArrayList<>();
-
         //1统计 租客结算费用明细， 补贴，费用总额
         handleRentAndPlatform(settleOrdersDefinition,settleOrders);
         //2统计 车主结算费用明细， 补贴，费用总额
         handleOwnerAndPlatform(settleOrdersDefinition,settleOrders);
-
-
-
+        //3统计 计算总费用
+        countCost(settleOrdersDefinition);
         return settleOrdersDefinition;
+    }
+
+    /**
+     *
+     * @param settleOrdersDefinition
+     */
+    private void countCost(SettleOrdersDefinition settleOrdersDefinition) {
+        List<AccountRenterCostSettleDetailEntity> accountRenterCostSettleDetails = settleOrdersDefinition.getAccountRenterCostSettleDetails();
+        //1租客总账
+        if(!CollectionUtils.isEmpty(accountRenterCostSettleDetails)){
+            int rentCostAmt =0;
+            rentCostAmt = accountRenterCostSettleDetails.stream().filter(obj ->{return obj.getAmt()<0;}).mapToInt(AccountRenterCostSettleDetailEntity::getAmt).sum();
+            settleOrdersDefinition.setRentCostAmt(rentCostAmt);
+            int rentSubsidyAmt =0;
+            rentSubsidyAmt = accountRenterCostSettleDetails.stream().filter(obj ->{return obj.getAmt()>0;}).mapToInt(AccountRenterCostSettleDetailEntity::getAmt).sum();
+            settleOrdersDefinition.setRentSubsidyAmt(rentSubsidyAmt);
+        }
+        //2车主总账
+        List<AccountOwnerCostSettleDetailEntity> accountOwnerCostSettleDetails = settleOrdersDefinition.getAccountOwnerCostSettleDetails();
+        if(!CollectionUtils.isEmpty(accountOwnerCostSettleDetails)){
+            int rentCostAmt =0;
+            rentCostAmt = accountOwnerCostSettleDetails.stream().filter(obj ->{return obj.getAmt()<0;}).mapToInt(AccountOwnerCostSettleDetailEntity::getAmt).sum();
+            settleOrdersDefinition.setOwnerCostAmt(rentCostAmt);
+            int rentSubsidyAmt =0;
+            rentSubsidyAmt = accountOwnerCostSettleDetails.stream().filter(obj ->{return obj.getAmt()>0;}).mapToInt(AccountOwnerCostSettleDetailEntity::getAmt).sum();
+            settleOrdersDefinition.setOwnerSubsidyAmt(rentSubsidyAmt);
+        }
+        //3 平台收益总账
+        List<AccountPlatformProfitDetailEntity> accountPlatformProfitDetails = settleOrdersDefinition.getAccountPlatformProfitDetails();
+        if(!CollectionUtils.isEmpty(accountPlatformProfitDetails)){
+            int platformProfitAmt=0;
+            platformProfitAmt = accountPlatformProfitDetails.stream().mapToInt(AccountPlatformProfitDetailEntity::getAmt).sum();
+            settleOrdersDefinition.setPlatformProfitAmt(platformProfitAmt);
+        }
+        //4 平台补贴总额
+        List<AccountPlatformSubsidyDetailEntity> accountPlatformSubsidyDetails = settleOrdersDefinition.getAccountPlatformSubsidyDetails();
+        if(!CollectionUtils.isEmpty(accountPlatformSubsidyDetails)){
+            int platformSubsidyAmt =0;
+            platformSubsidyAmt = accountPlatformSubsidyDetails.stream().mapToInt(AccountPlatformSubsidyDetailEntity::getAmt).sum();
+            settleOrdersDefinition.setPlatformSubsidyAmt(platformSubsidyAmt);
+        }
     }
 
     /**

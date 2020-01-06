@@ -1,8 +1,13 @@
 package com.atzuche.order.renterwz.service;
 
+import com.aliyun.oss.ClientException;
 import com.aliyun.oss.OSSClient;
+import com.aliyun.oss.OSSException;
 import com.aliyun.oss.model.ObjectMetadata;
 import com.aliyun.oss.model.PutObjectResult;
+import com.atzuche.order.commons.CatConstants;
+import com.dianping.cat.Cat;
+import com.dianping.cat.message.Transaction;
 import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,6 +51,7 @@ public class OssService implements AutoCloseable {
      * @throws Exception
      */
     public Integer upload(String key, String base64) throws Exception{
+        Transaction t = Cat.getProducer().newTransaction(CatConstants.FEIGN_CALL, "上传文件 至 bucket at-images");
         Integer result = -1;
         InputStream input = null;
         ObjectMetadata objectMeta = new ObjectMetadata();
@@ -55,20 +61,36 @@ public class OssService implements AutoCloseable {
             byte[] bytes = Base64.decodeBase64(base64);
             objectMeta.setContentLength(bytes.length);
             input = new ByteArrayInputStream(bytes);
+            Cat.logEvent(CatConstants.FEIGN_METHOD,"OssService.upload");
+            Cat.logEvent(CatConstants.FEIGN_PARAM,key);
             PutObjectResult res = client.putObject(bucket, key, input, objectMeta);
             logger.info("Res MD5:"+res.getETag());
             result = 200;
         } catch (Exception e) {
-            logger.error("",e);
+            logger.error("上传文件 至 bucket at-images 异常",e);
+            Cat.logError("上传文件 至 bucket at-images 异常",e);
         }finally{
             if(input != null){
                 input.close();
             }
+            t.complete();
         }
         return result;
     }
 
     public void deleteOSSObject(String key){
-        client.deleteObject(bucket, key);
+        Transaction t = Cat.getProducer().newTransaction(CatConstants.FEIGN_CALL, "删除文件 ");
+        try {
+            Cat.logEvent(CatConstants.FEIGN_METHOD,"OssService.deleteOSSObject");
+            Cat.logEvent(CatConstants.FEIGN_PARAM,key);
+            client.deleteObject(bucket, key);
+        } catch (OSSException e) {
+            e.printStackTrace();
+        } catch (ClientException e) {
+            logger.error("删除文件 异常",e);
+            Cat.logError("删除文件 异常",e);
+        } finally {
+            t.complete();
+        }
     }
 }

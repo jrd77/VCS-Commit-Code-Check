@@ -1,10 +1,12 @@
-package com.atzuche.order.renterwz.service;
+package com.atzuche.order.coreapi.service;
 
 import com.atzuche.order.commons.DateUtils;
+import com.atzuche.order.rentercommodity.service.RenterGoodsService;
 import com.atzuche.order.renterwz.entity.RenterOrderWzDetailEntity;
 import com.atzuche.order.renterwz.entity.RenterOrderWzIllegalPhotoEntity;
 import com.atzuche.order.renterwz.entity.RenterOrderWzStatusEntity;
 import com.atzuche.order.renterwz.entity.RenyunSendIllegalInfoLogEntity;
+import com.atzuche.order.renterwz.service.*;
 import com.atzuche.order.renterwz.vo.IllegalHandleMqVO;
 import com.google.gson.Gson;
 import net.sf.json.JSONArray;
@@ -50,6 +52,9 @@ public class TransIllegalMqService {
     @Resource
     private RenterOrderWzCostDetailService renterOrderWzCostDetailService;
 
+    @Resource
+    private RenterGoodsService renterGoodsService;
+
     private static Gson gson = new Gson();
 
     private static final String REN_YUN_MQ_INFO_ORDER_NO = "orderno";
@@ -81,8 +86,7 @@ public class TransIllegalMqService {
             }
             String orderNo = jsonObject.getString(REN_YUN_MQ_INFO_ORDER_NO);
             //根据订单号 查询最后一个有效子订单的车牌
-            //TODO
-            String carNum = "";
+            String carNum = renterGoodsService.queryCarNumByOrderNo(orderNo);
             //就算之前存在 ，仍需要记录 这是日志表
             isNeedHandle(messageBody,"01",carNum);
 
@@ -163,8 +167,7 @@ public class TransIllegalMqService {
             }
             String orderNo = jsonObject.getString(REN_YUN_MQ_INFO_ORDER_NO);
             //根据订单号 查询最后一个有效子订单的车牌
-            //TODO
-            String carNum = "";
+            String carNum = renterGoodsService.queryCarNumByOrderNo(orderNo);
             Integer memNo = null;
             //就算之前存在 ，仍需要记录 这是日志表
             isNeedHandle(messageBody,"02",carNum);
@@ -263,8 +266,7 @@ public class TransIllegalMqService {
             }
             String orderNo = jsonObject.getString(REN_YUN_MQ_INFO_ORDER_NO);
             //根据订单号 查询最后一个有效子订单的车牌
-            //TODO
-            String carNum = "";
+            String carNum = renterGoodsService.queryCarNumByOrderNo(orderNo);
             //就算之前存在 ，仍需要记录 这是日志表
             isNeedHandle(messageBody,"03",carNum);
 
@@ -319,8 +321,7 @@ public class TransIllegalMqService {
             }
             //根据订单号 查询最后一个有效子订单的车牌
             String orderNo=illegalHandleBo.getOrderno();
-            //TODO
-            String carNum = "";
+            String carNum = renterGoodsService.queryCarNumByOrderNo(orderNo);
             //就算之前存在 ，仍需要记录 这是日志表
             isNeedHandle(messageBody,"04",carNum);
 

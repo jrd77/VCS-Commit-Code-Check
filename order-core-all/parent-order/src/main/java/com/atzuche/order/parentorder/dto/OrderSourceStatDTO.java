@@ -132,6 +132,18 @@ public class OrderSourceStatDTO {
      */
     private String requestId;
     /**
+     * 下单地址
+     */
+    private String reqAddr;
+    /**
+     * 下单地址经度
+     */
+    private String publicLongitude;
+    /**
+     * 下单地址经度
+     */
+    private String publicLatitude;
+    /**
      *
      */
     private String schema;

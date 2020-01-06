@@ -1,8 +1,14 @@
 package com.atzuche.order.renterwz.service;
 
+import com.aliyun.mns.client.AsyncCallback;
+import com.aliyun.mns.model.Message;
+import com.atzuche.order.commons.JsonUtil;
 import com.atzuche.order.commons.JsonUtils;
 import com.atzuche.order.renterwz.aliyunmq.AliyunMnsService;
+import com.atzuche.order.renterwz.entity.MqSendFeelbackLogEntity;
 import com.atzuche.order.renterwz.entity.RenterOrderWzIllegalPhotoEntity;
+import com.atzuche.order.renterwz.mapper.MqSendFeelbackLogMapper;
+import com.atzuche.order.renterwz.vo.OrderInfoForIllegal;
 import com.atzuche.order.renterwz.vo.PhotoPath;
 import com.atzuche.order.renterwz.vo.TransIllegalPhotoBo;
 import org.slf4j.Logger;
@@ -11,6 +17,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -34,9 +41,13 @@ public class TransIllegalSendAliYunMq {
     @Resource
     private RenterOrderWzIllegalPhotoService renterOrderWzIllegalPhotoService;
 
+    @Resource
+    private RenterOrderWzSettleFlagService renterOrderWzSettleFlagService;
+
     @Value("${com.autoyol.mns.queue.renyun-receive-queue-result-feedback-queue}")
     private String renyunReceiveQueueResultFeedbackQueue;
-
+    @Value("${com.autoyol.mns.queue.auto-order-info-for-traffic-violation-queue}")
+    private String queueNameTransIllegal;
     @Value("${com.autoyol.mns.queue.auto-renter-voucher-queue}")
     private String renterVoucherQueue;
 
@@ -48,7 +59,7 @@ public class TransIllegalSendAliYunMq {
 
     private String bucketUrl = "http://" + bucket + "." + OSS_BASE_URL + "/";
 
-    public void renyunReceiveQueueResultFeedbackQueue(Map resMap){
+    public void renYunReceiveQueueResultFeedbackQueue(Map resMap){
         if(resMap==null){
             return ;
         }
@@ -59,7 +70,7 @@ public class TransIllegalSendAliYunMq {
         }
     }
 
-    public void transIllegalPhotoToRenyun(RenterOrderWzIllegalPhotoEntity photo) {
+    public void transIllegalPhotoToRenYun(RenterOrderWzIllegalPhotoEntity photo) {
         try{
             String orderNo = photo.getOrderNo();
             String carPlateNum = photo.getCarPlateNum();
@@ -81,6 +92,35 @@ public class TransIllegalSendAliYunMq {
             logger.info("发送违章凭证到仁云流程系统-结束");
         }catch (Exception e){
             logger.info("发送违章凭证到仁云流程系统，报错：{}",e);
+        }
+    }
+
+    @Resource
+    private MqSendFeelbackLogMapper mqSendFeelbackLogMapper;
+
+    public void sendTrafficViolationMq(List<OrderInfoForIllegal> list){
+        for(OrderInfoForIllegal bo:list) {
+            //记录标示
+            renterOrderWzSettleFlagService.addTransIllegalSettleFlag(bo.getOrderno(),bo.getPlatenum(),1,0,"发送违章订单定时任务");
+
+            String msgJson= JsonUtil.toJson(bo);
+            aliyunMnsService.asyncSend̨MessageToQueue(msgJson, queueNameTransIllegal,true, new AsyncCallback<Message>() {
+                @Override
+                public void onSuccess(Message result) {
+                    String messageId=result.getMessageId();
+                    MqSendFeelbackLogEntity log=new MqSendFeelbackLogEntity();
+                    log.setMsgId(messageId);
+                    log.setMsg(msgJson);
+                    log.setCreateTime(new Date());
+                    log.setQueueName(queueNameTransIllegal);
+                    log.setStatus("01");
+                    log.setSendTime(new Date());
+                    mqSendFeelbackLogMapper.saveMqSendFeelbackLog(log);
+                }
+                @Override
+                public void onFail(Exception ex) {
+                    ex.printStackTrace();
+                }});
         }
     }
 }
