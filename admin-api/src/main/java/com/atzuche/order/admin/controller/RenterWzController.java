@@ -1,7 +1,7 @@
 package com.atzuche.order.admin.controller;
 
+import com.atzuche.order.admin.vo.req.renterWz.RenterWzCostReqVO;
 import com.atzuche.order.admin.vo.req.renterWz.TemporaryRefundReqVO;
-import com.atzuche.order.admin.vo.resp.renterWz.RenterWzCostDetailResVO;
 import com.atzuche.order.admin.vo.resp.renterWz.TemporaryRefundLogsResVO;
 import com.atzuche.order.admin.vo.resp.renterWz.WzCostLogsResVO;
 import com.autoyol.commons.web.ErrorCode;
@@ -16,7 +16,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.List;
 
 /**
  * RenterWzController
@@ -40,9 +39,12 @@ public class RenterWzController extends BaseController {
 
     @PostMapping("/console/update/wz/cost")
     @AutoDocMethod(description = "修改违章费用", value = "修改违章费用",response = ResponseData.class)
-    public ResponseData updateWzCost(@Valid @RequestBody List<RenterWzCostDetailResVO> costDetails){
-        if (CollectionUtils.isEmpty(costDetails)) {
+    public ResponseData updateWzCost(@Valid @RequestBody RenterWzCostReqVO costDetail){
+        if (costDetail == null || CollectionUtils.isEmpty(costDetail.getCostDetails())) {
             return ResponseData.success();
+        }
+        if(StringUtils.isBlank(costDetail.getOrderNo())){
+            return ResponseData.createErrorCodeResponse(ErrorCode.ORDER_NO_PARAM_ERROR.getCode(), "订单编号为空");
         }
         return ResponseData.success();
     }
