@@ -2,7 +2,7 @@ package com.atzuche.order.admin.controller;
 
 import com.atzuche.order.admin.service.DeliveryCarInfoService;
 import com.atzuche.order.admin.service.HandoverCarInfoService;
-import com.atzuche.order.admin.vo.rep.delivery.RenterDeliveryCarVO;
+import com.atzuche.order.admin.vo.rep.delivery.DeliveryCarVO;
 import com.atzuche.order.admin.vo.req.DeliveryCarRepVO;
 import com.atzuche.order.admin.vo.req.delivery.CarConditionPhotoUploadVO;
 import com.autoyol.commons.web.ErrorCode;
@@ -40,7 +40,7 @@ public class DeliveryCarController extends BaseController {
      */
     @AutoDocVersion(version = "管理后台取还车配送服务信息")
     @AutoDocGroup(group = "管理后台取还车配送服务信息")
-    @AutoDocMethod(description = "取还车配送", value = "取还车配送",response = RenterDeliveryCarVO.class)
+    @AutoDocMethod(description = "取还车配送", value = "取还车配送",response = DeliveryCarVO.class)
     @PostMapping("/delivery/list")
     public ResponseData<?> findDeliveryListByOrderNo(@RequestBody DeliveryCarRepVO deliveryCarDTO) {
         if (null == deliveryCarDTO || StringUtils.isBlank(deliveryCarDTO.getOrderNo())) {

@@ -10,12 +10,14 @@ import lombok.ToString;
  */
 @Data
 @ToString
-public class RenterDeliveryCarVO {
+public class DeliveryCarVO {
 
     @AutoDocProperty("取车服务信息")
     private GetHandoverCarDTO getHandoverCarDTO;
     @AutoDocProperty("还车服务信息")
     private ReturnHandoverCarDTO returnHandoverCarDTO;
-    @AutoDocProperty("取还车服务")
-    private GetAndReturnCarDTO getAndReturnCarDTO;
+    @AutoDocProperty("车主取还车服务")
+    private OwnerGetAndReturnCarDTO ownerGetAndReturnCarDTO;
+    @AutoDocProperty("租客取还车服务")
+    private RenterGetAndReturnCarDTO renterGetAndReturnCarDTO;
 }
