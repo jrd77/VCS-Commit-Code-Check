@@ -13,9 +13,14 @@ buildscript {
 apply plugin: 'dependency-management'
 apply plugin: 'org.springframework.boot'
 apply plugin: 'war'
+apply plugin: 'application'
+
+mainClassName='com.autoyol.doc.parser.autodoc.AutoDocParser'
 
 group 'com.atzuche'
 version '0.0.1-SNAPSHOT'
+sourceCompatibility = '1.8'
+targetCompatibility = 1.8
 
 dependencies {
     compile project(":order-openapi")
