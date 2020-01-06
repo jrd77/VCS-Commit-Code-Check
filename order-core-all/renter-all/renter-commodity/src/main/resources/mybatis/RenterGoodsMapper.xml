@@ -148,11 +148,8 @@
         `engine_source`,
         `frame_no`,
         `engine_num`,
-        `create_time`,
         `create_op`,
-        `update_time`,
-        `update_op`,
-        `is_delete`
+        `update_op`
         )
         values
         (
@@ -195,11 +192,8 @@
         #{engineSource},
         #{frameNo},
         #{engineNum},
-        #{createTime},
         #{createOp},
-        #{updateTime},
-        #{updateOp},
-        #{isDelete}
+        #{updateOp}
         )
     </insert>
 

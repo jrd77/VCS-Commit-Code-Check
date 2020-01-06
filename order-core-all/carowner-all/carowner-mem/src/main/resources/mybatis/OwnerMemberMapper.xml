@@ -58,11 +58,8 @@
         `real_name`,
         `nick_name`,
         `order_success_count`,
-        `create_time`,
         `create_op`,
-        `update_time`,
-        `update_op`,
-        `is_delete`
+        `update_op`
         )
         values
         (
@@ -75,11 +72,8 @@
         #{realName},
         #{nickName},
         #{orderSuccessCount},
-        #{createTime},
         #{createOp},
-        #{updateTime},
-        #{updateOp},
-        #{isDelete}
+        #{updateOp}
         )
     </insert>
 

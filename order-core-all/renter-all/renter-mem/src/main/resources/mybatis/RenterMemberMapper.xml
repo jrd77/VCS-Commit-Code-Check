@@ -79,11 +79,8 @@
         `dri_lic_auth`,
         `dri_vice_lic_auth`,
         `renter_check`,
-        `create_time`,
         `create_op`,
-        `update_time`,
-        `update_op`,
-        `is_delete`
+        `update_op`
         )
         values
         (
@@ -103,11 +100,8 @@
         #{driLicAuth},
         #{driViceLicAuth},
         #{renterCheck},
-        #{createTime},
         #{createOp},
-        #{updateTime},
-        #{updateOp},
-        #{isDelete}
+        #{updateOp}
         )
     </insert>
 
