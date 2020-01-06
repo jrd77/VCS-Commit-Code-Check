@@ -65,7 +65,7 @@ public class RenterOrderReqVO implements Serializable {
     /**
      * 订单来源
      */
-    private Integer source;
+    private String source;
 
     /**
      * 场景号

@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -173,9 +174,9 @@ public class RenterOrderService {
         record.setGoodsCode(String.valueOf(renterOrderReqVO.getCarNo()));
         record.setGoodsType("1");
         record.setAgreeFlag(null == renterOrderReqVO.getReplyFlag() ? 0 : renterOrderReqVO.getReplyFlag());
+        record.setReqAcceptTime(null == renterOrderReqVO.getReplyFlag() ? null : LocalDateTime.now());
         record.setIsUseCoin(renterOrderReqVO.getUseAutoCoin());
         record.setIsUseWallet(renterOrderReqVO.getUseBal());
-
         record.setAddDriver(CollectionUtils.isEmpty(renterOrderReqVO.getDriverIds()) ? 0 :
                 renterOrderReqVO.getDriverIds().size());
         record.setIsUseCoupon(StringUtils.isNotBlank(renterOrderReqVO.getCarOwnerCouponNo())
@@ -271,7 +272,7 @@ public class RenterOrderService {
         getReturnCarCostReqDto.setCarLon(renterOrderReqVO.getCarLon());
         getReturnCarCostReqDto.setCityCode(Integer.valueOf(renterOrderReqVO.getCityCode()));
         getReturnCarCostReqDto.setEntryCode(renterOrderReqVO.getEntryCode());
-        getReturnCarCostReqDto.setSource(renterOrderReqVO.getSource());
+        getReturnCarCostReqDto.setSource(Integer.valueOf(renterOrderReqVO.getSource()));
         getReturnCarCostReqDto.setSrvGetLat(renterOrderReqVO.getSrvGetLat());
         getReturnCarCostReqDto.setSrvGetLon(renterOrderReqVO.getSrvGetLon());
         getReturnCarCostReqDto.setSrvReturnLon(renterOrderReqVO.getSrvReturnLon());

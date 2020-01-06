@@ -107,6 +107,11 @@ public class RenterOrderEntity implements Serializable {
 	 * 修改方 1、后台管理 2、租客 3、车主
 	 */
 	private String changeSource;
+    /**
+     * 车主同意请求时间
+     */
+	private LocalDateTime reqAcceptTime;
+
 	/**
 	 * 创建时间
 	 */
