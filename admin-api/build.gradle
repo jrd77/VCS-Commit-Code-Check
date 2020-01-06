@@ -12,10 +12,20 @@ buildscript {
 
 apply plugin: 'dependency-management'
 apply plugin: 'org.springframework.boot'
+apply plugin: 'application'
 apply plugin: 'war'
+apply plugin: 'application'
+
+mainClassName='com.autoyol.doc.parser.autodoc.AutoDocParser'
+
+mainClassName = 'com.autoyol.doc.parser.autodoc.AutoDocParser'
 
 group 'com.atzuche'
 version '0.0.1-SNAPSHOT'
+sourceCompatibility = '1.8'
+targetCompatibility = 1.8
+
+
 
 dependencies {
     compile project(":order-openapi")
@@ -31,6 +41,7 @@ dependencies {
     compile("com.autoyol.tools:prop-encrypt-spring-boot-starter:0.0.1-SNAPSHOT")
     compile('mysql:mysql-connector-java')
     compile('com.ctrip.framework.apollo:apollo-client:0.11.0-SNAPSHOT')
+    compile('net.coobird:thumbnailator:0.4.8')
 //	compile("com.autoyol:cat-starter:0.0.1-SNAPSHOT")
 //	compile('org.springframework.boot:spring-boot-starter-data-redis')
     testCompile 'org.springframework.boot:spring-boot-starter-test'

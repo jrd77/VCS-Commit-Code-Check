@@ -23,6 +23,7 @@ import com.atzuche.order.coreapi.entity.vo.req.AutoCoinDeductReqVO;
 import com.atzuche.order.coreapi.entity.vo.req.CarRentTimeRangeReqVO;
 import com.atzuche.order.coreapi.entity.vo.req.OwnerCouponBindReqVO;
 import com.atzuche.order.coreapi.entity.vo.res.CarRentTimeRangeResVO;
+import com.atzuche.order.coreapi.utils.BizAreaUtil;
 import com.atzuche.order.delivery.service.delivery.DeliveryCarService;
 import com.atzuche.order.flow.service.OrderFlowService;
 import com.atzuche.order.owner.commodity.service.OwnerGoodsService;
@@ -279,7 +280,7 @@ public class SubmitOrderService {
         orderDTO.setCityCode(orderReqVO.getCityCode());
         orderDTO.setCityName(orderReqVO.getCityName());
         orderDTO.setEntryCode(orderReqVO.getSceneCode());
-        orderDTO.setSource(Integer.valueOf(orderReqVO.getSource()));
+        orderDTO.setSource(orderReqVO.getSource());
         orderDTO.setExpRentTime(orderReqVO.getRentTime());
         orderDTO.setExpRevertTime(orderReqVO.getRevertTime());
         orderDTO.setIsFreeDeposit(StringUtils.isBlank(orderReqVO.getFreeDoubleTypeId())
@@ -323,6 +324,10 @@ public class SubmitOrderService {
         orderSourceStatDTO.setAppChannelId(orderReqVO.getAppChannelId());
         orderSourceStatDTO.setAndroidId(orderReqVO.getAndroidID());
         orderSourceStatDTO.setOrderNo(orderNo);
+        orderSourceStatDTO.setPublicLongitude(orderReqVO.getPublicLongitude());
+        orderSourceStatDTO.setPublicLatitude(orderReqVO.getPublicLatitude());
+        orderSourceStatDTO.setReqAddr(BizAreaUtil.getReqAddrFromLonLat(orderSourceStatDTO.getPublicLongitude(),
+                orderSourceStatDTO.getPublicLatitude()));
 
         LOGGER.info("Build order source stat dto,result is ,orderSourceStatDTO:[{}]", JSON.toJSONString(orderSourceStatDTO));
         return orderSourceStatDTO;
@@ -350,7 +355,7 @@ public class SubmitOrderService {
 
         OrderReqVO orderReqVO = reqContext.getOrderReqVO();
         renterOrderReqVO.setEntryCode(orderReqVO.getSceneCode());
-        renterOrderReqVO.setSource(Integer.valueOf(orderReqVO.getSource()));
+        renterOrderReqVO.setSource(orderReqVO.getSource());
         String driverIds = orderReqVO.getDriverIds();
         renterOrderReqVO.setDriverIds(ListUtil.parseString(driverIds, ","));
         renterOrderReqVO.setGetCarBeforeTime(null == carRentTimeRangeResVO || null == carRentTimeRangeResVO.getGetMinutes() ? 0 : carRentTimeRangeResVO.getGetMinutes());
