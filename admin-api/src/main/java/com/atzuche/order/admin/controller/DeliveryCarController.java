@@ -90,9 +90,9 @@ public class DeliveryCarController extends BaseController {
              handoverCarInfoService.updateDeliveryCarInfo(deliveryReqVO);
             return ResponseData.success();
         } catch (Exception e) {
-            log.error("取还车更新接口出现异常", e);
-            Cat.logError("取还车更新出现异常", e);
-            return ResponseData.createErrorCodeResponse(ErrorCode.FAILED.getCode(), "交接车照片上传接口出现错误");
+            log.error("配送取还车更新接口出现异常", e);
+            Cat.logError("配送取还车更新出现异常", e);
+            return ResponseData.createErrorCodeResponse(ErrorCode.FAILED.getCode(), "配送取还车更新接口出现错误");
         }
     }
 
@@ -113,9 +113,9 @@ public class DeliveryCarController extends BaseController {
             handoverCarInfoService.updateHandoverCarInfo(deliveryReqVO);
             return ResponseData.success();
         } catch (Exception e) {
-            log.error("交接车照片上传接口出现异常", e);
-            Cat.logError("交接车照片上传接口出现异常", e);
-            return ResponseData.createErrorCodeResponse(ErrorCode.FAILED.getCode(), "交接车照片上传接口出现错误");
+            log.error("取还车更新接口出现异常", e);
+            Cat.logError("取还车更新接口出现异常", e);
+            return ResponseData.createErrorCodeResponse(ErrorCode.FAILED.getCode(), "取还车更新接口出现错误");
         }
     }
 
