@@ -32,7 +32,7 @@ public class OrderDTO {
     /**
      * 来源 1：手机，2：网站，3:管理后台，4:cp b2c, 5:cp upop
      */
-    private Integer source;
+    private String source;
     /**
      * 预计起租时间
      */

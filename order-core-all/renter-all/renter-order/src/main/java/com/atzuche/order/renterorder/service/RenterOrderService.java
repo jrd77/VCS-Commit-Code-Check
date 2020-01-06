@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -173,9 +174,9 @@ public class RenterOrderService {
         record.setGoodsCode(String.valueOf(renterOrderReqVO.getCarNo()));
         record.setGoodsType("1");
         record.setAgreeFlag(null == renterOrderReqVO.getReplyFlag() ? 0 : renterOrderReqVO.getReplyFlag());
+        record.setReqAcceptTime(null == renterOrderReqVO.getReplyFlag() ? null : LocalDateTime.now());
         record.setIsUseCoin(renterOrderReqVO.getUseAutoCoin());
         record.setIsUseWallet(renterOrderReqVO.getUseBal());
-
         record.setAddDriver(CollectionUtils.isEmpty(renterOrderReqVO.getDriverIds()) ? 0 :
                 renterOrderReqVO.getDriverIds().size());
         record.setIsUseCoupon(StringUtils.isNotBlank(renterOrderReqVO.getCarOwnerCouponNo())
@@ -183,7 +184,7 @@ public class RenterOrderService {
                 || StringUtils.isNotBlank(renterOrderReqVO.getGetCarFreeCouponId()) ? 1 : 0);
         record.setIsGetCar(renterOrderReqVO.getSrvGetFlag());
         record.setIsReturnCar(renterOrderReqVO.getSrvReturnFlag());
-        record.setIsAbatement(Integer.valueOf(renterOrderReqVO.getAbatement()));
+        record.setIsAbatement(renterOrderReqVO.getAbatement()==null?0:Integer.valueOf(renterOrderReqVO.getAbatement()));
         record.setIsUseSpecialPrice(Integer.valueOf(renterOrderReqVO.getUseSpecialPrice()==null?"0":renterOrderReqVO.getUseSpecialPrice()));
         record.setChildStatus(RenterChildStatusEnum.PROCESS_ING.getCode());
         renterOrderMapper.insertSelective(record);
@@ -257,7 +258,7 @@ public class RenterOrderService {
         abatementAmtDTO.setReturnCarAfterTime(renterOrderReqVO.getReturnCarAfterTime());
         abatementAmtDTO.setInmsrp(renterOrderReqVO.getInmsrp());
         abatementAmtDTO.setGuidPrice(renterOrderReqVO.getGuidPrice());
-        abatementAmtDTO.setIsAbatement(StringUtils.equals(renterOrderReqVO.getAbatement(),"1"));
+        abatementAmtDTO.setIsAbatement(null != renterOrderReqVO.getAbatement() && renterOrderReqVO.getAbatement() == 1 );
 
         //附加驾驶人险计算相关信息
         ExtraDriverDTO extraDriverDTO = new ExtraDriverDTO();
@@ -271,7 +272,7 @@ public class RenterOrderService {
         getReturnCarCostReqDto.setCarLon(renterOrderReqVO.getCarLon());
         getReturnCarCostReqDto.setCityCode(Integer.valueOf(renterOrderReqVO.getCityCode()));
         getReturnCarCostReqDto.setEntryCode(renterOrderReqVO.getEntryCode());
-        getReturnCarCostReqDto.setSource(renterOrderReqVO.getSource());
+        getReturnCarCostReqDto.setSource(Integer.valueOf(renterOrderReqVO.getSource()));
         getReturnCarCostReqDto.setSrvGetLat(renterOrderReqVO.getSrvGetLat());
         getReturnCarCostReqDto.setSrvGetLon(renterOrderReqVO.getSrvGetLon());
         getReturnCarCostReqDto.setSrvReturnLon(renterOrderReqVO.getSrvReturnLon());
@@ -286,7 +287,9 @@ public class RenterOrderService {
         GetReturnCarOverCostReqDto getReturnCarOverCostReqDto = new GetReturnCarOverCostReqDto();
         getReturnCarOverCostReqDto.setCostBaseDTO(costBaseDTO);
         getReturnCarOverCostReqDto.setCityCode(Integer.valueOf(renterOrderReqVO.getCityCode()));
-        getReturnCarOverCostReqDto.setOrderType(Integer.valueOf(renterOrderReqVO.getOrderCategory()));
+        if (StringUtils.isNotBlank(renterOrderReqVO.getOrderCategory())) {
+        	getReturnCarOverCostReqDto.setOrderType(Integer.valueOf(renterOrderReqVO.getOrderCategory()));
+        }
 
         //租车费用计算相关参数
         RenterOrderCostReqDTO renterOrderCostReqDTO = new RenterOrderCostReqDTO();
