@@ -157,5 +157,5 @@
 		from owner_handover_car_remark where renter_order_no = #{renterOrderNo}
 		and type = #{type} and is_delete = 0
 	</select>
-
+  	
 </mapper>

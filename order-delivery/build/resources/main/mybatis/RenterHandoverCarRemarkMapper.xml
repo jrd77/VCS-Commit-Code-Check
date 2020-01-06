@@ -156,8 +156,8 @@
         SELECT a.*
         FROM renter_handover_car_remark a
         WHERE id = (SELECT max(id)
-        FROM renter_handover_car_remark
-        WHERE type = a.type) AND order_no = #{orderNo}
+                    FROM renter_handover_car_remark
+                    WHERE type = a.type) AND order_no = #{orderNo}
         ORDER BY a.id
     </select>
 
