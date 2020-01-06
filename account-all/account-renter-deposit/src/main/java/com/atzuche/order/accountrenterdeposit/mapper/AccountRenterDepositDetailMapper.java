@@ -1,6 +1,7 @@
 package com.atzuche.order.accountrenterdeposit.mapper;
 
 import com.atzuche.order.accountrenterdeposit.entity.AccountRenterDepositDetailEntity;
+import com.atzuche.order.accountrenterdeposit.entity.AccountRenterDepositEntity;
 import org.apache.ibatis.annotations.Mapper;
 import java.util.List;
 
@@ -16,5 +17,7 @@ public interface AccountRenterDepositDetailMapper{
     AccountRenterDepositDetailEntity selectByPrimaryKey(Integer id);
 
     int insert(AccountRenterDepositDetailEntity record);
-    
+
+    int updateByPrimaryKeySelective(AccountRenterDepositDetailEntity record);
+
 }

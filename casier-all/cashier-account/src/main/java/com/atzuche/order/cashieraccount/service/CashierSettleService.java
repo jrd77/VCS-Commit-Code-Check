@@ -8,6 +8,7 @@ import com.atzuche.order.accountplatorm.entity.AccountPlatformSubsidyDetailEntit
 import com.atzuche.order.accountplatorm.service.notservice.AccountPlatformProfitDetailNotService;
 import com.atzuche.order.accountplatorm.service.notservice.AccountPlatformSubsidyDetailNoTService;
 import com.atzuche.order.accountrenterdeposit.service.AccountRenterDepositService;
+import com.atzuche.order.accountrenterdeposit.vo.req.DetainRenterDepositReqVO;
 import com.atzuche.order.accountrenterdeposit.vo.res.AccountRenterDepositResVO;
 import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostDetailEntity;
 import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostSettleDetailEntity;
@@ -16,6 +17,7 @@ import com.atzuche.order.accountrenterrentcost.exception.AccountRenterRentCostSe
 import com.atzuche.order.accountrenterrentcost.service.AccountRenterCostSettleService;
 import com.atzuche.order.accountrenterrentcost.service.notservice.AccountRenterCostSettleDetailNoTService;
 import com.atzuche.order.accountrenterrentcost.service.notservice.AccountRenterCostSettleNoTService;
+import com.atzuche.order.accountrenterrentcost.vo.req.AccountRenterCostChangeReqVO;
 import com.atzuche.order.accountrenterwzdepost.service.AccountRenterWzDepositCostService;
 import com.atzuche.order.accountrenterwzdepost.service.AccountRenterWzDepositService;
 import com.atzuche.order.cashieraccount.service.notservice.CashierNoTService;
@@ -25,6 +27,7 @@ import com.atzuche.order.commons.enums.RenterCashCodeEnum;
 import com.atzuche.order.rentercost.service.RenterOrderCostCombineService;
 import com.atzuche.order.settle.service.AccountDebtService;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -166,7 +169,7 @@ public class CashierSettleService {
      */
     public int getRentDeposit(String orderNo, String renterMemNo) {
         AccountRenterDepositResVO vo = accountRenterDepositService.getAccountRenterDepositEntity(orderNo,renterMemNo);
-        if(Objects.isNull(vo) || Objects.isNull(vo.getOrderNo())){
+        if(Objects.isNull(vo) || Objects.isNull(vo.getSurplusDepositAmt())){
             return NumberUtils.INTEGER_ZERO;
         }
         return vo.getSurplusDepositAmt();
@@ -174,8 +177,28 @@ public class CashierSettleService {
 
 
     /**
-     * 结算时候， 应付金额大于实付金额，存在欠款，车辆押金抵扣
+     * 结算时候，应付金额大于实付金额，存在欠款，车辆押金抵扣
      */
-    public void deductDepositToRentCost(DeductDepositToRentCostReqVO vo) {
+    public int deductDepositToRentCost(DeductDepositToRentCostReqVO vo) {
+        //计算真实抵扣金额
+        int amt = vo.getAmt()+vo.getDepositAmt()>=0?vo.getAmt():-vo.getDepositAmt();
+        // 1 记录押金流水记录
+        DetainRenterDepositReqVO detainRenterDepositReqVO = new DetainRenterDepositReqVO();
+        detainRenterDepositReqVO.setAmt(amt);
+        detainRenterDepositReqVO.setMemNo(vo.getMemNo());
+        detainRenterDepositReqVO.setOrderNo(vo.getOrderNo());
+        detainRenterDepositReqVO.setRenterCashCodeEnum(RenterCashCodeEnum.SETTLE_DEPOSIT_TO_RENT_COST);
+        int renterDepositDetailId = accountRenterDepositService.detainRenterDeposit(detainRenterDepositReqVO);
+        //2 记录 更新 租客户头 租车费用
+        AccountRenterCostChangeReqVO accountRenterCostChangeReqVO = new AccountRenterCostChangeReqVO();
+        BeanUtils.copyProperties(detainRenterDepositReqVO,accountRenterCostChangeReqVO);
+        accountRenterCostChangeReqVO.setRenterOrderNo(vo.getRenterOrderNo());
+        accountRenterCostChangeReqVO.setUniqueNo(String.valueOf(renterDepositDetailId));
+        accountRenterCostChangeReqVO.setAmt(Math.abs(amt));
+        accountRenterCostChangeReqVO.setRenterCashCodeEnum(RenterCashCodeEnum.ACCOUNT_RENTER_DEPOSIT);
+        int rentCostDetailId = accountRenterCostSettleService.deductDepositToRentCost(accountRenterCostChangeReqVO);
+        // 更新押金流水 UniqueNo 字段
+        accountRenterDepositService.updateRenterDepositUniqueNo(String.valueOf(rentCostDetailId),renterDepositDetailId);
+        return amt;
     }
 }

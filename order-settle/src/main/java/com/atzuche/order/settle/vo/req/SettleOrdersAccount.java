@@ -1,14 +1,7 @@
 package com.atzuche.order.settle.vo.req;
 
-import com.atzuche.order.accountownercost.entity.AccountOwnerCostSettleDetailEntity;
-import com.atzuche.order.accountplatorm.entity.AccountPlatformProfitDetailEntity;
-import com.atzuche.order.accountplatorm.entity.AccountPlatformSubsidyDetailEntity;
-import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostSettleDetailEntity;
 import lombok.Data;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
 
 /**
  * 计算费用统计
@@ -20,19 +13,10 @@ public class SettleOrdersAccount {
 
     /** ***********************************************************************************车主端统计费用 统计费用 */
 
-
     /**
      * 车主最终收益金额
      */
     private int ownerCostAmtFinal;
-
-    /**
-     * 车主费用明细 （包含抵扣历史欠款费用明细 ，车主户头收益 明细)
-     */
-    private List<AccountOwnerCostSettleDetailEntity> accountOwnerCostSettleDetails;
-
-    /**************************************************************************************** 租客端统计费用 */
-
 
     /**
      * 租客应付费用
@@ -42,18 +26,54 @@ public class SettleOrdersAccount {
      * 租客实付付费用
      */
     private int rentCostPayAmtFinal;
+    /**
+     * 当 租车费用 实付大于应付时候 有效
+     * 剩余租车费用 即应退
+     */
+    private int rentCostSurplusAmt;
+
 
     /**
      * 租客实付 车辆押金
      */
     private int depositAmt;
 
+    /**
+     * 剩余 车辆押金
+     */
+    private int depositSurplusAmt;
 
 
     /**
-     * 租客费用明细 （包含 车辆押金抵扣租车费用费用，历史欠款费用，）
+     * 押金转费用金额
+     * 租客租车费用存在欠款时候  存在车俩押金  车俩押金转 租车费用
      */
-    private List<AccountRenterCostSettleDetailEntity> accountRenterCostSettleDetails;
+    private int depositToRentAmt;
 
+
+
+
+    /**
+     * 主订单号
+     */
+    private String orderNo;
+    /**
+     * 租客订单号
+     */
+    private String renterOrderNo;
+    /**
+     * 车主订单号
+     */
+    private String ownerOrderNo;
+
+    /**
+     * 租客会员号
+     */
+    private String renterMemNo;
+
+    /**
+     * 车主会员号
+     */
+    private String ownerMemNo;
 
 }

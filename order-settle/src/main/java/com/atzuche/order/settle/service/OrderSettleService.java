@@ -9,10 +9,12 @@ import com.atzuche.order.renterorder.service.RenterOrderService;
 import com.atzuche.order.settle.exception.OrderSettleFlatAccountException;
 import com.atzuche.order.settle.service.notservice.OrderSettleNoTService;
 import com.atzuche.order.settle.vo.req.SettleOrders;
+import com.atzuche.order.settle.vo.req.SettleOrdersAccount;
 import com.atzuche.order.settle.vo.req.SettleOrdersDefinition;
 import com.autoyol.commons.utils.GsonUtils;
 import com.autoyol.doc.util.StringUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -92,14 +94,23 @@ public class OrderSettleService {
         AccountRenterCostSettleEntity accountRenterCostSettle = cashierSettleService.updateRentSettleCost(settleOrders.getOrderNo(),settleOrders.getRenterMemNo(), settleOrdersDefinition.getAccountRenterCostSettleDetails());
         //8 获取租客 实付 车辆押金
         int depositAmt = cashierSettleService.getRentDeposit(settleOrders.getOrderNo(),settleOrders.getRenterMemNo());
-        settleOrdersDefinition.setRentCostAmtFinal(accountRenterCostSettle.getRentAmt());
-        settleOrdersDefinition.setRentCostPayAmtFinal(accountRenterCostSettle.getShifuAmt());
-        settleOrdersDefinition.setDepositAmt(depositAmt);
+        SettleOrdersAccount settleOrdersAccount = new SettleOrdersAccount();
+        BeanUtils.copyProperties(settleOrders,settleOrdersAccount);
+        settleOrdersAccount.setRentCostAmtFinal(accountRenterCostSettle.getRentAmt());
+        settleOrdersAccount.setRentCostPayAmtFinal(accountRenterCostSettle.getShifuAmt());
+        settleOrdersAccount.setDepositAmt(depositAmt);
+        settleOrdersAccount.setDepositSurplusAmt(depositAmt);
+        settleOrdersAccount.setOwnerCostAmtFinal(settleOrdersDefinition.getOwnerCostAmtFinal());
+        int rentCostSurplusAmt = (accountRenterCostSettle.getRentAmt() + accountRenterCostSettle.getShifuAmt())<=0?0:(accountRenterCostSettle.getRentAmt() + accountRenterCostSettle.getShifuAmt());
+        settleOrdersAccount.setRentCostSurplusAmt(rentCostSurplusAmt);
         //9 租客费用结余处理
-        orderSettleNoTService.rentCostSettle(settleOrders,settleOrdersDefinition);
+        orderSettleNoTService.rentCostSettle(settleOrders,settleOrdersAccount);
         //10租客车辆押金结余欠款
-//        orderSettleNoTService.repayHistoryDebtRent(settleOrdersDefinition);
-        //11 租客押金 费用退还
+        orderSettleNoTService.repayHistoryDebtRent(settleOrdersAccount);
+        //11 租客费用 退还
+        orderSettleNoTService.refundRentCost(settleOrdersAccount,settleOrdersDefinition.getAccountRenterCostSettleDetails());
+        //12 租客押金 退还
+        orderSettleNoTService.refundDepositAmt(settleOrdersAccount);
         //12车主收益 结余处理
 
     }

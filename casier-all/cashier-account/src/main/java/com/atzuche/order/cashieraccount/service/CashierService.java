@@ -1,5 +1,6 @@
 package com.atzuche.order.cashieraccount.service;
 
+import com.atzuche.order.accountrenterrentcost.vo.req.AccountRenterCostChangeReqVO;
 import com.atzuche.order.commons.enums.RenterCashCodeEnum;
 import com.atzuche.order.commons.enums.cashier.TransStatusEnum;
 import com.atzuche.order.settle.service.AccountDebtService;
@@ -75,6 +76,32 @@ public class CashierService {
      */
     public void insertRenterCost(CreateOrderRenterCostReqVO createOrderRenterCost){
         cashierNoTService.insertRenterCost(createOrderRenterCost);
+    }
+    /**
+     * 7）剩余租车费用抵扣历史欠款
+     */
+    @CatAnnotation
+    @Transactional(rollbackFor=Exception.class)
+    public CashierDeductDebtResVO deductDebtByRentCost(CashierDeductDebtReqVO cashierDeductDebtReq){
+        Assert.notNull(cashierDeductDebtReq, ErrorCode.PARAMETER_ERROR.getText());
+        cashierDeductDebtReq.check();
+        //1 查询历史总欠款
+        int debtAmt = accountDebtService.getAccountDebtNumByMemNo(cashierDeductDebtReq.getMemNo());
+        if(debtAmt<0){
+            return null;
+        }
+        //2 抵扣
+        AccountDeductDebtReqVO accountDeductDebt = new AccountDeductDebtReqVO();
+        BeanUtils.copyProperties(cashierDeductDebtReq,accountDeductDebt);
+        int debtedAmt = accountDebtService.deductDebt(accountDeductDebt);
+        //3 记录费用抵扣记录
+        AccountRenterCostChangeReqVO accountRenterCostChangeReqVO = new AccountRenterCostChangeReqVO();
+        BeanUtils.copyProperties(cashierDeductDebtReq,accountRenterCostChangeReqVO);
+        accountRenterCostChangeReqVO.setAmt(-Math.abs(debtedAmt));
+        accountRenterCostChangeReqVO.setRenterOrderNo(cashierDeductDebtReq.getRenterOrderNo());
+        accountRenterCostChangeReqVO.setRenterCashCodeEnum(RenterCashCodeEnum.SETTLE_RENT_COST_TO_HISTORY_AMT);
+        int id = accountRenterCostSettleService.deductDepositToRentCost(accountRenterCostChangeReqVO);
+        return new CashierDeductDebtResVO(cashierDeductDebtReq, debtedAmt,id);
     }
 
     /**  *************************************** 租车费用 end****************************************************/
@@ -168,8 +195,8 @@ public class CashierService {
         cashierDeductDebtReqVO.check();
         //1 查询历史总欠款
         int debtAmt = accountDebtService.getAccountDebtNumByMemNo(cashierDeductDebtReqVO.getMemNo());
-        if(debtAmt>=0){
-            return new CashierDeductDebtResVO(cashierDeductDebtReqVO, NumberUtils.INTEGER_ZERO);
+        if(debtAmt<0){
+            return null;
         }
         //2 抵扣
         AccountDeductDebtReqVO accountDeductDebt = new AccountDeductDebtReqVO();
@@ -178,8 +205,9 @@ public class CashierService {
         //3 记录费用抵扣记录
         PayedOrderRenterDepositWZDetailReqVO payedOrderRenterWZDepositDetail = new PayedOrderRenterDepositWZDetailReqVO();
         BeanUtils.copyProperties(cashierDeductDebtReqVO,payedOrderRenterWZDepositDetail);
-        accountRenterWzDepositService.updateRenterWZDepositChange(payedOrderRenterWZDepositDetail);
-        return new CashierDeductDebtResVO(cashierDeductDebtReqVO, debtedAmt);
+        payedOrderRenterWZDepositDetail.setAmt(debtedAmt);
+        int id = accountRenterWzDepositService.updateRenterWZDepositChange(payedOrderRenterWZDepositDetail);
+        return new CashierDeductDebtResVO(cashierDeductDebtReqVO, debtedAmt,id);
     }
     /**
      * 7）押金抵扣历史欠款
@@ -191,8 +219,8 @@ public class CashierService {
         cashierDeductDebtReq.check();
         //1 查询历史总欠款
         int debtAmt = accountDebtService.getAccountDebtNumByMemNo(cashierDeductDebtReq.getMemNo());
-        if(debtAmt>=0){
-            return new CashierDeductDebtResVO(cashierDeductDebtReq, NumberUtils.INTEGER_ZERO);
+        if(debtAmt<0){
+            return null;
         }
         //2 抵扣
         AccountDeductDebtReqVO accountDeductDebt = new AccountDeductDebtReqVO();
@@ -201,8 +229,9 @@ public class CashierService {
         //3 记录费用抵扣记录
         DetainRenterDepositReqVO detainRenterDepositReqVO = new DetainRenterDepositReqVO();
         BeanUtils.copyProperties(cashierDeductDebtReq,detainRenterDepositReqVO);
-        accountRenterDepositService.detainRenterDeposit(detainRenterDepositReqVO);
-        return new CashierDeductDebtResVO(cashierDeductDebtReq, debtedAmt);
+        detainRenterDepositReqVO.setAmt(debtedAmt);
+        int id = accountRenterDepositService.detainRenterDeposit(detainRenterDepositReqVO);
+        return new CashierDeductDebtResVO(cashierDeductDebtReq, debtedAmt,id);
     }
     /**
      * 查询用户历史欠款信息

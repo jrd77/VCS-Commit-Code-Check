@@ -1,12 +1,11 @@
 package com.atzuche.order.cashieraccount.vo.req;
 
-import com.atzuche.order.commons.enums.RenterCashCodeEnum;
 import com.autoyol.commons.web.ErrorCode;
 import lombok.Data;
 import org.springframework.util.Assert;
 
 /**
- * 抵扣欠款传参
+ * 押金抵扣 租车费用欠款
  * @author haibao.yan
  */
 @Data
@@ -20,6 +19,10 @@ public class DeductDepositToRentCostReqVO {
      * 主订单号
      */
     private String orderNo;
+    /**
+     * 租客订单号
+     */
+    private String renterOrderNo;
     /**
      * 待抵扣金额
      */

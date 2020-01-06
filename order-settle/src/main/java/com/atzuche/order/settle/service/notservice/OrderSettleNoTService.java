@@ -34,10 +34,7 @@ import com.atzuche.order.ownercost.service.OwnerOrderSubsidyDetailService;
 import com.atzuche.order.rentercost.entity.*;
 import com.atzuche.order.rentercost.service.*;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
-import com.atzuche.order.settle.vo.req.OwnerCosts;
-import com.atzuche.order.settle.vo.req.RentCosts;
-import com.atzuche.order.settle.vo.req.SettleOrders;
-import com.atzuche.order.settle.vo.req.SettleOrdersDefinition;
+import com.atzuche.order.settle.vo.req.*;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -790,24 +787,98 @@ public class OrderSettleNoTService {
 
     /**
      * 租客费用结余 处理
-     * @param settleOrdersDefinition
+     * @param settleOrdersAccount
      */
-    public void rentCostSettle(SettleOrders settleOrders ,SettleOrdersDefinition settleOrdersDefinition) {
-        //1 如果租车费用计算应付总额大于 实际支付 ，且车辆押金存在，扣减车辆押金 没有抵扣完的 走历史欠款
-        if(settleOrdersDefinition.getRentCostAmtFinal() + settleOrdersDefinition.getRentCostPayAmtFinal()<0){
-            DeductDepositToRentCostReqVO vo = new DeductDepositToRentCostReqVO();
-            cashierSettleService.deductDepositToRentCost(vo);
+    public void rentCostSettle(SettleOrders settleOrders , SettleOrdersAccount settleOrdersAccount) {
+        //1 如果租车费用计算应付总额大于 实际支付
+        if(settleOrdersAccount.getRentCostAmtFinal() + settleOrdersAccount.getRentCostPayAmtFinal()<0){
+            //1.1押金 抵扣 租车费用欠款
+            if(settleOrdersAccount.getDepositAmt()>0){
+                DeductDepositToRentCostReqVO vo = new DeductDepositToRentCostReqVO();
+                BeanUtils.copyProperties(settleOrders,vo);
+                //车俩押金抵扣 租车费用金额 返回 已抵扣部分
+                int amt= cashierSettleService.deductDepositToRentCost(vo);
+                //计算剩余车俩押金
+                settleOrdersAccount.setDepositSurplusAmt(settleOrdersAccount.getDepositSurplusAmt() + amt);
+                // 实付费用加上 押金已抵扣部分
+                settleOrdersAccount.setRentCostPayAmtFinal(settleOrdersAccount.getRentCostPayAmtFinal() + Math.abs(amt));
+            }
+        }
+//        // 1计算 押金转费用金额
+//        if(settleOrdersAccount.getRentCostAmtFinal() + settleOrdersAccount.getRentCostPayAmtFinal()<0 && settleOrdersAccount.getDepositAmt()>0){
+//            //计算真实抵扣金额 和剩余 押金
+//            int amt = settleOrdersAccount.getRentCostAmtFinal() + settleOrdersAccount.getRentCostPayAmtFinal();
+//            int depositToRentAmt = amt+settleOrdersAccount.getDepositAmt()>=0?amt:-settleOrdersAccount.getDepositAmt();
+//            settleOrdersAccount.setDepositToRentAmt(depositToRentAmt);
+//            settleOrdersAccount.setDepositSurplusAmt(settleOrdersAccount.getDepositSurplusAmt()+depositToRentAmt);
+//        }
+
+    }
+
+    /**
+     * 结算租客还历史欠款
+     * @param settleOrdersAccount
+     */
+    public void repayHistoryDebtRent(SettleOrdersAccount settleOrdersAccount) {
+        // 1 存在 实付大于应付 先走历史欠款
+        if(settleOrdersAccount.getRentCostSurplusAmt()>0){
+            CashierDeductDebtReqVO cashierDeductDebtReq = new CashierDeductDebtReqVO();
+            BeanUtils.copyProperties(settleOrdersAccount,cashierDeductDebtReq);
+            cashierDeductDebtReq.setAmt(settleOrdersAccount.getRentCostSurplusAmt());
+            cashierDeductDebtReq.setRenterCashCodeEnum(RenterCashCodeEnum.SETTLE_RENT_COST_TO_HISTORY_AMT);
+            CashierDeductDebtResVO result = cashierService.deductDebtByRentCost(cashierDeductDebtReq);
+            if(Objects.nonNull(result)){
+                //已抵扣抵扣金额
+                int deductAmt = result.getDeductAmt();
+                //计算 还完历史欠款 剩余 应退 剩余租车费用
+                settleOrdersAccount.setRentCostSurplusAmt(settleOrdersAccount.getRentCostSurplusAmt() - deductAmt);
+            }
+        }
+        //车辆押金存在 且 租车费用没有抵扣完 ，使用车辆押金抵扣
+        if(settleOrdersAccount.getDepositSurplusAmt()>0){
+            CashierDeductDebtReqVO cashierDeductDebtReq = new CashierDeductDebtReqVO();
+            BeanUtils.copyProperties(settleOrdersAccount,cashierDeductDebtReq);
+            cashierDeductDebtReq.setAmt(settleOrdersAccount.getDepositSurplusAmt());
+            cashierDeductDebtReq.setRenterCashCodeEnum(RenterCashCodeEnum.SETTLE_DEPOSIT_TO_HISTORY_AMT);
+            CashierDeductDebtResVO result = cashierService.deductDebt(cashierDeductDebtReq);
+            if(Objects.nonNull(result)){
+                //已抵扣抵扣金额
+                int deductAmt = result.getDeductAmt();
+                //计算 还完历史欠款 剩余 应退 剩余车俩押金
+                settleOrdersAccount.setDepositSurplusAmt(settleOrdersAccount.getDepositSurplusAmt() - deductAmt);
+            }
         }
     }
 
-//    /**
-//     * 结算租客还历史欠款
-//     * @param settleOrdersDefinition
-//     */
-//    public void repayHistoryDebtRent(SettleOrdersDefinition settleOrdersDefinition) {
-//        CashierDeductDebtReqVO cashierDeductDebtReq = new CashierDeductDebtReqVO();
-//
-//        CashierDeductDebtResVO result = cashierService.deductDebt(cashierDeductDebtReq);
-//
-//    }
+    /**
+     * 退还多余费用
+     * 退还优先级 凹凸币>钱包>消费
+     *
+     * @param settleOrdersAccount
+     */
+    public void refundRentCost(SettleOrdersAccount settleOrdersAccount,List<AccountRenterCostSettleDetailEntity> accountRenterCostSettleDetails) {
+        int rentCostSurplusAmt = settleOrdersAccount.getRentCostSurplusAmt();
+        if(rentCostSurplusAmt>0){
+            //1 优先退还凹凸币
+            int coinAmt = accountRenterCostSettleDetails.stream().filter(obj ->{
+                return RenterCashCodeEnum.AUTO_COIN_DEDUCT.getCashNo().equals(obj.getCostCode());
+            }).mapToInt(AccountRenterCostSettleDetailEntity::getAmt).sum();
+            rentCostSurplusAmt = rentCostSurplusAmt-coinAmt;
+            if(rentCostSurplusAmt>0){
+                // 退还凹凸币 coinAmt
+            }
+            //2 查询钱包 比较
+            //3 退还租车费用
+            if(rentCostSurplusAmt>0){
+
+            }
+        }
+    }
+
+    /**
+     * 退还剩余的 车辆押金
+     * @param settleOrdersAccount
+     */
+    public void refundDepositAmt(SettleOrdersAccount settleOrdersAccount) {
+    }
 }

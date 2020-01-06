@@ -26,7 +26,7 @@ public class AccountRenterDepositDetailNoTService {
      * 新增车辆押金 流水记录
      * @param detainRenterDeposit
      */
-    public void insertRenterDepositDetail(DetainRenterDepositReqVO detainRenterDeposit) {
+    public int insertRenterDepositDetail(DetainRenterDepositReqVO detainRenterDeposit) {
         AccountRenterDepositDetailEntity accountRenterDepositDetailEntity = new AccountRenterDepositDetailEntity();
         BeanUtils.copyProperties(detainRenterDeposit,accountRenterDepositDetailEntity);
         accountRenterDepositDetailEntity.setSourceCode(detainRenterDeposit.getRenterCashCodeEnum().getCashNo());
@@ -35,5 +35,14 @@ public class AccountRenterDepositDetailNoTService {
         if(result==0){
             throw new PayOrderRenterDepositDBException();
         }
+        return accountRenterDepositDetailEntity.getId();
+    }
+
+    public void updateRenterDepositUniqueNo(String uniqueNo, int renterDepositDetailId) {
+        AccountRenterDepositDetailEntity entity = new AccountRenterDepositDetailEntity();
+        entity.setId(renterDepositDetailId);
+        entity.setUniqueNo(uniqueNo);
+        accountRenterDepositDetailMapper.updateByPrimaryKeySelective(entity);
+
     }
 }

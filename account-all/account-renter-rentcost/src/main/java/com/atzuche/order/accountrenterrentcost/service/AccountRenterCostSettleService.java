@@ -1,13 +1,17 @@
 package com.atzuche.order.accountrenterrentcost.service;
 
 import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostDetailEntity;
+import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostSettleDetailEntity;
 import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostSettleEntity;
 import com.atzuche.order.accountrenterrentcost.exception.AccountRenterRentCostRefundException;
 import com.atzuche.order.accountrenterrentcost.service.notservice.AccountRenterCostDetailNoTService;
+import com.atzuche.order.accountrenterrentcost.service.notservice.AccountRenterCostSettleDetailNoTService;
 import com.atzuche.order.accountrenterrentcost.service.notservice.AccountRenterCostSettleNoTService;
+import com.atzuche.order.accountrenterrentcost.vo.req.AccountRenterCostChangeReqVO;
 import com.atzuche.order.accountrenterrentcost.vo.req.AccountRenterCostDetailReqVO;
 import com.atzuche.order.accountrenterrentcost.vo.req.AccountRenterCostReqVO;
 import com.autoyol.commons.web.ErrorCode;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
@@ -25,6 +29,7 @@ import java.util.Objects;
 public class AccountRenterCostSettleService{
     @Autowired private AccountRenterCostSettleNoTService accountRenterCostSettleNoTService;
     @Autowired private AccountRenterCostDetailNoTService accountRenterCostDetailNoTService;
+    @Autowired private AccountRenterCostSettleDetailNoTService accountRenterCostSettleDetailNoTService;
 
     /**
      * 查询订单 已付租车费用
@@ -70,4 +75,31 @@ public class AccountRenterCostSettleService{
     public List<AccountRenterCostDetailEntity> getAccountRenterCostDetailsByOrderNo(String orderNo){
         return accountRenterCostDetailNoTService.getAccountRenterCostDetailsByOrderNo(orderNo);
     }
+
+    /**
+     * 结算时候，
+     * 1应付金额大于实付金额，订单存在租车费用欠款，车辆押金抵扣
+     * 2实付大于应付 且存在历史欠款 费用还历史欠款，租客费用记录
+     * @param accountRenterCostChangeReqVO
+     */
+    public int deductDepositToRentCost(AccountRenterCostChangeReqVO accountRenterCostChangeReqVO) {
+        // 1 校验
+        AccountRenterCostSettleEntity entity =  accountRenterCostSettleNoTService.getCostPaidRentSettle(accountRenterCostChangeReqVO.getOrderNo(),accountRenterCostChangeReqVO.getMemNo());
+        Assert.notNull(entity, ErrorCode.PARAMETER_ERROR.getText());
+        Assert.notNull(entity.getId(), ErrorCode.PARAMETER_ERROR.getText());
+        //2 插入租客费用流水
+        AccountRenterCostSettleDetailEntity accountRenterCostSettleDetail = new AccountRenterCostSettleDetailEntity();
+        BeanUtils.copyProperties(accountRenterCostChangeReqVO,accountRenterCostSettleDetail);
+        int id = accountRenterCostSettleDetailNoTService.insertAccountRenterCostSettleDetail(accountRenterCostSettleDetail);
+        //3 更新租客总实付
+        AccountRenterCostSettleEntity accountRenterCostSettle = new AccountRenterCostSettleEntity();
+        accountRenterCostSettle.setId(entity.getId());
+        accountRenterCostSettle.setVersion(entity.getVersion());
+        accountRenterCostSettle.setShifuAmt(accountRenterCostSettle.getShifuAmt() + accountRenterCostSettleDetail.getAmt());
+        accountRenterCostSettleNoTService.updateAccountRenterCostSettle(accountRenterCostSettle);
+        return id;
+
+    }
+
+
 }

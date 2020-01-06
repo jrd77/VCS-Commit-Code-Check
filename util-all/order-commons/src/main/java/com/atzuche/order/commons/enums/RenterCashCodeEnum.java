@@ -66,6 +66,11 @@ public enum RenterCashCodeEnum {
     CASHIER_RENTER_WZ_DEPOSIT("41110001","收银台支付违章押金"),
     CASHIER_RENTER_COST("41110001","收银台支付租车费用"),
     CASHIER_RENTER_AGAIN_COST("41110001","收银台支付补付租车费用"),
+
+    SETTLE_DEPOSIT_TO_RENT_COST("51110001","车俩押金转租车费用"),
+    SETTLE_RENT_COST_TO_HISTORY_AMT("51110002","租车费用转历史欠款"),
+    SETTLE_DEPOSIT_TO_HISTORY_AMT("51110003","车俩押金转历史欠款"),
+
     ;
 	
 	/**

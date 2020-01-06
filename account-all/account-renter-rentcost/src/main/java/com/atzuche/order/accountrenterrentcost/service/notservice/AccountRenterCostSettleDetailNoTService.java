@@ -7,6 +7,7 @@ import com.atzuche.order.accountrenterrentcost.mapper.AccountRenterCostSettleDet
 import org.springframework.util.CollectionUtils;
 
 import java.util.List;
+import java.util.Objects;
 
 
 /**
@@ -32,6 +33,15 @@ public class AccountRenterCostSettleDetailNoTService {
                 accountRenterCostSettleDetailMapper.insertSelective(entity);
             }
         }
+    }
+
+    /**
+     * 插入租客费用明细
+     * @param accountRenterCostSettleDetail
+     */
+    public int insertAccountRenterCostSettleDetail(AccountRenterCostSettleDetailEntity accountRenterCostSettleDetail) {
+        return accountRenterCostSettleDetailMapper.insertSelective(accountRenterCostSettleDetail);
+
     }
 
 }
