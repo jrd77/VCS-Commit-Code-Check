@@ -22,10 +22,8 @@ public class DeliveryReqDTO {
     public String renterRealGetAddrReamrk;
     @AutoDocProperty("车主实际取车地址备注")
     public String ownerRealGetAddrReamrk;
-    @AutoDocProperty("是否使用取车")
-    private String isUsedGetCar;
-    @AutoDocProperty("是否使用还车服务")
-    private String isUsedReturnCar;
+    @AutoDocProperty("是否使用取还车服务 0:不使用 1:使用")
+    private String isUsedGetAndReturnCar;
     @AutoDocProperty("orderNo不能为空")
     @NotBlank(message="orderNo不能为空")
     private String orderNo;

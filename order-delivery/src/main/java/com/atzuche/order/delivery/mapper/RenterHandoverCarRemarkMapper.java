@@ -1,6 +1,7 @@
 package com.atzuche.order.delivery.mapper;
 
 import com.atzuche.order.delivery.entity.OwnerHandoverCarInfoEntity;
+import com.atzuche.order.delivery.entity.OwnerHandoverCarRemarkEntity;
 import com.atzuche.order.delivery.entity.RenterHandoverCarRemarkEntity;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -32,5 +33,13 @@ public interface RenterHandoverCarRemarkMapper{
      * @return
      */
     List<RenterHandoverCarRemarkEntity> selectObjectByOrderNo(@Param("orderNo") String orderNo);
+
+    /**
+     * 根据子订单号和类型获取
+     * @param renterOrderNo
+     * @param type
+     * @return
+     */
+    RenterHandoverCarRemarkEntity findRemarkObjectByRenterOrderNo(@Param("renterOrderNo") String renterOrderNo, @Param("type") Integer type);
 
 }
