@@ -10,6 +10,7 @@ import com.atzuche.order.delivery.common.DeliveryErrorCode;
 import com.atzuche.order.delivery.entity.OwnerHandoverCarInfoEntity;
 import com.atzuche.order.delivery.entity.RenterHandoverCarInfoEntity;
 import com.atzuche.order.delivery.enums.HandoverCarTypeEnum;
+import com.atzuche.order.delivery.exception.DeliveryOrderException;
 import com.atzuche.order.delivery.exception.HandoverCarOrderException;
 import com.atzuche.order.delivery.service.handover.HandoverCarService;
 import com.atzuche.order.delivery.utils.OSSUtils;
@@ -33,8 +34,12 @@ import static org.bouncycastle.asn1.x500.style.RFC4519Style.serialNumber;
 public class HandoverCarInfoService {
 
     protected  final Logger logger = LoggerFactory.getLogger(getClass());
+
     @Autowired
     HandoverCarService handoverCarService;
+    @Autowired
+    DeliveryCarInfoService deliveryCarInfoService;
+
 
     /**
      * 上传交接车
@@ -102,11 +107,27 @@ public class HandoverCarInfoService {
 
     /**
      * 更新取还车信息 更新仁云接口
-     * @param handoverCarReqVO
+     * @param deliveryReqVO
      * @throws Exception
      */
-    public void updateDeliveryCarInfo(DeliveryReqVO handoverCarReqVO) throws Exception {
-        logger.debug("参数：{}", ToStringBuilder.reflectionToString(handoverCarReqVO));
+    public void updateDeliveryCarInfo(DeliveryReqVO deliveryReqVO) throws Exception {
+        logger.debug("参数：{}", ToStringBuilder.reflectionToString(deliveryReqVO));
+        if (Objects.isNull(deliveryReqVO)) {
+            throw new DeliveryOrderException(DeliveryErrorCode.DELIVERY_PARAMS_ERROR.getValue(), "参数错误");
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     }
 
