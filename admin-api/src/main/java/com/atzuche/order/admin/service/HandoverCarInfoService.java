@@ -7,11 +7,14 @@ import com.atzuche.order.admin.vo.req.handover.HandoverCarInfoReqDTO;
 import com.atzuche.order.admin.vo.req.handover.HandoverCarInfoReqVO;
 import com.atzuche.order.commons.CommonUtils;
 import com.atzuche.order.delivery.common.DeliveryErrorCode;
-import com.atzuche.order.delivery.entity.OwnerHandoverCarInfoEntity;
-import com.atzuche.order.delivery.entity.RenterHandoverCarInfoEntity;
+import com.atzuche.order.delivery.entity.*;
 import com.atzuche.order.delivery.enums.HandoverCarTypeEnum;
 import com.atzuche.order.delivery.exception.DeliveryOrderException;
 import com.atzuche.order.delivery.exception.HandoverCarOrderException;
+import com.atzuche.order.delivery.mapper.OwnerHandoverCarRemarkMapper;
+import com.atzuche.order.delivery.mapper.RenterDeliveryAddrMapper;
+import com.atzuche.order.delivery.mapper.RenterHandoverCarRemarkMapper;
+import com.atzuche.order.delivery.mapper.RenterOrderDeliveryMapper;
 import com.atzuche.order.delivery.service.handover.HandoverCarService;
 import com.atzuche.order.delivery.utils.OSSUtils;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -21,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -39,7 +43,15 @@ public class HandoverCarInfoService {
     HandoverCarService handoverCarService;
     @Autowired
     DeliveryCarInfoService deliveryCarInfoService;
-
+    /**
+     * 暂时放admin
+     */
+    @Resource
+    RenterOrderDeliveryMapper renterOrderDeliveryMapper;
+    @Resource
+    RenterHandoverCarRemarkMapper renterHandoverCarRemarkMapper;
+    @Resource
+    OwnerHandoverCarRemarkMapper ownerHandoverCarRemarkMapper;
 
     /**
      * 上传交接车
@@ -93,7 +105,7 @@ public class HandoverCarInfoService {
         if(handoverCarReqVO.getRenterHandoverCarDTO() != null)
         {
             HandoverCarInfoReqDTO handoverCarInfoReqDTO = handoverCarReqVO.getRenterHandoverCarDTO();
-            //查找车主交接车相关信息
+            //查找租客交接车相关信息
             RenterHandoverCarInfoEntity renterHandoverCarReturnInfoEntity = handoverCarService.getRenterHandoverCarInfo(handoverCarInfoReqDTO.getOrderNo(), HandoverCarTypeEnum.RENTER_TO_RENYUN.getValue());
             renterHandoverCarReturnInfoEntity.setOilNum(Integer.valueOf(handoverCarInfoReqDTO.getRenterReturnOil()));
             renterHandoverCarReturnInfoEntity.setMileageNum(Integer.valueOf(handoverCarInfoReqDTO.getOwnReturnKM()));
@@ -114,6 +126,55 @@ public class HandoverCarInfoService {
         logger.debug("参数：{}", ToStringBuilder.reflectionToString(deliveryReqVO));
         if (Objects.isNull(deliveryReqVO)) {
             throw new DeliveryOrderException(DeliveryErrorCode.DELIVERY_PARAMS_ERROR.getValue(), "参数错误");
+        }
+        DeliveryReqDTO deliveryReqDTO;
+        //是否使用取车服务
+        if(deliveryReqVO.getGetDeliveryReqDTO() != null){
+            deliveryReqDTO = deliveryReqVO.getGetDeliveryReqDTO();
+            RenterOrderDeliveryEntity renterOrderDeliveryEntity = renterOrderDeliveryMapper.findRenterOrderByrOrderNo(deliveryReqDTO.getOrderNo(),1);
+            //取换车(租客向平台交车，车主)
+            RenterHandoverCarRemarkEntity renterHandoverCarRemarkEntity =renterHandoverCarRemarkMapper.findRemarkObjectByRenterOrderNo(renterOrderDeliveryEntity.getRenterOrderNo(),4);
+            //不使用取车服务
+            if(deliveryReqDTO.getIsUsedGetAndReturnCar().equals("0"))
+            {
+                //配送订单不是取消或初始状态
+                if(renterOrderDeliveryEntity.getStatus().intValue() != 3 && renterOrderDeliveryEntity.getStatus().intValue() != 0)
+                {
+                    //1.更新配送訂單表
+                    //2.根据原先的状态发送仁云取消事件
+                    renterOrderDeliveryEntity.setStatus(3);
+                    //发送取消事件
+                }
+            }
+            else if(deliveryReqDTO.getIsUsedGetAndReturnCar().equals("1"))
+            {
+                //1.更新配送订单表
+                renterOrderDeliveryEntity.setStatus(2);
+                //发送更新事件
+                renterOrderDeliveryEntity.setOwnerGetReturnAddr(deliveryReqDTO.getOwnRealReturnAddr());
+                renterOrderDeliveryEntity.setRenterGetReturnAddr(deliveryReqDTO.getRenterRealGetAddr());
+                renterHandoverCarRemarkEntity.setRemark(deliveryReqDTO.getRenterRealGetAddrReamrk());
+                //更新交接车备注数据
+
+
+
+            }else {
+                throw new DeliveryOrderException(DeliveryErrorCode.DELIVERY_PARAMS_ERROR.getValue(),"没有合适的参数");
+            }
+
+        }
+        //是否使用还车服务
+        if(deliveryReqVO.getRenterDeliveryReqDTO() != null){
+            deliveryReqDTO = deliveryReqVO.getRenterDeliveryReqDTO();
+            //不使用取车服务
+            if(deliveryReqDTO.getIsUsedGetAndReturnCar().equals("0"))
+            {
+                //1.更新配送訂單表
+                //2.根据原先的状态发送仁云取消事件
+
+
+            }
+
         }
 
 

@@ -1,13 +1,13 @@
 package com.atzuche.order.admin.controller;
 
-import com.atzuche.order.admin.vo.request.*;
-import com.atzuche.order.admin.vo.response.OrderInsuranceResponseVO;
+import com.atzuche.order.admin.vo.req.remark.OrderGetReturnCarRemarkRequestVO;
+import com.atzuche.order.admin.vo.req.remark.OrderRentCityRequestVO;
+import com.atzuche.order.admin.vo.req.remark.OrderRiskStatusRequestVO;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.doc.annotation.AutoDocMethod;
 import com.autoyol.doc.annotation.AutoDocVersion;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 @RequestMapping("/console/order/other/information")
 @RestController
