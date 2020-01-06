@@ -40,13 +40,12 @@
 	<select id="queryWzQueryDayConfById" resultType="com.atzuche.order.renterwz.entity.WzQueryDayConfEntity">
 		select <include refid="select_column" />
 		from wz_query_day_conf
-		where id = #{id} and is_delete = 0
+		where id = #{id}
 	</select>
 
 	<select id="queryList" resultType="com.atzuche.order.renterwz.entity.WzQueryDayConfEntity">
 		select <include refid="select_column" />
 		from wz_query_day_conf
-		where is_delete = 0
 	</select>
 
 	 <update id="updateWzQueryDayConf" parameterType="com.atzuche.order.renterwz.entity.WzQueryDayConfEntity">
@@ -61,14 +60,14 @@
 			trans_process_day = #{transProcessDay},
 		</if>
 		update_time = NOW()
-		where id = #{id} and is_delete = 0
+		where id = #{id}
 	</update>
 
 	 <update id="deleteWzQueryDayConfById" parameterType="java.lang.Long">
 		update wz_query_day_conf set
 		is_delete = 1,
 		update_time = NOW()
-		where id = #{id} and is_delete = 0
+		where id = #{id}
 	</update>
 
 </mapper>
