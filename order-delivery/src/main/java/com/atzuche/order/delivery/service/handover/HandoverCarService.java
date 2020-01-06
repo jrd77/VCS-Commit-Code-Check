@@ -228,5 +228,25 @@ public class HandoverCarService {
         return renterHandoverCarRemarkMapper.selectObjectByOrderNo(orderNo);
     }
 
+    /**
+     * 更新车主交接车信息
+     * @param ownerHandoverCarInfoEntity
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public Integer updateOwnerHandoverInfo(OwnerHandoverCarInfoEntity ownerHandoverCarInfoEntity) {
+
+        return ownerHandoverCarInfoMapper.updateByPrimaryKey(ownerHandoverCarInfoEntity);
+    }
+
+    /**
+     * 更新租客交接车信息
+     * @param renterHandoverCarInfoEntity
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public Integer updateRenterHandoverInfo(RenterHandoverCarInfoEntity renterHandoverCarInfoEntity) {
+
+        return renterHandoverCarInfoMapper.updateByPrimaryKey(renterHandoverCarInfoEntity);
+    }
+
 
 }
