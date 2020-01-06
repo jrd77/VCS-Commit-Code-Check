@@ -1,7 +1,7 @@
 package com.atzuche.order.coreapi.listener;
 
 import com.atzuche.order.commons.CatConstants;
-import com.atzuche.order.renterwz.service.TransIllegalMqService;
+import com.atzuche.order.coreapi.service.TransIllegalMqService;
 import com.atzuche.order.renterwz.service.TransIllegalSendAliYunMq;
 import com.dianping.cat.Cat;
 import com.dianping.cat.message.Transaction;
@@ -58,7 +58,7 @@ public class WzFeedbackIllegalListener extends RenYunListener{
             resMap.put("resMsg","mq处理失败：{}"+e.getMessage());
         }finally {
             t.complete();
-            transIllegalSendAliYunMq.renyunReceiveQueueResultFeedbackQueue(resMap);
+            transIllegalSendAliYunMq.renYunReceiveQueueResultFeedbackQueue(resMap);
         }
         logger.info("WzFeedbackIllegalListener process end " );
     }

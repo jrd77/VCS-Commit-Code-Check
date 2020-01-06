@@ -1,12 +1,16 @@
 package com.atzuche.order.coreapi.controller;
 
 import com.atzuche.order.coreapi.entity.request.PhotoUploadReqVO;
+import com.atzuche.order.coreapi.listener.HandoverCarListener;
 import com.atzuche.order.coreapi.service.RenterOrderWzService;
 import com.atzuche.order.renterwz.service.RenterOrderWzIllegalPhotoService;
 import com.atzuche.order.renterwz.vo.PhotoUploadVO;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.doc.annotation.AutoDocMethod;
+import com.dianping.cat.Cat;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
@@ -27,24 +31,29 @@ import javax.validation.Valid;
 @Controller
 public class RenterWzPhotoController {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(HandoverCarListener.class);
+
     @Resource
     private RenterOrderWzService renterOrderWzService;
 
     @ResponseBody
     @RequestMapping(value = "photo/upload",method = RequestMethod.POST)
     @AutoDocMethod(description = "上传凭证", value = "上传凭证", response = Integer.class)
-    public ResponseData upload(@Valid @RequestBody PhotoUploadReqVO photoUploadReqVo, BindingResult result){
+    public ResponseData<Integer> upload(@Valid @RequestBody PhotoUploadReqVO photoUploadReqVo, BindingResult result){
         if (result.hasErrors()) {
-            return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), ErrorCode.INPUT_ERROR.getText());
+            return ResponseData.success(400);
         }
         try {
             PhotoUploadVO photoUploadVO = new PhotoUploadVO();
             BeanUtils.copyProperties(photoUploadReqVo, photoUploadVO,PhotoUploadVO.class);
-            renterOrderWzService.upload(photoUploadVO);
+            //500 系统内部异常 400 参数异常 200 成功 -1  阿里云上传失败  -2 上传数量大于35张 -3订单不存在 -4您只能上传自己的违章照片
+            Integer status = renterOrderWzService.upload(photoUploadVO);
+            return ResponseData.success(status);
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.error("上传凭证 异常 e :",e);
+            Cat.logError("上传凭证 异常",e);
+            return ResponseData.success(500);
         }
-        return new ResponseData(ErrorCode.SUCCESS.getCode(),ErrorCode.SUCCESS.getText());
     }
 
 

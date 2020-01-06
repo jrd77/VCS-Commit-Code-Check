@@ -2,6 +2,10 @@ package com.atzuche.order.parentorder.mapper;
 
 import com.atzuche.order.parentorder.entity.OrderStatusEntity;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.Date;
+import java.util.List;
 
 /**
  * 主订单表状态
@@ -22,4 +26,5 @@ public interface OrderStatusMapper{
     
     int updateByPrimaryKeySelective(OrderStatusEntity record);
 
+    List<String> queryOrderNoByStartTimeAndEndTime(@Param("startTime") Date startTime,@Param("endTime") Date endTime);
 }

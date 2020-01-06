@@ -2,6 +2,7 @@ package com.atzuche.order.parentorder.mapper;
 
 import com.atzuche.order.parentorder.entity.OrderSourceStatEntity;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * 订单来源统计
@@ -22,4 +23,5 @@ public interface OrderSourceStatMapper{
     
     int updateByPrimaryKeySelective(OrderSourceStatEntity record);
 
+    Integer queryCtripOrderByOrderNo(@Param("orderNo") String orderNo);
 }

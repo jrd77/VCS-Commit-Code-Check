@@ -1,7 +1,7 @@
 package com.atzuche.order.coreapi.listener;
 
 import com.atzuche.order.commons.CatConstants;
-import com.atzuche.order.renterwz.service.TransIllegalMqService;
+import com.atzuche.order.coreapi.service.TransIllegalMqService;
 import com.dianping.cat.Cat;
 import com.dianping.cat.message.Transaction;
 import org.slf4j.Logger;

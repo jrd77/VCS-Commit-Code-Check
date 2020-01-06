@@ -2,6 +2,7 @@ package com.atzuche.order.coreapi.service;
 
 import com.atzuche.order.commons.CommonUtils;
 import com.atzuche.order.owner.mem.service.OwnerMemberService;
+import com.atzuche.order.rentercommodity.service.RenterGoodsService;
 import com.atzuche.order.rentermem.service.RenterMemberService;
 import com.atzuche.order.renterwz.entity.RenterOrderWzIllegalPhotoEntity;
 import com.atzuche.order.renterwz.service.OssService;
@@ -12,11 +13,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.util.Date;
-import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -44,6 +43,8 @@ public class RenterOrderWzService {
 
     @Resource
     private RenterMemberService renterMemberService;
+    @Resource
+    private RenterGoodsService renterGoodsService;
 
     private static final Integer SUCCESS_STATUS = 200;
     private static final Integer FAILED_STATUS = 500;
@@ -68,8 +69,7 @@ public class RenterOrderWzService {
         String key = basePath+"illegal/"+str+".jpg";
         String serialNumber = photoUpload.getSerialNumber();
         String userType = photoUpload.getUserType();
-        //TODO
-        String carNum = "";
+        String carNum = renterGoodsService.queryCarNumByOrderNo(orderNo);
         logger.info("上传文件。。orderNo : {},serialNumber:{},userType:{}",orderNo,serialNumber,userType);
 
         Integer result  = validateOrderInfo(photoUpload.getMemNo(),orderNo,Integer.parseInt(userType));
@@ -124,7 +124,7 @@ public class RenterOrderWzService {
                 result = SUCCESS_STATUS;
                 logger.info("记录文件到数据成功。。orderNo : {},serialNumber:{},userType:{}",orderNo,serialNumber,userType);
                 //保存成功，发送上传图片给仁云
-                transIllegalSendAliYunMq.transIllegalPhotoToRenyun(photo);
+                transIllegalSendAliYunMq.transIllegalPhotoToRenYun(photo);
             }else {
                 //保证图片存储于数据库一致
                 ossService.deleteOSSObject(key);

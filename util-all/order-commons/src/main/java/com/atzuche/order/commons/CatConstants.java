@@ -21,4 +21,12 @@ public class CatConstants {
 
     public static final String RABBIT_MQ_RESULT ="RabbitMq.Result" ;
 
+    public static final String XXL_JOB_CALL="XXLJob";
+
+    public static final String XXL_JOB_METHOD="XXLJob.Method";
+
+    public static final String XXL_JOB_PARAM="XXLJob.Param";
+
+    public static final String XXL_JOB_RESULT ="XXLJob.Result" ;
+
 }

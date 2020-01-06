@@ -58,11 +58,8 @@
 		where id = #{id} and is_delete = 0
 	</update>
 
-	 <update id="deleteRenterOrderWzRecordById" parameterType="java.lang.Long">
-		update renter_order_wz_record set
-		is_delete = 1,
-		update_time = NOW()
-		where id = #{id} and is_delete = 0
-	</update>
-
+	<delete id="deleteNotToday">
+        DELETE FROM renter_order_wz_record
+        WHERE date_format(create_time, '%Y-%m-%d') != date_format(now(), '%Y-%m-%d')
+    </delete>
 </mapper>
