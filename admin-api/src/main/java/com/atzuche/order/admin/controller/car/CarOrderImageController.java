@@ -38,9 +38,9 @@ public class CarOrderImageController {
         return null;
     }
 
-    @AutoDocMethod(description = "【liujun】删除订单照片", value = "删除订单照片", response = ResponseData.class)
+    @AutoDocMethod(description = "【liujun】删除订单照片；Type:1为取车照片，2为还车照片，3为违章缴纳凭证，4为车主上传，5为平台上传；id:图片ID;orderNum:订单编号", value = "删除订单照片", response = ResponseData.class)
     @PostMapping(value = "/delete/{id}/{orderNum}/{type}")
-    public ResponseData <?> deleteCarOrderImage(@RequestBody CarOrderImageDetailReqVO carOrderImageDetailReqVO, @PathVariable Long Id) {
+    public ResponseData <?> deleteCarOrderImage(@PathVariable Long Id,@PathVariable String orderNum,@PathVariable Integer type) {
 
         return null;
     }
