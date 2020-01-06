@@ -150,7 +150,9 @@ public class GoodsService {
         renterGoodsDetailDto.setType(carBaseVO.getType());
         renterGoodsDetailDto.setBrand(carBaseVO.getBrand()==null ? null:String.valueOf(carBaseVO.getBrand()));
         renterGoodsDetailDto.setLicenseDay(LocalDateTimeUtils.parseStringToLocalDate(carBaseVO.getLicenseDay()));
-        renterGoodsDetailDto.setCarInmsrp(data.getCarModelParam().getInmsrp());
+        if (data.getCarModelParam() != null) {
+        	renterGoodsDetailDto.setCarInmsrp(data.getCarModelParam().getInmsrp());
+        }
         renterGoodsDetailDto.setStopCostRate(data.getStopCostRate()==null ? 0D:Double.valueOf(data.getStopCostRate()));
         renterGoodsDetailDto.setServiceRate(data.getServerRate()==null ? 0D:Double.valueOf(data.getServerRate()));
         renterGoodsDetailDto.setCarGuideDayPrice(carBaseVO.getGuideDayPrice());

@@ -58,7 +58,7 @@ public class RenterGoodsService{
     public RenterGoodsDetailDTO getRenterGoodsDetail(String renterOrderNo, boolean isNeedPrice){
         RenterGoodsEntity renterGoodsEntity = renterGoodsMapper.selectByRenterOrderNo(renterOrderNo);
         RenterGoodsDetailDTO renterGoodsDetailDto  = new RenterGoodsDetailDTO();
-        BeanUtils.copyProperties(renterGoodsDetailDto,renterGoodsEntity);
+        BeanUtils.copyProperties(renterGoodsEntity,renterGoodsDetailDto);
         if(!isNeedPrice){
             return renterGoodsDetailDto;
         }
