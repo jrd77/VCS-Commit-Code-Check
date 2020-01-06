@@ -1,4 +1,4 @@
-package com.atzuche.order.admin.vo.request;
+package com.atzuche.order.admin.vo.req.autocoin;
 
 import com.autoyol.doc.annotation.AutoDocProperty;
 import lombok.Data;

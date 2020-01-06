@@ -1,4 +1,4 @@
-package com.atzuche.order.admin.vo.response;
+package com.atzuche.order.admin.vo.resp.wallet;
 
 import com.autoyol.doc.annotation.AutoDocProperty;
 import lombok.Data;

@@ -1,12 +1,12 @@
 package com.atzuche.order.admin.controller;
 
-import com.atzuche.order.admin.vo.request.CarDisCouponRequestVO;
+import com.atzuche.order.admin.vo.req.discoupon.CarDisCouponRequestVO;
 import com.atzuche.order.admin.vo.request.OrderInsuranceRequestVO;
-import com.atzuche.order.admin.vo.request.OwnerDisCouponRequestVO;
-import com.atzuche.order.admin.vo.request.PlatformDisCouponRequestVO;
-import com.atzuche.order.admin.vo.response.CarDisCouponListResponseVO;
-import com.atzuche.order.admin.vo.response.OwnerDisCouponListResponseVO;
-import com.atzuche.order.admin.vo.response.PlatformDisCouponListResponseVO;
+import com.atzuche.order.admin.vo.req.discoupon.OwnerDisCouponRequestVO;
+import com.atzuche.order.admin.vo.req.discoupon.PlatformDisCouponRequestVO;
+import com.atzuche.order.admin.vo.resp.discoupon.CarDisCouponListResponseVO;
+import com.atzuche.order.admin.vo.resp.discoupon.OwnerDisCouponListResponseVO;
+import com.atzuche.order.admin.vo.resp.discoupon.PlatformDisCouponListResponseVO;
 import com.atzuche.order.admin.vo.response.OrderInsuranceResponseVO;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;

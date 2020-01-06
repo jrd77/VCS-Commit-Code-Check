@@ -1,4 +1,4 @@
-package com.atzuche.order.admin.vo.request;
+package com.atzuche.order.admin.vo.req.discoupon;
 
 import com.autoyol.doc.annotation.AutoDocProperty;
 import lombok.Data;
@@ -12,7 +12,7 @@ import java.io.Serializable;
  */
 @Data
 @ToString
-public class OwnerDisCouponRequestVO implements Serializable {
+public class CarDisCouponRequestVO implements Serializable {
     @AutoDocProperty(value = "用户注册号")
     private String memNo;
 

@@ -1,10 +1,8 @@
 package com.atzuche.order.admin.controller;
 
-import com.atzuche.order.admin.vo.request.AutoCoinRequestVO;
-import com.atzuche.order.admin.vo.request.WalletRequestVO;
-import com.atzuche.order.admin.vo.response.AutoCoinResponseVO;
+import com.atzuche.order.admin.vo.req.autocoin.AutoCoinRequestVO;
+import com.atzuche.order.admin.vo.resp.autocoin.AutoCoinResponseVO;
 import com.atzuche.order.admin.vo.response.OrderInsuranceResponseVO;
-import com.atzuche.order.admin.vo.response.WalletResponseVO;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.doc.annotation.AutoDocMethod;

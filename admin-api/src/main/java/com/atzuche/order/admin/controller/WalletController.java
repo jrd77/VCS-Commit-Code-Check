@@ -1,10 +1,7 @@
 package com.atzuche.order.admin.controller;
 
-import com.atzuche.order.admin.vo.request.CarDisCouponRequestVO;
-import com.atzuche.order.admin.vo.request.OwnerDisCouponRequestVO;
-import com.atzuche.order.admin.vo.request.PlatformDisCouponRequestVO;
-import com.atzuche.order.admin.vo.request.WalletRequestVO;
-import com.atzuche.order.admin.vo.response.*;
+import com.atzuche.order.admin.vo.req.wallet.WalletRequestVO;
+import com.atzuche.order.admin.vo.resp.wallet.WalletResponseVO;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.doc.annotation.AutoDocMethod;
