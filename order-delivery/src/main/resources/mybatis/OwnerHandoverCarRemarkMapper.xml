@@ -150,5 +150,12 @@
 	<select id="selectObjectByOrderNo" resultMap="BaseResultMap">
 		select a.* from owner_handover_car_remark a where id = (select max(id) from owner_handover_car_remark where type = a.type) and order_no = #{orderNo} order by a.id
 	</select>
+
+	<select id="findRemarkObjectByRenterOrderNo" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List"/>
+		from owner_handover_car_remark where renter_order_no = #{renterOrderNo}
+		and type = #{type} and is_delete = 0
+	</select>
   	
 </mapper>

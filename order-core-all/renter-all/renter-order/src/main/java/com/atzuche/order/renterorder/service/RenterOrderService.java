@@ -16,9 +16,7 @@ import com.atzuche.order.renterorder.mapper.RenterOrderMapper;
 import com.atzuche.order.renterorder.vo.*;
 import com.atzuche.order.renterorder.vo.owner.OwnerCouponGetAndValidReqVO;
 import com.atzuche.order.renterorder.vo.platform.MemAvailCouponRequestVO;
-import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -186,7 +184,7 @@ public class RenterOrderService {
                 || StringUtils.isNotBlank(renterOrderReqVO.getGetCarFreeCouponId()) ? 1 : 0);
         record.setIsGetCar(renterOrderReqVO.getSrvGetFlag());
         record.setIsReturnCar(renterOrderReqVO.getSrvReturnFlag());
-        record.setIsAbatement(Integer.valueOf(renterOrderReqVO.getAbatement()));
+        record.setIsAbatement(renterOrderReqVO.getAbatement()==null?0:Integer.valueOf(renterOrderReqVO.getAbatement()));
         record.setIsUseSpecialPrice(Integer.valueOf(renterOrderReqVO.getUseSpecialPrice()==null?"0":renterOrderReqVO.getUseSpecialPrice()));
         record.setChildStatus(RenterChildStatusEnum.PROCESS_ING.getCode());
         renterOrderMapper.insertSelective(record);
@@ -289,7 +287,9 @@ public class RenterOrderService {
         GetReturnCarOverCostReqDto getReturnCarOverCostReqDto = new GetReturnCarOverCostReqDto();
         getReturnCarOverCostReqDto.setCostBaseDTO(costBaseDTO);
         getReturnCarOverCostReqDto.setCityCode(Integer.valueOf(renterOrderReqVO.getCityCode()));
-        getReturnCarOverCostReqDto.setOrderType(Integer.valueOf(renterOrderReqVO.getOrderCategory()));
+        if (StringUtils.isNotBlank(renterOrderReqVO.getOrderCategory())) {
+        	getReturnCarOverCostReqDto.setOrderType(Integer.valueOf(renterOrderReqVO.getOrderCategory()));
+        }
 
         //租车费用计算相关参数
         RenterOrderCostReqDTO renterOrderCostReqDTO = new RenterOrderCostReqDTO();
