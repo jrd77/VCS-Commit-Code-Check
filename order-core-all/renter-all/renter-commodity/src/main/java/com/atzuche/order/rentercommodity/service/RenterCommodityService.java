@@ -111,6 +111,7 @@ public class RenterCommodityService {
             renterGoodsPriceDetailDTOList.forEach(x->{
                 RenterGoodsPriceDetailEntity dbPrice = mapPrice.get(x.getCarDay());
                 x.setCarUnitPrice(dbPrice.getCarUnitPrice());
+                x.setRevertTime(revertTime);
             });
         }
     }

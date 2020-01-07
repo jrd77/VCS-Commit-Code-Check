@@ -12,6 +12,8 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class OwnerCommodityService {
@@ -70,45 +72,58 @@ public class OwnerCommodityService {
 
     //组合
     private void combination(OwnerGoodsDetailDTO ownerGoodsDetailDTO){
-        if(ownerGoodsDetailDTO.getOwnerOrderNo() == null){
+        String ownerOrderNo = ownerGoodsDetailDTO.getOwnerOrderNo();
+        if(ownerOrderNo == null){
             return;
         }
         LocalDateTime rentTime = ownerGoodsDetailDTO.getRentTime();
         LocalDateTime revertTime = ownerGoodsDetailDTO.getRevertTime();
-        List<OwnerGoodsPriceDetailEntity> dbGoodsPriceList = ownerGoodsPriceDetailMapper.selectByOwnerOrderNo(ownerGoodsDetailDTO.getOwnerOrderNo());
-        LocalDate carDayRent = dbGoodsPriceList.get(0).getCarDay();
-        LocalDate carDayRevert = dbGoodsPriceList.get(dbGoodsPriceList.size()-1).getCarDay();
-
-        if(!carDayRent.isEqual(rentTime.toLocalDate())){
+        LocalDateTime oldRentTime = ownerGoodsDetailDTO.getOldRentTime();
+        if(oldRentTime == null && !oldRentTime.isEqual(rentTime)){
             return;
-        } if(carDayRevert.isBefore(revertTime.toLocalDate())){//时间延后
-            dbGoodsPriceList.get(dbGoodsPriceList.size()-1).setCarHourCount(24F);
-            List<OwnerGoodsPriceDetailDTO> ownerGoodsPriceDetailDTOList = ownerGoodsDetailDTO.getOwnerGoodsPriceDetailDTOList();
-            //租期重叠部分- 使用数据库的 价格/小时数
-            for (int i = 0;i<dbGoodsPriceList.size();i++){
-                OwnerGoodsPriceDetailDTO ownerGoodsPriceDetailDto = ownerGoodsPriceDetailDTOList.get(i);
-                ownerGoodsPriceDetailDto.setCarUnitPrice(dbGoodsPriceList.get(i).getCarUnitPrice());
-                ownerGoodsPriceDetailDto.setRevertTime(dbGoodsPriceList.get(i).getRevertTime());
-                if(i == (dbGoodsPriceList.size()-1)){
-                    ownerGoodsPriceDetailDto.setCarHourCount(24F);
-                    continue;
+        }
+
+        List<OwnerGoodsPriceDetailEntity> dbGoodsPriceList = ownerGoodsPriceDetailMapper.selectByOwnerOrderNo(ownerOrderNo);
+        if(dbGoodsPriceList == null || dbGoodsPriceList.size()<=0){
+            return;
+        }
+        Map<LocalDate, OwnerGoodsPriceDetailEntity> mapPrice = dbGoodsPriceList
+                .stream()
+                .collect(Collectors.toMap(OwnerGoodsPriceDetailEntity::getCarDay, x -> x));
+        OwnerGoodsPriceDetailEntity dbPriceMaxCarDay = dbGoodsPriceList.get(dbGoodsPriceList.size() - 1);
+        LocalDateTime oldRevertTime = dbPriceMaxCarDay.getRevertTime();
+        List<OwnerGoodsPriceDetailDTO> ownerGoodsPriceDetailDTOList = ownerGoodsDetailDTO.getOwnerGoodsPriceDetailDTOList();
+        if(oldRevertTime.isBefore(revertTime)){//时间延后
+            OwnerGoodsPriceDetailDTO middle = new OwnerGoodsPriceDetailDTO();
+            ownerGoodsPriceDetailDTOList.forEach(x->{
+                OwnerGoodsPriceDetailEntity dbPrice = mapPrice.get(x.getCarDay());
+                if(dbPriceMaxCarDay.getCarDay().isEqual(x.getCarDay())){  //临界的地方需要拆分
+                    float HFirst = CommonUtils.getHolidayTopHours(dbPriceMaxCarDay.getRevertTime(), LocalDateTimeUtils.localdateToString(x.getCarDay()));
+                    middle.setRevertTime(revertTime);
+                    middle.setCarDay(dbPriceMaxCarDay.getCarDay());
+                    middle.setCarUnitPrice(x.getCarUnitPrice());
+                    middle.setCarHourCount(HFirst);
+
+                    x.setCarUnitPrice(dbPrice.getCarUnitPrice());
+                    x.setCarHourCount(dbPrice.getCarHourCount());
+                    x.setRevertTime(dbPrice.getRevertTime());
+                }else if(dbPrice != null){//临界之前的值使用数据库的  临界之后使用新生成的一天一价
+                    x.setCarUnitPrice(dbPrice.getCarUnitPrice());
+                    x.setCarHourCount(dbPrice.getCarHourCount());
+                    x.setRevertTime(dbPrice.getRevertTime());
                 }
-                ownerGoodsPriceDetailDto.setCarHourCount(dbGoodsPriceList.get(i).getCarHourCount());
-            }
+            });
+            ownerGoodsPriceDetailDTOList.add(middle);
+
             //租期不重叠部分 中间部分init中已经处理
             //租期不重叠部分 最后一天 init中已经处理
         }else{//时间提前
-            List<OwnerGoodsPriceDetailDTO> ownerGoodsPriceDetailDTOList = ownerGoodsDetailDTO.getOwnerGoodsPriceDetailDTOList();
-            //租期重叠部分- 使用数据库的 价格/小时数
-            for (int i = 0;i<dbGoodsPriceList.size();i++){
-                OwnerGoodsPriceDetailDTO ownerGoodsPriceDetailDto = ownerGoodsPriceDetailDTOList.get(i);
-                ownerGoodsPriceDetailDto.setCarUnitPrice(dbGoodsPriceList.get(i).getCarUnitPrice());
-                ownerGoodsPriceDetailDto.setRevertTime(dbGoodsPriceList.get(i).getRevertTime());
-                if(i == (dbGoodsPriceList.size()-1)){//最后一天不使用数据库的小时数
-                    continue;
-                }
-                ownerGoodsPriceDetailDto.setCarHourCount(dbGoodsPriceList.get(i).getCarHourCount());
-            }
+            //替换金额即可，使用数据库中的一天一价
+            ownerGoodsPriceDetailDTOList.forEach(x->{
+                OwnerGoodsPriceDetailEntity dbPrice = mapPrice.get(x.getCarDay());
+                x.setCarUnitPrice(dbPrice.getCarUnitPrice());
+                x.setRevertTime(revertTime);
+            });
         }
     }
 

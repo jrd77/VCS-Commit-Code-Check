@@ -75,7 +75,7 @@ public class TestController {
     }
 
     @GetMapping("testcombination")
-    public void testcombination(){
+    public RenterGoodsDetailDTO testcombination(){
         RenterGoodsDetailDTO renterGoodsDetailDTO = new RenterGoodsDetailDTO();
         renterGoodsDetailDTO.setRenterOrderNo("7047216010020610560");
         renterGoodsDetailDTO.setOldRentTime(LocalDateTime.of(2020,01,7 ,9,00,0));
@@ -103,5 +103,6 @@ public class TestController {
 
         renterGoodsDetailDTO.setRenterGoodsPriceDetailDTOList(list);
         renterCommodityService.combination(renterGoodsDetailDTO);
+        return renterGoodsDetailDTO;
     }
 }
