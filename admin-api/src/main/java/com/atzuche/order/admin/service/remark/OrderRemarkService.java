@@ -1,14 +1,17 @@
 package com.atzuche.order.admin.service.remark;
 
-import com.atzuche.order.admin.mapper.remark.OrderRemarkMapper;
+import com.atzuche.order.admin.entity.OrderRemarkOverviewEntity;
+import com.atzuche.order.admin.enums.RemarkTypeEnum;
+import com.atzuche.order.admin.mapper.OrderRemarkMapper;
 import com.atzuche.order.admin.vo.req.remark.OrderRemarkRequestVO;
 import com.atzuche.order.admin.vo.resp.remark.OrderRemarkOverviewListResponseVO;
 import com.atzuche.order.admin.vo.resp.remark.OrderRemarkOverviewResponseVO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,6 +20,7 @@ import java.util.List;
 @Service
 public class OrderRemarkService {
 
+    private static final Logger logger = LoggerFactory.getLogger(OrderRemarkService.class);
 
     @Autowired
     private OrderRemarkMapper orderRemarkMapper;
@@ -26,13 +30,20 @@ public class OrderRemarkService {
      * @param orderRemarkRequestVO
      * @return
      */
-    public OrderRemarkOverviewListResponseVO getOrderRemarkOverview(OrderRemarkRequestVO orderRemarkRequestVO){
-        List<OrderRemarkOverviewResponseVO> orderRemarkOverview = new ArrayList();
-        BeanUtils.copyProperties(orderRemarkMapper.getOrderRemarkOverview(orderRemarkRequestVO),orderRemarkOverview);
+    public OrderRemarkOverviewListResponseVO getOrderRemarkOverview(OrderRemarkRequestVO orderRemarkRequestVO) {
+        List<OrderRemarkOverviewResponseVO> orderRemarkOverviewList = new ArrayList();
+        List<OrderRemarkOverviewEntity> orderRemarkOverviewEntityList = orderRemarkMapper.getOrderRemarkOverview(orderRemarkRequestVO);
         OrderRemarkOverviewListResponseVO orderRemarkOverviewListResponseVO = new OrderRemarkOverviewListResponseVO();
-        orderRemarkOverviewListResponseVO.setRemarkOverviewList(orderRemarkOverview);
+        if (!CollectionUtils.isEmpty(orderRemarkOverviewEntityList)) {
+            for (OrderRemarkOverviewEntity orderRemarkOverviewEntity : orderRemarkOverviewEntityList) {
+                OrderRemarkOverviewResponseVO orderRemarkOverviewResponseVO = new OrderRemarkOverviewResponseVO();
+                BeanUtils.copyProperties(orderRemarkOverviewEntity, orderRemarkOverviewResponseVO);
+                orderRemarkOverviewResponseVO.setRemarkTypeText(RemarkTypeEnum.getDescriptionByType(orderRemarkOverviewResponseVO.getRemarkType()));
+                orderRemarkOverviewList.add(orderRemarkOverviewResponseVO);
+            }
+            orderRemarkOverviewListResponseVO.setRemarkOverviewList(orderRemarkOverviewList);
+        }
         return orderRemarkOverviewListResponseVO;
-
     }
 
 

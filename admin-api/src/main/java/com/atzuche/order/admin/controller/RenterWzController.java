@@ -62,7 +62,8 @@ public class RenterWzController extends BaseController {
         if (StringUtils.isBlank(orderNo)) {
             return ResponseData.createErrorCodeResponse(ErrorCode.ORDER_NO_PARAM_ERROR.getCode(), "订单编号为空");
         }
-        return ResponseData.success();
+        WzCostLogsResVO rep = renterWzService.queryWzCostLogsByOrderNo(orderNo);
+        return ResponseData.success(rep);
     }
 
     @GetMapping("/console/temporaryRefund/log")

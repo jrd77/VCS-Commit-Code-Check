@@ -34,5 +34,5 @@ public interface WzCostLogMapper{
 	 * 批量查询
 	 * @return 查询列表
 	 */
-	List<WzCostLogEntity> queryList();
+	List<WzCostLogEntity> queryWzCostLogsByOrderNo(@Param("orderNo") String orderNo);
 }

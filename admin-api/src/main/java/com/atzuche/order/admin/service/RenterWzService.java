@@ -2,7 +2,10 @@ package com.atzuche.order.admin.service;
 
 import com.atzuche.order.admin.common.AdminUserUtil;
 import com.atzuche.order.admin.vo.req.renterWz.RenterWzCostDetailReqVO;
+import com.atzuche.order.admin.vo.resp.renterWz.WzCostLogResVO;
+import com.atzuche.order.admin.vo.resp.renterWz.WzCostLogsResVO;
 import com.atzuche.order.commons.CompareHelper;
+import com.atzuche.order.commons.DateUtils;
 import com.atzuche.order.rentercommodity.service.RenterGoodsService;
 import com.atzuche.order.rentermem.service.RenterMemberService;
 import com.atzuche.order.renterwz.entity.RenterOrderWzCostDetailEntity;
@@ -15,10 +18,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.Date;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * RenterWzService
@@ -154,5 +154,22 @@ public class RenterWzService {
             map.put(REMARK,WZ_OTHER_FINE_REMARK);
         }
         return map;
+    }
+
+    public WzCostLogsResVO queryWzCostLogsByOrderNo(String orderNo) {
+        List<WzCostLogEntity> wzCostLogEntities = wzCostLogService.queryWzCostLogsByOrderNo(orderNo);
+        List<WzCostLogResVO> wzCostLogs = new ArrayList<>();
+        WzCostLogResVO vo = null;
+        for (WzCostLogEntity wzCostLog : wzCostLogEntities) {
+            vo = new WzCostLogResVO();
+            BeanUtils.copyProperties(wzCostLog,vo);
+            vo.setCostItem(WzCostEnums.getDesc(wzCostLog.getCostCode()));
+            vo.setCreateTimeStr(DateUtils.formate(wzCostLog.getCreateTime(),DateUtils.DATE_DEFAUTE1));
+            vo.setOperateContent(wzCostLog.getContent());
+            wzCostLogs.add(vo);
+        }
+        WzCostLogsResVO wzCostLogsResVO = new WzCostLogsResVO();
+        wzCostLogsResVO.setWzCostLogs(wzCostLogs);
+        return wzCostLogsResVO;
     }
 }

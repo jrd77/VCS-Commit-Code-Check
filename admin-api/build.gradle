@@ -20,7 +20,7 @@ mainClassName='com.autoyol.doc.parser.autodoc.AutoDocParser'
 mainClassName = 'com.autoyol.doc.parser.autodoc.AutoDocParser'
 
 group 'com.atzuche'
-version '0.0.1-SNAPSHOT'
+version '1.0.0-SNAPSHOT'
 sourceCompatibility = '1.8'
 targetCompatibility = 1.8
 
