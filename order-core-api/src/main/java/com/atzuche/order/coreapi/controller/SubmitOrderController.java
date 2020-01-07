@@ -66,6 +66,7 @@ public class SubmitOrderController {
             BeanCopier beanCopier = BeanCopier.create(NormalOrderReqVO.class, OrderReqVO.class, false);
             OrderReqVO orderReqVO = new OrderReqVO();
             beanCopier.copy(normalOrderReqVO, orderReqVO, null);
+            orderReqVO.setAbatement(Integer.valueOf(normalOrderReqVO.getAbatement()));
             orderReqVO.setRentTime(LocalDateTimeUtils.parseStringToDateTime(normalOrderReqVO.getRentTime(),
                     LocalDateTimeUtils.DEFAULT_PATTERN));
             orderReqVO.setRevertTime(LocalDateTimeUtils.parseStringToDateTime(normalOrderReqVO.getRevertTime(),

@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
  * 租客端会员概览表
  * 
  * @author ZhangBin
- * @date 2019-12-25 11:20:00
+ * @date 2020-01-07 10:26:32
  * @Description:
  */
 @Data
@@ -82,23 +82,22 @@ public class RenterMemberEntity implements Serializable {
 	 * 驾驶增副页 0：未上传，1：已上传，2：已认证，3：认证不通过, 4:无效数据, 5:未上传（已认证）
 	 */
 	private Integer driViceLicAuth;
-    /**
-     * 核查状态 0-未查核 1-核查通过 2-核查不通过 3-核查已通过，有劣迹
-     */
-    private Integer renterCheck;
-
-    /**
-     * 会员来源
-     */
-    private String outerSource;
-    /**
-     * 租客注册时间
-     */
-    private LocalDateTime regTime;
+	/**
+	 * 核查状态 0-未查核 1-核查通过 2-核查不通过 3-核查已通过，有劣迹
+	 */
+	private Integer renterCheck;
+	/**
+	 * 租客注册时间
+	 */
+	private LocalDateTime regTime;
+	/**
+	 * 会员来源
+	 */
+	private String outerSource;
 	/**
 	 * 创建时间
 	 */
-	 private LocalDateTime createTime;
+	private LocalDateTime createTime;
 	/**
 	 * 创建人
 	 */

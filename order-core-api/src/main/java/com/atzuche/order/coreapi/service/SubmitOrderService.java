@@ -13,10 +13,7 @@ import com.atzuche.order.commons.entity.dto.OwnerGoodsDetailDTO;
 import com.atzuche.order.commons.entity.dto.OwnerMemberDTO;
 import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
 import com.atzuche.order.commons.entity.dto.RenterMemberDTO;
-import com.atzuche.order.commons.enums.OrderStatusEnum;
-import com.atzuche.order.commons.enums.RenterCashCodeEnum;
-import com.atzuche.order.commons.enums.SubsidySourceCodeEnum;
-import com.atzuche.order.commons.enums.SubsidyTypeCodeEnum;
+import com.atzuche.order.commons.enums.*;
 import com.atzuche.order.commons.enums.account.FreeDepositTypeEnum;
 import com.atzuche.order.commons.vo.req.OrderReqVO;
 import com.atzuche.order.commons.vo.res.OrderResVO;
@@ -379,7 +376,7 @@ public class SubmitOrderService {
         renterOrderReqVO.setLabelIds(goodsDetail.getLabelIds());
         renterOrderReqVO.setRenterGoodsPriceDetailDTOList(goodsDetail.getRenterGoodsPriceDetailDTOList());
         renterOrderReqVO.setPlateNum(goodsDetail.getCarPlateNum());
-
+        renterOrderReqVO.setAbatement(orderReqVO.getAbatement());
 
         RenterMemberDTO renterMember = reqContext.getRenterMemberDto();
         renterOrderReqVO.setCertificationTime(renterMember.getCertificationTime());
@@ -500,7 +497,8 @@ public class SubmitOrderService {
                 OwnerOrderPurchaseDetailEntity.class, false);
 
         beanCopier.copy(rentAmtEntity, ownerOrderPurchaseDetailEntity, null);
-
+        ownerOrderPurchaseDetailEntity.setCostCode(OwnerCashCodeEnum.RENT_AMT.getCashNo());
+        ownerOrderPurchaseDetailEntity.setCostCodeDesc(OwnerCashCodeEnum.RENT_AMT.getTxt());
         ownerOrderPurchaseDetailEntity.setOrderNo(orderNo);
         ownerOrderPurchaseDetailEntity.setOwnerOrderNo(ownerOrderNo);
         ownerOrderPurchaseDetailEntity.setMemNo(memNo);
