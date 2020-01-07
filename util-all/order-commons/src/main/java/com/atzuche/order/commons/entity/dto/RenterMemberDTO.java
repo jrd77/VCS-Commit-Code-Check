@@ -4,6 +4,7 @@ import com.autoyol.member.detail.vo.res.CommUseDriverInfo;
 import lombok.Data;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -85,4 +86,13 @@ public class RenterMemberDTO {
      * 核查状态 0-未查核 1-核查通过 2-核查不通过 3-核查已通过，有劣迹
      */
     private Integer renterCheck;
+
+    /**
+     * 租客注册时间
+     */
+    private LocalDateTime regTime;
+    /**
+     * 会员来源
+     */
+    private String outerSource;
 }

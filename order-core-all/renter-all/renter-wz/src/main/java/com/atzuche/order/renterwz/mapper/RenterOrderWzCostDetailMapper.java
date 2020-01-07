@@ -59,4 +59,13 @@ public interface RenterOrderWzCostDetailMapper{
 	 * @param code 费用编码
 	 */
 	void updateCostStatusByOrderNoAndCarNumAndMemNoAndCostCode(@Param("orderNo") String orderNo,@Param("carNum") String carNum,@Param("memNo")  Integer memNo,@Param("costStatus")  Integer costStatus,@Param("code")  String code);
+
+	/**
+	 *  根据消费code和订单号 查询 详情
+	 * @param orderNo 订单号
+	 * @param costCode 消费code
+	 * @return 详情
+	 */
+	RenterOrderWzCostDetailEntity queryInfoByOrderAndCode(String orderNo, String costCode);
+
 }

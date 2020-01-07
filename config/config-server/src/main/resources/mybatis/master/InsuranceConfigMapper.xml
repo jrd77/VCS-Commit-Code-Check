@@ -11,7 +11,7 @@
     <select id="findAll" resultMap="base">
         SELECT
         id,
-        guid_price_begin
+        guid_price_begin,
         guid_price_end,
         insurance_value,
         super_support_risk

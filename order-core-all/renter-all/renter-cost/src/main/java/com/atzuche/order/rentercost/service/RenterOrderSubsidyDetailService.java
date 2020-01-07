@@ -191,7 +191,7 @@ public class RenterOrderSubsidyDetailService {
         renterOrderSubsidyDetailDTO.setSubsidySourceName(SubsidySourceCodeEnum.PLATFORM.getDesc());
 
         renterOrderSubsidyDetailDTO.setSubsidyTargetCode(SubsidySourceCodeEnum.RENTER.getCode());
-        renterOrderSubsidyDetailDTO.setSubsidyTypeName(SubsidySourceCodeEnum.RENTER.getDesc());
+        renterOrderSubsidyDetailDTO.setSubsidyTargetName(SubsidySourceCodeEnum.RENTER.getDesc());
         renterOrderSubsidyDetailDTO.setSubsidyCostCode(RenterCashCodeEnum.REAL_COUPON_OFFSET.getCashNo());
         renterOrderSubsidyDetailDTO.setSubsidyCostName(RenterCashCodeEnum.REAL_COUPON_OFFSET.getTxt());
         renterOrderSubsidyDetailDTO.setSubsidyDesc("使用优惠券抵扣租车费用(目前只抵扣租金)");

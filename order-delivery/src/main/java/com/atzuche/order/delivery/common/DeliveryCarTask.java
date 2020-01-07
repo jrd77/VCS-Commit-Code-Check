@@ -26,11 +26,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.util.Objects;
 
 /**
  * @author 胡春林
@@ -100,6 +100,9 @@ public class DeliveryCarTask {
             RenterDeliveryAddrEntity renterDeliveryAddrEntity = deliveryAddrMapper.selectByRenterOrderNo(deliveryAddrEntity.getRenterOrderNo());
             if (null == renterDeliveryAddrEntity) {
                 deliveryAddrMapper.insertSelective(deliveryAddrEntity);
+            }else {
+                CommonUtil.copyPropertiesIgnoreNull(deliveryAddrEntity,renterDeliveryAddrEntity);
+                deliveryAddrMapper.updateByPrimaryKey(renterDeliveryAddrEntity);
             }
         }
         if (orderDeliveryVO.getOrderDeliveryDTO() != null) {
@@ -107,8 +110,13 @@ public class DeliveryCarTask {
             BeanUtils.copyProperties(orderDeliveryVO.getOrderDeliveryDTO(), orderDeliveryEntity);
             if (type == DeliveryTypeEnum.ADD_TYPE.getValue().intValue()) {
                 orderDeliveryEntity.setOrderNoDelivery(codeUtils.createDeliveryNumber());
-                int aheadOrDelayTime = getMinutes == null ? returnMinutes : getMinutes;
-                orderDeliveryEntity.setAheadOrDelayTime(aheadOrDelayTime);
+                if (Objects.isNull(getMinutes) && Objects.isNull(returnMinutes)) {
+                    orderDeliveryEntity.setAheadOrDelayTime(0);
+                } else {
+                    int aheadOrDelayTime = getMinutes == null ? returnMinutes : getMinutes;
+                    orderDeliveryEntity.setAheadOrDelayTime(aheadOrDelayTime);
+                }
+                orderDeliveryEntity.setStatus(1);
                 orderDeliveryMapper.insertSelective(orderDeliveryEntity);
                 addHandoverCarInfo(orderDeliveryEntity, getMinutes, returnMinutes);
             } else {
@@ -117,6 +125,7 @@ public class DeliveryCarTask {
                     throw new DeliveryOrderException(DeliveryErrorCode.DELIVERY_MOUDLE_ERROR.getValue(), "没有找到最近的一笔配送订单记录");
                 }
                 CommonUtil.copyPropertiesIgnoreNull(orderDeliveryEntity, lastOrderDeliveryEntity);
+                lastOrderDeliveryEntity.setStatus(2);
                 orderDeliveryMapper.insert(lastOrderDeliveryEntity);
             }
         }

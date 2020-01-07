@@ -49,7 +49,7 @@ public class OrderRentalCostController {
     @AutoDocVersion(version = "管理后台基础费用修改")
     @AutoDocGroup(group = "管理后台基础费用修改")
     @AutoDocMethod(description = "基础费用修改", value = "基础费用修改",response = ResponseData.class)
-    @PostMapping("/cost/baseCost/update")
+    @PostMapping("/baseCost/update")
     public ResponseData<?> updateBaseCostByRenterOrderNo(@RequestBody BaseCostVO baseCostVO) {
         if (null == baseCostVO || StringUtils.isBlank(baseCostVO.getRenterOrderNo())) {
             return ResponseData.createErrorCodeResponse(ErrorCode.ORDER_NO_PARAM_ERROR.getCode(), "租客子订单编号为空");
@@ -65,7 +65,7 @@ public class OrderRentalCostController {
     @AutoDocVersion(version = "管理后台平台补贴修改")
     @AutoDocGroup(group = "管理后台平台补贴修改")
     @AutoDocMethod(description = "平台补贴修改", value = "平台补贴修改",response = ResponseData.class)
-    @PostMapping("/cost/platformSubsidy/update")
+    @PostMapping("/platformSubsidy/update")
     public ResponseData<?> updatePlatformSubsidyByRenterOrderNo(@RequestBody PlatformSubsidyVO platformSubsidyVO) {
         if (null == platformSubsidyVO || StringUtils.isBlank(platformSubsidyVO.getRenterOrderNo())) {
             return ResponseData.createErrorCodeResponse(ErrorCode.ORDER_NO_PARAM_ERROR.getCode(), "租客子订单编号为空");
@@ -81,7 +81,7 @@ public class OrderRentalCostController {
     @AutoDocVersion(version = "管理后台优惠抵扣修改")
     @AutoDocGroup(group = "管理后台优惠抵扣修改")
     @AutoDocMethod(description = "优惠抵扣修改", value = "优惠抵扣修改",response = ResponseData.class)
-    @PostMapping("/cost/couponDeduction/update")
+    @PostMapping("/couponDeduction/update")
     public ResponseData<?> updateCouponDeductionByRenterOrderNo(@RequestBody CouponDeductionVO couponDeductionVO) {
         if (null == couponDeductionVO || StringUtils.isBlank(couponDeductionVO.getRenterOrderNo())) {
             return ResponseData.createErrorCodeResponse(ErrorCode.ORDER_NO_PARAM_ERROR.getCode(), "租客子订单编号为空");
@@ -97,7 +97,7 @@ public class OrderRentalCostController {
     @AutoDocVersion(version = "管理后台车辆押金修改")
     @AutoDocGroup(group = "管理后台车辆押金修改")
     @AutoDocMethod(description = "车辆押金修改", value = "车辆押金修改",response = ResponseData.class)
-    @PostMapping("/cost/carDeposit/update")
+    @PostMapping("/carDeposit/update")
     public ResponseData<?> updateCarDepositByRenterOrderNo(@RequestBody CarDepositVO carDepositVO) {
         if (null == carDepositVO || StringUtils.isBlank(carDepositVO.getRenterOrderNo())) {
             return ResponseData.createErrorCodeResponse(ErrorCode.ORDER_NO_PARAM_ERROR.getCode(), "租客子订单编号为空");
@@ -113,7 +113,7 @@ public class OrderRentalCostController {
     @AutoDocVersion(version = "管理后台违章押金修改")
     @AutoDocGroup(group = "管理后台违章押金修改")
     @AutoDocMethod(description = "违章押金修改", value = "车辆押金修改",response = ResponseData.class)
-    @PostMapping("/cost/vehicleDeposit/update")
+    @PostMapping("/vehicleDeposit/update")
     public ResponseData<?> updateVehicleDepositByRenterOrderNo(@RequestBody VehicleDepositVO vehicleDepositVO) {
         if (null == vehicleDepositVO || StringUtils.isBlank(vehicleDepositVO.getRenterOrderNo())) {
             return ResponseData.createErrorCodeResponse(ErrorCode.ORDER_NO_PARAM_ERROR.getCode(), "租客子订单编号为空");

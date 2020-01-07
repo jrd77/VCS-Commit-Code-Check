@@ -75,12 +75,9 @@
 				`surplus_deposit_amt`,		
 				`surplus_authorize_deposit_amt`,		
 				`free_deposit_type`,
-				`version`,		
-				`create_time`,		
-				`create_op`,		
-				`update_time`,		
-				`update_op`,		
-				`is_delete`		
+				`version`,
+				`create_op`,
+				`update_op`
 			)
 		values
 		(
@@ -98,12 +95,9 @@
 				#{surplusDepositAmt}, 		
 				#{surplusAuthorizeDepositAmt}, 		
 				#{freeDepositType},
-				#{version}, 		
-				#{createTime}, 		
-				#{createOp}, 		
-				#{updateTime}, 		
-				#{updateOp}, 		
-				#{isDelete}		
+				#{version},
+				#{createOp},
+				#{updateOp}
 			)
 	</insert>
 	
