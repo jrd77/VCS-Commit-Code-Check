@@ -2,6 +2,9 @@ package com.atzuche.order.admin.service;
 
 import com.atzuche.order.admin.common.AdminUserUtil;
 import com.atzuche.order.admin.vo.req.renterWz.RenterWzCostDetailReqVO;
+import com.atzuche.order.admin.vo.req.renterWz.TemporaryRefundReqVO;
+import com.atzuche.order.admin.vo.resp.renterWz.TemporaryRefundLogResVO;
+import com.atzuche.order.admin.vo.resp.renterWz.TemporaryRefundLogsResVO;
 import com.atzuche.order.admin.vo.resp.renterWz.WzCostLogResVO;
 import com.atzuche.order.admin.vo.resp.renterWz.WzCostLogsResVO;
 import com.atzuche.order.commons.CompareHelper;
@@ -10,9 +13,12 @@ import com.atzuche.order.rentercommodity.service.RenterGoodsService;
 import com.atzuche.order.rentermem.service.RenterMemberService;
 import com.atzuche.order.renterwz.entity.RenterOrderWzCostDetailEntity;
 import com.atzuche.order.renterwz.entity.WzCostLogEntity;
+import com.atzuche.order.renterwz.entity.WzTemporaryRefundLogEntity;
 import com.atzuche.order.renterwz.enums.WzCostEnums;
+import com.atzuche.order.renterwz.mapper.RenterOrderWzQueryRecordMapper;
 import com.atzuche.order.renterwz.service.RenterOrderWzCostDetailService;
 import com.atzuche.order.renterwz.service.WzCostLogService;
+import com.atzuche.order.renterwz.service.WzTemporaryRefundLogService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -40,6 +46,9 @@ public class RenterWzService {
 
     @Resource
     private RenterMemberService renterMemberService;
+
+    @Resource
+    private WzTemporaryRefundLogService wzTemporaryRefundLogService;
 
     private static final String WZ_OTHER_FINE_REMARK = "其他扣款备注";
     private static final String WZ_OTHER_FINE = "其他扣款";
@@ -171,5 +180,44 @@ public class RenterWzService {
         WzCostLogsResVO wzCostLogsResVO = new WzCostLogsResVO();
         wzCostLogsResVO.setWzCostLogs(wzCostLogs);
         return wzCostLogsResVO;
+    }
+
+    public TemporaryRefundLogsResVO queryTemporaryRefundLogsByOrderNo(String orderNo) {
+        List<WzTemporaryRefundLogEntity> wzTemporaryRefundLogEntities = wzTemporaryRefundLogService.queryTemporaryRefundLogsByOrderNo(orderNo);
+        List<TemporaryRefundLogResVO> wzCostLogs = new ArrayList<>();
+        TemporaryRefundLogResVO vo = null;
+        for (WzTemporaryRefundLogEntity wzCostLog : wzTemporaryRefundLogEntities) {
+            vo = new TemporaryRefundLogResVO();
+            BeanUtils.copyProperties(wzCostLog,vo);
+            vo.setCreateTimeStr(DateUtils.formate(wzCostLog.getCreateTime(),DateUtils.DATE_DEFAUTE1));
+            vo.setAmount(String.valueOf(wzCostLog.getAmount()));
+            wzCostLogs.add(vo);
+        }
+        TemporaryRefundLogsResVO wzCostLogsResVO = new TemporaryRefundLogsResVO();
+        wzCostLogsResVO.setTemporaryRefundLogs(wzCostLogs);
+        return wzCostLogsResVO;
+    }
+
+    public void addTemporaryRefund(TemporaryRefundReqVO req) {
+        //TODO 调用退款接口
+        WzTemporaryRefundLogEntity dto = new WzTemporaryRefundLogEntity();
+        BeanUtils.copyProperties(req,dto);
+        dto.setCreateTime(new Date());
+        dto.setOperator(AdminUserUtil.getAdminUser().getAuthName());
+        dto.setAmount(convertIntString(req.getAmount()));
+        dto.setStatus(0);
+        wzTemporaryRefundLogService.save(dto);
+    }
+
+    private int convertIntString(String intStr){
+        if(org.apache.commons.lang.StringUtils.isBlank(intStr)){
+            return 0;
+        }
+        //判断是否有小数点
+        if(intStr.contains(".")){
+            String subStr= intStr.substring(0,(intStr.indexOf(".")));
+            return Integer.parseInt(subStr);
+        }
+        return Integer.parseInt(intStr);
     }
 }
