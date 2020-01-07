@@ -107,8 +107,9 @@ public class DeliveryCarTask {
             BeanUtils.copyProperties(orderDeliveryVO.getOrderDeliveryDTO(), orderDeliveryEntity);
             if (type == DeliveryTypeEnum.ADD_TYPE.getValue().intValue()) {
                 orderDeliveryEntity.setOrderNoDelivery(codeUtils.createDeliveryNumber());
-                int aheadOrDelayTime = getMinutes == null ? returnMinutes : getMinutes;
+                int aheadOrDelayTime = getMinutes == 0 ? returnMinutes : getMinutes;
                 orderDeliveryEntity.setAheadOrDelayTime(aheadOrDelayTime);
+                orderDeliveryEntity.setStatus(1);
                 orderDeliveryMapper.insertSelective(orderDeliveryEntity);
                 addHandoverCarInfo(orderDeliveryEntity, getMinutes, returnMinutes);
             } else {
@@ -117,6 +118,7 @@ public class DeliveryCarTask {
                     throw new DeliveryOrderException(DeliveryErrorCode.DELIVERY_MOUDLE_ERROR.getValue(), "没有找到最近的一笔配送订单记录");
                 }
                 CommonUtil.copyPropertiesIgnoreNull(orderDeliveryEntity, lastOrderDeliveryEntity);
+                lastOrderDeliveryEntity.setStatus(2);
                 orderDeliveryMapper.insert(lastOrderDeliveryEntity);
             }
         }
