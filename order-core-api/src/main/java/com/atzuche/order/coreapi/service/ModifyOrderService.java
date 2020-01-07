@@ -354,7 +354,7 @@ public class ModifyOrderService {
 		Integer diffAmt = updAutoCoinSubsidyAmt - initAutoCoinSubsidyAmt;
 		if (diffAmt > 0) {
 			AutoCoinAgainDeductRequestVO autoCoinRechange = new AutoCoinAgainDeductRequestVO();
-			autoCoinRechange.setCoin(diffAmt*100);
+			autoCoinRechange.setCoin(-diffAmt*100);
 			autoCoinRechange.setMemNo(modifyOrderDTO.getMemNo() == null?null:Integer.valueOf(modifyOrderDTO.getMemNo()));
 			autoCoinRechange.setOperator("order-center");
 			autoCoinRechange.setOrderNo(modifyOrderDTO.getOrderNo());
