@@ -1,7 +1,11 @@
 package com.atzuche.order.delivery.vo.delivery;
 
-import lombok.Data;
-import lombok.ToString;
+import com.atzuche.order.commons.entity.dto.RenterMemberDTO;
+import com.atzuche.order.delivery.entity.RenterDeliveryAddrEntity;
+import com.atzuche.order.delivery.enums.UsedDeliveryTypeEnum;
+import com.atzuche.order.delivery.vo.delivery.convert.Converter;
+import lombok.*;
+import org.springframework.beans.BeanUtils;
 
 import java.time.LocalDateTime;
 
@@ -11,6 +15,9 @@ import java.time.LocalDateTime;
  */
 @Data
 @ToString
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class RenterDeliveryAddrDTO {
 
     /**
@@ -93,4 +100,69 @@ public class RenterDeliveryAddrDTO {
      * 创建人
      */
     private String createOp;
+
+
+    /**
+     * 相互转换
+     */
+    private static class RenterDeliveryAddrDTOConvert extends Converter<RenterDeliveryAddrDTO, RenterDeliveryAddrEntity> {
+
+        @Override
+        protected RenterDeliveryAddrEntity doForWard(RenterDeliveryAddrDTO renterDeliveryAddrDTO) {
+            RenterDeliveryAddrEntity renterDeliveryAddrEntity = new RenterDeliveryAddrEntity();
+            BeanUtils.copyProperties(renterDeliveryAddrDTO, renterDeliveryAddrEntity);
+            return null;
+        }
+
+        @Override
+        protected RenterDeliveryAddrDTO doBackWard(RenterDeliveryAddrEntity renterDeliveryAddrEntity) {
+            RenterDeliveryAddrDTO renterDeliveryAddrDTO = RenterDeliveryAddrDTO.builder().build();
+            BeanUtils.copyProperties(renterDeliveryAddrEntity, renterDeliveryAddrDTO);
+            return renterDeliveryAddrDTO;
+        }
+
+        @Override
+        public RenterDeliveryAddrEntity apply(RenterDeliveryAddrDTO renterDeliveryAddrDTO) {
+            return null;
+        }
+    }
+
+    /**
+     * 设置参数
+     *
+     * @param orderType
+     * @param renterMemberDTO
+     */
+    public void setParamsTypeValue(Integer orderType, RenterMemberDTO renterMemberDTO) {
+        if (orderType == UsedDeliveryTypeEnum.USED.getValue().intValue()) {
+            setGetCarUserName(renterMemberDTO.getRealName());
+            setGetCarUserPhone(renterMemberDTO.getPhone());
+        } else {
+            setReturnCarUserName(renterMemberDTO.getRealName());
+            setReturnCarUserPhone(renterMemberDTO.getPhone());
+        }
+    }
+
+    /**
+     * 转换成DTO
+     * @param renterDeliveryAddrEntity
+     * @return
+     */
+    public RenterDeliveryAddrDTO convertToDTO(RenterDeliveryAddrEntity renterDeliveryAddrEntity) {
+
+        RenterDeliveryAddrDTOConvert renterDeliveryAddrDTOConvert = new RenterDeliveryAddrDTOConvert();
+        return renterDeliveryAddrDTOConvert.doBackWard(renterDeliveryAddrEntity);
+    }
+
+    /**
+     * 转换成entity
+     * @return
+     */
+    public RenterDeliveryAddrEntity convertToEntity() {
+
+        RenterDeliveryAddrDTOConvert renterDeliveryAddrDTOConvert = new RenterDeliveryAddrDTOConvert();
+        return renterDeliveryAddrDTOConvert.doForWard(this);
+    }
+
+
 }
