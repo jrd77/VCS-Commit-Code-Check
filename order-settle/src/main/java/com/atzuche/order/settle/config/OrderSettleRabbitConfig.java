@@ -35,7 +35,6 @@ public class OrderSettleRabbitConfig {
         try {
             Cat.logEvent(CatConstants.RABBIT_MQ_METHOD,"OrderSettleRabbitConfig.settleCallBack");
             Cat.logEvent(CatConstants.RABBIT_MQ_PARAM,orderNo);
-
             rabbitMsgLogService.insertRabbitMsgLog(message, RabbitBusinessTypeEnum.OEDER_SETTLE,orderNo,orderNo);
             orderSettleService.settleOrder(orderNo);
             t.setStatus(Transaction.SUCCESS);
