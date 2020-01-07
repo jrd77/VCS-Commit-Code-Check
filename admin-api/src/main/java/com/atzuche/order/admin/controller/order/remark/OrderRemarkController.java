@@ -2,10 +2,7 @@ package com.atzuche.order.admin.controller.order.remark;
 
 import com.atzuche.order.admin.service.remark.OrderRemarkService;
 import com.atzuche.order.admin.vo.req.remark.*;
-import com.atzuche.order.admin.vo.resp.remark.OrderRemarkLogPageListResponseVO;
-import com.atzuche.order.admin.vo.resp.remark.OrderRemarkOverviewListResponseVO;
-import com.atzuche.order.admin.vo.resp.remark.OrderRemarkOverviewResponseVO;
-import com.atzuche.order.admin.vo.resp.remark.OrderRemarkPageListResponseVO;
+import com.atzuche.order.admin.vo.resp.remark.*;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.doc.annotation.AutoDocMethod;
 import com.autoyol.doc.annotation.AutoDocVersion;
@@ -42,7 +39,8 @@ public class OrderRemarkController {
 
     @AutoDocMethod(description = "添加备注", value = "添加备注", response = ResponseData.class)
     @PostMapping("/add")
-    public ResponseData<ResponseData> add(@RequestBody OrderRemarkAdditionRequestVO orderRemarkAdditionRequestVO, BindingResult bindingResult) {
+    public ResponseData<ResponseData> addOrderRemark(@RequestBody OrderRemarkAdditionRequestVO orderRemarkAdditionRequestVO, BindingResult bindingResult) {
+        orderRemarkService.addOrderRemark(orderRemarkAdditionRequestVO);
         return ResponseData.success(null);
     }
 
@@ -58,5 +56,10 @@ public class OrderRemarkController {
         return ResponseData.success(null);
     }
 
+    @AutoDocMethod(description = "获取备注信息", value = "获取备注信息", response = OrderRemarkResponseVO.class)
+    @GetMapping("/information")
+    public ResponseData<ResponseData> getRemarkInformation(@RequestBody OrderRemarkInformationRequestVO orderRemarkInformationRequestVO, BindingResult bindingResult) {
+        return ResponseData.success(null);
+    }
 
 }
