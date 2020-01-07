@@ -59,7 +59,7 @@ public class OwnerGoodsService{
         OwnerGoodsEntity ownerGoodsEntity = ownerGoodsMapper.selectByOwnerOrderNo(ownerOrderNo);
 
         OwnerGoodsDetailDTO ownerGoodsDetailDto  = new OwnerGoodsDetailDTO();
-        BeanUtils.copyProperties(ownerGoodsDetailDto,ownerGoodsEntity);
+        BeanUtils.copyProperties(ownerGoodsEntity,ownerGoodsDetailDto);
         if(!isNeedPrice){
             return ownerGoodsDetailDto;
         }
@@ -67,7 +67,7 @@ public class OwnerGoodsService{
         List<OwnerGoodsPriceDetailDTO> ownerGoodsPriceDetailDTOList = new ArrayList<>();
         ownerGoodsPriceDetailEntities.forEach(x->{
             OwnerGoodsPriceDetailDTO ownerGoodsPriceDetailDto = new OwnerGoodsPriceDetailDTO();
-            BeanUtils.copyProperties(ownerGoodsPriceDetailDto,x);
+            BeanUtils.copyProperties(x,ownerGoodsPriceDetailDto);
             ownerGoodsPriceDetailDTOList.add(ownerGoodsPriceDetailDto);
         });
         ownerGoodsDetailDto.setOwnerGoodsPriceDetailDTOList(ownerGoodsPriceDetailDTOList);
