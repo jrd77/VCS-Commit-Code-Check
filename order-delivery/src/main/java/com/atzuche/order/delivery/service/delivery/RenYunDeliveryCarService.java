@@ -28,7 +28,6 @@ import java.util.Map;
 public class RenYunDeliveryCarService {
 
     @Autowired
-
     RetryDeliveryCarService retryDeliveryCarService;
 
     /**

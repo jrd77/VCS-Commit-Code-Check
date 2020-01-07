@@ -20,8 +20,6 @@ import java.util.List;
 @Service
 public class DeliveryCarInfoService {
 
-    //FIXME: remove -----
-
     @Autowired
     DeliveryCarService deliveryCarService;
     @Autowired

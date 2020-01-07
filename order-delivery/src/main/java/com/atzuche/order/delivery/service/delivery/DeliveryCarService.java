@@ -5,28 +5,15 @@ import com.atzuche.order.commons.entity.dto.*;
 import com.atzuche.order.commons.vo.req.OrderReqVO;
 import com.atzuche.order.delivery.common.DeliveryCarTask;
 import com.atzuche.order.delivery.common.DeliveryErrorCode;
-import com.atzuche.order.delivery.entity.RenterDeliveryAddrEntity;
-import com.atzuche.order.delivery.entity.RenterOrderDeliveryEntity;
 import com.atzuche.order.delivery.enums.*;
 import com.atzuche.order.delivery.exception.DeliveryOrderException;
-import com.atzuche.order.delivery.mapper.RenterDeliveryAddrMapper;
-import com.atzuche.order.delivery.mapper.RenterOrderDeliveryMapper;
-import com.atzuche.order.delivery.service.handover.HandoverCarService;
-import com.atzuche.order.delivery.utils.CodeUtils;
-import com.atzuche.order.delivery.utils.CommonUtil;
 import com.atzuche.order.delivery.utils.DateUtils;
 import com.atzuche.order.delivery.vo.delivery.*;
-import com.atzuche.order.delivery.vo.handover.HandoverCarInfoDTO;
-import com.atzuche.order.delivery.vo.handover.HandoverCarVO;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.Resource;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Objects;
 
 /**
