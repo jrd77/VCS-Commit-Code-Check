@@ -38,8 +38,6 @@ public class DeliveryCarService {
 
     @Autowired
     DeliveryCarTask deliveryCarTask;
-    @Resource
-    RenterOrderDeliveryMapper orderDeliveryMapper;
 
     /**
      * 添加配送相关信息(是否下单，是否推送仁云)
