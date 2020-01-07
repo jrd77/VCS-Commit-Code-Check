@@ -26,7 +26,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -101,6 +100,9 @@ public class DeliveryCarTask {
             RenterDeliveryAddrEntity renterDeliveryAddrEntity = deliveryAddrMapper.selectByRenterOrderNo(deliveryAddrEntity.getRenterOrderNo());
             if (null == renterDeliveryAddrEntity) {
                 deliveryAddrMapper.insertSelective(deliveryAddrEntity);
+            }else {
+                CommonUtil.copyPropertiesIgnoreNull(deliveryAddrEntity,renterDeliveryAddrEntity);
+                deliveryAddrMapper.updateByPrimaryKey(renterDeliveryAddrEntity);
             }
         }
         if (orderDeliveryVO.getOrderDeliveryDTO() != null) {

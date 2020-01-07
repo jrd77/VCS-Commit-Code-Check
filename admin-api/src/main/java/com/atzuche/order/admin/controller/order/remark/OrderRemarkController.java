@@ -1,4 +1,4 @@
-package com.atzuche.order.admin.controller;
+package com.atzuche.order.admin.controller.order.remark;
 
 import com.atzuche.order.admin.vo.req.remark.*;
 import com.atzuche.order.admin.vo.resp.remark.OrderRemarkLogPageListResponseVO;

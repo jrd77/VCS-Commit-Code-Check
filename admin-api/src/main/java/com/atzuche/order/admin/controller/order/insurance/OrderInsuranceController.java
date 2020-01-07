@@ -1,7 +1,8 @@
-package com.atzuche.order.admin.controller;
+package com.atzuche.order.admin.controller.order.insurance;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.atzuche.order.admin.common.AdminUserUtil;
 import com.atzuche.order.admin.dto.InsurancePurchaseDTO;
 import com.atzuche.order.admin.dto.InsurancePurchaseResultDTO;
 import com.atzuche.order.admin.dto.OrderInsuranceAdditionRequestDTO;
@@ -77,15 +78,15 @@ public class OrderInsuranceController {
 
     @AutoDocMethod(description = "手工录入保险信息", value = "手工录入保险信息", response = ResponseData.class)
     @PostMapping("/add")
-    public ResponseData<ResponseData> add(@RequestBody OrderInsuranceAdditionRequestVO additionOrderInsuranceRequestVO, BindingResult bindingResult) {
+    public ResponseData<ResponseData> add(@RequestBody OrderInsuranceAdditionRequestVO orderInsuranceAdditionRequestVO, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), ErrorCode.INPUT_ERROR.getText());
         }
-
 	    OrderInsuranceAdditionRequestDTO orderInsuranceAdditionRequestDTO = new OrderInsuranceAdditionRequestDTO();
         //属性拷贝
-	    BeanUtils.copyProperties(additionOrderInsuranceRequestVO,orderInsuranceAdditionRequestDTO);
-        orderInsuranceAdditionRequestDTO.setOperator("test");
+	    BeanUtils.copyProperties(orderInsuranceAdditionRequestVO,orderInsuranceAdditionRequestDTO);
+	    //获取操作人
+        orderInsuranceAdditionRequestDTO.setOperator(AdminUserUtil.getAdminUser().getAuthName());
         orderInsuranceAdditionRequestDTO.setInsuranceDate(DateUtils.formate(LocalDateTime.now(),DateUtils.DATE_DEFAUTE_4));
         ResponseEntity<String> responseEntity = restTemplate.postForEntity(insurancePurchaseUrl + ADD_PURCHASE, orderInsuranceAdditionRequestDTO, String.class);
         String result = responseEntity.getBody();

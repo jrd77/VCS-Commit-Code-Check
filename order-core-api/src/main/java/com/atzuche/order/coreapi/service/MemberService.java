@@ -82,7 +82,7 @@ public class MemberService {
         MemberStatisticsInfo memberStatisticsInfo = memberTotalInfo.getMemberStatisticsInfo();
         OwnerMemberDTO ownerMemberDto = new OwnerMemberDTO();
         ownerMemberDto.setMemNo(memNo);
-        ownerMemberDto.setPhone(memberCoreInfo.getPhone());
+        ownerMemberDto.setPhone(memberCoreInfo.getMobile()==null ? "" : String.valueOf(memberCoreInfo.getMobile()));
         ownerMemberDto.setHeaderUrl(memberCoreInfo.getPortraitPath());
         ownerMemberDto.setRealName(memberCoreInfo.getRealName());
         ownerMemberDto.setNickName(memberCoreInfo.getNickName());
@@ -228,6 +228,9 @@ public class MemberService {
         renterMemberDto.setCommUseDriverList(memberAdditionInfo.getCommUseDriverList());
         renterMemberDto.setIsNew(memberRoleInfo.getIsNew());
         renterMemberDto.setRenterCheck(memberAuthInfo.getRenterCheck());
+        renterMemberDto.setRegTime(memberCoreInfo.getRegTime()==null ? null: LocalDateTimeUtils.dateToLocalDateTime(memberCoreInfo.getRegTime()));
+        renterMemberDto.setOuterSource(memberBaseInfo.getOuterSource());
+
         List<RenterMemberRightDTO> rights = new ArrayList<>();
 
         if(memberRoleInfo != null){
