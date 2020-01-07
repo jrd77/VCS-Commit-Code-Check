@@ -258,7 +258,6 @@ account-all/account-renter-detain/.project
 account-all/account-renter-stopcost/.project
 account-all/account-renter-wz-deposit/.project
 admin-api/.project
-carowner-all/
 casier-all/cashier-api/.project
 config/.project
 config/config-client/.project
@@ -291,7 +290,4 @@ order-delivery/build/libs/
 order-flow/.project
 order-log/.project
 order-settle/build/
-order-settle/src/main/java/com/atzuche/order/settle/exception/
-order-settle/src/main/java/com/atzuche/order/settle/vo/res/
-renter-all/
 order-delivery/build
