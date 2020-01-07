@@ -10,6 +10,7 @@ import com.autoyol.commons.web.ResponseData;
 import com.autoyol.doc.annotation.AutoDocMethod;
 import com.autoyol.doc.annotation.AutoDocVersion;
 import com.atzuche.order.admin.vo.resp.renterWz.RenterWzDetailResVO;
+import com.dianping.cat.Cat;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.CollectionUtils;
@@ -51,8 +52,13 @@ public class RenterWzController extends BaseController {
         if(StringUtils.isBlank(costDetail.getOrderNo())){
             return ResponseData.createErrorCodeResponse(ErrorCode.ORDER_NO_PARAM_ERROR.getCode(), "订单编号为空");
         }
-        renterWzService.updateWzCost(costDetail.getOrderNo(),costDetail.getCostDetails());
-
+        try {
+            renterWzService.updateWzCost(costDetail.getOrderNo(),costDetail.getCostDetails());
+        } catch (Exception e) {
+            log.error("修改违章费用 异常", e);
+            Cat.logError("修改违章费用 异常", e);
+            return ResponseData.error();
+        }
         return ResponseData.success();
     }
 
@@ -62,7 +68,15 @@ public class RenterWzController extends BaseController {
         if (StringUtils.isBlank(orderNo)) {
             return ResponseData.createErrorCodeResponse(ErrorCode.ORDER_NO_PARAM_ERROR.getCode(), "订单编号为空");
         }
-        return ResponseData.success();
+        WzCostLogsResVO res = null;
+        try {
+            res = renterWzService.queryWzCostLogsByOrderNo(orderNo);
+        } catch (Exception e) {
+            log.error("查询违章费用日志 异常", e);
+            Cat.logError("查询违章费用日志 异常", e);
+            return ResponseData.error();
+        }
+        return ResponseData.success(res);
     }
 
     @GetMapping("/console/temporaryRefund/log")
@@ -71,7 +85,15 @@ public class RenterWzController extends BaseController {
         if (StringUtils.isBlank(orderNo)) {
             return ResponseData.createErrorCodeResponse(ErrorCode.ORDER_NO_PARAM_ERROR.getCode(), "订单编号为空");
         }
-        return ResponseData.success();
+        TemporaryRefundLogsResVO res = null;
+        try {
+            res = renterWzService.queryTemporaryRefundLogsByOrderNo(orderNo);
+        } catch (Exception e) {
+            log.error("查询暂扣返还日志 异常", e);
+            Cat.logError("查询暂扣返还日志 异常", e);
+            return ResponseData.error();
+        }
+        return ResponseData.success(res);
     }
 
     @PostMapping("/console/add/temporaryRefund")
@@ -79,6 +101,13 @@ public class RenterWzController extends BaseController {
     public ResponseData addTemporaryRefund(@Valid @RequestBody TemporaryRefundReqVO req, BindingResult bindingResult){
         if (bindingResult.hasErrors()) {
             return validate(bindingResult);
+        }
+        try {
+            renterWzService.addTemporaryRefund(req);
+        } catch (Exception e) {
+            log.error("添加暂扣返还 异常", e);
+            Cat.logError("添加暂扣返还 异常", e);
+            return ResponseData.error();
         }
         return ResponseData.success();
     }
