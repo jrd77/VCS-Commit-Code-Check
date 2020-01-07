@@ -168,6 +168,7 @@ public class TransIllegalMqService {
             String orderNo = jsonObject.getString(REN_YUN_MQ_INFO_ORDER_NO);
             //根据订单号 查询最后一个有效子订单的车牌
             String carNum = renterGoodsService.queryCarNumByOrderNo(orderNo);
+            //TODO
             Integer memNo = null;
             //就算之前存在 ，仍需要记录 这是日志表
             isNeedHandle(messageBody,"02",carNum);

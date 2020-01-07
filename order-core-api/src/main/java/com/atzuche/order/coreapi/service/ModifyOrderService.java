@@ -11,7 +11,6 @@ import com.atzuche.order.coreapi.modifyorder.exception.ModifyOrderParameterExcep
 import com.atzuche.order.coreapi.service.GoodsService.CarDetailReqVO;
 import com.atzuche.order.coreapi.utils.ModifyOrderUtils;
 import com.atzuche.order.delivery.entity.RenterOrderDeliveryEntity;
-import com.atzuche.order.delivery.enums.DeliveryTypeEnum;
 import com.atzuche.order.delivery.service.RenterOrderDeliveryService;
 import com.atzuche.order.delivery.service.delivery.DeliveryCarService;
 import com.atzuche.order.delivery.vo.delivery.OrderDeliveryDTO;
@@ -125,7 +124,7 @@ public class ModifyOrderService {
 		// DTO包装
 		ModifyOrderDTO modifyOrderDTO = getModifyOrderDTO(modifyOrderReq, renterOrderNo, initRenterOrder, deliveryList);
 		// 获取租客会员信息
-		RenterMemberDTO renterMemberDTO = getRenterMemberDTO(initRenterOrder.getRenterOrderNo());
+		RenterMemberDTO renterMemberDTO = getRenterMemberDTO(initRenterOrder.getRenterOrderNo(), renterOrderNo);
 		// 设置租客会员信息
 		modifyOrderDTO.setRenterMemberDTO(renterMemberDTO);
 		// 获取租客商品信息
@@ -177,6 +176,8 @@ public class ModifyOrderService {
 		renterOrderFineDeatailService.saveRenterOrderFineDeatailBatch(renterFineList);
 		// 保存附加驾驶人信息
 		saveAdditionalDriver(modifyOrderDTO);
+		// 保存优惠券信息
+		orderCouponService.insertBatch(costDeductVO.getOrderCouponList());
 		// 保存修改项目
 		orderChangeItemService.saveOrderChangeItemBatch(modifyOrderDTO.getChangeItemList());
 		// 保存配送订单信息
@@ -481,7 +482,7 @@ public class ModifyOrderService {
 			modifyOrderDTO.setSrvGetFlag(initRenterOrder.getIsGetCar());
 		}
 		if (modifyOrderReq.getSrvReturnFlag() == null) {
-			modifyOrderDTO.setSrvGetFlag(initRenterOrder.getIsReturnCar());
+			modifyOrderDTO.setSrvReturnFlag(initRenterOrder.getIsReturnCar());
 		}
 		if (modifyOrderReq.getUserCoinFlag() == null) {
 			modifyOrderDTO.setUserCoinFlag(initRenterOrder.getIsUseCoin());
@@ -536,20 +537,21 @@ public class ModifyOrderService {
 	
 	/**
 	 * 组装租客会员信息
-	 * @param renterOrderNo
+	 * @param renterOrderNo 修改前
+	 * @param updRenterOrderNo 修改后
 	 * @return RenterMemberDTO
 	 */
-	public RenterMemberDTO getRenterMemberDTO(String renterOrderNo) {
+	public RenterMemberDTO getRenterMemberDTO(String renterOrderNo, String updRenterOrderNo) {
 		// 获取租客会员信息
 		RenterMemberDTO renterMemberDTO = renterMemberService.selectrenterMemberByMemNo(renterOrderNo, true);
-		renterMemberDTO.setRenterOrderNo(renterOrderNo);
+		renterMemberDTO.setRenterOrderNo(updRenterOrderNo);
 		// 会员权益
 		List<RenterMemberRightDTO> renterMemberRightDTOList = renterMemberDTO.getRenterMemberRightDTOList();
 		if (renterMemberRightDTOList == null || renterMemberRightDTOList.isEmpty()) {
 			return renterMemberDTO;
 		}
 		for (RenterMemberRightDTO rr:renterMemberRightDTOList) {
-			rr.setRenterOrderNo(renterOrderNo);
+			rr.setRenterOrderNo(updRenterOrderNo);
 		}
 		return renterMemberDTO;
 	}
@@ -667,7 +669,7 @@ public class ModifyOrderService {
 	        if (comprehensiveEnsureAmount != null && initAbatementAmt != null && Math.abs(initAbatementAmt) > Math.abs(comprehensiveEnsureAmount)) {
 	        	Integer subsidyAmount = Math.abs(comprehensiveEnsureAmount) - Math.abs(initAbatementAmt);
 	        	// 产生补贴
-	        	RenterOrderSubsidyDetailDTO subsidyDetail = convertToRenterOrderSubsidyDetailDTO(renterOrderCostReqDTO.getCostBaseDTO(), subsidyAmount, SubsidyTypeCodeEnum.INSURE_AMT, 
+	        	RenterOrderSubsidyDetailDTO subsidyDetail = convertToRenterOrderSubsidyDetailDTO(renterOrderCostReqDTO.getCostBaseDTO(), subsidyAmount, SubsidyTypeCodeEnum.ABATEMENT_INSURE, 
 	        			SubsidySourceCodeEnum.PLATFORM, SubsidySourceCodeEnum.RENTER, RenterCashCodeEnum.ABATEMENT_INSURE, "修改订单全面保障费不退还");
 	        	renterSubsidyList.add(subsidyDetail);
 	        }
@@ -1089,6 +1091,9 @@ public class ModifyOrderService {
 		renterOrderReqVO.setIsNew((renterMemberDTO.getIsNew() != null && renterMemberDTO.getIsNew() == 1) ? true:false);
 		if (orderEntity.getCategory() != null) {
 			renterOrderReqVO.setOrderCategory(String.valueOf(orderEntity.getCategory()));
+		}
+		if (renterGoodsDetailDTO.getCarNo() != null) {
+			renterOrderReqVO.setCarNo(String.valueOf(renterGoodsDetailDTO.getCarNo()));
 		}
 		return renterOrderReqVO;
 	}

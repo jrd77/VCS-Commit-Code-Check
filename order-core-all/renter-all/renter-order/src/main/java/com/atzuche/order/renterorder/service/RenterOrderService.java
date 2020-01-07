@@ -291,6 +291,7 @@ public class RenterOrderService {
         	getReturnCarOverCostReqDto.setOrderType(Integer.valueOf(renterOrderReqVO.getOrderCategory()));
         }
 
+
         //租车费用计算相关参数
         RenterOrderCostReqDTO renterOrderCostReqDTO = new RenterOrderCostReqDTO();
         renterOrderCostReqDTO.setCostBaseDTO(costBaseDTO);

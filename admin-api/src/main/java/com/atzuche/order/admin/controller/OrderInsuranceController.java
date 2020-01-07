@@ -105,7 +105,7 @@ public class OrderInsuranceController {
 
     @AutoDocMethod(description = "导入保险信息excel", value = "导入保险信息excel", response = ResponseData.class)
     @PostMapping("/import")
-    public ResponseData<ResponseData> importExcel(@RequestParam("batchFile") MultipartFile batchFile, @RequestBody OrderInsuranceImportRequestVO orderInsuranceImportRequestVO, BindingResult bindingResult) {
+    public ResponseData<ResponseData> importExcel(@RequestParam("batchFile") MultipartFile batchFile, OrderInsuranceImportRequestVO orderInsuranceImportRequestVO, BindingResult bindingResult) {
         try {
             if(!batchFile.isEmpty()) {
                 String fileType = batchFile.getContentType();
@@ -120,6 +120,8 @@ public class OrderInsuranceController {
 
                     OSSUtils.uploadMultipartFile(key, batchFile);
                     OrderInsuranceImportRequestDTO orderInsuranceImportRequestDTO = new OrderInsuranceImportRequestDTO();
+                    orderInsuranceImportRequestDTO.setOssFileKey(key);
+                    orderInsuranceImportRequestDTO.setCreateOp("test");
                     BeanUtils.copyProperties(orderInsuranceImportRequestVO, orderInsuranceImportRequestDTO);
                     ResponseEntity<String> responseEntity = restTemplate.postForEntity(insurancePurchaseUrl+IMPORT_PURCHASE, orderInsuranceImportRequestDTO,String.class);
                     String body = responseEntity.getBody();
