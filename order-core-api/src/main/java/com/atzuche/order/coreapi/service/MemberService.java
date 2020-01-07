@@ -228,6 +228,9 @@ public class MemberService {
         renterMemberDto.setCommUseDriverList(memberAdditionInfo.getCommUseDriverList());
         renterMemberDto.setIsNew(memberRoleInfo.getIsNew());
         renterMemberDto.setRenterCheck(memberAuthInfo.getRenterCheck());
+        renterMemberDto.setRegTime(memberCoreInfo.getRegTime()==null ? null: LocalDateTimeUtils.dateToLocalDateTime(memberCoreInfo.getRegTime()));
+        renterMemberDto.setOuterSource(memberBaseInfo.getOuterSource());
+
         List<RenterMemberRightDTO> rights = new ArrayList<>();
 
         if(memberRoleInfo != null){
