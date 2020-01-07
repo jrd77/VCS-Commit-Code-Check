@@ -1,7 +1,9 @@
 package com.atzuche.order.admin.controller;
 
-import com.atzuche.order.admin.vo.req.wallet.WalletRequestVO;
-import com.atzuche.order.admin.vo.resp.wallet.WalletResponseVO;
+import com.atzuche.order.admin.vo.req.order.MainOrderRequestVO;
+import com.atzuche.order.admin.vo.req.order.RenterOrderRequestVO;
+import com.atzuche.order.admin.vo.resp.order.MainOrderResponseVO;
+import com.atzuche.order.admin.vo.resp.order.RenterOrderListResponseVO;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.doc.annotation.AutoDocMethod;
@@ -16,15 +18,15 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RequestMapping("/console/order/")
 @RestController
-@AutoDocVersion(version = "钱包接口文档")
-public class WalletController {
+@AutoDocVersion(version = "凹凸币接口文档")
+public class RenterOrderController {
 
-    private static final Logger logger = LoggerFactory.getLogger(WalletController.class);
+    private static final Logger logger = LoggerFactory.getLogger(RenterOrderController.class);
 
 
-	@AutoDocMethod(description = "获取钱包余额", value = "获取钱包余额", response = WalletResponseVO.class)
-	@GetMapping("wallet/balance")
-	public ResponseData walletBalance(@RequestBody WalletRequestVO walletRequestVO, BindingResult bindingResult) {
+	@AutoDocMethod(description = "获取子订单列表", value = "获取子订单列表", response = RenterOrderListResponseVO.class)
+	@GetMapping("renter/list")
+	public ResponseData renterList(@RequestBody RenterOrderRequestVO renterOrderRequestVO, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), ErrorCode.INPUT_ERROR.getText());
         }

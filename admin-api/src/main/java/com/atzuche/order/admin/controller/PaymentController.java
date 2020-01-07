@@ -1,7 +1,9 @@
 package com.atzuche.order.admin.controller;
 
-import com.atzuche.order.admin.vo.req.wallet.WalletRequestVO;
-import com.atzuche.order.admin.vo.resp.wallet.WalletResponseVO;
+import com.atzuche.order.admin.vo.req.order.MainOrderRequestVO;
+import com.atzuche.order.admin.vo.req.payment.PaymentRequestVO;
+import com.atzuche.order.admin.vo.resp.order.MainOrderResponseVO;
+import com.atzuche.order.admin.vo.resp.payment.PaymentInformationResponseVO;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.doc.annotation.AutoDocMethod;
@@ -16,15 +18,15 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RequestMapping("/console/order/")
 @RestController
-@AutoDocVersion(version = "钱包接口文档")
-public class WalletController {
+@AutoDocVersion(version = "订单接口文档")
+public class PaymentController {
 
-    private static final Logger logger = LoggerFactory.getLogger(WalletController.class);
+    private static final Logger logger = LoggerFactory.getLogger(PaymentController.class);
 
 
-	@AutoDocMethod(description = "获取钱包余额", value = "获取钱包余额", response = WalletResponseVO.class)
-	@GetMapping("wallet/balance")
-	public ResponseData walletBalance(@RequestBody WalletRequestVO walletRequestVO, BindingResult bindingResult) {
+	@AutoDocMethod(description = "支付信息", value = "支付信息", response = PaymentInformationResponseVO.class)
+	@GetMapping("payment/information")
+	public ResponseData platformDisCouponList(@RequestBody PaymentRequestVO paymentRequestVO, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), ErrorCode.INPUT_ERROR.getText());
         }

@@ -1,7 +1,9 @@
 package com.atzuche.order.admin.controller;
 
-import com.atzuche.order.admin.vo.req.wallet.WalletRequestVO;
-import com.atzuche.order.admin.vo.resp.wallet.WalletResponseVO;
+import com.atzuche.order.admin.vo.req.order.ModificationOrderRequestVO;
+import com.atzuche.order.admin.vo.req.order.OrderResponsibilityRequestVO;
+import com.atzuche.order.admin.vo.resp.order.ModificationOrderListResponseVO;
+import com.atzuche.order.admin.vo.resp.order.OrderResponsibilityResponseVO;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.doc.annotation.AutoDocMethod;
@@ -16,15 +18,15 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RequestMapping("/console/order/")
 @RestController
-@AutoDocVersion(version = "钱包接口文档")
-public class WalletController {
+@AutoDocVersion(version = "订单接口文档")
+public class OrderResponsibilityController {
 
-    private static final Logger logger = LoggerFactory.getLogger(WalletController.class);
+    private static final Logger logger = LoggerFactory.getLogger(OrderResponsibilityController.class);
 
 
-	@AutoDocMethod(description = "获取钱包余额", value = "获取钱包余额", response = WalletResponseVO.class)
-	@GetMapping("wallet/balance")
-	public ResponseData walletBalance(@RequestBody WalletRequestVO walletRequestVO, BindingResult bindingResult) {
+	@AutoDocMethod(description = "获取订单责任信息", value = "获取订单责任信息", response = OrderResponsibilityResponseVO.class)
+	@GetMapping("responsibility/information")
+	public ResponseData responsibilityInformation(@RequestBody OrderResponsibilityRequestVO orderResponsibilityRequestVO, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), ErrorCode.INPUT_ERROR.getText());
         }

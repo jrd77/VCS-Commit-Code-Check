@@ -1,7 +1,10 @@
 package com.atzuche.order.admin.controller;
 
-import com.atzuche.order.admin.vo.req.wallet.WalletRequestVO;
-import com.atzuche.order.admin.vo.resp.wallet.WalletResponseVO;
+import com.atzuche.order.admin.vo.req.autocoin.AutoCoinRequestVO;
+import com.atzuche.order.admin.vo.req.calendar.CalendarRequestVO;
+import com.atzuche.order.admin.vo.resp.autocoin.AutoCoinResponseVO;
+import com.atzuche.order.admin.vo.resp.calendar.CalendarListResponseVO;
+import com.atzuche.order.admin.vo.resp.calendar.CalendarResponseVO;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.doc.annotation.AutoDocMethod;
@@ -16,15 +19,15 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RequestMapping("/console/order/")
 @RestController
-@AutoDocVersion(version = "钱包接口文档")
-public class WalletController {
+@AutoDocVersion(version = "订单接口文档")
+public class CalendarController {
 
-    private static final Logger logger = LoggerFactory.getLogger(WalletController.class);
+    private static final Logger logger = LoggerFactory.getLogger(CalendarController.class);
 
 
-	@AutoDocMethod(description = "获取钱包余额", value = "获取钱包余额", response = WalletResponseVO.class)
-	@GetMapping("wallet/balance")
-	public ResponseData walletBalance(@RequestBody WalletRequestVO walletRequestVO, BindingResult bindingResult) {
+	@AutoDocMethod(description = "获取车辆价格日历", value = "获取车辆价格日历", response = CalendarListResponseVO.class)
+	@GetMapping("car/calendar/price")
+	public ResponseData carCalendarPrice(@RequestBody CalendarRequestVO calendarRequestVO, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), ErrorCode.INPUT_ERROR.getText());
         }

@@ -1,7 +1,11 @@
 package com.atzuche.order.admin.controller;
 
-import com.atzuche.order.admin.vo.req.autocoin.AutoCoinRequestVO;
-import com.atzuche.order.admin.vo.resp.autocoin.AutoCoinResponseVO;
+import com.atzuche.order.admin.vo.req.order.ModificationOrderRequestVO;
+import com.atzuche.order.admin.vo.req.order.OrderStatusRequestVO;
+import com.atzuche.order.admin.vo.req.payment.PaymentRequestVO;
+import com.atzuche.order.admin.vo.resp.order.ModificationOrderListResponseVO;
+import com.atzuche.order.admin.vo.resp.order.OrderStatusListResponseVO;
+import com.atzuche.order.admin.vo.resp.payment.PaymentInformationResponseVO;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.doc.annotation.AutoDocMethod;
@@ -17,14 +21,14 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/console/order/")
 @RestController
 @AutoDocVersion(version = "订单接口文档")
-public class AutoCoinController {
+public class ModificationOrderController {
 
-    private static final Logger logger = LoggerFactory.getLogger(AutoCoinController.class);
+    private static final Logger logger = LoggerFactory.getLogger(ModificationOrderController.class);
 
 
-	@AutoDocMethod(description = "获取凹凸币余额", value = "获取钱包余额", response = AutoCoinResponseVO.class)
-	@GetMapping("autocoin/balance")
-	public ResponseData autocoinBalance(@RequestBody AutoCoinRequestVO autoCoinRequestVO, BindingResult bindingResult) {
+	@AutoDocMethod(description = "订单修改信息列表", value = "订单修改信息列表", response = ModificationOrderListResponseVO.class)
+	@GetMapping("status/list")
+	public ResponseData statusList(@RequestBody ModificationOrderRequestVO modificationOrderRequestVO, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), ErrorCode.INPUT_ERROR.getText());
         }
