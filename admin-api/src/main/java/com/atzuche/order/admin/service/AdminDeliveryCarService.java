@@ -11,14 +11,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author 胡春林
  * 配送信息服务
  */
 @Service
-public class DeliveryCarService {
+public class AdminDeliveryCarService {
 
     @Autowired
     DeliveryCarInfoService deliveryCarInfoService;
@@ -53,7 +52,6 @@ public class DeliveryCarService {
      * @param handoverCarReqVO
      * @throws Exception
      */
-    @Transactional(rollbackFor = Exception.class)
     public void updateHandoverCarInfo(HandoverCarInfoReqVO handoverCarReqVO) throws Exception {
         logger.info("入参handoverCarReqVO：[{}]", handoverCarReqVO.toString());
         handoverCarInfoService.updateHandoverCarInfo(handoverCarReqVO);
