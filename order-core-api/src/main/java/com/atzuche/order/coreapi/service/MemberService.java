@@ -82,7 +82,7 @@ public class MemberService {
         MemberStatisticsInfo memberStatisticsInfo = memberTotalInfo.getMemberStatisticsInfo();
         OwnerMemberDTO ownerMemberDto = new OwnerMemberDTO();
         ownerMemberDto.setMemNo(memNo);
-        ownerMemberDto.setPhone(memberCoreInfo.getPhone());
+        ownerMemberDto.setPhone(memberCoreInfo.getMobile()==null ? "" : String.valueOf(memberCoreInfo.getMobile()));
         ownerMemberDto.setHeaderUrl(memberCoreInfo.getPortraitPath());
         ownerMemberDto.setRealName(memberCoreInfo.getRealName());
         ownerMemberDto.setNickName(memberCoreInfo.getNickName());
