@@ -142,6 +142,9 @@ public class DeliveryCarService {
                 renterDeliveryAddrDTO.setExpGetCarAddr(carShowAddr);
                 renterDeliveryAddrDTO.setExpGetCarLat(carShowLat);
                 renterDeliveryAddrDTO.setExpGetCarLon(carShowLng);
+                renterDeliveryAddrDTO.setExpReturnCarAddr(carShowAddr);
+                renterDeliveryAddrDTO.setExpReturnCarLat(carShowLat);
+                renterDeliveryAddrDTO.setExpReturnCarLon(carShowLng);
                 renterDeliveryAddrDTO.setOrderNo(renterGoodsDetailDTO.getOrderNo());
                 renterDeliveryAddrDTO.setRenterOrderNo(renterGoodsDetailDTO.getRenterOrderNo());
                 renterDeliveryAddrDTO.setCreateTime(LocalDateTime.now());
@@ -155,9 +158,12 @@ public class DeliveryCarService {
             renterDeliveryAddrDTO.setActReturnCarAddr(orderReqVO.getSrvReturnAddr());
             renterDeliveryAddrDTO.setActReturnCarLat(orderReqVO.getSrvReturnLat());
             renterDeliveryAddrDTO.setActReturnCarLon(orderReqVO.getSrvReturnLon());
-            renterDeliveryAddrDTO.setExpGetCarAddr(orderReqVO.getSrvReturnAddr());
-            renterDeliveryAddrDTO.setExpGetCarLat(orderReqVO.getSrvReturnLat());
-            renterDeliveryAddrDTO.setExpGetCarLon(orderReqVO.getSrvReturnLon());
+            renterDeliveryAddrDTO.setExpReturnCarAddr(orderReqVO.getSrvReturnAddr());
+            renterDeliveryAddrDTO.setExpReturnCarLat(orderReqVO.getSrvReturnLat());
+            renterDeliveryAddrDTO.setExpReturnCarLon(orderReqVO.getSrvReturnLon());
+            renterDeliveryAddrDTO.setExpGetCarAddr(orderReqVO.getSrvGetAddr());
+            renterDeliveryAddrDTO.setExpGetCarLat(orderReqVO.getSrvGetLat());
+            renterDeliveryAddrDTO.setExpGetCarLon(orderReqVO.getSrvGetLon());
             renterDeliveryAddrDTO.setCreateTime(LocalDateTime.now());
             renterDeliveryAddrDTO.setOrderNo(renterGoodsDetailDTO.getOrderNo());
             renterDeliveryAddrDTO.setRenterOrderNo(renterGoodsDetailDTO.getRenterOrderNo());
@@ -179,6 +185,7 @@ public class DeliveryCarService {
             orderDeliveryDTO.setOwnerGetReturnAddrLon(orderReqVO.getSrvReturnLon());
             orderDeliveryDTO.setOwnerName(ownerMemberDTO.getRealName());
             orderDeliveryDTO.setOwnerPhone(ownerMemberDTO.getPhone());
+            orderDeliveryDTO.setRenterPhone(renterMemberDTO.getPhone());
             orderDeliveryDTO.setRenterOrderNo(renterGoodsDetailDTO.getRenterOrderNo());
             orderDeliveryDTO.setRentTime(renterGoodsDetailDTO.getRentTime());
             orderDeliveryDTO.setRevertTime(renterGoodsDetailDTO.getRevertTime());
