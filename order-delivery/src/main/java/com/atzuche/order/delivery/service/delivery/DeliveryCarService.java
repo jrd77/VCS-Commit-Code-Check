@@ -191,8 +191,12 @@ public class DeliveryCarService {
             orderDeliveryDTO.setRevertTime(renterGoodsDetailDTO.getRevertTime());
             orderDeliveryDTO.setType(orderType);
             if (orderType == UsedDeliveryTypeEnum.USED.getValue().intValue()) {
+                orderDeliveryDTO.setGetReturnUserName(renterMemberDTO.getRealName());
+                orderDeliveryDTO.setGetReturnUserPhone(renterMemberDTO.getPhone());
                 renYunFlowOrderDTO.setPickupcaraddr(orderDeliveryDTO.getRenterGetReturnAddr());
             } else {
+                orderDeliveryDTO.setGetReturnUserName(ownerMemberDTO.getRealName());
+                orderDeliveryDTO.setGetReturnUserPhone(ownerMemberDTO.getPhone());
                 renYunFlowOrderDTO.setAlsocaraddr(orderDeliveryDTO.getRenterGetReturnAddr());
             }
             /**组装仁云信息**/
