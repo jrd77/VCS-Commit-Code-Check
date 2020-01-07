@@ -101,6 +101,9 @@ public class DeliveryCarTask {
             RenterDeliveryAddrEntity renterDeliveryAddrEntity = deliveryAddrMapper.selectByRenterOrderNo(deliveryAddrEntity.getRenterOrderNo());
             if (null == renterDeliveryAddrEntity) {
                 deliveryAddrMapper.insertSelective(deliveryAddrEntity);
+            }else {
+                CommonUtil.copyPropertiesIgnoreNull(deliveryAddrEntity,renterDeliveryAddrEntity);
+                deliveryAddrMapper.updateByPrimaryKey(renterDeliveryAddrEntity);
             }
         }
         if (orderDeliveryVO.getOrderDeliveryDTO() != null) {
