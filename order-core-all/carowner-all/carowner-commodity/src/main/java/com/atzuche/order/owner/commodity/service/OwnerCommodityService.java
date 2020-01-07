@@ -79,7 +79,7 @@ public class OwnerCommodityService {
         LocalDateTime rentTime = ownerGoodsDetailDTO.getRentTime();
         LocalDateTime revertTime = ownerGoodsDetailDTO.getRevertTime();
         LocalDateTime oldRentTime = ownerGoodsDetailDTO.getOldRentTime();
-        if(oldRentTime == null && !oldRentTime.isEqual(rentTime)){
+        if(oldRentTime == null || !oldRentTime.isEqual(rentTime)){
             return;
         }
 
