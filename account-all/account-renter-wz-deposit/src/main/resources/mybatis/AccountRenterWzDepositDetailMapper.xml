@@ -52,8 +52,8 @@
 		select <include refid="Base_Column_List" /> from account_renter_wz_deposit_detail where id = #{value}
 	</select>
 
-	<select id="selectALL" resultMap="BaseResultMap">
-		select  <include refid="Base_Column_List" /> from account_renter_wz_deposit_detail order by id desc
+	<select id="findByOrderNo" resultMap="BaseResultMap">
+		select  <include refid="Base_Column_List" /> from account_renter_wz_deposit_detail where order_no=#{orderNo} and is_delete=0 order by id desc
 	</select>
 
 	 
@@ -71,12 +71,9 @@
 				`source_detail`,		
 				`authorize_amt`,		
 				`authorize_expire_time`,		
-				`unique_no`,		
-				`create_time`,		
-				`create_op`,		
-				`update_time`,		
-				`update_op`,		
-				`is_delete`		
+				`unique_no`,
+				`create_op`,
+				`update_op`
 			)
 		values
 		(
@@ -91,12 +88,9 @@
 				#{sourceDetail}, 		
 				#{authorizeAmt}, 		
 				#{authorizeExpireTime}, 		
-				#{uniqueNo}, 		
-				#{createTime}, 		
-				#{createOp}, 		
-				#{updateTime}, 		
-				#{updateOp}, 		
-				#{isDelete}		
+				#{uniqueNo},
+				#{createOp},
+				#{updateOp}
 			)
 	</insert>
 	
@@ -143,54 +137,6 @@
 			)
 	</insert>
 	
-	 
-	<update id="updateByPrimaryKeySelective" parameterType="com.atzuche.order.accountrenterwzdepost.entity.AccountRenterWzDepositDetailEntity">
-		update account_renter_wz_deposit_detail 
-		<set>
-				<if test="orderNo != null">`order_no` = #{orderNo}, </if>
-				<if test="memNo != null">`mem_no` = #{memNo}, </if>
-				<if test="payment != null">`payment` = #{payment}, </if>
-				<if test="payChannel != null">`pay_channel` = #{payChannel}, </if>
-				<if test="costCode != null">`cost_code` = #{costCode}, </if>
-				<if test="costDetail != null">`cost_detail` = #{costDetail}, </if>
-				<if test="amt != null">`amt` = #{amt}, </if>
-				<if test="sourceCode != null">`source_code` = #{sourceCode}, </if>
-				<if test="sourceDetail != null">`source_detail` = #{sourceDetail}, </if>
-				<if test="authorizeAmt != null">`authorize_amt` = #{authorizeAmt}, </if>
-				<if test="authorizeExpireTime != null">`authorize_expire_time` = #{authorizeExpireTime}, </if>
-				<if test="uniqueNo != null">`unique_no` = #{uniqueNo}, </if>
-				<if test="createTime != null">`create_time` = #{createTime}, </if>
-				<if test="createOp != null">`create_op` = #{createOp}, </if>
-				<if test="updateTime != null">`update_time` = #{updateTime}, </if>
-				<if test="updateOp != null">`update_op` = #{updateOp}, </if>
-				<if test="isDelete != null">`is_delete` = #{isDelete}</if>
-			</set>
-		where id = #{id}
-	</update>
-	
-	<update id="updateByPrimaryKey" parameterType="com.atzuche.order.accountrenterwzdepost.entity.AccountRenterWzDepositDetailEntity">
-		update account_renter_wz_deposit_detail 
-		<set>
-				`order_no` = #{orderNo}, 		
-				`mem_no` = #{memNo}, 		
-				`payment` = #{payment}, 		
-				`pay_channel` = #{payChannel}, 		
-				`cost_code` = #{costCode}, 		
-				`cost_detail` = #{costDetail}, 		
-				`amt` = #{amt}, 		
-				`source_code` = #{sourceCode}, 		
-				`source_detail` = #{sourceDetail}, 		
-				`authorize_amt` = #{authorizeAmt}, 		
-				`authorize_expire_time` = #{authorizeExpireTime}, 		
-				`unique_no` = #{uniqueNo}, 		
-				`create_time` = #{createTime}, 		
-				`create_op` = #{createOp}, 		
-				`update_time` = #{updateTime}, 		
-				`update_op` = #{updateOp}, 		
-				`is_delete` = #{isDelete}		
-	
-		</set>
-		where id = #{id}
-	</update>
+
   	
 </mapper>

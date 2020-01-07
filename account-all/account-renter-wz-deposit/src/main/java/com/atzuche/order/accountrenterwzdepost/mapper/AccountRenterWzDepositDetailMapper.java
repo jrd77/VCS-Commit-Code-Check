@@ -15,14 +15,17 @@ public interface AccountRenterWzDepositDetailMapper{
 
     AccountRenterWzDepositDetailEntity selectByPrimaryKey(Integer id);
 
-    List<AccountRenterWzDepositDetailEntity> selectALL();
+    /**
+     * 获取指定订单号的违章押金进出流水记录
+     * @param orderNo
+     * @return
+     */
+    List<AccountRenterWzDepositDetailEntity> findByOrderNo(String orderNo);
+
 
     int insert(AccountRenterWzDepositDetailEntity record);
     
     int insertSelective(AccountRenterWzDepositDetailEntity record);
 
-    int updateByPrimaryKey(AccountRenterWzDepositDetailEntity record);
-    
-    int updateByPrimaryKeySelective(AccountRenterWzDepositDetailEntity record);
 
 }
