@@ -108,7 +108,8 @@ public class SubmitOrderController {
 
     @AutoDocMethod(description = "提交订单(管理后台)", value = "提交订单(管理后台)", response = OrderResVO.class)
     @PostMapping("/admin/req")
-    public ResponseData<OrderResVO> submitOrder(@RequestBody AdminOrderReqVO adminOrderReqVO, BindingResult bindingResult) {
+    public ResponseData<OrderResVO> submitOrder(@Valid @RequestBody AdminOrderReqVO adminOrderReqVO,
+                                                BindingResult bindingResult) {
 
 
         LOGGER.info("Submit order.param is,adminOrderReqVO:[{}]", JSON.toJSONString(adminOrderReqVO));
