@@ -279,13 +279,15 @@ public class ModifyOrderForOwnerService {
 	 * @param ownerOrderNo
 	 * @return CarDetailReqVO
 	 */
-	public CarDetailReqVO convertToCarDetailReqVO(ModifyOrderOwnerDTO modifyOrderOwnerDTO, OwnerOrderEntity ownerOrderEntity) {
+	public GoodsService.CarDetailReqVO convertToCarDetailReqVO(ModifyOrderOwnerDTO modifyOrderOwnerDTO, OwnerOrderEntity ownerOrderEntity) {
 		// 车主子订单号
 		String ownerOrderNo = ownerOrderEntity.getOwnerOrderNo();
 		// 获取车主商品信息
 		OwnerGoodsDetailDTO ownerGoodsDetailDTO = ownerCommodityService.getOwnerGoodsDetail(ownerOrderNo, false);
-		CarDetailReqVO carDetailReqVO = new CarDetailReqVO(); 
-		carDetailReqVO.setAddrIndex(ownerGoodsDetailDTO.getCarAddrIndex());
+		GoodsService.CarDetailReqVO carDetailReqVO = new GoodsService.CarDetailReqVO(); 
+		if (ownerGoodsDetailDTO.getCarAddrIndex() != null) {
+			carDetailReqVO.setAddrIndex(ownerGoodsDetailDTO.getCarAddrIndex());
+		}
 		carDetailReqVO.setCarNo(String.valueOf(ownerGoodsDetailDTO.getCarNo()));
 		carDetailReqVO.setRentTime(modifyOrderOwnerDTO.getRentTime());
 		carDetailReqVO.setRevertTime(modifyOrderOwnerDTO.getRevertTime());

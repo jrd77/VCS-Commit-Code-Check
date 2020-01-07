@@ -32,9 +32,10 @@ public interface WzTemporaryRefundLogMapper{
 
 	/**
 	 * 批量查询
+	 * @param orderNo 订单号
 	 * @return 查询列表
 	 */
-	List<WzTemporaryRefundLogEntity> queryList();
+	List<WzTemporaryRefundLogEntity> queryTemporaryRefundLogsByOrderNo(@Param("orderNo") String orderNo);
 
 	/**
 	 * 修改

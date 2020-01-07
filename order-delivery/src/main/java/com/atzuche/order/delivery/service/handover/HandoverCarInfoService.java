@@ -1,22 +1,23 @@
-package com.atzuche.order.admin.service;
+package com.atzuche.order.delivery.service.handover;
 
-import com.atzuche.order.admin.vo.req.delivery.CarConditionPhotoUploadVO;
-import com.atzuche.order.admin.vo.req.delivery.DeliveryReqDTO;
-import com.atzuche.order.admin.vo.req.delivery.DeliveryReqVO;
-import com.atzuche.order.admin.vo.req.handover.HandoverCarInfoReqDTO;
-import com.atzuche.order.admin.vo.req.handover.HandoverCarInfoReqVO;
 import com.atzuche.order.commons.CommonUtils;
 import com.atzuche.order.delivery.common.DeliveryErrorCode;
-import com.atzuche.order.delivery.entity.*;
+import com.atzuche.order.delivery.entity.OwnerHandoverCarInfoEntity;
+import com.atzuche.order.delivery.entity.RenterHandoverCarInfoEntity;
+import com.atzuche.order.delivery.entity.RenterHandoverCarRemarkEntity;
+import com.atzuche.order.delivery.entity.RenterOrderDeliveryEntity;
 import com.atzuche.order.delivery.enums.HandoverCarTypeEnum;
 import com.atzuche.order.delivery.exception.DeliveryOrderException;
 import com.atzuche.order.delivery.exception.HandoverCarOrderException;
-import com.atzuche.order.delivery.mapper.OwnerHandoverCarRemarkMapper;
-import com.atzuche.order.delivery.mapper.RenterDeliveryAddrMapper;
 import com.atzuche.order.delivery.mapper.RenterHandoverCarRemarkMapper;
 import com.atzuche.order.delivery.mapper.RenterOrderDeliveryMapper;
-import com.atzuche.order.delivery.service.handover.HandoverCarService;
+import com.atzuche.order.delivery.service.delivery.DeliveryCarService;
 import com.atzuche.order.delivery.utils.OSSUtils;
+import com.atzuche.order.delivery.vo.delivery.req.CarConditionPhotoUploadVO;
+import com.atzuche.order.delivery.vo.delivery.req.DeliveryReqDTO;
+import com.atzuche.order.delivery.vo.delivery.req.DeliveryReqVO;
+import com.atzuche.order.delivery.vo.handover.req.HandoverCarInfoReqDTO;
+import com.atzuche.order.delivery.vo.handover.req.HandoverCarInfoReqVO;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,20 +40,14 @@ public class HandoverCarInfoService {
 
     protected  final Logger logger = LoggerFactory.getLogger(getClass());
 
-//    @Autowired
+    @Autowired
     HandoverCarService handoverCarService;
-//    @Autowired
-    DeliveryCarInfoService deliveryCarInfoService;
-    /**
-     * 暂时放admin
-     */
-    //FIXME: remove -----
-//    @Resource
+    @Autowired
+    DeliveryCarService deliveryCarInfoService;
+    @Resource
     RenterOrderDeliveryMapper renterOrderDeliveryMapper;
-//    @Resource
+    @Resource
     RenterHandoverCarRemarkMapper renterHandoverCarRemarkMapper;
-//    @Resource
-    OwnerHandoverCarRemarkMapper ownerHandoverCarRemarkMapper;
 
     /**
      * 上传交接车
@@ -123,6 +118,7 @@ public class HandoverCarInfoService {
      * @param deliveryReqVO
      * @throws Exception
      */
+    @Transactional(rollbackFor = Exception.class)
     public void updateDeliveryCarInfo(DeliveryReqVO deliveryReqVO) throws Exception {
         logger.debug("参数：{}", ToStringBuilder.reflectionToString(deliveryReqVO));
         if (Objects.isNull(deliveryReqVO)) {
@@ -157,8 +153,6 @@ public class HandoverCarInfoService {
                 renterHandoverCarRemarkEntity.setRemark(deliveryReqDTO.getRenterRealGetAddrReamrk());
                 //更新交接车备注数据
 
-
-
             }else {
                 throw new DeliveryOrderException(DeliveryErrorCode.DELIVERY_PARAMS_ERROR.getValue(),"没有合适的参数");
             }
@@ -172,8 +166,6 @@ public class HandoverCarInfoService {
             {
                 //1.更新配送訂單表
                 //2.根据原先的状态发送仁云取消事件
-
-
             }
 
         }

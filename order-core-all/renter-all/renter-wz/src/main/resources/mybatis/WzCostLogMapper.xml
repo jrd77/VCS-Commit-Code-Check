@@ -35,9 +35,10 @@
 		where id = #{id}
 	</select>
 
-	<select id="queryList" resultType="com.atzuche.order.renterwz.entity.WzCostLogEntity">
+	<select id="queryWzCostLogsByOrderNo" resultMap="selectColumnMap" parameterType="java.lang.String">
 		select <include refid="select_column" />
 		from wz_cost_log
+		where order_no = #{orderNo} order by id desc
 	</select>
 
 </mapper>

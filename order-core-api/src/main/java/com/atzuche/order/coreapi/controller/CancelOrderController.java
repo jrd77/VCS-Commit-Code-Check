@@ -2,13 +2,16 @@ package com.atzuche.order.coreapi.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.vo.req.CancelOrderReqVO;
+import com.atzuche.order.coreapi.service.CancelOrderService;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.doc.annotation.AutoDocMethod;
 import com.autoyol.doc.annotation.AutoDocVersion;
+import com.netflix.discovery.converters.Auto;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -33,6 +36,9 @@ public class CancelOrderController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CancelOrderController.class);
 
+    @Autowired
+    private CancelOrderService cancelOrderService;
+
 
     @AutoDocMethod(description = "取消订单", value = "取消订单")
     @PostMapping("/normal/cancel")
@@ -52,7 +58,7 @@ public class CancelOrderController {
         }
 
 
-
+        cancelOrderService.cancel(cancelOrderReqVO);
 
 
         return ResponseData.success();

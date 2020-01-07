@@ -75,6 +75,10 @@ public class ModifyOrderUtils {
 	 * @return boolean
 	 */
 	public static boolean getModifyGetReturnAddrFlag(String initLon, String initLat, String updLon, String updLat) {
+		if ((StringUtils.isBlank(initLon) && StringUtils.isNotBlank(updLon)) || 
+				(StringUtils.isBlank(initLat) && StringUtils.isNotBlank(updLat))) {
+			return true;
+		}
 		if (StringUtils.isNotBlank(initLon) && StringUtils.isNotBlank(updLon)) {
 			BigDecimal bigInitLon = new BigDecimal(initLon);
 			BigDecimal bigLon = new BigDecimal(updLon);

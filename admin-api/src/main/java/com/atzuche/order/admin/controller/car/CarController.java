@@ -1,11 +1,12 @@
 package com.atzuche.order.admin.controller.car;
 
-import com.atzuche.order.admin.vo.resp.car.CarBaseInfoResVo;
+import com.atzuche.order.admin.vo.req.car.CarBaseInfoReqVO;
 import com.atzuche.order.admin.vo.req.car.CarBaseReqVO;
 import com.atzuche.order.admin.vo.req.car.CarOtherConfigReqVo;
-import com.atzuche.order.admin.vo.req.car.CarBaseInfoReqVO;
+import com.atzuche.order.admin.vo.resp.car.CarBaseInfoResVo;
 import com.atzuche.order.admin.vo.resp.car.CarBusinessResVO;
 import com.atzuche.order.admin.vo.resp.car.CarOtherConfigResVo;
+import com.atzuche.order.commons.DateUtils;
 import com.autoyol.car.api.exception.BaseException;
 import com.autoyol.car.api.feign.api.CarDetailQueryFeignApi;
 import com.autoyol.car.api.model.vo.CarBaseVO;
@@ -25,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import java.util.Date;
 import java.util.Objects;
 
 
@@ -134,11 +136,53 @@ public class CarController {
         return ResponseData.success(null);
     }
 
-    @AutoDocMethod(description = "【liujun】车辆运营信息", value = "保存车辆其他配置", response = CarBusinessResVO.class)
+    /**
+     * 老后台参考:
+     * com.autoyolConsole.controller.TransController.detail(String, String, HttpServletRequest)
+     * /autoyolConsole/src/main/webapp/WEB-INF/view/trans/detail.jsp
+     */
+    @AutoDocMethod(description = "【liujun】订单详细信息-查看车辆信息-车辆运营信息", value = "【liujun】订单详细信息-查看车辆信息-车辆运营信息", response = CarBusinessResVO.class)
     @PostMapping(value = "/car/bussiness")
     public ResponseData <?> getCarBusiness(@Valid @RequestBody CarBaseReqVO reqVo, BindingResult bindingResult) {
-
-        return ResponseData.success(null);
+        try {
+            ResponseObject <CarBaseVO> responseObject = carDetailQueryFeignApi.getCarDetailByCarNo(reqVo.getCarNo());
+            if(Objects.isNull(responseObject)){
+                return ResponseData.error();
+            }else if(!Objects.equals(responseObject.getResCode(), ErrorCode.SUCCESS.getCode())){
+                return new ResponseData <>(responseObject.getResCode(), responseObject.getResMsg());
+            }
+            CarBaseVO carBaseVO = responseObject.getData();
+            if(Objects.isNull(carBaseVO)){
+                return ResponseData.success();
+            }
+            CarBusinessResVO resVO = new CarBusinessResVO();
+            resVO.setGetCarAddr(carBaseVO.getGetCarAddr());
+            resVO.setLicenseOwer(carBaseVO.getLicenseOwer());
+            resVO.setLicenseModel(carBaseVO.getLicenseModel());
+            Date licenseExpire = carBaseVO.getLicenseExpire();
+            if(licenseExpire!=null){
+                resVO.setLicenseExpire(DateUtils.formate(licenseExpire, DateUtils.fmt_yyyyMMdd));
+            }
+            Date insuranceExpire = carBaseVO.getInsuranceExpire();
+            if(insuranceExpire!=null){
+                resVO.setInsuranceExpireDateStr(DateUtils.formate(insuranceExpire,DateUtils.fmt_yyyyMMdd));
+            }
+            resVO.setGps(carBaseVO.getGpsNo());
+            resVO.setSimNo(carBaseVO.getSimNo());
+            resVO.setMemo(carBaseVO.getMemo());
+            resVO.setCarRemark(carBaseVO.getCarDesc());//carSelectMap
+            resVO.setGetRevertExplain(carBaseVO.getGetRevertExplain());//carSelectMap
+            resVO.setDayMileage(carBaseVO.getDayMileage());//carSelectMap
+            return ResponseData.success(resVO);
+        } catch (BaseException e) {
+            LOGGER.error("获取车辆运营信息异常[{}]", reqVo, e);
+            Cat.logError("获取车辆运营信息异常[{" + reqVo + "}]", e);
+            return new ResponseData <>(e.getCode(), e.getMsg());
+        } catch (Exception e) {
+            LOGGER.error("获取车辆运营信息异常[{}]", reqVo, e);
+            Cat.logError("获取车辆运营信息异常[{" + reqVo + "}]", e);
+            return ResponseData.error();
+        }
     }
 
     private String convertIntegerToStr(Integer value){

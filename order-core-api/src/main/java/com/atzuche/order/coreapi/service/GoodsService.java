@@ -229,13 +229,13 @@ public class GoodsService {
         LocationDTO getCarAddress = new LocationDTO();
         getCarAddress.setFlag(reqVO.getSrvGetFlag());
         getCarAddress.setCarAddress(reqVO.getSrvGetAddr());
-        getCarAddress.setLat(Double.valueOf(reqVO.getSrvGetLat()));
-        getCarAddress.setLon(Double.valueOf(reqVO.getSrvGetLon()));
+        getCarAddress.setLat(StringUtils.isBlank(reqVO.getSrvGetLat()) ? null : Double.valueOf(reqVO.getSrvGetLat()));
+        getCarAddress.setLon(StringUtils.isBlank(reqVO.getSrvGetLon()) ? null : Double.valueOf(reqVO.getSrvGetLon()));
         LocationDTO returnCarAddress = new LocationDTO();
         returnCarAddress.setFlag(reqVO.getSrvReturnFlag());
         returnCarAddress.setCarAddress(reqVO.getSrvReturnAddr());
-        returnCarAddress.setLat(Double.valueOf(reqVO.getSrvReturnLat()));
-        returnCarAddress.setLon(Double.valueOf(reqVO.getSrvReturnLon()));
+        returnCarAddress.setLat(StringUtils.isBlank(reqVO.getSrvReturnLat()) ? null : Double.valueOf(reqVO.getSrvReturnLat()));
+        returnCarAddress.setLon(StringUtils.isBlank(reqVO.getSrvReturnLon()) ? null : Double.valueOf(reqVO.getSrvReturnLon()));
 
         carAddressDTO.setGetCarAddress(getCarAddress);
         carAddressDTO.setReturnCarAddress(returnCarAddress);

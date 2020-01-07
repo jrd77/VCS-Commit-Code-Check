@@ -5,28 +5,15 @@ import com.atzuche.order.commons.entity.dto.*;
 import com.atzuche.order.commons.vo.req.OrderReqVO;
 import com.atzuche.order.delivery.common.DeliveryCarTask;
 import com.atzuche.order.delivery.common.DeliveryErrorCode;
-import com.atzuche.order.delivery.entity.RenterDeliveryAddrEntity;
-import com.atzuche.order.delivery.entity.RenterOrderDeliveryEntity;
 import com.atzuche.order.delivery.enums.*;
 import com.atzuche.order.delivery.exception.DeliveryOrderException;
-import com.atzuche.order.delivery.mapper.RenterDeliveryAddrMapper;
-import com.atzuche.order.delivery.mapper.RenterOrderDeliveryMapper;
-import com.atzuche.order.delivery.service.handover.HandoverCarService;
-import com.atzuche.order.delivery.utils.CodeUtils;
-import com.atzuche.order.delivery.utils.CommonUtil;
 import com.atzuche.order.delivery.utils.DateUtils;
 import com.atzuche.order.delivery.vo.delivery.*;
-import com.atzuche.order.delivery.vo.handover.HandoverCarInfoDTO;
-import com.atzuche.order.delivery.vo.handover.HandoverCarVO;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.Resource;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Objects;
 
 /**
@@ -162,23 +149,11 @@ public class DeliveryCarService {
             orderDeliveryDTO.setRentTime(renterGoodsDetailDTO.getRentTime());
             orderDeliveryDTO.setRevertTime(renterGoodsDetailDTO.getRevertTime());
             orderDeliveryDTO.setType(orderType);
-            if (orderType == UsedDeliveryTypeEnum.USED.getValue().intValue()) {
-                orderDeliveryDTO.setGetReturnUserName(renterMemberDTO.getRealName());
-                orderDeliveryDTO.setGetReturnUserPhone(renterMemberDTO.getPhone());
-                renYunFlowOrderDTO.setPickupcaraddr(orderDeliveryDTO.getRenterGetReturnAddr());
-            } else {
-                orderDeliveryDTO.setGetReturnUserName(ownerMemberDTO.getRealName());
-                orderDeliveryDTO.setGetReturnUserPhone(ownerMemberDTO.getPhone());
-                renYunFlowOrderDTO.setAlsocaraddr(orderDeliveryDTO.getRenterGetReturnAddr());
-            }
+            orderDeliveryDTO.setParamsTypeValue(orderType,ownerMemberDTO,renterMemberDTO);
             /**组装仁云信息**/
             renYunFlowOrderDTO.setOrdernumber(renterGoodsDetailDTO.getOrderNo());
             renYunFlowOrderDTO.setOrderType(orderReqVO.getOrderCategory());
-            if (orderType == UsedDeliveryTypeEnum.USED.getValue().intValue()) {
-                renYunFlowOrderDTO.setServicetype(ServiceTypeEnum.TAKE_TYPE.getValue());
-            } else {
-                renYunFlowOrderDTO.setServicetype(ServiceTypeEnum.BACK_TYPE.getValue());
-            }
+            renYunFlowOrderDTO.setServiceTypeInfo(orderType,orderDeliveryDTO);
             renYunFlowOrderDTO.setTermtime(DateUtils.formate(renterGoodsDetailDTO.getRentTime(), DateUtils.DATE_DEFAUTE_4));
             renYunFlowOrderDTO.setReturntime(DateUtils.formate(renterGoodsDetailDTO.getRevertTime(), DateUtils.DATE_DEFAUTE_4));
             renYunFlowOrderDTO.setCarno(String.valueOf(renterGoodsDetailDTO.getCarNo()));
