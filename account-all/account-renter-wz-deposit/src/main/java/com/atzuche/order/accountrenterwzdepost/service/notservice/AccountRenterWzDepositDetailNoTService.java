@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.atzuche.order.accountrenterwzdepost.mapper.AccountRenterWzDepositDetailMapper;
 
+import java.util.List;
+
 
 /**
  * 违章押金进出明细表
@@ -35,6 +37,15 @@ public class AccountRenterWzDepositDetailNoTService {
         if(result==0){
             throw new PayOrderRenterWZDepositException();
         }
+    }
 
+
+    /**
+     * 返回指定订单的违章押金的支付流水记录
+     * @param orderNo
+     * @return
+     */
+    public List<AccountRenterWzDepositDetailEntity> findByOrderNo(String orderNo){
+        return accountRenterWzDepositDetailMapper.findByOrderNo(orderNo);
     }
 }
