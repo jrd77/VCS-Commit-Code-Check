@@ -125,49 +125,21 @@ public class DeliveryCarService {
         RenYunFlowOrderDTO renYunFlowOrderDTO = new RenYunFlowOrderDTO();
         RenterGoodsDetailDTO renterGoodsDetailDTO = orderReqContext.getRenterGoodsDetailDto();
         OwnerGoodsDetailDTO ownerGoodsDetailDTO = orderReqContext.getOwnerGoodsDetailDto();
-        //不使用还车服务（一定不使用取车服务）
+        renterDeliveryAddrDTO.setParamsTypeValue(orderType,renterMemberDTO);
         if (orderReqVO.getSrvReturnFlag().intValue() == UsedDeliveryTypeEnum.NO_USED.getValue().intValue()) {
-
             String carShowAddr = renterGoodsDetailDTO.getCarShowAddr() == null ? renterGoodsDetailDTO.getCarRealAddr() : renterGoodsDetailDTO.getCarShowAddr();
             String carShowLat = renterGoodsDetailDTO.getCarShowLat() == null ? renterGoodsDetailDTO.getCarRealLat() : renterGoodsDetailDTO.getCarShowLat();
             String carShowLng = renterGoodsDetailDTO.getCarShowLon() == null ? renterGoodsDetailDTO.getCarRealLon() : renterGoodsDetailDTO.getCarShowLon();
-            //入库取送地址数据
             if (StringUtils.isNotBlank(renterGoodsDetailDTO.getCarShowAddr())) {
-                renterDeliveryAddrDTO.setActGetCarAddr(carShowAddr);
-                renterDeliveryAddrDTO.setActGetCarLat(carShowLat);
-                renterDeliveryAddrDTO.setActGetCarLon(carShowLng);
-                renterDeliveryAddrDTO.setActReturnCarAddr(carShowAddr);
-                renterDeliveryAddrDTO.setActReturnCarLat(carShowLat);
-                renterDeliveryAddrDTO.setActReturnCarLon(carShowLng);
-                renterDeliveryAddrDTO.setExpGetCarAddr(carShowAddr);
-                renterDeliveryAddrDTO.setExpGetCarLat(carShowLat);
-                renterDeliveryAddrDTO.setExpGetCarLon(carShowLng);
-                renterDeliveryAddrDTO.setExpReturnCarAddr(carShowAddr);
-                renterDeliveryAddrDTO.setExpReturnCarLat(carShowLat);
-                renterDeliveryAddrDTO.setExpReturnCarLon(carShowLng);
-                renterDeliveryAddrDTO.setOrderNo(renterGoodsDetailDTO.getOrderNo());
-                renterDeliveryAddrDTO.setRenterOrderNo(renterGoodsDetailDTO.getRenterOrderNo());
-                renterDeliveryAddrDTO.setCreateTime(LocalDateTime.now());
-                renterDeliveryAddrDTO.setCreateOp("");
+                renterDeliveryAddrDTO = RenterDeliveryAddrDTO.builder().actGetCarAddr(carShowAddr).actGetCarLat(carShowLat).actGetCarLon(carShowLng).actReturnCarAddr(carShowAddr)
+                        .actReturnCarLat(carShowLat).actReturnCarLon(carShowLng).expGetCarAddr(carShowAddr).expGetCarLat(carShowLat).expGetCarLon(carShowLng).expReturnCarAddr(carShowAddr)
+                        .expReturnCarLat(carShowLat).expReturnCarLon(carShowLng).orderNo(renterGoodsDetailDTO.getOrderNo()).renterOrderNo(renterGoodsDetailDTO.getRenterOrderNo()).createTime(LocalDateTime.now()).createOp("").build();
             }
         } else {
             /**组装地址信息**/
-            renterDeliveryAddrDTO.setActGetCarAddr(orderReqVO.getSrvGetAddr());
-            renterDeliveryAddrDTO.setActGetCarLat(orderReqVO.getSrvGetLat());
-            renterDeliveryAddrDTO.setActGetCarLon(orderReqVO.getSrvGetLon());
-            renterDeliveryAddrDTO.setActReturnCarAddr(orderReqVO.getSrvReturnAddr());
-            renterDeliveryAddrDTO.setActReturnCarLat(orderReqVO.getSrvReturnLat());
-            renterDeliveryAddrDTO.setActReturnCarLon(orderReqVO.getSrvReturnLon());
-            renterDeliveryAddrDTO.setExpReturnCarAddr(orderReqVO.getSrvReturnAddr());
-            renterDeliveryAddrDTO.setExpReturnCarLat(orderReqVO.getSrvReturnLat());
-            renterDeliveryAddrDTO.setExpReturnCarLon(orderReqVO.getSrvReturnLon());
-            renterDeliveryAddrDTO.setExpGetCarAddr(orderReqVO.getSrvGetAddr());
-            renterDeliveryAddrDTO.setExpGetCarLat(orderReqVO.getSrvGetLat());
-            renterDeliveryAddrDTO.setExpGetCarLon(orderReqVO.getSrvGetLon());
-            renterDeliveryAddrDTO.setCreateTime(LocalDateTime.now());
-            renterDeliveryAddrDTO.setOrderNo(renterGoodsDetailDTO.getOrderNo());
-            renterDeliveryAddrDTO.setRenterOrderNo(renterGoodsDetailDTO.getRenterOrderNo());
-            renterDeliveryAddrDTO.setCreateOp("");
+            renterDeliveryAddrDTO = RenterDeliveryAddrDTO.builder().actGetCarAddr(orderReqVO.getSrvGetAddr()).actGetCarLat(orderReqVO.getSrvGetLat()).actGetCarLon(orderReqVO.getSrvGetLon()).actReturnCarAddr(orderReqVO.getSrvReturnAddr())
+                    .actReturnCarLat(orderReqVO.getSrvReturnLat()).actReturnCarLon(orderReqVO.getSrvReturnLon()).expGetCarAddr(orderReqVO.getSrvReturnAddr()).expGetCarLat(orderReqVO.getSrvReturnLat()).expGetCarLon(orderReqVO.getSrvReturnLon()).expReturnCarAddr(orderReqVO.getSrvGetAddr())
+                    .expReturnCarLat(orderReqVO.getSrvGetLat()).expReturnCarLon(orderReqVO.getSrvGetLon()).orderNo(renterGoodsDetailDTO.getOrderNo()).renterOrderNo(renterGoodsDetailDTO.getRenterOrderNo()).createTime(LocalDateTime.now()).createOp("").build();
             /**组装配送订单信息**/
             orderDeliveryDTO.setCityCode(orderReqVO.getCityCode());
             orderDeliveryDTO.setCityName(orderReqVO.getCityName());
@@ -191,8 +163,12 @@ public class DeliveryCarService {
             orderDeliveryDTO.setRevertTime(renterGoodsDetailDTO.getRevertTime());
             orderDeliveryDTO.setType(orderType);
             if (orderType == UsedDeliveryTypeEnum.USED.getValue().intValue()) {
+                orderDeliveryDTO.setGetReturnUserName(renterMemberDTO.getRealName());
+                orderDeliveryDTO.setGetReturnUserPhone(renterMemberDTO.getPhone());
                 renYunFlowOrderDTO.setPickupcaraddr(orderDeliveryDTO.getRenterGetReturnAddr());
             } else {
+                orderDeliveryDTO.setGetReturnUserName(ownerMemberDTO.getRealName());
+                orderDeliveryDTO.setGetReturnUserPhone(ownerMemberDTO.getPhone());
                 renYunFlowOrderDTO.setAlsocaraddr(orderDeliveryDTO.getRenterGetReturnAddr());
             }
             /**组装仁云信息**/
