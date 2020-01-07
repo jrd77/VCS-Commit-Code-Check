@@ -335,7 +335,7 @@ public class SubmitOrderService {
                 orderSourceStatDTO.getPublicLatitude()));
         orderSourceStatDTO.setDevice(orderReqVO.getDeviceName());
         orderSourceStatDTO.setUseAutoCoin(orderReqVO.getUseAutoCoin());
-
+        orderSourceStatDTO.setSpecialConsole(orderReqVO.getSpecialConsole()==null?0:Integer.valueOf(orderReqVO.getSpecialConsole()));
 
         LOGGER.info("Build order source stat dto,result is ,orderSourceStatDTO:[{}]", JSON.toJSONString(orderSourceStatDTO));
         return orderSourceStatDTO;
