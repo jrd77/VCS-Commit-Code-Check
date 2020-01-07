@@ -125,6 +125,13 @@ public class DeliveryCarService {
         RenYunFlowOrderDTO renYunFlowOrderDTO = new RenYunFlowOrderDTO();
         RenterGoodsDetailDTO renterGoodsDetailDTO = orderReqContext.getRenterGoodsDetailDto();
         OwnerGoodsDetailDTO ownerGoodsDetailDTO = orderReqContext.getOwnerGoodsDetailDto();
+        if (orderType == UsedDeliveryTypeEnum.USED.getValue().intValue()) {
+            renterDeliveryAddrDTO.setGetCarUserName(renterMemberDTO.getRealName());
+            renterDeliveryAddrDTO.setGetCarUserPhone(renterMemberDTO.getPhone());
+        } else {
+            renterDeliveryAddrDTO.setReturnCarUserName(renterMemberDTO.getRealName());
+            renterDeliveryAddrDTO.setReturnCarUserPhone(renterMemberDTO.getPhone());
+        }
         //不使用还车服务（一定不使用取车服务）
         if (orderReqVO.getSrvReturnFlag().intValue() == UsedDeliveryTypeEnum.NO_USED.getValue().intValue()) {
 
