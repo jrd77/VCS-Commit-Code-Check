@@ -36,7 +36,6 @@ public class OrderSettleService {
     /**
      * 车辆押金结算
      */
-    @Async
     @Transactional(rollbackFor=Exception.class)
     public void settleOrder(String orderNo) {
         log.info("OrderSettleService settleOrder start param [{}]",orderNo);
@@ -87,6 +86,7 @@ public class OrderSettleService {
                      + settleOrdersDefinition.getOwnerCostAmt() + settleOrdersDefinition.getOwnerSubsidyAmt()
                      + settleOrdersDefinition.getRentCostAmt() + settleOrdersDefinition.getRentSubsidyAmt();
         if(totleAmt != 0){
+            //TODO 走告警
             throw new OrderSettleFlatAccountException();
         }
         //开启事务

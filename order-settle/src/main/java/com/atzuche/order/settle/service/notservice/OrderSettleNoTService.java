@@ -778,7 +778,7 @@ public class OrderSettleNoTService {
      * @param settleOrdersDefinition
      */
     public void insertSettleOrders(SettleOrdersDefinition settleOrdersDefinition) {
-        //1 先删除 之前的的 结算记录 逻辑删除
+        //1 先删除 之前的的 结算记录 逻辑删除 TODO
         //2 明细落库
         //2.1 租客端 明细落库
         List<AccountRenterCostSettleDetailEntity> accountRenterCostSettleDetails = settleOrdersDefinition.getAccountRenterCostSettleDetails();
