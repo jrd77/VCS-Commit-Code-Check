@@ -57,6 +57,8 @@ dependencies {
     compile project(":util-all:fee-calculator")
     compile project(":util-all:order-commons")
     compile project(":order-delivery")
-    compile project(":order-core-all")
+    compile project(":order-core-all:renter-all:renter-wz")
+    compile project(":order-core-all:renter-all:renter-mem")
+    compile project(":order-core-all:renter-all:renter-commodity")
 
 }
