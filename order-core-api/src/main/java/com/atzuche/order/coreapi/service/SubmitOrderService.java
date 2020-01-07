@@ -328,10 +328,14 @@ public class SubmitOrderService {
         orderSourceStatDTO.setAppChannelId(orderReqVO.getAppChannelId());
         orderSourceStatDTO.setAndroidId(orderReqVO.getAndroidID());
         orderSourceStatDTO.setOrderNo(orderNo);
+        orderSourceStatDTO.setSrcPort(orderReqVO.getSrcPort()==null?"":String.valueOf(orderReqVO.getSrcPort()));
         orderSourceStatDTO.setPublicLongitude(orderReqVO.getPublicLongitude());
         orderSourceStatDTO.setPublicLatitude(orderReqVO.getPublicLatitude());
         orderSourceStatDTO.setReqAddr(BizAreaUtil.getReqAddrFromLonLat(orderSourceStatDTO.getPublicLongitude(),
                 orderSourceStatDTO.getPublicLatitude()));
+        orderSourceStatDTO.setDevice(orderReqVO.getDeviceName());
+        orderSourceStatDTO.setUseAutoCoin(orderReqVO.getUseAutoCoin());
+
 
         LOGGER.info("Build order source stat dto,result is ,orderSourceStatDTO:[{}]", JSON.toJSONString(orderSourceStatDTO));
         return orderSourceStatDTO;

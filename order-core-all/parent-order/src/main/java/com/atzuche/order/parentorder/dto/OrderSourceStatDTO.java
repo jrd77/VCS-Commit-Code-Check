@@ -110,11 +110,11 @@ public class OrderSourceStatDTO {
     /**
      * 是否使用凹凸币
      */
-    private String useAutoCoin;
+    private Integer useAutoCoin;
     /**
      * 是否后台管理操作
      */
-    private String specialConsole;
+    private Integer specialConsole;
     /**
      * 请求系统
      */
