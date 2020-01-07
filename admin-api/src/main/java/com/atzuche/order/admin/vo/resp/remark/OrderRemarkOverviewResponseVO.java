@@ -18,22 +18,6 @@ public class OrderRemarkOverviewResponseVO {
     private String remarkType;
 
     @AutoDocProperty(value = "备注数量")
-    private String count;
-
-    public String getRemarkType() {
-        return remarkType;
-    }
-
-    public void setRemarkType(String remarkType) {
-        this.remarkType = remarkType;
-    }
-
-    public String getCount() {
-        return count;
-    }
-
-    public void setCount(String count) {
-        this.count = count;
-    }
+    private String typeCount;
 
 }
