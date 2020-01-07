@@ -1,6 +1,7 @@
-package com.atzuche.order.admin.vo.resp.delivery;
+package com.atzuche.order.delivery.vo.delivery.rep;
 
 import com.autoyol.doc.annotation.AutoDocProperty;
+import lombok.Builder;
 import lombok.Data;
 import lombok.ToString;
 
@@ -10,6 +11,7 @@ import lombok.ToString;
  */
 @Data
 @ToString
+@Builder
 public class RenterGetAndReturnCarDTO {
 
     @AutoDocProperty("实际交车时间")

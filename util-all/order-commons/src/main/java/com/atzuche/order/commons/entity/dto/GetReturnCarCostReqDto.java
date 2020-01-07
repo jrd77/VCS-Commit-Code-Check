@@ -39,13 +39,24 @@ public class GetReturnCarCostReqDto {
      */
     private String srvReturnLat;
     /**
-     * 车辆经度
+     * 车辆显示经度
      */
-    private String carLon;
+    private String carShowLon;
     /**
-     * 车辆纬度
+     * 车辆显示纬度
      */
-    private String carLat;
+    private String carShowLat;
+
+    /**
+     * 车辆真实经度
+     */
+    private String carRealLon;
+    /**
+     * 车辆真实纬度
+     */
+    private String carRealLat;
+
+
     /**
      * 是否套餐订单(true:是，false:否)
      */

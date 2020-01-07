@@ -8,8 +8,6 @@
         <result property="orderNo" column="order_no"/>
         <result property="appVersion" column="app_version"/>
         <result property="device" column="device"/>
-        <result property="ip" column="ip"/>
-        <result property="port" column="port"/>
         <result property="channelId" column="channel_id"/>
         <result property="popularize" column="popularize"/>
         <result property="cooperationCity" column="cooperation_city"/>
@@ -63,7 +61,7 @@
 
 
 	<sql id="Base_Column_List">
-        `id`, `order_no`,`app_version`,`device`, `ip`,`port`,
+        `id`, `order_no`,`app_version`,`device`,
         `channel_id`, `popularize`,
         `cooperation_city`, `insurance_company`,
         `pay_source`, `activity_id`,
@@ -93,8 +91,6 @@
             `order_no`,
             `app_version`,
             `device`,
-            `ip`,
-            `port`,
             `channel_id`,
             `popularize`,
             `cooperation_city`,
@@ -143,8 +139,6 @@
             #{orderNo},
             #{appVersion},
             #{device},
-            #{ip},
-            #{port},
             #{channelId},
             #{popularize},
             #{cooperationCity},
@@ -198,8 +192,6 @@
             <if test="orderNo != null">`order_no`, </if>
             <if test="appVersion != null">`app_version`, </if>
             <if test="device != null">`device`, </if>
-            <if test="ip != null">`ip`, </if>
-            <if test="port != null">`port`, </if>
             <if test="channelId != null">`channel_id`, </if>
             <if test="popularize != null">`popularize`, </if>
             <if test="cooperationCity != null">`cooperation_city`, </if>
@@ -249,8 +241,6 @@
             <if test="orderNo != null">#{orderNo},  </if>
             <if test="appVersion != null">#{appVersion},  </if>
             <if test="device != null">#{device},  </if>
-            <if test="ip != null">#{ip},  </if>
-            <if test="port != null">#{port},  </if>
             <if test="channelId != null">#{channelId},  </if>
             <if test="popularize != null">#{popularize},  </if>
             <if test="cooperationCity != null">#{cooperationCity},  </if>
@@ -305,8 +295,6 @@
 				<if test="orderNo != null">`order_no` = #{orderNo}, </if>
 				<if test="appVersion != null">`app_version` = #{appVersion}, </if>
 				<if test="device != null">`device` = #{device}, </if>
-				<if test="ip != null">`ip` = #{ip}, </if>
-				<if test="port != null">`port` = #{port}, </if>
 				<if test="channelId != null">`channel_id` = #{channelId}, </if>
 				<if test="popularize != null">`popularize` = #{popularize}, </if>
 				<if test="cooperationCity != null">`cooperation_city` = #{cooperationCity}, </if>
@@ -361,9 +349,7 @@
 				`order_no` = #{orderNo}, 		
 				`app_version` = #{appVersion}, 		
 				`device` = #{device}, 		
-				`ip` = #{ip}, 		
-				`port` = #{port}, 		
-				`channel_id` = #{channelId}, 		
+				`channel_id` = #{channelId},
 				`popularize` = #{popularize}, 		
 				`cooperation_city` = #{cooperationCity}, 		
 				`insurance_company` = #{insuranceCompany}, 		

@@ -1,4 +1,4 @@
-package com.atzuche.order.admin.vo.req.delivery;
+package com.atzuche.order.delivery.vo.delivery.req;
 
 import com.autoyol.doc.annotation.AutoDocProperty;
 import lombok.Data;

@@ -21,7 +21,6 @@ public class RenterOrderWzCostDetailService {
     private RenterOrderWzCostDetailMapper renterOrderWzCostDetailMapper;
 
     private static final String SOURCE_TYPE_REN_YUN = "1";
-    private static final String SOURCE_TYPE_CONSOLE = "2";
     private static final String REN_YUN_NAME = "任云";
     private static final String CONSOLE_NAME = "管理后台";
 
@@ -72,5 +71,17 @@ public class RenterOrderWzCostDetailService {
         entity.setOperatorName(REN_YUN_NAME);
         entity.setCreateOp(REN_YUN_NAME);
         return entity;
+    }
+
+    public RenterOrderWzCostDetailEntity queryInfoByOrderAndCode(String orderNo, String costCode) {
+        return renterOrderWzCostDetailMapper.queryInfoByOrderAndCode(orderNo,costCode);
+    }
+
+    public void updateCostStatusByOrderNoAndCarNumAndMemNoAndCostCode(String orderNo, String carNum, Integer memNo, Integer costStatus, String code){
+        renterOrderWzCostDetailMapper.updateCostStatusByOrderNoAndCarNumAndMemNoAndCostCode(orderNo,carNum,memNo,costStatus,code);
+    }
+
+    public void saveRenterOrderWzCostDetail(RenterOrderWzCostDetailEntity renterOrderWzCostDetail){
+        renterOrderWzCostDetailMapper.saveRenterOrderWzCostDetail(renterOrderWzCostDetail);
     }
 }

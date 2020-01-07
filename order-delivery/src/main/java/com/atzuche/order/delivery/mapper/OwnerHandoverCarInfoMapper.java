@@ -39,14 +39,34 @@ public interface OwnerHandoverCarInfoMapper{
      * @param ownerOrderNo
      * @return
      */
-    List<OwnerHandoverCarInfoEntity> selectByOwnerOrderNo(@Param("ownerOrderNo") String ownerOrderNo);
+    OwnerHandoverCarInfoEntity selectByOwnerOrderNo(@Param("ownerOrderNo") String ownerOrderNo,@Param("type") Integer type);
 
     /**
-     * 根据订单号和类型查询
-     * @param orderNo
-     * @param type
+     * 根据子订单号查询
      * @return
      */
-    OwnerHandoverCarInfoEntity selectObjectByOrderNo(@Param("orderNo") String orderNo,@Param("type") Integer type);
+    List<OwnerHandoverCarInfoEntity> selectObjectByOwnerOrderNo(@Param("ownerOrderNo") String ownerOrderNo);
+
+
+    /**
+     * 根据子订单号
+     * @return
+     */
+    List<OwnerHandoverCarInfoEntity> selectOwnerHandovertByOwnerOrderNo(@Param("ownerOrderNo") String ownerOrderNo);
+
+    /**
+     * 根据车主订单查询
+     *
+     * @param orderNo
+     * @return
+     */
+    OwnerHandoverCarInfoEntity selectObjectByOrderNo(@Param("orderNo") String orderNo, @Param("type") Integer type);
+
+    /**
+     * 根据车主订单查询
+     * @param orderNo
+     * @return
+     */
+    List<OwnerHandoverCarInfoEntity> selectOwnerByOrderNo(@Param("orderNo") String orderNo);
 
 }
