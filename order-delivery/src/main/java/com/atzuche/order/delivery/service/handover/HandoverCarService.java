@@ -5,7 +5,6 @@ import com.atzuche.order.delivery.entity.OwnerHandoverCarInfoEntity;
 import com.atzuche.order.delivery.entity.OwnerHandoverCarRemarkEntity;
 import com.atzuche.order.delivery.entity.RenterHandoverCarInfoEntity;
 import com.atzuche.order.delivery.entity.RenterHandoverCarRemarkEntity;
-import com.atzuche.order.delivery.enums.ImgTypeEnum;
 import com.atzuche.order.delivery.enums.UserTypeEnum;
 import com.atzuche.order.delivery.exception.DeliveryOrderException;
 import com.atzuche.order.delivery.exception.HandoverCarOrderException;
@@ -14,17 +13,14 @@ import com.atzuche.order.delivery.utils.CommonUtil;
 import com.atzuche.order.delivery.vo.handover.HandoverCarRepVO;
 import com.atzuche.order.delivery.vo.handover.HandoverCarReqVO;
 import com.atzuche.order.delivery.vo.handover.HandoverCarVO;
-import com.autoyol.commons.web.ErrorCode;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 /**

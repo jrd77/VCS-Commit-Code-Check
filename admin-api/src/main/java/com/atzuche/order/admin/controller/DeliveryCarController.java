@@ -1,6 +1,6 @@
 package com.atzuche.order.admin.controller;
 
-import com.atzuche.order.admin.service.DeliveryCarService;
+import com.atzuche.order.admin.service.AdminDeliveryCarService;
 import com.atzuche.order.delivery.vo.delivery.rep.DeliveryCarVO;
 import com.atzuche.order.delivery.vo.delivery.req.CarConditionPhotoUploadVO;
 import com.atzuche.order.delivery.vo.delivery.req.DeliveryCarRepVO;
@@ -30,7 +30,7 @@ import org.springframework.web.bind.annotation.*;
 public class DeliveryCarController extends BaseController {
 
     @Autowired
-    private DeliveryCarService deliveryCarInfoService;
+    private AdminDeliveryCarService deliveryCarInfoService;
 
     /**
      * 获取配送信息
