@@ -15,7 +15,6 @@ import com.atzuche.order.renterwz.entity.RenterOrderWzCostDetailEntity;
 import com.atzuche.order.renterwz.entity.WzCostLogEntity;
 import com.atzuche.order.renterwz.entity.WzTemporaryRefundLogEntity;
 import com.atzuche.order.renterwz.enums.WzCostEnums;
-import com.atzuche.order.renterwz.mapper.RenterOrderWzQueryRecordMapper;
 import com.atzuche.order.renterwz.service.RenterOrderWzCostDetailService;
 import com.atzuche.order.renterwz.service.WzCostLogService;
 import com.atzuche.order.renterwz.service.WzTemporaryRefundLogService;
@@ -62,6 +61,8 @@ public class RenterWzService {
     private static final String AMOUNT = "amount";
 
     private static final String SOURCE_TYPE_CONSOLE = "2";
+
+    private static final String RADIX_POINT = ".";
 
 
     public void updateWzCost(String orderNo, List<RenterWzCostDetailReqVO> costDetails) {
@@ -168,7 +169,7 @@ public class RenterWzService {
     public WzCostLogsResVO queryWzCostLogsByOrderNo(String orderNo) {
         List<WzCostLogEntity> wzCostLogEntities = wzCostLogService.queryWzCostLogsByOrderNo(orderNo);
         List<WzCostLogResVO> wzCostLogs = new ArrayList<>();
-        WzCostLogResVO vo = null;
+        WzCostLogResVO vo;
         for (WzCostLogEntity wzCostLog : wzCostLogEntities) {
             vo = new WzCostLogResVO();
             BeanUtils.copyProperties(wzCostLog,vo);
@@ -185,7 +186,7 @@ public class RenterWzService {
     public TemporaryRefundLogsResVO queryTemporaryRefundLogsByOrderNo(String orderNo) {
         List<WzTemporaryRefundLogEntity> wzTemporaryRefundLogEntities = wzTemporaryRefundLogService.queryTemporaryRefundLogsByOrderNo(orderNo);
         List<TemporaryRefundLogResVO> wzCostLogs = new ArrayList<>();
-        TemporaryRefundLogResVO vo = null;
+        TemporaryRefundLogResVO vo;
         for (WzTemporaryRefundLogEntity wzCostLog : wzTemporaryRefundLogEntities) {
             vo = new TemporaryRefundLogResVO();
             BeanUtils.copyProperties(wzCostLog,vo);
@@ -214,8 +215,8 @@ public class RenterWzService {
             return 0;
         }
         //判断是否有小数点
-        if(intStr.contains(".")){
-            String subStr= intStr.substring(0,(intStr.indexOf(".")));
+        if(intStr.contains(RADIX_POINT)){
+            String subStr= intStr.substring(0,(intStr.indexOf(RADIX_POINT)));
             return Integer.parseInt(subStr);
         }
         return Integer.parseInt(intStr);
