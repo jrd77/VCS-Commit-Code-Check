@@ -33,7 +33,7 @@ import java.util.Objects;
 public class CarController {
 
     @Autowired
-    private CarDetailQueryFeignApi carDetailQueryApi;
+    private CarDetailQueryFeignApi carDetailQueryFeignApi;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CarController.class);
 
@@ -41,7 +41,7 @@ public class CarController {
     @GetMapping(value = "/car/baseInfo")
     public ResponseData <?> getCarBaseInfo(@Valid CarBaseReqVO reqVo, BindingResult bindingResult) {
         try {
-            ResponseObject <CarBaseVO> responseObject = carDetailQueryApi.getCarDetailByCarNo(reqVo.getCarNo());
+            ResponseObject <CarBaseVO> responseObject = carDetailQueryFeignApi.getCarDetailByCarNo(reqVo.getCarNo());
             if(Objects.isNull(responseObject)){
                 return ResponseData.error();
             }else if(!Objects.equals(responseObject.getResCode(), ErrorCode.SUCCESS.getCode())){
