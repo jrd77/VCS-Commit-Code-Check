@@ -1,4 +1,4 @@
-package com.atzuche.order.admin.vo.req.handover;
+package com.atzuche.order.delivery.vo.handover.req;
 
 import com.autoyol.doc.annotation.AutoDocProperty;
 import lombok.Data;

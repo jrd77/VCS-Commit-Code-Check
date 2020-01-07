@@ -1,4 +1,4 @@
-package com.atzuche.order.admin.vo.resp.delivery;
+package com.atzuche.order.delivery.vo.delivery.rep;
 
 import com.autoyol.doc.annotation.AutoDocProperty;
 import lombok.Data;
@@ -20,4 +20,11 @@ public class DeliveryCarVO {
     private OwnerGetAndReturnCarDTO ownerGetAndReturnCarDTO;
     @AutoDocProperty("租客取还车服务")
     private RenterGetAndReturnCarDTO renterGetAndReturnCarDTO;
+    @AutoDocProperty("是否取车")
+    private String isGetCar;
+    @AutoDocProperty("是否还车")
+    private String isReturnCar;
+
+
+
 }

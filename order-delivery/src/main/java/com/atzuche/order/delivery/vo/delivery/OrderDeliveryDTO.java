@@ -1,5 +1,8 @@
 package com.atzuche.order.delivery.vo.delivery;
 
+import com.atzuche.order.commons.entity.dto.OwnerMemberDTO;
+import com.atzuche.order.commons.entity.dto.RenterMemberDTO;
+import com.atzuche.order.delivery.enums.UsedDeliveryTypeEnum;
 import lombok.Data;
 import lombok.ToString;
 
@@ -112,4 +115,22 @@ public class OrderDeliveryDTO {
      * 修改人
      */
     private String updateOp;
+
+    /**
+     * 设置信息参数
+     * @param orderType
+     * @param ownerMemberDTO
+     * @param renterMemberDTO
+     */
+    public void setParamsTypeValue(Integer orderType, OwnerMemberDTO ownerMemberDTO, RenterMemberDTO renterMemberDTO) {
+        if (orderType == UsedDeliveryTypeEnum.USED.getValue().intValue()) {
+            setGetReturnUserName(renterMemberDTO.getRealName());
+            setGetReturnUserPhone(renterMemberDTO.getPhone());
+        } else {
+            setGetReturnUserName(ownerMemberDTO.getRealName());
+            setGetReturnUserPhone(ownerMemberDTO.getPhone());
+
+        }
+    }
+
 }
