@@ -57,5 +57,6 @@ dependencies {
     compile project(":util-all:fee-calculator")
     compile project(":util-all:order-commons")
     compile project(":order-delivery")
+    compile project(":order-core-all")
 
 }
