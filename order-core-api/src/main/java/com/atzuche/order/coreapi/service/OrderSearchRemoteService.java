@@ -22,6 +22,7 @@ import com.autoyol.search.vo.OrderVO;
 import com.autoyol.search.vo.ViolateVO;
 import com.dianping.cat.Cat;
 import com.dianping.cat.message.Transaction;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -256,7 +257,7 @@ public class OrderSearchRemoteService {
         for (ViolateBO violate : orderList) {
             dto = new IllegalToDO();
             dto.setOrderNo(violate.getOrderNo());
-            dto.setRegNo(violate.getCarNo());
+            dto.setRegNo(String.valueOf(violate.getCarNo()));
             dto.setPlateNum(violate.getPlateNum());
             dto.setRenterPhone(violate.getRenterPhone());
             dto.setRentNo(violate.getRenterNo());
@@ -269,8 +270,11 @@ public class OrderSearchRemoteService {
                 dto.setRevertTime(DateUtils.localDateTimeToDate(violate.getRevertTime()));
             }
             dto.setCityName(violate.getCityName());
-            dto.setEngineSource(violate.getEngineSource());
-            dto.setCityCode(violate.getCity());
+            dto.setEngineSource(String.valueOf(violate.getEngineSource()));
+            if(StringUtils.isNotBlank(violate.getCity())){
+                dto.setCityCode(Integer.parseInt(violate.getCity()));
+            }
+
             results.add(dto);
         }
         return results;
@@ -361,10 +365,10 @@ public class OrderSearchRemoteService {
         //查询车辆归属类型取值
         dto.setCartype(OwnerTypeEnum.getRemark(ownerType));
         dto.setOwnerType(null);
-        dto.setCarNo(fromBean.getCarNo());
+        dto.setCarNo(String.valueOf(fromBean.getCarNo()));
         dto.setCzphone(fromBean.getOwnerPhone());
         dto.setEnginenum(fromBean.getEngineNum());
-        dto.setEngineSource(fromBean.getEngineSource());
+        dto.setEngineSource(String.valueOf(fromBean.getEngineSource()));
         dto.setZkphone(fromBean.getRenterPhone());
         dto.setYccity(fromBean.getCityName());
         dto.setRenterNo(fromBean.getRenterNo());
