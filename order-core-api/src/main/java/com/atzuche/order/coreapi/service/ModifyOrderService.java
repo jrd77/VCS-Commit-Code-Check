@@ -477,6 +477,7 @@ public class ModifyOrderService {
 		renterGoodsDetailDTO.setRenterOrderNo(renterOrderEntity.getRenterOrderNo());
 		renterGoodsDetailDTO.setRentTime(modifyOrderDTO.getRentTime());
 		renterGoodsDetailDTO.setRevertTime(modifyOrderDTO.getRevertTime());
+		renterGoodsDetailDTO.setOldRentTime(renterOrderEntity.getExpRentTime());
 		// 获取汇总后的租客商品详情
 		renterGoodsDetailDTO = commodityService.setPriceAndGroup(renterGoodsDetailDTO);
 		// 设置最新的租客订单号
