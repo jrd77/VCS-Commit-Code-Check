@@ -229,14 +229,21 @@ public class GoodsService {
         LocationDTO getCarAddress = new LocationDTO();
         getCarAddress.setFlag(reqVO.getSrvGetFlag());
         getCarAddress.setCarAddress(reqVO.getSrvGetAddr());
-        getCarAddress.setLat(Double.valueOf(reqVO.getSrvGetLat()));
-        getCarAddress.setLon(Double.valueOf(reqVO.getSrvGetLon()));
+        if (StringUtils.isNotBlank(reqVO.getSrvGetLat())) {
+        	getCarAddress.setLat(Double.valueOf(reqVO.getSrvGetLat()));
+        }
+        if (StringUtils.isNotBlank(reqVO.getSrvGetLon())) {
+        	getCarAddress.setLon(Double.valueOf(reqVO.getSrvGetLon()));
+        }
         LocationDTO returnCarAddress = new LocationDTO();
         returnCarAddress.setFlag(reqVO.getSrvReturnFlag());
         returnCarAddress.setCarAddress(reqVO.getSrvReturnAddr());
-        returnCarAddress.setLat(Double.valueOf(reqVO.getSrvReturnLat()));
-        returnCarAddress.setLon(Double.valueOf(reqVO.getSrvReturnLon()));
-
+        if (StringUtils.isNotBlank(reqVO.getSrvReturnLat())) {
+        	returnCarAddress.setLat(Double.valueOf(reqVO.getSrvReturnLat()));
+        }
+        if (StringUtils.isNotBlank(reqVO.getSrvReturnLon())) {
+        	returnCarAddress.setLon(Double.valueOf(reqVO.getSrvReturnLon()));
+        }
         carAddressDTO.setGetCarAddress(getCarAddress);
         carAddressDTO.setReturnCarAddress(returnCarAddress);
         Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "车辆服务");
