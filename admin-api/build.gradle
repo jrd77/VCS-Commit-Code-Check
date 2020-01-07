@@ -20,7 +20,7 @@ mainClassName='com.autoyol.doc.parser.autodoc.AutoDocParser'
 mainClassName = 'com.autoyol.doc.parser.autodoc.AutoDocParser'
 
 group 'com.atzuche'
-version '0.0.1-SNAPSHOT'
+version '1.0.0-SNAPSHOT'
 sourceCompatibility = '1.8'
 targetCompatibility = 1.8
 
@@ -49,7 +49,8 @@ dependencies {
     }
     compile("com.caucho:hessian:4.0.38")
 
-
+    compile('com.autoyol.car:auto-car-service-api:2020010707-SNAPSHOT')
+   
 
 //    compile project(":casier-all:cashier-account")
 
@@ -57,5 +58,8 @@ dependencies {
     compile project(":util-all:fee-calculator")
     compile project(":util-all:order-commons")
     compile project(":order-delivery")
+    compile project(":order-core-all:renter-all:renter-wz")
+    compile project(":order-core-all:renter-all:renter-mem")
+    compile project(":order-core-all:renter-all:renter-commodity")
 
 }

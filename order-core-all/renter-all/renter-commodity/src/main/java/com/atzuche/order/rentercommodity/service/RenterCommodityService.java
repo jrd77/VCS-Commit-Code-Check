@@ -25,14 +25,6 @@ public class RenterCommodityService {
     private RenterGoodsPriceDetailMapper renterGoodsPriceDetailMapper;
     @Autowired
     private RenterGoodsService renterGoodsService;
-    /**
-     * 获取租客价格列表
-     * @param orderNo 主订单号
-     * @return List<RenterGoodsPriiceDetailEntity>
-     */
-    public List<RenterGoodsPriceDetailEntity> listRenterGoodsPriceByOrderNo(Long orderNo) {
-        return null;
-    }
 
     /**
      * 通过租客子单号获取一天一价列表

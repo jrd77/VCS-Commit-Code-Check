@@ -41,6 +41,11 @@ public class AccountRenterCostDetailNoTService {
         return accountRenterCostDetail.getId();
     }
 
+    /**
+     * 根据订单号查询租客的租金支付明细
+     * @param orderNo
+     * @return
+     */
     public List<AccountRenterCostDetailEntity> getAccountRenterCostDetailsByOrderNo(String orderNo) {
         return accountRenterCostDetailMapper.getAccountRenterCostDetailsByOrderNo(orderNo);
     }

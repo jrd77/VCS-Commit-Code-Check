@@ -67,12 +67,9 @@
 				`source_detail`,		
 				`trans_time`,		
 				`unique_no`,		
-				`time`,		
-				`create_time`,		
-				`create_op`,		
-				`update_time`,		
-				`update_op`,		
-				`is_delete`		
+				`time`,
+				`create_op`,
+				`update_op`
 			)
 		values
 		(
@@ -88,12 +85,9 @@
 				#{sourceDetail}, 		
 				#{transTime}, 		
 				#{uniqueNo}, 		
-				#{time}, 		
-				#{createTime}, 		
-				#{createOp}, 		
-				#{updateTime}, 		
-				#{updateOp}, 		
-				#{isDelete}		
+				#{time},
+				#{createOp},
+				#{updateOp}
 			)
 	</insert>
     <select id="getAccountRenterCostDetailsByOrderNo" resultMap="BaseResultMap">

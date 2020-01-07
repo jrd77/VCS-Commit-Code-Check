@@ -26,11 +26,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.util.Objects;
 
 /**
  * @author 胡春林
@@ -94,38 +94,41 @@ public class DeliveryCarTask {
     @Transactional(rollbackFor = Exception.class)
     public void insertDeliveryAddress(Integer getMinutes, Integer returnMinutes, OrderDeliveryVO orderDeliveryVO, Integer type) {
 
-        if (orderDeliveryVO.getRenterDeliveryAddrDTO() != null) {
-            RenterDeliveryAddrEntity deliveryAddrEntity = new RenterDeliveryAddrEntity();
-            BeanUtils.copyProperties(orderDeliveryVO.getRenterDeliveryAddrDTO(), deliveryAddrEntity);
-            RenterDeliveryAddrEntity renterDeliveryAddrEntity = deliveryAddrMapper.selectByRenterOrderNo(deliveryAddrEntity.getRenterOrderNo());
-            if (null == renterDeliveryAddrEntity) {
-                deliveryAddrMapper.insertSelective(deliveryAddrEntity);
-            }
-        }
+        insertHandoverAddInfo(orderDeliveryVO);
         if (orderDeliveryVO.getOrderDeliveryDTO() != null) {
             RenterOrderDeliveryEntity orderDeliveryEntity = new RenterOrderDeliveryEntity();
             BeanUtils.copyProperties(orderDeliveryVO.getOrderDeliveryDTO(), orderDeliveryEntity);
             if (type == DeliveryTypeEnum.ADD_TYPE.getValue().intValue()) {
                 orderDeliveryEntity.setOrderNoDelivery(codeUtils.createDeliveryNumber());
-                int aheadOrDelayTime = getMinutes == null ? returnMinutes : getMinutes;
-                orderDeliveryEntity.setAheadOrDelayTime(aheadOrDelayTime);
+                orderDeliveryEntity.setAheadOrDelayTimeInfo(getMinutes, returnMinutes);
+                orderDeliveryEntity.setStatus(1);
                 orderDeliveryMapper.insertSelective(orderDeliveryEntity);
-                addHandoverCarInfo(orderDeliveryEntity, getMinutes, returnMinutes);
+                addHandoverCarInfo(orderDeliveryEntity, getMinutes, returnMinutes, UserTypeEnum.RENTER_TYPE.getValue().intValue());
+                addHandoverCarInfo(orderDeliveryEntity, getMinutes, returnMinutes, UserTypeEnum.OWNER_TYPE.getValue().intValue());
             } else {
                 RenterOrderDeliveryEntity lastOrderDeliveryEntity = orderDeliveryMapper.findRenterOrderByrOrderNo(orderDeliveryEntity.getOrderNo(), orderDeliveryEntity.getType());
                 if (null == lastOrderDeliveryEntity) {
                     throw new DeliveryOrderException(DeliveryErrorCode.DELIVERY_MOUDLE_ERROR.getValue(), "没有找到最近的一笔配送订单记录");
                 }
                 CommonUtil.copyPropertiesIgnoreNull(orderDeliveryEntity, lastOrderDeliveryEntity);
-                orderDeliveryMapper.insert(lastOrderDeliveryEntity);
+                lastOrderDeliveryEntity.setStatus(2);
+                orderDeliveryMapper.insertSelective(lastOrderDeliveryEntity);
             }
         }
     }
 
-    public void addHandoverCarInfo(RenterOrderDeliveryEntity orderDeliveryEntity, Integer getMinutes, Integer returnMinutes) {
+    /**
+     * 新增交接车信息
+     * @param orderDeliveryEntity
+     * @param getMinutes
+     * @param returnMinutes
+     * @param userType
+     */
+    public void addHandoverCarInfo(RenterOrderDeliveryEntity orderDeliveryEntity, Integer getMinutes, Integer returnMinutes, Integer userType) {
 
         //提前或延后时间(取车:提前时间, 还车：延后时间
         HandoverCarInfoDTO handoverCarInfoDTO = new HandoverCarInfoDTO();
+        HandoverCarVO handoverCarVO = new HandoverCarVO();
         handoverCarInfoDTO.setCreateOp("");
         handoverCarInfoDTO.setOrderNo(orderDeliveryEntity.getOrderNo());
         handoverCarInfoDTO.setRenterOrderNo(orderDeliveryEntity.getRenterOrderNo());
@@ -136,9 +139,8 @@ public class DeliveryCarTask {
             handoverCarInfoDTO.setDelayTime(returnMinutes);
             handoverCarInfoDTO.setType(HandoverCarTypeEnum.RENTER_TO_RENYUN.getValue().intValue());
         }
-        HandoverCarVO handoverCarVO = new HandoverCarVO();
         handoverCarVO.setHandoverCarInfoDTO(handoverCarInfoDTO);
-        handoverCarService.addHandoverCarInfo(handoverCarVO, UserTypeEnum.RENTER_TYPE.getValue().intValue());
+        handoverCarService.addHandoverCarInfo(handoverCarVO, userType);
     }
 
     /**
@@ -185,4 +187,27 @@ public class DeliveryCarTask {
             log.info("发送邮件失败---->>>>{}:", e.getMessage());
         }
     }
+
+    /**
+     * 新增地址信息
+     *
+     * @param orderDeliveryVO
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public void insertHandoverAddInfo(OrderDeliveryVO orderDeliveryVO) {
+
+        if (orderDeliveryVO.getRenterDeliveryAddrDTO() != null) {
+            RenterDeliveryAddrEntity deliveryAddrEntity = new RenterDeliveryAddrEntity();
+            RenterDeliveryAddrEntity renterDeliveryAddrEntity = deliveryAddrMapper.selectByRenterOrderNo(deliveryAddrEntity.getRenterOrderNo());
+            if (null == renterDeliveryAddrEntity) {
+                BeanUtils.copyProperties(orderDeliveryVO.getRenterDeliveryAddrDTO(), deliveryAddrEntity);
+                deliveryAddrMapper.insertSelective(deliveryAddrEntity);
+            } else {
+                CommonUtil.copyPropertiesIgnoreNull(orderDeliveryVO.getRenterDeliveryAddrDTO(), renterDeliveryAddrEntity);
+                deliveryAddrMapper.updateByPrimaryKey(renterDeliveryAddrEntity);
+            }
+        }
+    }
+
+
 }

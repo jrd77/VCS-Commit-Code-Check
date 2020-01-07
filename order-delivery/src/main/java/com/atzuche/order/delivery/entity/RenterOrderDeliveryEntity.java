@@ -2,6 +2,8 @@ package com.atzuche.order.delivery.entity;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.Objects;
+
 import lombok.Data;
 
 
@@ -135,4 +137,14 @@ public class RenterOrderDeliveryEntity implements Serializable {
 
 	private Integer aheadOrDelayTime;
 
+
+    public void setAheadOrDelayTimeInfo(Integer getMinutes, Integer returnMinutes) {
+        if (Objects.isNull(getMinutes) && Objects.isNull(returnMinutes)) {
+            setAheadOrDelayTime(0);
+        } else {
+            int aheadOrDelayTime = getMinutes == null ? returnMinutes : getMinutes;
+            setAheadOrDelayTime(aheadOrDelayTime);
+        }
+
+    }
 }

@@ -1,5 +1,7 @@
 package com.atzuche.order.renterwz.enums;
 
+import org.apache.commons.lang3.StringUtils;
+
 /**
  * WzCostEnums
  *
@@ -7,11 +9,12 @@ package com.atzuche.order.renterwz.enums;
  * @date 2019/12/31
  */
 public enum WzCostEnums {
-    WZ_FINE(1,"","协助违章处理费"),
-    WZ_DYS_FINE(2,"","不良用车处罚金"),
-    WZ_SERVICE_COST(3,"","凹凸代办服务费"),
-    WZ_STOP_COST(4,"","停运费"),
-    WZ_OTHER_FINE(5,"","其他扣款"),
+    WZ_FINE(1,"1","协助违章处理费"),
+    WZ_DYS_FINE(2,"2","不良用车处罚金"),
+    WZ_SERVICE_COST(3,"3","凹凸代办服务费"),
+    WZ_STOP_COST(4,"4","停运费"),
+    WZ_OTHER_FINE(5,"5","其他扣款"),
+    INSURANCE_CLAIM(6,"6","保险理赔"),
     ;
 
     private Integer type;
@@ -44,8 +47,8 @@ public enum WzCostEnums {
         }
         WzCostEnums[] values = WzCostEnums.values();
         for (WzCostEnums value : values) {
-            if(type.equals(value.type)){
-                return value.code;
+            if(type.equals(value.getType())){
+                return value.getCode();
             }
         }
         return "";
@@ -57,8 +60,21 @@ public enum WzCostEnums {
         }
         WzCostEnums[] values = WzCostEnums.values();
         for (WzCostEnums value : values) {
-            if(type.equals(value.type)){
-                return value.desc;
+            if(type.equals(value.getType())){
+                return value.getDesc();
+            }
+        }
+        return "";
+    }
+
+    public static String getDesc(String code) {
+        if(StringUtils.isBlank(code)){
+            return "";
+        }
+        WzCostEnums[] values = WzCostEnums.values();
+        for (WzCostEnums value : values) {
+            if(code.equals(value.getCode())){
+                return value.getDesc();
             }
         }
         return "";

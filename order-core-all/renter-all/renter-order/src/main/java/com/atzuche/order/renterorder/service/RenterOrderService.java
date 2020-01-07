@@ -268,8 +268,10 @@ public class RenterOrderService {
         //取还车费用计算相关信息
         GetReturnCarCostReqDto getReturnCarCostReqDto = new GetReturnCarCostReqDto();
         getReturnCarCostReqDto.setCostBaseDTO(costBaseDTO);
-        getReturnCarCostReqDto.setCarLat(renterOrderReqVO.getCarLat());
-        getReturnCarCostReqDto.setCarLon(renterOrderReqVO.getCarLon());
+        getReturnCarCostReqDto.setCarShowLat(renterOrderReqVO.getCarShowLat());
+        getReturnCarCostReqDto.setCarShowLon(renterOrderReqVO.getCarShowLon());
+        getReturnCarCostReqDto.setCarRealLat(renterOrderReqVO.getCarRealLat());
+        getReturnCarCostReqDto.setCarRealLon(renterOrderReqVO.getCarRealLon());
         getReturnCarCostReqDto.setCityCode(Integer.valueOf(renterOrderReqVO.getCityCode()));
         getReturnCarCostReqDto.setEntryCode(renterOrderReqVO.getEntryCode());
         getReturnCarCostReqDto.setSource(Integer.valueOf(renterOrderReqVO.getSource()));

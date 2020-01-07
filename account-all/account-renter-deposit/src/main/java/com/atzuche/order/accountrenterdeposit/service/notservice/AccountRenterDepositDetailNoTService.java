@@ -8,6 +8,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 
 
 /**
@@ -44,5 +45,14 @@ public class AccountRenterDepositDetailNoTService {
         entity.setUniqueNo(uniqueNo);
         accountRenterDepositDetailMapper.updateByPrimaryKeySelective(entity);
 
+    }
+
+    /**
+     * 返回押金的支付流水
+     * @param orderNo
+     * @return
+     */
+    public List<AccountRenterDepositDetailEntity> findByOrderNo(String orderNo){
+        return accountRenterDepositDetailMapper.findByOrderNo(orderNo);
     }
 }

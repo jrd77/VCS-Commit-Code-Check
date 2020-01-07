@@ -155,4 +155,8 @@
 		where order_no = #{orderNo} and car_plate_num = #{carNum} and mem_no = #{memNo} and cost_code = #{code}
 	</update>
 
+	<select id="queryInfoByOrderAndCode" resultMap="selectColumnMap">
+		select * from renter_order_wz_cost_detail where order_no = #{orderNo} and cost_code = #{code} and cost_status = 0 and is_delete = 0 order by id desc limit 1
+	</select>
+
 </mapper>

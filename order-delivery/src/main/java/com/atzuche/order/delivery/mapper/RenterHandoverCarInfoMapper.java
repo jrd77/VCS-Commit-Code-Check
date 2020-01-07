@@ -14,27 +14,37 @@ import java.util.List;
  * @date 2019-12-28 15:56:17
  */
 @Mapper
-public interface RenterHandoverCarInfoMapper{
+public interface RenterHandoverCarInfoMapper {
 
     RenterHandoverCarInfoEntity selectByPrimaryKey(Integer id);
 
     int insert(RenterHandoverCarInfoEntity record);
-    
+
     int insertSelective(RenterHandoverCarInfoEntity record);
 
     int updateByPrimaryKey(RenterHandoverCarInfoEntity record);
-    
+
     int updateByPrimaryKeySelective(RenterHandoverCarInfoEntity record);
 
     /**
      * 根据租客子订单查询
+     *
      * @param renterOrderNo
      * @return
      */
     List<RenterHandoverCarInfoEntity> selectByRenterOrderNo(@Param("renterOrderNo") String renterOrderNo);
 
     /**
+     * 根据租客子订单查询
+     *
+     * @param renterOrderNo
+     * @return
+     */
+    List<RenterHandoverCarInfoEntity> selectRenterHandoverByRenterOrderNo(@Param("renterOrderNo") String renterOrderNo);
+
+    /**
      * 根據消息ID查詢是否存在
+     *
      * @param msgId
      * @return
      */
@@ -42,17 +52,27 @@ public interface RenterHandoverCarInfoMapper{
 
     /**
      * 根据子订单号和类型查询
+     *
      * @param renterOrderNo
      * @param type
      * @return
      */
-    RenterHandoverCarInfoEntity selectObjectByRenterOrderNo(@Param("renterOrderNo") String renterOrderNo,@Param("type") Integer type);
+    RenterHandoverCarInfoEntity selectObjectByRenterOrderNo(@Param("renterOrderNo") String renterOrderNo, @Param("type") Integer type);
 
     /**
-     * 根据订单号和类型查询
+     * 根据租客订单查询
+     *
      * @param orderNo
-     * @param type
      * @return
      */
-    RenterHandoverCarInfoEntity selectObjectByOrderNo(@Param("orderNo") String orderNo,@Param("type") Integer type);
+    RenterHandoverCarInfoEntity selectObjectByOrderNo(@Param("orderNo") String orderNo, @Param("type") Integer type);
+
+    /**
+     * 根据租客订单查询
+     *
+     * @param orderNo
+     * @return
+     */
+    List<RenterHandoverCarInfoEntity> selectRenterByOrderNo(@Param("orderNo") String orderNo);
+
 }

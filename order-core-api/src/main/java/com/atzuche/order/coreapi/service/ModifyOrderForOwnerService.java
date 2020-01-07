@@ -97,7 +97,7 @@ public class ModifyOrderForOwnerService {
 		// 获取修改前有效车主订单信息
 		OwnerOrderEntity ownerOrderEntity = ownerOrderService.getOwnerOrderByOrderNoAndIsEffective(orderNo);
 		// 获取车主会员信息
-		OwnerMemberDTO ownerMemberDTO = getOwnerMemberDTO(ownerOrderEntity.getOwnerOrderNo());
+		OwnerMemberDTO ownerMemberDTO = getOwnerMemberDTO(ownerOrderEntity.getOwnerOrderNo(), ownerOrderNo);
 		// 设置车主会员信息
 		modifyOrderOwnerDTO.setOwnerMemberDTO(ownerMemberDTO);
 		// 获取车主端商品详情
@@ -279,13 +279,15 @@ public class ModifyOrderForOwnerService {
 	 * @param ownerOrderNo
 	 * @return CarDetailReqVO
 	 */
-	public CarDetailReqVO convertToCarDetailReqVO(ModifyOrderOwnerDTO modifyOrderOwnerDTO, OwnerOrderEntity ownerOrderEntity) {
+	public GoodsService.CarDetailReqVO convertToCarDetailReqVO(ModifyOrderOwnerDTO modifyOrderOwnerDTO, OwnerOrderEntity ownerOrderEntity) {
 		// 车主子订单号
 		String ownerOrderNo = ownerOrderEntity.getOwnerOrderNo();
 		// 获取车主商品信息
 		OwnerGoodsDetailDTO ownerGoodsDetailDTO = ownerCommodityService.getOwnerGoodsDetail(ownerOrderNo, false);
-		CarDetailReqVO carDetailReqVO = new CarDetailReqVO(); 
-		carDetailReqVO.setAddrIndex(ownerGoodsDetailDTO.getCarAddrIndex());
+		GoodsService.CarDetailReqVO carDetailReqVO = new GoodsService.CarDetailReqVO(); 
+		if (ownerGoodsDetailDTO.getCarAddrIndex() != null) {
+			carDetailReqVO.setAddrIndex(ownerGoodsDetailDTO.getCarAddrIndex());
+		}
 		carDetailReqVO.setCarNo(String.valueOf(ownerGoodsDetailDTO.getCarNo()));
 		carDetailReqVO.setRentTime(modifyOrderOwnerDTO.getRentTime());
 		carDetailReqVO.setRevertTime(modifyOrderOwnerDTO.getRevertTime());
@@ -425,18 +427,19 @@ public class ModifyOrderForOwnerService {
 	
 	/**
 	 * 获取车主会员信息根据车主订单号
-	 * @param ownerOrderNo 车主订单号
+	 * @param ownerOrderNo 修改前车主订单号
+	 * @param updOwnerOrderNo 修改后车主订单号
 	 * @return OwnerMemberDTO
 	 */
-	public OwnerMemberDTO getOwnerMemberDTO(String ownerOrderNo) {
+	public OwnerMemberDTO getOwnerMemberDTO(String ownerOrderNo, String updOwnerOrderNo) {
 		OwnerMemberDTO ownerMemberDTO = ownerMemberService.selectownerMemberByMemNo(ownerOrderNo, true);
-		ownerMemberDTO.setOwnerOrderNo(ownerOrderNo);
+		ownerMemberDTO.setOwnerOrderNo(updOwnerOrderNo);
 		List<OwnerMemberRightDTO> ownerMemberRightDTOList = ownerMemberDTO.getOwnerMemberRightDTOList();
 		if (ownerMemberRightDTOList == null || ownerMemberRightDTOList.isEmpty()) {
 			return ownerMemberDTO;
 		}
 		for (OwnerMemberRightDTO mr:ownerMemberRightDTOList) {
-			mr.setOwnerOrderNo(ownerOrderNo);
+			mr.setOwnerOrderNo(updOwnerOrderNo);
 		}
 		return ownerMemberDTO;
 	}

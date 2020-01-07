@@ -52,6 +52,11 @@
 		select <include refid="Base_Column_List" /> from account_renter_deposit_detail where id = #{value}
 	</select>
 
+	<select id="findByOrderNo"
+			resultMap="BaseResultMap">
+        select select <include refid="Base_Column_List" /> from account_renter_deposit_detail where order_no=#{orderNo} and is_delete=0 order by id;
+	</select>
+
 	<insert id="insert" parameterType="com.atzuche.order.accountrenterdeposit.entity.AccountRenterDepositDetailEntity">
 		insert into account_renter_deposit_detail
 		(
@@ -67,12 +72,9 @@
 				`credit_pay_expire_time`,		
 				`source_code`,		
 				`source_detail`,		
-				`unique_no`,		
-				`create_time`,		
-				`create_op`,		
-				`update_time`,		
-				`update_op`,		
-				`is_delete`		
+				`unique_no`,
+				`create_op`,
+				`update_op`
 			)
 		values
 		(
@@ -88,12 +90,9 @@
 				#{creditPayExpireTime}, 		
 				#{sourceCode}, 		
 				#{sourceDetail}, 		
-				#{uniqueNo}, 		
-				#{createTime}, 		
-				#{createOp}, 		
-				#{updateTime}, 		
-				#{updateOp}, 		
-				#{isDelete}		
+				#{uniqueNo},
+				#{createOp},
+				#{updateOp}
 			)
 	</insert>
     <update id="updateByPrimaryKeySelective" parameterType="com.atzuche.order.accountrenterdeposit.entity.AccountRenterDepositDetailEntity">

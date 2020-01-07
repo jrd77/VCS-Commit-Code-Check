@@ -7,9 +7,9 @@ import javax.validation.constraints.NotNull;
 
 @Data
 public class CarBaseReqVO {
-	@AutoDocProperty(value="carNo,必填")
-	@NotNull(message="车辆注册号不能为空")
-	private Integer carNo;
+    @AutoDocProperty(value="carNo,必填")
+    @NotNull(message="车辆注册号不能为空")
+    private Integer carNo;
 
 
 }

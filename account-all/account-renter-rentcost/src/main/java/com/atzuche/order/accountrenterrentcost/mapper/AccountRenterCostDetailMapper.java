@@ -20,7 +20,7 @@ public interface AccountRenterCostDetailMapper{
     int insert(AccountRenterCostDetailEntity record);
 
     /**
-     * 根据订单号查询租车费用明细
+     * 根据订单号查询租车资金明细
      * @param orderNo
      * @return
      */

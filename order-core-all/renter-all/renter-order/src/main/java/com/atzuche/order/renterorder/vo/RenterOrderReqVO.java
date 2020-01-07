@@ -157,6 +157,26 @@ public class RenterOrderReqVO implements Serializable {
      */
     private String carLat;
 
+
+    /**
+     * 车辆显示经度
+     */
+    private String carShowLon;
+    /**
+     * 车辆显示纬度
+     */
+    private String carShowLat;
+
+    /**
+     * 车辆真实经度
+     */
+    private String carRealLon;
+    /**
+     * 车辆真实纬度
+     */
+    private String carRealLat;
+
+
     /**
      * 提前时间（分钟数）
      */
