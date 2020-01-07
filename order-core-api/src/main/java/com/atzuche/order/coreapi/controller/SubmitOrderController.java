@@ -38,7 +38,7 @@ import java.util.Optional;
  */
 @RequestMapping("/order")
 @RestController
-@AutoDocVersion(version = "普通订单下单接口文档")
+@AutoDocVersion(version = "订单接口文档")
 public class SubmitOrderController {
     private static final Logger LOGGER = LoggerFactory.getLogger(SubmitOrderController.class);
 
@@ -106,7 +106,7 @@ public class SubmitOrderController {
 
 
 
-    @AutoDocMethod(description = "管理后台提交订单", value = "管理后台提交订单", response = OrderResVO.class)
+    @AutoDocMethod(description = "提交订单(管理后台)", value = "提交订单(管理后台)", response = OrderResVO.class)
     @PostMapping("/admin/req")
     public ResponseData<OrderResVO> submitOrder(@RequestBody AdminOrderReqVO adminOrderReqVO, BindingResult bindingResult) {
 
