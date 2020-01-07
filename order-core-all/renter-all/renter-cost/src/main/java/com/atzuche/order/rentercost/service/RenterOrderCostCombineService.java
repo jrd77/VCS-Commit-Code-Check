@@ -641,9 +641,9 @@ public class RenterOrderCostCombineService {
         // 还车纬度
         String srvReturnLat = getReturnCarCostReqDto.getSrvReturnLat();
         // 车辆经度
-        String carLon = getReturnCarCostReqDto.getCarLon();
+        String carLon = getReturnCarCostReqDto.getCarRealLon();
         // 车辆纬度
-        String carLat = getReturnCarCostReqDto.getCarLat();
+        String carLat = getReturnCarCostReqDto.getCarRealLat();
         boolean getFlag = StringUtils.isBlank(srvGetLon) || StringUtils.isBlank(srvGetLat) || "0.0".equalsIgnoreCase(srvGetLon) || "0.0".equalsIgnoreCase(srvGetLat);
         boolean returnFlag = StringUtils.isBlank(srvReturnLon) || StringUtils.isBlank(srvReturnLat) || "0.0".equalsIgnoreCase(srvReturnLon) || "0.0".equalsIgnoreCase(srvReturnLat);
         CityDTO cityDTO = null;
@@ -691,12 +691,13 @@ public class RenterOrderCostCombineService {
         getCost.setGetReturnTime(String.valueOf(LocalDateTimeUtils.localDateTimeToLong(costBaseDTO.getEndTime())));
         getCost.setCityId(String.valueOf(cityCode));
         getCost.setOrderType(this.getIsPackageOrder(getReturnCarCostReqDto.getIsPackageOrder()));
-        getCost.setDistance(String.valueOf(returnDistance));
+        getCost.setDistance(String.valueOf(getDistance));
         if(returnFlag && cityDTO !=null) {
             getCost.setRenterLocation(cityDTO.getLon()+","+ cityDTO.getLat());
         } else {
             getCost.setRenterLocation(srvReturnLon+","+srvReturnLat);
         }
+
         getCost.setSumJudgeFreeFee(sumJudgeFreeFeeStr);
         reqList.add(getCost);
 

@@ -51,6 +51,8 @@
         <result property="updateTime" column="update_time"/>
         <result property="updateOp" column="update_op"/>
         <result property="isDelete" column="is_delete"/>
+        <result property="oilTotalCalibration" column="oil_total_calibration"/>
+        <result property="carGuideDayPrice" column="car_guide_day_price"/>
     </resultMap>
 
 
@@ -93,6 +95,8 @@
 	`car_addr_index`,
 	`stop_cost_rate`,
 	`engine_source`,
+	`oil_total_calibration`,
+	`car_guide_day_price`,
 	`frame_no`,
 	`engine_num`,
 	`service_rate`,
@@ -149,6 +153,8 @@
         `car_addr_index`,
         `stop_cost_rate`,
         `engine_source`,
+        `oil_total_calibration`,
+        `car_guide_day_price`,
         `frame_no`,
         `engine_num`,
         `service_rate`,
@@ -194,6 +200,8 @@
         #{carAddrIndex},
         #{stopCostRate},
         #{engineSource},
+        #{oilTotalCalibration},
+        #{carGuideDayPrice},
         #{frameNo},
         #{engineNum},
         #{serviceRate},
@@ -242,6 +250,8 @@
             <if test="carAddrIndex != null">`car_addr_index`, </if>
             <if test="stopCostRate != null">`stop_cost_rate`, </if>
             <if test="engineSource != null">`engine_source`, </if>
+            <if test="oilTotalCalibration != null">`oil_total_calibration`, </if>
+            <if test="carGuideDayPrice != null">`car_guide_day_price`, </if>
             <if test="frameNo != null">`frame_no`, </if>
             <if test="engineNum != null">`engine_num`, </if>
             <if test="serviceRate != null">`service_rate`, </if>
@@ -286,6 +296,8 @@
             <if test="carAddrIndex != null">#{carAddrIndex},  </if>
             <if test="stopCostRate != null">#{stopCostRate},  </if>
             <if test="engineSource != null">#{engineSource},  </if>
+            <if test="oilTotalCalibration != null">#{oilTotalCalibration},  </if>
+            <if test="carGuideDayPrice != null">#{carGuideDayPrice},  </if>
             <if test="frameNo != null">#{frameNo},  </if>
             <if test="engineNum != null">#{engineNum},  </if>
             <if test="serviceRate != null">#{serviceRate},  </if>
@@ -335,6 +347,8 @@
             <if test="carAddrIndex != null">`car_addr_index` = #{carAddrIndex}, </if>
             <if test="stopCostRate != null">`stop_cost_rate` = #{stopCostRate}, </if>
             <if test="engineSource != null">`engine_source` = #{engineSource}, </if>
+            <if test="oilTotalCalibration != null">`oil_total_calibration` = #{oilTotalCalibration},  </if>
+            <if test="carGuideDayPrice != null">`car_guide_day_price` = #{carGuideDayPrice},  </if>
             <if test="frameNo != null">`frame_no` = #{frameNo}, </if>
             <if test="engineNum != null">`engine_num` = #{engineNum}, </if>
             <if test="serviceRate != null">`service_rate` = #{serviceRate}, </if>
@@ -387,6 +401,8 @@
             `car_addr_index` = #{carAddrIndex},
             `stop_cost_rate` = #{stopCostRate},
             `engine_source` = #{engineSource},
+            `oil_total_calibration` = #{oilTotalCalibration},
+            `car_guide_day_price` = #{carGuideDayPrice},
             `frame_no` = #{frameNo},
             `engine_num` = #{engineNum},
             `service_rate` = #{serviceRate},

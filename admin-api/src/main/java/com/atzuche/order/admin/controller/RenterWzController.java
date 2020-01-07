@@ -1,5 +1,6 @@
 package com.atzuche.order.admin.controller;
 
+import com.atzuche.order.admin.service.RenterWzService;
 import com.atzuche.order.admin.vo.req.renterWz.RenterWzCostReqVO;
 import com.atzuche.order.admin.vo.req.renterWz.TemporaryRefundReqVO;
 import com.atzuche.order.admin.vo.resp.renterWz.TemporaryRefundLogsResVO;
@@ -15,6 +16,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
 import javax.validation.Valid;
 
 /**
@@ -27,6 +29,9 @@ import javax.validation.Valid;
 @RestController
 @AutoDocVersion(version = "管理后台违章押金信息")
 public class RenterWzController extends BaseController {
+
+    @Resource
+    private RenterWzService renterWzService;
 
     @GetMapping("/console/wz/detail")
     @AutoDocMethod(description = "违章押金信息", value = "违章押金信息",response = RenterWzDetailResVO.class)
@@ -46,6 +51,8 @@ public class RenterWzController extends BaseController {
         if(StringUtils.isBlank(costDetail.getOrderNo())){
             return ResponseData.createErrorCodeResponse(ErrorCode.ORDER_NO_PARAM_ERROR.getCode(), "订单编号为空");
         }
+        renterWzService.updateWzCost(costDetail.getOrderNo(),costDetail.getCostDetails());
+
         return ResponseData.success();
     }
 
@@ -55,7 +62,8 @@ public class RenterWzController extends BaseController {
         if (StringUtils.isBlank(orderNo)) {
             return ResponseData.createErrorCodeResponse(ErrorCode.ORDER_NO_PARAM_ERROR.getCode(), "订单编号为空");
         }
-        return ResponseData.success();
+        WzCostLogsResVO rep = renterWzService.queryWzCostLogsByOrderNo(orderNo);
+        return ResponseData.success(rep);
     }
 
     @GetMapping("/console/temporaryRefund/log")

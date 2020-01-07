@@ -1,8 +1,9 @@
 package com.atzuche.order.parentorder.entity;
 
+import lombok.Data;
+
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import lombok.Data;
 
 
 /**
@@ -32,14 +33,6 @@ public class OrderSourceStatEntity implements Serializable {
 	 * 设备信息
 	 */
 	private String device;
-	/**
-	 * IP信息
-	 */
-	private String ip;
-	/**
-	 * 端口信息
-	 */
-	private String port;
 	/**
 	 * 渠道信息
 	 */
@@ -119,11 +112,11 @@ public class OrderSourceStatEntity implements Serializable {
 	/**
 	 * 是否使用凹凸币
 	 */
-	private String useAutoCoin;
+	private Integer useAutoCoin;
 	/**
 	 * 是否后台管理操作
 	 */
-	private String specialConsole;
+	private Integer specialConsole;
 	/**
 	 * 请求系统
 	 */
