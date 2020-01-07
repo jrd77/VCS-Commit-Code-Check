@@ -11,8 +11,8 @@ import org.springframework.cloud.netflix.feign.EnableFeignClients;
  * @author <a href="mailto:lianglin.sjtu@gmail.com">AndySjtu</a>
  * @date 2020/1/2 1:57 下午
  **/
-@SpringBootApplication(scanBasePackages = {"com.atzuche.order.admin","com.atzuche.order.delivery"})
-@MapperScan({"com.atzuche.order.delivery"})
+@SpringBootApplication(scanBasePackages = {"com.atzuche.order"})
+@MapperScan({"com.atzuche.order"})
 @EnableFeignClients({"com.autoyol"})
 public class AdminSpringBoot extends SpringBootServletInitializer {
 
