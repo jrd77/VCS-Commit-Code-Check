@@ -10,6 +10,7 @@ import com.dianping.cat.message.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.Date;
@@ -89,20 +90,20 @@ public class PlatformCouponService {
      * 使用平台券
      *
      * @param disCoupondId 平台优惠券ID
-     * @param orderNo 主订单号
-     * @param useDate 使用日期
+     * @param orderNo      主订单号
+     * @param useDate      使用日期
      */
     public int usePlatformCoupon(String disCoupondId, Long orderNo, Date useDate) {
         logger.info("使用平台券.param is, disCoupondId:[{}],orderNo:[{}],useDate:[{}]", disCoupondId, orderNo, useDate);
         Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "平台优惠券服务");
         int result = 0;
-        try{
-            Cat.logEvent(CatConstants.FEIGN_METHOD,"couponServiceApi.useCoupon");
-            Cat.logEvent(CatConstants.FEIGN_PARAM,"disCoupondId="+disCoupondId+"&orderNo="+orderNo+"&useDate="+useDate);
+        try {
+            Cat.logEvent(CatConstants.FEIGN_METHOD, "couponServiceApi.useCoupon");
+            Cat.logEvent(CatConstants.FEIGN_PARAM, "disCoupondId=" + disCoupondId + "&orderNo=" + orderNo + "&useDate=" + useDate);
             result = couponServiceApi.useCoupon(disCoupondId, orderNo, useDate);
 
             logger.info("使用平台券.result is, result:[{}]", result);
-            Cat.logEvent(CatConstants.FEIGN_RESULT,String.valueOf(result));
+            Cat.logEvent(CatConstants.FEIGN_RESULT, String.valueOf(result));
             t.setStatus(Transaction.SUCCESS);
         } catch (Exception e) {
             logger.error("使用平台券异常.result:[{}]", result, e);
@@ -120,21 +121,21 @@ public class PlatformCouponService {
      * 使用送取服务券
      *
      * @param disCoupondId 送取服务惠券ID
-     * @param orderNo 主订单号
-     * @param useDate 使用日期
+     * @param orderNo      主订单号
+     * @param useDate      使用日期
      */
     public int useGetCarFreeCoupon(String disCoupondId, Long orderNo, Date useDate) {
 
         logger.info("使用送取服务券.param is, disCoupondId:[{}],orderNo:[{}],useDate:[{}]", disCoupondId, orderNo, useDate);
         Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "平台优惠券服务");
         int result = 0;
-        try{
-            Cat.logEvent(CatConstants.FEIGN_METHOD,"couponServiceApi.useGetCarFreeCoupon");
-            Cat.logEvent(CatConstants.FEIGN_PARAM,"disCoupondId="+disCoupondId+"&orderNo="+orderNo+"&useDate="+useDate);
+        try {
+            Cat.logEvent(CatConstants.FEIGN_METHOD, "couponServiceApi.useGetCarFreeCoupon");
+            Cat.logEvent(CatConstants.FEIGN_PARAM, "disCoupondId=" + disCoupondId + "&orderNo=" + orderNo + "&useDate=" + useDate);
             result = couponServiceApi.useGetCarFreeCoupon(disCoupondId, orderNo, useDate);
 
             logger.info("使用送取服务券.result is, result:[{}]", result);
-            Cat.logEvent(CatConstants.FEIGN_RESULT,String.valueOf(result));
+            Cat.logEvent(CatConstants.FEIGN_RESULT, String.valueOf(result));
             t.setStatus(Transaction.SUCCESS);
         } catch (Exception e) {
             logger.error("使用送取服务券异常.result:[{}]", result, e);
@@ -147,6 +148,33 @@ public class PlatformCouponService {
     }
 
 
+    /**
+     * 退还优惠券(平台优惠券+送取服务券)
+     *
+     * @param orderNo 订单号
+     * @return int
+     */
+    public int cancelCoupon(String orderNo) {
+        logger.info("退还优惠券(平台优惠券+送取服务券).param is, orderNo:[{}]", orderNo);
+        Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "平台优惠券服务");
+        int result = 0;
+        try {
+            Cat.logEvent(CatConstants.FEIGN_METHOD, "couponServiceApi.cancelCoupon");
+            Cat.logEvent(CatConstants.FEIGN_PARAM, "orderNo=" + orderNo);
+
+            result = couponServiceApi.cancelCoupon(Long.valueOf(orderNo));
+            logger.info("退还优惠券(平台优惠券+送取服务券).result is, result:[{}]", result);
+            Cat.logEvent(CatConstants.FEIGN_RESULT, String.valueOf(result));
+            t.setStatus(Transaction.SUCCESS);
+        } catch (Exception e) {
+            logger.error("退还优惠券(平台优惠券+送取服务券).result:[{}]", result, e);
+            t.setStatus(e);
+            Cat.logError("退还优惠券(平台优惠券+送取服务券).", e);
+        } finally {
+            t.complete();
+        }
+        return result;
+    }
 
 
 }
