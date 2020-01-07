@@ -2,6 +2,7 @@ package com.atzuche.order.coreapi.service;
 
 import com.atzuche.order.commons.enums.MemRoleEnum;
 import com.atzuche.order.commons.vo.req.CancelOrderReqVO;
+import com.atzuche.order.coreapi.entity.dto.CancelOrderResDTO;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,6 +23,9 @@ public class CancelOrderService {
     @Autowired
     private OwnerCancelOrderService ownerCancelOrderService;
 
+    @Autowired
+    private CouponAndCoinHandleService couponAndCoinHandleService;
+
     /**
      * 订单取消
      *
@@ -32,11 +36,15 @@ public class CancelOrderService {
         check();
 
         //取消处理
+        CancelOrderResDTO res = null;
         if (StringUtils.equals(MemRoleEnum.RENTER.getCode(), cancelOrderReqVO.getMemRole())) {
-            renterCancelOrderService.cancel();
+            res = renterCancelOrderService.cancel();
         } else if (StringUtils.equals(MemRoleEnum.OWNER.getCode(), cancelOrderReqVO.getMemRole())) {
-            ownerCancelOrderService.cancel();
+            res = ownerCancelOrderService.cancel();
         }
+
+        //优惠券、凹凸币退回(钱包收银台处理)
+        //todo
 
         //通知收银台退款
         //todo

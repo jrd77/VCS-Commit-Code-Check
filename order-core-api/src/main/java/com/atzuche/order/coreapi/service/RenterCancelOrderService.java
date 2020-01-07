@@ -1,7 +1,8 @@
 package com.atzuche.order.coreapi.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import com.atzuche.order.coreapi.entity.dto.CancelOrderResDTO;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * 租客取消
@@ -13,20 +14,20 @@ import org.springframework.stereotype.Service;
 @Service
 public class RenterCancelOrderService {
 
-    @Autowired
-    private CouponAndCoinHandleService couponAndCoinHandleService;
-
-    public void cancel() {
+    /**
+     * 取消处理
+     *
+     * @return CancelOrderResDTO 返回信息
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public CancelOrderResDTO cancel() {
         //校验
         //todo
 
         //调度判定
         //todo
 
-        //罚金计算
-        //todo
-
-        //优惠券、凹凸币退回(钱包收银台处理)
+        //罚金计算(罚金和收益)
         //todo
 
         //订单状态更新
@@ -38,6 +39,8 @@ public class RenterCancelOrderService {
         //落库
         //todo
 
+
+        return null;
     }
 
 
