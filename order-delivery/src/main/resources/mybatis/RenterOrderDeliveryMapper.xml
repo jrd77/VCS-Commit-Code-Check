@@ -286,7 +286,8 @@
 		select
 		<include refid="Base_Column_List"/>
 		from renter_order_delivery where renter_order_no = #{renterOrderNo}
-		and is_delete = 0
+		and is_delete = 0 
+		order by id desc
 	</select>
 
 	<update id="updateStatusById" parameterType="java.lang.Integer">
