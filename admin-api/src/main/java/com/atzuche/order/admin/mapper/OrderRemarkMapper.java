@@ -1,6 +1,8 @@
 package com.atzuche.order.admin.mapper;
 
+import com.atzuche.order.admin.dto.OrderRemarkAdditionRequestDTO;
 import com.atzuche.order.admin.entity.OrderRemarkOverviewEntity;
+import com.atzuche.order.admin.vo.req.remark.OrderRemarkAdditionRequestVO;
 import com.atzuche.order.admin.vo.req.remark.OrderRemarkRequestVO;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -16,5 +18,8 @@ public interface OrderRemarkMapper {
      * @return
      */
     List<OrderRemarkOverviewEntity> getOrderRemarkOverview(OrderRemarkRequestVO orderRemarkRequestVO);
+
+    void addOrderRemark(OrderRemarkAdditionRequestDTO orderRemarkAdditionRequestDTO);
+
 
 }

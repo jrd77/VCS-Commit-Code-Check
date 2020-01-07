@@ -1,8 +1,10 @@
 package com.atzuche.order.admin.service.remark;
 
+import com.atzuche.order.admin.dto.OrderRemarkAdditionRequestDTO;
 import com.atzuche.order.admin.entity.OrderRemarkOverviewEntity;
 import com.atzuche.order.admin.enums.RemarkTypeEnum;
 import com.atzuche.order.admin.mapper.OrderRemarkMapper;
+import com.atzuche.order.admin.vo.req.remark.OrderRemarkAdditionRequestVO;
 import com.atzuche.order.admin.vo.req.remark.OrderRemarkRequestVO;
 import com.atzuche.order.admin.vo.resp.remark.OrderRemarkOverviewListResponseVO;
 import com.atzuche.order.admin.vo.resp.remark.OrderRemarkOverviewResponseVO;
@@ -44,6 +46,16 @@ public class OrderRemarkService {
             orderRemarkOverviewListResponseVO.setRemarkOverviewList(orderRemarkOverviewList);
         }
         return orderRemarkOverviewListResponseVO;
+    }
+
+    /**
+     * 添加备注
+     * @param orderRemarkAdditionRequestVO
+     */
+    public void addOrderRemark(OrderRemarkAdditionRequestVO orderRemarkAdditionRequestVO) {
+        OrderRemarkAdditionRequestDTO orderRemarkAdditionRequestDTO = new OrderRemarkAdditionRequestDTO();
+        BeanUtils.copyProperties(orderRemarkAdditionRequestVO,orderRemarkAdditionRequestDTO);
+        orderRemarkMapper.addOrderRemark(orderRemarkAdditionRequestDTO);
     }
 
 

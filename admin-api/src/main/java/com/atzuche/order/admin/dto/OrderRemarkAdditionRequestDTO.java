@@ -1,4 +1,4 @@
-package com.atzuche.order.admin.vo.req.remark;
+package com.atzuche.order.admin.dto;
 
 import com.autoyol.doc.annotation.AutoDocProperty;
 import lombok.Data;
@@ -6,10 +6,13 @@ import lombok.ToString;
 
 @Data
 @ToString
-public class OrderRemarkAdditionRequestVO {
+public class OrderRemarkAdditionRequestDTO {
 
     @AutoDocProperty(value = "订单号")
     private String orderNo;
+
+    @AutoDocProperty(value = "序号")
+    private String number;
 
     @AutoDocProperty(value = "操作人部门id")
     private String departmentId;
@@ -28,6 +31,20 @@ public class OrderRemarkAdditionRequestVO {
 
     @AutoDocProperty(value = "是否限制租客延时，只有remarkType=2时，才需要填写")
     private String limitDelayed;
+
+    @AutoDocProperty(value = "创建时间")
+    private String createTime;
+
+    @AutoDocProperty(value = "创建人")
+    private String createOp;
+
+    @AutoDocProperty(value = "修改时间")
+    private String updateTime;
+
+    @AutoDocProperty(value = "修改人")
+    private String updateOp;
+
+
 
 
 
