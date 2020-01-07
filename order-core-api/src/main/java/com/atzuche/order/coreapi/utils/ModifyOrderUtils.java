@@ -158,7 +158,7 @@ public class ModifyOrderUtils {
 			changeItemList.add(new OrderChangeItemDTO(initRenterOrder.getOrderNo(), renterOrderNo, OrderChangeItemEnum.MODIFY_GETADDR.getCode(), OrderChangeItemEnum.MODIFY_GETADDR.getName()));
 		}
 		if (getModifyGetReturnAddrFlag(initReturnLon, initReturnLat, updModifyOrder.getRevertCarLon(), updModifyOrder.getRevertCarLat())) {
-			changeItemList.add(new OrderChangeItemDTO(initRenterOrder.getOrderNo(), renterOrderNo, OrderChangeItemEnum.MODIFY_GETADDR.getCode(), OrderChangeItemEnum.MODIFY_GETADDR.getName()));
+			changeItemList.add(new OrderChangeItemDTO(initRenterOrder.getOrderNo(), renterOrderNo, OrderChangeItemEnum.MODIFY_RETURNADDR.getCode(), OrderChangeItemEnum.MODIFY_RETURNADDR.getName()));
 		}
 		String initCarOwnerCouponId = null,initGetReturnCouponId = null,initPlatformCouponId = null;
 		if (orderCouponList != null && !orderCouponList.isEmpty()) {

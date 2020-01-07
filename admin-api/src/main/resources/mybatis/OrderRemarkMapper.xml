@@ -12,6 +12,39 @@
         SELECT remark_type, COUNT(*) AS typeCount FROM trans_remark where order_no = #{orderNo} GROUP BY remark_type
     </select>
 
+    <insert id="addOrderRemark" parameterType="com.atzuche.order.admin.dto.OrderRemarkAdditionRequestDTO">
+        insert into trans_remark
+		(
+			`order_no`,
+			`number`,
+			`remark_type`,
+			`remark`,
+			`limit_delayed`,
+			`follow_status`,
+			`follow_fail_reason`,
+			`create_time`,
+			`create_op`,
+			`update_time`,
+			`update_op`,
+			`dept_id`
+		)
+		values
+		(
+			#{orderNo},
+			#{number},
+			#{remarkType},
+			#{remarkContent},
+			#{limitDelayed},
+			#{followStatus},
+			#{followFailReason},
+			#{createTime},
+			#{createOp},
+			#{updateTime},
+			#{updateOp},
+			#{departmentId}
+		)
+    </insert>
+
 
 
   	
