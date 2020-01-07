@@ -1,12 +1,15 @@
 package com.atzuche.order.admin.controller.order.remark;
 
+import com.atzuche.order.admin.service.remark.OrderRemarkService;
 import com.atzuche.order.admin.vo.req.remark.*;
 import com.atzuche.order.admin.vo.resp.remark.OrderRemarkLogPageListResponseVO;
+import com.atzuche.order.admin.vo.resp.remark.OrderRemarkOverviewListResponseVO;
 import com.atzuche.order.admin.vo.resp.remark.OrderRemarkOverviewResponseVO;
 import com.atzuche.order.admin.vo.resp.remark.OrderRemarkPageListResponseVO;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.doc.annotation.AutoDocMethod;
 import com.autoyol.doc.annotation.AutoDocVersion;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,10 +18,13 @@ import org.springframework.web.bind.annotation.*;
 @AutoDocVersion(version = "订单备注接口文档")
 public class OrderRemarkController {
 
-	@AutoDocMethod(description = "备注总览", value = "备注总览", response = OrderRemarkOverviewResponseVO.class)
+    @Autowired
+    OrderRemarkService orderRemarkService;
+
+	@AutoDocMethod(description = "备注总览", value = "备注总览", response = OrderRemarkOverviewListResponseVO.class)
 	@GetMapping("/overview")
-	public ResponseData<OrderRemarkOverviewResponseVO> overview(@RequestBody OrderRemarkRequestVO orderRemarkRequestVO, BindingResult bindingResult) {
-		return ResponseData.success(null);
+	public ResponseData<OrderRemarkOverviewListResponseVO> getOverview(@RequestBody OrderRemarkRequestVO orderRemarkRequestVO, BindingResult bindingResult) {
+		return ResponseData.success(orderRemarkService.getOrderRemarkOverview(orderRemarkRequestVO));
 	}
 
     @AutoDocMethod(description = "备注查询列表", value = "备注查询列表", response = OrderRemarkPageListResponseVO.class)
