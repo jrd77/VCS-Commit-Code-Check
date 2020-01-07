@@ -381,6 +381,10 @@ public class SubmitOrderService {
         renterOrderReqVO.setRenterGoodsPriceDetailDTOList(goodsDetail.getRenterGoodsPriceDetailDTOList());
         renterOrderReqVO.setPlateNum(goodsDetail.getCarPlateNum());
         renterOrderReqVO.setAbatement(orderReqVO.getAbatement());
+        renterOrderReqVO.setCarShowLat(goodsDetail.getCarShowLat());
+        renterOrderReqVO.setCarShowLon(goodsDetail.getCarShowLon());
+        renterOrderReqVO.setCarRealLat(goodsDetail.getCarRealLat());
+        renterOrderReqVO.setCarRealLon(goodsDetail.getCarRealLon());
 
         RenterMemberDTO renterMember = reqContext.getRenterMemberDto();
         renterOrderReqVO.setCertificationTime(renterMember.getCertificationTime());
