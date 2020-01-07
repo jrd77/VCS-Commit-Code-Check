@@ -648,7 +648,7 @@ public class RenterOrderCostCombineService {
         boolean returnFlag = StringUtils.isBlank(srvReturnLon) || StringUtils.isBlank(srvReturnLat) || "0.0".equalsIgnoreCase(srvReturnLon) || "0.0".equalsIgnoreCase(srvReturnLat);
         CityDTO cityDTO = null;
         if (getFlag || returnFlag) {
-
+        	cityDTO = new CityDTO();
             CityEntity configByCityCode = cityConfigSDK.getConfigByCityCode(new DefaultConfigContext(), cityCode);
             log.info("计算取还车费用-配置服务中获取配置信息configByCityCode=[{}]",configByCityCode);
             String lat = configByCityCode.getLat();
