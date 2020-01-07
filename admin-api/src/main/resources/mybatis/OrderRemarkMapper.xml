@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.atzuche.order.admin.mapper.OrderRemarkMapper">
+
+    <resultMap id="orderRemarkOverviewMap" type="com.atzuche.order.admin.entity.OrderRemarkOverviewEntity" >
+        <result property="remarkType" column="remark_type"/>
+        <result property="typeCount" column="typeCount"/>
+    </resultMap>
+
+    <select id="getOrderRemarkOverview" resultMap="orderRemarkOverviewMap">
+        SELECT remark_type, COUNT(*) AS typeCount FROM trans_remark where order_no = #{orderNo} GROUP BY remark_type
+    </select>
+
+
+
+  	
+</mapper>
