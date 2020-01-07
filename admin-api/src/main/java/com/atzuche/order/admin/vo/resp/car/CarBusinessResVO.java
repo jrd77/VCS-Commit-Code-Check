@@ -1,9 +1,11 @@
 package com.atzuche.order.admin.vo.resp.car;
 
 import com.autoyol.doc.annotation.AutoDocProperty;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.Data;
 
-import java.util.Date;
-
+@JsonInclude(value= JsonInclude.Include.NON_EMPTY)
+@Data
 public class CarBusinessResVO {
     @AutoDocProperty("取车地址")
     private String getCarAddr;
@@ -19,12 +21,14 @@ public class CarBusinessResVO {
     @AutoDocProperty("保险到期日期（交强险）")
     private String insuranceExpireDateStr;
 
-    @AutoDocProperty("车辆gps信息")
-    private Integer gps;
+    @AutoDocProperty("GPS号")
+    private String gps;
+    @AutoDocProperty("SIM卡号")
+    private String simNo;
 
     @AutoDocProperty("车辆备注")
     private String memo;
-    @AutoDocProperty("车辆详情")
+    @AutoDocProperty("车辆详细")
     private String carRemark;
 
     @AutoDocProperty("取还车说明")

@@ -162,23 +162,11 @@ public class DeliveryCarService {
             orderDeliveryDTO.setRentTime(renterGoodsDetailDTO.getRentTime());
             orderDeliveryDTO.setRevertTime(renterGoodsDetailDTO.getRevertTime());
             orderDeliveryDTO.setType(orderType);
-            if (orderType == UsedDeliveryTypeEnum.USED.getValue().intValue()) {
-                orderDeliveryDTO.setGetReturnUserName(renterMemberDTO.getRealName());
-                orderDeliveryDTO.setGetReturnUserPhone(renterMemberDTO.getPhone());
-                renYunFlowOrderDTO.setPickupcaraddr(orderDeliveryDTO.getRenterGetReturnAddr());
-            } else {
-                orderDeliveryDTO.setGetReturnUserName(ownerMemberDTO.getRealName());
-                orderDeliveryDTO.setGetReturnUserPhone(ownerMemberDTO.getPhone());
-                renYunFlowOrderDTO.setAlsocaraddr(orderDeliveryDTO.getRenterGetReturnAddr());
-            }
+            orderDeliveryDTO.setParamsTypeValue(orderType,ownerMemberDTO,renterMemberDTO);
             /**组装仁云信息**/
             renYunFlowOrderDTO.setOrdernumber(renterGoodsDetailDTO.getOrderNo());
             renYunFlowOrderDTO.setOrderType(orderReqVO.getOrderCategory());
-            if (orderType == UsedDeliveryTypeEnum.USED.getValue().intValue()) {
-                renYunFlowOrderDTO.setServicetype(ServiceTypeEnum.TAKE_TYPE.getValue());
-            } else {
-                renYunFlowOrderDTO.setServicetype(ServiceTypeEnum.BACK_TYPE.getValue());
-            }
+            renYunFlowOrderDTO.setServiceTypeInfo(orderType,orderDeliveryDTO);
             renYunFlowOrderDTO.setTermtime(DateUtils.formate(renterGoodsDetailDTO.getRentTime(), DateUtils.DATE_DEFAUTE_4));
             renYunFlowOrderDTO.setReturntime(DateUtils.formate(renterGoodsDetailDTO.getRevertTime(), DateUtils.DATE_DEFAUTE_4));
             renYunFlowOrderDTO.setCarno(String.valueOf(renterGoodsDetailDTO.getCarNo()));
