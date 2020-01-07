@@ -6,6 +6,7 @@ import com.atzuche.order.accountplatorm.entity.AccountPlatformProfitDetailEntity
 import com.atzuche.order.accountplatorm.entity.AccountPlatformSubsidyDetailEntity;
 import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostDetailEntity;
 import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostSettleDetailEntity;
+import com.atzuche.order.accountrenterrentcost.service.notservice.AccountRenterCostNoTCoinService;
 import com.atzuche.order.cashieraccount.service.CashierService;
 import com.atzuche.order.cashieraccount.service.CashierSettleService;
 import com.atzuche.order.cashieraccount.service.remote.WalletRemoteService;
@@ -72,6 +73,7 @@ public class OrderSettleNoTService {
     @Autowired private OwnerGoodsService ownerGoodsService;
     @Autowired private AutoCoinService autoCoinService;
     @Autowired private WalletRemoteService walletRemoteService;
+    @Autowired private AccountRenterCostNoTCoinService accountRenterCostNoTCoinService;
 
     /**
      * 车辆结算
@@ -856,7 +858,7 @@ public class OrderSettleNoTService {
 
     /**
      * 退还多余费用
-     * 退还优先级 凹凸币>钱包>消费
+     * 退还优先级 凹凸币<钱包<消费
      *
      * @param settleOrdersAccount
      */
@@ -865,23 +867,36 @@ public class OrderSettleNoTService {
         //应退结余 租车费用
         int rentCostSurplusAmt = settleOrdersAccount.getRentCostSurplusAmt();
         if(rentCostSurplusAmt>0){
-            //1 优先退还凹凸币
+            //1 退还凹凸币 coinAmt为订单至少使用的凹凸币
             int coinAmt = accountRenterCostSettleDetails.stream().filter(obj ->{
                 return RenterCashCodeEnum.AUTO_COIN_DEDUCT.getCashNo().equals(obj.getCostCode());
             }).mapToInt(AccountRenterCostSettleDetailEntity::getAmt).sum();
             if(coinAmt>0){
+                int userCoinAmt = accountRenterCostNoTCoinService.getUserCoinAmtByOrder(settleOrdersAccount.getOrderNo(),settleOrdersAccount.getRenterMemNo());
                 //计算应退凹凸币金额
-                int returnCoinAmt = rentCostSurplusAmt>coinAmt?coinAmt:rentCostSurplusAmt;
-                // 1.1记录租车费用明细 退还凹凸币流水
-                AccountRenterCostSettleDetailEntity entity = getAccountRenterCostSettleDetailEntityForAutoCoin(settleOrdersAccount,-returnCoinAmt);
-                renterCostSettleDetails.add(entity);
-                // 1.2退还凹凸币 coinAmt
-                AutoCoiChargeRequestVO vo = getAutoCoiChargeRequestVO(settleOrdersAccount,returnCoinAmt);
-                boolean returnCoinResult = autoCoinService.returnCoin(vo);
-//                if(returnCoinResult){
-                    //退还成功
+                int returnCoinAmt = userCoinAmt - coinAmt;
+                if(returnCoinAmt>0){
+                    // 1.1记录租车费用明细 退还凹凸币流水
+                    AccountRenterCostSettleDetailEntity entity = getAccountRenterCostSettleDetailEntityForAutoCoin(settleOrdersAccount,-returnCoinAmt);
+                    renterCostSettleDetails.add(entity);
+                    // 1.2退还凹凸币 coinAmt
+                    AutoCoiChargeRequestVO vo = getAutoCoiChargeRequestVO(settleOrdersAccount,returnCoinAmt);
+                    boolean returnCoinResult = autoCoinService.returnCoin(vo);
                     rentCostSurplusAmt = rentCostSurplusAmt-coinAmt;
-//                }
+                }
+
+            }
+            //退还租车费用
+            if(rentCostSurplusAmt>0){
+                // 实付
+                int rentCostPayAmtFinal = settleOrdersAccount.getRentCostPayAmtFinal();
+                int returnAmt = rentCostSurplusAmt>rentCostPayAmtFinal?rentCostPayAmtFinal:rentCostPayAmtFinal-rentCostSurplusAmt;
+                //退还剩余 租车费用
+                CashierRefundApplyReqVO cashierRefundApplyReq = getCashierRefundApplyReqVO(settleOrdersAccount,-returnAmt);
+                int id = cashierService.refundRentCost(cashierRefundApplyReq);
+                AccountRenterCostSettleDetailEntity entity = getAccountRenterCostSettleDetailEntityForRentCost(settleOrdersAccount,-returnAmt,id);
+                renterCostSettleDetails.add(entity);
+                rentCostSurplusAmt = rentCostSurplusAmt-returnAmt;
             }
             //2 查询钱包 比较
             if(rentCostSurplusAmt>0){
@@ -894,15 +909,7 @@ public class OrderSettleNoTService {
 
                 AccountRenterCostSettleDetailEntity entity = getAccountRenterCostSettleDetailEntityForWallet(settleOrdersAccount,-returnWalletAmt,walletLogId);
                 renterCostSettleDetails.add(entity);
-                rentCostSurplusAmt = rentCostSurplusAmt-walletAmt;
-            }
-            //3 退还租车费用
-            if(rentCostSurplusAmt>0){
-                CashierRefundApplyReqVO cashierRefundApplyReq = getCashierRefundApplyReqVO(settleOrdersAccount,-rentCostSurplusAmt);
-                //退还剩余 租车费用
-                int id = cashierService.refundRentCost(cashierRefundApplyReq);
-                AccountRenterCostSettleDetailEntity entity = getAccountRenterCostSettleDetailEntityForRentCost(settleOrdersAccount,-rentCostSurplusAmt,id);
-                renterCostSettleDetails.add(entity);
+
             }
             //记录 凹凸币/钱包退还 流水
             cashierSettleService.insertAccountRenterCostSettleDetails(renterCostSettleDetails);
