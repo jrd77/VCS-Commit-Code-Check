@@ -90,8 +90,10 @@ public class OrderSettleService {
             throw new OrderSettleFlatAccountException();
         }
         //开启事务
-        //7 租车费用  总费用 信息落库 并返回最新租车费用 实付
+        //7.1 租车费用  总费用 信息落库 并返回最新租车费用 实付
         AccountRenterCostSettleEntity accountRenterCostSettle = cashierSettleService.updateRentSettleCost(settleOrders.getOrderNo(),settleOrders.getRenterMemNo(), settleOrdersDefinition.getAccountRenterCostSettleDetails());
+        //7.2 车主 费用 落库表
+        cashierSettleService.insertAccountOwnerCostSettle(settleOrders.getOrderNo(),settleOrders.getOwnerOrderNo(),settleOrders.getOwnerMemNo(),settleOrdersDefinition.getAccountOwnerCostSettleDetails());
         //8 获取租客 实付 车辆押金
         int depositAmt = cashierSettleService.getRentDeposit(settleOrders.getOrderNo(),settleOrders.getRenterMemNo());
         SettleOrdersAccount settleOrdersAccount = new SettleOrdersAccount();
@@ -101,17 +103,22 @@ public class OrderSettleService {
         settleOrdersAccount.setDepositAmt(depositAmt);
         settleOrdersAccount.setDepositSurplusAmt(depositAmt);
         settleOrdersAccount.setOwnerCostAmtFinal(settleOrdersDefinition.getOwnerCostAmtFinal());
+        settleOrdersAccount.setOwnerCostSurplusAmt(settleOrdersDefinition.getOwnerCostAmtFinal());
         int rentCostSurplusAmt = (accountRenterCostSettle.getRentAmt() + accountRenterCostSettle.getShifuAmt())<=0?0:(accountRenterCostSettle.getRentAmt() + accountRenterCostSettle.getShifuAmt());
         settleOrdersAccount.setRentCostSurplusAmt(rentCostSurplusAmt);
-        //9 租客费用结余处理
+        //9 租客费用 结余处理
         orderSettleNoTService.rentCostSettle(settleOrders,settleOrdersAccount);
-        //10租客车辆押金结余欠款
+        //10租客车辆押金/租客剩余租车费用 结余历史欠款
         orderSettleNoTService.repayHistoryDebtRent(settleOrdersAccount);
         //11 租客费用 退还
         orderSettleNoTService.refundRentCost(settleOrdersAccount,settleOrdersDefinition.getAccountRenterCostSettleDetails());
         //12 租客押金 退还
         orderSettleNoTService.refundDepositAmt(settleOrdersAccount);
-        //12车主收益 结余处理
+        //13车主收益 结余处理 历史欠款
+        orderSettleNoTService.repayHistoryDebtOwner(settleOrdersAccount);
+        //14 车主待审核收益落库
+        orderSettleNoTService.insertOwnerIncomeExamine(settleOrdersAccount);
+        //16 更新订单状态 TODO
 
     }
 }

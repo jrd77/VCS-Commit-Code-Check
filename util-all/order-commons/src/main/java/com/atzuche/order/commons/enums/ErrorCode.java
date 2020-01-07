@@ -41,7 +41,7 @@ public enum ErrorCode {
 
     GET_WALLETR_MSG("981005","查询钱包信息出错"),
     DEDUCT_WALLETR_MSG("981006","扣减钱包信息出错"),
-
+    SETTLE_RETURN_WALLETR_MSG("981008","结算扣减钱包出错"),
 
     ORDER_RENTER_ORDERNO_CREATE_ERROR("600001","订单编码创建异常"),
 

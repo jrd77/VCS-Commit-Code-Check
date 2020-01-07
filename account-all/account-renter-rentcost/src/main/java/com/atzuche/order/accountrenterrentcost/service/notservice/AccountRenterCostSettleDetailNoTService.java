@@ -1,6 +1,8 @@
 package com.atzuche.order.accountrenterrentcost.service.notservice;
 
 import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostSettleDetailEntity;
+import com.atzuche.order.commons.enums.RenterCashCodeEnum;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.atzuche.order.accountrenterrentcost.mapper.AccountRenterCostSettleDetailMapper;
@@ -18,8 +20,7 @@ import java.util.Objects;
  */
 @Service
 public class AccountRenterCostSettleDetailNoTService {
-    @Autowired
-    private AccountRenterCostSettleDetailMapper accountRenterCostSettleDetailMapper;
+    @Autowired private AccountRenterCostSettleDetailMapper accountRenterCostSettleDetailMapper;
 
 
     /**
@@ -41,7 +42,18 @@ public class AccountRenterCostSettleDetailNoTService {
      */
     public int insertAccountRenterCostSettleDetail(AccountRenterCostSettleDetailEntity accountRenterCostSettleDetail) {
         return accountRenterCostSettleDetailMapper.insertSelective(accountRenterCostSettleDetail);
-
     }
 
+    /**
+     * 根据订单号 和会员号 查询 订单 钱包支付金额
+     * @param orderNo
+     * @param renterMemNo
+     */
+    public int getRentCostPayByWallet(String orderNo, String renterMemNo) {
+       List<AccountRenterCostSettleDetailEntity> result = accountRenterCostSettleDetailMapper.selectRenterCostSettleDetail(orderNo,renterMemNo, RenterCashCodeEnum.WALLET_DEDUCT.getCashNo());
+        if(CollectionUtils.isEmpty(result)){
+            return 0;
+        }
+        return result.stream().mapToInt(AccountRenterCostSettleDetailEntity::getAmt).sum();
+    }
 }

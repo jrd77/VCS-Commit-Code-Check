@@ -29,13 +29,6 @@ public class DeductDepositToRentCostReqVO {
     private Integer amt;
 
     /**
-     * 租客实付 车辆押金
-     */
-    private int depositAmt;
-
-
-
-    /**
      * 参数详情
      */
     public void check() {
@@ -43,6 +36,5 @@ public class DeductDepositToRentCostReqVO {
         Assert.notNull(getOrderNo(), ErrorCode.PARAMETER_ERROR.getText());
         Assert.notNull(getAmt(), ErrorCode.PARAMETER_ERROR.getText());
         Assert.isTrue(getAmt()==0, ErrorCode.PARAMETER_ERROR.getText());
-        Assert.notNull(getDepositAmt(), ErrorCode.PARAMETER_ERROR.getText());
     }
 }

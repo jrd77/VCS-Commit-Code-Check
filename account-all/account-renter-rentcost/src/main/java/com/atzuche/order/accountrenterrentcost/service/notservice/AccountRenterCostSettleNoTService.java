@@ -70,8 +70,11 @@ public class AccountRenterCostSettleNoTService {
     }
 
     public void refundRenterCostSettle(AccountRenterCostSettleEntity accountRenterCostSettle,int amt) {
+        AccountRenterCostSettleEntity entity = new AccountRenterCostSettleEntity();
+        entity.setId(accountRenterCostSettle.getId());
+        entity.setVersion(accountRenterCostSettle.getVersion());
         int refundAmt = Objects.isNull(accountRenterCostSettle.getRefundAmt())?0:accountRenterCostSettle.getRefundAmt();
-        accountRenterCostSettle.setRentAmt(refundAmt + amt);
+        entity.setRefundAmt(refundAmt + amt);
         int result = accountRenterCostSettleMapper.updateByPrimaryKeySelective(accountRenterCostSettle);
         if(result==0){
             throw new AccountRenterRentCostRefundException();

@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import java.util.List;
+import java.util.Objects;
 
 
 /**
@@ -51,5 +52,15 @@ public class AccountOwnerCostSettleDetailNoTService {
                 accountOwnerCostSettleDetailMapper.insert(entity);
             }
         }
+    }
+    /**
+     * 车俩结算 车主费用明细落库
+     * @param accountOwnerCostSettleDetail
+     */
+    public int insertAccountOwnerCostSettleDetail(AccountOwnerCostSettleDetailEntity accountOwnerCostSettleDetail) {
+        if(Objects.nonNull(accountOwnerCostSettleDetail)){
+            accountOwnerCostSettleDetailMapper.insert(accountOwnerCostSettleDetail);
+        }
+        return accountOwnerCostSettleDetail.getId();
     }
 }

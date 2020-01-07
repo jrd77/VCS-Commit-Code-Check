@@ -1,6 +1,8 @@
 package com.atzuche.order.cashieraccount.service;
 
 import com.atzuche.order.accountownercost.entity.AccountOwnerCostSettleDetailEntity;
+import com.atzuche.order.accountownercost.entity.AccountOwnerCostSettleEntity;
+import com.atzuche.order.accountownercost.service.AccountOwnerCostSettleService;
 import com.atzuche.order.accountownercost.service.notservice.AccountOwnerCostSettleDetailNoTService;
 import com.atzuche.order.accountownerincome.service.AccountOwnerIncomeService;
 import com.atzuche.order.accountplatorm.entity.AccountPlatformProfitDetailEntity;
@@ -15,9 +17,11 @@ import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostSettleDet
 import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostSettleEntity;
 import com.atzuche.order.accountrenterrentcost.exception.AccountRenterRentCostSettleException;
 import com.atzuche.order.accountrenterrentcost.service.AccountRenterCostSettleService;
+import com.atzuche.order.accountrenterrentcost.service.notservice.AccountRenterCostDetailNoTService;
 import com.atzuche.order.accountrenterrentcost.service.notservice.AccountRenterCostSettleDetailNoTService;
 import com.atzuche.order.accountrenterrentcost.service.notservice.AccountRenterCostSettleNoTService;
 import com.atzuche.order.accountrenterrentcost.vo.req.AccountRenterCostChangeReqVO;
+import com.atzuche.order.accountrenterrentcost.vo.req.AccountRenterCostDetailReqVO;
 import com.atzuche.order.accountrenterwzdepost.service.AccountRenterWzDepositCostService;
 import com.atzuche.order.accountrenterwzdepost.service.AccountRenterWzDepositService;
 import com.atzuche.order.cashieraccount.service.notservice.CashierNoTService;
@@ -58,6 +62,8 @@ public class CashierSettleService {
     @Autowired AccountPlatformSubsidyDetailNoTService accountPlatformSubsidyDetailNoTService;
     @Autowired AccountPlatformProfitDetailNotService accountPlatformProfitDetailNotService;
     @Autowired private AccountRenterCostSettleNoTService accountRenterCostSettleNoTService;
+    @Autowired private AccountRenterCostDetailNoTService accountRenterCostDetailNoTService;
+    @Autowired private AccountOwnerCostSettleService accountOwnerCostSettleService;
 
 
     /**
@@ -78,6 +84,11 @@ public class CashierSettleService {
             accountRenterCostSettleDetailNoTService.insertAccountRenterCostSettleDetails(accountRenterCostSettleDetails);
         }
 
+    }
+    public void insertAccountRenterCostSettleDetail(AccountRenterCostSettleDetailEntity entity) {
+        if(Objects.nonNull(entity)){
+            accountRenterCostSettleDetailNoTService.insertAccountRenterCostSettleDetail(entity);
+        }
     }
 
     /**
@@ -154,7 +165,6 @@ public class CashierSettleService {
             entity.setComprehensiveEnsureAmount(comprehensiveEnsureAmount);
             entity.setBasicEnsureAmount(basicEnsureAmount);
             accountRenterCostSettleNoTService.updateAccountRenterCostSettle(entity);
-
         }
         return entity;
 
@@ -179,26 +189,54 @@ public class CashierSettleService {
     /**
      * 结算时候，应付金额大于实付金额，存在欠款，车辆押金抵扣
      */
-    public int deductDepositToRentCost(DeductDepositToRentCostReqVO vo) {
-        //计算真实抵扣金额
-        int amt = vo.getAmt()+vo.getDepositAmt()>=0?vo.getAmt():-vo.getDepositAmt();
+    public void deductDepositToRentCost(DeductDepositToRentCostReqVO vo) {
         // 1 记录押金流水记录
         DetainRenterDepositReqVO detainRenterDepositReqVO = new DetainRenterDepositReqVO();
-        detainRenterDepositReqVO.setAmt(amt);
-        detainRenterDepositReqVO.setMemNo(vo.getMemNo());
-        detainRenterDepositReqVO.setOrderNo(vo.getOrderNo());
+        BeanUtils.copyProperties(vo,detainRenterDepositReqVO);
         detainRenterDepositReqVO.setRenterCashCodeEnum(RenterCashCodeEnum.SETTLE_DEPOSIT_TO_RENT_COST);
         int renterDepositDetailId = accountRenterDepositService.detainRenterDeposit(detainRenterDepositReqVO);
         //2 记录 更新 租客户头 租车费用
-        AccountRenterCostChangeReqVO accountRenterCostChangeReqVO = new AccountRenterCostChangeReqVO();
+        AccountRenterCostDetailReqVO accountRenterCostChangeReqVO = new AccountRenterCostDetailReqVO();
         BeanUtils.copyProperties(detainRenterDepositReqVO,accountRenterCostChangeReqVO);
-        accountRenterCostChangeReqVO.setRenterOrderNo(vo.getRenterOrderNo());
         accountRenterCostChangeReqVO.setUniqueNo(String.valueOf(renterDepositDetailId));
-        accountRenterCostChangeReqVO.setAmt(Math.abs(amt));
+        accountRenterCostChangeReqVO.setAmt(Math.abs(vo.getAmt()));
         accountRenterCostChangeReqVO.setRenterCashCodeEnum(RenterCashCodeEnum.ACCOUNT_RENTER_DEPOSIT);
         int rentCostDetailId = accountRenterCostSettleService.deductDepositToRentCost(accountRenterCostChangeReqVO);
-        // 更新押金流水 UniqueNo 字段
+        //3 更新押金流水 UniqueNo 字段
         accountRenterDepositService.updateRenterDepositUniqueNo(String.valueOf(rentCostDetailId),renterDepositDetailId);
-        return amt;
+        // 4 租客结算费用明细 落库
+        AccountRenterCostSettleDetailEntity entity = new AccountRenterCostSettleDetailEntity();
+        BeanUtils.copyProperties(vo,entity);
+        entity.setAmt(Math.abs(vo.getAmt()));
+        entity.setCostCode(RenterCashCodeEnum.SETTLE_DEPOSIT_TO_RENT_COST.getCashNo());
+        entity.setCostDetail(RenterCashCodeEnum.SETTLE_DEPOSIT_TO_RENT_COST.getTxt());
+        entity.setUniqueNo(String.valueOf(renterDepositDetailId));
+        insertAccountRenterCostSettleDetail(entity);
+    }
+
+    /**
+     * 根据订单号 和会员号 查询 订单 钱包支付租车费用金额
+     * @param orderNo
+     * @param renterMemNo
+     */
+    public int getRentCostPayByWallet(String orderNo, String renterMemNo) {
+       return accountRenterCostDetailNoTService.getRentCostPayByWallet(orderNo, renterMemNo);
+    }
+
+
+    /**
+     * 计算车主费用
+     * @param accountOwnerCostSettleDetails
+     */
+    public void insertAccountOwnerCostSettle(String orderNo, String ownerMemNo, String ownerOrderNo,List<AccountOwnerCostSettleDetailEntity> accountOwnerCostSettleDetails) {
+        AccountOwnerCostSettleEntity entity = new AccountOwnerCostSettleEntity();
+        entity.setMemNo(ownerMemNo);
+        entity.setOrderNo(orderNo);
+        entity.setOwnerOrderNo(ownerOrderNo);
+        if(!CollectionUtils.isEmpty(accountOwnerCostSettleDetails)){
+            //车主补贴费用
+            int subsidyAmt =0;
+
+        }
     }
 }
