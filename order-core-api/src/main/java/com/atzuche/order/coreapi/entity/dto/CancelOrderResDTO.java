@@ -13,9 +13,14 @@ import lombok.Data;
 public class CancelOrderResDTO {
 
     /**
-     * 是否退款平台优惠券
+     * 是否退还优惠券(平台+送取服务)
      */
     private Boolean isReturnDisCoupon;
+
+    /**
+     * 是否退还车主券
+     */
+    private Boolean isReturnOwnerCoupon;
 
 
 }
