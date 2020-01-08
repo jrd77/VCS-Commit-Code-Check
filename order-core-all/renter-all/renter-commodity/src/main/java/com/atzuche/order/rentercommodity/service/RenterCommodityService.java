@@ -139,10 +139,9 @@ public class RenterCommodityService {
                    renterGoods.setCarUnitPrice(y.getCarUnitPrice());
                    renterGoods.setRevertTime(revertTime);
                    renterGoods.setCarDay(y.getCarDay());
-                   renterGoods.setCarHourCount(y.getCarHourCount());
+                   renterGoods.setCarHourCount(x.getCarHourCount());
                    newRenterGoodsPriceList.add(renterGoods);
                });
-
             });
         }
         renterGoodsDetailDTO.setRenterGoodsPriceDetailDTOList(newRenterGoodsPriceList);

@@ -141,11 +141,18 @@ public class OwnerCommodityService {
 
         }else{//时间提前
             //判断数据库中每个分组的revert_time 找到比数据库中的revert_time相同的
-           /* ownerGoodsPriceDetailDTOList.forEach(x->{
-                OwnerGoodsPriceDetailEntity dbPrice = mapPrice.get(x.getCarDay());
-                x.setCarUnitPrice(dbPrice.getCarUnitPrice());
-                x.setRevertTime(revertTime);
-            });*/
+            ownerGoodsPriceDetailDTOList.forEach(x->{
+                LocalDate carDay = x.getCarDay();
+                List<OwnerGoodsPriceDetailEntity> dbMapValue = carDayGroupMap.get(carDay);
+                dbMapValue.forEach(y->{
+                    OwnerGoodsPriceDetailDTO ownerGoods = new OwnerGoodsPriceDetailDTO();
+                    ownerGoods.setCarUnitPrice(y.getCarUnitPrice());
+                    ownerGoods.setRevertTime(revertTime);
+                    ownerGoods.setCarDay(y.getCarDay());
+                    ownerGoods.setCarHourCount(x.getCarHourCount());
+                    newOwnerGoodsPriceList.add(ownerGoods);
+                });
+            });
         }
         ownerGoodsDetailDTO.setOwnerGoodsPriceDetailDTOList(newOwnerGoodsPriceList);
     }
