@@ -58,8 +58,8 @@ public class OrderRemarkController {
 
     @AutoDocMethod(description = "获取备注信息", value = "获取备注信息", response = OrderRemarkResponseVO.class)
     @GetMapping("/information")
-    public ResponseData<ResponseData> getRemarkInformation(@RequestBody OrderRemarkInformationRequestVO orderRemarkInformationRequestVO, BindingResult bindingResult) {
-        return ResponseData.success(null);
+    public ResponseData<OrderRemarkResponseVO> getRemarkInformation(@RequestBody OrderRemarkInformationRequestVO orderRemarkInformationRequestVO, BindingResult bindingResult) {
+	    return ResponseData.success(orderRemarkService.getOrderRemarkInformation(orderRemarkInformationRequestVO));
     }
 
 }
