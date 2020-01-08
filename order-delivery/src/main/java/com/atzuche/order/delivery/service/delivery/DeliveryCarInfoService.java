@@ -6,6 +6,7 @@ import com.atzuche.order.delivery.service.RenterOrderDeliveryService;
 import com.atzuche.order.delivery.service.handover.HandoverCarService;
 import com.atzuche.order.delivery.utils.CommonUtil;
 import com.atzuche.order.delivery.utils.DateUtils;
+import com.atzuche.order.delivery.utils.MathUtil;
 import com.atzuche.order.delivery.vo.delivery.rep.*;
 import com.atzuche.order.delivery.vo.delivery.req.DeliveryCarRepVO;
 import org.springframework.beans.BeanUtils;
@@ -29,6 +30,8 @@ public class DeliveryCarInfoService {
     RenterOrderDeliveryService renterOrderDeliveryService;
     @Autowired
     HandoverCarService handoverCarService;
+    @Autowired
+    DeliveryCarInfoPriceService deliveryCarInfoPriceService;
 
     /**
      * 获取配送相关信息
@@ -36,13 +39,13 @@ public class DeliveryCarInfoService {
      * @param deliveryCarDTO
      * @return
      */
-    public DeliveryCarVO findDeliveryListByOrderNo(DeliveryCarRepVO deliveryCarDTO, OwnerGetAndReturnCarDTO ownerGetAndReturnCarDTO, Boolean isEscrowCar) {
+    public DeliveryCarVO findDeliveryListByOrderNo(DeliveryCarRepVO deliveryCarDTO, OwnerGetAndReturnCarDTO ownerGetAndReturnCarDTO, Boolean isEscrowCar,Integer carEngineType) {
         List<RenterHandoverCarInfoEntity> renterHandoverCarInfoEntities = handoverCarService.selectRenterByOrderNo(deliveryCarDTO.getOrderNo());
         List<OwnerHandoverCarInfoEntity> ownerHandoverCarInfoEntities = handoverCarService.selectOwnerByOrderNo(deliveryCarDTO.getOrderNo());
         List<RenterHandoverCarRemarkEntity> renterHandoverCarRemarkEntities = handoverCarService.getRenterHandoverRemarkInfo(deliveryCarDTO.getOrderNo());
         List<OwnerHandoverCarRemarkEntity> ownerHandoverCarRemarkEntities = handoverCarService.getOwnerHandoverRemarkInfo(deliveryCarDTO.getOrderNo());
         List<RenterOrderDeliveryEntity> renterOrderDeliveryEntityList = renterOrderDeliveryService.listRenterOrderDeliveryByRenterOrderNo(deliveryCarDTO.getRenterOrderNo());
-        DeliveryCarVO deliveryCarVO = createDeliveryCarVOParams(ownerGetAndReturnCarDTO, renterHandoverCarInfoEntities, ownerHandoverCarInfoEntities, renterHandoverCarRemarkEntities, ownerHandoverCarRemarkEntities, renterOrderDeliveryEntityList, isEscrowCar);
+        DeliveryCarVO deliveryCarVO = createDeliveryCarVOParams(ownerGetAndReturnCarDTO, renterHandoverCarInfoEntities, ownerHandoverCarInfoEntities, renterHandoverCarRemarkEntities, ownerHandoverCarRemarkEntities, renterOrderDeliveryEntityList, isEscrowCar,carEngineType);
         return deliveryCarVO;
     }
 
@@ -62,7 +65,8 @@ public class DeliveryCarInfoService {
                                                    List<RenterHandoverCarRemarkEntity> renterHandoverCarRemarkEntities,
                                                    List<OwnerHandoverCarRemarkEntity> ownerHandoverCarRemarkEntities,
                                                    List<RenterOrderDeliveryEntity> renterOrderDeliveryEntityList,
-                                                   Boolean isEscrowCar) {
+                                                   Boolean isEscrowCar,
+                                                   Integer carEngineType) {
         DeliveryCarVO deliveryCarVO = new DeliveryCarVO();
         deliveryCarVO.setIsReturnCar("0");
         deliveryCarVO.setIsGetCar("0");
@@ -72,8 +76,9 @@ public class DeliveryCarInfoService {
             }
             createGetHandoverCar(deliveryCarVO, renterHandoverCarRemarkEntities, ownerHandoverCarRemarkEntities, renterHandoverCarInfoEntities, renterOrderDeliveryEntity);
         }
-
-        deliveryCarVO = createDeliveryCarInfo(ownerGetAndReturnCarDTO, deliveryCarVO, ownerHandoverCarInfoEntities, renterHandoverCarInfoEntities, isEscrowCar);
+        //取车时的所在城市
+        String cityCode = renterOrderDeliveryEntityList.stream().filter(r->r.getType() == 1).map(RenterOrderDeliveryEntity::getCityCode).findFirst().get();
+        deliveryCarVO = createDeliveryCarInfo(ownerGetAndReturnCarDTO, deliveryCarVO, ownerHandoverCarInfoEntities, renterHandoverCarInfoEntities, isEscrowCar,carEngineType,cityCode);
         return deliveryCarVO;
     }
 
@@ -135,19 +140,18 @@ public class DeliveryCarInfoService {
 
     /**
      * 构造最终数据
-     *
      * @param deliveryCarVO
      * @param ownerHandoverCarInfoEntities
      * @param renterHandoverCarInfoEntities
      * @return
      */
-    public DeliveryCarVO createDeliveryCarInfo(OwnerGetAndReturnCarDTO ownerGetAndReturnCarDTO, DeliveryCarVO deliveryCarVO, List<OwnerHandoverCarInfoEntity> ownerHandoverCarInfoEntities, List<RenterHandoverCarInfoEntity> renterHandoverCarInfoEntities, Boolean isEscrowCar) {
+    public DeliveryCarVO createDeliveryCarInfo(OwnerGetAndReturnCarDTO ownerGetAndReturnCarDTO, DeliveryCarVO deliveryCarVO, List<OwnerHandoverCarInfoEntity> ownerHandoverCarInfoEntities, List<RenterHandoverCarInfoEntity> renterHandoverCarInfoEntities, Boolean isEscrowCar,Integer carEngineType,String cityCode) {
         RenterGetAndReturnCarDTO renterGetAndReturnCarDTO = RenterGetAndReturnCarDTO.builder().build();
         //车主取送信息
-        ownerGetAndReturnCarDTO = createOwnerGetAndReturnCarDTO(ownerGetAndReturnCarDTO, ownerHandoverCarInfoEntities);
+        ownerGetAndReturnCarDTO = createOwnerGetAndReturnCarDTO(ownerGetAndReturnCarDTO, ownerHandoverCarInfoEntities,carEngineType,cityCode);
         //租客取送信息
         ownerHandoverCarInfoEntities = CommonUtil.copyList(renterHandoverCarInfoEntities);
-        OwnerGetAndReturnCarDTO getAndReturnCarDTO = createOwnerGetAndReturnCarDTO(ownerGetAndReturnCarDTO, ownerHandoverCarInfoEntities);
+        OwnerGetAndReturnCarDTO getAndReturnCarDTO = createOwnerGetAndReturnCarDTO(ownerGetAndReturnCarDTO, ownerHandoverCarInfoEntities,carEngineType,cityCode);
         BeanUtils.copyProperties(getAndReturnCarDTO, renterGetAndReturnCarDTO);
         ownerGetAndReturnCarDTO.setPlatFormOilServiceCharge("0");
         renterGetAndReturnCarDTO.setCarOwnerOilCrash("0");
@@ -169,7 +173,7 @@ public class DeliveryCarInfoService {
      * @param HandoverCarInfoEntities
      * @return
      */
-    public OwnerGetAndReturnCarDTO createOwnerGetAndReturnCarDTO(OwnerGetAndReturnCarDTO ownerGetAndReturnCarDTO, List<OwnerHandoverCarInfoEntity> HandoverCarInfoEntities) {
+    public OwnerGetAndReturnCarDTO createOwnerGetAndReturnCarDTO(OwnerGetAndReturnCarDTO ownerGetAndReturnCarDTO, List<OwnerHandoverCarInfoEntity> HandoverCarInfoEntities,Integer carEngineType,String cityCode) {
         for (OwnerHandoverCarInfoEntity ownerHandoverCarInfoEntity : HandoverCarInfoEntities) {
             if (Objects.isNull(ownerHandoverCarInfoEntity.getType())) {
                 continue;
@@ -186,10 +190,10 @@ public class DeliveryCarInfoService {
         }
         //行驶里程
         String ownerDrivingKM = String.valueOf(Math.abs(Integer.valueOf(ownerGetAndReturnCarDTO.getKM)) - Math.abs(Integer.valueOf(ownerGetAndReturnCarDTO.getReturnKM())));
-        String oilDifference = String.valueOf(Math.abs(Integer.valueOf(ownerGetAndReturnCarDTO.getCarOil)) - Math.abs(Integer.valueOf(ownerGetAndReturnCarDTO.getReturnCarOil())));
+        int oilDifference = Math.abs(Integer.valueOf(ownerGetAndReturnCarDTO.getCarOil)) - Math.abs(Integer.valueOf(ownerGetAndReturnCarDTO.getReturnCarOil()));
         ownerGetAndReturnCarDTO.setDrivingKM(ownerDrivingKM);
-        ownerGetAndReturnCarDTO.setOilDifference(oilDifference);
-        ownerGetAndReturnCarDTO.setOilDifferenceCrash("0");
+        ownerGetAndReturnCarDTO.setOilDifference(String.valueOf(oilDifference));
+        ownerGetAndReturnCarDTO.setOilDifferenceCrash(String.valueOf(MathUtil.mul(oilDifference,deliveryCarInfoPriceService.getOilPriceByCityCodeAndType(Integer.valueOf(cityCode),carEngineType))));
         ownerGetAndReturnCarDTO.setOilServiceCharge("0");
         return ownerGetAndReturnCarDTO;
     }

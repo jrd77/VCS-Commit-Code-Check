@@ -93,9 +93,8 @@ public class DeliveryCarTask {
      * @param orderDeliveryVO
      */
     @Transactional(rollbackFor = Exception.class)
-    public void insertDeliveryAddress(Integer getMinutes, Integer returnMinutes, OrderDeliveryVO orderDeliveryVO, Integer type) {
+    public void insertRenterDeliveryInfoAndDeliveryAddressInfo(Integer getMinutes, Integer returnMinutes, OrderDeliveryVO orderDeliveryVO, Integer type) {
 
-        insertOrUpdateRenterDeliveryAddressInfo(orderDeliveryVO);
         if (Objects.nonNull(orderDeliveryVO.getOrderDeliveryDTO())) {
             RenterOrderDeliveryEntity orderDeliveryEntity = new RenterOrderDeliveryEntity();
             BeanUtils.copyProperties(orderDeliveryVO.getOrderDeliveryDTO(), orderDeliveryEntity);
@@ -116,10 +115,12 @@ public class DeliveryCarTask {
                 orderDeliveryMapper.insertSelective(lastOrderDeliveryEntity);
             }
         }
+        insertOrUpdateRenterDeliveryAddressInfo(orderDeliveryVO);
     }
 
     /**
      * 新增交接车信息
+     *
      * @param orderDeliveryEntity
      * @param getMinutes
      * @param returnMinutes
