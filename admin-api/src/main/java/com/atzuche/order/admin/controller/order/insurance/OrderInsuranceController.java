@@ -69,7 +69,7 @@ public class OrderInsuranceController {
 
 	@AutoDocMethod(description = "购买保险列表", value = "购买保险列表", response = OrderInsuranceResponseVO.class)
 	@GetMapping("/list")
-	public ResponseData<OrderInsuranceResponseVO> list(@RequestBody OrderInsuranceRequestVO orderInsuranceRequestVO, BindingResult bindingResult) {
+	public ResponseData<OrderInsuranceResponseVO> list(OrderInsuranceRequestVO orderInsuranceRequestVO, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), ErrorCode.INPUT_ERROR.getText());
         }
