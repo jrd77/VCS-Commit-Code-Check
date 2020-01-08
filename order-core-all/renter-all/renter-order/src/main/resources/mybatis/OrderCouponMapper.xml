@@ -74,7 +74,7 @@
             #{isDelete}
         )
 	</insert>
-	
+
 	<insert id="insertSelective" parameterType="com.atzuche.order.renterorder.entity.OrderCouponEntity" useGeneratedKeys="true" keyProperty="id">
 		insert into order_coupon
         <trim prefix="(" suffix=")" suffixOverrides="," >
@@ -108,10 +108,10 @@
             <if test="isDelete != null">#{isDelete} </if>
         </trim>
 	</insert>
-	
-	 
+
+
 	<update id="updateByPrimaryKeySelective" parameterType="com.atzuche.order.renterorder.entity.OrderCouponEntity">
-		update order_coupon 
+		update order_coupon
 		    <set>
 				<if test="orderNo != null">`order_no` = #{orderNo}, </if>
 				<if test="renterOrderNo != null">`renter_order_no` = #{renterOrderNo}, </if>
@@ -129,30 +129,43 @@
 			</set>
 		where id = #{id}
 	</update>
-	
+
 	<update id="updateByPrimaryKey" parameterType="com.atzuche.order.renterorder.entity.OrderCouponEntity">
-		update order_coupon 
+		update order_coupon
 		    <set>
-				`order_no` = #{orderNo}, 		
-				`renter_order_no` = #{renterOrderNo}, 		
-				`coupon_id` = #{couponId}, 		
-				`coupon_name` = #{couponName}, 		
-				`coupon_type` = #{couponType}, 		
-				`status` = #{status}, 		
-				`coupon_desc` = #{couponDesc}, 		
-				`amount` = #{amount}, 		
-				`create_time` = #{createTime}, 		
-				`create_op` = #{createOp}, 		
-				`update_time` = #{updateTime}, 		
-				`update_op` = #{updateOp}, 		
-				`is_delete` = #{isDelete}		
+				`order_no` = #{orderNo},
+				`renter_order_no` = #{renterOrderNo},
+				`coupon_id` = #{couponId},
+				`coupon_name` = #{couponName},
+				`coupon_type` = #{couponType},
+				`status` = #{status},
+				`coupon_desc` = #{couponDesc},
+				`amount` = #{amount},
+				`create_time` = #{createTime},
+				`create_op` = #{createOp},
+				`update_time` = #{updateTime},
+				`update_op` = #{updateOp},
+				`is_delete` = #{isDelete}
 		    </set>
 		where id = #{id}
 	</update>
-	
+
 	<select id="listOrderCouponByRenterOrderNo" resultMap="BaseResultMap">
 		select <include refid="Base_Column_List" /> from order_coupon where renter_order_no = #{renterOrderNo}
 		and is_delete = 0
 	</select>
-  	
+
+    <select id="selectByOrderNoAndRenterOrderNo" resultMap="BaseResultMap">
+        select
+            <include refid="Base_Column_List" />
+        from
+            order_coupon
+        where
+            `order_no` = #{orderNo}
+            and renter_order_no = #{renterOrderNo}
+            and `coupon_type` = #{couponType}
+            and is_delete = 0
+        limit 1
+    </select>
+
 </mapper>
