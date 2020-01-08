@@ -1,7 +1,5 @@
 package com.atzuche.order.delivery.mapper;
 
-import com.atzuche.order.delivery.entity.OwnerHandoverCarInfoEntity;
-import com.atzuche.order.delivery.entity.OwnerHandoverCarRemarkEntity;
 import com.atzuche.order.delivery.entity.RenterHandoverCarRemarkEntity;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -28,11 +26,20 @@ public interface RenterHandoverCarRemarkMapper{
     int updateByPrimaryKeySelective(RenterHandoverCarRemarkEntity record);
 
     /**
-     * 根据订单号和类型查询
+     * 根据订单号查询
      * @param orderNo
      * @return
      */
     List<RenterHandoverCarRemarkEntity> selectObjectByOrderNo(@Param("orderNo") String orderNo);
+
+    /**
+     * 根据订单号和类型查询
+     * @param orderNo
+     * @param type
+     * @return
+     */
+    RenterHandoverCarRemarkEntity selectObjectByOrderNoType(@Param("orderNo") String orderNo,@Param("type") Integer type);
+
 
     /**
      * 根据子订单号和类型获取
