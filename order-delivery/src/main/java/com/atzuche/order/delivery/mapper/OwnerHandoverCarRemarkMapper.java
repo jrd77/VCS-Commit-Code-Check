@@ -41,6 +41,14 @@ public interface OwnerHandoverCarRemarkMapper{
     List<OwnerHandoverCarRemarkEntity> selectOwnerRemarkByOrderNo(@Param("ownerOrderNo") String ownerOrderNo);
 
     /**
+     * 根据订单号和类型查询
+     * @param orderNo
+     * @param type
+     * @return
+     */
+    OwnerHandoverCarRemarkEntity selectObjectByOrderNoType(@Param("orderNo") String orderNo,@Param("type") Integer type);
+
+    /**
      * 根据子订单号和类型获取
      * @param ownerOrderNo
      * @param type
