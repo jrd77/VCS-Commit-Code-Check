@@ -35,7 +35,7 @@ public class AdminUserFilter implements Filter {
             String authId = req.getHeader("Console-AUTH-ID");
 
             if(StringUtils.trimToNull(authId)==null){
-                throw new OrderAdminException(ERROR_CODE,ERROR_TXT,"Header:Console-AUTH-ID cannot be null");
+                logger.info("cannot not detect user header");
             }
 
             authName = URLDecoder.decode(authName,"utf-8");
