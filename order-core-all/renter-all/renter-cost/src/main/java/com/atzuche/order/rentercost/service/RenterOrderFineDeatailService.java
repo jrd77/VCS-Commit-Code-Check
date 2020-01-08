@@ -293,20 +293,20 @@ public class RenterOrderFineDeatailService{
      * @param cancelFineAmtDTO 参数对象
      * @return RenterOrderFineDeatailEntity
      */
-    public RenterOrderFineDeatailEntity calCancelFine(CancelFineAmtDTO cancelFineAmtDTO) {
+    public int calCancelFine(CancelFineAmtDTO cancelFineAmtDTO) {
     	log.info("calCancelFine 计算取消订单违约金cancelFineAmtDTO[{}]", cancelFineAmtDTO);
     	if (cancelFineAmtDTO == null) {
-    		return null;
+    		return 0;
     	}
     	CostBaseDTO costBaseDTO = cancelFineAmtDTO.getCostBaseDTO();
     	LocalDateTime rentTime = costBaseDTO.getStartTime();
     	LocalDateTime cancelTime = cancelFineAmtDTO.getCancelTime();
     	if (rentTime == null || cancelTime == null) {
-    		return null;
+    		return 0;
     	}
     	Integer rentAmt = cancelFineAmtDTO.getRentAmt();
     	if (rentAmt == null) {
-    		return null;
+    		return 0;
     	}
     	int penalty = 0;
     	// 提前下单时间，单位小时
@@ -315,7 +315,7 @@ public class RenterOrderFineDeatailService{
 		LocalDateTime beforeHour = cancelTime.plusHours(beforeTransTimeSpan);
 		// 交易开始前提前4小时（含）以上不收取违约罚金/租客下普通订单且车辆类型为“代管车\无人代管车\短租托管车”时，取消规则按“交易开始前免费取消
 		if (beforeHour.isBefore(rentTime) || beforeHour.isEqual(rentTime) || CommonUtils.isEscrowCar(cancelFineAmtDTO.getOwnerType())) {
-			penalty = 0;
+
 		} else {
 			//交易开始前4小时内，收取订单租金的30%作为违约罚金
 			penalty = (int) (rentAmt*CommonUtils.CANCEL_FINE_RATIO);
@@ -328,8 +328,7 @@ public class RenterOrderFineDeatailService{
 		if (penalty > CommonUtils.CANCEL_FINE_LIMIT) {
             penalty = CommonUtils.CANCEL_FINE_LIMIT;
         }
-		RenterOrderFineDeatailEntity entity = fineDataConvert(costBaseDTO, penalty, FineSubsidyCodeEnum.PLATFORM, FineSubsidySourceCodeEnum.RENTER, FineTypeEnum.CANCEL_FINE);
-		return entity;
+		return penalty;
     }
 	
 	

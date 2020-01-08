@@ -59,13 +59,21 @@ public enum ErrorCode {
     FEIGN_MEMBER_DRIVER_fAIL("700100","获取附加驾驶人信息失败"),
     FEIGN_MEMBER_DRIVER_ERROR("700101","获取附加驾驶人信息异常"),
     FEIGN_RENTER_CAR_ERROR("700102","获取租客车辆信息异常"),
-    FEIGN_RENTER_CAR_FAIL("700102","获取租客车辆信息失败"),
-    FEIGN_OWNER_MEMBER_ERROR("700103","获取车主会员信息异常"),
-    FEIGN_OWNER_MEMBER_FAIL("700104","获取车主会员信息失败"),
-    FEIGN_RENTER_MEMBER_ERROR("500100","获取租客会员信息异常"),
-    FEIGN_RENTER_MEMBER_FAIL("500100","获取租客会员信息失败"),
+    FEIGN_RENTER_CAR_FAIL("700103","获取租客车辆信息失败"),
+    FEIGN_OWNER_MEMBER_ERROR("700104","获取车主会员信息异常"),
+    FEIGN_OWNER_MEMBER_FAIL("700105","获取车主会员信息失败"),
+    FEIGN_RENTER_MEMBER_ERROR("700106","获取租客会员信息异常"),
+    FEIGN_RENTER_MEMBER_FAIL("700107","获取租客会员信息失败"),
 
-
+    FEIGN_CHECK_CAR_STOCK_ERROR("700108","库存校验异常"),
+    FEIGN_CHECK_CAR_STOCK_FAIL("700109","库存校验失败"),
+    FEIGN_CUT_CAR_STOCK_ERROR("700110","扣减库存异常"),
+    FEIGN_CUT_CAR_STOCK_FAIL("700111","扣减库存失败"),
+    FEIGN_RELEASE_CAR_STOCK_ERROR("700112","释放库存异常"),
+    FEIGN_RELEASE_CAR_STOCK_FAIL("700113","释放库存失败"),
+    NOT_STOCK_EXCEPTION("700114","库存不足"),
+    LOCK_STOCK_FAIL("700114","锁定库存失败"),
+    RELEASE_STOCK_FAIL("700114","释放库存失败"),
     ;
 
     private String code;

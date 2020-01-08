@@ -27,4 +27,6 @@ public interface OwnerOrderMapper{
     
     Integer updateOwnerOrderInvalidById(@Param("id") Integer id);
 
+    Integer updateOwnerOrderChildStatus(@Param("id") Integer id, @Param("childStatus") Integer childStatus);
+
 }

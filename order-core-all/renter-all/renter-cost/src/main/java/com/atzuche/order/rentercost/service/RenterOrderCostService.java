@@ -20,4 +20,20 @@ public class RenterOrderCostService{
     public Integer saveRenterOrderCost(RenterOrderCostEntity renterOrderCostEntity){
         return renterOrderCostMapper.insert(renterOrderCostEntity);
     }
+
+
+    /**
+     * 根据主订单号和租客订单号获取租客费用信息
+     *
+     * @param orderNo 主订单号
+     * @param renterOrderNo 租客订单号
+     * @return RenterOrderCostEntity
+     */
+    public RenterOrderCostEntity getByOrderNoAndRenterNo(String orderNo, String renterOrderNo) {
+
+        return renterOrderCostMapper.selectByOrderNoAndRenterNo(orderNo, renterOrderNo);
+    }
+
+
+
 }
