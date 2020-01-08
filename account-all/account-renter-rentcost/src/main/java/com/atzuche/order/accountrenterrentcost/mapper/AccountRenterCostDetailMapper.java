@@ -25,4 +25,13 @@ public interface AccountRenterCostDetailMapper{
      * @return
      */
     List<AccountRenterCostDetailEntity> getAccountRenterCostDetailsByOrderNo(@Param("orderNo") String orderNo);
+
+    /**
+     * 查询支付费用明细
+     * @param orderNo
+     * @param renterMemNo
+     * @param paySourceCode
+     * @return
+     */
+    List<AccountRenterCostDetailEntity> selectRenterCostSettleDetail(@Param("orderNo")String orderNo, @Param("memNo")String renterMemNo, @Param("paySourceCode")String paySourceCode);
 }

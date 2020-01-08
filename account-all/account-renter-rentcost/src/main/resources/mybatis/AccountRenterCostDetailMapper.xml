@@ -95,5 +95,11 @@
 
 
     </select>
+    <select id="selectRenterCostSettleDetail" resultMap="BaseResultMap">
+
+        select <include refid="Base_Column_List" /> from account_renter_cost_detail
+        where order_no = #{orderNo} and mem_no = #{memNo} and pay_source_code = #{paySourceCode}
+
+    </select>
 
 </mapper>
