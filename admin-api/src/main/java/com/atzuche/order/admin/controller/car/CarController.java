@@ -170,9 +170,11 @@ public class CarController {
             resVO.setGps(carBaseVO.getGpsNo());
             resVO.setSimNo(carBaseVO.getSimNo());
             resVO.setMemo(carBaseVO.getMemo());
-            resVO.setCarRemark(carBaseVO.getCarDesc());//carSelectMap
-            resVO.setGetRevertExplain(carBaseVO.getGetRevertExplain());//carSelectMap
-            resVO.setDayMileage(carBaseVO.getDayMileage());//carSelectMap
+            //carSelectMap car_select_upgrade
+            resVO.setCarRemark(carBaseVO.getCarDesc());
+            resVO.setGetRevertExplain(carBaseVO.getGetRevertExplain());
+            resVO.setDayMileage(carBaseVO.getDayMileage());
+            //
             return ResponseData.success(resVO);
         } catch (BaseException e) {
             LOGGER.error("获取车辆运营信息异常[{}]", reqVo, e);
