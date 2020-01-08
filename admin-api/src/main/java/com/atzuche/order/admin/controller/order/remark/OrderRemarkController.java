@@ -59,7 +59,7 @@ public class OrderRemarkController {
     @AutoDocMethod(description = "删除备注", value = "删除备注", response = ResponseData.class)
     @DeleteMapping("/delete")
     public ResponseData<ResponseData> delete(@RequestBody OrderRemarkDeleteRequestVO orderRemarkDeleteRequestVO, BindingResult bindingResult) {
-        orderRemarkService.updateRemarkById(null);
+        //orderRemarkService.updateRemarkById(null);
         return ResponseData.success(null);
     }
 
