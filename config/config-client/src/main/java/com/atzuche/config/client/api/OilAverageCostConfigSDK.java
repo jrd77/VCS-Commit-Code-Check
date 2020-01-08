@@ -25,8 +25,9 @@ public class OilAverageCostConfigSDK {
 
     public List<OilAverageCostEntity> getConfig(ConfigContext configContext){
         ConfigItemDTO itemDTO = sdkFactory.getConfig(configContext,CONFIG_NAME);
-        List<SysConfigEntity> sysConfigEntities = new ArrayList<>();
+        List<OilAverageCostEntity> sysConfigEntities = new ArrayList<>();
 
         return JSON.parseObject(itemDTO.getConfigValue(),new TypeReference<List<OilAverageCostEntity>>(){});
     }
+
 }
