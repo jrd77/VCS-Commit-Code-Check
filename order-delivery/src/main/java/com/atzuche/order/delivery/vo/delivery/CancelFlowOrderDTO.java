@@ -2,6 +2,7 @@ package com.atzuche.order.delivery.vo.delivery;
 
 import lombok.Data;
 import lombok.ToString;
+import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 
@@ -10,6 +11,7 @@ import java.io.Serializable;
  */
 @Data
 @ToString
+@Accessors(chain = true)
 public class CancelFlowOrderDTO implements Serializable {
 
     /**
@@ -17,7 +19,7 @@ public class CancelFlowOrderDTO implements Serializable {
      **/
     private String ordernumber;
     /**
-     * 服务类型（take:取车服务 back:还车服务）
+     * 服务类型（take:取车服务 back:还车服务 all:所有）
      **/
     private String servicetype;
     /**
