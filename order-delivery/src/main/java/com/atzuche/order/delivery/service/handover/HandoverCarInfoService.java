@@ -155,7 +155,7 @@ public class HandoverCarInfoService {
                 deliveryCarInfoService.cancelRenYunFlowOrderInfo(new CancelOrderDeliveryVO().setCancelFlowOrderDTO(new CancelFlowOrderDTO().setServicetype(type == 1 ? "take" : "back").setOrdernumber(renterOrderDeliveryEntity.getOrderNo())).setRenterOrderNo(renterOrderDeliveryEntity.getRenterOrderNo()));
             }
         } else if (renterOrderDeliveryEntity != null && String.valueOf(UsedDeliveryTypeEnum.USED.getValue()).equals(deliveryReqDTO.getIsUsedGetAndReturnCar())) {
-            UpdateOrderDeliveryVO updateOrderDeliveryVO = createDeliveryCarInfoParams(deliveryReqDTO, type);
+            UpdateOrderDeliveryVO updateOrderDeliveryVO = createDeliveryCarInfoParams(renterOrderDeliveryEntity,deliveryReqDTO, type);
             deliveryCarInfoService.updateFlowOrderInfo(updateOrderDeliveryVO);
         } else {
             throw new DeliveryOrderException(DeliveryErrorCode.DELIVERY_PARAMS_ERROR.getValue(), "没有合适的参数");
@@ -166,7 +166,7 @@ public class HandoverCarInfoService {
      * 构造更新参数
      * @return
      */
-    public UpdateOrderDeliveryVO createDeliveryCarInfoParams(DeliveryReqDTO deliveryReqDTO,Integer type)
+    public UpdateOrderDeliveryVO createDeliveryCarInfoParams(RenterOrderDeliveryEntity renterOrderDeliveryEntity,DeliveryReqDTO deliveryReqDTO,Integer type)
     {
         OrderDeliveryDTO orderDeliveryDTO = new OrderDeliveryDTO();
         UpdateFlowOrderDTO updateFlowOrderDTO = new UpdateFlowOrderDTO();
@@ -174,7 +174,11 @@ public class HandoverCarInfoService {
         orderDeliveryDTO.setType(type);
         orderDeliveryDTO.setRenterGetReturnAddr(deliveryReqDTO.getRenterRealGetAddr());
         orderDeliveryDTO.setOwnerGetReturnAddr(deliveryReqDTO.getOwnRealReturnAddr());
+        orderDeliveryDTO.setOrderNo(renterOrderDeliveryEntity.getOrderNo());
+        orderDeliveryDTO.setRenterOrderNo(renterOrderDeliveryEntity.getRenterOrderNo());
         renterDeliveryAddrDTO.setExpGetCarAddr(deliveryReqDTO.getRenterRealGetAddr());
+        renterDeliveryAddrDTO.setOrderNo(renterOrderDeliveryEntity.getOrderNo());
+        renterDeliveryAddrDTO.setRenterOrderNo(renterOrderDeliveryEntity.getRenterOrderNo());
         renterDeliveryAddrDTO.setExpReturnCarAddr(deliveryReqDTO.getOwnRealReturnAddr());
         renterDeliveryAddrDTO.setActReturnCarAddr(deliveryReqDTO.getOwnRealReturnAddr());
         renterDeliveryAddrDTO.setActGetCarAddr(deliveryReqDTO.getRenterRealGetAddr());
