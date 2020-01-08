@@ -1,10 +1,11 @@
 package com.atzuche.order.admin.vo.resp.remark;
 
 import com.autoyol.doc.annotation.AutoDocProperty;
+import lombok.Data;
+import lombok.ToString;
 
-/**
- * Created by qincai.lin on 2020/1/2.
- */
+@Data
+@ToString
 public class OrderRemarkLogListResponseVO {
 
 
@@ -28,63 +29,5 @@ public class OrderRemarkLogListResponseVO {
 
     @AutoDocProperty(value = "新备注内容")
     private String newRemarkContent;
-
-
-    public String getOperateType() {
-        return operateType;
-    }
-
-    public void setOperateType(String operateType) {
-        this.operateType = operateType;
-    }
-
-    public String getOldRemarkContent() {
-        return oldRemarkContent;
-    }
-
-    public void setOldRemarkContent(String oldRemarkContent) {
-        this.oldRemarkContent = oldRemarkContent;
-    }
-
-    public String getNewRemarkContent() {
-        return newRemarkContent;
-    }
-
-    public void setNewRemarkContent(String newRemarkContent) {
-        this.newRemarkContent = newRemarkContent;
-    }
-
-    public String getRemarkType() {
-        return remarkType;
-    }
-
-    public void setRemarkType(String remarkType) {
-        this.remarkType = remarkType;
-    }
-
-    public String getNumber() {
-        return number;
-    }
-
-    public void setNumber(String number) {
-        this.number = number;
-    }
-
-    public String getDepartmentName() {
-        return departmentName;
-    }
-
-    public void setDepartmentName(String departmentName) {
-        this.departmentName = departmentName;
-    }
-
-    public String getOperatorName() {
-        return operatorName;
-    }
-
-    public void setOperatorName(String operatorName) {
-        this.operatorName = operatorName;
-    }
-
 
 }

@@ -1,21 +1,15 @@
 package com.atzuche.order.admin.vo.req.remark;
 
 import com.autoyol.doc.annotation.AutoDocProperty;
+import lombok.Data;
+import lombok.ToString;
 
-/**
- * Created by qincai.lin on 2019/12/30.
- */
+@Data
+@ToString
 public class OrderRemarkDeleteRequestVO {
 
     @AutoDocProperty(value = "备注id")
     private String remarkId;
 
-    public String getRemarkId() {
-        return remarkId;
-    }
-
-    public void setRemarkId(String remarkId) {
-        this.remarkId = remarkId;
-    }
 
 }
