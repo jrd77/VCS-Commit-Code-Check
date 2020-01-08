@@ -45,7 +45,7 @@
 	<select id="selectByOrderNo" resultMap="BaseResultMap">
 		select
 		    <include refid="Base_Column_List" />
-		from order_status where order_no = #{value} limit 1
+		from order_status where order_no = #{value} and is_delete = 0 limit 1
 	</select>
 
 	<insert id="insert" parameterType="com.atzuche.order.parentorder.entity.OrderStatusEntity" useGeneratedKeys="true" keyProperty="id">

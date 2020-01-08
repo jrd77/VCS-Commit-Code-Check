@@ -207,4 +207,9 @@
     	where id = #{id}
     </update>
 
+    <update id="updateOwnerOrderChildStatus">
+		update owner_order set child_status = #{childStatus}
+		where id = #{id}
+	</update>
+
 </mapper>

@@ -2,6 +2,8 @@ package com.atzuche.order.rentercost.mapper;
 
 import com.atzuche.order.rentercost.entity.RenterOrderCostEntity;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
 import java.util.List;
 
 /**
@@ -24,5 +26,15 @@ public interface RenterOrderCostMapper{
     int updateByPrimaryKey(RenterOrderCostEntity record);
     
     int updateByPrimaryKeySelective(RenterOrderCostEntity record);
+
+
+    /**
+     * 根据主订单号和租客订单号查询租客费用信息
+     *
+     * @param orderNo 主订单号
+     * @param renterOrderNo 租客订单号
+     * @return RenterOrderCostEntity
+     */
+    RenterOrderCostEntity selectByOrderNoAndRenterNo(@Param("orderNo") String orderNo, @Param("renterOrderNo") String renterOrderNo);
 
 }
