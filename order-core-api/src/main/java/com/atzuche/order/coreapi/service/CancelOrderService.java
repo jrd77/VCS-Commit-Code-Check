@@ -52,7 +52,7 @@ public class CancelOrderService {
 
         //通知收银台退款
         //todo
-        orderSettleService.settleOrder("");
+        orderSettleService.settleOrderCancel("");
         //通知流程系统
         //todo
 
