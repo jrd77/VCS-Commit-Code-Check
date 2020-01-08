@@ -37,9 +37,6 @@ public class CancelOrderService {
     @Autowired
     private OrderSettleService orderSettleService;
 
-    @Autowired
-    private OrderCouponService orderCouponService;
-
     /**
      * 订单取消
      *
@@ -56,7 +53,7 @@ public class CancelOrderService {
             res = renterCancelOrderService.cancel(cancelOrderReqVO.getOrderNo(), cancelOrderReqVO.getCancelReason());
         } else if (StringUtils.equals(MemRoleEnum.OWNER.getCode(), cancelOrderReqVO.getMemRole())) {
             //车主取消
-            res = ownerCancelOrderService.cancel();
+            res = ownerCancelOrderService.cancel(cancelOrderReqVO.getOrderNo(), cancelOrderReqVO.getCancelReason());
         }
 
         //优惠券
@@ -68,18 +65,8 @@ public class CancelOrderService {
         //订单取消（租客取消、车主取消、平台取消）如果使用了车主券且未支付，则退回否则不处理
         if (null != res && null != res.getIsReturnOwnerCoupon() && res.getIsReturnOwnerCoupon()) {
             //退还车主券
-            List<OrderCouponEntity> orderCouponEntities =
-                    orderCouponService.listOrderCouponByRenterOrderNo(res.getRenterOrderNo());
-            if (!CollectionUtils.isEmpty(orderCouponEntities)) {
-
-                Optional<OrderCouponEntity> couponOptional =
-                        orderCouponEntities.stream().filter(order -> order.getCouponType() == CouponTypeEnum.ORDER_COUPON_TYPE_OWNER.getCode()).findFirst();
-                if (couponOptional.isPresent()) {
-                    String recover = null == res.getRentCarPayStatus() || res.getRentCarPayStatus() == 0 ? "1" : "0";
-                    couponAndCoinHandleService.undoOwnerCoupon(cancelOrderReqVO.getOrderNo(), couponOptional.get().getCouponId(), recover);
-                }
-            }
-
+            String recover = null == res.getRentCarPayStatus() || res.getRentCarPayStatus() == 0 ? "1" : "0";
+            couponAndCoinHandleService.undoOwnerCoupon(cancelOrderReqVO.getOrderNo(), res.getOwnerCouponNo(), recover);
         }
 
         //通知收银台退款
