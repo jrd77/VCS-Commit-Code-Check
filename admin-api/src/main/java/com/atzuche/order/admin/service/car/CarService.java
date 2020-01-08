@@ -20,7 +20,8 @@ import java.util.Objects;
 public class CarService {
 
     private Logger logger = LoggerFactory.getLogger(getClass());
-
+    private static final String ERROR_CODE="999999";
+    private static final String ERROR_TXT="系统异常";
     @Autowired
     private CarDetailQueryFeignApi carDetailQueryFeignApi;
 
@@ -29,7 +30,7 @@ public class CarService {
         ResponseObject<CarBaseVO> responseObject = carDetailQueryFeignApi.getCarDetailByCarNo(carNo);
         if(Objects.isNull(responseObject)){
             logger.error("carDetailQueryFeignApi.getCarDetailByCarNo,responseObject:{}", JsonUtil.toJson(responseObject));
-            throw new OrderAdminException("999999","系统错误");
+            throw new OrderAdminException(ERROR_CODE,ERROR_TXT);
         }
         if(!ErrorCode.SUCCESS.getCode().equals(responseObject.getResCode())){
             throw new OrderAdminException(responseObject.getResCode(),responseObject.getResMsg());
@@ -37,7 +38,7 @@ public class CarService {
         CarBaseVO carBaseVO = responseObject.getData();
         if(Objects.isNull(carBaseVO)){
             logger.error("carDetailQueryFeignApi.getCarDetailByCarNo,carBaseVO is null");
-            throw new OrderAdminException("999999","系统错误");
+            throw new OrderAdminException(ERROR_CODE,ERROR_TXT);
         }
         resVO.setGetCarAddr(carBaseVO.getGetCarAddr());
         resVO.setLicenseOwer(carBaseVO.getLicenseOwer());
