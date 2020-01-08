@@ -28,6 +28,11 @@ public class CancelOrderResDTO {
     private Boolean isReturnOwnerCoupon;
 
     /**
+     * 车主券编码
+     */
+    private String ownerCouponNo;
+
+    /**
      * 租车费用支付状态
      */
     private Integer rentCarPayStatus;

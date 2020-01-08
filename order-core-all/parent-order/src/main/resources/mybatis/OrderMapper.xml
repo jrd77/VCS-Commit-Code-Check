@@ -229,12 +229,12 @@
 
     <select id="selectByOrderNo" resultMap="BaseResultMap">
         select
-        <include refid="Base_Column_List" />
+            <include refid="Base_Column_List" />
         from
-        `order`
+            `order`
         where
-        order_no = #{value}
-        and is_delete = 0
+            order_no = #{value}
+            and is_delete = 0
         limit 1
     </select>
 
