@@ -19,7 +19,8 @@ import java.util.Objects;
 @Service
 public class CarService {
 
-    private static final Logger logger = LoggerFactory.getLogger(CarService.class);
+    private Logger logger = LoggerFactory.getLogger(getClass());
+
     @Autowired
     private CarDetailQueryFeignApi carDetailQueryFeignApi;
 
@@ -49,7 +50,7 @@ public class CarService {
         if(insuranceExpire!=null){
             resVO.setInsuranceExpireDateStr(DateUtils.formate(insuranceExpire,DateUtils.fmt_yyyyMMdd));
         }
-        resVO.setGps(carBaseVO.getGpsNo());
+        resVO.setGpsNo(carBaseVO.getGpsNo());
         resVO.setSimNo(carBaseVO.getSimNo());
         resVO.setMemo(carBaseVO.getMemo());
         //carSelectMap car_select_upgrade

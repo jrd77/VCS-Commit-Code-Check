@@ -34,13 +34,14 @@ import java.util.Objects;
 @AutoDocVersion(version = "车辆信息管理")
 public class CarController {
 
+    private  Logger logger = LoggerFactory.getLogger(getClass());
+
     @Autowired
     private CarDetailQueryFeignApi carDetailQueryFeignApi;
 
     @Autowired
     private CarService carService;
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(CarController.class);
 
     @AutoDocMethod(description = "【liujun】获取基础信息", value = "获取车辆基础信息", response = CarBaseInfoResVo.class)
     @GetMapping(value = "/car/baseInfo")
@@ -109,11 +110,11 @@ public class CarController {
 
 
         } catch (BaseException e) {
-            LOGGER.error("获取车辆基本信息异常[{}]", reqVo, e);
+            logger.error("获取车辆基本信息异常[{}]", reqVo, e);
             Cat.logError("获取车辆基本信息异常[{" + reqVo + "}]", e);
             return new ResponseData <>(e.getCode(), e.getMsg());
         } catch (Exception e) {
-            LOGGER.error("获取车辆基本信息异常[{}]", reqVo, e);
+            logger.error("获取车辆基本信息异常[{}]", reqVo, e);
             Cat.logError("获取车辆基本信息异常[{" + reqVo + "}]", e);
         }
         return ResponseData.error();
@@ -151,11 +152,11 @@ public class CarController {
             CarBusinessResVO carBusiness = carService.getCarBusiness(reqVo.getCarNo());
             return ResponseData.success(carBusiness);
         } catch (OrderAdminException e) {
-            LOGGER.error("获取车辆运营信息异常[{}]", reqVo, e);
+            logger.error("获取车辆运营信息异常[{}]", reqVo, e);
             Cat.logError("获取车辆运营信息异常[{" + reqVo + "}]", e);
             return new ResponseData <>(e.getErrorCode(), e.getErrorMsg());
         } catch (Exception e) {
-            LOGGER.error("获取车辆运营信息异常[{}]", reqVo, e);
+            logger.error("获取车辆运营信息异常[{}]", reqVo, e);
             Cat.logError("获取车辆运营信息异常[{" + reqVo + "}]", e);
             return ResponseData.error();
         }
