@@ -155,14 +155,18 @@ public class CashierPayService{
         int amtDeposit = 0;
         if(orderPayReqVO.getPayKind().contains(DataPayKindConstant.RENT)){
             amtDeposit = cashierNoTService.getPayDeposit(orderPayReqVO.getOrderNo(),orderPayReqVO.getMenNo(), DataPayKindConstant.RENT);
-            accountPayAbles.add(new AccountPayAbleResVO(orderPayReqVO.getOrderNo(),orderPayReqVO.getMenNo(),amtDeposit, RenterCashCodeEnum.ACCOUNT_RENTER_DEPOSIT,RenterCashCodeEnum.ACCOUNT_RENTER_DEPOSIT.getTxt()));
+           if(amtDeposit < 0){
+               accountPayAbles.add(new AccountPayAbleResVO(orderPayReqVO.getOrderNo(),orderPayReqVO.getMenNo(),amtDeposit, RenterCashCodeEnum.ACCOUNT_RENTER_DEPOSIT,RenterCashCodeEnum.ACCOUNT_RENTER_DEPOSIT.getTxt()));
+           }
         }
 
         //违章押金 是否选择违章押金
         int amtWZDeposit = 0;
         if(orderPayReqVO.getPayKind().contains(DataPayKindConstant.DEPOSIT)){
             amtWZDeposit =  cashierNoTService.getPayDeposit(orderPayReqVO.getOrderNo(),orderPayReqVO.getMenNo(),DataPayKindConstant.DEPOSIT);
-            accountPayAbles.add(new AccountPayAbleResVO(orderPayReqVO.getOrderNo(),orderPayReqVO.getMenNo(),amtWZDeposit, RenterCashCodeEnum.ACCOUNT_RENTER_DEPOSIT,RenterCashCodeEnum.ACCOUNT_RENTER_DEPOSIT.getTxt()));
+            if(amtWZDeposit < 0){
+                accountPayAbles.add(new AccountPayAbleResVO(orderPayReqVO.getOrderNo(),orderPayReqVO.getMenNo(),amtWZDeposit, RenterCashCodeEnum.ACCOUNT_RENTER_WZ_DEPOSIT,RenterCashCodeEnum.ACCOUNT_RENTER_WZ_DEPOSIT.getTxt()));
+            }
         }
 
         //应付租车费用
@@ -176,7 +180,7 @@ public class CashierPayService{
             rentAmt = cashierNoTService.sumRentOrderCost(payableVOs);
             //已付租车费用
             rentAmtPayed = accountRenterCostSettleService.getCostPaidRent(orderPayReqVO.getOrderNo(),orderPayReqVO.getMenNo());
-            if(!CollectionUtils.isEmpty(payableVOs)){
+            if(!CollectionUtils.isEmpty(payableVOs) && rentAmt+rentAmtPayed <0){
                 for(int i=0;i<payableVOs.size();i++){
                     PayableVO payableVO = payableVOs.get(i);
                     //判断是租车费用、还是补付 租车费用 并记录 详情
@@ -221,10 +225,10 @@ public class CashierPayService{
         //待支付金额明细
         List<PayVo> payVo = new ArrayList<>();
         //车辆押金 是否选择车辆押金
-        if(orderPaySign.getPayKind().contains(DataPayKindConstant.RENT)){
+        if(orderPaySign.getPayKind().contains(DataPayKindConstant.RENT) && payVO.getAmtDeposit()<0){
           CashierEntity cashierEntity = cashierNoTService.getCashierEntity(orderPaySign.getOrderNo(),orderPaySign.getMenNo(), DataPayKindConstant.RENT);
           if(Objects.nonNull(cashierEntity)){
-              PayVo vo = cashierNoTService.getPayVO(cashierEntity,orderPaySign,payVO,DataPayKindConstant.RENT);
+              PayVo vo = cashierNoTService.getPayVO(cashierEntity,orderPaySign,payVO.getAmtDeposit(),payVO.getTitle(),DataPayKindConstant.RENT);
               String payMd5 = MD5.MD5Encode(FasterJsonUtil.toJson(vo));
               vo.setPayMd5(payMd5);
               payVo.add(vo);
@@ -232,10 +236,10 @@ public class CashierPayService{
         }
 
         //违章押金 是否选择违章押金
-        if(orderPaySign.getPayKind().contains(DataPayKindConstant.DEPOSIT)){
+        if(orderPaySign.getPayKind().contains(DataPayKindConstant.DEPOSIT) && payVO.getAmtWzDeposit()<0){
             CashierEntity cashierEntity = cashierNoTService.getCashierEntity(orderPaySign.getOrderNo(),orderPaySign.getMenNo(), DataPayKindConstant.DEPOSIT);
             if(Objects.nonNull(cashierEntity)){
-                PayVo vo = cashierNoTService.getPayVO(cashierEntity,orderPaySign,payVO,DataPayKindConstant.DEPOSIT);
+                PayVo vo = cashierNoTService.getPayVO(cashierEntity,orderPaySign,payVO.getAmtWzDeposit(),payVO.getTitle(),DataPayKindConstant.DEPOSIT);
                 String payMd5 = MD5.MD5Encode(FasterJsonUtil.toJson(vo));
                 vo.setPayMd5(payMd5);
                 payVo.add(vo);
@@ -244,14 +248,14 @@ public class CashierPayService{
         }
 
         //待付租车费用
-        if(orderPaySign.getPayKind().contains(DataPayKindConstant.RENT_AMOUNT)){
+        if(orderPaySign.getPayKind().contains(DataPayKindConstant.RENT_AMOUNT) && payVO.getAmtRent()<0){
             List<PayableVO> payableVOs = payVO.getPayableVOs();
             //待付租车费用
             int amt = payVO.getAmt();
             if(amt<0){
                 CashierEntity cashierEntity = cashierNoTService.getCashierEntity(orderPaySign.getOrderNo(),orderPaySign.getMenNo(), DataPayKindConstant.RENT_AMOUNT);
                 if(Objects.nonNull(cashierEntity)){
-                    PayVo vo = cashierNoTService.getPayVO(cashierEntity,orderPaySign,payVO,DataPayKindConstant.RENT_AMOUNT);
+                    PayVo vo = cashierNoTService.getPayVO(cashierEntity,orderPaySign,payVO.getAmtRent(),payVO.getTitle(),DataPayKindConstant.RENT_AMOUNT);
                     String paySn = cashierNoTService.getCashierRentCostPaySn(orderPaySign.getOrderNo(),orderPaySign.getMenNo());
                     vo.setPaySn(paySn);
                     vo.setExtendParams(GsonUtils.toJson(payableVOs));

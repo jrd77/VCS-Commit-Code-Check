@@ -5,9 +5,11 @@ import com.atzuche.order.admin.entity.OrderRemarkOverviewEntity;
 import com.atzuche.order.admin.enums.RemarkTypeEnum;
 import com.atzuche.order.admin.mapper.OrderRemarkMapper;
 import com.atzuche.order.admin.vo.req.remark.OrderRemarkAdditionRequestVO;
+import com.atzuche.order.admin.vo.req.remark.OrderRemarkInformationRequestVO;
 import com.atzuche.order.admin.vo.req.remark.OrderRemarkRequestVO;
 import com.atzuche.order.admin.vo.resp.remark.OrderRemarkOverviewListResponseVO;
 import com.atzuche.order.admin.vo.resp.remark.OrderRemarkOverviewResponseVO;
+import com.atzuche.order.admin.vo.resp.remark.OrderRemarkResponseVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -57,6 +59,15 @@ public class OrderRemarkService {
         BeanUtils.copyProperties(orderRemarkAdditionRequestVO,orderRemarkAdditionRequestDTO);
         orderRemarkMapper.addOrderRemark(orderRemarkAdditionRequestDTO);
     }
+
+    public OrderRemarkResponseVO getOrderRemarkInformation(OrderRemarkInformationRequestVO orderRemarkInformationRequestVO){
+        return orderRemarkMapper.getOrderRemarkInformation(orderRemarkInformationRequestVO);
+    }
+
+    public void updateRemarkById(OrderRemarkAdditionRequestDTO orderRemarkAdditionRequestDTO){
+        orderRemarkMapper.updateRemarkById(orderRemarkAdditionRequestDTO);
+    }
+
 
 
 }

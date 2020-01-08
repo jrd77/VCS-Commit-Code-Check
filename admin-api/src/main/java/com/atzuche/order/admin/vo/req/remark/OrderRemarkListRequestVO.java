@@ -1,10 +1,11 @@
 package com.atzuche.order.admin.vo.req.remark;
 
 import com.autoyol.doc.annotation.AutoDocProperty;
+import lombok.Data;
+import lombok.ToString;
 
-/**
- * Created by qincai.lin on 2019/12/30.
- */
+@Data
+@ToString
 public class OrderRemarkListRequestVO {
 
     @AutoDocProperty(value = "订单号")
@@ -25,51 +26,5 @@ public class OrderRemarkListRequestVO {
     @AutoDocProperty(value = "备注结束时间")
     private String endTime;
 
-    public String getOrderNo() {
-        return orderNo;
-    }
 
-    public void setOrderNo(String orderNo) {
-        this.orderNo = orderNo;
-    }
-
-    public String getRemarkType() {
-        return remarkType;
-    }
-
-    public void setRemarkType(String remarkType) {
-        this.remarkType = remarkType;
-    }
-
-    public String getDepartmentId() {
-        return departmentId;
-    }
-
-    public void setDepartmentId(String departmentId) {
-        this.departmentId = departmentId;
-    }
-
-    public String getOperatorName() {
-        return operatorName;
-    }
-
-    public void setOperatorName(String operatorName) {
-        this.operatorName = operatorName;
-    }
-
-    public String getStartTime() {
-        return startTime;
-    }
-
-    public void setStartTime(String startTime) {
-        this.startTime = startTime;
-    }
-
-    public String getEndTime() {
-        return endTime;
-    }
-
-    public void setEndTime(String endTime) {
-        this.endTime = endTime;
-    }
 }

@@ -142,6 +142,8 @@ public class GoodsService {
         renterGoodsDetailDto.setYear(carBaseVO.getYear() == null ? "" : String.valueOf(carBaseVO.getYear()));
         renterGoodsDetailDto.setBrand(carBaseVO.getBrand()==null ? null:String.valueOf(carBaseVO.getBrand()));
         renterGoodsDetailDto.setLicenseDay(LocalDateTimeUtils.parseStringToLocalDate(carBaseVO.getLicenseDay()));
+        renterGoodsDetailDto.setMoreLicenseFlag(carBaseVO.getMoreLicenseFlag());
+        renterGoodsDetailDto.setLicenseExpire(carBaseVO.getLicenseExpire()==null?null:LocalDateTimeUtils.dateToLocalDateTime(carBaseVO.getLicenseExpire()));
         if (data.getCarModelParam() != null) {
         	renterGoodsDetailDto.setCarInmsrp(data.getCarModelParam().getInmsrp());
         }

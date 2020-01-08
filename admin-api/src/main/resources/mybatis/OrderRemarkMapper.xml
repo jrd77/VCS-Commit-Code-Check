@@ -8,6 +8,13 @@
         <result property="typeCount" column="typeCount"/>
     </resultMap>
 
+	<resultMap id="orderRemarkInformationMap" type="com.atzuche.order.admin.vo.resp.remark.OrderRemarkResponseVO" >
+		<result property="remarkType" column="remark_type"/>
+		<result property="remarkContent" column="remark"/>
+		<result property="departmentId" column="dept_id"/>
+		<result property="remarkId" column="id"/>
+	</resultMap>
+
     <select id="getOrderRemarkOverview" resultMap="orderRemarkOverviewMap">
         SELECT remark_type, COUNT(*) AS typeCount FROM trans_remark where order_no = #{orderNo} GROUP BY remark_type
     </select>
@@ -45,6 +52,26 @@
 		)
     </insert>
 
+	<select id="getOrderRemarkInformation" resultMap="orderRemarkOverviewMap">
+		SELECT id, dept_id, remark, remark_type FROM trans_remark where id = #{remarkId}
+	</select>
+
+
+	<update id="updateRemarkById" parameterType="com.atzuche.order.delivery.entity.RenterOrderDeliveryEntity">
+		update trans_remark
+		<set>
+			<if test="departmentId != null">`dept_id` = #{departmentId}, </if>
+			<if test="remarkType != null">`remark_type` = #{remarkType}, </if>
+			<if test="remarkContent != null">`remark` = #{remarkContent}, </if>
+			<if test="limitDelayed != null">`limit_delayed` = #{limitDelayed}, </if>
+			<if test="followStatus != null">`follow_status` = #{followStatus}, </if>
+			<if test="followFailReason != null">`follow_fail_reason` = #{followFailReason}, </if>
+			<if test="updateOp != null">`update_op` = #{updateOp}, </if>
+			<if test="isDelete != null">`is_delete` = #{isDelete}</if>
+
+		</set>
+		where id = #{remarkId}
+	</update>
 
 
   	
