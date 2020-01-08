@@ -368,7 +368,10 @@ public class CashierNoTService {
     public String getPayEnv(){
         String m_env = System.getProperty("env");
         m_env = StringUtil.isBlank(m_env)?System.getProperty("ENV"):m_env;
-        return m_env;
+        if(StringUtil.isBlank(m_env)){
+            return "";
+        }
+        return PayPayEnvEnum.getFlagText(m_env.toUpperCase());
     }
 
     /**
