@@ -73,6 +73,8 @@ public class ModifyOrderForOwnerService {
 	private UniqueOrderNoService uniqueOrderNoService;
 	@Autowired
 	private OrderService orderService;
+	@Autowired
+    private CarRentalTimeApiService carRentalTimeApiService;
 
 	/**
 	 * 租客修改订单重新下车主订单逻辑(相当于车主同意)
@@ -351,8 +353,7 @@ public class ModifyOrderForOwnerService {
 		if (carRentTimeRangeReqVO == null) {
 			return null;
 		}
-		CarRentTimeRangeResVO carRentTimeRangeResVO = goodsService.getCarRentTimeRange(carRentTimeRangeReqVO);
-		return carRentTimeRangeResVO;
+		return carRentalTimeApiService.getCarRentTimeRange(carRentTimeRangeReqVO);
 	}
 	
 	/**
