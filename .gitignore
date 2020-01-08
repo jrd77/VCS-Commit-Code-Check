@@ -219,6 +219,7 @@ casier-all/build/
 casier-all/cashier-account/build/
 casier-all/cashier-api/build/
 config/build/classes/
+order-coin/build/
 config/build/generated/
 config/build/resources/main/mybatis/
 config/build/

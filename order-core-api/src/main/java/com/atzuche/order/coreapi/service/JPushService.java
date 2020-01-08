@@ -57,14 +57,20 @@ public class JPushService {
 
 	@Resource
 	private SendPlatformSmsService sendPlatformSmsService;
-	
-	private String contentTxt = "您的订单（订单号：#{orderNo}）查出有新的违章，立即点击查看：#{url}。";
-	
-	private String jpushContentTxt = "您的订单（订单号：#{orderNo}）查出有新的违章，立即点击查看。";
-	
-	private String ownerContentTxt = "您的订单（订单号：#{orderNo}）查出有新的违章，立即点击查看：#{url}。平台会督促租客在订单结束后的#{dealDays}天内完成违章处理，请您不要担心。";
 
-	private String ctripContentTxt = "您的订单(订单号: #{orderNo})查出有新的违章,如有问题请联系客服10100202";
+	private String jpushContentTxt = "您的订单（订单号：#{orderNo}）查出有新的违章，立即点击查看。";
+
+	/**
+	 * 租客的违章
+	 */
+	@Value("${renter_wz_renter_message}")
+	private String contentTxt;
+
+	@Value("${renter_wz_owner_message}")
+	private String ownerContentTxt;
+
+	@Value("${renter_wz_ctrip_message}")
+	private String ctripContentTxt;
 
 	/**
 	 * 发送违章短信、推送
@@ -77,10 +83,10 @@ public class JPushService {
 	public void updateIllegalMessage(String orderNo, String renterNo, String renterPhone, String type, boolean isCtripOrder) {
 		Map<String, Object> paramMap = new HashMap<>(4);
 		if (isCtripOrder && SMS_TYPE_RENTER.equals(type)) {
-			//paramMap.put("textCode", textCode);
+			paramMap.put("textCode", ctripContentTxt);
 		} else {
 			if(SMS_TYPE_RENTER.equals(type)) {
-				//paramMap.put("textCode", textCode);
+				paramMap.put("textCode", contentTxt);
 			}else {
 				String cityCode = "";
 				OrderEntity order = orderService.getOrderEntity(orderNo);
@@ -102,7 +108,7 @@ public class JPushService {
 						}
 					}
 				}
-				//paramMap.put("textCode", textCode);
+				paramMap.put("textCode", ownerContentTxt);
 				paramMap.put("dealDays",dealDays);
 			}
 		}
@@ -114,7 +120,7 @@ public class JPushService {
 		jPushText = jPushText.replace("#{orderNo}", String.valueOf(orderNo));
 		logger.info("发送orderNo is {}违章短信成功", orderNo);
 		//TODO
-		sendPlatformSmsService.sendNormalSms(new HashMap<>());
+		sendPlatformSmsService.sendNormalSms(paramMap);
 		/*this.sendCustomMsgByAlias(renterPhone, token, jPushText, orderNo + "", "63", appServerUrl+illgalDetailAppUrl);*/
 		if (SMS_TYPE_RENTER.equals(type)) {
 			renterOrderWzDetailService.updateSmsStatus(orderNo);

@@ -26,7 +26,7 @@ public class OrderSettleRabbitConfig {
     /**
      * 车辆结算MQ事件
      */
-    @RabbitListener(queues="${xxx}")
+    @RabbitListener(queues="xxx")
     @RabbitHandler
     public void settleCallBack(Message message, Channel channel,String orderNo){
         log.info("OrderSettleRabbitConfig settleCallBack start param;[{}]", message);

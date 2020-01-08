@@ -9,17 +9,17 @@ import lombok.Getter;
 @Getter
 public enum RenterMemRightEnum {
     //mamber_flag
-    HIGH_QUALITY_OWNER("MF_1","会员标识:优质车主"),
-    HIGH_QUALITY_RENTER("MF_2","会员标识:优质租客"),
-    HIGH_QUALITY_OWNER_RENTER("MF_3","会员标识:优质租客+优质车主"),
-    VIP("MF_4","会员标识:VIP"),
-    TD("MF_5","会员标识:免TD用户"),
+    HIGH_QUALITY_OWNER("1","优质车主"),
+    HIGH_QUALITY_RENTER("2","优质租客"),
+    HIGH_QUALITY_OWNER_RENTER("3","优质租客+优质车主"),
+    VIP("4","VIP"),
+    TD("5","免TD用户"),
 
     //任务
-    BIND_WECHAT("T_1","绑定微信"),
-    INVITE_FRIENDS("T_2","邀请好友"),
-    SUCCESS_RENTCAR("T_3","成功租车次数"),
-    MEMBER_LEVEL("T_4","会员的等级"),
+    BIND_WECHAT("1","绑定微信"),
+    INVITE_FRIENDS("2","邀请好友"),
+    SUCCESS_RENTCAR("3","成功租车次数"),
+    MEMBER_LEVEL("4","会员的等级"),
 
     STAFF("3","内部员工"),
 

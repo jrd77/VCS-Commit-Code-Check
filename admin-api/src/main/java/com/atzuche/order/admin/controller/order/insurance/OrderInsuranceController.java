@@ -69,7 +69,7 @@ public class OrderInsuranceController {
 
 	@AutoDocMethod(description = "购买保险列表", value = "购买保险列表", response = OrderInsuranceResponseVO.class)
 	@GetMapping("/list")
-	public ResponseData<OrderInsuranceResponseVO> list(@RequestBody OrderInsuranceRequestVO orderInsuranceRequestVO, BindingResult bindingResult) {
+	public ResponseData<OrderInsuranceResponseVO> list(OrderInsuranceRequestVO orderInsuranceRequestVO, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), ErrorCode.INPUT_ERROR.getText());
         }
@@ -82,24 +82,30 @@ public class OrderInsuranceController {
         if (bindingResult.hasErrors()) {
             return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), ErrorCode.INPUT_ERROR.getText());
         }
-	    OrderInsuranceAdditionRequestDTO orderInsuranceAdditionRequestDTO = new OrderInsuranceAdditionRequestDTO();
-        //属性拷贝
-	    BeanUtils.copyProperties(orderInsuranceAdditionRequestVO,orderInsuranceAdditionRequestDTO);
-	    //获取操作人
-        orderInsuranceAdditionRequestDTO.setOperator(AdminUserUtil.getAdminUser().getAuthName());
-        orderInsuranceAdditionRequestDTO.setInsuranceDate(DateUtils.formate(LocalDateTime.now(),DateUtils.DATE_DEFAUTE_4));
-        ResponseEntity<String> responseEntity = restTemplate.postForEntity(insurancePurchaseUrl + ADD_PURCHASE, orderInsuranceAdditionRequestDTO, String.class);
-        String result = responseEntity.getBody();
-        if (StringUtils.isEmpty(result)) {
-            return ResponseData.error();
+        logger.info("手工录入保险信息");
+        try{
+            OrderInsuranceAdditionRequestDTO orderInsuranceAdditionRequestDTO = new OrderInsuranceAdditionRequestDTO();
+            //属性拷贝
+            BeanUtils.copyProperties(orderInsuranceAdditionRequestVO,orderInsuranceAdditionRequestDTO);
+            //获取操作人
+            orderInsuranceAdditionRequestDTO.setOperator(AdminUserUtil.getAdminUser().getAuthName());
+            orderInsuranceAdditionRequestDTO.setInsuranceDate(DateUtils.formate(LocalDateTime.now(),DateUtils.DATE_DEFAUTE_4));
+            ResponseEntity<String> responseEntity = restTemplate.postForEntity(insurancePurchaseUrl + ADD_PURCHASE, orderInsuranceAdditionRequestDTO, String.class);
+            String result = responseEntity.getBody();
+            if (StringUtils.isEmpty(result)) {
+                return ResponseData.error();
+            }
+            JSONObject jsonObject = JSON.parseObject(result);
+            String resCode = jsonObject.getString(RES_CODE);
+            if (ErrorCode.SUCCESS.getCode().equalsIgnoreCase(resCode)) {
+                return ResponseData.success(null);
+            } else {
+                return new ResponseData<>(resCode, jsonObject.getString(RES_MSG));
+            }
+        } catch (Exception e) {
+            logger.info("手工录入保险信息",e);
         }
-        JSONObject jsonObject = JSON.parseObject(result);
-        String resCode = jsonObject.getString(RES_CODE);
-        if (ErrorCode.SUCCESS.getCode().equalsIgnoreCase(resCode)) {
-            return ResponseData.success(null);
-        } else {
-            return new ResponseData<>(resCode, jsonObject.getString(RES_MSG));
-        }
+	    return null;
 
     }
 

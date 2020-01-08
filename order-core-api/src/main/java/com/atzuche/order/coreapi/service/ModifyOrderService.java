@@ -9,7 +9,6 @@ import com.atzuche.order.coreapi.entity.vo.req.CarRentTimeRangeReqVO;
 import com.atzuche.order.coreapi.entity.vo.req.OwnerCouponBindReqVO;
 import com.atzuche.order.coreapi.entity.vo.res.CarRentTimeRangeResVO;
 import com.atzuche.order.coreapi.modifyorder.exception.ModifyOrderParameterException;
-import com.atzuche.order.coreapi.service.GoodsService.CarDetailReqVO;
 import com.atzuche.order.coreapi.utils.ModifyOrderUtils;
 import com.atzuche.order.delivery.entity.RenterOrderDeliveryEntity;
 import com.atzuche.order.delivery.service.RenterOrderDeliveryService;
@@ -105,6 +104,8 @@ public class ModifyOrderService {
 	private DeliveryCarService deliveryCarService;
 	@Autowired
 	private CouponAndCoinHandleService couponAndCoinHandleService;
+	@Autowired
+    private CarRentalTimeApiService carRentalTimeApiService;
 
 	/**
 	 * 修改订单主逻辑
@@ -284,8 +285,7 @@ public class ModifyOrderService {
 		if (carRentTimeRangeReqVO == null) {
 			return null;
 		}
-		CarRentTimeRangeResVO carRentTimeRangeResVO = goodsService.getCarRentTimeRange(carRentTimeRangeReqVO);
-		return carRentTimeRangeResVO;
+		return carRentalTimeApiService.getCarRentTimeRange(carRentTimeRangeReqVO);
 	}
 	
 	/**
@@ -484,7 +484,7 @@ public class ModifyOrderService {
 		renterGoodsDetailDTO.setRenterOrderNo(modifyOrderDTO.getRenterOrderNo());
 		// 每天价
 		List<RenterGoodsPriceDetailDTO> renterGoodsPriceDetailDTOList = renterGoodsDetailDTO.getRenterGoodsPriceDetailDTOList();
-		if (renterGoodsPriceDetailDTOList == null || renterGoodsPriceDetailDTOList.isEmpty()) {
+        if (renterGoodsPriceDetailDTOList == null || renterGoodsPriceDetailDTOList.isEmpty()) {
 			log.error("getRenterGoodsDetailDTO renterGoodsPriceDetailDTOList为空");
 			Cat.logError("getRenterGoodsDetailDTO renterGoodsPriceDetailDTOList为空",new ModifyOrderParameterException());
 			return renterGoodsDetailDTO;
@@ -1188,7 +1188,9 @@ public class ModifyOrderService {
 						changeCodeList.contains(OrderChangeItemEnum.MODIFY_SRVRETURNFLAG.getCode()))) {
 			return;
 		}
-		UpdateOrderDeliveryVO updateFlowOrderVO = new UpdateOrderDeliveryVO();
+		UpdateOrderDeliveryVO updateFlowOrderVO = null;
+		//FIXME:
+				//new UpdateOrderDeliveryVO();
 		// 配送地址
 		RenterDeliveryAddrDTO deliveryAddr = getRenterDeliveryAddrDTO(modifyOrderDTO);
 		updateFlowOrderVO.setRenterDeliveryAddrDTO(deliveryAddr);
