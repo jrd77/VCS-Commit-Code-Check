@@ -1,4 +1,4 @@
-package com.atzuche.order.renterorder.service;
+package com.atzuche.order.coin.service;
 
 import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.CatConstants;
@@ -7,6 +7,7 @@ import com.autoyol.auto.coin.service.vo.req.AutoCoiChargeRequestVO;
 import com.autoyol.auto.coin.service.vo.req.AutoCoinAgainDeductRequestVO;
 import com.autoyol.auto.coin.service.vo.res.AutoCoinResponseVO;
 import com.autoyol.commons.utils.GsonUtils;
+import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
 import com.dianping.cat.Cat;
 import com.dianping.cat.message.Transaction;
@@ -18,15 +19,13 @@ import javax.annotation.Resource;
 import java.util.Objects;
 
 /**
- * 凹凸币服务相关业务处理类
- *
- * @author pengcheng.fu
- * @date 2019/12/27 11:09
- */
+ * 该服务是远程凹凸币服务的本地代理
+ * @author <a href="mailto:lianglin.sjtu@gmail.com">AndySjtu</a>
+ * @date 2020/1/8 3:10 下午
+ **/
 @Service
-public class AutoCoinService {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(AutoCoinService.class);
+public class AutoCoinProxyService {
+    private static final Logger LOGGER = LoggerFactory.getLogger(AutoCoinProxyService.class);
 
     @Resource
     private AutoCoinFeignService autoCoinFeignService;
@@ -35,9 +34,9 @@ public class AutoCoinService {
      * 查询会员凹凸币信息
      *
      * @param memNo 租客注册号
-     * @return CrmCustPointDTO 凹凸币信息
+     * @return 凹凸币总和
      */
-    public AutoCoinResponseVO getCrmCustPoint(String memNo) {
+    public int getCrmCustPoint(String memNo) {
         LOGGER.info("AutoCoinService.getCrmCustPoint remote call start param memNo: [{}]", memNo);
         Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "凹凸币服务");
         try {
@@ -47,10 +46,15 @@ public class AutoCoinService {
             LOGGER.info("AutoRemoteCoinService.getCrmCustPoint remote call end result result: [{}]", JSON.toJSONString(result));
             Cat.logEvent(CatConstants.FEIGN_RESULT, JSON.toJSONString(result));
             t.setStatus(Transaction.SUCCESS);
-            if (Objects.isNull(result)) {
-                return null;
+            if(result!=null&& ErrorCode.SUCCESS.getCode().equals(result.getResCode())){
+                t.setStatus(Transaction.SUCCESS);
+                return result.getData().getPointValue();
+            }else{
+                LOGGER.error("获取远程的凹凸币服务出现异常,errorCode!=000000,context[memNo={},result is {}]",memNo,result);
+                RuntimeException e = new RuntimeException("remote auto coin exception:mem_no="+memNo);
+                t.setStatus(e);
+                Cat.logError("获取远程凹凸币服务出现异常",e);
             }
-            return result.getData();
         } catch (Exception e) {
             LOGGER.error("查询会员凹凸币信息异常.memNo:[{}]", memNo, e);
             t.setStatus(e);
@@ -58,7 +62,7 @@ public class AutoCoinService {
         } finally {
             t.complete();
         }
-        return null;
+        return 0;
     }
 
 
@@ -68,7 +72,7 @@ public class AutoCoinService {
      * @param vo 请求参数
      * @return Boolean
      */
-    public Boolean recharge(AutoCoiChargeRequestVO vo) {
+    public boolean recharge(AutoCoiChargeRequestVO vo) {
         LOGGER.info("AutoRemoteCoinService recharge remote call start param vo:[{}]", vo);
         Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "凹凸币服务");
         try {
@@ -78,8 +82,19 @@ public class AutoCoinService {
             LOGGER.info("AutoRemoteCoinService recharge remote call end result result: [{}]",
                     GsonUtils.toJson(vo));
             Cat.logEvent(CatConstants.FEIGN_RESULT, JSON.toJSONString(result));
-            t.setStatus(Transaction.SUCCESS);
-            return result.getData();
+            if(result!=null&&ErrorCode.SUCCESS.getCode().equals(result.getResCode())){
+                t.setStatus(Transaction.SUCCESS);
+                Boolean data = result.getData();
+                if(data!=null&&data){
+                    return true;
+                }
+                return false;
+            }else{
+                LOGGER.error("获取远程的凹凸币服务出现异常,errorCode!=000000,context[{},result is {}]",vo,result);
+                RuntimeException e = new RuntimeException("remote auto coin exception:vo="+vo);
+                t.setStatus(e);
+                Cat.logError("获取远程凹凸币服务出现异常",e);
+            }
         } catch (Exception e) {
             LOGGER.error("同步充值凹凸币信息异常.vo:[{}]", vo, e);
             t.setStatus(e);
@@ -118,8 +133,8 @@ public class AutoCoinService {
         return false;
 
     }
-    
-    
+
+
     /**
      * 补扣凹凸币
      *

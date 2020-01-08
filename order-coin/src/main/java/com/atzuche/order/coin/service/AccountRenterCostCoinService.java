@@ -27,10 +27,11 @@ public class AccountRenterCostCoinService {
      * @return
      */
     public int getUserCoinAmtByOrder(String orderNo,String memNo){
-        List<AccountRenterCostCoinEntity> accountRenterCostCoins = accountRenterCostCoinMapper.getAccountRenterCostCoins(orderNo,memNo);
-        if(CollectionUtils.isEmpty(accountRenterCostCoins)){
-            return NumberUtils.INTEGER_ZERO;
-        }
-        return accountRenterCostCoins.stream().mapToInt(AccountRenterCostCoinEntity::getAmt).sum();
+        return accountRenterCostCoinMapper.getAccountRenterCostCoinTotal(orderNo);
+    }
+
+    public int getUserCoinTotalAmt(String memNo){
+        //TODO:
+        return 0;
     }
 }
