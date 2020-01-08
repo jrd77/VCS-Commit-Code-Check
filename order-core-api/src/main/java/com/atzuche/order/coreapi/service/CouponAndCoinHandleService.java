@@ -99,4 +99,21 @@ public class CouponAndCoinHandleService {
     }
 
 
+
+
+    public boolean undoOwnerCoupon(String orderNo, String couponNo, String recover){
+        if(StringUtils.isBlank(couponNo)) {
+            return true;
+        }
+        return ownerDiscountCouponService.undoCoupon(orderNo, couponNo, recover);
+    }
+
+    public boolean undoPlatformCoupon(String orderNo) {
+        return platformCouponService.cancelPlatformCoupon(orderNo) > 0;
+    }
+
+    public boolean undoGetCarFeeCoupon(String orderNo) {
+        return platformCouponService.cancelGetCarFeeCoupon(orderNo) > 0;
+    }
+
 }
