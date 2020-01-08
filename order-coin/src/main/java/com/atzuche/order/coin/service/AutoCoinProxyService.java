@@ -121,6 +121,7 @@ public class AutoCoinProxyService {
             ResponseData<Boolean> result = autoCoinFeignService.deduct(vo);
             LOGGER.info("AutoRemoteCoinService deduct remote call end result result: [{}]", GsonUtils.toJson(result));
             Cat.logEvent(CatConstants.FEIGN_RESULT, JSON.toJSONString(result));
+            //FIXME: 判断响应码
             t.setStatus(Transaction.SUCCESS);
             return result.getData();
         } catch (Exception e) {
@@ -150,6 +151,7 @@ public class AutoCoinProxyService {
             ResponseData<Boolean> result = autoCoinFeignService.againDeduct(autoCoinRechange);
             LOGGER.info("AutoRemoteCoinService againDeduct remote call end result result: [{}]", GsonUtils.toJson(result));
             Cat.logEvent(CatConstants.FEIGN_RESULT, JSON.toJSONString(result));
+            //FIXME: 判断响应码
             t.setStatus(Transaction.SUCCESS);
             return result.getData();
         } catch (Exception e) {
@@ -175,6 +177,7 @@ public class AutoCoinProxyService {
             ResponseData<Boolean> result = autoCoinFeignService.returnAutoCoin(autoCoinRechange);
             LOGGER.info("AutoRemoteCoinService returnCoin remote call end result result: [{}]", GsonUtils.toJson(result));
             Cat.logEvent(CatConstants.FEIGN_RESULT, JSON.toJSONString(result));
+            //FIXME: 判断响应码
             t.setStatus(Transaction.SUCCESS);
             return result.getData();
         } catch (Exception e) {
