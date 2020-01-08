@@ -52,8 +52,6 @@ public class HandoverCarInfoService {
     DeliveryCarService deliveryCarInfoService;
     @Resource
     RenterOrderDeliveryMapper renterOrderDeliveryMapper;
-    @Resource
-    RenterHandoverCarRemarkMapper renterHandoverCarRemarkMapper;
     @Autowired
     DeliveryCarTask deliveryCarTask;
 
