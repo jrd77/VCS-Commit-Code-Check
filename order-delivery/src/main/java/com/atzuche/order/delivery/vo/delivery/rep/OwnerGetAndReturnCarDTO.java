@@ -13,7 +13,6 @@ import lombok.ToString;
 @ToString
 @Builder
 public class OwnerGetAndReturnCarDTO {
-
     @AutoDocProperty("实际取车时间")
     public String realGetTime;
     @AutoDocProperty("实际还车时间")
@@ -52,9 +51,4 @@ public class OwnerGetAndReturnCarDTO {
     public String carOilServiceCharge;
     @AutoDocProperty("代管车-车主总油费")
     public String carOwnerOilCrash;
-
-
-
-
-
 }

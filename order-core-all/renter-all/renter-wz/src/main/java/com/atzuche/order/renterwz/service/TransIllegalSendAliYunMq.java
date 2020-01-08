@@ -1,5 +1,6 @@
 package com.atzuche.order.renterwz.service;
 
+import com.alibaba.fastjson.JSON;
 import com.aliyun.mns.client.AsyncCallback;
 import com.aliyun.mns.model.Message;
 import com.atzuche.order.commons.JsonUtil;
@@ -8,9 +9,11 @@ import com.atzuche.order.renterwz.aliyunmq.AliyunMnsService;
 import com.atzuche.order.renterwz.entity.MqSendFeelbackLogEntity;
 import com.atzuche.order.renterwz.entity.RenterOrderWzIllegalPhotoEntity;
 import com.atzuche.order.renterwz.mapper.MqSendFeelbackLogMapper;
+import com.atzuche.order.renterwz.dto.BaseMessageBody;
 import com.atzuche.order.renterwz.vo.OrderInfoForIllegal;
 import com.atzuche.order.renterwz.vo.PhotoPath;
 import com.atzuche.order.renterwz.vo.TransIllegalPhotoBo;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -50,6 +53,8 @@ public class TransIllegalSendAliYunMq {
     private String queueNameTransIllegal;
     @Value("${com.autoyol.mns.queue.auto-renter-voucher-queue}")
     private String renterVoucherQueue;
+    @Value("${mq.auto.platform.message.queue}")
+    private String mqAutoPlatformMessageQueue;
 
     /** 普通 bucket */
     @Value("${oss.bucket}")
@@ -121,6 +126,26 @@ public class TransIllegalSendAliYunMq {
                 public void onFail(Exception ex) {
                     ex.printStackTrace();
                 }});
+        }
+    }
+
+    /**
+     * 发送push
+     *
+     * @param baseMessageBody
+     */
+    public void sendPushMsg(BaseMessageBody baseMessageBody) {
+        String messageBody = null;
+        try {
+            messageBody = JSON.toJSONString(baseMessageBody);
+            logger.info("send platform message to im center ,message body = {}", messageBody);
+            if (StringUtils.isEmpty(messageBody)) {
+                logger.error("send platform message error,message body is empty!");
+                return;
+            }
+            aliyunMnsService.asyncSend̨MessageToQueue(messageBody, mqAutoPlatformMessageQueue);
+        } catch (Exception e) {
+            logger.error("send a push message is error, the body is {}, queueName is {}", messageBody, mqAutoPlatformMessageQueue, e);
         }
     }
 }
