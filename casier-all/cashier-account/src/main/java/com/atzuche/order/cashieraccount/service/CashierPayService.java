@@ -165,7 +165,7 @@ public class CashierPayService{
         if(orderPayReqVO.getPayKind().contains(DataPayKindConstant.DEPOSIT)){
             amtWZDeposit =  cashierNoTService.getPayDeposit(orderPayReqVO.getOrderNo(),orderPayReqVO.getMenNo(),DataPayKindConstant.DEPOSIT);
             if(amtWZDeposit < 0){
-                accountPayAbles.add(new AccountPayAbleResVO(orderPayReqVO.getOrderNo(),orderPayReqVO.getMenNo(),amtWZDeposit, RenterCashCodeEnum.ACCOUNT_RENTER_DEPOSIT,RenterCashCodeEnum.ACCOUNT_RENTER_DEPOSIT.getTxt()));
+                accountPayAbles.add(new AccountPayAbleResVO(orderPayReqVO.getOrderNo(),orderPayReqVO.getMenNo(),amtWZDeposit, RenterCashCodeEnum.ACCOUNT_RENTER_WZ_DEPOSIT,RenterCashCodeEnum.ACCOUNT_RENTER_WZ_DEPOSIT.getTxt()));
             }
         }
 
