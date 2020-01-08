@@ -137,7 +137,7 @@ public class CashierService {
     public void insertRenterWZDeposit(CreateOrderRenterWZDepositReqVO createOrderRenterWZDepositReq){
         Assert.notNull(createOrderRenterWZDepositReq, ErrorCode.PARAMETER_ERROR.getText());
         createOrderRenterWZDepositReq.check();
-        createOrderRenterWZDepositReq.setPayKind(DataPayKindConstant.RENT);
+        createOrderRenterWZDepositReq.setPayKind(DataPayKindConstant.DEPOSIT);
         //1 收银台记录违章押金 应付
         cashierNoTService.insertRenterWZDeposit(createOrderRenterWZDepositReq);
         //2 违章押金记录应付

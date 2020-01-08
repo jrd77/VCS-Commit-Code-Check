@@ -37,6 +37,15 @@ public interface CashierMapper{
      * @param payKind (押金、违章押金、租车费用)
      * @return
      */
+    CashierEntity getPayAmtByPayKind(@Param("orderNo") String orderNo, @Param("memNo")String memNo, @Param("payKind")String payKind);
+
+    /**
+     * 查询收银台应付金额
+     * @param orderNo
+     * @param memNo
+     * @param payKind (押金、违章押金、租车费用)
+     * @return
+     */
     CashierEntity getPayDetail(@Param("orderNo") String orderNo, @Param("memNo")String memNo, @Param("payKind")String payKind,@Param("payType")String payType,@Param("paySource")String paySource);
 
     /**
@@ -47,5 +56,5 @@ public interface CashierMapper{
      * @param payType
      * @return
      */
-    List<CashierEntity> getCashierRentCosts(@Param("orderNo")String orderNo, @Param("menNo")String menNo, @Param("payKind")String payKind, @Param("payType")String payType);
+    List<CashierEntity> getCashierRentCosts(@Param("orderNo")String orderNo, @Param("memNo")String menNo, @Param("payKind")String payKind, @Param("payType")String payType);
 }

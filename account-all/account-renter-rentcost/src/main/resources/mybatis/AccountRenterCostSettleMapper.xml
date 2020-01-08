@@ -129,6 +129,6 @@
 
     <!-- 根据订单号 会员号查询用户支付记录 -->
     <select id="selectByOrderNo" resultMap="BaseResultMap">
-        select  <include refid="Base_Column_List" /> from account_renter_cost_settle where order_no  = #{orderNo} and mem_no = #{memNo}  limit 1 order by id desc
+        select  <include refid="Base_Column_List" /> from account_renter_cost_settle where order_no  = #{orderNo} and mem_no = #{memNo}  order by id desc  limit 1
     </select>
 </mapper>
