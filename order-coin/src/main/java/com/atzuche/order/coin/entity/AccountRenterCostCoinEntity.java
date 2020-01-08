@@ -1,8 +1,9 @@
-package com.atzuche.order.accountrenterrentcost.entity;
+package com.atzuche.order.coin.entity;
+
+import lombok.Data;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import lombok.Data;
 
 
 /**

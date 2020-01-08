@@ -84,4 +84,5 @@ include 'config:config-common'
 findProject(':config:config-common')?.name = 'config-common'
 include 'order-settle'
 include 'order-log'
+include 'order-coin'
 

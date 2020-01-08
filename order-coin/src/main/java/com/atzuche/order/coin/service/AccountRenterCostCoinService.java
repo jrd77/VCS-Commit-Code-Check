@@ -1,7 +1,8 @@
-package com.atzuche.order.accountrenterrentcost.service.notservice;
+package com.atzuche.order.coin.service;
 
-import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostCoinEntity;
-import com.atzuche.order.accountrenterrentcost.mapper.AccountRenterCostCoinMapper;
+
+import com.atzuche.order.coin.entity.AccountRenterCostCoinEntity;
+import com.atzuche.order.coin.mapper.AccountRenterCostCoinMapper;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,7 +18,7 @@ import java.util.List;
  * @date 2020-01-07 20:23:33
  */
 @Service
-public class AccountRenterCostNoTCoinService{
+public class AccountRenterCostCoinService {
     @Autowired
     private AccountRenterCostCoinMapper accountRenterCostCoinMapper;
 

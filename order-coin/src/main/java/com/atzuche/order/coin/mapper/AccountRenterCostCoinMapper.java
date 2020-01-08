@@ -1,6 +1,6 @@
-package com.atzuche.order.accountrenterrentcost.mapper;
+package com.atzuche.order.coin.mapper;
 
-import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostCoinEntity;
+import com.atzuche.order.coin.entity.AccountRenterCostCoinEntity;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -25,5 +25,5 @@ public interface AccountRenterCostCoinMapper{
     
     int updateByPrimaryKeySelective(AccountRenterCostCoinEntity record);
 
-    List<AccountRenterCostCoinEntity> getAccountRenterCostCoins(@Param("orderNo") String orderNo, @Param("memNo")String memNo);
+    List<AccountRenterCostCoinEntity> getAccountRenterCostCoins(@Param("orderNo") String orderNo, @Param("memNo") String memNo);
 }
