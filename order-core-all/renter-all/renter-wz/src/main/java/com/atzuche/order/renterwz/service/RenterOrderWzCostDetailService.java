@@ -14,7 +14,7 @@ import java.util.Date;
  * @author shisong
  * @date 2019/12/31
  */
-@Service
+@Service("renterOrderWzCostDetailService")
 public class RenterOrderWzCostDetailService {
 
     @Resource
@@ -22,7 +22,6 @@ public class RenterOrderWzCostDetailService {
 
     private static final String SOURCE_TYPE_REN_YUN = "1";
     private static final String REN_YUN_NAME = "任云";
-    private static final String CONSOLE_NAME = "管理后台";
 
     private static final Integer LOSE_EFFECTIVENESS = 1;
 

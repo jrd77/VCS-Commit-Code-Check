@@ -16,6 +16,12 @@ public class RenterGoodsDetailDTO {
      * 还车日期
      */
     private LocalDateTime revertTime;
+
+    /**
+     * 老订单的起租日期
+     */
+    private LocalDateTime oldRentTime;
+
     /**
      * 主订单号
      */

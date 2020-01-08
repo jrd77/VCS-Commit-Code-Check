@@ -17,6 +17,10 @@ public class OwnerGoodsDetailDTO {
      */
     private LocalDateTime revertTime;
     /**
+     * 老订单的起租日期
+     */
+    private LocalDateTime oldRentTime;
+    /**
      * 主订单号
      */
     private String orderNo;
