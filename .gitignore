@@ -249,6 +249,7 @@ order-core-all/renter-all/renter-wz/build/
 order-core-api/build/
 order-openapi/build/
 admin-api/doc/
+order-core-api/doc/
 util-all/build/
 util-all/fee-calculator/build/
 util-all/order-commons/build/
