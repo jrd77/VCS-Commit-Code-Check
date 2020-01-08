@@ -141,4 +141,34 @@ public class RabbitConfiguration {
 		return new Queue("handover_car_queue", true);
 	}
 
+	@Bean
+	public Queue wzDeRunCitiesQueue() {
+		return new Queue(RabbitMqEnums.WZ_DE_RUN_CITIES.getQueueName(), true);
+	}
+
+	@Bean
+	public DirectExchange wzDeRunCitiesExchange() {
+		return new DirectExchange(RabbitMqEnums.WZ_DE_RUN_CITIES.getExchange());
+	}
+
+	@Bean
+	public Binding wzDeRunCitiesBind() {
+		return BindingBuilder.bind(wzDeRunCitiesQueue()).to(wzDeRunCitiesExchange()).with(RabbitMqEnums.WZ_DE_RUN_CITIES.getRoutingKey());
+	}
+
+	@Bean
+	public Queue wzCheLeHangInfoQueue() {
+		return new Queue(RabbitMqEnums.WZ_CHE_LE_HANG_INFO.getQueueName(), true);
+	}
+
+	@Bean
+	public DirectExchange wzCheLeHangInfoExchange() {
+		return new DirectExchange(RabbitMqEnums.WZ_CHE_LE_HANG_INFO.getExchange());
+	}
+
+	@Bean
+	public Binding wzCheLeHangInfoBind() {
+		return BindingBuilder.bind(wzCheLeHangInfoQueue()).to(wzCheLeHangInfoExchange()).with(RabbitMqEnums.WZ_CHE_LE_HANG_INFO.getRoutingKey());
+	}
+
 }

@@ -4,6 +4,7 @@ import com.atzuche.order.coreapi.entity.dto.RenYunToWzMqDTO;
 import com.autoyol.commons.utils.GsonUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import java.util.Map;
 
@@ -13,6 +14,7 @@ import java.util.Map;
  * @author shisong
  * @date 2019/12/28
  */
+@Component
 public class RenYunListener {
 
     private static final Logger logger = LoggerFactory.getLogger(RenYunListener.class);
