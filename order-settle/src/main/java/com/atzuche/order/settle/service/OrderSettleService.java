@@ -121,4 +121,14 @@ public class OrderSettleService {
         //16 更新订单状态 TODO
 
     }
+
+    /**
+     * 取消订单结算
+     * @param orderNo
+     * @return
+     */
+    @Transactional(rollbackFor=Exception.class)
+    public boolean settleOrderCancel(String orderNo) {
+        return true;
+    }
 }
