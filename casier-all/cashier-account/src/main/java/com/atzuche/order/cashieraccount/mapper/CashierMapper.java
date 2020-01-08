@@ -47,5 +47,5 @@ public interface CashierMapper{
      * @param payType
      * @return
      */
-    List<CashierEntity> getCashierRentCosts(@Param("orderNo")String orderNo, @Param("menNo")String menNo, @Param("payKind")String payKind, @Param("payType")String payType);
+    List<CashierEntity> getCashierRentCosts(@Param("orderNo")String orderNo, @Param("memNo")String menNo, @Param("payKind")String payKind, @Param("payType")String payType);
 }

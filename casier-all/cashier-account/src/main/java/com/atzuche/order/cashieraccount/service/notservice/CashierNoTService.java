@@ -16,6 +16,7 @@ import com.atzuche.order.accountrenterwzdepost.vo.req.CreateOrderRenterWZDeposit
 import com.atzuche.order.accountrenterwzdepost.vo.req.PayedOrderRenterDepositWZDetailReqVO;
 import com.atzuche.order.accountrenterwzdepost.vo.req.PayedOrderRenterWZDepositReqVO;
 
+import com.atzuche.order.cashieraccount.common.AESUtil;
 import com.atzuche.order.cashieraccount.common.FasterJsonUtil;
 import com.atzuche.order.cashieraccount.entity.CashierEntity;
 import com.atzuche.order.cashieraccount.entity.CashierRefundApplyEntity;
@@ -111,6 +112,16 @@ public class CashierNoTService {
      */
     public CashierEntity getCashierEntity(String orderNo,String memNo,String payKind){
         CashierEntity cashierEntity = cashierMapper.getPayDeposit(orderNo,memNo,payKind,DataPayTypeConstant.PAY_PUR);
+        if(Objects.isNull(cashierEntity)){
+            cashierEntity = new CashierEntity();
+            cashierEntity.setOrderNo(orderNo);
+            cashierEntity.setMemNo(memNo);
+            cashierEntity.setPayKind(payKind);
+            cashierEntity.setPayType(DataPayTypeConstant.PAY_PUR);
+            cashierEntity.setPaySn(NumberUtils.INTEGER_ONE);
+            cashierEntity.setPayTitle("待支付订单号：" + orderNo);
+            cashierMapper.insert(cashierEntity);
+        }
         return cashierEntity;
     }
 
@@ -326,10 +337,9 @@ public class CashierNoTService {
      * 构造参数 PayVo (押金、违章押金)
      * @param cashierEntity
      * @param orderPaySign
-     * @param payVO
      * @return
      */
-    public PayVo getPayVO(CashierEntity cashierEntity,OrderPaySignReqVO orderPaySign,OrderPayableAmountResVO payVO,String payKind) {
+    public PayVo getPayVO(CashierEntity cashierEntity,OrderPaySignReqVO orderPaySign,int amt ,String title,String payKind) {
         PayVo vo = new PayVo();
         vo.setInternalNo(String.valueOf(cashierEntity.getPaySn()));
         vo.setExtendParams(GsonUtils.toJson(cashierEntity));
@@ -338,13 +348,13 @@ public class CashierNoTService {
         vo.setOrderNo(orderPaySign.getOrderNo());
         vo.setOpenId(orderPaySign.getOpenId());
         vo.setReqOs(orderPaySign.getReqOs());
-        vo.setPayAmt(String.valueOf(Math.abs(payVO.getAmt())));
+        vo.setPayAmt(String.valueOf(Math.abs(amt)));
         vo.setPayEnv(getPayEnv());
         vo.setPayId(cashierEntity.getId().toString());
         vo.setPayKind(payKind);
         vo.setPaySn(String.valueOf(cashierEntity.getPaySn()+1));
         vo.setPaySource(orderPaySign.getPaySource());
-        vo.setPayTitle(payVO.getTitle());
+        vo.setPayTitle(title);
         vo.setPayType(orderPaySign.getPayType());
         vo.setReqIp(IpUtil.getLocalIp());
         vo.setAtpaySign(StringUtils.EMPTY);
@@ -424,16 +434,16 @@ public class CashierNoTService {
                 for(int i=0;i<payVos.size();i++){
                     PayVo payVo = payVos.get(i);
                     String reqContent = FasterJsonUtil.toJson(payVo);
-                    //公钥加密
-                    String sign = RSASecurityUtils.privateKeySignature(PublicKeySignConstants.AUTO_PAYSYS_PUBLIC_KEY,reqContent);
+                    //私钥加密
+                    String sign = RSASecurityUtils.privateKeySignature(AESUtil.keySign,reqContent);
                     payVo.setAtpaySign(sign);
                 }
             }
             BatchPayVo bpv = new BatchPayVo();
             bpv.setLstPayVo(payVos);
             String reqContents = FasterJsonUtil.toJson(bpv);
-            //公钥加密
-            signs = AESSecurityUtils.encrypt(PublicKeySignConstants.AUTO_PAYSYS_PUBLIC_KEY,reqContents);
+            //私钥加密
+            signs = AESSecurityUtils.encrypt(AESUtil.keyAec, reqContents);
         } catch (Exception e) {
             log.error("getPaySignByPayVos 支付验签数据失败 ，param ;[{}],e:[{}]",FasterJsonUtil.toJson(payVos),e);
             throw new OrderPaySignParamException();
