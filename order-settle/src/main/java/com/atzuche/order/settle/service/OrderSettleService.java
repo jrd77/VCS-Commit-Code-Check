@@ -47,6 +47,7 @@ public class OrderSettleService {
         if(Objects.isNull(renterOrder) || Objects.isNull(renterOrder.getRenterOrderNo())){
             return;
         }
+        //FIXME:可能一个主订单存在多个完结的租客子单和车主子单，第一个车主可能存在罚金
         OwnerOrderEntity ownerOrder = ownerOrderService.getOwnerOrderByOrderNoAndIsEffective(orderNo);
         if(Objects.isNull(ownerOrder) || Objects.isNull(ownerOrder.getOwnerOrderNo())){
             return;
