@@ -105,6 +105,8 @@ public class ModifyOrderService {
 	private DeliveryCarService deliveryCarService;
 	@Autowired
 	private CouponAndCoinHandleService couponAndCoinHandleService;
+	@Autowired
+    private CarRentalTimeApiService carRentalTimeApiService;
 
 	/**
 	 * 修改订单主逻辑
@@ -284,8 +286,7 @@ public class ModifyOrderService {
 		if (carRentTimeRangeReqVO == null) {
 			return null;
 		}
-		CarRentTimeRangeResVO carRentTimeRangeResVO = goodsService.getCarRentTimeRange(carRentTimeRangeReqVO);
-		return carRentTimeRangeResVO;
+		return carRentalTimeApiService.getCarRentTimeRange(carRentTimeRangeReqVO);
 	}
 	
 	/**
