@@ -1,5 +1,6 @@
 package com.atzuche.order.delivery.vo.delivery;
 
+import lombok.Builder;
 import lombok.Data;
 
 /**
@@ -7,6 +8,7 @@ import lombok.Data;
  * 更新信息
  */
 @Data
+@Builder
 public class UpdateOrderDeliveryVO {
 
     /**
