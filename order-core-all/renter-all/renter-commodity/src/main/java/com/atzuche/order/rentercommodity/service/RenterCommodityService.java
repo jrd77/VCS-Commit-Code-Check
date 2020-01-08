@@ -76,44 +76,75 @@ public class RenterCommodityService {
         if(dbGoodsPriceList == null || dbGoodsPriceList.size()<=0){
             return;
         }
-        Map<LocalDate, RenterGoodsPriceDetailEntity> mapPrice = dbGoodsPriceList
-                .stream()
-                .collect(Collectors.toMap(RenterGoodsPriceDetailEntity::getCarDay, x -> x));
-        RenterGoodsPriceDetailEntity dbPriceMaxCarDay = dbGoodsPriceList.get(dbGoodsPriceList.size() - 1);
-        LocalDateTime oldRevertTime = dbPriceMaxCarDay.getRevertTime();
-        List<RenterGoodsPriceDetailDTO> renterGoodsPriceDetailDTOList = renterGoodsDetailDTO.getRenterGoodsPriceDetailDTOList();
-        if(oldRevertTime.isBefore(revertTime)){//时间延后
-            RenterGoodsPriceDetailDTO middle = new RenterGoodsPriceDetailDTO();
-            renterGoodsPriceDetailDTOList.forEach(x->{
-                RenterGoodsPriceDetailEntity dbPrice = mapPrice.get(x.getCarDay());
-                if(dbPriceMaxCarDay.getCarDay().isEqual(x.getCarDay())){  //临界的地方需要拆分
-                    float HFirst = CommonUtils.getHolidayTopHours(dbPriceMaxCarDay.getRevertTime(), LocalDateTimeUtils.localdateToString(x.getCarDay()));
-                    middle.setRevertTime(revertTime);
-                    middle.setCarDay(dbPriceMaxCarDay.getCarDay());
-                    middle.setCarUnitPrice(x.getCarUnitPrice());
-                    middle.setCarHourCount(HFirst);
 
-                    x.setCarUnitPrice(dbPrice.getCarUnitPrice());
-                    x.setCarHourCount(dbPrice.getCarHourCount());
-                    x.setRevertTime(dbPrice.getRevertTime());
-                }else if(dbPrice != null){//临界之前的值使用数据库的  临界之后使用新生成的一天一价
-                  x.setCarUnitPrice(dbPrice.getCarUnitPrice());
-                  x.setCarHourCount(dbPrice.getCarHourCount());
-                  x.setRevertTime(dbPrice.getRevertTime());
+        //使用revert_time分组
+        Map<LocalDate, List<RenterGoodsPriceDetailEntity>> carDayGroupMap = dbGoodsPriceList
+                .stream()
+                .collect(Collectors.groupingBy(RenterGoodsPriceDetailEntity::getCarDay));
+
+        RenterGoodsPriceDetailEntity dbPriceMaxCarDay = dbGoodsPriceList.get(dbGoodsPriceList.size() - 1);//最后一条
+        List<RenterGoodsPriceDetailDTO> renterGoodsPriceDetailDTOList = renterGoodsDetailDTO.getRenterGoodsPriceDetailDTOList();
+
+        List<RenterGoodsPriceDetailDTO> newRenterGoodsPriceList = new ArrayList<>();
+        if(dbPriceMaxCarDay.getRevertTime().isBefore(revertTime)){//时间延后
+            //过滤出revert_time时间最大的一个分组，比数据库中revert_time大的数据用新的，比据库中revert_time小的数据用数据库的，库中的最后一条数据特殊处理
+            renterGoodsPriceDetailDTOList.forEach(x->{
+                LocalDate carDay = x.getCarDay();
+                List<RenterGoodsPriceDetailEntity> dbMapValue = carDayGroupMap.get(carDay);
+                if(carDay.isEqual(dbPriceMaxCarDay.getCarDay())){//重复的这一天，可能数据重复，需要特别处理
+                    dbMapValue.forEach(y->{
+                        RenterGoodsPriceDetailDTO renterGoods = new RenterGoodsPriceDetailDTO();
+                        renterGoods.setCarHourCount(y.getCarHourCount());
+                        renterGoods.setCarDay(y.getCarDay());
+                        renterGoods.setCarUnitPrice(y.getCarUnitPrice());
+                        renterGoods.setRevertTime(y.getRevertTime());
+                        newRenterGoodsPriceList.add(renterGoods);
+                    });
+
+                    float HFirst = CommonUtils.getHolidayTopHours(dbPriceMaxCarDay.getRevertTime(), LocalDateTimeUtils.localdateToString(carDay));
+                    RenterGoodsPriceDetailDTO renterGoods = new RenterGoodsPriceDetailDTO();
+                    renterGoods.setCarHourCount(HFirst);
+                    renterGoods.setCarDay(x.getCarDay());
+                    renterGoods.setCarUnitPrice(x.getCarUnitPrice());
+                    renterGoods.setRevertTime(x.getRevertTime());
+                    newRenterGoodsPriceList.add(renterGoods);
+                }else if(carDay.isBefore(dbPriceMaxCarDay.getCarDay())){//取数据库中的数据
+                    dbMapValue.forEach(y->{
+                        RenterGoodsPriceDetailDTO renterGoods = new RenterGoodsPriceDetailDTO();
+                        renterGoods.setCarHourCount(y.getCarHourCount());
+                        renterGoods.setCarDay(y.getCarDay());
+                        renterGoods.setCarUnitPrice(y.getCarUnitPrice());
+                        renterGoods.setRevertTime(y.getRevertTime());
+                        newRenterGoodsPriceList.add(renterGoods);
+                    });
+                }else{//取最新的数据
+                    RenterGoodsPriceDetailDTO renterGoods = new RenterGoodsPriceDetailDTO();
+                    renterGoods.setCarHourCount(x.getCarHourCount());
+                    renterGoods.setCarDay(x.getCarDay());
+                    renterGoods.setCarUnitPrice(x.getCarUnitPrice());
+                    renterGoods.setRevertTime(x.getRevertTime());
+                    newRenterGoodsPriceList.add(renterGoods);
+
+                    float HFirst = CommonUtils.getHolidayTopHours(dbPriceMaxCarDay.getRevertTime(), LocalDateTimeUtils.localdateToString(carDay));
                 }
             });
-            renterGoodsPriceDetailDTOList.add(middle);
 
-            //租期不重叠部分 中间部分init中已经处理
-            //租期不重叠部分 最后一天 init中已经处理
         }else{//时间提前
-            //替换金额即可，使用数据库中的一天一价
-            renterGoodsPriceDetailDTOList.forEach(x->{
-                RenterGoodsPriceDetailEntity dbPrice = mapPrice.get(x.getCarDay());
-                x.setCarUnitPrice(dbPrice.getCarUnitPrice());
-                x.setRevertTime(revertTime);
+            //判断数据库中每个分组的revert_time 找到比数据库中的revert_time相同的
+           renterGoodsPriceDetailDTOList.forEach(x->{
+               LocalDate carDay = x.getCarDay();
+               List<RenterGoodsPriceDetailEntity> dbMapValue = carDayGroupMap.get(carDay);
+               dbMapValue.forEach(y->{
+                   RenterGoodsPriceDetailDTO renterGoods = new RenterGoodsPriceDetailDTO();
+                   renterGoods.setCarUnitPrice(y.getCarUnitPrice());
+                   renterGoods.setRevertTime(revertTime);
+                   renterGoods.setCarDay(y.getCarDay());
+                   renterGoods.setCarHourCount(x.getCarHourCount());
+                   newRenterGoodsPriceList.add(renterGoods);
+               });
             });
         }
+        renterGoodsDetailDTO.setRenterGoodsPriceDetailDTOList(newRenterGoodsPriceList);
     }
 
     //初始化设置小时数和分组日期

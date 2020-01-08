@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -87,44 +88,73 @@ public class OwnerCommodityService {
         if(dbGoodsPriceList == null || dbGoodsPriceList.size()<=0){
             return;
         }
-        Map<LocalDate, OwnerGoodsPriceDetailEntity> mapPrice = dbGoodsPriceList
-                .stream()
-                .collect(Collectors.toMap(OwnerGoodsPriceDetailEntity::getCarDay, x -> x));
-        OwnerGoodsPriceDetailEntity dbPriceMaxCarDay = dbGoodsPriceList.get(dbGoodsPriceList.size() - 1);
-        LocalDateTime oldRevertTime = dbPriceMaxCarDay.getRevertTime();
-        List<OwnerGoodsPriceDetailDTO> ownerGoodsPriceDetailDTOList = ownerGoodsDetailDTO.getOwnerGoodsPriceDetailDTOList();
-        if(oldRevertTime.isBefore(revertTime)){//时间延后
-            OwnerGoodsPriceDetailDTO middle = new OwnerGoodsPriceDetailDTO();
-            ownerGoodsPriceDetailDTOList.forEach(x->{
-                OwnerGoodsPriceDetailEntity dbPrice = mapPrice.get(x.getCarDay());
-                if(dbPriceMaxCarDay.getCarDay().isEqual(x.getCarDay())){  //临界的地方需要拆分
-                    float HFirst = CommonUtils.getHolidayTopHours(dbPriceMaxCarDay.getRevertTime(), LocalDateTimeUtils.localdateToString(x.getCarDay()));
-                    middle.setRevertTime(revertTime);
-                    middle.setCarDay(dbPriceMaxCarDay.getCarDay());
-                    middle.setCarUnitPrice(x.getCarUnitPrice());
-                    middle.setCarHourCount(HFirst);
 
-                    x.setCarUnitPrice(dbPrice.getCarUnitPrice());
-                    x.setCarHourCount(dbPrice.getCarHourCount());
-                    x.setRevertTime(dbPrice.getRevertTime());
-                }else if(dbPrice != null){//临界之前的值使用数据库的  临界之后使用新生成的一天一价
-                    x.setCarUnitPrice(dbPrice.getCarUnitPrice());
-                    x.setCarHourCount(dbPrice.getCarHourCount());
-                    x.setRevertTime(dbPrice.getRevertTime());
+        //使用revert_time分组
+        Map<LocalDate, List<OwnerGoodsPriceDetailEntity>> carDayGroupMap = dbGoodsPriceList
+                .stream()
+                .collect(Collectors.groupingBy(OwnerGoodsPriceDetailEntity::getCarDay));
+
+        OwnerGoodsPriceDetailEntity dbPriceMaxCarDay = dbGoodsPriceList.get(dbGoodsPriceList.size() - 1);//最后一条
+        List<OwnerGoodsPriceDetailDTO> ownerGoodsPriceDetailDTOList = ownerGoodsDetailDTO.getOwnerGoodsPriceDetailDTOList();
+
+        List<OwnerGoodsPriceDetailDTO> newOwnerGoodsPriceList = new ArrayList<>();
+        if(dbPriceMaxCarDay.getRevertTime().isBefore(revertTime)){//时间延后
+            //过滤出revert_time时间最大的一个分组，比数据库中revert_time大的数据用新的，比据库中revert_time小的数据用数据库的，库中的最后一条数据特殊处理
+            ownerGoodsPriceDetailDTOList.forEach(x->{
+                LocalDate carDay = x.getCarDay();
+                List<OwnerGoodsPriceDetailEntity> dbMapValue = carDayGroupMap.get(carDay);
+                if(carDay.isEqual(dbPriceMaxCarDay.getCarDay())){//重复的这一天，可能数据重复，需要特别处理
+                    dbMapValue.forEach(y->{
+                        OwnerGoodsPriceDetailDTO ownerGoods = new OwnerGoodsPriceDetailDTO();
+                        ownerGoods.setCarHourCount(y.getCarHourCount());
+                        ownerGoods.setCarDay(y.getCarDay());
+                        ownerGoods.setCarUnitPrice(y.getCarUnitPrice());
+                        ownerGoods.setRevertTime(y.getRevertTime());
+                        newOwnerGoodsPriceList.add(ownerGoods);
+                    });
+
+                    float HFirst = CommonUtils.getHolidayTopHours(dbPriceMaxCarDay.getRevertTime(), LocalDateTimeUtils.localdateToString(carDay));
+                    OwnerGoodsPriceDetailDTO ownerGoods = new OwnerGoodsPriceDetailDTO();
+                    ownerGoods.setCarHourCount(HFirst);
+                    ownerGoods.setCarDay(x.getCarDay());
+                    ownerGoods.setCarUnitPrice(x.getCarUnitPrice());
+                    ownerGoods.setRevertTime(x.getRevertTime());
+                    newOwnerGoodsPriceList.add(ownerGoods);
+                }else if(carDay.isBefore(dbPriceMaxCarDay.getCarDay())){//取数据库中的数据
+                    dbMapValue.forEach(y->{
+                        OwnerGoodsPriceDetailDTO ownerGoods = new OwnerGoodsPriceDetailDTO();
+                        ownerGoods.setCarHourCount(y.getCarHourCount());
+                        ownerGoods.setCarDay(y.getCarDay());
+                        ownerGoods.setCarUnitPrice(y.getCarUnitPrice());
+                        ownerGoods.setRevertTime(y.getRevertTime());
+                        newOwnerGoodsPriceList.add(ownerGoods);
+                    });
+                }else{//取最新的数据
+                    OwnerGoodsPriceDetailDTO ownerGoods = new OwnerGoodsPriceDetailDTO();
+                    ownerGoods.setCarHourCount(x.getCarHourCount());
+                    ownerGoods.setCarDay(x.getCarDay());
+                    ownerGoods.setCarUnitPrice(x.getCarUnitPrice());
+                    ownerGoods.setRevertTime(x.getRevertTime());
+                    newOwnerGoodsPriceList.add(ownerGoods);
                 }
             });
-            ownerGoodsPriceDetailDTOList.add(middle);
 
-            //租期不重叠部分 中间部分init中已经处理
-            //租期不重叠部分 最后一天 init中已经处理
         }else{//时间提前
-            //替换金额即可，使用数据库中的一天一价
+            //判断数据库中每个分组的revert_time 找到比数据库中的revert_time相同的
             ownerGoodsPriceDetailDTOList.forEach(x->{
-                OwnerGoodsPriceDetailEntity dbPrice = mapPrice.get(x.getCarDay());
-                x.setCarUnitPrice(dbPrice.getCarUnitPrice());
-                x.setRevertTime(revertTime);
+                LocalDate carDay = x.getCarDay();
+                List<OwnerGoodsPriceDetailEntity> dbMapValue = carDayGroupMap.get(carDay);
+                dbMapValue.forEach(y->{
+                    OwnerGoodsPriceDetailDTO ownerGoods = new OwnerGoodsPriceDetailDTO();
+                    ownerGoods.setCarUnitPrice(y.getCarUnitPrice());
+                    ownerGoods.setRevertTime(revertTime);
+                    ownerGoods.setCarDay(y.getCarDay());
+                    ownerGoods.setCarHourCount(x.getCarHourCount());
+                    newOwnerGoodsPriceList.add(ownerGoods);
+                });
             });
         }
+        ownerGoodsDetailDTO.setOwnerGoodsPriceDetailDTOList(newOwnerGoodsPriceList);
     }
 
     //初始化设置小时数和分组日期
