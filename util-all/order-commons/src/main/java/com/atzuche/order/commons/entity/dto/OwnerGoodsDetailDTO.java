@@ -226,4 +226,12 @@ public class OwnerGoodsDetailDTO {
      * 年份
      */
     private String year;
+    /**
+     * 是否超证:0否 1是 (车主端用)
+     */
+    private Integer moreLicenseFlag;
+    /**
+     * 行驶证到期日期(车主端用)
+     */
+    private LocalDateTime licenseExpire;
 }
