@@ -1189,7 +1189,9 @@ public class ModifyOrderService {
 						changeCodeList.contains(OrderChangeItemEnum.MODIFY_SRVRETURNFLAG.getCode()))) {
 			return;
 		}
-		UpdateOrderDeliveryVO updateFlowOrderVO = new UpdateOrderDeliveryVO();
+		UpdateOrderDeliveryVO updateFlowOrderVO = null;
+		//FIXME:
+				//new UpdateOrderDeliveryVO();
 		// 配送地址
 		RenterDeliveryAddrDTO deliveryAddr = getRenterDeliveryAddrDTO(modifyOrderDTO);
 		updateFlowOrderVO.setRenterDeliveryAddrDTO(deliveryAddr);
