@@ -26,7 +26,7 @@ public class OrderRemarkController {
 
 	@AutoDocMethod(description = "备注总览", value = "备注总览", response = OrderRemarkOverviewListResponseVO.class)
 	@GetMapping("/overview")
-	public ResponseData<OrderRemarkOverviewListResponseVO> getOverview(@RequestBody OrderRemarkRequestVO orderRemarkRequestVO, BindingResult bindingResult) {
+	public ResponseData<OrderRemarkOverviewListResponseVO> getOverview(OrderRemarkRequestVO orderRemarkRequestVO, BindingResult bindingResult) {
 	    try{
             logger.info("获取备注总览");
             return ResponseData.success(orderRemarkService.getOrderRemarkOverview(orderRemarkRequestVO));
@@ -38,13 +38,13 @@ public class OrderRemarkController {
 
     @AutoDocMethod(description = "备注查询列表", value = "备注查询列表", response = OrderRemarkPageListResponseVO.class)
     @GetMapping("/list")
-    public ResponseData<OrderRemarkPageListResponseVO> list(@RequestBody OrderRemarkListRequestVO orderRemarkListRequestVO, BindingResult bindingResult) {
+    public ResponseData<OrderRemarkPageListResponseVO> list(OrderRemarkListRequestVO orderRemarkListRequestVO, BindingResult bindingResult) {
         return ResponseData.success(null);
     }
 
     @AutoDocMethod(description = "备注日志查询列表", value = "备注日志查询列表", response = OrderRemarkLogPageListResponseVO.class)
     @GetMapping("/log/list")
-    public ResponseData<OrderRemarkLogPageListResponseVO> logList(@RequestBody OrderRemarkLogListRequestVO orderRemarkLogListRequestVO, BindingResult bindingResult) {
+    public ResponseData<OrderRemarkLogPageListResponseVO> logList(OrderRemarkLogListRequestVO orderRemarkLogListRequestVO, BindingResult bindingResult) {
         return ResponseData.success(null);
     }
 
@@ -72,7 +72,7 @@ public class OrderRemarkController {
 
     @AutoDocMethod(description = "获取备注信息", value = "获取备注信息", response = OrderRemarkResponseVO.class)
     @GetMapping("/information")
-    public ResponseData<OrderRemarkResponseVO> getRemarkInformation(@RequestBody OrderRemarkInformationRequestVO orderRemarkInformationRequestVO, BindingResult bindingResult) {
+    public ResponseData<OrderRemarkResponseVO> getRemarkInformation(OrderRemarkInformationRequestVO orderRemarkInformationRequestVO, BindingResult bindingResult) {
 	    return ResponseData.success(orderRemarkService.getOrderRemarkInformation(orderRemarkInformationRequestVO));
     }
 
