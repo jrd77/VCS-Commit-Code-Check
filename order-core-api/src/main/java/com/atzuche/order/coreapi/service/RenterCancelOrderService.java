@@ -54,6 +54,8 @@ public class RenterCancelOrderService {
     private OrderFlowService orderFlowService;
     @Autowired
     private OrderCancelReasonService orderCancelReasonService;
+    @Autowired
+    private OrderStatusService orderStatusService;
 
     /**
      * 取消处理
@@ -75,6 +77,9 @@ public class RenterCancelOrderService {
                 renterOrderEntity.getRenterOrderNo());
         //获取车主订单信息
         OwnerOrderEntity ownerOrderEntity = ownerOrderService.getOwnerOrderByOrderNoAndIsEffective(orderNo);
+        //获取订单状态信息
+        OrderStatusEntity orderStatusEntity = orderStatusService.getByOrderNo(orderNo);
+
         //罚金计算(罚金和收益)
         //租客罚金处理
         CancelFineAmtDTO cancelFineAmt = buildCancelFineAmtDTO(renterOrderEntity,
