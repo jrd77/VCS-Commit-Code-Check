@@ -95,8 +95,8 @@ public class DeliveryCarTask {
     @Transactional(rollbackFor = Exception.class)
     public void insertDeliveryAddress(Integer getMinutes, Integer returnMinutes, OrderDeliveryVO orderDeliveryVO, Integer type) {
 
-        insertHandoverAddInfo(orderDeliveryVO);
-        if (orderDeliveryVO.getOrderDeliveryDTO() != null) {
+        insertOrUpdateRenterDeliveryAddressInfo(orderDeliveryVO);
+        if (Objects.nonNull(orderDeliveryVO.getOrderDeliveryDTO())) {
             RenterOrderDeliveryEntity orderDeliveryEntity = new RenterOrderDeliveryEntity();
             BeanUtils.copyProperties(orderDeliveryVO.getOrderDeliveryDTO(), orderDeliveryEntity);
             if (type == DeliveryTypeEnum.ADD_TYPE.getValue().intValue()) {
@@ -195,7 +195,7 @@ public class DeliveryCarTask {
      * @param orderDeliveryVO
      */
     @Transactional(rollbackFor = Exception.class)
-    public void insertHandoverAddInfo(OrderDeliveryVO orderDeliveryVO) {
+    public void insertOrUpdateRenterDeliveryAddressInfo(OrderDeliveryVO orderDeliveryVO) {
 
         if (orderDeliveryVO.getRenterDeliveryAddrDTO() != null) {
             RenterDeliveryAddrEntity deliveryAddrEntity = new RenterDeliveryAddrEntity();
@@ -209,6 +209,5 @@ public class DeliveryCarTask {
             }
         }
     }
-
 
 }
