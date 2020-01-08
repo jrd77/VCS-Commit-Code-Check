@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 
@@ -19,6 +20,7 @@ import javax.annotation.Resource;
  * @author shisong
  * @date 2020/1/2
  */
+@Component
 public class WzCheLeHangInfoListener {
 
     private static final Logger logger = LoggerFactory.getLogger(WzFeedbackIllegalListener.class);

@@ -31,7 +31,6 @@ public class CityConfigSDK {
 
     public List<CityEntity> getConfig(ConfigContext configContext){
         ConfigItemDTO itemDTO = sdkFactory.getConfig(configContext,CONFIG_NAME);
-        List<SysConfigEntity> sysConfigEntities = new ArrayList<>();
 
         return JSON.parseObject(itemDTO.getConfigValue(),new TypeReference<List<CityEntity>>(){});
     }
