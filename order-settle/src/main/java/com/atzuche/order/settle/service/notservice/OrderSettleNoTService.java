@@ -6,7 +6,6 @@ import com.atzuche.order.accountplatorm.entity.AccountPlatformProfitDetailEntity
 import com.atzuche.order.accountplatorm.entity.AccountPlatformSubsidyDetailEntity;
 import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostDetailEntity;
 import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostSettleDetailEntity;
-import com.atzuche.order.accountrenterrentcost.service.notservice.AccountRenterCostNoTCoinService;
 import com.atzuche.order.cashieraccount.service.CashierService;
 import com.atzuche.order.cashieraccount.service.CashierSettleService;
 import com.atzuche.order.cashieraccount.service.remote.WalletRemoteService;
@@ -14,6 +13,7 @@ import com.atzuche.order.cashieraccount.vo.req.CashierDeductDebtReqVO;
 import com.atzuche.order.cashieraccount.vo.req.CashierRefundApplyReqVO;
 import com.atzuche.order.cashieraccount.vo.req.DeductDepositToRentCostReqVO;
 import com.atzuche.order.cashieraccount.vo.res.CashierDeductDebtResVO;
+import com.atzuche.order.coin.service.AccountRenterCostCoinService;
 import com.atzuche.order.commons.IpUtil;
 import com.atzuche.order.commons.entity.dto.CostBaseDTO;
 import com.atzuche.order.commons.entity.dto.MileageAmtDTO;
@@ -73,7 +73,7 @@ public class OrderSettleNoTService {
     @Autowired private OwnerGoodsService ownerGoodsService;
     @Autowired private AutoCoinService autoCoinService;
     @Autowired private WalletRemoteService walletRemoteService;
-    @Autowired private AccountRenterCostNoTCoinService accountRenterCostNoTCoinService;
+    @Autowired private AccountRenterCostCoinService accountRenterCostCoinService;
 
     /**
      * 车辆结算
@@ -872,7 +872,7 @@ public class OrderSettleNoTService {
                 return RenterCashCodeEnum.AUTO_COIN_DEDUCT.getCashNo().equals(obj.getCostCode());
             }).mapToInt(AccountRenterCostSettleDetailEntity::getAmt).sum();
             if(coinAmt>0){
-                int userCoinAmt = accountRenterCostNoTCoinService.getUserCoinAmtByOrder(settleOrdersAccount.getOrderNo(),settleOrdersAccount.getRenterMemNo());
+                int userCoinAmt = accountRenterCostCoinService.getUserCoinAmtByOrder(settleOrdersAccount.getOrderNo(),settleOrdersAccount.getRenterMemNo());
                 //计算应退凹凸币金额
                 int returnCoinAmt = userCoinAmt - coinAmt;
                 if(returnCoinAmt>0){
