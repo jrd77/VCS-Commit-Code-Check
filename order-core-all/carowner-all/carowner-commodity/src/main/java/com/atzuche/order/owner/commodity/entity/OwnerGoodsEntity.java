@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
  * 车主端商品概览表
  * 
  * @author ZhangBin
- * @date 2020-01-04 14:44:30
+ * @date 2020-01-08 16:25:38
  * @Description:
  */
 @Data
@@ -194,6 +194,14 @@ public class OwnerGoodsEntity implements Serializable {
 	 */
 	private Double serviceRate;
 	/**
+	 * 是否超证:0否 1是
+	 */
+	private Integer moreLicenseFlag;
+	/**
+	 * 行驶证到期日期
+	 */
+	private LocalDateTime licenseExpire;
+	/**
 	 * 创建时间
 	 */
 	private LocalDateTime createTime;
@@ -213,5 +221,9 @@ public class OwnerGoodsEntity implements Serializable {
 	 * 0-正常，1-已逻辑删除
 	 */
 	private Integer isDelete;
+	/**
+	 * 年份
+	 */
+	private String year;
 
 }
