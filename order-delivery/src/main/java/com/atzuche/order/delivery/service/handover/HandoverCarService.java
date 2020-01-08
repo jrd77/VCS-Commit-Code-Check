@@ -53,7 +53,7 @@ public class HandoverCarService {
         if (userType == UserTypeEnum.RENTER_TYPE.getValue().intValue()) {
             RenterHandoverCarInfoEntity renterHandoverCarInfoEntity = new RenterHandoverCarInfoEntity();
             BeanUtils.copyProperties(handoverCarVO.getHandoverCarInfoDTO(), renterHandoverCarInfoEntity);
-            RenterHandoverCarInfoEntity handoverCarInfoEntity = renterHandoverCarInfoMapper.selectObjectByRenterOrderNo(handoverCarVO.getHandoverCarInfoDTO().getRenterOrderNo(), handoverCarVO.getHandoverCarInfoDTO().getType());
+            RenterHandoverCarInfoEntity handoverCarInfoEntity = renterHandoverCarInfoMapper.selectObjectByOrderNo(handoverCarVO.getHandoverCarInfoDTO().getOrderNo(), handoverCarVO.getHandoverCarInfoDTO().getType());
             if (handoverCarInfoEntity != null) {
                 CommonUtil.copyPropertiesIgnoreNull(renterHandoverCarInfoEntity, handoverCarInfoEntity);
                 renterHandoverCarInfoMapper.updateByPrimaryKey(handoverCarInfoEntity);
@@ -68,7 +68,7 @@ public class HandoverCarService {
         } else if (userType == UserTypeEnum.OWNER_TYPE.getValue().intValue()) {
             OwnerHandoverCarInfoEntity ownerHandoverCarInfoEntity = new OwnerHandoverCarInfoEntity();
             BeanUtils.copyProperties(handoverCarVO.getHandoverCarInfoDTO(), ownerHandoverCarInfoEntity);
-            OwnerHandoverCarInfoEntity handoverCarInfoEntity = ownerHandoverCarInfoMapper.selectByOwnerOrderNo(handoverCarVO.getHandoverCarInfoDTO().getRenterOrderNo(), handoverCarVO.getHandoverCarInfoDTO().getType());
+            OwnerHandoverCarInfoEntity handoverCarInfoEntity = ownerHandoverCarInfoMapper.selectObjectByOrderNo(handoverCarVO.getHandoverCarInfoDTO().getOrderNo(), handoverCarVO.getHandoverCarInfoDTO().getType());
             if (handoverCarInfoEntity != null) {
                 CommonUtil.copyPropertiesIgnoreNull(ownerHandoverCarInfoEntity, handoverCarInfoEntity);
                 ownerHandoverCarInfoMapper.updateByPrimaryKey(handoverCarInfoEntity);
