@@ -34,15 +34,14 @@ public class AdminUserFilter implements Filter {
             String authName = req.getHeader("Console-AUTH-Name");
             String authId = req.getHeader("Console-AUTH-ID");
 
-            if(StringUtils.trimToNull(authId)==null){
-                logger.info("cannot not detect user header");
+            if(StringUtils.trimToNull(authId)!=null) {
+
+                authName = URLDecoder.decode(authName, "utf-8");
+
+                AdminUser adminUser = new AdminUser(authId, authName);
+
+                AdminUserUtil.put(adminUser);
             }
-
-            authName = URLDecoder.decode(authName,"utf-8");
-
-            AdminUser adminUser = new AdminUser(authId,authName);
-
-            AdminUserUtil.put(adminUser);
 
             chain.doFilter(request,response);
         }
