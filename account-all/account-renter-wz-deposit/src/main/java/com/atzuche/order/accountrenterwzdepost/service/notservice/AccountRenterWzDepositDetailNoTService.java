@@ -26,7 +26,7 @@ public class AccountRenterWzDepositDetailNoTService {
      * 新增违章押金 流水记录
      * @param payedOrderRenterWZDepositDetailReqVO
      */
-    public void insertRenterWZDepositDetail(PayedOrderRenterDepositWZDetailReqVO payedOrderRenterWZDepositDetailReqVO) {
+    public int insertRenterWZDepositDetail(PayedOrderRenterDepositWZDetailReqVO payedOrderRenterWZDepositDetailReqVO) {
         AccountRenterWzDepositDetailEntity accountRenterDepositDetailEntity = new AccountRenterWzDepositDetailEntity();
         BeanUtils.copyProperties(payedOrderRenterWZDepositDetailReqVO,accountRenterDepositDetailEntity);
         accountRenterDepositDetailEntity.setCostCode(payedOrderRenterWZDepositDetailReqVO.getRenterCashCodeEnum().getCashNo());
@@ -37,6 +37,7 @@ public class AccountRenterWzDepositDetailNoTService {
         if(result==0){
             throw new PayOrderRenterWZDepositException();
         }
+        return accountRenterDepositDetailEntity.getId();
     }
 
 

@@ -2,6 +2,7 @@ package com.atzuche.order.cashieraccount.service.remote;
 
 import com.atzuche.order.cashieraccount.exception.DeductWalletRemoteException;
 import com.atzuche.order.cashieraccount.exception.GetWalletRemoteException;
+import com.atzuche.order.cashieraccount.exception.SettleReturnWalletRemoteException;
 import com.atzuche.order.cashieraccount.vo.req.pay.OrderPaySignReqVO;
 import com.atzuche.order.cashieraccount.vo.res.OrderPayableAmountResVO;
 import com.atzuche.order.commons.CatConstants;
@@ -10,6 +11,7 @@ import com.autoyol.commons.utils.GsonUtils;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.vo.req.WalletDeductionReqVO;
+import com.autoyol.vo.req.WalletReturnReqVO;
 import com.autoyol.vo.res.WalletChangeResVO;
 import com.autoyol.vo.res.WalletResVO;
 import com.dianping.cat.Cat;
@@ -80,8 +82,8 @@ public class WalletRemoteService {
         log.info("WalletRemoteService  updateWalletByDeduct start 开始扣减会员钱包信息,walletDeduction：[{}]",GsonUtils.toJson(walletDeduction));
         Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "钱包扣减服务");
         try{
-            Cat.logEvent(CatConstants.FEIGN_METHOD,"WalletRemoteService.getWalletByMemNo");
-            String parameter = "memNo="+GsonUtils.toJson(walletDeduction);
+            Cat.logEvent(CatConstants.FEIGN_METHOD,"WalletRemoteService.updateWalletByDeduct");
+            String parameter = "param="+GsonUtils.toJson(walletDeduction);
             Cat.logEvent(CatConstants.FEIGN_PARAM,parameter);
             ResponseData<WalletChangeResVO> responseData =  walletFeignService.updateWalletByDeduct(walletDeduction);
             log.info("WalletRemoteService  updateWalletByDeduct end 扣减会员钱包信息结束,responseData：[{}]", GsonUtils.toJson(responseData));
@@ -108,5 +110,37 @@ public class WalletRemoteService {
         }
     }
 
+    /**
+     * 结算退还钱包金额
+     * @param walletReturnReqVO
+     */
+    public int returnWalletBySettle(WalletReturnReqVO walletReturnReqVO) {
+        log.info("WalletRemoteService  returnWalletBySettle start 结算退还钱包金额,walletDeduction：[{}]",GsonUtils.toJson(walletReturnReqVO));
+        Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "钱包结算退还服务");
+        try{
+            Cat.logEvent(CatConstants.FEIGN_METHOD,"WalletRemoteService.returnWalletBySettle");
+            String parameter = "param="+GsonUtils.toJson(walletReturnReqVO);
+            Cat.logEvent(CatConstants.FEIGN_PARAM,parameter);
+            ResponseData<WalletChangeResVO> responseData =  walletFeignService.updateWalletByReturn(walletReturnReqVO);
+            log.info("WalletRemoteService  returnWalletBySettle end 扣减会员钱包信息结束,responseData：[{}]", GsonUtils.toJson(responseData));
+            Cat.logEvent(CatConstants.FEIGN_RESULT, GsonUtils.toJson(responseData));
+            if(responseData == null || !ErrorCode.SUCCESS.getCode().equals(responseData.getResCode())){
+                throw new SettleReturnWalletRemoteException();
+            }
+            WalletChangeResVO vo = responseData.getData();
+            if(Objects.isNull(vo) || Objects.isNull(vo.getWalletLogId())){
+                throw new SettleReturnWalletRemoteException();
+            }
+            t.setStatus(Transaction.SUCCESS);
+            return vo.getWalletLogId();
+        }catch (Exception e){
+            t.setStatus(e);
+            Cat.logError("Feign 扣减租客钱包余额信息失败,e：[{}]",e);
+            log.error("Feign 扣减租客钱包余额,returnWalletBySettle：[{}],e：[{}]",GsonUtils.toJson(walletReturnReqVO),e);
+            throw new SettleReturnWalletRemoteException();
+        }finally {
+            t.complete();
+        }
+    }
 
 }
