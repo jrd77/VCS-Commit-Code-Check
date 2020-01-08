@@ -1,18 +1,24 @@
 package com.atzuche.order.delivery.service.handover;
 
 import com.atzuche.order.commons.CommonUtils;
+import com.atzuche.order.delivery.common.DeliveryCarTask;
 import com.atzuche.order.delivery.common.DeliveryErrorCode;
 import com.atzuche.order.delivery.entity.OwnerHandoverCarInfoEntity;
 import com.atzuche.order.delivery.entity.RenterHandoverCarInfoEntity;
 import com.atzuche.order.delivery.entity.RenterHandoverCarRemarkEntity;
 import com.atzuche.order.delivery.entity.RenterOrderDeliveryEntity;
+import com.atzuche.order.delivery.enums.DeliveryTypeEnum;
 import com.atzuche.order.delivery.enums.HandoverCarTypeEnum;
+import com.atzuche.order.delivery.enums.ServiceTypeEnum;
+import com.atzuche.order.delivery.enums.UsedDeliveryTypeEnum;
 import com.atzuche.order.delivery.exception.DeliveryOrderException;
 import com.atzuche.order.delivery.exception.HandoverCarOrderException;
 import com.atzuche.order.delivery.mapper.RenterHandoverCarRemarkMapper;
 import com.atzuche.order.delivery.mapper.RenterOrderDeliveryMapper;
 import com.atzuche.order.delivery.service.delivery.DeliveryCarService;
+import com.atzuche.order.delivery.service.delivery.RenYunDeliveryCarService;
 import com.atzuche.order.delivery.utils.OSSUtils;
+import com.atzuche.order.delivery.vo.delivery.*;
 import com.atzuche.order.delivery.vo.delivery.req.CarConditionPhotoUploadVO;
 import com.atzuche.order.delivery.vo.delivery.req.DeliveryReqDTO;
 import com.atzuche.order.delivery.vo.delivery.req.DeliveryReqVO;
@@ -48,6 +54,9 @@ public class HandoverCarInfoService {
     RenterOrderDeliveryMapper renterOrderDeliveryMapper;
     @Resource
     RenterHandoverCarRemarkMapper renterHandoverCarRemarkMapper;
+    @Autowired
+    DeliveryCarTask deliveryCarTask;
+
 
     /**
      * 上传交接车
@@ -125,64 +134,64 @@ public class HandoverCarInfoService {
             throw new DeliveryOrderException(DeliveryErrorCode.DELIVERY_PARAMS_ERROR.getValue(), "参数错误");
         }
         DeliveryReqDTO deliveryReqDTO;
-        //是否使用取车服务
-        if(deliveryReqVO.getGetDeliveryReqDTO() != null){
+        if (deliveryReqVO.getGetDeliveryReqDTO() != null) {
             deliveryReqDTO = deliveryReqVO.getGetDeliveryReqDTO();
-            RenterOrderDeliveryEntity renterOrderDeliveryEntity = renterOrderDeliveryMapper.findRenterOrderByrOrderNo(deliveryReqDTO.getOrderNo(),1);
-            //取换车(租客向平台交车，车主)
-            RenterHandoverCarRemarkEntity renterHandoverCarRemarkEntity =renterHandoverCarRemarkMapper.findRemarkObjectByRenterOrderNo(renterOrderDeliveryEntity.getRenterOrderNo(),4);
-            //不使用取车服务
-            if(deliveryReqDTO.getIsUsedGetAndReturnCar().equals("0"))
-            {
-                //配送订单不是取消或初始状态
-                if(renterOrderDeliveryEntity.getStatus().intValue() != 3 && renterOrderDeliveryEntity.getStatus().intValue() != 0)
-                {
-                    //1.更新配送訂單表
-                    //2.根据原先的状态发送仁云取消事件
-                    renterOrderDeliveryEntity.setStatus(3);
-                    //发送取消事件
-                }
-            }
-            else if(deliveryReqDTO.getIsUsedGetAndReturnCar().equals("1"))
-            {
-                //1.更新配送订单表
-                renterOrderDeliveryEntity.setStatus(2);
-                //发送更新事件
-                renterOrderDeliveryEntity.setOwnerGetReturnAddr(deliveryReqDTO.getOwnRealReturnAddr());
-                renterOrderDeliveryEntity.setRenterGetReturnAddr(deliveryReqDTO.getRenterRealGetAddr());
-                renterHandoverCarRemarkEntity.setRemark(deliveryReqDTO.getRenterRealGetAddrReamrk());
-                //更新交接车备注数据
-
-            }else {
-                throw new DeliveryOrderException(DeliveryErrorCode.DELIVERY_PARAMS_ERROR.getValue(),"没有合适的参数");
-            }
-
+            updateDeliveryCarInfoByUsed(deliveryReqDTO, 1);
         }
-        //是否使用还车服务
-        if(deliveryReqVO.getRenterDeliveryReqDTO() != null){
+        if (deliveryReqVO.getRenterDeliveryReqDTO() != null) {
             deliveryReqDTO = deliveryReqVO.getRenterDeliveryReqDTO();
-            //不使用取车服务
-            if(deliveryReqDTO.getIsUsedGetAndReturnCar().equals("0"))
-            {
-                //1.更新配送訂單表
-                //2.根据原先的状态发送仁云取消事件
-            }
-
+            updateDeliveryCarInfoByUsed(deliveryReqDTO, 2);
         }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     }
+
+    /**
+     * 更新配送订单相关信息
+     * @param deliveryReqDTO
+     */
+    public void updateDeliveryCarInfoByUsed(DeliveryReqDTO deliveryReqDTO, Integer type) {
+        RenterOrderDeliveryEntity renterOrderDeliveryEntity = renterOrderDeliveryMapper.findRenterOrderByrOrderNo(deliveryReqDTO.getOrderNo(), type);
+        if (renterOrderDeliveryEntity != null && String.valueOf(UsedDeliveryTypeEnum.NO_USED.getValue()).equals(deliveryReqDTO.getIsUsedGetAndReturnCar())) {
+            if (renterOrderDeliveryEntity.getStatus().intValue() != 3 && renterOrderDeliveryEntity.getStatus().intValue() != 0) {
+                deliveryCarInfoService.cancelRenYunFlowOrderInfo(new CancelOrderDeliveryVO().setCancelFlowOrderDTO(new CancelFlowOrderDTO().setServicetype(type == 1 ? "take" : "back").setOrdernumber(renterOrderDeliveryEntity.getOrderNo())).setRenterOrderNo(renterOrderDeliveryEntity.getRenterOrderNo()));
+            }
+        } else if (renterOrderDeliveryEntity != null && String.valueOf(UsedDeliveryTypeEnum.USED.getValue()).equals(deliveryReqDTO.getIsUsedGetAndReturnCar())) {
+            UpdateOrderDeliveryVO updateOrderDeliveryVO = createDeliveryCarInfoParams(deliveryReqDTO, type);
+            deliveryCarInfoService.updateFlowOrderInfo(updateOrderDeliveryVO);
+        } else {
+            throw new DeliveryOrderException(DeliveryErrorCode.DELIVERY_PARAMS_ERROR.getValue(), "没有合适的参数");
+        }
+    }
+
+    /**
+     * 构造更新参数
+     * @return
+     */
+    public UpdateOrderDeliveryVO createDeliveryCarInfoParams(DeliveryReqDTO deliveryReqDTO,Integer type)
+    {
+        OrderDeliveryDTO orderDeliveryDTO = new OrderDeliveryDTO();
+        UpdateFlowOrderDTO updateFlowOrderDTO = new UpdateFlowOrderDTO();
+        RenterDeliveryAddrDTO renterDeliveryAddrDTO = new RenterDeliveryAddrDTO();
+        orderDeliveryDTO.setType(type);
+        orderDeliveryDTO.setRenterGetReturnAddr(deliveryReqDTO.getRenterRealGetAddr());
+        orderDeliveryDTO.setOwnerGetReturnAddr(deliveryReqDTO.getOwnRealReturnAddr());
+        renterDeliveryAddrDTO.setExpGetCarAddr(deliveryReqDTO.getRenterRealGetAddr());
+        renterDeliveryAddrDTO.setExpReturnCarAddr(deliveryReqDTO.getOwnRealReturnAddr());
+        renterDeliveryAddrDTO.setActReturnCarAddr(deliveryReqDTO.getOwnRealReturnAddr());
+        renterDeliveryAddrDTO.setActGetCarAddr(deliveryReqDTO.getRenterRealGetAddr());
+        updateFlowOrderDTO.setOrdernumber(deliveryReqDTO.getOrderNo());
+        updateFlowOrderDTO.setServicetype(type == 1 ? "take" : "back");
+        updateFlowOrderDTO.setChangetype("ownerAddr");
+        updateFlowOrderDTO.setNewpickupcaraddr(deliveryReqDTO.getRenterRealGetAddr());
+        updateFlowOrderDTO.setNewalsocaraddr(deliveryReqDTO.getOwnRealReturnAddr());
+        return UpdateOrderDeliveryVO.builder().orderDeliveryDTO(orderDeliveryDTO).renterDeliveryAddrDTO(renterDeliveryAddrDTO).updateFlowOrderDTO(updateFlowOrderDTO).build();
+    }
+
+
+
+
+
+
+
+
 
 }

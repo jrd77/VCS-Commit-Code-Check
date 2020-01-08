@@ -16,7 +16,7 @@ public class DeliveryReqDTO {
     @AutoDocProperty("车主实际交车地址/车主实际收车地址")
     public String ownRealReturnAddr;
     @AutoDocProperty("租客实际送车地址/租客实际还车地址")
-    @NotBlank(message="orderNo不能为空")
+    @NotBlank(message="租客实际送车地址/租客实际还车地址")
     public String renterRealGetAddr;
     @AutoDocProperty("租客实际送车地址备注")
     public String renterRealGetAddrReamrk;
