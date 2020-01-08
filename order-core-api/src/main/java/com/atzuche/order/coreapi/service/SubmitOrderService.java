@@ -46,7 +46,6 @@ import com.atzuche.order.renterorder.vo.*;
 import com.autoyol.car.api.model.dto.LocationDTO;
 import com.autoyol.car.api.model.dto.OrderInfoDTO;
 import com.autoyol.car.api.model.enums.OrderOperationTypeEnum;
-import com.netflix.discovery.converters.Auto;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -145,7 +144,6 @@ public class SubmitOrderService {
         //2.2风控
         Integer riskAuditId = null;
 //        Integer riskAuditId = submitOrderRiskAuditService.check(buildSubmitOrderRiskCheckReqVO(orderReqVO, reqTime));
-
         //2.3校验链
         //2.4.生成主订单号
         String orderNo = uniqueOrderNoService.getOrderNo();
@@ -154,10 +152,8 @@ public class SubmitOrderService {
         stockService.cutCarStock(orderInfoDTO);
 
         //提前延后时间计算
-        CarRentTimeRangeResVO carRentTimeRangeResVO = goodsService.getCarRentTimeRange(buildCarRentTimeRangeReqVO(orderReqVO));
-
         CarRentTimeRangeResVO carRentTimeRangeResVO = carRentalTimeApiService.getCarRentTimeRange(buildCarRentTimeRangeReqVO(orderReqVO));
-
+        //3.生成主订单号
         //4.创建租客子订单
         //4.1.生成租客子订单号
         String renterOrderNo = uniqueOrderNoService.getRenterOrderNo(orderNo);
