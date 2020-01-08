@@ -1,8 +1,10 @@
 package com.atzuche.order.delivery.utils;
 
+import com.alibaba.fastjson.JSON;
 import com.atzuche.order.delivery.common.DeliveryConstants;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
 
@@ -117,5 +119,12 @@ public class CommonUtil {
 
     public static void copyPropertiesIgnoreNull(Object src, Object target){
         org.springframework.beans.BeanUtils.copyProperties(src, target, getNullPropertyNames(src));
+    }
+
+    public static <T> List copyList(List<T> list) {
+        if (CollectionUtils.isEmpty(list)) {
+            return new ArrayList();
+        }
+        return JSON.parseArray(JSON.toJSONString(list), list.get(0).getClass());
     }
 }

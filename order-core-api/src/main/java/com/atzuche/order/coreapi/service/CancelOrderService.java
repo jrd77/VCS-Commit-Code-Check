@@ -3,6 +3,7 @@ package com.atzuche.order.coreapi.service;
 import com.atzuche.order.commons.enums.MemRoleEnum;
 import com.atzuche.order.commons.vo.req.CancelOrderReqVO;
 import com.atzuche.order.coreapi.entity.dto.CancelOrderResDTO;
+import com.atzuche.order.settle.service.OrderSettleService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,6 +27,9 @@ public class CancelOrderService {
     @Autowired
     private CouponAndCoinHandleService couponAndCoinHandleService;
 
+    @Autowired
+    private OrderSettleService orderSettleService;
+
     /**
      * 订单取消
      *
@@ -48,7 +52,7 @@ public class CancelOrderService {
 
         //通知收银台退款
         //todo
-
+        orderSettleService.settleOrder("");
         //通知流程系统
         //todo
 

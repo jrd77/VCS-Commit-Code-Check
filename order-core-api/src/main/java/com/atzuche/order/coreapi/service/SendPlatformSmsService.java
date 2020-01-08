@@ -33,29 +33,6 @@ public class SendPlatformSmsService {
 
     /** 短信通知  */
     public static int MSG = 3;
-    /**
-     * 自动调度配车成功后发送短信
-     * @param textCode 模板code
-     * @param mobile 手机号
-     * @param message 备注
-     * @param orderNo 订单号
-     * @param packageName 套餐名称
-     * @param brand 车品牌
-     * @param type 车型号
-     */
-    public void carMatchSuccessSms(String textCode, String mobile, String message, Long orderNo, String packageName, String brand, String type) {
-        Map<String, Object> paramMap = new HashMap<>();
-        paramMap.put("textCode", textCode);
-        paramMap.put("mobile", mobile);
-        paramMap.put("message", message);
-        paramMap.put("orderNo", orderNo);
-        paramMap.put("packageName", packageName);
-        paramMap.put("brandTxt", brand);
-        paramMap.put("typeTxt", type);
-        paramMap.put("sender", SEND_SRV);
-        paramMap.put("type", MSG);
-        sendNormalSms(paramMap);
-    }
 
     /**
      * 发送普通短信

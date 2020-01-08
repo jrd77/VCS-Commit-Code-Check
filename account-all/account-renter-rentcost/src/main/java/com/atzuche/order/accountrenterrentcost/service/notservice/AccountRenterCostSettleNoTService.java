@@ -9,9 +9,7 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 
-import java.util.List;
 import java.util.Objects;
 
 
@@ -72,9 +70,23 @@ public class AccountRenterCostSettleNoTService {
     }
 
     public void refundRenterCostSettle(AccountRenterCostSettleEntity accountRenterCostSettle,int amt) {
+        AccountRenterCostSettleEntity entity = new AccountRenterCostSettleEntity();
+        entity.setId(accountRenterCostSettle.getId());
+        entity.setVersion(accountRenterCostSettle.getVersion());
         int refundAmt = Objects.isNull(accountRenterCostSettle.getRefundAmt())?0:accountRenterCostSettle.getRefundAmt();
-        accountRenterCostSettle.setRentAmt(refundAmt + amt);
+        entity.setRefundAmt(refundAmt + amt);
         int result = accountRenterCostSettleMapper.updateByPrimaryKeySelective(accountRenterCostSettle);
+        if(result==0){
+            throw new AccountRenterRentCostRefundException();
+        }
+    }
+
+    /**
+     * 结算更新 租客费用总账户  费用信息
+     * @param entity
+     */
+    public void updateAccountRenterCostSettle(AccountRenterCostSettleEntity entity) {
+        int result = accountRenterCostSettleMapper.updateByPrimaryKeySelective(entity);
         if(result==0){
             throw new AccountRenterRentCostRefundException();
         }
