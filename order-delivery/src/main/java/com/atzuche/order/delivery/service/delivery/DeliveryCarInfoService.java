@@ -29,22 +29,24 @@ public class DeliveryCarInfoService {
 
     /**
      * 获取配送相关信息
+     *
      * @param deliveryCarDTO
      * @return
      */
     public DeliveryCarVO findDeliveryListByOrderNo(DeliveryCarRepVO deliveryCarDTO) {
         List<RenterHandoverCarInfoEntity> renterHandoverCarInfoEntities = handoverCarService.selectRenterByOrderNo(deliveryCarDTO.getOrderNo());
-        List<OwnerHandoverCarInfoEntity>  ownerHandoverCarInfoEntities = handoverCarService.selectOwnerByOrderNo(deliveryCarDTO.getOrderNo());
+        List<OwnerHandoverCarInfoEntity> ownerHandoverCarInfoEntities = handoverCarService.selectOwnerByOrderNo(deliveryCarDTO.getOrderNo());
         List<RenterHandoverCarRemarkEntity> renterHandoverCarRemarkEntities = handoverCarService.getRenterHandoverRemarkInfo(deliveryCarDTO.getOrderNo());
         List<OwnerHandoverCarRemarkEntity> ownerHandoverCarRemarkEntities = handoverCarService.getOwnerHandoverRemarkInfo(deliveryCarDTO.getOrderNo());
         List<RenterOrderDeliveryEntity> renterOrderDeliveryEntityList = renterOrderDeliveryService.listRenterOrderDeliveryByRenterOrderNo(deliveryCarDTO.getRenterOrderNo());
-        DeliveryCarVO deliveryCarVO = createDeliveryCarVOParams(renterHandoverCarInfoEntities,ownerHandoverCarInfoEntities,renterHandoverCarRemarkEntities,ownerHandoverCarRemarkEntities,renterOrderDeliveryEntityList);
+        DeliveryCarVO deliveryCarVO = createDeliveryCarVOParams(renterHandoverCarInfoEntities, ownerHandoverCarInfoEntities, renterHandoverCarRemarkEntities, ownerHandoverCarRemarkEntities, renterOrderDeliveryEntityList);
         return deliveryCarVO;
     }
 
 
     /**
      * 构造结构体
+     *
      * @param renterHandoverCarInfoEntities
      * @param ownerHandoverCarInfoEntities
      * @param renterHandoverCarRemarkEntities
@@ -66,12 +68,13 @@ public class DeliveryCarInfoService {
             createGetHandoverCar(deliveryCarVO, renterHandoverCarRemarkEntities, ownerHandoverCarRemarkEntities, renterHandoverCarInfoEntities, renterOrderDeliveryEntity);
         }
 
-        deliveryCarVO = createDeliveryCarInfo(deliveryCarVO,ownerHandoverCarInfoEntities,renterHandoverCarInfoEntities);
+        deliveryCarVO = createDeliveryCarInfo(deliveryCarVO, ownerHandoverCarInfoEntities, renterHandoverCarInfoEntities);
         return deliveryCarVO;
     }
 
     /**
      * 组装取送车信息
+     *
      * @param renterHandoverCarRemarkEntities
      * @param ownerHandoverCarRemarkEntities
      * @param renterOrderDeliveryEntity
@@ -127,6 +130,7 @@ public class DeliveryCarInfoService {
 
     /**
      * 构造最终数据
+     *
      * @param deliveryCarVO
      * @param ownerHandoverCarInfoEntities
      * @param renterHandoverCarInfoEntities
@@ -137,10 +141,9 @@ public class DeliveryCarInfoService {
         String oilNum = ownerHandoverCarInfoEntities.stream().filter(r -> (r.getType().intValue() != HandoverCarTypeEnum.RENYUN_TO_RENTER.getValue().intValue())).findFirst().get().getOilNum().toString();
         String mileageNum = ownerHandoverCarInfoEntities.stream().filter(r -> (r.getType().intValue() != HandoverCarTypeEnum.RENYUN_TO_RENTER.getValue().intValue())).findFirst().get().getMileageNum().toString();
         String returnMileagNum = ownerHandoverCarInfoEntities.stream().filter(r -> (r.getType().intValue() != HandoverCarTypeEnum.RENYUN_TO_RENTER.getValue().intValue())).findFirst().get().getMileageNum().toString();
-        String realGetTime =  renterHandoverCarInfoEntities.stream().filter(r -> (r.getType().intValue() != HandoverCarTypeEnum.RENTER_TO_RENYUN.getValue().intValue())).findFirst().get().getRealReturnTime().toString();
-        String realReturnTime =  renterHandoverCarInfoEntities.stream().filter(r -> (r.getType().intValue() != HandoverCarTypeEnum.RENYUN_TO_RENTER.getValue().intValue())).findFirst().get().getRealReturnTime().toString();
+        String realGetTime = renterHandoverCarInfoEntities.stream().filter(r -> (r.getType().intValue() != HandoverCarTypeEnum.RENTER_TO_RENYUN.getValue().intValue())).findFirst().get().getRealReturnTime().toString();
+        String realReturnTime = renterHandoverCarInfoEntities.stream().filter(r -> (r.getType().intValue() != HandoverCarTypeEnum.RENYUN_TO_RENTER.getValue().intValue())).findFirst().get().getRealReturnTime().toString();
         String renterKM = renterHandoverCarInfoEntities.stream().filter(r -> (r.getType().intValue() != HandoverCarTypeEnum.RENYUN_TO_RENTER.getValue().intValue())).findFirst().get().getMileageNum().toString();
-
 
         OwnerGetAndReturnCarDTO ownerGetAndReturnCarDTO = OwnerGetAndReturnCarDTO.builder().carOilDifferenceCrash("0")
                 .carOilServiceCharge("0").carOwnerOilCrash("0").dayKM("0")
@@ -158,7 +161,5 @@ public class DeliveryCarInfoService {
         deliveryCarVO.setRenterGetAndReturnCarDTO(renterGetAndReturnCarDTO);
         return deliveryCarVO;
     }
-
-
 
 }
