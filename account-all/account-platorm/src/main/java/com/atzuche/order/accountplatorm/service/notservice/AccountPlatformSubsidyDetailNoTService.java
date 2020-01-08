@@ -44,4 +44,20 @@ public class AccountPlatformSubsidyDetailNoTService {
             }
         }
     }
+
+    /**
+     * 车俩结算 车主费用明细落库
+     * @param accountPlatformSubsidyDetails
+     */
+    public void insertAccountPlatformSubsidyDetails(List<AccountPlatformSubsidyDetailEntity> accountPlatformSubsidyDetails) {
+        if(!CollectionUtils.isEmpty(accountPlatformSubsidyDetails)){
+            for(int i =0;i<accountPlatformSubsidyDetails.size();i++){
+                AccountPlatformSubsidyDetailEntity entity = accountPlatformSubsidyDetails.get(i);
+                int result = accountPlatformSubsidyDetailMapper.insert(entity);
+                if(result==0){
+                    throw new AccountPlatormException();
+                }
+            }
+        }
+    }
 }

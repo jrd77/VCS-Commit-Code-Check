@@ -95,5 +95,28 @@
 				#{updateOp}
 			)
 	</insert>
-	
+    <update id="updateByPrimaryKeySelective" parameterType="com.atzuche.order.accountrenterdeposit.entity.AccountRenterDepositDetailEntity">
+        update account_renter_deposit_detail
+        <set>
+            <if test="orderNo != null">`order_no` = #{orderNo}, </if>
+            <if test="memNo != null">`mem_no` = #{memNo}, </if>
+            <if test="payment != null">`payment` = #{payment}, </if>
+            <if test="paymentChannel != null">`payment_channel` = #{paymentChannel}, </if>
+            <if test="amt != null">`amt` = #{amt}, </if>
+            <if test="authorizeDepositAmt != null">`authorize_deposit_amt` = #{authorizeDepositAmt}, </if>
+            <if test="authorizeExpireTime != null">`authorize_expire_time` = #{authorizeExpireTime}, </if>
+            <if test="creditPayAmt != null">`credit_pay_amt` = #{creditPayAmt}, </if>
+            <if test="creditPayExpireTime != null">`credit_pay_expire_time` = #{creditPayExpireTime}, </if>
+            <if test="sourceCode != null">`source_code` = #{sourceCode}, </if>
+            <if test="sourceDetail != null">`source_detail` = #{sourceDetail}, </if>
+            <if test="uniqueNo != null">`unique_no` = #{uniqueNo}, </if>
+            <if test="createTime != null">`create_time` = #{createTime}, </if>
+            <if test="createOp != null">`create_op` = #{createOp}, </if>
+            <if test="updateTime != null">`update_time` = #{updateTime}, </if>
+            <if test="updateOp != null">`update_op` = #{updateOp}, </if>
+            <if test="isDelete != null">`is_delete` = #{isDelete}</if>
+        </set>
+        where id = #{id}
+    </update>
+
 </mapper>

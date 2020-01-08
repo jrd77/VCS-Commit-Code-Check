@@ -1,9 +1,11 @@
 package com.atzuche.order.admin.controller.car;
 
-import com.atzuche.order.admin.vo.resp.car.CarBaseInfoResVo;
+import com.atzuche.order.admin.exception.OrderAdminException;
+import com.atzuche.order.admin.service.car.CarService;
+import com.atzuche.order.admin.vo.req.car.CarBaseInfoReqVO;
 import com.atzuche.order.admin.vo.req.car.CarBaseReqVO;
 import com.atzuche.order.admin.vo.req.car.CarOtherConfigReqVo;
-import com.atzuche.order.admin.vo.req.car.CarBaseInfoReqVO;
+import com.atzuche.order.admin.vo.resp.car.CarBaseInfoResVo;
 import com.atzuche.order.admin.vo.resp.car.CarBusinessResVO;
 import com.atzuche.order.admin.vo.resp.car.CarOtherConfigResVo;
 import com.autoyol.car.api.exception.BaseException;
@@ -34,6 +36,9 @@ public class CarController {
 
     @Autowired
     private CarDetailQueryFeignApi carDetailQueryFeignApi;
+
+    @Autowired
+    private CarService carService;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CarController.class);
 
@@ -134,11 +139,26 @@ public class CarController {
         return ResponseData.success(null);
     }
 
-    @AutoDocMethod(description = "【liujun】车辆运营信息", value = "保存车辆其他配置", response = CarBusinessResVO.class)
+    /**
+     * 老后台参考:
+     * com.autoyolConsole.controller.TransController.detail(String, String, HttpServletRequest)
+     * /autoyolConsole/src/main/webapp/WEB-INF/view/trans/detail.jsp
+     */
+    @AutoDocMethod(description = "【liujun】订单详细信息-查看车辆信息-车辆运营信息", value = "【liujun】订单详细信息-查看车辆信息-车辆运营信息", response = CarBusinessResVO.class)
     @PostMapping(value = "/car/bussiness")
     public ResponseData <?> getCarBusiness(@Valid @RequestBody CarBaseReqVO reqVo, BindingResult bindingResult) {
-
-        return ResponseData.success(null);
+        try {
+            CarBusinessResVO carBusiness = carService.getCarBusiness(reqVo.getCarNo());
+            return ResponseData.success(carBusiness);
+        } catch (OrderAdminException e) {
+            LOGGER.error("获取车辆运营信息异常[{}]", reqVo, e);
+            Cat.logError("获取车辆运营信息异常[{" + reqVo + "}]", e);
+            return new ResponseData <>(e.getErrorCode(), e.getErrorMsg());
+        } catch (Exception e) {
+            LOGGER.error("获取车辆运营信息异常[{}]", reqVo, e);
+            Cat.logError("获取车辆运营信息异常[{" + reqVo + "}]", e);
+            return ResponseData.error();
+        }
     }
 
     private String convertIntegerToStr(Integer value){

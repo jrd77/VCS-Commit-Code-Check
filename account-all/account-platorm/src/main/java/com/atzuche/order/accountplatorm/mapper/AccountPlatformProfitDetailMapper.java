@@ -15,8 +15,6 @@ public interface AccountPlatformProfitDetailMapper{
 
     AccountPlatformProfitDetailEntity selectByPrimaryKey(Integer id);
 
-    List<AccountPlatformProfitDetailEntity> selectALL();
-
     int insert(AccountPlatformProfitDetailEntity record);
     
     int insertSelective(AccountPlatformProfitDetailEntity record);

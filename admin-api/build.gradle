@@ -49,7 +49,7 @@ dependencies {
     }
     compile("com.caucho:hessian:4.0.38")
 
-    compile('com.autoyol.car:auto-car-service-api:2020010706-SNAPSHOT')
+    compile('com.autoyol.car:auto-car-service-api:2020010707-SNAPSHOT')
    
 
 //    compile project(":casier-all:cashier-account")

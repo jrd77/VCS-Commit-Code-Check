@@ -19,6 +19,6 @@ dependencies {
     compile project(":order-core-all:carowner-all:carowner-order")
 	compile project(":order-delivery")
     compile project(":order-core-all:carowner-all:carowner-commodity")
-
+    compile project(":order-coin")
 
 }

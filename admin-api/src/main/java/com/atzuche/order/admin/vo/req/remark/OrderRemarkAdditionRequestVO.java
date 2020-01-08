@@ -1,10 +1,11 @@
 package com.atzuche.order.admin.vo.req.remark;
 
 import com.autoyol.doc.annotation.AutoDocProperty;
+import lombok.Data;
+import lombok.ToString;
 
-/**
- * Created by qincai.lin on 2019/12/30.
- */
+@Data
+@ToString
 public class OrderRemarkAdditionRequestVO {
 
     @AutoDocProperty(value = "订单号")
@@ -19,36 +20,15 @@ public class OrderRemarkAdditionRequestVO {
     @AutoDocProperty(value = "备注内容")
     private String remarkContent;
 
-    public String getDepartmentId() {
-        return departmentId;
-    }
+    @AutoDocProperty(value = "跟进状态,只有remarkType=7时，才需要填写")
+    private String followStatus;
 
-    public void setDepartmentId(String departmentId) {
-        this.departmentId = departmentId;
-    }
+    @AutoDocProperty(value = "跟进失败原因，只有remarkType=7时，才需要填写")
+    private String followFailReason;
 
-    public String getRemarkType() {
-        return remarkType;
-    }
+    @AutoDocProperty(value = "是否限制租客延时，只有remarkType=2时，才需要填写")
+    private String limitDelayed;
 
-    public void setRemarkType(String remarkType) {
-        this.remarkType = remarkType;
-    }
 
-    public String getRemarkContent() {
-        return remarkContent;
-    }
-
-    public void setRemarkContent(String remarkContent) {
-        this.remarkContent = remarkContent;
-    }
-
-    public String getOrderNo() {
-        return orderNo;
-    }
-
-    public void setOrderNo(String orderNo) {
-        this.orderNo = orderNo;
-    }
 
 }

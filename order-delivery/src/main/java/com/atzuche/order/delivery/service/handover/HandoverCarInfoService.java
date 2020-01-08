@@ -118,6 +118,7 @@ public class HandoverCarInfoService {
      * @param deliveryReqVO
      * @throws Exception
      */
+    @Transactional(rollbackFor = Exception.class)
     public void updateDeliveryCarInfo(DeliveryReqVO deliveryReqVO) throws Exception {
         logger.debug("参数：{}", ToStringBuilder.reflectionToString(deliveryReqVO));
         if (Objects.isNull(deliveryReqVO)) {
@@ -165,8 +166,6 @@ public class HandoverCarInfoService {
             {
                 //1.更新配送訂單表
                 //2.根据原先的状态发送仁云取消事件
-
-
             }
 
         }

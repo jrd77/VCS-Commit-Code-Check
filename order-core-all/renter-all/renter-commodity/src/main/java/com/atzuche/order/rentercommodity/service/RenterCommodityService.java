@@ -1,5 +1,6 @@
 package com.atzuche.order.rentercommodity.service;
 
+import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.LocalDateTimeUtils;
 import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
 import com.atzuche.order.commons.entity.dto.RenterGoodsPriceDetailDTO;
@@ -11,7 +12,10 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /*
  * @Author ZhangBin
@@ -56,46 +60,59 @@ public class RenterCommodityService {
     }
 
     //组合
-    private void combination(RenterGoodsDetailDTO renterGoodsDetailDTO){
-        if(renterGoodsDetailDTO.getRenterOrderNo() == null){
+    public void combination(RenterGoodsDetailDTO renterGoodsDetailDTO){
+        String renterOrderNo = renterGoodsDetailDTO.getRenterOrderNo();
+        if(renterOrderNo == null){
             return;
         }
         LocalDateTime rentTime = renterGoodsDetailDTO.getRentTime();
         LocalDateTime revertTime = renterGoodsDetailDTO.getRevertTime();
-        List<RenterGoodsPriceDetailEntity> dbGoodsPriceList = renterGoodsPriceDetailMapper.selectByRenterOrderNo(renterGoodsDetailDTO.getRenterOrderNo());
-        LocalDate carDayRent = dbGoodsPriceList.get(0).getCarDay();
-        LocalDate carDayRevert = dbGoodsPriceList.get(dbGoodsPriceList.size()-1).getCarDay();
-
-        if(!carDayRent.isEqual(rentTime.toLocalDate())){
+        LocalDateTime oldRentTime = renterGoodsDetailDTO.getOldRentTime();
+        if(oldRentTime == null || !oldRentTime.isEqual(rentTime)){
             return;
-        } if(carDayRevert.isBefore(revertTime.toLocalDate())){//时间延后
-            dbGoodsPriceList.get(dbGoodsPriceList.size()-1).setCarHourCount(24F);
-            List<RenterGoodsPriceDetailDTO> renterGoodsPriceDetailDTOList = renterGoodsDetailDTO.getRenterGoodsPriceDetailDTOList();
-            //租期重叠部分- 使用数据库的 价格/小时数
-            for (int i = 0;i<dbGoodsPriceList.size();i++){
-                RenterGoodsPriceDetailDTO renterGoodsPriceDetailDto = renterGoodsPriceDetailDTOList.get(i);
-                renterGoodsPriceDetailDto.setCarUnitPrice(dbGoodsPriceList.get(i).getCarUnitPrice());
-                renterGoodsPriceDetailDto.setRevertTime(dbGoodsPriceList.get(i).getRevertTime());
-                if(i == (dbGoodsPriceList.size()-1)){
-                    renterGoodsPriceDetailDto.setCarHourCount(24F);
-                    continue;
+        }
+
+        List<RenterGoodsPriceDetailEntity> dbGoodsPriceList = renterGoodsPriceDetailMapper.selectByRenterOrderNo(renterOrderNo);
+        if(dbGoodsPriceList == null || dbGoodsPriceList.size()<=0){
+            return;
+        }
+        Map<LocalDate, RenterGoodsPriceDetailEntity> mapPrice = dbGoodsPriceList
+                .stream()
+                .collect(Collectors.toMap(RenterGoodsPriceDetailEntity::getCarDay, x -> x));
+        RenterGoodsPriceDetailEntity dbPriceMaxCarDay = dbGoodsPriceList.get(dbGoodsPriceList.size() - 1);
+        LocalDateTime oldRevertTime = dbPriceMaxCarDay.getRevertTime();
+        List<RenterGoodsPriceDetailDTO> renterGoodsPriceDetailDTOList = renterGoodsDetailDTO.getRenterGoodsPriceDetailDTOList();
+        if(oldRevertTime.isBefore(revertTime)){//时间延后
+            RenterGoodsPriceDetailDTO middle = new RenterGoodsPriceDetailDTO();
+            renterGoodsPriceDetailDTOList.forEach(x->{
+                RenterGoodsPriceDetailEntity dbPrice = mapPrice.get(x.getCarDay());
+                if(dbPriceMaxCarDay.getCarDay().isEqual(x.getCarDay())){  //临界的地方需要拆分
+                    float HFirst = CommonUtils.getHolidayTopHours(dbPriceMaxCarDay.getRevertTime(), LocalDateTimeUtils.localdateToString(x.getCarDay()));
+                    middle.setRevertTime(revertTime);
+                    middle.setCarDay(dbPriceMaxCarDay.getCarDay());
+                    middle.setCarUnitPrice(x.getCarUnitPrice());
+                    middle.setCarHourCount(HFirst);
+
+                    x.setCarUnitPrice(dbPrice.getCarUnitPrice());
+                    x.setCarHourCount(dbPrice.getCarHourCount());
+                    x.setRevertTime(dbPrice.getRevertTime());
+                }else if(dbPrice != null){//临界之前的值使用数据库的  临界之后使用新生成的一天一价
+                  x.setCarUnitPrice(dbPrice.getCarUnitPrice());
+                  x.setCarHourCount(dbPrice.getCarHourCount());
+                  x.setRevertTime(dbPrice.getRevertTime());
                 }
-                renterGoodsPriceDetailDto.setCarHourCount(dbGoodsPriceList.get(i).getCarHourCount());
-            }
+            });
+            renterGoodsPriceDetailDTOList.add(middle);
+
             //租期不重叠部分 中间部分init中已经处理
             //租期不重叠部分 最后一天 init中已经处理
         }else{//时间提前
-            List<RenterGoodsPriceDetailDTO> renterGoodsPriceDetailDTOList = renterGoodsDetailDTO.getRenterGoodsPriceDetailDTOList();
-            //租期重叠部分- 使用数据库的 价格/小时数
-            for (int i = 0;i<dbGoodsPriceList.size();i++){
-                RenterGoodsPriceDetailDTO renterGoodsPriceDetailDto = renterGoodsPriceDetailDTOList.get(i);
-                renterGoodsPriceDetailDto.setCarUnitPrice(dbGoodsPriceList.get(i).getCarUnitPrice());
-                renterGoodsPriceDetailDto.setRevertTime(dbGoodsPriceList.get(i).getRevertTime());
-                if(i == (dbGoodsPriceList.size()-1)){//最后一天不使用数据库的小时数
-                    continue;
-                }
-                renterGoodsPriceDetailDto.setCarHourCount(dbGoodsPriceList.get(i).getCarHourCount());
-            }
+            //替换金额即可，使用数据库中的一天一价
+            renterGoodsPriceDetailDTOList.forEach(x->{
+                RenterGoodsPriceDetailEntity dbPrice = mapPrice.get(x.getCarDay());
+                x.setCarUnitPrice(dbPrice.getCarUnitPrice());
+                x.setRevertTime(revertTime);
+            });
         }
     }
 
@@ -136,5 +153,34 @@ public class RenterCommodityService {
             renterGoodsPriceDetailDto.setCarHourCount(HLast);
         }
 
+    }
+
+    public static void main(String[] args) {
+        LocalDateTime localDateTime1 = LocalDateTime.of(2020,1,7,12,12,0);
+        LocalDateTime localDateTime2 = LocalDateTime.of(2020,1,7,12,12,1);
+        boolean before = localDateTime1.isBefore(localDateTime2);
+        System.out.println(before);
+
+        boolean equal = localDateTime1.isEqual(localDateTime2);
+        System.out.println(equal);
+
+        boolean after = localDateTime1.isAfter(localDateTime2);
+        System.out.println(after);
+        List<RenterGoodsPriceDetailEntity> dbGoodsPriceList = new ArrayList<>();
+        RenterGoodsPriceDetailEntity r = new RenterGoodsPriceDetailEntity();
+        r.setCarHourCount(1f);
+        r.setCarDay(LocalDate.of(2020,1,7));
+        r.setCarUnitPrice(100);
+        RenterGoodsPriceDetailEntity r1 = new RenterGoodsPriceDetailEntity();
+        r1.setCarHourCount(1f);
+        r1.setCarDay(LocalDate.of(2020,1,8));
+        r1.setCarUnitPrice(200);
+        dbGoodsPriceList.add(r);
+        dbGoodsPriceList.add(r1);
+
+        Map<LocalDate, RenterGoodsPriceDetailEntity> collect = dbGoodsPriceList.stream().collect(Collectors.toMap(RenterGoodsPriceDetailEntity::getCarDay, x -> x));
+        System.out.println(collect);
+
+        System.out.println(JSON.toJSONString(collect.get(LocalDate.of(2020,1,7))));
     }
 }

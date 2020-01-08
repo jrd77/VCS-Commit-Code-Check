@@ -355,7 +355,7 @@ public class ModifyOrderService {
 		Integer diffAmt = updAutoCoinSubsidyAmt - initAutoCoinSubsidyAmt;
 		if (diffAmt > 0) {
 			AutoCoinAgainDeductRequestVO autoCoinRechange = new AutoCoinAgainDeductRequestVO();
-			autoCoinRechange.setCoin(diffAmt*100);
+			autoCoinRechange.setCoin(-diffAmt*100);
 			autoCoinRechange.setMemNo(modifyOrderDTO.getMemNo() == null?null:Integer.valueOf(modifyOrderDTO.getMemNo()));
 			autoCoinRechange.setOperator("order-center");
 			autoCoinRechange.setOrderNo(modifyOrderDTO.getOrderNo());
@@ -478,6 +478,7 @@ public class ModifyOrderService {
 		renterGoodsDetailDTO.setRenterOrderNo(renterOrderEntity.getRenterOrderNo());
 		renterGoodsDetailDTO.setRentTime(modifyOrderDTO.getRentTime());
 		renterGoodsDetailDTO.setRevertTime(modifyOrderDTO.getRevertTime());
+		renterGoodsDetailDTO.setOldRentTime(renterOrderEntity.getExpRentTime());
 		// 获取汇总后的租客商品详情
 		renterGoodsDetailDTO = commodityService.setPriceAndGroup(renterGoodsDetailDTO);
 		// 设置最新的租客订单号

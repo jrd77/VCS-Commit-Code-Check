@@ -41,9 +41,15 @@ public class CashierDeductDebtResVO {
      */
     private String sourceDetail;
 
-    public CashierDeductDebtResVO(CashierDeductDebtReqVO cashierDeductDebtReqVO,int deductAmt) {
+    /**
+     * 押金操作流水Id
+     */
+    private int depositDetailId;
+
+    public CashierDeductDebtResVO(CashierDeductDebtReqVO cashierDeductDebtReqVO,int deductAmt,int depositDetailId) {
         BeanUtils.copyProperties(cashierDeductDebtReqVO,this);
         this.deductAmt = deductAmt;
         this.surplusAmt = amt - deductAmt;
+        this.depositDetailId = depositDetailId;
     }
 }

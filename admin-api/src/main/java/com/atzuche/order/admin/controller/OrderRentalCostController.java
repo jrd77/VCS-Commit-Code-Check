@@ -388,7 +388,7 @@ public class OrderRentalCostController {
     @AutoDocVersion(version = "管理后台租客车主互相调价")
     @AutoDocGroup(group = "管理后台租客车主互相调价")
     @AutoDocMethod(description = "租客车主互相调价", value = "租客车主互相调价",response = PriceAdjustmentVO.class)
-    @PostMapping("/priceAdjustment/list")
+    @PostMapping("/renterPriceAdjustment/list")
     public ResponseData<?> findPriceAdjustmentByOrderNo(@RequestBody RentalCostReqVO rentalCostReqVO) {
         if (null == rentalCostReqVO || StringUtils.isBlank(rentalCostReqVO.getRenterOrderNo())) {
             return ResponseData.createErrorCodeResponse(ErrorCode.ORDER_NO_PARAM_ERROR.getCode(), "租客子订单编号为空");
@@ -404,7 +404,7 @@ public class OrderRentalCostController {
     @AutoDocVersion(version = "管理后台租客需支付给平台的费用")
     @AutoDocGroup(group = "管理后台平台租客需支付给平台的费用")
     @AutoDocMethod(description = "租客需支付给平台的费用", value = "租客需支付给平台的费用",response = OwnerToPlatFormVO.class)
-    @PostMapping("/ownerToPlatForm/list")
+    @PostMapping("/renterToPlatForm/list")
     public ResponseData<?> findRenterToPlatFormListByOrderNo(@RequestBody RentalCostReqVO rentalCostReqVO) {
         if (null == rentalCostReqVO || StringUtils.isBlank(rentalCostReqVO.getRenterOrderNo())) {
             return ResponseData.createErrorCodeResponse(ErrorCode.ORDER_NO_PARAM_ERROR.getCode(), "租客子订单编号为空");

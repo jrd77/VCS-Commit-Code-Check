@@ -409,6 +409,7 @@ public class ModifyOrderForOwnerService {
 		ownerGoodsDetailDTO.setMemNo(ownerOrderEntity.getMemNo());
 		ownerGoodsDetailDTO.setRentTime(modifyOrderOwnerDTO.getRentTime());
 		ownerGoodsDetailDTO.setRevertTime(modifyOrderOwnerDTO.getRevertTime());
+		ownerGoodsDetailDTO.setOldRentTime(ownerOrderEntity.getExpRentTime());
 		ownerGoodsDetailDTO = ownerCommodityService.setPriceAndGroup(ownerGoodsDetailDTO);
 		// 设置最新的车主订单号
 		ownerGoodsDetailDTO.setOwnerOrderNo(modifyOrderOwnerDTO.getOwnerOrderNo());
