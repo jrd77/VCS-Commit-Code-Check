@@ -215,10 +215,7 @@ public class CashierNoTService {
              cashier.setId(cashierEntity.getId());
              cashier.setVersion(cashierEntity.getVersion());
              cashier.setPaySn(cashierEntity.getPaySn()+1);
-             if(TransStatusEnum.PAY_SUCCESS.getCode().equals(notifyDataVo.getTransStatus()) && cashierEntity.getTransStatus().equals(notifyDataVo.getTransStatus())){
-                 result = cashierMapper.updateByPrimaryKeySelective(cashier);
-             }
-
+             result = cashierMapper.updateByPrimaryKeySelective(cashier);
          }else {
              CashierEntity cashier = new CashierEntity();
              BeanUtils.copyProperties(notifyDataVo,cashier);
@@ -269,6 +266,7 @@ public class CashierNoTService {
         accountRenterCostDetail.setTime(LocalDateTimeUtils.parseStringToDateTime(notifyDataVo.getOrderTime(),LocalDateTimeUtils.DEFAULT_PATTERN));
         accountRenterCostDetail.setAmt(settleAmount);
         accountRenterCostDetail.setRenterCashCodeEnum(renterCashCodeEnum);
+        vo.setAccountRenterCostDetailReqVO(accountRenterCostDetail);
         return vo;
     }
     /**

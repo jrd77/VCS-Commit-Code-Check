@@ -159,5 +159,12 @@
 		</set>
 		where id = #{id}
 	</update>
-  	
+    <select id="selectRenterCostSettleDetail" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List" /> from account_renter_cost_settle_detail
+
+        where order_no = #{orderNo} and mem_no = #{memNo} and cost_code = #{costCode}
+
+
+    </select>
+
 </mapper>

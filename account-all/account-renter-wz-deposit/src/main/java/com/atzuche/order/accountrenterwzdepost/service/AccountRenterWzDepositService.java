@@ -96,14 +96,14 @@ public class AccountRenterWzDepositService{
      * 支户头违章押金资金进出 操作
      */
     @CatAnnotation
-    public void updateRenterWZDepositChange(PayedOrderRenterDepositWZDetailReqVO payedOrderRenterWZDepositDetail){
+    public int  updateRenterWZDepositChange(PayedOrderRenterDepositWZDetailReqVO payedOrderRenterWZDepositDetail){
         //1 参数校验
         Assert.notNull(payedOrderRenterWZDepositDetail, ErrorCode.PARAMETER_ERROR.getText());
         payedOrderRenterWZDepositDetail.check();
         //2更新车辆押金  剩余押金 金额
         accountRenterWzDepositNoTService.updateRenterWZDepositChange(payedOrderRenterWZDepositDetail);
         //添加押金资金进出明细
-        accountRenterWzDepositDetailNoTService.insertRenterWZDepositDetail(payedOrderRenterWZDepositDetail);
+        return accountRenterWzDepositDetailNoTService.insertRenterWZDepositDetail(payedOrderRenterWZDepositDetail);
     }
 
 }

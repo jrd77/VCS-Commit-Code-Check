@@ -22,7 +22,7 @@ public class CarBusinessResVO {
     private String insuranceExpireDateStr;
 
     @AutoDocProperty("GPS号")
-    private String gps;
+    private String gpsNo;
     @AutoDocProperty("SIM卡号")
     private String simNo;
 

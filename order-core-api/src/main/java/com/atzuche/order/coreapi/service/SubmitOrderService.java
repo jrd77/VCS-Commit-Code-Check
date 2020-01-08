@@ -43,6 +43,7 @@ import com.atzuche.order.rentercost.entity.dto.OrderCouponDTO;
 import com.atzuche.order.rentermem.service.RenterMemberService;
 import com.atzuche.order.renterorder.service.RenterOrderService;
 import com.atzuche.order.renterorder.vo.*;
+import com.netflix.discovery.converters.Auto;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -97,6 +98,8 @@ public class SubmitOrderService {
     private RenterCommodityService renterCommodityService;
     @Autowired
     private SubmitOrderRiskAuditService submitOrderRiskAuditService;
+    @Autowired
+    private CarRentalTimeApiService carRentalTimeApiService;
 
 
     /**
@@ -136,7 +139,7 @@ public class SubmitOrderService {
         //2.3校验链
 
         //提前延后时间计算
-        CarRentTimeRangeResVO carRentTimeRangeResVO = goodsService.getCarRentTimeRange(buildCarRentTimeRangeReqVO(orderReqVO));
+        CarRentTimeRangeResVO carRentTimeRangeResVO = carRentalTimeApiService.getCarRentTimeRange(buildCarRentTimeRangeReqVO(orderReqVO));
         //3.生成主订单号
         String orderNo = uniqueOrderNoService.getOrderNo();
         //4.创建租客子订单

@@ -56,7 +56,7 @@ public class AccountDebtNoTService {
      * 抵扣还款  欠款表记录更新
      * @param accountDeductDebt
      */
-    public void deductAccountDebt(AccountDeductDebtReqVO accountDeductDebt) {
+    public AccountDebtEntity deductAccountDebt(AccountDeductDebtReqVO accountDeductDebt) {
         //1 查询用户欠款总和
         AccountDebtEntity accountDebtEntity =  accountDebtMapper.getAccountDebtByMemNo(accountDeductDebt.getMemNo());
         if(Objects.isNull(accountDebtEntity) || Objects.isNull(accountDebtEntity.getId())){
@@ -71,6 +71,7 @@ public class AccountDebtNoTService {
         if(result==0){
             throw new AccountDeductDebtDBException();
         }
+        return accountDebtEntity;
     }
 
     /**

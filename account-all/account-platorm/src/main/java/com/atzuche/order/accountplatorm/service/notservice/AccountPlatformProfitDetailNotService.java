@@ -40,4 +40,20 @@ public class AccountPlatformProfitDetailNotService {
             }
         }
     }
+
+    /**
+     * 平台收益明细 落库
+     * @param accountPlatformProfitDetails
+     */
+    public void insertAccountPlatformProfitDetails(List<AccountPlatformProfitDetailEntity> accountPlatformProfitDetails) {
+        if(!CollectionUtils.isEmpty(accountPlatformProfitDetails)){
+            for(int i =0;i<accountPlatformProfitDetails.size();i++){
+                AccountPlatformProfitDetailEntity entity = accountPlatformProfitDetails.get(i);
+                int result = accountPlatformProfitDetailMapper.insert(entity);
+                if(result==0){
+                    throw new AccountPlatormException();
+                }
+            }
+        }
+    }
 }

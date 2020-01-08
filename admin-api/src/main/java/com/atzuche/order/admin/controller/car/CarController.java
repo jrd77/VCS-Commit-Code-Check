@@ -1,12 +1,13 @@
 package com.atzuche.order.admin.controller.car;
 
+import com.atzuche.order.admin.exception.OrderAdminException;
+import com.atzuche.order.admin.service.car.CarService;
 import com.atzuche.order.admin.vo.req.car.CarBaseInfoReqVO;
 import com.atzuche.order.admin.vo.req.car.CarBaseReqVO;
 import com.atzuche.order.admin.vo.req.car.CarOtherConfigReqVo;
 import com.atzuche.order.admin.vo.resp.car.CarBaseInfoResVo;
 import com.atzuche.order.admin.vo.resp.car.CarBusinessResVO;
 import com.atzuche.order.admin.vo.resp.car.CarOtherConfigResVo;
-import com.atzuche.order.commons.DateUtils;
 import com.autoyol.car.api.exception.BaseException;
 import com.autoyol.car.api.feign.api.CarDetailQueryFeignApi;
 import com.autoyol.car.api.model.vo.CarBaseVO;
@@ -26,7 +27,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
-import java.util.Date;
 import java.util.Objects;
 
 
@@ -34,10 +34,14 @@ import java.util.Objects;
 @AutoDocVersion(version = "车辆信息管理")
 public class CarController {
 
+    private  Logger logger = LoggerFactory.getLogger(getClass());
+
     @Autowired
     private CarDetailQueryFeignApi carDetailQueryFeignApi;
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(CarController.class);
+    @Autowired
+    private CarService carService;
+
 
     @AutoDocMethod(description = "【liujun】获取基础信息", value = "获取车辆基础信息", response = CarBaseInfoResVo.class)
     @GetMapping(value = "/car/baseInfo")
@@ -106,11 +110,11 @@ public class CarController {
 
 
         } catch (BaseException e) {
-            LOGGER.error("获取车辆基本信息异常[{}]", reqVo, e);
+            logger.error("获取车辆基本信息异常[{}]", reqVo, e);
             Cat.logError("获取车辆基本信息异常[{" + reqVo + "}]", e);
             return new ResponseData <>(e.getCode(), e.getMsg());
         } catch (Exception e) {
-            LOGGER.error("获取车辆基本信息异常[{}]", reqVo, e);
+            logger.error("获取车辆基本信息异常[{}]", reqVo, e);
             Cat.logError("获取车辆基本信息异常[{" + reqVo + "}]", e);
         }
         return ResponseData.error();
@@ -145,41 +149,14 @@ public class CarController {
     @PostMapping(value = "/car/bussiness")
     public ResponseData <?> getCarBusiness(@Valid @RequestBody CarBaseReqVO reqVo, BindingResult bindingResult) {
         try {
-            ResponseObject <CarBaseVO> responseObject = carDetailQueryFeignApi.getCarDetailByCarNo(reqVo.getCarNo());
-            if(Objects.isNull(responseObject)){
-                return ResponseData.error();
-            }else if(!Objects.equals(responseObject.getResCode(), ErrorCode.SUCCESS.getCode())){
-                return new ResponseData <>(responseObject.getResCode(), responseObject.getResMsg());
-            }
-            CarBaseVO carBaseVO = responseObject.getData();
-            if(Objects.isNull(carBaseVO)){
-                return ResponseData.success();
-            }
-            CarBusinessResVO resVO = new CarBusinessResVO();
-            resVO.setGetCarAddr(carBaseVO.getGetCarAddr());
-            resVO.setLicenseOwer(carBaseVO.getLicenseOwer());
-            resVO.setLicenseModel(carBaseVO.getLicenseModel());
-            Date licenseExpire = carBaseVO.getLicenseExpire();
-            if(licenseExpire!=null){
-                resVO.setLicenseExpire(DateUtils.formate(licenseExpire, DateUtils.fmt_yyyyMMdd));
-            }
-            Date insuranceExpire = carBaseVO.getInsuranceExpire();
-            if(insuranceExpire!=null){
-                resVO.setInsuranceExpireDateStr(DateUtils.formate(insuranceExpire,DateUtils.fmt_yyyyMMdd));
-            }
-            resVO.setGps(carBaseVO.getGpsNo());
-            resVO.setSimNo(carBaseVO.getSimNo());
-            resVO.setMemo(carBaseVO.getMemo());
-            resVO.setCarRemark(carBaseVO.getCarDesc());//carSelectMap
-            resVO.setGetRevertExplain(carBaseVO.getGetRevertExplain());//carSelectMap
-            resVO.setDayMileage(carBaseVO.getDayMileage());//carSelectMap
-            return ResponseData.success(resVO);
-        } catch (BaseException e) {
-            LOGGER.error("获取车辆运营信息异常[{}]", reqVo, e);
+            CarBusinessResVO carBusiness = carService.getCarBusiness(reqVo.getCarNo());
+            return ResponseData.success(carBusiness);
+        } catch (OrderAdminException e) {
+            logger.error("获取车辆运营信息异常[{}]", reqVo, e);
             Cat.logError("获取车辆运营信息异常[{" + reqVo + "}]", e);
-            return new ResponseData <>(e.getCode(), e.getMsg());
+            return new ResponseData <>(e.getErrorCode(), e.getErrorMsg());
         } catch (Exception e) {
-            LOGGER.error("获取车辆运营信息异常[{}]", reqVo, e);
+            logger.error("获取车辆运营信息异常[{}]", reqVo, e);
             Cat.logError("获取车辆运营信息异常[{" + reqVo + "}]", e);
             return ResponseData.error();
         }
