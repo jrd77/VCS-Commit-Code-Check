@@ -129,7 +129,9 @@ public class SubmitOrderService {
         OwnerMemberDTO ownerMemberDTO = memberService.getOwnerMemberInfo(renterGoodsDetailDTO.getOwnerMemNo());
         reqContext.setOwnerMemberDto(ownerMemberDTO);
         //2.下单校验
-        //2.1库存
+        //2.1库存校验
+
+
         //2.2风控
         Integer riskAuditId = null;
 //        Integer riskAuditId = submitOrderRiskAuditService.check(buildSubmitOrderRiskCheckReqVO(orderReqVO, reqTime));

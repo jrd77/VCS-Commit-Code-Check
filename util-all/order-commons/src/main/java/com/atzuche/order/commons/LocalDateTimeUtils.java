@@ -47,6 +47,21 @@ public class LocalDateTimeUtils {
     }
 
     /**
+     * Date转LocalDateTime
+     *
+     * @param date
+     *            Date对象
+     * @return
+     */
+    public static LocalDate dateToLocalDate(Date date) {
+        if(null == date) {
+            return null;
+        }
+        return date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+    }
+
+
+    /**
      * LocalDateTime转换为Date
      *
      * @param dateTime
@@ -452,7 +467,6 @@ public class LocalDateTimeUtils {
 //        System.out.println(localDateTimeToLong(LocalDateTime.now()));;
         LocalDateTime rentTime = LocalDateTime.of(2020,1,2,12,1,1);
         long l = localDateTimeToLong(rentTime);
-
 
     }
 
