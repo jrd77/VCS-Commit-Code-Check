@@ -43,6 +43,9 @@ import com.atzuche.order.rentercost.entity.dto.OrderCouponDTO;
 import com.atzuche.order.rentermem.service.RenterMemberService;
 import com.atzuche.order.renterorder.service.RenterOrderService;
 import com.atzuche.order.renterorder.vo.*;
+import com.autoyol.car.api.model.dto.LocationDTO;
+import com.autoyol.car.api.model.dto.OrderInfoDTO;
+import com.autoyol.car.api.model.enums.OrderOperationTypeEnum;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -97,7 +100,8 @@ public class SubmitOrderService {
     private RenterCommodityService renterCommodityService;
     @Autowired
     private SubmitOrderRiskAuditService submitOrderRiskAuditService;
-
+    @Autowired
+    private StockService stockService;
 
     /**
      * 提交订单
@@ -131,16 +135,23 @@ public class SubmitOrderService {
         //2.下单校验
         //2.1库存校验
 
+        OrderInfoDTO orderInfoDTO = initOrderInfoDTO(orderReqVO);
+        stockService.checkCarStock(orderInfoDTO);
 
         //2.2风控
         Integer riskAuditId = null;
 //        Integer riskAuditId = submitOrderRiskAuditService.check(buildSubmitOrderRiskCheckReqVO(orderReqVO, reqTime));
+
         //2.3校验链
+        //2.4.生成主订单号
+        String orderNo = uniqueOrderNoService.getOrderNo();
+        //2.5.锁定库存
+        orderInfoDTO.setOrderNo(orderNo);
+        stockService.cutCarStock(orderInfoDTO);
 
         //提前延后时间计算
         CarRentTimeRangeResVO carRentTimeRangeResVO = goodsService.getCarRentTimeRange(buildCarRentTimeRangeReqVO(orderReqVO));
-        //3.生成主订单号
-        String orderNo = uniqueOrderNoService.getOrderNo();
+
         //4.创建租客子订单
         //4.1.生成租客子订单号
         String renterOrderNo = uniqueOrderNoService.getRenterOrderNo(orderNo);
@@ -256,6 +267,36 @@ public class SubmitOrderService {
         OrderResVO orderResVO = new OrderResVO();
         orderResVO.setOrderNo(orderNo);
         return orderResVO;
+    }
+
+    private OrderInfoDTO initOrderInfoDTO(OrderReqVO orderReqVO) {
+        OrderInfoDTO orderInfoDTO = new OrderInfoDTO();
+        orderInfoDTO.setOrderNo(null);
+        orderInfoDTO.setCityCode(Integer.valueOf(orderReqVO.getCityCode()));
+        orderInfoDTO.setCarNo(Integer.valueOf(orderReqVO.getCarNo()));
+        orderInfoDTO.setOldCarNo(null);
+        orderInfoDTO.setStartDate(LocalDateTimeUtils.localDateTimeToDate(orderReqVO.getRentTime()));
+        orderInfoDTO.setEndDate(LocalDateTimeUtils.localDateTimeToDate(orderReqVO.getRevertTime()));
+        orderInfoDTO.setOperationType(OrderOperationTypeEnum.ZCXD.getType());
+
+        LocationDTO getCarAddress = new LocationDTO();
+        getCarAddress.setFlag(0);
+        if(orderReqVO.getSrvGetFlag() == 1){
+            getCarAddress.setFlag(1);
+            getCarAddress.setLat(orderReqVO.getSrvGetLat()==null?0.0:Double.valueOf(orderReqVO.getSrvGetLat()));
+            getCarAddress.setLon(orderReqVO.getSrvGetLon()==null?0.0:Double.valueOf(orderReqVO.getSrvGetLon()));
+            getCarAddress.setCarAddress(orderReqVO.getSrvGetAddr());
+        }
+        LocationDTO returnCarAddress = new LocationDTO();
+        returnCarAddress.setFlag(0);
+        if(orderReqVO.getSrvReturnFlag() == 1){
+            returnCarAddress.setLat(orderReqVO.getSrvReturnLat()==null?0.0:Double.valueOf(orderReqVO.getSrvReturnLat()));
+            returnCarAddress.setLon(orderReqVO.getSrvReturnLon()==null?0.0:Double.valueOf(orderReqVO.getSrvReturnLon()));
+            returnCarAddress.setCarAddress(orderReqVO.getSrvReturnAddr());
+        }
+        orderInfoDTO.setGetCarAddress(getCarAddress);
+        orderInfoDTO.setReturnCarAddress(returnCarAddress);
+        return orderInfoDTO;
     }
 
     private GoodsService.CarDetailReqVO buildCarDetailReqVO(OrderReqVO orderReqVO) {
