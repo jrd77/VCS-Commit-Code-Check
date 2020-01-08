@@ -97,7 +97,7 @@ public class CashierNoTService {
      * 收银台记录应收金额
      */
     public int getPayDeposit(String orderNo,String memNo,String payKind){
-        CashierEntity cashierEntity = cashierMapper.getPayDeposit(orderNo,memNo,payKind,DataPayTypeConstant.PAY_PUR);
+        CashierEntity cashierEntity = cashierMapper.getPayAmtByPayKind(orderNo,memNo,payKind);
         if(Objects.isNull(cashierEntity) || Objects.isNull(cashierEntity.getId())){
             return 0;
         }
@@ -107,21 +107,22 @@ public class CashierNoTService {
         return cashierEntity.getPayAmt() ;
     }
 
+
     /**
      * 收银台支付记录
      */
     public CashierEntity getCashierEntity(String orderNo,String memNo,String payKind){
         CashierEntity cashierEntity = cashierMapper.getPayDeposit(orderNo,memNo,payKind,DataPayTypeConstant.PAY_PUR);
-        if(Objects.isNull(cashierEntity)){
-            cashierEntity = new CashierEntity();
-            cashierEntity.setOrderNo(orderNo);
-            cashierEntity.setMemNo(memNo);
-            cashierEntity.setPayKind(payKind);
-            cashierEntity.setPayType(DataPayTypeConstant.PAY_PUR);
-            cashierEntity.setPaySn(NumberUtils.INTEGER_ONE);
-            cashierEntity.setPayTitle("待支付订单号：" + orderNo);
-            cashierMapper.insert(cashierEntity);
-        }
+//        if(Objects.isNull(cashierEntity)){
+//            cashierEntity = new CashierEntity();
+//            cashierEntity.setOrderNo(orderNo);
+//            cashierEntity.setMemNo(memNo);
+//            cashierEntity.setPayKind(payKind);
+//            cashierEntity.setPayType(DataPayTypeConstant.PAY_PUR);
+//            cashierEntity.setPaySn(NumberUtils.INTEGER_ONE);
+//            cashierEntity.setPayTitle("待支付订单号：" + orderNo);
+//            cashierMapper.insert(cashierEntity);
+//        }
         return cashierEntity;
     }
 
@@ -537,4 +538,6 @@ public class CashierNoTService {
         refundVo.setAtpaySign(sign);
         return refundVo;
     }
+
+
 }
