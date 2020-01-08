@@ -19,7 +19,7 @@ import java.util.Objects;
 
 /**
  * @author 胡春林
- * 配送服务
+ * 配送服务内部服务
  */
 @Service
 public class DeliveryCarService {
@@ -52,7 +52,7 @@ public class DeliveryCarService {
         if (null == orderDeliveryVO) {
             throw new DeliveryOrderException(DeliveryErrorCode.DELIVERY_PARAMS_ERROR);
         }
-        deliveryCarTask.insertDeliveryAddress(getMinutes, returnMinutes, orderDeliveryVO, DeliveryTypeEnum.ADD_TYPE.getValue().intValue());
+        deliveryCarTask.insertRenterDeliveryInfoAndDeliveryAddressInfo(getMinutes, returnMinutes, orderDeliveryVO, DeliveryTypeEnum.ADD_TYPE.getValue().intValue());
         if (orderDeliveryVO.getOrderDeliveryDTO() != null && orderDeliveryVO.getOrderDeliveryDTO().getIsNotifyRenyun().intValue() == UsedDeliveryTypeEnum.USED.getValue().intValue()) {
             RenYunFlowOrderDTO renYunFlowOrder = orderDeliveryVO.getRenYunFlowOrderDTO();
             deliveryCarTask.addRenYunFlowOrderInfo(renYunFlowOrder);
@@ -69,7 +69,7 @@ public class DeliveryCarService {
         OrderDeliveryVO orderDeliveryVO = new OrderDeliveryVO();
         orderDeliveryVO.setOrderDeliveryDTO(updateFlowOrderVO.getOrderDeliveryDTO());
         orderDeliveryVO.setRenterDeliveryAddrDTO(updateFlowOrderVO.getRenterDeliveryAddrDTO());
-        deliveryCarTask.insertDeliveryAddress(null, null, orderDeliveryVO, DeliveryTypeEnum.UPDATE_TYPE.getValue().intValue());
+        deliveryCarTask.insertRenterDeliveryInfoAndDeliveryAddressInfo(null, null, orderDeliveryVO, DeliveryTypeEnum.UPDATE_TYPE.getValue().intValue());
     }
 
     /**
