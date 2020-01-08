@@ -1,6 +1,9 @@
 package com.atzuche.order.coreapi.service;
 
 import com.atzuche.order.coreapi.entity.dto.CancelOrderResDTO;
+import com.atzuche.order.coreapi.entity.vo.req.CarDispatchReqVO;
+import com.atzuche.order.renterorder.service.OrderCouponService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -12,6 +15,12 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 public class OwnerCancelOrderService {
+
+    @Autowired
+    private CarRentalTimeApiService carRentalTimeApiService;
+
+    @Autowired
+    OrderCouponService orderCouponService;
 
     /**
      * 取消处理
@@ -25,7 +34,7 @@ public class OwnerCancelOrderService {
 
         //调度判定
         //todo
-
+        boolean isDispatch = carRentalTimeApiService.checkCarDispatch(null);
         //罚金计算(罚金和收益)
         //todo
 
@@ -41,6 +50,20 @@ public class OwnerCancelOrderService {
 
         return null;
 
+    }
+
+
+
+    public CarDispatchReqVO buildCarDispatchReqVO(){
+
+        CarDispatchReqVO carDispatchReqVO = new CarDispatchReqVO();
+
+        carDispatchReqVO.setType(2);
+
+
+
+
+        return carDispatchReqVO;
     }
 
 

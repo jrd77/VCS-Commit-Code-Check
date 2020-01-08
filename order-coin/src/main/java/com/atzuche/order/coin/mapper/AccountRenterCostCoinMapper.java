@@ -18,12 +18,13 @@ public interface AccountRenterCostCoinMapper{
     AccountRenterCostCoinEntity selectByPrimaryKey(Integer id);
 
     int insert(AccountRenterCostCoinEntity record);
-    
-    int insertSelective(AccountRenterCostCoinEntity record);
-
-    int updateByPrimaryKey(AccountRenterCostCoinEntity record);
-    
-    int updateByPrimaryKeySelective(AccountRenterCostCoinEntity record);
 
     List<AccountRenterCostCoinEntity> getAccountRenterCostCoins(@Param("orderNo") String orderNo, @Param("memNo") String memNo);
+
+    /**
+     * 获取某个订单的凹凸币使用的总量
+     * @param orderNo
+     * @return
+     */
+    int getAccountRenterCostCoinTotal(@Param("orderNo") String orderNo);
 }

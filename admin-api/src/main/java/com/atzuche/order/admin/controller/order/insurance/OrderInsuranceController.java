@@ -7,6 +7,7 @@ import com.atzuche.order.admin.dto.InsurancePurchaseDTO;
 import com.atzuche.order.admin.dto.InsurancePurchaseResultDTO;
 import com.atzuche.order.admin.dto.OrderInsuranceAdditionRequestDTO;
 import com.atzuche.order.admin.dto.OrderInsuranceImportRequestDTO;
+import com.atzuche.order.admin.enums.InsuranceCompanyTypeEnum;
 import com.atzuche.order.admin.util.CommonUtils;
 import com.atzuche.order.admin.util.oss.OSSUtils;
 import com.atzuche.order.admin.vo.req.insurance.OrderInsuranceAdditionRequestVO;
@@ -88,6 +89,7 @@ public class OrderInsuranceController {
             //属性拷贝
             BeanUtils.copyProperties(orderInsuranceAdditionRequestVO,orderInsuranceAdditionRequestDTO);
             //获取操作人
+            orderInsuranceAdditionRequestDTO.setInsuranceCompany(InsuranceCompanyTypeEnum.getDescriptionByType(orderInsuranceAdditionRequestVO.getInsuranceCompanyType()));
             orderInsuranceAdditionRequestDTO.setOperator(AdminUserUtil.getAdminUser().getAuthName());
             orderInsuranceAdditionRequestDTO.setInsuranceDate(DateUtils.formate(LocalDateTime.now(),DateUtils.DATE_DEFAUTE_4));
             ResponseEntity<String> responseEntity = restTemplate.postForEntity(insurancePurchaseUrl + ADD_PURCHASE, orderInsuranceAdditionRequestDTO, String.class);

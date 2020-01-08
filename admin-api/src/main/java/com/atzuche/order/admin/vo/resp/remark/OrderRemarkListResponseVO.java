@@ -1,10 +1,11 @@
 package com.atzuche.order.admin.vo.resp.remark;
 
 import com.autoyol.doc.annotation.AutoDocProperty;
+import lombok.Data;
+import lombok.ToString;
 
-/**
- * Created by qincai.lin on 2020/1/2.
- */
+@Data
+@ToString
 public class OrderRemarkListResponseVO {
 
     @AutoDocProperty(value = "备注id")
@@ -31,69 +32,5 @@ public class OrderRemarkListResponseVO {
     @AutoDocProperty(value = "备注内容")
     private String remarkContent;
 
-
-    public String getRemarkType() {
-        return remarkType;
-    }
-
-    public void setRemarkType(String remarkType) {
-        this.remarkType = remarkType;
-    }
-
-    public String getNumber() {
-        return number;
-    }
-
-    public void setNumber(String number) {
-        this.number = number;
-    }
-
-    public String getDepartmentName() {
-        return departmentName;
-    }
-
-    public void setDepartmentName(String departmentName) {
-        this.departmentName = departmentName;
-    }
-
-    public String getOperatorName() {
-        return operatorName;
-    }
-
-    public void setOperatorName(String operatorName) {
-        this.operatorName = operatorName;
-    }
-
-    public String getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(String createTime) {
-        this.createTime = createTime;
-    }
-
-    public String getUpdateTime() {
-        return updateTime;
-    }
-
-    public void setUpdateTime(String updateTime) {
-        this.updateTime = updateTime;
-    }
-
-    public String getRemarkContent() {
-        return remarkContent;
-    }
-
-    public void setRemarkContent(String remarkContent) {
-        this.remarkContent = remarkContent;
-    }
-
-    public String getRemarkId() {
-        return remarkId;
-    }
-
-    public void setRemarkId(String remarkId) {
-        this.remarkId = remarkId;
-    }
 
 }
