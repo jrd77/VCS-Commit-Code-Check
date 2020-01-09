@@ -73,7 +73,11 @@ public class OrderRemarkLogService {
         OrderRemarkLogPageListResponseVO orderRemarkLogPageListResponseVO = new OrderRemarkLogPageListResponseVO();
         List<OrderRemarkLogListResponseVO> orderRemarkPageList = new ArrayList<>();
         long count = orderRemarkLogMapper.selectRemarkLogListCount(orderRemarkLogListRequestVO);
-        OrderRemarkLogListRequestDTO orderRemarkLogListRequestDTO = new OrderRemarkLogListRequestDTO(count);
+        String pageNumber = orderRemarkLogListRequestVO.getPageNumber();
+        if(null == pageNumber){
+            pageNumber = "1";
+        }
+        OrderRemarkLogListRequestDTO orderRemarkLogListRequestDTO = new OrderRemarkLogListRequestDTO(Long.parseLong(pageNumber), count);
         BeanUtils.copyProperties(orderRemarkLogListRequestVO, orderRemarkLogListRequestDTO);
         List<OrderRemarkLogEntity> remarkList = orderRemarkLogMapper.selectRemarkLogList(orderRemarkLogListRequestDTO);
         if(!CollectionUtils.isEmpty(remarkList)) {

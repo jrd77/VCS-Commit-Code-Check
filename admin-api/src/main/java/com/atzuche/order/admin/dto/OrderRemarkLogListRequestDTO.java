@@ -9,8 +9,8 @@ import lombok.ToString;
 @ToString
 public class OrderRemarkLogListRequestDTO extends PageBean{
 
-    public OrderRemarkLogListRequestDTO(long total){
-        super(total, 10);
+    public OrderRemarkLogListRequestDTO(long total,long pageNumber){
+        super(pageNumber, total, 10);
     }
     @AutoDocProperty(value = "订单号")
     private String orderNo;
