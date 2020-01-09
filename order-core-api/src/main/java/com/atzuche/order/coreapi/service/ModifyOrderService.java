@@ -1234,9 +1234,7 @@ public class ModifyOrderService {
 						changeCodeList.contains(OrderChangeItemEnum.MODIFY_SRVRETURNFLAG.getCode()))) {
 			return;
 		}
-		UpdateOrderDeliveryVO updateFlowOrderVO = null;
-		//FIXME:
-				//new UpdateOrderDeliveryVO();
+		UpdateOrderDeliveryVO updateFlowOrderVO = new UpdateOrderDeliveryVO();
 		// 配送地址
 		RenterDeliveryAddrDTO deliveryAddr = getRenterDeliveryAddrDTO(modifyOrderDTO);
 		updateFlowOrderVO.setRenterDeliveryAddrDTO(deliveryAddr);
@@ -1329,7 +1327,7 @@ public class ModifyOrderService {
 		returnDelivery.setOrderNo(modifyOrderDTO.getOrderNo());
 		returnDelivery.setRenterOrderNo(modifyOrderDTO.getRenterOrderNo());
 		returnDelivery.setType(SrvGetReturnEnum.SRV_RETURN_TYPE.getCode());
-		delivMap.put(SrvGetReturnEnum.SRV_RETURN_TYPE.getCode(), getDelivery);
+		delivMap.put(SrvGetReturnEnum.SRV_RETURN_TYPE.getCode(), returnDelivery);
 		return delivMap;
 	}
 	
