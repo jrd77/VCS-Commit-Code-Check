@@ -107,7 +107,6 @@ public class OwnerRefuseOrderService {
             renterOrderService.updateRenterOrderChildStatus(renterOrderEntity.getId(),
                     RenterChildStatusEnum.END.getCode());
 
-
             //撤销优惠券
             //退还优惠券(平台券+送取服务券)
             couponAndCoinHandleService.undoPlatformCoupon(reqVO.getOrderNo());
