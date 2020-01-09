@@ -28,4 +28,7 @@ public class RenterWzDetailResVO {
     @AutoDocProperty(value="费用详情")
     private List<RenterWzCostDetailResVO> costDetails;
 
+    @AutoDocProperty("暂扣返还日志")
+    private List<TemporaryRefundLogResVO> temporaryRefundLogs;
+
 }
