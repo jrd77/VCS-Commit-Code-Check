@@ -17,8 +17,6 @@ public interface CashierBindCardMapper{
 
     List<CashierBindCardEntity> selectALL();
 
-    int insert(CashierBindCardEntity record);
-    
     int insertSelective(CashierBindCardEntity record);
 
     int updateByPrimaryKey(CashierBindCardEntity record);

@@ -66,62 +66,61 @@
 		select <include refid="Base_Column_List" /> from cashier_refund_apply where id = #{value}
 	</select>
 
-	<insert id="insert" parameterType="com.atzuche.order.cashieraccount.entity.CashierRefundApplyEntity" useGeneratedKeys="true" keyProperty="id">
-		insert into cashier_refund_apply
-		(
-				`mem_no`,		
-				`order_no`,		
-				`source_code`,		
-				`source_detail`,		
-				`atapp_id`,		
-				`pay_kind`,		
-				`pay_type`,		
-				`pay_source`,		
-				`amt`,		
-				`status`,		
-				`qn`,		
-				`unique_no`,		
-				`flag`,		
-				`type`,		
-				`num`,		
-				`pay_md5`,		
-				`remake`,		
-				`dept_name`,		
-				`create_time`,		
-				`create_op`,		
-				`update_time`,		
-				`update_op`,		
-				`version`,		
-				`is_delete`		
-			)
-		values
-		(
-				#{memNo}, 		
-				#{orderNo}, 		
-				#{sourceCode}, 		
-				#{sourceDetail}, 		
-				#{atappId}, 		
-				#{payKind}, 		
-				#{payType}, 		
-				#{paySource}, 		
-				#{amt}, 		
-				#{status}, 		
-				#{qn}, 		
-				#{uniqueNo}, 		
-				#{flag}, 		
-				#{type}, 		
-				#{num}, 		
-				#{payMd5}, 		
-				#{remake}, 		
-				#{deptName}, 		
-				#{createTime}, 		
-				#{createOp}, 		
-				#{updateTime}, 		
-				#{updateOp}, 		
-				#{version}, 		
-				#{isDelete}		
-			)
-	</insert>
+    <insert id="insertSelective" parameterType="com.atzuche.order.cashieraccount.entity.CashierRefundApplyEntity" useGeneratedKeys="true" keyProperty="id">
+        insert into cashier_refund_apply
+        <trim prefix="(" suffix=")" suffixOverrides="," >
+            <if test="memNo != null">`mem_no`, </if>
+            <if test="orderNo != null">`order_no`, </if>
+            <if test="sourceCode != null">`source_code`, </if>
+            <if test="sourceDetail != null">`source_detail`, </if>
+            <if test="atappId != null">`atapp_id`, </if>
+            <if test="payKind != null">`pay_kind`, </if>
+            <if test="payType != null">`pay_type`, </if>
+            <if test="paySource != null">`pay_source`, </if>
+            <if test="amt != null">`amt`, </if>
+            <if test="status != null">`status`, </if>
+            <if test="qn != null">`qn`, </if>
+            <if test="uniqueNo != null">`unique_no`, </if>
+            <if test="flag != null">`flag`, </if>
+            <if test="type != null">`type`, </if>
+            <if test="num != null">`num`, </if>
+            <if test="payMd5 != null">`pay_md5`, </if>
+            <if test="remake != null">`remake`, </if>
+            <if test="deptName != null">`dept_name`, </if>
+            <if test="createTime != null">`create_time`, </if>
+            <if test="createOp != null">`create_op`, </if>
+            <if test="updateTime != null">`update_time`, </if>
+            <if test="updateOp != null">`update_op`, </if>
+            <if test="version != null">`version`, </if>
+            <if test="isDelete != null">`is_delete` </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides="," >
+            <if test="memNo != null">#{memNo},  </if>
+            <if test="orderNo != null">#{orderNo},  </if>
+            <if test="sourceCode != null">#{sourceCode},  </if>
+            <if test="sourceDetail != null">#{sourceDetail},  </if>
+            <if test="atappId != null">#{atappId},  </if>
+            <if test="payKind != null">#{payKind},  </if>
+            <if test="payType != null">#{payType},  </if>
+            <if test="paySource != null">#{paySource},  </if>
+            <if test="amt != null">#{amt},  </if>
+            <if test="status != null">#{status},  </if>
+            <if test="qn != null">#{qn},  </if>
+            <if test="uniqueNo != null">#{uniqueNo},  </if>
+            <if test="flag != null">#{flag},  </if>
+            <if test="type != null">#{type},  </if>
+            <if test="num != null">#{num},  </if>
+            <if test="payMd5 != null">#{payMd5},  </if>
+            <if test="remake != null">#{remake},  </if>
+            <if test="deptName != null">#{deptName},  </if>
+            <if test="createTime != null">#{createTime},  </if>
+            <if test="createOp != null">#{createOp},  </if>
+            <if test="updateTime != null">#{updateTime},  </if>
+            <if test="updateOp != null">#{updateOp},  </if>
+            <if test="version != null">#{version},  </if>
+            <if test="isDelete != null">#{isDelete} </if>
+        </trim>
+    </insert>
 
 	 
 	<update id="updateByPrimaryKeySelective" parameterType="com.atzuche.order.cashieraccount.entity.CashierRefundApplyEntity">
