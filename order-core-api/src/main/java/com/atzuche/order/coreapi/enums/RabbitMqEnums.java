@@ -11,7 +11,9 @@ public enum  RabbitMqEnums {
     WZ_PRICE("auto-order-center-wz","order.center.wz.price","order.center.wz.price.queue"),
     WZ_VOUCHER("auto-order-center-wz","order.center.wz.voucher","order.center.wz.voucher.queue"),
     WZ_FEEDBACK("auto-order-center-wz","order.center.wz.feedback","order.center.wz.feedback.queue"),
-    WZ_RESULT_FEEDBACK("auto-order-center-wz","order.center.wz.result.feedback","order.center.wz.result.feedback.queue");
+    WZ_RESULT_FEEDBACK("auto-order-center-wz","order.center.wz.result.feedback","order.center.wz.result.feedback.queue"),
+    WZ_CHE_LE_HANG_INFO("auto-order-center-wz","order.center.wz.che.le.hang.info","order.center.wz.che.le.hang.info.queue"),
+    WZ_DE_RUN_CITIES("auto-order-center-wz","order.center.wz.cities","order.center.wz.cities.queue");
 
     private String exchange;
 

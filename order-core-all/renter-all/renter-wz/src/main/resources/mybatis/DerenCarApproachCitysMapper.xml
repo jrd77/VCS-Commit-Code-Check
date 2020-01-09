@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.atzuche.order.renterwz.mapper.DerenCarApproachCitysMapper">
+	<sql id="select_column">
+		id,plate_num,sim_no,order_no,mem_no,start_time,end_time,cities,create_time,update_time
+	</sql>
+
+	<resultMap id = "selectColumnMap" type="com.atzuche.order.renterwz.entity.DerenCarApproachCitysEntity">
+		<result property="id" column="id"/>
+		<result property="plateNum" column="plate_num"/>
+		<result property="simNo" column="sim_no"/>
+		<result property="orderNo" column="order_no"/>
+		<result property="memNo" column="mem_no"/>
+		<result property="startTime" column="start_time"/>
+		<result property="endTime" column="end_time"/>
+		<result property="cities" column="cities"/>
+		<result property="createTime" column="create_time"/>
+		<result property="updateTime" column="update_time"/>
+	</resultMap>
+
+	<insert id="saveDerenCarApproachCitys" parameterType="com.atzuche.order.renterwz.entity.DerenCarApproachCitysEntity" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+		insert into deren_car_approach_citys(
+			plate_num,
+			sim_no,
+			order_no,
+			mem_no,
+			start_time,
+			end_time,
+			cities,
+			create_time
+		) values (
+			#{plateNum},
+			#{simNo},
+			#{orderNo},
+			#{memNo},
+			#{startTime},
+			#{endTime},
+			#{cities},
+			NOW())
+	</insert>
+
+	<select id="queryDerenCarApproachCitysById" resultType="com.atzuche.order.renterwz.entity.DerenCarApproachCitysEntity">
+		select <include refid="select_column" />
+		from deren_car_approach_citys
+		where id = #{id}
+	</select>
+
+	<select id="queryList" resultType="com.atzuche.order.renterwz.entity.DerenCarApproachCitysEntity">
+		select <include refid="select_column" />
+		from deren_car_approach_citys
+	</select>
+
+	 <update id="updateDerenCarApproachCitys" parameterType="com.atzuche.order.renterwz.entity.DerenCarApproachCitysEntity">
+		update deren_car_approach_citys set
+		<if test="plateNum != null">
+			plate_num = #{plateNum},
+		</if>
+		<if test="simNo != null">
+			sim_no = #{simNo},
+		</if>
+		<if test="orderNo != null">
+			order_no = #{orderNo},
+		</if>
+		<if test="memNo != null">
+			mem_no = #{memNo},
+		</if>
+		<if test="startTime != null">
+			start_time = #{startTime},
+		</if>
+		<if test="endTime != null">
+			end_time = #{endTime},
+		</if>
+		<if test="cities != null">
+			cities = #{cities},
+		</if>
+		<if test="createTime != null">
+			create_time = #{createTime},
+		</if>
+		update_time = NOW()
+		where id = #{id}
+	</update>
+
+</mapper>
