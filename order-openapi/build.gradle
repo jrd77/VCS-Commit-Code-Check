@@ -16,7 +16,7 @@ apply plugin: 'war'
 
 mainClassName = 'com.autoyol.doc.parser.autodoc.AutoDocParser'
 dependencies {
-
+    compile project(":util-all:order-commons")
 }
 publishing {
     publications {

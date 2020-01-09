@@ -1,4 +1,4 @@
-package com.atzuche.order.open.dto;
+package com.atzuche.order.commons.entity.orderDetailDto;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;

@@ -1,7 +1,8 @@
 package com.atzuche.order.open.service;
 
-import com.atzuche.order.open.dto.OrderDetailReqDTO;
-import com.atzuche.order.open.dto.OrderDetailRespDTO;
+
+import com.atzuche.order.commons.entity.orderDetailDto.OrderDetailReqDTO;
+import com.atzuche.order.commons.entity.orderDetailDto.OrderDetailRespDTO;
 import com.autoyol.commons.web.ResponseData;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.web.bind.annotation.RequestBody;
