@@ -23,7 +23,7 @@
         SELECT remark_type, COUNT(*) AS typeCount FROM trans_remark where order_no = #{orderNo} GROUP BY remark_type
     </select>
 
-    <insert id="addOrderRemark" parameterType="com.atzuche.order.admin.entity.OrderInsuranceAdditionRequestEntity">
+    <insert id="addOrderRemark" parameterType="com.atzuche.order.admin.entity.OrderRemarkEntity">
         insert into trans_remark
 		(
 			`order_no`,
@@ -42,7 +42,7 @@
 		values
 		(
 			#{orderNo},
-			SELECT IFNULL(MAX(number)+1,1) FROM trans_remark WHERE order_no = #{orderNo},
+			#{number},
 			#{remarkType},
 			#{remarkContent},
 			#{limitDelayed},
@@ -55,6 +55,11 @@
 			#{departmentId}
 		)
     </insert>
+
+	<select id="getRemarkNumber" resultType="String">
+		SELECT IFNULL(MAX(number)+1,1) FROM trans_remark WHERE order_no = #{orderNo}
+	</select>
+
 
 	<select id="getOrderRemarkInformation" resultMap="orderRemarkInformationMap">
 		SELECT id, dept_id, remark, remark_type FROM trans_remark where id = #{remarkId}

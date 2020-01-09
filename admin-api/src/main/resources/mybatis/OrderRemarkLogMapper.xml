@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.atzuche.order.admin.mapper.OrderRemarkLogMapper">
+
+    <resultMap id="orderRemarkOverviewMap" type="com.atzuche.order.admin.entity.OrderRemarkOverviewEntity" >
+        <result property="remarkType" column="remark_type"/>
+        <result property="typeCount" column="typeCount"/>
+    </resultMap>
+
+	<resultMap id="orderRemarkInformationMap" type="com.atzuche.order.admin.entity.OrderRemarkEntity" >
+		<result property="remarkType" column="remark_type"/>
+		<result property="remarkContent" column="remark"/>
+		<result property="departmentId" column="dept_id"/>
+		<result property="remarkId" column="id"/>
+		<result property="number" column="number"/>
+		<result property="updateOp" column="update_op"/>
+		<result property="createTime" column="create_time"/>
+		<result property="updateTime" column="update_time"/>
+	</resultMap>
+
+
+    <insert id="addOrderRemarkLog" parameterType="com.atzuche.order.admin.entity.OrderRemarkEntity">
+        insert into trans_remark
+		(
+			`order_no`,
+			`number`,
+			`remark_type`,
+			`remark`,
+			`limit_delayed`,
+			`follow_status`,
+			`follow_fail_reason`,
+			`create_time`,
+			`create_op`,
+			`update_time`,
+			`update_op`,
+			`dept_id`
+		)
+		values
+		(
+			#{orderNo},
+			SELECT IFNULL(MAX(number)+1,1) FROM trans_remark WHERE order_no = #{orderNo},
+			#{remarkType},
+			#{remarkContent},
+			#{limitDelayed},
+			#{followStatus},
+			#{followFailReason},
+			#{createTime},
+			#{createOp},
+			#{updateTime},
+			#{updateOp},
+			#{departmentId}
+		)
+    </insert>
+
+
+
+
+
+
+  	
+</mapper>

@@ -1,9 +1,6 @@
 package com.atzuche.order.admin.service.remark;
 
-import com.atzuche.order.admin.common.AdminUser;
 import com.atzuche.order.admin.common.AdminUserUtil;
-import com.atzuche.order.admin.dto.OrderRemarkAdditionRequestDTO;
-import com.atzuche.order.admin.entity.OrderInsuranceAdditionRequestEntity;
 import com.atzuche.order.admin.entity.OrderRemarkEntity;
 import com.atzuche.order.admin.entity.OrderRemarkOverviewEntity;
 import com.atzuche.order.admin.enums.DepartmentEnum;
@@ -25,6 +22,7 @@ import java.util.List;
 @Service
 public class OrderRemarkService {
 
+    public static final String DELETE_FLAG = "1";
     private static final Logger logger = LoggerFactory.getLogger(OrderRemarkService.class);
 
     @Autowired
@@ -56,9 +54,14 @@ public class OrderRemarkService {
      * @param orderRemarkAdditionRequestVO
      */
     public void addOrderRemark(OrderRemarkAdditionRequestVO orderRemarkAdditionRequestVO) {
-        OrderInsuranceAdditionRequestEntity orderInsuranceAdditionRequestEntity = new OrderInsuranceAdditionRequestEntity();
-        BeanUtils.copyProperties(orderRemarkAdditionRequestVO,orderInsuranceAdditionRequestEntity);
-        orderRemarkMapper.addOrderRemark(orderInsuranceAdditionRequestEntity);
+        OrderRemarkEntity orderRemarkEntity = new OrderRemarkEntity();
+        BeanUtils.copyProperties(orderRemarkAdditionRequestVO,orderRemarkEntity);
+        String number = orderRemarkMapper.getRemarkNumber(orderRemarkAdditionRequestVO);
+        orderRemarkEntity.setNumber(number);
+        String userName = AdminUserUtil.getAdminUser().getAuthName();
+        orderRemarkEntity.setCreateOp(userName);
+        orderRemarkEntity.setUpdateOp(userName);
+        orderRemarkMapper.addOrderRemark(orderRemarkEntity);
     }
 
     public OrderRemarkResponseVO getOrderRemarkInformation(OrderRemarkInformationRequestVO orderRemarkInformationRequestVO){
@@ -87,7 +90,7 @@ public class OrderRemarkService {
     public void deleteRemarkById( OrderRemarkDeleteRequestVO orderRemarkDeleteRequestVO){
         OrderRemarkEntity orderRemarkEntity = new OrderRemarkEntity();
         BeanUtils.copyProperties(orderRemarkDeleteRequestVO,orderRemarkEntity);
-        orderRemarkEntity.setIsDelete("1");
+        orderRemarkEntity.setIsDelete(DELETE_FLAG);
         orderRemarkEntity.setUpdateOp(AdminUserUtil.getAdminUser().getAuthName());
         orderRemarkMapper.updateRemarkById(orderRemarkEntity);
     }

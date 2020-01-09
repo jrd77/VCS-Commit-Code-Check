@@ -8,6 +8,9 @@ import lombok.ToString;
 @ToString
 public class OrderRemarkEntity {
 
+    @AutoDocProperty(value = "订单号")
+    private String orderNo;
+
     @AutoDocProperty(value = "备注id")
     private String remarkId;
 
@@ -23,6 +26,9 @@ public class OrderRemarkEntity {
     @AutoDocProperty(value = "备注内容")
     private String remarkContent;
 
+    @AutoDocProperty(value = "创建人")
+    private String createOp;
+
     @AutoDocProperty(value = "操作人")
     private String updateOp;
 
@@ -34,6 +40,16 @@ public class OrderRemarkEntity {
 
     @AutoDocProperty(value = "修改时间")
     private String updateTime;
+
+    @AutoDocProperty(value = "是否限制租客延时")
+    private String limitDelayed;
+
+    @AutoDocProperty(value = "跟进状态")
+    private String followStatus;
+
+    @AutoDocProperty(value = "跟进失败原因")
+    private String followFailReason;
+
 
 
 
