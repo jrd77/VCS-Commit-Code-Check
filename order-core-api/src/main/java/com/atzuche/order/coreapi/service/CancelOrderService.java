@@ -91,13 +91,13 @@ public class CancelOrderService {
         }
 
         //消息发送
-        //todo
+        //TODO:发送订单取消事件
 
     }
 
 
     public void check() {
-        //todo
+        //TODO:订单取消公共校验
 
     }
 
