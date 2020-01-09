@@ -3,9 +3,13 @@ package com.atzuche.order.cashieraccount.service;
 import com.atzuche.order.accountownercost.entity.AccountOwnerCostSettleDetailEntity;
 import com.atzuche.order.accountownercost.service.AccountOwnerCostSettleService;
 import com.atzuche.order.accountownercost.service.notservice.AccountOwnerCostSettleDetailNoTService;
+import com.atzuche.order.accountrenterdeposit.vo.res.AccountRenterDepositResVO;
 import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostSettleDetailEntity;
+import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostSettleEntity;
 import com.atzuche.order.accountrenterrentcost.service.notservice.AccountRenterCostSettleDetailNoTService;
+import com.atzuche.order.accountrenterrentcost.service.notservice.AccountRenterCostSettleNoTService;
 import com.atzuche.order.accountrenterrentcost.vo.req.AccountRenterCostChangeReqVO;
+import com.atzuche.order.accountrenterwzdepost.vo.res.AccountRenterWZDepositResVO;
 import com.atzuche.order.commons.enums.OrderPayStatusEnum;
 import com.atzuche.order.commons.enums.OrderStatusEnum;
 import com.atzuche.order.commons.enums.RenterCashCodeEnum;
@@ -83,6 +87,7 @@ public class CashierService {
     @Autowired private AccountRenterCostSettleDetailNoTService accountRenterCostSettleDetailNoTService;
     @Autowired private AccountOwnerCostSettleDetailNoTService accountOwnerCostSettleDetailNoTService;
     @Autowired private OrderStatusService orderStatusService;
+    @Autowired private AccountRenterCostSettleNoTService accountRenterCostSettleNoTService;
 
 
     /**  *************************************** 租车费用 start****************************************************/
@@ -92,6 +97,9 @@ public class CashierService {
      */
     public void insertRenterCost(CreateOrderRenterCostReqVO createOrderRenterCost){
         cashierNoTService.insertRenterCost(createOrderRenterCost);
+    }
+    public AccountRenterCostSettleEntity getAccountRenterCostSettle(String orderNo, String memNo){
+       return accountRenterCostSettleNoTService.getCostPaidRentSettle(orderNo,memNo);
     }
 
     /**  *************************************** 租车费用 end****************************************************/
@@ -125,6 +133,12 @@ public class CashierService {
      */
     public boolean isPayOffForRenterDeposit(String orderNo, String memNo){
        return accountRenterDepositService.isPayOffForRenterDeposit(orderNo, memNo);
+    }
+    /**
+     * 查询应收车辆押金
+     */
+    public AccountRenterDepositResVO getRenterDepositEntity(String orderNo, String memNo){
+        return accountRenterDepositService.getAccountRenterDepositEntity(orderNo, memNo);
     }
     /**
      * 查询应收车辆押金
@@ -166,10 +180,17 @@ public class CashierService {
         return accountRenterWzDepositService.isPayOffForRenterWZDeposit(orderNo, memNo);
     }
     /**
-     * 查询违章押金余额
+     * 查询违章押金
      */
     public int getRenterWZDeposit(String orderNo, String memNo){
         return accountRenterWzDepositService.getRenterWZDeposit(orderNo, memNo);
+    }
+
+    /**
+     * 查询违章押金余额
+     */
+    public AccountRenterWZDepositResVO getRenterWZDepositEntity(String orderNo, String memNo){
+        return accountRenterWzDepositService.getAccountRenterWZDeposit(orderNo, memNo);
     }
 
     /**  ***************************************** 违章押金 end *************************************************     */
