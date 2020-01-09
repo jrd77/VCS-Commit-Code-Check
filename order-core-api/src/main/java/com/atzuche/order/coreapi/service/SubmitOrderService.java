@@ -436,7 +436,7 @@ public class SubmitOrderService {
         renterOrderReqVO.setIsNew(null == renterMember.getIsNew() || renterMember.getIsNew() == 0);
         renterOrderReqVO.setRenterMemberRightDTOList(renterMember.getRenterMemberRightDTOList());
         renterOrderReqVO.setCommUseDriverList(renterMember.getCommUseDriverList());
-
+        renterOrderReqVO.setReplyFlag(goodsDetail.getReplyFlag());
         LOGGER.info("Build renter order reqVO,result is ,renterOrderReqVO:[{}]",
                 JSON.toJSONString(renterOrderReqVO));
         return renterOrderReqVO;
