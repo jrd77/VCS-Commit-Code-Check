@@ -50,6 +50,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
@@ -78,6 +79,8 @@ public class CashierNoTService {
     AccountRenterWzDepositService accountRenterWzDepositService;
     @Autowired
     AccountRenterCostSettleService accountRenterCostSettleService;
+    @Value("${env_t}")
+    private String env;
 
 
     /**
@@ -341,7 +344,7 @@ public class CashierNoTService {
         vo.setOpenId(orderPaySign.getOpenId());
         vo.setReqOs(orderPaySign.getReqOs());
         vo.setPayAmt(String.valueOf(Math.abs(amt)));
-        vo.setPayEnv(getPayEnv());
+        vo.setPayEnv(env);
         int id = Objects.isNull(cashierEntity.getId())?0:cashierEntity.getId();
         vo.setPayId(String.valueOf(id));
         vo.setPayKind(payKind);
@@ -354,18 +357,7 @@ public class CashierNoTService {
         return vo;
     }
 
-    /**
-     * 获取支付环境
-     * @return
-     */
-    public String getPayEnv(){
-        String m_env = System.getProperty("env");
-        m_env = StringUtil.isBlank(m_env)?System.getProperty("ENV"):m_env;
-        if(StringUtil.isBlank(m_env)){
-            return "";
-        }
-        return PayPayEnvEnum.getFlagText(m_env.toUpperCase());
-    }
+
 
     /**
      * 租车押金 收银台回调
