@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.Date;
+import java.util.List;
 
 /**
  * RenterOrderWzCostDetailService
@@ -82,5 +83,9 @@ public class RenterOrderWzCostDetailService {
 
     public void saveRenterOrderWzCostDetail(RenterOrderWzCostDetailEntity renterOrderWzCostDetail){
         renterOrderWzCostDetailMapper.saveRenterOrderWzCostDetail(renterOrderWzCostDetail);
+    }
+
+    public List<RenterOrderWzCostDetailEntity> queryInfosByOrderNo(String orderNo) {
+        return renterOrderWzCostDetailMapper.queryInfosByOrderNo(orderNo);
     }
 }
