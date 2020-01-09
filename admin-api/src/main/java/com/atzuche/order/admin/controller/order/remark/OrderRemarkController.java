@@ -1,9 +1,12 @@
 package com.atzuche.order.admin.controller.order.remark;
 
-import com.atzuche.order.admin.controller.order.insurance.OrderInsuranceController;
+import com.atzuche.order.admin.service.remark.OrderRemarkLogService;
 import com.atzuche.order.admin.service.remark.OrderRemarkService;
 import com.atzuche.order.admin.vo.req.remark.*;
-import com.atzuche.order.admin.vo.resp.remark.*;
+import com.atzuche.order.admin.vo.resp.remark.OrderRemarkLogPageListResponseVO;
+import com.atzuche.order.admin.vo.resp.remark.OrderRemarkOverviewListResponseVO;
+import com.atzuche.order.admin.vo.resp.remark.OrderRemarkPageListResponseVO;
+import com.atzuche.order.admin.vo.resp.remark.OrderRemarkResponseVO;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.doc.annotation.AutoDocMethod;
 import com.autoyol.doc.annotation.AutoDocVersion;
@@ -23,6 +26,9 @@ public class OrderRemarkController {
 
     @Autowired
     OrderRemarkService orderRemarkService;
+
+    @Autowired
+    OrderRemarkLogService orderLogRemarkService;
 
 	@AutoDocMethod(description = "备注总览", value = "备注总览", response = OrderRemarkOverviewListResponseVO.class)
 	@GetMapping("/overview")
@@ -45,7 +51,7 @@ public class OrderRemarkController {
     @AutoDocMethod(description = "备注日志查询列表", value = "备注日志查询列表", response = OrderRemarkLogPageListResponseVO.class)
     @GetMapping("/log/list")
     public ResponseData<OrderRemarkLogPageListResponseVO> logList(OrderRemarkLogListRequestVO orderRemarkLogListRequestVO, BindingResult bindingResult) {
-        return ResponseData.success(null);
+        return ResponseData.success(orderLogRemarkService.selectRemarkLoglist(orderRemarkLogListRequestVO));
     }
 
 
