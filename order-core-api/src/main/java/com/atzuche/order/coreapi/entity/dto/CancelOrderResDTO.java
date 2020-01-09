@@ -13,6 +13,11 @@ import lombok.Data;
 public class CancelOrderResDTO {
 
     /**
+     * 是否通知退款
+     */
+    private Boolean isRefund;
+
+    /**
      * 租客订单号
      */
     private String renterOrderNo;
@@ -36,5 +41,10 @@ public class CancelOrderResDTO {
      * 租车费用支付状态
      */
     private Integer rentCarPayStatus;
+
+    /**
+     * 车辆注册号
+     */
+    private Integer carNo;
 
 }

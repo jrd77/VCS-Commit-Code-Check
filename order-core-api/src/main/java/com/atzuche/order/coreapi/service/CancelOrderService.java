@@ -37,6 +37,9 @@ public class CancelOrderService {
     @Autowired
     private OrderSettleService orderSettleService;
 
+    @Autowired
+    private StockService stockService;
+
     /**
      * 订单取消
      *
@@ -69,9 +72,16 @@ public class CancelOrderService {
             couponAndCoinHandleService.undoOwnerCoupon(cancelOrderReqVO.getOrderNo(), res.getOwnerCouponNo(), recover);
         }
 
+        //扣库存
+        if(null != res) {
+            stockService.releaseCarStock(cancelOrderReqVO.getOrderNo(), res.getCarNo());
+        }
+
         //通知收银台退款
-        //todo
-        orderSettleService.settleOrderCancel(cancelOrderReqVO.getOrderNo());
+        if(null != res && null != res.getIsRefund() && res.getIsRefund()) {
+            orderSettleService.settleOrderCancel(cancelOrderReqVO.getOrderNo());
+        }
+
         //通知流程系统
         //todo
 

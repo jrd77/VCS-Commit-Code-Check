@@ -107,12 +107,17 @@ public class RenterCancelOrderService {
         renterOrderFineDeatailService.saveRenterOrderFineDeatail(renterOrderFineDeatailEntity);
         consoleOwnerOrderFineDeatailService.addFineRecord(consoleOwnerOrderFineDeatailEntity);
 
+
+
+
         //返回信息处理
         CancelOrderResDTO cancelOrderResDTO = new CancelOrderResDTO();
         cancelOrderResDTO.setIsReturnDisCoupon(true);
         cancelOrderResDTO.setIsReturnOwnerCoupon(true);
+        cancelOrderResDTO.setIsRefund(true);
         cancelOrderResDTO.setRenterOrderNo(renterOrderEntity.getRenterOrderNo());
         cancelOrderResDTO.setRentCarPayStatus(orderStatusEntity.getRentCarPayStatus());
+        cancelOrderResDTO.setCarNo(goodsDetail.getCarNo());
         return cancelOrderResDTO;
     }
 

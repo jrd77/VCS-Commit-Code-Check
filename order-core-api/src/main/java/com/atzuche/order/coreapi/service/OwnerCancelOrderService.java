@@ -122,8 +122,6 @@ public class OwnerCancelOrderService {
         //订单状态更新
         //todo
 
-        //去库存
-        //todo
 
         //落库
         //todo
