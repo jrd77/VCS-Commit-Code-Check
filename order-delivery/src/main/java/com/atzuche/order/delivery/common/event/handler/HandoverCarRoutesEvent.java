@@ -1,15 +1,12 @@
 package com.atzuche.order.delivery.common.event.handler;
 
 import com.alibaba.fastjson.JSONObject;
-import com.aliyun.mns.model.Message;
 import com.atzuche.order.delivery.common.mq.handover.HandoverCarMq;
 import com.atzuche.order.delivery.common.mq.handover.HandoverRabbitMQEventEnum;
-import com.atzuche.order.delivery.enums.HandoverCarTypeEnum;
+import com.atzuche.order.delivery.enums.RenterHandoverCarTypeEnum;
 import com.atzuche.order.delivery.enums.ServiceTypeEnum;
 import com.atzuche.order.delivery.enums.UserTypeEnum;
 import com.atzuche.order.delivery.service.handover.HandoverCarService;
-import com.atzuche.order.delivery.utils.CommonUtil;
-import com.atzuche.order.delivery.utils.ZipUtils;
 import com.atzuche.order.delivery.vo.HandoverCarRenYunVO;
 import com.atzuche.order.delivery.vo.handover.HandoverCarInfoDTO;
 import com.atzuche.order.delivery.vo.handover.HandoverCarRemarkDTO;
@@ -26,7 +23,6 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -76,13 +72,13 @@ public class HandoverCarRoutesEvent {
         if (userType == UserTypeEnum.RENTER_TYPE.getValue().intValue()) {
             log.info("发送租客端事件,OrderNo:{}", handoverCarVO.getOrderNo());
             if (handoverCarVO.getServiceType().equals(ServiceTypeEnum.TAKE_TYPE.getValue())) {
-                HandoverCarVO handoverCar = createHandoverParams(handoverCarVO, HandoverCarTypeEnum.RENYUN_TO_RENTER.getValue().intValue(),handoverCarVO.getServiceType());
+                HandoverCarVO handoverCar = createHandoverParams(handoverCarVO, RenterHandoverCarTypeEnum.RENYUN_TO_RENTER.getValue().intValue(),handoverCarVO.getServiceType());
                 handoverCarService.addHandoverCarInfo(handoverCar,userType);
                 handoverCarMq.setRouteKey(HandoverRabbitMQEventEnum.RENTER_TAKE.routingKey);
                 String handoverCarMqJson = GsonUtils.toJson(handoverCarMq);
                 rabbitTemplate.convertAndSend(HandoverRabbitMQEventEnum.RENTER_TAKE.exchange,HandoverRabbitMQEventEnum.RENTER_TAKE.routingKey,handoverCarMqJson);
             } else if (handoverCarVO.getServiceType().equals(ServiceTypeEnum.BACK_TYPE.getValue())) {
-                HandoverCarVO handoverCar = createHandoverParams(handoverCarVO, HandoverCarTypeEnum.RENTER_TO_RENYUN.getValue().intValue(),handoverCarVO.getServiceType());
+                HandoverCarVO handoverCar = createHandoverParams(handoverCarVO, RenterHandoverCarTypeEnum.RENTER_TO_RENYUN.getValue().intValue(),handoverCarVO.getServiceType());
                 handoverCarService.addHandoverCarInfo(handoverCar,userType);
                 handoverCarMq.setRouteKey(HandoverRabbitMQEventEnum.RENTER_BACK.routingKey);
                 String handoverCarMqJson = GsonUtils.toJson(handoverCarMq);
@@ -92,13 +88,13 @@ public class HandoverCarRoutesEvent {
         else if (userType == UserTypeEnum.OWNER_TYPE.getValue().intValue()) {
             log.info("发送车主端事件,OrderNo:{}", handoverCarVO.getOrderNo());
             if (handoverCarVO.getServiceType().equals(ServiceTypeEnum.TAKE_TYPE.getValue())) {
-                HandoverCarVO handoverCar = createHandoverParams(handoverCarVO, HandoverCarTypeEnum.RENYUN_TO_RENTER.getValue().intValue(),handoverCarVO.getServiceType());
+                HandoverCarVO handoverCar = createHandoverParams(handoverCarVO, RenterHandoverCarTypeEnum.RENYUN_TO_RENTER.getValue().intValue(),handoverCarVO.getServiceType());
                 handoverCarService.addHandoverCarInfo(handoverCar,userType);
                 handoverCarMq.setRouteKey(HandoverRabbitMQEventEnum.OWNER_TAKE.routingKey);
                 String handoverCarMqJson = GsonUtils.toJson(handoverCarMq);
                 rabbitTemplate.convertAndSend(HandoverRabbitMQEventEnum.OWNER_TAKE.exchange,HandoverRabbitMQEventEnum.OWNER_TAKE.routingKey,handoverCarMqJson);
             } else if (handoverCarVO.getServiceType().equals(ServiceTypeEnum.BACK_TYPE.getValue())) {
-                HandoverCarVO handoverCar = createHandoverParams(handoverCarVO, HandoverCarTypeEnum.RENYUN_TO_RENTER.getValue().intValue(),handoverCarVO.getServiceType());
+                HandoverCarVO handoverCar = createHandoverParams(handoverCarVO, RenterHandoverCarTypeEnum.RENYUN_TO_RENTER.getValue().intValue(),handoverCarVO.getServiceType());
                 handoverCarService.addHandoverCarInfo(handoverCar,userType);
                 handoverCarMq.setRouteKey(HandoverRabbitMQEventEnum.OWNER_BACK.routingKey);
                 String handoverCarMqJson = GsonUtils.toJson(handoverCarMq);

@@ -1,7 +1,7 @@
 package com.atzuche.order.delivery.service.delivery;
 
 import com.atzuche.order.delivery.entity.*;
-import com.atzuche.order.delivery.enums.HandoverCarTypeEnum;
+import com.atzuche.order.delivery.enums.RenterHandoverCarTypeEnum;
 import com.atzuche.order.delivery.service.RenterOrderDeliveryService;
 import com.atzuche.order.delivery.service.handover.HandoverCarService;
 import com.atzuche.order.delivery.service.handover.OwnerHandoverCarService;
@@ -109,14 +109,14 @@ public class DeliveryCarInfoService {
             getHandoverCarDTO.setOwnDefaultGetCarAddr(renterOrderDeliveryEntity.getOwnerGetReturnAddr());
             getHandoverCarDTO.setOwnRealReturnAddr(renterOrderDeliveryEntity.getRenterGetReturnAddr());
             getHandoverCarDTO.setOwnerGetCarCrash("0");
-            String remark = ownerHandoverCarRemarkEntities.stream().filter(r -> (r.getType().intValue() != HandoverCarTypeEnum.RENYUN_TO_RENTER.getValue().intValue())).findFirst().get().getRemark();
+            String remark = ownerHandoverCarRemarkEntities.stream().filter(r -> (r.getType().intValue() != RenterHandoverCarTypeEnum.RENYUN_TO_RENTER.getValue().intValue())).findFirst().get().getRemark();
             getHandoverCarDTO.setOwnRealGetRemark(remark);
-            String renterRemark = renterHandoverCarRemarkEntities.stream().filter(r -> (r.getType().intValue() != HandoverCarTypeEnum.RENYUN_TO_RENTER.getValue().intValue())).findFirst().get().getRemark();
+            String renterRemark = renterHandoverCarRemarkEntities.stream().filter(r -> (r.getType().intValue() != RenterHandoverCarTypeEnum.RENYUN_TO_RENTER.getValue().intValue())).findFirst().get().getRemark();
             getHandoverCarDTO.setRenterRealGetAddrReamrk(renterRemark);
             deliveryCarVO.setIsGetCar("1");
             LocalDateTime rentTime = renterOrderDeliveryEntity.getRentTime();
             getHandoverCarDTO.setRentTime(DateUtils.formate(rentTime, DateUtils.DATE_DEFAUTE_4) + "," + renterOrderDeliveryEntity.getAheadOrDelayTime());
-            int mileageNum = renterHandoverCarInfoEntities.stream().filter(r -> (r.getType().intValue() != HandoverCarTypeEnum.RENYUN_TO_RENTER.getValue().intValue())).findFirst().get().getMileageNum();
+            int mileageNum = renterHandoverCarInfoEntities.stream().filter(r -> (r.getType().intValue() != RenterHandoverCarTypeEnum.RENYUN_TO_RENTER.getValue().intValue())).findFirst().get().getMileageNum();
             getHandoverCarDTO.setGetCarKM(String.valueOf(mileageNum));
             deliveryCarVO.setGetHandoverCarDTO(getHandoverCarDTO);
         } else if (renterOrderDeliveryEntity.getType() == 2 && renterOrderDeliveryEntity.getStatus() != 0) {
@@ -128,14 +128,14 @@ public class DeliveryCarInfoService {
             returnHandoverCarDTO.setOwnDefaultReturnCarAddr(renterOrderDeliveryEntity.getOwnerGetReturnAddr());
             returnHandoverCarDTO.setOwnerRealGetAddr(renterOrderDeliveryEntity.getRenterGetReturnAddr());
             returnHandoverCarDTO.setOwnerGetCarCrash("0");
-            String remark = ownerHandoverCarRemarkEntities.stream().filter(r -> (r.getType().intValue() != HandoverCarTypeEnum.RENTER_TO_RENYUN.getValue().intValue())).findFirst().get().getRemark();
+            String remark = ownerHandoverCarRemarkEntities.stream().filter(r -> (r.getType().intValue() != RenterHandoverCarTypeEnum.RENTER_TO_RENYUN.getValue().intValue())).findFirst().get().getRemark();
             returnHandoverCarDTO.setOwnerRealGetAddrReamrk(remark);
-            String renterRemark = renterHandoverCarRemarkEntities.stream().filter(r -> (r.getType().intValue() != HandoverCarTypeEnum.RENTER_TO_RENYUN.getValue().intValue())).findFirst().get().getRemark();
+            String renterRemark = renterHandoverCarRemarkEntities.stream().filter(r -> (r.getType().intValue() != RenterHandoverCarTypeEnum.RENTER_TO_RENYUN.getValue().intValue())).findFirst().get().getRemark();
             returnHandoverCarDTO.setRenterRealGetRemark(renterRemark);
             deliveryCarVO.setIsReturnCar("1");
             LocalDateTime rentTime = renterOrderDeliveryEntity.getRentTime();
             returnHandoverCarDTO.setRentTime(DateUtils.formate(rentTime, DateUtils.DATE_DEFAUTE_4) + "," + renterOrderDeliveryEntity.getAheadOrDelayTime());
-            int mileageNum = renterHandoverCarInfoEntities.stream().filter(r -> (r.getType().intValue() != HandoverCarTypeEnum.RENTER_TO_RENYUN.getValue().intValue())).findFirst().get().getMileageNum();
+            int mileageNum = renterHandoverCarInfoEntities.stream().filter(r -> (r.getType().intValue() != RenterHandoverCarTypeEnum.RENTER_TO_RENYUN.getValue().intValue())).findFirst().get().getMileageNum();
             returnHandoverCarDTO.setReturnCarKM(String.valueOf(mileageNum));
             deliveryCarVO.setReturnHandoverCarDTO(returnHandoverCarDTO);
         }
@@ -183,7 +183,7 @@ public class DeliveryCarInfoService {
             if (Objects.isNull(ownerHandoverCarInfoEntity.getType())) {
                 continue;
             }
-            if (ownerHandoverCarInfoEntity.getType().intValue() == HandoverCarTypeEnum.RENYUN_TO_RENTER.getValue().intValue()) {
+            if (ownerHandoverCarInfoEntity.getType().intValue() == RenterHandoverCarTypeEnum.RENYUN_TO_RENTER.getValue().intValue()) {
                 ownerGetAndReturnCarDTO.setGetCarOil(String.valueOf(ownerHandoverCarInfoEntity.getOilNum()));
                 ownerGetAndReturnCarDTO.setGetKM(String.valueOf(ownerHandoverCarInfoEntity.getMileageNum()));
                 ownerGetAndReturnCarDTO.setRealGetTime(String.valueOf(ownerHandoverCarInfoEntity.getRealReturnTime()));

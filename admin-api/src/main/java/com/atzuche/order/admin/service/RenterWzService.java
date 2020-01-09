@@ -73,7 +73,7 @@ public class RenterWzService {
                 fromDb = renterOrderWzCostDetailService.queryInfoByOrderAndCode(orderNo, costDetail.getCostCode());
             }
             if(INSURANCE_CLAIM_CODE.equals(costDetail.getCostCode())){
-                //TODO 调用其他接口
+                //TODO 还缺海豹的接口
             }
             try {
                 RenterOrderWzCostDetailEntity fromApp = new RenterOrderWzCostDetailEntity();
@@ -87,7 +87,7 @@ public class RenterWzService {
                         updateCostStatus(orderNo, costDetail, fromDb);
                     }
                     if(INSURANCE_CLAIM_CODE.equals(costDetail.getCostCode())){
-                        //TODO 调用其他接口
+                        //TODO 还缺海豹的接口
                     }
                     saveWzCostLog(orderNo, costDetail, content);
                 }
@@ -232,6 +232,7 @@ public class RenterWzService {
             costDetails.add(dto);
         }
         rs.setCostDetails(costDetails);
+        //TODO 还缺海豹的接口
         return rs;
     }
 }

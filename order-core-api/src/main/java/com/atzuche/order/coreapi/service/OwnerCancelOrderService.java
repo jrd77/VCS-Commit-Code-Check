@@ -3,28 +3,31 @@ package com.atzuche.order.coreapi.service;
 import com.atzuche.order.commons.entity.dto.CancelFineAmtDTO;
 import com.atzuche.order.commons.entity.dto.CostBaseDTO;
 import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
-import com.atzuche.order.commons.enums.FineSubsidyCodeEnum;
-import com.atzuche.order.commons.enums.FineSubsidySourceCodeEnum;
-import com.atzuche.order.commons.enums.FineTypeEnum;
+import com.atzuche.order.commons.enums.*;
 import com.atzuche.order.coreapi.entity.dto.CancelOrderResDTO;
 import com.atzuche.order.coreapi.entity.vo.req.CarDispatchReqVO;
-import com.atzuche.order.ownercost.entity.ConsoleOwnerOrderFineDeatailEntity;
+import com.atzuche.order.flow.service.OrderFlowService;
 import com.atzuche.order.ownercost.entity.OwnerOrderEntity;
+import com.atzuche.order.ownercost.entity.OwnerOrderFineDeatailEntity;
+import com.atzuche.order.ownercost.service.OwnerOrderFineDeatailService;
 import com.atzuche.order.ownercost.service.OwnerOrderService;
+import com.atzuche.order.parentorder.dto.OrderStatusDTO;
+import com.atzuche.order.parentorder.entity.OrderCancelReasonEntity;
 import com.atzuche.order.parentorder.entity.OrderEntity;
 import com.atzuche.order.parentorder.entity.OrderStatusEntity;
+import com.atzuche.order.parentorder.service.OrderCancelReasonService;
 import com.atzuche.order.parentorder.service.OrderService;
 import com.atzuche.order.parentorder.service.OrderStatusService;
 import com.atzuche.order.rentercommodity.service.RenterGoodsService;
+import com.atzuche.order.rentercost.entity.ConsoleRenterOrderFineDeatailEntity;
 import com.atzuche.order.rentercost.entity.RenterOrderCostEntity;
-import com.atzuche.order.rentercost.entity.RenterOrderFineDeatailEntity;
+import com.atzuche.order.rentercost.service.ConsoleRenterOrderFineDeatailService;
 import com.atzuche.order.rentercost.service.RenterOrderCostService;
 import com.atzuche.order.rentercost.service.RenterOrderFineDeatailService;
 import com.atzuche.order.renterorder.entity.OrderCouponEntity;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.atzuche.order.renterorder.service.OrderCouponService;
 import com.atzuche.order.renterorder.service.RenterOrderService;
-import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -58,7 +61,14 @@ public class OwnerCancelOrderService {
     OrderService orderService;
     @Autowired
     RenterOrderFineDeatailService renterOrderFineDeatailService;
-
+    @Autowired
+    OwnerOrderFineDeatailService ownerOrderFineDeatailService;
+    @Autowired
+    ConsoleRenterOrderFineDeatailService consoleRenterOrderFineDeatailService;
+    @Autowired
+    OrderFlowService orderFlowService;
+    @Autowired
+    OrderCancelReasonService orderCancelReasonService;
 
     /**
      * 取消处理
@@ -71,9 +81,6 @@ public class OwnerCancelOrderService {
     public CancelOrderResDTO cancel(String orderNo, String cancelReason) {
         //校验
         check();
-        //返回信息
-        CancelOrderResDTO cancelOrderResDTO = new CancelOrderResDTO();
-
         //获取订单信息
         OrderEntity orderEntity = orderService.getOrderEntity(orderNo);
         //获取租客订单信息
@@ -92,48 +99,65 @@ public class OwnerCancelOrderService {
         OrderCouponEntity ownerCouponEntity = orderCouponService.getOwnerCouponByOrderNoAndRenterOrderNo(orderNo,
                 renterOrderEntity.getRenterOrderNo());
         //调度判定
-        //todo
         boolean isDispatch = carRentalTimeApiService.checkCarDispatch(buildCarDispatchReqVO(orderEntity,
                 orderStatusEntity, ownerCouponEntity));
+
+        //返回信息
+        CancelOrderResDTO cancelOrderResDTO = new CancelOrderResDTO();
+        OrderStatusDTO orderStatusDTO = new OrderStatusDTO();
+        orderStatusDTO.setOrderNo(orderNo);
         if (isDispatch) {
             //取消进调度
             cancelOrderResDTO.setIsReturnDisCoupon(false);
             cancelOrderResDTO.setIsReturnOwnerCoupon(false);
-
-
+            cancelOrderResDTO.setIsRefund(false);
+            //订单状态更新
+            orderStatusDTO.setStatus(OrderStatusEnum.TO_DISPATCH.getStatus());
+            orderStatusDTO.setIsDispatch(1);
+            orderStatusDTO.setDispatchStatus(1);
         } else {
             //取消不进调度
             cancelOrderResDTO.setIsReturnDisCoupon(true);
             cancelOrderResDTO.setIsReturnOwnerCoupon(true);
             cancelOrderResDTO.setOwnerCouponNo(null == ownerCouponEntity ? null : ownerCouponEntity.getCouponId());
+            cancelOrderResDTO.setIsRefund(true);
+            cancelOrderResDTO.setRenterOrderNo(renterOrderEntity.getRenterOrderNo());
+            cancelOrderResDTO.setSrvGetFlag(null != renterOrderEntity.getIsGetCar() && renterOrderEntity.getIsGetCar() == 1);
+            cancelOrderResDTO.setSrvReturnFlag(null != renterOrderEntity.getIsReturnCar() && renterOrderEntity.getIsReturnCar() == 1);
             //罚金计算(罚金和收益)
             //车主罚金处理
             CancelFineAmtDTO cancelFineAmt = buildCancelFineAmtDTO(renterOrderEntity,
                     renterOrderCostEntity, goodsDetail.getCarOwnerType());
             int penalty = renterOrderFineDeatailService.calCancelFine(cancelFineAmt);
             int fineAmt = penalty + renterOrderCostEntity.getBasicEnsureAmount();
-
+            OwnerOrderFineDeatailEntity ownerOrderFineDeatailEntity =
+                    ownerOrderFineDeatailService.fineDataConvert(cancelFineAmt.getCostBaseDTO(), fineAmt,
+                            FineSubsidyCodeEnum.RENTER, FineSubsidySourceCodeEnum.OWNER, FineTypeEnum.CANCEL_FINE);
             //租客收益处理
+            ConsoleRenterOrderFineDeatailEntity consoleRenterOrderFineDeatailEntity =
+                    consoleRenterOrderFineDeatailService.fineDataConvert(cancelFineAmt.getCostBaseDTO(), penalty,
+                            FineSubsidyCodeEnum.RENTER, FineSubsidySourceCodeEnum.OWNER, FineTypeEnum.CANCEL_FINE);
+            //订单状态更新
+            orderStatusDTO.setStatus(OrderStatusEnum.CLOSED.getStatus());
 
-
+            renterOrderService.updateRenterOrderChildStatus(renterOrderEntity.getId(),
+                    RenterChildStatusEnum.END.getCode());
+            ownerOrderFineDeatailService.addOwnerOrderFineRecord(ownerOrderFineDeatailEntity);
+            consoleRenterOrderFineDeatailService.saveConsoleRenterOrderFineDeatail(consoleRenterOrderFineDeatailEntity);
         }
 
-
-        //订单状态更新
-        //todo
-
-        //去库存
-        //todo
-
         //落库
-        //todo
+        orderStatusService.saveOrderStatusInfo(orderStatusDTO);
+        ownerOrderService.updateOwnerOrderChildStatus(ownerOrderEntity.getId(), OwnerChildStatusEnum.END.getCode());
+        orderFlowService.inserOrderStatusChangeProcessInfo(orderNo, OrderStatusEnum.from(orderStatusDTO.getStatus()));
 
+        //取消信息处理(order_cancel_reason)
+        orderCancelReasonService.addOrderCancelReasonRecord(buildOrderCancelReasonEntity(orderNo, cancelReason));
 
         //返回信息处理
-
-
-        return null;
-
+        cancelOrderResDTO.setCarNo(goodsDetail.getCarNo());
+        cancelOrderResDTO.setRentCarPayStatus(orderStatusEntity.getRentCarPayStatus());
+        return cancelOrderResDTO;
     }
 
 
@@ -191,5 +215,16 @@ public class OwnerCancelOrderService {
         cancelFineAmtDTO.setRentAmt(renterOrderCostEntity.getRentCarAmount());
         cancelFineAmtDTO.setOwnerType(carOwnerType);
         return cancelFineAmtDTO;
+    }
+
+
+    private OrderCancelReasonEntity buildOrderCancelReasonEntity(String orderNo, String cancelReason) {
+        OrderCancelReasonEntity orderCancelReasonEntity = new OrderCancelReasonEntity();
+        orderCancelReasonEntity.setOperateType(CancelOperateTypeEnum.CANCEL_ORDER.getCode());
+        orderCancelReasonEntity.setCancelReason(cancelReason);
+        orderCancelReasonEntity.setCancelSource(CancelSourceEnum.OWNER.getCode());
+        orderCancelReasonEntity.setOrderNo(orderNo);
+        orderCancelReasonEntity.setDutySource(CancelOrderDutyEnum.CANCEL_ORDER_DUTY_RENTER.getCode());
+        return orderCancelReasonEntity;
     }
 }
