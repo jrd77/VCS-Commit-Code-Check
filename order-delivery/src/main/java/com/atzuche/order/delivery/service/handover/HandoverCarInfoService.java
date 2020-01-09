@@ -3,20 +3,12 @@ package com.atzuche.order.delivery.service.handover;
 import com.atzuche.order.commons.CommonUtils;
 import com.atzuche.order.delivery.common.DeliveryCarTask;
 import com.atzuche.order.delivery.common.DeliveryErrorCode;
-import com.atzuche.order.delivery.entity.OwnerHandoverCarInfoEntity;
-import com.atzuche.order.delivery.entity.RenterHandoverCarInfoEntity;
-import com.atzuche.order.delivery.entity.RenterHandoverCarRemarkEntity;
 import com.atzuche.order.delivery.entity.RenterOrderDeliveryEntity;
-import com.atzuche.order.delivery.enums.DeliveryTypeEnum;
-import com.atzuche.order.delivery.enums.HandoverCarTypeEnum;
-import com.atzuche.order.delivery.enums.ServiceTypeEnum;
 import com.atzuche.order.delivery.enums.UsedDeliveryTypeEnum;
 import com.atzuche.order.delivery.exception.DeliveryOrderException;
 import com.atzuche.order.delivery.exception.HandoverCarOrderException;
-import com.atzuche.order.delivery.mapper.RenterHandoverCarRemarkMapper;
 import com.atzuche.order.delivery.mapper.RenterOrderDeliveryMapper;
 import com.atzuche.order.delivery.service.delivery.DeliveryCarService;
-import com.atzuche.order.delivery.service.delivery.RenYunDeliveryCarService;
 import com.atzuche.order.delivery.utils.OSSUtils;
 import com.atzuche.order.delivery.vo.delivery.*;
 import com.atzuche.order.delivery.vo.delivery.req.CarConditionPhotoUploadVO;
@@ -32,6 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -44,7 +37,7 @@ import static org.bouncycastle.asn1.x500.style.RFC4519Style.serialNumber;
 @Service
 public class HandoverCarInfoService {
 
-    protected  final Logger logger = LoggerFactory.getLogger(getClass());
+    protected final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
     HandoverCarService handoverCarService;
@@ -54,6 +47,10 @@ public class HandoverCarInfoService {
     RenterOrderDeliveryMapper renterOrderDeliveryMapper;
     @Autowired
     DeliveryCarTask deliveryCarTask;
+    @Autowired
+    OwnerHandoverCarService ownerHandoverCarService;
+    @Autowired
+    RenterHandoverCarService renterHandoverCarService;
 
     /**
      * 上传交接车
@@ -82,6 +79,7 @@ public class HandoverCarInfoService {
 
     /**
      * 更新交接车信息
+     *
      * @param handoverCarReqVO
      * @throws Exception
      */
@@ -95,17 +93,18 @@ public class HandoverCarInfoService {
         if (handoverCarReqVO.getOwnerHandoverCarDTO() != null) {
             HandoverCarInfoReqDTO handoverCarInfoReqDTO = handoverCarReqVO.getOwnerHandoverCarDTO();
             //更新车主交接车相关信息
-            updateOwnerHandoverCarOilMileageNum(handoverCarInfoReqDTO);
+            ownerHandoverCarService.updateHandoverCarOilMileageNum(handoverCarInfoReqDTO);
         }
         if (handoverCarReqVO.getRenterHandoverCarDTO() != null) {
             HandoverCarInfoReqDTO handoverCarInfoReqDTO = handoverCarReqVO.getRenterHandoverCarDTO();
             //更新租客交接车相关信息
-            updateRenterHandoverCarOilMileageNum(handoverCarInfoReqDTO);
+            renterHandoverCarService.updateHandoverCarOilMileageNum(handoverCarInfoReqDTO);
         }
     }
 
     /**
      * 更新取还车信息 更新仁云接口
+     *
      * @param deliveryReqVO
      * @throws Exception
      */
@@ -128,6 +127,7 @@ public class HandoverCarInfoService {
 
     /**
      * 更新配送订单相关信息
+     *
      * @param deliveryReqDTO
      */
     public void updateDeliveryCarInfoByUsed(DeliveryReqDTO deliveryReqDTO, Integer type) {
@@ -137,7 +137,7 @@ public class HandoverCarInfoService {
                 deliveryCarInfoService.cancelRenYunFlowOrderInfo(new CancelOrderDeliveryVO().setCancelFlowOrderDTO(new CancelFlowOrderDTO().setServicetype(type == 1 ? "take" : "back").setOrdernumber(renterOrderDeliveryEntity.getOrderNo())).setRenterOrderNo(renterOrderDeliveryEntity.getRenterOrderNo()));
             }
         } else if (renterOrderDeliveryEntity != null && String.valueOf(UsedDeliveryTypeEnum.USED.getValue()).equals(deliveryReqDTO.getIsUsedGetAndReturnCar())) {
-            UpdateOrderDeliveryVO updateOrderDeliveryVO = createDeliveryCarInfoParams(renterOrderDeliveryEntity,deliveryReqDTO, type);
+            UpdateOrderDeliveryVO updateOrderDeliveryVO = createDeliveryCarInfoParams(renterOrderDeliveryEntity, deliveryReqDTO, type);
             deliveryCarInfoService.updateFlowOrderInfo(updateOrderDeliveryVO);
         } else {
             throw new DeliveryOrderException(DeliveryErrorCode.DELIVERY_PARAMS_ERROR.getValue(), "没有合适的参数");
@@ -146,10 +146,10 @@ public class HandoverCarInfoService {
 
     /**
      * 构造更新参数
+     *
      * @return
      */
-    public UpdateOrderDeliveryVO createDeliveryCarInfoParams(RenterOrderDeliveryEntity renterOrderDeliveryEntity,DeliveryReqDTO deliveryReqDTO,Integer type)
-    {
+    public UpdateOrderDeliveryVO createDeliveryCarInfoParams(RenterOrderDeliveryEntity renterOrderDeliveryEntity, DeliveryReqDTO deliveryReqDTO, Integer type) {
         OrderDeliveryDTO orderDeliveryDTO = new OrderDeliveryDTO();
         UpdateFlowOrderDTO updateFlowOrderDTO = new UpdateFlowOrderDTO();
         RenterDeliveryAddrDTO renterDeliveryAddrDTO = new RenterDeliveryAddrDTO();
@@ -172,36 +172,13 @@ public class HandoverCarInfoService {
         return UpdateOrderDeliveryVO.builder().orderDeliveryDTO(orderDeliveryDTO).renterDeliveryAddrDTO(renterDeliveryAddrDTO).updateFlowOrderDTO(updateFlowOrderDTO).build();
     }
 
-
-    /**
-     * 更新车主交接车油耗里程数据
-     * @param handoverCarInfoReqDTO
-     */
-    @Transactional(rollbackFor = Exception.class)
-    public void updateOwnerHandoverCarOilMileageNum(HandoverCarInfoReqDTO handoverCarInfoReqDTO){
-        OwnerHandoverCarInfoEntity ownerHandoverCarReturnInfoEntity = handoverCarService.getOwnerHandoverCarInfo(handoverCarInfoReqDTO.getOrderNo(), HandoverCarTypeEnum.RENTER_TO_RENYUN.getValue());
-        ownerHandoverCarReturnInfoEntity.setOilNum(Integer.valueOf(handoverCarInfoReqDTO.getRenterReturnOil()));
-        ownerHandoverCarReturnInfoEntity.setMileageNum(Integer.valueOf(handoverCarInfoReqDTO.getOwnReturnKM()));
-        handoverCarService.updateOwnerHandoverInfo(ownerHandoverCarReturnInfoEntity);
-        OwnerHandoverCarInfoEntity ownerHandoverCarGetInfoEntity = handoverCarService.getOwnerHandoverCarInfo(handoverCarInfoReqDTO.getOrderNo(), HandoverCarTypeEnum.RENYUN_TO_RENTER.getValue());
-        ownerHandoverCarGetInfoEntity.setOilNum(Integer.valueOf(handoverCarInfoReqDTO.getOwnReturnOil()));
-        ownerHandoverCarGetInfoEntity.setMileageNum(Integer.valueOf(handoverCarInfoReqDTO.getRenterRetrunKM()));
-        handoverCarService.updateOwnerHandoverInfo(ownerHandoverCarGetInfoEntity);
-    }
-
-    /**
-     * 更新租客交接车里程油耗数据
-     * @param handoverCarInfoReqDTO
-     */
-    @Transactional(rollbackFor = Exception.class)
-    public void updateRenterHandoverCarOilMileageNum(HandoverCarInfoReqDTO handoverCarInfoReqDTO){
-        RenterHandoverCarInfoEntity renterHandoverCarReturnInfoEntity = handoverCarService.getRenterHandoverCarInfo(handoverCarInfoReqDTO.getOrderNo(), HandoverCarTypeEnum.RENTER_TO_RENYUN.getValue());
-        renterHandoverCarReturnInfoEntity.setOilNum(Integer.valueOf(handoverCarInfoReqDTO.getRenterReturnOil()));
-        renterHandoverCarReturnInfoEntity.setMileageNum(Integer.valueOf(handoverCarInfoReqDTO.getOwnReturnKM()));
-        handoverCarService.updateRenterHandoverInfo(renterHandoverCarReturnInfoEntity);
-        RenterHandoverCarInfoEntity renterHandoverCarGetInfoEntity = handoverCarService.getRenterHandoverCarInfo(handoverCarInfoReqDTO.getOrderNo(), HandoverCarTypeEnum.RENYUN_TO_RENTER.getValue());
-        renterHandoverCarGetInfoEntity.setOilNum(Integer.valueOf(handoverCarInfoReqDTO.getOwnReturnOil()));
-        renterHandoverCarGetInfoEntity.setMileageNum(Integer.valueOf(handoverCarInfoReqDTO.getRenterRetrunKM()));
-        handoverCarService.updateRenterHandoverInfo(renterHandoverCarGetInfoEntity);
+    /*
+     * @Author ZhangBin
+     * @Date 2020/1/9 11:48
+     * @Description: 通过租客子订单号查询配送订单
+     *
+     **/
+    public List<RenterOrderDeliveryEntity> selectByRenterOrderNo(String renterOrderNo){
+        return renterOrderDeliveryMapper.selectByRenterOrderNo(renterOrderNo);
     }
 }

@@ -26,6 +26,8 @@ public class OrderCancelReasonService{
         return orderCancelReasonMapper.insertSelective(entity);
     }
 
-
+    public OrderCancelReasonEntity selectByOrderNo(String orderNo){
+        return orderCancelReasonMapper.selectByOrderNo(orderNo);
+    }
 
 }

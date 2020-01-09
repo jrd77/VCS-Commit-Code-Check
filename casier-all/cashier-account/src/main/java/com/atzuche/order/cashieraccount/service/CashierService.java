@@ -6,8 +6,13 @@ import com.atzuche.order.accountownercost.service.notservice.AccountOwnerCostSet
 import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostSettleDetailEntity;
 import com.atzuche.order.accountrenterrentcost.service.notservice.AccountRenterCostSettleDetailNoTService;
 import com.atzuche.order.accountrenterrentcost.vo.req.AccountRenterCostChangeReqVO;
+import com.atzuche.order.commons.enums.OrderPayStatusEnum;
+import com.atzuche.order.commons.enums.OrderStatusEnum;
 import com.atzuche.order.commons.enums.RenterCashCodeEnum;
 import com.atzuche.order.commons.enums.cashier.TransStatusEnum;
+import com.atzuche.order.parentorder.dto.OrderStatusDTO;
+import com.atzuche.order.parentorder.entity.OrderStatusEntity;
+import com.atzuche.order.parentorder.service.OrderStatusService;
 import com.atzuche.order.settle.service.AccountDebtService;
 import com.atzuche.order.settle.vo.req.AccountDeductDebtReqVO;
 import com.atzuche.order.settle.vo.req.AccountInsertDebtReqVO;
@@ -77,6 +82,7 @@ public class CashierService {
     @Autowired CashierNoTService cashierNoTService;
     @Autowired private AccountRenterCostSettleDetailNoTService accountRenterCostSettleDetailNoTService;
     @Autowired private AccountOwnerCostSettleDetailNoTService accountOwnerCostSettleDetailNoTService;
+    @Autowired private OrderStatusService orderStatusService;
 
 
     /**  *************************************** 租车费用 start****************************************************/
@@ -453,12 +459,14 @@ public class CashierService {
             log.info("payOrderCallBackSuccess check fail :[{}]", GsonUtils.toJson(notifyDataVo));
             return;
         }
+        OrderStatusDTO orderStatusDTO = new OrderStatusDTO();
         //1.1 租车押金 01
         if(Objects.nonNull(notifyDataVo) && DataPayKindConstant.RENT.equals(notifyDataVo.getPayKind())){
             //1 对象初始化转换
             PayedOrderRenterDepositReqVO payedOrderRenterDeposit = cashierNoTService.getPayedOrderRenterDepositReq(notifyDataVo);
             //2 收银台记录更新
             cashierNoTService.updataCashierAndRenterDeposit(notifyDataVo,payedOrderRenterDeposit);
+            orderStatusDTO.setDepositPayStatus(OrderPayStatusEnum.PAYED.getStatus());
         }
         //1.2 违章押金 02
         if(Objects.nonNull(notifyDataVo) && DataPayKindConstant.DEPOSIT.equals(notifyDataVo.getPayKind())){
@@ -466,6 +474,7 @@ public class CashierService {
             PayedOrderRenterWZDepositReqVO payedOrderRenterWZDeposit = cashierNoTService.getPayedOrderRenterWZDepositReq(notifyDataVo);
             //2 收银台记录更新
             cashierNoTService.updataCashierAndRenterWzDeposit(notifyDataVo,payedOrderRenterWZDeposit);
+            orderStatusDTO.setWzPayStatus(OrderPayStatusEnum.PAYED.getStatus());
         }
         //1.3 租车费用
         if(Objects.nonNull(notifyDataVo) && DataPayKindConstant.RENT_AMOUNT.equals(notifyDataVo.getPayKind()) ){
@@ -473,6 +482,7 @@ public class CashierService {
             AccountRenterCostReqVO accountRenterCostReq = cashierNoTService.getAccountRenterCostReq(notifyDataVo, RenterCashCodeEnum.ACCOUNT_RENTER_RENT_COST);
             //2 收银台记录更新
             cashierNoTService.updataCashierAndRenterCost(notifyDataVo,accountRenterCostReq);
+            orderStatusDTO.setRentCarPayStatus(OrderPayStatusEnum.PAYED.getStatus());
         }
         //1.4 补付租车费用
         if(Objects.nonNull(notifyDataVo) && DataPayKindConstant.RENT_INCREMENT.equals(notifyDataVo.getPayKind()) ){
@@ -480,8 +490,34 @@ public class CashierService {
             AccountRenterCostReqVO accountRenterCostReq = cashierNoTService.getAccountRenterCostReq(notifyDataVo, RenterCashCodeEnum.ACCOUNT_RENTER_RENT_COST_AGAIN);
             //2 收银台记录更新
             cashierNoTService.updataCashierAndRenterCost(notifyDataVo,accountRenterCostReq);
+            orderStatusDTO.setRentCarPayStatus(OrderPayStatusEnum.PAYED.getStatus());
         }
+        orderStatusDTO.setOrderNo(notifyDataVo.getOrderNo());
+
+        //支付成功更新 订单支付状态
+        if(Objects.nonNull(orderStatusDTO)){
+            setOrderStatus(orderStatusDTO);
+            int orderStatusResult = orderStatusService.saveOrderStatusInfo(orderStatusDTO);
+            Assert.isTrue(orderStatusResult==1,"支付成功更新订单状态失败");
+        }
+
         //TODO 支付回调成功 push/或者短信 怎么处理
+
+    }
+
+    /**
+     * 当支付成功（当车辆押金，违章押金，租车费用都支付成功，更新订单状态 待取车），更新主订单状态待取车
+     * @param orderStatusDTO
+     */
+    private void setOrderStatus(OrderStatusDTO orderStatusDTO){
+        OrderStatusEntity entity = orderStatusService.getByOrderNo(orderStatusDTO.getOrderNo());
+        if(
+                OrderPayStatusEnum.PAYED.getStatus()== entity.getRentCarPayStatus() &&
+                OrderPayStatusEnum.PAYED.getStatus()== entity.getWzPayStatus() &&
+                OrderPayStatusEnum.PAYED.getStatus()== entity.getDepositPayStatus()
+        ){
+            orderStatusDTO.setStatus(OrderStatusEnum.TO_GET_CAR.getStatus());
+        }
 
     }
 }

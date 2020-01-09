@@ -9,7 +9,7 @@ import lombok.Data;
  * 车主订单罚金明细表
  * 
  * @author ZhangBin
- * @date 2019-12-11 18:16:00
+ * @date 2020-01-09 11:30:07
  * @Description:
  */
 @Data
@@ -37,7 +37,7 @@ public class OwnerOrderFineDeatailEntity implements Serializable {
 	 */
 	private Integer fineAmount;
 	/**
-	 * 罚金补贴方编码（车主/租客/平台）
+	 * 罚金补贴方编码（车主/租客/平台）1-租客，2-车主，3-平台
 	 */
 	private String fineSubsidyCode;
 	/**
@@ -45,7 +45,7 @@ public class OwnerOrderFineDeatailEntity implements Serializable {
 	 */
 	private String fineSubsidyDesc;
 	/**
-	 * 罚金来源编码（车主/租客/平台）
+	 * 罚金来源编码（车主/租客/平台）1-租客，2-车主，3-平台
 	 */
 	private String fineSubsidySourceCode;
 	/**
@@ -53,9 +53,13 @@ public class OwnerOrderFineDeatailEntity implements Serializable {
 	 */
 	private String fineSubsidySourceDesc;
 	/**
-	 * 罚金描述
+	 * 罚金类型：1-车主修改交接车地址罚金，4-取消订单违约金
 	 */
-	private Integer fineDesc;
+	private Integer fineType;
+	/**
+	 * 罚金类型描述
+	 */
+	private String fineTypeDesc;
 	/**
 	 * 操作人ID
 	 */

@@ -13,7 +13,8 @@
         <result property="fineSubsidyDesc" column="fine_subsidy_desc"/>
         <result property="fineSubsidySourceCode" column="fine_subsidy_source_code"/>
         <result property="fineSubsidySourceDesc" column="fine_subsidy_source_desc"/>
-        <result property="fineDesc" column="fine_desc"/>
+        <result property="fineType" column="fine_type"/>
+        <result property="fineTypeDesc" column="fine_type_desc"/>
         <result property="operatorId" column="operator_id"/>
         <result property="operator" column="operator"/>
         <result property="deptId" column="dept_id"/>
@@ -28,27 +29,27 @@
 
 
 	<sql id="Base_Column_List">
-	`id`, 	
-	`order_no`, 	
-	`owner_order_no`, 	
-	`mem_no`, 	
-	`fine_amount`, 	
-	`fine_subsidy_code`, 	
-	`fine_subsidy_desc`, 	
-	`fine_subsidy_source_code`, 	
-	`fine_subsidy_source_desc`, 	
-	`fine_desc`, 	
-	`operator_id`, 	
-	`operator`, 	
-	`dept_id`, 	
-	`dept_name`, 	
-	`remark`, 	
-	`create_time`, 	
-	`create_op`, 	
-	`update_time`, 	
-	`update_op`, 	
-	`is_delete`	
-
+        `id`,
+        `order_no`,
+        `owner_order_no`,
+        `mem_no`,
+        `fine_amount`,
+        `fine_subsidy_code`,
+        `fine_subsidy_desc`,
+        `fine_subsidy_source_code`,
+        `fine_subsidy_source_desc`,
+        `fine_type`,
+        `fine_type_desc`,
+        `operator_id`,
+        `operator`,
+        `dept_id`,
+        `dept_name`,
+        `remark`,
+        `create_time`,
+        `create_op`,
+        `update_time`,
+        `update_op`,
+        `is_delete`
 	</sql>
 
 
@@ -56,14 +57,8 @@
 		select <include refid="Base_Column_List" /> from owner_order_fine_deatail where id = #{value}
 	</select>
 
-	<select id="selectALL" resultMap="BaseResultMap">
-		select  <include refid="Base_Column_List" /> from owner_order_fine_deatail order by id desc
-	</select>
-
-	 
 	<insert id="insert" parameterType="com.atzuche.order.ownercost.entity.OwnerOrderFineDeatailEntity" useGeneratedKeys="true" keyProperty="id">
-		insert into owner_order_fine_deatail
-		(
+		insert into owner_order_fine_deatail (
 				`order_no`,		
 				`owner_order_no`,		
 				`mem_no`,		
@@ -72,18 +67,14 @@
 				`fine_subsidy_desc`,		
 				`fine_subsidy_source_code`,		
 				`fine_subsidy_source_desc`,		
-				`fine_desc`,		
+				`fine_type`,		
+				`fine_type_desc`,		
 				`operator_id`,		
 				`operator`,		
 				`dept_id`,		
 				`dept_name`,		
-				`remark`,		
-				`create_time`,		
-				`create_op`,		
-				`update_time`,		
-				`update_op`,		
-				`is_delete`		
-			)
+				`remark`
+        )
 		values
 		(
 				#{orderNo}, 		
@@ -94,23 +85,19 @@
 				#{fineSubsidyDesc}, 		
 				#{fineSubsidySourceCode}, 		
 				#{fineSubsidySourceDesc}, 		
-				#{fineDesc}, 		
+				#{fineType}, 		
+				#{fineTypeDesc}, 		
 				#{operatorId}, 		
 				#{operator}, 		
 				#{deptId}, 		
 				#{deptName}, 		
-				#{remark}, 		
-				#{createTime}, 		
-				#{createOp}, 		
-				#{updateTime}, 		
-				#{updateOp}, 		
-				#{isDelete}		
-			)
+				#{remark}
+        )
 	</insert>
 	
 	<insert id="insertSelective" parameterType="com.atzuche.order.ownercost.entity.OwnerOrderFineDeatailEntity" useGeneratedKeys="true" keyProperty="id">
 		insert into owner_order_fine_deatail
-        <trim prefix="(" suffix=")" suffixOverrides="," >
+            <trim prefix="(" suffix=")" suffixOverrides="," >
 				<if test="orderNo != null">`order_no`, </if>
 				<if test="ownerOrderNo != null">`owner_order_no`, </if>
 				<if test="memNo != null">`mem_no`, </if>
@@ -119,7 +106,8 @@
 				<if test="fineSubsidyDesc != null">`fine_subsidy_desc`, </if>
 				<if test="fineSubsidySourceCode != null">`fine_subsidy_source_code`, </if>
 				<if test="fineSubsidySourceDesc != null">`fine_subsidy_source_desc`, </if>
-				<if test="fineDesc != null">`fine_desc`, </if>
+				<if test="fineType != null">`fine_type`, </if>
+				<if test="fineTypeDesc != null">`fine_type_desc`, </if>
 				<if test="operatorId != null">`operator_id`, </if>
 				<if test="operator != null">`operator`, </if>
 				<if test="deptId != null">`dept_id`, </if>
@@ -130,8 +118,8 @@
 				<if test="updateTime != null">`update_time`, </if>
 				<if test="updateOp != null">`update_op`, </if>
 				<if test="isDelete != null">`is_delete` </if>
-        </trim>
-        <trim prefix="values (" suffix=")" suffixOverrides="," >
+	        </trim>
+            <trim prefix="values (" suffix=")" suffixOverrides="," >
 				<if test="orderNo != null">#{orderNo},  </if>
 				<if test="ownerOrderNo != null">#{ownerOrderNo},  </if>
 				<if test="memNo != null">#{memNo},  </if>
@@ -140,7 +128,8 @@
 				<if test="fineSubsidyDesc != null">#{fineSubsidyDesc},  </if>
 				<if test="fineSubsidySourceCode != null">#{fineSubsidySourceCode},  </if>
 				<if test="fineSubsidySourceDesc != null">#{fineSubsidySourceDesc},  </if>
-				<if test="fineDesc != null">#{fineDesc},  </if>
+				<if test="fineType != null">#{fineType},  </if>
+				<if test="fineTypeDesc != null">#{fineTypeDesc},  </if>
 				<if test="operatorId != null">#{operatorId},  </if>
 				<if test="operator != null">#{operator},  </if>
 				<if test="deptId != null">#{deptId},  </if>
@@ -151,13 +140,13 @@
 				<if test="updateTime != null">#{updateTime},  </if>
 				<if test="updateOp != null">#{updateOp},  </if>
 				<if test="isDelete != null">#{isDelete} </if>
-        </trim>
+	        </trim>
 	</insert>
 	
 	 
 	<update id="updateByPrimaryKeySelective" parameterType="com.atzuche.order.ownercost.entity.OwnerOrderFineDeatailEntity">
 		update owner_order_fine_deatail 
-		<set>
+		    <set>
 				<if test="orderNo != null">`order_no` = #{orderNo}, </if>
 				<if test="ownerOrderNo != null">`owner_order_no` = #{ownerOrderNo}, </if>
 				<if test="memNo != null">`mem_no` = #{memNo}, </if>
@@ -166,7 +155,8 @@
 				<if test="fineSubsidyDesc != null">`fine_subsidy_desc` = #{fineSubsidyDesc}, </if>
 				<if test="fineSubsidySourceCode != null">`fine_subsidy_source_code` = #{fineSubsidySourceCode}, </if>
 				<if test="fineSubsidySourceDesc != null">`fine_subsidy_source_desc` = #{fineSubsidySourceDesc}, </if>
-				<if test="fineDesc != null">`fine_desc` = #{fineDesc}, </if>
+				<if test="fineType != null">`fine_type` = #{fineType}, </if>
+				<if test="fineTypeDesc != null">`fine_type_desc` = #{fineTypeDesc}, </if>
 				<if test="operatorId != null">`operator_id` = #{operatorId}, </if>
 				<if test="operator != null">`operator` = #{operator}, </if>
 				<if test="deptId != null">`dept_id` = #{deptId}, </if>
@@ -183,7 +173,7 @@
 	
 	<update id="updateByPrimaryKey" parameterType="com.atzuche.order.ownercost.entity.OwnerOrderFineDeatailEntity">
 		update owner_order_fine_deatail 
-		<set>
+		    <set>
 				`order_no` = #{orderNo}, 		
 				`owner_order_no` = #{ownerOrderNo}, 		
 				`mem_no` = #{memNo}, 		
@@ -192,19 +182,14 @@
 				`fine_subsidy_desc` = #{fineSubsidyDesc}, 		
 				`fine_subsidy_source_code` = #{fineSubsidySourceCode}, 		
 				`fine_subsidy_source_desc` = #{fineSubsidySourceDesc}, 		
-				`fine_desc` = #{fineDesc}, 		
+				`fine_type` = #{fineType}, 		
+				`fine_type_desc` = #{fineTypeDesc}, 		
 				`operator_id` = #{operatorId}, 		
 				`operator` = #{operator}, 		
 				`dept_id` = #{deptId}, 		
 				`dept_name` = #{deptName}, 		
-				`remark` = #{remark}, 		
-				`create_time` = #{createTime}, 		
-				`create_op` = #{createOp}, 		
-				`update_time` = #{updateTime}, 		
-				`update_op` = #{updateOp}, 		
-				`is_delete` = #{isDelete}		
-	
-		</set>
+				`remark` = #{remark}
+		    </set>
 		where id = #{id}
 	</update>
   	
