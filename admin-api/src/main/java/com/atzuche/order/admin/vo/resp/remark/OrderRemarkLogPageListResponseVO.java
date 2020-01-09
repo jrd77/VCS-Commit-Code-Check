@@ -12,16 +12,16 @@ public class OrderRemarkLogPageListResponseVO {
 
     // 当前页
     @AutoDocProperty(value = "当前页")
-    private int pageNum;
+    private String pageNumber;
     // 每页的数量
     @AutoDocProperty(value = "每页数量")
-    private int pageSize;
+    private String pageSize;
     // 总记录数
     @AutoDocProperty(value = "总记录数")
-    private long total;
+    private String total;
     // 总页数
     @AutoDocProperty(value = "总页数")
-    private int pages;
+    private String pages;
 
     @AutoDocProperty(value = "备注日志列表")
     private List<OrderRemarkLogListResponseVO> orderRemarkLogList;
