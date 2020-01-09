@@ -1006,7 +1006,7 @@ public class RenterOrderCostCombineService {
                         renterOrderCostDetailEntity.setOrderNo(costBaseDTO.getOrderNo());
                         renterOrderCostDetailEntity.setRenterOrderNo(costBaseDTO.getRenterOrderNo());
                         renterOrderCostDetailEntity.setMemNo(costBaseDTO.getMemNo());
-                        renterOrderCostDetailEntity.setTotalAmount(overTransportFee);
+                        renterOrderCostDetailEntity.setTotalAmount(-overTransportFee);
                         renterOrderCostDetailEntity.setCount(1D);
                         renterOrderCostDetailEntity.setCostCode(RenterCashCodeEnum.GET_BLOCKED_RAISE_AMT.getCashNo());
                         renterOrderCostDetailEntity.setCostDesc(RenterCashCodeEnum.GET_BLOCKED_RAISE_AMT.getTxt());
@@ -1060,7 +1060,7 @@ public class RenterOrderCostCombineService {
                         renterOrderCostDetailEntity.setOrderNo(costBaseDTO.getOrderNo());
                         renterOrderCostDetailEntity.setRenterOrderNo(costBaseDTO.getRenterOrderNo());
                         renterOrderCostDetailEntity.setMemNo(costBaseDTO.getMemNo());
-                        renterOrderCostDetailEntity.setTotalAmount(overTransportFee);
+                        renterOrderCostDetailEntity.setTotalAmount(-overTransportFee);
                         renterOrderCostDetailEntity.setCount(1D);
                         renterOrderCostDetailEntity.setCostCode(RenterCashCodeEnum.RETURN_BLOCKED_RAISE_AMT.getCashNo());
                         renterOrderCostDetailEntity.setCostDesc(RenterCashCodeEnum.RETURN_BLOCKED_RAISE_AMT.getTxt());
