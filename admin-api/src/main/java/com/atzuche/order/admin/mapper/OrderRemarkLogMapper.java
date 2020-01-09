@@ -2,6 +2,7 @@ package com.atzuche.order.admin.mapper;
 
 import com.atzuche.order.admin.entity.OrderInsuranceAdditionRequestEntity;
 import com.atzuche.order.admin.entity.OrderRemarkEntity;
+import com.atzuche.order.admin.entity.OrderRemarkLogEntity;
 import com.atzuche.order.admin.entity.OrderRemarkOverviewEntity;
 import com.atzuche.order.admin.vo.req.remark.OrderRemarkInformationRequestVO;
 import com.atzuche.order.admin.vo.req.remark.OrderRemarkListRequestVO;
@@ -17,9 +18,9 @@ public interface OrderRemarkLogMapper {
 
     /**
      * 添加备注操作日志
-     * @param orderInsuranceAdditionRequestEntity
+     * @param orderRemarkLogEntity
      */
-    void addOrderRemarkLog(OrderInsuranceAdditionRequestEntity orderInsuranceAdditionRequestEntity);
+    void addOrderRemarkLog(OrderRemarkLogEntity orderRemarkLogEntity);
 
 
 

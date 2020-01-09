@@ -2,9 +2,12 @@ package com.atzuche.order.admin.service.remark;
 
 import com.atzuche.order.admin.common.AdminUserUtil;
 import com.atzuche.order.admin.entity.OrderRemarkEntity;
+import com.atzuche.order.admin.entity.OrderRemarkLogEntity;
 import com.atzuche.order.admin.entity.OrderRemarkOverviewEntity;
 import com.atzuche.order.admin.enums.DepartmentEnum;
+import com.atzuche.order.admin.enums.OperateTypeEnum;
 import com.atzuche.order.admin.enums.RemarkTypeEnum;
+import com.atzuche.order.admin.mapper.OrderRemarkLogMapper;
 import com.atzuche.order.admin.mapper.OrderRemarkMapper;
 import com.atzuche.order.admin.vo.req.remark.*;
 import com.atzuche.order.admin.vo.resp.remark.*;
@@ -27,6 +30,8 @@ public class OrderRemarkService {
 
     @Autowired
     private OrderRemarkMapper orderRemarkMapper;
+    @Autowired
+    private OrderRemarkLogMapper orderRemarkLogMapper;
 
     /**
      * 获取备注总览
@@ -62,6 +67,12 @@ public class OrderRemarkService {
         orderRemarkEntity.setCreateOp(userName);
         orderRemarkEntity.setUpdateOp(userName);
         orderRemarkMapper.addOrderRemark(orderRemarkEntity);
+
+        //保存操作日志
+        OrderRemarkLogEntity orderRemarkLogEntity = new OrderRemarkLogEntity();
+        BeanUtils.copyProperties(orderRemarkEntity, orderRemarkLogEntity);
+        orderRemarkLogEntity.setOperateType(OperateTypeEnum.ADD.getType());
+        orderRemarkLogMapper.addOrderRemarkLog(orderRemarkLogEntity);
     }
 
     public OrderRemarkResponseVO getOrderRemarkInformation(OrderRemarkInformationRequestVO orderRemarkInformationRequestVO){
@@ -76,10 +87,21 @@ public class OrderRemarkService {
      * @param orderRemarkUpdateRequestVO
      */
     public void updateRemarkById(OrderRemarkUpdateRequestVO orderRemarkUpdateRequestVO){
+        OrderRemarkInformationRequestVO orderRemarkInformationRequestVO = new OrderRemarkInformationRequestVO();
+        orderRemarkInformationRequestVO.setRemarkId(orderRemarkUpdateRequestVO.getRemarkId());
+        OrderRemarkEntity oldOrderRemarkEntity = orderRemarkMapper.getOrderRemarkInformation(orderRemarkInformationRequestVO);
         OrderRemarkEntity orderRemarkEntity = new OrderRemarkEntity();
         BeanUtils.copyProperties(orderRemarkUpdateRequestVO,orderRemarkEntity);
         orderRemarkEntity.setUpdateOp(AdminUserUtil.getAdminUser().getAuthName());
         orderRemarkMapper.updateRemarkById(orderRemarkEntity);
+        //保存操作日志
+        OrderRemarkLogEntity orderRemarkLogEntity = new OrderRemarkLogEntity();
+        BeanUtils.copyProperties(orderRemarkEntity, orderRemarkLogEntity);
+        orderRemarkLogEntity.setOperateType(OperateTypeEnum.UPDATE.getType());
+        orderRemarkLogEntity.setRemarkHistory(oldOrderRemarkEntity.getRemarkContent());
+        orderRemarkLogEntity.setCreateOp(oldOrderRemarkEntity.getCreateOp());
+        orderRemarkLogEntity.setNumber(oldOrderRemarkEntity.getNumber());
+        orderRemarkLogMapper.addOrderRemarkLog(orderRemarkLogEntity);
     }
 
 
@@ -93,6 +115,22 @@ public class OrderRemarkService {
         orderRemarkEntity.setIsDelete(DELETE_FLAG);
         orderRemarkEntity.setUpdateOp(AdminUserUtil.getAdminUser().getAuthName());
         orderRemarkMapper.updateRemarkById(orderRemarkEntity);
+
+
+        //保存操作日志
+        OrderRemarkInformationRequestVO orderRemarkInformationRequestVO = new OrderRemarkInformationRequestVO();
+        orderRemarkInformationRequestVO.setRemarkId(orderRemarkInformationRequestVO.getRemarkId());
+        OrderRemarkEntity oldOrderRemarkEntity = orderRemarkMapper.getOrderRemarkInformation(orderRemarkInformationRequestVO);
+        OrderRemarkLogEntity orderRemarkLogEntity = new OrderRemarkLogEntity();
+        BeanUtils.copyProperties(orderRemarkEntity, orderRemarkLogEntity);
+        orderRemarkLogEntity.setOperateType(OperateTypeEnum.DELETE.getType());
+        orderRemarkLogEntity.setRemarkHistory(oldOrderRemarkEntity.getRemarkContent());
+        orderRemarkLogEntity.setCreateOp(oldOrderRemarkEntity.getCreateOp());
+        orderRemarkLogEntity.setNumber(oldOrderRemarkEntity.getNumber());
+        orderRemarkLogEntity.setUpdateOp(oldOrderRemarkEntity.getUpdateOp());
+        orderRemarkLogMapper.addOrderRemarkLog(orderRemarkLogEntity);
+
+
     }
 
 

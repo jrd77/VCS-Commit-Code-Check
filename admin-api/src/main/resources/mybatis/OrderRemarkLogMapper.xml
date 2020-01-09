@@ -3,10 +3,7 @@
 
 <mapper namespace="com.atzuche.order.admin.mapper.OrderRemarkLogMapper">
 
-    <resultMap id="orderRemarkOverviewMap" type="com.atzuche.order.admin.entity.OrderRemarkOverviewEntity" >
-        <result property="remarkType" column="remark_type"/>
-        <result property="typeCount" column="typeCount"/>
-    </resultMap>
+
 
 	<resultMap id="orderRemarkInformationMap" type="com.atzuche.order.admin.entity.OrderRemarkEntity" >
 		<result property="remarkType" column="remark_type"/>
@@ -20,10 +17,11 @@
 	</resultMap>
 
 
-    <insert id="addOrderRemarkLog" parameterType="com.atzuche.order.admin.entity.OrderRemarkEntity">
-        insert into trans_remark
+    <insert id="addOrderRemarkLog" parameterType="com.atzuche.order.admin.entity.OrderRemarkLogEntity">
+        insert into trans_remark_log
 		(
 			`order_no`,
+			`remark_id`,
 			`number`,
 			`remark_type`,
 			`remark`,
@@ -32,6 +30,7 @@
 			`follow_fail_reason`,
 			`create_time`,
 			`create_op`,
+			`operate_type`,
 			`update_time`,
 			`update_op`,
 			`dept_id`
@@ -39,7 +38,8 @@
 		values
 		(
 			#{orderNo},
-			SELECT IFNULL(MAX(number)+1,1) FROM trans_remark WHERE order_no = #{orderNo},
+			#{remarkId},
+			#{number},
 			#{remarkType},
 			#{remarkContent},
 			#{limitDelayed},
@@ -47,6 +47,7 @@
 			#{followFailReason},
 			#{createTime},
 			#{createOp},
+			#{operateType},
 			#{updateTime},
 			#{updateOp},
 			#{departmentId}

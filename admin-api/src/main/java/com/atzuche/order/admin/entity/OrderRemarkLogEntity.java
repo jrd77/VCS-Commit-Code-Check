@@ -6,7 +6,7 @@ import lombok.ToString;
 
 @Data
 @ToString
-public class OrderRemarkEntity {
+public class OrderRemarkLogEntity {
 
     @AutoDocProperty(value = "订单号")
     private String orderNo;
@@ -49,6 +49,12 @@ public class OrderRemarkEntity {
 
     @AutoDocProperty(value = "跟进失败原因")
     private String followFailReason;
+
+    @AutoDocProperty(value = "操作类型 1:新增,2更新,3删除")
+    private String operateType;
+
+    @AutoDocProperty(value = "备注历史内容")
+    private String remarkHistory;
 
 
 
