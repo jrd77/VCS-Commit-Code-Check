@@ -30,8 +30,8 @@ public class DeliveryCarInfoService {
     RenterOrderDeliveryService renterOrderDeliveryService;
     @Autowired
     HandoverCarService handoverCarService;
-    @Autowired
-    DeliveryCarInfoPriceService deliveryCarInfoPriceService;
+//    @Autowired
+//    DeliveryCarInfoPriceService deliveryCarInfoPriceService;
 
     /**
      * 获取配送相关信息
@@ -193,7 +193,7 @@ public class DeliveryCarInfoService {
         int oilDifference = Math.abs(Integer.valueOf(ownerGetAndReturnCarDTO.getCarOil)) - Math.abs(Integer.valueOf(ownerGetAndReturnCarDTO.getReturnCarOil()));
         ownerGetAndReturnCarDTO.setDrivingKM(ownerDrivingKM);
         ownerGetAndReturnCarDTO.setOilDifference(String.valueOf(oilDifference));
-        ownerGetAndReturnCarDTO.setOilDifferenceCrash(String.valueOf(MathUtil.mul(oilDifference,deliveryCarInfoPriceService.getOilPriceByCityCodeAndType(Integer.valueOf(cityCode),carEngineType))));
+       // ownerGetAndReturnCarDTO.setOilDifferenceCrash(String.valueOf(MathUtil.mul(oilDifference,deliveryCarInfoPriceService.getOilPriceByCityCodeAndType(Integer.valueOf(cityCode),carEngineType))));
         ownerGetAndReturnCarDTO.setOilServiceCharge("0");
         return ownerGetAndReturnCarDTO;
     }

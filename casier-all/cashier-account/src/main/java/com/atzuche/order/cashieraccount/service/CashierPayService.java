@@ -227,7 +227,7 @@ public class CashierPayService{
         //车辆押金 是否选择车辆押金
         if(orderPaySign.getPayKind().contains(DataPayKindConstant.RENT) && payVO.getAmtDeposit()<0){
           CashierEntity cashierEntity = cashierNoTService.getCashierEntity(orderPaySign.getOrderNo(),orderPaySign.getMenNo(), DataPayKindConstant.RENT);
-          if(Objects.nonNull(cashierEntity)){
+            if(Objects.nonNull(cashierEntity)){
               PayVo vo = cashierNoTService.getPayVO(cashierEntity,orderPaySign,payVO.getAmtDeposit(),payVO.getTitle(),DataPayKindConstant.RENT);
               String payMd5 = MD5.MD5Encode(FasterJsonUtil.toJson(vo));
               vo.setPayMd5(payMd5);

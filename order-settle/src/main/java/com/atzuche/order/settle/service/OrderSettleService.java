@@ -2,6 +2,7 @@ package com.atzuche.order.settle.service;
 
 import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostSettleEntity;
 import com.atzuche.order.cashieraccount.service.CashierSettleService;
+import com.atzuche.order.commons.CatConstants;
 import com.atzuche.order.ownercost.entity.OwnerOrderEntity;
 import com.atzuche.order.ownercost.service.OwnerOrderService;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
@@ -11,8 +12,11 @@ import com.atzuche.order.settle.service.notservice.OrderSettleNoTService;
 import com.atzuche.order.settle.vo.req.SettleOrders;
 import com.atzuche.order.settle.vo.req.SettleOrdersAccount;
 import com.atzuche.order.settle.vo.req.SettleOrdersDefinition;
+import com.autoyol.cat.CatAnnotation;
 import com.autoyol.commons.utils.GsonUtils;
 import com.autoyol.doc.util.StringUtil;
+import com.dianping.cat.Cat;
+import com.dianping.cat.message.Transaction;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,51 +32,27 @@ import java.util.Objects;
  */
 @Service
 @Slf4j
-public class OrderSettleService {
+public class OrderSettleService{
     @Autowired private CashierSettleService cashierSettleService;
     @Autowired private OrderSettleNoTService orderSettleNoTService;
-    @Autowired private RenterOrderService renterOrderService;
-    @Autowired private OwnerOrderService ownerOrderService;
+
     /**
      * 车辆押金结算
      */
     @Transactional(rollbackFor=Exception.class)
+    @CatAnnotation
     public void settleOrder(String orderNo) {
         log.info("OrderSettleService settleOrder start param [{}]",orderNo);
-        //1 校验参数
-        if(StringUtil.isBlank(orderNo)){
-            return;
-        }
-        RenterOrderEntity renterOrder = renterOrderService.getRenterOrderByOrderNoAndIsEffective(orderNo);
-        if(Objects.isNull(renterOrder) || Objects.isNull(renterOrder.getRenterOrderNo())){
-            return;
-        }
-        //FIXME:可能一个主订单存在多个完结的租客子单和车主子单，第一个车主可能存在罚金
-        OwnerOrderEntity ownerOrder = ownerOrderService.getOwnerOrderByOrderNoAndIsEffective(orderNo);
-        if(Objects.isNull(ownerOrder) || Objects.isNull(ownerOrder.getOwnerOrderNo())){
-            return;
-        }
-
-        // 2 TODO 校验订单状态 以及是否存在 理赔暂扣 存在不能进行结算 并CAT告警
-        orderSettleNoTService.check(renterOrder);
-        // 3 初始化数据
-
-        // 3.1获取租客子订单 和 租客会员号
-        String renterOrderNo = renterOrder.getRenterOrderNo();
-        String renterMemNo = "";
-        //3.2获取车主子订单 和 车主会员号
-        String ownerOrderNo = ownerOrder.getOwnerOrderNo();
-        String ownerMemNo = ownerOrder.getMemNo();
         //3.3 初始化结算对象
-        SettleOrders settleOrders =  orderSettleNoTService.initSettleOrders(orderNo,renterOrderNo,ownerOrderNo,renterMemNo,ownerMemNo);
+        SettleOrders settleOrders =  orderSettleNoTService.initSettleOrders(orderNo);
         log.info("OrderSettleService initSettleOrders settleOrders [{}]", GsonUtils.toJson(settleOrders));
 
         //3.4 查询所有租客费用明细
-        orderSettleNoTService.getRenterCostSettleDetail(settleOrders,renterOrder);
+        orderSettleNoTService.getRenterCostSettleDetail(settleOrders);
         log.info("OrderSettleService getRenterCostSettleDetail settleOrders [{}]", GsonUtils.toJson(settleOrders));
 
         //3.5 查询所有车主费用明细
-        orderSettleNoTService.getOwnerCostSettleDetail(settleOrders,ownerOrder);
+        orderSettleNoTService.getOwnerCostSettleDetail(settleOrders);
         log.info("OrderSettleService getOwnerCostSettleDetail settleOrders [{}]", GsonUtils.toJson(settleOrders));
 
         //4 计算费用统计  资金统计
@@ -100,7 +80,7 @@ public class OrderSettleService {
         SettleOrdersAccount settleOrdersAccount = new SettleOrdersAccount();
         BeanUtils.copyProperties(settleOrders,settleOrdersAccount);
         settleOrdersAccount.setRentCostAmtFinal(accountRenterCostSettle.getRentAmt());
-        settleOrdersAccount.setRentCostPayAmtFinal(accountRenterCostSettle.getShifuAmt());
+        settleOrdersAccount.setRentCostPayAmt(accountRenterCostSettle.getShifuAmt());
         settleOrdersAccount.setDepositAmt(depositAmt);
         settleOrdersAccount.setDepositSurplusAmt(depositAmt);
         settleOrdersAccount.setOwnerCostAmtFinal(settleOrdersDefinition.getOwnerCostAmtFinal());
@@ -130,6 +110,7 @@ public class OrderSettleService {
      */
     @Transactional(rollbackFor=Exception.class)
     public boolean settleOrderCancel(String orderNo) {
+
         return true;
     }
 }

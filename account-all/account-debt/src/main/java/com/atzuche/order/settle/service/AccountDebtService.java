@@ -86,14 +86,15 @@ public class AccountDebtService{
      * 记录用户历史欠款
      */
     @CatAnnotation
-    public void insertDebt(AccountInsertDebtReqVO accountInsertDebt){
+    public int insertDebt(AccountInsertDebtReqVO accountInsertDebt){
         //1校验
         Assert.notNull(accountInsertDebt, ErrorCode.PARAMETER_ERROR.getText());
         accountInsertDebt.check();
         //2 查询账户欠款
         accountDebtNoTService.productAccountDebt(accountInsertDebt);
         //3 新增欠款明细
-        accountDebtDetailNoTService.insertDebtDetail(accountInsertDebt);
+        return accountDebtDetailNoTService.insertDebtDetail(accountInsertDebt);
 
     }
+
 }
