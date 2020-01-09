@@ -2,6 +2,7 @@ package com.atzuche.order.delivery.vo.delivery;
 
 import com.atzuche.order.commons.entity.dto.OwnerMemberDTO;
 import com.atzuche.order.commons.entity.dto.RenterMemberDTO;
+import com.atzuche.order.commons.vo.req.OrderReqVO;
 import com.atzuche.order.delivery.enums.UsedDeliveryTypeEnum;
 import lombok.Data;
 import lombok.ToString;
@@ -122,11 +123,17 @@ public class OrderDeliveryDTO {
      * @param ownerMemberDTO
      * @param renterMemberDTO
      */
-    public void setParamsTypeValue(Integer orderType, OwnerMemberDTO ownerMemberDTO, RenterMemberDTO renterMemberDTO) {
+    public void setParamsTypeValue(OrderReqVO orderReqVO,Integer orderType, OwnerMemberDTO ownerMemberDTO, RenterMemberDTO renterMemberDTO) {
         if (orderType == UsedDeliveryTypeEnum.USED.getValue().intValue()) {
-            setGetReturnUserName(renterMemberDTO.getRealName());
-            setGetReturnUserPhone(renterMemberDTO.getPhone());
+           setRenterGetReturnAddr(orderReqVO.getSrvGetAddr());
+           setRenterGetReturnAddrLat(orderReqVO.getSrvGetLat());
+           setRenterGetReturnAddrLon(orderReqVO.getSrvGetLon());
+           setGetReturnUserName(renterMemberDTO.getRealName());
+           setGetReturnUserPhone(renterMemberDTO.getPhone());
         } else {
+            setRenterGetReturnAddr(orderReqVO.getSrvReturnAddr());
+            setRenterGetReturnAddrLat(orderReqVO.getSrvReturnLat());
+            setRenterGetReturnAddrLon(orderReqVO.getSrvReturnLon());
             setGetReturnUserName(ownerMemberDTO.getRealName());
             setGetReturnUserPhone(ownerMemberDTO.getPhone());
 

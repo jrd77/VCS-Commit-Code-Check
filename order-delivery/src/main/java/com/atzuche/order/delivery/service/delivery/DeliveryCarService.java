@@ -234,17 +234,14 @@ public class DeliveryCarService {
             orderDeliveryDTO.setCityCode(orderReqVO.getCityCode());
             orderDeliveryDTO.setCityName(orderReqVO.getCityName());
             orderDeliveryDTO.setCreateOp("");
-            orderDeliveryDTO.setRenterGetReturnAddr(orderReqVO.getSrvReturnAddr());
-            orderDeliveryDTO.setRenterGetReturnAddrLat(orderReqVO.getSrvReturnLat());
-            orderDeliveryDTO.setRenterGetReturnAddrLon(orderReqVO.getSrvReturnLon());
             orderDeliveryDTO.setRenterName(renterMemberDTO.getRealName());
             orderDeliveryDTO.setRenterPhone(renterMemberDTO.getPhone());
             orderDeliveryDTO.setOrderNo(renterGoodsDetailDTO.getOrderNo());
             orderDeliveryDTO.setRenterDealCount(renterMemberDTO.getOrderSuccessCount());
             orderDeliveryDTO.setIsNotifyRenyun(UsedDeliveryTypeEnum.USED.getValue().intValue());
-            orderDeliveryDTO.setOwnerGetReturnAddr(orderReqVO.getSrvReturnAddr());
-            orderDeliveryDTO.setOwnerGetReturnAddrLat(orderReqVO.getSrvReturnLat());
-            orderDeliveryDTO.setOwnerGetReturnAddrLon(orderReqVO.getSrvReturnLon());
+            orderDeliveryDTO.setOwnerGetReturnAddr(ownerGoodsDetailDTO.getCarRealAddr());
+            orderDeliveryDTO.setOwnerGetReturnAddrLat(ownerGoodsDetailDTO.getCarRealLat());
+            orderDeliveryDTO.setOwnerGetReturnAddrLon(ownerGoodsDetailDTO.getCarRealLon());
             orderDeliveryDTO.setOwnerName(ownerMemberDTO.getRealName());
             orderDeliveryDTO.setOwnerPhone(ownerMemberDTO.getPhone());
             orderDeliveryDTO.setRenterPhone(renterMemberDTO.getPhone());
@@ -252,7 +249,7 @@ public class DeliveryCarService {
             orderDeliveryDTO.setRentTime(renterGoodsDetailDTO.getRentTime());
             orderDeliveryDTO.setRevertTime(renterGoodsDetailDTO.getRevertTime());
             orderDeliveryDTO.setType(orderType);
-            orderDeliveryDTO.setParamsTypeValue(orderType,ownerMemberDTO,renterMemberDTO);
+            orderDeliveryDTO.setParamsTypeValue(orderReqVO,orderType,ownerMemberDTO,renterMemberDTO);
             /**组装仁云信息**/
             renYunFlowOrderDTO.setOrdernumber(renterGoodsDetailDTO.getOrderNo());
             renYunFlowOrderDTO.setOrderType(orderReqVO.getOrderCategory());
@@ -264,7 +261,6 @@ public class DeliveryCarService {
             renYunFlowOrderDTO.setVehicletype(renterGoodsDetailDTO.getCarTypeTxt());
             renYunFlowOrderDTO.setDeliverycarcity(orderReqVO.getCityName());
             renYunFlowOrderDTO.setDefaultpickupcaraddr(orderDeliveryDTO.getRenterGetReturnAddr());
-            renYunFlowOrderDTO.setAlsocaraddr(orderDeliveryDTO.getRenterGetReturnAddr());
             renYunFlowOrderDTO.setOwnername(ownerMemberDTO.getRealName());
             renYunFlowOrderDTO.setOwnerphone(ownerMemberDTO.getPhone());
             renYunFlowOrderDTO.setSuccessordenumber(String.valueOf(ownerMemberDTO.getOrderSuccessCount()));
