@@ -30,7 +30,7 @@ public class AccountDebtReceivableaDetailNoTService {
     public void insertAlreadyReceivablea(List<AccountDebtReceivableaDetailEntity> accountDebtReceivableaDetails) {
         for(int i=0;i<accountDebtReceivableaDetails.size();i++){
             AccountDebtReceivableaDetailEntity accountDebtReceivableaDetail =  accountDebtReceivableaDetails.get(i);
-            int result = accountDebtReceivableaDetailMapper.insert(accountDebtReceivableaDetail);
+            int result = accountDebtReceivableaDetailMapper.insertSelective(accountDebtReceivableaDetail);
             if(result==0){
                 throw new AccountDeductDebtDBException();
             }

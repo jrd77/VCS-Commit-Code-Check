@@ -13,7 +13,7 @@ import org.apache.ibatis.annotations.Mapper;
 public interface AccountOwnerIncomeExamineMapper{
 
     AccountOwnerIncomeExamineEntity selectByPrimaryKey(Integer id);
-    int insert(AccountOwnerIncomeExamineEntity record);
+    int insertSelective(AccountOwnerIncomeExamineEntity record);
     int updateByPrimaryKeySelective(AccountOwnerIncomeExamineEntity record);
 
 }

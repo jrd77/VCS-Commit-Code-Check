@@ -17,7 +17,7 @@ public interface AccountRenterDetainCostMapper{
 
     AccountRenterDetainCostEntity selectByPrimaryKey(Integer id);
 
-    int insert(AccountRenterDetainCostEntity record);
+    int insertSelective(AccountRenterDetainCostEntity record);
     
     int updateByPrimaryKeySelective(AccountRenterDetainCostEntity record);
 

@@ -17,8 +17,6 @@ public interface AccountRenterWzDepositCostDetailMapper{
 
     List<AccountRenterWzDepositCostDetailEntity> selectALL();
 
-    int insert(AccountRenterWzDepositCostDetailEntity record);
-    
     int insertSelective(AccountRenterWzDepositCostDetailEntity record);
 
     int updateByPrimaryKey(AccountRenterWzDepositCostDetailEntity record);
