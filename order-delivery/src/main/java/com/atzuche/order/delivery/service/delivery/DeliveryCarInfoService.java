@@ -109,9 +109,10 @@ public class DeliveryCarInfoService {
             getHandoverCarDTO.setGetCarCrash("0");
             getHandoverCarDTO.setGetCarKM("0'");
             getHandoverCarDTO.setIsChaoYunNeng("0");
+            getHandoverCarDTO.setOwnerGetCarCrash("0");
+            getHandoverCarDTO.setRenterRealGetAddr(renterOrderDeliveryEntity.getRenterGetReturnAddr());
             getHandoverCarDTO.setOwnDefaultGetCarAddr(renterOrderDeliveryEntity.getOwnerGetReturnAddr());
             getHandoverCarDTO.setOwnRealReturnAddr(renterOrderDeliveryEntity.getRenterGetReturnAddr());
-            getHandoverCarDTO.setOwnerGetCarCrash("0");
             String remark = ownerHandoverCarRemarkEntities.stream().filter(r -> (r.getType().intValue() != HandoverCarTypeEnum.RENYUN_TO_RENTER.getValue().intValue())).findFirst().get().getRemark();
             getHandoverCarDTO.setOwnRealGetRemark(remark);
             String renterRemark = renterHandoverCarRemarkEntities.stream().filter(r -> (r.getType().intValue() != HandoverCarTypeEnum.RENYUN_TO_RENTER.getValue().intValue())).findFirst().get().getRemark();
@@ -119,8 +120,6 @@ public class DeliveryCarInfoService {
             deliveryCarVO.setIsGetCar("1");
             LocalDateTime rentTime = renterOrderDeliveryEntity.getRentTime();
             getHandoverCarDTO.setRentTime(DateUtils.formate(rentTime, DateUtils.DATE_DEFAUTE_4) + "," + renterOrderDeliveryEntity.getAheadOrDelayTime());
-            int mileageNum = renterHandoverCarInfoEntities.stream().filter(r -> (r.getType().intValue() != HandoverCarTypeEnum.RENYUN_TO_RENTER.getValue().intValue())).findFirst().get().getMileageNum();
-            getHandoverCarDTO.setGetCarKM(String.valueOf(mileageNum));
             deliveryCarVO.setGetHandoverCarDTO(getHandoverCarDTO);
         } else if (renterOrderDeliveryEntity.getType() == 2 && renterOrderDeliveryEntity.getStatus() != 0) {
             ReturnHandoverCarDTO returnHandoverCarDTO = new ReturnHandoverCarDTO();
@@ -128,9 +127,10 @@ public class DeliveryCarInfoService {
             returnHandoverCarDTO.setReturnCarCrash("0");
             returnHandoverCarDTO.setReturnCarKM("0'");
             returnHandoverCarDTO.setIsChaoYunNeng("0");
+            returnHandoverCarDTO.setOwnerGetCarCrash("0");
+            returnHandoverCarDTO.setRenterRealReturnAddr(renterOrderDeliveryEntity.getRenterGetReturnAddr());
             returnHandoverCarDTO.setOwnDefaultReturnCarAddr(renterOrderDeliveryEntity.getOwnerGetReturnAddr());
             returnHandoverCarDTO.setOwnerRealGetAddr(renterOrderDeliveryEntity.getRenterGetReturnAddr());
-            returnHandoverCarDTO.setOwnerGetCarCrash("0");
             String remark = ownerHandoverCarRemarkEntities.stream().filter(r -> (r.getType().intValue() != HandoverCarTypeEnum.RENTER_TO_RENYUN.getValue().intValue())).findFirst().get().getRemark();
             returnHandoverCarDTO.setOwnerRealGetAddrReamrk(remark);
             String renterRemark = renterHandoverCarRemarkEntities.stream().filter(r -> (r.getType().intValue() != HandoverCarTypeEnum.RENTER_TO_RENYUN.getValue().intValue())).findFirst().get().getRemark();
