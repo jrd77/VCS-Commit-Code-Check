@@ -10,6 +10,7 @@ import com.atzuche.order.commons.enums.RenterCashCodeEnum;
 import com.atzuche.order.commons.enums.cashier.TransStatusEnum;
 import com.atzuche.order.settle.service.AccountDebtService;
 import com.atzuche.order.settle.vo.req.AccountDeductDebtReqVO;
+import com.atzuche.order.settle.vo.req.AccountInsertDebtReqVO;
 import com.atzuche.order.settle.vo.res.AccountDebtResVO;
 import com.atzuche.order.accountownerincome.service.AccountOwnerIncomeService;
 import com.atzuche.order.accountownerincome.vo.req.AccountOwnerIncomeExamineOpReqVO;
@@ -294,6 +295,12 @@ public class CashierService {
      */
     public AccountDebtResVO getAccountDebtByMemNo(String memNo) {
         return accountDebtService.getAccountDebtByMemNo(memNo);
+    }
+    /**
+     * 用户订单结算 产生历史欠款
+     */
+    public int createDebt(AccountInsertDebtReqVO accountInsertDebt){
+       return accountDebtService.insertDebt(accountInsertDebt);
     }
 
     /**  ***************************************** 历史欠款 end ************************************************* */
