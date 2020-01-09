@@ -225,12 +225,12 @@ public class DeliveryCarService {
                         .actReturnCarLat(carShowLat).actReturnCarLon(carShowLng).expGetCarAddr(carShowAddr).expGetCarLat(carShowLat).expGetCarLon(carShowLng).expReturnCarAddr(carShowAddr)
                         .expReturnCarLat(carShowLat).expReturnCarLon(carShowLng).orderNo(renterGoodsDetailDTO.getOrderNo()).renterOrderNo(renterGoodsDetailDTO.getRenterOrderNo()).createTime(LocalDateTime.now()).createOp("").build();
             }
-        } else {
-            /**组装地址信息**/
+        }else {
             renterDeliveryAddrDTO = RenterDeliveryAddrDTO.builder().actGetCarAddr(orderReqVO.getSrvGetAddr()).actGetCarLat(orderReqVO.getSrvGetLat()).actGetCarLon(orderReqVO.getSrvGetLon()).actReturnCarAddr(orderReqVO.getSrvReturnAddr())
                     .actReturnCarLat(orderReqVO.getSrvReturnLat()).actReturnCarLon(orderReqVO.getSrvReturnLon()).expGetCarAddr(orderReqVO.getSrvReturnAddr()).expGetCarLat(orderReqVO.getSrvReturnLat()).expGetCarLon(orderReqVO.getSrvReturnLon()).expReturnCarAddr(orderReqVO.getSrvGetAddr())
                     .expReturnCarLat(orderReqVO.getSrvGetLat()).expReturnCarLon(orderReqVO.getSrvGetLon()).orderNo(renterGoodsDetailDTO.getOrderNo()).renterOrderNo(renterGoodsDetailDTO.getRenterOrderNo()).createTime(LocalDateTime.now()).createOp("").build();
-            /**组装配送订单信息**/
+        }
+        /**组装配送订单信息**/
             orderDeliveryDTO.setCityCode(orderReqVO.getCityCode());
             orderDeliveryDTO.setCityName(orderReqVO.getCityName());
             orderDeliveryDTO.setCreateOp("");
@@ -275,7 +275,6 @@ public class DeliveryCarService {
             renYunFlowOrderDTO.setSceneName(orderReqVO.getSceneCode());
             renYunFlowOrderDTO.setDisplacement(String.valueOf(ownerGoodsDetailDTO.getCarCylinderCapacity()));
             renYunFlowOrderDTO.setSource(orderReqVO.getSource());
-        }
         orderDeliveryVO.setOrderDeliveryDTO(orderDeliveryDTO);
         orderDeliveryVO.setRenterDeliveryAddrDTO(renterDeliveryAddrDTO);
         orderDeliveryVO.setRenYunFlowOrderDTO(renYunFlowOrderDTO);
