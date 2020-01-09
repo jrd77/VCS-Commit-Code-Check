@@ -17,6 +17,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.ObjectUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -108,6 +109,20 @@ public class OrderRemarkService {
         orderRemarkLogService.addOrderRemarkLog(orderRemarkEntity, OperateTypeEnum.UPDATE.getType());
     }
 
+    /**
+     * 修改取送车备注remark_type=12，取送车备注一直累加,读取时取最新一条
+     * @param orderCarServiceRemarkUpdateRequestVO
+     */
+    public void updateCarServiceRemarkByOrderNo(OrderCarServiceRemarkRequestVO orderCarServiceRemarkUpdateRequestVO){
+        OrderRemarkEntity orderRemarkEntity = new OrderRemarkEntity();
+        BeanUtils.copyProperties(orderCarServiceRemarkUpdateRequestVO,orderRemarkEntity);
+        String userName = AdminUserUtil.getAdminUser().getAuthName();
+        orderRemarkEntity.setUpdateOp(userName);
+        orderRemarkEntity.setCreateOp(userName);
+        orderRemarkEntity.setRemarkType(RemarkTypeEnum.CAR_SERVICE.getType());
+        orderRemarkMapper.addOrderRemark(orderRemarkEntity);
+    }
+
 
     /**
      * 删除订单备注
@@ -146,6 +161,21 @@ public class OrderRemarkService {
         return orderRemarkPageListResponseVO;
     }
 
+
+
+    /**
+     * 获取取送车备注remarkType=12
+     * @param orderRemarkRequestVO
+     * @return
+     */
+    public OrderRemarkResponseVO getOrderCarServiceRemarkInformation(OrderRemarkRequestVO orderRemarkRequestVO){
+        OrderRemarkResponseVO orderRemarkResponseVO = new OrderRemarkResponseVO();
+        OrderRemarkEntity orderRemarkEntity = orderRemarkMapper.getOrderCarServiceRemarkInformation(orderRemarkRequestVO);
+        if(!ObjectUtils.isEmpty(orderRemarkEntity)){
+            BeanUtils.copyProperties(orderRemarkEntity, orderRemarkResponseVO);
+        }
+        return orderRemarkResponseVO;
+    }
 
 
 }
