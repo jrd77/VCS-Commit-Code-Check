@@ -99,8 +99,12 @@ public class OrderRemarkService {
         BeanUtils.copyProperties(orderRemarkEntity, orderRemarkLogEntity);
         orderRemarkLogEntity.setOperateType(OperateTypeEnum.UPDATE.getType());
         orderRemarkLogEntity.setRemarkHistory(oldOrderRemarkEntity.getRemarkContent());
-        orderRemarkLogEntity.setCreateOp(oldOrderRemarkEntity.getCreateOp());
+        String userName = AdminUserUtil.getAdminUser().getAuthName();
+        orderRemarkLogEntity.setOrderNo(oldOrderRemarkEntity.getOrderNo());
+        orderRemarkLogEntity.setCreateOp(userName);
+        orderRemarkLogEntity.setUpdateOp(userName);
         orderRemarkLogEntity.setNumber(oldOrderRemarkEntity.getNumber());
+        orderRemarkLogEntity.setDepartmentId(oldOrderRemarkEntity.getDepartmentId());
         orderRemarkLogMapper.addOrderRemarkLog(orderRemarkLogEntity);
     }
 
@@ -116,18 +120,22 @@ public class OrderRemarkService {
         orderRemarkEntity.setUpdateOp(AdminUserUtil.getAdminUser().getAuthName());
         orderRemarkMapper.updateRemarkById(orderRemarkEntity);
 
-
         //保存操作日志
         OrderRemarkInformationRequestVO orderRemarkInformationRequestVO = new OrderRemarkInformationRequestVO();
-        orderRemarkInformationRequestVO.setRemarkId(orderRemarkInformationRequestVO.getRemarkId());
+        orderRemarkInformationRequestVO.setRemarkId(orderRemarkDeleteRequestVO.getRemarkId());
         OrderRemarkEntity oldOrderRemarkEntity = orderRemarkMapper.getOrderRemarkInformation(orderRemarkInformationRequestVO);
         OrderRemarkLogEntity orderRemarkLogEntity = new OrderRemarkLogEntity();
         BeanUtils.copyProperties(orderRemarkEntity, orderRemarkLogEntity);
         orderRemarkLogEntity.setOperateType(OperateTypeEnum.DELETE.getType());
-        orderRemarkLogEntity.setRemarkHistory(oldOrderRemarkEntity.getRemarkContent());
-        orderRemarkLogEntity.setCreateOp(oldOrderRemarkEntity.getCreateOp());
+        String remarkContent = oldOrderRemarkEntity.getRemarkContent();
+        orderRemarkLogEntity.setRemarkHistory(remarkContent);
+        orderRemarkLogEntity.setRemarkContent(remarkContent);
+        String userName = AdminUserUtil.getAdminUser().getAuthName();
+        orderRemarkLogEntity.setCreateOp(userName);
+        orderRemarkLogEntity.setUpdateOp(userName);
+
         orderRemarkLogEntity.setNumber(oldOrderRemarkEntity.getNumber());
-        orderRemarkLogEntity.setUpdateOp(oldOrderRemarkEntity.getUpdateOp());
+        orderRemarkLogEntity.setOrderNo(oldOrderRemarkEntity.getOrderNo());
         orderRemarkLogMapper.addOrderRemarkLog(orderRemarkLogEntity);
 
 
