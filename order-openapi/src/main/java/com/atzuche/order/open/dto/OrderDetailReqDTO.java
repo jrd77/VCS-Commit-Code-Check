@@ -1,4 +1,4 @@
-package com.atzuche.order.commons.entity.orderDetailDto;
+package com.atzuche.order.open.dto;
 
 import lombok.Data;
 import org.hibernate.validator.constraints.NotBlank;

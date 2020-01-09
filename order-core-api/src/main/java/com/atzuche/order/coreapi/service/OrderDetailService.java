@@ -8,8 +8,7 @@ import com.atzuche.order.commons.entity.dto.OwnerMemberDTO;
 import com.atzuche.order.commons.entity.dto.OwnerMemberRightDTO;
 import com.atzuche.order.commons.entity.dto.RenterMemberDTO;
 import com.atzuche.order.commons.entity.dto.*;
-import com.atzuche.order.commons.entity.orderDetailDto.RenterMemberRightDTO;
-import com.atzuche.order.commons.entity.orderDetailDto.*;
+import com.atzuche.order.open.dto.*;
 import com.atzuche.order.commons.enums.DeliveryOrderTypeEnum;
 import com.atzuche.order.coreapi.submitOrder.exception.OrderDetailException;
 import com.atzuche.order.delivery.entity.RenterHandoverCarInfoEntity;
@@ -161,24 +160,24 @@ public class OrderDetailService {
 
         //会员权益
         RenterMemberDTO renterMemberDTO = renterMemberService.selectrenterMemberByRenterOrderNo(renterOrderNo, true);
-        com.atzuche.order.commons.entity.orderDetailDto.RenterMemberDTO renterMember = new com.atzuche.order.commons.entity.orderDetailDto.RenterMemberDTO();
+        com.atzuche.order.open.dto.RenterMemberDTO renterMember = new com.atzuche.order.open.dto.RenterMemberDTO();
         BeanUtils.copyProperties(renterMemberDTO,renterMember);
         List<com.atzuche.order.commons.entity.dto.RenterMemberRightDTO> renterMemberRightDTOList = renterMemberDTO.getRenterMemberRightDTOList();
-        List<RenterMemberRightDTO> renterMemberRightDTOS = new ArrayList<>();
+        List<com.atzuche.order.open.dto.RenterMemberRightDTO> renterMemberRightDTOS = new ArrayList<>();
         renterMemberRightDTOList.stream().forEach(x->{
-            RenterMemberRightDTO  renterMemberRightDTO = new RenterMemberRightDTO();
+            com.atzuche.order.open.dto.RenterMemberRightDTO renterMemberRightDTO = new com.atzuche.order.open.dto.RenterMemberRightDTO();
             BeanUtils.copyProperties(x,renterMemberRightDTO);
             renterMemberRightDTOS.add(renterMemberRightDTO);
         });
 
         //车主会员
         OwnerMemberDTO ownerMemberDTO = ownerMemberService.selectownerMemberByOwnerOrderNo(ownerOrderNo, true);
-        com.atzuche.order.commons.entity.orderDetailDto.OwnerMemberDTO ownerMember = new com.atzuche.order.commons.entity.orderDetailDto.OwnerMemberDTO();
+        com.atzuche.order.open.dto.OwnerMemberDTO ownerMember = new com.atzuche.order.open.dto.OwnerMemberDTO();
         BeanUtils.copyProperties(ownerMemberDTO,ownerMember);
         List<OwnerMemberRightDTO> ownerMemberRightDTOList = ownerMemberDTO.getOwnerMemberRightDTOList();
-        List<com.atzuche.order.commons.entity.orderDetailDto.OwnerMemberRightDTO> ownerMemberRightDTOS = new ArrayList<>();
+        List<com.atzuche.order.open.dto.OwnerMemberRightDTO> ownerMemberRightDTOS = new ArrayList<>();
         ownerMemberRightDTOList.stream().forEach(x->{
-            com.atzuche.order.commons.entity.orderDetailDto.OwnerMemberRightDTO ownerMemberRightDTO = new com.atzuche.order.commons.entity.orderDetailDto.OwnerMemberRightDTO();
+            com.atzuche.order.open.dto.OwnerMemberRightDTO ownerMemberRightDTO = new com.atzuche.order.open.dto.OwnerMemberRightDTO();
             BeanUtils.copyProperties(x,ownerMemberRightDTO);
             ownerMemberRightDTOS.add(ownerMemberRightDTO);
         });

@@ -1,7 +1,7 @@
 package com.atzuche.order.coreapi.controller;
 
-import com.atzuche.order.commons.entity.orderDetailDto.OrderDetailReqDTO;
-import com.atzuche.order.commons.entity.orderDetailDto.OrderDetailRespDTO;
+import com.atzuche.order.open.dto.OrderDetailReqDTO;
+import com.atzuche.order.open.dto.OrderDetailRespDTO;
 import com.atzuche.order.coreapi.service.OrderDetailService;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
