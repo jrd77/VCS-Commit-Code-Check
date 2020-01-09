@@ -30,4 +30,7 @@ public class OrderRemarkLogListResponseVO {
     @AutoDocProperty(value = "新备注内容")
     private String newRemarkContent;
 
+    @AutoDocProperty(value = "操作时间")
+    private String operateTime;
+
 }
