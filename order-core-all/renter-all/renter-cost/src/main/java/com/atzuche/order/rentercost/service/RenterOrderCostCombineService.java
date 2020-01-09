@@ -354,7 +354,7 @@ public class RenterOrderCostCombineService {
 		}
         List<DepositConfigEntity> depositList = depositConfigSDK.getConfig(new DefaultConfigContext());
 
-        double years = LocalDateTimeUtil.periodDays(depositAmtDTO.getLicenseDay(), LocalDate.now())/356D;
+        double years = LocalDateTimeUtil.periodDays(depositAmtDTO.getLicenseDay(), LocalDate.now())/365D;
         int surplusPriceProYear = CommonUtils.getSurplusPriceProYear(years);
         CarDepositAmtVO carDepositAmtVO = RenterFeeCalculatorUtils.calCarDepositAmt(depositAmtDTO.getCityCode(),
 				depositAmtDTO.getSurplusPrice(),
