@@ -11,6 +11,8 @@ import com.atzuche.order.delivery.utils.DateUtils;
 import com.atzuche.order.delivery.utils.MathUtil;
 import com.atzuche.order.delivery.vo.delivery.rep.*;
 import com.atzuche.order.delivery.vo.delivery.req.DeliveryCarRepVO;
+import com.autoyol.platformcost.OwnerFeeCalculatorUtils;
+import com.autoyol.platformcost.RenterFeeCalculatorUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -159,7 +161,7 @@ public class DeliveryCarInfoService {
         ownerHandoverCarInfoEntities = CommonUtil.copyList(renterHandoverCarInfoEntities);
         OwnerGetAndReturnCarDTO getAndReturnCarDTO = createOwnerGetAndReturnCarDTO(ownerGetAndReturnCarDTO, ownerHandoverCarInfoEntities,carEngineType,cityCode);
         BeanUtils.copyProperties(getAndReturnCarDTO, renterGetAndReturnCarDTO);
-        ownerGetAndReturnCarDTO.setPlatFormOilServiceCharge("0");
+        ownerGetAndReturnCarDTO.setPlatFormOilServiceCharge(RenterFeeCalculatorUtils.calServiceChargeFee().getTotalFee().toString());
         renterGetAndReturnCarDTO.setCarOwnerOilCrash("0");
         if (isEscrowCar) {
             ownerGetAndReturnCarDTO.setCarOilDifferenceCrash("0");

@@ -29,6 +29,7 @@ dependencies {
     compile 'net.sf.json-lib:json-lib:2.4:jdk15'
     compile project(":util-all:order-commons")
     compile project(":config")
+    compile project(":util-all:fee-calculator")
 
 
 }

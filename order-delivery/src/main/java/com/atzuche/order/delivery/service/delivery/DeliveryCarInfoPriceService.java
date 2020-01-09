@@ -38,7 +38,11 @@ public class DeliveryCarInfoPriceService {
         }
         int molecule = oilAverageCostEntity.getMolecule();
         int denominator = oilAverageCostEntity.getDenominator();
-        return MathUtil.div(molecule, denominator, 2);
+        if (denominator == 0) {
+           return  0d;
+        } else {
+            return MathUtil.div(molecule, denominator, 2);
+        }
     }
 
     /**
