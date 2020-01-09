@@ -246,6 +246,7 @@ public class RenterWzService {
             BeanUtils.copyProperties(costDetail,dto);
             dto.setAmount(String.valueOf(costDetail.getAmount()));
             dto.setCostType(WzCostEnums.getType(costDetail.getCostCode()));
+            dto.setRemarkName(WzCostEnums.getRemark(costDetail.getCostCode()));
             costDetails.add(dto);
         }
         return costDetails;
