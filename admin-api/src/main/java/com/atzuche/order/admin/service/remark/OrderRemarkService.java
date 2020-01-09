@@ -2,12 +2,10 @@ package com.atzuche.order.admin.service.remark;
 
 import com.atzuche.order.admin.common.AdminUserUtil;
 import com.atzuche.order.admin.entity.OrderRemarkEntity;
-import com.atzuche.order.admin.entity.OrderRemarkLogEntity;
 import com.atzuche.order.admin.entity.OrderRemarkOverviewEntity;
 import com.atzuche.order.admin.enums.DepartmentEnum;
 import com.atzuche.order.admin.enums.OperateTypeEnum;
 import com.atzuche.order.admin.enums.RemarkTypeEnum;
-import com.atzuche.order.admin.mapper.OrderRemarkLogMapper;
 import com.atzuche.order.admin.mapper.OrderRemarkMapper;
 import com.atzuche.order.admin.vo.req.remark.*;
 import com.atzuche.order.admin.vo.resp.remark.*;
