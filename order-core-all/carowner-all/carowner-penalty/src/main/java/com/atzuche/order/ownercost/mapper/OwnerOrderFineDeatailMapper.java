@@ -2,20 +2,17 @@ package com.atzuche.order.ownercost.mapper;
 
 import com.atzuche.order.ownercost.entity.OwnerOrderFineDeatailEntity;
 import org.apache.ibatis.annotations.Mapper;
-import java.util.List;
 
 /**
  * 车主订单罚金明细表
  * 
  * @author ZhangBin
- * @date 2019-12-11 18:16:00
+ * @date 2020-01-09 11:30:07
  */
 @Mapper
 public interface OwnerOrderFineDeatailMapper{
 
     OwnerOrderFineDeatailEntity selectByPrimaryKey(Integer id);
-
-    List<OwnerOrderFineDeatailEntity> selectALL();
 
     int insert(OwnerOrderFineDeatailEntity record);
     
