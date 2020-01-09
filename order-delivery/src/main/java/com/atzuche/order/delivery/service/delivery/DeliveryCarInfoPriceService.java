@@ -45,7 +45,7 @@ public class DeliveryCarInfoPriceService {
      * 设置预环境
      */
     @Builder
-    private class DeliveryCarInfoConfigContext implements ConfigContext {
+    private static class DeliveryCarInfoConfigContext implements ConfigContext {
 
         @Override
         public boolean preConfig() {
