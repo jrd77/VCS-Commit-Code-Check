@@ -4,6 +4,8 @@ import com.atzuche.order.delivery.entity.*;
 import com.atzuche.order.delivery.enums.RenterHandoverCarTypeEnum;
 import com.atzuche.order.delivery.service.RenterOrderDeliveryService;
 import com.atzuche.order.delivery.service.handover.HandoverCarService;
+import com.atzuche.order.delivery.service.handover.OwnerHandoverCarService;
+import com.atzuche.order.delivery.service.handover.RenterHandoverCarService;
 import com.atzuche.order.delivery.utils.CommonUtil;
 import com.atzuche.order.delivery.utils.DateUtils;
 import com.atzuche.order.delivery.vo.delivery.rep.*;
@@ -31,6 +33,10 @@ public class DeliveryCarInfoService {
     HandoverCarService handoverCarService;
 //    @Autowired
 //    DeliveryCarInfoPriceService deliveryCarInfoPriceService;
+    @Autowired
+    RenterHandoverCarService renterHandoverCarService;
+    @Autowired
+    OwnerHandoverCarService ownerHandoverCarService;
 
     /**
      * 获取配送相关信息
@@ -39,10 +45,10 @@ public class DeliveryCarInfoService {
      * @return
      */
     public DeliveryCarVO findDeliveryListByOrderNo(DeliveryCarRepVO deliveryCarDTO, OwnerGetAndReturnCarDTO ownerGetAndReturnCarDTO, Boolean isEscrowCar,Integer carEngineType) {
-        List<RenterHandoverCarInfoEntity> renterHandoverCarInfoEntities = handoverCarService.selectRenterByOrderNo(deliveryCarDTO.getOrderNo());
-        List<OwnerHandoverCarInfoEntity> ownerHandoverCarInfoEntities = handoverCarService.selectOwnerByOrderNo(deliveryCarDTO.getOrderNo());
-        List<RenterHandoverCarRemarkEntity> renterHandoverCarRemarkEntities = handoverCarService.getRenterHandoverRemarkInfo(deliveryCarDTO.getOrderNo());
-        List<OwnerHandoverCarRemarkEntity> ownerHandoverCarRemarkEntities = handoverCarService.getOwnerHandoverRemarkInfo(deliveryCarDTO.getOrderNo());
+        List<RenterHandoverCarInfoEntity> renterHandoverCarInfoEntities = renterHandoverCarService.selectRenterHandoverCarByOrderNo(deliveryCarDTO.getOrderNo());
+        List<OwnerHandoverCarInfoEntity> ownerHandoverCarInfoEntities = ownerHandoverCarService.selectOwnerByOrderNo(deliveryCarDTO.getOrderNo());
+        List<RenterHandoverCarRemarkEntity> renterHandoverCarRemarkEntities = renterHandoverCarService.getRenterHandoverRemarkInfo(deliveryCarDTO.getOrderNo());
+        List<OwnerHandoverCarRemarkEntity> ownerHandoverCarRemarkEntities = ownerHandoverCarService.getOwnerHandoverRemarkInfo(deliveryCarDTO.getOrderNo());
         List<RenterOrderDeliveryEntity> renterOrderDeliveryEntityList = renterOrderDeliveryService.listRenterOrderDeliveryByRenterOrderNo(deliveryCarDTO.getRenterOrderNo());
         DeliveryCarVO deliveryCarVO = createDeliveryCarVOParams(ownerGetAndReturnCarDTO, renterHandoverCarInfoEntities, ownerHandoverCarInfoEntities, renterHandoverCarRemarkEntities, ownerHandoverCarRemarkEntities, renterOrderDeliveryEntityList, isEscrowCar,carEngineType);
         return deliveryCarVO;

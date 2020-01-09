@@ -1,29 +1,20 @@
 package com.atzuche.order.delivery.common;
 
-import com.atzuche.order.delivery.entity.RenterDeliveryAddrEntity;
 import com.atzuche.order.delivery.entity.RenterOrderDeliveryEntity;
-import com.atzuche.order.delivery.enums.DeliveryTypeEnum;
-import com.atzuche.order.delivery.enums.RenterHandoverCarTypeEnum;
 import com.atzuche.order.delivery.enums.ServiceTypeEnum;
-import com.atzuche.order.delivery.enums.UserTypeEnum;
 import com.atzuche.order.delivery.exception.DeliveryOrderException;
-import com.atzuche.order.delivery.mapper.RenterDeliveryAddrMapper;
 import com.atzuche.order.delivery.mapper.RenterOrderDeliveryMapper;
 import com.atzuche.order.delivery.service.MailSendService;
+import com.atzuche.order.delivery.service.RenterOrderDeliveryService;
 import com.atzuche.order.delivery.service.delivery.RenYunDeliveryCarService;
 import com.atzuche.order.delivery.service.handover.HandoverCarService;
 import com.atzuche.order.delivery.utils.CodeUtils;
-import com.atzuche.order.delivery.utils.CommonUtil;
 import com.atzuche.order.delivery.utils.EmailConstants;
 import com.atzuche.order.delivery.vo.delivery.CancelFlowOrderDTO;
-import com.atzuche.order.delivery.vo.delivery.OrderDeliveryVO;
 import com.atzuche.order.delivery.vo.delivery.RenYunFlowOrderDTO;
 import com.atzuche.order.delivery.vo.delivery.UpdateFlowOrderDTO;
-import com.atzuche.order.delivery.vo.handover.HandoverCarInfoDTO;
-import com.atzuche.order.delivery.vo.handover.HandoverCarVO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -45,13 +36,13 @@ public class DeliveryCarTask {
     @Autowired
     MailSendService mailSendService;
     @Resource
-    RenterDeliveryAddrMapper deliveryAddrMapper;
-    @Resource
     RenterOrderDeliveryMapper orderDeliveryMapper;
     @Autowired
     HandoverCarService handoverCarService;
     @Autowired
     CodeUtils codeUtils;
+    @Autowired
+    RenterOrderDeliveryService renterOrderDeliveryService;
 
     /**
      * 添加订单到仁云流程系统
@@ -85,64 +76,6 @@ public class DeliveryCarTask {
         if (StringUtils.isBlank(result)) {
             sendMailByType(cancelFlowOrderDTO.getServicetype(), DeliveryConstants.CANCEL_TYPE, DeliveryConstants.CANCEL_FLOW_ORDER, cancelFlowOrderDTO.getOrdernumber());
         }
-    }
-
-    /**
-     * 插入配送地址/配送订单信息
-     *
-     * @param orderDeliveryVO
-     */
-    @Transactional(rollbackFor = Exception.class)
-    public void insertRenterDeliveryInfoAndDeliveryAddressInfo(Integer getMinutes, Integer returnMinutes, OrderDeliveryVO orderDeliveryVO, Integer type) {
-
-        if (Objects.nonNull(orderDeliveryVO.getOrderDeliveryDTO())) {
-            RenterOrderDeliveryEntity orderDeliveryEntity = new RenterOrderDeliveryEntity();
-            BeanUtils.copyProperties(orderDeliveryVO.getOrderDeliveryDTO(), orderDeliveryEntity);
-            if (type == DeliveryTypeEnum.ADD_TYPE.getValue().intValue()) {
-                orderDeliveryEntity.setOrderNoDelivery(codeUtils.createDeliveryNumber());
-                orderDeliveryEntity.setAheadOrDelayTimeInfo(getMinutes, returnMinutes);
-                orderDeliveryEntity.setStatus(1);
-                orderDeliveryMapper.insertSelective(orderDeliveryEntity);
-                addHandoverCarInfo(orderDeliveryEntity, getMinutes, returnMinutes, UserTypeEnum.RENTER_TYPE.getValue().intValue());
-                addHandoverCarInfo(orderDeliveryEntity, getMinutes, returnMinutes, UserTypeEnum.OWNER_TYPE.getValue().intValue());
-            } else {
-                RenterOrderDeliveryEntity lastOrderDeliveryEntity = orderDeliveryMapper.findRenterOrderByrOrderNo(orderDeliveryEntity.getOrderNo(), orderDeliveryEntity.getType());
-                if (null == lastOrderDeliveryEntity) {
-                    throw new DeliveryOrderException(DeliveryErrorCode.DELIVERY_MOUDLE_ERROR.getValue(), "没有找到最近的一笔配送订单记录");
-                }
-                CommonUtil.copyPropertiesIgnoreNull(orderDeliveryEntity, lastOrderDeliveryEntity);
-                lastOrderDeliveryEntity.setStatus(2);
-                orderDeliveryMapper.insertSelective(lastOrderDeliveryEntity);
-            }
-        }
-        insertOrUpdateRenterDeliveryAddressInfo(orderDeliveryVO);
-    }
-
-    /**
-     * 新增交接车信息
-     *
-     * @param orderDeliveryEntity
-     * @param getMinutes
-     * @param returnMinutes
-     * @param userType
-     */
-    public void addHandoverCarInfo(RenterOrderDeliveryEntity orderDeliveryEntity, Integer getMinutes, Integer returnMinutes, Integer userType) {
-
-        //提前或延后时间(取车:提前时间, 还车：延后时间
-        HandoverCarInfoDTO handoverCarInfoDTO = new HandoverCarInfoDTO();
-        HandoverCarVO handoverCarVO = new HandoverCarVO();
-        handoverCarInfoDTO.setCreateOp("");
-        handoverCarInfoDTO.setOrderNo(orderDeliveryEntity.getOrderNo());
-        handoverCarInfoDTO.setRenterOrderNo(orderDeliveryEntity.getRenterOrderNo());
-        if (getMinutes != null) {
-            handoverCarInfoDTO.setAheadTime(getMinutes);
-            handoverCarInfoDTO.setType(RenterHandoverCarTypeEnum.RENYUN_TO_RENTER.getValue().intValue());
-        } else if (returnMinutes != null) {
-            handoverCarInfoDTO.setDelayTime(returnMinutes);
-            handoverCarInfoDTO.setType(RenterHandoverCarTypeEnum.RENTER_TO_RENYUN.getValue().intValue());
-        }
-        handoverCarVO.setHandoverCarInfoDTO(handoverCarInfoDTO);
-        handoverCarService.addHandoverCarInfo(handoverCarVO, userType);
     }
 
     /**
@@ -187,27 +120,6 @@ public class DeliveryCarTask {
             }
         } catch (Exception e) {
             log.info("发送邮件失败---->>>>{}:", e.getMessage());
-        }
-    }
-
-    /**
-     * 新增地址信息
-     *
-     * @param orderDeliveryVO
-     */
-    @Transactional(rollbackFor = Exception.class)
-    public void insertOrUpdateRenterDeliveryAddressInfo(OrderDeliveryVO orderDeliveryVO) {
-
-        if (orderDeliveryVO.getRenterDeliveryAddrDTO() != null) {
-            RenterDeliveryAddrEntity deliveryAddrEntity = new RenterDeliveryAddrEntity();
-            RenterDeliveryAddrEntity renterDeliveryAddrEntity = deliveryAddrMapper.selectByRenterOrderNo(deliveryAddrEntity.getRenterOrderNo());
-            if (null == renterDeliveryAddrEntity) {
-                BeanUtils.copyProperties(orderDeliveryVO.getRenterDeliveryAddrDTO(), deliveryAddrEntity);
-                deliveryAddrMapper.insertSelective(deliveryAddrEntity);
-            } else {
-                CommonUtil.copyPropertiesIgnoreNull(orderDeliveryVO.getRenterDeliveryAddrDTO(), renterDeliveryAddrEntity);
-                deliveryAddrMapper.updateByPrimaryKey(renterDeliveryAddrEntity);
-            }
         }
     }
 

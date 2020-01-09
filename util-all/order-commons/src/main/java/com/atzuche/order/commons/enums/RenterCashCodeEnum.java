@@ -73,6 +73,7 @@ public enum RenterCashCodeEnum {
     SETTLE_RENT_COST_TO_RETURN_AMT("51110004","结算租车费用退还"),
     SETTLE_RENT_DEPOSIT_TO_RETURN_AMT("51110005","结算租车押金退还"),
     SETTLE_OWNER_INCOME_TO_HISTORY_AMT("51110006","车主收益转历史欠款"),
+    HISTORY_AMT("51110007","历史欠款"),
 
 
     ;

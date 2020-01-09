@@ -1,15 +1,20 @@
 package com.atzuche.order.delivery.service;
 
-import com.atzuche.order.delivery.entity.RenterOrderDeliveryEntity;
-import com.atzuche.order.delivery.mapper.RenterOrderDeliveryMapper;
-import org.springframework.stereotype.Service;
-
-import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
+
+import com.atzuche.order.delivery.entity.RenterDeliveryAddrEntity;
+import com.atzuche.order.delivery.entity.RenterOrderDeliveryEntity;
+import com.atzuche.order.delivery.mapper.RenterDeliveryAddrMapper;
+import com.atzuche.order.delivery.mapper.RenterOrderDeliveryMapper;
+import org.apache.ibatis.annotations.Param;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import javax.annotation.Resource;
 
 
 @Service
@@ -17,6 +22,8 @@ public class RenterOrderDeliveryService {
 
 	@Resource
 	private RenterOrderDeliveryMapper renterOrderDeliveryMapper;
+	@Resource
+    private RenterDeliveryAddrMapper renterDeliveryAddrMapper;
 	
 	/**
 	 * 根据租客子单号获取配送信息列表
@@ -35,13 +42,59 @@ public class RenterOrderDeliveryService {
 		return deliveryList;
 	}
 
-    /*
-     * @Author ZhangBin
-     * @Date 2020/1/9 11:48
-     * @Description: 通过租客子订单号查询配送订单
-     * 
-     **/
-	public List<RenterOrderDeliveryEntity> selectByRenterOrderNo(String renterOrderNo){
-        return renterOrderDeliveryMapper.selectByRenterOrderNo(renterOrderNo);
+	/**
+	 * 查找最近的一笔订单
+	 * @param orderNo
+	 * @param type
+	 * @return
+	 */
+    public	RenterOrderDeliveryEntity findRenterOrderByrOrderNo(String orderNo, Integer type){
+		RenterOrderDeliveryEntity lastOrderDeliveryEntity = renterOrderDeliveryMapper.findRenterOrderByrOrderNo(orderNo, type);
+    	return lastOrderDeliveryEntity;
+	}
+
+    /**
+     * 根据子订单号获取配送订单地址信息
+     * @param renterOrderNo
+     * @return
+     */
+    public RenterDeliveryAddrEntity selecAddrByRenterOrderNo(String renterOrderNo) {
+        RenterDeliveryAddrEntity renterDeliveryAddrEntity = renterDeliveryAddrMapper.selectByRenterOrderNo(renterOrderNo);
+        return renterDeliveryAddrEntity;
     }
+
+    /**
+     * 新增配送订单信息
+     * @param renterOrderDeliveryEntity
+     */
+    public void insert(RenterOrderDeliveryEntity renterOrderDeliveryEntity){
+        renterOrderDeliveryMapper.insertSelective(renterOrderDeliveryEntity);
+    }
+
+    /**
+     * 根据子订单号和类型
+     * @param renterOrderNo
+     * @param type
+     * @return
+     */
+    public RenterOrderDeliveryEntity findRenterOrderByRenterOrderNo(String renterOrderNo,Integer type){
+        return renterOrderDeliveryMapper.findRenterOrderByrOrderNo(renterOrderNo,type);
+    }
+
+    /**
+     * 新增配送订单地址信息
+     * @param renterDeliveryAddrEntity
+     */
+    public void insertDeliveryAddr(RenterDeliveryAddrEntity renterDeliveryAddrEntity){
+        renterDeliveryAddrMapper.insertSelective(renterDeliveryAddrEntity);
+    }
+
+    /**
+     * 更新配送订单地址信息
+     * @param renterDeliveryAddrEntity
+     */
+    public void updateDeliveryAddrByPrimaryKey(RenterDeliveryAddrEntity renterDeliveryAddrEntity){
+        renterDeliveryAddrMapper.updateByPrimaryKey(renterDeliveryAddrEntity);
+    }
+
 }

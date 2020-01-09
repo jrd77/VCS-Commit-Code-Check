@@ -81,10 +81,10 @@
 		where id = #{id} and is_delete = 0
 	</select>
 
-	<select id="queryList" resultType="com.atzuche.order.renterwz.entity.RenterOrderWzCostDetailEntity">
+	<select id="queryInfosByOrderNo" resultMap="selectColumnMap" parameterType="java.lang.String">
 		select <include refid="select_column" />
 		from renter_order_wz_cost_detail
-		where is_delete = 0
+		where order_no = #{orderNo} and is_delete = 0 and cost_status = 0
 	</select>
 
 	 <update id="updateRenterOrderWzCostDetail" parameterType="com.atzuche.order.renterwz.entity.RenterOrderWzCostDetailEntity">
