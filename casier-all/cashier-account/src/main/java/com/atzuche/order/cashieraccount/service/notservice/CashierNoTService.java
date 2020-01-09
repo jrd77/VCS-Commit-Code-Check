@@ -179,9 +179,7 @@ public class CashierNoTService {
         PayedOrderRenterDepositReqVO vo = new PayedOrderRenterDepositReqVO();
         DetainRenterDepositReqVO detainRenterDeposit = new DetainRenterDepositReqVO();
         BeanUtils.copyProperties(notifyDataVo,vo);
-        vo.setPayStatus(PayStatusEnum.PAYED.getCode());
-        int transStatus = StringUtil.isBlank(notifyDataVo.getTransStatus())?0:Integer.parseInt(notifyDataVo.getTransStatus());
-        vo.setPayStatus(transStatus);
+        vo.setPayStatus(notifyDataVo.getTransStatus());
         vo.setPayTime(LocalDateTimeUtils.parseStringToDateTime(notifyDataVo.getOrderTime(),LocalDateTimeUtils.DEFAULT_PATTERN));
         //"01"：消费
         if(DataPayTypeConstant.PAY_PUR.equals(notifyDataVo.getPayType())){
@@ -333,11 +331,15 @@ public class CashierNoTService {
      * @param orderPaySign
      * @return
      */
-    public PayVo getPayVO(CashierEntity cashierEntity,OrderPaySignReqVO orderPaySign,int amt ,String title,String payKind) {
+    public PayVo getPayVO(CashierEntity cashierEntity,OrderPaySignReqVO orderPaySign,int amt ,String title,String payKind,String payIdStr ,String extendParams) {
         PayVo vo = new PayVo();
-        int paySn = Objects.isNull(cashierEntity.getPaySn())?0:cashierEntity.getPaySn();
+        if(Objects.isNull(cashierEntity)){
+
+        }
+        Integer paySn = (Objects.isNull(cashierEntity)|| Objects.isNull(cashierEntity.getPaySn()))?0:cashierEntity.getPaySn();
+        paySn = Objects.isNull(paySn)?0:paySn;
         vo.setInternalNo(String.valueOf(paySn));
-        vo.setExtendParams(GsonUtils.toJson(cashierEntity));
+        vo.setExtendParams(extendParams);
         vo.setAtappId(DataAppIdConstant.APPID_SHORTRENT);
         vo.setMemNo(orderPaySign.getMenNo());
         vo.setOrderNo(orderPaySign.getOrderNo());
@@ -345,8 +347,7 @@ public class CashierNoTService {
         vo.setReqOs(orderPaySign.getReqOs());
         vo.setPayAmt(String.valueOf(Math.abs(amt)));
         vo.setPayEnv(env);
-        int id = Objects.isNull(cashierEntity.getId())?0:cashierEntity.getId();
-        vo.setPayId(String.valueOf(id));
+        vo.setPayId(payIdStr);
         vo.setPayKind(payKind);
         vo.setPaySn(String.valueOf(paySn));
         vo.setPaySource(orderPaySign.getPaySource());

@@ -16,6 +16,8 @@ import com.atzuche.order.renterorder.mapper.RenterOrderMapper;
 import com.atzuche.order.renterorder.vo.*;
 import com.atzuche.order.renterorder.vo.owner.OwnerCouponGetAndValidReqVO;
 import com.atzuche.order.renterorder.vo.platform.MemAvailCouponRequestVO;
+import com.autoyol.coupon.api.CouponSettleRequest;
+
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -354,6 +356,51 @@ public class RenterOrderService {
         memAvailCouponRequestVO.setOriginalRentAmt(null == renterOrderCostRespDTO.getRentAmount() ? 1 : Math.abs(renterOrderCostRespDTO.getRentAmount()));
         return memAvailCouponRequestVO;
     }
+    
+    
+    /**
+     * 获取调用券服务的参数
+     * @param renterOrderCostRespDTO
+     * @param renterOrderReqVO
+     * @return CouponSettleRequest
+     */
+    public CouponSettleRequest getCouponSettleRequest(RenterOrderCostRespDTO renterOrderCostRespDTO, RenterOrderReqVO renterOrderReqVO) {
+    	CouponSettleRequest couponReq = new CouponSettleRequest();
+    	couponReq.setAbatement(null == renterOrderCostRespDTO.getComprehensiveEnsureAmount() ? 0 : Math.abs(renterOrderCostRespDTO.getComprehensiveEnsureAmount()));
+    	Optional<RenterOrderCostDetailEntity> renterOrderCostDetailEntityOptional =
+                renterOrderCostRespDTO.getRenterOrderCostDetailDTOList().stream().filter(d -> StringUtils.equals(d.getCostCode(), RenterCashCodeEnum.RENT_AMT.getCashNo())).findFirst();
+    	int holidayAverage = renterOrderCostDetailEntityOptional.isPresent() ?
+                renterOrderCostDetailEntityOptional.get().getUnitPrice() : 0;
+    	couponReq.setAveragePrice(holidayAverage);
+    	if (StringUtils.isNotBlank(renterOrderReqVO.getCarNo())) {
+    		couponReq.setCarNo(Integer.valueOf(renterOrderReqVO.getCarNo()));
+    	}
+    	if (StringUtils.isNotBlank(renterOrderReqVO.getCityCode())) {
+    		couponReq.setCityCode(Integer.valueOf(renterOrderReqVO.getCityCode()));
+    	}
+    	couponReq.setCounterFee(null == renterOrderCostRespDTO.getCommissionAmount() ? 20 : Math.abs(renterOrderCostRespDTO.getCommissionAmount()));
+    	couponReq.setInsureTotalPrices(null  == renterOrderCostRespDTO.getBasicEnsureAmount() ? 0 :
+            Math.abs(renterOrderCostRespDTO.getBasicEnsureAmount()));
+    	couponReq.setLabelIds(renterOrderReqVO.getLabelIds());
+    	couponReq.setMemNo(Integer.valueOf(renterOrderReqVO.getMemNo()));
+    	couponReq.setOrderNo(Long.valueOf(renterOrderReqVO.getOrderNo()));
+    	couponReq.setOriginalRentAmt(null == renterOrderCostRespDTO.getRentAmount() ? 1 : Math.abs(renterOrderCostRespDTO.getRentAmount()));
+    	couponReq.setRentAmt(null == renterOrderCostRespDTO.getRentAmount() ? 1 : Math.abs(renterOrderCostRespDTO.getRentAmount()));
+    	couponReq.setRentTime(DateUtils.formateLong(renterOrderReqVO.getRentTime(), DateUtils.DATE_DEFAUTE));
+    	couponReq.setRevertTime(DateUtils.formateLong(renterOrderReqVO.getRevertTime(), DateUtils.DATE_DEFAUTE));
+    	int srvGetCost = null == renterOrderCostRespDTO.getGetRealAmt() ? 0 :
+            Math.abs(renterOrderCostRespDTO.getGetRealAmt());
+    	int getOverCost = null == renterOrderCostRespDTO.getGetOverAmt() ? 0 :
+            Math.abs(renterOrderCostRespDTO.getGetOverAmt());
+    	couponReq.setSrvGetCost(srvGetCost + getOverCost);
+    	int srvReturnCost = null == renterOrderCostRespDTO.getReturnRealAmt() ? 0 :
+            Math.abs(renterOrderCostRespDTO.getReturnRealAmt());
+    	int returnOverCost = null == renterOrderCostRespDTO.getReturnOverAmt() ? 0 :
+            Math.abs(renterOrderCostRespDTO.getReturnOverAmt());
+    	couponReq.setSrvReturnCost(srvReturnCost + returnOverCost);
+    	return couponReq;
+    }
+    
 
     /**
      * 车主券请求参数封装
@@ -410,6 +457,17 @@ public class RenterOrderService {
      */
     public Integer updateRenterOrderChildStatus(Integer id, Integer childStatus) {
     	return renterOrderMapper.updateRenterOrderChildStatus(id, childStatus);
+    }
+
+
+    /**
+     * 修改租客订单信息
+     *
+     * @param renterOrderEntity 租客订单信息
+     * @return Integer
+     */
+    public int updateRenterOrderInfo(RenterOrderEntity renterOrderEntity) {
+        return renterOrderMapper.updateByPrimaryKeySelective(renterOrderEntity);
     }
 
 }

@@ -5,15 +5,15 @@
 
 
 
-	<resultMap id="orderRemarkInformationMap" type="com.atzuche.order.admin.entity.OrderRemarkEntity" >
+	<resultMap id="orderRemarkLogInformationMap" type="com.atzuche.order.admin.entity.OrderRemarkLogEntity" >
 		<result property="remarkType" column="remark_type"/>
 		<result property="remarkContent" column="remark"/>
+		<result property="remarkHistory" column="remark_history"/>
+		<result property="operateType" column="operate_type"/>
 		<result property="departmentId" column="dept_id"/>
-		<result property="remarkId" column="id"/>
 		<result property="number" column="number"/>
-		<result property="updateOp" column="update_op"/>
+		<result property="createOp" column="create_op"/>
 		<result property="createTime" column="create_time"/>
-		<result property="updateTime" column="update_time"/>
 	</resultMap>
 
 
@@ -58,6 +58,23 @@
 
 
 
+	<select id="selectRemarkLogListCount" resultType="long">
+		select count(*) from trans_remark_log where order_no = #{orderNo}
+	</select>
+
+	<select id="selectRemarkLogList" resultMap="orderRemarkLogInformationMap">
+		select
+		`number`,
+		remark_type,
+		remark,
+		create_time,
+		create_op,
+		dept_id,
+		operate_type,
+		remark_history
+		from trans_remark_log where order_no = #{orderNo}
+		order by id desc LIMIT #{startIndex}, #{pageSize}
+	</select>
 
 
 

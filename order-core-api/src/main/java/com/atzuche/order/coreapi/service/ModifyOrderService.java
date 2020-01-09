@@ -1,5 +1,6 @@
 package com.atzuche.order.coreapi.service;
 
+import com.atzuche.order.coin.service.AccountRenterCostCoinService;
 import com.atzuche.order.commons.entity.dto.*;
 import com.atzuche.order.commons.enums.*;
 import com.atzuche.order.coreapi.entity.dto.ModifyOrderDTO;
@@ -36,9 +37,8 @@ import com.atzuche.order.renterorder.service.*;
 import com.atzuche.order.renterorder.vo.RenterOrderReqVO;
 import com.atzuche.order.renterorder.vo.owner.OwnerCouponGetAndValidReqVO;
 import com.atzuche.order.renterorder.vo.platform.MemAvailCouponRequestVO;
-import com.autoyol.auto.coin.service.vo.req.AutoCoinAgainDeductRequestVO;
-import com.autoyol.auto.coin.service.vo.res.AutoCoinResponseVO;
 import com.autoyol.commons.web.ResponseData;
+import com.autoyol.coupon.api.CouponSettleRequest;
 import com.autoyol.member.detail.vo.res.CommUseDriverInfo;
 import com.autoyol.platformcost.CommonUtils;
 import com.dianping.cat.Cat;
@@ -87,8 +87,6 @@ public class ModifyOrderService {
 	@Autowired
 	private RenterAdditionalDriverService renterAdditionalDriverService;
 	@Autowired
-	private AutoCoinService autoCoinService;
-	@Autowired
 	private AutoCoinCostCalService autoCoinCostCalService;
 	@Autowired
 	private RenterGoodsService renterGoodsService;
@@ -106,6 +104,8 @@ public class ModifyOrderService {
 	private CouponAndCoinHandleService couponAndCoinHandleService;
 	@Autowired
     private CarRentalTimeApiService carRentalTimeApiService;
+	@Autowired
+	private AccountRenterCostCoinService accountRenterCostCoinService;
 
 	/**
 	 * 修改订单主逻辑
@@ -197,7 +197,7 @@ public class ModifyOrderService {
 		// 使用平台券
 		bindPlatformCoupon(modifyOrderDTO);
 		// 补扣凹凸币 
-		againAutoCoinDeduct(modifyOrderDTO, costDeductVO.getRenterSubsidyList(), initSubsidyList);
+		againAutoCoinDeduct(modifyOrderDTO, costDeductVO.getRenterSubsidyList());
 		return ResponseData.success();
 	}
 	
@@ -322,9 +322,8 @@ public class ModifyOrderService {
 	 * 补扣凹凸币
 	 * @param modifyOrderDTO
 	 * @param updSubsidyList
-	 * @param initSubsidyList
 	 */
-	public void againAutoCoinDeduct(ModifyOrderDTO modifyOrderDTO, List<RenterOrderSubsidyDetailDTO> updSubsidyList, List<RenterOrderSubsidyDetailEntity> initSubsidyList) {
+	public void againAutoCoinDeduct(ModifyOrderDTO modifyOrderDTO, List<RenterOrderSubsidyDetailDTO> updSubsidyList) {
 		if (modifyOrderDTO == null) {
 			return;
 		}
@@ -342,28 +341,8 @@ public class ModifyOrderService {
 		if (updAutoCoinSubsidyAmt == null || updAutoCoinSubsidyAmt == 0) {
 			return;
 		}
-		// 修改前凹凸币抵扣金额
-		Integer initAutoCoinSubsidyAmt = 0;
-		for (RenterOrderSubsidyDetailEntity subsidy:initSubsidyList) {
-			if (RenterCashCodeEnum.AUTO_COIN_DEDUCT.getCashNo().equals(subsidy.getSubsidyCostCode())) {
-				initAutoCoinSubsidyAmt = subsidy.getSubsidyAmount() == null ? 0:subsidy.getSubsidyAmount();
-				break;
-			}
-		}
-		// 差价
-		Integer diffAmt = updAutoCoinSubsidyAmt - initAutoCoinSubsidyAmt;
-		if (diffAmt > 0) {
-			AutoCoinAgainDeductRequestVO autoCoinRechange = new AutoCoinAgainDeductRequestVO();
-			autoCoinRechange.setCoin(-diffAmt*100);
-			autoCoinRechange.setMemNo(modifyOrderDTO.getMemNo() == null?null:Integer.valueOf(modifyOrderDTO.getMemNo()));
-			autoCoinRechange.setOperator("order-center");
-			autoCoinRechange.setOrderNo(modifyOrderDTO.getOrderNo());
-			autoCoinRechange.setOrderNoRent(modifyOrderDTO.getRenterOrderNo());
-			autoCoinRechange.setOrderType(16);
-			autoCoinRechange.setRemark("修改订单补扣凹凸币");
-			autoCoinService.againDeduct(autoCoinRechange);
-		}
-		
+		// 抵扣凹凸币
+		accountRenterCostCoinService.deductAutoCoin(modifyOrderDTO.getMemNo(), modifyOrderDTO.getOrderNo(), modifyOrderDTO.getRenterOrderNo(), updAutoCoinSubsidyAmt);
 	}
 	
 	
@@ -569,6 +548,8 @@ public class ModifyOrderService {
 		String initGetReturnCouponId = null;
 		String initPlatformCouponId = null;
 		if (orderCouponList != null && !orderCouponList.isEmpty()) {
+			// 设置已使用的优惠券列表
+			modifyOrderDTO.setOrderCouponList(orderCouponList);
 			Map<Integer, String> orderCouponMap = orderCouponList.stream().collect(Collectors.toMap(OrderCouponEntity::getCouponType, OrderCouponEntity::getCouponId));
 			initCarOwnerCouponId = orderCouponMap.get(CouponTypeEnum.ORDER_COUPON_TYPE_OWNER.getCode()); 
 			initGetReturnCouponId = orderCouponMap.get(CouponTypeEnum.ORDER_COUPON_TYPE_GET_RETURN_SRV.getCode());
@@ -619,7 +600,7 @@ public class ModifyOrderService {
 	 */
 	public RenterMemberDTO getRenterMemberDTO(String renterOrderNo, String updRenterOrderNo) {
 		// 获取租客会员信息
-		RenterMemberDTO renterMemberDTO = renterMemberService.selectrenterMemberByMemNo(renterOrderNo, true);
+		RenterMemberDTO renterMemberDTO = renterMemberService.selectrenterMemberByRenterOrderNo(renterOrderNo, true);
 		renterMemberDTO.setRenterOrderNo(updRenterOrderNo);
 		// 会员权益
 		List<RenterMemberRightDTO> renterMemberRightDTOList = renterMemberDTO.getRenterMemberRightDTOList();
@@ -900,8 +881,24 @@ public class ModifyOrderService {
 			int limitRedAmt = limitRedSubsidy.getSubsidyAmount() == null ? 0:limitRedSubsidy.getSubsidyAmount();
 			surplusRentAmt = surplusRentAmt - limitRedAmt;
 		}
+		// 修改前已使用的优惠券列表
+		List<OrderCouponEntity> initOrderCouponList = modifyOrderDTO.getOrderCouponList();
+		Map<Integer,OrderCouponEntity> couponMap = null;
+		if (initOrderCouponList != null && !initOrderCouponList.isEmpty()) {
+			couponMap = initOrderCouponList.stream().collect(Collectors.toMap(OrderCouponEntity::getCouponType, initCoupon -> initCoupon));
+		}
+		// 修改种类
+		List<OrderChangeItemDTO> changeItemList = modifyOrderDTO.getChangeItemList();
+		List<String> changeCodeList = modifyOrderConfirmService.listChangeCode(changeItemList);
 		// 获取取还车券抵扣
-		OrderCouponDTO getCarFeeCoupon = getGetCarFeeCoupon(costBaseDTO, renterOrderCostRespDTO, renterOrderReqVO);
+		OrderCouponDTO getCarFeeCoupon = null;
+		if (changeCodeList != null && !changeCodeList.isEmpty() && changeCodeList.contains(OrderChangeItemEnum.MODIFY_GETRETURNCOUPON.getCode())) {
+			getCarFeeCoupon = getGetCarFeeCouponForConsole(costBaseDTO, renterOrderCostRespDTO, renterOrderReqVO);
+		} else {
+			if (couponMap != null) {
+				getCarFeeCoupon = getGetCarFeeCoupon(costBaseDTO, renterOrderCostRespDTO, renterOrderReqVO, couponMap.get(CouponTypeEnum.ORDER_COUPON_TYPE_GET_RETURN_SRV.getCode()));
+			}
+		}
 		if (getCarFeeCoupon != null) {
 			orderCouponList.add(getCarFeeCoupon);
 		}
@@ -911,7 +908,14 @@ public class ModifyOrderService {
 			renterSubsidyList.add(getCarFeeCouponSubsidy);
 		}
 		// 获取平台券抵扣
-		OrderCouponDTO platformCoupon = getPlatformCoupon(costBaseDTO, renterOrderCostRespDTO, renterOrderReqVO, getCarFeeCoupon, surplusRentAmt);
+		OrderCouponDTO platformCoupon = null;
+		if (changeCodeList != null && !changeCodeList.isEmpty() && changeCodeList.contains(OrderChangeItemEnum.MODIFY_PLATFORMCOUPON.getCode())) {
+			platformCoupon = getPlatformCouponForConsole(costBaseDTO, renterOrderCostRespDTO, renterOrderReqVO, getCarFeeCoupon, surplusRentAmt);
+		} else {
+			if (couponMap != null) {
+				platformCoupon = getPlatformCoupon(costBaseDTO, renterOrderCostRespDTO, renterOrderReqVO, getCarFeeCoupon, surplusRentAmt, couponMap.get(CouponTypeEnum.ORDER_COUPON_TYPE_PLATFORM.getCode()));
+			}
+		}
 		if (platformCoupon != null) {
 			orderCouponList.add(platformCoupon);
 		}
@@ -923,7 +927,7 @@ public class ModifyOrderService {
 			surplusRentAmt = surplusRentAmt - platformCouponAmt;
 		}
 		// 凹凸币补贴
-		RenterOrderSubsidyDetailDTO autoCoinSubsidy = getAutoCoinSubsidy(costBaseDTO, modifyOrderDTO, initSubsidyList, renterOrderCostRespDTO.getRentAmount(), surplusRentAmt);
+		RenterOrderSubsidyDetailDTO autoCoinSubsidy = getAutoCoinSubsidy(modifyOrderDTO, renterOrderCostRespDTO.getRentAmount(), surplusRentAmt);
 		if (autoCoinSubsidy != null) {
 			renterSubsidyList.add(autoCoinSubsidy);
 		}
@@ -1003,16 +1007,34 @@ public class ModifyOrderService {
 	
 	
 	/**
-	 * 获取车主券抵扣
+	 * 获取取还车券抵扣（管理后台用券）
 	 * @param costBaseDTO
 	 * @param renterOrderCostRespDTO
 	 * @param renterOrderReqVO
 	 * @return OrderCouponDTO
 	 */
-	public OrderCouponDTO getGetCarFeeCoupon(CostBaseDTO costBaseDTO, RenterOrderCostRespDTO renterOrderCostRespDTO, RenterOrderReqVO renterOrderReqVO) {
+	public OrderCouponDTO getGetCarFeeCouponForConsole(CostBaseDTO costBaseDTO, RenterOrderCostRespDTO renterOrderCostRespDTO, RenterOrderReqVO renterOrderReqVO) {
 		MemAvailCouponRequestVO getCarFeeCouponReqVO = renterOrderService.buildMemAvailCouponRequestVO(renterOrderCostRespDTO, renterOrderReqVO);
 		getCarFeeCouponReqVO.setDisCouponId(renterOrderReqVO.getGetCarFreeCouponId());
 		OrderCouponDTO getCarFeeCoupon = renterOrderCalCostService.calGetAndReturnSrvCouponDeductInfo(getCarFeeCouponReqVO);
+		if (getCarFeeCoupon != null) {
+			getCarFeeCoupon.setOrderNo(costBaseDTO.getOrderNo());
+			getCarFeeCoupon.setRenterOrderNo(costBaseDTO.getRenterOrderNo());
+		}
+		return getCarFeeCoupon;
+	}
+	
+	
+	/**
+	 * 获取取还车券抵扣
+	 * @param costBaseDTO
+	 * @param renterOrderCostRespDTO
+	 * @param renterOrderReqVO
+	 * @return OrderCouponDTO
+	 */
+	public OrderCouponDTO getGetCarFeeCoupon(CostBaseDTO costBaseDTO, RenterOrderCostRespDTO renterOrderCostRespDTO, RenterOrderReqVO renterOrderReqVO, OrderCouponEntity coupon) {
+		CouponSettleRequest getCarFeeCouponReqVO = renterOrderService.getCouponSettleRequest(renterOrderCostRespDTO, renterOrderReqVO);
+		OrderCouponDTO getCarFeeCoupon = renterOrderCalCostService.checkGetCarFreeCouponAvailable(getCarFeeCouponReqVO, coupon);
 		if (getCarFeeCoupon != null) {
 			getCarFeeCoupon.setOrderNo(costBaseDTO.getOrderNo());
 			getCarFeeCoupon.setRenterOrderNo(costBaseDTO.getRenterOrderNo());
@@ -1047,7 +1069,7 @@ public class ModifyOrderService {
 	
 	
 	/**
-	 * 获取平台券抵扣
+	 * 获取平台券抵扣（管理后台用券）
 	 * @param costBaseDTO
 	 * @param renterOrderCostRespDTO
 	 * @param renterOrderReqVO
@@ -1055,7 +1077,7 @@ public class ModifyOrderService {
 	 * @param surplusRentAmt
 	 * @return OrderCouponDTO
 	 */
-	public OrderCouponDTO getPlatformCoupon(CostBaseDTO costBaseDTO, RenterOrderCostRespDTO renterOrderCostRespDTO, RenterOrderReqVO renterOrderReqVO, OrderCouponDTO getCarFeeCoupon, Integer surplusRentAmt) {
+	public OrderCouponDTO getPlatformCouponForConsole(CostBaseDTO costBaseDTO, RenterOrderCostRespDTO renterOrderCostRespDTO, RenterOrderReqVO renterOrderReqVO, OrderCouponDTO getCarFeeCoupon, Integer surplusRentAmt) {
 		MemAvailCouponRequestVO platformCouponReqVO = renterOrderService.buildMemAvailCouponRequestVO(renterOrderCostRespDTO,
                 renterOrderReqVO);
         platformCouponReqVO.setDisCouponId(renterOrderReqVO.getDisCouponIds());
@@ -1071,6 +1093,33 @@ public class ModifyOrderService {
         }
         return platfromCoupon;
 	}
+	
+	
+	/**
+	 * 获取平台券抵扣
+	 * @param costBaseDTO
+	 * @param renterOrderCostRespDTO
+	 * @param renterOrderReqVO
+	 * @param getCarFeeCoupon
+	 * @param surplusRentAmt
+	 * @return OrderCouponDTO
+	 */
+	public OrderCouponDTO getPlatformCoupon(CostBaseDTO costBaseDTO, RenterOrderCostRespDTO renterOrderCostRespDTO, RenterOrderReqVO renterOrderReqVO, OrderCouponDTO getCarFeeCoupon, Integer surplusRentAmt, OrderCouponEntity coupon) {
+		CouponSettleRequest platformCouponReqVO = renterOrderService.getCouponSettleRequest(renterOrderCostRespDTO,
+                renterOrderReqVO);
+        if (getCarFeeCoupon != null) {
+        	platformCouponReqVO.setSrvGetCost(0);
+        	platformCouponReqVO.setSrvReturnCost(0);
+        }
+        platformCouponReqVO.setRentAmt(surplusRentAmt);
+        OrderCouponDTO platfromCoupon = renterOrderCalCostService.checkCouponAvailable(platformCouponReqVO, coupon);
+        if (platfromCoupon != null) {
+        	platfromCoupon.setOrderNo(costBaseDTO.getOrderNo());
+        	platfromCoupon.setRenterOrderNo(costBaseDTO.getRenterOrderNo());
+        }
+        return platfromCoupon;
+	}
+	
 	
 	/**
 	 * 获取平台券补贴
@@ -1092,28 +1141,25 @@ public class ModifyOrderService {
 	
 	/**
 	 * 获取凹凸币补贴
-	 * @param costBaseDTO
 	 * @param modifyOrderDTO
-	 * @param initSubsidyList
 	 * @param rentAmt
 	 * @param surplusRentAmt
 	 * @return RenterOrderSubsidyDetailDTO
 	 */
-	public RenterOrderSubsidyDetailDTO getAutoCoinSubsidy(CostBaseDTO costBaseDTO, ModifyOrderDTO modifyOrderDTO, List<RenterOrderSubsidyDetailEntity> initSubsidyList, Integer rentAmt, Integer surplusRentAmt) {
+	public RenterOrderSubsidyDetailDTO getAutoCoinSubsidy(ModifyOrderDTO modifyOrderDTO, Integer rentAmt, Integer surplusRentAmt) {
 		// 是否使用凹凸币
 		Integer userAutoCoinFlag = modifyOrderDTO.getUserCoinFlag();
 		if (userAutoCoinFlag == null || !userAutoCoinFlag.equals(1)) {
 			return null;
 		}
-		// 修改前凹凸币抵扣金额
-		Integer initAutoCoinAmt = 0;
-		if (initSubsidyList != null && !initSubsidyList.isEmpty()) {
-			initAutoCoinAmt = initSubsidyList.stream().filter(subsid -> {
-				return RenterCashCodeEnum.AUTO_COIN_DEDUCT.getCashNo().equals(subsid.getSubsidyCostCode());
-				}).mapToInt(RenterOrderSubsidyDetailEntity::getSubsidyAmount).sum();
+		// 凹凸币能抵扣的最大金额
+		Integer totalAutoCoinAmt = accountRenterCostCoinService.getUserCoinTotalAmt(modifyOrderDTO.getMemNo(), modifyOrderDTO.getOrderNo());
+		// 计算凹凸币补贴
+		RenterOrderSubsidyDetailDTO autoCoinSubsidy = autoCoinCostCalService.calAutoCoinDeductInfo(rentAmt, surplusRentAmt, totalAutoCoinAmt, modifyOrderDTO.getMemNo());
+		if (autoCoinSubsidy != null) {
+			autoCoinSubsidy.setOrderNo(modifyOrderDTO.getOrderNo());
+			autoCoinSubsidy.setRenterOrderNo(modifyOrderDTO.getRenterOrderNo());
 		}
-		AutoCoinResponseVO crmCustPoint = autoCoinService.getCrmCustPoint(costBaseDTO.getMemNo());
-		RenterOrderSubsidyDetailDTO autoCoinSubsidy = autoCoinCostCalService.calAutoCoinDeductInfo(rentAmt, surplusRentAmt, crmCustPoint, initAutoCoinAmt);
 		return autoCoinSubsidy;
 	}
 	
@@ -1188,9 +1234,7 @@ public class ModifyOrderService {
 						changeCodeList.contains(OrderChangeItemEnum.MODIFY_SRVRETURNFLAG.getCode()))) {
 			return;
 		}
-		UpdateOrderDeliveryVO updateFlowOrderVO = null;
-		//FIXME:
-				//new UpdateOrderDeliveryVO();
+		UpdateOrderDeliveryVO updateFlowOrderVO = new UpdateOrderDeliveryVO();
 		// 配送地址
 		RenterDeliveryAddrDTO deliveryAddr = getRenterDeliveryAddrDTO(modifyOrderDTO);
 		updateFlowOrderVO.setRenterDeliveryAddrDTO(deliveryAddr);
@@ -1283,7 +1327,7 @@ public class ModifyOrderService {
 		returnDelivery.setOrderNo(modifyOrderDTO.getOrderNo());
 		returnDelivery.setRenterOrderNo(modifyOrderDTO.getRenterOrderNo());
 		returnDelivery.setType(SrvGetReturnEnum.SRV_RETURN_TYPE.getCode());
-		delivMap.put(SrvGetReturnEnum.SRV_RETURN_TYPE.getCode(), getDelivery);
+		delivMap.put(SrvGetReturnEnum.SRV_RETURN_TYPE.getCode(), returnDelivery);
 		return delivMap;
 	}
 	

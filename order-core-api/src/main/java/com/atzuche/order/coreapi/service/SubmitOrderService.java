@@ -137,7 +137,6 @@ public class SubmitOrderService {
         reqContext.setOwnerMemberDto(ownerMemberDTO);
         //2.下单校验
         //2.1库存校验
-
         OrderInfoDTO orderInfoDTO = initOrderInfoDTO(orderReqVO);
         stockService.checkCarStock(orderInfoDTO);
 
@@ -145,6 +144,8 @@ public class SubmitOrderService {
         Integer riskAuditId = null;
 //        Integer riskAuditId = submitOrderRiskAuditService.check(buildSubmitOrderRiskCheckReqVO(orderReqVO, reqTime));
         //2.3校验链
+        //TODO:下单校验
+
         //2.4.生成主订单号
         String orderNo = uniqueOrderNoService.getOrderNo();
         //2.5.锁定库存
@@ -262,7 +263,7 @@ public class SubmitOrderService {
         LOGGER.info("Deduct autoCoin result is:[{}]", deductionAotuCoinResult);
 
         //8.订单完成事件发送
-        //todo
+        //TODO:发送下单成功事件
 
 
         //end 组装接口返回

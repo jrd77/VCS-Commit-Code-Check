@@ -1,12 +1,16 @@
 package com.atzuche.order.cashieraccount.service;
 
 import com.atzuche.order.accountrenterdeposit.service.AccountRenterDepositService;
+import com.atzuche.order.accountrenterdeposit.vo.res.AccountRenterDepositResVO;
+import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostSettleEntity;
 import com.atzuche.order.accountrenterrentcost.service.AccountRenterCostSettleService;
 import com.atzuche.order.accountrenterwzdepost.service.AccountRenterWzDepositService;
+import com.atzuche.order.accountrenterwzdepost.vo.res.AccountRenterWZDepositResVO;
 import com.atzuche.order.cashieraccount.common.FasterJsonUtil;
 import com.atzuche.order.cashieraccount.entity.CashierEntity;
 import com.atzuche.order.cashieraccount.entity.CashierRefundApplyEntity;
 import com.atzuche.order.cashieraccount.exception.OrderPayCallBackAsnyException;
+import com.atzuche.order.cashieraccount.exception.OrderPaySignFailException;
 import com.atzuche.order.cashieraccount.service.notservice.CashierNoTService;
 import com.atzuche.order.cashieraccount.service.notservice.CashierRefundApplyNoTService;
 import com.atzuche.order.cashieraccount.service.remote.RefundRemoteService;
@@ -18,6 +22,7 @@ import com.atzuche.order.cashieraccount.vo.res.OrderPayableAmountResVO;
 import com.atzuche.order.commons.CatConstants;
 import com.atzuche.order.commons.enums.RenterCashCodeEnum;
 import com.atzuche.order.commons.enums.YesNoEnum;
+import com.atzuche.order.commons.service.OrderPayCallBack;
 import com.atzuche.order.commons.service.RabbitMsgLogService;
 import com.atzuche.order.rentercost.entity.vo.PayableVO;
 import com.atzuche.order.rentercost.service.RenterOrderCostCombineService;
@@ -38,7 +43,6 @@ import com.dianping.cat.message.Transaction;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
@@ -74,15 +78,14 @@ public class CashierPayService{
      * 支付系统回调（支付回调，退款回调到时一个）
      * MQ 异步回调
      */
-    @Async
-    public void payCallBackAsyn(BatchNotifyDataVo batchNotifyDataVo){
+    public void payCallBack(BatchNotifyDataVo batchNotifyDataVo, OrderPayCallBack callBack){
         Transaction t = Cat.getProducer().newTransaction(CatConstants.RABBIT_MQ_CALL, "支付系统rabbitMQ异步回调payCallBackAsyn");
         try {
             Cat.logEvent(CatConstants.RABBIT_MQ_METHOD,"OrderPayCallBackRabbitConfig.payCallBackAsyn");
             Cat.logEvent(CatConstants.RABBIT_MQ_PARAM,GsonUtils.toJson(batchNotifyDataVo));
             //1 校验是否 为空
             if(Objects.nonNull(batchNotifyDataVo) && !CollectionUtils.isEmpty(batchNotifyDataVo.getLstNotifyDataVo())){
-                cashierService.callBackSuccess(batchNotifyDataVo.getLstNotifyDataVo());
+                cashierService.callBackSuccess(batchNotifyDataVo.getLstNotifyDataVo(),callBack);
             }
             //3 更新rabbitMQ 记录已消费
             String reqContent = FasterJsonUtil.toJson(batchNotifyDataVo);
@@ -131,6 +134,9 @@ public class CashierPayService{
         }
         //7 签名串
         List<PayVo> payVo = getOrderPayVO(orderPaySign,payVO);
+        if(CollectionUtils.isEmpty(payVo)){
+            throw new OrderPaySignFailException();
+        }
         String signStr = cashierNoTService.getPaySignByPayVos(payVo);
         return signStr;
     }
@@ -154,7 +160,7 @@ public class CashierPayService{
         //车辆押金 是否选择车辆押金
         int amtDeposit = 0;
         if(orderPayReqVO.getPayKind().contains(DataPayKindConstant.RENT)){
-            amtDeposit = cashierNoTService.getPayDeposit(orderPayReqVO.getOrderNo(),orderPayReqVO.getMenNo(), DataPayKindConstant.RENT);
+            amtDeposit = cashierService.getRenterDeposit(orderPayReqVO.getOrderNo(),orderPayReqVO.getMenNo());
            if(amtDeposit < 0){
                accountPayAbles.add(new AccountPayAbleResVO(orderPayReqVO.getOrderNo(),orderPayReqVO.getMenNo(),amtDeposit, RenterCashCodeEnum.ACCOUNT_RENTER_DEPOSIT,RenterCashCodeEnum.ACCOUNT_RENTER_DEPOSIT.getTxt()));
            }
@@ -163,7 +169,7 @@ public class CashierPayService{
         //违章押金 是否选择违章押金
         int amtWZDeposit = 0;
         if(orderPayReqVO.getPayKind().contains(DataPayKindConstant.DEPOSIT)){
-            amtWZDeposit =  cashierNoTService.getPayDeposit(orderPayReqVO.getOrderNo(),orderPayReqVO.getMenNo(),DataPayKindConstant.DEPOSIT);
+            amtWZDeposit = cashierService.getRenterWZDeposit(orderPayReqVO.getOrderNo(),orderPayReqVO.getMenNo());
             if(amtWZDeposit < 0){
                 accountPayAbles.add(new AccountPayAbleResVO(orderPayReqVO.getOrderNo(),orderPayReqVO.getMenNo(),amtWZDeposit, RenterCashCodeEnum.ACCOUNT_RENTER_WZ_DEPOSIT,RenterCashCodeEnum.ACCOUNT_RENTER_WZ_DEPOSIT.getTxt()));
             }
@@ -224,27 +230,33 @@ public class CashierPayService{
     public  List<PayVo> getOrderPayVO(OrderPaySignReqVO orderPaySign,OrderPayableAmountResVO payVO){
         //待支付金额明细
         List<PayVo> payVo = new ArrayList<>();
-        //车辆押金 是否选择车辆押金
-        if(orderPaySign.getPayKind().contains(DataPayKindConstant.RENT) && payVO.getAmtDeposit()<0){
-          CashierEntity cashierEntity = cashierNoTService.getCashierEntity(orderPaySign.getOrderNo(),orderPaySign.getMenNo(), DataPayKindConstant.RENT);
-            if(Objects.nonNull(cashierEntity)){
-              PayVo vo = cashierNoTService.getPayVO(cashierEntity,orderPaySign,payVO.getAmtDeposit(),payVO.getTitle(),DataPayKindConstant.RENT);
-              String payMd5 = MD5.MD5Encode(FasterJsonUtil.toJson(vo));
-              vo.setPayMd5(payMd5);
-              payVo.add(vo);
-          }
-        }
-
-        //违章押金 是否选择违章押金
-        if(orderPaySign.getPayKind().contains(DataPayKindConstant.DEPOSIT) && payVO.getAmtWzDeposit()<0){
-            CashierEntity cashierEntity = cashierNoTService.getCashierEntity(orderPaySign.getOrderNo(),orderPaySign.getMenNo(), DataPayKindConstant.DEPOSIT);
-            if(Objects.nonNull(cashierEntity)){
-                PayVo vo = cashierNoTService.getPayVO(cashierEntity,orderPaySign,payVO.getAmtWzDeposit(),payVO.getTitle(),DataPayKindConstant.DEPOSIT);
-                String payMd5 = MD5.MD5Encode(FasterJsonUtil.toJson(vo));
-                vo.setPayMd5(payMd5);
-                payVo.add(vo);
+        List<AccountPayAbleResVO> accountPayAbles = payVO.getAccountPayAbles();
+        if(!CollectionUtils.isEmpty(accountPayAbles)){
+            for(int i =0;i<accountPayAbles.size();i++){
+                AccountPayAbleResVO accountPayAbleResVO =  accountPayAbles.get(i);
+                //车俩押金
+                if(RenterCashCodeEnum.ACCOUNT_RENTER_DEPOSIT.equals(accountPayAbleResVO.getRenterCashCode())){
+                    CashierEntity cashierEntity = cashierNoTService.getCashierEntity(orderPaySign.getOrderNo(),orderPaySign.getMenNo(), DataPayKindConstant.RENT);
+                    AccountRenterDepositResVO accountRenterDeposit = cashierService.getRenterDepositEntity(orderPaySign.getOrderNo(),orderPaySign.getMenNo());
+                    Integer payId = Objects.isNull(accountRenterDeposit)?0:accountRenterDeposit.getId();
+                    String payIdStr = Objects.isNull(payId)?"":String.valueOf(payId);
+                    PayVo vo = cashierNoTService.getPayVO(cashierEntity,orderPaySign,payVO.getAmtDeposit(),payVO.getTitle(),DataPayKindConstant.RENT,payIdStr,GsonUtils.toJson(accountRenterDeposit));
+                    String payMd5 = MD5.MD5Encode(FasterJsonUtil.toJson(vo));
+                    vo.setPayMd5(payMd5);
+                    payVo.add(vo);
+                }
+                //违章押金
+                if(RenterCashCodeEnum.ACCOUNT_RENTER_WZ_DEPOSIT.equals(accountPayAbleResVO.getRenterCashCode())){
+                    CashierEntity cashierEntity = cashierNoTService.getCashierEntity(orderPaySign.getOrderNo(),orderPaySign.getMenNo(), DataPayKindConstant.DEPOSIT);
+                    AccountRenterWZDepositResVO accountRenterWZDepositRes = cashierService.getRenterWZDepositEntity(orderPaySign.getOrderNo(),orderPaySign.getMenNo());
+                    Integer payId = Objects.isNull(accountRenterWZDepositRes)?0:accountRenterWZDepositRes.getId();
+                    String payIdStr = Objects.isNull(payId)?"":String.valueOf(payId);
+                    PayVo vo = cashierNoTService.getPayVO(cashierEntity,orderPaySign,payVO.getAmtWzDeposit(),payVO.getTitle(),DataPayKindConstant.DEPOSIT,payIdStr,GsonUtils.toJson(accountRenterWZDepositRes));
+                    String payMd5 = MD5.MD5Encode(FasterJsonUtil.toJson(vo));
+                    vo.setPayMd5(payMd5);
+                    payVo.add(vo);
+                }
             }
-
         }
 
         //待付租车费用
@@ -254,16 +266,16 @@ public class CashierPayService{
             int amt = payVO.getAmt();
             if(amt<0){
                 CashierEntity cashierEntity = cashierNoTService.getCashierEntity(orderPaySign.getOrderNo(),orderPaySign.getMenNo(), DataPayKindConstant.RENT_AMOUNT);
-                if(Objects.nonNull(cashierEntity)){
-                    PayVo vo = cashierNoTService.getPayVO(cashierEntity,orderPaySign,payVO.getAmtRent(),payVO.getTitle(),DataPayKindConstant.RENT_AMOUNT);
-                    String paySn = cashierNoTService.getCashierRentCostPaySn(orderPaySign.getOrderNo(),orderPaySign.getMenNo());
-                    vo.setPaySn(paySn);
-                    vo.setExtendParams(GsonUtils.toJson(payableVOs));
-                    String payMd5 = MD5.MD5Encode(FasterJsonUtil.toJson(vo));
-                    vo.setPayMd5(payMd5);
-                    payVo.add(vo);
-
-                }
+                AccountRenterCostSettleEntity entity = cashierService.getAccountRenterCostSettle(orderPaySign.getOrderNo(),orderPaySign.getMenNo());
+                Integer payId = Objects.isNull(entity)?0:entity.getId();
+                String payIdStr = Objects.isNull(payId)?"":String.valueOf(payId);
+                PayVo vo = cashierNoTService.getPayVO(cashierEntity,orderPaySign,payVO.getAmtRent(),payVO.getTitle(),DataPayKindConstant.RENT_AMOUNT,payIdStr,GsonUtils.toJson(entity));
+                String paySn = cashierNoTService.getCashierRentCostPaySn(orderPaySign.getOrderNo(),orderPaySign.getMenNo());
+                vo.setPaySn(paySn);
+                vo.setExtendParams(GsonUtils.toJson(payableVOs));
+                String payMd5 = MD5.MD5Encode(FasterJsonUtil.toJson(vo));
+                vo.setPayMd5(payMd5);
+                payVo.add(vo);
             }
         }
         return payVo;

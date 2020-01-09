@@ -52,7 +52,7 @@ public class OwnerMemberService{
      * @param ownerOrderNo 子订单号
      * @param isNeedRight 是否需要权益值信息
      */
-    public OwnerMemberDTO selectownerMemberByMemNo(String ownerOrderNo, boolean isNeedRight){
+    public OwnerMemberDTO selectownerMemberByOwnerOrderNo(String ownerOrderNo, boolean isNeedRight){
         OwnerMemberDTO ownerMemberDto = new OwnerMemberDTO();
         OwnerMemberEntity ownerMemberEntity = ownerMemberMapper.selectByOwnerOrderNo(ownerOrderNo);
         BeanUtils.copyProperties(ownerMemberEntity,ownerMemberDto);

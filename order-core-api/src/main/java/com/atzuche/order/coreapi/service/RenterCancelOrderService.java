@@ -94,6 +94,7 @@ public class RenterCancelOrderService {
                 consoleOwnerOrderFineDeatailService.fineDataConvert(cancelFineAmt.getCostBaseDTO(), penalty, FineSubsidyCodeEnum.OWNER,
                         FineSubsidySourceCodeEnum.RENTER, FineTypeEnum.CANCEL_FINE);
 
+        //落库
         //订单状态更新
         orderStatusService.saveOrderStatusInfo(buildOrderStatusDTO(orderNo));
         renterOrderService.updateRenterOrderChildStatus(renterOrderEntity.getId(),
@@ -103,21 +104,25 @@ public class RenterCancelOrderService {
         //取消信息处理(order_cancel_reason)
         orderCancelReasonService.addOrderCancelReasonRecord(buildOrderCancelReasonEntity(orderNo, cancelReason));
 
-        //落库
         renterOrderFineDeatailService.saveRenterOrderFineDeatail(renterOrderFineDeatailEntity);
         consoleOwnerOrderFineDeatailService.addFineRecord(consoleOwnerOrderFineDeatailEntity);
+
 
         //返回信息处理
         CancelOrderResDTO cancelOrderResDTO = new CancelOrderResDTO();
         cancelOrderResDTO.setIsReturnDisCoupon(true);
         cancelOrderResDTO.setIsReturnOwnerCoupon(true);
-        cancelOrderResDTO.setRenterOrderNo(renterOrderEntity.getRenterOrderNo());
+        cancelOrderResDTO.setIsRefund(true);
         cancelOrderResDTO.setRentCarPayStatus(orderStatusEntity.getRentCarPayStatus());
+        cancelOrderResDTO.setCarNo(goodsDetail.getCarNo());
+        cancelOrderResDTO.setRenterOrderNo(renterOrderEntity.getRenterOrderNo());
+        cancelOrderResDTO.setSrvGetFlag(null != renterOrderEntity.getIsGetCar() && renterOrderEntity.getIsGetCar() == 1);
+        cancelOrderResDTO.setSrvReturnFlag(null != renterOrderEntity.getIsReturnCar() && renterOrderEntity.getIsReturnCar() == 1);
         return cancelOrderResDTO;
     }
 
     public void check() {
-        //todo
+        //TODO:租客取消校验
 
 
     }
@@ -159,6 +164,7 @@ public class RenterCancelOrderService {
 
     private OrderCancelReasonEntity buildOrderCancelReasonEntity(String orderNo, String cancelReason) {
         OrderCancelReasonEntity orderCancelReasonEntity = new OrderCancelReasonEntity();
+        orderCancelReasonEntity.setOperateType(CancelOperateTypeEnum.CANCEL_ORDER.getCode());
         orderCancelReasonEntity.setCancelReason(cancelReason);
         orderCancelReasonEntity.setCancelSource(CancelSourceEnum.RENTER.getCode());
         orderCancelReasonEntity.setOrderNo(orderNo);

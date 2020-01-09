@@ -2,6 +2,8 @@ package com.atzuche.order.settle.service;
 
 import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostSettleEntity;
 import com.atzuche.order.cashieraccount.service.CashierSettleService;
+import com.atzuche.order.parentorder.dto.OrderStatusDTO;
+import com.atzuche.order.parentorder.service.OrderStatusService;
 import com.atzuche.order.settle.exception.OrderSettleFlatAccountException;
 import com.atzuche.order.settle.service.notservice.OrderSettleNoTService;
 import com.atzuche.order.settle.vo.req.SettleOrders;
@@ -77,6 +79,7 @@ public class OrderSettleService{
         settleOrdersAccount.setOwnerCostSurplusAmt(settleOrdersDefinition.getOwnerCostAmtFinal());
         int rentCostSurplusAmt = (accountRenterCostSettle.getRentAmt() + accountRenterCostSettle.getShifuAmt())<=0?0:(accountRenterCostSettle.getRentAmt() + accountRenterCostSettle.getShifuAmt());
         settleOrdersAccount.setRentCostSurplusAmt(rentCostSurplusAmt);
+        log.info("OrderSettleService settleOrdersDefinition settleOrdersAccount one [{}]", GsonUtils.toJson(settleOrdersAccount));
         //9 租客费用 结余处理
         orderSettleNoTService.rentCostSettle(settleOrders,settleOrdersAccount);
         //10租客车辆押金/租客剩余租车费用 结余历史欠款
@@ -89,7 +92,10 @@ public class OrderSettleService{
         orderSettleNoTService.repayHistoryDebtOwner(settleOrdersAccount);
         //14 车主待审核收益落库
         orderSettleNoTService.insertOwnerIncomeExamine(settleOrdersAccount);
-        //16 更新订单状态 TODO
+        //15 更新订单状态 TODO
+        log.info("OrderSettleService settleOrdersDefinition settleOrdersAccount two [{}]", GsonUtils.toJson(settleOrdersAccount));
+        //16 支付系统发消息
+        orderSettleNoTService.saveOrderStatusInfo(settleOrdersAccount);
 
     }
 

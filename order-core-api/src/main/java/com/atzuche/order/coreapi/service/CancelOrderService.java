@@ -1,19 +1,15 @@
 package com.atzuche.order.coreapi.service;
 
-import com.atzuche.order.commons.enums.CouponTypeEnum;
 import com.atzuche.order.commons.enums.MemRoleEnum;
 import com.atzuche.order.commons.vo.req.CancelOrderReqVO;
 import com.atzuche.order.coreapi.entity.dto.CancelOrderResDTO;
-import com.atzuche.order.renterorder.entity.OrderCouponEntity;
-import com.atzuche.order.renterorder.service.OrderCouponService;
+import com.atzuche.order.delivery.service.delivery.DeliveryCarService;
+import com.atzuche.order.delivery.vo.delivery.CancelFlowOrderDTO;
+import com.atzuche.order.delivery.vo.delivery.CancelOrderDeliveryVO;
 import com.atzuche.order.settle.service.OrderSettleService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
-
-import java.util.List;
-import java.util.Optional;
 
 /**
  * 订单取消操作
@@ -36,6 +32,12 @@ public class CancelOrderService {
 
     @Autowired
     private OrderSettleService orderSettleService;
+
+    @Autowired
+    private StockService stockService;
+
+    @Autowired
+    private DeliveryCarService deliveryCarService;
 
     /**
      * 订单取消
@@ -69,21 +71,65 @@ public class CancelOrderService {
             couponAndCoinHandleService.undoOwnerCoupon(cancelOrderReqVO.getOrderNo(), res.getOwnerCouponNo(), recover);
         }
 
+        //扣库存
+        if (null != res) {
+            stockService.releaseCarStock(cancelOrderReqVO.getOrderNo(), res.getCarNo());
+        }
+
         //通知收银台退款
-        //todo
-        orderSettleService.settleOrderCancel(cancelOrderReqVO.getOrderNo());
+        if (null != res && null != res.getIsRefund() && res.getIsRefund()) {
+            orderSettleService.settleOrderCancel(cancelOrderReqVO.getOrderNo());
+        }
+
         //通知流程系统
-        //todo
+        if (null != res) {
+            CancelOrderDeliveryVO cancelOrderDeliveryVO = buildCancelOrderDeliveryVO(cancelOrderReqVO.getOrderNo(),
+                    res);
+            if (null != cancelOrderDeliveryVO) {
+                deliveryCarService.cancelRenYunFlowOrderInfo(cancelOrderDeliveryVO);
+            }
+        }
 
         //消息发送
-        //todo
+        //TODO:发送订单取消事件
 
     }
 
 
     public void check() {
-        //todo
+        //TODO:订单取消公共校验
 
+    }
+
+
+    /**
+     * 仁云流程系统请求信息处理
+     *
+     * @param orderNo 主订单号
+     * @param res     取消订单返回信息
+     * @return CancelOrderDeliveryVO 仁云流程系统请求信息
+     */
+    public CancelOrderDeliveryVO buildCancelOrderDeliveryVO(String orderNo, CancelOrderResDTO res) {
+        if (!res.getSrvGetFlag() && !res.getSrvReturnFlag()) {
+            return null;
+        }
+        String servicetype = "";
+        if (res.getSrvGetFlag() && res.getSrvReturnFlag()) {
+            servicetype = "all";
+        } else if (res.getSrvGetFlag()) {
+            servicetype = "take";
+        } else if (res.getSrvReturnFlag()) {
+            servicetype = "back";
+        }
+        CancelOrderDeliveryVO cancelOrderDeliveryVO = new CancelOrderDeliveryVO();
+
+        CancelFlowOrderDTO cancelFlowOrderDTO = new CancelFlowOrderDTO();
+        cancelFlowOrderDTO.setOrdernumber(orderNo);
+        cancelFlowOrderDTO.setServicetype(servicetype);
+
+        cancelOrderDeliveryVO.setRenterOrderNo(res.getRenterOrderNo());
+        cancelOrderDeliveryVO.setCancelFlowOrderDTO(cancelFlowOrderDTO);
+        return cancelOrderDeliveryVO;
     }
 
 }
