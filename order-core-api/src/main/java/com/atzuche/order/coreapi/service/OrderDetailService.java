@@ -8,7 +8,6 @@ import com.atzuche.order.commons.entity.dto.OwnerMemberDTO;
 import com.atzuche.order.commons.entity.dto.OwnerMemberRightDTO;
 import com.atzuche.order.commons.entity.dto.RenterMemberDTO;
 import com.atzuche.order.commons.entity.dto.*;
-import com.atzuche.order.commons.entity.orderDetailDto.RenterMemberRightDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.*;
 import com.atzuche.order.commons.enums.DeliveryOrderTypeEnum;
 import com.atzuche.order.coreapi.submitOrder.exception.OrderDetailException;
@@ -164,9 +163,9 @@ public class OrderDetailService {
         com.atzuche.order.commons.entity.orderDetailDto.RenterMemberDTO renterMember = new com.atzuche.order.commons.entity.orderDetailDto.RenterMemberDTO();
         BeanUtils.copyProperties(renterMemberDTO,renterMember);
         List<com.atzuche.order.commons.entity.dto.RenterMemberRightDTO> renterMemberRightDTOList = renterMemberDTO.getRenterMemberRightDTOList();
-        List<RenterMemberRightDTO> renterMemberRightDTOS = new ArrayList<>();
+        List<com.atzuche.order.commons.entity.orderDetailDto.RenterMemberRightDTO> renterMemberRightDTOS = new ArrayList<>();
         renterMemberRightDTOList.stream().forEach(x->{
-            RenterMemberRightDTO  renterMemberRightDTO = new RenterMemberRightDTO();
+            com.atzuche.order.commons.entity.orderDetailDto.RenterMemberRightDTO renterMemberRightDTO = new com.atzuche.order.commons.entity.orderDetailDto.RenterMemberRightDTO();
             BeanUtils.copyProperties(x,renterMemberRightDTO);
             renterMemberRightDTOS.add(renterMemberRightDTO);
         });

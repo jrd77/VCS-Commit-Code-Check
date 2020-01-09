@@ -34,6 +34,8 @@ import com.atzuche.order.ownercost.entity.OwnerOrderIncrementDetailEntity;
 import com.atzuche.order.ownercost.entity.OwnerOrderPurchaseDetailEntity;
 import com.atzuche.order.ownercost.entity.OwnerOrderSubsidyDetailEntity;
 import com.atzuche.order.ownercost.service.*;
+import com.atzuche.order.parentorder.dto.OrderStatusDTO;
+import com.atzuche.order.parentorder.service.OrderStatusService;
 import com.atzuche.order.rentercost.entity.*;
 import com.atzuche.order.rentercost.service.*;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
@@ -77,6 +79,8 @@ public class OrderSettleNoTService {
     @Autowired private AccountRenterCostCoinService accountRenterCostCoinService;
     @Autowired private RenterOrderService renterOrderService;
     @Autowired private OwnerOrderService ownerOrderService;
+    @Autowired private OrderStatusService orderStatusService;
+
 
     /**
      * 车辆结算
@@ -1120,5 +1124,15 @@ public class OrderSettleNoTService {
             cashierService.insertOwnerIncomeExamine(accountOwnerIncomeExamine);
         }
 
+    }
+
+    /**
+     * 车辆结算成功 更新订单状态
+     * @param settleOrdersAccount
+     */
+    public void saveOrderStatusInfo(SettleOrdersAccount settleOrdersAccount) {
+        OrderStatusDTO orderStatusDTO = new OrderStatusDTO();
+        orderStatusDTO.setOrderNo(settleOrdersAccount.getOrderNo());
+        orderStatusService.saveOrderStatusInfo(orderStatusDTO);
     }
 }

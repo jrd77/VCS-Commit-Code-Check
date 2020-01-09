@@ -3,9 +3,13 @@ package com.atzuche.order.cashieraccount.service;
 import com.atzuche.order.accountownercost.entity.AccountOwnerCostSettleDetailEntity;
 import com.atzuche.order.accountownercost.service.AccountOwnerCostSettleService;
 import com.atzuche.order.accountownercost.service.notservice.AccountOwnerCostSettleDetailNoTService;
+import com.atzuche.order.accountrenterdeposit.vo.res.AccountRenterDepositResVO;
 import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostSettleDetailEntity;
+import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostSettleEntity;
 import com.atzuche.order.accountrenterrentcost.service.notservice.AccountRenterCostSettleDetailNoTService;
+import com.atzuche.order.accountrenterrentcost.service.notservice.AccountRenterCostSettleNoTService;
 import com.atzuche.order.accountrenterrentcost.vo.req.AccountRenterCostChangeReqVO;
+import com.atzuche.order.accountrenterwzdepost.vo.res.AccountRenterWZDepositResVO;
 import com.atzuche.order.commons.enums.OrderPayStatusEnum;
 import com.atzuche.order.commons.enums.OrderStatusEnum;
 import com.atzuche.order.commons.enums.RenterCashCodeEnum;
@@ -83,6 +87,7 @@ public class CashierService {
     @Autowired private AccountRenterCostSettleDetailNoTService accountRenterCostSettleDetailNoTService;
     @Autowired private AccountOwnerCostSettleDetailNoTService accountOwnerCostSettleDetailNoTService;
     @Autowired private OrderStatusService orderStatusService;
+    @Autowired private AccountRenterCostSettleNoTService accountRenterCostSettleNoTService;
 
 
     /**  *************************************** 租车费用 start****************************************************/
@@ -92,6 +97,9 @@ public class CashierService {
      */
     public void insertRenterCost(CreateOrderRenterCostReqVO createOrderRenterCost){
         cashierNoTService.insertRenterCost(createOrderRenterCost);
+    }
+    public AccountRenterCostSettleEntity getAccountRenterCostSettle(String orderNo, String memNo){
+       return accountRenterCostSettleNoTService.getCostPaidRentSettle(orderNo,memNo);
     }
 
     /**  *************************************** 租车费用 end****************************************************/
@@ -106,8 +114,8 @@ public class CashierService {
         Assert.notNull(createOrderRenterDepositReqVO, ErrorCode.PARAMETER_ERROR.getText());
         createOrderRenterDepositReqVO.check();
         createOrderRenterDepositReqVO.setPayKind(DataPayKindConstant.RENT);
-        //1 收银台记录违章押金 应付
-        cashierNoTService.insertRenterDeposit(createOrderRenterDepositReqVO);
+//        //1 收银台记录违章押金 应付
+//        cashierNoTService.insertRenterDeposit(createOrderRenterDepositReqVO);
         //2 车俩押金记录应付
         accountRenterDepositService.insertRenterDeposit(createOrderRenterDepositReqVO);
     }
@@ -127,10 +135,16 @@ public class CashierService {
        return accountRenterDepositService.isPayOffForRenterDeposit(orderNo, memNo);
     }
     /**
-     * 查询车辆押金余额
+     * 查询应收车辆押金
      */
-    public int getSurplusRenterDeposit(String orderNo, String memNo){
-        return accountRenterDepositService.getSurplusRenterDeposit(orderNo, memNo);
+    public AccountRenterDepositResVO getRenterDepositEntity(String orderNo, String memNo){
+        return accountRenterDepositService.getAccountRenterDepositEntity(orderNo, memNo);
+    }
+    /**
+     * 查询应收车辆押金
+     */
+    public int getRenterDeposit(String orderNo, String memNo){
+        return accountRenterDepositService.getRenterDeposit(orderNo, memNo);
     }
 
     /**  ***************************************** 押金 end *************************************************     */
@@ -145,8 +159,8 @@ public class CashierService {
         Assert.notNull(createOrderRenterWZDepositReq, ErrorCode.PARAMETER_ERROR.getText());
         createOrderRenterWZDepositReq.check();
         createOrderRenterWZDepositReq.setPayKind(DataPayKindConstant.DEPOSIT);
-        //1 收银台记录违章押金 应付
-        cashierNoTService.insertRenterWZDeposit(createOrderRenterWZDepositReq);
+//        //1 收银台记录违章押金 应付
+//        cashierNoTService.insertRenterWZDeposit(createOrderRenterWZDepositReq);
         //2 违章押金记录应付
         accountRenterWzDepositService.insertRenterWZDeposit(createOrderRenterWZDepositReq);
     }
@@ -166,10 +180,17 @@ public class CashierService {
         return accountRenterWzDepositService.isPayOffForRenterWZDeposit(orderNo, memNo);
     }
     /**
+     * 查询违章押金
+     */
+    public int getRenterWZDeposit(String orderNo, String memNo){
+        return accountRenterWzDepositService.getRenterWZDeposit(orderNo, memNo);
+    }
+
+    /**
      * 查询违章押金余额
      */
-    public int getSurplusRenterWZDeposit(String orderNo, String memNo){
-        return accountRenterWzDepositService.getSurplusRenterWZDeposit(orderNo, memNo);
+    public AccountRenterWZDepositResVO getRenterWZDepositEntity(String orderNo, String memNo){
+        return accountRenterWzDepositService.getAccountRenterWZDeposit(orderNo, memNo);
     }
 
     /**  ***************************************** 违章押金 end *************************************************     */
@@ -497,6 +518,7 @@ public class CashierService {
         //支付成功更新 订单支付状态
         if(Objects.nonNull(orderStatusDTO)){
             setOrderStatus(orderStatusDTO);
+            log.info("payOrderCallBackSuccess saveOrderStatusInfo :[{}]", GsonUtils.toJson(orderStatusDTO));
             int orderStatusResult = orderStatusService.saveOrderStatusInfo(orderStatusDTO);
             Assert.isTrue(orderStatusResult==1,"支付成功更新订单状态失败");
         }

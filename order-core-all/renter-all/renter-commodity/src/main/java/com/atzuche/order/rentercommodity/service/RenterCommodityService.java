@@ -135,6 +135,11 @@ public class RenterCommodityService {
                LocalDate carDay = x.getCarDay();
                List<RenterGoodsPriceDetailEntity> dbMapValue = carDayGroupMap.get(carDay);
                dbMapValue.forEach(y->{
+                  /* if(){
+
+                   }else{
+
+                   }*/
                    RenterGoodsPriceDetailDTO renterGoods = new RenterGoodsPriceDetailDTO();
                    renterGoods.setCarUnitPrice(y.getCarUnitPrice());
                    renterGoods.setRevertTime(revertTime);
