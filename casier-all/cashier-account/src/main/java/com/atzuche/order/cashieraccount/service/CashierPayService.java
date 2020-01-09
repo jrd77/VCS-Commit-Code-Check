@@ -258,28 +258,6 @@ public class CashierPayService{
                 }
             }
         }
-//        //车辆押金 是否选择车辆押金
-//        if(orderPaySign.getPayKind().contains(DataPayKindConstant.RENT) && payVO.getAmtDeposit()<0){
-//          CashierEntity cashierEntity = cashierNoTService.getCashierEntity(orderPaySign.getOrderNo(),orderPaySign.getMenNo(), DataPayKindConstant.RENT);
-//            if(Objects.nonNull(cashierEntity)){
-//              PayVo vo = cashierNoTService.getPayVO(cashierEntity,orderPaySign,payVO.getAmtDeposit(),payVO.getTitle(),DataPayKindConstant.RENT);
-//              String payMd5 = MD5.MD5Encode(FasterJsonUtil.toJson(vo));
-//              vo.setPayMd5(payMd5);
-//              payVo.add(vo);
-//          }
-//        }
-//
-//        //违章押金 是否选择违章押金
-//        if(orderPaySign.getPayKind().contains(DataPayKindConstant.DEPOSIT) && payVO.getAmtWzDeposit()<0){
-//            CashierEntity cashierEntity = cashierNoTService.getCashierEntity(orderPaySign.getOrderNo(),orderPaySign.getMenNo(), DataPayKindConstant.DEPOSIT);
-//            if(Objects.nonNull(cashierEntity)){
-//                PayVo vo = cashierNoTService.getPayVO(cashierEntity,orderPaySign,payVO.getAmtWzDeposit(),payVO.getTitle(),DataPayKindConstant.DEPOSIT);
-//                String payMd5 = MD5.MD5Encode(FasterJsonUtil.toJson(vo));
-//                vo.setPayMd5(payMd5);
-//                payVo.add(vo);
-//            }
-//
-//        }
 
         //待付租车费用
         if(orderPaySign.getPayKind().contains(DataPayKindConstant.RENT_AMOUNT) && payVO.getAmtRent()<0){
