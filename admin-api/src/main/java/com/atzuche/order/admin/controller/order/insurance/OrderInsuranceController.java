@@ -8,6 +8,7 @@ import com.atzuche.order.admin.dto.InsurancePurchaseResultDTO;
 import com.atzuche.order.admin.dto.OrderInsuranceAdditionRequestDTO;
 import com.atzuche.order.admin.dto.OrderInsuranceImportRequestDTO;
 import com.atzuche.order.admin.enums.InsuranceCompanyTypeEnum;
+import com.atzuche.order.admin.enums.InsuranceInputTypeEnum;
 import com.atzuche.order.admin.util.CommonUtils;
 import com.atzuche.order.admin.util.oss.OSSUtils;
 import com.atzuche.order.admin.vo.req.insurance.OrderInsuranceAdditionRequestVO;
@@ -50,8 +51,6 @@ public class OrderInsuranceController {
     public static final String RES_CODE = "resCode";
     public static final String RES_MSG = "resMsg";
     public static final String DATA = "data";
-    public static final String CPIC_NAME = "太平洋保险";
-    public static final String PICC_NAME = "中国人民保险";
     public static final String SHEET_TYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
     public static final String XLS_TYPE = "application/vnd.ms-excel";
     public static final String XLSX_TYPE = "application/x-excel";
@@ -176,16 +175,12 @@ public class OrderInsuranceController {
             if(CollectionUtils.isNotEmpty(insuranceList)) {
                 insuranceList.forEach(insurance -> {
                     if (insurance.getType() == 2) {
-                        String insuranceCompany = insurance.getInsuranceCompany();
-                        if("1".equalsIgnoreCase(insuranceCompany)) {
-                            insurance.setInsuranceCompany(CPIC_NAME);
-                        } else if("2".equalsIgnoreCase(insuranceCompany)) {
-                            insurance.setInsuranceCompany(PICC_NAME);
-                        }
+                        insurance.setInsuranceCompany(InsuranceCompanyTypeEnum.getDescriptionByType(insurance.getInsuranceCompany()));
                     }
                     OrderInsuranceVO orderInsuranceVO = new OrderInsuranceVO();
                     //bean转换
                     BeanUtils.copyProperties(insurance, orderInsuranceVO);
+                    orderInsuranceVO.setType(InsuranceInputTypeEnum.getDescriptionByType(String.valueOf(insurance.getType())));
                     if(insurance.getType() == 3){
                         exceptedOrderInsuranceList.add(orderInsuranceVO);
                     }
