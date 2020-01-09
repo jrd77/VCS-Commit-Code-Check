@@ -17,6 +17,7 @@ import com.atzuche.order.delivery.utils.DateUtils;
 import com.atzuche.order.delivery.vo.delivery.*;
 import com.atzuche.order.delivery.vo.handover.HandoverCarInfoDTO;
 import com.atzuche.order.delivery.vo.handover.HandoverCarVO;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +32,7 @@ import java.util.Objects;
  * 配送服务内部服务
  */
 @Service
+@Slf4j
 public class DeliveryCarService {
 
     @Autowired
@@ -41,7 +43,6 @@ public class DeliveryCarService {
     RenterOrderDeliveryService renterOrderDeliveryService;
     @Autowired
     CodeUtils codeUtils;
-
 
     /**
      * 添加配送相关信息(是否下单，是否推送仁云)
@@ -69,6 +70,7 @@ public class DeliveryCarService {
             throw new DeliveryOrderException(DeliveryErrorCode.DELIVERY_PARAMS_ERROR);
         }
         insertRenterDeliveryInfoAndDeliveryAddressInfo(getMinutes, returnMinutes, orderDeliveryVO, DeliveryTypeEnum.ADD_TYPE.getValue().intValue());
+        log.info(orderDeliveryVO.getOrderDeliveryDTO().toString());
         if (orderDeliveryVO.getOrderDeliveryDTO() != null && orderDeliveryVO.getOrderDeliveryDTO().getIsNotifyRenyun().intValue() == UsedDeliveryTypeEnum.USED.getValue().intValue()) {
             RenYunFlowOrderDTO renYunFlowOrder = orderDeliveryVO.getRenYunFlowOrderDTO();
             deliveryCarTask.addRenYunFlowOrderInfo(renYunFlowOrder);
