@@ -181,6 +181,16 @@ public class ModifyOrderForRenterService {
 	
 	/**
 	 * 修改订单补付成功后调用
+	 * @param orderNo
+	 * @param renterOrderNo
+	 */
+	public void supplementPayPostProcess(String orderNo, String renterOrderNo) {
+		supplementPayPostProcess(orderNo, renterOrderNo, null, null);
+	}
+	
+	
+	/**
+	 * 修改订单补付成功后调用
 	 * @param orderNo 主订单号
 	 * @param renterOrderNo 最新修改租客子订单号
 	 */
@@ -199,8 +209,13 @@ public class ModifyOrderForRenterService {
 		// 判断是否自动同意
 		boolean autoAgree = !checkAutoAgree(initRenterOrderEntity.getExpRentTime(), initRenterOrderEntity.getExpRevertTime(), updRenterOrderEntity.getExpRentTime(), updRenterOrderEntity.getExpRevertTime());
 		if (autoAgree) {
-			// 自动同意
-			modifyOrderConfirmService.agreeModifyOrder(modifyOrderDTO, updRenterOrderEntity, initRenterOrderEntity, renterOrderSubsidyDetailDTOList);
+			if (modifyOrderDTO != null) {
+				// 自动同意
+				modifyOrderConfirmService.agreeModifyOrder(modifyOrderDTO, updRenterOrderEntity, initRenterOrderEntity, renterOrderSubsidyDetailDTOList);
+			} else {
+				// 模拟车主同意
+				modifyOrderConfirmService.agreeModifyOrder(orderNo, renterOrderNo);
+			}
 		} else {
 			// 保存修改申请记录
 			addRenterOrderChangeApply(orderNo, renterOrderNo, before, after);
