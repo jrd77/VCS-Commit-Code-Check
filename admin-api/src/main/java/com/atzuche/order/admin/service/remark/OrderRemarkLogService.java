@@ -2,6 +2,7 @@ package com.atzuche.order.admin.service.remark;
 
 import com.atzuche.order.admin.common.AdminUserUtil;
 import com.atzuche.order.admin.common.PageBean;
+import com.atzuche.order.admin.dto.OrderRemarkLogListRequestDTO;
 import com.atzuche.order.admin.entity.OrderRemarkEntity;
 import com.atzuche.order.admin.entity.OrderRemarkLogEntity;
 import com.atzuche.order.admin.enums.DepartmentEnum;
@@ -71,12 +72,14 @@ public class OrderRemarkLogService {
     public OrderRemarkLogPageListResponseVO selectRemarkLoglist(OrderRemarkLogListRequestVO orderRemarkLogListRequestVO){
         OrderRemarkLogPageListResponseVO orderRemarkLogPageListResponseVO = new OrderRemarkLogPageListResponseVO();
         List<OrderRemarkLogListResponseVO> orderRemarkPageList = new ArrayList<>();
-        String pageNumber = orderRemarkLogListRequestVO.getPageNumber();
         long count = orderRemarkLogMapper.selectRemarkLogListCount(orderRemarkLogListRequestVO);
-        PageBean pageBean = new PageBean(Long.parseLong(pageNumber), count, PageBean.PAGE_SIZE);
-        orderRemarkLogListRequestVO.setStartIndex(String.valueOf(pageBean.getStartIndex()));
-
-        List<OrderRemarkLogEntity> remarkList = orderRemarkLogMapper.selectRemarkLogList(orderRemarkLogListRequestVO);
+        String pageNumber = orderRemarkLogListRequestVO.getPageNumber();
+        if(null == pageNumber){
+            pageNumber = "1";
+        }
+        OrderRemarkLogListRequestDTO orderRemarkLogListRequestDTO = new OrderRemarkLogListRequestDTO(Long.parseLong(pageNumber), count);
+        BeanUtils.copyProperties(orderRemarkLogListRequestVO, orderRemarkLogListRequestDTO);
+        List<OrderRemarkLogEntity> remarkList = orderRemarkLogMapper.selectRemarkLogList(orderRemarkLogListRequestDTO);
         if(!CollectionUtils.isEmpty(remarkList)) {
             remarkList.forEach(remarkLogEntity -> {
                 OrderRemarkLogListResponseVO orderRemarkLogListResponseVO = new OrderRemarkLogListResponseVO();
@@ -92,9 +95,10 @@ public class OrderRemarkLogService {
             });
         }
 
-        orderRemarkLogPageListResponseVO.setPageNumber(pageNumber);
-        orderRemarkLogPageListResponseVO.setPages(String.valueOf(pageBean.getPages()));
-        orderRemarkLogPageListResponseVO.setPageSize(String.valueOf(pageBean.getPageSize()));
+        orderRemarkLogPageListResponseVO.setPageNumber(String.valueOf(orderRemarkLogListRequestDTO.getPageNumber()));
+        orderRemarkLogPageListResponseVO.setPages(String.valueOf(orderRemarkLogListRequestDTO.getPages()));
+        orderRemarkLogPageListResponseVO.setPageSize(String.valueOf(orderRemarkLogListRequestDTO.getPageSize()));
+        orderRemarkLogPageListResponseVO.setTotal(String.valueOf(orderRemarkLogListRequestDTO.getTotal()));
         orderRemarkLogPageListResponseVO.setOrderRemarkLogList(orderRemarkPageList);
         return orderRemarkLogPageListResponseVO;
     }

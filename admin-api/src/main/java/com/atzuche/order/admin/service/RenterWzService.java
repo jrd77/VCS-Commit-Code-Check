@@ -180,7 +180,7 @@ public class RenterWzService {
         return wzCostLogsResVO;
     }
 
-    public TemporaryRefundLogsResVO queryTemporaryRefundLogsByOrderNo(String orderNo) {
+    public List<TemporaryRefundLogResVO> queryTemporaryRefundLogsByOrderNo(String orderNo) {
         List<WzTemporaryRefundLogEntity> wzTemporaryRefundLogEntities = wzTemporaryRefundLogService.queryTemporaryRefundLogsByOrderNo(orderNo);
         List<TemporaryRefundLogResVO> wzCostLogs = new ArrayList<>();
         TemporaryRefundLogResVO vo;
@@ -191,9 +191,7 @@ public class RenterWzService {
             vo.setAmount(String.valueOf(wzCostLog.getAmount()));
             wzCostLogs.add(vo);
         }
-        TemporaryRefundLogsResVO wzCostLogsResVO = new TemporaryRefundLogsResVO();
-        wzCostLogsResVO.setTemporaryRefundLogs(wzCostLogs);
-        return wzCostLogsResVO;
+        return wzCostLogs;
     }
 
     public void addTemporaryRefund(TemporaryRefundReqVO req) {
@@ -221,6 +219,18 @@ public class RenterWzService {
 
     public RenterWzDetailResVO queryWzDetailByOrderNo(String orderNo) {
         RenterWzDetailResVO rs = new RenterWzDetailResVO();
+        //费用详情
+        List<RenterWzCostDetailResVO> costDetails = getRenterWzCostDetailRes(orderNo);
+        rs.setCostDetails(costDetails);
+
+        //暂扣日志
+        List<TemporaryRefundLogResVO> temporaryRefundLogResVOS = this.queryTemporaryRefundLogsByOrderNo(orderNo);
+        rs.setTemporaryRefundLogs(temporaryRefundLogResVOS);
+        //TODO 还缺海豹的接口
+        return rs;
+    }
+
+    private List<RenterWzCostDetailResVO> getRenterWzCostDetailRes(String orderNo) {
         List<RenterOrderWzCostDetailEntity> results = renterOrderWzCostDetailService.queryInfosByOrderNo(orderNo);
         List<RenterWzCostDetailResVO> costDetails = new ArrayList<>();
         RenterWzCostDetailResVO dto;
@@ -231,8 +241,6 @@ public class RenterWzService {
             dto.setCostType(WzCostEnums.getType(costDetail.getCostCode()));
             costDetails.add(dto);
         }
-        rs.setCostDetails(costDetails);
-        //TODO 还缺海豹的接口
-        return rs;
+        return costDetails;
     }
 }
