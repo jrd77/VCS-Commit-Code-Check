@@ -26,12 +26,14 @@ public class OrderOtherInformationController {
 	@AutoDocMethod(description = "修改租车城市", value = "修改租车城市", response = ResponseData.class)
     @RequestMapping(value = "/rent/city/update", method = RequestMethod.PUT)
 	public ResponseData<ResponseData> updateRentCity(@RequestBody OrderRentCityRequestVO orderRentCityRequestVO, BindingResult bindingResult) {
+        //调用订单服务
 		return ResponseData.success(null);
 	}
 
     @AutoDocMethod(description = "是否风控事故修改", value = "是否风控事故修改", response = ResponseData.class)
     @RequestMapping(value = "/risk/status/update", method = RequestMethod.PUT)
     public ResponseData<ResponseData> updateRiskStatus(@RequestBody OrderRiskStatusRequestVO orderRiskStatusRequestVO, BindingResult bindingResult) {
+	    //调用订单服务
         return ResponseData.success(null);
     }
 
@@ -46,6 +48,7 @@ public class OrderOtherInformationController {
     @GetMapping("/detail")
     public ResponseData<OrderOtherInformationResponseVO> getOtherRemarkInformation(OrderRemarkRequestVO orderRemarkRequestVO, BindingResult bindingResult) {
         OrderOtherInformationResponseVO orderOtherInformationResponseVO = new OrderOtherInformationResponseVO();
+        //调用订单服务
         orderOtherInformationResponseVO.setRentCity("上海");
         orderOtherInformationResponseVO.setRiskAccidentStatus("1");
         OrderRemarkResponseVO orderRemarkResponseVO = orderRemarkService.getOrderCarServiceRemarkInformation(orderRemarkRequestVO);
