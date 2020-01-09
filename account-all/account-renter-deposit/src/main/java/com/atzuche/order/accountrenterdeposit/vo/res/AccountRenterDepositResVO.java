@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
  */
 @Data
 public class AccountRenterDepositResVO {
+    private Integer id;
     /**
      * 主订单号
      */

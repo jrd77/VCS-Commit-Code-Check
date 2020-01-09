@@ -67,7 +67,7 @@ public class AccountRenterDepositService{
         Assert.notNull(accountRenterDepositRes, ErrorCode.PARAMETER_ERROR.getText());
         Assert.notNull(accountRenterDepositRes.getOrderNo(), ErrorCode.PARAMETER_ERROR.getText());
         //2 返回计算剩余押金余额
-        Integer amt = accountRenterDepositRes.getShifuDepositAmt();
+        Integer amt = accountRenterDepositRes.getYingfuDepositAmt();
         amt = Objects.isNull(amt)?0:amt;
         return amt;
     }
