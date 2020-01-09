@@ -104,6 +104,7 @@ public class OrderRemarkService {
         orderRemarkLogEntity.setCreateOp(userName);
         orderRemarkLogEntity.setUpdateOp(userName);
         orderRemarkLogEntity.setNumber(oldOrderRemarkEntity.getNumber());
+        orderRemarkLogEntity.setDepartmentId(oldOrderRemarkEntity.getDepartmentId());
         orderRemarkLogMapper.addOrderRemarkLog(orderRemarkLogEntity);
     }
 
@@ -126,10 +127,13 @@ public class OrderRemarkService {
         OrderRemarkLogEntity orderRemarkLogEntity = new OrderRemarkLogEntity();
         BeanUtils.copyProperties(orderRemarkEntity, orderRemarkLogEntity);
         orderRemarkLogEntity.setOperateType(OperateTypeEnum.DELETE.getType());
-        orderRemarkLogEntity.setRemarkHistory(oldOrderRemarkEntity.getRemarkContent());
+        String remarkContent = oldOrderRemarkEntity.getRemarkContent();
+        orderRemarkLogEntity.setRemarkHistory(remarkContent);
+        orderRemarkLogEntity.setRemarkContent(remarkContent);
         String userName = AdminUserUtil.getAdminUser().getAuthName();
         orderRemarkLogEntity.setCreateOp(userName);
         orderRemarkLogEntity.setUpdateOp(userName);
+
         orderRemarkLogEntity.setNumber(oldOrderRemarkEntity.getNumber());
         orderRemarkLogEntity.setOrderNo(oldOrderRemarkEntity.getOrderNo());
         orderRemarkLogMapper.addOrderRemarkLog(orderRemarkLogEntity);
