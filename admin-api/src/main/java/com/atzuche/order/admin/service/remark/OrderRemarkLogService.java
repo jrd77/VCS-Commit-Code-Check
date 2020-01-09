@@ -81,7 +81,7 @@ public class OrderRemarkLogService {
                 OrderRemarkLogListResponseVO orderRemarkLogListResponseVO = new OrderRemarkLogListResponseVO();
                 orderRemarkLogListResponseVO.setNumber(remarkLogEntity.getNumber());
                 orderRemarkLogListResponseVO.setRemarkType(RemarkTypeEnum.getDescriptionByType(remarkLogEntity.getRemarkType()));
-                orderRemarkLogListResponseVO.setOperateType(OperateTypeEnum.getDescriptionByType(remarkLogEntity.getOperateType()));
+                orderRemarkLogListResponseVO.setOperateTypeText(OperateTypeEnum.getDescriptionByType(remarkLogEntity.getOperateType()));
                 orderRemarkLogListResponseVO.setOperatorName(remarkLogEntity.getCreateOp());
                 orderRemarkLogListResponseVO.setOperateTime(remarkLogEntity.getCreateTime());
                 orderRemarkLogListResponseVO.setOldRemarkContent(remarkLogEntity.getRemarkHistory());
