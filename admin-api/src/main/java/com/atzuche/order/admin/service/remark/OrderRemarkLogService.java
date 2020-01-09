@@ -1,17 +1,30 @@
 package com.atzuche.order.admin.service.remark;
 
 import com.atzuche.order.admin.common.AdminUserUtil;
+import com.atzuche.order.admin.common.PageBean;
 import com.atzuche.order.admin.entity.OrderRemarkEntity;
 import com.atzuche.order.admin.entity.OrderRemarkLogEntity;
+import com.atzuche.order.admin.enums.DepartmentEnum;
 import com.atzuche.order.admin.enums.OperateTypeEnum;
+import com.atzuche.order.admin.enums.RemarkTypeEnum;
 import com.atzuche.order.admin.mapper.OrderRemarkLogMapper;
 import com.atzuche.order.admin.mapper.OrderRemarkMapper;
 import com.atzuche.order.admin.vo.req.remark.OrderRemarkInformationRequestVO;
+import com.atzuche.order.admin.vo.req.remark.OrderRemarkListRequestVO;
+import com.atzuche.order.admin.vo.req.remark.OrderRemarkLogListRequestVO;
+import com.atzuche.order.admin.vo.resp.remark.OrderRemarkListResponseVO;
+import com.atzuche.order.admin.vo.resp.remark.OrderRemarkLogListResponseVO;
+import com.atzuche.order.admin.vo.resp.remark.OrderRemarkLogPageListResponseVO;
+import com.atzuche.order.admin.vo.resp.remark.OrderRemarkPageListResponseVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Service
@@ -47,6 +60,43 @@ public class OrderRemarkLogService {
         String remarkContent = oldOrderRemarkEntity.getRemarkContent();
         orderRemarkLogEntity.setRemarkContent(remarkContent);
         orderRemarkLogMapper.addOrderRemarkLog(orderRemarkLogEntity);
+    }
+
+
+    /**
+     * 查询备注日志列表
+     * @param orderRemarkLogListRequestVO
+     * @return
+     */
+    public OrderRemarkLogPageListResponseVO selectRemarkLoglist(OrderRemarkLogListRequestVO orderRemarkLogListRequestVO){
+        OrderRemarkLogPageListResponseVO orderRemarkLogPageListResponseVO = new OrderRemarkLogPageListResponseVO();
+        List<OrderRemarkLogListResponseVO> orderRemarkPageList = new ArrayList<>();
+        String pageNumber = orderRemarkLogListRequestVO.getPageNumber();
+        long count = orderRemarkLogMapper.selectRemarkLogListCount(orderRemarkLogListRequestVO);
+        PageBean pageBean = new PageBean(Long.parseLong(pageNumber), count, PageBean.PAGE_SIZE);
+        orderRemarkLogListRequestVO.setStartIndex(String.valueOf(pageBean.getStartIndex()));
+
+        List<OrderRemarkLogEntity> remarkList = orderRemarkLogMapper.selectRemarkLogList(orderRemarkLogListRequestVO);
+        if(!CollectionUtils.isEmpty(remarkList)) {
+            remarkList.forEach(remarkLogEntity -> {
+                OrderRemarkLogListResponseVO orderRemarkLogListResponseVO = new OrderRemarkLogListResponseVO();
+                orderRemarkLogListResponseVO.setNumber(remarkLogEntity.getNumber());
+                orderRemarkLogListResponseVO.setRemarkType(RemarkTypeEnum.getDescriptionByType(remarkLogEntity.getRemarkType()));
+                orderRemarkLogListResponseVO.setOperateType(OperateTypeEnum.getDescriptionByType(remarkLogEntity.getOperateType()));
+                orderRemarkLogListResponseVO.setOperatorName(remarkLogEntity.getCreateOp());
+                orderRemarkLogListResponseVO.setOperateTime(remarkLogEntity.getCreateTime());
+                orderRemarkLogListResponseVO.setOldRemarkContent(remarkLogEntity.getRemarkHistory());
+                orderRemarkLogListResponseVO.setNewRemarkContent(remarkLogEntity.getRemarkContent());
+                orderRemarkLogListResponseVO.setDepartmentName(DepartmentEnum.getDescriptionByType(remarkLogEntity.getDepartmentId()));
+                orderRemarkPageList.add(orderRemarkLogListResponseVO);
+            });
+        }
+
+        orderRemarkLogPageListResponseVO.setPageNumber(pageNumber);
+        orderRemarkLogPageListResponseVO.setPages(String.valueOf(pageBean.getPages()));
+        orderRemarkLogPageListResponseVO.setPageSize(String.valueOf(pageBean.getPageSize()));
+        orderRemarkLogPageListResponseVO.setOrderRemarkLogList(orderRemarkPageList);
+        return orderRemarkLogPageListResponseVO;
     }
 
 }

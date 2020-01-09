@@ -16,6 +16,16 @@ apply plugin: 'war'
 
 mainClassName = 'com.autoyol.doc.parser.autodoc.AutoDocParser'
 dependencies {
-    testCompile group: 'junit', name: 'junit', version: '4.12'
     compile project(":util-all:order-commons")
+}
+publishing {
+    publications {
+        maven(MavenPublication) {
+            groupId = 'com.autoyol'
+            artifactId = 'order-openapi'
+            version = '1.2-SNAPSHOT'
+            from components.java
+            artifact sourceJar
+        }
+    }
 }

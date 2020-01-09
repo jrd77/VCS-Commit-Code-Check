@@ -29,8 +29,8 @@ public class RenterFeeCalculatorUtils {
 	//1亿表示100万以上区间
 	private static final int[] TOTAL_AMT_RANGE = {80000, 100000, 120000, 140000 ,160000, 180000, 200000, 250000,300000,400000,1000000,100000000};
 	private static final int[] TOTAL_AMT_LEVEL = {0, 1000,  1200,  1500,   2000,   2500,  3000, 3500, 5000, 10000, 15000, 50000};
-	private static final String CAREEPOSIT = "1"; //租车押金
-	private static final String CAREEPOSITDEFULT = "3"; //默认租车押金
+	private static final Integer CAREEPOSIT = 1; //租车押金
+	private static final Integer CAREEPOSITDEFULT = 3; //默认租车押金
 	private static final Integer INTERNAL_STAFF_FLAG = 1;//内部员工标志
 	public static final Integer RENT_ADJUST_AMT_INNER = 300; //内部员工调价金额支付300元。  租车预授权=租金+保险+去送车+不计免赔+300
 	public static final Map<Integer, Integer> ILLEGAL_DEPOSIT = new HashMap<Integer, Integer>() {

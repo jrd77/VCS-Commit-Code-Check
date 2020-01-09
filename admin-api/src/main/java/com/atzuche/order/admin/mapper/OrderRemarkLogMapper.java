@@ -1,12 +1,9 @@
 package com.atzuche.order.admin.mapper;
 
-import com.atzuche.order.admin.entity.OrderInsuranceAdditionRequestEntity;
 import com.atzuche.order.admin.entity.OrderRemarkEntity;
 import com.atzuche.order.admin.entity.OrderRemarkLogEntity;
-import com.atzuche.order.admin.entity.OrderRemarkOverviewEntity;
-import com.atzuche.order.admin.vo.req.remark.OrderRemarkInformationRequestVO;
 import com.atzuche.order.admin.vo.req.remark.OrderRemarkListRequestVO;
-import com.atzuche.order.admin.vo.req.remark.OrderRemarkRequestVO;
+import com.atzuche.order.admin.vo.req.remark.OrderRemarkLogListRequestVO;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -22,6 +19,9 @@ public interface OrderRemarkLogMapper {
      */
     void addOrderRemarkLog(OrderRemarkLogEntity orderRemarkLogEntity);
 
+    List<OrderRemarkLogEntity> selectRemarkLogList(OrderRemarkLogListRequestVO orderRemarkLogListRequestVO);
+
+    long selectRemarkLogListCount(OrderRemarkLogListRequestVO orderRemarkLogListRequestVO);
 
 
 }
