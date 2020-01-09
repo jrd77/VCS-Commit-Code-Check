@@ -496,13 +496,20 @@ public class CashierService {
 
         //支付成功更新 订单支付状态
         if(Objects.nonNull(orderStatusDTO)){
-           int orderStatus = orderStatusService.saveOrderStatusInfo(orderStatusDTO);
-
+            setOrderStatus(orderStatusDTO);
+            int orderStatusResult = orderStatusService.saveOrderStatusInfo(orderStatusDTO);
+            Assert.isTrue(orderStatusResult==1,"支付成功更新订单状态失败");
         }
+
         //TODO 支付回调成功 push/或者短信 怎么处理
 
     }
-    private void getStatus(OrderStatusDTO orderStatusDTO){
+
+    /**
+     * 当支付成功（当车辆押金，违章押金，租车费用都支付成功，更新订单状态 待取车），更新主订单状态待取车
+     * @param orderStatusDTO
+     */
+    private void setOrderStatus(OrderStatusDTO orderStatusDTO){
         OrderStatusEntity entity = orderStatusService.getByOrderNo(orderStatusDTO.getOrderNo());
         if(
                 OrderPayStatusEnum.PAYED.getStatus()== entity.getRentCarPayStatus() &&
