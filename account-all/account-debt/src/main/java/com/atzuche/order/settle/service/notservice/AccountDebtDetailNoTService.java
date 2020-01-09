@@ -50,7 +50,7 @@ public class AccountDebtDetailNoTService {
     }
 
 
-    public void insertDebtDetail(AccountInsertDebtReqVO accountInsertDebt) {
+    public int insertDebtDetail(AccountInsertDebtReqVO accountInsertDebt) {
         AccountDebtDetailEntity accountDebtDetail = new AccountDebtDetailEntity();
         BeanUtils.copyProperties(accountInsertDebt,accountDebtDetail);
         accountDebtDetail.setCurrentDebtAmt(accountInsertDebt.getAmt());
@@ -60,6 +60,7 @@ public class AccountDebtDetailNoTService {
         if(result==0){
             throw new AccountInsertDebtDBException();
         }
+        return accountDebtDetail.getId();
     }
 
     /**

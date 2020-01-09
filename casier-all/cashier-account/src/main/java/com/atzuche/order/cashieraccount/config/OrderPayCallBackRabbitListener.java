@@ -17,14 +17,14 @@ import org.springframework.amqp.rabbit.annotation.RabbitHandler;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
-import org.springframework.stereotype.Component;
+import org.springframework.context.annotation.Configuration;
 
 
 /**
  * 支付系统回调
  * @author haibao.yan
  */
-@Component
+@Configuration
 @Slf4j
 public class OrderPayCallBackRabbitListener {
     @Autowired RabbitMsgLogService rabbitMsgLogService;

@@ -72,25 +72,20 @@ public class AutoCoinCostCalService {
     
     
     /**
-     * 计算凹凸币抵扣信息
-     * <p>租客下单时凹凸币抵扣不超过车辆租金(originalRentAmt)5%</p>
-     *
-     * @param originalRentAmt 原始租金
-     * @param surplusRentAmt  剩余租金
-     * @param crmCustPoint    锁定凹凸币数据
-     * @param initAutoCoinAmt 修改前凹凸币抵扣金额
-     * @return RenterOrderSubsidyDetailDTO 凹凸币抵扣信息
+     * 凹凸币抵扣（修改订单）
+     * @param originalRentAmt
+     * @param surplusRentAmt
+     * @param totalAutoCoinAmt
+     * @param memNo
+     * @return RenterOrderSubsidyDetailDTO
      */
-    public RenterOrderSubsidyDetailDTO calAutoCoinDeductInfo(int originalRentAmt, int surplusRentAmt,
-                                                             AutoCoinResponseVO crmCustPoint, Integer initAutoCoinAmt) {
+    public RenterOrderSubsidyDetailDTO calAutoCoinDeductInfo(int originalRentAmt, int surplusRentAmt, Integer totalAutoCoinAmt, String memNo) {
 
-        if (0 == originalRentAmt || 0 == surplusRentAmt || null == crmCustPoint || 0 == crmCustPoint.getPointValue()) {
+        if (0 == originalRentAmt || 0 == surplusRentAmt || null == totalAutoCoinAmt || 0 == totalAutoCoinAmt) {
             return null;
         }
-        initAutoCoinAmt = initAutoCoinAmt == null ? 0:initAutoCoinAmt;
-        int pointValue = crmCustPoint.getPointValue();
         //会员凹凸币金额(1:100),默认全部抵扣
-        int pointValueDeducExchange = pointValue / 100 + initAutoCoinAmt;
+        int pointValueDeducExchange = Math.abs(totalAutoCoinAmt);
         //原始租金的5%
         int rentAmtFivePercent = originalRentAmt * OrderConstant.AUTO_COIN_DEDUCT_RATIO / 100;
         if (rentAmtFivePercent <= pointValueDeducExchange) {
@@ -104,7 +99,7 @@ public class AutoCoinCostCalService {
 
         if (pointValueDeducExchange > 0) {
             RenterOrderSubsidyDetailDTO renterOrderSubsidyDetailDTO = new RenterOrderSubsidyDetailDTO();
-            renterOrderSubsidyDetailDTO.setMemNo(String.valueOf(crmCustPoint.getMemNo()));
+            renterOrderSubsidyDetailDTO.setMemNo(memNo);
             renterOrderSubsidyDetailDTO.setSubsidyAmount(pointValueDeducExchange);
             renterOrderSubsidyDetailDTO.setSubsidyTypeCode(SubsidyTypeCodeEnum.RENT_AMT.getCode());
             renterOrderSubsidyDetailDTO.setSubsidyTypeName(SubsidyTypeCodeEnum.RENT_AMT.getDesc());

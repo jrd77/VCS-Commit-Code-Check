@@ -8,6 +8,7 @@ import com.atzuche.order.parentorder.service.OrderService;
 import com.atzuche.order.parentorder.service.OrderStatusService;
 import com.atzuche.order.rentercommodity.service.RenterGoodsService;
 import com.atzuche.order.parentorder.dto.SuccessOrderDTO;
+import com.atzuche.order.renterwz.service.DeRenCarApproachCitiesService;
 import com.atzuche.order.renterwz.service.RenterOrderWzDetailService;
 import com.atzuche.order.renterwz.vo.OrderInfoForIllegal;
 import com.atzuche.order.renterwz.entity.WzQueryDayConfEntity;
@@ -58,6 +59,8 @@ public class OrderSearchRemoteService {
 
     @Resource
     private RenterGoodsService renterGoodsService;
+
+    private DeRenCarApproachCitiesService deRenCarApproachCitiesService;
 
     @Resource
     private OrderService orderService;
@@ -274,7 +277,8 @@ public class OrderSearchRemoteService {
             if(StringUtils.isNotBlank(violate.getCity())){
                 dto.setCityCode(Integer.parseInt(violate.getCity()));
             }
-
+            String cities = deRenCarApproachCitiesService.queryCitiesByOrderNoAndCarNum(violate.getOrderNo(),violate.getPlateNum());
+            dto.setCities(cities);
             results.add(dto);
         }
         return results;
