@@ -18,11 +18,6 @@ public class CancelOrderResDTO {
     private Boolean isRefund;
 
     /**
-     * 租客订单号
-     */
-    private String renterOrderNo;
-
-    /**
      * 是否退还优惠券(平台+送取服务)
      */
     private Boolean isReturnDisCoupon;
@@ -46,5 +41,20 @@ public class CancelOrderResDTO {
      * 车辆注册号
      */
     private Integer carNo;
+
+    /**
+     * 租客订单号
+     */
+    private String renterOrderNo;
+
+    /**
+     * 取车服务标识
+     */
+    private Boolean srvGetFlag;
+
+    /**
+     * 还车服务标识
+     */
+    private Boolean srvReturnFlag;
 
 }

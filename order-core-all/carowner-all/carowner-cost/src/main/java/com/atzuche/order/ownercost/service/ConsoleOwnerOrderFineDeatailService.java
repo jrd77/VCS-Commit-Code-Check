@@ -20,6 +20,7 @@ import com.atzuche.order.ownercost.mapper.ConsoleOwnerOrderFineDeatailMapper;
  */
 @Service
 public class ConsoleOwnerOrderFineDeatailService{
+
     @Autowired
     private ConsoleOwnerOrderFineDeatailMapper consoleOwnerOrderFineDeatailMapper;
 
@@ -27,14 +28,6 @@ public class ConsoleOwnerOrderFineDeatailService{
 
     public int addFineRecord(ConsoleOwnerOrderFineDeatailEntity entity) {
         return consoleOwnerOrderFineDeatailMapper.insertSelective(entity);
-    }
-
-
-
-    public ConsoleOwnerOrderFineDeatailEntity fineDataConvert() {
-
-
-        return null;
     }
 
 

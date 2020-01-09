@@ -80,7 +80,7 @@ public enum OrderStatusEnum {
      * @param status int value
      * @return
      */
-    public OrderStatusEnum from(int status){
+    public static OrderStatusEnum from(int status){
         OrderStatusEnum[] statuses = values();
         for(OrderStatusEnum s:statuses){
             if(status==s.status){
