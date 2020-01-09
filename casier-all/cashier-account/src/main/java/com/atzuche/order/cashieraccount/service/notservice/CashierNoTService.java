@@ -336,7 +336,7 @@ public class CashierNoTService {
         if(Objects.isNull(cashierEntity)){
 
         }
-        Integer paySn = Objects.isNull(cashierEntity)?0:cashierEntity.getPaySn();
+        Integer paySn = (Objects.isNull(cashierEntity)|| Objects.isNull(cashierEntity.getPaySn()))?0:cashierEntity.getPaySn();
         paySn = Objects.isNull(paySn)?0:paySn;
         vo.setInternalNo(String.valueOf(paySn));
         vo.setExtendParams(extendParams);
