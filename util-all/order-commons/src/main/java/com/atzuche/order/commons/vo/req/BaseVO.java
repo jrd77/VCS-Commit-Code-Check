@@ -1,5 +1,6 @@
 package com.atzuche.order.commons.vo.req;
 
+import com.alibaba.fastjson.annotation.JSONField;
 import com.autoyol.doc.annotation.AutoDocProperty;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.apache.commons.lang3.StringUtils;
@@ -85,6 +86,8 @@ public class BaseVO implements Serializable {
     @AutoDocProperty(value = "【公用参数】mac地址,安卓需要组合mac,IMEI,androidID为唯一标识", hidden = true)
     private String mac;
 
+    @JSONField( name="AndroidId")
+    @JsonProperty(value = "AndroidId")
     @AutoDocProperty(value = "【公用参数】安卓id,安卓需要组合mac,IMEI,androidID为唯一标识", hidden = true)
     private String androidID;
 
