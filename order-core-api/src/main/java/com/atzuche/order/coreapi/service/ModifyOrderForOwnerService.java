@@ -1,26 +1,6 @@
 package com.atzuche.order.coreapi.service;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
-import com.atzuche.order.ownercost.entity.OwnerOrderCostEntity;
-import com.atzuche.order.ownercost.entity.OwnerOrderEntity;
-import com.atzuche.order.ownercost.entity.OwnerOrderIncrementDetailEntity;
-
-import com.atzuche.order.ownercost.service.*;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import com.atzuche.order.commons.entity.dto.CostBaseDTO;
-import com.atzuche.order.commons.entity.dto.OwnerGoodsDetailDTO;
-import com.atzuche.order.commons.entity.dto.OwnerGoodsPriceDetailDTO;
-import com.atzuche.order.commons.entity.dto.OwnerMemberDTO;
-import com.atzuche.order.commons.entity.dto.OwnerMemberRightDTO;
-import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
+import com.atzuche.order.commons.entity.dto.*;
 import com.atzuche.order.commons.enums.SrvGetReturnEnum;
 import com.atzuche.order.coreapi.entity.dto.ModifyOrderOwnerDTO;
 import com.atzuche.order.coreapi.entity.vo.req.CarRentTimeRangeReqVO;
@@ -28,16 +8,24 @@ import com.atzuche.order.coreapi.entity.vo.res.CarRentTimeRangeResVO;
 import com.atzuche.order.coreapi.modifyorder.exception.ModifyOrderParameterException;
 import com.atzuche.order.delivery.entity.RenterOrderDeliveryEntity;
 import com.atzuche.order.owner.commodity.service.OwnerCommodityService;
-import com.atzuche.order.ownercost.entity.OwnerOrderPurchaseDetailEntity;
-import com.atzuche.order.ownercost.entity.OwnerOrderSubsidyDetailEntity;
 import com.atzuche.order.owner.mem.service.OwnerMemberService;
-import com.atzuche.order.rentercost.entity.RenterOrderSubsidyDetailEntity;
-import com.atzuche.order.renterorder.entity.RenterOrderEntity;
+import com.atzuche.order.ownercost.entity.*;
+import com.atzuche.order.ownercost.service.*;
 import com.atzuche.order.parentorder.entity.OrderEntity;
 import com.atzuche.order.parentorder.service.OrderService;
+import com.atzuche.order.rentercost.entity.RenterOrderSubsidyDetailEntity;
+import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.dianping.cat.Cat;
-
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -426,7 +414,7 @@ public class ModifyOrderForOwnerService {
 	 * @return OwnerMemberDTO
 	 */
 	public OwnerMemberDTO getOwnerMemberDTO(String ownerOrderNo, String updOwnerOrderNo) {
-		OwnerMemberDTO ownerMemberDTO = ownerMemberService.selectownerMemberByMemNo(ownerOrderNo, true);
+		OwnerMemberDTO ownerMemberDTO = ownerMemberService.selectownerMemberByOwnerOrderNo(ownerOrderNo, true);
 		ownerMemberDTO.setOwnerOrderNo(updOwnerOrderNo);
 		List<OwnerMemberRightDTO> ownerMemberRightDTOList = ownerMemberDTO.getOwnerMemberRightDTOList();
 		if (ownerMemberRightDTOList == null || ownerMemberRightDTOList.isEmpty()) {

@@ -1,8 +1,11 @@
 package com.atzuche.order.ownercost.mapper;
+import org.apache.ibatis.annotations.Param;
 
 import org.apache.ibatis.annotations.Mapper;
 
 import com.atzuche.order.ownercost.entity.ConsoleOwnerOrderFineDeatailEntity;
+
+import java.util.List;
 
 
 /**
@@ -24,4 +27,5 @@ public interface ConsoleOwnerOrderFineDeatailMapper{
     
     int updateByPrimaryKeySelective(ConsoleOwnerOrderFineDeatailEntity record);
 
+    List<ConsoleOwnerOrderFineDeatailEntity> selectByOrderNo(@Param("orderNo")String orderNo);
 }

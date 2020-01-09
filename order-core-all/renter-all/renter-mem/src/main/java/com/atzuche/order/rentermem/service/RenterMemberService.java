@@ -52,7 +52,7 @@ public class RenterMemberService{
      * @param renterOrderNo 子订单号
      * @param isNeedRight 是否需要权益值信息
      */
-    public RenterMemberDTO selectrenterMemberByMemNo(String renterOrderNo, boolean isNeedRight){
+    public RenterMemberDTO selectrenterMemberByRenterOrderNo(String renterOrderNo, boolean isNeedRight){
         RenterMemberDTO renterMemberDto = new RenterMemberDTO();
         RenterMemberEntity renterMemberEntity = renterMemberMapper.selectByRenterOrderNo(renterOrderNo);
         BeanUtils.copyProperties(renterMemberEntity,renterMemberDto);

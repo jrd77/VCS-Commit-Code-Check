@@ -20,5 +20,6 @@ dependencies {
 	compile project(":order-delivery")
     compile project(":order-core-all:carowner-all:carowner-commodity")
     compile project(":order-coin")
+    compile project(":order-core-all:parent-order")
 
 }
