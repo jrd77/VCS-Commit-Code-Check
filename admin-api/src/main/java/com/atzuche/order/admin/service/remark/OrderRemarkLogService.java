@@ -94,6 +94,7 @@ public class OrderRemarkLogService {
         orderRemarkLogPageListResponseVO.setPageNumber(String.valueOf(orderRemarkLogListRequestDTO.getPageNumber()));
         orderRemarkLogPageListResponseVO.setPages(String.valueOf(orderRemarkLogListRequestDTO.getPages()));
         orderRemarkLogPageListResponseVO.setPageSize(String.valueOf(orderRemarkLogListRequestDTO.getPageSize()));
+        orderRemarkLogPageListResponseVO.setTotal(String.valueOf(orderRemarkLogListRequestDTO.getTotal()));
         orderRemarkLogPageListResponseVO.setOrderRemarkLogList(orderRemarkPageList);
         return orderRemarkLogPageListResponseVO;
     }
