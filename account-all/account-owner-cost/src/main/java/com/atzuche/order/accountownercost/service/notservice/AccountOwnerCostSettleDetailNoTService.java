@@ -34,7 +34,7 @@ public class AccountOwnerCostSettleDetailNoTService {
             accountOwnerCostSettleDetail.check();
             AccountOwnerCostSettleDetailEntity accountOwnerCostSettleDetailEntity = new AccountOwnerCostSettleDetailEntity();
             BeanUtils.copyProperties(accountOwnerCostSettleDetail,accountOwnerCostSettleDetailEntity);
-            int result = accountOwnerCostSettleDetailMapper.insert(accountOwnerCostSettleDetailEntity);
+            int result = accountOwnerCostSettleDetailMapper.insertSelective(accountOwnerCostSettleDetailEntity);
             if(result==0){
                 throw new AccountOwnerCostSettleException();
             }
@@ -49,7 +49,7 @@ public class AccountOwnerCostSettleDetailNoTService {
         if(!CollectionUtils.isEmpty(accountOwnerCostSettleDetails)){
             for(int i=0;i<accountOwnerCostSettleDetails.size();i++){
                 AccountOwnerCostSettleDetailEntity entity = accountOwnerCostSettleDetails.get(i);
-                accountOwnerCostSettleDetailMapper.insert(entity);
+                accountOwnerCostSettleDetailMapper.insertSelective(entity);
             }
         }
     }
@@ -59,7 +59,7 @@ public class AccountOwnerCostSettleDetailNoTService {
      */
     public int insertAccountOwnerCostSettleDetail(AccountOwnerCostSettleDetailEntity accountOwnerCostSettleDetail) {
         if(Objects.nonNull(accountOwnerCostSettleDetail)){
-            accountOwnerCostSettleDetailMapper.insert(accountOwnerCostSettleDetail);
+            accountOwnerCostSettleDetailMapper.insertSelective(accountOwnerCostSettleDetail);
         }
         return accountOwnerCostSettleDetail.getId();
     }

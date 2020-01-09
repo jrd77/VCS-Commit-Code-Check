@@ -58,7 +58,7 @@ public class AccountRenterCostSettleNoTService {
         if(Objects.isNull(accountRenterCostSettleExits)){
             BeanUtils.copyProperties(accountRenterCost,accountRenterCostSettle);
             //不存在插入
-            result = accountRenterCostSettleMapper.insert(accountRenterCostSettle);
+            result = accountRenterCostSettleMapper.insertSelective(accountRenterCostSettle);
         }else{
             //存在更新
             accountRenterCostSettleExits.setShifuAmt(accountRenterCostSettleExits.getShifuAmt() + accountRenterCost.getShifuAmt());

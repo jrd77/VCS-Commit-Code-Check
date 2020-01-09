@@ -134,6 +134,7 @@ public class CashierPayService{
         }
         //7 签名串
         List<PayVo> payVo = getOrderPayVO(orderPaySign,payVO);
+        log.info("CashierPayService 加密前费用列表打印 getPaySignStr payVo [{}] ",GsonUtils.toJson(payVo));
         if(CollectionUtils.isEmpty(payVo)){
             throw new OrderPaySignFailException();
         }

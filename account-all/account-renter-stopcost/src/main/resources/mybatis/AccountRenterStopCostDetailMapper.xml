@@ -56,92 +56,48 @@
 		select  <include refid="Base_Column_List" /> from account_renter_stop_cost_detail order by id desc
 	</select>
 
-	 
-	<insert id="insert" parameterType="com.atzuche.order.accountrenterstopcost.entity.AccountRenterStopCostDetailEntity" useGeneratedKeys="true" keyProperty="id">
-		insert into account_renter_stop_cost_detail
-		(
-				`order_no`,		
-				`mem_no`,		
-				`amt`,		
-				`time`,		
-				`source_code`,		
-				`source_detail`,		
-				`unique_no`,		
-				`payment_code`,		
-				`payment`,		
-				`cashier_unique_no`,		
-				`dept_name`,		
-				`create_op`,		
-				`remark`,		
-				`create_time`,		
-				`update_time`,		
-				`update_op`,		
-				`is_delete`		
-			)
-		values
-		(
-				#{orderNo}, 		
-				#{memNo}, 		
-				#{amt}, 		
-				#{time}, 		
-				#{sourceCode}, 		
-				#{sourceDetail}, 		
-				#{uniqueNo}, 		
-				#{paymentCode}, 		
-				#{payment}, 		
-				#{cashierUniqueNo}, 		
-				#{deptName}, 		
-				#{createOp}, 		
-				#{remark}, 		
-				#{createTime}, 		
-				#{updateTime}, 		
-				#{updateOp}, 		
-				#{isDelete}		
-			)
-	</insert>
-	
-	<insert id="insertSelective" parameterType="com.atzuche.order.accountrenterstopcost.entity.AccountRenterStopCostDetailEntity" useGeneratedKeys="true" keyProperty="id">
-		insert into account_renter_stop_cost_detail
-		(
-				<if test="orderNo != null">`order_no`, </if>
-				<if test="memNo != null">`mem_no`, </if>
-				<if test="amt != null">`amt`, </if>
-				<if test="time != null">`time`, </if>
-				<if test="sourceCode != null">`source_code`, </if>
-				<if test="sourceDetail != null">`source_detail`, </if>
-				<if test="uniqueNo != null">`unique_no`, </if>
-				<if test="paymentCode != null">`payment_code`, </if>
-				<if test="payment != null">`payment`, </if>
-				<if test="cashierUniqueNo != null">`cashier_unique_no`, </if>
-				<if test="deptName != null">`dept_name`, </if>
-				<if test="createOp != null">`create_op`, </if>
-				<if test="remark != null">`remark`, </if>
-				<if test="createTime != null">`create_time`, </if>
-				<if test="updateTime != null">`update_time`, </if>
-				<if test="updateOp != null">`update_op`, </if>
-				<if test="isDelete != null">`is_delete` </if>
-			)
-		values
-		(
-				<if test="orderNo != null">#{orderNo},  </if>
-				<if test="memNo != null">#{memNo},  </if>
-				<if test="amt != null">#{amt},  </if>
-				<if test="time != null">#{time},  </if>
-				<if test="sourceCode != null">#{sourceCode},  </if>
-				<if test="sourceDetail != null">#{sourceDetail},  </if>
-				<if test="uniqueNo != null">#{uniqueNo},  </if>
-				<if test="paymentCode != null">#{paymentCode},  </if>
-				<if test="payment != null">#{payment},  </if>
-				<if test="cashierUniqueNo != null">#{cashierUniqueNo},  </if>
-				<if test="deptName != null">#{deptName},  </if>
-				<if test="createOp != null">#{createOp},  </if>
-				<if test="remark != null">#{remark},  </if>
-				<if test="createTime != null">#{createTime},  </if>
-				<if test="updateTime != null">#{updateTime},  </if>
-				<if test="updateOp != null">#{updateOp},  </if>
-				<if test="isDelete != null">#{isDelete} </if>
-			)
-	</insert>
+
+    <insert id="insertSelective" parameterType="com.atzuche.order.accountrenterstopcost.entity.AccountRenterStopCostDetailEntity" useGeneratedKeys="true" keyProperty="id">
+        insert into account_renter_stop_cost_detail
+        <trim prefix="(" suffix=")" suffixOverrides="," >
+            <if test="orderNo != null">`order_no`, </if>
+            <if test="memNo != null">`mem_no`, </if>
+            <if test="amt != null">`amt`, </if>
+            <if test="time != null">`time`, </if>
+            <if test="sourceCode != null">`source_code`, </if>
+            <if test="sourceDetail != null">`source_detail`, </if>
+            <if test="uniqueNo != null">`unique_no`, </if>
+            <if test="paymentCode != null">`payment_code`, </if>
+            <if test="payment != null">`payment`, </if>
+            <if test="cashierUniqueNo != null">`cashier_unique_no`, </if>
+            <if test="deptName != null">`dept_name`, </if>
+            <if test="createOp != null">`create_op`, </if>
+            <if test="remark != null">`remark`, </if>
+            <if test="createTime != null">`create_time`, </if>
+            <if test="updateTime != null">`update_time`, </if>
+            <if test="updateOp != null">`update_op`, </if>
+            <if test="isDelete != null">`is_delete` </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides="," >
+            <if test="orderNo != null">#{orderNo},  </if>
+            <if test="memNo != null">#{memNo},  </if>
+            <if test="amt != null">#{amt},  </if>
+            <if test="time != null">#{time},  </if>
+            <if test="sourceCode != null">#{sourceCode},  </if>
+            <if test="sourceDetail != null">#{sourceDetail},  </if>
+            <if test="uniqueNo != null">#{uniqueNo},  </if>
+            <if test="paymentCode != null">#{paymentCode},  </if>
+            <if test="payment != null">#{payment},  </if>
+            <if test="cashierUniqueNo != null">#{cashierUniqueNo},  </if>
+            <if test="deptName != null">#{deptName},  </if>
+            <if test="createOp != null">#{createOp},  </if>
+            <if test="remark != null">#{remark},  </if>
+            <if test="createTime != null">#{createTime},  </if>
+            <if test="updateTime != null">#{updateTime},  </if>
+            <if test="updateOp != null">#{updateOp},  </if>
+            <if test="isDelete != null">#{isDelete} </if>
+        </trim>
+    </insert>
 	
 	 
 	<update id="updateByPrimaryKeySelective" parameterType="com.atzuche.order.accountrenterstopcost.entity.AccountRenterStopCostDetailEntity">

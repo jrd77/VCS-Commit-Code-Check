@@ -39,7 +39,7 @@ public class CashierRefundApplyNoTService {
         cashierRefundApplyEntity.setStatus(CashierRefundApplyStatus.WAITING_FOR_REFUND.getCode());
         cashierRefundApplyEntity.setSourceCode(cashierRefundApplyReq.getRenterCashCodeEnum().getCashNo());
         cashierRefundApplyEntity.setSourceDetail(cashierRefundApplyReq.getRenterCashCodeEnum().getTxt());
-        int result = cashierRefundApplyMapper.insert(cashierRefundApplyEntity);
+        int result = cashierRefundApplyMapper.insertSelective(cashierRefundApplyEntity);
         if(result==0){
             throw new CashierRefundApplyException();
         }
