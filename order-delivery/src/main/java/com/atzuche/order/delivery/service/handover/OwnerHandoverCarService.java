@@ -21,8 +21,6 @@ import java.util.List;
 @Service
 public class OwnerHandoverCarService implements IUpdateHandoverCarInfo {
 
-    @Autowired
-    HandoverCarService handoverCarService;
     @Resource
     OwnerHandoverCarInfoMapper ownerHandoverCarInfoMapper;
     @Resource

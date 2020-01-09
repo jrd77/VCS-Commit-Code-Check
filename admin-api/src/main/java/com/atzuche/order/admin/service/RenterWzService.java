@@ -219,6 +219,7 @@ public class RenterWzService {
 
     public RenterWzDetailResVO queryWzDetailByOrderNo(String orderNo) {
         RenterWzDetailResVO rs = new RenterWzDetailResVO();
+        rs.setOrderNo(orderNo);
         //费用详情
         List<RenterWzCostDetailResVO> costDetails = getRenterWzCostDetailRes(orderNo);
         rs.setCostDetails(costDetails);
@@ -227,6 +228,12 @@ public class RenterWzService {
         List<TemporaryRefundLogResVO> temporaryRefundLogResVOS = this.queryTemporaryRefundLogsByOrderNo(orderNo);
         rs.setTemporaryRefundLogs(temporaryRefundLogResVOS);
         //TODO 还缺海豹的接口
+
+        RenterWzWithholdResVO withhold = new RenterWzWithholdResVO();
+        rs.setWithhold(withhold);
+
+        RenterWzInfoResVO renterWzInfo = new RenterWzInfoResVO();
+        rs.setInfo(renterWzInfo);
         return rs;
     }
 

@@ -129,7 +129,6 @@ public class RenterDeliveryAddrDTO {
 
     /**
      * 设置参数
-     *
      * @param orderType
      * @param renterMemberDTO
      */
