@@ -112,17 +112,7 @@ public class CashierNoTService {
      * 收银台支付记录
      */
     public CashierEntity getCashierEntity(String orderNo,String memNo,String payKind){
-        CashierEntity cashierEntity = cashierMapper.getPayDeposit(orderNo,memNo,payKind,DataPayTypeConstant.PAY_PUR);
-//        if(Objects.isNull(cashierEntity)){
-//            cashierEntity = new CashierEntity();
-//            cashierEntity.setOrderNo(orderNo);
-//            cashierEntity.setMemNo(memNo);
-//            cashierEntity.setPayKind(payKind);
-//            cashierEntity.setPayType(DataPayTypeConstant.PAY_PUR);
-//            cashierEntity.setPaySn(NumberUtils.INTEGER_ONE);
-//            cashierEntity.setPayTitle("待支付订单号：" + orderNo);
-//            cashierMapper.insert(cashierEntity);
-//        }
+        CashierEntity cashierEntity = cashierMapper.getPayAmtByPayKind(orderNo,memNo,payKind);
         return cashierEntity;
     }
 

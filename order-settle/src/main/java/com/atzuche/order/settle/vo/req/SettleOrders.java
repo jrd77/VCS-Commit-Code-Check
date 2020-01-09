@@ -1,5 +1,7 @@
 package com.atzuche.order.settle.vo.req;
 
+import com.atzuche.order.ownercost.entity.OwnerOrderEntity;
+import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import lombok.Data;
 
 /**
@@ -44,5 +46,14 @@ public class SettleOrders {
      * 车主费用明细
      */
     private OwnerCosts ownerCosts;
+
+    /**
+     *  租客订单信息
+     */
+    RenterOrderEntity renterOrder;
+    /**
+     * 车主订单信息
+     */
+    OwnerOrderEntity ownerOrder;
 
 }

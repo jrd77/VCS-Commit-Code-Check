@@ -27,9 +27,10 @@ public class SettleOrdersAccount {
      */
     private int rentCostAmtFinal;
     /**
-     * 租客实付付费用
+     * 租客实付付费用 （在实付小于应付情况下 包含真实消费金额 + 押金抵扣租车费用部分 + 转移历史欠款冲正，用于计算部落库）
+     * （实付大于应付时候 ，为真实消费金额）
      */
-    private int rentCostPayAmtFinal;
+    private int rentCostPayAmt;
     /**
      * 当 租车费用 实付大于应付时候 有效
      * 剩余租车费用 即应退
