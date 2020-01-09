@@ -6,6 +6,7 @@ import com.atzuche.order.renterwz.mapper.RenterOrderWzStatusMapper;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * RenterOrderWzStatusService
@@ -45,5 +46,9 @@ public class RenterOrderWzStatusService {
 
     public void updateTransWzDisposeStatus(String orderNo, String carNumber, int wzDisposeStatus) {
         renterOrderWzStatusMapper.updateTransWzDisposeStatus(orderNo,carNumber,wzDisposeStatus);
+    }
+
+    public List<RenterOrderWzStatusEntity> queryInfosByOrderNo(String orderNo) {
+        return renterOrderWzStatusMapper.queryInfosByOrderNo(orderNo);
     }
 }

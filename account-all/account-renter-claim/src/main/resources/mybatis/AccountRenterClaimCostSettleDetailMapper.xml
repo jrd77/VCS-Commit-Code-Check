@@ -45,70 +45,36 @@
 	</select>
 
 	 
-	<insert id="insert" parameterType="com.atzuche.order.accountrenterclaim.entity.AccountRenterClaimCostSettleDetailEntity">
-		insert into account_renter_claim_cost_settle_detail
-		(
-			`id`,		
-				`order_no`,		
-				`renter_order_no`,		
-				`mem_no`,		
-				`cost_price`,		
-				`unit`,		
-				`amt`,		
-				`create_time`,		
-				`create_op`,		
-				`update_time`,		
-				`update_op`,		
-				`is_delete`		
-			)
-		values
-		(
-			#{id}, 		
-				#{orderNo}, 		
-				#{renterOrderNo}, 		
-				#{memNo}, 		
-				#{costPrice}, 		
-				#{unit}, 		
-				#{amt}, 		
-				#{createTime}, 		
-				#{createOp}, 		
-				#{updateTime}, 		
-				#{updateOp}, 		
-				#{isDelete}		
-			)
-	</insert>
-	
-	<insert id="insertSelective" parameterType="com.atzuche.order.accountrenterclaim.entity.AccountRenterClaimCostSettleDetailEntity">
-		insert into account_renter_claim_cost_settle_detail
-		(
-			<if test="id != null">`id`, </if>
-				<if test="orderNo != null">`order_no`, </if>
-				<if test="renterOrderNo != null">`renter_order_no`, </if>
-				<if test="memNo != null">`mem_no`, </if>
-				<if test="costPrice != null">`cost_price`, </if>
-				<if test="unit != null">`unit`, </if>
-				<if test="amt != null">`amt`, </if>
-				<if test="createTime != null">`create_time`, </if>
-				<if test="createOp != null">`create_op`, </if>
-				<if test="updateTime != null">`update_time`, </if>
-				<if test="updateOp != null">`update_op`, </if>
-				<if test="isDelete != null">`is_delete` </if>
-			)
-		values
-		(
-			<if test="id != null">#{id},  </if>
-				<if test="orderNo != null">#{orderNo},  </if>
-				<if test="renterOrderNo != null">#{renterOrderNo},  </if>
-				<if test="memNo != null">#{memNo},  </if>
-				<if test="costPrice != null">#{costPrice},  </if>
-				<if test="unit != null">#{unit},  </if>
-				<if test="amt != null">#{amt},  </if>
-				<if test="createTime != null">#{createTime},  </if>
-				<if test="createOp != null">#{createOp},  </if>
-				<if test="updateTime != null">#{updateTime},  </if>
-				<if test="updateOp != null">#{updateOp},  </if>
-				<if test="isDelete != null">#{isDelete} </if>
-			)
+	<insert id="insertSelective" parameterType="com.atzuche.order.accountrenterclaim.entity.AccountRenterClaimCostSettleDetailEntity" useGeneratedKeys="true" keyProperty="id">
+        insert into account_renter_claim_cost_settle_detail
+        <trim prefix="(" suffix=")" suffixOverrides="," >
+            <if test="id != null">`id`, </if>
+            <if test="orderNo != null">`order_no`, </if>
+            <if test="renterOrderNo != null">`renter_order_no`, </if>
+            <if test="memNo != null">`mem_no`, </if>
+            <if test="costPrice != null">`cost_price`, </if>
+            <if test="unit != null">`unit`, </if>
+            <if test="amt != null">`amt`, </if>
+            <if test="createTime != null">`create_time`, </if>
+            <if test="createOp != null">`create_op`, </if>
+            <if test="updateTime != null">`update_time`, </if>
+            <if test="updateOp != null">`update_op`, </if>
+            <if test="isDelete != null">`is_delete` </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides="," >
+            <if test="id != null">#{id},  </if>
+            <if test="orderNo != null">#{orderNo},  </if>
+            <if test="renterOrderNo != null">#{renterOrderNo},  </if>
+            <if test="memNo != null">#{memNo},  </if>
+            <if test="costPrice != null">#{costPrice},  </if>
+            <if test="unit != null">#{unit},  </if>
+            <if test="amt != null">#{amt},  </if>
+            <if test="createTime != null">#{createTime},  </if>
+            <if test="createOp != null">#{createOp},  </if>
+            <if test="updateTime != null">#{updateTime},  </if>
+            <if test="updateOp != null">#{updateOp},  </if>
+            <if test="isDelete != null">#{isDelete} </if>
+        </trim>
 	</insert>
 	
 	 

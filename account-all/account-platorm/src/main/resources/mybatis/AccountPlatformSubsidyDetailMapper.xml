@@ -44,37 +44,6 @@
 		select  <include refid="Base_Column_List" /> from account_platform_subsidy_detail order by id desc
 	</select>
 
-	 
-	<insert id="insert" parameterType="com.atzuche.order.accountplatorm.entity.AccountPlatformSubsidyDetailEntity" useGeneratedKeys="true" keyProperty="id">
-		insert into account_platform_subsidy_detail
-		(
-				`order_no`,		
-				`amt`,		
-				`source_code`,		
-				`source_desc`,		
-				`unique_no`,		
-				`subsidy_name`,		
-				`create_time`,		
-				`create_op`,		
-				`update_time`,		
-				`update_op`,		
-				`is_delete`		
-			)
-		values
-		(
-				#{orderNo}, 		
-				#{amt}, 		
-				#{sourceCode}, 		
-				#{sourceDesc}, 		
-				#{uniqueNo}, 		
-				#{subsidyName}, 		
-				#{createTime}, 		
-				#{createOp}, 		
-				#{updateTime}, 		
-				#{updateOp}, 		
-				#{isDelete}		
-			)
-	</insert>
 	
 	<insert id="insertSelective" parameterType="com.atzuche.order.accountplatorm.entity.AccountPlatformSubsidyDetailEntity" useGeneratedKeys="true" keyProperty="id">
 		insert into account_platform_subsidy_detail

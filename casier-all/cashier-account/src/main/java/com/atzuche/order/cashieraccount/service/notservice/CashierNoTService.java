@@ -131,7 +131,7 @@ public class CashierNoTService {
         CashierEntity cashierEntity = new CashierEntity();
         BeanUtils.copyProperties(createOrderRenterWZDepositReq,cashierEntity);
         cashierEntity.setPayAmt(createOrderRenterWZDepositReq.getYingfuDepositAmt());
-        int result = cashierMapper.insert(cashierEntity);
+        int result = cashierMapper.insertSelective(cashierEntity);
         if(result==0){
             throw new AccountRenterWZDepositException();
         }
@@ -147,7 +147,7 @@ public class CashierNoTService {
         CashierEntity cashierEntity = new CashierEntity();
         BeanUtils.copyProperties(createOrderRenterDeposit,cashierEntity);
         cashierEntity.setPayAmt(createOrderRenterDeposit.getYingfuDepositAmt());
-        int result = cashierMapper.insert(cashierEntity);
+        int result = cashierMapper.insertSelective(cashierEntity);
         if(result==0){
             throw new AccountRenterDepositDBException();
         }
@@ -164,7 +164,7 @@ public class CashierNoTService {
         CashierEntity cashierEntity = new CashierEntity();
         BeanUtils.copyProperties(createOrderRenterCost,cashierEntity);
         cashierEntity.setPayAmt(NumberUtils.INTEGER_ZERO);
-        int result = cashierMapper.insert(cashierEntity);
+        int result = cashierMapper.insertSelective(cashierEntity);
         if(result==0){
             throw new AccountRenterCostException();
         }
@@ -222,7 +222,7 @@ public class CashierNoTService {
          }else {
              CashierEntity cashier = new CashierEntity();
              BeanUtils.copyProperties(notifyDataVo,cashier);
-             result = cashierMapper.insert(cashier);
+             result = cashierMapper.insertSelective(cashier);
          }
          if(result == 0){
             throw new OrderPayCallBackAsnyException();
@@ -471,7 +471,7 @@ public class CashierNoTService {
             cashier.setAtappId(DataAppIdConstant.APPID_SHORTRENT);
             cashier.setTransStatus("00");
             cashier.setPaySn(NumberUtils.INTEGER_ONE);
-            result = cashierMapper.insert(cashier);
+            result = cashierMapper.insertSelective(cashier);
             cashierId = cashier.getId();
         }
         if(result ==0){
