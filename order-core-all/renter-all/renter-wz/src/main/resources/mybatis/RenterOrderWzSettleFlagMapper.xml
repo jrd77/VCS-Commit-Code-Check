@@ -165,4 +165,13 @@
         where order_no = #{orderNo}
         and car_plate_num = #{carNum}
     </update>
+
+	<update id="updateSettleFlag">
+        update renter_order_wz_settle_flag
+        set settle_flag = #{settleFlag},
+			settle_time = NOW(),
+			update_op = #{updateOp}
+        where order_no = #{orderNo}
+    </update>
+
 </mapper>

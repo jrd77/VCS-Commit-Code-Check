@@ -148,4 +148,9 @@
 		wz_dispose_status_edit_time = now()
 		WHERE order_no = #{orderNo} and car_plate_num = #{carNumber}
 	</update>
+
+	<select id="queryInfosByOrderNo" resultMap="selectColumnMap" parameterType="java.lang.String">
+		SELECT * FROM `renter_order_wz_status` WHERE order_no = #{orderNo} and is_delete = 0
+	</select>
+
 </mapper>
