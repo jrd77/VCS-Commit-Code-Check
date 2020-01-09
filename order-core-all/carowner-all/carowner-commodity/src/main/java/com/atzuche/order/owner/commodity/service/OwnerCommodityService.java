@@ -84,6 +84,7 @@ public class OwnerCommodityService {
             return;
         }
 
+
         List<OwnerGoodsPriceDetailEntity> dbGoodsPriceList = ownerGoodsPriceDetailMapper.selectByOwnerOrderNo(ownerOrderNo);
         if(dbGoodsPriceList == null || dbGoodsPriceList.size()<=0){
             return;
@@ -95,6 +96,9 @@ public class OwnerCommodityService {
                 .collect(Collectors.groupingBy(OwnerGoodsPriceDetailEntity::getCarDay));
 
         OwnerGoodsPriceDetailEntity dbPriceMaxCarDay = dbGoodsPriceList.get(dbGoodsPriceList.size() - 1);//最后一条
+        if(oldRentTime.isEqual(rentTime) && revertTime.isEqual(dbPriceMaxCarDay.getRevertTime())){
+            return;
+        }
         List<OwnerGoodsPriceDetailDTO> ownerGoodsPriceDetailDTOList = ownerGoodsDetailDTO.getOwnerGoodsPriceDetailDTOList();
 
         List<OwnerGoodsPriceDetailDTO> newOwnerGoodsPriceList = new ArrayList<>();

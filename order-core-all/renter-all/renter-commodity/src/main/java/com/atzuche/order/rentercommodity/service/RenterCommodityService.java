@@ -78,6 +78,9 @@ public class RenterCommodityService {
         }
 
         RenterGoodsPriceDetailEntity dbPriceMaxCarDay = dbGoodsPriceList.get(dbGoodsPriceList.size() - 1);//最后一条
+        if(oldRentTime.isEqual(rentTime) && revertTime.isEqual(dbPriceMaxCarDay.getRevertTime())){
+            return;
+        }
         List<RenterGoodsPriceDetailDTO> renterGoodsPriceDetailDTOList = renterGoodsDetailDTO.getRenterGoodsPriceDetailDTOList();
 
         List<RenterGoodsPriceDetailDTO> newRenterGoodsPriceList = new ArrayList<>();
