@@ -141,8 +141,7 @@ public class SubmitOrderService {
         stockService.checkCarStock(orderInfoDTO);
 
         //2.2风控
-        Integer riskAuditId = null;
-//        Integer riskAuditId = submitOrderRiskAuditService.check(buildSubmitOrderRiskCheckReqVO(orderReqVO, reqTime));
+        Integer riskAuditId = submitOrderRiskAuditService.check(buildSubmitOrderRiskCheckReqVO(orderReqVO, reqTime));
         //2.3校验链
         //TODO:下单校验
 
