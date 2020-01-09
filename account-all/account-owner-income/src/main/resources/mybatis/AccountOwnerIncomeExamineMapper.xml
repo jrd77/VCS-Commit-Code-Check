@@ -46,41 +46,40 @@
 		select <include refid="Base_Column_List" /> from account_owner_income_examine where id = #{value}
 	</select>
 
-	<insert id="insert" parameterType="com.atzuche.order.accountownerincome.entity.AccountOwnerIncomeExamineEntity" useGeneratedKeys="true" keyProperty="id">
-		insert into account_owner_income_examine
-		(
-				`mem_no`,		
-				`order_no`,		
-				`amt`,		
-				`detail`,		
-				`status`,		
-				`op_name`,		
-				`time`,		
-				`remark`,		
-				`version`,		
-				`create_time`,		
-				`create_op`,		
-				`update_time`,		
-				`update_op`,		
-				`is_delete`		
-			)
-		values
-		(
-				#{memNo}, 		
-				#{orderNo}, 		
-				#{amt}, 		
-				#{detail}, 		
-				#{status}, 		
-				#{opName}, 		
-				#{time}, 		
-				#{remark}, 		
-				#{version}, 		
-				#{createTime}, 		
-				#{createOp}, 		
-				#{updateTime}, 		
-				#{updateOp}, 		
-				#{isDelete}		
-			)
+	<insert id="insertSelective" parameterType="com.atzuche.order.accountownerincome.entity.AccountOwnerIncomeExamineEntity" useGeneratedKeys="true" keyProperty="id">
+        insert into account_owner_income_examine
+        <trim prefix="(" suffix=")" suffixOverrides="," >
+            <if test="memNo != null">`mem_no`, </if>
+            <if test="orderNo != null">`order_no`, </if>
+            <if test="amt != null">`amt`, </if>
+            <if test="detail != null">`detail`, </if>
+            <if test="status != null">`status`, </if>
+            <if test="opName != null">`op_name`, </if>
+            <if test="time != null">`time`, </if>
+            <if test="remark != null">`remark`, </if>
+            <if test="version != null">`version`, </if>
+            <if test="createTime != null">`create_time`, </if>
+            <if test="createOp != null">`create_op`, </if>
+            <if test="updateTime != null">`update_time`, </if>
+            <if test="updateOp != null">`update_op`, </if>
+            <if test="isDelete != null">`is_delete` </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides="," >
+            <if test="memNo != null">#{memNo},  </if>
+            <if test="orderNo != null">#{orderNo},  </if>
+            <if test="amt != null">#{amt},  </if>
+            <if test="detail != null">#{detail},  </if>
+            <if test="status != null">#{status},  </if>
+            <if test="opName != null">#{opName},  </if>
+            <if test="time != null">#{time},  </if>
+            <if test="remark != null">#{remark},  </if>
+            <if test="version != null">#{version},  </if>
+            <if test="createTime != null">#{createTime},  </if>
+            <if test="createOp != null">#{createOp},  </if>
+            <if test="updateTime != null">#{updateTime},  </if>
+            <if test="updateOp != null">#{updateOp},  </if>
+            <if test="isDelete != null">#{isDelete} </if>
+        </trim>
 	</insert>
 	
 	<update id="updateByPrimaryKeySelective" parameterType="com.atzuche.order.accountownerincome.entity.AccountOwnerIncomeExamineEntity">

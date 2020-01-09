@@ -23,21 +23,20 @@
 		select <include refid="Base_Column_List" /> from account_owner_income where id = #{value}
 	</select>
 
-	<insert id="insert" parameterType="com.atzuche.order.accountownerincome.entity.AccountOwnerIncomeEntity" useGeneratedKeys="true" keyProperty="id">
-		insert into account_owner_income
-		(
-				`mem_no`,		
-				`income_amt`,		
-				`version`,		
-				`create_time`		
-			)
-		values
-		(
-				#{memNo}, 		
-				#{incomeAmt}, 		
-				#{version}, 		
-				#{createTime}		
-			)
+	<insert id="insertSelective" parameterType="com.atzuche.order.accountownerincome.entity.AccountOwnerIncomeEntity" useGeneratedKeys="true" keyProperty="id">
+        insert into account_owner_income
+        <trim prefix="(" suffix=")" suffixOverrides="," >
+            <if test="memNo != null">`mem_no`, </if>
+            <if test="incomeAmt != null">`income_amt`, </if>
+            <if test="version != null">`version`, </if>
+            <if test="createTime != null">`create_time` </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides="," >
+            <if test="memNo != null">#{memNo},  </if>
+            <if test="incomeAmt != null">#{incomeAmt},  </if>
+            <if test="version != null">#{version},  </if>
+            <if test="createTime != null">#{createTime} </if>
+        </trim>
 	</insert>
 
 

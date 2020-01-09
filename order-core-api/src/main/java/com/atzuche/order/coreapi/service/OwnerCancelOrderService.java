@@ -99,7 +99,8 @@ public class OwnerCancelOrderService {
         OrderCouponEntity ownerCouponEntity = orderCouponService.getOwnerCouponByOrderNoAndRenterOrderNo(orderNo,
                 renterOrderEntity.getRenterOrderNo());
         //调度判定
-        boolean isDispatch = carRentalTimeApiService.checkCarDispatch(buildCarDispatchReqVO(orderEntity,
+        boolean isDispatch =
+                carRentalTimeApiService.checkCarDispatch(carRentalTimeApiService.buildCarDispatchReqVO(orderEntity,
                 orderStatusEntity, ownerCouponEntity));
 
         //返回信息
@@ -152,7 +153,8 @@ public class OwnerCancelOrderService {
         orderFlowService.inserOrderStatusChangeProcessInfo(orderNo, OrderStatusEnum.from(orderStatusDTO.getStatus()));
 
         //取消信息处理(order_cancel_reason)
-        orderCancelReasonService.addOrderCancelReasonRecord(buildOrderCancelReasonEntity(orderNo, cancelReason));
+        orderCancelReasonService.addOrderCancelReasonRecord(buildOrderCancelReasonEntity(orderNo,ownerOrderEntity.getOwnerOrderNo(),
+                cancelReason));
 
         //返回信息处理
         cancelOrderResDTO.setCarNo(goodsDetail.getCarNo());
@@ -162,32 +164,9 @@ public class OwnerCancelOrderService {
 
 
     public void check() {
-        //todo
+        //TODO:车主取消校验
 
 
-    }
-
-
-    /**
-     * 判定调度方法参数处理
-     *
-     * @param orderEntity       主订单信息
-     * @param orderStatusEntity 订单状态信息
-     * @param orderCouponEntity 订单车主券信息
-     * @return CarDispatchReqVO 判定调度信息
-     */
-    public CarDispatchReqVO buildCarDispatchReqVO(OrderEntity orderEntity, OrderStatusEntity orderStatusEntity,
-                                                  OrderCouponEntity orderCouponEntity) {
-
-        CarDispatchReqVO carDispatchReqVO = new CarDispatchReqVO();
-        carDispatchReqVO.setType(2);
-        carDispatchReqVO.setCityCode(Integer.valueOf(orderEntity.getCityCode()));
-        carDispatchReqVO.setReqTime(orderEntity.getReqTime());
-        carDispatchReqVO.setRentTime(orderEntity.getExpRentTime());
-        carDispatchReqVO.setRevertTime(orderEntity.getExpRevertTime());
-        carDispatchReqVO.setPayFlag(orderStatusEntity.getRentCarPayStatus());
-        carDispatchReqVO.setCouponFlag(null == orderCouponEntity || orderCouponEntity.getStatus() == 0 ? 0 : 1);
-        return carDispatchReqVO;
     }
 
 
@@ -218,12 +197,14 @@ public class OwnerCancelOrderService {
     }
 
 
-    private OrderCancelReasonEntity buildOrderCancelReasonEntity(String orderNo, String cancelReason) {
+    private OrderCancelReasonEntity buildOrderCancelReasonEntity(String orderNo, String ownerOrderNo,
+                                                                 String cancelReason) {
         OrderCancelReasonEntity orderCancelReasonEntity = new OrderCancelReasonEntity();
         orderCancelReasonEntity.setOperateType(CancelOperateTypeEnum.CANCEL_ORDER.getCode());
         orderCancelReasonEntity.setCancelReason(cancelReason);
         orderCancelReasonEntity.setCancelSource(CancelSourceEnum.OWNER.getCode());
         orderCancelReasonEntity.setOrderNo(orderNo);
+        orderCancelReasonEntity.setSubOrderNo(ownerOrderNo);
         orderCancelReasonEntity.setDutySource(CancelOrderDutyEnum.CANCEL_ORDER_DUTY_RENTER.getCode());
         return orderCancelReasonEntity;
     }

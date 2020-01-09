@@ -459,4 +459,15 @@ public class RenterOrderService {
     	return renterOrderMapper.updateRenterOrderChildStatus(id, childStatus);
     }
 
+
+    /**
+     * 修改租客订单信息
+     *
+     * @param renterOrderEntity 租客订单信息
+     * @return Integer
+     */
+    public int updateRenterOrderInfo(RenterOrderEntity renterOrderEntity) {
+        return renterOrderMapper.updateByPrimaryKeySelective(renterOrderEntity);
+    }
+
 }

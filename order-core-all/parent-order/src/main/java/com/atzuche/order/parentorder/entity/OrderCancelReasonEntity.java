@@ -25,6 +25,11 @@ public class OrderCancelReasonEntity implements Serializable {
 	private String orderNo;
 
     /**
+     * 租客/车主订单号(与取消方保持一致)
+     */
+	private String subOrderNo;
+
+    /**
      * 操作类型:1.取消订单 2.拒单
      */
 	private String operateType;

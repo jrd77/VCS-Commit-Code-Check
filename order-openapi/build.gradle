@@ -10,20 +10,21 @@ buildscript {
 }
 
 apply plugin: 'dependency-management'
-apply plugin: 'org.springframework.boot'
-apply plugin: 'application'
-apply plugin: 'war'
+apply plugin: 'java'
 
-mainClassName = 'com.autoyol.doc.parser.autodoc.AutoDocParser'
 dependencies {
     compile project(":util-all:order-commons")
 }
+
+group 'com.atzuche'
+version '0.0.1-SNAPSHOT'
+
 publishing {
     publications {
         maven(MavenPublication) {
             groupId = 'com.autoyol'
             artifactId = 'order-openapi'
-            version = '1.2-SNAPSHOT'
+            version = '1.0.0-SNAPSHOT'
             from components.java
             artifact sourceJar
         }

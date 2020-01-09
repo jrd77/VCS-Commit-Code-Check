@@ -45,7 +45,7 @@ public class AccountOwnerIncomeNoTService {
             accountOwnerIncome.setMemNo(memNo);
             accountOwnerIncome.setVersion(NumberUtils.INTEGER_ONE);
             accountOwnerIncome.setIncomeAmt(NumberUtils.INTEGER_ZERO);
-            accountOwnerIncomeMapper.insert(accountOwnerIncome);
+            accountOwnerIncomeMapper.insertSelective(accountOwnerIncome);
         }
         return accountOwnerIncome;
     }

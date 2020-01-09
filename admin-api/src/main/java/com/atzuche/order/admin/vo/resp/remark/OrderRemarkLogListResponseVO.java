@@ -12,8 +12,8 @@ public class OrderRemarkLogListResponseVO {
     @AutoDocProperty(value = "关联编号")
     private String number;
 
-    @AutoDocProperty(value = "操作类型 1:新增,2更新,3删除")
-    private String operateType;
+    @AutoDocProperty(value = "操作类型")
+    private String operateTypeText;
 
     @AutoDocProperty(value = "操作人部门")
     private String departmentName;

@@ -16,7 +16,7 @@ public interface AccountOwnerIncomeDetailMapper{
 
     AccountOwnerIncomeDetailEntity selectByPrimaryKey(Integer id);
 
-    int insert(AccountOwnerIncomeDetailEntity record);
+    int insertSelective(AccountOwnerIncomeDetailEntity record);
     
     List<AccountOwnerIncomeDetailEntity> selectByOrderNo(@Param("orderNo")String orderNo);
 

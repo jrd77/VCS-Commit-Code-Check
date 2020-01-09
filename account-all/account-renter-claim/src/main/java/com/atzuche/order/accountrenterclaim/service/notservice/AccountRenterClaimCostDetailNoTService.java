@@ -30,7 +30,7 @@ public class AccountRenterClaimCostDetailNoTService {
         BeanUtils.copyProperties(accountRenterClaimDetail,entity);
         entity.setSourceCode(Integer.parseInt(accountRenterClaimDetail.getRenterCashCodeEnum().getCashNo()));
         entity.setSourceDetail(accountRenterClaimDetail.getRenterCashCodeEnum().getTxt());
-        int result = accountRenterClaimCostDetailMapper.insert(entity);
+        int result = accountRenterClaimCostDetailMapper.insertSelective(entity);
         if(result==0){
             throw new AccountRenterClaimException();
         }

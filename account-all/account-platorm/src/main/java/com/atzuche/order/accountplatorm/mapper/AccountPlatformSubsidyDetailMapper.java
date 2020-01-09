@@ -17,8 +17,6 @@ public interface AccountPlatformSubsidyDetailMapper{
 
     List<AccountPlatformSubsidyDetailEntity> selectALL();
 
-    int insert(AccountPlatformSubsidyDetailEntity record);
-    
     int insertSelective(AccountPlatformSubsidyDetailEntity record);
 
     int updateByPrimaryKey(AccountPlatformSubsidyDetailEntity record);

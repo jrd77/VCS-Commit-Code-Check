@@ -3,7 +3,6 @@ package com.atzuche.order.admin.controller;
 import com.atzuche.order.admin.service.RenterWzService;
 import com.atzuche.order.admin.vo.req.renterWz.RenterWzCostReqVO;
 import com.atzuche.order.admin.vo.req.renterWz.TemporaryRefundReqVO;
-import com.atzuche.order.admin.vo.resp.renterWz.TemporaryRefundLogsResVO;
 import com.atzuche.order.admin.vo.resp.renterWz.WzCostLogsResVO;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
@@ -82,23 +81,6 @@ public class RenterWzController extends BaseController {
         } catch (Exception e) {
             log.error("查询违章费用日志 异常", e);
             Cat.logError("查询违章费用日志 异常", e);
-            return ResponseData.error();
-        }
-        return ResponseData.success(res);
-    }
-
-    @GetMapping("/console/temporaryRefund/log")
-    @AutoDocMethod(description = "查询暂扣返还日志", value = "查询暂扣返还日志",response = TemporaryRefundLogsResVO.class)
-    public ResponseData<TemporaryRefundLogsResVO> queryTemporaryRefundLogsByOrderNo(@RequestParam("orderNo") String orderNo){
-        if (StringUtils.isBlank(orderNo)) {
-            return ResponseData.createErrorCodeResponse(ErrorCode.ORDER_NO_PARAM_ERROR.getCode(), "订单编号为空");
-        }
-        TemporaryRefundLogsResVO res = null;
-        try {
-            res = renterWzService.queryTemporaryRefundLogsByOrderNo(orderNo);
-        } catch (Exception e) {
-            log.error("查询暂扣返还日志 异常", e);
-            Cat.logError("查询暂扣返还日志 异常", e);
             return ResponseData.error();
         }
         return ResponseData.success(res);

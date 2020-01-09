@@ -32,7 +32,7 @@ public class AccountRenterDepositDetailNoTService {
         BeanUtils.copyProperties(detainRenterDeposit,accountRenterDepositDetailEntity);
         accountRenterDepositDetailEntity.setSourceCode(detainRenterDeposit.getRenterCashCodeEnum().getCashNo());
         accountRenterDepositDetailEntity.setSourceDetail(detainRenterDeposit.getRenterCashCodeEnum().getCashNo());
-        int result = accountRenterDepositDetailMapper.insert(accountRenterDepositDetailEntity);
+        int result = accountRenterDepositDetailMapper.insertSelective(accountRenterDepositDetailEntity);
         if(result==0){
             throw new PayOrderRenterDepositDBException();
         }

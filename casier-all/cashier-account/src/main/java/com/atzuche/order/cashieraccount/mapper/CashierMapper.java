@@ -17,7 +17,7 @@ public interface CashierMapper{
 
     CashierEntity selectByPrimaryKey(Integer id);
 
-    int insert(CashierEntity record);
+    int insertSelective(CashierEntity record);
     
     int updateByPrimaryKeySelective(CashierEntity record);
 

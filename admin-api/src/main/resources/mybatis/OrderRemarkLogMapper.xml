@@ -73,8 +73,7 @@
 		operate_type,
 		remark_history
 		from trans_remark_log where order_no = #{orderNo}
-		LIMIT #{startIndex}, #{pageSize}
-		order by id desc
+		order by id desc LIMIT #{startIndex}, #{pageSize}
 	</select>
 
 

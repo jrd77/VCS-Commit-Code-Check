@@ -84,6 +84,7 @@ public class OwnerCommodityService {
             return;
         }
 
+
         List<OwnerGoodsPriceDetailEntity> dbGoodsPriceList = ownerGoodsPriceDetailMapper.selectByOwnerOrderNo(ownerOrderNo);
         if(dbGoodsPriceList == null || dbGoodsPriceList.size()<=0){
             return;
@@ -95,6 +96,9 @@ public class OwnerCommodityService {
                 .collect(Collectors.groupingBy(OwnerGoodsPriceDetailEntity::getCarDay));
 
         OwnerGoodsPriceDetailEntity dbPriceMaxCarDay = dbGoodsPriceList.get(dbGoodsPriceList.size() - 1);//最后一条
+        if(oldRentTime.isEqual(rentTime) && revertTime.isEqual(dbPriceMaxCarDay.getRevertTime())){
+            return;
+        }
         List<OwnerGoodsPriceDetailDTO> ownerGoodsPriceDetailDTOList = ownerGoodsDetailDTO.getOwnerGoodsPriceDetailDTOList();
 
         List<OwnerGoodsPriceDetailDTO> newOwnerGoodsPriceList = new ArrayList<>();
@@ -141,17 +145,44 @@ public class OwnerCommodityService {
 
         }else{//时间提前
             //判断数据库中每个分组的revert_time 找到比数据库中的revert_time相同的
-            ownerGoodsPriceDetailDTOList.forEach(x->{
-                LocalDate carDay = x.getCarDay();
-                List<OwnerGoodsPriceDetailEntity> dbMapValue = carDayGroupMap.get(carDay);
-                dbMapValue.forEach(y->{
-                    OwnerGoodsPriceDetailDTO ownerGoods = new OwnerGoodsPriceDetailDTO();
-                    ownerGoods.setCarUnitPrice(y.getCarUnitPrice());
-                    ownerGoods.setRevertTime(revertTime);
-                    ownerGoods.setCarDay(y.getCarDay());
-                    ownerGoods.setCarHourCount(x.getCarHourCount());
-                    newOwnerGoodsPriceList.add(ownerGoods);
-                });
+            Map<LocalDateTime, List<OwnerGoodsPriceDetailEntity>> dbRevertTimeGroup = dbGoodsPriceList
+                    .stream()
+                    .filter(x->(x.getCarDay().isBefore(revertTime.toLocalDate()) || x.getCarDay().isEqual(revertTime.toLocalDate())))
+                    .collect(Collectors.groupingBy(OwnerGoodsPriceDetailEntity::getRevertTime));
+            OwnerGoodsPriceDetailEntity lastGroup = dbGoodsPriceList.stream()
+                    .filter(x->(x.getCarDay().isBefore(revertTime.toLocalDate()) || x.getCarDay().isEqual(revertTime.toLocalDate())))
+                    .sorted((x, y) -> y.getCarDay().compareTo(x.getCarDay())).findFirst().get();
+            dbRevertTimeGroup.forEach((k,v)->{
+                if(lastGroup.getRevertTime().isEqual(k)){//最后的一段
+                    List<OwnerGoodsPriceDetailEntity> renterGoodsPriceDetailList = dbRevertTimeGroup.get(lastGroup.getRevertTime());
+                    renterGoodsPriceDetailList.stream().forEach(x->{
+                        if(x.getCarDay().isEqual(revertTime.toLocalDate())){
+                            float Hlast = CommonUtils.getHolidayFootHours(rentTime, LocalDateTimeUtils.localdateToString(rentTime.toLocalDate()));
+                            OwnerGoodsPriceDetailDTO renterGoods = new OwnerGoodsPriceDetailDTO();
+                            renterGoods.setCarHourCount(Hlast);
+                            renterGoods.setCarDay(x.getCarDay());
+                            renterGoods.setCarUnitPrice(x.getCarUnitPrice());
+                            renterGoods.setRevertTime(revertTime);
+                            newOwnerGoodsPriceList.add(renterGoods);
+                        }else{
+                            OwnerGoodsPriceDetailDTO renterGoods = new OwnerGoodsPriceDetailDTO();
+                            renterGoods.setCarHourCount(x.getCarHourCount());
+                            renterGoods.setCarDay(x.getCarDay());
+                            renterGoods.setCarUnitPrice(x.getCarUnitPrice());
+                            renterGoods.setRevertTime(revertTime);
+                            newOwnerGoodsPriceList.add(renterGoods);
+                        }
+                    });
+                }else{//其他的
+                    v.forEach(x->{
+                        OwnerGoodsPriceDetailDTO renterGoods = new OwnerGoodsPriceDetailDTO();
+                        renterGoods.setCarHourCount(x.getCarHourCount());
+                        renterGoods.setCarDay(x.getCarDay());
+                        renterGoods.setCarUnitPrice(x.getCarUnitPrice());
+                        renterGoods.setRevertTime(x.getRevertTime());
+                        newOwnerGoodsPriceList.add(renterGoods);
+                    });
+                }
             });
         }
         ownerGoodsDetailDTO.setOwnerGoodsPriceDetailDTOList(newOwnerGoodsPriceList);

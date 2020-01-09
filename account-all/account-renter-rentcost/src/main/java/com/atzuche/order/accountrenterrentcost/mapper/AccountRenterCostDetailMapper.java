@@ -17,7 +17,7 @@ public interface AccountRenterCostDetailMapper{
 
     AccountRenterCostDetailEntity selectByPrimaryKey(Integer id);
 
-    int insert(AccountRenterCostDetailEntity record);
+    int insertSelective(AccountRenterCostDetailEntity record);
 
     /**
      * 根据订单号查询租车资金明细

@@ -14,9 +14,4 @@ public class OrderRemarkLogListRequestVO {
     @AutoDocProperty("当前页码")
     private String pageNumber;
 
-    //记录开始位置
-    private String startIndex;
-
-
-
 }

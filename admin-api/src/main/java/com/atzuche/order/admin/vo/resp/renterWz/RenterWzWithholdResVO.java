@@ -52,4 +52,16 @@ public class RenterWzWithholdResVO {
 
     @AutoDocIgnoreProperty
     private Date deductionTime;
+
+    @AutoDocProperty("实际暂扣金额")
+    private String shiJiZanKouJinE;
+
+    @AutoDocProperty("实际已退违章押金")
+    private String shiJiYiTuiWeiZhangYaJin;
+
+    @AutoDocProperty("实际抵扣租车费用")
+    private String shiJiDiKouZuCheFee;
+
+    @AutoDocProperty("结算时抵扣历史欠款")
+    private String jieSuanShiDiKouLiShiQianKuan;
 }

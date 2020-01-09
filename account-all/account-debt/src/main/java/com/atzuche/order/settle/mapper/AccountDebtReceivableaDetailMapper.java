@@ -15,7 +15,7 @@ public interface AccountDebtReceivableaDetailMapper{
 
     AccountDebtReceivableaDetailEntity selectByPrimaryKey(Integer id);
 
-    int insert(AccountDebtReceivableaDetailEntity record);
+    int insertSelective(AccountDebtReceivableaDetailEntity record);
     
     AccountDebtReceivableaDetailEntity selectByUniqueAndSourceCode(@Param("sourceCode") Integer sourceCode, @Param("uniqueNo") String uniqueNo);
 }

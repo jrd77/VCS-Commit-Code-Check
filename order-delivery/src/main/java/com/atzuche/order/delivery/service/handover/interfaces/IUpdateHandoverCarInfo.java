@@ -9,6 +9,7 @@ public interface IUpdateHandoverCarInfo {
 
     /**
      * 更新取还车信息
+     * @param handoverCarInfoReqDTO
      */
     void updateHandoverCarOilMileageNum(HandoverCarInfoReqDTO handoverCarInfoReqDTO);
 }

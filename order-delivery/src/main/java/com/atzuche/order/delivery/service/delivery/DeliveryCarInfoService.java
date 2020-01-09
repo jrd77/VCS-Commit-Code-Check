@@ -8,8 +8,11 @@ import com.atzuche.order.delivery.service.handover.OwnerHandoverCarService;
 import com.atzuche.order.delivery.service.handover.RenterHandoverCarService;
 import com.atzuche.order.delivery.utils.CommonUtil;
 import com.atzuche.order.delivery.utils.DateUtils;
+import com.atzuche.order.delivery.utils.MathUtil;
 import com.atzuche.order.delivery.vo.delivery.rep.*;
 import com.atzuche.order.delivery.vo.delivery.req.DeliveryCarRepVO;
+import com.autoyol.platformcost.OwnerFeeCalculatorUtils;
+import com.autoyol.platformcost.RenterFeeCalculatorUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -31,8 +34,8 @@ public class DeliveryCarInfoService {
     RenterOrderDeliveryService renterOrderDeliveryService;
     @Autowired
     HandoverCarService handoverCarService;
-//    @Autowired
-//    DeliveryCarInfoPriceService deliveryCarInfoPriceService;
+    @Autowired
+    DeliveryCarInfoPriceService deliveryCarInfoPriceService;
     @Autowired
     RenterHandoverCarService renterHandoverCarService;
     @Autowired
@@ -45,7 +48,7 @@ public class DeliveryCarInfoService {
      * @return
      */
     public DeliveryCarVO findDeliveryListByOrderNo(DeliveryCarRepVO deliveryCarDTO, OwnerGetAndReturnCarDTO ownerGetAndReturnCarDTO, Boolean isEscrowCar,Integer carEngineType) {
-        List<RenterHandoverCarInfoEntity> renterHandoverCarInfoEntities = renterHandoverCarService.selectRenterHandoverCarByOrderNo(deliveryCarDTO.getOrderNo());
+        List<RenterHandoverCarInfoEntity> renterHandoverCarInfoEntities = renterHandoverCarService.selectRenterByOrderNo(deliveryCarDTO.getOrderNo());
         List<OwnerHandoverCarInfoEntity> ownerHandoverCarInfoEntities = ownerHandoverCarService.selectOwnerByOrderNo(deliveryCarDTO.getOrderNo());
         List<RenterHandoverCarRemarkEntity> renterHandoverCarRemarkEntities = renterHandoverCarService.getRenterHandoverRemarkInfo(deliveryCarDTO.getOrderNo());
         List<OwnerHandoverCarRemarkEntity> ownerHandoverCarRemarkEntities = ownerHandoverCarService.getOwnerHandoverRemarkInfo(deliveryCarDTO.getOrderNo());
@@ -158,7 +161,7 @@ public class DeliveryCarInfoService {
         ownerHandoverCarInfoEntities = CommonUtil.copyList(renterHandoverCarInfoEntities);
         OwnerGetAndReturnCarDTO getAndReturnCarDTO = createOwnerGetAndReturnCarDTO(ownerGetAndReturnCarDTO, ownerHandoverCarInfoEntities,carEngineType,cityCode);
         BeanUtils.copyProperties(getAndReturnCarDTO, renterGetAndReturnCarDTO);
-        ownerGetAndReturnCarDTO.setPlatFormOilServiceCharge("0");
+        ownerGetAndReturnCarDTO.setPlatFormOilServiceCharge(RenterFeeCalculatorUtils.calServiceChargeFee().getTotalFee().toString());
         renterGetAndReturnCarDTO.setCarOwnerOilCrash("0");
         if (isEscrowCar) {
             ownerGetAndReturnCarDTO.setCarOilDifferenceCrash("0");
@@ -198,7 +201,7 @@ public class DeliveryCarInfoService {
         int oilDifference = Math.abs(Integer.valueOf(ownerGetAndReturnCarDTO.getCarOil)) - Math.abs(Integer.valueOf(ownerGetAndReturnCarDTO.getReturnCarOil()));
         ownerGetAndReturnCarDTO.setDrivingKM(ownerDrivingKM);
         ownerGetAndReturnCarDTO.setOilDifference(String.valueOf(oilDifference));
-       // ownerGetAndReturnCarDTO.setOilDifferenceCrash(String.valueOf(MathUtil.mul(oilDifference,deliveryCarInfoPriceService.getOilPriceByCityCodeAndType(Integer.valueOf(cityCode),carEngineType))));
+        ownerGetAndReturnCarDTO.setOilDifferenceCrash(String.valueOf(MathUtil.mul(oilDifference,deliveryCarInfoPriceService.getOilPriceByCityCodeAndType(Integer.valueOf(cityCode),carEngineType))));
         ownerGetAndReturnCarDTO.setOilServiceCharge("0");
         return ownerGetAndReturnCarDTO;
     }
