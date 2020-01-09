@@ -57,6 +57,9 @@ public class IllegalToDoService {
     private static final String EVERY_DAY = "everyday";
     private static final String FINISHED = "finished";
 
+    private static final String ORDER_CENTER_WZ_WITHHOLD_EXCHANGE = "auto-order-center-wz";
+    private static final String ORDER_CENTER_WZ_WITHHOLD_ROUTING_KEY = "order.center.wz.with.hold.feedback";
+
 
     /**
      * 违章处理状态：处理中租客处理
@@ -133,7 +136,7 @@ public class IllegalToDoService {
                 }
             }
             if (decuct >= 6) {
-                //TODO 发送mq
+                rabbitTemplate.convertAndSend(ORDER_CENTER_WZ_WITHHOLD_EXCHANGE, ORDER_CENTER_WZ_WITHHOLD_ROUTING_KEY,orderNo );
             }
             //修改订单违章处理状态,5-未处理
             Integer nowWzDisposeStatus = renterOrderWzStatusService.getTransWzDisposeStatusByOrderNo(orderNo,carNumber);

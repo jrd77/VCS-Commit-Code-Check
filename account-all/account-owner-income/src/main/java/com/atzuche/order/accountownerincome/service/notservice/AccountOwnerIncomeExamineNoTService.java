@@ -38,7 +38,7 @@ public class AccountOwnerIncomeExamineNoTService {
         accountOwnerIncomeExamineEntity.setVersion(NumberUtils.INTEGER_ONE);
         accountOwnerIncomeExamineEntity.setIsDelete(NumberUtils.INTEGER_ZERO);
 
-        int result = accountOwnerIncomeExamineMapper.insert(accountOwnerIncomeExamineEntity);
+        int result = accountOwnerIncomeExamineMapper.insertSelective(accountOwnerIncomeExamineEntity);
         if(result==0){
             throw new AccountOwnerIncomeSettleException();
         }

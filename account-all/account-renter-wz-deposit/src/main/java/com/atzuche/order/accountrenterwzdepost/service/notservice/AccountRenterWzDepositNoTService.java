@@ -50,7 +50,8 @@ public class AccountRenterWzDepositNoTService {
         AccountRenterWzDepositEntity accountRenterDepositEntity = new AccountRenterWzDepositEntity ();
         BeanUtils.copyProperties(createOrderRenterWZDepositReq,accountRenterDepositEntity);
         accountRenterDepositEntity.setFreeDepositType(createOrderRenterWZDepositReq.getFreeDepositType().getCode());
-        int result = accountRenterWzDepositMapper.insert(accountRenterDepositEntity);
+        accountRenterDepositEntity.setYingshouDeposit(createOrderRenterWZDepositReq.getYingfuDepositAmt());
+        int result = accountRenterWzDepositMapper.insertSelective(accountRenterDepositEntity);
         if(result==0){
             throw new AccountRenterWZDepositException();
         }

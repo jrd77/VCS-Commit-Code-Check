@@ -43,7 +43,7 @@ public class AccountDebtNoTService {
             accountDebtEntity.setMemNo(memNo);
             accountDebtEntity.setDebtAmt(NumberUtils.INTEGER_ZERO);
             accountDebtEntity.setVersion(NumberUtils.INTEGER_ONE);
-            accountDebtMapper.insert(accountDebtEntity);
+            accountDebtMapper.insertSelective(accountDebtEntity);
         }
         AccountDebtResVO res = new AccountDebtResVO();
         BeanUtils.copyProperties(accountDebtEntity,res);

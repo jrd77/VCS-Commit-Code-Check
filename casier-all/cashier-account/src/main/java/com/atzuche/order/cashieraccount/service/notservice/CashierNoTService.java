@@ -131,7 +131,7 @@ public class CashierNoTService {
         CashierEntity cashierEntity = new CashierEntity();
         BeanUtils.copyProperties(createOrderRenterWZDepositReq,cashierEntity);
         cashierEntity.setPayAmt(createOrderRenterWZDepositReq.getYingfuDepositAmt());
-        int result = cashierMapper.insert(cashierEntity);
+        int result = cashierMapper.insertSelective(cashierEntity);
         if(result==0){
             throw new AccountRenterWZDepositException();
         }
@@ -147,7 +147,7 @@ public class CashierNoTService {
         CashierEntity cashierEntity = new CashierEntity();
         BeanUtils.copyProperties(createOrderRenterDeposit,cashierEntity);
         cashierEntity.setPayAmt(createOrderRenterDeposit.getYingfuDepositAmt());
-        int result = cashierMapper.insert(cashierEntity);
+        int result = cashierMapper.insertSelective(cashierEntity);
         if(result==0){
             throw new AccountRenterDepositDBException();
         }
@@ -164,7 +164,7 @@ public class CashierNoTService {
         CashierEntity cashierEntity = new CashierEntity();
         BeanUtils.copyProperties(createOrderRenterCost,cashierEntity);
         cashierEntity.setPayAmt(NumberUtils.INTEGER_ZERO);
-        int result = cashierMapper.insert(cashierEntity);
+        int result = cashierMapper.insertSelective(cashierEntity);
         if(result==0){
             throw new AccountRenterCostException();
         }
@@ -222,7 +222,7 @@ public class CashierNoTService {
          }else {
              CashierEntity cashier = new CashierEntity();
              BeanUtils.copyProperties(notifyDataVo,cashier);
-             result = cashierMapper.insert(cashier);
+             result = cashierMapper.insertSelective(cashier);
          }
          if(result == 0){
             throw new OrderPayCallBackAsnyException();
@@ -331,11 +331,15 @@ public class CashierNoTService {
      * @param orderPaySign
      * @return
      */
-    public PayVo getPayVO(CashierEntity cashierEntity,OrderPaySignReqVO orderPaySign,int amt ,String title,String payKind) {
+    public PayVo getPayVO(CashierEntity cashierEntity,OrderPaySignReqVO orderPaySign,int amt ,String title,String payKind,String payIdStr ,String extendParams) {
         PayVo vo = new PayVo();
-        int paySn = Objects.isNull(cashierEntity.getPaySn())?0:cashierEntity.getPaySn();
+        if(Objects.isNull(cashierEntity)){
+
+        }
+        Integer paySn = (Objects.isNull(cashierEntity)|| Objects.isNull(cashierEntity.getPaySn()))?0:cashierEntity.getPaySn();
+        paySn = Objects.isNull(paySn)?0:paySn;
         vo.setInternalNo(String.valueOf(paySn));
-        vo.setExtendParams(GsonUtils.toJson(cashierEntity));
+        vo.setExtendParams(extendParams);
         vo.setAtappId(DataAppIdConstant.APPID_SHORTRENT);
         vo.setMemNo(orderPaySign.getMenNo());
         vo.setOrderNo(orderPaySign.getOrderNo());
@@ -343,8 +347,7 @@ public class CashierNoTService {
         vo.setReqOs(orderPaySign.getReqOs());
         vo.setPayAmt(String.valueOf(Math.abs(amt)));
         vo.setPayEnv(env);
-        int id = Objects.isNull(cashierEntity.getId())?0:cashierEntity.getId();
-        vo.setPayId(String.valueOf(id));
+        vo.setPayId(payIdStr);
         vo.setPayKind(payKind);
         vo.setPaySn(String.valueOf(paySn));
         vo.setPaySource(orderPaySign.getPaySource());
@@ -468,7 +471,7 @@ public class CashierNoTService {
             cashier.setAtappId(DataAppIdConstant.APPID_SHORTRENT);
             cashier.setTransStatus("00");
             cashier.setPaySn(NumberUtils.INTEGER_ONE);
-            result = cashierMapper.insert(cashier);
+            result = cashierMapper.insertSelective(cashier);
             cashierId = cashier.getId();
         }
         if(result ==0){

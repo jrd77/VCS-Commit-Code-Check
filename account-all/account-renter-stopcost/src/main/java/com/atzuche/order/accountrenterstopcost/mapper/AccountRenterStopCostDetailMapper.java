@@ -17,8 +17,6 @@ public interface AccountRenterStopCostDetailMapper{
 
     List<AccountRenterStopCostDetailEntity> selectALL();
 
-    int insert(AccountRenterStopCostDetailEntity record);
-    
     int insertSelective(AccountRenterStopCostDetailEntity record);
 
     int updateByPrimaryKey(AccountRenterStopCostDetailEntity record);

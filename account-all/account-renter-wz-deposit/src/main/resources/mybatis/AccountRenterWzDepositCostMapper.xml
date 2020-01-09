@@ -40,36 +40,35 @@
 		select <include refid="Base_Column_List" /> from account_renter_wz_deposit_cost where id = #{value}
 	</select>
 
-	<insert id="insert" parameterType="com.atzuche.order.accountrenterwzdepost.entity.AccountRenterWzDepositCostEntity" useGeneratedKeys="true" keyProperty="id">
-		insert into account_renter_wz_deposit_cost
-		(
-				`order_no`,		
-				`mem_no`,		
-				`yingfu_amt`,		
-				`shifu_amt`,		
-				`debt_amt`,		
-				`version`,		
-				`create_time`,		
-				`create_op`,		
-				`update_time`,		
-				`update_op`,		
-				`is_delete`		
-			)
-		values
-		(
-				#{orderNo}, 		
-				#{memNo}, 		
-				#{yingfuAmt}, 		
-				#{shifuAmt}, 		
-				#{debtAmt}, 		
-				#{version}, 		
-				#{createTime}, 		
-				#{createOp}, 		
-				#{updateTime}, 		
-				#{updateOp}, 		
-				#{isDelete}		
-			)
-	</insert>
+    <insert id="insertSelective" parameterType="com.atzuche.order.accountrenterwzdepost.entity.AccountRenterWzDepositCostEntity" useGeneratedKeys="true" keyProperty="id">
+        insert into account_renter_wz_deposit_cost
+        <trim prefix="(" suffix=")" suffixOverrides="," >
+            <if test="orderNo != null">`order_no`, </if>
+            <if test="memNo != null">`mem_no`, </if>
+            <if test="yingfuAmt != null">`yingfu_amt`, </if>
+            <if test="shifuAmt != null">`shifu_amt`, </if>
+            <if test="debtAmt != null">`debt_amt`, </if>
+            <if test="version != null">`version`, </if>
+            <if test="createTime != null">`create_time`, </if>
+            <if test="createOp != null">`create_op`, </if>
+            <if test="updateTime != null">`update_time`, </if>
+            <if test="updateOp != null">`update_op`, </if>
+            <if test="isDelete != null">`is_delete` </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides="," >
+            <if test="orderNo != null">#{orderNo},  </if>
+            <if test="memNo != null">#{memNo},  </if>
+            <if test="yingfuAmt != null">#{yingfuAmt},  </if>
+            <if test="shifuAmt != null">#{shifuAmt},  </if>
+            <if test="debtAmt != null">#{debtAmt},  </if>
+            <if test="version != null">#{version},  </if>
+            <if test="createTime != null">#{createTime},  </if>
+            <if test="createOp != null">#{createOp},  </if>
+            <if test="updateTime != null">#{updateTime},  </if>
+            <if test="updateOp != null">#{updateOp},  </if>
+            <if test="isDelete != null">#{isDelete} </if>
+        </trim>
+    </insert>
 	<update id="updateByPrimaryKeySelective" parameterType="com.atzuche.order.accountrenterwzdepost.entity.AccountRenterWzDepositCostEntity">
 		update account_renter_wz_deposit_cost 
 		<set>

@@ -26,7 +26,7 @@ public class AccountRenterStopCostDetailNoTService {
         BeanUtils.copyProperties(accountRenterStopCostDetail,entity);
         entity.setSourceCode(Integer.parseInt(accountRenterStopCostDetail.getRenterCashCodeEnum().getCashNo()));
         entity.setSourceDetail(accountRenterStopCostDetail.getRenterCashCodeEnum().getTxt());
-        int result = accountRenterStopCostDetailMapper.insert(entity);
+        int result = accountRenterStopCostDetailMapper.insertSelective(entity);
         if(result==0){
             throw new AccountRenterStopDetailException();
         }

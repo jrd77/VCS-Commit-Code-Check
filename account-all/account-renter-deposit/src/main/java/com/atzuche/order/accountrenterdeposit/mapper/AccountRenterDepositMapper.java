@@ -17,7 +17,7 @@ public interface AccountRenterDepositMapper{
 
     AccountRenterDepositEntity selectByPrimaryKey(Integer id);
 
-    int insert(AccountRenterDepositEntity record);
+    int insertSelective(AccountRenterDepositEntity record);
     
     int updateByPrimaryKeySelective(AccountRenterDepositEntity record);
 

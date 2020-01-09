@@ -45,7 +45,7 @@ public class AccountPlatformProfitNoTService {
     public void insertAccountPlatformProfit(AccountPlatformProfitReqVO accountPlatformProfit) {
         AccountPlatformProfitEntity accountPlatformProfitEntity = new  AccountPlatformProfitEntity();
         BeanUtils.copyProperties(accountPlatformProfit,accountPlatformProfitEntity);
-        int result = accountPlatformProfitMapper.insert(accountPlatformProfitEntity);
+        int result = accountPlatformProfitMapper.insertSelective(accountPlatformProfitEntity);
         if(result==0){
             throw new AccountPlatormException();
         }

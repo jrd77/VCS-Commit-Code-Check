@@ -7,7 +7,6 @@ import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.doc.annotation.AutoDocMethod;
 import com.autoyol.doc.annotation.AutoDocVersion;
-import com.netflix.discovery.converters.Auto;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,8 +43,6 @@ public class CancelOrderController {
     @PostMapping("/normal/cancel")
     public ResponseData<?> cancelOrder(@Valid @RequestBody CancelOrderReqVO cancelOrderReqVO,
                                        BindingResult bindingResult) {
-
-
         LOGGER.info("Cancel order.param is,cancelOrderReqVO:[{}]", JSON.toJSONString(cancelOrderReqVO));
         if (bindingResult.hasErrors()) {
             Optional<FieldError> error = bindingResult.getFieldErrors().stream().findFirst();
@@ -56,11 +53,7 @@ public class CancelOrderController {
         if (StringUtils.isBlank(memNo)) {
             return new ResponseData<>(ErrorCode.NEED_LOGIN.getCode(), ErrorCode.NEED_LOGIN.getText());
         }
-
-
         cancelOrderService.cancel(cancelOrderReqVO);
-
-
         return ResponseData.success();
     }
 
