@@ -1,4 +1,4 @@
-package com.atzuche.order.open.dto;
+package com.atzuche.order.commons.entity.orderDetailDto;
 
 import lombok.Data;
 
@@ -6,14 +6,14 @@ import java.io.Serializable;
 
 
 /**
- * 租客端会员权益表
+ * 车主会员权益表
  * 
  * @author ZhangBin
- * @date 2020-01-08 20:46:11
+ * @date 2020-01-08 20:43:26
  * @Description:
  */
 @Data
-public class RenterMemberRightDTO implements Serializable {
+public class OwnerMemberRightDTO implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
 		/**
@@ -23,7 +23,7 @@ public class RenterMemberRightDTO implements Serializable {
     	/**
          * 子订单号
          */
-        private String renterOrderNo;
+        private String ownerOrderNo;
     	/**
          * 会员号
          */
