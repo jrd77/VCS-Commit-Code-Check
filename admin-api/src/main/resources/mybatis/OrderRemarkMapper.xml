@@ -10,6 +10,7 @@
 
 	<resultMap id="orderRemarkInformationMap" type="com.atzuche.order.admin.entity.OrderRemarkEntity" >
 		<result property="remarkType" column="remark_type"/>
+		<result property="orderNo" column="order_no"/>
 		<result property="remarkContent" column="remark"/>
 		<result property="departmentId" column="dept_id"/>
 		<result property="remarkId" column="id"/>
@@ -62,7 +63,7 @@
 
 
 	<select id="getOrderRemarkInformation" resultMap="orderRemarkInformationMap">
-		SELECT id, dept_id, remark, remark_type FROM trans_remark where id = #{remarkId}
+		SELECT id, order_no, dept_id, remark, remark_type, number FROM trans_remark where id = #{remarkId}
 	</select>
 
 
