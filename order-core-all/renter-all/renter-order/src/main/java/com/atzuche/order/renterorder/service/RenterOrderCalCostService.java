@@ -288,7 +288,7 @@ public class RenterOrderCalCostService {
                 OwnerDiscountCouponVO coupon = result.getData().getCouponDTO();
                 OrderCouponDTO ownerCoupon = new OrderCouponDTO();
                 ownerCoupon.setCouponId(coupon.getCouponNo());
-                ownerCoupon.setCouponName(coupon.getCouponName());
+                ownerCoupon.setCouponName(coupon.getCouponName()==null?"车主券":coupon.getCouponName());
                 ownerCoupon.setCouponDesc(coupon.getCouponText());
                 ownerCoupon.setAmount(null == coupon.getDiscount() ? 0 : coupon.getDiscount());
                 ownerCoupon.setCouponType(CouponTypeEnum.ORDER_COUPON_TYPE_OWNER.getCode());

@@ -36,6 +36,8 @@ public enum ErrorCode {
     CASHIER_PAY_REFUND_CALL_BACK_FAIL("981003","支付系统退款回调操作失败"),
     CASHIER_PAY_CALL_BACK_FAIL("981004","支付系统支付回调操作失败"),
     CASHIER_PAY_SIGN_PARAM_ERRER("981007","支付参数签名失败"),
+    CASHIER_PAY_SIGN_FAIL_ERRER("981009","没有待支付记录"),
+
 
     ORDER_SETTLE_FLAT_ACCOUNT("811001","结算费用未平账"),
 
@@ -74,6 +76,8 @@ public enum ErrorCode {
     NOT_STOCK_EXCEPTION("700114","库存不足"),
     LOCK_STOCK_FAIL("700114","锁定库存失败"),
     RELEASE_STOCK_FAIL("700114","释放库存失败"),
+
+    ORDER_QUERY_FAIL("700115","获取订单详情失败"),
     ;
 
     private String code;

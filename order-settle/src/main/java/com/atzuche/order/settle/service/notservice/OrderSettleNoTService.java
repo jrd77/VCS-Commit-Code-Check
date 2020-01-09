@@ -24,7 +24,7 @@ import com.atzuche.order.commons.enums.SubsidySourceCodeEnum;
 import com.atzuche.order.commons.enums.account.debt.DebtTypeEnum;
 import com.atzuche.order.delivery.entity.OwnerHandoverCarInfoEntity;
 import com.atzuche.order.delivery.entity.RenterHandoverCarInfoEntity;
-import com.atzuche.order.delivery.enums.HandoverCarTypeEnum;
+import com.atzuche.order.delivery.enums.RenterHandoverCarTypeEnum;
 import com.atzuche.order.delivery.service.handover.HandoverCarService;
 import com.atzuche.order.delivery.vo.handover.HandoverCarRepVO;
 import com.atzuche.order.delivery.vo.handover.HandoverCarReqVO;
@@ -34,6 +34,8 @@ import com.atzuche.order.ownercost.entity.OwnerOrderIncrementDetailEntity;
 import com.atzuche.order.ownercost.entity.OwnerOrderPurchaseDetailEntity;
 import com.atzuche.order.ownercost.entity.OwnerOrderSubsidyDetailEntity;
 import com.atzuche.order.ownercost.service.*;
+import com.atzuche.order.parentorder.dto.OrderStatusDTO;
+import com.atzuche.order.parentorder.service.OrderStatusService;
 import com.atzuche.order.rentercost.entity.*;
 import com.atzuche.order.rentercost.service.*;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
@@ -77,6 +79,8 @@ public class OrderSettleNoTService {
     @Autowired private AccountRenterCostCoinService accountRenterCostCoinService;
     @Autowired private RenterOrderService renterOrderService;
     @Autowired private OwnerOrderService ownerOrderService;
+    @Autowired private OrderStatusService orderStatusService;
+
 
     /**
      * 车辆结算
@@ -170,14 +174,14 @@ public class OrderSettleNoTService {
         if(!CollectionUtils.isEmpty(renterHandoverCarInfos)){
             for(int i=0;i<renterHandoverCarInfos.size();i++){
                 RenterHandoverCarInfoEntity renterHandoverCarInfo = renterHandoverCarInfos.get(i);
-                if(HandoverCarTypeEnum.OWNER_TO_RENTER.getValue().equals(renterHandoverCarInfo.getType())
-                ||  HandoverCarTypeEnum.RENYUN_TO_RENTER.getValue().equals(renterHandoverCarInfo.getType())
+                if(RenterHandoverCarTypeEnum.OWNER_TO_RENTER.getValue().equals(renterHandoverCarInfo.getType())
+                ||  RenterHandoverCarTypeEnum.RENYUN_TO_RENTER.getValue().equals(renterHandoverCarInfo.getType())
                 ){
                     oilAmtDTO.setReturnOilScale(Objects.isNull(renterHandoverCarInfo.getOilNum())?0:renterHandoverCarInfo.getOilNum());
                 }
 
-                if(HandoverCarTypeEnum.RENTER_TO_OWNER.getValue().equals(renterHandoverCarInfo.getType())
-                        ||  HandoverCarTypeEnum.RENTER_TO_RENYUN.getValue().equals(renterHandoverCarInfo.getType())
+                if(RenterHandoverCarTypeEnum.RENTER_TO_OWNER.getValue().equals(renterHandoverCarInfo.getType())
+                        ||  RenterHandoverCarTypeEnum.RENTER_TO_RENYUN.getValue().equals(renterHandoverCarInfo.getType())
                 ){
                     oilAmtDTO.setGetOilScale(Objects.isNull(renterHandoverCarInfo.getOilNum())?0:renterHandoverCarInfo.getOilNum());
                 }
@@ -206,14 +210,14 @@ public class OrderSettleNoTService {
         if(!CollectionUtils.isEmpty(renterHandoverCarInfos)){
             for(int i=0;i<renterHandoverCarInfos.size();i++){
                 RenterHandoverCarInfoEntity renterHandoverCarInfo = renterHandoverCarInfos.get(i);
-                if(HandoverCarTypeEnum.OWNER_TO_RENTER.getValue().equals(renterHandoverCarInfo.getType())
-                        ||  HandoverCarTypeEnum.RENYUN_TO_RENTER.getValue().equals(renterHandoverCarInfo.getType())
+                if(RenterHandoverCarTypeEnum.OWNER_TO_RENTER.getValue().equals(renterHandoverCarInfo.getType())
+                        ||  RenterHandoverCarTypeEnum.RENYUN_TO_RENTER.getValue().equals(renterHandoverCarInfo.getType())
                 ){
                     mileageAmtDTO.setReturnMileage(Objects.isNull(renterHandoverCarInfo.getMileageNum())?0:renterHandoverCarInfo.getOilNum());
                 }
 
-                if(HandoverCarTypeEnum.RENTER_TO_OWNER.getValue().equals(renterHandoverCarInfo.getType())
-                        ||  HandoverCarTypeEnum.RENTER_TO_RENYUN.getValue().equals(renterHandoverCarInfo.getType())
+                if(RenterHandoverCarTypeEnum.RENTER_TO_OWNER.getValue().equals(renterHandoverCarInfo.getType())
+                        ||  RenterHandoverCarTypeEnum.RENTER_TO_RENYUN.getValue().equals(renterHandoverCarInfo.getType())
                 ){
                     mileageAmtDTO.setGetmileage(Objects.isNull(renterHandoverCarInfo.getMileageNum())?0:renterHandoverCarInfo.getOilNum());
 
@@ -367,14 +371,14 @@ public class OrderSettleNoTService {
         if(!CollectionUtils.isEmpty(ownerHandoverCarInfoEntities)){
             for(int i=0;i<ownerHandoverCarInfoEntities.size();i++){
                 OwnerHandoverCarInfoEntity ownerHandoverCarInfoEntity = ownerHandoverCarInfoEntities.get(i);
-                if(HandoverCarTypeEnum.OWNER_TO_RENTER.getValue().equals(ownerHandoverCarInfoEntity.getType())
-                        ||  HandoverCarTypeEnum.RENYUN_TO_RENTER.getValue().equals(ownerHandoverCarInfoEntity.getType())
+                if(RenterHandoverCarTypeEnum.OWNER_TO_RENTER.getValue().equals(ownerHandoverCarInfoEntity.getType())
+                        ||  RenterHandoverCarTypeEnum.RENYUN_TO_RENTER.getValue().equals(ownerHandoverCarInfoEntity.getType())
                 ){
                     oilAmtDTO.setReturnOilScale(Objects.isNull(ownerHandoverCarInfoEntity.getOilNum())?0:ownerHandoverCarInfoEntity.getOilNum());
                 }
 
-                if(HandoverCarTypeEnum.RENTER_TO_OWNER.getValue().equals(ownerHandoverCarInfoEntity.getType())
-                        ||  HandoverCarTypeEnum.RENTER_TO_RENYUN.getValue().equals(ownerHandoverCarInfoEntity.getType())
+                if(RenterHandoverCarTypeEnum.RENTER_TO_OWNER.getValue().equals(ownerHandoverCarInfoEntity.getType())
+                        ||  RenterHandoverCarTypeEnum.RENTER_TO_RENYUN.getValue().equals(ownerHandoverCarInfoEntity.getType())
                 ){
                     oilAmtDTO.setGetOilScale(Objects.isNull(ownerHandoverCarInfoEntity.getOilNum())?0:ownerHandoverCarInfoEntity.getOilNum());
                 }
@@ -1120,5 +1124,15 @@ public class OrderSettleNoTService {
             cashierService.insertOwnerIncomeExamine(accountOwnerIncomeExamine);
         }
 
+    }
+
+    /**
+     * 车辆结算成功 更新订单状态
+     * @param settleOrdersAccount
+     */
+    public void saveOrderStatusInfo(SettleOrdersAccount settleOrdersAccount) {
+        OrderStatusDTO orderStatusDTO = new OrderStatusDTO();
+        orderStatusDTO.setOrderNo(settleOrdersAccount.getOrderNo());
+        orderStatusService.saveOrderStatusInfo(orderStatusDTO);
     }
 }

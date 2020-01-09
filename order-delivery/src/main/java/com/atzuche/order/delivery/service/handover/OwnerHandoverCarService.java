@@ -2,7 +2,7 @@ package com.atzuche.order.delivery.service.handover;
 
 import com.atzuche.order.delivery.entity.OwnerHandoverCarInfoEntity;
 import com.atzuche.order.delivery.entity.OwnerHandoverCarRemarkEntity;
-import com.atzuche.order.delivery.enums.HandoverCarTypeEnum;
+import com.atzuche.order.delivery.enums.RenterHandoverCarTypeEnum;
 import com.atzuche.order.delivery.mapper.OwnerHandoverCarInfoMapper;
 import com.atzuche.order.delivery.mapper.OwnerHandoverCarRemarkMapper;
 import com.atzuche.order.delivery.service.handover.interfaces.IUpdateHandoverCarInfo;
@@ -36,11 +36,11 @@ public class OwnerHandoverCarService implements IUpdateHandoverCarInfo {
     @Transactional(rollbackFor = Exception.class)
     @Override
     public void updateHandoverCarOilMileageNum(HandoverCarInfoReqDTO handoverCarInfoReqDTO) {
-        OwnerHandoverCarInfoEntity ownerHandoverCarReturnInfoEntity = selectObjectByOrderNo(handoverCarInfoReqDTO.getOrderNo(), HandoverCarTypeEnum.RENTER_TO_RENYUN.getValue());
+        OwnerHandoverCarInfoEntity ownerHandoverCarReturnInfoEntity = selectObjectByOrderNo(handoverCarInfoReqDTO.getOrderNo(), RenterHandoverCarTypeEnum.RENTER_TO_RENYUN.getValue());
         ownerHandoverCarReturnInfoEntity.setOilNum(Integer.valueOf(handoverCarInfoReqDTO.getRenterReturnOil()));
         ownerHandoverCarReturnInfoEntity.setMileageNum(Integer.valueOf(handoverCarInfoReqDTO.getOwnReturnKM()));
         updateOwnerHandoverInfoByPrimaryKey(ownerHandoverCarReturnInfoEntity);
-        OwnerHandoverCarInfoEntity ownerHandoverCarGetInfoEntity = selectObjectByOrderNo(handoverCarInfoReqDTO.getOrderNo(), HandoverCarTypeEnum.RENYUN_TO_RENTER.getValue());
+        OwnerHandoverCarInfoEntity ownerHandoverCarGetInfoEntity = selectObjectByOrderNo(handoverCarInfoReqDTO.getOrderNo(), RenterHandoverCarTypeEnum.RENYUN_TO_RENTER.getValue());
         ownerHandoverCarGetInfoEntity.setOilNum(Integer.valueOf(handoverCarInfoReqDTO.getOwnReturnOil()));
         ownerHandoverCarGetInfoEntity.setMileageNum(Integer.valueOf(handoverCarInfoReqDTO.getRenterRetrunKM()));
         updateOwnerHandoverInfoByPrimaryKey(ownerHandoverCarGetInfoEntity);

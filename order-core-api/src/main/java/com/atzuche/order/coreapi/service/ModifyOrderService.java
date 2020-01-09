@@ -600,7 +600,7 @@ public class ModifyOrderService {
 	 */
 	public RenterMemberDTO getRenterMemberDTO(String renterOrderNo, String updRenterOrderNo) {
 		// 获取租客会员信息
-		RenterMemberDTO renterMemberDTO = renterMemberService.selectrenterMemberByMemNo(renterOrderNo, true);
+		RenterMemberDTO renterMemberDTO = renterMemberService.selectrenterMemberByRenterOrderNo(renterOrderNo, true);
 		renterMemberDTO.setRenterOrderNo(updRenterOrderNo);
 		// 会员权益
 		List<RenterMemberRightDTO> renterMemberRightDTOList = renterMemberDTO.getRenterMemberRightDTOList();

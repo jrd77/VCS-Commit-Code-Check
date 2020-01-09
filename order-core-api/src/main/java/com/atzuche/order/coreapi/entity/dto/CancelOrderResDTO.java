@@ -13,9 +13,9 @@ import lombok.Data;
 public class CancelOrderResDTO {
 
     /**
-     * 租客订单号
+     * 是否通知退款
      */
-    private String renterOrderNo;
+    private Boolean isRefund;
 
     /**
      * 是否退还优惠券(平台+送取服务)
@@ -36,5 +36,25 @@ public class CancelOrderResDTO {
      * 租车费用支付状态
      */
     private Integer rentCarPayStatus;
+
+    /**
+     * 车辆注册号
+     */
+    private Integer carNo;
+
+    /**
+     * 租客订单号
+     */
+    private String renterOrderNo;
+
+    /**
+     * 取车服务标识
+     */
+    private Boolean srvGetFlag;
+
+    /**
+     * 还车服务标识
+     */
+    private Boolean srvReturnFlag;
 
 }

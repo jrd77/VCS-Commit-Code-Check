@@ -5,11 +5,11 @@ import com.atzuche.order.commons.enums.FineSubsidyCodeEnum;
 import com.atzuche.order.commons.enums.FineSubsidySourceCodeEnum;
 import com.atzuche.order.commons.enums.FineTypeEnum;
 import com.atzuche.order.ownercost.entity.ConsoleOwnerOrderFineDeatailEntity;
+import com.atzuche.order.ownercost.mapper.ConsoleOwnerOrderFineDeatailMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.atzuche.order.ownercost.mapper.ConsoleOwnerOrderFineDeatailMapper;
-
+import java.util.List;
 
 
 /**
@@ -20,6 +20,7 @@ import com.atzuche.order.ownercost.mapper.ConsoleOwnerOrderFineDeatailMapper;
  */
 @Service
 public class ConsoleOwnerOrderFineDeatailService{
+
     @Autowired
     private ConsoleOwnerOrderFineDeatailMapper consoleOwnerOrderFineDeatailMapper;
 
@@ -27,14 +28,6 @@ public class ConsoleOwnerOrderFineDeatailService{
 
     public int addFineRecord(ConsoleOwnerOrderFineDeatailEntity entity) {
         return consoleOwnerOrderFineDeatailMapper.insertSelective(entity);
-    }
-
-
-
-    public ConsoleOwnerOrderFineDeatailEntity fineDataConvert() {
-
-
-        return null;
     }
 
 
@@ -63,5 +56,9 @@ public class ConsoleOwnerOrderFineDeatailService{
         fineEntity.setMemNo(costBaseDTO.getMemNo());
         fineEntity.setOrderNo(costBaseDTO.getOrderNo());
         return fineEntity;
+    }
+
+    public List<ConsoleOwnerOrderFineDeatailEntity> selectByOrderNo(String orderNo){
+        return consoleOwnerOrderFineDeatailMapper.selectByOrderNo(orderNo);
     }
 }

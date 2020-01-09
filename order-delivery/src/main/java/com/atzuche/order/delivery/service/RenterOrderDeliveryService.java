@@ -1,20 +1,17 @@
 package com.atzuche.order.delivery.service;
 
+import com.atzuche.order.delivery.entity.RenterDeliveryAddrEntity;
+import com.atzuche.order.delivery.entity.RenterOrderDeliveryEntity;
+import com.atzuche.order.delivery.mapper.RenterDeliveryAddrMapper;
+import com.atzuche.order.delivery.mapper.RenterOrderDeliveryMapper;
+import org.springframework.stereotype.Service;
+
+import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
-
-import com.atzuche.order.delivery.entity.RenterDeliveryAddrEntity;
-import com.atzuche.order.delivery.entity.RenterOrderDeliveryEntity;
-import com.atzuche.order.delivery.mapper.RenterDeliveryAddrMapper;
-import com.atzuche.order.delivery.mapper.RenterOrderDeliveryMapper;
-import org.apache.ibatis.annotations.Param;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import javax.annotation.Resource;
 
 
 @Service
@@ -96,5 +93,13 @@ public class RenterOrderDeliveryService {
     public void updateDeliveryAddrByPrimaryKey(RenterDeliveryAddrEntity renterDeliveryAddrEntity){
         renterDeliveryAddrMapper.updateByPrimaryKey(renterDeliveryAddrEntity);
     }
-
+    /*
+     * @Author ZhangBin
+     * @Date 2020/1/9 11:48
+     * @Description: 通过租客子订单号查询配送订单
+     *
+     **/
+    public List<RenterOrderDeliveryEntity> selectByRenterOrderNo(String renterOrderNo){
+        return renterOrderDeliveryMapper.selectByRenterOrderNo(renterOrderNo);
+    }
 }
