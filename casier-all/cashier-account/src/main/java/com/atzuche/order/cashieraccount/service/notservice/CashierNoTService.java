@@ -179,9 +179,7 @@ public class CashierNoTService {
         PayedOrderRenterDepositReqVO vo = new PayedOrderRenterDepositReqVO();
         DetainRenterDepositReqVO detainRenterDeposit = new DetainRenterDepositReqVO();
         BeanUtils.copyProperties(notifyDataVo,vo);
-        vo.setPayStatus(PayStatusEnum.PAYED.getCode());
-        int transStatus = StringUtil.isBlank(notifyDataVo.getTransStatus())?0:Integer.parseInt(notifyDataVo.getTransStatus());
-        vo.setPayStatus(transStatus);
+        vo.setPayStatus(notifyDataVo.getTransStatus());
         vo.setPayTime(LocalDateTimeUtils.parseStringToDateTime(notifyDataVo.getOrderTime(),LocalDateTimeUtils.DEFAULT_PATTERN));
         //"01"：消费
         if(DataPayTypeConstant.PAY_PUR.equals(notifyDataVo.getPayType())){
