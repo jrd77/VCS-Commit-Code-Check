@@ -29,6 +29,11 @@ public class OrderStatusService {
     private OrderStatusMapper orderStatusMapper;
 
 
+    public OrderStatusEntity getByOrderNo(String orderNo) {
+        return orderStatusMapper.selectByOrderNo(orderNo);
+    }
+
+
     /**
      * 主订单状态信息保存
      *

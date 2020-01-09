@@ -26,31 +26,41 @@
 
 
 	<sql id="Base_Column_List">
-	`id`, 	
-	`order_no`, 	
-	`renter_order_no`, 	
-	`mem_no`, 	
-	`rent_car_amount`, 	
-	`commission_amount`, 	
-	`basic_ensure_amount`, 	
-	`comprehensive_ensure_amount`, 	
-	`additional_driving_ensure_amount`, 	
-	`other_amount`, 	
-	`platform_subsidy_amount`, 	
-	`car_owner_subsidy_amount`, 	
-	`version`, 	
-	`create_time`, 	
-	`create_op`, 	
-	`update_time`, 	
-	`update_op`, 	
-	`is_delete`	
-
+        `id`,
+        `order_no`,
+        `renter_order_no`,
+        `mem_no`,
+        `rent_car_amount`,
+        `commission_amount`,
+        `basic_ensure_amount`,
+        `comprehensive_ensure_amount`,
+        `additional_driving_ensure_amount`,
+        `other_amount`,
+        `platform_subsidy_amount`,
+        `car_owner_subsidy_amount`,
+        `version`,
+        `create_time`,
+        `create_op`,
+        `update_time`,
+        `update_op`,
+        `is_delete`
 	</sql>
 
 
 	<select id="selectByPrimaryKey" resultMap="BaseResultMap">
 		select <include refid="Base_Column_List" /> from renter_order_cost where id = #{value}
 	</select>
+
+    <select id="selectByOrderNoAndRenterNo" resultMap="BaseResultMap">
+        select
+            <include refid="Base_Column_List" />
+        from renter_order_cost
+        where
+            order_no = #{orderNo}
+            and renter_order_no = #{renterOrderNo}
+            and is_delete = 0
+        limit 1
+    </select>
 
 	<select id="selectALL" resultMap="BaseResultMap">
 		select  <include refid="Base_Column_List" /> from renter_order_cost order by id desc

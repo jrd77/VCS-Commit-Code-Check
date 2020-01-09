@@ -64,4 +64,10 @@ public class OrderRemarkService {
         return orderRemarkMapper.getOrderRemarkInformation(orderRemarkInformationRequestVO);
     }
 
+    public void updateRemarkById(OrderRemarkAdditionRequestDTO orderRemarkAdditionRequestDTO){
+        orderRemarkMapper.updateRemarkById(orderRemarkAdditionRequestDTO);
+    }
+
+
+
 }

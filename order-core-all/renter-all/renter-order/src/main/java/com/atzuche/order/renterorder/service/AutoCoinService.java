@@ -26,7 +26,7 @@ import java.util.Objects;
 @Service
 public class AutoCoinService {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(PlatformCouponService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AutoCoinService.class);
 
     @Resource
     private AutoCoinFeignService autoCoinFeignService;

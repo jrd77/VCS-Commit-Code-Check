@@ -924,25 +924,25 @@ public class OrderSettleNoTService {
         //应退结余 租车费用
         int rentCostSurplusAmt = settleOrdersAccount.getRentCostSurplusAmt();
         if(rentCostSurplusAmt>0){
-            //1 退还凹凸币 coinAmt为订单至少使用的凹凸币
-            int coinAmt = accountRenterCostSettleDetails.stream().filter(obj ->{
-                return RenterCashCodeEnum.AUTO_COIN_DEDUCT.getCashNo().equals(obj.getCostCode());
-            }).mapToInt(AccountRenterCostSettleDetailEntity::getAmt).sum();
-            if(coinAmt>0){
-                int userCoinAmt = accountRenterCostCoinService.getUserCoinAmtByOrder(settleOrdersAccount.getOrderNo(),settleOrdersAccount.getRenterMemNo());
-                //计算应退凹凸币金额
-                int returnCoinAmt = userCoinAmt - coinAmt;
-                if(returnCoinAmt>0){
-                    // 1.1记录租车费用明细 退还凹凸币流水
-                    AccountRenterCostSettleDetailEntity entity = getAccountRenterCostSettleDetailEntityForAutoCoin(settleOrdersAccount,-returnCoinAmt);
-                    renterCostSettleDetails.add(entity);
-                    // 1.2退还凹凸币 coinAmt
-                    AutoCoiChargeRequestVO vo = getAutoCoiChargeRequestVO(settleOrdersAccount,-returnCoinAmt);
-                    boolean returnCoinResult = autoCoinService.returnCoin(vo);
-                    //rentCostSurplusAmt = rentCostSurplusAmt-coinAmt;
-                }
-
-            }
+//            //1 退还凹凸币 coinAmt为订单至少使用的凹凸币
+//            int coinAmt = accountRenterCostSettleDetails.stream().filter(obj ->{
+//                return RenterCashCodeEnum.AUTO_COIN_DEDUCT.getCashNo().equals(obj.getCostCode());
+//            }).mapToInt(AccountRenterCostSettleDetailEntity::getAmt).sum();
+//            if(coinAmt>0){
+//                int userCoinAmt = accountRenterCostCoinService.getUserCoinAmtByOrder(settleOrdersAccount.getOrderNo(),settleOrdersAccount.getRenterMemNo());
+//                //计算应退凹凸币金额
+//                int returnCoinAmt = userCoinAmt - coinAmt;
+//                if(returnCoinAmt>0){
+//                    // 1.1记录租车费用明细 退还凹凸币流水
+//                    AccountRenterCostSettleDetailEntity entity = getAccountRenterCostSettleDetailEntityForAutoCoin(settleOrdersAccount,-returnCoinAmt);
+//                    renterCostSettleDetails.add(entity);
+//                    // 1.2退还凹凸币 coinAmt
+//                    AutoCoiChargeRequestVO vo = getAutoCoiChargeRequestVO(settleOrdersAccount,returnCoinAmt);
+//                    boolean returnCoinResult = autoCoinService.returnCoin(vo);
+//                    rentCostSurplusAmt = rentCostSurplusAmt-coinAmt;
+//                }
+//
+//            }
             //退还租车费用
             if(rentCostSurplusAmt>0){
                 // 实付

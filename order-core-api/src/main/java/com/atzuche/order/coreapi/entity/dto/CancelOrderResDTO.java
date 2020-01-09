@@ -13,6 +13,11 @@ import lombok.Data;
 public class CancelOrderResDTO {
 
     /**
+     * 租客订单号
+     */
+    private String renterOrderNo;
+
+    /**
      * 是否退还优惠券(平台+送取服务)
      */
     private Boolean isReturnDisCoupon;
@@ -22,5 +27,14 @@ public class CancelOrderResDTO {
      */
     private Boolean isReturnOwnerCoupon;
 
+    /**
+     * 车主券编码
+     */
+    private String ownerCouponNo;
+
+    /**
+     * 租车费用支付状态
+     */
+    private Integer rentCarPayStatus;
 
 }

@@ -55,7 +55,6 @@ public class HandoverCarInfoService {
     @Autowired
     DeliveryCarTask deliveryCarTask;
 
-
     /**
      * 上传交接车
      * @param photoUploadReqVo
@@ -95,28 +94,13 @@ public class HandoverCarInfoService {
         //车主取还车
         if (handoverCarReqVO.getOwnerHandoverCarDTO() != null) {
             HandoverCarInfoReqDTO handoverCarInfoReqDTO = handoverCarReqVO.getOwnerHandoverCarDTO();
-            //查找车主交接车相关信息
-            OwnerHandoverCarInfoEntity ownerHandoverCarReturnInfoEntity = handoverCarService.getOwnerHandoverCarInfo(handoverCarInfoReqDTO.getOrderNo(), HandoverCarTypeEnum.RENTER_TO_RENYUN.getValue());
-            ownerHandoverCarReturnInfoEntity.setOilNum(Integer.valueOf(handoverCarInfoReqDTO.getRenterReturnOil()));
-            ownerHandoverCarReturnInfoEntity.setMileageNum(Integer.valueOf(handoverCarInfoReqDTO.getOwnReturnKM()));
-            handoverCarService.updateOwnerHandoverInfo(ownerHandoverCarReturnInfoEntity);
-            OwnerHandoverCarInfoEntity ownerHandoverCarGetInfoEntity = handoverCarService.getOwnerHandoverCarInfo(handoverCarInfoReqDTO.getOrderNo(), HandoverCarTypeEnum.RENYUN_TO_RENTER.getValue());
-            ownerHandoverCarGetInfoEntity.setOilNum(Integer.valueOf(handoverCarInfoReqDTO.getOwnReturnOil()));
-            ownerHandoverCarGetInfoEntity.setMileageNum(Integer.valueOf(handoverCarInfoReqDTO.getRenterRetrunKM()));
-            handoverCarService.updateOwnerHandoverInfo(ownerHandoverCarGetInfoEntity);
+            //更新车主交接车相关信息
+            updateOwnerHandoverCarOilMileageNum(handoverCarInfoReqDTO);
         }
-        if(handoverCarReqVO.getRenterHandoverCarDTO() != null)
-        {
+        if (handoverCarReqVO.getRenterHandoverCarDTO() != null) {
             HandoverCarInfoReqDTO handoverCarInfoReqDTO = handoverCarReqVO.getRenterHandoverCarDTO();
-            //查找租客交接车相关信息
-            RenterHandoverCarInfoEntity renterHandoverCarReturnInfoEntity = handoverCarService.getRenterHandoverCarInfo(handoverCarInfoReqDTO.getOrderNo(), HandoverCarTypeEnum.RENTER_TO_RENYUN.getValue());
-            renterHandoverCarReturnInfoEntity.setOilNum(Integer.valueOf(handoverCarInfoReqDTO.getRenterReturnOil()));
-            renterHandoverCarReturnInfoEntity.setMileageNum(Integer.valueOf(handoverCarInfoReqDTO.getOwnReturnKM()));
-            handoverCarService.updateRenterHandoverInfo(renterHandoverCarReturnInfoEntity);
-            RenterHandoverCarInfoEntity renterHandoverCarGetInfoEntity = handoverCarService.getRenterHandoverCarInfo(handoverCarInfoReqDTO.getOrderNo(), HandoverCarTypeEnum.RENYUN_TO_RENTER.getValue());
-            renterHandoverCarGetInfoEntity.setOilNum(Integer.valueOf(handoverCarInfoReqDTO.getOwnReturnOil()));
-            renterHandoverCarGetInfoEntity.setMileageNum(Integer.valueOf(handoverCarInfoReqDTO.getRenterRetrunKM()));
-            handoverCarService.updateRenterHandoverInfo(renterHandoverCarGetInfoEntity);
+            //更新租客交接车相关信息
+            updateRenterHandoverCarOilMileageNum(handoverCarInfoReqDTO);
         }
     }
 
@@ -189,11 +173,35 @@ public class HandoverCarInfoService {
     }
 
 
+    /**
+     * 更新车主交接车油耗里程数据
+     * @param handoverCarInfoReqDTO
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public void updateOwnerHandoverCarOilMileageNum(HandoverCarInfoReqDTO handoverCarInfoReqDTO){
+        OwnerHandoverCarInfoEntity ownerHandoverCarReturnInfoEntity = handoverCarService.getOwnerHandoverCarInfo(handoverCarInfoReqDTO.getOrderNo(), HandoverCarTypeEnum.RENTER_TO_RENYUN.getValue());
+        ownerHandoverCarReturnInfoEntity.setOilNum(Integer.valueOf(handoverCarInfoReqDTO.getRenterReturnOil()));
+        ownerHandoverCarReturnInfoEntity.setMileageNum(Integer.valueOf(handoverCarInfoReqDTO.getOwnReturnKM()));
+        handoverCarService.updateOwnerHandoverInfo(ownerHandoverCarReturnInfoEntity);
+        OwnerHandoverCarInfoEntity ownerHandoverCarGetInfoEntity = handoverCarService.getOwnerHandoverCarInfo(handoverCarInfoReqDTO.getOrderNo(), HandoverCarTypeEnum.RENYUN_TO_RENTER.getValue());
+        ownerHandoverCarGetInfoEntity.setOilNum(Integer.valueOf(handoverCarInfoReqDTO.getOwnReturnOil()));
+        ownerHandoverCarGetInfoEntity.setMileageNum(Integer.valueOf(handoverCarInfoReqDTO.getRenterRetrunKM()));
+        handoverCarService.updateOwnerHandoverInfo(ownerHandoverCarGetInfoEntity);
+    }
 
-
-
-
-
-
-
+    /**
+     * 更新租客交接车里程油耗数据
+     * @param handoverCarInfoReqDTO
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public void updateRenterHandoverCarOilMileageNum(HandoverCarInfoReqDTO handoverCarInfoReqDTO){
+        RenterHandoverCarInfoEntity renterHandoverCarReturnInfoEntity = handoverCarService.getRenterHandoverCarInfo(handoverCarInfoReqDTO.getOrderNo(), HandoverCarTypeEnum.RENTER_TO_RENYUN.getValue());
+        renterHandoverCarReturnInfoEntity.setOilNum(Integer.valueOf(handoverCarInfoReqDTO.getRenterReturnOil()));
+        renterHandoverCarReturnInfoEntity.setMileageNum(Integer.valueOf(handoverCarInfoReqDTO.getOwnReturnKM()));
+        handoverCarService.updateRenterHandoverInfo(renterHandoverCarReturnInfoEntity);
+        RenterHandoverCarInfoEntity renterHandoverCarGetInfoEntity = handoverCarService.getRenterHandoverCarInfo(handoverCarInfoReqDTO.getOrderNo(), HandoverCarTypeEnum.RENYUN_TO_RENTER.getValue());
+        renterHandoverCarGetInfoEntity.setOilNum(Integer.valueOf(handoverCarInfoReqDTO.getOwnReturnOil()));
+        renterHandoverCarGetInfoEntity.setMileageNum(Integer.valueOf(handoverCarInfoReqDTO.getRenterRetrunKM()));
+        handoverCarService.updateRenterHandoverInfo(renterHandoverCarGetInfoEntity);
+    }
 }

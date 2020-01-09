@@ -46,7 +46,7 @@ public class TestController {
     @Autowired
     private RenterCommodityService renterCommodityService;
 
-    @GetMapping(path = "/test")
+    @GetMapping("/test")
     public String test(){
         CashierDeductDebtReqVO vo = new CashierDeductDebtReqVO();
         cashierService.deductDebt(vo);
@@ -54,7 +54,7 @@ public class TestController {
         return "";
     }
 
-    @GetMapping(path = "/test2/pp")
+    @GetMapping("/test2/pp")
     public String xx()  {
         logger.info("xxxxxxxxxxxxx");
         logger.info("{}",configSDK.getConfigByCityCode(new DefaultConfigContext(),310100));

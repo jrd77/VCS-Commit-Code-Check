@@ -9,6 +9,7 @@ import com.atzuche.order.ownercost.entity.dto.OwnerOrderCostReqDTO;
 import com.atzuche.order.ownercost.entity.dto.OwnerOrderReqDTO;
 import com.atzuche.order.ownercost.mapper.OwnerOrderMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -83,6 +84,11 @@ public class OwnerOrderService {
         log.info("下单-车主端-准备保存车主费用明细 ownerOrderNo=[{}],ownerOrderCostReqDTO=[{}]", ownerOrderReqDTO.getOwnerOrderNo(),JSON.toJSONString(ownerOrderCostReqDTO));
         ownerOrderCalCostService.getOrderCostAndDeailList(ownerOrderCostReqDTO);
 
+    }
+
+
+    public Integer updateOwnerOrderChildStatus(Integer id, Integer childStatus) {
+        return ownerOrderMapper.updateOwnerOrderChildStatus(id, childStatus);
     }
 
 }

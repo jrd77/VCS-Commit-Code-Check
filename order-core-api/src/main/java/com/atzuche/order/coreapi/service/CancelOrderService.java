@@ -1,12 +1,19 @@
 package com.atzuche.order.coreapi.service;
 
+import com.atzuche.order.commons.enums.CouponTypeEnum;
 import com.atzuche.order.commons.enums.MemRoleEnum;
 import com.atzuche.order.commons.vo.req.CancelOrderReqVO;
 import com.atzuche.order.coreapi.entity.dto.CancelOrderResDTO;
+import com.atzuche.order.renterorder.entity.OrderCouponEntity;
+import com.atzuche.order.renterorder.service.OrderCouponService;
 import com.atzuche.order.settle.service.OrderSettleService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
+
+import java.util.List;
+import java.util.Optional;
 
 /**
  * 订单取消操作
@@ -42,17 +49,29 @@ public class CancelOrderService {
         //取消处理
         CancelOrderResDTO res = null;
         if (StringUtils.equals(MemRoleEnum.RENTER.getCode(), cancelOrderReqVO.getMemRole())) {
-            res = renterCancelOrderService.cancel();
+            //租客取消
+            res = renterCancelOrderService.cancel(cancelOrderReqVO.getOrderNo(), cancelOrderReqVO.getCancelReason());
         } else if (StringUtils.equals(MemRoleEnum.OWNER.getCode(), cancelOrderReqVO.getMemRole())) {
-            res = ownerCancelOrderService.cancel();
+            //车主取消
+            res = ownerCancelOrderService.cancel(cancelOrderReqVO.getOrderNo(), cancelOrderReqVO.getCancelReason());
         }
 
-        //优惠券、凹凸币退回(钱包收银台处理)
-        //todo
+        //优惠券
+        if (null != res && null != res.getIsReturnDisCoupon() && res.getIsReturnDisCoupon()) {
+            //退还优惠券(平台券+送取服务券)
+            couponAndCoinHandleService.undoPlatformCoupon(cancelOrderReqVO.getOrderNo());
+            couponAndCoinHandleService.undoPlatformCoupon(cancelOrderReqVO.getOrderNo());
+        }
+        //订单取消（租客取消、车主取消、平台取消）如果使用了车主券且未支付，则退回否则不处理
+        if (null != res && null != res.getIsReturnOwnerCoupon() && res.getIsReturnOwnerCoupon()) {
+            //退还车主券
+            String recover = null == res.getRentCarPayStatus() || res.getRentCarPayStatus() == 0 ? "1" : "0";
+            couponAndCoinHandleService.undoOwnerCoupon(cancelOrderReqVO.getOrderNo(), res.getOwnerCouponNo(), recover);
+        }
 
         //通知收银台退款
         //todo
-        orderSettleService.settleOrder("");
+        orderSettleService.settleOrderCancel(cancelOrderReqVO.getOrderNo());
         //通知流程系统
         //todo
 
