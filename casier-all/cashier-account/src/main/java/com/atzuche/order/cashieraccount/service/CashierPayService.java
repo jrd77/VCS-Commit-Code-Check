@@ -7,6 +7,7 @@ import com.atzuche.order.cashieraccount.common.FasterJsonUtil;
 import com.atzuche.order.cashieraccount.entity.CashierEntity;
 import com.atzuche.order.cashieraccount.entity.CashierRefundApplyEntity;
 import com.atzuche.order.cashieraccount.exception.OrderPayCallBackAsnyException;
+import com.atzuche.order.cashieraccount.exception.OrderPaySignParamException;
 import com.atzuche.order.cashieraccount.service.notservice.CashierNoTService;
 import com.atzuche.order.cashieraccount.service.notservice.CashierRefundApplyNoTService;
 import com.atzuche.order.cashieraccount.service.remote.RefundRemoteService;
@@ -131,6 +132,9 @@ public class CashierPayService{
         }
         //7 签名串
         List<PayVo> payVo = getOrderPayVO(orderPaySign,payVO);
+        if(CollectionUtils.isEmpty(payVo)){
+            throw new OrderPaySignParamException();
+        }
         String signStr = cashierNoTService.getPaySignByPayVos(payVo);
         return signStr;
     }
@@ -154,7 +158,7 @@ public class CashierPayService{
         //车辆押金 是否选择车辆押金
         int amtDeposit = 0;
         if(orderPayReqVO.getPayKind().contains(DataPayKindConstant.RENT)){
-            amtDeposit = cashierNoTService.getPayDeposit(orderPayReqVO.getOrderNo(),orderPayReqVO.getMenNo(), DataPayKindConstant.RENT);
+            amtDeposit = cashierService.getRenterDeposit(orderPayReqVO.getOrderNo(),orderPayReqVO.getMenNo());
            if(amtDeposit < 0){
                accountPayAbles.add(new AccountPayAbleResVO(orderPayReqVO.getOrderNo(),orderPayReqVO.getMenNo(),amtDeposit, RenterCashCodeEnum.ACCOUNT_RENTER_DEPOSIT,RenterCashCodeEnum.ACCOUNT_RENTER_DEPOSIT.getTxt()));
            }
@@ -163,7 +167,7 @@ public class CashierPayService{
         //违章押金 是否选择违章押金
         int amtWZDeposit = 0;
         if(orderPayReqVO.getPayKind().contains(DataPayKindConstant.DEPOSIT)){
-            amtWZDeposit =  cashierNoTService.getPayDeposit(orderPayReqVO.getOrderNo(),orderPayReqVO.getMenNo(),DataPayKindConstant.DEPOSIT);
+            amtWZDeposit = cashierService.getRenterWZDeposit(orderPayReqVO.getOrderNo(),orderPayReqVO.getMenNo());
             if(amtWZDeposit < 0){
                 accountPayAbles.add(new AccountPayAbleResVO(orderPayReqVO.getOrderNo(),orderPayReqVO.getMenNo(),amtWZDeposit, RenterCashCodeEnum.ACCOUNT_RENTER_WZ_DEPOSIT,RenterCashCodeEnum.ACCOUNT_RENTER_WZ_DEPOSIT.getTxt()));
             }

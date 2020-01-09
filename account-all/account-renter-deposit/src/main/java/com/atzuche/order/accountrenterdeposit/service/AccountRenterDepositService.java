@@ -60,15 +60,16 @@ public class AccountRenterDepositService{
     /**
      * 查询车辆押金余额
      */
-    public int getSurplusRenterDeposit(String orderNo, String memNo) {
+    public int getRenterDeposit(String orderNo, String memNo) {
         //查询车辆押金信息
         AccountRenterDepositResVO accountRenterDepositRes = getAccountRenterDepositEntity(orderNo,memNo);
         //1 校验 是否存在车辆押金记录
         Assert.notNull(accountRenterDepositRes, ErrorCode.PARAMETER_ERROR.getText());
         Assert.notNull(accountRenterDepositRes.getOrderNo(), ErrorCode.PARAMETER_ERROR.getText());
         //2 返回计算剩余押金余额
-        int surplusRenterDeposit = accountRenterDepositRes.getSurplusDepositAmt() + accountRenterDepositRes.getSurplusAuthorizeDepositAmt() + accountRenterDepositRes.getSurplusCreditPayAmt();
-        return surplusRenterDeposit;
+        Integer amt = accountRenterDepositRes.getShifuDepositAmt();
+        amt = Objects.isNull(amt)?0:amt;
+        return amt;
     }
     /**
      * 下单成功记录应付押金
