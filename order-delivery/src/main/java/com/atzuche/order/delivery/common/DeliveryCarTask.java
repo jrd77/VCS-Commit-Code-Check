@@ -3,7 +3,6 @@ package com.atzuche.order.delivery.common;
 import com.atzuche.order.delivery.entity.RenterOrderDeliveryEntity;
 import com.atzuche.order.delivery.enums.ServiceTypeEnum;
 import com.atzuche.order.delivery.exception.DeliveryOrderException;
-import com.atzuche.order.delivery.mapper.RenterOrderDeliveryMapper;
 import com.atzuche.order.delivery.service.MailSendService;
 import com.atzuche.order.delivery.service.RenterOrderDeliveryService;
 import com.atzuche.order.delivery.service.delivery.RenYunDeliveryCarService;
@@ -20,9 +19,6 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.Resource;
-import java.util.Objects;
-
 /**
  * @author 胡春林
  * 执行流程
@@ -35,8 +31,6 @@ public class DeliveryCarTask {
     RenYunDeliveryCarService renyunDeliveryCarService;
     @Autowired
     MailSendService mailSendService;
-    @Resource
-    RenterOrderDeliveryMapper orderDeliveryMapper;
     @Autowired
     HandoverCarService handoverCarService;
     @Autowired
@@ -86,11 +80,12 @@ public class DeliveryCarTask {
      */
     @Transactional(rollbackFor = Exception.class)
     public void cancelOrderDelivery(String renterOrderNo, Integer serviceType) {
-        RenterOrderDeliveryEntity orderDeliveryEntity = orderDeliveryMapper.findRenterOrderByRenterOrderNo(renterOrderNo, serviceType);
+        RenterOrderDeliveryEntity orderDeliveryEntity =
+                renterOrderDeliveryService.findRenterOrderByRenterOrderNo(renterOrderNo, serviceType);
         if (null == orderDeliveryEntity) {
             throw new DeliveryOrderException(DeliveryErrorCode.DELIVERY_PARAMS_ERROR.getValue(), "没有找到该配送订单信息");
         }
-        orderDeliveryMapper.updateStatusById(orderDeliveryEntity.getId());
+        renterOrderDeliveryService.updateStatusById(orderDeliveryEntity.getId());
     }
 
     /**

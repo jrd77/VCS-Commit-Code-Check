@@ -20,45 +20,45 @@ import javax.annotation.Resource;
 @Service
 public class RenterOrderDeliveryService {
 
-	@Resource
-	private RenterOrderDeliveryMapper renterOrderDeliveryMapper;
-	@Resource
+    @Resource
+    private RenterOrderDeliveryMapper renterOrderDeliveryMapper;
+    @Resource
     private RenterDeliveryAddrMapper renterDeliveryAddrMapper;
-	
-	/**
-	 * 根据租客子单号获取配送信息列表
-	 * @param renterOrderNo 租客子单号
-	 * @return List<RenterOrderDeliveryEntity>
-	 */
-	public List<RenterOrderDeliveryEntity> listRenterOrderDeliveryByRenterOrderNo(String renterOrderNo) {
-		List<RenterOrderDeliveryEntity> deliveryList = renterOrderDeliveryMapper.listRenterOrderDeliveryByRenterOrderNo(renterOrderNo);
-		if (deliveryList == null || deliveryList.isEmpty()) {
-			return null;
-		}
-		// 根据type去重
-		deliveryList = deliveryList.stream().collect(
-	            Collectors.collectingAndThen(
-	                    Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(RenterOrderDeliveryEntity::getType))), ArrayList::new));
-		return deliveryList;
-	}
 
-	/**
-	 * 查找最近的一笔订单
-	 * @param orderNo
-	 * @param type
-	 * @return
-	 */
-    public	RenterOrderDeliveryEntity findRenterOrderByrOrderNo(String orderNo, Integer type){
-		RenterOrderDeliveryEntity lastOrderDeliveryEntity = renterOrderDeliveryMapper.findRenterOrderByrOrderNo(orderNo, type);
-    	return lastOrderDeliveryEntity;
-	}
+    /**
+     * 根据租客子单号获取配送信息列表
+     * @param renterOrderNo 租客子单号
+     * @return List<RenterOrderDeliveryEntity>
+     */
+    public List<RenterOrderDeliveryEntity> listRenterOrderDeliveryByRenterOrderNo(String renterOrderNo) {
+        List<RenterOrderDeliveryEntity> deliveryList = renterOrderDeliveryMapper.listRenterOrderDeliveryByRenterOrderNo(renterOrderNo);
+        if (deliveryList == null || deliveryList.isEmpty()) {
+            return null;
+        }
+        // 根据type去重
+        deliveryList = deliveryList.stream().collect(
+                Collectors.collectingAndThen(
+                        Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(RenterOrderDeliveryEntity::getType))), ArrayList::new));
+        return deliveryList;
+    }
+
+    /**
+     * 查找最近的一笔订单
+     * @param orderNo
+     * @param type
+     * @return
+     */
+    public RenterOrderDeliveryEntity findRenterOrderByrOrderNo(String orderNo, Integer type) {
+        RenterOrderDeliveryEntity lastOrderDeliveryEntity = renterOrderDeliveryMapper.findRenterOrderByrOrderNo(orderNo, type);
+        return lastOrderDeliveryEntity;
+    }
 
     /**
      * 根据子订单号获取配送订单地址信息
      * @param renterOrderNo
      * @return
      */
-    public RenterDeliveryAddrEntity selecAddrByRenterOrderNo(String renterOrderNo) {
+    public RenterDeliveryAddrEntity selectAddrByRenterOrderNo(String renterOrderNo) {
         RenterDeliveryAddrEntity renterDeliveryAddrEntity = renterDeliveryAddrMapper.selectByRenterOrderNo(renterOrderNo);
         return renterDeliveryAddrEntity;
     }
@@ -67,7 +67,7 @@ public class RenterOrderDeliveryService {
      * 新增配送订单信息
      * @param renterOrderDeliveryEntity
      */
-    public void insert(RenterOrderDeliveryEntity renterOrderDeliveryEntity){
+    public void insert(RenterOrderDeliveryEntity renterOrderDeliveryEntity) {
         renterOrderDeliveryMapper.insertSelective(renterOrderDeliveryEntity);
     }
 
@@ -77,15 +77,24 @@ public class RenterOrderDeliveryService {
      * @param type
      * @return
      */
-    public RenterOrderDeliveryEntity findRenterOrderByRenterOrderNo(String renterOrderNo,Integer type){
-        return renterOrderDeliveryMapper.findRenterOrderByrOrderNo(renterOrderNo,type);
+    public RenterOrderDeliveryEntity findRenterOrderByRenterOrderNo(String renterOrderNo, Integer type) {
+        return renterOrderDeliveryMapper.findRenterOrderByrOrderNo(renterOrderNo, type);
+    }
+
+    /**
+     * 根据ID更新状态值(取消配送订单)
+     * @param id
+     * @return
+     */
+    public Integer updateStatusById(Integer id) {
+        return renterOrderDeliveryMapper.updateStatusById(id);
     }
 
     /**
      * 新增配送订单地址信息
      * @param renterDeliveryAddrEntity
      */
-    public void insertDeliveryAddr(RenterDeliveryAddrEntity renterDeliveryAddrEntity){
+    public void insertDeliveryAddr(RenterDeliveryAddrEntity renterDeliveryAddrEntity) {
         renterDeliveryAddrMapper.insertSelective(renterDeliveryAddrEntity);
     }
 
@@ -93,7 +102,7 @@ public class RenterOrderDeliveryService {
      * 更新配送订单地址信息
      * @param renterDeliveryAddrEntity
      */
-    public void updateDeliveryAddrByPrimaryKey(RenterDeliveryAddrEntity renterDeliveryAddrEntity){
+    public void updateDeliveryAddrByPrimaryKey(RenterDeliveryAddrEntity renterDeliveryAddrEntity) {
         renterDeliveryAddrMapper.updateByPrimaryKey(renterDeliveryAddrEntity);
     }
 

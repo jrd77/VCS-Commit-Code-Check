@@ -8,6 +8,7 @@ import com.atzuche.order.delivery.service.handover.OwnerHandoverCarService;
 import com.atzuche.order.delivery.service.handover.RenterHandoverCarService;
 import com.atzuche.order.delivery.utils.CommonUtil;
 import com.atzuche.order.delivery.utils.DateUtils;
+import com.atzuche.order.delivery.utils.MathUtil;
 import com.atzuche.order.delivery.vo.delivery.rep.*;
 import com.atzuche.order.delivery.vo.delivery.req.DeliveryCarRepVO;
 import org.springframework.beans.BeanUtils;
@@ -31,8 +32,8 @@ public class DeliveryCarInfoService {
     RenterOrderDeliveryService renterOrderDeliveryService;
     @Autowired
     HandoverCarService handoverCarService;
-//    @Autowired
-//    DeliveryCarInfoPriceService deliveryCarInfoPriceService;
+    @Autowired
+    DeliveryCarInfoPriceService deliveryCarInfoPriceService;
     @Autowired
     RenterHandoverCarService renterHandoverCarService;
     @Autowired
@@ -198,7 +199,7 @@ public class DeliveryCarInfoService {
         int oilDifference = Math.abs(Integer.valueOf(ownerGetAndReturnCarDTO.getCarOil)) - Math.abs(Integer.valueOf(ownerGetAndReturnCarDTO.getReturnCarOil()));
         ownerGetAndReturnCarDTO.setDrivingKM(ownerDrivingKM);
         ownerGetAndReturnCarDTO.setOilDifference(String.valueOf(oilDifference));
-       // ownerGetAndReturnCarDTO.setOilDifferenceCrash(String.valueOf(MathUtil.mul(oilDifference,deliveryCarInfoPriceService.getOilPriceByCityCodeAndType(Integer.valueOf(cityCode),carEngineType))));
+        ownerGetAndReturnCarDTO.setOilDifferenceCrash(String.valueOf(MathUtil.mul(oilDifference,deliveryCarInfoPriceService.getOilPriceByCityCodeAndType(Integer.valueOf(cityCode),carEngineType))));
         ownerGetAndReturnCarDTO.setOilServiceCharge("0");
         return ownerGetAndReturnCarDTO;
     }
