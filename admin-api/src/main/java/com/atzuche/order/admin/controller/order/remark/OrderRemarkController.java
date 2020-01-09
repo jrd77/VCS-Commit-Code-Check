@@ -38,8 +38,8 @@ public class OrderRemarkController {
 
     @AutoDocMethod(description = "备注查询列表", value = "备注查询列表", response = OrderRemarkPageListResponseVO.class)
     @GetMapping("/list")
-    public ResponseData<OrderRemarkPageListResponseVO> list(OrderRemarkListRequestVO orderRemarkListRequestVO, BindingResult bindingResult) {
-        return ResponseData.success(null);
+    public ResponseData<OrderRemarkPageListResponseVO> selectRemarklist(OrderRemarkListRequestVO orderRemarkListRequestVO, BindingResult bindingResult) {
+        return ResponseData.success(orderRemarkService.selectRemarklist(orderRemarkListRequestVO));
     }
 
     @AutoDocMethod(description = "备注日志查询列表", value = "备注日志查询列表", response = OrderRemarkLogPageListResponseVO.class)
@@ -59,14 +59,14 @@ public class OrderRemarkController {
     @AutoDocMethod(description = "删除备注", value = "删除备注", response = ResponseData.class)
     @DeleteMapping("/delete")
     public ResponseData<ResponseData> delete(@RequestBody OrderRemarkDeleteRequestVO orderRemarkDeleteRequestVO, BindingResult bindingResult) {
-        //orderRemarkService.updateRemarkById(null);
+        orderRemarkService.deleteRemarkById(orderRemarkDeleteRequestVO);
         return ResponseData.success(null);
     }
 
     @AutoDocMethod(description = "编辑备注", value = "编辑备注", response = ResponseData.class)
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
     public ResponseData<ResponseData> update(@RequestBody OrderRemarkUpdateRequestVO orderRemarkUpdateRequestVO, BindingResult bindingResult) {
-        //orderRemarkService.updateRemarkById(orderRemarkUpdateRequestVO);
+        orderRemarkService.updateRemarkById(orderRemarkUpdateRequestVO);
         return ResponseData.success(null);
     }
 

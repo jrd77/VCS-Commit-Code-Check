@@ -1,10 +1,10 @@
 package com.atzuche.order.admin.mapper;
 
 import com.atzuche.order.admin.dto.OrderRemarkAdditionRequestDTO;
+import com.atzuche.order.admin.entity.OrderInsuranceAdditionRequestEntity;
+import com.atzuche.order.admin.entity.OrderRemarkEntity;
 import com.atzuche.order.admin.entity.OrderRemarkOverviewEntity;
-import com.atzuche.order.admin.vo.req.remark.OrderRemarkAdditionRequestVO;
-import com.atzuche.order.admin.vo.req.remark.OrderRemarkInformationRequestVO;
-import com.atzuche.order.admin.vo.req.remark.OrderRemarkRequestVO;
+import com.atzuche.order.admin.vo.req.remark.*;
 import com.atzuche.order.admin.vo.resp.remark.OrderRemarkResponseVO;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -21,13 +21,17 @@ public interface OrderRemarkMapper {
      */
     List<OrderRemarkOverviewEntity> getOrderRemarkOverview(OrderRemarkRequestVO orderRemarkRequestVO);
 
-    void addOrderRemark(OrderRemarkAdditionRequestDTO orderRemarkAdditionRequestDTO);
+    void addOrderRemark(OrderInsuranceAdditionRequestEntity orderInsuranceAdditionRequestEntity);
 
-    OrderRemarkResponseVO getOrderRemarkInformation(OrderRemarkInformationRequestVO orderRemarkInformationRequestVO);
+    OrderRemarkEntity getOrderRemarkInformation(OrderRemarkInformationRequestVO orderRemarkInformationRequestVO);
 
-    void updateRemarkById(OrderRemarkAdditionRequestDTO orderRemarkAdditionRequestDTO);
+    /**
+     * 修改订单备注
+     * @param orderRemarkEntity
+     */
+    void updateRemarkById(OrderRemarkEntity orderRemarkEntity);
 
 
-
+    List<OrderRemarkEntity> selectRemarkList(OrderRemarkListRequestVO orderRemarkListRequestVO);
 
 }
