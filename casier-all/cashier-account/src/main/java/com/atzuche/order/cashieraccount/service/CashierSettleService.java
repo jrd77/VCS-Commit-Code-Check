@@ -270,7 +270,7 @@ public class CashierSettleService {
             entity.setOilAmt(oilAmt);
             entity.setConsoleSubsidyAmt(consoleSubsidyAmt);
             entity.setConsoleFineAmt(consoleFineAmt);
-//            accountOwnerCostSettleService.insertAccountOwnerCostSettle(entity);
+            accountOwnerCostSettleService.insertAccountOwnerCostSettle(entity);
         }
     }
 }
