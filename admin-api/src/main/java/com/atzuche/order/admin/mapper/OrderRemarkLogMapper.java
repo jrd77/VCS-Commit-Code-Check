@@ -1,5 +1,6 @@
 package com.atzuche.order.admin.mapper;
 
+import com.atzuche.order.admin.dto.OrderRemarkLogListRequestDTO;
 import com.atzuche.order.admin.entity.OrderRemarkEntity;
 import com.atzuche.order.admin.entity.OrderRemarkLogEntity;
 import com.atzuche.order.admin.vo.req.remark.OrderRemarkListRequestVO;
@@ -19,7 +20,7 @@ public interface OrderRemarkLogMapper {
      */
     void addOrderRemarkLog(OrderRemarkLogEntity orderRemarkLogEntity);
 
-    List<OrderRemarkLogEntity> selectRemarkLogList(OrderRemarkLogListRequestVO orderRemarkLogListRequestVO);
+    List<OrderRemarkLogEntity> selectRemarkLogList(OrderRemarkLogListRequestDTO orderRemarkLogListRequestDTO);
 
     long selectRemarkLogListCount(OrderRemarkLogListRequestVO orderRemarkLogListRequestVO);
 
