@@ -80,7 +80,6 @@ public class CashierPayService{
      * 支付系统回调（支付回调，退款回调到时一个）
      * MQ 异步回调
      */
-    @Async
     public void payCallBackAsyn(BatchNotifyDataVo batchNotifyDataVo){
         Transaction t = Cat.getProducer().newTransaction(CatConstants.RABBIT_MQ_CALL, "支付系统rabbitMQ异步回调payCallBackAsyn");
         try {

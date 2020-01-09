@@ -1,4 +1,4 @@
-package com.atzuche.order.cashieraccount.config;
+package com.atzuche.order.coreapi.listener;
 
 import com.atzuche.order.cashieraccount.common.FasterJsonUtil;
 import com.atzuche.order.cashieraccount.service.CashierPayService;
