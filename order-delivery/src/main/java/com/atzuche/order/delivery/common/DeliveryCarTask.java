@@ -80,8 +80,7 @@ public class DeliveryCarTask {
      */
     @Transactional(rollbackFor = Exception.class)
     public void cancelOrderDelivery(String renterOrderNo, Integer serviceType) {
-        RenterOrderDeliveryEntity orderDeliveryEntity =
-                renterOrderDeliveryService.findRenterOrderByRenterOrderNo(renterOrderNo, serviceType);
+        RenterOrderDeliveryEntity orderDeliveryEntity = renterOrderDeliveryService.findRenterOrderByRenterOrderNo(renterOrderNo, serviceType);
         if (null == orderDeliveryEntity) {
             throw new DeliveryOrderException(DeliveryErrorCode.DELIVERY_PARAMS_ERROR.getValue(), "没有找到该配送订单信息");
         }
