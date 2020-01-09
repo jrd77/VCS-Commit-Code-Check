@@ -11,7 +11,6 @@ import com.atzuche.order.cashieraccount.entity.CashierEntity;
 import com.atzuche.order.cashieraccount.entity.CashierRefundApplyEntity;
 import com.atzuche.order.cashieraccount.exception.OrderPayCallBackAsnyException;
 import com.atzuche.order.cashieraccount.exception.OrderPaySignFailException;
-import com.atzuche.order.cashieraccount.exception.OrderPaySignParamException;
 import com.atzuche.order.cashieraccount.service.notservice.CashierNoTService;
 import com.atzuche.order.cashieraccount.service.notservice.CashierRefundApplyNoTService;
 import com.atzuche.order.cashieraccount.service.remote.RefundRemoteService;
@@ -23,6 +22,7 @@ import com.atzuche.order.cashieraccount.vo.res.OrderPayableAmountResVO;
 import com.atzuche.order.commons.CatConstants;
 import com.atzuche.order.commons.enums.RenterCashCodeEnum;
 import com.atzuche.order.commons.enums.YesNoEnum;
+import com.atzuche.order.commons.service.OrderPayCallBack;
 import com.atzuche.order.commons.service.RabbitMsgLogService;
 import com.atzuche.order.rentercost.entity.vo.PayableVO;
 import com.atzuche.order.rentercost.service.RenterOrderCostCombineService;
@@ -37,14 +37,12 @@ import com.autoyol.autopay.gateway.vo.res.AutoPayResultVo;
 import com.autoyol.cat.CatAnnotation;
 import com.autoyol.commons.utils.GsonUtils;
 import com.autoyol.commons.web.ErrorCode;
-import com.autoyol.doc.util.StringUtil;
 import com.autoyol.vo.req.WalletDeductionReqVO;
 import com.dianping.cat.Cat;
 import com.dianping.cat.message.Transaction;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
@@ -80,15 +78,14 @@ public class CashierPayService{
      * 支付系统回调（支付回调，退款回调到时一个）
      * MQ 异步回调
      */
-    @Async
-    public void payCallBackAsyn(BatchNotifyDataVo batchNotifyDataVo){
+    public void payCallBack(BatchNotifyDataVo batchNotifyDataVo, OrderPayCallBack callBack){
         Transaction t = Cat.getProducer().newTransaction(CatConstants.RABBIT_MQ_CALL, "支付系统rabbitMQ异步回调payCallBackAsyn");
         try {
             Cat.logEvent(CatConstants.RABBIT_MQ_METHOD,"OrderPayCallBackRabbitConfig.payCallBackAsyn");
             Cat.logEvent(CatConstants.RABBIT_MQ_PARAM,GsonUtils.toJson(batchNotifyDataVo));
             //1 校验是否 为空
             if(Objects.nonNull(batchNotifyDataVo) && !CollectionUtils.isEmpty(batchNotifyDataVo.getLstNotifyDataVo())){
-                cashierService.callBackSuccess(batchNotifyDataVo.getLstNotifyDataVo());
+                cashierService.callBackSuccess(batchNotifyDataVo.getLstNotifyDataVo(),callBack);
             }
             //3 更新rabbitMQ 记录已消费
             String reqContent = FasterJsonUtil.toJson(batchNotifyDataVo);
@@ -261,28 +258,6 @@ public class CashierPayService{
                 }
             }
         }
-//        //车辆押金 是否选择车辆押金
-//        if(orderPaySign.getPayKind().contains(DataPayKindConstant.RENT) && payVO.getAmtDeposit()<0){
-//          CashierEntity cashierEntity = cashierNoTService.getCashierEntity(orderPaySign.getOrderNo(),orderPaySign.getMenNo(), DataPayKindConstant.RENT);
-//            if(Objects.nonNull(cashierEntity)){
-//              PayVo vo = cashierNoTService.getPayVO(cashierEntity,orderPaySign,payVO.getAmtDeposit(),payVO.getTitle(),DataPayKindConstant.RENT);
-//              String payMd5 = MD5.MD5Encode(FasterJsonUtil.toJson(vo));
-//              vo.setPayMd5(payMd5);
-//              payVo.add(vo);
-//          }
-//        }
-//
-//        //违章押金 是否选择违章押金
-//        if(orderPaySign.getPayKind().contains(DataPayKindConstant.DEPOSIT) && payVO.getAmtWzDeposit()<0){
-//            CashierEntity cashierEntity = cashierNoTService.getCashierEntity(orderPaySign.getOrderNo(),orderPaySign.getMenNo(), DataPayKindConstant.DEPOSIT);
-//            if(Objects.nonNull(cashierEntity)){
-//                PayVo vo = cashierNoTService.getPayVO(cashierEntity,orderPaySign,payVO.getAmtWzDeposit(),payVO.getTitle(),DataPayKindConstant.DEPOSIT);
-//                String payMd5 = MD5.MD5Encode(FasterJsonUtil.toJson(vo));
-//                vo.setPayMd5(payMd5);
-//                payVo.add(vo);
-//            }
-//
-//        }
 
         //待付租车费用
         if(orderPaySign.getPayKind().contains(DataPayKindConstant.RENT_AMOUNT) && payVO.getAmtRent()<0){
