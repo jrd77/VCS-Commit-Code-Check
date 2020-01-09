@@ -79,7 +79,7 @@ public class CashierNoTService {
     AccountRenterWzDepositService accountRenterWzDepositService;
     @Autowired
     AccountRenterCostSettleService accountRenterCostSettleService;
-    @Value("env")
+    @Value("${env_t}")
     private String env;
 
 
