@@ -1,10 +1,11 @@
 package com.atzuche.order.admin.dto;
 
 import com.autoyol.doc.annotation.AutoDocProperty;
+import lombok.Data;
+import lombok.ToString;
 
-/**
- * Created by qincai.lin on 2019/12/30.
- */
+@Data
+@ToString
 public class OrderInsuranceAdditionRequestDTO {
     @AutoDocProperty(value = "订单号")
     private String orderNo;

@@ -3,10 +3,7 @@ package com.atzuche.order.admin.service;
 import com.atzuche.order.admin.common.AdminUserUtil;
 import com.atzuche.order.admin.vo.req.renterWz.RenterWzCostDetailReqVO;
 import com.atzuche.order.admin.vo.req.renterWz.TemporaryRefundReqVO;
-import com.atzuche.order.admin.vo.resp.renterWz.TemporaryRefundLogResVO;
-import com.atzuche.order.admin.vo.resp.renterWz.TemporaryRefundLogsResVO;
-import com.atzuche.order.admin.vo.resp.renterWz.WzCostLogResVO;
-import com.atzuche.order.admin.vo.resp.renterWz.WzCostLogsResVO;
+import com.atzuche.order.admin.vo.resp.renterWz.*;
 import com.atzuche.order.commons.CompareHelper;
 import com.atzuche.order.commons.DateUtils;
 import com.atzuche.order.rentercommodity.service.RenterGoodsService;
@@ -51,11 +48,11 @@ public class RenterWzService {
 
     private static final String WZ_OTHER_FINE_REMARK = "其他扣款备注";
     private static final String WZ_OTHER_FINE = "其他扣款";
-    private static final String WZ_OTHER_FINE_CODE = "5";
+    private static final String WZ_OTHER_FINE_CODE = "qiTaFei";
 
     private static final String INSURANCE_CLAIM_REMARK = "保险理赔备注";
     private static final String INSURANCE_CLAIM = "保险理赔";
-    private static final String INSURANCE_CLAIM_CODE = "6";
+    private static final String INSURANCE_CLAIM_CODE = "baoXianLiPei";
 
     private static final String REMARK = "remark";
     private static final String AMOUNT = "amount";
@@ -206,7 +203,7 @@ public class RenterWzService {
         dto.setCreateTime(new Date());
         dto.setOperator(AdminUserUtil.getAdminUser().getAuthName());
         dto.setAmount(convertIntString(req.getAmount()));
-        dto.setStatus(0);
+        dto.setStatus(1);
         wzTemporaryRefundLogService.save(dto);
     }
 
@@ -220,5 +217,21 @@ public class RenterWzService {
             return Integer.parseInt(subStr);
         }
         return Integer.parseInt(intStr);
+    }
+
+    public RenterWzDetailResVO queryWzDetailByOrderNo(String orderNo) {
+        RenterWzDetailResVO rs = new RenterWzDetailResVO();
+        List<RenterOrderWzCostDetailEntity> results = renterOrderWzCostDetailService.queryInfosByOrderNo(orderNo);
+        List<RenterWzCostDetailResVO> costDetails = new ArrayList<>();
+        RenterWzCostDetailResVO dto;
+        for (RenterOrderWzCostDetailEntity costDetail : results) {
+            dto = new RenterWzCostDetailResVO();
+            BeanUtils.copyProperties(costDetail,dto);
+            dto.setAmount(String.valueOf(costDetail.getAmount()));
+            dto.setCostType(WzCostEnums.getType(costDetail.getCostCode()));
+            costDetails.add(dto);
+        }
+        rs.setCostDetails(costDetails);
+        return rs;
     }
 }

@@ -42,4 +42,12 @@ public interface DerenCarApproachCitysMapper{
 	 * @return 成功条数
 	 */
 	Integer updateDerenCarApproachCitys(DerenCarApproachCitysEntity derenCarApproachCitys);
+
+	/**
+	 * 根据车牌号和订单号 查询途经城市
+	 * @param orderNo 订单号
+	 * @param plateNum 车牌号
+	 * @return 途经城市
+	 */
+	String queryCitiesByOrderNoAndCarNum(@Param("orderNo") String orderNo,@Param("plateNum") String plateNum);
 }

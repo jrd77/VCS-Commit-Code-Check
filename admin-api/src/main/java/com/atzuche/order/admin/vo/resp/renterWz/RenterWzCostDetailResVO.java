@@ -17,6 +17,9 @@ public class RenterWzCostDetailResVO {
     @AutoDocProperty("订单号")
     private String orderNo;
 
+    @AutoDocProperty("费用类型")
+    private Integer costType;
+
     @AutoDocProperty("费用编码")
     private String costCode;
 

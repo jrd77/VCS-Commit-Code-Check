@@ -9,7 +9,7 @@ import lombok.Data;
  *   车主结算费用总表
  * 
  * @author ZhangBin
- * @date 2019-12-17 16:33:28
+ * @date 2020-01-09 10:32:27
  * @Description:
  */
 @Data
@@ -45,13 +45,33 @@ public class AccountOwnerCostSettleEntity implements Serializable {
 	 */
 	private Integer incrementAmt;
 	/**
-	 * 应收费用
+	 * 车主端代管车服务费
 	 */
-	private Integer yingshouAmt;
+	private Integer proxyExpenseAmt;
 	/**
-	 * amt
+	 * 车主端平台服务费
 	 */
-	private Integer shishouAmt;
+	private Integer serviceExpenseAmt;
+	/**
+	 * gps服务费
+	 */
+	private Integer gpsAmt;
+	/**
+	 * 车主油费
+	 */
+	private Integer oilAmt;
+	/**
+	 * 管理后台补贴
+	 */
+	private Integer consoleSubsidyAmt;
+	/**
+	 * 车主罚金
+	 */
+	private Integer fineAmt;
+	/**
+	 * 管理后台全局罚金
+	 */
+	private Integer consoleFineAmt;
 	/**
 	 * 更新版本号
 	 */

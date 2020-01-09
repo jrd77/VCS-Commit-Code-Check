@@ -1,12 +1,14 @@
 package com.atzuche.order.admin.dto;
+import lombok.Data;
+import lombok.ToString;
+
 import java.util.List;
 
-/**
- * Created by dongdong.zhao on 2019/1/29.
- */
+@Data
+@ToString
 public class InsurancePurchaseResultDTO {
 
-
+    //保险列表
     private List<InsurancePurchaseDTO> insuranceList;
 
     public List<InsurancePurchaseDTO> getInsuranceList() {
