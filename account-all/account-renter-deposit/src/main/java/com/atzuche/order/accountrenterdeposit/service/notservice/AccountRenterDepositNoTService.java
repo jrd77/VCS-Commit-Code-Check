@@ -34,7 +34,7 @@ public class AccountRenterDepositNoTService {
         AccountRenterDepositEntity accountRenterDepositEntity = new AccountRenterDepositEntity ();
         BeanUtils.copyProperties(createOrderRenterDepositReqVO,accountRenterDepositEntity);
         accountRenterDepositEntity.setFreeDepositType(createOrderRenterDepositReqVO.getFreeDepositType().getCode());
-        int result = accountRenterDepositMapper.insert(accountRenterDepositEntity);
+        int result = accountRenterDepositMapper.insertSelective(accountRenterDepositEntity);
         if(result==0){
             throw new AccountRenterDepositDBException();
         }

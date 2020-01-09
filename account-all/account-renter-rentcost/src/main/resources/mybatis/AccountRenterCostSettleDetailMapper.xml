@@ -44,44 +44,9 @@
 		select <include refid="Base_Column_List" /> from account_renter_cost_settle_detail where id = #{value}
 	</select>
 
-	<insert id="insert" parameterType="com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostSettleDetailEntity">
-		insert into account_renter_cost_settle_detail
-		(
-			`id`,		
-				`order_no`,		
-				`renter_order_no`,		
-				`mem_no`,		
-				`amt`,		
-				`cost_code`,		
-				`cost_detail`,		
-				`unique_no`,		
-				`type`,		
-				`create_time`,		
-				`create_op`,		
-				`update_time`,		
-				`update_op`,		
-				`is_delete`		
-			)
-		values
-		(
-			#{id}, 		
-				#{orderNo}, 		
-				#{renterOrderNo}, 		
-				#{memNo}, 		
-				#{amt}, 		
-				#{costCode}, 		
-				#{costDetail}, 		
-				#{uniqueNo}, 		
-				#{type}, 		
-				#{createTime}, 		
-				#{createOp}, 		
-				#{updateTime}, 		
-				#{updateOp}, 		
-				#{isDelete}		
-			)
-	</insert>
+
 	
-	<insert id="insertSelective" parameterType="com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostSettleDetailEntity">
+	<insert id="insertSelective" parameterType="com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostSettleDetailEntity" useGeneratedKeys="true" keyProperty="id">
 		insert into account_renter_cost_settle_detail
 		(
 			<if test="id != null">`id`, </if>

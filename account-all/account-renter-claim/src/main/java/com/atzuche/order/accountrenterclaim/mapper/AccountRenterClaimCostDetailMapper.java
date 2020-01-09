@@ -17,8 +17,6 @@ public interface AccountRenterClaimCostDetailMapper{
 
     List<AccountRenterClaimCostDetailEntity> selectALL();
 
-    int insert(AccountRenterClaimCostDetailEntity record);
-    
     int insertSelective(AccountRenterClaimCostDetailEntity record);
 
     int updateByPrimaryKey(AccountRenterClaimCostDetailEntity record);

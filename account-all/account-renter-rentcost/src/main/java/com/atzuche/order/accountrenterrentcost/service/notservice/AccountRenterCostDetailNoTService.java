@@ -34,7 +34,7 @@ public class AccountRenterCostDetailNoTService {
         BeanUtils.copyProperties(accountRenterCostDetailReqVO,accountRenterCostDetail);
         accountRenterCostDetail.setSourceCode(accountRenterCostDetailReqVO.getRenterCashCodeEnum().getCashNo());
         accountRenterCostDetail.setSourceDetail(accountRenterCostDetailReqVO.getRenterCashCodeEnum().getTxt());
-        int result = accountRenterCostDetailMapper.insert(accountRenterCostDetail);
+        int result = accountRenterCostDetailMapper.insertSelective(accountRenterCostDetail);
         if(result==0){
             throw new AccountRenterRentCostDetailException();
         }

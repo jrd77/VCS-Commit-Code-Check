@@ -52,47 +52,46 @@
 		select <include refid="Base_Column_List" /> from account_platform_profit where id = #{value}
 	</select>
 
-	<insert id="insert" parameterType="com.atzuche.order.accountplatorm.entity.AccountPlatformProfitEntity" useGeneratedKeys="true" keyProperty="id">
-		insert into account_platform_profit
-		(
-				`order_no`,		
-				`owner_subsidy_amt`,		
-				`subsidy_owner_amt`,		
-				`owner_income_amt`,		
-				`renter_cost`,		
-				`renter_subsidy_amt`,		
-				`subsidy_renter_amt`,		
-				`platform_subsidy_amt`,		
-				`platform_receivable__amt`,		
-				`platform_received__amt`,		
-				`version`,		
-				`status`,		
-				`create_time`,		
-				`create_op`,		
-				`update_time`,		
-				`update_op`,		
-				`is_delete`		
-			)
-		values
-		(
-				#{orderNo}, 		
-				#{ownerSubsidyAmt}, 		
-				#{subsidyOwnerAmt}, 		
-				#{ownerIncomeAmt}, 		
-				#{renterCost}, 		
-				#{renterSubsidyAmt}, 		
-				#{subsidyRenterAmt}, 		
-				#{platformSubsidyAmt}, 		
-				#{platformReceivableAmt}, 		
-				#{platformReceivedAmt}, 		
-				#{version}, 		
-				#{status}, 		
-				#{createTime}, 		
-				#{createOp}, 		
-				#{updateTime}, 		
-				#{updateOp}, 		
-				#{isDelete}		
-			)
+	<insert id="insertSelective" parameterType="com.atzuche.order.accountplatorm.entity.AccountPlatformProfitEntity" useGeneratedKeys="true" keyProperty="id">
+        insert into account_platform_profit
+        <trim prefix="(" suffix=")" suffixOverrides="," >
+            <if test="orderNo != null">`order_no`, </if>
+            <if test="ownerSubsidyAmt != null">`owner_subsidy_amt`, </if>
+            <if test="subsidyOwnerAmt != null">`subsidy_owner_amt`, </if>
+            <if test="ownerIncomeAmt != null">`owner_income_amt`, </if>
+            <if test="renterCost != null">`renter_cost`, </if>
+            <if test="renterSubsidyAmt != null">`renter_subsidy_amt`, </if>
+            <if test="subsidyRenterAmt != null">`subsidy_renter_amt`, </if>
+            <if test="platformSubsidyAmt != null">`platform_subsidy_amt`, </if>
+            <if test="platformReceivableAmt != null">`platform_receivable__amt`, </if>
+            <if test="platformReceivedAmt != null">`platform_received__amt`, </if>
+            <if test="version != null">`version`, </if>
+            <if test="status != null">`status`, </if>
+            <if test="createTime != null">`create_time`, </if>
+            <if test="createOp != null">`create_op`, </if>
+            <if test="updateTime != null">`update_time`, </if>
+            <if test="updateOp != null">`update_op`, </if>
+            <if test="isDelete != null">`is_delete` </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides="," >
+            <if test="orderNo != null">#{orderNo},  </if>
+            <if test="ownerSubsidyAmt != null">#{ownerSubsidyAmt},  </if>
+            <if test="subsidyOwnerAmt != null">#{subsidyOwnerAmt},  </if>
+            <if test="ownerIncomeAmt != null">#{ownerIncomeAmt},  </if>
+            <if test="renterCost != null">#{renterCost},  </if>
+            <if test="renterSubsidyAmt != null">#{renterSubsidyAmt},  </if>
+            <if test="subsidyRenterAmt != null">#{subsidyRenterAmt},  </if>
+            <if test="platformSubsidyAmt != null">#{platformSubsidyAmt},  </if>
+            <if test="platformReceivableAmt != null">#{platformReceivableAmt},  </if>
+            <if test="platformReceivedAmt != null">#{platformReceivedAmt},  </if>
+            <if test="version != null">#{version},  </if>
+            <if test="status != null">#{status},  </if>
+            <if test="createTime != null">#{createTime},  </if>
+            <if test="createOp != null">#{createOp},  </if>
+            <if test="updateTime != null">#{updateTime},  </if>
+            <if test="updateOp != null">#{updateOp},  </if>
+            <if test="isDelete != null">#{isDelete} </if>
+        </trim>
 	</insert>
 
 	<update id="updateByPrimaryKeySelective" parameterType="com.atzuche.order.accountplatorm.entity.AccountPlatformProfitEntity">

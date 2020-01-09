@@ -15,7 +15,7 @@ public interface AccountDebtMapper{
 
     AccountDebtEntity selectByPrimaryKey(Integer id);
 
-    int insert(AccountDebtEntity record);
+    int insertSelective(AccountDebtEntity record);
     
 
     int updateByPrimaryKeySelective(AccountDebtEntity record);

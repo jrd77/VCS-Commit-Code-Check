@@ -33,7 +33,7 @@ public class AccountOwnerCostSettleNoTService {
         AccountOwnerCostSettleEntity accountOwnerCostSettle = new AccountOwnerCostSettleEntity();
         BeanUtils.copyProperties(accountOwnerCostSettleReqVO,accountOwnerCostSettle);
         accountOwnerCostSettle.setIsDelete(NumberUtils.INTEGER_ZERO);
-        int result = accountOwnerCostSettleMapper.insert(accountOwnerCostSettle);
+        int result = accountOwnerCostSettleMapper.insertSelective(accountOwnerCostSettle);
         if(result==0){
             throw new AccountOwnerCostSettleException();
         }
@@ -44,7 +44,7 @@ public class AccountOwnerCostSettleNoTService {
      * @param accountOwnerCostSettle
      */
     public void insertAccountOwnerCostSettle(AccountOwnerCostSettleEntity accountOwnerCostSettle) {
-        int result = accountOwnerCostSettleMapper.insert(accountOwnerCostSettle);
+        int result = accountOwnerCostSettleMapper.insertSelective(accountOwnerCostSettle);
         if(result==0){
             throw new AccountOwnerCostSettleException();
         }

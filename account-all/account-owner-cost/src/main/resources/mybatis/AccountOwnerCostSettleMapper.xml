@@ -56,53 +56,7 @@
 		select <include refid="Base_Column_List" /> from account_owner_cost_settle where id = #{value}
 	</select>
 
-	<insert id="insert" parameterType="com.atzuche.order.accountownercost.entity.AccountOwnerCostSettleEntity" useGeneratedKeys="true" keyProperty="id">
-		insert into account_owner_cost_settle
-		(
-				`mem_no`,		
-				`order_no`,		
-				`owner_order_no`,		
-				`subsidy_amt`,		
-				`purchase_amt`,		
-				`increment_amt`,		
-				`proxy_expense_amt`,		
-				`service_expense_amt`,		
-				`gps_amt`,		
-				`oil_amt`,		
-				`console_subsidy_amt`,		
-				`fine_amt`,		
-				`console_fine_amt`,		
-				`version`,		
-				`create_time`,		
-				`create_op`,		
-				`update_time`,		
-				`update_op`,		
-				`is_delete`		
-			)
-		values
-		(
-				#{memNo}, 		
-				#{orderNo}, 		
-				#{ownerOrderNo}, 		
-				#{subsidyAmt}, 		
-				#{purchaseAmt}, 		
-				#{incrementAmt}, 		
-				#{proxyExpenseAmt}, 		
-				#{serviceExpenseAmt}, 		
-				#{gpsAmt}, 		
-				#{oilAmt}, 		
-				#{consoleSubsidyAmt}, 		
-				#{fineAmt}, 		
-				#{consoleFineAmt}, 		
-				#{version}, 		
-				#{createTime}, 		
-				#{createOp}, 		
-				#{updateTime}, 		
-				#{updateOp}, 		
-				#{isDelete}		
-			)
-	</insert>
-	
+
 	<insert id="insertSelective" parameterType="com.atzuche.order.accountownercost.entity.AccountOwnerCostSettleEntity" useGeneratedKeys="true" keyProperty="id">
 		insert into account_owner_cost_settle
             <trim prefix="(" suffix=")" suffixOverrides="," >
