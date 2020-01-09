@@ -38,4 +38,15 @@ public class AccountOwnerCostSettleNoTService {
             throw new AccountOwnerCostSettleException();
         }
     }
+
+    /**
+     * 车主结算信息插入
+     * @param accountOwnerCostSettle
+     */
+    public void insertAccountOwnerCostSettle(AccountOwnerCostSettleEntity accountOwnerCostSettle) {
+        int result = accountOwnerCostSettleMapper.insert(accountOwnerCostSettle);
+        if(result==0){
+            throw new AccountOwnerCostSettleException();
+        }
+    }
 }
