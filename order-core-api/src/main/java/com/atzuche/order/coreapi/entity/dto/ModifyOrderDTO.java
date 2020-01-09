@@ -4,6 +4,7 @@ import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
 import com.atzuche.order.commons.entity.dto.RenterMemberDTO;
 import com.atzuche.order.parentorder.entity.OrderEntity;
 import com.atzuche.order.rentercost.entity.dto.RenterOrderSubsidyDetailDTO;
+import com.atzuche.order.renterorder.entity.OrderCouponEntity;
 import com.atzuche.order.renterorder.entity.dto.OrderChangeItemDTO;
 
 import lombok.Data;
@@ -127,4 +128,8 @@ public class ModifyOrderDTO {
 	 * 主订单信息
 	 */
 	private OrderEntity orderEntity;
+	/**
+	 * 已使用的券对象列表
+	 */
+	private List<OrderCouponEntity> orderCouponList;
 }
