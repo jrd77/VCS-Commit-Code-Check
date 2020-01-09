@@ -31,7 +31,7 @@ public class OrderRemarkService {
     @Autowired
     private OrderRemarkMapper orderRemarkMapper;
     @Autowired
-    private OrderRemarkLogMapper orderRemarkLogMapper;
+    OrderRemarkLogService orderRemarkLogService;
 
     /**
      * 获取备注总览
@@ -67,14 +67,15 @@ public class OrderRemarkService {
         orderRemarkEntity.setCreateOp(userName);
         orderRemarkEntity.setUpdateOp(userName);
         orderRemarkMapper.addOrderRemark(orderRemarkEntity);
-
         //保存操作日志
-        OrderRemarkLogEntity orderRemarkLogEntity = new OrderRemarkLogEntity();
-        BeanUtils.copyProperties(orderRemarkEntity, orderRemarkLogEntity);
-        orderRemarkLogEntity.setOperateType(OperateTypeEnum.ADD.getType());
-        orderRemarkLogMapper.addOrderRemarkLog(orderRemarkLogEntity);
+        orderRemarkLogService.addOrderRemarkLog(orderRemarkEntity, OperateTypeEnum.ADD.getType());
     }
 
+    /**
+     * 获取备注信息
+     * @param orderRemarkInformationRequestVO
+     * @return
+     */
     public OrderRemarkResponseVO getOrderRemarkInformation(OrderRemarkInformationRequestVO orderRemarkInformationRequestVO){
         OrderRemarkResponseVO orderRemarkResponseVO = new OrderRemarkResponseVO();
         OrderRemarkEntity orderRemarkEntity = orderRemarkMapper.getOrderRemarkInformation(orderRemarkInformationRequestVO);
@@ -83,29 +84,28 @@ public class OrderRemarkService {
     }
 
     /**
+     * 获取备注信息
+     * @param remarkId
+     * @return
+     */
+    public OrderRemarkEntity getOrderRemarkInformation(String remarkId){
+        OrderRemarkInformationRequestVO orderRemarkInformationRequestVO = new OrderRemarkInformationRequestVO();
+        orderRemarkInformationRequestVO.setRemarkId(remarkId);
+        OrderRemarkEntity orderRemarkEntity = orderRemarkMapper.getOrderRemarkInformation(orderRemarkInformationRequestVO);
+        return orderRemarkEntity;
+    }
+
+    /**
      * 修改订单备注
      * @param orderRemarkUpdateRequestVO
      */
     public void updateRemarkById(OrderRemarkUpdateRequestVO orderRemarkUpdateRequestVO){
-        OrderRemarkInformationRequestVO orderRemarkInformationRequestVO = new OrderRemarkInformationRequestVO();
-        orderRemarkInformationRequestVO.setRemarkId(orderRemarkUpdateRequestVO.getRemarkId());
-        OrderRemarkEntity oldOrderRemarkEntity = orderRemarkMapper.getOrderRemarkInformation(orderRemarkInformationRequestVO);
         OrderRemarkEntity orderRemarkEntity = new OrderRemarkEntity();
         BeanUtils.copyProperties(orderRemarkUpdateRequestVO,orderRemarkEntity);
         orderRemarkEntity.setUpdateOp(AdminUserUtil.getAdminUser().getAuthName());
         orderRemarkMapper.updateRemarkById(orderRemarkEntity);
         //保存操作日志
-        OrderRemarkLogEntity orderRemarkLogEntity = new OrderRemarkLogEntity();
-        BeanUtils.copyProperties(orderRemarkEntity, orderRemarkLogEntity);
-        orderRemarkLogEntity.setOperateType(OperateTypeEnum.UPDATE.getType());
-        orderRemarkLogEntity.setRemarkHistory(oldOrderRemarkEntity.getRemarkContent());
-        String userName = AdminUserUtil.getAdminUser().getAuthName();
-        orderRemarkLogEntity.setOrderNo(oldOrderRemarkEntity.getOrderNo());
-        orderRemarkLogEntity.setCreateOp(userName);
-        orderRemarkLogEntity.setUpdateOp(userName);
-        orderRemarkLogEntity.setNumber(oldOrderRemarkEntity.getNumber());
-        orderRemarkLogEntity.setDepartmentId(oldOrderRemarkEntity.getDepartmentId());
-        orderRemarkLogMapper.addOrderRemarkLog(orderRemarkLogEntity);
+        orderRemarkLogService.addOrderRemarkLog(orderRemarkEntity, OperateTypeEnum.UPDATE.getType());
     }
 
 
@@ -119,26 +119,8 @@ public class OrderRemarkService {
         orderRemarkEntity.setIsDelete(DELETE_FLAG);
         orderRemarkEntity.setUpdateOp(AdminUserUtil.getAdminUser().getAuthName());
         orderRemarkMapper.updateRemarkById(orderRemarkEntity);
-
         //保存操作日志
-        OrderRemarkInformationRequestVO orderRemarkInformationRequestVO = new OrderRemarkInformationRequestVO();
-        orderRemarkInformationRequestVO.setRemarkId(orderRemarkDeleteRequestVO.getRemarkId());
-        OrderRemarkEntity oldOrderRemarkEntity = orderRemarkMapper.getOrderRemarkInformation(orderRemarkInformationRequestVO);
-        OrderRemarkLogEntity orderRemarkLogEntity = new OrderRemarkLogEntity();
-        BeanUtils.copyProperties(orderRemarkEntity, orderRemarkLogEntity);
-        orderRemarkLogEntity.setOperateType(OperateTypeEnum.DELETE.getType());
-        String remarkContent = oldOrderRemarkEntity.getRemarkContent();
-        orderRemarkLogEntity.setRemarkHistory(remarkContent);
-        orderRemarkLogEntity.setRemarkContent(remarkContent);
-        String userName = AdminUserUtil.getAdminUser().getAuthName();
-        orderRemarkLogEntity.setCreateOp(userName);
-        orderRemarkLogEntity.setUpdateOp(userName);
-
-        orderRemarkLogEntity.setNumber(oldOrderRemarkEntity.getNumber());
-        orderRemarkLogEntity.setOrderNo(oldOrderRemarkEntity.getOrderNo());
-        orderRemarkLogMapper.addOrderRemarkLog(orderRemarkLogEntity);
-
-
+        orderRemarkLogService.addOrderRemarkLog(orderRemarkEntity, OperateTypeEnum.DELETE.getType());
     }
 
 
