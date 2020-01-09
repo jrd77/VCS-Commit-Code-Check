@@ -99,6 +99,7 @@ public class HandoverCarService {
      * @param photoType
      * @param key
      */
+    @Transactional(rollbackFor = Exception.class)
     public void findUpdateHandoverCarInfo(String orderNo, Integer userType, Integer photoType, String key) {
         RenterHandoverCarInfoEntity renterHandoverCarInfoEntity = null;
         OwnerHandoverCarInfoEntity ownerHandoverCarInfoEntity = null;

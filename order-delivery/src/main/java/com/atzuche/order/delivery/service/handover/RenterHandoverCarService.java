@@ -26,9 +26,6 @@ public class RenterHandoverCarService implements IUpdateHandoverCarInfo {
     @Resource
     RenterHandoverCarRemarkMapper renterHandoverCarRemarkMapper;
 
-    @Autowired
-    HandoverCarService handoverCarService;
-
     /**
      * 更新租客交接车里程油耗数据
      *
