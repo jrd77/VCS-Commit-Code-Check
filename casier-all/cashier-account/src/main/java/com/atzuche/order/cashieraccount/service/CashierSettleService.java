@@ -234,9 +234,43 @@ public class CashierSettleService {
         entity.setOrderNo(orderNo);
         entity.setOwnerOrderNo(ownerOrderNo);
         if(!CollectionUtils.isEmpty(accountOwnerCostSettleDetails)){
-            //车主补贴费用
-            int subsidyAmt =0;
-
+            //1车主端代管车服务费
+            int proxyExpenseAmt =accountOwnerCostSettleDetails.stream().filter(obj ->{return RenterCashCodeEnum.ACCOUNT_OWNER_PROXY_EXPENSE_COST.getCashNo().equals(obj.getSourceCode());})
+                    .mapToInt(AccountOwnerCostSettleDetailEntity::getAmt).sum();
+            //2车主端平台服务费
+            int serviceExpenseAmt =accountOwnerCostSettleDetails.stream().filter(obj ->{return RenterCashCodeEnum.ACCOUNT_OWNER_SERVICE_EXPENSE_COST.getCashNo().equals(obj.getSourceCode());})
+                    .mapToInt(AccountOwnerCostSettleDetailEntity::getAmt).sum();
+            //3获取车主补贴
+            int subsidyAmount =accountOwnerCostSettleDetails.stream().filter(obj ->{return RenterCashCodeEnum.ACCOUNT_OWNER_SUBSIDY_COST.getCashNo().equals(obj.getSourceCode());})
+                    .mapToInt(AccountOwnerCostSettleDetailEntity::getAmt).sum();
+            //4获取车主费用
+            int purchaseAmt =accountOwnerCostSettleDetails.stream().filter(obj ->{return RenterCashCodeEnum.ACCOUNT_OWNER_DEBT.getCashNo().equals(obj.getSourceCode());})
+                    .mapToInt(AccountOwnerCostSettleDetailEntity::getAmt).sum();
+            //5获取车主增值服务费用
+            int incrementAmt =accountOwnerCostSettleDetails.stream().filter(obj ->{return RenterCashCodeEnum.ACCOUNT_OWNER_INCREMENT_COST.getCashNo().equals(obj.getSourceCode());})
+                    .mapToInt(AccountOwnerCostSettleDetailEntity::getAmt).sum();
+            //6 获取gps服务费
+            int gpsAmt =accountOwnerCostSettleDetails.stream().filter(obj ->{return RenterCashCodeEnum.ACCOUNT_OWNER_GPS_COST.getCashNo().equals(obj.getSourceCode());})
+                    .mapToInt(AccountOwnerCostSettleDetailEntity::getAmt).sum();
+            //7 获取车主油费
+            int oilAmt =accountOwnerCostSettleDetails.stream().filter(obj ->{return RenterCashCodeEnum.ACCOUNT_OWNER_SETTLE_OIL_COST.getCashNo().equals(obj.getSourceCode());})
+                    .mapToInt(AccountOwnerCostSettleDetailEntity::getAmt).sum();
+            //8 管理后台补贴
+            int consoleSubsidyAmt =accountOwnerCostSettleDetails.stream().filter(obj ->{return RenterCashCodeEnum.ACCOUNT_CONSOLE_RENTER_SUBSIDY_COST.getCashNo().equals(obj.getSourceCode());})
+                    .mapToInt(AccountOwnerCostSettleDetailEntity::getAmt).sum();
+            //9 全局的车主订单罚金明细
+            int consoleFineAmt =accountOwnerCostSettleDetails.stream().filter(obj ->{return RenterCashCodeEnum.ACCOUNT_WHOLE_RENTER_FINE_COST.getCashNo().equals(obj.getSourceCode());})
+                    .mapToInt(AccountOwnerCostSettleDetailEntity::getAmt).sum();
+            entity.setProxyExpenseAmt(proxyExpenseAmt);
+            entity.setServiceExpenseAmt(serviceExpenseAmt);
+            entity.setSubsidyAmt(subsidyAmount);
+            entity.setPurchaseAmt(purchaseAmt);
+            entity.setIncrementAmt(incrementAmt);
+            entity.setGpsAmt(gpsAmt);
+            entity.setOilAmt(oilAmt);
+            entity.setConsoleSubsidyAmt(consoleSubsidyAmt);
+            entity.setConsoleFineAmt(consoleFineAmt);
+            accountOwnerCostSettleService.insertAccountOwnerCostSettle(entity);
         }
     }
 }

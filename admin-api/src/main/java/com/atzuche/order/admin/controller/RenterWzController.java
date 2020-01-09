@@ -40,7 +40,15 @@ public class RenterWzController extends BaseController {
         if (StringUtils.isBlank(orderNo)) {
             return ResponseData.createErrorCodeResponse(ErrorCode.ORDER_NO_PARAM_ERROR.getCode(), "订单编号为空");
         }
-        return ResponseData.success();
+        RenterWzDetailResVO res = null;
+        try {
+            res = renterWzService.queryWzDetailByOrderNo(orderNo);
+        } catch (Exception e) {
+            log.error("违章押金信息 异常", e);
+            Cat.logError("违章押金信息 异常", e);
+            return ResponseData.error();
+        }
+        return ResponseData.success(res);
     }
 
     @PostMapping("/console/update/wz/cost")

@@ -39,7 +39,7 @@ public class AccountInsertDebtReqVO {
     /**
      * 历史欠款来源编码
      */
-    private Integer sourceCode;
+    private String sourceCode;
     /**
      * 欠款历史来源描述
      */

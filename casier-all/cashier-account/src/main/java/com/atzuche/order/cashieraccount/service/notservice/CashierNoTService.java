@@ -112,17 +112,7 @@ public class CashierNoTService {
      * 收银台支付记录
      */
     public CashierEntity getCashierEntity(String orderNo,String memNo,String payKind){
-        CashierEntity cashierEntity = cashierMapper.getPayDeposit(orderNo,memNo,payKind,DataPayTypeConstant.PAY_PUR);
-//        if(Objects.isNull(cashierEntity)){
-//            cashierEntity = new CashierEntity();
-//            cashierEntity.setOrderNo(orderNo);
-//            cashierEntity.setMemNo(memNo);
-//            cashierEntity.setPayKind(payKind);
-//            cashierEntity.setPayType(DataPayTypeConstant.PAY_PUR);
-//            cashierEntity.setPaySn(NumberUtils.INTEGER_ONE);
-//            cashierEntity.setPayTitle("待支付订单号：" + orderNo);
-//            cashierMapper.insert(cashierEntity);
-//        }
+        CashierEntity cashierEntity = cashierMapper.getPayAmtByPayKind(orderNo,memNo,payKind);
         return cashierEntity;
     }
 
@@ -342,7 +332,8 @@ public class CashierNoTService {
      */
     public PayVo getPayVO(CashierEntity cashierEntity,OrderPaySignReqVO orderPaySign,int amt ,String title,String payKind) {
         PayVo vo = new PayVo();
-        vo.setInternalNo(String.valueOf(cashierEntity.getPaySn()));
+        int paySn = Objects.isNull(cashierEntity.getPaySn())?0:cashierEntity.getPaySn();
+        vo.setInternalNo(String.valueOf(paySn));
         vo.setExtendParams(GsonUtils.toJson(cashierEntity));
         vo.setAtappId(DataAppIdConstant.APPID_SHORTRENT);
         vo.setMemNo(orderPaySign.getMenNo());
@@ -351,9 +342,10 @@ public class CashierNoTService {
         vo.setReqOs(orderPaySign.getReqOs());
         vo.setPayAmt(String.valueOf(Math.abs(amt)));
         vo.setPayEnv(getPayEnv());
-        vo.setPayId(cashierEntity.getId().toString());
+        int id = Objects.isNull(cashierEntity.getId())?0:cashierEntity.getId();
+        vo.setPayId(String.valueOf(id));
         vo.setPayKind(payKind);
-        vo.setPaySn(String.valueOf(cashierEntity.getPaySn()+1));
+        vo.setPaySn(String.valueOf(paySn));
         vo.setPaySource(orderPaySign.getPaySource());
         vo.setPayTitle(title);
         vo.setPayType(orderPaySign.getPayType());

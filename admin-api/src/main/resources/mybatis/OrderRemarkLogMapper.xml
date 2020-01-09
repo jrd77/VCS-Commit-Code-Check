@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.atzuche.order.admin.mapper.OrderRemarkLogMapper">
+
+
+
+	<resultMap id="orderRemarkInformationMap" type="com.atzuche.order.admin.entity.OrderRemarkEntity" >
+		<result property="remarkType" column="remark_type"/>
+		<result property="remarkContent" column="remark"/>
+		<result property="departmentId" column="dept_id"/>
+		<result property="remarkId" column="id"/>
+		<result property="number" column="number"/>
+		<result property="updateOp" column="update_op"/>
+		<result property="createTime" column="create_time"/>
+		<result property="updateTime" column="update_time"/>
+	</resultMap>
+
+
+    <insert id="addOrderRemarkLog" parameterType="com.atzuche.order.admin.entity.OrderRemarkLogEntity">
+        insert into trans_remark_log
+		(
+			`order_no`,
+			`remark_id`,
+			`number`,
+			`remark_type`,
+			`remark`,
+			`limit_delayed`,
+			`follow_status`,
+			`follow_fail_reason`,
+			`create_time`,
+			`create_op`,
+			`operate_type`,
+			`update_time`,
+			`update_op`,
+			`dept_id`
+		)
+		values
+		(
+			#{orderNo},
+			#{remarkId},
+			#{number},
+			#{remarkType},
+			#{remarkContent},
+			#{limitDelayed},
+			#{followStatus},
+			#{followFailReason},
+			#{createTime},
+			#{createOp},
+			#{operateType},
+			#{updateTime},
+			#{updateOp},
+			#{departmentId}
+		)
+    </insert>
+
+
+
+
+
+
+  	
+</mapper>

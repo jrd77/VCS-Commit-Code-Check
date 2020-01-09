@@ -79,4 +79,17 @@ public enum WzCostEnums {
         }
         return "";
     }
+
+    public static Integer getType(String code) {
+        if(StringUtils.isBlank(code)){
+            return 0;
+        }
+        WzCostEnums[] values = WzCostEnums.values();
+        for (WzCostEnums value : values) {
+            if(code.equals(value.getCode())){
+                return value.getType();
+            }
+        }
+        return  0;
+    }
 }
