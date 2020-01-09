@@ -364,6 +364,7 @@ public class CashierNoTService {
         if(StringUtil.isBlank(m_env)){
             return "";
         }
+        log.info("getPayEnv m_env [{}]",m_env.toUpperCase());
         return PayPayEnvEnum.getFlagText(m_env.toUpperCase());
     }
 
