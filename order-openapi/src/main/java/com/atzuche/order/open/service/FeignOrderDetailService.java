@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 @FeignClient(name = "order-center-api")
-public interface OrderDetailService {
+public interface FeignOrderDetailService {
     /*
      * @Author ZhangBin
      * @Date 2020/1/8 21:06
@@ -18,4 +18,5 @@ public interface OrderDetailService {
      **/
     @RequestMapping(method = RequestMethod.POST, value = "/orderCenter/detail")
     ResponseData<OrderDetailRespDTO> getOrderDetail(@RequestBody OrderDetailReqDTO orderDetailReqDTO);
+
 }

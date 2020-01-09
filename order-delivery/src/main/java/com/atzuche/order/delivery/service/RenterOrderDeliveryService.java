@@ -1,16 +1,15 @@
 package com.atzuche.order.delivery.service;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.TreeSet;
-import java.util.stream.Collectors;
-
 import com.atzuche.order.delivery.entity.RenterOrderDeliveryEntity;
 import com.atzuche.order.delivery.mapper.RenterOrderDeliveryMapper;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -35,4 +34,14 @@ public class RenterOrderDeliveryService {
 	                    Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(RenterOrderDeliveryEntity::getType))), ArrayList::new));
 		return deliveryList;
 	}
+
+    /*
+     * @Author ZhangBin
+     * @Date 2020/1/9 11:48
+     * @Description: 通过租客子订单号查询配送订单
+     * 
+     **/
+	public List<RenterOrderDeliveryEntity> selectByRenterOrderNo(String renterOrderNo){
+        return renterOrderDeliveryMapper.selectByRenterOrderNo(renterOrderNo);
+    }
 }

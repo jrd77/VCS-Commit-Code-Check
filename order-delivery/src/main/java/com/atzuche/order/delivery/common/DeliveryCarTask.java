@@ -3,7 +3,7 @@ package com.atzuche.order.delivery.common;
 import com.atzuche.order.delivery.entity.RenterDeliveryAddrEntity;
 import com.atzuche.order.delivery.entity.RenterOrderDeliveryEntity;
 import com.atzuche.order.delivery.enums.DeliveryTypeEnum;
-import com.atzuche.order.delivery.enums.HandoverCarTypeEnum;
+import com.atzuche.order.delivery.enums.RenterHandoverCarTypeEnum;
 import com.atzuche.order.delivery.enums.ServiceTypeEnum;
 import com.atzuche.order.delivery.enums.UserTypeEnum;
 import com.atzuche.order.delivery.exception.DeliveryOrderException;
@@ -136,10 +136,10 @@ public class DeliveryCarTask {
         handoverCarInfoDTO.setRenterOrderNo(orderDeliveryEntity.getRenterOrderNo());
         if (getMinutes != null) {
             handoverCarInfoDTO.setAheadTime(getMinutes);
-            handoverCarInfoDTO.setType(HandoverCarTypeEnum.RENYUN_TO_RENTER.getValue().intValue());
+            handoverCarInfoDTO.setType(RenterHandoverCarTypeEnum.RENYUN_TO_RENTER.getValue().intValue());
         } else if (returnMinutes != null) {
             handoverCarInfoDTO.setDelayTime(returnMinutes);
-            handoverCarInfoDTO.setType(HandoverCarTypeEnum.RENTER_TO_RENYUN.getValue().intValue());
+            handoverCarInfoDTO.setType(RenterHandoverCarTypeEnum.RENTER_TO_RENYUN.getValue().intValue());
         }
         handoverCarVO.setHandoverCarInfoDTO(handoverCarInfoDTO);
         handoverCarService.addHandoverCarInfo(handoverCarVO, userType);

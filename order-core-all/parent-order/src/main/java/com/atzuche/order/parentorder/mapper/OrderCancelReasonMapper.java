@@ -1,7 +1,7 @@
 package com.atzuche.order.parentorder.mapper;
-
 import com.atzuche.order.parentorder.entity.OrderCancelReasonEntity;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * 订单取消原因
@@ -21,5 +21,9 @@ public interface OrderCancelReasonMapper{
     int updateByPrimaryKey(OrderCancelReasonEntity record);
     
     int updateByPrimaryKeySelective(OrderCancelReasonEntity record);
+
+    OrderCancelReasonEntity selectByOrderNo(@Param("orderNo")String orderNo);
+
+
 
 }
