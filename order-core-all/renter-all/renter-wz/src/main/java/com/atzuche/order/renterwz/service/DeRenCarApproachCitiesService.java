@@ -21,4 +21,8 @@ public class DeRenCarApproachCitiesService {
     public void save(DerenCarApproachCitysEntity deRenCarApproachCities) {
         derenCarApproachCitysMapper.saveDerenCarApproachCitys(deRenCarApproachCities);
     }
+
+    public String queryCitiesByOrderNoAndCarNum(String orderNo, String plateNum) {
+        return derenCarApproachCitysMapper.queryCitiesByOrderNoAndCarNum(orderNo,plateNum);
+    }
 }
