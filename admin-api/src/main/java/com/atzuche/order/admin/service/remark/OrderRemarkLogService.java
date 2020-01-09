@@ -1,7 +1,6 @@
 package com.atzuche.order.admin.service.remark;
 
 import com.atzuche.order.admin.common.AdminUserUtil;
-import com.atzuche.order.admin.common.PageBean;
 import com.atzuche.order.admin.dto.OrderRemarkLogListRequestDTO;
 import com.atzuche.order.admin.entity.OrderRemarkEntity;
 import com.atzuche.order.admin.entity.OrderRemarkLogEntity;
@@ -9,14 +8,9 @@ import com.atzuche.order.admin.enums.DepartmentEnum;
 import com.atzuche.order.admin.enums.OperateTypeEnum;
 import com.atzuche.order.admin.enums.RemarkTypeEnum;
 import com.atzuche.order.admin.mapper.OrderRemarkLogMapper;
-import com.atzuche.order.admin.mapper.OrderRemarkMapper;
-import com.atzuche.order.admin.vo.req.remark.OrderRemarkInformationRequestVO;
-import com.atzuche.order.admin.vo.req.remark.OrderRemarkListRequestVO;
 import com.atzuche.order.admin.vo.req.remark.OrderRemarkLogListRequestVO;
-import com.atzuche.order.admin.vo.resp.remark.OrderRemarkListResponseVO;
 import com.atzuche.order.admin.vo.resp.remark.OrderRemarkLogListResponseVO;
 import com.atzuche.order.admin.vo.resp.remark.OrderRemarkLogPageListResponseVO;
-import com.atzuche.order.admin.vo.resp.remark.OrderRemarkPageListResponseVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -37,6 +31,8 @@ public class OrderRemarkLogService {
     private OrderRemarkService orderRemarkService;
     @Autowired
     private OrderRemarkLogMapper orderRemarkLogMapper;
+
+    public static final String DEFAULT_PAGENUMBER = "1";
 
 
     /**
@@ -73,7 +69,11 @@ public class OrderRemarkLogService {
         OrderRemarkLogPageListResponseVO orderRemarkLogPageListResponseVO = new OrderRemarkLogPageListResponseVO();
         List<OrderRemarkLogListResponseVO> orderRemarkPageList = new ArrayList<>();
         long count = orderRemarkLogMapper.selectRemarkLogListCount(orderRemarkLogListRequestVO);
-        OrderRemarkLogListRequestDTO orderRemarkLogListRequestDTO = new OrderRemarkLogListRequestDTO(count);
+        String pageNumber = orderRemarkLogListRequestVO.getPageNumber();
+        if(null == pageNumber){
+            pageNumber = DEFAULT_PAGENUMBER;
+        }
+        OrderRemarkLogListRequestDTO orderRemarkLogListRequestDTO = new OrderRemarkLogListRequestDTO(Long.parseLong(pageNumber), count);
         BeanUtils.copyProperties(orderRemarkLogListRequestVO, orderRemarkLogListRequestDTO);
         List<OrderRemarkLogEntity> remarkList = orderRemarkLogMapper.selectRemarkLogList(orderRemarkLogListRequestDTO);
         if(!CollectionUtils.isEmpty(remarkList)) {
@@ -81,7 +81,7 @@ public class OrderRemarkLogService {
                 OrderRemarkLogListResponseVO orderRemarkLogListResponseVO = new OrderRemarkLogListResponseVO();
                 orderRemarkLogListResponseVO.setNumber(remarkLogEntity.getNumber());
                 orderRemarkLogListResponseVO.setRemarkType(RemarkTypeEnum.getDescriptionByType(remarkLogEntity.getRemarkType()));
-                orderRemarkLogListResponseVO.setOperateType(OperateTypeEnum.getDescriptionByType(remarkLogEntity.getOperateType()));
+                orderRemarkLogListResponseVO.setOperateTypeText(OperateTypeEnum.getDescriptionByType(remarkLogEntity.getOperateType()));
                 orderRemarkLogListResponseVO.setOperatorName(remarkLogEntity.getCreateOp());
                 orderRemarkLogListResponseVO.setOperateTime(remarkLogEntity.getCreateTime());
                 orderRemarkLogListResponseVO.setOldRemarkContent(remarkLogEntity.getRemarkHistory());

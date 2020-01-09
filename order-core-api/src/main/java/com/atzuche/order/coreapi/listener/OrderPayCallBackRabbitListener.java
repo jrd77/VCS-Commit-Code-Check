@@ -1,10 +1,11 @@
-package com.atzuche.order.cashieraccount.config;
+package com.atzuche.order.coreapi.listener;
 
 import com.atzuche.order.cashieraccount.common.FasterJsonUtil;
 import com.atzuche.order.cashieraccount.service.CashierPayService;
 import com.atzuche.order.commons.CatConstants;
 import com.atzuche.order.commons.enums.RabbitBusinessTypeEnum;
 import com.atzuche.order.commons.service.RabbitMsgLogService;
+import com.atzuche.order.coreapi.service.PayCallbackService;
 import com.autoyol.autopay.gateway.util.MD5;
 import com.autoyol.autopay.gateway.vo.req.BatchNotifyDataVo;
 import com.autoyol.commons.utils.GsonUtils;
@@ -29,6 +30,7 @@ import org.springframework.context.annotation.Configuration;
 public class OrderPayCallBackRabbitListener {
     @Autowired RabbitMsgLogService rabbitMsgLogService;
     @Autowired CashierPayService cashierPayService;
+    @Autowired PayCallbackService payCallbackService;
 
     /**
      * 支付系统回调
@@ -49,7 +51,7 @@ public class OrderPayCallBackRabbitListener {
             String reqContent = FasterJsonUtil.toJson(batchNotifyDataVo);
             String md5 =  MD5.MD5Encode(reqContent);
             rabbitMsgLogService.insertRabbitMsgLog(message, RabbitBusinessTypeEnum.ORDER_PAY_CALL_BACK,orderPayAsynStr,md5);
-            cashierPayService.payCallBackAsyn(batchNotifyDataVo);
+            cashierPayService.payCallBack(batchNotifyDataVo,payCallbackService);
             t.setStatus(Transaction.SUCCESS);
         } catch (Exception e) {
             log.error("OrderPayCallBack payCallBack,e={},message={}",e,message);

@@ -1,19 +1,18 @@
 package com.atzuche.order.cashieraccount.service;
 
 import com.atzuche.order.accountownercost.entity.AccountOwnerCostSettleDetailEntity;
-import com.atzuche.order.accountownercost.service.AccountOwnerCostSettleService;
 import com.atzuche.order.accountownercost.service.notservice.AccountOwnerCostSettleDetailNoTService;
 import com.atzuche.order.accountrenterdeposit.vo.res.AccountRenterDepositResVO;
 import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostSettleDetailEntity;
 import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostSettleEntity;
 import com.atzuche.order.accountrenterrentcost.service.notservice.AccountRenterCostSettleDetailNoTService;
 import com.atzuche.order.accountrenterrentcost.service.notservice.AccountRenterCostSettleNoTService;
-import com.atzuche.order.accountrenterrentcost.vo.req.AccountRenterCostChangeReqVO;
 import com.atzuche.order.accountrenterwzdepost.vo.res.AccountRenterWZDepositResVO;
 import com.atzuche.order.commons.enums.OrderPayStatusEnum;
 import com.atzuche.order.commons.enums.OrderStatusEnum;
 import com.atzuche.order.commons.enums.RenterCashCodeEnum;
 import com.atzuche.order.commons.enums.cashier.TransStatusEnum;
+import com.atzuche.order.commons.service.OrderPayCallBack;
 import com.atzuche.order.parentorder.dto.OrderStatusDTO;
 import com.atzuche.order.parentorder.entity.OrderStatusEntity;
 import com.atzuche.order.parentorder.service.OrderStatusService;
@@ -442,13 +441,13 @@ public class CashierService {
      * @param lstNotifyDataVo
      */
     @Transactional(rollbackFor=Exception.class)
-    public void callBackSuccess(List<NotifyDataVo> lstNotifyDataVo) {
+    public void callBackSuccess(List<NotifyDataVo> lstNotifyDataVo, OrderPayCallBack callBack) {
         if(!CollectionUtils.isEmpty(lstNotifyDataVo)){
             for(int i=0;i<lstNotifyDataVo.size();i++){
                 NotifyDataVo notifyDataVo = lstNotifyDataVo.get(i);
                 //2支付成功回调
                 if(DataPayTypeConstant.PAY_PUR.equals(notifyDataVo.getPayType()) || DataPayTypeConstant.PAY_PRE.equals(notifyDataVo.getPayType())){
-                    payOrderCallBackSuccess(notifyDataVo);
+                    payOrderCallBackSuccess(notifyDataVo,callBack);
                 }
             }
         }
@@ -473,7 +472,7 @@ public class CashierService {
      * 支付成功回调 更新收银台及费用
      * @param notifyDataVo
      */
-    public void payOrderCallBackSuccess(NotifyDataVo notifyDataVo) {
+    public void payOrderCallBackSuccess(NotifyDataVo notifyDataVo,OrderPayCallBack callBack) {
         log.info("payOrderCallBackSuccess param :[{}]", GsonUtils.toJson(notifyDataVo));
         //没有成功的 不处理
         if(Objects.isNull(notifyDataVo) || !TransStatusEnum.PAY_SUCCESS.getCode().equals(notifyDataVo.getTransStatus())){
@@ -481,6 +480,8 @@ public class CashierService {
             return;
         }
         OrderStatusDTO orderStatusDTO = new OrderStatusDTO();
+        orderStatusDTO.setOrderNo(notifyDataVo.getOrderNo());
+
         //1.1 租车押金 01
         if(Objects.nonNull(notifyDataVo) && DataPayKindConstant.RENT.equals(notifyDataVo.getPayKind())){
             //1 对象初始化转换
@@ -504,6 +505,7 @@ public class CashierService {
             //2 收银台记录更新
             cashierNoTService.updataCashierAndRenterCost(notifyDataVo,accountRenterCostReq);
             orderStatusDTO.setRentCarPayStatus(OrderPayStatusEnum.PAYED.getStatus());
+            callBack.callBack(notifyDataVo.getOrderNo());
         }
         //1.4 补付租车费用
         if(Objects.nonNull(notifyDataVo) && DataPayKindConstant.RENT_INCREMENT.equals(notifyDataVo.getPayKind()) ){
@@ -512,8 +514,8 @@ public class CashierService {
             //2 收银台记录更新
             cashierNoTService.updataCashierAndRenterCost(notifyDataVo,accountRenterCostReq);
             orderStatusDTO.setRentCarPayStatus(OrderPayStatusEnum.PAYED.getStatus());
+            callBack.callBack(notifyDataVo.getOrderNo());
         }
-        orderStatusDTO.setOrderNo(notifyDataVo.getOrderNo());
 
         //支付成功更新 订单支付状态
         if(Objects.nonNull(orderStatusDTO)){
