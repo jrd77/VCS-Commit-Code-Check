@@ -293,5 +293,14 @@
 		update renter_order set child_status = #{childStatus}
 		where id = #{id}
 	</update>
-	
+    <select id="getChangeRenterOrderByOrderNo" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List" /> from renter_order where order_no = #{orderNo}
+        AND is_effective = 0
+        AND is_cancle = 0
+        AND is_delete = 0
+        AND child_status = 3
+        ORDER BY id DESC
+        LIMIT 1
+    </select>
+
 </mapper>

@@ -28,7 +28,7 @@ dependencies {
 
     compile project(":order-core-all:renter-all:renter-order")
     compile project(":order-core-all:parent-order")
-    compile project(":order-wallet:order-wallet-server")
+    compile project(":order-wallet:order-wallet-client")
 
 
     compile 'com.autoyol:autoPayGatewaySecondary-api:1.0.7-SNAPSHOT'

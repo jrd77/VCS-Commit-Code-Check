@@ -211,5 +211,14 @@
 		update owner_order set child_status = #{childStatus}
 		where id = #{id}
 	</update>
+    <select id="getChangeOwnerByOrderNo" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List" /> from owner_order where order_no = #{orderNo}
+        and is_effective = 0
+        and is_cancel = 0
+        and is_delete = 0
+        and child_status = 3
+        order by id desc
+        limit 1
+    </select>
 
 </mapper>

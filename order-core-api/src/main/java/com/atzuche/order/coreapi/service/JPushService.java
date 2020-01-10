@@ -1,6 +1,6 @@
 package com.atzuche.order.coreapi.service;
 
-import com.atzuche.order.commons.service.ShortUrlService;
+import com.atzuche.order.renterwz.service.ShortUrlService;
 import com.atzuche.order.parentorder.entity.OrderEntity;
 import com.atzuche.order.parentorder.service.OrderService;
 import com.atzuche.order.renterwz.dto.RenterWzPushMessageBody;
@@ -11,7 +11,6 @@ import com.atzuche.order.renterwz.service.WzQueryDayConfService;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
