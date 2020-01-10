@@ -47,7 +47,8 @@ public class MemberService {
                 MemberSelectKeyEnum.MEMBER_BASE_INFO.getKey(),
                 MemberSelectKeyEnum.MEMBER_ROLE_INFO.getKey(),
                 MemberSelectKeyEnum.MEMBER_ADDITION_INFO.getKey(),
-                MemberSelectKeyEnum.MEMBER_STATISTICS_INFO.getKey());
+                MemberSelectKeyEnum.MEMBER_STATISTICS_INFO.getKey(),
+                MemberSelectKeyEnum.MEMBER_RELIEF_INFO.getKey());
         ResponseData<MemberTotalInfo> responseData = null;
         log.info("Feign 开始获取车主会员信息,memNo={}",memNo);
         Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "会员详情服务");
@@ -176,7 +177,8 @@ public class MemberService {
                 MemberSelectKeyEnum.MEMBER_BASE_INFO.getKey(),
                 MemberSelectKeyEnum.MEMBER_ROLE_INFO.getKey(),
                 MemberSelectKeyEnum.MEMBER_ADDITION_INFO.getKey(),
-                MemberSelectKeyEnum.MEMBER_STATISTICS_INFO.getKey());
+                MemberSelectKeyEnum.MEMBER_STATISTICS_INFO.getKey(),
+                MemberSelectKeyEnum.MEMBER_RELIEF_INFO.getKey());
         ResponseData<MemberTotalInfo> responseData = null;
         log.info("Feign 开始获取租客会员信息,memNo={}",memNo);
         Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "会员详情服务");
