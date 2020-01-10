@@ -26,7 +26,7 @@ public class OrderStatusController {
 
 	@AutoDocMethod(description = "订单状态流转列表", value = "订单状态流转列表", response = OrderStatusListResponseVO.class)
 	@GetMapping("status/list")
-	public ResponseData statusList(@RequestBody OrderStatusRequestVO orderStatusRequestVO, BindingResult bindingResult) {
+	public ResponseData statusList(OrderStatusRequestVO orderStatusRequestVO, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), ErrorCode.INPUT_ERROR.getText());
         }

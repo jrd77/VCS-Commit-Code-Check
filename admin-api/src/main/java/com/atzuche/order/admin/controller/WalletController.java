@@ -24,7 +24,7 @@ public class WalletController {
 
 	@AutoDocMethod(description = "获取钱包余额", value = "获取钱包余额", response = WalletResponseVO.class)
 	@GetMapping("wallet/balance")
-	public ResponseData walletBalance(@RequestBody WalletRequestVO walletRequestVO, BindingResult bindingResult) {
+	public ResponseData walletBalance(WalletRequestVO walletRequestVO, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), ErrorCode.INPUT_ERROR.getText());
         }
