@@ -35,9 +35,8 @@ public class AutoCoinCostCalService {
             return null;
         }
 
-        int pointValue = crmCustPoint.getPointValue();
         //会员凹凸币金额(1:100),默认全部抵扣
-        int pointValueDeducExchange = pointValue / 100;
+        int pointValueDeducExchange = crmCustPoint.getPointValue();
         //原始租金的5%
         int rentAmtFivePercent = originalRentAmt * OrderConstant.AUTO_COIN_DEDUCT_RATIO / 100;
         if (rentAmtFivePercent <= pointValueDeducExchange) {

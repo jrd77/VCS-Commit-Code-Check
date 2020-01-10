@@ -249,15 +249,18 @@ public class SubmitOrderService {
                 buildOwnerCouponBindReqVO(orderNo, renterOrderResVO.getCouponAndAutoCoinResVO(), reqContext);
         boolean bindOwnerCouponResult = couponAndCoinHandleService.bindOwnerCoupon(ownerCouponBindReqVO);
         LOGGER.info("Bind owner coupon result is:[{}]", bindOwnerCouponResult);
-        boolean bindPlatformCouponResult = couponAndCoinHandleService.bindCoupon(orderNo,
+
+       /* boolean bindPlatformCouponResult = couponAndCoinHandleService.bindCoupon(orderNo,
                 orderReqVO.getDisCouponIds(), 1,
                 renterOrderResVO.getCouponAndAutoCoinResVO().getIsUsePlatformCoupon());
         LOGGER.info("Bind platf coupon result is:[{}]", bindPlatformCouponResult);
         boolean bindGetCarFeeCouponResult = couponAndCoinHandleService.bindCoupon(orderNo,
                 orderReqVO.getGetCarFreeCouponId(), 2,
                 renterOrderResVO.getCouponAndAutoCoinResVO().getIsUseGetCarFeeCoupon());
-        LOGGER.info("Bind getCarFee coupon result is:[{}]", bindGetCarFeeCouponResult);
-        AutoCoinDeductReqVO autoCoinDeductReqVO = buildAutoCoinDeductReqVO(orderNo, renterOrderResVO.getCouponAndAutoCoinResVO(), reqContext);
+        LOGGER.info("Bind getCarFee coupon result is:[{}]", bindGetCarFeeCouponResult);*/
+
+        AutoCoinDeductReqVO autoCoinDeductReqVO = buildAutoCoinDeductReqVO(orderNo,
+                renterOrderNo,renterOrderResVO.getCouponAndAutoCoinResVO().getChargeAutoCoin(), reqContext);
         boolean deductionAotuCoinResult = couponAndCoinHandleService.deductionAotuCoin(autoCoinDeductReqVO);
         LOGGER.info("Deduct autoCoin result is:[{}]", deductionAotuCoinResult);
 
@@ -589,12 +592,13 @@ public class SubmitOrderService {
     }
 
 
-    private AutoCoinDeductReqVO buildAutoCoinDeductReqVO(String orderNo, CouponAndAutoCoinResVO couponAndAutoCoinResVO, OrderReqContext reqContext) {
+    private AutoCoinDeductReqVO buildAutoCoinDeductReqVO(String orderNo, String renterOrderNo, Integer chargeAutoCoin,
+                                                         OrderReqContext reqContext) {
         AutoCoinDeductReqVO autoCoinDeductReqVO = new AutoCoinDeductReqVO();
         autoCoinDeductReqVO.setOrderNo(orderNo);
-        autoCoinDeductReqVO.setMemNo(Integer.valueOf(reqContext.getOrderReqVO().getMemNo()));
-        autoCoinDeductReqVO.setChargeAutoCoin(null == couponAndAutoCoinResVO.getChargeAutoCoin() ? 0 :
-                -couponAndAutoCoinResVO.getChargeAutoCoin() * 100);
+        autoCoinDeductReqVO.setRenterOrderNo(renterOrderNo);
+        autoCoinDeductReqVO.setMemNo(reqContext.getOrderReqVO().getMemNo());
+        autoCoinDeductReqVO.setChargeAutoCoin(null == chargeAutoCoin ? 0 : chargeAutoCoin);
         autoCoinDeductReqVO.setOrderType("2");
         autoCoinDeductReqVO.setUseAutoCoin(reqContext.getOrderReqVO().getUseAutoCoin());
         autoCoinDeductReqVO.setRemark("租车消费");
