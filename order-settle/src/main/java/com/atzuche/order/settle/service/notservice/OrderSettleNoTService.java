@@ -251,7 +251,6 @@ public class OrderSettleNoTService {
         HandoverCarRepVO handoverCarRep = handoverCarService.getRenterHandover(handoverCarReq);
         // 1.2 油费、超里程费用 订单商品需要的参数
         RenterGoodsDetailDTO renterGoodsDetail = renterGoodsService.getRenterGoodsDetail(settleOrders.getRenterOrderNo(),Boolean.TRUE);
-        settleOrders.setRenterMemNo(renterGoodsDetail.getOwnerMemNo());
 
         //1 查询租车费用
         List<RenterOrderCostDetailEntity> renterOrderCostDetails = renterOrderCostDetailService.listRenterOrderCostDetail(settleOrders.getOrderNo(),settleOrders.getRenterOrderNo());
@@ -312,8 +311,7 @@ public class OrderSettleNoTService {
         handoverCarReq.setOwnerOrderNo(settleOrders.getOwnerOrderNo());
         HandoverCarRepVO handoverCarRep = handoverCarService.getRenterHandover(handoverCarReq);
         // 1.2 油费、超里程费用 订单商品需要的参数
-        OwnerGoodsDetailDTO ownerGoodsDetail = ownerGoodsService.getOwnerGoodsDetail(settleOrders.getOwnerMemNo(),Boolean.TRUE);
-        settleOrders.setRenterMemNo(ownerGoodsDetail.getMemNo());
+        OwnerGoodsDetailDTO ownerGoodsDetail = ownerGoodsService.getOwnerGoodsDetail(settleOrders.getOwnerOrderNo(),Boolean.TRUE);
 
         //1 车主端代管车服务费
         CostBaseDTO costBaseDTO= getCostBaseOwner(settleOrders.getOwnerOrder());
