@@ -141,9 +141,8 @@ public class ModifyOrderService {
 		// TODO 风控校验
 		
 		// TODO 库存校验
-		
 		// 获取主订单信息
-		OrderEntity orderEntity = orderService.getOrderEntity(modifyOrderDTO.getOrderNo());
+		OrderEntity orderEntity = orderService.getOrderByOrderNoAndMemNo(orderNo, modifyOrderReq.getMemNo());
 		// 设置主订单信息
 		modifyOrderDTO.setOrderEntity(orderEntity);
 		// 设置城市编号

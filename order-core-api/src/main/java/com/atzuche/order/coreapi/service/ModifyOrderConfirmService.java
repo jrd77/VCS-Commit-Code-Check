@@ -13,8 +13,10 @@ import com.atzuche.order.commons.enums.OrderChangeItemEnum;
 import com.atzuche.order.commons.enums.RenterCashCodeEnum;
 import com.atzuche.order.commons.enums.SrvGetReturnEnum;
 import com.atzuche.order.commons.vo.req.OrderReqVO;
+import com.atzuche.order.coreapi.entity.dto.ModifyConfirmDTO;
 import com.atzuche.order.coreapi.entity.dto.ModifyOrderDTO;
 import com.atzuche.order.coreapi.entity.dto.ModifyOrderOwnerDTO;
+import com.atzuche.order.coreapi.entity.request.ModifyApplyHandleReq;
 import com.atzuche.order.coreapi.modifyorder.exception.ModifyOrderParameterException;
 import com.atzuche.order.delivery.entity.RenterOrderDeliveryEntity;
 import com.atzuche.order.delivery.service.RenterOrderDeliveryService;
@@ -135,6 +137,12 @@ public class ModifyOrderConfirmService {
 		}
 		reqContext.setOrderReqVO(req);
 		return reqContext;
+	}
+	
+	
+	public ResponseData<?> modifyConfirm(ModifyApplyHandleReq modifyApplyHandleReq) {
+		ModifyConfirmDTO modifyConfirmDTO = null;
+		return null;
 	}
 	
 	
