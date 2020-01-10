@@ -18,5 +18,5 @@ dependencies {
     compile project(":order-coin")
 
 
-    compile('com.autoyol.coupon:coupon-api:2019121301-SNAPSHOT')
+    compile('com.autoyol.coupon:coupon-api:20200110-SNAPSHOT')
 }
