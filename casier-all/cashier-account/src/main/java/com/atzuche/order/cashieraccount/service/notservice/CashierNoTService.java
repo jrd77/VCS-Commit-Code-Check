@@ -209,7 +209,7 @@ public class CashierNoTService {
      * 更新收银台租车押金已支付
      * @param notifyDataVo
      */
-    public void updataCashier(NotifyDataVo notifyDataVo) {
+    public Boolean updataCashier(NotifyDataVo notifyDataVo) {
         CashierEntity cashierEntity = cashierMapper.selectCashierEntity(notifyDataVo.getPayMd5());
         int result =0;
          if(Objects.nonNull(cashierEntity) && Objects.nonNull(cashierEntity.getId())){
@@ -227,6 +227,10 @@ public class CashierNoTService {
              amtStr = Objects.isNull(amtStr)?"0":amtStr;
              cashier.setPayAmt(Integer.valueOf(amtStr));
              result = cashierMapper.updateByPrimaryKeySelective(cashier);
+             if(result == 0){
+                 throw new OrderPayCallBackAsnyException();
+             }
+             return false;
          }else {
              CashierEntity cashier = new CashierEntity();
              BeanUtils.copyProperties(notifyDataVo,cashier);
@@ -239,10 +243,12 @@ public class CashierNoTService {
              amtStr = Objects.isNull(amtStr)?"0":amtStr;
              cashier.setPayAmt(Integer.valueOf(amtStr));
              result = cashierMapper.insertSelective(cashier);
+             if(result == 0){
+                 throw new OrderPayCallBackAsnyException();
+             }
+             return true;
          }
-         if(result == 0){
-            throw new OrderPayCallBackAsnyException();
-         }
+
     }
 
     private String getPayTitle(String orderNo ,String payKind){
@@ -359,9 +365,12 @@ public class CashierNoTService {
      */
     public void updataCashierAndRenterDeposit(NotifyDataVo notifyDataVo, PayedOrderRenterDepositReqVO payedOrderRenterDeposit) {
         //1更新收银台
-        updataCashier(notifyDataVo);
-        //2 租车押金 更新数据
-        accountRenterDepositService.updateRenterDeposit(payedOrderRenterDeposit);
+        boolean bool = updataCashier(notifyDataVo);
+        if(bool){
+            //2 租车押金 更新数据
+            accountRenterDepositService.updateRenterDeposit(payedOrderRenterDeposit);
+        }
+
 
     }
     /**
@@ -371,9 +380,12 @@ public class CashierNoTService {
      */
     public void updataCashierAndRenterWzDeposit(NotifyDataVo notifyDataVo, PayedOrderRenterWZDepositReqVO payedOrderRenterWZDeposit) {
         //1更新收银台
-        updataCashier(notifyDataVo);
-        //2 违章押金 更新数据
-        accountRenterWzDepositService.updateRenterWZDeposit(payedOrderRenterWZDeposit);
+        boolean bool = updataCashier(notifyDataVo);
+        if(bool){
+            //2 违章押金 更新数据
+            accountRenterWzDepositService.updateRenterWZDeposit(payedOrderRenterWZDeposit);
+        }
+
     }
 
     /**
@@ -383,9 +395,12 @@ public class CashierNoTService {
      */
     public void updataCashierAndRenterCost(NotifyDataVo notifyDataVo,AccountRenterCostReqVO accountRenterCostReq) {
         //1更新收银台
-        updataCashier(notifyDataVo);
-        //2  实收租车费用落库 更新数据
-        accountRenterCostSettleService.insertRenterCostDetail(accountRenterCostReq);
+        boolean bool = updataCashier(notifyDataVo);
+        if(bool){
+            //2  实收租车费用落库 更新数据
+            accountRenterCostSettleService.insertRenterCostDetail(accountRenterCostReq);
+        }
+
     }
 
     /**

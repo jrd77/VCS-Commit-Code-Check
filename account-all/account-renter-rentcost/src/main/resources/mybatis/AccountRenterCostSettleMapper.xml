@@ -122,7 +122,7 @@
 				<if test="updateOp != null">`update_op` = #{updateOp}, </if>
 				<if test="isDelete != null">`is_delete` = #{isDelete}</if>
 			</set>
-		where id = #{id} and version = #{version},
+		where id = #{id} and version = #{version}
 	</update>
 	
 
