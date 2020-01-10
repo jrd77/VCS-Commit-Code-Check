@@ -72,6 +72,10 @@ public class RenterMemberDTO {
      * 会员权益
      */
     private List<RenterMemberRightDTO> renterMemberRightDTOList;
+    /**
+     * 常用驾驶人列表
+     */
+    private List<CommUseDriverInfoDTO> commUseDriverList;
 
     /**
      * 是否是新用户:0，否;1，是，定义没有已结算订单的用户为新用户
