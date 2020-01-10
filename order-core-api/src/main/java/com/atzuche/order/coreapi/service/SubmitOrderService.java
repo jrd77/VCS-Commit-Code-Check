@@ -584,7 +584,7 @@ public class SubmitOrderService {
         OwnerCouponBindReqVO ownerCouponBindReqVO = new OwnerCouponBindReqVO();
         ownerCouponBindReqVO.setCarNo(Integer.valueOf(reqContext.getOrderReqVO().getCarNo()));
         ownerCouponBindReqVO.setCouponNo(reqContext.getOrderReqVO().getCarOwnerCouponNo());
-        ownerCouponBindReqVO.setRentAmt(couponAndAutoCoinResVO.getRentAmt());
+        ownerCouponBindReqVO.setRentAmt(Math.abs(couponAndAutoCoinResVO.getRentAmt()));
         ownerCouponBindReqVO.setRenterFirstName(reqContext.getRenterMemberDto().getFirstName());
         ownerCouponBindReqVO.setRenterName(reqContext.getRenterMemberDto().getRealName());
         ownerCouponBindReqVO.setRenterSex(null == reqContext.getRenterMemberDto().getGender() ? "" :
