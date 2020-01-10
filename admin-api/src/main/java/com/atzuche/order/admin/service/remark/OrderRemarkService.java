@@ -3,9 +3,7 @@ package com.atzuche.order.admin.service.remark;
 import com.atzuche.order.admin.common.AdminUserUtil;
 import com.atzuche.order.admin.entity.OrderRemarkEntity;
 import com.atzuche.order.admin.entity.OrderRemarkOverviewEntity;
-import com.atzuche.order.admin.enums.DepartmentEnum;
-import com.atzuche.order.admin.enums.OperateTypeEnum;
-import com.atzuche.order.admin.enums.RemarkTypeEnum;
+import com.atzuche.order.admin.enums.*;
 import com.atzuche.order.admin.mapper.OrderRemarkMapper;
 import com.atzuche.order.admin.vo.req.remark.*;
 import com.atzuche.order.admin.vo.resp.remark.*;
@@ -129,7 +127,7 @@ public class OrderRemarkService {
     public void deleteRemarkById( OrderRemarkDeleteRequestVO orderRemarkDeleteRequestVO){
         OrderRemarkEntity orderRemarkEntity = new OrderRemarkEntity();
         BeanUtils.copyProperties(orderRemarkDeleteRequestVO,orderRemarkEntity);
-        orderRemarkEntity.setIsDelete(DELETE_FLAG);
+        orderRemarkEntity.setIsDelete(YesNoEnum.YES.getType());
         orderRemarkEntity.setUpdateOp(AdminUserUtil.getAdminUser().getAuthName());
         orderRemarkMapper.updateRemarkById(orderRemarkEntity);
         //保存操作日志
@@ -152,6 +150,9 @@ public class OrderRemarkService {
                 BeanUtils.copyProperties(remarkEntity, orderRemarkListResponseVO);
                 orderRemarkListResponseVO.setOperatorName(remarkEntity.getUpdateOp());
                 orderRemarkListResponseVO.setDepartmentName(DepartmentEnum.getDescriptionByType(remarkEntity.getDepartmentId()));
+                orderRemarkListResponseVO.setFollowStatusText(FollowStatusEnum.getDescriptionByType(remarkEntity.getFollowStatus()));
+                orderRemarkListResponseVO.setFollowFailReasonText(FollowfailReasonEnum.getDescriptionByType(remarkEntity.getFollowFailReason()));
+                orderRemarkListResponseVO.setLimitDelayedText(YesNoEnum.getDescriptionByType(remarkEntity.getLimitDelayed()));
                 orderRemarkPageList.add(orderRemarkListResponseVO);
             });
         }
