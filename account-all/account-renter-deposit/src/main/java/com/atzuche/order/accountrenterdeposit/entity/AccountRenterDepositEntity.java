@@ -35,7 +35,7 @@ public class AccountRenterDepositEntity implements Serializable {
 	/**
 	 * 支付时间
 	 */
-	private LocalDateTime payTime;
+	private String payTime;
 	/**
 	 * 结算状态
 	 */

@@ -17,6 +17,11 @@ public class LocalDateTimeUtils {
     /**
      * 默认的时间日期样式
      */
+    public static final String YYYYMMDDHHMMSSS_PATTERN = "yyyyMMddHHmmss";
+
+    /**
+     * 默认的时间日期样式
+     */
     public static final String DEFAULT_PATTERN = "yyyy-MM-dd HH:mm:ss";
 
     /**
@@ -482,6 +487,8 @@ public class LocalDateTimeUtils {
 //        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 //        LocalDateTime parse = LocalDateTime.parse(str1, dtf);
 //        System.out.println(parse);
+        LocalDateTime da = parseStringToDateTime("20200110170824",YYYYMMDDHHMMSSS_PATTERN);
+        System.out.println(da);
 
 
     }
