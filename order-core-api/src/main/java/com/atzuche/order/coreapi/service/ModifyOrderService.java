@@ -39,7 +39,6 @@ import com.atzuche.order.renterorder.vo.owner.OwnerCouponGetAndValidReqVO;
 import com.atzuche.order.renterorder.vo.platform.MemAvailCouponRequestVO;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.coupon.api.CouponSettleRequest;
-import com.autoyol.member.detail.vo.res.CommUseDriverInfo;
 import com.autoyol.platformcost.CommonUtils;
 import com.dianping.cat.Cat;
 import lombok.extern.slf4j.Slf4j;
@@ -431,7 +430,7 @@ public class ModifyOrderService {
 			return;
 		}
 		// 获取附加驾驶人信息
-		List<CommUseDriverInfo> useDriverList = memberService.getCommUseDriverList(modifyOrderDTO.getMemNo());
+		List<CommUseDriverInfoDTO> useDriverList = memberService.getCommUseDriverList(modifyOrderDTO.getMemNo());
 		// 保存
 		renterAdditionalDriverService.insertBatchAdditionalDriver(modifyOrderDTO.getOrderNo(), modifyOrderDTO.getRenterOrderNo(), driverIds, useDriverList);
 	}
