@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.vo.req.AgreeOrderReqVO;
 import com.atzuche.order.commons.vo.req.RefuseOrderReqVO;
 import com.atzuche.order.coreapi.service.OwnerAgreeOrderService;
+import com.atzuche.order.coreapi.service.OwnerRefuseOrderService;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.doc.annotation.AutoDocMethod;
@@ -37,6 +38,9 @@ public class RefuseOrderController {
     @Autowired
     OwnerAgreeOrderService ownerAgreeOrderService;
 
+    @Autowired
+    OwnerRefuseOrderService ownerRefuseOrderService;
+
     private static final Logger LOGGER = LoggerFactory.getLogger(RefuseOrderController.class);
 
 
@@ -55,7 +59,7 @@ public class RefuseOrderController {
             return new ResponseData<>(ErrorCode.NEED_LOGIN.getCode(), ErrorCode.NEED_LOGIN.getText());
         }
 
-
+        ownerRefuseOrderService.refuse(reqVO);
         return ResponseData.success();
     }
 
