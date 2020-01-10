@@ -60,9 +60,9 @@ public class AccountRenterDepositNoTService {
      * @param payedOrderRenterDeposit
      */
     public void updateRenterDeposit(PayedOrderRenterDepositReqVO payedOrderRenterDeposit) {
-        AccountRenterDepositEntity accountRenterDepositEntity = new AccountRenterDepositEntity();
+        AccountRenterDepositEntity accountRenterDepositEntity = accountRenterDepositMapper.selectByOrderAndMemNo(payedOrderRenterDeposit.getOrderNo(),payedOrderRenterDeposit.getMemNo());
         BeanUtils.copyProperties(payedOrderRenterDeposit,accountRenterDepositEntity);
-        int result = accountRenterDepositMapper.insertSelective(accountRenterDepositEntity);
+        int result = accountRenterDepositMapper.updateByPrimaryKeySelective(accountRenterDepositEntity);
         if(result==0){
             throw new PayOrderRenterDepositDBException();
         }
