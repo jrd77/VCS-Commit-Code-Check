@@ -155,7 +155,7 @@ public class OrderInsuranceController extends BaseController {
                     if (!StringUtils.isEmpty(body)) {
                         JSONObject jsonObject = JSON.parseObject(body);
                         if(!ErrorCode.SUCCESS.getCode().equals(jsonObject.getString(RES_CODE))){
-                            return ResponseData.success(null);
+                            return ResponseData.success();
                         }
                         //调接口保存数据
                         return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), "文件导入中，请稍候查询");
