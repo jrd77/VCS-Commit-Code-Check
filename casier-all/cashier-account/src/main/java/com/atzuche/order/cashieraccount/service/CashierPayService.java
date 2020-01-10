@@ -113,25 +113,25 @@ public class CashierPayService{
         //3 查询应付
         OrderPayReqVO orderPayReqVO = new OrderPayReqVO();
         BeanUtils.copyProperties(orderPaySign,orderPayReqVO);
-        OrderPayableAmountResVO payVO = getOrderPayableAmount(orderPayReqVO);
+        OrderPayableAmountResVO orderPayable = getOrderPayableAmount(orderPayReqVO);
         //4 抵扣钱包
-        if(YesNoEnum.YES.getCode()==payVO.getIsUseWallet()){
+        if(YesNoEnum.YES.getCode()==orderPayable.getIsUseWallet()){
            int payBalance = walletService.getTotalWallet(orderPaySign.getMenNo());
            //判断余额大于0
            if(payBalance>0){
                //5 抵扣钱包落库 （收银台落库、费用落库）
-               int amtWallet = walletService.deductWallet(orderPaySign.getMenNo(),orderPaySign.getOrderNo(),payVO.getAmtWallet());
+               int amtWallet = walletService.deductWallet(orderPaySign.getMenNo(),orderPaySign.getOrderNo(),orderPayable.getAmtWallet());
                //6收银台 钱包支付落库
                cashierNoTService.insertRenterCostByWallet(orderPaySign,amtWallet);
                //钱包未抵扣部分
                int amtPaying =0;
-               if(amtWallet<payVO.getAmtWallet()){
-                   amtPaying = amtWallet - payVO.getAmtWallet();
+               if(amtWallet<orderPayable.getAmtWallet()){
+                   amtPaying = amtWallet - orderPayable.getAmtWallet();
                }
-               payVO.setAmtWallet(amtWallet);
-               payVO.setAmt(payVO.getAmt() + amtPaying);
+               orderPayable.setAmtWallet(amtWallet);
+               orderPayable.setAmt(orderPayable.getAmt() + amtPaying);
                //如果待支付 金额等于 0 即 钱包抵扣完成
-               if(payVO.getAmt()==0){
+               if(orderPayable.getAmt()==0){
                    List<String> payKind = orderPaySign.getPayKind();
                    // 如果 支付款项 只有租车费用一个  并且使用钱包支付 ，当待支付金额完全被 钱包抵扣直接返回支付完成
                    if(!CollectionUtils.isEmpty(payKind) && payKind.size()==1 && orderPayReqVO.getPayKind().contains(DataPayKindConstant.RENT_AMOUNT)){
@@ -145,7 +145,7 @@ public class CashierPayService{
 
         }
         //7 签名串
-        List<PayVo> payVo = getOrderPayVO(orderPaySign,payVO);
+        List<PayVo> payVo = getOrderPayVO(orderPaySign,orderPayable);
         log.info("CashierPayService 加密前费用列表打印 getPaySignStr payVo [{}] ",GsonUtils.toJson(payVo));
         if(CollectionUtils.isEmpty(payVo)){
             throw new OrderPaySignFailException();
