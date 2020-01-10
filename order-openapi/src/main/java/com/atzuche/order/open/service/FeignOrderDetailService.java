@@ -17,7 +17,7 @@ public interface FeignOrderDetailService {
      * @Description: 获取订单详情
      *
      **/
-    @RequestMapping(method = RequestMethod.POST, value = "/orderCenter/detail")
+    @RequestMapping(method = RequestMethod.POST, value = "/order/detail/query")
     ResponseData<OrderDetailRespDTO> getOrderDetail(@RequestBody OrderDetailReqDTO orderDetailReqDTO);
 
 }
