@@ -3,6 +3,7 @@ package com.atzuche.order.coreapi.controller;
 import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.vo.req.AgreeOrderReqVO;
 import com.atzuche.order.commons.vo.req.RefuseOrderReqVO;
+import com.atzuche.order.coreapi.service.OwnerAgreeOrderService;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.doc.annotation.AutoDocMethod;
@@ -10,6 +11,7 @@ import com.autoyol.doc.annotation.AutoDocVersion;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -31,6 +33,9 @@ import java.util.Optional;
 @RestController
 @AutoDocVersion(version = "订单接口文档")
 public class RefuseOrderController {
+
+    @Autowired
+    OwnerAgreeOrderService ownerAgreeOrderService;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RefuseOrderController.class);
 
@@ -70,6 +75,7 @@ public class RefuseOrderController {
             return new ResponseData<>(ErrorCode.NEED_LOGIN.getCode(), ErrorCode.NEED_LOGIN.getText());
         }
 
+        ownerAgreeOrderService.agree(reqVO);
 
         return ResponseData.success();
     }
