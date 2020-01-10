@@ -121,7 +121,7 @@ public class CashierPayService{
            //判断余额大于0
            if(payBalance>0){
                //5 抵扣钱包落库 （收银台落库、费用落库）
-               int amtWallet = walletService.orderDeduct(orderPaySign.getMenNo(),orderPaySign.getOrderNo(),payVO.getAmtWallet());
+               int amtWallet = walletService.orderDeduct(orderPaySign.getMenNo(),orderPaySign.getOrderNo(),orderPayable.getAmt());
                //6收银台 钱包支付落库
                cashierNoTService.insertRenterCostByWallet(orderPaySign,amtWallet);
                //钱包未抵扣部分
