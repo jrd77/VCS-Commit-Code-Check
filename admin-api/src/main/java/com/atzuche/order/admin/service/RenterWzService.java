@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * RenterWzService
@@ -249,6 +250,9 @@ public class RenterWzService {
             dto.setRemarkName(WzCostEnums.getRemark(costDetail.getCostCode()));
             costDetails.add(dto);
         }
+        costDetails = costDetails.stream().sorted((dto1,dto2)->{
+            return dto1.getCostType() - dto2.getCostType();
+        }).collect(Collectors.toList());
         return costDetails;
     }
 }
