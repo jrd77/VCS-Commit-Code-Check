@@ -18,7 +18,7 @@
 
 
     <insert id="addOrderRemarkLog" parameterType="com.atzuche.order.admin.entity.OrderRemarkLogEntity">
-        insert into trans_remark_log
+        insert into order_remark_log
 		(
 			`order_no`,
 			`remark_id`,
@@ -59,7 +59,7 @@
 
 
 	<select id="selectRemarkLogListCount" resultType="long">
-		select count(*) from trans_remark_log where order_no = #{orderNo}
+		select count(*) from order_remark_log where order_no = #{orderNo}
 	</select>
 
 	<select id="selectRemarkLogList" resultMap="orderRemarkLogInformationMap">
@@ -72,7 +72,7 @@
 		dept_id,
 		operate_type,
 		remark_history
-		from trans_remark_log where order_no = #{orderNo}
+		from order_remark_log where order_no = #{orderNo}
 		order by id desc LIMIT #{startIndex}, #{pageSize}
 	</select>
 
