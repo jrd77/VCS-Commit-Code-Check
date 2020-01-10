@@ -12,7 +12,6 @@ import com.atzuche.order.cashieraccount.vo.req.CashierDeductDebtReqVO;
 import com.atzuche.order.cashieraccount.vo.req.CashierRefundApplyReqVO;
 import com.atzuche.order.cashieraccount.vo.req.DeductDepositToRentCostReqVO;
 import com.atzuche.order.cashieraccount.vo.res.CashierDeductDebtResVO;
-import com.atzuche.order.coin.service.AccountRenterCostCoinService;
 import com.atzuche.order.commons.IpUtil;
 import com.atzuche.order.commons.entity.dto.CostBaseDTO;
 import com.atzuche.order.commons.entity.dto.MileageAmtDTO;
@@ -39,7 +38,6 @@ import com.atzuche.order.parentorder.service.OrderStatusService;
 import com.atzuche.order.rentercost.entity.*;
 import com.atzuche.order.rentercost.service.*;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
-import com.atzuche.order.renterorder.service.AutoCoinService;
 import com.atzuche.order.renterorder.service.RenterOrderService;
 import com.atzuche.order.settle.exception.OrderSettleFlatAccountException;
 import com.atzuche.order.settle.vo.req.*;
@@ -133,10 +131,21 @@ public class OrderSettleNoTService {
     public void check(RenterOrderEntity renterOrder) {
         // 1 订单校验是否可以结算
         OrderStatusEntity orderStatus = orderStatusService.getByOrderNo(renterOrder.getOrderNo());
-
-        //
-//        cashierSettleService.getOrderClaim(renterOrder.getOrderNo());
-//        cashierSettleService.getOrderDetain(renterOrder.getOrderNo());
+        //2校验租客是否还车
+//        boolean isReturn = handoverCarService.isReturnCar(renterOrder.getOrderNo());
+//        if(!isReturn){
+//            throw new RuntimeException("租客未还车不能结算");
+//        }
+        //3 校验是否存在 理赔  存在不结算
+        boolean isClaim = cashierSettleService.getOrderClaim(renterOrder.getOrderNo());
+        if(isClaim){
+            throw new RuntimeException("租客存在理赔信息不能结算");
+        }
+        //3 是否存在 暂扣存在不结算
+        boolean isDetain = cashierSettleService.getOrderDetain(renterOrder.getOrderNo());
+        if(isDetain){
+            throw new RuntimeException("租客存在暂扣信息不能结算");
+        }
     }
 
     /**

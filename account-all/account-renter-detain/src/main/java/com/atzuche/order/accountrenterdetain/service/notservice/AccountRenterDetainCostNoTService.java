@@ -26,6 +26,16 @@ public class AccountRenterDetainCostNoTService {
     /**
      * 查询用户订单暂扣总额
      * @param orderNo
+     * @return
+     */
+    public AccountRenterDetainCostEntity getRenterDetaint(String orderNo) {
+        AccountRenterDetainCostEntity accountRenterDetainCostEntity = accountRenterDetainCostMapper.getRenterDetain(orderNo);
+        return  accountRenterDetainCostEntity;
+    }
+
+    /**
+     * 查询用户订单暂扣总额
+     * @param orderNo
      * @param memNo
      * @return
      */
