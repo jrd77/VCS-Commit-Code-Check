@@ -79,6 +79,9 @@
 			<if test="remarkType != null">`remark_type` = #{remarkType}, </if>
 			<if test="remarkContent != null">`remark` = #{remarkContent}, </if>
 			<if test="updateOp != null">`update_op` = #{updateOp}, </if>
+			<if test="limitDelayed != null">`limit_delayed` = #{limitDelayed}, </if>
+			<if test="followStatus != null">`follow_status` = #{followStatus}, </if>
+			<if test="followFailReason != null">`follow_fail_reason` = #{followFailReason}, </if>
 			<if test="isDelete != null">`is_delete` = #{isDelete}</if>
 
 		</set>
