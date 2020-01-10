@@ -105,11 +105,11 @@ public class CashierPayService{
      * @return
      */
     @Transactional(rollbackFor=Exception.class)
-    public String getPaySignStr(OrderPaySignReqVO orderPaySign){
+    public String getPaySignStr(OrderPaySignReqVO orderPaySign,OrderPayCallBack orderPayCallBack){
         //1校验
         Assert.notNull(orderPaySign, ErrorCode.PARAMETER_ERROR.getText());
         orderPaySign.check();
-
+        orderPayCallBack.callBack(orderPaySign.getOrderNo());
         //3 查询应付
         OrderPayReqVO orderPayReqVO = new OrderPayReqVO();
         BeanUtils.copyProperties(orderPaySign,orderPayReqVO);
@@ -135,6 +135,8 @@ public class CashierPayService{
                    List<String> payKind = orderPaySign.getPayKind();
                    // 如果 支付款项 只有租车费用一个  并且使用钱包支付 ，当待支付金额完全被 钱包抵扣直接返回支付完成
                    if(!CollectionUtils.isEmpty(payKind) && payKind.size()==1 && orderPayReqVO.getPayKind().contains(DataPayKindConstant.RENT_AMOUNT)){
+                       //修改子订单费用信息
+                       orderPayCallBack.callBack(orderPaySign.getOrderNo());
                        return "";
                    }
 
