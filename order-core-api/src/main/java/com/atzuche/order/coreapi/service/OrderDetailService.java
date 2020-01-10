@@ -115,6 +115,10 @@ public class OrderDetailService {
         }
         return responseData;
     }
+    public ResponseData<OrderStatusRespDTO> orderStatus(OrderDetailReqDTO orderDetailReqDTO) {
+
+        return null;
+    }
 
     private OrderDetailRespDTO orderDetailProxy(OrderDetailReqDTO orderDetailReqDTO) {
         String orderNo = orderDetailReqDTO.getOrderNo();
@@ -296,19 +300,37 @@ public class OrderDetailService {
 
         return orderDetailRespDTO;
     }
-    public ResponseData<OrderStatusRespDTO> orderStatus(OrderDetailReqDTO orderDetailReqDTO) {
+
+    private OrderStatusRespDTO orderStatusProxy(OrderDetailReqDTO orderDetailReqDTO) {
         String orderNo = orderDetailReqDTO.getOrderNo();
-        //订单状态
+        //主订单状态
         OrderStatusEntity orderStatusEntity = orderStatusService.getByOrderNo(orderNo);
         OrderStatusDTO orderStatusDTO = new OrderStatusDTO();
         BeanUtils.copyProperties(orderStatusEntity,orderStatusDTO);
 
+        //车主子订单状态
+        OwnerOrderEntity ownerOrderEntity = ownerOrderService.getOwnerOrderByOrderNoAndIsEffective(orderNo);
+        OwnerOrderStatusDTO ownerOrderStatusDTO = new OwnerOrderStatusDTO();
+        BeanUtils.copyProperties(ownerOrderEntity,ownerOrderStatusDTO);
+
+        //租客子订单状态
+        RenterOrderEntity renterOrderEntity = renterOrderService.getRenterOrderByOrderNoAndIsEffective(orderNo);
+        RenterOrderDTO renterOrderDTO = new RenterOrderDTO();
+        BeanUtils.copyProperties(renterOrderEntity,renterOrderDTO);
+
+
+        //改变中的车主子订单状态
+        OwnerOrderEntity changeOwnerByOrder = ownerOrderService.getChangeOwnerByOrderNo(orderNo);
+
+
+        //改变中的租客子订单状态
+
+
         OrderStatusRespDTO orderStatusRespDTO = new OrderStatusRespDTO();
 
 
-        return null;
+        return orderStatusRespDTO;
     }
-
     /*
      * @Author ZhangBin
      * @Date 2020/1/9 11:53

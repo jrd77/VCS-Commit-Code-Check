@@ -14,7 +14,6 @@ import com.atzuche.order.cashieraccount.exception.OrderPaySignFailException;
 import com.atzuche.order.cashieraccount.service.notservice.CashierNoTService;
 import com.atzuche.order.cashieraccount.service.notservice.CashierRefundApplyNoTService;
 import com.atzuche.order.cashieraccount.service.remote.RefundRemoteService;
-import com.atzuche.order.cashieraccount.service.remote.WalletRemoteService;
 import com.atzuche.order.cashieraccount.vo.req.pay.OrderPayReqVO;
 import com.atzuche.order.cashieraccount.vo.req.pay.OrderPaySignReqVO;
 import com.atzuche.order.cashieraccount.vo.res.AccountPayAbleResVO;
@@ -23,10 +22,10 @@ import com.atzuche.order.commons.CatConstants;
 import com.atzuche.order.commons.enums.RenterCashCodeEnum;
 import com.atzuche.order.commons.enums.YesNoEnum;
 import com.atzuche.order.commons.service.OrderPayCallBack;
-import com.atzuche.order.commons.service.RabbitMsgLogService;
 import com.atzuche.order.rentercost.entity.vo.PayableVO;
 import com.atzuche.order.rentercost.service.RenterOrderCostCombineService;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
+import com.atzuche.order.wallet.server.service.WalletService;
 import com.autoyol.autopay.gateway.constant.DataPayKindConstant;
 import com.autoyol.autopay.gateway.util.MD5;
 import com.autoyol.autopay.gateway.vo.req.BatchNotifyDataVo;
@@ -37,7 +36,6 @@ import com.autoyol.autopay.gateway.vo.res.AutoPayResultVo;
 import com.autoyol.cat.CatAnnotation;
 import com.autoyol.commons.utils.GsonUtils;
 import com.autoyol.commons.web.ErrorCode;
-import com.autoyol.vo.req.WalletDeductionReqVO;
 import com.dianping.cat.Cat;
 import com.dianping.cat.message.Transaction;
 import lombok.extern.slf4j.Slf4j;
@@ -66,11 +64,10 @@ public class CashierPayService{
     @Autowired AccountRenterDepositService accountRenterDepositService;
     @Autowired AccountRenterWzDepositService accountRenterWzDepositService;
     @Autowired CashierService cashierService;
-    @Autowired RabbitMsgLogService rabbitMsgLogService;
     @Autowired AccountRenterCostSettleService accountRenterCostSettleService;
     @Autowired RenterOrderCostCombineService renterOrderCostCombineService;
     @Autowired CashierNoTService cashierNoTService;
-    @Autowired WalletRemoteService walletRemoteService;
+    @Autowired WalletService walletService;
     @Autowired RefundRemoteService refundRemoteService;
     @Autowired CashierRefundApplyNoTService cashierRefundApplyNoTService;
 
@@ -90,7 +87,6 @@ public class CashierPayService{
             //3 更新rabbitMQ 记录已消费
             String reqContent = FasterJsonUtil.toJson(batchNotifyDataVo);
             String md5 =  MD5.MD5Encode(reqContent);
-            rabbitMsgLogService.updateConsume(md5);
             t.setStatus(Transaction.SUCCESS);
         } catch (Exception e) {
             log.info("OrderPayCallBack payCallBackAsyn start param;[{}]", GsonUtils.toJson(batchNotifyDataVo));
@@ -120,17 +116,25 @@ public class CashierPayService{
         OrderPayableAmountResVO payVO = getOrderPayableAmount(orderPayReqVO);
         //4 抵扣钱包
         if(YesNoEnum.YES.getCode()==payVO.getIsUseWallet()){
-           int payBalance = walletRemoteService.getWalletPayBalanceByMemNo(orderPaySign.getMenNo());
+           int payBalance = walletService.getTotalWallet(orderPaySign.getMenNo());
            //判断余额大于0
            if(payBalance>0){
-               //返回待支付次数
-               int paySn = cashierNoTService.payOrderByWallet(orderPaySign);
                //5 抵扣钱包落库 （收银台落库、费用落库）
-               WalletDeductionReqVO walletDeduction = cashierNoTService.getWalletDeductionReqVO(orderPaySign,payVO,paySn);
-               walletRemoteService.updateWalletByDeduct(walletDeduction);
+               int amtWallet = walletService.deductWallet(orderPaySign.getMenNo(),orderPaySign.getOrderNo(),payVO.getAmtWallet());
                //6收银台 钱包支付落库
-               cashierNoTService.insertRenterCostByWallet(orderPaySign,payVO.getAmtWallet());
+               cashierNoTService.insertRenterCostByWallet(orderPaySign,amtWallet);
+               //钱包未抵扣部分
+               int amtPaying =0;
+               if(amtWallet<payVO.getAmtWallet()){
+                   amtPaying = amtWallet - payVO.getAmtWallet();
+               }
+               payVO.setAmtWallet(amtWallet);
+               payVO.setAmt(payVO.getAmt() + amtPaying);
+               //如果待支付 金额等于 0 即 钱包抵扣完成
+               if(payVO.getAmt()==0){
+               }
            }
+
         }
         //7 签名串
         List<PayVo> payVo = getOrderPayVO(orderPaySign,payVO);
@@ -196,19 +200,19 @@ public class CashierPayService{
                 }
             }
         }
-        //待支付总额
+//        //待支付总额
         int amtTotal = amtDeposit + amtWZDeposit + rentAmt;
-        //实际待支付总额
+        //实际待支付租车费用总额 即真实应付租车费用
         Integer amtRent = rentAmt+rentAmtPayed;
-        // 计算钱包 支付
+        // 计算钱包 支付 目前支付抵扣租费费用
         int amtWallet =0;
         if(YesNoEnum.YES.getCode()==result.getIsUseWallet()){
-            int payBalance = walletRemoteService.getWalletPayBalanceByMemNo(orderPayReqVO.getMenNo());
+            int payBalance = walletService.getTotalWallet(orderPayReqVO.getMenNo());
             //预计钱包抵扣金额 = amtWallet
-            amtWallet = amtRent + payBalance < 0 ? -payBalance : amtRent;
-            // 抵扣钱包后  应付金额
-            amtRent =  amtRent + payBalance < 0 ? amtRent + payBalance : 0;
-            accountPayAbles.add(new AccountPayAbleResVO(orderPayReqVO.getOrderNo(),orderPayReqVO.getMenNo(),amtRent,RenterCashCodeEnum.ACCOUNT_WALLET_COST,RenterCashCodeEnum.ACCOUNT_WALLET_COST.getTxt()));
+            amtWallet = amtRent + payBalance < 0 ? payBalance : Math.abs(amtRent);
+            // 抵扣钱包后  应付租车费用金额
+            rentAmt =  rentAmt + amtWallet;
+            accountPayAbles.add(new AccountPayAbleResVO(orderPayReqVO.getOrderNo(),orderPayReqVO.getMenNo(),rentAmt,RenterCashCodeEnum.ACCOUNT_WALLET_COST,RenterCashCodeEnum.ACCOUNT_WALLET_COST.getTxt()));
         }
         result.setAmtWallet(amtWallet);
         result.setAmtRent(amtRent);
@@ -216,7 +220,7 @@ public class CashierPayService{
         result.setAmtWzDeposit(amtWZDeposit);
         result.setAmtTotal(amtTotal);
         result.setAmtPay(rentAmtPayed);
-        result.setAmt(amtTotal + rentAmtPayed);
+        result.setAmt(rentAmt + amtDeposit + amtWZDeposit);
         result.setMemNo(orderPayReqVO.getMenNo());
         result.setOrderNo(orderPayReqVO.getOrderNo());
         result.setTitle("待支付金额：" +result.getAmt() + "，订单号："  + result.getOrderNo());

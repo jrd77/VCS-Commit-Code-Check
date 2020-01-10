@@ -1,4 +1,4 @@
-package com.atzuche.order.commons.mapper;
+package com.atzuche.order.coreapi.mapper;
 
 import com.atzuche.order.commons.entity.RabbitMsgLogEntity;
 import org.apache.ibatis.annotations.Mapper;
@@ -11,11 +11,11 @@ import org.apache.ibatis.annotations.Param;
  * @date 2019-12-23 19:27:14
  */
 @Mapper
-public interface RabbitMsgLogMapper{
+public interface RabbitMsgLogMapper {
 
     RabbitMsgLogEntity selectByPrimaryKey(Integer id);
 
-    RabbitMsgLogEntity selectByUniqueNo(@Param("uniqueNo") String uniqueNo,@Param("businessType") String businessType);
+    RabbitMsgLogEntity selectByUniqueNo(@Param("uniqueNo") String uniqueNo, @Param("businessType") String businessType);
 
     int insert(RabbitMsgLogEntity record);
 

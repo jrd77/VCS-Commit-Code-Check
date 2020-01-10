@@ -1,6 +1,5 @@
 package com.atzuche.order.commons.entity.dto;
 
-import com.autoyol.member.detail.vo.res.CommUseDriverInfo;
 import lombok.Data;
 
 import java.time.LocalDate;
@@ -76,7 +75,7 @@ public class RenterMemberDTO {
     /**
      * 常用驾驶人列表
      */
-    private List<CommUseDriverInfo> commUseDriverList;
+    private List<CommUseDriverInfoDTO> commUseDriverList;
 
     /**
      * 是否是新用户:0，否;1，是，定义没有已结算订单的用户为新用户

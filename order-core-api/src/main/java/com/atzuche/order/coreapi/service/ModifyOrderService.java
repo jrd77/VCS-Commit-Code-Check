@@ -39,7 +39,6 @@ import com.atzuche.order.renterorder.vo.owner.OwnerCouponGetAndValidReqVO;
 import com.atzuche.order.renterorder.vo.platform.MemAvailCouponRequestVO;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.coupon.api.CouponSettleRequest;
-import com.autoyol.member.detail.vo.res.CommUseDriverInfo;
 import com.autoyol.platformcost.CommonUtils;
 import com.dianping.cat.Cat;
 import lombok.extern.slf4j.Slf4j;
@@ -141,9 +140,8 @@ public class ModifyOrderService {
 		// TODO 风控校验
 		
 		// TODO 库存校验
-		
 		// 获取主订单信息
-		OrderEntity orderEntity = orderService.getOrderEntity(modifyOrderDTO.getOrderNo());
+		OrderEntity orderEntity = orderService.getOrderByOrderNoAndMemNo(orderNo, modifyOrderReq.getMemNo());
 		// 设置主订单信息
 		modifyOrderDTO.setOrderEntity(orderEntity);
 		// 设置城市编号
@@ -432,7 +430,7 @@ public class ModifyOrderService {
 			return;
 		}
 		// 获取附加驾驶人信息
-		List<CommUseDriverInfo> useDriverList = memberService.getCommUseDriverList(modifyOrderDTO.getMemNo());
+		List<CommUseDriverInfoDTO> useDriverList = memberService.getCommUseDriverList(modifyOrderDTO.getMemNo());
 		// 保存
 		renterAdditionalDriverService.insertBatchAdditionalDriver(modifyOrderDTO.getOrderNo(), modifyOrderDTO.getRenterOrderNo(), driverIds, useDriverList);
 	}
