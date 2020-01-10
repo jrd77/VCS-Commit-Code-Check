@@ -271,6 +271,7 @@ public class SubmitOrderService {
         //end 组装接口返回
         OrderResVO orderResVO = new OrderResVO();
         orderResVO.setOrderNo(orderNo);
+        orderResVO.setStatus(String.valueOf(orderStatusDTO.getStatus()));
         return orderResVO;
     }
 
