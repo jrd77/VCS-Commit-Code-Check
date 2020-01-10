@@ -21,8 +21,6 @@ import java.util.List;
 
 @Service
 public class OrderRemarkService {
-
-    public static final String DELETE_FLAG = "1";
     private static final Logger logger = LoggerFactory.getLogger(OrderRemarkService.class);
 
     @Autowired
@@ -148,6 +146,7 @@ public class OrderRemarkService {
             remarkList.forEach(remarkEntity -> {
                 OrderRemarkListResponseVO orderRemarkListResponseVO = new OrderRemarkListResponseVO();
                 BeanUtils.copyProperties(remarkEntity, orderRemarkListResponseVO);
+                orderRemarkListResponseVO.setRemarkType(RemarkTypeEnum.getDescriptionByType(remarkEntity.getRemarkType()));
                 orderRemarkListResponseVO.setOperatorName(remarkEntity.getUpdateOp());
                 orderRemarkListResponseVO.setDepartmentName(DepartmentEnum.getDescriptionByType(remarkEntity.getDepartmentId()));
                 orderRemarkListResponseVO.setFollowStatusText(FollowStatusEnum.getDescriptionByType(remarkEntity.getFollowStatus()));

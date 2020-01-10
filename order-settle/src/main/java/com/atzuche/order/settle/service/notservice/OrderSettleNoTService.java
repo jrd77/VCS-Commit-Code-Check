@@ -8,7 +8,6 @@ import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostDetailEnt
 import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostSettleDetailEntity;
 import com.atzuche.order.cashieraccount.service.CashierService;
 import com.atzuche.order.cashieraccount.service.CashierSettleService;
-import com.atzuche.order.cashieraccount.service.remote.WalletRemoteService;
 import com.atzuche.order.cashieraccount.vo.req.CashierDeductDebtReqVO;
 import com.atzuche.order.cashieraccount.vo.req.CashierRefundApplyReqVO;
 import com.atzuche.order.cashieraccount.vo.req.DeductDepositToRentCostReqVO;
@@ -75,7 +74,6 @@ public class OrderSettleNoTService {
     @Autowired private HandoverCarService handoverCarService;
     @Autowired private OwnerGoodsService ownerGoodsService;
     @Autowired private AutoCoinService autoCoinService;
-    @Autowired private WalletRemoteService walletRemoteService;
     @Autowired private AccountRenterCostCoinService accountRenterCostCoinService;
     @Autowired private RenterOrderService renterOrderService;
     @Autowired private OwnerOrderService ownerOrderService;
@@ -966,9 +964,9 @@ public class OrderSettleNoTService {
                 int returnWalletAmt = rentCostSurplusAmt>walletAmt?walletAmt:rentCostSurplusAmt;
                 WalletReturnReqVO walletReturnReq = getWalletReturnReqVO(settleOrdersAccount,returnWalletAmt);
                 // TODO 钱包退还接口 待开发
-                int walletLogId = walletRemoteService.returnWalletBySettle(walletReturnReq);
+//                int walletLogId = walletRemoteService.returnWalletBySettle(walletReturnReq);
 
-                AccountRenterCostSettleDetailEntity entity = getAccountRenterCostSettleDetailEntityForWallet(settleOrdersAccount,-returnWalletAmt,walletLogId);
+                AccountRenterCostSettleDetailEntity entity = getAccountRenterCostSettleDetailEntityForWallet(settleOrdersAccount,-returnWalletAmt,0);
                 renterCostSettleDetails.add(entity);
 
             }

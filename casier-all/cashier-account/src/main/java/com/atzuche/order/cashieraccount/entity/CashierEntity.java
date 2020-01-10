@@ -59,7 +59,7 @@ public class CashierEntity implements Serializable {
 	/**
 	 * 支付时间
 	 */
-	private LocalDateTime payTime;
+	private String payTime;
 	/**
 	 * 是否补付
 	 */
