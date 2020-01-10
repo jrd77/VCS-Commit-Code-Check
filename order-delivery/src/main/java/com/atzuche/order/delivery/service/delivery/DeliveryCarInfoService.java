@@ -1,7 +1,12 @@
 package com.atzuche.order.delivery.service.delivery;
 
+import com.atzuche.order.commons.entity.dto.CostBaseDTO;
+import com.atzuche.order.commons.entity.dto.GetReturnCarOverCostReqDto;
+import com.atzuche.order.delivery.common.delivery.TranSportService;
+import com.atzuche.order.delivery.common.delivery.dto.GetReturnOverCostDTO;
 import com.atzuche.order.delivery.entity.*;
 import com.atzuche.order.delivery.enums.HandoverCarTypeEnum;
+import com.atzuche.order.delivery.exception.DeliveryOrderException;
 import com.atzuche.order.delivery.service.RenterOrderDeliveryService;
 import com.atzuche.order.delivery.service.handover.HandoverCarService;
 import com.atzuche.order.delivery.service.handover.OwnerHandoverCarService;
@@ -43,10 +48,11 @@ public class DeliveryCarInfoService {
     RenterHandoverCarService renterHandoverCarService;
     @Autowired
     OwnerHandoverCarService ownerHandoverCarService;
+    @Autowired
+    TranSportService tranSportService;
 
     /**
      * 获取配送相关信息
-     *
      * @param deliveryCarDTO
      * @return
      */
@@ -63,7 +69,6 @@ public class DeliveryCarInfoService {
 
     /**
      * 构造结构体
-     *
      * @param renterHandoverCarInfoEntities
      * @param ownerHandoverCarInfoEntities
      * @param renterHandoverCarRemarkEntities
@@ -107,6 +112,25 @@ public class DeliveryCarInfoService {
                                      List<OwnerHandoverCarRemarkEntity> ownerHandoverCarRemarkEntities,
                                      RenterOrderDeliveryEntity renterOrderDeliveryEntity,
                                      Integer carType) {
+
+        //获取超运能
+        GetReturnCarOverCostReqDto getReturnCarOverCostReqDto = new GetReturnCarOverCostReqDto();
+        getReturnCarOverCostReqDto.setCityCode(Integer.valueOf(renterOrderDeliveryEntity.getCityCode()));
+        CostBaseDTO costBaseDTO = new CostBaseDTO();
+        costBaseDTO.setStartTime(renterOrderDeliveryEntity.getRentTime());
+        costBaseDTO.setEndTime(renterOrderDeliveryEntity.getRevertTime());
+        getReturnCarOverCostReqDto.setCostBaseDTO(costBaseDTO);
+        String isGetOverTransport;
+        String isReturnOverTransport;
+        try {
+            GetReturnOverCostDTO getReturnOverCostDTO = tranSportService.getGetReturnOverCost(getReturnCarOverCostReqDto);
+            isGetOverTransport = getReturnOverCostDTO.getGetReturnOverTransportDTO().getIsGetOverTransport() == true ? "1" : "0";
+            isReturnOverTransport = getReturnOverCostDTO.getGetReturnOverTransportDTO().getIsReturnOverTransport() == true ? "1" : "0";
+        } catch (Exception e) {
+            log.error("获取超运能异常，给默认值,cause:{}", e.getMessage());
+            isGetOverTransport = "0";
+            isReturnOverTransport = "0";
+        }
         if (renterOrderDeliveryEntity.getType() == 1 && renterOrderDeliveryEntity.getStatus() != 0) {
             GetHandoverCarDTO getHandoverCarDTO = new GetHandoverCarDTO();
             getHandoverCarDTO = getHandoverCarInfo(getHandoverCarDTO,renterOrderDeliveryEntity,carType);
@@ -114,6 +138,7 @@ public class DeliveryCarInfoService {
             String renterRemark = renterHandoverCarRemarkEntities.stream().filter(r -> (r.getType().intValue() != HandoverCarTypeEnum.RENYUN_TO_RENTER.getValue().intValue())).findFirst().get().getRemark();
             getHandoverCarDTO.setRenterRealGetAddrReamrk(renterRemark);
             getHandoverCarDTO.setOwnRealGetRemark(remark);
+            getHandoverCarDTO.setIsChaoYunNeng(isGetOverTransport);
             deliveryCarVO.setGetHandoverCarDTO(getHandoverCarDTO);
             deliveryCarVO.setIsGetCar(1);
         } else if (renterOrderDeliveryEntity.getType() == 2 && renterOrderDeliveryEntity.getStatus() != 0) {
@@ -123,6 +148,7 @@ public class DeliveryCarInfoService {
             String renterRemark = renterHandoverCarRemarkEntities.stream().filter(r -> (r.getType().intValue() != HandoverCarTypeEnum.RENTER_TO_RENYUN.getValue().intValue())).findFirst().get().getRemark();
             returnHandoverCarDTO.setRenterRealGetRemark(renterRemark);
             returnHandoverCarDTO.setOwnerRealGetAddrReamrk(remark);
+            returnHandoverCarDTO.setIsChaoYunNeng(isReturnOverTransport);
             deliveryCarVO.setReturnHandoverCarDTO(returnHandoverCarDTO);
             deliveryCarVO.setIsReturnCar(1);
         }
@@ -213,7 +239,6 @@ public class DeliveryCarInfoService {
      */
     public GetHandoverCarDTO getHandoverCarInfo(GetHandoverCarDTO getHandoverCarDTO, RenterOrderDeliveryEntity renterOrderDeliveryEntity, Integer carType) {
         getHandoverCarDTO.setChaoYunNengAddCrash("0");
-        getHandoverCarDTO.setIsChaoYunNeng("0");
         getHandoverCarDTO.setGetCarCrash(String.valueOf(OwnerFeeCalculatorUtils.calOwnerSrvGetAmt(carType, renterOrderDeliveryEntity.getType())));
         getHandoverCarDTO.setGetCarKM(String.valueOf(getDistanceKM(renterOrderDeliveryEntity)));
         getHandoverCarDTO.setOwnerGetCarCrash(String.valueOf(OwnerFeeCalculatorUtils.calOwnerSrvGetAmt(carType, renterOrderDeliveryEntity.getType())));
@@ -231,7 +256,6 @@ public class DeliveryCarInfoService {
      */
     public ReturnHandoverCarDTO returnHandoverCarInfo(ReturnHandoverCarDTO returnHandoverCarDTO, RenterOrderDeliveryEntity renterOrderDeliveryEntity, Integer carType) {
         returnHandoverCarDTO.setChaoYunNengAddCrash("0");
-        returnHandoverCarDTO.setIsChaoYunNeng("0");
         returnHandoverCarDTO.setReturnCarCrash(String.valueOf(OwnerFeeCalculatorUtils.calOwnerSrvReturnAmt(carType, renterOrderDeliveryEntity.getType())));
         returnHandoverCarDTO.setReturnCarKM(String.valueOf(getDistanceKM(renterOrderDeliveryEntity)));
         returnHandoverCarDTO.setOwnerReturnCarCrash(String.valueOf(OwnerFeeCalculatorUtils.calOwnerSrvReturnAmt(carType, renterOrderDeliveryEntity.getType())));
@@ -242,5 +266,16 @@ public class DeliveryCarInfoService {
         returnHandoverCarDTO.setRentTime(DateUtils.formate(rentTime, DateUtils.DATE_DEFAUTE_4) + "," + renterOrderDeliveryEntity.getAheadOrDelayTime());
         return  returnHandoverCarDTO;
     }
+
+
+
+
+
+
+
+
+
+
+
 
 }
