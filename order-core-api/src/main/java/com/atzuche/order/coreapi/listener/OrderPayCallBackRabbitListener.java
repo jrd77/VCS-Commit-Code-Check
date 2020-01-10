@@ -69,8 +69,8 @@ public class OrderPayCallBackRabbitListener {
     }
 
     @Bean
-    DirectExchange payDirectExchange() {
-        return new DirectExchange(PayRabbitMQEventEnum.AUTO_PAY.exchange);
+    TopicExchange payDirectExchange() {
+        return new TopicExchange(PayRabbitMQEventEnum.AUTO_PAY.exchange);
     }
 
     @Bean

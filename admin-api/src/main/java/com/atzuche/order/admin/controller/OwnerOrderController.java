@@ -26,7 +26,7 @@ public class OwnerOrderController {
 
 	@AutoDocMethod(description = "获取车主子订单列表", value = "获取车主子订单列表", response = OwnerOrderListResponseVO.class)
 	@GetMapping("owner/list")
-	public ResponseData ownerList(@RequestBody OwnerOrderRequestVO ownerOrderRequestVO, BindingResult bindingResult) {
+	public ResponseData ownerList(OwnerOrderRequestVO ownerOrderRequestVO, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), ErrorCode.INPUT_ERROR.getText());
         }

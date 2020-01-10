@@ -26,7 +26,7 @@ public class MainOrderController {
 
 	@AutoDocMethod(description = "获取主订单信息", value = "获取主订单信息", response = MainOrderResponseVO.class)
 	@GetMapping("main/information")
-	public ResponseData mainInformation(@RequestBody MainOrderRequestVO mainOrderRequestVO, BindingResult bindingResult) {
+	public ResponseData mainInformation(MainOrderRequestVO mainOrderRequestVO, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), ErrorCode.INPUT_ERROR.getText());
         }

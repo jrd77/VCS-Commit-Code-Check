@@ -59,6 +59,8 @@ public class CommonUtils {
 	
 	public static final String FORMAT_STR_DEFAULT = "yyyy-MM-dd HH:mm:ss";
 	
+	public static final String FORMAT_STR_LONG = "yyyyMMddHHmmss";
+	
     /**
                * 初始化全面保障费单价配置
      */
