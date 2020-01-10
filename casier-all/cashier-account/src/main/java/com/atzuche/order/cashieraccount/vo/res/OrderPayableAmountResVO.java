@@ -27,17 +27,17 @@ public class OrderPayableAmountResVO {
      * 总待付款项
      */
     @AutoDocProperty("总待付款项")
-    private Integer amtTotal;
+    private int amtTotal;
     /**
      * 已付款项
      */
     @AutoDocProperty("已付款项")
-    private Integer amtPay;
+    private int amtPay;
     /**
      * 实际真实待款项
      */
     @AutoDocProperty("实际真实待款项")
-    private Integer amt;
+    private int amt;
     /**
      * 支付标题
      */
@@ -59,17 +59,17 @@ public class OrderPayableAmountResVO {
      * 应付租车费用
      */
     @AutoDocProperty("应付租车费用")
-    private Integer amtRent;
+    private int amtRent;
     /**
      * 应付租车车俩押金
      */
     @AutoDocProperty("应付租车车俩押金")
-    private Integer amtDeposit;
+    private int amtDeposit;
     /**
      * 应付租车违章押金
      */
     @AutoDocProperty("应付租车违章押金")
-    private Integer amtWzDeposit;
+    private int amtWzDeposit;
 
     /**
      * 钱包抵扣金额
@@ -81,5 +81,5 @@ public class OrderPayableAmountResVO {
      * 是否使用钱包 0-否，1-是
      */
     @AutoDocProperty("是否使用钱包 0-否，1-是")
-    private Integer isUseWallet;
+    private int isUseWallet;
 }

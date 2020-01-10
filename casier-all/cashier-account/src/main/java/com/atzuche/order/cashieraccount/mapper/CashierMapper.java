@@ -17,6 +17,9 @@ public interface CashierMapper{
 
     CashierEntity selectByPrimaryKey(Integer id);
 
+    CashierEntity selectCashierEntity(@Param("payMd5") String payMd5);
+
+
     int insertSelective(CashierEntity record);
     
     int updateByPrimaryKeySelective(CashierEntity record);
