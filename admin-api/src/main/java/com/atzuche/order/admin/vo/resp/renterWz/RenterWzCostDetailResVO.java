@@ -32,4 +32,7 @@ public class RenterWzCostDetailResVO {
     @AutoDocProperty("备注")
     private String remark;
 
+    @AutoDocProperty("备注名称")
+    private String remarkName;
+
 }

@@ -6,13 +6,16 @@ import lombok.ToString;
 
 @Data
 @ToString
-public class OrderRiskStatusRequestVO {
+public class OrderCarServiceRemarkRequestVO {
 
     @AutoDocProperty(value = "订单号")
     private String orderNo;
 
-    @AutoDocProperty(value = "是否有风控事故,1:有,0:无")
-    private String riskAccidentStatus;
+    @AutoDocProperty(value = "取还车备注内容")
+    private String remarkContent;
+
+
+
 
 
 }

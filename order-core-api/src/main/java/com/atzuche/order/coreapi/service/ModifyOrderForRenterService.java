@@ -9,6 +9,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.atzuche.order.commons.enums.ChangeSourceEnum;
 import com.atzuche.order.commons.enums.FineTypeEnum;
 import com.atzuche.order.commons.enums.RenterChildStatusEnum;
 import com.atzuche.order.commons.enums.SrvGetReturnEnum;
@@ -180,11 +181,22 @@ public class ModifyOrderForRenterService {
 	}
 	
 	/**
-	 * 修改订单补付成功后调用
-	 * @param orderNo
-	 * @param renterOrderNo
+	 * 修改订单补付成功后回调
+	 * @param orderNo 主订单号
+	 * @param renterOrderNo 支付回调透传过来的租客订单号
 	 */
 	public void supplementPayPostProcess(String orderNo, String renterOrderNo) {
+		log.info("修改订单补付成功回调orderNo=[{}], renterOrderNo=[{}]", orderNo, renterOrderNo);
+		// 获取租客修改订单
+		RenterOrderEntity updRenterOrderEntity = renterOrderService.getRenterOrderByRenterOrderNo(renterOrderNo);
+		if (ChangeSourceEnum.CONSOLE.getCode().equals(updRenterOrderEntity.getChangeSource())) {
+			log.info("管理后台修改订单产生的补付支付成功后不需要后续处理orderNo=[{}], renterOrderNo=[{}]", orderNo, renterOrderNo);
+			return;
+		}
+		if (EFFECTIVE_FLAG.equals(updRenterOrderEntity.getIsEffective())) {
+			log.info("已经生效的租客子订单产生的补付支付成功后不需要后续处理orderNo=[{}], renterOrderNo=[{}]", orderNo, renterOrderNo);
+			return;
+		}
 		supplementPayPostProcess(orderNo, renterOrderNo, null, null);
 	}
 	
