@@ -37,7 +37,7 @@ public class OrderPayCallBackRabbitListener {
      */
     @RabbitListener(bindings = {
             @QueueBinding(value = @Queue(value = "auto-pay-queue-order", durable = "true"), exchange = @Exchange(value = "auto-pay", durable = "true", type = "topic"), key = "pay.success.20")})
-    public void consumeMessage22(Message message) {
+    public void payCallBack(Message message) {
         log.info("OrderPayCallBack payCallBack start param;[{}]", message);
         Transaction t = Cat.getProducer().newTransaction(CatConstants.RABBIT_MQ_CALL, "支付系统rabbitMQ异步回调payCallBack");
 

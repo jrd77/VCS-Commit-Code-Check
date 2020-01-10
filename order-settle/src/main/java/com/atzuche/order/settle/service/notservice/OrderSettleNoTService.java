@@ -74,8 +74,6 @@ public class OrderSettleNoTService {
     @Autowired private RenterOrderCostCombineService renterOrderCostCombineService;
     @Autowired private HandoverCarService handoverCarService;
     @Autowired private OwnerGoodsService ownerGoodsService;
-    @Autowired private AutoCoinService autoCoinService;
-    @Autowired private AccountRenterCostCoinService accountRenterCostCoinService;
     @Autowired private RenterOrderService renterOrderService;
     @Autowired private OwnerOrderService ownerOrderService;
     @Autowired private OrderStatusService orderStatusService;
@@ -129,11 +127,16 @@ public class OrderSettleNoTService {
         return settleOrders;
     }
     /**
-     * 校验是否可以结算
+     * 校验是否可以结算 校验订单状态 以及是否存在 理赔暂扣 存在不能进行结算 并CAT告警
      * @param renterOrder
      */
     public void check(RenterOrderEntity renterOrder) {
+        // 1 订单校验是否可以结算
         OrderStatusEntity orderStatus = orderStatusService.getByOrderNo(renterOrder.getOrderNo());
+
+        //
+//        cashierSettleService.getOrderClaim(renterOrder.getOrderNo());
+//        cashierSettleService.getOrderDetain(renterOrder.getOrderNo());
     }
 
     /**
