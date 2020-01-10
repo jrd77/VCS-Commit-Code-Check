@@ -145,6 +145,7 @@ public class OrderInsuranceController extends BaseController {
                     String suffixes=batchFile.getOriginalFilename().substring(batchFile.getOriginalFilename().lastIndexOf("."), batchFile.getOriginalFilename().length());
                     String key = "console/import/insurance/"+str.substring(0, 8)+"/"+ CommonUtils.getRandomNumUpChar(8)+suffixes;
                     //上传文件
+                    //注意，这块OSS内容是从老管理后台拷贝过来的，bucket直接写死的
                     OSSUtils.uploadMultipartFile(key, batchFile);
                     OrderInsuranceImportRequestDTO orderInsuranceImportRequestDTO = new OrderInsuranceImportRequestDTO();
                     orderInsuranceImportRequestDTO.setOssFileKey(key);
