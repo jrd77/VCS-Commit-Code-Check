@@ -1,21 +1,16 @@
-package com.atzuche.order.admin.enums;
+package com.atzuche.order.admin.enums.insurance;
 
 
-public enum FollowStatusEnum {
-    WGJ("1", "未跟进"),
-    GJCG("2", "跟进成功"),
-    GJSB("3", "跟进失败"),
-    ZCZ("4", "找车中"),
-    CFXQ("5", "重复需求"),
-    SCBJ("6", "首次被拒"),
-    DXCX("7", "短信促单");
+public enum InsuranceCompanyTypeEnum {
+    CPIC("1", "太平洋保险"),
+    PICC("2", "中国人民保险");
 
 
     private String type;
 
     private String typeDescription;
 
-    FollowStatusEnum(String type, String typeDescription) {
+    InsuranceCompanyTypeEnum(String type, String typeDescription) {
         this.type = type;
         this.typeDescription = typeDescription;
     }
@@ -34,7 +29,7 @@ public enum FollowStatusEnum {
      * @return
      */
     public static String getDescriptionByType(String type){
-        for (FollowStatusEnum remarkType : FollowStatusEnum.values()) {
+        for (InsuranceCompanyTypeEnum remarkType : InsuranceCompanyTypeEnum.values()) {
             if(remarkType.getType().equals(type)){
                 return remarkType.getTypeDescription();
             }

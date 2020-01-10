@@ -1,17 +1,17 @@
-package com.atzuche.order.admin.enums;
+package com.atzuche.order.admin.enums.insurance;
 
 
-public enum OperateTypeEnum {
-    ADD("1", "新增"),
-    UPDATE("2", "更新"),
-    DELETE("3", "删除");
+public enum InsuranceInputTypeEnum {
+    MANUAL("1", "手工录入"),
+    IMPORT("2", "批量导入"),
+    BI_IMPORT("3", "BI导入");
 
 
     private String type;
 
     private String typeDescription;
 
-    OperateTypeEnum(String type, String typeDescription) {
+    InsuranceInputTypeEnum(String type, String typeDescription) {
         this.type = type;
         this.typeDescription = typeDescription;
     }
@@ -30,7 +30,7 @@ public enum OperateTypeEnum {
      * @return
      */
     public static String getDescriptionByType(String type){
-        for (OperateTypeEnum remarkType : OperateTypeEnum.values()) {
+        for (InsuranceInputTypeEnum remarkType : InsuranceInputTypeEnum.values()) {
             if(remarkType.getType().equals(type)){
                 return remarkType.getTypeDescription();
             }
