@@ -149,7 +149,7 @@ public class SubmitOrderService {
         String orderNo = uniqueOrderNoService.getOrderNo();
         //2.5.锁定库存
         orderInfoDTO.setOrderNo(orderNo);
-        stockService.cutCarStock(orderInfoDTO);
+        //stockService.cutCarStock(orderInfoDTO);
 
         //提前延后时间计算
         CarRentTimeRangeResVO carRentTimeRangeResVO = carRentalTimeApiService.getCarRentTimeRange(buildCarRentTimeRangeReqVO(orderReqVO));

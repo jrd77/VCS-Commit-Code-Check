@@ -49,6 +49,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -246,15 +247,16 @@ public class OrderDetailService {
         List<RenterOrderDeliveryEntity> renterOrderDeliveryList = renterOrderDeliveryService.selectByRenterOrderNo(renterOrderNo);
         RenterOrderDeliveryEntity renterOrderDeliveryGet = filterDeliveryOrderByType(renterOrderDeliveryList, DeliveryOrderTypeEnum.GET_CAR);
         RenterOrderDeliveryEntity renterOrderDeliveryReturn = filterDeliveryOrderByType(renterOrderDeliveryList, DeliveryOrderTypeEnum.RETURN_CAR);
-        RenterOrderDeliveryDTO renterOrderDeliveryGetDto = new RenterOrderDeliveryDTO();
+        RenterOrderDeliveryDTO renterOrderDeliveryGetDto = null;
         if(renterOrderDeliveryGet != null){
+            renterOrderDeliveryGetDto = new RenterOrderDeliveryDTO();
             BeanUtils.copyProperties(renterOrderDeliveryGet,renterOrderDeliveryGetDto);
         }
-        RenterOrderDeliveryDTO renterOrderDeliveryReturnDto =  new RenterOrderDeliveryDTO();
+        RenterOrderDeliveryDTO renterOrderDeliveryReturnDto =  null;
         if(renterOrderDeliveryReturn != null){
+            renterOrderDeliveryReturnDto = new RenterOrderDeliveryDTO();
             BeanUtils.copyProperties(renterOrderDeliveryReturn,renterOrderDeliveryReturnDto);
         }
-
 
         OrderDetailRespDTO orderDetailRespDTO = new OrderDetailRespDTO();
         orderDetailRespDTO.order = orderDTO;
@@ -288,6 +290,10 @@ public class OrderDetailService {
      * 
      **/
     private RenterOrderDeliveryEntity filterDeliveryOrderByType(List<RenterOrderDeliveryEntity> renterOrderDeliveryList, DeliveryOrderTypeEnum deliveryTypeEnum){
-        return null;
+        RenterOrderDeliveryEntity renterOrderDeliveryEntity = Optional.ofNullable(renterOrderDeliveryList).orElseGet(ArrayList::new)
+                .stream()
+                .filter(x -> deliveryTypeEnum.getCode() == x.getType())
+                .findFirst().get();
+        return renterOrderDeliveryEntity;
     }
 }

@@ -157,7 +157,7 @@ public class OwnerCommodityService {
                     List<OwnerGoodsPriceDetailEntity> renterGoodsPriceDetailList = dbRevertTimeGroup.get(lastGroup.getRevertTime());
                     renterGoodsPriceDetailList.stream().forEach(x->{
                         if(x.getCarDay().isEqual(revertTime.toLocalDate())){
-                            float Hlast = CommonUtils.getHolidayFootHours(rentTime, LocalDateTimeUtils.localdateToString(rentTime.toLocalDate()));
+                            float Hlast = CommonUtils.getHolidayFootHours(revertTime, LocalDateTimeUtils.localdateToString(revertTime.toLocalDate()));
                             OwnerGoodsPriceDetailDTO renterGoods = new OwnerGoodsPriceDetailDTO();
                             renterGoods.setCarHourCount(Hlast);
                             renterGoods.setCarDay(x.getCarDay());
