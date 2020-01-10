@@ -134,7 +134,7 @@ public class AccountRenterCostCoinService {
         requestVO.setOrderNo(orderNo);
         requestVO.setRemark("订单消费扣减");
         requestVO.setOrderType("1");
-        requestVO.setChargeAutoCoin(amt*AUTO_COIN_RATIO);
+        requestVO.setChargeAutoCoin(amt);
         boolean deductFlag = autoCoinProxyService.deduct(requestVO);
         if(deductFlag){
             insertDeductLog(memNo, renterOrderNo, amt);

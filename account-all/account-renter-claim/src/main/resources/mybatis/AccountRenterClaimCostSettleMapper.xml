@@ -97,5 +97,10 @@
     <select id="getRenterClaimCostAmt" resultMap="BaseResultMap">
         select <include refid="Base_Column_List" /> from account_renter_claim_cost_settle where order_no = #{orderNo} and mem_no = #{memNo} limit 1
     </select>
+    <select id="getRenterClaimCost" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List" /> from account_renter_claim_cost_settle where order_no = #{orderNo} limit 1
+
+
+    </select>
 
 </mapper>
