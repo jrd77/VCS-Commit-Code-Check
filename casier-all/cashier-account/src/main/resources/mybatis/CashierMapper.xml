@@ -168,7 +168,7 @@
 
     </select>
     <select id="selectCashierEntity" resultMap="BaseResultMap">
-        select <include refid="Base_Column_List" /> from cashier where pay_md5 = #{payMd5}
+        select <include refid="Base_Column_List" /> from cashier where pay_md5 = #{payMd5} limit 1
 
     </select>
 

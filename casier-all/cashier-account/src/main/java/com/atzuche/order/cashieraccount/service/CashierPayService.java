@@ -22,7 +22,6 @@ import com.atzuche.order.commons.CatConstants;
 import com.atzuche.order.commons.enums.RenterCashCodeEnum;
 import com.atzuche.order.commons.enums.YesNoEnum;
 import com.atzuche.order.commons.service.OrderPayCallBack;
-import com.atzuche.order.commons.service.RabbitMsgLogService;
 import com.atzuche.order.rentercost.entity.vo.PayableVO;
 import com.atzuche.order.rentercost.service.RenterOrderCostCombineService;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
@@ -65,7 +64,6 @@ public class CashierPayService{
     @Autowired AccountRenterDepositService accountRenterDepositService;
     @Autowired AccountRenterWzDepositService accountRenterWzDepositService;
     @Autowired CashierService cashierService;
-    @Autowired RabbitMsgLogService rabbitMsgLogService;
     @Autowired AccountRenterCostSettleService accountRenterCostSettleService;
     @Autowired RenterOrderCostCombineService renterOrderCostCombineService;
     @Autowired CashierNoTService cashierNoTService;
@@ -89,7 +87,6 @@ public class CashierPayService{
             //3 更新rabbitMQ 记录已消费
             String reqContent = FasterJsonUtil.toJson(batchNotifyDataVo);
             String md5 =  MD5.MD5Encode(reqContent);
-            rabbitMsgLogService.updateConsume(md5);
             t.setStatus(Transaction.SUCCESS);
         } catch (Exception e) {
             log.info("OrderPayCallBack payCallBackAsyn start param;[{}]", GsonUtils.toJson(batchNotifyDataVo));

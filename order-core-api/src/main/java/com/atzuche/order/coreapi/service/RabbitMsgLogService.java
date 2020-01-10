@@ -2,7 +2,7 @@ package com.atzuche.order.coreapi.service;
 
 import com.atzuche.order.commons.entity.RabbitMsgLogEntity;
 import com.atzuche.order.commons.enums.RabbitBusinessTypeEnum;
-import com.atzuche.order.commons.mapper.RabbitMsgLogMapper;
+import com.atzuche.order.coreapi.mapper.RabbitMsgLogMapper;
 import org.apache.commons.lang.math.NumberUtils;
 import org.springframework.amqp.core.Message;
 import org.springframework.beans.factory.annotation.Autowired;
