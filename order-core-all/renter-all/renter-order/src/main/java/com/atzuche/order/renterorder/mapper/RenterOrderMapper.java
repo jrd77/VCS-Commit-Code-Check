@@ -38,4 +38,6 @@ public interface RenterOrderMapper{
     RenterOrderEntity getRenterOrderByOrderNoAndWaitPay(@Param("orderNo") String orderNo);
     
     Integer updateRenterOrderChildStatus(@Param("id") Integer id, @Param("childStatus") Integer childStatus);
+
+    RenterOrderEntity getChangeRenterOrderByOrderNo(@Param("orderNo") String orderNo);
 }

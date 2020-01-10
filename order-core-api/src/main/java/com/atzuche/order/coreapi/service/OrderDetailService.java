@@ -115,10 +115,58 @@ public class OrderDetailService {
         }
         return responseData;
     }
-    public ResponseData<OrderStatusRespDTO> orderStatus(OrderDetailReqDTO orderDetailReqDTO) {
 
-        return null;
+    public ResponseData<OrderStatusRespDTO> orderStatus(OrderDetailReqDTO orderDetailReqDTO) {
+        log.info("准备获取订单状态orderDetailReqDTO={}", JSON.toJSONString(orderDetailReqDTO));
+        ResponseData responseData = new ResponseData();
+        try{
+            OrderStatusRespDTO orderStatusRespDTO = orderStatusProxy(orderDetailReqDTO);
+            responseData.setResCode(ErrorCode.SUCCESS.getCode());
+            responseData.setData(orderStatusRespDTO);
+            responseData.setResMsg(ErrorCode.SUCCESS.getText());
+        }catch (OrderException e){
+            log.error("订单详情转化失败orderDetailReqDTO={}",JSON.toJSONString(orderDetailReqDTO),e);
+            responseData.setResCode(e.getErrorCode());
+            responseData.setData(null);
+            responseData.setResMsg(e.getErrorMsg());
+        }catch (Exception e){
+            log.error("订单详情转化失败orderDetailReqDTO={}",JSON.toJSONString(orderDetailReqDTO),e);
+            responseData.setResCode(ErrorCode.SYS_ERROR.getCode());
+            responseData.setData(null);
+            responseData.setResMsg(ErrorCode.SYS_ERROR.getText());
+        }
+        return responseData;
     }
+
+    public ResponseData<OrderHistoryRespDTO> orderHistory(OrderHistoryReqDTO orderHistoryReqDTO) {
+        log.info("准备获取历史订单orderDetailReqDTO={}", JSON.toJSONString(orderHistoryReqDTO));
+        ResponseData responseData = new ResponseData();
+        try{
+            OrderHistoryRespDTO orderHistoryProxy = orderHistoryProxy(orderHistoryReqDTO);
+            responseData.setResCode(ErrorCode.SUCCESS.getCode());
+            responseData.setData(orderHistoryProxy);
+            responseData.setResMsg(ErrorCode.SUCCESS.getText());
+        }catch (OrderException e){
+            log.error("取历史订单获取失败orderDetailReqDTO={}",JSON.toJSONString(orderHistoryReqDTO),e);
+            responseData.setResCode(e.getErrorCode());
+            responseData.setData(null);
+            responseData.setResMsg(e.getErrorMsg());
+        }catch (Exception e){
+            log.error("取历史订单获取失败orderDetailReqDTO={}",JSON.toJSONString(orderHistoryReqDTO),e);
+            responseData.setResCode(ErrorCode.SYS_ERROR.getCode());
+            responseData.setData(null);
+            responseData.setResMsg(ErrorCode.SYS_ERROR.getText());
+        }
+        return responseData;
+    }
+
+    private OrderHistoryRespDTO orderHistoryProxy(OrderHistoryReqDTO orderHistoryReqDTO) {
+
+
+        OrderHistoryRespDTO orderHistoryRespDTO = new OrderHistoryRespDTO();
+        return orderHistoryRespDTO;
+    }
+
 
     private OrderDetailRespDTO orderDetailProxy(OrderDetailReqDTO orderDetailReqDTO) {
         String orderNo = orderDetailReqDTO.getOrderNo();
@@ -302,6 +350,8 @@ public class OrderDetailService {
     }
 
     private OrderStatusRespDTO orderStatusProxy(OrderDetailReqDTO orderDetailReqDTO) {
+        OrderStatusRespDTO orderStatusRespDTO = new OrderStatusRespDTO();
+        orderStatusRespDTO.isChange = false;
         String orderNo = orderDetailReqDTO.getOrderNo();
         //主订单状态
         OrderStatusEntity orderStatusEntity = orderStatusService.getByOrderNo(orderNo);
@@ -315,19 +365,31 @@ public class OrderDetailService {
 
         //租客子订单状态
         RenterOrderEntity renterOrderEntity = renterOrderService.getRenterOrderByOrderNoAndIsEffective(orderNo);
-        RenterOrderDTO renterOrderDTO = new RenterOrderDTO();
+        RenterOrderStatusDTO renterOrderDTO = new RenterOrderStatusDTO();
         BeanUtils.copyProperties(renterOrderEntity,renterOrderDTO);
 
+        //改变中的租客子订单状态
+        RenterOrderEntity changeRenterOrder = renterOrderService.getChangeRenterOrderByOrderNo(orderNo);
+        RenterOrderStatusDTO changeRenterStaus = null;
+        if(changeRenterOrder != null){
+            orderStatusRespDTO.isChange = true;
+            changeRenterStaus = new RenterOrderStatusDTO();
+            BeanUtils.copyProperties(changeRenterStaus,changeRenterStaus);
+        }
 
         //改变中的车主子订单状态
-        OwnerOrderEntity changeOwnerByOrder = ownerOrderService.getChangeOwnerByOrderNo(orderNo);
+        OwnerOrderEntity changeOwner = ownerOrderService.getChangeOwnerByOrderNo(orderNo);
+        OwnerOrderStatusDTO changeOwnerStatus = null;
+        if(changeOwner != null){
+            changeOwnerStatus = new OwnerOrderStatusDTO();
+            BeanUtils.copyProperties(changeOwner,changeOwnerStatus);
+        }
 
-
-        //改变中的租客子订单状态
-
-
-        OrderStatusRespDTO orderStatusRespDTO = new OrderStatusRespDTO();
-
+        orderStatusRespDTO.orderStatusDTO = orderStatusDTO;
+        orderStatusRespDTO.renterOrderStatusDTO = renterOrderDTO;
+        orderStatusRespDTO.ownerOrderStatusDTO = ownerOrderStatusDTO;
+        orderStatusRespDTO.renterOrderStatusChangeDTO = changeRenterStaus;
+        orderStatusRespDTO.ownerOrderStatusChangeDTO = changeOwnerStatus;
 
         return orderStatusRespDTO;
     }
