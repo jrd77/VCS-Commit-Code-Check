@@ -493,12 +493,12 @@ public class ModifyOrderService {
 		if (StringUtils.isBlank(modifyOrderReq.getRentTime())) {
 			modifyOrderDTO.setRentTime(initRenterOrder.getExpRentTime());
 		} else {
-			modifyOrderDTO.setRentTime(CommonUtils.parseTime(modifyOrderReq.getRentTime(), CommonUtils.FORMAT_STR_DEFAULT));
+			modifyOrderDTO.setRentTime(CommonUtils.parseTime(modifyOrderReq.getRentTime(), CommonUtils.FORMAT_STR_LONG));
 		}
 		if (StringUtils.isBlank(modifyOrderReq.getRevertTime())) {
 			modifyOrderDTO.setRevertTime(initRenterOrder.getExpRevertTime());
 		} else {
-			modifyOrderDTO.setRevertTime(CommonUtils.parseTime(modifyOrderReq.getRevertTime(), CommonUtils.FORMAT_STR_DEFAULT));
+			modifyOrderDTO.setRevertTime(CommonUtils.parseTime(modifyOrderReq.getRevertTime(), CommonUtils.FORMAT_STR_LONG));
 		}
 		// 获取修改前的附加驾驶人列表
 		List<String> drivers = renterAdditionalDriverService.listDriverIdByRenterOrderNo(initRenterOrder.getRenterOrderNo());
