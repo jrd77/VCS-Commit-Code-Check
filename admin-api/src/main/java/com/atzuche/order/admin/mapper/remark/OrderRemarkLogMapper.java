@@ -1,4 +1,4 @@
-package com.atzuche.order.admin.mapper;
+package com.atzuche.order.admin.mapper.remark;
 
 import com.atzuche.order.admin.dto.OrderRemarkLogListRequestDTO;
 import com.atzuche.order.admin.entity.OrderRemarkEntity;

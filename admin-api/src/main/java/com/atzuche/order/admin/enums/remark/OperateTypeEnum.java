@@ -1,16 +1,17 @@
-package com.atzuche.order.admin.enums;
+package com.atzuche.order.admin.enums.remark;
 
 
-public enum InsuranceCompanyTypeEnum {
-    CPIC("1", "太平洋保险"),
-    PICC("2", "中国人民保险");
+public enum OperateTypeEnum {
+    ADD("1", "新增"),
+    UPDATE("2", "更新"),
+    DELETE("3", "删除");
 
 
     private String type;
 
     private String typeDescription;
 
-    InsuranceCompanyTypeEnum(String type, String typeDescription) {
+    OperateTypeEnum(String type, String typeDescription) {
         this.type = type;
         this.typeDescription = typeDescription;
     }
@@ -29,7 +30,7 @@ public enum InsuranceCompanyTypeEnum {
      * @return
      */
     public static String getDescriptionByType(String type){
-        for (InsuranceCompanyTypeEnum remarkType : InsuranceCompanyTypeEnum.values()) {
+        for (OperateTypeEnum remarkType : OperateTypeEnum.values()) {
             if(remarkType.getType().equals(type)){
                 return remarkType.getTypeDescription();
             }

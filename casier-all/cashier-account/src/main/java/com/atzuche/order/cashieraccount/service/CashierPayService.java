@@ -25,7 +25,8 @@ import com.atzuche.order.commons.service.OrderPayCallBack;
 import com.atzuche.order.rentercost.entity.vo.PayableVO;
 import com.atzuche.order.rentercost.service.RenterOrderCostCombineService;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
-import com.atzuche.order.wallet.server.service.WalletService;
+import com.atzuche.order.wallet.WalletProxyService;
+import com.atzuche.order.wallet.api.OrderWalletFeignService;
 import com.autoyol.autopay.gateway.constant.DataPayKindConstant;
 import com.autoyol.autopay.gateway.util.MD5;
 import com.autoyol.autopay.gateway.vo.req.BatchNotifyDataVo;
@@ -67,7 +68,7 @@ public class CashierPayService{
     @Autowired AccountRenterCostSettleService accountRenterCostSettleService;
     @Autowired RenterOrderCostCombineService renterOrderCostCombineService;
     @Autowired CashierNoTService cashierNoTService;
-    @Autowired WalletService walletService;
+    @Autowired WalletProxyService walletService;
     @Autowired RefundRemoteService refundRemoteService;
     @Autowired CashierRefundApplyNoTService cashierRefundApplyNoTService;
 
@@ -105,39 +106,47 @@ public class CashierPayService{
      * @return
      */
     @Transactional(rollbackFor=Exception.class)
-    public String getPaySignStr(OrderPaySignReqVO orderPaySign){
+    public String getPaySignStr(OrderPaySignReqVO orderPaySign,OrderPayCallBack orderPayCallBack){
         //1校验
         Assert.notNull(orderPaySign, ErrorCode.PARAMETER_ERROR.getText());
         orderPaySign.check();
-
+        orderPayCallBack.callBack(orderPaySign.getOrderNo());
         //3 查询应付
         OrderPayReqVO orderPayReqVO = new OrderPayReqVO();
         BeanUtils.copyProperties(orderPaySign,orderPayReqVO);
-        OrderPayableAmountResVO payVO = getOrderPayableAmount(orderPayReqVO);
+        OrderPayableAmountResVO orderPayable = getOrderPayableAmount(orderPayReqVO);
         //4 抵扣钱包
-        if(YesNoEnum.YES.getCode()==payVO.getIsUseWallet()){
-           int payBalance = walletService.getTotalWallet(orderPaySign.getMenNo());
+        if(YesNoEnum.YES.getCode()==orderPayable.getIsUseWallet()){
+           int payBalance = walletService.getWalletByMemNo(orderPaySign.getMenNo());
            //判断余额大于0
            if(payBalance>0){
                //5 抵扣钱包落库 （收银台落库、费用落库）
-               int amtWallet = walletService.deductWallet(orderPaySign.getMenNo(),orderPaySign.getOrderNo(),payVO.getAmtWallet());
+               int amtWallet = walletService.orderDeduct(orderPaySign.getMenNo(),orderPaySign.getOrderNo(),orderPayable.getAmt());
                //6收银台 钱包支付落库
                cashierNoTService.insertRenterCostByWallet(orderPaySign,amtWallet);
                //钱包未抵扣部分
                int amtPaying =0;
-               if(amtWallet<payVO.getAmtWallet()){
-                   amtPaying = amtWallet - payVO.getAmtWallet();
+               if(amtWallet<orderPayable.getAmtWallet()){
+                   amtPaying = amtWallet - orderPayable.getAmtWallet();
                }
-               payVO.setAmtWallet(amtWallet);
-               payVO.setAmt(payVO.getAmt() + amtPaying);
+               orderPayable.setAmtWallet(amtWallet);
+               orderPayable.setAmt(orderPayable.getAmt() + amtPaying);
                //如果待支付 金额等于 0 即 钱包抵扣完成
-               if(payVO.getAmt()==0){
+               if(orderPayable.getAmt()==0){
+                   List<String> payKind = orderPaySign.getPayKind();
+                   // 如果 支付款项 只有租车费用一个  并且使用钱包支付 ，当待支付金额完全被 钱包抵扣直接返回支付完成
+                   if(!CollectionUtils.isEmpty(payKind) && payKind.size()==1 && orderPayReqVO.getPayKind().contains(DataPayKindConstant.RENT_AMOUNT)){
+                       //修改子订单费用信息
+                       orderPayCallBack.callBack(orderPaySign.getOrderNo());
+                       return "";
+                   }
+
                }
            }
 
         }
         //7 签名串
-        List<PayVo> payVo = getOrderPayVO(orderPaySign,payVO);
+        List<PayVo> payVo = getOrderPayVO(orderPaySign,orderPayable);
         log.info("CashierPayService 加密前费用列表打印 getPaySignStr payVo [{}] ",GsonUtils.toJson(payVo));
         if(CollectionUtils.isEmpty(payVo)){
             throw new OrderPaySignFailException();
@@ -207,7 +216,7 @@ public class CashierPayService{
         // 计算钱包 支付 目前支付抵扣租费费用
         int amtWallet =0;
         if(YesNoEnum.YES.getCode()==result.getIsUseWallet()){
-            int payBalance = walletService.getTotalWallet(orderPayReqVO.getMenNo());
+            int payBalance = walletService.getWalletByMemNo(orderPayReqVO.getMenNo());
             //预计钱包抵扣金额 = amtWallet
             amtWallet = amtRent + payBalance < 0 ? payBalance : Math.abs(amtRent);
             // 抵扣钱包后  应付租车费用金额

@@ -1,17 +1,21 @@
-package com.atzuche.order.admin.enums;
+package com.atzuche.order.admin.enums.remark;
 
 
-public enum InsuranceInputTypeEnum {
-    MANUAL("1", "手工录入"),
-    IMPORT("2", "批量导入"),
-    BI_IMPORT("3", "BI导入");
+public enum FollowStatusEnum {
+    WGJ("1", "未跟进"),
+    GJCG("2", "跟进成功"),
+    GJSB("3", "跟进失败"),
+    ZCZ("4", "找车中"),
+    CFXQ("5", "重复需求"),
+    SCBJ("6", "首次被拒"),
+    DXCX("7", "短信促单");
 
 
     private String type;
 
     private String typeDescription;
 
-    InsuranceInputTypeEnum(String type, String typeDescription) {
+    FollowStatusEnum(String type, String typeDescription) {
         this.type = type;
         this.typeDescription = typeDescription;
     }
@@ -30,7 +34,7 @@ public enum InsuranceInputTypeEnum {
      * @return
      */
     public static String getDescriptionByType(String type){
-        for (InsuranceInputTypeEnum remarkType : InsuranceInputTypeEnum.values()) {
+        for (FollowStatusEnum remarkType : FollowStatusEnum.values()) {
             if(remarkType.getType().equals(type)){
                 return remarkType.getTypeDescription();
             }

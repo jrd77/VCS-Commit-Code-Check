@@ -1,4 +1,4 @@
-package com.atzuche.order.admin.enums;
+package com.atzuche.order.admin.enums.remark;
 
 
 public enum FollowfailReasonEnum {
