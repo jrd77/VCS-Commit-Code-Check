@@ -132,6 +132,12 @@ public class CashierPayService{
                payVO.setAmt(payVO.getAmt() + amtPaying);
                //如果待支付 金额等于 0 即 钱包抵扣完成
                if(payVO.getAmt()==0){
+                   List<String> payKind = orderPaySign.getPayKind();
+                   // 如果 支付款项 只有租车费用一个  并且使用钱包支付 ，当待支付金额完全被 钱包抵扣直接返回支付完成
+                   if(!CollectionUtils.isEmpty(payKind) && payKind.size()==1 && orderPayReqVO.getPayKind().contains(DataPayKindConstant.RENT_AMOUNT)){
+                       return "";
+                   }
+
                }
            }
 
