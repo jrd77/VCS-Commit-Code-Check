@@ -321,7 +321,7 @@ public class RenterOrderService {
                                                                  RenterOrderReqVO renterOrderReqVO) {
 
         MemAvailCouponRequestVO memAvailCouponRequestVO = new MemAvailCouponRequestVO();
-
+        memAvailCouponRequestVO.setOrderNo(renterOrderReqVO.getOrderNo());
         memAvailCouponRequestVO.setMemNo(Integer.valueOf(renterOrderReqVO.getMemNo()));
         memAvailCouponRequestVO.setCarNo(Integer.valueOf(renterOrderReqVO.getCarNo()));
         memAvailCouponRequestVO.setCityCode(Integer.valueOf(renterOrderReqVO.getCityCode()));
@@ -416,6 +416,7 @@ public class RenterOrderService {
         ownerCouponGetAndValidReqVO.setCouponNo(renterOrderReqVO.getCarOwnerCouponNo());
         ownerCouponGetAndValidReqVO.setRentAmt(rentAmt);
         ownerCouponGetAndValidReqVO.setMark(1);
+        ownerCouponGetAndValidReqVO.setOrderNo(renterOrderReqVO.getOrderNo());
         return ownerCouponGetAndValidReqVO;
     }
 
