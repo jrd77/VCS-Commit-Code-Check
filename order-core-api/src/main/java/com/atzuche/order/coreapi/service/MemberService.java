@@ -324,7 +324,7 @@ public class MemberService {
      * @Description: 根据会员号，获取常用驾驶人列表
      *
      **/
-    public List<CommUseDriverInfo> getCommUseDriverList(String memNo){
+    public List<CommUseDriverInfoDTO> getCommUseDriverList(String memNo){
         List<String> selectKey = Arrays.asList(MemberSelectKeyEnum.MEMBER_ADDITION_INFO.getKey());
         ResponseData<MemberAdditionInfo> responseData = null;
         log.info("Feign 开始获取附加驾驶人信息,memNo={}",memNo);
@@ -354,6 +354,13 @@ public class MemberService {
             t.complete();
         }
         MemberAdditionInfo memberAdditionInfo = responseData.getData();
-        return memberAdditionInfo.getCommUseDriverList();
+        List<CommUseDriverInfo> commUseDriverList = memberAdditionInfo.getCommUseDriverList();
+        List<CommUseDriverInfoDTO> CommUseDriverList = new ArrayList<>();
+        commUseDriverList.forEach(x->{
+            CommUseDriverInfoDTO commUseDriverInfoDTO = new CommUseDriverInfoDTO();
+            BeanUtils.copyProperties(x,commUseDriverInfoDTO);
+            CommUseDriverList.add(commUseDriverInfoDTO);
+        });
+        return CommUseDriverList;
     }
 }
