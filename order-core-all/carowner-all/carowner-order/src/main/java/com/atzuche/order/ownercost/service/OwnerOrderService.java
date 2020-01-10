@@ -9,7 +9,6 @@ import com.atzuche.order.ownercost.entity.dto.OwnerOrderCostReqDTO;
 import com.atzuche.order.ownercost.entity.dto.OwnerOrderReqDTO;
 import com.atzuche.order.ownercost.mapper.OwnerOrderMapper;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,6 +20,17 @@ public class OwnerOrderService {
     private OwnerOrderMapper ownerOrderMapper;
     @Autowired
     private OwnerOrderCalCostService ownerOrderCalCostService;
+
+    /*
+     * @Author ZhangBin
+     * @Date 2020/1/10 14:30
+     * @Description: 获取待生效的子订单状态
+     * 
+     **/
+    public OwnerOrderEntity getChangeOwnerByOrderNo(String orderNo){
+        return ownerOrderMapper.getChangeOwnerByOrderNo(orderNo);
+    }
+
 
     /*
      * @Author ZhangBin
