@@ -1,0 +1,265 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.atzuche.order.delivery.mapper.OrderDeliveryFlowMapper">
+
+    <resultMap type="com.atzuche.order.delivery.entity.OrderDeliveryFlowEntity" id="BaseResultMap">
+        <result property="id" column="id"/>
+        <result property="orderNo" column="order_no"/>
+        <result property="orderType" column="order_type"/>
+        <result property="serviceType" column="service_type"/>
+        <result property="pickupAlsoCarAddr" column="pickup_also_car_addr"/>
+        <result property="termTime" column="term_time"/>
+        <result property="returnTime" column="return_time"/>
+        <result property="carNo" column="car_no"/>
+        <result property="defaultPickupCarAddr" column="default_pickup_car_addr"/>
+        <result property="vehicleModel" column="vehicle_model"/>
+        <result property="vehicleType" column="vehicle_type"/>
+        <result property="deliveryCarCity" column="delivery_car_city"/>
+        <result property="ownerName" column="owner_name"/>
+        <result property="ownerPhone" column="owner_phone"/>
+        <result property="successOrdeNumber" column="success_orde_number"/>
+        <result property="tenantName" column="tenant_name"/>
+        <result property="tenantPhone" column="tenant_phone"/>
+        <result property="tenantTurnoverNo" column="tenant_turnover_no"/>
+        <result property="ownerType" column="owner_type"/>
+        <result property="sceneName" column="scene_name"/>
+        <result property="displacement" column="displacement"/>
+        <result property="source" column="source"/>
+        <result property="createOp" column="create_op"/>
+        <result property="updateOp" column="update_op"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="isDelete" column="is_delete"/>
+    </resultMap>
+
+
+	<sql id="Base_Column_List">
+	`id`, 	
+	`order_no`, 	
+	`order_type`, 	
+	`service_type`, 	
+	`pickup_also_car_addr`, 	
+	`term_time`, 	
+	`return_time`, 	
+	`car_no`, 	
+	`default_pickup_car_addr`, 	
+	`vehicle_model`, 	
+	`vehicle_type`, 	
+	`delivery_car_city`, 	
+	`owner_name`, 	
+	`owner_phone`, 	
+	`success_orde_number`, 	
+	`tenant_name`, 	
+	`tenant_phone`, 	
+	`tenant_turnover_no`, 	
+	`owner_type`, 	
+	`scene_name`, 	
+	`displacement`, 	
+	`source`, 	
+	`create_op`, 	
+	`update_op`, 	
+	`create_time`, 	
+	`update_time`, 	
+	`is_delete`	
+
+	</sql>
+
+
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap">
+		select <include refid="Base_Column_List" /> from order_delivery_flow where id = #{value}
+	</select>
+
+	<insert id="insert" parameterType="com.atzuche.order.delivery.entity.OrderDeliveryFlowEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into order_delivery_flow
+		(
+				`order_no`,		
+				`order_type`,		
+				`service_type`,		
+				`pickup_also_car_addr`,		
+				`term_time`,		
+				`return_time`,		
+				`car_no`,		
+				`default_pickup_car_addr`,		
+				`vehicle_model`,		
+				`vehicle_type`,		
+				`delivery_car_city`,		
+				`owner_name`,		
+				`owner_phone`,		
+				`success_orde_number`,		
+				`tenant_name`,		
+				`tenant_phone`,		
+				`tenant_turnover_no`,		
+				`owner_type`,		
+				`scene_name`,		
+				`displacement`,		
+				`source`,		
+				`create_op`,		
+				`update_op`,		
+				`create_time`,		
+				`update_time`,		
+				`is_delete`		
+			)
+		values
+		(
+				#{orderNo}, 		
+				#{orderType}, 		
+				#{serviceType}, 		
+				#{pickupAlsoCarAddr}, 		
+				#{termTime}, 		
+				#{returnTime}, 		
+				#{carNo}, 		
+				#{defaultPickupCarAddr}, 		
+				#{vehicleModel}, 		
+				#{vehicleType}, 		
+				#{deliveryCarCity}, 		
+				#{ownerName}, 		
+				#{ownerPhone}, 		
+				#{successOrdeNumber}, 		
+				#{tenantName}, 		
+				#{tenantPhone}, 		
+				#{tenantTurnoverNo}, 		
+				#{ownerType}, 		
+				#{sceneName}, 		
+				#{displacement}, 		
+				#{source}, 		
+				#{createOp}, 		
+				#{updateOp}, 		
+				#{createTime}, 		
+				#{updateTime}, 		
+				#{isDelete}		
+			)
+	</insert>
+	
+	<insert id="insertSelective" parameterType="com.atzuche.order.delivery.entity.OrderDeliveryFlowEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into order_delivery_flow
+            <trim prefix="(" suffix=")" suffixOverrides="," >
+				<if test="orderNo != null">`order_no`, </if>
+				<if test="orderType != null">`order_type`, </if>
+				<if test="serviceType != null">`service_type`, </if>
+				<if test="pickupAlsoCarAddr != null">`pickup_also_car_addr`, </if>
+				<if test="termTime != null">`term_time`, </if>
+				<if test="returnTime != null">`return_time`, </if>
+				<if test="carNo != null">`car_no`, </if>
+				<if test="defaultPickupCarAddr != null">`default_pickup_car_addr`, </if>
+				<if test="vehicleModel != null">`vehicle_model`, </if>
+				<if test="vehicleType != null">`vehicle_type`, </if>
+				<if test="deliveryCarCity != null">`delivery_car_city`, </if>
+				<if test="ownerName != null">`owner_name`, </if>
+				<if test="ownerPhone != null">`owner_phone`, </if>
+				<if test="successOrdeNumber != null">`success_orde_number`, </if>
+				<if test="tenantName != null">`tenant_name`, </if>
+				<if test="tenantPhone != null">`tenant_phone`, </if>
+				<if test="tenantTurnoverNo != null">`tenant_turnover_no`, </if>
+				<if test="ownerType != null">`owner_type`, </if>
+				<if test="sceneName != null">`scene_name`, </if>
+				<if test="displacement != null">`displacement`, </if>
+				<if test="source != null">`source`, </if>
+				<if test="createOp != null">`create_op`, </if>
+				<if test="updateOp != null">`update_op`, </if>
+				<if test="createTime != null">`create_time`, </if>
+				<if test="updateTime != null">`update_time`, </if>
+				<if test="isDelete != null">`is_delete` </if>
+	        </trim>
+            <trim prefix="values (" suffix=")" suffixOverrides="," >
+				<if test="orderNo != null">#{orderNo},  </if>
+				<if test="orderType != null">#{orderType},  </if>
+				<if test="serviceType != null">#{serviceType},  </if>
+				<if test="pickupAlsoCarAddr != null">#{pickupAlsoCarAddr},  </if>
+				<if test="termTime != null">#{termTime},  </if>
+				<if test="returnTime != null">#{returnTime},  </if>
+				<if test="carNo != null">#{carNo},  </if>
+				<if test="defaultPickupCarAddr != null">#{defaultPickupCarAddr},  </if>
+				<if test="vehicleModel != null">#{vehicleModel},  </if>
+				<if test="vehicleType != null">#{vehicleType},  </if>
+				<if test="deliveryCarCity != null">#{deliveryCarCity},  </if>
+				<if test="ownerName != null">#{ownerName},  </if>
+				<if test="ownerPhone != null">#{ownerPhone},  </if>
+				<if test="successOrdeNumber != null">#{successOrdeNumber},  </if>
+				<if test="tenantName != null">#{tenantName},  </if>
+				<if test="tenantPhone != null">#{tenantPhone},  </if>
+				<if test="tenantTurnoverNo != null">#{tenantTurnoverNo},  </if>
+				<if test="ownerType != null">#{ownerType},  </if>
+				<if test="sceneName != null">#{sceneName},  </if>
+				<if test="displacement != null">#{displacement},  </if>
+				<if test="source != null">#{source},  </if>
+				<if test="createOp != null">#{createOp},  </if>
+				<if test="updateOp != null">#{updateOp},  </if>
+				<if test="createTime != null">#{createTime},  </if>
+				<if test="updateTime != null">#{updateTime},  </if>
+				<if test="isDelete != null">#{isDelete} </if>
+	        </trim>
+	</insert>
+	
+	 
+	<update id="updateByPrimaryKeySelective" parameterType="com.atzuche.order.delivery.entity.OrderDeliveryFlowEntity">
+		update order_delivery_flow 
+		<set>
+				<if test="orderNo != null">`order_no` = #{orderNo}, </if>
+				<if test="orderType != null">`order_type` = #{orderType}, </if>
+				<if test="serviceType != null">`service_type` = #{serviceType}, </if>
+				<if test="pickupAlsoCarAddr != null">`pickup_also_car_addr` = #{pickupAlsoCarAddr}, </if>
+				<if test="termTime != null">`term_time` = #{termTime}, </if>
+				<if test="returnTime != null">`return_time` = #{returnTime}, </if>
+				<if test="carNo != null">`car_no` = #{carNo}, </if>
+				<if test="defaultPickupCarAddr != null">`default_pickup_car_addr` = #{defaultPickupCarAddr}, </if>
+				<if test="vehicleModel != null">`vehicle_model` = #{vehicleModel}, </if>
+				<if test="vehicleType != null">`vehicle_type` = #{vehicleType}, </if>
+				<if test="deliveryCarCity != null">`delivery_car_city` = #{deliveryCarCity}, </if>
+				<if test="ownerName != null">`owner_name` = #{ownerName}, </if>
+				<if test="ownerPhone != null">`owner_phone` = #{ownerPhone}, </if>
+				<if test="successOrdeNumber != null">`success_orde_number` = #{successOrdeNumber}, </if>
+				<if test="tenantName != null">`tenant_name` = #{tenantName}, </if>
+				<if test="tenantPhone != null">`tenant_phone` = #{tenantPhone}, </if>
+				<if test="tenantTurnoverNo != null">`tenant_turnover_no` = #{tenantTurnoverNo}, </if>
+				<if test="ownerType != null">`owner_type` = #{ownerType}, </if>
+				<if test="sceneName != null">`scene_name` = #{sceneName}, </if>
+				<if test="displacement != null">`displacement` = #{displacement}, </if>
+				<if test="source != null">`source` = #{source}, </if>
+				<if test="createOp != null">`create_op` = #{createOp}, </if>
+				<if test="updateOp != null">`update_op` = #{updateOp}, </if>
+				<if test="createTime != null">`create_time` = #{createTime}, </if>
+				<if test="updateTime != null">`update_time` = #{updateTime}, </if>
+				<if test="isDelete != null">`is_delete` = #{isDelete}</if>
+			</set>
+		where id = #{id}
+	</update>
+	
+	<update id="updateByPrimaryKey" parameterType="com.atzuche.order.delivery.entity.OrderDeliveryFlowEntity">
+		update order_delivery_flow 
+		<set>
+				`order_no` = #{orderNo}, 		
+				`order_type` = #{orderType}, 		
+				`service_type` = #{serviceType}, 		
+				`pickup_also_car_addr` = #{pickupAlsoCarAddr}, 		
+				`term_time` = #{termTime}, 		
+				`return_time` = #{returnTime}, 		
+				`car_no` = #{carNo}, 		
+				`default_pickup_car_addr` = #{defaultPickupCarAddr}, 		
+				`vehicle_model` = #{vehicleModel}, 		
+				`vehicle_type` = #{vehicleType}, 		
+				`delivery_car_city` = #{deliveryCarCity}, 		
+				`owner_name` = #{ownerName}, 		
+				`owner_phone` = #{ownerPhone}, 		
+				`success_orde_number` = #{successOrdeNumber}, 		
+				`tenant_name` = #{tenantName}, 		
+				`tenant_phone` = #{tenantPhone}, 		
+				`tenant_turnover_no` = #{tenantTurnoverNo}, 		
+				`owner_type` = #{ownerType}, 		
+				`scene_name` = #{sceneName}, 		
+				`displacement` = #{displacement}, 		
+				`source` = #{source}, 		
+				`create_op` = #{createOp}, 		
+				`update_op` = #{updateOp}, 		
+				`create_time` = #{createTime}, 		
+				`update_time` = #{updateTime}, 		
+				`is_delete` = #{isDelete}		
+	
+		</set>
+		where id = #{id}
+	</update>
+
+	<select id="selectOrderDeliveryByOrderNo" resultMap="BaseResultMap">
+		select <include refid="Base_Column_List" /> from order_delivery_flow where order_no = #{orderNo} and service_type = #{serviceType}
+	</select>
+</mapper>
