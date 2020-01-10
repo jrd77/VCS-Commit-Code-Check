@@ -470,5 +470,13 @@ public class RenterOrderService {
     public int updateRenterOrderInfo(RenterOrderEntity renterOrderEntity) {
         return renterOrderMapper.updateByPrimaryKeySelective(renterOrderEntity);
     }
-
+    /*
+     * @Author ZhangBin
+     * @Date 2020/1/10 16:05
+     * @Description: 获取待生效的租客子订单
+     *
+     **/
+    public RenterOrderEntity getChangeRenterOrderByOrderNo(String orderNo) {
+        return renterOrderMapper.getChangeRenterOrderByOrderNo(orderNo);
+    }
 }

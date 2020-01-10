@@ -1,9 +1,6 @@
 package com.atzuche.order.coreapi.controller;
 
-import com.atzuche.order.commons.entity.orderDetailDto.OrderDetailReqDTO;
-import com.atzuche.order.commons.entity.orderDetailDto.OrderDetailRespDTO;
-import com.atzuche.order.commons.entity.orderDetailDto.OrderHistoryRespDTO;
-import com.atzuche.order.commons.entity.orderDetailDto.OrderStatusRespDTO;
+import com.atzuche.order.commons.entity.orderDetailDto.*;
 import com.atzuche.order.coreapi.service.OrderDetailService;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
@@ -48,13 +45,13 @@ public class OrderDetailController {
         return respData;
     }
     @PostMapping("/orderHistory")
-    public ResponseData<OrderHistoryRespDTO> orderHistory(@Valid @RequestBody OrderDetailReqDTO orderDetailReqDTO, BindingResult bindingResult){
+    public ResponseData<OrderHistoryRespDTO> orderHistory(@Valid @RequestBody OrderHistoryReqDTO orderHistoryReqDTO, BindingResult bindingResult){
         if (bindingResult.hasErrors()) {
             Optional<FieldError> error = bindingResult.getFieldErrors().stream().findFirst();
             return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), error.isPresent() ?
                     error.get().getDefaultMessage() : ErrorCode.INPUT_ERROR.getText());
         }
-        ResponseData<OrderHistoryRespDTO> respData = orderDetailService.orderHistory(orderDetailReqDTO);
+        ResponseData<OrderHistoryRespDTO> respData = orderDetailService.orderHistory(orderHistoryReqDTO);
         return respData;
     }
 
