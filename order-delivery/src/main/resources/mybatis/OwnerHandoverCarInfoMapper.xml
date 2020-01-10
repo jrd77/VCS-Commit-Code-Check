@@ -282,5 +282,13 @@
 		order_no = #{orderNo} and is_delete = 0
 	</select>
 
+    <select id="selectByOwnerOrderNoAndType" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from owner_handover_car_info
+        where owner_order_no=#{ownerOrderNo} and `type`=#{type}
+        and is_delete = 0 limit 1
+    </select>
+
 
 </mapper>

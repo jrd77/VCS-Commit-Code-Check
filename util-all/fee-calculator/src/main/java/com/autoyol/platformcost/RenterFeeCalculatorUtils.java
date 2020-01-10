@@ -373,7 +373,7 @@ public class RenterFeeCalculatorUtils {
         //初始化车辆押金
         Integer suggestTotal = getSuggestTotalAmt(guidPrice);
         Boolean carbool = true;
-        String cityCodeStr = cityCode == null ? "":String.valueOf(cityCode);
+        Integer cityCodeStr = cityCode == null ? null:Integer.valueOf(cityCode);
         if(null!=depositList&&depositList.size()>0){
             for (DepositConfigEntity dt : depositList) {
                 if(CAREEPOSIT.equals(dt.getDepositType())

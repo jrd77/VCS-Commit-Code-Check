@@ -30,6 +30,6 @@ dependencies {
     compile project(":util-all:order-commons")
     compile project(":config")
     compile project(":util-all:fee-calculator")
-
+    compile 'com.aliyun.oss:aliyun-sdk-oss:2.8.3'
 
 }

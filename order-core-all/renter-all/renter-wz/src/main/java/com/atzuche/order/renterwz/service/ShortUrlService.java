@@ -1,4 +1,4 @@
-package com.atzuche.order.commons.service;
+package com.atzuche.order.renterwz.service;
 
 import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.CatConstants;

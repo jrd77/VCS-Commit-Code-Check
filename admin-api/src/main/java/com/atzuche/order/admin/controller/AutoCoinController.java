@@ -24,7 +24,7 @@ public class AutoCoinController {
 
 	@AutoDocMethod(description = "获取凹凸币余额", value = "获取钱包余额", response = AutoCoinResponseVO.class)
 	@GetMapping("autocoin/balance")
-	public ResponseData autocoinBalance(@RequestBody AutoCoinRequestVO autoCoinRequestVO, BindingResult bindingResult) {
+	public ResponseData autocoinBalance(AutoCoinRequestVO autoCoinRequestVO, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), ErrorCode.INPUT_ERROR.getText());
         }

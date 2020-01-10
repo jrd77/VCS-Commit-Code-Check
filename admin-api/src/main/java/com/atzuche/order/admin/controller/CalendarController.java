@@ -27,7 +27,7 @@ public class CalendarController {
 
 	@AutoDocMethod(description = "获取车辆价格日历", value = "获取车辆价格日历", response = CalendarListResponseVO.class)
 	@GetMapping("car/calendar/price")
-	public ResponseData carCalendarPrice(@RequestBody CalendarRequestVO calendarRequestVO, BindingResult bindingResult) {
+	public ResponseData carCalendarPrice(CalendarRequestVO calendarRequestVO, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), ErrorCode.INPUT_ERROR.getText());
         }

@@ -11,9 +11,11 @@ import com.atzuche.order.commons.entity.dto.*;
 import com.atzuche.order.commons.entity.orderDetailDto.*;
 import com.atzuche.order.commons.enums.DeliveryOrderTypeEnum;
 import com.atzuche.order.coreapi.submitOrder.exception.OrderDetailException;
+import com.atzuche.order.delivery.entity.OwnerHandoverCarInfoEntity;
 import com.atzuche.order.delivery.entity.RenterHandoverCarInfoEntity;
 import com.atzuche.order.delivery.entity.RenterOrderDeliveryEntity;
 import com.atzuche.order.delivery.enums.RenterHandoverCarTypeEnum;
+import com.atzuche.order.delivery.service.OwnerHandoverCarInfoService;
 import com.atzuche.order.delivery.service.RenterHandoverCarInfoService;
 import com.atzuche.order.delivery.service.RenterOrderDeliveryService;
 import com.atzuche.order.owner.commodity.service.OwnerGoodsService;
@@ -50,6 +52,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -88,6 +91,8 @@ public class OrderDetailService {
     private OwnerOrderPurchaseDetailService ownerOrderPurchaseDetailService;
     @Autowired
     private ConsoleOwnerOrderFineDeatailService consoleOwnerOrderFineDeatailService;
+    @Autowired
+    private OwnerHandoverCarInfoService ownerHandoverCarInfoService;
 
     public ResponseData<OrderDetailRespDTO> orderDetail(OrderDetailReqDTO orderDetailReqDTO){
         log.info("准备获取订单详情orderDetailReqDTO={}", JSON.toJSONString(orderDetailReqDTO));
@@ -109,6 +114,10 @@ public class OrderDetailService {
             responseData.setResMsg(ErrorCode.SYS_ERROR.getText());
         }
         return responseData;
+    }
+    public ResponseData<OrderStatusRespDTO> orderStatus(OrderDetailReqDTO orderDetailReqDTO) {
+
+        return null;
     }
 
     private OrderDetailRespDTO orderDetailProxy(OrderDetailReqDTO orderDetailReqDTO) {
@@ -190,18 +199,27 @@ public class OrderDetailService {
 
         //订单取消原因
         OrderCancelReasonEntity orderCancelReasonEntity = orderCancelReasonService.selectByOrderNo(orderNo);
-        OrderCancelReasonDTO orderCancelReasonDTO = new OrderCancelReasonDTO();
+        OrderCancelReasonDTO orderCancelReasonDTO = null;
         if(orderCancelReasonEntity != null){
+            orderCancelReasonDTO = new OrderCancelReasonDTO();
             BeanUtils.copyProperties(orderCancelReasonEntity,orderCancelReasonDTO);
         }
 
         //租客交接车
         RenterHandoverCarInfoEntity renterHandoverCarInfoEntity = renterHandoverCarInfoService.selectByRenterOrderNoAndType(renterOrderNo, RenterHandoverCarTypeEnum.OWNER_TO_RENTER.getValue());
-        RenterHandoverCarInfoDTO renterHandoverCarInfoDTO = new RenterHandoverCarInfoDTO();
+        RenterHandoverCarInfoDTO renterHandoverCarInfoDTO = null;
         if(renterHandoverCarInfoEntity != null){
+            renterHandoverCarInfoDTO = new RenterHandoverCarInfoDTO();
             BeanUtils.copyProperties(renterHandoverCarInfoEntity,renterHandoverCarInfoDTO);
         }
 
+        //车主交接车
+        OwnerHandoverCarInfoEntity ownerHandoverCarInfoEntity = ownerHandoverCarInfoService.selectByRenterOrderNoAndType(renterOrderNo, RenterHandoverCarTypeEnum.OWNER_TO_RENTER.getValue());
+        OwnerHandoverCarInfoDTO ownerHandoverCarInfoDTO = null;
+        if(ownerHandoverCarInfoDTO != null){
+            ownerHandoverCarInfoDTO = new OwnerHandoverCarInfoDTO();
+            BeanUtils.copyProperties(ownerHandoverCarInfoEntity,ownerHandoverCarInfoDTO);
+        }
 
         //车主订单费用明细
         List<RenterOrderCostDetailEntity> renterOrderCostDetailList = renterOrderCostDetailService.listRenterOrderCostDetail(orderNo, renterOrderNo);
@@ -283,6 +301,36 @@ public class OrderDetailService {
         return orderDetailRespDTO;
     }
 
+    private OrderStatusRespDTO orderStatusProxy(OrderDetailReqDTO orderDetailReqDTO) {
+        String orderNo = orderDetailReqDTO.getOrderNo();
+        //主订单状态
+        OrderStatusEntity orderStatusEntity = orderStatusService.getByOrderNo(orderNo);
+        OrderStatusDTO orderStatusDTO = new OrderStatusDTO();
+        BeanUtils.copyProperties(orderStatusEntity,orderStatusDTO);
+
+        //车主子订单状态
+        OwnerOrderEntity ownerOrderEntity = ownerOrderService.getOwnerOrderByOrderNoAndIsEffective(orderNo);
+        OwnerOrderStatusDTO ownerOrderStatusDTO = new OwnerOrderStatusDTO();
+        BeanUtils.copyProperties(ownerOrderEntity,ownerOrderStatusDTO);
+
+        //租客子订单状态
+        RenterOrderEntity renterOrderEntity = renterOrderService.getRenterOrderByOrderNoAndIsEffective(orderNo);
+        RenterOrderDTO renterOrderDTO = new RenterOrderDTO();
+        BeanUtils.copyProperties(renterOrderEntity,renterOrderDTO);
+
+
+        //改变中的车主子订单状态
+        OwnerOrderEntity changeOwnerByOrder = ownerOrderService.getChangeOwnerByOrderNo(orderNo);
+
+
+        //改变中的租客子订单状态
+
+
+        OrderStatusRespDTO orderStatusRespDTO = new OrderStatusRespDTO();
+
+
+        return orderStatusRespDTO;
+    }
     /*
      * @Author ZhangBin
      * @Date 2020/1/9 11:53
@@ -290,10 +338,15 @@ public class OrderDetailService {
      * 
      **/
     private RenterOrderDeliveryEntity filterDeliveryOrderByType(List<RenterOrderDeliveryEntity> renterOrderDeliveryList, DeliveryOrderTypeEnum deliveryTypeEnum){
-        RenterOrderDeliveryEntity renterOrderDeliveryEntity = Optional.ofNullable(renterOrderDeliveryList).orElseGet(ArrayList::new)
+        List<RenterOrderDeliveryEntity> list = Optional.ofNullable(renterOrderDeliveryList).orElseGet(ArrayList::new)
                 .stream()
                 .filter(x -> deliveryTypeEnum.getCode() == x.getType())
-                .findFirst().get();
-        return renterOrderDeliveryEntity;
+                .collect(Collectors.toList());
+        if(list != null && list.size() > 0){
+            return list.get(0);
+        }
+        return null;
     }
+
+
 }

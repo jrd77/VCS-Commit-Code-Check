@@ -26,7 +26,7 @@ public class OrderFineController {
 
 	@AutoDocMethod(description = "违约金信息", value = "违约金信息", response = OrderFineResponseVO.class)
 	@GetMapping("fine/information")
-	public ResponseData fineInformation(@RequestBody OrderFineRequestVO orderFineRequestVO, BindingResult bindingResult) {
+	public ResponseData fineInformation(OrderFineRequestVO orderFineRequestVO, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), ErrorCode.INPUT_ERROR.getText());
         }

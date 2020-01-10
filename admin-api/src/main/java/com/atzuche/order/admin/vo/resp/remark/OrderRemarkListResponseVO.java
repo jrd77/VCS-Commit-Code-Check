@@ -32,5 +32,15 @@ public class OrderRemarkListResponseVO {
     @AutoDocProperty(value = "备注内容")
     private String remarkContent;
 
+    @AutoDocProperty(value = "是否限制租客延时")
+    private String limitDelayedText;
+
+    @AutoDocProperty(value = "跟进状态")
+    private String followStatusText;
+
+    @AutoDocProperty(value = "跟进失败原因")
+    private String followFailReasonText;
+
+
 
 }

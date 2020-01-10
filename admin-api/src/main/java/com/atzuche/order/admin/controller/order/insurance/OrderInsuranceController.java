@@ -3,6 +3,7 @@ package com.atzuche.order.admin.controller.order.insurance;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.atzuche.order.admin.common.AdminUserUtil;
+import com.atzuche.order.admin.controller.BaseController;
 import com.atzuche.order.admin.dto.InsurancePurchaseDTO;
 import com.atzuche.order.admin.dto.InsurancePurchaseResultDTO;
 import com.atzuche.order.admin.dto.OrderInsuranceAdditionRequestDTO;
@@ -42,7 +43,7 @@ import java.util.*;
 @RequestMapping("/console/order/insurance")
 @RestController
 @AutoDocVersion(version = "购买保险接口文档")
-public class OrderInsuranceController {
+public class OrderInsuranceController extends BaseController {
 
     private static final Logger logger = LoggerFactory.getLogger(OrderInsuranceController.class);
     public static final String GET_PURCHASE_BY_ORDERNO = "insurance/purchase/getByOrderNo/";
@@ -70,18 +71,14 @@ public class OrderInsuranceController {
 	@AutoDocMethod(description = "购买保险列表", value = "购买保险列表", response = OrderInsuranceResponseVO.class)
 	@GetMapping("/list")
 	public ResponseData<OrderInsuranceResponseVO> list(OrderInsuranceRequestVO orderInsuranceRequestVO, BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), ErrorCode.INPUT_ERROR.getText());
-        }
+        validate(bindingResult);
 		return ResponseData.success(getPurchaseList(orderInsuranceRequestVO));
 	}
 
     @AutoDocMethod(description = "手工录入保险信息", value = "手工录入保险信息", response = ResponseData.class)
     @PostMapping("/add")
     public ResponseData<ResponseData> add(@RequestBody OrderInsuranceAdditionRequestVO orderInsuranceAdditionRequestVO, BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), ErrorCode.INPUT_ERROR.getText());
-        }
+        validate(bindingResult);
         logger.info("手工录入保险信息");
         try{
             OrderInsuranceAdditionRequestDTO orderInsuranceAdditionRequestDTO = new OrderInsuranceAdditionRequestDTO();
@@ -114,6 +111,7 @@ public class OrderInsuranceController {
     @AutoDocMethod(description = "导入保险信息excel", value = "导入保险信息excel", response = ResponseData.class)
     @PostMapping("/import")
     public ResponseData<ResponseData> importExcel(@RequestParam("batchFile") MultipartFile batchFile, OrderInsuranceImportRequestVO orderInsuranceImportRequestVO, BindingResult bindingResult) {
+        validate(bindingResult);
         try {
             if(!batchFile.isEmpty()) {
                 String fileType = batchFile.getContentType();

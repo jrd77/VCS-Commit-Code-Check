@@ -24,7 +24,7 @@ public class ModificationOrderController {
 
 	@AutoDocMethod(description = "订单修改信息列表", value = "订单修改信息列表", response = ModificationOrderListResponseVO.class)
 	@GetMapping("modifacion/infomation/list")
-	public ResponseData statusList(@RequestBody ModificationOrderRequestVO modificationOrderRequestVO, BindingResult bindingResult) {
+	public ResponseData statusList(ModificationOrderRequestVO modificationOrderRequestVO, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), ErrorCode.INPUT_ERROR.getText());
         }

@@ -18,4 +18,5 @@ dependencies {
 
 
     compile('com.autoyol.coupon:coupon-api:2019121301-SNAPSHOT')
+    compile('com.autoyol:memberDetailService-api:1.0.1-SNAPSHOT')
 }

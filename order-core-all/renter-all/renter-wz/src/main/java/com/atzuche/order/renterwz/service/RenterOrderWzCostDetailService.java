@@ -88,4 +88,7 @@ public class RenterOrderWzCostDetailService {
     public List<RenterOrderWzCostDetailEntity> queryInfosByOrderNo(String orderNo) {
         return renterOrderWzCostDetailMapper.queryInfosByOrderNo(orderNo);
     }
+
+    //查询能否违章能否结算
+    /*public*/
 }

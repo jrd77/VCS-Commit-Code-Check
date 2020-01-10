@@ -30,7 +30,7 @@ public class DisCouponController {
 
 	@AutoDocMethod(description = "获取平台优惠券列表", value = "获取平台优惠券列表", response = PlatformDisCouponListResponseVO.class)
 	@GetMapping("platform/discoupon/list")
-	public ResponseData platformDisCouponList(@RequestBody PlatformDisCouponRequestVO platformDisCouponRequestVO, BindingResult bindingResult) {
+	public ResponseData platformDisCouponList(PlatformDisCouponRequestVO platformDisCouponRequestVO, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), ErrorCode.INPUT_ERROR.getText());
         }
