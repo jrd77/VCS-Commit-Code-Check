@@ -7,6 +7,9 @@ import com.atzuche.order.coreapi.entity.vo.req.CarDispatchReqVO;
 import com.atzuche.order.coreapi.entity.vo.req.CarRentTimeRangeReqVO;
 import com.atzuche.order.coreapi.entity.vo.res.CarRentTimeRangeResVO;
 import com.atzuche.order.coreapi.submitOrder.exception.RenterCarDetailFailException;
+import com.atzuche.order.parentorder.entity.OrderEntity;
+import com.atzuche.order.parentorder.entity.OrderStatusEntity;
+import com.atzuche.order.renterorder.entity.OrderCouponEntity;
 import com.autoyol.car.api.CarRentalTimeApi;
 import com.autoyol.car.api.model.dto.CarAddressDTO;
 import com.autoyol.car.api.model.dto.CarDispatchDTO;
@@ -140,5 +143,27 @@ public class CarRentalTimeApiService {
         return false;
     }
 
+
+    /**
+     * 判定调度方法参数处理
+     *
+     * @param orderEntity       主订单信息
+     * @param orderStatusEntity 订单状态信息
+     * @param orderCouponEntity 订单车主券信息
+     * @return CarDispatchReqVO 判定调度信息
+     */
+    public CarDispatchReqVO buildCarDispatchReqVO(OrderEntity orderEntity, OrderStatusEntity orderStatusEntity,
+                                                  OrderCouponEntity orderCouponEntity) {
+
+        CarDispatchReqVO carDispatchReqVO = new CarDispatchReqVO();
+        carDispatchReqVO.setType(2);
+        carDispatchReqVO.setCityCode(Integer.valueOf(orderEntity.getCityCode()));
+        carDispatchReqVO.setReqTime(orderEntity.getReqTime());
+        carDispatchReqVO.setRentTime(orderEntity.getExpRentTime());
+        carDispatchReqVO.setRevertTime(orderEntity.getExpRevertTime());
+        carDispatchReqVO.setPayFlag(orderStatusEntity.getRentCarPayStatus());
+        carDispatchReqVO.setCouponFlag(null == orderCouponEntity || orderCouponEntity.getStatus() == 0 ? 0 : 1);
+        return carDispatchReqVO;
+    }
 
 }

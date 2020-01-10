@@ -18,10 +18,13 @@
 		<result property="updateOp" column="update_op"/>
 		<result property="createTime" column="create_time"/>
 		<result property="updateTime" column="update_time"/>
+		<result property="limitDelayed" column="limit_delayed"/>
+		<result property="followStatus" column="follow_status"/>
+		<result property="followFailReason" column="follow_fail_reason"/>
 	</resultMap>
 
     <select id="getOrderRemarkOverview" resultMap="orderRemarkOverviewMap">
-        SELECT remark_type, COUNT(*) AS typeCount FROM trans_remark where order_no = #{orderNo} GROUP BY remark_type
+        SELECT remark_type, COUNT(*) AS typeCount FROM trans_remark where order_no = #{orderNo} and remark_type!=12 GROUP BY remark_type
     </select>
 
     <insert id="addOrderRemark" parameterType="com.atzuche.order.admin.entity.OrderRemarkEntity" useGeneratedKeys="true" keyProperty="remarkId">
@@ -63,7 +66,12 @@
 
 
 	<select id="getOrderRemarkInformation" resultMap="orderRemarkInformationMap">
-		SELECT id, order_no, dept_id, remark, remark_type, number FROM trans_remark where id = #{remarkId}
+		SELECT id, order_no, dept_id, remark, remark_type, limit_delayed, follow_status, follow_fail_reason, number FROM trans_remark where id = #{remarkId}
+	</select>
+
+
+	<select id="getOrderCarServiceRemarkInformation" resultMap="orderRemarkInformationMap">
+		SELECT  remark  FROM trans_remark where remark_type = 12 and order_no = #{orderNo} ORDER BY id DESC  limit 1
 	</select>
 
 
@@ -74,6 +82,9 @@
 			<if test="remarkType != null">`remark_type` = #{remarkType}, </if>
 			<if test="remarkContent != null">`remark` = #{remarkContent}, </if>
 			<if test="updateOp != null">`update_op` = #{updateOp}, </if>
+			<if test="limitDelayed != null">`limit_delayed` = #{limitDelayed}, </if>
+			<if test="followStatus != null">`follow_status` = #{followStatus}, </if>
+			<if test="followFailReason != null">`follow_fail_reason` = #{followFailReason}, </if>
 			<if test="isDelete != null">`is_delete` = #{isDelete}</if>
 
 		</set>
@@ -89,6 +100,9 @@
 		update_op,
 		create_time,
 		update_time,
+		limit_delayed,
+		follow_status,
+		follow_fail_reason,
 		dept_id
 		from trans_remark where order_no = #{orderNo} and is_delete = 0
 		<if test="departmentId != null and departmentId != ''">

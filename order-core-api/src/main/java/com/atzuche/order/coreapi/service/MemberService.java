@@ -319,14 +319,14 @@ public class MemberService {
      **/
     public List<CommUseDriverInfo> getCommUseDriverList(String memNo){
         List<String> selectKey = Arrays.asList(MemberSelectKeyEnum.MEMBER_ADDITION_INFO.getKey());
-        ResponseData<MemberTotalInfo> responseData = null;
+        ResponseData<MemberAdditionInfo> responseData = null;
         log.info("Feign 开始获取附加驾驶人信息,memNo={}",memNo);
         Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "附加驾驶人信息");
         try{
             Cat.logEvent(CatConstants.FEIGN_METHOD,"MemberDetailFeignService.getMemberSelectInfo");
             String parameter = "memNo="+memNo+"&selectKey"+JSON.toJSONString(selectKey);
             Cat.logEvent(CatConstants.FEIGN_PARAM,parameter);
-            responseData = memberDetailFeignService.getMemberSelectInfo(Integer.parseInt(memNo), selectKey);
+            responseData = memberDetailFeignService.getMemberAdditionInfo(Integer.parseInt(memNo));
             if(responseData == null || !ErrorCode.SUCCESS.getCode().equals(responseData.getResCode()) || responseData.getData() == null){
                 log.error("Feign 获取附加驾驶人信息失败,memNo={},responseData={}",memNo,JSON.toJSONString(responseData));
                 RenterDriverFailException failException = new RenterDriverFailException();
@@ -346,7 +346,7 @@ public class MemberService {
         }finally {
             t.complete();
         }
-        MemberAdditionInfo memberAdditionInfo = responseData.getData().getMemberAdditionInfo();
+        MemberAdditionInfo memberAdditionInfo = responseData.getData();
         return memberAdditionInfo.getCommUseDriverList();
     }
 }

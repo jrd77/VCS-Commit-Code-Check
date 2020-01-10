@@ -26,7 +26,7 @@ public class RenterOrderController {
 
 	@AutoDocMethod(description = "获取子订单列表", value = "获取子订单列表", response = RenterOrderListResponseVO.class)
 	@GetMapping("renter/list")
-	public ResponseData renterList(@RequestBody RenterOrderRequestVO renterOrderRequestVO, BindingResult bindingResult) {
+	public ResponseData renterList(RenterOrderRequestVO renterOrderRequestVO, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), ErrorCode.INPUT_ERROR.getText());
         }

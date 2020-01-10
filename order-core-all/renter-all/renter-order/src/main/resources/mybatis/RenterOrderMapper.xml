@@ -62,7 +62,7 @@
 	`update_time`, 	
 	`update_op`, 	
 	`is_delete`,
-	`change_source`	,
+	`change_source`,
 	`req_accept_time`
 	</sql>
 

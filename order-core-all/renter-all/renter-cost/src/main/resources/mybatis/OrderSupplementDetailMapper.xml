@@ -171,6 +171,12 @@
 		where id = #{id}
 	</update>
 	
+	<update id="updatePayFlagById">
+		update order_supplement_detail 
+		set `pay_flag` = #{payFlag}
+		where id = #{id}
+	</update>
+	
 	<select id="listOrderSupplementDetailByOrderNoAndMemNo" resultMap="BaseResultMap">
 		select <include refid="Base_Column_List" /> from order_supplement_detail where order_no = #{orderNo} 
 		and mem_no = #{memNo} 

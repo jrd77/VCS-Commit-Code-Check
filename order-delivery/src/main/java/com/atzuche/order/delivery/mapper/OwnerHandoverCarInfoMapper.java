@@ -1,7 +1,6 @@
 package com.atzuche.order.delivery.mapper;
 
 import com.atzuche.order.delivery.entity.OwnerHandoverCarInfoEntity;
-import com.atzuche.order.delivery.entity.RenterHandoverCarInfoEntity;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -68,5 +67,7 @@ public interface OwnerHandoverCarInfoMapper{
      * @return
      */
     List<OwnerHandoverCarInfoEntity> selectOwnerByOrderNo(@Param("orderNo") String orderNo);
+
+     OwnerHandoverCarInfoEntity selectByOwnerOrderNoAndType(@Param("ownerOrderNo")String ownerOrderNo,@Param("type")Integer type);
 
 }

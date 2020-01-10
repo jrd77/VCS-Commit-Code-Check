@@ -9,12 +9,12 @@ import org.apache.commons.lang3.StringUtils;
  * @date 2019/12/31
  */
 public enum WzCostEnums {
-    WZ_FINE(1,"chuLiFei","协助违章处理费"),
-    WZ_DYS_FINE(2,"chuFaJin","不良用车处罚金"),
-    WZ_SERVICE_COST(3,"fuWuFei","凹凸代办服务费"),
-    WZ_STOP_COST(4,"tingYunFei","停运费"),
-    WZ_OTHER_FINE(5,"qiTaFei","其他扣款"),
-    INSURANCE_CLAIM(6,"baoXianLiPei","保险理赔"),
+    WZ_FINE(1,"chuLiFei","协助违章处理费","处理费备注"),
+    WZ_DYS_FINE(2,"chuFaJin","不良用车处罚金","服务费备注"),
+    WZ_SERVICE_COST(3,"fuWuFei","凹凸代办服务费","处罚金备注"),
+    WZ_STOP_COST(4,"tingYunFei","停运费","停运费备注"),
+    WZ_OTHER_FINE(5,"qiTaFei","其他扣款","其他扣款备注"),
+    INSURANCE_CLAIM(6,"baoXianLiPei","保险理赔","保险理赔备注"),
     ;
 
     private Integer type;
@@ -22,6 +22,8 @@ public enum WzCostEnums {
     private String code;
 
     private String desc;
+
+    private String remark;
 
     public Integer getType() {
         return type;
@@ -35,10 +37,15 @@ public enum WzCostEnums {
         return desc;
     }
 
-    WzCostEnums(Integer type, String code, String desc) {
+    public String getRemark() {
+        return remark;
+    }
+
+    WzCostEnums(Integer type, String code, String desc,String remark) {
         this.type = type;
         this.code = code;
         this.desc = desc;
+        this.remark = remark;
     }
 
     public static String getCode(Integer type) {
@@ -91,5 +98,18 @@ public enum WzCostEnums {
             }
         }
         return  0;
+    }
+
+    public static String getRemark(String code){
+        if(StringUtils.isBlank(code)){
+            return "";
+        }
+        WzCostEnums[] values = WzCostEnums.values();
+        for (WzCostEnums value : values) {
+            if(code.equals(value.getCode())){
+                return value.getRemark();
+            }
+        }
+        return  "";
     }
 }

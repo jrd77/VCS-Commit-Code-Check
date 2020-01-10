@@ -12,7 +12,8 @@ public enum RemarkTypeEnum {
     LIQUIDATION("8", "运营清算备注"),
     TELEMARKETING_CENTER("9", "电销中心备注"),
     OPERATION("10", "商品运营备注"),
-    RISK("11", "风控备注");
+    RISK("11", "风控备注"),
+    CAR_SERVICE("12", "取送车备注");
 
 
     private String type;

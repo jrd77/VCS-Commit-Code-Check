@@ -21,9 +21,26 @@ public interface OrderRemarkMapper {
      */
     List<OrderRemarkOverviewEntity> getOrderRemarkOverview(OrderRemarkRequestVO orderRemarkRequestVO);
 
+    /**
+     * 添加备注
+     * @param orderRemarkEntity
+     */
     void addOrderRemark(OrderRemarkEntity orderRemarkEntity);
 
+    /**
+     * 获取备注信息
+     * @param orderRemarkInformationRequestVO
+     * @return
+     */
     OrderRemarkEntity getOrderRemarkInformation(OrderRemarkInformationRequestVO orderRemarkInformationRequestVO);
+
+    /**
+     * 获取取送车备注信息remarkType=12
+     * @param orderRemarkRequestVO
+     * @return
+     */
+    OrderRemarkEntity getOrderCarServiceRemarkInformation(OrderRemarkRequestVO orderRemarkRequestVO);
+
 
     /**
      * 修改订单备注
@@ -32,8 +49,18 @@ public interface OrderRemarkMapper {
     void updateRemarkById(OrderRemarkEntity orderRemarkEntity);
 
 
+    /**
+     * 获取备注列表
+     * @param orderRemarkListRequestVO
+     * @return
+     */
     List<OrderRemarkEntity> selectRemarkList(OrderRemarkListRequestVO orderRemarkListRequestVO);
 
+    /**
+     * 获取备注序号
+     * @param orderRemarkAdditionRequestVO
+     * @return
+     */
     String getRemarkNumber(OrderRemarkAdditionRequestVO orderRemarkAdditionRequestVO);
 
 

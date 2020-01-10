@@ -134,7 +134,7 @@
 		where id = #{id}
 	</update>
   	
-  	<select id="listDriverIdByRenterOrderNo" resultMap="BaseResultMap">
+  	<select id="listDriverIdByRenterOrderNo" resultType="String">
 		select driver_id from renter_additional_driver where renter_order_no = #{renterOrderNo}
 		and is_delete = 0
 	</select>

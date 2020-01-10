@@ -26,7 +26,7 @@ public class PaymentController {
 
 	@AutoDocMethod(description = "支付信息", value = "支付信息", response = PaymentInformationResponseVO.class)
 	@GetMapping("payment/information")
-	public ResponseData platformDisCouponList(@RequestBody PaymentRequestVO paymentRequestVO, BindingResult bindingResult) {
+	public ResponseData platformDisCouponList(PaymentRequestVO paymentRequestVO, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), ErrorCode.INPUT_ERROR.getText());
         }

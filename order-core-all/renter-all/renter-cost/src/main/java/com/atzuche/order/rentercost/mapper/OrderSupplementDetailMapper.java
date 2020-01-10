@@ -27,5 +27,7 @@ public interface OrderSupplementDetailMapper{
     int updateByPrimaryKeySelective(OrderSupplementDetailEntity record);
     
     List<OrderSupplementDetailEntity> listOrderSupplementDetailByOrderNoAndMemNo(@Param("orderNo") String orderNo,@Param("memNo") String memNo);
+    
+    Integer updatePayFlagById(@Param("id") Integer id, @Param("payFlag") Integer payFlag);
 
 }

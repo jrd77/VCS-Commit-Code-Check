@@ -2,12 +2,8 @@ package com.atzuche.order.admin.service.remark;
 
 import com.atzuche.order.admin.common.AdminUserUtil;
 import com.atzuche.order.admin.entity.OrderRemarkEntity;
-import com.atzuche.order.admin.entity.OrderRemarkLogEntity;
 import com.atzuche.order.admin.entity.OrderRemarkOverviewEntity;
-import com.atzuche.order.admin.enums.DepartmentEnum;
-import com.atzuche.order.admin.enums.OperateTypeEnum;
-import com.atzuche.order.admin.enums.RemarkTypeEnum;
-import com.atzuche.order.admin.mapper.OrderRemarkLogMapper;
+import com.atzuche.order.admin.enums.*;
 import com.atzuche.order.admin.mapper.OrderRemarkMapper;
 import com.atzuche.order.admin.vo.req.remark.*;
 import com.atzuche.order.admin.vo.resp.remark.*;
@@ -17,6 +13,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.ObjectUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,8 +21,6 @@ import java.util.List;
 
 @Service
 public class OrderRemarkService {
-
-    public static final String DELETE_FLAG = "1";
     private static final Logger logger = LoggerFactory.getLogger(OrderRemarkService.class);
 
     @Autowired
@@ -108,6 +103,20 @@ public class OrderRemarkService {
         orderRemarkLogService.addOrderRemarkLog(orderRemarkEntity, OperateTypeEnum.UPDATE.getType());
     }
 
+    /**
+     * 修改取送车备注remark_type=12，取送车备注一直累加,读取时取最新一条
+     * @param orderCarServiceRemarkUpdateRequestVO
+     */
+    public void updateCarServiceRemarkByOrderNo(OrderCarServiceRemarkRequestVO orderCarServiceRemarkUpdateRequestVO){
+        OrderRemarkEntity orderRemarkEntity = new OrderRemarkEntity();
+        BeanUtils.copyProperties(orderCarServiceRemarkUpdateRequestVO,orderRemarkEntity);
+        String userName = AdminUserUtil.getAdminUser().getAuthName();
+        orderRemarkEntity.setUpdateOp(userName);
+        orderRemarkEntity.setCreateOp(userName);
+        orderRemarkEntity.setRemarkType(RemarkTypeEnum.CAR_SERVICE.getType());
+        orderRemarkMapper.addOrderRemark(orderRemarkEntity);
+    }
+
 
     /**
      * 删除订单备注
@@ -116,7 +125,7 @@ public class OrderRemarkService {
     public void deleteRemarkById( OrderRemarkDeleteRequestVO orderRemarkDeleteRequestVO){
         OrderRemarkEntity orderRemarkEntity = new OrderRemarkEntity();
         BeanUtils.copyProperties(orderRemarkDeleteRequestVO,orderRemarkEntity);
-        orderRemarkEntity.setIsDelete(DELETE_FLAG);
+        orderRemarkEntity.setIsDelete(YesNoEnum.YES.getType());
         orderRemarkEntity.setUpdateOp(AdminUserUtil.getAdminUser().getAuthName());
         orderRemarkMapper.updateRemarkById(orderRemarkEntity);
         //保存操作日志
@@ -137,8 +146,12 @@ public class OrderRemarkService {
             remarkList.forEach(remarkEntity -> {
                 OrderRemarkListResponseVO orderRemarkListResponseVO = new OrderRemarkListResponseVO();
                 BeanUtils.copyProperties(remarkEntity, orderRemarkListResponseVO);
+                orderRemarkListResponseVO.setRemarkType(RemarkTypeEnum.getDescriptionByType(remarkEntity.getRemarkType()));
                 orderRemarkListResponseVO.setOperatorName(remarkEntity.getUpdateOp());
                 orderRemarkListResponseVO.setDepartmentName(DepartmentEnum.getDescriptionByType(remarkEntity.getDepartmentId()));
+                orderRemarkListResponseVO.setFollowStatusText(FollowStatusEnum.getDescriptionByType(remarkEntity.getFollowStatus()));
+                orderRemarkListResponseVO.setFollowFailReasonText(FollowfailReasonEnum.getDescriptionByType(remarkEntity.getFollowFailReason()));
+                orderRemarkListResponseVO.setLimitDelayedText(YesNoEnum.getDescriptionByType(remarkEntity.getLimitDelayed()));
                 orderRemarkPageList.add(orderRemarkListResponseVO);
             });
         }
@@ -146,6 +159,21 @@ public class OrderRemarkService {
         return orderRemarkPageListResponseVO;
     }
 
+
+
+    /**
+     * 获取取送车备注remarkType=12
+     * @param orderRemarkRequestVO
+     * @return
+     */
+    public OrderRemarkResponseVO getOrderCarServiceRemarkInformation(OrderRemarkRequestVO orderRemarkRequestVO){
+        OrderRemarkResponseVO orderRemarkResponseVO = new OrderRemarkResponseVO();
+        OrderRemarkEntity orderRemarkEntity = orderRemarkMapper.getOrderCarServiceRemarkInformation(orderRemarkRequestVO);
+        if(!ObjectUtils.isEmpty(orderRemarkEntity)){
+            BeanUtils.copyProperties(orderRemarkEntity, orderRemarkResponseVO);
+        }
+        return orderRemarkResponseVO;
+    }
 
 
 }
