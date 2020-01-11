@@ -14,15 +14,15 @@ import java.util.Map;
  */
 public class CompareHelper<T> {
 
-    private T fromDB;
+    private T fromDb;
 
     private T fromApp;
 
     private Map<String,String> paramNames;
 
 
-    public CompareHelper(T fromDB, T fromApp, Map<String,String> paramNames) {
-        this.fromDB = fromDB;
+    public CompareHelper(T fromDb, T fromApp, Map<String,String> paramNames) {
+        this.fromDb = fromDb;
         this.fromApp = fromApp;
         this.paramNames = paramNames;
     }
@@ -32,9 +32,9 @@ public class CompareHelper<T> {
         if(fromApp == null || CollectionUtils.isEmpty(paramNames)){
             return "";
         }
-        if(fromDB == null){
+        if(fromDb == null){
             try {
-                fromDB = (T) fromApp.getClass().newInstance();
+                fromDb = (T) fromApp.getClass().newInstance();
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -42,7 +42,7 @@ public class CompareHelper<T> {
         StringBuilder sb = new StringBuilder();
         for (String paramName : paramNames.keySet()) {
             String s = paramNames.get(paramName);
-            String targetValue = getDeclaredFieldValueByField(fromDB, paramName);
+            String targetValue = getDeclaredFieldValueByField(fromDb, paramName);
             String sourceValue = getDeclaredFieldValueByField(fromApp, paramName);
             if(StringUtils.isBlank(targetValue) && StringUtils.isBlank(sourceValue)){
                 continue;

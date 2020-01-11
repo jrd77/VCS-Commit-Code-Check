@@ -6,8 +6,6 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import sun.misc.BASE64Decoder;
-import sun.misc.BASE64Encoder;
 
 import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
@@ -166,7 +164,7 @@ public class CommonUtils {
 			in = new FileInputStream(fileName);
 			byte[] bytes = new byte[in.available()];
 			in.read(bytes);
-			base64Str = new BASE64Encoder().encode(bytes);
+			base64Str = Base64.getEncoder().encodeToString(bytes);
 		}catch(FileNotFoundException e){
 			throw e;
 		}catch (Exception e) {

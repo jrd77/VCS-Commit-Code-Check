@@ -46,6 +46,7 @@ import com.atzuche.order.renterorder.vo.*;
 import com.autoyol.car.api.model.dto.LocationDTO;
 import com.autoyol.car.api.model.dto.OrderInfoDTO;
 import com.autoyol.car.api.model.enums.OrderOperationTypeEnum;
+import order.atzuche.order.mem.MemProxyService;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,7 +70,7 @@ public class SubmitOrderService {
     private static final Logger LOGGER = LoggerFactory.getLogger(SubmitOrderService.class);
 
     @Autowired
-    private MemberService memberService;
+    private MemProxyService memberService;
     @Autowired
     private GoodsService goodsService;
     @Resource

@@ -209,6 +209,9 @@ public class DeliveryCarService {
         handoverCarInfoDTO.setOrderNo(orderDeliveryEntity.getOrderNo());
         handoverCarInfoDTO.setRenterOrderNo(orderDeliveryEntity.getRenterOrderNo());
         handoverCarInfoDTO.setAheadTimeAndType(getMinutes, returnMinutes);
+        handoverCarInfoDTO.setRealReturnAddr(orderDeliveryEntity.getRenterGetReturnAddr());
+        handoverCarInfoDTO.setRealReturnAddrLat(orderDeliveryEntity.getRenterGetReturnAddrLat());
+        handoverCarInfoDTO.setRealReturnAddrLon(orderDeliveryEntity.getRenterGetReturnAddrLon());
         handoverCarVO.setHandoverCarInfoDTO(handoverCarInfoDTO);
         handoverCarService.addHandoverCarInfo(handoverCarVO, userType);
     }
@@ -243,8 +246,8 @@ public class DeliveryCarService {
             }
         } else {
             renterDeliveryAddrDTO = RenterDeliveryAddrDTO.builder().actGetCarAddr(orderReqVO.getSrvGetAddr()).actGetCarLat(orderReqVO.getSrvGetLat()).actGetCarLon(orderReqVO.getSrvGetLon()).actReturnCarAddr(orderReqVO.getSrvReturnAddr())
-                    .actReturnCarLat(orderReqVO.getSrvReturnLat()).actReturnCarLon(orderReqVO.getSrvReturnLon()).expGetCarAddr(orderReqVO.getSrvGetAddr()).expGetCarLat(orderReqVO.getSrvReturnLat()).expGetCarLon(orderReqVO.getSrvReturnLon()).expReturnCarAddr(orderReqVO.getSrvReturnAddr())
-                    .expReturnCarLat(orderReqVO.getSrvGetLat()).expReturnCarLon(orderReqVO.getSrvGetLon()).orderNo(renterGoodsDetailDTO.getOrderNo()).renterOrderNo(renterGoodsDetailDTO.getRenterOrderNo()).createTime(LocalDateTime.now()).createOp("").build();
+                    .actReturnCarLat(orderReqVO.getSrvReturnLat()).actReturnCarLon(orderReqVO.getSrvReturnLon()).expGetCarAddr(orderReqVO.getSrvGetAddr()).expGetCarLat(orderReqVO.getSrvGetLat()).expGetCarLon(orderReqVO.getSrvGetLon()).expReturnCarAddr(orderReqVO.getSrvReturnAddr())
+                    .expReturnCarLat(orderReqVO.getSrvReturnLat()).expReturnCarLon(orderReqVO.getSrvReturnLon()).orderNo(renterGoodsDetailDTO.getOrderNo()).renterOrderNo(renterGoodsDetailDTO.getRenterOrderNo()).createTime(LocalDateTime.now()).createOp("").build();
         }
         /**组装配送订单信息**/
         orderDeliveryDTO.setCityCode(orderReqVO.getCityCode());
