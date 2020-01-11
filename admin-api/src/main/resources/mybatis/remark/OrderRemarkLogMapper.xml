@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.atzuche.order.admin.mapper.remark.OrderRemarkLogMapper">
+<mapper namespace="com.atzuche.com.admin.mapper.remark.OrderRemarkLogMapper">
 
 
 
@@ -73,7 +73,7 @@
 		operate_type,
 		remark_history
 		from order_remark_log where order_no = #{orderNo}
-		order by id desc LIMIT #{startIndex}, #{pageSize}
+		com by id desc LIMIT #{startIndex}, #{pageSize}
 	</select>
 
 

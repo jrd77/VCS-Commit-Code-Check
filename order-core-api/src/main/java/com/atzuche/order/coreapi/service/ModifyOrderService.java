@@ -43,7 +43,7 @@ import com.autoyol.coupon.api.CouponSettleRequest;
 import com.autoyol.platformcost.CommonUtils;
 import com.dianping.cat.Cat;
 import lombok.extern.slf4j.Slf4j;
-import order.atzuche.order.mem.MemProxyService;
+import com.atzuche.order.mem.MemProxyService;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -92,7 +92,7 @@ public class ModifyOrderService {
 	@Autowired
 	private RenterGoodsService renterGoodsService;
 	@Autowired
-	private MemProxyService memberService;
+	private MemProxyService memProxyService;
 	@Autowired
 	private ModifyOrderForRenterService modifyOrderForRenterService;
 	@Autowired
@@ -434,7 +434,7 @@ public class ModifyOrderService {
 			return;
 		}
 		// 获取附加驾驶人信息
-		List<CommUseDriverInfoDTO> useDriverList = memberService.getCommUseDriverList(modifyOrderDTO.getMemNo());
+		List<CommUseDriverInfoDTO> useDriverList = memProxyService.getCommUseDriverList(modifyOrderDTO.getMemNo());
 		// 保存
 		renterAdditionalDriverService.insertBatchAdditionalDriver(modifyOrderDTO.getOrderNo(), modifyOrderDTO.getRenterOrderNo(), driverIds, useDriverList);
 	}

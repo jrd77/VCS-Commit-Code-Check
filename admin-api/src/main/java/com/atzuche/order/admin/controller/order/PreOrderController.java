@@ -5,7 +5,7 @@ import com.atzuche.order.admin.vo.resp.order.PreOrderAdminResponseVO;
 import com.atzuche.order.car.CarProxyService;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
-import order.atzuche.order.mem.MemProxyService;
+import com.atzuche.order.mem.MemProxyService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;

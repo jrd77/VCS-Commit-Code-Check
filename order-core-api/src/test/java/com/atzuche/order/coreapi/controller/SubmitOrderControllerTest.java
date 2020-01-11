@@ -4,9 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.http.HttpResult;
 import com.atzuche.order.commons.http.HttpUtil;
 import com.atzuche.order.commons.vo.req.NormalOrderReqVO;
-import org.junit.Test;
 
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 public class SubmitOrderControllerTest {
@@ -79,8 +77,8 @@ public class SubmitOrderControllerTest {
         param.setUtmMedium("广告媒体");
         param.setUtmTerm("广告名称");
         param.setUtmCampaign("广告关键字");
-        param.setModuleName("order");
-        param.setFunctionName("order/req");
+        param.setModuleName("com");
+        param.setFunctionName("com/req");
         param.setReqSource(1);
         param.setReqVersion("10");
         param.setReqOs("android");
@@ -88,7 +86,7 @@ public class SubmitOrderControllerTest {
         param.setSrcPort(7777);
         String paramStr = JSON.toJSONString(param);
         System.out.println("paramStr---->"+paramStr);
-        HttpResult httpResult = HttpUtil.doPostNotGzip("order/normal/req", paramStr);
+        HttpResult httpResult = HttpUtil.doPostNotGzip("com/normal/req", paramStr);
         System.out.println(httpResult);
     }
 }

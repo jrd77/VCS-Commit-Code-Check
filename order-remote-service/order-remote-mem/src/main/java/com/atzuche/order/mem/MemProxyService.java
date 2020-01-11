@@ -1,4 +1,4 @@
-package order.atzuche.order.mem;
+package com.atzuche.order.mem;
 
 import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.CatConstants;

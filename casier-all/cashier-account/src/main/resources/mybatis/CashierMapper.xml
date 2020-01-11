@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.atzuche.order.cashieraccount.mapper.CashierMapper">
+<mapper namespace="com.atzuche.com.cashieraccount.mapper.CashierMapper">
 
     <resultMap type="com.atzuche.order.cashieraccount.entity.CashierEntity" id="BaseResultMap">
         <result property="id" column="id"/>
@@ -153,18 +153,18 @@
 		where id = #{id} and version = #{version}
 	</update>
     <select id="getPayDeposit" resultMap="BaseResultMap">
-        select <include refid="Base_Column_List" /> from cashier where order_no = #{orderNo} and mem_no = #{memNo} and pay_kind = #{payKind} and pay_type = #{payType} order by id desc limit 1
+        select <include refid="Base_Column_List" /> from cashier where order_no = #{orderNo} and mem_no = #{memNo} and pay_kind = #{payKind} and pay_type = #{payType} com by id desc limit 1
     </select>
     <select id="getCashierRentCosts" resultMap="BaseResultMap">
         select <include refid="Base_Column_List" /> from cashier where order_no = #{orderNo} and mem_no = #{memNo} and pay_kind = #{payKind} and pay_type = #{payType}
     </select>
     <select id="getPayDetail" resultMap="BaseResultMap">
-        select <include refid="Base_Column_List" /> from cashier where order_no = #{orderNo} and mem_no = #{memNo} and pay_kind = #{payKind} and pay_type = #{payType} and pay_source = #{paySource} order by id desc limit 1
+        select <include refid="Base_Column_List" /> from cashier where order_no = #{orderNo} and mem_no = #{memNo} and pay_kind = #{payKind} and pay_type = #{payType} and pay_source = #{paySource} com by id desc limit 1
 
 
     </select>
     <select id="getPayAmtByPayKind" resultMap="BaseResultMap">
-        select <include refid="Base_Column_List" /> from cashier where order_no = #{orderNo} and mem_no = #{memNo} and pay_kind = #{payKind} order by id desc limit 1
+        select <include refid="Base_Column_List" /> from cashier where order_no = #{orderNo} and mem_no = #{memNo} and pay_kind = #{payKind} com by id desc limit 1
 
     </select>
     <select id="selectCashierEntity" resultMap="BaseResultMap">

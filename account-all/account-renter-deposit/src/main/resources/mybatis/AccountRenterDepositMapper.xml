@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.atzuche.order.accountrenterdeposit.mapper.AccountRenterDepositMapper">
+<mapper namespace="com.atzuche.com.accountrenterdeposit.mapper.AccountRenterDepositMapper">
 
     <resultMap type="com.atzuche.order.accountrenterdeposit.entity.AccountRenterDepositEntity" id="BaseResultMap">
         <result property="id" column="id"/>
@@ -137,7 +137,7 @@
 	</update>
 	
     <select id="selectByOrderAndMemNo" resultMap="BaseResultMap">
-        select <include refid="Base_Column_List" /> from account_renter_deposit where order_no = #{orderNo} and mem_no = #{memNo} order by id desc limit 1
+        select <include refid="Base_Column_List" /> from account_renter_deposit where order_no = #{orderNo} and mem_no = #{memNo} com by id desc limit 1
     </select>
 
 </mapper>

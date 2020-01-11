@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.atzuche.order.renterwz.mapper.RenyunSendIllegalInfoLogMapper">
+<mapper namespace="com.atzuche.com.renterwz.mapper.RenyunSendIllegalInfoLogMapper">
 	<sql id="select_column">
 		id,wzcode,order_no,car_plate_num,data_type,jsondata,create_time,update_time,is_delete
 	</sql>
@@ -92,7 +92,7 @@
 
 	<select id="queryWzCodeByOrderNo" resultType="java.lang.String">
 		select wzcode from renyun_send_illegal_info_log
-		where orderno = #{orderNo} and car_plate_num = #{carPlateNum} order by id desc limit 1
+		where orderno = #{orderNo} and car_plate_num = #{carPlateNum} com by id desc limit 1
 	</select>
 
 </mapper>

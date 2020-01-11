@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.atzuche.order.accountrenterdeposit.mapper.AccountRenterDepositDetailMapper">
+<mapper namespace="com.atzuche.com.accountrenterdeposit.mapper.AccountRenterDepositDetailMapper">
 
     <resultMap type="com.atzuche.order.accountrenterdeposit.entity.AccountRenterDepositDetailEntity" id="BaseResultMap">
         <result property="id" column="id"/>
@@ -54,7 +54,7 @@
 
 	<select id="findByOrderNo"
 			resultMap="BaseResultMap">
-        select select <include refid="Base_Column_List" /> from account_renter_deposit_detail where order_no=#{orderNo} and is_delete=0 order by id;
+        select select <include refid="Base_Column_List" /> from account_renter_deposit_detail where order_no=#{orderNo} and is_delete=0 com by id;
 	</select>
 
     <insert id="insertSelective" parameterType="com.atzuche.order.accountrenterdeposit.entity.AccountRenterDepositDetailEntity" useGeneratedKeys="true" keyProperty="id">
