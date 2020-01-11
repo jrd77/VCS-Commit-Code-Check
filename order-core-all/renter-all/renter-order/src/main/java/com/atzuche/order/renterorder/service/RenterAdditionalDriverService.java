@@ -60,4 +60,14 @@ public class RenterAdditionalDriverService {
     public List<String> listDriverIdByRenterOrderNo(String renterOrderNo) {
     	return renterAdditionalDriverMapper.listDriverIdByRenterOrderNo(renterOrderNo);
     }
+    /**
+     * 获取租客已添加的附加驾驶人
+     * @param renterOrderNo 租客子单号
+     * @return
+     */
+    public List<RenterAdditionalDriverEntity> listDriversByRenterOrderNo(String renterOrderNo) {
+        return renterAdditionalDriverMapper.selectByRenterOrderNo(renterOrderNo);
+    }
+
+
 }

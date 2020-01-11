@@ -27,4 +27,8 @@ public interface RenterAdditionalDriverMapper{
     
     List<String> listDriverIdByRenterOrderNo(@Param("renterOrderNo") String renterOrderNo);
 
+    List<RenterAdditionalDriverEntity> selectByRenterOrderNo(@Param("renterOrderNo")String renterOrderNo);
+
+
+
 }

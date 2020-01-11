@@ -48,6 +48,7 @@ import com.atzuche.order.rentercost.entity.RenterOrderCostEntity;
 import com.atzuche.order.rentercost.service.RenterOrderCostDetailService;
 import com.atzuche.order.rentercost.service.RenterOrderCostService;
 import com.atzuche.order.rentermem.service.RenterMemberService;
+import com.atzuche.order.renterorder.entity.RenterAdditionalDriverEntity;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.atzuche.order.renterorder.service.RenterAdditionalDriverService;
 import com.atzuche.order.renterorder.service.RenterOrderService;
@@ -420,7 +421,7 @@ public class OrderDetailService {
             BeanUtils.copyProperties(renterOrderDeliveryReturn,renterOrderDeliveryReturnDto);
         }
         //附加驾驶人
-        List<String> renterAdditionalDriverList = renterAdditionalDriverService.listDriverIdByRenterOrderNo(renterOrderNo);
+        List<RenterAdditionalDriverEntity> renterAdditionalDriverList = renterAdditionalDriverService.listDriversByRenterOrderNo(renterOrderNo);
         List<RenterAdditionalDriverDTO>  renterAdditionalDriverDTOList = new ArrayList<>();
         renterAdditionalDriverList.stream().forEach(x->{
             RenterAdditionalDriverDTO renterAdditionalDriverDTO = new RenterAdditionalDriverDTO();
