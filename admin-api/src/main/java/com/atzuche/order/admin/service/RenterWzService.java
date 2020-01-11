@@ -67,6 +67,7 @@ public class RenterWzService {
 
 
     public void updateWzCost(String orderNo, List<RenterWzCostDetailReqVO> costDetails) {
+        //TODO 查询订单是否结算
         //只会处理其他扣款 和 保险理赔
         for (RenterWzCostDetailReqVO costDetail : costDetails) {
             if(!WZ_OTHER_FINE_CODE.equals(costDetail.getCostCode()) && !INSURANCE_CLAIM_CODE.equals(costDetail.getCostCode())){

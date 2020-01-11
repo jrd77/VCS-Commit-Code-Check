@@ -55,7 +55,9 @@ public class OwnerMemberService{
     public OwnerMemberDTO selectownerMemberByOwnerOrderNo(String ownerOrderNo, boolean isNeedRight){
         OwnerMemberDTO ownerMemberDto = new OwnerMemberDTO();
         OwnerMemberEntity ownerMemberEntity = ownerMemberMapper.selectByOwnerOrderNo(ownerOrderNo);
-        BeanUtils.copyProperties(ownerMemberEntity,ownerMemberDto);
+        if(ownerMemberEntity != null){
+            BeanUtils.copyProperties(ownerMemberEntity,ownerMemberDto);
+        }
         if(!isNeedRight){
             return ownerMemberDto;
         }
