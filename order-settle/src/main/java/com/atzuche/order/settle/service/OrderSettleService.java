@@ -45,7 +45,7 @@ public class  OrderSettleService{
         orderSettleNoTService.getRenterCostSettleDetail(settleOrders);
         log.info("OrderSettleService getRenterCostSettleDetail settleOrders [{}]", GsonUtils.toJson(settleOrders));
 
-        //3.5 查询所有车主费用明细
+        //3.5 查询所有车主费用明细 TODO 暂不支持 多个车主
         orderSettleNoTService.getOwnerCostSettleDetail(settleOrders);
         log.info("OrderSettleService getOwnerCostSettleDetail settleOrders [{}]", GsonUtils.toJson(settleOrders));
 

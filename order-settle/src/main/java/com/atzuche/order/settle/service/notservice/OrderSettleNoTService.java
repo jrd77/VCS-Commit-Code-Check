@@ -111,7 +111,7 @@ public class OrderSettleNoTService {
 
         // 3.1获取租客子订单 和 租客会员号
         String renterOrderNo = renterOrder.getRenterOrderNo();
-        String renterMemNo = "";
+        String renterMemNo = renterOrder.getRenterMemNo();
         //3.2获取车主子订单 和 车主会员号
         String ownerOrderNo = ownerOrder.getOwnerOrderNo();
         String ownerMemNo = ownerOrder.getMemNo();
@@ -133,11 +133,14 @@ public class OrderSettleNoTService {
     public void check(RenterOrderEntity renterOrder) {
         // 1 订单校验是否可以结算
         OrderStatusEntity orderStatus = orderStatusService.getByOrderNo(renterOrder.getOrderNo());
+        if(OrderStatusEnum.TO_SETTLE.getStatus() == orderStatus.getStatus()){
+            throw new RuntimeException("租客订单状态不是待结算，不能结算");
+        }
         //2校验租客是否还车
-//        boolean isReturn = handoverCarService.isReturnCar(renterOrder.getOrderNo());
-//        if(!isReturn){
-//            throw new RuntimeException("租客未还车不能结算");
-//        }
+        boolean isReturn = handoverCarService.isReturnCar(renterOrder.getOrderNo());
+        if(!isReturn){
+            throw new RuntimeException("租客未还车不能结算");
+        }
         //3 校验是否存在 理赔  存在不结算
         boolean isClaim = cashierSettleService.getOrderClaim(renterOrder.getOrderNo());
         if(isClaim){
