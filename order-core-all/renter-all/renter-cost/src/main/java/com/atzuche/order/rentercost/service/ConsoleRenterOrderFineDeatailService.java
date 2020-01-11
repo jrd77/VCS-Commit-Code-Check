@@ -6,6 +6,8 @@ import com.atzuche.order.commons.entity.dto.CostBaseDTO;
 import com.atzuche.order.commons.enums.FineSubsidyCodeEnum;
 import com.atzuche.order.commons.enums.FineSubsidySourceCodeEnum;
 import com.atzuche.order.commons.enums.FineTypeEnum;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,6 +24,9 @@ import com.atzuche.order.rentercost.mapper.ConsoleRenterOrderFineDeatailMapper;
  */
 @Service
 public class ConsoleRenterOrderFineDeatailService{
+
+    private static Logger logger = LoggerFactory.getLogger(ConsoleRenterOrderFineDeatailService.class);
+
     @Autowired
     private ConsoleRenterOrderFineDeatailMapper consoleRenterOrderFineDeatailMapper;
 
@@ -42,6 +47,10 @@ public class ConsoleRenterOrderFineDeatailService{
      * @return Integer
      */
     public Integer saveConsoleRenterOrderFineDeatail(ConsoleRenterOrderFineDeatailEntity consoleFine) {
+        if(null == consoleFine) {
+            logger.warn("Not fund console renter order fine data.");
+            return 0;
+        }
     	return consoleRenterOrderFineDeatailMapper.insertSelective(consoleFine);
     }
 
