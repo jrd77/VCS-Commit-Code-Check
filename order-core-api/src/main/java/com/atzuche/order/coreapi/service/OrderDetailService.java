@@ -41,6 +41,7 @@ import com.atzuche.order.rentercost.service.RenterOrderCostDetailService;
 import com.atzuche.order.rentercost.service.RenterOrderCostService;
 import com.atzuche.order.rentermem.service.RenterMemberService;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
+import com.atzuche.order.renterorder.service.RenterAdditionalDriverService;
 import com.atzuche.order.renterorder.service.RenterOrderService;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
@@ -93,6 +94,8 @@ public class OrderDetailService {
     private ConsoleOwnerOrderFineDeatailService consoleOwnerOrderFineDeatailService;
     @Autowired
     private OwnerHandoverCarInfoService ownerHandoverCarInfoService;
+    @Autowired
+    private RenterAdditionalDriverService renterAdditionalDriverService;
 
     public ResponseData<OrderDetailRespDTO> orderDetail(OrderDetailReqDTO orderDetailReqDTO){
         log.info("准备获取订单详情orderDetailReqDTO={}", JSON.toJSONString(orderDetailReqDTO));
@@ -327,6 +330,15 @@ public class OrderDetailService {
             renterOrderDeliveryReturnDto = new RenterOrderDeliveryDTO();
             BeanUtils.copyProperties(renterOrderDeliveryReturn,renterOrderDeliveryReturnDto);
         }
+        //附加驾驶人
+        List<String> renterAdditionalDriverList = renterAdditionalDriverService.listDriverIdByRenterOrderNo(renterOrderNo);
+        List<RenterAdditionalDriverDTO>  renterAdditionalDriverDTOList = new ArrayList<>();
+        renterAdditionalDriverList.stream().forEach(x->{
+            RenterAdditionalDriverDTO renterAdditionalDriverDTO = new RenterAdditionalDriverDTO();
+            BeanUtils.copyProperties(x,renterAdditionalDriverDTO);
+            renterAdditionalDriverDTOList.add(renterAdditionalDriverDTO);
+        });
+
 
         OrderDetailRespDTO orderDetailRespDTO = new OrderDetailRespDTO();
         orderDetailRespDTO.order = orderDTO;
@@ -349,6 +361,7 @@ public class OrderDetailService {
         orderDetailRespDTO.accountOwnerIncomeDetailList = accountOwnerIncomeDetailDTOList;
         orderDetailRespDTO.ownerOrderPurchaseDetailList = ownerOrderPurchaseDetailDTOList;
         orderDetailRespDTO.consoleOwnerOrderFineDetailList = consoleOwnerOrderFineDeatailDTOList;
+        orderDetailRespDTO.renterAdditionalDriverList = renterAdditionalDriverDTOList;
 
         return orderDetailRespDTO;
     }

@@ -2,6 +2,7 @@ package com.atzuche.order.admin.service;
 
 import com.atzuche.order.admin.util.StringUtil;
 import com.atzuche.order.admin.util.TimeUtil;
+import com.atzuche.order.admin.vo.req.orderSubmit.AdminTransReqVO;
 import com.atzuche.order.commons.vo.req.AdminOrderReqVO;
 import com.atzuche.order.commons.vo.res.OrderResVO;
 import com.atzuche.order.open.service.FeignOrderAdminSubmitService;
@@ -19,7 +20,7 @@ public class OrderSubmitService {
     @Autowired
     private FeignOrderAdminSubmitService feignOrderAdminSubmitService;
 
-    public ResponseData<OrderResVO> submit(AdminOrderReqVO adminOrderReqVO, HttpServletRequest request) throws Exception {
+    public ResponseData<OrderResVO> submit(AdminTransReqVO adminOrderReqVO, HttpServletRequest request) throws Exception {
         //1、组装参数
         AdminOrderReqVO adminOrderReqParam = this.transDto(adminOrderReqVO,request);
 
@@ -34,7 +35,7 @@ public class OrderSubmitService {
         return responseData;
     }
 
-    private AdminOrderReqVO transDto(AdminOrderReqVO reqVO, HttpServletRequest request){
+    private AdminOrderReqVO transDto(AdminTransReqVO reqVO, HttpServletRequest request){
         String sceneCode = reqVO.getSceneCode();
         //1、参数转化
         //1.2 rentTime和revertTime的转化
