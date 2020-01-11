@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.atzuche.com.accountrenterwzdepost.mapper.AccountRenterWzDepositCostDetailMapper">
+<mapper namespace="com.atzuche.order.accountrenterwzdepost.mapper.AccountRenterWzDepositCostDetailMapper">
 
     <resultMap type="com.atzuche.order.accountrenterwzdepost.entity.AccountRenterWzDepositCostDetailEntity" id="BaseResultMap">
         <result property="id" column="id"/>
@@ -53,7 +53,7 @@
 	</select>
 
 	<select id="selectALL" resultMap="BaseResultMap">
-		select  <include refid="Base_Column_List" /> from account_renter_wz_deposit_cost_detail com by id desc
+		select  <include refid="Base_Column_List" /> from account_renter_wz_deposit_cost_detail order by id desc
 	</select>
 
 

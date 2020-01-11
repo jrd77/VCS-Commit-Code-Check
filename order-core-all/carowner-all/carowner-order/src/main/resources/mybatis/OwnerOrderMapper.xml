@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.atzuche.com.ownercost.mapper.OwnerOrderMapper">
+<mapper namespace="com.atzuche.order.ownercost.mapper.OwnerOrderMapper">
 
     <resultMap type="com.atzuche.order.ownercost.entity.OwnerOrderEntity" id="BaseResultMap">
         <result property="id" column="id"/>
@@ -233,7 +233,7 @@
 		and child_status = 3
 		and is_cancel = 0
 		and is_delete = 0
-		com by id desc
+		order by id desc
 		limit 1
     </select>
     
@@ -252,7 +252,7 @@
         and is_cancel = 0
         and is_delete = 0
         and child_status = 3
-        com by id desc
+        order by id desc
         limit 1
     </select>
 

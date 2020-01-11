@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.atzuche.com.ownercost.mapper.OwnerOrderCostMapper">
+<mapper namespace="com.atzuche.order.ownercost.mapper.OwnerOrderCostMapper">
 
     <resultMap type="com.atzuche.order.ownercost.entity.OwnerOrderCostEntity" id="BaseResultMap">
         <result property="id" column="id"/>
@@ -43,7 +43,7 @@
 	</select>
 
 	<select id="selectALL" resultMap="BaseResultMap">
-		select  <include refid="Base_Column_List" /> from owner_order_cost com by id desc
+		select  <include refid="Base_Column_List" /> from owner_order_cost order by id desc
 	</select>
 
 	 

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.atzuche.com.renterwz.mapper.RenterOrderWzFinishedTodoMapper">
+<mapper namespace="com.atzuche.order.renterwz.mapper.RenterOrderWzFinishedTodoMapper">
 	<sql id="select_column">
 		id,order_no,car_no,car_plate_num,rent_time,revert_time,renter_no,renter_phone,frame_no,engine_num,status,city_name,cities,create_op,create_time,update_time,update_op,is_delete
 	</sql>

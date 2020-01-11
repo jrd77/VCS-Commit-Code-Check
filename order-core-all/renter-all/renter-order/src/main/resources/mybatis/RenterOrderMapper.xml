@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.atzuche.com.renterorder.mapper.RenterOrderMapper">
+<mapper namespace="com.atzuche.order.renterorder.mapper.RenterOrderMapper">
 
     <resultMap type="com.atzuche.order.renterorder.entity.RenterOrderEntity" id="BaseResultMap">
         <result property="id" column="id"/>
@@ -74,7 +74,7 @@
 	</select>
 
 	<select id="selectALL" resultMap="BaseResultMap">
-		select  <include refid="Base_Column_List" /> from renter_order com by id desc
+		select  <include refid="Base_Column_List" /> from renter_order order by id desc
 	</select>
 
 
@@ -260,7 +260,7 @@
 		select <include refid="Base_Column_List" /> from renter_order where order_no = #{orderNo} 
 		and agree_flag = 1
 		and is_delete = 0
-		com by id asc
+		order by id asc
 	</select>
 
 
@@ -269,7 +269,7 @@
 		and is_effective = 1
 		and is_cancle = 0
 		and is_delete = 0
-		com by id desc
+		order by id desc
 		limit 1
 	</select>
 	
@@ -277,7 +277,7 @@
 		select <include refid="Base_Column_List" /> from renter_order where renter_order_no = #{renterOrderNo}
 		and is_cancle = 0
 		and is_delete = 0
-		com by id desc
+		order by id desc
 		limit 1
 	</select>
 	
@@ -296,7 +296,7 @@
 		and child_status = 3
 		and is_cancle = 0
 		and is_delete = 0
-		com by id desc
+		order by id desc
 		limit 1
 	</select>
 	

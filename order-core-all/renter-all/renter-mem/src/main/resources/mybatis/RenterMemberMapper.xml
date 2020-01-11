@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.atzuche.com.rentermem.mapper.RenterMemberMapper">
+<mapper namespace="com.atzuche.order.rentermem.mapper.RenterMemberMapper">
 
     <resultMap type="com.atzuche.order.rentermem.entity.RenterMemberEntity" id="BaseResultMap">
         <result property="id" column="id"/>
@@ -229,7 +229,7 @@
         select
             mem_no
         from renter_member
-        where order_no = #{orderNo} and is_delete = 0 com by id desc limit 1
+        where order_no = #{orderNo} and is_delete = 0 order by id desc limit 1
     </select>
 
     <select id="queryMemNoAndPhoneByOrderList" resultMap="BaseResultMap">
