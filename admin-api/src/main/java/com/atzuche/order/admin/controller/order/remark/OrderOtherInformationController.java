@@ -14,9 +14,11 @@ import com.atzuche.order.admin.vo.req.remark.OrderRiskStatusRequestVO;
 import com.atzuche.order.admin.vo.resp.remark.OrderOtherInformationResponseVO;
 import com.atzuche.order.admin.vo.resp.remark.OrderRemarkResponseVO;
 
+import com.atzuche.order.commons.entity.dto.RentCityAndRiskAccidentReqDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.OrderDetailReqDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.OrderStatusRespDTO;
 import com.atzuche.order.open.service.FeignOrderDetailService;
+import com.atzuche.order.open.service.FeignOrderUpdateService;
 import com.autoyol.commons.utils.GsonUtils;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
@@ -51,16 +53,27 @@ public class OrderOtherInformationController extends BaseController{
     FeignOrderDetailService feignOrderDetailService;
 
 
+    FeignOrderUpdateService feignOrderUpdateService;
+
+
 
 	@AutoDocMethod(description = "修改租车城市", value = "修改租车城市", response = ResponseData.class)
     @RequestMapping(value = "/rent/city/update", method = RequestMethod.PUT)
 	public ResponseData<ResponseData> updateRentCity(@RequestBody OrderRentCityRequestVO orderRentCityRequestVO, BindingResult bindingResult) {
         validateParameter(bindingResult);
-        //调用订单服务
         try{
             logger.info(LogDescription.getLogDescription(DescriptionConstant.CONSOLE_ORDER_OTHER_INFORMATION_RENT_CITY_UPDATE, DescriptionConstant.INPUT_TEXT),orderRentCityRequestVO.toString());
-            CatLogRecord.successLog(LogDescription.getCatDescription(DescriptionConstant.CONSOLE_ORDER_OTHER_INFORMATION_RENT_CITY_UPDATE, DescriptionConstant.SUCCESS_TEXT), UrlConstant.CONSOLE_ORDER_OTHER_INFORMATION_RENT_CITY_UPDATE,  orderRentCityRequestVO);
-            return ResponseData.success();
+            //调用订单服务修改租车城市
+            RentCityAndRiskAccidentReqDTO rentCityAndRiskAccidentReqDTO = new RentCityAndRiskAccidentReqDTO();
+            rentCityAndRiskAccidentReqDTO.setRentCity(orderRentCityRequestVO.getRentCity());
+            ResponseData<?> responseData = feignOrderUpdateService.updateRentCityAndRiskAccident(rentCityAndRiskAccidentReqDTO);
+            if(!ObjectUtils.isEmpty(responseData)) {
+                if(ErrorCode.SUCCESS.getCode().equals(responseData.getResCode())){
+                    CatLogRecord.successLog(LogDescription.getCatDescription(DescriptionConstant.CONSOLE_ORDER_OTHER_INFORMATION_RENT_CITY_UPDATE, DescriptionConstant.SUCCESS_TEXT), UrlConstant.CONSOLE_ORDER_OTHER_INFORMATION_RENT_CITY_UPDATE,  orderRentCityRequestVO);
+                    return ResponseData.success();
+                }
+            }
+            return ResponseData.error();
         } catch (Exception e) {
             logger.info(LogDescription.getLogDescription(DescriptionConstant.CONSOLE_ORDER_OTHER_INFORMATION_RENT_CITY_UPDATE, DescriptionConstant.EXCEPTION_TEXT),e);
             CatLogRecord.failLog(LogDescription.getCatDescription(DescriptionConstant.CONSOLE_ORDER_OTHER_INFORMATION_RENT_CITY_UPDATE, DescriptionConstant.EXCEPTION_TEXT), UrlConstant.CONSOLE_ORDER_OTHER_INFORMATION_RENT_CITY_UPDATE,  orderRentCityRequestVO, e);
@@ -73,15 +86,23 @@ public class OrderOtherInformationController extends BaseController{
     @RequestMapping(value = "/risk/status/update", method = RequestMethod.PUT)
     public ResponseData<ResponseData> updateRiskStatus(@RequestBody OrderRiskStatusRequestVO orderRiskStatusRequestVO, BindingResult bindingResult) {
         validateParameter(bindingResult);
-        //调用订单服务
+
         try{
             logger.info(LogDescription.getLogDescription(DescriptionConstant.CONSOLE_ORDER_OTHER_INFORMATION_RISK_STATUS_UPDATE, DescriptionConstant.INPUT_TEXT),orderRiskStatusRequestVO.toString());
-            CatLogRecord.successLog(LogDescription.getCatDescription(DescriptionConstant.CONSOLE_ORDER_OTHER_INFORMATION_RISK_STATUS_UPDATE, DescriptionConstant.SUCCESS_TEXT), UrlConstant.CONSOLE_ORDER_OTHER_INFORMATION_RISK_STATUS_UPDATE,  orderRiskStatusRequestVO);
-
-            //发送MQ事件
-            String mqJson = GsonUtils.toJson(orderRiskStatusRequestVO);
-            rabbitTemplate.convertAndSend(RiskRabbitMQEventEnum.ORDER_RISK_STATUS_CHANGE.exchange,RiskRabbitMQEventEnum.ORDER_RISK_STATUS_CHANGE.routingKey, mqJson);
-            return ResponseData.success();
+            //调用订单服务修改风控事故状态
+            RentCityAndRiskAccidentReqDTO rentCityAndRiskAccidentReqDTO = new RentCityAndRiskAccidentReqDTO();
+            rentCityAndRiskAccidentReqDTO.setIsRiskAccident(Integer.parseInt(orderRiskStatusRequestVO.getRiskAccidentStatus()));
+            ResponseData<?> responseData = feignOrderUpdateService.updateRentCityAndRiskAccident(rentCityAndRiskAccidentReqDTO);
+            if(!ObjectUtils.isEmpty(responseData)) {
+                if(ErrorCode.SUCCESS.getCode().equals(responseData.getResCode())){
+                    //修改成功发送MQ事件
+                    String mqJson = GsonUtils.toJson(orderRiskStatusRequestVO);
+                    rabbitTemplate.convertAndSend(RiskRabbitMQEventEnum.ORDER_RISK_STATUS_CHANGE.exchange, RiskRabbitMQEventEnum.ORDER_RISK_STATUS_CHANGE.routingKey, mqJson);
+                    CatLogRecord.successLog(LogDescription.getCatDescription(DescriptionConstant.CONSOLE_ORDER_OTHER_INFORMATION_RISK_STATUS_UPDATE, DescriptionConstant.SUCCESS_TEXT), UrlConstant.CONSOLE_ORDER_OTHER_INFORMATION_RISK_STATUS_UPDATE,  orderRiskStatusRequestVO);
+                    return ResponseData.success();
+                }
+            }
+            return ResponseData.error();
         } catch (Exception e) {
             logger.info(LogDescription.getLogDescription(DescriptionConstant.CONSOLE_ORDER_OTHER_INFORMATION_RISK_STATUS_UPDATE, DescriptionConstant.EXCEPTION_TEXT),e);
             CatLogRecord.failLog(LogDescription.getCatDescription(DescriptionConstant.CONSOLE_ORDER_OTHER_INFORMATION_RISK_STATUS_UPDATE, DescriptionConstant.EXCEPTION_TEXT), UrlConstant.CONSOLE_ORDER_OTHER_INFORMATION_RISK_STATUS_UPDATE,  orderRiskStatusRequestVO, e);
@@ -116,20 +137,18 @@ public class OrderOtherInformationController extends BaseController{
         try{
             logger.info(LogDescription.getLogDescription(DescriptionConstant.CONSOLE_ORDER_OTHER_INFORMATION_DETAIL, DescriptionConstant.INPUT_TEXT),orderRemarkRequestVO.toString());
             OrderOtherInformationResponseVO orderOtherInformationResponseVO = new OrderOtherInformationResponseVO();
-            //调用订单服务
+            //调用订单服务获取租车城市和风控事故状态
             OrderDetailReqDTO orderDetailReqDTO = new OrderDetailReqDTO();
             orderDetailReqDTO.setOrderNo(orderRemarkRequestVO.getOrderNo());
             ResponseData<OrderStatusRespDTO> orderStatusRespDTOResponse = feignOrderDetailService.getOrderStatus(orderDetailReqDTO);
             if(!ObjectUtils.isEmpty(orderStatusRespDTOResponse)){
                 OrderStatusRespDTO orderStatusRespDTO = orderStatusRespDTOResponse.getData();
-                orderOtherInformationResponseVO.setRentCity("");
-                orderOtherInformationResponseVO.setRiskAccidentStatus("1");
+                orderOtherInformationResponseVO.setRentCity(orderStatusRespDTO.getOrderDTO().getRentCity());
+                orderOtherInformationResponseVO.setRiskAccidentStatus(orderStatusRespDTO.getOrderStatusDTO().getIsRiskAccident().toString());
             }
-
             OrderRemarkResponseVO orderRemarkResponseVO = orderRemarkService.getOrderCarServiceRemarkInformation(orderRemarkRequestVO);
             orderOtherInformationResponseVO.setRemarkContent(orderRemarkResponseVO.getRemarkContent());
             CatLogRecord.successLog(LogDescription.getCatDescription(DescriptionConstant.CONSOLE_ORDER_OTHER_INFORMATION_DETAIL, DescriptionConstant.SUCCESS_TEXT), UrlConstant.CONSOLE_ORDER_OTHER_INFORMATION_DETAIL,  orderRemarkRequestVO);
-
             return ResponseData.success(orderOtherInformationResponseVO);
         } catch (Exception e) {
             logger.info(LogDescription.getLogDescription(DescriptionConstant.CONSOLE_ORDER_OTHER_INFORMATION_DETAIL, DescriptionConstant.EXCEPTION_TEXT),e);
