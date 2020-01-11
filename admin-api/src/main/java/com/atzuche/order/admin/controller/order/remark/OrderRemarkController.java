@@ -1,6 +1,10 @@
 package com.atzuche.order.admin.controller.order.remark;
 
+import com.atzuche.order.admin.cat.CatLogRecord;
+import com.atzuche.order.admin.constant.cat.UrlConstant;
+import com.atzuche.order.admin.constant.description.DescriptionConstant;
 import com.atzuche.order.admin.controller.BaseController;
+import com.atzuche.order.admin.description.LogDescription;
 import com.atzuche.order.admin.exception.remark.OrderRemarkException;
 import com.atzuche.order.admin.service.remark.OrderRemarkLogService;
 import com.atzuche.order.admin.service.remark.OrderRemarkService;
@@ -36,13 +40,17 @@ public class OrderRemarkController extends BaseController {
 	@AutoDocMethod(description = "备注总览", value = "备注总览", response = OrderRemarkOverviewListResponseVO.class)
 	@GetMapping("/overview")
 	public ResponseData<OrderRemarkOverviewListResponseVO> getOverview(OrderRemarkRequestVO orderRemarkRequestVO, BindingResult bindingResult) {
-        //参数验证
+
 	    validateParameter(bindingResult);
 	    try{
-            logger.info("获取备注总览入参:{}",orderRemarkRequestVO.toString());
-            return ResponseData.success(orderRemarkService.getOrderRemarkOverview(orderRemarkRequestVO));
+            logger.info(LogDescription.getLogDescription(DescriptionConstant.CONSOLE_ORDER_REMARK_OVERVIEW, DescriptionConstant.INPUT_TEXT),orderRemarkRequestVO.toString());
+            OrderRemarkOverviewListResponseVO orderRemarkOverviewListResponseVO = orderRemarkService.getOrderRemarkOverview(orderRemarkRequestVO);
+            CatLogRecord.successLog(LogDescription.getCatDescription(DescriptionConstant.CONSOLE_ORDER_REMARK_OVERVIEW, DescriptionConstant.SUCCESS_TEXT), UrlConstant.CONSOLE_ORDER_REMARK_OVERVIEW,  orderRemarkRequestVO);
+            return ResponseData.success(orderRemarkOverviewListResponseVO);
         } catch (Exception e) {
-            logger.info("获取备注总览异常:{}",e);
+            logger.info(LogDescription.getLogDescription(DescriptionConstant.CONSOLE_ORDER_REMARK_OVERVIEW, DescriptionConstant.EXCEPTION_TEXT),e);
+            CatLogRecord.failLog(LogDescription.getCatDescription(DescriptionConstant.CONSOLE_ORDER_REMARK_OVERVIEW, DescriptionConstant.EXCEPTION_TEXT), UrlConstant.CONSOLE_ORDER_REMARK_OVERVIEW, orderRemarkRequestVO, e);
+            //参数验证
             throw new OrderRemarkException(ErrorCode.SYS_ERROR.getCode(),ErrorCode.SYS_ERROR.getText());
         }
 	}
@@ -53,10 +61,13 @@ public class OrderRemarkController extends BaseController {
         //参数验证
         validateParameter(bindingResult);
         try{
-            logger.info("备注查询列表入参:{}",orderRemarkListRequestVO.toString());
-            return ResponseData.success(orderRemarkService.selectRemarklist(orderRemarkListRequestVO));
+            logger.info(LogDescription.getLogDescription(DescriptionConstant.CONSOLE_ORDER_REMARK_LIST, DescriptionConstant.INPUT_TEXT),orderRemarkListRequestVO.toString());
+            OrderRemarkPageListResponseVO orderRemarkPageListResponseVO = orderRemarkService.selectRemarklist(orderRemarkListRequestVO);
+            CatLogRecord.successLog(LogDescription.getCatDescription(DescriptionConstant.CONSOLE_ORDER_REMARK_LIST, DescriptionConstant.SUCCESS_TEXT), UrlConstant.CONSOLE_ORDER_REMARK_LIST,  orderRemarkListRequestVO);
+            return ResponseData.success(orderRemarkPageListResponseVO);
         } catch (Exception e) {
-            logger.info("备注查询列表异常{}",e);
+            logger.info(LogDescription.getLogDescription(DescriptionConstant.CONSOLE_ORDER_REMARK_LIST, DescriptionConstant.EXCEPTION_TEXT),e);
+            CatLogRecord.failLog(LogDescription.getCatDescription(DescriptionConstant.CONSOLE_ORDER_REMARK_LIST, DescriptionConstant.EXCEPTION_TEXT), UrlConstant.CONSOLE_ORDER_REMARK_LIST, orderRemarkListRequestVO, e);
             throw new OrderRemarkException(ErrorCode.SYS_ERROR.getCode(),ErrorCode.SYS_ERROR.getText());
         }
 
@@ -68,10 +79,13 @@ public class OrderRemarkController extends BaseController {
         //参数验证
         validateParameter(bindingResult);
         try{
-            logger.info("备注日志查询列表入参:{}",orderRemarkLogListRequestVO.toString());
-            return ResponseData.success(orderLogRemarkService.selectRemarkLoglist(orderRemarkLogListRequestVO));
+            logger.info(LogDescription.getLogDescription(DescriptionConstant.CONSOLE_ORDER_REMARK_LOG_LIST, DescriptionConstant.INPUT_TEXT),orderRemarkLogListRequestVO.toString());
+            OrderRemarkLogPageListResponseVO orderRemarkLogPageListResponseVO = orderLogRemarkService.selectRemarkLoglist(orderRemarkLogListRequestVO);
+            CatLogRecord.successLog(LogDescription.getCatDescription(DescriptionConstant.CONSOLE_ORDER_REMARK_LOG_LIST, DescriptionConstant.SUCCESS_TEXT), UrlConstant.CONSOLE_ORDER_REMARK_LOG_LIST,  orderRemarkLogListRequestVO);
+            return ResponseData.success(orderRemarkLogPageListResponseVO);
         } catch (Exception e) {
-            logger.info("备注日志查询列表异常{}",e);
+            logger.info(LogDescription.getLogDescription(DescriptionConstant.CONSOLE_ORDER_REMARK_LOG_LIST, DescriptionConstant.EXCEPTION_TEXT),e);
+            CatLogRecord.failLog(LogDescription.getCatDescription(DescriptionConstant.CONSOLE_ORDER_REMARK_LOG_LIST, DescriptionConstant.EXCEPTION_TEXT), UrlConstant.CONSOLE_ORDER_REMARK_LOG_LIST, orderRemarkLogListRequestVO, e);
             throw new OrderRemarkException(ErrorCode.SYS_ERROR.getCode(),ErrorCode.SYS_ERROR.getText());
         }
 
@@ -84,11 +98,13 @@ public class OrderRemarkController extends BaseController {
         //参数验证
         validateParameter(bindingResult);
         try{
-            logger.info("添加备注入参:{}",orderRemarkAdditionRequestVO.toString());
+            logger.info(LogDescription.getLogDescription(DescriptionConstant.CONSOLE_ORDER_REMARK_ADD, DescriptionConstant.INPUT_TEXT),orderRemarkAdditionRequestVO.toString());
             orderRemarkService.addOrderRemark(orderRemarkAdditionRequestVO);
-            return ResponseData.success(null);
+            CatLogRecord.successLog(LogDescription.getCatDescription(DescriptionConstant.CONSOLE_ORDER_REMARK_ADD, DescriptionConstant.SUCCESS_TEXT), UrlConstant.CONSOLE_ORDER_REMARK_ADD,  orderRemarkAdditionRequestVO);
+            return ResponseData.success();
         } catch (Exception e) {
-            logger.info("添加备注异常{}",e);
+            logger.info(LogDescription.getLogDescription(DescriptionConstant.CONSOLE_ORDER_REMARK_ADD, DescriptionConstant.EXCEPTION_TEXT),e);
+            CatLogRecord.failLog(LogDescription.getCatDescription(DescriptionConstant.CONSOLE_ORDER_REMARK_ADD, DescriptionConstant.EXCEPTION_TEXT), UrlConstant.CONSOLE_ORDER_REMARK_ADD, orderRemarkAdditionRequestVO, e);
             throw new OrderRemarkException(ErrorCode.SYS_ERROR.getCode(),ErrorCode.SYS_ERROR.getText());
         }
     }
@@ -99,11 +115,13 @@ public class OrderRemarkController extends BaseController {
         //参数验证
         validateParameter(bindingResult);
         try{
-            logger.info("删除备注入参:{}",orderRemarkDeleteRequestVO.toString());
+            logger.info(LogDescription.getLogDescription(DescriptionConstant.CONSOLE_ORDER_REMARK_DELETE, DescriptionConstant.INPUT_TEXT),orderRemarkDeleteRequestVO.toString());
             orderRemarkService.deleteRemarkById(orderRemarkDeleteRequestVO);
-            return ResponseData.success(null);
+            CatLogRecord.successLog(LogDescription.getCatDescription(DescriptionConstant.CONSOLE_ORDER_REMARK_DELETE, DescriptionConstant.SUCCESS_TEXT), UrlConstant.CONSOLE_ORDER_REMARK_DELETE,  orderRemarkDeleteRequestVO);
+            return ResponseData.success();
         } catch (Exception e) {
-            logger.info("删除备注异常{}",e);
+            logger.info(LogDescription.getLogDescription(DescriptionConstant.CONSOLE_ORDER_REMARK_DELETE, DescriptionConstant.EXCEPTION_TEXT),e);
+            CatLogRecord.failLog(LogDescription.getCatDescription(DescriptionConstant.CONSOLE_ORDER_REMARK_DELETE, DescriptionConstant.EXCEPTION_TEXT), UrlConstant.CONSOLE_ORDER_REMARK_DELETE, orderRemarkDeleteRequestVO, e);
             throw new OrderRemarkException(ErrorCode.SYS_ERROR.getCode(),ErrorCode.SYS_ERROR.getText());
         }
     }
@@ -114,11 +132,13 @@ public class OrderRemarkController extends BaseController {
         //参数验证
         validateParameter(bindingResult);
         try{
-            logger.info("编辑备注入参:{}",orderRemarkUpdateRequestVO.toString());
+            logger.info(LogDescription.getLogDescription(DescriptionConstant.CONSOLE_ORDER_REMARK_UPDATE, DescriptionConstant.INPUT_TEXT),orderRemarkUpdateRequestVO.toString());
             orderRemarkService.updateRemarkById(orderRemarkUpdateRequestVO);
-            return ResponseData.success(null);
+            CatLogRecord.successLog(LogDescription.getCatDescription(DescriptionConstant.CONSOLE_ORDER_REMARK_UPDATE, DescriptionConstant.SUCCESS_TEXT), UrlConstant.CONSOLE_ORDER_REMARK_UPDATE,  orderRemarkUpdateRequestVO);
+            return ResponseData.success();
         } catch (Exception e) {
-            logger.info("编辑备注异常{}",e);
+            logger.info(LogDescription.getLogDescription(DescriptionConstant.CONSOLE_ORDER_REMARK_UPDATE, DescriptionConstant.EXCEPTION_TEXT),e);
+            CatLogRecord.failLog(LogDescription.getCatDescription(DescriptionConstant.CONSOLE_ORDER_REMARK_UPDATE, DescriptionConstant.EXCEPTION_TEXT), UrlConstant.CONSOLE_ORDER_REMARK_UPDATE, orderRemarkUpdateRequestVO, e);
             throw new OrderRemarkException(ErrorCode.SYS_ERROR.getCode(),ErrorCode.SYS_ERROR.getText());
         }
     }
@@ -129,10 +149,13 @@ public class OrderRemarkController extends BaseController {
         //参数验证
         validateParameter(bindingResult);
         try{
-            logger.info("获取备注信息入参:{}",orderRemarkInformationRequestVO.toString());
-            return ResponseData.success(orderRemarkService.getOrderRemarkInformation(orderRemarkInformationRequestVO));
+            logger.info(LogDescription.getLogDescription(DescriptionConstant.CONSOLE_ORDER_REMARK_INFORMATION, DescriptionConstant.INPUT_TEXT),orderRemarkInformationRequestVO.toString());
+            OrderRemarkResponseVO orderRemarkResponseVO = orderRemarkService.getOrderRemarkInformation(orderRemarkInformationRequestVO);
+            CatLogRecord.successLog(LogDescription.getCatDescription(DescriptionConstant.CONSOLE_ORDER_REMARK_INFORMATION, DescriptionConstant.SUCCESS_TEXT), UrlConstant.CONSOLE_ORDER_REMARK_INFORMATION,  orderRemarkInformationRequestVO);
+            return ResponseData.success(orderRemarkResponseVO);
         } catch (Exception e) {
-            logger.info("获取备注信息异常{}",e);
+            logger.info(LogDescription.getLogDescription(DescriptionConstant.CONSOLE_ORDER_REMARK_INFORMATION, DescriptionConstant.EXCEPTION_TEXT),e);
+            CatLogRecord.failLog(LogDescription.getCatDescription(DescriptionConstant.CONSOLE_ORDER_REMARK_INFORMATION, DescriptionConstant.EXCEPTION_TEXT), UrlConstant.CONSOLE_ORDER_REMARK_INFORMATION, orderRemarkInformationRequestVO, e);
             throw new OrderRemarkException(ErrorCode.SYS_ERROR.getCode(),ErrorCode.SYS_ERROR.getText());
         }
 
