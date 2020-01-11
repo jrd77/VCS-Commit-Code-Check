@@ -86,7 +86,6 @@ public class AccountRenterDepositService{
     /**
      * 支付成功后记录实付押金信息 和押金资金进出信息
      */
-    @CatAnnotation
     public void updateRenterDeposit(PayedOrderRenterDepositReqVO payedOrderRenterDeposit){
         //1 参数校验
         Assert.notNull(payedOrderRenterDeposit, ErrorCode.PARAMETER_ERROR.getText());
@@ -114,5 +113,13 @@ public class AccountRenterDepositService{
 
     public void updateRenterDepositUniqueNo(String uniqueNo, int renterDepositDetailId) {
         accountRenterDepositDetailNoTService.updateRenterDepositUniqueNo(uniqueNo,renterDepositDetailId);
+    }
+
+    /**
+     * 车俩押金结算 状态更新
+     * @param detainRenterDepositReqVO
+     */
+    public void updateOrderDepositSettle(DetainRenterDepositReqVO detainRenterDepositReqVO) {
+        accountRenterDepositNoTService.updateOrderDepositSettle(detainRenterDepositReqVO.getMemNo(),detainRenterDepositReqVO.getOrderNo());
     }
 }

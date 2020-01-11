@@ -40,7 +40,6 @@ public class AccountDebtService{
      * @param memNo
      * @return
      */
-    @CatAnnotation
     public AccountDebtResVO getAccountDebtByMemNo(String memNo) {
         return accountDebtNoTService.getAccountDebtByMemNo(memNo);
     }
@@ -62,7 +61,6 @@ public class AccountDebtService{
      * 抵扣历史欠款
      * @return
      */
-    @CatAnnotation
     public int deductDebt(AccountDeductDebtReqVO accountDeductDebt) {
         // 1 参数校验
         Assert.notNull(accountDeductDebt, ErrorCode.PARAMETER_ERROR.getText());
@@ -85,7 +83,6 @@ public class AccountDebtService{
     /**
      * 记录用户历史欠款
      */
-    @CatAnnotation
     public int insertDebt(AccountInsertDebtReqVO accountInsertDebt){
         //1校验
         Assert.notNull(accountInsertDebt, ErrorCode.PARAMETER_ERROR.getText());

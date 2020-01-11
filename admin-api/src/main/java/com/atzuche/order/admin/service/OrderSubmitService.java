@@ -62,8 +62,8 @@ public class OrderSubmitService {
         param.setBusinessChildType("");
         param.setPlatformParentType("7");
         param.setPlatformChildType("");
-        param.setModuleName("order");
-        param.setFunctionName("order/admin/req");
+        param.setModuleName("com");
+        param.setFunctionName("com/admin/req");
         param.setReqSource(1);
         param.setReqVersion("10");
         param.setReqOs("ReqOs");

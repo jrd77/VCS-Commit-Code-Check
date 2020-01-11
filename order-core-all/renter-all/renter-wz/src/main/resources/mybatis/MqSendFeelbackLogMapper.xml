@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.atzuche.order.renterwz.mapper.MqSendFeelbackLogMapper">
+<mapper namespace="com.atzuche.com.renterwz.mapper.MqSendFeelbackLogMapper">
 	<sql id="select_column">
 		id,msg_id,queue_name,msg,status,send_time,feelback_time,feelback_code,feelback_msg,create_time,update_time
 	</sql>

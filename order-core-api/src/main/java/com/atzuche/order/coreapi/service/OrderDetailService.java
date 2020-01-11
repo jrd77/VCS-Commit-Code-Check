@@ -15,8 +15,6 @@ import com.atzuche.order.delivery.entity.OwnerHandoverCarInfoEntity;
 import com.atzuche.order.delivery.entity.RenterHandoverCarInfoEntity;
 import com.atzuche.order.delivery.entity.RenterOrderDeliveryEntity;
 import com.atzuche.order.delivery.enums.RenterHandoverCarTypeEnum;
-import com.atzuche.order.delivery.service.OwnerHandoverCarInfoService;
-import com.atzuche.order.delivery.service.RenterHandoverCarInfoService;
 import com.atzuche.order.delivery.service.RenterOrderDeliveryService;
 import com.atzuche.order.owner.commodity.service.OwnerGoodsService;
 import com.atzuche.order.owner.mem.service.OwnerMemberService;
@@ -41,7 +39,6 @@ import com.atzuche.order.rentercost.service.RenterOrderCostDetailService;
 import com.atzuche.order.rentercost.service.RenterOrderCostService;
 import com.atzuche.order.rentermem.service.RenterMemberService;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
-import com.atzuche.order.renterorder.service.RenterAdditionalDriverService;
 import com.atzuche.order.renterorder.service.RenterOrderService;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
@@ -83,7 +80,7 @@ public class OrderDetailService {
     @Autowired
     private OrderCancelReasonService orderCancelReasonService;
     @Autowired
-    private RenterHandoverCarInfoService renterHandoverCarInfoService;
+    private RenterHandoverCarService renterHandoverCarInfoService;
     @Autowired
     private RenterOrderCostDetailService renterOrderCostDetailService;
     @Autowired
@@ -96,6 +93,7 @@ public class OrderDetailService {
     private OwnerHandoverCarInfoService ownerHandoverCarInfoService;
     @Autowired
     private RenterAdditionalDriverService renterAdditionalDriverService;
+    private OwnerHandoverCarService ownerHandoverCarInfoService;
 
     public ResponseData<OrderDetailRespDTO> orderDetail(OrderDetailReqDTO orderDetailReqDTO){
         log.info("准备获取订单详情orderDetailReqDTO={}", JSON.toJSONString(orderDetailReqDTO));

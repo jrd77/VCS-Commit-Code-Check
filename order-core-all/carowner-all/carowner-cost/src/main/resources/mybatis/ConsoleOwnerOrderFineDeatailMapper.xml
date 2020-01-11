@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.atzuche.order.ownercost.mapper.ConsoleOwnerOrderFineDeatailMapper">
+<mapper namespace="com.atzuche.com.ownercost.mapper.ConsoleOwnerOrderFineDeatailMapper">
 
     <resultMap type="com.atzuche.order.ownercost.entity.ConsoleOwnerOrderFineDeatailEntity" id="BaseResultMap">
         <result property="id" column="id"/>
@@ -115,16 +115,8 @@
 				<if test="fineSubsidySourceDesc != null">`fine_subsidy_source_desc`, </if>
 				<if test="fineType != null">`fine_type`, </if>
 				<if test="fineTypeDesc != null">`fine_type_desc`, </if>
-				<if test="operatorId != null">`operator_id`, </if>
 				<if test="operator != null">`operator`, </if>
-				<if test="deptId != null">`dept_id`, </if>
-				<if test="deptName != null">`dept_name`, </if>
 				<if test="remark != null">`remark`, </if>
-				<if test="createTime != null">`create_time`, </if>
-				<if test="createOp != null">`create_op`, </if>
-				<if test="updateTime != null">`update_time`, </if>
-				<if test="updateOp != null">`update_op`, </if>
-				<if test="isDelete != null">`is_delete` </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides="," >
 				<if test="orderNo != null">#{orderNo},  </if>
@@ -136,16 +128,8 @@
 				<if test="fineSubsidySourceDesc != null">#{fineSubsidySourceDesc},  </if>
 				<if test="fineType != null">#{fineType},  </if>
 				<if test="fineTypeDesc != null">#{fineTypeDesc},  </if>
-				<if test="operatorId != null">#{operatorId},  </if>
 				<if test="operator != null">#{operator},  </if>
-				<if test="deptId != null">#{deptId},  </if>
-				<if test="deptName != null">#{deptName},  </if>
 				<if test="remark != null">#{remark},  </if>
-				<if test="createTime != null">#{createTime},  </if>
-				<if test="createOp != null">#{createOp},  </if>
-				<if test="updateTime != null">#{updateTime},  </if>
-				<if test="updateOp != null">#{updateOp},  </if>
-				<if test="isDelete != null">#{isDelete} </if>
         </trim>
 	</insert>
 	

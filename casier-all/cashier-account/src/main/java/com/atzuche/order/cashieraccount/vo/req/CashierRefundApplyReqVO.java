@@ -78,7 +78,7 @@ public class CashierRefundApplyReqVO {
     /**
      * 退款项目：押金，违章押金，费用
      */
-    private Integer flag;
+    private String flag;
     /**
      * 类型（系统退款/手工退款）
      */

@@ -13,6 +13,7 @@ import com.atzuche.order.commons.enums.OrderStatusEnum;
 import com.atzuche.order.commons.enums.RenterCashCodeEnum;
 import com.atzuche.order.commons.enums.cashier.TransStatusEnum;
 import com.atzuche.order.commons.service.OrderPayCallBack;
+import com.atzuche.order.flow.service.OrderFlowService;
 import com.atzuche.order.parentorder.dto.OrderStatusDTO;
 import com.atzuche.order.parentorder.entity.OrderStatusEntity;
 import com.atzuche.order.parentorder.service.OrderStatusService;
@@ -86,6 +87,7 @@ public class CashierService {
     @Autowired private AccountRenterCostSettleDetailNoTService accountRenterCostSettleDetailNoTService;
     @Autowired private AccountOwnerCostSettleDetailNoTService accountOwnerCostSettleDetailNoTService;
     @Autowired private OrderStatusService orderStatusService;
+    @Autowired private OrderFlowService orderFlowService;
     @Autowired private AccountRenterCostSettleNoTService accountRenterCostSettleNoTService;
 
 
@@ -198,7 +200,6 @@ public class CashierService {
     /**
      * 7）违章押金抵扣历史欠款
      */
-    @CatAnnotation
     @Transactional(rollbackFor=Exception.class)
     public CashierDeductDebtResVO deductWZDebt(CashierDeductDebtReqVO cashierDeductDebtReqVO){
         Assert.notNull(cashierDeductDebtReqVO, ErrorCode.PARAMETER_ERROR.getText());
@@ -222,7 +223,6 @@ public class CashierService {
     /**
      * 7）押金抵扣历史欠款
      */
-    @CatAnnotation
     @Transactional(rollbackFor=Exception.class)
     public CashierDeductDebtResVO deductDebt(CashierDeductDebtReqVO cashierDeductDebtReq){
         Assert.notNull(cashierDeductDebtReq, ErrorCode.PARAMETER_ERROR.getText());
@@ -256,7 +256,6 @@ public class CashierService {
     /**
      * 7）剩余租车费用抵扣历史欠款
      */
-    @CatAnnotation
     @Transactional(rollbackFor=Exception.class)
     public CashierDeductDebtResVO deductDebtByRentCost(CashierDeductDebtReqVO cashierDeductDebtReq){
         Assert.notNull(cashierDeductDebtReq, ErrorCode.PARAMETER_ERROR.getText());
@@ -290,7 +289,6 @@ public class CashierService {
     /**
      * 车主收益 抵扣历史欠款
      */
-    @CatAnnotation
     @Transactional(rollbackFor=Exception.class)
     public CashierDeductDebtResVO deductDebtByOwnerIncome(CashierDeductDebtReqVO cashierDeductDebtReq){
         Assert.notNull(cashierDeductDebtReq, ErrorCode.PARAMETER_ERROR.getText());
@@ -333,9 +331,8 @@ public class CashierService {
     /**  ***************************************** 退还押金 start ************************************************* */
 
     /**
-     * 退还车辆押金
+     * 结算退还车辆押金
      */
-    @CatAnnotation
     @Transactional(rollbackFor=Exception.class)
     public int refundDeposit(CashierRefundApplyReqVO cashierRefundApplyReq){
         Assert.notNull(cashierRefundApplyReq, ErrorCode.PARAMETER_ERROR.getText());
@@ -346,12 +343,15 @@ public class CashierService {
         DetainRenterDepositReqVO detainRenterDepositReqVO = new DetainRenterDepositReqVO();
         BeanUtils.copyProperties(cashierRefundApplyReq,detainRenterDepositReqVO);
         detainRenterDepositReqVO.setUniqueNo(id.toString());
-        return accountRenterDepositService.detainRenterDeposit(detainRenterDepositReqVO);
+        //2 押金账户资金转移接口
+        int depositDetailId = accountRenterDepositService.detainRenterDeposit(detainRenterDepositReqVO);
+        // 3 更新押金结算状态
+        accountRenterDepositService.updateOrderDepositSettle(detainRenterDepositReqVO);
+        return depositDetailId;
     }
     /**
      * 结算退还租车费用
      */
-    @CatAnnotation
     @Transactional(rollbackFor=Exception.class)
     public int refundRentCost(CashierRefundApplyReqVO cashierRefundApplyReq){
         Assert.notNull(cashierRefundApplyReq, ErrorCode.PARAMETER_ERROR.getText());
@@ -369,7 +369,6 @@ public class CashierService {
     /**
      * 退还违章押金
      */
-    @CatAnnotation
     @Transactional(rollbackFor=Exception.class)
     public void refundWZDeposit(CashierRefundApplyReqVO cashierRefundApplyReq){
         Assert.notNull(cashierRefundApplyReq, ErrorCode.PARAMETER_ERROR.getText());
@@ -423,7 +422,6 @@ public class CashierService {
     /**
      * 违章费用资金进出
      */
-    @CatAnnotation
     @Transactional(rollbackFor=Exception.class)
     public void changeWZDepositCost(RenterWZDepositCostReqVO renterWZDepositCost){
         accountRenterWzDepositCostService.changeWZDepositCost(renterWZDepositCost);
@@ -541,6 +539,8 @@ public class CashierService {
                 OrderPayStatusEnum.PAYED.getStatus()== entity.getDepositPayStatus()
         ){
             orderStatusDTO.setStatus(OrderStatusEnum.TO_GET_CAR.getStatus());
+            //记录订单流程
+            orderFlowService.inserOrderStatusChangeProcessInfo(orderStatusDTO.getOrderNo(), OrderStatusEnum.TO_GET_CAR);
         }
 
     }
