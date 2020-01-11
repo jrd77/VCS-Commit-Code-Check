@@ -2,6 +2,7 @@ package com.atzuche.order.settle.service;
 
 import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostSettleEntity;
 import com.atzuche.order.cashieraccount.service.CashierSettleService;
+import com.atzuche.order.flow.service.OrderFlowService;
 import com.atzuche.order.parentorder.dto.OrderStatusDTO;
 import com.atzuche.order.parentorder.service.OrderStatusService;
 import com.atzuche.order.settle.exception.OrderSettleFlatAccountException;
@@ -27,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class  OrderSettleService{
     @Autowired private CashierSettleService cashierSettleService;
     @Autowired private OrderSettleNoTService orderSettleNoTService;
+
 
     /**
      * 车辆押金结算
@@ -80,22 +82,25 @@ public class  OrderSettleService{
         int rentCostSurplusAmt = (accountRenterCostSettle.getRentAmt() + accountRenterCostSettle.getShifuAmt())<=0?0:(accountRenterCostSettle.getRentAmt() + accountRenterCostSettle.getShifuAmt());
         settleOrdersAccount.setRentCostSurplusAmt(rentCostSurplusAmt);
         log.info("OrderSettleService settleOrdersDefinition settleOrdersAccount one [{}]", GsonUtils.toJson(settleOrdersAccount));
+        OrderStatusDTO orderStatusDTO = new OrderStatusDTO();
+        orderStatusDTO.setOrderNo(settleOrders.getOrderNo());
         //9 租客费用 结余处理
         orderSettleNoTService.rentCostSettle(settleOrders,settleOrdersAccount);
         //10租客车辆押金/租客剩余租车费用 结余历史欠款
         orderSettleNoTService.repayHistoryDebtRent(settleOrdersAccount);
         //11 租客费用 退还
-        orderSettleNoTService.refundRentCost(settleOrdersAccount,settleOrdersDefinition.getAccountRenterCostSettleDetails());
+        orderSettleNoTService.refundRentCost(settleOrdersAccount,settleOrdersDefinition.getAccountRenterCostSettleDetails(),orderStatusDTO);
         //12 租客押金 退还
-        orderSettleNoTService.refundDepositAmt(settleOrdersAccount);
+        orderSettleNoTService.refundDepositAmt(settleOrdersAccount,orderStatusDTO);
         //13车主收益 结余处理 历史欠款
         orderSettleNoTService.repayHistoryDebtOwner(settleOrdersAccount);
         //14 车主待审核收益落库
         orderSettleNoTService.insertOwnerIncomeExamine(settleOrdersAccount);
         //15 更新订单状态 TODO
-        log.info("OrderSettleService settleOrdersDefinition settleOrdersAccount two [{}]", GsonUtils.toJson(settleOrdersAccount));
-        //16 支付系统发消息
+        settleOrdersAccount.setOrderStatusDTO(orderStatusDTO);
         orderSettleNoTService.saveOrderStatusInfo(settleOrdersAccount);
+        log.info("OrderSettleService settleOrdersDefinition settleOrdersAccount two [{}]", GsonUtils.toJson(settleOrdersAccount));
+        //16 发消息
 
     }
 
