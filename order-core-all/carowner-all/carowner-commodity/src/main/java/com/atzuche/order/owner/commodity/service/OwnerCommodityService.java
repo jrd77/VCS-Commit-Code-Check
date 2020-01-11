@@ -84,16 +84,10 @@ public class OwnerCommodityService {
             return;
         }
 
-
         List<OwnerGoodsPriceDetailEntity> dbGoodsPriceList = ownerGoodsPriceDetailMapper.selectByOwnerOrderNo(ownerOrderNo);
         if(dbGoodsPriceList == null || dbGoodsPriceList.size()<=0){
             return;
         }
-
-        //使用revert_time分组
-        Map<LocalDate, List<OwnerGoodsPriceDetailEntity>> carDayGroupMap = dbGoodsPriceList
-                .stream()
-                .collect(Collectors.groupingBy(OwnerGoodsPriceDetailEntity::getCarDay));
 
         OwnerGoodsPriceDetailEntity dbPriceMaxCarDay = dbGoodsPriceList.get(dbGoodsPriceList.size() - 1);//最后一条
         List<OwnerGoodsPriceDetailDTO> newOwnerGoodsPriceList = new ArrayList<>();
@@ -111,8 +105,13 @@ public class OwnerCommodityService {
         }
         List<OwnerGoodsPriceDetailDTO> ownerGoodsPriceDetailDTOList = ownerGoodsDetailDTO.getOwnerGoodsPriceDetailDTOList();
 
+
         if(dbPriceMaxCarDay.getRevertTime().isBefore(revertTime)){//时间延后
             //过滤出revert_time时间最大的一个分组，比数据库中revert_time大的数据用新的，比据库中revert_time小的数据用数据库的，库中的最后一条数据特殊处理
+            //使用carday分组
+            Map<LocalDate, List<OwnerGoodsPriceDetailEntity>> carDayGroupMap = dbGoodsPriceList
+                    .stream()
+                    .collect(Collectors.groupingBy(OwnerGoodsPriceDetailEntity::getCarDay));
             ownerGoodsPriceDetailDTOList.forEach(x->{
                 LocalDate carDay = x.getCarDay();
                 List<OwnerGoodsPriceDetailEntity> dbMapValue = carDayGroupMap.get(carDay);
@@ -151,9 +150,7 @@ public class OwnerCommodityService {
                     newOwnerGoodsPriceList.add(ownerGoods);
                 }
             });
-
         }else{//时间提前
-            //判断数据库中每个分组的revert_time 找到比数据库中的revert_time相同的
             Map<LocalDateTime, List<OwnerGoodsPriceDetailEntity>> dbRevertTimeGroup = dbGoodsPriceList
                     .stream()
                     .filter(x->(x.getCarDay().isBefore(revertTime.toLocalDate()) || x.getCarDay().isEqual(revertTime.toLocalDate())))
