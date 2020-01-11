@@ -27,7 +27,6 @@ public class AccountRenterStopCostSettleService{
     /**
      * 查询 停运费总和
      */
-    @CatAnnotation
     public int getRenterStopCostAmt(String memNo){
         return accountRenterStopCostSettleNoTService.getRenterStopCostAmt(memNo);
     }
@@ -35,7 +34,6 @@ public class AccountRenterStopCostSettleService{
     /**
      *  停运费资金进出
      */
-    @CatAnnotation
     public void changeRenteStopCostCost(AccountRenterStopCostDetailReqVO accountRenterStopCostDetail){
         //1校验
         Assert.notNull(accountRenterStopCostDetail, ErrorCode.PARAMETER_ERROR.getText());

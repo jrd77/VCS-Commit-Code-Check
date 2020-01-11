@@ -26,7 +26,6 @@ public class AccountRenterDetainService {
     /**
      * 查询暂扣费用总和
      */
-    @CatAnnotation
     public int getRenterDetainAmt(String orderNo ,String memNo){
         return accountRenterDetainCostNoTService.getRenterDetainAmt(orderNo,memNo);
     }
@@ -34,7 +33,6 @@ public class AccountRenterDetainService {
     /**
      * 暂扣费用资金进出
      */
-    @CatAnnotation
     public void changeRenterDetainCost(DetainRenterDepositReqVO detainRenterDeposit){
         //1校验
         Assert.notNull(detainRenterDeposit, ErrorCode.PARAMETER_ERROR.getText());
