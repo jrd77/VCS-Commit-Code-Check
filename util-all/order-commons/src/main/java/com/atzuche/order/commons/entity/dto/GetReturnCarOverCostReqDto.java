@@ -16,6 +16,15 @@ public class GetReturnCarOverCostReqDto {
     /**
      * 订单类型:1,短租订单 2,平台套餐订单
      */
-    Integer orderType;
+    private Integer orderType;
+
+    /**
+     * 是否计算取车费用
+     */
+    private Boolean isGetCarCost;
+    /**
+     * 是否计算还车费用
+     */
+    private Boolean isReturnCarCost;
 
 }

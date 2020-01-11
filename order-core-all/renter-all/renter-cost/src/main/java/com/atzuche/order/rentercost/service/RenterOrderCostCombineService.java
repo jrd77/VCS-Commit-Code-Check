@@ -955,10 +955,12 @@ public class RenterOrderCostCombineService {
         GetReturnOverTransportDTO getReturnOverTransport = new GetReturnOverTransportDTO(false, 0, false, 0);
         getReturnOverTransport.setIsUpdateRentTime(true);
         getReturnOverTransport.setIsUpdateRevertTime(true);
+
         if (cityCode == null || (rentTime == null && revertTime == null)) {
             getReturnOverCostDTO.setRenterOrderCostDetailEntityList(renterOrderCostDetailEntityList);
             return getReturnOverCostDTO;
         }
+
         try {
             // 超运能后计算附加费的订单类型列表1-短租订单和3-平台套餐订单
             List<Integer> orderTypeList = Arrays.asList(ORDER_TYPES);
@@ -966,8 +968,8 @@ public class RenterOrderCostCombineService {
             Boolean isAddFee = orderTypeList.contains(getReturnCarOverCostReqDto.getOrderType());
             Integer overTransportFee = this.getGetReturnOverTransportFee(cityCode);
             String rentTimeLongStr = String.valueOf(LocalDateTimeUtils.localDateTimeToLong(rentTime));
-
-            if (rentTime != null) {
+            boolean getIsGetCarCost = getReturnCarOverCostReqDto.getIsGetCarCost() == null ? false : getReturnCarOverCostReqDto.getIsGetCarCost();
+            if (rentTime != null && getIsGetCarCost) {
                 ResponseObject<Boolean> getFlgResponse = null;
                 Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "取车是否超运能");
                 try{
@@ -1023,7 +1025,8 @@ public class RenterOrderCostCombineService {
                     getReturnOverTransport.setIsGetOverTransport(false);
                 }
             }
-            if (revertTime != null) {
+            boolean getIsReturnCarCost = getReturnCarOverCostReqDto.getIsReturnCarCost()==null?false:getReturnCarOverCostReqDto.getIsReturnCarCost();
+            if (revertTime != null && getIsReturnCarCost) {
                 String revertTimeLongStr = String.valueOf(LocalDateTimeUtils.localDateTimeToLong(revertTime));
                 ResponseObject<Boolean>  returnFlgResponse = null;
                 Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL,"还车是否超运能");
