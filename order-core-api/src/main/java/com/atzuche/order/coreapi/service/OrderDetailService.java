@@ -278,8 +278,12 @@ public class OrderDetailService {
 
         //订单状态
         OrderStatusEntity orderStatusEntity = orderStatusService.getByOrderNo(orderNo);
-        OrderStatusDTO orderStatusDTO = new OrderStatusDTO();
-        BeanUtils.copyProperties(orderStatusEntity,orderStatusDTO);
+        OrderStatusDTO orderStatusDTO = null;
+        if(orderStatusEntity != null){
+            orderStatusDTO = new OrderStatusDTO();
+            BeanUtils.copyProperties(orderStatusEntity,orderStatusDTO);
+        }
+
 
         //统计信息
         OrderSourceStatEntity orderSourceStatEntity = orderSourceStatService.selectByOrderNo(orderNo);
@@ -292,26 +296,38 @@ public class OrderDetailService {
 
         //租客订单
         RenterOrderEntity renterOrderEntity = renterOrderService.getRenterOrderByOrderNoAndIsEffective(orderNo);
-        RenterOrderDTO renterOrderDTO = new RenterOrderDTO();
-        BeanUtils.copyProperties(renterOrderEntity,renterOrderDTO);
+        RenterOrderDTO renterOrderDTO = null;
+        if(renterOrderEntity != null){
+            renterOrderDTO = new RenterOrderDTO();
+            BeanUtils.copyProperties(renterOrderEntity,renterOrderDTO);
+            renterOrderNo = renterOrderNo==null?renterOrderEntity.getRenterOrderNo():renterOrderNo;
+        }
 
         //车主订单
         OwnerOrderEntity ownerOrderEntity = ownerOrderService.getOwnerOrderByOrderNoAndIsEffective(orderNo);
         OwnerOrderDTO ownerOrderDTO = new OwnerOrderDTO();
-        BeanUtils.copyProperties(ownerOrderEntity,ownerOrderDTO);
-
-        renterOrderNo = renterOrderNo==null?renterOrderEntity.getRenterOrderNo():renterOrderNo;
-        ownerOrderNo = ownerOrderNo==null?ownerOrderEntity.getOwnerOrderNo():ownerOrderNo;
+        if(ownerOrderEntity !=null){
+            ownerOrderDTO = new OwnerOrderDTO();
+            BeanUtils.copyProperties(ownerOrderEntity,ownerOrderDTO);
+            ownerOrderNo = ownerOrderNo==null?ownerOrderEntity.getOwnerOrderNo():ownerOrderNo;
+        }
 
         //租客商品
         RenterGoodsDetailDTO renterGoodsDetail = renterGoodsService.getRenterGoodsDetail(renterOrderNo, false);
-        RenterGoodsDTO renterGoodsDTO = new RenterGoodsDTO();
-        BeanUtils.copyProperties(renterGoodsDetail,renterGoodsDTO);
+        RenterGoodsDTO renterGoodsDTO = null;
+        if(renterGoodsDetail != null){
+            renterGoodsDTO = new RenterGoodsDTO();
+            BeanUtils.copyProperties(renterGoodsDetail,renterGoodsDTO);
+        }
+
 
         //车主商品
         OwnerGoodsDetailDTO ownerGoodsDetail = ownerGoodsService.getOwnerGoodsDetail(ownerOrderNo, false);
-        OwnerGoodsDTO ownerGoodsDTO = new OwnerGoodsDTO();
-        BeanUtils.copyProperties(ownerGoodsDetail,ownerGoodsDTO);
+        OwnerGoodsDTO ownerGoodsDTO = null;
+        if(ownerGoodsDetail != null){
+            ownerGoodsDTO = new OwnerGoodsDTO();
+            BeanUtils.copyProperties(ownerGoodsDetail,ownerGoodsDTO);
+        }
 
         //会员权益
         RenterMemberDTO renterMemberDTO = renterMemberService.selectrenterMemberByRenterOrderNo(renterOrderNo, true);
