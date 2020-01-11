@@ -5,6 +5,7 @@ import com.atzuche.order.delivery.mapper.OrderDeliveryFlowMapper;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 
 /**
@@ -29,7 +30,7 @@ public class OrderDeliveryFlowService{
      * @param renterOrderNo
      * @return
      */
-    public OrderDeliveryFlowEntity selectOrderDeliveryFlowByOrderNo(String renterOrderNo) {
+    public List<OrderDeliveryFlowEntity> selectOrderDeliveryFlowByOrderNo(String renterOrderNo) {
         return orderDeliveryFlowMapper.selectOrderDeliveryByRenterOrderNo(renterOrderNo);
     }
 
