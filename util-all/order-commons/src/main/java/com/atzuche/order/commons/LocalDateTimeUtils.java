@@ -1,5 +1,7 @@
 package com.atzuche.order.commons;
 
+import java.text.ParsePosition;
+import java.text.SimpleDateFormat;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAdjusters;
@@ -11,6 +13,11 @@ import java.util.Date;
  *
  **/
 public class LocalDateTimeUtils {
+
+    /**
+     * 默认的时间日期样式
+     */
+    public static final String YYYYMMDDHHMMSSS_PATTERN = "yyyyMMddHHmmss";
 
     /**
      * 默认的时间日期样式
@@ -193,6 +200,8 @@ public class LocalDateTimeUtils {
         DateTimeFormatter df = DateTimeFormatter.ofPattern(format);
         return LocalDateTime.parse(time, df);
     }
+
+
 
     /**
      * 字符换日期转化为Localdate
@@ -447,6 +456,7 @@ public class LocalDateTimeUtils {
         return localDateTime;
     }
 
+
     public static void main(String[] args) {
 //        System.out.println(getDateAfter(LocalDateTime.now(),10));
 //        String dateTime = formatEpochSecond("yyyy-MM-dd HH:mm:ss", 1525767228);
@@ -467,6 +477,19 @@ public class LocalDateTimeUtils {
 //        System.out.println(localDateTimeToLong(LocalDateTime.now()));;
         LocalDateTime rentTime = LocalDateTime.of(2020,1,2,12,1,1);
         long l = localDateTimeToLong(rentTime);
+
+//        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");//代替simpleDateFormat
+//
+//        String t= DefaultFormatEpochSecond(Long.valueOf("20200109212524"));
+//        System.out.println(t);
+
+//        String str1="20200109212524";
+//        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+//        LocalDateTime parse = LocalDateTime.parse(str1, dtf);
+//        System.out.println(parse);
+        LocalDateTime da = parseStringToDateTime("20200110170824",YYYYMMDDHHMMSSS_PATTERN);
+        System.out.println(da);
+
 
     }
 

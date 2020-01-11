@@ -102,7 +102,8 @@ public class RenterCancelOrderService {
         ownerOrderService.updateOwnerOrderChildStatus(ownerOrderEntity.getId(), OwnerChildStatusEnum.END.getCode());
         orderFlowService.inserOrderStatusChangeProcessInfo(orderNo, OrderStatusEnum.CLOSED);
         //取消信息处理(order_cancel_reason)
-        orderCancelReasonService.addOrderCancelReasonRecord(buildOrderCancelReasonEntity(orderNo, cancelReason));
+        orderCancelReasonService.addOrderCancelReasonRecord(buildOrderCancelReasonEntity(orderNo,renterOrderEntity.getRenterOrderNo(),
+                cancelReason));
 
         renterOrderFineDeatailService.saveRenterOrderFineDeatail(renterOrderFineDeatailEntity);
         consoleOwnerOrderFineDeatailService.addFineRecord(consoleOwnerOrderFineDeatailEntity);
@@ -162,12 +163,14 @@ public class RenterCancelOrderService {
         return orderStatusDTO;
     }
 
-    private OrderCancelReasonEntity buildOrderCancelReasonEntity(String orderNo, String cancelReason) {
+    private OrderCancelReasonEntity buildOrderCancelReasonEntity(String orderNo,
+                                                                 String renterOrderNo, String cancelReason) {
         OrderCancelReasonEntity orderCancelReasonEntity = new OrderCancelReasonEntity();
         orderCancelReasonEntity.setOperateType(CancelOperateTypeEnum.CANCEL_ORDER.getCode());
         orderCancelReasonEntity.setCancelReason(cancelReason);
         orderCancelReasonEntity.setCancelSource(CancelSourceEnum.RENTER.getCode());
         orderCancelReasonEntity.setOrderNo(orderNo);
+        orderCancelReasonEntity.setSubOrderNo(renterOrderNo);
         orderCancelReasonEntity.setDutySource(CancelOrderDutyEnum.CANCEL_ORDER_DUTY_RENTER.getCode());
         return orderCancelReasonEntity;
     }

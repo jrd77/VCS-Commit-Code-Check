@@ -4,11 +4,16 @@ import com.atzuche.order.commons.entity.dto.*;
 import com.atzuche.order.rentercost.entity.dto.RenterOrderSubsidyDetailDTO;
 import lombok.Data;
 
+import java.io.Serializable;
 import java.util.List;
 
 @Data
-public class RenterOrderCostReqDTO {
+public class RenterOrderCostReqDTO implements Serializable{
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = 8665130129924386005L;
+	/**
      * 基本信息
      */
     private CostBaseDTO costBaseDTO;

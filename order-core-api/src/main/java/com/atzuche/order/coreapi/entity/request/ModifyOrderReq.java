@@ -24,10 +24,10 @@ public class ModifyOrderReq {
 	@AutoDocProperty(value="补充全险是否开启，0：否，1：是")
 	private Integer abatementFlag;
 	
-	@AutoDocProperty(value="取车时间,格式 yyyy-MM-dd HH:mm:ss",required=true)
+	@AutoDocProperty(value="取车时间,格式 yyyyMMddHHmmss",required=true)
 	private String rentTime;
 	
-	@AutoDocProperty(value="还车时间,格式 yyyy-MM-dd HH:mm:ss",required=true)
+	@AutoDocProperty(value="还车时间,格式 yyyyMMddHHmmss",required=true)
 	private String revertTime;
 	
 	@AutoDocProperty(value="取车地址")

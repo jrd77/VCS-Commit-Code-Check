@@ -17,8 +17,6 @@ public interface AccountRenterDetainDetailMapper{
 
     List<AccountRenterDetainDetailEntity> selectALL();
 
-    int insert(AccountRenterDetainDetailEntity record);
-    
     int insertSelective(AccountRenterDetainDetailEntity record);
 
     int updateByPrimaryKey(AccountRenterDetainDetailEntity record);

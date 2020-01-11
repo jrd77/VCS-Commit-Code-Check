@@ -58,48 +58,55 @@
 		select <include refid="Base_Column_List" /> from account_renter_deposit where id = #{value}
 	</select>
 
-	<insert id="insert" parameterType="com.atzuche.order.accountrenterdeposit.entity.AccountRenterDepositEntity">
-		insert into account_renter_deposit
-		(
-				`order_no`,
-				`mem_no`,		
-				`pay_status`,		
-				`pay_time`,		
-				`settle_status`,		
-				`settle_time`,		
-				`yingfu_deposit_amt`,		
-				`shifu_deposit_amt`,		
-				`authorize_deposit_amt`,		
-				`credit_pay_amt`,
-				 surplus_credit_pay_amt,
-				`surplus_deposit_amt`,		
-				`surplus_authorize_deposit_amt`,		
-				`free_deposit_type`,
-				`version`,
-				`create_op`,
-				`update_op`
-			)
-		values
-		(
-				#{orderNo},
-				#{memNo}, 		
-				#{payStatus}, 		
-				#{payTime}, 		
-				#{settleStatus}, 		
-				#{settleTime}, 		
-				#{yingfuDepositAmt}, 		
-				#{shifuDepositAmt}, 		
-				#{authorizeDepositAmt}, 		
-				#{creditPayAmt},
-				#{surplusCreditPayAmt},
-				#{surplusDepositAmt}, 		
-				#{surplusAuthorizeDepositAmt}, 		
-				#{freeDepositType},
-				#{version},
-				#{createOp},
-				#{updateOp}
-			)
-	</insert>
+    <insert id="insertSelective" parameterType="com.atzuche.order.accountrenterdeposit.entity.AccountRenterDepositEntity" useGeneratedKeys="true" keyProperty="id">
+        insert into account_renter_deposit
+        <trim prefix="(" suffix=")" suffixOverrides="," >
+            <if test="orderNo != null">`order_no`, </if>
+            <if test="memNo != null">`mem_no`, </if>
+            <if test="payStatus != null">`pay_status`, </if>
+            <if test="payTime != null">`pay_time`, </if>
+            <if test="settleStatus != null">`settle_status`, </if>
+            <if test="settleTime != null">`settle_time`, </if>
+            <if test="yingfuDepositAmt != null">`yingfu_deposit_amt`, </if>
+            <if test="shifuDepositAmt != null">`shifu_deposit_amt`, </if>
+            <if test="authorizeDepositAmt != null">`authorize_deposit_amt`, </if>
+            <if test="creditPayAmt != null">`credit_pay_amt`, </if>
+            <if test="surplusCreditPayAmt != null">`surplus_credit_pay_amt`, </if>
+            <if test="surplusDepositAmt != null">`surplus_deposit_amt`, </if>
+            <if test="surplusAuthorizeDepositAmt != null">`surplus_authorize_deposit_amt`, </if>
+            <if test="reductionAmt != null">`reduction_amt`, </if>
+            <if test="freeDepositType != null">`free_deposit_type`, </if>
+            <if test="version != null">`version`, </if>
+            <if test="createTime != null">`create_time`, </if>
+            <if test="createOp != null">`create_op`, </if>
+            <if test="updateTime != null">`update_time`, </if>
+            <if test="updateOp != null">`update_op`, </if>
+            <if test="isDelete != null">`is_delete` </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides="," >
+            <if test="orderNo != null">#{orderNo},  </if>
+            <if test="memNo != null">#{memNo},  </if>
+            <if test="payStatus != null">#{payStatus},  </if>
+            <if test="payTime != null">#{payTime},  </if>
+            <if test="settleStatus != null">#{settleStatus},  </if>
+            <if test="settleTime != null">#{settleTime},  </if>
+            <if test="yingfuDepositAmt != null">#{yingfuDepositAmt},  </if>
+            <if test="shifuDepositAmt != null">#{shifuDepositAmt},  </if>
+            <if test="authorizeDepositAmt != null">#{authorizeDepositAmt},  </if>
+            <if test="creditPayAmt != null">#{creditPayAmt},  </if>
+            <if test="surplusCreditPayAmt != null">#{surplusCreditPayAmt},  </if>
+            <if test="surplusDepositAmt != null">#{surplusDepositAmt},  </if>
+            <if test="surplusAuthorizeDepositAmt != null">#{surplusAuthorizeDepositAmt},  </if>
+            <if test="reductionAmt != null">#{reductionAmt},  </if>
+            <if test="freeDepositType != null">#{freeDepositType},  </if>
+            <if test="version != null">#{version},  </if>
+            <if test="createTime != null">#{createTime},  </if>
+            <if test="createOp != null">#{createOp},  </if>
+            <if test="updateTime != null">#{updateTime},  </if>
+            <if test="updateOp != null">#{updateOp},  </if>
+            <if test="isDelete != null">#{isDelete} </if>
+        </trim>
+    </insert>
 	
 	<update id="updateByPrimaryKeySelective" parameterType="com.atzuche.order.accountrenterdeposit.entity.AccountRenterDepositEntity">
 		update account_renter_deposit 

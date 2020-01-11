@@ -29,4 +29,5 @@ public interface OwnerOrderMapper{
 
     Integer updateOwnerOrderChildStatus(@Param("id") Integer id, @Param("childStatus") Integer childStatus);
 
+    OwnerOrderEntity getChangeOwnerByOrderNo(@Param("orderNo") String orderNo);
 }

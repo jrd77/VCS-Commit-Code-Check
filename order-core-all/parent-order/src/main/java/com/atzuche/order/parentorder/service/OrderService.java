@@ -81,4 +81,14 @@ public class OrderService {
     public List<SuccessOrderDTO> queryOrderNoByOrderNos(List<String> orderNos) {
         return orderMapper.queryOrderNoByOrderNos(orderNos);
     }
+    
+    /**
+     * 根据订单号和会员号获取主订单信息
+     * @param orderNo 主订单号
+     * @param memNo 租客会员号
+     * @return OrderEntity
+     */
+    public OrderEntity getOrderByOrderNoAndMemNo(String orderNo, String memNo) {
+    	return orderMapper.getOrderByOrderNoAndMemNo(orderNo, memNo);
+    }
 }

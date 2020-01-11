@@ -141,8 +141,7 @@ public class SubmitOrderService {
         stockService.checkCarStock(orderInfoDTO);
 
         //2.2风控
-        Integer riskAuditId = null;
-//        Integer riskAuditId = submitOrderRiskAuditService.check(buildSubmitOrderRiskCheckReqVO(orderReqVO, reqTime));
+        Integer riskAuditId = submitOrderRiskAuditService.check(buildSubmitOrderRiskCheckReqVO(orderReqVO, reqTime));
         //2.3校验链
         //TODO:下单校验
 
@@ -248,17 +247,21 @@ public class SubmitOrderService {
         //7. 优惠券绑定、凹凸币扣除等
         OwnerCouponBindReqVO ownerCouponBindReqVO =
                 buildOwnerCouponBindReqVO(orderNo, renterOrderResVO.getCouponAndAutoCoinResVO(), reqContext);
+
         boolean bindOwnerCouponResult = couponAndCoinHandleService.bindOwnerCoupon(ownerCouponBindReqVO);
         LOGGER.info("Bind owner coupon result is:[{}]", bindOwnerCouponResult);
-        boolean bindPlatformCouponResult = couponAndCoinHandleService.bindCoupon(orderNo,
+
+       /* boolean bindPlatformCouponResult = couponAndCoinHandleService.bindCoupon(orderNo,
                 orderReqVO.getDisCouponIds(), 1,
                 renterOrderResVO.getCouponAndAutoCoinResVO().getIsUsePlatformCoupon());
         LOGGER.info("Bind platf coupon result is:[{}]", bindPlatformCouponResult);
         boolean bindGetCarFeeCouponResult = couponAndCoinHandleService.bindCoupon(orderNo,
                 orderReqVO.getGetCarFreeCouponId(), 2,
                 renterOrderResVO.getCouponAndAutoCoinResVO().getIsUseGetCarFeeCoupon());
-        LOGGER.info("Bind getCarFee coupon result is:[{}]", bindGetCarFeeCouponResult);
-        AutoCoinDeductReqVO autoCoinDeductReqVO = buildAutoCoinDeductReqVO(orderNo, renterOrderResVO.getCouponAndAutoCoinResVO(), reqContext);
+        LOGGER.info("Bind getCarFee coupon result is:[{}]", bindGetCarFeeCouponResult);*/
+
+        AutoCoinDeductReqVO autoCoinDeductReqVO = buildAutoCoinDeductReqVO(orderNo,
+                renterOrderNo,renterOrderResVO.getCouponAndAutoCoinResVO().getChargeAutoCoin(), reqContext);
         boolean deductionAotuCoinResult = couponAndCoinHandleService.deductionAotuCoin(autoCoinDeductReqVO);
         LOGGER.info("Deduct autoCoin result is:[{}]", deductionAotuCoinResult);
 
@@ -269,6 +272,7 @@ public class SubmitOrderService {
         //end 组装接口返回
         OrderResVO orderResVO = new OrderResVO();
         orderResVO.setOrderNo(orderNo);
+        orderResVO.setStatus(String.valueOf(orderStatusDTO.getStatus()));
         return orderResVO;
     }
 
@@ -580,26 +584,29 @@ public class SubmitOrderService {
         OwnerCouponBindReqVO ownerCouponBindReqVO = new OwnerCouponBindReqVO();
         ownerCouponBindReqVO.setCarNo(Integer.valueOf(reqContext.getOrderReqVO().getCarNo()));
         ownerCouponBindReqVO.setCouponNo(reqContext.getOrderReqVO().getCarOwnerCouponNo());
-        ownerCouponBindReqVO.setRentAmt(couponAndAutoCoinResVO.getRentAmt());
+        ownerCouponBindReqVO.setRentAmt(Math.abs(couponAndAutoCoinResVO.getRentAmt()));
         ownerCouponBindReqVO.setRenterFirstName(reqContext.getRenterMemberDto().getFirstName());
         ownerCouponBindReqVO.setRenterName(reqContext.getRenterMemberDto().getRealName());
         ownerCouponBindReqVO.setRenterSex(null == reqContext.getRenterMemberDto().getGender() ? "" :
                 reqContext.getRenterMemberDto().getGender().toString());
         ownerCouponBindReqVO.setOrderNo(orderNo);
+        LOGGER.info("Build OwnerCouponBindReqVO result is:[{}]", ownerCouponBindReqVO);
         return ownerCouponBindReqVO;
     }
 
 
-    private AutoCoinDeductReqVO buildAutoCoinDeductReqVO(String orderNo, CouponAndAutoCoinResVO couponAndAutoCoinResVO, OrderReqContext reqContext) {
+    private AutoCoinDeductReqVO buildAutoCoinDeductReqVO(String orderNo, String renterOrderNo, Integer chargeAutoCoin,
+                                                         OrderReqContext reqContext) {
         AutoCoinDeductReqVO autoCoinDeductReqVO = new AutoCoinDeductReqVO();
         autoCoinDeductReqVO.setOrderNo(orderNo);
-        autoCoinDeductReqVO.setMemNo(Integer.valueOf(reqContext.getOrderReqVO().getMemNo()));
-        autoCoinDeductReqVO.setChargeAutoCoin(null == couponAndAutoCoinResVO.getChargeAutoCoin() ? 0 :
-                -couponAndAutoCoinResVO.getChargeAutoCoin() * 100);
+        autoCoinDeductReqVO.setRenterOrderNo(renterOrderNo);
+        autoCoinDeductReqVO.setMemNo(reqContext.getOrderReqVO().getMemNo());
+        autoCoinDeductReqVO.setChargeAutoCoin(null == chargeAutoCoin ? 0 : chargeAutoCoin);
         autoCoinDeductReqVO.setOrderType("2");
         autoCoinDeductReqVO.setUseAutoCoin(reqContext.getOrderReqVO().getUseAutoCoin());
         autoCoinDeductReqVO.setRemark("租车消费");
         autoCoinDeductReqVO.setRemarkExtend("租车消费");
+        LOGGER.info("Build AutoCoinDeductReqVO result is:[{}]", autoCoinDeductReqVO);
         return autoCoinDeductReqVO;
     }
 

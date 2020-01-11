@@ -18,6 +18,11 @@ public class AutoCoinDeductReqVO {
     private String orderNo;
 
     /**
+     * 租客订单号
+     */
+    private String renterOrderNo;
+
+    /**
      * 使用凹凸币标识
      */
     private Integer useAutoCoin;
@@ -25,7 +30,7 @@ public class AutoCoinDeductReqVO {
     /**
      * 租客会员注册号
      */
-    private Integer memNo;
+    private String memNo;
 
 
     /**

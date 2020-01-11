@@ -90,7 +90,7 @@ public class AccountRenterDepositService{
     public void updateRenterDeposit(PayedOrderRenterDepositReqVO payedOrderRenterDeposit){
         //1 参数校验
         Assert.notNull(payedOrderRenterDeposit, ErrorCode.PARAMETER_ERROR.getText());
-        payedOrderRenterDeposit.check();
+        //payedOrderRenterDeposit.check();
         //2更新押金 实付信息
         accountRenterDepositNoTService.updateRenterDeposit(payedOrderRenterDeposit);
         //添加押金资金进出明细

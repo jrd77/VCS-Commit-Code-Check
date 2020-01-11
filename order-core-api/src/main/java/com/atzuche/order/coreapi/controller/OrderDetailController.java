@@ -1,7 +1,6 @@
 package com.atzuche.order.coreapi.controller;
 
-import com.atzuche.order.commons.entity.orderDetailDto.OrderDetailReqDTO;
-import com.atzuche.order.commons.entity.orderDetailDto.OrderDetailRespDTO;
+import com.atzuche.order.commons.entity.orderDetailDto.*;
 import com.atzuche.order.coreapi.service.OrderDetailService;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
@@ -32,6 +31,27 @@ public class OrderDetailController {
                     error.get().getDefaultMessage() : ErrorCode.INPUT_ERROR.getText());
         }
         ResponseData<OrderDetailRespDTO> respData = orderDetailService.orderDetail(orderDetailReqDTO);
+        return respData;
+    }
+
+    @PostMapping("/orderStatus")
+    public ResponseData<OrderStatusRespDTO> orderStatus(@Valid @RequestBody OrderDetailReqDTO orderDetailReqDTO, BindingResult bindingResult){
+        if (bindingResult.hasErrors()) {
+            Optional<FieldError> error = bindingResult.getFieldErrors().stream().findFirst();
+            return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), error.isPresent() ?
+                    error.get().getDefaultMessage() : ErrorCode.INPUT_ERROR.getText());
+        }
+        ResponseData<OrderStatusRespDTO> respData = orderDetailService.orderStatus(orderDetailReqDTO);
+        return respData;
+    }
+    @PostMapping("/orderHistory")
+    public ResponseData<OrderHistoryRespDTO> orderHistory(@Valid @RequestBody OrderHistoryReqDTO orderHistoryReqDTO, BindingResult bindingResult){
+        if (bindingResult.hasErrors()) {
+            Optional<FieldError> error = bindingResult.getFieldErrors().stream().findFirst();
+            return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), error.isPresent() ?
+                    error.get().getDefaultMessage() : ErrorCode.INPUT_ERROR.getText());
+        }
+        ResponseData<OrderHistoryRespDTO> respData = orderDetailService.orderHistory(orderHistoryReqDTO);
         return respData;
     }
 

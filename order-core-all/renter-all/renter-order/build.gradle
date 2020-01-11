@@ -17,5 +17,7 @@ dependencies {
     compile project(":order-core-all:renter-all:renter-mem")
 
 
-    compile('com.autoyol.coupon:coupon-api:2019121301-SNAPSHOT')
+    compile('com.autoyol:memberDetailService-api:1.0.1-SNAPSHOT')
+    compile('com.autoyol.coupon:coupon-api:20200110-SNAPSHOT')
+    compile project(":order-coin")
 }

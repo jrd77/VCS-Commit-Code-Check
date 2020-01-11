@@ -52,7 +52,7 @@ public class AccountOwnerIncomeDetailNoTService {
         accountOwnerIncomeDetail.setType(AccountOwnerIncomeDetailType.INCOME.getType());
         accountOwnerIncomeDetail.setCostCode(OrderCoseSourceCode.OWNER_COST_SETTLE.getCode());
         accountOwnerIncomeDetail.setCostDetail(OrderCoseSourceCode.OWNER_COST_SETTLE.getDesc());
-        int result = accountOwnerIncomeDetailMapper.insert(accountOwnerIncomeDetail);
+        int result = accountOwnerIncomeDetailMapper.insertSelective(accountOwnerIncomeDetail);
         if(result==0){
             throw new AccountOwnerIncomeExamineException();
         }

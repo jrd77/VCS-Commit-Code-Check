@@ -15,7 +15,7 @@ public interface AccountPlatformProfitMapper{
 
     AccountPlatformProfitEntity selectByPrimaryKey(Integer id);
 
-    int insert(AccountPlatformProfitEntity record);
+    int insertSelective(AccountPlatformProfitEntity record);
 
     int updateByPrimaryKeySelective(AccountPlatformProfitEntity record);
 

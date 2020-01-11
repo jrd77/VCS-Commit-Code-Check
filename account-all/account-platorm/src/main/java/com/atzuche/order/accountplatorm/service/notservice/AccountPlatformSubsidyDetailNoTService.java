@@ -37,7 +37,7 @@ public class AccountPlatformSubsidyDetailNoTService {
                 accountPlatformSubsidyDetail.setSubsidyName(vo.getSubsidyName().getDesc());
                 accountPlatformSubsidyDetail.setSourceCode(vo.getRenterCashCodeEnum().getCashNo());
                 accountPlatformSubsidyDetail.setSourceDesc(vo.getRenterCashCodeEnum().getTxt());
-                int result = accountPlatformSubsidyDetailMapper.insert(accountPlatformSubsidyDetail);
+                int result = accountPlatformSubsidyDetailMapper.insertSelective(accountPlatformSubsidyDetail);
                 if(result==0){
                     throw new AccountPlatormException();
                 }
@@ -53,7 +53,7 @@ public class AccountPlatformSubsidyDetailNoTService {
         if(!CollectionUtils.isEmpty(accountPlatformSubsidyDetails)){
             for(int i =0;i<accountPlatformSubsidyDetails.size();i++){
                 AccountPlatformSubsidyDetailEntity entity = accountPlatformSubsidyDetails.get(i);
-                int result = accountPlatformSubsidyDetailMapper.insert(entity);
+                int result = accountPlatformSubsidyDetailMapper.insertSelective(entity);
                 if(result==0){
                     throw new AccountPlatormException();
                 }

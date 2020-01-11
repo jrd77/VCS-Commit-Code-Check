@@ -58,7 +58,7 @@ public class ModifyOrderUtils {
 	public static boolean getModifyTimeFlag(LocalDateTime initTime, String updTimeStr) {
 		LocalDateTime updTime = null;
 		if (StringUtils.isNotBlank(updTimeStr)) {
-			updTime = CommonUtils.parseTime(updTimeStr, CommonUtils.FORMAT_STR_DEFAULT);
+			updTime = CommonUtils.parseTime(updTimeStr, CommonUtils.FORMAT_STR_LONG);
 		}
 		if (updTime != null && !updTime.equals(initTime)) {
 			return true;

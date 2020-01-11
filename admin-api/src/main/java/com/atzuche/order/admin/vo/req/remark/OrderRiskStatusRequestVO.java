@@ -12,7 +12,7 @@ public class OrderRiskStatusRequestVO {
     private String orderNo;
 
     @AutoDocProperty(value = "是否有风控事故,1:有,0:无")
-    private String riskStatus;
+    private String riskAccidentStatus;
 
 
 }

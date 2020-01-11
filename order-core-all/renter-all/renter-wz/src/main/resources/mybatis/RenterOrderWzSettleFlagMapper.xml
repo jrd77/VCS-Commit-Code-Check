@@ -93,10 +93,10 @@
 		where id = #{id} and is_delete = 0
 	</select>
 
-	<select id="queryList" resultType="com.atzuche.order.renterwz.entity.RenterOrderWzSettleFlagEntity">
+	<select id="getIllegalSettleInfosByOrderNo" resultMap="selectColumnMap">
 		select <include refid="select_column" />
 		from renter_order_wz_settle_flag
-		where is_delete = 0
+		where order_no = #{orderNo} and is_delete = 0
 	</select>
 
 	 <update id="updateRenterOrderWzSettleFlag" parameterType="com.atzuche.order.renterwz.entity.RenterOrderWzSettleFlagEntity">
@@ -147,15 +147,15 @@
         set has_illegal = #{hasIllegal},
             update_op = #{updateOp}
         where order_no = #{orderNo}
-		and car_plate_num = #{carNum}
+		and car_plate_num = #{carNum} and is_delete = 0
     </update>
 
 	<select id="countByOrderNoAndCarNum" resultType="int">
-        select count(*) from renter_order_wz_settle_flag where order_no=#{orderNo} and car_plate_num = #{carNum}
+        select count(*) from renter_order_wz_settle_flag where order_no=#{orderNo} and car_plate_num = #{carNum} and is_delete = 0
     </select>
 
 	<select id="getIllegalSettleFlag" resultType="java.lang.Integer">
-        select settle_flag from trans_illegal_settle_flag where order_no=#{orderNo} and car_plate_num = #{carNum}
+        select settle_flag from trans_illegal_settle_flag where order_no=#{orderNo} and car_plate_num = #{carNum} and is_delete = 0
     </select>
 
 	<update id="updateIsIllegalCost">
@@ -163,6 +163,15 @@
         set has_illegal_cost = #{hasIllegalCost},
         	update_op = #{updateOp}
         where order_no = #{orderNo}
-        and car_plate_num = #{carNum}
+        and car_plate_num = #{carNum} and is_delete = 0
     </update>
+
+	<update id="updateSettleFlag">
+        update renter_order_wz_settle_flag
+        set settle_flag = #{settleFlag},
+			settle_time = NOW(),
+			update_op = #{updateOp}
+        where order_no = #{orderNo} and is_delete = 0
+    </update>
+
 </mapper>

@@ -3,10 +3,7 @@ package com.atzuche.order.coreapi.service;
 import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.CatConstants;
 import com.atzuche.order.commons.LocalDateTimeUtils;
-import com.atzuche.order.commons.entity.dto.OwnerMemberDTO;
-import com.atzuche.order.commons.entity.dto.OwnerMemberRightDTO;
-import com.atzuche.order.commons.entity.dto.RenterMemberDTO;
-import com.atzuche.order.commons.entity.dto.RenterMemberRightDTO;
+import com.atzuche.order.commons.entity.dto.*;
 import com.atzuche.order.commons.enums.MemberFlagEnum;
 import com.atzuche.order.commons.enums.OwnerMemRightEnum;
 import com.atzuche.order.commons.enums.RenterMemRightEnum;
@@ -21,6 +18,7 @@ import com.dianping.cat.Cat;
 import com.dianping.cat.message.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -47,7 +45,8 @@ public class MemberService {
                 MemberSelectKeyEnum.MEMBER_BASE_INFO.getKey(),
                 MemberSelectKeyEnum.MEMBER_ROLE_INFO.getKey(),
                 MemberSelectKeyEnum.MEMBER_ADDITION_INFO.getKey(),
-                MemberSelectKeyEnum.MEMBER_STATISTICS_INFO.getKey());
+                MemberSelectKeyEnum.MEMBER_STATISTICS_INFO.getKey(),
+                MemberSelectKeyEnum.MEMBER_RELIEF_INFO.getKey());
         ResponseData<MemberTotalInfo> responseData = null;
         log.info("Feign 开始获取车主会员信息,memNo={}",memNo);
         Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "会员详情服务");
@@ -176,7 +175,8 @@ public class MemberService {
                 MemberSelectKeyEnum.MEMBER_BASE_INFO.getKey(),
                 MemberSelectKeyEnum.MEMBER_ROLE_INFO.getKey(),
                 MemberSelectKeyEnum.MEMBER_ADDITION_INFO.getKey(),
-                MemberSelectKeyEnum.MEMBER_STATISTICS_INFO.getKey());
+                MemberSelectKeyEnum.MEMBER_STATISTICS_INFO.getKey(),
+                MemberSelectKeyEnum.MEMBER_RELIEF_INFO.getKey());
         ResponseData<MemberTotalInfo> responseData = null;
         log.info("Feign 开始获取租客会员信息,memNo={}",memNo);
         Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "会员详情服务");
@@ -226,7 +226,14 @@ public class MemberService {
         renterMemberDto.setDriLicAuth(memberAuthInfo.getDriLicAuth());
         renterMemberDto.setDriViceLicAuth(memberAuthInfo.getDriViceLicAuth());
         renterMemberDto.setOrderSuccessCount(memberStatisticsInfo.getSuccessOrderNum());
-        renterMemberDto.setCommUseDriverList(memberAdditionInfo.getCommUseDriverList());
+        List<CommUseDriverInfo> commUseDriverList = memberAdditionInfo.getCommUseDriverList();
+        List<CommUseDriverInfoDTO> CommUseDriverList = new ArrayList<>();
+        commUseDriverList.forEach(x->{
+            CommUseDriverInfoDTO commUseDriverInfoDTO = new CommUseDriverInfoDTO();
+            BeanUtils.copyProperties(x,commUseDriverInfoDTO);
+            CommUseDriverList.add(commUseDriverInfoDTO);
+        });
+        renterMemberDto.setCommUseDriverList(CommUseDriverList);
         renterMemberDto.setIsNew(memberRoleInfo.getIsNew());
         renterMemberDto.setRenterCheck(memberAuthInfo.getRenterCheck());
         renterMemberDto.setRegTime(memberCoreInfo.getRegTime()==null ? null: LocalDateTimeUtils.dateToLocalDateTime(memberCoreInfo.getRegTime()));
@@ -317,16 +324,16 @@ public class MemberService {
      * @Description: 根据会员号，获取常用驾驶人列表
      *
      **/
-    public List<CommUseDriverInfo> getCommUseDriverList(String memNo){
+    public List<CommUseDriverInfoDTO> getCommUseDriverList(String memNo){
         List<String> selectKey = Arrays.asList(MemberSelectKeyEnum.MEMBER_ADDITION_INFO.getKey());
-        ResponseData<MemberTotalInfo> responseData = null;
+        ResponseData<MemberAdditionInfo> responseData = null;
         log.info("Feign 开始获取附加驾驶人信息,memNo={}",memNo);
         Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "附加驾驶人信息");
         try{
             Cat.logEvent(CatConstants.FEIGN_METHOD,"MemberDetailFeignService.getMemberSelectInfo");
             String parameter = "memNo="+memNo+"&selectKey"+JSON.toJSONString(selectKey);
             Cat.logEvent(CatConstants.FEIGN_PARAM,parameter);
-            responseData = memberDetailFeignService.getMemberSelectInfo(Integer.parseInt(memNo), selectKey);
+            responseData = memberDetailFeignService.getMemberAdditionInfo(Integer.parseInt(memNo));
             if(responseData == null || !ErrorCode.SUCCESS.getCode().equals(responseData.getResCode()) || responseData.getData() == null){
                 log.error("Feign 获取附加驾驶人信息失败,memNo={},responseData={}",memNo,JSON.toJSONString(responseData));
                 RenterDriverFailException failException = new RenterDriverFailException();
@@ -346,7 +353,14 @@ public class MemberService {
         }finally {
             t.complete();
         }
-        MemberAdditionInfo memberAdditionInfo = responseData.getData().getMemberAdditionInfo();
-        return memberAdditionInfo.getCommUseDriverList();
+        MemberAdditionInfo memberAdditionInfo = responseData.getData();
+        List<CommUseDriverInfo> commUseDriverList = memberAdditionInfo.getCommUseDriverList();
+        List<CommUseDriverInfoDTO> CommUseDriverList = new ArrayList<>();
+        commUseDriverList.forEach(x->{
+            CommUseDriverInfoDTO commUseDriverInfoDTO = new CommUseDriverInfoDTO();
+            BeanUtils.copyProperties(x,commUseDriverInfoDTO);
+            CommUseDriverList.add(commUseDriverInfoDTO);
+        });
+        return CommUseDriverList;
     }
 }
