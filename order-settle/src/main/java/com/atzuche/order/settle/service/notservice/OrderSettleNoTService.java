@@ -31,7 +31,9 @@ import com.atzuche.order.ownercost.entity.OwnerOrderPurchaseDetailEntity;
 import com.atzuche.order.ownercost.entity.OwnerOrderSubsidyDetailEntity;
 import com.atzuche.order.ownercost.service.*;
 import com.atzuche.order.parentorder.dto.OrderStatusDTO;
+import com.atzuche.order.parentorder.entity.OrderEntity;
 import com.atzuche.order.parentorder.entity.OrderStatusEntity;
+import com.atzuche.order.parentorder.service.OrderService;
 import com.atzuche.order.parentorder.service.OrderStatusService;
 import com.atzuche.order.rentercommodity.service.RenterGoodsService;
 import com.atzuche.order.rentercost.entity.*;
@@ -47,9 +49,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * 订单结算
@@ -77,6 +77,7 @@ public class OrderSettleNoTService {
     @Autowired private AccountRenterCostCoinService accountRenterCostCoinService;
     @Autowired private WalletProxyService walletProxyService;
     @Autowired private OrderFlowService orderFlowService;
+    @Autowired private OrderService orderService;
 
 
     /**
@@ -105,7 +106,7 @@ public class OrderSettleNoTService {
             throw new OrderSettleFlatAccountException();
         }
 
-        // 2 TODO 校验订单状态 以及是否存在 理赔暂扣 存在不能进行结算 并CAT告警
+        // 2 校验订单状态 以及是否存在 理赔暂扣 存在不能进行结算 并CAT告警
         this.check(renterOrder);
         // 3 初始化数据
 
@@ -154,7 +155,7 @@ public class OrderSettleNoTService {
     }
 
     /**
-     *  租客返回基本信息 TODO
+     *  租客返回基本信息
      * @return
      */
     private CostBaseDTO getCostBaseRent(SettleOrders settleOrders,RenterOrderEntity renterOrder){
@@ -167,7 +168,7 @@ public class OrderSettleNoTService {
         return costBaseDTO;
     }
     /**
-     * 租客交接车-油费 参数构建 TODO
+     * 租客交接车-油费 参数构建
      * @param settleOrders
      * @param renterOrder
      * @return
@@ -177,12 +178,19 @@ public class OrderSettleNoTService {
         CostBaseDTO costBaseDTO = getCostBaseRent(settleOrders,renterOrder);
         oilAmtDTO.setCostBaseDTO(costBaseDTO);
         oilAmtDTO.setCarOwnerType(renterGoodsDetail.getCarOwnerType());
-        // TODO
-        oilAmtDTO.setCityCode(null);
+        OrderEntity orderEntity = orderService.getOrderEntity(settleOrders.getOrderNo());
+        String cityCodeStr = "";
+        if(Objects.nonNull(orderEntity) && Objects.nonNull(orderEntity.getCityCode())){
+            cityCodeStr = orderEntity.getCityCode();
+        }
+        if(StringUtil.isBlank(cityCodeStr)){
+            throw new RuntimeException("结算下单城市不存在");
+        }
+        oilAmtDTO.setCityCode(Integer.parseInt(cityCodeStr));
         oilAmtDTO.setEngineType(renterGoodsDetail.getCarEngineType());
         oilAmtDTO.setOilVolume(renterGoodsDetail.getCarOilVolume());
-        // TODO
-        oilAmtDTO.setOilScaleDenominator(null);
+        //
+        oilAmtDTO.setOilScaleDenominator(renterGoodsDetail.getCarOilVolume());
 
         //默认值0  取/还 车油表刻度
         oilAmtDTO.setGetOilScale(0);
@@ -322,12 +330,20 @@ public class OrderSettleNoTService {
         //1 车主端代管车服务费
         CostBaseDTO costBaseDTO= getCostBaseOwner(settleOrders.getOwnerOrder());
         Integer rentAmt=settleOrders.getRenterOrderCost();
-        //代管车服务费比例 商品 TODO
-        Integer proxyProportion=0;
+        //代管车服务费比例 商品
+        Double proxyProportionDou= ownerGoodsDetail.getServiceRate();
+        if(proxyProportionDou==null){
+            proxyProportionDou = Double.valueOf(0.0);
+        }
+        Integer proxyProportion = proxyProportionDou.intValue();
         OwnerOrderPurchaseDetailEntity proxyExpense = ownerOrderCostCombineService.getProxyExpense(costBaseDTO,rentAmt,proxyProportion);
         //2 车主端平台服务费
-        //服务费比例 商品 TODO
-        Integer serviceProportion =0;
+        //服务费比例 商品
+        Double serviceRate = ownerGoodsDetail.getServiceRate();
+        if(serviceRate==null){
+            serviceRate = Double.valueOf(0.0);
+        }
+        Integer serviceProportion = serviceRate.intValue();
         OwnerOrderPurchaseDetailEntity serviceExpense = ownerOrderCostCombineService.getServiceExpense(costBaseDTO,rentAmt,serviceProportion);
         //3 获取车主补贴明细列表
         List<OwnerOrderSubsidyDetailEntity> ownerOrderSubsidyDetail = ownerOrderSubsidyDetailService.listOwnerOrderSubsidyDetail(settleOrders.getOrderNo(),settleOrders.getOwnerOrderNo());
@@ -336,8 +352,8 @@ public class OrderSettleNoTService {
         //5 获取车主增值服务费用列表
         List<OwnerOrderIncrementDetailEntity> ownerOrderIncrementDetail = ownerOrderIncrementDetailService.listOwnerOrderIncrementDetail(settleOrders.getOrderNo(),settleOrders.getOwnerOrderNo());
         // 6 获取gps服务费
-        //车辆安装gps序列号列表 商品系统 TODO
-        List<Integer> lsGpsSerialNumber = null;
+        //车辆安装gps序列号列表 商品系统
+        List<Integer> lsGpsSerialNumber = getLsGpsSerialNumber(ownerGoodsDetail.getGpsSerialNumber());
         List<OwnerOrderPurchaseDetailEntity> gpsCost =  ownerOrderCostCombineService.getGpsServiceAmtEntity(costBaseDTO,lsGpsSerialNumber);
         //7 获取车主油费 //超里程
         OilAmtDTO oilAmtDTO = getOilAmtOwner(settleOrders.getOwnerOrder(),handoverCarRep,ownerGoodsDetail);
@@ -362,7 +378,26 @@ public class OrderSettleNoTService {
     }
 
     /**
-     * 车主交接车-油费 参数构建 TODO
+     * gps 列表
+     * @param gpsSerialNumber
+     * @return
+     */
+    private List<Integer> getLsGpsSerialNumber(String gpsSerialNumber) {
+        if(StringUtil.isBlank(gpsSerialNumber)){
+            return Collections.emptyList();
+        }
+        String[] gpsSerialNumberArr = gpsSerialNumber.split(",");
+        List<Integer> list = new ArrayList<>();
+        for(int i=0;i<gpsSerialNumberArr.length;i++){
+            if(!StringUtil.isBlank(gpsSerialNumber)){
+                list.add(Integer.valueOf(gpsSerialNumber));
+            }
+        }
+        return list;
+    }
+
+    /**
+     * 车主交接车-油费 参数构建
      * @param ownerOrder
      * @return
      */
@@ -376,8 +411,8 @@ public class OrderSettleNoTService {
         oilAmtDTO.setCityCode(null);
         oilAmtDTO.setEngineType(ownerGoodsDetail.getCarEngineType());
         oilAmtDTO.setOilVolume(ownerGoodsDetail.getCarOilVolume());
-        // TODO
-        oilAmtDTO.setOilScaleDenominator(null);
+        //
+        oilAmtDTO.setOilScaleDenominator(ownerGoodsDetail.getOilTotalCalibration());
 
         //默认值0  取/还 车油表刻度
         oilAmtDTO.setGetOilScale(0);
@@ -402,7 +437,7 @@ public class OrderSettleNoTService {
         return oilAmtDTO;
     }
     /**
-     *  租客返回基本信息 TODO
+     *  租客返回基本信息
      * @return
      */
     private CostBaseDTO getCostBaseOwner(OwnerOrderEntity ownerOrder){
@@ -833,7 +868,7 @@ public class OrderSettleNoTService {
      * @param settleOrdersDefinition
      */
     public void insertSettleOrders(SettleOrdersDefinition settleOrdersDefinition) {
-        //1 先删除 之前的的 结算记录 逻辑删除 TODO
+        //1 先删除 之前的的 结算记录 逻辑删除
         //2 明细落库
         //2.1 租客端 明细落库
         List<AccountRenterCostSettleDetailEntity> accountRenterCostSettleDetails = settleOrdersDefinition.getAccountRenterCostSettleDetails();
