@@ -93,6 +93,16 @@ public class RenterOrderService {
     public Integer updateRenterOrderEffective(Integer id, Integer effectiveFlag) {
         return renterOrderMapper.updateRenterOrderEffective(id, effectiveFlag);
     }
+    
+    /**
+     * 修改租客子单agreeFlag标志
+     * @param id
+     * @param agreeFlag
+     * @return Integer
+     */
+    public Integer updateRenterOrderAgreeFlag(Integer id, Integer agreeFlag) {
+    	return renterOrderMapper.updateRenterOrderAgreeFlag(id, agreeFlag);
+    }
 
     /**
      * 保存租客子订单
@@ -481,13 +491,5 @@ public class RenterOrderService {
         return renterOrderMapper.getChangeRenterOrderByOrderNo(orderNo);
     }
 
-    /**
-     * 修改租客订单信息
-     *
-     * @param renterOrderEntity 租客订单信息
-     * @return Integer
-     */
-    public int updateRenterOrderByOrderNo(RenterOrderEntity renterOrderEntity) {
-        return renterOrderMapper.updateByPrimaryKeySelective(renterOrderEntity);
-    }
+
 }

@@ -2,17 +2,18 @@ package com.atzuche.order.coreapi.modifyorder.exception;
 
 import com.atzuche.order.commons.OrderException;
 
-public class ModifyOrderRenterOrderNotFindException extends OrderException{
+public class ModifyOrderChangeApplyNotFindException extends OrderException{
+	
 	private static String ERROR_CODE = "400404";
 	
-	private static String ERROR_MSG = "未找到租客订单";
+	private static String ERROR_MSG = "未找到有效的修改申请记录";
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
 
-	public ModifyOrderRenterOrderNotFindException() {
+	public ModifyOrderChangeApplyNotFindException() {
 		super(ERROR_CODE, ERROR_MSG);
 	}
 }

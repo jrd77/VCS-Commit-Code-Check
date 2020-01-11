@@ -33,5 +33,5 @@ public class ReturnHandoverCarDTO {
     @AutoDocProperty("超运能加价")
     public String chaoYunNengAddCrash;
     @AutoDocProperty("车主还车费用")
-    public String ownerGetCarCrash;
+    public String ownerReturnCarCrash;
 }
