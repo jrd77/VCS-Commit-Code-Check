@@ -1,6 +1,7 @@
 package com.atzuche.order.admin.service;
 
 import com.atzuche.order.admin.common.AdminUserUtil;
+import com.atzuche.order.admin.util.StringUtil;
 import com.atzuche.order.admin.vo.req.renterWz.RenterWzCostDetailReqVO;
 import com.atzuche.order.admin.vo.req.renterWz.TemporaryRefundReqVO;
 import com.atzuche.order.admin.vo.resp.renterWz.*;
@@ -75,6 +76,9 @@ public class RenterWzService {
             try {
                 RenterOrderWzCostDetailEntity fromApp = new RenterOrderWzCostDetailEntity();
                 BeanUtils.copyProperties(costDetail,fromApp);
+                if(StringUtils.isNotBlank(costDetail.getAmount())){
+                    fromApp.setAmount(Integer.parseInt(costDetail.getAmount()));
+                }
                 Map<String,String> paramNames = this.getParamNamesByCode(costDetail.getCostCode());
                 CompareHelper<RenterOrderWzCostDetailEntity> compareHelper = new CompareHelper<>(fromDb,fromApp,paramNames);
                 String content = compareHelper.compare();
