@@ -1,5 +1,6 @@
 package com.atzuche.order.settle.vo.req;
 
+import com.atzuche.order.parentorder.dto.OrderStatusDTO;
 import lombok.Data;
 
 
@@ -69,5 +70,11 @@ public class SettleOrdersAccount {
      * 车主会员号
      */
     private String ownerMemNo;
+
+
+    /**
+     * 订单流转状态
+     */
+    private OrderStatusDTO orderStatusDTO;
 
 }

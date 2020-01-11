@@ -15,9 +15,9 @@ import com.atzuche.order.delivery.entity.OwnerHandoverCarInfoEntity;
 import com.atzuche.order.delivery.entity.RenterHandoverCarInfoEntity;
 import com.atzuche.order.delivery.entity.RenterOrderDeliveryEntity;
 import com.atzuche.order.delivery.enums.RenterHandoverCarTypeEnum;
-import com.atzuche.order.delivery.service.OwnerHandoverCarInfoService;
-import com.atzuche.order.delivery.service.RenterHandoverCarInfoService;
 import com.atzuche.order.delivery.service.RenterOrderDeliveryService;
+import com.atzuche.order.delivery.service.handover.OwnerHandoverCarService;
+import com.atzuche.order.delivery.service.handover.RenterHandoverCarService;
 import com.atzuche.order.owner.commodity.service.OwnerGoodsService;
 import com.atzuche.order.owner.mem.service.OwnerMemberService;
 import com.atzuche.order.ownercost.entity.ConsoleOwnerOrderFineDeatailEntity;
@@ -82,7 +82,7 @@ public class OrderDetailService {
     @Autowired
     private OrderCancelReasonService orderCancelReasonService;
     @Autowired
-    private RenterHandoverCarInfoService renterHandoverCarInfoService;
+    private RenterHandoverCarService renterHandoverCarInfoService;
     @Autowired
     private RenterOrderCostDetailService renterOrderCostDetailService;
     @Autowired
@@ -92,7 +92,7 @@ public class OrderDetailService {
     @Autowired
     private ConsoleOwnerOrderFineDeatailService consoleOwnerOrderFineDeatailService;
     @Autowired
-    private OwnerHandoverCarInfoService ownerHandoverCarInfoService;
+    private OwnerHandoverCarService ownerHandoverCarInfoService;
 
     public ResponseData<OrderDetailRespDTO> orderDetail(OrderDetailReqDTO orderDetailReqDTO){
         log.info("准备获取订单详情orderDetailReqDTO={}", JSON.toJSONString(orderDetailReqDTO));

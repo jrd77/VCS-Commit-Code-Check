@@ -27,7 +27,6 @@ import com.atzuche.order.cashieraccount.vo.req.pay.OrderPaySignReqVO;
 import com.atzuche.order.commons.IpUtil;
 import com.atzuche.order.commons.LocalDateTimeUtils;
 import com.atzuche.order.commons.enums.RenterCashCodeEnum;
-import com.atzuche.order.commons.enums.account.PayStatusEnum;
 import com.atzuche.order.commons.enums.cashier.*;
 import com.atzuche.order.rentercost.entity.vo.PayableVO;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
@@ -94,19 +93,6 @@ public class CashierNoTService {
         return renterOrderEntity;
     }
 
-    /**
-     * 收银台记录应收金额
-     */
-    public int getPayDeposit(String orderNo,String memNo,String payKind){
-        CashierEntity cashierEntity = cashierMapper.getPayAmtByPayKind(orderNo,memNo,payKind);
-        if(Objects.isNull(cashierEntity) || Objects.isNull(cashierEntity.getId())){
-            return 0;
-        }
-        if(PayStatusEnum.PAYED.getCode().equals(cashierEntity.getTransStatus())){
-            return 0;
-        }
-        return cashierEntity.getPayAmt() ;
-    }
 
 
     /**
