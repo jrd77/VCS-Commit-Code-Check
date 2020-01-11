@@ -3,7 +3,7 @@
 
 
 
-<mapper namespace="com.atzuche.com.parentorder.mapper.OrderMapper">
+<mapper namespace="com.atzuche.order.parentorder.mapper.OrderMapper">
 
     <resultMap type="com.atzuche.order.parentorder.entity.OrderEntity" id="BaseResultMap">
         <result property="id" column="id"/>
