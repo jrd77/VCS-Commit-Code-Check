@@ -45,19 +45,6 @@ public class RenterOrderCostRespDTO {
      * 附加驾驶人保障费用
      */
     private Integer additionalDrivingEnsureAmount;
-
-    /**
-     * 其他费用
-     */
-    //private Integer otherAmount;
-    /**
-     * 平台补贴费用
-     */
-    //private Integer platformSubsidyAmount;
-    /**
-     * 车主补贴费用
-     */
-    //private Integer carOwnerSubsidyAmount;
     /**
      *取还车-取车真实费用
      */
@@ -66,7 +53,6 @@ public class RenterOrderCostRespDTO {
      *取还车-还车真实费用
      */
     private Integer returnRealAmt;
-
     /**
      *超运能-取车费用
      */

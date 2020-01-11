@@ -19,11 +19,11 @@ public enum OwnerAgreeTypeEnum {
     /**
      * 已支付
      **/
-    ARGEE(2, "已同意"),
+    ARGEE(1, "已同意"),
     /**
      * 待支付
      **/
-    REFUSE(3, "已拒绝");
+    REFUSE(2, "已拒绝");
 
 
     private int code;
