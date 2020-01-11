@@ -102,12 +102,12 @@ public class RenterOrderDeliveryService {
     public void updateDeliveryAddrByPrimaryKey(RenterDeliveryAddrEntity renterDeliveryAddrEntity) {
         renterDeliveryAddrMapper.updateByPrimaryKey(renterDeliveryAddrEntity);
     }
-    /*
-     * @Author ZhangBin
-     * @Date 2020/1/9 11:48
-     * @Description: 通过租客子订单号查询配送订单
-     *
-     **/
+
+    /**
+     * 通过租客子订单号查询配送订单
+     * @param renterOrderNo
+     * @return
+     */
     public List<RenterOrderDeliveryEntity> selectByRenterOrderNo(String renterOrderNo){
         return renterOrderDeliveryMapper.selectByRenterOrderNo(renterOrderNo);
     }
