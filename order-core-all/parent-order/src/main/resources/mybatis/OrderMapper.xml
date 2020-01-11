@@ -65,7 +65,7 @@
 
 
     <insert id="insert" parameterType="com.atzuche.order.parentorder.entity.OrderEntity" useGeneratedKeys="true" keyProperty="id">
-        insert into `order`
+        insert into `com`
         (
         `order_no`,
         `mem_no_renter`,
@@ -116,7 +116,7 @@
     </insert>
 
     <insert id="insertSelective" parameterType="com.atzuche.order.parentorder.entity.OrderEntity" useGeneratedKeys="true" keyProperty="id">
-        insert into `order`
+        insert into `com`
         <trim prefix="(" suffix=")" suffixOverrides="," >
             <if test="orderNo != null">`order_no`, </if>
             <if test="memNoRenter != null">`mem_no_renter`, </if>
@@ -167,7 +167,7 @@
 
 
     <update id="updateByPrimaryKeySelective" parameterType="com.atzuche.order.parentorder.entity.OrderEntity">
-        update `order`
+        update `com`
         <set>
             <if test="orderNo != null">`order_no` = #{orderNo}, </if>
             <if test="memNoRenter != null">`mem_no_renter` = #{memNoRenter}, </if>
@@ -198,7 +198,7 @@
     </update>
 
     <update id="updateByPrimaryKey" parameterType="com.atzuche.order.parentorder.entity.OrderEntity">
-        update `order`
+        update `com`
         <set>
             `order_no` = #{orderNo},
             `mem_no_renter` = #{memNoRenter},
@@ -233,7 +233,7 @@
         select
             <include refid="Base_Column_List" />
         from
-            `order`
+            `com`
         where
             order_no = #{value}
             and is_delete = 0
@@ -241,7 +241,7 @@
     </select>
 
     <select id="queryOrderNoByOrderNos" resultType="com.atzuche.order.parentorder.dto.SuccessOrderDTO">
-        select order_no orderNo,mem_no_renter renterNo from `order` where is_delete = 0 and order_no in
+        select order_no orderNo,mem_no_renter renterNo from `com` where is_delete = 0 and order_no in
         <foreach collection="orderNos" open="(" close=")" separator="," item="orderNo">
             #{orderNo}
         </foreach>
@@ -251,7 +251,7 @@
         select
             <include refid="Base_Column_List" />
         from
-            `order`
+            `com`
         where
             order_no = #{orderNo}
             and mem_no_renter = #{memNo}
@@ -260,7 +260,7 @@
     </select>
 
     <update id="updateByOrderNoSelective" parameterType="com.atzuche.order.parentorder.entity.OrderEntity">
-        update `order`
+        update `com`
         <set>
             <if test="orderNo != null">`order_no` = #{orderNo}, </if>
             <if test="memNoRenter != null">`mem_no_renter` = #{memNoRenter}, </if>

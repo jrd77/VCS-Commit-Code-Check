@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.atzuche.order.renterwz.mapper.RenterOrderWzDetailMapper">
+<mapper namespace="com.atzuche.com.renterwz.mapper.RenterOrderWzDetailMapper">
 	<sql id="select_column">
 		id,order_no,car_plate_num,order_flag,illegal_time,illegal_addr,illegal_reason,illegal_amt,illegal_deduct,illegal_fine,illegal_dys_fine,illegal_service_cost,is_valid,is_sms,illegal_status,code,ry_wz_code,owner_is_sms,illegal_supercer_cost,delete_operate,delete_time,create_op,create_time,update_time,update_op,is_delete
 	</sql>

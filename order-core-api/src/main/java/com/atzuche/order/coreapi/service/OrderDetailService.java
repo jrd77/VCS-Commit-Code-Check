@@ -16,8 +16,6 @@ import com.atzuche.order.delivery.entity.RenterHandoverCarInfoEntity;
 import com.atzuche.order.delivery.entity.RenterOrderDeliveryEntity;
 import com.atzuche.order.delivery.enums.RenterHandoverCarTypeEnum;
 import com.atzuche.order.delivery.service.RenterOrderDeliveryService;
-import com.atzuche.order.delivery.service.handover.OwnerHandoverCarService;
-import com.atzuche.order.delivery.service.handover.RenterHandoverCarService;
 import com.atzuche.order.owner.commodity.service.OwnerGoodsService;
 import com.atzuche.order.owner.mem.service.OwnerMemberService;
 import com.atzuche.order.ownercost.entity.ConsoleOwnerOrderFineDeatailEntity;
@@ -92,6 +90,9 @@ public class OrderDetailService {
     @Autowired
     private ConsoleOwnerOrderFineDeatailService consoleOwnerOrderFineDeatailService;
     @Autowired
+    private OwnerHandoverCarInfoService ownerHandoverCarInfoService;
+    @Autowired
+    private RenterAdditionalDriverService renterAdditionalDriverService;
     private OwnerHandoverCarService ownerHandoverCarInfoService;
 
     public ResponseData<OrderDetailRespDTO> orderDetail(OrderDetailReqDTO orderDetailReqDTO){
@@ -327,6 +328,15 @@ public class OrderDetailService {
             renterOrderDeliveryReturnDto = new RenterOrderDeliveryDTO();
             BeanUtils.copyProperties(renterOrderDeliveryReturn,renterOrderDeliveryReturnDto);
         }
+        //附加驾驶人
+        List<String> renterAdditionalDriverList = renterAdditionalDriverService.listDriverIdByRenterOrderNo(renterOrderNo);
+        List<RenterAdditionalDriverDTO>  renterAdditionalDriverDTOList = new ArrayList<>();
+        renterAdditionalDriverList.stream().forEach(x->{
+            RenterAdditionalDriverDTO renterAdditionalDriverDTO = new RenterAdditionalDriverDTO();
+            BeanUtils.copyProperties(x,renterAdditionalDriverDTO);
+            renterAdditionalDriverDTOList.add(renterAdditionalDriverDTO);
+        });
+
 
         OrderDetailRespDTO orderDetailRespDTO = new OrderDetailRespDTO();
         orderDetailRespDTO.order = orderDTO;
@@ -349,6 +359,7 @@ public class OrderDetailService {
         orderDetailRespDTO.accountOwnerIncomeDetailList = accountOwnerIncomeDetailDTOList;
         orderDetailRespDTO.ownerOrderPurchaseDetailList = ownerOrderPurchaseDetailDTOList;
         orderDetailRespDTO.consoleOwnerOrderFineDetailList = consoleOwnerOrderFineDeatailDTOList;
+        orderDetailRespDTO.renterAdditionalDriverList = renterAdditionalDriverDTOList;
 
         return orderDetailRespDTO;
     }

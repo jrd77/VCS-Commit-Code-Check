@@ -23,6 +23,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+
 @RequestMapping("/console/order/remark")
 @RestController
 @AutoDocVersion(version = "订单备注接口文档")
@@ -39,8 +41,8 @@ public class OrderRemarkController extends BaseController {
 
 	@AutoDocMethod(description = "备注总览", value = "备注总览", response = OrderRemarkOverviewListResponseVO.class)
 	@GetMapping("/overview")
-	public ResponseData<OrderRemarkOverviewListResponseVO> getOverview(OrderRemarkRequestVO orderRemarkRequestVO, BindingResult bindingResult) {
-
+	public ResponseData<OrderRemarkOverviewListResponseVO> getOverview(@Valid OrderRemarkRequestVO orderRemarkRequestVO, BindingResult bindingResult) {
+        //参数验证
 	    validateParameter(bindingResult);
 	    try{
             logger.info(LogDescription.getLogDescription(DescriptionConstant.CONSOLE_ORDER_REMARK_OVERVIEW, DescriptionConstant.INPUT_TEXT),orderRemarkRequestVO.toString());
@@ -50,14 +52,13 @@ public class OrderRemarkController extends BaseController {
         } catch (Exception e) {
             logger.info(LogDescription.getLogDescription(DescriptionConstant.CONSOLE_ORDER_REMARK_OVERVIEW, DescriptionConstant.EXCEPTION_TEXT),e);
             CatLogRecord.failLog(LogDescription.getCatDescription(DescriptionConstant.CONSOLE_ORDER_REMARK_OVERVIEW, DescriptionConstant.EXCEPTION_TEXT), UrlConstant.CONSOLE_ORDER_REMARK_OVERVIEW, orderRemarkRequestVO, e);
-            //参数验证
             throw new OrderRemarkException(ErrorCode.SYS_ERROR.getCode(),ErrorCode.SYS_ERROR.getText());
         }
 	}
 
     @AutoDocMethod(description = "备注查询列表", value = "备注查询列表", response = OrderRemarkPageListResponseVO.class)
     @GetMapping("/list")
-    public ResponseData<OrderRemarkPageListResponseVO> selectRemarklist(OrderRemarkListRequestVO orderRemarkListRequestVO, BindingResult bindingResult) {
+    public ResponseData<OrderRemarkPageListResponseVO> selectRemarklist(@Valid OrderRemarkListRequestVO orderRemarkListRequestVO, BindingResult bindingResult) {
         //参数验证
         validateParameter(bindingResult);
         try{
@@ -75,7 +76,7 @@ public class OrderRemarkController extends BaseController {
 
     @AutoDocMethod(description = "备注日志查询列表", value = "备注日志查询列表", response = OrderRemarkLogPageListResponseVO.class)
     @GetMapping("/log/list")
-    public ResponseData<OrderRemarkLogPageListResponseVO> logList(OrderRemarkLogListRequestVO orderRemarkLogListRequestVO, BindingResult bindingResult) {
+    public ResponseData<OrderRemarkLogPageListResponseVO> logList(@Valid OrderRemarkLogListRequestVO orderRemarkLogListRequestVO, BindingResult bindingResult) {
         //参数验证
         validateParameter(bindingResult);
         try{
@@ -94,7 +95,7 @@ public class OrderRemarkController extends BaseController {
 
     @AutoDocMethod(description = "添加备注", value = "添加备注", response = ResponseData.class)
     @PostMapping("/add")
-    public ResponseData<ResponseData> addOrderRemark(@RequestBody OrderRemarkAdditionRequestVO orderRemarkAdditionRequestVO, BindingResult bindingResult) {
+    public ResponseData<ResponseData> addOrderRemark(@Valid @RequestBody OrderRemarkAdditionRequestVO orderRemarkAdditionRequestVO, BindingResult bindingResult) {
         //参数验证
         validateParameter(bindingResult);
         try{
@@ -111,7 +112,7 @@ public class OrderRemarkController extends BaseController {
 
     @AutoDocMethod(description = "删除备注", value = "删除备注", response = ResponseData.class)
     @DeleteMapping("/delete")
-    public ResponseData<ResponseData> delete(@RequestBody OrderRemarkDeleteRequestVO orderRemarkDeleteRequestVO, BindingResult bindingResult) {
+    public ResponseData<ResponseData> delete(@Valid @RequestBody OrderRemarkDeleteRequestVO orderRemarkDeleteRequestVO, BindingResult bindingResult) {
         //参数验证
         validateParameter(bindingResult);
         try{
@@ -128,7 +129,7 @@ public class OrderRemarkController extends BaseController {
 
     @AutoDocMethod(description = "编辑备注", value = "编辑备注", response = ResponseData.class)
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
-    public ResponseData<ResponseData> update(@RequestBody OrderRemarkUpdateRequestVO orderRemarkUpdateRequestVO, BindingResult bindingResult) {
+    public ResponseData<ResponseData> update(@Valid @RequestBody OrderRemarkUpdateRequestVO orderRemarkUpdateRequestVO, BindingResult bindingResult) {
         //参数验证
         validateParameter(bindingResult);
         try{
@@ -145,7 +146,7 @@ public class OrderRemarkController extends BaseController {
 
     @AutoDocMethod(description = "获取备注信息", value = "获取备注信息", response = OrderRemarkResponseVO.class)
     @GetMapping("/information")
-    public ResponseData<OrderRemarkResponseVO> getRemarkInformation(OrderRemarkInformationRequestVO orderRemarkInformationRequestVO, BindingResult bindingResult) {
+    public ResponseData<OrderRemarkResponseVO> getRemarkInformation(@Valid OrderRemarkInformationRequestVO orderRemarkInformationRequestVO, BindingResult bindingResult) {
         //参数验证
         validateParameter(bindingResult);
         try{

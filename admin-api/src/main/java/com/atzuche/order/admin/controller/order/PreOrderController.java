@@ -2,9 +2,10 @@ package com.atzuche.order.admin.controller.order;
 
 import com.atzuche.order.admin.vo.req.order.PreOrderAdminRequestVO;
 import com.atzuche.order.admin.vo.resp.order.PreOrderAdminResponseVO;
+import com.atzuche.order.car.CarProxyService;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
-import order.atzuche.order.mem.MemProxyService;
+import com.atzuche.order.mem.MemProxyService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
@@ -23,6 +24,9 @@ public class PreOrderController {
     @Autowired
     private MemProxyService memProxyService;
 
+    @Autowired
+    private CarProxyService carProxyService;
+
 
     @PostMapping("console/order/adminPre")
     public ResponseData<PreOrderAdminResponseVO> preOrderAdmin(@RequestBody PreOrderAdminRequestVO request, BindingResult result){
@@ -39,6 +43,13 @@ public class PreOrderController {
 
             memNo = memProxyService.getMemNoByMoile(mobile).toString();
         }
+
+        CarProxyService.CarDetailReqVO carDetailReqVO = new CarProxyService.CarDetailReqVO();
+        carDetailReqVO.setAddrIndex(0);
+        carDetailReqVO.setCarNo(request.getCarNo());
+        carDetailReqVO.setUseSpecialPrice(true);
+
+
 
 
 

@@ -130,8 +130,6 @@ public class SubmitOrderController {
     @PostMapping("/admin/req")
     public ResponseData<OrderResVO> submitOrder(@Valid @RequestBody AdminOrderReqVO adminOrderReqVO,
                                                 BindingResult bindingResult) {
-
-
         LOGGER.info("Submit order.param is,adminOrderReqVO:[{}]", JSON.toJSONString(adminOrderReqVO));
         if (bindingResult.hasErrors()) {
             Optional<FieldError> error = bindingResult.getFieldErrors().stream().findFirst();

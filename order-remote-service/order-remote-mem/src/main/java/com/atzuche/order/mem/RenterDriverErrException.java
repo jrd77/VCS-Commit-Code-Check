@@ -1,4 +1,4 @@
-package order.atzuche.order.mem;
+package com.atzuche.order.mem;
 
 import com.atzuche.order.commons.OrderException;
 import com.atzuche.order.commons.enums.ErrorCode;
