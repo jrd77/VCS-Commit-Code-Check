@@ -96,9 +96,6 @@ public class OwnerCommodityService {
                 .collect(Collectors.groupingBy(OwnerGoodsPriceDetailEntity::getCarDay));
 
         OwnerGoodsPriceDetailEntity dbPriceMaxCarDay = dbGoodsPriceList.get(dbGoodsPriceList.size() - 1);//最后一条
-        if(oldRentTime.isEqual(rentTime) && revertTime.isEqual(dbPriceMaxCarDay.getRevertTime())){
-            return;
-        }
         List<OwnerGoodsPriceDetailDTO> newOwnerGoodsPriceList = new ArrayList<>();
         if(oldRentTime.isEqual(rentTime) && revertTime.isEqual(dbPriceMaxCarDay.getRevertTime())){
             dbGoodsPriceList.stream().forEach(y->{
