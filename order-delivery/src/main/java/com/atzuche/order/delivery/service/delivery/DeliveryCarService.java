@@ -20,6 +20,7 @@ import com.atzuche.order.delivery.vo.delivery.*;
 import com.atzuche.order.delivery.vo.handover.HandoverCarInfoDTO;
 import com.atzuche.order.delivery.vo.handover.HandoverCarVO;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +28,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -83,15 +85,17 @@ public class DeliveryCarService {
      */
     public void sendDataMessageToRenYun(String renterOrderNo) {
 
-        OrderDeliveryFlowEntity orderDeliveryFlowEntity = deliveryFlowService.selectOrderDeliveryFlowByOrderNo(renterOrderNo);
-        if (Objects.isNull(orderDeliveryFlowEntity)) {
+        List<OrderDeliveryFlowEntity> orderDeliveryFlowEntityList = deliveryFlowService.selectOrderDeliveryFlowByOrderNo(renterOrderNo);
+        if (CollectionUtils.isEmpty(orderDeliveryFlowEntityList)) {
             throw new DeliveryOrderException(DeliveryErrorCode.DELIVERY_PARAMS_ERROR.getValue(), "没有找到发送至仁云的数据");
         }
-        RenYunFlowOrderDTO renYunFlowOrderDTO = createRenYunDTO(orderDeliveryFlowEntity);
-        if (Objects.isNull(renYunFlowOrderDTO)) {
-            throw new DeliveryOrderException(DeliveryErrorCode.DELIVERY_PARAMS_ERROR.getValue(), "发送给仁云的参数为空");
+        for(OrderDeliveryFlowEntity orderDeliveryFlowEntity : orderDeliveryFlowEntityList) {
+            RenYunFlowOrderDTO renYunFlowOrderDTO = createRenYunDTO(orderDeliveryFlowEntity);
+            if (Objects.isNull(renYunFlowOrderDTO)) {
+                continue;
+            }
+            deliveryCarTask.addRenYunFlowOrderInfo(renYunFlowOrderDTO);
         }
-        deliveryCarTask.addRenYunFlowOrderInfo(renYunFlowOrderDTO);
     }
 
     /**

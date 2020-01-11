@@ -4,6 +4,8 @@ import com.atzuche.order.delivery.entity.OrderDeliveryFlowEntity;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.List;
+
 /**
  * 发送仁云信息表
  * @author 胡春林
@@ -23,6 +25,6 @@ public interface OrderDeliveryFlowMapper{
 
     OrderDeliveryFlowEntity selectOrderDeliveryByOrderNo(@Param("orderNo") String orderNo,@Param("serviceType") String serviceType);
 
-    OrderDeliveryFlowEntity selectOrderDeliveryByRenterOrderNo(@Param("renterOrderNo") String renterOrderNo);
+    List<OrderDeliveryFlowEntity> selectOrderDeliveryByRenterOrderNo(@Param("renterOrderNo") String renterOrderNo);
 
 }
