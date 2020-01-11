@@ -3,6 +3,7 @@ package com.atzuche.order.coreapi.service;
 import com.alibaba.fastjson.JSON;
 import com.atzuche.order.accountrenterdeposit.vo.req.CreateOrderRenterDepositReqVO;
 import com.atzuche.order.accountrenterwzdepost.vo.req.CreateOrderRenterWZDepositReqVO;
+import com.atzuche.order.car.CarProxyService;
 import com.atzuche.order.cashieraccount.service.CashierService;
 import com.atzuche.order.commons.CommonUtils;
 import com.atzuche.order.commons.ListUtil;
@@ -72,7 +73,7 @@ public class SubmitOrderService {
     @Autowired
     private MemProxyService memberService;
     @Autowired
-    private GoodsService goodsService;
+    private CarProxyService goodsService;
     @Resource
     private UniqueOrderNoService uniqueOrderNoService;
     @Resource
@@ -307,8 +308,8 @@ public class SubmitOrderService {
         return orderInfoDTO;
     }
 
-    private GoodsService.CarDetailReqVO buildCarDetailReqVO(OrderReqVO orderReqVO) {
-        GoodsService.CarDetailReqVO carDetailReqVO = new GoodsService.CarDetailReqVO();
+    private CarProxyService.CarDetailReqVO buildCarDetailReqVO(OrderReqVO orderReqVO) {
+        CarProxyService.CarDetailReqVO carDetailReqVO = new CarProxyService.CarDetailReqVO();
         carDetailReqVO.setAddrIndex(StringUtils.isBlank(orderReqVO.getCarAddrIndex()) ? 0 : Integer.parseInt(orderReqVO.getCarAddrIndex()));
         carDetailReqVO.setCarNo(orderReqVO.getCarNo());
         carDetailReqVO.setRentTime(orderReqVO.getRentTime());

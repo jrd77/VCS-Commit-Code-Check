@@ -44,6 +44,7 @@ dependencies {
     compile('com.autoyol.unique:unique-no-feign:3.0-SNAPSHOT')
     compile('com.autoyol.car:auto-car-service-api:2020010802-SNAPSHOT')
     compile('com.autoyol:riskCheckService-api:1.0.0-SNAPSHOT')
+    compile project(":order-remote-service:order-remote-car")
 
 
     compile project(":config")
