@@ -115,4 +115,12 @@ public class AccountRenterDepositService{
     public void updateRenterDepositUniqueNo(String uniqueNo, int renterDepositDetailId) {
         accountRenterDepositDetailNoTService.updateRenterDepositUniqueNo(uniqueNo,renterDepositDetailId);
     }
+
+    /**
+     * 车俩押金结算 状态更新
+     * @param detainRenterDepositReqVO
+     */
+    public void updateOrderDepositSettle(DetainRenterDepositReqVO detainRenterDepositReqVO) {
+        accountRenterDepositNoTService.updateOrderDepositSettle(detainRenterDepositReqVO.getMemNo(),detainRenterDepositReqVO.getOrderNo());
+    }
 }

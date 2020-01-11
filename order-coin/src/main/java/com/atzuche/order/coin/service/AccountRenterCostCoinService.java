@@ -59,6 +59,7 @@ public class AccountRenterCostCoinService {
      * @return
      */
     public void deductAutoCoin(String memNo,String orderNo,String renterOrderNo,int amt){
+        logger.info("deductAutoCoin:memNo={},orderNo={},renterOrderNo={},amt={}",memNo,orderNo,renterOrderNo,amt);
         int totalExpense = countAutoCoinByOrderNo(orderNo);
         if(amt*AUTO_COIN_RATIO>totalExpense){
             int diff = amt-totalExpense/AUTO_COIN_RATIO;
@@ -83,7 +84,7 @@ public class AccountRenterCostCoinService {
             if(returnFlag){
                 insertReturnLog(memNo, diff);
             }
-            logger.info("success settle autoCoin:{}");
+            logger.info("success settle autoCoin:{},memNo={},orderNo={}",deductAmt,memNo,orderNo);
         }else if(totalExpense<deductAmt){
             throw new RuntimeException("the expense autoCoin:"+totalExpense+" is less than deductAmt:"+deductAmt);
         }

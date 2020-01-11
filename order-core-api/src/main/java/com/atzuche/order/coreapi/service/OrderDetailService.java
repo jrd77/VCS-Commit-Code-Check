@@ -15,9 +15,9 @@ import com.atzuche.order.delivery.entity.OwnerHandoverCarInfoEntity;
 import com.atzuche.order.delivery.entity.RenterHandoverCarInfoEntity;
 import com.atzuche.order.delivery.entity.RenterOrderDeliveryEntity;
 import com.atzuche.order.delivery.enums.RenterHandoverCarTypeEnum;
-import com.atzuche.order.delivery.service.OwnerHandoverCarInfoService;
-import com.atzuche.order.delivery.service.RenterHandoverCarInfoService;
 import com.atzuche.order.delivery.service.RenterOrderDeliveryService;
+import com.atzuche.order.delivery.service.handover.OwnerHandoverCarService;
+import com.atzuche.order.delivery.service.handover.RenterHandoverCarService;
 import com.atzuche.order.owner.commodity.service.OwnerGoodsService;
 import com.atzuche.order.owner.mem.service.OwnerMemberService;
 import com.atzuche.order.ownercost.entity.ConsoleOwnerOrderFineDeatailEntity;
@@ -82,7 +82,7 @@ public class OrderDetailService {
     @Autowired
     private OrderCancelReasonService orderCancelReasonService;
     @Autowired
-    private RenterHandoverCarInfoService renterHandoverCarInfoService;
+    private RenterHandoverCarService renterHandoverCarInfoService;
     @Autowired
     private RenterOrderCostDetailService renterOrderCostDetailService;
     @Autowired
@@ -92,7 +92,7 @@ public class OrderDetailService {
     @Autowired
     private ConsoleOwnerOrderFineDeatailService consoleOwnerOrderFineDeatailService;
     @Autowired
-    private OwnerHandoverCarInfoService ownerHandoverCarInfoService;
+    private OwnerHandoverCarService ownerHandoverCarInfoService;
 
     public ResponseData<OrderDetailRespDTO> orderDetail(OrderDetailReqDTO orderDetailReqDTO){
         log.info("准备获取订单详情orderDetailReqDTO={}", JSON.toJSONString(orderDetailReqDTO));
@@ -191,7 +191,11 @@ public class OrderDetailService {
         //统计信息
         OrderSourceStatEntity orderSourceStatEntity = orderSourceStatService.selectByOrderNo(orderNo);
         OrderSourceStatDTO orderSourceStatDTO = new OrderSourceStatDTO();
-        BeanUtils.copyProperties(orderSourceStatEntity,orderSourceStatDTO);
+        if(orderSourceStatEntity != null){
+            orderSourceStatDTO = new OrderSourceStatDTO();
+            BeanUtils.copyProperties(orderSourceStatEntity,orderSourceStatDTO);
+        }
+
 
         //租客订单
         RenterOrderEntity renterOrderEntity = renterOrderService.getRenterOrderByOrderNoAndIsEffective(orderNo);
@@ -350,9 +354,19 @@ public class OrderDetailService {
     }
 
     private OrderStatusRespDTO orderStatusProxy(OrderDetailReqDTO orderDetailReqDTO) {
+        String orderNo = orderDetailReqDTO.getOrderNo();
+        //主订单
+        OrderEntity orderEntity = orderService.getOrderEntity(orderNo);
+        if(orderEntity == null){
+            log.error("获取订单数据为空orderNo={}",orderNo);
+            throw new OrderDetailException();
+        }
+        OrderDTO orderDTO = new OrderDTO();
+        BeanUtils.copyProperties(orderEntity,orderDTO);
+
         OrderStatusRespDTO orderStatusRespDTO = new OrderStatusRespDTO();
         orderStatusRespDTO.isChange = false;
-        String orderNo = orderDetailReqDTO.getOrderNo();
+
         //主订单状态
         OrderStatusEntity orderStatusEntity = orderStatusService.getByOrderNo(orderNo);
         OrderStatusDTO orderStatusDTO = new OrderStatusDTO();
@@ -384,7 +398,7 @@ public class OrderDetailService {
             changeOwnerStatus = new OwnerOrderStatusDTO();
             BeanUtils.copyProperties(changeOwner,changeOwnerStatus);
         }
-
+        orderStatusRespDTO.orderDTO = orderDTO;
         orderStatusRespDTO.orderStatusDTO = orderStatusDTO;
         orderStatusRespDTO.renterOrderStatusDTO = renterOrderDTO;
         orderStatusRespDTO.ownerOrderStatusDTO = ownerOrderStatusDTO;

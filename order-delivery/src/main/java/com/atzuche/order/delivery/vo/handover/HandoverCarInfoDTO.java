@@ -1,5 +1,6 @@
 package com.atzuche.order.delivery.vo.handover;
 
+import com.atzuche.order.delivery.entity.RenterOrderDeliveryEntity;
 import com.atzuche.order.delivery.enums.RenterHandoverCarTypeEnum;
 import lombok.Data;
 import lombok.ToString;

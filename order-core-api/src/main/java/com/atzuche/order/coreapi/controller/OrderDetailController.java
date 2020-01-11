@@ -34,7 +34,7 @@ public class OrderDetailController {
         return respData;
     }
 
-    @PostMapping("/orderStatus")
+    @PostMapping("/status")
     public ResponseData<OrderStatusRespDTO> orderStatus(@Valid @RequestBody OrderDetailReqDTO orderDetailReqDTO, BindingResult bindingResult){
         if (bindingResult.hasErrors()) {
             Optional<FieldError> error = bindingResult.getFieldErrors().stream().findFirst();
@@ -44,7 +44,7 @@ public class OrderDetailController {
         ResponseData<OrderStatusRespDTO> respData = orderDetailService.orderStatus(orderDetailReqDTO);
         return respData;
     }
-    @PostMapping("/orderHistory")
+    @PostMapping("/childHistory")
     public ResponseData<OrderHistoryRespDTO> orderHistory(@Valid @RequestBody OrderHistoryReqDTO orderHistoryReqDTO, BindingResult bindingResult){
         if (bindingResult.hasErrors()) {
             Optional<FieldError> error = bindingResult.getFieldErrors().stream().findFirst();
