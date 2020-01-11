@@ -481,13 +481,5 @@ public class RenterOrderService {
         return renterOrderMapper.getChangeRenterOrderByOrderNo(orderNo);
     }
 
-    /**
-     * 修改租客订单信息
-     *
-     * @param renterOrderEntity 租客订单信息
-     * @return Integer
-     */
-    public int updateRenterOrderByOrderNo(RenterOrderEntity renterOrderEntity) {
-        return renterOrderMapper.updateByPrimaryKeySelective(renterOrderEntity);
-    }
+
 }
