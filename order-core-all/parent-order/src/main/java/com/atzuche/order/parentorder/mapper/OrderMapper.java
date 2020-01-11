@@ -60,4 +60,6 @@ public interface OrderMapper {
     List<SuccessOrderDTO> queryOrderNoByOrderNos(@Param("orderNos") List<String> orderNos);
     
     OrderEntity getOrderByOrderNoAndMemNo(@Param("orderNo") String orderNo, @Param("memNo") String memNo);
+
+    int updateByOrderNoSelective(OrderEntity orderEntity);
 }
