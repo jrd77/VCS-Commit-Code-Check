@@ -2,6 +2,10 @@ package com.atzuche.order.coreapi.service;
 
 import com.atzuche.order.commons.vo.req.NormalOrderCostCalculateReqVO;
 import com.atzuche.order.commons.vo.res.NormalOrderCostCalculateResVO;
+import com.atzuche.order.renterorder.entity.dto.RenterOrderCostReqDTO;
+import com.atzuche.order.renterorder.entity.dto.RenterOrderCostRespDTO;
+import com.atzuche.order.renterorder.service.RenterOrderCalCostService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
@@ -13,6 +17,11 @@ import org.springframework.stereotype.Service;
 @Service
 public class SubmitOrderBeforeCostCalService {
 
+    @Autowired
+    private RenterOrderCalCostService renterOrderCalCostService;
+
+
+
 
     /**
      * 下单前费用计算
@@ -23,7 +32,8 @@ public class SubmitOrderBeforeCostCalService {
     public NormalOrderCostCalculateResVO costCalculate(NormalOrderCostCalculateReqVO reqVO) {
 
         //TODO:租车费用处理
-
+        RenterOrderCostRespDTO renterOrderCostRespDTO =
+                renterOrderCalCostService.getOrderCostAndDeailList(new RenterOrderCostReqDTO());
 
         //TODO:抵扣费用处理
 
@@ -38,6 +48,9 @@ public class SubmitOrderBeforeCostCalService {
         return new NormalOrderCostCalculateResVO();
 
     }
+
+
+
 
 
 }
