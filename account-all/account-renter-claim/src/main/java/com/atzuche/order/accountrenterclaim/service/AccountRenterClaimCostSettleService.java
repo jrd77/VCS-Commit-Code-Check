@@ -27,7 +27,6 @@ public class AccountRenterClaimCostSettleService{
     /**
      * 查询理赔费用总和
      */
-    @CatAnnotation
     public int getRenterClaimCostAmt(String orderNo ,String memNo){
         return accountRenterClaimCostSettleNoTService.getRenterClaimCostAmt(orderNo,memNo);
     }
@@ -35,7 +34,6 @@ public class AccountRenterClaimCostSettleService{
     /**
      * 理赔费用资金进出
      */
-    @CatAnnotation
     public void changeRenterClaimCostCost(AccountRenterClaimDetailReqVO accountRenterClaimDetail){
         //1校验
         Assert.notNull(accountRenterClaimDetail, ErrorCode.PARAMETER_ERROR.getText());

@@ -85,9 +85,9 @@ public class CashierPayService{
             if(Objects.nonNull(batchNotifyDataVo) && !CollectionUtils.isEmpty(batchNotifyDataVo.getLstNotifyDataVo())){
                 cashierService.callBackSuccess(batchNotifyDataVo.getLstNotifyDataVo(),callBack);
             }
-            //3 更新rabbitMQ 记录已消费
-            String reqContent = FasterJsonUtil.toJson(batchNotifyDataVo);
-            String md5 =  MD5.MD5Encode(reqContent);
+//            //3 更新rabbitMQ 记录已消费
+//            String reqContent = FasterJsonUtil.toJson(batchNotifyDataVo);
+//            String md5 =  MD5.MD5Encode(reqContent);
             t.setStatus(Transaction.SUCCESS);
         } catch (Exception e) {
             log.info("OrderPayCallBack payCallBackAsyn start param;[{}]", GsonUtils.toJson(batchNotifyDataVo));
@@ -158,7 +158,6 @@ public class CashierPayService{
     /**
      * 查询支付款项信息
      */
-    @CatAnnotation
     public OrderPayableAmountResVO getOrderPayableAmount(OrderPayReqVO orderPayReqVO){
         Assert.notNull(orderPayReqVO, ErrorCode.PARAMETER_ERROR.getText());
         orderPayReqVO.check();
@@ -240,7 +239,6 @@ public class CashierPayService{
     /**
      * 查询包装 待支付签名对象
      */
-    @CatAnnotation
     public  List<PayVo> getOrderPayVO(OrderPaySignReqVO orderPaySign,OrderPayableAmountResVO payVO){
         //待支付金额明细
         List<PayVo> payVo = new ArrayList<>();

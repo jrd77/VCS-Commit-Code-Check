@@ -22,9 +22,6 @@ public interface AccountRenterWzDepositDetailMapper{
      */
     List<AccountRenterWzDepositDetailEntity> findByOrderNo(String orderNo);
 
-
-    int insert(AccountRenterWzDepositDetailEntity record);
-    
     int insertSelective(AccountRenterWzDepositDetailEntity record);
 
 

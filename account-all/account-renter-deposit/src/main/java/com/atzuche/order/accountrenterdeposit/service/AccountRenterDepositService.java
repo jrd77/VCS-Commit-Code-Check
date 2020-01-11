@@ -86,7 +86,6 @@ public class AccountRenterDepositService{
     /**
      * 支付成功后记录实付押金信息 和押金资金进出信息
      */
-    @CatAnnotation
     public void updateRenterDeposit(PayedOrderRenterDepositReqVO payedOrderRenterDeposit){
         //1 参数校验
         Assert.notNull(payedOrderRenterDeposit, ErrorCode.PARAMETER_ERROR.getText());
