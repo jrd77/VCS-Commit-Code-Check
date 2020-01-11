@@ -24,6 +24,7 @@ public class SubmitOrderBeforeCostCalService {
 
         //TODO:租车费用处理
 
+
         //TODO:抵扣费用处理
 
         //TODO:车辆押金处理
@@ -33,7 +34,6 @@ public class SubmitOrderBeforeCostCalService {
         //TODO:租车费用小计处理
 
         //TODO:待支付信息处理
-
 
         return new NormalOrderCostCalculateResVO();
 
