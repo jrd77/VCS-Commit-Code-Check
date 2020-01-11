@@ -8,6 +8,9 @@ import com.atzuche.order.commons.entity.dto.RenterGoodsPriceDetailDTO;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
 import com.atzuche.order.mem.MemProxyService;
+import com.autoyol.doc.annotation.AutoDocGroup;
+import com.autoyol.doc.annotation.AutoDocMethod;
+import com.autoyol.doc.annotation.AutoDocVersion;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
@@ -34,7 +37,9 @@ public class PreOrderController {
     @Autowired
     private CarProxyService carProxyService;
 
-
+    @AutoDocVersion(version = "下单前确定页面")
+    @AutoDocGroup(group = "下单前确定页面")
+    @AutoDocMethod(description = "下单前确定页面展示", value = "下单前确定页面展示",response = PreOrderAdminResponseVO.class)
     @PostMapping("console/order/adminPre")
     public ResponseData<PreOrderAdminResponseVO> preOrderAdmin(@RequestBody PreOrderAdminRequestVO request, BindingResult result){
         if (result.hasErrors()) {
