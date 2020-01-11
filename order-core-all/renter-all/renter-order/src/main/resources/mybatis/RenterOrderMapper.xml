@@ -280,6 +280,11 @@
 		where id = #{id}
 	</update>
 	
+	<update id="updateRenterOrderAgreeFlag" >
+		update renter_order set agree_flag = #{agreeFlag}
+		where id = #{id}
+	</update>
+	
 	<select id="getRenterOrderByOrderNoAndWaitPay" resultMap="BaseResultMap">
 		select <include refid="Base_Column_List" /> from renter_order where order_no = #{orderNo}
 		and child_status = 3
