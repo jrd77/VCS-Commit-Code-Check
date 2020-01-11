@@ -20,10 +20,10 @@ public class DeliveryCarVO {
     private OwnerGetAndReturnCarDTO ownerGetAndReturnCarDTO;
     @AutoDocProperty("租客取还车服务")
     private RenterGetAndReturnCarDTO renterGetAndReturnCarDTO;
-    @AutoDocProperty("是否取车")
-    private String isGetCar;
-    @AutoDocProperty("是否还车")
-    private String isReturnCar;
+    @AutoDocProperty("是否取车 0:否 1:是")
+    private Integer isGetCar;
+    @AutoDocProperty("是否还车 0:否 1:是")
+    private Integer isReturnCar;
 
 
 

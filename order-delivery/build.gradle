@@ -31,5 +31,7 @@ dependencies {
     compile project(":config")
     compile project(":util-all:fee-calculator")
     compile 'com.aliyun.oss:aliyun-sdk-oss:2.8.3'
+    compile('com.autoyol.car:auto-car-service-api:2020010707-SNAPSHOT')
+
 
 }

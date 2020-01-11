@@ -93,6 +93,16 @@ public class RenterOrderService {
     public Integer updateRenterOrderEffective(Integer id, Integer effectiveFlag) {
         return renterOrderMapper.updateRenterOrderEffective(id, effectiveFlag);
     }
+    
+    /**
+     * 修改租客子单agreeFlag标志
+     * @param id
+     * @param agreeFlag
+     * @return Integer
+     */
+    public Integer updateRenterOrderAgreeFlag(Integer id, Integer agreeFlag) {
+    	return renterOrderMapper.updateRenterOrderAgreeFlag(id, agreeFlag);
+    }
 
     /**
      * 保存租客子订单
