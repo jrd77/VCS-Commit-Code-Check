@@ -120,7 +120,7 @@
 		<if test="endTime != null and endTime != ''">
 			AND date_format(create_time,'%Y%m%d') <![CDATA[<=]]> date_format(#{endTime},'%Y%m%d')
 		</if>
-		com by id desc
+		order by id desc
 	</select>
 
 

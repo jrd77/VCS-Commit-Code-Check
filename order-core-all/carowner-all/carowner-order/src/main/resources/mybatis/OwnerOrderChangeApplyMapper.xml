@@ -71,7 +71,7 @@
 	</select>
 
 	<select id="selectALL" resultMap="BaseResultMap">
-		select  <include refid="Base_Column_List" /> from owner_order_change_apply com by id desc
+		select  <include refid="Base_Column_List" /> from owner_order_change_apply order by id desc
 	</select>
 
 	 

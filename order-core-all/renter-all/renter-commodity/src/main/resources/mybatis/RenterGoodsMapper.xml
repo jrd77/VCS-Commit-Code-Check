@@ -438,7 +438,7 @@
     </select>
 
     <select id="queryCarNumByOrderNo" resultType="java.lang.String" parameterType="java.lang.String">
-        select car_plate_num from renter_goods where order_no = #{orderNo} and is_delete = 0 com by id desc limit 1
+        select car_plate_num from renter_goods where order_no = #{orderNo} and is_delete = 0 order by id desc limit 1
     </select>
 
 </mapper>

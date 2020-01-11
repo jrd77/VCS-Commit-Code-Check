@@ -39,7 +39,7 @@
 	</select>
 
 	<select id="selectALL" resultMap="BaseResultMap">
-		select  <include refid="Base_Column_List" /> from renter_detain_unfreeze com by id desc
+		select  <include refid="Base_Column_List" /> from renter_detain_unfreeze order by id desc
 	</select>
 
 	 

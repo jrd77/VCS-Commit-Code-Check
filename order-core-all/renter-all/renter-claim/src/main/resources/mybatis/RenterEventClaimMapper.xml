@@ -39,7 +39,7 @@
 	</select>
 
 	<select id="selectALL" resultMap="BaseResultMap">
-		select  <include refid="Base_Column_List" /> from renter_event_claim com by id desc
+		select  <include refid="Base_Column_List" /> from renter_event_claim order by id desc
 	</select>
 
 	 

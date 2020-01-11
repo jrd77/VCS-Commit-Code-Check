@@ -43,7 +43,7 @@
 	</select>
 
 	<select id="selectALL" resultMap="BaseResultMap">
-		select  <include refid="Base_Column_List" /> from account_renter_wz_deposit_cost_settle_detail com by id desc
+		select  <include refid="Base_Column_List" /> from account_renter_wz_deposit_cost_settle_detail order by id desc
 	</select>
 
 

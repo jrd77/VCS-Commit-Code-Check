@@ -41,7 +41,7 @@
 	</select>
 
 	<select id="selectALL" resultMap="BaseResultMap">
-		select  <include refid="Base_Column_List" /> from owner_order_operate_log com by id desc
+		select  <include refid="Base_Column_List" /> from owner_order_operate_log order by id desc
 	</select>
 
 	 

@@ -53,7 +53,7 @@
 	</select>
 
 	<select id="findByOrderNo" resultMap="BaseResultMap">
-		select  <include refid="Base_Column_List" /> from account_renter_wz_deposit_detail where order_no=#{orderNo} and is_delete=0 com by id desc
+		select  <include refid="Base_Column_List" /> from account_renter_wz_deposit_detail where order_no=#{orderNo} and is_delete=0 order by id desc
 	</select>
 
 

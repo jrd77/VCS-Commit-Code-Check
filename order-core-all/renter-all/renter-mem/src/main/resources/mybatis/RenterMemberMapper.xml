@@ -229,7 +229,7 @@
         select
             mem_no
         from renter_member
-        where order_no = #{orderNo} and is_delete = 0 com by id desc limit 1
+        where order_no = #{orderNo} and is_delete = 0 order by id desc limit 1
     </select>
 
     <select id="queryMemNoAndPhoneByOrderList" resultMap="BaseResultMap">

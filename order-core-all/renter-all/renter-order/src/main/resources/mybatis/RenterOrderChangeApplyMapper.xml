@@ -71,7 +71,7 @@
 	</select>
 
 	<select id="selectALL" resultMap="BaseResultMap">
-		select  <include refid="Base_Column_List" /> from renter_order_change_apply com by id desc
+		select  <include refid="Base_Column_List" /> from renter_order_change_apply order by id desc
 	</select>
 
 	 
@@ -272,7 +272,7 @@
   	<select id="getRenterOrderChangeApplyByRenterOrderNo" resultMap="BaseResultMap">
 		select <include refid="Base_Column_List" /> from renter_order_change_apply where renter_order_no = #{renterOrderNo}
 		and is_delete = 0
-		com by id desc
+		order by id desc
 		limit 1
 	</select>
 	

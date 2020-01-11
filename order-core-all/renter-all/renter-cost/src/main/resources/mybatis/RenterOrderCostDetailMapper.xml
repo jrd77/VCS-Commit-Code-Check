@@ -59,7 +59,7 @@
 	</select>
 
 	<select id="selectALL" resultMap="BaseResultMap">
-		select  <include refid="Base_Column_List" /> from renter_order_cost_detail com by id desc
+		select  <include refid="Base_Column_List" /> from renter_order_cost_detail order by id desc
 	</select>
 
 	 

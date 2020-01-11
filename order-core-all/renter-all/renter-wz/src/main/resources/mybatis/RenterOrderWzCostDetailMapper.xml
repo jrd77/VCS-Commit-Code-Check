@@ -156,7 +156,7 @@
 	</update>
 
 	<select id="queryInfoByOrderAndCode" resultMap="selectColumnMap">
-		select * from renter_order_wz_cost_detail where order_no = #{orderNo} and cost_code = #{costCode} and cost_status = 0 and is_delete = 0 com by id desc limit 1
+		select * from renter_order_wz_cost_detail where order_no = #{orderNo} and cost_code = #{costCode} and cost_status = 0 and is_delete = 0 order by id desc limit 1
 	</select>
 
 	<select id="queryInfoWithSumAmountByOrderAndCode" resultMap="selectColumnMap">

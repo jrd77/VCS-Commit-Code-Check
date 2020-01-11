@@ -233,7 +233,7 @@
 		and child_status = 3
 		and is_cancel = 0
 		and is_delete = 0
-		com by id desc
+		order by id desc
 		limit 1
     </select>
     
@@ -252,7 +252,7 @@
         and is_cancel = 0
         and is_delete = 0
         and child_status = 3
-        com by id desc
+        order by id desc
         limit 1
     </select>
 

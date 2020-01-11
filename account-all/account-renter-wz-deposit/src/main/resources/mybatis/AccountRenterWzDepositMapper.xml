@@ -115,7 +115,7 @@
 	</update>
     <!-- 根据订单号查询车俩租金信息 -->
     <select id="selectByOrderAndMemNo" resultMap="BaseResultMap">
-        select <include refid="Base_Column_List" /> from account_renter_wz_deposit where order_no = #{orderNo} and mem_no = #{memNo} com by id desc limit 1
+        select <include refid="Base_Column_List" /> from account_renter_wz_deposit where order_no = #{orderNo} and mem_no = #{memNo} order by id desc limit 1
     </select>
 
 </mapper>
