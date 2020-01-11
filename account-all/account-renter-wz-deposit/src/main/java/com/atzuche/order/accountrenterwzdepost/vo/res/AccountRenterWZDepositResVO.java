@@ -63,8 +63,11 @@ public class AccountRenterWZDepositResVO {
      */
     private String updateOp;
 
-
-
+    /**
+     * 结算状态 0未结算 1 已结算
+     * 枚举类型 SettleStatusEnum
+     */
+    private Integer settleStatus;
 
 
 }

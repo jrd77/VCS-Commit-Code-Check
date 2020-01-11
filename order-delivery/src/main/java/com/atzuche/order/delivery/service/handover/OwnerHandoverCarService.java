@@ -142,4 +142,8 @@ public class OwnerHandoverCarService implements IUpdateHandoverCarInfo {
         return ownerHandoverCarRemarkMapper.selectObjectByOrderNoType(orderNo, type);
     }
 
+    public OwnerHandoverCarInfoEntity selectByRenterOrderNoAndType(String renterOrderNo, Integer type) {
+        return ownerHandoverCarInfoMapper.selectByOwnerOrderNoAndType(renterOrderNo, type);
+    }
+
 }

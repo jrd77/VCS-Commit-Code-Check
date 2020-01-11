@@ -9,7 +9,7 @@ import javax.annotation.Resource;
 
 /**
  * 托管车信息表
- * author 胡春林
+ * @author 胡春林
  */
 @Service
 public class OrderCarTrusteeshipService{

@@ -12,17 +12,18 @@ import com.atzuche.order.cashieraccount.vo.req.CashierDeductDebtReqVO;
 import com.atzuche.order.cashieraccount.vo.req.CashierRefundApplyReqVO;
 import com.atzuche.order.cashieraccount.vo.req.DeductDepositToRentCostReqVO;
 import com.atzuche.order.cashieraccount.vo.res.CashierDeductDebtResVO;
-import com.atzuche.order.commons.IpUtil;
+import com.atzuche.order.coin.service.AccountRenterCostCoinService;
 import com.atzuche.order.commons.entity.dto.*;
-import com.atzuche.order.commons.enums.RenterCashCodeEnum;
-import com.atzuche.order.commons.enums.SubsidySourceCodeEnum;
+import com.atzuche.order.commons.enums.*;
 import com.atzuche.order.commons.enums.account.debt.DebtTypeEnum;
+import com.atzuche.order.commons.enums.cashier.OrderRefundStatusEnum;
 import com.atzuche.order.delivery.entity.OwnerHandoverCarInfoEntity;
 import com.atzuche.order.delivery.entity.RenterHandoverCarInfoEntity;
 import com.atzuche.order.delivery.enums.RenterHandoverCarTypeEnum;
 import com.atzuche.order.delivery.service.handover.HandoverCarService;
 import com.atzuche.order.delivery.vo.handover.HandoverCarRepVO;
 import com.atzuche.order.delivery.vo.handover.HandoverCarReqVO;
+import com.atzuche.order.flow.service.OrderFlowService;
 import com.atzuche.order.owner.commodity.service.OwnerGoodsService;
 import com.atzuche.order.ownercost.entity.OwnerOrderEntity;
 import com.atzuche.order.ownercost.entity.OwnerOrderIncrementDetailEntity;
@@ -39,9 +40,8 @@ import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.atzuche.order.renterorder.service.RenterOrderService;
 import com.atzuche.order.settle.exception.OrderSettleFlatAccountException;
 import com.atzuche.order.settle.vo.req.*;
-import com.autoyol.auto.coin.service.vo.req.AutoCoiChargeRequestVO;
+import com.atzuche.order.wallet.WalletProxyService;
 import com.autoyol.doc.util.StringUtil;
-import com.autoyol.vo.req.WalletReturnReqVO;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -74,6 +74,9 @@ public class OrderSettleNoTService {
     @Autowired private OwnerOrderService ownerOrderService;
     @Autowired private OrderStatusService orderStatusService;
     @Autowired private RenterGoodsService renterGoodsService;
+    @Autowired private AccountRenterCostCoinService accountRenterCostCoinService;
+    @Autowired private WalletProxyService walletProxyService;
+    @Autowired private OrderFlowService orderFlowService;
 
 
     /**
@@ -108,7 +111,7 @@ public class OrderSettleNoTService {
 
         // 3.1获取租客子订单 和 租客会员号
         String renterOrderNo = renterOrder.getRenterOrderNo();
-        String renterMemNo = "";
+        String renterMemNo = renterOrder.getRenterMemNo();
         //3.2获取车主子订单 和 车主会员号
         String ownerOrderNo = ownerOrder.getOwnerOrderNo();
         String ownerMemNo = ownerOrder.getMemNo();
@@ -130,11 +133,14 @@ public class OrderSettleNoTService {
     public void check(RenterOrderEntity renterOrder) {
         // 1 订单校验是否可以结算
         OrderStatusEntity orderStatus = orderStatusService.getByOrderNo(renterOrder.getOrderNo());
+        if(OrderStatusEnum.TO_SETTLE.getStatus() == orderStatus.getStatus()){
+            throw new RuntimeException("租客订单状态不是待结算，不能结算");
+        }
         //2校验租客是否还车
-//        boolean isReturn = handoverCarService.isReturnCar(renterOrder.getOrderNo());
-//        if(!isReturn){
-//            throw new RuntimeException("租客未还车不能结算");
-//        }
+        boolean isReturn = handoverCarService.isReturnCar(renterOrder.getOrderNo());
+        if(!isReturn){
+            throw new RuntimeException("租客未还车不能结算");
+        }
         //3 校验是否存在 理赔  存在不结算
         boolean isClaim = cashierSettleService.getOrderClaim(renterOrder.getOrderNo());
         if(isClaim){
@@ -154,7 +160,7 @@ public class OrderSettleNoTService {
     private CostBaseDTO getCostBaseRent(SettleOrders settleOrders,RenterOrderEntity renterOrder){
         CostBaseDTO costBaseDTO = new CostBaseDTO();
         costBaseDTO.setOrderNo(renterOrder.getOrderNo());
-        costBaseDTO.setMemNo("");
+        costBaseDTO.setMemNo(renterOrder.getRenterMemNo());
         costBaseDTO.setRenterOrderNo(renterOrder.getRenterOrderNo());
         costBaseDTO.setStartTime(renterOrder.getExpRentTime());
         costBaseDTO.setEndTime(renterOrder.getExpRevertTime());
@@ -932,30 +938,19 @@ public class OrderSettleNoTService {
      *
      * @param settleOrdersAccount
      */
-    public void refundRentCost(SettleOrdersAccount settleOrdersAccount,List<AccountRenterCostSettleDetailEntity> accountRenterCostSettleDetails) {
+    public void refundRentCost(SettleOrdersAccount settleOrdersAccount,List<AccountRenterCostSettleDetailEntity> accountRenterCostSettleDetails,OrderStatusDTO orderStatusDTO) {
         List<AccountRenterCostSettleDetailEntity> renterCostSettleDetails = new ArrayList<>();
         //应退结余 租车费用
         int rentCostSurplusAmt = settleOrdersAccount.getRentCostSurplusAmt();
         if(rentCostSurplusAmt>0){
-//            //1 退还凹凸币 coinAmt为订单至少使用的凹凸币
-//            int coinAmt = accountRenterCostSettleDetails.stream().filter(obj ->{
-//                return RenterCashCodeEnum.AUTO_COIN_DEDUCT.getCashNo().equals(obj.getCostCode());
-//            }).mapToInt(AccountRenterCostSettleDetailEntity::getAmt).sum();
-//            if(coinAmt>0){
-//                int userCoinAmt = accountRenterCostCoinService.getUserCoinAmtByOrder(settleOrdersAccount.getOrderNo(),settleOrdersAccount.getRenterMemNo());
-//                //计算应退凹凸币金额
-//                int returnCoinAmt = userCoinAmt - coinAmt;
-//                if(returnCoinAmt>0){
-//                    // 1.1记录租车费用明细 退还凹凸币流水
-//                    AccountRenterCostSettleDetailEntity entity = getAccountRenterCostSettleDetailEntityForAutoCoin(settleOrdersAccount,-returnCoinAmt);
-//                    renterCostSettleDetails.add(entity);
-//                    // 1.2退还凹凸币 coinAmt
-//                    AutoCoiChargeRequestVO vo = getAutoCoiChargeRequestVO(settleOrdersAccount,returnCoinAmt);
-//                    boolean returnCoinResult = autoCoinService.returnCoin(vo);
-//                    rentCostSurplusAmt = rentCostSurplusAmt-coinAmt;
-//                }
-//
-//            }
+            //1 退还凹凸币 coinAmt为订单真实使用的凹凸币
+            int coinAmt = accountRenterCostSettleDetails.stream().filter(obj ->{
+                return RenterCashCodeEnum.AUTO_COIN_DEDUCT.getCashNo().equals(obj.getCostCode());
+            }).mapToInt(AccountRenterCostSettleDetailEntity::getAmt).sum();
+            if(coinAmt>0){
+                //退还多余凹凸币
+                accountRenterCostCoinService.settleAutoCoin(settleOrdersAccount.getRenterMemNo(),settleOrdersAccount.getOrderNo(),coinAmt);
+            }
             //退还租车费用
             if(rentCostSurplusAmt>0){
                 // 实付
@@ -967,17 +962,15 @@ public class OrderSettleNoTService {
                 AccountRenterCostSettleDetailEntity entity = getAccountRenterCostSettleDetailEntityForRentCost(settleOrdersAccount,-returnAmt,id);
                 renterCostSettleDetails.add(entity);
                 rentCostSurplusAmt = rentCostSurplusAmt-returnAmt;
+                orderStatusDTO.setRentCarRefundStatus(OrderRefundStatusEnum.REFUNDING.getStatus());
             }
             //2 查询钱包 比较
             if(rentCostSurplusAmt>0){
                 int walletAmt = cashierSettleService.getRentCostPayByWallet(settleOrdersAccount.getOrderNo(),settleOrdersAccount.getRenterMemNo());
-                //计算应退钱包金额
+                //计算应退钱包金额 并退还
                 int returnWalletAmt = rentCostSurplusAmt>walletAmt?walletAmt:rentCostSurplusAmt;
-                WalletReturnReqVO walletReturnReq = getWalletReturnReqVO(settleOrdersAccount,returnWalletAmt);
-                // TODO 钱包退还接口 待开发
-//                int walletLogId = walletRemoteService.returnWalletBySettle(walletReturnReq);
-
-                AccountRenterCostSettleDetailEntity entity = getAccountRenterCostSettleDetailEntityForWallet(settleOrdersAccount,-returnWalletAmt,0);
+                walletProxyService.returnOrChargeWallet(settleOrdersAccount.getRenterMemNo(),settleOrdersAccount.getOrderNo(),Math.abs(returnWalletAmt));
+                AccountRenterCostSettleDetailEntity entity = getAccountRenterCostSettleDetailEntityForWallet(settleOrdersAccount,-returnWalletAmt);
                 renterCostSettleDetails.add(entity);
 
             }
@@ -1022,63 +1015,21 @@ public class OrderSettleNoTService {
      * @param returnWalletAmt
      * @return
      */
-    private AccountRenterCostSettleDetailEntity getAccountRenterCostSettleDetailEntityForWallet(SettleOrdersAccount settleOrdersAccount, int returnWalletAmt,int walletLogId) {
+    private AccountRenterCostSettleDetailEntity getAccountRenterCostSettleDetailEntityForWallet(SettleOrdersAccount settleOrdersAccount, int returnWalletAmt) {
         AccountRenterCostSettleDetailEntity entity = new AccountRenterCostSettleDetailEntity();
         BeanUtils.copyProperties(settleOrdersAccount,entity);
         entity.setAmt(returnWalletAmt);
         entity.setCostCode(RenterCashCodeEnum.WALLET_DEDUCT.getCashNo());
         entity.setCostDetail(RenterCashCodeEnum.WALLET_DEDUCT.getTxt());
-        entity.setUniqueNo(String.valueOf(walletLogId));
         return entity;
     }
 
-    /**
-     * 结算退还凹凸币 费用明细
-     * @param settleOrdersAccount
-     * @param returnCoinAmt
-     * @return
-     */
-    private AccountRenterCostSettleDetailEntity getAccountRenterCostSettleDetailEntityForAutoCoin(SettleOrdersAccount settleOrdersAccount, int returnCoinAmt) {
-        AccountRenterCostSettleDetailEntity entity = new AccountRenterCostSettleDetailEntity();
-        BeanUtils.copyProperties(settleOrdersAccount,entity);
-        entity.setAmt(returnCoinAmt);
-        entity.setCostCode(RenterCashCodeEnum.AUTO_COIN_DEDUCT.getCashNo());
-        entity.setCostDetail(RenterCashCodeEnum.AUTO_COIN_DEDUCT.getTxt());
-        return entity;
-    }
-    /**
-     * 构造结算退还凹凸币，请求参数
-     * @return
-     */
-    private WalletReturnReqVO getWalletReturnReqVO(SettleOrdersAccount settleOrdersAccount, int returnWalletAmt) {
-        WalletReturnReqVO vo = new WalletReturnReqVO();
-        vo.setMemNo(Integer.valueOf(settleOrdersAccount.getRenterMemNo()));
-        vo.setOrderNo(Long.valueOf(settleOrdersAccount.getOrderNo()));
-        vo.setIp(IpUtil.getLocalIp());
-        vo.setServiceName("新订单结算");
-        vo.setPlatform("OPERATION_TERMINAL");
-        return vo;
-    }
-    /**
-     * 构造结算退还凹凸币，请求参数
-     * @return
-     */
-    private AutoCoiChargeRequestVO getAutoCoiChargeRequestVO(SettleOrdersAccount settleOrdersAccount,int returnCoinAmt) {
-        AutoCoiChargeRequestVO vo = new AutoCoiChargeRequestVO();
-        vo.setMemNo(Integer.valueOf(settleOrdersAccount.getRenterMemNo()));
-        vo.setOrderNo(settleOrdersAccount.getOrderNo());
-        vo.setRemark("结算返还");
-        vo.setRemarkExtend("结算返还");
-        vo.setOrderType("10");
-        vo.setChargeAutoCoin(returnCoinAmt*100);
-        return vo;
-    }
 
     /**
      * 退还剩余的 车辆押金
      * @param settleOrdersAccount
      */
-    public void refundDepositAmt(SettleOrdersAccount settleOrdersAccount) {
+    public void refundDepositAmt(SettleOrdersAccount settleOrdersAccount,OrderStatusDTO orderStatusDTO) {
         if(settleOrdersAccount.getDepositSurplusAmt()>0){
             //1退还租车押金
             CashierRefundApplyReqVO cashierRefundApply = new CashierRefundApplyReqVO();
@@ -1086,6 +1037,8 @@ public class OrderSettleNoTService {
             cashierRefundApply.setAmt(-settleOrdersAccount.getDepositSurplusAmt());
             cashierRefundApply.setRenterCashCodeEnum(RenterCashCodeEnum.SETTLE_RENT_DEPOSIT_TO_RETURN_AMT);
             cashierRefundApply.setRemake(RenterCashCodeEnum.SETTLE_RENT_DEPOSIT_TO_RETURN_AMT.getTxt());
+            cashierRefundApply.setFlag(RenterCashCodeEnum.ACCOUNT_RENTER_DEPOSIT.getCashNo());
+            cashierRefundApply.setType(SysOrHandEnum.SYSTEM.getStatus());
             int id =cashierService.refundDeposit(cashierRefundApply);
             // 2记录退还 租车押金 结算费用明细
             AccountRenterCostSettleDetailEntity entity = new AccountRenterCostSettleDetailEntity();
@@ -1095,6 +1048,8 @@ public class OrderSettleNoTService {
             entity.setCostDetail(RenterCashCodeEnum.SETTLE_RENT_DEPOSIT_TO_RETURN_AMT.getTxt());
             entity.setUniqueNo(String.valueOf(id));
             cashierSettleService.insertAccountRenterCostSettleDetail(entity);
+            orderStatusDTO.setDepositRefundStatus(OrderRefundStatusEnum.REFUNDING.getStatus());
+
         }
 
     }
@@ -1140,8 +1095,9 @@ public class OrderSettleNoTService {
      * @param settleOrdersAccount
      */
     public void saveOrderStatusInfo(SettleOrdersAccount settleOrdersAccount) {
-        OrderStatusDTO orderStatusDTO = new OrderStatusDTO();
-        orderStatusDTO.setOrderNo(settleOrdersAccount.getOrderNo());
-        orderStatusService.saveOrderStatusInfo(orderStatusDTO);
+        //1更新 订单流转状态
+        orderStatusService.saveOrderStatusInfo(settleOrdersAccount.getOrderStatusDTO());
+        //2记录订单流传信息
+        orderFlowService.inserOrderStatusChangeProcessInfo(settleOrdersAccount.getOrderNo(), OrderStatusEnum.TO_WZ_SETTLE);
     }
 }
