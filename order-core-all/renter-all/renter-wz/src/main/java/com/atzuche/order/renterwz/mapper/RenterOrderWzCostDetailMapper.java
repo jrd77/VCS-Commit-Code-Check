@@ -67,6 +67,13 @@ public interface RenterOrderWzCostDetailMapper{
 	 * @param costCode 消费code
 	 * @return 详情
 	 */
-	RenterOrderWzCostDetailEntity queryInfoByOrderAndCode(String orderNo, String costCode);
+	RenterOrderWzCostDetailEntity queryInfoByOrderAndCode(@Param("orderNo") String orderNo, @Param("costCode")String costCode);
 
+	/**
+	 * 查询费用信息
+	 * @param orderNo 订单号
+	 * @param costCode 费用编码
+	 * @return 费用信息
+	 */
+	RenterOrderWzCostDetailEntity queryInfoWithSumAmountByOrderAndCode(@Param("orderNo") String orderNo,@Param("costCode") String costCode);
 }
