@@ -960,7 +960,13 @@ public class RenterOrderCostCombineService {
             getReturnOverCostDTO.setRenterOrderCostDetailEntityList(renterOrderCostDetailEntityList);
             return getReturnOverCostDTO;
         }
-
+        boolean getIsGetCarCost = getReturnCarOverCostReqDto.getIsGetCarCost() == null ? false : getReturnCarOverCostReqDto.getIsGetCarCost();
+        boolean getIsReturnCarCost = getReturnCarOverCostReqDto.getIsReturnCarCost()==null?false:getReturnCarOverCostReqDto.getIsReturnCarCost();
+        if(!getIsGetCarCost && !getIsReturnCarCost){
+            log.info("不需要计算超运能费用getReturnCarOverCostReqDto={}",JSON.toJSONString(getReturnCarOverCostReqDto));
+            getReturnOverCostDTO.setRenterOrderCostDetailEntityList(renterOrderCostDetailEntityList);
+            return getReturnOverCostDTO;
+        }
         try {
             // 超运能后计算附加费的订单类型列表1-短租订单和3-平台套餐订单
             List<Integer> orderTypeList = Arrays.asList(ORDER_TYPES);
@@ -968,7 +974,7 @@ public class RenterOrderCostCombineService {
             Boolean isAddFee = orderTypeList.contains(getReturnCarOverCostReqDto.getOrderType());
             Integer overTransportFee = this.getGetReturnOverTransportFee(cityCode);
             String rentTimeLongStr = String.valueOf(LocalDateTimeUtils.localDateTimeToLong(rentTime));
-            boolean getIsGetCarCost = getReturnCarOverCostReqDto.getIsGetCarCost() == null ? false : getReturnCarOverCostReqDto.getIsGetCarCost();
+
             if (rentTime != null && getIsGetCarCost) {
                 ResponseObject<Boolean> getFlgResponse = null;
                 Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "取车是否超运能");
@@ -1025,7 +1031,7 @@ public class RenterOrderCostCombineService {
                     getReturnOverTransport.setIsGetOverTransport(false);
                 }
             }
-            boolean getIsReturnCarCost = getReturnCarOverCostReqDto.getIsReturnCarCost()==null?false:getReturnCarOverCostReqDto.getIsReturnCarCost();
+
             if (revertTime != null && getIsReturnCarCost) {
                 String revertTimeLongStr = String.valueOf(LocalDateTimeUtils.localDateTimeToLong(revertTime));
                 ResponseObject<Boolean>  returnFlgResponse = null;
