@@ -34,6 +34,8 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+
 @RequestMapping("/console/order/other/information")
 @RestController
 @AutoDocVersion(version = "订单备注接口文档")
@@ -52,14 +54,14 @@ public class OrderOtherInformationController extends BaseController{
     @Autowired
     FeignOrderDetailService feignOrderDetailService;
 
-
+    @Autowired
     FeignOrderUpdateService feignOrderUpdateService;
 
 
 
 	@AutoDocMethod(description = "修改租车城市", value = "修改租车城市", response = ResponseData.class)
     @RequestMapping(value = "/rent/city/update", method = RequestMethod.PUT)
-	public ResponseData<ResponseData> updateRentCity(@RequestBody OrderRentCityRequestVO orderRentCityRequestVO, BindingResult bindingResult) {
+	public ResponseData<ResponseData> updateRentCity(@Valid @RequestBody OrderRentCityRequestVO orderRentCityRequestVO, BindingResult bindingResult) {
         validateParameter(bindingResult);
         try{
             logger.info(LogDescription.getLogDescription(DescriptionConstant.CONSOLE_ORDER_OTHER_INFORMATION_RENT_CITY_UPDATE, DescriptionConstant.INPUT_TEXT),orderRentCityRequestVO.toString());
@@ -84,7 +86,7 @@ public class OrderOtherInformationController extends BaseController{
 
     @AutoDocMethod(description = "是否风控事故修改", value = "是否风控事故修改", response = ResponseData.class)
     @RequestMapping(value = "/risk/status/update", method = RequestMethod.PUT)
-    public ResponseData<ResponseData> updateRiskStatus(@RequestBody OrderRiskStatusRequestVO orderRiskStatusRequestVO, BindingResult bindingResult) {
+    public ResponseData<ResponseData> updateRiskStatus(@Valid @RequestBody OrderRiskStatusRequestVO orderRiskStatusRequestVO, BindingResult bindingResult) {
         validateParameter(bindingResult);
 
         try{
@@ -113,7 +115,7 @@ public class OrderOtherInformationController extends BaseController{
 
     @AutoDocMethod(description = "取送车备注修改", value = "取送车备注修改", response = ResponseData.class)
     @RequestMapping(value = "/car/service/update", method = RequestMethod.PUT)
-    public ResponseData<ResponseData> updateGetReturnCarRemark(@RequestBody OrderCarServiceRemarkRequestVO orderCarServiceRemarkRequestVO, BindingResult bindingResult) {
+    public ResponseData<ResponseData> updateGetReturnCarRemark(@Valid @RequestBody OrderCarServiceRemarkRequestVO orderCarServiceRemarkRequestVO, BindingResult bindingResult) {
         validateParameter(bindingResult);
         try{
             logger.info(LogDescription.getLogDescription(DescriptionConstant.CONSOLE_ORDER_OTHER_INFORMATION_CAR_SERVICE_UPDATE, DescriptionConstant.INPUT_TEXT),orderCarServiceRemarkRequestVO.toString());

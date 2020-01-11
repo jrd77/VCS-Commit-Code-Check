@@ -1,4 +1,4 @@
-package com.atzuche.order.coreapi.service;
+package com.atzuche.order.car;
 
 import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.CatConstants;
@@ -8,10 +8,6 @@ import com.atzuche.order.commons.entity.dto.OwnerGoodsDetailDTO;
 import com.atzuche.order.commons.entity.dto.OwnerGoodsPriceDetailDTO;
 import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
 import com.atzuche.order.commons.entity.dto.RenterGoodsPriceDetailDTO;
-import com.atzuche.order.coreapi.submitOrder.exception.CarDetailByFeignException;
-import com.atzuche.order.coreapi.submitOrder.exception.RenterCarDetailErrException;
-import com.atzuche.order.coreapi.submitOrder.exception.RenterCarDetailFailException;
-import com.atzuche.order.coreapi.submitOrder.exception.RenterMemberFailException;
 import com.autoyol.car.api.feign.api.CarDetailQueryFeignApi;
 import com.autoyol.car.api.model.dto.OrderCarInfoParamDTO;
 import com.autoyol.car.api.model.vo.*;
@@ -32,15 +28,13 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
- * 封装对远程车辆详情服务的调用
  * @author <a href="mailto:lianglin.sjtu@gmail.com">AndySjtu</a>
- * @date 2019/12/19 4:55 下午
+ * @date 2020/1/11 3:03 下午
  **/
 @Service
-public class GoodsService {
-    
-    private final static Logger log = LoggerFactory.getLogger(GoodsService.class);
-    
+public class CarProxyService {
+    private final static Logger log = LoggerFactory.getLogger(CarProxyService.class);
+
     @Autowired
     private CarDetailQueryFeignApi carDetailQueryFeignApi;
 
@@ -145,7 +139,7 @@ public class GoodsService {
         renterGoodsDetailDto.setMoreLicenseFlag(carBaseVO.getMoreLicenseFlag());
         renterGoodsDetailDto.setLicenseExpire(carBaseVO.getLicenseExpire()==null?null:LocalDateTimeUtils.dateToLocalDateTime(carBaseVO.getLicenseExpire()));
         if (data.getCarModelParam() != null) {
-        	renterGoodsDetailDto.setCarInmsrp(data.getCarModelParam().getInmsrp());
+            renterGoodsDetailDto.setCarInmsrp(data.getCarModelParam().getInmsrp());
         }
         renterGoodsDetailDto.setStopCostRate(data.getStopCostRate()==null ? 0D:Double.valueOf(data.getStopCostRate()));
         renterGoodsDetailDto.setServiceRate(data.getServerRate()==null ? 0D:Double.valueOf(data.getServerRate()));
@@ -174,7 +168,7 @@ public class GoodsService {
         return renterGoodsDetailDto;
     }
     //获取车主商品信息
-    public OwnerGoodsDetailDTO getOwnerGoodsDetail(RenterGoodsDetailDTO renterGoodsDetailDto) throws CarDetailByFeignException, RenterMemberFailException {
+    public OwnerGoodsDetailDTO getOwnerGoodsDetail(RenterGoodsDetailDTO renterGoodsDetailDto) throws CarDetailByFeignException {
         OwnerGoodsDetailDTO ownerGoodsDetailDto = new OwnerGoodsDetailDTO();
         BeanUtils.copyProperties(renterGoodsDetailDto, ownerGoodsDetailDto);
         List<OwnerGoodsPriceDetailDTO> ownerGoodsPriceList = renterGoodsDetailDto.getRenterGoodsPriceDetailDTOList()
@@ -202,7 +196,6 @@ public class GoodsService {
         coverPic = collect.size()<=0 ?  "" : collect.get(0).getPicPath();
         return coverPic;
     }
-
 
 
 }

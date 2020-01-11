@@ -1,6 +1,7 @@
 package com.atzuche.order.admin.service;
 
 import com.atzuche.order.admin.common.AdminUserUtil;
+import com.atzuche.order.admin.util.StringUtil;
 import com.atzuche.order.admin.vo.req.renterWz.RenterWzCostDetailReqVO;
 import com.atzuche.order.admin.vo.req.renterWz.TemporaryRefundReqVO;
 import com.atzuche.order.admin.vo.resp.renterWz.*;
@@ -75,6 +76,9 @@ public class RenterWzService {
             try {
                 RenterOrderWzCostDetailEntity fromApp = new RenterOrderWzCostDetailEntity();
                 BeanUtils.copyProperties(costDetail,fromApp);
+                if(StringUtils.isNotBlank(costDetail.getAmount())){
+                    fromApp.setAmount(Integer.parseInt(costDetail.getAmount()));
+                }
                 Map<String,String> paramNames = this.getParamNamesByCode(costDetail.getCostCode());
                 CompareHelper<RenterOrderWzCostDetailEntity> compareHelper = new CompareHelper<>(fromDb,fromApp,paramNames);
                 String content = compareHelper.compare();
@@ -105,12 +109,13 @@ public class RenterWzService {
         //先将之前的置为无效
         renterOrderWzCostDetailService.updateCostStatusByOrderNoAndCarNumAndMemNoAndCostCode(orderNo,carNum,memNo,1,costDetail.getCostCode());
         //再新添加
-        RenterOrderWzCostDetailEntity entityByType = getEntityByType(costDetail.getCostCode(), orderNo, costDetail.getAmount(), carNum, memNo);
+        RenterOrderWzCostDetailEntity entityByType = getEntityByType(costDetail.getCostCode(), orderNo, costDetail.getAmount(), carNum, memNo,costDetail.getRemark());
         renterOrderWzCostDetailService.saveRenterOrderWzCostDetail(entityByType);
     }
 
-    private RenterOrderWzCostDetailEntity getEntityByType(String code,String orderNo,String amount,String carNum, Integer memNo){
+    private RenterOrderWzCostDetailEntity getEntityByType(String code, String orderNo, String amount, String carNum, Integer memNo, String remark){
         String authName = AdminUserUtil.getAdminUser().getAuthName();
+        String authId = AdminUserUtil.getAdminUser().getAuthId();
         RenterOrderWzCostDetailEntity entity = new RenterOrderWzCostDetailEntity();
         entity.setOrderNo(orderNo);
         entity.setCarPlateNum(carNum);
@@ -125,7 +130,9 @@ public class RenterWzService {
         entity.setCreateTime(new Date());
         entity.setSourceType(SOURCE_TYPE_CONSOLE);
         entity.setOperatorName(authName);
+        entity.setOperatorId(authId);
         entity.setCreateOp(authName);
+        entity.setRemark(remark);
         return entity;
     }
 

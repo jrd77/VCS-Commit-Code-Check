@@ -34,7 +34,6 @@ public class  OrderSettleService{
      * 车辆押金结算
      */
     @Transactional(rollbackFor=Exception.class)
-    @CatAnnotation
     public void settleOrder(String orderNo) {
         log.info("OrderSettleService settleOrder start param [{}]",orderNo);
         //3.3 初始化结算对象

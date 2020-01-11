@@ -29,7 +29,6 @@ public class AccountOwnerCostSettleService{
      * 车主结算信息插入
      * @param accountOwnerCostSettleReqVO
      */
-    @CatAnnotation
     public void insertAccountOwnerCostSettle(AccountOwnerCostSettleReqVO accountOwnerCostSettleReqVO){
         //1 校验
         Assert.notNull(accountOwnerCostSettleReqVO, ErrorCode.PARAMETER_ERROR.getText());
@@ -43,7 +42,6 @@ public class AccountOwnerCostSettleService{
      * 车主结算信息插入
      * @param  accountOwnerCostSettle
      */
-    @CatAnnotation
     public void insertAccountOwnerCostSettle(AccountOwnerCostSettleEntity accountOwnerCostSettle){
         accountOwnerCostSettleNoTService.insertAccountOwnerCostSettle(accountOwnerCostSettle);
     }
