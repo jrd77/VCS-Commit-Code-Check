@@ -78,12 +78,12 @@ public class DeliveryCarService {
     }
 
     /**
-     * 发送配送订单到仁云
-     *
-     * @param orderNo
+     * 发送配送订单到仁云 提供给外层回调
+     * @param renterOrderNo
      */
-    public void sendDataMessageToRenYun(String orderNo, String serviceType) {
-        OrderDeliveryFlowEntity orderDeliveryFlowEntity = deliveryFlowService.selectOrderDeliveryFlowByOrderNo(orderNo, serviceType);
+    public void sendDataMessageToRenYun(String renterOrderNo) {
+
+        OrderDeliveryFlowEntity orderDeliveryFlowEntity = deliveryFlowService.selectOrderDeliveryFlowByOrderNo(renterOrderNo);
         if (Objects.isNull(orderDeliveryFlowEntity)) {
             throw new DeliveryOrderException(DeliveryErrorCode.DELIVERY_PARAMS_ERROR.getValue(), "没有找到发送至仁云的数据");
         }
@@ -266,6 +266,7 @@ public class DeliveryCarService {
         orderDeliveryDTO.setRevertTime(renterGoodsDetailDTO.getRevertTime());
         orderDeliveryDTO.setType(orderType);
         orderDeliveryDTO.setParamsTypeValue(orderReqVO, orderType, ownerMemberDTO, renterMemberDTO);
+        orderDeliveryFlowEntity.setRenterOrderNo(renterGoodsDetailDTO.getRenterOrderNo());
         orderDeliveryFlowEntity.setOrderNo(renterGoodsDetailDTO.getOrderNo());
         orderDeliveryFlowEntity.setOrderType(orderReqVO.getOrderCategory());
         orderDeliveryFlowEntity.setServiceTypeInfo(orderType, orderDeliveryDTO);

@@ -23,4 +23,6 @@ public interface OrderDeliveryFlowMapper{
 
     OrderDeliveryFlowEntity selectOrderDeliveryByOrderNo(@Param("orderNo") String orderNo,@Param("serviceType") String serviceType);
 
+    OrderDeliveryFlowEntity selectOrderDeliveryByRenterOrderNo(@Param("renterOrderNo") String renterOrderNo);
+
 }

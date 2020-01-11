@@ -31,6 +31,7 @@
         <result property="createTime" column="create_time"/>
         <result property="updateTime" column="update_time"/>
         <result property="isDelete" column="is_delete"/>
+        <result property="renterOrderNo" column="renter_order_no"/>
     </resultMap>
 
 
@@ -61,7 +62,8 @@
 	`update_op`, 	
 	`create_time`, 	
 	`update_time`, 	
-	`is_delete`	
+	`is_delete`, 	
+	`renter_order_no`	
 
 	</sql>
 
@@ -98,7 +100,8 @@
 				`update_op`,		
 				`create_time`,		
 				`update_time`,		
-				`is_delete`		
+				`is_delete`,		
+				`renter_order_no`		
 			)
 		values
 		(
@@ -127,7 +130,8 @@
 				#{updateOp}, 		
 				#{createTime}, 		
 				#{updateTime}, 		
-				#{isDelete}		
+				#{isDelete}, 		
+				#{renterOrderNo}		
 			)
 	</insert>
 	
@@ -159,7 +163,8 @@
 				<if test="updateOp != null">`update_op`, </if>
 				<if test="createTime != null">`create_time`, </if>
 				<if test="updateTime != null">`update_time`, </if>
-				<if test="isDelete != null">`is_delete` </if>
+				<if test="isDelete != null">`is_delete`, </if>
+				<if test="renterOrderNo != null">`renter_order_no` </if>
 	        </trim>
             <trim prefix="values (" suffix=")" suffixOverrides="," >
 				<if test="orderNo != null">#{orderNo},  </if>
@@ -187,7 +192,8 @@
 				<if test="updateOp != null">#{updateOp},  </if>
 				<if test="createTime != null">#{createTime},  </if>
 				<if test="updateTime != null">#{updateTime},  </if>
-				<if test="isDelete != null">#{isDelete} </if>
+				<if test="isDelete != null">#{isDelete},  </if>
+				<if test="renterOrderNo != null">#{renterOrderNo} </if>
 	        </trim>
 	</insert>
 	
@@ -220,7 +226,8 @@
 				<if test="updateOp != null">`update_op` = #{updateOp}, </if>
 				<if test="createTime != null">`create_time` = #{createTime}, </if>
 				<if test="updateTime != null">`update_time` = #{updateTime}, </if>
-				<if test="isDelete != null">`is_delete` = #{isDelete}</if>
+				<if test="isDelete != null">`is_delete` = #{isDelete}, </if>
+				<if test="renterOrderNo != null">`renter_order_no` = #{renterOrderNo}</if>
 			</set>
 		where id = #{id}
 	</update>
@@ -253,13 +260,21 @@
 				`update_op` = #{updateOp}, 		
 				`create_time` = #{createTime}, 		
 				`update_time` = #{updateTime}, 		
-				`is_delete` = #{isDelete}		
+				`is_delete` = #{isDelete}, 		
+				`renter_order_no` = #{renterOrderNo}		
 	
 		</set>
 		where id = #{id}
 	</update>
 
 	<select id="selectOrderDeliveryByOrderNo" resultMap="BaseResultMap">
-		select <include refid="Base_Column_List" /> from order_delivery_flow where order_no = #{orderNo} and service_type = #{serviceType}
+		select
+		<include refid="Base_Column_List"/>
+		from order_delivery_flow where order_no = #{orderNo} and service_type = #{serviceType}
+	</select>
+	<select id="selectOrderDeliveryByRenterOrderNo" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List"/>
+		from order_delivery_flow where renter_order_no = #{renterOrderNo} and is_delete = 0;
 	</select>
 </mapper>

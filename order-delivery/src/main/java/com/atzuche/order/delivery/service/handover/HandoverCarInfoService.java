@@ -171,14 +171,4 @@ public class HandoverCarInfoService {
         updateFlowOrderDTO.setNewalsocaraddr(deliveryReqDTO.getOwnRealReturnAddr());
         return UpdateOrderDeliveryVO.builder().orderDeliveryDTO(orderDeliveryDTO).renterDeliveryAddrDTO(renterDeliveryAddrDTO).updateFlowOrderDTO(updateFlowOrderDTO).build();
     }
-
-    /*
-     * @Author ZhangBin
-     * @Date 2020/1/9 11:48
-     * @Description: 通过租客子订单号查询配送订单
-     *
-     **/
-    public List<RenterOrderDeliveryEntity> selectByRenterOrderNo(String renterOrderNo){
-        return renterOrderDeliveryMapper.selectByRenterOrderNo(renterOrderNo);
-    }
 }

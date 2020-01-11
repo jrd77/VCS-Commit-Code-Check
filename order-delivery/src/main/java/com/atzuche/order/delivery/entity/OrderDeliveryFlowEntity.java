@@ -128,6 +128,11 @@ public class OrderDeliveryFlowEntity implements Serializable {
 	 */
 	private Integer isDelete;
 
+    /**
+     * 子订单
+     */
+	private String renterOrderNo;
+
 
     public void setServiceTypeInfo(Integer orderType,OrderDeliveryDTO orderDeliveryDTO) {
         if (orderType == UsedDeliveryTypeEnum.USED.getValue().intValue()) {

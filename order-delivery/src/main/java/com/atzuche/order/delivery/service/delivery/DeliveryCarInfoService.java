@@ -1,8 +1,11 @@
 package com.atzuche.order.delivery.service.delivery;
 
+import com.atzuche.order.commons.entity.dto.CostBaseDTO;
+import com.atzuche.order.commons.entity.dto.GetReturnCarOverCostReqDto;
+import com.atzuche.order.delivery.common.delivery.TranSportService;
+import com.atzuche.order.delivery.common.delivery.dto.GetReturnOverCostDTO;
 import com.atzuche.order.delivery.entity.*;
-import com.atzuche.order.delivery.enums.HandoverCarTypeEnum;
-import com.atzuche.order.delivery.exception.DeliveryOrderException;
+import com.atzuche.order.delivery.enums.RenterHandoverCarTypeEnum;
 import com.atzuche.order.delivery.service.RenterOrderDeliveryService;
 import com.atzuche.order.delivery.service.handover.HandoverCarService;
 import com.atzuche.order.delivery.service.handover.OwnerHandoverCarService;
@@ -29,6 +32,7 @@ import java.util.Objects;
  * 配送信息服务
  */
 @Service
+@Slf4j
 public class DeliveryCarInfoService {
 
     @Autowired
@@ -129,8 +133,8 @@ public class DeliveryCarInfoService {
         if (renterOrderDeliveryEntity.getType() == 1 && renterOrderDeliveryEntity.getStatus() != 0) {
             GetHandoverCarDTO getHandoverCarDTO = new GetHandoverCarDTO();
             getHandoverCarDTO = getHandoverCarInfo(getHandoverCarDTO,renterOrderDeliveryEntity,carType);
-            String remark = ownerHandoverCarRemarkEntities.stream().filter(r -> (r.getType().intValue() != HandoverCarTypeEnum.RENYUN_TO_RENTER.getValue().intValue())).findFirst().get().getRemark();
-            String renterRemark = renterHandoverCarRemarkEntities.stream().filter(r -> (r.getType().intValue() != HandoverCarTypeEnum.RENYUN_TO_RENTER.getValue().intValue())).findFirst().get().getRemark();
+            String remark = ownerHandoverCarRemarkEntities.stream().filter(r -> (r.getType().intValue() != RenterHandoverCarTypeEnum.RENYUN_TO_RENTER.getValue().intValue())).findFirst().get().getRemark();
+            String renterRemark = renterHandoverCarRemarkEntities.stream().filter(r -> (r.getType().intValue() != RenterHandoverCarTypeEnum.RENYUN_TO_RENTER.getValue().intValue())).findFirst().get().getRemark();
             getHandoverCarDTO.setRenterRealGetAddrReamrk(renterRemark);
             getHandoverCarDTO.setOwnRealGetRemark(remark);
             getHandoverCarDTO.setIsChaoYunNeng(isGetOverTransport);
@@ -139,8 +143,8 @@ public class DeliveryCarInfoService {
         } else if (renterOrderDeliveryEntity.getType() == 2 && renterOrderDeliveryEntity.getStatus() != 0) {
             ReturnHandoverCarDTO returnHandoverCarDTO = new ReturnHandoverCarDTO();
             returnHandoverCarDTO = returnHandoverCarInfo(returnHandoverCarDTO,renterOrderDeliveryEntity,carType);
-            String remark = ownerHandoverCarRemarkEntities.stream().filter(r -> (r.getType().intValue() != HandoverCarTypeEnum.RENTER_TO_RENYUN.getValue().intValue())).findFirst().get().getRemark();
-            String renterRemark = renterHandoverCarRemarkEntities.stream().filter(r -> (r.getType().intValue() != HandoverCarTypeEnum.RENTER_TO_RENYUN.getValue().intValue())).findFirst().get().getRemark();
+            String remark = ownerHandoverCarRemarkEntities.stream().filter(r -> (r.getType().intValue() != RenterHandoverCarTypeEnum.RENTER_TO_RENYUN.getValue().intValue())).findFirst().get().getRemark();
+            String renterRemark = renterHandoverCarRemarkEntities.stream().filter(r -> (r.getType().intValue() != RenterHandoverCarTypeEnum.RENTER_TO_RENYUN.getValue().intValue())).findFirst().get().getRemark();
             returnHandoverCarDTO.setRenterRealGetRemark(renterRemark);
             returnHandoverCarDTO.setOwnerRealGetAddrReamrk(remark);
             returnHandoverCarDTO.setIsChaoYunNeng(isReturnOverTransport);
@@ -261,16 +265,5 @@ public class DeliveryCarInfoService {
         returnHandoverCarDTO.setRentTime(DateUtils.formate(rentTime, DateUtils.DATE_DEFAUTE_4) + "," + renterOrderDeliveryEntity.getAheadOrDelayTime());
         return  returnHandoverCarDTO;
     }
-
-
-
-
-
-
-
-
-
-
-
 
 }

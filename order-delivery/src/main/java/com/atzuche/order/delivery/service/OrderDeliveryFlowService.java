@@ -26,12 +26,11 @@ public class OrderDeliveryFlowService{
 
     /**
      * 根据订单号和配送类型获取仁云数据
-     * @param orderNo
-     * @param serviceType
+     * @param renterOrderNo
      * @return
      */
-    public OrderDeliveryFlowEntity selectOrderDeliveryFlowByOrderNo(String orderNo,String serviceType) {
-        return orderDeliveryFlowMapper.selectOrderDeliveryByOrderNo(orderNo,serviceType);
+    public OrderDeliveryFlowEntity selectOrderDeliveryFlowByOrderNo(String renterOrderNo) {
+        return orderDeliveryFlowMapper.selectOrderDeliveryByRenterOrderNo(renterOrderNo);
     }
 
 
