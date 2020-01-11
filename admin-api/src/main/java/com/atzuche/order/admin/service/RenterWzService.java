@@ -49,11 +49,11 @@ public class RenterWzService {
 
     private static final String WZ_OTHER_FINE_REMARK = "其他扣款备注";
     private static final String WZ_OTHER_FINE = "其他扣款";
-    private static final String WZ_OTHER_FINE_CODE = "qiTaFei";
+    private static final String WZ_OTHER_FINE_CODE = "100044";
 
     private static final String INSURANCE_CLAIM_REMARK = "保险理赔备注";
     private static final String INSURANCE_CLAIM = "保险理赔";
-    private static final String INSURANCE_CLAIM_CODE = "baoXianLiPei";
+    private static final String INSURANCE_CLAIM_CODE = "100045";
 
     private static final String REMARK = "remark";
     private static final String AMOUNT = "amount";
@@ -62,6 +62,8 @@ public class RenterWzService {
 
     private static final String RADIX_POINT = ".";
 
+    private static final List<String> COST_CODE_LIST = Arrays.asList("100040","100042","100041","100043","100044","100045");
+
 
     public void updateWzCost(String orderNo, List<RenterWzCostDetailReqVO> costDetails) {
         //只会处理其他扣款 和 保险理赔
@@ -69,13 +71,7 @@ public class RenterWzService {
             if(!WZ_OTHER_FINE_CODE.equals(costDetail.getCostCode()) && !INSURANCE_CLAIM_CODE.equals(costDetail.getCostCode())){
                 continue;
             }
-            RenterOrderWzCostDetailEntity fromDb = new RenterOrderWzCostDetailEntity();
-            if(WZ_OTHER_FINE_CODE.equals(costDetail.getCostCode())){
-                fromDb = renterOrderWzCostDetailService.queryInfoByOrderAndCode(orderNo, costDetail.getCostCode());
-            }
-            if(INSURANCE_CLAIM_CODE.equals(costDetail.getCostCode())){
-                //TODO 还缺海豹的接口
-            }
+            RenterOrderWzCostDetailEntity fromDb = renterOrderWzCostDetailService.queryInfoByOrderAndCode(orderNo, costDetail.getCostCode());
             try {
                 RenterOrderWzCostDetailEntity fromApp = new RenterOrderWzCostDetailEntity();
                 BeanUtils.copyProperties(costDetail,fromApp);
@@ -84,12 +80,7 @@ public class RenterWzService {
                 String content = compareHelper.compare();
                 if(StringUtils.isNotBlank(content)){
                     //记录日志 并且做修改费用处理
-                    if(WZ_OTHER_FINE_CODE.equals(costDetail.getCostCode())){
-                        updateCostStatus(orderNo, costDetail, fromDb);
-                    }
-                    if(INSURANCE_CLAIM_CODE.equals(costDetail.getCostCode())){
-                        //TODO 还缺海豹的接口
-                    }
+                    updateCostStatus(orderNo, costDetail, fromDb);
                     saveWzCostLog(orderNo, costDetail, content);
                 }
             } catch (Exception e) {
@@ -239,7 +230,18 @@ public class RenterWzService {
     }
 
     private List<RenterWzCostDetailResVO> getRenterWzCostDetailRes(String orderNo) {
-        List<RenterOrderWzCostDetailEntity> results = renterOrderWzCostDetailService.queryInfosByOrderNo(orderNo);
+        List<RenterOrderWzCostDetailEntity> results = new ArrayList<>();
+        for (String costCode : COST_CODE_LIST) {
+            RenterOrderWzCostDetailEntity dto = renterOrderWzCostDetailService.queryInfoWithSumAmountByOrderAndCode(orderNo,costCode);
+            if(dto == null){
+                dto = new RenterOrderWzCostDetailEntity();
+                dto.setAmount(0);
+                dto.setCostCode(costCode);
+                dto.setCostDesc(WzCostEnums.getDesc(costCode));
+                dto.setOrderNo(orderNo);
+            }
+            results.add(dto);
+        }
         List<RenterWzCostDetailResVO> costDetails = new ArrayList<>();
         RenterWzCostDetailResVO dto;
         for (RenterOrderWzCostDetailEntity costDetail : results) {
@@ -250,9 +252,6 @@ public class RenterWzService {
             dto.setRemarkName(WzCostEnums.getRemark(costDetail.getCostCode()));
             costDetails.add(dto);
         }
-        costDetails = costDetails.stream().sorted((dto1,dto2)->{
-            return dto1.getCostType() - dto2.getCostType();
-        }).collect(Collectors.toList());
         return costDetails;
     }
 }

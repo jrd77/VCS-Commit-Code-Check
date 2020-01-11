@@ -230,5 +230,33 @@
     <select id="queryOrderNoByStartTimeAndEndTime" resultType="java.lang.String">
         select order_no from order_status where status = 8 and create_time BETWEEN #{startTime} AND #{endTime} and is_delete = 0
     </select>
-  	
+    <update id="updateRenterOrderByOrderNo" parameterType="com.atzuche.order.parentorder.entity.OrderStatusEntity">
+        update order_status
+        <set>
+            <if test="orderNo != null">`order_no` = #{orderNo}, </if>
+            <if test="rentCarPayStatus != null">`rent_car_pay_status` = #{rentCarPayStatus}, </if>
+            <if test="rentCarRefundStatus != null">`rent_car_refund_status` = #{rentCarRefundStatus}, </if>
+            <if test="depositPayStatus != null">`deposit_pay_status` = #{depositPayStatus}, </if>
+            <if test="depositRefundStatus != null">`deposit_refund_status` = #{depositRefundStatus}, </if>
+            <if test="wzPayStatus != null">`wz_pay_status` = #{wzPayStatus}, </if>
+            <if test="wzRefundStatus != null">`wz_refund_status` = #{wzRefundStatus}, </if>
+            <if test="wzSettleStatus != null">`wz_settle_status` = #{wzSettleStatus}, </if>
+            <if test="wzSettleTime != null">`wz_settle_time` = #{wzSettleTime}, </if>
+            <if test="carDepositSettleStatus != null">`car_deposit_settle_status` = #{carDepositSettleStatus}, </if>
+            <if test="carDepositSettleTime != null">`car_deposit_settle_time` = #{carDepositSettleTime}, </if>
+            <if test="settleStatus != null">`settle_status` = #{settleStatus}, </if>
+            <if test="settleTime != null">`settle_time` = #{settleTime}, </if>
+            <if test="isDispatch != null">`is_dispatch` = #{isDispatch}, </if>
+            <if test="dispatchStatus != null">`dispatch_status` = #{dispatchStatus}, </if>
+            <if test="isClaims != null">`is_claims` = #{isClaims}, </if>
+            <if test="isDetain != null">`is_detain` = #{isDetain}, </if>
+            <if test="isWz != null">`is_wz` = #{isWz}, </if>
+            <if test="isRiskAccident != null">`is_risk_accident` = #{isRiskAccident}, </if>
+            <if test="status != null">`status` = #{status}, </if>
+            <if test="createOp != null">`create_op` = #{createOp}, </if>
+            <if test="updateOp != null">`update_op` = #{updateOp}, </if>
+            <if test="isDelete != null">`is_delete` = #{isDelete}</if>
+        </set>
+        where order_no = #{orderNo}
+    </update>
 </mapper>
