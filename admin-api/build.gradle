@@ -64,5 +64,7 @@ dependencies {
     compile project(":order-core-all:renter-all:renter-commodity")
     compile project(":order-settle")
 
+    compile project(":order-remote-service:order-remote-mem")
+
 
 }

@@ -42,6 +42,7 @@ import com.autoyol.coupon.api.CouponSettleRequest;
 import com.autoyol.platformcost.CommonUtils;
 import com.dianping.cat.Cat;
 import lombok.extern.slf4j.Slf4j;
+import order.atzuche.order.mem.MemProxyService;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -90,7 +91,7 @@ public class ModifyOrderService {
 	@Autowired
 	private RenterGoodsService renterGoodsService;
 	@Autowired
-	private MemberService memberService;
+	private MemProxyService memberService;
 	@Autowired
 	private ModifyOrderForRenterService modifyOrderForRenterService;
 	@Autowired
