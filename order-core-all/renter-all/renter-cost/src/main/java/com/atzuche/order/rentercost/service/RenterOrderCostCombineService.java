@@ -698,7 +698,7 @@ public class RenterOrderCostCombineService {
         if(returnFlag && cityDTO !=null) {
             getCost.setRenterLocation(cityDTO.getLon()+","+ cityDTO.getLat());
         } else {
-            getCost.setRenterLocation(srvReturnLon+","+srvReturnLat);
+            getCost.setRenterLocation(srvGetLon+","+srvGetLat);
         }
 
         getCost.setSumJudgeFreeFee(sumJudgeFreeFeeStr);
