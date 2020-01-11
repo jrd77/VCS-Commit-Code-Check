@@ -31,6 +31,7 @@ import java.util.stream.Collectors;
  * @author <a href="mailto:lianglin.sjtu@gmail.com">AndySjtu</a>
  * @date 2020/1/11 3:03 下午
  **/
+@Service
 public class CarProxyService {
     private final static Logger log = LoggerFactory.getLogger(CarProxyService.class);
 
@@ -195,4 +196,6 @@ public class CarProxyService {
         coverPic = collect.size()<=0 ?  "" : collect.get(0).getPicPath();
         return coverPic;
     }
+
+
 }
