@@ -13,6 +13,7 @@ import com.atzuche.order.commons.enums.OrderStatusEnum;
 import com.atzuche.order.commons.enums.RenterCashCodeEnum;
 import com.atzuche.order.commons.enums.cashier.TransStatusEnum;
 import com.atzuche.order.commons.service.OrderPayCallBack;
+import com.atzuche.order.flow.service.OrderFlowService;
 import com.atzuche.order.parentorder.dto.OrderStatusDTO;
 import com.atzuche.order.parentorder.entity.OrderStatusEntity;
 import com.atzuche.order.parentorder.service.OrderStatusService;
@@ -86,6 +87,7 @@ public class CashierService {
     @Autowired private AccountRenterCostSettleDetailNoTService accountRenterCostSettleDetailNoTService;
     @Autowired private AccountOwnerCostSettleDetailNoTService accountOwnerCostSettleDetailNoTService;
     @Autowired private OrderStatusService orderStatusService;
+    @Autowired private OrderFlowService orderFlowService;
     @Autowired private AccountRenterCostSettleNoTService accountRenterCostSettleNoTService;
 
 
@@ -333,7 +335,7 @@ public class CashierService {
     /**  ***************************************** 退还押金 start ************************************************* */
 
     /**
-     * 退还车辆押金
+     * 结算退还车辆押金
      */
     @CatAnnotation
     @Transactional(rollbackFor=Exception.class)
@@ -346,7 +348,11 @@ public class CashierService {
         DetainRenterDepositReqVO detainRenterDepositReqVO = new DetainRenterDepositReqVO();
         BeanUtils.copyProperties(cashierRefundApplyReq,detainRenterDepositReqVO);
         detainRenterDepositReqVO.setUniqueNo(id.toString());
-        return accountRenterDepositService.detainRenterDeposit(detainRenterDepositReqVO);
+        //2 押金账户资金转移接口
+        int depositDetailId = accountRenterDepositService.detainRenterDeposit(detainRenterDepositReqVO);
+        // 3 更新押金结算状态
+        accountRenterDepositService.updateOrderDepositSettle(detainRenterDepositReqVO);
+        return depositDetailId;
     }
     /**
      * 结算退还租车费用
@@ -541,6 +547,8 @@ public class CashierService {
                 OrderPayStatusEnum.PAYED.getStatus()== entity.getDepositPayStatus()
         ){
             orderStatusDTO.setStatus(OrderStatusEnum.TO_GET_CAR.getStatus());
+            //记录订单流程
+            orderFlowService.inserOrderStatusChangeProcessInfo(orderStatusDTO.getOrderNo(), OrderStatusEnum.TO_GET_CAR);
         }
 
     }
