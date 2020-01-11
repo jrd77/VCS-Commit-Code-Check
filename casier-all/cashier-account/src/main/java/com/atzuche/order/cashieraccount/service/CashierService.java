@@ -37,6 +37,8 @@ import com.atzuche.order.accountrenterwzdepost.vo.req.CreateOrderRenterWZDeposit
 import com.atzuche.order.accountrenterwzdepost.vo.req.PayedOrderRenterDepositWZDetailReqVO;
 import com.atzuche.order.accountrenterwzdepost.vo.req.PayedOrderRenterWZDepositReqVO;
 import com.atzuche.order.accountrenterwzdepost.vo.req.RenterWZDepositCostReqVO;
+import com.atzuche.order.cashieraccount.entity.CashierEntity;
+import com.atzuche.order.cashieraccount.mapper.CashierMapper;
 import com.atzuche.order.cashieraccount.service.notservice.CashierNoTService;
 import com.atzuche.order.cashieraccount.service.notservice.CashierRefundApplyNoTService;
 import com.atzuche.order.cashieraccount.vo.req.CashierDeductDebtReqVO;
@@ -52,6 +54,7 @@ import com.autoyol.commons.utils.GsonUtils;
 import com.autoyol.commons.web.ErrorCode;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -87,7 +90,8 @@ public class CashierService {
     @Autowired private AccountOwnerCostSettleDetailNoTService accountOwnerCostSettleDetailNoTService;
     @Autowired private OrderStatusService orderStatusService;
     @Autowired private AccountRenterCostSettleNoTService accountRenterCostSettleNoTService;
-
+    @Autowired
+    private CashierMapper cashierMapper;
 
     /**  *************************************** 租车费用 start****************************************************/
     /**
@@ -544,4 +548,10 @@ public class CashierService {
         }
 
     }
+    
+    
+    public List<CashierEntity> getCashierRentCostsByOrderNo(String orderNo){
+    	return cashierMapper.getCashierRentCostsByOrderNo(orderNo);
+    }
+    
 }

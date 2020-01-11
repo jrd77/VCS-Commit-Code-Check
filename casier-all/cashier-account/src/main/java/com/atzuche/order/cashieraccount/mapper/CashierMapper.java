@@ -60,4 +60,12 @@ public interface CashierMapper{
      * @return
      */
     List<CashierEntity> getCashierRentCosts(@Param("orderNo")String orderNo, @Param("memNo")String menNo, @Param("payKind")String payKind, @Param("payType")String payType);
+    
+    /**
+     * 根据订单号查询收银台支付记录列表
+     * @param orderNo
+     * @return
+     */
+    List<CashierEntity> getCashierRentCostsByOrderNo(@Param("orderNo")String orderNo);
+    
 }

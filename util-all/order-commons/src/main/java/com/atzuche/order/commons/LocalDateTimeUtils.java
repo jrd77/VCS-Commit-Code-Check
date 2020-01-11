@@ -6,6 +6,8 @@ import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAdjusters;
 import java.util.Date;
+
+import com.autoyol.commons.utils.StringUtils;
 /*
  * @Author ZhangBin
  * @Date 2019/12/13 18:33
@@ -82,6 +84,9 @@ public class LocalDateTimeUtils {
      * @return
      */
     public static String formatDateTime(LocalDateTime dateTime) {
+    	if(dateTime == null) {
+    		return "";
+    	}
         return formatDateTime(dateTime, DEFAULT_PATTERN);
     }
 
@@ -340,6 +345,20 @@ public class LocalDateTimeUtils {
         Instant instant = localDateTime.atZone(ZONE_ID).toInstant();
         return instant.toEpochMilli();
     }
+    
+    /**
+     * 入参时间格式转换成LocalDateTime
+     * @param dateTime
+     * @return
+     */
+    public static LocalDateTime parseStringToDateTime(String dateTime) {
+    	if(StringUtils.isBlank(dateTime)) {
+    		return null;
+    	}
+        LocalDateTime localDateTime = LocalDateTime.parse(dateTime, DateTimeFormatter.ofPattern(DEFAULT_PATTERN));
+        return localDateTime;
+    }
+    
 
     /**
      * 将localdate转化为  年月日时分秒格式的long格式
