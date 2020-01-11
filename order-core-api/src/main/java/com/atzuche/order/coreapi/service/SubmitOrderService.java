@@ -138,7 +138,7 @@ public class SubmitOrderService {
         //2.下单校验
         //2.1库存校验
         OrderInfoDTO orderInfoDTO = initOrderInfoDTO(orderReqVO);
-        stockService.checkCarStock(orderInfoDTO);
+        //stockService.checkCarStock(orderInfoDTO);
 
         //2.2风控
         Integer riskAuditId = submitOrderRiskAuditService.check(buildSubmitOrderRiskCheckReqVO(orderReqVO, reqTime));
@@ -149,7 +149,7 @@ public class SubmitOrderService {
         String orderNo = uniqueOrderNoService.getOrderNo();
         //2.5.锁定库存
         orderInfoDTO.setOrderNo(orderNo);
-        stockService.cutCarStock(orderInfoDTO);
+        //stockService.cutCarStock(orderInfoDTO);
 
         //提前延后时间计算
         CarRentTimeRangeResVO carRentTimeRangeResVO = carRentalTimeApiService.getCarRentTimeRange(buildCarRentTimeRangeReqVO(orderReqVO));
