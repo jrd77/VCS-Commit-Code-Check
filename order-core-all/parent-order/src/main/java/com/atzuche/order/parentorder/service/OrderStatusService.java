@@ -78,4 +78,8 @@ public class OrderStatusService {
     public List<String> queryOrderNoByStartTimeAndEndTime(Date startTime, Date endTime) {
         return orderStatusMapper.queryOrderNoByStartTimeAndEndTime(startTime,endTime);
     }
+
+    public int updateRenterOrderByOrderNo(OrderStatusEntity orderStatusEntity) {
+        return orderStatusMapper.updateRenterOrderByOrderNo(orderStatusEntity);
+    }
 }

@@ -1,5 +1,6 @@
 package com.atzuche.order.delivery.vo.delivery;
 
+import com.atzuche.order.delivery.entity.OrderDeliveryFlowEntity;
 import lombok.Data;
 import lombok.ToString;
 
@@ -20,7 +21,7 @@ public class OrderDeliveryVO implements Serializable {
     /**
      * 仁云需要的数据
      */
-    private RenYunFlowOrderDTO renYunFlowOrderDTO;
+    private OrderDeliveryFlowEntity orderDeliveryFlowEntity;
     /**
      * 租客配送地址信息
      */

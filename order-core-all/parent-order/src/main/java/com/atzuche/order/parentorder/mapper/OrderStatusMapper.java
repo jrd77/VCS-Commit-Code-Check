@@ -27,4 +27,6 @@ public interface OrderStatusMapper{
     int updateByPrimaryKeySelective(OrderStatusEntity record);
 
     List<String> queryOrderNoByStartTimeAndEndTime(@Param("startTime") Date startTime,@Param("endTime") Date endTime);
+
+    int updateRenterOrderByOrderNo(OrderStatusEntity orderStatusEntity);
 }

@@ -12,4 +12,5 @@ public class OwnerOrderStatusDTO {
      * 是否取消 0-正常，1-取消
      */
     private Integer isCancel;
+
 }

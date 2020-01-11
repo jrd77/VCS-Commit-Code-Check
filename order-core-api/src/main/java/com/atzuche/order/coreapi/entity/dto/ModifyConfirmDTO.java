@@ -16,9 +16,13 @@ public class ModifyConfirmDTO {
 	 */
 	private String renterOrderNo;
 	/**
+	 * 车主订单号
+	 */
+	private String ownerOrderNo;
+	/**
 	 * 车主会员号
 	 */
-	private String memNo;
+	private String ownerMemNo;
 	/**
 	 * 操作类型：1-同意，2-拒绝
 	 */

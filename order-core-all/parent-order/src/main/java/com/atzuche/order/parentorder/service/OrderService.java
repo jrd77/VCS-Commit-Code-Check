@@ -91,4 +91,13 @@ public class OrderService {
     public OrderEntity getOrderByOrderNoAndMemNo(String orderNo, String memNo) {
     	return orderMapper.getOrderByOrderNoAndMemNo(orderNo, memNo);
     }
+    /*
+     * @Author ZhangBin
+     * @Date 2020/1/11 11:22
+     * @Description: 通过订单号更新订单信息
+     * 
+     **/
+    public int updateOrderByOrderNo(OrderEntity orderEntity){
+       return orderMapper.updateByOrderNoSelective(orderEntity);
+    }
 }

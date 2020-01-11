@@ -93,6 +93,16 @@ public class RenterOrderService {
     public Integer updateRenterOrderEffective(Integer id, Integer effectiveFlag) {
         return renterOrderMapper.updateRenterOrderEffective(id, effectiveFlag);
     }
+    
+    /**
+     * 修改租客子单agreeFlag标志
+     * @param id
+     * @param agreeFlag
+     * @return Integer
+     */
+    public Integer updateRenterOrderAgreeFlag(Integer id, Integer agreeFlag) {
+    	return renterOrderMapper.updateRenterOrderAgreeFlag(id, agreeFlag);
+    }
 
     /**
      * 保存租客子订单
@@ -189,6 +199,7 @@ public class RenterOrderService {
         record.setIsAbatement(renterOrderReqVO.getAbatement()==null?0:Integer.valueOf(renterOrderReqVO.getAbatement()));
         record.setIsUseSpecialPrice(Integer.valueOf(renterOrderReqVO.getUseSpecialPrice()==null?"0":renterOrderReqVO.getUseSpecialPrice()));
         record.setChildStatus(RenterChildStatusEnum.PROCESS_ING.getCode());
+        record.setRenterMemNo(renterOrderReqVO.getMemNo());
         renterOrderMapper.insertSelective(record);
         //保存租客订单费用、费用明细、补贴明细等
         renterOrderCostRespDTO.setRenterOrderSubsidyDetailDTOList(context.getOrderSubsidyDetailList());
@@ -479,4 +490,6 @@ public class RenterOrderService {
     public RenterOrderEntity getChangeRenterOrderByOrderNo(String orderNo) {
         return renterOrderMapper.getChangeRenterOrderByOrderNo(orderNo);
     }
+
+
 }
