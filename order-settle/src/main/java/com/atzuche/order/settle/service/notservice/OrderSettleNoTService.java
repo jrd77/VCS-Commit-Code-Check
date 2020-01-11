@@ -407,8 +407,16 @@ public class OrderSettleNoTService {
         oilAmtDTO.setCostBaseDTO(costBaseDTO);
 
         oilAmtDTO.setCarOwnerType(ownerGoodsDetail.getCarOwnerType());
-        // TODO
-        oilAmtDTO.setCityCode(null);
+        //
+        OrderEntity orderEntity = orderService.getOrderEntity(ownerOrder.getOrderNo());
+        String cityCodeStr = "";
+        if(Objects.nonNull(orderEntity) && Objects.nonNull(orderEntity.getCityCode())){
+            cityCodeStr = orderEntity.getCityCode();
+        }
+        if(StringUtil.isBlank(cityCodeStr)){
+            throw new RuntimeException("结算下单城市不存在");
+        }
+        oilAmtDTO.setCityCode(Integer.parseInt(cityCodeStr));
         oilAmtDTO.setEngineType(ownerGoodsDetail.getCarEngineType());
         oilAmtDTO.setOilVolume(ownerGoodsDetail.getCarOilVolume());
         //
