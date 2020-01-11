@@ -7,6 +7,8 @@ import java.io.Serializable;
 import java.util.List;
 
 /**
+ * 下单前费用计算返回信息
+ *
  * @author pengcheng.fu
  * @date 2020/1/11 14:17
  */

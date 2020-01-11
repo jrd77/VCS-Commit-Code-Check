@@ -22,7 +22,7 @@ public class DisCouponMemInfoVO implements Serializable {
     private String id;
     @AutoDocProperty(value = "优惠券名称")
     private String disName;
-    @AutoDocProperty(value = "券类型 0:平台券 1:车主券 ")
+    @AutoDocProperty(value = "券类型")
     private String couponType;
     @AutoDocProperty(value = "优惠券有效期开始时间", hidden = true)
     private String startDate;
@@ -64,10 +64,10 @@ public class DisCouponMemInfoVO implements Serializable {
     @AutoDocProperty(value = "优惠数据展示字段，含￥为金额，前端可以根据此判断是金额还是折扣-[5.9.1变更]")
     private String showPreferential;
 
-    @AutoDocProperty(value = "【5.12新增】取还车优惠券是否全免,0不全免,1全免")
+    @AutoDocProperty(value = "取还车优惠券是否全免,0不全免,1全免")
     private String isCostFree;
 
-    @AutoDocProperty(value = "【5.12新增】平台券类型,该值为8表示取还车优惠券类型，不为8表示原来的平台券")
+    @AutoDocProperty(value = "平台券类型,该值为8表示取还车优惠券类型，不为8表示原来的平台券")
     private String platformCouponType;
 
     @Override
