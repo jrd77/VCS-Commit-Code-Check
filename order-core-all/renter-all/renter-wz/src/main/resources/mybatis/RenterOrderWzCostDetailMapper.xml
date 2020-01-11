@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.atzuche.com.renterwz.mapper.RenterOrderWzCostDetailMapper">
+<mapper namespace="com.atzuche.order.renterwz.mapper.RenterOrderWzCostDetailMapper">
 	<sql id="select_column">
 		id,order_no,car_plate_num,mem_no,cost_code,cost_desc,amount,note,source_type,operator_id,operator_name,cost_status,remark,create_time,create_op,update_time,update_op,is_delete
 	</sql>

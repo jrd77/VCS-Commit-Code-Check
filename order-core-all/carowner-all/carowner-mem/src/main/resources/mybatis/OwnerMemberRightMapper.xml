@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 
-<mapper namespace="com.atzuche.com.owner.mem.mapper.OwnerMemberRightMapper">
+<mapper namespace="com.atzuche.order.owner.mem.mapper.OwnerMemberRightMapper">
 
     <resultMap type="com.atzuche.order.owner.mem.entity.OwnerMemberRightEntity" id="BaseResultMap">
         <result property="id" column="id"/>

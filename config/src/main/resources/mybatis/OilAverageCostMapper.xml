@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.atzuche.com.config.oilpriceconfig.OilAverageCostMapper">
+<mapper namespace="com.atzuche.order.config.oilpriceconfig.OilAverageCostMapper">
     <resultMap id="oilAverageCost" type="com.atzuche.order.config.oilpriceconfig.OilAverageCostEntity">
         <id property="id" column="id"/>
          <result column="engine_type" property="engineType"></result>
