@@ -292,6 +292,7 @@ public class DeliveryCarService {
         orderDeliveryFlowEntity.setTenantTurnoverNo(String.valueOf(renterMemberDTO.getOrderSuccessCount()));
         orderDeliveryFlowEntity.setOwnerType(Integer.valueOf(ownerGoodsDetailDTO.getType()));
         orderDeliveryFlowEntity.setSceneName(orderReqVO.getSceneCode());
+        orderDeliveryFlowEntity.setIsDelete(0);
         orderDeliveryFlowEntity.setDisplacement(String.valueOf(ownerGoodsDetailDTO.getCarCylinderCapacity()));
         orderDeliveryFlowEntity.setSource(orderReqVO.getSource());
         orderDeliveryVO.setOrderDeliveryDTO(orderDeliveryDTO);
