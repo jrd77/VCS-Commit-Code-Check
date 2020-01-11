@@ -9,9 +9,13 @@ import com.atzuche.order.accountplatorm.entity.AccountPlatformProfitDetailEntity
 import com.atzuche.order.accountplatorm.entity.AccountPlatformSubsidyDetailEntity;
 import com.atzuche.order.accountplatorm.service.notservice.AccountPlatformProfitDetailNotService;
 import com.atzuche.order.accountplatorm.service.notservice.AccountPlatformSubsidyDetailNoTService;
+import com.atzuche.order.accountrenterclaim.entity.AccountRenterClaimCostSettleEntity;
+import com.atzuche.order.accountrenterclaim.service.notservice.AccountRenterClaimCostSettleNoTService;
 import com.atzuche.order.accountrenterdeposit.service.AccountRenterDepositService;
 import com.atzuche.order.accountrenterdeposit.vo.req.DetainRenterDepositReqVO;
 import com.atzuche.order.accountrenterdeposit.vo.res.AccountRenterDepositResVO;
+import com.atzuche.order.accountrenterdetain.entity.AccountRenterDetainCostEntity;
+import com.atzuche.order.accountrenterdetain.service.notservice.AccountRenterDetainCostNoTService;
 import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostDetailEntity;
 import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostSettleDetailEntity;
 import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostSettleEntity;
@@ -64,6 +68,8 @@ public class CashierSettleService {
     @Autowired private AccountRenterCostSettleNoTService accountRenterCostSettleNoTService;
     @Autowired private AccountRenterCostDetailNoTService accountRenterCostDetailNoTService;
     @Autowired private AccountOwnerCostSettleService accountOwnerCostSettleService;
+    @Autowired private AccountRenterClaimCostSettleNoTService accountRenterClaimCostSettleNoTService;
+    @Autowired private AccountRenterDetainCostNoTService accountRenterDetainCostNoTService;
 
 
     /**
@@ -272,5 +278,32 @@ public class CashierSettleService {
             entity.setConsoleFineAmt(consoleFineAmt);
             accountOwnerCostSettleService.insertAccountOwnerCostSettle(entity);
         }
+    }
+
+    /**
+     * 根据订单号查询订单 理赔信息
+     * @param orderNo
+     */
+    public boolean getOrderClaim(String orderNo) {
+        boolean result = false;
+        AccountRenterClaimCostSettleEntity accountRenterClaimCostSettle = accountRenterClaimCostSettleNoTService.getRenterClaimCost(orderNo);
+        if(Objects.nonNull(accountRenterClaimCostSettle) && Objects.nonNull(accountRenterClaimCostSettle.getId())){
+            result = true;
+        }
+        return result;
+    }
+
+    /**
+     * 根据订单号查询订单 暂扣
+     * @param orderNo
+     * @return
+     */
+    public boolean getOrderDetain(String orderNo) {
+        boolean result = false;
+        AccountRenterDetainCostEntity accountRenterDetainCostEntity = accountRenterDetainCostNoTService.getRenterDetaint(orderNo);
+        if(Objects.nonNull(accountRenterDetainCostEntity) && Objects.nonNull(accountRenterDetainCostEntity.getId())){
+            result = true;
+        }
+        return result;
     }
 }

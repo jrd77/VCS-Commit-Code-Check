@@ -62,9 +62,6 @@ public class AccountRenterWzDepositNoTService {
      */
     public void updateRenterDeposit(PayedOrderRenterWZDepositReqVO payedOrderWZRenterDeposit) {
         AccountRenterWzDepositEntity accountRenterDepositEntity = accountRenterWzDepositMapper.selectByOrderAndMemNo(payedOrderWZRenterDeposit.getOrderNo(),payedOrderWZRenterDeposit.getMemNo());
-        if(Objects.isNull(accountRenterDepositEntity)){
-            throw new PayOrderRenterWZDepositException();
-        }
         BeanUtils.copyProperties(payedOrderWZRenterDeposit,accountRenterDepositEntity);
         int result = accountRenterWzDepositMapper.updateByPrimaryKeySelective(accountRenterDepositEntity);
         if(result==0){

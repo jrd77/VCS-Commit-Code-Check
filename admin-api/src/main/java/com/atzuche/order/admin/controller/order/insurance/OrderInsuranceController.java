@@ -2,8 +2,12 @@ package com.atzuche.order.admin.controller.order.insurance;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.atzuche.order.admin.cat.CatLogRecord;
 import com.atzuche.order.admin.common.AdminUserUtil;
+import com.atzuche.order.admin.constant.cat.UrlConstant;
+import com.atzuche.order.admin.constant.description.DescriptionConstant;
 import com.atzuche.order.admin.controller.BaseController;
+import com.atzuche.order.admin.description.LogDescription;
 import com.atzuche.order.admin.dto.InsurancePurchaseDTO;
 import com.atzuche.order.admin.dto.InsurancePurchaseResultDTO;
 import com.atzuche.order.admin.dto.OrderInsuranceAdditionRequestDTO;
@@ -75,10 +79,12 @@ public class OrderInsuranceController extends BaseController {
         //参数验证
         validateParameter(bindingResult);
         try{
-            logger.info("购买保险列表入参:{}",orderInsuranceRequestVO.toString());
+            logger.info(LogDescription.getLogDescription(DescriptionConstant.CONSOLE_ORDER_INSURANCE_LIST, DescriptionConstant.INPUT_TEXT),orderInsuranceRequestVO.toString());
+            CatLogRecord.successLog(LogDescription.getCatDescription(DescriptionConstant.CONSOLE_ORDER_INSURANCE_LIST, DescriptionConstant.SUCCESS_TEXT), UrlConstant.CONSOLE_ORDER_INSURANCE_LIST, orderInsuranceRequestVO);
             return ResponseData.success(getPurchaseList(orderInsuranceRequestVO));
         } catch (Exception e) {
-            logger.info("购买保险列表异常{}",e);
+            logger.info(LogDescription.getLogDescription(DescriptionConstant.CONSOLE_ORDER_INSURANCE_LIST, DescriptionConstant.EXCEPTION_TEXT),e);
+            CatLogRecord.failLog(LogDescription.getCatDescription(DescriptionConstant.CONSOLE_ORDER_INSURANCE_LIST, DescriptionConstant.EXCEPTION_TEXT), UrlConstant.CONSOLE_ORDER_INSURANCE_LIST, orderInsuranceRequestVO, e);
             throw new OrderInsuranceException(ErrorCode.SYS_ERROR.getCode(),ErrorCode.SYS_ERROR.getText());
         }
 
@@ -90,7 +96,8 @@ public class OrderInsuranceController extends BaseController {
         //参数验证
         validateParameter(bindingResult);
         try{
-            logger.info("手工录入保险信息入参:{}",orderInsuranceAdditionRequestVO.toString());
+
+            logger.info(LogDescription.getLogDescription(DescriptionConstant.CONSOLE_ORDER_INSURANCE_ADD, DescriptionConstant.INPUT_TEXT),orderInsuranceAdditionRequestVO.toString());
             OrderInsuranceAdditionRequestDTO orderInsuranceAdditionRequestDTO = new OrderInsuranceAdditionRequestDTO();
             //属性拷贝
             BeanUtils.copyProperties(orderInsuranceAdditionRequestVO,orderInsuranceAdditionRequestDTO);
@@ -106,12 +113,16 @@ public class OrderInsuranceController extends BaseController {
             JSONObject jsonObject = JSON.parseObject(result);
             String resCode = jsonObject.getString(RES_CODE);
             if (ErrorCode.SUCCESS.getCode().equalsIgnoreCase(resCode)) {
-                return ResponseData.success(null);
+                CatLogRecord.successLog(LogDescription.getCatDescription(DescriptionConstant.CONSOLE_ORDER_INSURANCE_ADD, DescriptionConstant.SUCCESS_TEXT), UrlConstant.CONSOLE_ORDER_INSURANCE_ADD, orderInsuranceAdditionRequestVO);
+                return ResponseData.success();
             } else {
+                CatLogRecord.failLog(LogDescription.getCatDescription(DescriptionConstant.CONSOLE_ORDER_INSURANCE_ADD, DescriptionConstant.EXCEPTION_TEXT), UrlConstant.CONSOLE_ORDER_INSURANCE_ADD, orderInsuranceAdditionRequestVO, new OrderInsuranceException(resCode, jsonObject.getString(RES_MSG)));
                 return new ResponseData<>(resCode, jsonObject.getString(RES_MSG));
             }
         } catch (Exception e) {
-            logger.info("手工录入保险信息异常{}",e);
+            logger.info(LogDescription.getLogDescription(DescriptionConstant.CONSOLE_ORDER_INSURANCE_ADD, DescriptionConstant.EXCEPTION_TEXT),e);
+            CatLogRecord.failLog(LogDescription.getCatDescription(DescriptionConstant.CONSOLE_ORDER_INSURANCE_ADD, DescriptionConstant.EXCEPTION_TEXT), UrlConstant.CONSOLE_ORDER_INSURANCE_ADD, orderInsuranceAdditionRequestVO, e);
+
             throw new OrderInsuranceException(ErrorCode.SYS_ERROR.getCode(),ErrorCode.SYS_ERROR.getText());
         }
 
@@ -134,6 +145,7 @@ public class OrderInsuranceController extends BaseController {
                     String suffixes=batchFile.getOriginalFilename().substring(batchFile.getOriginalFilename().lastIndexOf("."), batchFile.getOriginalFilename().length());
                     String key = "console/import/insurance/"+str.substring(0, 8)+"/"+ CommonUtils.getRandomNumUpChar(8)+suffixes;
                     //上传文件
+                    //注意，这块OSS内容是从老管理后台拷贝过来的，bucket直接写死的
                     OSSUtils.uploadMultipartFile(key, batchFile);
                     OrderInsuranceImportRequestDTO orderInsuranceImportRequestDTO = new OrderInsuranceImportRequestDTO();
                     orderInsuranceImportRequestDTO.setOssFileKey(key);
@@ -144,7 +156,7 @@ public class OrderInsuranceController extends BaseController {
                     if (!StringUtils.isEmpty(body)) {
                         JSONObject jsonObject = JSON.parseObject(body);
                         if(!ErrorCode.SUCCESS.getCode().equals(jsonObject.getString(RES_CODE))){
-                            return ResponseData.success(null);
+                            return ResponseData.success();
                         }
                         //调接口保存数据
                         return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), "文件导入中，请稍候查询");

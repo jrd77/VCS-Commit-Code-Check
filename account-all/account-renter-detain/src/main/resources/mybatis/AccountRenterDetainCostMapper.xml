@@ -77,10 +77,13 @@
 			</set>
 		where id = #{id} and version = #{version}
 	</update>
-	
+
 
     <select id="getRenterDetainAmt" resultMap="BaseResultMap">
-
+        select <include refid="Base_Column_List" /> from account_renter_detain_cost where order_no = #{orderNo}  and mem_no = #{memNo} limit 1
+    </select>
+    <select id="getRenterDetain" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List" /> from account_renter_detain_cost where order_no = #{orderNo} limit 1
     </select>
 
 </mapper>

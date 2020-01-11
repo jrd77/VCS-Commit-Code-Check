@@ -12,12 +12,8 @@ import com.atzuche.order.cashieraccount.vo.req.CashierDeductDebtReqVO;
 import com.atzuche.order.cashieraccount.vo.req.CashierRefundApplyReqVO;
 import com.atzuche.order.cashieraccount.vo.req.DeductDepositToRentCostReqVO;
 import com.atzuche.order.cashieraccount.vo.res.CashierDeductDebtResVO;
-import com.atzuche.order.coin.service.AccountRenterCostCoinService;
 import com.atzuche.order.commons.IpUtil;
-import com.atzuche.order.commons.entity.dto.CostBaseDTO;
-import com.atzuche.order.commons.entity.dto.MileageAmtDTO;
-import com.atzuche.order.commons.entity.dto.OilAmtDTO;
-import com.atzuche.order.commons.entity.dto.OwnerGoodsDetailDTO;
+import com.atzuche.order.commons.entity.dto.*;
 import com.atzuche.order.commons.enums.RenterCashCodeEnum;
 import com.atzuche.order.commons.enums.SubsidySourceCodeEnum;
 import com.atzuche.order.commons.enums.account.debt.DebtTypeEnum;
@@ -34,11 +30,12 @@ import com.atzuche.order.ownercost.entity.OwnerOrderPurchaseDetailEntity;
 import com.atzuche.order.ownercost.entity.OwnerOrderSubsidyDetailEntity;
 import com.atzuche.order.ownercost.service.*;
 import com.atzuche.order.parentorder.dto.OrderStatusDTO;
+import com.atzuche.order.parentorder.entity.OrderStatusEntity;
 import com.atzuche.order.parentorder.service.OrderStatusService;
+import com.atzuche.order.rentercommodity.service.RenterGoodsService;
 import com.atzuche.order.rentercost.entity.*;
 import com.atzuche.order.rentercost.service.*;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
-import com.atzuche.order.renterorder.service.AutoCoinService;
 import com.atzuche.order.renterorder.service.RenterOrderService;
 import com.atzuche.order.settle.exception.OrderSettleFlatAccountException;
 import com.atzuche.order.settle.vo.req.*;
@@ -73,11 +70,10 @@ public class OrderSettleNoTService {
     @Autowired private RenterOrderCostCombineService renterOrderCostCombineService;
     @Autowired private HandoverCarService handoverCarService;
     @Autowired private OwnerGoodsService ownerGoodsService;
-    @Autowired private AutoCoinService autoCoinService;
-    @Autowired private AccountRenterCostCoinService accountRenterCostCoinService;
     @Autowired private RenterOrderService renterOrderService;
     @Autowired private OwnerOrderService ownerOrderService;
     @Autowired private OrderStatusService orderStatusService;
+    @Autowired private RenterGoodsService renterGoodsService;
 
 
     /**
@@ -128,10 +124,27 @@ public class OrderSettleNoTService {
         return settleOrders;
     }
     /**
-     * 校验是否可以结算
+     * 校验是否可以结算 校验订单状态 以及是否存在 理赔暂扣 存在不能进行结算 并CAT告警
      * @param renterOrder
      */
     public void check(RenterOrderEntity renterOrder) {
+        // 1 订单校验是否可以结算
+        OrderStatusEntity orderStatus = orderStatusService.getByOrderNo(renterOrder.getOrderNo());
+        //2校验租客是否还车
+//        boolean isReturn = handoverCarService.isReturnCar(renterOrder.getOrderNo());
+//        if(!isReturn){
+//            throw new RuntimeException("租客未还车不能结算");
+//        }
+        //3 校验是否存在 理赔  存在不结算
+        boolean isClaim = cashierSettleService.getOrderClaim(renterOrder.getOrderNo());
+        if(isClaim){
+            throw new RuntimeException("租客存在理赔信息不能结算");
+        }
+        //3 是否存在 暂扣存在不结算
+        boolean isDetain = cashierSettleService.getOrderDetain(renterOrder.getOrderNo());
+        if(isDetain){
+            throw new RuntimeException("租客存在暂扣信息不能结算");
+        }
     }
 
     /**
@@ -153,15 +166,15 @@ public class OrderSettleNoTService {
      * @param renterOrder
      * @return
      */
-    private OilAmtDTO getOilAmtDTO(SettleOrders settleOrders,RenterOrderEntity renterOrder,HandoverCarRepVO handoverCarRep,OwnerGoodsDetailDTO ownerGoodsDetail) {
+    private OilAmtDTO getOilAmtDTO(SettleOrders settleOrders,RenterOrderEntity renterOrder,HandoverCarRepVO handoverCarRep,RenterGoodsDetailDTO renterGoodsDetail) {
         OilAmtDTO oilAmtDTO = new OilAmtDTO();
         CostBaseDTO costBaseDTO = getCostBaseRent(settleOrders,renterOrder);
         oilAmtDTO.setCostBaseDTO(costBaseDTO);
-        oilAmtDTO.setCarOwnerType(ownerGoodsDetail.getCarOwnerType());
+        oilAmtDTO.setCarOwnerType(renterGoodsDetail.getCarOwnerType());
         // TODO
         oilAmtDTO.setCityCode(null);
-        oilAmtDTO.setEngineType(ownerGoodsDetail.getCarEngineType());
-        oilAmtDTO.setOilVolume(ownerGoodsDetail.getCarOilVolume());
+        oilAmtDTO.setEngineType(renterGoodsDetail.getCarEngineType());
+        oilAmtDTO.setOilVolume(renterGoodsDetail.getCarOilVolume());
         // TODO
         oilAmtDTO.setOilScaleDenominator(null);
 
@@ -192,14 +205,14 @@ public class OrderSettleNoTService {
     /**
      * 交接车-获取超里程费用
      */
-    private MileageAmtDTO getMileageAmtDTO(SettleOrders settleOrders, RenterOrderEntity renterOrder,HandoverCarRepVO handoverCarRep,OwnerGoodsDetailDTO goodsDetail) {
+    private MileageAmtDTO getMileageAmtDTO(SettleOrders settleOrders, RenterOrderEntity renterOrder,HandoverCarRepVO handoverCarRep,RenterGoodsDetailDTO renterGoodsDetail) {
         MileageAmtDTO mileageAmtDTO = new MileageAmtDTO();
         CostBaseDTO costBaseDTO = getCostBaseRent(settleOrders,renterOrder);
         mileageAmtDTO.setCostBaseDTO(costBaseDTO);
 
-        mileageAmtDTO.setCarOwnerType(goodsDetail.getCarOwnerType());
-        mileageAmtDTO.setGuideDayPrice(goodsDetail.getCarGuidePrice());
-        mileageAmtDTO.setDayMileage(goodsDetail.getCarDayMileage());
+        mileageAmtDTO.setCarOwnerType(renterGoodsDetail.getCarOwnerType());
+        mileageAmtDTO.setGuideDayPrice(renterGoodsDetail.getCarGuidePrice());
+        mileageAmtDTO.setDayMileage(renterGoodsDetail.getCarDayMileage());
 
         //默认值0  取/还 车里程数
         mileageAmtDTO.setGetmileage(0);
@@ -237,16 +250,15 @@ public class OrderSettleNoTService {
     	handoverCarReq.setRenterOrderNo(settleOrders.getRenterOrderNo());
         HandoverCarRepVO handoverCarRep = handoverCarService.getRenterHandover(handoverCarReq);
         // 1.2 油费、超里程费用 订单商品需要的参数
-        OwnerGoodsDetailDTO ownerGoodsDetail = ownerGoodsService.getOwnerGoodsDetail(settleOrders.getRenterOrderNo(),Boolean.TRUE);
-        settleOrders.setRenterMemNo(ownerGoodsDetail.getMemNo());
+        RenterGoodsDetailDTO renterGoodsDetail = renterGoodsService.getRenterGoodsDetail(settleOrders.getRenterOrderNo(),Boolean.TRUE);
 
         //1 查询租车费用
         List<RenterOrderCostDetailEntity> renterOrderCostDetails = renterOrderCostDetailService.listRenterOrderCostDetail(settleOrders.getOrderNo(),settleOrders.getRenterOrderNo());
         //2 交接车-油费
-        OilAmtDTO oilAmtDTO = getOilAmtDTO(settleOrders,settleOrders.getRenterOrder(),handoverCarRep,ownerGoodsDetail);
+        OilAmtDTO oilAmtDTO = getOilAmtDTO(settleOrders,settleOrders.getRenterOrder(),handoverCarRep,renterGoodsDetail);
         RenterOrderCostDetailEntity oilAmt = renterOrderCostCombineService.getOilAmtEntity(oilAmtDTO);
         //3 交接车-获取超里程费用
-        MileageAmtDTO mileageAmtDTO = getMileageAmtDTO(settleOrders,settleOrders.getRenterOrder(),handoverCarRep,ownerGoodsDetail);
+        MileageAmtDTO mileageAmtDTO = getMileageAmtDTO(settleOrders,settleOrders.getRenterOrder(),handoverCarRep,renterGoodsDetail);
         RenterOrderCostDetailEntity mileageAmt = renterOrderCostCombineService.getMileageAmtEntity(mileageAmtDTO);
         //4 补贴
         List<RenterOrderSubsidyDetailEntity> renterOrderSubsidyDetails = renterOrderSubsidyDetailService.listRenterOrderSubsidyDetail(settleOrders.getOrderNo(),settleOrders.getRenterOrderNo());
@@ -299,8 +311,7 @@ public class OrderSettleNoTService {
         handoverCarReq.setOwnerOrderNo(settleOrders.getOwnerOrderNo());
         HandoverCarRepVO handoverCarRep = handoverCarService.getRenterHandover(handoverCarReq);
         // 1.2 油费、超里程费用 订单商品需要的参数
-        OwnerGoodsDetailDTO ownerGoodsDetail = ownerGoodsService.getOwnerGoodsDetail(settleOrders.getOwnerMemNo(),Boolean.TRUE);
-        settleOrders.setRenterMemNo(ownerGoodsDetail.getMemNo());
+        OwnerGoodsDetailDTO ownerGoodsDetail = ownerGoodsService.getOwnerGoodsDetail(settleOrders.getOwnerOrderNo(),Boolean.TRUE);
 
         //1 车主端代管车服务费
         CostBaseDTO costBaseDTO= getCostBaseOwner(settleOrders.getOwnerOrder());
