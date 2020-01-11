@@ -13,13 +13,22 @@ import com.atzuche.order.admin.vo.req.remark.OrderRentCityRequestVO;
 import com.atzuche.order.admin.vo.req.remark.OrderRiskStatusRequestVO;
 import com.atzuche.order.admin.vo.resp.remark.OrderOtherInformationResponseVO;
 import com.atzuche.order.admin.vo.resp.remark.OrderRemarkResponseVO;
+
+import com.atzuche.order.commons.entity.orderDetailDto.OrderDetailReqDTO;
+import com.atzuche.order.commons.entity.orderDetailDto.OrderStatusRespDTO;
+import com.atzuche.order.open.service.FeignOrderDetailService;
+import com.autoyol.commons.utils.GsonUtils;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.doc.annotation.AutoDocMethod;
 import com.autoyol.doc.annotation.AutoDocVersion;
+import com.autoyol.event.rabbit.risk.RiskRabbitMQEventEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.ObjectUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,6 +43,13 @@ public class OrderOtherInformationController extends BaseController{
 
     @Autowired
     OrderRemarkService orderRemarkService;
+
+    @Autowired
+    RabbitTemplate rabbitTemplate;
+
+    @Autowired
+    FeignOrderDetailService feignOrderDetailService;
+
 
 
 	@AutoDocMethod(description = "修改租车城市", value = "修改租车城市", response = ResponseData.class)
@@ -62,6 +78,9 @@ public class OrderOtherInformationController extends BaseController{
             logger.info(LogDescription.getLogDescription(DescriptionConstant.CONSOLE_ORDER_OTHER_INFORMATION_RISK_STATUS_UPDATE, DescriptionConstant.INPUT_TEXT),orderRiskStatusRequestVO.toString());
             CatLogRecord.successLog(LogDescription.getCatDescription(DescriptionConstant.CONSOLE_ORDER_OTHER_INFORMATION_RISK_STATUS_UPDATE, DescriptionConstant.SUCCESS_TEXT), UrlConstant.CONSOLE_ORDER_OTHER_INFORMATION_RISK_STATUS_UPDATE,  orderRiskStatusRequestVO);
 
+            //发送MQ事件
+            String mqJson = GsonUtils.toJson(orderRiskStatusRequestVO);
+            rabbitTemplate.convertAndSend(RiskRabbitMQEventEnum.ORDER_RISK_STATUS_CHANGE.exchange,RiskRabbitMQEventEnum.ORDER_RISK_STATUS_CHANGE.routingKey, mqJson);
             return ResponseData.success();
         } catch (Exception e) {
             logger.info(LogDescription.getLogDescription(DescriptionConstant.CONSOLE_ORDER_OTHER_INFORMATION_RISK_STATUS_UPDATE, DescriptionConstant.EXCEPTION_TEXT),e);
@@ -98,8 +117,15 @@ public class OrderOtherInformationController extends BaseController{
             logger.info(LogDescription.getLogDescription(DescriptionConstant.CONSOLE_ORDER_OTHER_INFORMATION_DETAIL, DescriptionConstant.INPUT_TEXT),orderRemarkRequestVO.toString());
             OrderOtherInformationResponseVO orderOtherInformationResponseVO = new OrderOtherInformationResponseVO();
             //调用订单服务
-            orderOtherInformationResponseVO.setRentCity("上海");
-            orderOtherInformationResponseVO.setRiskAccidentStatus("1");
+            OrderDetailReqDTO orderDetailReqDTO = new OrderDetailReqDTO();
+            orderDetailReqDTO.setOrderNo(orderRemarkRequestVO.getOrderNo());
+            ResponseData<OrderStatusRespDTO> orderStatusRespDTOResponse = feignOrderDetailService.getOrderStatus(orderDetailReqDTO);
+            if(!ObjectUtils.isEmpty(orderStatusRespDTOResponse)){
+                OrderStatusRespDTO orderStatusRespDTO = orderStatusRespDTOResponse.getData();
+                orderOtherInformationResponseVO.setRentCity("");
+                orderOtherInformationResponseVO.setRiskAccidentStatus("1");
+            }
+
             OrderRemarkResponseVO orderRemarkResponseVO = orderRemarkService.getOrderCarServiceRemarkInformation(orderRemarkRequestVO);
             orderOtherInformationResponseVO.setRemarkContent(orderRemarkResponseVO.getRemarkContent());
             CatLogRecord.successLog(LogDescription.getCatDescription(DescriptionConstant.CONSOLE_ORDER_OTHER_INFORMATION_DETAIL, DescriptionConstant.SUCCESS_TEXT), UrlConstant.CONSOLE_ORDER_OTHER_INFORMATION_DETAIL,  orderRemarkRequestVO);

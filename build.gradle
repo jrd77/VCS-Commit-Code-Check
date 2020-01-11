@@ -68,8 +68,6 @@ subprojects {
             exclude module:'servlet-api'
         }*/
 //        compile('org.springframework.boot:spring-boot-starter-amqp')
-        compile 'org.springframework.amqp:spring-rabbit:1.7.13.RELEASE'
-        compile 'net.sf.json-lib:json-lib:2.4:jdk15'
     }
  
 }
