@@ -1,10 +1,12 @@
 package com.atzuche.order.admin.controller.order.remark;
 
 import com.atzuche.order.admin.cat.CatLogRecord;
+import com.atzuche.order.admin.common.AdminUserUtil;
 import com.atzuche.order.admin.constant.cat.UrlConstant;
 import com.atzuche.order.admin.constant.description.DescriptionConstant;
 import com.atzuche.order.admin.controller.BaseController;
 import com.atzuche.order.admin.description.LogDescription;
+import com.atzuche.order.admin.dto.OrderRiskStatusRequestDTO;
 import com.atzuche.order.admin.exception.remark.OrderRemarkException;
 import com.atzuche.order.admin.service.remark.OrderRemarkService;
 import com.atzuche.order.admin.vo.req.remark.OrderCarServiceRemarkRequestVO;
@@ -98,7 +100,10 @@ public class OrderOtherInformationController extends BaseController{
             if(!ObjectUtils.isEmpty(responseData)) {
                 if(ErrorCode.SUCCESS.getCode().equals(responseData.getResCode())){
                     //修改成功发送MQ事件
-                    String mqJson = GsonUtils.toJson(orderRiskStatusRequestVO);
+                    OrderRiskStatusRequestDTO orderRiskStatusRequestDTO = new OrderRiskStatusRequestDTO();
+                    BeanUtils.copyProperties(orderRiskStatusRequestVO, orderRiskStatusRequestDTO);
+                    orderRiskStatusRequestDTO.setOperator(AdminUserUtil.getAdminUser().getAuthName());
+                    String mqJson = GsonUtils.toJson(orderRiskStatusRequestDTO);
                     rabbitTemplate.convertAndSend(RiskRabbitMQEventEnum.ORDER_RISK_STATUS_CHANGE.exchange, RiskRabbitMQEventEnum.ORDER_RISK_STATUS_CHANGE.routingKey, mqJson);
                     CatLogRecord.successLog(LogDescription.getCatDescription(DescriptionConstant.CONSOLE_ORDER_OTHER_INFORMATION_RISK_STATUS_UPDATE, DescriptionConstant.SUCCESS_TEXT), UrlConstant.CONSOLE_ORDER_OTHER_INFORMATION_RISK_STATUS_UPDATE,  orderRiskStatusRequestVO);
                     return ResponseData.success();
