@@ -7,6 +7,7 @@ import com.atzuche.order.commons.vo.req.AdminOrderReqVO;
 import com.atzuche.order.commons.vo.req.NormalOrderReqVO;
 import com.atzuche.order.commons.vo.req.OrderReqVO;
 import com.atzuche.order.commons.vo.res.OrderResVO;
+import com.atzuche.order.coreapi.service.StockService;
 import com.atzuche.order.coreapi.service.SubmitOrderService;
 import com.atzuche.order.parentorder.entity.OrderRecordEntity;
 import com.atzuche.order.parentorder.service.OrderRecordService;
@@ -38,7 +39,7 @@ import java.util.Optional;
  */
 @RequestMapping("/order")
 @RestController
-@AutoDocVersion(version = "普通订单下单接口文档")
+@AutoDocVersion(version = "订单接口文档")
 public class SubmitOrderController {
     private static final Logger LOGGER = LoggerFactory.getLogger(SubmitOrderController.class);
 
@@ -46,7 +47,8 @@ public class SubmitOrderController {
     private SubmitOrderService submitOrderService;
     @Autowired
     private OrderRecordService orderRecordService;
-
+    @Autowired
+    private StockService stockService;
 
     @AutoDocMethod(description = "提交订单", value = "提交订单", response = OrderResVO.class)
     @PostMapping("/normal/req")
@@ -62,16 +64,20 @@ public class SubmitOrderController {
             return new ResponseData<>(ErrorCode.NEED_LOGIN.getCode(), ErrorCode.NEED_LOGIN.getText());
         }
         OrderResVO orderResVO = null;
+
         try{
             BeanCopier beanCopier = BeanCopier.create(NormalOrderReqVO.class, OrderReqVO.class, false);
             OrderReqVO orderReqVO = new OrderReqVO();
             beanCopier.copy(normalOrderReqVO, orderReqVO, null);
+            orderReqVO.setAbatement(Integer.valueOf(normalOrderReqVO.getAbatement()));
+            orderReqVO.setIMEI(normalOrderReqVO.getIMEI());
             orderReqVO.setRentTime(LocalDateTimeUtils.parseStringToDateTime(normalOrderReqVO.getRentTime(),
                     LocalDateTimeUtils.DEFAULT_PATTERN));
             orderReqVO.setRevertTime(LocalDateTimeUtils.parseStringToDateTime(normalOrderReqVO.getRevertTime(),
                     LocalDateTimeUtils.DEFAULT_PATTERN));
 
             orderResVO = submitOrderService.submitOrder(orderReqVO);
+
             OrderRecordEntity orderRecordEntity = new OrderRecordEntity();
             orderRecordEntity.setErrorCode(ErrorCode.SUCCESS.getCode());
             orderRecordEntity.setErrorTxt(ErrorCode.SUCCESS.getText());
@@ -81,16 +87,24 @@ public class SubmitOrderController {
             orderRecordEntity.setResult(JSON.toJSONString(orderResVO));
             orderRecordService.save(orderRecordEntity);
         }catch(OrderException orderException){
+            String orderNo = orderResVO==null?"":orderResVO.getOrderNo();
             OrderRecordEntity orderRecordEntity = new OrderRecordEntity();
             orderRecordEntity.setErrorCode(orderException.getErrorCode());
             orderRecordEntity.setErrorTxt(orderException.getErrorMsg());
             orderRecordEntity.setMemNo(normalOrderReqVO.getMemNo());
-            orderRecordEntity.setOrderNo(orderResVO==null?"":orderResVO.getOrderNo());
+            orderRecordEntity.setOrderNo(orderNo);
             orderRecordEntity.setParam(JSON.toJSONString(normalOrderReqVO));
             orderRecordEntity.setResult(JSON.toJSONString(orderResVO));
             orderRecordService.save(orderRecordEntity);
+
+            //释放库存
+            if(orderNo != null && orderNo.trim().length()>0){
+                Integer carNo = Integer.valueOf(normalOrderReqVO.getCarNo());
+                stockService.releaseCarStock(orderNo,carNo);
+            }
             throw orderException;
         }catch (Exception e){
+            String orderNo = orderResVO==null?"":orderResVO.getOrderNo();
             OrderRecordEntity orderRecordEntity = new OrderRecordEntity();
             orderRecordEntity.setErrorCode(ErrorCode.SYS_ERROR.getCode());
             orderRecordEntity.setErrorTxt(ErrorCode.SYS_ERROR.getText());
@@ -99,6 +113,12 @@ public class SubmitOrderController {
             orderRecordEntity.setParam(JSON.toJSONString(normalOrderReqVO));
             orderRecordEntity.setResult(JSON.toJSONString(orderResVO));
             orderRecordService.save(orderRecordEntity);
+
+            //释放库存
+            if(orderNo != null && orderNo.trim().length()>0){
+                Integer carNo = Integer.valueOf(normalOrderReqVO.getCarNo());
+                stockService.releaseCarStock(orderNo,carNo);
+            }
             throw e;
         }
         return ResponseData.success(orderResVO);
@@ -106,9 +126,10 @@ public class SubmitOrderController {
 
 
 
-    @AutoDocMethod(description = "管理后台提交订单", value = "管理后台提交订单", response = OrderResVO.class)
+    @AutoDocMethod(description = "提交订单(管理后台)", value = "提交订单(管理后台)", response = OrderResVO.class)
     @PostMapping("/admin/req")
-    public ResponseData<OrderResVO> submitOrder(@RequestBody AdminOrderReqVO adminOrderReqVO, BindingResult bindingResult) {
+    public ResponseData<OrderResVO> submitOrder(@Valid @RequestBody AdminOrderReqVO adminOrderReqVO,
+                                                BindingResult bindingResult) {
 
 
         LOGGER.info("Submit order.param is,adminOrderReqVO:[{}]", JSON.toJSONString(adminOrderReqVO));

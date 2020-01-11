@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
  */
 @Data
 public class AccountRenterDepositResVO {
+    private Integer id;
     /**
      * 主订单号
      */
@@ -70,6 +71,10 @@ public class AccountRenterDepositResVO {
      * 开启免押
      */
     private Integer isFreeDeposit;
+    /**
+     * 免押方式(1:绑卡减免,2:芝麻减免,3:消费)
+     */
+    private Integer freeDepositType;
     /**
      * 创建时间
      */

@@ -58,15 +58,16 @@ public class AccountRenterWzDepositService{
     /**
      * 查询违章押金余额
      */
-    public int getSurplusRenterWZDeposit(String orderNo, String memNo) {
+    public int getRenterWZDeposit(String orderNo, String memNo) {
         //查询车辆押金信息
         AccountRenterWZDepositResVO accountRenterDepositRes = getAccountRenterWZDeposit(orderNo,memNo);
         //1 校验 是否存在车辆押金记录
         Assert.notNull(accountRenterDepositRes, ErrorCode.PARAMETER_ERROR.getText());
         Assert.notNull(accountRenterDepositRes.getOrderNo(), ErrorCode.PARAMETER_ERROR.getText());
         //2 返回计算剩余押金余额  即应退余额
-        int shouldReturnDeposit = accountRenterDepositRes.getShouldReturnDeposit();
-        return shouldReturnDeposit;
+        Integer amt = accountRenterDepositRes.getYingshouDeposit();
+        amt = Objects.isNull(amt)?0:amt;
+        return amt;
     }
 
     /**
@@ -86,7 +87,7 @@ public class AccountRenterWzDepositService{
     public void updateRenterWZDeposit(PayedOrderRenterWZDepositReqVO payedOrderWZRenterDeposit){
         //1 参数校验
         Assert.notNull(payedOrderWZRenterDeposit, ErrorCode.PARAMETER_ERROR.getText());
-        payedOrderWZRenterDeposit.check();
+//        payedOrderWZRenterDeposit.check();
         //2更新押金 实付信息
         accountRenterWzDepositNoTService.updateRenterDeposit(payedOrderWZRenterDeposit);
         //添加押金资金进出明细
@@ -96,14 +97,14 @@ public class AccountRenterWzDepositService{
      * 支户头违章押金资金进出 操作
      */
     @CatAnnotation
-    public void updateRenterWZDepositChange(PayedOrderRenterDepositWZDetailReqVO payedOrderRenterWZDepositDetail){
+    public int  updateRenterWZDepositChange(PayedOrderRenterDepositWZDetailReqVO payedOrderRenterWZDepositDetail){
         //1 参数校验
         Assert.notNull(payedOrderRenterWZDepositDetail, ErrorCode.PARAMETER_ERROR.getText());
         payedOrderRenterWZDepositDetail.check();
         //2更新车辆押金  剩余押金 金额
         accountRenterWzDepositNoTService.updateRenterWZDepositChange(payedOrderRenterWZDepositDetail);
         //添加押金资金进出明细
-        accountRenterWzDepositDetailNoTService.insertRenterWZDepositDetail(payedOrderRenterWZDepositDetail);
+        return accountRenterWzDepositDetailNoTService.insertRenterWZDepositDetail(payedOrderRenterWZDepositDetail);
     }
 
 }

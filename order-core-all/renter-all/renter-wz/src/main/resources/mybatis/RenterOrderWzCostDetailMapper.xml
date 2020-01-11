@@ -81,10 +81,10 @@
 		where id = #{id} and is_delete = 0
 	</select>
 
-	<select id="queryList" resultType="com.atzuche.order.renterwz.entity.RenterOrderWzCostDetailEntity">
-		select <include refid="select_column" />
+	<select id="queryInfosByOrderNo" resultMap="selectColumnMap" parameterType="java.lang.String">
+		select id,order_no,car_plate_num,mem_no,cost_code,cost_desc,sum(amount) amount,note,source_type,operator_id,operator_name,cost_status,remark
 		from renter_order_wz_cost_detail
-		where is_delete = 0
+		where order_no = #{orderNo} and is_delete = 0 and cost_status = 0 GROUP BY cost_code
 	</select>
 
 	 <update id="updateRenterOrderWzCostDetail" parameterType="com.atzuche.order.renterwz.entity.RenterOrderWzCostDetailEntity">
@@ -154,5 +154,9 @@
 		update_time = NOW()
 		where order_no = #{orderNo} and car_plate_num = #{carNum} and mem_no = #{memNo} and cost_code = #{code}
 	</update>
+
+	<select id="queryInfoByOrderAndCode" resultMap="selectColumnMap">
+		select * from renter_order_wz_cost_detail where order_no = #{orderNo} and cost_code = #{code} and cost_status = 0 and is_delete = 0 order by id desc limit 1
+	</select>
 
 </mapper>

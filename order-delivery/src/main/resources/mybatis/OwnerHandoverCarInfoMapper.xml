@@ -257,14 +257,38 @@
 	</select>
 
 	<select id="selectByOwnerOrderNo" resultMap="BaseResultMap">
-		select oil_num,mileage_num,delay_time,ahead_time,type from owner_handover_car_info where
-		renter_order_no = #{renterOrderNo} and is_delete = 0
+		select <include refid="Base_Column_List"/> from owner_handover_car_info where
+		owner_order_no = #{ownerOrderNo} and type = #{type} and is_delete = 0
 	</select>
-	<select id="selectObjectByOrderNo" resultMap="BaseResultMap">
-		select
-		<include refid="Base_Column_List"/>
+	<select id="selectObjectByOwnerOrderNo" resultMap="BaseResultMap">
+		select oil_num,mileage_num,delay_time,ahead_time,type
 		from owner_handover_car_info where
-		order_no = #{orderNo} and type = #{type} and is_delete = 0 order by id limit 1
+		owner_order_no = #{ownerOrderNo} and is_delete = 0
 	</select>
-  	
+
+	<select id="selectOwnerHandovertByOwnerOrderNo" resultMap="BaseResultMap">
+		select <include refid="Base_Column_List"/>
+		from owner_handover_car_info where
+		owner_order_no = #{ownerOrderNo} and is_delete = 0
+	</select>
+
+	<select id="selectObjectByOrderNo" resultMap="BaseResultMap">
+		select <include refid="Base_Column_List"/> from owner_handover_car_info where
+		order_no = #{orderNo} and type = #{type} and is_delete = 0
+	</select>
+
+	<select id="selectOwnerByOrderNo" resultMap="BaseResultMap">
+		select <include refid="Base_Column_List"/> from owner_handover_car_info where
+		order_no = #{orderNo} and is_delete = 0
+	</select>
+
+    <select id="selectByOwnerOrderNoAndType" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from owner_handover_car_info
+        where owner_order_no=#{ownerOrderNo} and `type`=#{type}
+        and is_delete = 0 limit 1
+    </select>
+
+
 </mapper>

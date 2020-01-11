@@ -4,7 +4,6 @@ import com.alibaba.fastjson.JSON;
 import com.atzuche.order.parentorder.dto.OrderSourceStatDTO;
 import com.atzuche.order.parentorder.entity.OrderSourceStatEntity;
 import com.atzuche.order.parentorder.mapper.OrderSourceStatMapper;
-import com.dianping.cat.message.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cglib.beans.BeanCopier;
@@ -76,5 +75,15 @@ public class OrderSourceStatService {
     public boolean isCtripOrderByOrderNo(String orderNo) {
         Integer count = orderSourceStatMapper.queryCtripOrderByOrderNo(orderNo);
         return (count == null || count.equals(0)) ? false : true;
+    }
+
+    /*
+     * @Author ZhangBin
+     * @Date 2020/1/9 11:39
+     * @Description: 通过订单号获取订单状态
+     *
+     **/
+    public OrderSourceStatEntity selectByOrderNo(String orderNo){
+        return orderSourceStatMapper.selectByOrderNo(orderNo);
     }
 }

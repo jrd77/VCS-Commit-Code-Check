@@ -13,10 +13,7 @@ import com.atzuche.order.commons.entity.dto.OwnerGoodsDetailDTO;
 import com.atzuche.order.commons.entity.dto.OwnerMemberDTO;
 import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
 import com.atzuche.order.commons.entity.dto.RenterMemberDTO;
-import com.atzuche.order.commons.enums.OrderStatusEnum;
-import com.atzuche.order.commons.enums.RenterCashCodeEnum;
-import com.atzuche.order.commons.enums.SubsidySourceCodeEnum;
-import com.atzuche.order.commons.enums.SubsidyTypeCodeEnum;
+import com.atzuche.order.commons.enums.*;
 import com.atzuche.order.commons.enums.account.FreeDepositTypeEnum;
 import com.atzuche.order.commons.vo.req.OrderReqVO;
 import com.atzuche.order.commons.vo.res.OrderResVO;
@@ -46,6 +43,9 @@ import com.atzuche.order.rentercost.entity.dto.OrderCouponDTO;
 import com.atzuche.order.rentermem.service.RenterMemberService;
 import com.atzuche.order.renterorder.service.RenterOrderService;
 import com.atzuche.order.renterorder.vo.*;
+import com.autoyol.car.api.model.dto.LocationDTO;
+import com.autoyol.car.api.model.dto.OrderInfoDTO;
+import com.autoyol.car.api.model.enums.OrderOperationTypeEnum;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -100,7 +100,11 @@ public class SubmitOrderService {
     private RenterCommodityService renterCommodityService;
     @Autowired
     private SubmitOrderRiskAuditService submitOrderRiskAuditService;
+    @Autowired
+    private CarRentalTimeApiService carRentalTimeApiService;
 
+    @Autowired
+    private StockService stockService;
 
     /**
      * 提交订单
@@ -132,16 +136,24 @@ public class SubmitOrderService {
         OwnerMemberDTO ownerMemberDTO = memberService.getOwnerMemberInfo(renterGoodsDetailDTO.getOwnerMemNo());
         reqContext.setOwnerMemberDto(ownerMemberDTO);
         //2.下单校验
-        //2.1库存
+        //2.1库存校验
+        OrderInfoDTO orderInfoDTO = initOrderInfoDTO(orderReqVO);
+        //stockService.checkCarStock(orderInfoDTO);
+
         //2.2风控
-        Integer riskAuditId = null;
-//        Integer riskAuditId = submitOrderRiskAuditService.check(buildSubmitOrderRiskCheckReqVO(orderReqVO, reqTime));
+        Integer riskAuditId = submitOrderRiskAuditService.check(buildSubmitOrderRiskCheckReqVO(orderReqVO, reqTime));
         //2.3校验链
+        //TODO:下单校验
+
+        //2.4.生成主订单号
+        String orderNo = uniqueOrderNoService.getOrderNo();
+        //2.5.锁定库存
+        orderInfoDTO.setOrderNo(orderNo);
+        //stockService.cutCarStock(orderInfoDTO);
 
         //提前延后时间计算
-        CarRentTimeRangeResVO carRentTimeRangeResVO = goodsService.getCarRentTimeRange(buildCarRentTimeRangeReqVO(orderReqVO));
+        CarRentTimeRangeResVO carRentTimeRangeResVO = carRentalTimeApiService.getCarRentTimeRange(buildCarRentTimeRangeReqVO(orderReqVO));
         //3.生成主订单号
-        String orderNo = uniqueOrderNoService.getOrderNo();
         //4.创建租客子订单
         //4.1.生成租客子订单号
         String renterOrderNo = uniqueOrderNoService.getRenterOrderNo(orderNo);
@@ -235,28 +247,63 @@ public class SubmitOrderService {
         //7. 优惠券绑定、凹凸币扣除等
         OwnerCouponBindReqVO ownerCouponBindReqVO =
                 buildOwnerCouponBindReqVO(orderNo, renterOrderResVO.getCouponAndAutoCoinResVO(), reqContext);
+
         boolean bindOwnerCouponResult = couponAndCoinHandleService.bindOwnerCoupon(ownerCouponBindReqVO);
         LOGGER.info("Bind owner coupon result is:[{}]", bindOwnerCouponResult);
-        boolean bindPlatformCouponResult = couponAndCoinHandleService.bindCoupon(orderNo,
+
+       /* boolean bindPlatformCouponResult = couponAndCoinHandleService.bindCoupon(orderNo,
                 orderReqVO.getDisCouponIds(), 1,
                 renterOrderResVO.getCouponAndAutoCoinResVO().getIsUsePlatformCoupon());
         LOGGER.info("Bind platf coupon result is:[{}]", bindPlatformCouponResult);
         boolean bindGetCarFeeCouponResult = couponAndCoinHandleService.bindCoupon(orderNo,
                 orderReqVO.getGetCarFreeCouponId(), 2,
                 renterOrderResVO.getCouponAndAutoCoinResVO().getIsUseGetCarFeeCoupon());
-        LOGGER.info("Bind getCarFee coupon result is:[{}]", bindGetCarFeeCouponResult);
-        AutoCoinDeductReqVO autoCoinDeductReqVO = buildAutoCoinDeductReqVO(orderNo, renterOrderResVO.getCouponAndAutoCoinResVO(), reqContext);
+        LOGGER.info("Bind getCarFee coupon result is:[{}]", bindGetCarFeeCouponResult);*/
+
+        AutoCoinDeductReqVO autoCoinDeductReqVO = buildAutoCoinDeductReqVO(orderNo,
+                renterOrderNo,renterOrderResVO.getCouponAndAutoCoinResVO().getChargeAutoCoin(), reqContext);
         boolean deductionAotuCoinResult = couponAndCoinHandleService.deductionAotuCoin(autoCoinDeductReqVO);
         LOGGER.info("Deduct autoCoin result is:[{}]", deductionAotuCoinResult);
 
         //8.订单完成事件发送
-        //todo
+        //TODO:发送下单成功事件
 
 
         //end 组装接口返回
         OrderResVO orderResVO = new OrderResVO();
         orderResVO.setOrderNo(orderNo);
+        orderResVO.setStatus(String.valueOf(orderStatusDTO.getStatus()));
         return orderResVO;
+    }
+
+    private OrderInfoDTO initOrderInfoDTO(OrderReqVO orderReqVO) {
+        OrderInfoDTO orderInfoDTO = new OrderInfoDTO();
+        orderInfoDTO.setOrderNo(null);
+        orderInfoDTO.setCityCode(Integer.valueOf(orderReqVO.getCityCode()));
+        orderInfoDTO.setCarNo(Integer.valueOf(orderReqVO.getCarNo()));
+        orderInfoDTO.setOldCarNo(null);
+        orderInfoDTO.setStartDate(LocalDateTimeUtils.localDateTimeToDate(orderReqVO.getRentTime()));
+        orderInfoDTO.setEndDate(LocalDateTimeUtils.localDateTimeToDate(orderReqVO.getRevertTime()));
+        orderInfoDTO.setOperationType(OrderOperationTypeEnum.ZCXD.getType());
+
+        LocationDTO getCarAddress = new LocationDTO();
+        getCarAddress.setFlag(0);
+        if(orderReqVO.getSrvGetFlag() == 1){
+            getCarAddress.setFlag(1);
+            getCarAddress.setLat(orderReqVO.getSrvGetLat()==null?0.0:Double.valueOf(orderReqVO.getSrvGetLat()));
+            getCarAddress.setLon(orderReqVO.getSrvGetLon()==null?0.0:Double.valueOf(orderReqVO.getSrvGetLon()));
+            getCarAddress.setCarAddress(orderReqVO.getSrvGetAddr());
+        }
+        LocationDTO returnCarAddress = new LocationDTO();
+        returnCarAddress.setFlag(0);
+        if(orderReqVO.getSrvReturnFlag() == 1){
+            returnCarAddress.setLat(orderReqVO.getSrvReturnLat()==null?0.0:Double.valueOf(orderReqVO.getSrvReturnLat()));
+            returnCarAddress.setLon(orderReqVO.getSrvReturnLon()==null?0.0:Double.valueOf(orderReqVO.getSrvReturnLon()));
+            returnCarAddress.setCarAddress(orderReqVO.getSrvReturnAddr());
+        }
+        orderInfoDTO.setGetCarAddress(getCarAddress);
+        orderInfoDTO.setReturnCarAddress(returnCarAddress);
+        return orderInfoDTO;
     }
 
     private GoodsService.CarDetailReqVO buildCarDetailReqVO(OrderReqVO orderReqVO) {
@@ -331,10 +378,14 @@ public class SubmitOrderService {
         orderSourceStatDTO.setAppChannelId(orderReqVO.getAppChannelId());
         orderSourceStatDTO.setAndroidId(orderReqVO.getAndroidID());
         orderSourceStatDTO.setOrderNo(orderNo);
+        orderSourceStatDTO.setSrcPort(orderReqVO.getSrcPort()==null?"":String.valueOf(orderReqVO.getSrcPort()));
         orderSourceStatDTO.setPublicLongitude(orderReqVO.getPublicLongitude());
         orderSourceStatDTO.setPublicLatitude(orderReqVO.getPublicLatitude());
         orderSourceStatDTO.setReqAddr(BizAreaUtil.getReqAddrFromLonLat(orderSourceStatDTO.getPublicLongitude(),
                 orderSourceStatDTO.getPublicLatitude()));
+        orderSourceStatDTO.setDevice(orderReqVO.getDeviceName());
+        orderSourceStatDTO.setUseAutoCoin(orderReqVO.getUseAutoCoin());
+        orderSourceStatDTO.setSpecialConsole(orderReqVO.getSpecialConsole()==null?0:Integer.valueOf(orderReqVO.getSpecialConsole()));
 
         LOGGER.info("Build order source stat dto,result is ,orderSourceStatDTO:[{}]", JSON.toJSONString(orderSourceStatDTO));
         return orderSourceStatDTO;
@@ -379,14 +430,18 @@ public class SubmitOrderService {
         renterOrderReqVO.setLabelIds(goodsDetail.getLabelIds());
         renterOrderReqVO.setRenterGoodsPriceDetailDTOList(goodsDetail.getRenterGoodsPriceDetailDTOList());
         renterOrderReqVO.setPlateNum(goodsDetail.getCarPlateNum());
-
+        renterOrderReqVO.setAbatement(orderReqVO.getAbatement());
+        renterOrderReqVO.setCarShowLat(goodsDetail.getCarShowLat());
+        renterOrderReqVO.setCarShowLon(goodsDetail.getCarShowLon());
+        renterOrderReqVO.setCarRealLat(goodsDetail.getCarRealLat());
+        renterOrderReqVO.setCarRealLon(goodsDetail.getCarRealLon());
 
         RenterMemberDTO renterMember = reqContext.getRenterMemberDto();
         renterOrderReqVO.setCertificationTime(renterMember.getCertificationTime());
         renterOrderReqVO.setIsNew(null == renterMember.getIsNew() || renterMember.getIsNew() == 0);
         renterOrderReqVO.setRenterMemberRightDTOList(renterMember.getRenterMemberRightDTOList());
         renterOrderReqVO.setCommUseDriverList(renterMember.getCommUseDriverList());
-
+        renterOrderReqVO.setReplyFlag(goodsDetail.getReplyFlag());
         LOGGER.info("Build renter order reqVO,result is ,renterOrderReqVO:[{}]",
                 JSON.toJSONString(renterOrderReqVO));
         return renterOrderReqVO;
@@ -500,7 +555,8 @@ public class SubmitOrderService {
                 OwnerOrderPurchaseDetailEntity.class, false);
 
         beanCopier.copy(rentAmtEntity, ownerOrderPurchaseDetailEntity, null);
-
+        ownerOrderPurchaseDetailEntity.setCostCode(OwnerCashCodeEnum.RENT_AMT.getCashNo());
+        ownerOrderPurchaseDetailEntity.setCostCodeDesc(OwnerCashCodeEnum.RENT_AMT.getTxt());
         ownerOrderPurchaseDetailEntity.setOrderNo(orderNo);
         ownerOrderPurchaseDetailEntity.setOwnerOrderNo(ownerOrderNo);
         ownerOrderPurchaseDetailEntity.setMemNo(memNo);
@@ -528,26 +584,29 @@ public class SubmitOrderService {
         OwnerCouponBindReqVO ownerCouponBindReqVO = new OwnerCouponBindReqVO();
         ownerCouponBindReqVO.setCarNo(Integer.valueOf(reqContext.getOrderReqVO().getCarNo()));
         ownerCouponBindReqVO.setCouponNo(reqContext.getOrderReqVO().getCarOwnerCouponNo());
-        ownerCouponBindReqVO.setRentAmt(couponAndAutoCoinResVO.getRentAmt());
+        ownerCouponBindReqVO.setRentAmt(Math.abs(couponAndAutoCoinResVO.getRentAmt()));
         ownerCouponBindReqVO.setRenterFirstName(reqContext.getRenterMemberDto().getFirstName());
         ownerCouponBindReqVO.setRenterName(reqContext.getRenterMemberDto().getRealName());
         ownerCouponBindReqVO.setRenterSex(null == reqContext.getRenterMemberDto().getGender() ? "" :
                 reqContext.getRenterMemberDto().getGender().toString());
         ownerCouponBindReqVO.setOrderNo(orderNo);
+        LOGGER.info("Build OwnerCouponBindReqVO result is:[{}]", ownerCouponBindReqVO);
         return ownerCouponBindReqVO;
     }
 
 
-    private AutoCoinDeductReqVO buildAutoCoinDeductReqVO(String orderNo, CouponAndAutoCoinResVO couponAndAutoCoinResVO, OrderReqContext reqContext) {
+    private AutoCoinDeductReqVO buildAutoCoinDeductReqVO(String orderNo, String renterOrderNo, Integer chargeAutoCoin,
+                                                         OrderReqContext reqContext) {
         AutoCoinDeductReqVO autoCoinDeductReqVO = new AutoCoinDeductReqVO();
         autoCoinDeductReqVO.setOrderNo(orderNo);
-        autoCoinDeductReqVO.setMemNo(Integer.valueOf(reqContext.getOrderReqVO().getMemNo()));
-        autoCoinDeductReqVO.setChargeAutoCoin(null == couponAndAutoCoinResVO.getChargeAutoCoin() ? 0 :
-                -couponAndAutoCoinResVO.getChargeAutoCoin() * 100);
+        autoCoinDeductReqVO.setRenterOrderNo(renterOrderNo);
+        autoCoinDeductReqVO.setMemNo(reqContext.getOrderReqVO().getMemNo());
+        autoCoinDeductReqVO.setChargeAutoCoin(null == chargeAutoCoin ? 0 : chargeAutoCoin);
         autoCoinDeductReqVO.setOrderType("2");
         autoCoinDeductReqVO.setUseAutoCoin(reqContext.getOrderReqVO().getUseAutoCoin());
         autoCoinDeductReqVO.setRemark("租车消费");
         autoCoinDeductReqVO.setRemarkExtend("租车消费");
+        LOGGER.info("Build AutoCoinDeductReqVO result is:[{}]", autoCoinDeductReqVO);
         return autoCoinDeductReqVO;
     }
 

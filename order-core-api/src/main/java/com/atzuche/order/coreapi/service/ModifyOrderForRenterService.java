@@ -9,7 +9,9 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.atzuche.order.commons.enums.ChangeSourceEnum;
 import com.atzuche.order.commons.enums.FineTypeEnum;
+import com.atzuche.order.commons.enums.RenterChildStatusEnum;
 import com.atzuche.order.commons.enums.SrvGetReturnEnum;
 import com.atzuche.order.coreapi.entity.dto.ModifyCompareDTO;
 import com.atzuche.order.coreapi.entity.dto.ModifyOrderDTO;
@@ -28,6 +30,7 @@ import com.atzuche.order.renterorder.entity.RenterOrderChangeApplyEntity;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.atzuche.order.renterorder.service.RenterOrderChangeApplyService;
 import com.atzuche.order.renterorder.service.RenterOrderService;
+import com.autoyol.platformcost.CommonUtils;
 import com.dianping.cat.Cat;
 
 import lombok.extern.slf4j.Slf4j;
@@ -157,10 +160,14 @@ public class ModifyOrderForRenterService {
 		renterApply.setGetCarBeforeAfterLon(after.getGetLon());
 		renterApply.setOrderNo(orderNo);
 		if (after.getRentTime() != null && after.getRevertTime() != null) {
-			renterApply.setRentAfterTime(after.getRentTime().toString()+"-"+after.getRevertTime().toString());
+			String strRentTime = CommonUtils.formatTime(after.getRentTime(), CommonUtils.FORMAT_STR_DEFAULT);
+			String strRevertTime = CommonUtils.formatTime(after.getRevertTime(), CommonUtils.FORMAT_STR_DEFAULT);
+			renterApply.setRentAfterTime(strRentTime+"至"+strRevertTime);
 		}
 		if (before.getRentTime() != null && before.getRevertTime() != null) {
-			renterApply.setRentBeforeTime(before.getRentTime().toString()+"-"+before.getRevertTime().toString());
+			String strRentTime = CommonUtils.formatTime(before.getRentTime(), CommonUtils.FORMAT_STR_DEFAULT);
+			String strRevertTime = CommonUtils.formatTime(before.getRevertTime(), CommonUtils.FORMAT_STR_DEFAULT);
+			renterApply.setRentBeforeTime(strRentTime+"至"+strRevertTime);
 		}
 		renterApply.setRenterOrderNo(renterOrderNo);
 		renterApply.setRentTimeFlag(1);
@@ -172,6 +179,27 @@ public class ModifyOrderForRenterService {
 		renterApply.setReturnCarBeforeAfterLon(after.getReturnLon());
 		renterOrderChangeApplyService.saveRenterOrderChangeApply(renterApply);
 	}
+	
+	/**
+	 * 修改订单补付成功后回调
+	 * @param orderNo 主订单号
+	 * @param renterOrderNo 支付回调透传过来的租客订单号
+	 */
+	public void supplementPayPostProcess(String orderNo, String renterOrderNo) {
+		log.info("修改订单补付成功回调orderNo=[{}], renterOrderNo=[{}]", orderNo, renterOrderNo);
+		// 获取租客修改订单
+		RenterOrderEntity updRenterOrderEntity = renterOrderService.getRenterOrderByRenterOrderNo(renterOrderNo);
+		if (ChangeSourceEnum.CONSOLE.getCode().equals(updRenterOrderEntity.getChangeSource())) {
+			log.info("管理后台修改订单产生的补付支付成功后不需要后续处理orderNo=[{}], renterOrderNo=[{}]", orderNo, renterOrderNo);
+			return;
+		}
+		if (EFFECTIVE_FLAG.equals(updRenterOrderEntity.getIsEffective())) {
+			log.info("已经生效的租客子订单产生的补付支付成功后不需要后续处理orderNo=[{}], renterOrderNo=[{}]", orderNo, renterOrderNo);
+			return;
+		}
+		supplementPayPostProcess(orderNo, renterOrderNo, null, null);
+	}
+	
 	
 	/**
 	 * 修改订单补付成功后调用
@@ -193,13 +221,18 @@ public class ModifyOrderForRenterService {
 		// 判断是否自动同意
 		boolean autoAgree = !checkAutoAgree(initRenterOrderEntity.getExpRentTime(), initRenterOrderEntity.getExpRevertTime(), updRenterOrderEntity.getExpRentTime(), updRenterOrderEntity.getExpRevertTime());
 		if (autoAgree) {
-			// 自动同意
-			modifyOrderConfirmService.agreeModifyOrder(modifyOrderDTO, updRenterOrderEntity, initRenterOrderEntity, renterOrderSubsidyDetailDTOList);
+			if (modifyOrderDTO != null) {
+				// 自动同意
+				modifyOrderConfirmService.agreeModifyOrder(modifyOrderDTO, updRenterOrderEntity, initRenterOrderEntity, renterOrderSubsidyDetailDTOList);
+			} else {
+				// 模拟车主同意
+				modifyOrderConfirmService.agreeModifyOrder(orderNo, renterOrderNo);
+			}
 		} else {
 			// 保存修改申请记录
 			addRenterOrderChangeApply(orderNo, renterOrderNo, before, after);
 			// 修改订单子状态:1-待补付,2-修改待确认,3-进行中,4-已完结,5-已结束 
-			renterOrderService.updateRenterOrderChildStatus(updRenterOrderEntity.getId(), 2);
+			renterOrderService.updateRenterOrderChildStatus(updRenterOrderEntity.getId(), RenterChildStatusEnum.PROCESS_ING.getCode());
 		}
 	}
 	

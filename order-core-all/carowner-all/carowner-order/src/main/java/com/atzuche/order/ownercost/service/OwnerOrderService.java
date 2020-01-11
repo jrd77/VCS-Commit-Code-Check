@@ -23,6 +23,17 @@ public class OwnerOrderService {
 
     /*
      * @Author ZhangBin
+     * @Date 2020/1/10 14:30
+     * @Description: 获取待生效的子订单状态
+     * 
+     **/
+    public OwnerOrderEntity getChangeOwnerByOrderNo(String orderNo){
+        return ownerOrderMapper.getChangeOwnerByOrderNo(orderNo);
+    }
+
+
+    /*
+     * @Author ZhangBin
      * @Date 2019/12/25 10:08
      * @Description: 查询有效的子订单
      *
@@ -83,6 +94,11 @@ public class OwnerOrderService {
         log.info("下单-车主端-准备保存车主费用明细 ownerOrderNo=[{}],ownerOrderCostReqDTO=[{}]", ownerOrderReqDTO.getOwnerOrderNo(),JSON.toJSONString(ownerOrderCostReqDTO));
         ownerOrderCalCostService.getOrderCostAndDeailList(ownerOrderCostReqDTO);
 
+    }
+
+
+    public Integer updateOwnerOrderChildStatus(Integer id, Integer childStatus) {
+        return ownerOrderMapper.updateOwnerOrderChildStatus(id, childStatus);
     }
 
 }

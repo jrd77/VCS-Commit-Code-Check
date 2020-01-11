@@ -1,12 +1,11 @@
 package com.atzuche.order.admin.controller;
 
-import com.atzuche.order.admin.service.DeliveryCarInfoService;
-import com.atzuche.order.admin.service.HandoverCarInfoService;
-import com.atzuche.order.admin.vo.resp.delivery.DeliveryCarVO;
-import com.atzuche.order.admin.vo.req.DeliveryCarRepVO;
-import com.atzuche.order.admin.vo.req.delivery.CarConditionPhotoUploadVO;
-import com.atzuche.order.admin.vo.req.delivery.DeliveryReqVO;
-import com.atzuche.order.admin.vo.req.handover.HandoverCarInfoReqVO;
+import com.atzuche.order.admin.service.AdminDeliveryCarService;
+import com.atzuche.order.delivery.vo.delivery.rep.DeliveryCarVO;
+import com.atzuche.order.delivery.vo.delivery.req.CarConditionPhotoUploadVO;
+import com.atzuche.order.delivery.vo.delivery.req.DeliveryCarRepVO;
+import com.atzuche.order.delivery.vo.delivery.req.DeliveryReqVO;
+import com.atzuche.order.delivery.vo.handover.req.HandoverCarInfoReqVO;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.doc.annotation.AutoDocGroup;
@@ -31,9 +30,7 @@ import org.springframework.web.bind.annotation.*;
 public class DeliveryCarController extends BaseController {
 
     @Autowired
-    private DeliveryCarInfoService deliveryCarInfoService;
-    @Autowired
-    HandoverCarInfoService handoverCarInfoService;
+    private AdminDeliveryCarService deliveryCarInfoService;
 
     /**
      * 获取配送信息
@@ -46,7 +43,7 @@ public class DeliveryCarController extends BaseController {
     @PostMapping("/delivery/list")
     public ResponseData<?> findDeliveryListByOrderNo(@RequestBody DeliveryCarRepVO deliveryCarDTO) {
         if (null == deliveryCarDTO || StringUtils.isBlank(deliveryCarDTO.getOrderNo())) {
-            return ResponseData.createErrorCodeResponse(ErrorCode.ORDER_NO_PARAM_ERROR.getCode(), "租客子订单编号为空");
+            return ResponseData.createErrorCodeResponse(ErrorCode.ORDER_NO_PARAM_ERROR.getCode(), "租客订单编号为空");
         }
         DeliveryCarVO deliveryCarRepVO = deliveryCarInfoService.findDeliveryListByOrderNo(deliveryCarDTO);
         return ResponseData.success(deliveryCarRepVO);
@@ -59,13 +56,13 @@ public class DeliveryCarController extends BaseController {
     @AutoDocVersion(version = "管理后台交接车照片上传")
     @AutoDocGroup(group = "管理后台交接车照片上传")
     @AutoDocMethod(description = "交接车照片上传", value = "交接车照片上传",response = ResponseData.class)
-    @RequestMapping(value = "/photo/upload", method = RequestMethod.POST)
+    @RequestMapping(value = "/handover/photo/upload", method = RequestMethod.POST)
     public ResponseData<?> upload(@RequestBody @Validated CarConditionPhotoUploadVO photoUploadReqVo, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             return validate(bindingResult);
         }
         try {
-            boolean result = handoverCarInfoService.uploadByOrderNo(photoUploadReqVo);
+            boolean result = deliveryCarInfoService.uploadByOrderNo(photoUploadReqVo);
             return ResponseData.success(result);
         } catch (Exception e) {
             log.error("交接车照片上传接口出现异常", e);
@@ -87,7 +84,7 @@ public class DeliveryCarController extends BaseController {
             return validate(bindingResult);
         }
         try {
-             handoverCarInfoService.updateDeliveryCarInfo(deliveryReqVO);
+            deliveryCarInfoService.updateDeliveryCarInfo(deliveryReqVO);
             return ResponseData.success();
         } catch (Exception e) {
             log.error("配送取还车更新接口出现异常", e);
@@ -110,7 +107,7 @@ public class DeliveryCarController extends BaseController {
             return validate(bindingResult);
         }
         try {
-            handoverCarInfoService.updateHandoverCarInfo(deliveryReqVO);
+            deliveryCarInfoService.updateHandoverCarInfo(deliveryReqVO);
             return ResponseData.success();
         } catch (Exception e) {
             log.error("取还车更新接口出现异常", e);

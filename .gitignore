@@ -219,6 +219,7 @@ casier-all/build/
 casier-all/cashier-account/build/
 casier-all/cashier-api/build/
 config/build/classes/
+order-coin/build/
 config/build/generated/
 config/build/resources/main/mybatis/
 config/build/
@@ -248,6 +249,7 @@ order-core-all/renter-all/renter-wz/build/
 order-core-api/build/
 order-openapi/build/
 admin-api/doc/
+order-core-api/doc/
 util-all/build/
 util-all/fee-calculator/build/
 util-all/order-commons/build/
@@ -258,7 +260,6 @@ account-all/account-renter-detain/.project
 account-all/account-renter-stopcost/.project
 account-all/account-renter-wz-deposit/.project
 admin-api/.project
-carowner-all/
 casier-all/cashier-api/.project
 config/.project
 config/config-client/.project
@@ -291,7 +292,5 @@ order-delivery/build/libs/
 order-flow/.project
 order-log/.project
 order-settle/build/
-order-settle/src/main/java/com/atzuche/order/settle/exception/
-order-settle/src/main/java/com/atzuche/order/settle/vo/res/
-renter-all/
 order-delivery/build
+order-wallet/order-wallet-server/build/

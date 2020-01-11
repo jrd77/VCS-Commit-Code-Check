@@ -114,6 +114,7 @@ public class OwnerDiscountCouponService {
             String json = restTemplate.postForObject(ownerCouponUrl + "/ownerCoupon/trans/req", params, String.class);
             logger.info("ownerCoupon/trans/req. result is:[{}]", json);
             Cat.logEvent(CatConstants.FEIGN_RESULT, json);
+            t.setStatus(Transaction.SUCCESS);
             if (StringUtils.isNotBlank(json)) {
                 ResponseData responseData = new Gson().fromJson(json, ResponseData.class);
                 if (null != responseData) {
@@ -122,7 +123,6 @@ public class OwnerDiscountCouponService {
                     }
                 }
             }
-            t.setStatus(Transaction.SUCCESS);
         } catch (Exception e) {
             logger.info("bindCoupon error . url:[{}],params:[{}]", ownerCouponUrl + "/ownerCoupon/trans/req", params, e);
             Cat.logError("下单绑定车主券失败. url:/ownerCoupon/trans/req,params:"+JSON.toJSONString(params), e);

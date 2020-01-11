@@ -26,7 +26,7 @@ import java.util.Objects;
 @Service
 public class AutoCoinService {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(PlatformCouponService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AutoCoinService.class);
 
     @Resource
     private AutoCoinFeignService autoCoinFeignService;
@@ -148,4 +148,28 @@ public class AutoCoinService {
 
     }
 
+    /**
+     * 结算退还多余凹凸币
+     */
+    public Boolean returnCoin(AutoCoiChargeRequestVO autoCoinRechange) {
+        LOGGER.info("AutoRemoteCoinService returnCoin remote call start param vo:[{}]", autoCoinRechange);
+        Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "凹凸币服务");
+        try {
+            Cat.logEvent(CatConstants.FEIGN_METHOD, "autoCoinFeignService.returnCoin(vo)");
+            Cat.logEvent(CatConstants.FEIGN_PARAM, "vo=" + JSON.toJSONString(autoCoinRechange));
+            ResponseData<Boolean> result = autoCoinFeignService.returnAutoCoin(autoCoinRechange);
+            LOGGER.info("AutoRemoteCoinService returnCoin remote call end result result: [{}]", GsonUtils.toJson(result));
+            Cat.logEvent(CatConstants.FEIGN_RESULT, JSON.toJSONString(result));
+            t.setStatus(Transaction.SUCCESS);
+            return result.getData();
+        } catch (Exception e) {
+            LOGGER.error("退还凹凸币异常.vo:[{}]", autoCoinRechange, e);
+            t.setStatus(e);
+            Cat.logError("退还凹凸币异常.", e);
+        } finally {
+            t.complete();
+        }
+        return false;
+
+    }
 }

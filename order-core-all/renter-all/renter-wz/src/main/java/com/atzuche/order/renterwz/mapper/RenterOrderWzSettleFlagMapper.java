@@ -32,9 +32,10 @@ public interface RenterOrderWzSettleFlagMapper{
 
 	/**
 	 * 批量查询
+	 * @param orderNo 订单号
 	 * @return 查询列表
 	 */
-	List<RenterOrderWzSettleFlagEntity> queryList();
+	List<RenterOrderWzSettleFlagEntity> getIllegalSettleInfosByOrderNo(String orderNo);
 
 	/**
 	 * 修改
@@ -83,4 +84,12 @@ public interface RenterOrderWzSettleFlagMapper{
 	 * @param carNum 车牌号
 	 */
     void updateIsIllegalCost(@Param("orderNo") String orderNo,@Param("hasIllegalCost") int hasIllegalCost,@Param("updateOp") String updateOp,@Param("carNum") String carNum);
+
+	/**
+	 * 根据订单号 修改结算状态
+	 * @param orderNo 订单号
+	 * @param settleFlag 结算状态
+	 * @param updateOp 修改人
+	 */
+	void updateSettleFlag(@Param("orderNo") String orderNo,@Param("settleFlag") int settleFlag,@Param("updateOp") String updateOp);
 }

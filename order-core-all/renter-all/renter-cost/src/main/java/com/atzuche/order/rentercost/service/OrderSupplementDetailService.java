@@ -40,4 +40,14 @@ public class OrderSupplementDetailService{
     public Integer saveOrderSupplementDetail(OrderSupplementDetailEntity supplementEntity) {
     	return orderSupplementDetailMapper.insertSelective(supplementEntity);
     }
+    
+    /**
+     * 更新补付支付状态
+     * @param id
+     * @param payFlag
+     * @return Integer
+     */
+    public Integer updatePayFlagById(Integer id, Integer payFlag) {
+    	return orderSupplementDetailMapper.updatePayFlagById(id, payFlag);
+    }
 }

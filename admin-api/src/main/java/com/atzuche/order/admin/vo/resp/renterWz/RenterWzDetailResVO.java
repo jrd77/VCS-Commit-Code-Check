@@ -20,12 +20,15 @@ public class RenterWzDetailResVO {
     private String orderNo;
 
     @AutoDocProperty(value="违章押金信息")
-    private RenterWzInfoVO info;
+    private RenterWzInfoResVO info;
 
     @AutoDocProperty(value="违章押金暂扣处理")
-    private RenterWzWithholdVO withhold;
+    private RenterWzWithholdResVO withhold;
 
     @AutoDocProperty(value="费用详情")
-    private List<RenterWzCostDetailVO> costDetails;
+    private List<RenterWzCostDetailResVO> costDetails;
+
+    @AutoDocProperty("暂扣返还日志")
+    private List<TemporaryRefundLogResVO> temporaryRefundLogs;
 
 }

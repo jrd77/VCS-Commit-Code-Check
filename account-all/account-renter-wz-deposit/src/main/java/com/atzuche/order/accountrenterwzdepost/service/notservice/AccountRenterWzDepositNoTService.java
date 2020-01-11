@@ -50,7 +50,8 @@ public class AccountRenterWzDepositNoTService {
         AccountRenterWzDepositEntity accountRenterDepositEntity = new AccountRenterWzDepositEntity ();
         BeanUtils.copyProperties(createOrderRenterWZDepositReq,accountRenterDepositEntity);
         accountRenterDepositEntity.setFreeDepositType(createOrderRenterWZDepositReq.getFreeDepositType().getCode());
-        int result = accountRenterWzDepositMapper.insert(accountRenterDepositEntity);
+        accountRenterDepositEntity.setYingshouDeposit(createOrderRenterWZDepositReq.getYingfuDepositAmt());
+        int result = accountRenterWzDepositMapper.insertSelective(accountRenterDepositEntity);
         if(result==0){
             throw new AccountRenterWZDepositException();
         }
@@ -61,9 +62,6 @@ public class AccountRenterWzDepositNoTService {
      */
     public void updateRenterDeposit(PayedOrderRenterWZDepositReqVO payedOrderWZRenterDeposit) {
         AccountRenterWzDepositEntity accountRenterDepositEntity = accountRenterWzDepositMapper.selectByOrderAndMemNo(payedOrderWZRenterDeposit.getOrderNo(),payedOrderWZRenterDeposit.getMemNo());
-        if(Objects.isNull(accountRenterDepositEntity)){
-            throw new PayOrderRenterWZDepositException();
-        }
         BeanUtils.copyProperties(payedOrderWZRenterDeposit,accountRenterDepositEntity);
         int result = accountRenterWzDepositMapper.updateByPrimaryKeySelective(accountRenterDepositEntity);
         if(result==0){

@@ -1,5 +1,6 @@
 package com.atzuche.order.accountownercost.service;
 
+import com.atzuche.order.accountownercost.entity.AccountOwnerCostSettleEntity;
 import com.atzuche.order.accountownercost.service.notservice.AccountOwnerCostSettleNoTService;
 import com.atzuche.order.accountownercost.service.notservice.AccountOwnerCostSettleDetailNoTService;
 import com.atzuche.order.accountownercost.vo.req.AccountOwnerCostSettleReqVO;
@@ -37,6 +38,15 @@ public class AccountOwnerCostSettleService{
         accountOwnerCostSettleNoTService.insertAccountOwnerCostSettle(accountOwnerCostSettleReqVO);
         //3 费用结算插入 车主结算明细表
         accountOwnerCostSettleDetailNoTService.insertAccountOwnerCostSettleDetail(accountOwnerCostSettleReqVO.getAccountOwnerCostSettleDetailReqVO());
-
     }
+    /**
+     * 车主结算信息插入
+     * @param  accountOwnerCostSettle
+     */
+    @CatAnnotation
+    public void insertAccountOwnerCostSettle(AccountOwnerCostSettleEntity accountOwnerCostSettle){
+        accountOwnerCostSettleNoTService.insertAccountOwnerCostSettle(accountOwnerCostSettle);
+    }
+
+
 }

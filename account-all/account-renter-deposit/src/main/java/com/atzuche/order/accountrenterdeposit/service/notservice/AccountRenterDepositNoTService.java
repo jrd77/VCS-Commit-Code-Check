@@ -34,7 +34,7 @@ public class AccountRenterDepositNoTService {
         AccountRenterDepositEntity accountRenterDepositEntity = new AccountRenterDepositEntity ();
         BeanUtils.copyProperties(createOrderRenterDepositReqVO,accountRenterDepositEntity);
         accountRenterDepositEntity.setFreeDepositType(createOrderRenterDepositReqVO.getFreeDepositType().getCode());
-        int result = accountRenterDepositMapper.insert(accountRenterDepositEntity);
+        int result = accountRenterDepositMapper.insertSelective(accountRenterDepositEntity);
         if(result==0){
             throw new AccountRenterDepositDBException();
         }
@@ -61,12 +61,6 @@ public class AccountRenterDepositNoTService {
      */
     public void updateRenterDeposit(PayedOrderRenterDepositReqVO payedOrderRenterDeposit) {
         AccountRenterDepositEntity accountRenterDepositEntity = accountRenterDepositMapper.selectByOrderAndMemNo(payedOrderRenterDeposit.getOrderNo(),payedOrderRenterDeposit.getMemNo());
-        if(Objects.isNull(accountRenterDepositEntity)){
-            throw new PayOrderRenterDepositDBException();
-        }
-        if("00".equals(accountRenterDepositEntity.getPayStatus())){
-            return;
-        }
         BeanUtils.copyProperties(payedOrderRenterDeposit,accountRenterDepositEntity);
         int result = accountRenterDepositMapper.updateByPrimaryKeySelective(accountRenterDepositEntity);
         if(result==0){
@@ -85,7 +79,7 @@ public class AccountRenterDepositNoTService {
         }
         //计算剩余可扣金额押金总和
         int surplusAmt = accountRenterDepositEntity.getSurplusDepositAmt() + accountRenterDepositEntity.getSurplusAuthorizeDepositAmt() + accountRenterDepositEntity.getSurplusCreditPayAmt();
-        if(detainRenterDepositReqVO.getAmt() + surplusAmt<0){
+        if(-detainRenterDepositReqVO.getAmt() + surplusAmt<0){
             //可用 剩余押金 不足
             throw new PayOrderRenterDepositDBException();
         }
@@ -94,15 +88,15 @@ public class AccountRenterDepositNoTService {
         accountRenterDeposit.setVersion(accountRenterDepositEntity.getVersion());
         //预授权押金剩余金额
         if(Objects.nonNull(accountRenterDeposit.getSurplusAuthorizeDepositAmt()) || accountRenterDeposit.getSurplusAuthorizeDepositAmt()>0){
-            accountRenterDeposit.setSurplusAuthorizeDepositAmt(accountRenterDeposit.getSurplusAuthorizeDepositAmt() + detainRenterDepositReqVO.getAmt());
+            accountRenterDeposit.setSurplusAuthorizeDepositAmt(accountRenterDeposit.getSurplusAuthorizeDepositAmt() - detainRenterDepositReqVO.getAmt());
         }
         //押金剩余金额
         if(Objects.nonNull(accountRenterDeposit.getSurplusDepositAmt()) || accountRenterDeposit.getSurplusDepositAmt()>0){
-            accountRenterDeposit.setSurplusDepositAmt(accountRenterDeposit.getSurplusDepositAmt() + detainRenterDepositReqVO.getAmt());
+            accountRenterDeposit.setSurplusDepositAmt(accountRenterDeposit.getSurplusDepositAmt() - detainRenterDepositReqVO.getAmt());
         }
         //信用支付押金剩余金额
         if(Objects.nonNull(accountRenterDeposit.getSurplusCreditPayAmt()) || accountRenterDeposit.getSurplusCreditPayAmt()>0){
-            accountRenterDeposit.setSurplusCreditPayAmt(accountRenterDeposit.getSurplusCreditPayAmt() + detainRenterDepositReqVO.getAmt());
+            accountRenterDeposit.setSurplusCreditPayAmt(accountRenterDeposit.getSurplusCreditPayAmt() - detainRenterDepositReqVO.getAmt());
         }
         int result =  accountRenterDepositMapper.updateByPrimaryKeySelective(accountRenterDeposit);
         if(result==0){

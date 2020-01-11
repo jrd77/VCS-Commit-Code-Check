@@ -40,4 +40,6 @@ public interface RenterOrderDeliveryMapper {
      */
     RenterOrderDeliveryEntity findRenterOrderByrOrderNo(@Param("orderNo") String orderNo,@Param("type") Integer type);
 
+    List<RenterOrderDeliveryEntity> selectByRenterOrderNo(@Param("renterOrderNo")String renterOrderNo);
+
 }

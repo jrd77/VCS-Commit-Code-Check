@@ -5,6 +5,8 @@ import org.apache.ibatis.annotations.Param;
 
 import com.atzuche.order.renterwz.entity.RenterOrderWzStatusEntity;
 
+import java.util.List;
+
 /**
  * RenterOrderWzStatusMapper
  *
@@ -78,4 +80,11 @@ public interface RenterOrderWzStatusMapper{
 	 * @param wzDisposeStatus 状态
 	 */
 	void updateTransWzDisposeStatus(@Param("orderNo") String orderNo,@Param("carNumber") String carNumber,@Param("status") int wzDisposeStatus);
+
+	/**
+	 * 根据订单号查询 违章处理状态信息
+	 * @param orderNo 订单号
+	 * @return 违章处理状态信息列表
+	 */
+    List<RenterOrderWzStatusEntity> queryInfosByOrderNo(@Param("orderNo") String orderNo);
 }

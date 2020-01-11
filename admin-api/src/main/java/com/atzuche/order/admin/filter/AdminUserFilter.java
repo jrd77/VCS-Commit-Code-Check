@@ -34,15 +34,14 @@ public class AdminUserFilter implements Filter {
             String authName = req.getHeader("Console-AUTH-Name");
             String authId = req.getHeader("Console-AUTH-ID");
 
-            if(StringUtils.trimToNull(authId)==null){
-                throw new OrderAdminException(ERROR_CODE,ERROR_TXT,"Header:Console-AUTH-ID cannot be null");
+            if(StringUtils.trimToNull(authId)!=null) {
+
+                authName = URLDecoder.decode(authName, "utf-8");
+
+                AdminUser adminUser = new AdminUser(authId, authName);
+
+                AdminUserUtil.put(adminUser);
             }
-
-            authName = URLDecoder.decode(authName,"utf-8");
-
-            AdminUser adminUser = new AdminUser(authId,authName);
-
-            AdminUserUtil.put(adminUser);
 
             chain.doFilter(request,response);
         }
@@ -50,5 +49,15 @@ public class AdminUserFilter implements Filter {
             logger.error("request not the instance of HttpServletRequest,adminUser cannot set----------");
         }
 
+    }
+
+    @Override
+    public void init(FilterConfig filterConfig) throws ServletException {
+        //do nothing
+    }
+
+    @Override
+    public void destroy() {
+        //do nothing
     }
 }

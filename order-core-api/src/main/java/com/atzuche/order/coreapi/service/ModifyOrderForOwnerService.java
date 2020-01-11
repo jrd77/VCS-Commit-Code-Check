@@ -1,51 +1,31 @@
 package com.atzuche.order.coreapi.service;
 
+import com.atzuche.order.commons.entity.dto.*;
+import com.atzuche.order.commons.enums.SrvGetReturnEnum;
+import com.atzuche.order.coreapi.entity.dto.ModifyOrderOwnerDTO;
+import com.atzuche.order.coreapi.entity.vo.req.CarRentTimeRangeReqVO;
+import com.atzuche.order.coreapi.entity.vo.res.CarRentTimeRangeResVO;
+import com.atzuche.order.coreapi.modifyorder.exception.ModifyOrderParameterException;
+import com.atzuche.order.delivery.entity.RenterOrderDeliveryEntity;
+import com.atzuche.order.owner.commodity.service.OwnerCommodityService;
+import com.atzuche.order.owner.mem.service.OwnerMemberService;
+import com.atzuche.order.ownercost.entity.*;
+import com.atzuche.order.ownercost.service.*;
+import com.atzuche.order.parentorder.entity.OrderEntity;
+import com.atzuche.order.parentorder.service.OrderService;
+import com.atzuche.order.rentercost.entity.RenterOrderSubsidyDetailEntity;
+import com.atzuche.order.renterorder.entity.RenterOrderEntity;
+import com.dianping.cat.Cat;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
-import com.atzuche.order.ownercost.entity.OwnerOrderCostEntity;
-import com.atzuche.order.ownercost.entity.OwnerOrderEntity;
-import com.atzuche.order.ownercost.entity.OwnerOrderIncrementDetailEntity;
-
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import com.atzuche.order.commons.entity.dto.CostBaseDTO;
-import com.atzuche.order.commons.entity.dto.OwnerGoodsDetailDTO;
-import com.atzuche.order.commons.entity.dto.OwnerGoodsPriceDetailDTO;
-import com.atzuche.order.commons.entity.dto.OwnerMemberDTO;
-import com.atzuche.order.commons.entity.dto.OwnerMemberRightDTO;
-import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
-import com.atzuche.order.commons.enums.SrvGetReturnEnum;
-import com.atzuche.order.coreapi.entity.dto.ModifyOrderDTO;
-import com.atzuche.order.coreapi.entity.dto.ModifyOrderOwnerDTO;
-import com.atzuche.order.coreapi.entity.vo.req.CarRentTimeRangeReqVO;
-import com.atzuche.order.coreapi.entity.vo.res.CarRentTimeRangeResVO;
-import com.atzuche.order.coreapi.modifyorder.exception.ModifyOrderParameterException;
-import com.atzuche.order.coreapi.service.GoodsService.CarDetailReqVO;
-import com.atzuche.order.delivery.entity.RenterOrderDeliveryEntity;
-import com.atzuche.order.owner.commodity.service.OwnerCommodityService;
-import com.atzuche.order.ownercost.entity.OwnerOrderPurchaseDetailEntity;
-import com.atzuche.order.ownercost.entity.OwnerOrderSubsidyDetailEntity;
-import com.atzuche.order.owner.mem.service.OwnerMemberService;
-import com.atzuche.order.rentercost.entity.RenterOrderSubsidyDetailEntity;
-import com.atzuche.order.renterorder.entity.RenterOrderEntity;
-import com.atzuche.order.ownercost.service.OwnerOrderCostCombineService;
-import com.atzuche.order.ownercost.service.OwnerOrderCostService;
-import com.atzuche.order.ownercost.service.OwnerOrderIncrementDetailService;
-import com.atzuche.order.ownercost.service.OwnerOrderPurchaseDetailService;
-import com.atzuche.order.ownercost.service.OwnerOrderService;
-import com.atzuche.order.ownercost.service.OwnerOrderSubsidyDetailService;
-import com.atzuche.order.parentorder.entity.OrderEntity;
-import com.atzuche.order.parentorder.service.OrderService;
-import com.autoyol.commons.web.ResponseData;
-import com.dianping.cat.Cat;
-
-import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Slf4j
@@ -73,6 +53,8 @@ public class ModifyOrderForOwnerService {
 	private UniqueOrderNoService uniqueOrderNoService;
 	@Autowired
 	private OrderService orderService;
+	@Autowired
+    private CarRentalTimeApiService carRentalTimeApiService;
 
 	/**
 	 * 租客修改订单重新下车主订单逻辑(相当于车主同意)
@@ -97,7 +79,7 @@ public class ModifyOrderForOwnerService {
 		// 获取修改前有效车主订单信息
 		OwnerOrderEntity ownerOrderEntity = ownerOrderService.getOwnerOrderByOrderNoAndIsEffective(orderNo);
 		// 获取车主会员信息
-		OwnerMemberDTO ownerMemberDTO = getOwnerMemberDTO(ownerOrderEntity.getOwnerOrderNo());
+		OwnerMemberDTO ownerMemberDTO = getOwnerMemberDTO(ownerOrderEntity.getOwnerOrderNo(), ownerOrderNo);
 		// 设置车主会员信息
 		modifyOrderOwnerDTO.setOwnerMemberDTO(ownerMemberDTO);
 		// 获取车主端商品详情
@@ -279,13 +261,15 @@ public class ModifyOrderForOwnerService {
 	 * @param ownerOrderNo
 	 * @return CarDetailReqVO
 	 */
-	public CarDetailReqVO convertToCarDetailReqVO(ModifyOrderOwnerDTO modifyOrderOwnerDTO, OwnerOrderEntity ownerOrderEntity) {
+	public GoodsService.CarDetailReqVO convertToCarDetailReqVO(ModifyOrderOwnerDTO modifyOrderOwnerDTO, OwnerOrderEntity ownerOrderEntity) {
 		// 车主子订单号
 		String ownerOrderNo = ownerOrderEntity.getOwnerOrderNo();
 		// 获取车主商品信息
 		OwnerGoodsDetailDTO ownerGoodsDetailDTO = ownerCommodityService.getOwnerGoodsDetail(ownerOrderNo, false);
-		CarDetailReqVO carDetailReqVO = new CarDetailReqVO(); 
-		carDetailReqVO.setAddrIndex(ownerGoodsDetailDTO.getCarAddrIndex());
+		GoodsService.CarDetailReqVO carDetailReqVO = new GoodsService.CarDetailReqVO(); 
+		if (ownerGoodsDetailDTO.getCarAddrIndex() != null) {
+			carDetailReqVO.setAddrIndex(ownerGoodsDetailDTO.getCarAddrIndex());
+		}
 		carDetailReqVO.setCarNo(String.valueOf(ownerGoodsDetailDTO.getCarNo()));
 		carDetailReqVO.setRentTime(modifyOrderOwnerDTO.getRentTime());
 		carDetailReqVO.setRevertTime(modifyOrderOwnerDTO.getRevertTime());
@@ -349,8 +333,7 @@ public class ModifyOrderForOwnerService {
 		if (carRentTimeRangeReqVO == null) {
 			return null;
 		}
-		CarRentTimeRangeResVO carRentTimeRangeResVO = goodsService.getCarRentTimeRange(carRentTimeRangeReqVO);
-		return carRentTimeRangeResVO;
+		return carRentalTimeApiService.getCarRentTimeRange(carRentTimeRangeReqVO);
 	}
 	
 	/**
@@ -406,6 +389,7 @@ public class ModifyOrderForOwnerService {
 		ownerGoodsDetailDTO.setMemNo(ownerOrderEntity.getMemNo());
 		ownerGoodsDetailDTO.setRentTime(modifyOrderOwnerDTO.getRentTime());
 		ownerGoodsDetailDTO.setRevertTime(modifyOrderOwnerDTO.getRevertTime());
+		ownerGoodsDetailDTO.setOldRentTime(ownerOrderEntity.getExpRentTime());
 		ownerGoodsDetailDTO = ownerCommodityService.setPriceAndGroup(ownerGoodsDetailDTO);
 		// 设置最新的车主订单号
 		ownerGoodsDetailDTO.setOwnerOrderNo(modifyOrderOwnerDTO.getOwnerOrderNo());
@@ -425,18 +409,19 @@ public class ModifyOrderForOwnerService {
 	
 	/**
 	 * 获取车主会员信息根据车主订单号
-	 * @param ownerOrderNo 车主订单号
+	 * @param ownerOrderNo 修改前车主订单号
+	 * @param updOwnerOrderNo 修改后车主订单号
 	 * @return OwnerMemberDTO
 	 */
-	public OwnerMemberDTO getOwnerMemberDTO(String ownerOrderNo) {
-		OwnerMemberDTO ownerMemberDTO = ownerMemberService.selectownerMemberByMemNo(ownerOrderNo, true);
-		ownerMemberDTO.setOwnerOrderNo(ownerOrderNo);
+	public OwnerMemberDTO getOwnerMemberDTO(String ownerOrderNo, String updOwnerOrderNo) {
+		OwnerMemberDTO ownerMemberDTO = ownerMemberService.selectownerMemberByOwnerOrderNo(ownerOrderNo, true);
+		ownerMemberDTO.setOwnerOrderNo(updOwnerOrderNo);
 		List<OwnerMemberRightDTO> ownerMemberRightDTOList = ownerMemberDTO.getOwnerMemberRightDTOList();
 		if (ownerMemberRightDTOList == null || ownerMemberRightDTOList.isEmpty()) {
 			return ownerMemberDTO;
 		}
 		for (OwnerMemberRightDTO mr:ownerMemberRightDTOList) {
-			mr.setOwnerOrderNo(ownerOrderNo);
+			mr.setOwnerOrderNo(updOwnerOrderNo);
 		}
 		return ownerMemberDTO;
 	}

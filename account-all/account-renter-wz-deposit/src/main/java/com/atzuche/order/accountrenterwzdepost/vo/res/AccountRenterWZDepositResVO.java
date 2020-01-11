@@ -11,6 +11,10 @@ import java.time.LocalDateTime;
 @Data
 public class AccountRenterWZDepositResVO {
     /**
+     *
+     */
+    private Integer id;
+    /**
      * 主订单号
      */
     private String orderNo;

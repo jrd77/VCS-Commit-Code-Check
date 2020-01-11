@@ -40,15 +40,19 @@
         <result property="carRealLon" column="car_real_lon"/>
         <result property="carRealLat" column="car_real_lat"/>
         <result property="carAddrIndex" column="car_addr_index"/>
+        <result property="carGuideDayPrice" column="car_guide_day_price"/>
         <result property="stopCostRate" column="stop_cost_rate"/>
         <result property="engineSource" column="engine_source"/>
         <result property="frameNo" column="frame_no"/>
         <result property="engineNum" column="engine_num"/>
+        <result property="year" column="year"/>
         <result property="createTime" column="create_time"/>
         <result property="createOp" column="create_op"/>
         <result property="updateTime" column="update_time"/>
         <result property="updateOp" column="update_op"/>
         <result property="isDelete" column="is_delete"/>
+        <result property="oilTotalCalibration" column="oil_total_calibration"/>
+
     </resultMap>
 
 
@@ -89,15 +93,19 @@
 	`car_real_lon`,
 	`car_real_lat`,
 	`car_addr_index`,
+	`car_guide_day_price`,
+	`oil_total_calibration`,
 	`stop_cost_rate`,
 	`engine_source`,
 	`frame_no`,
 	`engine_num`,
+	`year`,
 	`create_time`,
 	`create_op`,
 	`update_time`,
 	`update_op`,
 	`is_delete`
+
 
 	</sql>
 
@@ -144,10 +152,13 @@
         `car_real_lon`,
         `car_real_lat`,
         `car_addr_index`,
+        `car_guide_day_price`,
+        `oil_total_calibration`,
         `stop_cost_rate`,
         `engine_source`,
         `frame_no`,
         `engine_num`,
+        `year`,
         `create_op`,
         `update_op`
         )
@@ -188,10 +199,13 @@
         #{carRealLon},
         #{carRealLat},
         #{carAddrIndex},
+        #{carGuideDayPrice},
+        #{oilTotalCalibration},
         #{stopCostRate},
         #{engineSource},
         #{frameNo},
         #{engineNum},
+        #{year},
         #{createOp},
         #{updateOp}
         )
@@ -235,10 +249,13 @@
             <if test="carRealLon != null">`car_real_lon`, </if>
             <if test="carRealLat != null">`car_real_lat`, </if>
             <if test="carAddrIndex != null">`car_addr_index`, </if>
+            <if test="carGuideDayPrice != null">`car_guide_day_price`, </if>
+            <if test="oilTotalCalibration != null">`oil_total_calibration`, </if>
             <if test="stopCostRate != null">`stop_cost_rate`, </if>
             <if test="engineSource != null">`engine_source`, </if>
             <if test="frameNo != null">`frame_no`, </if>
             <if test="engineNum != null">`engine_num`, </if>
+            <if test="year != null">`year`,</if>
             <if test="createTime != null">`create_time`, </if>
             <if test="createOp != null">`create_op`, </if>
             <if test="updateTime != null">`update_time`, </if>
@@ -281,10 +298,13 @@
             <if test="carRealLon != null">#{carRealLon},  </if>
             <if test="carRealLat != null">#{carRealLat},  </if>
             <if test="carAddrIndex != null">#{carAddrIndex},  </if>
+            <if test="carGuideDayPrice != null">#{carGuideDayPrice},  </if>
+            <if test="oilTotalCalibration != null">#{oilTotalCalibration},  </if>
             <if test="stopCostRate != null">#{stopCostRate},  </if>
             <if test="engineSource != null">#{engineSource},  </if>
             <if test="frameNo != null">#{frameNo},  </if>
             <if test="engineNum != null">#{engineNum},  </if>
+            <if test="year != null">#{year},</if>
             <if test="createTime != null">#{createTime},  </if>
             <if test="createOp != null">#{createOp},  </if>
             <if test="updateTime != null">#{updateTime},  </if>
@@ -332,10 +352,13 @@
             <if test="carRealLon != null">`car_real_lon` = #{carRealLon}, </if>
             <if test="carRealLat != null">`car_real_lat` = #{carRealLat}, </if>
             <if test="carAddrIndex != null">`car_addr_index` = #{carAddrIndex}, </if>
+            <if test="carGuideDayPrice != null">`car_guide_day_price` = #{carGuideDayPrice},  </if>
+            <if test="oilTotalCalibration != null">`oil_total_calibration` = #{oilTotalCalibration},  </if>
             <if test="stopCostRate != null">`stop_cost_rate` = #{stopCostRate}, </if>
             <if test="engineSource != null">`engine_source` = #{engineSource}, </if>
             <if test="frameNo != null">`frame_no` = #{frameNo}, </if>
             <if test="engineNum != null">`engine_num` = #{engineNum}, </if>
+            <if test="year != null">`year` = #{year}, </if>
             <if test="createTime != null">`create_time` = #{createTime}, </if>
             <if test="createOp != null">`create_op` = #{createOp}, </if>
             <if test="updateTime != null">`update_time` = #{updateTime}, </if>
@@ -383,10 +406,13 @@
             `car_real_lon` = #{carRealLon},
             `car_real_lat` = #{carRealLat},
             `car_addr_index` = #{carAddrIndex},
+            `car_guide_day_price` = #{carGuideDayPrice},
+            `oil_total_calibration` = #{oilTotalCalibration}
             `stop_cost_rate` = #{stopCostRate},
             `engine_source` = #{engineSource},
             `frame_no` = #{frameNo},
             `engine_num` = #{engineNum},
+            `year` = #{year}
             `create_time` = #{createTime},
             `create_op` = #{createOp},
             `update_time` = #{updateTime},

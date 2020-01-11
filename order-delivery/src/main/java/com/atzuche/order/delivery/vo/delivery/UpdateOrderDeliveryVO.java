@@ -1,12 +1,18 @@
 package com.atzuche.order.delivery.vo.delivery;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * @author 胡春林
  * 更新信息
  */
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class UpdateOrderDeliveryVO {
 
     /**

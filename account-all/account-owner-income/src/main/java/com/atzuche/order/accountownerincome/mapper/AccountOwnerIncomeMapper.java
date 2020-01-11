@@ -14,7 +14,7 @@ import org.apache.ibatis.annotations.Param;
 public interface AccountOwnerIncomeMapper{
 
     AccountOwnerIncomeEntity selectByPrimaryKey(Integer id);
-    int insert(AccountOwnerIncomeEntity record);
+    int insertSelective(AccountOwnerIncomeEntity record);
     int updateByPrimaryKey(AccountOwnerIncomeEntity record);
     
     /**

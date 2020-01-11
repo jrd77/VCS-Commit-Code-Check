@@ -64,15 +64,12 @@ public class NormalOrderReqVO extends BaseVO implements Serializable {
     private Integer srvGetFlag;
 
     @AutoDocProperty(value = "取车服务-取车地址", required = true)
-    @NotBlank(message = "取车地址不能为空")
     private String srvGetAddr;
 
     @AutoDocProperty(value = "取车服务-取车地址-地址经度", required = true)
-    @NotBlank(message = "取车地址经度不能为空")
     private String srvGetLon;
 
     @AutoDocProperty(value = "取车服务-取车地址-地址维度", required = true)
-    @NotBlank(message = "取车地址维度不能为空")
     private String srvGetLat;
 
     @AutoDocProperty(value = "是否使用还车服务:0.否 1.是", required = true)
@@ -80,15 +77,12 @@ public class NormalOrderReqVO extends BaseVO implements Serializable {
     private Integer srvReturnFlag;
 
     @AutoDocProperty(value = "还车服务-还车地址", required = true)
-    @NotBlank(message = "还车地址不能为空")
     private String srvReturnAddr;
 
     @AutoDocProperty(value = "还车服务-还车地址-地址经度", required = true)
-    @NotBlank(message = "还车地址经度不能为空")
     private String srvReturnLon;
 
     @AutoDocProperty(value = "还车服务-还车地址-地址维度", required = true)
-    @NotBlank(message = "还车地址维度不能为空")
     private String srvReturnLat;
 
     @AutoDocProperty(value = "车辆注册号", required = true)

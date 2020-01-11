@@ -58,7 +58,7 @@ public class ModifyOrderUtils {
 	public static boolean getModifyTimeFlag(LocalDateTime initTime, String updTimeStr) {
 		LocalDateTime updTime = null;
 		if (StringUtils.isNotBlank(updTimeStr)) {
-			updTime = CommonUtils.parseTime(updTimeStr, CommonUtils.FORMAT_STR_DEFAULT);
+			updTime = CommonUtils.parseTime(updTimeStr, CommonUtils.FORMAT_STR_LONG);
 		}
 		if (updTime != null && !updTime.equals(initTime)) {
 			return true;
@@ -75,6 +75,10 @@ public class ModifyOrderUtils {
 	 * @return boolean
 	 */
 	public static boolean getModifyGetReturnAddrFlag(String initLon, String initLat, String updLon, String updLat) {
+		if ((StringUtils.isBlank(initLon) && StringUtils.isNotBlank(updLon)) || 
+				(StringUtils.isBlank(initLat) && StringUtils.isNotBlank(updLat))) {
+			return true;
+		}
 		if (StringUtils.isNotBlank(initLon) && StringUtils.isNotBlank(updLon)) {
 			BigDecimal bigInitLon = new BigDecimal(initLon);
 			BigDecimal bigLon = new BigDecimal(updLon);
@@ -154,7 +158,7 @@ public class ModifyOrderUtils {
 			changeItemList.add(new OrderChangeItemDTO(initRenterOrder.getOrderNo(), renterOrderNo, OrderChangeItemEnum.MODIFY_GETADDR.getCode(), OrderChangeItemEnum.MODIFY_GETADDR.getName()));
 		}
 		if (getModifyGetReturnAddrFlag(initReturnLon, initReturnLat, updModifyOrder.getRevertCarLon(), updModifyOrder.getRevertCarLat())) {
-			changeItemList.add(new OrderChangeItemDTO(initRenterOrder.getOrderNo(), renterOrderNo, OrderChangeItemEnum.MODIFY_GETADDR.getCode(), OrderChangeItemEnum.MODIFY_GETADDR.getName()));
+			changeItemList.add(new OrderChangeItemDTO(initRenterOrder.getOrderNo(), renterOrderNo, OrderChangeItemEnum.MODIFY_RETURNADDR.getCode(), OrderChangeItemEnum.MODIFY_RETURNADDR.getName()));
 		}
 		String initCarOwnerCouponId = null,initGetReturnCouponId = null,initPlatformCouponId = null;
 		if (orderCouponList != null && !orderCouponList.isEmpty()) {

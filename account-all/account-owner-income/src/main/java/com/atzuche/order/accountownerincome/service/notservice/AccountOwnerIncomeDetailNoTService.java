@@ -2,7 +2,6 @@ package com.atzuche.order.accountownerincome.service.notservice;
 
 import com.atzuche.order.accountownerincome.entity.AccountOwnerIncomeDetailEntity;
 import com.atzuche.order.accountownerincome.entity.AccountOwnerIncomeExamineEntity;
-
 import com.atzuche.order.accountownerincome.exception.AccountOwnerIncomeExamineException;
 import com.atzuche.order.accountownerincome.mapper.AccountOwnerIncomeDetailMapper;
 import com.atzuche.order.accountownerincome.vo.req.AccountOwnerIncomeExamineOpReqVO;
@@ -13,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Objects;
 
 
@@ -52,10 +52,15 @@ public class AccountOwnerIncomeDetailNoTService {
         accountOwnerIncomeDetail.setType(AccountOwnerIncomeDetailType.INCOME.getType());
         accountOwnerIncomeDetail.setCostCode(OrderCoseSourceCode.OWNER_COST_SETTLE.getCode());
         accountOwnerIncomeDetail.setCostDetail(OrderCoseSourceCode.OWNER_COST_SETTLE.getDesc());
-        int result = accountOwnerIncomeDetailMapper.insert(accountOwnerIncomeDetail);
+        int result = accountOwnerIncomeDetailMapper.insertSelective(accountOwnerIncomeDetail);
         if(result==0){
             throw new AccountOwnerIncomeExamineException();
         }
         return accountOwnerIncomeDetail;
+    }
+
+
+    public List<AccountOwnerIncomeDetailEntity> selectByOrderNo(String orderNo){
+        return accountOwnerIncomeDetailMapper.selectByOrderNo(orderNo);
     }
 }

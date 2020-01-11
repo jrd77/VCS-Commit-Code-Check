@@ -68,7 +68,7 @@ public class AccountRenterCostDetailReqVO {
     /**
      * 入账时间
      */
-    private LocalDateTime time;
+    private String time;
 
 
     /**

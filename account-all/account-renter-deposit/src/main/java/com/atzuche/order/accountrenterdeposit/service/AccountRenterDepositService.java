@@ -60,15 +60,16 @@ public class AccountRenterDepositService{
     /**
      * 查询车辆押金余额
      */
-    public int getSurplusRenterDeposit(String orderNo, String memNo) {
+    public int getRenterDeposit(String orderNo, String memNo) {
         //查询车辆押金信息
         AccountRenterDepositResVO accountRenterDepositRes = getAccountRenterDepositEntity(orderNo,memNo);
         //1 校验 是否存在车辆押金记录
         Assert.notNull(accountRenterDepositRes, ErrorCode.PARAMETER_ERROR.getText());
         Assert.notNull(accountRenterDepositRes.getOrderNo(), ErrorCode.PARAMETER_ERROR.getText());
         //2 返回计算剩余押金余额
-        int surplusRenterDeposit = accountRenterDepositRes.getSurplusDepositAmt() + accountRenterDepositRes.getSurplusAuthorizeDepositAmt() + accountRenterDepositRes.getSurplusCreditPayAmt();
-        return surplusRenterDeposit;
+        Integer amt = accountRenterDepositRes.getYingfuDepositAmt();
+        amt = Objects.isNull(amt)?0:amt;
+        return amt;
     }
     /**
      * 下单成功记录应付押金
@@ -89,7 +90,7 @@ public class AccountRenterDepositService{
     public void updateRenterDeposit(PayedOrderRenterDepositReqVO payedOrderRenterDeposit){
         //1 参数校验
         Assert.notNull(payedOrderRenterDeposit, ErrorCode.PARAMETER_ERROR.getText());
-        payedOrderRenterDeposit.check();
+        //payedOrderRenterDeposit.check();
         //2更新押金 实付信息
         accountRenterDepositNoTService.updateRenterDeposit(payedOrderRenterDeposit);
         //添加押金资金进出明细
@@ -100,13 +101,18 @@ public class AccountRenterDepositService{
      * 账户押金转出
      * @param detainRenterDepositReqVO
      */
-    public void detainRenterDeposit(DetainRenterDepositReqVO detainRenterDepositReqVO) {
+    public int detainRenterDeposit(DetainRenterDepositReqVO detainRenterDepositReqVO) {
         //1 参数校验
         Assert.notNull(detainRenterDepositReqVO, ErrorCode.PARAMETER_ERROR.getText());
         detainRenterDepositReqVO.check();
         //2更新车辆押金  剩余押金 金额
         accountRenterDepositNoTService.updateRenterDepositChange(detainRenterDepositReqVO);
         //添加押金资金进出明细
-        accountRenterDepositDetailNoTService.insertRenterDepositDetail(detainRenterDepositReqVO);
+        int id = accountRenterDepositDetailNoTService.insertRenterDepositDetail(detainRenterDepositReqVO);
+        return id;
+    }
+
+    public void updateRenterDepositUniqueNo(String uniqueNo, int renterDepositDetailId) {
+        accountRenterDepositDetailNoTService.updateRenterDepositUniqueNo(uniqueNo,renterDepositDetailId);
     }
 }

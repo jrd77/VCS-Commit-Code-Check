@@ -11,9 +11,12 @@ import com.atzuche.order.commons.OrderReqContext;
 import com.atzuche.order.commons.entity.dto.OwnerGoodsDetailDTO;
 import com.atzuche.order.commons.enums.OrderChangeItemEnum;
 import com.atzuche.order.commons.enums.RenterCashCodeEnum;
+import com.atzuche.order.commons.enums.SrvGetReturnEnum;
 import com.atzuche.order.commons.vo.req.OrderReqVO;
+import com.atzuche.order.coreapi.entity.dto.ModifyConfirmDTO;
 import com.atzuche.order.coreapi.entity.dto.ModifyOrderDTO;
 import com.atzuche.order.coreapi.entity.dto.ModifyOrderOwnerDTO;
+import com.atzuche.order.coreapi.entity.request.ModifyApplyHandleReq;
 import com.atzuche.order.coreapi.modifyorder.exception.ModifyOrderParameterException;
 import com.atzuche.order.delivery.entity.RenterOrderDeliveryEntity;
 import com.atzuche.order.delivery.service.RenterOrderDeliveryService;
@@ -137,6 +140,12 @@ public class ModifyOrderConfirmService {
 	}
 	
 	
+	public ResponseData<?> modifyConfirm(ModifyApplyHandleReq modifyApplyHandleReq) {
+		ModifyConfirmDTO modifyConfirmDTO = null;
+		return null;
+	}
+	
+	
 	/**
 	 * 车主同意
 	 * @param orderNo
@@ -217,7 +226,7 @@ public class ModifyOrderConfirmService {
 						reqContext.getOrderReqVO().setSrvReturnFlag(0);
 					}
 					// 新增取车服务
-					deliveryCarService.addRenYunFlowOrderInfo(getMinutes, returnMinutes, reqContext);
+					deliveryCarService.addRenYunFlowOrderInfo(getMinutes, returnMinutes, reqContext, SrvGetReturnEnum.SRV_GET_TYPE.getCode());
 				}
 				if (srvGetFlag != null && srvGetFlag == 0) {
 					// 取消取车服务
@@ -236,7 +245,7 @@ public class ModifyOrderConfirmService {
 						reqContext.getOrderReqVO().setSrvReturnFlag(1);
 					}
 					// 新增取车服务
-					deliveryCarService.addRenYunFlowOrderInfo(getMinutes, returnMinutes, reqContext);
+					deliveryCarService.addRenYunFlowOrderInfo(getMinutes, returnMinutes, reqContext, SrvGetReturnEnum.SRV_RETURN_TYPE.getCode());
 				}
 				if (srvReturnFlag != null && srvReturnFlag == 0) {
 					// 取消还车服务

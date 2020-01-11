@@ -17,7 +17,7 @@
         <result property="goodsCode" column="goods_code"/>
         <result property="goodsType" column="goods_type"/>
         <result property="childStatus" column="child_status"/>
-        <result property="isCancel" column="is_cancle"/>
+        <result property="isCancel" column="is_cancel"/>
         <result property="isUseSpecialPrice" column="is_use_special_price"/>
         <result property="cancleOp" column="cancle_op"/>
         <result property="createTime" column="create_time"/>
@@ -42,7 +42,7 @@
 	`goods_code`,
 	`goods_type`,
 	`child_status`,
-	`is_cancle`,
+	`is_cancel`,
 	`is_use_special_price`,
 	`cancle_op`,
 	`create_time`,
@@ -114,7 +114,7 @@
             <if test="goodsCode != null">`goods_code`, </if>
             <if test="goodsType != null">`goods_type`, </if>
             <if test="childStatus != null">`child_status`, </if>
-            <if test="isCancel != null">`is_cancle`, </if>
+            <if test="isCancel != null">`is_cancel`, </if>
             <if test="isUseSpecialPrice != null">`is_use_special_price`, </if>
             <if test="cancleOp != null">`cancle_op`, </if>
             <if test="createOp != null">`create_op`, </if>
@@ -157,7 +157,7 @@
             <if test="goodsCode != null">`goods_code` = #{goodsCode}, </if>
             <if test="goodsType != null">`goods_type` = #{goodsType}, </if>
             <if test="childStatus != null">`child_status` = #{childStatus}, </if>
-            <if test="isCancel != null">`is_cancle` = #{isCancel}, </if>
+            <if test="isCancel != null">`is_cancel` = #{isCancel}, </if>
             <if test="isUseSpecialPrice != null">`is_use_special_price` = #{isUseSpecialPrice}, </if>
             <if test="cancleOp != null">`cancle_op` = #{cancleOp}, </if>
             <if test="createOp != null">`create_op` = #{createOp}, </if>
@@ -182,7 +182,7 @@
             `goods_code` = #{goodsCode},
             `goods_type` = #{goodsType},
             `child_status` = #{childStatus},
-            `is_cancle` = #{isCancel},
+            `is_cancel` = #{isCancel},
             `is_use_special_price` = #{isUseSpecialPrice},
             `cancle_op` = #{cancleOp},
             `create_op` = #{createOp},
@@ -196,7 +196,7 @@
 	<select id="getOwnerOrderByOrderNoAndIsEffective" resultMap="BaseResultMap">
         select <include refid="Base_Column_List" /> from owner_order where order_no = #{orderNo}
 		and is_effective = 1
-		and is_cancle = 0
+		and is_cancel = 0
 		and is_delete = 0
 		order by id desc
 		limit 1
@@ -206,5 +206,19 @@
     	update owner_order set is_effective = 0
     	where id = #{id}
     </update>
+
+    <update id="updateOwnerOrderChildStatus">
+		update owner_order set child_status = #{childStatus}
+		where id = #{id}
+	</update>
+    <select id="getChangeOwnerByOrderNo" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List" /> from owner_order where order_no = #{orderNo}
+        and is_effective = 0
+        and is_cancel = 0
+        and is_delete = 0
+        and child_status = 3
+        order by id desc
+        limit 1
+    </select>
 
 </mapper>

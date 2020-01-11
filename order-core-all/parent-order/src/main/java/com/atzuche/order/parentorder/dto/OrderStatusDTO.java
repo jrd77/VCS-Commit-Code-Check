@@ -90,5 +90,15 @@ public class OrderStatusDTO {
      */
     private Integer status;
 
+    /**
+     * 创建人
+     */
+    private String createOp;
+
+    /**
+     * 修改人
+     */
+    private String updateOp;
+
 
 }

@@ -22,7 +22,7 @@ public class PayedOrderRenterDepositReqVO {
     /**
      * 支付状态
      */
-    private Integer payStatus;
+    private String payStatus;
     /**
      * 支付时间
      */
@@ -74,7 +74,6 @@ public class PayedOrderRenterDepositReqVO {
     public void check() {
         Assert.notNull(getMemNo(), ErrorCode.PARAMETER_ERROR.getText());
         Assert.notNull(getOrderNo(), ErrorCode.PARAMETER_ERROR.getText());
-        Assert.notNull(getIsFreeDeposit(), ErrorCode.PARAMETER_ERROR.getText());
         Assert.notNull(getPayStatus(), ErrorCode.PARAMETER_ERROR.getText());
         Assert.notNull(getPayTime(), ErrorCode.PARAMETER_ERROR.getText());
         Assert.notNull(getDetainRenterDepositReqVO(), ErrorCode.PARAMETER_ERROR.getText());

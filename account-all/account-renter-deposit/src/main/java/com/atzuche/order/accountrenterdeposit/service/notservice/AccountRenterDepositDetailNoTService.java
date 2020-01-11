@@ -8,6 +8,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 
 
 /**
@@ -26,14 +27,32 @@ public class AccountRenterDepositDetailNoTService {
      * 新增车辆押金 流水记录
      * @param detainRenterDeposit
      */
-    public void insertRenterDepositDetail(DetainRenterDepositReqVO detainRenterDeposit) {
+    public int insertRenterDepositDetail(DetainRenterDepositReqVO detainRenterDeposit) {
         AccountRenterDepositDetailEntity accountRenterDepositDetailEntity = new AccountRenterDepositDetailEntity();
         BeanUtils.copyProperties(detainRenterDeposit,accountRenterDepositDetailEntity);
         accountRenterDepositDetailEntity.setSourceCode(detainRenterDeposit.getRenterCashCodeEnum().getCashNo());
         accountRenterDepositDetailEntity.setSourceDetail(detainRenterDeposit.getRenterCashCodeEnum().getCashNo());
-        int result = accountRenterDepositDetailMapper.insert(accountRenterDepositDetailEntity);
+        int result = accountRenterDepositDetailMapper.insertSelective(accountRenterDepositDetailEntity);
         if(result==0){
             throw new PayOrderRenterDepositDBException();
         }
+        return accountRenterDepositDetailEntity.getId();
+    }
+
+    public void updateRenterDepositUniqueNo(String uniqueNo, int renterDepositDetailId) {
+        AccountRenterDepositDetailEntity entity = new AccountRenterDepositDetailEntity();
+        entity.setId(renterDepositDetailId);
+        entity.setUniqueNo(uniqueNo);
+        accountRenterDepositDetailMapper.updateByPrimaryKeySelective(entity);
+
+    }
+
+    /**
+     * 返回押金的支付流水
+     * @param orderNo
+     * @return
+     */
+    public List<AccountRenterDepositDetailEntity> findByOrderNo(String orderNo){
+        return accountRenterDepositDetailMapper.findByOrderNo(orderNo);
     }
 }

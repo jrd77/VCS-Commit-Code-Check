@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import java.util.List;
+import java.util.Objects;
 
 
 /**
@@ -33,10 +34,33 @@ public class AccountOwnerCostSettleDetailNoTService {
             accountOwnerCostSettleDetail.check();
             AccountOwnerCostSettleDetailEntity accountOwnerCostSettleDetailEntity = new AccountOwnerCostSettleDetailEntity();
             BeanUtils.copyProperties(accountOwnerCostSettleDetail,accountOwnerCostSettleDetailEntity);
-            int result = accountOwnerCostSettleDetailMapper.insert(accountOwnerCostSettleDetailEntity);
+            int result = accountOwnerCostSettleDetailMapper.insertSelective(accountOwnerCostSettleDetailEntity);
             if(result==0){
                 throw new AccountOwnerCostSettleException();
             }
         }
+    }
+
+    /**
+     * 车俩结算 车主费用明细落库
+     * @param accountOwnerCostSettleDetails
+     */
+    public void insertAccountOwnerCostSettleDetails(List<AccountOwnerCostSettleDetailEntity> accountOwnerCostSettleDetails) {
+        if(!CollectionUtils.isEmpty(accountOwnerCostSettleDetails)){
+            for(int i=0;i<accountOwnerCostSettleDetails.size();i++){
+                AccountOwnerCostSettleDetailEntity entity = accountOwnerCostSettleDetails.get(i);
+                accountOwnerCostSettleDetailMapper.insertSelective(entity);
+            }
+        }
+    }
+    /**
+     * 车俩结算 车主费用明细落库
+     * @param accountOwnerCostSettleDetail
+     */
+    public int insertAccountOwnerCostSettleDetail(AccountOwnerCostSettleDetailEntity accountOwnerCostSettleDetail) {
+        if(Objects.nonNull(accountOwnerCostSettleDetail)){
+            accountOwnerCostSettleDetailMapper.insertSelective(accountOwnerCostSettleDetail);
+        }
+        return accountOwnerCostSettleDetail.getId();
     }
 }

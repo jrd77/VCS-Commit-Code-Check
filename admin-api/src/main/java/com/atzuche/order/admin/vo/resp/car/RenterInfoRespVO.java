@@ -42,4 +42,16 @@ public class RenterInfoRespVO implements Serializable {
     @AutoDocProperty(value = "附加驾驶人信息")
     private List<CommUseDriverVO> commUseDrivers;
 
+    ///////////////////人工调度处理-租客信息////////////////////////
+    @AutoDocProperty(value = "身份证")
+    private String idNo;
+    @AutoDocProperty(value = "加入时间")
+    private String regTimeTxt;
+    @AutoDocProperty(value = "驾龄")
+    private String driveAge;
+    @AutoDocProperty(value = "成功租车次数")
+    private String buyTimes;
+    @AutoDocProperty(value = "成功升级车辆次数")
+    private String upgrades;
+
 }

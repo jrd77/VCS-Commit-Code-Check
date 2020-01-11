@@ -1,15 +1,16 @@
 package com.atzuche.order.coreapi.service;
 
-import com.atzuche.order.commons.service.ShortUrlService;
+import com.atzuche.order.renterwz.service.ShortUrlService;
 import com.atzuche.order.parentorder.entity.OrderEntity;
 import com.atzuche.order.parentorder.service.OrderService;
+import com.atzuche.order.renterwz.dto.RenterWzPushMessageBody;
 import com.atzuche.order.renterwz.entity.WzQueryDayConfEntity;
 import com.atzuche.order.renterwz.service.RenterOrderWzDetailService;
+import com.atzuche.order.renterwz.service.TransIllegalSendAliYunMq;
 import com.atzuche.order.renterwz.service.WzQueryDayConfService;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -57,14 +58,26 @@ public class JPushService {
 
 	@Resource
 	private SendPlatformSmsService sendPlatformSmsService;
-	
-	private String contentTxt = "您的订单（订单号：#{orderNo}）查出有新的违章，立即点击查看：#{url}。";
-	
-	private String jpushContentTxt = "您的订单（订单号：#{orderNo}）查出有新的违章，立即点击查看。";
-	
-	private String ownerContentTxt = "您的订单（订单号：#{orderNo}）查出有新的违章，立即点击查看：#{url}。平台会督促租客在订单结束后的#{dealDays}天内完成违章处理，请您不要担心。";
 
-	private String ctripContentTxt = "您的订单(订单号: #{orderNo})查出有新的违章,如有问题请联系客服10100202";
+	@Resource
+	private TransIllegalSendAliYunMq transIllegalSendAliYunMq;
+
+	private String jpushContentTxt = "您的订单（订单号：#{orderNo}）查出有新的违章，立即点击查看。";
+
+	/**
+	 * 租客的违章
+	 */
+	@Value("${renter_wz_renter_message}")
+	private String contentTxt;
+
+	@Value("${renter_wz_owner_message}")
+	private String ownerContentTxt;
+
+	@Value("${renter_wz_ctrip_message}")
+	private String ctripContentTxt;
+
+	@Value("${renter_wz_push_event}")
+	private String renterWzPushEvent;
 
 	/**
 	 * 发送违章短信、推送
@@ -76,11 +89,12 @@ public class JPushService {
 	 */
 	public void updateIllegalMessage(String orderNo, String renterNo, String renterPhone, String type, boolean isCtripOrder) {
 		Map<String, Object> paramMap = new HashMap<>(4);
+		RenterWzPushMessageBody renterWzPushMessageBody = new RenterWzPushMessageBody();
 		if (isCtripOrder && SMS_TYPE_RENTER.equals(type)) {
-			//paramMap.put("textCode", textCode);
+			paramMap.put("textCode", ctripContentTxt);
 		} else {
 			if(SMS_TYPE_RENTER.equals(type)) {
-				//paramMap.put("textCode", textCode);
+				paramMap.put("textCode", contentTxt);
 			}else {
 				String cityCode = "";
 				OrderEntity order = orderService.getOrderEntity(orderNo);
@@ -102,7 +116,7 @@ public class JPushService {
 						}
 					}
 				}
-				//paramMap.put("textCode", textCode);
+				paramMap.put("textCode", ownerContentTxt);
 				paramMap.put("dealDays",dealDays);
 			}
 		}
@@ -110,69 +124,17 @@ public class JPushService {
 		paramMap.put("orderNo",String.valueOf(orderNo));
 		paramMap.put("url",shortUrlService.getShortUrlNew(url));
 
-		String jPushText = jpushContentTxt;
-		jPushText = jPushText.replace("#{orderNo}", String.valueOf(orderNo));
 		logger.info("发送orderNo is {}违章短信成功", orderNo);
-		//TODO
-		sendPlatformSmsService.sendNormalSms(new HashMap<>());
-		/*this.sendCustomMsgByAlias(renterPhone, token, jPushText, orderNo + "", "63", appServerUrl+illgalDetailAppUrl);*/
+		sendPlatformSmsService.sendNormalSms(paramMap);
+		renterWzPushMessageBody.setOrderNo(orderNo);
+		renterWzPushMessageBody.setMemNo(renterPhone);
+		renterWzPushMessageBody.setEvent(renterWzPushEvent);
+		transIllegalSendAliYunMq.sendPushMsg(renterWzPushMessageBody);
 		if (SMS_TYPE_RENTER.equals(type)) {
 			renterOrderWzDetailService.updateSmsStatus(orderNo);
 		} else {
 			renterOrderWzDetailService.updateOwnerSmsStatus(orderNo);
 		}
 	}
-
-
-	/**
-	 * 推送JPUSH违章信息事件
-	 * @param mobile
-	 * @param alias
-	 * @param content
-	 * @param orderNo
-	 * @param flag
-	 * @param url
-	 * @return
-	 */
-	/*public boolean sendCustomMsgByAlias(String mobile,String alias, String content, String orderNo, String flag,String url){
-		RestTemplate restTemplate = new RestTemplate();
-		boolean res = true;
-		logger.info("entring into sendCustomMsgByAlias..alias:{},mobile:{},content:{},orderNo:{},flag:{}",alias,mobile,content,orderNo,flag);
-		JPushVo jPushVo = new JPushVo(mobile,alias,content,orderNo,flag,url);
-		HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(MediaType.APPLICATION_JSON);
-		HttpEntity<JPushVo> request = new HttpEntity<JPushVo>(jPushVo,headers);
-		BaseOutJB baseOutJB = restTemplate.postForObject(jpushUrl+"/jpush/sendCustomMsgByAlias", request, BaseOutJB.class);
-		logger.info("baseOutJB:{}",(new Gson()).toJson(baseOutJB));
-		if (baseOutJB.getResCode().equals("000000")) {
-			res = true;
-		}else{	
-			logger.info(baseOutJB.getResMsg());
-			res = false;
-		}
-		return res;
-	}*/
-
-	/*public  boolean sendCodeContent(String mobile, String content, String message, int sender, int type){
-		try {
-			RestTemplate restTemplate = new RestTemplate();
-			StringBuilder sb = getSendContent(mobile, content, sender, type, message);
-			HttpHeaders headers = new HttpHeaders();
-			MediaType mediaType = MediaType.parseMediaType("application/x-www-form-urlencoded; charset=utf-8");
-			headers.setContentType(mediaType);
-			HttpEntity<String> formEntity = new HttpEntity<String>(sb.toString(), headers);
-			String resStr = restTemplate.postForObject(SMS_CODE_URL, formEntity, String.class);
-			logger.info("resStr:{}",resStr);
-			if("success".equals(resStr)){
-				return true;
-			}else{
-				logger.error("{}短信发送失败，返回：{}",mobile,resStr);
-				return false;
-			}
-		} catch (Exception e) {
-			logger.error("",e);
-		}
-		return false;
-	}*/
 	
 }

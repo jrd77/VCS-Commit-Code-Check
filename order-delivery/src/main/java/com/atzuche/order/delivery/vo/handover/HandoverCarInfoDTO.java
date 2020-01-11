@@ -1,5 +1,6 @@
 package com.atzuche.order.delivery.vo.handover;
 
+import com.atzuche.order.delivery.enums.RenterHandoverCarTypeEnum;
 import lombok.Data;
 import lombok.ToString;
 
@@ -102,4 +103,16 @@ public class HandoverCarInfoDTO {
      * 消息ID
      */
     private String msgId;
+
+
+    public void setAheadTimeAndType(Integer getMinutes, Integer returnMinutes) {
+        if (getMinutes != null) {
+            setAheadTime(getMinutes);
+            setType(RenterHandoverCarTypeEnum.RENYUN_TO_RENTER.getValue().intValue());
+        } else if (returnMinutes != null) {
+            setDelayTime(returnMinutes);
+            setType(RenterHandoverCarTypeEnum.RENTER_TO_RENYUN.getValue().intValue());
+        }
+    }
+
 }

@@ -31,11 +31,11 @@ public class AccountRenterDepositEntity implements Serializable {
 	/**
 	 * 支付状态
 	 */
-	private Integer payStatus;
+	private String payStatus;
 	/**
 	 * 支付时间
 	 */
-	private LocalDateTime payTime;
+	private String payTime;
 	/**
 	 * 结算状态
 	 */
@@ -60,6 +60,7 @@ public class AccountRenterDepositEntity implements Serializable {
 	 * 信用支付金额
 	 */
 	private Integer creditPayAmt;
+	private Integer reductionAmt;
     /**
      * 剩余信用支付金额
      */
@@ -74,7 +75,7 @@ public class AccountRenterDepositEntity implements Serializable {
 	private Integer surplusAuthorizeDepositAmt;
 
     /**
-     * 免押方式
+     * 免押方式(1:绑卡减免,2:芝麻减免,3:消费)
      */
     private Integer freeDepositType;
 	/**

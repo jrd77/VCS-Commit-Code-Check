@@ -2,6 +2,7 @@ package com.atzuche.order.coreapi.service;
 
 import com.atzuche.order.commons.DateUtils;
 import com.atzuche.order.rentercommodity.service.RenterGoodsService;
+import com.atzuche.order.rentermem.service.RenterMemberService;
 import com.atzuche.order.renterwz.entity.RenterOrderWzDetailEntity;
 import com.atzuche.order.renterwz.entity.RenterOrderWzIllegalPhotoEntity;
 import com.atzuche.order.renterwz.entity.RenterOrderWzStatusEntity;
@@ -54,6 +55,9 @@ public class TransIllegalMqService {
 
     @Resource
     private RenterGoodsService renterGoodsService;
+
+    @Resource
+    private RenterMemberService renterMemberService;
 
     private static Gson gson = new Gson();
 
@@ -168,8 +172,11 @@ public class TransIllegalMqService {
             String orderNo = jsonObject.getString(REN_YUN_MQ_INFO_ORDER_NO);
             //根据订单号 查询最后一个有效子订单的车牌
             String carNum = renterGoodsService.queryCarNumByOrderNo(orderNo);
-            //TODO
+            String memNoStr = renterMemberService.getRenterNoByOrderNo(orderNo);
             Integer memNo = null;
+            if(StringUtils.isNotBlank(memNoStr)){
+                memNo = Integer.parseInt(memNoStr);
+            }
             //就算之前存在 ，仍需要记录 这是日志表
             isNeedHandle(messageBody,"02",carNum);
 

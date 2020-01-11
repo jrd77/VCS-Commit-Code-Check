@@ -17,12 +17,21 @@ public interface AccountRenterCostDetailMapper{
 
     AccountRenterCostDetailEntity selectByPrimaryKey(Integer id);
 
-    int insert(AccountRenterCostDetailEntity record);
+    int insertSelective(AccountRenterCostDetailEntity record);
 
     /**
-     * 根据订单号查询租车费用明细
+     * 根据订单号查询租车资金明细
      * @param orderNo
      * @return
      */
     List<AccountRenterCostDetailEntity> getAccountRenterCostDetailsByOrderNo(@Param("orderNo") String orderNo);
+
+    /**
+     * 查询支付费用明细
+     * @param orderNo
+     * @param renterMemNo
+     * @param paySourceCode
+     * @return
+     */
+    List<AccountRenterCostDetailEntity> selectRenterCostSettleDetail(@Param("orderNo")String orderNo, @Param("memNo")String renterMemNo, @Param("paySourceCode")String paySourceCode);
 }

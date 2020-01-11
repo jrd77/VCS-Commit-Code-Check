@@ -33,7 +33,23 @@ public class AccountPlatformProfitDetailNotService {
                 AccountPlatformProfitDetailReqVO vo = accountPlatformProfitDetails.get(i);
                 AccountPlatformProfitDetailEntity accountPlatformProfitDetail = new AccountPlatformProfitDetailEntity();
                 BeanUtils.copyProperties(vo,accountPlatformProfitDetail);
-                int result = accountPlatformProfitDetailMapper.insert(accountPlatformProfitDetail);
+                int result = accountPlatformProfitDetailMapper.insertSelective(accountPlatformProfitDetail);
+                if(result==0){
+                    throw new AccountPlatormException();
+                }
+            }
+        }
+    }
+
+    /**
+     * 平台收益明细 落库
+     * @param accountPlatformProfitDetails
+     */
+    public void insertAccountPlatformProfitDetails(List<AccountPlatformProfitDetailEntity> accountPlatformProfitDetails) {
+        if(!CollectionUtils.isEmpty(accountPlatformProfitDetails)){
+            for(int i =0;i<accountPlatformProfitDetails.size();i++){
+                AccountPlatformProfitDetailEntity entity = accountPlatformProfitDetails.get(i);
+                int result = accountPlatformProfitDetailMapper.insertSelective(entity);
                 if(result==0){
                     throw new AccountPlatormException();
                 }

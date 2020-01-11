@@ -2,14 +2,13 @@ package com.atzuche.order.renterorder.service;
 
 import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.CatConstants;
-import com.autoyol.coupon.api.CouponServiceApi;
-import com.autoyol.coupon.api.MemAvailCouponRequest;
-import com.autoyol.coupon.api.MemAvailCouponResponse;
+import com.autoyol.coupon.api.*;
 import com.dianping.cat.Cat;
 import com.dianping.cat.message.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.Date;
@@ -89,20 +88,20 @@ public class PlatformCouponService {
      * 使用平台券
      *
      * @param disCoupondId 平台优惠券ID
-     * @param orderNo 主订单号
-     * @param useDate 使用日期
+     * @param orderNo      主订单号
+     * @param useDate      使用日期
      */
     public int usePlatformCoupon(String disCoupondId, Long orderNo, Date useDate) {
         logger.info("使用平台券.param is, disCoupondId:[{}],orderNo:[{}],useDate:[{}]", disCoupondId, orderNo, useDate);
         Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "平台优惠券服务");
         int result = 0;
-        try{
-            Cat.logEvent(CatConstants.FEIGN_METHOD,"couponServiceApi.useCoupon");
-            Cat.logEvent(CatConstants.FEIGN_PARAM,"disCoupondId="+disCoupondId+"&orderNo="+orderNo+"&useDate="+useDate);
+        try {
+            Cat.logEvent(CatConstants.FEIGN_METHOD, "couponServiceApi.useCoupon");
+            Cat.logEvent(CatConstants.FEIGN_PARAM, "disCoupondId=" + disCoupondId + "&orderNo=" + orderNo + "&useDate=" + useDate);
             result = couponServiceApi.useCoupon(disCoupondId, orderNo, useDate);
 
             logger.info("使用平台券.result is, result:[{}]", result);
-            Cat.logEvent(CatConstants.FEIGN_RESULT,String.valueOf(result));
+            Cat.logEvent(CatConstants.FEIGN_RESULT, String.valueOf(result));
             t.setStatus(Transaction.SUCCESS);
         } catch (Exception e) {
             logger.error("使用平台券异常.result:[{}]", result, e);
@@ -120,21 +119,21 @@ public class PlatformCouponService {
      * 使用送取服务券
      *
      * @param disCoupondId 送取服务惠券ID
-     * @param orderNo 主订单号
-     * @param useDate 使用日期
+     * @param orderNo      主订单号
+     * @param useDate      使用日期
      */
     public int useGetCarFreeCoupon(String disCoupondId, Long orderNo, Date useDate) {
 
         logger.info("使用送取服务券.param is, disCoupondId:[{}],orderNo:[{}],useDate:[{}]", disCoupondId, orderNo, useDate);
         Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "平台优惠券服务");
         int result = 0;
-        try{
-            Cat.logEvent(CatConstants.FEIGN_METHOD,"couponServiceApi.useGetCarFreeCoupon");
-            Cat.logEvent(CatConstants.FEIGN_PARAM,"disCoupondId="+disCoupondId+"&orderNo="+orderNo+"&useDate="+useDate);
+        try {
+            Cat.logEvent(CatConstants.FEIGN_METHOD, "couponServiceApi.useGetCarFreeCoupon");
+            Cat.logEvent(CatConstants.FEIGN_PARAM, "disCoupondId=" + disCoupondId + "&orderNo=" + orderNo + "&useDate=" + useDate);
             result = couponServiceApi.useGetCarFreeCoupon(disCoupondId, orderNo, useDate);
 
             logger.info("使用送取服务券.result is, result:[{}]", result);
-            Cat.logEvent(CatConstants.FEIGN_RESULT,String.valueOf(result));
+            Cat.logEvent(CatConstants.FEIGN_RESULT, String.valueOf(result));
             t.setStatus(Transaction.SUCCESS);
         } catch (Exception e) {
             logger.error("使用送取服务券异常.result:[{}]", result, e);
@@ -147,6 +146,150 @@ public class PlatformCouponService {
     }
 
 
+    /**
+     * 退还优惠券(平台优惠券)
+     *
+     * @param orderNo 订单号
+     * @return int
+     */
+    public int cancelPlatformCoupon(String orderNo) {
+        logger.info("退还优惠券(平台优惠券).param is, orderNo:[{}]", orderNo);
+        Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "平台优惠券服务");
+        int result = 0;
+        try {
+            Cat.logEvent(CatConstants.FEIGN_METHOD, "couponServiceApi.cancelCoupon");
+            Cat.logEvent(CatConstants.FEIGN_PARAM, "orderNo=" + orderNo);
 
+            result = couponServiceApi.cancelCoupon(Long.valueOf(orderNo));
+            logger.info("退还优惠券(平台优惠券).result is, result:[{}]", result);
+            Cat.logEvent(CatConstants.FEIGN_RESULT, String.valueOf(result));
+            t.setStatus(Transaction.SUCCESS);
+        } catch (Exception e) {
+            logger.error("退还优惠券(平台优惠券)异常.result:[{}]", result, e);
+            t.setStatus(e);
+            Cat.logError("退还优惠券(平台优惠券)异常.", e);
+        } finally {
+            t.complete();
+        }
+        return result;
+    }
+
+
+    /**
+     * 退还优惠券(送取服务券)
+     *
+     * @param orderNo 订单号
+     * @return int
+     */
+    public int cancelGetCarFeeCoupon(String orderNo) {
+        logger.info("退还优惠券(送取服务券).param is, orderNo:[{}]", orderNo);
+        Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "平台优惠券服务");
+        int result = 0;
+        try {
+            Cat.logEvent(CatConstants.FEIGN_METHOD, "couponServiceApi.cancelGetCarFreeCoupon");
+            Cat.logEvent(CatConstants.FEIGN_PARAM, "orderNo=" + orderNo);
+
+            result = couponServiceApi.cancelGetCarFreeCoupon(Long.valueOf(orderNo));
+            logger.info("退还优惠券(送取服务券).result is, result:[{}]", result);
+            Cat.logEvent(CatConstants.FEIGN_RESULT, String.valueOf(result));
+            t.setStatus(Transaction.SUCCESS);
+        } catch (Exception e) {
+            logger.error("退还优惠券(送取服务券)异常.result:[{}]", result, e);
+            t.setStatus(e);
+            Cat.logError("退还优惠券(送取服务券)异常.", e);
+        } finally {
+            t.complete();
+        }
+        return result;
+    }
+
+    
+    
+    /**
+     * 获取会员送取服务优惠券抵扣信息
+     *
+     * @param request 请求参数
+     * @return CouponSettleResponse 优惠券信息
+     */
+    public CouponSettleResponse checkGetCarFreeCouponAvailable(CouponSettleRequest request) {
+        logger.info("获取会员送取服务优惠券抵扣信息.request:[{}]", JSON.toJSONString(request));
+        Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "youhuiqia");
+        try {
+            Cat.logEvent(CatConstants.FEIGN_METHOD, "CouponServiceApi.checkGetCarFreeCouponAvailable");
+            Cat.logEvent(CatConstants.FEIGN_PARAM, JSON.toJSONString(request));
+            CouponSettleResponse memCouponResponse = couponServiceApi.checkGetCarFreeCouponAvailable(request);
+            logger.info("获取会员送取服务优惠券抵扣信息.response:[{}]", JSON.toJSONString(memCouponResponse));
+            Cat.logEvent(CatConstants.FEIGN_RESULT, JSON.toJSONString(memCouponResponse));
+            t.setStatus(Transaction.SUCCESS);
+            return memCouponResponse;
+        } catch (Exception e) {
+            logger.error("获取会员送取服务优惠券抵扣信息异常.request:[{}]", request, e);
+            t.setStatus(e);
+            Cat.logError("获取会员送取服务优惠券抵扣信息异常.", e);
+        } finally {
+            t.complete();
+        }
+        return null;
+    }
+    
+    
+    /**
+     * 获取会员平台优惠券抵扣信息
+     *
+     * @param request 请求参数
+     * @return CouponSettleResponse 优惠券信息
+     */
+    public CouponSettleResponse checkCouponAvailable(CouponSettleRequest request) {
+        logger.info("获取会员平台优惠券抵扣信息.request:[{}]", JSON.toJSONString(request));
+        Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "youhuiqia");
+        try {
+            Cat.logEvent(CatConstants.FEIGN_METHOD, "CouponServiceApi.checkCouponAvailable");
+            Cat.logEvent(CatConstants.FEIGN_PARAM, JSON.toJSONString(request));
+            CouponSettleResponse memCouponResponse = couponServiceApi.checkCouponAvailable(request);
+            logger.info("获取会员平台优惠券抵扣信息.response:[{}]", JSON.toJSONString(memCouponResponse));
+            Cat.logEvent(CatConstants.FEIGN_RESULT, JSON.toJSONString(memCouponResponse));
+            t.setStatus(Transaction.SUCCESS);
+            return memCouponResponse;
+        } catch (Exception e) {
+            logger.error("获取会员平台优惠券抵扣信息异常.request:[{}]", request, e);
+            t.setStatus(e);
+            Cat.logError("获取会员平台优惠券抵扣信息异常.", e);
+        } finally {
+            t.complete();
+        }
+        return null;
+    }
+
+
+    /**
+     * 校验并使用优惠券(平台券+取送服务券)
+     *
+     * @param orderNo  订单号
+     * @param couponNo 优惠券码
+     * @param request  请求参数
+     * @return MemAvailCoupon 优惠券信息
+     */
+    public MemAvailCoupon checkAndUseCouponAailable(String orderNo, String couponNo, MemAvailCouponRequest request) {
+        logger.info("校验并使用优惠券(平台券+取送服务券).orderNo:[{}],couponNo:[{}],request:[{}]", orderNo, couponNo,
+                JSON.toJSONString(request));
+        Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "youhuiqia");
+        try {
+            Cat.logEvent(CatConstants.FEIGN_METHOD, "CouponServiceApi.checkCouponAvailable");
+            Cat.logEvent(CatConstants.FEIGN_PARAM, JSON.toJSONString(request));
+            MemAvailCoupon memAvailCoupon = couponServiceApi.checkAndUseCouponAailable(request, Long.valueOf(orderNo),
+                    couponNo);
+            logger.info("校验并使用优惠券(平台券+取送服务券).memAvailCoupon:[{}]", JSON.toJSONString(memAvailCoupon));
+            Cat.logEvent(CatConstants.FEIGN_RESULT, JSON.toJSONString(memAvailCoupon));
+            t.setStatus(Transaction.SUCCESS);
+            return memAvailCoupon;
+        } catch (Exception e) {
+            logger.error("获取会员平台优惠券抵扣信息异常.request:[{}]", request, e);
+            t.setStatus(e);
+            Cat.logError("获取会员平台优惠券抵扣信息异常.", e);
+        } finally {
+            t.complete();
+        }
+        return null;
+    }
 
 }
