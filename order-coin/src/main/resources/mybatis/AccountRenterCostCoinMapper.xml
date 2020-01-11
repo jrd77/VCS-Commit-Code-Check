@@ -16,16 +16,15 @@
     </resultMap>
 
 	<sql id="Base_Column_List">
-	`id`, 	
-	`order_no`, 	
-	`renter_order_no`, 	
-	`mem_no`, 	
-	`order_type`, 	
-	`amt`, 	
-	`remark`,
-	`create_op`,
-	`update_op`
-
+        `id`,
+        `order_no`,
+        `renter_order_no`,
+        `mem_no`,
+        `order_type`,
+        `amt`,
+        `remark`,
+        `create_op`,
+        `update_op`
 	</sql>
 
 
@@ -34,10 +33,8 @@
 	</select>
 
 	<insert id="insert" parameterType="com.atzuche.order.coin.entity.AccountRenterCostCoinEntity">
-		insert into account_renter_cost_coin
-		(
-			`id`,		
-				`order_no`,		
+		insert into account_renter_cost_coin (
+				`order_no`,
 				`renter_order_no`,		
 				`mem_no`,		
 				`order_type`,		
@@ -45,11 +42,10 @@
 				`remark`,
 				`create_op`,
 				`update_op`
-			)
+        )
 		values
 		(
-			#{id}, 		
-				#{orderNo}, 		
+				#{orderNo},
 				#{renterOrderNo}, 		
 				#{memNo}, 		
 				#{orderType}, 		

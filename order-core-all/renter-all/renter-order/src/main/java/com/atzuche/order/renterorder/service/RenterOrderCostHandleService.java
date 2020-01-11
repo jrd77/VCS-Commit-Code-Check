@@ -1,6 +1,7 @@
 package com.atzuche.order.renterorder.service;
 
 import com.alibaba.fastjson.JSON;
+import com.atzuche.order.coin.service.AccountRenterCostCoinService;
 import com.atzuche.order.commons.entity.dto.CostBaseDTO;
 import com.atzuche.order.commons.entity.dto.DepositAmtDTO;
 import com.atzuche.order.commons.entity.dto.IllegalDepositAmtDTO;
@@ -57,7 +58,7 @@ public class RenterOrderCostHandleService {
     private RenterOrderSubsidyDetailService renterOrderSubsidyDetailService;
 
     @Resource
-    private AutoCoinService autoCoinService;
+    private AccountRenterCostCoinService accountRenterCostCoinService;
 
     /**
      * 车辆押金计算已处理
@@ -290,7 +291,10 @@ public class RenterOrderCostHandleService {
      */
     public int handleAutoCoin(DeductAndSubsidyContextDTO context, String memNo, Integer useAutoCoin) {
         LOGGER.info("凹凸币处理.param is, context:[{}],memNo:[{}],useAutoCoin:[{}]", JSON.toJSONString(context), memNo, useAutoCoin);
-        AutoCoinResponseVO crmCustPoint = autoCoinService.getCrmCustPoint(memNo);
+        int pointValue = accountRenterCostCoinService.getUserCoinTotalAmt(memNo);
+        AutoCoinResponseVO crmCustPoint = new AutoCoinResponseVO();
+        crmCustPoint.setMemNo(Integer.valueOf(memNo));
+        crmCustPoint.setPointValue(pointValue);
         RenterOrderSubsidyDetailDTO autoCoinSubsidyInfo = renterOrderSubsidyDetailService.calAutoCoinSubsidyInfo(crmCustPoint,
                 context.getOriginalRentAmt(), context.getSurplusRentAmt(), useAutoCoin);
         LOGGER.info("凹凸币处理-->凹凸币补贴信息.result is, autoCoinSubsidyInfo:[{}]", JSON.toJSONString(autoCoinSubsidyInfo));

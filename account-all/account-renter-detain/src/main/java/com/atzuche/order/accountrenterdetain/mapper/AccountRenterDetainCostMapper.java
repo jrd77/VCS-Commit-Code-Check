@@ -22,4 +22,11 @@ public interface AccountRenterDetainCostMapper{
     int updateByPrimaryKeySelective(AccountRenterDetainCostEntity record);
 
     AccountRenterDetainCostEntity getRenterDetainAmt(@Param("orderNo") String orderNo, @Param("memNo")String memNo);
+
+    /**
+     * 查询用户订单暂扣总额
+     * @param orderNo
+     * @return
+     */
+    AccountRenterDetainCostEntity getRenterDetain(@Param("orderNo")String orderNo);
 }

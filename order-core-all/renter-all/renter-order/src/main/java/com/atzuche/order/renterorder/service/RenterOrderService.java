@@ -199,6 +199,7 @@ public class RenterOrderService {
         record.setIsAbatement(renterOrderReqVO.getAbatement()==null?0:Integer.valueOf(renterOrderReqVO.getAbatement()));
         record.setIsUseSpecialPrice(Integer.valueOf(renterOrderReqVO.getUseSpecialPrice()==null?"0":renterOrderReqVO.getUseSpecialPrice()));
         record.setChildStatus(RenterChildStatusEnum.PROCESS_ING.getCode());
+        record.setRenterMemNo(renterOrderReqVO.getMemNo());
         renterOrderMapper.insertSelective(record);
         //保存租客订单费用、费用明细、补贴明细等
         renterOrderCostRespDTO.setRenterOrderSubsidyDetailDTOList(context.getOrderSubsidyDetailList());
@@ -331,7 +332,7 @@ public class RenterOrderService {
                                                                  RenterOrderReqVO renterOrderReqVO) {
 
         MemAvailCouponRequestVO memAvailCouponRequestVO = new MemAvailCouponRequestVO();
-
+        memAvailCouponRequestVO.setOrderNo(renterOrderReqVO.getOrderNo());
         memAvailCouponRequestVO.setMemNo(Integer.valueOf(renterOrderReqVO.getMemNo()));
         memAvailCouponRequestVO.setCarNo(Integer.valueOf(renterOrderReqVO.getCarNo()));
         memAvailCouponRequestVO.setCityCode(Integer.valueOf(renterOrderReqVO.getCityCode()));
@@ -426,6 +427,7 @@ public class RenterOrderService {
         ownerCouponGetAndValidReqVO.setCouponNo(renterOrderReqVO.getCarOwnerCouponNo());
         ownerCouponGetAndValidReqVO.setRentAmt(rentAmt);
         ownerCouponGetAndValidReqVO.setMark(1);
+        ownerCouponGetAndValidReqVO.setOrderNo(renterOrderReqVO.getOrderNo());
         return ownerCouponGetAndValidReqVO;
     }
 
@@ -479,5 +481,23 @@ public class RenterOrderService {
     public int updateRenterOrderInfo(RenterOrderEntity renterOrderEntity) {
         return renterOrderMapper.updateByPrimaryKeySelective(renterOrderEntity);
     }
+    /*
+     * @Author ZhangBin
+     * @Date 2020/1/10 16:05
+     * @Description: 获取待生效的租客子订单
+     *
+     **/
+    public RenterOrderEntity getChangeRenterOrderByOrderNo(String orderNo) {
+        return renterOrderMapper.getChangeRenterOrderByOrderNo(orderNo);
+    }
 
+    /**
+     * 修改租客订单信息
+     *
+     * @param renterOrderEntity 租客订单信息
+     * @return Integer
+     */
+    public int updateRenterOrderByOrderNo(RenterOrderEntity renterOrderEntity) {
+        return renterOrderMapper.updateByPrimaryKeySelective(renterOrderEntity);
+    }
 }

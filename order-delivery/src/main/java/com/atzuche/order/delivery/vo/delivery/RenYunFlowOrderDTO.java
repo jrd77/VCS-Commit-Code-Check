@@ -1,6 +1,7 @@
 package com.atzuche.order.delivery.vo.delivery;
 
 
+import com.atzuche.order.delivery.entity.OrderDeliveryFlowEntity;
 import com.atzuche.order.delivery.enums.ServiceTypeEnum;
 import com.atzuche.order.delivery.enums.UsedDeliveryTypeEnum;
 import lombok.Data;
@@ -305,16 +306,15 @@ public class RenYunFlowOrderDTO implements Serializable {
      **/
     private String partner;
 
-    public void setServiceTypeInfo(Integer orderType,OrderDeliveryDTO orderDeliveryDTO) {
-        if (orderType == UsedDeliveryTypeEnum.USED.getValue().intValue()) {
+    public void setServiceTypeInfo(OrderDeliveryFlowEntity orderDeliveryFlowEntity) {
+        if (Integer.valueOf(orderDeliveryFlowEntity.getOrderType()).intValue() == UsedDeliveryTypeEnum.USED.getValue().intValue()) {
             setServicetype(ServiceTypeEnum.TAKE_TYPE.getValue());
-            setPickupcaraddr(orderDeliveryDTO.getRenterGetReturnAddr());
+            setPickupcaraddr(orderDeliveryFlowEntity.getPickupAlsoCarAddr());
         } else {
             setServicetype(ServiceTypeEnum.BACK_TYPE.getValue());
-            setAlsocaraddr(orderDeliveryDTO.getRenterGetReturnAddr());
+            setAlsocaraddr(orderDeliveryFlowEntity.getPickupAlsoCarAddr());
         }
     }
-
 }
 
 

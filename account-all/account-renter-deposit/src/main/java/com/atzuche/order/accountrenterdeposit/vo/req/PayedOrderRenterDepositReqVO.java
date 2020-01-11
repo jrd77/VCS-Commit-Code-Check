@@ -74,7 +74,6 @@ public class PayedOrderRenterDepositReqVO {
     public void check() {
         Assert.notNull(getMemNo(), ErrorCode.PARAMETER_ERROR.getText());
         Assert.notNull(getOrderNo(), ErrorCode.PARAMETER_ERROR.getText());
-        Assert.notNull(getIsFreeDeposit(), ErrorCode.PARAMETER_ERROR.getText());
         Assert.notNull(getPayStatus(), ErrorCode.PARAMETER_ERROR.getText());
         Assert.notNull(getPayTime(), ErrorCode.PARAMETER_ERROR.getText());
         Assert.notNull(getDetainRenterDepositReqVO(), ErrorCode.PARAMETER_ERROR.getText());

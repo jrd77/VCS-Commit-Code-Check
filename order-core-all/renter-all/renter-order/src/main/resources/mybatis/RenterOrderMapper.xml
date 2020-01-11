@@ -7,6 +7,7 @@
         <result property="id" column="id"/>
         <result property="orderNo" column="order_no"/>
         <result property="renterOrderNo" column="renter_order_no"/>
+        <result property="renterMemNo" column="renter_mem_no"/>
         <result property="expRentTime" column="exp_rent_time"/>
         <result property="expRevertTime" column="exp_revert_time"/>
         <result property="actRentTime" column="act_rent_time"/>
@@ -38,7 +39,8 @@
 	<sql id="Base_Column_List">
 	`id`, 	
 	`order_no`, 	
-	`renter_order_no`, 	
+	`renter_order_no`,
+	`renter_mem_no`,
 	`exp_rent_time`, 	
 	`exp_revert_time`, 	
 	`act_rent_time`, 	
@@ -80,6 +82,7 @@
         insert into renter_order  (
         `order_no`,
         `renter_order_no`,
+        `renter_mem_no`,
         `exp_rent_time`,
         `exp_revert_time`,
         `act_rent_time`,
@@ -106,6 +109,7 @@
         (
         #{orderNo},
         #{renterOrderNo},
+        #{renterMemNo},
         #{expRentTime},
         #{expRevertTime},
         #{actRentTime},
@@ -135,6 +139,7 @@
         <trim prefix="(" suffix=")" suffixOverrides="," >
             <if test="orderNo != null">`order_no`, </if>
             <if test="renterOrderNo != null">`renter_order_no`, </if>
+            <if test="renterMemNo != null">`renter_mem_no`, </if>
             <if test="expRentTime != null">`exp_rent_time`, </if>
             <if test="expRevertTime != null">`exp_revert_time`, </if>
             <if test="actRentTime != null">`act_rent_time`, </if>
@@ -161,6 +166,7 @@
         <trim prefix="values (" suffix=")" suffixOverrides="," >
             <if test="orderNo != null">#{orderNo},  </if>
             <if test="renterOrderNo != null">#{renterOrderNo},  </if>
+            <if test="renterMemNo != null">#{renterMemNo}, </if>
             <if test="expRentTime != null">#{expRentTime},  </if>
             <if test="expRevertTime != null">#{expRevertTime},  </if>
             <if test="actRentTime != null">#{actRentTime},  </if>
@@ -298,5 +304,14 @@
 		update renter_order set child_status = #{childStatus}
 		where id = #{id}
 	</update>
-	
+    <select id="getChangeRenterOrderByOrderNo" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List" /> from renter_order where order_no = #{orderNo}
+        AND is_effective = 0
+        AND is_cancle = 0
+        AND is_delete = 0
+        AND child_status = 3
+        ORDER BY id DESC
+        LIMIT 1
+    </select>
+
 </mapper>

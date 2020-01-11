@@ -40,4 +40,6 @@ public interface RenterOrderMapper{
     Integer updateRenterOrderChildStatus(@Param("id") Integer id, @Param("childStatus") Integer childStatus);
     
     Integer updateRenterOrderAgreeFlag(@Param("id") Integer id, @Param("agreeFlag") Integer agreeFlag);
+
+    RenterOrderEntity getChangeRenterOrderByOrderNo(@Param("orderNo") String orderNo);
 }

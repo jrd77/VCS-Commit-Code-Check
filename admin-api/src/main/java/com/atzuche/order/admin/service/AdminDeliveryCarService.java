@@ -50,7 +50,8 @@ public class AdminDeliveryCarService {
         ownerGetAndReturnCarDTO.setDayKM(String.valueOf(renterGoodsDetailDTO.getCarDayMileage().toString()));
         ownerGetAndReturnCarDTO.setOilContainer(String.valueOf(renterGoodsDetailDTO.getCarOilVolume()));
         boolean isEscrowCar = CarTypeEnum.isCarType(renterGoodsDetailDTO.getCarType());
-        return deliveryCarInfoService.findDeliveryListByOrderNo(deliveryCarDTO,ownerGetAndReturnCarDTO,isEscrowCar,renterGoodsDetailDTO.getCarEngineType());
+        int carType = renterGoodsDetailDTO.getCarType();
+        return deliveryCarInfoService.findDeliveryListByOrderNo(deliveryCarDTO,ownerGetAndReturnCarDTO,isEscrowCar,renterGoodsDetailDTO.getCarEngineType(),carType);
     }
 
     /**

@@ -1,14 +1,12 @@
 package com.atzuche.order.coreapi.service;
 
+import com.atzuche.order.coin.service.AccountRenterCostCoinService;
 import com.atzuche.order.coreapi.entity.vo.req.AutoCoinDeductReqVO;
 import com.atzuche.order.coreapi.entity.vo.req.OwnerCouponBindReqVO;
-import com.atzuche.order.renterorder.service.AutoCoinService;
 import com.atzuche.order.renterorder.service.OwnerDiscountCouponService;
 import com.atzuche.order.renterorder.service.PlatformCouponService;
-import com.autoyol.auto.coin.service.vo.req.AutoCoiChargeRequestVO;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cglib.beans.BeanCopier;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -29,8 +27,11 @@ public class CouponAndCoinHandleService {
     @Autowired
     private PlatformCouponService platformCouponService;
 
+//    @Autowired
+//    private AutoCoinService autoCoinService;
+
     @Autowired
-    private AutoCoinService autoCoinService;
+    private AccountRenterCostCoinService accountRenterCostCoinService;
 
     /**
      * 车主券绑定
@@ -92,10 +93,14 @@ public class CouponAndCoinHandleService {
                 || null == autoCoinDeductReqVO.getChargeAutoCoin() || autoCoinDeductReqVO.getChargeAutoCoin() == 0) {
             return true;
         }
-        AutoCoiChargeRequestVO vo = new AutoCoiChargeRequestVO();
-        BeanCopier beanCopier = BeanCopier.create(AutoCoinDeductReqVO.class, AutoCoiChargeRequestVO.class, false);
-        beanCopier.copy(autoCoinDeductReqVO, vo, null);
-        return autoCoinService.deduct(vo);
+//        AutoCoiChargeRequestVO vo = new AutoCoiChargeRequestVO();
+//        BeanCopier beanCopier = BeanCopier.create(AutoCoinDeductReqVO.class, AutoCoiChargeRequestVO.class, false);
+//        beanCopier.copy(autoCoinDeductReqVO, vo, null);
+//        return autoCoinService.deduct(vo);
+
+        accountRenterCostCoinService.deductAutoCoin(autoCoinDeductReqVO.getMemNo(),autoCoinDeductReqVO.getOrderNo(),
+                autoCoinDeductReqVO.getRenterOrderNo(),autoCoinDeductReqVO.getChargeAutoCoin());
+        return true;
     }
 
 

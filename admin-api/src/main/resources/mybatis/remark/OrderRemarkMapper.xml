@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.atzuche.order.admin.mapper.OrderRemarkMapper">
+<mapper namespace="com.atzuche.order.admin.mapper.remark.OrderRemarkMapper">
 
     <resultMap id="orderRemarkOverviewMap" type="com.atzuche.order.admin.entity.OrderRemarkOverviewEntity" >
         <result property="remarkType" column="remark_type"/>
@@ -24,11 +24,11 @@
 	</resultMap>
 
     <select id="getOrderRemarkOverview" resultMap="orderRemarkOverviewMap">
-        SELECT remark_type, COUNT(*) AS typeCount FROM trans_remark where order_no = #{orderNo} and remark_type!=12 GROUP BY remark_type
+        SELECT remark_type, COUNT(*) AS typeCount FROM order_remark where order_no = #{orderNo} and remark_type!=12 GROUP BY remark_type
     </select>
 
     <insert id="addOrderRemark" parameterType="com.atzuche.order.admin.entity.OrderRemarkEntity" useGeneratedKeys="true" keyProperty="remarkId">
-        insert into trans_remark
+        insert into order_remark
 		(
 			`order_no`,
 			`number`,
@@ -61,22 +61,22 @@
     </insert>
 
 	<select id="getRemarkNumber" resultType="String">
-		SELECT IFNULL(MAX(number)+1,1) FROM trans_remark WHERE order_no = #{orderNo}
+		SELECT IFNULL(MAX(number)+1,1) FROM order_remark WHERE order_no = #{orderNo}
 	</select>
 
 
 	<select id="getOrderRemarkInformation" resultMap="orderRemarkInformationMap">
-		SELECT id, order_no, dept_id, remark, remark_type, limit_delayed, follow_status, follow_fail_reason, number FROM trans_remark where id = #{remarkId}
+		SELECT id, order_no, dept_id, remark, remark_type, limit_delayed, follow_status, follow_fail_reason, number FROM order_remark where id = #{remarkId}
 	</select>
 
 
 	<select id="getOrderCarServiceRemarkInformation" resultMap="orderRemarkInformationMap">
-		SELECT  remark  FROM trans_remark where remark_type = 12 and order_no = #{orderNo} ORDER BY id DESC  limit 1
+		SELECT  remark  FROM order_remark where remark_type = 12 and order_no = #{orderNo} ORDER BY id DESC  limit 1
 	</select>
 
 
 	<update id="updateRemarkById" parameterType="com.atzuche.order.admin.entity.OrderRemarkEntity">
-		update trans_remark
+		update order_remark
 		<set>
 			<if test="departmentId != null">`dept_id` = #{departmentId}, </if>
 			<if test="remarkType != null">`remark_type` = #{remarkType}, </if>
@@ -104,7 +104,7 @@
 		follow_status,
 		follow_fail_reason,
 		dept_id
-		from trans_remark where order_no = #{orderNo} and is_delete = 0
+		from order_remark where order_no = #{orderNo} and is_delete = 0
 		<if test="departmentId != null and departmentId != ''">
 			and dept_id = #{departmentId}
 		</if>

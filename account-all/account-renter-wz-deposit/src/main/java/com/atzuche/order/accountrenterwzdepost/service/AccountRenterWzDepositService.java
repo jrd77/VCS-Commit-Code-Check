@@ -87,7 +87,7 @@ public class AccountRenterWzDepositService{
     public void updateRenterWZDeposit(PayedOrderRenterWZDepositReqVO payedOrderWZRenterDeposit){
         //1 参数校验
         Assert.notNull(payedOrderWZRenterDeposit, ErrorCode.PARAMETER_ERROR.getText());
-        payedOrderWZRenterDeposit.check();
+//        payedOrderWZRenterDeposit.check();
         //2更新押金 实付信息
         accountRenterWzDepositNoTService.updateRenterDeposit(payedOrderWZRenterDeposit);
         //添加押金资金进出明细
