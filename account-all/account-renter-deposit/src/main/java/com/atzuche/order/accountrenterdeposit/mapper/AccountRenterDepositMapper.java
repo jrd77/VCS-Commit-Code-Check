@@ -4,8 +4,6 @@ import com.atzuche.order.accountrenterdeposit.entity.AccountRenterDepositEntity;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
-import java.util.List;
-
 /**
  * 租车押金状态及其总表
  * 
@@ -28,4 +26,6 @@ public interface AccountRenterDepositMapper{
      * @return
      */
     AccountRenterDepositEntity selectByOrderAndMemNo(@Param("orderNo") String orderNo, @Param("memNo")String memNo);
+
+    AccountRenterDepositEntity selectByOrderNo(String orderNo);
 }

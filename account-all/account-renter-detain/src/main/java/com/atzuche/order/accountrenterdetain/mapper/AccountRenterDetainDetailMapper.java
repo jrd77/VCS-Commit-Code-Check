@@ -1,4 +1,5 @@
 package com.atzuche.order.accountrenterdetain.mapper;
+import org.apache.ibatis.annotations.Param;
 
 import com.atzuche.order.accountrenterdetain.entity.AccountRenterDetainDetailEntity;
 import org.apache.ibatis.annotations.Mapper;
@@ -22,5 +23,8 @@ public interface AccountRenterDetainDetailMapper{
     int updateByPrimaryKey(AccountRenterDetainDetailEntity record);
     
     int updateByPrimaryKeySelective(AccountRenterDetainDetailEntity record);
+
+   List<AccountRenterDetainDetailEntity> selectByOrderNo(@Param("orderNo")String orderNo);
+
 
 }

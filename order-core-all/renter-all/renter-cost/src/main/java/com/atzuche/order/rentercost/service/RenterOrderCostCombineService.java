@@ -1003,7 +1003,7 @@ public class RenterOrderCostCombineService {
                         getReturnOverTransport.setGetOverTransportFee(overTransportFee);
                         if(DateUtils.isNight(rentTimeLongStr, nightBegin, nightEnd)) {
                             //夜间
-                            getReturnOverTransport.setNightGetOverTransportFee(overTransportFee);
+                            getReturnOverTransport.setNightGetOverTransportFee(overTransportFee==null?0:overTransportFee);
                         }
                         RenterOrderCostDetailEntity renterOrderCostDetailEntity = new RenterOrderCostDetailEntity();
                         renterOrderCostDetailEntity.setOrderNo(costBaseDTO.getOrderNo());
@@ -1057,7 +1057,7 @@ public class RenterOrderCostCombineService {
                         getReturnOverTransport.setReturnOverTransportFee(overTransportFee);
                         if(DateUtils.isNight(String.valueOf(LocalDateTimeUtils.localDateTimeToLong(revertTime)), nightBegin, nightEnd)) {
                             //夜间
-                            getReturnOverTransport.setNightReturnOverTransportFee(overTransportFee);;
+                            getReturnOverTransport.setNightReturnOverTransportFee(overTransportFee==null?0:overTransportFee);;
                         }
                         RenterOrderCostDetailEntity renterOrderCostDetailEntity = new RenterOrderCostDetailEntity();
                         renterOrderCostDetailEntity.setOrderNo(costBaseDTO.getOrderNo());

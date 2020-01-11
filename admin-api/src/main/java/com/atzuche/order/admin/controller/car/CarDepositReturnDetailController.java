@@ -1,27 +1,41 @@
 package com.atzuche.order.admin.controller.car;
 
-import com.atzuche.order.admin.vo.req.car.*;
+import com.alibaba.fastjson.JSON;
+import com.atzuche.order.admin.service.CarDepositReturnDetailService;
+import com.atzuche.order.admin.vo.req.car.CarDepositOtherReqVO;
+import com.atzuche.order.admin.vo.req.car.CarDepositReqVO;
+import com.atzuche.order.admin.vo.req.car.CarDepositReturnDetailListReqVO;
 import com.atzuche.order.admin.vo.resp.car.CarDepositOtherRespVO;
 import com.atzuche.order.admin.vo.resp.car.CarDepositRespVo;
 import com.atzuche.order.admin.vo.resp.car.CarDepositReturnDetailResVO;
+import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.doc.annotation.AutoDocMethod;
 import com.autoyol.doc.annotation.AutoDocVersion;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 
+@Slf4j
 @RestController
 @AutoDocVersion(version = "车辆押金信息")
 public class CarDepositReturnDetailController {
+    @Autowired
+    private CarDepositReturnDetailService carDepositReturnDetailService;
 
     @AutoDocMethod(description = "【liujun】车辆押金信息", value = "车辆押金信息", response = CarDepositRespVo.class)
     @GetMapping(value = "/car/deposit/return/detail/baseInfo")
-    public ResponseData <?> getCarDepositReturnDetail(@Valid CarDepositReqVO reqVo, BindingResult bindingResult) {
-
-        return null;
+    public ResponseData<CarDepositRespVo> getCarDepositReturnDetail(@Valid CarDepositReqVO reqVo, BindingResult bindingResult) {
+        log.info("车辆押金信息-reqVo={}", JSON.toJSONString(reqVo));
+        if (bindingResult.hasErrors()) {
+            return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), ErrorCode.INPUT_ERROR.getText());
+        }
+        ResponseData<CarDepositRespVo>  respVoResponseData = carDepositReturnDetailService.getCarDepositReturnDetail(reqVo);
+        return respVoResponseData;
     }
 
     @AutoDocMethod(description = "【liujun】车辆押金暂扣处理", value = "车辆押金暂扣处理", response = CarDepositOtherRespVO.class)
