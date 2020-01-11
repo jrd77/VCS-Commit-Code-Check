@@ -57,6 +57,10 @@ public class OrderDTO implements Serializable {
          * 是否出市 0-否，1-是
          */
         private Integer isOutCity;
+        /**
+         * 租车城市（用车城市）
+         */
+        private String rentCity;
     	/**
          * 是否免押 0-否，1-是
          */

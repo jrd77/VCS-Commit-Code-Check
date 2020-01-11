@@ -5,6 +5,10 @@ import lombok.Data;
 @Data
 public class OrderStatusRespDTO {
     /**
+     * 主订单
+     */
+    public OrderDTO orderDTO;
+    /**
      * 主订单状态
      */
     public OrderStatusDTO orderStatusDTO;
@@ -16,7 +20,9 @@ public class OrderStatusRespDTO {
      * 正常生效的车主订单状态
      */
     public OwnerOrderStatusDTO ownerOrderStatusDTO;
-
+    /**
+     * 是否有待生效的订单（当isChange=true时，再取renterOrderStatusChangeDTO，ownerOrderStatusChangeDTO）
+     */
     public Boolean isChange;
     /**
      * 改变中的租客订单状态
