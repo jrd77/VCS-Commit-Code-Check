@@ -8,7 +8,6 @@ import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.multipart.MultipartFile;
-import sun.misc.BASE64Decoder;
 
 import javax.imageio.ImageIO;
 import javax.imageio.stream.ImageOutputStream;
@@ -17,6 +16,7 @@ import java.io.*;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Calendar;
 import java.util.List;
 
@@ -394,7 +394,7 @@ public class OSSUtils {
     	ObjectMetadata objectMeta = new ObjectMetadata();
         objectMeta.setContentType("image/*");//在metadata中标记文件类型
     	try {
-	        byte[] bytes = new BASE64Decoder().decodeBuffer(base64);
+	        byte[] bytes = Base64.getDecoder().decode(base64);
 	        objectMeta.setContentLength(bytes.length);
 	        input = new ByteArrayInputStream(bytes);
 			PutObjectResult	res = client.putObject(BUCKET, key, input, objectMeta);
@@ -429,7 +429,7 @@ public class OSSUtils {
     	ObjectMetadata objectMeta = new ObjectMetadata();
         objectMeta.setContentType("image/*");//在metadata中标记文件类型
     	try {
-	        byte[] bytes = new BASE64Decoder().decodeBuffer(base64);
+	        byte[] bytes = Base64.getDecoder().decode(base64);
 	        objectMeta.setContentLength(bytes.length);
 	        input = new ByteArrayInputStream(bytes);
 			PutObjectResult	res = client.putObject(BUCKET_AUTH, key, input, objectMeta);
@@ -464,7 +464,7 @@ public class OSSUtils {
     	ObjectMetadata objectMeta = new ObjectMetadata();
         objectMeta.setContentType("image/*");//在metadata中标记文件类型
     	try {
-	        byte[] bytes = new BASE64Decoder().decodeBuffer(base64);
+	        byte[] bytes = Base64.getDecoder().decode(base64);
 	        objectMeta.setContentLength(bytes.length);
 	        input = new ByteArrayInputStream(bytes);
 			PutObjectResult	res = client.putObject(BUCKET, key, input, objectMeta);
