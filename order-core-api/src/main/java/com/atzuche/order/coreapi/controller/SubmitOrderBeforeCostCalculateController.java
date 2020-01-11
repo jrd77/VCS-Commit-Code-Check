@@ -37,7 +37,7 @@ public class SubmitOrderBeforeCostCalculateController {
 
 
 
-        return ResponseData.success();
+        return ResponseData.success(new NormalOrderCostCalculateResVO());
 
     }
 
