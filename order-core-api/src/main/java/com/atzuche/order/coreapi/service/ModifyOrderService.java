@@ -1,5 +1,6 @@
 package com.atzuche.order.coreapi.service;
 
+import com.atzuche.order.car.CarProxyService;
 import com.atzuche.order.coin.service.AccountRenterCostCoinService;
 import com.atzuche.order.commons.entity.dto.*;
 import com.atzuche.order.commons.enums.*;
@@ -65,7 +66,7 @@ public class ModifyOrderService {
 	@Autowired
 	private RenterMemberService renterMemberService;
 	@Autowired
-	private GoodsService goodsService;
+	private CarProxyService goodsService;
 	@Autowired
 	private RenterCommodityService commodityService;
 	@Autowired
@@ -575,12 +576,12 @@ public class ModifyOrderService {
 	 * @param modifyOrderDTO
 	 * @return CarDetailReqVO
 	 */
-	public GoodsService.CarDetailReqVO convertToCarDetailReqVO(ModifyOrderDTO modifyOrderDTO, RenterOrderEntity renterOrderEntity) {
+	public CarProxyService.CarDetailReqVO convertToCarDetailReqVO(ModifyOrderDTO modifyOrderDTO, RenterOrderEntity renterOrderEntity) {
 		// 租客子订单号
 		String renterOrderNo = renterOrderEntity.getRenterOrderNo();
 		// 获取租客商品信息
 		RenterGoodsDetailDTO renterGoodsDetailDTO = commodityService.getRenterGoodsDetail(renterOrderNo, false);
-		GoodsService.CarDetailReqVO carDetailReqVO = new GoodsService.CarDetailReqVO(); 
+		CarProxyService.CarDetailReqVO carDetailReqVO = new CarProxyService.CarDetailReqVO();
 		if (renterGoodsDetailDTO.getCarAddrIndex() != null) {
 			carDetailReqVO.setAddrIndex(renterGoodsDetailDTO.getCarAddrIndex());
 		}
