@@ -3,6 +3,7 @@ package com.atzuche.order.coreapi.service;
 import com.alibaba.fastjson.JSON;
 import com.atzuche.order.accountrenterdeposit.vo.req.CreateOrderRenterDepositReqVO;
 import com.atzuche.order.accountrenterwzdepost.vo.req.CreateOrderRenterWZDepositReqVO;
+import com.atzuche.order.car.CarProxyService;
 import com.atzuche.order.cashieraccount.service.CashierService;
 import com.atzuche.order.commons.CommonUtils;
 import com.atzuche.order.commons.ListUtil;
@@ -46,6 +47,7 @@ import com.atzuche.order.renterorder.vo.*;
 import com.autoyol.car.api.model.dto.LocationDTO;
 import com.autoyol.car.api.model.dto.OrderInfoDTO;
 import com.autoyol.car.api.model.enums.OrderOperationTypeEnum;
+import com.atzuche.order.mem.MemProxyService;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,9 +71,9 @@ public class SubmitOrderService {
     private static final Logger LOGGER = LoggerFactory.getLogger(SubmitOrderService.class);
 
     @Autowired
-    private MemberService memberService;
+    private MemProxyService memberService;
     @Autowired
-    private GoodsService goodsService;
+    private CarProxyService goodsService;
     @Resource
     private UniqueOrderNoService uniqueOrderNoService;
     @Resource
@@ -138,7 +140,7 @@ public class SubmitOrderService {
         //2.下单校验
         //2.1库存校验
         OrderInfoDTO orderInfoDTO = initOrderInfoDTO(orderReqVO);
-        //stockService.checkCarStock(orderInfoDTO);
+        stockService.checkCarStock(orderInfoDTO);
 
         //2.2风控
         Integer riskAuditId = submitOrderRiskAuditService.check(buildSubmitOrderRiskCheckReqVO(orderReqVO, reqTime));
@@ -149,7 +151,7 @@ public class SubmitOrderService {
         String orderNo = uniqueOrderNoService.getOrderNo();
         //2.5.锁定库存
         orderInfoDTO.setOrderNo(orderNo);
-        //stockService.cutCarStock(orderInfoDTO);
+        stockService.cutCarStock(orderInfoDTO);
 
         //提前延后时间计算
         CarRentTimeRangeResVO carRentTimeRangeResVO = carRentalTimeApiService.getCarRentTimeRange(buildCarRentTimeRangeReqVO(orderReqVO));
@@ -306,8 +308,8 @@ public class SubmitOrderService {
         return orderInfoDTO;
     }
 
-    private GoodsService.CarDetailReqVO buildCarDetailReqVO(OrderReqVO orderReqVO) {
-        GoodsService.CarDetailReqVO carDetailReqVO = new GoodsService.CarDetailReqVO();
+    private CarProxyService.CarDetailReqVO buildCarDetailReqVO(OrderReqVO orderReqVO) {
+        CarProxyService.CarDetailReqVO carDetailReqVO = new CarProxyService.CarDetailReqVO();
         carDetailReqVO.setAddrIndex(StringUtils.isBlank(orderReqVO.getCarAddrIndex()) ? 0 : Integer.parseInt(orderReqVO.getCarAddrIndex()));
         carDetailReqVO.setCarNo(orderReqVO.getCarNo());
         carDetailReqVO.setRentTime(orderReqVO.getRentTime());

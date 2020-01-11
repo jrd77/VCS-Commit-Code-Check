@@ -33,7 +33,7 @@ public class AccountRenterWzDepositDetailNoTService {
         accountRenterDepositDetailEntity.setCostDetail(payedOrderRenterWZDepositDetailReqVO.getRenterCashCodeEnum().getTxt());
         accountRenterDepositDetailEntity.setSourceCode(payedOrderRenterWZDepositDetailReqVO.getRenterCashCodeEnum().getCashNo());
         accountRenterDepositDetailEntity.setSourceDetail(payedOrderRenterWZDepositDetailReqVO.getRenterCashCodeEnum().getTxt());
-        int result = accountRenterWzDepositDetailMapper.insert(accountRenterDepositDetailEntity);
+        int result = accountRenterWzDepositDetailMapper.insertSelective(accountRenterDepositDetailEntity);
         if(result==0){
             throw new PayOrderRenterWZDepositException();
         }

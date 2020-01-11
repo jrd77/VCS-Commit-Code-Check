@@ -104,8 +104,8 @@ public class SubmitOrderRiskAuditService {
         createOrderRiskCheckRequestVO.setRenterGpsAddrLat(submitOrderRiskCheckReqVO.getPublicLatitude());
         createOrderRiskCheckRequestVO.setRenterGpsAddrLon(submitOrderRiskCheckReqVO.getPublicLongitude());
 
-        createOrderRiskCheckRequestVO.setUserCarCityCode(submitOrderRiskCheckReqVO.getCityCode());
-        createOrderRiskCheckRequestVO.setUserCarCityName(submitOrderRiskCheckReqVO.getCityName());
+        createOrderRiskCheckRequestVO.setUseCarCityCode(submitOrderRiskCheckReqVO.getCityCode());
+        createOrderRiskCheckRequestVO.setUseCarCityName(submitOrderRiskCheckReqVO.getCityName());
 
         return createOrderRiskCheckRequestVO;
     }

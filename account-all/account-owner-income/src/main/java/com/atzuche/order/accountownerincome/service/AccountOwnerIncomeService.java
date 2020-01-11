@@ -51,7 +51,6 @@ public class AccountOwnerIncomeService{
     /**
      * 收益审核通过 更新车主收益信息
      */
-    @CatAnnotation
     public void examineOwnerIncomeExamine(AccountOwnerIncomeExamineOpReqVO accountOwnerIncomeExamineOpReq){
         //1参数校验
         Assert.notNull(accountOwnerIncomeExamineOpReq, ErrorCode.PARAMETER_ERROR.getText());

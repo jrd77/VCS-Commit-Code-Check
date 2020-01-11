@@ -1,4 +1,4 @@
-package com.atzuche.order.coreapi.service;
+package com.atzuche.order.mem;
 
 import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.CatConstants;
@@ -8,7 +8,6 @@ import com.atzuche.order.commons.enums.MemberFlagEnum;
 import com.atzuche.order.commons.enums.OwnerMemRightEnum;
 import com.atzuche.order.commons.enums.RenterMemRightEnum;
 import com.atzuche.order.commons.enums.RightTypeEnum;
-import com.atzuche.order.coreapi.submitOrder.exception.*;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.member.detail.api.MemberDetailFeignService;
@@ -32,11 +31,52 @@ import java.util.List;
  * @date 2019/12/19 2:18 下午
  **/
 @Service
-public class MemberService {
-    private final static Logger log = LoggerFactory.getLogger(MemberService.class);
-    
+public class MemProxyService {
+    private final static Logger log = LoggerFactory.getLogger(MemProxyService.class);
+
     @Autowired
     private MemberDetailFeignService memberDetailFeignService;
+
+
+    /**
+     * 返回用户的会员号
+     * @param mobile
+     * @return
+     * @throws RenterMemberFailException
+     */
+    public Integer getMemNoByMoile(String mobile)throws RenterMemberFailException{
+        ResponseData<Integer> responseData = null;
+        log.info("Feign 开始获取车主会员信息,mobile={}",mobile);
+        Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "会员详情服务");
+        try{
+            Cat.logEvent(CatConstants.FEIGN_METHOD,"MemberDetailFeignService.getMemNoByMobile");
+            String parameter = "mobile="+mobile;
+            Cat.logEvent(CatConstants.FEIGN_PARAM,parameter);
+            responseData = memberDetailFeignService.getMemNoByMobile(Long.parseLong(mobile));
+            Cat.logEvent(CatConstants.FEIGN_RESULT,JSON.toJSONString(responseData));
+            if(responseData == null || !ErrorCode.SUCCESS.getCode().equals(responseData.getResCode())){
+                log.error("Feign 获取车主会员信息失败,mobile={},orderContextDto={}",mobile, JSON.toJSONString(responseData));
+                OwnerMemberFailException failException = new OwnerMemberFailException();
+                throw failException;
+            }
+            t.setStatus(Transaction.SUCCESS);
+            return responseData.getData();
+        }catch (OwnerMemberFailException oe){
+            Cat.logError("Feign 获取车主会员信息失败",oe);
+            t.setStatus(oe);
+            throw oe;
+        }
+        catch (Exception e){
+            t.setStatus(e);
+            Cat.logError("Feign 获取车主会员信息失败",e);
+            log.error("Feign 获取车主会员信息失败,orderContextDto={},mobile={}",mobile,e);
+            throw new OwnerMemberErrException();
+        }finally {
+            t.complete();
+        }
+    }
+
+
 
     //获取车主会员信息
     public OwnerMemberDTO getOwnerMemberInfo(String memNo) throws RenterMemberFailException {
@@ -52,7 +92,7 @@ public class MemberService {
         Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "会员详情服务");
         try{
             Cat.logEvent(CatConstants.FEIGN_METHOD,"MemberDetailFeignService.getMemberSelectInfo");
-            String parameter = "memNo="+memNo+"&selectKey"+JSON.toJSONString(selectKey);
+            String parameter = "memNo="+memNo+"&selectKey"+ JSON.toJSONString(selectKey);
             Cat.logEvent(CatConstants.FEIGN_PARAM,parameter);
             responseData = memberDetailFeignService.getMemberSelectInfo(Integer.valueOf(memNo), selectKey);
             Cat.logEvent(CatConstants.FEIGN_RESULT,JSON.toJSONString(responseData));

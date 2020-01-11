@@ -68,7 +68,7 @@ public class CashierPayService{
     @Autowired AccountRenterCostSettleService accountRenterCostSettleService;
     @Autowired RenterOrderCostCombineService renterOrderCostCombineService;
     @Autowired CashierNoTService cashierNoTService;
-    @Autowired WalletProxyService walletService;
+    @Autowired WalletProxyService walletProxyService;
     @Autowired RefundRemoteService refundRemoteService;
     @Autowired CashierRefundApplyNoTService cashierRefundApplyNoTService;
 
@@ -85,9 +85,9 @@ public class CashierPayService{
             if(Objects.nonNull(batchNotifyDataVo) && !CollectionUtils.isEmpty(batchNotifyDataVo.getLstNotifyDataVo())){
                 cashierService.callBackSuccess(batchNotifyDataVo.getLstNotifyDataVo(),callBack);
             }
-            //3 更新rabbitMQ 记录已消费
-            String reqContent = FasterJsonUtil.toJson(batchNotifyDataVo);
-            String md5 =  MD5.MD5Encode(reqContent);
+//            //3 更新rabbitMQ 记录已消费
+//            String reqContent = FasterJsonUtil.toJson(batchNotifyDataVo);
+//            String md5 =  MD5.MD5Encode(reqContent);
             t.setStatus(Transaction.SUCCESS);
         } catch (Exception e) {
             log.info("OrderPayCallBack payCallBackAsyn start param;[{}]", GsonUtils.toJson(batchNotifyDataVo));
@@ -117,11 +117,11 @@ public class CashierPayService{
         OrderPayableAmountResVO orderPayable = getOrderPayableAmount(orderPayReqVO);
         //4 抵扣钱包
         if(YesNoEnum.YES.getCode()==orderPayable.getIsUseWallet()){
-           int payBalance = walletService.getWalletByMemNo(orderPaySign.getMenNo());
+           int payBalance = walletProxyService.getWalletByMemNo(orderPaySign.getMenNo());
            //判断余额大于0
            if(payBalance>0){
                //5 抵扣钱包落库 （收银台落库、费用落库）
-               int amtWallet = walletService.orderDeduct(orderPaySign.getMenNo(),orderPaySign.getOrderNo(),orderPayable.getAmt());
+               int amtWallet = walletProxyService.orderDeduct(orderPaySign.getMenNo(),orderPaySign.getOrderNo(),orderPayable.getAmt());
                //6收银台 钱包支付落库
                cashierNoTService.insertRenterCostByWallet(orderPaySign,amtWallet);
                //钱包未抵扣部分
@@ -158,7 +158,6 @@ public class CashierPayService{
     /**
      * 查询支付款项信息
      */
-    @CatAnnotation
     public OrderPayableAmountResVO getOrderPayableAmount(OrderPayReqVO orderPayReqVO){
         Assert.notNull(orderPayReqVO, ErrorCode.PARAMETER_ERROR.getText());
         orderPayReqVO.check();
@@ -216,7 +215,7 @@ public class CashierPayService{
         // 计算钱包 支付 目前支付抵扣租费费用
         int amtWallet =0;
         if(YesNoEnum.YES.getCode()==result.getIsUseWallet()){
-            int payBalance = walletService.getWalletByMemNo(orderPayReqVO.getMenNo());
+            int payBalance = walletProxyService.getWalletByMemNo(orderPayReqVO.getMenNo());
             //预计钱包抵扣金额 = amtWallet
             amtWallet = amtRent + payBalance < 0 ? payBalance : Math.abs(amtRent);
             // 抵扣钱包后  应付租车费用金额
@@ -240,7 +239,6 @@ public class CashierPayService{
     /**
      * 查询包装 待支付签名对象
      */
-    @CatAnnotation
     public  List<PayVo> getOrderPayVO(OrderPaySignReqVO orderPaySign,OrderPayableAmountResVO payVO){
         //待支付金额明细
         List<PayVo> payVo = new ArrayList<>();
