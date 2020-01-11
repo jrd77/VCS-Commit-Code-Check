@@ -85,7 +85,7 @@ public class RenterCancelOrderService {
         CancelFineAmtDTO cancelFineAmt = buildCancelFineAmtDTO(renterOrderEntity,
                 renterOrderCostEntity, goodsDetail.getCarOwnerType());
         int penalty = renterOrderFineDeatailService.calCancelFine(cancelFineAmt);
-        int fineAmt = penalty + renterOrderCostEntity.getBasicEnsureAmount();
+        int fineAmt = penalty + Math.abs(renterOrderCostEntity.getBasicEnsureAmount());
         RenterOrderFineDeatailEntity renterOrderFineDeatailEntity =
                 renterOrderFineDeatailService.fineDataConvert(cancelFineAmt.getCostBaseDTO(), fineAmt, FineSubsidyCodeEnum.OWNER,
                         FineSubsidySourceCodeEnum.RENTER, FineTypeEnum.CANCEL_FINE);
@@ -150,7 +150,7 @@ public class RenterCancelOrderService {
 
         cancelFineAmtDTO.setCostBaseDTO(costBaseDTO);
         cancelFineAmtDTO.setCancelTime(LocalDateTime.now());
-        cancelFineAmtDTO.setRentAmt(renterOrderCostEntity.getRentCarAmount());
+        cancelFineAmtDTO.setRentAmt(Math.abs(renterOrderCostEntity.getRentCarAmount()));
         cancelFineAmtDTO.setOwnerType(carOwnerType);
         return cancelFineAmtDTO;
     }

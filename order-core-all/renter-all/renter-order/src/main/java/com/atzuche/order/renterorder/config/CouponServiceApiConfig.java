@@ -1,4 +1,4 @@
-package com.atzuche.order.coreapi.config;
+package com.atzuche.order.renterorder.config;
 
 import com.autoyol.coupon.api.CouponServiceApi;
 import org.springframework.beans.factory.annotation.Value;
