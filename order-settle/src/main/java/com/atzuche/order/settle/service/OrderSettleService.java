@@ -96,11 +96,11 @@ public class  OrderSettleService{
         orderSettleNoTService.repayHistoryDebtOwner(settleOrdersAccount);
         //14 车主待审核收益落库
         orderSettleNoTService.insertOwnerIncomeExamine(settleOrdersAccount);
-        //15 更新订单状态 TODO
+        //15 更新订单状态
         settleOrdersAccount.setOrderStatusDTO(orderStatusDTO);
         orderSettleNoTService.saveOrderStatusInfo(settleOrdersAccount);
         log.info("OrderSettleService settleOrdersDefinition settleOrdersAccount two [{}]", GsonUtils.toJson(settleOrdersAccount));
-        //16 发消息
+        //16 发消息 TODO
 
     }
 

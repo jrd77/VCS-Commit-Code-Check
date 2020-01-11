@@ -160,7 +160,7 @@ public class OrderSettleNoTService {
     private CostBaseDTO getCostBaseRent(SettleOrders settleOrders,RenterOrderEntity renterOrder){
         CostBaseDTO costBaseDTO = new CostBaseDTO();
         costBaseDTO.setOrderNo(renterOrder.getOrderNo());
-        costBaseDTO.setMemNo("");
+        costBaseDTO.setMemNo(renterOrder.getRenterMemNo());
         costBaseDTO.setRenterOrderNo(renterOrder.getRenterOrderNo());
         costBaseDTO.setStartTime(renterOrder.getExpRentTime());
         costBaseDTO.setEndTime(renterOrder.getExpRevertTime());
