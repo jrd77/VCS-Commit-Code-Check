@@ -17,7 +17,7 @@ public class NormalOrderCostCalculateReqVO extends BaseVO {
     private static final long serialVersionUID = 4077530429676649793L;
 
     @AutoDocProperty(value = "订单类型", required = true)
-    @NotBlank(message = "订单类型不能为空")
+    @NotBlank(message = "订单类型不能为空,1.普通订单 2.套餐订单")
     private String orderCategory;
 
     @AutoDocProperty(value = "业务来源主类型,1:OTA,2代步车，3:礼品卡,4:安联,5:自有 ")
@@ -52,26 +52,26 @@ public class NormalOrderCostCalculateReqVO extends BaseVO {
     @NotNull(message = "是否使用取车服务标识不能为空")
     private Integer srvGetFlag;
 
-    @AutoDocProperty(value = "取车服务-取车地址", required = true)
+    @AutoDocProperty(value = "取车服务-取车地址")
     private String srvGetAddr;
 
-    @AutoDocProperty(value = "取车服务-取车地址-地址经度", required = true)
+    @AutoDocProperty(value = "取车服务-取车地址-地址经度")
     private String srvGetLon;
 
-    @AutoDocProperty(value = "取车服务-取车地址-地址维度", required = true)
+    @AutoDocProperty(value = "取车服务-取车地址-地址维度")
     private String srvGetLat;
 
     @AutoDocProperty(value = "是否使用还车服务:0.否 1.是", required = true)
     @NotNull(message = "是否使用还车服务标识不能为空")
     private Integer srvReturnFlag;
 
-    @AutoDocProperty(value = "还车服务-还车地址", required = true)
+    @AutoDocProperty(value = "还车服务-还车地址")
     private String srvReturnAddr;
 
-    @AutoDocProperty(value = "还车服务-还车地址-地址经度", required = true)
+    @AutoDocProperty(value = "还车服务-还车地址-地址经度")
     private String srvReturnLon;
 
-    @AutoDocProperty(value = "还车服务-还车地址-地址维度", required = true)
+    @AutoDocProperty(value = "还车服务-还车地址-地址维度")
     private String srvReturnLat;
 
     @AutoDocProperty(value = "车辆注册号", required = true)
