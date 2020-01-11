@@ -1,7 +1,5 @@
 package com.atzuche.order.coreapi.entity.request;
 
-import javax.validation.constraints.Pattern;
-
 import org.hibernate.validator.constraints.NotBlank;
 
 import com.autoyol.doc.annotation.AutoDocProperty;
@@ -21,7 +19,6 @@ public class ModifyApplyHandleReq {
 	@AutoDocProperty(value="modifyApplicationId,必填，",required=true)
 	private String modifyApplicationId;
 	
-	@NotBlank(message="修改订单申请flag不能为空")
-    @Pattern(regexp="^[0-1]*$",message="修改订单申请flag必须为数字且为0或1")
+	@NotBlank(message="修改订单申请flag不能为空，1-同意，0-拒绝")
 	private String flag;
 }
