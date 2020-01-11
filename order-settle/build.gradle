@@ -23,6 +23,8 @@ dependencies {
     compile project(":order-core-all:parent-order")
     compile project(":order-core-all:renter-all:renter-commodity")
     compile project(":order-flow")
+    compile project(":order-core-all:carowner-all:carowner-penalty")
+
 
 
 }

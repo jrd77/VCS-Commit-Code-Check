@@ -31,8 +31,7 @@ public class OwnerOrderFineDeatailService{
      * @param orderNo
      * @return
      */
-
-    public List<OwnerOrderFineDeatailEntity> addOwnerOrderFineRecord(String orderNo) {
+    public List<OwnerOrderFineDeatailEntity> getOwnerOrderFineDeatailByOrderNo(String orderNo) {
         List<OwnerOrderFineDeatailEntity> result = ownerOrderFineDeatailMapper.selectByOrderNo(orderNo);
         if(CollectionUtils.isEmpty(result)){
             return Collections.emptyList();
