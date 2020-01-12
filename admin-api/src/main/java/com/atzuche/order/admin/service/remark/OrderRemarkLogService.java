@@ -1,7 +1,7 @@
 package com.atzuche.order.admin.service.remark;
 
 import com.atzuche.order.admin.common.AdminUserUtil;
-import com.atzuche.order.admin.dto.OrderRemarkLogListRequestDTO;
+import com.atzuche.order.admin.dto.remark.OrderRemarkLogListRequestDTO;
 import com.atzuche.order.admin.entity.OrderRemarkEntity;
 import com.atzuche.order.admin.entity.OrderRemarkLogEntity;
 import com.atzuche.order.admin.enums.remark.DepartmentEnum;

@@ -6,7 +6,7 @@ import com.atzuche.order.admin.constant.cat.UrlConstant;
 import com.atzuche.order.admin.constant.description.DescriptionConstant;
 import com.atzuche.order.admin.controller.BaseController;
 import com.atzuche.order.admin.description.LogDescription;
-import com.atzuche.order.admin.dto.OrderRiskStatusRequestDTO;
+import com.atzuche.order.admin.dto.remark.OrderRiskStatusRequestDTO;
 import com.atzuche.order.admin.exception.remark.OrderRemarkException;
 import com.atzuche.order.admin.service.remark.OrderRemarkService;
 import com.atzuche.order.admin.vo.req.remark.OrderCarServiceRemarkRequestVO;
