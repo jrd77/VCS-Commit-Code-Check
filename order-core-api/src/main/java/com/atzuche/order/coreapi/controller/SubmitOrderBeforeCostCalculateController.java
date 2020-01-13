@@ -1,8 +1,10 @@
 package com.atzuche.order.coreapi.controller;
 
 import com.alibaba.fastjson.JSON;
+import com.atzuche.order.commons.LocalDateTimeUtils;
 import com.atzuche.order.commons.vo.req.NormalOrderCostCalculateReqVO;
 import com.atzuche.order.commons.vo.req.NormalOrderReqVO;
+import com.atzuche.order.commons.vo.req.OrderReqVO;
 import com.atzuche.order.commons.vo.res.NormalOrderCostCalculateResVO;
 import com.atzuche.order.commons.vo.res.OrderResVO;
 import com.atzuche.order.coreapi.service.SubmitOrderBeforeCostCalService;
@@ -14,6 +16,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cglib.beans.BeanCopier;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -58,7 +61,17 @@ public class SubmitOrderBeforeCostCalculateController {
             return new ResponseData<>(ErrorCode.NEED_LOGIN.getCode(), ErrorCode.NEED_LOGIN.getText());
         }
 
-        NormalOrderCostCalculateResVO resVO = submitOrderBeforeCostCalService.costCalculate(reqVO);
+        BeanCopier beanCopier = BeanCopier.create(NormalOrderCostCalculateReqVO.class, OrderReqVO.class, false);
+        OrderReqVO orderReqVO = new OrderReqVO();
+        beanCopier.copy(reqVO, orderReqVO, null);
+        orderReqVO.setAbatement(Integer.valueOf(reqVO.getAbatement()));
+        orderReqVO.setRentTime(LocalDateTimeUtils.parseStringToDateTime(reqVO.getRentTime(),
+                LocalDateTimeUtils.DEFAULT_PATTERN));
+        orderReqVO.setRevertTime(LocalDateTimeUtils.parseStringToDateTime(reqVO.getRevertTime(),
+                LocalDateTimeUtils.DEFAULT_PATTERN));
+
+        LOGGER.info("Submit order before cost calculate.conversion param is,orderReqVO:[{}]", JSON.toJSONString(orderReqVO));
+        NormalOrderCostCalculateResVO resVO = submitOrderBeforeCostCalService.costCalculate(orderReqVO);
         LOGGER.info("Submit order before cost calculate.result is,resVO:[{}]", JSON.toJSONString(resVO));
         return ResponseData.success(resVO);
     }

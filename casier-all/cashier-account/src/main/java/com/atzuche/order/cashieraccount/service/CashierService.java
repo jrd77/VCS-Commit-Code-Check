@@ -8,6 +8,7 @@ import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostSettleEnt
 import com.atzuche.order.accountrenterrentcost.service.notservice.AccountRenterCostSettleDetailNoTService;
 import com.atzuche.order.accountrenterrentcost.service.notservice.AccountRenterCostSettleNoTService;
 import com.atzuche.order.accountrenterwzdepost.vo.res.AccountRenterWZDepositResVO;
+import com.atzuche.order.cashieraccount.vo.res.pay.OrderPayCallBackSuccessVO;
 import com.atzuche.order.commons.enums.OrderPayStatusEnum;
 import com.atzuche.order.commons.enums.OrderStatusEnum;
 import com.atzuche.order.commons.enums.RenterCashCodeEnum;
@@ -38,6 +39,8 @@ import com.atzuche.order.accountrenterwzdepost.vo.req.CreateOrderRenterWZDeposit
 import com.atzuche.order.accountrenterwzdepost.vo.req.PayedOrderRenterDepositWZDetailReqVO;
 import com.atzuche.order.accountrenterwzdepost.vo.req.PayedOrderRenterWZDepositReqVO;
 import com.atzuche.order.accountrenterwzdepost.vo.req.RenterWZDepositCostReqVO;
+import com.atzuche.order.cashieraccount.entity.CashierEntity;
+import com.atzuche.order.cashieraccount.mapper.CashierMapper;
 import com.atzuche.order.cashieraccount.service.notservice.CashierNoTService;
 import com.atzuche.order.cashieraccount.service.notservice.CashierRefundApplyNoTService;
 import com.atzuche.order.cashieraccount.vo.req.CashierDeductDebtReqVO;
@@ -53,6 +56,7 @@ import com.autoyol.commons.utils.GsonUtils;
 import com.autoyol.commons.web.ErrorCode;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -89,7 +93,8 @@ public class CashierService {
     @Autowired private OrderStatusService orderStatusService;
     @Autowired private OrderFlowService orderFlowService;
     @Autowired private AccountRenterCostSettleNoTService accountRenterCostSettleNoTService;
-
+    @Autowired
+    private CashierMapper cashierMapper;
 
     /**  *************************************** 租车费用 start****************************************************/
     /**
@@ -439,16 +444,18 @@ public class CashierService {
      * @param lstNotifyDataVo
      */
     @Transactional(rollbackFor=Exception.class)
-    public void callBackSuccess(List<NotifyDataVo> lstNotifyDataVo, OrderPayCallBack callBack) {
+    public OrderPayCallBackSuccessVO callBackSuccess(List<NotifyDataVo> lstNotifyDataVo) {
+        OrderPayCallBackSuccessVO vo = new OrderPayCallBackSuccessVO();
         if(!CollectionUtils.isEmpty(lstNotifyDataVo)){
             for(int i=0;i<lstNotifyDataVo.size();i++){
                 NotifyDataVo notifyDataVo = lstNotifyDataVo.get(i);
                 //2支付成功回调
                 if(DataPayTypeConstant.PAY_PUR.equals(notifyDataVo.getPayType()) || DataPayTypeConstant.PAY_PRE.equals(notifyDataVo.getPayType())){
-                    payOrderCallBackSuccess(notifyDataVo,callBack);
+                    payOrderCallBackSuccess(notifyDataVo,vo);
                 }
             }
         }
+        return vo;
     }
 
     /**
@@ -470,23 +477,22 @@ public class CashierService {
      * 支付成功回调 更新收银台及费用
      * @param notifyDataVo
      */
-    public void payOrderCallBackSuccess(NotifyDataVo notifyDataVo,OrderPayCallBack callBack) {
+    public void payOrderCallBackSuccess(NotifyDataVo notifyDataVo,OrderPayCallBackSuccessVO vo) {
         log.info("payOrderCallBackSuccess param :[{}]", GsonUtils.toJson(notifyDataVo));
         //没有成功的 不处理
         if(Objects.isNull(notifyDataVo) || !TransStatusEnum.PAY_SUCCESS.getCode().equals(notifyDataVo.getTransStatus())){
             log.info("payOrderCallBackSuccess check fail :[{}]", GsonUtils.toJson(notifyDataVo));
             return;
         }
-        OrderStatusDTO orderStatusDTO = new OrderStatusDTO();
-        orderStatusDTO.setOrderNo(notifyDataVo.getOrderNo());
-
+        vo.setOrderNo(notifyDataVo.getOrderNo());
+        vo.setMemNo(notifyDataVo.getMemNo());
         //1.1 租车押金 01
         if(Objects.nonNull(notifyDataVo) && DataPayKindConstant.RENT.equals(notifyDataVo.getPayKind())){
             //1 对象初始化转换
             PayedOrderRenterDepositReqVO payedOrderRenterDeposit = cashierNoTService.getPayedOrderRenterDepositReq(notifyDataVo);
             //2 收银台记录更新
             cashierNoTService.updataCashierAndRenterDeposit(notifyDataVo,payedOrderRenterDeposit);
-            orderStatusDTO.setDepositPayStatus(OrderPayStatusEnum.PAYED.getStatus());
+            vo.setDepositPayStatus(OrderPayStatusEnum.PAYED.getStatus());
         }
         //1.2 违章押金 02
         if(Objects.nonNull(notifyDataVo) && DataPayKindConstant.DEPOSIT.equals(notifyDataVo.getPayKind())){
@@ -494,7 +500,7 @@ public class CashierService {
             PayedOrderRenterWZDepositReqVO payedOrderRenterWZDeposit = cashierNoTService.getPayedOrderRenterWZDepositReq(notifyDataVo);
             //2 收银台记录更新
             cashierNoTService.updataCashierAndRenterWzDeposit(notifyDataVo,payedOrderRenterWZDeposit);
-            orderStatusDTO.setWzPayStatus(OrderPayStatusEnum.PAYED.getStatus());
+            vo.setWzPayStatus(OrderPayStatusEnum.PAYED.getStatus());
         }
         //1.3 租车费用
         if(Objects.nonNull(notifyDataVo) && DataPayKindConstant.RENT_AMOUNT.equals(notifyDataVo.getPayKind()) ){
@@ -502,8 +508,7 @@ public class CashierService {
             AccountRenterCostReqVO accountRenterCostReq = cashierNoTService.getAccountRenterCostReq(notifyDataVo, RenterCashCodeEnum.ACCOUNT_RENTER_RENT_COST);
             //2 收银台记录更新
             cashierNoTService.updataCashierAndRenterCost(notifyDataVo,accountRenterCostReq);
-            orderStatusDTO.setRentCarPayStatus(OrderPayStatusEnum.PAYED.getStatus());
-            callBack.callBack(notifyDataVo.getOrderNo());
+            vo.setRentCarPayStatus(OrderPayStatusEnum.PAYED.getStatus());
         }
         //1.4 补付租车费用
         if(Objects.nonNull(notifyDataVo) && DataPayKindConstant.RENT_INCREMENT.equals(notifyDataVo.getPayKind()) ){
@@ -511,16 +516,7 @@ public class CashierService {
             AccountRenterCostReqVO accountRenterCostReq = cashierNoTService.getAccountRenterCostReq(notifyDataVo, RenterCashCodeEnum.ACCOUNT_RENTER_RENT_COST_AGAIN);
             //2 收银台记录更新
             cashierNoTService.updataCashierAndRenterCost(notifyDataVo,accountRenterCostReq);
-            orderStatusDTO.setRentCarPayStatus(OrderPayStatusEnum.PAYED.getStatus());
-            callBack.callBack(notifyDataVo.getOrderNo());
-        }
-
-        //支付成功更新 订单支付状态
-        if(Objects.nonNull(orderStatusDTO)){
-            setOrderStatus(orderStatusDTO);
-            log.info("payOrderCallBackSuccess saveOrderStatusInfo :[{}]", GsonUtils.toJson(orderStatusDTO));
-            int orderStatusResult = orderStatusService.saveOrderStatusInfo(orderStatusDTO);
-            Assert.isTrue(orderStatusResult==1,"支付成功更新订单状态失败");
+            vo.setRentCarPayStatus(OrderPayStatusEnum.PAYED.getStatus());
         }
 
         //TODO 支付回调成功 push/或者短信 怎么处理
@@ -544,4 +540,10 @@ public class CashierService {
         }
 
     }
+    
+    
+    public List<CashierEntity> getCashierRentCostsByOrderNo(String orderNo){
+    	return cashierMapper.getCashierRentCostsByOrderNo(orderNo);
+    }
+    
 }

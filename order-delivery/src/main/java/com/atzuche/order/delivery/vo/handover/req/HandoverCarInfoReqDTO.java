@@ -1,7 +1,9 @@
 package com.atzuche.order.delivery.vo.handover.req;
 
 import com.autoyol.doc.annotation.AutoDocProperty;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.hibernate.validator.constraints.NotBlank;
 
@@ -11,6 +13,8 @@ import org.hibernate.validator.constraints.NotBlank;
  */
 @Data
 @ToString
+@AllArgsConstructor
+@NoArgsConstructor
 public class HandoverCarInfoReqDTO {
 
     @AutoDocProperty("车主取车里程数/租客收车里程数")

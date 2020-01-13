@@ -24,6 +24,8 @@ import com.autoyol.platformcost.CommonUtils;
 import com.dianping.cat.Cat;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -42,6 +44,9 @@ import java.util.stream.Collectors;
 @Service
 @Slf4j
 public class RenterOrderFineDeatailService{
+
+    private static Logger logger = LoggerFactory.getLogger(RenterOrderFineDeatailService.class);
+
     @Autowired
     private RenterOrderFineDeatailMapper renterOrderFineDeatailMapper;
     @Autowired
@@ -67,6 +72,10 @@ public class RenterOrderFineDeatailService{
      * @return Integer
      */
     public Integer saveRenterOrderFineDeatail(RenterOrderFineDeatailEntity renterOrderFineDeatailEntity) {
+        if(null == renterOrderFineDeatailEntity) {
+            logger.warn("Not fund renterr order fine data.");
+            return 0;
+        }
     	return renterOrderFineDeatailMapper.saveRenterOrderFineDeatail(renterOrderFineDeatailEntity);
     }
     

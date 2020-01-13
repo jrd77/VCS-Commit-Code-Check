@@ -24,6 +24,8 @@ public class DeliveryCarVO {
     private Integer isGetCar;
     @AutoDocProperty("是否还车 0:否 1:是")
     private Integer isReturnCar;
+    @AutoDocProperty("orderNo订单号")
+    private String orderNo;
 
 
 
