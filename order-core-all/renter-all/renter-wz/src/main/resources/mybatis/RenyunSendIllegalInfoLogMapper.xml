@@ -86,7 +86,7 @@
 		select
 		count(*)
 		from renyun_send_illegal_info_log
-		where wzcode = #{wzcode} and data_type = #{dataType} and car_plate_num = #{carNum}
+		where wzcode = #{wzCode} and data_type = #{dataType} and car_plate_num = #{carNum}
   </select>
 
 
