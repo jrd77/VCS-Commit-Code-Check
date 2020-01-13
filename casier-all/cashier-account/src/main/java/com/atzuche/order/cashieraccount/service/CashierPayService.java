@@ -110,10 +110,13 @@ public class CashierPayService{
                 orderStatusDTO.setStatus(OrderStatusEnum.TO_GET_CAR.getStatus());
                 //记录订单流程
                 orderFlowService.inserOrderStatusChangeProcessInfo(orderStatusDTO.getOrderNo(), OrderStatusEnum.TO_GET_CAR);
+            }
+            orderStatusService.saveOrderStatusInfo(orderStatusDTO);
+            //更新配送 订单补付等信息
+            if(isGetCar(orderStatusDTO)){
                 callBack.callBack(vo.getOrderNo());
             }
             log.info("payOrderCallBackSuccess saveOrderStatusInfo :[{}]", GsonUtils.toJson(orderStatusDTO));
-           orderStatusService.saveOrderStatusInfo(orderStatusDTO);
         }
     }
 
