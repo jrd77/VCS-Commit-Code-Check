@@ -1,8 +1,12 @@
 package com.atzuche.order.delivery.vo.trusteeship;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.ToString;
+import org.hibernate.validator.constraints.NotBlank;
 
+import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 /**
@@ -13,56 +17,41 @@ import java.time.LocalDateTime;
 @ToString
 public class OrderCarTrusteeshipVO {
 
-    /**
-     * 主订单号
-     */
+    @ApiModelProperty(value="订单号",required=true)
+    @NotBlank(message="orderNo不能为空")
     private String orderNo;
-    /**
-     * 车牌号
-     */
+    @ApiModelProperty(value="车牌号",required=true)
+    @NotBlank(message="车牌号不能为空")
     private String carNo;
-    /**
-     * 车管家姓名
-     */
     private String trusteeshipName;
-    /**
-     * 车管家手机号
-     */
     private String trusteeshipTelephone;
-    /**
-     * 出库时间
-     */
+    @ApiModelProperty(value="出库时间",required=true)
+    @NotNull(message="出库时间不能为空")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     private LocalDateTime outDepotTime;
-    /**
-     * 入库时间
-     */
+    @ApiModelProperty(value="入库时间",required=true)
+    @NotNull(message="入库时间不能为空")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     private LocalDateTime inDepotTime;
-    /**
-     * 出库里程数
-     */
+    @ApiModelProperty(value="出库里程数",required=true)
+    @NotBlank(message="出库里程数不能为空")
     private String outDepotMileage;
-    /**
-     * 入库里程数
-     */
+    @ApiModelProperty(value="入库里程数",required=true)
+    @NotBlank(message="入库里程数不能为空")
     private String inDepotMileage;
-    /**
-     * 出库油量: 1:1/16,2:2/16,3:3/16,4:4/16,5:5/16,6:6/16,7:7/16,8:8/16,9:9/16,10:10/16,11:11/16,12:12/16,13:13/16,14:14/16,15:15/16,16:16/16
-     */
+    @ApiModelProperty(value="出库油量: 1:1/16,2:2/16,3:3/16,4:4/16,....",required=true)
+    @NotBlank(message="出库油量不能为空")
     private Integer outDepotOimass;
-    /**
-     * 入库油量: 1:1/16,2:2/16,3:3/16,4:4/16,5:5/16,6:6/16,7:7/16,8:8/16,9:9/16,10:10/16,11:11/16,12:12/16,13:13/16,14:14/16,15:15/16,16:16/16
-     */
+    @ApiModelProperty(value="入库油量:1:1/16,2:2/16,3:3/16,4:4/16,....",required=true)
+    @NotBlank(message="入库油量不能为空")
     private Integer inDepotOimass;
-    /**
-     * 入库是否损伤:1:是,2:否
-     */
+    @ApiModelProperty(value="入库是否损伤 1:是,2:否",required=true)
+    @NotBlank(message="入库是否损伤不能为空")
     private Integer inDepotDamage;
-    /**
-     * 行驶证是否正常交接: 1:是，2:否
-     */
+    @ApiModelProperty(value="行驶证是否正常交接: 1:是，2:否",required=true)
+    @NotBlank(message="行驶证是否正常交接不能为空")
     private Integer drivingLicenseJoin;
-    /**
-     * 车钥匙是否正常交接: 1:是，2:否
-     */
+    @ApiModelProperty(value="车钥匙是否正常交接: 1:是，2:否",required=true)
+    @NotBlank(message="车钥匙是否正常交接不能为空")
     private Integer carKeyJoin;
 }
