@@ -955,7 +955,15 @@ public class RenterOrderCostCombineService {
         GetReturnOverTransportDTO getReturnOverTransport = new GetReturnOverTransportDTO(false, 0, false, 0);
         getReturnOverTransport.setIsUpdateRentTime(true);
         getReturnOverTransport.setIsUpdateRevertTime(true);
+
         if (cityCode == null || (rentTime == null && revertTime == null)) {
+            getReturnOverCostDTO.setRenterOrderCostDetailEntityList(renterOrderCostDetailEntityList);
+            return getReturnOverCostDTO;
+        }
+        boolean getIsGetCarCost = getReturnCarOverCostReqDto.getIsGetCarCost() == null ? false : getReturnCarOverCostReqDto.getIsGetCarCost();
+        boolean getIsReturnCarCost = getReturnCarOverCostReqDto.getIsReturnCarCost()==null?false:getReturnCarOverCostReqDto.getIsReturnCarCost();
+        if(!getIsGetCarCost && !getIsReturnCarCost){
+            log.info("不需要计算超运能费用getReturnCarOverCostReqDto={}",JSON.toJSONString(getReturnCarOverCostReqDto));
             getReturnOverCostDTO.setRenterOrderCostDetailEntityList(renterOrderCostDetailEntityList);
             return getReturnOverCostDTO;
         }
@@ -967,7 +975,7 @@ public class RenterOrderCostCombineService {
             Integer overTransportFee = this.getGetReturnOverTransportFee(cityCode);
             String rentTimeLongStr = String.valueOf(LocalDateTimeUtils.localDateTimeToLong(rentTime));
 
-            if (rentTime != null) {
+            if (rentTime != null && getIsGetCarCost) {
                 ResponseObject<Boolean> getFlgResponse = null;
                 Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "取车是否超运能");
                 try{
@@ -1003,7 +1011,7 @@ public class RenterOrderCostCombineService {
                         getReturnOverTransport.setGetOverTransportFee(overTransportFee);
                         if(DateUtils.isNight(rentTimeLongStr, nightBegin, nightEnd)) {
                             //夜间
-                            getReturnOverTransport.setNightGetOverTransportFee(overTransportFee);
+                            getReturnOverTransport.setNightGetOverTransportFee(overTransportFee==null?0:overTransportFee);
                         }
                         RenterOrderCostDetailEntity renterOrderCostDetailEntity = new RenterOrderCostDetailEntity();
                         renterOrderCostDetailEntity.setOrderNo(costBaseDTO.getOrderNo());
@@ -1023,7 +1031,8 @@ public class RenterOrderCostCombineService {
                     getReturnOverTransport.setIsGetOverTransport(false);
                 }
             }
-            if (revertTime != null) {
+
+            if (revertTime != null && getIsReturnCarCost) {
                 String revertTimeLongStr = String.valueOf(LocalDateTimeUtils.localDateTimeToLong(revertTime));
                 ResponseObject<Boolean>  returnFlgResponse = null;
                 Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL,"还车是否超运能");
@@ -1057,7 +1066,7 @@ public class RenterOrderCostCombineService {
                         getReturnOverTransport.setReturnOverTransportFee(overTransportFee);
                         if(DateUtils.isNight(String.valueOf(LocalDateTimeUtils.localDateTimeToLong(revertTime)), nightBegin, nightEnd)) {
                             //夜间
-                            getReturnOverTransport.setNightReturnOverTransportFee(overTransportFee);;
+                            getReturnOverTransport.setNightReturnOverTransportFee(overTransportFee==null?0:overTransportFee);;
                         }
                         RenterOrderCostDetailEntity renterOrderCostDetailEntity = new RenterOrderCostDetailEntity();
                         renterOrderCostDetailEntity.setOrderNo(costBaseDTO.getOrderNo());

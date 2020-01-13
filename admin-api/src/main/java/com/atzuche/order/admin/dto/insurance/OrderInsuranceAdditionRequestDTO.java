@@ -1,4 +1,4 @@
-package com.atzuche.order.admin.dto;
+package com.atzuche.order.admin.dto.insurance;
 
 import com.autoyol.doc.annotation.AutoDocProperty;
 import lombok.Data;

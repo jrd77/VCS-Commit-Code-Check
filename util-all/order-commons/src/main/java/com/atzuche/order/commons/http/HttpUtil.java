@@ -62,7 +62,7 @@ public class HttpUtil {
     //fee
 //    private static final String BASE_URL = "http://10.0.3.87:8182/";
     //local appserver  http://localhost:7064/app-server/
-    private static final String BASE_URL = "http://localhost:7777/";
+    private static final String BASE_URL = "";//http://localhost:7777/
 //    http://114.55.235.185:7064/
     	
 //    test6
