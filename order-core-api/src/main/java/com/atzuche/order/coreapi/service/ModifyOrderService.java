@@ -1354,9 +1354,9 @@ public class ModifyOrderService {
 		OrderDeliveryDTO returnDelivery = new OrderDeliveryDTO();
 		returnDelivery.setRentTime(modifyOrderDTO.getRentTime());
 		returnDelivery.setRevertTime(modifyOrderDTO.getRevertTime());
-		returnDelivery.setRenterGetReturnAddr(modifyOrderDTO.getGetCarAddress());
-		returnDelivery.setRenterGetReturnAddrLat(modifyOrderDTO.getGetCarLat());
-		returnDelivery.setRenterGetReturnAddrLon(modifyOrderDTO.getGetCarLon());
+		returnDelivery.setRenterGetReturnAddr(modifyOrderDTO.getRevertCarAddress());
+		returnDelivery.setRenterGetReturnAddrLat(modifyOrderDTO.getRevertCarLat());
+		returnDelivery.setRenterGetReturnAddrLon(modifyOrderDTO.getRevertCarLon());
 		returnDelivery.setOrderNo(modifyOrderDTO.getOrderNo());
 		returnDelivery.setRenterOrderNo(modifyOrderDTO.getRenterOrderNo());
 		returnDelivery.setType(SrvGetReturnEnum.SRV_RETURN_TYPE.getCode());

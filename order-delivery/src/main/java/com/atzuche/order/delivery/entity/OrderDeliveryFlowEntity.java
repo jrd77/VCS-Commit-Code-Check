@@ -133,14 +133,55 @@ public class OrderDeliveryFlowEntity implements Serializable {
      */
 	private String renterOrderNo;
 
+	/**
+	 * 实际取车经度
+	 **/
+	private String realGetCarLon;
+	/**
+	 * 实际取车维度
+	 **/
+	private String realGetCarLat;
+	/**
+	 * 实际还车经度
+	 **/
+	private String realReturnCarLon;
+	/**
+	 * 实际还车维度
+	 **/
+	private String realReturnCarLat;
+    /**
+     * 车主取车地址
+     **/
+    private String ownerGetAddr;
+    /**
+     * 车主还车地址
+     **/
+    private String ownerReturnAddr;
+
+    /**
+     * 日限里程
+     **/
+    private String dayMileage;
+
+    /**
+     * 油箱容量
+     **/
+    private String tankCapacity;
+
 
     public void setServiceTypeInfo(Integer orderType,OrderDeliveryDTO orderDeliveryDTO) {
-        if (orderType == UsedDeliveryTypeEnum.USED.getValue().intValue()) {
+        if (orderType.intValue() == UsedDeliveryTypeEnum.USED.getValue().intValue()) {
             setServiceType(ServiceTypeEnum.TAKE_TYPE.getValue());
             setPickupAlsoCarAddr(orderDeliveryDTO.getRenterGetReturnAddr());
+			setRealGetCarLat(orderDeliveryDTO.getRenterGetReturnAddrLat());
+			setRealGetCarLon(orderDeliveryDTO.getRenterGetReturnAddrLon());
+
+
         } else {
             setServiceType(ServiceTypeEnum.BACK_TYPE.getValue());
             setPickupAlsoCarAddr(orderDeliveryDTO.getRenterGetReturnAddr());
+			setRealReturnCarLat(orderDeliveryDTO.getRenterGetReturnAddrLat());
+			setRealReturnCarLon(orderDeliveryDTO.getRenterGetReturnAddrLon());
         }
     }
 

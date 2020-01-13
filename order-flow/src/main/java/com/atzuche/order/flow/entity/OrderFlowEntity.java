@@ -32,6 +32,11 @@ public class OrderFlowEntity implements Serializable {
 	 * 状态描述
 	 */
 	private String orderStatusDesc;
+
+	/**
+	 * 来源，如管理后台
+	 */
+	private String source;
 	/**
 	 * 创建时间
 	 */
