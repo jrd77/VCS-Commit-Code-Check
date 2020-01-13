@@ -107,6 +107,8 @@ public class ModifyOrderService {
     private CarRentalTimeApiService carRentalTimeApiService;
 	@Autowired
 	private AccountRenterCostCoinService accountRenterCostCoinService;
+	@Autowired
+	private ModifyOrderCheckService modifyOrderCheckService;
 
 	/**
 	 * 修改订单主逻辑
@@ -142,13 +144,16 @@ public class ModifyOrderService {
 		
 		// TODO 风控校验
 		
-		// TODO 库存校验
 		// 获取主订单信息
 		OrderEntity orderEntity = orderService.getOrderByOrderNoAndMemNo(orderNo, modifyOrderReq.getMemNo());
 		// 设置主订单信息
 		modifyOrderDTO.setOrderEntity(orderEntity);
+		// 校验
+		modifyOrderCheckService.modifyMainCheck(modifyOrderDTO);
 		// 设置城市编号
 		modifyOrderDTO.setCityCode(orderEntity.getCityCode());
+		// 库存校验
+		//modifyOrderCheckService.checkCarStock(modifyOrderDTO);
 		log.info("ModifyOrderService.modifyOrder again modifyOrderDTO=[{}]", modifyOrderDTO);
 		// 获取修改前租客费用明细
 		List<RenterOrderCostDetailEntity> initCostList = renterOrderCostDetailService.listRenterOrderCostDetail(modifyOrderDTO.getOrderNo(), initRenterOrder.getRenterOrderNo());
@@ -202,6 +207,7 @@ public class ModifyOrderService {
 		againAutoCoinDeduct(modifyOrderDTO, costDeductVO.getRenterSubsidyList());
 		return ResponseData.success();
 	}
+	
 	
 	
 	/**
