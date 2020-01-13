@@ -88,7 +88,7 @@ public class PreOrderController {
         for(RenterGoodsPriceDetailDTO dto:renterGoodsPriceDetailDTOList){
             logger.info("dto is {}",dto);
             PreOrderAdminResponseVO.CarDayPrice carDayPrice = new PreOrderAdminResponseVO.CarDayPrice();
-            carDayPrice.setDay(dto.getRevertTime().toString());
+            carDayPrice.setDay(dto.getCarDay().toString());
             carDayPrice.setPrice(dto.getCarUnitPrice().toString());
             carDayPrice.setDesc("工作日");
         }
