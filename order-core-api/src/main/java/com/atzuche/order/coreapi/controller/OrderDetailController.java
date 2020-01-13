@@ -44,8 +44,6 @@ public class OrderDetailController {
         ResponseData<OrderAccountDetailRespDTO> respData = orderDetailService.orderAccountDetail(orderDetailReqDTO);
         return respData;
     }
-
-
     @PostMapping("/status")
     public ResponseData<OrderStatusRespDTO> orderStatus(@Valid @RequestBody OrderDetailReqDTO orderDetailReqDTO, BindingResult bindingResult){
         if (bindingResult.hasErrors()) {
