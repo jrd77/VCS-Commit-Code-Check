@@ -45,7 +45,7 @@ public class NormalOrderReqVO extends BaseVO implements Serializable {
     private String sceneCode;
 
     @AutoDocProperty(value = "订单来源", required = true)
-    @NotBlank(message = "订单来源不能为空")
+    //@NotBlank(message = "订单来源不能为空")
     private String source;
 
     @AutoDocProperty(value = "细分订单来源")

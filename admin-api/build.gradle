@@ -61,10 +61,10 @@ dependencies {
     compile project(":order-core-all:renter-all:renter-wz")
     compile project(":order-core-all:renter-all:renter-mem")
     compile project(":order-core-all:renter-all:renter-commodity")
+	compile project(":order-core-all:renter-all:renter-cost")
+	compile project(":order-core-all:parent-order")
     compile project(":order-settle")
 
     compile project(":order-remote-service:order-remote-mem")
     compile project(":order-remote-service:order-remote-car")
-
-
 }

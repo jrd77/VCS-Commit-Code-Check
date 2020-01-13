@@ -29,7 +29,8 @@ public class OrderSubmitService {
 
         //2、http发送
         //ResponseData<OrderResVO> orderDetail = feignOrderAdminSubmitService.getOrderDetail(adminOrderReqParam);
-        HttpResult orderDetail = HttpUtil.doPostNotGzip("http://10.0.3.235:1412/order/admin/req", JSON.toJSONString(adminOrderReqParam));
+        //HttpResult orderDetail = HttpUtil.doPostNotGzip("http://10.0.3.235:1412/order/admin/req", JSON.toJSONString(adminOrderReqParam));
+        HttpResult orderDetail = HttpUtil.doPostNotGzip("http://localhost:7777/order/admin/req", JSON.toJSONString(adminOrderReqParam));
         //3、返回结果
         ResponseData responseData = new ResponseData();
         responseData.setData(orderDetail.getData());
@@ -128,7 +129,7 @@ public class OrderSubmitService {
         param.setSchema(reqVO.getSchema());
         param.setCityCode(reqVO.getCityCode());
         param.setSceneCode(sceneCode);
-        param.setSource(reqVO.getSource());
+        param.setSource("3");
         param.setSubSource(reqVO.getSubSource());
         param.setSrvGetAddr(reqVO.getSrvGetAddr());
         param.setSrvReturnAddr(reqVO.getSrvReturnAddr());
