@@ -17,7 +17,6 @@ apply plugin: 'application'
 
 mainClassName='com.autoyol.doc.parser.autodoc.AutoDocParser'
 
-mainClassName = 'com.autoyol.doc.parser.autodoc.AutoDocParser'
 
 group 'com.atzuche'
 version '1.0.0-SNAPSHOT'

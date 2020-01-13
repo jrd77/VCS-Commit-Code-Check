@@ -24,10 +24,10 @@ public class PreOrderAdminRequestVO {
     private String mobile;
     @AutoDocProperty(value = "会员号")
     private String memNo;
-    @AutoDocProperty(value = "起租时间")
+    @AutoDocProperty(value = "起租时间,格式yyyyMMddHHmmss")
     @NotBlank(message = "rentTime cannot be null")
     private String rentTime;
-    @AutoDocProperty(value = "结束时间")
+    @AutoDocProperty(value = "结束时间,格式yyyyMMddHHmmss")
     @NotBlank(message = "reverTime cannot be null")
     private String revertTime;
     @AutoDocProperty(value = "车辆编号")
