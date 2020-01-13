@@ -339,6 +339,9 @@ public class DeliveryCarService {
         renYunFlowOrderDTO.setDisplacement(String.valueOf(orderDeliveryFlowEntity.getDisplacement()));
         renYunFlowOrderDTO.setSource(orderDeliveryFlowEntity.getSource());
         renYunFlowOrderDTO.setCarno(orderDeliveryFlowEntity.getCarNo());
+        renYunFlowOrderDTO.setVehicletype(orderDeliveryFlowEntity.getVehicleType());
+        renYunFlowOrderDTO.setVehiclemodel(orderDeliveryFlowEntity.getVehicleModel());
+
         return renYunFlowOrderDTO;
     }
 
