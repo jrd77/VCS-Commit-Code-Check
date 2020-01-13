@@ -42,4 +42,6 @@ public interface RenterOrderMapper{
     Integer updateRenterOrderAgreeFlag(@Param("id") Integer id, @Param("agreeFlag") Integer agreeFlag);
 
     RenterOrderEntity getChangeRenterOrderByOrderNo(@Param("orderNo") String orderNo);
+
+    List<RenterOrderEntity> queryHostiryRenterOrderByOrderNo(@Param("orderNo") String orderNo);
 }
