@@ -1,7 +1,5 @@
 package com.atzuche.order.delivery.vo.delivery;
 
-import com.atzuche.order.commons.entity.dto.OwnerMemberDTO;
-import com.atzuche.order.commons.entity.dto.RenterMemberDTO;
 import com.atzuche.order.commons.vo.req.OrderReqVO;
 import com.atzuche.order.delivery.enums.UsedDeliveryTypeEnum;
 import lombok.Data;
