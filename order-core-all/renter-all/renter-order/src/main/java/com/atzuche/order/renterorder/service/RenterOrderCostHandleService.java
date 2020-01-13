@@ -73,19 +73,21 @@ public class RenterOrderCostHandleService {
         depositAmtDTO.setBrand(renterOrderReqVO.getBrandId());
         depositAmtDTO.setType(renterOrderReqVO.getTypeId());
         depositAmtDTO.setLicenseDay(renterOrderReqVO.getLicenseDay());
-        LOGGER.info("车辆押金计算.param is,depositAmtDTO:[{}]", JSON.toJSONString(depositAmtDTO));
+        LOGGER.info("车辆押金计算A.param is,depositAmtDTO:[{}]", JSON.toJSONString(depositAmtDTO));
         CarDepositAmtVO carDepositAmt = renterOrderCostCombineService.getCarDepositAmtVO(depositAmtDTO);
-        LOGGER.info("车辆押金计算.result is,carDepositAmt:[{}]", JSON.toJSONString(carDepositAmt));
+        LOGGER.info("车辆押金计算A.result is,carDepositAmt:[{}]", JSON.toJSONString(carDepositAmt));
 
         MemRightCarDepositAmtReqDTO memRightCarDepositAmtReqDTO = new MemRightCarDepositAmtReqDTO();
         memRightCarDepositAmtReqDTO.setGuidPrice(renterOrderReqVO.getGuidPrice());
         memRightCarDepositAmtReqDTO.setOriginalDepositAmt(null == carDepositAmt.getCarDepositAmt() ? 0 :
                 Math.abs(carDepositAmt.getCarDepositAmt()));
         memRightCarDepositAmtReqDTO.setRenterMemberRightDTOList(renterOrderReqVO.getRenterMemberRightDTOList());
-        LOGGER.info("车辆押金减免计算.param is,memRightCarDepositAmtReqDTO:[{}]", JSON.toJSONString(memRightCarDepositAmtReqDTO));
+        LOGGER.info("车辆押金减免计算A.param is,memRightCarDepositAmtReqDTO:[{}]",
+                JSON.toJSONString(memRightCarDepositAmtReqDTO));
         MemRightCarDepositAmtRespDTO memRightCarDepositAmtRespDTO =
                 renterMemberRightService.carDepositAmt(memRightCarDepositAmtReqDTO);
-        LOGGER.info("车辆押金减免计算.result is,memRightCarDepositAmtRespDTO:[{}]", JSON.toJSONString(memRightCarDepositAmtRespDTO));
+        LOGGER.info("车辆押金减免计算A.result is,memRightCarDepositAmtRespDTO:[{}]",
+                JSON.toJSONString(memRightCarDepositAmtRespDTO));
 
         RenterOrderCarDepositResVO renterOrderCarDepositResVO = new RenterOrderCarDepositResVO();
         renterOrderCarDepositResVO.setMemNo(renterOrderReqVO.getMemNo());
@@ -94,6 +96,7 @@ public class RenterOrderCostHandleService {
                 : Math.abs(memRightCarDepositAmtRespDTO.getReductionDepositAmt()));
         renterOrderCarDepositResVO.setYingfuDepositAmt(-(memRightCarDepositAmtRespDTO.getOriginalDepositAmt() - renterOrderCarDepositResVO.getReductionAmt()));
         renterOrderCarDepositResVO.setFreeDepositType(FreeDepositTypeEnum.getFreeDepositTypeEnumByCode(Integer.valueOf(renterOrderReqVO.getFreeDoubleTypeId())));
+        renterOrderCarDepositResVO.setReductionRate(Double.valueOf(memRightCarDepositAmtRespDTO.getReductionRate() * 100).intValue());
 
         //车辆押金明细入库
         RenterDepositDetailEntity record = new RenterDepositDetailEntity();
@@ -106,7 +109,7 @@ public class RenterOrderCostHandleService {
         record.setReductionRate(memRightCarDepositAmtRespDTO.getReductionRate());
         renterDepositDetailMapper.insertSelective(record);
 
-        LOGGER.info("租客车辆押金.result is,renterOrderCarDepositResVO:[{}]",
+        LOGGER.info("租客车辆押金A.result is,renterOrderCarDepositResVO:[{}]",
                 JSON.toJSONString(renterOrderCarDepositResVO));
         return renterOrderCarDepositResVO;
     }
@@ -116,12 +119,43 @@ public class RenterOrderCostHandleService {
      * 车辆押金计算及处理(不保存)
      *
      * @param renterOrderReqVO 租客订单请求信息
+     * @return RenterOrderCarDepositResVO
      */
-    public int handleCarDepositAmtNotSave(RenterOrderReqVO renterOrderReqVO) {
+    public RenterOrderCarDepositResVO handleCarDepositAmtNotSave(RenterOrderReqVO renterOrderReqVO) {
+        DepositAmtDTO depositAmtDTO = new DepositAmtDTO();
+        depositAmtDTO.setSurplusPrice(renterOrderReqVO.getCarSurplusPrice()==null ? renterOrderReqVO.getGuidPrice():renterOrderReqVO.getCarSurplusPrice());
+        depositAmtDTO.setCityCode(Integer.valueOf(renterOrderReqVO.getCityCode()));
+        depositAmtDTO.setBrand(renterOrderReqVO.getBrandId());
+        depositAmtDTO.setType(renterOrderReqVO.getTypeId());
+        depositAmtDTO.setLicenseDay(renterOrderReqVO.getLicenseDay());
+        LOGGER.info("车辆押金计算B.param is,depositAmtDTO:[{}]", JSON.toJSONString(depositAmtDTO));
+        CarDepositAmtVO carDepositAmt = renterOrderCostCombineService.getCarDepositAmtVO(depositAmtDTO);
+        LOGGER.info("车辆押金计算B.result is,carDepositAmt:[{}]", JSON.toJSONString(carDepositAmt));
 
+        MemRightCarDepositAmtReqDTO memRightCarDepositAmtReqDTO = new MemRightCarDepositAmtReqDTO();
+        memRightCarDepositAmtReqDTO.setGuidPrice(renterOrderReqVO.getGuidPrice());
+        memRightCarDepositAmtReqDTO.setOriginalDepositAmt(null == carDepositAmt.getCarDepositAmt() ? 0 :
+                Math.abs(carDepositAmt.getCarDepositAmt()));
+        memRightCarDepositAmtReqDTO.setRenterMemberRightDTOList(renterOrderReqVO.getRenterMemberRightDTOList());
+        LOGGER.info("车辆押金减免计算B.param is,memRightCarDepositAmtReqDTO:[{}]",
+                JSON.toJSONString(memRightCarDepositAmtReqDTO));
+        MemRightCarDepositAmtRespDTO memRightCarDepositAmtRespDTO =
+                renterMemberRightService.carDepositAmt(memRightCarDepositAmtReqDTO);
+        LOGGER.info("车辆押金减免计算B.result is,memRightCarDepositAmtRespDTO:[{}]",
+                JSON.toJSONString(memRightCarDepositAmtRespDTO));
 
-        return 0;
+        RenterOrderCarDepositResVO renterOrderCarDepositResVO = new RenterOrderCarDepositResVO();
+        renterOrderCarDepositResVO.setMemNo(renterOrderReqVO.getMemNo());
+        renterOrderCarDepositResVO.setOrderNo(renterOrderReqVO.getOrderNo());
+        renterOrderCarDepositResVO.setReductionAmt(null == memRightCarDepositAmtRespDTO.getReductionDepositAmt() ? 0
+                : Math.abs(memRightCarDepositAmtRespDTO.getReductionDepositAmt()));
+        renterOrderCarDepositResVO.setYingfuDepositAmt(-(memRightCarDepositAmtRespDTO.getOriginalDepositAmt() - renterOrderCarDepositResVO.getReductionAmt()));
+        renterOrderCarDepositResVO.setFreeDepositType(FreeDepositTypeEnum.getFreeDepositTypeEnumByCode(Integer.valueOf(renterOrderReqVO.getFreeDoubleTypeId())));
+        renterOrderCarDepositResVO.setReductionRate(Double.valueOf(memRightCarDepositAmtRespDTO.getReductionRate() * 100).intValue());
 
+        LOGGER.info("租客车辆押金B.result is,renterOrderCarDepositResVO:[{}]",
+                JSON.toJSONString(renterOrderCarDepositResVO));
+        return renterOrderCarDepositResVO;
     }
 
 

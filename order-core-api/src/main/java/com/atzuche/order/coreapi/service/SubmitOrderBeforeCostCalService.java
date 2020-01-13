@@ -19,7 +19,9 @@ import com.atzuche.order.rentercommodity.service.RenterCommodityService;
 import com.atzuche.order.renterorder.entity.dto.RenterOrderCostReqDTO;
 import com.atzuche.order.renterorder.entity.dto.RenterOrderCostRespDTO;
 import com.atzuche.order.renterorder.service.RenterOrderCalCostService;
+import com.atzuche.order.renterorder.service.RenterOrderCostHandleService;
 import com.atzuche.order.renterorder.service.RenterOrderService;
+import com.atzuche.order.renterorder.vo.RenterOrderCarDepositResVO;
 import com.atzuche.order.renterorder.vo.RenterOrderReqVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,6 +56,8 @@ public class SubmitOrderBeforeCostCalService {
     private RenterCommodityService renterCommodityService;
     @Autowired
     private RenterOrderService renterOrderService;
+    @Autowired
+    private RenterOrderCostHandleService renterOrderCostHandleService;
 
 
 
@@ -86,8 +90,11 @@ public class SubmitOrderBeforeCostCalService {
         //TODO:租车费用处理
         CarRentTimeRangeResVO carRentTimeRangeResVO =
                 carRentalTimeApiService.getCarRentTimeRange(carRentalTimeApiService.buildCarRentTimeRangeReqVO(orderReqVO));
+
+        RenterOrderReqVO renterOrderReqVO = orderCommonConver.buildRenterOrderReqVO(null, null, reqContext,
+                carRentTimeRangeResVO);
         RenterOrderCostReqDTO renterOrderCostReqDTO =
-                renterOrderService.buildRenterOrderCostReqDTO(orderCommonConver.buildRenterOrderReqVO(null, null, reqContext, carRentTimeRangeResVO));
+                renterOrderService.buildRenterOrderCostReqDTO(renterOrderReqVO);
         RenterOrderCostRespDTO renterOrderCostRespDTO =
                 renterOrderCalCostService.getOrderCostAndDeailList(renterOrderCostReqDTO);
 
@@ -97,6 +104,8 @@ public class SubmitOrderBeforeCostCalService {
 
 
         //TODO:车辆押金处理
+        RenterOrderCarDepositResVO renterOrderCarDepositResVO =
+                renterOrderCostHandleService.handleCarDepositAmtNotSave(renterOrderReqVO);
 
         //TODO:违章押金处理
 
@@ -106,6 +115,7 @@ public class SubmitOrderBeforeCostCalService {
         NormalOrderCostCalculateResVO res = new NormalOrderCostCalculateResVO();
         res.setCostItemList(costItemList);
         res.setTotalCost(orderCommonConver.buildTotalCostVO(costItemList));
+
 
         return res;
 
