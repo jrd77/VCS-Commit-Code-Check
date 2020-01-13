@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.*;
  * 配送服务接口
  */
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/console/api")
 @Slf4j
 public class DeliveryCarController extends BaseController {
 
