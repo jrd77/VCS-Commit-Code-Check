@@ -132,26 +132,28 @@ public class OrderSettleService{
      */
     @Transactional(rollbackFor=Exception.class)
     public boolean settleOrderCancel(String orderNo) {
-        Transaction t = Cat.getProducer().newTransaction(CatConstants.FEIGN_CALL, "取消订单结算服务");
-        try {
-            Cat.logEvent(CatConstants.FEIGN_METHOD, "OrderSettleService.settleOrderCancel");
-            Cat.logEvent(CatConstants.FEIGN_PARAM, orderNo);
-            // 1 取消订单初始化
-            SettleOrders settleOrders =  orderSettleNoTService.initSettleOrders(orderNo);
-            //3.4 查询所有租客罚金明细
-            orderSettleNoTService.getCencelRenterCostSettleDetail(settleOrders);
-
-
-            log.info("OrderSettleService initSettleOrders settleOrders [{}]", GsonUtils.toJson(settleOrders));
-            Cat.logEvent("settleOrders",GsonUtils.toJson(settleOrders));
-        } catch (Exception e) {
-            log.error("OrderSettleService settleOrderCancel,e={},",e);
-            t.setStatus(e);
-            Cat.logError("结算失败  :{}",e);
-            throw new RuntimeException("结算失败 ,不能结算");
-        } finally {
-            t.complete();
-        }
+//        Transaction t = Cat.getProducer().newTransaction(CatConstants.FEIGN_CALL, "取消订单结算服务");
+//        try {
+//            Cat.logEvent(CatConstants.FEIGN_METHOD, "OrderSettleService.settleOrderCancel");
+//            Cat.logEvent(CatConstants.FEIGN_PARAM, orderNo);
+//            // 1 取消订单初始化
+//            SettleOrders settleOrders =  orderSettleNoTService.initSettleOrders(orderNo);
+//            //2 查询所有租客罚金明细
+//            orderSettleNoTService.getCancelRenterCostSettleDetail(settleOrders);
+//            //3 查询所有车主罚金明细
+//            orderSettleNoTService.getCancelOwnerCostSettleDetail(settleOrders);
+//
+//
+//            log.info("OrderSettleService initSettleOrders settleOrders [{}]", GsonUtils.toJson(settleOrders));
+//            Cat.logEvent("settleOrders",GsonUtils.toJson(settleOrders));
+//        } catch (Exception e) {
+//            log.error("OrderSettleService settleOrderCancel,e={},",e);
+//            t.setStatus(e);
+//            Cat.logError("结算失败  :{}",e);
+//            throw new RuntimeException("结算失败 ,不能结算");
+//        } finally {
+//            t.complete();
+//        }
         return true;
     }
 }
