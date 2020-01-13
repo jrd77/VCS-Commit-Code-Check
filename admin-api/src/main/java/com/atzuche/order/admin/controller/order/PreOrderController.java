@@ -12,6 +12,8 @@ import com.autoyol.doc.annotation.AutoDocGroup;
 import com.autoyol.doc.annotation.AutoDocMethod;
 import com.autoyol.doc.annotation.AutoDocVersion;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -30,6 +32,8 @@ import java.util.List;
  **/
 @RestController
 public class PreOrderController {
+    private final static Logger logger = LoggerFactory.getLogger(PreOrderController.class);
+    
 
     @Autowired
     private MemProxyService memProxyService;
@@ -82,8 +86,9 @@ public class PreOrderController {
         List<PreOrderAdminResponseVO.CarDayPrice> carDayPrices = new ArrayList<>();
 
         for(RenterGoodsPriceDetailDTO dto:renterGoodsPriceDetailDTOList){
+            logger.info("dto is {}",dto);
             PreOrderAdminResponseVO.CarDayPrice carDayPrice = new PreOrderAdminResponseVO.CarDayPrice();
-            carDayPrice.setDay(dto.getRevertTime().format(DateTimeFormatter.BASIC_ISO_DATE));
+            carDayPrice.setDay(dto.getRevertTime().toString());
             carDayPrice.setPrice(dto.getCarUnitPrice().toString());
             carDayPrice.setDesc("工作日");
         }
