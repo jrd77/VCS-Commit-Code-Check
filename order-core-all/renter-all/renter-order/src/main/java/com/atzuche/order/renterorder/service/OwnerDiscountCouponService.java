@@ -3,6 +3,8 @@ package com.atzuche.order.renterorder.service;
 import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.CatConstants;
 import com.atzuche.order.renterorder.vo.owner.OwnerCouponGetAndValidResultVO;
+import com.atzuche.order.renterorder.vo.owner.OwnerCouponListResult;
+import com.atzuche.order.renterorder.vo.owner.OwnerDiscountCouponVO;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
 import com.dianping.cat.Cat;
@@ -16,7 +18,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -167,6 +171,49 @@ public class OwnerDiscountCouponService {
                     params, e);
         }
         return false;
+    }
+
+
+    /**
+     * 获取租客名下可用车主券列表 <BR>
+     *
+     * @param rentAmt
+     *            租金
+     * @param memNo
+     *            租客会员号
+     * @param carNo
+     *            车辆注册号
+     * @param couponNo
+     *            车主券券编码（选中则传否为空）
+     * @return List<OwnerDiscountCoupon>
+     */
+    public List<OwnerDiscountCouponVO> getCouponList(Integer rentAmt, Integer memNo, Integer carNo, String couponNo) {
+        logger.info(
+                "Get a list of available vehicle owners' coupons under the tenant's name,param is: rentAmt = {}, memNo = {}, carNo = {}, couponNo = {}  ",
+                rentAmt, memNo, carNo, couponNo);
+
+        StringBuffer url = new StringBuffer("ownerCoupon/orderOwnerCoupon?");
+        url.append("rented=").append(rentAmt);
+        url.append("&memNo=").append(memNo);
+        url.append("&carNo=").append(carNo);
+        if (StringUtils.isNotEmpty(couponNo)) {
+            url.append("&couponNo=").append(couponNo);
+        }
+        String urlStr = ownerCouponUrl + "/" + url.toString();
+        try {
+            String json = restTemplate.getForObject(urlStr, String.class);
+            logger.info("ownerCoupon/orderOwnerCoupon. result is :{}", json);
+            if (null != json) {
+                OwnerCouponListResult result = new Gson().fromJson(json, OwnerCouponListResult.class);
+                if (null != result.getData()) {
+                    return result.getData().getOwnerCouponDTOList();
+                }
+            }
+        } catch (Exception e) {
+            logger.error("getCouponList error. url={}", urlStr, e);
+        }
+
+        return new ArrayList<>();
     }
 
 }

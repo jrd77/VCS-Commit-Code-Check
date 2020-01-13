@@ -212,7 +212,7 @@ public class OwnerCancelOrderService {
         orderCancelReasonEntity.setCancelSource(CancelSourceEnum.OWNER.getCode());
         orderCancelReasonEntity.setOrderNo(orderNo);
         orderCancelReasonEntity.setSubOrderNo(ownerOrderNo);
-        orderCancelReasonEntity.setDutySource(CancelOrderDutyEnum.CANCEL_ORDER_DUTY_RENTER.getCode());
+        orderCancelReasonEntity.setDutySource(CancelOrderDutyEnum.CANCEL_ORDER_DUTY_OWNER.getCode());
         return orderCancelReasonEntity;
     }
 }
