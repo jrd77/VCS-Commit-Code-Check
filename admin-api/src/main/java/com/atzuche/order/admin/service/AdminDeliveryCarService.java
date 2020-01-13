@@ -5,7 +5,6 @@ import com.atzuche.order.delivery.entity.RenterOrderDeliveryEntity;
 import com.atzuche.order.delivery.enums.CarTypeEnum;
 import com.atzuche.order.delivery.service.RenterOrderDeliveryService;
 import com.atzuche.order.delivery.service.delivery.DeliveryCarInfoService;
-import com.atzuche.order.delivery.service.delivery.DeliveryCarService;
 import com.atzuche.order.delivery.service.handover.HandoverCarInfoService;
 import com.atzuche.order.delivery.vo.delivery.rep.*;
 import com.atzuche.order.delivery.vo.delivery.req.CarConditionPhotoUploadVO;
@@ -20,7 +19,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.Duration;
 import java.util.Objects;
 
 /**
@@ -102,8 +100,8 @@ public class AdminDeliveryCarService {
             deliveryReqDTO.setOrderNo(deliveryCarVO.getOrderNo());
             deliveryReqDTO.setOwnerRealGetAddrReamrk(getHandoverCarDTO.getOwnRealGetRemark());
             deliveryReqDTO.setRenterRealGetAddrReamrk(getHandoverCarDTO.getRenterRealGetAddrReamrk());
-            deliveryReqDTO.setRenterRealGetAddr(getHandoverCarDTO.getRenterRealGetAddr());
-            deliveryReqDTO.setOwnRealReturnAddr(getHandoverCarDTO.getOwnRealReturnAddr());
+            deliveryReqDTO.setRenterGetReturnAddr(getHandoverCarDTO.getRenterRealGetAddr());
+            deliveryReqDTO.setOwnerGetReturnAddr(returnHandoverCarDTO.getOwnerRealGetAddr() );
             deliveryReqVO.setGetDeliveryReqDTO(deliveryReqDTO);
         }
         if (Objects.nonNull(returnHandoverCarDTO)) {
@@ -112,9 +110,9 @@ public class AdminDeliveryCarService {
             renterDeliveryReqDTO.setOrderNo(deliveryCarVO.getOrderNo());
             renterDeliveryReqDTO.setRenterRealGetAddrReamrk(returnHandoverCarDTO.getRenterRealGetRemark());
             renterDeliveryReqDTO.setOwnerRealGetAddrReamrk(returnHandoverCarDTO.getOwnerRealGetAddrReamrk());
-            renterDeliveryReqDTO.setRenterRealGetAddr(returnHandoverCarDTO.getRenterRealReturnAddr());
-            renterDeliveryReqDTO.setOwnRealReturnAddr(returnHandoverCarDTO.getOwnerRealGetAddr());
-            deliveryReqVO.setGetDeliveryReqDTO(renterDeliveryReqDTO);
+            renterDeliveryReqDTO.setRenterGetReturnAddr(returnHandoverCarDTO.getRenterRealReturnAddr());
+            renterDeliveryReqDTO.setOwnerGetReturnAddr(getHandoverCarDTO.getOwnRealReturnAddr());
+            deliveryReqVO.setRenterDeliveryReqDTO(renterDeliveryReqDTO);
         }
         return deliveryReqVO;
     }
