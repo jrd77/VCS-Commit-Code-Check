@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author 胡春林
@@ -35,13 +36,17 @@ public class RenterHandoverCarService implements IUpdateHandoverCarInfo {
     @Override
     public void updateHandoverCarOilMileageNum(HandoverCarInfoReqDTO handoverCarInfoReqDTO) {
         RenterHandoverCarInfoEntity renterHandoverCarReturnInfoEntity = selectObjectByOrderNo(handoverCarInfoReqDTO.getOrderNo(), RenterHandoverCarTypeEnum.RENTER_TO_RENYUN.getValue());
-        renterHandoverCarReturnInfoEntity.setOilNum(Integer.valueOf(handoverCarInfoReqDTO.getRenterReturnOil()));
-        renterHandoverCarReturnInfoEntity.setMileageNum(Integer.valueOf(handoverCarInfoReqDTO.getOwnReturnKM()));
-        updateRenterHandoverInfoByPrimaryKey(renterHandoverCarReturnInfoEntity);
+        if (Objects.nonNull(renterHandoverCarReturnInfoEntity)) {
+            renterHandoverCarReturnInfoEntity.setOilNum(Integer.valueOf(handoverCarInfoReqDTO.getRenterReturnOil()));
+            renterHandoverCarReturnInfoEntity.setMileageNum(Integer.valueOf(handoverCarInfoReqDTO.getOwnReturnKM()));
+            updateRenterHandoverInfoByPrimaryKey(renterHandoverCarReturnInfoEntity);
+        }
         RenterHandoverCarInfoEntity renterHandoverCarGetInfoEntity = selectObjectByOrderNo(handoverCarInfoReqDTO.getOrderNo(), RenterHandoverCarTypeEnum.RENYUN_TO_RENTER.getValue());
-        renterHandoverCarGetInfoEntity.setOilNum(Integer.valueOf(handoverCarInfoReqDTO.getOwnReturnOil()));
-        renterHandoverCarGetInfoEntity.setMileageNum(Integer.valueOf(handoverCarInfoReqDTO.getRenterRetrunKM()));
-        updateRenterHandoverInfoByPrimaryKey(renterHandoverCarGetInfoEntity);
+        if (Objects.nonNull(renterHandoverCarGetInfoEntity)) {
+            renterHandoverCarGetInfoEntity.setOilNum(Integer.valueOf(handoverCarInfoReqDTO.getOwnReturnOil()));
+            renterHandoverCarGetInfoEntity.setMileageNum(Integer.valueOf(handoverCarInfoReqDTO.getRenterRetrunKM()));
+            updateRenterHandoverInfoByPrimaryKey(renterHandoverCarGetInfoEntity);
+        }
     }
 
 

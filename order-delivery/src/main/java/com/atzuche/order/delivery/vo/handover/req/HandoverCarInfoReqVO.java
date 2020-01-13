@@ -1,7 +1,9 @@
 package com.atzuche.order.delivery.vo.handover.req;
 
 import com.autoyol.doc.annotation.AutoDocProperty;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 /**
@@ -10,6 +12,8 @@ import lombok.ToString;
  */
 @Data
 @ToString
+@NoArgsConstructor
+@AllArgsConstructor
 public class HandoverCarInfoReqVO {
 
     @AutoDocProperty("车主取还车")
