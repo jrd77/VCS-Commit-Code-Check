@@ -17,7 +17,7 @@ public interface AccountRenterWzDepositCostMapper{
 
     AccountRenterWzDepositCostEntity selectByPrimaryKey(Integer id);
 
-    int insert(AccountRenterWzDepositCostEntity record);
+    int insertSelective(AccountRenterWzDepositCostEntity record);
     
     int updateByPrimaryKeySelective(AccountRenterWzDepositCostEntity record);
 
