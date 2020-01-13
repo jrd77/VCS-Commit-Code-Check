@@ -28,6 +28,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+
 /**
  * 车主拒绝订单
  *
@@ -95,7 +97,7 @@ public class OwnerRefuseOrderService {
                 renterOrderEntity.getRenterOrderNo());
         boolean isDispatch =
                 carRentalTimeApiService.checkCarDispatch(carRentalTimeApiService.buildCarDispatchReqVO(orderEntity,
-                        orderStatusEntity, ownerCouponEntity));
+                        orderStatusEntity, ownerCouponEntity,1));
 
         OrderStatusDTO orderStatusDTO = new OrderStatusDTO();
         orderStatusDTO.setOrderNo(reqVO.getOrderNo());
@@ -124,8 +126,13 @@ public class OwnerRefuseOrderService {
             orderSettleService.settleOrderCancel(reqVO.getOrderNo());
         }
 
-
         //落库
+        RenterOrderEntity record = new RenterOrderEntity();
+        record.setId(renterOrderEntity.getId());
+        record.setReqAcceptTime(LocalDateTime.now());
+        record.setAgreeFlag(OwnerAgreeTypeEnum.REFUSE.getCode());
+        renterOrderService.updateRenterOrderInfo(record);
+
         orderStatusService.saveOrderStatusInfo(orderStatusDTO);
         //添加order_flow记录
         orderFlowService.inserOrderStatusChangeProcessInfo(reqVO.getOrderNo(),

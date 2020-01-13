@@ -77,7 +77,7 @@ public enum ErrorCode {
     LOCK_STOCK_FAIL("700114","锁定库存失败"),
     RELEASE_STOCK_FAIL("700114","释放库存失败"),
 
-    ORDER_QUERY_FAIL("700115","获取订单详情失败"),
+    ORDER_QUERY_FAIL("700115","获取订单失败"),
     ;
 
     private String code;

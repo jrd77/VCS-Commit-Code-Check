@@ -3,13 +3,17 @@
  */
 package com.atzuche.order.coreapi.service;
 
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.beanutils.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.atzuche.order.cashieraccount.entity.CashierEntity;
 import com.atzuche.order.cashieraccount.service.CashierService;
+import com.atzuche.order.commons.vo.res.CashierResVo;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -25,9 +29,19 @@ public class PaymentCashierService {
 	
 	/**
 	 * 根据订单号查询支付记录
+	 * @throws InvocationTargetException 
+	 * @throws IllegalAccessException 
 	 */
-	public List<CashierEntity> queryPaymentList(String orderNo) {
-		return cashierService.getCashierRentCostsByOrderNo(orderNo);
+	public List<CashierResVo> queryPaymentList(String orderNo) throws Exception {
+		List<CashierResVo> lstRet = new ArrayList<CashierResVo>();
+		List<CashierEntity> lst = cashierService.getCashierRentCostsByOrderNo(orderNo);
+		for (CashierEntity cashierEntity : lst) {
+			CashierResVo vo = new CashierResVo();
+			//数据转换
+			BeanUtils.copyProperties(vo, cashierEntity);
+			lstRet.add(vo);
+		}
+		return lstRet;
 	}
 	
 }

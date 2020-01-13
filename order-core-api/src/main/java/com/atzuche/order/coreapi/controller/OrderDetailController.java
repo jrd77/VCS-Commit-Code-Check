@@ -66,5 +66,4 @@ public class OrderDetailController {
         ResponseData<OrderHistoryRespDTO> respData = orderDetailService.orderHistory(orderHistoryReqDTO);
         return respData;
     }
-
 }

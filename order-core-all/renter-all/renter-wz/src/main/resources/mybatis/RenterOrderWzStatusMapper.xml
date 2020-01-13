@@ -23,79 +23,31 @@
 
 	<insert id="saveRenterOrderWzStatus" parameterType="com.atzuche.order.renterwz.entity.RenterOrderWzStatusEntity" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
 		insert into renter_order_wz_status(
-			<if test="orderNo != null">
-				order_no,
-			</if>
-			<if test="carPlateNum != null">
-				car_plate_num,
-			</if>
-			<if test="status != null">
-				status,
-			</if>
-			<if test="statusDesc != null">
-				status_desc,
-			</if>
-			<if test="managementMode != null">
-				management_mode,
-			</if>
-			<if test="illegalQuery != null">
-				illegal_query,
-			</if>
-			<if test="createOp != null">
-				create_op,
-			</if>
-			<if test="updateTime != null">
-				update_time,
-			</if>
-			<if test="updateOp != null">
-				update_op,
-			</if>
-			<if test="isDelete != null">
-				is_delete,
-			</if>
+			order_no,
+			car_plate_num,
+			status,
+			status_desc,
+			create_op,
+			is_delete,
 			create_time
 		) values (
-			<if test="orderNo != null">
-				#{orderNo},
-			</if>
-			<if test="carPlateNum != null">
-				#{carPlateNum},
-			</if>
-			<if test="status != null">
-				#{status},
-			</if>
-			<if test="statusDesc != null">
-				#{statusDesc},
-			</if>
-			<if test="managementMode != null">
-				#{managementMode},
-			</if>
-			<if test="illegalQuery != null">
-				#{illegalQuery},
-			</if>
-			<if test="createOp != null">
-				#{createOp},
-			</if>
-			<if test="updateTime != null">
-				#{updateTime},
-			</if>
-			<if test="updateOp != null">
-				#{updateOp},
-			</if>
-			<if test="isDelete != null">
-				#{isDelete},
-			</if>
-			NOW())
+			#{orderNo},
+			#{carPlateNum},
+			#{status},
+			#{statusDesc},
+			#{createOp},
+			0,
+			#{createTime})
 	</insert>
 
 	<update id="updateTransIllegalQuery">
-		UPDATE renter_order_wz_status SET illegal_query=#{status} where order_no=#{orderNo} and car_plate_num = #{carNum}
+		UPDATE renter_order_wz_status SET illegal_query=#{status} where order_no=#{orderNo} and car_plate_num = #{carNum} and is_delete = 0
 	</update>
 
 	<update id="updateIllegalHandle">
 		UPDATE renter_order_wz_status
 		SET management_mode = #{managementMode}
-		where order_no = #{orderNo} and and car_plate_num = #{carNum}
+		where order_no = #{orderNo} and and car_plate_num = #{carNum} and is_delete = 0
 	</update>
 
 	<update id="updateTransIllegalStatus">
@@ -112,25 +64,25 @@
 			management_mode = 1,
 		</if>
 		wz_dispose_status_edit_time=now()
-		where order_no=#{orderNo} and car_plate_num = #{carNum}
+		where order_no=#{orderNo} and car_plate_num = #{carNum} and is_delete = 0
 	</update>
 
 	<select id="selectByOrderNo" parameterType="java.lang.Long" resultMap="selectColumnMap">
 		select
 		<include refid="select_column"/>
 		from renter_order_wz_status
-		where order_no = #{orderNo} and car_plate_num = #{carNum}
+		where order_no = #{orderNo} and car_plate_num = #{carNum} and is_delete = 0
 	</select>
 
 	<update id="updateStatusByOrderNoAndCarNum">
 		UPDATE renter_order_wz_status SET
 		status = #{status},
 		status_desc = #{statusDesc}
-		WHERE order_no = #{orderNo} and car_plate_num = #{carNum}
+		WHERE order_no = #{orderNo} and car_plate_num = #{carNum} and is_delete = 0
 	</update>
 
 	<select id="getTransWzDisposeStatusByOrderNo" resultType="java.lang.Integer">
-        select status from renter_order_wz_status where order_no = #{orderNo} and car_plate_num = #{plateNum} limit 1
+        select status from renter_order_wz_status where order_no = #{orderNo} and car_plate_num = #{plateNum} and is_delete = 0 limit 1
     </select>
 
 	<update id="updateTransWzDisposeStatus">
@@ -146,11 +98,19 @@
 			management_mode = 1,
 		</if>
 		wz_dispose_status_edit_time = now()
-		WHERE order_no = #{orderNo} and car_plate_num = #{carNumber}
+		WHERE order_no = #{orderNo} and car_plate_num = #{carNumber} and is_delete = 0
 	</update>
 
 	<select id="queryInfosByOrderNo" resultMap="selectColumnMap" parameterType="java.lang.String">
 		SELECT * FROM `renter_order_wz_status` WHERE order_no = #{orderNo} and is_delete = 0
 	</select>
+
+	<update id="deleteInfoByOrderNo">
+		UPDATE renter_order_wz_status SET
+		is_delete = 1,
+		update_op = #{operator},
+		update_time = NOW()
+		where order_no = #{orderNo} and is_delete = 0
+	</update>
 
 </mapper>

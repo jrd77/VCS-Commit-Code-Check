@@ -13,15 +13,15 @@ public enum OwnerAgreeTypeEnum {
 
 
     /**
-     * 已支付
+     * 未处理
      **/
     UNPROCESSED(0, "未处理"),
     /**
-     * 已支付
+     * 已同意
      **/
     ARGEE(1, "已同意"),
     /**
-     * 待支付
+     * 已拒绝
      **/
     REFUSE(2, "已拒绝");
 

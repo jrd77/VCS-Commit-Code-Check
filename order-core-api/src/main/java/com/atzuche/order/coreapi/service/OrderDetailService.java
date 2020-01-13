@@ -114,85 +114,6 @@ public class OrderDetailService {
     @Autowired
     private AccountRenterDetainCostNoTService accountRenterDetainCostNoTService;
 
-    
-
-    /*
-     * @Author ZhangBin
-     * @Date 2020/1/11 16:20
-     * @Description: 获取account费用详情
-     *
-     **/
-    public ResponseData<OrderAccountDetailRespDTO> orderAccountDetail(OrderDetailReqDTO orderDetailReqDTO) {
-        log.info("准备获取订单费用详情orderDetailReqDTO={}", JSON.toJSONString(orderDetailReqDTO));
-        ResponseData responseData = new ResponseData();
-        try{
-            OrderAccountDetailRespDTO orderDetailRespDTO = orderAccountDetailProxy(orderDetailReqDTO);
-            responseData.setResCode(ErrorCode.SUCCESS.getCode());
-            responseData.setData(orderDetailRespDTO);
-            responseData.setResMsg(ErrorCode.SUCCESS.getText());
-        }catch (OrderException e){
-            log.error("订单费用详情转化失败orderDetailReqDTO={}",JSON.toJSONString(orderDetailReqDTO),e);
-            responseData.setResCode(e.getErrorCode());
-            responseData.setData(null);
-            responseData.setResMsg(e.getErrorMsg());
-        }catch (Exception e){
-            log.error("订单费用详情转化失败orderDetailReqDTO={}",JSON.toJSONString(orderDetailReqDTO),e);
-            responseData.setResCode(ErrorCode.SYS_ERROR.getCode());
-            responseData.setData(null);
-            responseData.setResMsg(ErrorCode.SYS_ERROR.getText());
-        }
-        return responseData;
-    }
-
-    private OrderAccountDetailRespDTO orderAccountDetailProxy(OrderDetailReqDTO orderDetailReqDTO) {
-        String orderNo = orderDetailReqDTO.getOrderNo();
-
-        //押金比例
-
-
-        //租客押金
-        AccountRenterDepositEntity accountRenterDepositEntity = accountRenterDepositService.selectByOrderNo(orderNo);
-        AccountRenterDepositDTO accountRenterDepositDTO = null;
-        if(accountRenterDepositEntity != null){
-            accountRenterDepositDTO =  new AccountRenterDepositDTO();
-            BeanUtils.copyProperties(accountRenterDepositEntity,accountRenterDepositDTO);
-        }
-        //租客押金流水
-        List<AccountRenterDepositDetailEntity> accountRenterDepositDetailEntityList = accountRenterDepositDetailNoTService.findByOrderNo(orderNo);
-        List<AccountRenterDepositDetailDTO> accountRenterDepositDetailDTOList = new ArrayList<>();
-        if(accountRenterDepositDetailEntityList !=null){
-            Optional.ofNullable(accountRenterDepositDetailEntityList).orElseGet(ArrayList::new).stream().forEach(x->{
-                AccountRenterDepositDetailDTO dto = new AccountRenterDepositDetailDTO();
-                BeanUtils.copyProperties(x,dto);
-                accountRenterDepositDetailDTOList.add(dto);
-            });
-        }
-        //租客暂扣费用
-        AccountRenterDetainCostEntity accountRenterDetainCostEntity = accountRenterDetainCostNoTService.getRenterDetaint(orderNo);
-        AccountRenterDetainCostDTO accountRenterDetainCostDTO = null;
-        if(accountRenterDetainCostEntity != null){
-            accountRenterDetainCostDTO = new AccountRenterDetainCostDTO();
-            BeanUtils.copyProperties(accountRenterDetainCostEntity,accountRenterDetainCostDTO);
-        }
-        //租客暂扣流水
-        List<AccountRenterDetainDetailEntity> accountRenterDetainDetailEntities = accountRenterDetainDetailNoTService.selectByOrderNo(orderNo);
-        List<AccountRenterDetainDetailDTO> accountRenterDetainDetailDTOList = new ArrayList<>();
-        Optional.ofNullable(accountRenterDetainDetailEntities).orElseGet(ArrayList::new).stream().forEach(x->{
-            AccountRenterDetainDetailDTO dto = new AccountRenterDetainDetailDTO();
-            BeanUtils.copyProperties(x,dto);
-            accountRenterDetainDetailDTOList.add(dto);
-        });
-
-        OrderAccountDetailRespDTO orderAccountDetailRespDTO = new OrderAccountDetailRespDTO();
-        orderAccountDetailRespDTO.accountRenterDepositDetailDTOList = accountRenterDepositDetailDTOList;
-        orderAccountDetailRespDTO.accountRenterDepositDTO = accountRenterDepositDTO;
-        orderAccountDetailRespDTO.accountRenterDetainCostDTO = accountRenterDetainCostDTO;
-        orderAccountDetailRespDTO.accountRenterDetainDetailDTOList = accountRenterDetainDetailDTOList;
-
-        return orderAccountDetailRespDTO;
-    }
-
-
     public ResponseData<OrderDetailRespDTO> orderDetail(OrderDetailReqDTO orderDetailReqDTO){
         log.info("准备获取订单详情orderDetailReqDTO={}", JSON.toJSONString(orderDetailReqDTO));
         ResponseData responseData = new ResponseData();
@@ -259,11 +180,117 @@ public class OrderDetailService {
         return responseData;
     }
 
+    /*
+     * @Author ZhangBin
+     * @Date 2020/1/11 16:20
+     * @Description: 获取account费用详情
+     *
+     **/
+    public ResponseData<OrderAccountDetailRespDTO> orderAccountDetail(OrderDetailReqDTO orderDetailReqDTO) {
+        log.info("准备获取订单费用详情orderDetailReqDTO={}", JSON.toJSONString(orderDetailReqDTO));
+        ResponseData responseData = new ResponseData();
+        try{
+            OrderAccountDetailRespDTO orderDetailRespDTO = orderAccountDetailProxy(orderDetailReqDTO);
+            responseData.setResCode(ErrorCode.SUCCESS.getCode());
+            responseData.setData(orderDetailRespDTO);
+            responseData.setResMsg(ErrorCode.SUCCESS.getText());
+        }catch (OrderException e){
+            log.error("订单费用详情转化失败orderDetailReqDTO={}",JSON.toJSONString(orderDetailReqDTO),e);
+            responseData.setResCode(e.getErrorCode());
+            responseData.setData(null);
+            responseData.setResMsg(e.getErrorMsg());
+        }catch (Exception e){
+            log.error("订单费用详情转化失败orderDetailReqDTO={}",JSON.toJSONString(orderDetailReqDTO),e);
+            responseData.setResCode(ErrorCode.SYS_ERROR.getCode());
+            responseData.setData(null);
+            responseData.setResMsg(ErrorCode.SYS_ERROR.getText());
+        }
+        return responseData;
+    }
+
+
     private OrderHistoryRespDTO orderHistoryProxy(OrderHistoryReqDTO orderHistoryReqDTO) {
+        String orderNo = orderHistoryReqDTO.getOrderNo();
+        OrderEntity orderEntity = orderService.getOrderEntity(orderNo);
+        if(orderEntity == null){
+            log.error("获取订单数据为空orderNo={}",orderNo);
+            throw new OrderDetailException();
+        }
+        OrderDTO orderDTO = new OrderDTO();
+        BeanUtils.copyProperties(orderEntity,orderDTO);
 
-
+        //租客历史订单
+        List<RenterOrderDTO> renterOrderDTOHistoryList = new ArrayList<>();
+        if(orderHistoryReqDTO.isNeedOwnerOrderHistory()){
+            List<RenterOrderEntity> renterOrderEntities = renterOrderService.queryHostiryRenterOrderByOrderNo(orderNo);
+            renterOrderEntities.stream().forEach(x->{
+                RenterOrderDTO renterOrderDTO = new RenterOrderDTO();
+                BeanUtils.copyProperties(x,renterOrderDTO);
+                renterOrderDTOHistoryList.add(renterOrderDTO);
+            });
+        }
+        //车主历史订单
+        List<OwnerOrderDTO> ownerOrderDTOHistoryLIst = new ArrayList<>();
+        if(orderHistoryReqDTO.isNeedOwnerOrderHistory()){
+            List<OwnerOrderEntity> ownerOrderEntities = ownerOrderService.queryHostiryOwnerOrderByOrderNo(orderNo);
+            ownerOrderEntities.stream().forEach(x->{
+                OwnerOrderDTO ownerOrderDTO = new OwnerOrderDTO();
+                BeanUtils.copyProperties(x,ownerOrderDTO);
+                ownerOrderDTOHistoryLIst.add(ownerOrderDTO);
+            });
+        }
         OrderHistoryRespDTO orderHistoryRespDTO = new OrderHistoryRespDTO();
+        orderHistoryRespDTO.orderDTO = orderDTO;
+        orderHistoryRespDTO.ownerOrderDTOHistoryLIst = ownerOrderDTOHistoryLIst;
+        orderHistoryRespDTO.renterOrderDTOHistoryList = renterOrderDTOHistoryList;
         return orderHistoryRespDTO;
+    }
+    private OrderAccountDetailRespDTO orderAccountDetailProxy(OrderDetailReqDTO orderDetailReqDTO) {
+        String orderNo = orderDetailReqDTO.getOrderNo();
+
+        //押金比例
+
+
+        //租客押金
+        AccountRenterDepositEntity accountRenterDepositEntity = accountRenterDepositService.selectByOrderNo(orderNo);
+        AccountRenterDepositDTO accountRenterDepositDTO = null;
+        if(accountRenterDepositEntity != null){
+            accountRenterDepositDTO =  new AccountRenterDepositDTO();
+            BeanUtils.copyProperties(accountRenterDepositEntity,accountRenterDepositDTO);
+        }
+        //租客押金流水
+        List<AccountRenterDepositDetailEntity> accountRenterDepositDetailEntityList = accountRenterDepositDetailNoTService.findByOrderNo(orderNo);
+        List<AccountRenterDepositDetailDTO> accountRenterDepositDetailDTOList = new ArrayList<>();
+        if(accountRenterDepositDetailEntityList !=null){
+            Optional.ofNullable(accountRenterDepositDetailEntityList).orElseGet(ArrayList::new).stream().forEach(x->{
+                AccountRenterDepositDetailDTO dto = new AccountRenterDepositDetailDTO();
+                BeanUtils.copyProperties(x,dto);
+                accountRenterDepositDetailDTOList.add(dto);
+            });
+        }
+        //租客暂扣费用
+        AccountRenterDetainCostEntity accountRenterDetainCostEntity = accountRenterDetainCostNoTService.getRenterDetaint(orderNo);
+        AccountRenterDetainCostDTO accountRenterDetainCostDTO = null;
+        if(accountRenterDetainCostEntity != null){
+            accountRenterDetainCostDTO = new AccountRenterDetainCostDTO();
+            BeanUtils.copyProperties(accountRenterDetainCostEntity,accountRenterDetainCostDTO);
+        }
+        //租客暂扣流水
+        List<AccountRenterDetainDetailEntity> accountRenterDetainDetailEntities = accountRenterDetainDetailNoTService.selectByOrderNo(orderNo);
+        List<AccountRenterDetainDetailDTO> accountRenterDetainDetailDTOList = new ArrayList<>();
+        Optional.ofNullable(accountRenterDetainDetailEntities).orElseGet(ArrayList::new).stream().forEach(x->{
+            AccountRenterDetainDetailDTO dto = new AccountRenterDetainDetailDTO();
+            BeanUtils.copyProperties(x,dto);
+            accountRenterDetainDetailDTOList.add(dto);
+        });
+
+        OrderAccountDetailRespDTO orderAccountDetailRespDTO = new OrderAccountDetailRespDTO();
+        orderAccountDetailRespDTO.accountRenterDepositDetailDTOList = accountRenterDepositDetailDTOList;
+        orderAccountDetailRespDTO.accountRenterDepositDTO = accountRenterDepositDTO;
+        orderAccountDetailRespDTO.accountRenterDetainCostDTO = accountRenterDetainCostDTO;
+        orderAccountDetailRespDTO.accountRenterDetainDetailDTOList = accountRenterDetainDetailDTOList;
+
+        return orderAccountDetailRespDTO;
     }
 
 

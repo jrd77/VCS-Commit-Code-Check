@@ -4,6 +4,8 @@ import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Mapper;
 import com.atzuche.order.ownercost.entity.*;
 
+import java.util.List;
+
 /**
  * 车主订单子表
  * 
@@ -30,4 +32,6 @@ public interface OwnerOrderMapper{
     Integer updateOwnerOrderChildStatus(@Param("id") Integer id, @Param("childStatus") Integer childStatus);
 
     OwnerOrderEntity getChangeOwnerByOrderNo(@Param("orderNo") String orderNo);
+
+    List<OwnerOrderEntity> queryHostiryOwnerOrderByOrderNo(@Param("orderNo")String orderNo);
 }

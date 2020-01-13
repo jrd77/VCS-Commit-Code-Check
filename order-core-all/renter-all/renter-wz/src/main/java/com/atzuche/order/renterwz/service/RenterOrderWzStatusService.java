@@ -6,6 +6,7 @@ import com.atzuche.order.renterwz.mapper.RenterOrderWzStatusMapper;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -50,5 +51,17 @@ public class RenterOrderWzStatusService {
 
     public List<RenterOrderWzStatusEntity> queryInfosByOrderNo(String orderNo) {
         return renterOrderWzStatusMapper.queryInfosByOrderNo(orderNo);
+    }
+
+    public void createInfo(String orderNo,String carNum,String operator){
+        renterOrderWzStatusMapper.deleteInfoByOrderNo(orderNo,operator);
+        RenterOrderWzStatusEntity dto = new RenterOrderWzStatusEntity();
+        dto.setOrderNo(orderNo);
+        dto.setCarPlateNum(carNum);
+        dto.setStatus(5);
+        dto.setCreateOp(operator);
+        dto.setCreateTime(new Date());
+        dto.setStatusDesc(WzStatusEnums.getStatusDesc(dto.getStatus()));
+        renterOrderWzStatusMapper.saveRenterOrderWzStatus(dto);
     }
 }
