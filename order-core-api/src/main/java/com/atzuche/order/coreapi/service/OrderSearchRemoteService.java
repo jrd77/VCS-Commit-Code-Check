@@ -68,8 +68,8 @@ public class OrderSearchRemoteService {
 
     private static final List<Integer> CITIES = Arrays.asList(330100,320100,310100,110100,440100,440300);
 
-    private static final LocalDateTime FESTIVAL_START_TIME = LocalDateTime.of(2019,10,01,00,00,00);
-    private static final LocalDateTime FESTIVAL_END_TIME = LocalDateTime.of(2019,10,07,23,59,59);
+    private static final LocalDateTime FESTIVAL_START_TIME = LocalDateTime.of(2019,10,1,0,0,0);
+    private static final LocalDateTime FESTIVAL_END_TIME = LocalDateTime.of(2019,10,7,23,59,59);
 
     public List<IllegalToDO> violateProcessOrder() {
         Transaction t = Cat.getProducer().newTransaction(CatConstants.FEIGN_CALL, "每天定时查询当前进行中的订单");
@@ -77,6 +77,7 @@ public class OrderSearchRemoteService {
             ViolateVO reqVO = new ViolateVO();
             reqVO.setPageNum(1);
             reqVO.setPageSize(10000);
+            reqVO.setDate(DateUtils.minDays(2));
             Cat.logEvent(CatConstants.FEIGN_METHOD,"OrderSearchRemoteService.violateProcessOrder");
             Cat.logEvent(CatConstants.FEIGN_PARAM, JSON.toJSONString(reqVO));
             ResponseData<OrderVO<ViolateBO>> orderResponseData = orderSearchService.violateProcessOrder(reqVO);
@@ -147,12 +148,12 @@ public class OrderSearchRemoteService {
         //15,18,30,33
         Set<Integer> queryDays = treeMap.keySet();
         //城市编码
-        List<Integer> cityCodeAll = new ArrayList<Integer>();
+        List<Integer> cityCodeAll = new ArrayList<>();
 
         List<IllegalToDO> all = new ArrayList<>();
         //最小的天数
         Integer minKey = treeMap.firstKey();
-        ViolateVO reqVO = null;
+        ViolateVO reqVO;
         for (Integer day : queryDays) {
             List<Integer> cityCode = treeMap.get(day);
             //查询天数
@@ -187,20 +188,15 @@ public class OrderSearchRemoteService {
                 && cityCode!=null
                 && cityCode.size()>0) {
             //15天的订单的特殊处理，春节订单往后延时处理
-            if(minKey!=null && days!=null && days.equals(minKey)){
+            if(days!=null && days.equals(minKey)){
                 if (cityCode.contains(illegal.getCityCode())) {
                     String startTime = DateUtils.formate(illegal.getRentTime(),DateUtils.DATE_DEFAUTE);
                     String endTime = DateUtils.formate(illegal.getRevertTime(),DateUtils.DATE_DEFAUTE);
-                    if (DateUtils.isFestival(Long.parseLong(startTime), Long.parseLong(endTime))) {
-                        return false;
-                    }
-                    return true;
+                    return !DateUtils.isFestival(Long.parseLong(startTime), Long.parseLong(endTime));
                 }
             }else{
                 //正常的情况  非15天的情况   包含城市列表且  排除 附赠套餐的订单。
-                if (cityCode.contains(illegal.getCityCode())) {
-                    return true;
-                }
+                return cityCode.contains(illegal.getCityCode());
             }
         }else {
             return false;
@@ -219,14 +215,11 @@ public class OrderSearchRemoteService {
             /*
              * 配置的城市编码之外的，都按最大的时间来处理  111111  30
              */
-            if (!cityCode.contains(illegal.getCityCode())
-                    || DateUtils.isFestival(Long.parseLong(startTime), Long.parseLong(endTime))) {
-                return true;
-            }
+            return !cityCode.contains(illegal.getCityCode())
+                    || DateUtils.isFestival(Long.parseLong(startTime), Long.parseLong(endTime));
         }else {
             return false;
         }
-        return false;
     }
 
     private List<IllegalToDO> violatePendingOrderByDay(ViolateVO reqVO) {
@@ -249,7 +242,7 @@ public class OrderSearchRemoteService {
         }finally {
             t.complete();
         }
-        return null;
+        return new ArrayList<>();
     }
 
     private List<IllegalToDO> convertDto(List<ViolateBO> orderList) {
@@ -257,7 +250,7 @@ public class OrderSearchRemoteService {
             return new ArrayList<>();
         }
         List<IllegalToDO> results = new ArrayList<>();
-        IllegalToDO dto = null;
+        IllegalToDO dto;
         for (ViolateBO violate : orderList) {
             dto = new IllegalToDO();
             dto.setOrderNo(violate.getOrderNo());
@@ -336,7 +329,7 @@ public class OrderSearchRemoteService {
             /*and (a.rent_time &gt; #{festivalEndTime} or a.`revert_time` &lt; #{festivalStartTime})*/
             List<ViolateBO> temp = violates
                     .stream()
-                    .filter(dto -> conf.getCityCode().equals(dto.getCity()))
+                    .filter(dto -> String.valueOf(conf.getCityCode()).equals(dto.getCity()))
                     .filter(dto -> dto.getRentTime().isAfter(FESTIVAL_END_TIME) || dto.getRevertTime().isBefore(FESTIVAL_START_TIME))
                     .collect(Collectors.toList());
             if(!CollectionUtils.isEmpty(temp)){
@@ -412,7 +405,7 @@ public class OrderSearchRemoteService {
             }
             //查询待统计的信息
             List<SuccessOrderDTO> successList = this.getSuccessOrderStatistics(carNo, currentYear, licenseExpire);
-            if(successList != null && successList.size() > 0) {
+            if(successList.size() > 0) {
                 List<String> orders = successList.stream().map(SuccessOrderDTO::getOrderNo).collect(Collectors.toList());
                 SuccessOrderStaCount successOrderStaCountBo = new SuccessOrderStaCount();
                 //成功订单数
