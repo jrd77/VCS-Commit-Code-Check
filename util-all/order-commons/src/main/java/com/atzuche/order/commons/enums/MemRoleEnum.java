@@ -13,11 +13,16 @@ public enum MemRoleEnum {
     /**
      * 租客
      **/
-    RENTER("1", "租客"),
+    RENTER("2", "租客"),
     /**
      * 车主
      **/
-    OWNER("0", "车主"),
+    OWNER("1", "车主"),
+
+    /**
+     * 平台
+     **/
+    PLATFORM("3", "平台"),
 
 
 

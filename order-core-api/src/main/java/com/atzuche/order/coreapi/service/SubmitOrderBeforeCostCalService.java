@@ -22,6 +22,7 @@ import com.atzuche.order.renterorder.service.RenterOrderCalCostService;
 import com.atzuche.order.renterorder.service.RenterOrderCostHandleService;
 import com.atzuche.order.renterorder.service.RenterOrderService;
 import com.atzuche.order.renterorder.vo.RenterOrderCarDepositResVO;
+import com.atzuche.order.renterorder.vo.RenterOrderIllegalResVO;
 import com.atzuche.order.renterorder.vo.RenterOrderReqVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,7 +69,7 @@ public class SubmitOrderBeforeCostCalService {
      * @return NormalOrderCostCalculateResVO 返回信息
      */
     public NormalOrderCostCalculateResVO costCalculate(OrderReqVO orderReqVO) {
-        //TODO:公共参数处理
+        //公共参数处理
         //1.请求参数处理
         OrderReqContext reqContext = new OrderReqContext();
         reqContext.setOrderReqVO(orderReqVO);
@@ -87,7 +88,7 @@ public class SubmitOrderBeforeCostCalService {
         //车主会员信息
         OwnerMemberDTO ownerMemberDTO = memberService.getOwnerMemberInfo(renterGoodsDetailDTO.getOwnerMemNo());
         reqContext.setOwnerMemberDto(ownerMemberDTO);
-        //TODO:租车费用处理
+        //租车费用处理
         CarRentTimeRangeResVO carRentTimeRangeResVO =
                 carRentalTimeApiService.getCarRentTimeRange(carRentalTimeApiService.buildCarRentTimeRangeReqVO(orderReqVO));
 
@@ -97,25 +98,23 @@ public class SubmitOrderBeforeCostCalService {
                 renterOrderService.buildRenterOrderCostReqDTO(renterOrderReqVO);
         RenterOrderCostRespDTO renterOrderCostRespDTO =
                 renterOrderCalCostService.getOrderCostAndDeailList(renterOrderCostReqDTO);
-
-        List<CostItemVO> costItemList = orderCommonConver.buildCostItemList(renterOrderCostRespDTO);
-
         //TODO:抵扣费用处理
 
 
-        //TODO:车辆押金处理
+
+
+        //T车辆押金处理
         RenterOrderCarDepositResVO renterOrderCarDepositResVO =
                 renterOrderCostHandleService.handleCarDepositAmtNotSave(renterOrderReqVO);
-
-        //TODO:违章押金处理
-
-        //TODO:租车费用小计处理
-
-        //TODO:返回信息处理
+        //违章押金处理
+        RenterOrderIllegalResVO renterOrderIllegalResVO =
+                renterOrderCostHandleService.handleIllegalDepositAmt(renterOrderCostReqDTO.getCostBaseDTO(),renterOrderReqVO);
+        //返回信息处理
         NormalOrderCostCalculateResVO res = new NormalOrderCostCalculateResVO();
-        res.setCostItemList(costItemList);
-        res.setTotalCost(orderCommonConver.buildTotalCostVO(costItemList));
-
+        res.setCostItemList(orderCommonConver.buildCostItemList(renterOrderCostRespDTO));
+        res.setTotalCost(orderCommonConver.buildTotalCostVO(res.getCostItemList()));
+        res.setDeposit(orderCommonConver.buildDepositAmtVO(renterOrderCarDepositResVO));
+        res.setIllegalDeposit(orderCommonConver.buildIllegalDepositVO(renterOrderIllegalResVO));
 
         return res;
 

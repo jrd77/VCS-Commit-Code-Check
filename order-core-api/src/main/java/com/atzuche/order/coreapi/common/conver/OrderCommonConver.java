@@ -10,10 +10,12 @@ import com.atzuche.order.commons.enums.RenterCashCodeEnum;
 import com.atzuche.order.commons.vo.req.OrderReqVO;
 import com.atzuche.order.commons.vo.res.order.CostItemVO;
 import com.atzuche.order.commons.vo.res.order.DepositAmtVO;
+import com.atzuche.order.commons.vo.res.order.IllegalDepositVO;
 import com.atzuche.order.commons.vo.res.order.TotalCostVO;
 import com.atzuche.order.coreapi.entity.vo.res.CarRentTimeRangeResVO;
 import com.atzuche.order.renterorder.entity.dto.RenterOrderCostRespDTO;
 import com.atzuche.order.renterorder.vo.RenterOrderCarDepositResVO;
+import com.atzuche.order.renterorder.vo.RenterOrderIllegalResVO;
 import com.atzuche.order.renterorder.vo.RenterOrderReqVO;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -176,6 +178,23 @@ public class OrderCommonConver {
         depositAmtVO.setReductionAmt(renterOrderCarDepositResVO.getReductionAmt());
         depositAmtVO.setReductionRate(renterOrderCarDepositResVO.getReductionRate());
         return depositAmtVO;
+    }
+
+    /**
+     * 下单前费用计算--违章押金信息
+     *
+     * @param renterOrderIllegalResVO 违章押金信息
+     * @return IllegalDepositVO
+     */
+    public IllegalDepositVO buildIllegalDepositVO(RenterOrderIllegalResVO renterOrderIllegalResVO) {
+
+        if(null == renterOrderIllegalResVO) {
+            return null;
+        }
+
+        IllegalDepositVO illegalDepositVO = new IllegalDepositVO();
+        illegalDepositVO.setIllegalDepositAmt(renterOrderIllegalResVO.getYingfuDepositAmt());
+        return illegalDepositVO;
     }
 
 }
