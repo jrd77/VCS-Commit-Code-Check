@@ -32,7 +32,7 @@
 			#{carPlateNum},
 			#{dataType},
 			#{jsonData},
-			#{isDelete},
+			0,
 			#{createTime})
 	</insert>
 
