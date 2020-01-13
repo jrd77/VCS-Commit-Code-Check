@@ -70,6 +70,7 @@ public class OrderSubmitService {
         param.setActivityId("ActivityId");
         param.setRentReason("租个车还填啥原因啊！");
         param.setCityName("上海");
+        param.setSource("admin");
 
         //不计免赔
         param.setAbatement(abatement);
