@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.atzuche.order.commons.mapper.RabbitMsgLogMapper">
+<mapper namespace="com.atzuche.order.coreapi.mapper.RabbitMsgLogMapper">
 
-    <resultMap type="com.atzuche.order.commons.entity.RabbitMsgLogEntity" id="BaseResultMap">
+    <resultMap type="com.atzuche.order.coreapi.entity.RabbitMsgLogEntity" id="BaseResultMap">
         <result property="id" column="id"/>
         <result property="mqKey" column="mq_key"/>
         <result property="mqExchange" column="mq_exchange"/>
@@ -34,7 +34,7 @@
 		select <include refid="Base_Column_List" /> from rabbit_msg_log where id = #{value}
 	</select>
 
-	<insert id="insert" parameterType="com.atzuche.order.commons.entity.RabbitMsgLogEntity" useGeneratedKeys="true" keyProperty="id">
+	<insert id="insert" parameterType="com.atzuche.order.coreapi.entity.RabbitMsgLogEntity" useGeneratedKeys="true" keyProperty="id">
 		insert into rabbit_msg_log
 		(
 				`mq_key`,		

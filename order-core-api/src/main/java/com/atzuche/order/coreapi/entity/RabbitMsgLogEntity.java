@@ -1,8 +1,9 @@
-package com.atzuche.order.commons.entity;
+package com.atzuche.order.coreapi.entity;
+
+import lombok.Data;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import lombok.Data;
 
 
 /**
