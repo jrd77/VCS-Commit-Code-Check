@@ -26,13 +26,6 @@ public class AccountRenterWzDepositCostService{
     private AccountRenterWzDepositCostDetailNoTService accountRenterWzDepositCostDetailNoTService;
 
     /**
-     * 查询实扣违章费用总和
-     */
-    public int getWZDepositCostAmt(String orderNo ,String memNo){
-      return accountRenterWzDepositCostNoTService.getWZDepositCostAmt(orderNo,memNo);
-    }
-
-    /**
      * 违章费用资金进出
      */
     public void changeWZDepositCost(RenterWZDepositCostReqVO renterWZDepositCost){

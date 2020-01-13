@@ -418,12 +418,7 @@ public class CashierService {
     /**  ***************************************** 车主收益 end ************************************************* */
 
     /**  ***************************************** 违章费用 start ************************************************* */
-    /**
-     * 查询实扣违章费用总和
-     */
-    public int getWZDepositCostAmt(String orderNo ,String memNo){
-        return accountRenterWzDepositCostService.getWZDepositCostAmt(orderNo,memNo);
-    }
+
     /**
      * 违章费用资金进出
      */
