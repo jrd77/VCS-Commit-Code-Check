@@ -60,6 +60,7 @@ public class OrderSearchRemoteService {
     @Resource
     private RenterGoodsService renterGoodsService;
 
+    @Resource
     private DeRenCarApproachCitiesService deRenCarApproachCitiesService;
 
     @Resource

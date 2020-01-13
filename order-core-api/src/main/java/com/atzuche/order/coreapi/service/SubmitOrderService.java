@@ -18,6 +18,7 @@ import com.atzuche.order.commons.enums.*;
 import com.atzuche.order.commons.enums.account.FreeDepositTypeEnum;
 import com.atzuche.order.commons.vo.req.OrderReqVO;
 import com.atzuche.order.commons.vo.res.OrderResVO;
+import com.atzuche.order.coreapi.common.conver.OrderCommonConver;
 import com.atzuche.order.coreapi.entity.vo.req.AutoCoinDeductReqVO;
 import com.atzuche.order.coreapi.entity.vo.req.CarRentTimeRangeReqVO;
 import com.atzuche.order.coreapi.entity.vo.req.OwnerCouponBindReqVO;
@@ -104,7 +105,8 @@ public class SubmitOrderService {
     private SubmitOrderRiskAuditService submitOrderRiskAuditService;
     @Autowired
     private CarRentalTimeApiService carRentalTimeApiService;
-
+    @Autowired
+    private OrderCommonConver orderCommonConver;
     @Autowired
     private StockService stockService;
 
@@ -125,7 +127,8 @@ public class SubmitOrderService {
                 memberService.getRenterMemberInfo(String.valueOf(orderReqVO.getMemNo()));
         reqContext.setRenterMemberDto(renterMemberDTO);
         //租客商品明细
-        RenterGoodsDetailDTO renterGoodsDetailDTO = goodsService.getRenterGoodsDetail(buildCarDetailReqVO(orderReqVO));
+        RenterGoodsDetailDTO renterGoodsDetailDTO =
+                goodsService.getRenterGoodsDetail(orderCommonConver.buildCarDetailReqVO(orderReqVO));
         reqContext.setRenterGoodsDetailDto(renterGoodsDetailDTO);
 
         //一天一价分组
@@ -154,13 +157,15 @@ public class SubmitOrderService {
         stockService.cutCarStock(orderInfoDTO);
 
         //提前延后时间计算
-        CarRentTimeRangeResVO carRentTimeRangeResVO = carRentalTimeApiService.getCarRentTimeRange(buildCarRentTimeRangeReqVO(orderReqVO));
+        CarRentTimeRangeResVO carRentTimeRangeResVO =
+                carRentalTimeApiService.getCarRentTimeRange(carRentalTimeApiService.buildCarRentTimeRangeReqVO(orderReqVO));
         //3.生成主订单号
         //4.创建租客子订单
         //4.1.生成租客子订单号
         String renterOrderNo = uniqueOrderNoService.getRenterOrderNo(orderNo);
         //4.2.调用租客订单模块处理租客订单相关业务
-        RenterOrderResVO renterOrderResVO = renterOrderService.generateRenterOrderInfo(buildRenterOrderReqVO(orderNo, renterOrderNo, reqContext, carRentTimeRangeResVO));
+        RenterOrderResVO renterOrderResVO =
+                renterOrderService.generateRenterOrderInfo(orderCommonConver.buildRenterOrderReqVO(orderNo, renterOrderNo, reqContext, carRentTimeRangeResVO));
         //4.3.接收租客订单返回信息
         //4.3.1 车辆押金处理
         BeanCopier beanCopierCarDeposit = BeanCopier.create(RenterOrderCarDepositResVO.class,
@@ -308,16 +313,7 @@ public class SubmitOrderService {
         return orderInfoDTO;
     }
 
-    private CarProxyService.CarDetailReqVO buildCarDetailReqVO(OrderReqVO orderReqVO) {
-        CarProxyService.CarDetailReqVO carDetailReqVO = new CarProxyService.CarDetailReqVO();
-        carDetailReqVO.setAddrIndex(StringUtils.isBlank(orderReqVO.getCarAddrIndex()) ? 0 : Integer.parseInt(orderReqVO.getCarAddrIndex()));
-        carDetailReqVO.setCarNo(orderReqVO.getCarNo());
-        carDetailReqVO.setRentTime(orderReqVO.getRentTime());
-        carDetailReqVO.setRevertTime(orderReqVO.getRevertTime());
-        carDetailReqVO.setUseSpecialPrice(StringUtils.equals("0",
-                orderReqVO.getUseSpecialPrice()));
-        return carDetailReqVO;
-    }
+
 
 
     /**
@@ -394,60 +390,7 @@ public class SubmitOrderService {
     }
 
 
-    /**
-     * 租客订单请求参数封装
-     *
-     * @param orderNo               主订单号
-     * @param renterOrderNo         租客子订单号
-     * @param reqContext            下单请求参数
-     * @param carRentTimeRangeResVO 提前延后信息
-     * @return RenterOrderReqVO 租客订单请求参数
-     */
-    private RenterOrderReqVO buildRenterOrderReqVO(String orderNo, String renterOrderNo, OrderReqContext reqContext,
-                                                   CarRentTimeRangeResVO carRentTimeRangeResVO) {
 
-        RenterOrderReqVO renterOrderReqVO = new RenterOrderReqVO();
-        renterOrderReqVO.setOrderNo(orderNo);
-        renterOrderReqVO.setRenterOrderNo(renterOrderNo);
-
-        BeanCopier beanCopier = BeanCopier.create(OrderReqVO.class, RenterOrderReqVO.class, false);
-        beanCopier.copy(reqContext.getOrderReqVO(), renterOrderReqVO, null);
-
-        OrderReqVO orderReqVO = reqContext.getOrderReqVO();
-        renterOrderReqVO.setEntryCode(orderReqVO.getSceneCode());
-        renterOrderReqVO.setSource(orderReqVO.getSource());
-        String driverIds = orderReqVO.getDriverIds();
-        renterOrderReqVO.setDriverIds(ListUtil.parseString(driverIds, ","));
-        renterOrderReqVO.setGetCarBeforeTime(null == carRentTimeRangeResVO || null == carRentTimeRangeResVO.getGetMinutes() ? 0 : carRentTimeRangeResVO.getGetMinutes());
-        renterOrderReqVO.setReturnCarAfterTime(null == carRentTimeRangeResVO || null == carRentTimeRangeResVO.getReturnMinutes() ? 0 :
-                carRentTimeRangeResVO.getReturnMinutes());
-
-        RenterGoodsDetailDTO goodsDetail = reqContext.getRenterGoodsDetailDto();
-        renterOrderReqVO.setGuidPrice(goodsDetail.getCarGuidePrice());
-        renterOrderReqVO.setCarSurplusPrice(goodsDetail.getCarSurplusPrice());
-        renterOrderReqVO.setInmsrp(goodsDetail.getCarInmsrp());
-        renterOrderReqVO.setBrandId(goodsDetail.getBrand());
-        renterOrderReqVO.setTypeId(goodsDetail.getType());
-        renterOrderReqVO.setLicenseDay(goodsDetail.getLicenseDay());
-        renterOrderReqVO.setLabelIds(goodsDetail.getLabelIds());
-        renterOrderReqVO.setRenterGoodsPriceDetailDTOList(goodsDetail.getRenterGoodsPriceDetailDTOList());
-        renterOrderReqVO.setPlateNum(goodsDetail.getCarPlateNum());
-        renterOrderReqVO.setAbatement(orderReqVO.getAbatement());
-        renterOrderReqVO.setCarShowLat(goodsDetail.getCarShowLat());
-        renterOrderReqVO.setCarShowLon(goodsDetail.getCarShowLon());
-        renterOrderReqVO.setCarRealLat(goodsDetail.getCarRealLat());
-        renterOrderReqVO.setCarRealLon(goodsDetail.getCarRealLon());
-
-        RenterMemberDTO renterMember = reqContext.getRenterMemberDto();
-        renterOrderReqVO.setCertificationTime(renterMember.getCertificationTime());
-        renterOrderReqVO.setIsNew(null == renterMember.getIsNew() || renterMember.getIsNew() == 0);
-        renterOrderReqVO.setRenterMemberRightDTOList(renterMember.getRenterMemberRightDTOList());
-        renterOrderReqVO.setCommUseDriverList(renterMember.getCommUseDriverList());
-        renterOrderReqVO.setReplyFlag(goodsDetail.getReplyFlag());
-        LOGGER.info("Build renter order reqVO,result is ,renterOrderReqVO:[{}]",
-                JSON.toJSONString(renterOrderReqVO));
-        return renterOrderReqVO;
-    }
 
 
     /**
@@ -481,21 +424,6 @@ public class SubmitOrderService {
         return ownerOrderReqDTO;
     }
 
-    /**
-     * 提前延后时间计算请求参数封装
-     *
-     * @param orderReqVO 下单请求参数
-     * @return CarRentTimeRangeReqVO 提前延后时间计算请求参数
-     */
-    private CarRentTimeRangeReqVO buildCarRentTimeRangeReqVO(OrderReqVO orderReqVO) {
-        CarRentTimeRangeReqVO carRentTimeRangeReqVO = new CarRentTimeRangeReqVO();
-        BeanCopier beanCopier = BeanCopier.create(OrderReqVO.class, CarRentTimeRangeReqVO.class, false);
-        beanCopier.copy(orderReqVO, carRentTimeRangeReqVO, null);
-
-        LOGGER.info("Build CarRentTimeRangeReqVO,result is ,carRentTimeRangeReqVO:[{}]",
-                JSON.toJSONString(carRentTimeRangeReqVO));
-        return carRentTimeRangeReqVO;
-    }
 
     /**
      * 车主券补贴信息封装(车主端)

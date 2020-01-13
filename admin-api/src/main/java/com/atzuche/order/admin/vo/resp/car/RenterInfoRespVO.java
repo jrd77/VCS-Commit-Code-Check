@@ -1,6 +1,7 @@
 package com.atzuche.order.admin.vo.resp.car;
 
 import com.autoyol.doc.annotation.AutoDocProperty;
+import com.autoyol.member.detail.vo.res.CommUseDriverInfo;
 import lombok.Data;
 import lombok.ToString;
 
@@ -40,7 +41,7 @@ public class RenterInfoRespVO implements Serializable {
     @AutoDocProperty(value = "下单地址")
     private String reqAddr;
     @AutoDocProperty(value = "附加驾驶人信息")
-    private List<CommUseDriverVO> commUseDrivers;
+    private List<CommUseDriverInfo> additionalDrivers;
 
     ///////////////////人工调度处理-租客信息////////////////////////
     @AutoDocProperty(value = "身份证")
