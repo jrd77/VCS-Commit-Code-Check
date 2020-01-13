@@ -1185,4 +1185,11 @@ public class OrderSettleNoTService {
         //2记录订单流传信息
         orderFlowService.inserOrderStatusChangeProcessInfo(settleOrdersAccount.getOrderNo(), OrderStatusEnum.TO_WZ_SETTLE);
     }
+
+    /**
+     * 取消订单查询 租客罚金信息
+     * @param settleOrders
+     */
+    public void getCencelRenterCostSettleDetail(SettleOrders settleOrders) {
+    }
 }
