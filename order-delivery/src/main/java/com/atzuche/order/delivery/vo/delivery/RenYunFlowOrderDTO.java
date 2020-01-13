@@ -307,7 +307,7 @@ public class RenYunFlowOrderDTO implements Serializable {
     private String partner;
 
     public void setServiceTypeInfo(OrderDeliveryFlowEntity orderDeliveryFlowEntity) {
-        if (Integer.valueOf(orderDeliveryFlowEntity.getOrderType()).intValue() == UsedDeliveryTypeEnum.USED.getValue().intValue()) {
+        if (orderDeliveryFlowEntity.getServiceType().equals(ServiceTypeEnum.TAKE_TYPE.getValue())) {
             setServicetype(ServiceTypeEnum.TAKE_TYPE.getValue());
             setPickupcaraddr(orderDeliveryFlowEntity.getPickupAlsoCarAddr());
             setRealGetCarLat(orderDeliveryFlowEntity.getRealGetCarLat());
