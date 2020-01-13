@@ -1,4 +1,4 @@
-package com.atzuche.order.admin.dto;
+package com.atzuche.order.admin.dto.insurance;
 import lombok.Data;
 import lombok.ToString;
 

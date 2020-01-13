@@ -1,4 +1,4 @@
-package com.atzuche.order.admin.dto;
+package com.atzuche.order.admin.dto.remark;
 
 import com.atzuche.order.admin.common.PageBean;
 import com.autoyol.doc.annotation.AutoDocProperty;
