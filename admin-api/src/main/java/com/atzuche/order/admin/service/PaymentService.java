@@ -11,13 +11,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
+import com.atzuche.order.admin.entity.CashierEntity;
 import com.atzuche.order.admin.vo.req.payment.PaymentRequestVO;
 import com.atzuche.order.admin.vo.resp.payment.PaymentInformationResponseVO;
 import com.atzuche.order.admin.vo.resp.payment.PaymentResponseVO;
-import com.atzuche.order.cashieraccount.entity.CashierEntity;
 import com.atzuche.order.commons.LocalDateTimeUtils;
-import com.atzuche.order.coreapi.service.PaymentCashierService;
+import com.atzuche.order.commons.vo.req.PaymentVo;
 import com.atzuche.order.parentorder.entity.OrderStatusEntity;
 import com.atzuche.order.parentorder.service.OrderStatusService;
 
@@ -31,8 +32,8 @@ public class PaymentService {
 	
 	@Autowired
 	OrderStatusService orderStatusService;
-	@Autowired
-	PaymentCashierService paymentCashierService;
+//	@Autowired
+//	PaymentCashierService paymentCashierService;
 	
 	public PaymentInformationResponseVO platformPaymentList(PaymentRequestVO paymentRequestVO) {
 		String orderNo = paymentRequestVO.getOrderNo();
@@ -81,7 +82,14 @@ public class PaymentService {
 			wzSettleTime = orderStatus.getWzSettleTime();
 		}
 		
-		List<CashierEntity> lst = paymentCashierService.queryPaymentList(orderNo);
+		RestTemplate restTemplate = new RestTemplate();
+		PaymentVo vo2 = new PaymentVo();
+		vo2.setOrderNo(orderNo);
+	    
+//		String result2 = restTemplate.postForObject(url, vo, String.class);
+		
+		
+		List<CashierEntity> lst = null; //paymentCashierService.queryPaymentList(orderNo);
 		for (CashierEntity cashierEntity : lst) {
 			String payTime = cashierEntity.getPayTime();
 			/**

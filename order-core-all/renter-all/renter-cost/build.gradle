@@ -19,4 +19,5 @@ dependencies {
     compile('com.autoyol.car:auto-car-service-api:2020010601-SNAPSHOT')
     compile('com.autoyol:auto-coin-service-api:1.0.3-SNAPSHOT')
     compile project(":config:config-client")
+    //compile project(":casier-all:cashier-account")
 }
