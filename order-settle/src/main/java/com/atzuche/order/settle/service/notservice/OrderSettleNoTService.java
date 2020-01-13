@@ -1186,6 +1186,41 @@ public class OrderSettleNoTService {
         orderFlowService.inserOrderStatusChangeProcessInfo(settleOrdersAccount.getOrderNo(), OrderStatusEnum.TO_WZ_SETTLE);
     }
 
+
+    /**
+     * 取消订单结算 数据初始化
+     * @param orderNo
+     * @return
+     */
+    public SettleOrders initCancelSettleOrders(String orderNo) {
+        //1 校验参数
+        if(StringUtil.isBlank(orderNo)){
+            throw new OrderSettleFlatAccountException();
+        }
+        RenterOrderEntity renterOrder = renterOrderService.getRenterOrderByOrderNoAndIsEffective(orderNo);
+        if(Objects.isNull(renterOrder) || Objects.isNull(renterOrder.getRenterOrderNo())){
+            throw new OrderSettleFlatAccountException();
+        }
+        OwnerOrderEntity ownerOrder = ownerOrderService.getOwnerOrderByOrderNoAndIsEffective(orderNo);
+        // 3 初始化数据
+        // 3.1获取租客子订单 和 租客会员号
+        String renterOrderNo = renterOrder.getRenterOrderNo();
+        String renterMemNo = renterOrder.getRenterMemNo();
+        //3.2获取车主子订单 和 车主会员号
+        String ownerOrderNo = Objects.nonNull(ownerOrder)?ownerOrder.getOwnerOrderNo():"";
+        String ownerMemNo = Objects.nonNull(ownerOrder)?ownerOrder.getMemNo():"";
+
+        SettleOrders settleOrders = new SettleOrders();
+        settleOrders.setOrderNo(orderNo);
+        settleOrders.setRenterOrderNo(renterOrderNo);
+        settleOrders.setOwnerOrderNo(ownerOrderNo);
+        settleOrders.setRenterMemNo(renterMemNo);
+        settleOrders.setOwnerMemNo(ownerMemNo);
+        settleOrders.setRenterOrder(renterOrder);
+        settleOrders.setOwnerOrder(ownerOrder);
+        return settleOrders;
+    }
+
     /**
      * 取消订单查询 获取租客罚金信息
      * @param settleOrders
@@ -1195,8 +1230,10 @@ public class OrderSettleNoTService {
         List<RenterOrderFineDeatailEntity> renterOrderFineDeatails = renterOrderFineDeatailService.listRenterOrderFineDeatail(settleOrders.getOrderNo(),settleOrders.getRenterOrderNo());
         //2 获取全局的租客订单罚金明细（租客车主共用表 ，会员号区分车主/租客）
         List<ConsoleRenterOrderFineDeatailEntity> consoleRenterOrderFineDeatails = consoleRenterOrderFineDeatailService.listConsoleRenterOrderFineDeatail(settleOrders.getOrderNo(),settleOrders.getRenterMemNo());
+        //3 补贴包含凹凸币信息
+        List<RenterOrderSubsidyDetailEntity> renterOrderSubsidyDetails = renterOrderSubsidyDetailService.listRenterOrderSubsidyDetail(settleOrders.getOrderNo(),settleOrders.getRenterOrderNo());
         RentCosts rentCosts = new RentCosts();
-
+        rentCosts.setRenterOrderSubsidyDetails(renterOrderSubsidyDetails);
         rentCosts.setRenterOrderFineDeatails(renterOrderFineDeatails);
         rentCosts.setConsoleRenterOrderFineDeatails(consoleRenterOrderFineDeatails);
         settleOrders.setRentCosts(rentCosts);
@@ -1208,13 +1245,85 @@ public class OrderSettleNoTService {
      */
     public void getCancelOwnerCostSettleDetail(SettleOrders settleOrders) {
         OwnerCosts ownerCosts = new OwnerCosts();
-
         //1 获取全局的车主订单罚金明细（租客车主共用表 ，会员号区分车主/租客）
-        List<ConsoleRenterOrderFineDeatailEntity> consoleRenterOrderFineDeatails = consoleRenterOrderFineDeatailService.listConsoleRenterOrderFineDeatail(settleOrders.getOrderNo(),settleOrders.getOwnerOrderNo());
+        List<ConsoleRenterOrderFineDeatailEntity> consoleRenterOrderFineDeatails = consoleRenterOrderFineDeatailService.listConsoleRenterOrderFineDeatail(settleOrders.getOrderNo(),settleOrders.getOwnerMemNo());
         //2 车主罚金
         List<OwnerOrderFineDeatailEntity> ownerOrderFineDeatails = ownerOrderFineDeatailService.getOwnerOrderFineDeatailByOrderNo(settleOrders.getOrderNo());
         ownerCosts.setOwnerOrderFineDeatails(ownerOrderFineDeatails);
         ownerCosts.setConsoleRenterOrderFineDeatails(consoleRenterOrderFineDeatails);
         settleOrders.setOwnerCosts(ownerCosts);
+    }
+
+    /**
+     * 初始化 取消订单结算信息
+     * @param settleOrders
+     * @return
+     */
+    public SettleCancelOrdersAccount initSettleCancelOrdersAccount(SettleOrders settleOrders) {
+        SettleCancelOrdersAccount settleCancelOrdersAccount = new SettleCancelOrdersAccount();
+        // 实付车俩押金金额
+        int rentDepositAmt = cashierSettleService.getRentDeposit(settleOrders.getOrderNo(),settleOrders.getRenterMemNo());
+        // 实付钱包金额
+        int rentWalletAmt = cashierSettleService.getRentCostPayByWallet(settleOrders.getOrderNo(),settleOrders.getRenterMemNo());
+        // 实付违章押金金额
+        int rentWzDepositAmt = cashierSettleService.getWZDepositCostAmt(settleOrders.getOrderNo(),settleOrders.getRenterMemNo());
+        // 查询实付租车费用金额
+        int rentCostAmt = cashierSettleService.getRentCost(settleOrders.getOrderNo(),settleOrders.getRenterMemNo());
+        // 计算租客罚金
+        int rentFineAmt =0;
+        RentCosts rentCosts = settleOrders.getRentCosts();
+        if(Objects.nonNull(rentCosts) && !CollectionUtils.isEmpty(rentCosts.getRenterOrderFineDeatails())){
+            int amt = rentCosts.getRenterOrderFineDeatails().stream().mapToInt(RenterOrderFineDeatailEntity::getFineAmount).sum();
+            rentFineAmt = rentFineAmt +amt;
+        }
+        if(Objects.nonNull(rentCosts) && !CollectionUtils.isEmpty(rentCosts.getConsoleRenterOrderFineDeatails())){
+            int amt = rentCosts.getConsoleRenterOrderFineDeatails().stream().mapToInt(ConsoleRenterOrderFineDeatailEntity::getFineAmount).sum();
+            rentFineAmt = rentFineAmt +amt;
+        }
+        // 计算凹凸币使用金额
+        int renCoinAmt =0;
+        if(Objects.nonNull(rentCosts) && !CollectionUtils.isEmpty(rentCosts.getRenterOrderSubsidyDetails())){
+            renCoinAmt = rentCosts.getRenterOrderSubsidyDetails().stream().filter(obj ->{
+                return RenterCashCodeEnum.AUTO_COIN_DEDUCT.getCashNo().equals(obj.getSubsidyCostCode());
+            }).mapToInt(RenterOrderSubsidyDetailEntity::getSubsidyAmount).sum();
+        }
+        //计算 车主罚金
+        int ownerFineAmt = 0;
+        OwnerCosts ownerCosts = settleOrders.getOwnerCosts();
+        if(Objects.nonNull(ownerCosts) && !CollectionUtils.isEmpty(ownerCosts.getOwnerOrderFineDeatails())){
+            int amt = ownerCosts.getOwnerOrderFineDeatails().stream().mapToInt(OwnerOrderFineDeatailEntity::getFineAmount).sum();
+            ownerFineAmt = ownerFineAmt +amt;
+        }
+        if(Objects.nonNull(ownerCosts) && !CollectionUtils.isEmpty(ownerCosts.getConsoleRenterOrderFineDeatails())){
+            int amt = ownerCosts.getConsoleRenterOrderFineDeatails().stream().mapToInt(ConsoleRenterOrderFineDeatailEntity::getFineAmount).sum();
+            ownerFineAmt = ownerFineAmt +amt;
+        }
+        settleCancelOrdersAccount.setOwnerFineAmt(ownerFineAmt);
+        settleCancelOrdersAccount.setRentFineAmt(rentFineAmt);
+        settleCancelOrdersAccount.setRentCostAmt(rentCostAmt);
+        settleCancelOrdersAccount.setRentDepositAmt(rentDepositAmt);
+        settleCancelOrdersAccount.setRentWzDepositAmt(rentWzDepositAmt);
+        settleCancelOrdersAccount.setRenWalletAmt(rentWalletAmt);
+        settleCancelOrdersAccount.setRenCoinAmt(renCoinAmt);
+        return settleCancelOrdersAccount;
+    }
+
+    /**
+     * 车主存在 罚金 走历史欠款
+     * @param settleCancelOrdersAccount
+     */
+    public void handleOwnerFine(SettleOrders settleOrders,SettleCancelOrdersAccount settleCancelOrdersAccount) {
+        //1 车主存在 罚金走历史欠款
+        if(settleCancelOrdersAccount.getOwnerFineAmt()<0){
+            //2 记录历史欠款
+            AccountInsertDebtReqVO accountInsertDebt = new AccountInsertDebtReqVO();
+            BeanUtils.copyProperties(settleOrders,accountInsertDebt);
+            accountInsertDebt.setType(DebtTypeEnum.CANCEL.getCode());
+
+            accountInsertDebt.setSourceCode(RenterCashCodeEnum.HISTORY_AMT.getCashNo());
+            accountInsertDebt.setSourceDetail(RenterCashCodeEnum.HISTORY_AMT.getTxt());
+            accountInsertDebt.setAmt(settleCancelOrdersAccount.getOwnerFineAmt());
+            cashierService.createDebt(accountInsertDebt);
+        }
     }
 }

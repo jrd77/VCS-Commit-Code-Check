@@ -132,9 +132,9 @@ public class CashierPayService{
         Integer depositPayStatus = Objects.isNull(orderStatusDTO.getDepositPayStatus())?entity.getDepositPayStatus():orderStatusDTO.getDepositPayStatus();
         Integer wzPayStatus = Objects.isNull(orderStatusDTO.getWzPayStatus())?entity.getWzPayStatus():orderStatusDTO.getWzPayStatus();
         if(
-                (Objects.nonNull(rentCarPayStatus) || OrderPayStatusEnum.PAYED.getStatus() == rentCarPayStatus)&&
-                ( Objects.nonNull(depositPayStatus) || OrderPayStatusEnum.PAYED.getStatus() == depositPayStatus )&&
-                (Objects.nonNull(wzPayStatus)  || OrderPayStatusEnum.PAYED.getStatus() == wzPayStatus)
+                (Objects.nonNull(rentCarPayStatus) && OrderPayStatusEnum.PAYED.getStatus() == rentCarPayStatus)&&
+                ( Objects.nonNull(depositPayStatus) && OrderPayStatusEnum.PAYED.getStatus() == depositPayStatus )&&
+                (Objects.nonNull(wzPayStatus)  && OrderPayStatusEnum.PAYED.getStatus() == wzPayStatus)
         ){
             getCar =true;
         }
