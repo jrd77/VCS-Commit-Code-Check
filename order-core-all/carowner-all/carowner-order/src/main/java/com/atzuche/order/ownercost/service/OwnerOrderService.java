@@ -9,7 +9,6 @@ import com.atzuche.order.ownercost.entity.dto.OwnerOrderCostReqDTO;
 import com.atzuche.order.ownercost.entity.dto.OwnerOrderReqDTO;
 import com.atzuche.order.ownercost.mapper.OwnerOrderMapper;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,6 +20,17 @@ public class OwnerOrderService {
     private OwnerOrderMapper ownerOrderMapper;
     @Autowired
     private OwnerOrderCalCostService ownerOrderCalCostService;
+
+    /*
+     * @Author ZhangBin
+     * @Date 2020/1/10 14:30
+     * @Description: 获取待生效的子订单状态
+     * 
+     **/
+    public OwnerOrderEntity getChangeOwnerByOrderNo(String orderNo){
+        return ownerOrderMapper.getChangeOwnerByOrderNo(orderNo);
+    }
+
 
     /*
      * @Author ZhangBin
@@ -65,7 +75,7 @@ public class OwnerOrderService {
         ownerOrderEntity.setGoodsType(String.valueOf(ownerOrderReqDTO.getCategory()));
         ownerOrderEntity.setChildStatus(OwnerChildStatusEnum.PROCESS_ING.getCode());
         log.info("下单-车主端-生成车主子订单ownerOrderEntity=[{}]",JSON.toJSONString(ownerOrderEntity));
-        int result = ownerOrderMapper.insert(ownerOrderEntity);
+        int result = ownerOrderMapper.insertSelective(ownerOrderEntity);
         log.info("下单-车主端-生成车主子订单结果result=[{}],ownerOrderEntity=[{}]",result,JSON.toJSONString(ownerOrderEntity));
 
         //2、生成费用信息

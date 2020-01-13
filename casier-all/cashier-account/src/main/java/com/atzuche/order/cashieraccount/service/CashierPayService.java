@@ -18,14 +18,22 @@ import com.atzuche.order.cashieraccount.vo.req.pay.OrderPayReqVO;
 import com.atzuche.order.cashieraccount.vo.req.pay.OrderPaySignReqVO;
 import com.atzuche.order.cashieraccount.vo.res.AccountPayAbleResVO;
 import com.atzuche.order.cashieraccount.vo.res.OrderPayableAmountResVO;
+import com.atzuche.order.cashieraccount.vo.res.pay.OrderPayCallBackSuccessVO;
 import com.atzuche.order.commons.CatConstants;
+import com.atzuche.order.commons.enums.OrderPayStatusEnum;
+import com.atzuche.order.commons.enums.OrderStatusEnum;
 import com.atzuche.order.commons.enums.RenterCashCodeEnum;
 import com.atzuche.order.commons.enums.YesNoEnum;
 import com.atzuche.order.commons.service.OrderPayCallBack;
+import com.atzuche.order.flow.service.OrderFlowService;
+import com.atzuche.order.parentorder.dto.OrderStatusDTO;
+import com.atzuche.order.parentorder.entity.OrderStatusEntity;
+import com.atzuche.order.parentorder.service.OrderStatusService;
 import com.atzuche.order.rentercost.entity.vo.PayableVO;
 import com.atzuche.order.rentercost.service.RenterOrderCostCombineService;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
-import com.atzuche.order.wallet.server.service.WalletService;
+import com.atzuche.order.wallet.WalletProxyService;
+import com.atzuche.order.wallet.api.OrderWalletFeignService;
 import com.autoyol.autopay.gateway.constant.DataPayKindConstant;
 import com.autoyol.autopay.gateway.util.MD5;
 import com.autoyol.autopay.gateway.vo.req.BatchNotifyDataVo;
@@ -67,36 +75,67 @@ public class CashierPayService{
     @Autowired AccountRenterCostSettleService accountRenterCostSettleService;
     @Autowired RenterOrderCostCombineService renterOrderCostCombineService;
     @Autowired CashierNoTService cashierNoTService;
-    @Autowired WalletService walletService;
+    @Autowired WalletProxyService walletProxyService;
     @Autowired RefundRemoteService refundRemoteService;
     @Autowired CashierRefundApplyNoTService cashierRefundApplyNoTService;
+    @Autowired private OrderStatusService orderStatusService;
+    @Autowired private OrderFlowService orderFlowService;
+
 
     /**
      * 支付系统回调（支付回调，退款回调到时一个）
      * MQ 异步回调
      */
     public void payCallBack(BatchNotifyDataVo batchNotifyDataVo, OrderPayCallBack callBack){
-        Transaction t = Cat.getProducer().newTransaction(CatConstants.RABBIT_MQ_CALL, "支付系统rabbitMQ异步回调payCallBackAsyn");
-        try {
-            Cat.logEvent(CatConstants.RABBIT_MQ_METHOD,"OrderPayCallBackRabbitConfig.payCallBackAsyn");
-            Cat.logEvent(CatConstants.RABBIT_MQ_PARAM,GsonUtils.toJson(batchNotifyDataVo));
-            //1 校验是否 为空
-            if(Objects.nonNull(batchNotifyDataVo) && !CollectionUtils.isEmpty(batchNotifyDataVo.getLstNotifyDataVo())){
-                cashierService.callBackSuccess(batchNotifyDataVo.getLstNotifyDataVo(),callBack);
-            }
-            //3 更新rabbitMQ 记录已消费
-            String reqContent = FasterJsonUtil.toJson(batchNotifyDataVo);
-            String md5 =  MD5.MD5Encode(reqContent);
-            t.setStatus(Transaction.SUCCESS);
-        } catch (Exception e) {
-            log.info("OrderPayCallBack payCallBackAsyn start param;[{}]", GsonUtils.toJson(batchNotifyDataVo));
-            t.setStatus(e);
-            Cat.logError("异步处理支付系统回调 失败",e);
-            throw new OrderPayCallBackAsnyException();
-        } finally {
-            log.info("OrderPayCallBack payCallBackAsyn start end;[{}]", GsonUtils.toJson(batchNotifyDataVo));
-            t.complete();
+        if(Objects.nonNull(batchNotifyDataVo) && !CollectionUtils.isEmpty(batchNotifyDataVo.getLstNotifyDataVo())){
+            // 1 支付信息落库
+            OrderPayCallBackSuccessVO vo = cashierService.callBackSuccess(batchNotifyDataVo.getLstNotifyDataVo());
+           // 2 订单流程 数据更新
+            orderPayCallBack(vo,callBack);
         }
+    }
+
+    /**
+     * 订单流程 数据更新
+     * @param vo
+     * @param callBack
+     */
+    private void orderPayCallBack(OrderPayCallBackSuccessVO vo, OrderPayCallBack callBack) {
+        //支付成功更新 订单支付状态
+        if(Objects.nonNull(vo)&&Objects.nonNull(vo.getOrderNo())){
+            OrderStatusDTO orderStatusDTO = new OrderStatusDTO();
+            BeanUtils.copyProperties(vo,orderStatusDTO);
+            //当支付成功（当车辆押金，违章押金，租车费用都支付成功，更新订单状态 待取车），更新主订单状态待取车
+            if(isGetCar(orderStatusDTO)){
+                orderStatusDTO.setStatus(OrderStatusEnum.TO_GET_CAR.getStatus());
+                //记录订单流程
+                orderFlowService.inserOrderStatusChangeProcessInfo(orderStatusDTO.getOrderNo(), OrderStatusEnum.TO_GET_CAR);
+                callBack.callBack(vo.getOrderNo());
+            }
+            log.info("payOrderCallBackSuccess saveOrderStatusInfo :[{}]", GsonUtils.toJson(orderStatusDTO));
+           orderStatusService.saveOrderStatusInfo(orderStatusDTO);
+        }
+    }
+
+    /**
+     * 判断 租车费用 押金 违章押金 是否全部成功支付
+     * @param orderStatusDTO
+     * @return
+     */
+    private Boolean isGetCar(OrderStatusDTO orderStatusDTO){
+        OrderStatusEntity entity = orderStatusService.getByOrderNo(orderStatusDTO.getOrderNo());
+        boolean getCar = false;
+        Integer rentCarPayStatus = Objects.isNull(orderStatusDTO.getRentCarPayStatus())?entity.getRentCarPayStatus():orderStatusDTO.getRentCarPayStatus();
+        Integer depositPayStatus = Objects.isNull(orderStatusDTO.getDepositPayStatus())?entity.getDepositPayStatus():orderStatusDTO.getDepositPayStatus();
+        Integer wzPayStatus = Objects.isNull(orderStatusDTO.getWzPayStatus())?entity.getWzPayStatus():orderStatusDTO.getWzPayStatus();
+        if(
+                (Objects.nonNull(rentCarPayStatus) || OrderPayStatusEnum.PAYED.getStatus() == rentCarPayStatus)&&
+                ( Objects.nonNull(depositPayStatus) || OrderPayStatusEnum.PAYED.getStatus() == depositPayStatus )&&
+                (Objects.nonNull(wzPayStatus)  || OrderPayStatusEnum.PAYED.getStatus() == wzPayStatus)
+        ){
+            getCar =true;
+        }
+        return getCar;
     }
 
     /**
@@ -105,39 +144,47 @@ public class CashierPayService{
      * @return
      */
     @Transactional(rollbackFor=Exception.class)
-    public String getPaySignStr(OrderPaySignReqVO orderPaySign){
+    public String getPaySignStr(OrderPaySignReqVO orderPaySign,OrderPayCallBack orderPayCallBack){
         //1校验
         Assert.notNull(orderPaySign, ErrorCode.PARAMETER_ERROR.getText());
         orderPaySign.check();
-
+        orderPayCallBack.callBack(orderPaySign.getOrderNo());
         //3 查询应付
         OrderPayReqVO orderPayReqVO = new OrderPayReqVO();
         BeanUtils.copyProperties(orderPaySign,orderPayReqVO);
-        OrderPayableAmountResVO payVO = getOrderPayableAmount(orderPayReqVO);
+        OrderPayableAmountResVO orderPayable = getOrderPayableAmount(orderPayReqVO);
         //4 抵扣钱包
-        if(YesNoEnum.YES.getCode()==payVO.getIsUseWallet()){
-           int payBalance = walletService.getTotalWallet(orderPaySign.getMenNo());
+        if(YesNoEnum.YES.getCode()==orderPayable.getIsUseWallet()){
+           int payBalance = walletProxyService.getWalletByMemNo(orderPaySign.getMenNo());
            //判断余额大于0
            if(payBalance>0){
                //5 抵扣钱包落库 （收银台落库、费用落库）
-               int amtWallet = walletService.deductWallet(orderPaySign.getMenNo(),orderPaySign.getOrderNo(),payVO.getAmtWallet());
+               int amtWallet = walletProxyService.orderDeduct(orderPaySign.getMenNo(),orderPaySign.getOrderNo(),orderPayable.getAmt());
                //6收银台 钱包支付落库
                cashierNoTService.insertRenterCostByWallet(orderPaySign,amtWallet);
                //钱包未抵扣部分
                int amtPaying =0;
-               if(amtWallet<payVO.getAmtWallet()){
-                   amtPaying = amtWallet - payVO.getAmtWallet();
+               if(amtWallet<orderPayable.getAmtWallet()){
+                   amtPaying = amtWallet - orderPayable.getAmtWallet();
                }
-               payVO.setAmtWallet(amtWallet);
-               payVO.setAmt(payVO.getAmt() + amtPaying);
+               orderPayable.setAmtWallet(amtWallet);
+               orderPayable.setAmt(orderPayable.getAmt() + amtPaying);
                //如果待支付 金额等于 0 即 钱包抵扣完成
-               if(payVO.getAmt()==0){
+               if(orderPayable.getAmt()==0){
+                   List<String> payKind = orderPaySign.getPayKind();
+                   // 如果 支付款项 只有租车费用一个  并且使用钱包支付 ，当待支付金额完全被 钱包抵扣直接返回支付完成
+                   if(!CollectionUtils.isEmpty(payKind) && payKind.size()==1 && orderPayReqVO.getPayKind().contains(DataPayKindConstant.RENT_AMOUNT)){
+                       //修改子订单费用信息
+                       orderPayCallBack.callBack(orderPaySign.getOrderNo());
+                       return "";
+                   }
+
                }
            }
 
         }
         //7 签名串
-        List<PayVo> payVo = getOrderPayVO(orderPaySign,payVO);
+        List<PayVo> payVo = getOrderPayVO(orderPaySign,orderPayable);
         log.info("CashierPayService 加密前费用列表打印 getPaySignStr payVo [{}] ",GsonUtils.toJson(payVo));
         if(CollectionUtils.isEmpty(payVo)){
             throw new OrderPaySignFailException();
@@ -149,7 +196,6 @@ public class CashierPayService{
     /**
      * 查询支付款项信息
      */
-    @CatAnnotation
     public OrderPayableAmountResVO getOrderPayableAmount(OrderPayReqVO orderPayReqVO){
         Assert.notNull(orderPayReqVO, ErrorCode.PARAMETER_ERROR.getText());
         orderPayReqVO.check();
@@ -207,7 +253,7 @@ public class CashierPayService{
         // 计算钱包 支付 目前支付抵扣租费费用
         int amtWallet =0;
         if(YesNoEnum.YES.getCode()==result.getIsUseWallet()){
-            int payBalance = walletService.getTotalWallet(orderPayReqVO.getMenNo());
+            int payBalance = walletProxyService.getWalletByMemNo(orderPayReqVO.getMenNo());
             //预计钱包抵扣金额 = amtWallet
             amtWallet = amtRent + payBalance < 0 ? payBalance : Math.abs(amtRent);
             // 抵扣钱包后  应付租车费用金额
@@ -231,7 +277,6 @@ public class CashierPayService{
     /**
      * 查询包装 待支付签名对象
      */
-    @CatAnnotation
     public  List<PayVo> getOrderPayVO(OrderPaySignReqVO orderPaySign,OrderPayableAmountResVO payVO){
         //待支付金额明细
         List<PayVo> payVo = new ArrayList<>();

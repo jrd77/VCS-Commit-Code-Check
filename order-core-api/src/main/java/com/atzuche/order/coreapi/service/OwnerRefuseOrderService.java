@@ -7,6 +7,7 @@ import com.atzuche.order.commons.vo.req.OrderReqVO;
 import com.atzuche.order.commons.vo.req.RefuseOrderReqVO;
 import com.atzuche.order.delivery.service.delivery.DeliveryCarService;
 import com.atzuche.order.delivery.vo.delivery.CancelOrderDeliveryVO;
+import com.atzuche.order.flow.service.OrderFlowService;
 import com.atzuche.order.ownercost.entity.OwnerOrderEntity;
 import com.atzuche.order.ownercost.service.OwnerOrderService;
 import com.atzuche.order.parentorder.dto.OrderStatusDTO;
@@ -63,6 +64,9 @@ public class OwnerRefuseOrderService {
     RenterGoodsService renterGoodsService;
     @Autowired
     OrderSettleService orderSettleService;
+    @Autowired
+    OrderFlowService orderFlowService;
+
 
 
     /**
@@ -112,8 +116,10 @@ public class OwnerRefuseOrderService {
             couponAndCoinHandleService.undoPlatformCoupon(reqVO.getOrderNo());
             couponAndCoinHandleService.undoPlatformCoupon(reqVO.getOrderNo());
             //退还车主券
-            String recover = null == orderStatusEntity.getRentCarPayStatus() || orderStatusEntity.getRentCarPayStatus() == 0 ? "1" : "0";
-            couponAndCoinHandleService.undoOwnerCoupon(reqVO.getOrderNo(), ownerCouponEntity.getCouponId(), recover);
+            if(null != ownerCouponEntity) {
+                String recover = null == orderStatusEntity.getRentCarPayStatus() || orderStatusEntity.getRentCarPayStatus() == 0 ? "1" : "0";
+                couponAndCoinHandleService.undoOwnerCoupon(reqVO.getOrderNo(), ownerCouponEntity.getCouponId(), recover);
+            }
             //通知收银台退还凹凸币和钱包
             orderSettleService.settleOrderCancel(reqVO.getOrderNo());
         }
@@ -121,6 +127,9 @@ public class OwnerRefuseOrderService {
 
         //落库
         orderStatusService.saveOrderStatusInfo(orderStatusDTO);
+        //添加order_flow记录
+        orderFlowService.inserOrderStatusChangeProcessInfo(reqVO.getOrderNo(),
+                OrderStatusEnum.from(orderStatusDTO.getStatus()));
         ownerOrderService.updateOwnerOrderChildStatus(ownerOrderEntity.getId(), OwnerChildStatusEnum.END.getCode());
         //取消信息处理(order_cancel_reason)
         orderCancelReasonService.addOrderCancelReasonRecord(buildOrderCancelReasonEntity(reqVO.getOrderNo(), ownerOrderEntity.getOwnerOrderNo()));

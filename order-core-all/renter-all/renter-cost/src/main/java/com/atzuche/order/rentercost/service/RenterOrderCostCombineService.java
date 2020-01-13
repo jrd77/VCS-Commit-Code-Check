@@ -36,6 +36,7 @@ import com.dianping.cat.Cat;
 import com.dianping.cat.message.Transaction;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -130,7 +131,9 @@ public class RenterOrderCostCombineService {
 			Cat.logError("获取租金对象列表rentAmtDTO.costBaseDTO对象为空", new RenterCostParameterException());
 			throw new RenterCostParameterException();
 		}
-		
+		CostBaseDTO costBaseCopyDTO = new CostBaseDTO();
+		// 赋值后需要
+		BeanUtils.copyProperties(costBaseDTO, costBaseCopyDTO);
 		List<RenterGoodsPriceDetailDTO> dayPriceList = rentAmtDTO.getRenterGoodsPriceDetailDTOList();
 		// 按还车时间分组
 		Map<LocalDateTime, List<RenterGoodsPriceDetailDTO>> dayPriceMap = dayPriceList.stream().collect(Collectors.groupingBy(RenterGoodsPriceDetailDTO::getRevertTime));
@@ -140,12 +143,12 @@ public class RenterOrderCostCombineService {
 		List<RenterOrderCostDetailEntity> renterOrderCostDetailEntityList = new ArrayList<RenterOrderCostDetailEntity>();
 		for(Map.Entry<LocalDateTime, List<RenterGoodsPriceDetailDTO>> it : dayPriceMap.entrySet()){
 			if (i == 1) {
-				costBaseDTO.setEndTime(it.getKey());
+				costBaseCopyDTO.setEndTime(it.getKey());
 			} else {
-				costBaseDTO.setStartTime(costBaseDTO.getEndTime());
-				costBaseDTO.setEndTime(it.getKey());
+				costBaseCopyDTO.setStartTime(costBaseCopyDTO.getEndTime());
+				costBaseCopyDTO.setEndTime(it.getKey());
 			}
-			renterOrderCostDetailEntityList.add(getRentAmtEntity(costBaseDTO, it.getValue()));
+			renterOrderCostDetailEntityList.add(getRentAmtEntity(costBaseCopyDTO, it.getValue()));
 			i++;
 		}
 		return renterOrderCostDetailEntityList;
@@ -688,14 +691,14 @@ public class RenterOrderCostCombineService {
         getCost.setChannelName(channelCode);
         getCost.setRequestTime(LocalDateTimeUtils.getNowDateLong());
         getCost.setGetReturnType("get");
-        getCost.setGetReturnTime(String.valueOf(LocalDateTimeUtils.localDateTimeToLong(costBaseDTO.getEndTime())));
+        getCost.setGetReturnTime(String.valueOf(LocalDateTimeUtils.localDateTimeToLong(costBaseDTO.getStartTime())));
         getCost.setCityId(String.valueOf(cityCode));
         getCost.setOrderType(this.getIsPackageOrder(getReturnCarCostReqDto.getIsPackageOrder()));
         getCost.setDistance(String.valueOf(getDistance));
         if(returnFlag && cityDTO !=null) {
             getCost.setRenterLocation(cityDTO.getLon()+","+ cityDTO.getLat());
         } else {
-            getCost.setRenterLocation(srvReturnLon+","+srvReturnLat);
+            getCost.setRenterLocation(srvGetLon+","+srvGetLat);
         }
 
         getCost.setSumJudgeFreeFee(sumJudgeFreeFeeStr);
@@ -952,7 +955,15 @@ public class RenterOrderCostCombineService {
         GetReturnOverTransportDTO getReturnOverTransport = new GetReturnOverTransportDTO(false, 0, false, 0);
         getReturnOverTransport.setIsUpdateRentTime(true);
         getReturnOverTransport.setIsUpdateRevertTime(true);
+
         if (cityCode == null || (rentTime == null && revertTime == null)) {
+            getReturnOverCostDTO.setRenterOrderCostDetailEntityList(renterOrderCostDetailEntityList);
+            return getReturnOverCostDTO;
+        }
+        boolean getIsGetCarCost = getReturnCarOverCostReqDto.getIsGetCarCost() == null ? false : getReturnCarOverCostReqDto.getIsGetCarCost();
+        boolean getIsReturnCarCost = getReturnCarOverCostReqDto.getIsReturnCarCost()==null?false:getReturnCarOverCostReqDto.getIsReturnCarCost();
+        if(!getIsGetCarCost && !getIsReturnCarCost){
+            log.info("不需要计算超运能费用getReturnCarOverCostReqDto={}",JSON.toJSONString(getReturnCarOverCostReqDto));
             getReturnOverCostDTO.setRenterOrderCostDetailEntityList(renterOrderCostDetailEntityList);
             return getReturnOverCostDTO;
         }
@@ -964,7 +975,7 @@ public class RenterOrderCostCombineService {
             Integer overTransportFee = this.getGetReturnOverTransportFee(cityCode);
             String rentTimeLongStr = String.valueOf(LocalDateTimeUtils.localDateTimeToLong(rentTime));
 
-            if (rentTime != null) {
+            if (rentTime != null && getIsGetCarCost) {
                 ResponseObject<Boolean> getFlgResponse = null;
                 Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "取车是否超运能");
                 try{
@@ -1000,7 +1011,7 @@ public class RenterOrderCostCombineService {
                         getReturnOverTransport.setGetOverTransportFee(overTransportFee);
                         if(DateUtils.isNight(rentTimeLongStr, nightBegin, nightEnd)) {
                             //夜间
-                            getReturnOverTransport.setNightGetOverTransportFee(overTransportFee);
+                            getReturnOverTransport.setNightGetOverTransportFee(overTransportFee==null?0:overTransportFee);
                         }
                         RenterOrderCostDetailEntity renterOrderCostDetailEntity = new RenterOrderCostDetailEntity();
                         renterOrderCostDetailEntity.setOrderNo(costBaseDTO.getOrderNo());
@@ -1020,7 +1031,8 @@ public class RenterOrderCostCombineService {
                     getReturnOverTransport.setIsGetOverTransport(false);
                 }
             }
-            if (revertTime != null) {
+
+            if (revertTime != null && getIsReturnCarCost) {
                 String revertTimeLongStr = String.valueOf(LocalDateTimeUtils.localDateTimeToLong(revertTime));
                 ResponseObject<Boolean>  returnFlgResponse = null;
                 Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL,"还车是否超运能");
@@ -1054,7 +1066,7 @@ public class RenterOrderCostCombineService {
                         getReturnOverTransport.setReturnOverTransportFee(overTransportFee);
                         if(DateUtils.isNight(String.valueOf(LocalDateTimeUtils.localDateTimeToLong(revertTime)), nightBegin, nightEnd)) {
                             //夜间
-                            getReturnOverTransport.setNightReturnOverTransportFee(overTransportFee);;
+                            getReturnOverTransport.setNightReturnOverTransportFee(overTransportFee==null?0:overTransportFee);;
                         }
                         RenterOrderCostDetailEntity renterOrderCostDetailEntity = new RenterOrderCostDetailEntity();
                         renterOrderCostDetailEntity.setOrderNo(costBaseDTO.getOrderNo());

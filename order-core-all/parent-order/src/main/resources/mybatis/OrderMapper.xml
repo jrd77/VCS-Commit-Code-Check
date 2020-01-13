@@ -17,6 +17,7 @@
         <result property="cityName" column="city_name"/>
         <result property="cityCode" column="city_code"/>
         <result property="isOutCity" column="is_out_city"/>
+        <result property="rentCity" column="rent_city"/>
         <result property="isFreeDeposit" column="is_free_deposit"/>
         <result property="isUseAirPortService" column="is_use_air_port_Service"/>
         <result property="flightId" column="flight_id"/>
@@ -45,6 +46,7 @@
 	`city_name`,
 	`city_code`,
 	`is_out_city`,
+	`rent_city`,
 	`is_free_deposit`,
 	`is_use_air_port_Service`,
 	`flight_id`,
@@ -75,6 +77,7 @@
         `city_name`,
         `city_code`,
         `is_out_city`,
+        `rent_city`,
         `is_free_deposit`,
         `is_use_air_port_Service`,
         `flight_id`,
@@ -83,11 +86,8 @@
         `risk_audit_id`,
         `version`,
         `base_path`,
-        `create_time`,
         `create_op`,
-        `update_time`,
-        `update_op`,
-        `is_delete`
+        `update_op`
         )
         values
         (
@@ -101,6 +101,7 @@
         #{cityName},
         #{cityCode},
         #{isOutCity},
+        #{rentCity},
         #{isFreeDeposit},
         #{isUseAirPortService},
         #{flightId},
@@ -109,11 +110,8 @@
         #{riskAuditId},
         #{version},
         #{basePath},
-        #{createTime},
         #{createOp},
-        #{updateTime},
-        #{updateOp},
-        #{isDelete}
+        #{updateOp}
         )
     </insert>
 
@@ -130,6 +128,7 @@
             <if test="cityName != null">`city_name`, </if>
             <if test="cityCode != null">`city_code`, </if>
             <if test="isOutCity != null">`is_out_city`, </if>
+            <if test="rentCity != null">`rent_city`, </if>
             <if test="isFreeDeposit != null">`is_free_deposit`, </if>
             <if test="isUseAirPortService != null">`is_use_air_port_Service`, </if>
             <if test="flightId != null">`flight_id`, </if>
@@ -152,6 +151,7 @@
             <if test="cityName != null">#{cityName},  </if>
             <if test="cityCode != null">#{cityCode},  </if>
             <if test="isOutCity != null">#{isOutCity},  </if>
+            <if test="rentCity != null">#{rentCity},  </if>
             <if test="isFreeDeposit != null">#{isFreeDeposit},  </if>
             <if test="isUseAirPortService != null">#{isUseAirPortService},  </if>
             <if test="flightId != null">#{flightId},  </if>
@@ -179,6 +179,7 @@
             <if test="cityName != null">`city_name` = #{cityName}, </if>
             <if test="cityCode != null">`city_code` = #{cityCode}, </if>
             <if test="isOutCity != null">`is_out_city` = #{isOutCity}, </if>
+            <if test="rentCity != null">`rent_city` = #{rentCity}, </if>
             <if test="isFreeDeposit != null">`is_free_deposit` = #{isFreeDeposit}, </if>
             <if test="isUseAirPortService != null">`is_use_air_port_Service` = #{isUseAirPortService}, </if>
             <if test="flightId != null">`flight_id` = #{flightId}, </if>
@@ -208,6 +209,7 @@
             `exp_revert_time` = #{expRevertTime},
             `city_name` = #{cityName},
             `city_code` = #{cityCode},
+            `is_out_city` = #{isOutCity},
             `is_out_city` = #{isOutCity},
             `is_free_deposit` = #{isFreeDeposit},
             `is_use_air_port_Service` = #{isUseAirPortService},
@@ -244,5 +246,46 @@
             #{orderNo}
         </foreach>
     </select>
-  	
+    
+    <select id="getOrderByOrderNoAndMemNo" resultMap="BaseResultMap">
+        select
+            <include refid="Base_Column_List" />
+        from
+            `order`
+        where
+            order_no = #{orderNo}
+            and mem_no_renter = #{memNo}
+            and is_delete = 0
+        limit 1
+    </select>
+
+    <update id="updateByOrderNoSelective" parameterType="com.atzuche.order.parentorder.entity.OrderEntity">
+        update `order`
+        <set>
+            <if test="orderNo != null">`order_no` = #{orderNo}, </if>
+            <if test="memNoRenter != null">`mem_no_renter` = #{memNoRenter}, </if>
+            <if test="category != null">`category` = #{category}, </if>
+            <if test="entryCode != null">`entry_code` = #{entryCode}, </if>
+            <if test="source != null">`source` = #{source}, </if>
+            <if test="expRentTime != null">`exp_rent_time` = #{expRentTime}, </if>
+            <if test="expRevertTime != null">`exp_revert_time` = #{expRevertTime}, </if>
+            <if test="cityName != null">`city_name` = #{cityName}, </if>
+            <if test="cityCode != null">`city_code` = #{cityCode}, </if>
+            <if test="isOutCity != null">`is_out_city` = #{isOutCity}, </if>
+            <if test="rentCity != null">`rent_city` = #{rentCity}, </if>
+            <if test="isFreeDeposit != null">`is_free_deposit` = #{isFreeDeposit}, </if>
+            <if test="isUseAirPortService != null">`is_use_air_port_Service` = #{isUseAirPortService}, </if>
+            <if test="flightId != null">`flight_id` = #{flightId}, </if>
+            <if test="reqTime != null">`req_time` = #{reqTime}, </if>
+            <if test="limitAmt != null">`limit_amt` = #{limitAmt}, </if>
+            <if test="riskAuditId != null">`risk_audit_id` = #{riskAuditId}, </if>
+            <if test="version != null">`version` = #{version}, </if>
+            <if test="basePath != null">`base_path` = #{basePath}, </if>
+            <if test="createOp != null">`create_op` = #{createOp}, </if>
+            <if test="updateOp != null">`update_op` = #{updateOp}, </if>
+            <if test="isDelete != null">`is_delete` = #{isDelete}</if>
+        </set>
+        where order_no = #{orderNo}
+    </update>
+
 </mapper>

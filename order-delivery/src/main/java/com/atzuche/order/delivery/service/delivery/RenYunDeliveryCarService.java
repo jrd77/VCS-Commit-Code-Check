@@ -95,11 +95,4 @@ public class RenYunDeliveryCarService {
         return sb.toString();
     }
 
-
-
-
-
-
-
-
 }

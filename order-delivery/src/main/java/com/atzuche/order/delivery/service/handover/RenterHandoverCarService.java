@@ -143,4 +143,8 @@ public class RenterHandoverCarService implements IUpdateHandoverCarInfo {
         renterHandoverCarRemarkMapper.updateByPrimaryKeySelective(renterHandoverCarRemarkEntity);
     }
 
+    public RenterHandoverCarInfoEntity selectByRenterOrderNoAndType(String renterOrderNo, Integer type) {
+        return renterHandoverCarInfoMapper.selectByRenterOrderNoAndType(renterOrderNo, type);
+    }
+
 }

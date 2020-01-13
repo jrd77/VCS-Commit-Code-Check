@@ -22,4 +22,6 @@ public interface AccountRenterClaimCostSettleMapper{
     int updateByPrimaryKeySelective(AccountRenterClaimCostSettleEntity record);
 
     AccountRenterClaimCostSettleEntity getRenterClaimCostAmt(@Param("orderNo") String orderNo, @Param("memNo")String memNo);
+
+    AccountRenterClaimCostSettleEntity getRenterClaimCost(@Param("orderNo")String orderNo);
 }

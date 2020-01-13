@@ -1,5 +1,6 @@
 package com.atzuche.order.coreapi.service;
 
+import com.atzuche.order.car.CarProxyService;
 import com.atzuche.order.coin.service.AccountRenterCostCoinService;
 import com.atzuche.order.commons.entity.dto.*;
 import com.atzuche.order.commons.enums.*;
@@ -18,7 +19,9 @@ import com.atzuche.order.delivery.vo.delivery.OrderDeliveryDTO;
 import com.atzuche.order.delivery.vo.delivery.RenterDeliveryAddrDTO;
 import com.atzuche.order.delivery.vo.delivery.UpdateOrderDeliveryVO;
 import com.atzuche.order.parentorder.entity.OrderEntity;
+import com.atzuche.order.parentorder.entity.OrderStatusEntity;
 import com.atzuche.order.parentorder.service.OrderService;
+import com.atzuche.order.parentorder.service.OrderStatusService;
 import com.atzuche.order.rentercommodity.service.RenterCommodityService;
 import com.atzuche.order.rentercommodity.service.RenterGoodsService;
 import com.atzuche.order.rentercost.entity.RenterOrderCostDetailEntity;
@@ -39,10 +42,10 @@ import com.atzuche.order.renterorder.vo.owner.OwnerCouponGetAndValidReqVO;
 import com.atzuche.order.renterorder.vo.platform.MemAvailCouponRequestVO;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.coupon.api.CouponSettleRequest;
-import com.autoyol.member.detail.vo.res.CommUseDriverInfo;
 import com.autoyol.platformcost.CommonUtils;
 import com.dianping.cat.Cat;
 import lombok.extern.slf4j.Slf4j;
+import com.atzuche.order.mem.MemProxyService;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,7 +68,7 @@ public class ModifyOrderService {
 	@Autowired
 	private RenterMemberService renterMemberService;
 	@Autowired
-	private GoodsService goodsService;
+	private CarProxyService goodsService;
 	@Autowired
 	private RenterCommodityService commodityService;
 	@Autowired
@@ -91,7 +94,7 @@ public class ModifyOrderService {
 	@Autowired
 	private RenterGoodsService renterGoodsService;
 	@Autowired
-	private MemberService memberService;
+	private MemProxyService memProxyService;
 	@Autowired
 	private ModifyOrderForRenterService modifyOrderForRenterService;
 	@Autowired
@@ -106,6 +109,10 @@ public class ModifyOrderService {
     private CarRentalTimeApiService carRentalTimeApiService;
 	@Autowired
 	private AccountRenterCostCoinService accountRenterCostCoinService;
+	@Autowired
+	private ModifyOrderCheckService modifyOrderCheckService;
+	@Autowired
+	private OrderStatusService orderStatusService;
 
 	/**
 	 * 修改订单主逻辑
@@ -127,6 +134,7 @@ public class ModifyOrderService {
 		List<RenterOrderDeliveryEntity> deliveryList = renterOrderDeliveryService.listRenterOrderDeliveryByRenterOrderNo(initRenterOrder.getRenterOrderNo());
 		// DTO包装
 		ModifyOrderDTO modifyOrderDTO = getModifyOrderDTO(modifyOrderReq, renterOrderNo, initRenterOrder, deliveryList);
+		log.info("ModifyOrderService.modifyOrder modifyOrderDTO=[{}]", modifyOrderDTO);
 		// 获取租客会员信息
 		RenterMemberDTO renterMemberDTO = getRenterMemberDTO(initRenterOrder.getRenterOrderNo(), renterOrderNo);
 		// 设置租客会员信息
@@ -140,20 +148,29 @@ public class ModifyOrderService {
 		
 		// TODO 风控校验
 		
-		// TODO 库存校验
-		
 		// 获取主订单信息
-		OrderEntity orderEntity = orderService.getOrderEntity(modifyOrderDTO.getOrderNo());
+		OrderEntity orderEntity = orderService.getOrderByOrderNoAndMemNo(orderNo, modifyOrderReq.getMemNo());
 		// 设置主订单信息
 		modifyOrderDTO.setOrderEntity(orderEntity);
+		// 查询主订单状态
+		OrderStatusEntity orderStatusEntity = orderStatusService.getByOrderNo(orderNo);
+		// 设置订单状态
+		modifyOrderDTO.setOrderStatusEntity(orderStatusEntity);
+		// 校验
+		modifyOrderCheckService.modifyMainCheck(modifyOrderDTO);
 		// 设置城市编号
 		modifyOrderDTO.setCityCode(orderEntity.getCityCode());
+		// 库存校验
+		//modifyOrderCheckService.checkCarStock(modifyOrderDTO);
+		log.info("ModifyOrderService.modifyOrder again modifyOrderDTO=[{}]", modifyOrderDTO);
 		// 获取修改前租客费用明细
 		List<RenterOrderCostDetailEntity> initCostList = renterOrderCostDetailService.listRenterOrderCostDetail(modifyOrderDTO.getOrderNo(), initRenterOrder.getRenterOrderNo());
 		// 获取修改前补贴信息
 		List<RenterOrderSubsidyDetailEntity> initSubsidyList = renterOrderSubsidyDetailService.listRenterOrderSubsidyDetail(modifyOrderDTO.getOrderNo(), initRenterOrder.getRenterOrderNo());
-		//提前延后时间计算
+		// 提前延后时间计算
 		CarRentTimeRangeResVO carRentTimeRangeResVO = getCarRentTimeRangeResVO(modifyOrderDTO);
+		// 设置提前延后时间
+		modifyOrderDTO.setCarRentTimeRangeResVO(carRentTimeRangeResVO);
 		// 封装计算用对象
 		RenterOrderReqVO renterOrderReqVO = convertToRenterOrderReqVO(modifyOrderDTO, renterMemberDTO, renterGoodsDetailDTO, orderEntity, carRentTimeRangeResVO);
 		// 基础费用计算包含租金，手续费，基础保障费用，全面保障费用，附加驾驶人保障费用，取还车费用计算和超运能费用计算
@@ -200,6 +217,7 @@ public class ModifyOrderService {
 		againAutoCoinDeduct(modifyOrderDTO, costDeductVO.getRenterSubsidyList());
 		return ResponseData.success();
 	}
+	
 	
 	
 	/**
@@ -432,7 +450,7 @@ public class ModifyOrderService {
 			return;
 		}
 		// 获取附加驾驶人信息
-		List<CommUseDriverInfo> useDriverList = memberService.getCommUseDriverList(modifyOrderDTO.getMemNo());
+		List<CommUseDriverInfoDTO> useDriverList = memProxyService.getCommUseDriverList(modifyOrderDTO.getMemNo());
 		// 保存
 		renterAdditionalDriverService.insertBatchAdditionalDriver(modifyOrderDTO.getOrderNo(), modifyOrderDTO.getRenterOrderNo(), driverIds, useDriverList);
 	}
@@ -574,12 +592,12 @@ public class ModifyOrderService {
 	 * @param modifyOrderDTO
 	 * @return CarDetailReqVO
 	 */
-	public GoodsService.CarDetailReqVO convertToCarDetailReqVO(ModifyOrderDTO modifyOrderDTO, RenterOrderEntity renterOrderEntity) {
+	public CarProxyService.CarDetailReqVO convertToCarDetailReqVO(ModifyOrderDTO modifyOrderDTO, RenterOrderEntity renterOrderEntity) {
 		// 租客子订单号
 		String renterOrderNo = renterOrderEntity.getRenterOrderNo();
 		// 获取租客商品信息
 		RenterGoodsDetailDTO renterGoodsDetailDTO = commodityService.getRenterGoodsDetail(renterOrderNo, false);
-		GoodsService.CarDetailReqVO carDetailReqVO = new GoodsService.CarDetailReqVO(); 
+		CarProxyService.CarDetailReqVO carDetailReqVO = new CarProxyService.CarDetailReqVO();
 		if (renterGoodsDetailDTO.getCarAddrIndex() != null) {
 			carDetailReqVO.setAddrIndex(renterGoodsDetailDTO.getCarAddrIndex());
 		}
@@ -668,7 +686,7 @@ public class ModifyOrderService {
 		// 构建参数
 		RenterOrderCostReqDTO renterOrderCostReqDTO = renterOrderService.buildRenterOrderCostReqDTO(renterOrderReqVO);
 		// 获取费用补贴列表
-		List<RenterOrderSubsidyDetailDTO> subsidyList = getRenterSubsidyList(renterOrderCostReqDTO, modifyOrderDTO.getRenterSubsidyList(), initCostList, initSubsidyList);
+		List<RenterOrderSubsidyDetailDTO> subsidyList = getRenterSubsidyList(modifyOrderDTO, renterOrderCostReqDTO, modifyOrderDTO.getRenterSubsidyList(), initCostList, initSubsidyList);
 		renterOrderCostReqDTO.setSubsidyOutList(subsidyList);
 		// 获取计算好的费用信息
 		RenterOrderCostRespDTO renterOrderCostRespDTO = renterOrderCalCostService.getOrderCostAndDeailList(renterOrderCostReqDTO);
@@ -686,9 +704,19 @@ public class ModifyOrderService {
 	 * @param initSubsidyList
 	 * @return List<RenterOrderSubsidyDetailDTO>
 	 */
-	public List<RenterOrderSubsidyDetailDTO> getRenterSubsidyList(RenterOrderCostReqDTO renterOrderCostReqDTO, List<RenterOrderSubsidyDetailDTO> renterSubsidyList, List<RenterOrderCostDetailEntity> initCostList, List<RenterOrderSubsidyDetailEntity> initSubsidyList) {
+	public List<RenterOrderSubsidyDetailDTO> getRenterSubsidyList(ModifyOrderDTO modifyOrderDTO, RenterOrderCostReqDTO renterOrderCostReqDTO, List<RenterOrderSubsidyDetailDTO> renterSubsidyList, List<RenterOrderCostDetailEntity> initCostList, List<RenterOrderSubsidyDetailEntity> initSubsidyList) {
+		if (modifyOrderDTO == null) {
+			return null;
+		}
 		if (renterSubsidyList == null) {
 			renterSubsidyList = new ArrayList<RenterOrderSubsidyDetailDTO>();
+		}
+		// 订单状态
+		OrderStatusEntity orderStatusEntity = modifyOrderDTO.getOrderStatusEntity();
+		if (orderStatusEntity != null && orderStatusEntity.getStatus() != null && 
+				orderStatusEntity.getStatus() < OrderStatusEnum.TO_RETURN_CAR.getStatus()) {
+			// 订单开始前保险不计免赔退回
+			return renterSubsidyList;
 		}
 		Map<String,RenterOrderSubsidyDetailDTO> subMap = renterSubsidyList.stream().collect(Collectors.toMap(RenterOrderSubsidyDetailDTO::getSubsidyCostCode, sub -> {return sub;}));
 		if (subMap == null || subMap.get(RenterCashCodeEnum.INSURE_TOTAL_PRICES.getCashNo()) == null) {
@@ -1308,6 +1336,8 @@ public class ModifyOrderService {
 		if (modifyOrderDTO == null) {
 			return delivMap;
 		}
+		// 提前延后时间
+		CarRentTimeRangeResVO carRentTimeRangeResVO = modifyOrderDTO.getCarRentTimeRangeResVO();
 		OrderDeliveryDTO getDelivery = new OrderDeliveryDTO();
 		getDelivery.setRentTime(modifyOrderDTO.getRentTime());
 		getDelivery.setRevertTime(modifyOrderDTO.getRevertTime());
@@ -1317,6 +1347,9 @@ public class ModifyOrderService {
 		getDelivery.setOrderNo(modifyOrderDTO.getOrderNo());
 		getDelivery.setRenterOrderNo(modifyOrderDTO.getRenterOrderNo());
 		getDelivery.setType(SrvGetReturnEnum.SRV_GET_TYPE.getCode());
+		if (carRentTimeRangeResVO != null && carRentTimeRangeResVO.getGetMinutes() != null) {
+			getDelivery.setAheadOrDelayTime(carRentTimeRangeResVO.getGetMinutes());
+		}
 		delivMap.put(SrvGetReturnEnum.SRV_GET_TYPE.getCode(), getDelivery);
 		OrderDeliveryDTO returnDelivery = new OrderDeliveryDTO();
 		returnDelivery.setRentTime(modifyOrderDTO.getRentTime());
@@ -1327,6 +1360,9 @@ public class ModifyOrderService {
 		returnDelivery.setOrderNo(modifyOrderDTO.getOrderNo());
 		returnDelivery.setRenterOrderNo(modifyOrderDTO.getRenterOrderNo());
 		returnDelivery.setType(SrvGetReturnEnum.SRV_RETURN_TYPE.getCode());
+		if (carRentTimeRangeResVO != null && carRentTimeRangeResVO.getReturnMinutes() != null) {
+			returnDelivery.setAheadOrDelayTime(carRentTimeRangeResVO.getReturnMinutes());
+		}
 		delivMap.put(SrvGetReturnEnum.SRV_RETURN_TYPE.getCode(), returnDelivery);
 		return delivMap;
 	}

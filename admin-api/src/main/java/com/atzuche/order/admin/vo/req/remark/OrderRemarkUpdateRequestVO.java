@@ -3,18 +3,22 @@ package com.atzuche.order.admin.vo.req.remark;
 import com.autoyol.doc.annotation.AutoDocProperty;
 import lombok.Data;
 import lombok.ToString;
+import org.hibernate.validator.constraints.NotBlank;
 
 @Data
 @ToString
 public class OrderRemarkUpdateRequestVO {
 
     @AutoDocProperty(value = "备注id")
+    @NotBlank(message = "备注id不能为空")
     private String remarkId;
 
     @AutoDocProperty(value = "操作人部门id")
+    @NotBlank(message = "操作人部门id不能为空")
     private String departmentId;
 
     @AutoDocProperty(value = "备注类型 1:理赔备注,2:限制租客延时备注,3:违章备注,4:违章处理备注,5:交易备注,6:呼叫中心备注,7:跟进备注,8:运营清算备注,9:电销中心备注,10:商品运营备注,11:风控备注")
+    @NotBlank(message = "备注类型不能为空")
     private String remarkType;
 
     @AutoDocProperty(value = "备注内容")

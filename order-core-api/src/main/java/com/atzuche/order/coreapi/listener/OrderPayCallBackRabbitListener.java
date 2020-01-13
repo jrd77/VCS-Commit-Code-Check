@@ -36,8 +36,8 @@ public class OrderPayCallBackRabbitListener {
      * MQ 异步回调
      */
     @RabbitListener(bindings = {
-            @QueueBinding(value = @Queue(value = "auto-pay-queue-order", durable = "true"), exchange = @Exchange(value = "auto-pay", durable = "true", type = "topic"), key = "pay.success.20")})
-    public void consumeMessage22(Message message) {
+            @QueueBinding(value = @Queue(value = "pay.success.20", durable = "true"), exchange = @Exchange(value = "auto-pay", durable = "true", type = "topic"), key = "pay.success.20")})
+    public void payCallBack(Message message) {
         log.info("OrderPayCallBack payCallBack start param;[{}]", message);
         Transaction t = Cat.getProducer().newTransaction(CatConstants.RABBIT_MQ_CALL, "支付系统rabbitMQ异步回调payCallBack");
 
@@ -49,7 +49,7 @@ public class OrderPayCallBackRabbitListener {
             BatchNotifyDataVo batchNotifyDataVo = GsonUtils.convertObj(orderPayAsynStr, BatchNotifyDataVo.class);
             String reqContent = FasterJsonUtil.toJson(batchNotifyDataVo);
             String md5 =  MD5.MD5Encode(reqContent);
-//            rabbitMsgLogService.insertRabbitMsgLog(message, RabbitBusinessTypeEnum.ORDER_PAY_CALL_BACK,orderPayAsynStr,md5);
+            rabbitMsgLogService.insertRabbitMsgLog(message, RabbitBusinessTypeEnum.ORDER_PAY_CALL_BACK,orderPayAsynStr,md5);
             cashierPayService.payCallBack(batchNotifyDataVo,payCallbackService);
             t.setStatus(Transaction.SUCCESS);
         } catch (Exception e) {

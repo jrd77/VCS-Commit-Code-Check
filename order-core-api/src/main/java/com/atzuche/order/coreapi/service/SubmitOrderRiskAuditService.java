@@ -2,8 +2,10 @@ package com.atzuche.order.coreapi.service;
 
 import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.CatConstants;
+import com.atzuche.order.commons.LocalDateTimeUtils;
 import com.atzuche.order.coreapi.entity.vo.req.SubmitOrderRiskCheckReqVO;
 import com.atzuche.order.coreapi.submitOrder.exception.SubmitOrderException;
+import com.atzuche.order.coreapi.utils.BizAreaUtil;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.riskCheckService.api.RiskCheckServiceFeignService;
@@ -76,9 +78,36 @@ public class SubmitOrderRiskAuditService {
 
 
     private CreateOrderRiskCheckRequestVO buildCreateOrderRiskCheckRequestVO(SubmitOrderRiskCheckReqVO submitOrderRiskCheckReqVO) {
+        CreateOrderRiskCheckRequestVO createOrderRiskCheckRequestVO = new CreateOrderRiskCheckRequestVO();
+        createOrderRiskCheckRequestVO.setMemNoRenter(Integer.valueOf(submitOrderRiskCheckReqVO.getMemNo()));
+        createOrderRiskCheckRequestVO.setReqOrderTime(submitOrderRiskCheckReqVO.getReqTime());
+        createOrderRiskCheckRequestVO.setOrderInsideType(submitOrderRiskCheckReqVO.getOrderCategory());
+        createOrderRiskCheckRequestVO.setOrderBusinessParentType(submitOrderRiskCheckReqVO.getBusinessParentType());
+        createOrderRiskCheckRequestVO.setOrderBusinessChildType(submitOrderRiskCheckReqVO.getBusinessChildType());
+        createOrderRiskCheckRequestVO.setOrderPlatformParentType(submitOrderRiskCheckReqVO.getPlatformParentType());
+        createOrderRiskCheckRequestVO.setOrderPlatformChildType(submitOrderRiskCheckReqVO.getPlatformChildType());
+        createOrderRiskCheckRequestVO.setMemClientIp(submitOrderRiskCheckReqVO.getSrcIp());
+        createOrderRiskCheckRequestVO.setCarNo(Integer.valueOf(submitOrderRiskCheckReqVO.getCarNo()));
+        createOrderRiskCheckRequestVO.setCarOwnerType(submitOrderRiskCheckReqVO.getCarOwnerType());
+        createOrderRiskCheckRequestVO.setRentTime(LocalDateTimeUtils.localDateTimeToDate(submitOrderRiskCheckReqVO.getRentTime()));
+        createOrderRiskCheckRequestVO.setRevertTime(LocalDateTimeUtils.localDateTimeToDate(submitOrderRiskCheckReqVO.getRevertTime()));
+        createOrderRiskCheckRequestVO.setGetFlag(submitOrderRiskCheckReqVO.getSrvGetFlag());
+        createOrderRiskCheckRequestVO.setReturnFlag(submitOrderRiskCheckReqVO.getSrvReturnFlag());
+        createOrderRiskCheckRequestVO.setRenterGetAddr(submitOrderRiskCheckReqVO.getSrvGetAddr());
+        createOrderRiskCheckRequestVO.setRenterGetAddrLat(submitOrderRiskCheckReqVO.getSrvGetLat());
+        createOrderRiskCheckRequestVO.setRenterGetAddrLon(submitOrderRiskCheckReqVO.getSrvGetLon());
+        createOrderRiskCheckRequestVO.setRenterReturnAddr(submitOrderRiskCheckReqVO.getSrvReturnAddr());
+        createOrderRiskCheckRequestVO.setRenterReturnAddrLat(submitOrderRiskCheckReqVO.getSrvReturnLat());
+        createOrderRiskCheckRequestVO.setRenterReturnAddrLon(submitOrderRiskCheckReqVO.getSrvReturnLon());
 
+        createOrderRiskCheckRequestVO.setRenterGpsAddr(BizAreaUtil.getReqAddrFromLonLat(submitOrderRiskCheckReqVO.getPublicLatitude(), submitOrderRiskCheckReqVO.getPublicLongitude()));
+        createOrderRiskCheckRequestVO.setRenterGpsAddrLat(submitOrderRiskCheckReqVO.getPublicLatitude());
+        createOrderRiskCheckRequestVO.setRenterGpsAddrLon(submitOrderRiskCheckReqVO.getPublicLongitude());
 
-        return null;
+        createOrderRiskCheckRequestVO.setUseCarCityCode(submitOrderRiskCheckReqVO.getCityCode());
+        createOrderRiskCheckRequestVO.setUseCarCityName(submitOrderRiskCheckReqVO.getCityName());
+
+        return createOrderRiskCheckRequestVO;
     }
 
 }

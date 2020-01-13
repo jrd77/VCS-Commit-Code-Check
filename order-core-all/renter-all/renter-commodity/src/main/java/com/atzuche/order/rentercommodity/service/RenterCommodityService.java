@@ -78,12 +78,22 @@ public class RenterCommodityService {
         }
 
         RenterGoodsPriceDetailEntity dbPriceMaxCarDay = dbGoodsPriceList.get(dbGoodsPriceList.size() - 1);//最后一条
+        List<RenterGoodsPriceDetailDTO> newRenterGoodsPriceList = new ArrayList<>();
         if(oldRentTime.isEqual(rentTime) && revertTime.isEqual(dbPriceMaxCarDay.getRevertTime())){
+            dbGoodsPriceList.stream().forEach(y->{
+                RenterGoodsPriceDetailDTO renterGoods = new RenterGoodsPriceDetailDTO();
+                renterGoods.setCarHourCount(y.getCarHourCount());
+                renterGoods.setCarDay(y.getCarDay());
+                renterGoods.setCarUnitPrice(y.getCarUnitPrice());
+                renterGoods.setRevertTime(y.getRevertTime());
+                newRenterGoodsPriceList.add(renterGoods);
+            });
+            renterGoodsDetailDTO.setRenterGoodsPriceDetailDTOList(newRenterGoodsPriceList);
             return;
         }
         List<RenterGoodsPriceDetailDTO> renterGoodsPriceDetailDTOList = renterGoodsDetailDTO.getRenterGoodsPriceDetailDTOList();
 
-        List<RenterGoodsPriceDetailDTO> newRenterGoodsPriceList = new ArrayList<>();
+
         if(dbPriceMaxCarDay.getRevertTime().isBefore(revertTime)){//时间延后
             //过滤出revert_time时间最大的一个分组，比数据库中revert_time大的数据用新的，比据库中revert_time小的数据用数据库的，库中的最后一条数据特殊处理
             //使用carday分组

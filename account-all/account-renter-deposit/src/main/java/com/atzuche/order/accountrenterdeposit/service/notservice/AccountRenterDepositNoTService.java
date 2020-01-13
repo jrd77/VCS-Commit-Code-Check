@@ -8,10 +8,12 @@ import com.atzuche.order.accountrenterdeposit.vo.req.CreateOrderRenterDepositReq
 import com.atzuche.order.accountrenterdeposit.vo.req.DetainRenterDepositReqVO;
 import com.atzuche.order.accountrenterdeposit.vo.req.PayedOrderRenterDepositReqVO;
 import com.atzuche.order.accountrenterdeposit.vo.res.AccountRenterDepositResVO;
+import com.atzuche.order.commons.enums.account.SettleStatusEnum;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 /**
@@ -61,12 +63,6 @@ public class AccountRenterDepositNoTService {
      */
     public void updateRenterDeposit(PayedOrderRenterDepositReqVO payedOrderRenterDeposit) {
         AccountRenterDepositEntity accountRenterDepositEntity = accountRenterDepositMapper.selectByOrderAndMemNo(payedOrderRenterDeposit.getOrderNo(),payedOrderRenterDeposit.getMemNo());
-        if(Objects.isNull(accountRenterDepositEntity)){
-            throw new PayOrderRenterDepositDBException();
-        }
-        if("00".equals(accountRenterDepositEntity.getPayStatus())){
-            return;
-        }
         BeanUtils.copyProperties(payedOrderRenterDeposit,accountRenterDepositEntity);
         int result = accountRenterDepositMapper.updateByPrimaryKeySelective(accountRenterDepositEntity);
         if(result==0){
@@ -106,6 +102,27 @@ public class AccountRenterDepositNoTService {
         }
         int result =  accountRenterDepositMapper.updateByPrimaryKeySelective(accountRenterDeposit);
         if(result==0){
+            throw new PayOrderRenterDepositDBException();
+        }
+    }
+
+    /**
+     * 更新押金结算状态
+     * @param memNo
+     * @param orderNo
+     */
+    public void updateOrderDepositSettle(String memNo, String orderNo) {
+        AccountRenterDepositEntity accountRenterDepositEntity = accountRenterDepositMapper.selectByOrderAndMemNo(orderNo,memNo);
+        if(Objects.isNull(accountRenterDepositEntity)){
+            throw new PayOrderRenterDepositDBException();
+        }
+        AccountRenterDepositEntity entity = new AccountRenterDepositEntity();
+        entity.setId(accountRenterDepositEntity.getId());
+        entity.setVersion(accountRenterDepositEntity.getVersion());
+        entity.setSettleStatus(SettleStatusEnum.SETTLED.getCode());
+        entity.setSettleTime(LocalDateTime.now());
+        int result = accountRenterDepositMapper.updateByPrimaryKeySelective(entity);
+        if(result == 0){
             throw new PayOrderRenterDepositDBException();
         }
     }

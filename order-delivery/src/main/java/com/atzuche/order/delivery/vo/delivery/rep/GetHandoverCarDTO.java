@@ -18,9 +18,9 @@ public class GetHandoverCarDTO {
     public String ownRealReturnAddr;
     @AutoDocProperty("车主实际取车地址备注")
     public String ownRealGetRemark;
-    @AutoDocProperty("租客实际送车地址")
+    @AutoDocProperty("租客实际送车地址?应该是取车")
     public String renterRealGetAddr;
-    @AutoDocProperty("租客实际送车地址备注")
+    @AutoDocProperty("租客实际送车地址备注?应该是取车")
     public String renterRealGetAddrReamrk;
     @AutoDocProperty("预计提前取车时间")
     public String rentTime;

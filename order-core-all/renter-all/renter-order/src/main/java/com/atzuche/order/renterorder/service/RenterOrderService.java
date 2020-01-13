@@ -93,6 +93,16 @@ public class RenterOrderService {
     public Integer updateRenterOrderEffective(Integer id, Integer effectiveFlag) {
         return renterOrderMapper.updateRenterOrderEffective(id, effectiveFlag);
     }
+    
+    /**
+     * 修改租客子单agreeFlag标志
+     * @param id
+     * @param agreeFlag
+     * @return Integer
+     */
+    public Integer updateRenterOrderAgreeFlag(Integer id, Integer agreeFlag) {
+    	return renterOrderMapper.updateRenterOrderAgreeFlag(id, agreeFlag);
+    }
 
     /**
      * 保存租客子订单
@@ -189,6 +199,7 @@ public class RenterOrderService {
         record.setIsAbatement(renterOrderReqVO.getAbatement()==null?0:Integer.valueOf(renterOrderReqVO.getAbatement()));
         record.setIsUseSpecialPrice(Integer.valueOf(renterOrderReqVO.getUseSpecialPrice()==null?"0":renterOrderReqVO.getUseSpecialPrice()));
         record.setChildStatus(RenterChildStatusEnum.PROCESS_ING.getCode());
+        record.setRenterMemNo(renterOrderReqVO.getMemNo());
         renterOrderMapper.insertSelective(record);
         //保存租客订单费用、费用明细、补贴明细等
         renterOrderCostRespDTO.setRenterOrderSubsidyDetailDTOList(context.getOrderSubsidyDetailList());
@@ -291,6 +302,10 @@ public class RenterOrderService {
         GetReturnCarOverCostReqDto getReturnCarOverCostReqDto = new GetReturnCarOverCostReqDto();
         getReturnCarOverCostReqDto.setCostBaseDTO(costBaseDTO);
         getReturnCarOverCostReqDto.setCityCode(Integer.valueOf(renterOrderReqVO.getCityCode()));
+        getReturnCarOverCostReqDto.setIsGetCarCost(null != renterOrderReqVO.getSrvGetFlag() && StringUtils.equals("1",
+                renterOrderReqVO.getSrvGetFlag().toString()));
+        getReturnCarOverCostReqDto.setIsReturnCarCost(null != renterOrderReqVO.getSrvReturnFlag() && StringUtils.equals("1",
+                renterOrderReqVO.getSrvReturnFlag().toString()));
         if (StringUtils.isNotBlank(renterOrderReqVO.getOrderCategory())) {
         	getReturnCarOverCostReqDto.setOrderType(Integer.valueOf(renterOrderReqVO.getOrderCategory()));
         }
@@ -321,7 +336,7 @@ public class RenterOrderService {
                                                                  RenterOrderReqVO renterOrderReqVO) {
 
         MemAvailCouponRequestVO memAvailCouponRequestVO = new MemAvailCouponRequestVO();
-
+        memAvailCouponRequestVO.setOrderNo(renterOrderReqVO.getOrderNo());
         memAvailCouponRequestVO.setMemNo(Integer.valueOf(renterOrderReqVO.getMemNo()));
         memAvailCouponRequestVO.setCarNo(Integer.valueOf(renterOrderReqVO.getCarNo()));
         memAvailCouponRequestVO.setCityCode(Integer.valueOf(renterOrderReqVO.getCityCode()));
@@ -416,6 +431,7 @@ public class RenterOrderService {
         ownerCouponGetAndValidReqVO.setCouponNo(renterOrderReqVO.getCarOwnerCouponNo());
         ownerCouponGetAndValidReqVO.setRentAmt(rentAmt);
         ownerCouponGetAndValidReqVO.setMark(1);
+        ownerCouponGetAndValidReqVO.setOrderNo(renterOrderReqVO.getOrderNo());
         return ownerCouponGetAndValidReqVO;
     }
 
@@ -469,5 +485,15 @@ public class RenterOrderService {
     public int updateRenterOrderInfo(RenterOrderEntity renterOrderEntity) {
         return renterOrderMapper.updateByPrimaryKeySelective(renterOrderEntity);
     }
+    /*
+     * @Author ZhangBin
+     * @Date 2020/1/10 16:05
+     * @Description: 获取待生效的租客子订单
+     *
+     **/
+    public RenterOrderEntity getChangeRenterOrderByOrderNo(String orderNo) {
+        return renterOrderMapper.getChangeRenterOrderByOrderNo(orderNo);
+    }
+
 
 }

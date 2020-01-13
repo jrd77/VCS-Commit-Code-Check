@@ -30,14 +30,12 @@ import com.autoyol.coupon.api.CouponSettleRequest;
 import com.autoyol.coupon.api.CouponSettleResponse;
 import com.autoyol.coupon.api.MemAvailCoupon;
 import com.autoyol.coupon.api.MemAvailCouponRequest;
-import com.autoyol.coupon.api.MemAvailCouponResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.cglib.beans.BeanCopier;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
@@ -316,23 +314,19 @@ public class RenterOrderCalCostService {
             return null;
         }
         MemAvailCouponRequest request = buildMemAvailCouponRequest(memAvailCouponRequestVO);
-        MemAvailCouponResponse response = platformCouponService.findAvailMemGetAndReturnSrvCoupons(request);
-        if (null != response && !CollectionUtils.isEmpty(response.getAvailCoupons())) {
-            Map<String, MemAvailCoupon> availCouponMap = response.getAvailCoupons().stream()
-                    .collect(Collectors.toMap(MemAvailCoupon::getId, memAvailCoupon -> memAvailCoupon));
-            MemAvailCoupon memAvailCoupon = availCouponMap.get(memAvailCouponRequestVO.getDisCouponId());
-
-            if (null != memAvailCoupon) {
-                OrderCouponDTO getCarFeeDiscoupon = new OrderCouponDTO();
-                getCarFeeDiscoupon.setCouponId(memAvailCouponRequestVO.getDisCouponId());
-                getCarFeeDiscoupon.setCouponName(memAvailCoupon.getDisName());
-                getCarFeeDiscoupon.setCouponDesc(memAvailCoupon.getDescription());
-                getCarFeeDiscoupon.setAmount(null == memAvailCoupon.getRealCouponOffset() ? 0 : memAvailCoupon.getRealCouponOffset());
-                getCarFeeDiscoupon.setCouponType(CouponTypeEnum.ORDER_COUPON_TYPE_GET_RETURN_SRV.getCode());
-                //绑定后变更为已使用
-                getCarFeeDiscoupon.setStatus(getCarFeeDiscoupon.getAmount() > 0 ? OrderConstant.YES : OrderConstant.NO);
-                return getCarFeeDiscoupon;
-            }
+        MemAvailCoupon response =
+                platformCouponService.checkAndUseCouponAailable(memAvailCouponRequestVO.getOrderNo(),
+                        memAvailCouponRequestVO.getDisCouponId(),request);
+        if (null != response) {
+            OrderCouponDTO getCarFeeDiscoupon = new OrderCouponDTO();
+            getCarFeeDiscoupon.setCouponId(memAvailCouponRequestVO.getDisCouponId());
+            getCarFeeDiscoupon.setCouponName(response.getDisName());
+            getCarFeeDiscoupon.setCouponDesc(response.getDescription());
+            getCarFeeDiscoupon.setAmount(null == response.getRealCouponOffset() ? 0 : response.getRealCouponOffset());
+            getCarFeeDiscoupon.setCouponType(CouponTypeEnum.ORDER_COUPON_TYPE_GET_RETURN_SRV.getCode());
+            //绑定后变更为已使用
+            getCarFeeDiscoupon.setStatus(getCarFeeDiscoupon.getAmount() > 0 ? OrderConstant.YES : OrderConstant.NO);
+            return getCarFeeDiscoupon;
 
         }
 
@@ -355,26 +349,20 @@ public class RenterOrderCalCostService {
             return null;
         }
         MemAvailCouponRequest request = buildMemAvailCouponRequest(memAvailCouponRequestVO);
-        MemAvailCouponResponse response = platformCouponService.findAvailMemCoupons(request);
-        if (null != response && !CollectionUtils.isEmpty(response.getAvailCoupons())) {
-            Map<String, MemAvailCoupon> availCouponMap = response.getAvailCoupons().stream()
-                    .collect(Collectors.toMap(MemAvailCoupon::getId, memAvailCoupon -> memAvailCoupon));
-            MemAvailCoupon memAvailCoupon = availCouponMap.get(memAvailCouponRequestVO.getDisCouponId());
-
-            if (null != memAvailCoupon) {
-                OrderCouponDTO getCarFeeDiscoupon = new OrderCouponDTO();
-                getCarFeeDiscoupon.setCouponId(memAvailCouponRequestVO.getDisCouponId());
-                getCarFeeDiscoupon.setCouponName(memAvailCoupon.getDisName());
-                getCarFeeDiscoupon.setCouponDesc(memAvailCoupon.getDescription());
-                getCarFeeDiscoupon.setAmount(null == memAvailCoupon.getRealCouponOffset() ? 0 : memAvailCoupon.getRealCouponOffset());
-                getCarFeeDiscoupon.setCouponType(CouponTypeEnum.ORDER_COUPON_TYPE_PLATFORM.getCode());
-                //绑定后变更为已使用
-                getCarFeeDiscoupon.setStatus(getCarFeeDiscoupon.getAmount() > 0 ? OrderConstant.YES : OrderConstant.NO);
-                return getCarFeeDiscoupon;
-            }
-
+        MemAvailCoupon response =
+                platformCouponService.checkAndUseCouponAailable(memAvailCouponRequestVO.getOrderNo(),
+                        memAvailCouponRequestVO.getDisCouponId(),request);
+        if (null != response ) {
+            OrderCouponDTO getCarFeeDiscoupon = new OrderCouponDTO();
+            getCarFeeDiscoupon.setCouponId(memAvailCouponRequestVO.getDisCouponId());
+            getCarFeeDiscoupon.setCouponName(response.getDisName());
+            getCarFeeDiscoupon.setCouponDesc(response.getDescription());
+            getCarFeeDiscoupon.setAmount(null == response.getRealCouponOffset() ? 0 : response.getRealCouponOffset());
+            getCarFeeDiscoupon.setCouponType(CouponTypeEnum.ORDER_COUPON_TYPE_PLATFORM.getCode());
+            //绑定后变更为已使用
+            getCarFeeDiscoupon.setStatus(getCarFeeDiscoupon.getAmount() > 0 ? OrderConstant.YES : OrderConstant.NO);
+            return getCarFeeDiscoupon;
         }
-
         return null;
     }
     

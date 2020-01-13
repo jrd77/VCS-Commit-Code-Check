@@ -48,11 +48,11 @@ public class RenterWzService {
 
     private static final String WZ_OTHER_FINE_REMARK = "其他扣款备注";
     private static final String WZ_OTHER_FINE = "其他扣款";
-    private static final String WZ_OTHER_FINE_CODE = "qiTaFei";
+    private static final String WZ_OTHER_FINE_CODE = "100044";
 
     private static final String INSURANCE_CLAIM_REMARK = "保险理赔备注";
     private static final String INSURANCE_CLAIM = "保险理赔";
-    private static final String INSURANCE_CLAIM_CODE = "baoXianLiPei";
+    private static final String INSURANCE_CLAIM_CODE = "100045";
 
     private static final String REMARK = "remark";
     private static final String AMOUNT = "amount";
@@ -61,34 +61,29 @@ public class RenterWzService {
 
     private static final String RADIX_POINT = ".";
 
+    private static final List<String> COST_CODE_LIST = Arrays.asList("100040","100042","100041","100043","100044","100045");
+
 
     public void updateWzCost(String orderNo, List<RenterWzCostDetailReqVO> costDetails) {
+        //TODO 查询订单是否结算
         //只会处理其他扣款 和 保险理赔
         for (RenterWzCostDetailReqVO costDetail : costDetails) {
             if(!WZ_OTHER_FINE_CODE.equals(costDetail.getCostCode()) && !INSURANCE_CLAIM_CODE.equals(costDetail.getCostCode())){
                 continue;
             }
-            RenterOrderWzCostDetailEntity fromDb = new RenterOrderWzCostDetailEntity();
-            if(WZ_OTHER_FINE_CODE.equals(costDetail.getCostCode())){
-                fromDb = renterOrderWzCostDetailService.queryInfoByOrderAndCode(orderNo, costDetail.getCostCode());
-            }
-            if(INSURANCE_CLAIM_CODE.equals(costDetail.getCostCode())){
-                //TODO 还缺海豹的接口
-            }
+            RenterOrderWzCostDetailEntity fromDb = renterOrderWzCostDetailService.queryInfoByOrderAndCode(orderNo, costDetail.getCostCode());
             try {
                 RenterOrderWzCostDetailEntity fromApp = new RenterOrderWzCostDetailEntity();
                 BeanUtils.copyProperties(costDetail,fromApp);
+                if(StringUtils.isNotBlank(costDetail.getAmount())){
+                    fromApp.setAmount(Integer.parseInt(costDetail.getAmount()));
+                }
                 Map<String,String> paramNames = this.getParamNamesByCode(costDetail.getCostCode());
                 CompareHelper<RenterOrderWzCostDetailEntity> compareHelper = new CompareHelper<>(fromDb,fromApp,paramNames);
                 String content = compareHelper.compare();
                 if(StringUtils.isNotBlank(content)){
                     //记录日志 并且做修改费用处理
-                    if(WZ_OTHER_FINE_CODE.equals(costDetail.getCostCode())){
-                        updateCostStatus(orderNo, costDetail, fromDb);
-                    }
-                    if(INSURANCE_CLAIM_CODE.equals(costDetail.getCostCode())){
-                        //TODO 还缺海豹的接口
-                    }
+                    updateCostStatus(orderNo, costDetail, fromDb);
                     saveWzCostLog(orderNo, costDetail, content);
                 }
             } catch (Exception e) {
@@ -113,12 +108,13 @@ public class RenterWzService {
         //先将之前的置为无效
         renterOrderWzCostDetailService.updateCostStatusByOrderNoAndCarNumAndMemNoAndCostCode(orderNo,carNum,memNo,1,costDetail.getCostCode());
         //再新添加
-        RenterOrderWzCostDetailEntity entityByType = getEntityByType(costDetail.getCostCode(), orderNo, costDetail.getAmount(), carNum, memNo);
+        RenterOrderWzCostDetailEntity entityByType = getEntityByType(costDetail.getCostCode(), orderNo, costDetail.getAmount(), carNum, memNo,costDetail.getRemark());
         renterOrderWzCostDetailService.saveRenterOrderWzCostDetail(entityByType);
     }
 
-    private RenterOrderWzCostDetailEntity getEntityByType(String code,String orderNo,String amount,String carNum, Integer memNo){
+    private RenterOrderWzCostDetailEntity getEntityByType(String code, String orderNo, String amount, String carNum, Integer memNo, String remark){
         String authName = AdminUserUtil.getAdminUser().getAuthName();
+        String authId = AdminUserUtil.getAdminUser().getAuthId();
         RenterOrderWzCostDetailEntity entity = new RenterOrderWzCostDetailEntity();
         entity.setOrderNo(orderNo);
         entity.setCarPlateNum(carNum);
@@ -133,7 +129,9 @@ public class RenterWzService {
         entity.setCreateTime(new Date());
         entity.setSourceType(SOURCE_TYPE_CONSOLE);
         entity.setOperatorName(authName);
+        entity.setOperatorId(authId);
         entity.setCreateOp(authName);
+        entity.setRemark(remark);
         return entity;
     }
 
@@ -180,7 +178,7 @@ public class RenterWzService {
         return wzCostLogsResVO;
     }
 
-    public List<TemporaryRefundLogResVO> queryTemporaryRefundLogsByOrderNo(String orderNo) {
+    private List<TemporaryRefundLogResVO> queryTemporaryRefundLogsByOrderNo(String orderNo) {
         List<WzTemporaryRefundLogEntity> wzTemporaryRefundLogEntities = wzTemporaryRefundLogService.queryTemporaryRefundLogsByOrderNo(orderNo);
         List<TemporaryRefundLogResVO> wzCostLogs = new ArrayList<>();
         TemporaryRefundLogResVO vo;
@@ -225,8 +223,8 @@ public class RenterWzService {
         rs.setCostDetails(costDetails);
 
         //暂扣日志
-        List<TemporaryRefundLogResVO> temporaryRefundLogResVOS = this.queryTemporaryRefundLogsByOrderNo(orderNo);
-        rs.setTemporaryRefundLogs(temporaryRefundLogResVOS);
+        List<TemporaryRefundLogResVO> temporaryRefundLogResVos = this.queryTemporaryRefundLogsByOrderNo(orderNo);
+        rs.setTemporaryRefundLogs(temporaryRefundLogResVos);
         //TODO 还缺海豹的接口
 
         RenterWzWithholdResVO withhold = new RenterWzWithholdResVO();
@@ -238,7 +236,18 @@ public class RenterWzService {
     }
 
     private List<RenterWzCostDetailResVO> getRenterWzCostDetailRes(String orderNo) {
-        List<RenterOrderWzCostDetailEntity> results = renterOrderWzCostDetailService.queryInfosByOrderNo(orderNo);
+        List<RenterOrderWzCostDetailEntity> results = new ArrayList<>();
+        for (String costCode : COST_CODE_LIST) {
+            RenterOrderWzCostDetailEntity dto = renterOrderWzCostDetailService.queryInfoWithSumAmountByOrderAndCode(orderNo,costCode);
+            if(dto == null){
+                dto = new RenterOrderWzCostDetailEntity();
+                dto.setAmount(0);
+                dto.setCostCode(costCode);
+                dto.setCostDesc(WzCostEnums.getDesc(costCode));
+                dto.setOrderNo(orderNo);
+            }
+            results.add(dto);
+        }
         List<RenterWzCostDetailResVO> costDetails = new ArrayList<>();
         RenterWzCostDetailResVO dto;
         for (RenterOrderWzCostDetailEntity costDetail : results) {

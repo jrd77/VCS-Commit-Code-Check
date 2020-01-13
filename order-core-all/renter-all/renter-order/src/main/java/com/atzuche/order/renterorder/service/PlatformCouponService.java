@@ -2,11 +2,7 @@ package com.atzuche.order.renterorder.service;
 
 import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.CatConstants;
-import com.autoyol.coupon.api.CouponServiceApi;
-import com.autoyol.coupon.api.CouponSettleRequest;
-import com.autoyol.coupon.api.CouponSettleResponse;
-import com.autoyol.coupon.api.MemAvailCouponRequest;
-import com.autoyol.coupon.api.MemAvailCouponResponse;
+import com.autoyol.coupon.api.*;
 import com.dianping.cat.Cat;
 import com.dianping.cat.message.Transaction;
 import org.slf4j.Logger;
@@ -254,6 +250,38 @@ public class PlatformCouponService {
             Cat.logEvent(CatConstants.FEIGN_RESULT, JSON.toJSONString(memCouponResponse));
             t.setStatus(Transaction.SUCCESS);
             return memCouponResponse;
+        } catch (Exception e) {
+            logger.error("获取会员平台优惠券抵扣信息异常.request:[{}]", request, e);
+            t.setStatus(e);
+            Cat.logError("获取会员平台优惠券抵扣信息异常.", e);
+        } finally {
+            t.complete();
+        }
+        return null;
+    }
+
+
+    /**
+     * 校验并使用优惠券(平台券+取送服务券)
+     *
+     * @param orderNo  订单号
+     * @param couponNo 优惠券码
+     * @param request  请求参数
+     * @return MemAvailCoupon 优惠券信息
+     */
+    public MemAvailCoupon checkAndUseCouponAailable(String orderNo, String couponNo, MemAvailCouponRequest request) {
+        logger.info("校验并使用优惠券(平台券+取送服务券).orderNo:[{}],couponNo:[{}],request:[{}]", orderNo, couponNo,
+                JSON.toJSONString(request));
+        Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "youhuiqia");
+        try {
+            Cat.logEvent(CatConstants.FEIGN_METHOD, "CouponServiceApi.checkCouponAvailable");
+            Cat.logEvent(CatConstants.FEIGN_PARAM, JSON.toJSONString(request));
+            MemAvailCoupon memAvailCoupon = couponServiceApi.checkAndUseCouponAailable(request, Long.valueOf(orderNo),
+                    couponNo);
+            logger.info("校验并使用优惠券(平台券+取送服务券).memAvailCoupon:[{}]", JSON.toJSONString(memAvailCoupon));
+            Cat.logEvent(CatConstants.FEIGN_RESULT, JSON.toJSONString(memAvailCoupon));
+            t.setStatus(Transaction.SUCCESS);
+            return memAvailCoupon;
         } catch (Exception e) {
             logger.error("获取会员平台优惠券抵扣信息异常.request:[{}]", request, e);
             t.setStatus(e);

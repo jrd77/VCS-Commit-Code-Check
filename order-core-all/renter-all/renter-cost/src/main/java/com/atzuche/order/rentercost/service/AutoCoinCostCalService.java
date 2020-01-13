@@ -35,9 +35,8 @@ public class AutoCoinCostCalService {
             return null;
         }
 
-        int pointValue = crmCustPoint.getPointValue();
         //会员凹凸币金额(1:100),默认全部抵扣
-        int pointValueDeducExchange = pointValue / 100;
+        int pointValueDeducExchange = crmCustPoint.getPointValue();
         //原始租金的5%
         int rentAmtFivePercent = originalRentAmt * OrderConstant.AUTO_COIN_DEDUCT_RATIO / 100;
         if (rentAmtFivePercent <= pointValueDeducExchange) {
@@ -59,7 +58,7 @@ public class AutoCoinCostCalService {
             renterOrderSubsidyDetailDTO.setSubsidySourceName(SubsidySourceCodeEnum.PLATFORM.getDesc());
 
             renterOrderSubsidyDetailDTO.setSubsidyTargetCode(SubsidySourceCodeEnum.RENTER.getCode());
-            renterOrderSubsidyDetailDTO.setSubsidyTypeName(SubsidySourceCodeEnum.RENTER.getDesc());
+            renterOrderSubsidyDetailDTO.setSubsidyTargetName(SubsidySourceCodeEnum.RENTER.getDesc());
             renterOrderSubsidyDetailDTO.setSubsidyCostCode(RenterCashCodeEnum.AUTO_COIN_DEDUCT.getCashNo());
             renterOrderSubsidyDetailDTO.setSubsidyCostName(RenterCashCodeEnum.AUTO_COIN_DEDUCT.getTxt());
             renterOrderSubsidyDetailDTO.setSubsidyDesc("使用凹凸币抵扣租金");

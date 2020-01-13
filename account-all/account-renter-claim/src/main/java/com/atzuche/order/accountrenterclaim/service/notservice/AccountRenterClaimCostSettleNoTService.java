@@ -26,6 +26,16 @@ public class AccountRenterClaimCostSettleNoTService {
     /**
      * 查询租客订单理赔费用总额
      * @param orderNo
+     * @return
+     */
+    public AccountRenterClaimCostSettleEntity getRenterClaimCost(String orderNo) {
+        AccountRenterClaimCostSettleEntity accountRenterClaimCostSettle = accountRenterClaimCostSettleMapper.getRenterClaimCost(orderNo);
+        return  accountRenterClaimCostSettle;
+    }
+
+    /**
+     * 查询租客订单理赔费用总额
+     * @param orderNo
      * @param memNo
      * @return
      */

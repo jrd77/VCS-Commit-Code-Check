@@ -1,5 +1,7 @@
 package com.atzuche.order.accountrenterdeposit.service;
 
+import com.atzuche.order.accountrenterdeposit.entity.AccountRenterDepositEntity;
+import com.atzuche.order.accountrenterdeposit.mapper.AccountRenterDepositMapper;
 import com.atzuche.order.accountrenterdeposit.service.notservice.AccountRenterDepositDetailNoTService;
 import com.atzuche.order.accountrenterdeposit.service.notservice.AccountRenterDepositNoTService;
 import com.atzuche.order.accountrenterdeposit.vo.req.CreateOrderRenterDepositReqVO;
@@ -7,7 +9,6 @@ import com.atzuche.order.accountrenterdeposit.vo.req.DetainRenterDepositReqVO;
 import com.atzuche.order.accountrenterdeposit.vo.req.PayedOrderRenterDepositReqVO;
 import com.atzuche.order.accountrenterdeposit.vo.res.AccountRenterDepositResVO;
 import com.atzuche.order.commons.enums.YesNoEnum;
-import com.autoyol.cat.CatAnnotation;
 import com.autoyol.commons.web.ErrorCode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,6 +28,21 @@ public class AccountRenterDepositService{
     private AccountRenterDepositDetailNoTService accountRenterDepositDetailNoTService;
     @Autowired
     private AccountRenterDepositNoTService accountRenterDepositNoTService;
+    @Autowired
+    public AccountRenterDepositMapper accountRenterDepositMapper;
+
+
+
+    /*
+     * @Author ZhangBin
+     * @Date 2020/1/11 16:25
+     * @Description: 根据订单号查询押金信息
+     *
+     **/
+    public AccountRenterDepositEntity selectByOrderNo(String orderNo){
+        return accountRenterDepositMapper.selectByOrderNo(orderNo);
+    }
+
     /**
      * 查询押金状态信息
      */
@@ -86,11 +102,10 @@ public class AccountRenterDepositService{
     /**
      * 支付成功后记录实付押金信息 和押金资金进出信息
      */
-    @CatAnnotation
     public void updateRenterDeposit(PayedOrderRenterDepositReqVO payedOrderRenterDeposit){
         //1 参数校验
         Assert.notNull(payedOrderRenterDeposit, ErrorCode.PARAMETER_ERROR.getText());
-        payedOrderRenterDeposit.check();
+        //payedOrderRenterDeposit.check();
         //2更新押金 实付信息
         accountRenterDepositNoTService.updateRenterDeposit(payedOrderRenterDeposit);
         //添加押金资金进出明细
@@ -114,5 +129,13 @@ public class AccountRenterDepositService{
 
     public void updateRenterDepositUniqueNo(String uniqueNo, int renterDepositDetailId) {
         accountRenterDepositDetailNoTService.updateRenterDepositUniqueNo(uniqueNo,renterDepositDetailId);
+    }
+
+    /**
+     * 车俩押金结算 状态更新
+     * @param detainRenterDepositReqVO
+     */
+    public void updateOrderDepositSettle(DetainRenterDepositReqVO detainRenterDepositReqVO) {
+        accountRenterDepositNoTService.updateOrderDepositSettle(detainRenterDepositReqVO.getMemNo(),detainRenterDepositReqVO.getOrderNo());
     }
 }

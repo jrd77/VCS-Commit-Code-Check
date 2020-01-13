@@ -218,4 +218,20 @@ public class HandoverCarService {
             }
         }
     }
+
+    /**
+     * 租客是否还车
+     * @param orderNo
+     * @return
+     */
+    public Boolean isReturnCar(String orderNo) {
+        RenterHandoverCarInfoEntity renterHandoverCarInfoEntity = renterHandoverCarService.selectObjectByOrderNo(orderNo, 4);
+        if (Objects.isNull(renterHandoverCarInfoEntity) || StringUtils.isBlank(renterHandoverCarInfoEntity.getMsgId())) {
+            return false;
+        }
+        return true;
+    }
+
+
+
 }

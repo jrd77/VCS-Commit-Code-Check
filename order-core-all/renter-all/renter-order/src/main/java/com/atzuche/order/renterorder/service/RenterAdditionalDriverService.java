@@ -1,15 +1,13 @@
 package com.atzuche.order.renterorder.service;
 
+import com.atzuche.order.commons.entity.dto.CommUseDriverInfoDTO;
 import com.atzuche.order.renterorder.entity.RenterAdditionalDriverEntity;
 import com.atzuche.order.renterorder.mapper.RenterAdditionalDriverMapper;
-import com.autoyol.member.detail.vo.res.CommUseDriverInfo;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cglib.beans.BeanCopier;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 
 /**
@@ -33,9 +31,9 @@ public class RenterAdditionalDriverService {
      * @param commUseDriverList 租客可用附加驾驶人列表
      */
     public void insertBatchAdditionalDriver(String orderNo, String renterOrderNo, List<String> driverIds,
-                                            List<CommUseDriverInfo> commUseDriverList) {
+                                            List<CommUseDriverInfoDTO> commUseDriverList) {
         if (!CollectionUtils.isEmpty(driverIds) && !CollectionUtils.isEmpty(commUseDriverList)) {
-            for (CommUseDriverInfo commUseDriverInfo : commUseDriverList) {
+            for (CommUseDriverInfoDTO commUseDriverInfo : commUseDriverList) {
                 if (null != commUseDriverInfo.getId() && driverIds.contains(commUseDriverInfo.getId().toString())) {
                     RenterAdditionalDriverEntity record = new RenterAdditionalDriverEntity();
                     record.setOrderNo(orderNo);
@@ -62,4 +60,14 @@ public class RenterAdditionalDriverService {
     public List<String> listDriverIdByRenterOrderNo(String renterOrderNo) {
     	return renterAdditionalDriverMapper.listDriverIdByRenterOrderNo(renterOrderNo);
     }
+    /**
+     * 获取租客已添加的附加驾驶人
+     * @param renterOrderNo 租客子单号
+     * @return
+     */
+    public List<RenterAdditionalDriverEntity> listDriversByRenterOrderNo(String renterOrderNo) {
+        return renterAdditionalDriverMapper.selectByRenterOrderNo(renterOrderNo);
+    }
+
+
 }

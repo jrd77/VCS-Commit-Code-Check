@@ -28,7 +28,7 @@ import java.util.List;
 @Component("illegalQueryTask")
 public class IllegalQueryTask extends IJobHandler {
 
-    private Logger logger = LoggerFactory.getLogger(IllegalInOrderQueryTask.class);
+    private Logger logger = LoggerFactory.getLogger(IllegalQueryTask.class);
 
     @Resource
     private OrderSearchRemoteService orderSearchRemoteService;

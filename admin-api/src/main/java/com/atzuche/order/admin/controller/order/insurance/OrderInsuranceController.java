@@ -2,14 +2,19 @@ package com.atzuche.order.admin.controller.order.insurance;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.atzuche.order.admin.cat.CatLogRecord;
 import com.atzuche.order.admin.common.AdminUserUtil;
+import com.atzuche.order.admin.constant.cat.UrlConstant;
+import com.atzuche.order.admin.constant.description.DescriptionConstant;
 import com.atzuche.order.admin.controller.BaseController;
-import com.atzuche.order.admin.dto.InsurancePurchaseDTO;
-import com.atzuche.order.admin.dto.InsurancePurchaseResultDTO;
-import com.atzuche.order.admin.dto.OrderInsuranceAdditionRequestDTO;
-import com.atzuche.order.admin.dto.OrderInsuranceImportRequestDTO;
-import com.atzuche.order.admin.enums.InsuranceCompanyTypeEnum;
-import com.atzuche.order.admin.enums.InsuranceInputTypeEnum;
+import com.atzuche.order.admin.description.LogDescription;
+import com.atzuche.order.admin.dto.insurance.InsurancePurchaseDTO;
+import com.atzuche.order.admin.dto.insurance.InsurancePurchaseResultDTO;
+import com.atzuche.order.admin.dto.insurance.OrderInsuranceAdditionRequestDTO;
+import com.atzuche.order.admin.dto.insurance.OrderInsuranceImportRequestDTO;
+import com.atzuche.order.admin.enums.insurance.InsuranceCompanyTypeEnum;
+import com.atzuche.order.admin.enums.insurance.InsuranceInputTypeEnum;
+import com.atzuche.order.admin.exception.insurance.OrderInsuranceException;
 import com.atzuche.order.admin.util.CommonUtils;
 import com.atzuche.order.admin.util.oss.OSSUtils;
 import com.atzuche.order.admin.vo.req.insurance.OrderInsuranceAdditionRequestVO;
@@ -37,8 +42,10 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.validation.Valid;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @RequestMapping("/console/order/insurance")
 @RestController
@@ -58,7 +65,6 @@ public class OrderInsuranceController extends BaseController {
 
     @Bean
     public RestTemplate restTemplate(RestTemplateBuilder builder) {
-        // Do any additional configuration here
         return builder.build();
     }
     @Autowired
@@ -70,17 +76,29 @@ public class OrderInsuranceController extends BaseController {
 
 	@AutoDocMethod(description = "购买保险列表", value = "购买保险列表", response = OrderInsuranceResponseVO.class)
 	@GetMapping("/list")
-	public ResponseData<OrderInsuranceResponseVO> list(OrderInsuranceRequestVO orderInsuranceRequestVO, BindingResult bindingResult) {
-        validate(bindingResult);
-		return ResponseData.success(getPurchaseList(orderInsuranceRequestVO));
+	public ResponseData<OrderInsuranceResponseVO> list(@Valid OrderInsuranceRequestVO orderInsuranceRequestVO, BindingResult bindingResult) {
+        //参数验证
+        validateParameter(bindingResult);
+        try{
+            logger.info(LogDescription.getLogDescription(DescriptionConstant.CONSOLE_ORDER_INSURANCE_LIST, DescriptionConstant.INPUT_TEXT),orderInsuranceRequestVO.toString());
+            CatLogRecord.successLog(LogDescription.getCatDescription(DescriptionConstant.CONSOLE_ORDER_INSURANCE_LIST, DescriptionConstant.SUCCESS_TEXT), UrlConstant.CONSOLE_ORDER_INSURANCE_LIST, orderInsuranceRequestVO);
+            return ResponseData.success(getPurchaseList(orderInsuranceRequestVO));
+        } catch (Exception e) {
+            logger.info(LogDescription.getLogDescription(DescriptionConstant.CONSOLE_ORDER_INSURANCE_LIST, DescriptionConstant.EXCEPTION_TEXT),e);
+            CatLogRecord.failLog(LogDescription.getCatDescription(DescriptionConstant.CONSOLE_ORDER_INSURANCE_LIST, DescriptionConstant.EXCEPTION_TEXT), UrlConstant.CONSOLE_ORDER_INSURANCE_LIST, orderInsuranceRequestVO, e);
+            throw new OrderInsuranceException(ErrorCode.SYS_ERROR.getCode(),ErrorCode.SYS_ERROR.getText());
+        }
+
 	}
 
     @AutoDocMethod(description = "手工录入保险信息", value = "手工录入保险信息", response = ResponseData.class)
     @PostMapping("/add")
-    public ResponseData<ResponseData> add(@RequestBody OrderInsuranceAdditionRequestVO orderInsuranceAdditionRequestVO, BindingResult bindingResult) {
-        validate(bindingResult);
-        logger.info("手工录入保险信息");
+    public ResponseData<ResponseData> add(@Valid @RequestBody OrderInsuranceAdditionRequestVO orderInsuranceAdditionRequestVO, BindingResult bindingResult) {
+        //参数验证
+        validateParameter(bindingResult);
         try{
+
+            logger.info(LogDescription.getLogDescription(DescriptionConstant.CONSOLE_ORDER_INSURANCE_ADD, DescriptionConstant.INPUT_TEXT),orderInsuranceAdditionRequestVO.toString());
             OrderInsuranceAdditionRequestDTO orderInsuranceAdditionRequestDTO = new OrderInsuranceAdditionRequestDTO();
             //属性拷贝
             BeanUtils.copyProperties(orderInsuranceAdditionRequestVO,orderInsuranceAdditionRequestDTO);
@@ -96,23 +114,29 @@ public class OrderInsuranceController extends BaseController {
             JSONObject jsonObject = JSON.parseObject(result);
             String resCode = jsonObject.getString(RES_CODE);
             if (ErrorCode.SUCCESS.getCode().equalsIgnoreCase(resCode)) {
-                return ResponseData.success(null);
+                CatLogRecord.successLog(LogDescription.getCatDescription(DescriptionConstant.CONSOLE_ORDER_INSURANCE_ADD, DescriptionConstant.SUCCESS_TEXT), UrlConstant.CONSOLE_ORDER_INSURANCE_ADD, orderInsuranceAdditionRequestVO);
+                return ResponseData.success();
             } else {
+                CatLogRecord.failLog(LogDescription.getCatDescription(DescriptionConstant.CONSOLE_ORDER_INSURANCE_ADD, DescriptionConstant.EXCEPTION_TEXT), UrlConstant.CONSOLE_ORDER_INSURANCE_ADD, orderInsuranceAdditionRequestVO, new OrderInsuranceException(resCode, jsonObject.getString(RES_MSG)));
                 return new ResponseData<>(resCode, jsonObject.getString(RES_MSG));
             }
         } catch (Exception e) {
-            logger.info("手工录入保险信息",e);
+            logger.info(LogDescription.getLogDescription(DescriptionConstant.CONSOLE_ORDER_INSURANCE_ADD, DescriptionConstant.EXCEPTION_TEXT),e);
+            CatLogRecord.failLog(LogDescription.getCatDescription(DescriptionConstant.CONSOLE_ORDER_INSURANCE_ADD, DescriptionConstant.EXCEPTION_TEXT), UrlConstant.CONSOLE_ORDER_INSURANCE_ADD, orderInsuranceAdditionRequestVO, e);
+
+            throw new OrderInsuranceException(ErrorCode.SYS_ERROR.getCode(),ErrorCode.SYS_ERROR.getText());
         }
-	    return null;
 
     }
 
 
     @AutoDocMethod(description = "导入保险信息excel", value = "导入保险信息excel", response = ResponseData.class)
     @PostMapping("/import")
-    public ResponseData<ResponseData> importExcel(@RequestParam("batchFile") MultipartFile batchFile, OrderInsuranceImportRequestVO orderInsuranceImportRequestVO, BindingResult bindingResult) {
-        validate(bindingResult);
-        try {
+    public ResponseData importExcel(@RequestParam("batchFile") MultipartFile batchFile, @Valid OrderInsuranceImportRequestVO orderInsuranceImportRequestVO, BindingResult bindingResult) {
+        //参数验证
+        validateParameter(bindingResult);
+        try{
+            logger.info("导入保险信息excel入参:{}",orderInsuranceImportRequestVO.toString());
             if(!batchFile.isEmpty()) {
                 String fileType = batchFile.getContentType();
                 if (!fileType.equals(SHEET_TYPE) && !fileType.equals(XLS_TYPE)&& !fileType.equals(XLSX_TYPE)) {
@@ -120,34 +144,34 @@ public class OrderInsuranceController extends BaseController {
                 } else {
                     String str=DateUtils.formate(LocalDateTime.now(),DateUtils.DATE_DEFAUTE);
                     String suffixes=batchFile.getOriginalFilename().substring(batchFile.getOriginalFilename().lastIndexOf("."), batchFile.getOriginalFilename().length());
-   ;
                     String key = "console/import/insurance/"+str.substring(0, 8)+"/"+ CommonUtils.getRandomNumUpChar(8)+suffixes;
                     //上传文件
-
+                    //注意，这块OSS内容是从老管理后台拷贝过来的，bucket直接写死的
                     OSSUtils.uploadMultipartFile(key, batchFile);
                     OrderInsuranceImportRequestDTO orderInsuranceImportRequestDTO = new OrderInsuranceImportRequestDTO();
                     orderInsuranceImportRequestDTO.setOssFileKey(key);
-                    orderInsuranceImportRequestDTO.setCreateOp("test");
+                    orderInsuranceImportRequestDTO.setCreateOp(AdminUserUtil.getAdminUser().getAuthName());
                     BeanUtils.copyProperties(orderInsuranceImportRequestVO, orderInsuranceImportRequestDTO);
                     ResponseEntity<String> responseEntity = restTemplate.postForEntity(insurancePurchaseUrl+IMPORT_PURCHASE, orderInsuranceImportRequestDTO,String.class);
                     String body = responseEntity.getBody();
                     if (!StringUtils.isEmpty(body)) {
                         JSONObject jsonObject = JSON.parseObject(body);
-                        if(!"000000".equals(jsonObject.getString(RES_CODE))){
-                            return ResponseData.success(null);
+                        if(!ErrorCode.SUCCESS.getCode().equals(jsonObject.getString(RES_CODE))){
+                            return ResponseData.success();
                         }
                         //调接口保存数据
                         return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), "文件导入中，请稍候查询");
                     }
+                    return ResponseData.error();
                 }
             }else{
                 return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), "请选择上传文件！");
             }
         } catch (Exception e) {
-            logger.error("上传保险信息失败：", e);
-            return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), "上传失败，请稍后再试");
+            logger.info("导入保险信息excel异常{}",e);
+            throw new OrderInsuranceException(ErrorCode.SYS_ERROR.getCode(),ErrorCode.SYS_ERROR.getText());
         }
-        return ResponseData.error();
+
     }
 
 
@@ -172,17 +196,17 @@ public class OrderInsuranceController extends BaseController {
             List<InsurancePurchaseDTO> insuranceList = insurancePurchaseResultVO.getInsuranceList();
             if(CollectionUtils.isNotEmpty(insuranceList)) {
                 insuranceList.forEach(insurance -> {
-                    if (insurance.getType() == 2) {
+                    if (InsuranceInputTypeEnum.IMPORT.getType().equals(String.valueOf(insurance.getType()))) {
                         insurance.setInsuranceCompany(InsuranceCompanyTypeEnum.getDescriptionByType(insurance.getInsuranceCompany()));
                     }
                     OrderInsuranceVO orderInsuranceVO = new OrderInsuranceVO();
                     //bean转换
                     BeanUtils.copyProperties(insurance, orderInsuranceVO);
                     orderInsuranceVO.setType(InsuranceInputTypeEnum.getDescriptionByType(String.valueOf(insurance.getType())));
-                    if(insurance.getType() == 3){
+                    if(InsuranceInputTypeEnum.BI_IMPORT.getType().equals(String.valueOf(insurance.getType()))){
                         exceptedOrderInsuranceList.add(orderInsuranceVO);
                     }
-                    if(insurance.getType() == 1 || insurance.getType() == 2){
+                    if(InsuranceInputTypeEnum.MANUAL.getType().equals(String.valueOf(insurance.getType())) || InsuranceInputTypeEnum.IMPORT.getType().equals(String.valueOf(insurance.getType()))){
                         realOrderInsuranceList.add(orderInsuranceVO);
                     }
                     orderInsuranceResponseVO.setExceptedOrderInsuranceList(exceptedOrderInsuranceList);
@@ -193,6 +217,17 @@ public class OrderInsuranceController extends BaseController {
 
         }
         return null;
+    }
+
+
+    /**
+     * 验证参数
+     * @param bindingResult
+     */
+    private void validateParameter(BindingResult bindingResult){
+        if(bindingResult.hasErrors()){
+            throw new OrderInsuranceException(ErrorCode.PARAMETER_ERROR.getCode(),bindingResult.getFieldError().getDefaultMessage());
+        }
     }
 
 }

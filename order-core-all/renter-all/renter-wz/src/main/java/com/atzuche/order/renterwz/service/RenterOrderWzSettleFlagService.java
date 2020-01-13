@@ -95,4 +95,8 @@ public class RenterOrderWzSettleFlagService {
     private void updateIllegalSettleFlagSuccess(String orderNo) {
         renterOrderWzSettleFlagMapper.updateSettleFlag(orderNo,SETTLE_FLAG_SUCCESS,"违章结算定时任务");
     }
+
+    public List<RenterOrderWzSettleFlagEntity> getIllegalSettleInfosByOrderNo(String orderNo) {
+        return renterOrderWzSettleFlagMapper.getIllegalSettleInfosByOrderNo(orderNo);
+    }
 }

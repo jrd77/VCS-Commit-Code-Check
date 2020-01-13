@@ -32,9 +32,10 @@ public interface RenterOrderWzSettleFlagMapper{
 
 	/**
 	 * 批量查询
+	 * @param orderNo 订单号
 	 * @return 查询列表
 	 */
-	List<RenterOrderWzSettleFlagEntity> queryList();
+	List<RenterOrderWzSettleFlagEntity> getIllegalSettleInfosByOrderNo(String orderNo);
 
 	/**
 	 * 修改

@@ -83,11 +83,10 @@ public class AccountRenterWzDepositService{
     /**
      * 支付成功后记录实付违章押金信息 和违章押金资金进出信息
      */
-    @CatAnnotation
     public void updateRenterWZDeposit(PayedOrderRenterWZDepositReqVO payedOrderWZRenterDeposit){
         //1 参数校验
         Assert.notNull(payedOrderWZRenterDeposit, ErrorCode.PARAMETER_ERROR.getText());
-        payedOrderWZRenterDeposit.check();
+//        payedOrderWZRenterDeposit.check();
         //2更新押金 实付信息
         accountRenterWzDepositNoTService.updateRenterDeposit(payedOrderWZRenterDeposit);
         //添加押金资金进出明细
@@ -96,7 +95,6 @@ public class AccountRenterWzDepositService{
     /**
      * 支户头违章押金资金进出 操作
      */
-    @CatAnnotation
     public int  updateRenterWZDepositChange(PayedOrderRenterDepositWZDetailReqVO payedOrderRenterWZDepositDetail){
         //1 参数校验
         Assert.notNull(payedOrderRenterWZDepositDetail, ErrorCode.PARAMETER_ERROR.getText());

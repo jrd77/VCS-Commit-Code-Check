@@ -59,9 +59,10 @@ public class AccountRenterCostCoinService {
      * @return
      */
     public void deductAutoCoin(String memNo,String orderNo,String renterOrderNo,int amt){
+        logger.info("deductAutoCoin:memNo={},orderNo={},renterOrderNo={},amt={}",memNo,orderNo,renterOrderNo,amt);
         int totalExpense = countAutoCoinByOrderNo(orderNo);
         if(amt*AUTO_COIN_RATIO>totalExpense){
-            int diff = amt*AUTO_COIN_RATIO-totalExpense;
+            int diff = amt-totalExpense/AUTO_COIN_RATIO;
             doDeductAutoCoin(memNo,orderNo,renterOrderNo,diff);
         }else{
             logger.warn("扣减的凹凸币数值:{} 小于已扣金额:{}，不再进行扣减",amt*AUTO_COIN_RATIO,totalExpense);
@@ -83,7 +84,7 @@ public class AccountRenterCostCoinService {
             if(returnFlag){
                 insertReturnLog(memNo, diff);
             }
-            logger.info("success settle autoCoin:{}");
+            logger.info("success settle autoCoin:{},memNo={},orderNo={}",deductAmt,memNo,orderNo);
         }else if(totalExpense<deductAmt){
             throw new RuntimeException("the expense autoCoin:"+totalExpense+" is less than deductAmt:"+deductAmt);
         }
@@ -134,7 +135,7 @@ public class AccountRenterCostCoinService {
         requestVO.setOrderNo(orderNo);
         requestVO.setRemark("订单消费扣减");
         requestVO.setOrderType("1");
-        requestVO.setChargeAutoCoin(amt*AUTO_COIN_RATIO);
+        requestVO.setChargeAutoCoin(amt);
         boolean deductFlag = autoCoinProxyService.deduct(requestVO);
         if(deductFlag){
             insertDeductLog(memNo, renterOrderNo, amt);

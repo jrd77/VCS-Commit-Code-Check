@@ -19,6 +19,8 @@ import com.atzuche.order.coreapi.modifyorder.exception.ModifyOrderRenterOrderNot
 import com.atzuche.order.coreapi.utils.ModifyOrderUtils;
 import com.atzuche.order.delivery.entity.RenterOrderDeliveryEntity;
 import com.atzuche.order.delivery.service.RenterOrderDeliveryService;
+import com.atzuche.order.ownercost.entity.OwnerOrderEntity;
+import com.atzuche.order.ownercost.service.OwnerOrderService;
 import com.atzuche.order.parentorder.dto.OrderDTO;
 import com.atzuche.order.parentorder.service.OrderService;
 import com.atzuche.order.rentercost.entity.ConsoleRenterOrderFineDeatailEntity;
@@ -53,6 +55,8 @@ public class ModifyOrderForRenterService {
 	private ConsoleRenterOrderFineDeatailService consoleRenterOrderFineDeatailService;
 	@Autowired
 	private OrderService orderService;
+	@Autowired
+	private OwnerOrderService ownerOrderService;
 	/**
 	 * 无效
 	 */
@@ -93,6 +97,8 @@ public class ModifyOrderForRenterService {
 		renterOrderService.updateRenterOrderEffective(initRenterOrderEntity.getId(), INVALID_FLAG);
 		// 修改租客待确认的子单状态为有效
 		renterOrderService.updateRenterOrderEffective(agreeRenterOrderEntity.getId(), EFFECTIVE_FLAG);
+		// 修改agree_flag为已同意
+		renterOrderService.updateRenterOrderAgreeFlag(agreeRenterOrderEntity.getId(), AUDIT_STATUS_AGREE);
 		// 获取申请记录
 		RenterOrderChangeApplyEntity renterOrderChangeApplyEntity = renterOrderChangeApplyService.getRenterOrderChangeApplyByRenterOrderNo(renterOrderNo);
 		if (renterOrderChangeApplyEntity != null) {
@@ -104,6 +110,32 @@ public class ModifyOrderForRenterService {
 		// 对取还车违约金进行处理
 		transferRenterFine(orderNo, renterOrderNo);
 	}
+	
+	
+	/**
+	 * 修改租客子单状态（拒绝）
+	 * @param renterOrderNo
+	 */
+	public void updateRefuseOrderStatus(String renterOrderNo) {
+		// 获取租客待处理的租客子订单
+		RenterOrderEntity agreeRenterOrderEntity = renterOrderService.getRenterOrderByRenterOrderNo(renterOrderNo);
+		if (agreeRenterOrderEntity == null) {
+			log.error("ModifyOrderForRenterService.updateRefuseOrderStatus agreeRenterOrderEntity is null renterOrderNo=[{}]", renterOrderNo);
+			Cat.logError("ModifyOrderForRenterService.updateRefuseOrderStatus", new ModifyOrderRenterOrderNotFindException());
+			throw new ModifyOrderRenterOrderNotFindException();
+		}
+		// 修改agree_flag为已拒绝
+		renterOrderService.updateRenterOrderAgreeFlag(agreeRenterOrderEntity.getId(), AUDIT_STATUS_REFUSE);
+		// 获取申请记录
+		RenterOrderChangeApplyEntity renterOrderChangeApplyEntity = renterOrderChangeApplyService.getRenterOrderChangeApplyByRenterOrderNo(renterOrderNo);
+		if (renterOrderChangeApplyEntity != null) {
+			// 修改租客申请状态为已同意
+			renterOrderChangeApplyService.updateRenterOrderChangeApplyStatus(renterOrderChangeApplyEntity.getId(), AUDIT_STATUS_REFUSE);
+		}
+		// 更新租客子订单状态
+		renterOrderService.updateRenterOrderChildStatus(agreeRenterOrderEntity.getId(), RenterChildStatusEnum.END.getCode());
+	}
+	
 	
 	/**
 	 * 同意后对租客取还车违约金进行处理
@@ -147,7 +179,10 @@ public class ModifyOrderForRenterService {
 		if (before == null || after == null) {
 			return;
 		}
+		// 获取修改前有效车主订单信息
+		OwnerOrderEntity ownerOrderEntity = ownerOrderService.getOwnerOrderByOrderNoAndIsEffective(orderNo);
 		RenterOrderChangeApplyEntity renterApply = new RenterOrderChangeApplyEntity();
+		renterApply.setOwnerOrderNo(ownerOrderEntity.getOwnerOrderNo());
 		renterApply.setApplyTime(LocalDateTime.now());
 		renterApply.setApplyType(1);
 		renterApply.setAuditStatus(AUDIT_STATUS_WAIT);

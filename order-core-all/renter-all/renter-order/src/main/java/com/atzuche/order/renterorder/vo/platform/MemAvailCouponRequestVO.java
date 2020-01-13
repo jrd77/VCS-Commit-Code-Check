@@ -15,6 +15,12 @@ import java.util.List;
 public class MemAvailCouponRequestVO implements Serializable {
 
     private static final long serialVersionUID = -5149532041298618909L;
+
+    /**
+     * 订单号
+     */
+    private String orderNo;
+
     /**
      * 优惠券ID(平台券+取送服务券)
      */
