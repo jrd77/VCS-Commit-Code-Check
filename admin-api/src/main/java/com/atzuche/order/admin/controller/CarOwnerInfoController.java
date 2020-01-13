@@ -4,11 +4,14 @@ import com.atzuche.order.admin.vo.req.car.CarMemNoReqVO;
 import com.atzuche.order.admin.vo.resp.car.CarOwnerInfoRespVO;
 import com.atzuche.order.admin.vo.resp.car.RenterInfoRespVO;
 import com.atzuche.order.car.CarProxyService;
+import com.atzuche.order.commons.entity.dto.OrderFlowListResponseDTO;
+import com.atzuche.order.commons.entity.dto.OrderFlowRequestDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.OrderDetailReqDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.OrderDetailRespDTO;
 import com.atzuche.order.mem.MemProxyService;
 import com.atzuche.order.mem.dto.OrderRenterInfoDTO;
 import com.atzuche.order.open.service.FeignOrderDetailService;
+import com.atzuche.order.open.service.FeignOrderFlowService;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.doc.annotation.AutoDocMethod;
 import com.autoyol.doc.annotation.AutoDocVersion;
@@ -38,7 +41,7 @@ public class CarOwnerInfoController {
     private CarProxyService carProxyService;
 
     @Autowired
-    private FeignOrderDetailService feignOrderDetailService;
+    private FeignOrderFlowService feignOrderDetailService;
 
     @AutoDocMethod(description = "查看车主信息接口信息", value = "查看车主信息接口信息", response = CarOwnerInfoRespVO.class)
     @GetMapping(value = "/info")
@@ -55,11 +58,11 @@ public class CarOwnerInfoController {
         respVO.setOwnerNo(orderRenterInfoDTO.getMemNo());
         respVO.setProvince(orderRenterInfoDTO.getProvince());
 
-        OrderDetailReqDTO reqDTO = new OrderDetailReqDTO();
-        reqDTO.setOrderNo("45697331100299");
-        ResponseData<OrderDetailRespDTO> result = feignOrderDetailService.getOrderDetail(reqDTO);
+        OrderFlowRequestDTO reqDTO = new OrderFlowRequestDTO();
+        reqDTO.setOrderNo("86943331100299");
+        ResponseData<OrderFlowListResponseDTO> result = feignOrderDetailService.selectOrderFlowList(reqDTO);
 
-        logger.info("feign is {}",result.getData());
+        logger.info("feign is {}",result.getResMsg());
 
         //TODO:车主等级
         return ResponseData.success(respVO);

@@ -1,7 +1,6 @@
 package com.atzuche.order.commons.vo.res.order;
 
 import com.autoyol.doc.annotation.AutoDocProperty;
-import org.omg.PortableInterceptor.INACTIVE;
 
 import java.io.Serializable;
 
