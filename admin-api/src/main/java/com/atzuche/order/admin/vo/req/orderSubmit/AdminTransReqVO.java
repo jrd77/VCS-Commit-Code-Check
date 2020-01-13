@@ -34,8 +34,8 @@ public class AdminTransReqVO extends BaseVO {
     @NotBlank(message = "车辆注册号不能为空")
     private String carNo;
 
-    @AutoDocProperty(value = "用户token")
-    private String token;
+   // @AutoDocProperty(value = "用户token")
+   // private String token;
 
     @AutoDocProperty(value = "cityCode(310100)")
     private String cityCode;
