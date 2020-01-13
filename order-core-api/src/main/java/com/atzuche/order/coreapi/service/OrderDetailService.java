@@ -221,7 +221,7 @@ public class OrderDetailService {
 
         //租客历史订单
         List<RenterOrderDTO> renterOrderDTOHistoryList = new ArrayList<>();
-        if(orderHistoryReqDTO.isNeedOwnerOrderHistory()){
+        if(orderHistoryReqDTO.getIsNeedOwnerOrderHistory()){
             List<RenterOrderEntity> renterOrderEntities = renterOrderService.queryHostiryRenterOrderByOrderNo(orderNo);
             renterOrderEntities.stream().forEach(x->{
                 RenterOrderDTO renterOrderDTO = new RenterOrderDTO();
@@ -231,7 +231,7 @@ public class OrderDetailService {
         }
         //车主历史订单
         List<OwnerOrderDTO> ownerOrderDTOHistoryLIst = new ArrayList<>();
-        if(orderHistoryReqDTO.isNeedOwnerOrderHistory()){
+        if(orderHistoryReqDTO.getIsNeedOwnerOrderHistory()){
             List<OwnerOrderEntity> ownerOrderEntities = ownerOrderService.queryHostiryOwnerOrderByOrderNo(orderNo);
             ownerOrderEntities.stream().forEach(x->{
                 OwnerOrderDTO ownerOrderDTO = new OwnerOrderDTO();

@@ -27,6 +27,22 @@ public class AccountRenterWzDepositNoTService {
     private AccountRenterWzDepositMapper accountRenterWzDepositMapper;
 
 
+
+    /**
+     * 查询违章信息
+     * @param orderNo
+     * @param memNo
+     * @return
+     */
+    public int getAccountRenterWZDepositAmt(String orderNo, String memNo) {
+        AccountRenterWZDepositResVO  result = new AccountRenterWZDepositResVO();
+        AccountRenterWzDepositEntity accountRenterDepositEntity = accountRenterWzDepositMapper.selectByOrderAndMemNo(orderNo,memNo);
+        if(Objects.nonNull(accountRenterDepositEntity) || Objects.nonNull(accountRenterDepositEntity.getShishouDeposit())){
+            return 0;
+        }
+        return accountRenterDepositEntity.getShishouDeposit();
+    }
+
     /**
      * 查询违章信息
      * @param orderNo
