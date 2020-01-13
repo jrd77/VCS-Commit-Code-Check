@@ -6,7 +6,7 @@ import com.autoyol.commons.web.ResponseData;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 
-@FeignClient(name = "order-center-api")
+@FeignClient(url = "http://10.0.3.235:1412",name="order-center-api")
 public interface FeignOrderFlowService {
 
     @GetMapping("/order/flow/list")
