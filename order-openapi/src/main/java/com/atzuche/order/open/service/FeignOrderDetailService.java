@@ -30,7 +30,12 @@ public interface FeignOrderDetailService {
     @RequestMapping(method = RequestMethod.POST, value = "/order/detail/status")
     ResponseData<OrderStatusRespDTO> getOrderStatus(@RequestBody OrderDetailReqDTO orderDetailReqDTO);
 
-
+    /*
+     * @Author ZhangBin
+     * @Date 2020/1/13 16:47
+     * @Description: 获取历史订单列表
+     *
+     **/
     @PostMapping("/order/detail/childHistory")
     ResponseData<OrderHistoryRespDTO> orderHistory(@RequestBody OrderHistoryReqDTO orderHistoryReqDTO);
 }
