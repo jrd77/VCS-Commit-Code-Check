@@ -5,9 +5,11 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.ToString;
 import org.hibernate.validator.constraints.NotBlank;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
+import java.util.Date;
 
 /**
  * @author 胡春林
@@ -28,11 +30,11 @@ public class OrderCarTrusteeshipVO {
     @ApiModelProperty(value="出库时间",required=true)
     @NotNull(message="出库时间不能为空")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
-    private LocalDateTime outDepotTime;
+    private Date outDepotTime;
     @ApiModelProperty(value="入库时间",required=true)
     @NotNull(message="入库时间不能为空")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
-    private LocalDateTime inDepotTime;
+    private Date inDepotTime;
     @ApiModelProperty(value="出库里程数",required=true)
     @NotBlank(message="出库里程数不能为空")
     private String outDepotMileage;
@@ -40,18 +42,18 @@ public class OrderCarTrusteeshipVO {
     @NotBlank(message="入库里程数不能为空")
     private String inDepotMileage;
     @ApiModelProperty(value="出库油量: 1:1/16,2:2/16,3:3/16,4:4/16,....",required=true)
-    @NotBlank(message="出库油量不能为空")
+    @NotNull(message="出库油量不能为空")
     private Integer outDepotOimass;
     @ApiModelProperty(value="入库油量:1:1/16,2:2/16,3:3/16,4:4/16,....",required=true)
-    @NotBlank(message="入库油量不能为空")
+    @NotNull(message="入库油量不能为空")
     private Integer inDepotOimass;
     @ApiModelProperty(value="入库是否损伤 1:是,2:否",required=true)
-    @NotBlank(message="入库是否损伤不能为空")
+    @NotNull(message="入库是否损伤不能为空")
     private Integer inDepotDamage;
     @ApiModelProperty(value="行驶证是否正常交接: 1:是，2:否",required=true)
-    @NotBlank(message="行驶证是否正常交接不能为空")
+    @NotNull(message="行驶证是否正常交接不能为空")
     private Integer drivingLicenseJoin;
     @ApiModelProperty(value="车钥匙是否正常交接: 1:是，2:否",required=true)
-    @NotBlank(message="车钥匙是否正常交接不能为空")
+    @NotNull(message="车钥匙是否正常交接不能为空")
     private Integer carKeyJoin;
 }

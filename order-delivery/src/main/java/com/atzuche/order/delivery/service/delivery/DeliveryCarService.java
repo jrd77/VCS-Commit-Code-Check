@@ -90,7 +90,6 @@ public class DeliveryCarService {
             //不抛异常，直接return
             log.info("没有找到当前子订单的配送订单信息：renterOrderNo：{}",renterOrderNo.toString());
             return;
-            //throw new DeliveryOrderException(DeliveryErrorCode.DELIVERY_PARAMS_ERROR.getValue(), "没有找到发送至仁云的数据");
         }
         for(OrderDeliveryFlowEntity orderDeliveryFlowEntity : orderDeliveryFlowEntityList) {
             RenYunFlowOrderDTO renYunFlowOrderDTO = createRenYunDTO(orderDeliveryFlowEntity);
@@ -276,6 +275,8 @@ public class DeliveryCarService {
         orderDeliveryDTO.setRevertTime(renterGoodsDetailDTO.getRevertTime());
         orderDeliveryDTO.setType(orderType);
         orderDeliveryDTO.setParamsTypeValue(orderReqVO, orderType, ownerMemberDTO, renterMemberDTO);
+
+
         orderDeliveryFlowEntity.setRenterOrderNo(renterGoodsDetailDTO.getRenterOrderNo());
         orderDeliveryFlowEntity.setOrderNo(renterGoodsDetailDTO.getOrderNo());
         orderDeliveryFlowEntity.setServiceTypeInfo(orderType, orderDeliveryDTO);
@@ -340,6 +341,7 @@ public class DeliveryCarService {
         renYunFlowOrderDTO.setSceneName(orderDeliveryFlowEntity.getSceneName());
         renYunFlowOrderDTO.setDisplacement(String.valueOf(orderDeliveryFlowEntity.getDisplacement()));
         renYunFlowOrderDTO.setSource(orderDeliveryFlowEntity.getSource());
+        renYunFlowOrderDTO.setCarno(orderDeliveryFlowEntity.getCarNo());
         return renYunFlowOrderDTO;
     }
 
