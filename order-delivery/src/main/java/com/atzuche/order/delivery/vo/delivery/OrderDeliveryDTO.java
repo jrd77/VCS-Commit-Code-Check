@@ -116,6 +116,11 @@ public class OrderDeliveryDTO {
      * 修改人
      */
     private String updateOp;
+    
+    /**
+     * 提前或延后时间(取车:提前时间, 还车：延后时间)
+     */
+    private Integer aheadOrDelayTime;
 
     /**
      * 设置信息参数

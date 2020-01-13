@@ -6,6 +6,8 @@ import com.atzuche.order.commons.enums.FineSubsidySourceCodeEnum;
 import com.atzuche.order.commons.enums.FineTypeEnum;
 import com.atzuche.order.ownercost.entity.OwnerOrderFineDeatailEntity;
 import com.atzuche.order.ownercost.mapper.OwnerOrderFineDeatailMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -22,6 +24,8 @@ import java.util.List;
  */
 @Service
 public class OwnerOrderFineDeatailService{
+
+    private static Logger logger = LoggerFactory.getLogger(OwnerOrderFineDeatailService.class);
 
     @Autowired
     private OwnerOrderFineDeatailMapper ownerOrderFineDeatailMapper;
@@ -65,7 +69,14 @@ public class OwnerOrderFineDeatailService{
         fineEntity.setOrderNo(costBaseDTO.getOrderNo());
         return fineEntity;
     }
+
+
     public int addOwnerOrderFineRecord(OwnerOrderFineDeatailEntity entity) {
+        if(null == entity) {
+            logger.warn("Not fund Owner order fine data.");
+            return 0;
+        }
+
         return  ownerOrderFineDeatailMapper.insertSelective(entity);
     }
 }
