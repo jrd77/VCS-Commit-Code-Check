@@ -274,7 +274,7 @@ public class DeliveryCarService {
         orderDeliveryDTO.setRentTime(renterGoodsDetailDTO.getRentTime());
         orderDeliveryDTO.setRevertTime(renterGoodsDetailDTO.getRevertTime());
         orderDeliveryDTO.setType(orderType);
-        orderDeliveryDTO.setParamsTypeValue(orderReqVO, orderType, ownerMemberDTO, renterMemberDTO);
+        orderDeliveryDTO.setParamsTypeValue(orderReqVO, orderType);
 
 
         orderDeliveryFlowEntity.setRenterOrderNo(renterGoodsDetailDTO.getRenterOrderNo());

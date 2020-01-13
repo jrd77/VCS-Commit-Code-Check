@@ -125,22 +125,16 @@ public class OrderDeliveryDTO {
     /**
      * 设置信息参数
      * @param orderType
-     * @param ownerMemberDTO
-     * @param renterMemberDTO
      */
-    public void setParamsTypeValue(OrderReqVO orderReqVO,Integer orderType, OwnerMemberDTO ownerMemberDTO, RenterMemberDTO renterMemberDTO) {
+    public void setParamsTypeValue(OrderReqVO orderReqVO,Integer orderType) {
         if (orderType == UsedDeliveryTypeEnum.USED.getValue().intValue()) {
            setRenterGetReturnAddr(orderReqVO.getSrvGetAddr());
            setRenterGetReturnAddrLat(orderReqVO.getSrvGetLat());
            setRenterGetReturnAddrLon(orderReqVO.getSrvGetLon());
-           setGetReturnUserName(renterMemberDTO.getRealName());
-           setGetReturnUserPhone(renterMemberDTO.getPhone());
         } else {
             setRenterGetReturnAddr(orderReqVO.getSrvReturnAddr());
             setRenterGetReturnAddrLat(orderReqVO.getSrvReturnLat());
             setRenterGetReturnAddrLon(orderReqVO.getSrvReturnLon());
-            setGetReturnUserName(ownerMemberDTO.getRealName());
-            setGetReturnUserPhone(ownerMemberDTO.getPhone());
 
         }
     }
