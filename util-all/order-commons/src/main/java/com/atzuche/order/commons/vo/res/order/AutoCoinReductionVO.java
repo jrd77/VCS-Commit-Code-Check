@@ -21,7 +21,7 @@ public class AutoCoinReductionVO implements Serializable {
     private Integer autoCoinDeductibleAmt;
 
     @AutoDocProperty(value = "凹凸币余额(包含当前抵扣部分)，如-8")
-    private Integer availableAutoCoinNumber;
+    private Integer availableAutoCoinAmt;
 
 
     public String getAutoCoinIsShow() {
@@ -40,11 +40,11 @@ public class AutoCoinReductionVO implements Serializable {
         this.autoCoinDeductibleAmt = autoCoinDeductibleAmt;
     }
 
-    public Integer getAvailableAutoCoinNumber() {
-        return availableAutoCoinNumber;
+    public Integer getAvailableAutoCoinAmt() {
+        return availableAutoCoinAmt;
     }
 
-    public void setAvailableAutoCoinNumber(Integer availableAutoCoinNumber) {
-        this.availableAutoCoinNumber = availableAutoCoinNumber;
+    public void setAvailableAutoCoinAmt(Integer availableAutoCoinAmt) {
+        this.availableAutoCoinAmt = availableAutoCoinAmt;
     }
 }

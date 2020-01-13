@@ -31,9 +31,9 @@ public class RenterOrderCarDepositResVO {
     private Integer reductionAmt;
 
     /**
-     * 减免金额比例
+     * 免押金额
      */
-    private String amt;
+    private Integer reductionRate;
 
     /**
      * 免押方式

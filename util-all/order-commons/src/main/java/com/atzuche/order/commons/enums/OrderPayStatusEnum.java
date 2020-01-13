@@ -36,7 +36,7 @@ public enum OrderPayStatusEnum {
      * @param status int value
      * @return
      */
-    public OrderPayStatusEnum from(int status){
+    public static OrderPayStatusEnum from(int status){
         OrderPayStatusEnum[] statuses = values();
         for(OrderPayStatusEnum s:statuses){
             if(status==s.status){

@@ -168,6 +168,7 @@ public class DeliveryCarService {
                 lastOrderDeliveryEntity.setIsDelete(1);
                 renterOrderDeliveryService.updateDeliveryByPrimaryKey(lastOrderDeliveryEntity);
                 CommonUtil.copyPropertiesIgnoreNull(orderDeliveryEntity, lastOrderDeliveryEntity);
+                lastOrderDeliveryEntity.setIsDelete(0);
                 lastOrderDeliveryEntity.setStatus(2);
                 renterOrderDeliveryService.insert(lastOrderDeliveryEntity);
             }
@@ -273,8 +274,7 @@ public class DeliveryCarService {
         orderDeliveryDTO.setRentTime(renterGoodsDetailDTO.getRentTime());
         orderDeliveryDTO.setRevertTime(renterGoodsDetailDTO.getRevertTime());
         orderDeliveryDTO.setType(orderType);
-        orderDeliveryDTO.setParamsTypeValue(orderReqVO, orderType, ownerMemberDTO, renterMemberDTO);
-
+        orderDeliveryDTO.setParamsTypeValue(orderReqVO, orderType);
 
         orderDeliveryFlowEntity.setRenterOrderNo(renterGoodsDetailDTO.getRenterOrderNo());
         orderDeliveryFlowEntity.setOrderNo(renterGoodsDetailDTO.getOrderNo());
@@ -353,9 +353,6 @@ public class DeliveryCarService {
         renYunFlowOrderDTO.setTankCapacity(orderDeliveryFlowEntity.getTankCapacity());
         renYunFlowOrderDTO.setOwnerReturnAddr(orderDeliveryFlowEntity.getOwnerReturnAddr());
         renYunFlowOrderDTO.setOwnerGetAddr(orderDeliveryFlowEntity.getOwnerGetAddr());
-
-
-
         return renYunFlowOrderDTO;
     }
 

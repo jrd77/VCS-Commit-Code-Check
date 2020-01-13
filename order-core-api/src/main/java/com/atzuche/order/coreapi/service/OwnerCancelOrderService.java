@@ -156,7 +156,9 @@ public class OwnerCancelOrderService {
 
         //落库
         orderStatusService.saveOrderStatusInfo(orderStatusDTO);
-        ownerOrderService.updateOwnerOrderChildStatus(ownerOrderEntity.getId(), OwnerChildStatusEnum.END.getCode());
+        if(null != ownerOrderEntity) {
+            ownerOrderService.updateOwnerOrderChildStatus(ownerOrderEntity.getId(), OwnerChildStatusEnum.END.getCode());
+        }
         orderFlowService.inserOrderStatusChangeProcessInfo(orderNo, OrderStatusEnum.from(orderStatusDTO.getStatus()));
 
         //取消信息处理(order_cancel_reason)
@@ -212,7 +214,7 @@ public class OwnerCancelOrderService {
         orderCancelReasonEntity.setCancelSource(CancelSourceEnum.OWNER.getCode());
         orderCancelReasonEntity.setOrderNo(orderNo);
         orderCancelReasonEntity.setSubOrderNo(ownerOrderNo);
-        orderCancelReasonEntity.setDutySource(CancelOrderDutyEnum.CANCEL_ORDER_DUTY_RENTER.getCode());
+        orderCancelReasonEntity.setDutySource(CancelOrderDutyEnum.CANCEL_ORDER_DUTY_OWNER.getCode());
         return orderCancelReasonEntity;
     }
 }
