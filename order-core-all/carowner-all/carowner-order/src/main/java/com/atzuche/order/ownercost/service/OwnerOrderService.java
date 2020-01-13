@@ -13,6 +13,8 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Slf4j
 @Service
 public class OwnerOrderService {
@@ -101,4 +103,7 @@ public class OwnerOrderService {
         return ownerOrderMapper.updateOwnerOrderChildStatus(id, childStatus);
     }
 
+    public List<OwnerOrderEntity> queryHostiryOwnerOrderByOrderNo(String orderNo) {
+        return ownerOrderMapper.queryHostiryOwnerOrderByOrderNo(orderNo);
+    }
 }
