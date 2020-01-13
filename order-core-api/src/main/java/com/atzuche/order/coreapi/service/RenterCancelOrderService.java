@@ -90,9 +90,12 @@ public class RenterCancelOrderService {
                 renterOrderFineDeatailService.fineDataConvert(cancelFineAmt.getCostBaseDTO(), penalty, FineSubsidyCodeEnum.OWNER,
                         FineSubsidySourceCodeEnum.RENTER, FineTypeEnum.CANCEL_FINE);
         //罚租客补贴给平台(保险费)
-        RenterOrderFineDeatailEntity renterOrderFineDeatailEntityTwo =
-                renterOrderFineDeatailService.fineDataConvert(cancelFineAmt.getCostBaseDTO(), Math.abs(renterOrderCostEntity.getBasicEnsureAmount()), FineSubsidyCodeEnum.PLATFORM,
-                        FineSubsidySourceCodeEnum.RENTER, FineTypeEnum.CANCEL_FINE);
+        if(orderStatusEntity.getStatus() >= OrderStatusEnum.TO_RETURN_CAR.getStatus() && orderStatusEntity.getStatus() != OrderStatusEnum.CLOSED.getStatus()) {
+            RenterOrderFineDeatailEntity renterOrderFineDeatailEntityTwo =
+                    renterOrderFineDeatailService.fineDataConvert(cancelFineAmt.getCostBaseDTO(), Math.abs(renterOrderCostEntity.getBasicEnsureAmount()), FineSubsidyCodeEnum.PLATFORM,
+                            FineSubsidySourceCodeEnum.RENTER, FineTypeEnum.CANCEL_FINE);
+            renterOrderFineDeatailService.saveRenterOrderFineDeatail(renterOrderFineDeatailEntityTwo);
+        }
         //车主收益
         ConsoleOwnerOrderFineDeatailEntity consoleOwnerOrderFineDeatailEntity =
                 consoleOwnerOrderFineDeatailService.fineDataConvert(cancelFineAmt.getCostBaseDTO(), penalty, FineSubsidyCodeEnum.OWNER,
@@ -110,7 +113,6 @@ public class RenterCancelOrderService {
                 cancelReason));
 
         renterOrderFineDeatailService.saveRenterOrderFineDeatail(renterOrderFineDeatailEntityOne);
-        renterOrderFineDeatailService.saveRenterOrderFineDeatail(renterOrderFineDeatailEntityTwo);
         consoleOwnerOrderFineDeatailService.addFineRecord(consoleOwnerOrderFineDeatailEntity);
 
 

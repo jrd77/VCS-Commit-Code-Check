@@ -135,10 +135,14 @@ public class OwnerCancelOrderService {
             OwnerOrderFineDeatailEntity ownerOrderFineDeatailEntityOne =
                     ownerOrderFineDeatailService.fineDataConvert(cancelFineAmt.getCostBaseDTO(), penalty,
                             FineSubsidyCodeEnum.RENTER, FineSubsidySourceCodeEnum.OWNER, FineTypeEnum.CANCEL_FINE);
+            ownerOrderFineDeatailService.addOwnerOrderFineRecord(ownerOrderFineDeatailEntityOne);
             //罚车主补贴给平台(保险费)
-            OwnerOrderFineDeatailEntity ownerOrderFineDeatailEntityTwo =
-                    ownerOrderFineDeatailService.fineDataConvert(cancelFineAmt.getCostBaseDTO(), Math.abs(renterOrderCostEntity.getBasicEnsureAmount()),
-                            FineSubsidyCodeEnum.PLATFORM, FineSubsidySourceCodeEnum.OWNER, FineTypeEnum.CANCEL_FINE);
+            if(orderStatusEntity.getStatus() >= OrderStatusEnum.TO_RETURN_CAR.getStatus() && orderStatusEntity.getStatus() != OrderStatusEnum.CLOSED.getStatus()) {
+                OwnerOrderFineDeatailEntity ownerOrderFineDeatailEntityTwo =
+                        ownerOrderFineDeatailService.fineDataConvert(cancelFineAmt.getCostBaseDTO(), Math.abs(renterOrderCostEntity.getBasicEnsureAmount()),
+                                FineSubsidyCodeEnum.PLATFORM, FineSubsidySourceCodeEnum.OWNER, FineTypeEnum.CANCEL_FINE);
+                ownerOrderFineDeatailService.addOwnerOrderFineRecord(ownerOrderFineDeatailEntityTwo);
+            }
             //租客收益处理
             ConsoleRenterOrderFineDeatailEntity consoleRenterOrderFineDeatailEntity =
                     consoleRenterOrderFineDeatailService.fineDataConvert(cancelFineAmt.getCostBaseDTO(), penalty,
@@ -148,8 +152,6 @@ public class OwnerCancelOrderService {
 
             renterOrderService.updateRenterOrderChildStatus(renterOrderEntity.getId(),
                     RenterChildStatusEnum.END.getCode());
-            ownerOrderFineDeatailService.addOwnerOrderFineRecord(ownerOrderFineDeatailEntityOne);
-            ownerOrderFineDeatailService.addOwnerOrderFineRecord(ownerOrderFineDeatailEntityTwo);
             consoleRenterOrderFineDeatailService.saveConsoleRenterOrderFineDeatail(consoleRenterOrderFineDeatailEntity);
         }
 
