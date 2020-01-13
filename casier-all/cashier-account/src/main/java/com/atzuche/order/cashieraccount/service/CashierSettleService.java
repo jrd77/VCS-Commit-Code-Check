@@ -28,6 +28,7 @@ import com.atzuche.order.accountrenterrentcost.vo.req.AccountRenterCostChangeReq
 import com.atzuche.order.accountrenterrentcost.vo.req.AccountRenterCostDetailReqVO;
 import com.atzuche.order.accountrenterwzdepost.service.AccountRenterWzDepositCostService;
 import com.atzuche.order.accountrenterwzdepost.service.AccountRenterWzDepositService;
+import com.atzuche.order.accountrenterwzdepost.service.notservice.AccountRenterWzDepositNoTService;
 import com.atzuche.order.cashieraccount.service.notservice.CashierNoTService;
 import com.atzuche.order.cashieraccount.service.notservice.CashierRefundApplyNoTService;
 import com.atzuche.order.cashieraccount.vo.req.DeductDepositToRentCostReqVO;
@@ -54,6 +55,7 @@ import java.util.Objects;
 public class CashierSettleService {
     @Autowired AccountRenterDepositService accountRenterDepositService;
     @Autowired AccountRenterWzDepositService accountRenterWzDepositService;
+    @Autowired AccountRenterWzDepositNoTService accountRenterWzDepositNoTService;
     @Autowired AccountDebtService accountDebtService;
     @Autowired CashierRefundApplyNoTService cashierRefundApplyNoTService;
     @Autowired AccountOwnerIncomeService accountOwnerIncomeService;
@@ -305,5 +307,25 @@ public class CashierSettleService {
             result = true;
         }
         return result;
+    }
+
+    /**
+     * 查询实付 违章押金金额
+     * @param orderNo
+     * @param renterMemNo
+     * @return
+     */
+    public int getWZDepositCostAmt(String orderNo, String renterMemNo) {
+        return accountRenterWzDepositNoTService.getAccountRenterWZDepositAmt(orderNo,renterMemNo);
+    }
+
+    /**
+     * 查询实付 租车费用
+     * @param orderNo
+     * @param renterMemNo
+     * @return
+     */
+    public int getRentCost(String orderNo, String renterMemNo) {
+       return accountRenterCostSettleNoTService.getCostPaidRent(orderNo,renterMemNo);
     }
 }

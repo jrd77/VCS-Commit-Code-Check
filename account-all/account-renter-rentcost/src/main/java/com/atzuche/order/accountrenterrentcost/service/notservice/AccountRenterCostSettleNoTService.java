@@ -40,10 +40,10 @@ public class AccountRenterCostSettleNoTService {
      */
     public int getCostPaidRent(String orderNo,String memNo) {
         AccountRenterCostSettleEntity accountRenterCostSettle = accountRenterCostSettleMapper.selectByOrderNo(orderNo,memNo);
-        if(Objects.isNull(accountRenterCostSettle)){
+        if(Objects.isNull(accountRenterCostSettle) || Objects.isNull(accountRenterCostSettle.getShifuAmt())){
            return NumberUtils.INTEGER_ZERO;
         }
-        return accountRenterCostSettle.getShifuAmt()==null?0:accountRenterCostSettle.getShifuAmt();
+        return accountRenterCostSettle.getShifuAmt();
     }
 
 
