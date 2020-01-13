@@ -165,6 +165,8 @@ public class DeliveryCarService {
                 if (null == lastOrderDeliveryEntity) {
                     throw new DeliveryOrderException(DeliveryErrorCode.DELIVERY_MOUDLE_ERROR.getValue(), "没有找到最近的一笔配送订单记录");
                 }
+                lastOrderDeliveryEntity.setIsDelete(1);
+                renterOrderDeliveryService.updateDeliveryByPrimaryKey(lastOrderDeliveryEntity);
                 CommonUtil.copyPropertiesIgnoreNull(orderDeliveryEntity, lastOrderDeliveryEntity);
                 lastOrderDeliveryEntity.setStatus(2);
                 renterOrderDeliveryService.insert(lastOrderDeliveryEntity);

@@ -103,6 +103,15 @@ public class RenterOrderDeliveryService {
         renterDeliveryAddrMapper.updateByPrimaryKey(renterDeliveryAddrEntity);
     }
 
+
+    /**
+     * 更新配送订单地址信息
+     * @param renterOrderDeliveryEntity
+     */
+    public void updateDeliveryByPrimaryKey(RenterOrderDeliveryEntity renterOrderDeliveryEntity) {
+        renterOrderDeliveryMapper.updateByPrimaryKey(renterOrderDeliveryEntity);
+    }
+
     /**
      * 通过租客子订单号查询配送订单
      * @param renterOrderNo
