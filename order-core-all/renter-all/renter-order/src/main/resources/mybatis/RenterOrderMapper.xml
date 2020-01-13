@@ -313,5 +313,10 @@
         ORDER BY id DESC
         LIMIT 1
     </select>
+    <select id="queryHostiryRenterOrderByOrderNo" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List" /> from renter_order where order_no = #{orderNo}
+        AND is_delete = 0
+        LIMIT 1
+    </select>
 
 </mapper>
