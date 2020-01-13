@@ -168,6 +168,7 @@ public class DeliveryCarService {
                 lastOrderDeliveryEntity.setIsDelete(1);
                 renterOrderDeliveryService.updateDeliveryByPrimaryKey(lastOrderDeliveryEntity);
                 CommonUtil.copyPropertiesIgnoreNull(orderDeliveryEntity, lastOrderDeliveryEntity);
+                lastOrderDeliveryEntity.setIsDelete(0);
                 lastOrderDeliveryEntity.setStatus(2);
                 renterOrderDeliveryService.insert(lastOrderDeliveryEntity);
             }
