@@ -29,7 +29,7 @@ public interface RenterOrderWzStatusMapper{
 	 * @param orderNo 订单号
 	 * @param carNum 车牌号
 	 */
-    void updateTransIllegalQuery(@Param("illegalQuery") Integer illegalQuery,@Param("orderNo") String orderNo,@Param("carNum") String carNum);
+    void updateTransIllegalQuery(@Param("status") Integer illegalQuery,@Param("orderNo") String orderNo,@Param("carNum") String carNum);
 
 	/**
 	 * 修改 违章的状态
@@ -87,4 +87,11 @@ public interface RenterOrderWzStatusMapper{
 	 * @return 违章处理状态信息列表
 	 */
     List<RenterOrderWzStatusEntity> queryInfosByOrderNo(@Param("orderNo") String orderNo);
+
+	/**
+	 * 删除之前的数据
+	 * @param orderNo 订单号
+	 * @param operator 操作人
+	 */
+	void deleteInfoByOrderNo(@Param("orderNo") String orderNo,@Param("operator") String operator);
 }

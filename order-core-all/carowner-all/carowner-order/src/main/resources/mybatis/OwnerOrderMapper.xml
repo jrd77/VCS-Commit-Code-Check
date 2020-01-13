@@ -255,5 +255,10 @@
         order by id desc
         limit 1
     </select>
+    <select id="queryHostiryOwnerOrderByOrderNo" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List" /> from owner_order where order_no = #{orderNo}
+        and is_delete = 0
+        order by id desc
+    </select>
 
 </mapper>

@@ -495,5 +495,13 @@ public class RenterOrderService {
         return renterOrderMapper.getChangeRenterOrderByOrderNo(orderNo);
     }
 
-
+    /*
+     * @Author ZhangBin
+     * @Date 2020/1/13 14:59
+     * @Description: 查询租客历史订单（包含有效的订单）
+     *
+     **/
+    public List<RenterOrderEntity> queryHostiryRenterOrderByOrderNo(String orderNo) {
+        return renterOrderMapper.queryHostiryRenterOrderByOrderNo(orderNo);
+    }
 }
