@@ -101,7 +101,7 @@ public class OwnerCancelOrderService {
         //调度判定
         boolean isDispatch =
                 carRentalTimeApiService.checkCarDispatch(carRentalTimeApiService.buildCarDispatchReqVO(orderEntity,
-                orderStatusEntity, ownerCouponEntity));
+                orderStatusEntity, ownerCouponEntity,2));
 
         //返回信息
         CancelOrderResDTO cancelOrderResDTO = new CancelOrderResDTO();

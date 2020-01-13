@@ -3,6 +3,7 @@ package com.atzuche.order.coreapi.service;
 import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.CatConstants;
 import com.atzuche.order.commons.LocalDateTimeUtils;
+import com.atzuche.order.commons.vo.req.OrderReqVO;
 import com.atzuche.order.coreapi.entity.vo.req.CarDispatchReqVO;
 import com.atzuche.order.coreapi.entity.vo.req.CarRentTimeRangeReqVO;
 import com.atzuche.order.coreapi.entity.vo.res.CarRentTimeRangeResVO;
@@ -153,10 +154,10 @@ public class CarRentalTimeApiService {
      * @return CarDispatchReqVO 判定调度信息
      */
     public CarDispatchReqVO buildCarDispatchReqVO(OrderEntity orderEntity, OrderStatusEntity orderStatusEntity,
-                                                  OrderCouponEntity orderCouponEntity) {
+                                                  OrderCouponEntity orderCouponEntity,Integer type) {
 
         CarDispatchReqVO carDispatchReqVO = new CarDispatchReqVO();
-        carDispatchReqVO.setType(2);
+        carDispatchReqVO.setType(type);
         carDispatchReqVO.setCityCode(Integer.valueOf(orderEntity.getCityCode()));
         carDispatchReqVO.setReqTime(orderEntity.getReqTime());
         carDispatchReqVO.setRentTime(orderEntity.getExpRentTime());
@@ -164,6 +165,23 @@ public class CarRentalTimeApiService {
         carDispatchReqVO.setPayFlag(orderStatusEntity.getRentCarPayStatus());
         carDispatchReqVO.setCouponFlag(null == orderCouponEntity || orderCouponEntity.getStatus() == 0 ? 0 : 1);
         return carDispatchReqVO;
+    }
+
+
+    /**
+     * 提前延后时间计算请求参数封装
+     *
+     * @param orderReqVO 下单请求参数
+     * @return CarRentTimeRangeReqVO 提前延后时间计算请求参数
+     */
+    public CarRentTimeRangeReqVO buildCarRentTimeRangeReqVO(OrderReqVO orderReqVO) {
+        CarRentTimeRangeReqVO carRentTimeRangeReqVO = new CarRentTimeRangeReqVO();
+        BeanCopier beanCopier = BeanCopier.create(OrderReqVO.class, CarRentTimeRangeReqVO.class, false);
+        beanCopier.copy(orderReqVO, carRentTimeRangeReqVO, null);
+
+        LOGGER.info("Submit order before build CarRentTimeRangeReqVO,result is ,carRentTimeRangeReqVO:[{}]",
+                JSON.toJSONString(carRentTimeRangeReqVO));
+        return carRentTimeRangeReqVO;
     }
 
 }
