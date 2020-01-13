@@ -1,9 +1,10 @@
-package com.atzuche.order.flow.controller;
+package com.atzuche.order.coreapi.controller;
 
-import com.atzuche.order.flow.exception.OrderFlowException;
-import com.atzuche.order.flow.service.OrderFlowService;
+
 import com.atzuche.order.flow.dto.req.OrderFlowRequestDTO;
 import com.atzuche.order.flow.dto.resp.OrderFlowListResponseDTO;
+import com.atzuche.order.flow.exception.OrderFlowException;
+import com.atzuche.order.flow.service.OrderFlowService;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.doc.annotation.AutoDocMethod;
@@ -26,7 +27,6 @@ public class OrderFlowController {
 
     @Autowired
     private OrderFlowService orderFlowService;
-
 
     @AutoDocMethod(description = "订单状态流转列表", value = "订单状态流转列表", response = OrderFlowListResponseDTO.class)
     @GetMapping("/list")
