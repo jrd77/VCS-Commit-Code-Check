@@ -1,7 +1,6 @@
 package com.atzuche.order.admin.service;
 
 import com.atzuche.order.admin.common.AdminUserUtil;
-import com.atzuche.order.admin.util.StringUtil;
 import com.atzuche.order.admin.vo.req.renterWz.RenterWzCostDetailReqVO;
 import com.atzuche.order.admin.vo.req.renterWz.TemporaryRefundReqVO;
 import com.atzuche.order.admin.vo.resp.renterWz.*;
@@ -22,7 +21,6 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * RenterWzService
@@ -180,7 +178,7 @@ public class RenterWzService {
         return wzCostLogsResVO;
     }
 
-    public List<TemporaryRefundLogResVO> queryTemporaryRefundLogsByOrderNo(String orderNo) {
+    private List<TemporaryRefundLogResVO> queryTemporaryRefundLogsByOrderNo(String orderNo) {
         List<WzTemporaryRefundLogEntity> wzTemporaryRefundLogEntities = wzTemporaryRefundLogService.queryTemporaryRefundLogsByOrderNo(orderNo);
         List<TemporaryRefundLogResVO> wzCostLogs = new ArrayList<>();
         TemporaryRefundLogResVO vo;
@@ -225,8 +223,8 @@ public class RenterWzService {
         rs.setCostDetails(costDetails);
 
         //暂扣日志
-        List<TemporaryRefundLogResVO> temporaryRefundLogResVOS = this.queryTemporaryRefundLogsByOrderNo(orderNo);
-        rs.setTemporaryRefundLogs(temporaryRefundLogResVOS);
+        List<TemporaryRefundLogResVO> temporaryRefundLogResVos = this.queryTemporaryRefundLogsByOrderNo(orderNo);
+        rs.setTemporaryRefundLogs(temporaryRefundLogResVos);
         //TODO 还缺海豹的接口
 
         RenterWzWithholdResVO withhold = new RenterWzWithholdResVO();
