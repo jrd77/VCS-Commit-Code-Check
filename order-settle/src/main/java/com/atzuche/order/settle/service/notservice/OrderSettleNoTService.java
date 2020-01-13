@@ -750,7 +750,7 @@ public class OrderSettleNoTService {
         if(Objects.nonNull(rentCosts)){
             //1.1 查询租车费用
             List<RenterOrderCostDetailEntity> renterOrderCostDetails = rentCosts.getRenterOrderCostDetails();
-            if(CollectionUtils.isEmpty(renterOrderCostDetails)){
+            if(!CollectionUtils.isEmpty(renterOrderCostDetails)){
                 for(int i=0; i<renterOrderCostDetails.size();i++){
                     RenterOrderCostDetailEntity renterOrderCostDetail = renterOrderCostDetails.get(i);
                     AccountRenterCostSettleDetailEntity accountRenterCostSettleDetail = new AccountRenterCostSettleDetailEntity();
@@ -758,6 +758,7 @@ public class OrderSettleNoTService {
                     accountRenterCostSettleDetail.setCostCode(renterOrderCostDetail.getCostCode());
                     accountRenterCostSettleDetail.setCostDetail(renterOrderCostDetail.getCostDesc());
                     accountRenterCostSettleDetail.setUniqueNo(String.valueOf(renterOrderCostDetail.getId()));
+                    accountRenterCostSettleDetail.setAmt(renterOrderCostDetail.getTotalAmount());
                     accountRenterCostSettleDetails.add(accountRenterCostSettleDetail);
                 }
             }
@@ -769,6 +770,7 @@ public class OrderSettleNoTService {
                 accountRenterCostSettleDetail.setCostCode(RenterCashCodeEnum.ACCOUNT_RENTER_DELIVERY_OIL_COST.getCashNo());
                 accountRenterCostSettleDetail.setCostDetail(RenterCashCodeEnum.ACCOUNT_RENTER_DELIVERY_OIL_COST.getTxt());
                 accountRenterCostSettleDetail.setUniqueNo(String.valueOf(oilAmt.getId()));
+                accountRenterCostSettleDetail.setAmt(oilAmt.getTotalAmount());
                 accountRenterCostSettleDetails.add(accountRenterCostSettleDetail);
             }
             //1.3 交接车-获取超里程费用
@@ -779,11 +781,12 @@ public class OrderSettleNoTService {
                 accountRenterCostSettleDetail.setCostCode(RenterCashCodeEnum.ACCOUNT_RENTER_DELIVERY_MILEAGE_COST.getCashNo());
                 accountRenterCostSettleDetail.setCostDetail(RenterCashCodeEnum.ACCOUNT_RENTER_DELIVERY_MILEAGE_COST.getTxt());
                 accountRenterCostSettleDetail.setUniqueNo(String.valueOf(mileageAmt.getId()));
+                accountRenterCostSettleDetail.setAmt(mileageAmt.getTotalAmount());
                 accountRenterCostSettleDetails.add(accountRenterCostSettleDetail);
             }
             //1.4 补贴
             List<RenterOrderSubsidyDetailEntity> renterOrderSubsidyDetails = rentCosts.getRenterOrderSubsidyDetails();
-            if(CollectionUtils.isEmpty(renterOrderSubsidyDetails)) {
+            if(!CollectionUtils.isEmpty(renterOrderSubsidyDetails)) {
                 for (int i = 0; i < renterOrderSubsidyDetails.size(); i++) {
                     RenterOrderSubsidyDetailEntity renterOrderCostDetail = renterOrderSubsidyDetails.get(i);
                     AccountRenterCostSettleDetailEntity accountRenterCostSettleDetail = new AccountRenterCostSettleDetailEntity();
@@ -808,7 +811,7 @@ public class OrderSettleNoTService {
             }
             //1.5租客罚金
             List<RenterOrderFineDeatailEntity> renterOrderFineDeatails = rentCosts.getRenterOrderFineDeatails();
-            if(CollectionUtils.isEmpty(renterOrderFineDeatails)) {
+            if(!CollectionUtils.isEmpty(renterOrderFineDeatails)) {
                 for (int i = 0; i < renterOrderFineDeatails.size(); i++) {
                     RenterOrderFineDeatailEntity renterOrderCostDetail = renterOrderFineDeatails.get(i);
                     AccountRenterCostSettleDetailEntity accountRenterCostSettleDetail = new AccountRenterCostSettleDetailEntity();
@@ -844,7 +847,7 @@ public class OrderSettleNoTService {
             }
             //1.6 管理后台补贴
             List<OrderConsoleSubsidyDetailEntity> orderConsoleSubsidyDetails = rentCosts.getOrderConsoleSubsidyDetails();
-            if(CollectionUtils.isEmpty(orderConsoleSubsidyDetails)) {
+            if(!CollectionUtils.isEmpty(orderConsoleSubsidyDetails)) {
                 for (int i = 0; i < orderConsoleSubsidyDetails.size(); i++) {
                     OrderConsoleSubsidyDetailEntity renterOrderCostDetail = orderConsoleSubsidyDetails.get(i);
                     AccountRenterCostSettleDetailEntity accountRenterCostSettleDetail = new AccountRenterCostSettleDetailEntity();
@@ -870,7 +873,7 @@ public class OrderSettleNoTService {
             }
             //1.7 获取全局的租客订单罚金明细
             List<ConsoleRenterOrderFineDeatailEntity> consoleRenterOrderFineDeatails = rentCosts.getConsoleRenterOrderFineDeatails();
-            if(CollectionUtils.isEmpty(consoleRenterOrderFineDeatails)) {
+            if(!CollectionUtils.isEmpty(consoleRenterOrderFineDeatails)) {
                 for (int i = 0; i < consoleRenterOrderFineDeatails.size(); i++) {
                     ConsoleRenterOrderFineDeatailEntity renterOrderCostDetail = consoleRenterOrderFineDeatails.get(i);
                     AccountRenterCostSettleDetailEntity accountRenterCostSettleDetail = new AccountRenterCostSettleDetailEntity();
