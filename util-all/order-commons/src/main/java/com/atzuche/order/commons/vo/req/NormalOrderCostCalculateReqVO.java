@@ -40,6 +40,10 @@ public class NormalOrderCostCalculateReqVO extends BaseVO {
     @NotBlank(message = "订单场景编码不能为空")
     private String sceneCode;
 
+    @AutoDocProperty(value = "订单来源")
+    @NotBlank(message = "订单来源不能为空")
+    private String source;
+
     @AutoDocProperty(value = "订单取车时间(yyyy-MM-dd HH:mm:ss)", required = true)
     @NotBlank(message = "订单取车时间不能为空")
     private String rentTime;
