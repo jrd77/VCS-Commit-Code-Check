@@ -65,5 +65,7 @@ public class OwnerOrderFineDeatailService{
         fineEntity.setOrderNo(costBaseDTO.getOrderNo());
         return fineEntity;
     }
-
+    public int addOwnerOrderFineRecord(OwnerOrderFineDeatailEntity entity) {
+        return  ownerOrderFineDeatailMapper.insertSelective(entity);
+    }
 }
