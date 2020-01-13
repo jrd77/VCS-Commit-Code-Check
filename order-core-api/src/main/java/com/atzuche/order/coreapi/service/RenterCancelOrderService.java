@@ -106,7 +106,11 @@ public class RenterCancelOrderService {
         orderStatusService.saveOrderStatusInfo(buildOrderStatusDTO(orderNo));
         renterOrderService.updateRenterOrderChildStatus(renterOrderEntity.getId(),
                 RenterChildStatusEnum.END.getCode());
-        ownerOrderService.updateOwnerOrderChildStatus(ownerOrderEntity.getId(), OwnerChildStatusEnum.END.getCode());
+
+        if(null != ownerOrderEntity) {
+            ownerOrderService.updateOwnerOrderChildStatus(ownerOrderEntity.getId(), OwnerChildStatusEnum.END.getCode());
+        }
+
         orderFlowService.inserOrderStatusChangeProcessInfo(orderNo, OrderStatusEnum.CLOSED);
         //取消信息处理(order_cancel_reason)
         orderCancelReasonService.addOrderCancelReasonRecord(buildOrderCancelReasonEntity(orderNo,renterOrderEntity.getRenterOrderNo(),

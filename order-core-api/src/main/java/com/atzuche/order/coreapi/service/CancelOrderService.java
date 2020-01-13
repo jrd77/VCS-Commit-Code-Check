@@ -76,13 +76,10 @@ public class CancelOrderService {
             stockService.releaseCarStock(cancelOrderReqVO.getOrderNo(), res.getCarNo());
         }
 
-        //通知收银台退款以及退还凹凸币和钱包
         if (null != res && null != res.getIsRefund() && res.getIsRefund()) {
+            //通知收银台退款以及退还凹凸币和钱包
             orderSettleService.settleOrderCancel(cancelOrderReqVO.getOrderNo());
-        }
-
-        //通知流程系统
-        if (null != res) {
+            //通知流程系统
             CancelOrderDeliveryVO cancelOrderDeliveryVO = buildCancelOrderDeliveryVO(cancelOrderReqVO.getOrderNo(),
                     res);
             if (null != cancelOrderDeliveryVO) {

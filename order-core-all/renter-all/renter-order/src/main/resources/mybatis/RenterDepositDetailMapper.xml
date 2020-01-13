@@ -141,5 +141,11 @@
 		    </set>
 		where id = #{id}
 	</update>
-  	
+    <select id="selectByOrderNo" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List" />
+        from renter_deposit_detail
+        where `order_no` = #{orderNo}
+         and `is_delete` = 0
+    </select>
+
 </mapper>
