@@ -87,7 +87,10 @@ public class DeliveryCarService {
 
         List<OrderDeliveryFlowEntity> orderDeliveryFlowEntityList = deliveryFlowService.selectOrderDeliveryFlowByOrderNo(renterOrderNo);
         if (CollectionUtils.isEmpty(orderDeliveryFlowEntityList)) {
-            throw new DeliveryOrderException(DeliveryErrorCode.DELIVERY_PARAMS_ERROR.getValue(), "没有找到发送至仁云的数据");
+            //不抛异常，直接return
+            log.info("没有找到当前子订单的配送订单信息：renterOrderNo：{}",renterOrderNo.toString());
+            return;
+            //throw new DeliveryOrderException(DeliveryErrorCode.DELIVERY_PARAMS_ERROR.getValue(), "没有找到发送至仁云的数据");
         }
         for(OrderDeliveryFlowEntity orderDeliveryFlowEntity : orderDeliveryFlowEntityList) {
             RenYunFlowOrderDTO renYunFlowOrderDTO = createRenYunDTO(orderDeliveryFlowEntity);
