@@ -97,7 +97,7 @@ public class OwnerRefuseOrderService {
                 renterOrderEntity.getRenterOrderNo());
         boolean isDispatch =
                 carRentalTimeApiService.checkCarDispatch(carRentalTimeApiService.buildCarDispatchReqVO(orderEntity,
-                        orderStatusEntity, ownerCouponEntity));
+                        orderStatusEntity, ownerCouponEntity,1));
 
         OrderStatusDTO orderStatusDTO = new OrderStatusDTO();
         orderStatusDTO.setOrderNo(reqVO.getOrderNo());

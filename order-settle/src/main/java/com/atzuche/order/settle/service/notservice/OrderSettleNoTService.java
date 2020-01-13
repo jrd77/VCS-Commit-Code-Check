@@ -492,9 +492,9 @@ public class OrderSettleNoTService {
         if(!CollectionUtils.isEmpty(accountOwnerCostSettleDetails)){
             int ownerCostAmtFinal = accountOwnerCostSettleDetails.stream().mapToInt(AccountOwnerCostSettleDetailEntity::getAmt).sum();
             settleOrdersDefinition.setOwnerCostAmtFinal(ownerCostAmtFinal);
-            int ownerCostAmt = accountOwnerCostSettleDetails.stream().filter(obj ->{return obj.getAmt()<0;}).mapToInt(AccountOwnerCostSettleDetailEntity::getAmt).sum();
+            int ownerCostAmt = accountOwnerCostSettleDetails.stream().filter(obj ->{return obj.getAmt()>0;}).mapToInt(AccountOwnerCostSettleDetailEntity::getAmt).sum();
             settleOrdersDefinition.setOwnerCostAmt(ownerCostAmt);
-            int ownerSubsidyAmt = accountOwnerCostSettleDetails.stream().filter(obj ->{return obj.getAmt()>0;}).mapToInt(AccountOwnerCostSettleDetailEntity::getAmt).sum();
+            int ownerSubsidyAmt = accountOwnerCostSettleDetails.stream().filter(obj ->{return obj.getAmt()<0;}).mapToInt(AccountOwnerCostSettleDetailEntity::getAmt).sum();
             settleOrdersDefinition.setOwnerSubsidyAmt(ownerSubsidyAmt);
         }
         //3 平台收益总账
@@ -1187,9 +1187,34 @@ public class OrderSettleNoTService {
     }
 
     /**
-     * 取消订单查询 租客罚金信息
+     * 取消订单查询 获取租客罚金信息
      * @param settleOrders
      */
-    public void getCencelRenterCostSettleDetail(SettleOrders settleOrders) {
+    public void getCancelRenterCostSettleDetail(SettleOrders settleOrders) {
+        //1 租客罚金
+        List<RenterOrderFineDeatailEntity> renterOrderFineDeatails = renterOrderFineDeatailService.listRenterOrderFineDeatail(settleOrders.getOrderNo(),settleOrders.getRenterOrderNo());
+        //2 获取全局的租客订单罚金明细（租客车主共用表 ，会员号区分车主/租客）
+        List<ConsoleRenterOrderFineDeatailEntity> consoleRenterOrderFineDeatails = consoleRenterOrderFineDeatailService.listConsoleRenterOrderFineDeatail(settleOrders.getOrderNo(),settleOrders.getRenterMemNo());
+        RentCosts rentCosts = new RentCosts();
+
+        rentCosts.setRenterOrderFineDeatails(renterOrderFineDeatails);
+        rentCosts.setConsoleRenterOrderFineDeatails(consoleRenterOrderFineDeatails);
+        settleOrders.setRentCosts(rentCosts);
+    }
+
+    /**
+     * 查询所有车主罚金明细
+     * @param settleOrders
+     */
+    public void getCancelOwnerCostSettleDetail(SettleOrders settleOrders) {
+        OwnerCosts ownerCosts = new OwnerCosts();
+
+        //1 获取全局的车主订单罚金明细（租客车主共用表 ，会员号区分车主/租客）
+        List<ConsoleRenterOrderFineDeatailEntity> consoleRenterOrderFineDeatails = consoleRenterOrderFineDeatailService.listConsoleRenterOrderFineDeatail(settleOrders.getOrderNo(),settleOrders.getOwnerOrderNo());
+        //2 车主罚金
+        List<OwnerOrderFineDeatailEntity> ownerOrderFineDeatails = ownerOrderFineDeatailService.getOwnerOrderFineDeatailByOrderNo(settleOrders.getOrderNo());
+        ownerCosts.setOwnerOrderFineDeatails(ownerOrderFineDeatails);
+        ownerCosts.setConsoleRenterOrderFineDeatails(consoleRenterOrderFineDeatails);
+        settleOrders.setOwnerCosts(ownerCosts);
     }
 }
