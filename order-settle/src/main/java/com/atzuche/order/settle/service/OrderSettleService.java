@@ -148,6 +148,7 @@ public class OrderSettleService{
 //            //5 车主罚金处理
 //            orderSettleNoTService.handleOwnerFine(settleOrders,settleCancelOrdersAccount);
 //            //6 租客罚金处理
+//            orderSettleNoTService.handleRentFine(settleOrders,settleCancelOrdersAccount);
 //            //7 租客金额 退还 包含 凹凸币，钱包 租车费用 押金 违章押金 退还 （优惠卷退还 TODO）
 //
 //            log.info("OrderSettleService initSettleOrders settleOrders [{}]", GsonUtils.toJson(settleOrders));

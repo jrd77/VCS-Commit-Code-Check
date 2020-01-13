@@ -25,7 +25,7 @@ public class WzTestController {
     /**
      * 每天定时查询当前进行中的订单，查询是否有违章记录
      */
-    @GetMapping(path = "/wz/illegalInOrderQueryTaskTest")
+    @GetMapping("/wz/illegalInOrderQueryTaskTest")
     public String illegalInOrderQueryTaskTest() {
         try {
             illegalInOrderQueryTask.execute("");
@@ -39,7 +39,7 @@ public class WzTestController {
     /**
      * 查询按规则配置日期内完成的订单
      */
-    @GetMapping(path = "/wz/illegalQueryTask")
+    @GetMapping("/wz/illegalQueryTask")
     public String illegalQueryTask(){
         try {
             illegalQueryTask.execute("");
@@ -53,7 +53,7 @@ public class WzTestController {
     /**
      * 查询违章待发短信，jPush通知和App推送信息
      */
-    @GetMapping(path = "/wz/illegalSmsSendTask")
+    @GetMapping("/wz/illegalSmsSendTask")
     public String illegalSmsSendTask(){
         try {
             illegalSmsSendTask.execute("");
@@ -67,7 +67,7 @@ public class WzTestController {
     /**
      * 每天定时处理结算前15分钟订单，查询是否有违章记录
      */
-    @GetMapping(path = "/wz/illegalTransStatTask")
+    @GetMapping("/wz/illegalTransStatTask")
     public String illegalTransStatTask(){
         try {
             illegalTransStatTask.execute("");
@@ -80,7 +80,7 @@ public class WzTestController {
     /**
      * 每天定时处理 实际还车15天后系统自动生成，调用流程系统，查询是否有违章记录
      */
-    @GetMapping(path = "/wz/orderIllegalRenYunTask")
+    @GetMapping("/wz/orderIllegalRenYunTask")
     public String orderIllegalRenYunTask(){
         try {
             orderIllegalRenYunTask.execute("");
