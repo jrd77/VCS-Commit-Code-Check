@@ -1,6 +1,6 @@
 package com.atzuche.order.coreapi.mapper;
 
-import com.atzuche.order.commons.entity.RabbitMsgLogEntity;
+import com.atzuche.order.coreapi.entity.RabbitMsgLogEntity;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 

@@ -91,6 +91,7 @@ public class PreOrderController {
             carDayPrice.setDay(dto.getCarDay().toString());
             carDayPrice.setPrice(dto.getCarUnitPrice().toString());
             carDayPrice.setDesc("工作日");
+            carDayPrices.add(carDayPrice);
         }
 
         responseVO.setCarSpecialDayPrices(carDayPrices);

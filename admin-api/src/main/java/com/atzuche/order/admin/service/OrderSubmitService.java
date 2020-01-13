@@ -1,8 +1,11 @@
 package com.atzuche.order.admin.service;
 
+import com.alibaba.fastjson.JSON;
 import com.atzuche.order.admin.util.StringUtil;
 import com.atzuche.order.admin.util.TimeUtil;
 import com.atzuche.order.admin.vo.req.orderSubmit.AdminTransReqVO;
+import com.atzuche.order.commons.http.HttpResult;
+import com.atzuche.order.commons.http.HttpUtil;
 import com.atzuche.order.commons.vo.req.AdminOrderReqVO;
 import com.atzuche.order.commons.vo.res.OrderResVO;
 import com.atzuche.order.open.service.FeignOrderAdminSubmitService;
@@ -25,8 +28,8 @@ public class OrderSubmitService {
         AdminOrderReqVO adminOrderReqParam = this.transDto(adminOrderReqVO,request);
 
         //2、http发送
-        ResponseData<OrderResVO> orderDetail = feignOrderAdminSubmitService.getOrderDetail(adminOrderReqParam);
-        //HttpResult orderDetail = HttpUtil.doPostNotGzip("http://localhost:7777/order/admin/req", JSON.toJSONString(adminOrderReqParam));
+        //ResponseData<OrderResVO> orderDetail = feignOrderAdminSubmitService.getOrderDetail(adminOrderReqParam);
+        HttpResult orderDetail = HttpUtil.doPostNotGzip("http://10.0.3.235:1412/order/admin/req", JSON.toJSONString(adminOrderReqParam));
         //3、返回结果
         ResponseData responseData = new ResponseData();
         responseData.setData(orderDetail.getData());
@@ -120,7 +123,7 @@ public class OrderSubmitService {
         param.setAppName(reqVO.getAppName());
         param.setPublicToken(reqVO.getPublicToken());
         param.setAppChannelId(reqVO.getAppChannelId());
-        param.setMemNo(reqVO.getMemNo());
+        param.setMemNo(reqVO.getMemNo()==null?reqVO.getMem_no():null);
         param.setCarNo(reqVO.getCarNo());
         param.setSchema(reqVO.getSchema());
         param.setCityCode(reqVO.getCityCode());

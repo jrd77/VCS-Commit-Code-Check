@@ -116,8 +116,10 @@ public class OwnerRefuseOrderService {
             couponAndCoinHandleService.undoPlatformCoupon(reqVO.getOrderNo());
             couponAndCoinHandleService.undoPlatformCoupon(reqVO.getOrderNo());
             //退还车主券
-            String recover = null == orderStatusEntity.getRentCarPayStatus() || orderStatusEntity.getRentCarPayStatus() == 0 ? "1" : "0";
-            couponAndCoinHandleService.undoOwnerCoupon(reqVO.getOrderNo(), ownerCouponEntity.getCouponId(), recover);
+            if(null != ownerCouponEntity) {
+                String recover = null == orderStatusEntity.getRentCarPayStatus() || orderStatusEntity.getRentCarPayStatus() == 0 ? "1" : "0";
+                couponAndCoinHandleService.undoOwnerCoupon(reqVO.getOrderNo(), ownerCouponEntity.getCouponId(), recover);
+            }
             //通知收银台退还凹凸币和钱包
             orderSettleService.settleOrderCancel(reqVO.getOrderNo());
         }
