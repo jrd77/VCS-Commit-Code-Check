@@ -170,10 +170,6 @@ public class IllegalToDoService {
                     List list = (List) result.getData();
                     for (Object object : list) {
                         Violation violation = JSONObject.parseObject(object.toString(), Violation.class);
-                        if(org.apache.commons.lang3.StringUtils.isNotBlank(violation.getClxCode())){
-                            logger.error("查询车乐行 错误 code :[{}],error:[{}]",violation.getClxCode(),violation.getClxErrorsMsg());
-                            continue;
-                        }
                         if (violation.getTime().before(revertTime) && violation.getTime().after(rentTime)) {
                             // 车辆有违章信息
                             entity.setIllegalFlag(1);

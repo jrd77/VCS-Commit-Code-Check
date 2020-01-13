@@ -6,7 +6,6 @@ import com.atzuche.order.accountrenterwzdepost.vo.req.CreateOrderRenterWZDeposit
 import com.atzuche.order.car.CarProxyService;
 import com.atzuche.order.cashieraccount.service.CashierService;
 import com.atzuche.order.commons.CommonUtils;
-import com.atzuche.order.commons.ListUtil;
 import com.atzuche.order.commons.LocalDateTimeUtils;
 import com.atzuche.order.commons.OrderReqContext;
 import com.atzuche.order.commons.constant.OrderConstant;
@@ -20,13 +19,13 @@ import com.atzuche.order.commons.vo.req.OrderReqVO;
 import com.atzuche.order.commons.vo.res.OrderResVO;
 import com.atzuche.order.coreapi.common.conver.OrderCommonConver;
 import com.atzuche.order.coreapi.entity.vo.req.AutoCoinDeductReqVO;
-import com.atzuche.order.coreapi.entity.vo.req.CarRentTimeRangeReqVO;
 import com.atzuche.order.coreapi.entity.vo.req.OwnerCouponBindReqVO;
 import com.atzuche.order.coreapi.entity.vo.req.SubmitOrderRiskCheckReqVO;
 import com.atzuche.order.coreapi.entity.vo.res.CarRentTimeRangeResVO;
 import com.atzuche.order.coreapi.utils.BizAreaUtil;
 import com.atzuche.order.delivery.service.delivery.DeliveryCarService;
 import com.atzuche.order.flow.service.OrderFlowService;
+import com.atzuche.order.mem.MemProxyService;
 import com.atzuche.order.owner.commodity.service.OwnerGoodsService;
 import com.atzuche.order.owner.mem.service.OwnerMemberService;
 import com.atzuche.order.ownercost.entity.OwnerOrderPurchaseDetailEntity;
@@ -44,11 +43,14 @@ import com.atzuche.order.rentercost.entity.RenterOrderCostDetailEntity;
 import com.atzuche.order.rentercost.entity.dto.OrderCouponDTO;
 import com.atzuche.order.rentermem.service.RenterMemberService;
 import com.atzuche.order.renterorder.service.RenterOrderService;
-import com.atzuche.order.renterorder.vo.*;
+import com.atzuche.order.renterorder.vo.CouponAndAutoCoinResVO;
+import com.atzuche.order.renterorder.vo.RenterOrderCarDepositResVO;
+import com.atzuche.order.renterorder.vo.RenterOrderIllegalResVO;
+import com.atzuche.order.renterorder.vo.RenterOrderResVO;
+import com.atzuche.order.renterwz.service.RenterOrderWzStatusService;
 import com.autoyol.car.api.model.dto.LocationDTO;
 import com.autoyol.car.api.model.dto.OrderInfoDTO;
 import com.autoyol.car.api.model.enums.OrderOperationTypeEnum;
-import com.atzuche.order.mem.MemProxyService;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -109,6 +111,8 @@ public class SubmitOrderService {
     private OrderCommonConver orderCommonConver;
     @Autowired
     private StockService stockService;
+    @Autowired
+    private RenterOrderWzStatusService renterOrderWzStatusService;
 
     /**
      * 提交订单
@@ -224,7 +228,9 @@ public class SubmitOrderService {
                         carRentTimeRangeResVO.getGetMinutes(), null == carRentTimeRangeResVO ? null :
                         carRentTimeRangeResVO.getReturnMinutes(),
                 reqContext);
-
+        //违章状态
+        String operator = orderReqVO.getOperator()==null||orderReqVO.getOperator().trim().length()<=0?renterMemberDTO.getRealName():orderReqVO.getOperator();
+        renterOrderWzStatusService.createInfo(orderNo,ownerGoodsDetailDTO.getCarPlateNum(),operator);
         //6.主订单相关信息处理
         ParentOrderDTO parentOrderDTO = new ParentOrderDTO();
         //6.1主订单信息处理

@@ -104,7 +104,7 @@ public class OrderOtherInformationController extends BaseController{
                     BeanUtils.copyProperties(orderRiskStatusRequestVO, orderRiskStatusRequestDTO);
                     orderRiskStatusRequestDTO.setOperator(AdminUserUtil.getAdminUser().getAuthName());
                     String mqJson = GsonUtils.toJson(orderRiskStatusRequestDTO);
-                    rabbitTemplate.convertAndSend(RiskRabbitMQEventEnum.ORDER_RISK_STATUS_CHANGE.exchange, RiskRabbitMQEventEnum.ORDER_RISK_STATUS_CHANGE.routingKey, mqJson);
+                    rabbitTemplate.convertAndSend(RiskRabbitMQEventEnum.ORDER_RISK_C_CAR_ACCIDENT.exchange, RiskRabbitMQEventEnum.ORDER_RISK_C_CAR_ACCIDENT.routingKey, mqJson);
                     CatLogRecord.successLog(LogDescription.getCatDescription(DescriptionConstant.CONSOLE_ORDER_OTHER_INFORMATION_RISK_STATUS_UPDATE, DescriptionConstant.SUCCESS_TEXT), UrlConstant.CONSOLE_ORDER_OTHER_INFORMATION_RISK_STATUS_UPDATE,  orderRiskStatusRequestVO);
                     return ResponseData.success();
                 }
