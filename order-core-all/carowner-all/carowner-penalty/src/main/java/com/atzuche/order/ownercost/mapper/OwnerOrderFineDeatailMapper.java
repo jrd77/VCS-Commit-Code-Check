@@ -2,6 +2,9 @@ package com.atzuche.order.ownercost.mapper;
 
 import com.atzuche.order.ownercost.entity.OwnerOrderFineDeatailEntity;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
  * 车主订单罚金明细表
@@ -13,6 +16,8 @@ import org.apache.ibatis.annotations.Mapper;
 public interface OwnerOrderFineDeatailMapper{
 
     OwnerOrderFineDeatailEntity selectByPrimaryKey(Integer id);
+
+    List<OwnerOrderFineDeatailEntity> selectByOrderNo(@Param("orderNo") String orderNo);
 
     int insert(OwnerOrderFineDeatailEntity record);
     

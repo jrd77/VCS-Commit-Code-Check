@@ -275,10 +275,9 @@ public class DeliveryCarService {
         orderDeliveryDTO.setParamsTypeValue(orderReqVO, orderType, ownerMemberDTO, renterMemberDTO);
         orderDeliveryFlowEntity.setRenterOrderNo(renterGoodsDetailDTO.getRenterOrderNo());
         orderDeliveryFlowEntity.setOrderNo(renterGoodsDetailDTO.getOrderNo());
-        orderDeliveryFlowEntity.setOrderType(orderReqVO.getOrderCategory());
         orderDeliveryFlowEntity.setServiceTypeInfo(orderType, orderDeliveryDTO);
         orderDeliveryFlowEntity.setTermTime(renterGoodsDetailDTO.getRentTime());
-        orderDeliveryFlowEntity.setReturnTime(renterGoodsDetailDTO.getRentTime());
+        orderDeliveryFlowEntity.setReturnTime(renterGoodsDetailDTO.getRevertTime());
         orderDeliveryFlowEntity.setCarNo(String.valueOf(renterGoodsDetailDTO.getCarNo()));
         orderDeliveryFlowEntity.setVehicleModel(renterGoodsDetailDTO.getCarBrandTxt());
         orderDeliveryFlowEntity.setVehicleType(renterGoodsDetailDTO.getCarTypeTxt());
@@ -293,6 +292,11 @@ public class DeliveryCarService {
         orderDeliveryFlowEntity.setOwnerType(Integer.valueOf(ownerGoodsDetailDTO.getType()));
         orderDeliveryFlowEntity.setSceneName(orderReqVO.getSceneCode());
         orderDeliveryFlowEntity.setIsDelete(0);
+        if(StringUtils.isNotBlank(orderReqVO.getOrderCategory()) && "1".equals(orderReqVO.getOrderCategory())){
+            orderDeliveryFlowEntity.setOrderType("0");
+        }
+        orderDeliveryFlowEntity.setCreateTime(LocalDateTime.now());
+        orderDeliveryFlowEntity.setUpdateTime(LocalDateTime.now());
         orderDeliveryFlowEntity.setDisplacement(String.valueOf(ownerGoodsDetailDTO.getCarCylinderCapacity()));
         orderDeliveryFlowEntity.setSource(orderReqVO.getSource());
         orderDeliveryVO.setOrderDeliveryDTO(orderDeliveryDTO);

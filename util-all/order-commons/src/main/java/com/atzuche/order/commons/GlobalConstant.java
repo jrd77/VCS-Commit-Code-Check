@@ -33,4 +33,7 @@ public class GlobalConstant {
     public static final String GET_FINE_AMT = "get_fine_amt";
     public static final String RETURN_FINE_AMT = "return_fine_amt";
 
+    public static final String NEW_ORDER_NO_SUFFIX = "99";
+    public static final int NEW_ORDER_NO_LEN = 14;
+
 }
