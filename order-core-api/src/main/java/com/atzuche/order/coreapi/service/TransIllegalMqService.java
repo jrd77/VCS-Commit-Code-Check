@@ -65,6 +65,7 @@ public class TransIllegalMqService {
     private static final String REN_YUN_MQ_INFO_WZ_INFO = "wzinfo";
     private static final String REN_YUN_MQ_INFO_WZ_ADDR = "wziaddr";
     private static final String REN_YUN_MQ_INFO_WZ_CODE = "wzicode";
+    private static final String REN_YUN_MQ_INFO_WZ_CODE_1 = "wzcode";
     private static final String REN_YUN_MQ_INFO_WZ_CONTENT = "wzicontent";
     private static final String REN_YUN_MQ_INFO_WZ_FINES = "wzifines";
     private static final String REN_YUN_MQ_INFO_WZ_POINTS = "wzipoints";
@@ -180,7 +181,7 @@ public class TransIllegalMqService {
             //就算之前存在 ，仍需要记录 这是日志表
             isNeedHandle(messageBody,"02",carNum);
 
-            String wzCode=jsonObject.getString(REN_YUN_MQ_INFO_WZ_CODE);
+            String wzCode=jsonObject.getString(REN_YUN_MQ_INFO_WZ_CODE_1);
             //校验订单是否已结算
             if(renterOrderWzSettleFlagService.getIllegalSettleFlag(orderNo,carNum)>0){
                 throw new RuntimeException("订单号："+orderNo+"，违章编号："+wzCode+"，订单违章已结算，不做数据处理，请流程系统检查数据");
