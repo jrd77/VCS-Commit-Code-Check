@@ -92,4 +92,5 @@ include 'order-wallet:order-wallet-client'
 findProject(':order-wallet:order-wallet-client')?.name = 'order-wallet-client'
 include 'order-wallet:order-wallet-api'
 findProject(':order-wallet:order-wallet-api')?.name = 'order-wallet-api'
+include 'order-transport'
 
