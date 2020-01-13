@@ -116,16 +116,16 @@ public class MemProxyService {
 
     private String convertYesOrNo(Integer internalStaff) {
         if(internalStaff!=null&&internalStaff==1){
-            return "是";
+            return "1";
         }
-        return "否";
+        return "0";
     }
 
     private String convertGender(Integer gender) {
         if(gender!=null&&gender==1){
-            return "男";
+            return "1";
         }
-        return "女";
+        return "2";
     }
 
 
