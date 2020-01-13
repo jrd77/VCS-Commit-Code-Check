@@ -2,6 +2,8 @@ package com.atzuche.order.delivery.utils;
 
 import com.alibaba.fastjson.JSON;
 import com.atzuche.order.delivery.common.DeliveryConstants;
+import com.atzuche.order.delivery.entity.OwnerHandoverCarInfoEntity;
+import com.atzuche.order.delivery.entity.RenterHandoverCarInfoEntity;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.collections.CollectionUtils;

@@ -2,7 +2,9 @@ package com.atzuche.order.coreapi.entity.dto;
 
 import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
 import com.atzuche.order.commons.entity.dto.RenterMemberDTO;
+import com.atzuche.order.coreapi.entity.vo.res.CarRentTimeRangeResVO;
 import com.atzuche.order.parentorder.entity.OrderEntity;
+import com.atzuche.order.parentorder.entity.OrderStatusEntity;
 import com.atzuche.order.rentercost.entity.dto.RenterOrderSubsidyDetailDTO;
 import com.atzuche.order.renterorder.entity.OrderCouponEntity;
 import com.atzuche.order.renterorder.entity.dto.OrderChangeItemDTO;
@@ -132,4 +134,12 @@ public class ModifyOrderDTO {
 	 * 已使用的券对象列表
 	 */
 	private List<OrderCouponEntity> orderCouponList;
+	/**
+	 * 订单状态
+	 */
+	private OrderStatusEntity orderStatusEntity;
+	/**
+	 * 提前延后时间
+	 */
+	private CarRentTimeRangeResVO carRentTimeRangeResVO;
 }

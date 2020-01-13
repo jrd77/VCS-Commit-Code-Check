@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.*;
  * 配送服务接口
  */
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/console/api")
 @Slf4j
 public class DeliveryCarController extends BaseController {
 
@@ -79,12 +79,12 @@ public class DeliveryCarController extends BaseController {
     @AutoDocGroup(group = "管理后台取还车更新")
     @AutoDocMethod(description = "取还车更新", value = "取还车更新",response = ResponseData.class)
     @RequestMapping(value = "/delivery/update", method = RequestMethod.POST)
-    public ResponseData<?> updateDeliveryCarInfo(@RequestBody @Validated DeliveryReqVO deliveryReqVO, BindingResult bindingResult) {
+    public ResponseData<?> updateDeliveryCarInfo(@RequestBody @Validated DeliveryCarVO deliveryCarVO, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             return validate(bindingResult);
         }
         try {
-            deliveryCarInfoService.updateDeliveryCarInfo(deliveryReqVO);
+            deliveryCarInfoService.updateDeliveryCarInfo(deliveryCarVO);
             return ResponseData.success();
         } catch (Exception e) {
             log.error("配送取还车更新接口出现异常", e);
@@ -100,14 +100,14 @@ public class DeliveryCarController extends BaseController {
      */
     @AutoDocVersion(version = "管理后台取还车更新")
     @AutoDocGroup(group = "管理后台取还车更新")
-    @AutoDocMethod(description = "取还车更新", value = "取还车更新",response = ResponseData.class)
+    @AutoDocMethod(description = "交接车更新", value = "交接车更新",response = ResponseData.class)
     @RequestMapping(value = "/handover/update", method = RequestMethod.POST)
-    public ResponseData<?> updateHandoverCarInfo(@RequestBody @Validated HandoverCarInfoReqVO deliveryReqVO, BindingResult bindingResult) {
+    public ResponseData<?> updateHandoverCarInfo(@RequestBody @Validated DeliveryCarVO deliveryCarVO, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             return validate(bindingResult);
         }
         try {
-            deliveryCarInfoService.updateHandoverCarInfo(deliveryReqVO);
+            deliveryCarInfoService.updateHandoverCarInfo(deliveryCarVO);
             return ResponseData.success();
         } catch (Exception e) {
             log.error("取还车更新接口出现异常", e);

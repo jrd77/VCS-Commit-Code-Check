@@ -29,7 +29,7 @@ import java.util.List;
 @Component("illegalTransStatTask")
 public class IllegalTransStatTask extends IJobHandler {
 
-    private Logger logger = LoggerFactory.getLogger(IllegalInOrderQueryTask.class);
+    private Logger logger = LoggerFactory.getLogger(IllegalTransStatTask.class);
 
     @Resource
     private OrderSearchRemoteService orderSearchRemoteService;

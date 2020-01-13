@@ -158,6 +158,11 @@
     <select id="getCashierRentCosts" resultMap="BaseResultMap">
         select <include refid="Base_Column_List" /> from cashier where order_no = #{orderNo} and mem_no = #{memNo} and pay_kind = #{payKind} and pay_type = #{payType}
     </select>
+    
+    <select id="getCashierRentCostsByOrderNo" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List" /> from cashier where order_no = #{orderNo} and is_delete = 0
+    </select>
+    
     <select id="getPayDetail" resultMap="BaseResultMap">
         select <include refid="Base_Column_List" /> from cashier where order_no = #{orderNo} and mem_no = #{memNo} and pay_kind = #{payKind} and pay_type = #{payType} and pay_source = #{paySource} order by id desc limit 1
 

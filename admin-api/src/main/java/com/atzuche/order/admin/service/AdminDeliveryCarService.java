@@ -1,14 +1,18 @@
 package com.atzuche.order.admin.service;
 
 import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
+import com.atzuche.order.delivery.entity.RenterOrderDeliveryEntity;
 import com.atzuche.order.delivery.enums.CarTypeEnum;
+import com.atzuche.order.delivery.service.RenterOrderDeliveryService;
 import com.atzuche.order.delivery.service.delivery.DeliveryCarInfoService;
+import com.atzuche.order.delivery.service.delivery.DeliveryCarService;
 import com.atzuche.order.delivery.service.handover.HandoverCarInfoService;
-import com.atzuche.order.delivery.vo.delivery.rep.DeliveryCarVO;
-import com.atzuche.order.delivery.vo.delivery.rep.OwnerGetAndReturnCarDTO;
+import com.atzuche.order.delivery.vo.delivery.rep.*;
 import com.atzuche.order.delivery.vo.delivery.req.CarConditionPhotoUploadVO;
 import com.atzuche.order.delivery.vo.delivery.req.DeliveryCarRepVO;
+import com.atzuche.order.delivery.vo.delivery.req.DeliveryReqDTO;
 import com.atzuche.order.delivery.vo.delivery.req.DeliveryReqVO;
+import com.atzuche.order.delivery.vo.handover.req.HandoverCarInfoReqDTO;
 import com.atzuche.order.delivery.vo.handover.req.HandoverCarInfoReqVO;
 import com.atzuche.order.rentercommodity.service.RenterCommodityService;
 import org.slf4j.Logger;
@@ -17,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
+import java.util.Objects;
 
 /**
  * @author 胡春林
@@ -31,6 +36,8 @@ public class AdminDeliveryCarService {
     HandoverCarInfoService handoverCarInfoService;
     @Autowired
     RenterCommodityService renterCommodityService;
+    @Autowired
+    RenterOrderDeliveryService renterOrderDeliveryService;
 
     protected final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -42,16 +49,15 @@ public class AdminDeliveryCarService {
     public DeliveryCarVO findDeliveryListByOrderNo(DeliveryCarRepVO deliveryCarDTO) {
         logger.info("入参deliveryCarDTO：[{}]", deliveryCarDTO.toString());
         // 获取租客商品信息
-        RenterGoodsDetailDTO renterGoodsDetailDTO = renterCommodityService.getRenterGoodsDetail(deliveryCarDTO.getRenterOrderNo(), false);
+        RenterOrderDeliveryEntity renterOrderDeliveryEntity = renterOrderDeliveryService.findRenterOrderByrOrderNo(deliveryCarDTO.getOrderNo(),1);
+        RenterGoodsDetailDTO renterGoodsDetailDTO = renterCommodityService.getRenterGoodsDetail(renterOrderDeliveryEntity.getRenterOrderNo(), false);
         OwnerGetAndReturnCarDTO ownerGetAndReturnCarDTO = OwnerGetAndReturnCarDTO.builder().build();
-        String tenancy = String.valueOf(Duration.between(renterGoodsDetailDTO.getRentTime(),renterGoodsDetailDTO.getRevertTime()).toDays());
-        ownerGetAndReturnCarDTO.setZuQi(tenancy);
         ownerGetAndReturnCarDTO.setRanLiao(String.valueOf(renterGoodsDetailDTO.getCarEngineType()));
         ownerGetAndReturnCarDTO.setDayKM(String.valueOf(renterGoodsDetailDTO.getCarDayMileage().toString()));
         ownerGetAndReturnCarDTO.setOilContainer(String.valueOf(renterGoodsDetailDTO.getCarOilVolume()));
         boolean isEscrowCar = CarTypeEnum.isCarType(renterGoodsDetailDTO.getCarType());
         int carType = renterGoodsDetailDTO.getCarType();
-        return deliveryCarInfoService.findDeliveryListByOrderNo(deliveryCarDTO,ownerGetAndReturnCarDTO,isEscrowCar,renterGoodsDetailDTO.getCarEngineType(),carType);
+        return deliveryCarInfoService.findDeliveryListByOrderNo(renterOrderDeliveryEntity.getRenterOrderNo(),deliveryCarDTO,ownerGetAndReturnCarDTO,isEscrowCar,renterGoodsDetailDTO.getCarEngineType(),carType);
     }
 
     /**
@@ -66,23 +72,82 @@ public class AdminDeliveryCarService {
 
     /**
      * 更新交接车信息
-     *
-     * @param handoverCarReqVO
+     * @param deliveryCarVO
      * @throws Exception
      */
-    public void updateHandoverCarInfo(HandoverCarInfoReqVO handoverCarReqVO) throws Exception {
-        logger.info("入参handoverCarReqVO：[{}]", handoverCarReqVO.toString());
-        handoverCarInfoService.updateHandoverCarInfo(handoverCarReqVO);
+    public void updateHandoverCarInfo(DeliveryCarVO deliveryCarVO) throws Exception {
+        logger.info("入参handoverCarReqVO：[{}]", deliveryCarVO.toString());
+        handoverCarInfoService.updateHandoverCarInfo(createHandoverCarInfoParams(deliveryCarVO));
     }
 
     /**
      * 更新取还车信息 更新仁云接口
-     *
-     * @param deliveryReqVO
+     * @param deliveryCarVO
      * @throws Exception
      */
-    public void updateDeliveryCarInfo(DeliveryReqVO deliveryReqVO) throws Exception {
-        logger.info("入参deliveryReqVO：[{}]", deliveryReqVO.toString());
-        handoverCarInfoService.updateDeliveryCarInfo(deliveryReqVO);
+    public void updateDeliveryCarInfo(DeliveryCarVO deliveryCarVO) throws Exception {
+        logger.info("入参deliveryReqVO：[{}]", deliveryCarVO.toString());
+        handoverCarInfoService.updateDeliveryCarInfo( createParams(deliveryCarVO));
     }
+
+
+    public DeliveryReqVO createParams(DeliveryCarVO deliveryCarVO) {
+        //取车服务信息
+        DeliveryReqVO deliveryReqVO = new DeliveryReqVO();
+        GetHandoverCarDTO getHandoverCarDTO = deliveryCarVO.getGetHandoverCarDTO();
+        ReturnHandoverCarDTO returnHandoverCarDTO = deliveryCarVO.getReturnHandoverCarDTO();
+        if (Objects.nonNull(getHandoverCarDTO)) {
+            DeliveryReqDTO deliveryReqDTO = new DeliveryReqDTO();
+            deliveryReqDTO.setIsUsedGetAndReturnCar("1");
+            deliveryReqDTO.setOrderNo(deliveryCarVO.getOrderNo());
+            deliveryReqDTO.setOwnerRealGetAddrReamrk(getHandoverCarDTO.getOwnRealGetRemark());
+            deliveryReqDTO.setRenterRealGetAddrReamrk(getHandoverCarDTO.getRenterRealGetAddrReamrk());
+            deliveryReqDTO.setRenterRealGetAddr(getHandoverCarDTO.getRenterRealGetAddr());
+            deliveryReqDTO.setOwnRealReturnAddr(getHandoverCarDTO.getOwnRealReturnAddr());
+            deliveryReqVO.setGetDeliveryReqDTO(deliveryReqDTO);
+        }
+        if (Objects.nonNull(returnHandoverCarDTO)) {
+            DeliveryReqDTO renterDeliveryReqDTO = new DeliveryReqDTO();
+            renterDeliveryReqDTO.setIsUsedGetAndReturnCar("1");
+            renterDeliveryReqDTO.setOrderNo(deliveryCarVO.getOrderNo());
+            renterDeliveryReqDTO.setRenterRealGetAddrReamrk(returnHandoverCarDTO.getRenterRealGetRemark());
+            renterDeliveryReqDTO.setOwnerRealGetAddrReamrk(returnHandoverCarDTO.getOwnerRealGetAddrReamrk());
+            renterDeliveryReqDTO.setRenterRealGetAddr(returnHandoverCarDTO.getRenterRealReturnAddr());
+            renterDeliveryReqDTO.setOwnRealReturnAddr(returnHandoverCarDTO.getOwnerRealGetAddr());
+            deliveryReqVO.setGetDeliveryReqDTO(renterDeliveryReqDTO);
+        }
+        return deliveryReqVO;
+    }
+
+    /**
+     * 构造交接车数据
+     * @param deliveryCarVO
+     * @return
+     */
+    public HandoverCarInfoReqVO createHandoverCarInfoParams(DeliveryCarVO deliveryCarVO) {
+        HandoverCarInfoReqVO handoverCarReqVO = new HandoverCarInfoReqVO();
+        if (Objects.nonNull(deliveryCarVO.getRenterGetAndReturnCarDTO())) {
+            RenterGetAndReturnCarDTO renterGetAndReturnCarDTO = deliveryCarVO.getRenterGetAndReturnCarDTO();
+            HandoverCarInfoReqDTO handoverCarInfoReqDTO = new HandoverCarInfoReqDTO();
+            handoverCarInfoReqDTO.setOrderNo(deliveryCarVO.getOrderNo());
+            handoverCarInfoReqDTO.setOwnReturnKM(renterGetAndReturnCarDTO.getReturnKM());
+            handoverCarInfoReqDTO.setOwnReturnOil(renterGetAndReturnCarDTO.getReturnCarOil());
+            handoverCarInfoReqDTO.setRenterRetrunKM(renterGetAndReturnCarDTO.getGetKM());
+            handoverCarInfoReqDTO.setRenterReturnOil(renterGetAndReturnCarDTO.getGetCarOil());
+            handoverCarReqVO.setRenterHandoverCarDTO(handoverCarInfoReqDTO);
+
+        }
+        if (Objects.nonNull(deliveryCarVO.getOwnerGetAndReturnCarDTO())) {
+            OwnerGetAndReturnCarDTO ownerGetAndReturnCarDTO = deliveryCarVO.getOwnerGetAndReturnCarDTO();
+            HandoverCarInfoReqDTO handoverCarInfoReqDTO = new HandoverCarInfoReqDTO();
+            handoverCarInfoReqDTO.setOrderNo(deliveryCarVO.getOrderNo());
+            handoverCarInfoReqDTO.setOwnReturnKM(ownerGetAndReturnCarDTO.getReturnKM());
+            handoverCarInfoReqDTO.setOwnReturnOil(ownerGetAndReturnCarDTO.getReturnCarOil());
+            handoverCarInfoReqDTO.setRenterRetrunKM(ownerGetAndReturnCarDTO.getGetKM());
+            handoverCarInfoReqDTO.setRenterReturnOil(ownerGetAndReturnCarDTO.getGetCarOil());
+            handoverCarReqVO.setOwnerHandoverCarDTO(handoverCarInfoReqDTO);
+        }
+        return handoverCarReqVO;
+    }
+
 }
