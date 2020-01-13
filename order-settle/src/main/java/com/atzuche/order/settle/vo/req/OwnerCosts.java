@@ -1,5 +1,6 @@
 package com.atzuche.order.settle.vo.req;
 
+import com.atzuche.order.ownercost.entity.OwnerOrderFineDeatailEntity;
 import com.atzuche.order.ownercost.entity.OwnerOrderIncrementDetailEntity;
 import com.atzuche.order.ownercost.entity.OwnerOrderPurchaseDetailEntity;
 import com.atzuche.order.ownercost.entity.OwnerOrderSubsidyDetailEntity;
@@ -54,4 +55,9 @@ public class OwnerCosts {
      * 全局的车主订单罚金明细
      */
     List<ConsoleRenterOrderFineDeatailEntity> consoleRenterOrderFineDeatails;
+
+    /**
+     * 车主订单罚金明细
+     */
+    List<OwnerOrderFineDeatailEntity> ownerOrderFineDeatails;
 }
