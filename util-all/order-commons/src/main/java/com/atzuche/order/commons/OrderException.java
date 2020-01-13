@@ -27,14 +27,14 @@ public abstract class OrderException extends RuntimeException {
     }
 
     public OrderException(String errorCode, String errorMsg,Object extra) {
-        super();
+        super(errorMsg);
         this.errorCode = errorCode;
         this.errorMsg = errorMsg;
         this.extra = extra;
     }
 
     public OrderException(String errorCode,String errorMsg){
-        super();
+        super(errorMsg);
         this.errorCode =errorCode;
         this.errorMsg =errorMsg;
     }

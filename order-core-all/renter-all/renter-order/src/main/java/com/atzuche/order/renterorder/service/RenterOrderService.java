@@ -93,6 +93,16 @@ public class RenterOrderService {
     public Integer updateRenterOrderEffective(Integer id, Integer effectiveFlag) {
         return renterOrderMapper.updateRenterOrderEffective(id, effectiveFlag);
     }
+    
+    /**
+     * 修改租客子单agreeFlag标志
+     * @param id
+     * @param agreeFlag
+     * @return Integer
+     */
+    public Integer updateRenterOrderAgreeFlag(Integer id, Integer agreeFlag) {
+    	return renterOrderMapper.updateRenterOrderAgreeFlag(id, agreeFlag);
+    }
 
     /**
      * 保存租客子订单
@@ -292,6 +302,10 @@ public class RenterOrderService {
         GetReturnCarOverCostReqDto getReturnCarOverCostReqDto = new GetReturnCarOverCostReqDto();
         getReturnCarOverCostReqDto.setCostBaseDTO(costBaseDTO);
         getReturnCarOverCostReqDto.setCityCode(Integer.valueOf(renterOrderReqVO.getCityCode()));
+        getReturnCarOverCostReqDto.setIsGetCarCost(null != renterOrderReqVO.getSrvGetFlag() && StringUtils.equals("1",
+                renterOrderReqVO.getSrvGetFlag().toString()));
+        getReturnCarOverCostReqDto.setIsReturnCarCost(null != renterOrderReqVO.getSrvReturnFlag() && StringUtils.equals("1",
+                renterOrderReqVO.getSrvReturnFlag().toString()));
         if (StringUtils.isNotBlank(renterOrderReqVO.getOrderCategory())) {
         	getReturnCarOverCostReqDto.setOrderType(Integer.valueOf(renterOrderReqVO.getOrderCategory()));
         }
@@ -481,13 +495,5 @@ public class RenterOrderService {
         return renterOrderMapper.getChangeRenterOrderByOrderNo(orderNo);
     }
 
-    /**
-     * 修改租客订单信息
-     *
-     * @param renterOrderEntity 租客订单信息
-     * @return Integer
-     */
-    public int updateRenterOrderByOrderNo(RenterOrderEntity renterOrderEntity) {
-        return renterOrderMapper.updateByPrimaryKeySelective(renterOrderEntity);
-    }
+
 }

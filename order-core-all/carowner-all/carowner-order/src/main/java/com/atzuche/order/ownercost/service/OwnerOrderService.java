@@ -75,7 +75,7 @@ public class OwnerOrderService {
         ownerOrderEntity.setGoodsType(String.valueOf(ownerOrderReqDTO.getCategory()));
         ownerOrderEntity.setChildStatus(OwnerChildStatusEnum.PROCESS_ING.getCode());
         log.info("下单-车主端-生成车主子订单ownerOrderEntity=[{}]",JSON.toJSONString(ownerOrderEntity));
-        int result = ownerOrderMapper.insert(ownerOrderEntity);
+        int result = ownerOrderMapper.insertSelective(ownerOrderEntity);
         log.info("下单-车主端-生成车主子订单结果result=[{}],ownerOrderEntity=[{}]",result,JSON.toJSONString(ownerOrderEntity));
 
         //2、生成费用信息

@@ -100,7 +100,7 @@ public class DeliveryCarController extends BaseController {
      */
     @AutoDocVersion(version = "管理后台取还车更新")
     @AutoDocGroup(group = "管理后台取还车更新")
-    @AutoDocMethod(description = "取还车更新", value = "取还车更新",response = ResponseData.class)
+    @AutoDocMethod(description = "交接车更新", value = "交接车更新",response = ResponseData.class)
     @RequestMapping(value = "/handover/update", method = RequestMethod.POST)
     public ResponseData<?> updateHandoverCarInfo(@RequestBody @Validated HandoverCarInfoReqVO deliveryReqVO, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {

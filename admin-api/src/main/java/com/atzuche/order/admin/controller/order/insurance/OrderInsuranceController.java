@@ -8,10 +8,10 @@ import com.atzuche.order.admin.constant.cat.UrlConstant;
 import com.atzuche.order.admin.constant.description.DescriptionConstant;
 import com.atzuche.order.admin.controller.BaseController;
 import com.atzuche.order.admin.description.LogDescription;
-import com.atzuche.order.admin.dto.InsurancePurchaseDTO;
-import com.atzuche.order.admin.dto.InsurancePurchaseResultDTO;
-import com.atzuche.order.admin.dto.OrderInsuranceAdditionRequestDTO;
-import com.atzuche.order.admin.dto.OrderInsuranceImportRequestDTO;
+import com.atzuche.order.admin.dto.insurance.InsurancePurchaseDTO;
+import com.atzuche.order.admin.dto.insurance.InsurancePurchaseResultDTO;
+import com.atzuche.order.admin.dto.insurance.OrderInsuranceAdditionRequestDTO;
+import com.atzuche.order.admin.dto.insurance.OrderInsuranceImportRequestDTO;
 import com.atzuche.order.admin.enums.insurance.InsuranceCompanyTypeEnum;
 import com.atzuche.order.admin.enums.insurance.InsuranceInputTypeEnum;
 import com.atzuche.order.admin.exception.insurance.OrderInsuranceException;
@@ -42,6 +42,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.validation.Valid;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -75,7 +76,7 @@ public class OrderInsuranceController extends BaseController {
 
 	@AutoDocMethod(description = "购买保险列表", value = "购买保险列表", response = OrderInsuranceResponseVO.class)
 	@GetMapping("/list")
-	public ResponseData<OrderInsuranceResponseVO> list(OrderInsuranceRequestVO orderInsuranceRequestVO, BindingResult bindingResult) {
+	public ResponseData<OrderInsuranceResponseVO> list(@Valid OrderInsuranceRequestVO orderInsuranceRequestVO, BindingResult bindingResult) {
         //参数验证
         validateParameter(bindingResult);
         try{
@@ -92,7 +93,7 @@ public class OrderInsuranceController extends BaseController {
 
     @AutoDocMethod(description = "手工录入保险信息", value = "手工录入保险信息", response = ResponseData.class)
     @PostMapping("/add")
-    public ResponseData<ResponseData> add(@RequestBody OrderInsuranceAdditionRequestVO orderInsuranceAdditionRequestVO, BindingResult bindingResult) {
+    public ResponseData<ResponseData> add(@Valid @RequestBody OrderInsuranceAdditionRequestVO orderInsuranceAdditionRequestVO, BindingResult bindingResult) {
         //参数验证
         validateParameter(bindingResult);
         try{
@@ -131,7 +132,7 @@ public class OrderInsuranceController extends BaseController {
 
     @AutoDocMethod(description = "导入保险信息excel", value = "导入保险信息excel", response = ResponseData.class)
     @PostMapping("/import")
-    public ResponseData importExcel(@RequestParam("batchFile") MultipartFile batchFile, OrderInsuranceImportRequestVO orderInsuranceImportRequestVO, BindingResult bindingResult) {
+    public ResponseData importExcel(@RequestParam("batchFile") MultipartFile batchFile, @Valid OrderInsuranceImportRequestVO orderInsuranceImportRequestVO, BindingResult bindingResult) {
         //参数验证
         validateParameter(bindingResult);
         try{

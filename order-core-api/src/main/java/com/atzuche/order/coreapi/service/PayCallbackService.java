@@ -1,6 +1,7 @@
 package com.atzuche.order.coreapi.service;
 
 import com.atzuche.order.commons.service.OrderPayCallBack;
+import com.atzuche.order.delivery.service.delivery.DeliveryCarService;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.atzuche.order.renterorder.service.RenterOrderService;
 import com.atzuche.order.settle.exception.OrderSettleFlatAccountException;
@@ -21,6 +22,7 @@ public class PayCallbackService implements OrderPayCallBack {
 
     @Autowired ModifyOrderForRenterService modifyOrderForRenterService;
     @Autowired private RenterOrderService renterOrderService;
+    @Autowired private DeliveryCarService deliveryCarService;
 
     /**
      * ModifyOrderForRenterService.supplementPayPostProcess（修改订单补付回掉）
@@ -32,7 +34,12 @@ public class PayCallbackService implements OrderPayCallBack {
         if(Objects.isNull(renterOrder) || Objects.isNull(renterOrder.getRenterOrderNo())){
             throw new OrderSettleFlatAccountException();
         }
+        log.info("PayCallbackService supplementPayPostProcess param [{}] [{}]",orderNo, renterOrder.getRenterOrderNo());
         modifyOrderForRenterService.supplementPayPostProcess(orderNo,renterOrder.getRenterOrderNo());
+
+        log.info("PayCallbackService sendDataMessageToRenYun param [{}]", renterOrder.getRenterOrderNo());
+        deliveryCarService.sendDataMessageToRenYun(renterOrder.getRenterOrderNo());
+
         log.info("PayCallbackService callBack end param [{}]", GsonUtils.toJson(renterOrder));
 
     }

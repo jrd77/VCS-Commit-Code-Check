@@ -1,5 +1,6 @@
 package com.atzuche.order.coreapi.service;
 
+import com.atzuche.order.car.CarProxyService;
 import com.atzuche.order.coin.service.AccountRenterCostCoinService;
 import com.atzuche.order.commons.entity.dto.*;
 import com.atzuche.order.commons.enums.*;
@@ -42,6 +43,7 @@ import com.autoyol.coupon.api.CouponSettleRequest;
 import com.autoyol.platformcost.CommonUtils;
 import com.dianping.cat.Cat;
 import lombok.extern.slf4j.Slf4j;
+import com.atzuche.order.mem.MemProxyService;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,7 +66,7 @@ public class ModifyOrderService {
 	@Autowired
 	private RenterMemberService renterMemberService;
 	@Autowired
-	private GoodsService goodsService;
+	private CarProxyService goodsService;
 	@Autowired
 	private RenterCommodityService commodityService;
 	@Autowired
@@ -90,7 +92,7 @@ public class ModifyOrderService {
 	@Autowired
 	private RenterGoodsService renterGoodsService;
 	@Autowired
-	private MemberService memberService;
+	private MemProxyService memProxyService;
 	@Autowired
 	private ModifyOrderForRenterService modifyOrderForRenterService;
 	@Autowired
@@ -105,6 +107,8 @@ public class ModifyOrderService {
     private CarRentalTimeApiService carRentalTimeApiService;
 	@Autowired
 	private AccountRenterCostCoinService accountRenterCostCoinService;
+	@Autowired
+	private ModifyOrderCheckService modifyOrderCheckService;
 
 	/**
 	 * 修改订单主逻辑
@@ -126,6 +130,7 @@ public class ModifyOrderService {
 		List<RenterOrderDeliveryEntity> deliveryList = renterOrderDeliveryService.listRenterOrderDeliveryByRenterOrderNo(initRenterOrder.getRenterOrderNo());
 		// DTO包装
 		ModifyOrderDTO modifyOrderDTO = getModifyOrderDTO(modifyOrderReq, renterOrderNo, initRenterOrder, deliveryList);
+		log.info("ModifyOrderService.modifyOrder modifyOrderDTO=[{}]", modifyOrderDTO);
 		// 获取租客会员信息
 		RenterMemberDTO renterMemberDTO = getRenterMemberDTO(initRenterOrder.getRenterOrderNo(), renterOrderNo);
 		// 设置租客会员信息
@@ -139,13 +144,17 @@ public class ModifyOrderService {
 		
 		// TODO 风控校验
 		
-		// TODO 库存校验
 		// 获取主订单信息
 		OrderEntity orderEntity = orderService.getOrderByOrderNoAndMemNo(orderNo, modifyOrderReq.getMemNo());
 		// 设置主订单信息
 		modifyOrderDTO.setOrderEntity(orderEntity);
+		// 校验
+		modifyOrderCheckService.modifyMainCheck(modifyOrderDTO);
 		// 设置城市编号
 		modifyOrderDTO.setCityCode(orderEntity.getCityCode());
+		// 库存校验
+		//modifyOrderCheckService.checkCarStock(modifyOrderDTO);
+		log.info("ModifyOrderService.modifyOrder again modifyOrderDTO=[{}]", modifyOrderDTO);
 		// 获取修改前租客费用明细
 		List<RenterOrderCostDetailEntity> initCostList = renterOrderCostDetailService.listRenterOrderCostDetail(modifyOrderDTO.getOrderNo(), initRenterOrder.getRenterOrderNo());
 		// 获取修改前补贴信息
@@ -198,6 +207,7 @@ public class ModifyOrderService {
 		againAutoCoinDeduct(modifyOrderDTO, costDeductVO.getRenterSubsidyList());
 		return ResponseData.success();
 	}
+	
 	
 	
 	/**
@@ -430,7 +440,7 @@ public class ModifyOrderService {
 			return;
 		}
 		// 获取附加驾驶人信息
-		List<CommUseDriverInfoDTO> useDriverList = memberService.getCommUseDriverList(modifyOrderDTO.getMemNo());
+		List<CommUseDriverInfoDTO> useDriverList = memProxyService.getCommUseDriverList(modifyOrderDTO.getMemNo());
 		// 保存
 		renterAdditionalDriverService.insertBatchAdditionalDriver(modifyOrderDTO.getOrderNo(), modifyOrderDTO.getRenterOrderNo(), driverIds, useDriverList);
 	}
@@ -572,12 +582,12 @@ public class ModifyOrderService {
 	 * @param modifyOrderDTO
 	 * @return CarDetailReqVO
 	 */
-	public GoodsService.CarDetailReqVO convertToCarDetailReqVO(ModifyOrderDTO modifyOrderDTO, RenterOrderEntity renterOrderEntity) {
+	public CarProxyService.CarDetailReqVO convertToCarDetailReqVO(ModifyOrderDTO modifyOrderDTO, RenterOrderEntity renterOrderEntity) {
 		// 租客子订单号
 		String renterOrderNo = renterOrderEntity.getRenterOrderNo();
 		// 获取租客商品信息
 		RenterGoodsDetailDTO renterGoodsDetailDTO = commodityService.getRenterGoodsDetail(renterOrderNo, false);
-		GoodsService.CarDetailReqVO carDetailReqVO = new GoodsService.CarDetailReqVO(); 
+		CarProxyService.CarDetailReqVO carDetailReqVO = new CarProxyService.CarDetailReqVO();
 		if (renterGoodsDetailDTO.getCarAddrIndex() != null) {
 			carDetailReqVO.setAddrIndex(renterGoodsDetailDTO.getCarAddrIndex());
 		}

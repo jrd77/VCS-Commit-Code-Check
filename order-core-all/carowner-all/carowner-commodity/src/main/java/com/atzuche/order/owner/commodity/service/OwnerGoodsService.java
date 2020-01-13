@@ -57,9 +57,10 @@ public class OwnerGoodsService{
      */
     public OwnerGoodsDetailDTO getOwnerGoodsDetail(String ownerOrderNo, boolean isNeedPrice){
         OwnerGoodsEntity ownerGoodsEntity = ownerGoodsMapper.selectByOwnerOrderNo(ownerOrderNo);
-
-        OwnerGoodsDetailDTO ownerGoodsDetailDto  = new OwnerGoodsDetailDTO();
-        BeanUtils.copyProperties(ownerGoodsEntity,ownerGoodsDetailDto);
+        OwnerGoodsDetailDTO   ownerGoodsDetailDto  = new OwnerGoodsDetailDTO();
+        if(ownerGoodsEntity != null){
+            BeanUtils.copyProperties(ownerGoodsEntity,ownerGoodsDetailDto);
+        }
         if(!isNeedPrice){
             return ownerGoodsDetailDto;
         }

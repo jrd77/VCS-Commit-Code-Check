@@ -19,6 +19,8 @@ import com.autoyol.platformcost.model.CarPriceOfDay;
 import com.autoyol.platformcost.model.FeeResult;
 import com.dianping.cat.Cat;
 import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -58,7 +60,9 @@ public class OwnerOrderCostCombineService {
 			Cat.logError("获取租金对象列表ownerGoodsPriceDetailDTOList对象为空", new OwnerCostParameterException());
 			throw new OwnerCostParameterException();
 		}
-		
+		CostBaseDTO costBaseCopyDTO = new CostBaseDTO();
+		// 赋值后需要
+		BeanUtils.copyProperties(costBaseDTO, costBaseCopyDTO);
 		// 按还车时间分组
 		Map<LocalDateTime, List<OwnerGoodsPriceDetailDTO>> dayPriceMap = dayPriceList.stream().collect(Collectors.groupingBy(OwnerGoodsPriceDetailDTO::getRevertTime));
 		dayPriceMap = dayPriceMap.entrySet().stream().sorted(Map.Entry.comparingByKey()).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue,
@@ -67,12 +71,12 @@ public class OwnerOrderCostCombineService {
 		List<OwnerOrderPurchaseDetailEntity> ownerOrderPurchaseDetailEntityList = new ArrayList<OwnerOrderPurchaseDetailEntity>();
 		for(Map.Entry<LocalDateTime, List<OwnerGoodsPriceDetailDTO>> it : dayPriceMap.entrySet()){
 			if (i == 1) {
-				costBaseDTO.setEndTime(it.getKey());
+				costBaseCopyDTO.setEndTime(it.getKey());
 			} else {
-				costBaseDTO.setStartTime(costBaseDTO.getEndTime());
-				costBaseDTO.setEndTime(it.getKey());
+				costBaseCopyDTO.setStartTime(costBaseCopyDTO.getEndTime());
+				costBaseCopyDTO.setEndTime(it.getKey());
 			}
-			ownerOrderPurchaseDetailEntityList.add(getRentAmtEntity(costBaseDTO, it.getValue()));
+			ownerOrderPurchaseDetailEntityList.add(getRentAmtEntity(costBaseCopyDTO, it.getValue()));
 			i++;
 		}
 		return ownerOrderPurchaseDetailEntityList;

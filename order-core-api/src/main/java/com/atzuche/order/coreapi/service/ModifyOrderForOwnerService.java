@@ -1,5 +1,6 @@
 package com.atzuche.order.coreapi.service;
 
+import com.atzuche.order.car.CarProxyService;
 import com.atzuche.order.commons.entity.dto.*;
 import com.atzuche.order.commons.enums.SrvGetReturnEnum;
 import com.atzuche.order.coreapi.entity.dto.ModifyOrderOwnerDTO;
@@ -36,7 +37,7 @@ public class ModifyOrderForOwnerService {
 	@Autowired
 	private OwnerMemberService ownerMemberService;
 	@Autowired
-	private GoodsService goodsService;
+	private CarProxyService goodsService;
 	@Autowired
 	private OwnerCommodityService ownerCommodityService;
 	@Autowired
@@ -261,12 +262,12 @@ public class ModifyOrderForOwnerService {
 	 * @param ownerOrderNo
 	 * @return CarDetailReqVO
 	 */
-	public GoodsService.CarDetailReqVO convertToCarDetailReqVO(ModifyOrderOwnerDTO modifyOrderOwnerDTO, OwnerOrderEntity ownerOrderEntity) {
+	public CarProxyService.CarDetailReqVO convertToCarDetailReqVO(ModifyOrderOwnerDTO modifyOrderOwnerDTO, OwnerOrderEntity ownerOrderEntity) {
 		// 车主子订单号
 		String ownerOrderNo = ownerOrderEntity.getOwnerOrderNo();
 		// 获取车主商品信息
 		OwnerGoodsDetailDTO ownerGoodsDetailDTO = ownerCommodityService.getOwnerGoodsDetail(ownerOrderNo, false);
-		GoodsService.CarDetailReqVO carDetailReqVO = new GoodsService.CarDetailReqVO(); 
+		CarProxyService.CarDetailReqVO carDetailReqVO = new CarProxyService.CarDetailReqVO();
 		if (ownerGoodsDetailDTO.getCarAddrIndex() != null) {
 			carDetailReqVO.setAddrIndex(ownerGoodsDetailDTO.getCarAddrIndex());
 		}

@@ -7,8 +7,10 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.atzuche.order.commons.LocalDateTimeUtils;
 import com.atzuche.order.commons.OrderReqContext;
 import com.atzuche.order.commons.entity.dto.OwnerGoodsDetailDTO;
+import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
 import com.atzuche.order.commons.enums.OrderChangeItemEnum;
 import com.atzuche.order.commons.enums.RenterCashCodeEnum;
 import com.atzuche.order.commons.enums.SrvGetReturnEnum;
@@ -17,6 +19,8 @@ import com.atzuche.order.coreapi.entity.dto.ModifyConfirmDTO;
 import com.atzuche.order.coreapi.entity.dto.ModifyOrderDTO;
 import com.atzuche.order.coreapi.entity.dto.ModifyOrderOwnerDTO;
 import com.atzuche.order.coreapi.entity.request.ModifyApplyHandleReq;
+import com.atzuche.order.coreapi.modifyorder.exception.ModifyOrderChangeApplyNotFindException;
+import com.atzuche.order.coreapi.modifyorder.exception.ModifyOrderGoodNotExistException;
 import com.atzuche.order.coreapi.modifyorder.exception.ModifyOrderParameterException;
 import com.atzuche.order.delivery.entity.RenterOrderDeliveryEntity;
 import com.atzuche.order.delivery.service.RenterOrderDeliveryService;
@@ -29,10 +33,15 @@ import com.atzuche.order.parentorder.entity.OrderEntity;
 import com.atzuche.order.rentercost.entity.RenterOrderSubsidyDetailEntity;
 import com.atzuche.order.rentercost.entity.dto.RenterOrderSubsidyDetailDTO;
 import com.atzuche.order.rentercost.service.RenterOrderSubsidyDetailService;
+import com.atzuche.order.renterorder.entity.RenterOrderChangeApplyEntity;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.atzuche.order.renterorder.entity.dto.OrderChangeItemDTO;
 import com.atzuche.order.renterorder.service.OrderChangeItemService;
+import com.atzuche.order.renterorder.service.RenterOrderChangeApplyService;
 import com.atzuche.order.renterorder.service.RenterOrderService;
+import com.autoyol.car.api.model.dto.LocationDTO;
+import com.autoyol.car.api.model.dto.OrderInfoDTO;
+import com.autoyol.car.api.model.enums.OrderOperationTypeEnum;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.platformcost.CommonUtils;
 import com.dianping.cat.Cat;
@@ -57,6 +66,18 @@ public class ModifyOrderConfirmService {
 	private OrderChangeItemService orderChangeItemService;
 	@Autowired
 	private DeliveryCarService deliveryCarService;
+	@Autowired
+	private RenterOrderChangeApplyService renterOrderChangeApplyService;
+	@Autowired
+	private StockService stockService;
+	/*
+	 * 同意操作
+	 */
+	public static final String AGREE_OPERATION = "1";
+	/**
+	 * 拒绝操作
+	 */
+	public static final String REFUSE_OPERATION = "0";
 	
 	/**
 	 * 自动同意
@@ -104,6 +125,8 @@ public class ModifyOrderConfirmService {
 		OrderReqContext reqContext = getOrderReqContext(modifyOrderDTO, modifyOrderOwnerDTO);
 		// 通知仁云
 		noticeRenYun(modifyOrderDTO.getRenterOrderNo(), modifyOrderOwnerDTO, listChangeCode(modifyOrderDTO.getChangeItemList()), reqContext);
+		// 扣库存
+		//cutCarStock(modifyOrderOwnerDTO, listChangeCode(modifyOrderDTO.getChangeItemList()));
 	}
 	
 	/**
@@ -140,9 +163,35 @@ public class ModifyOrderConfirmService {
 	}
 	
 	
+	/**
+	 * 车主操作修改申请
+	 * @param modifyApplyHandleReq
+	 * @return ResponseData
+	 */
 	public ResponseData<?> modifyConfirm(ModifyApplyHandleReq modifyApplyHandleReq) {
-		ModifyConfirmDTO modifyConfirmDTO = null;
-		return null;
+		log.info("ModifyOrderConfirmService.modifyConfirm modifyApplyHandleReq=[{}]", modifyApplyHandleReq);
+		if (modifyApplyHandleReq == null) {
+			log.error("ModifyOrderConfirmService.modifyConfirm车主处理修改申请报错参数为空");
+			Cat.logError("ModifyOrderConfirmService.modifyConfirm车主处理修改申请报错", new ModifyOrderParameterException());
+			throw new ModifyOrderParameterException();
+		}
+		ModifyConfirmDTO modifyConfirmDTO = convertToModifyConfirmDTO(modifyApplyHandleReq);
+		RenterOrderChangeApplyEntity changeApply = renterOrderChangeApplyService.getRenterOrderChangeApplyByRenterOrderNo(modifyConfirmDTO.getRenterOrderNo());
+		if (changeApply == null) {
+			log.error("ModifyOrderConfirmService.modifyConfirm未找到有效的修改申请记录modifyApplyHandleReq=[{}]", modifyApplyHandleReq);
+			Cat.logError("ModifyOrderConfirmService.modifyConfirm车主处理修改申请报错", new ModifyOrderChangeApplyNotFindException());
+			throw new ModifyOrderChangeApplyNotFindException();
+		}
+		modifyConfirmDTO.setOrderNo(changeApply.getOrderNo());
+		modifyConfirmDTO.setOwnerOrderNo(changeApply.getOwnerOrderNo());
+		if (AGREE_OPERATION.equals(modifyConfirmDTO.getFlag())) {
+			// 同意
+			agreeModifyOrder(changeApply.getOrderNo(), modifyConfirmDTO.getRenterOrderNo());
+		} else if (REFUSE_OPERATION.equals(modifyConfirmDTO.getFlag())) {
+			// 拒绝
+			refuseModifyOrder(modifyConfirmDTO);
+		}
+		return ResponseData.success();
 	}
 	
 	
@@ -152,7 +201,7 @@ public class ModifyOrderConfirmService {
 	 * @param renterOrderNo
 	 * @return ResponseData<?>
 	 */
-	public ResponseData<?> agreeModifyOrder(String orderNo, String renterOrderNo) {
+	public void agreeModifyOrder(String orderNo, String renterOrderNo) {
 		log.info("modifyOrderConfirmService agreeModifyOrder orderNo=[{}],renterOrderNo=[{}]",orderNo,renterOrderNo);
 		// 获取租客修改申请表中已同意的租客子订单
 		RenterOrderEntity renterOrder = renterOrderService.getRenterOrderByRenterOrderNo(renterOrderNo);
@@ -181,7 +230,17 @@ public class ModifyOrderConfirmService {
 		modifyOrderForRenterService.updateRenterOrderStatus(orderNo, renterOrderNo, initRenterOrder);
 		// 通知仁云
 		noticeRenYun(renterOrderNo, modifyOrderOwnerDTO, changeItemList, null);
-		return ResponseData.success();
+		// 扣库存
+		//cutCarStock(modifyOrderOwnerDTO, changeItemList);
+	}
+	
+	
+	/**
+	 * 车主拒绝
+	 * @param modifyConfirmDTO
+	 */
+	public void refuseModifyOrder(ModifyConfirmDTO modifyConfirmDTO) {
+		modifyOrderForRenterService.updateRefuseOrderStatus(modifyConfirmDTO.getRenterOrderNo());
 	}
 	
 	/**
@@ -346,5 +405,68 @@ public class ModifyOrderConfirmService {
 		cancelFlowOrderDTO.setOrdernumber(orderNo);
 		cancelFlowOrderDTO.setServicetype(servicetype);
 		return cancelFlowOrderDTO;
+	}
+	
+	
+	/**
+	 * Req转DTO
+	 * @param modifyApplyHandleReq
+	 * @return ModifyConfirmDTO
+	 */
+	public ModifyConfirmDTO convertToModifyConfirmDTO(ModifyApplyHandleReq modifyApplyHandleReq) {
+		ModifyConfirmDTO modifyConfirmDTO = new ModifyConfirmDTO();
+		modifyConfirmDTO.setFlag(modifyApplyHandleReq.getFlag());
+		modifyConfirmDTO.setOwnerMemNo(modifyApplyHandleReq.getMemNo());
+		modifyConfirmDTO.setRenterOrderNo(modifyApplyHandleReq.getModifyApplicationId());
+		return modifyConfirmDTO;
+	}
+	
+	
+	/**
+	 * 扣库存
+	 * @param modifyOrderOwnerDTO
+	 * @param changeItemList
+	 */
+	public void cutCarStock(ModifyOrderOwnerDTO modifyOrderOwnerDTO, List<String> changeItemList) {
+		if (modifyOrderOwnerDTO == null) {
+			log.error("ModifyOrderConfirmService.cutCarStock扣库存  modifyOrderOwnerDTO为空");
+			Cat.logError("ModifyOrderConfirmService.cutCarStock扣库存modifyOrderOwnerDTO为空",new ModifyOrderParameterException());
+			throw new ModifyOrderParameterException();
+		}
+		// 修改项目
+		if (changeItemList == null || changeItemList.isEmpty()) {
+			return;
+		}
+		if (!changeItemList.contains(OrderChangeItemEnum.MODIFY_RENTTIME.getCode()) && 
+				!changeItemList.contains(OrderChangeItemEnum.MODIFY_REVERTTIME.getCode())) {
+			// 未修改租期,不需要校验库存
+			return;
+		}
+		OrderInfoDTO orderInfoDTO = new OrderInfoDTO();
+		orderInfoDTO.setOrderNo(modifyOrderOwnerDTO.getOrderNo());
+		orderInfoDTO.setCityCode(modifyOrderOwnerDTO.getCityCode() != null ? Integer.valueOf(modifyOrderOwnerDTO.getCityCode()):null);
+		// 商品信息
+		OwnerGoodsDetailDTO ownerGoodsDetailDTO = modifyOrderOwnerDTO.getOwnerGoodsDetailDTO();
+		if (ownerGoodsDetailDTO == null) {
+			Cat.logError("ModifyOrderConfirmService.cutCarStock扣库存", new ModifyOrderGoodNotExistException());
+			throw new ModifyOrderGoodNotExistException();
+		}
+		orderInfoDTO.setCarNo(ownerGoodsDetailDTO.getCarNo());
+		orderInfoDTO.setStartDate(LocalDateTimeUtils.localDateTimeToDate(modifyOrderOwnerDTO.getRentTime()));
+		orderInfoDTO.setEndDate(LocalDateTimeUtils.localDateTimeToDate(modifyOrderOwnerDTO.getRevertTime()));
+		LocationDTO getCarAddress = new LocationDTO();
+		getCarAddress.setCarAddress(modifyOrderOwnerDTO.getGetCarAddress());
+		getCarAddress.setFlag(modifyOrderOwnerDTO.getSrvGetFlag());
+		getCarAddress.setLat(modifyOrderOwnerDTO.getGetCarLat() != null ? Double.valueOf(modifyOrderOwnerDTO.getGetCarLat()):null);
+		getCarAddress.setLon(modifyOrderOwnerDTO.getGetCarLon() != null ? Double.valueOf(modifyOrderOwnerDTO.getGetCarLon()):null);
+		orderInfoDTO.setGetCarAddress(getCarAddress);
+		LocationDTO returnCarAddress = new LocationDTO();
+		returnCarAddress.setCarAddress(modifyOrderOwnerDTO.getRevertCarAddress());
+		returnCarAddress.setFlag(modifyOrderOwnerDTO.getSrvReturnFlag());
+		returnCarAddress.setLat(modifyOrderOwnerDTO.getRevertCarLat() != null ? Double.valueOf(modifyOrderOwnerDTO.getRevertCarLat()):null);
+		returnCarAddress.setLon(modifyOrderOwnerDTO.getRevertCarLon() != null ? Double.valueOf(modifyOrderOwnerDTO.getRevertCarLon()):null);
+		orderInfoDTO.setReturnCarAddress(returnCarAddress);
+		orderInfoDTO.setOperationType(OrderOperationTypeEnum.DDXGZQ.getType());
+		stockService.cutCarStock(orderInfoDTO);
 	}
 }
