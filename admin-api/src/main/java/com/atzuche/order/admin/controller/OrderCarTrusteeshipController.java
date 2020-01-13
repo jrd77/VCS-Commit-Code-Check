@@ -1,6 +1,5 @@
 package com.atzuche.order.admin.controller;
 
-import com.atzuche.order.admin.service.CarDepositReturnDetailService;
 import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
 import com.atzuche.order.delivery.entity.OrderCarTrusteeshipEntity;
 import com.atzuche.order.delivery.entity.RenterOrderDeliveryEntity;
@@ -66,6 +65,8 @@ public class OrderCarTrusteeshipController extends BaseController {
             }
             OrderCarTrusteeshipEntity orderCarTrusteeshipEntity = new OrderCarTrusteeshipEntity();
             BeanUtils.copyProperties(orderCarTrusteeshipVO, orderCarTrusteeshipEntity);
+            orderCarTrusteeshipEntity.setOutDepotTime(DateUtil.asLocalDateTime(orderCarTrusteeshipVO.getOutDepotTime()));
+            orderCarTrusteeshipEntity.setInDepotTime(DateUtil.asLocalDateTime(orderCarTrusteeshipVO.getInDepotTime()));
             int result = orderCarTrusteeshipService.insertOrderCarTrusteeship(orderCarTrusteeshipEntity);
             if (result > 0) {
                 return ResponseData.success();
