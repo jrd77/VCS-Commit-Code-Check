@@ -14,11 +14,16 @@ public class OrderHistoryReqDTO {
     @NotNull(message = "主订单号不能为空")
     private String orderNo;
     /**
-     * 租客子订单号
+     * 是否需要租客历史订单 true:需要  false：不需要
      */
-    private String renterOrderNo;
+    @NotBlank(message = "是否需要租客历史订单不能为空")
+    @NotNull(message = "是否需要租客历史订单不能为空")
+    private boolean isNeedRenterOrderHistory;
     /**
-     * 车主子订单号
+     * 是否需要车主历史订单 true：需要  false：不需要
      */
-    private String ownerOrderNo;
+    @NotBlank(message = "是否需要车主历史订单不能为空")
+    @NotNull(message = "是否需要车主历史订单不能为空")
+    private boolean isNeedOwnerOrderHistory;
+
 }

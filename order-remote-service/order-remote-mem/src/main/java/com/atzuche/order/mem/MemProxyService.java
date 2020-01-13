@@ -8,6 +8,7 @@ import com.atzuche.order.commons.enums.MemberFlagEnum;
 import com.atzuche.order.commons.enums.OwnerMemRightEnum;
 import com.atzuche.order.commons.enums.RenterMemRightEnum;
 import com.atzuche.order.commons.enums.RightTypeEnum;
+import com.atzuche.order.mem.dto.OrderRenterInfoDTO;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.member.detail.api.MemberDetailFeignService;
@@ -21,8 +22,10 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -36,6 +39,94 @@ public class MemProxyService {
 
     @Autowired
     private MemberDetailFeignService memberDetailFeignService;
+
+    public OrderRenterInfoDTO getRenterInfoByMemNo(String memNo){
+        List<String> selectKey = Arrays.asList(
+                MemberSelectKeyEnum.MEMBER_CORE_INFO.getKey(),
+                MemberSelectKeyEnum.MEMBER_AUTH_INFO.getKey(),
+                MemberSelectKeyEnum.MEMBER_BASE_INFO.getKey(),
+                MemberSelectKeyEnum.MEMBER_ROLE_INFO.getKey(),
+                MemberSelectKeyEnum.MEMBER_ADDITION_INFO.getKey(),
+                MemberSelectKeyEnum.MEMBER_STATISTICS_INFO.getKey(),
+                MemberSelectKeyEnum.MEMBER_RELIEF_INFO.getKey());
+        ResponseData<MemberTotalInfo> responseData = null;
+        log.info("Feign 开始获取租客会员信息,memNo={}",memNo);
+        Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "会员详情服务");
+        try{
+            Cat.logEvent(CatConstants.FEIGN_METHOD,"MemberDetailFeignService.getMemberSelectInfo");
+            String parameter = "memNo="+memNo+"&selectKey"+JSON.toJSONString(selectKey);
+            Cat.logEvent(CatConstants.FEIGN_PARAM,parameter);
+            responseData = memberDetailFeignService.getMemberSelectInfo(Integer.parseInt(memNo), selectKey);
+            if(responseData == null || !ErrorCode.SUCCESS.getCode().equals(responseData.getResCode()) || responseData.getData() == null){
+                log.error("Feign 获取租客会员信息失败,memNo={},responseData={}",memNo,JSON.toJSONString(responseData));
+                RenterMemberFailException renterMemberByFeignException = new RenterMemberFailException();
+                throw renterMemberByFeignException;
+            }
+            t.setStatus(Transaction.SUCCESS);
+        }catch(RenterMemberFailException ex){
+            t.setStatus(ex);
+            Cat.logError("Feign 获取租客会员信息失败",ex);
+            throw ex;
+        }catch (Exception e){
+            log.error("Feign 获取租客会员信息失败,submitReqDto={},memNo={}",memNo,null,e);
+            RenterMemberErrException err = new RenterMemberErrException();
+            Cat.logError("Feign 获取租客会员信息失败",err);
+            t.setStatus(e);
+            throw err;
+        }finally {
+            t.complete();
+        }
+
+        MemberTotalInfo memberTotalInfo = responseData.getData();
+        MemberAuthInfo memberAuthInfo = memberTotalInfo.getMemberAuthInfo();
+        MemberCoreInfo memberCoreInfo = memberTotalInfo.getMemberCoreInfo();
+        MemberBaseInfo memberBaseInfo = memberTotalInfo.getMemberBaseInfo();
+        MemberAdditionInfo memberAdditionInfo = memberTotalInfo.getMemberAdditionInfo();
+        MemberStatisticsInfo memberStatisticsInfo = memberTotalInfo.getMemberStatisticsInfo();
+        MemberRoleInfo memberRoleInfo = memberTotalInfo.getMemberRoleInfo();
+
+        OrderRenterInfoDTO dto = new OrderRenterInfoDTO();
+        dto.setMemNo(memNo);
+        dto.setRealName(memberCoreInfo.getRealName());
+        dto.setRenterPhone(String.valueOf(memberCoreInfo.getMobile()));
+        dto.setEmail(memberAuthInfo.getEmail());
+        dto.setGender(convertGender(memberBaseInfo.getGender()));
+        dto.setDriLicRecordNo(memberAuthInfo.getDriLicRecordNo());
+        dto.setIdNo(memberAuthInfo.getIdCard());
+        dto.setCensusRegiste(memberBaseInfo.getCensusRegiste());
+        dto.setCity(memberBaseInfo.getCity());
+        dto.setProvince(memberBaseInfo.getProvince());
+        dto.setInternalStaff(convertYesOrNo(memberRoleInfo.getInternalStaff()));
+        dto.setCpicFlag(convertYesOrNo(memberRoleInfo.getCpicMemberFlag()));
+//        dto.setLabelTagList(convertLabelList(memberRoleInfo.));
+        dto.setAdditionalDrivers(memberAdditionInfo.getCommUseDriverList());
+        dto.setRegTimeTxt(convertTime(memberCoreInfo.getRegTime()));
+        dto.setDriveAge(memberAuthInfo.getDriLicFirstTime());//TODO
+        dto.setBuyTimes(String.valueOf(memberStatisticsInfo.getSuccessOrderNum()));
+        dto.setUpgrades("0");
+
+
+        return dto;
+    }
+
+    private String convertTime(Date regTime) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
+        return dateFormat.format(regTime);
+    }
+
+    private String convertYesOrNo(Integer internalStaff) {
+        if(internalStaff!=null&&internalStaff==1){
+            return "1";
+        }
+        return "0";
+    }
+
+    private String convertGender(Integer gender) {
+        if(gender!=null&&gender==1){
+            return "1";
+        }
+        return "2";
+    }
 
 
     /**

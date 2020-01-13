@@ -1,19 +1,19 @@
-package com.atzuche.order.admin.vo.resp.car;
+package com.atzuche.order.mem.dto;
 
 import com.autoyol.doc.annotation.AutoDocProperty;
 import com.autoyol.member.detail.vo.res.CommUseDriverInfo;
 import lombok.Data;
 import lombok.ToString;
 
-import java.io.Serializable;
 import java.util.List;
 
 /**
- * 订单详细信息 - 查看租客信息响应信息
- */
+ * @author <a href="mailto:lianglin.sjtu@gmail.com">AndySjtu</a>
+ * @date 2020/1/13 1:18 下午
+ **/
 @Data
 @ToString
-public class RenterInfoRespVO implements Serializable {
+public class OrderRenterInfoDTO {
     @AutoDocProperty(value = "会员号")
     private String memNo;
     @AutoDocProperty(value = "租客姓名")
@@ -43,6 +43,15 @@ public class RenterInfoRespVO implements Serializable {
     @AutoDocProperty(value = "附加驾驶人信息")
     private List<CommUseDriverInfo> additionalDrivers;
 
+    @AutoDocProperty(value = "户籍")
+    private String censusRegiste;
+
+    @AutoDocProperty(value = "户籍省")
+    private String province;
+
+    @AutoDocProperty(value = "户籍市")
+    private String city;
+
     ///////////////////人工调度处理-租客信息////////////////////////
     @AutoDocProperty(value = "身份证")
     private String idNo;
@@ -54,5 +63,4 @@ public class RenterInfoRespVO implements Serializable {
     private String buyTimes;
     @AutoDocProperty(value = "成功升级车辆次数")
     private String upgrades;
-
 }

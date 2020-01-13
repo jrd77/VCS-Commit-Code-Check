@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -30,7 +31,7 @@ public class PaymentController {
 	@AutoDocMethod(description = "支付信息", value = "支付信息", response = PaymentInformationResponseVO.class)
 //	@GetMapping("payment/information")
 	@RequestMapping(value="payment/information",method = RequestMethod.POST)
-	public ResponseData platformPaymentList(PaymentRequestVO paymentRequestVO, BindingResult bindingResult) {
+	public ResponseData platformPaymentList(@RequestBody PaymentRequestVO paymentRequestVO, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), ErrorCode.INPUT_ERROR.getText());
         }
