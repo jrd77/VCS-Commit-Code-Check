@@ -5,22 +5,25 @@ package com.atzuche.order.admin.service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
-import com.atzuche.order.admin.entity.CashierEntity;
 import com.atzuche.order.admin.vo.req.payment.PaymentRequestVO;
 import com.atzuche.order.admin.vo.resp.payment.PaymentInformationResponseVO;
 import com.atzuche.order.admin.vo.resp.payment.PaymentResponseVO;
 import com.atzuche.order.commons.LocalDateTimeUtils;
 import com.atzuche.order.commons.vo.req.PaymentVo;
+import com.atzuche.order.commons.vo.res.CashierResVo;
+import com.atzuche.order.open.service.FeignPaymentService;
 import com.atzuche.order.parentorder.entity.OrderStatusEntity;
 import com.atzuche.order.parentorder.service.OrderStatusService;
+import com.autoyol.commons.utils.StringUtils;
+import com.autoyol.commons.web.ResponseData;
 
 /**
  * @author jing.huang
@@ -32,6 +35,9 @@ public class PaymentService {
 	
 	@Autowired
 	OrderStatusService orderStatusService;
+	@Autowired
+	FeignPaymentService feignPaymentService;
+	
 //	@Autowired
 //	PaymentCashierService paymentCashierService;
 	
@@ -55,8 +61,9 @@ public class PaymentService {
 		List<PaymentResponseVO> violationDepositSettlementPaymentList = new ArrayList<PaymentResponseVO>();
 		
 		//根据结算时间来切分
+//		logger.info("orderStatus toString={}",orderStatusService.toString());
 		OrderStatusEntity orderStatus = orderStatusService.getByOrderNo(orderNo);
-		
+//		logger.info("orderStatus toString={}",orderStatus.toString());
 		/**
 		 * 违章结算时间
 		 */
@@ -82,30 +89,38 @@ public class PaymentService {
 			wzSettleTime = orderStatus.getWzSettleTime();
 		}
 		
-		RestTemplate restTemplate = new RestTemplate();
+//		RestTemplate restTemplate = new RestTemplate();
 		PaymentVo vo2 = new PaymentVo();
-		vo2.setOrderNo(orderNo);
-	    
+		vo2.setOrderNo(orderNo);	    
 //		String result2 = restTemplate.postForObject(url, vo, String.class);
 		
+//		logger.info("feignPaymentService toString={}",feignPaymentService.toString());
+		ResponseData<List<CashierResVo>> resData = feignPaymentService.queryByOrderNo(vo2); //paymentCashierService.queryPaymentList(orderNo);
 		
-		List<CashierEntity> lst = null; //paymentCashierService.queryPaymentList(orderNo);
-		for (CashierEntity cashierEntity : lst) {
+		List<CashierResVo> lst = resData.getData();
+		for (CashierResVo cashierEntity : lst) {
 			String payTime = cashierEntity.getPayTime();
-			/**
-			 * 根据支付时间来切换
-			 */
-			LocalDateTime payTimeLdt = LocalDateTimeUtils.parseStringToDateTime(payTime, "yyyyMMddHHmmss");
-			if(payTimeLdt.isBefore(settleTime)) {
-				PaymentResponseVO vo = convertPaymentResponseVO(cashierEntity,payTimeLdt);
-				beforeDepositSettlementPaymentList.add(vo);
-			}else if(payTimeLdt.isAfter(wzSettleTime)) {
-				PaymentResponseVO vo = convertPaymentResponseVO(cashierEntity,payTimeLdt);
-				violationDepositSettlementPaymentList.add(vo);
-			}else {
+			if(StringUtils.isBlank(payTime)) {
+				LocalDateTime payTimeLdt = LocalDateTimeUtils.dateToLocalDateTime(new Date());
 				//中间段的。
 				PaymentResponseVO vo = convertPaymentResponseVO(cashierEntity,payTimeLdt);
 				afterDepositSettlementPaymentList.add(vo);
+			}else {
+				/**
+				 * 根据支付时间来切换
+				 */
+				LocalDateTime payTimeLdt = LocalDateTimeUtils.parseStringToDateTime(payTime, "yyyyMMddHHmmss");
+				if(settleTime != null && payTimeLdt.isBefore(settleTime)) {
+					PaymentResponseVO vo = convertPaymentResponseVO(cashierEntity,payTimeLdt);
+					beforeDepositSettlementPaymentList.add(vo);
+				}else if(wzSettleTime != null && payTimeLdt.isAfter(wzSettleTime)) {
+					PaymentResponseVO vo = convertPaymentResponseVO(cashierEntity,payTimeLdt);
+					violationDepositSettlementPaymentList.add(vo);
+				}else {
+					//中间段的。
+					PaymentResponseVO vo = convertPaymentResponseVO(cashierEntity,payTimeLdt);
+					afterDepositSettlementPaymentList.add(vo);
+				}
 			}
 		}
 		
@@ -123,7 +138,7 @@ public class PaymentService {
 	 * @param cashierEntity
 	 * @return
 	 */
-	private PaymentResponseVO convertPaymentResponseVO(CashierEntity cashierEntity,LocalDateTime payTimeLdt) {
+	private PaymentResponseVO convertPaymentResponseVO(CashierResVo cashierEntity,LocalDateTime payTimeLdt) {
 		PaymentResponseVO vo = new PaymentResponseVO();
 		vo.setCreateTime(LocalDateTimeUtils.formatDateTime(payTimeLdt));
 		vo.setItem(convertItem(cashierEntity.getPayKind()));
