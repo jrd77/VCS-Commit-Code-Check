@@ -10,6 +10,7 @@ import com.atzuche.order.commons.entity.dto.RenterMemberDTO;
 import com.atzuche.order.commons.vo.req.NormalOrderCostCalculateReqVO;
 import com.atzuche.order.commons.vo.req.OrderReqVO;
 import com.atzuche.order.commons.vo.res.NormalOrderCostCalculateResVO;
+import com.atzuche.order.commons.vo.res.order.CostItemVO;
 import com.atzuche.order.coreapi.common.conver.OrderCommonConver;
 import com.atzuche.order.coreapi.entity.vo.req.CarRentTimeRangeReqVO;
 import com.atzuche.order.coreapi.entity.vo.res.CarRentTimeRangeResVO;
@@ -25,6 +26,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cglib.beans.BeanCopier;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 /**
  * 下单前费用计算
@@ -88,8 +91,7 @@ public class SubmitOrderBeforeCostCalService {
         RenterOrderCostRespDTO renterOrderCostRespDTO =
                 renterOrderCalCostService.getOrderCostAndDeailList(renterOrderCostReqDTO);
 
-
-
+        List<CostItemVO> costItemList = orderCommonConver.buildCostItemList(renterOrderCostRespDTO);
 
         //TODO:抵扣费用处理
 
@@ -100,18 +102,16 @@ public class SubmitOrderBeforeCostCalService {
 
         //TODO:租车费用小计处理
 
-        //TODO:待支付信息处理
+        //TODO:返回信息处理
+        NormalOrderCostCalculateResVO res = new NormalOrderCostCalculateResVO();
+        res.setCostItemList(costItemList);
+        res.setTotalCost(orderCommonConver.buildTotalCostVO(costItemList));
 
-        return new NormalOrderCostCalculateResVO();
+        return res;
 
     }
 
 
-    public RenterOrderReqVO buildRenterOrderReqVO() {
-
-
-        return null;
-    }
 
 
 }

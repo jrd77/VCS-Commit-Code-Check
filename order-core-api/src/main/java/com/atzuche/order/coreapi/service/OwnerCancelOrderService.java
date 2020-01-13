@@ -130,10 +130,15 @@ public class OwnerCancelOrderService {
             CancelFineAmtDTO cancelFineAmt = buildCancelFineAmtDTO(renterOrderEntity,
                     renterOrderCostEntity, goodsDetail.getCarOwnerType());
             int penalty = renterOrderFineDeatailService.calCancelFine(cancelFineAmt);
-            int fineAmt = penalty + Math.abs(renterOrderCostEntity.getBasicEnsureAmount());
-            OwnerOrderFineDeatailEntity ownerOrderFineDeatailEntity =
-                    ownerOrderFineDeatailService.fineDataConvert(cancelFineAmt.getCostBaseDTO(), fineAmt,
+
+            //罚车主补贴给租客
+            OwnerOrderFineDeatailEntity ownerOrderFineDeatailEntityOne =
+                    ownerOrderFineDeatailService.fineDataConvert(cancelFineAmt.getCostBaseDTO(), penalty,
                             FineSubsidyCodeEnum.RENTER, FineSubsidySourceCodeEnum.OWNER, FineTypeEnum.CANCEL_FINE);
+            //罚车主补贴给平台(保险费)
+            OwnerOrderFineDeatailEntity ownerOrderFineDeatailEntityTwo =
+                    ownerOrderFineDeatailService.fineDataConvert(cancelFineAmt.getCostBaseDTO(), Math.abs(renterOrderCostEntity.getBasicEnsureAmount()),
+                            FineSubsidyCodeEnum.PLATFORM, FineSubsidySourceCodeEnum.OWNER, FineTypeEnum.CANCEL_FINE);
             //租客收益处理
             ConsoleRenterOrderFineDeatailEntity consoleRenterOrderFineDeatailEntity =
                     consoleRenterOrderFineDeatailService.fineDataConvert(cancelFineAmt.getCostBaseDTO(), penalty,
@@ -143,7 +148,8 @@ public class OwnerCancelOrderService {
 
             renterOrderService.updateRenterOrderChildStatus(renterOrderEntity.getId(),
                     RenterChildStatusEnum.END.getCode());
-            ownerOrderFineDeatailService.addOwnerOrderFineRecord(ownerOrderFineDeatailEntity);
+            ownerOrderFineDeatailService.addOwnerOrderFineRecord(ownerOrderFineDeatailEntityOne);
+            ownerOrderFineDeatailService.addOwnerOrderFineRecord(ownerOrderFineDeatailEntityTwo);
             consoleRenterOrderFineDeatailService.saveConsoleRenterOrderFineDeatail(consoleRenterOrderFineDeatailEntity);
         }
 
