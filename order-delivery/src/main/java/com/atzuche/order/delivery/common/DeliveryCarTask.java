@@ -10,6 +10,7 @@ import com.atzuche.order.delivery.service.handover.HandoverCarService;
 import com.atzuche.order.delivery.utils.CodeUtils;
 import com.atzuche.order.delivery.utils.EmailConstants;
 import com.atzuche.order.delivery.vo.delivery.CancelFlowOrderDTO;
+import com.atzuche.order.delivery.vo.delivery.CancelOrderDeliveryVO;
 import com.atzuche.order.delivery.vo.delivery.RenYunFlowOrderDTO;
 import com.atzuche.order.delivery.vo.delivery.UpdateFlowOrderDTO;
 import lombok.extern.slf4j.Slf4j;
@@ -79,14 +80,14 @@ public class DeliveryCarTask {
      * @param serviceType
      */
     @Transactional(rollbackFor = Exception.class)
-    public void cancelOrderDelivery(String renterOrderNo, Integer serviceType) {
+    public void cancelOrderDelivery(String renterOrderNo, Integer serviceType,CancelOrderDeliveryVO cancelOrderDeliveryVO) {
         RenterOrderDeliveryEntity orderDeliveryEntity = renterOrderDeliveryService.findRenterOrderByRenterOrderNo(renterOrderNo, serviceType);
         if (null == orderDeliveryEntity) {
             log.info("没有找到该配送订单信息，renterOrderNo：{}",renterOrderNo);
             return;
-            //throw new DeliveryOrderException(DeliveryErrorCode.DELIVERY_PARAMS_ERROR.getValue(), "没有找到该配送订单信息");
         }
         renterOrderDeliveryService.updateStatusById(orderDeliveryEntity.getId());
+        cancelRenYunFlowOrderInfo(cancelOrderDeliveryVO.getCancelFlowOrderDTO());
     }
 
     /**
