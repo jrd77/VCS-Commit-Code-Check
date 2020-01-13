@@ -60,10 +60,10 @@ public class DeliveryCarService {
         int getMinute = getMinutes == null ? 0 : getMinutes;
         int returnMinute = returnMinutes == null ? 0 : returnMinutes;
         if (orderReqContext.getOrderReqVO().getSrvReturnFlag().intValue() == UsedDeliveryTypeEnum.USED.getValue().intValue()) {
-            addRenYunFlowOrderInfo(getMinute, returnMinute, orderReqContext, UserTypeEnum.OWNER_TYPE.getValue());
+            addRenYunFlowOrderInfo(getMinute, returnMinute, orderReqContext, UserTypeEnum.OWNER_TYPE.getValue().intValue());
         }
         if (orderReqContext.getOrderReqVO().getSrvGetFlag().intValue() == UsedDeliveryTypeEnum.USED.getValue().intValue()) {
-            addRenYunFlowOrderInfo(getMinute, returnMinute, orderReqContext, UserTypeEnum.RENTER_TYPE.getValue());
+            addRenYunFlowOrderInfo(getMinute, returnMinute, orderReqContext, UserTypeEnum.RENTER_TYPE.getValue().intValue());
         }
     }
 
@@ -87,7 +87,9 @@ public class DeliveryCarService {
 
         List<OrderDeliveryFlowEntity> orderDeliveryFlowEntityList = deliveryFlowService.selectOrderDeliveryFlowByOrderNo(renterOrderNo);
         if (CollectionUtils.isEmpty(orderDeliveryFlowEntityList)) {
-            throw new DeliveryOrderException(DeliveryErrorCode.DELIVERY_PARAMS_ERROR.getValue(), "没有找到发送至仁云的数据");
+            //不抛异常，直接return
+            log.info("没有找到当前子订单的配送订单信息：renterOrderNo：{}",renterOrderNo.toString());
+            return;
         }
         for(OrderDeliveryFlowEntity orderDeliveryFlowEntity : orderDeliveryFlowEntityList) {
             RenYunFlowOrderDTO renYunFlowOrderDTO = createRenYunDTO(orderDeliveryFlowEntity);
@@ -131,16 +133,13 @@ public class DeliveryCarService {
         }
         int serviceType;
         if (cancelOrderDeliveryVO.getCancelFlowOrderDTO().getServicetype().equals("all")) {
-            deliveryCarTask.cancelOrderDelivery(cancelOrderDeliveryVO.getRenterOrderNo(), 1);
             cancelOrderDeliveryVO.getCancelFlowOrderDTO().setServicetype(ServiceTypeEnum.TAKE_TYPE.getValue());
-            deliveryCarTask.cancelRenYunFlowOrderInfo(cancelOrderDeliveryVO.getCancelFlowOrderDTO());
-            deliveryCarTask.cancelOrderDelivery(cancelOrderDeliveryVO.getRenterOrderNo(), 2);
+            deliveryCarTask.cancelOrderDelivery(cancelOrderDeliveryVO.getRenterOrderNo(), 1,cancelOrderDeliveryVO);
             cancelOrderDeliveryVO.getCancelFlowOrderDTO().setServicetype(ServiceTypeEnum.BACK_TYPE.getValue());
-            deliveryCarTask.cancelRenYunFlowOrderInfo(cancelOrderDeliveryVO.getCancelFlowOrderDTO());
+            deliveryCarTask.cancelOrderDelivery(cancelOrderDeliveryVO.getRenterOrderNo(), 2,cancelOrderDeliveryVO);
         } else {
             serviceType = cancelOrderDeliveryVO.getCancelFlowOrderDTO().getServicetype().equals(ServiceTypeEnum.TAKE_TYPE.getValue()) ? 1 : 2;
-            deliveryCarTask.cancelOrderDelivery(cancelOrderDeliveryVO.getRenterOrderNo(), serviceType);
-            deliveryCarTask.cancelRenYunFlowOrderInfo(cancelOrderDeliveryVO.getCancelFlowOrderDTO());
+            deliveryCarTask.cancelOrderDelivery(cancelOrderDeliveryVO.getRenterOrderNo(), serviceType,cancelOrderDeliveryVO);
         }
     }
 
@@ -166,6 +165,8 @@ public class DeliveryCarService {
                 if (null == lastOrderDeliveryEntity) {
                     throw new DeliveryOrderException(DeliveryErrorCode.DELIVERY_MOUDLE_ERROR.getValue(), "没有找到最近的一笔配送订单记录");
                 }
+                lastOrderDeliveryEntity.setIsDelete(1);
+                renterOrderDeliveryService.updateDeliveryByPrimaryKey(lastOrderDeliveryEntity);
                 CommonUtil.copyPropertiesIgnoreNull(orderDeliveryEntity, lastOrderDeliveryEntity);
                 lastOrderDeliveryEntity.setStatus(2);
                 renterOrderDeliveryService.insert(lastOrderDeliveryEntity);
@@ -273,6 +274,8 @@ public class DeliveryCarService {
         orderDeliveryDTO.setRevertTime(renterGoodsDetailDTO.getRevertTime());
         orderDeliveryDTO.setType(orderType);
         orderDeliveryDTO.setParamsTypeValue(orderReqVO, orderType, ownerMemberDTO, renterMemberDTO);
+
+
         orderDeliveryFlowEntity.setRenterOrderNo(renterGoodsDetailDTO.getRenterOrderNo());
         orderDeliveryFlowEntity.setOrderNo(renterGoodsDetailDTO.getOrderNo());
         orderDeliveryFlowEntity.setServiceTypeInfo(orderType, orderDeliveryDTO);
@@ -299,6 +302,12 @@ public class DeliveryCarService {
         orderDeliveryFlowEntity.setUpdateTime(LocalDateTime.now());
         orderDeliveryFlowEntity.setDisplacement(String.valueOf(ownerGoodsDetailDTO.getCarCylinderCapacity()));
         orderDeliveryFlowEntity.setSource(orderReqVO.getSource());
+        orderDeliveryFlowEntity.setDayMileage(String.valueOf(renterGoodsDetailDTO.getCarDayMileage()));
+        orderDeliveryFlowEntity.setTankCapacity(String.valueOf(renterGoodsDetailDTO.getCarOilVolume()));
+        orderDeliveryFlowEntity.setOwnerGetAddr(renterGoodsDetailDTO.getCarRealAddr());
+        orderDeliveryFlowEntity.setOwnerReturnAddr(orderReqVO.getSrvGetAddr());
+
+
         orderDeliveryVO.setOrderDeliveryDTO(orderDeliveryDTO);
         orderDeliveryVO.setRenterDeliveryAddrDTO(renterDeliveryAddrDTO);
         orderDeliveryVO.setOrderDeliveryFlowEntity(orderDeliveryFlowEntity);
@@ -337,6 +346,16 @@ public class DeliveryCarService {
         renYunFlowOrderDTO.setSceneName(orderDeliveryFlowEntity.getSceneName());
         renYunFlowOrderDTO.setDisplacement(String.valueOf(orderDeliveryFlowEntity.getDisplacement()));
         renYunFlowOrderDTO.setSource(orderDeliveryFlowEntity.getSource());
+        renYunFlowOrderDTO.setCarno(orderDeliveryFlowEntity.getCarNo());
+        renYunFlowOrderDTO.setVehicletype(orderDeliveryFlowEntity.getVehicleType());
+        renYunFlowOrderDTO.setVehiclemodel(orderDeliveryFlowEntity.getVehicleModel());
+        renYunFlowOrderDTO.setDayMileage(orderDeliveryFlowEntity.getDayMileage());
+        renYunFlowOrderDTO.setTankCapacity(orderDeliveryFlowEntity.getTankCapacity());
+        renYunFlowOrderDTO.setOwnerReturnAddr(orderDeliveryFlowEntity.getOwnerReturnAddr());
+        renYunFlowOrderDTO.setOwnerGetAddr(orderDeliveryFlowEntity.getOwnerGetAddr());
+
+
+
         return renYunFlowOrderDTO;
     }
 

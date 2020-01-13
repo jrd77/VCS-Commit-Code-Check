@@ -126,7 +126,7 @@ public class CarProxyService {
         renterGoodsDetailDto.setCarRealAddr(carAddressOfTransVO==null ? "" : carAddressOfTransVO.getCarRealAddress());
         renterGoodsDetailDto.setCarRealLon(carAddressOfTransVO==null || carAddressOfTransVO.getRealAddressLon()==null ? "" : String.valueOf(carAddressOfTransVO.getRealAddressLon()));
         renterGoodsDetailDto.setCarRealLat(carAddressOfTransVO==null || carAddressOfTransVO.getRealAddressLat()==null ? "" : String.valueOf(carAddressOfTransVO.getRealAddressLat()));
-        renterGoodsDetailDto.setOwnerMemNo(carAddressOfTransVO==null ? "" : String.valueOf(carBaseVO.getOwnerNo()));
+        renterGoodsDetailDto.setOwnerMemNo(carAddressOfTransVO==null || carBaseVO.getOwnerNo()==null? "" : String.valueOf(carBaseVO.getOwnerNo()));
         renterGoodsDetailDto.setLabelIds(carTagVO == null ? new ArrayList<>():carTagVO.getLabelIds());
         renterGoodsDetailDto.setEngineSource(carBaseVO.getEngineSource());
         renterGoodsDetailDto.setFrameNo(carBaseVO.getFrameNo());

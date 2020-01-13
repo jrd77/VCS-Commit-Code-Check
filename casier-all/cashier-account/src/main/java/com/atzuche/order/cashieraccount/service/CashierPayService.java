@@ -132,9 +132,9 @@ public class CashierPayService{
         Integer depositPayStatus = Objects.isNull(orderStatusDTO.getDepositPayStatus())?entity.getDepositPayStatus():orderStatusDTO.getDepositPayStatus();
         Integer wzPayStatus = Objects.isNull(orderStatusDTO.getWzPayStatus())?entity.getWzPayStatus():orderStatusDTO.getWzPayStatus();
         if(
-                (Objects.nonNull(rentCarPayStatus) || OrderPayStatusEnum.PAYED.getStatus() == rentCarPayStatus)&&
-                ( Objects.nonNull(depositPayStatus) || OrderPayStatusEnum.PAYED.getStatus() == depositPayStatus )&&
-                (Objects.nonNull(wzPayStatus)  || OrderPayStatusEnum.PAYED.getStatus() == wzPayStatus)
+                (Objects.nonNull(rentCarPayStatus) && OrderPayStatusEnum.PAYED.getStatus() == rentCarPayStatus)&&
+                ( Objects.nonNull(depositPayStatus) && OrderPayStatusEnum.PAYED.getStatus() == depositPayStatus )&&
+                (Objects.nonNull(wzPayStatus)  && OrderPayStatusEnum.PAYED.getStatus() == wzPayStatus)
         ){
             getCar =true;
         }
@@ -275,6 +275,18 @@ public class CashierPayService{
         result.setTitle("待支付金额：" +result.getAmt() + "，订单号："  + result.getOrderNo());
         result.setAccountPayAbles(accountPayAbles);
         return result;
+    }
+
+    public int getRentCost(String orderNo,String memNo){
+        RenterOrderEntity renterOrderEntity = cashierNoTService.getRenterOrderNoByOrderNo(orderNo);
+
+        //查询应付租车费用列表
+        List<PayableVO> payableVOs = renterOrderCostCombineService.listPayableVO(orderNo,renterOrderEntity.getRenterOrderNo(),memNo);
+        //应付租车费用
+        int rentAmt = cashierNoTService.sumRentOrderCost(payableVOs);
+        //已付租车费用
+        int rentAmtPayed = accountRenterCostSettleService.getCostPaidRent(orderNo,memNo);
+        return rentAmt + rentAmtPayed;
     }
 
     /**

@@ -6,14 +6,22 @@ import com.atzuche.order.commons.ListUtil;
 import com.atzuche.order.commons.OrderReqContext;
 import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
 import com.atzuche.order.commons.entity.dto.RenterMemberDTO;
+import com.atzuche.order.commons.enums.RenterCashCodeEnum;
 import com.atzuche.order.commons.vo.req.OrderReqVO;
+import com.atzuche.order.commons.vo.res.order.CostItemVO;
+import com.atzuche.order.commons.vo.res.order.TotalCostVO;
 import com.atzuche.order.coreapi.entity.vo.res.CarRentTimeRangeResVO;
+import com.atzuche.order.renterorder.entity.dto.RenterOrderCostRespDTO;
 import com.atzuche.order.renterorder.vo.RenterOrderReqVO;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cglib.beans.BeanCopier;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author pengcheng.fu
@@ -95,6 +103,59 @@ public class OrderCommonConver {
         carDetailReqVO.setUseSpecialPrice(StringUtils.equals("0",
                 orderReqVO.getUseSpecialPrice()));
         return carDetailReqVO;
+    }
+
+    /**
+     * 下单前计算页租车费用列表
+     *
+     * @param renterOrderCostRespDTO 订单租车费用信息
+     * @return List<CostItemVO>
+     */
+    public List<CostItemVO> buildCostItemList(RenterOrderCostRespDTO renterOrderCostRespDTO) {
+        logger.info("Build costItem list.param is,renterOrderCostRespDTO:[{}]",JSON.toJSONString(renterOrderCostRespDTO));
+        if (null == renterOrderCostRespDTO || CollectionUtils.isEmpty(renterOrderCostRespDTO.getRenterOrderCostDetailDTOList())) {
+            return null;
+        }
+
+        List<CostItemVO> costItemList = new ArrayList<>();
+        renterOrderCostRespDTO.getRenterOrderCostDetailDTOList().stream().forEach(cost -> {
+            CostItemVO vo = new CostItemVO();
+            vo.setCostCode(cost.getCostCode());
+            vo.setCostDesc(cost.getCostDesc());
+            vo.setCount(cost.getCount());
+            if(StringUtils.equals(RenterCashCodeEnum.SRV_GET_COST.getCashNo(),cost.getCostCode())) {
+                vo.setUnitPrice(renterOrderCostRespDTO.getGetRealAmt());
+                vo.setTotalAmount(renterOrderCostRespDTO.getGetRealAmt());
+            } else if(StringUtils.equals(RenterCashCodeEnum.SRV_RETURN_COST.getCashNo(),cost.getCostCode())) {
+                vo.setUnitPrice(renterOrderCostRespDTO.getReturnRealAmt());
+                vo.setTotalAmount(renterOrderCostRespDTO.getReturnRealAmt());
+            } else {
+                vo.setUnitPrice(cost.getUnitPrice());
+                vo.setTotalAmount(cost.getTotalAmount());
+            }
+            costItemList.add(vo);
+        });
+
+        logger.info("Build costItem list.result is,costItemList:[{}]",JSON.toJSONString(costItemList));
+        return costItemList;
+    }
+
+    /**
+     * 租车费用总计
+     *
+     * @param costItems 租车费用列表
+     * @return TotalCostVO 租车费用总计信息
+     */
+    public TotalCostVO buildTotalCostVO(List<CostItemVO> costItems) {
+
+        if(CollectionUtils.isEmpty(costItems)) {
+            return null;
+        }
+        int totalFee = costItems.stream().mapToInt(CostItemVO::getTotalAmount).sum();
+        TotalCostVO totalCost = new TotalCostVO();
+        totalCost.setTotalFee(totalFee);
+        logger.info("Build TotalCostVO.result is,totalCost:[{}]",JSON.toJSONString(totalCost));
+        return totalCost;
     }
 
 

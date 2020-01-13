@@ -6,9 +6,17 @@ import java.util.List;
 
 @Data
 public class OrderHistoryRespDTO {
-
-    List<RenterOrderDTO> renterOrderDTOList;
-
-    List<OwnerOrderDTO> ownerOrderDTOLIst;
+    /**
+     * 主订单
+     */
+    public OrderDTO orderDTO;
+    /**
+     * 租客历史订单(包含生效的租客订单)
+     */
+    public List<RenterOrderDTO> renterOrderDTOHistoryList;
+    /**
+     * 车主历史订单（包含生效的车主订单）
+     */
+    public List<OwnerOrderDTO> ownerOrderDTOHistoryLIst;
 
 }

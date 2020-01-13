@@ -310,9 +310,13 @@ public class RenYunFlowOrderDTO implements Serializable {
         if (Integer.valueOf(orderDeliveryFlowEntity.getOrderType()).intValue() == UsedDeliveryTypeEnum.USED.getValue().intValue()) {
             setServicetype(ServiceTypeEnum.TAKE_TYPE.getValue());
             setPickupcaraddr(orderDeliveryFlowEntity.getPickupAlsoCarAddr());
+            setRealGetCarLat(orderDeliveryFlowEntity.getRealGetCarLat());
+            setRealGetCarLon(orderDeliveryFlowEntity.getRealGetCarLon());
         } else {
             setServicetype(ServiceTypeEnum.BACK_TYPE.getValue());
             setAlsocaraddr(orderDeliveryFlowEntity.getPickupAlsoCarAddr());
+            setRealReturnCarLat(orderDeliveryFlowEntity.getRealReturnCarLat());
+            setRealReturnCarLon(orderDeliveryFlowEntity.getRealReturnCarLon());
         }
     }
 }

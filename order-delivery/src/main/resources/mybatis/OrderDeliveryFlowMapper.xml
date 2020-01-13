@@ -32,6 +32,14 @@
         <result property="updateTime" column="update_time"/>
         <result property="isDelete" column="is_delete"/>
         <result property="renterOrderNo" column="renter_order_no"/>
+        <result property="realGetCarLon" column="real_get_car_lon"/>
+        <result property="realGetCarLat" column="real_get_car_lat"/>
+        <result property="realReturnCarLon" column="real_return_car_lon"/>
+        <result property="realReturnCarLat" column="real_return_car_lat"/>
+        <result property="ownerGetAddr" column="owner_get_addr"/>
+        <result property="ownerReturnAddr" column="owner_return_addr"/>
+        <result property="dayMileage" column="day_mileage"/>
+        <result property="tankCapacity" column="tank_capacity"/>
     </resultMap>
 
 
@@ -63,7 +71,15 @@
 	`create_time`, 	
 	`update_time`, 	
 	`is_delete`, 	
-	`renter_order_no`	
+	`renter_order_no`, 	
+	`real_get_car_lon`, 	
+	`real_get_car_lat`, 	
+	`real_return_car_lon`, 	
+	`real_return_car_lat`, 	
+	`owner_get_addr`, 	
+	`owner_return_addr`, 	
+	`day_mileage`, 	
+	`tank_capacity`	
 
 	</sql>
 
@@ -101,7 +117,15 @@
 				`create_time`,		
 				`update_time`,		
 				`is_delete`,		
-				`renter_order_no`		
+				`renter_order_no`,		
+				`real_get_car_lon`,		
+				`real_get_car_lat`,		
+				`real_return_car_lon`,		
+				`real_return_car_lat`,		
+				`owner_get_addr`,		
+				`owner_return_addr`,		
+				`day_mileage`,		
+				`tank_capacity`		
 			)
 		values
 		(
@@ -131,7 +155,15 @@
 				#{createTime}, 		
 				#{updateTime}, 		
 				#{isDelete}, 		
-				#{renterOrderNo}		
+				#{renterOrderNo}, 		
+				#{realGetCarLon}, 		
+				#{realGetCarLat}, 		
+				#{realReturnCarLon}, 		
+				#{realReturnCarLat}, 		
+				#{ownerGetAddr}, 		
+				#{ownerReturnAddr}, 		
+				#{dayMileage}, 		
+				#{tankCapacity}		
 			)
 	</insert>
 	
@@ -164,7 +196,15 @@
 				<if test="createTime != null">`create_time`, </if>
 				<if test="updateTime != null">`update_time`, </if>
 				<if test="isDelete != null">`is_delete`, </if>
-				<if test="renterOrderNo != null">`renter_order_no` </if>
+				<if test="renterOrderNo != null">`renter_order_no`, </if>
+				<if test="realGetCarLon != null">`real_get_car_lon`, </if>
+				<if test="realGetCarLat != null">`real_get_car_lat`, </if>
+				<if test="realReturnCarLon != null">`real_return_car_lon`, </if>
+				<if test="realReturnCarLat != null">`real_return_car_lat`, </if>
+				<if test="ownerGetAddr != null">`owner_get_addr`, </if>
+				<if test="ownerReturnAddr != null">`owner_return_addr`, </if>
+				<if test="dayMileage != null">`day_mileage`, </if>
+				<if test="tankCapacity != null">`tank_capacity` </if>
 	        </trim>
             <trim prefix="values (" suffix=")" suffixOverrides="," >
 				<if test="orderNo != null">#{orderNo},  </if>
@@ -193,7 +233,15 @@
 				<if test="createTime != null">#{createTime},  </if>
 				<if test="updateTime != null">#{updateTime},  </if>
 				<if test="isDelete != null">#{isDelete},  </if>
-				<if test="renterOrderNo != null">#{renterOrderNo} </if>
+				<if test="renterOrderNo != null">#{renterOrderNo},  </if>
+				<if test="realGetCarLon != null">#{realGetCarLon},  </if>
+				<if test="realGetCarLat != null">#{realGetCarLat},  </if>
+				<if test="realReturnCarLon != null">#{realReturnCarLon},  </if>
+				<if test="realReturnCarLat != null">#{realReturnCarLat},  </if>
+				<if test="ownerGetAddr != null">#{ownerGetAddr},  </if>
+				<if test="ownerReturnAddr != null">#{ownerReturnAddr},  </if>
+				<if test="dayMileage != null">#{dayMileage},  </if>
+				<if test="tankCapacity != null">#{tankCapacity} </if>
 	        </trim>
 	</insert>
 	
@@ -227,7 +275,15 @@
 				<if test="createTime != null">`create_time` = #{createTime}, </if>
 				<if test="updateTime != null">`update_time` = #{updateTime}, </if>
 				<if test="isDelete != null">`is_delete` = #{isDelete}, </if>
-				<if test="renterOrderNo != null">`renter_order_no` = #{renterOrderNo}</if>
+				<if test="renterOrderNo != null">`renter_order_no` = #{renterOrderNo}, </if>
+				<if test="realGetCarLon != null">`real_get_car_lon` = #{realGetCarLon}, </if>
+				<if test="realGetCarLat != null">`real_get_car_lat` = #{realGetCarLat}, </if>
+				<if test="realReturnCarLon != null">`real_return_car_lon` = #{realReturnCarLon}, </if>
+				<if test="realReturnCarLat != null">`real_return_car_lat` = #{realReturnCarLat}, </if>
+				<if test="ownerGetAddr != null">`owner_get_addr` = #{ownerGetAddr}, </if>
+				<if test="ownerReturnAddr != null">`owner_return_addr` = #{ownerReturnAddr}, </if>
+				<if test="dayMileage != null">`day_mileage` = #{dayMileage}, </if>
+				<if test="tankCapacity != null">`tank_capacity` = #{tankCapacity}</if>
 			</set>
 		where id = #{id}
 	</update>
@@ -261,7 +317,15 @@
 				`create_time` = #{createTime}, 		
 				`update_time` = #{updateTime}, 		
 				`is_delete` = #{isDelete}, 		
-				`renter_order_no` = #{renterOrderNo}		
+				`renter_order_no` = #{renterOrderNo}, 		
+				`real_get_car_lon` = #{realGetCarLon}, 		
+				`real_get_car_lat` = #{realGetCarLat}, 		
+				`real_return_car_lon` = #{realReturnCarLon}, 		
+				`real_return_car_lat` = #{realReturnCarLat}, 		
+				`owner_get_addr` = #{ownerGetAddr}, 		
+				`owner_return_addr` = #{ownerReturnAddr}, 		
+				`day_mileage` = #{dayMileage}, 		
+				`tank_capacity` = #{tankCapacity}		
 	
 		</set>
 		where id = #{id}

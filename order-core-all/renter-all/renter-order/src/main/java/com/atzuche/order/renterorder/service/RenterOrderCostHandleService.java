@@ -61,9 +61,10 @@ public class RenterOrderCostHandleService {
     private AccountRenterCostCoinService accountRenterCostCoinService;
 
     /**
-     * 车辆押金计算已处理
+     * 车辆押金计算及处理(包含保存方法)
      *
      * @param renterOrderReqVO 租客订单请求信息
+     * @return RenterOrderCarDepositResVO
      */
     public RenterOrderCarDepositResVO handleCarDepositAmt(RenterOrderReqVO renterOrderReqVO) {
         DepositAmtDTO depositAmtDTO = new DepositAmtDTO();
@@ -109,6 +110,24 @@ public class RenterOrderCostHandleService {
                 JSON.toJSONString(renterOrderCarDepositResVO));
         return renterOrderCarDepositResVO;
     }
+
+
+    /**
+     * 车辆押金计算及处理(不保存)
+     *
+     * @param renterOrderReqVO 租客订单请求信息
+     */
+    public int handleCarDepositAmtNotSave(RenterOrderReqVO renterOrderReqVO) {
+
+
+        return 0;
+
+    }
+
+
+
+
+
 
 
     /**
