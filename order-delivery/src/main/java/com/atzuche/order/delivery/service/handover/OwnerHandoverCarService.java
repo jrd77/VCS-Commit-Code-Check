@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author 胡春林
@@ -35,13 +36,17 @@ public class OwnerHandoverCarService implements IUpdateHandoverCarInfo {
     @Override
     public void updateHandoverCarOilMileageNum(HandoverCarInfoReqDTO handoverCarInfoReqDTO) {
         OwnerHandoverCarInfoEntity ownerHandoverCarReturnInfoEntity = selectObjectByOrderNo(handoverCarInfoReqDTO.getOrderNo(), RenterHandoverCarTypeEnum.RENTER_TO_RENYUN.getValue());
-        ownerHandoverCarReturnInfoEntity.setOilNum(Integer.valueOf(handoverCarInfoReqDTO.getRenterReturnOil()));
-        ownerHandoverCarReturnInfoEntity.setMileageNum(Integer.valueOf(handoverCarInfoReqDTO.getOwnReturnKM()));
-        updateOwnerHandoverInfoByPrimaryKey(ownerHandoverCarReturnInfoEntity);
+        if(Objects.nonNull(ownerHandoverCarReturnInfoEntity)) {
+            ownerHandoverCarReturnInfoEntity.setOilNum(Integer.valueOf(handoverCarInfoReqDTO.getRenterReturnOil()));
+            ownerHandoverCarReturnInfoEntity.setMileageNum(Integer.valueOf(handoverCarInfoReqDTO.getOwnReturnKM()));
+            updateOwnerHandoverInfoByPrimaryKey(ownerHandoverCarReturnInfoEntity);
+        }
         OwnerHandoverCarInfoEntity ownerHandoverCarGetInfoEntity = selectObjectByOrderNo(handoverCarInfoReqDTO.getOrderNo(), RenterHandoverCarTypeEnum.RENYUN_TO_RENTER.getValue());
-        ownerHandoverCarGetInfoEntity.setOilNum(Integer.valueOf(handoverCarInfoReqDTO.getOwnReturnOil()));
-        ownerHandoverCarGetInfoEntity.setMileageNum(Integer.valueOf(handoverCarInfoReqDTO.getRenterRetrunKM()));
-        updateOwnerHandoverInfoByPrimaryKey(ownerHandoverCarGetInfoEntity);
+        if(Objects.nonNull(ownerHandoverCarGetInfoEntity)) {
+            ownerHandoverCarGetInfoEntity.setOilNum(Integer.valueOf(handoverCarInfoReqDTO.getOwnReturnOil()));
+            ownerHandoverCarGetInfoEntity.setMileageNum(Integer.valueOf(handoverCarInfoReqDTO.getRenterRetrunKM()));
+            updateOwnerHandoverInfoByPrimaryKey(ownerHandoverCarGetInfoEntity);
+        }
     }
 
 
