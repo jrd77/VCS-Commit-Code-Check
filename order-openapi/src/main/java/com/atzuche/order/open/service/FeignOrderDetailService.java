@@ -1,11 +1,10 @@
 package com.atzuche.order.open.service;
 
 
-import com.atzuche.order.commons.entity.orderDetailDto.OrderDetailReqDTO;
-import com.atzuche.order.commons.entity.orderDetailDto.OrderDetailRespDTO;
-import com.atzuche.order.commons.entity.orderDetailDto.OrderStatusRespDTO;
+import com.atzuche.order.commons.entity.orderDetailDto.*;
 import com.autoyol.commons.web.ResponseData;
 import org.springframework.cloud.netflix.feign.FeignClient;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -31,4 +30,7 @@ public interface FeignOrderDetailService {
     @RequestMapping(method = RequestMethod.POST, value = "/order/detail/status")
     ResponseData<OrderStatusRespDTO> getOrderStatus(@RequestBody OrderDetailReqDTO orderDetailReqDTO);
 
+
+    @PostMapping("/order/detail/childHistory")
+    ResponseData<OrderHistoryRespDTO> orderHistory(@RequestBody OrderHistoryReqDTO orderHistoryReqDTO);
 }
