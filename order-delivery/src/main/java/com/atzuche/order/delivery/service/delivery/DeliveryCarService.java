@@ -353,9 +353,6 @@ public class DeliveryCarService {
         renYunFlowOrderDTO.setTankCapacity(orderDeliveryFlowEntity.getTankCapacity());
         renYunFlowOrderDTO.setOwnerReturnAddr(orderDeliveryFlowEntity.getOwnerReturnAddr());
         renYunFlowOrderDTO.setOwnerGetAddr(orderDeliveryFlowEntity.getOwnerGetAddr());
-
-
-
         return renYunFlowOrderDTO;
     }
 
