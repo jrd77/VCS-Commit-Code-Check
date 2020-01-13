@@ -58,7 +58,7 @@ public class OrderRemarkController extends BaseController {
 
     @AutoDocMethod(description = "备注查询列表", value = "备注查询列表", response = OrderRemarkPageListResponseVO.class)
     @GetMapping("/list")
-    public ResponseData<OrderRemarkPageListResponseVO> selectRemarklist(@Valid OrderRemarkListRequestVO orderRemarkListRequestVO, BindingResult bindingResult) {
+    public ResponseData<OrderRemarkPageListResponseVO> selectRemarkList(@Valid OrderRemarkListRequestVO orderRemarkListRequestVO, BindingResult bindingResult) {
         //参数验证
         validateParameter(bindingResult);
         try{

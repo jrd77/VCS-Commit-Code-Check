@@ -1,7 +1,10 @@
 package com.atzuche.order.flow.mapper;
 
 import com.atzuche.order.flow.entity.OrderFlowEntity;
+import com.atzuche.order.flow.dto.req.OrderFlowRequestDTO;
 import org.apache.ibatis.annotations.Mapper;
+
+import java.util.List;
 
 /**
  * 租客端交易流程表
@@ -21,5 +24,7 @@ public interface OrderFlowMapper{
     int updateByPrimaryKey(OrderFlowEntity record);
     
     int updateByPrimaryKeySelective(OrderFlowEntity record);
+
+    List<OrderFlowEntity> selectOrderFlowListByOrderNo(OrderFlowRequestDTO orderFlowRequestVO);
 
 }

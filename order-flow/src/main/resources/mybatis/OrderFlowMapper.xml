@@ -8,6 +8,7 @@
         <result property="orderNo" column="order_no"/>
         <result property="orderStatus" column="order_status"/>
         <result property="orderStatusDesc" column="order_status_desc"/>
+        <result property="source" column="source"/>
         <result property="createTime" column="create_time"/>
         <result property="createOp" column="create_op"/>
         <result property="updateTime" column="update_time"/>
@@ -21,6 +22,7 @@
         `order_no`,
         `order_status`,
         `order_status_desc`,
+        `source`,
         `create_time`,
         `create_op`,
         `update_time`,
@@ -37,11 +39,13 @@
 		insert into order_flow (
             `order_no`,
             `order_status`,
-            `order_status_desc`
+            `order_status_desc`,
+            `source`
         ) values (
             #{orderNo},
             #{orderStatus},
-            #{orderStatusDesc}
+            #{orderStatusDesc},
+            #{source}
         )
 	</insert>
 	
@@ -51,6 +55,7 @@
             <if test="orderNo != null">`order_no`, </if>
             <if test="orderStatus != null">`order_status`, </if>
             <if test="orderStatusDesc != null">`order_status_desc`, </if>
+            <if test="source != null">`source`, </if>
             <if test="createTime != null">`create_time`, </if>
             <if test="createOp != null">`create_op`, </if>
             <if test="updateTime != null">`update_time`, </if>
@@ -61,6 +66,7 @@
             <if test="orderNo != null">#{orderNo},  </if>
             <if test="orderStatus != null">#{orderStatus},  </if>
             <if test="orderStatusDesc != null">#{orderStatusDesc},  </if>
+            <if test="source != null">#{source},  </if>
             <if test="createTime != null">#{createTime},  </if>
             <if test="createOp != null">#{createOp},  </if>
             <if test="updateTime != null">#{updateTime},  </if>
@@ -76,6 +82,7 @@
 				<if test="orderNo != null">`order_no` = #{orderNo}, </if>
 				<if test="orderStatus != null">`order_status` = #{orderStatus}, </if>
 				<if test="orderStatusDesc != null">`order_status_desc` = #{orderStatusDesc}, </if>
+                <if test="source != null">`source` = #{source}, </if>
 				<if test="createTime != null">`create_time` = #{createTime}, </if>
 				<if test="createOp != null">`create_op` = #{createOp}, </if>
 				<if test="updateTime != null">`update_time` = #{updateTime}, </if>
@@ -90,9 +97,15 @@
 		    <set>
 				`order_no` = #{orderNo}, 		
 				`order_status` = #{orderStatus}, 		
-				`order_status_desc` = #{orderStatusDesc}, 		
+				`order_status_desc` = #{orderStatusDesc},
+                `source` = #{source}
 		    </set>
 		where id = #{id}
 	</update>
+
+
+    <select id="selectOrderFlowListByOrderNo" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List" /> from order_flow where order_no = #{orderNo} and is_delete = 0
+    </select>
   	
 </mapper>
