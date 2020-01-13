@@ -271,6 +271,7 @@
   	
   	<select id="getRenterOrderChangeApplyByRenterOrderNo" resultMap="BaseResultMap">
 		select <include refid="Base_Column_List" /> from renter_order_change_apply where renter_order_no = #{renterOrderNo}
+		and audit_status = 0
 		and is_delete = 0
 		order by id desc
 		limit 1
