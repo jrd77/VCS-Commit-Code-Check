@@ -114,6 +114,8 @@ public class OrderDetailService {
     @Autowired
     private AccountRenterDetainCostNoTService accountRenterDetainCostNoTService;
 
+    
+
     /*
      * @Author ZhangBin
      * @Date 2020/1/11 16:20
@@ -144,6 +146,10 @@ public class OrderDetailService {
 
     private OrderAccountDetailRespDTO orderAccountDetailProxy(OrderDetailReqDTO orderDetailReqDTO) {
         String orderNo = orderDetailReqDTO.getOrderNo();
+
+        //押金比例
+
+
         //租客押金
         AccountRenterDepositEntity accountRenterDepositEntity = accountRenterDepositService.selectByOrderNo(orderNo);
         AccountRenterDepositDTO accountRenterDepositDTO = null;

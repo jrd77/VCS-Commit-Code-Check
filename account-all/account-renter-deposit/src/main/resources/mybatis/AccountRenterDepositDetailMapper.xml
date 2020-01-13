@@ -54,7 +54,7 @@
 
 	<select id="findByOrderNo"
 			resultMap="BaseResultMap">
-        select select <include refid="Base_Column_List" /> from account_renter_deposit_detail where order_no=#{orderNo} and is_delete=0 order by id;
+        select <include refid="Base_Column_List" /> from account_renter_deposit_detail where order_no=#{orderNo} and is_delete=0 order by id;
 	</select>
 
     <insert id="insertSelective" parameterType="com.atzuche.order.accountrenterdeposit.entity.AccountRenterDepositDetailEntity" useGeneratedKeys="true" keyProperty="id">
