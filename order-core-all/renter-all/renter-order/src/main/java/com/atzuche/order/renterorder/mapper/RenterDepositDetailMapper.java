@@ -2,6 +2,7 @@ package com.atzuche.order.renterorder.mapper;
 
 import com.atzuche.order.renterorder.entity.RenterDepositDetailEntity;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * 车辆押金详情
@@ -22,4 +23,5 @@ public interface RenterDepositDetailMapper{
     
     int updateByPrimaryKeySelective(RenterDepositDetailEntity record);
 
+    RenterDepositDetailEntity selectByOrderNo(@Param("orderNo") String orderNo);
 }

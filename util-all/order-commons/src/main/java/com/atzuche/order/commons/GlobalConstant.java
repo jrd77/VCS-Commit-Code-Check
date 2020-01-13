@@ -16,9 +16,13 @@ public class GlobalConstant {
 
     public static final DateTimeFormatter DATE_TIME_FORMAT_2 = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
 
+    public static final  DateTimeFormatter DATE_TIME_FORMAT_1 = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
     public static final String FORMAT_STR = "yyyyMMddHHmmss";
 
     public static final String FORMAT_DATE_STR = "yyyyMMdd";
+    public static final String FORMAT_DATE_STR1 = "yyyy-MM-dd HH:mm:ss";
+
 
     public static final String CAR_YEAR_NEQTWO = "car_year_neqtwo";
     public static final double CAR_YEAR_NEQTWO_DEFAULT_VALUE = 1.4;
