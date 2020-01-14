@@ -84,6 +84,10 @@ public class RenterGoodsService{
         return renterGoodsMapper.queryCarNumByOrderNo(orderNo);
     }
 
+    public RenterGoodsEntity queryCarInfoByOrderNoAndCarNo(String orderNo, String carNo) {
+        return renterGoodsMapper.queryCarInfoByOrderNoAndCarNo(orderNo,carNo);
+    }
+
     @Data
     public static class JSONStr{
         private Integer id;

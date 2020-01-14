@@ -276,6 +276,14 @@ public class OrderDetailService {
     }
     private OrderAccountDetailRespDTO orderAccountDetailProxy(OrderDetailReqDTO orderDetailReqDTO) {
         String orderNo = orderDetailReqDTO.getOrderNo();
+        //主订单
+        OrderEntity orderEntity = orderService.getOrderEntity(orderNo);
+        if(orderEntity == null){
+            log.error("获取订单数据为空orderNo={}",orderNo);
+            throw new OrderDetailException();
+        }
+        OrderDTO orderDTO = new OrderDTO();
+        BeanUtils.copyProperties(orderEntity,orderDTO);
 
         //订单状态
         OrderStatusEntity orderStatusEntity = orderStatusService.getByOrderNo(orderNo);
@@ -334,6 +342,7 @@ public class OrderDetailService {
         });
 
         OrderAccountDetailRespDTO orderAccountDetailRespDTO = new OrderAccountDetailRespDTO();
+        orderAccountDetailRespDTO.orderDTO = orderDTO;
         orderAccountDetailRespDTO.orderStatusDTO = orderStatusDTO;
         orderAccountDetailRespDTO.renterDepositDetailDTO = renterDepositDetailDTO;
         orderAccountDetailRespDTO.accountRenterDepositDetailDTOList = accountRenterDepositDetailDTOList;
