@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.Mapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-@FeignClient(url = "http://10.0.3.235:1412" ,name="order-center-api")
+@FeignClient("order-center-api")
 public interface FeignOrderFlowService {
 
     @PostMapping("/order/flow/list")
