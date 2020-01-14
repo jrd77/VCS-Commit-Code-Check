@@ -1,24 +1,33 @@
 package com.atzuche.order.coreapi.service;
 
+import com.atzuche.order.cashieraccount.service.CashierRefundApplyService;
 import com.atzuche.order.commons.CommonUtils;
-import com.atzuche.order.commons.entity.dto.RenterMemberDTO;
+import com.atzuche.order.commons.DateUtils;
 import com.atzuche.order.coreapi.entity.vo.res.IllegalOrderInfoResVO;
+import com.atzuche.order.coreapi.entity.vo.res.TransIllegalDetailResVO;
+import com.atzuche.order.coreapi.enums.OrderStatusEnums;
 import com.atzuche.order.owner.mem.entity.OwnerMemberEntity;
 import com.atzuche.order.owner.mem.service.OwnerMemberService;
 import com.atzuche.order.parentorder.entity.OrderEntity;
 import com.atzuche.order.parentorder.service.OrderService;
+import com.atzuche.order.parentorder.service.OrderStatusService;
 import com.atzuche.order.rentercommodity.entity.RenterGoodsEntity;
 import com.atzuche.order.rentercommodity.service.RenterGoodsService;
 import com.atzuche.order.rentermem.entity.RenterMemberEntity;
 import com.atzuche.order.rentermem.service.RenterMemberService;
+import com.atzuche.order.renterorder.entity.RenterOrderEntity;
+import com.atzuche.order.renterorder.service.RenterOrderService;
 import com.atzuche.order.renterwz.entity.RenterOrderWzCostDetailEntity;
+import com.atzuche.order.renterwz.entity.RenterOrderWzDetailEntity;
 import com.atzuche.order.renterwz.entity.RenterOrderWzIllegalPhotoEntity;
 import com.atzuche.order.renterwz.entity.RenterOrderWzStatusEntity;
 import com.atzuche.order.renterwz.service.*;
 import com.atzuche.order.renterwz.vo.PhotoUploadVO;
+import com.autoyol.autopay.gateway.constant.DataPayKindConstant;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -66,21 +75,30 @@ public class RenterOrderWzService {
     @Resource
     private OrderService orderService;
 
+    @Resource
+    private RenterOrderService renterOrderService;
+
+    @Resource
+    private OrderStatusService orderStatusService;
+
+    @Resource
+    private CashierRefundApplyService cashierRefundApplyService;
+
+    @Resource
+    private RenterOrderWzDetailService renterOrderWzDetailService;
+
     private static final Integer SUCCESS_STATUS = 200;
     private static final Integer FAILED_STATUS = 500;
-
 
     /**图片上传张数上限**/
     public static final int IMAGE_UPLOAD_LIMIT = 35;
 
-    /**图片上传超过35张给用户的提示**/
-    public static final String SURPASS_IMAGE_ERROR_TEXT = "图片只能上传35张";
 
     /**
      *  500 系统内部异常 200 成功 -1  阿里云上传失败  -2 上传数量大于35张 -3订单不存在 -4您只能上传自己的违章照片
-     * @param photoUpload
-     * @return
-     * @throws Exception
+     * @param photoUpload 照片实体
+     * @return 状态码
+     * @throws Exception 异常
      */
     public Integer upload(PhotoUploadVO photoUpload) throws Exception{
         String orderNo = photoUpload.getOrderNo();
@@ -187,24 +205,142 @@ public class RenterOrderWzService {
         List<IllegalOrderInfoResVO> results = new ArrayList<>();
         IllegalOrderInfoResVO result;
         for (RenterOrderWzStatusEntity wzStatusEntity : wzStatusEntities) {
-            result = new IllegalOrderInfoResVO();
-            String orderNo = wzStatusEntity.getOrderNo();
-            String carNo = wzStatusEntity.getCarNo();
-            String ownerNo = wzStatusEntity.getOwnerNo();
-            String renterNo = wzStatusEntity.getRenterNo();
-            //查询 车主信息
-            OwnerMemberEntity owner = ownerMemberService.queryOwnerInfoByOrderNoAndOwnerNo(orderNo,ownerNo);
-            //查询 租客信息
-            RenterMemberEntity renter = renterMemberService.queryRenterInfoByOrderNoAndRenterNo(orderNo,renterNo);
-            //查询 车辆信息
-            RenterGoodsEntity car = renterGoodsService.queryCarInfoByOrderNoAndCarNo(orderNo,carNo);
-            //查询 订单信息
-            OrderEntity order = orderService.getOrderEntity(orderNo);
-            //查询 费用
-            List<RenterOrderWzCostDetailEntity> renterOrderWzCostDetailEntities = renterOrderWzCostDetailService.queryInfosByOrderNo(orderNo);
-
+            result = getIllegalOrderInfoResVO(wzStatusEntity);
             results.add(result);
         }
         return results;
+    }
+
+    private IllegalOrderInfoResVO getIllegalOrderInfoResVO(RenterOrderWzStatusEntity wzStatusEntity) {
+        IllegalOrderInfoResVO result;
+        String orderNo = wzStatusEntity.getOrderNo();
+        String carNo = wzStatusEntity.getCarNo();
+        String ownerNo = wzStatusEntity.getOwnerNo();
+        String renterNo = wzStatusEntity.getRenterNo();
+        //查询 车主信息
+        OwnerMemberEntity owner = ownerMemberService.queryOwnerInfoByOrderNoAndOwnerNo(orderNo,ownerNo);
+        //查询 租客信息
+        RenterMemberEntity renter = renterMemberService.queryRenterInfoByOrderNoAndRenterNo(orderNo,renterNo);
+        //查询 车辆信息
+        RenterGoodsEntity car = renterGoodsService.queryCarInfoByOrderNoAndCarNo(orderNo,carNo);
+        //查询 订单信息
+        OrderEntity order = orderService.getOrderEntity(orderNo);
+        //查询 费用
+        List<RenterOrderWzCostDetailEntity> wzCosts = renterOrderWzCostDetailService.queryInfosByOrderNo(orderNo);
+        RenterOrderEntity renterOrder = renterOrderService.getRenterOrderByOrderNoAndIsEffective(orderNo);
+        result = convertTo(wzStatusEntity,owner,renter,car,order,wzCosts,renterOrder);
+        //订单状态
+        Integer status = orderStatusService.getStatusByOrderNo(orderNo);
+        result.setStatus(OrderStatusEnums.getOldStatus(status));
+        Date wzAmtReturnTime = cashierRefundApplyService.queryRefundTimeByOrderNo(orderNo, DataPayKindConstant.DEPOSIT);
+        result.setWzAmtReturnTime(wzAmtReturnTime);
+        result.setOrderNo(orderNo);
+        return result;
+    }
+
+    private static final String WZ_FINE = "100040";
+    private static final String WZ_DYS_FINE = "100042";
+    private static final String WZ_SERVICE_COST = "100041";
+    private static final String WZ_STOP_COST = "100043";
+    private static final String WZ_OTHER_FINE = "100044";
+    private static final String INSURANCE_CLAIM = "100045";
+
+    private IllegalOrderInfoResVO convertTo(RenterOrderWzStatusEntity wzStatusEntity, OwnerMemberEntity owner, RenterMemberEntity renter, RenterGoodsEntity car, OrderEntity order, List<RenterOrderWzCostDetailEntity> wzCosts, RenterOrderEntity renterOrder){
+        IllegalOrderInfoResVO result = new IllegalOrderInfoResVO();
+        if(wzStatusEntity != null){
+            result.setWzHandleCompleteTime(wzStatusEntity.getWzHandleCompleteTime());
+            result.setIllegalQuery(String.valueOf(wzStatusEntity.getIllegalQuery()));
+            result.setWzDisposeStatus(String.valueOf(wzStatusEntity.getStatus()));
+        }
+        if(!CollectionUtils.isEmpty(wzCosts)){
+            for (RenterOrderWzCostDetailEntity wzCost : wzCosts) {
+                if(wzCost == null){
+                    continue;
+                }
+                if(WZ_FINE.equalsIgnoreCase(wzCost.getCostCode())&& wzCost.getAmount() != null){
+                    result.setWzFine(String.valueOf(wzCost.getAmount()));
+                }else if(WZ_DYS_FINE.equalsIgnoreCase(wzCost.getCostCode()) && wzCost.getAmount() != null){
+                    result.setWzDysFine(String.valueOf(wzCost.getAmount()));
+                }else if(WZ_SERVICE_COST.equalsIgnoreCase(wzCost.getCostCode()) && wzCost.getAmount() != null){
+                    result.setWzServiceCost(String.valueOf(wzCost.getAmount()));
+                }else if(WZ_STOP_COST.equalsIgnoreCase(wzCost.getCostCode()) && wzCost.getAmount() != null){
+                    result.setWzOffStreamCost(String.valueOf(wzCost.getAmount()));
+                }else if(WZ_OTHER_FINE.equalsIgnoreCase(wzCost.getCostCode()) && wzCost.getAmount() != null){
+                    result.setOtherDeductionAmt(String.valueOf(wzCost.getAmount()));
+                }else if(INSURANCE_CLAIM.equalsIgnoreCase(wzCost.getCostCode()) && wzCost.getAmount() != null){
+                    result.setInsuranceClaimAmt(String.valueOf(wzCost.getAmount()));
+                }
+            }
+        }
+        if(renter != null){
+            result.setRenterName(renter.getRealName());
+            result.setRenterNo(renter.getMemNo());
+            result.setRenterPhone(renter.getPhone());
+        }
+        if(owner != null){
+            result.setOwnerNo(owner.getMemNo());
+            result.setOwnerPhone(owner.getPhone());
+        }
+        if(order != null){
+            if(order.getExpRentTime() != null){
+                result.setRentTime(DateUtils.formate(order.getExpRentTime(),DateUtils.DATE_DEFAUTE));
+            }
+            if(order.getExpRevertTime() != null){
+                result.setRevertTime(DateUtils.formate(order.getExpRevertTime(),DateUtils.DATE_DEFAUTE));
+            }
+            result.setSource(order.getSource());
+        }
+        if(renterOrder != null){
+            if(renterOrder.getActRentTime() != null){
+                result.setRealRentTime(DateUtils.formate(renterOrder.getActRentTime(),DateUtils.DATE_DEFAUTE));
+            }
+            if(renterOrder.getActRevertTime() !=null){
+                result.setRealRevertTime(DateUtils.formate(renterOrder.getActRevertTime(),DateUtils.DATE_DEFAUTE));
+            }
+        }
+        if(car != null){
+            result.setCarBrand(car.getCarBrandTxt());
+            result.setCarNo(String.valueOf(car.getCarNo()));
+            result.setCarType(car.getCarTypeTxt());
+            result.setCarPlateNum(car.getCarPlateNum());
+        }
+        return result;
+    }
+
+    public List<TransIllegalDetailResVO> findTransIllegalDetailByOrderNo(String orderNo) {
+        List<RenterOrderWzDetailEntity> wzDetailEntities = renterOrderWzDetailService.findTransIllegalDetailByOrderNo(orderNo);
+        if(CollectionUtils.isEmpty(wzDetailEntities)){
+            return new ArrayList<>();
+        }
+        List<TransIllegalDetailResVO> results = new ArrayList<>();
+        for (RenterOrderWzDetailEntity wzDetailEntity : wzDetailEntities) {
+            TransIllegalDetailResVO dto = new TransIllegalDetailResVO();
+            BeanUtils.copyProperties(wzDetailEntity,dto);
+            if(StringUtils.isNotBlank(wzDetailEntity.getIllegalAmt())){
+                dto.setIllegalAmt(convertIntString(wzDetailEntity.getIllegalAmt()));
+            }
+            if(StringUtils.isNotBlank(wzDetailEntity.getIllegalDeduct())){
+                dto.setIllegalDeduct(convertIntString(wzDetailEntity.getIllegalDeduct()));
+            }
+            results.add(dto);
+        }
+        return results;
+    }
+
+    private int convertIntString(String intStr){
+        if(org.apache.commons.lang.StringUtils.isBlank(intStr)){
+            return 0;
+        }
+        //判断是否有小数点
+        if(intStr.contains(".")){
+            String subStr= intStr.substring(0,(intStr.indexOf(".")));
+            return Integer.parseInt(subStr);
+        }
+        return Integer.parseInt(intStr);
+    }
+
+    public IllegalOrderInfoResVO getOrderInfoByOrderNo(String orderNo) {
+        RenterOrderWzStatusEntity wzStatusEntity = renterOrderWzStatusService.getOrderInfoByOrderNo(orderNo);
+        return getIllegalOrderInfoResVO(wzStatusEntity);
     }
 }

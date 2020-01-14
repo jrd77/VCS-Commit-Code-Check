@@ -26,7 +26,7 @@ public class CarController {
 
     private  Logger logger = LoggerFactory.getLogger(getClass());
 
-
+    @Autowired
     private CarProxyService carProxyService;
 
     @AutoDocMethod(description = "订单详细信息-查看车辆信息", value = "订单详细信息-查看车辆信息", response = CarDetailDTO.class)

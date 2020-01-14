@@ -57,26 +57,26 @@ public class PlatformCouponService {
 
 
     /**
-     * 获取会员有效的去送服务优惠券信息
+     * 获取会员有效的优惠券信息(平台券+取还车券)
      *
      * @param request 请求参数
      * @return MemAvailCouponResponse 优惠券信息
      */
-    public MemAvailCouponResponse findAvailMemGetAndReturnSrvCoupons(MemAvailCouponRequest request) {
-        logger.info("获取会员有效的取送服务优惠券信息(平台券+取还车券).request:[{}]", JSON.toJSONString(request));
-        Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "youhuiqia");
+    public MemAvailCouponResponse findAvailMemCouponsV2(MemAvailCouponRequest request) {
+        logger.info("获取会员有效的优惠券信息(平台券+取还车券).request:[{}]", JSON.toJSONString(request));
+        Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "平台优惠券服务");
         try {
             Cat.logEvent(CatConstants.FEIGN_METHOD, "CouponServiceApi.findAvailMemCouponsV2");
             Cat.logEvent(CatConstants.FEIGN_PARAM, JSON.toJSONString(request));
             MemAvailCouponResponse memCouponResponse = couponServiceApi.findAvailMemCouponsV2(request);
-            logger.info("获取会员有效的取送服务优惠券信息(平台券+取还车券).response:[{}]", JSON.toJSONString(memCouponResponse));
+            logger.info("获取会员有效的优惠券信息(平台券+取还车券).response:[{}]", JSON.toJSONString(memCouponResponse));
             Cat.logEvent(CatConstants.FEIGN_RESULT, JSON.toJSONString(memCouponResponse));
             t.setStatus(Transaction.SUCCESS);
             return memCouponResponse;
         } catch (Exception e) {
-            logger.error("获取会员有效的取送服务优惠券信息(平台券+取还车券)异常.request:[{}]", request, e);
+            logger.error("获取会员有效的优惠券信息(平台券+取还车券)异常.request:[{}]", request, e);
             t.setStatus(e);
-            Cat.logError("获取会员有效的取送服务优惠券信息(平台券+取还车券)异常.", e);
+            Cat.logError("获取会员有效的优惠券信息(平台券+取还车券)异常.", e);
         } finally {
             t.complete();
         }

@@ -134,5 +134,11 @@ public class SubmitOrderRiskCheckReqVO {
     private String cityName;
 
 
+    /**
+     * 周末价格
+     */
+    private Integer weekendPrice;
+
+
 
 }

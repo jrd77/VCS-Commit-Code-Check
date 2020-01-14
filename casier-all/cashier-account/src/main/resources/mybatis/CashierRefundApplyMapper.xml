@@ -147,7 +147,9 @@
 				<if test="createTime != null">`create_time` = #{createTime}, </if>
 				<if test="createOp != null">`create_op` = #{createOp}, </if>
 				<if test="updateTime != null">`update_time` = #{updateTime}, </if>
-				<if test="updateOp != null">`update_op` = #{updateOp}, </if>
+             <if test="refundTime != null">`refund_time` = #{refundTime}, </if>
+
+            <if test="updateOp != null">`update_op` = #{updateOp}, </if>
 				version = version +1 ,
 				<if test="isDelete != null">`is_delete` = #{isDelete}</if>
 			</set>
@@ -161,6 +163,15 @@
         select <include refid="Base_Column_List" /> from cashier_refund_apply
         where mem_no = #{memNo} and order_no = #{orderNo} and pay_md5 = #{payMd5} limit 1
 
+    </select>
+    <select id="selectRefundByType" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List" /> from cashier_refund_apply
+        where order_no = #{orderNo} and pay_kind = #{payKind} limit 1
+    </select>
+
+    <select id="queryRefundTimeByOrderNo" resultType="java.util.Date">
+        select refund_time from cashier_refund_apply
+        where order_no = #{orderNo} and pay_kind = #{payKind} limit 1
     </select>
 
 

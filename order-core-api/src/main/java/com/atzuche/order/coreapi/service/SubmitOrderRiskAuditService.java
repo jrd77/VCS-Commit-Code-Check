@@ -42,7 +42,8 @@ public class SubmitOrderRiskAuditService {
      * @return Integer riskAuditId
      */
     public Integer check(SubmitOrderRiskCheckReqVO submitOrderRiskCheckReqVO) {
-        logger.info("Submit order rish audit check.param is,submitOrderRiskCheckReqVO:[{}]", JSON.toJSONString(submitOrderRiskCheckReqVO));
+        logger.info("Submit order risk audit check.param is,submitOrderRiskCheckReqVO:[{}]",
+                JSON.toJSONString(submitOrderRiskCheckReqVO));
         
         CreateOrderRiskCheckRequestVO req = buildCreateOrderRiskCheckRequestVO(submitOrderRiskCheckReqVO);
         Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "风控服务");
@@ -106,6 +107,7 @@ public class SubmitOrderRiskAuditService {
 
         createOrderRiskCheckRequestVO.setUseCarCityCode(submitOrderRiskCheckReqVO.getCityCode());
         createOrderRiskCheckRequestVO.setUseCarCityName(submitOrderRiskCheckReqVO.getCityName());
+        createOrderRiskCheckRequestVO.setAverageDailyPrice(String.valueOf(submitOrderRiskCheckReqVO.getWeekendPrice()));
 
         return createOrderRiskCheckRequestVO;
     }

@@ -2,6 +2,7 @@ package com.atzuche.order.coreapi.controller;
 
 import com.atzuche.order.coreapi.entity.request.PhotoUploadReqVO;
 import com.atzuche.order.coreapi.entity.vo.res.IllegalOrderInfoResVO;
+import com.atzuche.order.coreapi.entity.vo.res.TransIllegalDetailResVO;
 import com.atzuche.order.coreapi.listener.HandoverCarListener;
 import com.atzuche.order.coreapi.service.RenterOrderWzService;
 import com.atzuche.order.renterwz.service.RenterOrderWzIllegalPhotoService;
@@ -69,6 +70,32 @@ public class RenterWzPhotoController {
         }
     }
 
+    @ResponseBody
+    @RequestMapping(value = "get/illegalDetailList",method = RequestMethod.GET)
+    @AutoDocMethod(description = "查询当前订单内的违章", value = "查询当前订单内的违章", response = ResponseData.class)
+    public ResponseData<List<TransIllegalDetailResVO>> findTransIllegalDetailByOrderNo(@RequestParam("orderNo") String orderNo){
+        try {
+            List<TransIllegalDetailResVO> results= renterOrderWzService.findTransIllegalDetailByOrderNo(orderNo);
+            return ResponseData.success(results);
+        } catch (Exception e) {
+            LOGGER.error("查询当前订单内的违章 异常 e :",e);
+            Cat.logError("查询当前订单内的违章 异常",e);
+            return ResponseData.error();
+        }
+    }
 
+    @ResponseBody
+    @RequestMapping(value = "get/illegalDetail",method = RequestMethod.GET)
+    @AutoDocMethod(description = "查询当前订单的违章详情", value = "查询当前订单的违章详情", response = ResponseData.class)
+    public ResponseData<IllegalOrderInfoResVO> getOrderInfoByOrderNo(@RequestParam("orderNo") String orderNo){
+        try {
+            IllegalOrderInfoResVO result= renterOrderWzService.getOrderInfoByOrderNo(orderNo);
+            return ResponseData.success(result);
+        } catch (Exception e) {
+            LOGGER.error("查询当前订单的违章详情 异常 e :",e);
+            Cat.logError("查询当前订单的违章详情 异常",e);
+            return ResponseData.error();
+        }
+    }
 
 }
