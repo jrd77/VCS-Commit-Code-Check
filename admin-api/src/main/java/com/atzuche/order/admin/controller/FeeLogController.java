@@ -10,11 +10,11 @@ import com.autoyol.doc.annotation.AutoDocVersion;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@AutoDocVersion(version = "费用操作日志")
+@AutoDocVersion(version = "管理后台操作日志")
 public class FeeLogController {
 
-    @AutoDocMethod(description = "费用操作日志", value = "费用操作日志", response = FeeLogRespVO.class)
-    @PostMapping(value = "/fee/log/list")
+    @AutoDocMethod(description = "管理后台操作日志", value = "管理后台操作日志", response = FeeLogRespVO.class)
+    @PostMapping(value = "console/admin/log/list")
     public ResponseData <?> getFeeLog(@RequestBody FeeLogReqVO feeLogReqVO){
 
         return null;

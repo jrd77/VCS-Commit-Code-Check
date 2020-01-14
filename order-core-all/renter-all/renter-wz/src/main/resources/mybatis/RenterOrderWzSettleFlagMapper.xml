@@ -96,7 +96,7 @@
 	<select id="getIllegalSettleInfosByOrderNo" resultMap="selectColumnMap">
 		select <include refid="select_column" />
 		from renter_order_wz_settle_flag
-		where order_no = #{orderNo} and is_delete = 0
+		where order_no = #{orderNo}  and is_delete = 0 and ((has_illegal = 2 and has_illegal_cost =1) || (has_illegal = 3 and has_illegal_cost =0))
 	</select>
 
 	 <update id="updateRenterOrderWzSettleFlag" parameterType="com.atzuche.order.renterwz.entity.RenterOrderWzSettleFlagEntity">

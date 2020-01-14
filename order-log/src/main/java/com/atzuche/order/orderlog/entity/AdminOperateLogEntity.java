@@ -19,6 +19,7 @@ public class AdminOperateLogEntity implements Serializable {
      */
     private String opType;
 
+
     private String opSubType;
 
     /**

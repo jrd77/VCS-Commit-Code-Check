@@ -28,6 +28,7 @@ public class AccountRenterWzDepositNoTService {
 
 
 
+
     /**
      * 查询违章信息
      * @param orderNo
@@ -35,9 +36,8 @@ public class AccountRenterWzDepositNoTService {
      * @return
      */
     public int getAccountRenterWZDepositAmt(String orderNo, String memNo) {
-        AccountRenterWZDepositResVO  result = new AccountRenterWZDepositResVO();
         AccountRenterWzDepositEntity accountRenterDepositEntity = accountRenterWzDepositMapper.selectByOrderAndMemNo(orderNo,memNo);
-        if(Objects.nonNull(accountRenterDepositEntity) || Objects.nonNull(accountRenterDepositEntity.getShishouDeposit())){
+        if(Objects.isNull(accountRenterDepositEntity) || Objects.isNull(accountRenterDepositEntity.getShishouDeposit())){
             return 0;
         }
         return accountRenterDepositEntity.getShishouDeposit();
@@ -93,17 +93,19 @@ public class AccountRenterWzDepositNoTService {
         if(Objects.isNull(accountRenterDepositEntity)){
             throw new PayOrderRenterWZDepositException();
         }
-        if(payedOrderRenterWZDepositDetail.getAmt() + accountRenterDepositEntity.getShouldReturnDeposit()<0){
+        if(payedOrderRenterWZDepositDetail.getAmt() + accountRenterDepositEntity.getShishouDeposit()<0){
             //可用 剩余押金 不足
             throw new PayOrderRenterWZDepositException();
         }
         AccountRenterWzDepositEntity accountRenterDeposit = new AccountRenterWzDepositEntity();
         accountRenterDeposit.setId(accountRenterDepositEntity.getId());
         accountRenterDeposit.setVersion(accountRenterDepositEntity.getVersion());
+        accountRenterDeposit.setRealReturnDeposit(accountRenterDepositEntity.getRealReturnDeposit());
 
-        if(Objects.nonNull(accountRenterDeposit.getShouldReturnDeposit()) || accountRenterDeposit.getShouldReturnDeposit()>Math.abs(payedOrderRenterWZDepositDetail.getAmt())){
-            accountRenterDeposit.setShouldReturnDeposit(accountRenterDeposit.getShouldReturnDeposit() + payedOrderRenterWZDepositDetail.getAmt());
+        if(Objects.nonNull(accountRenterDeposit.getRealReturnDeposit()) || accountRenterDeposit.getRealReturnDeposit()>Math.abs(payedOrderRenterWZDepositDetail.getAmt())){
+            accountRenterDeposit.setRealReturnDeposit(accountRenterDeposit.getRealReturnDeposit() + payedOrderRenterWZDepositDetail.getAmt());
         }
+        accountRenterDeposit.setRealReturnDeposit(accountRenterDeposit.getRealReturnDeposit());
         int result =  accountRenterWzDepositMapper.updateByPrimaryKeySelective(accountRenterDeposit);
         if(result==0){
             throw new PayOrderRenterWZDepositException();

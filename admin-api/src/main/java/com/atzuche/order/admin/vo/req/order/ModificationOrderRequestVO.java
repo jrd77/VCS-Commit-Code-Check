@@ -18,9 +18,9 @@ public class ModificationOrderRequestVO implements Serializable {
 	@AutoDocProperty(value="订单编号,必填，",required=true)
 	private String orderNo;
 	
-	@NotBlank(message="memNo不能为空")
-	@AutoDocProperty(value="memNo,必填，",required=true)
-	private String memNo;
+//	@NotBlank(message="memNo不能为空")
+//	@AutoDocProperty(value="memNo,必填，",required=true)
+//	private String memNo;
 	
 //	@NotBlank(message="租客子订单编号不能为空")
 //	@AutoDocProperty(value="租客子订单编号,必填，",required=true)

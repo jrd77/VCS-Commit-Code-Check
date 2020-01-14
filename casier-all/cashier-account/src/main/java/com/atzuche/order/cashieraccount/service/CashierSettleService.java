@@ -12,6 +12,7 @@ import com.atzuche.order.accountplatorm.service.notservice.AccountPlatformSubsid
 import com.atzuche.order.accountrenterclaim.entity.AccountRenterClaimCostSettleEntity;
 import com.atzuche.order.accountrenterclaim.service.notservice.AccountRenterClaimCostSettleNoTService;
 import com.atzuche.order.accountrenterdeposit.service.AccountRenterDepositService;
+import com.atzuche.order.accountrenterdeposit.service.notservice.AccountRenterDepositDetailNoTService;
 import com.atzuche.order.accountrenterdeposit.vo.req.DetainRenterDepositReqVO;
 import com.atzuche.order.accountrenterdeposit.vo.req.OrderCancelRenterDepositReqVO;
 import com.atzuche.order.accountrenterdeposit.vo.res.AccountRenterDepositResVO;
@@ -30,6 +31,7 @@ import com.atzuche.order.accountrenterrentcost.vo.req.AccountRenterCostDetailReq
 import com.atzuche.order.accountrenterrentcost.vo.req.AccountRenterCostToFineReqVO;
 import com.atzuche.order.accountrenterwzdepost.service.AccountRenterWzDepositCostService;
 import com.atzuche.order.accountrenterwzdepost.service.AccountRenterWzDepositService;
+import com.atzuche.order.accountrenterwzdepost.service.notservice.AccountRenterWzDepositDetailNoTService;
 import com.atzuche.order.accountrenterwzdepost.service.notservice.AccountRenterWzDepositNoTService;
 import com.atzuche.order.accountrenterwzdepost.vo.req.RenterCancelWZDepositCostReqVO;
 import com.atzuche.order.cashieraccount.service.notservice.CashierNoTService;
@@ -75,6 +77,8 @@ public class CashierSettleService {
     @Autowired private AccountOwnerCostSettleService accountOwnerCostSettleService;
     @Autowired private AccountRenterClaimCostSettleNoTService accountRenterClaimCostSettleNoTService;
     @Autowired private AccountRenterDetainCostNoTService accountRenterDetainCostNoTService;
+    @Autowired private AccountRenterWzDepositDetailNoTService accountRenterWzDepositDetailNoTService;
+    @Autowired private AccountRenterDepositDetailNoTService accountRenterDepositDetailNoTService;
 
 
     /**
@@ -193,7 +197,8 @@ public class CashierSettleService {
         if(Objects.isNull(vo) || Objects.isNull(vo.getSurplusDepositAmt())){
             return NumberUtils.INTEGER_ZERO;
         }
-        return vo.getSurplusDepositAmt();
+        int amt = accountRenterDepositDetailNoTService.getRentDeposit(orderNo,renterMemNo);
+        return amt;
     }
 
 
@@ -323,6 +328,16 @@ public class CashierSettleService {
     }
 
     /**
+     * 查询实付 违章押金金额()
+     * @param orderNo
+     * @param renterMemNo
+     * @return
+     */
+    public int getSurplusWZDepositCostAmt(String orderNo, String renterMemNo) {
+        return accountRenterWzDepositDetailNoTService.getSurplusWZDepositCostAmt(orderNo,renterMemNo);
+    }
+
+    /**
      * 查询实付 租车费用
      * @param orderNo
      * @param renterMemNo
@@ -330,6 +345,17 @@ public class CashierSettleService {
      */
     public int getRentCost(String orderNo, String renterMemNo) {
        return accountRenterCostSettleNoTService.getCostPaidRent(orderNo,renterMemNo);
+    }
+
+    /**
+     * 查询实付 租车费用
+     * @param orderNo
+     * @param renterMemNo
+     * @return
+     */
+    public int getCostPaidRentRefundAmt(String orderNo, String renterMemNo) {
+          return accountRenterCostDetailNoTService.getRentCostPayByPay(orderNo,renterMemNo);
+//        return accountRenterCostSettleNoTService.getCostPaidRentRefundAmt(orderNo,renterMemNo);
     }
 
     /**

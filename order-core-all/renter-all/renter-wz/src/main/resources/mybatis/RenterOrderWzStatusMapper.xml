@@ -9,6 +9,9 @@
 		<result property="id" column="id"/>
 		<result property="orderNo" column="order_no"/>
 		<result property="carPlateNum" column="car_plate_num"/>
+		<result property="renterNo" column="renter_no"/>
+		<result property="ownerNo" column="owner_no"/>
+		<result property="carNo" column="car_no"/>
 		<result property="status" column="status"/>
 		<result property="statusDesc" column="status_desc"/>
 		<result property="managementMode" column="management_mode"/>
@@ -27,6 +30,7 @@
 			car_plate_num,
 			renter_no,
 			owner_no,
+			car_no,
 			status,
 			status_desc,
 			create_op,
@@ -37,6 +41,7 @@
 			#{carPlateNum},
 			#{renterNo},
 			#{ownerNo},
+			#{carNo},
 			#{status},
 			#{statusDesc},
 			#{createOp},
@@ -116,5 +121,9 @@
 		update_time = NOW()
 		where order_no = #{orderNo} and is_delete = 0
 	</update>
+
+	<select id="queryIllegalOrderListByMemNo" resultMap="selectColumnMap">
+		select * from renter_order_wz_status where (t.owner_no = #{memNo} OR t.renter_no = #{memNo}) AND t.illegal_query = 4 AND t.status in (5,10,25,26,40,50,51,52) and is_delete = 0
+	</select>
 
 </mapper>

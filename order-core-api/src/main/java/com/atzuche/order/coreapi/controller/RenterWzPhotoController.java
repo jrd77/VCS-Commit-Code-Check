@@ -1,6 +1,7 @@
 package com.atzuche.order.coreapi.controller;
 
 import com.atzuche.order.coreapi.entity.request.PhotoUploadReqVO;
+import com.atzuche.order.coreapi.entity.vo.res.IllegalOrderInfoResVO;
 import com.atzuche.order.coreapi.listener.HandoverCarListener;
 import com.atzuche.order.coreapi.service.RenterOrderWzService;
 import com.atzuche.order.renterwz.service.RenterOrderWzIllegalPhotoService;
@@ -14,13 +15,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
+import java.util.List;
 
 /**
  * RenterWzPhotoController
@@ -53,6 +52,20 @@ public class RenterWzPhotoController {
             LOGGER.error("上传凭证 异常 e :",e);
             Cat.logError("上传凭证 异常",e);
             return ResponseData.success(500);
+        }
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "get/illegalOrderList",method = RequestMethod.GET)
+    @AutoDocMethod(description = "查询有违章的订单", value = "查询有违章的订单", response = ResponseData.class)
+    public ResponseData<List<IllegalOrderInfoResVO>> getIllegalOrderListByMemNo(@RequestParam("memNo") String memNo){
+        try {
+            List<IllegalOrderInfoResVO> results= renterOrderWzService.getIllegalOrderListByMemNo(memNo);
+            return ResponseData.success(results);
+        } catch (Exception e) {
+            LOGGER.error("查询有违章的订单 异常 e :",e);
+            Cat.logError("查询有违章的订单 异常",e);
+            return ResponseData.error();
         }
     }
 
