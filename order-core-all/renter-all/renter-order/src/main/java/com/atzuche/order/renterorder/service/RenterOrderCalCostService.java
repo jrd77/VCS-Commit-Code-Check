@@ -523,7 +523,7 @@ public class RenterOrderCalCostService {
             ownerDiscountCouponList.forEach(ownerCoupon -> {
                 CarOwnerCouponDetailVO carOwnerCouponDetail = new CarOwnerCouponDetailVO();
                 try {
-                    BeanUtils.copyProperties(carOwnerCouponDetail, ownerCoupon);
+                    BeanUtils.copyProperties(ownerCoupon, carOwnerCouponDetail);
                     carOwnerCouponDetailVoList.add(carOwnerCouponDetail);
                 } catch (Exception e) {
                     LOGGER.error("下单前费用计算，获取车主券抵扣信息复制属性出错：", e);
@@ -677,7 +677,7 @@ public class RenterOrderCalCostService {
                 continue;
             }
             DisCouponMemInfoVO disCouponMemInfoVO = new DisCouponMemInfoVO();
-            BeanUtils.copyProperties(disCouponMemInfoVO, memCoupon);
+            BeanUtils.copyProperties(memCoupon,disCouponMemInfoVO);
             Integer couponType = memCoupon.getCouponType();
             if (couponType == null) {
                 disCouponMemInfoVO.setPlatformCouponType("-1");

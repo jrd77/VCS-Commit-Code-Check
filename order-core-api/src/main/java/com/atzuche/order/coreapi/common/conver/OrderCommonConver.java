@@ -124,17 +124,17 @@ public class OrderCommonConver {
         }
 
         List<CostItemVO> costItemList = new ArrayList<>();
-        renterOrderCostRespDTO.getRenterOrderCostDetailDTOList().stream().forEach(cost -> {
+        renterOrderCostRespDTO.getRenterOrderCostDetailDTOList().forEach(cost -> {
             CostItemVO vo = new CostItemVO();
             vo.setCostCode(cost.getCostCode());
             vo.setCostDesc(cost.getCostDesc());
             vo.setCount(cost.getCount());
             if (StringUtils.equals(RenterCashCodeEnum.SRV_GET_COST.getCashNo(), cost.getCostCode())) {
                 vo.setUnitPrice(renterOrderCostRespDTO.getGetRealAmt());
-                vo.setTotalAmount(renterOrderCostRespDTO.getGetRealAmt());
+                vo.setTotalAmount(-renterOrderCostRespDTO.getGetRealAmt());
             } else if (StringUtils.equals(RenterCashCodeEnum.SRV_RETURN_COST.getCashNo(), cost.getCostCode())) {
                 vo.setUnitPrice(renterOrderCostRespDTO.getReturnRealAmt());
-                vo.setTotalAmount(renterOrderCostRespDTO.getReturnRealAmt());
+                vo.setTotalAmount(-renterOrderCostRespDTO.getReturnRealAmt());
             } else {
                 vo.setUnitPrice(cost.getUnitPrice());
                 vo.setTotalAmount(cost.getTotalAmount());
