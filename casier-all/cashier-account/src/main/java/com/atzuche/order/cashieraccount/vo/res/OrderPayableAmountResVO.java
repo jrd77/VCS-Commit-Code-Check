@@ -50,6 +50,12 @@ public class OrderPayableAmountResVO {
     private List<AccountPayAbleResVO> accountPayAbles;
 
     /**
+     * 待付费用明细（包含应付租车费用明细）
+     */
+    @AutoDocProperty("是否补付 1 是 0 否")
+    private Integer isPayAgain;
+
+    /**
      * 应付租车费用明细
      */
     @AutoDocProperty("应付租车费用明细")

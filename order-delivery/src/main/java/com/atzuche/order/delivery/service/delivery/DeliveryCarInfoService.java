@@ -1,22 +1,19 @@
 package com.atzuche.order.delivery.service.delivery;
 
-import com.atzuche.order.commons.StringUtil;
 import com.atzuche.order.commons.entity.dto.CostBaseDTO;
 import com.atzuche.order.commons.entity.dto.GetReturnCarOverCostReqDto;
 import com.atzuche.order.delivery.common.delivery.TranSportService;
-import com.atzuche.order.delivery.common.delivery.dto.GetReturnOverCostDTO;
 import com.atzuche.order.delivery.entity.*;
-import com.atzuche.order.delivery.enums.RenterHandoverCarTypeEnum;
 import com.atzuche.order.delivery.service.RenterOrderDeliveryService;
 import com.atzuche.order.delivery.service.handover.HandoverCarService;
 import com.atzuche.order.delivery.service.handover.OwnerHandoverCarService;
 import com.atzuche.order.delivery.service.handover.RenterHandoverCarService;
 import com.atzuche.order.delivery.utils.CommonUtil;
 import com.atzuche.order.delivery.utils.DateUtils;
-import com.atzuche.order.delivery.utils.MathUtil;
 import com.atzuche.order.delivery.vo.delivery.rep.*;
 import com.atzuche.order.delivery.vo.delivery.req.DeliveryCarRepVO;
-import com.autoyol.platformcost.CommonUtils;
+import com.atzuche.order.transport.service.TranSportProxyService;
+import com.atzuche.order.transport.vo.GetReturnOverCostDTO;
 import com.autoyol.platformcost.OwnerFeeCalculatorUtils;
 import com.autoyol.platformcost.RenterFeeCalculatorUtils;
 import com.google.common.collect.Lists;
@@ -24,13 +21,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * @author 胡春林
@@ -54,6 +48,8 @@ public class DeliveryCarInfoService {
     OwnerHandoverCarService ownerHandoverCarService;
     @Autowired
     TranSportService tranSportService;
+    @Autowired
+    TranSportProxyService tranSportProxyService;
 
     /**
      * 获取配送相关信息
@@ -63,10 +59,8 @@ public class DeliveryCarInfoService {
     public DeliveryCarVO findDeliveryListByOrderNo(String renterOrderNo,DeliveryCarRepVO deliveryCarDTO, OwnerGetAndReturnCarDTO ownerGetAndReturnCarDTO, Boolean isEscrowCar,Integer carEngineType,int carType) {
         List<RenterHandoverCarInfoEntity> renterHandoverCarInfoEntities = renterHandoverCarService.selectRenterByOrderNo(deliveryCarDTO.getOrderNo());
         List<OwnerHandoverCarInfoEntity> ownerHandoverCarInfoEntities = ownerHandoverCarService.selectOwnerByOrderNo(deliveryCarDTO.getOrderNo());
-        List<RenterHandoverCarRemarkEntity> renterHandoverCarRemarkEntities = renterHandoverCarService.getRenterHandoverRemarkInfo(deliveryCarDTO.getOrderNo());
-        List<OwnerHandoverCarRemarkEntity> ownerHandoverCarRemarkEntities = ownerHandoverCarService.getOwnerHandoverRemarkInfo(deliveryCarDTO.getOrderNo());
         List<RenterOrderDeliveryEntity> renterOrderDeliveryEntityList = renterOrderDeliveryService.listRenterOrderDeliveryByRenterOrderNo(renterOrderNo);
-        DeliveryCarVO deliveryCarVO = createDeliveryCarVOParams(ownerGetAndReturnCarDTO, renterHandoverCarInfoEntities, ownerHandoverCarInfoEntities, renterHandoverCarRemarkEntities, ownerHandoverCarRemarkEntities, renterOrderDeliveryEntityList, isEscrowCar, carEngineType, carType);
+        DeliveryCarVO deliveryCarVO = createDeliveryCarVOParams(ownerGetAndReturnCarDTO, renterHandoverCarInfoEntities, ownerHandoverCarInfoEntities, renterOrderDeliveryEntityList, isEscrowCar, carEngineType, carType);
         return deliveryCarVO;
     }
 
@@ -75,15 +69,11 @@ public class DeliveryCarInfoService {
      * 构造结构体
      * @param renterHandoverCarInfoEntities
      * @param ownerHandoverCarInfoEntities
-     * @param renterHandoverCarRemarkEntities
-     * @param ownerHandoverCarRemarkEntities
      * @return
      */
     public DeliveryCarVO createDeliveryCarVOParams(OwnerGetAndReturnCarDTO ownerGetAndReturnCarDTO,
                                                    List<RenterHandoverCarInfoEntity> renterHandoverCarInfoEntities,
                                                    List<OwnerHandoverCarInfoEntity> ownerHandoverCarInfoEntities,
-                                                   List<RenterHandoverCarRemarkEntity> renterHandoverCarRemarkEntities,
-                                                   List<OwnerHandoverCarRemarkEntity> ownerHandoverCarRemarkEntities,
                                                    List<RenterOrderDeliveryEntity> renterOrderDeliveryEntityList,
                                                    Boolean isEscrowCar,
                                                    Integer carEngineType,
@@ -95,7 +85,7 @@ public class DeliveryCarInfoService {
             if (null == renterOrderDeliveryEntity) {
                 continue;
             }
-            createGetHandoverCar(deliveryCarVO, renterHandoverCarRemarkEntities, ownerHandoverCarRemarkEntities, renterOrderDeliveryEntity,carType);
+            createGetHandoverCar(deliveryCarVO, renterOrderDeliveryEntity,carType);
         }
         //取车时的所在城市
         RenterOrderDeliveryEntity renterOrderDelivery = renterOrderDeliveryEntityList.stream().filter(r->r.getType() == 1).findFirst().get();
@@ -109,30 +99,35 @@ public class DeliveryCarInfoService {
     /**
      * 组装取送车信息
      *
-     * @param renterHandoverCarRemarkEntities
-     * @param ownerHandoverCarRemarkEntities
      * @param renterOrderDeliveryEntity
      * @return
      */
     public void createGetHandoverCar(DeliveryCarVO deliveryCarVO,
-                                     List<RenterHandoverCarRemarkEntity> renterHandoverCarRemarkEntities,
-                                     List<OwnerHandoverCarRemarkEntity> ownerHandoverCarRemarkEntities,
                                      RenterOrderDeliveryEntity renterOrderDeliveryEntity,
                                      Integer carType) {
 
         //获取超运能
         GetReturnCarOverCostReqDto getReturnCarOverCostReqDto = new GetReturnCarOverCostReqDto();
         getReturnCarOverCostReqDto.setCityCode(Integer.valueOf(renterOrderDeliveryEntity.getCityCode()));
+        getReturnCarOverCostReqDto.setOrderType(1);
         CostBaseDTO costBaseDTO = new CostBaseDTO();
         costBaseDTO.setStartTime(renterOrderDeliveryEntity.getRentTime());
         costBaseDTO.setEndTime(renterOrderDeliveryEntity.getRevertTime());
+        costBaseDTO.setOrderNo(renterOrderDeliveryEntity.getOrderNo());
+        costBaseDTO.setRenterOrderNo(renterOrderDeliveryEntity.getRenterOrderNo());
         getReturnCarOverCostReqDto.setCostBaseDTO(costBaseDTO);
         String isGetOverTransport;
         String isReturnOverTransport;
+        String chaoYunNengAddCrashStr = "";
+        String returnChaoYunNengAddCrashStr = "";
         try {
-            GetReturnOverCostDTO getReturnOverCostDTO = tranSportService.getGetReturnOverCost(getReturnCarOverCostReqDto);
+            GetReturnOverCostDTO getReturnOverCostDTO = tranSportProxyService.getGetReturnOverCost(getReturnCarOverCostReqDto);
             isGetOverTransport = getReturnOverCostDTO.getGetReturnOverTransportDTO().getIsGetOverTransport() == true ? "1" : "0";
             isReturnOverTransport = getReturnOverCostDTO.getGetReturnOverTransportDTO().getIsReturnOverTransport() == true ? "1" : "0";
+            int chaoYunNengAddCrash = getReturnOverCostDTO.getGetReturnOverTransportDTO().getGetOverTransportFee() + getReturnOverCostDTO.getGetReturnOverTransportDTO().getNightGetOverTransportFee();
+            int returnChaoYunNengAddCrash = getReturnOverCostDTO.getGetReturnOverTransportDTO().getNightReturnOverTransportFee() + getReturnOverCostDTO.getGetReturnOverTransportDTO().getNightReturnOverTransportFee();
+            returnChaoYunNengAddCrashStr = String.valueOf(returnChaoYunNengAddCrash);
+            chaoYunNengAddCrashStr = String.valueOf(chaoYunNengAddCrash);
         } catch (Exception e) {
             log.error("获取超运能异常，给默认值,cause:{}", e.getMessage());
             isGetOverTransport = "0";
@@ -148,6 +143,7 @@ public class DeliveryCarInfoService {
                 log.error("备注获取失败");
             }
             getHandoverCarDTO.setIsChaoYunNeng(isGetOverTransport);
+            getHandoverCarDTO.setChaoYunNengAddCrash(chaoYunNengAddCrashStr);
             deliveryCarVO.setGetHandoverCarDTO(getHandoverCarDTO);
             deliveryCarVO.setIsGetCar(1);
         } else if (renterOrderDeliveryEntity.getType() == 2 && renterOrderDeliveryEntity.getStatus() != 0) {
@@ -160,6 +156,7 @@ public class DeliveryCarInfoService {
                 log.error("备注获取失败");
             }
             returnHandoverCarDTO.setIsChaoYunNeng(isReturnOverTransport);
+            returnHandoverCarDTO.setChaoYunNengAddCrash(returnChaoYunNengAddCrashStr);
             deliveryCarVO.setReturnHandoverCarDTO(returnHandoverCarDTO);
             deliveryCarVO.setIsReturnCar(1);
         }

@@ -77,7 +77,7 @@ public class PicUtils {
     
     static{
     	try {
-    		WATERMARK_IMG_1 = ImageIO.read(PicUtils.class.getResourceAsStream("watermard_small.png"));
+			WATERMARK_IMG_1 = ImageIO.read(PicUtils.class.getResourceAsStream("watermard_small.png"));
     		WATERMARK_IMG_2 = ImageIO.read(PicUtils.class.getResourceAsStream("watermark_mid.png"));
 		} catch (IOException e) {
 			logger.error("",e);

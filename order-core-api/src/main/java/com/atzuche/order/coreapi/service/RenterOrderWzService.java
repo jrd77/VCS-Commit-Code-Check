@@ -205,31 +205,37 @@ public class RenterOrderWzService {
         List<IllegalOrderInfoResVO> results = new ArrayList<>();
         IllegalOrderInfoResVO result;
         for (RenterOrderWzStatusEntity wzStatusEntity : wzStatusEntities) {
-            String orderNo = wzStatusEntity.getOrderNo();
-            String carNo = wzStatusEntity.getCarNo();
-            String ownerNo = wzStatusEntity.getOwnerNo();
-            String renterNo = wzStatusEntity.getRenterNo();
-            //查询 车主信息
-            OwnerMemberEntity owner = ownerMemberService.queryOwnerInfoByOrderNoAndOwnerNo(orderNo,ownerNo);
-            //查询 租客信息
-            RenterMemberEntity renter = renterMemberService.queryRenterInfoByOrderNoAndRenterNo(orderNo,renterNo);
-            //查询 车辆信息
-            RenterGoodsEntity car = renterGoodsService.queryCarInfoByOrderNoAndCarNo(orderNo,carNo);
-            //查询 订单信息
-            OrderEntity order = orderService.getOrderEntity(orderNo);
-            //查询 费用
-            List<RenterOrderWzCostDetailEntity> wzCosts = renterOrderWzCostDetailService.queryInfosByOrderNo(orderNo);
-            RenterOrderEntity renterOrder = renterOrderService.getRenterOrderByOrderNoAndIsEffective(orderNo);
-            result = convertTo(wzStatusEntity,owner,renter,car,order,wzCosts,renterOrder);
-            //订单状态
-            Integer status = orderStatusService.getStatusByOrderNo(orderNo);
-            result.setStatus(OrderStatusEnums.getOldStatus(status));
-            Date wzAmtReturnTime = cashierRefundApplyService.queryRefundTimeByOrderNo(orderNo, DataPayKindConstant.DEPOSIT);
-            result.setWzAmtReturnTime(wzAmtReturnTime);
-            result.setOrderNo(orderNo);
+            result = getIllegalOrderInfoResVO(wzStatusEntity);
             results.add(result);
         }
         return results;
+    }
+
+    private IllegalOrderInfoResVO getIllegalOrderInfoResVO(RenterOrderWzStatusEntity wzStatusEntity) {
+        IllegalOrderInfoResVO result;
+        String orderNo = wzStatusEntity.getOrderNo();
+        String carNo = wzStatusEntity.getCarNo();
+        String ownerNo = wzStatusEntity.getOwnerNo();
+        String renterNo = wzStatusEntity.getRenterNo();
+        //查询 车主信息
+        OwnerMemberEntity owner = ownerMemberService.queryOwnerInfoByOrderNoAndOwnerNo(orderNo,ownerNo);
+        //查询 租客信息
+        RenterMemberEntity renter = renterMemberService.queryRenterInfoByOrderNoAndRenterNo(orderNo,renterNo);
+        //查询 车辆信息
+        RenterGoodsEntity car = renterGoodsService.queryCarInfoByOrderNoAndCarNo(orderNo,carNo);
+        //查询 订单信息
+        OrderEntity order = orderService.getOrderEntity(orderNo);
+        //查询 费用
+        List<RenterOrderWzCostDetailEntity> wzCosts = renterOrderWzCostDetailService.queryInfosByOrderNo(orderNo);
+        RenterOrderEntity renterOrder = renterOrderService.getRenterOrderByOrderNoAndIsEffective(orderNo);
+        result = convertTo(wzStatusEntity,owner,renter,car,order,wzCosts,renterOrder);
+        //订单状态
+        Integer status = orderStatusService.getStatusByOrderNo(orderNo);
+        result.setStatus(OrderStatusEnums.getOldStatus(status));
+        Date wzAmtReturnTime = cashierRefundApplyService.queryRefundTimeByOrderNo(orderNo, DataPayKindConstant.DEPOSIT);
+        result.setWzAmtReturnTime(wzAmtReturnTime);
+        result.setOrderNo(orderNo);
+        return result;
     }
 
     private static final String WZ_FINE = "100040";
@@ -331,5 +337,10 @@ public class RenterOrderWzService {
             return Integer.parseInt(subStr);
         }
         return Integer.parseInt(intStr);
+    }
+
+    public IllegalOrderInfoResVO getOrderInfoByOrderNo(String orderNo) {
+        RenterOrderWzStatusEntity wzStatusEntity = renterOrderWzStatusService.getOrderInfoByOrderNo(orderNo);
+        return getIllegalOrderInfoResVO(wzStatusEntity);
     }
 }
