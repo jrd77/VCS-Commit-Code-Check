@@ -343,4 +343,76 @@ public class RenterOrderWzService {
         RenterOrderWzStatusEntity wzStatusEntity = renterOrderWzStatusService.getOrderInfoByOrderNo(orderNo);
         return getIllegalOrderInfoResVO(wzStatusEntity);
     }
+
+    /**
+     *  500 系统内部异常 200 成功 -1  阿里云上传失败  -2 上传数量大于35张 -3订单不存在 -4您只能上传自己的违章照片 -5上传交接车,picKey为空!
+     * @param photoUpload 照片实体
+     * @return 状态码
+     * @throws Exception 异常
+     */
+    public Integer uploadV47(PhotoUploadVO photoUpload) {
+        String orderNo = photoUpload.getOrderNo();
+        // 上传图片key，前端传过来的图片相对路径
+        String picKey = photoUpload.getPicKey();
+        String carNum = renterGoodsService.queryCarNumByOrderNo(orderNo);
+        if(org.apache.commons.lang.StringUtils.isBlank(picKey)){
+            logger.error("上传交接车,picKey为空!");
+            return -5;
+        }
+        String serialNumber = photoUpload.getSerialNumber();
+        String userType = photoUpload.getUserType();
+        logger.info("上传违章照片。。orderNo : {},serialNumber:{},userType:{},picKey={}",orderNo,serialNumber,userType,picKey);
+        Integer result  = validateOrderInfo(photoUpload.getMemNo(),orderNo,Integer.parseInt(userType));
+        if (!SUCCESS_STATUS.equals(result)) {
+            return result;
+        }
+        RenterOrderWzIllegalPhotoEntity photo = new RenterOrderWzIllegalPhotoEntity();
+        Date date = new Date();
+        photo.setOrderNo(orderNo);
+        photo.setPath(picKey);
+        photo.setUserType(Integer.valueOf(photoUpload.getUserType()));
+        photo.setCarPlateNum(carNum);
+        photo.setCreateTime(date);
+        photo.setUpdateTime(date);;
+        photo.setUpdateOp(String.valueOf(photoUpload.getMemNo()));
+        photo.setCreateOp(String.valueOf(photoUpload.getMemNo()));
+
+        int i = 0;
+        //如果没有传入serialNumber则是新增图片，如果传入了替换图片
+        if (StringUtils.isNotEmpty(serialNumber) ) {
+            logger.info("替换图片：{},orderNo:{},userType:{}",serialNumber,orderNo,userType);
+            RenterOrderWzIllegalPhotoEntity illegalPhoto  =  renterOrderWzIllegalPhotoService.getIllegalPhotoBy(orderNo,Integer.parseInt(userType),Integer.parseInt(serialNumber),carNum);
+            if (illegalPhoto!=null) {
+                //保证图片存储于数据库一致
+                ossService.deleteOSSObject(illegalPhoto.getPath());
+                photo.setSerialNumber(Integer.parseInt(serialNumber));
+                i = renterOrderWzIllegalPhotoService.update(photo);
+            }else{
+                if (Integer.parseInt(photoUpload.getUserType()) != 3) {
+                    if (renterOrderWzIllegalPhotoService.countIllegalPhoto(orderNo,Integer.parseInt(photoUpload.getUserType()),carNum) >= IMAGE_UPLOAD_LIMIT) {
+                        return -2;
+                    }
+                }
+                photo.setSerialNumber(Integer.parseInt(serialNumber));
+                i = renterOrderWzIllegalPhotoService.insert(photo);
+            }
+
+        }else{
+            if (Integer.parseInt(photoUpload.getUserType()) != 3) {
+                if (renterOrderWzIllegalPhotoService.countIllegalPhoto(orderNo,Integer.parseInt(photoUpload.getUserType()),carNum) >= IMAGE_UPLOAD_LIMIT) {
+                    return -2;
+                }
+            }
+            Integer num = renterOrderWzIllegalPhotoService.getMaxSerialNum(orderNo,Integer.parseInt(userType),carNum);
+            photo.setSerialNumber((num!=null?num:0)+1);
+            i = renterOrderWzIllegalPhotoService.insert(photo);
+        }
+        if (i>0) {
+            result = SUCCESS_STATUS;
+            logger.info("记录文件到数据成功。。orderNo : {},serialNumber:{},userType:{}",orderNo,serialNumber,userType);
+            //保存成功，发送上传图片给仁云
+            transIllegalSendAliYunMq.transIllegalPhotoToRenYun(photo);
+        }
+        return result;
+    }
 }
