@@ -7,7 +7,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.beanutils.BeanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +26,8 @@ import com.atzuche.order.commons.vo.res.cost.RenterOrderFineDeatailResVO;
 import com.atzuche.order.commons.vo.res.cost.RenterOrderSubsidyDetailResVO;
 import com.atzuche.order.commons.vo.res.order.RenterOrderResVO;
 import com.atzuche.order.open.service.FeignOrderModifyService;
+import com.atzuche.order.parentorder.entity.OrderEntity;
+import com.atzuche.order.parentorder.service.OrderService;
 import com.autoyol.commons.utils.StringUtils;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.platformcost.CommonUtils;
@@ -41,13 +42,24 @@ public class ModificationOrderService {
 	
 	@Autowired
 	FeignOrderModifyService feignOrderModifyService;
+	@Autowired
+	OrderService orderService;
 	
 	public ModificationOrderListResponseVO queryModifyList(ModificationOrderRequestVO modificationOrderRequestVO) throws Exception{
 		ModificationOrderListResponseVO respVo = new ModificationOrderListResponseVO();
 		List<ModificationOrderResponseVO> modificationOrderList =  new ArrayList<ModificationOrderResponseVO>();
-		
+		//主订单
+        OrderEntity orderEntity = orderService.getOrderEntity(modificationOrderRequestVO.getOrderNo());
+        if(orderEntity == null){
+        	logger.error("获取订单数据为空orderNo={}",modificationOrderRequestVO.getOrderNo());
+            throw new Exception("获取订单数据为空");
+        }
+        
 		ModifyOrderMainQueryReqVO req = new ModifyOrderMainQueryReqVO();
-		BeanUtils.copyProperties(req, modificationOrderRequestVO);
+//		BeanUtils.copyProperties(req, modificationOrderRequestVO);
+		req.setOrderNo(modificationOrderRequestVO.getOrderNo());
+		req.setMemNo(orderEntity.getMemNoRenter());
+        
 		ResponseData<ModifyOrderMainResVO> resData = feignOrderModifyService.getModifyOrderMain(req);
 		if(resData != null) {
 			ModifyOrderMainResVO data = resData.getData();
