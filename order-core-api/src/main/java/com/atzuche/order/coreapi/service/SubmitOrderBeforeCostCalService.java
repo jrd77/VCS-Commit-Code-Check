@@ -10,12 +10,13 @@ import com.atzuche.order.commons.entity.dto.RenterMemberDTO;
 import com.atzuche.order.commons.vo.req.NormalOrderCostCalculateReqVO;
 import com.atzuche.order.commons.vo.req.OrderReqVO;
 import com.atzuche.order.commons.vo.res.NormalOrderCostCalculateResVO;
-import com.atzuche.order.commons.vo.res.order.CostItemVO;
+import com.atzuche.order.commons.vo.res.order.*;
 import com.atzuche.order.coreapi.common.conver.OrderCommonConver;
 import com.atzuche.order.coreapi.entity.vo.req.CarRentTimeRangeReqVO;
 import com.atzuche.order.coreapi.entity.vo.res.CarRentTimeRangeResVO;
 import com.atzuche.order.mem.MemProxyService;
 import com.atzuche.order.rentercommodity.service.RenterCommodityService;
+import com.atzuche.order.renterorder.entity.dto.DeductContextDTO;
 import com.atzuche.order.renterorder.entity.dto.RenterOrderCostReqDTO;
 import com.atzuche.order.renterorder.entity.dto.RenterOrderCostRespDTO;
 import com.atzuche.order.renterorder.service.RenterOrderCalCostService;
@@ -24,6 +25,9 @@ import com.atzuche.order.renterorder.service.RenterOrderService;
 import com.atzuche.order.renterorder.vo.RenterOrderCarDepositResVO;
 import com.atzuche.order.renterorder.vo.RenterOrderIllegalResVO;
 import com.atzuche.order.renterorder.vo.RenterOrderReqVO;
+import com.atzuche.order.renterorder.vo.owner.OwnerCouponReqVO;
+import com.atzuche.order.renterorder.vo.platform.MemAvailCouponRequestVO;
+import com.atzuche.order.wallet.WalletProxyService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,6 +63,8 @@ public class SubmitOrderBeforeCostCalService {
     private RenterOrderService renterOrderService;
     @Autowired
     private RenterOrderCostHandleService renterOrderCostHandleService;
+    @Autowired
+    private WalletProxyService walletProxyService;
 
 
 
@@ -99,16 +105,38 @@ public class SubmitOrderBeforeCostCalService {
         RenterOrderCostRespDTO renterOrderCostRespDTO =
                 renterOrderCalCostService.getOrderCostAndDeailList(renterOrderCostReqDTO);
         //TODO:抵扣费用处理
+        //抵扣公共信息抽取
+        DeductContextDTO deductContext = orderCommonConver.initDeductContext(renterOrderCostRespDTO);
+        //车主券抵扣
+        CarOwnerCouponReductionVO carOwnerCouponReductionVO =
+                renterOrderCalCostService.getCarOwnerCouponReductionVo(deductContext,
+                new OwnerCouponReqVO(Integer.valueOf(orderReqVO.getMemNo()),Integer.valueOf(orderReqVO.getCarNo()),
+                        orderReqVO.getCarOwnerCouponNo()));
+        //TODO:限时红包
 
 
+        //优惠券抵扣
+        MemAvailCouponRequestVO memAvailCouponRequestVO =
+                renterOrderService.buildMemAvailCouponRequestVO(renterOrderCostRespDTO, renterOrderReqVO);
+        CouponReductionVO couponReductionVO = renterOrderCalCostService.getCouponReductionVO(deductContext,
+                memAvailCouponRequestVO,
+                renterOrderReqVO.getDisCouponIds(),renterOrderReqVO.getGetCarFreeCouponId());
+        //TODO:凹凸币
+        AutoCoinReductionVO autoCoinReductionVO = renterOrderCalCostService.getAutoCoinReductionVO(deductContext,
+                orderReqVO.getMemNo(),
+                orderReqVO.getUseAutoCoin());
 
+        //钱包抵扣信息
+        int wallet = walletProxyService.getWalletByMemNo(renterOrderReqVO.getMemNo());
 
-        //T车辆押金处理
+        //车辆押金处理
         RenterOrderCarDepositResVO renterOrderCarDepositResVO =
                 renterOrderCostHandleService.handleCarDepositAmtNotSave(renterOrderReqVO);
         //违章押金处理
         RenterOrderIllegalResVO renterOrderIllegalResVO =
                 renterOrderCostHandleService.handleIllegalDepositAmt(renterOrderCostReqDTO.getCostBaseDTO(),renterOrderReqVO);
+
+
         //返回信息处理
         NormalOrderCostCalculateResVO res = new NormalOrderCostCalculateResVO();
         res.setCostItemList(orderCommonConver.buildCostItemList(renterOrderCostRespDTO));
@@ -116,6 +144,12 @@ public class SubmitOrderBeforeCostCalService {
         res.setDeposit(orderCommonConver.buildDepositAmtVO(renterOrderCarDepositResVO));
         res.setIllegalDeposit(orderCommonConver.buildIllegalDepositVO(renterOrderIllegalResVO));
 
+        ReductionVO reduction = new ReductionVO();
+        reduction.setCarOwnerCouponReduction(carOwnerCouponReductionVO);
+        reduction.setCouponReduction(couponReductionVO);
+        reduction.setAutoCoinReduction(autoCoinReductionVO);
+        reduction.setWalletReduction(new WalletReductionVO(wallet));
+        res.setReduction(reduction);
         return res;
 
     }

@@ -287,6 +287,16 @@ public class CashierPayService{
         int rentAmtPayed = accountRenterCostSettleService.getCostPaidRent(orderNo,memNo);
         return rentAmt + rentAmtPayed;
     }
+    public int getRealRentCost(String orderNo,String memNo){
+        RenterOrderEntity renterOrderEntity = cashierNoTService.getRenterOrderNoByOrderNo(orderNo);
+
+        //查询应付租车费用列表
+        List<PayableVO> payableVOs = renterOrderCostCombineService.listPayableVO(orderNo,renterOrderEntity.getRenterOrderNo(),memNo);
+        //应付租车费用
+        int rentAmt = cashierNoTService.sumRentOrderCost(payableVOs);
+
+        return rentAmt;
+    }
 
     /**
      * 查询包装 待支付签名对象

@@ -22,7 +22,7 @@ public class DisCouponMemInfoVO implements Serializable {
     private String id;
     @AutoDocProperty(value = "优惠券名称")
     private String disName;
-    @AutoDocProperty(value = "券类型")
+    @AutoDocProperty(value = "券类型:0,平台券")
     private String couponType;
     @AutoDocProperty(value = "优惠券有效期开始时间", hidden = true)
     private String startDate;
