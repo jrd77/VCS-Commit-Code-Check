@@ -230,7 +230,11 @@ public class SubmitOrderService {
                 reqContext);
         //违章状态
         String operator = orderReqVO.getOperator()==null||orderReqVO.getOperator().trim().length()<=0?renterMemberDTO.getRealName():orderReqVO.getOperator();
-        renterOrderWzStatusService.createInfo(orderNo,ownerGoodsDetailDTO.getCarPlateNum(),operator);
+        //租客会员号
+        String renterNo = orderReqVO.getMemNo();
+        //车主会员号
+        String ownerNo = ownerGoodsDetailDTO.getMemNo();
+        renterOrderWzStatusService.createInfo(orderNo,ownerGoodsDetailDTO.getCarPlateNum(),operator,renterNo, ownerNo);
         //6.主订单相关信息处理
         ParentOrderDTO parentOrderDTO = new ParentOrderDTO();
         //6.1主订单信息处理
