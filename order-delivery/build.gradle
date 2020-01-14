@@ -33,5 +33,13 @@ dependencies {
     compile 'com.aliyun.oss:aliyun-sdk-oss:2.8.3'
     compile('com.autoyol.car:auto-car-service-api:2020010707-SNAPSHOT')
     compile project(":order-transport")
+    compile group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.10.0'
+    compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.10.0'
+    compile group: 'com.fasterxml.jackson.module', name: 'jackson-module-parameter-names', version: '2.10.0'
+    compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jdk8', version: '2.10.0'
+    compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.10.0'
+
+
+
 
 }
