@@ -77,39 +77,42 @@ public class DeliveryCarInfoPriceService {
      * @return
      */
     public DeliveryOilCostVO getOilCostByRenterOrderNo(String orderNo, Integer carEngineType) {
-        List<OwnerHandoverCarInfoEntity> ownerHandoverCarInfoEntities = ownerHandoverCarService.selectOwnerByOrderNo(orderNo);
-        List<RenterHandoverCarInfoEntity> renterHandoverCarInfoEntities = renterHandoverCarService.selectRenterByOrderNo(orderNo);
-        List<RenterOrderDeliveryEntity> renterOrderDeliveryEntityList = renterOrderDeliveryService.findRenterOrderListByOrderNo(orderNo);
-        if (CollectionUtils.isEmpty(renterOrderDeliveryEntityList)) {
-            throw new DeliveryOrderException(DeliveryErrorCode.DELIVERY_PARAMS_ERROR.getValue(), "没有找到该笔配送订单");
+        try {
+            List<OwnerHandoverCarInfoEntity> ownerHandoverCarInfoEntities = ownerHandoverCarService.selectOwnerByOrderNo(orderNo);
+            List<RenterHandoverCarInfoEntity> renterHandoverCarInfoEntities = renterHandoverCarService.selectRenterByOrderNo(orderNo);
+            List<RenterOrderDeliveryEntity> renterOrderDeliveryEntityList = renterOrderDeliveryService.findRenterOrderListByOrderNo(orderNo);
+            if (CollectionUtils.isEmpty(renterOrderDeliveryEntityList)) {
+                throw new DeliveryOrderException(DeliveryErrorCode.DELIVERY_PARAMS_ERROR.getValue(), "没有找到该笔配送订单");
+            }
+            //取车时的所在城市
+            RenterOrderDeliveryEntity renterOrderDelivery = renterOrderDeliveryEntityList.stream().filter(r -> r.getType() == 1).findFirst().get();
+            String cityCode = renterOrderDelivery.getCityCode();
+            if (StringUtils.isBlank(cityCode)) {
+                throw new DeliveryOrderException(DeliveryErrorCode.DELIVERY_PARAMS_ERROR.getValue(), "没有找到cityCode");
+            }
+            OwnerGetAndReturnCarDTO ownerGetAndReturnCarDTO = OwnerGetAndReturnCarDTO.builder().build();
+            RenterGetAndReturnCarDTO renterGetAndReturnCarDTO = RenterGetAndReturnCarDTO.builder().build();
+            //车主取送信息
+            ownerGetAndReturnCarDTO = createOwnerGetAndReturnCarDTO(ownerGetAndReturnCarDTO, ownerHandoverCarInfoEntities, carEngineType, cityCode);
+            OwnerGetAndReturnCarDTO ownerGetAndReturnCarDO = OwnerGetAndReturnCarDTO.builder().build();
+            BeanUtils.copyProperties(ownerGetAndReturnCarDTO, ownerGetAndReturnCarDO);
+            //租客取送信息
+            List<OwnerHandoverCarInfoEntity> ownerHandoverCarInfoList = Lists.newArrayList();
+            for (RenterHandoverCarInfoEntity renterGetAndReturnCar : renterHandoverCarInfoEntities) {
+                OwnerHandoverCarInfoEntity ownerGetAndReturnCar = new OwnerHandoverCarInfoEntity();
+                BeanUtils.copyProperties(renterGetAndReturnCar, ownerGetAndReturnCar);
+                ownerHandoverCarInfoList.add(ownerGetAndReturnCar);
+            }
+            ownerGetAndReturnCarDO = createOwnerGetAndReturnCarDTO(ownerGetAndReturnCarDO, ownerHandoverCarInfoList, carEngineType, cityCode);
+            BeanUtils.copyProperties(ownerGetAndReturnCarDO, renterGetAndReturnCarDTO);
+            return DeliveryOilCostVO.builder().ownerGetAndReturnCarDTO(ownerGetAndReturnCarDTO).renterGetAndReturnCarDTO(renterGetAndReturnCarDTO).build();
+        } catch (DeliveryOrderException e) {
+            log.info("获取油费等数据发生业务异常：{}", e.getErrorMsg());
+        } catch (Exception ex) {
+            log.info("获取油费等数据发生异常：{}", ex.getMessage());
         }
-        //取车时的所在城市
-        RenterOrderDeliveryEntity renterOrderDelivery = renterOrderDeliveryEntityList.stream().filter(r->r.getType() == 1).findFirst().get();
-        String cityCode = renterOrderDelivery.getCityCode();
-        if(StringUtils.isBlank(cityCode))
-        {
-            throw new DeliveryOrderException(DeliveryErrorCode.DELIVERY_PARAMS_ERROR.getValue(),"没有找到cityCode");
-        }
-        OwnerGetAndReturnCarDTO ownerGetAndReturnCarDTO = OwnerGetAndReturnCarDTO.builder().build();
-        RenterGetAndReturnCarDTO renterGetAndReturnCarDTO = RenterGetAndReturnCarDTO.builder().build();
-        //车主取送信息
-        ownerGetAndReturnCarDTO = createOwnerGetAndReturnCarDTO(ownerGetAndReturnCarDTO, ownerHandoverCarInfoEntities,carEngineType,cityCode);
-        OwnerGetAndReturnCarDTO ownerGetAndReturnCarDO = OwnerGetAndReturnCarDTO.builder().build();
-        BeanUtils.copyProperties(ownerGetAndReturnCarDTO,ownerGetAndReturnCarDO);
-        //租客取送信息
-        List<OwnerHandoverCarInfoEntity> ownerHandoverCarInfoList = Lists.newArrayList();
-        for(RenterHandoverCarInfoEntity renterGetAndReturnCar : renterHandoverCarInfoEntities )
-        {
-            OwnerHandoverCarInfoEntity ownerGetAndReturnCar = new OwnerHandoverCarInfoEntity();
-            BeanUtils.copyProperties(renterGetAndReturnCar,ownerGetAndReturnCar);
-            ownerHandoverCarInfoList.add(ownerGetAndReturnCar);
-        }
-        ownerGetAndReturnCarDO = createOwnerGetAndReturnCarDTO(ownerGetAndReturnCarDO, ownerHandoverCarInfoList,carEngineType,cityCode);
-        BeanUtils.copyProperties(ownerGetAndReturnCarDO,renterGetAndReturnCarDTO);
-        return DeliveryOilCostVO.builder().ownerGetAndReturnCarDTO(ownerGetAndReturnCarDTO).renterGetAndReturnCarDTO(renterGetAndReturnCarDTO).build();
+        return DeliveryOilCostVO.builder().build();
     }
-
-
 
     /**
      * 获取取/还车实际距离
