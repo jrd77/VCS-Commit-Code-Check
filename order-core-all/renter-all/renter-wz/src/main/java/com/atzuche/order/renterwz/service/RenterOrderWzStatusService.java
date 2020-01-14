@@ -53,7 +53,7 @@ public class RenterOrderWzStatusService {
         return renterOrderWzStatusMapper.queryInfosByOrderNo(orderNo);
     }
 
-    public void createInfo(String orderNo,String carNum,String operator,String renterNo,String ownerNo){
+    public void createInfo(String orderNo,String carNum,String operator,String renterNo,String ownerNo,String carNo){
         renterOrderWzStatusMapper.deleteInfoByOrderNo(orderNo,operator);
         RenterOrderWzStatusEntity dto = new RenterOrderWzStatusEntity();
         dto.setOrderNo(orderNo);
@@ -63,6 +63,7 @@ public class RenterOrderWzStatusService {
         dto.setCreateTime(new Date());
         dto.setRenterNo(renterNo);
         dto.setOwnerNo(ownerNo);
+        dto.setCarNo(carNo);
         dto.setStatusDesc(WzStatusEnums.getStatusDesc(dto.getStatus()));
         renterOrderWzStatusMapper.saveRenterOrderWzStatus(dto);
     }
