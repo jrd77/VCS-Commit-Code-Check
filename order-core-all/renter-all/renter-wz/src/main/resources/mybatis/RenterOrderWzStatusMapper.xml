@@ -25,6 +25,8 @@
 		insert into renter_order_wz_status(
 			order_no,
 			car_plate_num,
+			renter_no,
+			owner_no,
 			status,
 			status_desc,
 			create_op,
@@ -33,6 +35,8 @@
 		) values (
 			#{orderNo},
 			#{carPlateNum},
+			#{renterNo},
+			#{ownerNo},
 			#{status},
 			#{statusDesc},
 			#{createOp},
