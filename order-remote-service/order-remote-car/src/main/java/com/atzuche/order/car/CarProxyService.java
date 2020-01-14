@@ -156,6 +156,7 @@ public class CarProxyService {
         renterGoodsDetailDto.setCarOilVolume(carBaseVO.getOilVolume());
         renterGoodsDetailDto.setCarEngineType(carBaseVO.getEngineType());
         renterGoodsDetailDto.setCarDesc(carBaseVO.getCarDesc());
+        renterGoodsDetailDto.setWeekendPrice(null == carBaseVO.getWeekendPrice() ? 0 : carBaseVO.getWeekendPrice());
         renterGoodsDetailDto.setCarStewardPhone(carSteward==null||carSteward.getStewardPhone()==null ? "" : String.valueOf(carSteward.getStewardPhone()));
         renterGoodsDetailDto.setCarCheckStatus(carDetect == null ? null : carDetect.getDetectStatus());
         renterGoodsDetailDto.setCarShowAddr(carAddressOfTransVO==null ? "" : carAddressOfTransVO.getCarVirtualAddress());

@@ -236,4 +236,9 @@ public class RenterGoodsDetailDTO {
      */
     private LocalDateTime licenseExpire;
 
+    /**
+     * 周末价格
+     */
+    private Integer weekendPrice;
+
 }
