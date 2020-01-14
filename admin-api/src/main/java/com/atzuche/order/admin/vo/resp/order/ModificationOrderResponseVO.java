@@ -16,7 +16,7 @@ public class ModificationOrderResponseVO implements Serializable{
 	@AutoDocProperty(value="下单/申请修改时间")
 	private String modificationTime;
 
-	@AutoDocProperty(value="修改来源")
+	@AutoDocProperty(value="修改来源:后台管理，租客，车主")
 	private String source;
 
 	@AutoDocProperty(value="修改人")
@@ -30,7 +30,10 @@ public class ModificationOrderResponseVO implements Serializable{
 
 	@AutoDocProperty(value="结束时间")
 	private String revertTime;
-
+	
+	@AutoDocProperty(value="总租期")
+	private String totalRentDay;
+	
 	@AutoDocProperty(value="租金")
 	private String rentAmount;
 
@@ -55,7 +58,7 @@ public class ModificationOrderResponseVO implements Serializable{
 	@AutoDocProperty(value="还车地址")
 	private String returnAddress;
 
-	@AutoDocProperty(value="配送费")
+	@AutoDocProperty(value="配送费(含超运能)")
 	private String carServiceFee;
 
 	@AutoDocProperty(value="优惠抵扣")
@@ -73,7 +76,7 @@ public class ModificationOrderResponseVO implements Serializable{
 	@AutoDocProperty(value="需补付金额")
 	private String paymentAmount;
 
-	@AutoDocProperty(value="车主操作状态")
+	@AutoDocProperty(value="车主操作状态:未处理，已同意，已拒绝")
 	private String operatorStatus;
 
 }

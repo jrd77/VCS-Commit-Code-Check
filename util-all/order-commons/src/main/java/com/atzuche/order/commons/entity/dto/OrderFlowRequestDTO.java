@@ -13,7 +13,7 @@ import java.io.Serializable;
 public class OrderFlowRequestDTO implements Serializable {
 
 	@AutoDocProperty(value = "订单号")
-	@NotBlank
+	@NotBlank(message = "订单号不能为空")
 	private String orderNo;
 
 }

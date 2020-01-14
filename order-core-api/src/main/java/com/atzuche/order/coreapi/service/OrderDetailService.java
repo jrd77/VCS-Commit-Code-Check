@@ -236,32 +236,41 @@ public class OrderDetailService {
         BeanUtils.copyProperties(orderEntity,orderDTO);
 
         //租客历史订单
-        List<RenterOrderDTO> renterOrderDTOHistoryList = new ArrayList<>();
+        List<RenterDetailDTO> renterDetailDTOS = new ArrayList<>();
         if(orderHistoryReqDTO.getIsNeedOwnerOrderHistory()){
             List<RenterOrderEntity> renterOrderEntities = renterOrderService.queryHostiryRenterOrderByOrderNo(orderNo);
             renterOrderEntities.stream().forEach(x->{
+                RenterDetailDTO renterDetailDTO = new RenterDetailDTO();
                 RenterOrderDTO renterOrderDTO = new RenterOrderDTO();
                 BeanUtils.copyProperties(x,renterOrderDTO);
-                renterOrderDTOHistoryList.add(renterOrderDTO);
-
-
+                RenterGoodsDetailDTO renterGoodsDetail = renterGoodsService.getRenterGoodsDetail(x.getRenterOrderNo(), false);
+                RenterMemberDTO renterMemberDTO = renterMemberService.selectrenterMemberByRenterOrderNo(x.getRenterOrderNo(), false);
+                renterDetailDTO.setRenterOrderDTO(renterOrderDTO);
+                renterDetailDTO.setRenterMemberDTO(renterMemberDTO);
+                renterDetailDTO.setRenterGoodsDetail(renterGoodsDetail);
+                renterDetailDTOS.add(renterDetailDTO);
             });
         }
         //车主历史订单
-        List<OwnerOrderDTO> ownerOrderDTOHistoryLIst = new ArrayList<>();
+        List<OwnerDetailDTO> ownerDetailDTOS = new ArrayList<>();
         if(orderHistoryReqDTO.getIsNeedOwnerOrderHistory()){
             List<OwnerOrderEntity> ownerOrderEntities = ownerOrderService.queryHostiryOwnerOrderByOrderNo(orderNo);
             ownerOrderEntities.stream().forEach(x->{
+                OwnerDetailDTO ownerDetailDTO = new OwnerDetailDTO();
                 OwnerOrderDTO ownerOrderDTO = new OwnerOrderDTO();
                 BeanUtils.copyProperties(x,ownerOrderDTO);
-                ownerOrderDTOHistoryLIst.add(ownerOrderDTO);
-                //获取商品
-                //
+                OwnerMemberDTO ownerMemberDTO = ownerMemberService.selectownerMemberByOwnerOrderNo(x.getOwnerOrderNo(), false);
+                OwnerGoodsDetailDTO ownerGoodsDetail = ownerGoodsService.getOwnerGoodsDetail(x.getOwnerOrderNo(), false);
+                ownerDetailDTO.setOwnerOrderDTO(ownerOrderDTO);
+                ownerDetailDTO.setOwnerMemberDTO(ownerMemberDTO);
+                ownerDetailDTO.setOwnerGoodsDetailDTO(ownerGoodsDetail);
+                ownerDetailDTOS.add(ownerDetailDTO);
             });
         }
         OrderHistoryRespDTO orderHistoryRespDTO = new OrderHistoryRespDTO();
         orderHistoryRespDTO.orderDTO = orderDTO;
-
+        orderHistoryRespDTO.ownerDetailDTOS = ownerDetailDTOS;
+        orderHistoryRespDTO.renterDetailDTOS = renterDetailDTOS;
 
         return orderHistoryRespDTO;
     }

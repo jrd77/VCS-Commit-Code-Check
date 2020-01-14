@@ -194,5 +194,9 @@
 		</set>
 		where id = #{id}
 	</update>
+
+	<select id="selectObjectByOrderNoAndType" resultMap="BaseResultMap">
+		select <include refid="Base_Column_List" /> from order_car_trusteeship where order_no = #{orderNo} and car_no = carNo and is_delete = 0
+	</select>
   	
 </mapper>
