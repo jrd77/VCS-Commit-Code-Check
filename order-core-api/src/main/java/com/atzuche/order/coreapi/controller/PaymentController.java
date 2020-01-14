@@ -18,8 +18,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.alibaba.fastjson.JSON;
 import com.atzuche.order.cashieraccount.entity.CashierEntity;
-import com.atzuche.order.commons.vo.req.PaymentVo;
-import com.atzuche.order.commons.vo.res.CashierResVo;
+import com.atzuche.order.commons.vo.req.PaymentReqVO;
+import com.atzuche.order.commons.vo.res.CashierResVO;
 import com.atzuche.order.coreapi.service.PaymentCashierService;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.doc.annotation.AutoDocMethod;
@@ -37,12 +37,12 @@ public class PaymentController {
 	@Autowired
 	PaymentCashierService paymentCashierService;
 	
-	@AutoDocMethod(description = "查询支付记录", value = "查询支付记录", response = CashierEntity.class)
+	@AutoDocMethod(description = "查询支付记录", value = "查询支付记录", response = CashierResVO.class)
     @PostMapping("/payment/queryByOrderNo")
-    public ResponseData<List<CashierResVo>> queryByOrderNo(@Valid @RequestBody PaymentVo vo, BindingResult bindingResult) throws Exception {
+    public ResponseData<List<CashierResVO>> queryByOrderNo(@Valid @RequestBody PaymentReqVO vo, BindingResult bindingResult) throws Exception {
 		logger.info("queryByOrderNo:[{}]", JSON.toJSONString(vo));
         try {
-        	 List<CashierResVo> lst = paymentCashierService.queryPaymentList(vo.getOrderNo());
+        	 List<CashierResVO> lst = paymentCashierService.queryPaymentList(vo.getOrderNo());
              return ResponseData.success(lst);
 		} catch (Exception e) {
 			logger.error("查询收银台记录异常:",e);

@@ -30,6 +30,7 @@ public interface RenterOrderMapper{
     List<RenterOrderEntity> listAgreeRenterOrderByOrderNo(@Param("orderNo") String orderNo);
 
     RenterOrderEntity getRenterOrderByOrderNoAndIsEffective(@Param("orderNo") String orderNo);
+    List<RenterOrderEntity> queryRenterOrderByOrderNo(@Param("orderNo")String orderNo);
     
     RenterOrderEntity getRenterOrderByRenterOrderNo(@Param("renterOrderNo") String renterOrderNo);
     
@@ -44,4 +45,6 @@ public interface RenterOrderMapper{
     RenterOrderEntity getChangeRenterOrderByOrderNo(@Param("orderNo") String orderNo);
 
     List<RenterOrderEntity> queryHostiryRenterOrderByOrderNo(@Param("orderNo") String orderNo);
+
+	
 }

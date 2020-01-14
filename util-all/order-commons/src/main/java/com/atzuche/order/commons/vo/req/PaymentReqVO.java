@@ -11,7 +11,7 @@ import com.autoyol.doc.annotation.AutoDocProperty;
  * @author jing.huang
  *
  */
-public class PaymentVo {
+public class PaymentReqVO {
     @AutoDocProperty(value = "订单号")
     @NotBlank(message = "订单号不能为空")
     private String orderNo;

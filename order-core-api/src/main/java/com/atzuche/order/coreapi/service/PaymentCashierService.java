@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 
 import com.atzuche.order.cashieraccount.entity.CashierEntity;
 import com.atzuche.order.cashieraccount.service.CashierService;
-import com.atzuche.order.commons.vo.res.CashierResVo;
+import com.atzuche.order.commons.vo.res.CashierResVO;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -32,11 +32,11 @@ public class PaymentCashierService {
 	 * @throws InvocationTargetException 
 	 * @throws IllegalAccessException 
 	 */
-	public List<CashierResVo> queryPaymentList(String orderNo) throws Exception {
-		List<CashierResVo> lstRet = new ArrayList<CashierResVo>();
+	public List<CashierResVO> queryPaymentList(String orderNo) throws Exception {
+		List<CashierResVO> lstRet = new ArrayList<CashierResVO>();
 		List<CashierEntity> lst = cashierService.getCashierRentCostsByOrderNo(orderNo);
 		for (CashierEntity cashierEntity : lst) {
-			CashierResVo vo = new CashierResVo();
+			CashierResVO vo = new CashierResVO();
 			//数据转换
 			BeanUtils.copyProperties(vo, cashierEntity);
 			lstRet.add(vo);
