@@ -4,7 +4,6 @@ import com.atzuche.order.commons.OrderException;
 import com.atzuche.order.commons.enums.ErrorCode;
 import lombok.Data;
 
-@Data
 public class OrderPayRefundCallBackAsnyException extends OrderException {
 
     public OrderPayRefundCallBackAsnyException() {

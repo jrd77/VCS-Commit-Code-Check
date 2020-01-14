@@ -372,6 +372,48 @@ public class RenterOrderCalCostService {
 
 
     /**
+     * 计算车主券抵扣信息(修改订单用)
+     *
+     * @param ownerCouponGetAndValidReqVO 请求参数
+     * @param ooupon
+     * @return OrderCouponDTO 订单优惠券信息
+     */
+    public OrderCouponDTO calOwnerCouponDeductInfo(OwnerCouponGetAndValidReqVO ownerCouponGetAndValidReqVO, OrderCouponEntity ooupon) {
+
+        LOGGER.info("获取车主优惠券抵扣信息. param is,ownerCouponGetAndValidReqDTO:[{}]",
+                JSON.toJSONString(ownerCouponGetAndValidReqVO));
+        if (null == ownerCouponGetAndValidReqVO || StringUtils.isBlank(ownerCouponGetAndValidReqVO.getCouponNo()) || ooupon == null) {
+            return null;
+        }
+
+        OwnerCouponGetAndValidResultVO result =
+                ownerDiscountCouponService.getAndValidCoupon(ownerCouponGetAndValidReqVO.getOrderNo(),
+                        ownerCouponGetAndValidReqVO.getRentAmt(), ownerCouponGetAndValidReqVO.getCouponNo(),
+                        ownerCouponGetAndValidReqVO.getCarNo(), ownerCouponGetAndValidReqVO.getMark());
+        OrderCouponDTO ownerCoupon = new OrderCouponDTO();
+        ownerCoupon.setCouponId(ooupon.getCouponId());
+        ownerCoupon.setCouponName(ooupon.getCouponName());
+        ownerCoupon.setCouponDesc(ooupon.getCouponDesc());
+        ownerCoupon.setAmount(0);
+        ownerCoupon.setCouponType(CouponTypeEnum.ORDER_COUPON_TYPE_OWNER.getCode());
+        ownerCoupon.setStatus(OrderConstant.NO);
+        if (null != result) {
+            if (StringUtils.equals(ErrorCode.SUCCESS.getCode(), result.getResCode()) && null != result.getData()) {
+                OwnerDiscountCouponVO coupon = result.getData().getCouponDTO();
+                ownerCoupon.setCouponId(coupon.getCouponNo());
+                ownerCoupon.setCouponName(coupon.getCouponName()==null?"车主券":coupon.getCouponName());
+                ownerCoupon.setCouponDesc(coupon.getCouponText());
+                ownerCoupon.setAmount(null == coupon.getDiscount() ? 0 : coupon.getDiscount());
+                ownerCoupon.setCouponType(CouponTypeEnum.ORDER_COUPON_TYPE_OWNER.getCode());
+                //绑定后变更为已使用
+                ownerCoupon.setStatus(ownerCoupon.getAmount() > 0 ? OrderConstant.YES : OrderConstant.NO);
+            }
+        }
+        return ownerCoupon;
+    }
+    
+    
+    /**
      * 计算取送服务券抵扣信息
      *
      * @param request 请求参数
@@ -387,18 +429,19 @@ public class RenterOrderCalCostService {
             return null;
         }
         CouponSettleResponse response = platformCouponService.checkGetCarFreeCouponAvailable(request);
+        OrderCouponDTO getCarFeeDiscoupon = new OrderCouponDTO();
+        getCarFeeDiscoupon.setCouponId(coupon.getCouponId());
+        getCarFeeDiscoupon.setCouponName(coupon.getCouponName());
+        getCarFeeDiscoupon.setCouponDesc(coupon.getCouponDesc());
+        getCarFeeDiscoupon.setCouponType(CouponTypeEnum.ORDER_COUPON_TYPE_GET_RETURN_SRV.getCode());
+        getCarFeeDiscoupon.setAmount(0);
+        getCarFeeDiscoupon.setStatus(OrderConstant.NO);
         if (null != response) {
-            OrderCouponDTO getCarFeeDiscoupon = new OrderCouponDTO();
-            getCarFeeDiscoupon.setCouponId(coupon.getCouponId());
-            getCarFeeDiscoupon.setCouponName(coupon.getCouponName());
-            getCarFeeDiscoupon.setCouponDesc(coupon.getCouponDesc());
             getCarFeeDiscoupon.setAmount(response.getDisAmt());
-            getCarFeeDiscoupon.setCouponType(CouponTypeEnum.ORDER_COUPON_TYPE_GET_RETURN_SRV.getCode());
             //绑定后变更为已使用
             getCarFeeDiscoupon.setStatus(getCarFeeDiscoupon.getAmount() > 0 ? OrderConstant.YES : OrderConstant.NO);
-            return getCarFeeDiscoupon;
         }
-        return null;
+        return getCarFeeDiscoupon;
     }
 
 
@@ -417,18 +460,19 @@ public class RenterOrderCalCostService {
             return null;
         }
         CouponSettleResponse response = platformCouponService.checkCouponAvailable(request);
+        OrderCouponDTO getCarFeeDiscoupon = new OrderCouponDTO();
+        getCarFeeDiscoupon.setCouponId(coupon.getCouponId());
+        getCarFeeDiscoupon.setCouponName(coupon.getCouponName());
+        getCarFeeDiscoupon.setCouponDesc(coupon.getCouponDesc());
+        getCarFeeDiscoupon.setCouponType(CouponTypeEnum.ORDER_COUPON_TYPE_PLATFORM.getCode());
+        getCarFeeDiscoupon.setAmount(0);
+        getCarFeeDiscoupon.setStatus(OrderConstant.NO);
         if (null != response) {
-            OrderCouponDTO getCarFeeDiscoupon = new OrderCouponDTO();
-            getCarFeeDiscoupon.setCouponId(coupon.getCouponId());
-            getCarFeeDiscoupon.setCouponName(coupon.getCouponName());
-            getCarFeeDiscoupon.setCouponDesc(coupon.getCouponDesc());
             getCarFeeDiscoupon.setAmount(response.getDisAmt());
-            getCarFeeDiscoupon.setCouponType(CouponTypeEnum.ORDER_COUPON_TYPE_PLATFORM.getCode());
             //绑定后变更为已使用
             getCarFeeDiscoupon.setStatus(getCarFeeDiscoupon.getAmount() > 0 ? OrderConstant.YES : OrderConstant.NO);
-            return getCarFeeDiscoupon;
         }
-        return null;
+        return getCarFeeDiscoupon;
     }
 
 

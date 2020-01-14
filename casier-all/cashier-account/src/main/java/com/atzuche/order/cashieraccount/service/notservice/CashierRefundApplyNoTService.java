@@ -1,10 +1,12 @@
 package com.atzuche.order.cashieraccount.service.notservice;
 
+import com.atzuche.order.cashieraccount.common.FasterJsonUtil;
 import com.atzuche.order.cashieraccount.entity.CashierRefundApplyEntity;
 import com.atzuche.order.cashieraccount.exception.CashierRefundApplyException;
 import com.atzuche.order.cashieraccount.exception.OrderPayRefundCallBackAsnyException;
 import com.atzuche.order.cashieraccount.vo.req.CashierRefundApplyReqVO;
 import com.atzuche.order.commons.enums.cashier.CashierRefundApplyStatus;
+import com.autoyol.autopay.gateway.util.MD5;
 import com.autoyol.autopay.gateway.vo.req.NotifyDataVo;
 import com.autoyol.autopay.gateway.vo.res.AutoPayResultVo;
 import org.springframework.beans.BeanUtils;
@@ -39,6 +41,15 @@ public class CashierRefundApplyNoTService {
         cashierRefundApplyEntity.setStatus(CashierRefundApplyStatus.WAITING_FOR_REFUND.getCode());
         cashierRefundApplyEntity.setSourceCode(cashierRefundApplyReq.getRenterCashCodeEnum().getCashNo());
         cashierRefundApplyEntity.setSourceDetail(cashierRefundApplyReq.getRenterCashCodeEnum().getTxt());
+        String payMd5 = MD5.MD5Encode(FasterJsonUtil.toJson(cashierRefundApplyEntity));
+
+        cashierRefundApplyEntity.setPayMd5(payMd5);
+//        CashierRefundApplyEntity entity = cashierRefundApplyMapper.selectRefundByQn(cashierRefundApplyReq.getMemNo(),cashierRefundApplyReq.getOrderNo(),cashierRefundApplyReq.getQn());
+        CashierRefundApplyEntity entity = cashierRefundApplyMapper.selectRefundByMd5(cashierRefundApplyReq.getMemNo(),cashierRefundApplyReq.getOrderNo(),payMd5);
+
+        if(Objects.nonNull(entity) && Objects.nonNull(entity.getId())){
+            return entity.getId();
+        }
         int result = cashierRefundApplyMapper.insertSelective(cashierRefundApplyEntity);
         if(result==0){
             throw new CashierRefundApplyException();

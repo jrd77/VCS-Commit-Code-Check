@@ -80,7 +80,7 @@ public class AccountRenterDepositNoTService {
             throw new PayOrderRenterDepositDBException();
         }
         //计算剩余可扣金额押金总和
-        int surplusAmt = accountRenterDepositEntity.getSurplusDepositAmt() + accountRenterDepositEntity.getSurplusAuthorizeDepositAmt() + accountRenterDepositEntity.getSurplusCreditPayAmt();
+        int surplusAmt = accountRenterDepositEntity.getSurplusDepositAmt();
         if(-detainRenterDepositReqVO.getAmt() + surplusAmt<0){
             //可用 剩余押金 不足
             throw new PayOrderRenterDepositDBException();
@@ -88,18 +88,9 @@ public class AccountRenterDepositNoTService {
         AccountRenterDepositEntity accountRenterDeposit = new AccountRenterDepositEntity();
         accountRenterDeposit.setId(accountRenterDepositEntity.getId());
         accountRenterDeposit.setVersion(accountRenterDepositEntity.getVersion());
-        //预授权押金剩余金额
-        if(Objects.nonNull(accountRenterDeposit.getSurplusAuthorizeDepositAmt()) || accountRenterDeposit.getSurplusAuthorizeDepositAmt()>0){
-            accountRenterDeposit.setSurplusAuthorizeDepositAmt(accountRenterDeposit.getSurplusAuthorizeDepositAmt() - detainRenterDepositReqVO.getAmt());
-        }
         //押金剩余金额
-        if(Objects.nonNull(accountRenterDeposit.getSurplusDepositAmt()) || accountRenterDeposit.getSurplusDepositAmt()>0){
-            accountRenterDeposit.setSurplusDepositAmt(accountRenterDeposit.getSurplusDepositAmt() - detainRenterDepositReqVO.getAmt());
-        }
-        //信用支付押金剩余金额
-        if(Objects.nonNull(accountRenterDeposit.getSurplusCreditPayAmt()) || accountRenterDeposit.getSurplusCreditPayAmt()>0){
-            accountRenterDeposit.setSurplusCreditPayAmt(accountRenterDeposit.getSurplusCreditPayAmt() - detainRenterDepositReqVO.getAmt());
-        }
+        accountRenterDeposit.setSurplusDepositAmt(accountRenterDepositEntity.getSurplusDepositAmt() - Math.abs(detainRenterDepositReqVO.getAmt()));
+
         int result =  accountRenterDepositMapper.updateByPrimaryKeySelective(accountRenterDeposit);
         if(result==0){
             throw new PayOrderRenterDepositDBException();

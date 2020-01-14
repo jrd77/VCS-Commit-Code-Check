@@ -46,6 +46,19 @@ public class AccountRenterCostSettleNoTService {
         return accountRenterCostSettle.getShifuAmt();
     }
 
+    /**
+     * 查询订单 已付租车费用除去（已退款部分）
+     */
+    public int getCostPaidRentRefundAmt(String orderNo,String memNo) {
+        AccountRenterCostSettleEntity accountRenterCostSettle = accountRenterCostSettleMapper.selectByOrderNo(orderNo,memNo);
+        if(Objects.isNull(accountRenterCostSettle) || Objects.isNull(accountRenterCostSettle.getShifuAmt())){
+            return NumberUtils.INTEGER_ZERO;
+        }
+        Integer refundAmt = accountRenterCostSettle.getRefundAmt();
+        refundAmt = Objects.isNull(refundAmt)?0:refundAmt;
+        return accountRenterCostSettle.getShifuAmt() + refundAmt;
+    }
+
 
     /**
      * 租车费用计算总表落库、更新
@@ -75,7 +88,7 @@ public class AccountRenterCostSettleNoTService {
         entity.setVersion(accountRenterCostSettle.getVersion());
         int refundAmt = Objects.isNull(accountRenterCostSettle.getRefundAmt())?0:accountRenterCostSettle.getRefundAmt();
         entity.setRefundAmt(refundAmt + amt);
-        int result = accountRenterCostSettleMapper.updateByPrimaryKeySelective(accountRenterCostSettle);
+        int result = accountRenterCostSettleMapper.updateByPrimaryKeySelective(entity);
         if(result==0){
             throw new AccountRenterRentCostRefundException();
         }

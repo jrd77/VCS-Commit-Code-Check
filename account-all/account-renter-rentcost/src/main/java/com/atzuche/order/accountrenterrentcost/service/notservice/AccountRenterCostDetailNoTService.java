@@ -75,4 +75,19 @@ public class AccountRenterCostDetailNoTService {
         int amt = result.stream().mapToInt(AccountRenterCostDetailEntity::getAmt).sum();
         return amt;
     }
+    /**
+     * 根据订单号 和会员号 查询 订单 消费支付金额
+     * @param orderNo
+     * @param renterMemNo
+     */
+    public int getRentCostPayByPay(String orderNo, String renterMemNo) {
+        List<AccountRenterCostDetailEntity> result = accountRenterCostDetailMapper.getAccountRenterCostDetailsByOrderNo(orderNo);
+        if(CollectionUtils.isEmpty(result)){
+            return 0;
+        }
+        int amt = result.stream().filter(obj ->{
+            return !PaySourceEnum.WALLET_PAY.getCode().equals(obj.getPaySourceCode());
+        }).mapToInt(AccountRenterCostDetailEntity::getAmt).sum();
+        return amt;
+    }
 }

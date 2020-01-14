@@ -234,6 +234,7 @@
 
     <select id="queryMemNoAndPhoneByOrderList" resultMap="BaseResultMap">
         SELECT
+            order_no,
             mem_no,
             phone
         FROM

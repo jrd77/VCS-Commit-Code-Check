@@ -4,6 +4,7 @@ import com.atzuche.order.delivery.entity.RenterDeliveryAddrEntity;
 import com.atzuche.order.delivery.entity.RenterOrderDeliveryEntity;
 import com.atzuche.order.delivery.mapper.RenterDeliveryAddrMapper;
 import com.atzuche.order.delivery.mapper.RenterOrderDeliveryMapper;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -117,7 +118,16 @@ public class RenterOrderDeliveryService {
      * @param renterOrderNo
      * @return
      */
-    public List<RenterOrderDeliveryEntity> selectByRenterOrderNo(String renterOrderNo){
+    public List<RenterOrderDeliveryEntity> selectByRenterOrderNo(String renterOrderNo) {
         return renterOrderDeliveryMapper.selectByRenterOrderNo(renterOrderNo);
+    }
+
+    /**
+     * 通过订单号查询配送订单
+     * @param orderNo
+     * @return
+     */
+    public List<RenterOrderDeliveryEntity> findRenterOrderListByOrderNo(String orderNo) {
+        return renterOrderDeliveryMapper.findRenterOrderListByorderNo(orderNo);
     }
 }

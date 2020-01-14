@@ -42,4 +42,6 @@ public interface RenterOrderDeliveryMapper {
 
     List<RenterOrderDeliveryEntity> selectByRenterOrderNo(@Param("renterOrderNo")String renterOrderNo);
 
+    List<RenterOrderDeliveryEntity> findRenterOrderListByorderNo(@Param("orderNo") String orderNo);
+
 }
