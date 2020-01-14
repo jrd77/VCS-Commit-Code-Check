@@ -1,6 +1,7 @@
 package com.atzuche.order.coreapi.service;
 
 import com.atzuche.order.commons.CommonUtils;
+import com.atzuche.order.coreapi.entity.vo.res.IllegalOrderInfoResVO;
 import com.atzuche.order.owner.mem.service.OwnerMemberService;
 import com.atzuche.order.rentercommodity.service.RenterGoodsService;
 import com.atzuche.order.rentermem.service.RenterMemberService;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -159,4 +161,7 @@ public class RenterOrderWzService {
         return SUCCESS_STATUS;
     }
 
+    public List<IllegalOrderInfoResVO> getIllegalOrderListByMemNo(String memNo) {
+        return null;
+    }
 }
