@@ -120,6 +120,10 @@ public class OrderDeliveryDTO {
      */
     private Integer aheadOrDelayTime;
 
+    private String renterRealGetReturnRemark;
+
+    private String ownerRealGetReturnRemark;
+
     /**
      * 设置信息参数
      * @param orderType

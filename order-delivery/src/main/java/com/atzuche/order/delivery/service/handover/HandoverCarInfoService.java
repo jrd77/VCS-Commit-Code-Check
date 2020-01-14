@@ -117,10 +117,12 @@ public class HandoverCarInfoService {
         if (deliveryReqVO.getGetDeliveryReqDTO() != null) {
             deliveryReqDTO = deliveryReqVO.getGetDeliveryReqDTO();
             updateDeliveryCarInfoByUsed(deliveryReqDTO, 1);
+            //更新取车备注信息
         }
         if (deliveryReqVO.getRenterDeliveryReqDTO() != null) {
             deliveryReqDTO = deliveryReqVO.getRenterDeliveryReqDTO();
             updateDeliveryCarInfoByUsed(deliveryReqDTO, 2);
+            //更新还车备注信息
         }
     }
 
@@ -158,6 +160,8 @@ public class HandoverCarInfoService {
         orderDeliveryDTO.setOwnerGetReturnAddr(deliveryReqDTO.getOwnerGetReturnAddr());
         orderDeliveryDTO.setOrderNo(renterOrderDeliveryEntity.getOrderNo());
         orderDeliveryDTO.setRenterOrderNo(renterOrderDeliveryEntity.getRenterOrderNo());
+        orderDeliveryDTO.setOwnerRealGetReturnRemark(deliveryReqDTO.getOwnerRealGetAddrReamrk());
+        orderDeliveryDTO.setRenterRealGetReturnRemark(deliveryReqDTO.getRenterRealGetAddrReamrk());
         renterDeliveryAddrDTO.setExpGetCarAddr(deliveryReqDTO.getRenterGetReturnAddr());
         renterDeliveryAddrDTO.setOrderNo(renterOrderDeliveryEntity.getOrderNo());
         renterDeliveryAddrDTO.setRenterOrderNo(renterOrderDeliveryEntity.getRenterOrderNo());
