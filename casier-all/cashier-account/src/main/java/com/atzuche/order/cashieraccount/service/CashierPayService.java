@@ -151,7 +151,6 @@ public class CashierPayService{
         //1校验
         Assert.notNull(orderPaySign, ErrorCode.PARAMETER_ERROR.getText());
         orderPaySign.check();
-        orderPayCallBack.callBack(orderPaySign.getOrderNo());
         //3 查询应付
         OrderPayReqVO orderPayReqVO = new OrderPayReqVO();
         BeanUtils.copyProperties(orderPaySign,orderPayReqVO);
