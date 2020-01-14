@@ -13,6 +13,8 @@ public class PhotoUploadReqVO {
 
     private String photoContent;
 
+    private String picKey;
+
     private String serialNumber;
 
     private String userType;
