@@ -13,11 +13,10 @@ import org.hibernate.validator.constraints.NotBlank;
 @ToString
 public class RentalCostReqVO {
 
-    @ApiModelProperty(value="子订单号",required=true)
-    @NotBlank(message="renterOrderNo不能为空")
-    private String renterOrderNo;
+    @ApiModelProperty(value="订单号",required=true)
+    @NotBlank(message="orderNo不能为空")
+    private String orderNo;
     @ApiModelProperty(value="子订单状态",required=true)
-    @NotBlank(message="renterOrderStatus不能为空")
     private Integer renterOrderStatus;
 
 

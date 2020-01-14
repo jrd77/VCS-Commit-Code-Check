@@ -124,7 +124,7 @@ public class OrderPhotoController{
 				}
 			}
 
-		return null;
+		return ResponseData.success();
     } 
 	/**
 	 * 
@@ -140,7 +140,8 @@ public class OrderPhotoController{
 	@DeleteMapping("/delete")
 	@AutoDocMethod(description = "删除订单照片", value = "删除订单照片", response = ResponseData.class)
 	public ResponseData delOrderPhoto(@RequestBody OrderDeleteRequestVO orderDeleteRequestVO){
-		return ResponseData.success(orderPhotoService.delOrderPhoto(orderDeleteRequestVO.getPhotoType(),orderDeleteRequestVO.getPhotoId()));
+		orderPhotoService.delOrderPhoto(orderDeleteRequestVO.getPhotoType(),orderDeleteRequestVO.getPhotoId());
+		return ResponseData.success();
 	}
 
 }

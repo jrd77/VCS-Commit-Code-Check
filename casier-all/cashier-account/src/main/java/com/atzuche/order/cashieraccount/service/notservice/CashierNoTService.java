@@ -316,12 +316,8 @@ public class CashierNoTService {
      */
     public PayVo getPayVO(CashierEntity cashierEntity,OrderPaySignReqVO orderPaySign,int amt ,String title,String payKind,String payIdStr ,String extendParams) {
         PayVo vo = new PayVo();
-        if(Objects.isNull(cashierEntity)){
-
-        }
         Integer paySn = (Objects.isNull(cashierEntity)|| Objects.isNull(cashierEntity.getPaySn()))?0:cashierEntity.getPaySn();
-        paySn = Objects.isNull(paySn)?0:paySn;
-        vo.setInternalNo(String.valueOf(paySn));
+        vo.setInternalNo("1");
         vo.setExtendParams(extendParams);
         vo.setAtappId(DataAppIdConstant.APPID_SHORTRENT);
         vo.setMemNo(orderPaySign.getMenNo());
