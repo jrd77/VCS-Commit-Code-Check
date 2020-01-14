@@ -53,6 +53,7 @@ import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -515,5 +516,18 @@ public class CashierNoTService {
         return refundVo;
     }
 
-
+    /**
+     * 查询补付记录
+     * @param orderNo
+     * @param renterMemNo
+     * @param payKind
+     * @return
+     */
+    public List<CashierEntity> getCashierEntitys(String orderNo, String renterMemNo, String payKind) {
+        List<CashierEntity> cashierEntity = cashierMapper.getPayAmtByPayKinds(orderNo,renterMemNo,payKind);
+        if(CollectionUtils.isEmpty(cashierEntity)){
+            return Collections.emptyList();
+        }
+        return cashierEntity;
+    }
 }

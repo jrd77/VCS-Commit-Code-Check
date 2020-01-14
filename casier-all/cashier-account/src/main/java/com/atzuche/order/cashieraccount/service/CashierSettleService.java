@@ -13,6 +13,7 @@ import com.atzuche.order.accountrenterclaim.entity.AccountRenterClaimCostSettleE
 import com.atzuche.order.accountrenterclaim.service.notservice.AccountRenterClaimCostSettleNoTService;
 import com.atzuche.order.accountrenterdeposit.service.AccountRenterDepositService;
 import com.atzuche.order.accountrenterdeposit.vo.req.DetainRenterDepositReqVO;
+import com.atzuche.order.accountrenterdeposit.vo.req.OrderCancelRenterDepositReqVO;
 import com.atzuche.order.accountrenterdeposit.vo.res.AccountRenterDepositResVO;
 import com.atzuche.order.accountrenterdetain.entity.AccountRenterDetainCostEntity;
 import com.atzuche.order.accountrenterdetain.service.notservice.AccountRenterDetainCostNoTService;
@@ -26,9 +27,11 @@ import com.atzuche.order.accountrenterrentcost.service.notservice.AccountRenterC
 import com.atzuche.order.accountrenterrentcost.service.notservice.AccountRenterCostSettleNoTService;
 import com.atzuche.order.accountrenterrentcost.vo.req.AccountRenterCostChangeReqVO;
 import com.atzuche.order.accountrenterrentcost.vo.req.AccountRenterCostDetailReqVO;
+import com.atzuche.order.accountrenterrentcost.vo.req.AccountRenterCostToFineReqVO;
 import com.atzuche.order.accountrenterwzdepost.service.AccountRenterWzDepositCostService;
 import com.atzuche.order.accountrenterwzdepost.service.AccountRenterWzDepositService;
 import com.atzuche.order.accountrenterwzdepost.service.notservice.AccountRenterWzDepositNoTService;
+import com.atzuche.order.accountrenterwzdepost.vo.req.RenterCancelWZDepositCostReqVO;
 import com.atzuche.order.cashieraccount.service.notservice.CashierNoTService;
 import com.atzuche.order.cashieraccount.service.notservice.CashierRefundApplyNoTService;
 import com.atzuche.order.cashieraccount.vo.req.DeductDepositToRentCostReqVO;
@@ -327,5 +330,37 @@ public class CashierSettleService {
      */
     public int getRentCost(String orderNo, String renterMemNo) {
        return accountRenterCostSettleNoTService.getCostPaidRent(orderNo,renterMemNo);
+    }
+
+    /**
+     * 租车费用 抵扣罚金
+     * @param vo
+     */
+    public void deductRentCostToRentFine(AccountRenterCostToFineReqVO vo) {
+        accountRenterCostSettleService.deductRentCostToRentFine(vo);
+    }
+
+    /**
+     * 钱包抵扣 罚金
+     * @param vo
+     */
+    public void deductWalletCostToRentFine(AccountRenterCostToFineReqVO vo) {
+        // 1记录钱包抵扣罚金流水
+        accountRenterCostSettleService.deductWalletCostToRentFine(vo);
+    }
+
+    /**
+     * 车俩押金抵扣 罚金
+     * @param vo
+     */
+    public void deductRentDepositToRentFine(OrderCancelRenterDepositReqVO vo) {
+        accountRenterDepositService.deductRentDepositToRentFine(vo);
+    }
+    /**
+     * 违章押金抵扣 罚金
+     * @param vo
+     */
+    public void deductRentWzDepositToRentFine(RenterCancelWZDepositCostReqVO vo) {
+        accountRenterWzDepositService.deductRentWzDepositToRentFine(vo);
     }
 }

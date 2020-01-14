@@ -1,11 +1,14 @@
 package com.atzuche.order.accountrenterwzdepost.service;
 
+import com.atzuche.order.accountrenterwzdepost.entity.AccountRenterWzDepositDetailEntity;
 import com.atzuche.order.accountrenterwzdepost.service.notservice.AccountRenterWzDepositDetailNoTService;
 import com.atzuche.order.accountrenterwzdepost.service.notservice.AccountRenterWzDepositNoTService;
 import com.atzuche.order.accountrenterwzdepost.vo.req.CreateOrderRenterWZDepositReqVO;
 import com.atzuche.order.accountrenterwzdepost.vo.req.PayedOrderRenterDepositWZDetailReqVO;
 import com.atzuche.order.accountrenterwzdepost.vo.req.PayedOrderRenterWZDepositReqVO;
+import com.atzuche.order.accountrenterwzdepost.vo.req.RenterCancelWZDepositCostReqVO;
 import com.atzuche.order.accountrenterwzdepost.vo.res.AccountRenterWZDepositResVO;
+import com.atzuche.order.commons.enums.RenterCashCodeEnum;
 import com.atzuche.order.commons.enums.YesNoEnum;
 import com.autoyol.cat.CatAnnotation;
 import com.autoyol.commons.web.ErrorCode;
@@ -105,4 +108,17 @@ public class AccountRenterWzDepositService{
         return accountRenterWzDepositDetailNoTService.insertRenterWZDepositDetail(payedOrderRenterWZDepositDetail);
     }
 
+    /**
+     * 违章押金 抵扣罚金
+     * @param vo
+     */
+    public void deductRentWzDepositToRentFine(RenterCancelWZDepositCostReqVO vo) {
+        AccountRenterWzDepositDetailEntity accountRenterDepositDetailEntity = new AccountRenterWzDepositDetailEntity();
+        accountRenterDepositDetailEntity.setOrderNo(vo.getOrderNo());
+        accountRenterDepositDetailEntity.setMemNo(vo.getMemNo());
+        accountRenterDepositDetailEntity.setAmt(vo.getAmt());
+        accountRenterDepositDetailEntity.setSourceCode(RenterCashCodeEnum.SETTLE_RENT_WZ_DEPOSIT_COST_TO_FINE.getCashNo());
+        accountRenterDepositDetailEntity.setSourceDetail(RenterCashCodeEnum.SETTLE_RENT_WZ_DEPOSIT_COST_TO_FINE.getTxt());
+        accountRenterWzDepositDetailNoTService.insertRenterDepositDetailEntity(accountRenterDepositDetailEntity);
+    }
 }
