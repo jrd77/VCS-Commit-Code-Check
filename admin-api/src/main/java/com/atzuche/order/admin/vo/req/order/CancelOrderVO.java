@@ -1,5 +1,6 @@
 package com.atzuche.order.admin.vo.req.order;
 
+import com.atzuche.order.commons.vo.req.BaseVO;
 import com.autoyol.doc.annotation.AutoDocProperty;
 import lombok.Data;
 import org.hibernate.validator.constraints.NotBlank;
@@ -9,7 +10,7 @@ import org.hibernate.validator.constraints.NotBlank;
  * @date 2020/1/7 11:27 上午
  **/
 @Data
-public class CancelOrderVO {
+public class CancelOrderVO extends BaseVO {
     @AutoDocProperty(value = "订单号")
     @NotBlank(message = "订单号不能为空")
     private String orderNo;

@@ -12,7 +12,6 @@ import com.autoyol.car.api.feign.api.CarDetailQueryFeignApi;
 import com.autoyol.car.api.model.dto.OrderCarInfoParamDTO;
 import com.autoyol.car.api.model.vo.*;
 import com.autoyol.commons.web.ErrorCode;
-import com.autoyol.commons.web.ResponseData;
 import com.dianping.cat.Cat;
 import com.dianping.cat.message.Transaction;
 import lombok.Data;
@@ -22,6 +21,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -235,5 +235,8 @@ public class CarProxyService {
         return coverPic;
     }
 
-
+    public static void main(String[] args) {
+        LocalDate localDate = LocalDateTimeUtils.parseStringToLocalDate("2012-06-21");
+        System.out.println(localDate);
+    }
 }

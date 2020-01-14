@@ -92,6 +92,7 @@ com_crashlytics_export_strings.xml
 crashlytics.properties
 crashlytics-build.properties
 fabric.properties
+order-photo-server/build/
 
 # Editor-based Rest Client
 .idea/httpRequests
