@@ -23,6 +23,11 @@ version '1.0.0-SNAPSHOT'
 sourceCompatibility = '1.8'
 targetCompatibility = 1.8
 
+compileJava {
+    options.fork = true
+    options.forkOptions.executable = "javac" // assumes that javac is on PATH
+    options.compilerArgs << "-XDignore.symbol.file"
+}
 
 
 dependencies {
@@ -51,7 +56,8 @@ dependencies {
     compile("com.autoframework:auto-mq-event:1.0-SNAPSHOT")
 
     compile('com.autoyol.car:auto-car-service-api:2020010802-SNAPSHOT')
-
+    compile 'com.aliyun.oss:aliyun-sdk-oss:2.8.3'
+    compile('com.aliyun.mns:aliyun-sdk-mns:1.1.4')
 
 //    compile project(":casier-all:cashier-account")
 
