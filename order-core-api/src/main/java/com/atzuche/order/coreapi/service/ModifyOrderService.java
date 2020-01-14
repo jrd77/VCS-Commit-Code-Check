@@ -897,7 +897,8 @@ public class ModifyOrderService {
 			couponMap = initOrderCouponList.stream().collect(Collectors.toMap(OrderCouponEntity::getCouponType, initCoupon -> initCoupon));
 		}
 		// 获取车主券抵扣
-		OrderCouponDTO ownerCoupon = getOwnerCoupon(costBaseDTO, renterOrderReqVO, surplusRentAmt, couponMap.get(CouponTypeEnum.ORDER_COUPON_TYPE_OWNER.getCode()));
+		OrderCouponEntity carOwnerCouponEntity = couponMap == null ? null:couponMap.get(CouponTypeEnum.ORDER_COUPON_TYPE_OWNER.getCode());
+		OrderCouponDTO ownerCoupon = getOwnerCoupon(costBaseDTO, renterOrderReqVO, surplusRentAmt, carOwnerCouponEntity);
 		if (ownerCoupon != null) {
 			orderCouponList.add(ownerCoupon);
 			int ownerCouponAmt = ownerCoupon.getAmount() == null ? 0:ownerCoupon.getAmount();
