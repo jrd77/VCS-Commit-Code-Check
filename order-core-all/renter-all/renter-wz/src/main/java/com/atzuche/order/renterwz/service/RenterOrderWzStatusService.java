@@ -71,4 +71,8 @@ public class RenterOrderWzStatusService {
     public List<RenterOrderWzStatusEntity> queryIllegalOrderListByMemNo(String memNo) {
         return renterOrderWzStatusMapper.queryIllegalOrderListByMemNo(memNo);
     }
+
+    public RenterOrderWzStatusEntity getOrderInfoByOrderNo(String orderNo) {
+        return renterOrderWzStatusMapper.getOrderInfoByOrderNo(orderNo);
+    }
 }
