@@ -57,6 +57,7 @@ public class OrderFlowService {
             orderFlowList.forEach(orderFlowEntity -> {
                 OrderFlowDTO orderFlowDTO = new OrderFlowDTO();
                 BeanUtils.copyProperties(orderFlowEntity ,orderFlowDTO);
+                orderFlowDTO.setCreateTime(orderFlowEntity.getCreateTime().toString());
                 orderFlowDTOList.add(orderFlowDTO);
             });
         }
