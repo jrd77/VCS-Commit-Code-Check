@@ -240,4 +240,9 @@ public class RenterGoodsDetailDTO {
      */
     private LocalDate inspectExpire;
 
+    /**
+     * 周末价格
+     */
+    private Integer weekendPrice;
+
 }
