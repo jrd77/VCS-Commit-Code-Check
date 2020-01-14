@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
  * @date 2019-12-25 11:35:17
  * @Description:
  */
-public class CashierResVo implements Serializable {
+public class CashierResVO implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
 	/**

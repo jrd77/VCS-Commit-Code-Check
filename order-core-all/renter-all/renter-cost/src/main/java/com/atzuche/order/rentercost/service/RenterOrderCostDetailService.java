@@ -1,14 +1,17 @@
 package com.atzuche.order.rentercost.service;
 
-import com.atzuche.order.rentercost.entity.RenterOrderCostDetailEntity;
-import com.atzuche.order.rentercost.mapper.RenterOrderCostDetailMapper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.atzuche.order.rentercost.entity.RenterOrderCostDetailEntity;
+import com.atzuche.order.rentercost.entity.RenterOrderFineDeatailEntity;
+import com.atzuche.order.rentercost.mapper.RenterOrderCostDetailMapper;
+import com.atzuche.order.rentercost.mapper.RenterOrderFineDeatailMapper;
 
 
 /**
@@ -21,6 +24,16 @@ import java.util.stream.Collectors;
 public class RenterOrderCostDetailService{
     @Autowired
     private RenterOrderCostDetailMapper renterOrderCostDetailMapper;
+    @Autowired
+    RenterOrderFineDeatailMapper renterOrderFineDeatailMapper;
+    
+    /**
+     * 租客罚金列表
+     */
+    public List<RenterOrderFineDeatailEntity> queryRentOrderFineDetail(String orderNo,String renterOrderNo) {
+    	List<RenterOrderFineDeatailEntity> lst = renterOrderFineDeatailMapper.listRenterOrderFineDeatail(orderNo, renterOrderNo);
+    	return lst;
+    }
     
     /**
      * 保存费用明细
