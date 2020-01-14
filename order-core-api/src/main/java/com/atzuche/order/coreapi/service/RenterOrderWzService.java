@@ -1,21 +1,29 @@
 package com.atzuche.order.coreapi.service;
 
 import com.atzuche.order.commons.CommonUtils;
+import com.atzuche.order.commons.entity.dto.RenterMemberDTO;
 import com.atzuche.order.coreapi.entity.vo.res.IllegalOrderInfoResVO;
+import com.atzuche.order.owner.mem.entity.OwnerMemberEntity;
 import com.atzuche.order.owner.mem.service.OwnerMemberService;
+import com.atzuche.order.parentorder.entity.OrderEntity;
+import com.atzuche.order.parentorder.service.OrderService;
+import com.atzuche.order.rentercommodity.entity.RenterGoodsEntity;
 import com.atzuche.order.rentercommodity.service.RenterGoodsService;
+import com.atzuche.order.rentermem.entity.RenterMemberEntity;
 import com.atzuche.order.rentermem.service.RenterMemberService;
+import com.atzuche.order.renterwz.entity.RenterOrderWzCostDetailEntity;
 import com.atzuche.order.renterwz.entity.RenterOrderWzIllegalPhotoEntity;
-import com.atzuche.order.renterwz.service.OssService;
-import com.atzuche.order.renterwz.service.RenterOrderWzIllegalPhotoService;
-import com.atzuche.order.renterwz.service.TransIllegalSendAliYunMq;
+import com.atzuche.order.renterwz.entity.RenterOrderWzStatusEntity;
+import com.atzuche.order.renterwz.service.*;
 import com.atzuche.order.renterwz.vo.PhotoUploadVO;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -45,8 +53,18 @@ public class RenterOrderWzService {
 
     @Resource
     private RenterMemberService renterMemberService;
+
     @Resource
     private RenterGoodsService renterGoodsService;
+
+    @Resource
+    private RenterOrderWzStatusService renterOrderWzStatusService;
+
+    @Resource
+    private RenterOrderWzCostDetailService renterOrderWzCostDetailService;
+
+    @Resource
+    private OrderService orderService;
 
     private static final Integer SUCCESS_STATUS = 200;
     private static final Integer FAILED_STATUS = 500;
@@ -162,6 +180,31 @@ public class RenterOrderWzService {
     }
 
     public List<IllegalOrderInfoResVO> getIllegalOrderListByMemNo(String memNo) {
-        return null;
+        List<RenterOrderWzStatusEntity> wzStatusEntities = renterOrderWzStatusService.queryIllegalOrderListByMemNo(memNo);
+        if(CollectionUtils.isEmpty(wzStatusEntities)){
+            return new ArrayList<>();
+        }
+        List<IllegalOrderInfoResVO> results = new ArrayList<>();
+        IllegalOrderInfoResVO result;
+        for (RenterOrderWzStatusEntity wzStatusEntity : wzStatusEntities) {
+            result = new IllegalOrderInfoResVO();
+            String orderNo = wzStatusEntity.getOrderNo();
+            String carNo = wzStatusEntity.getCarNo();
+            String ownerNo = wzStatusEntity.getOwnerNo();
+            String renterNo = wzStatusEntity.getRenterNo();
+            //查询 车主信息
+            OwnerMemberEntity owner = ownerMemberService.queryOwnerInfoByOrderNoAndOwnerNo(orderNo,ownerNo);
+            //查询 租客信息
+            RenterMemberEntity renter = renterMemberService.queryRenterInfoByOrderNoAndRenterNo(orderNo,renterNo);
+            //查询 车辆信息
+            RenterGoodsEntity car = renterGoodsService.queryCarInfoByOrderNoAndCarNo(orderNo,carNo);
+            //查询 订单信息
+            OrderEntity order = orderService.getOrderEntity(orderNo);
+            //查询 费用
+            List<RenterOrderWzCostDetailEntity> renterOrderWzCostDetailEntities = renterOrderWzCostDetailService.queryInfosByOrderNo(orderNo);
+
+            results.add(result);
+        }
+        return results;
     }
 }

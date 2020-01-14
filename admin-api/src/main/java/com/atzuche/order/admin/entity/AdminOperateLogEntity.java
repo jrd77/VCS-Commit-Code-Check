@@ -1,4 +1,4 @@
-package com.atzuche.order.orderlog.entity;
+package com.atzuche.order.admin.entity;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
