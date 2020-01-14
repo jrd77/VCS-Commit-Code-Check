@@ -87,7 +87,7 @@ public class OrderCarTrusteeshipController extends BaseController {
      */
     @AutoDocVersion(version = "管理后台托管车信息")
     @AutoDocGroup(group = "管理后台托管车信息")
-    @AutoDocMethod(description = "托管车信息", value = "托管车信息", response = ResponseData.class)
+    @AutoDocMethod(description = "托管车信息", value = "托管车信息", response = OrderCarTrusteeshipEntity.class)
     @RequestMapping(value = "/trusteeship/get", method = RequestMethod.POST)
     public ResponseData<?> getOrderCarTrusteeship(@RequestBody @Validated OrderCarTrusteeshipReqVO orderCarTrusteeshipReqVO, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
