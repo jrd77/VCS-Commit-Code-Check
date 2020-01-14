@@ -150,7 +150,8 @@ public class SubmitOrderService {
         stockService.checkCarStock(orderInfoDTO);
 
         //2.2风控
-        Integer riskAuditId = submitOrderRiskAuditService.check(buildSubmitOrderRiskCheckReqVO(orderReqVO, reqTime));
+        Integer riskAuditId = submitOrderRiskAuditService.check(buildSubmitOrderRiskCheckReqVO(orderReqVO, reqTime,
+                renterGoodsDetailDTO.getWeekendPrice()));
         //2.3校验链
         //TODO:下单校验
 
@@ -550,12 +551,14 @@ public class SubmitOrderService {
         return autoCoinDeductReqVO;
     }
 
-    private SubmitOrderRiskCheckReqVO buildSubmitOrderRiskCheckReqVO(OrderReqVO orderReqVO, LocalDateTime reqTime) {
+    private SubmitOrderRiskCheckReqVO buildSubmitOrderRiskCheckReqVO(OrderReqVO orderReqVO, LocalDateTime reqTime,
+                                                                     Integer weekendPrice) {
 
         SubmitOrderRiskCheckReqVO submitOrderRiskCheckReqVO = new SubmitOrderRiskCheckReqVO();
         BeanCopier beanCopier = BeanCopier.create(OrderReqVO.class, SubmitOrderRiskCheckReqVO.class, false);
         beanCopier.copy(orderReqVO, submitOrderRiskCheckReqVO, null);
         submitOrderRiskCheckReqVO.setReqTime(LocalDateTimeUtils.localDateTimeToDate(reqTime));
+        submitOrderRiskCheckReqVO.setWeekendPrice(weekendPrice);
         return submitOrderRiskCheckReqVO;
     }
 }

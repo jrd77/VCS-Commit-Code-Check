@@ -107,7 +107,7 @@ public class SubmitOrderRiskAuditService {
 
         createOrderRiskCheckRequestVO.setUseCarCityCode(submitOrderRiskCheckReqVO.getCityCode());
         createOrderRiskCheckRequestVO.setUseCarCityName(submitOrderRiskCheckReqVO.getCityName());
-
+        createOrderRiskCheckRequestVO.setAverageDailyPrice(String.valueOf(submitOrderRiskCheckReqVO.getWeekendPrice()));
 
         return createOrderRiskCheckRequestVO;
     }
