@@ -98,25 +98,25 @@ public class RenterOrderSubsidyDetailResVO implements Serializable {
 	 * 部门名称
 	 */
 	private String deptName;
-//	/**
-//	 * 创建时间
-//	 */
-//	private LocalDateTime createTime;
-//	/**
-//	 * 创建人
-//	 */
-//	private String createOp;
-//	/**
-//	 * 修改时间
-//	 */
-//	private LocalDateTime updateTime;
-//	/**
-//	 * 修改人
-//	 */
-//	private String updateOp;
-//	/**
-//	 * 0-正常，1-已逻辑删除
-//	 */
-//	private Integer isDelete;
+	/**
+	 * 创建时间
+	 */
+	private LocalDateTime createTime;
+	/**
+	 * 创建人
+	 */
+	private String createOp;
+	/**
+	 * 修改时间
+	 */
+	private LocalDateTime updateTime;
+	/**
+	 * 修改人
+	 */
+	private String updateOp;
+	/**
+	 * 0-正常，1-已逻辑删除
+	 */
+	private Integer isDelete;
 
 }

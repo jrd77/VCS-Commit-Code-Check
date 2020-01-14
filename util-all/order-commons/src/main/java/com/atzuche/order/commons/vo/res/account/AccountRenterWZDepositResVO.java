@@ -46,22 +46,22 @@ public class AccountRenterWZDepositResVO {
      * 实退押金
      */
     private Integer realReturnDeposit;
-//    /**
-//     * 创建时间
-//     */
-//    private LocalDateTime createTime;
-//    /**
-//     * 创建人
-//     */
-//    private String createOp;
-//    /**
-//     * 修改时间
-//     */
-//    private LocalDateTime updateTime;
-//    /**
-//     * 更新人
-//     */
-//    private String updateOp;
+    /**
+     * 创建时间
+     */
+    private LocalDateTime createTime;
+    /**
+     * 创建人
+     */
+    private String createOp;
+    /**
+     * 修改时间
+     */
+    private LocalDateTime updateTime;
+    /**
+     * 更新人
+     */
+    private String updateOp;
 
     /**
      * 结算状态 0未结算 1 已结算

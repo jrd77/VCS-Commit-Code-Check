@@ -43,12 +43,12 @@ public class RenterOrderDeliveryResVO implements Serializable {
 	/**
 	 * 起租时间
 	 */
-	@JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
+//	@JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
 	private LocalDateTime rentTime;
 	/**
 	 * 归还时间
 	 */
-	@JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
+//	@JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
 	private LocalDateTime revertTime;
 	/**
 	 * 城市编码
@@ -118,26 +118,26 @@ public class RenterOrderDeliveryResVO implements Serializable {
 	 * 是否通知到仁云 0-否，1-是
 	 */
 	private Integer isNotifyRenyun;
-//	/**
-//	 * 创建时间
-//	 */
-//	private LocalDateTime createTime;
-//	/**
-//	 * 创建人
-//	 */
-//	private String createOp;
-//	/**
-//	 * 修改时间
-//	 */
-//	private LocalDateTime updateTime;
-//	/**
-//	 * 修改人
-//	 */
-//	private String updateOp;
-//	/**
-//	 * 0-正常，1-已逻辑删除
-//	 */
-//	private Integer isDelete;
+	/**
+	 * 创建时间
+	 */
+	private LocalDateTime createTime;
+	/**
+	 * 创建人
+	 */
+	private String createOp;
+	/**
+	 * 修改时间
+	 */
+	private LocalDateTime updateTime;
+	/**
+	 * 修改人
+	 */
+	private String updateOp;
+	/**
+	 * 0-正常，1-已逻辑删除
+	 */
+	private Integer isDelete;
 
 	private Integer aheadOrDelayTime;
 

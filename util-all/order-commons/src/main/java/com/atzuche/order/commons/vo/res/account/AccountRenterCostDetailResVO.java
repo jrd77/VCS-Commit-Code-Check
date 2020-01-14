@@ -62,7 +62,7 @@ public class AccountRenterCostDetailResVO implements Serializable {
 	/**
 	 * 交易时间
 	 */
-	@JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
+//	@JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
 	private LocalDateTime transTime;
 	/**
 	 * 唯一标识
@@ -71,27 +71,27 @@ public class AccountRenterCostDetailResVO implements Serializable {
 	/**
 	 * 入账时间
 	 */
-	@JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
+//	@JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
 	private LocalDateTime time;
-//	/**
-//	 * 创建时间
-//	 */
-//	private LocalDateTime createTime;
-//	/**
-//	 * 创建人
-//	 */
-//	private String createOp;
-//	/**
-//	 * 修改时间
-//	 */
-//	private LocalDateTime updateTime;
-//	/**
-//	 * 修改人
-//	 */
-//	private String updateOp;
-//	/**
-//	 * 0-正常，1-已逻辑删除
-//	 */
-//	private Integer isDelete;
+	/**
+	 * 创建时间
+	 */
+	private LocalDateTime createTime;
+	/**
+	 * 创建人
+	 */
+	private String createOp;
+	/**
+	 * 修改时间
+	 */
+	private LocalDateTime updateTime;
+	/**
+	 * 修改人
+	 */
+	private String updateOp;
+	/**
+	 * 0-正常，1-已逻辑删除
+	 */
+	private Integer isDelete;
 
 }

@@ -17,8 +17,8 @@ import com.autoyol.commons.web.ResponseData;
  * @author jing.huang
  *
  */
-@FeignClient(url = "http://localhost:7777" ,name="order-center-api")  //本地测试
-//@FeignClient(url = "http://10.0.3.235:1412" ,name="order-center-api")
+//@FeignClient(url = "http://localhost:1412" ,name="order-center-api")  //本地测试
+@FeignClient(url = "http://10.0.3.235:1412" ,name="order-center-api")
 public interface FeignPaymentService {
 	
 	 @PostMapping("/order/payment/queryByOrderNo")

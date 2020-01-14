@@ -28,7 +28,7 @@ public class AccountRenterDepositResVO {
     /**
      * 支付时间
      */
-    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
+//    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
     private LocalDateTime payTime;
     /**
      * 结算状态
@@ -37,7 +37,7 @@ public class AccountRenterDepositResVO {
     /**
      * 结算时间
      */
-    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
+//    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
     private LocalDateTime settleTime;
     /**
      * 应付押金总额
@@ -79,22 +79,22 @@ public class AccountRenterDepositResVO {
      * 免押方式(1:绑卡减免,2:芝麻减免,3:消费)
      */
     private Integer freeDepositType;
-//    /**
-//     * 创建时间
-//     */
-//    private LocalDateTime createTime;
-//    /**
-//     * 创建人
-//     */
-//    private String createOp;
-//    /**
-//     * 修改时间
-//     */
-//    private LocalDateTime updateTime;
-//    /**
-//     * 更新人
-//     */
-//    private String updateOp;
+    /**
+     * 创建时间
+     */
+    private LocalDateTime createTime;
+    /**
+     * 创建人
+     */
+    private String createOp;
+    /**
+     * 修改时间
+     */
+    private LocalDateTime updateTime;
+    /**
+     * 更新人
+     */
+    private String updateOp;
 
 
 

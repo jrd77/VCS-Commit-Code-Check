@@ -27,6 +27,7 @@ import com.atzuche.order.commons.vo.res.cost.RenterOrderFineDeatailResVO;
 import com.atzuche.order.commons.vo.res.cost.RenterOrderSubsidyDetailResVO;
 import com.atzuche.order.commons.vo.res.order.RenterOrderResVO;
 import com.atzuche.order.open.service.FeignOrderModifyService;
+import com.autoyol.commons.utils.StringUtils;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.platformcost.CommonUtils;
 
@@ -249,6 +250,9 @@ public class ModificationOrderService {
 	
 	private String convertAgreeFlag(RenterOrderResVO renterOrderResVO) {
 		String flag = "";
+		if(renterOrderResVO.getAgreeFlag() == null) {
+			return "---";
+		}
 		switch (renterOrderResVO.getAgreeFlag()) {
 		case 0:
 			flag = "未处理";
@@ -288,6 +292,9 @@ public class ModificationOrderService {
 
 	private String convertSource(String changeSource) {
 		String source = "";
+		if(StringUtils.isBlank(changeSource)) {
+			return "---";
+		}
 		switch (changeSource) {
 		case "1":
 			source = "后台管理";

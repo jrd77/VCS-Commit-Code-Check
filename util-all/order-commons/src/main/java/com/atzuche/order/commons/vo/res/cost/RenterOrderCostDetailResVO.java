@@ -46,12 +46,12 @@ public class RenterOrderCostDetailResVO implements Serializable {
 	/**
 	 * 开始时间
 	 */
-	@JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
+//	@JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
 	private LocalDateTime startTime;
 	/**
 	 * 结束时间
 	 */
-	@JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
+//	@JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
 	private LocalDateTime endTime;
 	/**
 	 * 单价
@@ -85,26 +85,26 @@ public class RenterOrderCostDetailResVO implements Serializable {
 	 * 备注
 	 */
 	private String remark;
-//	/**
-//	 * 创建时间
-//	 */
-//	private LocalDateTime createTime;
-//	/**
-//	 * 创建人
-//	 */
-//	private String createOp;
-//	/**
-//	 * 修改时间
-//	 */
-//	private LocalDateTime updateTime;
-//	/**
-//	 * 修改人
-//	 */
-//	private String updateOp;
-//	/**
-//	 * 0-正常，1-已逻辑删除
-//	 */
-//	private Integer isDelete;
+	/**
+	 * 创建时间
+	 */
+	private LocalDateTime createTime;
+	/**
+	 * 创建人
+	 */
+	private String createOp;
+	/**
+	 * 修改时间
+	 */
+	private LocalDateTime updateTime;
+	/**
+	 * 修改人
+	 */
+	private String updateOp;
+	/**
+	 * 0-正常，1-已逻辑删除
+	 */
+	private Integer isDelete;
 	
 	public RenterOrderCostDetailResVO() {}
 	

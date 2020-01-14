@@ -40,22 +40,22 @@ public class RenterOrderResVO implements Serializable {
 	/**
 	 * 预计起租时间
 	 */
-	@JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")  
+//	@JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")  
 	private LocalDateTime expRentTime;
 	/**
 	 * 预计还车时间
 	 */
-	@JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")  
+//	@JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")  
 	private LocalDateTime expRevertTime;
 	/**
 	 * 实际起租时间
 	 */
-	@JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
+//	@JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
 	private LocalDateTime actRentTime;
 	/**
 	 * 实际还车时间
 	 */
-	@JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
+//	@JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
 	private LocalDateTime actRevertTime;
 	/**
 	 * 商品编码
@@ -120,13 +120,13 @@ public class RenterOrderResVO implements Serializable {
     /**
      * 车主同意请求时间
      */
-	@JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
+//	@JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
 	private LocalDateTime reqAcceptTime;
 
 	/**
 	 * 创建时间
 	 */
-	@JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
+//	@JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
 	private LocalDateTime createTime;
 	/**
 	 * 创建人
@@ -135,7 +135,7 @@ public class RenterOrderResVO implements Serializable {
 	/**
 	 * 修改时间
 	 */
-	@JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
+//	@JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
 	private LocalDateTime updateTime;
 	/**
 	 * 修改人
@@ -145,6 +145,7 @@ public class RenterOrderResVO implements Serializable {
 	 * 0-正常，1-已逻辑删除
 	 */
 	private Integer isDelete;
+	
 	public Integer getId() {
 		return id;
 	}
