@@ -33,4 +33,6 @@ public interface RenterOrderFineDeatailMapper{
     Integer saveRenterOrderFineDeatailBatch(@Param("costList") List<RenterOrderFineDeatailEntity> costList);
     
     Integer deleteGetReturnFineAfterAgree(@Param("id") Integer id, @Param("remark") String remark);
+
+    List<RenterOrderFineDeatailEntity> getRenterOrderFineDeatailByOwnerOrderNo(@Param("renterOrderNo")String renterOrderNo);
 }

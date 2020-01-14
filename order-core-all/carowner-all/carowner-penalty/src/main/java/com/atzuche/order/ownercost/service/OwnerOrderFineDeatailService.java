@@ -79,4 +79,14 @@ public class OwnerOrderFineDeatailService{
 
         return  ownerOrderFineDeatailMapper.insertSelective(entity);
     }
+
+    /*
+     * @Author ZhangBin
+     * @Date 2020/1/14 10:37
+     * @Description: 根据子订单号查询罚金明细
+     *
+     **/
+    public List<OwnerOrderFineDeatailEntity> getOwnerOrderFineDeatailByOwnerOrderNo(String ownerOrderNo) {
+        return ownerOrderFineDeatailMapper.getOwnerOrderFineDeatailByOwnerOrderNo(ownerOrderNo);
+    }
 }

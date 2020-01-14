@@ -644,9 +644,9 @@ public class RenterOrderCostCombineService {
         // 还车纬度
         String srvReturnLat = getReturnCarCostReqDto.getSrvReturnLat();
         // 车辆经度
-        String carLon = getReturnCarCostReqDto.getCarRealLon();
+        String carLon = getReturnCarCostReqDto.getCarShowLon();
         // 车辆纬度
-        String carLat = getReturnCarCostReqDto.getCarRealLat();
+        String carLat = getReturnCarCostReqDto.getCarShowLat();
         boolean getFlag = StringUtils.isBlank(srvGetLon) || StringUtils.isBlank(srvGetLat) || "0.0".equalsIgnoreCase(srvGetLon) || "0.0".equalsIgnoreCase(srvGetLat);
         boolean returnFlag = StringUtils.isBlank(srvReturnLon) || StringUtils.isBlank(srvReturnLat) || "0.0".equalsIgnoreCase(srvReturnLon) || "0.0".equalsIgnoreCase(srvReturnLat);
         CityDTO cityDTO = null;

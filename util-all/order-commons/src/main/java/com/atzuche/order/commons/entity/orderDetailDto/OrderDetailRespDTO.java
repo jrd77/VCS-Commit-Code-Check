@@ -29,4 +29,7 @@ public class OrderDetailRespDTO {
     public List<OwnerOrderPurchaseDetailDTO> ownerOrderPurchaseDetailList;
     public List<ConsoleOwnerOrderFineDeatailDTO> consoleOwnerOrderFineDetailList;
     public List<RenterAdditionalDriverDTO> renterAdditionalDriverList;
+    public List<OwnerOrderFineDeatailDTO> ownerOrderFineDeatailList;
+    public List<RenterOrderFineDeatailDTO> renterOrderFineDeatailList;
+
 }
