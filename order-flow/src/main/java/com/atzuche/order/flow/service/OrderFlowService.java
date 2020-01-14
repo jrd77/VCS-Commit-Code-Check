@@ -1,11 +1,12 @@
 package com.atzuche.order.flow.service;
 
+import com.atzuche.order.commons.DateUtils;
+import com.atzuche.order.commons.entity.dto.OrderFlowDTO;
+import com.atzuche.order.commons.entity.dto.OrderFlowListResponseDTO;
+import com.atzuche.order.commons.entity.dto.OrderFlowRequestDTO;
 import com.atzuche.order.commons.enums.OrderStatusEnum;
-import com.atzuche.order.flow.dto.resp.OrderFlowDTO;
 import com.atzuche.order.flow.entity.OrderFlowEntity;
 import com.atzuche.order.flow.mapper.OrderFlowMapper;
-import com.atzuche.order.flow.dto.req.OrderFlowRequestDTO;
-import com.atzuche.order.flow.dto.resp.OrderFlowListResponseDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -13,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,7 +40,7 @@ public class OrderFlowService {
         record.setOrderNo(orderNo);
         record.setOrderStatus(orderStatus.getStatus());
         record.setOrderStatusDesc(orderStatus.getDesc());
-
+        
         int reslut = orderFlowMapper.insert(record);
         LOGGER.info("Add order status change records. result is: [{}]", reslut);
     }
@@ -57,7 +59,7 @@ public class OrderFlowService {
             orderFlowList.forEach(orderFlowEntity -> {
                 OrderFlowDTO orderFlowDTO = new OrderFlowDTO();
                 BeanUtils.copyProperties(orderFlowEntity ,orderFlowDTO);
-                orderFlowDTO.setCreateTime(orderFlowEntity.getCreateTime());
+                orderFlowDTO.setCreateTime(DateUtils.formate(orderFlowEntity.getCreateTime(),DateUtils.DATE_DEFAUTE1));
                 orderFlowDTOList.add(orderFlowDTO);
             });
         }

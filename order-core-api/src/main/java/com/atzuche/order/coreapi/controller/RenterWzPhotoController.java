@@ -1,6 +1,7 @@
 package com.atzuche.order.coreapi.controller;
 
 import com.atzuche.order.coreapi.entity.request.PhotoUploadReqVO;
+import com.atzuche.order.coreapi.entity.vo.res.IllegalOrderInfoResVO;
 import com.atzuche.order.coreapi.listener.HandoverCarListener;
 import com.atzuche.order.coreapi.service.RenterOrderWzService;
 import com.atzuche.order.renterwz.service.RenterOrderWzIllegalPhotoService;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
+import java.util.List;
 
 /**
  * RenterWzPhotoController
@@ -54,6 +56,10 @@ public class RenterWzPhotoController {
             Cat.logError("上传凭证 异常",e);
             return ResponseData.success(500);
         }
+    }
+
+    public ResponseData<List<IllegalOrderInfoResVO>> getIllegalOrderListByMemNo(){
+        return ResponseData.success();
     }
 
 

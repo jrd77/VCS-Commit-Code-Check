@@ -70,6 +70,9 @@ subprojects {
 //        compile('org.springframework.boot:spring-boot-starter-amqp')
         compile 'org.springframework.amqp:spring-rabbit:1.7.13.RELEASE'
         compile 'net.sf.json-lib:json-lib:2.4:jdk15'
+        //compile 'org.apache.httpcomponents:httpclient:4.3.5'
+        //compile 'org.apache.httpcomponents:httpcore:4.4.12'
+        //compile 'com.netflix.feign:feign-httpclient:8.15.1'
     }
  
 }

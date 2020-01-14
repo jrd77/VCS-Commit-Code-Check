@@ -32,8 +32,10 @@ import com.atzuche.order.owner.commodity.service.OwnerGoodsService;
 import com.atzuche.order.owner.mem.service.OwnerMemberService;
 import com.atzuche.order.ownercost.entity.ConsoleOwnerOrderFineDeatailEntity;
 import com.atzuche.order.ownercost.entity.OwnerOrderEntity;
+import com.atzuche.order.ownercost.entity.OwnerOrderFineDeatailEntity;
 import com.atzuche.order.ownercost.entity.OwnerOrderPurchaseDetailEntity;
 import com.atzuche.order.ownercost.service.ConsoleOwnerOrderFineDeatailService;
+import com.atzuche.order.ownercost.service.OwnerOrderFineDeatailService;
 import com.atzuche.order.ownercost.service.OwnerOrderPurchaseDetailService;
 import com.atzuche.order.ownercost.service.OwnerOrderService;
 import com.atzuche.order.parentorder.entity.OrderCancelReasonEntity;
@@ -47,8 +49,10 @@ import com.atzuche.order.parentorder.service.OrderStatusService;
 import com.atzuche.order.rentercommodity.service.RenterGoodsService;
 import com.atzuche.order.rentercost.entity.RenterOrderCostDetailEntity;
 import com.atzuche.order.rentercost.entity.RenterOrderCostEntity;
+import com.atzuche.order.rentercost.entity.RenterOrderFineDeatailEntity;
 import com.atzuche.order.rentercost.service.RenterOrderCostDetailService;
 import com.atzuche.order.rentercost.service.RenterOrderCostService;
+import com.atzuche.order.rentercost.service.RenterOrderFineDeatailService;
 import com.atzuche.order.rentermem.service.RenterMemberService;
 import com.atzuche.order.renterorder.entity.RenterAdditionalDriverEntity;
 import com.atzuche.order.renterorder.entity.RenterDepositDetailEntity;
@@ -121,6 +125,10 @@ public class OrderDetailService {
     private RenterDepositDetailService renterDepositDetailService;
     @Autowired
     private AccountRenterCostDetailNoTService accountRenterCostDetailNoTService;
+    @Autowired
+    private OwnerOrderFineDeatailService ownerOrderFineDeatailService;
+    @Autowired
+    private RenterOrderFineDeatailService renterOrderFineDeatailService;
 
     public ResponseData<OrderDetailRespDTO> orderDetail(OrderDetailReqDTO orderDetailReqDTO){
         log.info("准备获取订单详情orderDetailReqDTO={}", JSON.toJSONString(orderDetailReqDTO));
@@ -228,29 +236,42 @@ public class OrderDetailService {
         BeanUtils.copyProperties(orderEntity,orderDTO);
 
         //租客历史订单
-        List<RenterOrderDTO> renterOrderDTOHistoryList = new ArrayList<>();
+        List<RenterDetailDTO> renterDetailDTOS = new ArrayList<>();
         if(orderHistoryReqDTO.getIsNeedOwnerOrderHistory()){
             List<RenterOrderEntity> renterOrderEntities = renterOrderService.queryHostiryRenterOrderByOrderNo(orderNo);
             renterOrderEntities.stream().forEach(x->{
+                RenterDetailDTO renterDetailDTO = new RenterDetailDTO();
                 RenterOrderDTO renterOrderDTO = new RenterOrderDTO();
                 BeanUtils.copyProperties(x,renterOrderDTO);
-                renterOrderDTOHistoryList.add(renterOrderDTO);
+                RenterGoodsDetailDTO renterGoodsDetail = renterGoodsService.getRenterGoodsDetail(x.getRenterOrderNo(), false);
+                RenterMemberDTO renterMemberDTO = renterMemberService.selectrenterMemberByRenterOrderNo(x.getRenterOrderNo(), false);
+                renterDetailDTO.setRenterOrderDTO(renterOrderDTO);
+                renterDetailDTO.setRenterMemberDTO(renterMemberDTO);
+                renterDetailDTO.setRenterGoodsDetail(renterGoodsDetail);
+                renterDetailDTOS.add(renterDetailDTO);
             });
         }
         //车主历史订单
-        List<OwnerOrderDTO> ownerOrderDTOHistoryLIst = new ArrayList<>();
+        List<OwnerDetailDTO> ownerDetailDTOS = new ArrayList<>();
         if(orderHistoryReqDTO.getIsNeedOwnerOrderHistory()){
             List<OwnerOrderEntity> ownerOrderEntities = ownerOrderService.queryHostiryOwnerOrderByOrderNo(orderNo);
             ownerOrderEntities.stream().forEach(x->{
+                OwnerDetailDTO ownerDetailDTO = new OwnerDetailDTO();
                 OwnerOrderDTO ownerOrderDTO = new OwnerOrderDTO();
                 BeanUtils.copyProperties(x,ownerOrderDTO);
-                ownerOrderDTOHistoryLIst.add(ownerOrderDTO);
+                OwnerMemberDTO ownerMemberDTO = ownerMemberService.selectownerMemberByOwnerOrderNo(x.getOwnerOrderNo(), false);
+                OwnerGoodsDetailDTO ownerGoodsDetail = ownerGoodsService.getOwnerGoodsDetail(x.getOwnerOrderNo(), false);
+                ownerDetailDTO.setOwnerOrderDTO(ownerOrderDTO);
+                ownerDetailDTO.setOwnerMemberDTO(ownerMemberDTO);
+                ownerDetailDTO.setOwnerGoodsDetailDTO(ownerGoodsDetail);
+                ownerDetailDTOS.add(ownerDetailDTO);
             });
         }
         OrderHistoryRespDTO orderHistoryRespDTO = new OrderHistoryRespDTO();
         orderHistoryRespDTO.orderDTO = orderDTO;
-        orderHistoryRespDTO.ownerOrderDTOHistoryLIst = ownerOrderDTOHistoryLIst;
-        orderHistoryRespDTO.renterOrderDTOHistoryList = renterOrderDTOHistoryList;
+        orderHistoryRespDTO.ownerDetailDTOS = ownerDetailDTOS;
+        orderHistoryRespDTO.renterDetailDTOS = renterDetailDTOS;
+
         return orderHistoryRespDTO;
     }
     private OrderAccountDetailRespDTO orderAccountDetailProxy(OrderDetailReqDTO orderDetailReqDTO) {
@@ -509,6 +530,23 @@ public class OrderDetailService {
             renterAdditionalDriverDTOList.add(renterAdditionalDriverDTO);
         });
 
+        //租客罚金
+        List<RenterOrderFineDeatailEntity> renterOrderFineDeatailList = renterOrderFineDeatailService.getRenterOrderFineDeatailByOwnerOrderNo(renterOrderNo);
+        List<RenterOrderFineDeatailDTO> renterOrderFineDeatailDTOS = new ArrayList<>();
+        renterOrderFineDeatailList.stream().forEach(x->{
+            RenterOrderFineDeatailDTO renterOrderFineDeatailDTO = new RenterOrderFineDeatailDTO();
+            BeanUtils.copyProperties(x,renterOrderFineDeatailDTO);
+            renterOrderFineDeatailDTOS.add(renterOrderFineDeatailDTO);
+        });
+
+        //车主罚金
+        List<OwnerOrderFineDeatailEntity> ownerOrderFineDeatailList = ownerOrderFineDeatailService.getOwnerOrderFineDeatailByOwnerOrderNo(ownerOrderNo);
+        List<OwnerOrderFineDeatailDTO> ownerOrderFineDeatailDTOS = new ArrayList<>();
+        ownerOrderFineDeatailList.stream().forEach(x->{
+            OwnerOrderFineDeatailDTO ownerOrderFineDeatailDTO = new OwnerOrderFineDeatailDTO();
+            BeanUtils.copyProperties(x,ownerOrderFineDeatailDTO);
+            ownerOrderFineDeatailDTOS.add(ownerOrderFineDeatailDTO);
+        });
 
         OrderDetailRespDTO orderDetailRespDTO = new OrderDetailRespDTO();
         orderDetailRespDTO.order = orderDTO;
@@ -532,7 +570,8 @@ public class OrderDetailService {
         orderDetailRespDTO.ownerOrderPurchaseDetailList = ownerOrderPurchaseDetailDTOList;
         orderDetailRespDTO.consoleOwnerOrderFineDetailList = consoleOwnerOrderFineDeatailDTOList;
         orderDetailRespDTO.renterAdditionalDriverList = renterAdditionalDriverDTOList;
-
+        orderDetailRespDTO.ownerOrderFineDeatailList = ownerOrderFineDeatailDTOS;
+        orderDetailRespDTO.renterOrderFineDeatailList = renterOrderFineDeatailDTOS;
         return orderDetailRespDTO;
     }
 

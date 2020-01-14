@@ -8,7 +8,9 @@ import com.atzuche.order.admin.vo.req.car.CarDepositReturnDetailListReqVO;
 import com.atzuche.order.admin.vo.resp.car.CarDepositOtherRespVO;
 import com.atzuche.order.admin.vo.resp.car.CarDepositRespVo;
 import com.atzuche.order.admin.vo.resp.car.CarDepositReturnDetailResVO;
-import com.atzuche.order.commons.entity.dto.RentCityAndRiskAccidentReqDTO;
+import com.atzuche.order.commons.entity.orderDetailDto.OrderDetailReqDTO;
+import com.atzuche.order.commons.entity.orderDetailDto.OrderStatusRespDTO;
+import com.atzuche.order.open.service.FeignOrderDetailService;
 import com.atzuche.order.open.service.FeignOrderUpdateService;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
@@ -63,13 +65,19 @@ public class CarDepositReturnDetailController {
     }
     @Autowired
     FeignOrderUpdateService feignOrderUpdateService;
+    @Autowired
+    FeignOrderDetailService feignOrderDetailService;
     @RequestMapping("test")
     public void test(){
-        RentCityAndRiskAccidentReqDTO p = new RentCityAndRiskAccidentReqDTO();
+        OrderDetailReqDTO orderDetailReqDTO = new OrderDetailReqDTO();
+        orderDetailReqDTO.setOrderNo("39270331100299");
+        ResponseData<OrderStatusRespDTO> orderStatus = feignOrderDetailService.getOrderStatus(orderDetailReqDTO);
+        System.out.println(JSON.toJSONString(orderStatus));
+       /* RentCityAndRiskAccidentReqDTO p = new RentCityAndRiskAccidentReqDTO();
         p.setOrderNo("39270331100299");
         p.setIsRiskAccident(1);
         p.setRentCity("上海");
         ResponseData<?> responseData = feignOrderUpdateService.updateRentCityAndRiskAccident(p);
-        System.out.println(JSON.toJSONString(responseData));
+        System.out.println(JSON.toJSONString(responseData));*/
     }
 }

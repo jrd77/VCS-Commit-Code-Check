@@ -368,5 +368,8 @@ public class RenterOrderFineDeatailService{
 		fineEntity.setRenterOrderNo(costBaseDTO.getRenterOrderNo());
 		return fineEntity;
 	}
-	
+
+    public List<RenterOrderFineDeatailEntity> getRenterOrderFineDeatailByOwnerOrderNo(String renterOrderNo) {
+        return renterOrderFineDeatailMapper.getRenterOrderFineDeatailByOwnerOrderNo(renterOrderNo);
+    }
 }

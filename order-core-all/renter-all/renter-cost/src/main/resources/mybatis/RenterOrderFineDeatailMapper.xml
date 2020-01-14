@@ -247,4 +247,7 @@
 		`is_delete` = 1
 		where id = #{id}
 	</update>
+    <select id="getRenterOrderFineDeatailByOwnerOrderNo" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List" /> from renter_order_fine_deatail where renter_order_no = #{renterOrderNo}
+    </select>
 </mapper>

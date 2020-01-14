@@ -1,8 +1,9 @@
 package com.atzuche.order.flow.entity;
 
+import lombok.Data;
+
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import lombok.Data;
 
 
 /**
@@ -36,7 +37,7 @@ public class OrderFlowEntity implements Serializable {
 	/**
 	 * 来源，如管理后台
 	 */
-	private String source;
+	private String source = "系统";
 	/**
 	 * 创建时间
 	 */

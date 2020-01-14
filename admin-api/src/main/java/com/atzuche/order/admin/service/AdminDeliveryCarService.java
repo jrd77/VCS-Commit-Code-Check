@@ -101,7 +101,7 @@ public class AdminDeliveryCarService {
             deliveryReqDTO.setOwnerRealGetAddrReamrk(getHandoverCarDTO.getOwnRealGetRemark());
             deliveryReqDTO.setRenterRealGetAddrReamrk(getHandoverCarDTO.getRenterRealGetAddrReamrk());
             deliveryReqDTO.setRenterGetReturnAddr(getHandoverCarDTO.getRenterRealGetAddr());
-            deliveryReqDTO.setOwnerGetReturnAddr(returnHandoverCarDTO.getOwnerRealGetAddr() );
+            deliveryReqDTO.setOwnerGetReturnAddr(getHandoverCarDTO.getOwnRealReturnAddr() );
             deliveryReqVO.setGetDeliveryReqDTO(deliveryReqDTO);
         }
         if (Objects.nonNull(returnHandoverCarDTO)) {
@@ -111,7 +111,7 @@ public class AdminDeliveryCarService {
             renterDeliveryReqDTO.setRenterRealGetAddrReamrk(returnHandoverCarDTO.getRenterRealGetRemark());
             renterDeliveryReqDTO.setOwnerRealGetAddrReamrk(returnHandoverCarDTO.getOwnerRealGetAddrReamrk());
             renterDeliveryReqDTO.setRenterGetReturnAddr(returnHandoverCarDTO.getRenterRealReturnAddr());
-            renterDeliveryReqDTO.setOwnerGetReturnAddr(getHandoverCarDTO.getOwnRealReturnAddr());
+            renterDeliveryReqDTO.setOwnerGetReturnAddr(returnHandoverCarDTO.getOwnerRealGetAddr());
             deliveryReqVO.setRenterDeliveryReqDTO(renterDeliveryReqDTO);
         }
         return deliveryReqVO;

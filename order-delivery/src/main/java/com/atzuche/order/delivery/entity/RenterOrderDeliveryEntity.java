@@ -137,6 +137,9 @@ public class RenterOrderDeliveryEntity implements Serializable {
 
 	private Integer aheadOrDelayTime;
 
+	private String renterRealGetReturnRemark;
+	private String ownerRealGetReturnRemark;
+
 
     public void setAheadOrDelayTimeInfo(Integer getMinutes, Integer returnMinutes) {
         if (Objects.isNull(getMinutes) && Objects.isNull(returnMinutes)) {

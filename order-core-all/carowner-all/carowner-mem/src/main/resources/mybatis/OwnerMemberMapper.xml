@@ -174,10 +174,11 @@
 
     <select id="queryMemNoAndPhoneByOrderList" resultMap="BaseResultMap">
         SELECT
-        mem_no,
-        phone
+            order_no,
+            mem_no,
+            phone
         FROM
-        owner_member
+            owner_member
         <where>
             order_no in
             <foreach collection="orderNos" open="(" separator="," close=")" item="orderNo">

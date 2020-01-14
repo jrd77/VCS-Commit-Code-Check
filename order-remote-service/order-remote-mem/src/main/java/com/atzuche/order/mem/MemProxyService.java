@@ -22,7 +22,6 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.swing.text.DateFormatter;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.LocalDate;
@@ -367,7 +366,7 @@ public class MemProxyService {
         renterMemberDto.setHeaderUrl(memberCoreInfo.getPortraitPath());
         renterMemberDto.setRealName(memberCoreInfo.getRealName());
         renterMemberDto.setNickName(memberCoreInfo.getNickName());
-        renterMemberDto.setCertificationTime(LocalDateTimeUtils.parseStringToLocalDate(memberAuthInfo.getDriLicFirstTime()));
+        renterMemberDto.setCertificationTime(memberAuthInfo.getDriLicFirstTime()!=null?LocalDateTimeUtils.parseStringToLocalDate(memberAuthInfo.getDriLicFirstTime()):null);
         renterMemberDto.setRentFlag(memberCoreInfo.getRentFlag());
         renterMemberDto.setFirstName(memberBaseInfo.getFirstName());
         renterMemberDto.setGender(memberBaseInfo.getGender());
