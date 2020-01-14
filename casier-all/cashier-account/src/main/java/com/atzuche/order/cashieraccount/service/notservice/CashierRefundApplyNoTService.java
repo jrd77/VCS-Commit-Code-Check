@@ -6,9 +6,11 @@ import com.atzuche.order.cashieraccount.exception.CashierRefundApplyException;
 import com.atzuche.order.cashieraccount.exception.OrderPayRefundCallBackAsnyException;
 import com.atzuche.order.cashieraccount.vo.req.CashierRefundApplyReqVO;
 import com.atzuche.order.commons.enums.cashier.CashierRefundApplyStatus;
+import com.autoyol.autopay.gateway.constant.DataPayKindConstant;
 import com.autoyol.autopay.gateway.util.MD5;
 import com.autoyol.autopay.gateway.vo.req.NotifyDataVo;
 import com.autoyol.autopay.gateway.vo.res.AutoPayResultVo;
+import com.autoyol.doc.util.StringUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import com.atzuche.order.cashieraccount.mapper.CashierRefundApplyMapper;
 
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 
@@ -63,14 +66,17 @@ public class CashierRefundApplyNoTService {
      */
     public void updateRefundDepositSuccess(AutoPayResultVo notifyDataVo) {
         //1 校验
-        CashierRefundApplyEntity cashierRefundApplyEntity = cashierRefundApplyMapper.selectRefundByQn(notifyDataVo.getMemNo(),notifyDataVo.getOrderNo(),notifyDataVo.getQn());
+        String refundIdStr = notifyDataVo.getRefundId();
+        int refundId = StringUtil.isBlank(refundIdStr)?0:Integer.valueOf(refundIdStr);
+        CashierRefundApplyEntity cashierRefundApplyEntity = cashierRefundApplyMapper.selectByPrimaryKey(refundId);
         //2 回调退款是否成功判断 TODOD
         if(Objects.nonNull(cashierRefundApplyEntity) && CashierRefundApplyStatus.RECEIVED_REFUND.getCode().equals(notifyDataVo.getTransStatus())){
             //3 更新退款成功
             CashierRefundApplyEntity cashierRefundApplyUpdate = new CashierRefundApplyEntity();
-            cashierRefundApplyUpdate.setStatus(CashierRefundApplyStatus.RECEIVED_REFUND.getCode());
+            cashierRefundApplyUpdate.setStatus(notifyDataVo.getTransStatus());
             cashierRefundApplyUpdate.setVersion(cashierRefundApplyEntity.getVersion());
             cashierRefundApplyUpdate.setId(cashierRefundApplyEntity.getId());
+            cashierRefundApplyUpdate.setRefundTime(LocalDateTime.now());
             int result = cashierRefundApplyMapper.updateByPrimaryKeySelective(cashierRefundApplyUpdate);
             if(result==0){
                 throw new OrderPayRefundCallBackAsnyException();
@@ -88,5 +94,14 @@ public class CashierRefundApplyNoTService {
         cashierRefundApplyEntity.setNum(cashierRefundApply.getNum()+1);
         cashierRefundApplyEntity.setVersion(cashierRefundApply.getVersion());
         cashierRefundApplyMapper.updateByPrimaryKeySelective(cashierRefundApplyEntity);
+    }
+
+    /**
+     *
+     * @param orderNo
+     * @return
+     */
+    public CashierRefundApplyEntity selectorderNo(String orderNo,String payKind) {
+        return cashierRefundApplyMapper.selectRefundByType(orderNo,payKind);
     }
 }
