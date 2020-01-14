@@ -1,7 +1,7 @@
 package com.atzuche.order.flow.mapper;
 
+import com.atzuche.order.commons.entity.dto.OrderFlowRequestDTO;
 import com.atzuche.order.flow.entity.OrderFlowEntity;
-import com.atzuche.order.flow.dto.req.OrderFlowRequestDTO;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;

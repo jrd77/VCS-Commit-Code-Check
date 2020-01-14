@@ -22,7 +22,7 @@ public class OrderFlowDTO implements Serializable {
 	private String source;
 
 	@AutoDocProperty(value = "创建时间")
-	private LocalDateTime createTime;
+	private String createTime;
 
 
 }
