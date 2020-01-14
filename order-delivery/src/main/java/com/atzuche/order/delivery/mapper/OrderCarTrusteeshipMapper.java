@@ -2,6 +2,7 @@ package com.atzuche.order.delivery.mapper;
 
 import com.atzuche.order.delivery.entity.OrderCarTrusteeshipEntity;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * 托管车信息表
@@ -19,5 +20,9 @@ public interface OrderCarTrusteeshipMapper{
     int updateByPrimaryKey(OrderCarTrusteeshipEntity record);
     
     int updateByPrimaryKeySelective(OrderCarTrusteeshipEntity record);
+
+    OrderCarTrusteeshipEntity selectObjectByOrderNoAndType(@Param("orderNo")String orderNo,@Param("type")String type);
+
+
 
 }

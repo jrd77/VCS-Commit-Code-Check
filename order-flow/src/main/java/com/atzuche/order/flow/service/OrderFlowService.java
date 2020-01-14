@@ -40,7 +40,7 @@ public class OrderFlowService {
         record.setOrderNo(orderNo);
         record.setOrderStatus(orderStatus.getStatus());
         record.setOrderStatusDesc(orderStatus.getDesc());
-
+        
         int reslut = orderFlowMapper.insert(record);
         LOGGER.info("Add order status change records. result is: [{}]", reslut);
     }

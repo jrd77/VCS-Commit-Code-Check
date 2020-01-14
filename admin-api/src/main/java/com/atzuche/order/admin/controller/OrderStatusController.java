@@ -73,11 +73,17 @@ public class OrderStatusController {
         }
 
         //获取订单当前状态描述
-        ResponseData<OrderStatusRespDTO> responseDataOrderStatusRespDTO = feignOrderDetailService.getOrderStatus(orderDetailReqDTO);
-        if(responseDataOrderStatusRespDTO.getResCode().equals(ErrorCode.SUCCESS.getCode())){
-            //获取当前状态
+        try{
             orderStatusListResponseVO.setStatusDescription("当前状态");
+            ResponseData<OrderStatusRespDTO> responseDataOrderStatusRespDTO = feignOrderDetailService.getOrderStatus(orderDetailReqDTO);
+            if(responseDataOrderStatusRespDTO.getResCode().equals(ErrorCode.SUCCESS.getCode())){
+                //获取当前状态
+
+            }
+        }catch (Exception e) {
+
         }
+
 
 		return ResponseData.success(orderStatusListResponseVO);
 	}
