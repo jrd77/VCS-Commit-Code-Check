@@ -235,5 +235,9 @@ public class RenterGoodsDetailDTO {
      * 行驶证到期日期(车主端用)
      */
     private LocalDateTime licenseExpire;
+    /**
+     * 年检到期日期
+     */
+    private LocalDate inspectExpire;
 
 }
