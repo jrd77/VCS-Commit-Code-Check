@@ -18,7 +18,7 @@ import java.util.Objects;
  */
 @RestController
 @RequestMapping("/api/carTrusteeship")
-public class OrderCarTrusteeshipController {
+public class OrderCarTrusteeshipInfoController {
 
     @Autowired
     OrderCarTrusteeshipService orderCarTrusteeshipService;

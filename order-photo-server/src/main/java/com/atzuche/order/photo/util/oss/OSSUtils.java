@@ -34,22 +34,22 @@ public class OSSUtils {
 	private static final String ACCESS_KEY = "6GNGlPXmKe3uKC1GQJs5avnRHuOeE2";
 	
     /** 普通bucket */
-	private static final String BUCKET = SysConf.OSS_BUCKET;
+	private static final String BUCKET = "at-images-test";
 	/** 需授权访问的 bucket */
-	private static final String BUCKET_AUTH = SysConf.OSS_BUCKET_AUTH;
+	private static final String BUCKET_AUTH = "veri-images-test";
 	/** 需授权访问的 bucket car */
-	private static final String BUCKET_CAR_AUTH = SysConf.OSS_BUCKET_CAR_AUTH;
+	private static final String BUCKET_CAR_AUTH = "veri-images-car-test";
 	
     //OSS cilent
-    private static final OSSClient client = new OSSClient(SysConf.OSS_END_POINT, ACCESS_ID, ACCESS_KEY);
+    private static final OSSClient client = new OSSClient("http://oss-cn-hangzhou.aliyuncs.com", ACCESS_ID, ACCESS_KEY);
     
 	private static MessageDigest MD5 = null;
 	
 	//----------------------------------------------------------------------------------------------------
 	
-	public static final String BUCKET_URL = "https://" + BUCKET + "." + SysConf.OSS_BASE_URL + "/";
-	public static final String BUCKET_AUTH_URL = "http://" + BUCKET_AUTH + "." + SysConf.OSS_BASE_URL + "/";
-	public static final String BUCKET_AUTH_CAR_URL = "http://" + BUCKET_CAR_AUTH + "." + SysConf.OSS_BASE_URL + "/";
+	public static final String BUCKET_URL = "https://" + BUCKET + "." + "oss-cn-hangzhou.aliyuncs.com" + "/";
+	public static final String BUCKET_AUTH_URL = "http://" + BUCKET_AUTH + "." + "oss-cn-hangzhou.aliyuncs.com" + "/";
+	public static final String BUCKET_AUTH_CAR_URL = "http://" + BUCKET_CAR_AUTH + "." + "oss-cn-hangzhou.aliyuncs.com" + "/";
 	
 	
 	/** 车辆图片 （ car/YY/MM/"carNo"/"picName" ）  */
@@ -66,7 +66,7 @@ public class OSSUtils {
 
 	private static  List<String> HEAD_IMAGE_KEY;
 
-	public static final String BUCKET_URL_NOS = "http://" + BUCKET + "." + SysConf.OSS_BASE_URL + "/";
+	public static final String BUCKET_URL_NOS = "http://" + BUCKET + "." + "oss-cn-hangzhou.aliyuncs.com" + "/";
 
     static {
     	try {
