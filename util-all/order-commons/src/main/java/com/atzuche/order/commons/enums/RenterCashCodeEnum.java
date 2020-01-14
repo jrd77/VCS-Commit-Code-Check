@@ -81,6 +81,8 @@ public enum RenterCashCodeEnum {
     CANCEL_RENT_DEPOSIT_TO_RETURN_AMT("51110012","取消租车押金退还"),
     CANCEL_RENT_WZ_DEPOSIT_TO_RETURN_AMT("51110013","取消违章押金退还"),
     CANCEL_WZ_DEPOSIT_TO_HISTORY_AMT("51110014","违章押金转历史欠款"),
+    CANCEL_RENT_COST_TO_RETURN_AMT("51110015","取消租车费用退还"),
+
     ;
 	
 	/**

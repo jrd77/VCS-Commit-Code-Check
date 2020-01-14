@@ -39,7 +39,7 @@ public class AccountDebtReceivableaDetailEntity implements Serializable {
 	/**
 	 * 收款来源编码描述
 	 */
-	private Integer sourceCode;
+	private String sourceCode;
 	/**
 	 * 收款来源编码（收银台/非收银台）
 	 */

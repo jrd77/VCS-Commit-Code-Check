@@ -21,11 +21,25 @@ public class OrderSettleController {
      * @return
      */
     @AutoDocMethod(value = "查询支付款项信息", description = "查询支付款项信息", response = String.class)
-    @PostMapping("/deposit")
+    @GetMapping("/deposit")
     public ResponseData<String> settleDeposit(@RequestParam("orderNo") String orderNo) {
         log.info("OrderSettleController settleDeposit start param [{}]", orderNo);
         orderSettleService.settleOrder(orderNo);
         log.info("CashierController getOrderPayableAmount end param [{}],result [{}]");
+        return ResponseData.success();
+    }
+
+    /**
+     * 手动车辆结算接口
+     * @param orderNo
+     * @return
+     */
+    @AutoDocMethod(value = "查询支付款项信息", description = "查询支付款项信息", response = String.class)
+    @GetMapping("/settleOrderCancel")
+    public ResponseData<String> settleOrderCancel(@RequestParam("orderNo") String orderNo) {
+        log.info("OrderSettleController settleOrderCancel start param [{}]", orderNo);
+        orderSettleService.settleOrderCancel(orderNo);
+        log.info("CashierController settleOrderCancel end param [{}],result [{}]");
         return ResponseData.success();
     }
 
