@@ -1459,6 +1459,8 @@ public class OrderSettleNoTService {
             cashierRefundApply.setFlag(RenterCashCodeEnum.ACCOUNT_RENTER_WZ_DEPOSIT.getCashNo());
             cashierRefundApply.setType(SysOrHandEnum.SYSTEM.getStatus());
             cashierRefundApply.setQn(cashierEntity.getQn());
+            cashierRefundApply.setPayKind(DataPayKindConstant.DEPOSIT);
+
             cashierService.refundWZDeposit(cashierRefundApply);
             orderStatusDTO.setWzRefundStatus(OrderRefundStatusEnum.REFUNDING.getStatus());
         }

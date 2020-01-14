@@ -24,4 +24,6 @@ public interface CashierRefundApplyMapper{
     CashierRefundApplyEntity selectRefundByQn(@Param("memNo") String menNo, @Param("orderNo")String orderNo, @Param("qn")String qn);
 
     CashierRefundApplyEntity selectRefundByMd5(@Param("memNo") String memNo, @Param("orderNo")String orderNo, @Param("payMd5")String payMd5);
+
+    CashierRefundApplyEntity selectRefundByType(@Param("orderNo")String orderNo,@Param("payKind")String payKind);
 }
