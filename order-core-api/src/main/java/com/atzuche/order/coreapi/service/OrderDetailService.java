@@ -11,6 +11,8 @@ import com.atzuche.order.accountrenterdetain.entity.AccountRenterDetainCostEntit
 import com.atzuche.order.accountrenterdetain.entity.AccountRenterDetainDetailEntity;
 import com.atzuche.order.accountrenterdetain.service.notservice.AccountRenterDetainCostNoTService;
 import com.atzuche.order.accountrenterdetain.service.notservice.AccountRenterDetainDetailNoTService;
+import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostDetailEntity;
+import com.atzuche.order.accountrenterrentcost.service.notservice.AccountRenterCostDetailNoTService;
 import com.atzuche.order.commons.OrderException;
 import com.atzuche.order.commons.entity.dto.OwnerMemberDTO;
 import com.atzuche.order.commons.entity.dto.OwnerMemberRightDTO;
@@ -49,8 +51,10 @@ import com.atzuche.order.rentercost.service.RenterOrderCostDetailService;
 import com.atzuche.order.rentercost.service.RenterOrderCostService;
 import com.atzuche.order.rentermem.service.RenterMemberService;
 import com.atzuche.order.renterorder.entity.RenterAdditionalDriverEntity;
+import com.atzuche.order.renterorder.entity.RenterDepositDetailEntity;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.atzuche.order.renterorder.service.RenterAdditionalDriverService;
+import com.atzuche.order.renterorder.service.RenterDepositDetailService;
 import com.atzuche.order.renterorder.service.RenterOrderService;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
@@ -113,6 +117,10 @@ public class OrderDetailService {
     private AccountRenterDetainDetailNoTService accountRenterDetainDetailNoTService;
     @Autowired
     private AccountRenterDetainCostNoTService accountRenterDetainCostNoTService;
+    @Autowired
+    private RenterDepositDetailService renterDepositDetailService;
+    @Autowired
+    private AccountRenterCostDetailNoTService accountRenterCostDetailNoTService;
 
     public ResponseData<OrderDetailRespDTO> orderDetail(OrderDetailReqDTO orderDetailReqDTO){
         log.info("准备获取订单详情orderDetailReqDTO={}", JSON.toJSONString(orderDetailReqDTO));
@@ -248,9 +256,21 @@ public class OrderDetailService {
     private OrderAccountDetailRespDTO orderAccountDetailProxy(OrderDetailReqDTO orderDetailReqDTO) {
         String orderNo = orderDetailReqDTO.getOrderNo();
 
+        //订单状态
+        OrderStatusEntity orderStatusEntity = orderStatusService.getByOrderNo(orderNo);
+        OrderStatusDTO orderStatusDTO = null;
+        if(orderStatusEntity != null){
+            orderStatusDTO = new OrderStatusDTO();
+            BeanUtils.copyProperties(orderStatusEntity,orderStatusDTO);
+        }
+
         //押金比例
-
-
+        RenterDepositDetailEntity renterDepositDetailEntity = renterDepositDetailService.queryByOrderNo(orderNo);
+        RenterDepositDetailDTO renterDepositDetailDTO = null;
+        if(renterDepositDetailEntity != null){
+            renterDepositDetailDTO = new RenterDepositDetailDTO();
+            BeanUtils.copyProperties(renterDepositDetailEntity,renterDepositDetailDTO);
+        }
         //租客押金
         AccountRenterDepositEntity accountRenterDepositEntity = accountRenterDepositService.selectByOrderNo(orderNo);
         AccountRenterDepositDTO accountRenterDepositDTO = null;
@@ -283,12 +303,23 @@ public class OrderDetailService {
             BeanUtils.copyProperties(x,dto);
             accountRenterDetainDetailDTOList.add(dto);
         });
+        //租车费用流水
+        List<AccountRenterCostDetailEntity> accountRenterCostDetailsByOrderNo = accountRenterCostDetailNoTService.getAccountRenterCostDetailsByOrderNo(orderNo);
+        List<AccountRenterCostDetailDTO> accountRenterCostDetailDTOList = new ArrayList<>();
+        accountRenterCostDetailsByOrderNo.stream().forEach(x->{
+            AccountRenterCostDetailDTO accountRenterCostDetailDTO = new AccountRenterCostDetailDTO();
+            BeanUtils.copyProperties(x,accountRenterCostDetailDTO);
+            accountRenterCostDetailDTOList.add(accountRenterCostDetailDTO);
+        });
 
         OrderAccountDetailRespDTO orderAccountDetailRespDTO = new OrderAccountDetailRespDTO();
+        orderAccountDetailRespDTO.orderStatusDTO = orderStatusDTO;
+        orderAccountDetailRespDTO.renterDepositDetailDTO = renterDepositDetailDTO;
         orderAccountDetailRespDTO.accountRenterDepositDetailDTOList = accountRenterDepositDetailDTOList;
         orderAccountDetailRespDTO.accountRenterDepositDTO = accountRenterDepositDTO;
         orderAccountDetailRespDTO.accountRenterDetainCostDTO = accountRenterDetainCostDTO;
         orderAccountDetailRespDTO.accountRenterDetainDetailDTOList = accountRenterDetainDetailDTOList;
+        orderAccountDetailRespDTO.accountRenterCostDetailDTOS = accountRenterCostDetailDTOList;
 
         return orderAccountDetailRespDTO;
     }

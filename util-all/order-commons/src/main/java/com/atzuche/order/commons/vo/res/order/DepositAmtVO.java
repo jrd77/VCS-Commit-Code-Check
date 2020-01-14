@@ -14,26 +14,38 @@ public class DepositAmtVO implements Serializable {
 
     private static final long serialVersionUID = -3511873737686632869L;
 
-    @AutoDocProperty(value = "车辆押金,如:2100")
-    private String depositAmt;
+    @AutoDocProperty(value = "车辆押金")
+    private Integer depositAmt;
 
-    @AutoDocProperty(value = "预计退款时间,如:2017.11.13")
-    private String refundTime;
+    @AutoDocProperty(value = "车辆押金减免金额")
+    private Integer reductionAmt;
+
+    @AutoDocProperty(value = "车辆押金减免比例")
+    private Integer reductionRate;
 
 
-    public String getDepositAmt() {
+
+    public Integer getDepositAmt() {
         return depositAmt;
     }
 
-    public void setDepositAmt(String depositAmt) {
+    public void setDepositAmt(Integer depositAmt) {
         this.depositAmt = depositAmt;
     }
 
-    public String getRefundTime() {
-        return refundTime;
+    public Integer getReductionAmt() {
+        return reductionAmt;
     }
 
-    public void setRefundTime(String refundTime) {
-        this.refundTime = refundTime;
+    public void setReductionAmt(Integer reductionAmt) {
+        this.reductionAmt = reductionAmt;
+    }
+
+    public Integer getReductionRate() {
+        return reductionRate;
+    }
+
+    public void setReductionRate(Integer reductionRate) {
+        this.reductionRate = reductionRate;
     }
 }

@@ -4,6 +4,8 @@ import com.atzuche.order.admin.exception.OrderAdminException;
 import com.atzuche.order.admin.service.car.CarService;
 import com.atzuche.order.admin.vo.req.car.CarBaseReqVO;
 import com.atzuche.order.admin.vo.resp.car.CarBusinessResVO;
+import com.atzuche.order.car.CarDetailDTO;
+import com.atzuche.order.car.CarProxyService;
 import com.autoyol.car.api.feign.api.CarDetailQueryFeignApi;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.doc.annotation.AutoDocMethod;
@@ -13,9 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
@@ -26,30 +26,30 @@ public class CarController {
 
     private  Logger logger = LoggerFactory.getLogger(getClass());
 
+//    @Autowired
+//    private CarDetailQueryFeignApi carDetailQueryFeignApi;
+//
+//    @Autowired
+//    private CarService carService;
     @Autowired
-    private CarDetailQueryFeignApi carDetailQueryFeignApi;
-
-    @Autowired
-    private CarService carService;
+    private CarProxyService carProxyService;
 
     /**
      * 老后台参考:
-     * com.autoyolConsole.controller.TransController.detail(String, String, HttpServletRequest)
-     * /autoyolConsole/src/main/webapp/WEB-INF/view/trans/detail.jsp
      */
-    @AutoDocMethod(description = "【liujun】订单详细信息-查看车辆信息-车辆运营信息", value = "【liujun】订单详细信息-查看车辆信息-车辆运营信息", response = CarBusinessResVO.class)
-    @PostMapping(value = "/car/bussiness")
-    public ResponseData <?> getCarBusiness(@Valid @RequestBody CarBaseReqVO reqVo, BindingResult bindingResult) {
+    @AutoDocMethod(description = "【liujun】订单详细信息-查看车辆信息-车辆运营信息", value = "【liujun】订单详细信息-查看车辆信息-车辆运营信息", response = CarDetailDTO.class)
+    @GetMapping(value = "console/car/detail")
+    public ResponseData <CarDetailDTO> getCarBusiness(@RequestParam("carNo")String carNo) {
         try {
-            CarBusinessResVO carBusiness = carService.getCarBusiness(reqVo.getCarNo());
+            CarDetailDTO carBusiness = carProxyService.getCarDetail(carNo);
             return ResponseData.success(carBusiness);
         } catch (OrderAdminException e) {
-            logger.error("获取车辆运营信息异常[{}]", reqVo, e);
-            Cat.logError("获取车辆运营信息异常[{" + reqVo + "}]", e);
+            logger.error("获取车辆运营信息异常[{}]", carNo, e);
+            Cat.logError("获取车辆运营信息异常[{" + carNo + "}]", e);
             return new ResponseData <>(e.getErrorCode(), e.getErrorMsg());
         } catch (Exception e) {
-            logger.error("获取车辆运营信息异常[{}]", reqVo, e);
-            Cat.logError("获取车辆运营信息异常[{" + reqVo + "}]", e);
+            logger.error("获取车辆运营信息异常[{}]", carNo, e);
+            Cat.logError("获取车辆运营信息异常[{" + carNo + "}]", e);
             return ResponseData.error();
         }
     }

@@ -1207,6 +1207,10 @@ public class ModifyOrderService {
                 modifyOrderDTO.getAbatementFlag());
 		renterOrderReqVO.setCarLat(renterGoodsDetailDTO.getCarShowLat());
 		renterOrderReqVO.setCarLon(renterGoodsDetailDTO.getCarShowLon());
+		renterOrderReqVO.setCarRealLat(renterGoodsDetailDTO.getCarRealLat());
+		renterOrderReqVO.setCarRealLon(renterGoodsDetailDTO.getCarRealLon());
+		renterOrderReqVO.setCarShowLat(renterGoodsDetailDTO.getCarShowLat());
+		renterOrderReqVO.setCarShowLon(renterGoodsDetailDTO.getCarShowLon());
 		renterOrderReqVO.setCarOwnerCouponNo(modifyOrderDTO.getCarOwnerCouponId());
 		renterOrderReqVO.setCertificationTime(renterMemberDTO.getCertificationTime());
 		renterOrderReqVO.setCityCode(orderEntity.getCityCode());
@@ -1354,9 +1358,9 @@ public class ModifyOrderService {
 		OrderDeliveryDTO returnDelivery = new OrderDeliveryDTO();
 		returnDelivery.setRentTime(modifyOrderDTO.getRentTime());
 		returnDelivery.setRevertTime(modifyOrderDTO.getRevertTime());
-		returnDelivery.setRenterGetReturnAddr(modifyOrderDTO.getGetCarAddress());
-		returnDelivery.setRenterGetReturnAddrLat(modifyOrderDTO.getGetCarLat());
-		returnDelivery.setRenterGetReturnAddrLon(modifyOrderDTO.getGetCarLon());
+		returnDelivery.setRenterGetReturnAddr(modifyOrderDTO.getRevertCarAddress());
+		returnDelivery.setRenterGetReturnAddrLat(modifyOrderDTO.getRevertCarLat());
+		returnDelivery.setRenterGetReturnAddrLon(modifyOrderDTO.getRevertCarLon());
 		returnDelivery.setOrderNo(modifyOrderDTO.getOrderNo());
 		returnDelivery.setRenterOrderNo(modifyOrderDTO.getRenterOrderNo());
 		returnDelivery.setType(SrvGetReturnEnum.SRV_RETURN_TYPE.getCode());

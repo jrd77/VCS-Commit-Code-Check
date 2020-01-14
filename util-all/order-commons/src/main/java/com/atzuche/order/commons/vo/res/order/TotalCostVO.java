@@ -14,28 +14,17 @@ public class TotalCostVO implements Serializable {
 
     private static final long serialVersionUID = 8629850469878842670L;
 
-    @AutoDocProperty(value = "费用小计(抵扣前),小计=订单总租金+订单取还车服务费+订单基础保障费+订单手续费+订单超级补充全险（若购买）,如:2100")
-    private String totalFee;
-
-    @AutoDocProperty(value = "减去钱包、优惠券抵扣项后的总费用(减去钱包、优惠券等抵扣金额后的总费用),如:2000")
-    private String reductionTotalFee;
+    @AutoDocProperty(value = "费用小计(抵扣前),小计=订单总租金+订单取还车服务费(包含超运能溢价)+订单基础保障费+订单手续费+订单超级补充全险（若购买）+附加驾驶员保障费,如:2100")
+    private Integer totalFee;
 
 
-    public String getTotalFee() {
+
+    public Integer getTotalFee() {
         return totalFee;
     }
 
-    public String getReductionTotalFee() {
-        return reductionTotalFee;
-    }
-
-    public void setTotalFee(String totalFee) {
+    public void setTotalFee(Integer totalFee) {
         this.totalFee = totalFee;
     }
-
-    public void setReductionTotalFee(String reductionTotalFee) {
-        this.reductionTotalFee = reductionTotalFee;
-    }
-
 
 }

@@ -12,6 +12,7 @@ import com.autoyol.car.api.feign.api.CarDetailQueryFeignApi;
 import com.autoyol.car.api.model.dto.OrderCarInfoParamDTO;
 import com.autoyol.car.api.model.vo.*;
 import com.autoyol.commons.web.ErrorCode;
+import com.autoyol.commons.web.ResponseData;
 import com.dianping.cat.Cat;
 import com.dianping.cat.message.Transaction;
 import lombok.Data;
@@ -45,6 +46,43 @@ public class CarProxyService {
         private boolean useSpecialPrice;
         private LocalDateTime rentTime;
         private LocalDateTime revertTime;
+    }
+
+    public CarDetailDTO getCarDetail(String carNo){
+        Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "租客商品信息");
+        ResponseObject<CarBaseVO> responseObject = null;
+        try{
+            Cat.logEvent(CatConstants.FEIGN_METHOD,"CarDetailQueryFeignApi.getCarDetail");
+            log.info("Feign 开始获取车辆信息,carNo={}", JSON.toJSONString(carNo));
+            Cat.logEvent(CatConstants.FEIGN_PARAM,JSON.toJSONString(carNo));
+            responseObject = carDetailQueryFeignApi.getCarDetailByCarNo(Integer.parseInt(carNo));
+            Cat.logEvent(CatConstants.FEIGN_RESULT,JSON.toJSONString(responseObject));
+            if(responseObject == null || !ErrorCode.SUCCESS.getCode().equals(responseObject.getResCode())){
+                log.error("Feign 获取车辆信息失败,responseObject={},carNo={}",JSON.toJSONString(responseObject),JSON.toJSONString(carNo));
+                RenterCarDetailFailException failException = new RenterCarDetailFailException();
+                Cat.logError("Feign 获取车辆信息失败",failException);
+                throw failException;
+            }
+
+            CarDetailDTO dto = new CarDetailDTO();
+            CarBaseVO baseVO = responseObject.getData();
+            log.info("baseVo is {}",baseVO);
+            BeanUtils.copyProperties(baseVO,dto);
+            log.info("dto is {}",dto);
+            t.setStatus(Transaction.SUCCESS);
+            return dto;
+        }catch (RenterCarDetailFailException e){
+            Cat.logError("Feign 获取车辆信息失败",e);
+            t.setStatus(e);
+            throw e;
+        }catch (Exception e){
+            log.error("Feign 获取车辆信息异常,responseObject={},orderCarInfoParamDTO={}",JSON.toJSONString(responseObject),JSON.toJSONString(carNo),e);
+            RenterCarDetailErrException carDetailByFeignException = new RenterCarDetailErrException();
+            Cat.logError("Feign 获取车辆信息异常",carDetailByFeignException);
+            throw carDetailByFeignException;
+        }finally {
+            t.complete();
+        }
     }
 
     //获取租客商品信息

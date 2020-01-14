@@ -10,81 +10,58 @@ import com.autoyol.doc.annotation.AutoDocProperty;
  */
 public class CostItemVO {
 
-    @AutoDocProperty(value = "费用项key值,如:车辆租金:rentAmt")
-    private String itemKey;
+    @AutoDocProperty(value = "费用项编码,如:11110003(车辆租金) 等")
+    private String costCode;
 
-    @AutoDocProperty(value = "费用项名称,如:车辆租金、上门送取服务费、基本保险费等")
-    private String itemName;
+    @AutoDocProperty(value = "费用项描述,如:车辆租金 等")
+    private String costDesc;
 
-    @AutoDocProperty(value = "费用项小i跳转url,绝对路径,如:https://www.baidu.com")
-    private String itemHintUrl;
+    @AutoDocProperty(value = "费用项单价")
+    private Integer unitPrice;
 
-    @AutoDocProperty(value = "费用项计算公式,如:40元*1.13天")
-    private String itemFormula;
+    @AutoDocProperty(value = "费用项份数")
+    private Double count;
 
-    @AutoDocProperty(value = "费用项值,如:60")
-    private String itemValue;
+    @AutoDocProperty(value = "费用项总金额")
+    private Integer totalAmount;
 
-    @AutoDocProperty(value = "费用项类型,1:普通项,2:有开关按钮")
-    private String itemType;
-
-    @AutoDocProperty(value = "开关是否打开,itemType为2时才有,0:关闭,1:打开")
-    private String itemButtonValue;
-
-
-    public String getItemKey() {
-        return itemKey;
+    public String getCostCode() {
+        return costCode;
     }
 
-    public void setItemKey(String itemKey) {
-        this.itemKey = itemKey;
+    public void setCostCode(String costCode) {
+        this.costCode = costCode;
     }
 
-    public String getItemName() {
-        return itemName;
+    public String getCostDesc() {
+        return costDesc;
     }
 
-    public void setItemName(String itemName) {
-        this.itemName = itemName;
+    public void setCostDesc(String costDesc) {
+        this.costDesc = costDesc;
     }
 
-    public String getItemHintUrl() {
-        return itemHintUrl;
+    public Integer getUnitPrice() {
+        return unitPrice;
     }
 
-    public void setItemHintUrl(String itemHintUrl) {
-        this.itemHintUrl = itemHintUrl;
+    public void setUnitPrice(Integer unitPrice) {
+        this.unitPrice = unitPrice;
     }
 
-    public String getItemFormula() {
-        return itemFormula;
+    public Double getCount() {
+        return count;
     }
 
-    public void setItemFormula(String itemFormula) {
-        this.itemFormula = itemFormula;
+    public void setCount(Double count) {
+        this.count = count;
     }
 
-    public String getItemValue() {
-        return itemValue;
+    public Integer getTotalAmount() {
+        return totalAmount;
     }
 
-    public void setItemValue(String itemValue) {
-        this.itemValue = itemValue;
-    }
-
-    public String getItemType() {
-        return itemType;
-    }
-
-    public void setItemType(String itemType) {
-        this.itemType = itemType;
-    }
-
-    public String getItemButtonValue() {
-        return itemButtonValue;
-    }
-
-    public void setItemButtonValue(String itemButtonValue) {
-        this.itemButtonValue = itemButtonValue;
+    public void setTotalAmount(Integer totalAmount) {
+        this.totalAmount = totalAmount;
     }
 }

@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-@FeignClient(name = "order-center-api")
+@FeignClient(url="http://10.0.3.235:1412",name = "order-center-api")
 public interface FeignOrderUpdateService {
     /*
      * @Author ZhangBin

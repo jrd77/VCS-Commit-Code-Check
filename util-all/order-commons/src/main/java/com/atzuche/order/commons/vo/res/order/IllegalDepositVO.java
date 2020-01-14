@@ -14,25 +14,15 @@ public class IllegalDepositVO implements Serializable {
 
     private static final long serialVersionUID = 5262006441699646228L;
 
-    @AutoDocProperty(value = "违章押金,如:2100")
-    private String illegalDepositAmt;
+    @AutoDocProperty(value = "违章押金")
+    private Integer illegalDepositAmt;
 
-    @AutoDocProperty(value = "预计退款时间,如:2017.11.13")
-    private String refundTime;
-
-    public String getIllegalDepositAmt() {
+    public Integer getIllegalDepositAmt() {
         return illegalDepositAmt;
     }
 
-    public void setIllegalDepositAmt(String illegalDepositAmt) {
+    public void setIllegalDepositAmt(Integer illegalDepositAmt) {
         this.illegalDepositAmt = illegalDepositAmt;
     }
 
-    public String getRefundTime() {
-        return refundTime;
-    }
-
-    public void setRefundTime(String refundTime) {
-        this.refundTime = refundTime;
-    }
 }

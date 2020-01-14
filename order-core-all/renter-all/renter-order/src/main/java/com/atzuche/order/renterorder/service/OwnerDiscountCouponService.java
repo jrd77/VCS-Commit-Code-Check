@@ -3,6 +3,8 @@ package com.atzuche.order.renterorder.service;
 import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.CatConstants;
 import com.atzuche.order.renterorder.vo.owner.OwnerCouponGetAndValidResultVO;
+import com.atzuche.order.renterorder.vo.owner.OwnerCouponListResult;
+import com.atzuche.order.renterorder.vo.owner.OwnerDiscountCouponVO;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
 import com.dianping.cat.Cat;
@@ -16,7 +18,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -107,9 +111,9 @@ public class OwnerDiscountCouponService {
         params.put("renterFirstName", renterFirstName);
         params.put("renterSex", renterSex);
 
-        Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL,"车主券服务");
+        Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "车主券服务");
         try {
-            Cat.logEvent(CatConstants.FEIGN_METHOD,"ownerCoupon/trans/req");
+            Cat.logEvent(CatConstants.FEIGN_METHOD, "ownerCoupon/trans/req");
             Cat.logEvent(CatConstants.FEIGN_PARAM, JSON.toJSONString(params));
             String json = restTemplate.postForObject(ownerCouponUrl + "/ownerCoupon/trans/req", params, String.class);
             logger.info("ownerCoupon/trans/req. result is:[{}]", json);
@@ -125,7 +129,7 @@ public class OwnerDiscountCouponService {
             }
         } catch (Exception e) {
             logger.info("bindCoupon error . url:[{}],params:[{}]", ownerCouponUrl + "/ownerCoupon/trans/req", params, e);
-            Cat.logError("下单绑定车主券失败. url:/ownerCoupon/trans/req,params:"+JSON.toJSONString(params), e);
+            Cat.logError("下单绑定车主券失败. url:/ownerCoupon/trans/req,params:" + JSON.toJSONString(params), e);
             t.setStatus(e);
         } finally {
             t.complete();
@@ -139,7 +143,7 @@ public class OwnerDiscountCouponService {
      *
      * @param orderNo  订单号
      * @param couponNo 车主券券编码
-     * @param recover 标识
+     * @param recover  标识
      * @return boolean true:撤销成功 false:撤销失败
      */
     public boolean undoCoupon(String orderNo, String couponNo, String recover) {
@@ -149,10 +153,16 @@ public class OwnerDiscountCouponService {
         params.put("orderNo", orderNo);
         params.put("couponNo", couponNo);
         params.put("recover", recover);
+
+        Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "车主券服务");
         try {
+            Cat.logEvent(CatConstants.FEIGN_METHOD, "ownerCoupon/trans/cancel");
+            Cat.logEvent(CatConstants.FEIGN_PARAM, JSON.toJSONString(params));
             String json = restTemplate.postForObject(ownerCouponUrl + "/ownerCoupon/trans/cancel",
                     params, String.class);
-            logger.info("ownerCoupon/trans/cancel. result is {}", json);
+            logger.info("ownerCoupon/trans/cancel. result is:[{}]", json);
+            Cat.logEvent(CatConstants.FEIGN_RESULT, json);
+            t.setStatus(Transaction.SUCCESS);
             if (StringUtils.isNotBlank(json)) {
                 ResponseData responseData = new Gson().fromJson(json, ResponseData.class);
                 if (null != responseData) {
@@ -165,8 +175,60 @@ public class OwnerDiscountCouponService {
         } catch (Exception e) {
             logger.info("undoCoupon error. url:[{}],params:[{}]", ownerCouponUrl + "/ownerCoupon/trans/cancel",
                     params, e);
+            Cat.logError("获订单已使用车主券撤销操作. url:/ownerCoupon/trans/cancel,params:" + JSON.toJSONString(params), e);
+            t.setStatus(e);
+        } finally {
+            t.complete();
         }
         return false;
+    }
+
+
+    /**
+     * 获取租客名下可用车主券列表 <BR>
+     *
+     * @param rentAmt  租金
+     * @param memNo    租客会员号
+     * @param carNo    车辆注册号
+     * @param couponNo 车主券券编码（选中则传否为空）
+     * @return List<OwnerDiscountCoupon>
+     */
+    public List<OwnerDiscountCouponVO> getCouponList(Integer rentAmt, Integer memNo, Integer carNo, String couponNo) {
+        logger.info(
+                "Get a list of available vehicle owners' coupons under the tenant's name,param is: rentAmt:[{}], memNo:[{}] carNo:[{}], couponNo:[{}]",
+                rentAmt, memNo, carNo, couponNo);
+
+        StringBuilder url = new StringBuilder("ownerCoupon/orderOwnerCoupon?");
+        url.append("rented=").append(rentAmt);
+        url.append("&memNo=").append(memNo);
+        url.append("&carNo=").append(carNo);
+        if (StringUtils.isNotEmpty(couponNo)) {
+            url.append("&couponNo=").append(couponNo);
+        }
+        String urlStr = ownerCouponUrl + "/" + url.toString();
+        Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "车主券服务");
+        try {
+            Cat.logEvent(CatConstants.FEIGN_METHOD, "ownerCoupon/orderOwnerCoupon");
+            Cat.logEvent(CatConstants.FEIGN_PARAM, urlStr);
+            String json = restTemplate.getForObject(urlStr, String.class);
+            logger.info("ownerCoupon/orderOwnerCoupon. result is :[{}]", json);
+            Cat.logEvent(CatConstants.FEIGN_RESULT, json);
+            t.setStatus(Transaction.SUCCESS);
+            if (null != json) {
+                OwnerCouponListResult result = new Gson().fromJson(json, OwnerCouponListResult.class);
+                if (null != result.getData()) {
+                    return result.getData().getOwnerCouponDTOList();
+                }
+            }
+        } catch (Exception e) {
+            logger.info("getCouponList error . params is,urlStr:[{}]", urlStr, e);
+            Cat.logError("获取租客名下可用车主券列表. url:/ownerCoupon/orderOwnerCoupon,params:" + urlStr, e);
+            t.setStatus(e);
+        } finally {
+            t.complete();
+        }
+
+        return new ArrayList<>();
     }
 
 }

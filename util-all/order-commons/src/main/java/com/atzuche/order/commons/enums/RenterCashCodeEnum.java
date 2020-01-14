@@ -51,7 +51,7 @@ public enum RenterCashCodeEnum {
     ACCOUNT_OWNER_SETTLE_OIL_COST("21110020","车主油费"),
 
 
-
+    ACCOUNT_RENTER_DETAIN_CAR_AMT("21110021","暂扣的租车费用"),
 
 
 

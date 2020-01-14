@@ -60,10 +60,10 @@ public class DeliveryCarService {
         int getMinute = getMinutes == null ? 0 : getMinutes;
         int returnMinute = returnMinutes == null ? 0 : returnMinutes;
         if (orderReqContext.getOrderReqVO().getSrvReturnFlag().intValue() == UsedDeliveryTypeEnum.USED.getValue().intValue()) {
-            addRenYunFlowOrderInfo(getMinute, returnMinute, orderReqContext, UserTypeEnum.OWNER_TYPE.getValue());
+            addRenYunFlowOrderInfo(getMinute, returnMinute, orderReqContext, UserTypeEnum.OWNER_TYPE.getValue().intValue());
         }
         if (orderReqContext.getOrderReqVO().getSrvGetFlag().intValue() == UsedDeliveryTypeEnum.USED.getValue().intValue()) {
-            addRenYunFlowOrderInfo(getMinute, returnMinute, orderReqContext, UserTypeEnum.RENTER_TYPE.getValue());
+            addRenYunFlowOrderInfo(getMinute, returnMinute, orderReqContext, UserTypeEnum.RENTER_TYPE.getValue().intValue());
         }
     }
 
@@ -168,6 +168,7 @@ public class DeliveryCarService {
                 lastOrderDeliveryEntity.setIsDelete(1);
                 renterOrderDeliveryService.updateDeliveryByPrimaryKey(lastOrderDeliveryEntity);
                 CommonUtil.copyPropertiesIgnoreNull(orderDeliveryEntity, lastOrderDeliveryEntity);
+                lastOrderDeliveryEntity.setIsDelete(0);
                 lastOrderDeliveryEntity.setStatus(2);
                 renterOrderDeliveryService.insert(lastOrderDeliveryEntity);
             }
@@ -218,7 +219,9 @@ public class DeliveryCarService {
         handoverCarInfoDTO.setRealReturnAddrLat(orderDeliveryEntity.getRenterGetReturnAddrLat());
         handoverCarInfoDTO.setRealReturnAddrLon(orderDeliveryEntity.getRenterGetReturnAddrLon());
         handoverCarVO.setHandoverCarInfoDTO(handoverCarInfoDTO);
+        handoverCarInfoDTO.setType(orderDeliveryEntity.getType().intValue() == 1 ? 3: 4);
         handoverCarService.addHandoverCarInfo(handoverCarVO, userType);
+
     }
 
     /**
@@ -273,8 +276,7 @@ public class DeliveryCarService {
         orderDeliveryDTO.setRentTime(renterGoodsDetailDTO.getRentTime());
         orderDeliveryDTO.setRevertTime(renterGoodsDetailDTO.getRevertTime());
         orderDeliveryDTO.setType(orderType);
-        orderDeliveryDTO.setParamsTypeValue(orderReqVO, orderType, ownerMemberDTO, renterMemberDTO);
-
+        orderDeliveryDTO.setParamsTypeValue(orderReqVO, orderType);
 
         orderDeliveryFlowEntity.setRenterOrderNo(renterGoodsDetailDTO.getRenterOrderNo());
         orderDeliveryFlowEntity.setOrderNo(renterGoodsDetailDTO.getOrderNo());
@@ -302,6 +304,11 @@ public class DeliveryCarService {
         orderDeliveryFlowEntity.setUpdateTime(LocalDateTime.now());
         orderDeliveryFlowEntity.setDisplacement(String.valueOf(ownerGoodsDetailDTO.getCarCylinderCapacity()));
         orderDeliveryFlowEntity.setSource(orderReqVO.getSource());
+        orderDeliveryFlowEntity.setDayMileage(String.valueOf(renterGoodsDetailDTO.getCarDayMileage()));
+        orderDeliveryFlowEntity.setTankCapacity(String.valueOf(renterGoodsDetailDTO.getCarOilVolume()));
+        orderDeliveryFlowEntity.setOwnerGetAddr(renterGoodsDetailDTO.getCarRealAddr());
+        orderDeliveryFlowEntity.setOwnerReturnAddr(orderReqVO.getSrvGetAddr());
+
         orderDeliveryVO.setOrderDeliveryDTO(orderDeliveryDTO);
         orderDeliveryVO.setRenterDeliveryAddrDTO(renterDeliveryAddrDTO);
         orderDeliveryVO.setOrderDeliveryFlowEntity(orderDeliveryFlowEntity);
@@ -343,7 +350,10 @@ public class DeliveryCarService {
         renYunFlowOrderDTO.setCarno(orderDeliveryFlowEntity.getCarNo());
         renYunFlowOrderDTO.setVehicletype(orderDeliveryFlowEntity.getVehicleType());
         renYunFlowOrderDTO.setVehiclemodel(orderDeliveryFlowEntity.getVehicleModel());
-
+        renYunFlowOrderDTO.setDayMileage(orderDeliveryFlowEntity.getDayMileage());
+        renYunFlowOrderDTO.setTankCapacity(orderDeliveryFlowEntity.getTankCapacity());
+        renYunFlowOrderDTO.setOwnerReturnAddr(orderDeliveryFlowEntity.getOwnerReturnAddr());
+        renYunFlowOrderDTO.setOwnerGetAddr(orderDeliveryFlowEntity.getOwnerGetAddr());
         return renYunFlowOrderDTO;
     }
 

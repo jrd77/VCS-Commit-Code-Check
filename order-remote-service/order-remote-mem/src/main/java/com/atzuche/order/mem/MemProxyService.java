@@ -22,7 +22,11 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.swing.text.DateFormatter;
 import java.text.SimpleDateFormat;
+import java.time.Duration;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -101,7 +105,7 @@ public class MemProxyService {
 //        dto.setLabelTagList(convertLabelList(memberRoleInfo.));
         dto.setAdditionalDrivers(memberAdditionInfo.getCommUseDriverList());
         dto.setRegTimeTxt(convertTime(memberCoreInfo.getRegTime()));
-        dto.setDriveAge(memberAuthInfo.getDriLicFirstTime());//TODO
+        dto.setDriveAge(convertAge(memberAuthInfo.getDriLicFirstTime()));
         dto.setBuyTimes(String.valueOf(memberStatisticsInfo.getSuccessOrderNum()));
         dto.setUpgrades("0");
 
@@ -109,8 +113,22 @@ public class MemProxyService {
         return dto;
     }
 
+    private String convertAge(String driLicFirstTime) {
+        if(driLicFirstTime==null){
+            return "0";
+        }else{
+            try{
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+                LocalDate date = LocalDate.parse(driLicFirstTime,formatter);
+                return String.valueOf(Duration.between(LocalDate.now(),date).toDays()/365f);
+            }catch (Exception e){
+                return "0";
+            }
+        }
+    }
+
     private String convertTime(Date regTime) {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy年MM月dd日HH:mm:ss");
         return dateFormat.format(regTime);
     }
 

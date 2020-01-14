@@ -1,9 +1,11 @@
 package com.atzuche.order.commons.entity.orderDetailDto;
 import lombok.Data;
+import lombok.ToString;
 
 import java.util.List;
 
 @Data
+@ToString
 public class OrderDetailRespDTO {
     public OrderDTO order;
     public RenterOrderDTO renterOrder;
