@@ -16,5 +16,8 @@ public class CancelOrderVO {
 
     @AutoDocProperty(value = "取消方编码，1-租客，2-车主")
     @NotBlank(message = "取消方编码不能为空")
-    private Integer cancelSrcCode;
+    private String cancelSrcCode;
+
+    @AutoDocProperty(value = "取消原因")
+    private String cancelReason;
 }
