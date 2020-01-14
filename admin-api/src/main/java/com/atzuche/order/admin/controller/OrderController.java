@@ -4,7 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.atzuche.order.admin.service.AdminOrderService;
 import com.atzuche.order.admin.vo.req.order.CancelOrderByPlatVO;
 import com.atzuche.order.admin.vo.req.order.CancelOrderVO;
-import com.atzuche.order.admin.vo.req.order.OrderModifyTimeVO;
+import com.atzuche.order.commons.vo.req.ModifyOrderReqVO;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.doc.annotation.AutoDocGroup;
@@ -40,10 +40,15 @@ public class OrderController {
     @AutoDocGroup(group = "订单修改")
     @AutoDocMethod(description = "修改订单", value = "修改订单",response = ResponseData.class)
     @RequestMapping(value="console/order/modifyTime",method = RequestMethod.POST)
-    public ResponseData modifyOrderTime(@RequestBody OrderModifyTimeVO orderModifyTimeVO,
-                                        HttpServletRequest request, HttpServletResponse response)throws Exception{
-        //TODO:
-        return null;
+    public ResponseData modifyOrder(@RequestBody ModifyOrderReqVO modifyOrderReqVO, BindingResult bindingResult)throws Exception{
+        log.info("车辆押金信息-modifyOrderReqVO={}", JSON.toJSONString(modifyOrderReqVO));
+        if (bindingResult.hasErrors()) {
+            Optional<FieldError> error = bindingResult.getFieldErrors().stream().findFirst();
+            return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), error.isPresent() ?
+                    error.get().getDefaultMessage() : ErrorCode.INPUT_ERROR.getText());
+        }
+        ResponseData responseData = adminOrderService.modifyOrder(modifyOrderReqVO);
+        return responseData;
     }
 
     @AutoDocVersion(version = "订单修改")
