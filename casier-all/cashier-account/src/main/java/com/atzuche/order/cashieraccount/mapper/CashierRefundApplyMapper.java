@@ -21,6 +21,7 @@ public interface CashierRefundApplyMapper{
     
     int updateByPrimaryKeySelective(CashierRefundApplyEntity record);
 
-    CashierRefundApplyEntity selectRefundByQn(@Param("menNo") String menNo, @Param("orderNo")String orderNo, @Param("qn")String qn);
+    CashierRefundApplyEntity selectRefundByQn(@Param("memNo") String menNo, @Param("orderNo")String orderNo, @Param("qn")String qn);
 
+    CashierRefundApplyEntity selectRefundByMd5(@Param("memNo") String memNo, @Param("orderNo")String orderNo, @Param("payMd5")String payMd5);
 }

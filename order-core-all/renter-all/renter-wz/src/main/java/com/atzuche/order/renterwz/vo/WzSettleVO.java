@@ -21,9 +21,4 @@ public class WzSettleVO {
      */
     private Boolean canSettle;
 
-    /**
-     * 是否有违章
-     */
-    private Boolean hasIllegal;
-
 }

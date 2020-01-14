@@ -234,7 +234,7 @@ public class SubmitOrderService {
         String renterNo = orderReqVO.getMemNo();
         //车主会员号
         String ownerNo = ownerGoodsDetailDTO.getMemNo();
-        renterOrderWzStatusService.createInfo(orderNo,ownerGoodsDetailDTO.getCarPlateNum(),operator,renterNo, ownerNo);
+        renterOrderWzStatusService.createInfo(orderNo,ownerGoodsDetailDTO.getCarPlateNum(),operator,renterNo, ownerNo,String.valueOf(ownerGoodsDetailDTO.getCarNo()));
         //6.主订单相关信息处理
         ParentOrderDTO parentOrderDTO = new ParentOrderDTO();
         //6.1主订单信息处理
