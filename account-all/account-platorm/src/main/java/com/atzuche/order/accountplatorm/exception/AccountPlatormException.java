@@ -8,7 +8,6 @@ import lombok.EqualsAndHashCode;
 /**
  * 结算平台收益补贴出错
  */
-@Data
 @EqualsAndHashCode(callSuper = false)
 public class AccountPlatormException extends OrderException {
     public AccountPlatormException() {

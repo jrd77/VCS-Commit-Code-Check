@@ -40,8 +40,6 @@ public class CarOwnerInfoController {
     @Autowired
     private CarProxyService carProxyService;
 
-    @Autowired
-    private FeignOrderFlowService feignOrderDetailService;
 
     @AutoDocMethod(description = "查看车主信息接口信息", value = "查看车主信息接口信息", response = CarOwnerInfoRespVO.class)
     @GetMapping(value = "/info")
@@ -58,11 +56,6 @@ public class CarOwnerInfoController {
         respVO.setOwnerNo(orderRenterInfoDTO.getMemNo());
         respVO.setProvince(orderRenterInfoDTO.getProvince());
 
-        OrderFlowRequestDTO reqDTO = new OrderFlowRequestDTO();
-        reqDTO.setOrderNo("86943331100299");
-        ResponseData<OrderFlowListResponseDTO> result = feignOrderDetailService.selectOrderFlowList(reqDTO);
-
-        logger.info("feign is {}",result.getResMsg());
 
         //TODO:车主等级
         return ResponseData.success(respVO);

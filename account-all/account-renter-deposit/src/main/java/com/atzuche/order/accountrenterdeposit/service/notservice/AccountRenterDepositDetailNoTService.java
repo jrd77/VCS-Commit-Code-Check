@@ -7,6 +7,7 @@ import com.atzuche.order.accountrenterdeposit.vo.req.DetainRenterDepositReqVO;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.util.List;
 
@@ -66,5 +67,19 @@ public class AccountRenterDepositDetailNoTService {
      */
     public List<AccountRenterDepositDetailEntity> findByOrderNo(String orderNo){
         return accountRenterDepositDetailMapper.findByOrderNo(orderNo);
+    }
+
+    /**
+     *
+     * @param orderNo
+     * @param renterMemNo
+     * @return
+     */
+    public int getRentDeposit(String orderNo, String renterMemNo) {
+        List<AccountRenterDepositDetailEntity> list = findByOrderNo(orderNo);
+        if(CollectionUtils.isEmpty(list)){
+            return 0;
+        }
+        return list.stream().mapToInt(AccountRenterDepositDetailEntity::getAmt).sum();
     }
 }

@@ -28,7 +28,7 @@ public class AccountDeductDebtReqVO {
     /**
      * 来源编码描述
      */
-    private Integer sourceCode;
+    private String sourceCode;
     /**
      * 来源编码（收银台/非收银台）
      */
@@ -62,7 +62,7 @@ public class AccountDeductDebtReqVO {
     public void check() {
         Assert.notNull(getMemNo(), ErrorCode.PARAMETER_ERROR.getText());
         Assert.notNull(getAmt(), ErrorCode.PARAMETER_ERROR.getText());
-        Assert.isTrue(getAmt()==0, ErrorCode.PARAMETER_ERROR.getText());
+        Assert.isTrue(getAmt()!=0, ErrorCode.PARAMETER_ERROR.getText());
         Assert.notNull(getSourceCode(), ErrorCode.PARAMETER_ERROR.getText());
     }
 }
