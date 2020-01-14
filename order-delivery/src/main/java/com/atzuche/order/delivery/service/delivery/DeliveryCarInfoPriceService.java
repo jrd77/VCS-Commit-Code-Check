@@ -71,7 +71,7 @@ public class DeliveryCarInfoPriceService {
 
 
     /**
-     * 根据子订单号获取油费
+     * 根据订单号获取油费
      * 燃料类型 1：92号汽油、2：95号汽油、3：0号柴油、4：纯电动、5: 98号汽油
      * @param orderNo
      * @return
