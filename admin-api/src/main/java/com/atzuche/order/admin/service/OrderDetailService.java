@@ -26,7 +26,7 @@ public class OrderDetailService {
     public ResponseData<OrderHistoryRespDTO> listOrderHistory(String orderNo){
         OrderHistoryReqDTO orderHistoryReqDTO = new OrderHistoryReqDTO();
         orderHistoryReqDTO.setOrderNo(orderNo);
-        orderHistoryReqDTO.setIsNeedOwnerOrderHistory(true);
+        orderHistoryReqDTO.setIsNeedRenterOrderHistory(true);
         orderHistoryReqDTO.setIsNeedOwnerOrderHistory(true);
         ResponseData<OrderHistoryRespDTO> responseObject = null;
         Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "获取历史订单列表");
