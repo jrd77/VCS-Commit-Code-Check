@@ -12,6 +12,7 @@ import com.atzuche.order.cashieraccount.vo.res.pay.OrderPayCallBackSuccessVO;
 import com.atzuche.order.commons.enums.OrderPayStatusEnum;
 import com.atzuche.order.commons.enums.OrderStatusEnum;
 import com.atzuche.order.commons.enums.RenterCashCodeEnum;
+import com.atzuche.order.commons.enums.YesNoEnum;
 import com.atzuche.order.commons.enums.cashier.TransStatusEnum;
 import com.atzuche.order.commons.service.OrderPayCallBack;
 import com.atzuche.order.flow.service.OrderFlowService;
@@ -514,6 +515,7 @@ public class CashierService {
             //2 收银台记录更新
             cashierNoTService.updataCashierAndRenterCost(notifyDataVo,accountRenterCostReq);
             vo.setRentCarPayStatus(OrderPayStatusEnum.PAYED.getStatus());
+            vo.setIsPayAgain(YesNoEnum.YES.getCode());
         }
 
         //TODO 支付回调成功 push/或者短信 怎么处理
