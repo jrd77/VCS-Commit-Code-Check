@@ -12,7 +12,7 @@ public enum YesNoEnum {
     /**
      * code
      */
-    private int code;
+    private Integer code;
     /**
      * msg
      */
