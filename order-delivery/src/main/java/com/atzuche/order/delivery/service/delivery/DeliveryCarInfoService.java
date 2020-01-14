@@ -202,43 +202,6 @@ public class DeliveryCarInfoService {
         return deliveryCarVO;
     }
 
-//
-//    /**
-//     * 获取车主租客取送车信息
-//     *
-//     * @param ownerGetAndReturnCarDTO
-//     * @param HandoverCarInfoEntities
-//     * @return
-//     */
-//    public OwnerGetAndReturnCarDTO createOwnerGetAndReturnCarDTO(OwnerGetAndReturnCarDTO ownerGetAndReturnCarDTO, List<OwnerHandoverCarInfoEntity> HandoverCarInfoEntities,Integer carEngineType,String cityCode) {
-//        for (OwnerHandoverCarInfoEntity ownerHandoverCarInfoEntity : HandoverCarInfoEntities) {
-//            if (Objects.isNull(ownerHandoverCarInfoEntity.getType())) {
-//                continue;
-//            }
-//            if (ownerHandoverCarInfoEntity.getType().intValue() == RenterHandoverCarTypeEnum.RENYUN_TO_RENTER.getValue().intValue()) {
-//                ownerGetAndReturnCarDTO.setGetCarOil(String.valueOf(ownerHandoverCarInfoEntity.getOilNum()));
-//                ownerGetAndReturnCarDTO.setGetKM(String.valueOf(ownerHandoverCarInfoEntity.getMileageNum()));
-//                ownerGetAndReturnCarDTO.setRealGetTime(String.valueOf(ownerHandoverCarInfoEntity.getRealReturnTime()));
-//            } else {
-//                ownerGetAndReturnCarDTO.setReturnCarOil(String.valueOf(ownerHandoverCarInfoEntity.getOilNum()));
-//                ownerGetAndReturnCarDTO.setReturnKM(String.valueOf(ownerHandoverCarInfoEntity.getMileageNum()));
-//                ownerGetAndReturnCarDTO.setRealReturnTime(String.valueOf(ownerHandoverCarInfoEntity.getRealReturnTime()));
-//            }
-//        }
-//        //行驶里程
-//        try {
-//            String ownerDrivingKM = String.valueOf(Math.abs(Integer.valueOf(ownerGetAndReturnCarDTO.getGetKM())) - Math.abs(Integer.valueOf(ownerGetAndReturnCarDTO.getReturnKM())));
-//            int oilDifference = Math.abs(Integer.valueOf(ownerGetAndReturnCarDTO.getGetCarOil())) - Math.abs(Integer.valueOf(ownerGetAndReturnCarDTO.getReturnCarOil()));
-//            ownerGetAndReturnCarDTO.setDrivingKM(ownerDrivingKM);
-//            ownerGetAndReturnCarDTO.setOilDifference(String.valueOf(oilDifference));
-//            ownerGetAndReturnCarDTO.setOilDifferenceCrash(String.valueOf(MathUtil.mul(oilDifference, deliveryCarInfoPriceService.getOilPriceByCityCodeAndType(Integer.valueOf(cityCode), carEngineType))));
-//        }catch (Exception e)
-//        {
-//            log.error("设置参数失败,目前没有值");
-//        }
-//        return ownerGetAndReturnCarDTO;
-//    }
-
 
     /**
      * 获取取车相关数据

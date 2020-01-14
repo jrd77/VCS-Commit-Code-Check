@@ -73,13 +73,13 @@ public class DeliveryCarInfoPriceService {
     /**
      * 根据子订单号获取油费
      * 燃料类型 1：92号汽油、2：95号汽油、3：0号柴油、4：纯电动、5: 98号汽油
-     * @param renterOrderNo
+     * @param orderNo
      * @return
      */
-    public DeliveryOilCostVO getOilCostByRenterOrderNo(String renterOrderNo, Integer carEngineType) {
-        List<OwnerHandoverCarInfoEntity> ownerHandoverCarInfoEntities = ownerHandoverCarService.selectOwnerHandoverCarByOrderNo(renterOrderNo);
-        List<RenterHandoverCarInfoEntity> renterHandoverCarInfoEntities = renterHandoverCarService.selectRenterHandoverCarByOrderNo(renterOrderNo);
-        List<RenterOrderDeliveryEntity> renterOrderDeliveryEntityList = renterOrderDeliveryService.selectByRenterOrderNo(renterOrderNo);
+    public DeliveryOilCostVO getOilCostByRenterOrderNo(String orderNo, Integer carEngineType) {
+        List<OwnerHandoverCarInfoEntity> ownerHandoverCarInfoEntities = ownerHandoverCarService.selectOwnerByOrderNo(orderNo);
+        List<RenterHandoverCarInfoEntity> renterHandoverCarInfoEntities = renterHandoverCarService.selectRenterByOrderNo(orderNo);
+        List<RenterOrderDeliveryEntity> renterOrderDeliveryEntityList = renterOrderDeliveryService.findRenterOrderListByOrderNo(orderNo);
         if (CollectionUtils.isEmpty(renterOrderDeliveryEntityList)) {
             throw new DeliveryOrderException(DeliveryErrorCode.DELIVERY_PARAMS_ERROR.getValue(), "没有找到该笔配送订单");
         }
