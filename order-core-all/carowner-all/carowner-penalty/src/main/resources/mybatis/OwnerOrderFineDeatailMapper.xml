@@ -196,5 +196,8 @@
 		    </set>
 		where id = #{id}
 	</update>
-  	
+    <select id="getOwnerOrderFineDeatailByOwnerOrderNo" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List" /> from owner_order_fine_deatail where owner_order_no = #{ownerOrderNo} and is_delete = 0
+    </select>
+
 </mapper>

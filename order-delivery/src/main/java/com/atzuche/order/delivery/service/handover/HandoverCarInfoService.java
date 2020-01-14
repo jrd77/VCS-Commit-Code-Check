@@ -117,10 +117,12 @@ public class HandoverCarInfoService {
         if (deliveryReqVO.getGetDeliveryReqDTO() != null) {
             deliveryReqDTO = deliveryReqVO.getGetDeliveryReqDTO();
             updateDeliveryCarInfoByUsed(deliveryReqDTO, 1);
+            //更新取车备注信息
         }
         if (deliveryReqVO.getRenterDeliveryReqDTO() != null) {
             deliveryReqDTO = deliveryReqVO.getRenterDeliveryReqDTO();
             updateDeliveryCarInfoByUsed(deliveryReqDTO, 2);
+            //更新还车备注信息
         }
     }
 
@@ -154,21 +156,23 @@ public class HandoverCarInfoService {
         UpdateFlowOrderDTO updateFlowOrderDTO = new UpdateFlowOrderDTO();
         RenterDeliveryAddrDTO renterDeliveryAddrDTO = new RenterDeliveryAddrDTO();
         orderDeliveryDTO.setType(type);
-        orderDeliveryDTO.setRenterGetReturnAddr(deliveryReqDTO.getRenterRealGetAddr());
-        orderDeliveryDTO.setOwnerGetReturnAddr(deliveryReqDTO.getOwnRealReturnAddr());
+        orderDeliveryDTO.setRenterGetReturnAddr(deliveryReqDTO.getRenterGetReturnAddr());
+        orderDeliveryDTO.setOwnerGetReturnAddr(deliveryReqDTO.getOwnerGetReturnAddr());
         orderDeliveryDTO.setOrderNo(renterOrderDeliveryEntity.getOrderNo());
         orderDeliveryDTO.setRenterOrderNo(renterOrderDeliveryEntity.getRenterOrderNo());
-        renterDeliveryAddrDTO.setExpGetCarAddr(deliveryReqDTO.getRenterRealGetAddr());
+        orderDeliveryDTO.setOwnerRealGetReturnRemark(deliveryReqDTO.getOwnerRealGetAddrReamrk());
+        orderDeliveryDTO.setRenterRealGetReturnRemark(deliveryReqDTO.getRenterRealGetAddrReamrk());
+        renterDeliveryAddrDTO.setExpGetCarAddr(deliveryReqDTO.getRenterGetReturnAddr());
         renterDeliveryAddrDTO.setOrderNo(renterOrderDeliveryEntity.getOrderNo());
         renterDeliveryAddrDTO.setRenterOrderNo(renterOrderDeliveryEntity.getRenterOrderNo());
-        renterDeliveryAddrDTO.setExpReturnCarAddr(deliveryReqDTO.getOwnRealReturnAddr());
-        renterDeliveryAddrDTO.setActReturnCarAddr(deliveryReqDTO.getOwnRealReturnAddr());
-        renterDeliveryAddrDTO.setActGetCarAddr(deliveryReqDTO.getRenterRealGetAddr());
+        renterDeliveryAddrDTO.setExpReturnCarAddr(deliveryReqDTO.getOwnerGetReturnAddr());
+        renterDeliveryAddrDTO.setActReturnCarAddr(deliveryReqDTO.getOwnerGetReturnAddr());
+        renterDeliveryAddrDTO.setActGetCarAddr(deliveryReqDTO.getRenterGetReturnAddr());
         updateFlowOrderDTO.setOrdernumber(deliveryReqDTO.getOrderNo());
         updateFlowOrderDTO.setServicetype(type == 1 ? "take" : "back");
         updateFlowOrderDTO.setChangetype("ownerAddr");
-        updateFlowOrderDTO.setNewpickupcaraddr(deliveryReqDTO.getRenterRealGetAddr());
-        updateFlowOrderDTO.setNewalsocaraddr(deliveryReqDTO.getOwnRealReturnAddr());
+        updateFlowOrderDTO.setNewpickupcaraddr(deliveryReqDTO.getRenterGetReturnAddr());
+        updateFlowOrderDTO.setNewalsocaraddr(deliveryReqDTO.getOwnerGetReturnAddr());
         return UpdateOrderDeliveryVO.builder().orderDeliveryDTO(orderDeliveryDTO).renterDeliveryAddrDTO(renterDeliveryAddrDTO).updateFlowOrderDTO(updateFlowOrderDTO).build();
     }
 }

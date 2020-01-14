@@ -1207,6 +1207,10 @@ public class ModifyOrderService {
                 modifyOrderDTO.getAbatementFlag());
 		renterOrderReqVO.setCarLat(renterGoodsDetailDTO.getCarShowLat());
 		renterOrderReqVO.setCarLon(renterGoodsDetailDTO.getCarShowLon());
+		renterOrderReqVO.setCarRealLat(renterGoodsDetailDTO.getCarRealLat());
+		renterOrderReqVO.setCarRealLon(renterGoodsDetailDTO.getCarRealLon());
+		renterOrderReqVO.setCarShowLat(renterGoodsDetailDTO.getCarShowLat());
+		renterOrderReqVO.setCarShowLon(renterGoodsDetailDTO.getCarShowLon());
 		renterOrderReqVO.setCarOwnerCouponNo(modifyOrderDTO.getCarOwnerCouponId());
 		renterOrderReqVO.setCertificationTime(renterMemberDTO.getCertificationTime());
 		renterOrderReqVO.setCityCode(orderEntity.getCityCode());

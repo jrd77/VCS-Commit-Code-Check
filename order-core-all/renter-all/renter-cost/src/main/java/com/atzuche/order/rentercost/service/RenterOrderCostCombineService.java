@@ -644,9 +644,9 @@ public class RenterOrderCostCombineService {
         // 还车纬度
         String srvReturnLat = getReturnCarCostReqDto.getSrvReturnLat();
         // 车辆经度
-        String carLon = getReturnCarCostReqDto.getCarRealLon();
+        String carLon = getReturnCarCostReqDto.getCarShowLon();
         // 车辆纬度
-        String carLat = getReturnCarCostReqDto.getCarRealLat();
+        String carLat = getReturnCarCostReqDto.getCarShowLat();
         boolean getFlag = StringUtils.isBlank(srvGetLon) || StringUtils.isBlank(srvGetLat) || "0.0".equalsIgnoreCase(srvGetLon) || "0.0".equalsIgnoreCase(srvGetLat);
         boolean returnFlag = StringUtils.isBlank(srvReturnLon) || StringUtils.isBlank(srvReturnLat) || "0.0".equalsIgnoreCase(srvReturnLon) || "0.0".equalsIgnoreCase(srvReturnLat);
         CityDTO cityDTO = null;
@@ -1114,7 +1114,7 @@ public class RenterOrderCostCombineService {
             log.info("Feign 获取取还车超出运能附加金额入参:[{}]",JSON.toJSONString(reqParam));
             Cat.logEvent(CatConstants.FEIGN_METHOD,"FetchBackCarFeeFeignService.getPriceCarHumanFeeRuleConfig");
             Cat.logEvent(CatConstants.FEIGN_PARAM,JSON.toJSONString(reqParam));
-            responseData = fetchBackCarFeeFeignService.getPriceCarHumanFeeRuleConfig(reqParam);
+            responseData = fetchBackCarFeeFeignService.getPriceCarHumanFeeRuleConfig(String.valueOf(cityCode),String.valueOf(LocalDateTimeUtils.localDateTimeToLong(LocalDateTime.now())));
             log.info("Feign 获取取还车超出运能附加金额结果:[{}],获取取还车超出运能附加金额入参:[{}]",JSON.toJSONString(responseData),JSON.toJSONString(reqParam));
             if(responseData == null || responseData.getResCode()==null){
                 GetReturnOverCostFailException fail = new GetReturnOverCostFailException();
@@ -1123,6 +1123,7 @@ public class RenterOrderCostCombineService {
             Cat.logEvent(CatConstants.FEIGN_RESULT,JSON.toJSONString(responseData));
             t.setStatus(Transaction.SUCCESS);
         }catch (GetReturnCostFailException e){
+            log.error("Feign 获取取还车超出运能附加金额失败",e);
             Cat.logError("Feign 获取取还车超出运能附加金额失败！", e);
             t.setStatus(e);
             throw e;
@@ -1136,7 +1137,6 @@ public class RenterOrderCostCombineService {
             return responseData.getData().getHumanFee().intValue();
         }
         try {
-           // return Integer.valueOf(apolloCostConfig.getGetReturnOverTransportFee());
             return getReturnOverTransportFee;
         } catch (Exception e) {
             log.error("获取取还车超运能溢价默认值异常：", e);

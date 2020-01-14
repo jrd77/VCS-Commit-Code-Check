@@ -25,6 +25,18 @@ public class AccountRenterDepositDetailNoTService {
 
     /**
      * 新增车辆押金 流水记录
+     * @param accountRenterDepositDetailEntity
+     */
+    public int insertRenterDepositDetailEntity(AccountRenterDepositDetailEntity accountRenterDepositDetailEntity) {
+        int result = accountRenterDepositDetailMapper.insertSelective(accountRenterDepositDetailEntity);
+        if(result==0){
+            throw new PayOrderRenterDepositDBException();
+        }
+        return accountRenterDepositDetailEntity.getId();
+    }
+
+    /**
+     * 新增车辆押金 流水记录
      * @param detainRenterDeposit
      */
     public int insertRenterDepositDetail(DetainRenterDepositReqVO detainRenterDeposit) {

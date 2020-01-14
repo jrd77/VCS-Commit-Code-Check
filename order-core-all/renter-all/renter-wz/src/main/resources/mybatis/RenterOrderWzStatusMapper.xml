@@ -25,6 +25,8 @@
 		insert into renter_order_wz_status(
 			order_no,
 			car_plate_num,
+			renter_no,
+			owner_no,
 			status,
 			status_desc,
 			create_op,
@@ -33,6 +35,8 @@
 		) values (
 			#{orderNo},
 			#{carPlateNum},
+			#{renterNo},
+			#{ownerNo},
 			#{status},
 			#{statusDesc},
 			#{createOp},
@@ -52,7 +56,7 @@
 
 	<update id="updateTransIllegalStatus">
 		UPDATE renter_order_wz_status
-		SET wz_dispose_status=#{status},
+		SET status=#{status},
 		status_desc = #{statusDesc},
 		<if test="status == 40">
 			management_mode = 2,

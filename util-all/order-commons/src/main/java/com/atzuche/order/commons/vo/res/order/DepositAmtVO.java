@@ -17,6 +17,13 @@ public class DepositAmtVO implements Serializable {
     @AutoDocProperty(value = "车辆押金")
     private Integer depositAmt;
 
+    @AutoDocProperty(value = "车辆押金减免金额")
+    private Integer reductionAmt;
+
+    @AutoDocProperty(value = "车辆押金减免比例")
+    private Integer reductionRate;
+
+
 
     public Integer getDepositAmt() {
         return depositAmt;
@@ -26,4 +33,19 @@ public class DepositAmtVO implements Serializable {
         this.depositAmt = depositAmt;
     }
 
+    public Integer getReductionAmt() {
+        return reductionAmt;
+    }
+
+    public void setReductionAmt(Integer reductionAmt) {
+        this.reductionAmt = reductionAmt;
+    }
+
+    public Integer getReductionRate() {
+        return reductionRate;
+    }
+
+    public void setReductionRate(Integer reductionRate) {
+        this.reductionRate = reductionRate;
+    }
 }

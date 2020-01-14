@@ -176,6 +176,10 @@
         select <include refid="Base_Column_List" /> from cashier where pay_md5 = #{payMd5} limit 1
 
     </select>
+    <select id="getPayAmtByPayKinds" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List" /> from cashier where order_no = #{orderNo} and mem_no = #{memNo} and pay_kind = #{payKind} order by id desc
+
+    </select>
 
 
 </mapper>
