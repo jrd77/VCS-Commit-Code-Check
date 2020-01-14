@@ -59,7 +59,7 @@ public class CashierDeductDebtReqVO {
     public void check() {
         Assert.notNull(getMemNo(), ErrorCode.PARAMETER_ERROR.getText());
         Assert.notNull(getAmt(), ErrorCode.PARAMETER_ERROR.getText());
-        Assert.isTrue(getAmt()==0, ErrorCode.PARAMETER_ERROR.getText());
+        Assert.isTrue(getAmt()!=0, ErrorCode.PARAMETER_ERROR.getText());
         Assert.notNull(getRenterCashCodeEnum(), ErrorCode.PARAMETER_ERROR.getText());
     }
 }
