@@ -71,6 +71,15 @@ public class RenterOrderService {
     public RenterOrderEntity getRenterOrderByOrderNoAndIsEffective(String orderNo) {
         return renterOrderMapper.getRenterOrderByOrderNoAndIsEffective(orderNo);
     }
+    
+    /**
+     * 获取全部的租客子单
+     * @param orderNo
+     * @return
+     */
+    public List<RenterOrderEntity> queryRenterOrderByOrderNo(String orderNo) {
+        return renterOrderMapper.queryRenterOrderByOrderNo(orderNo);
+    }
 
 
     /**

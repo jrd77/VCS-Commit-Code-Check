@@ -8,6 +8,10 @@ import com.atzuche.order.admin.vo.req.car.CarDepositReturnDetailListReqVO;
 import com.atzuche.order.admin.vo.resp.car.CarDepositOtherRespVO;
 import com.atzuche.order.admin.vo.resp.car.CarDepositRespVo;
 import com.atzuche.order.admin.vo.resp.car.CarDepositReturnDetailResVO;
+import com.atzuche.order.commons.entity.orderDetailDto.OrderDetailReqDTO;
+import com.atzuche.order.commons.entity.orderDetailDto.OrderStatusRespDTO;
+import com.atzuche.order.open.service.FeignOrderDetailService;
+import com.atzuche.order.open.service.FeignOrderUpdateService;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.doc.annotation.AutoDocMethod;
@@ -16,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
@@ -28,7 +33,7 @@ public class CarDepositReturnDetailController {
     private CarDepositReturnDetailService carDepositReturnDetailService;
 
     @AutoDocMethod(description = "【liujun】车辆押金信息", value = "车辆押金信息", response = CarDepositRespVo.class)
-    @GetMapping(value = "/car/deposit/return/detail/baseInfo")
+    @GetMapping(value = "/console/deposit/getCarDepositReturnDetail")
     public ResponseData<CarDepositRespVo> getCarDepositReturnDetail(@Valid CarDepositReqVO reqVo, BindingResult bindingResult) {
         log.info("车辆押金信息-reqVo={}", JSON.toJSONString(reqVo));
         if (bindingResult.hasErrors()) {
@@ -39,23 +44,40 @@ public class CarDepositReturnDetailController {
     }
 
     @AutoDocMethod(description = "【liujun】车辆押金暂扣处理", value = "车辆押金暂扣处理", response = CarDepositOtherRespVO.class)
-    @GetMapping(value = "/car/deposit/return/detail/otherInfo")
+    @GetMapping(value = "/console/deposit/return/detail/otherInfo")
     public ResponseData <?> getCarDepositReturnDetailOtherInfo(@Valid CarDepositOtherReqVO reqVo, BindingResult bindingResult) {
 
         return null;
     }
 
     @AutoDocMethod(description = "【liujun】车辆押金返还处理列表", value = "车辆押金返还处理列表", response = CarDepositReturnDetailResVO.class)
-    @GetMapping(value = "/car/deposit/return/detail/list")
+    @GetMapping(value = "/console/deposit/return/detail/list")
     public ResponseData <?> getCarDepositReturnDetail(@Valid CarDepositReturnDetailListReqVO reqVo, BindingResult bindingResult) {
 
         return null;
     }
 
     @AutoDocMethod(description = "【liujun】保存车辆押金返还处理", value = "保存车辆押金返还处理", response = ResponseData.class)
-    @GetMapping(value = "/save/car/deposit/return/detail/baseInfo")
+    @GetMapping(value = "/console/deposit/return/detail/save")
     public ResponseData <?> saveCarDepositReturnDetail(@Valid CarDepositReturnDetailResVO reqVo, BindingResult bindingResult) {
 
         return null;
+    }
+    @Autowired
+    FeignOrderUpdateService feignOrderUpdateService;
+    @Autowired
+    FeignOrderDetailService feignOrderDetailService;
+    @RequestMapping("test")
+    public void test(){
+        OrderDetailReqDTO orderDetailReqDTO = new OrderDetailReqDTO();
+        orderDetailReqDTO.setOrderNo("39270331100299");
+        ResponseData<OrderStatusRespDTO> orderStatus = feignOrderDetailService.getOrderStatus(orderDetailReqDTO);
+        System.out.println(JSON.toJSONString(orderStatus));
+       /* RentCityAndRiskAccidentReqDTO p = new RentCityAndRiskAccidentReqDTO();
+        p.setOrderNo("39270331100299");
+        p.setIsRiskAccident(1);
+        p.setRentCity("上海");
+        ResponseData<?> responseData = feignOrderUpdateService.updateRentCityAndRiskAccident(p);
+        System.out.println(JSON.toJSONString(responseData));*/
     }
 }

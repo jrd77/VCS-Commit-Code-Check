@@ -37,13 +37,13 @@ public class OwnerHandoverCarService implements IUpdateHandoverCarInfo {
     public void updateHandoverCarOilMileageNum(HandoverCarInfoReqDTO handoverCarInfoReqDTO) {
         OwnerHandoverCarInfoEntity ownerHandoverCarReturnInfoEntity = selectObjectByOrderNo(handoverCarInfoReqDTO.getOrderNo(), RenterHandoverCarTypeEnum.RENTER_TO_RENYUN.getValue());
         if(Objects.nonNull(ownerHandoverCarReturnInfoEntity)) {
-            ownerHandoverCarReturnInfoEntity.setOilNum(Integer.valueOf(handoverCarInfoReqDTO.getRenterReturnOil()));
+            ownerHandoverCarReturnInfoEntity.setOilNum(Integer.valueOf(handoverCarInfoReqDTO.getOwnReturnOil()));
             ownerHandoverCarReturnInfoEntity.setMileageNum(Integer.valueOf(handoverCarInfoReqDTO.getOwnReturnKM()));
             updateOwnerHandoverInfoByPrimaryKey(ownerHandoverCarReturnInfoEntity);
         }
         OwnerHandoverCarInfoEntity ownerHandoverCarGetInfoEntity = selectObjectByOrderNo(handoverCarInfoReqDTO.getOrderNo(), RenterHandoverCarTypeEnum.RENYUN_TO_RENTER.getValue());
         if(Objects.nonNull(ownerHandoverCarGetInfoEntity)) {
-            ownerHandoverCarGetInfoEntity.setOilNum(Integer.valueOf(handoverCarInfoReqDTO.getOwnReturnOil()));
+            ownerHandoverCarGetInfoEntity.setOilNum(Integer.valueOf(handoverCarInfoReqDTO.getRenterReturnOil()));
             ownerHandoverCarGetInfoEntity.setMileageNum(Integer.valueOf(handoverCarInfoReqDTO.getRenterRetrunKM()));
             updateOwnerHandoverInfoByPrimaryKey(ownerHandoverCarGetInfoEntity);
         }

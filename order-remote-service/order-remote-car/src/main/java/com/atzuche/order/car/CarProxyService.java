@@ -21,6 +21,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -45,6 +46,43 @@ public class CarProxyService {
         private boolean useSpecialPrice;
         private LocalDateTime rentTime;
         private LocalDateTime revertTime;
+    }
+
+    public CarDetailDTO getCarDetail(String carNo){
+        Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "租客商品信息");
+        ResponseObject<CarBaseVO> responseObject = null;
+        try{
+            Cat.logEvent(CatConstants.FEIGN_METHOD,"CarDetailQueryFeignApi.getCarDetail");
+            log.info("Feign 开始获取车辆信息,carNo={}", JSON.toJSONString(carNo));
+            Cat.logEvent(CatConstants.FEIGN_PARAM,JSON.toJSONString(carNo));
+            responseObject = carDetailQueryFeignApi.getCarDetailByCarNo(Integer.parseInt(carNo));
+            Cat.logEvent(CatConstants.FEIGN_RESULT,JSON.toJSONString(responseObject));
+            if(responseObject == null || !ErrorCode.SUCCESS.getCode().equals(responseObject.getResCode())){
+                log.error("Feign 获取车辆信息失败,responseObject={},carNo={}",JSON.toJSONString(responseObject),JSON.toJSONString(carNo));
+                RenterCarDetailFailException failException = new RenterCarDetailFailException();
+                Cat.logError("Feign 获取车辆信息失败",failException);
+                throw failException;
+            }
+
+            CarDetailDTO dto = new CarDetailDTO();
+            CarBaseVO baseVO = responseObject.getData();
+            log.info("baseVo is {}",baseVO);
+            BeanUtils.copyProperties(baseVO,dto);
+            log.info("dto is {}",dto);
+            t.setStatus(Transaction.SUCCESS);
+            return dto;
+        }catch (RenterCarDetailFailException e){
+            Cat.logError("Feign 获取车辆信息失败",e);
+            t.setStatus(e);
+            throw e;
+        }catch (Exception e){
+            log.error("Feign 获取车辆信息异常,responseObject={},orderCarInfoParamDTO={}",JSON.toJSONString(responseObject),JSON.toJSONString(carNo),e);
+            RenterCarDetailErrException carDetailByFeignException = new RenterCarDetailErrException();
+            Cat.logError("Feign 获取车辆信息异常",carDetailByFeignException);
+            throw carDetailByFeignException;
+        }finally {
+            t.complete();
+        }
     }
 
     //获取租客商品信息
@@ -197,5 +235,8 @@ public class CarProxyService {
         return coverPic;
     }
 
-
+    public static void main(String[] args) {
+        LocalDate localDate = LocalDateTimeUtils.parseStringToLocalDate("2012-06-21");
+        System.out.println(localDate);
+    }
 }

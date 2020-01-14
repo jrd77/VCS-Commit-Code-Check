@@ -1,7 +1,5 @@
 package com.atzuche.order.delivery.vo.delivery;
 
-import com.atzuche.order.commons.entity.dto.OwnerMemberDTO;
-import com.atzuche.order.commons.entity.dto.RenterMemberDTO;
 import com.atzuche.order.commons.vo.req.OrderReqVO;
 import com.atzuche.order.delivery.enums.UsedDeliveryTypeEnum;
 import lombok.Data;
@@ -121,6 +119,10 @@ public class OrderDeliveryDTO {
      * 提前或延后时间(取车:提前时间, 还车：延后时间)
      */
     private Integer aheadOrDelayTime;
+
+    private String renterRealGetReturnRemark;
+
+    private String ownerRealGetReturnRemark;
 
     /**
      * 设置信息参数

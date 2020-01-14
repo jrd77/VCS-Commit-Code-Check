@@ -27,4 +27,5 @@ public interface OwnerOrderFineDeatailMapper{
     
     int updateByPrimaryKeySelective(OwnerOrderFineDeatailEntity record);
 
+    List<OwnerOrderFineDeatailEntity> getOwnerOrderFineDeatailByOwnerOrderNo(@Param("ownerOrderNo")String ownerOrderNo);
 }

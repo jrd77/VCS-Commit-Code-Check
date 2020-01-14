@@ -155,7 +155,7 @@
     </select>
 
 	<select id="getIllegalSettleFlag" resultType="java.lang.Integer">
-        select settle_flag from trans_illegal_settle_flag where order_no=#{orderNo} and car_plate_num = #{carNum} and is_delete = 0
+        select settle_flag from renter_order_wz_settle_flag where order_no=#{orderNo} and car_plate_num = #{carNum} and is_delete = 0
     </select>
 
 	<update id="updateIsIllegalCost">

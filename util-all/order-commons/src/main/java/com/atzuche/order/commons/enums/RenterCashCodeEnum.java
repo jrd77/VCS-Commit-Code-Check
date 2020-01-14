@@ -51,7 +51,7 @@ public enum RenterCashCodeEnum {
     ACCOUNT_OWNER_SETTLE_OIL_COST("21110020","车主油费"),
 
 
-
+    ACCOUNT_RENTER_DETAIN_CAR_AMT("21110021","暂扣的租车费用"),
 
 
 
@@ -74,8 +74,13 @@ public enum RenterCashCodeEnum {
     SETTLE_RENT_DEPOSIT_TO_RETURN_AMT("51110005","结算租车押金退还"),
     SETTLE_OWNER_INCOME_TO_HISTORY_AMT("51110006","车主收益转历史欠款"),
     HISTORY_AMT("51110007","历史欠款"),
-
-
+    SETTLE_RENT_COST_TO_FINE("51110008","租车费用转罚金"),
+    SETTLE_RENT_WALLET_COST_TO_FINE("51110009","租车费用钱包转罚金"),
+    SETTLE_RENT_DEPOSIT_COST_TO_FINE("51110010","车辆押金转罚金"),
+    SETTLE_RENT_WZ_DEPOSIT_COST_TO_FINE("51110011","违章押金转罚金"),
+    CANCEL_RENT_DEPOSIT_TO_RETURN_AMT("51110012","取消租车押金退还"),
+    CANCEL_RENT_WZ_DEPOSIT_TO_RETURN_AMT("51110013","取消违章押金退还"),
+    CANCEL_WZ_DEPOSIT_TO_HISTORY_AMT("51110014","违章押金转历史欠款"),
     ;
 	
 	/**

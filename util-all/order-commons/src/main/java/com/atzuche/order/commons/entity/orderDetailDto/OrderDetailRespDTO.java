@@ -1,9 +1,11 @@
 package com.atzuche.order.commons.entity.orderDetailDto;
 import lombok.Data;
+import lombok.ToString;
 
 import java.util.List;
 
 @Data
+@ToString
 public class OrderDetailRespDTO {
     public OrderDTO order;
     public RenterOrderDTO renterOrder;
@@ -27,4 +29,7 @@ public class OrderDetailRespDTO {
     public List<OwnerOrderPurchaseDetailDTO> ownerOrderPurchaseDetailList;
     public List<ConsoleOwnerOrderFineDeatailDTO> consoleOwnerOrderFineDetailList;
     public List<RenterAdditionalDriverDTO> renterAdditionalDriverList;
+    public List<OwnerOrderFineDeatailDTO> ownerOrderFineDeatailList;
+    public List<RenterOrderFineDeatailDTO> renterOrderFineDeatailList;
+
 }

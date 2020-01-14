@@ -219,7 +219,9 @@ public class DeliveryCarService {
         handoverCarInfoDTO.setRealReturnAddrLat(orderDeliveryEntity.getRenterGetReturnAddrLat());
         handoverCarInfoDTO.setRealReturnAddrLon(orderDeliveryEntity.getRenterGetReturnAddrLon());
         handoverCarVO.setHandoverCarInfoDTO(handoverCarInfoDTO);
+        handoverCarInfoDTO.setType(orderDeliveryEntity.getType().intValue() == 1 ? 3: 4);
         handoverCarService.addHandoverCarInfo(handoverCarVO, userType);
+
     }
 
     /**
@@ -306,7 +308,6 @@ public class DeliveryCarService {
         orderDeliveryFlowEntity.setTankCapacity(String.valueOf(renterGoodsDetailDTO.getCarOilVolume()));
         orderDeliveryFlowEntity.setOwnerGetAddr(renterGoodsDetailDTO.getCarRealAddr());
         orderDeliveryFlowEntity.setOwnerReturnAddr(orderReqVO.getSrvGetAddr());
-
 
         orderDeliveryVO.setOrderDeliveryDTO(orderDeliveryDTO);
         orderDeliveryVO.setRenterDeliveryAddrDTO(renterDeliveryAddrDTO);

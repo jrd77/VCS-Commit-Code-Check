@@ -78,6 +78,10 @@ public enum ErrorCode {
     RELEASE_STOCK_FAIL("700114","释放库存失败"),
 
     ORDER_QUERY_FAIL("700115","获取订单失败"),
+
+    ADMIN_CAR_DEPOSIT_QUERY_FAIL("700116","车辆押金"),
+    ADMIN_ORDER_CANCEL_ERR("700117","取消订单异常"),
+    ADMIN_ORDER_CANCEL_FAIL("700118","取消订单失败"),
     ;
 
     private String code;
