@@ -61,4 +61,8 @@ public class RenterOrderWzDetailService {
         Integer count = renterOrderWzDetailMapper.queryIllegalCountByCarNoAndOrders(orders,carNo);
         return count == null ? 0 : count;
     }
+
+    public List<RenterOrderWzDetailEntity> findTransIllegalDetailByOrderNo(String orderNo) {
+        return renterOrderWzDetailMapper.findTransIllegalDetailByOrderNo(orderNo);
+    }
 }

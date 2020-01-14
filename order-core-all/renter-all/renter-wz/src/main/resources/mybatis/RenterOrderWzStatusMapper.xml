@@ -123,7 +123,7 @@
 	</update>
 
 	<select id="queryIllegalOrderListByMemNo" resultMap="selectColumnMap">
-		select * from renter_order_wz_status where (t.owner_no = #{memNo} OR t.renter_no = #{memNo}) AND t.illegal_query = 4 AND t.status in (5,10,25,26,40,50,51,52) and is_delete = 0
+		select * from renter_order_wz_status where (owner_no = #{memNo} OR renter_no = #{memNo}) AND illegal_query = 4 AND status in (5,10,25,26,40,50,51,52) and is_delete = 0
 	</select>
 
 </mapper>
