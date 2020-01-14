@@ -18,6 +18,12 @@ public class WalletReductionVO implements Serializable {
     private Integer walletBal;
 
 
+    public WalletReductionVO() {
+    }
+
+    public WalletReductionVO(Integer walletBal) {
+        this.walletBal = walletBal;
+    }
 
     public Integer getWalletBal() {
         return walletBal;

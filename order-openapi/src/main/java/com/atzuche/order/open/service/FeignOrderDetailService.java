@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 //@FeignClient(name = "order-center-api")
-@FeignClient(url = "http://localhost:1412" ,name="order-center-api")
+@FeignClient(url = "http://10.0.3.235:1412" ,name="order-center-api")
 public interface FeignOrderDetailService {
     /*
      * @Author ZhangBin
@@ -32,7 +32,7 @@ public interface FeignOrderDetailService {
     /*
      * @Author ZhangBin
      * @Date 2020/1/13 16:47
-     * @Description: 获取历史订单列表
+     * @Description:  获取历史订单列表
      *
      **/
     @RequestMapping(method = RequestMethod.POST, value = "/order/detail/childHistory")

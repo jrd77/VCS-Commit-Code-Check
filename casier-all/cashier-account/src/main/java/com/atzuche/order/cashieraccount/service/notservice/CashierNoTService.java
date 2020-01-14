@@ -496,18 +496,23 @@ public class CashierNoTService {
     public RefundVo getRefundVo(CashierRefundApplyEntity cashierRefundApply) {
         RefundVo refundVo = new RefundVo();
         BeanUtils.copyProperties(cashierRefundApply,refundVo);
+        refundVo.setRefundId(cashierRefundApply.getId().toString());
         refundVo.setPayType(DataPayTypeConstant.PUR_RETURN);
         refundVo.setReqIp(IpUtil.getLocalIp());
         refundVo.setPaySn(String.valueOf(cashierRefundApply.getNum()+1));
         refundVo.setExtendParams(GsonUtils.toJson(cashierRefundApply));
         refundVo.setAtpaySign(StringUtils.EMPTY);
+        refundVo.setPayEnv(env);
+        refundVo.setInternalNo("1");
+        refundVo.setReqOs("IOS");
+        refundVo.setRefundAmt(String.valueOf(Math.abs(cashierRefundApply.getAmt())));
         String payMd5 =  MD5.MD5Encode(FasterJsonUtil.toJson(refundVo));
         refundVo.setPayMd5(payMd5);
         String reqContent = FasterJsonUtil.toJson(refundVo);
         //TODO 签名串
         String sign = StringUtils.EMPTY;
         try {
-            sign = RSASecurityUtils.privateKeySignature(PublicKeySignConstants.AUTO_TRANS_PUBLIC_KEY,reqContent);
+            sign =RSASecurityUtils.privateKeySignature(AESUtil.keySign,reqContent);
         } catch (Exception e) {
             log.error("refundOrderPay 支付验签数据失败 ，param ;[{}],e:[{}]",FasterJsonUtil.toJson(refundVo),e);
             throw new OrderPaySignParamException();
