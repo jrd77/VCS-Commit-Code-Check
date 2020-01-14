@@ -243,6 +243,8 @@ public class OrderDetailService {
                 RenterOrderDTO renterOrderDTO = new RenterOrderDTO();
                 BeanUtils.copyProperties(x,renterOrderDTO);
                 renterOrderDTOHistoryList.add(renterOrderDTO);
+
+
             });
         }
         //车主历史订单
@@ -253,12 +255,14 @@ public class OrderDetailService {
                 OwnerOrderDTO ownerOrderDTO = new OwnerOrderDTO();
                 BeanUtils.copyProperties(x,ownerOrderDTO);
                 ownerOrderDTOHistoryLIst.add(ownerOrderDTO);
+                //获取商品
+                //
             });
         }
         OrderHistoryRespDTO orderHistoryRespDTO = new OrderHistoryRespDTO();
         orderHistoryRespDTO.orderDTO = orderDTO;
-        orderHistoryRespDTO.ownerOrderDTOHistoryLIst = ownerOrderDTOHistoryLIst;
-        orderHistoryRespDTO.renterOrderDTOHistoryList = renterOrderDTOHistoryList;
+
+
         return orderHistoryRespDTO;
     }
     private OrderAccountDetailRespDTO orderAccountDetailProxy(OrderDetailReqDTO orderDetailReqDTO) {
