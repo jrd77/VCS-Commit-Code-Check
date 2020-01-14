@@ -124,27 +124,11 @@ public class RenterOrderWzCostDetailService {
         }
         List<RenterOrderWzSettleFlagEntity> settleInfos = renterOrderWzSettleFlagService.getIllegalSettleInfosByOrderNo(orderNo);
         //过滤未结算和结算失败的
-        if(CollectionUtils.isEmpty(settleInfos)){
-            settleInfos = settleInfos.stream().filter(Objects::nonNull).filter(dto->dto.getSettleFlag() != null).filter(dto->dto.getSettleFlag().equals(0) || dto.getSettleFlag().equals(2)).collect(Collectors.toList());
+        if(!CollectionUtils.isEmpty(settleInfos)){
+            rs.setAmount(String.valueOf(totalAmount));
         }else{
-            //没数据 说明没查询过  不能结算
             rs.setCanSettle(false);
             return rs;
-        }
-        if(CollectionUtils.isEmpty(settleInfos)){
-            List<RenterOrderWzSettleFlagEntity> noNotices = settleInfos.stream().filter(Objects::nonNull).filter(dto -> dto.getHasIllegal() != null).filter(dto -> dto.getHasIllegal().equals(1)).collect(Collectors.toList());
-            if(!CollectionUtils.isEmpty(noNotices)){
-                //有数据 说明有未查询的违章的数据  不能结算
-                rs.setCanSettle(false);
-                return rs;
-            }
-            List<RenterOrderWzSettleFlagEntity> hasIllegals = settleInfos.stream().filter(Objects::nonNull).filter(dto -> dto.getHasIllegal() != null).filter(dto -> dto.getHasIllegal().equals(2)).collect(Collectors.toList());
-            if(CollectionUtils.isEmpty(hasIllegals)){
-                rs.setHasIllegal(true);
-                rs.setAmount(String.valueOf(totalAmount));
-            }else {
-                rs.setHasIllegal(false);
-            }
         }
         return rs;
     }
