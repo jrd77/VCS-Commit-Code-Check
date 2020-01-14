@@ -29,4 +29,6 @@ public interface OrderStatusMapper{
     List<String> queryOrderNoByStartTimeAndEndTime(@Param("startTime") Date startTime,@Param("endTime") Date endTime);
 
     int updateRenterOrderByOrderNo(OrderStatusEntity orderStatusEntity);
+
+    Integer getStatusByOrderNo(@Param("orderNo") String orderNo);
 }

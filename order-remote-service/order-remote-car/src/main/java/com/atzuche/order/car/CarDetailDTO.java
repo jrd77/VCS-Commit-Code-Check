@@ -111,4 +111,12 @@ public class CarDetailDTO {
     @AutoDocProperty("车辆使用类型文本释义（子类型）")
     private String ownerTypeTxt;
 
+    @AutoDocProperty("SIM卡号")
+    private String simNo;
+
+    @AutoDocProperty("功能类型，1:MPV，2：SUV,3:中型车，4：中大型车，5：其它，6：客车，7：小型车，8：微型车，9：房车，10：皮卡，11：紧凑型车，12：豪华车，13：跑车，14：面包车")
+    private Integer useType;
+    @AutoDocProperty("功能类型文字释义")
+    private String useTypeTxt;
+
 }
