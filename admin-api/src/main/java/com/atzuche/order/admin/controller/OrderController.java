@@ -1,7 +1,7 @@
 package com.atzuche.order.admin.controller;
 
 import com.alibaba.fastjson.JSON;
-import com.atzuche.order.admin.service.OrderService;
+import com.atzuche.order.admin.service.AdminOrderService;
 import com.atzuche.order.admin.vo.req.order.CancelOrderByPlatVO;
 import com.atzuche.order.admin.vo.req.order.CancelOrderVO;
 import com.atzuche.order.admin.vo.req.order.OrderModifyTimeVO;
@@ -33,7 +33,7 @@ import java.util.Optional;
 @RestController
 public class OrderController {
     @Autowired
-    private OrderService orderService;
+    private AdminOrderService adminOrderService;
 
     @AutoDocVersion(version = "订单修改")
     @AutoDocGroup(group = "订单修改")
@@ -65,7 +65,7 @@ public class OrderController {
             return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), error.isPresent() ?
                     error.get().getDefaultMessage() : ErrorCode.INPUT_ERROR.getText());
         }
-        ResponseData responseData = orderService.cancelOrder(cancelOrderVO);
+        ResponseData responseData = adminOrderService.cancelOrder(cancelOrderVO);
         return responseData;
     }
 
