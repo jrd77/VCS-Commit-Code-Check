@@ -77,4 +77,8 @@ public class RenterMemberService{
     public List<RenterMemberEntity> queryMemNoAndPhoneByOrderList(List<String> orderNos) {
         return renterMemberMapper.queryMemNoAndPhoneByOrderList(orderNos);
     }
+
+    public RenterMemberEntity queryRenterInfoByOrderNoAndRenterNo(String orderNo, String renterNo) {
+        return renterMemberMapper.queryRenterInfoByOrderNoAndRenterNo(orderNo,renterNo);
+    }
 }

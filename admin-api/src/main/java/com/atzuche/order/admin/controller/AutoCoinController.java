@@ -28,6 +28,7 @@ public class AutoCoinController {
         if (bindingResult.hasErrors()) {
             return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), ErrorCode.INPUT_ERROR.getText());
         }
+        //TODO:
 		return ResponseData.success(null);
 	}
 
