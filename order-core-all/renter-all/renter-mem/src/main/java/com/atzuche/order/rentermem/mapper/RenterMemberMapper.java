@@ -29,4 +29,6 @@ public interface RenterMemberMapper{
     String getRenterNoByOrderNo(@Param("orderNo") String orderNo);
 
     List<RenterMemberEntity> queryMemNoAndPhoneByOrderList(@Param("orderNos") List<String> orderNos);
+
+    RenterMemberEntity queryRenterInfoByOrderNoAndRenterNo(@Param("orderNo") String orderNo,@Param("renterNo") String renterNo);
 }

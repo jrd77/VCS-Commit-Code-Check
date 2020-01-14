@@ -67,4 +67,8 @@ public class RenterOrderWzStatusService {
         dto.setStatusDesc(WzStatusEnums.getStatusDesc(dto.getStatus()));
         renterOrderWzStatusMapper.saveRenterOrderWzStatus(dto);
     }
+
+    public List<RenterOrderWzStatusEntity> queryIllegalOrderListByMemNo(String memNo) {
+        return renterOrderWzStatusMapper.queryIllegalOrderListByMemNo(memNo);
+    }
 }
