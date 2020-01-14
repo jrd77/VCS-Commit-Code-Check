@@ -557,7 +557,8 @@ public class OrderDetailService {
         orderDetailRespDTO.ownerOrderPurchaseDetailList = ownerOrderPurchaseDetailDTOList;
         orderDetailRespDTO.consoleOwnerOrderFineDetailList = consoleOwnerOrderFineDeatailDTOList;
         orderDetailRespDTO.renterAdditionalDriverList = renterAdditionalDriverDTOList;
-
+        orderDetailRespDTO.ownerOrderFineDeatailList = ownerOrderFineDeatailDTOS;
+        orderDetailRespDTO.renterOrderFineDeatailList = renterOrderFineDeatailDTOS;
         return orderDetailRespDTO;
     }
 
