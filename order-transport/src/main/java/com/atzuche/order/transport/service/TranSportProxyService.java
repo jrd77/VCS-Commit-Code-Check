@@ -217,7 +217,6 @@ public class TranSportProxyService {
      * @param cityCode 城市编码
      * @return
      */
-
     @SuppressWarnings("unchecked")
     private Integer getGetReturnOverTransportFee(Integer cityCode) {
         String premiumAmt = null;
