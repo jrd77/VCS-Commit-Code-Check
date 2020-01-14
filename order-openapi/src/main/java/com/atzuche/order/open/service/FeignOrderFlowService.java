@@ -7,10 +7,11 @@ import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.Mapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
 @FeignClient("order-center-api")
 public interface FeignOrderFlowService {
 
     @PostMapping("/order/flow/list")
-    ResponseData<OrderFlowListResponseDTO> selectOrderFlowList(OrderFlowRequestDTO orderFlowRequestDTO);
+    ResponseData<OrderFlowListResponseDTO> selectOrderFlowList(@RequestBody OrderFlowRequestDTO orderFlowRequestDTO);
 }
