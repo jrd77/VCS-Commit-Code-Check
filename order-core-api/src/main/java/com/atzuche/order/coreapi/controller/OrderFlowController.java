@@ -12,9 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
@@ -29,7 +27,7 @@ public class OrderFlowController {
     private OrderFlowService orderFlowService;
 
     @AutoDocMethod(description = "订单状态流转列表", value = "订单状态流转列表", response = OrderFlowListResponseDTO.class)
-    @GetMapping("/list")
+    @PostMapping("/list")
     public ResponseData selectOrderFlowList(@Valid OrderFlowRequestDTO orderFlowRequestVO, BindingResult bindingResult) {
         //参数验证
         validateParameter(bindingResult);
