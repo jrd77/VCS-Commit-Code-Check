@@ -388,4 +388,12 @@
 	<update id="updateOwnerSmsStatus" parameterType="java.lang.String">
 		UPDATE renter_order_wz_detail SET owner_is_sms = 1 WHERE order_no = #{orderNo}
 	</update>
+
+	<select id="findTransIllegalDetailByOrderNo" resultMap="selectColumnMap">
+		select
+		id,order_no,illegal_time,illegal_addr,illegal_reason,illegal_amt,illegal_deduct,create_time,
+        order_flag,illegal_status,update_time
+		from renter_order_wz_detail
+		where order_no = #{orderNo}  and order_flag = 1 and is_valid=1
+	</select>
 </mapper>
