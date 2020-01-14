@@ -97,9 +97,9 @@ public class OrderCarTrusteeshipController extends BaseController {
             OrderCarTrusteeshipEntity orderCarTrusteeshipEntity = orderCarTrusteeshipService.selectObjectByOrderNoAndCar(orderCarTrusteeshipReqVO.getOrderNo(),orderCarTrusteeshipReqVO.getCarNo());
             return ResponseData.success(orderCarTrusteeshipEntity);
         } catch (Exception e) {
-            log.error("取还车更新接口出现异常", e);
-            Cat.logError("取还车更新接口出现异常", e);
-            return ResponseData.createErrorCodeResponse(ErrorCode.FAILED.getCode(), "取还车更新接口出现错误");
+            log.error("托管车信息出现异常", e);
+            Cat.logError("托管车信息出现异常", e);
+            return ResponseData.createErrorCodeResponse(ErrorCode.FAILED.getCode(), "托管车信息出现错误");
         }
     }
 }
