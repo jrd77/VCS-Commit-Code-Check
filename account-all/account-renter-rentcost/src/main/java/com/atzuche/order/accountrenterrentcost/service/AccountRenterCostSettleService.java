@@ -10,6 +10,8 @@ import com.atzuche.order.accountrenterrentcost.service.notservice.AccountRenterC
 import com.atzuche.order.accountrenterrentcost.vo.req.AccountRenterCostChangeReqVO;
 import com.atzuche.order.accountrenterrentcost.vo.req.AccountRenterCostDetailReqVO;
 import com.atzuche.order.accountrenterrentcost.vo.req.AccountRenterCostReqVO;
+import com.atzuche.order.accountrenterrentcost.vo.req.AccountRenterCostToFineReqVO;
+import com.atzuche.order.commons.enums.RenterCashCodeEnum;
 import com.autoyol.commons.web.ErrorCode;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -85,11 +87,34 @@ public class AccountRenterCostSettleService{
 
 
     /**
-     * 更新实退金额
-     * @param rentCostSurplusAmt
-     * @param orderNo
-     * @param orderNo1
+     * 租车费用转 罚金 记录 租车费用资金流水
+     * @param vo
      */
-    public void updateRefundAmt(int rentCostSurplusAmt, String orderNo, String orderNo1) {
+    public void deductRentCostToRentFine(AccountRenterCostToFineReqVO vo) {
+        AccountRenterCostDetailEntity accountRenterCostDetail = new AccountRenterCostDetailEntity();
+        accountRenterCostDetail.setOrderNo(vo.getOrderNo());
+        accountRenterCostDetail.setMemNo(vo.getMemNo());
+        accountRenterCostDetail.setAmt(vo.getAmt());
+        accountRenterCostDetail.setSourceCode(RenterCashCodeEnum.SETTLE_RENT_COST_TO_FINE.getCashNo());
+        accountRenterCostDetail.setSourceDetail(RenterCashCodeEnum.SETTLE_RENT_COST_TO_FINE.getTxt());
+        accountRenterCostDetail.setPaySource(RenterCashCodeEnum.ACCOUNT_RENTER_RENT_COST.getTxt());
+        accountRenterCostDetail.setPaySource(RenterCashCodeEnum.ACCOUNT_RENTER_RENT_COST.getCashNo());
+        accountRenterCostDetailNoTService.insertAccountRenterCostDetailEntity(accountRenterCostDetail);
+
+    }
+    /**
+     * 钱包支付金额 抵扣 罚金 记录 租车费用资金流水
+     * @param vo
+     */
+    public void deductWalletCostToRentFine(AccountRenterCostToFineReqVO vo) {
+        AccountRenterCostDetailEntity accountRenterCostDetail = new AccountRenterCostDetailEntity();
+        accountRenterCostDetail.setOrderNo(vo.getOrderNo());
+        accountRenterCostDetail.setMemNo(vo.getMemNo());
+        accountRenterCostDetail.setAmt(vo.getAmt());
+        accountRenterCostDetail.setSourceCode(RenterCashCodeEnum.SETTLE_RENT_WALLET_COST_TO_FINE.getCashNo());
+        accountRenterCostDetail.setSourceDetail(RenterCashCodeEnum.SETTLE_RENT_WALLET_COST_TO_FINE.getTxt());
+        accountRenterCostDetail.setPaySource(RenterCashCodeEnum.ACCOUNT_RENTER_RENT_COST.getTxt());
+        accountRenterCostDetail.setPaySource(RenterCashCodeEnum.ACCOUNT_RENTER_RENT_COST.getCashNo());
+        accountRenterCostDetailNoTService.insertAccountRenterCostDetailEntity(accountRenterCostDetail);
     }
 }

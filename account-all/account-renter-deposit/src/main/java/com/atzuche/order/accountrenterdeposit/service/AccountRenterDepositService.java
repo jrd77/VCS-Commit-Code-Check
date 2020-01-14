@@ -1,13 +1,16 @@
 package com.atzuche.order.accountrenterdeposit.service;
 
+import com.atzuche.order.accountrenterdeposit.entity.AccountRenterDepositDetailEntity;
 import com.atzuche.order.accountrenterdeposit.entity.AccountRenterDepositEntity;
 import com.atzuche.order.accountrenterdeposit.mapper.AccountRenterDepositMapper;
 import com.atzuche.order.accountrenterdeposit.service.notservice.AccountRenterDepositDetailNoTService;
 import com.atzuche.order.accountrenterdeposit.service.notservice.AccountRenterDepositNoTService;
 import com.atzuche.order.accountrenterdeposit.vo.req.CreateOrderRenterDepositReqVO;
 import com.atzuche.order.accountrenterdeposit.vo.req.DetainRenterDepositReqVO;
+import com.atzuche.order.accountrenterdeposit.vo.req.OrderCancelRenterDepositReqVO;
 import com.atzuche.order.accountrenterdeposit.vo.req.PayedOrderRenterDepositReqVO;
 import com.atzuche.order.accountrenterdeposit.vo.res.AccountRenterDepositResVO;
+import com.atzuche.order.commons.enums.RenterCashCodeEnum;
 import com.atzuche.order.commons.enums.YesNoEnum;
 import com.autoyol.commons.web.ErrorCode;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -137,5 +140,20 @@ public class AccountRenterDepositService{
      */
     public void updateOrderDepositSettle(DetainRenterDepositReqVO detainRenterDepositReqVO) {
         accountRenterDepositNoTService.updateOrderDepositSettle(detainRenterDepositReqVO.getMemNo(),detainRenterDepositReqVO.getOrderNo());
+    }
+
+
+    /**
+     * 车俩押金抵扣 罚金
+     * @param vo
+     */
+    public void deductRentDepositToRentFine(OrderCancelRenterDepositReqVO vo) {
+        AccountRenterDepositDetailEntity accountRenterDepositDetailEntity = new AccountRenterDepositDetailEntity();
+        accountRenterDepositDetailEntity.setOrderNo(vo.getOrderNo());
+        accountRenterDepositDetailEntity.setMemNo(vo.getMemNo());
+        accountRenterDepositDetailEntity.setAmt(vo.getAmt());
+        accountRenterDepositDetailEntity.setSourceCode(RenterCashCodeEnum.SETTLE_RENT_DEPOSIT_COST_TO_FINE.getCashNo());
+        accountRenterDepositDetailEntity.setSourceDetail(RenterCashCodeEnum.SETTLE_RENT_DEPOSIT_COST_TO_FINE.getTxt());
+        accountRenterDepositDetailNoTService.insertRenterDepositDetailEntity(accountRenterDepositDetailEntity);
     }
 }

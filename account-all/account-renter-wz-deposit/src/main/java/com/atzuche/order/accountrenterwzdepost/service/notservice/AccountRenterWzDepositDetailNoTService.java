@@ -49,4 +49,11 @@ public class AccountRenterWzDepositDetailNoTService {
     public List<AccountRenterWzDepositDetailEntity> findByOrderNo(String orderNo){
         return accountRenterWzDepositDetailMapper.findByOrderNo(orderNo);
     }
+
+    public void insertRenterDepositDetailEntity(AccountRenterWzDepositDetailEntity accountRenterDepositDetailEntity) {
+        int result = accountRenterWzDepositDetailMapper.insertSelective(accountRenterDepositDetailEntity);
+        if(result==0){
+            throw new PayOrderRenterWZDepositException();
+        }
+    }
 }

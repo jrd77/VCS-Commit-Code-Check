@@ -28,9 +28,19 @@ public class SettleCancelOrdersAccount {
     private int rentCostAmt;
 
     /**
+     * 租客实付剩余租车费用
+     */
+    private int rentSurplusCostAmt;
+
+    /**
      * 租客实付租车押金
      */
     private int rentDepositAmt;
+
+    /**
+     * 租客实付剩余租车押金
+     */
+    private int rentSurplusDepositAmt;
 
     /**
      * 租客实付违章押金
@@ -38,9 +48,19 @@ public class SettleCancelOrdersAccount {
     private int rentWzDepositAmt;
 
     /**
+     * 租客实付剩余违章押金
+     */
+    private int rentSurplusWzDepositAmt;
+
+    /**
      * 租客实付钱包金额
      */
     private int renWalletAmt;
+
+    /**
+     * 租客实付剩余钱包金额
+     */
+    private int rentSurplusWalletAmt;
 
     /**
      * 租客实付凹凸币金额

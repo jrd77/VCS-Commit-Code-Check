@@ -42,6 +42,18 @@ public class AccountRenterCostDetailNoTService {
     }
 
     /**
+     * 租车费用资金明细落库
+     * @param accountRenterCostDetail
+     */
+    public int insertAccountRenterCostDetailEntity(AccountRenterCostDetailEntity accountRenterCostDetail) {
+        int result = accountRenterCostDetailMapper.insertSelective(accountRenterCostDetail);
+        if(result==0){
+            throw new AccountRenterRentCostDetailException();
+        }
+        return accountRenterCostDetail.getId();
+    }
+
+    /**
      * 根据订单号查询租客的租金支付明细
      * @param orderNo
      * @return

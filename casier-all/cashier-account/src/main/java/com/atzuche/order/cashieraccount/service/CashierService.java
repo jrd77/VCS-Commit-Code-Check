@@ -540,5 +540,20 @@ public class CashierService {
     public List<CashierEntity> getCashierRentCostsByOrderNo(String orderNo){
     	return cashierMapper.getCashierRentCostsByOrderNo(orderNo);
     }
-    
+
+    /**
+     * 退还租车费用
+     */
+    public void refundRentCostCancel(CashierRefundApplyReqVO cashierRefundApplyReq){
+        Assert.notNull(cashierRefundApplyReq, ErrorCode.PARAMETER_ERROR.getText());
+        //1 记录退还记录
+        Integer id = cashierRefundApplyNoTService.insertRefundDeposit(cashierRefundApplyReq);
+        //2 记录费用平账
+        AccountRenterCostDetailReqVO accountRenterCostDetail = new AccountRenterCostDetailReqVO();
+        BeanUtils.copyProperties(cashierRefundApplyReq,accountRenterCostDetail);
+        accountRenterCostDetail.setUniqueNo(id.toString());
+        int accountRenterCostDetailId = accountRenterCostSettleService.refundRenterCostDetail(accountRenterCostDetail);
+    }
+
+
 }

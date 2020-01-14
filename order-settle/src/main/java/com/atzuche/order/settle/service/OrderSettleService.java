@@ -137,6 +137,8 @@ public class OrderSettleService{
 //        try {
 //            Cat.logEvent(CatConstants.FEIGN_METHOD, "OrderSettleService.settleOrderCancel");
 //            Cat.logEvent(CatConstants.FEIGN_PARAM, orderNo);
+//            OrderStatusDTO orderStatusDTO = new OrderStatusDTO();
+//            orderStatusDTO.setOrderNo(orderNo);
 //            // 1 取消订单初始化
 //            SettleOrders settleOrders =  orderSettleNoTService.initCancelSettleOrders(orderNo);
 //            //2 查询所有租客罚金明细  及 凹凸币补贴
@@ -149,7 +151,10 @@ public class OrderSettleService{
 //            orderSettleNoTService.handleOwnerFine(settleOrders,settleCancelOrdersAccount);
 //            //6 租客罚金处理
 //            orderSettleNoTService.handleRentFine(settleOrders,settleCancelOrdersAccount);
-//            //7 租客金额 退还 包含 凹凸币，钱包 租车费用 押金 违章押金 退还 （优惠卷退还 TODO）
+//            //7 租客还历史欠款
+//            orderSettleNoTService.repayHistoryDebtRentCancel(settleOrders,settleCancelOrdersAccount);
+//            //8 租客金额 退还 包含 凹凸币，钱包 租车费用 押金 违章押金 退还 （优惠卷退还 TODO）
+//            orderSettleNoTService.refundCancelCost(settleOrders,settleCancelOrdersAccount,orderStatusDTO);
 //
 //            log.info("OrderSettleService initSettleOrders settleOrders [{}]", GsonUtils.toJson(settleOrders));
 //            Cat.logEvent("settleOrders",GsonUtils.toJson(settleOrders));
