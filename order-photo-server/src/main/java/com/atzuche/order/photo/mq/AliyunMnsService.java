@@ -11,6 +11,8 @@ import com.aliyun.mns.client.MNSClient;
 import com.atzuche.order.photo.util.SysConf;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
 import java.io.ByteArrayOutputStream;
@@ -21,11 +23,12 @@ import java.util.zip.GZIPOutputStream;
 /**
  * Created by andy on 16/6/16.
  */
+@Service
 public class AliyunMnsService {
     private final static Logger logger = LoggerFactory.getLogger(AliyunMnsService.class);
-    private static final String accessKey= SysConf.MQ_ACCESS_KEY;
-    private static final String accessId=SysConf.MQ_ACCESS_ID;
-    private static final String accountEndPoint=SysConf.MQ_ACCESS_END_POINT;
+    private String accessKey;
+    private String accessId;
+    private String accountEndPoint;
     private boolean inited = false;
 
 

@@ -1,15 +1,22 @@
 package com.atzuche.order.photo.service;
 
+import com.atzuche.order.commons.DateUtils;
 import com.atzuche.order.commons.JsonUtil;
+import com.atzuche.order.commons.enums.cashier.PlatformEnum;
+import com.atzuche.order.photo.dto.OrderPhotoDTO;
 import com.atzuche.order.photo.dto.TransIllegalPhotoDTO;
-import com.atzuche.order.photo.entity.OrderPhotoDTO;
+import com.atzuche.order.photo.entity.OrderPhotoEntity;
 import com.atzuche.order.photo.entity.PhotoPathDTO;
+import com.atzuche.order.photo.enums.UserTypeEnum;
 import com.atzuche.order.photo.mapper.OrderPhotoMapper;
 import com.atzuche.order.photo.mq.AliyunMnsService;
 import com.atzuche.order.photo.util.SysConf;
 import com.atzuche.order.photo.util.oss.OSSUtils;
+import com.atzuche.order.photo.vo.resp.OrderViolationPhotoResponseVO;
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -17,6 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -28,15 +36,26 @@ public class OrderPhotoService {
 	private AliyunMnsService aliyunMnsService;
 
 
-	public List<OrderPhotoDTO> queryGetSrvCarList(String orderNo, int type) {
-		return orderPhotoMapper.queryGetSrvCarList(orderNo,type);
+	public List<OrderPhotoDTO> queryGetSrvCarList(String orderNo, String type) {
+		List<OrderPhotoEntity> photoList = orderPhotoMapper.queryGetSrvCarList(orderNo,type);
+		List<OrderPhotoDTO> carPhotoList = new ArrayList();
+		if(CollectionUtils.isNotEmpty(photoList)) {
+			photoList.forEach(photoEntity -> {
+				OrderPhotoDTO orderPhotoDTO = new OrderPhotoDTO();
+				BeanUtils.copyProperties(photoEntity, orderPhotoDTO);
+				orderPhotoDTO.setUserTypeText(UserTypeEnum.getDescriptionByType(photoEntity.getUserType()));
+				orderPhotoDTO.setCreateTime(DateUtils.formate(photoEntity.getCreateTime(), DateUtils.DATE_DEFAUTE1));
+				carPhotoList.add(orderPhotoDTO);
+			});
+		}
+		return carPhotoList;
 	}
 
 	public String uploadOrderPhoto(List<MultipartFile> data, String uploadType,
                                    String orderNo, String operator) throws Exception {
 		String msg = null;
 		//平台上传
-		int userType=3;
+		String userType = UserTypeEnum.PLATFORM.getType();
         for(MultipartFile multifile :data){
         		InputStream input = null;
         		try {
@@ -70,8 +89,34 @@ public class OrderPhotoService {
 	}
 
 
-	public List<OrderPhotoDTO> queryViolationPhotoList(String orderNo) {
-		return orderPhotoMapper.queryViolationPhotoList(orderNo);
+	public OrderViolationPhotoResponseVO queryViolationPhotoList(String orderNo) {
+		List<OrderPhotoEntity> violationPhotoList = orderPhotoMapper.queryViolationPhotoList(orderNo);
+		OrderViolationPhotoResponseVO orderViolationPhotoResponseVO = new OrderViolationPhotoResponseVO();
+
+		List<OrderPhotoDTO> renterPhotoList = new ArrayList();
+		List<OrderPhotoDTO> ownerPhotoList = new ArrayList();
+		List<OrderPhotoDTO> platformPhotoList = new ArrayList();
+		if(CollectionUtils.isNotEmpty(violationPhotoList)) {
+			violationPhotoList.forEach(violationPhoto -> {
+				OrderPhotoDTO orderPhotoDTO = new OrderPhotoDTO();
+				BeanUtils.copyProperties(violationPhoto, orderPhotoDTO);
+				orderPhotoDTO.setCreateTime(DateUtils.formate(violationPhoto.getCreateTime(),DateUtils.DATE_DEFAUTE1));
+				orderPhotoDTO.setUserTypeText(UserTypeEnum.getDescriptionByType(violationPhoto.getUserType()));
+
+				//租客上传
+				if(violationPhoto.getUserType().equals(UserTypeEnum.RENTER.getType())){
+					renterPhotoList.add(orderPhotoDTO);
+				} else if (violationPhoto.getUserType().equals(UserTypeEnum.OWNER.getType())) {
+					ownerPhotoList.add(orderPhotoDTO);
+				} else {
+					platformPhotoList.add(orderPhotoDTO);
+				}
+			});
+		}
+		orderViolationPhotoResponseVO.setRenterPhotoList(renterPhotoList);
+		orderViolationPhotoResponseVO.setOwnerPhotoList(ownerPhotoList);
+		orderViolationPhotoResponseVO.setPlatformPhotoList(platformPhotoList);
+		return orderViolationPhotoResponseVO;
 	}
 
 	public int delOrderPhoto(String photoType, String id) {

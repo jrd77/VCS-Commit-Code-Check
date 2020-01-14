@@ -1,6 +1,7 @@
 package com.atzuche.order.photo.vo.resp;
 
-import com.atzuche.order.photo.entity.OrderPhotoDTO;
+import com.atzuche.order.photo.dto.OrderPhotoDTO;
+import com.atzuche.order.photo.entity.OrderPhotoEntity;
 import com.autoyol.doc.annotation.AutoDocProperty;
 import lombok.Data;
 import lombok.ToString;
@@ -18,7 +19,7 @@ public class OrderPhotoResponseVO {
     private List<OrderPhotoDTO> returnCarPhotoList;
 
     @AutoDocProperty(value = "违章缴纳凭证照片列表")
-    private List<OrderPhotoDTO> violationPhotoList;
+    private OrderViolationPhotoResponseVO OrderViolationPhotoResponseVO;
 
 
 

@@ -1,14 +1,17 @@
 package com.atzuche.order.photo.controller;
 
 
-import com.atzuche.order.photo.entity.OrderPhotoDTO;
+import com.atzuche.order.photo.common.AdminUserUtil;
+import com.atzuche.order.photo.dto.OrderPhotoDTO;
+import com.atzuche.order.photo.entity.OrderPhotoEntity;
+import com.atzuche.order.photo.enums.UserTypeEnum;
 import com.atzuche.order.photo.service.OrderPhotoService;
-import com.atzuche.order.photo.util.oss.OSSUtils;
 import com.atzuche.order.photo.util.oss.PicUtils;
 import com.atzuche.order.photo.vo.req.OrderDeleteRequestVO;
 import com.atzuche.order.photo.vo.req.OrderRequestVO;
 import com.atzuche.order.photo.vo.req.OrderUploadRequestVO;
 import com.atzuche.order.photo.vo.resp.OrderPhotoResponseVO;
+import com.atzuche.order.photo.vo.resp.OrderViolationPhotoResponseVO;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.doc.annotation.AutoDocMethod;
 import com.autoyol.doc.annotation.AutoDocVersion;
@@ -19,9 +22,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.io.InputStream;
@@ -38,6 +39,7 @@ import java.util.List;
  */
 @Controller
 @AutoDocVersion(version = "订单照片接口文档")
+@RestController
 @RequestMapping("console/order/photo/")
 public class OrderPhotoController{
 	private Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -57,13 +59,13 @@ public class OrderPhotoController{
 	@GetMapping("/list")
 	public ResponseData list(@Valid OrderRequestVO orderRequestVO, BindingResult bindingResult){
 		String orderNo = orderRequestVO.getOrderNo();
-	    List<OrderPhotoDTO> getCarList =orderPhotoService.queryGetSrvCarList(orderNo,1);
-	    List<OrderPhotoDTO> srvCarList =orderPhotoService.queryGetSrvCarList(orderNo,2);
-	    List<OrderPhotoDTO> violationPhotoList =orderPhotoService.queryViolationPhotoList(orderNo);
+	    List<OrderPhotoDTO> getCarList =orderPhotoService.queryGetSrvCarList(orderNo, UserTypeEnum.RENTER.getType());
+	    List<OrderPhotoDTO> srvCarList =orderPhotoService.queryGetSrvCarList(orderNo, UserTypeEnum.OWNER.getType());
+		OrderViolationPhotoResponseVO orderViolationPhotoResponseVO =orderPhotoService.queryViolationPhotoList(orderNo);
 		OrderPhotoResponseVO orderPhotoResponseVO = new OrderPhotoResponseVO();
 		orderPhotoResponseVO.setGetCarPhotoList(getCarList);
 		orderPhotoResponseVO.setReturnCarPhotoList(srvCarList);
-		orderPhotoResponseVO.setViolationPhotoList(violationPhotoList);
+		orderPhotoResponseVO.setOrderViolationPhotoResponseVO(orderViolationPhotoResponseVO);
 		return ResponseData.success(orderPhotoResponseVO);
 	}
 	
@@ -83,8 +85,8 @@ public class OrderPhotoController{
 	 */
 	@PostMapping("upload")
 	@AutoDocMethod(description = "上传订单照片", value = "上传订单照片", response = ResponseData.class)
-    public ResponseData uploadOrderPhoto(@Valid @RequestBody OrderUploadRequestVO orderUploadRequestVO, @RequestParam("picFiles") MultipartFile[] files) throws Exception {
-		String operator="test";//AdminUserUtil.getAdminUser().getAuthName();
+    public ResponseData uploadOrderPhoto(@RequestParam("picFiles") MultipartFile[] files, @Valid OrderUploadRequestVO orderUploadRequestVO) throws Exception {
+		String operator =  AdminUserUtil.getAdminUser().getAuthName();
 
 		String msg = null;
 			if(files !=null && files.length >0){
