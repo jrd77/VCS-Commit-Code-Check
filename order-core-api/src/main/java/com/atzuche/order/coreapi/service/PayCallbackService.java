@@ -1,5 +1,6 @@
 package com.atzuche.order.coreapi.service;
 
+import com.atzuche.order.commons.enums.YesNoEnum;
 import com.atzuche.order.commons.service.OrderPayCallBack;
 import com.atzuche.order.delivery.service.delivery.DeliveryCarService;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
@@ -28,14 +29,17 @@ public class PayCallbackService implements OrderPayCallBack {
      * ModifyOrderForRenterService.supplementPayPostProcess（修改订单补付回掉）
      */
     @Override
-    public void callBack(String orderNo){
-        log.info("PayCallbackService callBack start param [{}]",orderNo);
+    public void callBack(String orderNo,Integer isPayAgain){
+        log.info("PayCallbackService callBack start param [{}] [{}]",orderNo,isPayAgain);
         RenterOrderEntity renterOrder = renterOrderService.getRenterOrderByOrderNoAndIsEffective(orderNo);
         if(Objects.isNull(renterOrder) || Objects.isNull(renterOrder.getRenterOrderNo())){
             throw new OrderSettleFlatAccountException();
         }
         log.info("PayCallbackService supplementPayPostProcess param [{}] [{}]",orderNo, renterOrder.getRenterOrderNo());
-        modifyOrderForRenterService.supplementPayPostProcess(orderNo,renterOrder.getRenterOrderNo());
+        if(YesNoEnum.YES.getCode().equals(isPayAgain)){
+            // 修改订单补付成功后回调
+            modifyOrderForRenterService.supplementPayPostProcess(orderNo,renterOrder.getRenterOrderNo());
+        }
 
         log.info("PayCallbackService sendDataMessageToRenYun param [{}]", renterOrder.getRenterOrderNo());
         deliveryCarService.sendDataMessageToRenYun(renterOrder.getRenterOrderNo());
