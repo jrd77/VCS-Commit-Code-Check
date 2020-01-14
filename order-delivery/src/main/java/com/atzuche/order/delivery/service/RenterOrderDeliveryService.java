@@ -76,7 +76,7 @@ public class RenterOrderDeliveryService {
      * @return
      */
     public RenterOrderDeliveryEntity findRenterOrderByRenterOrderNo(String renterOrderNo, Integer type) {
-        return renterOrderDeliveryMapper.findRenterOrderByrOrderNo(renterOrderNo, type);
+        return renterOrderDeliveryMapper.findRenterOrderByRenterOrderNo(renterOrderNo, type);
     }
 
     /**
@@ -106,7 +106,7 @@ public class RenterOrderDeliveryService {
 
 
     /**
-     * 更新配送订单地址信息
+     * 更新配送订单信息
      * @param renterOrderDeliveryEntity
      */
     public void updateDeliveryByPrimaryKey(RenterOrderDeliveryEntity renterOrderDeliveryEntity) {
