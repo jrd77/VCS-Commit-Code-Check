@@ -1,5 +1,6 @@
 package com.atzuche.order.photo;
 
+import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
@@ -11,6 +12,7 @@ import org.springframework.boot.web.support.SpringBootServletInitializer;
  * @date 2019/12/27 4:12 下午
  **/
 @SpringBootApplication(scanBasePackages = {"com.atzuche.order.photo"})
+@MapperScan({"com.atzuche.order"})
 public class OrderPhotoServerSpringBoot extends SpringBootServletInitializer {
 
     public static void main(String[] args) {
