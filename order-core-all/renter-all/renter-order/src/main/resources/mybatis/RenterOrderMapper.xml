@@ -273,6 +273,15 @@
 		limit 1
 	</select>
 	
+	<!-- 去掉 		and is_effective = 1 -->
+	<select id="queryRenterOrderByOrderNo" resultMap="BaseResultMap">
+		select <include refid="Base_Column_List" /> from renter_order where order_no = #{orderNo}
+		and is_cancle = 0
+		and is_delete = 0
+		order by id desc
+	</select>
+	
+	
 	<select id="getRenterOrderByRenterOrderNo" resultMap="BaseResultMap">
 		select <include refid="Base_Column_List" /> from renter_order where renter_order_no = #{renterOrderNo}
 		and is_cancle = 0
