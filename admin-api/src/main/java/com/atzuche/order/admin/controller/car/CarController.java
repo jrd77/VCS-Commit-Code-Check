@@ -26,18 +26,10 @@ public class CarController {
 
     private  Logger logger = LoggerFactory.getLogger(getClass());
 
-//    @Autowired
-//    private CarDetailQueryFeignApi carDetailQueryFeignApi;
-//
-//    @Autowired
-//    private CarService carService;
-    @Autowired
+
     private CarProxyService carProxyService;
 
-    /**
-     * 老后台参考:
-     */
-    @AutoDocMethod(description = "【liujun】订单详细信息-查看车辆信息-车辆运营信息", value = "【liujun】订单详细信息-查看车辆信息-车辆运营信息", response = CarDetailDTO.class)
+    @AutoDocMethod(description = "订单详细信息-查看车辆信息", value = "订单详细信息-查看车辆信息", response = CarDetailDTO.class)
     @GetMapping(value = "console/car/detail")
     public ResponseData <CarDetailDTO> getCarBusiness(@RequestParam("carNo")String carNo) {
         try {
