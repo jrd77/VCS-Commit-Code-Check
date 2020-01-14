@@ -11,6 +11,7 @@ import com.autoyol.doc.annotation.AutoDocGroup;
 import com.autoyol.doc.annotation.AutoDocMethod;
 import com.autoyol.doc.annotation.AutoDocVersion;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -64,6 +65,10 @@ public class OrderController {
             Optional<FieldError> error = bindingResult.getFieldErrors().stream().findFirst();
             return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), error.isPresent() ?
                     error.get().getDefaultMessage() : ErrorCode.INPUT_ERROR.getText());
+        }
+        String memNo = cancelOrderVO.getMemNo();
+        if (StringUtils.isBlank(memNo)) {
+            return new ResponseData<>(ErrorCode.NEED_LOGIN.getCode(), ErrorCode.NEED_LOGIN.getText());
         }
         ResponseData responseData = adminOrderService.cancelOrder(cancelOrderVO);
         return responseData;
