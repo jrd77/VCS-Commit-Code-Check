@@ -1,4 +1,4 @@
-package com.atzuche.order.delivery.controller;
+package com.atzuche.order.coreapi.controller;
 
 import com.atzuche.order.delivery.common.DeliveryErrorCode;
 import com.atzuche.order.delivery.entity.OrderCarTrusteeshipEntity;
@@ -8,7 +8,10 @@ import com.atzuche.order.delivery.vo.delivery.req.TrusteeshipVO;
 import com.autoyol.commons.web.ResponseData;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Objects;
 
