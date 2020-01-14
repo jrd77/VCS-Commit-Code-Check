@@ -163,5 +163,10 @@
 
     </select>
 
+    <select id="queryRefundTimeByOrderNo" resultType="java.util.Date">
+        select refund_time from cashier_refund_apply
+        where order_no = #{orderNo} and pay_kind = #{payKind} limit 1
+    </select>
+
 
 </mapper>

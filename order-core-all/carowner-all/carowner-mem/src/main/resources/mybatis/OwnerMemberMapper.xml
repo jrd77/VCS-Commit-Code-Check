@@ -188,7 +188,7 @@
     </select>
 
     <select id="queryOwnerInfoByOrderNoAndOwnerNo" resultMap="BaseResultMap">
-        select mem_no,phone from owner_member where order_no = #{orderNo} and mem_no = #{ownerNo} and is_delete = 0 orderNo by id desc limit 1
+        select mem_no,phone from owner_member where order_no = #{orderNo} and mem_no = #{ownerNo} and is_delete = 0 order by id desc limit 1
     </select>
 
 </mapper>
