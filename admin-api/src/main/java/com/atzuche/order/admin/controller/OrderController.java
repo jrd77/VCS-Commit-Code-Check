@@ -39,7 +39,7 @@ public class OrderController {
     @AutoDocVersion(version = "订单修改")
     @AutoDocGroup(group = "订单修改")
     @AutoDocMethod(description = "修改订单", value = "修改订单",response = ResponseData.class)
-    @RequestMapping(value="console/order/modifyTime",method = RequestMethod.POST)
+    @RequestMapping(value="console/order/modifyOrder",method = RequestMethod.POST)
     public ResponseData modifyOrder(@RequestBody ModifyOrderReqVO modifyOrderReqVO, BindingResult bindingResult)throws Exception{
         log.info("车辆押金信息-modifyOrderReqVO={}", JSON.toJSONString(modifyOrderReqVO));
         if (bindingResult.hasErrors()) {
