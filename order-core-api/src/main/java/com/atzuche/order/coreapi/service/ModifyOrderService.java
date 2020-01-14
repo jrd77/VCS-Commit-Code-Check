@@ -890,8 +890,15 @@ public class ModifyOrderService {
 		List<RenterOrderSubsidyDetailDTO> renterSubsidyList = new ArrayList<RenterOrderSubsidyDetailDTO>();
 		// 剩余抵扣的租金
 		Integer surplusRentAmt = Math.abs(renterOrderCostRespDTO.getRentAmount());
+		// 修改前已使用的优惠券列表
+		List<OrderCouponEntity> initOrderCouponList = modifyOrderDTO.getOrderCouponList();
+		Map<Integer,OrderCouponEntity> couponMap = null;
+		if (initOrderCouponList != null && !initOrderCouponList.isEmpty()) {
+			couponMap = initOrderCouponList.stream().collect(Collectors.toMap(OrderCouponEntity::getCouponType, initCoupon -> initCoupon));
+		}
 		// 获取车主券抵扣
-		OrderCouponDTO ownerCoupon = getOwnerCoupon(costBaseDTO, renterOrderReqVO, surplusRentAmt);
+		OrderCouponEntity carOwnerCouponEntity = couponMap == null ? null:couponMap.get(CouponTypeEnum.ORDER_COUPON_TYPE_OWNER.getCode());
+		OrderCouponDTO ownerCoupon = getOwnerCoupon(costBaseDTO, renterOrderReqVO, surplusRentAmt, carOwnerCouponEntity);
 		if (ownerCoupon != null) {
 			orderCouponList.add(ownerCoupon);
 			int ownerCouponAmt = ownerCoupon.getAmount() == null ? 0:ownerCoupon.getAmount();
@@ -908,12 +915,6 @@ public class ModifyOrderService {
 			renterSubsidyList.add(limitRedSubsidy);
 			int limitRedAmt = limitRedSubsidy.getSubsidyAmount() == null ? 0:limitRedSubsidy.getSubsidyAmount();
 			surplusRentAmt = surplusRentAmt - limitRedAmt;
-		}
-		// 修改前已使用的优惠券列表
-		List<OrderCouponEntity> initOrderCouponList = modifyOrderDTO.getOrderCouponList();
-		Map<Integer,OrderCouponEntity> couponMap = null;
-		if (initOrderCouponList != null && !initOrderCouponList.isEmpty()) {
-			couponMap = initOrderCouponList.stream().collect(Collectors.toMap(OrderCouponEntity::getCouponType, initCoupon -> initCoupon));
 		}
 		// 修改种类
 		List<OrderChangeItemDTO> changeItemList = modifyOrderDTO.getChangeItemList();
@@ -973,12 +974,12 @@ public class ModifyOrderService {
 	 * @param surplusRentAmt
 	 * @return OrderCouponDTO
 	 */
-	public OrderCouponDTO getOwnerCoupon(CostBaseDTO costBaseDTO, RenterOrderReqVO renterOrderReqVO, Integer surplusRentAmt) {
+	public OrderCouponDTO getOwnerCoupon(CostBaseDTO costBaseDTO, RenterOrderReqVO renterOrderReqVO, Integer surplusRentAmt, OrderCouponEntity ooupon) {
 		OwnerCouponGetAndValidReqVO ownerCouponGetAndValidReqVO = renterOrderService.buildOwnerCouponGetAndValidReqVO(renterOrderReqVO,
 				surplusRentAmt);
 		// 修改标识
 		ownerCouponGetAndValidReqVO.setMark(2);
-        OrderCouponDTO ownerCoupon = renterOrderCalCostService.calOwnerCouponDeductInfo(ownerCouponGetAndValidReqVO);
+        OrderCouponDTO ownerCoupon = renterOrderCalCostService.calOwnerCouponDeductInfo(ownerCouponGetAndValidReqVO, ooupon);
         if (ownerCoupon != null) {
         	ownerCoupon.setOrderNo(costBaseDTO.getOrderNo());
             ownerCoupon.setRenterOrderNo(costBaseDTO.getRenterOrderNo());
