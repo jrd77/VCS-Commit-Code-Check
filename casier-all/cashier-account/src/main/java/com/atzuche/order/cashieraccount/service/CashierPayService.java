@@ -171,6 +171,8 @@ public class CashierPayService{
                }
                orderPayable.setAmtWallet(amtWallet);
                orderPayable.setAmt(orderPayable.getAmt() + amtPaying);
+               orderPayable.setAmtRent(orderPayable.getAmtRent() + amtPaying);
+
                //如果待支付 金额等于 0 即 钱包抵扣完成
                if(orderPayable.getAmt()==0){
                    List<String> payKind = orderPaySign.getPayKind();
@@ -262,8 +264,8 @@ public class CashierPayService{
             //预计钱包抵扣金额 = amtWallet
             amtWallet = amtRent + payBalance < 0 ? payBalance : Math.abs(amtRent);
             // 抵扣钱包后  应付租车费用金额
-            rentAmt =  rentAmt + amtWallet;
-            accountPayAbles.add(new AccountPayAbleResVO(orderPayReqVO.getOrderNo(),orderPayReqVO.getMenNo(),rentAmt,RenterCashCodeEnum.ACCOUNT_WALLET_COST,RenterCashCodeEnum.ACCOUNT_WALLET_COST.getTxt()));
+            amtRent =  amtRent + amtWallet;
+            accountPayAbles.add(new AccountPayAbleResVO(orderPayReqVO.getOrderNo(),orderPayReqVO.getMenNo(),amtWallet,RenterCashCodeEnum.ACCOUNT_WALLET_COST,RenterCashCodeEnum.ACCOUNT_WALLET_COST.getTxt()));
         }
         result.setAmtWallet(amtWallet);
         result.setAmtRent(amtRent);
@@ -271,7 +273,7 @@ public class CashierPayService{
         result.setAmtWzDeposit(amtWZDeposit);
         result.setAmtTotal(amtTotal);
         result.setAmtPay(rentAmtPayed);
-        result.setAmt(rentAmt + amtDeposit + amtWZDeposit);
+        result.setAmt(amtRent + amtDeposit + amtWZDeposit);
         result.setMemNo(orderPayReqVO.getMenNo());
         result.setOrderNo(orderPayReqVO.getOrderNo());
         result.setTitle("待支付金额：" +result.getAmt() + "，订单号："  + result.getOrderNo());
@@ -339,21 +341,19 @@ public class CashierPayService{
         //待付租车费用
         if(orderPaySign.getPayKind().contains(DataPayKindConstant.RENT_AMOUNT) && payVO.getAmtRent()<0){
             //待付租车费用
-            int amt = payVO.getAmt();
-            if(amt<0){
-                String payKind = YesNoEnum.YES.getCode().equals(payVO.getIsPayAgain())?DataPayKindConstant.RENT_INCREMENT:DataPayKindConstant.RENT_AMOUNT;
-                AccountRenterCostSettleEntity entity = cashierService.getAccountRenterCostSettle(orderPaySign.getOrderNo(),orderPaySign.getMenNo());
-                Integer payId = Objects.isNull(entity)?0:entity.getId();
-                String payIdStr = Objects.isNull(payId)?"":String.valueOf(payId);
-                PayVo vo = cashierNoTService.getPayVO(null,orderPaySign,payVO.getAmtRent(),payVO.getTitle(),payKind,payIdStr,GsonUtils.toJson(entity));
-                String paySn = cashierNoTService.getCashierRentCostPaySn(orderPaySign.getOrderNo(),orderPaySign.getMenNo());
-                vo.setPaySn(paySn);
-                vo.setExtendParams(GsonUtils.toJson(payVO));
-                vo.setPayTitle("待支付金额：-"+amt+"，订单号："+vo.getOrderNo());
-                String payMd5 = MD5.MD5Encode(FasterJsonUtil.toJson(vo));
-                vo.setPayMd5(payMd5);
-                payVo.add(vo);
-            }
+            int amt = payVO.getAmtRent();
+            String payKind = YesNoEnum.YES.getCode().equals(payVO.getIsPayAgain())?DataPayKindConstant.RENT_INCREMENT:DataPayKindConstant.RENT_AMOUNT;
+            AccountRenterCostSettleEntity entity = cashierService.getAccountRenterCostSettle(orderPaySign.getOrderNo(),orderPaySign.getMenNo());
+            Integer payId = Objects.isNull(entity)?0:entity.getId();
+            String payIdStr = Objects.isNull(payId)?"":String.valueOf(payId);
+            PayVo vo = cashierNoTService.getPayVO(null,orderPaySign,payVO.getAmtRent(),payVO.getTitle(),payKind,payIdStr,GsonUtils.toJson(entity));
+            String paySn = cashierNoTService.getCashierRentCostPaySn(orderPaySign.getOrderNo(),orderPaySign.getMenNo());
+            vo.setPaySn(paySn);
+            vo.setExtendParams(GsonUtils.toJson(payVO));
+            vo.setPayTitle("待支付金额："+amt+"，订单号："+vo.getOrderNo());
+            String payMd5 = MD5.MD5Encode(FasterJsonUtil.toJson(vo));
+            vo.setPayMd5(payMd5);
+            payVo.add(vo);
         }
         return payVo;
     }
