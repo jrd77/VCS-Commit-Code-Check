@@ -108,6 +108,7 @@ public class SubmitOrderRiskAuditService {
         createOrderRiskCheckRequestVO.setUseCarCityCode(submitOrderRiskCheckReqVO.getCityCode());
         createOrderRiskCheckRequestVO.setUseCarCityName(submitOrderRiskCheckReqVO.getCityName());
 
+
         return createOrderRiskCheckRequestVO;
     }
 
