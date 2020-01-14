@@ -142,10 +142,8 @@ public class DeliveryCarInfoService {
             GetHandoverCarDTO getHandoverCarDTO = new GetHandoverCarDTO();
             getHandoverCarDTO = getHandoverCarInfo(getHandoverCarDTO, renterOrderDeliveryEntity, carType);
             try {
-                String remark = ownerHandoverCarRemarkEntities.stream().filter(r -> (r.getType().intValue() != RenterHandoverCarTypeEnum.RENYUN_TO_RENTER.getValue().intValue())).findFirst().get().getRemark();
-                String renterRemark = renterHandoverCarRemarkEntities.stream().filter(r -> (r.getType().intValue() != RenterHandoverCarTypeEnum.RENYUN_TO_RENTER.getValue().intValue())).findFirst().get().getRemark();
-                getHandoverCarDTO.setRenterRealGetAddrReamrk(renterRemark);
-                getHandoverCarDTO.setOwnRealGetRemark(remark);
+                getHandoverCarDTO.setRenterRealGetAddrReamrk(renterOrderDeliveryEntity.getRenterRealGetReturnRemark());
+                getHandoverCarDTO.setOwnRealGetRemark(renterOrderDeliveryEntity.getOwnerRealGetReturnRemark());
             } catch (Exception e) {
                 log.error("备注获取失败");
             }
@@ -156,10 +154,8 @@ public class DeliveryCarInfoService {
             ReturnHandoverCarDTO returnHandoverCarDTO = new ReturnHandoverCarDTO();
             returnHandoverCarDTO = returnHandoverCarInfo(returnHandoverCarDTO, renterOrderDeliveryEntity, carType);
             try {
-                String remark = ownerHandoverCarRemarkEntities.stream().filter(r -> (r.getType().intValue() != RenterHandoverCarTypeEnum.RENTER_TO_RENYUN.getValue().intValue())).findFirst().get().getRemark();
-                String renterRemark = renterHandoverCarRemarkEntities.stream().filter(r -> (r.getType().intValue() != RenterHandoverCarTypeEnum.RENTER_TO_RENYUN.getValue().intValue())).findFirst().get().getRemark();
-                returnHandoverCarDTO.setRenterRealGetRemark(renterRemark);
-                returnHandoverCarDTO.setOwnerRealGetAddrReamrk(remark);
+                returnHandoverCarDTO.setRenterRealGetRemark(renterOrderDeliveryEntity.getRenterRealGetReturnRemark());
+                returnHandoverCarDTO.setOwnerRealGetAddrReamrk(renterOrderDeliveryEntity.getOwnerRealGetReturnRemark());
             } catch (Exception e) {
                 log.error("备注获取失败");
             }

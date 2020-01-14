@@ -28,12 +28,14 @@
         <result property="ownerGetReturnAddrLat" column="owner_get_return_addr_lat"/>
         <result property="status" column="status"/>
         <result property="isNotifyRenyun" column="is_notify_renyun"/>
+        <result property="aheadOrDelayTime" column="ahead_or_delay_time"/>
         <result property="createTime" column="create_time"/>
         <result property="createOp" column="create_op"/>
         <result property="updateTime" column="update_time"/>
         <result property="updateOp" column="update_op"/>
         <result property="isDelete" column="is_delete"/>
-		<result property="aheadOrDelayTime" column="ahead_or_delay_time"/>
+        <result property="renterRealGetReturnRemark" column="renter_real_get_return_remark"/>
+        <result property="ownerRealGetReturnRemark" column="owner_real_get_return_remark"/>
     </resultMap>
 
 
@@ -62,12 +64,15 @@
 	`owner_get_return_addr_lat`, 	
 	`status`, 	
 	`is_notify_renyun`, 	
+	`ahead_or_delay_time`, 	
 	`create_time`, 	
 	`create_op`, 	
 	`update_time`, 	
 	`update_op`, 	
-	`is_delete`,
-	`ahead_or_delay_time`
+	`is_delete`, 	
+	`renter_real_get_return_remark`, 	
+	`owner_real_get_return_remark`	
+
 	</sql>
 
 
@@ -101,12 +106,14 @@
 				`owner_get_return_addr_lat`,		
 				`status`,		
 				`is_notify_renyun`,		
+				`ahead_or_delay_time`,		
 				`create_time`,		
 				`create_op`,		
 				`update_time`,		
 				`update_op`,		
-				`is_delete`	,
-				`ahead_or_delay_time`
+				`is_delete`,		
+				`renter_real_get_return_remark`,		
+				`owner_real_get_return_remark`		
 			)
 		values
 		(
@@ -133,18 +140,20 @@
 				#{ownerGetReturnAddrLat}, 		
 				#{status}, 		
 				#{isNotifyRenyun}, 		
+				#{aheadOrDelayTime}, 		
 				#{createTime}, 		
 				#{createOp}, 		
 				#{updateTime}, 		
 				#{updateOp}, 		
-				#{isDelete},
-				#{aheadOrDelayTime}
+				#{isDelete}, 		
+				#{renterRealGetReturnRemark}, 		
+				#{ownerRealGetReturnRemark}		
 			)
 	</insert>
 	
 	<insert id="insertSelective" parameterType="com.atzuche.order.delivery.entity.RenterOrderDeliveryEntity" useGeneratedKeys="true" keyProperty="id">
 		insert into renter_order_delivery
-        <trim prefix="(" suffix=")" suffixOverrides="," >
+            <trim prefix="(" suffix=")" suffixOverrides="," >
 				<if test="orderNo != null">`order_no`, </if>
 				<if test="renterOrderNo != null">`renter_order_no`, </if>
 				<if test="orderNoDelivery != null">`order_no_delivery`, </if>
@@ -168,14 +177,16 @@
 				<if test="ownerGetReturnAddrLat != null">`owner_get_return_addr_lat`, </if>
 				<if test="status != null">`status`, </if>
 				<if test="isNotifyRenyun != null">`is_notify_renyun`, </if>
+				<if test="aheadOrDelayTime != null">`ahead_or_delay_time`, </if>
 				<if test="createTime != null">`create_time`, </if>
 				<if test="createOp != null">`create_op`, </if>
 				<if test="updateTime != null">`update_time`, </if>
 				<if test="updateOp != null">`update_op`, </if>
 				<if test="isDelete != null">`is_delete`, </if>
-			<if test="aheadOrDelayTime != null">`ahead_or_delay_time` </if>
-        </trim>
-        <trim prefix="values (" suffix=")" suffixOverrides="," >
+				<if test="renterRealGetReturnRemark != null">`renter_real_get_return_remark`, </if>
+				<if test="ownerRealGetReturnRemark != null">`owner_real_get_return_remark` </if>
+	        </trim>
+            <trim prefix="values (" suffix=")" suffixOverrides="," >
 				<if test="orderNo != null">#{orderNo},  </if>
 				<if test="renterOrderNo != null">#{renterOrderNo},  </if>
 				<if test="orderNoDelivery != null">#{orderNoDelivery},  </if>
@@ -199,13 +210,15 @@
 				<if test="ownerGetReturnAddrLat != null">#{ownerGetReturnAddrLat},  </if>
 				<if test="status != null">#{status},  </if>
 				<if test="isNotifyRenyun != null">#{isNotifyRenyun},  </if>
+				<if test="aheadOrDelayTime != null">#{aheadOrDelayTime},  </if>
 				<if test="createTime != null">#{createTime},  </if>
 				<if test="createOp != null">#{createOp},  </if>
 				<if test="updateTime != null">#{updateTime},  </if>
 				<if test="updateOp != null">#{updateOp},  </if>
-				<if test="isDelete != null">#{isDelete}, </if>
-			<if test="aheadOrDelayTime != null">#{aheadOrDelayTime} </if>
-        </trim>
+				<if test="isDelete != null">#{isDelete},  </if>
+				<if test="renterRealGetReturnRemark != null">#{renterRealGetReturnRemark},  </if>
+				<if test="ownerRealGetReturnRemark != null">#{ownerRealGetReturnRemark} </if>
+	        </trim>
 	</insert>
 	
 	 
@@ -235,12 +248,14 @@
 				<if test="ownerGetReturnAddrLat != null">`owner_get_return_addr_lat` = #{ownerGetReturnAddrLat}, </if>
 				<if test="status != null">`status` = #{status}, </if>
 				<if test="isNotifyRenyun != null">`is_notify_renyun` = #{isNotifyRenyun}, </if>
+				<if test="aheadOrDelayTime != null">`ahead_or_delay_time` = #{aheadOrDelayTime}, </if>
 				<if test="createTime != null">`create_time` = #{createTime}, </if>
 				<if test="createOp != null">`create_op` = #{createOp}, </if>
 				<if test="updateTime != null">`update_time` = #{updateTime}, </if>
 				<if test="updateOp != null">`update_op` = #{updateOp}, </if>
-				<if test="isDelete != null">`is_delete` = #{isDelete},</if>
-			<if test="aheadOrDelayTime != null">`ahead_or_delay_time` = #{aheadOrDelayTime} </if>
+				<if test="isDelete != null">`is_delete` = #{isDelete}, </if>
+				<if test="renterRealGetReturnRemark != null">`renter_real_get_return_remark` = #{renterRealGetReturnRemark}, </if>
+				<if test="ownerRealGetReturnRemark != null">`owner_real_get_return_remark` = #{ownerRealGetReturnRemark}</if>
 			</set>
 		where id = #{id}
 	</update>
@@ -271,22 +286,24 @@
 				`owner_get_return_addr_lat` = #{ownerGetReturnAddrLat}, 		
 				`status` = #{status}, 		
 				`is_notify_renyun` = #{isNotifyRenyun}, 		
+				`ahead_or_delay_time` = #{aheadOrDelayTime}, 		
 				`create_time` = #{createTime}, 		
 				`create_op` = #{createOp}, 		
 				`update_time` = #{updateTime}, 		
 				`update_op` = #{updateOp}, 		
-				`is_delete` = #{isDelete},
-			`ahead_or_delay_time` = #{aheadOrDelayTime}
+				`is_delete` = #{isDelete}, 		
+				`renter_real_get_return_remark` = #{renterRealGetReturnRemark}, 		
+				`owner_real_get_return_remark` = #{ownerRealGetReturnRemark}		
+	
 		</set>
 		where id = #{id}
 	</update>
-
 
 	<select id="listRenterOrderDeliveryByRenterOrderNo" resultMap="BaseResultMap">
 		select
 		<include refid="Base_Column_List"/>
 		from renter_order_delivery where renter_order_no = #{renterOrderNo}
-		and is_delete = 0 
+		and is_delete = 0
 		order by id desc
 	</select>
 
@@ -310,13 +327,13 @@
 		and type = #{type} and is_delete = 0 order by id desc limit 1
 	</select>
 
-<!--auto generated by MybatisCodeHelper on 2020-01-09-->
-    <select id="selectByRenterOrderNo" resultMap="BaseResultMap">
-        select
-        <include refid="Base_Column_List"/>
-        from renter_order_delivery
-        where renter_order_no=#{renterOrderNo}
-        and is_delete = 0
-    </select>
-
+	<!--auto generated by MybatisCodeHelper on 2020-01-09-->
+	<select id="selectByRenterOrderNo" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List"/>
+		from renter_order_delivery
+		where renter_order_no=#{renterOrderNo}
+		and is_delete = 0
+	</select>
+  	
 </mapper>
