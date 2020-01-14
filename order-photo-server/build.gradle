@@ -23,6 +23,11 @@ version '1.0.0-SNAPSHOT'
 sourceCompatibility = '1.8'
 targetCompatibility = 1.8
 
+compileJava {
+    options.fork = true
+    options.forkOptions.executable = "javac" // assumes that javac is on PATH
+    options.compilerArgs << "-XDignore.symbol.file"
+}
 
 
 dependencies {
