@@ -97,10 +97,11 @@ public class DeliveryCarService {
         //开始取消仁云订单数据
         Future<Boolean> result = cancelRenYunFlowOrderInfo(new CancelOrderDeliveryVO().setRenterOrderNo(orderDeliveryVO.getOrderDeliveryDTO().getRenterOrderNo())
                 .setCancelFlowOrderDTO(new CancelFlowOrderDTO().setOrdernumber(orderDeliveryVO.getOrderDeliveryDTO().getOrderNo()).setServicetype(orderDeliveryVO.getOrderDeliveryFlowEntity().getServiceType())));
-        if(result.isDone())
-        {
+        if (result.isDone()) {
             ////开始新增数据并发送仁云
-            addFlowOrderInfo(getMinutes,returnMinutes,orderReqContext);
+            addFlowOrderInfo(getMinutes, returnMinutes, orderReqContext);
+            RenYunFlowOrderDTO renYunFlowOrderDTO = createRenYunDTO(orderDeliveryVO.getOrderDeliveryFlowEntity());
+            deliveryCarTask.addRenYunFlowOrderInfo(renYunFlowOrderDTO);
         }
     }
 
