@@ -38,6 +38,7 @@ public class OwnerOrderDTO implements Serializable {
          */
         @AutoDocProperty(value="显示起租时间",required=true)
         private LocalDateTime showRentTime;
+
     	/**
          * 显示还车时间
          */
@@ -48,11 +49,15 @@ public class OwnerOrderDTO implements Serializable {
          */
         @AutoDocProperty(value="预计起租时间",required=true)
         private LocalDateTime expRentTime;
-    	/**
-         * 预计还车时间
-         */
+        @AutoDocProperty("预计起租时间")
+        private String expRentTimeStr;
+    /**
+     * 预计还车时间
+     */
         @AutoDocProperty(value="预计还车时间",required=true)
         private LocalDateTime expRevertTime;
+        @AutoDocProperty("预计还车时间")
+        private String expRevertTimeStr;
     	/**
          * 实际起租时间
          */

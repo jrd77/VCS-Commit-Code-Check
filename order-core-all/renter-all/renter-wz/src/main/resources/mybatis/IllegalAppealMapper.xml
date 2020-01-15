@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.atzuche.order.renterwz.mapper.IllegalAppealMapper">
+	<sql id="select_column">
+		id,order_no,illegal_num,appeal_content,create_time
+	</sql>
+
+	<resultMap id = "selectColumnMap" type="com.atzuche.order.renterwz.entity.IllegalAppealEntity">
+		<result property="id" column="id"/>
+		<result property="orderNo" column="order_no"/>
+		<result property="illegalNum" column="illegal_num"/>
+		<result property="appealContent" column="appeal_content"/>
+		<result property="createTime" column="create_time"/>
+	</resultMap>
+
+	<insert id="saveIllegalAppeal" parameterType="com.atzuche.order.renterwz.entity.IllegalAppealEntity" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+		INSERT INTO illegal_appeal (order_no, illegal_num, appeal_content)
+		VALUES (#{orderNo}, #{illegalNum}, #{appealContent})
+	</insert>
+
+	<select id="getIllegalAppealCount" resultType="int">
+		SELECT count(*) FROM illegal_appeal WHERE order_no=#{orderNo} and illegal_num=#{illegalNum} and create_time &gt; CURDATE()
+	</select>
+
+</mapper>

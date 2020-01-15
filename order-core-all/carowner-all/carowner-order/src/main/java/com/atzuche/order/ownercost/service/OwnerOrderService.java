@@ -108,6 +108,10 @@ public class OwnerOrderService {
         return ownerOrderMapper.queryHostiryOwnerOrderByOrderNo(orderNo);
     }
 
+    public OwnerOrderEntity queryCancelOwnerOrderByOrderNoIsEffective(String orderNo) {
+       return ownerOrderMapper.queryCancelOwnerOrderByOrderNoIsEffective(orderNo);
+    }
+
 
     public Integer updateChildStatusByOrderNo(String orderNo, Integer childStatus){
         return ownerOrderMapper.updateChildStatusByOrderNo(orderNo, childStatus);
