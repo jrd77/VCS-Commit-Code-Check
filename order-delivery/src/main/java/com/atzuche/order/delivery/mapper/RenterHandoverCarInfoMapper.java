@@ -76,6 +76,4 @@ public interface RenterHandoverCarInfoMapper {
     List<RenterHandoverCarInfoEntity> selectRenterByOrderNo(@Param("orderNo") String orderNo);
 
     RenterHandoverCarInfoEntity selectByRenterOrderNoAndType(@Param("renterOrderNo")String renterOrderNo,@Param("type")Integer type);
-
-
 }

@@ -14,7 +14,8 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class DeliveryOilCostVO {
+public class
+DeliveryOilCostVO {
 
     @AutoDocProperty("车主取还车服务")
     OwnerGetAndReturnCarDTO ownerGetAndReturnCarDTO;
