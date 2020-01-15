@@ -60,7 +60,7 @@ public class OrderCostController {
 	}
 	
 	
-	@AutoDocMethod(description = "计算车主订单费用", value = "计算车主订单费用", response = OrderOwnerCostResVO.class)
+	@AutoDocMethod(description = "计算车主子订单费用", value = "计算车主子订单费用", response = OrderOwnerCostResVO.class)
 	@RequestMapping(value="calculateOwnerOrderCost",method = RequestMethod.POST)
 	public ResponseData calculateOwnerOrderCost(@RequestBody OwnerCostReqVO ownerCostReqVO, HttpServletRequest request, HttpServletResponse response,BindingResult bindingResult) {
         logger.info("calculateOwnerOrderCost controller params={}",ownerCostReqVO.toString());
