@@ -32,10 +32,9 @@ public class OwnerOrderFineApplyService {
     }
 
 
-
-
-
-
+    public OwnerOrderFineApplyEntity getByOrderNo(String orderNo){
+        return ownerOrderFineApplyMapper.selectByOrderNo(orderNo);
+    }
 
 
 }

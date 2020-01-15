@@ -150,7 +150,7 @@ public class SubmitOrderService {
         stockService.checkCarStock(orderInfoDTO);
 
         //2.2风控
-        Integer riskAuditId = submitOrderRiskAuditService.check(buildSubmitOrderRiskCheckReqVO(orderReqVO, reqTime,
+        String riskAuditId = submitOrderRiskAuditService.check(buildSubmitOrderRiskCheckReqVO(orderReqVO, reqTime,
                 renterGoodsDetailDTO.getWeekendPrice()));
         //2.3校验链
         //TODO:下单校验
@@ -336,7 +336,7 @@ public class SubmitOrderService {
      * @param reqTime     下单时间
      * @return OrderDTO 主订单基本信息
      */
-    private OrderDTO buildOrderDTO(String orderNo, Integer riskAuditId, OrderReqVO orderReqVO, LocalDateTime reqTime) {
+    private OrderDTO buildOrderDTO(String orderNo, String riskAuditId, OrderReqVO orderReqVO, LocalDateTime reqTime) {
         OrderDTO orderDTO = new OrderDTO();
         orderDTO.setMemNoRenter(orderReqVO.getMemNo());
         orderDTO.setCategory(Integer.valueOf(orderReqVO.getOrderCategory()));
