@@ -93,6 +93,9 @@ public class OwnerOrderDTO implements Serializable {
          */
         @AutoDocProperty(value="是否有效 1-有效 0-无效",required=true)
         private Integer isEffective;
+
+        @AutoDocProperty("是否有效 1-有效 0-无效")
+        private String isEffectiveTxt;
     	/**
          * 是否使用特供价 0-否，1-是
          */

@@ -12,7 +12,7 @@ import org.springframework.boot.web.support.SpringBootServletInitializer;
  * @date 2019/12/27 4:12 下午
  **/
 @SpringBootApplication(scanBasePackages = {"com.atzuche.order.photo"})
-@MapperScan({"com.atzuche.order"})
+@MapperScan({"com.atzuche.order.photo"})
 public class OrderPhotoServerSpringBoot extends SpringBootServletInitializer {
 
     public static void main(String[] args) {
