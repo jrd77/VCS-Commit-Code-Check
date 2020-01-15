@@ -53,6 +53,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 订单结算
@@ -1209,7 +1210,7 @@ public class OrderSettleNoTService {
         if(Objects.isNull(renterOrder) || Objects.isNull(renterOrder.getRenterOrderNo())){
             throw new OrderSettleFlatAccountException();
         }
-        OwnerOrderEntity ownerOrder = ownerOrderService.getOwnerOrderByOrderNoAndIsEffective(orderNo);
+        OwnerOrderEntity ownerOrder = ownerOrderService.queryCancelOwnerOrderByOrderNoIsEffective(orderNo);
         // 3 初始化数据
         // 3.1获取租客子订单 和 租客会员号
         String renterOrderNo = renterOrder.getRenterOrderNo();
