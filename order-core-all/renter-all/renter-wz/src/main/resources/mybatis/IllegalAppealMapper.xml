@@ -14,28 +14,8 @@
 	</resultMap>
 
 	<insert id="saveIllegalAppeal" parameterType="com.atzuche.order.renterwz.entity.IllegalAppealEntity" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
-		insert into illegal_appeal(
-			<if test="orderNo != null">
-				order_no,
-			</if>
-			<if test="illegalNum != null">
-				illegal_num,
-			</if>
-			<if test="appealContent != null">
-				appeal_content,
-			</if>
-			create_time
-		) values (
-			<if test="orderNo != null">
-				#{orderNo},
-			</if>
-			<if test="illegalNum != null">
-				#{illegalNum},
-			</if>
-			<if test="appealContent != null">
-				#{appealContent},
-			</if>
-			NOW())
+		INSERT INTO illegal_appeal (order_no, illegal_num, appeal_content)
+		VALUES (#{orderNo}, #{illegalNum}, #{appealContent})
 	</insert>
 
 	<select id="getIllegalAppealCount" resultType="int">
