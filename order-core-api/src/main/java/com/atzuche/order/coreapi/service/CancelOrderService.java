@@ -1,5 +1,6 @@
 package com.atzuche.order.coreapi.service;
 
+import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.enums.MemRoleEnum;
 import com.atzuche.order.commons.vo.req.CancelOrderReqVO;
 import com.atzuche.order.coreapi.entity.dto.CancelOrderResDTO;
@@ -8,6 +9,8 @@ import com.atzuche.order.delivery.vo.delivery.CancelFlowOrderDTO;
 import com.atzuche.order.delivery.vo.delivery.CancelOrderDeliveryVO;
 import com.atzuche.order.settle.service.OrderSettleService;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +23,8 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class CancelOrderService {
+
+    private static Logger logger = LoggerFactory.getLogger(CancelOrderService.class);
 
     @Autowired
     private RenterCancelOrderService renterCancelOrderService;
@@ -58,11 +63,12 @@ public class CancelOrderService {
             res = ownerCancelOrderService.cancel(cancelOrderReqVO.getOrderNo(), cancelOrderReqVO.getCancelReason());
         }
 
+        logger.info("res:[{}]", JSON.toJSONString(res));
         //优惠券
         if (null != res && null != res.getIsReturnDisCoupon() && res.getIsReturnDisCoupon()) {
             //退还优惠券(平台券+送取服务券)
             couponAndCoinHandleService.undoPlatformCoupon(cancelOrderReqVO.getOrderNo());
-            couponAndCoinHandleService.undoPlatformCoupon(cancelOrderReqVO.getOrderNo());
+            couponAndCoinHandleService.undoGetCarFeeCoupon(cancelOrderReqVO.getOrderNo());
         }
         //订单取消（租客取消、车主取消、平台取消）如果使用了车主券且未支付，则退回否则不处理
         if (null != res && null != res.getIsReturnOwnerCoupon() && res.getIsReturnOwnerCoupon()) {

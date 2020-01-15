@@ -59,6 +59,15 @@ public class CancelOrderController {
         return ResponseData.success();
     }
 
+    @AutoDocMethod(description = "管理后台取消订单", value = "管理后台取消订单")
+    @PostMapping("/admin/cancel")
+    public ResponseData<?> adminCancelOrder(@Valid @RequestBody CancelOrderReqVO cancelOrderReqVO,
+                                       BindingResult bindingResult) {
+
+
+        return ResponseData.success();
+    }
+
 
     @AutoDocMethod(description = "测试车主取消订单进度后续操作", value = "测试车主取消订单进度后续操作")
     @PostMapping("/test/owner/cancel/{orderNo}/{dispatcherStatus}")
