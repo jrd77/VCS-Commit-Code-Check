@@ -32,7 +32,9 @@ public class OwnerOrderService {
     public OwnerOrderEntity getChangeOwnerByOrderNo(String orderNo){
         return ownerOrderMapper.getChangeOwnerByOrderNo(orderNo);
     }
-
+    
+    
+    
 
     /*
      * @Author ZhangBin
@@ -42,6 +44,15 @@ public class OwnerOrderService {
      **/
     public OwnerOrderEntity getOwnerOrderByOrderNoAndIsEffective(String orderNo){
         return ownerOrderMapper.getOwnerOrderByOrderNoAndIsEffective(orderNo);
+    }
+    
+    /**
+     * 根据子订单号查询
+     * @param ownerOrderNo
+     * @return
+     */
+    public OwnerOrderEntity getOwnerOrderByOwnerOrderNo(String ownerOrderNo){
+        return ownerOrderMapper.getOwnerOrderByOwnerOrderNo(ownerOrderNo);
     }
     
     /**

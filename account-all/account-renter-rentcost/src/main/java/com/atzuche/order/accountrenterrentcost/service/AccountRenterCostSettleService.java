@@ -4,6 +4,7 @@ import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostDetailEnt
 import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostSettleDetailEntity;
 import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostSettleEntity;
 import com.atzuche.order.accountrenterrentcost.exception.AccountRenterRentCostRefundException;
+import com.atzuche.order.accountrenterrentcost.mapper.AccountRenterCostSettleMapper;
 import com.atzuche.order.accountrenterrentcost.service.notservice.AccountRenterCostDetailNoTService;
 import com.atzuche.order.accountrenterrentcost.service.notservice.AccountRenterCostSettleDetailNoTService;
 import com.atzuche.order.accountrenterrentcost.service.notservice.AccountRenterCostSettleNoTService;
@@ -31,7 +32,8 @@ import java.util.Objects;
 public class AccountRenterCostSettleService{
     @Autowired private AccountRenterCostSettleNoTService accountRenterCostSettleNoTService;
     @Autowired private AccountRenterCostDetailNoTService accountRenterCostDetailNoTService;
-
+    @Autowired private AccountRenterCostSettleMapper accountRenterCostSettleMapper;
+    
     /**
      * 查询订单 已付租车费用
      */
@@ -117,4 +119,15 @@ public class AccountRenterCostSettleService{
         accountRenterCostDetail.setPaySource(RenterCashCodeEnum.ACCOUNT_RENTER_RENT_COST.getCashNo());
         accountRenterCostDetailNoTService.insertAccountRenterCostDetailEntity(accountRenterCostDetail);
     }
+    
+    /**
+     * 查询结算对象
+     * @param orderNo
+     * @param memNo
+     * @return
+     */
+    public AccountRenterCostSettleEntity selectByOrderNo(String orderNo,String memNo) {
+    	return accountRenterCostSettleMapper.selectByOrderNo(orderNo, memNo);
+    }
+    
 }

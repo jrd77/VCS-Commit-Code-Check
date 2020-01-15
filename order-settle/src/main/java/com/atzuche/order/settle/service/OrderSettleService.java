@@ -1,27 +1,26 @@
 package com.atzuche.order.settle.service;
 
-import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostSettleEntity;
-import com.atzuche.order.cashieraccount.service.CashierSettleService;
-import com.atzuche.order.commons.CatConstants;
-import com.atzuche.order.flow.service.OrderFlowService;
-import com.atzuche.order.parentorder.dto.OrderStatusDTO;
-import com.atzuche.order.parentorder.service.OrderStatusService;
-import com.atzuche.order.settle.exception.OrderSettleFlatAccountException;
-import com.atzuche.order.settle.service.notservice.OrderSettleNoTService;
-import com.atzuche.order.settle.vo.req.SettleCancelOrdersAccount;
-import com.atzuche.order.settle.vo.req.SettleOrders;
-import com.atzuche.order.settle.vo.req.SettleOrdersAccount;
-import com.atzuche.order.settle.vo.req.SettleOrdersDefinition;
-import com.autoyol.cat.CatAnnotation;
-import com.autoyol.commons.utils.GsonUtils;
-
-import com.dianping.cat.Cat;
-import com.dianping.cat.message.Transaction;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostSettleEntity;
+import com.atzuche.order.cashieraccount.service.CashierSettleService;
+import com.atzuche.order.commons.CatConstants;
+import com.atzuche.order.parentorder.dto.OrderStatusDTO;
+import com.atzuche.order.settle.exception.OrderSettleFlatAccountException;
+import com.atzuche.order.settle.service.notservice.OrderSettleNoTService;
+import com.atzuche.order.settle.vo.req.OwnerCosts;
+import com.atzuche.order.settle.vo.req.RentCosts;
+import com.atzuche.order.settle.vo.req.SettleOrders;
+import com.atzuche.order.settle.vo.req.SettleOrdersAccount;
+import com.atzuche.order.settle.vo.req.SettleOrdersDefinition;
+import com.autoyol.commons.utils.GsonUtils;
+import com.dianping.cat.Cat;
+import com.dianping.cat.message.Transaction;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * 车辆结算
@@ -32,8 +31,29 @@ import org.springframework.transaction.annotation.Transactional;
 public class OrderSettleService{
     @Autowired private CashierSettleService cashierSettleService;
     @Autowired private OrderSettleNoTService orderSettleNoTService;
-
-
+    
+    /**
+     * 获取租客预结算数据
+     * @param orderNo
+     */
+    public RentCosts preRenterSettleOrder(String orderNo,String renterOrderNo) {
+    	SettleOrders settleOrders =  orderSettleNoTService.preInitSettleOrders(orderNo,renterOrderNo,null);
+    	 //3.4 查询所有租客费用明细
+        orderSettleNoTService.getRenterCostSettleDetail(settleOrders);
+        return settleOrders.getRentCosts();
+    }
+    
+    /**
+     * 获取租客预结算数据
+     * @param orderNo
+     */
+    public OwnerCosts preOwnerSettleOrder(String orderNo,String ownerOrderNo) {
+    	SettleOrders settleOrders =  orderSettleNoTService.preInitSettleOrders(orderNo,null,ownerOrderNo);
+        //3.5 查询所有车主费用明细 TODO 暂不支持 多个车主
+    	orderSettleNoTService.getOwnerCostSettleDetail(settleOrders);
+    	return settleOrders.getOwnerCosts();
+    }
+    
     /**
      * 车辆押金结算
      */
