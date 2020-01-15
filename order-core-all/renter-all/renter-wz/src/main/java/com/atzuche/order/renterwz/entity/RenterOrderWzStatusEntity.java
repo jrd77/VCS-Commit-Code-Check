@@ -33,6 +33,10 @@ public class RenterOrderWzStatusEntity{
 	 */
 	private String ownerNo;
 	/**
+	 * 车辆好
+	 */
+	private String carNo;
+	/**
 	*处理状态 5:未处理，10(待租客处理)，20(已处理-无违章)，25(处理中-租客处理)，26(处理中-车主处理)，35(已处理-异常订单)，40(处理中-平台处理)，45(已处理-无信息) 46(处理中-无数据) 50(已处理-租客处理) 51(已处理-车主处理)
 	*/
 	private Integer status;

@@ -2,17 +2,17 @@ package com.atzuche.order.admin.service;
 
 
 import com.alibaba.fastjson.JSON;
-import com.atzuche.order.admin.exception.CarDepositQueryException;
+import com.atzuche.order.admin.exception.CarDepositQueryErrException;
+import com.atzuche.order.admin.exception.CarDepositQueryFailException;
 import com.atzuche.order.admin.vo.req.car.CarDepositReqVO;
 import com.atzuche.order.admin.vo.resp.car.CarDepositRespVo;
-import com.atzuche.order.car.RenterCarDetailErrException;
 import com.atzuche.order.car.RenterCarDetailFailException;
 import com.atzuche.order.commons.CatConstants;
 import com.atzuche.order.commons.GlobalConstant;
 import com.atzuche.order.commons.LocalDateTimeUtils;
 import com.atzuche.order.commons.entity.orderDetailDto.*;
-import com.atzuche.order.commons.enums.OrderPayStatusEnum;
 import com.atzuche.order.commons.enums.RenterCashCodeEnum;
+import com.atzuche.order.commons.enums.cashier.TransStatusEnum;
 import com.atzuche.order.open.service.FeignOrderDetailService;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
@@ -48,7 +48,7 @@ public class CarDepositReturnDetailService {
             Cat.logEvent(CatConstants.FEIGN_RESULT,JSON.toJSONString(orderDetailReqDTO));
             if(responseData == null || !ErrorCode.SUCCESS.getCode().equals(responseData.getResCode())){
                 log.error("Feign 获取费用详情失败,responseData={},orderDetailReqDTO={}",JSON.toJSONString(responseData),JSON.toJSONString(responseData));
-                RenterCarDetailFailException failException = new RenterCarDetailFailException();
+                CarDepositQueryFailException failException = new CarDepositQueryFailException();
                 Cat.logError("Feign 获取费用详情失败",failException);
                 throw failException;
             }
@@ -59,22 +59,23 @@ public class CarDepositReturnDetailService {
             throw e;
         }catch (Exception e){
             log.error("Feign 获取费用详情异常,responseData={},orderDetailReqDTO={}",JSON.toJSONString(responseData),JSON.toJSONString(responseData),e);
-            RenterCarDetailErrException carDetailByFeignException = new RenterCarDetailErrException();
-            Cat.logError("Feign 获取费用详情异常",carDetailByFeignException);
-            throw carDetailByFeignException;
+            CarDepositQueryErrException err = new CarDepositQueryErrException();
+            Cat.logError("Feign 获取费用详情异常",err);
+            throw err;
         }finally {
             t.complete();
         }
         OrderAccountDetailRespDTO data = responseData.getData();
         OrderStatusDTO orderStatusDTO = data.orderStatusDTO;
         if(orderStatusDTO == null){
-            CarDepositQueryException carDepositQueryException = new CarDepositQueryException();
-            log.error("车辆押金获取失败",carDepositQueryException);
-            throw carDepositQueryException;
+            CarDepositQueryErrException carDepositQueryErrException = new CarDepositQueryErrException();
+            log.error("车辆押金获取失败", carDepositQueryErrException);
+            throw carDepositQueryErrException;
         }
 
         AccountRenterDepositDTO accountRenterDepositDTO = data.getAccountRenterDepositDTO();
         RenterDepositDetailDTO renterDepositDetailDTO = data.getRenterDepositDetailDTO();
+        OrderDTO orderDTO = data.getOrderDTO();
         AccountRenterDetainCostDTO accountRenterDetainCostDTO = data.getAccountRenterDetainCostDTO();
         List<AccountRenterDetainDetailDTO> accountRenterDetainDetailDTOList = data.getAccountRenterDetainDetailDTOList();
         List<AccountRenterCostDetailDTO> accountRenterCostDetailDTOS = data.getAccountRenterCostDetailDTOS();
@@ -93,7 +94,7 @@ public class CarDepositReturnDetailService {
                 .filter(x -> RenterCashCodeEnum.SETTLE_DEPOSIT_TO_RENT_COST.equals(x.getSourceCode()))
                 .collect(Collectors.summingInt(AccountRenterCostDetailDTO::getAmt));
 
-        Integer depositToHistoryAmt = accountRenterDepositDetailDTOList.stream()
+        Integer depositToHistoryAmt = Optional.ofNullable(accountRenterDepositDetailDTOList).orElseGet(ArrayList::new).stream()
                 .filter(x -> RenterCashCodeEnum.SETTLE_DEPOSIT_TO_HISTORY_AMT.equals(x.getSourceCode()))
                 .collect(Collectors.summingInt(AccountRenterDepositDetailDTO::getAmt));
 
@@ -109,25 +110,35 @@ public class CarDepositReturnDetailService {
             depositType = "消费";
             payType = "支付宝/微信";
         }
-        int payStatus = Integer.valueOf(accountRenterDepositDTO.getPayStatus());
+        String payStatus = accountRenterDepositDTO.getPayStatus();
         LocalDateTime actSettleTimeLocalDateTIme = orderStatusDTO.getSettleTime();
-        String actSettleTime = LocalDateTimeUtils.formateLocalDateTimeStr(actSettleTimeLocalDateTIme, GlobalConstant.DATE_TIME_FORMAT_1);
-        LocalDateTime expSettleTimeLocalDateTIme = orderStatusDTO.getSettleTime().plusHours(4);
+        String actSettleTime = "";
+        if(actSettleTimeLocalDateTIme != null){
+            actSettleTime = LocalDateTimeUtils.formateLocalDateTimeStr(actSettleTimeLocalDateTIme, GlobalConstant.DATE_TIME_FORMAT_1);
+        }
+        LocalDateTime expSettleTimeLocalDateTIme = orderDTO.getExpRevertTime().plusHours(4);
         String expSettleTime = LocalDateTimeUtils.formateLocalDateTimeStr(expSettleTimeLocalDateTIme, GlobalConstant.DATE_TIME_FORMAT_1);
         LocalDateTime time = accountRenterDetainDetailDTO.getTime();
-        String detainTime = LocalDateTimeUtils.formateLocalDateTimeStr(time, GlobalConstant.DATE_TIME_FORMAT_1);
+        String detainTime = "";
+        if(time != null){
+            detainTime = LocalDateTimeUtils.formateLocalDateTimeStr(time, GlobalConstant.DATE_TIME_FORMAT_1);
+        }
+        LocalDateTime payTime = accountRenterDepositDTO.getPayTime();
+        String payTimeStr = "";
+        if(payTime != null){
+            payTimeStr = LocalDateTimeUtils.formateLocalDateTimeStr(payTime, GlobalConstant.DATE_TIME_FORMAT_1);
+        }
 
         CarDepositRespVo carDepositRespVo = new CarDepositRespVo();
         carDepositRespVo.setCarDepositMonty(renterDepositDetailDTO.getOriginalDepositAmt());
         carDepositRespVo.setOriginalTotalAmt(renterDepositDetailDTO.getReductionDepositAmt());
         carDepositRespVo.setReceivableMonty(accountRenterDepositDTO.getYingfuDepositAmt());
 
-
         carDepositRespVo.setPayType(payType);
         carDepositRespVo.setDepositType(depositType);
         carDepositRespVo.setReliefAmtStr(renterDepositDetailDTO.getReductionDepositAmt());
-        carDepositRespVo.setPayDateStr(LocalDateTimeUtils.formateLocalDateTimeStr(accountRenterDepositDTO.getPayTime(), GlobalConstant.DATE_TIME_FORMAT_1));
-        carDepositRespVo.setPayStatusStr(OrderPayStatusEnum.from(payStatus).getDesc());
+        carDepositRespVo.setPayDateStr(payTimeStr);
+        carDepositRespVo.setPayStatusStr(TransStatusEnum.getFlagText(payStatus));
 
         carDepositRespVo.setSurplusDepositAmt(accountRenterDepositDTO.getSurplusDepositAmt());
         carDepositRespVo.setRealDeductionRentCarAmt(depositToCarAmt);
@@ -135,7 +146,7 @@ public class CarDepositReturnDetailService {
         carDepositRespVo.setDeductionHistoryAmt(depositToHistoryAmt);
         carDepositRespVo.setExpSettleTime(expSettleTime);
         carDepositRespVo.setActSettleTime(actSettleTime);
-        carDepositRespVo.setActDetainAmt(accountRenterDetainCostDTO.getAmt());
+        carDepositRespVo.setActDetainAmt(accountRenterDetainCostDTO==null?0:accountRenterDetainCostDTO.getAmt());
         carDepositRespVo.setActDetainStatus("成功");
         carDepositRespVo.setActDetainTime(detainTime);
 

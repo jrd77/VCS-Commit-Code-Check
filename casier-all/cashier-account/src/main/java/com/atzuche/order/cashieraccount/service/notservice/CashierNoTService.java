@@ -316,12 +316,8 @@ public class CashierNoTService {
      */
     public PayVo getPayVO(CashierEntity cashierEntity,OrderPaySignReqVO orderPaySign,int amt ,String title,String payKind,String payIdStr ,String extendParams) {
         PayVo vo = new PayVo();
-        if(Objects.isNull(cashierEntity)){
-
-        }
         Integer paySn = (Objects.isNull(cashierEntity)|| Objects.isNull(cashierEntity.getPaySn()))?0:cashierEntity.getPaySn();
-        paySn = Objects.isNull(paySn)?0:paySn;
-        vo.setInternalNo(String.valueOf(paySn));
+        vo.setInternalNo("1");
         vo.setExtendParams(extendParams);
         vo.setAtappId(DataAppIdConstant.APPID_SHORTRENT);
         vo.setMemNo(orderPaySign.getMenNo());
@@ -443,29 +439,19 @@ public class CashierNoTService {
         int result = 0;
         int cashierId=0;
         RenterCashCodeEnum renterCashCodeEnum = RenterCashCodeEnum.ACCOUNT_RENTER_RENT_COST;
-        if(Objects.nonNull(cashierEntity) && Objects.nonNull(cashierEntity.getPaySn())){
-            CashierEntity cashier = new CashierEntity ();
-            cashier.setId(cashierEntity.getId());
-            cashier.setPaySn(cashierEntity.getPaySn() + 1);
-            cashier.setPayAmt(cashier.getPayAmt() + amtWallet);
-            cashier.setVersion(cashierEntity.getVersion());
-            result = cashierMapper.updateByPrimaryKeySelective(cashier);
-            cashierId = cashier.getId();
-            renterCashCodeEnum = RenterCashCodeEnum.ACCOUNT_RENTER_RENT_COST_AGAIN;
-        }else {
-            CashierEntity cashier = new CashierEntity ();
-            BeanUtils.copyProperties(orderPaySign,cashier);
-            cashier.setPayAmt(amtWallet);
-            cashier.setPaySource(PaySourceEnum.WALLET_PAY.getCode());
-            cashier.setPayTitle("订单号：" + orderPaySign.getOrderNo() + "钱包支付金额：" + amtWallet + "元");
-            cashier.setPayKind(DataPayKindConstant.RENT_AMOUNT);
-            cashier.setPayType(DataPayTypeConstant.PAY_PUR);
-            cashier.setAtappId(DataAppIdConstant.APPID_SHORTRENT);
-            cashier.setTransStatus("00");
-            cashier.setPaySn(NumberUtils.INTEGER_ONE);
-            result = cashierMapper.insertSelective(cashier);
-            cashierId = cashier.getId();
-        }
+        CashierEntity cashier = new CashierEntity ();
+        BeanUtils.copyProperties(orderPaySign,cashier);
+        cashier.setMemNo(orderPaySign.getMenNo());
+        cashier.setPayAmt(amtWallet);
+        cashier.setPaySource(PaySourceEnum.WALLET_PAY.getCode());
+        cashier.setPayTitle("订单号：" + orderPaySign.getOrderNo() + "钱包支付金额：" + amtWallet + "元");
+        cashier.setPayKind(DataPayKindConstant.RENT_AMOUNT);
+        cashier.setPayType(DataPayTypeConstant.PAY_PUR);
+        cashier.setAtappId(DataAppIdConstant.APPID_SHORTRENT);
+        cashier.setTransStatus("00");
+        cashier.setPaySn(NumberUtils.INTEGER_ONE);
+        result = cashierMapper.insertSelective(cashier);
+        cashierId = cashier.getId();
         if(result ==0){
             throw new AccountRenterDepositDBException();
         }
@@ -474,8 +460,11 @@ public class CashierNoTService {
         AccountRenterCostReqVO accountRenterCostReq = new AccountRenterCostReqVO();
         BeanUtils.copyProperties(orderPaySign,accountRenterCostReq);
         accountRenterCostReq.setShifuAmt(Math.abs(amtWallet));
+        accountRenterCostReq.setMemNo(orderPaySign.getMenNo());
+
         AccountRenterCostDetailReqVO accountRenterCostDetailReq = new AccountRenterCostDetailReqVO();
         BeanUtils.copyProperties(orderPaySign,accountRenterCostDetailReq);
+        accountRenterCostDetailReq.setMemNo(orderPaySign.getMenNo());
         accountRenterCostDetailReq.setUniqueNo(String.valueOf(cashierId));
         accountRenterCostDetailReq.setAmt(Math.abs(amtWallet));
         accountRenterCostDetailReq.setTransTime(LocalDateTime.now());
@@ -496,18 +485,23 @@ public class CashierNoTService {
     public RefundVo getRefundVo(CashierRefundApplyEntity cashierRefundApply) {
         RefundVo refundVo = new RefundVo();
         BeanUtils.copyProperties(cashierRefundApply,refundVo);
+        refundVo.setRefundId(cashierRefundApply.getId().toString());
         refundVo.setPayType(DataPayTypeConstant.PUR_RETURN);
         refundVo.setReqIp(IpUtil.getLocalIp());
         refundVo.setPaySn(String.valueOf(cashierRefundApply.getNum()+1));
         refundVo.setExtendParams(GsonUtils.toJson(cashierRefundApply));
         refundVo.setAtpaySign(StringUtils.EMPTY);
+        refundVo.setPayEnv(env);
+        refundVo.setInternalNo("1");
+        refundVo.setReqOs("IOS");
+        refundVo.setRefundAmt(String.valueOf(Math.abs(cashierRefundApply.getAmt())));
         String payMd5 =  MD5.MD5Encode(FasterJsonUtil.toJson(refundVo));
         refundVo.setPayMd5(payMd5);
         String reqContent = FasterJsonUtil.toJson(refundVo);
         //TODO 签名串
         String sign = StringUtils.EMPTY;
         try {
-            sign = RSASecurityUtils.privateKeySignature(PublicKeySignConstants.AUTO_TRANS_PUBLIC_KEY,reqContent);
+            sign =RSASecurityUtils.privateKeySignature(AESUtil.keySign,reqContent);
         } catch (Exception e) {
             log.error("refundOrderPay 支付验签数据失败 ，param ;[{}],e:[{}]",FasterJsonUtil.toJson(refundVo),e);
             throw new OrderPaySignParamException();

@@ -334,5 +334,12 @@
 		where renter_order_no=#{renterOrderNo}
 		and is_delete = 0
 	</select>
+
+	<select id="findRenterOrderListByorderNo" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List"/>
+		from renter_order_delivery where order_no = #{orderNo}
+	    and is_delete = 0
+	</select>
   	
 </mapper>

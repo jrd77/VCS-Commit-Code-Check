@@ -41,8 +41,9 @@ public class SubmitOrderRiskAuditService {
      * @param submitOrderRiskCheckReqVO 请求参数
      * @return Integer riskAuditId
      */
-    public Integer check(SubmitOrderRiskCheckReqVO submitOrderRiskCheckReqVO) {
-        logger.info("Submit order rish audit check.param is,submitOrderRiskCheckReqVO:[{}]", JSON.toJSONString(submitOrderRiskCheckReqVO));
+    public String check(SubmitOrderRiskCheckReqVO submitOrderRiskCheckReqVO) {
+        logger.info("Submit order risk audit check.param is,submitOrderRiskCheckReqVO:[{}]",
+                JSON.toJSONString(submitOrderRiskCheckReqVO));
         
         CreateOrderRiskCheckRequestVO req = buildCreateOrderRiskCheckRequestVO(submitOrderRiskCheckReqVO);
         Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "风控服务");
@@ -60,7 +61,7 @@ public class SubmitOrderRiskAuditService {
                 throw new SubmitOrderException(responseData.getResCode(), responseData.getResMsg(), responseData.getData());
             } else {
                 t.setStatus(Transaction.SUCCESS);
-                return null == responseData.getData() ? null : Integer.valueOf(responseData.getData().toString());
+                return String.valueOf(responseData.getData());
             }
         } catch (SubmitOrderException soe) {
             logger.error("下单调用风控服务审核不通过.param is, reqVo:[{}]", req, soe);
@@ -106,6 +107,7 @@ public class SubmitOrderRiskAuditService {
 
         createOrderRiskCheckRequestVO.setUseCarCityCode(submitOrderRiskCheckReqVO.getCityCode());
         createOrderRiskCheckRequestVO.setUseCarCityName(submitOrderRiskCheckReqVO.getCityName());
+        createOrderRiskCheckRequestVO.setAverageDailyPrice(String.valueOf(submitOrderRiskCheckReqVO.getWeekendPrice()));
 
         return createOrderRiskCheckRequestVO;
     }

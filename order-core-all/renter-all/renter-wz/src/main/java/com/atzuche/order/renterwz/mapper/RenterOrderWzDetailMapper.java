@@ -122,4 +122,11 @@ public interface RenterOrderWzDetailMapper{
 	 * @return 违章数量
 	 */
     Integer queryIllegalCountByCarNoAndOrders(@Param("orders") List<String> orders,@Param("carNo") String carNo);
+
+	/**
+	 * 查询违章详情
+	 * @param orderNo 订单号
+	 * @return 违章详情
+	 */
+	List<RenterOrderWzDetailEntity> findTransIllegalDetailByOrderNo(String orderNo);
 }

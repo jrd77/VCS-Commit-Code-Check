@@ -24,6 +24,7 @@ import com.atzuche.order.renterorder.vo.owner.OwnerCouponGetAndValidReqVO;
 import com.atzuche.order.renterorder.vo.platform.MemAvailCouponRequestVO;
 import com.autoyol.auto.coin.service.vo.res.AutoCoinResponseVO;
 import com.autoyol.platformcost.model.CarDepositAmtVO;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -150,7 +151,8 @@ public class RenterOrderCostHandleService {
         renterOrderCarDepositResVO.setReductionAmt(null == memRightCarDepositAmtRespDTO.getReductionDepositAmt() ? 0
                 : Math.abs(memRightCarDepositAmtRespDTO.getReductionDepositAmt()));
         renterOrderCarDepositResVO.setYingfuDepositAmt(-(memRightCarDepositAmtRespDTO.getOriginalDepositAmt() - renterOrderCarDepositResVO.getReductionAmt()));
-        renterOrderCarDepositResVO.setFreeDepositType(FreeDepositTypeEnum.getFreeDepositTypeEnumByCode(Integer.valueOf(renterOrderReqVO.getFreeDoubleTypeId())));
+        renterOrderCarDepositResVO.setFreeDepositType(StringUtils.isNotBlank(renterOrderReqVO.getFreeDoubleTypeId()) ?
+                FreeDepositTypeEnum.getFreeDepositTypeEnumByCode(Integer.valueOf(renterOrderReqVO.getFreeDoubleTypeId())) : null);
         renterOrderCarDepositResVO.setReductionRate(Double.valueOf(memRightCarDepositAmtRespDTO.getReductionRate() * 100).intValue());
 
         LOGGER.info("租客车辆押金B.result is,renterOrderCarDepositResVO:[{}]",
@@ -179,7 +181,8 @@ public class RenterOrderCostHandleService {
                 realIllegalDepositAmt);
         RenterOrderIllegalResVO renterOrderIllegalResVO = new RenterOrderIllegalResVO();
         renterOrderIllegalResVO.setOrderNo(renterOrderReqVO.getOrderNo());
-        renterOrderIllegalResVO.setFreeDepositType(FreeDepositTypeEnum.getFreeDepositTypeEnumByCode(Integer.valueOf(renterOrderReqVO.getFreeDoubleTypeId())));
+        renterOrderIllegalResVO.setFreeDepositType(StringUtils.isNotBlank(renterOrderReqVO.getFreeDoubleTypeId()) ?
+                FreeDepositTypeEnum.getFreeDepositTypeEnumByCode(Integer.valueOf(renterOrderReqVO.getFreeDoubleTypeId())) : null);
         renterOrderIllegalResVO.setMemNo(renterOrderReqVO.getMemNo());
         renterOrderIllegalResVO.setYingfuDepositAmt(-Math.abs(realIllegalDepositAmt));
         LOGGER.info("违章押金处理.result is, renterOrderIllegalResVO:[{}]", renterOrderIllegalResVO);

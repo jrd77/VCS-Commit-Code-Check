@@ -12,7 +12,6 @@ import com.autoyol.car.api.feign.api.CarDetailQueryFeignApi;
 import com.autoyol.car.api.model.dto.OrderCarInfoParamDTO;
 import com.autoyol.car.api.model.vo.*;
 import com.autoyol.commons.web.ErrorCode;
-import com.autoyol.commons.web.ResponseData;
 import com.dianping.cat.Cat;
 import com.dianping.cat.message.Transaction;
 import lombok.Data;
@@ -22,6 +21,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -122,6 +122,7 @@ public class CarProxyService {
         }
 
         CarDetailVO data = responseObject.getData();
+        List<CarInspectVO> carInspectS = data.getCarInspectS();
         CarBaseVO carBaseVO = data.getCarBaseVO();
         CarDetectVO carDetect = data.getCarDetect();
         CarStewardVO carSteward = data.getCarSteward();
@@ -156,6 +157,7 @@ public class CarProxyService {
         renterGoodsDetailDto.setCarOilVolume(carBaseVO.getOilVolume());
         renterGoodsDetailDto.setCarEngineType(carBaseVO.getEngineType());
         renterGoodsDetailDto.setCarDesc(carBaseVO.getCarDesc());
+        renterGoodsDetailDto.setWeekendPrice(null == carBaseVO.getWeekendPrice() ? 0 : carBaseVO.getWeekendPrice());
         renterGoodsDetailDto.setCarStewardPhone(carSteward==null||carSteward.getStewardPhone()==null ? "" : String.valueOf(carSteward.getStewardPhone()));
         renterGoodsDetailDto.setCarCheckStatus(carDetect == null ? null : carDetect.getDetectStatus());
         renterGoodsDetailDto.setCarShowAddr(carAddressOfTransVO==null ? "" : carAddressOfTransVO.getCarVirtualAddress());
@@ -176,6 +178,10 @@ public class CarProxyService {
         renterGoodsDetailDto.setLicenseDay(LocalDateTimeUtils.parseStringToLocalDate(carBaseVO.getLicenseDay()));
         renterGoodsDetailDto.setMoreLicenseFlag(carBaseVO.getMoreLicenseFlag());
         renterGoodsDetailDto.setLicenseExpire(carBaseVO.getLicenseExpire()==null?null:LocalDateTimeUtils.dateToLocalDateTime(carBaseVO.getLicenseExpire()));
+        CarInspectVO carInspectVO = carInspectS != null && carInspectS.size() > 0 ? carInspectS.get(0) : null;
+        String inspectExpire = carInspectVO != null ? carInspectVO.getInspectExpire() : null;
+        renterGoodsDetailDto.setInspectExpire(inspectExpire!=null?LocalDateTimeUtils.parseStringToLocalDate(inspectExpire):null);
+
         if (data.getCarModelParam() != null) {
             renterGoodsDetailDto.setCarInmsrp(data.getCarModelParam().getInmsrp());
         }
@@ -236,5 +242,8 @@ public class CarProxyService {
         return coverPic;
     }
 
-
+    public static void main(String[] args) {
+        LocalDate localDate = LocalDateTimeUtils.parseStringToLocalDate("2012-06-21");
+        System.out.println(localDate);
+    }
 }

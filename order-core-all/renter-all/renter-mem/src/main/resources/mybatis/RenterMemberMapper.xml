@@ -234,6 +234,7 @@
 
     <select id="queryMemNoAndPhoneByOrderList" resultMap="BaseResultMap">
         SELECT
+            order_no,
             mem_no,
             phone
         FROM
@@ -244,6 +245,10 @@
                 #{orderNo}
             </foreach>
         </where>
+    </select>
+
+    <select id="queryRenterInfoByOrderNoAndRenterNo" resultMap="BaseResultMap">
+        select mem_no,phone,real_name from renter_member where order_no = #{orderNo} and mem_no = #{renterNo} and is_delete = 0 order by id desc limit 1
     </select>
 
 </mapper>

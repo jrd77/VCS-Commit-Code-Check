@@ -52,7 +52,7 @@
         <result property="updateOp" column="update_op"/>
         <result property="isDelete" column="is_delete"/>
         <result property="oilTotalCalibration" column="oil_total_calibration"/>
-
+        <result property="inspectExpire" column="inspect_expire"/>
     </resultMap>
 
 
@@ -104,8 +104,8 @@
 	`create_op`,
 	`update_time`,
 	`update_op`,
-	`is_delete`
-
+	`is_delete`,
+    `inspect_expire`
 
 	</sql>
 
@@ -160,7 +160,8 @@
         `engine_num`,
         `year`,
         `create_op`,
-        `update_op`
+        `update_op`,
+        `inspect_expire`
         )
         values
         (
@@ -207,7 +208,8 @@
         #{engineNum},
         #{year},
         #{createOp},
-        #{updateOp}
+        #{updateOp},
+        #{inspectExpire}
         )
     </insert>
 
@@ -260,7 +262,8 @@
             <if test="createOp != null">`create_op`, </if>
             <if test="updateTime != null">`update_time`, </if>
             <if test="updateOp != null">`update_op`, </if>
-            <if test="isDelete != null">`is_delete` </if>
+            <if test="isDelete != null">`is_delete`, </if>
+            <if test="inspectExpire != null">`inspect_expire` </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides="," >
             <if test="orderNo != null">#{orderNo},  </if>
@@ -309,7 +312,8 @@
             <if test="createOp != null">#{createOp},  </if>
             <if test="updateTime != null">#{updateTime},  </if>
             <if test="updateOp != null">#{updateOp},  </if>
-            <if test="isDelete != null">#{isDelete} </if>
+            <if test="isDelete != null">#{isDelete}, </if>
+            <if test="inspectExpire != null">#{inspectExpire} </if>
         </trim>
     </insert>
 
@@ -363,6 +367,7 @@
             <if test="createOp != null">`create_op` = #{createOp}, </if>
             <if test="updateTime != null">`update_time` = #{updateTime}, </if>
             <if test="updateOp != null">`update_op` = #{updateOp}, </if>
+            <if test="inspectExpire != null">`inspect_expire` = #{inspectExpire}, </if>
             <if test="isDelete != null">`is_delete` = #{isDelete}</if>
         </set>
         where id = #{id}
@@ -409,6 +414,7 @@
             `car_guide_day_price` = #{carGuideDayPrice},
             `oil_total_calibration` = #{oilTotalCalibration}
             `stop_cost_rate` = #{stopCostRate},
+            `inspect_expire` = #{inspectExpire},
             `engine_source` = #{engineSource},
             `frame_no` = #{frameNo},
             `engine_num` = #{engineNum},
@@ -439,6 +445,10 @@
 
     <select id="queryCarNumByOrderNo" resultType="java.lang.String" parameterType="java.lang.String">
         select car_plate_num from renter_goods where order_no = #{orderNo} and is_delete = 0 order by id desc limit 1
+    </select>
+
+    <select id="queryCarInfoByOrderNoAndCarNo" resultMap="BaseResultMap">
+        select car_no,car_plate_num,car_brand_txt,car_type_txt,inspect_expire from renter_goods where order_no = #{orderNo} and car_no = #{carNo} and is_delete = 0 order by id desc limit 1
     </select>
 
 </mapper>

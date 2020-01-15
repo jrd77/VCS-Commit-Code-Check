@@ -8,7 +8,6 @@ import lombok.EqualsAndHashCode;
 /**
  * 收益审核失败异常
  */
-@Data
 @EqualsAndHashCode(callSuper = false)
 public class AccountOwnerIncomeExamineException extends OrderException {
     public AccountOwnerIncomeExamineException() {

@@ -72,7 +72,7 @@ public class AccountInsertDebtReqVO {
         Assert.notNull(getOrderNo(), ErrorCode.PARAMETER_ERROR.getText());
         Assert.notNull(getRenterOrderNo(), ErrorCode.PARAMETER_ERROR.getText());
         Assert.notNull(getAmt(), ErrorCode.PARAMETER_ERROR.getText());
-        Assert.isTrue(getAmt()==0, ErrorCode.PARAMETER_ERROR.getText());
+        Assert.isTrue(getAmt()!=0, ErrorCode.PARAMETER_ERROR.getText());
         Assert.notNull(getSourceCode(), ErrorCode.PARAMETER_ERROR.getText());
         Assert.notNull(getType(), ErrorCode.PARAMETER_ERROR.getText());
 

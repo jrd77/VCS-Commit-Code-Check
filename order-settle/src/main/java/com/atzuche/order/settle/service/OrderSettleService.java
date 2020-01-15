@@ -1,20 +1,17 @@
 package com.atzuche.order.settle.service;
 
 import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostSettleEntity;
+import com.atzuche.order.cashieraccount.service.CashierService;
 import com.atzuche.order.cashieraccount.service.CashierSettleService;
 import com.atzuche.order.commons.CatConstants;
-import com.atzuche.order.flow.service.OrderFlowService;
 import com.atzuche.order.parentorder.dto.OrderStatusDTO;
-import com.atzuche.order.parentorder.service.OrderStatusService;
 import com.atzuche.order.settle.exception.OrderSettleFlatAccountException;
 import com.atzuche.order.settle.service.notservice.OrderSettleNoTService;
 import com.atzuche.order.settle.vo.req.SettleCancelOrdersAccount;
 import com.atzuche.order.settle.vo.req.SettleOrders;
 import com.atzuche.order.settle.vo.req.SettleOrdersAccount;
 import com.atzuche.order.settle.vo.req.SettleOrdersDefinition;
-import com.autoyol.cat.CatAnnotation;
 import com.autoyol.commons.utils.GsonUtils;
-
 import com.dianping.cat.Cat;
 import com.dianping.cat.message.Transaction;
 import lombok.extern.slf4j.Slf4j;
@@ -32,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class OrderSettleService{
     @Autowired private CashierSettleService cashierSettleService;
     @Autowired private OrderSettleNoTService orderSettleNoTService;
+    @Autowired private CashierService cashierService;
 
 
     /**
@@ -67,7 +65,7 @@ public class OrderSettleService{
             //5 费用明细先落库
             orderSettleNoTService.insertSettleOrders(settleOrdersDefinition);
 
-            //6 费用平账 平台收入 + 平台补贴 + 车主收益 + 车主补贴 + 租客费用 + 租客补贴 = 0
+            //6 费用平账 平台收入 + 平台补贴 +  + 车主补贴 + 租客费用 + 租客补贴 = 0
             int totleAmt = settleOrdersDefinition.getPlatformProfitAmt() + settleOrdersDefinition.getPlatformSubsidyAmt()
                          + settleOrdersDefinition.getOwnerCostAmt() + settleOrdersDefinition.getOwnerSubsidyAmt()
                          + settleOrdersDefinition.getRentCostAmt() + settleOrdersDefinition.getRentSubsidyAmt();
@@ -133,39 +131,41 @@ public class OrderSettleService{
      */
     @Transactional(rollbackFor=Exception.class)
     public boolean settleOrderCancel(String orderNo) {
-//        Transaction t = Cat.getProducer().newTransaction(CatConstants.FEIGN_CALL, "取消订单结算服务");
-//        try {
-//            Cat.logEvent(CatConstants.FEIGN_METHOD, "OrderSettleService.settleOrderCancel");
-//            Cat.logEvent(CatConstants.FEIGN_PARAM, orderNo);
-//            OrderStatusDTO orderStatusDTO = new OrderStatusDTO();
-//            orderStatusDTO.setOrderNo(orderNo);
-//            // 1 取消订单初始化
-//            SettleOrders settleOrders =  orderSettleNoTService.initCancelSettleOrders(orderNo);
-//            //2 查询所有租客罚金明细  及 凹凸币补贴
-//            orderSettleNoTService.getCancelRenterCostSettleDetail(settleOrders);
-//            //3 查询所有车主罚金明细
-//            orderSettleNoTService.getCancelOwnerCostSettleDetail(settleOrders);
-//            //4 查询 租客实际 付款金额（包含 租车费用，车俩押金，违章押金，钱包）
-//            SettleCancelOrdersAccount settleCancelOrdersAccount = orderSettleNoTService.initSettleCancelOrdersAccount(settleOrders);
-//            //5 车主罚金处理
-//            orderSettleNoTService.handleOwnerFine(settleOrders,settleCancelOrdersAccount);
-//            //6 租客罚金处理
-//            orderSettleNoTService.handleRentFine(settleOrders,settleCancelOrdersAccount);
-//            //7 租客还历史欠款
-//            orderSettleNoTService.repayHistoryDebtRentCancel(settleOrders,settleCancelOrdersAccount);
-//            //8 租客金额 退还 包含 凹凸币，钱包 租车费用 押金 违章押金 退还 （优惠卷退还 TODO）
-//            orderSettleNoTService.refundCancelCost(settleOrders,settleCancelOrdersAccount,orderStatusDTO);
-//
-//            log.info("OrderSettleService initSettleOrders settleOrders [{}]", GsonUtils.toJson(settleOrders));
-//            Cat.logEvent("settleOrders",GsonUtils.toJson(settleOrders));
-//        } catch (Exception e) {
-//            log.error("OrderSettleService settleOrderCancel,e={},",e);
-//            t.setStatus(e);
-//            Cat.logError("结算失败  :{}",e);
-//            throw new RuntimeException("结算失败 ,不能结算");
-//        } finally {
-//            t.complete();
-//        }
+        Transaction t = Cat.getProducer().newTransaction(CatConstants.FEIGN_CALL, "取消订单结算服务");
+        try {
+            Cat.logEvent(CatConstants.FEIGN_METHOD, "OrderSettleService.settleOrderCancel");
+            Cat.logEvent(CatConstants.FEIGN_PARAM, orderNo);
+            OrderStatusDTO orderStatusDTO = new OrderStatusDTO();
+            orderStatusDTO.setOrderNo(orderNo);
+            // 1 取消订单初始化
+            SettleOrders settleOrders =  orderSettleNoTService.initCancelSettleOrders(orderNo);
+            //2 查询所有租客罚金明细  及 凹凸币补贴
+            orderSettleNoTService.getCancelRenterCostSettleDetail(settleOrders);
+            //3 查询所有车主罚金明细
+            orderSettleNoTService.getCancelOwnerCostSettleDetail(settleOrders);
+            //4 查询 租客实际 付款金额（包含 租车费用，车俩押金，违章押金，钱包）
+            SettleCancelOrdersAccount settleCancelOrdersAccount = orderSettleNoTService.initSettleCancelOrdersAccount(settleOrders);
+            //5 车主罚金处理
+            orderSettleNoTService.handleOwnerFine(settleOrders,settleCancelOrdersAccount);
+            //6 租客罚金处理
+            orderSettleNoTService.handleRentFine(settleOrders,settleCancelOrdersAccount);
+            //7 租客还历史欠款
+            orderSettleNoTService.repayHistoryDebtRentCancel(settleOrders,settleCancelOrdersAccount);
+            //8 租客金额 退还 包含 凹凸币，钱包 租车费用 押金 违章押金 退还 （优惠卷退还 TODO）
+            orderSettleNoTService.refundCancelCost(settleOrders,settleCancelOrdersAccount,orderStatusDTO);
+            //9 修改订单状态表
+            cashierService.saveCancelOrderStatusInfo(orderStatusDTO);
+
+            log.info("OrderSettleService initSettleOrders settleOrders [{}]", GsonUtils.toJson(settleOrders));
+            Cat.logEvent("settleOrders",GsonUtils.toJson(settleOrders));
+        } catch (Exception e) {
+            log.error("OrderSettleService settleOrderCancel,e={},",e);
+            t.setStatus(e);
+            Cat.logError("结算失败  :{}",e);
+            throw new RuntimeException("结算失败 ,不能结算");
+        } finally {
+            t.complete();
+        }
         return true;
     }
 }
