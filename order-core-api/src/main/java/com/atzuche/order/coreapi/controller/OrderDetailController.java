@@ -32,6 +32,7 @@ public class OrderDetailController {
         return respData;
     }
 
+
     @PostMapping("/orderAccountDetail")
     public ResponseData<OrderAccountDetailRespDTO> orderAccountDetail(@Valid @RequestBody OrderDetailReqDTO orderDetailReqDTO, BindingResult bindingResult){
         if (bindingResult.hasErrors()) {
@@ -63,13 +64,14 @@ public class OrderDetailController {
         return respData;
     }
     @GetMapping("/adminOwnerOrderDetail")
-    public ResponseData<AdminOwnerOrderDetailDTO> adminOwnerOrderDetail(@RequestParam("ownerOrderNo") String ownerOrderNo){
+    public ResponseData<AdminOwnerOrderDetailDTO> adminOwnerOrderDetail(@RequestParam("ownerOrderNo") String ownerOrderNo,@RequestParam("orderNo")String orderNo){
         if(ownerOrderNo==null ||ownerOrderNo.trim().length()<=0){
             ResponseData responseData = new ResponseData();
             responseData.setResMsg("车主自订单号不能为空");
             responseData.setResCode(ErrorCode.INPUT_ERROR.getCode());
             return responseData;
         }
-        return null;
+        ResponseData<AdminOwnerOrderDetailDTO> responseData = orderDetailService.adminOwnerOrderDetail(ownerOrderNo,orderNo);
+        return responseData;
     }
 }

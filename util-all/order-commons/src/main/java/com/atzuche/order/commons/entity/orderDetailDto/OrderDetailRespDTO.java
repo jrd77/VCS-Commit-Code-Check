@@ -1,4 +1,5 @@
 package com.atzuche.order.commons.entity.orderDetailDto;
+import com.atzuche.order.commons.entity.dto.RenterOrderSubsidyDetailDTO;
 import lombok.Data;
 import lombok.ToString;
 
@@ -31,5 +32,7 @@ public class OrderDetailRespDTO {
     public List<RenterAdditionalDriverDTO> renterAdditionalDriverList;
     public List<OwnerOrderFineDeatailDTO> ownerOrderFineDeatailList;
     public List<RenterOrderFineDeatailDTO> renterOrderFineDeatailList;
+    public List<RenterOrderSubsidyDetailDTO> renterOrderSubsidyDetailDTOS;
+    public List<OwnerOrderSubsidyDetailDTO> ownerOrderSubsidyDetailDTOS;
 
 }
