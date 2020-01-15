@@ -1,6 +1,17 @@
-plugins {
-    id 'java'
+buildscript {
+    repositories {
+        maven{url "http://10.0.3.208:8081/nexus/content/groups/public/"}
+        maven{url "http://maven.aliyun.com/nexus/content/groups/public/"}
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.autoyol.tool:dependency-management:1.0-SNAPSHOT'
+    }
 }
+
+apply plugin: 'dependency-management'
+apply plugin: 'java'
+
 
 group 'com.atzuche'
 version '0.0.1-SNAPSHOT'
@@ -39,7 +50,16 @@ dependencies {
     compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jdk8', version: '2.10.0'
     compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.10.0'
 
+}
 
-
-
+publishing {
+    publications {
+        maven(MavenPublication) {
+            groupId = 'com.autoyol'
+            artifactId = 'order-openapi'
+            version = '1.5.1-SNAPSHOT'
+            from components.java
+            artifact sourceJar
+        }
+    }
 }
