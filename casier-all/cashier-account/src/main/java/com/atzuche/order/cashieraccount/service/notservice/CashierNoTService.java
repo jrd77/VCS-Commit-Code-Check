@@ -434,47 +434,50 @@ public class CashierNoTService {
      * @param amtWallet
      */
     public void insertRenterCostByWallet(OrderPaySignReqVO orderPaySign, int amtWallet) {
-       //1查询 收银台保存 钱包支付信息
-        CashierEntity cashierEntity = cashierMapper.getPayDeposit(orderPaySign.getOrderNo(),orderPaySign.getMenNo(),DataPayKindConstant.RENT_AMOUNT,DataPayTypeConstant.PAY_PUR);
-        int result = 0;
-        int cashierId=0;
-        RenterCashCodeEnum renterCashCodeEnum = RenterCashCodeEnum.ACCOUNT_RENTER_RENT_COST;
-        CashierEntity cashier = new CashierEntity ();
-        BeanUtils.copyProperties(orderPaySign,cashier);
-        cashier.setMemNo(orderPaySign.getMenNo());
-        cashier.setPayAmt(amtWallet);
-        cashier.setPaySource(PaySourceEnum.WALLET_PAY.getCode());
-        cashier.setPayTitle("订单号：" + orderPaySign.getOrderNo() + "钱包支付金额：" + amtWallet + "元");
-        cashier.setPayKind(DataPayKindConstant.RENT_AMOUNT);
-        cashier.setPayType(DataPayTypeConstant.PAY_PUR);
-        cashier.setAtappId(DataAppIdConstant.APPID_SHORTRENT);
-        cashier.setTransStatus("00");
-        cashier.setPaySn(NumberUtils.INTEGER_ONE);
-        result = cashierMapper.insertSelective(cashier);
-        cashierId = cashier.getId();
-        if(result ==0){
-            throw new AccountRenterDepositDBException();
+        if(amtWallet!=0){
+//1查询 收银台保存 钱包支付信息
+            CashierEntity cashierEntity = cashierMapper.getPayDeposit(orderPaySign.getOrderNo(),orderPaySign.getMenNo(),DataPayKindConstant.RENT_AMOUNT,DataPayTypeConstant.PAY_PUR);
+            int result = 0;
+            int cashierId=0;
+            RenterCashCodeEnum renterCashCodeEnum = RenterCashCodeEnum.ACCOUNT_RENTER_RENT_COST;
+            CashierEntity cashier = new CashierEntity ();
+            BeanUtils.copyProperties(orderPaySign,cashier);
+            cashier.setMemNo(orderPaySign.getMenNo());
+            cashier.setPayAmt(amtWallet);
+            cashier.setPaySource(PaySourceEnum.WALLET_PAY.getCode());
+            cashier.setPayTitle("订单号：" + orderPaySign.getOrderNo() + "钱包支付金额：" + amtWallet + "元");
+            cashier.setPayKind(DataPayKindConstant.RENT_AMOUNT);
+            cashier.setPayType(DataPayTypeConstant.PAY_PUR);
+            cashier.setAtappId(DataAppIdConstant.APPID_SHORTRENT);
+            cashier.setTransStatus("00");
+            cashier.setPaySn(NumberUtils.INTEGER_ONE);
+            result = cashierMapper.insertSelective(cashier);
+            cashierId = cashier.getId();
+            if(result ==0){
+                throw new AccountRenterDepositDBException();
+            }
+
+            //2 构造参数  记录个人 租车费用户头 记录 钱包支付信息
+            AccountRenterCostReqVO accountRenterCostReq = new AccountRenterCostReqVO();
+            BeanUtils.copyProperties(orderPaySign,accountRenterCostReq);
+            accountRenterCostReq.setShifuAmt(Math.abs(amtWallet));
+            accountRenterCostReq.setMemNo(orderPaySign.getMenNo());
+
+            AccountRenterCostDetailReqVO accountRenterCostDetailReq = new AccountRenterCostDetailReqVO();
+            BeanUtils.copyProperties(orderPaySign,accountRenterCostDetailReq);
+            accountRenterCostDetailReq.setMemNo(orderPaySign.getMenNo());
+            accountRenterCostDetailReq.setUniqueNo(String.valueOf(cashierId));
+            accountRenterCostDetailReq.setAmt(Math.abs(amtWallet));
+            accountRenterCostDetailReq.setTransTime(LocalDateTime.now());
+            accountRenterCostDetailReq.setRenterCashCodeEnum(renterCashCodeEnum);
+            accountRenterCostDetailReq.setPaySource(PaySourceEnum.WALLET_PAY.getText());
+            accountRenterCostDetailReq.setPaySourceCode(PaySourceEnum.WALLET_PAY.getCode());
+            accountRenterCostDetailReq.setPayTypeCode(orderPaySign.getPayType());
+            accountRenterCostDetailReq.setPayType(PayTypeEnum.getFlagText(orderPaySign.getPayType()));
+            accountRenterCostReq.setAccountRenterCostDetailReqVO(accountRenterCostDetailReq);
+            accountRenterCostSettleService.insertRenterCostDetail(accountRenterCostReq);
         }
 
-        //2 构造参数  记录个人 租车费用户头 记录 钱包支付信息
-        AccountRenterCostReqVO accountRenterCostReq = new AccountRenterCostReqVO();
-        BeanUtils.copyProperties(orderPaySign,accountRenterCostReq);
-        accountRenterCostReq.setShifuAmt(Math.abs(amtWallet));
-        accountRenterCostReq.setMemNo(orderPaySign.getMenNo());
-
-        AccountRenterCostDetailReqVO accountRenterCostDetailReq = new AccountRenterCostDetailReqVO();
-        BeanUtils.copyProperties(orderPaySign,accountRenterCostDetailReq);
-        accountRenterCostDetailReq.setMemNo(orderPaySign.getMenNo());
-        accountRenterCostDetailReq.setUniqueNo(String.valueOf(cashierId));
-        accountRenterCostDetailReq.setAmt(Math.abs(amtWallet));
-        accountRenterCostDetailReq.setTransTime(LocalDateTime.now());
-        accountRenterCostDetailReq.setRenterCashCodeEnum(renterCashCodeEnum);
-        accountRenterCostDetailReq.setPaySource(PaySourceEnum.WALLET_PAY.getText());
-        accountRenterCostDetailReq.setPaySourceCode(PaySourceEnum.WALLET_PAY.getCode());
-        accountRenterCostDetailReq.setPayTypeCode(orderPaySign.getPayType());
-        accountRenterCostDetailReq.setPayType(PayTypeEnum.getFlagText(orderPaySign.getPayType()));
-        accountRenterCostReq.setAccountRenterCostDetailReqVO(accountRenterCostDetailReq);
-        accountRenterCostSettleService.insertRenterCostDetail(accountRenterCostReq);
     }
 
     /**

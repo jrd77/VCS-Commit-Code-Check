@@ -1,6 +1,6 @@
 package com.atzuche.order.admin.controller;
 
-import com.atzuche.order.admin.dto.AdminOwnerOrderDetailDTO;
+import com.atzuche.order.commons.entity.ownerOrderDetail.AdminOwnerOrderDetailDTO;
 import com.atzuche.order.admin.service.OrderDetailService;
 import com.atzuche.order.commons.entity.orderDetailDto.OrderHistoryRespDTO;
 import com.autoyol.commons.web.ErrorCode;

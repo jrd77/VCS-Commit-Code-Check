@@ -1,7 +1,7 @@
 package com.atzuche.order.admin.service;
 
 import com.alibaba.fastjson.JSON;
-import com.atzuche.order.admin.dto.AdminOwnerOrderDetailDTO;
+import com.atzuche.order.commons.entity.ownerOrderDetail.AdminOwnerOrderDetailDTO;
 import com.atzuche.order.admin.exception.OrderHistoryErrException;
 import com.atzuche.order.admin.exception.OrderHistoryFailException;
 import com.atzuche.order.car.RenterCarDetailFailException;
