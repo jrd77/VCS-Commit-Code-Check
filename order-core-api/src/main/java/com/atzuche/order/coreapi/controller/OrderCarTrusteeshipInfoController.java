@@ -81,7 +81,9 @@ public class OrderCarTrusteeshipInfoController {
         }
         OrderCarTrusteeshipEntity orderCarTrusteeship = orderCarTrusteeshipService.selectObjectByOrderNoAndCar(orderCarTrusteeshipEntity.getOrderNo(), orderCarTrusteeshipEntity.getCarNo());
         if (Objects.nonNull(orderCarTrusteeship)) {
-            return ResponseData.createErrorCodeResponse(DeliveryErrorCode.DELIVERY_PARAMS_ERROR.getValue(), "已存在该数据");
+            BeanUtils.copyProperties(orderCarTrusteeshipEntity, orderCarTrusteeship);
+            orderCarTrusteeshipService.updateOrderCarTrusteeship(orderCarTrusteeship);
+            return ResponseData.success();
         }
         int result = orderCarTrusteeshipService.insertOrderCarTrusteeship(orderCarTrusteeship);
         if (result > 0) {

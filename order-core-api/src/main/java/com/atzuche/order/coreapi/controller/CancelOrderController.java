@@ -66,7 +66,7 @@ public class CancelOrderController {
                                             @PathVariable("dispatcherStatus") int dispatcherStatus) {
        boolean result = ownerOrderFineApplyHandelService.handleFineApplyRecord(orderNo,
                 DispatcherStatusEnum.from(dispatcherStatus));
-        return ResponseData.success();
+        return ResponseData.success(result);
     }
 
 
