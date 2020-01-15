@@ -22,11 +22,8 @@ public class AdminOwnerOrderDetailDTO {
 
     @AutoDocProperty("车主租客互相调价")
     private Integer ownerRenterPrice;
-    @AutoDocProperty("租客对车主的调价（明细）")
-    private Integer renterToOwnerPrice;
-    @AutoDocProperty("车主对租客的调价（明细）")
-    private Integer ownerToRenterPrice;
-
+    @AutoDocProperty("车主租客互相调价详情")
+    private RenterOwnerPriceDTO renterOwnerPriceDTO;
     @AutoDocProperty("超里程费用")
     private Integer mileageAmt;
     @AutoDocProperty("油费")

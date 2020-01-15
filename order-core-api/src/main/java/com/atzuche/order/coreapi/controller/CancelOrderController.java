@@ -1,8 +1,11 @@
 package com.atzuche.order.coreapi.controller;
 
 import com.alibaba.fastjson.JSON;
+import com.atzuche.order.commons.enums.DispatcherStatusEnum;
 import com.atzuche.order.commons.vo.req.CancelOrderReqVO;
 import com.atzuche.order.coreapi.service.CancelOrderService;
+import com.atzuche.order.coreapi.service.OwnerOrderFineApplyHandelService;
+import com.atzuche.order.ownercost.service.OwnerOrderFineApplyService;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.doc.annotation.AutoDocMethod;
@@ -13,10 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.Optional;
@@ -37,6 +37,8 @@ public class CancelOrderController {
 
     @Autowired
     private CancelOrderService cancelOrderService;
+    @Autowired
+    private OwnerOrderFineApplyHandelService ownerOrderFineApplyHandelService;
 
 
     @AutoDocMethod(description = "取消订单", value = "取消订单")
@@ -55,6 +57,25 @@ public class CancelOrderController {
         }
         cancelOrderService.cancel(cancelOrderReqVO);
         return ResponseData.success();
+    }
+
+    @AutoDocMethod(description = "管理后台取消订单", value = "管理后台取消订单")
+    @PostMapping("/admin/cancel")
+    public ResponseData<?> adminCancelOrder(@Valid @RequestBody CancelOrderReqVO cancelOrderReqVO,
+                                       BindingResult bindingResult) {
+
+
+        return ResponseData.success();
+    }
+
+
+    @AutoDocMethod(description = "测试车主取消订单进度后续操作", value = "测试车主取消订单进度后续操作")
+    @PostMapping("/test/owner/cancel/{orderNo}/{dispatcherStatus}")
+    public ResponseData<?> ownerCancelOrder(@PathVariable("orderNo") String orderNo,
+                                            @PathVariable("dispatcherStatus") int dispatcherStatus) {
+       boolean result = ownerOrderFineApplyHandelService.handleFineApplyRecord(orderNo,
+                DispatcherStatusEnum.from(dispatcherStatus));
+        return ResponseData.success(result);
     }
 
 

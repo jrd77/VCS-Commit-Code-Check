@@ -15,9 +15,9 @@ public class CancelOrderVO extends BaseVO {
     @NotBlank(message = "订单号不能为空")
     private String orderNo;
 
-    @AutoDocProperty(value = "取消方编码，1-租客，2-车主")
-    @NotBlank(message = "取消方编码不能为空")
-    private String cancelSrcCode;
+    @AutoDocProperty(value = "使用角色:1.租客 2.车主", required = true)
+    @NotBlank(message = "使用角色不能为空")
+    private String memRole;
 
     @AutoDocProperty(value = "取消原因")
     private String cancelReason;
