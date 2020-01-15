@@ -3,10 +3,7 @@ package com.atzuche.order.coreapi.service;
 import com.atzuche.order.commons.DateUtils;
 import com.atzuche.order.rentercommodity.service.RenterGoodsService;
 import com.atzuche.order.rentermem.service.RenterMemberService;
-import com.atzuche.order.renterwz.entity.RenterOrderWzDetailEntity;
-import com.atzuche.order.renterwz.entity.RenterOrderWzIllegalPhotoEntity;
-import com.atzuche.order.renterwz.entity.RenterOrderWzStatusEntity;
-import com.atzuche.order.renterwz.entity.RenyunSendIllegalInfoLogEntity;
+import com.atzuche.order.renterwz.entity.*;
 import com.atzuche.order.renterwz.service.*;
 import com.atzuche.order.renterwz.vo.IllegalHandleMqVO;
 import com.google.gson.Gson;
@@ -58,6 +55,9 @@ public class TransIllegalMqService {
 
     @Resource
     private RenterMemberService renterMemberService;
+
+    @Resource
+    private MqSendFeelbackLogService mqSendFeelbackLogService;
 
     private static Gson gson = new Gson();
 
@@ -138,12 +138,12 @@ public class TransIllegalMqService {
 
             }
         }catch (Exception e){
-            logger.error("处理：仁云流程系统同步订单违章信息MQ,报错:[{}]",e);
+            logger.error("处理：仁云流程系统同步订单违章信息MQ,报错:",e);
             throw e;
         }
     }
 
-    private boolean isNeedHandle(String messageBody,String dataType,String carNum) {
+    private void isNeedHandle(String messageBody,String dataType,String carNum) {
         try {
             RenyunSendIllegalInfoLogEntity log = gson.fromJson(messageBody, RenyunSendIllegalInfoLogEntity.class);
             String wzCode = log.getWzcode();
@@ -157,7 +157,6 @@ public class TransIllegalMqService {
             log.setCarPlateNum(carNum);
             log.setCreateTime(new Date());
             renyunSendIllegalInfoLogService.saveRenyunSendIllegalInfoLog(log);
-            return true;
         }catch (Exception e){
             logger.error("MQ在插入日志表失败，MQ类型：{},messageBody:{},报错：{}",  dataType,messageBody,e);
             throw e;
@@ -211,7 +210,7 @@ public class TransIllegalMqService {
             }
             if(StringUtils.isNotBlank(wzslCost)) {
                 wzslCostInt = Double.valueOf(wzslCost).intValue();
-                if(wzslCostInt != null && wzslCostInt > 0) {
+                if(wzslCostInt > 0) {
                     wzTotalCostInt += wzslCostInt;
                 }
             }
@@ -250,7 +249,7 @@ public class TransIllegalMqService {
                 }
             }
         }catch (Exception e){
-            logger.error("处理：仁云流程系统同步违章报价信息反馈MQ,报错:{}",e);
+            logger.error("处理：仁云流程系统同步违章报价信息反馈MQ,报错:",e);
             throw e;
         }
     }
@@ -316,7 +315,7 @@ public class TransIllegalMqService {
                 }
             }
         }catch (Exception e){
-            logger.error("处理：仁云流程系统同步违章凭证信息反馈MQ,报错:{}",e);
+            logger.error("处理：仁云流程系统同步违章凭证信息反馈MQ,报错:",e);
             throw e;
         }
     }
@@ -365,8 +364,22 @@ public class TransIllegalMqService {
                 renterOrderWzStatusService.updateStatusByOrderNoAndCarNum(orderNo,status,carNum);
             }
         }catch (Exception e){
-            logger.error("处理：仁云流程系统同步单违章处理方MQ,报错:{}",e);
+            logger.error("处理：仁云流程系统同步单违章处理方MQ,报错:",e);
             throw e;
+        }
+    }
+
+    public void autoReceiveQueueResultFeedbackQueueHandle(String messageBody) {
+        JSONObject jsonObject = JSONObject.fromObject(messageBody);
+        MqSendFeelbackLogEntity log=new MqSendFeelbackLogEntity();
+        if(jsonObject!=null) {
+            log.setMsgId(jsonObject.getString("msgId"));
+            log.setStatus(jsonObject.getString("resCode"));
+            log.setFeelbackCode(jsonObject.getString("resCode"));
+            log.setFeelbackMsg(jsonObject.getString("resMsg"));
+            log.setUpdateTime(new Date());
+            log.setFeelbackTime(new Date());
+            mqSendFeelbackLogService.updateByMsgIdSelective(log);
         }
     }
 }

@@ -72,7 +72,7 @@ public class OwnerCommodityService {
 
 
     //组合
-    private void combination(OwnerGoodsDetailDTO ownerGoodsDetailDTO){
+    public void combination(OwnerGoodsDetailDTO ownerGoodsDetailDTO){
         String ownerOrderNo = ownerGoodsDetailDTO.getOwnerOrderNo();
         if(ownerOrderNo == null){
             return;
@@ -150,6 +150,7 @@ public class OwnerCommodityService {
                     newOwnerGoodsPriceList.add(ownerGoods);
                 }
             });
+            ownerGoodsDetailDTO.setOwnerGoodsPriceDetailDTOList(newOwnerGoodsPriceList);
         }else{//时间提前
             Map<LocalDateTime, List<OwnerGoodsPriceDetailEntity>> dbRevertTimeGroup = dbGoodsPriceList
                     .stream()
@@ -190,10 +191,13 @@ public class OwnerCommodityService {
                     });
                 }
             });
-        }
-        ownerGoodsDetailDTO.setOwnerGoodsPriceDetailDTOList(newOwnerGoodsPriceList);
-    }
 
+            List<OwnerGoodsPriceDetailDTO> collect = newOwnerGoodsPriceList.stream()
+                    .filter(x -> x.getRevertTime().isEqual(revertTime) || x.getRevertTime().isBefore(revertTime))
+                    .collect(Collectors.toList());
+            ownerGoodsDetailDTO.setOwnerGoodsPriceDetailDTOList(collect);
+        }
+    }
     //初始化设置小时数和分组日期
     private void init(OwnerGoodsDetailDTO ownerGoodsDetailDTO){
         LocalDateTime rentTime = ownerGoodsDetailDTO.getRentTime();

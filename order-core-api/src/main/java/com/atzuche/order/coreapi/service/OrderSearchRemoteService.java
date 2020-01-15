@@ -77,6 +77,7 @@ public class OrderSearchRemoteService {
             ViolateVO reqVO = new ViolateVO();
             reqVO.setPageNum(1);
             reqVO.setPageSize(10000);
+            reqVO.setType("1");
             reqVO.setDate(DateUtils.minDays(2));
             Cat.logEvent(CatConstants.FEIGN_METHOD,"OrderSearchRemoteService.violateProcessOrder");
             Cat.logEvent(CatConstants.FEIGN_PARAM, JSON.toJSONString(reqVO));
@@ -104,9 +105,10 @@ public class OrderSearchRemoteService {
             ViolateVO reqVO = new ViolateVO();
             reqVO.setPageNum(1);
             reqVO.setPageSize(10000);
-            Cat.logEvent(CatConstants.FEIGN_METHOD,"OrderSearchRemoteService.violateSettleOrder");
+            reqVO.setType("3");
+            Cat.logEvent(CatConstants.FEIGN_METHOD,"OrderSearchRemoteService.violateProcessOrder");
             Cat.logEvent(CatConstants.FEIGN_PARAM, JSON.toJSONString(reqVO));
-            ResponseData<OrderVO<ViolateBO>> orderResponseData = orderSearchService.violateSettleOrder(reqVO);
+            ResponseData<OrderVO<ViolateBO>> orderResponseData = orderSearchService.violateProcessOrder(reqVO);
             Cat.logEvent(CatConstants.FEIGN_RESULT, JSON.toJSONString(orderResponseData));
             if(orderResponseData != null && orderResponseData.getResCode() != null
                     && ErrorCode.SUCCESS.getCode().equals(orderResponseData.getResCode()) && orderResponseData.getData() != null){
@@ -160,6 +162,7 @@ public class OrderSearchRemoteService {
             reqVO = new ViolateVO();
             reqVO.setPageNum(1);
             reqVO.setPageSize(10000);
+            reqVO.setType("2");
             reqVO.setDate(DateUtils.minDays(day));
             //所有城市的列表,15天的
             cityCodeAll.addAll(cityCode);
@@ -174,6 +177,7 @@ public class OrderSearchRemoteService {
         reqVO = new ViolateVO();
         reqVO.setPageNum(1);
         reqVO.setPageSize(10000);
+        reqVO.setType("2");
         reqVO.setDate(DateUtils.minDays(maxKey));
         List<IllegalToDO> list = this.violatePendingOrderByDay(reqVO);
         //过滤城市cityCodeAll集合之外的数据（默认都以最大值查询）
@@ -225,9 +229,9 @@ public class OrderSearchRemoteService {
     private List<IllegalToDO> violatePendingOrderByDay(ViolateVO reqVO) {
         Transaction t = Cat.getProducer().newTransaction(CatConstants.FEIGN_CALL, "查询按规则配置日期内完成的订单，获取待查询违章的对象列表");
         try {
-            Cat.logEvent(CatConstants.FEIGN_METHOD,"OrderSearchRemoteService.violatePendingOrder");
+            Cat.logEvent(CatConstants.FEIGN_METHOD,"OrderSearchRemoteService.violateProcessOrder");
             Cat.logEvent(CatConstants.FEIGN_PARAM, JSON.toJSONString(reqVO));
-            ResponseData<OrderVO<ViolateBO>> orderResponseData = orderSearchService.violatePendingOrder(reqVO);
+            ResponseData<OrderVO<ViolateBO>> orderResponseData = orderSearchService.violateProcessOrder(reqVO);
             Cat.logEvent(CatConstants.FEIGN_RESULT, JSON.toJSONString(orderResponseData));
             if(orderResponseData != null && orderResponseData.getResCode() != null
                     && ErrorCode.SUCCESS.getCode().equals(orderResponseData.getResCode()) && orderResponseData.getData() != null){
@@ -458,10 +462,11 @@ public class OrderSearchRemoteService {
             ViolateVO reqVO = new ViolateVO();
             reqVO.setPageNum(1);
             reqVO.setPageSize(10000);
+            reqVO.setType("2");
             reqVO.setDate(DateUtils.minDays(day));
-            Cat.logEvent(CatConstants.FEIGN_METHOD,"OrderSearchRemoteService.violatePendingOrder");
+            Cat.logEvent(CatConstants.FEIGN_METHOD,"OrderSearchRemoteService.violateProcessOrder");
             Cat.logEvent(CatConstants.FEIGN_PARAM, JSON.toJSONString(reqVO));
-            ResponseData<OrderVO<ViolateBO>> orderResponseData = orderSearchService.violatePendingOrder(reqVO);
+            ResponseData<OrderVO<ViolateBO>> orderResponseData = orderSearchService.violateProcessOrder(reqVO);
             Cat.logEvent(CatConstants.FEIGN_RESULT, JSON.toJSONString(orderResponseData));
             if(orderResponseData != null && orderResponseData.getResCode() != null
                     && ErrorCode.SUCCESS.getCode().equals(orderResponseData.getResCode()) && orderResponseData.getData() != null){
