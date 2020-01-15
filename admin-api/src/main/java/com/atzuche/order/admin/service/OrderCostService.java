@@ -5,6 +5,7 @@ package com.atzuche.order.admin.service;
 
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,8 +67,17 @@ public class OrderCostService {
 		req.setOrderNo(renterCostReqVO.getOrderNo());
 		req.setMemNo(orderEntity.getMemNoRenter());
 		req.setSubOrderNo(renterCostReqVO.getRenterOrderNo());
+		
         ///子订单号
 		realVo.setRenterOrderNo(renterCostReqVO.getRenterOrderNo());
+		//默认值处理  调价目前没有
+		realVo.setAdjustAmt("0");
+		//加油服务费
+		realVo.setAddOilSrvAmt("0");
+		///租客需支付给平台的费用
+		realVo.setRenterPayToPlatform("0");
+		
+		
 		
 		ResponseData<com.atzuche.order.commons.vo.res.OrderRenterCostResVO> resData = feignOrderCostService.orderCostRenterGet(req);
 		if(resData != null) {
@@ -103,13 +113,6 @@ public class OrderCostService {
 			}
 		}
 		
-		//默认值处理  调价目前没有
-		realVo.setAdjustAmt("---");
-		//加油服务费
-		realVo.setAddOilSrvAmt("---");
-		///租客需支付给平台的费用
-		realVo.setRenterPayToPlatform("---");
-		
 		return realVo;
 	}
 	
@@ -136,7 +139,7 @@ public class OrderCostService {
 		//租客需支付给平台的费用
 		int rentPayToPlatform = Integer.valueOf(realVo.getRenterPayToPlatform());
 		//超里程
-		int beyondMile = Integer.valueOf(realVo.getBeyondMileAmt());
+		int beyondMile = StringUtils.isNotBlank(realVo.getBeyondMileAmt())?Integer.valueOf(realVo.getBeyondMileAmt()):0;
 		//加油服务费
 		int addOil = Integer.valueOf(realVo.getAddOilSrvAmt());
 		
@@ -415,6 +418,15 @@ public class OrderCostService {
 		req.setSubOrderNo(ownerCostReqVO.getOwnerOrderNo());
 		ResponseData<com.atzuche.order.commons.vo.res.OrderOwnerCostResVO> resData = feignOrderCostService.orderCostOwnerGet(req);
 		
+		//子订单号
+		realVo.setOwnerOrderNo(ownerCostReqVO.getOwnerOrderNo());
+		//默认值处理  调价目前没有
+		realVo.setAdjustAmt("0");
+		//加油服务费
+		realVo.setAddOilSrvAmt("0");
+		///车主需支付给平台的费用
+		realVo.setOwnerPayToPlatform("0");
+		
 		
 		if(resData != null) {
 			com.atzuche.order.commons.vo.res.OrderOwnerCostResVO data = resData.getData();
@@ -432,16 +444,9 @@ public class OrderCostService {
 				putIncome(realVo,data);
 				
 			}
+		}else {
+			logger.error("feign接口返回resData null!!! params={}",ownerCostReqVO.toString());
 		}
-		
-		
-		//默认值处理  调价目前没有
-		realVo.setAdjustAmt("---");
-		//加油服务费
-		realVo.setAddOilSrvAmt("---");
-		///车主需支付给平台的费用
-		realVo.setOwnerPayToPlatform("---");
-		
 		
 		return realVo;
 	}

@@ -71,6 +71,7 @@ public class OrderCostController {
         try {
         	
         	OrderOwnerCostResVO resp = orderCostService.calculateOwnerOrderCost(ownerCostReqVO);
+        	logger.info("resp = " + resp.toString());
         	return ResponseData.success(resp);
 		} catch (Exception e) {
 			Cat.logError("calculateOwnerOrderCost exception params="+ownerCostReqVO.toString(),e);

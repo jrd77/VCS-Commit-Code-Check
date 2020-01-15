@@ -53,6 +53,7 @@ import com.atzuche.order.settle.service.OrderSettleService;
 import com.atzuche.order.settle.vo.req.OwnerCosts;
 import com.atzuche.order.settle.vo.req.RentCosts;
 
+import ch.qos.logback.classic.Logger;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -301,9 +302,14 @@ public class OrderCostService {
 		String ownerOrderNo = req.getSubOrderNo();
 		// ----------------------------------------------------- 结算前查询
 		OwnerCosts ownerCosts = orderSettleService.preOwnerSettleOrder(orderNo,ownerOrderNo);
-		
+		if(ownerCosts != null) {
+			log.info("ownerCosts===============不为空");
+		}else {
+			log.info("ownerCosts===============为空");
+		}
 		//数据封装
 		putOwnerCosts(resVo,ownerCosts);
+		log.info("ownerCosts===============数据封装");
 		
 		// 获取修改前租客使用的优惠券列表
 		  List<OrderCouponEntity> orderCouponList = orderCouponService.listOrderCouponByOrderNo(orderNo);

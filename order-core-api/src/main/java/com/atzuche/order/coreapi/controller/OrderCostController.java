@@ -35,7 +35,7 @@ public class OrderCostController {
 	
 	@PostMapping("/order/cost/renter/get")
 	public ResponseData<OrderRenterCostResVO> orderCostRenterGet(@Valid @RequestBody OrderCostReqVO req, BindingResult bindingResult) {
-		log.info("子订单费用详细 orderCostRenterGet params=[{}]", req.toString());
+		log.info("租客子订单费用详细 orderCostRenterGet params=[{}]", req.toString());
 		if (bindingResult.hasErrors()) {
             Optional<FieldError> error = bindingResult.getFieldErrors().stream().findFirst();
             return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), error.isPresent() ?
@@ -52,7 +52,7 @@ public class OrderCostController {
 	
 	@PostMapping("/order/cost/owner/get")
 	public ResponseData<OrderOwnerCostResVO> orderCostOwnerGet(@Valid @RequestBody OrderCostReqVO req, BindingResult bindingResult) {
-		log.info("子订单费用详细 orderCostOwnerGet params=[{}]", req.toString());
+		log.info("车主子订单费用详细 orderCostOwnerGet params=[{}]", req.toString());
 		if (bindingResult.hasErrors()) {
             Optional<FieldError> error = bindingResult.getFieldErrors().stream().findFirst();
             return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), error.isPresent() ?
