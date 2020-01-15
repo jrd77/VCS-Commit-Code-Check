@@ -13,8 +13,8 @@
         <result property="inDepotTime" column="in_depot_time"/>
         <result property="outDepotMileage" column="out_depot_mileage"/>
         <result property="inDepotMileage" column="in_depot_mileage"/>
-        <result property="outDepotOimass" column="out_depot_oiMass"/>
-        <result property="inDepotOimass" column="in_depot_oiMass"/>
+        <result property="outDepotoimass" column="out_depot_oimass"/>
+        <result property="inDepotOimass" column="in_depot_oimass"/>
         <result property="inDepotDamage" column="in_depot_damage"/>
         <result property="drivingLicenseJoin" column="driving_license_join"/>
         <result property="carKeyJoin" column="car_key_join"/>
@@ -23,6 +23,7 @@
         <result property="createTime" column="create_time"/>
         <result property="updateTime" column="update_time"/>
         <result property="isDelete" column="is_delete"/>
+        <result property="oilScale" column="oil_scale"/>
     </resultMap>
 
 
@@ -36,8 +37,8 @@
 	`in_depot_time`, 	
 	`out_depot_mileage`, 	
 	`in_depot_mileage`, 	
-	`out_depot_oiMass`, 	
-	`in_depot_oiMass`, 	
+	`out_depot_oimass`, 	
+	`in_depot_oimass`, 	
 	`in_depot_damage`, 	
 	`driving_license_join`, 	
 	`car_key_join`, 	
@@ -45,7 +46,8 @@
 	`update_op`, 	
 	`create_time`, 	
 	`update_time`, 	
-	`is_delete`	
+	`is_delete`, 	
+	`oil_scale`	
 
 	</sql>
 
@@ -65,8 +67,8 @@
 				`in_depot_time`,		
 				`out_depot_mileage`,		
 				`in_depot_mileage`,		
-				`out_depot_oiMass`,		
-				`in_depot_oiMass`,		
+				`out_depot_oimass`,		
+				`in_depot_oimass`,		
 				`in_depot_damage`,		
 				`driving_license_join`,		
 				`car_key_join`,		
@@ -74,7 +76,8 @@
 				`update_op`,		
 				`create_time`,		
 				`update_time`,		
-				`is_delete`		
+				`is_delete`,		
+				`oil_scale`		
 			)
 		values
 		(
@@ -95,7 +98,8 @@
 				#{updateOp}, 		
 				#{createTime}, 		
 				#{updateTime}, 		
-				#{isDelete}		
+				#{isDelete}, 		
+				#{oilScale}		
 			)
 	</insert>
 	
@@ -110,8 +114,8 @@
 				<if test="inDepotTime != null">`in_depot_time`, </if>
 				<if test="outDepotMileage != null">`out_depot_mileage`, </if>
 				<if test="inDepotMileage != null">`in_depot_mileage`, </if>
-				<if test="outDepotOimass != null">`out_depot_oiMass`, </if>
-				<if test="inDepotOimass != null">`in_depot_oiMass`, </if>
+				<if test="outDepotOimass != null">`out_depot_oimass`, </if>
+				<if test="inDepotOimass != null">`in_depot_oimass`, </if>
 				<if test="inDepotDamage != null">`in_depot_damage`, </if>
 				<if test="drivingLicenseJoin != null">`driving_license_join`, </if>
 				<if test="carKeyJoin != null">`car_key_join`, </if>
@@ -119,7 +123,8 @@
 				<if test="updateOp != null">`update_op`, </if>
 				<if test="createTime != null">`create_time`, </if>
 				<if test="updateTime != null">`update_time`, </if>
-				<if test="isDelete != null">`is_delete` </if>
+				<if test="isDelete != null">`is_delete`, </if>
+				<if test="oilScale != null">`oil_scale` </if>
 	        </trim>
             <trim prefix="values (" suffix=")" suffixOverrides="," >
 				<if test="orderNo != null">#{orderNo},  </if>
@@ -139,7 +144,8 @@
 				<if test="updateOp != null">#{updateOp},  </if>
 				<if test="createTime != null">#{createTime},  </if>
 				<if test="updateTime != null">#{updateTime},  </if>
-				<if test="isDelete != null">#{isDelete} </if>
+				<if test="isDelete != null">#{isDelete},  </if>
+				<if test="oilScale != null">#{oilScale} </if>
 	        </trim>
 	</insert>
 	
@@ -155,8 +161,8 @@
 				<if test="inDepotTime != null">`in_depot_time` = #{inDepotTime}, </if>
 				<if test="outDepotMileage != null">`out_depot_mileage` = #{outDepotMileage}, </if>
 				<if test="inDepotMileage != null">`in_depot_mileage` = #{inDepotMileage}, </if>
-				<if test="outDepotOimass != null">`out_depot_oiMass` = #{outDepotOimass}, </if>
-				<if test="inDepotOimass != null">`in_depot_oiMass` = #{inDepotOimass}, </if>
+				<if test="outDepotOimass != null">`out_depot_oimass` = #{outDepotOimass}, </if>
+				<if test="inDepotOimass != null">`in_depot_oimass` = #{inDepotOimass}, </if>
 				<if test="inDepotDamage != null">`in_depot_damage` = #{inDepotDamage}, </if>
 				<if test="drivingLicenseJoin != null">`driving_license_join` = #{drivingLicenseJoin}, </if>
 				<if test="carKeyJoin != null">`car_key_join` = #{carKeyJoin}, </if>
@@ -164,7 +170,8 @@
 				<if test="updateOp != null">`update_op` = #{updateOp}, </if>
 				<if test="createTime != null">`create_time` = #{createTime}, </if>
 				<if test="updateTime != null">`update_time` = #{updateTime}, </if>
-				<if test="isDelete != null">`is_delete` = #{isDelete}</if>
+				<if test="isDelete != null">`is_delete` = #{isDelete}, </if>
+				<if test="oilScale != null">`oil_scale` = #{oilScale}</if>
 			</set>
 		where id = #{id}
 	</update>
@@ -180,8 +187,8 @@
 				`in_depot_time` = #{inDepotTime}, 		
 				`out_depot_mileage` = #{outDepotMileage}, 		
 				`in_depot_mileage` = #{inDepotMileage}, 		
-				`out_depot_oiMass` = #{outDepotOimass}, 		
-				`in_depot_oiMass` = #{inDepotOimass}, 		
+				`out_depot_oimass` = #{outDepotOimass}, 		
+				`in_depot_oimass` = #{inDepotOimass}, 		
 				`in_depot_damage` = #{inDepotDamage}, 		
 				`driving_license_join` = #{drivingLicenseJoin}, 		
 				`car_key_join` = #{carKeyJoin}, 		
@@ -189,12 +196,12 @@
 				`update_op` = #{updateOp}, 		
 				`create_time` = #{createTime}, 		
 				`update_time` = #{updateTime}, 		
-				`is_delete` = #{isDelete}		
+				`is_delete` = #{isDelete}, 		
+				`oil_scale` = #{oilScale}		
 	
 		</set>
 		where id = #{id}
 	</update>
-
 	<select id="selectObjectByOrderNoAndType" resultMap="BaseResultMap">
 		select <include refid="Base_Column_List" /> from order_car_trusteeship where order_no = #{orderNo} and car_no = #{carNo} and is_delete = 0
 	</select>
