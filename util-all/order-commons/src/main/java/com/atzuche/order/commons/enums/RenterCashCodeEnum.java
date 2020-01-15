@@ -19,6 +19,7 @@ public enum RenterCashCodeEnum {
 	GET_BLOCKED_RAISE_AMT("11110036","取车运能加价"),
 	RETURN_BLOCKED_RAISE_AMT("11110037","还车运能加价"),
 	RENTER_PENALTY("11110039","取消订单违约金"),
+	DISPATCHING_AMT("12130031","升级车辆补贴"),
 
     REAL_COUPON_OFFSET("12120010", "优惠券抵扣金额"),
     GETCARFEE_COUPON_OFFSET("12120013", "取送服务券抵扣金额"),
