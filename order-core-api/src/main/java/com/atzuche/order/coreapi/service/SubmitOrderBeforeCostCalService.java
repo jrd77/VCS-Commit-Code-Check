@@ -7,6 +7,7 @@ import com.atzuche.order.commons.entity.dto.OwnerGoodsDetailDTO;
 import com.atzuche.order.commons.entity.dto.OwnerMemberDTO;
 import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
 import com.atzuche.order.commons.entity.dto.RenterMemberDTO;
+import com.atzuche.order.commons.enums.OsTypeEnum;
 import com.atzuche.order.commons.vo.req.NormalOrderCostCalculateReqVO;
 import com.atzuche.order.commons.vo.req.OrderReqVO;
 import com.atzuche.order.commons.vo.res.NormalOrderCostCalculateResVO;
@@ -28,6 +29,7 @@ import com.atzuche.order.renterorder.vo.RenterOrderReqVO;
 import com.atzuche.order.renterorder.vo.owner.OwnerCouponReqVO;
 import com.atzuche.order.renterorder.vo.platform.MemAvailCouponRequestVO;
 import com.atzuche.order.wallet.WalletProxyService;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -104,9 +106,11 @@ public class SubmitOrderBeforeCostCalService {
                 renterOrderService.buildRenterOrderCostReqDTO(renterOrderReqVO);
         RenterOrderCostRespDTO renterOrderCostRespDTO =
                 renterOrderCalCostService.getOrderCostAndDeailList(renterOrderCostReqDTO);
-        //TODO:抵扣费用处理
+
         //抵扣公共信息抽取
         DeductContextDTO deductContext = orderCommonConver.initDeductContext(renterOrderCostRespDTO);
+        deductContext.setOsVal(StringUtils.isBlank(orderReqVO.getOS()) ?
+                OsTypeEnum.OTHER.getOsVal() : OsTypeEnum.valueOf(orderReqVO.getOS()).getOsVal());
         //车主券抵扣
         CarOwnerCouponReductionVO carOwnerCouponReductionVO =
                 renterOrderCalCostService.getCarOwnerCouponReductionVo(deductContext,
