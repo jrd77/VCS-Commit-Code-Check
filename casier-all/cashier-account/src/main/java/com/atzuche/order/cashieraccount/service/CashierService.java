@@ -480,6 +480,32 @@ public class CashierService {
     }
 
     /**
+     * 钱包支付成功订单状态
+     * @param
+     */
+    public void saveWalletPaylOrderStatusInfo( String orderNo){
+        OrderStatusDTO orderStatusDTO = new OrderStatusDTO();
+        orderStatusDTO.setOrderNo(orderNo);
+        OrderStatusEntity entity = orderStatusService.getByOrderNo(orderNo);
+        if(Objects.nonNull(entity)){
+            orderStatusDTO.setRentCarPayStatus(OrderPayStatusEnum.PAYED.getStatus());
+            orderStatusDTO.setDepositPayStatus(entity.getDepositPayStatus());
+            orderStatusDTO.setWzPayStatus(entity.getWzPayStatus());
+            if(
+                 ( Objects.nonNull(orderStatusDTO.getDepositPayStatus()) && OrderPayStatusEnum.PAYED.getStatus() == orderStatusDTO.getDepositPayStatus() )&&
+                  (Objects.nonNull(orderStatusDTO.getWzPayStatus())  && OrderPayStatusEnum.PAYED.getStatus() == orderStatusDTO.getWzPayStatus())
+            ){
+                orderStatusDTO.setStatus(OrderStatusEnum.TO_GET_CAR.getStatus());
+                //2记录订单流传信息
+                orderFlowService.inserOrderStatusChangeProcessInfo(orderStatusDTO.getOrderNo(), OrderStatusEnum.TO_GET_CAR);
+
+            }
+        }
+        //1更新 订单流转状态
+        orderStatusService.saveOrderStatusInfo(orderStatusDTO);
+
+    }
+    /**
      * 取消订单结算
      * @param orderStatusDTO
      */
