@@ -209,6 +209,7 @@ public class CarProxyService {
     public OwnerGoodsDetailDTO getOwnerGoodsDetail(RenterGoodsDetailDTO renterGoodsDetailDto) throws CarDetailByFeignException {
         OwnerGoodsDetailDTO ownerGoodsDetailDto = new OwnerGoodsDetailDTO();
         BeanUtils.copyProperties(renterGoodsDetailDto, ownerGoodsDetailDto);
+        ownerGoodsDetailDto.setMemNo(renterGoodsDetailDto.getOwnerMemNo());
         List<OwnerGoodsPriceDetailDTO> ownerGoodsPriceList = renterGoodsDetailDto.getRenterGoodsPriceDetailDTOList()
                 .stream()
                 .map(x -> {

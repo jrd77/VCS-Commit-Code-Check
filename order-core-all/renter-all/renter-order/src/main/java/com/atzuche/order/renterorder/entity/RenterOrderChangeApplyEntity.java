@@ -109,6 +109,10 @@ public class RenterOrderChangeApplyEntity implements Serializable {
 	 */
 	private LocalDateTime auditTime;
 	/**
+	 * 发起申请人 1-租客、2-车主、3-后台
+	 */
+	private Integer applySource;
+	/**
 	 * 创建时间
 	 */
 	private LocalDateTime createTime;
