@@ -1,5 +1,6 @@
 package com.atzuche.order.renterwz.service;
 
+import com.atzuche.order.renterwz.entity.IllegalAppealEntity;
 import com.atzuche.order.renterwz.mapper.IllegalAppealMapper;
 import org.springframework.stereotype.Service;
 
@@ -19,5 +20,9 @@ public class IllegalAppealService {
 
     public Integer getIllegalAppealCount(String orderNo, String illegalNum) {
         return illegalAppealMapper.getIllegalAppealCount(orderNo,illegalNum);
+    }
+
+    public void insertIllegalAppeal(IllegalAppealEntity entity) {
+        illegalAppealMapper.saveIllegalAppeal(entity);
     }
 }

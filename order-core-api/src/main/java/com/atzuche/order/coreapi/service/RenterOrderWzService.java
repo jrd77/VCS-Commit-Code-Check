@@ -3,6 +3,7 @@ package com.atzuche.order.coreapi.service;
 import com.atzuche.order.cashieraccount.service.CashierRefundApplyService;
 import com.atzuche.order.commons.CommonUtils;
 import com.atzuche.order.commons.DateUtils;
+import com.atzuche.order.coreapi.entity.request.IllegalAppealReqVO;
 import com.atzuche.order.coreapi.entity.vo.res.IllegalOrderInfoResVO;
 import com.atzuche.order.coreapi.entity.vo.res.TransIllegalDetailResVO;
 import com.atzuche.order.coreapi.enums.OrderStatusEnums;
@@ -17,10 +18,7 @@ import com.atzuche.order.rentermem.entity.RenterMemberEntity;
 import com.atzuche.order.rentermem.service.RenterMemberService;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.atzuche.order.renterorder.service.RenterOrderService;
-import com.atzuche.order.renterwz.entity.RenterOrderWzCostDetailEntity;
-import com.atzuche.order.renterwz.entity.RenterOrderWzDetailEntity;
-import com.atzuche.order.renterwz.entity.RenterOrderWzIllegalPhotoEntity;
-import com.atzuche.order.renterwz.entity.RenterOrderWzStatusEntity;
+import com.atzuche.order.renterwz.entity.*;
 import com.atzuche.order.renterwz.service.*;
 import com.atzuche.order.renterwz.vo.PhotoUploadVO;
 import com.autoyol.autopay.gateway.constant.DataPayKindConstant;
@@ -425,5 +423,11 @@ public class RenterOrderWzService {
 
     public Integer getIllegalAppealCount(String orderNo, String illegalNum) {
         return illegalAppealService.getIllegalAppealCount(orderNo,illegalNum);
+    }
+
+    public void insertIllegalAppeal(IllegalAppealReqVO illegalAppeal) {
+        IllegalAppealEntity entity = new IllegalAppealEntity();
+        BeanUtils.copyProperties(illegalAppeal,entity);
+        illegalAppealService.insertIllegalAppeal(entity);
     }
 }
