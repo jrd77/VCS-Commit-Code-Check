@@ -1,37 +1,51 @@
 package com.atzuche.order.commons.enums;
 
 import lombok.Getter;
+import org.apache.commons.lang3.StringUtils;
 
 /**
- *
- *
  * @author pengcheng.fu
  * @date 2020/1/14 14:51
  */
 @Getter
 public enum OsTypeEnum {
-    /**IOS**/
-    IOS("IOS","1"),
-    /**ANDROID**/
-    ANDROID("ANDROID","1"),
-    /**H5**/
-    H5("H5","2"),
-    /**WECHAT_APPLETS**/
-    WECHAT_APPLETS("miniprogram-wechat", "3"),
-    /**ALIPAY_APPLETS**/
-    ALIPAY_APPLETS("miniprogram-alipay","4"),
-    /**OTHER**/
-    OTHER("other","5");
+    /**
+     * IOS
+     **/
+    IOS("IOS", "1", "APP"),
+    /**
+     * ANDROID
+     **/
+    ANDROID("ANDROID", "1", "APP"),
+    /**
+     * H5
+     **/
+    H5("H5", "2", "H5"),
+    /**
+     * WECHAT_APPLETS,微信小程序
+     **/
+    WECHAT_APPLETS("miniprogram-wechat", "3", "WX"),
+    /**
+     * ALIPAY_APPLETS,支付宝小程序
+     **/
+    ALIPAY_APPLETS("miniprogram-alipay", "4", "ALIPAY"),
+    /**
+     * OTHER
+     **/
+    OTHER("other", "5", "other");
 
 
     private String os;
 
     private String osVal;
 
+    private String osDesc;
 
-    OsTypeEnum(String os, String osVal) {
+
+    OsTypeEnum(String os, String osVal, String osDesc) {
         this.os = os;
         this.osVal = osVal;
+        this.osDesc = osDesc;
     }
 
 
@@ -42,12 +56,12 @@ public enum OsTypeEnum {
      * @return OsTypeEnum
      */
     public OsTypeEnum from(String os) {
-        OsTypeEnum[] statuses = values();
-        for (OsTypeEnum s : statuses) {
-            if (os == s.os) {
-                return s;
+        OsTypeEnum[] osTypes = values();
+        for (OsTypeEnum osType : osTypes) {
+            if (StringUtils.equals(osType.os, os)) {
+                return osType;
             }
         }
-        throw new RuntimeException("the value :" + os + " not supported,please check");
+        return OTHER;
     }
 }
