@@ -281,4 +281,16 @@
 		limit 1
 	</select>
 	
+	<select id="getRenterOrderChangeApplyCountByOrderNo" resultType="Integer">
+		select count(*) from renter_order_change_apply where order_no = #{orderNo}
+		and audit_status = 0
+		and is_delete = 0
+	</select>
+	
+	<update id="updateRenterOrderChangeApplyStatusByOrderNo">
+		update renter_order_change_apply set audit_status = 2
+		where order_no = #{orderNo}
+		and audit_status = 0
+	</update>
+	
 </mapper>
