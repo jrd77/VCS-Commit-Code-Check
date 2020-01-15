@@ -61,4 +61,13 @@ public interface OwnerOrderFineApplyMapper{
      */
     int updateByPrimaryKeySelective(OwnerOrderFineApplyEntity record);
 
+
+    /**
+     * 修改
+     *
+     * @param id 主键
+     * @return int
+     */
+    int updateInvalidByPrimaryKey(Integer id);
+
 }

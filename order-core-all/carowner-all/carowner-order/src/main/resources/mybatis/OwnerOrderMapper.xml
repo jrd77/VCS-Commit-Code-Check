@@ -244,6 +244,11 @@
 		update owner_order set child_status = #{childStatus}
 		where id = #{id}
 	</update>
+
+    <update id="updateChildStatusByOrderNo">
+		update owner_order set child_status = #{childStatus} where order_no = #{orderNo}
+	</update>
+
     <select id="getChangeOwnerByOrderNo" resultMap="BaseResultMap">
         select <include refid="Base_Column_List" /> from owner_order where order_no = #{orderNo}
         and is_effective = 0
