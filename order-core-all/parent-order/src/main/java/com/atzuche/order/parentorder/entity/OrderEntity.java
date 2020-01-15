@@ -88,7 +88,7 @@ public class OrderEntity implements Serializable {
 	/**
 	 * 风控审核id
 	 */
-	private Integer riskAuditId;
+	private String riskAuditId;
 	/**
 	 * 版本号
 	 */

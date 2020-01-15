@@ -68,7 +68,7 @@ public class OrderDTO {
     /**
      * 风控审核id
      */
-    private Integer riskAuditId;
+    private String riskAuditId;
     /**
      * 航班号
      */
