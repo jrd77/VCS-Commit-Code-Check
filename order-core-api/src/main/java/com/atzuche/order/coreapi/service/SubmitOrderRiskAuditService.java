@@ -67,14 +67,15 @@ public class SubmitOrderRiskAuditService {
             logger.error("下单调用风控服务审核不通过.param is, reqVo:[{}]", req, soe);
             t.setStatus(soe);
             Cat.logError("下单调用风控服务审核不通过.", soe);
+            throw soe;
         } catch (Exception e) {
             logger.error("下单调用风控服务异常.param is, reqVo:[{}]", req, e);
             t.setStatus(e);
             Cat.logError("下单调用风控服务异常.", e);
+            throw e;
         } finally {
             t.complete();
         }
-        return null;
     }
 
 
