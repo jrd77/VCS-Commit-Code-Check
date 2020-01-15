@@ -3,6 +3,7 @@ package com.atzuche.order.owner.commodity.entity;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 
@@ -225,5 +226,10 @@ public class OwnerGoodsEntity implements Serializable {
 	 * 年份
 	 */
 	private String year;
+
+    /**
+     * 年检到期时间
+     */
+    private LocalDate inspectExpire;
 
 }

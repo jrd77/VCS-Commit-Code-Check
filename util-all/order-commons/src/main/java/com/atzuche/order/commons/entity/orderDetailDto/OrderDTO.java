@@ -48,11 +48,18 @@ public class OrderDTO implements Serializable {
          */
     	@AutoDocProperty("预计起租时间")
         private LocalDateTime expRentTime;
+
+        @AutoDocProperty("预计起租时间")
+    	private String expRentTimeStr;
     	/**
          * 预计还车时间
          */
     	@AutoDocProperty("预计还车时间")
         private LocalDateTime expRevertTime;
+        @AutoDocProperty("预计还车时间")
+        private String expRevertTimeStr;
+
+
     	/**
          * 下单城市名称
          */

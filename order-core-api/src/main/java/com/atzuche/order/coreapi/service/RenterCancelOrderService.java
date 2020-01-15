@@ -8,6 +8,7 @@ import com.atzuche.order.coreapi.entity.dto.CancelOrderResDTO;
 import com.atzuche.order.flow.service.OrderFlowService;
 import com.atzuche.order.ownercost.entity.ConsoleOwnerOrderFineDeatailEntity;
 import com.atzuche.order.ownercost.entity.OwnerOrderEntity;
+import com.atzuche.order.ownercost.entity.OwnerOrderFineApplyEntity;
 import com.atzuche.order.ownercost.service.ConsoleOwnerOrderFineDeatailService;
 import com.atzuche.order.ownercost.service.OwnerOrderService;
 import com.atzuche.order.parentorder.dto.OrderStatusDTO;
@@ -104,11 +105,10 @@ public class RenterCancelOrderService {
         //落库
         //订单状态更新
         orderStatusService.saveOrderStatusInfo(buildOrderStatusDTO(orderNo));
-        renterOrderService.updateRenterOrderChildStatus(renterOrderEntity.getId(),
-                RenterChildStatusEnum.END.getCode());
+        renterOrderService.updateChildStatusByOrderNo(orderNo, RenterChildStatusEnum.END.getCode());
 
         if(null != ownerOrderEntity) {
-            ownerOrderService.updateOwnerOrderChildStatus(ownerOrderEntity.getId(), OwnerChildStatusEnum.END.getCode());
+            ownerOrderService.updateChildStatusByOrderNo(orderNo, OwnerChildStatusEnum.END.getCode());
         }
 
         orderFlowService.inserOrderStatusChangeProcessInfo(orderNo, OrderStatusEnum.CLOSED);

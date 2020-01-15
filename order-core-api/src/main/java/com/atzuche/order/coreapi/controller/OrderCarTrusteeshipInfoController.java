@@ -1,12 +1,14 @@
 package com.atzuche.order.coreapi.controller;
 
+import com.atzuche.order.commons.entity.trusteeship.OrderCarTrusteeshipRepVO;
+import com.atzuche.order.commons.entity.trusteeship.TrusteeshipVO;
 import com.atzuche.order.delivery.common.DeliveryErrorCode;
 import com.atzuche.order.delivery.entity.OrderCarTrusteeshipEntity;
 import com.atzuche.order.delivery.service.OrderCarTrusteeshipService;
 import com.atzuche.order.delivery.utils.CommonUtil;
-import com.atzuche.order.delivery.vo.delivery.req.TrusteeshipVO;
 import com.autoyol.commons.web.ResponseData;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -27,11 +29,14 @@ public class OrderCarTrusteeshipInfoController {
     OrderCarTrusteeshipService orderCarTrusteeshipService;
 
     @PostMapping("/select")
-    public ResponseData<?> selectObjectByOrderNoAndCar(@RequestBody TrusteeshipVO trusteeshipVO) {
+    public ResponseData<OrderCarTrusteeshipRepVO> selectObjectByOrderNoAndCar(@RequestBody TrusteeshipVO trusteeshipVO) {
         if (Objects.isNull(trusteeshipVO) || StringUtils.isBlank(trusteeshipVO.getOrderNo())) {
             return ResponseData.createErrorCodeResponse(DeliveryErrorCode.DELIVERY_PARAMS_ERROR.getValue(), DeliveryErrorCode.DELIVERY_PARAMS_ERROR.getName());
         }
-        return ResponseData.success(orderCarTrusteeshipService.selectObjectByOrderNoAndCar(trusteeshipVO.getOrderNo(), trusteeshipVO.getCarNo()));
+        OrderCarTrusteeshipEntity orderCarTrusteeship = orderCarTrusteeshipService.selectObjectByOrderNoAndCar(trusteeshipVO.getOrderNo(), trusteeshipVO.getCarNo());
+        OrderCarTrusteeshipRepVO orderCarTrusteeshipRepVO = new OrderCarTrusteeshipRepVO();
+        BeanUtils.copyProperties(orderCarTrusteeship,orderCarTrusteeshipRepVO);
+        return ResponseData.success(orderCarTrusteeshipRepVO);
     }
 
     @PostMapping("/delete")
@@ -53,7 +58,7 @@ public class OrderCarTrusteeshipInfoController {
      * @return
      */
     @PostMapping("/update")
-    public ResponseData<?> updateOrderCarTrusteeship(@RequestBody OrderCarTrusteeshipEntity orderCarTrusteeshipEntity) {
+    public ResponseData<?> updateOrderCarTrusteeship(@RequestBody OrderCarTrusteeshipRepVO orderCarTrusteeshipEntity) {
         if (Objects.isNull(orderCarTrusteeshipEntity) || StringUtils.isBlank(orderCarTrusteeshipEntity.getOrderNo())) {
             return ResponseData.createErrorCodeResponse(DeliveryErrorCode.DELIVERY_PARAMS_ERROR.getValue(), DeliveryErrorCode.DELIVERY_PARAMS_ERROR.getName());
         }
@@ -70,7 +75,7 @@ public class OrderCarTrusteeshipInfoController {
     }
 
     @PostMapping("/add")
-    public ResponseData<?> insertOrderCarTrusteeship(@RequestBody OrderCarTrusteeshipEntity orderCarTrusteeshipEntity) {
+    public ResponseData<?> insertOrderCarTrusteeship(@RequestBody OrderCarTrusteeshipRepVO orderCarTrusteeshipEntity) {
         if (Objects.isNull(orderCarTrusteeshipEntity) || StringUtils.isBlank(orderCarTrusteeshipEntity.getOrderNo())) {
             return ResponseData.createErrorCodeResponse(DeliveryErrorCode.DELIVERY_PARAMS_ERROR.getValue(), DeliveryErrorCode.DELIVERY_PARAMS_ERROR.getName());
         }
