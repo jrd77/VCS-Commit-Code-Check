@@ -12,8 +12,9 @@ import com.atzuche.order.cashieraccount.vo.res.pay.OrderPayCallBackSuccessVO;
 import com.atzuche.order.commons.enums.OrderPayStatusEnum;
 import com.atzuche.order.commons.enums.OrderStatusEnum;
 import com.atzuche.order.commons.enums.RenterCashCodeEnum;
+import com.atzuche.order.commons.enums.YesNoEnum;
+import com.atzuche.order.commons.enums.cashier.OrderRefundStatusEnum;
 import com.atzuche.order.commons.enums.cashier.TransStatusEnum;
-import com.atzuche.order.commons.service.OrderPayCallBack;
 import com.atzuche.order.flow.service.OrderFlowService;
 import com.atzuche.order.parentorder.dto.OrderStatusDTO;
 import com.atzuche.order.parentorder.entity.OrderStatusEntity;
@@ -51,12 +52,9 @@ import com.autoyol.autopay.gateway.constant.DataPayKindConstant;
 import com.autoyol.autopay.gateway.constant.DataPayTypeConstant;
 import com.autoyol.autopay.gateway.vo.req.NotifyDataVo;
 import com.autoyol.autopay.gateway.vo.res.AutoPayResultVo;
-import com.autoyol.cat.CatAnnotation;
 import com.autoyol.commons.utils.GsonUtils;
 import com.autoyol.commons.web.ErrorCode;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.math.NumberUtils;
-import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -65,7 +63,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -467,9 +464,32 @@ public class CashierService {
             return;
         }
         cashierRefundApplyNoTService.updateRefundDepositSuccess(notifyDataVo);
+        OrderStatusDTO orderStatusDTO = new OrderStatusDTO();
+        orderStatusDTO.setOrderNo(notifyDataVo.getOrderNo());
+        if(DataPayKindConstant.RENT.equals(notifyDataVo.getPayKind())){
+            orderStatusDTO.setDepositRefundStatus(OrderRefundStatusEnum.REFUNDED.getStatus());
+        }
+        if(DataPayKindConstant.DEPOSIT.equals(notifyDataVo.getPayKind())){
+            orderStatusDTO.setWzRefundStatus(OrderRefundStatusEnum.REFUNDED.getStatus());
+        }
+        if(DataPayKindConstant.RENT_AMOUNT.equals(notifyDataVo.getPayKind())){
+            orderStatusDTO.setRentCarRefundStatus(OrderRefundStatusEnum.REFUNDED.getStatus());
+        }
+        saveCancelOrderStatusInfo(orderStatusDTO);
         //TODO 支付回调成功 push/或者短信 怎么处理
     }
 
+    /**
+     * 取消订单结算
+     * @param orderStatusDTO
+     */
+    public void saveCancelOrderStatusInfo(OrderStatusDTO orderStatusDTO){
+        //1更新 订单流转状态
+        orderStatusService.saveOrderStatusInfo(orderStatusDTO);
+        //2记录订单流传信息
+        orderFlowService.inserOrderStatusChangeProcessInfo(orderStatusDTO.getOrderNo(), OrderStatusEnum.CLOSED);
+
+    }
     /**
      * 支付成功回调 更新收银台及费用
      * @param notifyDataVo
@@ -514,6 +534,7 @@ public class CashierService {
             //2 收银台记录更新
             cashierNoTService.updataCashierAndRenterCost(notifyDataVo,accountRenterCostReq);
             vo.setRentCarPayStatus(OrderPayStatusEnum.PAYED.getStatus());
+            vo.setIsPayAgain(YesNoEnum.YES.getCode());
         }
 
         //TODO 支付回调成功 push/或者短信 怎么处理

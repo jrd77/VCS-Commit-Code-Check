@@ -15,6 +15,8 @@ public class PhotoUploadVO {
 
     private String serialNumber;
 
+    private String picKey;
+
     private String userType;
 
     private String orderNo;

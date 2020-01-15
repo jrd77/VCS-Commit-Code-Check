@@ -316,12 +316,8 @@ public class CashierNoTService {
      */
     public PayVo getPayVO(CashierEntity cashierEntity,OrderPaySignReqVO orderPaySign,int amt ,String title,String payKind,String payIdStr ,String extendParams) {
         PayVo vo = new PayVo();
-        if(Objects.isNull(cashierEntity)){
-
-        }
         Integer paySn = (Objects.isNull(cashierEntity)|| Objects.isNull(cashierEntity.getPaySn()))?0:cashierEntity.getPaySn();
-        paySn = Objects.isNull(paySn)?0:paySn;
-        vo.setInternalNo(String.valueOf(paySn));
+        vo.setInternalNo("1");
         vo.setExtendParams(extendParams);
         vo.setAtappId(DataAppIdConstant.APPID_SHORTRENT);
         vo.setMemNo(orderPaySign.getMenNo());
@@ -443,29 +439,19 @@ public class CashierNoTService {
         int result = 0;
         int cashierId=0;
         RenterCashCodeEnum renterCashCodeEnum = RenterCashCodeEnum.ACCOUNT_RENTER_RENT_COST;
-        if(Objects.nonNull(cashierEntity) && Objects.nonNull(cashierEntity.getPaySn())){
-            CashierEntity cashier = new CashierEntity ();
-            cashier.setId(cashierEntity.getId());
-            cashier.setPaySn(cashierEntity.getPaySn() + 1);
-            cashier.setPayAmt(cashier.getPayAmt() + amtWallet);
-            cashier.setVersion(cashierEntity.getVersion());
-            result = cashierMapper.updateByPrimaryKeySelective(cashier);
-            cashierId = cashier.getId();
-            renterCashCodeEnum = RenterCashCodeEnum.ACCOUNT_RENTER_RENT_COST_AGAIN;
-        }else {
-            CashierEntity cashier = new CashierEntity ();
-            BeanUtils.copyProperties(orderPaySign,cashier);
-            cashier.setPayAmt(amtWallet);
-            cashier.setPaySource(PaySourceEnum.WALLET_PAY.getCode());
-            cashier.setPayTitle("订单号：" + orderPaySign.getOrderNo() + "钱包支付金额：" + amtWallet + "元");
-            cashier.setPayKind(DataPayKindConstant.RENT_AMOUNT);
-            cashier.setPayType(DataPayTypeConstant.PAY_PUR);
-            cashier.setAtappId(DataAppIdConstant.APPID_SHORTRENT);
-            cashier.setTransStatus("00");
-            cashier.setPaySn(NumberUtils.INTEGER_ONE);
-            result = cashierMapper.insertSelective(cashier);
-            cashierId = cashier.getId();
-        }
+        CashierEntity cashier = new CashierEntity ();
+        BeanUtils.copyProperties(orderPaySign,cashier);
+        cashier.setMemNo(orderPaySign.getMenNo());
+        cashier.setPayAmt(amtWallet);
+        cashier.setPaySource(PaySourceEnum.WALLET_PAY.getCode());
+        cashier.setPayTitle("订单号：" + orderPaySign.getOrderNo() + "钱包支付金额：" + amtWallet + "元");
+        cashier.setPayKind(DataPayKindConstant.RENT_AMOUNT);
+        cashier.setPayType(DataPayTypeConstant.PAY_PUR);
+        cashier.setAtappId(DataAppIdConstant.APPID_SHORTRENT);
+        cashier.setTransStatus("00");
+        cashier.setPaySn(NumberUtils.INTEGER_ONE);
+        result = cashierMapper.insertSelective(cashier);
+        cashierId = cashier.getId();
         if(result ==0){
             throw new AccountRenterDepositDBException();
         }
@@ -474,8 +460,11 @@ public class CashierNoTService {
         AccountRenterCostReqVO accountRenterCostReq = new AccountRenterCostReqVO();
         BeanUtils.copyProperties(orderPaySign,accountRenterCostReq);
         accountRenterCostReq.setShifuAmt(Math.abs(amtWallet));
+        accountRenterCostReq.setMemNo(orderPaySign.getMenNo());
+
         AccountRenterCostDetailReqVO accountRenterCostDetailReq = new AccountRenterCostDetailReqVO();
         BeanUtils.copyProperties(orderPaySign,accountRenterCostDetailReq);
+        accountRenterCostDetailReq.setMemNo(orderPaySign.getMenNo());
         accountRenterCostDetailReq.setUniqueNo(String.valueOf(cashierId));
         accountRenterCostDetailReq.setAmt(Math.abs(amtWallet));
         accountRenterCostDetailReq.setTransTime(LocalDateTime.now());
