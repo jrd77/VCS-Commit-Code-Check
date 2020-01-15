@@ -124,36 +124,36 @@ public class OwnerCancelOrderService {
             cancelOrderResDTO.setRenterOrderNo(renterOrderEntity.getRenterOrderNo());
             cancelOrderResDTO.setSrvGetFlag(null != renterOrderEntity.getIsGetCar() && renterOrderEntity.getIsGetCar() == 1);
             cancelOrderResDTO.setSrvReturnFlag(null != renterOrderEntity.getIsReturnCar() && renterOrderEntity.getIsReturnCar() == 1);
-            //罚金计算(罚金和收益)
-            //车主罚金处理
-            CancelFineAmtDTO cancelFineAmt = buildCancelFineAmtDTO(renterOrderEntity,
-                    renterOrderCostEntity, goodsDetail.getCarOwnerType());
-            int penalty = renterOrderFineDeatailService.calCancelFine(cancelFineAmt);
-
-            //罚车主补贴给租客
-            OwnerOrderFineDeatailEntity ownerOrderFineDeatailEntityOne =
-                    ownerOrderFineDeatailService.fineDataConvert(cancelFineAmt.getCostBaseDTO(), penalty,
-                            FineSubsidyCodeEnum.RENTER, FineSubsidySourceCodeEnum.OWNER, FineTypeEnum.CANCEL_FINE);
-            ownerOrderFineDeatailService.addOwnerOrderFineRecord(ownerOrderFineDeatailEntityOne);
-            //罚车主补贴给平台(保险费)
-            if(orderStatusEntity.getStatus() >= OrderStatusEnum.TO_RETURN_CAR.getStatus() && orderStatusEntity.getStatus() != OrderStatusEnum.CLOSED.getStatus()) {
-                OwnerOrderFineDeatailEntity ownerOrderFineDeatailEntityTwo =
-                        ownerOrderFineDeatailService.fineDataConvert(cancelFineAmt.getCostBaseDTO(), Math.abs(renterOrderCostEntity.getBasicEnsureAmount()),
-                                FineSubsidyCodeEnum.PLATFORM, FineSubsidySourceCodeEnum.OWNER, FineTypeEnum.CANCEL_FINE);
-                ownerOrderFineDeatailService.addOwnerOrderFineRecord(ownerOrderFineDeatailEntityTwo);
-            }
-            //租客收益处理
-            ConsoleRenterOrderFineDeatailEntity consoleRenterOrderFineDeatailEntity =
-                    consoleRenterOrderFineDeatailService.fineDataConvert(cancelFineAmt.getCostBaseDTO(), penalty,
-                            FineSubsidyCodeEnum.RENTER, FineSubsidySourceCodeEnum.OWNER, FineTypeEnum.CANCEL_FINE);
-            //订单状态更新
-            orderStatusDTO.setStatus(OrderStatusEnum.CLOSED.getStatus());
-
-            renterOrderService.updateRenterOrderChildStatus(renterOrderEntity.getId(),
-                    RenterChildStatusEnum.END.getCode());
-            consoleRenterOrderFineDeatailService.saveConsoleRenterOrderFineDeatail(consoleRenterOrderFineDeatailEntity);
         }
 
+        //罚金计算(罚金和收益)
+        //车主罚金处理
+        CancelFineAmtDTO cancelFineAmt = buildCancelFineAmtDTO(renterOrderEntity,
+                renterOrderCostEntity, goodsDetail.getCarOwnerType());
+        int penalty = renterOrderFineDeatailService.calCancelFine(cancelFineAmt);
+
+        //罚车主补贴给租客
+        OwnerOrderFineDeatailEntity ownerOrderFineDeatailEntityOne =
+                ownerOrderFineDeatailService.fineDataConvert(cancelFineAmt.getCostBaseDTO(), penalty,
+                        FineSubsidyCodeEnum.RENTER, FineSubsidySourceCodeEnum.OWNER, FineTypeEnum.CANCEL_FINE);
+        ownerOrderFineDeatailService.addOwnerOrderFineRecord(ownerOrderFineDeatailEntityOne);
+        //罚车主补贴给平台(保险费)
+        if(orderStatusEntity.getStatus() >= OrderStatusEnum.TO_RETURN_CAR.getStatus() && orderStatusEntity.getStatus() != OrderStatusEnum.CLOSED.getStatus()) {
+            OwnerOrderFineDeatailEntity ownerOrderFineDeatailEntityTwo =
+                    ownerOrderFineDeatailService.fineDataConvert(cancelFineAmt.getCostBaseDTO(), Math.abs(renterOrderCostEntity.getBasicEnsureAmount()),
+                            FineSubsidyCodeEnum.PLATFORM, FineSubsidySourceCodeEnum.OWNER, FineTypeEnum.CANCEL_FINE);
+            ownerOrderFineDeatailService.addOwnerOrderFineRecord(ownerOrderFineDeatailEntityTwo);
+        }
+        //租客收益处理
+        ConsoleRenterOrderFineDeatailEntity consoleRenterOrderFineDeatailEntity =
+                consoleRenterOrderFineDeatailService.fineDataConvert(cancelFineAmt.getCostBaseDTO(), penalty,
+                        FineSubsidyCodeEnum.RENTER, FineSubsidySourceCodeEnum.OWNER, FineTypeEnum.CANCEL_FINE);
+        //订单状态更新
+        orderStatusDTO.setStatus(OrderStatusEnum.CLOSED.getStatus());
+
+        renterOrderService.updateRenterOrderChildStatus(renterOrderEntity.getId(),
+                RenterChildStatusEnum.END.getCode());
+        consoleRenterOrderFineDeatailService.saveConsoleRenterOrderFineDeatail(consoleRenterOrderFineDeatailEntity);
         //落库
         orderStatusService.saveOrderStatusInfo(orderStatusDTO);
         if(null != ownerOrderEntity) {
