@@ -21,4 +21,6 @@ public class PlatformToOwnerSubsidyDTO {
     private Integer incomeSubsidyAmt;
     @AutoDocProperty("其他补贴")
     private Integer otherSubsidyAmt;
+    @AutoDocProperty("总补贴")
+    private Integer total;
 }
