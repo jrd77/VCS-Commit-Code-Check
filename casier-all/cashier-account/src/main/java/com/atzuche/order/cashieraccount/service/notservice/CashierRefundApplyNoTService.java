@@ -13,12 +13,14 @@ import com.autoyol.autopay.gateway.vo.res.AutoPayResultVo;
 import com.autoyol.doc.util.StringUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 
 import com.atzuche.order.cashieraccount.mapper.CashierRefundApplyMapper;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Objects;
 
 
@@ -33,6 +35,7 @@ public class CashierRefundApplyNoTService {
     @Autowired
     private CashierRefundApplyMapper cashierRefundApplyMapper;
 
+    @Value("${refundWatingDays:1}") String refundWatingDays;
 
     /**
      * 记录待退款信息
@@ -103,5 +106,14 @@ public class CashierRefundApplyNoTService {
      */
     public CashierRefundApplyEntity selectorderNo(String orderNo,String payKind) {
         return cashierRefundApplyMapper.selectRefundByType(orderNo,payKind);
+    }
+
+    public List<CashierRefundApplyEntity> selectorderNoWaitingAll() {
+        //回去
+        long refundWatingDaysLong = Long.parseLong(refundWatingDays);
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime date = now.plusDays(-refundWatingDaysLong);
+        List<CashierRefundApplyEntity> result = cashierRefundApplyMapper.getCashierRefundApplyByTime(date);
+        return result;
     }
 }

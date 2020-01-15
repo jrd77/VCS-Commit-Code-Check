@@ -74,4 +74,13 @@ public class OwnerGoodsService{
         ownerGoodsDetailDto.setOwnerGoodsPriceDetailDTOList(ownerGoodsPriceDetailDTOList);
         return ownerGoodsDetailDto;
     }
+    
+    /**
+     * 获取最新的车主商品信息
+     * @param orderNo
+     * @return OwnerGoodsEntity
+     */
+    public OwnerGoodsEntity getLastOwnerGoodsByOrderNo(String orderNo) {
+    	return ownerGoodsMapper.getLastOwnerGoodsByOrderNo(orderNo);
+    }
 }

@@ -13,13 +13,16 @@ import com.atzuche.order.commons.entity.dto.RenterMemberDTO;
 import com.atzuche.order.commons.enums.OrderChangeItemEnum;
 import com.atzuche.order.coreapi.entity.dto.ModifyOrderDTO;
 import com.atzuche.order.coreapi.modifyorder.exception.ModifyOrderDataNoChangeException;
+import com.atzuche.order.coreapi.modifyorder.exception.ModifyOrderExistTODOChangeApplyException;
 import com.atzuche.order.coreapi.modifyorder.exception.ModifyOrderGoodNotExistException;
 import com.atzuche.order.coreapi.modifyorder.exception.ModifyOrderGoodPriceNotExistException;
 import com.atzuche.order.coreapi.modifyorder.exception.ModifyOrderMemberNotExistException;
 import com.atzuche.order.coreapi.modifyorder.exception.ModifyOrderParentOrderNotFindException;
 import com.atzuche.order.coreapi.modifyorder.exception.ModifyOrderRentOrRevertTimeException;
 import com.atzuche.order.parentorder.entity.OrderEntity;
+import com.atzuche.order.renterorder.entity.RenterOrderChangeApplyEntity;
 import com.atzuche.order.renterorder.entity.dto.OrderChangeItemDTO;
+import com.atzuche.order.renterorder.service.RenterOrderChangeApplyService;
 import com.autoyol.car.api.model.dto.LocationDTO;
 import com.autoyol.car.api.model.dto.OrderInfoDTO;
 import com.autoyol.car.api.model.enums.OrderOperationTypeEnum;
@@ -32,6 +35,8 @@ public class ModifyOrderCheckService {
 	private ModifyOrderConfirmService modifyOrderConfirmService;
 	@Autowired
 	private StockService stockService;
+	@Autowired
+	private RenterOrderChangeApplyService renterOrderChangeApplyService;
 	
 	/**
 	 * 库存校验
@@ -94,6 +99,10 @@ public class ModifyOrderCheckService {
 		RenterMemberDTO renterMemberDTO = modifyOrderDTO.getRenterMemberDTO();
 		// 校验会员
 		checkMember(renterMemberDTO);
+		if (modifyOrderDTO.getConsoleFlag() == null || !modifyOrderDTO.getConsoleFlag()) {
+			// 校验是否有未处理的申请
+			checkChangeApply(modifyOrderDTO.getOrderNo());
+		}
 	}
 	
 	/**
@@ -176,6 +185,18 @@ public class ModifyOrderCheckService {
 		if (renterMemberDTO == null) {
 			Cat.logError("ModifyOrderCheckService.checkMember校验会员信息", new ModifyOrderMemberNotExistException());
 			throw new ModifyOrderMemberNotExistException();
+		}
+	}
+	
+	/**
+	 * 校验是否有未处理的申请
+	 * @param orderNo
+	 */
+	public void checkChangeApply(String orderNo) {
+		Integer changeApplyCount = renterOrderChangeApplyService.getRenterOrderChangeApplyCountByOrderNo(orderNo);
+		if (changeApplyCount != null && changeApplyCount > 0) {
+			Cat.logError("ModifyOrderCheckService.checkChangeApply校验是否有未处理的申请", new ModifyOrderExistTODOChangeApplyException());
+			throw new ModifyOrderExistTODOChangeApplyException();
 		}
 	}
 }

@@ -31,4 +31,7 @@ public interface RenterOrderChangeApplyMapper{
     
     RenterOrderChangeApplyEntity getRenterOrderChangeApplyByRenterOrderNo(@Param("renterOrderNo") String renterOrderNo);
 
+    Integer getRenterOrderChangeApplyCountByOrderNo(@Param("orderNo") String orderNo);
+    
+    Integer updateRenterOrderChangeApplyStatusByOrderNo(@Param("orderNo") String orderNo);
 }

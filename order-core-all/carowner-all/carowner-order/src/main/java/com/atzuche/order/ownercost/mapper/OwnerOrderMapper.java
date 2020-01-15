@@ -37,5 +37,9 @@ public interface OwnerOrderMapper{
 
     List<OwnerOrderEntity> queryHostiryOwnerOrderByOrderNo(@Param("orderNo")String orderNo);
 
+
+	OwnerOrderEntity getOwnerOrderByOwnerOrderNo(@Param("ownerOrderNo")String ownerOrderNo);
+
     OwnerOrderEntity queryCancelOwnerOrderByOrderNoIsEffective(@Param("orderNo")String orderNo);
+
 }
