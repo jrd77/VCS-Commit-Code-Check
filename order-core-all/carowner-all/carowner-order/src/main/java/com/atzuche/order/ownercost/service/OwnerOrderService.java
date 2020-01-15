@@ -106,4 +106,8 @@ public class OwnerOrderService {
     public List<OwnerOrderEntity> queryHostiryOwnerOrderByOrderNo(String orderNo) {
         return ownerOrderMapper.queryHostiryOwnerOrderByOrderNo(orderNo);
     }
+
+    public OwnerOrderEntity queryCancelOwnerOrderByOrderNoIsEffective(String orderNo) {
+       return ownerOrderMapper.queryCancelOwnerOrderByOrderNoIsEffective(orderNo);
+    }
 }
