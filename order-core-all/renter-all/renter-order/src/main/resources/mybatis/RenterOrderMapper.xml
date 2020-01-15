@@ -312,6 +312,11 @@
 		update renter_order set child_status = #{childStatus}
 		where id = #{id}
 	</update>
+
+    <update id="updateChildStatusByOrderNo">
+		update renter_order set child_status = #{childStatus} where order_no = #{orderNo}
+	</update>
+
     <select id="getChangeRenterOrderByOrderNo" resultMap="BaseResultMap">
         select <include refid="Base_Column_List" /> from renter_order where order_no = #{orderNo}
         AND is_effective = 0
