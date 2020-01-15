@@ -570,8 +570,9 @@ public class OrderDetailService {
             ownerOrderFineDeatailDTOS.add(ownerOrderFineDeatailDTO);
         });
 
-        List<OwnerOrderSubsidyDetailDTO> ownerOrderSubsidyDetailDTOS = new ArrayList<>();
+
         //车主补贴
+        List<OwnerOrderSubsidyDetailDTO> ownerOrderSubsidyDetailDTOS = new ArrayList<>();
         List<OwnerOrderSubsidyDetailEntity> ownerOrderSubsidyDetailEntities = ownerOrderSubsidyDetailService.listOwnerOrderSubsidyDetail(orderNo, ownerOrderNo);
         ownerOrderSubsidyDetailEntities.stream().forEach(x->{
             OwnerOrderSubsidyDetailDTO ownerOrderSubsidyDetailDTO = new OwnerOrderSubsidyDetailDTO();
@@ -580,9 +581,13 @@ public class OrderDetailService {
         });
 
         //租客补贴
-        List<RenterOrderSubsidyDetailEntity> renterOrderSubsidyDetailEntities = renterOrderSubsidyDetailService.listRenterOrderSubsidyDetail(orderNo, renterOrderNo);
         List<RenterOrderSubsidyDetailDTO> renterOrderSubsidyDetailDTOS = new ArrayList<>();
-
+        List<RenterOrderSubsidyDetailEntity> renterOrderSubsidyDetailEntities = renterOrderSubsidyDetailService.listRenterOrderSubsidyDetail(orderNo, renterOrderNo);
+        renterOrderSubsidyDetailEntities.stream().forEach(x->{
+            RenterOrderSubsidyDetailDTO renterOrderSubsidyDetailDTO = new RenterOrderSubsidyDetailDTO();
+            BeanUtils.copyProperties(x,renterOrderSubsidyDetailDTO);
+            renterOrderSubsidyDetailDTOS.add(renterOrderSubsidyDetailDTO);
+        });
 
         OrderDetailRespDTO orderDetailRespDTO = new OrderDetailRespDTO();
         orderDetailRespDTO.order = orderDTO;
@@ -608,8 +613,8 @@ public class OrderDetailService {
         orderDetailRespDTO.renterAdditionalDriverList = renterAdditionalDriverDTOList;
         orderDetailRespDTO.ownerOrderFineDeatailList = ownerOrderFineDeatailDTOS;
         orderDetailRespDTO.renterOrderFineDeatailList = renterOrderFineDeatailDTOS;
-        orderDetailRespDTO.renterOrderSubsidyDetailDTOS = null;
-        orderDetailRespDTO.ownerOrderSubsidyDetailDTOS = null;
+        orderDetailRespDTO.renterOrderSubsidyDetailDTOS = renterOrderSubsidyDetailDTOS;
+        orderDetailRespDTO.ownerOrderSubsidyDetailDTOS = ownerOrderSubsidyDetailDTOS;
         return orderDetailRespDTO;
     }
 
