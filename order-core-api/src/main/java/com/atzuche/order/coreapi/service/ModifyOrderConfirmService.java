@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 import com.atzuche.order.commons.LocalDateTimeUtils;
 import com.atzuche.order.commons.OrderReqContext;
 import com.atzuche.order.commons.entity.dto.OwnerGoodsDetailDTO;
-import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
 import com.atzuche.order.commons.enums.OrderChangeItemEnum;
 import com.atzuche.order.commons.enums.RenterCashCodeEnum;
 import com.atzuche.order.commons.enums.SrvGetReturnEnum;
@@ -19,7 +18,6 @@ import com.atzuche.order.coreapi.entity.dto.ModifyConfirmDTO;
 import com.atzuche.order.coreapi.entity.dto.ModifyOrderDTO;
 import com.atzuche.order.coreapi.entity.dto.ModifyOrderOwnerDTO;
 import com.atzuche.order.coreapi.entity.request.ModifyApplyHandleReq;
-import com.atzuche.order.coreapi.modifyorder.exception.ModifyOrderChangeApplyNotFindException;
 import com.atzuche.order.coreapi.modifyorder.exception.ModifyOrderGoodNotExistException;
 import com.atzuche.order.coreapi.modifyorder.exception.ModifyOrderParameterException;
 import com.atzuche.order.delivery.entity.RenterOrderDeliveryEntity;
@@ -33,7 +31,6 @@ import com.atzuche.order.parentorder.entity.OrderEntity;
 import com.atzuche.order.rentercost.entity.RenterOrderSubsidyDetailEntity;
 import com.atzuche.order.rentercost.entity.dto.RenterOrderSubsidyDetailDTO;
 import com.atzuche.order.rentercost.service.RenterOrderSubsidyDetailService;
-import com.atzuche.order.renterorder.entity.RenterOrderChangeApplyEntity;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.atzuche.order.renterorder.entity.dto.OrderChangeItemDTO;
 import com.atzuche.order.renterorder.service.OrderChangeItemService;
@@ -42,7 +39,6 @@ import com.atzuche.order.renterorder.service.RenterOrderService;
 import com.autoyol.car.api.model.dto.LocationDTO;
 import com.autoyol.car.api.model.dto.OrderInfoDTO;
 import com.autoyol.car.api.model.enums.OrderOperationTypeEnum;
-import com.autoyol.commons.web.ResponseData;
 import com.autoyol.platformcost.CommonUtils;
 import com.dianping.cat.Cat;
 
@@ -67,17 +63,9 @@ public class ModifyOrderConfirmService {
 	@Autowired
 	private DeliveryCarService deliveryCarService;
 	@Autowired
-	private RenterOrderChangeApplyService renterOrderChangeApplyService;
-	@Autowired
 	private StockService stockService;
-	/*
-	 * 同意操作
-	 */
-	public static final String AGREE_OPERATION = "1";
-	/**
-	 * 拒绝操作
-	 */
-	public static final String REFUSE_OPERATION = "0";
+	@Autowired
+	private RenterOrderChangeApplyService renterOrderChangeApplyService;
 	
 	/**
 	 * 自动同意
@@ -121,6 +109,8 @@ public class ModifyOrderConfirmService {
 		modifyOrderForOwnerService.modifyOrderForOwner(modifyOrderOwnerDTO, renterSubsidy);
 		// 处理租客订单信息
 		modifyOrderForRenterService.updateRenterOrderStatus(renterOrder.getOrderNo(), renterOrder.getRenterOrderNo(), initRenterOrder);
+		// 更新历史未处理的申请记录为拒绝(管理后台修改订单逻辑)
+		renterOrderChangeApplyService.updateRenterOrderChangeApplyStatusByOrderNo(modifyOrderOwnerDTO.getOrderNo());
 		// 封装OrderReqContext对象
 		OrderReqContext reqContext = getOrderReqContext(modifyOrderDTO, modifyOrderOwnerDTO);
 		// 通知仁云
@@ -164,43 +154,12 @@ public class ModifyOrderConfirmService {
 	
 	
 	/**
-	 * 车主操作修改申请
-	 * @param modifyApplyHandleReq
-	 * @return ResponseData
-	 */
-	public ResponseData<?> modifyConfirm(ModifyApplyHandleReq modifyApplyHandleReq) {
-		log.info("ModifyOrderConfirmService.modifyConfirm modifyApplyHandleReq=[{}]", modifyApplyHandleReq);
-		if (modifyApplyHandleReq == null) {
-			log.error("ModifyOrderConfirmService.modifyConfirm车主处理修改申请报错参数为空");
-			Cat.logError("ModifyOrderConfirmService.modifyConfirm车主处理修改申请报错", new ModifyOrderParameterException());
-			throw new ModifyOrderParameterException();
-		}
-		ModifyConfirmDTO modifyConfirmDTO = convertToModifyConfirmDTO(modifyApplyHandleReq);
-		RenterOrderChangeApplyEntity changeApply = renterOrderChangeApplyService.getRenterOrderChangeApplyByRenterOrderNo(modifyConfirmDTO.getRenterOrderNo());
-		if (changeApply == null) {
-			log.error("ModifyOrderConfirmService.modifyConfirm未找到有效的修改申请记录modifyApplyHandleReq=[{}]", modifyApplyHandleReq);
-			Cat.logError("ModifyOrderConfirmService.modifyConfirm车主处理修改申请报错", new ModifyOrderChangeApplyNotFindException());
-			throw new ModifyOrderChangeApplyNotFindException();
-		}
-		modifyConfirmDTO.setOrderNo(changeApply.getOrderNo());
-		modifyConfirmDTO.setOwnerOrderNo(changeApply.getOwnerOrderNo());
-		if (AGREE_OPERATION.equals(modifyConfirmDTO.getFlag())) {
-			// 同意
-			agreeModifyOrder(changeApply.getOrderNo(), modifyConfirmDTO.getRenterOrderNo());
-		} else if (REFUSE_OPERATION.equals(modifyConfirmDTO.getFlag())) {
-			// 拒绝
-			refuseModifyOrder(modifyConfirmDTO);
-		}
-		return ResponseData.success();
-	}
-	
-	
-	/**
 	 * 车主同意
 	 * @param orderNo
 	 * @param renterOrderNo
 	 * @return ResponseData<?>
 	 */
+	
 	public void agreeModifyOrder(String orderNo, String renterOrderNo) {
 		log.info("modifyOrderConfirmService agreeModifyOrder orderNo=[{}],renterOrderNo=[{}]",orderNo,renterOrderNo);
 		// 获取租客修改申请表中已同意的租客子订单

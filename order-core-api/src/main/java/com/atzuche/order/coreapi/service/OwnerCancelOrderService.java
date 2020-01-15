@@ -1,5 +1,6 @@
 package com.atzuche.order.coreapi.service;
 
+import com.atzuche.order.commons.constant.OrderConstant;
 import com.atzuche.order.commons.entity.dto.CancelFineAmtDTO;
 import com.atzuche.order.commons.entity.dto.CostBaseDTO;
 import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
@@ -7,7 +8,9 @@ import com.atzuche.order.commons.enums.*;
 import com.atzuche.order.coreapi.entity.dto.CancelOrderResDTO;
 import com.atzuche.order.flow.service.OrderFlowService;
 import com.atzuche.order.ownercost.entity.OwnerOrderEntity;
+import com.atzuche.order.ownercost.entity.OwnerOrderFineApplyEntity;
 import com.atzuche.order.ownercost.entity.OwnerOrderFineDeatailEntity;
+import com.atzuche.order.ownercost.service.OwnerOrderFineApplyService;
 import com.atzuche.order.ownercost.service.OwnerOrderFineDeatailService;
 import com.atzuche.order.ownercost.service.OwnerOrderService;
 import com.atzuche.order.parentorder.dto.OrderStatusDTO;
@@ -68,6 +71,8 @@ public class OwnerCancelOrderService {
     OrderFlowService orderFlowService;
     @Autowired
     OrderCancelReasonService orderCancelReasonService;
+    @Autowired
+    OwnerOrderFineApplyService ownerOrderFineApplyService;
 
     /**
      * 取消处理
@@ -102,7 +107,19 @@ public class OwnerCancelOrderService {
                 carRentalTimeApiService.checkCarDispatch(carRentalTimeApiService.buildCarDispatchReqVO(orderEntity,
                 orderStatusEntity, ownerCouponEntity,2));
 
-        //返回信息
+
+        //车主罚金处理
+        CancelFineAmtDTO cancelFineAmt = buildCancelFineAmtDTO(renterOrderEntity,
+                renterOrderCostEntity, goodsDetail.getCarOwnerType());
+        int penalty = renterOrderFineDeatailService.calCancelFine(cancelFineAmt);
+        //罚车主补贴给平台(保险费)
+        if(orderStatusEntity.getStatus() >= OrderStatusEnum.TO_RETURN_CAR.getStatus() && orderStatusEntity.getStatus() != OrderStatusEnum.CLOSED.getStatus()) {
+            OwnerOrderFineDeatailEntity ownerOrderFineDeatailEntityTwo =
+                    ownerOrderFineDeatailService.fineDataConvert(cancelFineAmt.getCostBaseDTO(), Math.abs(renterOrderCostEntity.getBasicEnsureAmount()),
+                            FineSubsidyCodeEnum.PLATFORM, FineSubsidySourceCodeEnum.OWNER, FineTypeEnum.CANCEL_FINE);
+            ownerOrderFineDeatailService.addOwnerOrderFineRecord(ownerOrderFineDeatailEntityTwo);
+        }
+
         CancelOrderResDTO cancelOrderResDTO = new CancelOrderResDTO();
         OrderStatusDTO orderStatusDTO = new OrderStatusDTO();
         orderStatusDTO.setOrderNo(orderNo);
@@ -113,8 +130,12 @@ public class OwnerCancelOrderService {
             cancelOrderResDTO.setIsRefund(false);
             //订单状态更新
             orderStatusDTO.setStatus(OrderStatusEnum.TO_DISPATCH.getStatus());
-            orderStatusDTO.setIsDispatch(1);
-            orderStatusDTO.setDispatchStatus(1);
+            orderStatusDTO.setIsDispatch(OrderConstant.YES);
+            orderStatusDTO.setDispatchStatus(DispatcherStatusEnum.DISPATCH_ING.getCode());
+
+            //调度后处理
+            ownerOrderFineApplyService.addFineApplyRecord(buildOwnerOrderFineApplyEntity(orderNo,
+                    ownerOrderEntity.getOwnerOrderNo(),Integer.valueOf(ownerOrderEntity.getMemNo()),penalty));
         } else {
             //取消不进调度
             cancelOrderResDTO.setIsReturnDisCoupon(true);
@@ -124,47 +145,34 @@ public class OwnerCancelOrderService {
             cancelOrderResDTO.setRenterOrderNo(renterOrderEntity.getRenterOrderNo());
             cancelOrderResDTO.setSrvGetFlag(null != renterOrderEntity.getIsGetCar() && renterOrderEntity.getIsGetCar() == 1);
             cancelOrderResDTO.setSrvReturnFlag(null != renterOrderEntity.getIsReturnCar() && renterOrderEntity.getIsReturnCar() == 1);
+
+            //罚车主补贴给租客
+            OwnerOrderFineDeatailEntity ownerOrderFineDeatailEntityOne =
+                    ownerOrderFineDeatailService.fineDataConvert(cancelFineAmt.getCostBaseDTO(), penalty,
+                            FineSubsidyCodeEnum.RENTER, FineSubsidySourceCodeEnum.OWNER, FineTypeEnum.CANCEL_FINE);
+            ownerOrderFineDeatailService.addOwnerOrderFineRecord(ownerOrderFineDeatailEntityOne);
+
+            //租客收益处理
+            ConsoleRenterOrderFineDeatailEntity consoleRenterOrderFineDeatailEntity =
+                    consoleRenterOrderFineDeatailService.fineDataConvert(cancelFineAmt.getCostBaseDTO(), penalty,
+                            FineSubsidyCodeEnum.RENTER, FineSubsidySourceCodeEnum.OWNER, FineTypeEnum.CANCEL_FINE);
+            consoleRenterOrderFineDeatailService.saveConsoleRenterOrderFineDeatail(consoleRenterOrderFineDeatailEntity);
+
+            //订单状态更新
+            orderStatusDTO.setStatus(OrderStatusEnum.CLOSED.getStatus());
+            orderStatusDTO.setIsDispatch(OrderConstant.NO);
+            orderStatusDTO.setDispatchStatus(DispatcherStatusEnum.NOT_DISPATCH.getCode());
+            renterOrderService.updateChildStatusByOrderNo(orderNo, RenterChildStatusEnum.END.getCode());
         }
-
-        //罚金计算(罚金和收益)
-        //车主罚金处理
-        CancelFineAmtDTO cancelFineAmt = buildCancelFineAmtDTO(renterOrderEntity,
-                renterOrderCostEntity, goodsDetail.getCarOwnerType());
-        int penalty = renterOrderFineDeatailService.calCancelFine(cancelFineAmt);
-
-        //罚车主补贴给租客
-        OwnerOrderFineDeatailEntity ownerOrderFineDeatailEntityOne =
-                ownerOrderFineDeatailService.fineDataConvert(cancelFineAmt.getCostBaseDTO(), penalty,
-                        FineSubsidyCodeEnum.RENTER, FineSubsidySourceCodeEnum.OWNER, FineTypeEnum.CANCEL_FINE);
-        ownerOrderFineDeatailService.addOwnerOrderFineRecord(ownerOrderFineDeatailEntityOne);
-        //罚车主补贴给平台(保险费)
-        if(orderStatusEntity.getStatus() >= OrderStatusEnum.TO_RETURN_CAR.getStatus() && orderStatusEntity.getStatus() != OrderStatusEnum.CLOSED.getStatus()) {
-            OwnerOrderFineDeatailEntity ownerOrderFineDeatailEntityTwo =
-                    ownerOrderFineDeatailService.fineDataConvert(cancelFineAmt.getCostBaseDTO(), Math.abs(renterOrderCostEntity.getBasicEnsureAmount()),
-                            FineSubsidyCodeEnum.PLATFORM, FineSubsidySourceCodeEnum.OWNER, FineTypeEnum.CANCEL_FINE);
-            ownerOrderFineDeatailService.addOwnerOrderFineRecord(ownerOrderFineDeatailEntityTwo);
-        }
-        //租客收益处理
-        ConsoleRenterOrderFineDeatailEntity consoleRenterOrderFineDeatailEntity =
-                consoleRenterOrderFineDeatailService.fineDataConvert(cancelFineAmt.getCostBaseDTO(), penalty,
-                        FineSubsidyCodeEnum.RENTER, FineSubsidySourceCodeEnum.OWNER, FineTypeEnum.CANCEL_FINE);
-        //订单状态更新
-        orderStatusDTO.setStatus(OrderStatusEnum.CLOSED.getStatus());
-
-        renterOrderService.updateRenterOrderChildStatus(renterOrderEntity.getId(),
-                RenterChildStatusEnum.END.getCode());
-        consoleRenterOrderFineDeatailService.saveConsoleRenterOrderFineDeatail(consoleRenterOrderFineDeatailEntity);
         //落库
         orderStatusService.saveOrderStatusInfo(orderStatusDTO);
-        if(null != ownerOrderEntity) {
-            ownerOrderService.updateOwnerOrderChildStatus(ownerOrderEntity.getId(), OwnerChildStatusEnum.END.getCode());
-        }
         orderFlowService.inserOrderStatusChangeProcessInfo(orderNo, OrderStatusEnum.from(orderStatusDTO.getStatus()));
-
-        //取消信息处理(order_cancel_reason)
-        orderCancelReasonService.addOrderCancelReasonRecord(buildOrderCancelReasonEntity(orderNo,ownerOrderEntity.getOwnerOrderNo(),
-                cancelReason));
-
+        if(null != ownerOrderEntity) {
+            ownerOrderService.updateChildStatusByOrderNo(orderNo, OwnerChildStatusEnum.END.getCode());
+            //取消信息处理(order_cancel_reason)
+            orderCancelReasonService.addOrderCancelReasonRecord(buildOrderCancelReasonEntity(orderNo,ownerOrderEntity.getOwnerOrderNo(),
+                    cancelReason));
+        }
         //返回信息处理
         cancelOrderResDTO.setCarNo(goodsDetail.getCarNo());
         cancelOrderResDTO.setRentCarPayStatus(orderStatusEntity.getRentCarPayStatus());
@@ -216,5 +224,34 @@ public class OwnerCancelOrderService {
         orderCancelReasonEntity.setSubOrderNo(ownerOrderNo);
         orderCancelReasonEntity.setDutySource(CancelOrderDutyEnum.CANCEL_ORDER_DUTY_OWNER.getCode());
         return orderCancelReasonEntity;
+    }
+
+
+    /**
+     * 车主取消罚金调度后续处理信息
+     *
+     * @param orderNo      订单号
+     * @param ownerOrderNo 车主订单号
+     * @param memNo        租客会员号
+     * @param fineAmt      罚金
+     * @return OwnerOrderFineApplyEntity
+     */
+    private OwnerOrderFineApplyEntity buildOwnerOrderFineApplyEntity(String orderNo, String ownerOrderNo,
+                                                                     Integer memNo, Integer fineAmt) {
+        if(null == fineAmt || fineAmt == 0) {
+            return null;
+        }
+        OwnerOrderFineApplyEntity applyEntity = new OwnerOrderFineApplyEntity();
+        applyEntity.setOrderNo(orderNo);
+        applyEntity.setOwnerOrderNo(ownerOrderNo);
+        applyEntity.setMemNo(memNo);
+        applyEntity.setFineAmount(fineAmt);
+
+        applyEntity.setFineSubsidySourceCode(FineSubsidySourceCodeEnum.OWNER.getFineSubsidySourceCode());
+        applyEntity.setFineSubsidySourceDesc(FineSubsidySourceCodeEnum.OWNER.getFineSubsidySourceDesc());
+        applyEntity.setFineType(FineTypeEnum.CANCEL_FINE.getFineType());
+        applyEntity.setFineTypeDesc(FineTypeEnum.CANCEL_FINE.getFineTypeDesc());
+
+        return applyEntity;
     }
 }

@@ -31,9 +31,15 @@ public interface OwnerOrderMapper{
 
     Integer updateOwnerOrderChildStatus(@Param("id") Integer id, @Param("childStatus") Integer childStatus);
 
+    Integer updateChildStatusByOrderNo(@Param("orderNo") String orderNo, @Param("childStatus") Integer childStatus);
+
     OwnerOrderEntity getChangeOwnerByOrderNo(@Param("orderNo") String orderNo);
 
     List<OwnerOrderEntity> queryHostiryOwnerOrderByOrderNo(@Param("orderNo")String orderNo);
 
+
+	OwnerOrderEntity getOwnerOrderByOwnerOrderNo(@Param("ownerOrderNo")String ownerOrderNo);
+
     OwnerOrderEntity queryCancelOwnerOrderByOrderNoIsEffective(@Param("orderNo")String orderNo);
+
 }

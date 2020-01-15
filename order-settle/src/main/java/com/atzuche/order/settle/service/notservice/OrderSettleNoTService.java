@@ -46,6 +46,7 @@ import com.atzuche.order.settle.exception.OrderSettleFlatAccountException;
 import com.atzuche.order.settle.vo.req.*;
 import com.atzuche.order.wallet.WalletProxyService;
 import com.autoyol.autopay.gateway.constant.DataPayKindConstant;
+import com.autoyol.commons.utils.StringUtils;
 import com.autoyol.doc.util.StringUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -94,6 +95,57 @@ public class OrderSettleNoTService {
     public List<AccountRenterCostDetailEntity> getAccountRenterCostDetailsByOrderNo(String orderNo){
         return cashierSettleService.getAccountRenterCostDetailsByOrderNo(orderNo);
     }
+    
+    
+    public SettleOrders preInitSettleOrders(String orderNo,String renterOrderNo,String ownerOrderNo) {
+        SettleOrders settleOrders = new SettleOrders();
+        settleOrders.setOrderNo(orderNo);
+        
+        //1 校验参数
+        if(StringUtil.isBlank(orderNo)){
+            throw new OrderSettleFlatAccountException();
+        }
+        //查询租客子单
+        if(org.apache.commons.lang.StringUtils.isNotBlank(renterOrderNo)) {
+	        RenterOrderEntity renterOrder = renterOrderService.getRenterOrderByRenterOrderNo(renterOrderNo);
+	        if(Objects.isNull(renterOrder) || Objects.isNull(renterOrder.getRenterOrderNo())){
+	            throw new OrderSettleFlatAccountException();
+	        }
+	        String renterMemNo = renterOrder.getRenterMemNo();
+	        settleOrders.setRenterMemNo(renterMemNo);
+	        settleOrders.setRenterOrderNo(renterOrderNo);
+	        settleOrders.setRenterOrder(renterOrder);
+        }
+        
+        
+        if(org.apache.commons.lang.StringUtils.isNotBlank(ownerOrderNo)) {
+	        OwnerOrderEntity ownerOrder = ownerOrderService.getOwnerOrderByOwnerOrderNo(ownerOrderNo);
+	        if(Objects.isNull(ownerOrder) || Objects.isNull(ownerOrder.getOwnerOrderNo())){
+	            throw new OrderSettleFlatAccountException();
+	        }
+	        
+	        String ownerMemNo = ownerOrder.getMemNo();
+	        settleOrders.setOwnerOrderNo(ownerOrderNo);
+	        settleOrders.setOwnerMemNo(ownerMemNo);
+	        settleOrders.setOwnerOrder(ownerOrder);
+	        
+        }
+
+        // 2 校验订单状态 以及是否存在 理赔暂扣 存在不能进行结算 并CAT告警
+//        this.check(renterOrder);
+        // 3 初始化数据
+
+        // 3.1获取租客子订单 和 租客会员号
+//        String renterOrderNo = renterOrder.getRenterOrderNo();
+//        String renterMemNo = renterOrder.getRenterMemNo();
+        //3.2获取车主子订单 和 车主会员号
+//        String ownerOrderNo = ownerOrder.getOwnerOrderNo();
+        
+        return settleOrders;
+    }
+    
+    
+    
     /**
      * 初始化结算对象
      * @param orderNo
