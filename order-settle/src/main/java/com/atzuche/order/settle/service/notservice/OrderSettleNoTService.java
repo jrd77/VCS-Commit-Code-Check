@@ -1331,7 +1331,7 @@ public class OrderSettleNoTService {
             AccountInsertDebtReqVO accountInsertDebt = new AccountInsertDebtReqVO();
             BeanUtils.copyProperties(settleOrders,accountInsertDebt);
             accountInsertDebt.setType(DebtTypeEnum.CANCEL.getCode());
-
+            accountInsertDebt.setMemNo(settleOrders.getOwnerMemNo());
             accountInsertDebt.setSourceCode(RenterCashCodeEnum.HISTORY_AMT.getCashNo());
             accountInsertDebt.setSourceDetail(RenterCashCodeEnum.HISTORY_AMT.getTxt());
             accountInsertDebt.setAmt(settleCancelOrdersAccount.getOwnerFineAmt());
@@ -1356,6 +1356,7 @@ public class OrderSettleNoTService {
         if(renWalletAmt>0 && rentFineAmt<0){
             AccountRenterCostToFineReqVO vo = new AccountRenterCostToFineReqVO();
             BeanUtils.copyProperties(settleOrders,vo);
+            vo.setMemNo(settleOrders.getRenterMemNo());
             int debtAmt = renWalletAmt + rentFineAmt;
             //计算抵扣金额
             int amt = debtAmt>=0?rentFineAmt:-renWalletAmt;
@@ -1369,6 +1370,7 @@ public class OrderSettleNoTService {
         if(rentCostAmt>0 && rentFineAmt<0){
             AccountRenterCostToFineReqVO vo = new AccountRenterCostToFineReqVO();
             BeanUtils.copyProperties(settleOrders,vo);
+            vo.setMemNo(settleOrders.getRenterMemNo());
             int debtAmt = rentCostAmt + rentFineAmt;
             //计算抵扣金额
             int amt = debtAmt>=0?rentFineAmt:-rentCostAmt;
@@ -1382,6 +1384,7 @@ public class OrderSettleNoTService {
         if(rentDepositAmt>0 && rentFineAmt<0){
             OrderCancelRenterDepositReqVO vo = new OrderCancelRenterDepositReqVO();
             BeanUtils.copyProperties(settleOrders,vo);
+            vo.setMemNo(settleOrders.getRenterMemNo());
             int debtAmt = rentDepositAmt + rentFineAmt;
             //计算抵扣金额
             int amt = debtAmt>=0?rentFineAmt:-rentDepositAmt;
@@ -1395,6 +1398,7 @@ public class OrderSettleNoTService {
         if(rentWzDepositAmt>0 && rentFineAmt<0){
             RenterCancelWZDepositCostReqVO vo = new RenterCancelWZDepositCostReqVO();
             BeanUtils.copyProperties(settleOrders,vo);
+            vo.setMemNo(settleOrders.getRenterMemNo());
             int debtAmt = rentDepositAmt + rentFineAmt;
             //计算抵扣金额
             int amt = debtAmt>=0?rentFineAmt:-rentDepositAmt;
@@ -1542,16 +1546,5 @@ public class OrderSettleNoTService {
             cashierDeductDebtReq.setMemNo(settleOrders.getRenterMemNo());
             CashierDeductDebtResVO result = cashierService.deductDebtByRentCost(cashierDeductDebtReq);
         }
-    }
-
-    /**
-     * 取消订单结算
-     * @param orderStatusDTO
-     */
-    public void saveCancelOrderStatusInfo(OrderStatusDTO orderStatusDTO) {
-        //1更新 订单流转状态
-        orderStatusService.saveOrderStatusInfo(orderStatusDTO);
-        //2记录订单流传信息
-        orderFlowService.inserOrderStatusChangeProcessInfo(orderStatusDTO.getOrderNo(), OrderStatusEnum.CLOSED);
     }
 }

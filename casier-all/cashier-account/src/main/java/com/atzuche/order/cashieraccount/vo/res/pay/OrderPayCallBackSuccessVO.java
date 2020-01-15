@@ -1,5 +1,6 @@
 package com.atzuche.order.cashieraccount.vo.res.pay;
 
+import com.autoyol.doc.annotation.AutoDocProperty;
 import lombok.Data;
 
 /**
@@ -30,6 +31,11 @@ public class OrderPayCallBackSuccessVO {
      * 违章押金支付状态
      */
     private Integer wzPayStatus;
+
+    /**
+     * 租车费用是否 补付 1 是 0 否
+     */
+    private Integer isPayAgain;
 
 
 }

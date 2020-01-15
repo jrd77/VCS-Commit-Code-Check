@@ -21,7 +21,7 @@ public interface OrderCarTrusteeshipMapper{
     
     int updateByPrimaryKeySelective(OrderCarTrusteeshipEntity record);
 
-    OrderCarTrusteeshipEntity selectObjectByOrderNoAndType(@Param("orderNo")String orderNo,@Param("carNo")String carNo);
+    OrderCarTrusteeshipEntity selectObjectByOrderNoAndType(@Param("orderNo") String orderNo,@Param("carNo") String carNo);
 
 
 

@@ -1,6 +1,7 @@
 package com.atzuche.order.settle.service;
 
 import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostSettleEntity;
+import com.atzuche.order.cashieraccount.service.CashierService;
 import com.atzuche.order.cashieraccount.service.CashierSettleService;
 import com.atzuche.order.commons.CatConstants;
 import com.atzuche.order.parentorder.dto.OrderStatusDTO;
@@ -28,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class OrderSettleService{
     @Autowired private CashierSettleService cashierSettleService;
     @Autowired private OrderSettleNoTService orderSettleNoTService;
+    @Autowired private CashierService cashierService;
 
 
     /**
@@ -152,7 +154,7 @@ public class OrderSettleService{
             //8 租客金额 退还 包含 凹凸币，钱包 租车费用 押金 违章押金 退还 （优惠卷退还 TODO）
             orderSettleNoTService.refundCancelCost(settleOrders,settleCancelOrdersAccount,orderStatusDTO);
             //9 修改订单状态表
-            orderSettleNoTService.saveCancelOrderStatusInfo(orderStatusDTO);
+            cashierService.saveCancelOrderStatusInfo(orderStatusDTO);
 
             log.info("OrderSettleService initSettleOrders settleOrders [{}]", GsonUtils.toJson(settleOrders));
             Cat.logEvent("settleOrders",GsonUtils.toJson(settleOrders));
