@@ -512,9 +512,6 @@ public class CashierService {
     public void saveCancelOrderStatusInfo(OrderStatusDTO orderStatusDTO){
         //1更新 订单流转状态
         orderStatusService.saveOrderStatusInfo(orderStatusDTO);
-        //2记录订单流传信息
-        orderFlowService.inserOrderStatusChangeProcessInfo(orderStatusDTO.getOrderNo(), OrderStatusEnum.CLOSED);
-
     }
     /**
      * 支付成功回调 更新收银台及费用
