@@ -68,7 +68,7 @@ public class OwnerOrderFineApplyHandelService {
             entity.setFineSubsidyCode(FineSubsidyCodeEnum.RENTER.getFineSubsidyCode());
             entity.setFineSubsidyDesc(FineSubsidyCodeEnum.RENTER.getFineSubsidyDesc());
             //租客收益信息处理
-            consoleRenterOrderFineDeatailService.saveConsoleRenterOrderFineDeatail();
+            consoleRenterOrderFineDeatailService.saveConsoleRenterOrderFineDeatail(null);
         } else {
             logger.warn("Dispatcher status is invalid. orderNo:[{}],dispatcherStatus:[{}]", orderNo, dispatcherStatus);
             return false;
