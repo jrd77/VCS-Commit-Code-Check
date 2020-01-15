@@ -212,6 +212,7 @@ public class ModifyOrderForRenterService {
 		renterApply.setReturnCarBeforeAddrLon(before.getReturnLon());
 		renterApply.setReturnCarBeforeAfterLat(after.getReturnLat());
 		renterApply.setReturnCarBeforeAfterLon(after.getReturnLon());
+		renterApply.setApplySource(1);
 		renterOrderChangeApplyService.saveRenterOrderChangeApply(renterApply);
 	}
 	

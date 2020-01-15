@@ -238,7 +238,7 @@ public class RenterOrderCostCombineService {
 			Cat.logError("获取全面保障费abatementAmtDTO对象为空", new RenterCostParameterException());
 			throw new RenterCostParameterException();
 		}
-		if(!abatementAmtDTO.getIsAbatement()){
+		if(abatementAmtDTO.getIsAbatement() == null || !abatementAmtDTO.getIsAbatement()){
 		    log.info("不需要计算全面保障费！abatementAmtDTO=[{}]",JSON.toJSONString(abatementAmtDTO));
             return new ArrayList<>();
         }
