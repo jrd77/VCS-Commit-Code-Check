@@ -34,7 +34,11 @@ public class OrderCouponService {
     public List<OrderCouponEntity> listOrderCouponByRenterOrderNo(String renterOrderNo) {
         return orderCouponMapper.listOrderCouponByRenterOrderNo(renterOrderNo);
     }
-
+    
+    public List<OrderCouponEntity> listOrderCouponByOrderNo(String orderNo) {
+        return orderCouponMapper.listOrderCouponByOrderNo(orderNo);
+    }
+    
     /**
      * 批量插入订单优惠券信息
      *

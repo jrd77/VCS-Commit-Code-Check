@@ -27,7 +27,8 @@ public interface OrderCouponMapper {
     int updateByPrimaryKeySelective(OrderCouponEntity record);
 
     List<OrderCouponEntity> listOrderCouponByRenterOrderNo(@Param("renterOrderNo") String renterOrderNo);
-
+    
+    List<OrderCouponEntity> listOrderCouponByOrderNo(@Param("orderNo") String orderNo);
 
     /**
      * 查询指定订单的优惠券信息

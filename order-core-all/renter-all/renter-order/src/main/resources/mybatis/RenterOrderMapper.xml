@@ -282,8 +282,7 @@
 	
 	
 	<select id="getRenterOrderByRenterOrderNo" resultMap="BaseResultMap">
-		select <include refid="Base_Column_List" /> from renter_order where renter_order_no = #{renterOrderNo}
-		and is_cancle = 0
+		select <include refid="Base_Column_List" /> from renter_order where renter_order_no = #{renterOrderNo} 
 		and is_delete = 0
 		order by id desc
 		limit 1
