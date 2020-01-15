@@ -1,7 +1,9 @@
 package com.atzuche.order.open.service;
 
 import com.atzuche.order.commons.vo.req.DeliveryCarPriceReqVO;
+import com.atzuche.order.commons.vo.res.delivery.DeliveryCarRepVO;
 import com.atzuche.order.commons.vo.res.delivery.DeliveryOilCostRepVO;
+import com.atzuche.order.commons.vo.res.delivery.DistributionCostVO;
 import com.atzuche.order.commons.vo.res.delivery.RenterOrderDeliveryRepVO;
 import com.autoyol.commons.web.ResponseData;
 import org.springframework.cloud.netflix.feign.FeignClient;
@@ -24,4 +26,13 @@ public interface FeignDeliveryCarInfoService {
     ResponseData<DeliveryOilCostRepVO> getOilCostByRenterOrderNo(@RequestBody DeliveryCarPriceReqVO deliveryCarPriceReqVO);
     @PostMapping("/delivery/list")
     ResponseData<List<RenterOrderDeliveryRepVO>> findRenterOrderListByOrderNo(@RequestParam("orderNo") String orderNo);
+
+    /**
+     * 获取取还车费用
+     * @param deliveryCarDTO
+     * @return
+     */
+    @PostMapping("/delivery/getAndReturnCarCost")
+    ResponseData <DistributionCostVO> findDeliveryCostByOrderNo(@RequestBody DeliveryCarRepVO deliveryCarDTO);
+
 }

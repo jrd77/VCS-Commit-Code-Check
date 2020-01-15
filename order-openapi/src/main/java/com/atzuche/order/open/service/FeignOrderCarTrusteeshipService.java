@@ -10,14 +10,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 /**
  * @author 胡春林
- *
  */
-@FeignClient(value = "order-center-api", path = "/api/carTrusteeship")
+@FeignClient(value = "order-center-api", path = "/api/handOver")
 @Repository
 public interface FeignOrderCarTrusteeshipService {
 
     /**
      * 新增
+     *
      * @param trusteeshipVO
      * @return
      */
