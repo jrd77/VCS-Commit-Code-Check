@@ -5,79 +5,44 @@
 
 
 
-    <resultMap id="orderRemarkLogInformationMap" type="com.atzuche.order.admin.entity.AdminOperateLogEntity" >
+    <resultMap id="base" type="com.atzuche.order.admin.entity.AdminOperateLogEntity" >
         <id property="id" column="id"/>
-        <result property="remarkType" column="remark_type"/>
-        <result property="remarkContent" column="remark"/>
-        <result property="remarkHistory" column="remark_history"/>
-        <result property="operateType" column="operate_type"/>
-        <result property="departmentId" column="dept_id"/>
-        <result property="number" column="number"/>
-        <result property="createOp" column="create_op"/>
+        <result property="orderNo" column="order_no"/>
+        <result property="operatorId" column="operator_id"/>
+        <result property="operatorName" column="operator_name"/>
+        <result property="deptId" column="dept_id"/>
+        <result property="opType" column="op_type_code"/>
+        <result property="opTypeDesc" column="op_type_desc"/>
+        <result property="desc" column="desc"/>
         <result property="createTime" column="create_time"/>
     </resultMap>
+	<insert id="insertLog">
+        insert into order_console_operate_log(order_no,operator_id,operator_name,dept_id,op_type_code,op_type_desc,`desc`)
+        values(#{orderNo},#{operatorId},#{operatorName},#{deptId},#{opType},#{opTypeDesc},#{desc})
 
-
-    <insert id="addOrderRemarkLog" parameterType="com.atzuche.order.admin.entity.OrderRemarkLogEntity">
-        insert into order_remark_log
-		(
-			`order_no`,
-			`remark_id`,
-			`number`,
-			`remark_type`,
-			`remark`,
-			`remark_history`,
-			`limit_delayed`,
-			`follow_status`,
-			`follow_fail_reason`,
-			`create_time`,
-			`create_op`,
-			`operate_type`,
-			`update_time`,
-			`update_op`,
-			`dept_id`
-		)
-		values
-		(
-			#{orderNo},
-			#{remarkId},
-			#{number},
-			#{remarkType},
-			#{remarkContent},
-			#{remarkHistory},
-			#{limitDelayed},
-			#{followStatus},
-			#{followFailReason},
-			#{createTime},
-			#{createOp},
-			#{operateType},
-			#{updateTime},
-			#{updateOp},
-			#{departmentId}
-		)
-    </insert>
-
-
-
-    <select id="selectRemarkLogListCount" resultType="long">
-		select count(*) from order_remark_log where order_no = #{orderNo}
+	</insert>
+	<select id="findAll" resultMap="base">
+		select id,order_no,operator_id,operator_name,dept_id,op_type_code,op_type_desc,`desc`,create_time
+		from order_console_operate_log where order_no=#{orderNo} and is_delete=0 order by create_time desc
 	</select>
+    <select id="findByQuery" resultMap="base">
+        select id,order_no,operator_id,operator_name,dept_id,op_type_code,op_type_desc,`desc`,create_time
+		from order_console_operate_log where order_no=#{orderNo} and is_delete=0
+        <if test="startTime != null and  endTime != null">
+            and create_time between #{startTime} and #{endTime}
+        </if>
+        <if test="content != null and  content != ''">
+            and `desc` like concat(#{content},'%')
+        </if>
+        <if test="opType != null and  opType != ''">
+            and op_type_code = #{opType}
+        </if>
+        <if test="operator != null and  operator != ''">
+            and operator_name = #{operator}
+        </if>
 
-    <select id="selectRemarkLogList" resultMap="orderRemarkLogInformationMap">
-		select
-		`number`,
-		remark_type,
-		remark,
-		create_time,
-		create_op,
-		dept_id,
-		operate_type,
-		remark_history
-		from order_remark_log where order_no = #{orderNo}
-		order by id desc LIMIT #{startIndex}, #{pageSize}
-	</select>
 
-
+    </select>
 
 
 </mapper>
