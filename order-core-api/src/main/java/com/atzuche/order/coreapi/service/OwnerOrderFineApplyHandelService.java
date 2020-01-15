@@ -48,7 +48,15 @@ public class OwnerOrderFineApplyHandelService {
 
 
         //todo:处理罚金补贴信息
+        if(DispatcherStatusEnum.DISPATCH_SUCCESS.getCode() == dispatcherStatus.getCode()) {
+            //调度成功,罚金补贴给平台
 
+
+        } else if(DispatcherStatusEnum.DISPATCH_FAIL.getCode() == dispatcherStatus.getCode()) {
+            //调度失败,罚金补贴给租客
+
+
+        }
 
         //todo:删除罚金请求信息
 
