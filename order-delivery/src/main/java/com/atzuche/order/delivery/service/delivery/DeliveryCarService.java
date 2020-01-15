@@ -106,9 +106,6 @@ public class DeliveryCarService {
     }
 
 
-
-
-
     /**
      * 发送配送订单到仁云 提供给外层回调
      * @param renterOrderNo
