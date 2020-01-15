@@ -82,9 +82,16 @@ public class AccountDebtNoTService {
         //1 查询用户欠款总和
         AccountDebtEntity accountDebtEntity =  accountDebtMapper.getAccountDebtByMemNo(accountInsertDebt.getMemNo());
         if(Objects.isNull(accountDebtEntity) || Objects.isNull(accountDebtEntity.getId())){
-            throw new AccountInsertDebtDBException();
+            accountDebtEntity = new AccountDebtEntity();
+            accountDebtEntity.setDebtAmt(accountInsertDebt.getAmt());
+            accountDebtEntity.setMemNo(accountInsertDebt.getMemNo());
+            accountDebtEntity.setVersion(1);
+            int result = accountDebtMapper.insertSelective(accountDebtEntity);
+            if(result==0){
+                throw new AccountInsertDebtDBException();
+            }
         }
-        int amt = accountDebtEntity.getDebtAmt()+Math.abs(accountInsertDebt.getAmt());
+        int amt = accountDebtEntity.getDebtAmt()-Math.abs(accountInsertDebt.getAmt());
         accountDebtEntity.setDebtAmt(amt);
         int result = accountDebtMapper.updateByPrimaryKeySelective(accountDebtEntity);
         if(result==0){

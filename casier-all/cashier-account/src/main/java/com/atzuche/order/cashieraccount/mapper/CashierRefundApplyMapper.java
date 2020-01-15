@@ -4,6 +4,7 @@ import com.atzuche.order.cashieraccount.entity.CashierRefundApplyEntity;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -30,4 +31,6 @@ public interface CashierRefundApplyMapper{
 
 
     CashierRefundApplyEntity selectRefundByType(@Param("orderNo")String orderNo,@Param("payKind")String payKind);
+
+    List<CashierRefundApplyEntity> getCashierRefundApplyByTime(@Param("date")LocalDateTime date);
 }

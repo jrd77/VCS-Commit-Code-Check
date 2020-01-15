@@ -1,6 +1,8 @@
 package com.atzuche.order.admin.controller;
 
+import com.atzuche.order.admin.constant.AdminOpTypeEnum;
 import com.atzuche.order.admin.service.RenterWzService;
+import com.atzuche.order.admin.service.log.AdminLogService;
 import com.atzuche.order.admin.vo.req.renterWz.RenterWzCostReqVO;
 import com.atzuche.order.admin.vo.req.renterWz.TemporaryRefundReqVO;
 import com.atzuche.order.admin.vo.resp.renterWz.WzCostLogsResVO;
@@ -33,6 +35,9 @@ public class RenterWzController extends BaseController {
     @Resource
     private RenterWzService renterWzService;
 
+    @Resource
+    private AdminLogService adminLogService;
+
     @GetMapping("/console/wz/detail")
     @AutoDocMethod(description = "违章押金信息", value = "违章押金信息",response = RenterWzDetailResVO.class)
     public ResponseData<RenterWzDetailResVO> queryWzDetailByOrderNo(@RequestParam("orderNo") String orderNo){
@@ -61,6 +66,8 @@ public class RenterWzController extends BaseController {
         }
         try {
             renterWzService.updateWzCost(costDetail.getOrderNo(),costDetail.getCostDetails());
+            String opDesc = costDetail.toString();
+            adminLogService.insertLog(AdminOpTypeEnum.CHANGE_WZ_FEE,costDetail.getOrderNo(),opDesc);
         } catch (Exception e) {
             log.error("修改违章费用 异常", e);
             Cat.logError("修改违章费用 异常", e);

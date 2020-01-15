@@ -76,4 +76,5 @@ public class OwnerOrderFineDeatailDTO implements Serializable {
 	 * 备注
 	 */
 	private String remark;
+
 }

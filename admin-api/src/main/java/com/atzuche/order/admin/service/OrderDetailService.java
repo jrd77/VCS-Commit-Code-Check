@@ -58,7 +58,7 @@ public class OrderDetailService {
         return responseObject;
     }
 
-    public ResponseData<AdminOwnerOrderDetailDTO> ownerOrderDetail(String ownerOrderNo) {
+    public ResponseData<AdminOwnerOrderDetailDTO> ownerOrderDetail(String ownerOrderNo,String orderNo) {
 
         return null;
     }
