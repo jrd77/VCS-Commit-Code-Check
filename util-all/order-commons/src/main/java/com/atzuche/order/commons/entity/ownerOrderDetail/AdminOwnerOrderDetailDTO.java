@@ -1,4 +1,4 @@
-package com.atzuche.order.admin.dto;
+package com.atzuche.order.commons.entity.ownerOrderDetail;
 
 import com.autoyol.doc.annotation.AutoDocProperty;
 import lombok.Data;
@@ -13,10 +13,20 @@ public class AdminOwnerOrderDetailDTO {
     private Integer income;
     @AutoDocProperty("车主租金")
     private Integer rentAmt;
+    @AutoDocProperty("车主租金明细")
+    private OwnerRentDetailDTO ownerRentDetailDTO;
     @AutoDocProperty("违约罚金")
     private Integer fienAmt;
+    @AutoDocProperty("违约罚金明细")
+    private FienAmtDetailDTO fienAmtDetailDTO;
+
     @AutoDocProperty("车主租客互相调价")
     private Integer ownerRenterPrice;
+    @AutoDocProperty("租客对车主的调价（明细）")
+    private Integer renterToOwnerPrice;
+    @AutoDocProperty("车主对租客的调价（明细）")
+    private Integer ownerToRenterPrice;
+
     @AutoDocProperty("超里程费用")
     private Integer mileageAmt;
     @AutoDocProperty("油费")
@@ -28,6 +38,9 @@ public class AdminOwnerOrderDetailDTO {
     private Integer deductionAmt;
     @AutoDocProperty("服务费")
     private Integer serviceAmt;
+    @AutoDocProperty("服务费明细")
+    private ServiceDetailDTO serviceDetailDTO;
+
     @AutoDocProperty("平台加油服务费")
     private Integer platformOilServiceAmt;
     @AutoDocProperty("车主需要支付给平台的费用")
@@ -50,11 +63,7 @@ public class AdminOwnerOrderDetailDTO {
     private Integer platformSubsidyAmt;
     @AutoDocProperty("平台对车主的补贴")
     private Integer platformToOwnerSubsidyAmt;
-
     @AutoDocProperty("平台给车主的补贴明细")
     private PlatformToOwnerSubsidyDTO platformToOwnerSubsidyDTO;
-
-    @AutoDocProperty("车主租金明细")
-    private OwnerRentDetailDTO ownerRentDetailDTO;
 
 }
