@@ -34,7 +34,7 @@ public class RevertCar4HoursAutoSettleTask extends IJobHandler{
     public ReturnT<String> execute(String s) throws Exception {
         Transaction t = Cat.getProducer().newTransaction(CatConstants.XXL_JOB_CALL, "定时查询 还车4小时后，自动结算 定时任务");
         try {
-            Cat.logEvent(CatConstants.XXL_JOB_METHOD,"renterAutoCancelTask.execute");
+            Cat.logEvent(CatConstants.XXL_JOB_METHOD,"revertCar4HoursTask.execute");
             Cat.logEvent(CatConstants.XXL_JOB_PARAM,null);
             logger.info("开始执行 还车4小时后，自动结算  定时器");
             XxlJobLogger.log("开始执行 还车4小时后，自动结算 定时器");
