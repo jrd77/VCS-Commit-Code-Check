@@ -44,7 +44,7 @@ public class IllegalTransStatTask extends IJobHandler {
     public ReturnT<String> execute(String s) throws Exception {
         Transaction t = Cat.getProducer().newTransaction(CatConstants.XXL_JOB_CALL, "每天定时处理结算前15分钟订单，查询是否有违章记录");
         try {
-            Cat.logEvent(CatConstants.XXL_JOB_METHOD,"IllegalInOrderQueryTask.execute");
+            Cat.logEvent(CatConstants.XXL_JOB_METHOD,"illegalTransStatTask.execute");
             Cat.logEvent(CatConstants.XXL_JOB_PARAM,null);
             logger.info("开始执行 每天定时处理结算前15分钟订单，查询是否有违章记录  定时器");
             XxlJobLogger.log("开始执行 每天定时处理结算前15分钟订单，查询是否有违章记录 定时器");
