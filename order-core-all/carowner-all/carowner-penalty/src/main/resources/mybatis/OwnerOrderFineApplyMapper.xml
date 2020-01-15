@@ -146,4 +146,8 @@
 		    </set>
 		where id = #{id}
 	</update>
+
+    <update id="updateInvalidByPrimaryKey" parameterType="int">
+        update owner_order_fine_apply set `is_delete` = 1 where id = #{id}
+    </update>
 </mapper>

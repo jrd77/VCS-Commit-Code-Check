@@ -110,8 +110,7 @@ public class OwnerRefuseOrderService {
         } else {
             //不进调度
             orderStatusDTO.setStatus(OrderStatusEnum.CLOSED.getStatus());
-            renterOrderService.updateRenterOrderChildStatus(renterOrderEntity.getId(),
-                    RenterChildStatusEnum.END.getCode());
+            renterOrderService.updateChildStatusByOrderNo(reqVO.getOrderNo(), RenterChildStatusEnum.END.getCode());
 
             //撤销优惠券
             //退还优惠券(平台券+送取服务券)
@@ -137,13 +136,15 @@ public class OwnerRefuseOrderService {
         //添加order_flow记录
         orderFlowService.inserOrderStatusChangeProcessInfo(reqVO.getOrderNo(),
                 OrderStatusEnum.from(orderStatusDTO.getStatus()));
-        ownerOrderService.updateOwnerOrderChildStatus(ownerOrderEntity.getId(), OwnerChildStatusEnum.END.getCode());
+        ownerOrderService.updateChildStatusByOrderNo(reqVO.getOrderNo(), OwnerChildStatusEnum.END.getCode());
         //取消信息处理(order_cancel_reason)
         orderCancelReasonService.addOrderCancelReasonRecord(buildOrderCancelReasonEntity(reqVO.getOrderNo(), ownerOrderEntity.getOwnerOrderNo()));
         //扣除库存
         stockService.releaseCarStock(reqVO.getOrderNo(), goodsDetail.getCarNo());
 
         //TODO:发送车主拒绝事件
+
+
     }
 
 
