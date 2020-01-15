@@ -32,7 +32,7 @@ public interface FeignDeliveryCarInfoService {
      * @param deliveryCarDTO
      * @return
      */
-    @PostMapping("/delivery/getAndReturnCarCost")
+    @PostMapping("/getAndReturnCarCost")
     ResponseData <DistributionCostVO> findDeliveryCostByOrderNo(@RequestBody DeliveryCarRepVO deliveryCarDTO);
 
 }
