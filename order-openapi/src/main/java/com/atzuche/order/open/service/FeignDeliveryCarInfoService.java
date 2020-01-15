@@ -22,8 +22,19 @@ import java.util.List;
 @Repository
 public interface FeignDeliveryCarInfoService {
 
+    /**
+     * 获取油费
+     * @param deliveryCarPriceReqVO
+     * @return
+     */
     @PostMapping("/oil/getOilCrash")
     ResponseData<DeliveryOilCostRepVO> getOilCostByRenterOrderNo(@RequestBody DeliveryCarPriceReqVO deliveryCarPriceReqVO);
+
+    /**
+     * 获取配送相关信息
+     * @param orderNo
+     * @return
+     */
     @PostMapping("/delivery/list")
     ResponseData<List<RenterOrderDeliveryRepVO>> findRenterOrderListByOrderNo(@RequestParam("orderNo") String orderNo);
 
