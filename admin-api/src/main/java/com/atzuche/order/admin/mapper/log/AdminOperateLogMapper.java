@@ -23,7 +23,7 @@ public interface AdminOperateLogMapper {
      * @param queryVO
      * @return
      */
-    public List<AdminOperateLogEntity> findAll(QueryVO queryVO);
+    public List<AdminOperateLogEntity> findByQuery(QueryVO queryVO);
 
     /**
      * 插入一条日志
