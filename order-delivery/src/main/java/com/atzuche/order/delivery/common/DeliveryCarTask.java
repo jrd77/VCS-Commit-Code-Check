@@ -86,7 +86,8 @@ public class DeliveryCarTask {
             log.info("没有找到该配送订单信息，renterOrderNo：{}",renterOrderNo);
             return;
         }
-        renterOrderDeliveryService.updateStatusById(orderDeliveryEntity.getId());
+        orderDeliveryEntity.setStatus(3);
+        renterOrderDeliveryService.updateDeliveryByPrimaryKey(orderDeliveryEntity);
         cancelRenYunFlowOrderInfo(cancelOrderDeliveryVO.getCancelFlowOrderDTO());
     }
 

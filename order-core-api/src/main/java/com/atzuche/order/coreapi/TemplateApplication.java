@@ -15,7 +15,7 @@ import org.springframework.cloud.netflix.hystrix.EnableHystrix;
  * @date 2019-08-01 14:03
  **/
 @EnableHystrix
-@EnableFeignClients({"com.autoyol","com.atzuche.config"})
+@EnableFeignClients({"com.autoyol","com.atzuche"})
 @EnableEurekaClient
 @SpringBootApplication(scanBasePackages = {"com.atzuche.order","com.autoyol","com.atzuche.config"})
 @MapperScan({"com.atzuche.order"})

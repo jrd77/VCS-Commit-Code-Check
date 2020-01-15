@@ -82,4 +82,8 @@ public class OrderStatusService {
     public int updateRenterOrderByOrderNo(OrderStatusEntity orderStatusEntity) {
         return orderStatusMapper.updateRenterOrderByOrderNo(orderStatusEntity);
     }
+
+    public Integer getStatusByOrderNo(String orderNo) {
+        return orderStatusMapper.getStatusByOrderNo(orderNo);
+    }
 }

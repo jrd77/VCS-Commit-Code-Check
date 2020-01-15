@@ -37,7 +37,7 @@ public class WzResultFeedbackListener{
         try {
             Cat.logEvent(CatConstants.RABBIT_MQ_METHOD,"WzResultFeedbackListener.process");
             Cat.logEvent(CatConstants.RABBIT_MQ_PARAM,wzResultFeedbackJson);
-            transIllegalMqService.renYunFeedbackIllegalHandle(wzResultFeedbackJson);
+            transIllegalMqService.autoReceiveQueueResultFeedbackQueueHandle(wzResultFeedbackJson);
             t.setStatus(Transaction.SUCCESS);
         } catch (Exception e) {
             logger.error("对方MQ处理结果反馈MQ 异常,wzResultFeedbackJson:[{}] , e :[{}]", wzResultFeedbackJson,e);

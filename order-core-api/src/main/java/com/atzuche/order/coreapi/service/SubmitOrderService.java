@@ -150,7 +150,8 @@ public class SubmitOrderService {
         stockService.checkCarStock(orderInfoDTO);
 
         //2.2风控
-        Integer riskAuditId = submitOrderRiskAuditService.check(buildSubmitOrderRiskCheckReqVO(orderReqVO, reqTime));
+        String riskAuditId = submitOrderRiskAuditService.check(buildSubmitOrderRiskCheckReqVO(orderReqVO, reqTime,
+                renterGoodsDetailDTO.getWeekendPrice()));
         //2.3校验链
         //TODO:下单校验
 
@@ -234,7 +235,7 @@ public class SubmitOrderService {
         String renterNo = orderReqVO.getMemNo();
         //车主会员号
         String ownerNo = ownerGoodsDetailDTO.getMemNo();
-        renterOrderWzStatusService.createInfo(orderNo,ownerGoodsDetailDTO.getCarPlateNum(),operator,renterNo, ownerNo);
+        renterOrderWzStatusService.createInfo(orderNo,ownerGoodsDetailDTO.getCarPlateNum(),operator,renterNo, ownerNo,String.valueOf(ownerGoodsDetailDTO.getCarNo()));
         //6.主订单相关信息处理
         ParentOrderDTO parentOrderDTO = new ParentOrderDTO();
         //6.1主订单信息处理
@@ -335,7 +336,7 @@ public class SubmitOrderService {
      * @param reqTime     下单时间
      * @return OrderDTO 主订单基本信息
      */
-    private OrderDTO buildOrderDTO(String orderNo, Integer riskAuditId, OrderReqVO orderReqVO, LocalDateTime reqTime) {
+    private OrderDTO buildOrderDTO(String orderNo, String riskAuditId, OrderReqVO orderReqVO, LocalDateTime reqTime) {
         OrderDTO orderDTO = new OrderDTO();
         orderDTO.setMemNoRenter(orderReqVO.getMemNo());
         orderDTO.setCategory(Integer.valueOf(orderReqVO.getOrderCategory()));
@@ -550,12 +551,14 @@ public class SubmitOrderService {
         return autoCoinDeductReqVO;
     }
 
-    private SubmitOrderRiskCheckReqVO buildSubmitOrderRiskCheckReqVO(OrderReqVO orderReqVO, LocalDateTime reqTime) {
+    private SubmitOrderRiskCheckReqVO buildSubmitOrderRiskCheckReqVO(OrderReqVO orderReqVO, LocalDateTime reqTime,
+                                                                     Integer weekendPrice) {
 
         SubmitOrderRiskCheckReqVO submitOrderRiskCheckReqVO = new SubmitOrderRiskCheckReqVO();
         BeanCopier beanCopier = BeanCopier.create(OrderReqVO.class, SubmitOrderRiskCheckReqVO.class, false);
         beanCopier.copy(orderReqVO, submitOrderRiskCheckReqVO, null);
         submitOrderRiskCheckReqVO.setReqTime(LocalDateTimeUtils.localDateTimeToDate(reqTime));
+        submitOrderRiskCheckReqVO.setWeekendPrice(weekendPrice);
         return submitOrderRiskCheckReqVO;
     }
 }

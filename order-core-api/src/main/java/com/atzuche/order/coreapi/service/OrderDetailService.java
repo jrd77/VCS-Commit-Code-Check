@@ -13,6 +13,8 @@ import com.atzuche.order.accountrenterdetain.service.notservice.AccountRenterDet
 import com.atzuche.order.accountrenterdetain.service.notservice.AccountRenterDetainDetailNoTService;
 import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostDetailEntity;
 import com.atzuche.order.accountrenterrentcost.service.notservice.AccountRenterCostDetailNoTService;
+import com.atzuche.order.commons.GlobalConstant;
+import com.atzuche.order.commons.LocalDateTimeUtils;
 import com.atzuche.order.commons.OrderException;
 import com.atzuche.order.commons.entity.dto.OwnerMemberDTO;
 import com.atzuche.order.commons.entity.dto.OwnerMemberRightDTO;
@@ -20,6 +22,7 @@ import com.atzuche.order.commons.entity.dto.RenterMemberDTO;
 import com.atzuche.order.commons.entity.dto.*;
 import com.atzuche.order.commons.entity.orderDetailDto.*;
 import com.atzuche.order.commons.enums.DeliveryOrderTypeEnum;
+import com.atzuche.order.commons.enums.EffectiveEnum;
 import com.atzuche.order.coreapi.submitOrder.exception.OrderDetailException;
 import com.atzuche.order.delivery.entity.OwnerHandoverCarInfoEntity;
 import com.atzuche.order.delivery.entity.RenterHandoverCarInfoEntity;
@@ -236,37 +239,60 @@ public class OrderDetailService {
         BeanUtils.copyProperties(orderEntity,orderDTO);
 
         //租客历史订单
-        List<RenterOrderDTO> renterOrderDTOHistoryList = new ArrayList<>();
+        List<RenterDetailDTO> renterDetailDTOS = new ArrayList<>();
         if(orderHistoryReqDTO.getIsNeedOwnerOrderHistory()){
             List<RenterOrderEntity> renterOrderEntities = renterOrderService.queryHostiryRenterOrderByOrderNo(orderNo);
             renterOrderEntities.stream().forEach(x->{
+                RenterDetailDTO renterDetailDTO = new RenterDetailDTO();
                 RenterOrderDTO renterOrderDTO = new RenterOrderDTO();
                 BeanUtils.copyProperties(x,renterOrderDTO);
-                renterOrderDTOHistoryList.add(renterOrderDTO);
-
-
+                renterOrderDTO.setIsEffectiveTxt(EffectiveEnum.getName(x.getIsEffective()));
+                renterOrderDTO.setExpRevertTimeStr(x.getExpRevertTime()!=null? LocalDateTimeUtils.localdateToString(x.getExpRevertTime(), GlobalConstant.FORMAT_DATE_STR1):null);
+                renterOrderDTO.setExpRentTimeStr(x.getExpRentTime()!=null?LocalDateTimeUtils.localdateToString(x.getExpRentTime(), GlobalConstant.FORMAT_DATE_STR1):null);
+                RenterGoodsDetailDTO renterGoodsDetail = renterGoodsService.getRenterGoodsDetail(x.getRenterOrderNo(), false);
+                RenterMemberDTO renterMemberDTO = renterMemberService.selectrenterMemberByRenterOrderNo(x.getRenterOrderNo(), false);
+                renterDetailDTO.setRenterOrderDTO(renterOrderDTO);
+                renterDetailDTO.setRenterMemberDTO(renterMemberDTO);
+                renterDetailDTO.setRenterGoodsDetail(renterGoodsDetail);
+                renterDetailDTOS.add(renterDetailDTO);
             });
         }
         //车主历史订单
-        List<OwnerOrderDTO> ownerOrderDTOHistoryLIst = new ArrayList<>();
+        List<OwnerDetailDTO> ownerDetailDTOS = new ArrayList<>();
         if(orderHistoryReqDTO.getIsNeedOwnerOrderHistory()){
             List<OwnerOrderEntity> ownerOrderEntities = ownerOrderService.queryHostiryOwnerOrderByOrderNo(orderNo);
             ownerOrderEntities.stream().forEach(x->{
+                OwnerDetailDTO ownerDetailDTO = new OwnerDetailDTO();
                 OwnerOrderDTO ownerOrderDTO = new OwnerOrderDTO();
                 BeanUtils.copyProperties(x,ownerOrderDTO);
-                ownerOrderDTOHistoryLIst.add(ownerOrderDTO);
-                //获取商品
-                //
+                ownerOrderDTO.setIsEffectiveTxt(EffectiveEnum.getName(x.getIsEffective()));
+                ownerOrderDTO.setExpRevertTimeStr(x.getExpRevertTime()!=null? LocalDateTimeUtils.localdateToString(x.getExpRevertTime(), GlobalConstant.FORMAT_DATE_STR1):null);
+                ownerOrderDTO.setExpRentTimeStr(x.getExpRentTime()!=null?LocalDateTimeUtils.localdateToString(x.getExpRentTime(), GlobalConstant.FORMAT_DATE_STR1):null);
+                OwnerMemberDTO ownerMemberDTO = ownerMemberService.selectownerMemberByOwnerOrderNo(x.getOwnerOrderNo(), false);
+                OwnerGoodsDetailDTO ownerGoodsDetail = ownerGoodsService.getOwnerGoodsDetail(x.getOwnerOrderNo(), false);
+                ownerDetailDTO.setOwnerOrderDTO(ownerOrderDTO);
+                ownerDetailDTO.setOwnerMemberDTO(ownerMemberDTO);
+                ownerDetailDTO.setOwnerGoodsDetailDTO(ownerGoodsDetail);
+                ownerDetailDTOS.add(ownerDetailDTO);
             });
         }
         OrderHistoryRespDTO orderHistoryRespDTO = new OrderHistoryRespDTO();
         orderHistoryRespDTO.orderDTO = orderDTO;
-
+        orderHistoryRespDTO.ownerDetailDTOS = ownerDetailDTOS;
+        orderHistoryRespDTO.renterDetailDTOS = renterDetailDTOS;
 
         return orderHistoryRespDTO;
     }
     private OrderAccountDetailRespDTO orderAccountDetailProxy(OrderDetailReqDTO orderDetailReqDTO) {
         String orderNo = orderDetailReqDTO.getOrderNo();
+        //主订单
+        OrderEntity orderEntity = orderService.getOrderEntity(orderNo);
+        if(orderEntity == null){
+            log.error("获取订单数据为空orderNo={}",orderNo);
+            throw new OrderDetailException();
+        }
+        OrderDTO orderDTO = new OrderDTO();
+        BeanUtils.copyProperties(orderEntity,orderDTO);
 
         //订单状态
         OrderStatusEntity orderStatusEntity = orderStatusService.getByOrderNo(orderNo);
@@ -325,6 +351,7 @@ public class OrderDetailService {
         });
 
         OrderAccountDetailRespDTO orderAccountDetailRespDTO = new OrderAccountDetailRespDTO();
+        orderAccountDetailRespDTO.orderDTO = orderDTO;
         orderAccountDetailRespDTO.orderStatusDTO = orderStatusDTO;
         orderAccountDetailRespDTO.renterDepositDetailDTO = renterDepositDetailDTO;
         orderAccountDetailRespDTO.accountRenterDepositDetailDTOList = accountRenterDepositDetailDTOList;

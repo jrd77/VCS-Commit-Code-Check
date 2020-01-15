@@ -47,6 +47,9 @@ public class TransIllegalSendAliYunMq {
     @Resource
     private RenterOrderWzSettleFlagService renterOrderWzSettleFlagService;
 
+    @Resource
+    private MqSendFeelbackLogService mqSendFeelbackLogService;
+
     @Value("${com.autoyol.mns.queue.renyun-receive-queue-result-feedback-queue}")
     private String renyunReceiveQueueResultFeedbackQueue;
     @Value("${com.autoyol.mns.queue.auto-order-info-for-traffic-violation-queue}")
@@ -100,9 +103,6 @@ public class TransIllegalSendAliYunMq {
         }
     }
 
-    @Resource
-    private MqSendFeelbackLogMapper mqSendFeelbackLogMapper;
-
     public void sendTrafficViolationMq(List<OrderInfoForIllegal> list){
         for(OrderInfoForIllegal bo:list) {
             //记录标示
@@ -120,7 +120,7 @@ public class TransIllegalSendAliYunMq {
                     log.setQueueName(queueNameTransIllegal);
                     log.setStatus("01");
                     log.setSendTime(new Date());
-                    mqSendFeelbackLogMapper.saveMqSendFeelbackLog(log);
+                    mqSendFeelbackLogService.saveMqSendFeelbackLog(log);
                 }
                 @Override
                 public void onFail(Exception ex) {

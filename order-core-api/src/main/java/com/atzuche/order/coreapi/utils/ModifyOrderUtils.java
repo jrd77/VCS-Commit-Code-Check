@@ -185,6 +185,10 @@ public class ModifyOrderUtils {
 		if (getModifyFlag(initRenterOrder.getIsReturnCar(), updModifyOrder.getSrvReturnFlag())) {
 			changeItemList.add(new OrderChangeItemDTO(initRenterOrder.getOrderNo(), renterOrderNo, OrderChangeItemEnum.MODIFY_SRVRETURNFLAG.getCode(), OrderChangeItemEnum.MODIFY_SRVRETURNFLAG.getName()));
 		}
+		if (updModifyOrder.getTransferFlag() != null && updModifyOrder.getTransferFlag() && StringUtils.isNotBlank(updModifyOrder.getCarNo())) {
+			// 换车操作
+			changeItemList.add(new OrderChangeItemDTO(initRenterOrder.getOrderNo(), renterOrderNo, OrderChangeItemEnum.MODIFY_TRANSFER.getCode(), OrderChangeItemEnum.MODIFY_TRANSFER.getName()));
+		}
 		return changeItemList;
 	}
 	

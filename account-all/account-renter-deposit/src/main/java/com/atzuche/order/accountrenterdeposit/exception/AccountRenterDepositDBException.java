@@ -6,7 +6,6 @@ import com.atzuche.order.commons.enums.ErrorCode;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-@Data
 @EqualsAndHashCode(callSuper = false)
 public class AccountRenterDepositDBException extends OrderException {
 

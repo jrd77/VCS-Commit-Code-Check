@@ -1,8 +1,7 @@
 package com.atzuche.order.admin.vo.resp.cost;
 
 import com.autoyol.doc.annotation.AutoDocProperty;
-import lombok.Data;
-import lombok.ToString;
+import lombok.*;
 
 /**
  * @author 胡春林
@@ -10,7 +9,11 @@ import lombok.ToString;
  */
 @Data
 @ToString
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class DistributionCostVO {
+
     @AutoDocProperty("取车费用")
     private String getCarAmt;
     @AutoDocProperty("还车费用")
@@ -19,4 +22,5 @@ public class DistributionCostVO {
     private String getCarChaoYunNeng;
     @AutoDocProperty("还车-超运能加价")
     private String returnCarChaoYunNeng;
+
 }

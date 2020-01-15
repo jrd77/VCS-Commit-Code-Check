@@ -32,7 +32,7 @@ dependencies {
     compile project(":order-flow")
 
 
-    compile 'com.autoyol:autoPayGatewaySecondary-api:1.0.7-SNAPSHOT'
+    compile 'com.autoyol:autoPayGatewaySecondary-api:1.0.9-SNAPSHOT'
     compile 'com.autoframework:auto-mq-event:1.0-SNAPSHOT'
     compile 'com.autoyol:auto-wallet-service-api:1.0.2-SNAPSHOT'
 }

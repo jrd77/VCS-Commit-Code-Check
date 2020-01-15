@@ -9,7 +9,7 @@ import com.atzuche.order.commons.enums.ErrorCode;
  **/
 public class OrderCancelErrException extends OrderException {
     public OrderCancelErrException() {
-        super(ErrorCode.ADMIN_ORDER_CANCEL_ERR.getCode(), ErrorCode.ADMIN_ORDER_CANCEL_ERR.getCode());
+        super(ErrorCode.ADMIN_ORDER_CANCEL_ERR.getCode(), ErrorCode.ADMIN_ORDER_CANCEL_ERR.getText());
     }
 
 }

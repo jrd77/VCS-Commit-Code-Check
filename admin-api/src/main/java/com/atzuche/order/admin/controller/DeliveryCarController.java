@@ -19,6 +19,8 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Objects;
+
 
 /**
  * @author 胡春林
@@ -45,8 +47,17 @@ public class DeliveryCarController extends BaseController {
         if (null == deliveryCarDTO || StringUtils.isBlank(deliveryCarDTO.getOrderNo())) {
             return ResponseData.createErrorCodeResponse(ErrorCode.ORDER_NO_PARAM_ERROR.getCode(), "租客订单编号为空");
         }
-        DeliveryCarVO deliveryCarRepVO = deliveryCarInfoService.findDeliveryListByOrderNo(deliveryCarDTO);
-        return ResponseData.success(deliveryCarRepVO);
+        try {
+            DeliveryCarVO deliveryCarRepVO = deliveryCarInfoService.findDeliveryListByOrderNo(deliveryCarDTO);
+            if (Objects.nonNull(deliveryCarRepVO)) {
+                return ResponseData.success(deliveryCarRepVO);
+            }
+            return ResponseData.success();
+        } catch (Exception e) {
+            log.error("取还车配送接口出现异常", e);
+            Cat.logError("取还车配送接口出现异常", e);
+            return ResponseData.error();
+        }
     }
 
     /**

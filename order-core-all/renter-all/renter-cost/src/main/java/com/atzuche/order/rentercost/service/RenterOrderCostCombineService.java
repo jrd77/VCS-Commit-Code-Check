@@ -13,6 +13,7 @@ import com.atzuche.order.commons.enums.RenterCashCodeEnum;
 import com.atzuche.order.commons.enums.SubsidySourceCodeEnum;
 import com.atzuche.order.commons.enums.SubsidyTypeCodeEnum;
 import com.atzuche.order.rentercost.entity.*;
+import com.atzuche.order.rentercost.entity.dto.RenterOrderSubsidyDetailDTO;
 import com.atzuche.order.rentercost.entity.dto.*;
 import com.atzuche.order.rentercost.entity.vo.GetReturnResponseVO;
 import com.atzuche.order.rentercost.entity.vo.PayableVO;
@@ -31,7 +32,9 @@ import com.autoyol.feeservice.api.vo.pricefetchback.PriceCarHumanFeeRule;
 import com.autoyol.platformcost.CommonUtils;
 import com.autoyol.platformcost.LocalDateTimeUtil;
 import com.autoyol.platformcost.RenterFeeCalculatorUtils;
-import com.autoyol.platformcost.model.*;
+import com.autoyol.platformcost.model.CarDepositAmtVO;
+import com.autoyol.platformcost.model.CarPriceOfDay;
+import com.autoyol.platformcost.model.FeeResult;
 import com.dianping.cat.Cat;
 import com.dianping.cat.message.Transaction;
 import lombok.extern.slf4j.Slf4j;
@@ -235,7 +238,7 @@ public class RenterOrderCostCombineService {
 			Cat.logError("获取全面保障费abatementAmtDTO对象为空", new RenterCostParameterException());
 			throw new RenterCostParameterException();
 		}
-		if(!abatementAmtDTO.getIsAbatement()){
+		if(abatementAmtDTO.getIsAbatement() == null || !abatementAmtDTO.getIsAbatement()){
 		    log.info("不需要计算全面保障费！abatementAmtDTO=[{}]",JSON.toJSONString(abatementAmtDTO));
             return new ArrayList<>();
         }

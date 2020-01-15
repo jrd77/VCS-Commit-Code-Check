@@ -117,4 +117,9 @@ public class CashierRefundApplyEntity implements Serializable {
 	 */
 	private Integer isDelete;
 
+    /**
+     *退款成功时间
+     */
+    private LocalDateTime refundTime;
+
 }

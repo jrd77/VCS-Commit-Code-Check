@@ -79,6 +79,22 @@ public class ModifyOrderReq {
 	 */
 	private String platformCouponId;
 	/**
+     * 是否使用特供价（换车用）1-使用，0-不使用
+     */
+    private Integer useSpecialPriceFlag;
+    /**
+     * 车辆注册号（换车用）
+     */
+    private String carNo;
+    /**
+     * 是否换车操作 （换车用）
+     */
+    private Boolean transferFlag;
+    /**
+     * 管理后台操作人
+     */
+    private String operator;
+	/**
 	 * 租客费用补贴
 	 */
     @AutoDocProperty(value="租客费用补贴", hidden = true)
