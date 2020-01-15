@@ -4,7 +4,10 @@ import com.alibaba.fastjson.JSON;
 import com.atzuche.order.admin.service.AdminOrderService;
 import com.atzuche.order.admin.vo.req.order.CancelOrderByPlatVO;
 import com.atzuche.order.admin.vo.req.order.CancelOrderVO;
+import com.atzuche.order.commons.entity.orderDetailDto.OrderDetailReqDTO;
+import com.atzuche.order.commons.entity.orderDetailDto.OrderDetailRespDTO;
 import com.atzuche.order.commons.vo.req.ModifyOrderReqVO;
+import com.atzuche.order.open.service.FeignOrderDetailService;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.doc.annotation.AutoDocGroup;
@@ -35,6 +38,8 @@ import java.util.Optional;
 public class OrderController {
     @Autowired
     private AdminOrderService adminOrderService;
+    @Autowired
+    private FeignOrderDetailService feignOrderDetailService;
 
     @AutoDocVersion(version = "订单修改")
     @AutoDocGroup(group = "订单修改")
@@ -71,7 +76,22 @@ public class OrderController {
             return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), error.isPresent() ?
                     error.get().getDefaultMessage() : ErrorCode.INPUT_ERROR.getText());
         }
-        String memNo = cancelOrderVO.getMemNo();
+        String orderNo = cancelOrderVO.getOrderNo();
+        OrderDetailReqDTO reqDTO = new OrderDetailReqDTO();
+        reqDTO.setOrderNo(orderNo);
+
+        ResponseData<OrderDetailRespDTO> respDTOResponseData =feignOrderDetailService.getOrderDetail(reqDTO);
+        if(respDTOResponseData==null||!ErrorCode.SUCCESS.getCode().equalsIgnoreCase(respDTOResponseData.getResCode())){
+            throw new RenterInfoController.RenterNotFoundException(orderNo);
+        }
+
+        OrderDetailRespDTO detailRespDTO = respDTOResponseData.getData();
+        String memNo = "";
+        if("1".equals(cancelOrderVO.getCancelSrcCode())){
+            memNo = detailRespDTO.getRenterMember().getMemNo();
+        }else if("2".equals(cancelOrderVO.getCancelSrcCode())){
+            memNo = detailRespDTO.getOwnerMember().getMemNo();
+        }
         if (StringUtils.isBlank(memNo)) {
             return new ResponseData<>(ErrorCode.NEED_LOGIN.getCode(), ErrorCode.NEED_LOGIN.getText());
         }
