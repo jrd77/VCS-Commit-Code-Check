@@ -1543,15 +1543,4 @@ public class OrderSettleNoTService {
             CashierDeductDebtResVO result = cashierService.deductDebtByRentCost(cashierDeductDebtReq);
         }
     }
-
-    /**
-     * 取消订单结算
-     * @param orderStatusDTO
-     */
-    public void saveCancelOrderStatusInfo(OrderStatusDTO orderStatusDTO) {
-        //1更新 订单流转状态
-        orderStatusService.saveOrderStatusInfo(orderStatusDTO);
-        //2记录订单流传信息
-        orderFlowService.inserOrderStatusChangeProcessInfo(orderStatusDTO.getOrderNo(), OrderStatusEnum.CLOSED);
-    }
 }
