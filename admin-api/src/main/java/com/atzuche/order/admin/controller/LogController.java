@@ -43,7 +43,7 @@ public class LogController {
 
     @AutoDocVersion(version = "操作日志")
     @AutoDocGroup(group = "操作日志")
-    @AutoDocMethod(description = "操作日志列表", value = "操作日志列表",response = LogListRespVO.class)
+    @AutoDocMethod(description = "操作日志查询", value = "操作日志查询",response = LogListRespVO.class)
     @GetMapping("console/log/query")
     public ResponseData<LogListRespVO> query(LogQueryVO queryVO){
         LogListRespVO respVO = new LogListRespVO();

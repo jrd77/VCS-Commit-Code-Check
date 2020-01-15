@@ -1,7 +1,9 @@
 package com.atzuche.order.coreapi.controller;
 
 import com.atzuche.order.commons.vo.req.DeliveryCarPriceReqVO;
+import com.atzuche.order.commons.vo.res.delivery.DeliveryCarRepVO;
 import com.atzuche.order.commons.vo.res.delivery.DeliveryOilCostRepVO;
+import com.atzuche.order.commons.vo.res.delivery.DistributionCostVO;
 import com.atzuche.order.commons.vo.res.delivery.RenterOrderDeliveryRepVO;
 import com.atzuche.order.delivery.entity.RenterOrderDeliveryEntity;
 import com.atzuche.order.delivery.service.RenterOrderDeliveryService;
@@ -65,7 +67,7 @@ public class DeliveryCarInfoController {
      * @param orderNo
      * @return
      */
-    @PostMapping("/delivery/list")
+    @GetMapping("/delivery/list")
     public ResponseData<List<RenterOrderDeliveryRepVO>> findRenterOrderListByOrderNo(@RequestParam("orderNo") String orderNo) {
         if (StringUtils.isBlank(orderNo)) {
             return new ResponseData(ErrorCode.INPUT_ERROR.getCode(), ErrorCode.INPUT_ERROR.getText());
@@ -79,6 +81,17 @@ public class DeliveryCarInfoController {
             return ResponseData.error();
         }
 
+    }
+
+    /**
+     * 获取取还车费用
+     * @param carType
+     * @return
+     */
+    @GetMapping("/getAndReturnCarCost")
+    public ResponseData<DistributionCostVO> findDeliveryCostByOrderNo(@RequestParam("carType") Integer carType) {
+        DistributionCostVO distributionCostVO = deliveryCarInfoPriceService.getDistributionCost(carType);
+        return ResponseData.success(distributionCostVO);
     }
 
 

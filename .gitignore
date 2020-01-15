@@ -201,6 +201,7 @@ gradle-app.setting
 
 
 .classpath
+.project
 /.classpath
 /.project
 .idea/

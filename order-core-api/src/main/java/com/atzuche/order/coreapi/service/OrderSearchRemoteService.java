@@ -544,4 +544,128 @@ public class OrderSearchRemoteService {
         }
         return new ArrayList<>();
     }
+
+    public List<String> queryOrderNosWithUnDispatchOrder() {
+        Transaction t = Cat.getProducer().newTransaction(CatConstants.FEIGN_CALL, "查询待调度后4小时的订单");
+        try {
+            ViolateVO reqVO = new ViolateVO();
+            reqVO.setPageNum(1);
+            reqVO.setPageSize(10000);
+            reqVO.setType("7");
+            Cat.logEvent(CatConstants.FEIGN_METHOD,"orderSearchService.violateProcessOrder");
+            Cat.logEvent(CatConstants.FEIGN_PARAM, JSON.toJSONString(reqVO));
+            ResponseData<OrderVO<ViolateBO>> orderResponseData = orderSearchService.violateProcessOrder(reqVO);
+            Cat.logEvent(CatConstants.FEIGN_RESULT, JSON.toJSONString(orderResponseData));
+            if(orderResponseData != null && orderResponseData.getResCode() != null
+                    && ErrorCode.SUCCESS.getCode().equals(orderResponseData.getResCode()) && orderResponseData.getData() != null){
+                List<ViolateBO> orderList = orderResponseData.getData().getOrderList();
+                if(CollectionUtils.isEmpty(orderList)){
+                    return new ArrayList<>();
+                }else{
+                    return  orderList.stream().map(ViolateBO::getOrderNo).collect(Collectors.toList());
+                }
+            }else{
+                return new ArrayList<>();
+            }
+        } catch (Exception e) {
+            logger.error("执行 查询待调度后4小时的订单 异常",e);
+            Cat.logError("执行 查询待调度后4小时的订单 异常",e);
+        }finally {
+            t.complete();
+        }
+        return new ArrayList<>();
+    }
+
+    public List<String> queryOrderNosWithUnPayViolationDeposit() {
+        Transaction t = Cat.getProducer().newTransaction(CatConstants.FEIGN_CALL, "查询订单开始仍未支付违章押金的订单");
+        try {
+            ViolateVO reqVO = new ViolateVO();
+            reqVO.setPageNum(1);
+            reqVO.setPageSize(10000);
+            reqVO.setType("6");
+            Cat.logEvent(CatConstants.FEIGN_METHOD,"orderSearchService.violateProcessOrder");
+            Cat.logEvent(CatConstants.FEIGN_PARAM, JSON.toJSONString(reqVO));
+            ResponseData<OrderVO<ViolateBO>> orderResponseData = orderSearchService.violateProcessOrder(reqVO);
+            Cat.logEvent(CatConstants.FEIGN_RESULT, JSON.toJSONString(orderResponseData));
+            if(orderResponseData != null && orderResponseData.getResCode() != null
+                    && ErrorCode.SUCCESS.getCode().equals(orderResponseData.getResCode()) && orderResponseData.getData() != null){
+                List<ViolateBO> orderList = orderResponseData.getData().getOrderList();
+                if(CollectionUtils.isEmpty(orderList)){
+                    return new ArrayList<>();
+                }else{
+                    return  orderList.stream().map(ViolateBO::getOrderNo).collect(Collectors.toList());
+                }
+            }else{
+                return new ArrayList<>();
+            }
+        } catch (Exception e) {
+            logger.error("执行 查询订单开始仍未支付违章押金的订单 异常",e);
+            Cat.logError("执行 查询订单开始仍未支付违章押金的订单 异常",e);
+        }finally {
+            t.complete();
+        }
+        return new ArrayList<>();
+    }
+
+    public List<String> queryOrderNosWithRevertCar4Hours() {
+        Transaction t = Cat.getProducer().newTransaction(CatConstants.FEIGN_CALL, "查询还车4小时后的订单");
+        try {
+            ViolateVO reqVO = new ViolateVO();
+            reqVO.setPageNum(1);
+            reqVO.setPageSize(10000);
+            reqVO.setType("8");
+            Cat.logEvent(CatConstants.FEIGN_METHOD,"orderSearchService.violateProcessOrder");
+            Cat.logEvent(CatConstants.FEIGN_PARAM, JSON.toJSONString(reqVO));
+            ResponseData<OrderVO<ViolateBO>> orderResponseData = orderSearchService.violateProcessOrder(reqVO);
+            Cat.logEvent(CatConstants.FEIGN_RESULT, JSON.toJSONString(orderResponseData));
+            if(orderResponseData != null && orderResponseData.getResCode() != null
+                    && ErrorCode.SUCCESS.getCode().equals(orderResponseData.getResCode()) && orderResponseData.getData() != null){
+                List<ViolateBO> orderList = orderResponseData.getData().getOrderList();
+                if(CollectionUtils.isEmpty(orderList)){
+                    return new ArrayList<>();
+                }else{
+                    return  orderList.stream().map(ViolateBO::getOrderNo).collect(Collectors.toList());
+                }
+            }else{
+                return new ArrayList<>();
+            }
+        } catch (Exception e) {
+            logger.error("执行 查询还车4小时后的订单 异常",e);
+            Cat.logError("执行 查询还车4小时后的订单 异常",e);
+        }finally {
+            t.complete();
+        }
+        return new ArrayList<>();
+    }
+
+    public List<String> queryOrderNosWithExpRevertCar12Hours() {
+        Transaction t = Cat.getProducer().newTransaction(CatConstants.FEIGN_CALL, "查询预计还车12小时后的订单");
+        try {
+            ViolateVO reqVO = new ViolateVO();
+            reqVO.setPageNum(1);
+            reqVO.setPageSize(10000);
+            reqVO.setType("9");
+            Cat.logEvent(CatConstants.FEIGN_METHOD,"orderSearchService.violateProcessOrder");
+            Cat.logEvent(CatConstants.FEIGN_PARAM, JSON.toJSONString(reqVO));
+            ResponseData<OrderVO<ViolateBO>> orderResponseData = orderSearchService.violateProcessOrder(reqVO);
+            Cat.logEvent(CatConstants.FEIGN_RESULT, JSON.toJSONString(orderResponseData));
+            if(orderResponseData != null && orderResponseData.getResCode() != null
+                    && ErrorCode.SUCCESS.getCode().equals(orderResponseData.getResCode()) && orderResponseData.getData() != null){
+                List<ViolateBO> orderList = orderResponseData.getData().getOrderList();
+                if(CollectionUtils.isEmpty(orderList)){
+                    return new ArrayList<>();
+                }else{
+                    return  orderList.stream().map(ViolateBO::getOrderNo).collect(Collectors.toList());
+                }
+            }else{
+                return new ArrayList<>();
+            }
+        } catch (Exception e) {
+            logger.error("执行 查询预计还车12小时后的订单 异常",e);
+            Cat.logError("执行 查询预计还车12小时后的订单 异常",e);
+        }finally {
+            t.complete();
+        }
+        return new ArrayList<>();
+    }
 }
