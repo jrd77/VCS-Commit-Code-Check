@@ -36,4 +36,20 @@ public enum DispatcherStatusEnum {
         this.name = name;
     }
 
+
+    /**
+     * convert int value to DispatcherStatusEnum
+     *
+     * @param code int value
+     * @return OsTypeEnum
+     */
+    public static DispatcherStatusEnum from(int code) {
+        DispatcherStatusEnum[] status = values();
+        for (DispatcherStatusEnum s : status) {
+            if (code == s.code) {
+                return s;
+            }
+        }
+        throw new RuntimeException("the value of code :" + code + " not supported,please check");
+    }
 }
