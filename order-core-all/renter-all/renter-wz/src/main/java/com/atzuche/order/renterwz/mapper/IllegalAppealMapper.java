@@ -29,5 +29,5 @@ public interface IllegalAppealMapper{
 	 * @param illegalNum
 	 * @return
 	 */
-    Integer getIllegalAppealCount(String orderNo, String illegalNum);
+    Integer getIllegalAppealCount(@Param("orderNo") String orderNo,@Param("illegalNum") String illegalNum);
 }
