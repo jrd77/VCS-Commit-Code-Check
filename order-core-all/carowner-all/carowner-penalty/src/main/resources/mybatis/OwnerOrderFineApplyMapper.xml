@@ -32,8 +32,20 @@
 
 
 	<select id="selectByPrimaryKey" resultMap="BaseResultMap">
-		select <include refid="Base_Column_List" /> from owner_order_fine_apply where id = #{value}
+		select
+		    <include refid="Base_Column_List" />
+		from
+		    owner_order_fine_apply
+		where id = #{value}
 	</select>
+
+    <select id="selectByOrderNo" resultMap="BaseResultMap">
+        select
+            <include refid="Base_Column_List" />
+        from
+            owner_order_fine_apply
+        where order_no = #{orderNo} and is_delete = 0 order by id desc limit 1
+    </select>
 
 	<insert id="insert" parameterType="com.atzuche.order.ownercost.entity.OwnerOrderFineApplyEntity" useGeneratedKeys="true" keyProperty="id">
 		insert into owner_order_fine_apply (

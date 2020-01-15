@@ -20,6 +20,15 @@ public interface OwnerOrderFineApplyMapper{
      */
     OwnerOrderFineApplyEntity selectByPrimaryKey(Integer id);
 
+
+    /**
+     * 依据订单号获取罚金信息
+     *
+     * @param orderNo 主订单号
+     * @return OwnerOrderFineApplyEntity
+     */
+    OwnerOrderFineApplyEntity selectByOrderNo(String orderNo);
+
     /**
      * 新增
      *

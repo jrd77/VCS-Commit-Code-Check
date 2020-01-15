@@ -66,7 +66,7 @@ public class OrderCarTrusteeshipEntity implements Serializable {
 	 * 出库油量: 1:1/16,2:2/16,3:3/16,4:4/16,5:5/16,6:6/16,7:7/16,8:8/16,9:9/16,10:10/16,11:11/16,12:12/16,13:13/16,14:14/16,15:15/16,16:16/16
 	 */
     @AutoDocProperty(value="出库油量1:1/16,2:2/16,3:3/16,4:4/16,5:5/16..")
-	private Integer outDepotOimass;
+	private Integer outDepotoimass;
 	/**
 	 * 入库油量: 1:1/16,2:2/16,3:3/16,4:4/16,5:5/16,6:6/16,7:7/16,8:8/16,9:9/16,10:10/16,11:11/16,12:12/16,13:13/16,14:14/16,15:15/16,16:16/16
 	 */
@@ -107,6 +107,10 @@ public class OrderCarTrusteeshipEntity implements Serializable {
 	 */
     @AutoDocProperty(value="修改时间")
 	private LocalDateTime updateTime;
+
+    @AutoDocProperty(value="油耗刻度")
+    private String oilScale;
+
 	/**
 	 * 0-正常，1-已逻辑删除
 	 */

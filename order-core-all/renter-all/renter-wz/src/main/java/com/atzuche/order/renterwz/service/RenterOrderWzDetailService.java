@@ -65,4 +65,8 @@ public class RenterOrderWzDetailService {
     public List<RenterOrderWzDetailEntity> findTransIllegalDetailByOrderNo(String orderNo) {
         return renterOrderWzDetailMapper.findTransIllegalDetailByOrderNo(orderNo);
     }
+
+    public Integer getIllegalDetailCount(String orderNo, String illegalNum) {
+        return renterOrderWzDetailMapper.getIllegalDetailCount(orderNo,illegalNum);
+    }
 }

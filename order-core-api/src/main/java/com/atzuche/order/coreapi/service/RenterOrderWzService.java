@@ -87,6 +87,9 @@ public class RenterOrderWzService {
     @Resource
     private RenterOrderWzDetailService renterOrderWzDetailService;
 
+    @Resource
+    private IllegalAppealService illegalAppealService;
+
     private static final Integer SUCCESS_STATUS = 200;
     private static final Integer FAILED_STATUS = 500;
 
@@ -414,5 +417,13 @@ public class RenterOrderWzService {
             transIllegalSendAliYunMq.transIllegalPhotoToRenYun(photo);
         }
         return result;
+    }
+
+    public Integer getIllegalDetailCount(String orderNo, String illegalNum) {
+        return renterOrderWzDetailService.getIllegalDetailCount(orderNo,illegalNum);
+    }
+
+    public Integer getIllegalAppealCount(String orderNo, String illegalNum) {
+        return illegalAppealService.getIllegalAppealCount(orderNo,illegalNum);
     }
 }

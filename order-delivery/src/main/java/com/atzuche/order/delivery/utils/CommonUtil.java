@@ -6,6 +6,7 @@ import com.atzuche.order.delivery.entity.OwnerHandoverCarInfoEntity;
 import com.atzuche.order.delivery.entity.RenterHandoverCarInfoEntity;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
@@ -44,7 +45,7 @@ public class CommonUtil {
             return null;
         }
         try {
-            Map<String, Object> map = BeanUtils.describe(obj);
+            Map<String, Object> map = PropertyUtils.describe(obj);
             return map;
         } catch (Exception e) {
             log.info("转换成map失败");

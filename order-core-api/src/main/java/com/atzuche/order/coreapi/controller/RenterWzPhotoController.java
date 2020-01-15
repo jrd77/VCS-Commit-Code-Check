@@ -118,4 +118,32 @@ public class RenterWzPhotoController {
         }
     }
 
+    @ResponseBody
+    @RequestMapping(value = "get/illegalDetailCount",method = RequestMethod.GET)
+    @AutoDocMethod(description = "获取是否存在违章记录", value = "获取是否存在违章记录", response = ResponseData.class)
+    public ResponseData<Integer> getIllegalDetailCount(@RequestParam("orderNo") String orderNo,@RequestParam("illegalNum") String illegalNum){
+        try {
+            Integer result= renterOrderWzService.getIllegalDetailCount(orderNo,illegalNum);
+            return ResponseData.success(result);
+        } catch (Exception e) {
+            LOGGER.error("获取是否存在违章记录 异常 e :",e);
+            Cat.logError("获取是否存在违章记录 异常",e);
+            return ResponseData.error();
+        }
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "get/illegalAppealCount",method = RequestMethod.GET)
+    @AutoDocMethod(description = "获取当天已存在的申诉记录数", value = "获取当天已存在的申诉记录数", response = ResponseData.class)
+    public ResponseData<Integer> getIllegalAppealCount(@RequestParam("orderNo") String orderNo,@RequestParam("illegalNum") String illegalNum){
+        try {
+            Integer result= renterOrderWzService.getIllegalAppealCount(orderNo,illegalNum);
+            return ResponseData.success(result);
+        } catch (Exception e) {
+            LOGGER.error("获取当天已存在的申诉记录数 异常 e :",e);
+            Cat.logError("获取当天已存在的申诉记录数 异常",e);
+            return ResponseData.error();
+        }
+    }
+
 }
