@@ -57,6 +57,7 @@
         <result property="updateOp" column="update_op"/>
         <result property="isDelete" column="is_delete"/>
         <result property="year" column="year"/>
+        <result property="inspectExpire" column="inspect_expire"/>
     </resultMap>
 
 
@@ -112,8 +113,8 @@
 	`update_time`,
 	`update_op`,
 	`is_delete`,
-	`year`
-
+	`year`,
+    `inspect_expire`
 	</sql>
 
 
@@ -171,7 +172,8 @@
         `license_expire`,
         `create_op`,
         `update_op`,
-        `year`
+        `year`,
+        `inspect_expire`
         )
         values
         (
@@ -222,7 +224,8 @@
         #{licenseExpire},
         #{createOp},
         #{updateOp},
-        #{year}
+        #{year},
+        #{inspectExpire}
         )
     </insert>
 
@@ -279,7 +282,8 @@
             <if test="updateTime != null">`update_time`, </if>
             <if test="updateOp != null">`update_op`, </if>
             <if test="isDelete != null">`is_delete`, </if>
-            <if test="year != null">`year` </if>
+            <if test="year != null">`year`, </if>
+            <if test="inspectExpire != null">`inspect_expire` </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides="," >
             <if test="orderNo != null">#{orderNo},  </if>
@@ -332,7 +336,8 @@
             <if test="updateTime != null">#{updateTime},  </if>
             <if test="updateOp != null">#{updateOp},  </if>
             <if test="isDelete != null">#{isDelete},  </if>
-            <if test="year != null">#{year} </if>
+            <if test="year != null">#{year}, </if>
+            <if test="inspectExpire != null">#{inspectExpire} </if>
         </trim>
     </insert>
 
@@ -387,6 +392,7 @@
             <if test="licenseExpire != null">`license_expire` = #{licenseExpire}, </if>
             <if test="createOp != null">`create_op` = #{createOp}, </if>
             <if test="updateOp != null">`update_op` = #{updateOp}, </if>
+            <if test="inspectExpire != null">`inspect_expire` = #{inspectExpire}, </if>
             <if test="year != null">`year` = #{year}</if>
         </set>
         where id = #{id}
@@ -442,6 +448,7 @@
             `license_expire` = #{licenseExpire},
             `create_op` = #{createOp},
             `update_op` = #{updateOp},
+            `inspect_expire` = #{inspectExpire},
             `year` = #{year}
 
         </set>
@@ -454,6 +461,13 @@
         <include refid="Base_Column_List"/>
         from owner_goods
         where owner_order_no=#{ownerOrderNo} and is_delete = 0 limit 1
+    </select>
+    
+    <select id="getLastOwnerGoodsByOrderNo" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List" /> from owner_goods where order_no = #{orderNo} 
+        and is_delete = 0 
+        order by id desc
+        limit 1
     </select>
 
 </mapper>

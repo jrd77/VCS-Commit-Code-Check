@@ -24,7 +24,10 @@ public class OwnerOrderFineApplyService {
 
     public boolean addFineApplyRecord(OwnerOrderFineApplyEntity record) {
         logger.info("Add owner order fine apply record. param is,record:[{}]", JSON.toJSONString(record));
-
+        if(null == record) {
+            logger.warn("Owner order fine apply record is empty.");
+            return false;
+        }
         int result = ownerOrderFineApplyMapper.insertSelective(record);
 
         logger.info("Add owner order fine apply record. result is,result:[{}],id:[{}]", result, record.getId());
@@ -32,10 +35,13 @@ public class OwnerOrderFineApplyService {
     }
 
 
+    public OwnerOrderFineApplyEntity getByOrderNo(String orderNo){
+        return ownerOrderFineApplyMapper.selectByOrderNo(orderNo);
+    }
 
 
-
-
-
+    public int setInvalid(Integer id) {
+        return ownerOrderFineApplyMapper.updateInvalidByPrimaryKey(id);
+    }
 
 }

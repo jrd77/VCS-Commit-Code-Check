@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.atzuche.order.coreapi.entity.request.ModifyApplyHandleReq;
 import com.atzuche.order.coreapi.entity.request.ModifyOrderAppReq;
 import com.atzuche.order.coreapi.entity.request.ModifyOrderReq;
-import com.atzuche.order.coreapi.service.ModifyOrderConfirmService;
+import com.atzuche.order.coreapi.service.ModifyOrderOwnerConfirmService;
 import com.atzuche.order.coreapi.service.ModifyOrderService;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
@@ -29,7 +29,7 @@ public class ModifyOrderController {
 	@Autowired
 	private ModifyOrderService modifyOrderService;
 	@Autowired
-	private ModifyOrderConfirmService modifyOrderConfirmService;
+	private ModifyOrderOwnerConfirmService modifyOrderOwnerConfirmService;
 	
 	/**
 	 * 修改订单（APP端或H5端）
@@ -83,6 +83,6 @@ public class ModifyOrderController {
             return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), error.isPresent() ?
                     error.get().getDefaultMessage() : ErrorCode.INPUT_ERROR.getText());
         }
-		return modifyOrderConfirmService.modifyConfirm(modifyApplyHandleReq);
+		return modifyOrderOwnerConfirmService.modifyConfirm(modifyApplyHandleReq);
 	}
 }

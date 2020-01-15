@@ -1,6 +1,7 @@
 package com.atzuche.order.admin.controller;
 
 import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
+import com.atzuche.order.delivery.common.DeliveryErrorCode;
 import com.atzuche.order.delivery.entity.OrderCarTrusteeshipEntity;
 import com.atzuche.order.delivery.entity.RenterOrderDeliveryEntity;
 import com.atzuche.order.delivery.service.OrderCarTrusteeshipService;
@@ -68,6 +69,11 @@ public class OrderCarTrusteeshipController extends BaseController {
             BeanUtils.copyProperties(orderCarTrusteeshipVO, orderCarTrusteeshipEntity);
             orderCarTrusteeshipEntity.setOutDepotTime(DateUtil.asLocalDateTime(orderCarTrusteeshipVO.getOutDepotTime()));
             orderCarTrusteeshipEntity.setInDepotTime(DateUtil.asLocalDateTime(orderCarTrusteeshipVO.getInDepotTime()));
+            OrderCarTrusteeshipEntity orderNoAndCar = orderCarTrusteeshipService.selectObjectByOrderNoAndCar(orderCarTrusteeshipVO.getOrderNo(),orderCarTrusteeshipVO.getCarNo());
+            if(Objects.nonNull(orderNoAndCar))
+            {
+                return ResponseData.createErrorCodeResponse(DeliveryErrorCode.DELIVERY_PARAMS_ERROR.getValue(), "已存在該托管车信息");
+            }
             int result = orderCarTrusteeshipService.insertOrderCarTrusteeship(orderCarTrusteeshipEntity);
             if (result > 0) {
                 return ResponseData.success();

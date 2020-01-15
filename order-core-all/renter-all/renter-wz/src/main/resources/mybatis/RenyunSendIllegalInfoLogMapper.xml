@@ -92,7 +92,7 @@
 
 	<select id="queryWzCodeByOrderNo" resultType="java.lang.String">
 		select wzcode from renyun_send_illegal_info_log
-		where orderno = #{orderNo} and car_plate_num = #{carPlateNum} order by id desc limit 1
+		where order_no = #{orderNo} and car_plate_num = #{carPlateNum} order by id desc limit 1
 	</select>
 
 </mapper>

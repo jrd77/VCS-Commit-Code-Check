@@ -1,4 +1,4 @@
-package com.atzuche.order.admin.dto;
+package com.atzuche.order.commons.entity.ownerOrderDetail;
 
 import com.atzuche.order.commons.entity.dto.OwnerGoodsPriceDetailDTO;
 import com.autoyol.doc.annotation.AutoDocProperty;

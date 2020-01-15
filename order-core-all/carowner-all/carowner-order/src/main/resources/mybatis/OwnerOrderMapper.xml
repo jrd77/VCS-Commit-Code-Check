@@ -230,12 +230,19 @@
 	<select id="getOwnerOrderByOrderNoAndIsEffective" resultMap="BaseResultMap">
         select <include refid="Base_Column_List" /> from owner_order where order_no = #{orderNo}
 		and is_effective = 1
-		and child_status = 3
-		and is_cancel = 0
 		and is_delete = 0
 		order by id desc
 		limit 1
     </select>
+    
+    <!--         and is_cancle = 0  -->
+    <select id="getOwnerOrderByOwnerOrderNo" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List" /> from owner_order where owner_order_no = #{ownerOrderNo} 
+		and is_delete = 0
+		order by id desc
+		limit 1
+    </select>
+    
     
     <update id="updateOwnerOrderInvalidById">
     	update owner_order set is_effective = 0
@@ -246,6 +253,11 @@
 		update owner_order set child_status = #{childStatus}
 		where id = #{id}
 	</update>
+
+    <update id="updateChildStatusByOrderNo">
+		update owner_order set child_status = #{childStatus} where order_no = #{orderNo}
+	</update>
+
     <select id="getChangeOwnerByOrderNo" resultMap="BaseResultMap">
         select <include refid="Base_Column_List" /> from owner_order where order_no = #{orderNo}
         and is_effective = 0
@@ -259,6 +271,16 @@
         select <include refid="Base_Column_List" /> from owner_order where order_no = #{orderNo}
         and is_delete = 0
         order by id desc
+    </select>
+    <select id="queryCancelOwnerOrderByOrderNoIsEffective" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List" /> from owner_order where order_no = #{orderNo}
+        and is_effective = 0
+        and is_cancel = 0
+        and is_delete = 0
+        and child_status = 0
+        order by id desc
+        limit 1
+
     </select>
 
 </mapper>

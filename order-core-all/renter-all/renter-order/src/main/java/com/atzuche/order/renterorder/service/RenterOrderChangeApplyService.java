@@ -45,4 +45,21 @@ public class RenterOrderChangeApplyService{
     public Integer updateRenterOrderChangeApplyStatus(Integer id, Integer auditStatus) {
     	return renterOrderChangeApplyMapper.updateRenterOrderChangeApplyStatus(id, auditStatus);
     }
+    /**
+     * 获取是否有待处理得申请记录
+     * @param orderNo
+     * @return Integer
+     */
+    public Integer getRenterOrderChangeApplyCountByOrderNo(String orderNo) {
+    	return renterOrderChangeApplyMapper.getRenterOrderChangeApplyCountByOrderNo(orderNo);
+    }
+    
+    /**
+     * 更新申请状态为拒绝根据订单号
+     * @param orderNo
+     * @return Integer
+     */
+    public Integer updateRenterOrderChangeApplyStatusByOrderNo(String orderNo) {
+    	return renterOrderChangeApplyMapper.updateRenterOrderChangeApplyStatusByOrderNo(orderNo);
+    }
 }

@@ -161,7 +161,7 @@ public class CashierPayService{
            //判断余额大于0
            if(payBalance>0){
                //5 抵扣钱包落库 （收银台落库、费用落库）
-               int amtWallet = walletProxyService.orderDeduct(orderPaySign.getMenNo(),orderPaySign.getOrderNo(),orderPayable.getAmt());
+               int amtWallet = walletProxyService.orderDeduct(orderPaySign.getMenNo(),orderPaySign.getOrderNo(),orderPayable.getAmtWallet());
                //6收银台 钱包支付落库
                cashierNoTService.insertRenterCostByWallet(orderPaySign,amtWallet);
                //钱包未抵扣部分
@@ -172,12 +172,16 @@ public class CashierPayService{
                orderPayable.setAmtWallet(amtWallet);
                orderPayable.setAmt(orderPayable.getAmt() + amtPaying);
                orderPayable.setAmtRent(orderPayable.getAmtRent() + amtPaying);
+               // 钱包支付完租车费用  租车费用为0 状态变更
+               if(orderPayable.getAmtRent()==0){
+                   cashierService.saveWalletPaylOrderStatusInfo(orderPaySign.getOrderNo());
+               }
 
                //如果待支付 金额等于 0 即 钱包抵扣完成
                if(orderPayable.getAmt()==0){
                    List<String> payKind = orderPaySign.getPayKind();
                    // 如果 支付款项 只有租车费用一个  并且使用钱包支付 ，当待支付金额完全被 钱包抵扣直接返回支付完成
-                   if(!CollectionUtils.isEmpty(payKind) && payKind.size()==1 && orderPayReqVO.getPayKind().contains(DataPayKindConstant.RENT_AMOUNT)){
+                   if(!CollectionUtils.isEmpty(payKind) && orderPayReqVO.getPayKind().contains(DataPayKindConstant.RENT_AMOUNT)){
                        //修改子订单费用信息
                        orderPayCallBack.callBack(orderPaySign.getOrderNo(),orderPayable.getIsPayAgain());
                        return "";
