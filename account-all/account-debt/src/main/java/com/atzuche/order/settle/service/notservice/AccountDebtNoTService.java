@@ -91,7 +91,7 @@ public class AccountDebtNoTService {
                 throw new AccountInsertDebtDBException();
             }
         }
-        int amt = accountDebtEntity.getDebtAmt()+Math.abs(accountInsertDebt.getAmt());
+        int amt = accountDebtEntity.getDebtAmt()-Math.abs(accountInsertDebt.getAmt());
         accountDebtEntity.setDebtAmt(amt);
         int result = accountDebtMapper.updateByPrimaryKeySelective(accountDebtEntity);
         if(result==0){

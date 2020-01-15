@@ -1461,16 +1461,16 @@ public class OrderSettleNoTService {
             rentFineAmt = rentDepositAmt + rentFineAmt;
             settleCancelOrdersAccount.setRentSurplusWzDepositAmt(settleCancelOrdersAccount.getRentSurplusWzDepositAmt()+amt);
         }
-        //1 车主存在 罚金走历史欠款
+        //3 租客存在 罚金走历史欠款
         if(rentFineAmt<0){
             //2 记录历史欠款
             AccountInsertDebtReqVO accountInsertDebt = new AccountInsertDebtReqVO();
             BeanUtils.copyProperties(settleOrders,accountInsertDebt);
             accountInsertDebt.setType(DebtTypeEnum.CANCEL.getCode());
-            accountInsertDebt.setMemNo(settleOrders.getOwnerMemNo());
+            accountInsertDebt.setMemNo(settleOrders.getRenterMemNo());
             accountInsertDebt.setSourceCode(RenterCashCodeEnum.HISTORY_AMT.getCashNo());
             accountInsertDebt.setSourceDetail(RenterCashCodeEnum.HISTORY_AMT.getTxt());
-            accountInsertDebt.setAmt(settleCancelOrdersAccount.getOwnerFineAmt());
+            accountInsertDebt.setAmt(rentFineAmt);
             cashierService.createDebt(accountInsertDebt);
         }
     }
