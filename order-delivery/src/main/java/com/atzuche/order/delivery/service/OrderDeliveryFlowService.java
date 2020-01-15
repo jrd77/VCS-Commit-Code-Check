@@ -10,10 +10,11 @@ import java.util.List;
 
 /**
  * 发送仁云信息表
+ *
  * @author 胡春林
  */
 @Service
-public class OrderDeliveryFlowService{
+public class OrderDeliveryFlowService {
     @Resource
     private OrderDeliveryFlowMapper orderDeliveryFlowMapper;
 
@@ -34,7 +35,13 @@ public class OrderDeliveryFlowService{
         return orderDeliveryFlowMapper.selectOrderDeliveryByRenterOrderNo(renterOrderNo);
     }
 
+    public OrderDeliveryFlowEntity selectOrderDeliveryFlowByOrderNo(String orderNo, String serviceType) {
+        return orderDeliveryFlowMapper.selectOrderDeliveryByOrderNo(orderNo, serviceType);
+    }
 
+    public Integer updateOrderDeliveryFlow(OrderDeliveryFlowEntity orderDeliveryFlowEntity) {
+        return orderDeliveryFlowMapper.updateByPrimaryKey(orderDeliveryFlowEntity);
+    }
 
 
 }

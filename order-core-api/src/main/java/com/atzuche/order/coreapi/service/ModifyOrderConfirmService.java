@@ -233,6 +233,12 @@ public class ModifyOrderConfirmService {
 			Integer srvGetFlag = modify.getSrvGetFlag();
 			// 还车服务标志
 			Integer srvReturnFlag = modify.getSrvReturnFlag();
+			if (modify.getTransferFlag() != null && modify.getTransferFlag()) {
+				// 换车操作先取消上笔仁云再新增当前订单
+				
+			}
+			// 是否发送仁云
+			boolean sendRenyunFlag = false;
 			if (changeItemList.contains(OrderChangeItemEnum.MODIFY_SRVGETFLAG.getCode())) {
 				// 修改过取车服务标记
 				if (srvGetFlag != null && srvGetFlag == 1) {
@@ -245,6 +251,7 @@ public class ModifyOrderConfirmService {
 					}
 					// 新增取车服务
 					deliveryCarService.addRenYunFlowOrderInfo(getMinutes, returnMinutes, reqContext, SrvGetReturnEnum.SRV_GET_TYPE.getCode());
+					sendRenyunFlag = true;
 				}
 				if (srvGetFlag != null && srvGetFlag == 0) {
 					// 取消取车服务
@@ -264,6 +271,7 @@ public class ModifyOrderConfirmService {
 					}
 					// 新增取车服务
 					deliveryCarService.addRenYunFlowOrderInfo(getMinutes, returnMinutes, reqContext, SrvGetReturnEnum.SRV_RETURN_TYPE.getCode());
+					sendRenyunFlag = true;
 				}
 				if (srvReturnFlag != null && srvReturnFlag == 0) {
 					// 取消还车服务
@@ -272,6 +280,10 @@ public class ModifyOrderConfirmService {
 			}
 			if (changeItemList.contains(OrderChangeItemEnum.MODIFY_SRVRETURNFLAG.getCode()) || 
 					changeItemList.contains(OrderChangeItemEnum.MODIFY_SRVGETFLAG.getCode())) {
+				if (sendRenyunFlag) {
+					// 发送给仁云
+					deliveryCarService.sendDataMessageToRenYun(renterOrderNo);
+				}
 				return;
 			}
 			if (srvGetFlag != null && srvGetFlag == 1) {

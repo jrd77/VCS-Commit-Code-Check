@@ -38,7 +38,7 @@ public class UnDispatchOrderTask extends IJobHandler {
     public ReturnT<String> execute(String s) throws Exception {
         Transaction t = Cat.getProducer().newTransaction(CatConstants.XXL_JOB_CALL, "定时查询待调度后4小时，仍未调度的订单,自动取消 定时任务");
         try {
-            Cat.logEvent(CatConstants.XXL_JOB_METHOD,"renterAutoCancelTask.execute");
+            Cat.logEvent(CatConstants.XXL_JOB_METHOD,"unDispatchOrderTask.execute");
             Cat.logEvent(CatConstants.XXL_JOB_PARAM,null);
             logger.info("开始执行 待调度后4小时，仍未调度的订单,自动取消  定时器");
             XxlJobLogger.log("开始执行 待调度后4小时，仍未调度的订单,自动取消 定时器");
