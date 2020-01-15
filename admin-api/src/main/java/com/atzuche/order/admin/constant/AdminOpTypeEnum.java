@@ -7,7 +7,8 @@ package com.atzuche.order.admin.constant;
 public enum AdminOpTypeEnum {
     CHANGE_ODER_REQ(1,"修改订单条件"),
     CHANGE_ODER_FEE(2,"修改订单费用"),
-    WZ_OP(3,"违章操作");
+    CHANGE_WZ_FEE(3,"修改违章费用"),
+    WZ_OP(4,"违章操作");
     private int opCode;
     private String opType;
 
