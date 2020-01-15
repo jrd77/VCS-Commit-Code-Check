@@ -38,9 +38,9 @@ public class SettleCashierController {
     @AutoDocMethod(value = "查询支付款项信息", description = "查询支付款项信息", response = String.class)
     @GetMapping("/deposit")
     public ResponseData<String> settleDeposit(@RequestParam("orderNo") String orderNo) {
-        log.info("OrderSettleController settleDeposit start param [{}]", orderNo);
+        log.info("SettleCashierController deposit start param [{}]", orderNo);
         orderSettleService.settleOrder(orderNo);
-        log.info("CashierController getOrderPayableAmount end param [{}],result [{}]");
+        log.info("SettleCashierController deposit end param [{}],result [{}]");
         return ResponseData.success();
     }
 
@@ -52,9 +52,9 @@ public class SettleCashierController {
     @AutoDocMethod(value = "查询支付款项信息", description = "查询支付款项信息", response = String.class)
     @GetMapping("/settleOrderCancel")
     public ResponseData<String> settleOrderCancel(@RequestParam("orderNo") String orderNo) {
-        log.info("OrderSettleController settleOrderCancel start param [{}]", orderNo);
+        log.info("SettleCashierController settleOrderCancel start param [{}]", orderNo);
         orderSettleService.settleOrderCancel(orderNo);
-        log.info("CashierController settleOrderCancel end param [{}],result [{}]");
+        log.info("SettleCashierController settleOrderCancel end param [{}],result [{}]");
         return ResponseData.success();
     }
 
@@ -64,10 +64,10 @@ public class SettleCashierController {
     @AutoDocMethod(value = "查询支付款项信息", description = "查询支付款项信息", response = String.class)
     @GetMapping("/cashierRefundApply")
     public ResponseData<String> cashierRefundApply(@RequestParam("orderNo") String orderNo,@RequestParam("payKind") String payKind) {
-        log.info("OrderSettleController settleOrderCancel start param [{}]", orderNo);
+        log.info("OrderSettleController cashierRefundApply start param [{}]", orderNo);
         CashierRefundApplyEntity cashierRefundApply = cashierRefundApplyNoTService.selectorderNo(orderNo,payKind);
         cashierPayService.refundOrderPay(cashierRefundApply);
-        log.info("CashierController settleOrderCancel end param [{}],result [{}]");
+        log.info("CashierController cashierRefundApply end param [{}],result [{}]");
         return ResponseData.success();
     }
 
