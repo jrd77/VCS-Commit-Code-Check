@@ -1467,10 +1467,10 @@ public class OrderSettleNoTService {
             AccountInsertDebtReqVO accountInsertDebt = new AccountInsertDebtReqVO();
             BeanUtils.copyProperties(settleOrders,accountInsertDebt);
             accountInsertDebt.setType(DebtTypeEnum.CANCEL.getCode());
-            accountInsertDebt.setMemNo(settleOrders.getOwnerMemNo());
+            accountInsertDebt.setMemNo(settleOrders.getRenterMemNo());
             accountInsertDebt.setSourceCode(RenterCashCodeEnum.HISTORY_AMT.getCashNo());
             accountInsertDebt.setSourceDetail(RenterCashCodeEnum.HISTORY_AMT.getTxt());
-            accountInsertDebt.setAmt(settleCancelOrdersAccount.getOwnerFineAmt());
+            accountInsertDebt.setAmt(rentFineAmt);
             cashierService.createDebt(accountInsertDebt);
         }
     }

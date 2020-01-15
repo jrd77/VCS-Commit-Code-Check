@@ -28,16 +28,16 @@
     <select id="findByQuery" resultMap="base">
         select id,order_no,operator_id,operator_name,dept_id,op_type_code,op_type_desc,`desc`,create_time
 		from order_console_operate_log where order_no=#{orderNo} and is_delete=0
-        <if test="startTime != null and  endTime! = null">
+        <if test="startTime != null and  endTime != null">
             and create_time between #{startTime} and #{endTime}
         </if>
-        <if test="content != null and  endTime! = ''">
-            and content like concat(#{content},'%')
+        <if test="content != null and  content != ''">
+            and `desc` like concat(#{content},'%')
         </if>
-        <if test="opType != null and  opType! = ''">
+        <if test="opType != null and  opType != ''">
             and op_type_code = #{opType}
         </if>
-        <if test="operator != null and  operator! = ''">
+        <if test="operator != null and  operator != ''">
             and operator_name = #{operator}
         </if>
 
