@@ -19,6 +19,8 @@ import com.atzuche.order.coreapi.modifyorder.exception.ModifyOrderRenterOrderNot
 import com.atzuche.order.coreapi.utils.ModifyOrderUtils;
 import com.atzuche.order.delivery.entity.RenterOrderDeliveryEntity;
 import com.atzuche.order.delivery.service.RenterOrderDeliveryService;
+import com.atzuche.order.owner.commodity.entity.OwnerGoodsEntity;
+import com.atzuche.order.owner.commodity.service.OwnerGoodsService;
 import com.atzuche.order.ownercost.entity.OwnerOrderEntity;
 import com.atzuche.order.ownercost.service.OwnerOrderService;
 import com.atzuche.order.parentorder.dto.OrderDTO;
@@ -57,6 +59,8 @@ public class ModifyOrderForRenterService {
 	private OrderService orderService;
 	@Autowired
 	private OwnerOrderService ownerOrderService;
+	@Autowired
+	private OwnerGoodsService ownerGoodsService;
 	/**
 	 * 无效
 	 */
@@ -254,9 +258,13 @@ public class ModifyOrderForRenterService {
 		// 获取租客配送订单信息
 		List<RenterOrderDeliveryEntity> updDeliveryList = renterOrderDeliveryService.listRenterOrderDeliveryByRenterOrderNo(renterOrderNo);
 		ModifyCompareDTO after = getModifyCompareDTO(updRenterOrderEntity, updDeliveryList);
+		// 获取最新的车主商品信息
+		OwnerGoodsEntity ownerGoodsEntity = ownerGoodsService.getLastOwnerGoodsByOrderNo(orderNo);
+		// 车主类型
+		Integer carOwnerType = ownerGoodsEntity == null ? null:ownerGoodsEntity.getCarOwnerType();
 		// 判断是否自动同意
 		boolean autoAgree = !checkAutoAgree(initRenterOrderEntity.getExpRentTime(), initRenterOrderEntity.getExpRevertTime(), updRenterOrderEntity.getExpRentTime(), updRenterOrderEntity.getExpRevertTime());
-		if (autoAgree) {
+		if (autoAgree || CommonUtils.isEscrowCar(carOwnerType)) {
 			if (modifyOrderDTO != null) {
 				// 自动同意
 				modifyOrderConfirmService.agreeModifyOrder(modifyOrderDTO, updRenterOrderEntity, initRenterOrderEntity, renterOrderSubsidyDetailDTOList);
