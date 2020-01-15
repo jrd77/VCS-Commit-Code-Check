@@ -230,8 +230,6 @@
 	<select id="getOwnerOrderByOrderNoAndIsEffective" resultMap="BaseResultMap">
         select <include refid="Base_Column_List" /> from owner_order where order_no = #{orderNo}
 		and is_effective = 1
-		and child_status = 3
-		and is_cancel = 0
 		and is_delete = 0
 		order by id desc
 		limit 1
