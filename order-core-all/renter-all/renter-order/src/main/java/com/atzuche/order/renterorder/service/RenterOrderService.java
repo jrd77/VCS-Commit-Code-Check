@@ -19,6 +19,7 @@ import com.atzuche.order.renterorder.vo.platform.MemAvailCouponRequestVO;
 import com.autoyol.coupon.api.CouponSettleRequest;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.ibatis.annotations.Param;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -484,6 +485,10 @@ public class RenterOrderService {
     	return renterOrderMapper.updateRenterOrderChildStatus(id, childStatus);
     }
 
+
+    public Integer updateChildStatusByOrderNo(String orderNo, Integer childStatus) {
+        return renterOrderMapper.updateChildStatusByOrderNo(orderNo, childStatus);
+    }
 
     /**
      * 修改租客订单信息

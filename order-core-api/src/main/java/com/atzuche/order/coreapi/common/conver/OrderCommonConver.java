@@ -13,6 +13,7 @@ import com.atzuche.order.commons.vo.res.order.DepositAmtVO;
 import com.atzuche.order.commons.vo.res.order.IllegalDepositVO;
 import com.atzuche.order.commons.vo.res.order.TotalCostVO;
 import com.atzuche.order.coreapi.entity.vo.res.CarRentTimeRangeResVO;
+import com.atzuche.order.ownercost.entity.OwnerOrderFineApplyEntity;
 import com.atzuche.order.renterorder.entity.dto.DeductContextDTO;
 import com.atzuche.order.renterorder.entity.dto.RenterOrderCostRespDTO;
 import com.atzuche.order.renterorder.vo.RenterOrderCarDepositResVO;
@@ -230,16 +231,6 @@ public class OrderCommonConver {
         deductContext.setSrvReturnCost(srvReturnCost + overReturnCost);
         logger.info("下单前费用计算--初始context数据.deductContext:[{}]", JSON.toJSONString(deductContext));
         return deductContext;
-    }
-
-
-    public OwnerCouponReqVO buildOwnerCouponReqVO() {
-
-        OwnerCouponReqVO ownerCouponReqVO = new OwnerCouponReqVO();
-
-
-
-        return ownerCouponReqVO;
     }
 
 }
