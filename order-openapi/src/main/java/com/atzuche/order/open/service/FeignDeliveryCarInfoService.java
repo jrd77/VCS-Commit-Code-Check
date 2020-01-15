@@ -29,10 +29,10 @@ public interface FeignDeliveryCarInfoService {
 
     /**
      * 获取取还车费用
-     * @param deliveryCarDTO
+     * @param
      * @return
      */
     @PostMapping("/getAndReturnCarCost")
-    ResponseData <DistributionCostVO> findDeliveryCostByOrderNo(@RequestBody DeliveryCarRepVO deliveryCarDTO);
+    public ResponseData<DistributionCostVO> findDeliveryCostByOrderNo(@RequestParam("carType") Integer carType);
 
 }
