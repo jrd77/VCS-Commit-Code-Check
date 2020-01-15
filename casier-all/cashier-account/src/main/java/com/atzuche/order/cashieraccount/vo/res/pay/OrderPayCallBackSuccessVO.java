@@ -17,6 +17,10 @@ public class OrderPayCallBackSuccessVO {
      * 订单号
      */
     private String orderNo;
+    /**
+     * 子订单号 补付支付 对应的 租客子订单
+     */
+    private String renterOrderNo;
 
     /**
      * 租车费用支付状态（待支付、已支付）
