@@ -1,6 +1,8 @@
 package com.atzuche.order.open.service;
 
 import com.atzuche.order.commons.vo.req.DeliveryCarPriceReqVO;
+import com.atzuche.order.commons.vo.req.handover.rep.HandoverCarRespVO;
+import com.atzuche.order.commons.vo.req.handover.req.HandoverCarInfoReqVO;
 import com.atzuche.order.commons.vo.res.delivery.DeliveryCarRepVO;
 import com.atzuche.order.commons.vo.res.delivery.DeliveryOilCostRepVO;
 import com.atzuche.order.commons.vo.res.delivery.DistributionCostVO;
@@ -45,6 +47,22 @@ public interface FeignDeliveryCarInfoService {
      * @return
      */
     @GetMapping("/getAndReturnCarCost")
-    public ResponseData<DistributionCostVO> findDeliveryCostByOrderNo(@RequestParam("carType") Integer carType);
+     ResponseData<DistributionCostVO> findDeliveryCostByOrderNo(@RequestParam("carType") Integer carType);
+
+    /**
+     * 设置油耗里程
+     * @param handoverCarReqVO
+     * @return
+     */
+    @PostMapping("/oil/setOil")
+    ResponseData<?> updateHandoverCarInfo(@RequestBody HandoverCarInfoReqVO handoverCarReqVO);
+
+    /**
+     * 获取油耗里程
+     * @param orderNo
+     * @return
+     */
+    @GetMapping("/oil/list")
+    ResponseData<HandoverCarRespVO> updateHandoverCarInfo(@RequestParam("orderNo") String  orderNo);
 
 }

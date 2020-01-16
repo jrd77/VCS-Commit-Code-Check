@@ -235,6 +235,15 @@ public class ModifyOrderConfirmService {
 			Integer srvReturnFlag = modify.getSrvReturnFlag();
 			if (modify.getTransferFlag() != null && modify.getTransferFlag()) {
 				// 换车操作先取消上笔仁云再新增当前订单
+				OwnerOrderEntity ownerOrderEffective = modify.getOwnerOrderEffective();
+				Integer getMinutes = ownerOrderEffective == null ? 0:ownerOrderEffective.getBeforeMinutes();
+				Integer returnMinutes = ownerOrderEffective == null ? 0:ownerOrderEffective.getAfterMinutes();
+				if (srvGetFlag != null && srvGetFlag == 1) {
+					deliveryCarService.updateRenYunFlowOrderCarInfo(getMinutes, returnMinutes, reqContext, SrvGetReturnEnum.SRV_GET_TYPE.getCode());
+				}
+				if (srvReturnFlag != null && srvReturnFlag == 1) {
+					deliveryCarService.updateRenYunFlowOrderCarInfo(getMinutes, returnMinutes, reqContext, SrvGetReturnEnum.SRV_RETURN_TYPE.getCode());
+				}
 				
 			}
 			// 是否发送仁云
