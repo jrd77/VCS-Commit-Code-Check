@@ -112,6 +112,11 @@ public class CarRentalTimeApiService {
      */
     public boolean checkCarDispatch(CarDispatchReqVO reqVO) {
         LOGGER.info("判断是否进入调度. param is,reqVO:[{}]", JSON.toJSONString(reqVO));
+        if(null == reqVO) {
+            LOGGER.warn("Check car dispatch param is empty.");
+            return false;
+        }
+
         CarDispatchDTO dispatch = new CarDispatchDTO();
         BeanCopier beanCopier = BeanCopier.create(CarDispatchReqVO.class, CarDispatchDTO.class, false);
         beanCopier.copy(reqVO, dispatch, null);
@@ -155,7 +160,9 @@ public class CarRentalTimeApiService {
      */
     public CarDispatchReqVO buildCarDispatchReqVO(OrderEntity orderEntity, OrderStatusEntity orderStatusEntity,
                                                   OrderCouponEntity orderCouponEntity,Integer type) {
-
+        if(null == type) {
+            return null;
+        }
         CarDispatchReqVO carDispatchReqVO = new CarDispatchReqVO();
         carDispatchReqVO.setType(type);
         carDispatchReqVO.setCityCode(Integer.valueOf(orderEntity.getCityCode()));
