@@ -56,10 +56,6 @@ public class CancelOrderController {
             return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), error.isPresent() ?
                     error.get().getDefaultMessage() : ErrorCode.INPUT_ERROR.getText());
         }
-        String memNo = cancelOrderReqVO.getMemNo();
-        if (StringUtils.isBlank(memNo)) {
-            return new ResponseData<>(ErrorCode.NEED_LOGIN.getCode(), ErrorCode.NEED_LOGIN.getText());
-        }
         cancelOrderService.cancel(cancelOrderReqVO);
         return ResponseData.success();
     }
