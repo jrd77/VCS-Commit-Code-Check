@@ -3,6 +3,7 @@ package com.atzuche.order.flow.mapper;
 import com.atzuche.order.commons.entity.dto.OrderFlowRequestDTO;
 import com.atzuche.order.flow.entity.OrderFlowEntity;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -27,4 +28,5 @@ public interface OrderFlowMapper{
 
     List<OrderFlowEntity> selectOrderFlowListByOrderNo(OrderFlowRequestDTO orderFlowRequestVO);
 
+    OrderFlowEntity getByOrderNoAndStatus(@Param("oderNo")String oderNo, @Param("orderStatus")Integer orderStatus);
 }

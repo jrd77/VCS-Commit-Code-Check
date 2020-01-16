@@ -57,7 +57,7 @@ public class SubmitOrderRiskAuditService {
                     JSON.toJSONString(responseData));
             Cat.logEvent(CatConstants.FEIGN_RESULT, JSON.toJSONString(responseData));
 
-            if (null == responseData || !StringUtils.equals(responseData.getResCode(), ErrorCode.SUCCESS.getCode())) {
+            if (!StringUtils.equals(responseData.getResCode(), ErrorCode.SUCCESS.getCode())) {
                 throw new SubmitOrderException(responseData.getResCode(), responseData.getResMsg(), responseData.getData());
             } else {
                 t.setStatus(Transaction.SUCCESS);

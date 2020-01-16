@@ -24,6 +24,7 @@ import com.atzuche.order.parentorder.service.OrderService;
 import com.atzuche.order.parentorder.service.OrderStatusService;
 import com.atzuche.order.rentercommodity.service.RenterCommodityService;
 import com.atzuche.order.rentercommodity.service.RenterGoodsService;
+import com.atzuche.order.rentercost.entity.OrderConsoleSubsidyDetailEntity;
 import com.atzuche.order.rentercost.entity.RenterOrderCostDetailEntity;
 import com.atzuche.order.rentercost.entity.RenterOrderFineDeatailEntity;
 import com.atzuche.order.rentercost.entity.RenterOrderSubsidyDetailEntity;
@@ -113,9 +114,11 @@ public class ModifyOrderService {
 	private ModifyOrderCheckService modifyOrderCheckService;
 	@Autowired
 	private OrderStatusService orderStatusService;
+	@Autowired
+	private OrderConsoleSubsidyDetailService orderConsoleSubsidyDetailService;
 
 	/**
-	 * 修改订单主逻辑
+	 * 修改订单主逻辑（含换车）
 	 * @param modifyOrderReq
 	 * @return ResponseData
 	 */
@@ -159,7 +162,7 @@ public class ModifyOrderService {
 		// 设置城市编号
 		modifyOrderDTO.setCityCode(orderEntity.getCityCode());
 		// 库存校验
-		//modifyOrderCheckService.checkCarStock(modifyOrderDTO);
+		modifyOrderCheckService.checkCarStock(modifyOrderDTO);
 		log.info("ModifyOrderService.modifyOrder again modifyOrderDTO=[{}]", modifyOrderDTO);
 		// 获取修改前租客费用明细
 		List<RenterOrderCostDetailEntity> initCostList = renterOrderCostDetailService.listRenterOrderCostDetail(modifyOrderDTO.getOrderNo(), initRenterOrder.getRenterOrderNo());
@@ -184,9 +187,7 @@ public class ModifyOrderService {
 		// 计算补付金额
 		Integer supplementAmt = getRenterSupplementAmt(modifyOrderDTO, initRenterOrder, renterOrderCostRespDTO, renterFineList);
 		// 计算升级补贴（换车逻辑）
-		RenterOrderSubsidyDetailDTO dispatchingAmtSubsidy = getDispatchingAmtSubsidy(modifyOrderDTO, costBaseDTO, supplementAmt);
-		// 组合升级补贴
-		renterOrderCostRespDTO = combinationDispatchingAmtSubsidy(renterOrderCostRespDTO, dispatchingAmtSubsidy);
+		OrderConsoleSubsidyDetailEntity consoleSubsidy = getDispatchingAmtSubsidy(modifyOrderDTO, costBaseDTO, supplementAmt);
 		/////////////////////////////////////////// 入库 ////////////////////////////////////////
 		// 保存租客商品信息
 		renterGoodsService.save(renterGoodsDetailDTO);
@@ -198,6 +199,8 @@ public class ModifyOrderService {
 		renterOrderCalCostService.saveOrderCostAndDeailList(renterOrderCostRespDTO);
 		// 保存罚金
 		renterOrderFineDeatailService.saveRenterOrderFineDeatailBatch(renterFineList);
+		// 保存升级补贴
+		orderConsoleSubsidyDetailService.saveDispatchingSubsidy(orderNo, consoleSubsidy);
 		// 保存附加驾驶人信息
 		saveAdditionalDriver(modifyOrderDTO);
 		// 保存优惠券信息
@@ -226,13 +229,15 @@ public class ModifyOrderService {
 	 * @param supplementAmt
 	 * @return RenterOrderSubsidyDetailDTO
 	 */
-	public RenterOrderSubsidyDetailDTO getDispatchingAmtSubsidy(ModifyOrderDTO modifyOrderDTO, CostBaseDTO costBaseDTO, Integer supplementAmt) {
+	public OrderConsoleSubsidyDetailEntity getDispatchingAmtSubsidy(ModifyOrderDTO modifyOrderDTO, CostBaseDTO costBaseDTO, Integer supplementAmt) {
 		if (modifyOrderDTO.getTransferFlag() != null && modifyOrderDTO.getTransferFlag() && 
 				supplementAmt != null && supplementAmt > 0) {
 			// 如果是换车操作计算升级车辆补贴
         	RenterOrderSubsidyDetailDTO subsidyDetail = convertToRenterOrderSubsidyDetailDTO(costBaseDTO, supplementAmt, SubsidyTypeCodeEnum.RENT_COST_AMT, 
         			SubsidySourceCodeEnum.PLATFORM, SubsidySourceCodeEnum.RENTER, RenterCashCodeEnum.DISPATCHING_AMT, "换车补贴");
-        	return subsidyDetail;
+        	OrderConsoleSubsidyDetailEntity consoleSubsidy = new OrderConsoleSubsidyDetailEntity();
+        	BeanUtils.copyProperties(subsidyDetail, consoleSubsidy);
+        	return consoleSubsidy;
 		}
 		return null;
 	}
@@ -727,7 +732,7 @@ public class ModifyOrderService {
 		renterOrderNew.setIsAbatement(modifyOrderDTO.getAbatementFlag());
 		renterOrderNew.setIsEffective(0);
 		renterOrderNew.setAgreeFlag(0);
-		renterOrderNew.setCreateOp(null);
+		renterOrderNew.setCreateOp(modifyOrderDTO.getOperator());
 		renterOrderNew.setCreateTime(null);
 		renterOrderNew.setUpdateOp(null);
 		renterOrderNew.setUpdateTime(null);

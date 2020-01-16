@@ -30,6 +30,10 @@ public class OwnerGoodsPriceDetailDTO {
      */
     @AutoDocProperty("天")
     private LocalDate carDay;
+
+    @AutoDocProperty("天")
+    private String carDayStr;
+
     /**
      * 天单价
      */

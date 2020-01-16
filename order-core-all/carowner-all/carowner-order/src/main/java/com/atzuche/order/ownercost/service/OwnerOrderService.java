@@ -10,6 +10,7 @@ import com.atzuche.order.ownercost.entity.dto.OwnerOrderReqDTO;
 import com.atzuche.order.ownercost.mapper.OwnerOrderMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.annotations.Param;
+import org.omg.PortableInterceptor.INACTIVE;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -64,6 +65,17 @@ public class OwnerOrderService {
     public Integer updateOwnerOrderInvalidById(Integer id) {
     	return ownerOrderMapper.updateOwnerOrderInvalidById(id);
     }
+
+    /**
+     * 依据主键更新车主订单信息
+     *
+     * @param ownerOrderEntity 车主订单信息
+     * @return Integer
+     */
+    public Integer updateOwnerOrderInfo(OwnerOrderEntity ownerOrderEntity){
+        return ownerOrderMapper.updateByPrimaryKey(ownerOrderEntity);
+    }
+
     
     /**
      * 保存车主子订单

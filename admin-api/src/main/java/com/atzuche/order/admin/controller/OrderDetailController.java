@@ -27,7 +27,7 @@ public class OrderDetailController {
 
     @AutoDocMethod(description = "订单历史信息", value = "订单历史信息",response = OrderHistoryRespDTO.class)
     @RequestMapping(value = "console/order/history/list", method = RequestMethod.GET)
-    public ResponseData<OrderHistoryRespDTO/*OrderShortDetailListVO*/> listOrderHistory(@RequestParam("orderNo") String orderNo)throws Exception{
+    public ResponseData<OrderHistoryRespDTO> listOrderHistory(@RequestParam("orderNo") String orderNo)throws Exception{
         if(orderNo == null || orderNo.trim().length()<=0){
             ResponseData responseData = new ResponseData();
             responseData.setData(null);
