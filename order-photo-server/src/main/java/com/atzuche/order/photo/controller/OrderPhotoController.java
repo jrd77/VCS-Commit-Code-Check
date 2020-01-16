@@ -9,6 +9,7 @@ import com.atzuche.order.photo.service.OrderPhotoService;
 import com.atzuche.order.photo.util.oss.PicUtils;
 import com.atzuche.order.photo.vo.req.OrderDeleteRequestVO;
 import com.atzuche.order.photo.vo.req.OrderRequestVO;
+import com.atzuche.order.photo.vo.req.OrderUpdateRequestVO;
 import com.atzuche.order.photo.vo.req.OrderUploadRequestVO;
 import com.atzuche.order.photo.vo.resp.OrderPhotoResponseVO;
 import com.atzuche.order.photo.vo.resp.OrderViolationPhotoResponseVO;
@@ -120,7 +121,7 @@ public class OrderPhotoController{
 					
 				}
 				if(data != null && data.size()>0){
-					msg = orderPhotoService.uploadOrderPhoto(data,orderUploadRequestVO.getPhotoType(),orderUploadRequestVO.getOrderNo(), operator);
+					orderPhotoService.uploadOrderPhoto(data,orderUploadRequestVO.getPhotoType(),orderUploadRequestVO.getOrderNo(), operator);
 				}
 			}
 
@@ -141,6 +142,50 @@ public class OrderPhotoController{
 	@AutoDocMethod(description = "删除订单照片", value = "删除订单照片", response = ResponseData.class)
 	public ResponseData delOrderPhoto(@RequestBody OrderDeleteRequestVO orderDeleteRequestVO){
 		orderPhotoService.delOrderPhoto(orderDeleteRequestVO.getPhotoType(),orderDeleteRequestVO.getPhotoId());
+		return ResponseData.success();
+	}
+
+
+	/**
+	 *
+	 * @Title: uploadOrderPhoto
+	 * @Description: (上传订单照片)
+	 * @param @param orderNo
+	 * @param @param uploadType
+	 * @param @param files
+	 * @param @param request
+	 * @param @param redirectAttributes
+	 * @param @return
+	 * @param @throws Exception    设定文件
+	 * @return String    返回类型
+	 * @throws
+	 */
+	@PostMapping("update")
+	@AutoDocMethod(description = "变更订单照片", value = "变更订单照片", response = ResponseData.class)
+	public ResponseData updateOrderPhoto(@RequestParam("picFile") MultipartFile multipartFile, @Valid OrderUpdateRequestVO orderUpdateRequestVO) throws Exception {
+		String operator =  AdminUserUtil.getAdminUser().getAuthName();
+		String msg = null;
+		if(multipartFile !=null){
+			try {
+				InputStream inputTmp = multipartFile.getInputStream();
+				int fileSize = inputTmp.available();
+				logger.info("Upload File size:{}",fileSize);
+				if(fileSize > PicUtils.FILE_LIMIT_SIZE){
+					msg ="上传文件不能大于3M";
+				}
+
+				String picType = PicUtils.getPicType((InputStream)inputTmp);
+				if(!PicUtils.TYPE_JPG.equals(picType)&&!PicUtils.TYPE_PNG.equals(picType)){
+					logger.error("不支持该图片格式！");
+					msg= "上传失败,请上传 jpg 或  png 格式的图片";
+				}
+				orderPhotoService.uploadOrderPhoto(multipartFile, orderUpdateRequestVO.getPhotoId(), operator);
+			}catch (IOException e) {
+				logger.error("上传违章处理图片报IO流异常："+e.getMessage());
+
+			}
+		}
+
 		return ResponseData.success();
 	}
 
