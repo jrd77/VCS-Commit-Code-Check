@@ -89,7 +89,7 @@ public class CashierNoTService {
     public RenterOrderEntity getRenterOrderNoByOrderNo(String orderNo){
         RenterOrderEntity renterOrderEntity =  renterOrderService.getRenterOrderByOrderNoAndWaitPay(orderNo);
         if(Objects.isNull(renterOrderEntity) || StringUtil.isBlank(renterOrderEntity.getRenterOrderNo())){
-            throw new AccountRenterWZDepositException();
+           return new RenterOrderEntity();
         }
         return renterOrderEntity;
     }

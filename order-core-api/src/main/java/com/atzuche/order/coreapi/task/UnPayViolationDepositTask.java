@@ -43,7 +43,7 @@ public class UnPayViolationDepositTask extends IJobHandler {
     public ReturnT<String> execute(String s) throws Exception {
         Transaction t = Cat.getProducer().newTransaction(CatConstants.XXL_JOB_CALL, "定时 查询订单开始仍未支付违章押金，发邮件 定时任务");
         try {
-            Cat.logEvent(CatConstants.XXL_JOB_METHOD,"renterAutoCancelTask.execute");
+            Cat.logEvent(CatConstants.XXL_JOB_METHOD,"unPayViolationDepositTask.execute");
             Cat.logEvent(CatConstants.XXL_JOB_PARAM,null);
             logger.info("开始执行 查询订单开始仍未支付违章押金，发邮件  定时器");
             XxlJobLogger.log("开始执行 查询订单开始仍未支付违章押金，发邮件 定时器");

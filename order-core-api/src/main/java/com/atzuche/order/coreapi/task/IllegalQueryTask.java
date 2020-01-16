@@ -46,7 +46,7 @@ public class IllegalQueryTask extends IJobHandler {
     public ReturnT<String> execute(String s) throws Exception {
         Transaction t = Cat.getProducer().newTransaction(CatConstants.XXL_JOB_CALL, "查询按规则配置日期内完成的订单，获取待查询违章的对象列表 ，查询是否有违章记录");
         try {
-            Cat.logEvent(CatConstants.XXL_JOB_METHOD,"IllegalInOrderQueryTask.execute");
+            Cat.logEvent(CatConstants.XXL_JOB_METHOD,"illegalQueryTask.execute");
             Cat.logEvent(CatConstants.XXL_JOB_PARAM,null);
             logger.info("开始执行 查询按规则配置日期内完成的订单，获取待查询违章的对象列表 ，查询是否有违章记录  定时器");
             XxlJobLogger.log("开始执行 查询按规则配置日期内完成的订单，获取待查询违章的对象列表 ，查询是否有违章记录 定时器");

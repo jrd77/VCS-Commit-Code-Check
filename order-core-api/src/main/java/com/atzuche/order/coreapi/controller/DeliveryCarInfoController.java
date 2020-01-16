@@ -67,7 +67,7 @@ public class DeliveryCarInfoController {
      * @param orderNo
      * @return
      */
-    @PostMapping("/delivery/list")
+    @GetMapping("/delivery/list")
     public ResponseData<List<RenterOrderDeliveryRepVO>> findRenterOrderListByOrderNo(@RequestParam("orderNo") String orderNo) {
         if (StringUtils.isBlank(orderNo)) {
             return new ResponseData(ErrorCode.INPUT_ERROR.getCode(), ErrorCode.INPUT_ERROR.getText());
@@ -88,7 +88,7 @@ public class DeliveryCarInfoController {
      * @param carType
      * @return
      */
-    @PostMapping("/getAndReturnCarCost")
+    @GetMapping("/getAndReturnCarCost")
     public ResponseData<DistributionCostVO> findDeliveryCostByOrderNo(@RequestParam("carType") Integer carType) {
         DistributionCostVO distributionCostVO = deliveryCarInfoPriceService.getDistributionCost(carType);
         return ResponseData.success(distributionCostVO);

@@ -156,5 +156,8 @@
 		</set>
 		where id = #{id} and version = #{version}
 	</update>
-  	
+    <select id="getsettleAmtByOrderNo" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List" /> from account_owner_cost_settle where order_no = #{orderNo} and owner_order_no = #{ownerOrderNo}
+    </select>
+
 </mapper>

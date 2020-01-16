@@ -3,6 +3,7 @@ package com.atzuche.order.coreapi.service;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +20,7 @@ import com.atzuche.order.coreapi.modifyorder.exception.ModifyOrderGoodPriceNotEx
 import com.atzuche.order.coreapi.modifyorder.exception.ModifyOrderMemberNotExistException;
 import com.atzuche.order.coreapi.modifyorder.exception.ModifyOrderParentOrderNotFindException;
 import com.atzuche.order.coreapi.modifyorder.exception.ModifyOrderRentOrRevertTimeException;
+import com.atzuche.order.coreapi.modifyorder.exception.TransferUseOwnerCouponException;
 import com.atzuche.order.parentorder.entity.OrderEntity;
 import com.atzuche.order.renterorder.entity.RenterOrderChangeApplyEntity;
 import com.atzuche.order.renterorder.entity.dto.OrderChangeItemDTO;
@@ -103,6 +105,8 @@ public class ModifyOrderCheckService {
 			// 校验是否有未处理的申请
 			checkChangeApply(modifyOrderDTO.getOrderNo());
 		}
+		// 使用车主券不允许换车
+		checkUserOwnerCoupon(modifyOrderDTO);
 	}
 	
 	/**
@@ -197,6 +201,21 @@ public class ModifyOrderCheckService {
 		if (changeApplyCount != null && changeApplyCount > 0) {
 			Cat.logError("ModifyOrderCheckService.checkChangeApply校验是否有未处理的申请", new ModifyOrderExistTODOChangeApplyException());
 			throw new ModifyOrderExistTODOChangeApplyException();
+		}
+	}
+	
+	/**
+	 * 使用车主券不允许换车
+	 * @param modifyOrderDTO
+	 */
+	public void checkUserOwnerCoupon(ModifyOrderDTO modifyOrderDTO) {
+		if (modifyOrderDTO.getTransferFlag() != null && modifyOrderDTO.getTransferFlag()) {
+			// 换车操作
+			if (StringUtils.isNotBlank(modifyOrderDTO.getCarOwnerCouponId())) {
+				// 使用车主券不允许换车
+				Cat.logError("ModifyOrderCheckService.checkUserOwnerCoupon校验使用车主券不允许换车", new TransferUseOwnerCouponException());
+				throw new TransferUseOwnerCouponException();
+			}
 		}
 	}
 }
