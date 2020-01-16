@@ -11,10 +11,9 @@ buildscript {
 
 apply plugin: 'dependency-management'
 apply plugin: 'org.springframework.boot'
-apply plugin: 'application'
+//apply plugin: 'application'
 apply plugin: 'war'
 apply plugin: 'application'
-
 mainClassName='com.autoyol.doc.parser.autodoc.AutoDocParser'
 
 
