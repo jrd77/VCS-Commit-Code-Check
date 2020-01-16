@@ -2,7 +2,7 @@ package com.atzuche.order.mq.listener;
 
 import com.alibaba.fastjson.JSONObject;
 import com.atzuche.order.mq.common.base.OrderMessage;
-import com.atzuche.order.mq.util.SendPlatformSmsService;
+import com.atzuche.order.mq.util.MQSendPlatformSmsService;
 import com.dianping.cat.Cat;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Message;
@@ -21,7 +21,7 @@ import org.springframework.stereotype.Component;
 public class OrderActionEventListener {
 
     @Autowired
-    SendPlatformSmsService sendPlatformSmsService;
+    MQSendPlatformSmsService sendPlatformSmsService;
 
     @RabbitListener(bindings = {@QueueBinding(value = @Queue(value = "order_action_01", durable = "true"),
             exchange = @Exchange(value = "auto-order-action", durable = "true", type = "topic"), key = "action.#")

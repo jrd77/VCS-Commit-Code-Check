@@ -16,9 +16,9 @@ import java.util.*;
  * @date ：Created in 2019/11/8 17:31
  */
 @Service
-public class SendPlatformSmsService {
+public class MQSendPlatformSmsService {
 
-    private static final Logger logger = LoggerFactory.getLogger(SendPlatformSmsService.class);
+    private static final Logger logger = LoggerFactory.getLogger(MQSendPlatformSmsService.class);
 
     @Autowired
     private RabbitTemplate rabbitTemplate;
