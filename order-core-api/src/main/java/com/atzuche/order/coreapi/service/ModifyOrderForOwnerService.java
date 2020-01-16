@@ -341,6 +341,10 @@ public class ModifyOrderForOwnerService {
 		BeanUtils.copyProperties(ownerOrderEntity, ownerOrderEntityEffective);
 		ownerOrderEntityEffective.setOwnerOrderNo(modifyOrderOwnerDTO.getOwnerOrderNo());
 		ownerOrderEntityEffective.setId(null);
+		ownerOrderEntityEffective.setUpdateOp(null);
+		ownerOrderEntityEffective.setUpdateTime(null);
+		ownerOrderEntityEffective.setCreateOp(null);
+		ownerOrderEntityEffective.setCreateTime(null);
 		ownerOrderEntityEffective.setIsEffective(1);
 		ownerOrderEntityEffective.setExpRentTime(modifyOrderOwnerDTO.getRentTime());
 		ownerOrderEntityEffective.setExpRevertTime(modifyOrderOwnerDTO.getRevertTime());
@@ -481,6 +485,7 @@ public class ModifyOrderForOwnerService {
 					omr.setOwnerOrderNo(updOwnerOrderNo);
 				}
 			}
+			return ownerMemberTransferDTO;
 		}
 		OwnerMemberDTO ownerMemberDTO = ownerMemberService.selectownerMemberByOwnerOrderNo(ownerOrderNo, true);
 		ownerMemberDTO.setOwnerOrderNo(updOwnerOrderNo);
