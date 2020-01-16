@@ -10,7 +10,7 @@ public interface OrderPhotoMapper {
 
 	List<OrderPhotoEntity> queryGetSrvCarList(@Param("orderNo") String orderNo, @Param("type") String type);
 
-	void addUploadOrderPhoto(@Param("orderNo") String orderNo, @Param("path") String path, @Param("photoType") String photoType, @Param("userType") String userType, @Param("operator") String operator);
+	void addUploadOrderPhoto(@Param("orderNo") String orderNo, @Param("path") String path, @Param("photoType") String photoType, @Param("userType") String userType, @Param("operator") String operator, @Param("carPlateNum") String carPlateNum);
 
 	void updateUploadOrderPhoto(@Param("photoId") String photoId, @Param("path") String path, @Param("operator") String operator, @Param("userType") String userType, @Param("photoType") String photoType);
 

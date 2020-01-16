@@ -668,4 +668,66 @@ public class OrderSearchRemoteService {
         }
         return new ArrayList<>();
     }
+
+    public List<String> queryOrderNosWithTransIllegalSettle() {
+        //获取城市违章天数配置
+        List<WzQueryDayConfEntity> configs = wzQueryDayConfService.queryAll();
+        //转换数据
+        Map<Integer, List<Integer>> map = wzQueryDayConfService.convertTranQueryDayByList(configs);
+        return this.queryIllegalSettle(map);
+    }
+
+    private List<String> queryIllegalSettle(Map<Integer, List<Integer>> map) {
+        Transaction t = Cat.getProducer().newTransaction(CatConstants.FEIGN_CALL, "查询可结算的订单");
+        if (CollectionUtils.isEmpty(map)) {
+            return new ArrayList<>();
+        }
+        //用treeMap，默认按KEY的增值排序
+        TreeMap<Integer, List<Integer>> treeMap = new TreeMap<>(map);
+        //最小的天数
+        Integer min = treeMap.firstKey();
+        try {
+            ViolateVO reqVO = new ViolateVO();
+            reqVO.setPageNum(1);
+            reqVO.setPageSize(10000);
+            reqVO.setType("10");
+            reqVO.setDate(DateUtils.minDays(min));
+            Cat.logEvent(CatConstants.FEIGN_METHOD,"orderSearchService.violateProcessOrder");
+            Cat.logEvent(CatConstants.FEIGN_PARAM, JSON.toJSONString(reqVO));
+            ResponseData<OrderVO<ViolateBO>> orderResponseData = orderSearchService.violateProcessOrder(reqVO);
+            Cat.logEvent(CatConstants.FEIGN_RESULT, JSON.toJSONString(orderResponseData));
+            if(orderResponseData != null && orderResponseData.getResCode() != null
+                    && ErrorCode.SUCCESS.getCode().equals(orderResponseData.getResCode()) && orderResponseData.getData() != null){
+                List<ViolateBO> orderList = orderResponseData.getData().getOrderList();
+                if(CollectionUtils.isEmpty(orderList)){
+                    return new ArrayList<>();
+                }
+                orderList = orderList.stream().filter(this::filterCanSettle).collect(Collectors.toList());
+                if(CollectionUtils.isEmpty(orderList)){
+                    return new ArrayList<>();
+                }
+                return  orderList.stream().map(ViolateBO::getOrderNo).collect(Collectors.toList());
+            }else{
+                return new ArrayList<>();
+            }
+        } catch (Exception e) {
+            logger.error("执行 查询可结算的订单 异常",e);
+            Cat.logError("执行 查询可结算的订单 异常",e);
+        }finally {
+            t.complete();
+        }
+        return new ArrayList<>();
+    }
+
+    private boolean filterCanSettle(ViolateBO violate) {
+        if(violate == null){
+            return false;
+        }
+        //已支付 违章押金
+        if(violate.getWzPayStatus() != null && violate.getWzPayStatus().equals(1)){
+            return true;
+        }
+        //被暂扣
+        return violate.getIsDetain() != null && violate.getIsDetain().equals(1);
+    }
 }

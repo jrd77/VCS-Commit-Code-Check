@@ -11,7 +11,7 @@ public class OrderHistoryRespDTO {
      * 主订单
      */
     @AutoDocProperty("主订单")
-    public OrderDTO orderDTO;
+    public OrderDetailDTO orderDetailDTO;
     /**
      * 车主详情
      */

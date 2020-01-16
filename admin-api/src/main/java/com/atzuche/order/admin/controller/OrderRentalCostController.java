@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
  * 该类中注释掉的接口方法 分离挪动到 OrderRentalCostDetailController 租客费用明细类中。余下的保留不动。
  */
 @RestController
-@RequestMapping("/api/cost")
+@RequestMapping("/console/api/cost")
 public class OrderRentalCostController {
 
     @Autowired

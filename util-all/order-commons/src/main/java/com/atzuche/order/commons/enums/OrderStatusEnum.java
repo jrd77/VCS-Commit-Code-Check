@@ -89,6 +89,18 @@ public enum OrderStatusEnum {
         }
         throw new RuntimeException("the value of status :"+status+" not supported,please check");
     }
+    public static String getDescByStatus(Integer status){
+        if(status == null){
+            return null;
+        }
 
+        OrderStatusEnum[] values = OrderStatusEnum.values();
+        for (int i = 0; i < values.length; i++) {
+            if(values[i].getStatus() == (status)){
+                return values[i].desc;
+            }
+        }
+        return null;
+    }
 
 }

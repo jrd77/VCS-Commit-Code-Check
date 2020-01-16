@@ -107,5 +107,13 @@
     <select id="selectOrderFlowListByOrderNo" resultMap="BaseResultMap">
         select <include refid="Base_Column_List" /> from order_flow where order_no = #{orderNo} and is_delete = 0
     </select>
-  	
+    <select id="getByOrderNoAndStatus" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List" /> from order_flow
+        where order_no = #{oderNo}
+        and order_status = #{orderStatus}
+        and is_delete = 0
+        order by id
+        desc limit 1
+    </select>
+
 </mapper>

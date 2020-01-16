@@ -4,6 +4,7 @@ import com.atzuche.order.renterwz.entity.RenterOrderWzSettleFlagEntity;
 import com.atzuche.order.renterwz.entity.RenterOrderWzStatusEntity;
 import com.atzuche.order.renterwz.mapper.RenterOrderWzSettleFlagMapper;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -74,8 +75,25 @@ public class RenterOrderWzSettleFlagService {
         }
     }
 
-    public void updateSettle(String orderNo) {
-        //结算成功后的处理
+    /**
+     * 违章押金结算后 调用
+     * @param orderNo 订单号
+     * @param isSuccessful 是否结算成功 1 成功  0 失败
+     */
+    public void updateSettle(String orderNo,Integer isSuccessful) {
+        if(StringUtils.isBlank(orderNo) || isSuccessful == null){
+            return;
+        }
+        if(isSuccessful.equals(1)){
+            //结算成功后的处理
+            this.settleSuccess(orderNo);
+        }else{
+            //结算失败
+            updateIllegalSettleFlagFail(orderNo);
+        }
+    }
+
+    private void settleSuccess(String orderNo){
         this.updateIllegalSettleFlagSuccess(orderNo);
         List<RenterOrderWzStatusEntity> list = renterOrderWzStatusService.queryInfosByOrderNo(orderNo);
         if(CollectionUtils.isNotEmpty(list)){
@@ -94,6 +112,10 @@ public class RenterOrderWzSettleFlagService {
 
     private void updateIllegalSettleFlagSuccess(String orderNo) {
         renterOrderWzSettleFlagMapper.updateSettleFlag(orderNo,SETTLE_FLAG_SUCCESS,"违章结算定时任务");
+    }
+
+    private void updateIllegalSettleFlagFail(String orderNo) {
+        renterOrderWzSettleFlagMapper.updateSettleFlag(orderNo,SETTLE_FLAG_ERROR,"违章结算定时任务");
     }
 
     public List<RenterOrderWzSettleFlagEntity> getIllegalSettleInfosByOrderNo(String orderNo) {
