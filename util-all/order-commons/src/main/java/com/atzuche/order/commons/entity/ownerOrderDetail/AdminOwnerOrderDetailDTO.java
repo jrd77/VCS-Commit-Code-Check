@@ -25,9 +25,9 @@ public class AdminOwnerOrderDetailDTO {
     @AutoDocProperty("车主租客互相调价详情")
     private RenterOwnerPriceDTO renterOwnerPriceDTO;
     @AutoDocProperty("超里程费用")
-    private Integer mileageAmt;
+    private String mileageAmt;
     @AutoDocProperty("油费")
-    private Integer oilAmt;
+    private String oilAmt;
     @AutoDocProperty("加油服务费")
     private Integer oilServiceAmt;
 
@@ -52,7 +52,7 @@ public class AdminOwnerOrderDetailDTO {
     @AutoDocProperty("给租客的优惠")
     private Integer renterDiscountAmt;
     @AutoDocProperty("车主券名称")
-    private Integer ownerCouponName;
+    private String ownerCouponName;
     @AutoDocProperty("车主券金额")
     private Integer ownerCouponAmt;
 

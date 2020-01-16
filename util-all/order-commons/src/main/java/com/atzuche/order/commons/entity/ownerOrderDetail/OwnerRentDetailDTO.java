@@ -9,11 +9,11 @@ import java.util.List;
 @Data
 public class OwnerRentDetailDTO {
     @AutoDocProperty("请求时间")
-    private String reqTime;
+    private String reqTimeStr;
     @AutoDocProperty("开始时间")
-    private String rentTime;
+    private String rentTimeStr;
     @AutoDocProperty("结束时间")
-    private String revertTime;
+    private String revertTimeStr;
     @AutoDocProperty("日均价")
     private Integer dayAverageAmt;
     @AutoDocProperty("一天一价列表")

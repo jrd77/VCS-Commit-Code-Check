@@ -1,18 +1,31 @@
-package com.atzuche.order.admin.vo.resp.cost;
+/**
+ * 
+ */
+package com.atzuche.order.admin.vo.req.cost;
+
+import org.hibernate.validator.constraints.NotBlank;
 
 import com.autoyol.doc.annotation.AutoDocProperty;
+
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.ToString;
 
 /**
- * @author 胡春林
- * 附加驾驶员险
+ * @author jing.huang
+ *
  */
 @Data
 @ToString
-public class AdditionalDriverInsuranceVO {
-
+public class RenterAddDriveCostReqVO {
+	@NotBlank(message="订单编号不能为空")
+	@AutoDocProperty(value="订单编号,必填，",required=true)
+	private String orderNo;
+	
+    @ApiModelProperty(value="租客子订单号",required=true)
+    @NotBlank(message="renterOrderNo不能为空")
+    private String renterOrderNo;
+    
     @AutoDocProperty("姓名")
     private String realName;
     @AutoDocProperty("手机号")
@@ -29,6 +42,4 @@ public class AdditionalDriverInsuranceVO {
     private String driverEndTime;
     @AutoDocProperty("附加驾驶员险费用")
     private String driverAmt;
-//    @ApiModelProperty(value="子订单号",required=true)
-//    private String renterOrderNo;
 }
