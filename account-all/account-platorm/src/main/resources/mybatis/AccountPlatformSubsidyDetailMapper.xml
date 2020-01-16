@@ -113,5 +113,8 @@
 		</set>
 		where id = #{id}
 	</update>
-  	
+    <select id="getPlatformSubsidyDetails" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List" /> from account_platform_subsidy_detail where order_no = #{orderNo}
+    </select>
+
 </mapper>
