@@ -91,8 +91,6 @@ public class OrderPhotoController{
     public ResponseData uploadOrderPhoto(@RequestParam("picFiles") MultipartFile[] files, @Valid OrderUploadRequestVO orderUploadRequestVO, BindingResult bindingResult) throws Exception {
         validateParameter(bindingResult);
 	    String operator =  AdminUserUtil.getAdminUser().getAuthName();
-
-		String msg = null;
 			if(files !=null && files.length >0){
 				List<MultipartFile> data = new ArrayList<MultipartFile>();
 				if(files.length>10 ){
