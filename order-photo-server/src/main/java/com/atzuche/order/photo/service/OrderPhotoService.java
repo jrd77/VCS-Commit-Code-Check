@@ -44,7 +44,7 @@ public class OrderPhotoService {
 				OrderPhotoDTO orderPhotoDTO = new OrderPhotoDTO();
 				BeanUtils.copyProperties(photoEntity, orderPhotoDTO);
 				orderPhotoDTO.setUserTypeText(UserTypeEnum.getDescriptionByType(photoEntity.getUserType()));
-				orderPhotoDTO.setCreateTime(DateUtils.formate(photoEntity.getCreateTime(), DateUtils.DATE_DEFAUTE1));
+				orderPhotoDTO.setCreateTime(DateUtils.formate(photoEntity.getUpdateTime(), DateUtils.DATE_DEFAUTE1));
 				carPhotoList.add(orderPhotoDTO);
 			});
 		}
@@ -96,7 +96,7 @@ public class OrderPhotoService {
 			violationPhotoList.forEach(violationPhoto -> {
 				OrderPhotoDTO orderPhotoDTO = new OrderPhotoDTO();
 				BeanUtils.copyProperties(violationPhoto, orderPhotoDTO);
-				orderPhotoDTO.setCreateTime(DateUtils.formate(violationPhoto.getCreateTime(),DateUtils.DATE_DEFAUTE1));
+				orderPhotoDTO.setCreateTime(DateUtils.formate(violationPhoto.getUpdateTime(),DateUtils.DATE_DEFAUTE1));
 				orderPhotoDTO.setUserTypeText(UserTypeEnum.getDescriptionByType(violationPhoto.getUserType()));
 
 				//租客上传
@@ -149,7 +149,7 @@ public class OrderPhotoService {
 		//平台上传
 		String userType = UserTypeEnum.PLATFORM.getType();
 		InputStream input = null;
-		OrderPhotoEntity orderPhotoEntity = orderPhotoMapper.queryPhotoInfo(orderUpdateRequestVO.getPhotoId());
+		OrderPhotoEntity orderPhotoEntity = orderPhotoMapper.queryPhotoInfo(orderUpdateRequestVO.getPhotoId(), orderUpdateRequestVO.getPhotoType());
 		String orderNo = orderPhotoEntity.getOrderNo();
 		try {
 			String relativePath = orderNo + "/";// 图片相对路径

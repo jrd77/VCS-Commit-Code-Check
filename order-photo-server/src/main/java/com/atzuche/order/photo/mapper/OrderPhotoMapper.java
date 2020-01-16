@@ -37,11 +37,11 @@ public interface OrderPhotoMapper {
 
 
 	/**
-	 * 获取违章信息
+	 * 获取照片信息
 	 * @param photoId
 	 * @return
 	 */
-	OrderPhotoEntity queryPhotoInfo(@Param("photoId") String photoId);
+	OrderPhotoEntity queryPhotoInfo(@Param("photoId") String photoId, @Param("photoType") String photoType);
 
 
 
