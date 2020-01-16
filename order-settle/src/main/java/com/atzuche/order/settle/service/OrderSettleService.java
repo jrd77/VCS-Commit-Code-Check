@@ -99,7 +99,7 @@ public class OrderSettleService{
                          + settleOrdersDefinition.getOwnerCostAmt() + settleOrdersDefinition.getOwnerSubsidyAmt()
                          + settleOrdersDefinition.getRentCostAmt() + settleOrdersDefinition.getRentSubsidyAmt();
             if(totleAmt != 0){
-                //TODO 走告警
+                //TODO 走Cat告警
                 throw new OrderSettleFlatAccountException();
             }
             //开启事务
