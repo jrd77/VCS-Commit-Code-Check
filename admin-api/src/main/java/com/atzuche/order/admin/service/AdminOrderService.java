@@ -5,9 +5,11 @@ import com.atzuche.order.admin.exception.OrderCancelErrException;
 import com.atzuche.order.admin.exception.OrderCancelFailException;
 import com.atzuche.order.admin.exception.OrderModifyErrException;
 import com.atzuche.order.admin.exception.OrderModifyFailException;
+import com.atzuche.order.admin.vo.req.order.CancelOrderByPlatVO;
 import com.atzuche.order.admin.vo.req.order.CancelOrderVO;
 import com.atzuche.order.car.RenterCarDetailFailException;
 import com.atzuche.order.commons.CatConstants;
+import com.atzuche.order.commons.vo.req.AdminOrderCancelReqVO;
 import com.atzuche.order.commons.vo.req.CancelOrderReqVO;
 import com.atzuche.order.commons.vo.req.ModifyOrderReqVO;
 import com.atzuche.order.open.service.FeignOrderModifyService;
@@ -61,6 +63,42 @@ public class AdminOrderService {
         }
         return responseObject;
     }
+
+    /**
+     * 平台取消订单
+     * @param platVO
+     */
+    public void cancelOrderByAdmin(CancelOrderByPlatVO platVO){
+        Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "订单CoreAPI");
+        try{
+            Cat.logEvent(CatConstants.FEIGN_METHOD,"FeignOrderUpdateService.cancelOrder");
+            log.info("Feign 开始修改订单,platVO={}", JSON.toJSONString(platVO));
+            Cat.logEvent(CatConstants.FEIGN_PARAM,JSON.toJSONString(platVO));
+            AdminOrderCancelReqVO adminOrderCancelReqVO = new AdminOrderCancelReqVO();
+            BeanUtils.copyProperties(platVO,adminOrderCancelReqVO);
+            ResponseData responseObject = feignOrderUpdateService.adminCancelOrder(adminOrderCancelReqVO);
+            Cat.logEvent(CatConstants.FEIGN_RESULT,JSON.toJSONString(responseObject));
+            if(responseObject == null || !ErrorCode.SUCCESS.getCode().equals(responseObject.getResCode())){
+                log.error("Feign 取消订单失败,responseObject={},cancelReq={}",JSON.toJSONString(responseObject),JSON.toJSONString(platVO));
+                OrderModifyFailException failException = new OrderModifyFailException();
+                Cat.logError("Feign 取消订单失败",failException);
+                throw failException;
+            }
+            t.setStatus(Transaction.SUCCESS);
+        }catch (RenterCarDetailFailException e){
+            Cat.logError("Feign 取消订单失败",e);
+            t.setStatus(e);
+            throw e;
+        }catch (Exception e){
+            log.error("调用远程取消订单失败,param={}",platVO,e);
+            Cat.logError("Feign 取消订单失败",e);
+            throw e;
+        }finally {
+            t.complete();
+        }
+    }
+
+
     public ResponseData modifyOrder(ModifyOrderReqVO modifyOrderReq) {
         ResponseData<?> responseObject = null;
         Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "租客商品信息");

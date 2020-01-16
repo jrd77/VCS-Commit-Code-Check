@@ -182,4 +182,7 @@
             )
         </foreach>
     </insert>
+    <select id="getByOwnerOrderNo" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List" /> from owner_goods_price_detail where owner_order_no = #{ownerOrderNo} and is_delete = 0
+    </select>
 </mapper>

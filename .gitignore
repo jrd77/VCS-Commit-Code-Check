@@ -227,6 +227,7 @@ config/build/resources/main/mybatis/
 config/build/
 config/out/
 order-flow/build/
+order-photo-server/doc/
 
 config/config-server/build/
 order-log/build/
