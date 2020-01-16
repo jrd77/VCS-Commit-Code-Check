@@ -106,9 +106,8 @@ public class OrderController {
             memNo = detailRespDTO.getOwnerMember().getMemNo();
         }
         if (StringUtils.isBlank(memNo)) {
-            return new ResponseData<>(ErrorCode.NEED_LOGIN.getCode(), ErrorCode.NEED_LOGIN.getText());
+            return new ResponseData<>(ErrorCode.ORDER_NOT_EXIST.getCode(), ErrorCode.ORDER_NOT_EXIST.getText());
         }
-        cancelOrderVO.setMemNo(memNo);
         ResponseData responseData = adminOrderService.cancelOrder(cancelOrderVO);
         return responseData;
     }

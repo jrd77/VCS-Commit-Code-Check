@@ -1,8 +1,9 @@
 package com.atzuche.order.accountownercost.entity;
 
+import lombok.Data;
+
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import lombok.Data;
 
 
 /**
@@ -24,6 +25,11 @@ public class AccountOwnerCostSettleEntity implements Serializable {
 	 * 会员号
 	 */
 	private String memNo;
+    /**
+     * 最终收益
+     */
+	private Integer incomeAmt;
+
 	/**
 	 * 车主订单号
 	 */

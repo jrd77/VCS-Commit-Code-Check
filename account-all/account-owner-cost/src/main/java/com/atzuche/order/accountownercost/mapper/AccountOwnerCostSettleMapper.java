@@ -2,7 +2,7 @@ package com.atzuche.order.accountownercost.mapper;
 
 import com.atzuche.order.accountownercost.entity.AccountOwnerCostSettleEntity;
 import org.apache.ibatis.annotations.Mapper;
-import java.util.List;
+import org.apache.ibatis.annotations.Param;
 
 /**
  *   车主结算费用总表
@@ -21,4 +21,5 @@ public interface AccountOwnerCostSettleMapper{
     
     int updateByPrimaryKeySelective(AccountOwnerCostSettleEntity record);
 
+    AccountOwnerCostSettleEntity getsettleAmtByOrderNo(@Param("orderNo")String orderNo, @Param("ownerOrderNo")String ownerOrderNo);
 }

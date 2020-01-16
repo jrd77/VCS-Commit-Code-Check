@@ -471,7 +471,16 @@ public class ModifyOrderForOwnerService {
 		if (modifyOrderOwnerDTO.getTransferFlag() != null && modifyOrderOwnerDTO.getTransferFlag()) {
 			// 换车操作调远程服务获取
 			//车主会员信息
-	        return memberService.getOwnerMemberInfo(ownerMemNo);
+			OwnerMemberDTO ownerMemberTransferDTO = memberService.getOwnerMemberInfo(ownerMemNo);
+			ownerMemberTransferDTO.setOrderNo(modifyOrderOwnerDTO.getOrderNo());
+			ownerMemberTransferDTO.setOwnerOrderNo(updOwnerOrderNo);
+			List<OwnerMemberRightDTO> ownerMemberRightTransferDTOList = ownerMemberTransferDTO.getOwnerMemberRightDTOList();
+			if (ownerMemberRightTransferDTOList != null && !ownerMemberRightTransferDTOList.isEmpty()) {
+				for (OwnerMemberRightDTO omr:ownerMemberRightTransferDTOList) {
+					omr.setOrderNo(modifyOrderOwnerDTO.getOrderNo());
+					omr.setOwnerOrderNo(updOwnerOrderNo);
+				}
+			}
 		}
 		OwnerMemberDTO ownerMemberDTO = ownerMemberService.selectownerMemberByOwnerOrderNo(ownerOrderNo, true);
 		ownerMemberDTO.setOwnerOrderNo(updOwnerOrderNo);

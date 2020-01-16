@@ -19,6 +19,7 @@ public enum RenterCashCodeEnum {
 	GET_BLOCKED_RAISE_AMT("11110036","取车运能加价"),
 	RETURN_BLOCKED_RAISE_AMT("11110037","还车运能加价"),
 	RENTER_PENALTY("11110039","取消订单违约金"),
+	DISPATCHING_AMT("12130031","升级车辆补贴"),
 
     REAL_COUPON_OFFSET("12120010", "优惠券抵扣金额"),
     GETCARFEE_COUPON_OFFSET("12120013", "取送服务券抵扣金额"),
@@ -63,9 +64,9 @@ public enum RenterCashCodeEnum {
     OWNER_PENALTIES_INCOME("31110002","违约金收益"),
 
     CASHIER_RENTER_DEPOSIT("41110001","收银台支付车俩押金"),
-    CASHIER_RENTER_WZ_DEPOSIT("41110001","收银台支付违章押金"),
-    CASHIER_RENTER_COST("41110001","收银台支付租车费用"),
-    CASHIER_RENTER_AGAIN_COST("41110001","收银台支付补付租车费用"),
+    CASHIER_RENTER_WZ_DEPOSIT("41110002","收银台支付违章押金"),
+    CASHIER_RENTER_COST("41110003","收银台支付租车费用"),
+    CASHIER_RENTER_AGAIN_COST("41110004","收银台支付补付租车费用"),
 
     SETTLE_DEPOSIT_TO_RENT_COST("51110001","车俩押金转租车费用"),
     SETTLE_RENT_COST_TO_HISTORY_AMT("51110002","租车费用转历史欠款"),

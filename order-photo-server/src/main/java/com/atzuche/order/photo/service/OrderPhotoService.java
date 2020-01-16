@@ -2,16 +2,16 @@ package com.atzuche.order.photo.service;
 
 import com.atzuche.order.commons.DateUtils;
 import com.atzuche.order.commons.JsonUtil;
-import com.atzuche.order.commons.enums.cashier.PlatformEnum;
 import com.atzuche.order.photo.dto.OrderPhotoDTO;
 import com.atzuche.order.photo.dto.TransIllegalPhotoDTO;
 import com.atzuche.order.photo.entity.OrderPhotoEntity;
-import com.atzuche.order.photo.entity.PhotoPathDTO;
+import com.atzuche.order.photo.dto.PhotoPathDTO;
 import com.atzuche.order.photo.enums.UserTypeEnum;
 import com.atzuche.order.photo.mapper.OrderPhotoMapper;
 import com.atzuche.order.photo.mq.AliyunMnsService;
 import com.atzuche.order.photo.util.SysConf;
 import com.atzuche.order.photo.util.oss.OSSUtils;
+import com.atzuche.order.photo.vo.req.OrderUpdateRequestVO;
 import com.atzuche.order.photo.vo.resp.OrderViolationPhotoResponseVO;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
@@ -44,22 +44,20 @@ public class OrderPhotoService {
 				OrderPhotoDTO orderPhotoDTO = new OrderPhotoDTO();
 				BeanUtils.copyProperties(photoEntity, orderPhotoDTO);
 				orderPhotoDTO.setUserTypeText(UserTypeEnum.getDescriptionByType(photoEntity.getUserType()));
-				orderPhotoDTO.setCreateTime(DateUtils.formate(photoEntity.getCreateTime(), DateUtils.DATE_DEFAUTE1));
+				orderPhotoDTO.setCreateTime(DateUtils.formate(photoEntity.getUpdateTime(), DateUtils.DATE_DEFAUTE1));
 				carPhotoList.add(orderPhotoDTO);
 			});
 		}
 		return carPhotoList;
 	}
 
-	public String uploadOrderPhoto(List<MultipartFile> data, String uploadType,
+	public void uploadOrderPhoto(List<MultipartFile> data, String uploadType,
                                    String orderNo, String operator) throws Exception {
-		String msg = null;
 		//平台上传
 		String userType = UserTypeEnum.PLATFORM.getType();
         for(MultipartFile multifile :data){
         		InputStream input = null;
         		try {
-        			String photoType=uploadType;
         			String relativePath = orderNo + "/";// 图片相对路径
         			String path = relativePath + System.currentTimeMillis() + ".jpg";// 重命名图片
 					input = multifile.getInputStream();
@@ -70,8 +68,7 @@ public class OrderPhotoService {
 					OSSUtils.uploadBufferedImage1(2, path, bufImg);
 					//上传大图（原图）
 					OSSUtils.uploadBufferedImage1(3, path, bufImg);
-					orderPhotoMapper.addUploadOrderPhoto(orderNo, path, photoType, userType,operator);
-					msg="图片上传成功！";
+					orderPhotoMapper.addUploadOrderPhoto(orderNo, path, uploadType, userType,operator);
 				} catch (Exception e) {
 					logger.error("",e);
 					throw e;
@@ -85,7 +82,6 @@ public class OrderPhotoService {
 			//上传结束，触发发送违章凭证到仁云违章处理系统
 			transIllegalPhotoToRenyun(orderNo);
 		}
-		return msg;
 	}
 
 
@@ -100,7 +96,7 @@ public class OrderPhotoService {
 			violationPhotoList.forEach(violationPhoto -> {
 				OrderPhotoDTO orderPhotoDTO = new OrderPhotoDTO();
 				BeanUtils.copyProperties(violationPhoto, orderPhotoDTO);
-				orderPhotoDTO.setCreateTime(DateUtils.formate(violationPhoto.getCreateTime(),DateUtils.DATE_DEFAUTE1));
+				orderPhotoDTO.setCreateTime(DateUtils.formate(violationPhoto.getUpdateTime(),DateUtils.DATE_DEFAUTE1));
 				orderPhotoDTO.setUserTypeText(UserTypeEnum.getDescriptionByType(violationPhoto.getUserType()));
 
 				//租客上传
@@ -144,5 +140,41 @@ public class OrderPhotoService {
 			logger.info("发送违章凭证到仁云流程系统，报错：{}",e);
 		}
 
+	}
+
+
+
+	public void uploadOrderPhoto(MultipartFile multipartFile,
+								 OrderUpdateRequestVO orderUpdateRequestVO, String operator) throws Exception {
+		//平台上传
+		String userType = UserTypeEnum.PLATFORM.getType();
+		InputStream input = null;
+		OrderPhotoEntity orderPhotoEntity = orderPhotoMapper.queryPhotoInfo(orderUpdateRequestVO.getPhotoId(), orderUpdateRequestVO.getPhotoType());
+		String orderNo = orderPhotoEntity.getOrderNo();
+		try {
+			String relativePath = orderNo + "/";// 图片相对路径
+			String path = relativePath + System.currentTimeMillis() + ".jpg";// 重命名图片
+			input = multipartFile.getInputStream();
+			BufferedImage  bufImg = ImageIO.read(input);//把图片读入到内存中
+			//上传小图
+			OSSUtils.uploadBufferedImage1(1, path, bufImg);
+			//上传中图
+			OSSUtils.uploadBufferedImage1(2, path, bufImg);
+			//上传大图（原图）
+			OSSUtils.uploadBufferedImage1(3, path, bufImg);
+			orderPhotoMapper.updateUploadOrderPhoto(orderUpdateRequestVO.getPhotoId(), path,operator, userType, orderUpdateRequestVO.getPhotoType());
+		} catch (Exception e) {
+			logger.error("",e);
+			throw e;
+		} finally{
+			if(input != null){
+				input.close();
+			}
+		}
+
+		if(orderPhotoEntity.getPhotoType().equals("4")){
+			//上传结束，触发发送违章凭证到仁云违章处理系统
+			transIllegalPhotoToRenyun(orderNo);
+		}
 	}
 }
