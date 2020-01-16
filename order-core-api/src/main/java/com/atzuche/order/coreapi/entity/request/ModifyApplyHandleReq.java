@@ -11,8 +11,8 @@ import lombok.ToString;
 @ToString
 public class ModifyApplyHandleReq {
 
-	@NotBlank(message="memNo不能为空")
-	@AutoDocProperty(value="memNo,必填，",required=true)
+	@NotBlank(message="车主memNo不能为空")
+	@AutoDocProperty(value="车主memNo,必填，",required=true)
 	private String memNo;
 	
 	@NotBlank(message="处理修改申请编码不能为空")
