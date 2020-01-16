@@ -59,7 +59,8 @@ dependencies {
     compile('com.autoyol.car:auto-car-service-api:2020011405-SNAPSHOT')
     compile 'com.aliyun.oss:aliyun-sdk-oss:2.8.3'
     compile('com.aliyun.mns:aliyun-sdk-mns:1.1.4')
-    compile(":order-core-all:renter-all:renter-commodity")
+    compile project(":order-core-all:renter-all:renter-commodity")
+
 
 
 //    compile project(":casier-all:cashier-account")

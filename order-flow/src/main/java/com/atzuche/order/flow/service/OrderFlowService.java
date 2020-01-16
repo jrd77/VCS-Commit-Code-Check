@@ -14,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -67,6 +66,14 @@ public class OrderFlowService {
         LOGGER.info("orderFlow list result is: [{}]", orderFlowList);
         return orderFlowListResponseVO;
     }
-
+    /*
+     * @Author ZhangBin
+     * @Date 2020/1/16 19:37
+     * @Description: 通过订单号获取流程状态
+     *
+     **/
+    public OrderFlowEntity getByOrderNoAndStatus(String oderNo,Integer orderStatus){
+        return orderFlowMapper.getByOrderNoAndStatus(oderNo,orderStatus);
+    }
 
 }
