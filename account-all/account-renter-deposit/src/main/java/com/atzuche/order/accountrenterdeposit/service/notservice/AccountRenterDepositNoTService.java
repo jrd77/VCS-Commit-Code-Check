@@ -48,13 +48,9 @@ public class AccountRenterDepositNoTService {
      * @param memNo
      * @return
      */
-    public AccountRenterDepositResVO getAccountRenterDepositEntity(String orderNo, String memNo) {
-        AccountRenterDepositResVO  result = new AccountRenterDepositResVO();
+    public AccountRenterDepositEntity getAccountRenterDepositEntity(String orderNo, String memNo) {
         AccountRenterDepositEntity accountRenterDepositEntity = accountRenterDepositMapper.selectByOrderAndMemNo(orderNo,memNo);
-        if(Objects.nonNull(accountRenterDepositEntity)){
-            BeanUtils.copyProperties(accountRenterDepositEntity,result);
-        }
-        return result;
+        return accountRenterDepositEntity;
     }
 
     /**
@@ -116,5 +112,9 @@ public class AccountRenterDepositNoTService {
         if(result == 0){
             throw new PayOrderRenterDepositDBException();
         }
+    }
+
+    public void updateRenterDepositEntity(AccountRenterDepositEntity entity) {
+        accountRenterDepositMapper.updateByPrimaryKeySelective(entity);
     }
 }

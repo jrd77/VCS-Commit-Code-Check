@@ -3,6 +3,7 @@ package com.atzuche.order.coreapi.service;
 import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.enums.MemRoleEnum;
 import com.atzuche.order.commons.vo.req.CancelOrderReqVO;
+import com.atzuche.order.coreapi.common.conver.OrderCommonConver;
 import com.atzuche.order.coreapi.entity.dto.CancelOrderResDTO;
 import com.atzuche.order.delivery.service.delivery.DeliveryCarService;
 import com.atzuche.order.delivery.vo.delivery.CancelFlowOrderDTO;
@@ -28,21 +29,18 @@ public class CancelOrderService {
 
     @Autowired
     private RenterCancelOrderService renterCancelOrderService;
-
     @Autowired
     private OwnerCancelOrderService ownerCancelOrderService;
-
     @Autowired
     private CouponAndCoinHandleService couponAndCoinHandleService;
-
     @Autowired
     private OrderSettleService orderSettleService;
-
     @Autowired
     private StockService stockService;
-
     @Autowired
     private DeliveryCarService deliveryCarService;
+    @Autowired
+    private OrderCommonConver orderCommonConver;
 
     /**
      * 订单取消
@@ -86,7 +84,8 @@ public class CancelOrderService {
             //通知收银台退款以及退还凹凸币和钱包
             orderSettleService.settleOrderCancel(cancelOrderReqVO.getOrderNo());
             //通知流程系统
-            CancelOrderDeliveryVO cancelOrderDeliveryVO = buildCancelOrderDeliveryVO(cancelOrderReqVO.getOrderNo(),
+            CancelOrderDeliveryVO cancelOrderDeliveryVO =
+                    orderCommonConver.buildCancelOrderDeliveryVO(cancelOrderReqVO.getOrderNo(),
                     res);
             if (null != cancelOrderDeliveryVO) {
                 deliveryCarService.cancelRenYunFlowOrderInfo(cancelOrderDeliveryVO);
@@ -105,34 +104,6 @@ public class CancelOrderService {
     }
 
 
-    /**
-     * 仁云流程系统请求信息处理
-     *
-     * @param orderNo 主订单号
-     * @param res     取消订单返回信息
-     * @return CancelOrderDeliveryVO 仁云流程系统请求信息
-     */
-    public CancelOrderDeliveryVO buildCancelOrderDeliveryVO(String orderNo, CancelOrderResDTO res) {
-        if (!res.getSrvGetFlag() && !res.getSrvReturnFlag()) {
-            return null;
-        }
-        String servicetype = "";
-        if (res.getSrvGetFlag() && res.getSrvReturnFlag()) {
-            servicetype = "all";
-        } else if (res.getSrvGetFlag()) {
-            servicetype = "take";
-        } else if (res.getSrvReturnFlag()) {
-            servicetype = "back";
-        }
-        CancelOrderDeliveryVO cancelOrderDeliveryVO = new CancelOrderDeliveryVO();
 
-        CancelFlowOrderDTO cancelFlowOrderDTO = new CancelFlowOrderDTO();
-        cancelFlowOrderDTO.setOrdernumber(orderNo);
-        cancelFlowOrderDTO.setServicetype(servicetype);
-
-        cancelOrderDeliveryVO.setRenterOrderNo(res.getRenterOrderNo());
-        cancelOrderDeliveryVO.setCancelFlowOrderDTO(cancelFlowOrderDTO);
-        return cancelOrderDeliveryVO;
-    }
 
 }

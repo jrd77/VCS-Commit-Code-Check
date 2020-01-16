@@ -1,6 +1,7 @@
 package com.atzuche.order.accountrenterwzdepost.service;
 
 import com.atzuche.order.accountrenterwzdepost.entity.AccountRenterWzDepositDetailEntity;
+import com.atzuche.order.accountrenterwzdepost.entity.AccountRenterWzDepositEntity;
 import com.atzuche.order.accountrenterwzdepost.service.notservice.AccountRenterWzDepositDetailNoTService;
 import com.atzuche.order.accountrenterwzdepost.service.notservice.AccountRenterWzDepositNoTService;
 import com.atzuche.order.accountrenterwzdepost.vo.req.CreateOrderRenterWZDepositReqVO;
@@ -12,6 +13,7 @@ import com.atzuche.order.commons.enums.RenterCashCodeEnum;
 import com.atzuche.order.commons.enums.YesNoEnum;
 import com.autoyol.cat.CatAnnotation;
 import com.autoyol.commons.web.ErrorCode;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
@@ -38,7 +40,12 @@ public class AccountRenterWzDepositService{
     public AccountRenterWZDepositResVO getAccountRenterWZDeposit(String orderNo, String memNo){
         Assert.notNull(orderNo, ErrorCode.PARAMETER_ERROR.getText());
         Assert.notNull(memNo, ErrorCode.PARAMETER_ERROR.getText());
-        return accountRenterWzDepositNoTService.getAccountRenterWZDeposit(orderNo,memNo);
+        AccountRenterWZDepositResVO  result = new AccountRenterWZDepositResVO();
+        AccountRenterWzDepositEntity accountRenterDepositEntity = accountRenterWzDepositNoTService.getAccountRenterWZDeposit(orderNo,memNo);
+        if(Objects.nonNull(accountRenterDepositEntity)){
+            BeanUtils.copyProperties(accountRenterDepositEntity,result);
+        }
+        return result;
     }
     /**
      * 查询违章押金是否付清
