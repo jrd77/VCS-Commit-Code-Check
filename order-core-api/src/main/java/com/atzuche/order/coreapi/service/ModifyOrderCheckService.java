@@ -51,14 +51,14 @@ public class ModifyOrderCheckService {
 	 */
 	public void checkCarStock(ModifyOrderDTO modifyOrderDTO) {
 		// 修改项目
-		List<OrderChangeItemDTO> changeItemList = modifyOrderDTO.getChangeItemList();
-		checkDataChange(changeItemList);
-		List<String> changeCodeList = modifyOrderConfirmService.listChangeCode(changeItemList);
-		if (!changeCodeList.contains(OrderChangeItemEnum.MODIFY_RENTTIME.getCode()) && 
-				!changeCodeList.contains(OrderChangeItemEnum.MODIFY_REVERTTIME.getCode())) {
-			// 未修改租期,不需要校验库存
-			return;
-		}
+		/*
+		 * List<OrderChangeItemDTO> changeItemList = modifyOrderDTO.getChangeItemList();
+		 * checkDataChange(changeItemList); List<String> changeCodeList =
+		 * modifyOrderConfirmService.listChangeCode(changeItemList); if
+		 * (!changeCodeList.contains(OrderChangeItemEnum.MODIFY_RENTTIME.getCode()) &&
+		 * !changeCodeList.contains(OrderChangeItemEnum.MODIFY_REVERTTIME.getCode())) {
+		 * // 未修改租期,不需要校验库存 return; }
+		 */
 		OrderInfoDTO orderInfoDTO = new OrderInfoDTO();
 		orderInfoDTO.setOrderNo(modifyOrderDTO.getOrderNo());
 		orderInfoDTO.setCityCode(modifyOrderDTO.getCityCode() != null ? Integer.valueOf(modifyOrderDTO.getCityCode()):null);
