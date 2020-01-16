@@ -57,4 +57,7 @@ public interface FeignOrderDetailService {
      **/
     @GetMapping("/order/detail/adminOwnerOrderDetail")
     public ResponseData<AdminOwnerOrderDetailDTO> adminOwnerOrderDetail(@RequestParam("ownerOrderNo") String ownerOrderNo, @RequestParam("orderNo")String orderNo);
+
+    
+
 }
