@@ -1,13 +1,21 @@
 package com.atzuche.order.admin.service;
 
+import com.alibaba.fastjson.JSON;
 import com.atzuche.order.admin.common.AdminUserUtil;
+import com.atzuche.order.admin.exception.OrderSubmitErrException;
+import com.atzuche.order.admin.exception.OrderSubmitFailException;
 import com.atzuche.order.admin.util.StringUtil;
 import com.atzuche.order.admin.util.TimeUtil;
 import com.atzuche.order.admin.vo.req.orderSubmit.AdminTransReqVO;
+import com.atzuche.order.car.RenterCarDetailFailException;
+import com.atzuche.order.commons.CatConstants;
 import com.atzuche.order.commons.vo.req.AdminOrderReqVO;
 import com.atzuche.order.commons.vo.res.OrderResVO;
 import com.atzuche.order.open.service.FeignOrderAdminSubmitService;
+import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
+import com.dianping.cat.Cat;
+import com.dianping.cat.message.Transaction;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,13 +34,38 @@ public class OrderSubmitService {
         //1、组装参数
         AdminOrderReqVO adminOrderReqParam = this.transDto(adminOrderReqVO,request);
 
-        //2、http发送
-        ResponseData<OrderResVO> orderDetail = feignOrderAdminSubmitService.submitOrder(adminOrderReqParam);
+        ResponseData<OrderResVO> responseObject = null;
+        Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "后台管理系统下单");
+        try{
+            Cat.logEvent(CatConstants.FEIGN_METHOD,"feignOrderAdminSubmitService.submitOrder");
+            log.info("Feign 开始后台管理系统下单,adminOrderReqVO={}", adminOrderReqVO);
+            Cat.logEvent(CatConstants.FEIGN_PARAM,JSON.toJSONString(adminOrderReqVO));
+            responseObject =  feignOrderAdminSubmitService.submitOrder(adminOrderReqParam);
+            Cat.logEvent(CatConstants.FEIGN_RESULT,JSON.toJSONString(responseObject));
+            if(responseObject == null || !ErrorCode.SUCCESS.getCode().equals(responseObject.getResCode())){
+                log.error("Feign 后台管理系统下单失败,responseObject={}", JSON.toJSONString(responseObject));
+                OrderSubmitFailException failException = new OrderSubmitFailException();
+                Cat.logError("Feign 后台管理系统下单失败",failException);
+                throw failException;
+            }
+            t.setStatus(Transaction.SUCCESS);
+        }catch (RenterCarDetailFailException e){
+            Cat.logError("Feign 后台管理系统下单失败",e);
+            t.setStatus(e);
+            throw e;
+        }catch (Exception e){
+            log.error("Feign 后台管理系统下单异常,responseObject={}", JSON.toJSONString(responseObject),e);
+            OrderSubmitErrException err = new OrderSubmitErrException();
+            Cat.logError("Feign 后台管理系统下单异常",err);
+            throw err;
+        }finally {
+            t.complete();
+        }
         //3、返回结果
         ResponseData responseData = new ResponseData();
-        responseData.setData(orderDetail.getData());
-        responseData.setResCode(orderDetail.getResCode());
-        responseData.setResMsg(orderDetail.getResMsg());
+        responseData.setData(responseObject.getData());
+        responseData.setResCode(responseObject.getResCode());
+        responseData.setResMsg(responseObject.getResMsg());
         return responseData;
     }
 

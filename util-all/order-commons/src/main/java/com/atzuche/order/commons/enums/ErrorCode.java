@@ -101,6 +101,8 @@ public enum ErrorCode {
     OWNER_PLATFORM_FAIL("700134","获取车主付给平台费用失败"),
     OWNER_PLATFORM_SUBSIDY_ERR("700135","获取平台给车主的补贴明细异常"),
     OWNER_PLATFORM_SUBSIDY_FAIL("700136","获取平台给车主的补贴明细失败"),
+    ADMIN_ORDER_SUBMIT_ERR("700137","后台管理系统下单异常"),
+    ADMIN_ORDER_SUBMIT_FAIL("700138","后台管理系统下单失败"),
     ;
 
     private String code;
