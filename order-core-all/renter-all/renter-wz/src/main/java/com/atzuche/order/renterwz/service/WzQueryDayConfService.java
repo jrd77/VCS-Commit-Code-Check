@@ -51,4 +51,28 @@ public class WzQueryDayConfService {
         }
         return map;
     }
+
+    /**
+     * 组装数据：map{查询日期：城市代码列表}
+     * @param list
+     * @return
+     */
+    public Map<Integer, List<Integer>> convertTranQueryDayByList(List<WzQueryDayConfEntity> list){
+        Map<Integer, List<Integer>> map = new HashMap<>(16);
+        if (list == null || list.size() == 0) {
+            map.put(TV_QUERY_DAYS, null);
+            return map;
+        }
+        for (WzQueryDayConfEntity illegalQueryDayConf : list) {
+            //18,33天
+            Integer key = illegalQueryDayConf.getTransProcessDay();
+            List<Integer> city = map.get(key);
+            if (city == null || city.size() == 0) {
+                city = new ArrayList<Integer>();
+                map.put(key, city);
+            }
+            city.add(illegalQueryDayConf.getCityCode());
+        }
+        return map;
+    }
 }
