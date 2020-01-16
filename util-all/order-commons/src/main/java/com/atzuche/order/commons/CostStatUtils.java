@@ -8,7 +8,9 @@ package com.atzuche.order.commons;
 
 import com.atzuche.order.commons.entity.orderDetailDto.*;
 import com.atzuche.order.commons.entity.ownerOrderDetail.RenterOwnerPriceDTO;
+import com.atzuche.order.commons.enums.ConsoleCostCashNoEnum;
 import com.atzuche.order.commons.enums.OwnerCashCodeEnum;
+import com.atzuche.order.commons.enums.OwnerFineTypeEnum;
 import com.atzuche.order.commons.enums.SubsidySourceCodeEnum;
 
 import java.util.ArrayList;
@@ -170,6 +172,40 @@ public class CostStatUtils {
         return amt;
     }
 
+    /*
+     * @Author ZhangBin
+     * @Date 2020/1/16 14:24
+     * @Description: 通过费用编码计算罚金
+     *
+     **/
+    public static int calOwnerFineByCashNo(OwnerFineTypeEnum ownerFineTypeEnum,List<OwnerOrderFineDeatailDTO> ownerOrderFineDeatailDTOS){
+        if(ownerOrderFineDeatailDTOS == null || ownerOrderFineDeatailDTOS.size()<=0){
+            return 0;
+        }
+        if(ownerFineTypeEnum == null){
+            return 0;
+        }
+        Integer amt = ownerOrderFineDeatailDTOS
+                .stream()
+                .filter(x -> ownerFineTypeEnum.getFineType().equals(x.getFineType()))
+                .collect(Collectors.summingInt(OwnerOrderFineDeatailDTO::getFineAmount));
+        if(amt == null){
+            return 0;
+        }
+        return amt;
+    }
 
-
+    public static int calConsoleAmtByCashNo(ConsoleCostCashNoEnum consoleCostCashNoEnum,List<OrderConsoleCostDetailDTO> list) {
+        if(consoleCostCashNoEnum == null){
+            return 0;
+        }
+        Integer amt = Optional.ofNullable(list).orElseGet(ArrayList::new)
+                .stream()
+                .filter(x -> consoleCostCashNoEnum.getCashNo().equals(x.getSubsidyTypeCode()))
+                .collect(Collectors.summingInt(OrderConsoleCostDetailDTO::getSubsidyAmount));
+        if(amt == null ){
+            return amt;
+        }
+        return 0;
+    }
 }

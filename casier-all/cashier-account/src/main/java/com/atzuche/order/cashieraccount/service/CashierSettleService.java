@@ -193,10 +193,10 @@ public class CashierSettleService {
      * @return
      */
     public int getRentDeposit(String orderNo, String renterMemNo) {
-        AccountRenterDepositResVO vo = accountRenterDepositService.getAccountRenterDepositEntity(orderNo,renterMemNo);
-        if(Objects.isNull(vo) || Objects.isNull(vo.getSurplusDepositAmt())){
-            return NumberUtils.INTEGER_ZERO;
-        }
+//        AccountRenterDepositResVO vo = accountRenterDepositService.getAccountRenterDepositEntity(orderNo,renterMemNo);
+//        if(Objects.isNull(vo) || Objects.isNull(vo.getSurplusDepositAmt())){
+//            return NumberUtils.INTEGER_ZERO;
+//        }
         int amt = accountRenterDepositDetailNoTService.getRentDeposit(orderNo,renterMemNo);
         return amt;
     }

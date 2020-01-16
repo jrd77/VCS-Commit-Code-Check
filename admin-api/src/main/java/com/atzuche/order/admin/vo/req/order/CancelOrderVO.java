@@ -21,4 +21,5 @@ public class CancelOrderVO extends BaseVO {
 
     @AutoDocProperty(value = "取消原因")
     private String cancelReason;
+
 }

@@ -22,10 +22,10 @@ public class BaseVO implements Serializable {
 
     private static final long serialVersionUID = -7872969928507856739L;
 
-    @AutoDocProperty(value = "【公用参数】请求id", required = true)
-    @Length(max = 200, message = "requestId长度不能超过200")
-    @NotBlank(message = "【公用参数】requestId不能为空")
-    private String requestId;
+//    @AutoDocProperty(value = "【公用参数】请求id", required = true)
+//    @Length(max = 200, message = "requestId长度不能超过200")
+//    @NotBlank(message = "【公用参数】requestId不能为空")
+//    private String requestId;
 
     @AutoDocProperty(value = "【公用参数】系统来源：当m站在下单前费用计算时传CREDITH5-ALIPAY或FUNDH5-ALIPAY来区分是否显示芝麻免押", hidden = true)
     @Length(max = 200, message = "OS长度不能超过200")
@@ -99,20 +99,9 @@ public class BaseVO implements Serializable {
     private String schema;
 
 
-    public String getRequestId() {
-        //请求id为空时，自动生成UUID给日志使用
-        if (StringUtils.isBlank(requestId)) {
-            this.requestId = MDC.get("request_id");
-            if (StringUtils.isBlank(requestId)) {
-                this.requestId = UUID.randomUUID().toString();
-            }
-        }
-        return requestId;
-    }
 
-    public void setRequestId(String requestId) {
-        this.requestId = requestId;
-    }
+
+
 
     public String getOS() {
         return OS;
@@ -245,7 +234,6 @@ public class BaseVO implements Serializable {
     @Override
     public String toString() {
         return "BaseVO{" +
-                "requestId='" + requestId + '\'' +
                 ", OS='" + OS + '\'' +
                 ", OsVersion='" + OsVersion + '\'' +
                 ", AppVersion='" + AppVersion + '\'' +

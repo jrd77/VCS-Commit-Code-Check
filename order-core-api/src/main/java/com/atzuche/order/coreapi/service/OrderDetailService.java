@@ -821,15 +821,15 @@ public class OrderDetailService {
         }
 
         ServiceDetailDTO serviceDetailDTO = new ServiceDetailDTO();
-        serviceDetailDTO.setCarType(ownerGoodsDetail.getCarOwnerType());
-        serviceDetailDTO.setServiceAmt(ownerGoodsDetail.getServiceRate());
+        //serviceDetailDTO.setCarType(ownerGoodsDetail.getCarOwnerType());
+        //serviceDetailDTO.setServiceAmt(ownerGoodsDetail.getServiceRate());
 
         AdminOwnerOrderDetailDTO adminOwnerOrderDetailDTO = new AdminOwnerOrderDetailDTO();
         adminOwnerOrderDetailDTO.setExpIncome(null);
         adminOwnerOrderDetailDTO.setSettleincome(accountOwnerCostSettleEntity!=null?accountOwnerCostSettleEntity.getIncomeAmt():null);
         adminOwnerOrderDetailDTO.setIncome(null);
         adminOwnerOrderDetailDTO.setRentAmt(ownerRentAmt);
-        adminOwnerOrderDetailDTO.setOwnerRentDetailDTO(null);
+        adminOwnerOrderDetailDTO.setOwnerRentDetailDTO(ownerRentDetailDTO);
         adminOwnerOrderDetailDTO.setFienAmt(ownerFienAmt);
         adminOwnerOrderDetailDTO.setFienAmtDetailDTO(null);
         adminOwnerOrderDetailDTO.setOwnerRenterPrice(renterOwnerPriceDTO.getOwnerToRenterPrice());
