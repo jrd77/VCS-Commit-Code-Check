@@ -3,8 +3,10 @@ package com.atzuche.order.coreapi.controller;
 import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.vo.req.AgreeOrderReqVO;
 import com.atzuche.order.commons.vo.req.RefuseOrderReqVO;
+import com.atzuche.order.commons.vo.req.ReturnCarReqVO;
 import com.atzuche.order.coreapi.service.OwnerAgreeOrderService;
 import com.atzuche.order.coreapi.service.OwnerRefuseOrderService;
+import com.atzuche.order.coreapi.service.OwnerReturnCarService;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.doc.annotation.AutoDocMethod;
@@ -41,6 +43,9 @@ public class RefuseOrderController {
     @Autowired
     OwnerRefuseOrderService ownerRefuseOrderService;
 
+    @Autowired
+    OwnerReturnCarService ownerReturnCarService;
+
     private static final Logger LOGGER = LoggerFactory.getLogger(RefuseOrderController.class);
 
 
@@ -54,7 +59,6 @@ public class RefuseOrderController {
             return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), error.isPresent() ?
                     error.get().getDefaultMessage() : ErrorCode.INPUT_ERROR.getText());
         }
-
         ownerRefuseOrderService.refuse(reqVO);
         return ResponseData.success();
     }
@@ -71,8 +75,21 @@ public class RefuseOrderController {
                     error.get().getDefaultMessage() : ErrorCode.INPUT_ERROR.getText());
         }
         ownerAgreeOrderService.agree(reqVO);
-
         return ResponseData.success();
     }
 
+
+    @AutoDocMethod(description = "车主交车", value = "车主交车")
+    @PostMapping("/normal/returnCar")
+    public ResponseData<?> returnCar(@Valid @RequestBody ReturnCarReqVO reqVO, BindingResult bindingResult) {
+
+        LOGGER.info("Owner return car.param is,reqVO:[{}]", JSON.toJSONString(reqVO));
+        if (bindingResult.hasErrors()) {
+            Optional<FieldError> error = bindingResult.getFieldErrors().stream().findFirst();
+            return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), error.isPresent() ?
+                    error.get().getDefaultMessage() : ErrorCode.INPUT_ERROR.getText());
+        }
+        ownerReturnCarService.returnCar(reqVO);
+        return ResponseData.success();
+    }
 }
