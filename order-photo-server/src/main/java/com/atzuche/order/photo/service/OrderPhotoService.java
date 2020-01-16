@@ -13,6 +13,7 @@ import com.atzuche.order.photo.util.SysConf;
 import com.atzuche.order.photo.util.oss.OSSUtils;
 import com.atzuche.order.photo.vo.req.OrderUpdateRequestVO;
 import com.atzuche.order.photo.vo.resp.OrderViolationPhotoResponseVO;
+import com.atzuche.order.rentercommodity.service.RenterGoodsService;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.annotation.Resource;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.InputStream;
@@ -34,6 +36,9 @@ public class OrderPhotoService {
 	private OrderPhotoMapper orderPhotoMapper;
 	@Autowired
 	private AliyunMnsService aliyunMnsService;
+
+	@Autowired
+	private RenterGoodsService renterGoodsService;
 
 
 	public List<OrderPhotoDTO> queryGetSrvCarList(String orderNo, String type) {
@@ -55,6 +60,7 @@ public class OrderPhotoService {
                                    String orderNo, String operator) throws Exception {
 		//平台上传
 		String userType = UserTypeEnum.PLATFORM.getType();
+		String carNum = renterGoodsService.queryCarNumByOrderNo(orderNo);
         for(MultipartFile multifile :data){
         		InputStream input = null;
         		try {
@@ -68,7 +74,7 @@ public class OrderPhotoService {
 					OSSUtils.uploadBufferedImage1(2, path, bufImg);
 					//上传大图（原图）
 					OSSUtils.uploadBufferedImage1(3, path, bufImg);
-					orderPhotoMapper.addUploadOrderPhoto(orderNo, path, uploadType, userType,operator);
+					orderPhotoMapper.addUploadOrderPhoto(orderNo, path, uploadType, userType,operator, carNum);
 				} catch (Exception e) {
 					logger.error("",e);
 					throw e;
