@@ -56,4 +56,13 @@ public class AccountPlatformProfitDetailNotService {
             }
         }
     }
+
+    /**
+     * 查询 平台结算收益明
+     * @param orderNo
+     * @return
+     */
+    public List<AccountPlatformProfitDetailEntity> getPlatformProfitDetails(String orderNo) {
+        return accountPlatformProfitDetailMapper.getPlatformProfitDetails(orderNo);
+    }
 }

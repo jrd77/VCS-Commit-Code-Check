@@ -60,4 +60,13 @@ public class AccountPlatformSubsidyDetailNoTService {
             }
         }
     }
+
+    /**
+     * 查询平台结算补贴明
+     * @param orderNo
+     * @return
+     */
+    public List<AccountPlatformSubsidyDetailEntity> getPlatformSubsidyDetails(String orderNo) {
+        return accountPlatformSubsidyDetailMapper.getPlatformSubsidyDetails(orderNo);
+    }
 }

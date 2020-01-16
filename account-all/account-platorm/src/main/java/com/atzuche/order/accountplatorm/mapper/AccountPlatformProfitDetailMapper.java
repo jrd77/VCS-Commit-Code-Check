@@ -2,6 +2,8 @@ package com.atzuche.order.accountplatorm.mapper;
 
 import com.atzuche.order.accountplatorm.entity.AccountPlatformProfitDetailEntity;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
 import java.util.List;
 
 /**
@@ -21,4 +23,5 @@ public interface AccountPlatformProfitDetailMapper{
     
     int updateByPrimaryKeySelective(AccountPlatformProfitDetailEntity record);
 
+    List<AccountPlatformProfitDetailEntity> getPlatformProfitDetails(@Param("orderNo") String orderNo);
 }

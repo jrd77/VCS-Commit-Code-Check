@@ -131,5 +131,9 @@
 
 
     </select>
+    <select id="selectRenterCostSettleDetailByOrderNo" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List" /> from account_renter_cost_settle_detail
+        where order_no = #{orderNo}
+    </select>
 
 </mapper>

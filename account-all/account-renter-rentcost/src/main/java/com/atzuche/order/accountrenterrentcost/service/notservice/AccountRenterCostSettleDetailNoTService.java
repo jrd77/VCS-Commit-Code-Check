@@ -56,4 +56,13 @@ public class AccountRenterCostSettleDetailNoTService {
         }
         return result.stream().mapToInt(AccountRenterCostSettleDetailEntity::getAmt).sum();
     }
+
+    /**
+     * 根据订单号查询 租客结算明细列表
+     * @param orderNo
+     * @return
+     */
+    public List<AccountRenterCostSettleDetailEntity> getAccountRenterCostSettleDetail(String orderNo) {
+        return accountRenterCostSettleDetailMapper.selectRenterCostSettleDetailByOrderNo(orderNo);
+    }
 }

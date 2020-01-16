@@ -40,6 +40,9 @@ import com.atzuche.order.cashieraccount.vo.req.DeductDepositToRentCostReqVO;
 import com.atzuche.order.commons.enums.RenterCashCodeEnum;
 import com.atzuche.order.rentercost.service.RenterOrderCostCombineService;
 import com.atzuche.order.settle.service.AccountDebtService;
+import com.autoyol.commons.utils.GsonUtils;
+import com.dianping.cat.Cat;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,6 +60,7 @@ import java.util.Objects;
  * @date 2019-12-11 11:17:59
  */
 @Service
+@Slf4j
 public class CashierSettleService {
     @Autowired AccountRenterDepositService accountRenterDepositService;
     @Autowired AccountRenterWzDepositService accountRenterWzDepositService;
@@ -193,10 +197,6 @@ public class CashierSettleService {
      * @return
      */
     public int getRentDeposit(String orderNo, String renterMemNo) {
-//        AccountRenterDepositResVO vo = accountRenterDepositService.getAccountRenterDepositEntity(orderNo,renterMemNo);
-//        if(Objects.isNull(vo) || Objects.isNull(vo.getSurplusDepositAmt())){
-//            return NumberUtils.INTEGER_ZERO;
-//        }
         int amt = accountRenterDepositDetailNoTService.getRentDeposit(orderNo,renterMemNo);
         return amt;
     }
@@ -286,6 +286,8 @@ public class CashierSettleService {
             entity.setOilAmt(oilAmt);
             entity.setConsoleSubsidyAmt(consoleSubsidyAmt);
             entity.setConsoleFineAmt(consoleFineAmt);
+            log.info("OrderSettleService insertAccountOwnerCostSettle [{}]", GsonUtils.toJson(entity));
+            Cat.logEvent("insertAccountOwnerCostSettle",GsonUtils.toJson(entity));
             accountOwnerCostSettleService.insertAccountOwnerCostSettle(entity);
         }
     }
