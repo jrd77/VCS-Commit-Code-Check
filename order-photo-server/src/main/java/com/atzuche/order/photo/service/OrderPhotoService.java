@@ -11,6 +11,7 @@ import com.atzuche.order.photo.mapper.OrderPhotoMapper;
 import com.atzuche.order.photo.mq.AliyunMnsService;
 import com.atzuche.order.photo.util.SysConf;
 import com.atzuche.order.photo.util.oss.OSSUtils;
+import com.atzuche.order.photo.vo.req.OrderUpdateRequestVO;
 import com.atzuche.order.photo.vo.resp.OrderViolationPhotoResponseVO;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
@@ -144,11 +145,11 @@ public class OrderPhotoService {
 
 
 	public void uploadOrderPhoto(MultipartFile multipartFile,
-								   String photoId, String operator) throws Exception {
+								 OrderUpdateRequestVO orderUpdateRequestVO, String operator) throws Exception {
 		//平台上传
 		String userType = UserTypeEnum.PLATFORM.getType();
 		InputStream input = null;
-		OrderPhotoEntity orderPhotoEntity = orderPhotoMapper.queryPhotoInfo(photoId);
+		OrderPhotoEntity orderPhotoEntity = orderPhotoMapper.queryPhotoInfo(orderUpdateRequestVO.getPhotoId());
 		String orderNo = orderPhotoEntity.getOrderNo();
 		try {
 			String relativePath = orderNo + "/";// 图片相对路径
@@ -161,7 +162,7 @@ public class OrderPhotoService {
 			OSSUtils.uploadBufferedImage1(2, path, bufImg);
 			//上传大图（原图）
 			OSSUtils.uploadBufferedImage1(3, path, bufImg);
-			orderPhotoMapper.updateUploadOrderPhoto(photoId, path,operator, userType);
+			orderPhotoMapper.updateUploadOrderPhoto(orderUpdateRequestVO.getPhotoId(), path,operator, userType, orderUpdateRequestVO.getPhotoType());
 		} catch (Exception e) {
 			logger.error("",e);
 			throw e;

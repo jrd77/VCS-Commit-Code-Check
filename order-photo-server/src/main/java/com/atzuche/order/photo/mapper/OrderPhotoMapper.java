@@ -12,7 +12,7 @@ public interface OrderPhotoMapper {
 
 	void addUploadOrderPhoto(@Param("orderNo") String orderNo, @Param("path") String path, @Param("photoType") String photoType, @Param("userType") String userType, @Param("operator") String operator);
 
-	void updateUploadOrderPhoto(@Param("photoId") String photoId, @Param("path") String path, @Param("operator") String operator, @Param("userType") String userType);
+	void updateUploadOrderPhoto(@Param("photoId") String photoId, @Param("path") String path, @Param("operator") String operator, @Param("userType") String userType, @Param("photoType") String photoType);
 
 
 	List<OrderPhotoEntity> queryInsuranceClaimPhotoList(String orderNo);

@@ -68,15 +68,15 @@
 
 
 	<select id="queryPhotoInfo" resultType="com.atzuche.order.photo.entity.OrderPhotoEntity">
-		select order_no as orderNo, user_type as userType from
+		select order_no as orderNo, user_type as userType
 		<if test="photoType==1||photoType==2">
-			trans_car_condition_photo where id = #{photoId};
+			from trans_car_condition_photo where id = #{photoId};
 		</if>
 		<if test="photoType==3">
-			trans_claim_photo where id = #{photoId};
+			from trans_claim_photo where id = #{photoId};
 		</if>
 		<if test="photoType==4">
-			trans_illegal_photo where id = #{photoId};
+		    from trans_illegal_photo where id = #{photoId};
 		</if>
 	</select>
 

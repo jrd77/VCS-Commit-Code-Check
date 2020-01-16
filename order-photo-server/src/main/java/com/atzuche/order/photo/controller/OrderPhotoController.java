@@ -179,7 +179,7 @@ public class OrderPhotoController{
 					logger.error("不支持该图片格式！");
 					msg= "上传失败,请上传 jpg 或  png 格式的图片";
 				}
-				orderPhotoService.uploadOrderPhoto(multipartFile, orderUpdateRequestVO.getPhotoId(), operator);
+				orderPhotoService.uploadOrderPhoto(multipartFile, orderUpdateRequestVO, operator);
 			}catch (IOException e) {
 				logger.error("上传违章处理图片报IO流异常："+e.getMessage());
 
