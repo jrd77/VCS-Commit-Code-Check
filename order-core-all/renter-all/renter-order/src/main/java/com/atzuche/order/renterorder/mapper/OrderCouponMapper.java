@@ -40,4 +40,13 @@ public interface OrderCouponMapper {
     OrderCouponEntity selectByOrderNoAndRenterOrderNo(@Param("orderNo") String orderNo, @Param(
             "renterOrderNo") String renterOrderNo,@Param("couponType") Integer couponType);
 
+    /**
+     * 获取车主券码
+     *
+     * @param orderNo 订单号
+     * @param couponType 优惠券类型
+     * @return String
+     */
+    String selectCouponNoByOrderNo(@Param("orderNo") String orderNo,@Param("couponType") int couponType);
+
 }
