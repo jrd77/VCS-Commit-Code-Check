@@ -34,7 +34,6 @@ import com.atzuche.order.open.service.FeignOrderCostService;
 import com.atzuche.order.parentorder.entity.OrderEntity;
 import com.atzuche.order.parentorder.service.OrderService;
 import com.autoyol.commons.web.ResponseData;
-import com.autoyol.doc.annotation.AutoDocProperty;
 
 /**
  * @author jing.huang
@@ -105,7 +104,7 @@ public class OrderCostService {
 				//平台给租客的补贴
 				putConsoleSubsidy(realVo,data);
 				
-				//补付费用
+				//补付费用 
 				putSupplementAmt(realVo,data);
 				
 				//rentFeeBase基础费用
@@ -174,7 +173,15 @@ public class OrderCostService {
 		String platformSubsidyAmt = "";
 		String platformSubsidyRealAmt = "";
 		
+		//add 200116  车主给租客的补贴
+		String ownerSubsidyTotalAmt;
+		///add 200116  租客租金补贴
+		String ownerSubsidyRentAmt;
+		
 		int platformSubsidyAmount = 0;
+		///
+		int ownerSubsidyRentTotalAmount = 0;
+		int ownerSubsidyRentAmount = 0;
 		
 		List<OrderConsoleSubsidyDetailEntity> orderConsoleSubsidyDetails = data.getOrderConsoleSubsidyDetails();
 		for (OrderConsoleSubsidyDetailEntity orderConsoleSubsidyDetailEntity : orderConsoleSubsidyDetails) {
@@ -183,15 +190,31 @@ public class OrderCostService {
 			if("3".equals(orderConsoleSubsidyDetailEntity.getSubsidySourceName()) && "1".equals(orderConsoleSubsidyDetailEntity.getSubsidyTargetName())) {
 				platformSubsidyAmount += orderConsoleSubsidyDetailEntity.getSubsidyAmount().intValue();
 			}
+			
+			if("2".equals(orderConsoleSubsidyDetailEntity.getSubsidySourceName()) && "1".equals(orderConsoleSubsidyDetailEntity.getSubsidyTargetName())) {
+				//车主给租客的补贴
+				ownerSubsidyRentTotalAmount += orderConsoleSubsidyDetailEntity.getSubsidyAmount().intValue();
+				//租金的补贴
+				if(orderConsoleSubsidyDetailEntity.getSubsidyCostCode().equals(RenterCashCodeEnum.SUBSIDY_OWNER_TORENTER_RENTAMT.getCashNo())) {
+					ownerSubsidyRentAmount += orderConsoleSubsidyDetailEntity.getSubsidyAmount().intValue();
+				}
+			}
 		}
 		
 		platformSubsidyTotalAmt = String.valueOf(platformSubsidyAmount);
 		platformSubsidyAmt = String.valueOf(platformSubsidyAmount);
 		platformSubsidyRealAmt = String.valueOf(platformSubsidyAmount);
+		///车主给租客的租金补贴
+		ownerSubsidyTotalAmt = String.valueOf(ownerSubsidyRentTotalAmount);
+		ownerSubsidyRentAmt = String.valueOf(ownerSubsidyRentAmount);
+		
 		
 		realVo.setPlatformSubsidyTotalAmt(platformSubsidyTotalAmt);
 		realVo.setPlatformSubsidyRealAmt(platformSubsidyRealAmt);
 		realVo.setPlatformSubsidyAmt(platformSubsidyAmt);
+		///
+		realVo.setOwnerSubsidyTotalAmt(ownerSubsidyTotalAmt);
+		realVo.setOwnerSubsidyRentAmt(ownerSubsidyRentAmt);
 	}
 
 	private void putOilBeyondMile(OrderRenterCostResVO realVo,
@@ -392,7 +415,7 @@ public class OrderCostService {
 	}
 
 	/**
-	 * 租客
+	 * 租客 租车费用
 	 * @param realVo
 	 * @param data
 	 */
@@ -402,6 +425,10 @@ public class OrderCostService {
 		//实收
 		AccountRenterCostSettleResVO renterSettleVo = data.getRenterSettleVo();
 		realVo.setRentFeeShishou(String.valueOf(renterSettleVo.getShifuAmt()));
+		//海豹后面表里要加上的。 海豹的表里面有的
+		realVo.setRentFeeYingtui("---");//data.getWzVo()!=null?String.valueOf(data.getWzVo().getYingshouDeposit()):"---"
+		realVo.setRentFeeShitui("---");//data.getWzVo()!=null?String.valueOf(data.getWzVo().getYingshouDeposit()):"---"
+		
 	}
 	
 	
@@ -632,11 +659,13 @@ public class OrderCostService {
 		 String couponDeductionAmount = "0";
 		 String ownerCouponTitle = ""; 
 		 String ownerCouponAmt = "0";
+		 String ownerSubsidyRentAmt = "0";
 		 //补贴
 		 String platformSubsidyTotalAmt = "0";
 		 String platformSubsidyAmt = "0";
 		 
 		 int platformSubsidyAmount = 0;
+		 int ownerSubsidyRentAmount = 0;
 		 List<OrderConsoleSubsidyDetailEntity> orderConsoleSubsidyDetails = data.getOrderConsoleSubsidyDetails();
 			for (OrderConsoleSubsidyDetailEntity orderConsoleSubsidyDetailEntity : orderConsoleSubsidyDetails) {
 				//`subsidy_source_name` varchar(16) DEFAULT NULL COMMENT '补贴来源方 1、租客 2、车主 3、平台',
@@ -644,6 +673,14 @@ public class OrderCostService {
 				if("3".equals(orderConsoleSubsidyDetailEntity.getSubsidySourceName()) && "2".equals(orderConsoleSubsidyDetailEntity.getSubsidyTargetName())) {
 					platformSubsidyAmount += orderConsoleSubsidyDetailEntity.getSubsidyAmount().intValue();
 				}
+				
+				if("2".equals(orderConsoleSubsidyDetailEntity.getSubsidySourceName()) && "1".equals(orderConsoleSubsidyDetailEntity.getSubsidyTargetName())) {
+					//租金的补贴
+					if(orderConsoleSubsidyDetailEntity.getSubsidyCostCode().equals(RenterCashCodeEnum.SUBSIDY_OWNER_TORENTER_RENTAMT.getCashNo())) {
+						ownerSubsidyRentAmount += orderConsoleSubsidyDetailEntity.getSubsidyAmount().intValue();
+					}
+				}
+				
 			}
 		 
 			
@@ -660,11 +697,15 @@ public class OrderCostService {
 			platformSubsidyTotalAmt = String.valueOf(platformSubsidyAmount);	
 			platformSubsidyAmt = String.valueOf(platformSubsidyAmount);	
 			ownerCouponAmt = String.valueOf(ownerCouponAmtInt);
-			couponDeductionAmount = String.valueOf(ownerCouponAmtInt);
-		 //抵扣
+			couponDeductionAmount = String.valueOf(ownerCouponAmtInt + ownerSubsidyRentAmount);
+			ownerSubsidyRentAmt = String.valueOf(ownerSubsidyRentAmount);
+			
+		 //抵扣  给租客的优惠
 		 realVo.setCouponDeductionAmount(couponDeductionAmount);
 		 realVo.setOwnerCouponTitle(ownerCouponTitle);
 		 realVo.setOwnerCouponAmt(ownerCouponAmt);
+		 realVo.setOwnerSubsidyRentAmt(ownerSubsidyRentAmt);
+		 /////平台补贴
 		 realVo.setPlatformSubsidyAmt(platformSubsidyAmt);
 		 realVo.setPlatformSubsidyTotalAmt(platformSubsidyTotalAmt);
 	}

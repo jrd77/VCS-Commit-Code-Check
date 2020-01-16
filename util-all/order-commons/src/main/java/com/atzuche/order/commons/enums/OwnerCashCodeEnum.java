@@ -2,6 +2,11 @@ package com.atzuche.order.commons.enums;
 
 import lombok.Getter;
 
+/**
+ * 收费序号,车主从20开头  车主 第一位：2， 第二位：1正2负 1正2负      1正2负 3可正可负   ->0可正可负，第三位：0，第四位：分模块，后4位是编码
+ * @author jing.huang
+ *
+ */
 @Getter
 public enum OwnerCashCodeEnum {
 	RENT_AMT("21010035","租金"),
@@ -24,6 +29,8 @@ public enum OwnerCashCodeEnum {
     OWNER_INCOME_SUBSIDY("12120056","车主收益补贴"),
     OWNER_WASH_CAR_SUBSIDY("12120057","车主洗车补贴"),
     //补贴
+    SUBSIDY_OWNER_TORENTER_RENTAMT("22120029", "车主给租客的租金补贴金额"),
+    
 	;
 	
 	/**

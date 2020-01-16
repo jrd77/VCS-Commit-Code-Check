@@ -1,7 +1,14 @@
 package com.atzuche.order.commons.enums;
 
+import com.autoyol.doc.annotation.AutoDocProperty;
+
 import lombok.Getter;
 
+/**
+ * 收费序号,租客从10开头  租客 第一位：1，第二位：1正2负      1正2负 3可正可负   ->0可正可负，第三位：押金类型，第四位：分模块，后4位是编码
+ * @author jing.huang
+ *
+ */
 @Getter
 public enum RenterCashCodeEnum {
 
@@ -28,6 +35,36 @@ public enum RenterCashCodeEnum {
     AUTO_COIN_DEDUCT("12120012", "凹凸币抵扣金额"),
     REAL_LIMIT_REDUCTI("12120028", "限时立减抵扣金额"),
 
+    //补贴费用编码定义  费用编码定义
+    SUBSIDY_OWNER_TORENTER_RENTAMT("12120029", "车主给租客的租金补贴金额"),
+    //升级车辆补贴
+    SUBSIDY_DISPATCHING_AMT("12120030","升级车辆补贴"),
+	//油费补贴
+    subsidy_oilSubsidy("12120031","油费补贴"),
+	//洗车费补贴
+	subsidy_cleanCarSubsidy("12120032","洗车费补贴"),
+	//取还车迟到补贴
+	subsidy_getReturnDelaySubsidy("12120033","取还车迟到补贴"),
+	//延时补贴
+	subsidy_delaySubsidy("12120034","延时补贴"),
+	//交通费补贴
+	subsidy_trafficSubsidy("12120035","交通费补贴"),
+	//基础保障费补贴
+	subsidy_insureSubsidy("12120036","基础保障费补贴"),
+	//租金补贴
+	subsidy_rentAmtSubsidy("12120037","租金补贴"),
+	//其他补贴
+	subsidy_otherSubsidy("12120038","其他补贴"),
+	//全面保障服务费补贴
+	subsidy_abatementSubsidy("12120039","全面保障服务费补贴"),
+	//手续费补贴
+	subsidy_fee("12120040","手续费补贴"),
+	//租客给车主的调价
+	subsidy_renterToOwnerAdjust("12120041","租客给车主的调价补贴"),
+	//车主给租客的调价
+	subsidy_ownerToRenterAdjust("12120042","车主给租客的调价补贴"),
+	
+    
 
 
     ACCOUNT_RENTER_WZ_DEPOSIT("21110001","违章押金"),
