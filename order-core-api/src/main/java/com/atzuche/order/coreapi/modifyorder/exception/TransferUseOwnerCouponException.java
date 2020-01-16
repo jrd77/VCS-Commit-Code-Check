@@ -5,7 +5,7 @@ import com.atzuche.order.commons.OrderException;
 public class TransferUseOwnerCouponException extends OrderException{
 
 
-	private static String ERROR_CODE = "4007604";
+	private static String ERROR_CODE = "400704";
 	
 	private static String ERROR_MSG = "使用了车主券不能换车";
 

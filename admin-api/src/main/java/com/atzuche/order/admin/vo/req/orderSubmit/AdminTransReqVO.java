@@ -15,7 +15,7 @@ import java.util.List;
 @Data
 public class AdminTransReqVO extends AdminReqBaseVO {
 
-    @AutoDocProperty(value = "是否使用特供价", required = true)
+    @AutoDocProperty(value = "是否使用特供价")
     private String useSpecialPrice="0";
 
     @AutoDocProperty(value = "用户注册号")
@@ -50,12 +50,10 @@ public class AdminTransReqVO extends AdminReqBaseVO {
     private String revertTime;
 
     @AutoDocProperty(value = "取车服务开关(0/1)")
-    @NotNull(message = "是否使用取车服务标识不能为空")
-    private String srvGetFlag;
+    private String srvGetFlag="0";
 
     @AutoDocProperty(value = "还车服务开关(0/1)")
-    @NotNull(message = "是否使用还车服务标识不能为空")
-    private String srvReturnFlag;
+    private String srvReturnFlag="0";
 
     @AutoDocProperty(value = "取车地址")
     //@NotBlank(message = "取车地址不能为空")
@@ -93,8 +91,7 @@ public class AdminTransReqVO extends AdminReqBaseVO {
     private String abatement;
 
     @AutoDocProperty(value = "是否出市(0/1)")
-    @NotBlank(message="是否出市开关不能为空")
-    private String isLeaveCity;
+    private String isLeaveCity="0";
 
     @AutoDocProperty(value = "限时立减状态(0/1)")
     private String limitRedStatus;
