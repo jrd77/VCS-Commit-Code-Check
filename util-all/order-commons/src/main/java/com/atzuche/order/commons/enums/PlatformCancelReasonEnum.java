@@ -57,7 +57,7 @@ public enum PlatformCancelReasonEnum {
      * @param code int value
      * @return PlateformCancelReasonEnum
      */
-    public PlatformCancelReasonEnum from(String code) {
+    public static PlatformCancelReasonEnum from(String code) {
         PlatformCancelReasonEnum[] reasonEnums = values();
         for (PlatformCancelReasonEnum reason : reasonEnums) {
             if (StringUtils.equals(reason.code, code)) {

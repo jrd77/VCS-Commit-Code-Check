@@ -2,10 +2,12 @@ package com.atzuche.order.coreapi.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.enums.DispatcherStatusEnum;
+import com.atzuche.order.commons.enums.PlatformCancelReasonEnum;
 import com.atzuche.order.commons.vo.req.AdminOrderCancelReqVO;
 import com.atzuche.order.commons.vo.req.CancelOrderReqVO;
 import com.atzuche.order.coreapi.service.CancelOrderService;
 import com.atzuche.order.coreapi.service.OwnerOrderFineApplyHandelService;
+import com.atzuche.order.coreapi.service.PlatformCancelOrderService;
 import com.atzuche.order.ownercost.service.OwnerOrderFineApplyService;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
@@ -40,6 +42,8 @@ public class CancelOrderController {
     private CancelOrderService cancelOrderService;
     @Autowired
     private OwnerOrderFineApplyHandelService ownerOrderFineApplyHandelService;
+    @Autowired
+    private PlatformCancelOrderService platformCancelOrderService;
 
 
     @AutoDocMethod(description = "取消订单", value = "取消订单")
@@ -71,7 +75,8 @@ public class CancelOrderController {
                     error.get().getDefaultMessage() : ErrorCode.INPUT_ERROR.getText());
         }
 
-
+        platformCancelOrderService.cancel(reqVO.getOrderNo(), reqVO.getOperator(),
+                PlatformCancelReasonEnum.from(reqVO.getCancelType()));
         return ResponseData.success();
     }
 
