@@ -14,7 +14,7 @@ public class OrderUtil {
      * @param orderNo
      * @return
      */
-    public boolean isNewOrder(String orderNo){
+    public static boolean isNewOrder(String orderNo){
         orderNo = StringUtils.trimToNull(orderNo);
         if(orderNo==null){
             throw new IllegalArgumentException("orderNo cannot be null :"+orderNo);

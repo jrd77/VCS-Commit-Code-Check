@@ -181,8 +181,13 @@ public class ModifyOrderService {
 		CostDeductVO costDeductVO = getCostDeductVO(modifyOrderDTO, costBaseDTO, renterOrderCostRespDTO, renterOrderReqVO, orderEntity, initSubsidyList);
 		// 聚合租客补贴
 		renterOrderCostRespDTO.setRenterOrderSubsidyDetailDTOList(getPolymerizationSubsidy(renterOrderCostRespDTO, costDeductVO));
-		
-		// 入库
+		// 计算补付金额
+		Integer supplementAmt = getRenterSupplementAmt(modifyOrderDTO, initRenterOrder, renterOrderCostRespDTO, renterFineList);
+		// 计算升级补贴（换车逻辑）
+		RenterOrderSubsidyDetailDTO dispatchingAmtSubsidy = getDispatchingAmtSubsidy(modifyOrderDTO, costBaseDTO, supplementAmt);
+		// 组合升级补贴
+		renterOrderCostRespDTO = combinationDispatchingAmtSubsidy(renterOrderCostRespDTO, dispatchingAmtSubsidy);
+		/////////////////////////////////////////// 入库 ////////////////////////////////////////
 		// 保存租客商品信息
 		renterGoodsService.save(renterGoodsDetailDTO);
 		// 保存租客会员信息
@@ -201,8 +206,6 @@ public class ModifyOrderService {
 		orderChangeItemService.saveOrderChangeItemBatch(modifyOrderDTO.getChangeItemList());
 		// 保存配送订单信息
 		saveRenterDelivery(modifyOrderDTO);
-		// 计算补付金额
-		Integer supplementAmt = getRenterSupplementAmt(modifyOrderDTO, initRenterOrder, renterOrderCostRespDTO, renterFineList);
 		// 修改后处理方法
 		modifyPostProcess(modifyOrderDTO, renterOrderNew, initRenterOrder, supplementAmt, renterOrderCostRespDTO.getRenterOrderSubsidyDetailDTOList());
 		// 使用车主券
@@ -214,6 +217,45 @@ public class ModifyOrderService {
 		// 补扣凹凸币 
 		againAutoCoinDeduct(modifyOrderDTO, costDeductVO.getRenterSubsidyList());
 		return ResponseData.success();
+	}
+	
+	
+	/**
+	 * 换车操作计算升级车辆补贴
+	 * @param modifyOrderDTO
+	 * @param supplementAmt
+	 * @return RenterOrderSubsidyDetailDTO
+	 */
+	public RenterOrderSubsidyDetailDTO getDispatchingAmtSubsidy(ModifyOrderDTO modifyOrderDTO, CostBaseDTO costBaseDTO, Integer supplementAmt) {
+		if (modifyOrderDTO.getTransferFlag() != null && modifyOrderDTO.getTransferFlag() && 
+				supplementAmt != null && supplementAmt > 0) {
+			// 如果是换车操作计算升级车辆补贴
+        	RenterOrderSubsidyDetailDTO subsidyDetail = convertToRenterOrderSubsidyDetailDTO(costBaseDTO, supplementAmt, SubsidyTypeCodeEnum.RENT_COST_AMT, 
+        			SubsidySourceCodeEnum.PLATFORM, SubsidySourceCodeEnum.RENTER, RenterCashCodeEnum.DISPATCHING_AMT, "换车补贴");
+        	return subsidyDetail;
+		}
+		return null;
+	}
+	
+	
+	/**
+	 * 组合升级补贴
+	 * @param renterOrderCostRespDTO
+	 * @param dispatchingAmtSubsidy
+	 * @return RenterOrderCostRespDTO
+	 */
+	public RenterOrderCostRespDTO combinationDispatchingAmtSubsidy(RenterOrderCostRespDTO renterOrderCostRespDTO, RenterOrderSubsidyDetailDTO dispatchingAmtSubsidy) {
+		// 补贴
+		List<RenterOrderSubsidyDetailDTO> renterOrderSubsidyDetailDTOList = renterOrderCostRespDTO.getRenterOrderSubsidyDetailDTOList();
+		List<RenterOrderSubsidyDetailDTO> rosdList = new ArrayList<RenterOrderSubsidyDetailDTO>();
+		if (renterOrderSubsidyDetailDTOList != null && !renterOrderSubsidyDetailDTOList.isEmpty()) {
+			rosdList.addAll(renterOrderSubsidyDetailDTOList);
+		}
+		if (dispatchingAmtSubsidy != null) {
+			rosdList.add(dispatchingAmtSubsidy);
+		}
+		renterOrderCostRespDTO.setRenterOrderSubsidyDetailDTOList(rosdList);
+		return renterOrderCostRespDTO;
 	}
 	
 	
@@ -737,7 +779,8 @@ public class ModifyOrderService {
 		}
 		if (modifyOrderDTO.getTransferFlag() != null && modifyOrderDTO.getTransferFlag()) {
 			// 换车操作
-			return getRenterSubsidyListTransfer(renterOrderCostReqDTO, initCostList, initSubsidyList);
+			//return getRenterSubsidyListTransfer(renterOrderCostReqDTO, initCostList, initSubsidyList);
+			return renterSubsidyList;
 		}
 		// 订单状态
 		OrderStatusEntity orderStatusEntity = modifyOrderDTO.getOrderStatusEntity();
@@ -1362,6 +1405,10 @@ public class ModifyOrderService {
 		if (changeCodeList != null && !changeCodeList.isEmpty() && 
 				(changeCodeList.contains(OrderChangeItemEnum.MODIFY_SRVGETFLAG.getCode()) || 
 						changeCodeList.contains(OrderChangeItemEnum.MODIFY_SRVRETURNFLAG.getCode()))) {
+			return;
+		}
+		if (modifyOrderDTO.getTransferFlag() != null && modifyOrderDTO.getTransferFlag()) {
+			// 换车操作
 			return;
 		}
 		UpdateOrderDeliveryVO updateFlowOrderVO = new UpdateOrderDeliveryVO();

@@ -25,4 +25,5 @@ public class RenterCostReqVO {
     @ApiModelProperty(value="租客子订单号",required=true)
     @NotBlank(message="renterOrderNo不能为空")
     private String renterOrderNo;
+    
 }

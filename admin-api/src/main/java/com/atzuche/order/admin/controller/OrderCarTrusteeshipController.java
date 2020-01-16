@@ -6,6 +6,7 @@ import com.atzuche.order.delivery.entity.OrderCarTrusteeshipEntity;
 import com.atzuche.order.delivery.entity.RenterOrderDeliveryEntity;
 import com.atzuche.order.delivery.service.OrderCarTrusteeshipService;
 import com.atzuche.order.delivery.service.RenterOrderDeliveryService;
+import com.atzuche.order.delivery.utils.CommonUtil;
 import com.atzuche.order.delivery.vo.trusteeship.OrderCarTrusteeshipReqVO;
 import com.atzuche.order.delivery.vo.trusteeship.OrderCarTrusteeshipVO;
 import com.atzuche.order.rentercommodity.service.RenterCommodityService;
@@ -72,7 +73,9 @@ public class OrderCarTrusteeshipController extends BaseController {
             OrderCarTrusteeshipEntity orderNoAndCar = orderCarTrusteeshipService.selectObjectByOrderNoAndCar(orderCarTrusteeshipVO.getOrderNo(),orderCarTrusteeshipVO.getCarNo());
             if(Objects.nonNull(orderNoAndCar))
             {
-                return ResponseData.createErrorCodeResponse(DeliveryErrorCode.DELIVERY_PARAMS_ERROR.getValue(), "已存在該托管车信息");
+                CommonUtil.copyPropertiesIgnoreNull(orderCarTrusteeshipVO,orderNoAndCar);
+                orderCarTrusteeshipService.updateOrderCarTrusteeship(orderNoAndCar);
+                return ResponseData.success();
             }
             int result = orderCarTrusteeshipService.insertOrderCarTrusteeship(orderCarTrusteeshipEntity);
             if (result > 0) {

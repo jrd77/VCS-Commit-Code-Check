@@ -1,5 +1,8 @@
 package com.atzuche.order.delivery.service.handover;
 
+import com.atzuche.order.commons.vo.req.handover.rep.HandoverCarRespVO;
+import com.atzuche.order.commons.vo.req.handover.rep.OwnerHandoverCarInfoVO;
+import com.atzuche.order.commons.vo.req.handover.rep.RenterHandoverCarInfoVO;
 import com.atzuche.order.delivery.common.DeliveryErrorCode;
 import com.atzuche.order.delivery.entity.OwnerHandoverCarInfoEntity;
 import com.atzuche.order.delivery.entity.OwnerHandoverCarRemarkEntity;
@@ -87,6 +90,25 @@ public class HandoverCarService {
         HandoverCarRepVO handoverCarRepVO = new HandoverCarRepVO();
         handoverCarRepVO.setOwnerHandoverCarInfoEntities(ownerHandoverCarInfoEntities);
         handoverCarRepVO.setRenterHandoverCarInfoEntities(renterHandoverCarInfoEntities);
+        return handoverCarRepVO;
+    }
+
+    /**
+     * 根据订单号查询(油耗 里程)需要的数据（给外部）
+     * @param orderNo
+     * @return
+     */
+    public HandoverCarRespVO getHandoverCarInfoByOrderNo(String  orderNo) {
+        if (StringUtils.isBlank(orderNo)) {
+            throw new HandoverCarOrderException(DeliveryErrorCode.DELIVERY_PARAMS_ERROR.getValue(), "参数错误");
+        }
+        List<RenterHandoverCarInfoEntity> renterHandoverCarInfoEntities = renterHandoverCarService.selectRenterByOrderNo(orderNo);
+        List<OwnerHandoverCarInfoEntity> ownerHandoverCarInfoEntities = ownerHandoverCarService.selectOwnerByOrderNo(orderNo);
+        HandoverCarRespVO handoverCarRepVO = new HandoverCarRespVO();
+        List<OwnerHandoverCarInfoVO> ownerHandoverCarInfoVOS = CommonUtil.copyList(ownerHandoverCarInfoEntities);
+        List<RenterHandoverCarInfoVO> renterHandoverCarInfoVOS = CommonUtil.copyList(renterHandoverCarInfoEntities);
+        handoverCarRepVO.setOwnerHandoverCarInfoVOS(ownerHandoverCarInfoVOS);
+        handoverCarRepVO.setRenterHandoverCarInfoVOS(renterHandoverCarInfoVOS);
         return handoverCarRepVO;
     }
 

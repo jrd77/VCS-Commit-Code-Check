@@ -1,6 +1,8 @@
 package com.atzuche.order.delivery.service.handover;
 
 import com.atzuche.order.commons.CommonUtils;
+import com.atzuche.order.commons.vo.req.handover.req.HandoverCarInfoReqDTO;
+import com.atzuche.order.commons.vo.req.handover.req.HandoverCarInfoReqVO;
 import com.atzuche.order.delivery.common.DeliveryCarTask;
 import com.atzuche.order.delivery.common.DeliveryErrorCode;
 import com.atzuche.order.delivery.entity.RenterOrderDeliveryEntity;
@@ -14,8 +16,6 @@ import com.atzuche.order.delivery.vo.delivery.*;
 import com.atzuche.order.delivery.vo.delivery.req.CarConditionPhotoUploadVO;
 import com.atzuche.order.delivery.vo.delivery.req.DeliveryReqDTO;
 import com.atzuche.order.delivery.vo.delivery.req.DeliveryReqVO;
-import com.atzuche.order.delivery.vo.handover.req.HandoverCarInfoReqDTO;
-import com.atzuche.order.delivery.vo.handover.req.HandoverCarInfoReqVO;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

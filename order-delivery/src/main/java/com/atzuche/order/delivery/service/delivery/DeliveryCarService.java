@@ -30,6 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.Future;
 
 /**
  * @author 胡春林
@@ -79,6 +80,32 @@ public class DeliveryCarService {
         log.info(orderDeliveryVO.getOrderDeliveryDTO().toString());
     }
 
+
+    /**
+     * 更新车辆数据到仁云
+     * @param getMinutes
+     * @param returnMinutes
+     * @param orderReqContext
+     * @param orderType
+     */
+    public void updateRenYunFlowOrderCarInfo(Integer getMinutes, Integer returnMinutes, OrderReqContext orderReqContext, Integer orderType)
+    {
+        OrderDeliveryVO orderDeliveryVO = createOrderDeliveryParams(orderReqContext, orderType);
+        if (null == orderDeliveryVO) {
+            throw new DeliveryOrderException(DeliveryErrorCode.DELIVERY_PARAMS_ERROR);
+        }
+        //开始取消仁云订单数据
+        Future<Boolean> result = cancelRenYunFlowOrderInfo(new CancelOrderDeliveryVO().setRenterOrderNo(orderDeliveryVO.getOrderDeliveryDTO().getRenterOrderNo())
+                .setCancelFlowOrderDTO(new CancelFlowOrderDTO().setOrdernumber(orderDeliveryVO.getOrderDeliveryDTO().getOrderNo()).setServicetype(orderDeliveryVO.getOrderDeliveryFlowEntity().getServiceType())));
+        if (result.isDone()) {
+            //开始新增数据并发送仁云
+            addFlowOrderInfo(getMinutes, returnMinutes, orderReqContext);
+            RenYunFlowOrderDTO renYunFlowOrderDTO = createRenYunDTO(orderDeliveryVO.getOrderDeliveryFlowEntity());
+            deliveryCarTask.addRenYunFlowOrderInfo(renYunFlowOrderDTO);
+        }
+    }
+
+
     /**
      * 发送配送订单到仁云 提供给外层回调
      * @param renterOrderNo
@@ -127,7 +154,7 @@ public class DeliveryCarService {
      * 取消配送订单到仁云流程系统
      */
     @Transactional(rollbackFor = Exception.class)
-    public void cancelRenYunFlowOrderInfo(CancelOrderDeliveryVO cancelOrderDeliveryVO) {
+    public Future<Boolean> cancelRenYunFlowOrderInfo(CancelOrderDeliveryVO cancelOrderDeliveryVO) {
         if (null == cancelOrderDeliveryVO || cancelOrderDeliveryVO.getCancelFlowOrderDTO() == null || StringUtils.isBlank(cancelOrderDeliveryVO.getRenterOrderNo())) {
             throw new DeliveryOrderException(DeliveryErrorCode.DELIVERY_PARAMS_ERROR);
         }
@@ -139,8 +166,9 @@ public class DeliveryCarService {
             deliveryCarTask.cancelOrderDelivery(cancelOrderDeliveryVO.getRenterOrderNo(), 2,cancelOrderDeliveryVO);
         } else {
             serviceType = cancelOrderDeliveryVO.getCancelFlowOrderDTO().getServicetype().equals(ServiceTypeEnum.TAKE_TYPE.getValue()) ? 1 : 2;
-            deliveryCarTask.cancelOrderDelivery(cancelOrderDeliveryVO.getRenterOrderNo(), serviceType,cancelOrderDeliveryVO);
+           return deliveryCarTask.cancelOrderDelivery(cancelOrderDeliveryVO.getRenterOrderNo(), serviceType,cancelOrderDeliveryVO);
         }
+        return null;
     }
 
     /**
@@ -320,6 +348,14 @@ public class DeliveryCarService {
      * @param orderDeliveryFlowEntity
      */
     public void insertRenYunFlowOrderDTO(OrderDeliveryFlowEntity orderDeliveryFlowEntity) {
+
+        OrderDeliveryFlowEntity orderDeliveryFlow = deliveryFlowService.selectOrderDeliveryFlowByOrderNo(orderDeliveryFlowEntity.getOrderNo(),orderDeliveryFlowEntity.getServiceType());
+        if(Objects.nonNull(orderDeliveryFlow))
+        {
+            BeanUtils.copyProperties(orderDeliveryFlowEntity,orderDeliveryFlow);
+            deliveryFlowService.updateOrderDeliveryFlow(orderDeliveryFlow);
+            return;
+        }
         deliveryFlowService.insertOrderDeliveryFlow(orderDeliveryFlowEntity);
     }
 

@@ -96,8 +96,14 @@ public class OrderCostService {
 		 * 根据订单号查询封装
 		 */
 		//需补付金额
-		int needIncrementAmt = cashierPayService.getRentCost(orderNo, memNo);  //getRealRentCost )  海豹提供
-		resVo.setNeedIncrementAmt(needIncrementAmt);
+		try {
+			int needIncrementAmt = cashierPayService.getRealRentCost(orderNo, memNo);  //getRealRentCost )  海豹提供
+			resVo.setNeedIncrementAmt(needIncrementAmt);
+		} catch (Exception e) {
+			log.error("实际租车费用:",e);
+			resVo.setNeedIncrementAmt(0);
+		}
+		
 		
 		
         //违章押金
