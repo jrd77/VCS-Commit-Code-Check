@@ -87,7 +87,20 @@ public enum ErrorCode {
     ADMIN_CAR_DEPOSIT_QUERY_ERR("700121","车辆押金查询异常"),
     ADMIN_ORDER_MODIFY_ERR("700122","修改订单异常"),
     ADMIN_ORDER_MODIFY_FAIL("700123","修啊给I订单失败"),
-    NO_EFFECTIVE_ERR("700124","有效子订单异常")
+    NO_EFFECTIVE_ERR("700124","有效子订单异常"),
+
+    OWNER_RENT_DETAIL_ERR("700125","获取车主租金详情异常"),
+    OWNER_RENT_DETAIL_FAIL("700126","获取车主租金详情失败"),
+    OWNER_RENT_PRICE_ERR("700127","获取车主租客的相互调价异常"),
+    OWNER_RENT_PRICE_FAIL("700128","获取车主租客的相互调价失败"),
+    OWNER_FINE_DETAIL_ERR("700129","获取违约罚金异常"),
+    OWNER_FINE_DETAIL_FAIL("700130","获取违约罚金失败"),
+    OWNER_SERVICE_FEE_FAIL("700131","获取服务费失败"),
+    OWNER_SERVICE_FEE_ERR("700132","获取服务费异常"),
+    OWNER_PLATFORM_ERR("700133","获取车主付给平台费用异常"),
+    OWNER_PLATFORM_FAIL("700134","获取车主付给平台费用失败"),
+    OWNER_PLATFORM_SUBSIDY_ERR("700135","获取平台给车主的补贴明细异常"),
+    OWNER_PLATFORM_SUBSIDY_FAIL("700136","获取平台给车主的补贴明细失败"),
     ;
 
     private String code;

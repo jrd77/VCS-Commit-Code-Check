@@ -25,7 +25,7 @@ public class OrderSubmitService {
         AdminOrderReqVO adminOrderReqParam = this.transDto(adminOrderReqVO,request);
 
         //2、http发送
-        ResponseData<OrderResVO> orderDetail = feignOrderAdminSubmitService.getOrderDetail(adminOrderReqParam);
+        ResponseData<OrderResVO> orderDetail = feignOrderAdminSubmitService.submit(adminOrderReqParam);
         //HttpResult orderDetail = HttpUtil.doPostNotGzip("http://10.0.3.235:1412/order/admin/req", JSON.toJSONString(adminOrderReqParam));
         //HttpResult orderDetail = HttpUtil.doPostNotGzip("http://localhost:7777/order/admin/req", JSON.toJSONString(adminOrderReqParam));
         //3、返回结果

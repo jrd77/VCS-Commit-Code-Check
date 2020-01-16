@@ -18,5 +18,5 @@ public interface FeignOrderAdminSubmitService {
      *
      **/
     @RequestMapping(method = RequestMethod.POST, value = "/order/admin/req")
-    ResponseData<OrderResVO> getOrderDetail(@RequestBody AdminOrderReqVO adminOrderReqVO);
+    ResponseData<OrderResVO> submit(@RequestBody AdminOrderReqVO adminOrderReqVO);
 }
