@@ -6,9 +6,9 @@ import lombok.Data;
 @Data
 public class ServiceDetailDTO {
     @AutoDocProperty("车辆类型")
-    private Integer carType;
+    private String carType;
     @AutoDocProperty("服务费比例")
-    private String serviceRate;
+    private Double serviceRate;
     @AutoDocProperty("服务费")
-    private Double serviceAmt;
+    private Integer serviceAmt;
 }

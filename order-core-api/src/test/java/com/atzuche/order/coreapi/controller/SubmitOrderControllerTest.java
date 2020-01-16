@@ -5,8 +5,6 @@ import com.atzuche.order.commons.http.HttpResult;
 import com.atzuche.order.commons.http.HttpUtil;
 import com.atzuche.order.commons.vo.req.NormalOrderReqVO;
 
-import java.util.UUID;
-
 public class SubmitOrderControllerTest {
 
     //@Test
@@ -14,7 +12,7 @@ public class SubmitOrderControllerTest {
 //        LocalDateTime rentTime = LocalDateTime.of(2020,1,2,12,1,1);
 //        LocalDateTime revertTime = LocalDateTime.of(2020,1,3,12,1,1);
         NormalOrderReqVO param = new NormalOrderReqVO();
-        param.setRequestId(UUID.randomUUID().toString());
+        //param.setRequestId(UUID.randomUUID().toString());
         param.setOS("PC");
         param.setOsVersion("90");
         param.setAppVersion("100");
