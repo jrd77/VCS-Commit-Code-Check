@@ -9,17 +9,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class BaseProducer extends RabbitMQProducer {
 
-
-    /**
-     * 发送消息
-     * @param queueName
-     * @param message
-     */
-    public void sendMessage(String queueName, OrderMessage message)
-    {
-        super.sendMsg(queueName,message);
-    }
-
     /**
      * 发送消息
      * @param exchange

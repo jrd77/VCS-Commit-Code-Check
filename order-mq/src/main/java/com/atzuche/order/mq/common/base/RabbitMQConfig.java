@@ -53,7 +53,7 @@ public class RabbitMQConfig {
     @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
     public RabbitTemplate rabbitTemplate() {
         RabbitTemplate template = new RabbitTemplate(connectionFactory());
-        template.setMessageConverter(jsonMessageConverter());
+       // template.setMessageConverter(jsonMessageConverter());
         return template;
     }
 
@@ -73,7 +73,7 @@ public class RabbitMQConfig {
     public SimpleRabbitListenerContainerFactory rabbitListenerContainerFactory(ConnectionFactory connectionFactory) {
         SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
         factory.setConnectionFactory(connectionFactory);
-        factory.setMessageConverter(jsonMessageConverter());
+        //factory.setMessageConverter(jsonMessageConverter());
         factory.setConcurrentConsumers(Integer.valueOf(prefetchCount));
         return factory;
     }
