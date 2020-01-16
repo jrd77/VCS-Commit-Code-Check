@@ -1,4 +1,4 @@
-package com.atzuche.order.photo.entity;
+package com.atzuche.order.photo.dto;
 
 import lombok.Data;
 import lombok.ToString;
