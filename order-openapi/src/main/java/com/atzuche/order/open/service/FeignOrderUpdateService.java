@@ -1,6 +1,7 @@
 package com.atzuche.order.open.service;
 
 import com.atzuche.order.commons.entity.dto.RentCityAndRiskAccidentReqDTO;
+import com.atzuche.order.commons.vo.req.AdminOrderCancelReqVO;
 import com.atzuche.order.commons.vo.req.CancelOrderReqVO;
 import com.autoyol.commons.web.ResponseData;
 import org.springframework.cloud.netflix.feign.FeignClient;
@@ -28,4 +29,14 @@ public interface FeignOrderUpdateService {
      **/
     @PostMapping("/order/normal/cancel")
     public ResponseData<?> cancelOrder(@RequestBody CancelOrderReqVO cancelOrderReqVO);
+
+
+    /**
+     * 平台取消
+     *
+     * @param adminOrderCancelReqVO 请求参数
+     * @return ResponseData<?>
+     */
+    @PostMapping("/order/admin/cancel")
+    public ResponseData<?> adminCancelOrder(@RequestBody AdminOrderCancelReqVO adminOrderCancelReqVO);
 }
