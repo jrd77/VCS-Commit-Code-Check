@@ -58,27 +58,27 @@ public class DeliveryCarController extends BaseController {
         }
     }
 
-    /**
-     * 交接车照片上传
-     * @return
-     */
-    @AutoDocVersion(version = "管理后台交接车照片上传")
-    @AutoDocGroup(group = "管理后台交接车照片上传")
-    @AutoDocMethod(description = "交接车照片上传", value = "交接车照片上传", response = ResponseData.class)
-    @RequestMapping(value = "/handover/photo/upload", method = RequestMethod.POST)
-    public ResponseData<?> upload(@RequestBody @Validated CarConditionPhotoUploadVO photoUploadReqVo, BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            return validate(bindingResult);
-        }
-        try {
-            boolean result = deliveryCarInfoService.uploadByOrderNo(photoUploadReqVo);
-            return ResponseData.success(result);
-        } catch (Exception e) {
-            log.error("交接车照片上传接口出现异常", e);
-            Cat.logError("交接车照片上传接口出现异常", e);
-            return ResponseData.createErrorCodeResponse(ErrorCode.FAILED.getCode(), "交接车照片上传接口出现错误");
-        }
-    }
+//    /**
+//     * 交接车照片上传
+//     * @return
+//     */
+//    @AutoDocVersion(version = "管理后台交接车照片上传")
+//    @AutoDocGroup(group = "管理后台交接车照片上传")
+//    @AutoDocMethod(description = "交接车照片上传", value = "交接车照片上传", response = ResponseData.class)
+//    @RequestMapping(value = "/handover/photo/upload", method = RequestMethod.POST)
+//    public ResponseData<?> upload(@RequestBody @Validated CarConditionPhotoUploadVO photoUploadReqVo, BindingResult bindingResult) {
+//        if (bindingResult.hasErrors()) {
+//            return validate(bindingResult);
+//        }
+//        try {
+//            boolean result = deliveryCarInfoService.uploadByOrderNo(photoUploadReqVo);
+//            return ResponseData.success(result);
+//        } catch (Exception e) {
+//            log.error("交接车照片上传接口出现异常", e);
+//            Cat.logError("交接车照片上传接口出现异常", e);
+//            return ResponseData.createErrorCodeResponse(ErrorCode.FAILED.getCode(), "交接车照片上传接口出现错误");
+//        }
+//    }
 
     /**
      * 取还车（是否取还车）更新接口
