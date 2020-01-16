@@ -1,6 +1,6 @@
 package com.atzuche.order.delivery.service.handover.interfaces;
 
-import com.atzuche.order.delivery.vo.handover.req.HandoverCarInfoReqDTO;
+import com.atzuche.order.commons.vo.req.handover.req.HandoverCarInfoReqDTO;
 
 /**
  * @author 胡春林
