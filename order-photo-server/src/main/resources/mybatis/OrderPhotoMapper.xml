@@ -12,7 +12,7 @@
 	</select>
 	
 	<select id="queryViolationPhotoList" resultType="com.atzuche.order.photo.entity.OrderPhotoEntity">
-		SELECT id,path,user_type userType,order_no orderNo,create_time createTime,update_time updateTime,operator FROM trans_illegal_photo where order_no=#{orderNo}
+		SELECT id,path,user_type userType,order_no orderNo,create_time createTime,update_time updateTime,operator FROM renter_order_wz_illegal_photo where order_no=#{orderNo}
 	</select>
 	
 	<insert id="addUploadOrderPhoto" parameterType="map">
@@ -24,7 +24,7 @@
 		  trans_claim_photo(path,user_type,order_no,serial_number,operator) VALUES(#{path},#{userType},#{orderNo},0,#{operator});
 		 </if>
 		  <if test="photoType==4">
-		  trans_illegal_photo(path,user_type,order_no,serial_number,operator) VALUES(#{path},#{userType},#{orderNo},0,#{operator});
+		  renter_order_wz_illegal_photo(path,user_type,order_no,serial_number,operator, car_plate_num) VALUES(#{path},#{userType},#{orderNo},0,#{operator},#{carPlateNum});
 		 </if>
 	</insert>
 
@@ -38,7 +38,7 @@
 			trans_claim_photo set path = #{path}, operator = #{operator}, user_type = #{userType} where id = #{photoId};
 		</if>
 		<if test="photoType==4">
-			trans_illegal_photo set path = #{path}, operator = #{operator}, user_type = #{userType} where id = #{photoId};
+			renter_order_wz_illegal_photo set path = #{path}, operator = #{operator}, user_type = #{userType} where id = #{photoId};
 		</if>
 	</insert>
 
@@ -52,7 +52,7 @@
 		  trans_claim_photo
 		 </if>
 		 <if test="photoType==4">
-		  trans_illegal_photo
+		  renter_order_wz_illegal_photo
 		 </if>
 		 WHERE id=#{id}
 	</delete>
@@ -62,7 +62,7 @@
 	</select>
 	<select id="queryIllegalPhotoByOrderNo" resultType="com.atzuche.order.photo.dto.PhotoPathDTO">
 		select user_type userType,path img
-		from trans_illegal_photo
+		from renter_order_wz_illegal_photo
 		where order_no=#{orderNo}
 	</select>
 
@@ -76,7 +76,7 @@
 			from trans_claim_photo where id = #{photoId};
 		</if>
 		<if test="photoType==4">
-		    from trans_illegal_photo where id = #{photoId};
+		    from renter_order_wz_illegal_photo where id = #{photoId};
 		</if>
 	</select>
 
