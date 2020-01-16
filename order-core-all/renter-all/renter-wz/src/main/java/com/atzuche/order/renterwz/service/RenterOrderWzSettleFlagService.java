@@ -74,7 +74,12 @@ public class RenterOrderWzSettleFlagService {
         }
     }
 
-    public void updateSettle(String orderNo) {
+    /**
+     * 违章押金结算后 调用
+     * @param orderNo 订单号
+     * @param isSuccessful 是否结算成功 1 成功  0 失败
+     */
+    public void updateSettle(String orderNo,Integer isSuccessful) {
         //结算成功后的处理
         this.updateIllegalSettleFlagSuccess(orderNo);
         List<RenterOrderWzStatusEntity> list = renterOrderWzStatusService.queryInfosByOrderNo(orderNo);
