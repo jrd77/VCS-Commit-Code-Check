@@ -29,7 +29,7 @@ public class OrderStatusEventListener {
     },containerFactory = "rabbitListenerContainerFactory")
     public void process(Message message) {
         log.info("receive order action message: " + new String(message.getBody()));
-        OrderMessage orderMessage = JSONObject.parseObject(message.getBody(),OrderMessage.class);
+        OrderMessage orderMessage = JSONObject.parseObject(new String(message.getBody()),OrderMessage.class);
         log.info("新订单状态总事件监听,入参orderMessage:[{}]", orderMessage.toString());
             try {
                 sendPlatformSmsService.orderPaySms(orderMessage.getContext(), orderMessage.getPhone(), "大事件備注",null);
