@@ -29,8 +29,8 @@ public class DeliveryController {
     @PostMapping("/delivery/add")
     public ResponseData<?> add() {
 
-        OrderMessage orderMessage =OrderMessage.builder().phone("18164031722").context("测试短信首付").build();
-        baseProducer.sendTopicMessage("auto-order-action","order.create",orderMessage);
+        OrderMessage orderMessage =OrderMessage.builder().phone("13628645717").context("测试短信首付").build();
+        baseProducer.sendTopicMessage("auto-order-action","action.order.create",orderMessage);
 
         return null;
 //        RenYunFlowOrderDTO renYunFlowOrderDTO = new RenYunFlowOrderDTO();
