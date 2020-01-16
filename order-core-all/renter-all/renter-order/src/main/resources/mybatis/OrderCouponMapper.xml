@@ -173,4 +173,16 @@
         limit 1
     </select>
 
+    <select id="selectCouponNoByOrderNo" resultType="string" >
+        select
+            coupon_id as couponNo
+        from
+            order_coupon
+        where
+            `order_no` = #{orderNo}
+            and `coupon_type` = #{couponType}
+            and is_delete = 0
+        limit 1
+    </select>
+
 </mapper>

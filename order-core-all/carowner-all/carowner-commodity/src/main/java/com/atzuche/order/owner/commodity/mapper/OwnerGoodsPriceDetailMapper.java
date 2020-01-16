@@ -29,5 +29,5 @@ public interface OwnerGoodsPriceDetailMapper{
 
     int insertList(@Param("list")List<OwnerGoodsPriceDetailEntity> list);
 
-
+    List<OwnerGoodsPriceDetailEntity> getByOwnerOrderNo(@Param("ownerOrderNo")String ownerOrderNo);
 }

@@ -69,7 +69,7 @@ public class CouponAndCoinHandleService {
         if (StringUtils.isBlank(disCopuponId)) {
             return true;
         }
-        if(null == isUse || !isUse) {
+        if (null == isUse || !isUse) {
             return true;
         }
 
@@ -98,27 +98,48 @@ public class CouponAndCoinHandleService {
 //        beanCopier.copy(autoCoinDeductReqVO, vo, null);
 //        return autoCoinService.deduct(vo);
 
-        accountRenterCostCoinService.deductAutoCoin(autoCoinDeductReqVO.getMemNo(),autoCoinDeductReqVO.getOrderNo(),
-                autoCoinDeductReqVO.getRenterOrderNo(),autoCoinDeductReqVO.getChargeAutoCoin());
+        accountRenterCostCoinService.deductAutoCoin(autoCoinDeductReqVO.getMemNo(), autoCoinDeductReqVO.getOrderNo(),
+                autoCoinDeductReqVO.getRenterOrderNo(), autoCoinDeductReqVO.getChargeAutoCoin());
         return true;
     }
 
 
-
-
-    public boolean undoOwnerCoupon(String orderNo, String couponNo, String recover){
-        if(StringUtils.isBlank(couponNo)) {
+    /**
+     * 撤销车主券
+     *
+     * @param orderNo  订单号
+     * @param couponNo 车主券码
+     * @param recover  操作标识
+     * @return boolean
+     */
+    public boolean undoOwnerCoupon(String orderNo, String couponNo, String recover) {
+        if (StringUtils.isBlank(couponNo)) {
             return true;
         }
         return ownerDiscountCouponService.undoCoupon(orderNo, couponNo, recover);
     }
 
+    /**
+     * 撤销平台优惠券
+     *
+     * @param orderNo 订单号
+     * @return boolean
+     */
     public boolean undoPlatformCoupon(String orderNo) {
         return platformCouponService.cancelPlatformCoupon(orderNo) > 0;
     }
 
+    /**
+     * 撤销送取服务券
+     *
+     * @param orderNo 订单号
+     * @return boolean
+     */
     public boolean undoGetCarFeeCoupon(String orderNo) {
         return platformCouponService.cancelGetCarFeeCoupon(orderNo) > 0;
     }
+
+
+
 
 }

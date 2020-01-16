@@ -20,7 +20,10 @@ import com.atzuche.order.coreapi.modifyorder.exception.ModifyOrderGoodPriceNotEx
 import com.atzuche.order.coreapi.modifyorder.exception.ModifyOrderMemberNotExistException;
 import com.atzuche.order.coreapi.modifyorder.exception.ModifyOrderParentOrderNotFindException;
 import com.atzuche.order.coreapi.modifyorder.exception.ModifyOrderRentOrRevertTimeException;
+import com.atzuche.order.coreapi.modifyorder.exception.TransferCarException;
 import com.atzuche.order.coreapi.modifyorder.exception.TransferUseOwnerCouponException;
+import com.atzuche.order.owner.commodity.entity.OwnerGoodsEntity;
+import com.atzuche.order.owner.commodity.service.OwnerGoodsService;
 import com.atzuche.order.parentorder.entity.OrderEntity;
 import com.atzuche.order.renterorder.entity.RenterOrderChangeApplyEntity;
 import com.atzuche.order.renterorder.entity.dto.OrderChangeItemDTO;
@@ -39,6 +42,8 @@ public class ModifyOrderCheckService {
 	private StockService stockService;
 	@Autowired
 	private RenterOrderChangeApplyService renterOrderChangeApplyService;
+	@Autowired
+	private OwnerGoodsService ownerGoodsService;
 	
 	/**
 	 * 库存校验
@@ -46,14 +51,14 @@ public class ModifyOrderCheckService {
 	 */
 	public void checkCarStock(ModifyOrderDTO modifyOrderDTO) {
 		// 修改项目
-		List<OrderChangeItemDTO> changeItemList = modifyOrderDTO.getChangeItemList();
-		checkDataChange(changeItemList);
-		List<String> changeCodeList = modifyOrderConfirmService.listChangeCode(changeItemList);
-		if (!changeCodeList.contains(OrderChangeItemEnum.MODIFY_RENTTIME.getCode()) && 
-				!changeCodeList.contains(OrderChangeItemEnum.MODIFY_REVERTTIME.getCode())) {
-			// 未修改租期,不需要校验库存
-			return;
-		}
+		/*
+		 * List<OrderChangeItemDTO> changeItemList = modifyOrderDTO.getChangeItemList();
+		 * checkDataChange(changeItemList); List<String> changeCodeList =
+		 * modifyOrderConfirmService.listChangeCode(changeItemList); if
+		 * (!changeCodeList.contains(OrderChangeItemEnum.MODIFY_RENTTIME.getCode()) &&
+		 * !changeCodeList.contains(OrderChangeItemEnum.MODIFY_REVERTTIME.getCode())) {
+		 * // 未修改租期,不需要校验库存 return; }
+		 */
 		OrderInfoDTO orderInfoDTO = new OrderInfoDTO();
 		orderInfoDTO.setOrderNo(modifyOrderDTO.getOrderNo());
 		orderInfoDTO.setCityCode(modifyOrderDTO.getCityCode() != null ? Integer.valueOf(modifyOrderDTO.getCityCode()):null);
@@ -107,6 +112,8 @@ public class ModifyOrderCheckService {
 		}
 		// 使用车主券不允许换车
 		checkUserOwnerCoupon(modifyOrderDTO);
+		// 换车校验车辆
+		checkTransferCar(modifyOrderDTO);
 	}
 	
 	/**
@@ -215,6 +222,23 @@ public class ModifyOrderCheckService {
 				// 使用车主券不允许换车
 				Cat.logError("ModifyOrderCheckService.checkUserOwnerCoupon校验使用车主券不允许换车", new TransferUseOwnerCouponException());
 				throw new TransferUseOwnerCouponException();
+			}
+		}
+	}
+	
+	/**
+	 * 换车校验车辆
+	 * @param modifyOrderDTO
+	 */
+	public void checkTransferCar(ModifyOrderDTO modifyOrderDTO) {
+		if (modifyOrderDTO.getTransferFlag() != null && modifyOrderDTO.getTransferFlag()) {
+			// 获取最新的车主商品信息
+			OwnerGoodsEntity ownerGoodsEntity = ownerGoodsService.getLastOwnerGoodsByOrderNo(modifyOrderDTO.getOrderNo());
+			String initCarNo = (ownerGoodsEntity != null && ownerGoodsEntity.getCarNo() != null) ? String.valueOf(ownerGoodsEntity.getCarNo()):null;  
+			if (initCarNo != null && initCarNo.equals(modifyOrderDTO.getCarNo())) {
+				// 使用车主券不允许换车
+				Cat.logError("ModifyOrderCheckService.checkUserOwnerCoupon校验使用车主券不允许换车", new TransferCarException());
+				throw new TransferCarException();
 			}
 		}
 	}

@@ -1,6 +1,5 @@
 package com.atzuche.order.photo.dto;
 
-import com.atzuche.order.photo.entity.PhotoPathDTO;
 import lombok.Data;
 import lombok.ToString;
 

@@ -22,16 +22,17 @@ public class TransferReq implements Serializable{
 	@AutoDocProperty(value="订单编号,必填，",required=true)
 	private String orderNo;
 	
-	@NotBlank(message="memNo不能为空")
-	@AutoDocProperty(value="memNo,必填，",required=true)
+	@NotBlank(message="租客memNo不能为空")
+	@AutoDocProperty(value="租客memNo,必填，",required=true)
 	private String memNo;
+	
+	@NotBlank(message="车辆注册号carNo不能为空")
+	@AutoDocProperty(value="车辆注册号",required=true)
+    private String carNo;
 	
 	@AutoDocProperty(value="是否使用特供价 1-使用，0-不使用")
     private Integer useSpecialPriceFlag;
 	
-	@AutoDocProperty(value="车辆注册号")
-    private String carNo;
-
 	@AutoDocProperty(value="管理后台操作人")
     private String operator;
 }

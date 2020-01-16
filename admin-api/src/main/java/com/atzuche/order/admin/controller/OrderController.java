@@ -1,6 +1,7 @@
 package com.atzuche.order.admin.controller;
 
 import com.alibaba.fastjson.JSON;
+import com.atzuche.order.admin.common.AdminUserUtil;
 import com.atzuche.order.admin.service.AdminOrderService;
 import com.atzuche.order.admin.vo.req.order.CancelOrderByPlatVO;
 import com.atzuche.order.admin.vo.req.order.CancelOrderVO;
@@ -15,6 +16,8 @@ import com.autoyol.doc.annotation.AutoDocMethod;
 import com.autoyol.doc.annotation.AutoDocVersion;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -36,6 +39,8 @@ import java.util.Optional;
 @Slf4j
 @RestController
 public class OrderController {
+    private final static Logger logger = LoggerFactory.getLogger(OrderController.class);
+    
     @Autowired
     private AdminOrderService adminOrderService;
     @Autowired
@@ -73,9 +78,18 @@ public class OrderController {
     @AutoDocGroup(group = "订单修改")
     @AutoDocMethod(description = "平台取消", value = "平台取消",response = ResponseData.class)
     @RequestMapping(value="console/order/cancel/plat",method = RequestMethod.POST)
-    public ResponseData cancelOrderByPlat(@RequestBody CancelOrderByPlatVO cancelOrderByPlatVO, HttpServletRequest request, HttpServletResponse response)throws Exception{
-        //TODO:
-        return null;
+    public ResponseData cancelOrderByPlat(@RequestBody CancelOrderByPlatVO cancelOrderByPlatVO,BindingResult result, HttpServletRequest request, HttpServletResponse response)throws Exception{
+         logger.info("admin={},cancelOrderByPlatVO is {}", AdminUserUtil.getAdminUser(),cancelOrderByPlatVO);
+         if(result.hasErrors()){
+             Optional<FieldError> error = result.getFieldErrors().stream().findFirst();
+             return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), error.isPresent() ?
+                     error.get().getDefaultMessage() : ErrorCode.INPUT_ERROR.getText());
+         }
+         cancelOrderByPlatVO.setOperator(AdminUserUtil.getAdminUser().getAuthName());
+         adminOrderService.cancelOrderByAdmin(cancelOrderByPlatVO);
+         return ResponseData.success();
+
+
     }
 
     @AutoDocVersion(version = "订单修改")
@@ -89,26 +103,6 @@ public class OrderController {
             return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), error.isPresent() ?
                     error.get().getDefaultMessage() : ErrorCode.INPUT_ERROR.getText());
         }
-        String orderNo = cancelOrderVO.getOrderNo();
-        OrderDetailReqDTO reqDTO = new OrderDetailReqDTO();
-        reqDTO.setOrderNo(orderNo);
-
-        ResponseData<OrderDetailRespDTO> respDTOResponseData =feignOrderDetailService.getOrderDetail(reqDTO);
-        if(respDTOResponseData==null||!ErrorCode.SUCCESS.getCode().equalsIgnoreCase(respDTOResponseData.getResCode())){
-            throw new RenterInfoController.RenterNotFoundException(orderNo);
-        }
-
-        OrderDetailRespDTO detailRespDTO = respDTOResponseData.getData();
-        String memNo = "";
-        if("1".equals(cancelOrderVO.getMemRole())){
-            memNo = detailRespDTO.getRenterMember().getMemNo();
-        }else if("2".equals(cancelOrderVO.getMemRole())){
-            memNo = detailRespDTO.getOwnerMember().getMemNo();
-        }
-        if (StringUtils.isBlank(memNo)) {
-            return new ResponseData<>(ErrorCode.NEED_LOGIN.getCode(), ErrorCode.NEED_LOGIN.getText());
-        }
-        cancelOrderVO.setMemNo(memNo);
         ResponseData responseData = adminOrderService.cancelOrder(cancelOrderVO);
         return responseData;
     }

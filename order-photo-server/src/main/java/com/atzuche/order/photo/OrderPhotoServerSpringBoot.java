@@ -11,8 +11,8 @@ import org.springframework.boot.web.support.SpringBootServletInitializer;
  * @author <a href="mailto:lianglin.sjtu@gmail.com">AndySjtu</a>
  * @date 2019/12/27 4:12 下午
  **/
-@SpringBootApplication(scanBasePackages = {"com.atzuche.order.photo"})
-@MapperScan({"com.atzuche.order.photo"})
+@SpringBootApplication(scanBasePackages = {"com.atzuche.order.photo","com.atzuche.order"})
+@MapperScan({"com.atzuche.order"})
 public class OrderPhotoServerSpringBoot extends SpringBootServletInitializer {
 
     public static void main(String[] args) {

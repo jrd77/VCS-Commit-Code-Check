@@ -116,7 +116,7 @@ public class ModifyOrderConfirmService {
 		// 通知仁云
 		noticeRenYun(modifyOrderDTO.getRenterOrderNo(), modifyOrderOwnerDTO, listChangeCode(modifyOrderDTO.getChangeItemList()), reqContext);
 		// 扣库存
-		//cutCarStock(modifyOrderOwnerDTO, listChangeCode(modifyOrderDTO.getChangeItemList()));
+		cutCarStock(modifyOrderOwnerDTO, listChangeCode(modifyOrderDTO.getChangeItemList()));
 	}
 	
 	/**
@@ -190,7 +190,7 @@ public class ModifyOrderConfirmService {
 		// 通知仁云
 		noticeRenYun(renterOrderNo, modifyOrderOwnerDTO, changeItemList, null);
 		// 扣库存
-		//cutCarStock(modifyOrderOwnerDTO, changeItemList);
+		cutCarStock(modifyOrderOwnerDTO, changeItemList);
 	}
 	
 	
@@ -235,6 +235,15 @@ public class ModifyOrderConfirmService {
 			Integer srvReturnFlag = modify.getSrvReturnFlag();
 			if (modify.getTransferFlag() != null && modify.getTransferFlag()) {
 				// 换车操作先取消上笔仁云再新增当前订单
+				OwnerOrderEntity ownerOrderEffective = modify.getOwnerOrderEffective();
+				Integer getMinutes = ownerOrderEffective == null ? 0:ownerOrderEffective.getBeforeMinutes();
+				Integer returnMinutes = ownerOrderEffective == null ? 0:ownerOrderEffective.getAfterMinutes();
+				if (srvGetFlag != null && srvGetFlag == 1) {
+					deliveryCarService.updateRenYunFlowOrderCarInfo(getMinutes, returnMinutes, reqContext, SrvGetReturnEnum.SRV_GET_TYPE.getCode());
+				}
+				if (srvReturnFlag != null && srvReturnFlag == 1) {
+					deliveryCarService.updateRenYunFlowOrderCarInfo(getMinutes, returnMinutes, reqContext, SrvGetReturnEnum.SRV_RETURN_TYPE.getCode());
+				}
 				
 			}
 			// 是否发送仁云
@@ -405,14 +414,12 @@ public class ModifyOrderConfirmService {
 			throw new ModifyOrderParameterException();
 		}
 		// 修改项目
-		if (changeItemList == null || changeItemList.isEmpty()) {
-			return;
-		}
-		if (!changeItemList.contains(OrderChangeItemEnum.MODIFY_RENTTIME.getCode()) && 
-				!changeItemList.contains(OrderChangeItemEnum.MODIFY_REVERTTIME.getCode())) {
-			// 未修改租期,不需要校验库存
-			return;
-		}
+		/*
+		 * if (changeItemList == null || changeItemList.isEmpty()) { return; } if
+		 * (!changeItemList.contains(OrderChangeItemEnum.MODIFY_RENTTIME.getCode()) &&
+		 * !changeItemList.contains(OrderChangeItemEnum.MODIFY_REVERTTIME.getCode())) {
+		 * // 未修改租期,不需要校验库存 return; }
+		 */
 		OrderInfoDTO orderInfoDTO = new OrderInfoDTO();
 		orderInfoDTO.setOrderNo(modifyOrderOwnerDTO.getOrderNo());
 		orderInfoDTO.setCityCode(modifyOrderOwnerDTO.getCityCode() != null ? Integer.valueOf(modifyOrderOwnerDTO.getCityCode()):null);

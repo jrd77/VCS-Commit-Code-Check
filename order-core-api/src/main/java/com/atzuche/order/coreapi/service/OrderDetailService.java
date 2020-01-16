@@ -25,10 +25,7 @@ import com.atzuche.order.commons.entity.dto.RenterMemberDTO;
 import com.atzuche.order.commons.entity.dto.*;
 import com.atzuche.order.commons.entity.orderDetailDto.*;
 import com.atzuche.order.commons.entity.ownerOrderDetail.*;
-import com.atzuche.order.commons.enums.DeliveryOrderTypeEnum;
-import com.atzuche.order.commons.enums.EffectiveEnum;
-import com.atzuche.order.commons.enums.OwnerCashCodeEnum;
-import com.atzuche.order.commons.enums.RenterCashCodeEnum;
+import com.atzuche.order.commons.enums.*;
 import com.atzuche.order.coreapi.modifyorder.exception.NoEffectiveErrException;
 import com.atzuche.order.coreapi.submitOrder.exception.OrderDetailException;
 import com.atzuche.order.delivery.entity.OwnerHandoverCarInfoEntity;
@@ -41,6 +38,8 @@ import com.atzuche.order.delivery.service.handover.OwnerHandoverCarService;
 import com.atzuche.order.delivery.service.handover.RenterHandoverCarService;
 import com.atzuche.order.delivery.vo.delivery.DeliveryOilCostVO;
 import com.atzuche.order.delivery.vo.delivery.rep.OwnerGetAndReturnCarDTO;
+import com.atzuche.order.flow.entity.OrderFlowEntity;
+import com.atzuche.order.flow.service.OrderFlowService;
 import com.atzuche.order.owner.commodity.service.OwnerGoodsService;
 import com.atzuche.order.owner.mem.service.OwnerMemberService;
 import com.atzuche.order.ownercost.entity.*;
@@ -78,6 +77,8 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -152,6 +153,8 @@ public class OrderDetailService {
     private AccountOwnerCostSettleService accountOwnerCostSettleService;
     @Autowired
     private DeliveryCarInfoPriceService deliveryCarInfoPriceService;
+    @Autowired
+    private OrderFlowService orderFlowService;
 
     public ResponseData<OrderDetailRespDTO> orderDetail(OrderDetailReqDTO orderDetailReqDTO){
         log.info("准备获取订单详情orderDetailReqDTO={}", JSON.toJSONString(orderDetailReqDTO));
@@ -255,8 +258,30 @@ public class OrderDetailService {
             log.error("获取订单数据为空orderNo={}",orderNo);
             throw new OrderDetailException();
         }
-        OrderDTO orderDTO = new OrderDTO();
-        BeanUtils.copyProperties(orderEntity,orderDTO);
+        //统计信息
+        OrderSourceStatEntity orderSourceStatEntity = orderSourceStatService.selectByOrderNo(orderNo);
+        OrderStatusEntity orderStatusEntity = orderStatusService.getByOrderNo(orderNo);
+        OrderFlowEntity orderFlowEntity = orderFlowService.getByOrderNoAndStatus(orderNo, orderStatusEntity.getStatus());
+        OrderDetailDTO orderDetailDTO = new OrderDetailDTO();
+
+        orderDetailDTO.orderStatus = OrderStatusEnum.getDescByStatus(orderStatusEntity.getStatus());
+        orderDetailDTO.totalRentTime = String.valueOf(ChronoUnit.HOURS.between(orderEntity.getExpRentTime(), orderEntity.getExpRevertTime()));
+        if(orderSourceStatEntity != null){
+            String category = CategoryEnum.getNameByCode(orderSourceStatEntity.getCategory());
+            String businessParentType = BusinessParentTypeEnum.getNameByCode(orderSourceStatEntity.getBusinessParentType());
+            String platformParentType = PlatformParentTypeEnum.getNameByCode(orderSourceStatEntity.getPlatformParentType());
+            String platformChildType = PlatformChildTypeEnum.getNameByCode(orderSourceStatEntity.getPlatformChildType());
+            orderDetailDTO.paySource = PaySourceEnum.getNameByCode(orderSourceStatEntity.getPaySource());
+            orderDetailDTO.orderSource = (category==null?"":category) + "/" + (businessParentType==null?"":businessParentType) + "/" + (platformParentType==null?"":platformParentType) + "/" + (platformChildType==null?"":platformChildType);
+        }
+        if(orderFlowEntity != null){
+            LocalDateTime createTime = orderFlowEntity.getCreateTime();
+            orderDetailDTO.statusUpdateTIme = createTime != null ? LocalDateTimeUtils.localdateToString(createTime,GlobalConstant.FORMAT_DATE_STR1):null;
+        }
+        orderDetailDTO.rentTimeStr = LocalDateTimeUtils.localdateToString(orderEntity.getExpRentTime(),GlobalConstant.FORMAT_DATE_STR1);
+        orderDetailDTO.revertTimeStr = LocalDateTimeUtils.localdateToString(orderEntity.getExpRevertTime(),GlobalConstant.FORMAT_DATE_STR1);
+        orderDetailDTO.orderNo = orderNo;
+
 
         //租客历史订单
         List<RenterDetailDTO> renterDetailDTOS = new ArrayList<>();
@@ -297,7 +322,7 @@ public class OrderDetailService {
             });
         }
         OrderHistoryRespDTO orderHistoryRespDTO = new OrderHistoryRespDTO();
-        orderHistoryRespDTO.orderDTO = orderDTO;
+        orderHistoryRespDTO.orderDetailDTO = orderDetailDTO;
         orderHistoryRespDTO.ownerDetailDTOS = ownerDetailDTOS;
         orderHistoryRespDTO.renterDetailDTOS = renterDetailDTOS;
 
@@ -821,15 +846,15 @@ public class OrderDetailService {
         }
 
         ServiceDetailDTO serviceDetailDTO = new ServiceDetailDTO();
-        serviceDetailDTO.setCarType(ownerGoodsDetail.getCarOwnerType());
-        serviceDetailDTO.setServiceAmt(ownerGoodsDetail.getServiceRate());
+        //serviceDetailDTO.setCarType(ownerGoodsDetail.getCarOwnerType());
+        //serviceDetailDTO.setServiceAmt(ownerGoodsDetail.getServiceRate());
 
         AdminOwnerOrderDetailDTO adminOwnerOrderDetailDTO = new AdminOwnerOrderDetailDTO();
         adminOwnerOrderDetailDTO.setExpIncome(null);
         adminOwnerOrderDetailDTO.setSettleincome(accountOwnerCostSettleEntity!=null?accountOwnerCostSettleEntity.getIncomeAmt():null);
         adminOwnerOrderDetailDTO.setIncome(null);
         adminOwnerOrderDetailDTO.setRentAmt(ownerRentAmt);
-        adminOwnerOrderDetailDTO.setOwnerRentDetailDTO(null);
+        adminOwnerOrderDetailDTO.setOwnerRentDetailDTO(ownerRentDetailDTO);
         adminOwnerOrderDetailDTO.setFienAmt(ownerFienAmt);
         adminOwnerOrderDetailDTO.setFienAmtDetailDTO(null);
         adminOwnerOrderDetailDTO.setOwnerRenterPrice(renterOwnerPriceDTO.getOwnerToRenterPrice());
