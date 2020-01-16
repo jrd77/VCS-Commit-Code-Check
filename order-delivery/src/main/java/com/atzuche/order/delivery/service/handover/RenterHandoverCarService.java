@@ -1,13 +1,12 @@
 package com.atzuche.order.delivery.service.handover;
 
+import com.atzuche.order.commons.vo.req.handover.req.HandoverCarInfoReqDTO;
 import com.atzuche.order.delivery.entity.RenterHandoverCarInfoEntity;
 import com.atzuche.order.delivery.entity.RenterHandoverCarRemarkEntity;
 import com.atzuche.order.delivery.enums.RenterHandoverCarTypeEnum;
 import com.atzuche.order.delivery.mapper.RenterHandoverCarInfoMapper;
 import com.atzuche.order.delivery.mapper.RenterHandoverCarRemarkMapper;
 import com.atzuche.order.delivery.service.handover.interfaces.IUpdateHandoverCarInfo;
-import com.atzuche.order.delivery.vo.handover.req.HandoverCarInfoReqDTO;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
