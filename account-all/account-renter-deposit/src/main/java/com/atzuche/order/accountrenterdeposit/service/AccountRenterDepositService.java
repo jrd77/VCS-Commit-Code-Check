@@ -13,6 +13,7 @@ import com.atzuche.order.accountrenterdeposit.vo.res.AccountRenterDepositResVO;
 import com.atzuche.order.commons.enums.RenterCashCodeEnum;
 import com.atzuche.order.commons.enums.YesNoEnum;
 import com.autoyol.commons.web.ErrorCode;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
@@ -52,7 +53,13 @@ public class AccountRenterDepositService{
     public AccountRenterDepositResVO getAccountRenterDepositEntity(String orderNo, String memNo){
         Assert.notNull(orderNo, ErrorCode.PARAMETER_ERROR.getText());
         Assert.notNull(memNo, ErrorCode.PARAMETER_ERROR.getText());
-        return accountRenterDepositNoTService.getAccountRenterDepositEntity(orderNo,memNo);
+
+        AccountRenterDepositResVO  result = new AccountRenterDepositResVO();
+        AccountRenterDepositEntity accountRenterDepositEntity = accountRenterDepositNoTService.getAccountRenterDepositEntity(orderNo,memNo);
+        if(Objects.nonNull(accountRenterDepositEntity)){
+            BeanUtils.copyProperties(accountRenterDepositEntity,result);
+        }
+        return result;
     }
     /**
      * 查询车俩押金是否付清
@@ -155,5 +162,11 @@ public class AccountRenterDepositService{
         accountRenterDepositDetailEntity.setSourceCode(RenterCashCodeEnum.SETTLE_RENT_DEPOSIT_COST_TO_FINE.getCashNo());
         accountRenterDepositDetailEntity.setSourceDetail(RenterCashCodeEnum.SETTLE_RENT_DEPOSIT_COST_TO_FINE.getTxt());
         accountRenterDepositDetailNoTService.insertRenterDepositDetailEntity(accountRenterDepositDetailEntity);
+
+        AccountRenterDepositEntity entity = accountRenterDepositNoTService.getAccountRenterDepositEntity(vo.getOrderNo(),vo.getMemNo());
+        if(Objects.nonNull(entity) && Objects.nonNull(entity.getMemNo())){
+            entity.setSurplusDepositAmt(entity.getSurplusDepositAmt() + vo.getAmt());
+            accountRenterDepositNoTService.updateRenterDepositEntity(entity);
+        }
     }
 }
