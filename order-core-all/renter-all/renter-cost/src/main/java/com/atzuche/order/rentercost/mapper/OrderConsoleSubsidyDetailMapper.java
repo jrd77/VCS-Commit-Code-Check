@@ -28,4 +28,5 @@ public interface OrderConsoleSubsidyDetailMapper{
     
     List<OrderConsoleSubsidyDetailEntity> listOrderConsoleSubsidyDetailByOrderNoAndMemNo(@Param("orderNo") String orderNo, @Param("memNo") String memNo);
 
+    Integer deleteConsoleSubsidyByOrderNoAndCode(@Param("orderNo") String orderNo, @Param("subsidyCostCode") String subsidyCostCode);
 }
