@@ -1,5 +1,6 @@
 package com.atzuche.order.admin.service;
 
+import com.atzuche.order.admin.common.AdminUserUtil;
 import com.atzuche.order.admin.util.StringUtil;
 import com.atzuche.order.admin.util.TimeUtil;
 import com.atzuche.order.admin.vo.req.orderSubmit.AdminTransReqVO;
@@ -8,6 +9,7 @@ import com.atzuche.order.commons.vo.res.OrderResVO;
 import com.atzuche.order.open.service.FeignOrderAdminSubmitService;
 import com.autoyol.commons.web.ResponseData;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -25,9 +27,7 @@ public class OrderSubmitService {
         AdminOrderReqVO adminOrderReqParam = this.transDto(adminOrderReqVO,request);
 
         //2、http发送
-        ResponseData<OrderResVO> orderDetail = feignOrderAdminSubmitService.submit(adminOrderReqParam);
-        //HttpResult orderDetail = HttpUtil.doPostNotGzip("http://10.0.3.235:1412/order/admin/req", JSON.toJSONString(adminOrderReqParam));
-        //HttpResult orderDetail = HttpUtil.doPostNotGzip("http://localhost:7777/order/admin/req", JSON.toJSONString(adminOrderReqParam));
+        ResponseData<OrderResVO> orderDetail = feignOrderAdminSubmitService.submitOrder(adminOrderReqParam);
         //3、返回结果
         ResponseData responseData = new ResponseData();
         responseData.setData(orderDetail.getData());
@@ -37,7 +37,11 @@ public class OrderSubmitService {
     }
 
     private AdminOrderReqVO transDto(AdminTransReqVO reqVO, HttpServletRequest request){
-        String sceneCode = reqVO.getSceneCode();
+        //2、组装新的下单参数
+        AdminOrderReqVO param = new AdminOrderReqVO();
+
+        BeanUtils.copyProperties(reqVO,param);
+
         //1、参数转化
         //1.2 rentTime和revertTime的转化
         String rentTime = reqVO.getRentTime();
@@ -50,28 +54,18 @@ public class OrderSubmitService {
         String srcIp = StringUtil.getReqIpAddr(request);
         int srcPort = request.getRemotePort();
 
-        //2、组装新的下单参数
-        AdminOrderReqVO param = new AdminOrderReqVO();
-
         param.setUseSpecialPrice(reqVO.getUseSpecialPrice());
-        param.setOperator(reqVO.getOperator());
-        param.setSpecialConsole(reqVO.getSpecialConsole());
-        param.setOfflineOrderStatus(reqVO.getOfflineOrderStatus());
+        param.setOperator(AdminUserUtil.getAdminUser().getAuthName());
+        param.setSpecialConsole("0");
+        param.setOfflineOrderStatus("0");
 
-        param.setOrderCategory("1");
-        param.setBusinessParentType("5");
-        param.setBusinessChildType("");
         param.setPlatformParentType("7");
-        param.setPlatformChildType("");
-        param.setModuleName("order");
-        param.setFunctionName("order/admin/req");
-        param.setReqSource(1);
-        param.setReqVersion("10");
-        param.setReqOs("ReqOs");
-        param.setActivityId("ActivityId");
-        param.setRentReason("租个车还填啥原因啊！");
-        param.setCityName("上海");
-        param.setSource("admin");
+        param.setCityName(reqVO.getRentCity());
+        param.setOrderCategory("1");
+        param.setSceneCode("EX007");
+        param.setSource("1");
+
+        param.setMemNo(reqVO.getMemNo());
 
         //不计免赔
         param.setAbatement(abatement);
@@ -96,52 +90,29 @@ public class OrderSubmitService {
         param.setRevertTime(newRevertTime);
 
         //经纬度的转化
-        param.setPublicLongitude(StringUtil.convertLatOrLon(reqVO.getPublicLongitude()));
-        param.setPublicLatitude(StringUtil.convertLatOrLon(reqVO.getPublicLatitude()));
         param.setSrvGetLon(StringUtil.convertLatOrLon(reqVO.getSrvGetLon()));
         param.setSrvGetLat(StringUtil.convertLatOrLon(reqVO.getSrvGetLat()));
         param.setSrvReturnLon(StringUtil.convertLatOrLon(reqVO.getSrvReturnLon()));
         param.setSrvReturnLat(StringUtil.convertLatOrLon(reqVO.getSrvReturnLat()));
 
-        //ip、端口
-        param.setSrcIp(srcIp);
-        param.setSrcPort(srcPort);
-
-        //设备版本
-        param.setOS(reqVO.getOS());
-        param.setOsVersion(reqVO.getOsVersion());
-        param.setAppVersion(reqVO.getAppVersion());
-        param.setIMEI(reqVO.getIMEI());
-        param.setOAID(reqVO.getOAID());
-        param.setDeviceName(reqVO.getDeviceName());
-        param.setMac(reqVO.getMac());
 
         //其他
         param.setCarAddrIndex(reqVO.getCarAddrIndex());
-        param.setPublicCityCode(reqVO.getPublicCityCode());
-        param.setAppName(reqVO.getAppName());
-        param.setPublicToken(reqVO.getPublicToken());
-        param.setAppChannelId(reqVO.getAppChannelId());
-        param.setMemNo(reqVO.getMemNo()==null?reqVO.getMem_no():null);
+
+        param.setMemNo(reqVO.getMemNo());
         param.setCarNo(reqVO.getCarNo());
-        param.setSchema(reqVO.getSchema());
+
         param.setCityCode(reqVO.getCityCode());
-        param.setSceneCode(sceneCode);
-        param.setSource("3");
-        param.setSubSource(reqVO.getSubSource());
+
+
         param.setSrvGetAddr(reqVO.getSrvGetAddr());
         param.setSrvReturnAddr(reqVO.getSrvReturnAddr());
         param.setGetCarFreeCouponId(reqVO.getGetCarFreeCouponId());
         param.setFlightNo(reqVO.getFlightNo());
         param.setLimitRedStatus(reqVO.getLimitRedStatus());
         param.setRentCity(reqVO.getRentCity());
-        param.setQueryId(reqVO.getQueryId());
         param.setOilType(reqVO.getOilType());
-        param.setConPhone(reqVO.getConPhone());
-        param.setUtmSource(reqVO.getUtmSource());
-        param.setUtmMedium(reqVO.getUtmMedium());
-        param.setUtmTerm(reqVO.getUtmTerm());
-        param.setUtmCampaign(reqVO.getUtmCampaign());
+
         return param;
     }
 }
