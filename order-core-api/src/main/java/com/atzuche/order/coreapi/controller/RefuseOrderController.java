@@ -54,10 +54,6 @@ public class RefuseOrderController {
             return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), error.isPresent() ?
                     error.get().getDefaultMessage() : ErrorCode.INPUT_ERROR.getText());
         }
-        String memNo = reqVO.getMemNo();
-        if (StringUtils.isBlank(memNo)) {
-            return new ResponseData<>(ErrorCode.NEED_LOGIN.getCode(), ErrorCode.NEED_LOGIN.getText());
-        }
 
         ownerRefuseOrderService.refuse(reqVO);
         return ResponseData.success();
@@ -74,11 +70,6 @@ public class RefuseOrderController {
             return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), error.isPresent() ?
                     error.get().getDefaultMessage() : ErrorCode.INPUT_ERROR.getText());
         }
-        String memNo = reqVO.getMemNo();
-        if (StringUtils.isBlank(memNo)) {
-            return new ResponseData<>(ErrorCode.NEED_LOGIN.getCode(), ErrorCode.NEED_LOGIN.getText());
-        }
-
         ownerAgreeOrderService.agree(reqVO);
 
         return ResponseData.success();

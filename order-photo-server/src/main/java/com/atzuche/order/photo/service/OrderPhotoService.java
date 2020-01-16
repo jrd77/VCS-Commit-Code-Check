@@ -172,7 +172,7 @@ public class OrderPhotoService {
 			}
 		}
 
-		if(orderPhotoEntity.getPhotoType().equals("4")){
+		if(orderUpdateRequestVO.getPhotoType().equals("4")){
 			//上传结束，触发发送违章凭证到仁云违章处理系统
 			transIllegalPhotoToRenyun(orderNo);
 		}

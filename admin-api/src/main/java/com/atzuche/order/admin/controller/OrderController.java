@@ -89,25 +89,25 @@ public class OrderController {
             return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), error.isPresent() ?
                     error.get().getDefaultMessage() : ErrorCode.INPUT_ERROR.getText());
         }
-        String orderNo = cancelOrderVO.getOrderNo();
-        OrderDetailReqDTO reqDTO = new OrderDetailReqDTO();
-        reqDTO.setOrderNo(orderNo);
-
-        ResponseData<OrderDetailRespDTO> respDTOResponseData =feignOrderDetailService.getOrderDetail(reqDTO);
-        if(respDTOResponseData==null||!ErrorCode.SUCCESS.getCode().equalsIgnoreCase(respDTOResponseData.getResCode())){
-            throw new RenterInfoController.RenterNotFoundException(orderNo);
-        }
-
-        OrderDetailRespDTO detailRespDTO = respDTOResponseData.getData();
-        String memNo = "";
-        if("1".equals(cancelOrderVO.getMemRole())){
-            memNo = detailRespDTO.getRenterMember().getMemNo();
-        }else if("2".equals(cancelOrderVO.getMemRole())){
-            memNo = detailRespDTO.getOwnerMember().getMemNo();
-        }
-        if (StringUtils.isBlank(memNo)) {
-            return new ResponseData<>(ErrorCode.ORDER_NOT_EXIST.getCode(), ErrorCode.ORDER_NOT_EXIST.getText());
-        }
+//        String orderNo = cancelOrderVO.getOrderNo();
+//        OrderDetailReqDTO reqDTO = new OrderDetailReqDTO();
+//        reqDTO.setOrderNo(orderNo);
+//
+//        ResponseData<OrderDetailRespDTO> respDTOResponseData =feignOrderDetailService.getOrderDetail(reqDTO);
+//        if(respDTOResponseData==null||!ErrorCode.SUCCESS.getCode().equalsIgnoreCase(respDTOResponseData.getResCode())){
+//            throw new RenterInfoController.RenterNotFoundException(orderNo);
+//        }
+//
+//        OrderDetailRespDTO detailRespDTO = respDTOResponseData.getData();
+//        String memNo = "";
+//        if("1".equals(cancelOrderVO.getMemRole())){
+//            memNo = detailRespDTO.getRenterMember().getMemNo();
+//        }else if("2".equals(cancelOrderVO.getMemRole())){
+//            memNo = detailRespDTO.getOwnerMember().getMemNo();
+//        }
+//        if (StringUtils.isBlank(memNo)) {
+//            return new ResponseData<>(ErrorCode.ORDER_NOT_EXIST.getCode(), ErrorCode.ORDER_NOT_EXIST.getText());
+//        }
         ResponseData responseData = adminOrderService.cancelOrder(cancelOrderVO);
         return responseData;
     }
