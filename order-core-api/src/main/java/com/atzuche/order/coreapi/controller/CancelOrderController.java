@@ -2,9 +2,12 @@ package com.atzuche.order.coreapi.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.enums.DispatcherStatusEnum;
+import com.atzuche.order.commons.enums.PlatformCancelReasonEnum;
+import com.atzuche.order.commons.vo.req.AdminOrderCancelReqVO;
 import com.atzuche.order.commons.vo.req.CancelOrderReqVO;
 import com.atzuche.order.coreapi.service.CancelOrderService;
 import com.atzuche.order.coreapi.service.OwnerOrderFineApplyHandelService;
+import com.atzuche.order.coreapi.service.PlatformCancelOrderService;
 import com.atzuche.order.ownercost.service.OwnerOrderFineApplyService;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
@@ -39,6 +42,8 @@ public class CancelOrderController {
     private CancelOrderService cancelOrderService;
     @Autowired
     private OwnerOrderFineApplyHandelService ownerOrderFineApplyHandelService;
+    @Autowired
+    private PlatformCancelOrderService platformCancelOrderService;
 
 
     @AutoDocMethod(description = "取消订单", value = "取消订单")
@@ -61,10 +66,17 @@ public class CancelOrderController {
 
     @AutoDocMethod(description = "管理后台取消订单", value = "管理后台取消订单")
     @PostMapping("/admin/cancel")
-    public ResponseData<?> adminCancelOrder(@Valid @RequestBody CancelOrderReqVO cancelOrderReqVO,
-                                       BindingResult bindingResult) {
+    public ResponseData<?> adminCancelOrder(@Valid @RequestBody AdminOrderCancelReqVO reqVO,
+                                            BindingResult bindingResult) {
+        LOGGER.info("User [{}] console cancel order.param is,reqVO:[{}]", reqVO.getOperator(), JSON.toJSONString(reqVO));
+        if (bindingResult.hasErrors()) {
+            Optional<FieldError> error = bindingResult.getFieldErrors().stream().findFirst();
+            return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), error.isPresent() ?
+                    error.get().getDefaultMessage() : ErrorCode.INPUT_ERROR.getText());
+        }
 
-
+        platformCancelOrderService.cancel(reqVO.getOrderNo(), reqVO.getOperator(),
+                PlatformCancelReasonEnum.from(reqVO.getCancelType()));
         return ResponseData.success();
     }
 
@@ -73,7 +85,7 @@ public class CancelOrderController {
     @PostMapping("/test/owner/cancel/{orderNo}/{dispatcherStatus}")
     public ResponseData<?> ownerCancelOrder(@PathVariable("orderNo") String orderNo,
                                             @PathVariable("dispatcherStatus") int dispatcherStatus) {
-       boolean result = ownerOrderFineApplyHandelService.handleFineApplyRecord(orderNo,
+        boolean result = ownerOrderFineApplyHandelService.handleFineApplyRecord(orderNo,
                 DispatcherStatusEnum.from(dispatcherStatus));
         return ResponseData.success(result);
     }

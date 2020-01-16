@@ -12,7 +12,10 @@ import com.atzuche.order.commons.vo.res.order.CostItemVO;
 import com.atzuche.order.commons.vo.res.order.DepositAmtVO;
 import com.atzuche.order.commons.vo.res.order.IllegalDepositVO;
 import com.atzuche.order.commons.vo.res.order.TotalCostVO;
+import com.atzuche.order.coreapi.entity.dto.CancelOrderResDTO;
 import com.atzuche.order.coreapi.entity.vo.res.CarRentTimeRangeResVO;
+import com.atzuche.order.delivery.vo.delivery.CancelFlowOrderDTO;
+import com.atzuche.order.delivery.vo.delivery.CancelOrderDeliveryVO;
 import com.atzuche.order.ownercost.entity.OwnerOrderFineApplyEntity;
 import com.atzuche.order.renterorder.entity.dto.DeductContextDTO;
 import com.atzuche.order.renterorder.entity.dto.RenterOrderCostRespDTO;
@@ -232,5 +235,36 @@ public class OrderCommonConver {
         logger.info("下单前费用计算--初始context数据.deductContext:[{}]", JSON.toJSONString(deductContext));
         return deductContext;
     }
+
+    /**
+     * 仁云流程系统请求信息处理
+     *
+     * @param orderNo 主订单号
+     * @param res     取消订单返回信息
+     * @return CancelOrderDeliveryVO 仁云流程系统请求信息
+     */
+    public CancelOrderDeliveryVO buildCancelOrderDeliveryVO(String orderNo, CancelOrderResDTO res) {
+        if (!res.getSrvGetFlag() && !res.getSrvReturnFlag()) {
+            return null;
+        }
+        String servicetype = "";
+        if (res.getSrvGetFlag() && res.getSrvReturnFlag()) {
+            servicetype = "all";
+        } else if (res.getSrvGetFlag()) {
+            servicetype = "take";
+        } else if (res.getSrvReturnFlag()) {
+            servicetype = "back";
+        }
+        CancelOrderDeliveryVO cancelOrderDeliveryVO = new CancelOrderDeliveryVO();
+
+        CancelFlowOrderDTO cancelFlowOrderDTO = new CancelFlowOrderDTO();
+        cancelFlowOrderDTO.setOrdernumber(orderNo);
+        cancelFlowOrderDTO.setServicetype(servicetype);
+
+        cancelOrderDeliveryVO.setRenterOrderNo(res.getRenterOrderNo());
+        cancelOrderDeliveryVO.setCancelFlowOrderDTO(cancelFlowOrderDTO);
+        return cancelOrderDeliveryVO;
+    }
+
 
 }
