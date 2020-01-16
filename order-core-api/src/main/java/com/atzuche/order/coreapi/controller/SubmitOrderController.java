@@ -86,6 +86,8 @@ public class SubmitOrderController {
             orderRecordEntity.setParam(JSON.toJSONString(normalOrderReqVO));
             orderRecordEntity.setResult(JSON.toJSONString(orderResVO));
             orderRecordService.save(orderRecordEntity);
+
+            //TODO:发送订单成功的MQ事件
         }catch(OrderException orderException){
             String orderNo = orderResVO==null?"":orderResVO.getOrderNo();
             OrderRecordEntity orderRecordEntity = new OrderRecordEntity();
