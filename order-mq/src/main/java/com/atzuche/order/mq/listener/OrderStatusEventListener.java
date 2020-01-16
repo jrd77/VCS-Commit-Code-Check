@@ -24,12 +24,12 @@ public class OrderStatusEventListener {
     @Autowired
     SendPlatformSmsService sendPlatformSmsService;
 
-    @RabbitListener(bindings = {@QueueBinding(value = @Queue(value = "order_status_01", durable = "true"),
+    @RabbitListener(bindings = {@QueueBinding(value = @Queue(value = "order_status_02", durable = "true"),
             exchange = @Exchange(value = "auto-order-status", durable = "true", type = "topic"), key = "status.#")
     },containerFactory = "rabbitListenerContainerFactory")
     public void process(Message message) {
-        log.info("receive order action message: " + new String(message.getBody()));
-        OrderMessage orderMessage = JSONObject.parseObject(new String(message.getBody()),OrderMessage.class);
+        log.info("receive order status message: " + new String(message.getBody()));
+        OrderMessage orderMessage = JSONObject.parseObject(message.getBody(),OrderMessage.class);
         log.info("新订单状态总事件监听,入参orderMessage:[{}]", orderMessage.toString());
             try {
                 sendPlatformSmsService.orderPaySms(orderMessage.getContext(), orderMessage.getPhone(), "大事件備注",null);
