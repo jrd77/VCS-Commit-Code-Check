@@ -100,7 +100,7 @@ public class AccountRenterCostSettleService{
         accountRenterCostDetail.setSourceCode(RenterCashCodeEnum.SETTLE_RENT_COST_TO_FINE.getCashNo());
         accountRenterCostDetail.setSourceDetail(RenterCashCodeEnum.SETTLE_RENT_COST_TO_FINE.getTxt());
         accountRenterCostDetail.setPaySource(RenterCashCodeEnum.ACCOUNT_RENTER_RENT_COST.getTxt());
-        accountRenterCostDetail.setPaySource(RenterCashCodeEnum.ACCOUNT_RENTER_RENT_COST.getCashNo());
+        accountRenterCostDetail.setPaySourceCode(RenterCashCodeEnum.ACCOUNT_RENTER_RENT_COST.getCashNo());
         accountRenterCostDetailNoTService.insertAccountRenterCostDetailEntity(accountRenterCostDetail);
 
     }
@@ -116,7 +116,7 @@ public class AccountRenterCostSettleService{
         accountRenterCostDetail.setSourceCode(RenterCashCodeEnum.SETTLE_RENT_WALLET_COST_TO_FINE.getCashNo());
         accountRenterCostDetail.setSourceDetail(RenterCashCodeEnum.SETTLE_RENT_WALLET_COST_TO_FINE.getTxt());
         accountRenterCostDetail.setPaySource(RenterCashCodeEnum.ACCOUNT_RENTER_RENT_COST.getTxt());
-        accountRenterCostDetail.setPaySource(RenterCashCodeEnum.ACCOUNT_RENTER_RENT_COST.getCashNo());
+        accountRenterCostDetail.setPaySourceCode(RenterCashCodeEnum.ACCOUNT_RENTER_RENT_COST.getCashNo());
         accountRenterCostDetailNoTService.insertAccountRenterCostDetailEntity(accountRenterCostDetail);
     }
     

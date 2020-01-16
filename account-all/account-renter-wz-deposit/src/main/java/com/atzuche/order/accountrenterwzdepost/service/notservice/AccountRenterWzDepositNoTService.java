@@ -49,13 +49,9 @@ public class AccountRenterWzDepositNoTService {
      * @param memNo
      * @return
      */
-    public AccountRenterWZDepositResVO getAccountRenterWZDeposit(String orderNo, String memNo) {
-        AccountRenterWZDepositResVO  result = new AccountRenterWZDepositResVO();
+    public AccountRenterWzDepositEntity getAccountRenterWZDeposit(String orderNo, String memNo) {
         AccountRenterWzDepositEntity accountRenterDepositEntity = accountRenterWzDepositMapper.selectByOrderAndMemNo(orderNo,memNo);
-        if(Objects.nonNull(accountRenterDepositEntity)){
-            BeanUtils.copyProperties(accountRenterDepositEntity,result);
-        }
-        return result;
+        return accountRenterDepositEntity;
     }
 
     /**

@@ -168,20 +168,36 @@ public class OrderSettleService{
             orderStatusDTO.setOrderNo(orderNo);
             // 1 取消订单初始化
             SettleOrders settleOrders =  orderSettleNoTService.initCancelSettleOrders(orderNo);
+            Cat.logEvent("settleOrderCancel",GsonUtils.toJson(settleOrders));
+            log.info("OrderPayCallBack settleOrderCancel settleOrders [{}] ",GsonUtils.toJson(settleOrders));
             //2 查询所有租客罚金明细  及 凹凸币补贴
             orderSettleNoTService.getCancelRenterCostSettleDetail(settleOrders);
+            Cat.logEvent("settleOrders",GsonUtils.toJson(settleOrders));
+            log.info("OrderPayCallBack settleOrderCancel settleOrders [{}] ",GsonUtils.toJson(settleOrders));
             //3 查询所有车主罚金明细
             orderSettleNoTService.getCancelOwnerCostSettleDetail(settleOrders);
+            Cat.logEvent("settleOrdersFine",GsonUtils.toJson(settleOrders));
+            log.info("OrderPayCallBack settleOrderCancel settleOrders [{}] ",GsonUtils.toJson(settleOrders));
             //4 查询 租客实际 付款金额（包含 租车费用，车俩押金，违章押金，钱包）
             SettleCancelOrdersAccount settleCancelOrdersAccount = orderSettleNoTService.initSettleCancelOrdersAccount(settleOrders);
+            Cat.logEvent("settleCancelOrdersAccount",GsonUtils.toJson(settleCancelOrdersAccount));
+            log.info("OrderPayCallBack settleCancelOrdersAccount settleCancelOrdersAccount [{}] ",GsonUtils.toJson(settleCancelOrdersAccount));
             //5 车主罚金处理
             orderSettleNoTService.handleOwnerFine(settleOrders,settleCancelOrdersAccount);
+            Cat.logEvent("handleOwnerFine",GsonUtils.toJson(settleCancelOrdersAccount));
+            log.info("OrderPayCallBack handleOwnerFine settleCancelOrdersAccount [{}] ",GsonUtils.toJson(settleCancelOrdersAccount));
             //6 租客罚金处理
             orderSettleNoTService.handleRentFine(settleOrders,settleCancelOrdersAccount);
+            Cat.logEvent("handleRentFine",GsonUtils.toJson(settleCancelOrdersAccount));
+            log.info("OrderPayCallBack handleRentFine settleCancelOrdersAccount [{}] ",GsonUtils.toJson(settleCancelOrdersAccount));
             //7 租客还历史欠款
             orderSettleNoTService.repayHistoryDebtRentCancel(settleOrders,settleCancelOrdersAccount);
+            Cat.logEvent("repayHistoryDebtRentCancel",GsonUtils.toJson(settleCancelOrdersAccount));
+            log.info("OrderPayCallBack repayHistoryDebtRentCancel settleCancelOrdersAccount [{}] ",GsonUtils.toJson(settleCancelOrdersAccount));
             //8 租客金额 退还 包含 凹凸币，钱包 租车费用 押金 违章押金 退还 （优惠卷退还 TODO）
             orderSettleNoTService.refundCancelCost(settleOrders,settleCancelOrdersAccount,orderStatusDTO);
+            Cat.logEvent("refundCancelCost",GsonUtils.toJson(settleCancelOrdersAccount));
+            log.info("OrderPayCallBack refundCancelCost settleCancelOrdersAccount [{}] ",GsonUtils.toJson(settleCancelOrdersAccount));
             //9 修改订单状态表
             cashierService.saveCancelOrderStatusInfo(orderStatusDTO);
 

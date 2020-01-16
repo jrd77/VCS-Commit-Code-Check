@@ -9,13 +9,14 @@ import lombok.Getter;
  *
  **/
 @Getter
-public enum ConsoleSubsidyEnum {
+public enum ConsoleCostCashNoEnum {
 
-    TIME_OUT_SUBSIDY("21010001","超时费用"),
-    car_wash_subsidy("21010002","车辆清洗费"),
-    dlay_wait_subsidy("21010003","延误等待费"),
-    stop_cat_subsidy("21010004","停车费"),
-    oil_amt_subsidy("21010005","油费补贴")
+    TIME_OUT("21010001","超时费用"),
+    CAR_WASH("21010002","车辆清洗费"),
+    DLAY_WAIT("21010003","延误等待费"),
+    STOP_CAR("21010004","停车费"),
+    EXTRA_MILEAGE("21010005","超里程"),
+    MODIFY_ADDR_TIME("21010006","临时修改订单地址时间")
 
     //补贴
     ;
@@ -30,7 +31,7 @@ public enum ConsoleSubsidyEnum {
      */
     private String txt;
 
-    ConsoleSubsidyEnum(String cashNo, String txt) {
+    ConsoleCostCashNoEnum(String cashNo, String txt) {
         this.cashNo = cashNo;
         this.txt = txt;
     }
