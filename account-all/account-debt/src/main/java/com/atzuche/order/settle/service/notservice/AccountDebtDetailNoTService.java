@@ -100,6 +100,7 @@ public class AccountDebtDetailNoTService {
             }
         }
         accountDeductDebt.setRealAmt(realAmt);
+        accountDeductDebt.setAmt(accountDeductDebt.getAmt() - accountDeductDebt.getRealAmt());
         return accountDebtDetailTodos;
     }
 }

@@ -118,7 +118,7 @@ public class ModifyOrderService {
 	private OrderConsoleSubsidyDetailService orderConsoleSubsidyDetailService;
 
 	/**
-	 * 修改订单主逻辑
+	 * 修改订单主逻辑（含换车）
 	 * @param modifyOrderReq
 	 * @return ResponseData
 	 */
@@ -162,7 +162,7 @@ public class ModifyOrderService {
 		// 设置城市编号
 		modifyOrderDTO.setCityCode(orderEntity.getCityCode());
 		// 库存校验
-		//modifyOrderCheckService.checkCarStock(modifyOrderDTO);
+		modifyOrderCheckService.checkCarStock(modifyOrderDTO);
 		log.info("ModifyOrderService.modifyOrder again modifyOrderDTO=[{}]", modifyOrderDTO);
 		// 获取修改前租客费用明细
 		List<RenterOrderCostDetailEntity> initCostList = renterOrderCostDetailService.listRenterOrderCostDetail(modifyOrderDTO.getOrderNo(), initRenterOrder.getRenterOrderNo());
@@ -732,7 +732,7 @@ public class ModifyOrderService {
 		renterOrderNew.setIsAbatement(modifyOrderDTO.getAbatementFlag());
 		renterOrderNew.setIsEffective(0);
 		renterOrderNew.setAgreeFlag(0);
-		renterOrderNew.setCreateOp(null);
+		renterOrderNew.setCreateOp(modifyOrderDTO.getOperator());
 		renterOrderNew.setCreateTime(null);
 		renterOrderNew.setUpdateOp(null);
 		renterOrderNew.setUpdateTime(null);

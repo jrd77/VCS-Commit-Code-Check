@@ -2,6 +2,8 @@ package com.atzuche.order.accountownercost.mapper;
 
 import com.atzuche.order.accountownercost.entity.AccountOwnerCostSettleDetailEntity;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
 import java.util.List;
 
 /**
@@ -16,5 +18,6 @@ public interface AccountOwnerCostSettleDetailMapper{
     AccountOwnerCostSettleDetailEntity selectByPrimaryKey(Integer id);
 
     int insertSelective(AccountOwnerCostSettleDetailEntity record);
-    
+
+    List<AccountOwnerCostSettleDetailEntity> getAccountOwnerCostSettleDetails(@Param("orderNo") String orderNo);
 }

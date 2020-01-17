@@ -3,6 +3,7 @@ package com.atzuche.order.coreapi.task;
 import com.atzuche.order.commons.CatConstants;
 import com.atzuche.order.commons.vo.req.CancelOrderReqVO;
 import com.atzuche.order.coreapi.service.OrderSearchRemoteService;
+import com.atzuche.order.settle.service.OrderSettleService;
 import com.dianping.cat.Cat;
 import com.dianping.cat.message.Transaction;
 import com.xxl.job.core.biz.model.ReturnT;
@@ -30,6 +31,9 @@ public class RevertCar4HoursAutoSettleTask extends IJobHandler{
     @Resource
     private OrderSearchRemoteService orderSearchRemoteService;
 
+    @Resource
+    private OrderSettleService orderSettleService;
+
     @Override
     public ReturnT<String> execute(String s) throws Exception {
         Transaction t = Cat.getProducer().newTransaction(CatConstants.XXL_JOB_CALL, "定时查询 还车4小时后，自动结算 定时任务");
@@ -49,7 +53,7 @@ public class RevertCar4HoursAutoSettleTask extends IJobHandler{
 
             if(CollectionUtils.isNotEmpty(orderNos)){
                 for (String orderNo : orderNos) {
-                    //TODO 自动结算
+                    orderSettleService.settleOrder(orderNo);
                 }
             }
             logger.info("结束执行 还车4小时后，自动结算");
