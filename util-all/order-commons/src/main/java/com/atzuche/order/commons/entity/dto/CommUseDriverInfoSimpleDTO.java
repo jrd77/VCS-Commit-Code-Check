@@ -20,5 +20,5 @@ public class CommUseDriverInfoSimpleDTO {
     private String realName;
 
     @AutoDocProperty(value = "手机号")
-    private Long mobile;
+    private String mobile;  //long修改为字符串类型
 }

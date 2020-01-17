@@ -49,7 +49,7 @@ public class OrderRentalCostDetailController {
 	OrderCostDetailService orderCostDetailService;
 	
 	@AutoDocMethod(description = "违约罚金 修改违约罚金", value = "违约罚金 修改违约罚金",response = ResponseData.class)
-    @PostMapping("/fineAmt/update")
+    @PostMapping("fineAmt/update")
     public ResponseData<?> updatefineAmtListByOrderNo(@RequestBody RenterFineCostReqVO renterCostReqVO, HttpServletRequest request, HttpServletResponse response,BindingResult bindingResult) {
     	logger.info("updatefineAmtListByOrderNo controller params={}",renterCostReqVO.toString());
 		if (bindingResult.hasErrors()) {
@@ -73,7 +73,7 @@ public class OrderRentalCostDetailController {
      * @return
      */
     @AutoDocMethod(description = "违约罚金 违约罚金明细", value = "违约罚金 违约罚金明细",response = OrderRenterFineAmtDetailResVO.class)
-    @PostMapping("/fineAmt/list")
+    @PostMapping("fineAmt/list")
     public ResponseData<OrderRenterFineAmtDetailResVO> findfineAmtListByOrderNo(@RequestBody RenterCostReqVO renterCostReqVO, HttpServletRequest request, HttpServletResponse response,BindingResult bindingResult) {
     	logger.info("findfineAmtListByOrderNo controller params={}",renterCostReqVO.toString());
 		if (bindingResult.hasErrors()) {
@@ -97,7 +97,7 @@ public class OrderRentalCostDetailController {
      * @return
      */
     @AutoDocMethod(description = "减免明细 押金减免明细", value = "减免明细 押金减免明细",response = ReductionDetailResVO.class)
-    @PostMapping("/reductionDetails/list")
+    @PostMapping("reductionDetails/list")
     public ResponseData<ReductionDetailResVO> findReductionDetailsListByOrderNo(@RequestBody RenterCostReqVO renterCostReqVO, HttpServletRequest request, HttpServletResponse response,BindingResult bindingResult) {
     	logger.info("findReductionDetailsListByOrderNo controller params={}",renterCostReqVO.toString());
 		if (bindingResult.hasErrors()) {
@@ -120,7 +120,7 @@ public class OrderRentalCostDetailController {
      * @return
      */
     @AutoDocMethod(description = "附加驾驶员险 附加驾驶人明细", value = "附加驾驶员险 附加驾驶人明细",response = AdditionalDriverInsuranceVO.class)
-    @PostMapping("/additionalDriverInsurance/list")
+    @PostMapping("additionalDriverInsurance/list")
     public ResponseData<?> findAdditionalDriverInsuranceByOrderNo(@RequestBody RenterCostReqVO renterCostReqVO, HttpServletRequest request, HttpServletResponse response,BindingResult bindingResult) {
     	logger.info("findAdditionalDriverInsuranceByOrderNo controller params={}",renterCostReqVO.toString());
 		if (bindingResult.hasErrors()) {
@@ -143,7 +143,7 @@ public class OrderRentalCostDetailController {
      * @return
      */
     @AutoDocMethod(description = "新增附加驾驶员险  新增附加驾驶人", value = "新增附加驾驶员险  新增附加驾驶人",response = ResponseData.class)
-    @PostMapping("/additionalDriverInsurance/add")
+    @PostMapping("additionalDriverInsurance/add")
     public ResponseData<?> insertAdditionalDriverInsuranceByOrderNo(@RequestBody AdditionalDriverInsuranceIdsReqVO renterCostReqVO, HttpServletRequest request, HttpServletResponse response,BindingResult bindingResult) {
     	logger.info("insertAdditionalDriverInsuranceByOrderNo controller params={}",renterCostReqVO.toString());
 		if (bindingResult.hasErrors()) {
@@ -166,7 +166,7 @@ public class OrderRentalCostDetailController {
      * @return
      */
     @AutoDocMethod(description = "平台给租客的补贴 平台给租客的补贴明细", value = "平台给租客的补贴 平台给租客的补贴明细",response = PlatformToRenterSubsidyResVO.class)
-    @PostMapping("/platFormToRenter/list")
+    @PostMapping("platFormToRenter/list")
     public ResponseData<PlatformToRenterSubsidyResVO> findPlatFormToRenterListByOrderNo(@RequestBody RenterCostReqVO renterCostReqVO, HttpServletRequest request, HttpServletResponse response,BindingResult bindingResult) {
     	logger.info("findPlatFormToRenterListByOrderNo controller params={}",renterCostReqVO.toString());
 		if (bindingResult.hasErrors()) {
@@ -190,7 +190,7 @@ public class OrderRentalCostDetailController {
      * @return
      */
     @AutoDocMethod(description = "租客车主互相调价 车主租客互相调价操作", value = "租客车主互相调价 车主租客互相调价操作",response = ResponseData.class)
-    @PostMapping("/renterPriceAdjustment/update")
+    @PostMapping("renterPriceAdjustment/update")
     public ResponseData<?> updateRenterPriceAdjustmentByOrderNo(@RequestBody RenterAdjustCostReqVO renterCostReqVO, HttpServletRequest request, HttpServletResponse response,BindingResult bindingResult) {
     	logger.info("updateRenterPriceAdjustmentByOrderNo controller params={}",renterCostReqVO.toString());
 		if (bindingResult.hasErrors()) {
@@ -213,7 +213,7 @@ public class OrderRentalCostDetailController {
      * @return    PriceAdjustmentVO
      */
     @AutoDocMethod(description = "租客车主互相调价 车主租客互相调价展示", value = "租客车主互相调价 车主租客互相调价展示",response = RenterPriceAdjustmentResVO.class)
-    @PostMapping("/renterPriceAdjustment/list")
+    @PostMapping("renterPriceAdjustment/list")
     public ResponseData<RenterPriceAdjustmentResVO> findRenterPriceAdjustmentByOrderNo(@RequestBody RenterCostReqVO renterCostReqVO, HttpServletRequest request, HttpServletResponse response,BindingResult bindingResult) {
     	logger.info("findRenterPriceAdjustmentByOrderNo controller params={}",renterCostReqVO.toString());
 		if (bindingResult.hasErrors()) {
@@ -239,7 +239,7 @@ public class OrderRentalCostDetailController {
      * @return
      */
     @AutoDocMethod(description = "租客需支付给平台的费用 查询接口", value = "租客需支付给平台的费用 查询接口",response = RenterToPlatformVO.class)
-    @PostMapping("/renterToPlatForm/list")
+    @PostMapping("renterToPlatForm/list")
     public ResponseData<RenterToPlatformVO> findRenterToPlatFormListByOrderNo(@RequestBody RenterCostReqVO renterCostReqVO, HttpServletRequest request, HttpServletResponse response,BindingResult bindingResult) {
     	logger.info("findRenterToPlatFormListByOrderNo controller params={}",renterCostReqVO.toString());
 		if (bindingResult.hasErrors()) {
@@ -263,7 +263,7 @@ public class OrderRentalCostDetailController {
      * @return
      */
     @AutoDocMethod(description = "租客需支付给平台的费用 修改接口", value = "租客需支付给平台的费用 修改接口",response = ResponseData.class)
-    @PostMapping("/renterToPlatForm/update")
+    @PostMapping("renterToPlatForm/update")
     public ResponseData<?> updateRenterToPlatFormListByOrderNo(@RequestBody RenterToPlatformCostReqVO renterCostReqVO, HttpServletRequest request, HttpServletResponse response,BindingResult bindingResult) {
     	logger.info("updateRenterToPlatFormListByOrderNo controller params={}",renterCostReqVO.toString());
 		if (bindingResult.hasErrors()) {
@@ -286,7 +286,7 @@ public class OrderRentalCostDetailController {
      * @return
      */
     @AutoDocMethod(description = "租客租金 租金明细接口", value = "租客租金 租金明细接口",response = RenterRentDetailDTO.class)
-    @PostMapping("/renterRentAmt/list")
+    @PostMapping("renterRentAmt/list")
     public ResponseData<RenterRentDetailDTO> findRenterRentAmtListByOrderNo(@RequestBody RenterCostReqVO renterCostReqVO, HttpServletRequest request, HttpServletResponse response,BindingResult bindingResult) {
     	logger.info("findTenantRentListByOrderNo controller params={}",renterCostReqVO.toString());
 		if (bindingResult.hasErrors()) {
@@ -312,7 +312,7 @@ public class OrderRentalCostDetailController {
      * @return
      */
     @AutoDocMethod(description = "车主需支付给平台的费用 修改接口", value = "车主需支付给平台的费用 修改接口",response = ResponseData.class)
-    @PostMapping("/ownerToPlatForm/update")
+    @PostMapping("ownerToPlatForm/update")
     public ResponseData<?> updateOwnerToPlatFormListByOrderNo(@RequestBody OwnerToPlatformCostReqVO ownerCostReqVO, HttpServletRequest request, HttpServletResponse response,BindingResult bindingResult) {
     	logger.info("updateOwnerToPlatFormListByOrderNo controller params={}",ownerCostReqVO.toString());
 		if (bindingResult.hasErrors()) {

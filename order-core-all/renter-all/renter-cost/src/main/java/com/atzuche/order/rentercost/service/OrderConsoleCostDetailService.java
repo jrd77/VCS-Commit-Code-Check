@@ -41,6 +41,7 @@ public class OrderConsoleCostDetailService{
     	boolean isExists = false;
     	for (OrderConsoleCostDetailEntity orderConsoleCostDetailEntity : list) {
 			if(orderConsoleCostDetailEntity.getSubsidySourceCode().equals(record.getSubsidySourceCode()) && orderConsoleCostDetailEntity.getSubsidyTargetCode().equals(record.getSubsidyTargetCode()) && orderConsoleCostDetailEntity.getSubsidyTypeCode().equals(record.getSubsidyTypeCode())) {
+				record.setId(orderConsoleCostDetailEntity.getId());
 				orderConsoleCostDetailMapper.updateByPrimaryKeySelective(record);
 				isExists = true;
 			}

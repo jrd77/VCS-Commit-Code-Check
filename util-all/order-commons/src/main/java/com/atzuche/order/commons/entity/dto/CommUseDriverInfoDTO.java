@@ -17,7 +17,7 @@ public class CommUseDriverInfoDTO {
     private String realName;
 
     @AutoDocProperty(value = "手机号")
-    private Long mobile;
+    private String mobile;
 
     @AutoDocProperty(value = "身份证")
     private String idCard;
@@ -62,11 +62,11 @@ public class CommUseDriverInfoDTO {
         this.realName = realName;
     }
 
-    public Long getMobile() {
+    public String getMobile() {
         return mobile;
     }
 
-    public void setMobile(Long mobile) {
+    public void setMobile(String mobile) {
         this.mobile = mobile;
     }
 
