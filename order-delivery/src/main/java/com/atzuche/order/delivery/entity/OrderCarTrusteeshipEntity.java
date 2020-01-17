@@ -4,8 +4,10 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 import com.autoyol.doc.annotation.AutoDocProperty;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import lombok.ToString;
+import org.springframework.format.annotation.DateTimeFormat;
 
 
 /**
@@ -45,11 +47,15 @@ public class OrderCarTrusteeshipEntity implements Serializable {
 	/**
 	 * 出库时间
 	 */
+	@JsonFormat(shape= JsonFormat.Shape.STRING, pattern="yyyy-MM-dd HH:mm:ss")
+	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @AutoDocProperty(value="出库时间")
 	private LocalDateTime outDepotTime;
 	/**
 	 * 入库时间
 	 */
+	@JsonFormat(shape= JsonFormat.Shape.STRING, pattern="yyyy-MM-dd HH:mm:ss")
+	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @AutoDocProperty(value="入库时间")
 	private LocalDateTime inDepotTime;
 	/**
@@ -100,11 +106,15 @@ public class OrderCarTrusteeshipEntity implements Serializable {
 	/**
 	 * 创建时间
 	 */
+    @JsonFormat(shape= JsonFormat.Shape.STRING, pattern="yyyy-MM-dd HH:mm:ss")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @AutoDocProperty(value="创建时间")
 	private LocalDateTime createTime;
 	/**
 	 * 修改时间
 	 */
+    @JsonFormat(shape= JsonFormat.Shape.STRING, pattern="yyyy-MM-dd HH:mm:ss")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @AutoDocProperty(value="修改时间")
 	private LocalDateTime updateTime;
 
