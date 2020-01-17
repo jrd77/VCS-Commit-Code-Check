@@ -1,11 +1,11 @@
 package com.atzuche.order.coreapi.service;
 
+import com.atzuche.order.commons.vo.req.ModifyApplyHandleReq;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.atzuche.order.coreapi.entity.dto.ModifyConfirmDTO;
-import com.atzuche.order.coreapi.entity.request.ModifyApplyHandleReq;
 import com.atzuche.order.coreapi.modifyorder.exception.ModifyOrderChangeApplyNotFindException;
 import com.atzuche.order.coreapi.modifyorder.exception.ModifyOrderParameterException;
 import com.atzuche.order.renterorder.entity.RenterOrderChangeApplyEntity;

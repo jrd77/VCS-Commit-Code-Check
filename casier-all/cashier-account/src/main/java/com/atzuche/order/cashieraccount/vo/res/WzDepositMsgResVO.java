@@ -53,4 +53,32 @@ public class WzDepositMsgResVO {
      * 支付状态
      */
     private String payStatus;
+
+    /**
+     * 剩余可用违章押金
+     */
+    private int wzDepositSurplusAmt;
+    /**
+     * 预计/实际 暂扣金额
+     */
+    private int detainAmt;
+
+    /**\
+     * 预计/实际 抵扣租车费用
+     */
+    private int detainCostAmt;
+
+    /**
+     * 结算时候抵扣历史欠款
+     */
+    private int debtAmt;
+    /**
+     * 实际已退
+     */
+    private int refundAmt;
+
+    /**
+     * 扣款状态
+     */
+    private String debtStatus;
 }

@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
+import com.atzuche.order.delivery.vo.delivery.OrderDeliveryVO;
 import lombok.Data;
 
 
@@ -141,12 +142,15 @@ public class RenterOrderDeliveryEntity implements Serializable {
 	private String ownerRealGetReturnRemark;
 
 
-    public void setAheadOrDelayTimeInfo(Integer getMinutes, Integer returnMinutes) {
+    public void setAheadOrDelayTimeInfo(Integer getMinutes, Integer returnMinutes,OrderDeliveryVO orderDeliveryVO) {
         if (Objects.isNull(getMinutes) && Objects.isNull(returnMinutes)) {
             setAheadOrDelayTime(0);
         } else {
-            int aheadOrDelayTime = getMinutes == null ? returnMinutes : getMinutes;
-            setAheadOrDelayTime(aheadOrDelayTime);
+			if (orderDeliveryVO.getOrderDeliveryDTO().getType().intValue() == 1) {
+				setAheadOrDelayTime(getMinutes);
+			} else {
+				setAheadOrDelayTime(returnMinutes);
+			}
         }
 
     }
