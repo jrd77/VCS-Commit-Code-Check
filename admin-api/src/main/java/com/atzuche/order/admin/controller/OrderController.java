@@ -5,6 +5,7 @@ import com.atzuche.order.admin.common.AdminUserUtil;
 import com.atzuche.order.admin.service.AdminOrderService;
 import com.atzuche.order.admin.vo.req.order.CancelOrderByPlatVO;
 import com.atzuche.order.admin.vo.req.order.CancelOrderVO;
+import com.atzuche.order.admin.vo.req.order.OrderModifyConfirmReqVO;
 import com.atzuche.order.commons.entity.orderDetailDto.OrderDetailReqDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.OrderDetailRespDTO;
 import com.atzuche.order.commons.vo.req.ModifyOrderReqVO;
@@ -105,6 +106,22 @@ public class OrderController {
         }
         ResponseData responseData = adminOrderService.cancelOrder(cancelOrderVO);
         return responseData;
+    }
+
+    @AutoDocVersion(version = "订单修改")
+    @AutoDocGroup(group = "订单修改")
+    @AutoDocMethod(description = "租客的订单修改申请车主拒绝或者同意接口", value = "租客的订单修改申请车主拒绝或者同意接口",response = ResponseData.class)
+    @RequestMapping(value="console/order/modify/confirm",method = RequestMethod.POST)
+    public ResponseData modifyApplicationConfirm(@Valid @RequestBody OrderModifyConfirmReqVO reqVO,BindingResult result){
+        if(result.hasErrors()){
+            Optional<FieldError> error = result.getFieldErrors().stream().findFirst();
+            return ResponseData.createErrorCodeResponse(ErrorCode.INPUT_ERROR.getCode(), error.isPresent() ?
+                    error.get().getDefaultMessage() : ErrorCode.INPUT_ERROR.getText());
+        }
+
+        adminOrderService.modificationConfirm(reqVO);
+        return ResponseData.success();
+
     }
 
 
