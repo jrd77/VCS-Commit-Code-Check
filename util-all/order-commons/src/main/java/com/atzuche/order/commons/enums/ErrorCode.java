@@ -103,6 +103,8 @@ public enum ErrorCode {
     OWNER_PLATFORM_SUBSIDY_FAIL("700136","获取平台给车主的补贴明细失败"),
     ADMIN_ORDER_SUBMIT_ERR("700137","后台管理系统下单异常"),
     ADMIN_ORDER_SUBMIT_FAIL("700138","后台管理系统下单失败"),
+    ADMIN_ORDER_QUERY_R_HISTORY_ERR("700139","人工调度查询子订单历史列表异常"),
+    ADMIN_ORDER_QUERY_R_HISTORY_FAIL("700140","人工调度查询历史订单列表失败"),
     ;
 
     private String code;
