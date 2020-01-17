@@ -6,7 +6,7 @@ import com.atzuche.order.commons.constant.OrderConstant;
 import com.atzuche.order.commons.entity.dto.CostBaseDTO;
 import com.atzuche.order.commons.entity.dto.GetReturnCarCostReqDto;
 import com.atzuche.order.commons.enums.CouponTypeEnum;
-import com.atzuche.order.commons.enums.RenterCashCodeEnum;
+import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.commons.vo.res.order.*;
 import com.atzuche.order.rentercost.entity.RenterOrderCostDetailEntity;
 import com.atzuche.order.rentercost.entity.RenterOrderCostEntity;

@@ -1,7 +1,7 @@
 package com.atzuche.order.admin.controller;
 
 import com.atzuche.order.admin.service.OrderDetailService;
-import com.atzuche.order.commons.entity.orderDetailDto.OrderHistoryDTO;
+import com.atzuche.order.commons.entity.orderDetailDto.OrderHistoryListDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.OrderHistoryRespDTO;
 import com.atzuche.order.commons.entity.ownerOrderDetail.AdminOwnerOrderDetailDTO;
 import com.atzuche.order.open.service.FeignOrderDetailService;
@@ -13,8 +13,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 /**
  * 订单详情接口
@@ -57,9 +55,9 @@ public class OrderDetailController {
         return orderHistoryRespDTOResponseData;
     }
 
-    @AutoDocMethod(description = "人工调度历史订单", value = "人工调度历史订单",response = OrderHistoryDTO.class)
+    @AutoDocMethod(description = "人工调度历史订单", value = "人工调度历史订单",response = OrderHistoryListDTO.class)
     @RequestMapping(value = "console/order/dispatchHistory", method = RequestMethod.GET)
-    public ResponseData<List<OrderHistoryDTO>> dispatchHistory(@RequestParam("orderNo")String orderNo)throws Exception{
+    public ResponseData<OrderHistoryListDTO> dispatchHistory(@RequestParam("orderNo")String orderNo)throws Exception{
         if(orderNo == null || orderNo.trim().length()<=0){
             ResponseData responseData = new ResponseData();
             responseData.setData(null);
@@ -67,7 +65,7 @@ public class OrderDetailController {
             responseData.setResMsg("主订单号不能为空");
             return responseData;
         }
-        ResponseData<List<OrderHistoryDTO>> responseData = orderDetailService.dispatchHistory(orderNo);
+        ResponseData<OrderHistoryListDTO> responseData = orderDetailService.dispatchHistory(orderNo);
         return responseData;
     }
 

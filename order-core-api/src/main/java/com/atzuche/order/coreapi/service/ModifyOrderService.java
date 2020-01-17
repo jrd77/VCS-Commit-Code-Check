@@ -4,6 +4,7 @@ import com.atzuche.order.car.CarProxyService;
 import com.atzuche.order.coin.service.AccountRenterCostCoinService;
 import com.atzuche.order.commons.entity.dto.*;
 import com.atzuche.order.commons.enums.*;
+import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.coreapi.entity.dto.ModifyOrderDTO;
 import com.atzuche.order.coreapi.entity.request.ModifyOrderReq;
 import com.atzuche.order.coreapi.entity.vo.CostDeductVO;
@@ -1101,7 +1102,7 @@ public class ModifyOrderService {
 			surplusRentAmt = surplusRentAmt - platformCouponAmt;
 		}
 		// 凹凸币补贴
-		RenterOrderSubsidyDetailDTO autoCoinSubsidy = getAutoCoinSubsidy(modifyOrderDTO, renterOrderCostRespDTO.getRentAmount(), surplusRentAmt);
+		RenterOrderSubsidyDetailDTO autoCoinSubsidy = getAutoCoinSubsidy(modifyOrderDTO, Math.abs(renterOrderCostRespDTO.getRentAmount()), surplusRentAmt);
 		if (autoCoinSubsidy != null) {
 			renterSubsidyList.add(autoCoinSubsidy);
 		}

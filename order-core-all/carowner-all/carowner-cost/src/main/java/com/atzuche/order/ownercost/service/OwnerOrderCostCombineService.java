@@ -10,7 +10,7 @@ import com.atzuche.order.commons.entity.dto.CostBaseDTO;
 import com.atzuche.order.commons.entity.dto.MileageAmtDTO;
 import com.atzuche.order.commons.entity.dto.OilAmtDTO;
 import com.atzuche.order.commons.entity.dto.OwnerGoodsPriceDetailDTO;
-import com.atzuche.order.commons.enums.OwnerCashCodeEnum;
+import com.atzuche.order.commons.enums.cashcode.OwnerCashCodeEnum;
 import com.atzuche.order.ownercost.entity.OwnerOrderIncrementDetailEntity;
 import com.atzuche.order.ownercost.entity.OwnerOrderPurchaseDetailEntity;
 import com.atzuche.order.ownercost.exception.OwnerCostParameterException;

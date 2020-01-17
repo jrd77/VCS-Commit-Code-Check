@@ -20,7 +20,7 @@ import com.atzuche.order.accountrenterwzdepost.service.AccountRenterWzDepositSer
 import com.atzuche.order.accountrenterwzdepost.vo.res.AccountRenterWZDepositResVO;
 import com.atzuche.order.cashieraccount.service.CashierPayService;
 import com.atzuche.order.commons.enums.DeliveryOrderTypeEnum;
-import com.atzuche.order.commons.enums.RenterCashCodeEnum;
+import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.commons.vo.res.ModifyOrderMainResVO;
 import com.atzuche.order.commons.vo.res.ModifyOrderResVO;
 import com.atzuche.order.commons.vo.res.account.AccountRenterCostDetailResVO;

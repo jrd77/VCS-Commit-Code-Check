@@ -1,9 +1,9 @@
 package com.atzuche.order.rentercost.service;
 
 import com.atzuche.order.commons.constant.OrderConstant;
-import com.atzuche.order.commons.enums.RenterCashCodeEnum;
 import com.atzuche.order.commons.enums.SubsidySourceCodeEnum;
 import com.atzuche.order.commons.enums.SubsidyTypeCodeEnum;
+import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.rentercost.entity.dto.RenterOrderSubsidyDetailDTO;
 import com.autoyol.auto.coin.service.vo.res.AutoCoinResponseVO;
 import org.springframework.stereotype.Service;

@@ -31,8 +31,9 @@ public enum SubsidyTypeCodeEnum {
     
     ABATEMENT_INSURE("5","全面保障费"),
     
-    RENT_COST_AMT("6","租车费用")
-
+    RENT_COST_AMT("6","租车费用"),
+    
+    ADJUST_AMT("6","调价费用")
     ;
 
     private String code;

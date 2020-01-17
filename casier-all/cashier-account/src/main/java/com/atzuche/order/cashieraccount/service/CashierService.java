@@ -11,8 +11,8 @@ import com.atzuche.order.accountrenterwzdepost.vo.res.AccountRenterWZDepositResV
 import com.atzuche.order.cashieraccount.vo.res.pay.OrderPayCallBackSuccessVO;
 import com.atzuche.order.commons.enums.OrderPayStatusEnum;
 import com.atzuche.order.commons.enums.OrderStatusEnum;
-import com.atzuche.order.commons.enums.RenterCashCodeEnum;
 import com.atzuche.order.commons.enums.YesNoEnum;
+import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.commons.enums.cashier.OrderRefundStatusEnum;
 import com.atzuche.order.commons.enums.cashier.TransStatusEnum;
 import com.atzuche.order.flow.service.OrderFlowService;
@@ -266,7 +266,7 @@ public class CashierService {
         //3 记录租车费用资金 进出记录
         AccountRenterCostDetailReqVO accountRenterCostChangeReqVO = new AccountRenterCostDetailReqVO();
         BeanUtils.copyProperties(cashierDeductDebtReq,accountRenterCostChangeReqVO);
-        accountRenterCostChangeReqVO.setAmt(-Math.abs(debtedAmt));
+        accountRenterCostChangeReqVO.setAmt(-debtedAmt);
         accountRenterCostChangeReqVO.setRenterCashCodeEnum(RenterCashCodeEnum.SETTLE_RENT_COST_TO_HISTORY_AMT);
         int id = accountRenterCostSettleService.deductDepositToRentCost(accountRenterCostChangeReqVO);
         // 4 记录结算费用 抵扣记录
@@ -275,7 +275,7 @@ public class CashierService {
         renterCostSettleDetail.setUniqueNo(String.valueOf(id));
         renterCostSettleDetail.setCostCode(RenterCashCodeEnum.SETTLE_RENT_COST_TO_HISTORY_AMT.getCashNo());
         renterCostSettleDetail.setCostDetail(RenterCashCodeEnum.SETTLE_RENT_COST_TO_HISTORY_AMT.getTxt());
-        renterCostSettleDetail.setAmt(-Math.abs(debtedAmt));
+        renterCostSettleDetail.setAmt(-debtedAmt);
         accountRenterCostSettleDetailNoTService.insertAccountRenterCostSettleDetail(renterCostSettleDetail);
         return new CashierDeductDebtResVO(cashierDeductDebtReq, debtedAmt,id);
     }
@@ -355,6 +355,16 @@ public class CashierService {
         AccountRenterCostDetailReqVO accountRenterCostDetail = new AccountRenterCostDetailReqVO();
         BeanUtils.copyProperties(cashierRefundApplyReq,accountRenterCostDetail);
         accountRenterCostDetail.setUniqueNo(id.toString());
+        int accountRenterCostDetailId = accountRenterCostSettleService.refundRenterCostDetail(accountRenterCostDetail);
+        //3 发消息通知 存在退款
+        return accountRenterCostDetailId;
+    }
+    /**
+     * 结算退还租车费用 钱包
+     */
+    @Transactional(rollbackFor=Exception.class)
+    public int refundRentCostWallet(AccountRenterCostDetailReqVO accountRenterCostDetail){
+        Assert.notNull(accountRenterCostDetail, ErrorCode.PARAMETER_ERROR.getText());
         int accountRenterCostDetailId = accountRenterCostSettleService.refundRenterCostDetail(accountRenterCostDetail);
         //3 发消息通知 存在退款
         return accountRenterCostDetailId;

@@ -16,7 +16,7 @@ import com.atzuche.order.admin.vo.req.order.ModificationOrderRequestVO;
 import com.atzuche.order.admin.vo.resp.order.ModificationOrderListResponseVO;
 import com.atzuche.order.admin.vo.resp.order.ModificationOrderResponseVO;
 import com.atzuche.order.commons.LocalDateTimeUtils;
-import com.atzuche.order.commons.enums.RenterCashCodeEnum;
+import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.commons.vo.req.ModifyOrderMainQueryReqVO;
 import com.atzuche.order.commons.vo.req.ModifyOrderQueryReqVO;
 import com.atzuche.order.commons.vo.res.ModifyOrderMainResVO;

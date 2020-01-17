@@ -15,6 +15,8 @@ import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
 import com.atzuche.order.commons.entity.dto.RenterMemberDTO;
 import com.atzuche.order.commons.enums.*;
 import com.atzuche.order.commons.enums.account.FreeDepositTypeEnum;
+import com.atzuche.order.commons.enums.cashcode.OwnerCashCodeEnum;
+import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.commons.vo.req.OrderReqVO;
 import com.atzuche.order.commons.vo.res.OrderResVO;
 import com.atzuche.order.coreapi.common.conver.OrderCommonConver;
@@ -315,6 +317,7 @@ public class SubmitOrderService {
         LocationDTO returnCarAddress = new LocationDTO();
         returnCarAddress.setFlag(0);
         if(orderReqVO.getSrvReturnFlag() == 1){
+            returnCarAddress.setFlag(1);
             returnCarAddress.setLat(orderReqVO.getSrvReturnLat()==null?0.0:Double.valueOf(orderReqVO.getSrvReturnLat()));
             returnCarAddress.setLon(orderReqVO.getSrvReturnLon()==null?0.0:Double.valueOf(orderReqVO.getSrvReturnLon()));
             returnCarAddress.setCarAddress(orderReqVO.getSrvReturnAddr());

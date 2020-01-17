@@ -7,7 +7,7 @@ import com.atzuche.order.admin.exception.OrderRHistoryErrException;
 import com.atzuche.order.admin.exception.OrderRHistoryFailException;
 import com.atzuche.order.car.RenterCarDetailFailException;
 import com.atzuche.order.commons.CatConstants;
-import com.atzuche.order.commons.entity.orderDetailDto.OrderHistoryDTO;
+import com.atzuche.order.commons.entity.orderDetailDto.OrderHistoryListDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.OrderHistoryReqDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.OrderHistoryRespDTO;
 import com.atzuche.order.commons.entity.ownerOrderDetail.AdminOwnerOrderDetailDTO;
@@ -19,8 +19,6 @@ import com.dianping.cat.message.Transaction;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Slf4j
 @Service
@@ -68,8 +66,8 @@ public class OrderDetailService {
         return null;
     }
 
-    public ResponseData<List<OrderHistoryDTO>> dispatchHistory(String orderNo) {
-        ResponseData<List<OrderHistoryDTO>> responseObject = null;
+    public ResponseData<OrderHistoryListDTO> dispatchHistory(String orderNo) {
+        ResponseData<OrderHistoryListDTO> responseObject = null;
         Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "获取人工调度历史订单列表");
         try{
             Cat.logEvent(CatConstants.FEIGN_METHOD,"feignOrderUpdateService.cancelOrder");

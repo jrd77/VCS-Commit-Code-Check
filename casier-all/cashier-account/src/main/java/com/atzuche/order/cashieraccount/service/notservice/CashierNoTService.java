@@ -26,7 +26,7 @@ import com.atzuche.order.cashieraccount.mapper.CashierMapper;
 import com.atzuche.order.cashieraccount.vo.req.pay.OrderPaySignReqVO;
 import com.atzuche.order.commons.IpUtil;
 import com.atzuche.order.commons.LocalDateTimeUtils;
-import com.atzuche.order.commons.enums.RenterCashCodeEnum;
+import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.commons.enums.cashier.*;
 import com.atzuche.order.rentercost.entity.vo.PayableVO;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
@@ -290,6 +290,8 @@ public class CashierNoTService {
         accountRenterCostDetail.setTime(notifyDataVo.getOrderTime());
         accountRenterCostDetail.setAmt(settleAmount);
         accountRenterCostDetail.setRenterCashCodeEnum(renterCashCodeEnum);
+        accountRenterCostDetail.setPaySourceCode(notifyDataVo.getPaySource());
+        accountRenterCostDetail.setPaySource(PaySourceEnum.getFlagText(notifyDataVo.getPaySource()));
         vo.setAccountRenterCostDetailReqVO(accountRenterCostDetail);
         return vo;
     }

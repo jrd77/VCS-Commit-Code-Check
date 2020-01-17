@@ -76,14 +76,14 @@ public class OrderDetailController {
         return responseData;
     }
     @GetMapping("/dispatchHistory")
-    public ResponseData<List<OrderHistoryDTO>> dispatchHistory(@RequestParam("orderNo") String orderNo){
+    public ResponseData<OrderHistoryListDTO> dispatchHistory(@RequestParam("orderNo") String orderNo){
         if(orderNo == null || orderNo.trim().length()<=0){
             ResponseData responseData = new ResponseData();
             responseData.setResCode(ErrorCode.INPUT_ERROR.getCode());
             responseData.setResMsg("订单号不能为空");
             return responseData;
         }
-        ResponseData<List<OrderHistoryDTO>> responseData = orderDetailService.dispatchHistory(orderNo);
+        ResponseData<OrderHistoryListDTO> responseData = orderDetailService.dispatchHistory(orderNo);
         return responseData;
     }
 

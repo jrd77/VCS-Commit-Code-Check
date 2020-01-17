@@ -9,8 +9,8 @@ import com.atzuche.order.accountrenterwzdepost.vo.req.PayedOrderRenterDepositWZD
 import com.atzuche.order.accountrenterwzdepost.vo.req.PayedOrderRenterWZDepositReqVO;
 import com.atzuche.order.accountrenterwzdepost.vo.req.RenterCancelWZDepositCostReqVO;
 import com.atzuche.order.accountrenterwzdepost.vo.res.AccountRenterWZDepositResVO;
-import com.atzuche.order.commons.enums.RenterCashCodeEnum;
 import com.atzuche.order.commons.enums.YesNoEnum;
+import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.autoyol.cat.CatAnnotation;
 import com.autoyol.commons.web.ErrorCode;
 import org.springframework.beans.BeanUtils;

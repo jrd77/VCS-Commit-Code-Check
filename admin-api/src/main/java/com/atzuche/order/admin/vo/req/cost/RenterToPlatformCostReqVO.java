@@ -26,18 +26,33 @@ public class RenterToPlatformCostReqVO {
     @NotBlank(message="renterOrderNo不能为空")
     private String renterOrderNo;
     
-    @AutoDocProperty("超里程费用")
-    private String extraMileageFee;
     @AutoDocProperty("油费")
-    private String oilFee;
+    private String oliAmt;
+    @AutoDocProperty("超时费用")
+    private String timeOut;
+    @AutoDocProperty("临时修改订单的时间和地址")
+    private String modifyOrderTimeAndAddrAmt;
     @AutoDocProperty("车辆清洗费")
-    private String carWashFee;
-    @AutoDocProperty("停车费")
-    private String stayCarFee;
-    @AutoDocProperty("超时费")
-    private String overTimeFee;
-    @AutoDocProperty("临时修改订单时间、地址")
-    private String temporaryModifyOrderFee;
+    private String carWash;
     @AutoDocProperty("延误等待费")
-    private String delayWaitFee;
+    private String dlayWait;
+    @AutoDocProperty("停车费")
+    private String stopCar;
+    @AutoDocProperty("超里程费用")
+    private String extraMileage;
+    
+//    @AutoDocProperty("超里程费用")
+//    private String extraMileageFee;
+//    @AutoDocProperty("油费")
+//    private String oilFee;
+//    @AutoDocProperty("车辆清洗费")
+//    private String carWashFee;
+//    @AutoDocProperty("停车费")
+//    private String stayCarFee;
+//    @AutoDocProperty("超时费")
+//    private String overTimeFee;
+//    @AutoDocProperty("临时修改订单时间、地址")
+//    private String temporaryModifyOrderFee;
+//    @AutoDocProperty("延误等待费")
+//    private String delayWaitFee;
 }
