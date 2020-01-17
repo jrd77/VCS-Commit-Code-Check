@@ -1,5 +1,6 @@
 package com.atzuche.order.admin.service;
 
+import com.atzuche.order.accountrenterdeposit.exception.AccountRenterDepositDBException;
 import com.atzuche.order.admin.common.AdminUserUtil;
 import com.atzuche.order.admin.vo.req.renterWz.RenterWzCostDetailReqVO;
 import com.atzuche.order.admin.vo.req.renterWz.TemporaryRefundReqVO;
@@ -7,6 +8,10 @@ import com.atzuche.order.admin.vo.resp.renterWz.*;
 import com.atzuche.order.cashieraccount.service.CashierQueryService;
 import com.atzuche.order.commons.CompareHelper;
 import com.atzuche.order.commons.DateUtils;
+import com.atzuche.order.commons.OrderException;
+import com.atzuche.order.commons.enums.ErrorCode;
+import com.atzuche.order.parentorder.entity.OrderStatusEntity;
+import com.atzuche.order.parentorder.service.OrderStatusService;
 import com.atzuche.order.rentercommodity.service.RenterGoodsService;
 import com.atzuche.order.rentermem.service.RenterMemberService;
 import com.atzuche.order.renterwz.entity.RenterOrderWzCostDetailEntity;
@@ -50,6 +55,9 @@ public class RenterWzService {
     @Resource
     private CashierQueryService cashierQueryService;
 
+    @Resource
+    private OrderStatusService orderStatusService;
+
     private static final String WZ_OTHER_FINE_REMARK = "其他扣款备注";
     private static final String WZ_OTHER_FINE = "其他扣款";
     private static final String WZ_OTHER_FINE_CODE = "100044";
@@ -69,7 +77,10 @@ public class RenterWzService {
 
 
     public void updateWzCost(String orderNo, List<RenterWzCostDetailReqVO> costDetails) {
-        //TODO 查询订单是否结算
+        OrderStatusEntity orderStatus = orderStatusService.getByOrderNo(orderNo);
+        if(orderStatus != null && orderStatus.getWzSettleStatus() != null && orderStatus.getWzSettleStatus().equals(1)){
+            throw new AccountRenterDepositDBException(ErrorCode.RENTER_WZ_SETTLED.getCode(),ErrorCode.RENTER_WZ_SETTLED.getText());
+        }
         //只会处理其他扣款 和 保险理赔
         for (RenterWzCostDetailReqVO costDetail : costDetails) {
             if(!WZ_OTHER_FINE_CODE.equals(costDetail.getCostCode()) && !INSURANCE_CLAIM_CODE.equals(costDetail.getCostCode())){
