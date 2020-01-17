@@ -56,7 +56,7 @@
 	<update id="updateIllegalHandle">
 		UPDATE renter_order_wz_status
 		SET management_mode = #{managementMode}
-		where order_no = #{orderNo} and and car_plate_num = #{carNum} and is_delete = 0
+		where order_no = #{orderNo} and car_plate_num = #{carNum} and is_delete = 0
 	</update>
 
 	<update id="updateTransIllegalStatus">

@@ -63,4 +63,13 @@ public class AccountOwnerCostSettleDetailNoTService {
         }
         return accountOwnerCostSettleDetail.getId();
     }
+
+    /**
+     * 根据订单号 查询 车主费用结算明细
+     * @param orderNo
+     * @return
+     */
+    public List<AccountOwnerCostSettleDetailEntity> getAccountOwnerCostSettleDetails(String orderNo) {
+        return accountOwnerCostSettleDetailMapper.getAccountOwnerCostSettleDetails(orderNo);
+    }
 }
