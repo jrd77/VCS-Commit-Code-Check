@@ -81,4 +81,9 @@ public class WzDepositMsgResVO {
      * 扣款状态
      */
     private String debtStatus;
+
+    /**
+     * 扣款时间
+     */
+    private String deductionTime;
 }
