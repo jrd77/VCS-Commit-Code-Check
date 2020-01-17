@@ -13,7 +13,7 @@ public class OrderPhotoDTO {
 	private String id;
 	@AutoDocProperty(value = "图片路径")
 	private String path;
-	@AutoDocProperty(value = "用户上传类型")
+	@AutoDocProperty(value = "用户上传类型,1:租客，2:车主,3:平台")
 	private String userType;
 	@AutoDocProperty(value = "用户上传类型描述")
 	private String userTypeText;
