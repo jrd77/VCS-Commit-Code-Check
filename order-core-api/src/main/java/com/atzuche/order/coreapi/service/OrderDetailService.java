@@ -712,19 +712,20 @@ public class OrderDetailService {
         }
 
         //申请信息
-        RenterOrderChangeApplyEntity renterOrderChangeApplyByRenterOrderNo = null;
+        RenterOrderChangeApplyEntity renterOrderChangeApply = null;
+        RenterOrderChangeApplyStatusDTO renterOrderChangeApplyStatusDTO = null;
         if(renterOrderNo != null){
-            renterOrderChangeApplyByRenterOrderNo = renterOrderChangeApplyService.getRenterOrderChangeApplyByRenterOrderNo(renterOrderNo);
+            renterOrderChangeApply = renterOrderChangeApplyService.getRenterOrderChangeApplyByRenterOrderNo(renterOrderNo);
+            renterOrderChangeApplyStatusDTO = new RenterOrderChangeApplyStatusDTO();
+            BeanUtils.copyProperties(renterOrderChangeApply,renterOrderChangeApplyStatusDTO);
         }
-
-
         orderStatusRespDTO.orderDTO = orderDTO;
         orderStatusRespDTO.orderStatusDTO = orderStatusDTO;
         orderStatusRespDTO.renterOrderStatusDTO = renterOrderDTO;
         orderStatusRespDTO.ownerOrderStatusDTO = ownerOrderStatusDTO;
         orderStatusRespDTO.renterOrderStatusChangeDTO = changeRenterStaus;
         orderStatusRespDTO.ownerOrderStatusChangeDTO = changeOwnerStatus;
-
+        orderStatusRespDTO.renterOrderChangeApplyStatusDTO = renterOrderChangeApplyStatusDTO;
         return orderStatusRespDTO;
     }
     /*
