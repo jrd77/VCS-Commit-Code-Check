@@ -7,7 +7,6 @@ import com.atzuche.order.admin.exception.OrderSubmitFailException;
 import com.atzuche.order.admin.util.StringUtil;
 import com.atzuche.order.admin.util.TimeUtil;
 import com.atzuche.order.admin.vo.req.orderSubmit.AdminTransReqVO;
-import com.atzuche.order.car.RenterCarDetailFailException;
 import com.atzuche.order.commons.CatConstants;
 import com.atzuche.order.commons.vo.req.AdminOrderReqVO;
 import com.atzuche.order.commons.vo.res.OrderResVO;
@@ -49,7 +48,7 @@ public class OrderSubmitService {
                 throw failException;
             }
             t.setStatus(Transaction.SUCCESS);
-        }catch (RenterCarDetailFailException e){
+        }catch (OrderSubmitFailException e){
             Cat.logError("Feign 后台管理系统下单失败",e);
             t.setStatus(e);
             throw e;
