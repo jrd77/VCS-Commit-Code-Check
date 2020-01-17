@@ -28,4 +28,6 @@ public interface OwnerOrderFineDeatailMapper{
     int updateByCashNoAndOwnerOrderNo(OwnerOrderFineDeatailEntity record);
 
     List<OwnerOrderFineDeatailEntity> getOwnerOrderFineDeatailByOwnerOrderNo(@Param("ownerOrderNo")String ownerOrderNo);
+
+    OwnerOrderFineDeatailEntity getByCashNoAndOwnerOrderNo(@Param("ownerOrderNo")String ownerOrderNo, @Param("fineType")Integer fineType);
 }

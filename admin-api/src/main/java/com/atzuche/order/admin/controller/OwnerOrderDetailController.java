@@ -6,9 +6,12 @@ import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.doc.annotation.AutoDocMethod;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
+import java.util.Optional;
 
 @RestController
 public class OwnerOrderDetailController {
@@ -172,5 +175,18 @@ public class OwnerOrderDetailController {
         ResponseData<PlatformToOwnerSubsidyDTO> responseData = ownerOrderDetailService.platformToOwnerSubsidy(orderNo,ownerOrderNo);
         return responseData;
     }
+
+    @AutoDocMethod(description = "平台给车主的补贴", value = "平台给车的补贴", response = PlatformToOwnerSubsidyDTO.class)
+    @PostMapping("/console/owner/updateFien")
+    public ResponseData<?> updateFineAmt(@Valid @RequestBody FienAmtUpdateReqDTO fienAmtUpdateReqDTO, BindingResult bindingResult){
+        if (bindingResult.hasErrors()) {
+            Optional<FieldError> error = bindingResult.getFieldErrors().stream().findFirst();
+            return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), error.isPresent() ?
+                    error.get().getDefaultMessage() : ErrorCode.INPUT_ERROR.getText());
+        }
+        ResponseData<?> responseData = ownerOrderDetailService.updateFineAmt(fienAmtUpdateReqDTO);
+        return responseData;
+    }
+
 
 }

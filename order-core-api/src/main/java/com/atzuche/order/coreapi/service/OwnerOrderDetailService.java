@@ -11,7 +11,8 @@ import com.atzuche.order.commons.entity.orderDetailDto.OwnerOrderFineDeatailDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.OwnerOrderSubsidyDetailDTO;
 import com.atzuche.order.commons.entity.ownerOrderDetail.*;
 import com.atzuche.order.commons.enums.CarOwnerTypeEnum;
-import com.atzuche.order.commons.enums.OwnerFineTypeEnum;
+import com.atzuche.order.commons.enums.FineSubsidyCodeEnum;
+import com.atzuche.order.commons.enums.FineTypeEnum;
 import com.atzuche.order.commons.enums.cashcode.ConsoleCashCodeEnum;
 import com.atzuche.order.commons.enums.cashcode.OwnerCashCodeEnum;
 import com.atzuche.order.coreapi.submitOrder.exception.OrderDetailException;
@@ -146,11 +147,11 @@ public class OwnerOrderDetailService {
             BeanUtils.copyProperties(x,ownerOrderFineDeatailDTO);
             ownerOrderFineDeatailDTOS.add(ownerOrderFineDeatailDTO);
         });
-        int ownerFine = CostStatUtils.calOwnerFineByCashNo(OwnerFineTypeEnum.OWNER_FINE, ownerOrderFineDeatailDTOS);
-        int ownerGetReturnCarFienAmt = CostStatUtils.calOwnerFineByCashNo(OwnerFineTypeEnum.MODIFY_ADDRESS_FINE, ownerOrderFineDeatailDTOS);
-        int ownerModifyAddrAmt = CostStatUtils.calOwnerFineByCashNo(OwnerFineTypeEnum.MODIFY_ADDRESS_FINE, ownerOrderFineDeatailDTOS);
-        int renterAdvanceReturnCarFienAmt = CostStatUtils.calOwnerFineByCashNo(OwnerFineTypeEnum.RENTER_ADVANCE_RETURN, ownerOrderFineDeatailDTOS);
-        int renterDelayReturnCarFienAmt = CostStatUtils.calOwnerFineByCashNo(OwnerFineTypeEnum.RENTER_DELAY_RETURN, ownerOrderFineDeatailDTOS);
+        int ownerFine = CostStatUtils.calOwnerFineByCashNo(FineTypeEnum.OWNER_FINE, ownerOrderFineDeatailDTOS);
+        int ownerGetReturnCarFienAmt = CostStatUtils.calOwnerFineByCashNo(FineTypeEnum.GET_RETURN_CAR, ownerOrderFineDeatailDTOS);
+        int ownerModifyAddrAmt = CostStatUtils.calOwnerFineByCashNo(FineTypeEnum.MODIFY_ADDRESS_FINE, ownerOrderFineDeatailDTOS);
+        int renterAdvanceReturnCarFienAmt = CostStatUtils.calOwnerFineByCashNo(FineTypeEnum.RENTER_ADVANCE_RETURN, ownerOrderFineDeatailDTOS);
+        int renterDelayReturnCarFienAmt = CostStatUtils.calOwnerFineByCashNo(FineTypeEnum.RENTER_DELAY_RETURN, ownerOrderFineDeatailDTOS);
 
         FienAmtDetailDTO fienAmtDetailDTO = new FienAmtDetailDTO();
         fienAmtDetailDTO.setOwnerFienAmt(ownerFine);
@@ -158,10 +159,10 @@ public class OwnerOrderDetailService {
         fienAmtDetailDTO.setOwnerModifyAddrAmt(ownerModifyAddrAmt);
         fienAmtDetailDTO.setRenterAdvanceReturnCarFienAmt(renterAdvanceReturnCarFienAmt);
         fienAmtDetailDTO.setRenterDelayReturnCarFienAmt(renterDelayReturnCarFienAmt);
+        fienAmtDetailDTO.setOwnerGetReturnCarFienCashNo(FineTypeEnum.GET_RETURN_CAR.getFineType());
+        fienAmtDetailDTO.setOwnerModifyAddrAmtCashNo(FineTypeEnum.MODIFY_ADDRESS_FINE.getFineType());
         return ResponseData.success(fienAmtDetailDTO);
     }
-
-
 
 
     private PlatformToOwnerSubsidyDTO getPlatformToOwnerSubsidyDTO(List<OwnerOrderSubsidyDetailDTO> ownerOrderSubsidyDetailDTOS ){
@@ -231,10 +232,44 @@ public class OwnerOrderDetailService {
     }
 
     public ResponseData<?> updateFien(FienAmtUpdateReqDTO fienAmtUpdateReqDTO) {
+        String ownerOrderNo = fienAmtUpdateReqDTO.getOwnerOrderNo();
         OwnerOrderFineDeatailEntity ownerOrderFineDeatailEntity = new OwnerOrderFineDeatailEntity();
-        ownerOrderFineDeatailEntity.setOwnerOrderNo(fienAmtUpdateReqDTO.getOwnerOrderNo());
-
-        ownerOrderFineDeatailService.updateByCashNoAndOwnerOrderNo(ownerOrderFineDeatailEntity);
-        return null;
+        ownerOrderFineDeatailEntity.setOrderNo(fienAmtUpdateReqDTO.getOrderNo());
+        ownerOrderFineDeatailEntity.setOwnerOrderNo(ownerOrderNo);
+        ownerOrderFineDeatailEntity.setMemNo(fienAmtUpdateReqDTO.getOwnerMemNo());
+        ownerOrderFineDeatailEntity.setFineType(fienAmtUpdateReqDTO.getOwnerGetReturnCarFienCashNo());
+        ownerOrderFineDeatailEntity.setFineAmount(fienAmtUpdateReqDTO.getOwnerGetReturnCarFienAmt());
+        ownerOrderFineDeatailEntity.setFineType(FineTypeEnum.GET_RETURN_CAR.getFineType());
+        ownerOrderFineDeatailEntity.setFineTypeDesc(FineTypeEnum.GET_RETURN_CAR.getFineTypeDesc());
+        OwnerOrderFineDeatailEntity getOwnerGetReturnCarFienCashNo = ownerOrderFineDeatailService.getByCashNoAndOwnerOrderNo(ownerOrderNo, fienAmtUpdateReqDTO.getOwnerGetReturnCarFienCashNo());
+        if(getOwnerGetReturnCarFienCashNo == null){
+            /*if(fienAmtUpdateReqDTO.getOwnerGetReturnCarFienAmt() == 0){
+                return ResponseData.success();
+            }*/
+            ownerOrderFineDeatailEntity.setFineSubsidyCode(FineSubsidyCodeEnum.PLATFORM.getFineSubsidyCode());
+            ownerOrderFineDeatailEntity.setFineSubsidyDesc(FineSubsidyCodeEnum.PLATFORM.getFineSubsidyDesc());
+            ownerOrderFineDeatailEntity.setFineSubsidySourceCode(FineSubsidyCodeEnum.OWNER.getFineSubsidyCode());
+            ownerOrderFineDeatailEntity.setFineSubsidySourceDesc(FineSubsidyCodeEnum.OWNER.getFineSubsidyDesc());
+            ownerOrderFineDeatailService.addOwnerOrderFineRecord(ownerOrderFineDeatailEntity);
+        }else{
+            ownerOrderFineDeatailService.updateByCashNoAndOwnerOrderNo(ownerOrderFineDeatailEntity);
+        }
+        ownerOrderFineDeatailEntity.setFineTypeDesc(FineTypeEnum.MODIFY_ADDRESS_FINE.getFineTypeDesc());
+        ownerOrderFineDeatailEntity.setFineType(fienAmtUpdateReqDTO.getOwnerModifyAddrAmtCashNo());
+        ownerOrderFineDeatailEntity.setFineAmount(fienAmtUpdateReqDTO.getOwnerModifyAddrAmt());
+        OwnerOrderFineDeatailEntity byCashNoAndOwnerOrderNo = ownerOrderFineDeatailService.getByCashNoAndOwnerOrderNo(ownerOrderNo, fienAmtUpdateReqDTO.getOwnerModifyAddrAmtCashNo());
+        if(byCashNoAndOwnerOrderNo == null){
+           /* if(fienAmtUpdateReqDTO.getOwnerModifyAddrAmt() == 0){
+                return ResponseData.success();
+            }*/
+            ownerOrderFineDeatailEntity.setFineSubsidyCode(FineSubsidyCodeEnum.PLATFORM.getFineSubsidyCode());
+            ownerOrderFineDeatailEntity.setFineSubsidyDesc(FineSubsidyCodeEnum.PLATFORM.getFineSubsidyDesc());
+            ownerOrderFineDeatailEntity.setFineSubsidySourceCode(FineSubsidyCodeEnum.OWNER.getFineSubsidyCode());
+            ownerOrderFineDeatailEntity.setFineSubsidySourceDesc(FineSubsidyCodeEnum.OWNER.getFineSubsidyDesc());
+            ownerOrderFineDeatailService.addOwnerOrderFineRecord(ownerOrderFineDeatailEntity);
+        }else{
+            ownerOrderFineDeatailService.updateByCashNoAndOwnerOrderNo(ownerOrderFineDeatailEntity);
+        }
+        return ResponseData.success();
     }
 }

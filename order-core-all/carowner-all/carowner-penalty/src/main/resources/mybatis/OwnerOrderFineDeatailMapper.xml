@@ -172,7 +172,7 @@
 				<if test="updateOp != null">`update_op` = #{updateOp}, </if>
 				<if test="isDelete != null">`is_delete` = #{isDelete}</if>
 			</set>
-		where owner_order_no = #{ownerOrderNo} and fineType = #{fineType}
+		where owner_order_no = #{ownerOrderNo} and fine_type = #{fineType}
 	</update>
 	
 	<update id="updateByPrimaryKey" parameterType="com.atzuche.order.ownercost.entity.OwnerOrderFineDeatailEntity">
@@ -199,5 +199,8 @@
     <select id="getOwnerOrderFineDeatailByOwnerOrderNo" resultMap="BaseResultMap">
         select <include refid="Base_Column_List" /> from owner_order_fine_deatail where owner_order_no = #{ownerOrderNo} and is_delete = 0
     </select>
-
+    <select id="getByCashNoAndOwnerOrderNo" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List" /> from owner_order_fine_deatail where owner_order_no = #{ownerOrderNo} and  fine_type = #{fineType} and is_delete = 0
+    </select>
+    
 </mapper>

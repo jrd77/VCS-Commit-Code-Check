@@ -106,6 +106,8 @@ public enum ErrorCode {
     ADMIN_ORDER_SUBMIT_FAIL("700138","后台管理系统下单失败"),
     ADMIN_ORDER_QUERY_R_HISTORY_ERR("700139","人工调度查询子订单历史列表异常"),
     ADMIN_ORDER_QUERY_R_HISTORY_FAIL("700140","人工调度查询历史订单列表失败"),
+    ADMIN_OWNER_UPDATE_FIEN_ERR("700141","修改车主罚金异常"),
+    ADMIN_OWNER_UPDATE_FIEN_FAIL("700142","修改车主罚金失败")
     ;
 
     private String code;
