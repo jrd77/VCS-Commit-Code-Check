@@ -29,6 +29,7 @@ public enum ErrorCode {
     ACCOUT_RENTET_WZ_DEPOSIT_FAIL("971001","违章押金操作失败"),
     ACCOUT_RENTET_WZ_COST_FAIL("971002","违章费用操作失败"),
     CHANGE_ACCOUT_RENTET_WZ_DEPOSIT_FAIL("971003","违章押金资金进出操作失败"),
+    RENTER_WZ_SETTLED("971004","违章押金已结算"),
 
     PLATFORM_SETTLE_SUBSIDY_AND_PROFIT("871001","结算平台费用出错"),
 
@@ -103,6 +104,8 @@ public enum ErrorCode {
     OWNER_PLATFORM_SUBSIDY_FAIL("700136","获取平台给车主的补贴明细失败"),
     ADMIN_ORDER_SUBMIT_ERR("700137","后台管理系统下单异常"),
     ADMIN_ORDER_SUBMIT_FAIL("700138","后台管理系统下单失败"),
+    ADMIN_ORDER_QUERY_R_HISTORY_ERR("700139","人工调度查询子订单历史列表异常"),
+    ADMIN_ORDER_QUERY_R_HISTORY_FAIL("700140","人工调度查询历史订单列表失败"),
     ;
 
     private String code;

@@ -1,6 +1,7 @@
 package com.atzuche.order.admin.controller;
 
 import com.atzuche.order.admin.service.OrderDetailService;
+import com.atzuche.order.commons.entity.orderDetailDto.OrderHistoryListDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.OrderHistoryRespDTO;
 import com.atzuche.order.commons.entity.ownerOrderDetail.AdminOwnerOrderDetailDTO;
 import com.atzuche.order.open.service.FeignOrderDetailService;
@@ -52,6 +53,20 @@ public class OrderDetailController {
         }
         ResponseData<AdminOwnerOrderDetailDTO> orderHistoryRespDTOResponseData = orderDetailService.ownerOrderDetail(ownerOrderNo,orderNo);
         return orderHistoryRespDTOResponseData;
+    }
+
+    @AutoDocMethod(description = "人工调度历史订单", value = "人工调度历史订单",response = OrderHistoryListDTO.class)
+    @RequestMapping(value = "console/order/dispatchHistory", method = RequestMethod.GET)
+    public ResponseData<OrderHistoryListDTO> dispatchHistory(@RequestParam("orderNo")String orderNo)throws Exception{
+        if(orderNo == null || orderNo.trim().length()<=0){
+            ResponseData responseData = new ResponseData();
+            responseData.setData(null);
+            responseData.setResCode(ErrorCode.INPUT_ERROR.getCode());
+            responseData.setResMsg("主订单号不能为空");
+            return responseData;
+        }
+        ResponseData<OrderHistoryListDTO> responseData = orderDetailService.dispatchHistory(orderNo);
+        return responseData;
     }
 
 }

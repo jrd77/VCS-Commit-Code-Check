@@ -58,6 +58,11 @@ public interface FeignOrderDetailService {
     @GetMapping("/order/detail/adminOwnerOrderDetail")
     public ResponseData<AdminOwnerOrderDetailDTO> adminOwnerOrderDetail(@RequestParam("ownerOrderNo") String ownerOrderNo, @RequestParam("orderNo")String orderNo);
 
-    
-
+    /**
+     * 人工调度历史订单
+     * @param orderNo
+     * @return
+     */
+    @GetMapping("/order/detail/dispatchHistory")
+    public ResponseData<OrderHistoryListDTO> dispatchHistory(@RequestParam("orderNo") String orderNo);
 }

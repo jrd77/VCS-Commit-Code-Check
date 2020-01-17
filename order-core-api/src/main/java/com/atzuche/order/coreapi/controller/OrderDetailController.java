@@ -12,6 +12,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -74,4 +75,16 @@ public class OrderDetailController {
         ResponseData<AdminOwnerOrderDetailDTO> responseData = orderDetailService.adminOwnerOrderDetail(ownerOrderNo,orderNo);
         return responseData;
     }
+    @GetMapping("/dispatchHistory")
+    public ResponseData<OrderHistoryListDTO> dispatchHistory(@RequestParam("orderNo") String orderNo){
+        if(orderNo == null || orderNo.trim().length()<=0){
+            ResponseData responseData = new ResponseData();
+            responseData.setResCode(ErrorCode.INPUT_ERROR.getCode());
+            responseData.setResMsg("订单号不能为空");
+            return responseData;
+        }
+        ResponseData<OrderHistoryListDTO> responseData = orderDetailService.dispatchHistory(orderNo);
+        return responseData;
+    }
+
 }
