@@ -55,4 +55,10 @@ public class RenterInfoRespVO implements Serializable {
     @AutoDocProperty(value = "成功升级车辆次数")
     private String upgrades;
 
+    @AutoDocProperty(value = "户籍")
+    private String censusRegiste;
+
+    @AutoDocProperty(value = "户籍省")
+    private String province;
+
 }

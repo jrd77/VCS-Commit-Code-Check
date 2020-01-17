@@ -10,7 +10,6 @@ import com.atzuche.order.ownercost.entity.dto.OwnerOrderReqDTO;
 import com.atzuche.order.ownercost.mapper.OwnerOrderMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.annotations.Param;
-import org.omg.PortableInterceptor.INACTIVE;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

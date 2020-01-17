@@ -34,5 +34,6 @@ public class OrderDetailRespDTO {
     public List<RenterOrderFineDeatailDTO> renterOrderFineDeatailList;
     public List<RenterOrderSubsidyDetailDTO> renterOrderSubsidyDetailDTOS;
     public List<OwnerOrderSubsidyDetailDTO> ownerOrderSubsidyDetailDTOS;
+    public OwnerOrderCostDTO ownerOrderCostDTO;
 
 }
