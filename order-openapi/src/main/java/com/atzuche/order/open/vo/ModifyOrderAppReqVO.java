@@ -1,4 +1,4 @@
-package com.atzuche.order.coreapi.entity.request;
+package com.atzuche.order.open.vo;
 
 import java.util.List;
 
@@ -11,7 +11,7 @@ import lombok.ToString;
 
 @Data
 @ToString
-public class ModifyOrderAppReq {
+public class ModifyOrderAppReqVO {
 	
 	@NotBlank(message="订单编号不能为空")
 	@AutoDocProperty(value="订单编号,必填，",required=true)
