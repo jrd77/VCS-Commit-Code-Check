@@ -22,6 +22,9 @@ public class WzTestController {
     @Autowired
     private OrderIllegalRenYunTask orderIllegalRenYunTask;
 
+    @Autowired
+    private UnDispatchOrderTask unDispatchOrderTask;
+
     /**
      * 每天定时查询当前进行中的订单，查询是否有违章记录
      */
@@ -84,6 +87,17 @@ public class WzTestController {
     public String orderIllegalRenYunTask(){
         try {
             orderIllegalRenYunTask.execute("");
+            return "success";
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "failure";
+        }
+    }
+
+    @GetMapping("/wz/unDispatchOrderTask")
+    public String unDispatchOrderTask(){
+        try {
+            unDispatchOrderTask.execute("");
             return "success";
         } catch (Exception e) {
             e.printStackTrace();

@@ -18,6 +18,7 @@ import com.atzuche.order.transport.service.GetReturnCarCostProxyService;
 import com.atzuche.order.transport.service.TranSportProxyService;
 import com.atzuche.order.transport.vo.GetReturnCostDTO;
 import com.atzuche.order.transport.vo.GetReturnOverCostDTO;
+import com.autoyol.commons.utils.DateUtil;
 import com.autoyol.platformcost.OwnerFeeCalculatorUtils;
 import com.autoyol.platformcost.RenterFeeCalculatorUtils;
 import com.google.common.collect.Lists;
@@ -68,6 +69,7 @@ public class DeliveryCarInfoService {
         List<OwnerHandoverCarInfoEntity> ownerHandoverCarInfoEntities = ownerHandoverCarService.selectOwnerByOrderNo(deliveryCarDTO.getOrderNo());
         List<RenterOrderDeliveryEntity> renterOrderDeliveryEntityList = renterOrderDeliveryService.listRenterOrderDeliveryByRenterOrderNo(renterOrderNo);
         DeliveryCarVO deliveryCarVO = createDeliveryCarVOParams(ownerGetAndReturnCarDTO, renterHandoverCarInfoEntities, ownerHandoverCarInfoEntities, renterOrderDeliveryEntityList, isEscrowCar, carEngineType, carType, renterGoodsDetailDTO);
+
         return deliveryCarVO;
     }
 
@@ -246,6 +248,7 @@ public class DeliveryCarInfoService {
         getHandoverCarDTO.setOwnDefaultGetCarAddr(renterOrderDeliveryEntity.getOwnerGetReturnAddr());
         getHandoverCarDTO.setOwnRealReturnAddr(renterOrderDeliveryEntity.getOwnerGetReturnAddr());
         LocalDateTime rentTime = renterOrderDeliveryEntity.getRentTime();
+        rentTime = rentTime.minusMinutes(renterOrderDeliveryEntity.getAheadOrDelayTime());
         getHandoverCarDTO.setRentTime(DateUtils.formate(rentTime, DateUtils.DATE_DEFAUTE_4) + "," + renterOrderDeliveryEntity.getAheadOrDelayTime());
         return getHandoverCarDTO;
     }
@@ -262,7 +265,8 @@ public class DeliveryCarInfoService {
         returnHandoverCarDTO.setRenterRealReturnAddr(renterOrderDeliveryEntity.getRenterGetReturnAddr());
         returnHandoverCarDTO.setOwnDefaultReturnCarAddr(renterOrderDeliveryEntity.getOwnerGetReturnAddr());
         returnHandoverCarDTO.setOwnerRealGetAddr(renterOrderDeliveryEntity.getOwnerGetReturnAddr());
-        LocalDateTime rentTime = renterOrderDeliveryEntity.getRentTime();
+        LocalDateTime rentTime = renterOrderDeliveryEntity.getRevertTime();
+        rentTime = rentTime.plusMinutes(renterOrderDeliveryEntity.getAheadOrDelayTime());
         returnHandoverCarDTO.setRentTime(DateUtils.formate(rentTime, DateUtils.DATE_DEFAUTE_4) + "," + renterOrderDeliveryEntity.getAheadOrDelayTime());
         return  returnHandoverCarDTO;
     }

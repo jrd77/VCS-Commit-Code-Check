@@ -2,7 +2,6 @@ package com.atzuche.order.admin.service;
 
 import com.alibaba.fastjson.JSON;
 import com.atzuche.order.admin.exception.*;
-import com.atzuche.order.car.RenterCarDetailFailException;
 import com.atzuche.order.commons.CatConstants;
 import com.atzuche.order.commons.entity.ownerOrderDetail.*;
 import com.atzuche.order.open.service.FeignOwnerDetailService;
@@ -36,7 +35,7 @@ public class OwnerOrderDetailService {
                 throw failException;
             }
             t.setStatus(Transaction.SUCCESS);
-        }catch (RenterCarDetailFailException e){
+        }catch (OwnerRentDetailFailException e){
             Cat.logError("Feign 获取租金明细失败",e);
             t.setStatus(e);
             throw e;
@@ -73,7 +72,7 @@ public class OwnerOrderDetailService {
                 throw failException;
             }
             t.setStatus(Transaction.SUCCESS);
-        }catch (RenterCarDetailFailException e){
+        }catch (OwnerRenterPricelFailException e){
             Cat.logError("Feign 获取车主租客调价明细失败",e);
             t.setStatus(e);
             throw e;
@@ -104,7 +103,7 @@ public class OwnerOrderDetailService {
                 throw failException;
             }
             t.setStatus(Transaction.SUCCESS);
-        }catch (RenterCarDetailFailException e){
+        }catch (OwnerFinelFailException e){
             Cat.logError("Feign 获取服务费明细失败",e);
             t.setStatus(e);
             throw e;
@@ -135,7 +134,7 @@ public class OwnerOrderDetailService {
                 throw failException;
             }
             t.setStatus(Transaction.SUCCESS);
-        }catch (RenterCarDetailFailException e){
+        }catch (OwnerFinelFailException e){
             Cat.logError("Feign 获取服务费明细失败",e);
             t.setStatus(e);
             throw e;
@@ -166,7 +165,7 @@ public class OwnerOrderDetailService {
                 throw failException;
             }
             t.setStatus(Transaction.SUCCESS);
-        }catch (RenterCarDetailFailException e){
+        }catch (OwnerPlatformFailException e){
             Cat.logError("Feign 获取车主付给平台的费用明细失败",e);
             t.setStatus(e);
             throw e;
@@ -197,7 +196,7 @@ public class OwnerOrderDetailService {
                 throw failException;
             }
             t.setStatus(Transaction.SUCCESS);
-        }catch (RenterCarDetailFailException e){
+        }catch (OwnerPlatformSubsidyFailException e){
             Cat.logError("Feign 获取平台给车主的补贴明细失败",e);
             t.setStatus(e);
             throw e;
@@ -205,6 +204,37 @@ public class OwnerOrderDetailService {
             log.error("Feign 获取平台给车主的补贴明细异常,responseObject={},orderNo={}", JSON.toJSONString(responseObject),orderNo,e);
             OwnerPlatformSubsidyErrException err = new OwnerPlatformSubsidyErrException();
             Cat.logError("Feign 获取平台给车主的补贴明细异常",err);
+            throw err;
+        }finally {
+            t.complete();
+        }
+        return responseObject;
+    }
+
+    public ResponseData<?> updateFineAmt(FienAmtUpdateReqDTO fienAmtUpdateReqDTO) {
+        ResponseData<?> responseObject = null;
+        Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "获取修改罚金");
+        try{
+            Cat.logEvent(CatConstants.FEIGN_METHOD,"feignOrderUpdateService.cancelOrder");
+            log.info("Feign 开始获取修改罚金,fienAmtUpdateReqDTO={}", JSON.toJSONString(fienAmtUpdateReqDTO));
+            Cat.logEvent(CatConstants.FEIGN_PARAM,JSON.toJSONString(fienAmtUpdateReqDTO));
+            responseObject =  feignOwnerDetailService.updateFineAmt(fienAmtUpdateReqDTO);
+            Cat.logEvent(CatConstants.FEIGN_RESULT,JSON.toJSONString(fienAmtUpdateReqDTO));
+            if(responseObject == null || !ErrorCode.SUCCESS.getCode().equals(responseObject.getResCode())){
+                log.error("Feign 获取修改罚金失败,responseObject={},orderNo={}",JSON.toJSONString(responseObject),JSON.toJSONString(fienAmtUpdateReqDTO));
+                OwnerUpdateFineFailException failException = new OwnerUpdateFineFailException();
+                Cat.logError("Feign 获取修改罚金失败",failException);
+                throw failException;
+            }
+            t.setStatus(Transaction.SUCCESS);
+        }catch (OwnerUpdateFineFailException e){
+            Cat.logError("Feign 获取修改罚金失败",e);
+            t.setStatus(e);
+            throw e;
+        }catch (Exception e){
+            log.error("Feign 获取修改罚金异常,responseObject={},fienAmtUpdateReqDTO={}", JSON.toJSONString(responseObject),JSON.toJSONString(fienAmtUpdateReqDTO),e);
+            OwnerUpdateFineErrException err = new OwnerUpdateFineErrException();
+            Cat.logError("Feign 获取修改罚金异常",err);
             throw err;
         }finally {
             t.complete();

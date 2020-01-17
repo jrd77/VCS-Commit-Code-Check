@@ -1,4 +1,4 @@
-package com.atzuche.order.coreapi.entity.vo;
+package com.atzuche.order.open.vo;
 
 import java.io.Serializable;
 

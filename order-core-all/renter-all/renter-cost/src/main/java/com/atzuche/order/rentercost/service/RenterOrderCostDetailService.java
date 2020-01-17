@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.rentercost.entity.RenterOrderCostDetailEntity;
 import com.atzuche.order.rentercost.entity.RenterOrderFineDeatailEntity;
 import com.atzuche.order.rentercost.mapper.RenterOrderCostDetailMapper;
@@ -97,4 +98,21 @@ public class RenterOrderCostDetailService{
     	}
     	return list;
     }
+
+	public int saveOrUpdateRenterOrderCostDetail(RenterOrderCostDetailEntity extraDriverInsureAmtEntity) {
+		List<RenterOrderCostDetailEntity> list = listRenterOrderCostDetail(extraDriverInsureAmtEntity.getOrderNo(), extraDriverInsureAmtEntity.getRenterOrderNo());
+		boolean isExists = false;
+		for (RenterOrderCostDetailEntity renterOrderCostDetailEntity : list) {
+			if(renterOrderCostDetailEntity.getCostCode().equals(RenterCashCodeEnum.EXTRA_DRIVER_INSURE.getCashNo())) {
+				//根据ID修改
+				extraDriverInsureAmtEntity.setId(renterOrderCostDetailEntity.getId());
+				renterOrderCostDetailMapper.updateByPrimaryKeySelective(extraDriverInsureAmtEntity);
+				isExists = true;
+			}
+		}
+		if(!isExists) {
+			renterOrderCostDetailMapper.saveRenterOrderCostDetail(extraDriverInsureAmtEntity);
+		}
+		return 0;
+	}
 }

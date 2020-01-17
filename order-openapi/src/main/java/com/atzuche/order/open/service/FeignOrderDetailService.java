@@ -3,6 +3,7 @@ package com.atzuche.order.open.service;
 
 import com.atzuche.order.commons.entity.orderDetailDto.*;
 import com.atzuche.order.commons.entity.ownerOrderDetail.AdminOwnerOrderDetailDTO;
+import com.atzuche.order.commons.entity.ownerOrderDetail.FienAmtUpdateReqDTO;
 import com.autoyol.commons.web.ResponseData;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.web.bind.annotation.*;
@@ -65,4 +66,5 @@ public interface FeignOrderDetailService {
      */
     @GetMapping("/order/detail/dispatchHistory")
     public ResponseData<OrderHistoryListDTO> dispatchHistory(@RequestParam("orderNo") String orderNo);
+
 }

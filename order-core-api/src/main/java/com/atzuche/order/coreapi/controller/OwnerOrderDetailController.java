@@ -166,7 +166,7 @@ public class OwnerOrderDetailController {
     }
 
     @PostMapping("/owner/updateFien")
-    public ResponseData<?> updateFien(@Valid @RequestBody FienAmtUpdateReqDTO fienAmtUpdateReqDTO, BindingResult bindingResult){
+    public ResponseData<?> updateFineAmt(@Valid @RequestBody FienAmtUpdateReqDTO fienAmtUpdateReqDTO, BindingResult bindingResult){
         if (bindingResult.hasErrors()) {
             return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), ErrorCode.INPUT_ERROR.getText());
         }
