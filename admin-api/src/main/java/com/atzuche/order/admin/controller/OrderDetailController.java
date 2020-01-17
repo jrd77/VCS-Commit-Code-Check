@@ -1,7 +1,6 @@
 package com.atzuche.order.admin.controller;
 
 import com.atzuche.order.admin.service.OrderDetailService;
-import com.atzuche.order.commons.entity.orderDetailDto.OrderHistoryDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.OrderHistoryListDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.OrderHistoryRespDTO;
 import com.atzuche.order.commons.entity.ownerOrderDetail.AdminOwnerOrderDetailDTO;
@@ -56,7 +55,7 @@ public class OrderDetailController {
         return orderHistoryRespDTOResponseData;
     }
 
-    @AutoDocMethod(description = "人工调度历史订单", value = "人工调度历史订单",response = OrderHistoryDTO.class)
+    @AutoDocMethod(description = "人工调度历史订单", value = "人工调度历史订单",response = OrderHistoryListDTO.class)
     @RequestMapping(value = "console/order/dispatchHistory", method = RequestMethod.GET)
     public ResponseData<OrderHistoryListDTO> dispatchHistory(@RequestParam("orderNo")String orderNo)throws Exception{
         if(orderNo == null || orderNo.trim().length()<=0){
