@@ -16,9 +16,9 @@ dependencies {
     compile("com.autoyol.aliyunmq:auto-aliyunmq-core:0.0.2")
     compile 'org.springframework.amqp:spring-rabbit:1.7.5.RELEASE'
     compile 'com.rabbitmq:amqp-client:4.0.3'
-    compile("com.autoframework:auto-mq-event:1.0-SNAPSHOT")
     compile project(":util-all:order-commons")
     compile("org.apache.commons:commons-collections4:4.0")
+    compile("com.autoframework:auto-mq-event:1.0-SNAPSHOT")
 
 }
 
