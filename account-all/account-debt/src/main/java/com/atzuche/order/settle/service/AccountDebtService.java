@@ -59,6 +59,7 @@ public class AccountDebtService{
 
     /**
      * 抵扣历史欠款
+     *  正数
      * @return
      */
     public int deductDebt(AccountDeductDebtReqVO accountDeductDebt) {

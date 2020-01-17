@@ -7,6 +7,7 @@ import com.atzuche.order.accountplatorm.entity.AccountPlatformSubsidyDetailEntit
 import com.atzuche.order.accountrenterdeposit.vo.req.OrderCancelRenterDepositReqVO;
 import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostDetailEntity;
 import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostSettleDetailEntity;
+import com.atzuche.order.accountrenterrentcost.vo.req.AccountRenterCostDetailReqVO;
 import com.atzuche.order.accountrenterrentcost.vo.req.AccountRenterCostToFineReqVO;
 import com.atzuche.order.accountrenterwzdepost.vo.req.RenterCancelWZDepositCostReqVO;
 import com.atzuche.order.cashieraccount.entity.CashierEntity;
@@ -22,6 +23,7 @@ import com.atzuche.order.commons.entity.dto.*;
 import com.atzuche.order.commons.enums.*;
 import com.atzuche.order.commons.enums.account.debt.DebtTypeEnum;
 import com.atzuche.order.commons.enums.cashier.OrderRefundStatusEnum;
+import com.atzuche.order.commons.enums.cashier.PayTypeEnum;
 import com.atzuche.order.delivery.entity.OwnerHandoverCarInfoEntity;
 import com.atzuche.order.delivery.entity.RenterHandoverCarInfoEntity;
 import com.atzuche.order.delivery.enums.RenterHandoverCarTypeEnum;
@@ -1514,6 +1516,16 @@ public class OrderSettleNoTService {
         //2 退还 钱包金额
         if(settleCancelOrdersAccount.getRentSurplusWalletAmt()>0){
             walletProxyService.returnOrChargeWallet(settleOrders.getRenterMemNo(),settleOrders.getOrderNo(),settleCancelOrdersAccount.getRentSurplusWalletAmt());
+            //记录退还
+            AccountRenterCostDetailReqVO accountRenterCostDetail = new AccountRenterCostDetailReqVO ();
+            accountRenterCostDetail.setMemNo(settleOrders.getRenterMemNo());
+            accountRenterCostDetail.setOrderNo(settleOrders.getOrderNo());
+            accountRenterCostDetail.setPaySource(com.atzuche.order.commons.enums.cashier.PaySourceEnum.WALLET_PAY.getText());
+            accountRenterCostDetail.setPaySourceCode(com.atzuche.order.commons.enums.cashier.PaySourceEnum.WALLET_PAY.getCode());
+            accountRenterCostDetail.setRenterCashCodeEnum(RenterCashCodeEnum.CANCEL_RENT_COST_TO_RETURN_AMT);
+            accountRenterCostDetail.setAmt(-settleCancelOrdersAccount.getRentSurplusWalletAmt());
+            accountRenterCostDetail.setPayType(PayTypeEnum.PAY_PUR.getCode());
+            cashierService.refundRentCostWallet(accountRenterCostDetail);
         }
         //3 租车费用 退还
         if(settleCancelOrdersAccount.getRentSurplusCostAmt()>0){
@@ -1617,6 +1629,12 @@ public class OrderSettleNoTService {
             cashierDeductDebtReq.setRenterCashCodeEnum(RenterCashCodeEnum.SETTLE_RENT_COST_TO_HISTORY_AMT);
             cashierDeductDebtReq.setMemNo(settleOrders.getRenterMemNo());
             CashierDeductDebtResVO result = cashierService.deductDebtByRentCost(cashierDeductDebtReq);
+            if(Objects.nonNull(result)){
+                //已抵扣抵扣金额
+                int deductAmt = result.getDeductAmt();
+                //计算 还完历史欠款 剩余 应退 剩余租车费用
+                settleCancelOrdersAccount.setRentSurplusCostAmt(settleCancelOrdersAccount.getRentSurplusCostAmt() - deductAmt);
+            }
         }
         //车辆押金
         if(settleCancelOrdersAccount.getRentSurplusDepositAmt()>0){
@@ -1626,6 +1644,12 @@ public class OrderSettleNoTService {
             cashierDeductDebtReq.setRenterCashCodeEnum(RenterCashCodeEnum.SETTLE_DEPOSIT_TO_HISTORY_AMT);
             cashierDeductDebtReq.setMemNo(settleOrders.getRenterMemNo());
             CashierDeductDebtResVO result = cashierService.deductDebtByRentCost(cashierDeductDebtReq);
+            if(Objects.nonNull(result)){
+                //已抵扣抵扣金额
+                int deductAmt = result.getDeductAmt();
+                //计算 还完历史欠款 剩余 应退 剩余租车费用
+                settleCancelOrdersAccount.setRentSurplusDepositAmt(settleCancelOrdersAccount.getRentSurplusDepositAmt() - deductAmt);
+            }
         }
 
         //违章押金
@@ -1636,6 +1660,12 @@ public class OrderSettleNoTService {
             cashierDeductDebtReq.setRenterCashCodeEnum(RenterCashCodeEnum.CANCEL_WZ_DEPOSIT_TO_HISTORY_AMT);
             cashierDeductDebtReq.setMemNo(settleOrders.getRenterMemNo());
             CashierDeductDebtResVO result = cashierService.deductDebtByRentCost(cashierDeductDebtReq);
+            if(Objects.nonNull(result)){
+                //已抵扣抵扣金额
+                int deductAmt = result.getDeductAmt();
+                //计算 还完历史欠款 剩余 应退 剩余租车费用
+                settleCancelOrdersAccount.setRentSurplusWzDepositAmt(settleCancelOrdersAccount.getRentSurplusWzDepositAmt() - deductAmt);
+            }
         }
     }
 
