@@ -81,6 +81,7 @@ public class CashierPayService{
     @Autowired CashierRefundApplyNoTService cashierRefundApplyNoTService;
     @Autowired private OrderStatusService orderStatusService;
     @Autowired private OrderFlowService orderFlowService;
+    @Autowired private CashierQueryService cashierQueryService;
 
 
     /**
@@ -296,7 +297,7 @@ public class CashierPayService{
                 }
             }
         }
-//        //待支付总额
+        //待支付总额
         int amtTotal = amtDeposit + amtWZDeposit + rentAmt;
         //实际待支付租车费用总额 即真实应付租车费用
         Integer amtRent = rentAmt+rentAmtPayed;
@@ -321,7 +322,27 @@ public class CashierPayService{
         result.setOrderNo(orderPayReqVO.getOrderNo());
         result.setTitle("待支付金额：" +result.getAmt() + "，订单号："  + result.getOrderNo());
         result.setAccountPayAbles(accountPayAbles);
+        //支付显示 文案处理
+        handCopywriting(result,orderPayReqVO);
         return result;
+    }
+
+    /**
+     * 支付显示 文案处理
+     * @param result
+     */
+    private void handCopywriting(OrderPayableAmountResVO result,OrderPayReqVO orderPayReqVO) {
+        result.setButtonName("去支付");
+        result.setHints("请于1小时内完成支付，超时未支付订单将自动取消");
+        String costText ="";
+        if(orderPayReqVO.getPayKind().contains(DataPayKindConstant.RENT)){
+            costText =costText+"车辆押金"+result.getAmtDeposit();
+        }
+        if(orderPayReqVO.getPayKind().contains(DataPayKindConstant.DEPOSIT)){
+            costText =costText+" 违章押金"+result.getAmtWzDeposit();
+        }
+        result.setCostText(costText);
+
     }
 
     public int getRentCost(String orderNo,String memNo){

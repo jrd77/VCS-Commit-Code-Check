@@ -3,7 +3,7 @@
 <mapper namespace="com.atzuche.order.photo.mapper.OrderPhotoMapper">
 	
 	<select id="queryGetSrvCarList" resultType="com.atzuche.order.photo.entity.OrderPhotoEntity">
-		SELECT id,photo_type photoType,path,user_type userType,order_no orderNo,create_time createTime,update_time updateTime,operator FROM trans_car_condition_photo
+		SELECT id,photo_type photoType,path,user_type userType,order_no orderNo,create_time createTime,update_time updateTime,operator FROM order_car_condition_photo
 		where order_no=#{orderNo} and photo_type=#{type}	
 	</select>
 	
@@ -12,19 +12,19 @@
 	</select>
 	
 	<select id="queryViolationPhotoList" resultType="com.atzuche.order.photo.entity.OrderPhotoEntity">
-		SELECT id,path,user_type userType,order_no orderNo,create_time createTime,update_time updateTime,operator FROM renter_order_wz_illegal_photo where order_no=#{orderNo}
+		SELECT id,path,user_type userType,order_no orderNo,create_time createTime,update_time updateTime,create_op as operator FROM renter_order_wz_illegal_photo where order_no=#{orderNo}
 	</select>
 	
 	<insert id="addUploadOrderPhoto" parameterType="map">
 		 INSERT INTO
 		 <if test="photoType==1||photoType==2">
-		  trans_car_condition_photo(photo_type,path,user_type,order_no,serial_number,operator) VALUES(#{photoType},#{path},#{userType},#{orderNo},0,#{operator});
+		  order_car_condition_photo(photo_type,path,user_type,order_no,serial_number,operator) VALUES(#{photoType},#{path},#{userType},#{orderNo},0,#{operator});
 		 </if>
 		 <if test="photoType==3">
 		  trans_claim_photo(path,user_type,order_no,serial_number,operator) VALUES(#{path},#{userType},#{orderNo},0,#{operator});
 		 </if>
 		  <if test="photoType==4">
-		  renter_order_wz_illegal_photo(path,user_type,order_no,serial_number,operator, car_plate_num) VALUES(#{path},#{userType},#{orderNo},0,#{operator},#{carPlateNum});
+		  renter_order_wz_illegal_photo(path,user_type,order_no,serial_number,create_op, car_plate_num, update_op) VALUES(#{path},#{userType},#{orderNo},0,#{operator},#{carPlateNum},#{operator});
 		 </if>
 	</insert>
 
@@ -32,13 +32,13 @@
 	<insert id="updateUploadOrderPhoto" parameterType="map">
 		update
 		<if test="photoType==1||photoType==2">
-			trans_car_condition_photo set path = #{path}, operator = #{operator}, user_type = #{userType} where id = #{photoId};
+			order_car_condition_photo set path = #{path}, operator = #{operator}, user_type = #{userType} where id = #{photoId};
 		</if>
 		<if test="photoType==3">
 			trans_claim_photo set path = #{path}, operator = #{operator}, user_type = #{userType} where id = #{photoId};
 		</if>
 		<if test="photoType==4">
-			renter_order_wz_illegal_photo set path = #{path}, operator = #{operator}, user_type = #{userType} where id = #{photoId};
+			renter_order_wz_illegal_photo set path = #{path}, create_op = #{operator},update_op = #{operator}, user_type = #{userType} where id = #{photoId};
 		</if>
 	</insert>
 
@@ -46,7 +46,7 @@
 	<delete id="delOrderPhoto">
 		 DELETE FROM 
 		 <if test="photoType==1||photoType==2">
-		  trans_car_condition_photo
+		  order_car_condition_photo
 		 </if>
 		 <if test="photoType==3">
 		  trans_claim_photo
@@ -70,7 +70,7 @@
 	<select id="queryPhotoInfo" resultType="com.atzuche.order.photo.entity.OrderPhotoEntity">
 		select order_no as orderNo, user_type as userType
 		<if test="photoType==1||photoType==2">
-			from trans_car_condition_photo where id = #{photoId};
+			from order_car_condition_photo where id = #{photoId};
 		</if>
 		<if test="photoType==3">
 			from trans_claim_photo where id = #{photoId};
