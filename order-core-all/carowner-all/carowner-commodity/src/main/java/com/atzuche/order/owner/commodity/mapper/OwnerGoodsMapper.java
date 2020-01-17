@@ -1,9 +1,7 @@
 package com.atzuche.order.owner.commodity.mapper;
-import org.apache.ibatis.annotations.Param;
-import java.util.List;
-
 import com.atzuche.order.owner.commodity.entity.OwnerGoodsEntity;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * 车主端商品概览表
@@ -28,4 +26,5 @@ public interface OwnerGoodsMapper{
     
     OwnerGoodsEntity getLastOwnerGoodsByOrderNo(@Param("orderNo")String orderNo);
 
+    OwnerGoodsEntity getOwnerGoodsByCarNo(@Param("carNo")Integer carNo);
 }

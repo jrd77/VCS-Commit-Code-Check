@@ -83,4 +83,13 @@ public class OwnerGoodsService{
     public OwnerGoodsEntity getLastOwnerGoodsByOrderNo(String orderNo) {
     	return ownerGoodsMapper.getLastOwnerGoodsByOrderNo(orderNo);
     }
+    /*
+     * @Author ZhangBin
+     * @Date 2020/1/17 10:05
+     * @Description: 
+     * 
+     **/
+    public OwnerGoodsEntity getOwnerGoodsByCarNo(Integer carNo){
+        return ownerGoodsMapper.getOwnerGoodsByCarNo(carNo);
+    }
 }

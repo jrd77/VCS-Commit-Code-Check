@@ -123,6 +123,7 @@ public class CarProxyService {
 
         CarDetailVO data = responseObject.getData();
         List<CarInspectVO> carInspectS = data.getCarInspectS();
+        CarChargeLevelVO carChargeLevelVO = data.getCarChargeLevelVO();
         CarBaseVO carBaseVO = data.getCarBaseVO();
         CarDetectVO carDetect = data.getCarDetect();
         CarStewardVO carSteward = data.getCarSteward();
@@ -132,6 +133,10 @@ public class CarProxyService {
         List<CarGpsVO> carGpsVOS = data.getCarGpsVOS();
         TransReplyVO transReplyVO = carBaseVO.getTransReplyVO();
         RenterGoodsDetailDTO renterGoodsDetailDto = new RenterGoodsDetailDTO();
+        renterGoodsDetailDto.setCarAge(carBaseVO.getCarAge());
+        renterGoodsDetailDto.setSucessRate(carChargeLevelVO!=null?carChargeLevelVO.getSucessRate():null);
+        renterGoodsDetailDto.setIsLocal(carBaseVO.getIsLocal());
+        renterGoodsDetailDto.setChoiceCar(data.isChoiceCar());
         renterGoodsDetailDto.setRentTime(reqVO.getRentTime());
         renterGoodsDetailDto.setRevertTime(reqVO.getRevertTime());
         renterGoodsDetailDto.setReplyFlag(transReplyVO ==null || transReplyVO.getReplyFlag() == null ? 0: transReplyVO.getReplyFlag());
