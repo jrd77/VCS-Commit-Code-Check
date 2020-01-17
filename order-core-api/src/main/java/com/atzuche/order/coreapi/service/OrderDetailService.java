@@ -78,6 +78,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -262,8 +263,9 @@ public class OrderDetailService {
         OrderStatusEntity orderStatusEntity = orderStatusService.getByOrderNo(orderNo);
         OrderFlowEntity orderFlowEntity = orderFlowService.getByOrderNoAndStatus(orderNo, orderStatusEntity.getStatus());
         OrderDetailDTO orderDetailDTO = new OrderDetailDTO();
-        orderDetailDTO.statusUpdateTIme = null;
+
         orderDetailDTO.orderStatus = OrderStatusEnum.getDescByStatus(orderStatusEntity.getStatus());
+        orderDetailDTO.totalRentTime = String.valueOf(ChronoUnit.HOURS.between(orderEntity.getExpRentTime(), orderEntity.getExpRevertTime()));
         if(orderSourceStatEntity != null){
             String category = CategoryEnum.getNameByCode(orderSourceStatEntity.getCategory());
             String businessParentType = BusinessParentTypeEnum.getNameByCode(orderSourceStatEntity.getBusinessParentType());
@@ -274,7 +276,7 @@ public class OrderDetailService {
         }
         if(orderFlowEntity != null){
             LocalDateTime createTime = orderFlowEntity.getCreateTime();
-            orderDetailDTO.totalRentTime = createTime != null ? LocalDateTimeUtils.localdateToString(createTime,GlobalConstant.FORMAT_DATE_STR1):null;
+            orderDetailDTO.statusUpdateTIme = createTime != null ? LocalDateTimeUtils.localdateToString(createTime,GlobalConstant.FORMAT_DATE_STR1):null;
         }
         orderDetailDTO.rentTimeStr = LocalDateTimeUtils.localdateToString(orderEntity.getExpRentTime(),GlobalConstant.FORMAT_DATE_STR1);
         orderDetailDTO.revertTimeStr = LocalDateTimeUtils.localdateToString(orderEntity.getExpRevertTime(),GlobalConstant.FORMAT_DATE_STR1);

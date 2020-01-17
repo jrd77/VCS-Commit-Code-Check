@@ -27,5 +27,5 @@ public interface AccountRenterDepositMapper{
      */
     AccountRenterDepositEntity selectByOrderAndMemNo(@Param("orderNo") String orderNo, @Param("memNo")String memNo);
 
-    AccountRenterDepositEntity selectByOrderNo(String orderNo);
+    AccountRenterDepositEntity selectByOrderNo(@Param("orderNo") String orderNo);
 }
