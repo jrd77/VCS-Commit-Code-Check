@@ -7,6 +7,7 @@ package com.atzuche.order.transport.common;
 public enum TransPortErrorCode {
 
     TRANS_PORT_ERROR("300010", "超运能出错"),
+    GET_RETURN_CAR_ERROR("300011", "租客取还车费用出错"),
     ;
 
     private String code;
