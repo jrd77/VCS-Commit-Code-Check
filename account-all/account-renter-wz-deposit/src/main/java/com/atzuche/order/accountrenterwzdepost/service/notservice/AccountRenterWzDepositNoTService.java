@@ -53,6 +53,15 @@ public class AccountRenterWzDepositNoTService {
         AccountRenterWzDepositEntity accountRenterDepositEntity = accountRenterWzDepositMapper.selectByOrderAndMemNo(orderNo,memNo);
         return accountRenterDepositEntity;
     }
+    /**
+     * 查询违章信息
+     * @param orderNo
+     * @return
+     */
+    public AccountRenterWzDepositEntity getAccountRenterWZDepositByOrder(String orderNo) {
+        AccountRenterWzDepositEntity accountRenterDepositEntity = accountRenterWzDepositMapper.selectByOrder(orderNo);
+        return accountRenterDepositEntity;
+    }
 
     /**
      * 订单下单成功 记录 应收违章押金

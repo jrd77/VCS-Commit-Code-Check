@@ -290,6 +290,8 @@ public class CashierNoTService {
         accountRenterCostDetail.setTime(notifyDataVo.getOrderTime());
         accountRenterCostDetail.setAmt(settleAmount);
         accountRenterCostDetail.setRenterCashCodeEnum(renterCashCodeEnum);
+        accountRenterCostDetail.setPaySourceCode(notifyDataVo.getPaySource());
+        accountRenterCostDetail.setPaySource(PaySourceEnum.getFlagText(notifyDataVo.getPaySource()));
         vo.setAccountRenterCostDetailReqVO(accountRenterCostDetail);
         return vo;
     }

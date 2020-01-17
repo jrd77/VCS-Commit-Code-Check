@@ -1,7 +1,9 @@
 package com.atzuche.order.delivery.service.delivery;
 
 import com.atzuche.order.commons.entity.dto.CostBaseDTO;
+import com.atzuche.order.commons.entity.dto.GetReturnCarCostReqDto;
 import com.atzuche.order.commons.entity.dto.GetReturnCarOverCostReqDto;
+import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
 import com.atzuche.order.delivery.common.delivery.TranSportService;
 import com.atzuche.order.delivery.entity.*;
 import com.atzuche.order.delivery.service.RenterOrderDeliveryService;
@@ -12,7 +14,9 @@ import com.atzuche.order.delivery.utils.CommonUtil;
 import com.atzuche.order.delivery.utils.DateUtils;
 import com.atzuche.order.delivery.vo.delivery.rep.*;
 import com.atzuche.order.delivery.vo.delivery.req.DeliveryCarRepVO;
+import com.atzuche.order.transport.service.GetReturnCarCostProxyService;
 import com.atzuche.order.transport.service.TranSportProxyService;
+import com.atzuche.order.transport.vo.GetReturnCostDTO;
 import com.atzuche.order.transport.vo.GetReturnOverCostDTO;
 import com.autoyol.platformcost.OwnerFeeCalculatorUtils;
 import com.autoyol.platformcost.RenterFeeCalculatorUtils;
@@ -25,6 +29,7 @@ import org.springframework.stereotype.Service;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author 胡春林
@@ -50,23 +55,25 @@ public class DeliveryCarInfoService {
     TranSportService tranSportService;
     @Autowired
     TranSportProxyService tranSportProxyService;
+    @Autowired
+    GetReturnCarCostProxyService getReturnCarCostProxyService;
 
     /**
-     * 获取配送相关信息
+     * 获取配送相关信息（待优化）
      * @param deliveryCarDTO
      * @return
      */
-    public DeliveryCarVO findDeliveryListByOrderNo(String renterOrderNo,DeliveryCarRepVO deliveryCarDTO, OwnerGetAndReturnCarDTO ownerGetAndReturnCarDTO, Boolean isEscrowCar,Integer carEngineType,int carType) {
+    public DeliveryCarVO findDeliveryListByOrderNo(String renterOrderNo,DeliveryCarRepVO deliveryCarDTO, OwnerGetAndReturnCarDTO ownerGetAndReturnCarDTO, Boolean isEscrowCar,Integer carEngineType,int carType,RenterGoodsDetailDTO renterGoodsDetailDTO) {
         List<RenterHandoverCarInfoEntity> renterHandoverCarInfoEntities = renterHandoverCarService.selectRenterByOrderNo(deliveryCarDTO.getOrderNo());
         List<OwnerHandoverCarInfoEntity> ownerHandoverCarInfoEntities = ownerHandoverCarService.selectOwnerByOrderNo(deliveryCarDTO.getOrderNo());
         List<RenterOrderDeliveryEntity> renterOrderDeliveryEntityList = renterOrderDeliveryService.listRenterOrderDeliveryByRenterOrderNo(renterOrderNo);
-        DeliveryCarVO deliveryCarVO = createDeliveryCarVOParams(ownerGetAndReturnCarDTO, renterHandoverCarInfoEntities, ownerHandoverCarInfoEntities, renterOrderDeliveryEntityList, isEscrowCar, carEngineType, carType);
+        DeliveryCarVO deliveryCarVO = createDeliveryCarVOParams(ownerGetAndReturnCarDTO, renterHandoverCarInfoEntities, ownerHandoverCarInfoEntities, renterOrderDeliveryEntityList, isEscrowCar, carEngineType, carType, renterGoodsDetailDTO);
         return deliveryCarVO;
     }
 
 
     /**
-     * 构造结构体
+     * 构造结构体(待优化)
      * @param renterHandoverCarInfoEntities
      * @param ownerHandoverCarInfoEntities
      * @return
@@ -77,15 +84,32 @@ public class DeliveryCarInfoService {
                                                    List<RenterOrderDeliveryEntity> renterOrderDeliveryEntityList,
                                                    Boolean isEscrowCar,
                                                    Integer carEngineType,
-                                                   Integer carType) {
+                                                   Integer carType,
+                                                   RenterGoodsDetailDTO renterGoodsDetailDTO
+                                                   ) {
         DeliveryCarVO deliveryCarVO = new DeliveryCarVO();
         deliveryCarVO.setIsReturnCar(0);
         deliveryCarVO.setIsGetCar(0);
+        GetReturnCarCostReqDto getReturnCarCostReqDto = new GetReturnCarCostReqDto();
         for (RenterOrderDeliveryEntity renterOrderDeliveryEntity : renterOrderDeliveryEntityList) {
             if (null == renterOrderDeliveryEntity) {
                 continue;
             }
-            createGetHandoverCar(deliveryCarVO, renterOrderDeliveryEntity,carType);
+            if(renterOrderDeliveryEntity.getType().intValue() == 1) {  //取车
+                getReturnCarCostReqDto.setIsGetCarCost(true);
+                getReturnCarCostReqDto.setIsReturnCarCost(false);
+            } else { //还车
+                getReturnCarCostReqDto.setIsGetCarCost(false);
+                getReturnCarCostReqDto.setIsReturnCarCost(true);
+            }
+            getReturnCarCostReqDto.setCityCode(Integer.valueOf(renterOrderDeliveryEntity.getCityCode()));
+            getReturnCarCostReqDto.setIsPackageOrder(false);
+            createGetHandoverCar(getReturnCarCostReqDto,deliveryCarVO, renterOrderDeliveryEntity,carType,renterGoodsDetailDTO);
+        }
+        GetReturnCostDTO getReturnCostDTO = getReturnCarCostProxyService.getReturnCarCost(getReturnCarCostReqDto);
+        if(Objects.nonNull(getReturnCostDTO)) {
+            deliveryCarVO.getGetHandoverCarDTO().setGetCarCrash(String.valueOf(getReturnCostDTO.getGetReturnResponseVO().getGetFee()));
+            deliveryCarVO.getReturnHandoverCarDTO().setReturnCarCrash(String.valueOf(getReturnCostDTO.getGetReturnResponseVO().getReturnFee()));
         }
         //取车时的所在城市
         RenterOrderDeliveryEntity renterOrderDelivery = renterOrderDeliveryEntityList.stream().filter(r->r.getType() == 1).findFirst().get();
@@ -102,9 +126,10 @@ public class DeliveryCarInfoService {
      * @param renterOrderDeliveryEntity
      * @return
      */
-    public void createGetHandoverCar(DeliveryCarVO deliveryCarVO,
+    public void createGetHandoverCar(GetReturnCarCostReqDto getReturnCarCostReqDto,DeliveryCarVO deliveryCarVO,
                                      RenterOrderDeliveryEntity renterOrderDeliveryEntity,
-                                     Integer carType) {
+                                     Integer carType,
+                                     RenterGoodsDetailDTO renterGoodsDetailDTO) {
 
         //获取超运能
         GetReturnCarOverCostReqDto getReturnCarOverCostReqDto = new GetReturnCarOverCostReqDto();
@@ -116,6 +141,7 @@ public class DeliveryCarInfoService {
         costBaseDTO.setOrderNo(renterOrderDeliveryEntity.getOrderNo());
         costBaseDTO.setRenterOrderNo(renterOrderDeliveryEntity.getRenterOrderNo());
         getReturnCarOverCostReqDto.setCostBaseDTO(costBaseDTO);
+        getReturnCarCostReqDto.setCostBaseDTO(costBaseDTO);
         String isGetOverTransport;
         String isReturnOverTransport;
         String chaoYunNengAddCrashStr = "";
@@ -142,8 +168,11 @@ public class DeliveryCarInfoService {
             } catch (Exception e) {
                 log.error("备注获取失败");
             }
+            getReturnCarCostReqDto.setSrvGetLat(renterOrderDeliveryEntity.getRenterGetReturnAddrLat());
+            getReturnCarCostReqDto.setSrvGetLon(renterOrderDeliveryEntity.getRenterGetReturnAddrLon());
             getHandoverCarDTO.setIsChaoYunNeng(isGetOverTransport);
             getHandoverCarDTO.setChaoYunNengAddCrash(chaoYunNengAddCrashStr);
+            getHandoverCarDTO.setOwnDefaultGetCarAddr(renterGoodsDetailDTO.getCarRealAddr());
             deliveryCarVO.setGetHandoverCarDTO(getHandoverCarDTO);
             deliveryCarVO.setIsGetCar(1);
         } else if (renterOrderDeliveryEntity.getType() == 2 && renterOrderDeliveryEntity.getStatus() != 0) {
@@ -155,8 +184,11 @@ public class DeliveryCarInfoService {
             } catch (Exception e) {
                 log.error("备注获取失败");
             }
+            getReturnCarCostReqDto.setSrvReturnLat(renterOrderDeliveryEntity.getRenterGetReturnAddrLat());
+            getReturnCarCostReqDto.setSrvReturnLon(renterOrderDeliveryEntity.getRenterGetReturnAddrLon());
             returnHandoverCarDTO.setIsChaoYunNeng(isReturnOverTransport);
             returnHandoverCarDTO.setChaoYunNengAddCrash(returnChaoYunNengAddCrashStr);
+            returnHandoverCarDTO.setOwnDefaultReturnCarAddr(renterGoodsDetailDTO.getCarRealAddr());
             deliveryCarVO.setReturnHandoverCarDTO(returnHandoverCarDTO);
             deliveryCarVO.setIsReturnCar(1);
         }

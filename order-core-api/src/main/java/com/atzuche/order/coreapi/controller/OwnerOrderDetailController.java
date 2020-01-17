@@ -5,9 +5,10 @@ import com.atzuche.order.coreapi.service.OwnerOrderDetailService;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
 
 @RestController
 public class OwnerOrderDetailController {
@@ -164,4 +165,12 @@ public class OwnerOrderDetailController {
         return responseData;
     }
 
+    @PostMapping("/owner/updateFien")
+    public ResponseData<?> updateFien(@Valid @RequestBody FienAmtUpdateReqDTO fienAmtUpdateReqDTO, BindingResult bindingResult){
+        if (bindingResult.hasErrors()) {
+            return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), ErrorCode.INPUT_ERROR.getText());
+        }
+        ResponseData<?> responseData = ownerOrderDetailService.updateFien(fienAmtUpdateReqDTO);
+        return responseData;
+    }
 }

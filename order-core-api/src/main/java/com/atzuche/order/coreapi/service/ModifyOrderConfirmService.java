@@ -3,6 +3,7 @@ package com.atzuche.order.coreapi.service;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.atzuche.order.commons.vo.req.ModifyApplyHandleReq;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,7 +18,6 @@ import com.atzuche.order.commons.vo.req.OrderReqVO;
 import com.atzuche.order.coreapi.entity.dto.ModifyConfirmDTO;
 import com.atzuche.order.coreapi.entity.dto.ModifyOrderDTO;
 import com.atzuche.order.coreapi.entity.dto.ModifyOrderOwnerDTO;
-import com.atzuche.order.coreapi.entity.request.ModifyApplyHandleReq;
 import com.atzuche.order.coreapi.modifyorder.exception.ModifyOrderGoodNotExistException;
 import com.atzuche.order.coreapi.modifyorder.exception.ModifyOrderParameterException;
 import com.atzuche.order.delivery.entity.RenterOrderDeliveryEntity;

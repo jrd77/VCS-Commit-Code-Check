@@ -6,14 +6,14 @@ import java.util.List;
 import org.springframework.beans.BeanUtils;
 
 import com.atzuche.order.coreapi.entity.dto.ModifyOrderDTO;
-import com.atzuche.order.coreapi.entity.request.ModifyOrderAppReq;
+import com.atzuche.order.open.vo.ModifyOrderAppReqVO;
 import com.atzuche.order.coreapi.entity.request.ModifyOrderReq;
 import com.atzuche.order.rentercost.entity.dto.RenterOrderSubsidyDetailDTO;
 
 public class Test {
 
 	public static void main(String[] args) {
-		ModifyOrderAppReq modifyOrderAppReq = new ModifyOrderAppReq();
+		ModifyOrderAppReqVO modifyOrderAppReq = new ModifyOrderAppReqVO();
 		modifyOrderAppReq.setGetCarAddress("xxxxxxx");
 		List<String> driverIds = new ArrayList<String>();
 		driverIds.add("a");

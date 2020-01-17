@@ -317,6 +317,7 @@ public class SubmitOrderService {
         LocationDTO returnCarAddress = new LocationDTO();
         returnCarAddress.setFlag(0);
         if(orderReqVO.getSrvReturnFlag() == 1){
+            returnCarAddress.setFlag(1);
             returnCarAddress.setLat(orderReqVO.getSrvReturnLat()==null?0.0:Double.valueOf(orderReqVO.getSrvReturnLat()));
             returnCarAddress.setLon(orderReqVO.getSrvReturnLon()==null?0.0:Double.valueOf(orderReqVO.getSrvReturnLon()));
             returnCarAddress.setCarAddress(orderReqVO.getSrvReturnAddr());
