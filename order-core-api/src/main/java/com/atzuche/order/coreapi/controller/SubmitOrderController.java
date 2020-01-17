@@ -227,9 +227,4 @@ public class SubmitOrderController {
         baseProducer.sendTopicMessage("auto-order-action","action.order.create",orderMessage);
     }
 
-
-
-
-
-
 }
