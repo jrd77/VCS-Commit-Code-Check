@@ -94,13 +94,7 @@ public class CashierService {
     private CashierMapper cashierMapper;
 
     /**  *************************************** 租车费用 start****************************************************/
-    /**
-     * 记录应收车俩费用
-     * 下单成功  调收银台 记录 （z租车费用真实值从子订单费用中取）
-     */
-    public void insertRenterCost(CreateOrderRenterCostReqVO createOrderRenterCost){
-        cashierNoTService.insertRenterCost(createOrderRenterCost);
-    }
+
     public AccountRenterCostSettleEntity getAccountRenterCostSettle(String orderNo, String memNo){
        return accountRenterCostSettleNoTService.getCostPaidRentSettle(orderNo,memNo);
     }
@@ -131,12 +125,7 @@ public class CashierService {
         accountRenterDepositService.detainRenterDeposit(detainRenterDepositReqVO);
     }
 
-    /**
-     * 查询车辆押金是否付清
-     */
-    public boolean isPayOffForRenterDeposit(String orderNo, String memNo){
-       return accountRenterDepositService.isPayOffForRenterDeposit(orderNo, memNo);
-    }
+
     /**
      * 查询应收车辆押金
      */
@@ -389,12 +378,7 @@ public class CashierService {
     /**  ***************************************** 退还押金 end ************************************************* */
 
     /**  ***************************************** 车主收益 start ************************************************* */
-    /**
-     * 查询车主收益信息
-     */
-    public void getOwnerIncomeAmt(String memNo){
-        accountOwnerIncomeService.getOwnerIncomeAmt(memNo);
-    }
+
     /**
      * 结算产生车主待审核收益
      */
@@ -408,12 +392,7 @@ public class CashierService {
         accountOwnerIncomeService.examineOwnerIncomeExamine(accountOwnerIncomeExamineOpReq);
     }
 
-    /**
-     * 收益提现
-     */
-    public void cashOwnerIncome(){
-        accountOwnerIncomeService.cashOwnerIncome();
-    }
+
     /**  ***************************************** 车主收益 end ************************************************* */
 
     /**  ***************************************** 违章费用 start ************************************************* */
@@ -586,20 +565,5 @@ public class CashierService {
     public List<CashierEntity> getCashierRentCostsByOrderNo(String orderNo){
     	return cashierMapper.getCashierRentCostsByOrderNo(orderNo);
     }
-
-    /**
-     * 退还租车费用
-     */
-    public void refundRentCostCancel(CashierRefundApplyReqVO cashierRefundApplyReq){
-        Assert.notNull(cashierRefundApplyReq, ErrorCode.PARAMETER_ERROR.getText());
-        //1 记录退还记录
-        Integer id = cashierRefundApplyNoTService.insertRefundDeposit(cashierRefundApplyReq);
-        //2 记录费用平账
-        AccountRenterCostDetailReqVO accountRenterCostDetail = new AccountRenterCostDetailReqVO();
-        BeanUtils.copyProperties(cashierRefundApplyReq,accountRenterCostDetail);
-        accountRenterCostDetail.setUniqueNo(id.toString());
-        int accountRenterCostDetailId = accountRenterCostSettleService.refundRenterCostDetail(accountRenterCostDetail);
-    }
-
 
 }
