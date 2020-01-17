@@ -1662,6 +1662,21 @@ public class OrderSettleNoTService {
      * 租客还历史欠款
      */
     public void repayHistoryDebtRentCancel(SettleOrders settleOrders, SettleCancelOrdersAccount settleCancelOrdersAccount) {
+        //钱包抵扣历史欠款
+        if(settleCancelOrdersAccount.getRentSurplusWalletAmt()>0){
+            CashierDeductDebtReqVO cashierDeductDebtReq = new CashierDeductDebtReqVO();
+            BeanUtils.copyProperties(settleOrders,cashierDeductDebtReq);
+            cashierDeductDebtReq.setAmt(settleCancelOrdersAccount.getRentSurplusWalletAmt());
+            cashierDeductDebtReq.setRenterCashCodeEnum(RenterCashCodeEnum.SETTLE_RENT_WALLET_TO_HISTORY_AMT);
+            cashierDeductDebtReq.setMemNo(settleOrders.getRenterMemNo());
+            CashierDeductDebtResVO result = cashierService.deductDebtByRentCost(cashierDeductDebtReq);
+            if(Objects.nonNull(result)){
+                //已抵扣抵扣金额
+                int deductAmt = result.getDeductAmt();
+                //计算 还完历史欠款 剩余 应退 剩余租车费用
+                settleCancelOrdersAccount.setRentSurplusWalletAmt(settleCancelOrdersAccount.getRentSurplusWalletAmt() - deductAmt);
+            }
+        }
        //租车费用
         if(settleCancelOrdersAccount.getRentSurplusCostAmt()>0){
             CashierDeductDebtReqVO cashierDeductDebtReq = new CashierDeductDebtReqVO();
