@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import com.atzuche.order.commons.enums.cashier.PaySourceEnum;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -1625,6 +1626,8 @@ public class OrderSettleNoTService {
             BeanUtils.copyProperties(cashierEntity,vo);
             vo.setFlag(RenterCashCodeEnum.ACCOUNT_RENTER_RENT_COST.getCashNo());
             vo.setRenterCashCodeEnum(RenterCashCodeEnum.CANCEL_RENT_COST_TO_RETURN_AMT);
+            vo.setPaySource(PaySourceEnum.getFlagText(cashierEntity.getPaySource()));
+            vo.setPayType(PayTypeEnum.getFlagText(cashierEntity.getPayType()));
             vo.setRemake("取消订单退还");
             int amt = refundAmt + cashierEntity.getPayAmt();
             vo.setAmt(amt>=0?refundAmt:-cashierEntity.getPayAmt());
@@ -1640,6 +1643,7 @@ public class OrderSettleNoTService {
                         BeanUtils.copyProperties(cashierEntity,vo);
                         vo.setFlag(RenterCashCodeEnum.ACCOUNT_RENTER_RENT_COST.getCashNo());
                         vo.setRenterCashCodeEnum(RenterCashCodeEnum.CANCEL_RENT_COST_TO_RETURN_AMT);
+                        vo.setPaySource(PaySourceEnum.getFlagText(cashierEntity.getPaySource()));
                         vo.setRemake("取消订单退还");
                         int amt = refundAmt + cashierEntity.getPayAmt();
                         vo.setAmt(amt>=0?refundAmt:-cashierEntity.getPayAmt());
