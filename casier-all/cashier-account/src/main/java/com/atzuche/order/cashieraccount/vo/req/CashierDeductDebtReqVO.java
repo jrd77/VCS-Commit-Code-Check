@@ -22,6 +22,11 @@ public class CashierDeductDebtReqVO {
     private Integer amt;
 
     /**
+     * 订单
+     */
+    private String orderNo;
+
+    /**
      * 租客子订单
      */
     private String renterOrderNo;

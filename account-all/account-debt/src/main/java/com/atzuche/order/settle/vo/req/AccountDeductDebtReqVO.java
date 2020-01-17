@@ -1,8 +1,11 @@
 package com.atzuche.order.settle.vo.req;
 
+import com.atzuche.order.settle.entity.AccountDebtReceivableaDetailEntity;
 import com.autoyol.commons.web.ErrorCode;
 import lombok.Data;
 import org.springframework.util.Assert;
+
+import java.util.List;
 
 /**
  * 抵扣欠款传参
@@ -55,6 +58,11 @@ public class AccountDeductDebtReqVO {
      * 更新人
      */
     private String updateOp;
+
+    /**
+     * 欠款抵扣 收款list
+     */
+    List<AccountDebtReceivableaDetailEntity> accountDebtReceivableaDetails;
 
     /**
      * 参数详情
