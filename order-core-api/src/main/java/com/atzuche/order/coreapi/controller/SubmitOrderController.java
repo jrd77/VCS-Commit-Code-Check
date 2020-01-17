@@ -86,6 +86,8 @@ public class SubmitOrderController {
             orderRecordEntity.setParam(JSON.toJSONString(normalOrderReqVO));
             orderRecordEntity.setResult(JSON.toJSONString(orderResVO));
             orderRecordService.save(orderRecordEntity);
+
+            //TODO:发送订单成功的MQ事件
         }catch(OrderException orderException){
             String orderNo = orderResVO==null?"":orderResVO.getOrderNo();
             OrderRecordEntity orderRecordEntity = new OrderRecordEntity();
@@ -168,6 +170,12 @@ public class SubmitOrderController {
             orderRecordEntity.setParam(JSON.toJSONString(adminOrderReqVO));
             orderRecordEntity.setResult(JSON.toJSONString(orderResVO));
             orderRecordService.save(orderRecordEntity);
+            //释放库存
+            String orderNo = orderResVO==null?"":orderResVO.getOrderNo();
+            if(orderNo != null && orderNo.trim().length()>0){
+                Integer carNo = Integer.valueOf(adminOrderReqVO.getCarNo());
+                stockService.releaseCarStock(orderNo,carNo);
+            }
             throw orderException;
         }catch (Exception e){
             OrderRecordEntity orderRecordEntity = new OrderRecordEntity();
@@ -178,6 +186,12 @@ public class SubmitOrderController {
             orderRecordEntity.setParam(JSON.toJSONString(adminOrderReqVO));
             orderRecordEntity.setResult(JSON.toJSONString(orderResVO));
             orderRecordService.save(orderRecordEntity);
+            //释放库存
+            String orderNo = orderResVO==null?"":orderResVO.getOrderNo();
+            if(orderNo != null && orderNo.trim().length()>0){
+                Integer carNo = Integer.valueOf(adminOrderReqVO.getCarNo());
+                stockService.releaseCarStock(orderNo,carNo);
+            }
             throw e;
         }
 

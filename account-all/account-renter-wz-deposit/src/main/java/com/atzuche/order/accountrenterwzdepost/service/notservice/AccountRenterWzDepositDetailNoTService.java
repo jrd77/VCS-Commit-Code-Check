@@ -7,6 +7,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.atzuche.order.accountrenterwzdepost.mapper.AccountRenterWzDepositDetailMapper;
+import org.springframework.util.CollectionUtils;
 
 import java.util.List;
 
@@ -55,5 +56,19 @@ public class AccountRenterWzDepositDetailNoTService {
         if(result==0){
             throw new PayOrderRenterWZDepositException();
         }
+    }
+
+    /**
+     * 查询剩余 违章押金 金额
+     * @param orderNo
+     * @param renterMemNo
+     * @return
+     */
+    public int getSurplusWZDepositCostAmt(String orderNo, String renterMemNo) {
+        List<AccountRenterWzDepositDetailEntity> list = findByOrderNo(orderNo);
+        if(CollectionUtils.isEmpty(list)){
+            return 0;
+        }
+       return list.stream().mapToInt(AccountRenterWzDepositDetailEntity::getAmt).sum();
     }
 }

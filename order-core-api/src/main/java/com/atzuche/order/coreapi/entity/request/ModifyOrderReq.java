@@ -17,8 +17,8 @@ public class ModifyOrderReq {
 	@AutoDocProperty(value="订单编号,必填，",required=true)
 	private String orderNo;
 	
-	@NotBlank(message="memNo不能为空")
-	@AutoDocProperty(value="memNo,必填，",required=true)
+	@NotBlank(message="租客memNo不能为空")
+	@AutoDocProperty(value="租客memNo,必填，",required=true)
 	private String memNo;
 	
 	@AutoDocProperty(value="补充全险是否开启，0：否，1：是")
@@ -78,6 +78,22 @@ public class ModifyOrderReq {
 	 * 平台优惠券id
 	 */
 	private String platformCouponId;
+	/**
+     * 是否使用特供价（换车用）1-使用，0-不使用
+     */
+    private Integer useSpecialPriceFlag;
+    /**
+     * 车辆注册号（换车用）
+     */
+    private String carNo;
+    /**
+     * 是否换车操作 （换车用）
+     */
+    private Boolean transferFlag;
+    /**
+     * 管理后台操作人
+     */
+    private String operator;
 	/**
 	 * 租客费用补贴
 	 */

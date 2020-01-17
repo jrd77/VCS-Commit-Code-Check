@@ -12,8 +12,9 @@ import com.atzuche.order.cashieraccount.vo.res.pay.OrderPayCallBackSuccessVO;
 import com.atzuche.order.commons.enums.OrderPayStatusEnum;
 import com.atzuche.order.commons.enums.OrderStatusEnum;
 import com.atzuche.order.commons.enums.RenterCashCodeEnum;
+import com.atzuche.order.commons.enums.YesNoEnum;
+import com.atzuche.order.commons.enums.cashier.OrderRefundStatusEnum;
 import com.atzuche.order.commons.enums.cashier.TransStatusEnum;
-import com.atzuche.order.commons.service.OrderPayCallBack;
 import com.atzuche.order.flow.service.OrderFlowService;
 import com.atzuche.order.parentorder.dto.OrderStatusDTO;
 import com.atzuche.order.parentorder.entity.OrderStatusEntity;
@@ -51,12 +52,9 @@ import com.autoyol.autopay.gateway.constant.DataPayKindConstant;
 import com.autoyol.autopay.gateway.constant.DataPayTypeConstant;
 import com.autoyol.autopay.gateway.vo.req.NotifyDataVo;
 import com.autoyol.autopay.gateway.vo.res.AutoPayResultVo;
-import com.autoyol.cat.CatAnnotation;
 import com.autoyol.commons.utils.GsonUtils;
 import com.autoyol.commons.web.ErrorCode;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.math.NumberUtils;
-import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -65,7 +63,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -97,13 +94,7 @@ public class CashierService {
     private CashierMapper cashierMapper;
 
     /**  *************************************** 租车费用 start****************************************************/
-    /**
-     * 记录应收车俩费用
-     * 下单成功  调收银台 记录 （z租车费用真实值从子订单费用中取）
-     */
-    public void insertRenterCost(CreateOrderRenterCostReqVO createOrderRenterCost){
-        cashierNoTService.insertRenterCost(createOrderRenterCost);
-    }
+
     public AccountRenterCostSettleEntity getAccountRenterCostSettle(String orderNo, String memNo){
        return accountRenterCostSettleNoTService.getCostPaidRentSettle(orderNo,memNo);
     }
@@ -134,12 +125,7 @@ public class CashierService {
         accountRenterDepositService.detainRenterDeposit(detainRenterDepositReqVO);
     }
 
-    /**
-     * 查询车辆押金是否付清
-     */
-    public boolean isPayOffForRenterDeposit(String orderNo, String memNo){
-       return accountRenterDepositService.isPayOffForRenterDeposit(orderNo, memNo);
-    }
+
     /**
      * 查询应收车辆押金
      */
@@ -267,12 +253,14 @@ public class CashierService {
         cashierDeductDebtReq.check();
         //1 查询历史总欠款
         int debtAmt = accountDebtService.getAccountDebtNumByMemNo(cashierDeductDebtReq.getMemNo());
-        if(debtAmt<0){
+        if(debtAmt>=0){
             return null;
         }
         //2 抵扣
         AccountDeductDebtReqVO accountDeductDebt = new AccountDeductDebtReqVO();
         BeanUtils.copyProperties(cashierDeductDebtReq,accountDeductDebt);
+        accountDeductDebt.setSourceCode(cashierDeductDebtReq.getRenterCashCodeEnum().getCashNo());
+        accountDeductDebt.setSourceDetail(cashierDeductDebtReq.getRenterCashCodeEnum().getTxt());
         //返回真实抵扣金额
         int debtedAmt = accountDebtService.deductDebt(accountDeductDebt);
         //3 记录租车费用资金 进出记录
@@ -390,12 +378,7 @@ public class CashierService {
     /**  ***************************************** 退还押金 end ************************************************* */
 
     /**  ***************************************** 车主收益 start ************************************************* */
-    /**
-     * 查询车主收益信息
-     */
-    public void getOwnerIncomeAmt(String memNo){
-        accountOwnerIncomeService.getOwnerIncomeAmt(memNo);
-    }
+
     /**
      * 结算产生车主待审核收益
      */
@@ -409,12 +392,7 @@ public class CashierService {
         accountOwnerIncomeService.examineOwnerIncomeExamine(accountOwnerIncomeExamineOpReq);
     }
 
-    /**
-     * 收益提现
-     */
-    public void cashOwnerIncome(){
-        accountOwnerIncomeService.cashOwnerIncome();
-    }
+
     /**  ***************************************** 车主收益 end ************************************************* */
 
     /**  ***************************************** 违章费用 start ************************************************* */
@@ -465,9 +443,55 @@ public class CashierService {
             return;
         }
         cashierRefundApplyNoTService.updateRefundDepositSuccess(notifyDataVo);
+        OrderStatusDTO orderStatusDTO = new OrderStatusDTO();
+        orderStatusDTO.setOrderNo(notifyDataVo.getOrderNo());
+        if(DataPayKindConstant.RENT.equals(notifyDataVo.getPayKind())){
+            orderStatusDTO.setDepositRefundStatus(OrderRefundStatusEnum.REFUNDED.getStatus());
+        }
+        if(DataPayKindConstant.DEPOSIT.equals(notifyDataVo.getPayKind())){
+            orderStatusDTO.setWzRefundStatus(OrderRefundStatusEnum.REFUNDED.getStatus());
+        }
+        if(DataPayKindConstant.RENT_AMOUNT.equals(notifyDataVo.getPayKind())){
+            orderStatusDTO.setRentCarRefundStatus(OrderRefundStatusEnum.REFUNDED.getStatus());
+        }
+        saveCancelOrderStatusInfo(orderStatusDTO);
         //TODO 支付回调成功 push/或者短信 怎么处理
     }
 
+    /**
+     * 钱包支付成功订单状态
+     * @param
+     */
+    public void saveWalletPaylOrderStatusInfo( String orderNo){
+        OrderStatusDTO orderStatusDTO = new OrderStatusDTO();
+        orderStatusDTO.setOrderNo(orderNo);
+        OrderStatusEntity entity = orderStatusService.getByOrderNo(orderNo);
+        if(Objects.nonNull(entity)){
+            orderStatusDTO.setRentCarPayStatus(OrderPayStatusEnum.PAYED.getStatus());
+            orderStatusDTO.setDepositPayStatus(entity.getDepositPayStatus());
+            orderStatusDTO.setWzPayStatus(entity.getWzPayStatus());
+            if(
+                 ( Objects.nonNull(orderStatusDTO.getDepositPayStatus()) && OrderPayStatusEnum.PAYED.getStatus() == orderStatusDTO.getDepositPayStatus() )&&
+                  (Objects.nonNull(orderStatusDTO.getWzPayStatus())  && OrderPayStatusEnum.PAYED.getStatus() == orderStatusDTO.getWzPayStatus())
+            ){
+                orderStatusDTO.setStatus(OrderStatusEnum.TO_GET_CAR.getStatus());
+                //2记录订单流传信息
+                orderFlowService.inserOrderStatusChangeProcessInfo(orderStatusDTO.getOrderNo(), OrderStatusEnum.TO_GET_CAR);
+
+            }
+        }
+        //1更新 订单流转状态
+        orderStatusService.saveOrderStatusInfo(orderStatusDTO);
+
+    }
+    /**
+     * 取消订单结算
+     * @param orderStatusDTO
+     */
+    public void saveCancelOrderStatusInfo(OrderStatusDTO orderStatusDTO){
+        //1更新 订单流转状态
+        orderStatusService.saveOrderStatusInfo(orderStatusDTO);
+    }
     /**
      * 支付成功回调 更新收银台及费用
      * @param notifyDataVo
@@ -512,6 +536,7 @@ public class CashierService {
             //2 收银台记录更新
             cashierNoTService.updataCashierAndRenterCost(notifyDataVo,accountRenterCostReq);
             vo.setRentCarPayStatus(OrderPayStatusEnum.PAYED.getStatus());
+            vo.setIsPayAgain(YesNoEnum.YES.getCode());
         }
 
         //TODO 支付回调成功 push/或者短信 怎么处理
@@ -540,20 +565,5 @@ public class CashierService {
     public List<CashierEntity> getCashierRentCostsByOrderNo(String orderNo){
     	return cashierMapper.getCashierRentCostsByOrderNo(orderNo);
     }
-
-    /**
-     * 退还租车费用
-     */
-    public void refundRentCostCancel(CashierRefundApplyReqVO cashierRefundApplyReq){
-        Assert.notNull(cashierRefundApplyReq, ErrorCode.PARAMETER_ERROR.getText());
-        //1 记录退还记录
-        Integer id = cashierRefundApplyNoTService.insertRefundDeposit(cashierRefundApplyReq);
-        //2 记录费用平账
-        AccountRenterCostDetailReqVO accountRenterCostDetail = new AccountRenterCostDetailReqVO();
-        BeanUtils.copyProperties(cashierRefundApplyReq,accountRenterCostDetail);
-        accountRenterCostDetail.setUniqueNo(id.toString());
-        int accountRenterCostDetailId = accountRenterCostSettleService.refundRenterCostDetail(accountRenterCostDetail);
-    }
-
 
 }

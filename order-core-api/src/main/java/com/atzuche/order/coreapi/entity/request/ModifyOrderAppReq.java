@@ -17,8 +17,8 @@ public class ModifyOrderAppReq {
 	@AutoDocProperty(value="订单编号,必填，",required=true)
 	private String orderNo;
 	
-	@NotBlank(message="memNo不能为空")
-	@AutoDocProperty(value="memNo,必填，",required=true)
+	@NotBlank(message="租客memNo不能为空")
+	@AutoDocProperty(value="租客memNo,必填，",required=true)
 	private String memNo;
 	
 	@AutoDocProperty(value="补充全险是否开启，0：否，1：是")

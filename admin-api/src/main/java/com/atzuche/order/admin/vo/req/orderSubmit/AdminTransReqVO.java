@@ -13,19 +13,19 @@ import java.util.List;
  * @date 2020/1/5 5:56 下午
  **/
 @Data
-public class AdminTransReqVO extends BaseVO {
+public class AdminTransReqVO extends AdminReqBaseVO {
 
-    @AutoDocProperty(value = "是否使用特供价", required = true)
-    private String useSpecialPrice;
+    @AutoDocProperty(value = "是否使用特供价")
+    private String useSpecialPrice="0";
 
-    @AutoDocProperty(value = "操作人", required = true)
-    private String operator;
+    @AutoDocProperty(value = "用户注册号")
+    private String memNo;
 
-    @AutoDocProperty(value = "管理后台下单特殊处理标识", required = true)
-    private String specialConsole;
+//    @AutoDocProperty(value = "管理后台下单特殊处理标识", required = true)
+//    private String specialConsole="0";
 
-    @AutoDocProperty(value = "线下订单类型", required = true)
-    private String offlineOrderStatus;
+//    @AutoDocProperty(value = "线下订单类型", required = true)
+//    private String offlineOrderStatus;
 
  /*   @AutoDocProperty(value = "限时红包面额(管理后台)")
     private Integer reductiAmt;*/
@@ -34,29 +34,26 @@ public class AdminTransReqVO extends BaseVO {
     @NotBlank(message = "车辆注册号不能为空")
     private String carNo;
 
-   // @AutoDocProperty(value = "用户token")
-   // private String token;
-
     @AutoDocProperty(value = "cityCode(310100)")
+    @NotBlank(message ="cityCode不能为空")
     private String cityCode;
 
-    @AutoDocProperty(value = "场景编码(例S009)")
-    private String sceneCode;
+//    @AutoDocProperty(value = "场景编码(例S009)")
+//    private String sceneCode="EX007";
 
     @AutoDocProperty(value = "起租时间 格式(20171205201500)")
+    @NotBlank(message ="rentTime不能为空")
     private String rentTime;
 
     @AutoDocProperty(value = "还车时间 格式(20171207201500)")
-    @NotBlank(message = "订单还车时间不能为空")
+    @NotBlank(message = "revertTime订单还车时间不能为空")
     private String revertTime;
 
     @AutoDocProperty(value = "取车服务开关(0/1)")
-    @NotNull(message = "是否使用取车服务标识不能为空")
-    private String srvGetFlag;
+    private String srvGetFlag="0";
 
     @AutoDocProperty(value = "还车服务开关(0/1)")
-    @NotNull(message = "是否使用还车服务标识不能为空")
-    private String srvReturnFlag;
+    private String srvReturnFlag="0";
 
     @AutoDocProperty(value = "取车地址")
     //@NotBlank(message = "取车地址不能为空")
@@ -81,8 +78,8 @@ public class AdminTransReqVO extends BaseVO {
     //@NotBlank(message = "还车地址经度不能为空")
     private String srvReturnLon;
 
-    @AutoDocProperty(value = "车主电话")
-    private String conPhone;
+//    @AutoDocProperty(value = "车主电话")
+//    private String conPhone;
 
     @AutoDocProperty(value = "优惠券id")
     private String disCouponIds;
@@ -91,12 +88,10 @@ public class AdminTransReqVO extends BaseVO {
     private String getCarFreeCouponId;
 
     @AutoDocProperty(value = "超级补充全险开关")
-    //@NotBlank(message = "是否购买补充保障不能为空")
     private String abatement;
 
     @AutoDocProperty(value = "是否出市(0/1)")
-    @NotBlank(message="是否出市开关不能为空")
-    private String isLeaveCity;
+    private String isLeaveCity="0";
 
     @AutoDocProperty(value = "限时立减状态(0/1)")
     private String limitRedStatus;
@@ -108,19 +103,16 @@ public class AdminTransReqVO extends BaseVO {
     private String oilType;
 
     @AutoDocProperty(value = "用车城市 例(上海)")
+    @NotBlank(message = "rentCity不能为空")
     private String rentCity;
 
-    @AutoDocProperty(value = "交易来源 1：手机，2：网站 ，3：管理后台, 14:m站")
-    private String source;
+//    @AutoDocProperty(value = "交易来源 1：手机，2：网站 ，3：管理后台, 14:m站")
+//    private String source="3";
 
-    @AutoDocProperty(value = "交易子来源 1：微信")
-    private String subSource;
 
     @AutoDocProperty(value = "是否使用余额(0/1)")
     private String useBal;
 
-    @AutoDocProperty(value = "用户下单时的筛选条件id 例(120687_A)")
-    private String queryId;
 
     @AutoDocProperty(value = "是否使用凹凸币")
     private String useAutoCoin;
@@ -143,13 +135,6 @@ public class AdminTransReqVO extends BaseVO {
     @AutoDocProperty(value = "车主优惠券编码")
     private String carOwnerCouponNo;
 
-    @AutoDocProperty(value = "渠道")
-    private String utmSource;
-    @AutoDocProperty(value = "媒介")
-    private String utmMedium;
-    @AutoDocProperty(value = "活动")
-    private String utmCampaign;
-    @AutoDocProperty(value = "关键词")
-    private String utmTerm;
+
 
 }

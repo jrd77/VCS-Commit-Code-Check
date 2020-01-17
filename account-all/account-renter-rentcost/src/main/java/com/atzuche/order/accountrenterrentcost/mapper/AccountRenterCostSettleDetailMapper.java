@@ -17,8 +17,7 @@ public interface AccountRenterCostSettleDetailMapper{
 
     AccountRenterCostSettleDetailEntity selectByPrimaryKey(Integer id);
 
-    int insert(AccountRenterCostSettleDetailEntity record);
-    
+
     int insertSelective(AccountRenterCostSettleDetailEntity record);
 
     int updateByPrimaryKey(AccountRenterCostSettleDetailEntity record);
@@ -26,4 +25,6 @@ public interface AccountRenterCostSettleDetailMapper{
     int updateByPrimaryKeySelective(AccountRenterCostSettleDetailEntity record);
 
     List<AccountRenterCostSettleDetailEntity> selectRenterCostSettleDetail(@Param("orderNo") String orderNo, @Param("memNo")String renterMemNo, @Param("costCode")String costCode);
+
+    List<AccountRenterCostSettleDetailEntity> selectRenterCostSettleDetailByOrderNo(@Param("orderNo")String orderNo);
 }

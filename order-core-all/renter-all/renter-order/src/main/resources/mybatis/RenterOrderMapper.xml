@@ -267,15 +267,22 @@
   	<select id="getRenterOrderByOrderNoAndIsEffective" resultMap="BaseResultMap">
 		select <include refid="Base_Column_List" /> from renter_order where order_no = #{orderNo}
 		and is_effective = 1
-		and is_cancle = 0
 		and is_delete = 0
 		order by id desc
 		limit 1
 	</select>
 	
-	<select id="getRenterOrderByRenterOrderNo" resultMap="BaseResultMap">
-		select <include refid="Base_Column_List" /> from renter_order where renter_order_no = #{renterOrderNo}
+	<!-- 去掉 		and is_effective = 1 -->
+	<select id="queryRenterOrderByOrderNo" resultMap="BaseResultMap">
+		select <include refid="Base_Column_List" /> from renter_order where order_no = #{orderNo}
 		and is_cancle = 0
+		and is_delete = 0
+		order by id desc
+	</select>
+	
+	
+	<select id="getRenterOrderByRenterOrderNo" resultMap="BaseResultMap">
+		select <include refid="Base_Column_List" /> from renter_order where renter_order_no = #{renterOrderNo} 
 		and is_delete = 0
 		order by id desc
 		limit 1
@@ -304,6 +311,11 @@
 		update renter_order set child_status = #{childStatus}
 		where id = #{id}
 	</update>
+
+    <update id="updateChildStatusByOrderNo">
+		update renter_order set child_status = #{childStatus} where order_no = #{orderNo}
+	</update>
+
     <select id="getChangeRenterOrderByOrderNo" resultMap="BaseResultMap">
         select <include refid="Base_Column_List" /> from renter_order where order_no = #{orderNo}
         AND is_effective = 0

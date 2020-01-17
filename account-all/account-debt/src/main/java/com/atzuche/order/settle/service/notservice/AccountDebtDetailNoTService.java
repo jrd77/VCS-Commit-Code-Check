@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 
@@ -35,7 +36,7 @@ public class AccountDebtDetailNoTService {
     public List<AccountDebtDetailEntity> getDebtListByMemNo(String memNo){
         List<AccountDebtDetailEntity> result = accountDebtDetailMapper.getDebtListByMemNo(memNo);
         if(CollectionUtils.isEmpty(result)){
-            throw new AccountDeductDebtDBException();
+           return Collections.emptyList();
         }
         return result;
     }
@@ -99,6 +100,7 @@ public class AccountDebtDetailNoTService {
             }
         }
         accountDeductDebt.setRealAmt(realAmt);
+        accountDeductDebt.setAmt(accountDeductDebt.getAmt() - accountDeductDebt.getRealAmt());
         return accountDebtDetailTodos;
     }
 }

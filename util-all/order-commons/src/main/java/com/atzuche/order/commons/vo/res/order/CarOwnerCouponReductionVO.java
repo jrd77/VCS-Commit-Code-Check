@@ -16,16 +16,16 @@ public class CarOwnerCouponReductionVO implements Serializable {
     private static final long serialVersionUID = 2556052833923486798L;
 
     @AutoDocProperty(value = "优惠券抵扣金额，为负数“如-30”")
-    private String discouponDeductibleAmt;
+    private Integer discouponDeductibleAmt;
 
     @AutoDocProperty(value = "可用优惠券列表")
     private List<CarOwnerCouponDetailVO> availableCouponList;
 
-    public String getDiscouponDeductibleAmt() {
+    public Integer getDiscouponDeductibleAmt() {
         return discouponDeductibleAmt;
     }
 
-    public void setDiscouponDeductibleAmt(String discouponDeductibleAmt) {
+    public void setDiscouponDeductibleAmt(Integer discouponDeductibleAmt) {
         this.discouponDeductibleAmt = discouponDeductibleAmt;
     }
 

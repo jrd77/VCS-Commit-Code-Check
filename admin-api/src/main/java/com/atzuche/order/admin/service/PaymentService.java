@@ -17,8 +17,8 @@ import com.atzuche.order.admin.vo.req.payment.PaymentRequestVO;
 import com.atzuche.order.admin.vo.resp.payment.PaymentInformationResponseVO;
 import com.atzuche.order.admin.vo.resp.payment.PaymentResponseVO;
 import com.atzuche.order.commons.LocalDateTimeUtils;
-import com.atzuche.order.commons.vo.req.PaymentVo;
-import com.atzuche.order.commons.vo.res.CashierResVo;
+import com.atzuche.order.commons.vo.req.PaymentReqVO;
+import com.atzuche.order.commons.vo.res.CashierResVO;
 import com.atzuche.order.open.service.FeignPaymentService;
 import com.atzuche.order.parentorder.entity.OrderStatusEntity;
 import com.atzuche.order.parentorder.service.OrderStatusService;
@@ -63,6 +63,11 @@ public class PaymentService {
 		//根据结算时间来切分
 //		logger.info("orderStatus toString={}",orderStatusService.toString());
 		OrderStatusEntity orderStatus = orderStatusService.getByOrderNo(orderNo);
+		//非空处理
+//		if(orderStatus == null) {
+//			return null;
+//		}
+		
 //		logger.info("orderStatus toString={}",orderStatus.toString());
 		/**
 		 * 违章结算时间
@@ -78,48 +83,61 @@ public class PaymentService {
 		LocalDateTime settleTime = null;
 		
 		//租车费用结算状态:0,否 1,是 
-		if(orderStatus.getSettleStatus().intValue() == 1) {
+		if(orderStatus != null && orderStatus.getSettleStatus().intValue() == 1) {
 			settleTime = orderStatus.getSettleTime();
 		}
 //		if(orderStatus.getCarDepositSettleStatus().intValue() == 1) {  //车辆押金结算状态:0,否 1,是
 //			carDepositSettleTime = orderStatus.getCarDepositSettleTime();
 //		}
 		
-		if(orderStatus.getWzSettleStatus().intValue() == 1) {  //违章结算状态:0,否 1,是
+		if(orderStatus != null && orderStatus.getWzSettleStatus().intValue() == 1) {  //违章结算状态:0,否 1,是
 			wzSettleTime = orderStatus.getWzSettleTime();
 		}
 		
 //		RestTemplate restTemplate = new RestTemplate();
-		PaymentVo vo2 = new PaymentVo();
+		PaymentReqVO vo2 = new PaymentReqVO();
 		vo2.setOrderNo(orderNo);	    
 //		String result2 = restTemplate.postForObject(url, vo, String.class);
 		
 //		logger.info("feignPaymentService toString={}",feignPaymentService.toString());
-		ResponseData<List<CashierResVo>> resData = feignPaymentService.queryByOrderNo(vo2); //paymentCashierService.queryPaymentList(orderNo);
+		ResponseData<List<CashierResVO>> resData = feignPaymentService.queryByOrderNo(vo2); //paymentCashierService.queryPaymentList(orderNo);
 		
-		List<CashierResVo> lst = resData.getData();
-		for (CashierResVo cashierEntity : lst) {
-			String payTime = cashierEntity.getPayTime();
-			if(StringUtils.isBlank(payTime)) {
-				LocalDateTime payTimeLdt = LocalDateTimeUtils.dateToLocalDateTime(new Date());
-				//中间段的。
-				PaymentResponseVO vo = convertPaymentResponseVO(cashierEntity,payTimeLdt);
-				afterDepositSettlementPaymentList.add(vo);
-			}else {
-				/**
-				 * 根据支付时间来切换
-				 */
-				LocalDateTime payTimeLdt = LocalDateTimeUtils.parseStringToDateTime(payTime, "yyyyMMddHHmmss");
-				if(settleTime != null && payTimeLdt.isBefore(settleTime)) {
+		/**
+		 * 不等于空
+		 */
+		if(resData != null) {
+			List<CashierResVO> lst = resData.getData();
+			for (CashierResVO cashierEntity : lst) {
+				String payTime = cashierEntity.getPayTime();
+				if(StringUtils.isBlank(payTime)) {
+					LocalDateTime payTimeLdt = LocalDateTimeUtils.dateToLocalDateTime(new Date());
+					//中间段的。
+//					PaymentResponseVO vo = convertPaymentResponseVO(cashierEntity,payTimeLdt);
+//					afterDepositSettlementPaymentList.add(vo);
 					PaymentResponseVO vo = convertPaymentResponseVO(cashierEntity,payTimeLdt);
 					beforeDepositSettlementPaymentList.add(vo);
-				}else if(wzSettleTime != null && payTimeLdt.isAfter(wzSettleTime)) {
-					PaymentResponseVO vo = convertPaymentResponseVO(cashierEntity,payTimeLdt);
-					violationDepositSettlementPaymentList.add(vo);
 				}else {
-					//中间段的。
-					PaymentResponseVO vo = convertPaymentResponseVO(cashierEntity,payTimeLdt);
-					afterDepositSettlementPaymentList.add(vo);
+					/**
+					 * 根据支付时间来切换
+					 */
+					LocalDateTime payTimeLdt = LocalDateTimeUtils.parseStringToDateTime(payTime, "yyyyMMddHHmmss");
+					//未结算
+					if(settleTime == null) {
+						PaymentResponseVO vo = convertPaymentResponseVO(cashierEntity,payTimeLdt);
+						beforeDepositSettlementPaymentList.add(vo);
+					}else {
+						if(settleTime != null && payTimeLdt.isBefore(settleTime)) {
+							PaymentResponseVO vo = convertPaymentResponseVO(cashierEntity,payTimeLdt);
+							beforeDepositSettlementPaymentList.add(vo);
+						}else if(wzSettleTime != null && payTimeLdt.isAfter(wzSettleTime)) {
+							PaymentResponseVO vo = convertPaymentResponseVO(cashierEntity,payTimeLdt);
+							violationDepositSettlementPaymentList.add(vo);
+						}else {
+							//中间段的。
+							PaymentResponseVO vo = convertPaymentResponseVO(cashierEntity,payTimeLdt);
+							afterDepositSettlementPaymentList.add(vo);
+						}
+					}
 				}
 			}
 		}
@@ -138,7 +156,7 @@ public class PaymentService {
 	 * @param cashierEntity
 	 * @return
 	 */
-	private PaymentResponseVO convertPaymentResponseVO(CashierResVo cashierEntity,LocalDateTime payTimeLdt) {
+	private PaymentResponseVO convertPaymentResponseVO(CashierResVO cashierEntity,LocalDateTime payTimeLdt) {
 		PaymentResponseVO vo = new PaymentResponseVO();
 		vo.setCreateTime(LocalDateTimeUtils.formatDateTime(payTimeLdt));
 		vo.setItem(convertItem(cashierEntity.getPayKind()));

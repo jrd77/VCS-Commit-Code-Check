@@ -16,9 +16,9 @@ public class DeliveryConstants {
      */
     public static final String USER_AGENT_OPERATECENTER = "Autoyol-OperateCenter";
 
-    public static final String CANCEL_FLOW_ORDER = "http://114.55.63.205:8888/AOTU_TEST/" + "AotuInterface/cancelfloworder";
+    public static final String CANCEL_FLOW_ORDER = "http://114.55.63.205:8878/AOTU_TEST02/" + "AotuInterface/cancelfloworder";
 
-    public static final String CHANGE_FLOW_ORDER = "http://114.55.63.205:8888/AOTU_TEST/" + "AotuInterface/floworderchange";
+    public static final String CHANGE_FLOW_ORDER = "http://114.55.63.205:8878/AOTU_TEST02/" + "AotuInterface/floworderchange";
 
     public static final String ADD_FLOW_ORDER = "http://114.55.63.205:8878/AOTU_TEST02/" + "AotuInterface/addflowprocessdata";
 

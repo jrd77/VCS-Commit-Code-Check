@@ -103,5 +103,8 @@
 		</set>
 		where id = #{id}
 	</update>
-  	
+    <select id="getPlatformProfitDetails" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List" /> from account_platform_profit_detail where order_no = #{orderNo}
+    </select>
+
 </mapper>

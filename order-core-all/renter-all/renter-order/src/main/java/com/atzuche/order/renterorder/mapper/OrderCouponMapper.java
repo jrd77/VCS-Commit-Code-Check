@@ -1,11 +1,10 @@
 package com.atzuche.order.renterorder.mapper;
 
 import com.atzuche.order.renterorder.entity.OrderCouponEntity;
-
-import java.util.List;
-
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
  * 订单券表
@@ -27,7 +26,8 @@ public interface OrderCouponMapper {
     int updateByPrimaryKeySelective(OrderCouponEntity record);
 
     List<OrderCouponEntity> listOrderCouponByRenterOrderNo(@Param("renterOrderNo") String renterOrderNo);
-
+    
+    List<OrderCouponEntity> listOrderCouponByOrderNo(@Param("orderNo") String orderNo);
 
     /**
      * 查询指定订单的优惠券信息
@@ -39,5 +39,14 @@ public interface OrderCouponMapper {
      */
     OrderCouponEntity selectByOrderNoAndRenterOrderNo(@Param("orderNo") String orderNo, @Param(
             "renterOrderNo") String renterOrderNo,@Param("couponType") Integer couponType);
+
+    /**
+     * 获取车主券码
+     *
+     * @param orderNo 订单号
+     * @param couponType 优惠券类型
+     * @return String
+     */
+    String selectCouponNoByOrderNo(@Param("orderNo") String orderNo,@Param("couponType") int couponType);
 
 }

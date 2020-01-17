@@ -1,8 +1,10 @@
 package com.atzuche.order.rentercommodity.entity;
 
-import java.io.Serializable;
-import java.time.LocalDateTime;
 import lombok.Data;
+
+import java.io.Serializable;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 
 /**
@@ -212,5 +214,9 @@ public class RenterGoodsEntity implements Serializable {
 	 * 0-正常，1-已逻辑删除
 	 */
 	private Integer isDelete;
+	/**
+	 * 年检到期时间
+	 */
+	private LocalDate inspectExpire;
 
 }

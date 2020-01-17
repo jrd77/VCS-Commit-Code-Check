@@ -8,7 +8,6 @@ import lombok.EqualsAndHashCode;
 /**
  * 结算产生待审核收益 落库失败
  */
-@Data
 @EqualsAndHashCode(callSuper = false)
 public class AccountOwnerIncomeSettleException extends OrderException {
     public AccountOwnerIncomeSettleException() {

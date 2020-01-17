@@ -50,6 +50,12 @@ public class OrderPayableAmountResVO {
     private List<AccountPayAbleResVO> accountPayAbles;
 
     /**
+     * 待付费用明细（包含应付租车费用明细）
+     */
+    @AutoDocProperty("是否补付 1 是 0 否")
+    private Integer isPayAgain;
+
+    /**
      * 应付租车费用明细
      */
     @AutoDocProperty("应付租车费用明细")
@@ -82,4 +88,27 @@ public class OrderPayableAmountResVO {
      */
     @AutoDocProperty("是否使用钱包 0-否，1-是")
     private int isUseWallet;
+
+    /**
+     * 按钮文案
+     */
+    @AutoDocProperty("按钮文案")
+    private String buttonName;
+
+    /**
+     * costText 支付文案
+     */
+    @AutoDocProperty("支付文案")
+    private String costText;
+    /**
+     * 支付时间倒计时 单位：秒
+     */
+    @AutoDocProperty("支付时间倒计时 单位：秒")
+    private int countdown;
+
+    /**
+     * hints
+     */
+    @AutoDocProperty("提示文案")
+    private String hints;
 }

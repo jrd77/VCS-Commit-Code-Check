@@ -12,11 +12,17 @@ import com.atzuche.order.commons.vo.res.order.CostItemVO;
 import com.atzuche.order.commons.vo.res.order.DepositAmtVO;
 import com.atzuche.order.commons.vo.res.order.IllegalDepositVO;
 import com.atzuche.order.commons.vo.res.order.TotalCostVO;
+import com.atzuche.order.coreapi.entity.dto.CancelOrderResDTO;
 import com.atzuche.order.coreapi.entity.vo.res.CarRentTimeRangeResVO;
+import com.atzuche.order.delivery.vo.delivery.CancelFlowOrderDTO;
+import com.atzuche.order.delivery.vo.delivery.CancelOrderDeliveryVO;
+import com.atzuche.order.ownercost.entity.OwnerOrderFineApplyEntity;
+import com.atzuche.order.renterorder.entity.dto.DeductContextDTO;
 import com.atzuche.order.renterorder.entity.dto.RenterOrderCostRespDTO;
 import com.atzuche.order.renterorder.vo.RenterOrderCarDepositResVO;
 import com.atzuche.order.renterorder.vo.RenterOrderIllegalResVO;
 import com.atzuche.order.renterorder.vo.RenterOrderReqVO;
+import com.atzuche.order.renterorder.vo.owner.OwnerCouponReqVO;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -116,23 +122,23 @@ public class OrderCommonConver {
      * @return List<CostItemVO>
      */
     public List<CostItemVO> buildCostItemList(RenterOrderCostRespDTO renterOrderCostRespDTO) {
-        logger.info("Build costItem list.param is,renterOrderCostRespDTO:[{}]",JSON.toJSONString(renterOrderCostRespDTO));
+        logger.info("Build costItem list.param is,renterOrderCostRespDTO:[{}]", JSON.toJSONString(renterOrderCostRespDTO));
         if (null == renterOrderCostRespDTO || CollectionUtils.isEmpty(renterOrderCostRespDTO.getRenterOrderCostDetailDTOList())) {
             return null;
         }
 
         List<CostItemVO> costItemList = new ArrayList<>();
-        renterOrderCostRespDTO.getRenterOrderCostDetailDTOList().stream().forEach(cost -> {
+        renterOrderCostRespDTO.getRenterOrderCostDetailDTOList().forEach(cost -> {
             CostItemVO vo = new CostItemVO();
             vo.setCostCode(cost.getCostCode());
             vo.setCostDesc(cost.getCostDesc());
             vo.setCount(cost.getCount());
-            if(StringUtils.equals(RenterCashCodeEnum.SRV_GET_COST.getCashNo(),cost.getCostCode())) {
+            if (StringUtils.equals(RenterCashCodeEnum.SRV_GET_COST.getCashNo(), cost.getCostCode())) {
                 vo.setUnitPrice(renterOrderCostRespDTO.getGetRealAmt());
-                vo.setTotalAmount(renterOrderCostRespDTO.getGetRealAmt());
-            } else if(StringUtils.equals(RenterCashCodeEnum.SRV_RETURN_COST.getCashNo(),cost.getCostCode())) {
+                vo.setTotalAmount(-renterOrderCostRespDTO.getGetRealAmt());
+            } else if (StringUtils.equals(RenterCashCodeEnum.SRV_RETURN_COST.getCashNo(), cost.getCostCode())) {
                 vo.setUnitPrice(renterOrderCostRespDTO.getReturnRealAmt());
-                vo.setTotalAmount(renterOrderCostRespDTO.getReturnRealAmt());
+                vo.setTotalAmount(-renterOrderCostRespDTO.getReturnRealAmt());
             } else {
                 vo.setUnitPrice(cost.getUnitPrice());
                 vo.setTotalAmount(cost.getTotalAmount());
@@ -140,7 +146,7 @@ public class OrderCommonConver {
             costItemList.add(vo);
         });
 
-        logger.info("Build costItem list.result is,costItemList:[{}]",JSON.toJSONString(costItemList));
+        logger.info("Build costItem list.result is,costItemList:[{}]", JSON.toJSONString(costItemList));
         return costItemList;
     }
 
@@ -152,13 +158,13 @@ public class OrderCommonConver {
      */
     public TotalCostVO buildTotalCostVO(List<CostItemVO> costItems) {
 
-        if(CollectionUtils.isEmpty(costItems)) {
+        if (CollectionUtils.isEmpty(costItems)) {
             return null;
         }
         int totalFee = costItems.stream().mapToInt(CostItemVO::getTotalAmount).sum();
         TotalCostVO totalCost = new TotalCostVO();
         totalCost.setTotalFee(totalFee);
-        logger.info("Build TotalCostVO.result is,totalCost:[{}]",JSON.toJSONString(totalCost));
+        logger.info("Build TotalCostVO.result is,totalCost:[{}]", JSON.toJSONString(totalCost));
         return totalCost;
     }
 
@@ -169,7 +175,7 @@ public class OrderCommonConver {
      * @return DepositAmtVO
      */
     public DepositAmtVO buildDepositAmtVO(RenterOrderCarDepositResVO renterOrderCarDepositResVO) {
-        if(null == renterOrderCarDepositResVO) {
+        if (null == renterOrderCarDepositResVO) {
             return null;
         }
 
@@ -188,7 +194,7 @@ public class OrderCommonConver {
      */
     public IllegalDepositVO buildIllegalDepositVO(RenterOrderIllegalResVO renterOrderIllegalResVO) {
 
-        if(null == renterOrderIllegalResVO) {
+        if (null == renterOrderIllegalResVO) {
             return null;
         }
 
@@ -196,5 +202,69 @@ public class OrderCommonConver {
         illegalDepositVO.setIllegalDepositAmt(renterOrderIllegalResVO.getYingfuDepositAmt());
         return illegalDepositVO;
     }
+
+
+    /**
+     * 依据租车费用初始化抵扣信息
+     *
+     * @param renterOrderCostRespDTO 租车费用明细
+     * @return DeductContextDTO 抵扣信息公共参数
+     */
+    public DeductContextDTO initDeductContext(RenterOrderCostRespDTO renterOrderCostRespDTO) {
+
+        if (null == renterOrderCostRespDTO) {
+            return null;
+        }
+
+        DeductContextDTO deductContext = new DeductContextDTO();
+        deductContext.setOriginalRentAmt(null == renterOrderCostRespDTO.getRentAmount() ? 1 : Math.abs(renterOrderCostRespDTO.getRentAmount()));
+        deductContext.setSurplusRentAmt(null == renterOrderCostRespDTO.getRentAmount() ? 1 : Math.abs(renterOrderCostRespDTO.getRentAmount()));
+
+        int srvGetCost = null == renterOrderCostRespDTO.getGetRealAmt() ? 0 :
+                Math.abs(renterOrderCostRespDTO.getGetRealAmt());
+
+        int srvReturnCost = null == renterOrderCostRespDTO.getReturnRealAmt() ? 0 :
+                Math.abs(renterOrderCostRespDTO.getReturnRealAmt());
+
+        int overGetCost = null == renterOrderCostRespDTO.getGetOverAmt() ? 0 : Math.abs(renterOrderCostRespDTO.getGetOverAmt());
+        int overReturnCost = null == renterOrderCostRespDTO.getReturnOverAmt() ? 0 :
+                Math.abs(renterOrderCostRespDTO.getReturnOverAmt());
+
+        deductContext.setSrvGetCost(srvGetCost + overGetCost);
+        deductContext.setSrvReturnCost(srvReturnCost + overReturnCost);
+        logger.info("下单前费用计算--初始context数据.deductContext:[{}]", JSON.toJSONString(deductContext));
+        return deductContext;
+    }
+
+    /**
+     * 仁云流程系统请求信息处理
+     *
+     * @param orderNo 主订单号
+     * @param res     取消订单返回信息
+     * @return CancelOrderDeliveryVO 仁云流程系统请求信息
+     */
+    public CancelOrderDeliveryVO buildCancelOrderDeliveryVO(String orderNo, CancelOrderResDTO res) {
+        if (!res.getSrvGetFlag() && !res.getSrvReturnFlag()) {
+            return null;
+        }
+        String servicetype = "";
+        if (res.getSrvGetFlag() && res.getSrvReturnFlag()) {
+            servicetype = "all";
+        } else if (res.getSrvGetFlag()) {
+            servicetype = "take";
+        } else if (res.getSrvReturnFlag()) {
+            servicetype = "back";
+        }
+        CancelOrderDeliveryVO cancelOrderDeliveryVO = new CancelOrderDeliveryVO();
+
+        CancelFlowOrderDTO cancelFlowOrderDTO = new CancelFlowOrderDTO();
+        cancelFlowOrderDTO.setOrdernumber(orderNo);
+        cancelFlowOrderDTO.setServicetype(servicetype);
+
+        cancelOrderDeliveryVO.setRenterOrderNo(res.getRenterOrderNo());
+        cancelOrderDeliveryVO.setCancelFlowOrderDTO(cancelFlowOrderDTO);
+        return cancelOrderDeliveryVO;
+    }
+
 
 }

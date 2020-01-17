@@ -5,6 +5,7 @@ import com.atzuche.order.accountplatorm.entity.AccountPlatformProfitDetailEntity
 import com.atzuche.order.accountplatorm.entity.AccountPlatformSubsidyDetailEntity;
 import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostSettleDetailEntity;
 import lombok.Data;
+import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -80,22 +81,48 @@ public class SettleOrdersDefinition {
      */
     public void addPlatformProfit(AccountPlatformProfitDetailEntity accountPlatformProfitDetail){
         List<AccountPlatformProfitDetailEntity> accountPlatformProfitDetails = getAccountPlatformProfitDetails();
-        if(Objects.isNull(accountPlatformProfitDetails)){
+        if(!CollectionUtils.isEmpty(accountPlatformProfitDetails)){
             accountPlatformProfitDetails = new ArrayList<>();
         }
         accountPlatformProfitDetails.add(accountPlatformProfitDetail);
         setAccountPlatformProfitDetails(accountPlatformProfitDetails);
     }
     /**
-     * 平台补贴总额
+     * 平台补贴 费用明细
      * @param accountPlatformSubsidyDetail
      */
     public void addPlatformSubsidy(AccountPlatformSubsidyDetailEntity accountPlatformSubsidyDetail){
         List<AccountPlatformSubsidyDetailEntity> accountPlatformSubsidyDetailEntitys = getAccountPlatformSubsidyDetails();
-        if(Objects.isNull(accountPlatformSubsidyDetailEntitys)){
+        if(!CollectionUtils.isEmpty(accountPlatformSubsidyDetailEntitys)){
             accountPlatformSubsidyDetailEntitys = new ArrayList<>();
         }
         accountPlatformSubsidyDetailEntitys.add(accountPlatformSubsidyDetail);
         setAccountPlatformSubsidyDetails(accountPlatformSubsidyDetailEntitys);
+    }
+
+    /**
+     * 租客费用补贴总额
+     * @param accountRenterCostSettleDetailEntity
+     */
+    public void addRentCosts(AccountRenterCostSettleDetailEntity accountRenterCostSettleDetailEntity){
+        List<AccountRenterCostSettleDetailEntity> accountRenterCostSettleDetailEntitys = getAccountRenterCostSettleDetails();
+        if(!CollectionUtils.isEmpty(accountRenterCostSettleDetailEntitys)){
+            accountRenterCostSettleDetailEntitys = new ArrayList<>();
+        }
+        accountRenterCostSettleDetailEntitys.add(accountRenterCostSettleDetailEntity);
+        setAccountRenterCostSettleDetails(accountRenterCostSettleDetailEntitys);
+    }
+
+    /**
+     * 车主费用明细
+     * @param accountOwnerCostSettleDetailEntity
+     */
+    public void addOwnerCosts(AccountOwnerCostSettleDetailEntity accountOwnerCostSettleDetailEntity){
+        List<AccountOwnerCostSettleDetailEntity> accountOwnerCostSettleDetailEntitys = getAccountOwnerCostSettleDetails();
+        if(!CollectionUtils.isEmpty(accountOwnerCostSettleDetailEntitys)){
+            accountOwnerCostSettleDetailEntitys = new ArrayList<>();
+        }
+        accountOwnerCostSettleDetailEntitys.add(accountOwnerCostSettleDetailEntity);
+        setAccountOwnerCostSettleDetails(accountOwnerCostSettleDetailEntitys);
     }
 }

@@ -19,7 +19,8 @@ public enum OrderChangeItemEnum {
 	MODIFY_USERCOINFLAG("9", "修改使用凹凸币"),
 	MODIFY_CAROWNERCOUPON("10", "修改车主券"),
 	MODIFY_GETRETURNCOUPON("11", "修改取还车券"),
-	MODIFY_PLATFORMCOUPON("12", "修改平台券")
+	MODIFY_PLATFORMCOUPON("12", "修改平台券"),
+	MODIFY_TRANSFER("13", "管理后台换车")
     ;
 
 

@@ -30,6 +30,7 @@ public interface RenterOrderMapper{
     List<RenterOrderEntity> listAgreeRenterOrderByOrderNo(@Param("orderNo") String orderNo);
 
     RenterOrderEntity getRenterOrderByOrderNoAndIsEffective(@Param("orderNo") String orderNo);
+    List<RenterOrderEntity> queryRenterOrderByOrderNo(@Param("orderNo")String orderNo);
     
     RenterOrderEntity getRenterOrderByRenterOrderNo(@Param("renterOrderNo") String renterOrderNo);
     
@@ -38,10 +39,21 @@ public interface RenterOrderMapper{
     RenterOrderEntity getRenterOrderByOrderNoAndWaitPay(@Param("orderNo") String orderNo);
     
     Integer updateRenterOrderChildStatus(@Param("id") Integer id, @Param("childStatus") Integer childStatus);
-    
+
+    /**
+     * 订单结束更新所有租客订单状态
+     *
+     * @param orderNo 主订单号
+     * @param childStatus 子订单状态
+     * @return Integer
+     */
+    Integer updateChildStatusByOrderNo(@Param("orderNo") String orderNo, @Param("childStatus") Integer childStatus);
+
     Integer updateRenterOrderAgreeFlag(@Param("id") Integer id, @Param("agreeFlag") Integer agreeFlag);
 
     RenterOrderEntity getChangeRenterOrderByOrderNo(@Param("orderNo") String orderNo);
 
     List<RenterOrderEntity> queryHostiryRenterOrderByOrderNo(@Param("orderNo") String orderNo);
+
+	
 }

@@ -9,6 +9,8 @@ import com.atzuche.order.ownercost.entity.dto.OwnerOrderCostReqDTO;
 import com.atzuche.order.ownercost.entity.dto.OwnerOrderReqDTO;
 import com.atzuche.order.ownercost.mapper.OwnerOrderMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.ibatis.annotations.Param;
+import org.omg.PortableInterceptor.INACTIVE;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -32,7 +34,9 @@ public class OwnerOrderService {
     public OwnerOrderEntity getChangeOwnerByOrderNo(String orderNo){
         return ownerOrderMapper.getChangeOwnerByOrderNo(orderNo);
     }
-
+    
+    
+    
 
     /*
      * @Author ZhangBin
@@ -45,6 +49,15 @@ public class OwnerOrderService {
     }
     
     /**
+     * 根据子订单号查询
+     * @param ownerOrderNo
+     * @return
+     */
+    public OwnerOrderEntity getOwnerOrderByOwnerOrderNo(String ownerOrderNo){
+        return ownerOrderMapper.getOwnerOrderByOwnerOrderNo(ownerOrderNo);
+    }
+    
+    /**
      * 根据id把上笔车主子单置为无效
      * @param id
      * @return Integer
@@ -52,6 +65,17 @@ public class OwnerOrderService {
     public Integer updateOwnerOrderInvalidById(Integer id) {
     	return ownerOrderMapper.updateOwnerOrderInvalidById(id);
     }
+
+    /**
+     * 依据主键更新车主订单信息
+     *
+     * @param ownerOrderEntity 车主订单信息
+     * @return Integer
+     */
+    public Integer updateOwnerOrderInfo(OwnerOrderEntity ownerOrderEntity){
+        return ownerOrderMapper.updateByPrimaryKey(ownerOrderEntity);
+    }
+
     
     /**
      * 保存车主子订单
@@ -105,5 +129,14 @@ public class OwnerOrderService {
 
     public List<OwnerOrderEntity> queryHostiryOwnerOrderByOrderNo(String orderNo) {
         return ownerOrderMapper.queryHostiryOwnerOrderByOrderNo(orderNo);
+    }
+
+    public OwnerOrderEntity queryCancelOwnerOrderByOrderNoIsEffective(String orderNo) {
+       return ownerOrderMapper.queryCancelOwnerOrderByOrderNoIsEffective(orderNo);
+    }
+
+
+    public Integer updateChildStatusByOrderNo(String orderNo, Integer childStatus){
+        return ownerOrderMapper.updateChildStatusByOrderNo(orderNo, childStatus);
     }
 }

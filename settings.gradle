@@ -98,4 +98,6 @@ findProject(':order-remote-service:order-remote-car')?.name = 'order-remote-car'
 include 'order-remote-service:order-remote-mem'
 findProject(':order-remote-service:order-remote-mem')?.name = 'order-remote-mem'
 include 'order-transport'
+include 'order-photo-server'
+include 'order-mq'
 

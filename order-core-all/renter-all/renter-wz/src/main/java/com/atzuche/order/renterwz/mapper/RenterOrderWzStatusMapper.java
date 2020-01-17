@@ -94,4 +94,18 @@ public interface RenterOrderWzStatusMapper{
 	 * @param operator 操作人
 	 */
 	void deleteInfoByOrderNo(@Param("orderNo") String orderNo,@Param("operator") String operator);
+
+	/**
+	 * 查询违章的订单
+	 * @param memNo 会员号
+	 * @return 违章订单
+	 */
+    List<RenterOrderWzStatusEntity> queryIllegalOrderListByMemNo(@Param("memNo") String memNo);
+
+	/**
+	 * 查询当前订单的违章详情
+	 * @param orderNo
+	 * @return
+	 */
+	RenterOrderWzStatusEntity getOrderInfoByOrderNo(@Param("orderNo") String orderNo);
 }

@@ -1,10 +1,10 @@
 package com.atzuche.order.accountownercost.service;
 
 import com.atzuche.order.accountownercost.entity.AccountOwnerCostSettleEntity;
-import com.atzuche.order.accountownercost.service.notservice.AccountOwnerCostSettleNoTService;
+import com.atzuche.order.accountownercost.mapper.AccountOwnerCostSettleMapper;
 import com.atzuche.order.accountownercost.service.notservice.AccountOwnerCostSettleDetailNoTService;
+import com.atzuche.order.accountownercost.service.notservice.AccountOwnerCostSettleNoTService;
 import com.atzuche.order.accountownercost.vo.req.AccountOwnerCostSettleReqVO;
-import com.autoyol.cat.CatAnnotation;
 import com.autoyol.commons.web.ErrorCode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,7 +23,8 @@ public class AccountOwnerCostSettleService{
     private AccountOwnerCostSettleNoTService accountOwnerCostSettleNoTService;
     @Autowired
     private AccountOwnerCostSettleDetailNoTService accountOwnerCostSettleDetailNoTService;
-
+    @Autowired
+    private AccountOwnerCostSettleMapper accountOwnerCostSettleMapper;
 
     /**
      * 车主结算信息插入
@@ -45,6 +46,14 @@ public class AccountOwnerCostSettleService{
     public void insertAccountOwnerCostSettle(AccountOwnerCostSettleEntity accountOwnerCostSettle){
         accountOwnerCostSettleNoTService.insertAccountOwnerCostSettle(accountOwnerCostSettle);
     }
-
+    /*
+     * @Author ZhangBin
+     * @Date 2020/1/15 20:38
+     * @Description: 通过订单号查询收益
+     *
+     **/
+    public AccountOwnerCostSettleEntity getsettleAmtByOrderNo(String orderNo,String ownerOrderNo){
+        return accountOwnerCostSettleMapper.getsettleAmtByOrderNo(orderNo,ownerOrderNo);
+    }
 
 }

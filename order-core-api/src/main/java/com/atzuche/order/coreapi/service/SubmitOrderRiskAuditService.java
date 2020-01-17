@@ -41,8 +41,9 @@ public class SubmitOrderRiskAuditService {
      * @param submitOrderRiskCheckReqVO 请求参数
      * @return Integer riskAuditId
      */
-    public Integer check(SubmitOrderRiskCheckReqVO submitOrderRiskCheckReqVO) {
-        logger.info("Submit order rish audit check.param is,submitOrderRiskCheckReqVO:[{}]", JSON.toJSONString(submitOrderRiskCheckReqVO));
+    public String check(SubmitOrderRiskCheckReqVO submitOrderRiskCheckReqVO) {
+        logger.info("Submit order risk audit check.param is,submitOrderRiskCheckReqVO:[{}]",
+                JSON.toJSONString(submitOrderRiskCheckReqVO));
         
         CreateOrderRiskCheckRequestVO req = buildCreateOrderRiskCheckRequestVO(submitOrderRiskCheckReqVO);
         Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "风控服务");
@@ -56,24 +57,25 @@ public class SubmitOrderRiskAuditService {
                     JSON.toJSONString(responseData));
             Cat.logEvent(CatConstants.FEIGN_RESULT, JSON.toJSONString(responseData));
 
-            if (null == responseData || !StringUtils.equals(responseData.getResCode(), ErrorCode.SUCCESS.getCode())) {
+            if (!StringUtils.equals(responseData.getResCode(), ErrorCode.SUCCESS.getCode())) {
                 throw new SubmitOrderException(responseData.getResCode(), responseData.getResMsg(), responseData.getData());
             } else {
                 t.setStatus(Transaction.SUCCESS);
-                return null == responseData.getData() ? null : Integer.valueOf(responseData.getData().toString());
+                return String.valueOf(responseData.getData());
             }
         } catch (SubmitOrderException soe) {
             logger.error("下单调用风控服务审核不通过.param is, reqVo:[{}]", req, soe);
             t.setStatus(soe);
             Cat.logError("下单调用风控服务审核不通过.", soe);
+            throw soe;
         } catch (Exception e) {
             logger.error("下单调用风控服务异常.param is, reqVo:[{}]", req, e);
             t.setStatus(e);
             Cat.logError("下单调用风控服务异常.", e);
+            throw e;
         } finally {
             t.complete();
         }
-        return null;
     }
 
 
@@ -106,6 +108,7 @@ public class SubmitOrderRiskAuditService {
 
         createOrderRiskCheckRequestVO.setUseCarCityCode(submitOrderRiskCheckReqVO.getCityCode());
         createOrderRiskCheckRequestVO.setUseCarCityName(submitOrderRiskCheckReqVO.getCityName());
+        createOrderRiskCheckRequestVO.setAverageDailyPrice(String.valueOf(submitOrderRiskCheckReqVO.getWeekendPrice()));
 
         return createOrderRiskCheckRequestVO;
     }

@@ -1,6 +1,8 @@
 package com.atzuche.order.delivery.service.handover;
 
 import com.atzuche.order.commons.CommonUtils;
+import com.atzuche.order.commons.vo.req.handover.req.HandoverCarInfoReqDTO;
+import com.atzuche.order.commons.vo.req.handover.req.HandoverCarInfoReqVO;
 import com.atzuche.order.delivery.common.DeliveryCarTask;
 import com.atzuche.order.delivery.common.DeliveryErrorCode;
 import com.atzuche.order.delivery.entity.RenterOrderDeliveryEntity;
@@ -14,8 +16,6 @@ import com.atzuche.order.delivery.vo.delivery.*;
 import com.atzuche.order.delivery.vo.delivery.req.CarConditionPhotoUploadVO;
 import com.atzuche.order.delivery.vo.delivery.req.DeliveryReqDTO;
 import com.atzuche.order.delivery.vo.delivery.req.DeliveryReqVO;
-import com.atzuche.order.delivery.vo.handover.req.HandoverCarInfoReqDTO;
-import com.atzuche.order.delivery.vo.handover.req.HandoverCarInfoReqVO;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -117,10 +117,12 @@ public class HandoverCarInfoService {
         if (deliveryReqVO.getGetDeliveryReqDTO() != null) {
             deliveryReqDTO = deliveryReqVO.getGetDeliveryReqDTO();
             updateDeliveryCarInfoByUsed(deliveryReqDTO, 1);
+            //更新取车备注信息
         }
         if (deliveryReqVO.getRenterDeliveryReqDTO() != null) {
             deliveryReqDTO = deliveryReqVO.getRenterDeliveryReqDTO();
             updateDeliveryCarInfoByUsed(deliveryReqDTO, 2);
+            //更新还车备注信息
         }
     }
 
@@ -158,6 +160,8 @@ public class HandoverCarInfoService {
         orderDeliveryDTO.setOwnerGetReturnAddr(deliveryReqDTO.getOwnerGetReturnAddr());
         orderDeliveryDTO.setOrderNo(renterOrderDeliveryEntity.getOrderNo());
         orderDeliveryDTO.setRenterOrderNo(renterOrderDeliveryEntity.getRenterOrderNo());
+        orderDeliveryDTO.setOwnerRealGetReturnRemark(deliveryReqDTO.getOwnerRealGetAddrReamrk());
+        orderDeliveryDTO.setRenterRealGetReturnRemark(deliveryReqDTO.getRenterRealGetAddrReamrk());
         renterDeliveryAddrDTO.setExpGetCarAddr(deliveryReqDTO.getRenterGetReturnAddr());
         renterDeliveryAddrDTO.setOrderNo(renterOrderDeliveryEntity.getOrderNo());
         renterDeliveryAddrDTO.setRenterOrderNo(renterOrderDeliveryEntity.getRenterOrderNo());

@@ -27,8 +27,8 @@ public class AdditionalDriverInsuranceVO {
     private String driverBeginTime;
     @AutoDocProperty("驾驶证有效终止时间")
     private String driverEndTime;
-    @AutoDocProperty("附加驾驶员险")
+    @AutoDocProperty("附加驾驶员险费用")
     private String driverAmt;
-    @ApiModelProperty(value="子订单号",required=true)
-    private String renterOrderNo;
+//    @ApiModelProperty(value="子订单号",required=true)
+//    private String renterOrderNo;
 }

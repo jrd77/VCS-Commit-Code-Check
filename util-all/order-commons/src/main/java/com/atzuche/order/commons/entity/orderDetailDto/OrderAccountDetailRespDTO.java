@@ -7,7 +7,8 @@ import java.util.List;
 
 @Data
 public class OrderAccountDetailRespDTO {
-
+    @AutoDocProperty(value="订单状态")
+    public OrderDTO orderDTO;
     @AutoDocProperty(value="订单状态")
     public OrderStatusDTO orderStatusDTO;
     @AutoDocProperty(value="租客押金减免信息")
