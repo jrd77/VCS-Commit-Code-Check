@@ -1,6 +1,7 @@
 package com.atzuche.order.coreapi.service;
 
 import com.atzuche.order.commons.vo.req.ModifyApplyHandleReq;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,6 +23,9 @@ public class ModifyOrderOwnerConfirmService {
 	private ModifyOrderConfirmService modifyOrderConfirmService;
 	@Autowired
 	private RenterOrderChangeApplyService renterOrderChangeApplyService;
+
+	@Autowired
+	private OrderDetailService orderDetailService;
 	/**
 	 * 同意操作
 	 */
@@ -44,6 +48,10 @@ public class ModifyOrderOwnerConfirmService {
 			Cat.logError("ModifyOrderConfirmService.modifyConfirm车主处理修改申请报错", new ModifyOrderParameterException());
 			throw new ModifyOrderParameterException();
 		}
+        if(StringUtils.trimToNull(modifyApplyHandleReq.getMemNo())==null){
+        	modifyApplyHandleReq.setMemNo(orderDetailService.getOwnerMemNo(modifyApplyHandleReq.getModifyApplicationId()));
+		}
+
 		ModifyConfirmDTO modifyConfirmDTO = modifyOrderConfirmService.convertToModifyConfirmDTO(modifyApplyHandleReq);
 		RenterOrderChangeApplyEntity changeApply = renterOrderChangeApplyService.getRenterOrderChangeApplyByRenterOrderNo(modifyConfirmDTO.getRenterOrderNo());
 		if (changeApply == null) {

@@ -5,7 +5,6 @@ import com.atzuche.order.admin.exception.OrderHistoryErrException;
 import com.atzuche.order.admin.exception.OrderHistoryFailException;
 import com.atzuche.order.admin.exception.OrderRHistoryErrException;
 import com.atzuche.order.admin.exception.OrderRHistoryFailException;
-import com.atzuche.order.car.RenterCarDetailFailException;
 import com.atzuche.order.commons.CatConstants;
 import com.atzuche.order.commons.entity.orderDetailDto.OrderHistoryListDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.OrderHistoryReqDTO;
@@ -46,7 +45,7 @@ public class OrderDetailService {
                 throw failException;
             }
             t.setStatus(Transaction.SUCCESS);
-        }catch (RenterCarDetailFailException e){
+        }catch (OrderHistoryFailException e){
             Cat.logError("Feign 获取历史订单列表失败",e);
             t.setStatus(e);
             throw e;
@@ -82,7 +81,7 @@ public class OrderDetailService {
                 throw failException;
             }
             t.setStatus(Transaction.SUCCESS);
-        }catch (RenterCarDetailFailException e){
+        }catch (OrderRHistoryFailException e){
             Cat.logError("Feign 获取人工调度历史订单列表失败",e);
             t.setStatus(e);
             throw e;
