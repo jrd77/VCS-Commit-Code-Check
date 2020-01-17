@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.ToString;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 /**
  * @author 胡春林
@@ -106,13 +107,18 @@ public class HandoverCarInfoDTO {
     private String msgId;
 
 
-    public void setAheadTimeAndType(Integer getMinutes, Integer returnMinutes) {
-        if (getMinutes != null) {
-            setAheadTime(getMinutes);
-            setType(RenterHandoverCarTypeEnum.RENYUN_TO_RENTER.getValue().intValue());
-        } else if (returnMinutes != null) {
-            setDelayTime(returnMinutes);
-            setType(RenterHandoverCarTypeEnum.RENTER_TO_RENYUN.getValue().intValue());
+    public void setAheadTimeAndType(Integer getMinutes, Integer returnMinutes,RenterOrderDeliveryEntity orderDeliveryEntity) {
+
+        if (Objects.isNull(getMinutes) && Objects.isNull(returnMinutes)) {
+            setAheadTime(0);
+        } else {
+            if (orderDeliveryEntity.getType().intValue() == 1) {
+                setAheadTime(getMinutes);
+                setType(RenterHandoverCarTypeEnum.RENYUN_TO_RENTER.getValue().intValue());
+            } else {
+                setAheadTime(returnMinutes);
+                setType(RenterHandoverCarTypeEnum.RENTER_TO_RENYUN.getValue().intValue());
+            }
         }
     }
 

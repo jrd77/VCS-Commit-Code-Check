@@ -22,6 +22,8 @@ public class RenterRentDetailDTO {
     private String rentTimeStr;
     @AutoDocProperty("结束时间")
     private String revertTimeStr;
+    @AutoDocProperty("车牌号")
+    private String carPlateNum;
     @AutoDocProperty("日均价")
     private Integer dayAverageAmt;
     @AutoDocProperty("一天一价列表")

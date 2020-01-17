@@ -9,12 +9,16 @@ import com.atzuche.order.commons.vo.req.OrderReqVO;
 import com.atzuche.order.commons.vo.res.OrderResVO;
 import com.atzuche.order.coreapi.service.StockService;
 import com.atzuche.order.coreapi.service.SubmitOrderService;
+import com.atzuche.order.mq.common.base.BaseProducer;
+import com.atzuche.order.mq.common.base.OrderMessage;
 import com.atzuche.order.parentorder.entity.OrderRecordEntity;
 import com.atzuche.order.parentorder.service.OrderRecordService;
+import com.autoyol.commons.utils.DateUtil;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.doc.annotation.AutoDocMethod;
 import com.autoyol.doc.annotation.AutoDocVersion;
+import com.autoyol.event.rabbit.neworder.OrderCreateMq;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,6 +53,8 @@ public class SubmitOrderController {
     private OrderRecordService orderRecordService;
     @Autowired
     private StockService stockService;
+    @Autowired
+    BaseProducer baseProducer;
 
     @AutoDocMethod(description = "提交订单", value = "提交订单", response = OrderResVO.class)
     @PostMapping("/normal/req")
@@ -86,7 +92,7 @@ public class SubmitOrderController {
             orderRecordEntity.setParam(JSON.toJSONString(normalOrderReqVO));
             orderRecordEntity.setResult(JSON.toJSONString(orderResVO));
             orderRecordService.save(orderRecordEntity);
-
+            sendCreateOrderSuccess(orderReqVO,orderResVO);
             //TODO:发送订单成功的MQ事件
         }catch(OrderException orderException){
             String orderNo = orderResVO==null?"":orderResVO.getOrderNo();
@@ -199,8 +205,26 @@ public class SubmitOrderController {
     }
 
 
-
-
-
+    /**
+     * 发送下单事件
+     * @param orderReqVO
+     * @param orderResVO
+     */
+    public void sendCreateOrderSuccess(OrderReqVO orderReqVO,OrderResVO orderResVO){
+        //发送MQ时间
+        OrderCreateMq orderCreateMq = new OrderCreateMq();
+        orderCreateMq.setOrderNo(orderResVO.getOrderNo());
+        orderCreateMq.setBusinessChildType(orderReqVO.getBusinessChildType());
+        orderCreateMq.setCategory(orderReqVO.getOrderCategory());
+        orderCreateMq.setRentTime(DateUtil.asDate(orderReqVO.getRentTime().toLocalDate()));
+        orderCreateMq.setRevertTime(DateUtil.asDate(orderReqVO.getRevertTime().toLocalDate()));
+        orderCreateMq.setMemNo(Integer.valueOf(orderReqVO.getMemNo()));
+        orderCreateMq.setPlatformChildType(orderReqVO.getPlatformChildType());
+        OrderMessage orderMessage = OrderMessage.builder().build();
+        orderMessage.setPhone("13628645717");
+        orderMessage.setMessage("订单创建成功");
+        orderMessage.setMessage(orderCreateMq);
+        baseProducer.sendTopicMessage("auto-order-action","action.order.create",orderMessage);
+    }
 
 }

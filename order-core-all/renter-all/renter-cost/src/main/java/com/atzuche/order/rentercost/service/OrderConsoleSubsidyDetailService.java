@@ -52,9 +52,9 @@ public class OrderConsoleSubsidyDetailService{
     	}
     	
     	SubsidySourceCodeEnum sourceEnum = SubsidySourceCodeEnum.RENTER;
-    	if(SubsidySourceCodeEnum.RENTER.getCode().equals(record.getSubsidyTargetCode())) {
+    	if(SubsidySourceCodeEnum.RENTER.getCode().equals(record.getSubsidySourceCode())) {
     		sourceEnum = SubsidySourceCodeEnum.OWNER;
-    	}else if(SubsidySourceCodeEnum.OWNER.getCode().equals(record.getSubsidyTargetCode())) {
+    	}else if(SubsidySourceCodeEnum.OWNER.getCode().equals(record.getSubsidySourceCode())) {
     		sourceEnum = SubsidySourceCodeEnum.RENTER;
     	}
     	
@@ -80,11 +80,13 @@ public class OrderConsoleSubsidyDetailService{
     	for (OrderConsoleSubsidyDetailEntity orderConsoleSubsidyDetailEntity : list) {
 			//存在
     		if(orderConsoleSubsidyDetailEntity.getSubsidySourceCode().equals(record.getSubsidySourceCode()) && orderConsoleSubsidyDetailEntity.getSubsidyTargetCode().equals(record.getSubsidyTargetCode()) && orderConsoleSubsidyDetailEntity.getSubsidyCostCode().equals(record.getSubsidyCostCode())) {
+    			record.setId(orderConsoleSubsidyDetailEntity.getId());
     			orderConsoleSubsidyDetailMapper.updateByPrimaryKeySelective(record);
     			isExists = true;
 			}
     		//修改反向记录（费用编码相同）
     		if(orderConsoleSubsidyDetailEntity.getSubsidySourceCode().equals(record.getSubsidyTargetCode()) && orderConsoleSubsidyDetailEntity.getSubsidyTargetCode().equals(record.getSubsidySourceCode()) && orderConsoleSubsidyDetailEntity.getSubsidyCostCode().equals(record.getSubsidyCostCode())) {
+    			record.setId(orderConsoleSubsidyDetailEntity.getId());
     			orderConsoleSubsidyDetailMapper.updateByPrimaryKeySelective(recordConvert);
     			isConvertExists = true;
 			}
