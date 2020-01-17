@@ -3,6 +3,7 @@
  */
 package com.atzuche.order.open.service;
 
+import com.atzuche.order.commons.vo.req.ModifyApplyHandleReq;
 import com.atzuche.order.commons.vo.req.ModifyOrderMainQueryReqVO;
 import com.atzuche.order.commons.vo.req.ModifyOrderQueryReqVO;
 import com.atzuche.order.commons.vo.req.ModifyOrderReqVO;
@@ -10,6 +11,7 @@ import com.atzuche.order.commons.vo.res.ModifyOrderMainResVO;
 import com.atzuche.order.commons.vo.res.ModifyOrderResVO;
 import com.autoyol.commons.web.ResponseData;
 import org.springframework.cloud.netflix.feign.FeignClient;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -37,4 +39,7 @@ public interface FeignOrderModifyService {
 
     @PostMapping("/order/modifyconsole")
     ResponseData<?> modifyOrderForConsole(@Valid @RequestBody ModifyOrderReqVO modifyOrderReqVO);
+
+	@PostMapping("/order/modifyconfirm")
+	public ResponseData<?> ownerHandleModifyApplication(@Valid @RequestBody ModifyApplyHandleReq req);
 }

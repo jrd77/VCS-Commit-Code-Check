@@ -7,10 +7,12 @@ import com.atzuche.order.admin.exception.OrderModifyErrException;
 import com.atzuche.order.admin.exception.OrderModifyFailException;
 import com.atzuche.order.admin.vo.req.order.CancelOrderByPlatVO;
 import com.atzuche.order.admin.vo.req.order.CancelOrderVO;
+import com.atzuche.order.admin.vo.req.order.OrderModifyConfirmReqVO;
 import com.atzuche.order.car.RenterCarDetailFailException;
 import com.atzuche.order.commons.CatConstants;
 import com.atzuche.order.commons.vo.req.AdminOrderCancelReqVO;
 import com.atzuche.order.commons.vo.req.CancelOrderReqVO;
+import com.atzuche.order.commons.vo.req.ModifyApplyHandleReq;
 import com.atzuche.order.commons.vo.req.ModifyOrderReqVO;
 import com.atzuche.order.open.service.FeignOrderModifyService;
 import com.atzuche.order.open.service.FeignOrderUpdateService;
@@ -128,5 +130,32 @@ public class AdminOrderService {
             t.complete();
         }
         return responseObject;
+    }
+
+    public void modificationConfirm(OrderModifyConfirmReqVO reqVO) {
+        ModifyApplyHandleReq req = new ModifyApplyHandleReq();
+        BeanUtils.copyProperties(reqVO,req);
+        ResponseData<?> responseObject = null;
+        Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "订单CoreAPI服务");
+        try{
+            Cat.logEvent(CatConstants.FEIGN_METHOD,"feignOrderUpdateService.ownerHandleModifyApplication");
+            log.info("Feign 管理后台替车主操作修改申请,param={}", JSON.toJSONString(req));
+            Cat.logEvent(CatConstants.FEIGN_PARAM,JSON.toJSONString(req));
+            responseObject = feignOrderModifyService.ownerHandleModifyApplication(req);
+            Cat.logEvent(CatConstants.FEIGN_RESULT,JSON.toJSONString(responseObject));
+            if(responseObject == null || !ErrorCode.SUCCESS.getCode().equals(responseObject.getResCode())){
+                log.error("Feign 管理后台替车主操作修改申请,responseObject={},modifyOrderReq={}",JSON.toJSONString(responseObject),JSON.toJSONString(req));
+                OrderModifyFailException failException = new OrderModifyFailException();
+                Cat.logError("Feign 管理后台替车主操作修改申请",failException);
+                throw failException;
+            }
+            t.setStatus(Transaction.SUCCESS);
+        }catch (Exception e){
+            log.error("Feign 管理后台替车主操作修改申请,responseObject={},modifyOrderReq={}",JSON.toJSONString(responseObject),JSON.toJSONString(req),e);
+            Cat.logError("Feign 管理后台替车主操作修改申请",e);
+            throw e;
+        }finally {
+            t.complete();
+        }
     }
 }
