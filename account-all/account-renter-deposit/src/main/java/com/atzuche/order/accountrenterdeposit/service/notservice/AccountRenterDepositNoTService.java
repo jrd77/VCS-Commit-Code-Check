@@ -117,4 +117,14 @@ public class AccountRenterDepositNoTService {
     public void updateRenterDepositEntity(AccountRenterDepositEntity entity) {
         accountRenterDepositMapper.updateByPrimaryKeySelective(entity);
     }
+
+    /**
+     * 查询车辆押金信息
+     * @param orderNo
+     * @return
+     */
+    public AccountRenterDepositEntity queryDeposit(String orderNo) {
+        AccountRenterDepositEntity accountRenterDepositEntity = accountRenterDepositMapper.selectByOrderNo(orderNo);
+        return accountRenterDepositEntity;
+    }
 }
