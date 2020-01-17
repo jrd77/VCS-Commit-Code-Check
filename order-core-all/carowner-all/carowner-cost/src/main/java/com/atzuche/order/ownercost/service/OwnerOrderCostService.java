@@ -20,4 +20,14 @@ public class OwnerOrderCostService {
 	public Integer saveOwnerOrderCost(OwnerOrderCostEntity ownerOrderCostEntity) {
 		return ownerOrderCostMapper.saveOwnerOrderCost(ownerOrderCostEntity);
 	}
+
+	/*
+	 * @Author ZhangBin
+	 * @Date 2020/1/17 18:27
+	 * @Description: 获取车主费用
+	 *
+	 **/
+	public OwnerOrderCostEntity getOwnerOrderCostByOwnerOrderNo(String ownerOrderNo){
+        return ownerOrderCostMapper.getOwnerOrderCostByOwnerOrderNo(ownerOrderNo);
+    }
 }

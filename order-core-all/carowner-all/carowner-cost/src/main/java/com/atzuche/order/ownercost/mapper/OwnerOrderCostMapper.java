@@ -25,4 +25,5 @@ public interface OwnerOrderCostMapper{
     
     int updateByPrimaryKeySelective(OwnerOrderCostEntity record);
 
+    OwnerOrderCostEntity getOwnerOrderCostByOwnerOrderNo(String ownerOrderNo);
 }
