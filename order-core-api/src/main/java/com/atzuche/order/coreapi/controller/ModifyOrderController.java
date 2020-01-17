@@ -121,7 +121,7 @@ public class ModifyOrderController {
 	 * 修改前费用计算
 	 * @param modifyOrderAppReq
 	 * @param bindingResult
-	 * @return ResponseData<?>
+	 * @return ResponseData<ModifyOrderCompareVO>
 	 */
 	@PostMapping("/order/modifyorderFee")
 	public ResponseData<ModifyOrderCompareVO> modifyOrderFee(@Valid @RequestBody ModifyOrderAppReq modifyOrderAppReq, BindingResult bindingResult) {
