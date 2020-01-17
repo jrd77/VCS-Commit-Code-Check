@@ -153,6 +153,9 @@ public class OrderDetailService {
     @Autowired
     private OrderFlowService orderFlowService;
 
+    @Autowired
+    private OwnerOrderCostService ownerOrderCostService;
+
 
     public ResponseData<OrderDetailRespDTO> orderDetail(OrderDetailReqDTO orderDetailReqDTO){
         log.info("准备获取订单详情orderDetailReqDTO={}", JSON.toJSONString(orderDetailReqDTO));
@@ -628,6 +631,14 @@ public class OrderDetailService {
             renterOrderSubsidyDetailDTOS.add(renterOrderSubsidyDetailDTO);
         });
 
+        //车主费用
+        OwnerOrderCostEntity ownerOrderCostEntity = ownerOrderCostService.getOwnerOrderCostByOwnerOrderNo(ownerOrderNo);
+        OwnerOrderCostDTO ownerOrderCostDTO = null;
+        if(ownerOrderCostEntity != null){
+            ownerOrderCostDTO = new OwnerOrderCostDTO();
+            BeanUtils.copyProperties(ownerOrderCostEntity,ownerOrderCostDTO);
+        }
+
         OrderDetailRespDTO orderDetailRespDTO = new OrderDetailRespDTO();
         orderDetailRespDTO.order = orderDTO;
         orderDetailRespDTO.renterOrder = renterOrderDTO;
@@ -654,6 +665,7 @@ public class OrderDetailService {
         orderDetailRespDTO.renterOrderFineDeatailList = renterOrderFineDeatailDTOS;
         orderDetailRespDTO.renterOrderSubsidyDetailDTOS = renterOrderSubsidyDetailDTOS;
         orderDetailRespDTO.ownerOrderSubsidyDetailDTOS = ownerOrderSubsidyDetailDTOS;
+        orderDetailRespDTO.ownerOrderCostDTO = ownerOrderCostDTO;
         return orderDetailRespDTO;
     }
 

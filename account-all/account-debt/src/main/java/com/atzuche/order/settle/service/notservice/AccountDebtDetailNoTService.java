@@ -1,5 +1,6 @@
 package com.atzuche.order.settle.service.notservice;
 
+import com.atzuche.order.settle.entity.AccountDebtReceivableaDetailEntity;
 import com.atzuche.order.settle.exception.AccountDeductDebtDBException;
 import com.atzuche.order.settle.exception.AccountInsertDebtDBException;
 import com.atzuche.order.settle.vo.req.AccountDeductDebtReqVO;
@@ -12,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -70,6 +72,7 @@ public class AccountDebtDetailNoTService {
      * @param accountDeductDebt  本次租客 要还欠款总金额 和更新人
      */
     public  List<AccountDebtDetailEntity> getDebtListByDebtAll(List<AccountDebtDetailEntity> accountDebtDetailAlls, AccountDeductDebtReqVO accountDeductDebt) {
+        List<AccountDebtReceivableaDetailEntity> accountDebtReceivableaDetails = new ArrayList<>();
         int amt = accountDeductDebt.getAmt();
         Integer realAmt = NumberUtils.INTEGER_ZERO;
         List<AccountDebtDetailEntity>  accountDebtDetailTodos = new ArrayList<>();
@@ -79,28 +82,53 @@ public class AccountDebtDetailNoTService {
             //  amt >0 表示 租客还款总金额 还有剩余   =0表示欠款记录欠款金额 刚好抵扣完  <0 表示最后一条 欠款信息 存在部分还款
             amt = amt - Math.abs(accountDebtDetailAll.getCurrentDebtAmt());
             if(amt>0){
-                accountDebtDetailAll.setCurrentDebtAmt(NumberUtils.INTEGER_ZERO);
-                accountDebtDetailAll.setRepaidDebtAmt(Math.abs(accountDebtDetailAll.getOrderDebtAmt()));
+                AccountDebtReceivableaDetailEntity entity = new AccountDebtReceivableaDetailEntity();
+                BeanUtils.copyProperties(accountDebtDetailAll,entity);
+                entity.setDebtDetailId(accountDebtDetailAll.getId());
+                entity.setAmt(-accountDebtDetailAll.getCurrentDebtAmt());
+                entity.setTime(LocalDateTime.now());
+                accountDebtReceivableaDetails.add(entity);
+
+                accountDebtDetailAll.setRepaidDebtAmt(accountDebtDetailAll.getRepaidDebtAmt()-accountDebtDetailAll.getCurrentDebtAmt());
                 accountDebtDetailTodos.add(accountDebtDetailAll);
                 realAmt = realAmt + Math.abs(accountDebtDetailAll.getCurrentDebtAmt());
+                accountDebtDetailAll.setCurrentDebtAmt(NumberUtils.INTEGER_ZERO);
             }
             if(amt==0){
-                accountDebtDetailAll.setCurrentDebtAmt(NumberUtils.INTEGER_ZERO);
-                accountDebtDetailAll.setRepaidDebtAmt(Math.abs(accountDebtDetailAll.getOrderDebtAmt()));
+                AccountDebtReceivableaDetailEntity entity = new AccountDebtReceivableaDetailEntity();
+                BeanUtils.copyProperties(accountDebtDetailAll,entity);
+                entity.setDebtDetailId(accountDebtDetailAll.getId());
+                entity.setTime(LocalDateTime.now());
+                entity.setAmt(-accountDebtDetailAll.getCurrentDebtAmt());
+                accountDebtReceivableaDetails.add(entity);
+
+                accountDebtDetailAll.setRepaidDebtAmt(accountDebtDetailAll.getRepaidDebtAmt()-accountDebtDetailAll.getCurrentDebtAmt());
                 accountDebtDetailTodos.add(accountDebtDetailAll);
                 realAmt = realAmt + Math.abs(accountDebtDetailAll.getCurrentDebtAmt());
+                accountDebtDetailAll.setCurrentDebtAmt(NumberUtils.INTEGER_ZERO);
                 break;
             }
             if(amt<0){
-                accountDebtDetailAll.setCurrentDebtAmt(-Math.abs(amt));
-                accountDebtDetailAll.setRepaidDebtAmt(accountDebtDetailAll.getCurrentDebtAmt()-accountDebtDetailAll.getOrderDebtAmt());
+
+                AccountDebtReceivableaDetailEntity entity = new AccountDebtReceivableaDetailEntity();
+                BeanUtils.copyProperties(accountDebtDetailAll,entity);
+                entity.setDebtDetailId(accountDebtDetailAll.getId());
+                entity.setTime(LocalDateTime.now());
+                entity.setAmt(-(accountDebtDetailAll.getCurrentDebtAmt()-amt));
+                accountDebtReceivableaDetails.add(entity);
+
+                accountDebtDetailAll.setRepaidDebtAmt(accountDebtDetailAll.getRepaidDebtAmt()-(accountDebtDetailAll.getCurrentDebtAmt()-amt));
                 accountDebtDetailTodos.add(accountDebtDetailAll);
                 realAmt = realAmt + Math.abs(accountDebtDetailAll.getCurrentDebtAmt()) - Math.abs(amt);
+                accountDebtDetailAll.setCurrentDebtAmt(-Math.abs(amt));
+
+
                 break;
             }
         }
         accountDeductDebt.setRealAmt(realAmt);
         accountDeductDebt.setAmt(accountDeductDebt.getAmt() - accountDeductDebt.getRealAmt());
+        accountDeductDebt.setAccountDebtReceivableaDetails(accountDebtReceivableaDetails);
         return accountDebtDetailTodos;
     }
 }

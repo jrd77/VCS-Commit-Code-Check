@@ -70,12 +70,10 @@ public class AccountDebtService{
         List<AccountDebtDetailEntity> accountDebtDetailAlls =  accountDebtDetailNoTService.getDebtListByMemNo(accountDeductDebt.getMemNo());
         //3 根据租客还款总额  从用户所有待还款记录中 过滤本次 待还款的记录
         List<AccountDebtDetailEntity> accountDebtDetails = accountDebtDetailNoTService.getDebtListByDebtAll(accountDebtDetailAlls,accountDeductDebt);
-        // 4 根据 用户 本次待还记录 返回 欠款收款记录
-        List<AccountDebtReceivableaDetailEntity> accountDebtReceivableaDetails = accountDebtReceivableaDetailNoTService.getDebtReceivableaDetailsByDebtDetails(accountDebtDetails,accountDeductDebt);
         //5更新欠款表 当前欠款数
         accountDebtDetailNoTService.updateAlreadyDeductDebt(accountDebtDetails);
         //6 记录欠款收款详情
-        accountDebtReceivableaDetailNoTService.insertAlreadyReceivablea(accountDebtReceivableaDetails);
+        accountDebtReceivableaDetailNoTService.insertAlreadyReceivablea(accountDeductDebt.getAccountDebtReceivableaDetails());
         //7 更新总欠款表
         accountDebtNoTService.deductAccountDebt(accountDeductDebt);
         return accountDeductDebt.getRealAmt();

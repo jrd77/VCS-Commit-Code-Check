@@ -90,12 +90,14 @@ public class AccountDebtNoTService {
             if(result==0){
                 throw new AccountInsertDebtDBException();
             }
+        }else{
+            int amt = accountDebtEntity.getDebtAmt()-Math.abs(accountInsertDebt.getAmt());
+            accountDebtEntity.setDebtAmt(amt);
+            int result = accountDebtMapper.updateByPrimaryKeySelective(accountDebtEntity);
+            if(result==0){
+                throw new AccountInsertDebtDBException();
+            }
         }
-        int amt = accountDebtEntity.getDebtAmt()-Math.abs(accountInsertDebt.getAmt());
-        accountDebtEntity.setDebtAmt(amt);
-        int result = accountDebtMapper.updateByPrimaryKeySelective(accountDebtEntity);
-        if(result==0){
-            throw new AccountInsertDebtDBException();
-        }
+
     }
 }
