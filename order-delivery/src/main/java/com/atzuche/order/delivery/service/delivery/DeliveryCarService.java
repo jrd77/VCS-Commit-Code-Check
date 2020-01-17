@@ -301,8 +301,8 @@ public class DeliveryCarService {
         orderDeliveryDTO.setOwnerPhone(ownerMemberDTO.getPhone());
         orderDeliveryDTO.setRenterPhone(renterMemberDTO.getPhone());
         orderDeliveryDTO.setRenterOrderNo(renterGoodsDetailDTO.getRenterOrderNo());
-        orderDeliveryDTO.setRentTime(renterGoodsDetailDTO.getRentTime());
-        orderDeliveryDTO.setRevertTime(renterGoodsDetailDTO.getRevertTime());
+        orderDeliveryDTO.setRentTime(orderReqContext.getOrderReqVO().getRentTime());
+        orderDeliveryDTO.setRevertTime(orderReqContext.getOrderReqVO().getRevertTime());
         orderDeliveryDTO.setType(orderType);
         orderDeliveryDTO.setParamsTypeValue(orderReqVO, orderType);
 

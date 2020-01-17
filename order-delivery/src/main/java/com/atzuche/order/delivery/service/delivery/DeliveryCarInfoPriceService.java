@@ -173,7 +173,7 @@ public class DeliveryCarInfoPriceService {
 
 
     /**
-     * 获取取车还车费用
+     * 获取车主取车还车费用
      * @param carType
      * @return
      */
@@ -185,7 +185,6 @@ public class DeliveryCarInfoPriceService {
         distributionCostVO.setReturnAmt(String.valueOf(OwnerFeeCalculatorUtils.calOwnerSrvReturnAmt(carType, 2)));
         return distributionCostVO;
     }
-
 
     /**
      * 设置预环境

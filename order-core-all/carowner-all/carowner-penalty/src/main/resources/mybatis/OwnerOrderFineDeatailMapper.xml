@@ -148,7 +148,7 @@
 	</insert>
 	
 	 
-	<update id="updateByPrimaryKeySelective" parameterType="com.atzuche.order.ownercost.entity.OwnerOrderFineDeatailEntity">
+	<update id="updateByCashNoAndOwnerOrderNo" parameterType="com.atzuche.order.ownercost.entity.OwnerOrderFineDeatailEntity">
 		update owner_order_fine_deatail 
 		    <set>
 				<if test="orderNo != null">`order_no` = #{orderNo}, </if>
@@ -172,7 +172,7 @@
 				<if test="updateOp != null">`update_op` = #{updateOp}, </if>
 				<if test="isDelete != null">`is_delete` = #{isDelete}</if>
 			</set>
-		where id = #{id}
+		where owner_order_no = #{ownerOrderNo} and fineType = #{fineType}
 	</update>
 	
 	<update id="updateByPrimaryKey" parameterType="com.atzuche.order.ownercost.entity.OwnerOrderFineDeatailEntity">
