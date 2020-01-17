@@ -4,8 +4,12 @@ import com.atzuche.order.accountrenterdeposit.entity.AccountRenterDepositEntity;
 import com.atzuche.order.accountrenterdeposit.service.notservice.AccountRenterDepositNoTService;
 
 import com.atzuche.order.accountrenterwzdepost.entity.AccountRenterWzDepositCostEntity;
+import com.atzuche.order.accountrenterwzdepost.entity.AccountRenterWzDepositDetailEntity;
+import com.atzuche.order.accountrenterwzdepost.entity.AccountRenterWzDepositEntity;
 import com.atzuche.order.accountrenterwzdepost.service.notservice.AccountRenterWzDepositCostNoTService;
 
+import com.atzuche.order.accountrenterwzdepost.service.notservice.AccountRenterWzDepositDetailNoTService;
+import com.atzuche.order.accountrenterwzdepost.service.notservice.AccountRenterWzDepositNoTService;
 import com.atzuche.order.cashieraccount.entity.CashierEntity;
 import com.atzuche.order.cashieraccount.service.notservice.CashierNoTService;
 import com.atzuche.order.cashieraccount.vo.res.WzDepositMsgResVO;
@@ -17,6 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Objects;
 
 
@@ -30,31 +35,32 @@ import java.util.Objects;
 @Slf4j
 public class CashierQueryService {
     @Autowired
-    private AccountRenterWzDepositCostNoTService accountRenterWzDepositCostNoTService;
+    private AccountRenterWzDepositNoTService accountRenterWzDepositNoTService;
     @Autowired
     private AccountRenterDepositNoTService accountRenterDepositNoTService;
     @Autowired private CashierNoTService cashierNoTService;
+    @Autowired private AccountRenterWzDepositDetailNoTService accountRenterWzDepositDetailNoTService;
 
 
     /**
      * 查询违章押金
      */
-    public AccountRenterWzDepositCostEntity queryWzDeposit(String orderNo){
-        AccountRenterWzDepositCostEntity entity = accountRenterWzDepositCostNoTService.queryWzDeposit(orderNo);
+    public AccountRenterWzDepositEntity queryWzDeposit(String orderNo){
+        AccountRenterWzDepositEntity entity = accountRenterWzDepositNoTService.getAccountRenterWZDepositByOrder(orderNo);
         return entity;
     }
     public WzDepositMsgResVO queryWzDepositMsg(String orderNo){
         WzDepositMsgResVO result = new WzDepositMsgResVO();
         result.setOrderNo(orderNo);
-        AccountRenterWzDepositCostEntity entity = queryWzDeposit(orderNo);
+        AccountRenterWzDepositEntity entity = queryWzDeposit(orderNo);
         if(Objects.isNull(entity) || Objects.isNull(entity.getOrderNo())){
             return result;
         }
 
-        result.setWzDepositAmt(entity.getShifuAmt());
+        result.setWzDepositAmt(entity.getShishouDeposit());
         result.setReductionAmt(0);
         result.setMemNo(entity.getMemNo());
-        result.setYingshouWzDepositAmt(entity.getYingfuAmt());
+        result.setYingshouWzDepositAmt(entity.getYingshouDeposit());
         CashierEntity cashierEntity = cashierNoTService.getCashierEntity(orderNo,entity.getMemNo(), DataPayKindConstant.DEPOSIT);
 
         if(Objects.nonNull(cashierEntity)){
@@ -62,6 +68,13 @@ public class CashierQueryService {
             result.setPayTime(DateUtils.formate(cashierEntity.getCreateTime(),DateUtils.DATE_DEFAUTE1));
             result.setPayType(PayTypeEnum.getFlagText(cashierEntity.getPayType()));
         }
+
+        List<AccountRenterWzDepositDetailEntity> list = accountRenterWzDepositDetailNoTService.findByOrderNo(orderNo);
+        int wzDepositSurplusAmt = list.stream().mapToInt(AccountRenterWzDepositDetailEntity::getAmt).sum();
+        result.setDebtStatus("成功");
+        result.setWzDepositSurplusAmt(wzDepositSurplusAmt);
+        result.setDebtAmt(0);
+        result.setRefundAmt(entity.getRealReturnDeposit());
         return result;
     }
 

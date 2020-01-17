@@ -28,4 +28,6 @@ public interface AccountRenterWzDepositMapper{
      * @return
      */
     AccountRenterWzDepositEntity selectByOrderAndMemNo(@Param("orderNo") String orderNo, @Param("memNo")String memNo);
+
+    AccountRenterWzDepositEntity selectByOrder(@Param("orderNo")String orderNo);
 }
