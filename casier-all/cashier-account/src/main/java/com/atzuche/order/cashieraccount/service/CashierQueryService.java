@@ -6,6 +6,13 @@ import com.atzuche.order.accountrenterdeposit.service.notservice.AccountRenterDe
 import com.atzuche.order.accountrenterwzdepost.entity.AccountRenterWzDepositCostEntity;
 import com.atzuche.order.accountrenterwzdepost.service.notservice.AccountRenterWzDepositCostNoTService;
 
+import com.atzuche.order.cashieraccount.entity.CashierEntity;
+import com.atzuche.order.cashieraccount.service.notservice.CashierNoTService;
+import com.atzuche.order.cashieraccount.vo.res.WzDepositMsgResVO;
+import com.atzuche.order.commons.DateUtils;
+import com.atzuche.order.commons.enums.cashier.PayTypeEnum;
+import com.atzuche.order.commons.enums.cashier.TransStatusEnum;
+import com.autoyol.autopay.gateway.constant.DataPayKindConstant;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,6 +33,7 @@ public class CashierQueryService {
     private AccountRenterWzDepositCostNoTService accountRenterWzDepositCostNoTService;
     @Autowired
     private AccountRenterDepositNoTService accountRenterDepositNoTService;
+    @Autowired private CashierNoTService cashierNoTService;
 
 
     /**
@@ -35,26 +43,26 @@ public class CashierQueryService {
         AccountRenterWzDepositCostEntity entity = accountRenterWzDepositCostNoTService.queryWzDeposit(orderNo);
         return entity;
     }
+    public WzDepositMsgResVO queryWzDepositMsg(String orderNo){
+        WzDepositMsgResVO result = new WzDepositMsgResVO();
+        result.setOrderNo(orderNo);
+        AccountRenterWzDepositCostEntity entity = queryWzDeposit(orderNo);
+        if(Objects.isNull(entity) || Objects.isNull(entity.getOrderNo())){
+            return result;
+        }
 
-    /**
-     * 查询违章押金实付
-     */
-    public int queryWzDepositShifuAmt(String orderNo){
-        AccountRenterWzDepositCostEntity entity = queryWzDeposit(orderNo);
-        if(Objects.isNull(entity) || Objects.isNull(entity.getShifuAmt())){
-            return 0;
+        result.setWzDepositAmt(entity.getShifuAmt());
+        result.setReductionAmt(0);
+        result.setMemNo(entity.getMemNo());
+        result.setYingshouWzDepositAmt(entity.getYingfuAmt());
+        CashierEntity cashierEntity = cashierNoTService.getCashierEntity(orderNo,entity.getMemNo(), DataPayKindConstant.DEPOSIT);
+
+        if(Objects.nonNull(cashierEntity)){
+            result.setPayStatus("支付成功");
+            result.setPayTime(DateUtils.formate(cashierEntity.getCreateTime(),DateUtils.DATE_DEFAUTE1));
+            result.setPayType(PayTypeEnum.getFlagText(cashierEntity.getPayType()));
         }
-        return entity.getShifuAmt();
-    }
-    /**
-     * 查询违章押金应付
-     */
-    public int queryWzDepositYingfuAmt(String orderNo){
-        AccountRenterWzDepositCostEntity entity = queryWzDeposit(orderNo);
-        if(Objects.isNull(entity) || Objects.isNull(entity.getYingfuAmt())){
-            return 0;
-        }
-        return entity.getYingfuAmt();
+        return result;
     }
 
     /**
@@ -65,24 +73,4 @@ public class CashierQueryService {
         return entity;
     }
 
-    /**
-     * 查询车辆押金实付
-     */
-    public int queryDepositShifuAmt(String orderNo){
-        AccountRenterDepositEntity entity = queryDeposit(orderNo);
-        if(Objects.isNull(entity) || Objects.isNull(entity.getShifuDepositAmt())){
-            return 0;
-        }
-        return entity.getShifuDepositAmt();
-    }
-    /**
-     * 查询车辆押金应付
-     */
-    public int queryDepositYingfuAmt(String orderNo){
-        AccountRenterDepositEntity entity = queryDeposit(orderNo);
-        if(Objects.isNull(entity) || Objects.isNull(entity.getYingfuDepositAmt())){
-            return 0;
-        }
-        return entity.getYingfuDepositAmt();
-    }
 }
