@@ -55,7 +55,7 @@ public enum OsTypeEnum {
      * @param os int value
      * @return OsTypeEnum
      */
-    public OsTypeEnum from(String os) {
+    public static OsTypeEnum from(String os) {
         OsTypeEnum[] osTypes = values();
         for (OsTypeEnum osType : osTypes) {
             if (StringUtils.equals(osType.os, os)) {
