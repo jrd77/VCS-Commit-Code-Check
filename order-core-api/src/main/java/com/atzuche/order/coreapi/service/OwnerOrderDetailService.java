@@ -204,20 +204,23 @@ public class OwnerOrderDetailService {
             BeanUtils.copyProperties(x,orderConsoleCostDetailDTO);
             orderConsoleCostDetailDTOS.add(orderConsoleCostDetailDTO);
         });
-
+        
+        int oilFee = CostStatUtils.calConsoleAmtByCashNo(ConsoleCostCashNoEnum.OIL_FEE, orderConsoleCostDetailDTOS);
         int timeOut = CostStatUtils.calConsoleAmtByCashNo(ConsoleCostCashNoEnum.TIME_OUT, orderConsoleCostDetailDTOS);
         int modifyOrderTimeAndAddrAmt = CostStatUtils.calConsoleAmtByCashNo(ConsoleCostCashNoEnum.MODIFY_ADDR_TIME, orderConsoleCostDetailDTOS);
         int carWash = CostStatUtils.calConsoleAmtByCashNo(ConsoleCostCashNoEnum.CAR_WASH, orderConsoleCostDetailDTOS);
         int dlayWait = CostStatUtils.calConsoleAmtByCashNo(ConsoleCostCashNoEnum.DLAY_WAIT, orderConsoleCostDetailDTOS);
         int stopCar = CostStatUtils.calConsoleAmtByCashNo(ConsoleCostCashNoEnum.STOP_CAR, orderConsoleCostDetailDTOS);
         int extraMileage = CostStatUtils.calConsoleAmtByCashNo(ConsoleCostCashNoEnum.EXTRA_MILEAGE, orderConsoleCostDetailDTOS);
-        OwnerCosts ownerCosts = orderSettleService.preOwnerSettleOrder(orderNo, ownerOrderNo);
-        OwnerOrderPurchaseDetailEntity renterOrderCostDetail = null;
-        if(ownerCosts != null){
-            renterOrderCostDetail = ownerCosts.getRenterOrderCostDetail();
-        }
+        //作为常量，不从计算的结果中获取。
+//        OwnerCosts ownerCosts = orderSettleService.preOwnerSettleOrder(orderNo, ownerOrderNo);
+//        OwnerOrderPurchaseDetailEntity renterOrderCostDetail = null;
+//        if(ownerCosts != null){
+//            renterOrderCostDetail = ownerCosts.getRenterOrderCostDetail();
+//        }
         PlatformToOwnerDTO platformToOwnerDTO = new PlatformToOwnerDTO();
-        platformToOwnerDTO.setOliAmt(renterOrderCostDetail!=null?renterOrderCostDetail.getTotalAmount():0);
+//        platformToOwnerDTO.setOliAmt(renterOrderCostDetail!=null?renterOrderCostDetail.getTotalAmount():0);
+        platformToOwnerDTO.setOliAmt(oilFee);
         platformToOwnerDTO.setTimeOut(timeOut);
         platformToOwnerDTO.setModifyOrderTimeAndAddrAmt(modifyOrderTimeAndAddrAmt);
         platformToOwnerDTO.setCarWash(carWash);

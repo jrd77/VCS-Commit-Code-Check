@@ -3,8 +3,10 @@
  */
 package com.atzuche.order.admin.service;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang.StringUtils;
@@ -14,24 +16,33 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.atzuche.order.admin.vo.req.cost.AdditionalDriverInsuranceIdsReqVO;
+import com.atzuche.order.admin.vo.req.cost.OwnerToPlatformCostReqVO;
 import com.atzuche.order.admin.vo.req.cost.RenterAdjustCostReqVO;
 import com.atzuche.order.admin.vo.req.cost.RenterCostReqVO;
 import com.atzuche.order.admin.vo.req.cost.RenterFineCostReqVO;
 import com.atzuche.order.admin.vo.req.cost.RenterToPlatformCostReqVO;
 import com.atzuche.order.admin.vo.resp.cost.AdditionalDriverInsuranceVO;
-import com.atzuche.order.admin.vo.resp.income.OwnerToPlatFormVO;
+import com.atzuche.order.admin.vo.resp.income.RenterToPlatformVO;
 import com.atzuche.order.admin.vo.resp.order.cost.detail.OrderRenterFineAmtDetailResVO;
 import com.atzuche.order.admin.vo.resp.order.cost.detail.PlatformToRenterSubsidyResVO;
 import com.atzuche.order.admin.vo.resp.order.cost.detail.ReductionDetailResVO;
 import com.atzuche.order.admin.vo.resp.order.cost.detail.ReductionTaskResVO;
 import com.atzuche.order.admin.vo.resp.order.cost.detail.RenterPriceAdjustmentResVO;
-import com.atzuche.order.admin.vo.resp.order.cost.detail.RenterRentAmtResVO;
+import com.atzuche.order.commons.CostStatUtils;
+import com.atzuche.order.commons.GlobalConstant;
+import com.atzuche.order.commons.LocalDateTimeUtils;
 import com.atzuche.order.commons.entity.dto.CommUseDriverInfoDTO;
 import com.atzuche.order.commons.entity.dto.CommUseDriverInfoSimpleDTO;
 import com.atzuche.order.commons.entity.dto.CostBaseDTO;
 import com.atzuche.order.commons.entity.dto.ExtraDriverDTO;
+import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
+import com.atzuche.order.commons.entity.dto.RenterGoodsPriceDetailDTO;
 import com.atzuche.order.commons.entity.dto.RenterMemberDTO;
 import com.atzuche.order.commons.entity.dto.RenterMemberRightDTO;
+import com.atzuche.order.commons.entity.orderDetailDto.OrderConsoleCostDetailDTO;
+import com.atzuche.order.commons.entity.orderDetailDto.OrderDTO;
+import com.atzuche.order.commons.entity.ownerOrderDetail.RenterRentDetailDTO;
+import com.atzuche.order.commons.enums.ConsoleCostCashNoEnum;
 import com.atzuche.order.commons.enums.FineSubsidyCodeEnum;
 import com.atzuche.order.commons.enums.FineSubsidySourceCodeEnum;
 import com.atzuche.order.commons.enums.FineTypeEnum;
@@ -40,12 +51,17 @@ import com.atzuche.order.commons.enums.RightTypeEnum;
 import com.atzuche.order.commons.enums.SubsidySourceCodeEnum;
 import com.atzuche.order.commons.enums.SubsidyTypeCodeEnum;
 import com.atzuche.order.mem.MemProxyService;
+import com.atzuche.order.ownercost.entity.OwnerOrderEntity;
+import com.atzuche.order.ownercost.service.OwnerOrderService;
 import com.atzuche.order.parentorder.entity.OrderEntity;
 import com.atzuche.order.parentorder.service.OrderService;
+import com.atzuche.order.rentercommodity.service.RenterGoodsService;
 import com.atzuche.order.rentercost.entity.ConsoleRenterOrderFineDeatailEntity;
+import com.atzuche.order.rentercost.entity.OrderConsoleCostDetailEntity;
 import com.atzuche.order.rentercost.entity.OrderConsoleSubsidyDetailEntity;
 import com.atzuche.order.rentercost.entity.RenterOrderCostDetailEntity;
 import com.atzuche.order.rentercost.service.ConsoleRenterOrderFineDeatailService;
+import com.atzuche.order.rentercost.service.OrderConsoleCostDetailService;
 import com.atzuche.order.rentercost.service.OrderConsoleSubsidyDetailService;
 import com.atzuche.order.rentercost.service.RenterOrderCostCombineService;
 import com.atzuche.order.rentercost.service.RenterOrderCostDetailService;
@@ -53,6 +69,7 @@ import com.atzuche.order.rentermem.service.RenterMemberService;
 import com.atzuche.order.renterorder.entity.RenterDepositDetailEntity;
 import com.atzuche.order.renterorder.service.RenterAdditionalDriverService;
 import com.atzuche.order.renterorder.service.RenterDepositDetailService;
+import com.atzuche.order.settle.service.OrderSettleService;
 
 /**
  * @author jing.huang
@@ -80,7 +97,16 @@ public class OrderCostDetailService {
     RenterOrderCostDetailService renterOrderCostDetailService;
     @Autowired
     OrderConsoleSubsidyDetailService orderConsoleSubsidyDetailService;
-
+    @Autowired
+    OrderConsoleCostDetailService orderConsoleCostDetailService;
+    @Autowired
+    OrderSettleService orderSettleService;
+    @Autowired
+    RenterGoodsService renterGoodsService;
+    @Autowired
+    OwnerOrderService ownerOrderService;
+    
+    
 	public ReductionDetailResVO findReductionDetailsListByOrderNo(RenterCostReqVO renterCostReqVO) throws Exception {
 		ReductionDetailResVO resVo = new ReductionDetailResVO();
 	     //根据订单号查询会员号
@@ -407,7 +433,7 @@ public class OrderCostDetailService {
 		   CostBaseDTO costBaseDTO = new CostBaseDTO();
 	    	costBaseDTO.setOrderNo(renterCostReqVO.getOrderNo());
 	    	costBaseDTO.setMemNo(orderEntity.getMemNoRenter());
-	    	OrderConsoleSubsidyDetailEntity record = orderConsoleSubsidyDetailService.subsidyDataConvert(costBaseDTO, Integer.valueOf(renterCostReqVO.getRenterToOwnerAdjustAmt()), targetEnum, sourceEnum, SubsidyTypeCodeEnum.ADJUST_AMT, cash);
+	    	OrderConsoleSubsidyDetailEntity record = orderConsoleSubsidyDetailService.buildData(costBaseDTO, Integer.valueOf(renterCostReqVO.getRenterToOwnerAdjustAmt()), targetEnum, sourceEnum, SubsidyTypeCodeEnum.ADJUST_AMT, cash);
 	    	orderConsoleSubsidyDetailService.saveOrUpdateOrderConsoleSubsidyDetailAdjust(record);
 	    	
 	   }else if(StringUtils.isNotBlank(renterCostReqVO.getOwnerToRenterAdjustAmt())) {
@@ -418,7 +444,7 @@ public class OrderCostDetailService {
 		   CostBaseDTO costBaseDTO = new CostBaseDTO();
 	    	costBaseDTO.setOrderNo(renterCostReqVO.getOrderNo());
 	    	costBaseDTO.setMemNo(orderEntity.getMemNoRenter());
-	    	OrderConsoleSubsidyDetailEntity record = orderConsoleSubsidyDetailService.subsidyDataConvert(costBaseDTO, Integer.valueOf(renterCostReqVO.getOwnerToRenterAdjustAmt()), targetEnum, sourceEnum, SubsidyTypeCodeEnum.ADJUST_AMT, cash);
+	    	OrderConsoleSubsidyDetailEntity record = orderConsoleSubsidyDetailService.buildData(costBaseDTO, Integer.valueOf(renterCostReqVO.getOwnerToRenterAdjustAmt()), targetEnum, sourceEnum, SubsidyTypeCodeEnum.ADJUST_AMT, cash);
 	    	orderConsoleSubsidyDetailService.saveOrUpdateOrderConsoleSubsidyDetailAdjust(record);
 	    	
 	   }
@@ -427,29 +453,271 @@ public class OrderCostDetailService {
     	
 	}
 	
-
-
-	public RenterRentAmtResVO findRenterRentAmtListByOrderNo(RenterCostReqVO renterCostReqVO) {
-		// TODO Auto-generated method stub
-		return null;
+	public RenterToPlatformVO findRenterToPlatFormListByOrderNo(RenterCostReqVO renterCostReqVO) throws Exception {
+		//主订单
+	      OrderEntity orderEntity = orderService.getOrderEntity(renterCostReqVO.getOrderNo());
+	      if(orderEntity == null){
+	      	logger.error("获取订单数据为空orderNo={}",renterCostReqVO.getOrderNo());
+	          throw new Exception("获取订单数据为空");
+	      }
+	      
+		String orderNo = renterCostReqVO.getOrderNo();
+		List<OrderConsoleCostDetailEntity> list = orderConsoleCostDetailService.getOrderConsoleCostDetaiByOrderNo(orderNo);
+        List<OrderConsoleCostDetailDTO> orderConsoleCostDetailDTOS = new ArrayList<>();
+        Optional.ofNullable(list).orElseGet(ArrayList::new).forEach(x->{
+            OrderConsoleCostDetailDTO orderConsoleCostDetailDTO = new OrderConsoleCostDetailDTO();
+            try {
+				BeanUtils.copyProperties(x,orderConsoleCostDetailDTO);
+			} catch (Exception e) {
+				logger.error("e:",e);
+			} 
+            orderConsoleCostDetailDTOS.add(orderConsoleCostDetailDTO);
+        });
+        
+        int oil = CostStatUtils.calConsoleAmtByCashNo(ConsoleCostCashNoEnum.RENTER_OIL_FEE, orderConsoleCostDetailDTOS);
+        int timeOut = CostStatUtils.calConsoleAmtByCashNo(ConsoleCostCashNoEnum.RENTER_TIME_OUT, orderConsoleCostDetailDTOS);
+        int modifyOrderTimeAndAddrAmt = CostStatUtils.calConsoleAmtByCashNo(ConsoleCostCashNoEnum.RENTER_MODIFY_ADDR_TIME, orderConsoleCostDetailDTOS);
+        int carWash = CostStatUtils.calConsoleAmtByCashNo(ConsoleCostCashNoEnum.RENTER_CAR_WASH, orderConsoleCostDetailDTOS);
+        int dlayWait = CostStatUtils.calConsoleAmtByCashNo(ConsoleCostCashNoEnum.RENTER_DLAY_WAIT, orderConsoleCostDetailDTOS);
+        int stopCar = CostStatUtils.calConsoleAmtByCashNo(ConsoleCostCashNoEnum.RENTER_STOP_CAR, orderConsoleCostDetailDTOS);
+        int extraMileage = CostStatUtils.calConsoleAmtByCashNo(ConsoleCostCashNoEnum.RENTER_EXTRA_MILEAGE, orderConsoleCostDetailDTOS);
+        
+        //作为常量，不应该跟计算的结果来处理。
+//        com.atzuche.order.settle.vo.req.RentCosts ownerCosts = orderSettleService.preRenterSettleOrder(orderNo, orderEntity.getMemNoRenter());
+//        OwnerOrderPurchaseDetailEntity renterOrderCostDetail = null;
+//        if(ownerCosts != null){
+//            renterOrderCostDetail = ownerCosts.getRenterOrderCostDetail();
+//        }
+        
+        
+        //封装数据
+        RenterToPlatformVO resVo = new RenterToPlatformVO();
+        resVo.setOliAmt(String.valueOf(oil));
+        resVo.setTimeOut(String.valueOf(timeOut));
+        resVo.setModifyOrderTimeAndAddrAmt(String.valueOf(modifyOrderTimeAndAddrAmt));
+        resVo.setCarWash(String.valueOf(carWash));
+        resVo.setDlayWait(String.valueOf(dlayWait));
+        resVo.setStopCar(String.valueOf(stopCar));
+        resVo.setExtraMileage(String.valueOf(extraMileage));
+		return resVo;
 	}
-
-
-
-
-
-
-
-
-	public OwnerToPlatFormVO findRenterToPlatFormListByOrderNo(RenterCostReqVO renterCostReqVO) {
-		// TODO Auto-generated method stub
-		return null;
+	
+	
+	
+	//添加
+	public void updateRenterToPlatFormListByOrderNo(RenterToPlatformCostReqVO renterCostReqVO) throws Exception {
+		CostBaseDTO costBaseDTO = new CostBaseDTO();
+		//根据订单号查询会员号
+		//主订单
+        OrderEntity orderEntity = orderService.getOrderEntity(renterCostReqVO.getOrderNo());
+        if(orderEntity == null){
+        	logger.error("获取订单数据为空orderNo={}",renterCostReqVO.getOrderNo());
+            throw new Exception("获取订单数据为空");
+        }
+        
+		//封装订单号和会员号
+		costBaseDTO.setOrderNo(renterCostReqVO.getOrderNo());
+		costBaseDTO.setMemNo(orderEntity.getMemNoRenter());
+		
+		 String oliAmt = renterCostReqVO.getOliAmt();
+		 String timeOut = renterCostReqVO.getTimeOut();
+		 String modifyOrderTimeAndAddrAmt = renterCostReqVO.getModifyOrderTimeAndAddrAmt();
+		 String carWash = renterCostReqVO.getCarWash();
+		 String dlayWait = renterCostReqVO.getDlayWait();
+		 String stopCar = renterCostReqVO.getStopCar();
+		 String extraMileage = renterCostReqVO.getExtraMileage();
+		    
+		if(StringUtils.isNotBlank(oliAmt)) {
+			OrderConsoleCostDetailEntity record = orderConsoleCostDetailService.buildData(costBaseDTO, Integer.valueOf(oliAmt), SubsidySourceCodeEnum.PLATFORM, SubsidySourceCodeEnum.RENTER, ConsoleCostCashNoEnum.RENTER_OIL_FEE);
+			orderConsoleCostDetailService.saveOrUpdateOrderConsoleCostDetaiByOrderNo(record);
+			
+			//反向记录
+			OrderConsoleCostDetailEntity recordConvert = orderConsoleCostDetailService.buildData(costBaseDTO, -Integer.valueOf(oliAmt), SubsidySourceCodeEnum.RENTER, SubsidySourceCodeEnum.PLATFORM, ConsoleCostCashNoEnum.RENTER_OIL_FEE);
+			orderConsoleCostDetailService.saveOrUpdateOrderConsoleCostDetaiByOrderNo(recordConvert);
+		}
+		
+		if(StringUtils.isNotBlank(timeOut)) {
+			OrderConsoleCostDetailEntity record = orderConsoleCostDetailService.buildData(costBaseDTO, Integer.valueOf(timeOut), SubsidySourceCodeEnum.PLATFORM, SubsidySourceCodeEnum.RENTER, ConsoleCostCashNoEnum.RENTER_TIME_OUT);
+			orderConsoleCostDetailService.saveOrUpdateOrderConsoleCostDetaiByOrderNo(record);
+			
+			//反向记录
+			OrderConsoleCostDetailEntity recordConvert = orderConsoleCostDetailService.buildData(costBaseDTO, -Integer.valueOf(timeOut), SubsidySourceCodeEnum.RENTER, SubsidySourceCodeEnum.PLATFORM, ConsoleCostCashNoEnum.RENTER_TIME_OUT);
+			orderConsoleCostDetailService.saveOrUpdateOrderConsoleCostDetaiByOrderNo(recordConvert);
+		}
+		
+		if(StringUtils.isNotBlank(modifyOrderTimeAndAddrAmt)) {
+			OrderConsoleCostDetailEntity record = orderConsoleCostDetailService.buildData(costBaseDTO, Integer.valueOf(modifyOrderTimeAndAddrAmt), SubsidySourceCodeEnum.PLATFORM, SubsidySourceCodeEnum.RENTER, ConsoleCostCashNoEnum.RENTER_MODIFY_ADDR_TIME);
+			orderConsoleCostDetailService.saveOrUpdateOrderConsoleCostDetaiByOrderNo(record);
+			
+			//反向记录
+			OrderConsoleCostDetailEntity recordConvert = orderConsoleCostDetailService.buildData(costBaseDTO, -Integer.valueOf(modifyOrderTimeAndAddrAmt), SubsidySourceCodeEnum.RENTER, SubsidySourceCodeEnum.PLATFORM, ConsoleCostCashNoEnum.RENTER_MODIFY_ADDR_TIME);
+			orderConsoleCostDetailService.saveOrUpdateOrderConsoleCostDetaiByOrderNo(recordConvert);
+		}
+		
+		if(StringUtils.isNotBlank(carWash)) {
+			OrderConsoleCostDetailEntity record = orderConsoleCostDetailService.buildData(costBaseDTO, Integer.valueOf(carWash), SubsidySourceCodeEnum.PLATFORM, SubsidySourceCodeEnum.RENTER, ConsoleCostCashNoEnum.RENTER_CAR_WASH);
+			orderConsoleCostDetailService.saveOrUpdateOrderConsoleCostDetaiByOrderNo(record);
+			
+			//反向记录
+			OrderConsoleCostDetailEntity recordConvert = orderConsoleCostDetailService.buildData(costBaseDTO, -Integer.valueOf(carWash), SubsidySourceCodeEnum.RENTER, SubsidySourceCodeEnum.PLATFORM, ConsoleCostCashNoEnum.RENTER_CAR_WASH);
+			orderConsoleCostDetailService.saveOrUpdateOrderConsoleCostDetaiByOrderNo(recordConvert);
+		}
+		
+		if(StringUtils.isNotBlank(dlayWait)) {
+			OrderConsoleCostDetailEntity record = orderConsoleCostDetailService.buildData(costBaseDTO, Integer.valueOf(dlayWait), SubsidySourceCodeEnum.PLATFORM, SubsidySourceCodeEnum.RENTER, ConsoleCostCashNoEnum.RENTER_DLAY_WAIT);
+			orderConsoleCostDetailService.saveOrUpdateOrderConsoleCostDetaiByOrderNo(record);
+			
+			//反向记录
+			OrderConsoleCostDetailEntity recordConvert = orderConsoleCostDetailService.buildData(costBaseDTO, -Integer.valueOf(dlayWait), SubsidySourceCodeEnum.RENTER, SubsidySourceCodeEnum.PLATFORM, ConsoleCostCashNoEnum.RENTER_DLAY_WAIT);
+			orderConsoleCostDetailService.saveOrUpdateOrderConsoleCostDetaiByOrderNo(recordConvert);
+		}
+		
+		if(StringUtils.isNotBlank(stopCar)) {
+			OrderConsoleCostDetailEntity record = orderConsoleCostDetailService.buildData(costBaseDTO, Integer.valueOf(stopCar), SubsidySourceCodeEnum.PLATFORM, SubsidySourceCodeEnum.RENTER, ConsoleCostCashNoEnum.RENTER_STOP_CAR);
+			orderConsoleCostDetailService.saveOrUpdateOrderConsoleCostDetaiByOrderNo(record);
+			
+			//反向记录
+			OrderConsoleCostDetailEntity recordConvert = orderConsoleCostDetailService.buildData(costBaseDTO, -Integer.valueOf(stopCar), SubsidySourceCodeEnum.RENTER, SubsidySourceCodeEnum.PLATFORM, ConsoleCostCashNoEnum.RENTER_STOP_CAR);
+			orderConsoleCostDetailService.saveOrUpdateOrderConsoleCostDetaiByOrderNo(recordConvert);
+		}
+		
+		if(StringUtils.isNotBlank(extraMileage)) {
+			OrderConsoleCostDetailEntity record = orderConsoleCostDetailService.buildData(costBaseDTO, Integer.valueOf(extraMileage), SubsidySourceCodeEnum.PLATFORM, SubsidySourceCodeEnum.RENTER, ConsoleCostCashNoEnum.RENTER_EXTRA_MILEAGE);
+			orderConsoleCostDetailService.saveOrUpdateOrderConsoleCostDetaiByOrderNo(record);
+			
+			//反向记录
+			OrderConsoleCostDetailEntity recordConvert = orderConsoleCostDetailService.buildData(costBaseDTO, -Integer.valueOf(extraMileage), SubsidySourceCodeEnum.RENTER, SubsidySourceCodeEnum.PLATFORM, ConsoleCostCashNoEnum.RENTER_EXTRA_MILEAGE);
+			orderConsoleCostDetailService.saveOrUpdateOrderConsoleCostDetaiByOrderNo(recordConvert);
+		}
+		
 	}
+	
+	
+	
+	//添加，车主需支付给平台的费用。
+		public void updateOwnerToPlatFormListByOrderNo(OwnerToPlatformCostReqVO ownerCostReqVO) throws Exception {
+			CostBaseDTO costBaseDTO = new CostBaseDTO();
+			//根据订单号查询会员号
+			//主订单
+//	        OrderEntity orderEntity = orderService.getOrderEntity(ownerCostReqVO.getOrderNo());
+			OwnerOrderEntity orderEntity = ownerOrderService.getOwnerOrderByOwnerOrderNo(ownerCostReqVO.getOwnerOrderNo());
+	        if(orderEntity == null){
+	        	logger.error("获取订单数据(车主)为空orderNo={}",ownerCostReqVO.getOrderNo());
+	            throw new Exception("获取订单数据(车主)为空");
+	        }
+	        
+			//封装订单号和会员号
+			costBaseDTO.setOrderNo(ownerCostReqVO.getOrderNo());
+			costBaseDTO.setMemNo(orderEntity.getMemNo());
+			
+			 String oliAmt = ownerCostReqVO.getOliAmt();
+			 String timeOut = ownerCostReqVO.getTimeOut();
+			 String modifyOrderTimeAndAddrAmt = ownerCostReqVO.getModifyOrderTimeAndAddrAmt();
+			 String carWash = ownerCostReqVO.getCarWash();
+			 String dlayWait = ownerCostReqVO.getDlayWait();
+			 String stopCar = ownerCostReqVO.getStopCar();
+			 String extraMileage = ownerCostReqVO.getExtraMileage();
+			    
+			if(StringUtils.isNotBlank(oliAmt)) {
+				OrderConsoleCostDetailEntity record = orderConsoleCostDetailService.buildData(costBaseDTO, Integer.valueOf(oliAmt), SubsidySourceCodeEnum.PLATFORM, SubsidySourceCodeEnum.OWNER, ConsoleCostCashNoEnum.OIL_FEE);
+				orderConsoleCostDetailService.saveOrUpdateOrderConsoleCostDetaiByOrderNo(record);
+				
+				//反向记录
+				OrderConsoleCostDetailEntity recordConvert = orderConsoleCostDetailService.buildData(costBaseDTO, -Integer.valueOf(oliAmt), SubsidySourceCodeEnum.OWNER, SubsidySourceCodeEnum.PLATFORM, ConsoleCostCashNoEnum.OIL_FEE);
+				orderConsoleCostDetailService.saveOrUpdateOrderConsoleCostDetaiByOrderNo(recordConvert);
+			}
+			
+			if(StringUtils.isNotBlank(timeOut)) {
+				OrderConsoleCostDetailEntity record = orderConsoleCostDetailService.buildData(costBaseDTO, Integer.valueOf(timeOut), SubsidySourceCodeEnum.PLATFORM, SubsidySourceCodeEnum.OWNER, ConsoleCostCashNoEnum.TIME_OUT);
+				orderConsoleCostDetailService.saveOrUpdateOrderConsoleCostDetaiByOrderNo(record);
+				
+				//反向记录
+				OrderConsoleCostDetailEntity recordConvert = orderConsoleCostDetailService.buildData(costBaseDTO, -Integer.valueOf(timeOut), SubsidySourceCodeEnum.OWNER, SubsidySourceCodeEnum.PLATFORM, ConsoleCostCashNoEnum.TIME_OUT);
+				orderConsoleCostDetailService.saveOrUpdateOrderConsoleCostDetaiByOrderNo(recordConvert);
+			}
+			
+			if(StringUtils.isNotBlank(modifyOrderTimeAndAddrAmt)) {
+				OrderConsoleCostDetailEntity record = orderConsoleCostDetailService.buildData(costBaseDTO, Integer.valueOf(modifyOrderTimeAndAddrAmt), SubsidySourceCodeEnum.PLATFORM, SubsidySourceCodeEnum.OWNER, ConsoleCostCashNoEnum.MODIFY_ADDR_TIME);
+				orderConsoleCostDetailService.saveOrUpdateOrderConsoleCostDetaiByOrderNo(record);
+				
+				//反向记录
+				OrderConsoleCostDetailEntity recordConvert = orderConsoleCostDetailService.buildData(costBaseDTO, -Integer.valueOf(modifyOrderTimeAndAddrAmt), SubsidySourceCodeEnum.OWNER, SubsidySourceCodeEnum.PLATFORM, ConsoleCostCashNoEnum.MODIFY_ADDR_TIME);
+				orderConsoleCostDetailService.saveOrUpdateOrderConsoleCostDetaiByOrderNo(recordConvert);
+			}
+			
+			if(StringUtils.isNotBlank(carWash)) {
+				OrderConsoleCostDetailEntity record = orderConsoleCostDetailService.buildData(costBaseDTO, Integer.valueOf(carWash), SubsidySourceCodeEnum.PLATFORM, SubsidySourceCodeEnum.OWNER, ConsoleCostCashNoEnum.CAR_WASH);
+				orderConsoleCostDetailService.saveOrUpdateOrderConsoleCostDetaiByOrderNo(record);
+				
+				//反向记录
+				OrderConsoleCostDetailEntity recordConvert = orderConsoleCostDetailService.buildData(costBaseDTO, -Integer.valueOf(carWash), SubsidySourceCodeEnum.OWNER, SubsidySourceCodeEnum.PLATFORM, ConsoleCostCashNoEnum.CAR_WASH);
+				orderConsoleCostDetailService.saveOrUpdateOrderConsoleCostDetaiByOrderNo(recordConvert);
+			}
+			
+			if(StringUtils.isNotBlank(dlayWait)) {
+				OrderConsoleCostDetailEntity record = orderConsoleCostDetailService.buildData(costBaseDTO, Integer.valueOf(dlayWait), SubsidySourceCodeEnum.PLATFORM, SubsidySourceCodeEnum.OWNER, ConsoleCostCashNoEnum.DLAY_WAIT);
+				orderConsoleCostDetailService.saveOrUpdateOrderConsoleCostDetaiByOrderNo(record);
+				
+				//反向记录
+				OrderConsoleCostDetailEntity recordConvert = orderConsoleCostDetailService.buildData(costBaseDTO, -Integer.valueOf(dlayWait), SubsidySourceCodeEnum.OWNER, SubsidySourceCodeEnum.PLATFORM, ConsoleCostCashNoEnum.DLAY_WAIT);
+				orderConsoleCostDetailService.saveOrUpdateOrderConsoleCostDetaiByOrderNo(recordConvert);
+			}
+			
+			if(StringUtils.isNotBlank(stopCar)) {
+				OrderConsoleCostDetailEntity record = orderConsoleCostDetailService.buildData(costBaseDTO, Integer.valueOf(stopCar), SubsidySourceCodeEnum.PLATFORM, SubsidySourceCodeEnum.OWNER, ConsoleCostCashNoEnum.STOP_CAR);
+				orderConsoleCostDetailService.saveOrUpdateOrderConsoleCostDetaiByOrderNo(record);
+				
+				//反向记录
+				OrderConsoleCostDetailEntity recordConvert = orderConsoleCostDetailService.buildData(costBaseDTO, -Integer.valueOf(stopCar), SubsidySourceCodeEnum.OWNER, SubsidySourceCodeEnum.PLATFORM, ConsoleCostCashNoEnum.STOP_CAR);
+				orderConsoleCostDetailService.saveOrUpdateOrderConsoleCostDetaiByOrderNo(recordConvert);
+			}
+			
+			if(StringUtils.isNotBlank(extraMileage)) {
+				OrderConsoleCostDetailEntity record = orderConsoleCostDetailService.buildData(costBaseDTO, Integer.valueOf(extraMileage), SubsidySourceCodeEnum.PLATFORM, SubsidySourceCodeEnum.OWNER, ConsoleCostCashNoEnum.EXTRA_MILEAGE);
+				orderConsoleCostDetailService.saveOrUpdateOrderConsoleCostDetaiByOrderNo(record);
+				
+				//反向记录
+				OrderConsoleCostDetailEntity recordConvert = orderConsoleCostDetailService.buildData(costBaseDTO, -Integer.valueOf(extraMileage), SubsidySourceCodeEnum.OWNER, SubsidySourceCodeEnum.PLATFORM, ConsoleCostCashNoEnum.EXTRA_MILEAGE);
+				orderConsoleCostDetailService.saveOrUpdateOrderConsoleCostDetaiByOrderNo(recordConvert);
+			}
+			
+		}
+		
+	
+	
 
-	public OwnerToPlatFormVO findRenterToPlatFormListByOrderNo(RenterToPlatformCostReqVO renterCostReqVO) {
-		// TODO Auto-generated method stub
-		return null;
+
+	public RenterRentDetailDTO findRenterRentAmtListByOrderNo(RenterCostReqVO renterCostReqVO) throws Exception {
+      //主订单
+        OrderEntity orderEntity = orderService.getOrderEntity(renterCostReqVO.getOrderNo());
+        if(orderEntity == null){
+        	logger.error("获取订单数据为空orderNo={}",renterCostReqVO.getOrderNo());
+            throw new Exception("获取订单数据为空");
+        }
+        
+        RenterGoodsDetailDTO renterGoodsDetail = renterGoodsService.getRenterGoodsDetail(renterCostReqVO.getRenterOrderNo(), true); 
+        RenterRentDetailDTO renterRentDetailDTO = new RenterRentDetailDTO();
+        if(renterGoodsDetail != null && renterGoodsDetail.getRenterGoodsPriceDetailDTOList()!=null && renterGoodsDetail.getRenterGoodsPriceDetailDTOList().size()>0){
+            List<RenterGoodsPriceDetailDTO> renterGoodsPriceDetailDTOList = renterGoodsDetail.getRenterGoodsPriceDetailDTOList();
+            renterGoodsPriceDetailDTOList
+                   .forEach(x->{
+                       LocalDate carDay = x.getCarDay();
+                       x.setCarDayStr(carDay!=null?LocalDateTimeUtils.localdateToString(carDay):null);
+                   });
+            renterRentDetailDTO.setDayAverageAmt(renterGoodsPriceDetailDTOList.get(0).getCarUnitPrice());
+            renterRentDetailDTO.setRenterGoodsPriceDetailDTOS(renterGoodsPriceDetailDTOList);
+        }
+
+
+        OrderDTO orderDTO = new OrderDTO();
+        BeanUtils.copyProperties(orderEntity,orderDTO);
+        renterRentDetailDTO.setReqTimeStr(orderDTO.getReqTime()!=null? LocalDateTimeUtils.localdateToString(orderDTO.getReqTime(), GlobalConstant.FORMAT_DATE_STR1):null);
+        renterRentDetailDTO.setRevertTimeStr(orderDTO.getExpRevertTime()!=null? LocalDateTimeUtils.localdateToString(orderDTO.getExpRevertTime(), GlobalConstant.FORMAT_DATE_STR1):null);
+        renterRentDetailDTO.setRentTimeStr(orderDTO.getExpRentTime()!=null?LocalDateTimeUtils.localdateToString(orderDTO.getExpRentTime(), GlobalConstant.FORMAT_DATE_STR1):null);
+        
+        return renterRentDetailDTO;
 	}
+	
 	
 	public OrderRenterFineAmtDetailResVO findfineAmtListByOrderNo(RenterCostReqVO renterCostReqVO) throws Exception {
 		OrderRenterFineAmtDetailResVO resVo = new OrderRenterFineAmtDetailResVO();
@@ -538,6 +806,8 @@ public class OrderCostDetailService {
 		}
 		
 	}
+
+
 	
 	
 }

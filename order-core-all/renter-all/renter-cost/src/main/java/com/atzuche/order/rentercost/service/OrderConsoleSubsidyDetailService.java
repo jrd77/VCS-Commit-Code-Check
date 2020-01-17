@@ -36,6 +36,11 @@ public class OrderConsoleSubsidyDetailService{
     	return orderConsoleSubsidyDetailMapper.listOrderConsoleSubsidyDetailByOrderNoAndMemNo(orderNo, memNo);
     }
     
+    /**
+     * 调价的公共方法，在一个方法内完成。
+     * @param record
+     * @return
+     */
     public int saveOrUpdateOrderConsoleSubsidyDetailAdjust(OrderConsoleSubsidyDetailEntity record) {
     	
     	//反向记录  取反向值。
@@ -67,7 +72,7 @@ public class OrderConsoleSubsidyDetailService{
     	CostBaseDTO costBaseDTO = new CostBaseDTO();
     	costBaseDTO.setOrderNo(record.getOrderNo());
     	costBaseDTO.setMemNo(record.getMemNo());
-    	OrderConsoleSubsidyDetailEntity recordConvert = subsidyDataConvert(costBaseDTO, -record.getSubsidyAmount(), targetEnum, sourceEnum, SubsidyTypeCodeEnum.ADJUST_AMT, cashConvert);
+    	OrderConsoleSubsidyDetailEntity recordConvert = buildData(costBaseDTO, -record.getSubsidyAmount(), targetEnum, sourceEnum, SubsidyTypeCodeEnum.ADJUST_AMT, cashConvert);
     	
     	List<OrderConsoleSubsidyDetailEntity> list = listOrderConsoleSubsidyDetailByOrderNoAndMemNo(record.getOrderNo(), record.getMemNo()); 
     	boolean isExists = false;
@@ -108,7 +113,7 @@ public class OrderConsoleSubsidyDetailService{
      * @param type 罚金类型枚举
      * @return ConsoleRenterOrderFineDeatailEntity
      */
-    public OrderConsoleSubsidyDetailEntity subsidyDataConvert(CostBaseDTO costBaseDTO, Integer subsidyAmount, SubsidySourceCodeEnum target, SubsidySourceCodeEnum source, SubsidyTypeCodeEnum type,RenterCashCodeEnum cash) {
+    public OrderConsoleSubsidyDetailEntity buildData(CostBaseDTO costBaseDTO, Integer subsidyAmount, SubsidySourceCodeEnum target, SubsidySourceCodeEnum source, SubsidyTypeCodeEnum type,RenterCashCodeEnum cash) {
         if (subsidyAmount == null || subsidyAmount == 0) {
             return null;
         }

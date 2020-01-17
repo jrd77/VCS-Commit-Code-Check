@@ -40,32 +40,34 @@ public class OwnerOrderDetailController {
         ResponseData<OwnerRentDetailDTO> responseData = ownerOrderDetailService.ownerRentDetail(orderNo,ownerOrderNo);
         return responseData;
     }
-
+    
+    
     /*
      * @Author ZhangBin
      * @Date 2020/1/15 21:29
-     * @Description: 车主租客调价明细
+     * @Description: 车主租客调价明细                      见：/renterPriceAdjustment/list 接口合并。
      * 
      **/
-    @AutoDocMethod(description = "车主租客调价明细", value = "车主租客调价明细", response = RenterOwnerPriceDTO.class)
-    @GetMapping("/console/owner/renterOwnerPrice")
-    public ResponseData<RenterOwnerPriceDTO> renterOwnerPrice(@RequestParam("orderNo") String orderNo, @RequestParam("ownerOrderNo") String ownerOrderNo){
-        if(orderNo == null || orderNo.trim().length()<=0){
-            ResponseData responseData = new ResponseData();
-            responseData.setResCode(ErrorCode.INPUT_ERROR.getCode());
-            responseData.setResMsg("主订单号不能为空");
-            return responseData;
-        }
-
-        if(ownerOrderNo == null || ownerOrderNo.trim().length()<=0){
-            ResponseData responseData = new ResponseData();
-            responseData.setResCode(ErrorCode.INPUT_ERROR.getCode());
-            responseData.setResMsg("车主订单号不能为空");
-            return responseData;
-        }
-        ResponseData<RenterOwnerPriceDTO> responseData = ownerOrderDetailService.renterOwnerPrice(orderNo,ownerOrderNo);
-        return responseData;
-    }
+//    @AutoDocMethod(description = "车主租客调价明细", value = "车主租客调价明细", response = RenterOwnerPriceDTO.class)
+//    @GetMapping("/console/owner/renterOwnerPrice")
+//    public ResponseData<RenterOwnerPriceDTO> renterOwnerPrice(@RequestParam("orderNo") String orderNo, @RequestParam("ownerOrderNo") String ownerOrderNo){
+//        if(orderNo == null || orderNo.trim().length()<=0){
+//            ResponseData responseData = new ResponseData();
+//            responseData.setResCode(ErrorCode.INPUT_ERROR.getCode());
+//            responseData.setResMsg("主订单号不能为空");
+//            return responseData;
+//        }
+//
+//        if(ownerOrderNo == null || ownerOrderNo.trim().length()<=0){
+//            ResponseData responseData = new ResponseData();
+//            responseData.setResCode(ErrorCode.INPUT_ERROR.getCode());
+//            responseData.setResMsg("车主订单号不能为空");
+//            return responseData;
+//        }
+//        ResponseData<RenterOwnerPriceDTO> responseData = ownerOrderDetailService.renterOwnerPrice(orderNo,ownerOrderNo);
+//        return responseData;
+//    }
+    
 
     /*
      * @Author ZhangBin

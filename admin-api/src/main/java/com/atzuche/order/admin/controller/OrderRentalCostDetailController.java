@@ -17,17 +17,18 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.atzuche.order.admin.service.OrderCostDetailService;
 import com.atzuche.order.admin.vo.req.cost.AdditionalDriverInsuranceIdsReqVO;
+import com.atzuche.order.admin.vo.req.cost.OwnerToPlatformCostReqVO;
 import com.atzuche.order.admin.vo.req.cost.RenterAdjustCostReqVO;
 import com.atzuche.order.admin.vo.req.cost.RenterCostReqVO;
 import com.atzuche.order.admin.vo.req.cost.RenterFineCostReqVO;
 import com.atzuche.order.admin.vo.req.cost.RenterToPlatformCostReqVO;
 import com.atzuche.order.admin.vo.resp.cost.AdditionalDriverInsuranceVO;
-import com.atzuche.order.admin.vo.resp.income.OwnerToPlatFormVO;
+import com.atzuche.order.admin.vo.resp.income.RenterToPlatformVO;
 import com.atzuche.order.admin.vo.resp.order.cost.detail.OrderRenterFineAmtDetailResVO;
 import com.atzuche.order.admin.vo.resp.order.cost.detail.PlatformToRenterSubsidyResVO;
 import com.atzuche.order.admin.vo.resp.order.cost.detail.ReductionDetailResVO;
 import com.atzuche.order.admin.vo.resp.order.cost.detail.RenterPriceAdjustmentResVO;
-import com.atzuche.order.admin.vo.resp.order.cost.detail.RenterRentAmtResVO;
+import com.atzuche.order.commons.entity.ownerOrderDetail.RenterRentDetailDTO;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.doc.annotation.AutoDocMethod;
@@ -231,24 +232,22 @@ public class OrderRentalCostDetailController {
     
     
     
-    // --------------------------------------------------------------------------------------------------- 第二阶段 
-    
-    
+
     /**
      * 租客需支付给平台的费用
      * @param rentalCostReqVO
      * @return
      */
-    @AutoDocMethod(description = "租客需支付给平台的费用 查询接口", value = "租客需支付给平台的费用 查询接口",response = OwnerToPlatFormVO.class)
+    @AutoDocMethod(description = "租客需支付给平台的费用 查询接口", value = "租客需支付给平台的费用 查询接口",response = RenterToPlatformVO.class)
     @PostMapping("/renterToPlatForm/list")
-    public ResponseData<?> findRenterToPlatFormListByOrderNo(@RequestBody RenterCostReqVO renterCostReqVO, HttpServletRequest request, HttpServletResponse response,BindingResult bindingResult) {
+    public ResponseData<RenterToPlatformVO> findRenterToPlatFormListByOrderNo(@RequestBody RenterCostReqVO renterCostReqVO, HttpServletRequest request, HttpServletResponse response,BindingResult bindingResult) {
     	logger.info("findRenterToPlatFormListByOrderNo controller params={}",renterCostReqVO.toString());
 		if (bindingResult.hasErrors()) {
             return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), ErrorCode.INPUT_ERROR.getText());
         }
         
         try {
-        	OwnerToPlatFormVO resp = orderCostDetailService.findRenterToPlatFormListByOrderNo(renterCostReqVO);
+        	RenterToPlatformVO resp = orderCostDetailService.findRenterToPlatFormListByOrderNo(renterCostReqVO);
         	return ResponseData.success(resp);
 		} catch (Exception e) {
 			Cat.logError("findRenterToPlatFormListByOrderNo exception params="+renterCostReqVO.toString(),e);
@@ -256,45 +255,46 @@ public class OrderRentalCostDetailController {
 			return ResponseData.error();
 		}
     }
-
+    
+    
     /**
      * 租客需支付给平台的费用
      * @param ownerToPlatFormVO
      * @return
      */
-    @AutoDocMethod(description = "租客需支付给平台的费用 修改接口", value = "租客需支付给平台的费用 修改接口",response = OwnerToPlatFormVO.class)
-    @PostMapping("/ownerToPlatForm/update")
-    public ResponseData<OwnerToPlatFormVO> updateRenterToPlatFormListByOrderNo(@RequestBody RenterToPlatformCostReqVO renterCostReqVO, HttpServletRequest request, HttpServletResponse response,BindingResult bindingResult) {
-    	logger.info("findRenterToPlatFormListByOrderNo controller params={}",renterCostReqVO.toString());
+    @AutoDocMethod(description = "租客需支付给平台的费用 修改接口", value = "租客需支付给平台的费用 修改接口",response = ResponseData.class)
+    @PostMapping("/renterToPlatForm/update")
+    public ResponseData<?> updateRenterToPlatFormListByOrderNo(@RequestBody RenterToPlatformCostReqVO renterCostReqVO, HttpServletRequest request, HttpServletResponse response,BindingResult bindingResult) {
+    	logger.info("updateRenterToPlatFormListByOrderNo controller params={}",renterCostReqVO.toString());
 		if (bindingResult.hasErrors()) {
             return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), ErrorCode.INPUT_ERROR.getText());
         }
         
         try {
-        	OwnerToPlatFormVO resp = orderCostDetailService.findRenterToPlatFormListByOrderNo(renterCostReqVO);
-        	return ResponseData.success(resp);
+        	orderCostDetailService.updateRenterToPlatFormListByOrderNo(renterCostReqVO);
+        	return ResponseData.success();
 		} catch (Exception e) {
-			Cat.logError("findRenterToPlatFormListByOrderNo exception params="+renterCostReqVO.toString(),e);
-			logger.error("findRenterToPlatFormListByOrderNo exception params="+renterCostReqVO.toString(),e);
+			Cat.logError("updateRenterToPlatFormListByOrderNo exception params="+renterCostReqVO.toString(),e);
+			logger.error("updateRenterToPlatFormListByOrderNo exception params="+renterCostReqVO.toString(),e);
 			return ResponseData.error();
 		}
     }
     
     /**
-     *租客租金明细
+     *租客租金明细, 参考车主的租金组成明细。
      * @param rentalCostReqVO
      * @return
      */
-    @AutoDocMethod(description = "租客租金 租金明细接口", value = "租客租金 租金明细接口",response = RenterRentAmtResVO.class)
+    @AutoDocMethod(description = "租客租金 租金明细接口", value = "租客租金 租金明细接口",response = RenterRentDetailDTO.class)
     @PostMapping("/renterRentAmt/list")
-    public ResponseData<RenterRentAmtResVO> findRenterRentAmtListByOrderNo(@RequestBody RenterCostReqVO renterCostReqVO, HttpServletRequest request, HttpServletResponse response,BindingResult bindingResult) {
+    public ResponseData<RenterRentDetailDTO> findRenterRentAmtListByOrderNo(@RequestBody RenterCostReqVO renterCostReqVO, HttpServletRequest request, HttpServletResponse response,BindingResult bindingResult) {
     	logger.info("findTenantRentListByOrderNo controller params={}",renterCostReqVO.toString());
 		if (bindingResult.hasErrors()) {
             return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), ErrorCode.INPUT_ERROR.getText());
         }
         
         try {
-        	RenterRentAmtResVO resp = orderCostDetailService.findRenterRentAmtListByOrderNo(renterCostReqVO);
+        	RenterRentDetailDTO resp = orderCostDetailService.findRenterRentAmtListByOrderNo(renterCostReqVO);
         	return ResponseData.success(resp);
 		} catch (Exception e) {
 			Cat.logError("findRenterRentAmtListByOrderNo exception params="+renterCostReqVO.toString(),e);
@@ -303,5 +303,32 @@ public class OrderRentalCostDetailController {
 		}
     }
     
+    // --------------------------------------------------------------------------------------------------- 第二阶段 
 
+    
+    /**
+     * 车主需支付给平台的费用 @张斌
+     * @param ownerToPlatFormVO
+     * @return
+     */
+    @AutoDocMethod(description = "车主需支付给平台的费用 修改接口", value = "车主需支付给平台的费用 修改接口",response = ResponseData.class)
+    @PostMapping("/ownerToPlatForm/update")
+    public ResponseData<?> updateOwnerToPlatFormListByOrderNo(@RequestBody OwnerToPlatformCostReqVO ownerCostReqVO, HttpServletRequest request, HttpServletResponse response,BindingResult bindingResult) {
+    	logger.info("updateOwnerToPlatFormListByOrderNo controller params={}",ownerCostReqVO.toString());
+		if (bindingResult.hasErrors()) {
+            return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), ErrorCode.INPUT_ERROR.getText());
+        }
+        
+        try {
+        	orderCostDetailService.updateOwnerToPlatFormListByOrderNo(ownerCostReqVO);
+        	return ResponseData.success();
+		} catch (Exception e) {
+			Cat.logError("updateOwnerToPlatFormListByOrderNo exception params="+ownerCostReqVO.toString(),e);
+			logger.error("updateOwnerToPlatFormListByOrderNo exception params="+ownerCostReqVO.toString(),e);
+			return ResponseData.error();
+		}
+    }
+    
+    
+    
 }

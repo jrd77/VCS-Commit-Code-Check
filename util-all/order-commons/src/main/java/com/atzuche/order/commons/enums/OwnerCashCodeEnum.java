@@ -19,7 +19,7 @@ public enum OwnerCashCodeEnum {
 	OWNER_MODIFY_SRV_ADDR_COST("22010027","车主修改取还车地址总费用"),
 	SRV_GET_COST_OWNER("22060039","车主取车服务费"),
 	SRV_RETURN_COST_OWNER("22060040","车主还车服务费"),
-    OWNER_RENTER_PRICE("22060041","租客车主相互调价"),
+    OWNER_RENTER_PRICE("22060041","租客车主相互调价"),  //????
 
     OWNER_MILEAGE_COST_SUBSIDY("12120052","车主超里程补贴"),
     OWNER_OIL_SUBSIDY("12120053","车主油费补贴"),

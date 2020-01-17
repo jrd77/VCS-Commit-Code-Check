@@ -10,14 +10,24 @@ import lombok.Getter;
  **/
 @Getter
 public enum ConsoleCostCashNoEnum {
-
-    TIME_OUT("21010001","超时费用"),
-    CAR_WASH("21010002","车辆清洗费"),
-    DLAY_WAIT("21010003","延误等待费"),
-    STOP_CAR("21010004","停车费"),
-    EXTRA_MILEAGE("21010005","超里程"),
-    MODIFY_ADDR_TIME("21010006","临时修改订单地址时间")
-
+	OIL_FEE("21010000","车主油费"),
+    TIME_OUT("21010001","车主超时费用"),
+    CAR_WASH("21010002","车主车辆清洗费"),
+    DLAY_WAIT("21010003","车主延误等待费"),
+    STOP_CAR("21010004","车主停车费"),
+    EXTRA_MILEAGE("21010005","车主超里程"),
+    MODIFY_ADDR_TIME("21010006","车主临时修改订单地址时间"),
+    
+    
+    //根据type来分
+    RENTER_OIL_FEE("11010000","租客油费"),
+    RENTER_TIME_OUT("11010001","租客超时费用"),
+    RENTER_CAR_WASH("11010002","租客车辆清洗费"),
+    RENTER_DLAY_WAIT("11010003","租客延误等待费"),
+    RENTER_STOP_CAR("11010004","租客停车费"),
+    RENTER_EXTRA_MILEAGE("11010005","租客超里程"),
+    RENTER_MODIFY_ADDR_TIME("11010006","租客临时修改订单地址时间")
+    
     //补贴
     ;
 

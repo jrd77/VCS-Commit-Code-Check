@@ -30,6 +30,10 @@ public class RenterGoodsPriceDetailDTO {
      */
     @AutoDocProperty("天")
     private LocalDate carDay;
+    
+    @AutoDocProperty("天")
+    private String carDayStr;
+    
     /**
      * 天单价
      */
@@ -45,4 +49,8 @@ public class RenterGoodsPriceDetailDTO {
      */
     @AutoDocProperty("还车时间")
     private LocalDateTime revertTime;
+    
+    
+    
+    
 }
