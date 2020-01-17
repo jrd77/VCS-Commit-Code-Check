@@ -9,31 +9,20 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.atzuche.order.coreapi.entity.request.ModifyOrderAppReq;
+import com.atzuche.order.open.vo.ModifyOrderAppReqVO;
 import com.atzuche.order.coreapi.entity.request.ModifyOrderReq;
 import com.atzuche.order.coreapi.entity.request.TransferReq;
-import com.atzuche.order.coreapi.entity.vo.ModifyOrderCompareVO;
+import com.atzuche.order.open.vo.ModifyOrderCompareVO;
 import com.atzuche.order.coreapi.service.ModifyOrderFeeService;
 import com.atzuche.order.coreapi.service.ModifyOrderOwnerConfirmService;
 import com.atzuche.order.coreapi.service.ModifyOrderService;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
-
-import javax.validation.Valid;
-import java.util.Optional;
 
 @RestController
 @Slf4j
@@ -54,7 +43,7 @@ public class ModifyOrderController {
 	 * @return ResponseData
 	 */
 	@PostMapping("/order/modify")
-	public ResponseData<?> modifyOrder(@Valid @RequestBody ModifyOrderAppReq modifyOrderAppReq, BindingResult bindingResult) {
+	public ResponseData<?> modifyOrder(@Valid @RequestBody ModifyOrderAppReqVO modifyOrderAppReq, BindingResult bindingResult) {
 		log.info("修改订单（APP端或H5端）modifyOrderAppReq=[{}]", modifyOrderAppReq);
 		if (bindingResult.hasErrors()) {
             Optional<FieldError> error = bindingResult.getFieldErrors().stream().findFirst();
@@ -138,7 +127,7 @@ public class ModifyOrderController {
 	 * @return ResponseData<ModifyOrderCompareVO>
 	 */
 	@PostMapping("/order/modifyorderFee")
-	public ResponseData<ModifyOrderCompareVO> modifyOrderFee(@Valid @RequestBody ModifyOrderAppReq modifyOrderAppReq, BindingResult bindingResult) {
+	public ResponseData<ModifyOrderCompareVO> modifyOrderFee(@Valid @RequestBody ModifyOrderAppReqVO modifyOrderAppReq, BindingResult bindingResult) {
 		log.info("修改前费用计算modifyOrderAppReq=[{}] ", modifyOrderAppReq);
 		if (bindingResult.hasErrors()) {
             Optional<FieldError> error = bindingResult.getFieldErrors().stream().findFirst();
