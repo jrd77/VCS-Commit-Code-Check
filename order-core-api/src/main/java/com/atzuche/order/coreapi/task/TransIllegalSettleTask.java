@@ -2,7 +2,7 @@ package com.atzuche.order.coreapi.task;
 
 import com.atzuche.order.commons.CatConstants;
 import com.atzuche.order.coreapi.service.OrderSearchRemoteService;
-import com.atzuche.order.renterwz.vo.IllegalToDO;
+import com.atzuche.order.settle.service.OrderWzSettleService;
 import com.dianping.cat.Cat;
 import com.dianping.cat.message.Transaction;
 import com.xxl.job.core.biz.model.ReturnT;
@@ -30,6 +30,10 @@ public class TransIllegalSettleTask extends IJobHandler {
     @Resource
     private OrderSearchRemoteService orderSearchRemoteService;
 
+    @Resource
+    private OrderWzSettleService orderWzSettleService;
+
+
     @Override
     public ReturnT<String> execute(String s) throws Exception {
         Transaction t = Cat.getProducer().newTransaction(CatConstants.XXL_JOB_CALL, "查询按规则配置日期内完成的订单，获取待结算的对象列表 ，查询能否结算");
@@ -48,8 +52,9 @@ public class TransIllegalSettleTask extends IJobHandler {
             XxlJobLogger.log("查询 远程调用 查询按规则配置日期内完成的订单，获取待结算的对象列表 ,查询结果 models:" + list);
 
             if(CollectionUtils.isNotEmpty(list)){
-                //TODO 结算
-
+                for (String orderNo : list) {
+                    orderWzSettleService.settleWzOrder(orderNo);
+                }
             }
             logger.info("结束执行 查询按规则配置日期内完成的订单，获取待结算的对象列表 ，查询能否结算 ");
             XxlJobLogger.log("结束执行 查询按规则配置日期内完成的订单，获取待结算的对象列表 ，查询能否结算 ");

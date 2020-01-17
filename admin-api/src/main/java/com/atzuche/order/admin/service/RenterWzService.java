@@ -4,6 +4,7 @@ import com.atzuche.order.admin.common.AdminUserUtil;
 import com.atzuche.order.admin.vo.req.renterWz.RenterWzCostDetailReqVO;
 import com.atzuche.order.admin.vo.req.renterWz.TemporaryRefundReqVO;
 import com.atzuche.order.admin.vo.resp.renterWz.*;
+import com.atzuche.order.cashieraccount.service.CashierQueryService;
 import com.atzuche.order.commons.CompareHelper;
 import com.atzuche.order.commons.DateUtils;
 import com.atzuche.order.rentercommodity.service.RenterGoodsService;
@@ -45,6 +46,9 @@ public class RenterWzService {
 
     @Resource
     private WzTemporaryRefundLogService wzTemporaryRefundLogService;
+
+    @Resource
+    private CashierQueryService cashierQueryService;
 
     private static final String WZ_OTHER_FINE_REMARK = "其他扣款备注";
     private static final String WZ_OTHER_FINE = "其他扣款";
