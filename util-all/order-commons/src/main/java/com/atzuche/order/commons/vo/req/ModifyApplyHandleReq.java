@@ -1,11 +1,9 @@
-package com.atzuche.order.coreapi.entity.request;
-
-import org.hibernate.validator.constraints.NotBlank;
+package com.atzuche.order.commons.vo.req;
 
 import com.autoyol.doc.annotation.AutoDocProperty;
-
 import lombok.Data;
 import lombok.ToString;
+import org.hibernate.validator.constraints.NotBlank;
 
 @Data
 @ToString
