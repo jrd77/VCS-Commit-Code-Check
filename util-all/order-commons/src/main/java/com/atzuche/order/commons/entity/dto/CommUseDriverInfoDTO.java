@@ -33,8 +33,20 @@ public class CommUseDriverInfoDTO {
 
     @AutoDocProperty(value = "是否认证 0-未认证，1-认证通过，2认证失败")
     private String isAuth;
+    
+    ///附加驾驶人金额
+    private String amt;
+    
+    
+    public String getAmt() {
+		return amt;
+	}
 
-    public Integer getId() {
+	public void setAmt(String amt) {
+		this.amt = amt;
+	}
+
+	public Integer getId() {
         return id;
     }
 

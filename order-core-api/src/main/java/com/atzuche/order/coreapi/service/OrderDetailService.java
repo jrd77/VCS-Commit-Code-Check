@@ -26,6 +26,8 @@ import com.atzuche.order.commons.entity.dto.*;
 import com.atzuche.order.commons.entity.orderDetailDto.*;
 import com.atzuche.order.commons.entity.ownerOrderDetail.*;
 import com.atzuche.order.commons.enums.*;
+import com.atzuche.order.commons.enums.cashcode.OwnerCashCodeEnum;
+import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.coreapi.modifyorder.exception.NoEffectiveErrException;
 import com.atzuche.order.coreapi.submitOrder.exception.OrderDetailException;
 import com.atzuche.order.delivery.entity.OwnerHandoverCarInfoEntity;
@@ -63,14 +65,8 @@ import com.atzuche.order.rentercost.service.RenterOrderCostService;
 import com.atzuche.order.rentercost.service.RenterOrderFineDeatailService;
 import com.atzuche.order.rentercost.service.RenterOrderSubsidyDetailService;
 import com.atzuche.order.rentermem.service.RenterMemberService;
-import com.atzuche.order.renterorder.entity.OrderCouponEntity;
-import com.atzuche.order.renterorder.entity.RenterAdditionalDriverEntity;
-import com.atzuche.order.renterorder.entity.RenterDepositDetailEntity;
-import com.atzuche.order.renterorder.entity.RenterOrderEntity;
-import com.atzuche.order.renterorder.service.OrderCouponService;
-import com.atzuche.order.renterorder.service.RenterAdditionalDriverService;
-import com.atzuche.order.renterorder.service.RenterDepositDetailService;
-import com.atzuche.order.renterorder.service.RenterOrderService;
+import com.atzuche.order.renterorder.entity.*;
+import com.atzuche.order.renterorder.service.*;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
 import lombok.extern.slf4j.Slf4j;
@@ -154,6 +150,8 @@ public class OrderDetailService {
     private DeliveryCarInfoPriceService deliveryCarInfoPriceService;
     @Autowired
     private OrderFlowService orderFlowService;
+    @Autowired
+    private RenterOrderChangeApplyService renterOrderChangeApplyService;
 
     public ResponseData<OrderDetailRespDTO> orderDetail(OrderDetailReqDTO orderDetailReqDTO){
         log.info("准备获取订单详情orderDetailReqDTO={}", JSON.toJSONString(orderDetailReqDTO));
@@ -679,13 +677,22 @@ public class OrderDetailService {
 
         //车主子订单状态
         OwnerOrderEntity ownerOrderEntity = ownerOrderService.getOwnerOrderByOrderNoAndIsEffective(orderNo);
-        OwnerOrderStatusDTO ownerOrderStatusDTO = new OwnerOrderStatusDTO();
-        BeanUtils.copyProperties(ownerOrderEntity,ownerOrderStatusDTO);
+        OwnerOrderStatusDTO ownerOrderStatusDTO = null;
+        if(ownerOrderEntity != null ){
+            ownerOrderStatusDTO = new OwnerOrderStatusDTO();
+            BeanUtils.copyProperties(ownerOrderEntity,ownerOrderStatusDTO);
+        }
 
+        String renterOrderNo = null;
         //租客子订单状态
         RenterOrderEntity renterOrderEntity = renterOrderService.getRenterOrderByOrderNoAndIsEffective(orderNo);
-        RenterOrderStatusDTO renterOrderDTO = new RenterOrderStatusDTO();
-        BeanUtils.copyProperties(renterOrderEntity,renterOrderDTO);
+        RenterOrderStatusDTO renterOrderDTO = null;
+        if(renterOrderEntity != null){
+            renterOrderDTO = new RenterOrderStatusDTO();
+            BeanUtils.copyProperties(renterOrderEntity,renterOrderDTO);
+            renterOrderNo = renterOrderEntity.getRenterOrderNo();
+        }
+
 
         //改变中的租客子订单状态
         RenterOrderEntity changeRenterOrder = renterOrderService.getChangeRenterOrderByOrderNo(orderNo);
@@ -703,13 +710,22 @@ public class OrderDetailService {
             changeOwnerStatus = new OwnerOrderStatusDTO();
             BeanUtils.copyProperties(changeOwner,changeOwnerStatus);
         }
+
+        //申请信息
+        RenterOrderChangeApplyEntity renterOrderChangeApply = null;
+        RenterOrderChangeApplyStatusDTO renterOrderChangeApplyStatusDTO = null;
+        if(renterOrderNo != null){
+            renterOrderChangeApply = renterOrderChangeApplyService.getRenterOrderChangeApplyByRenterOrderNo(renterOrderNo);
+            renterOrderChangeApplyStatusDTO = new RenterOrderChangeApplyStatusDTO();
+            BeanUtils.copyProperties(renterOrderChangeApply,renterOrderChangeApplyStatusDTO);
+        }
         orderStatusRespDTO.orderDTO = orderDTO;
         orderStatusRespDTO.orderStatusDTO = orderStatusDTO;
         orderStatusRespDTO.renterOrderStatusDTO = renterOrderDTO;
         orderStatusRespDTO.ownerOrderStatusDTO = ownerOrderStatusDTO;
         orderStatusRespDTO.renterOrderStatusChangeDTO = changeRenterStaus;
         orderStatusRespDTO.ownerOrderStatusChangeDTO = changeOwnerStatus;
-
+        orderStatusRespDTO.renterOrderChangeApplyStatusDTO = renterOrderChangeApplyStatusDTO;
         return orderStatusRespDTO;
     }
     /*
@@ -912,7 +928,7 @@ public class OrderDetailService {
     }
 
 
-    public ResponseData<List<OrderHistoryDTO>> dispatchHistory(String orderNo) {
+    public ResponseData<OrderHistoryListDTO> dispatchHistory(String orderNo) {
         List<OrderHistoryDTO> orderHistoryDTOS = new ArrayList<>();
         List<RenterOrderEntity> renterOrderEntities = renterOrderService.queryHostiryRenterOrderByOrderNo(orderNo);
         Map<String, RenterGoodsDetailDTO> rentergoodsMap = new HashMap<>();
@@ -985,6 +1001,8 @@ public class OrderDetailService {
                     orderHistoryDTO.choiceCar = ChoiceCarEnum.getNameByCode(renterGoodsDetail.isChoiceCar()==true?1:0);
                     orderHistoryDTOS.add(orderHistoryDTO);
                 });
-        return ResponseData.success(orderHistoryDTOS);
+        OrderHistoryListDTO orderHistoryListDTO = new OrderHistoryListDTO();
+        orderHistoryListDTO.setOrderHistoryList(orderHistoryDTOS);
+        return ResponseData.success(orderHistoryListDTO);
     }
 }

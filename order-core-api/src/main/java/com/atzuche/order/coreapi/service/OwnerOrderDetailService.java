@@ -11,9 +11,9 @@ import com.atzuche.order.commons.entity.orderDetailDto.OwnerOrderFineDeatailDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.OwnerOrderSubsidyDetailDTO;
 import com.atzuche.order.commons.entity.ownerOrderDetail.*;
 import com.atzuche.order.commons.enums.CarOwnerTypeEnum;
-import com.atzuche.order.commons.enums.ConsoleCostCashNoEnum;
-import com.atzuche.order.commons.enums.OwnerCashCodeEnum;
 import com.atzuche.order.commons.enums.OwnerFineTypeEnum;
+import com.atzuche.order.commons.enums.cashcode.ConsoleCashCodeEnum;
+import com.atzuche.order.commons.enums.cashcode.OwnerCashCodeEnum;
 import com.atzuche.order.coreapi.submitOrder.exception.OrderDetailException;
 import com.atzuche.order.owner.commodity.service.OwnerGoodsService;
 import com.atzuche.order.ownercost.entity.OwnerOrderFineDeatailEntity;
@@ -204,20 +204,23 @@ public class OwnerOrderDetailService {
             BeanUtils.copyProperties(x,orderConsoleCostDetailDTO);
             orderConsoleCostDetailDTOS.add(orderConsoleCostDetailDTO);
         });
-
-        int timeOut = CostStatUtils.calConsoleAmtByCashNo(ConsoleCostCashNoEnum.TIME_OUT, orderConsoleCostDetailDTOS);
-        int modifyOrderTimeAndAddrAmt = CostStatUtils.calConsoleAmtByCashNo(ConsoleCostCashNoEnum.MODIFY_ADDR_TIME, orderConsoleCostDetailDTOS);
-        int carWash = CostStatUtils.calConsoleAmtByCashNo(ConsoleCostCashNoEnum.CAR_WASH, orderConsoleCostDetailDTOS);
-        int dlayWait = CostStatUtils.calConsoleAmtByCashNo(ConsoleCostCashNoEnum.DLAY_WAIT, orderConsoleCostDetailDTOS);
-        int stopCar = CostStatUtils.calConsoleAmtByCashNo(ConsoleCostCashNoEnum.STOP_CAR, orderConsoleCostDetailDTOS);
-        int extraMileage = CostStatUtils.calConsoleAmtByCashNo(ConsoleCostCashNoEnum.EXTRA_MILEAGE, orderConsoleCostDetailDTOS);
-        OwnerCosts ownerCosts = orderSettleService.preOwnerSettleOrder(orderNo, ownerOrderNo);
-        OwnerOrderPurchaseDetailEntity renterOrderCostDetail = null;
-        if(ownerCosts != null){
-            renterOrderCostDetail = ownerCosts.getRenterOrderCostDetail();
-        }
+        
+        int oilFee = CostStatUtils.calConsoleAmtByCashNo(ConsoleCashCodeEnum.OIL_FEE, orderConsoleCostDetailDTOS);
+        int timeOut = CostStatUtils.calConsoleAmtByCashNo(ConsoleCashCodeEnum.TIME_OUT, orderConsoleCostDetailDTOS);
+        int modifyOrderTimeAndAddrAmt = CostStatUtils.calConsoleAmtByCashNo(ConsoleCashCodeEnum.MODIFY_ADDR_TIME, orderConsoleCostDetailDTOS);
+        int carWash = CostStatUtils.calConsoleAmtByCashNo(ConsoleCashCodeEnum.CAR_WASH, orderConsoleCostDetailDTOS);
+        int dlayWait = CostStatUtils.calConsoleAmtByCashNo(ConsoleCashCodeEnum.DLAY_WAIT, orderConsoleCostDetailDTOS);
+        int stopCar = CostStatUtils.calConsoleAmtByCashNo(ConsoleCashCodeEnum.STOP_CAR, orderConsoleCostDetailDTOS);
+        int extraMileage = CostStatUtils.calConsoleAmtByCashNo(ConsoleCashCodeEnum.EXTRA_MILEAGE, orderConsoleCostDetailDTOS);
+        //作为常量，不从计算的结果中获取。
+//        OwnerCosts ownerCosts = orderSettleService.preOwnerSettleOrder(orderNo, ownerOrderNo);
+//        OwnerOrderPurchaseDetailEntity renterOrderCostDetail = null;
+//        if(ownerCosts != null){
+//            renterOrderCostDetail = ownerCosts.getRenterOrderCostDetail();
+//        }
         PlatformToOwnerDTO platformToOwnerDTO = new PlatformToOwnerDTO();
-        platformToOwnerDTO.setOliAmt(renterOrderCostDetail!=null?renterOrderCostDetail.getTotalAmount():0);
+//        platformToOwnerDTO.setOliAmt(renterOrderCostDetail!=null?renterOrderCostDetail.getTotalAmount():0);
+        platformToOwnerDTO.setOliAmt(oilFee);
         platformToOwnerDTO.setTimeOut(timeOut);
         platformToOwnerDTO.setModifyOrderTimeAndAddrAmt(modifyOrderTimeAndAddrAmt);
         platformToOwnerDTO.setCarWash(carWash);
