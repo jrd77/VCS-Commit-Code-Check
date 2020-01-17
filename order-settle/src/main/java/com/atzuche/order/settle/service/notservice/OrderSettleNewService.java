@@ -1,5 +1,13 @@
 package com.atzuche.order.settle.service.notservice;
 
+import java.util.List;
+
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
+
 import com.atzuche.order.accountownercost.entity.AccountOwnerCostSettleDetailEntity;
 import com.atzuche.order.accountownercost.service.notservice.AccountOwnerCostSettleDetailNoTService;
 import com.atzuche.order.accountplatorm.entity.AccountPlatformProfitDetailEntity;
@@ -11,22 +19,20 @@ import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostSettleEnt
 import com.atzuche.order.accountrenterrentcost.service.notservice.AccountRenterCostSettleDetailNoTService;
 import com.atzuche.order.cashieraccount.service.CashierSettleService;
 import com.atzuche.order.cashieraccount.service.notservice.CashierNoTService;
-import com.atzuche.order.commons.enums.RenterCashCodeEnum;
-import com.atzuche.order.ownercost.entity.*;
+import com.atzuche.order.commons.enums.cashcode.OwnerCashCodeEnum;
+import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
+import com.atzuche.order.ownercost.entity.OwnerOrderIncrementDetailEntity;
+import com.atzuche.order.ownercost.entity.OwnerOrderPurchaseDetailEntity;
 import com.atzuche.order.parentorder.dto.OrderStatusDTO;
-import com.atzuche.order.rentercost.entity.*;
+import com.atzuche.order.rentercost.entity.RenterOrderCostDetailEntity;
 import com.atzuche.order.settle.exception.OrderSettleFlatAccountException;
-import com.atzuche.order.settle.vo.req.*;
+import com.atzuche.order.settle.vo.req.SettleOrders;
+import com.atzuche.order.settle.vo.req.SettleOrdersAccount;
+import com.atzuche.order.settle.vo.req.SettleOrdersDefinition;
 import com.autoyol.commons.utils.GsonUtils;
 import com.dianping.cat.Cat;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.CollectionUtils;
 
-import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 
 
 @Service
@@ -287,8 +293,8 @@ public class OrderSettleNewService {
         int totalAmount = proxyExpense.getTotalAmount();
         AccountPlatformProfitDetailEntity accountPlatformProfitDetail = new AccountPlatformProfitDetailEntity();
         accountPlatformProfitDetail.setAmt(-totalAmount);
-        accountPlatformProfitDetail.setSourceCode(RenterCashCodeEnum.ACCOUNT_OWNER_PROXY_EXPENSE_COST.getCashNo());
-        accountPlatformProfitDetail.setSourceDesc(RenterCashCodeEnum.ACCOUNT_OWNER_PROXY_EXPENSE_COST.getTxt());
+        accountPlatformProfitDetail.setSourceCode(OwnerCashCodeEnum.ACCOUNT_OWNER_PROXY_EXPENSE_COST.getCashNo());
+        accountPlatformProfitDetail.setSourceDesc(OwnerCashCodeEnum.ACCOUNT_OWNER_PROXY_EXPENSE_COST.getTxt());
         accountPlatformProfitDetail.setUniqueNo(String.valueOf(proxyExpense.getId()));
         accountPlatformProfitDetail.setOrderNo(proxyExpense.getOrderNo());
         settleOrdersDefinition.addPlatformProfit(accountPlatformProfitDetail);
@@ -304,8 +310,8 @@ public class OrderSettleNewService {
         int totalAmount = serviceExpense.getTotalAmount();
         AccountPlatformProfitDetailEntity accountPlatformProfitDetail = new AccountPlatformProfitDetailEntity();
         accountPlatformProfitDetail.setAmt(-totalAmount);
-        accountPlatformProfitDetail.setSourceCode(RenterCashCodeEnum.ACCOUNT_OWNER_SERVICE_EXPENSE_COST.getCashNo());
-        accountPlatformProfitDetail.setSourceDesc(RenterCashCodeEnum.ACCOUNT_OWNER_SERVICE_EXPENSE_COST.getTxt());
+        accountPlatformProfitDetail.setSourceCode(OwnerCashCodeEnum.ACCOUNT_OWNER_SERVICE_EXPENSE_COST.getCashNo());
+        accountPlatformProfitDetail.setSourceDesc(OwnerCashCodeEnum.ACCOUNT_OWNER_SERVICE_EXPENSE_COST.getTxt());
         accountPlatformProfitDetail.setUniqueNo(String.valueOf(serviceExpense.getId()));
         accountPlatformProfitDetail.setOrderNo(serviceExpense.getOrderNo());
         settleOrdersDefinition.addPlatformProfit(accountPlatformProfitDetail);
@@ -320,8 +326,8 @@ public class OrderSettleNewService {
         int totalAmount = renterOrderCostDetail.getTotalAmount();
         AccountPlatformProfitDetailEntity accountPlatformProfitDetail = new AccountPlatformProfitDetailEntity();
         accountPlatformProfitDetail.setAmt(-totalAmount);
-        accountPlatformProfitDetail.setSourceCode(RenterCashCodeEnum.ACCOUNT_OWNER_INCREMENT_COST.getCashNo());
-        accountPlatformProfitDetail.setSourceDesc(RenterCashCodeEnum.ACCOUNT_OWNER_INCREMENT_COST.getTxt());
+        accountPlatformProfitDetail.setSourceCode(OwnerCashCodeEnum.ACCOUNT_OWNER_INCREMENT_COST.getCashNo());
+        accountPlatformProfitDetail.setSourceDesc(OwnerCashCodeEnum.ACCOUNT_OWNER_INCREMENT_COST.getTxt());
         accountPlatformProfitDetail.setUniqueNo(String.valueOf(renterOrderCostDetail.getId()));
         accountPlatformProfitDetail.setOrderNo(renterOrderCostDetail.getOrderNo());
         settleOrdersDefinition.addPlatformProfit(accountPlatformProfitDetail);
@@ -336,8 +342,8 @@ public class OrderSettleNewService {
         int totalAmount = renterOrderCostDetail.getTotalAmount();
         AccountPlatformProfitDetailEntity accountPlatformProfitDetail = new AccountPlatformProfitDetailEntity();
         accountPlatformProfitDetail.setAmt(-totalAmount);
-        accountPlatformProfitDetail.setSourceCode(RenterCashCodeEnum.ACCOUNT_OWNER_GPS_COST.getCashNo());
-        accountPlatformProfitDetail.setSourceDesc(RenterCashCodeEnum.ACCOUNT_OWNER_GPS_COST.getTxt());
+        accountPlatformProfitDetail.setSourceCode(OwnerCashCodeEnum.ACCOUNT_OWNER_GPS_COST.getCashNo());
+        accountPlatformProfitDetail.setSourceDesc(OwnerCashCodeEnum.ACCOUNT_OWNER_GPS_COST.getTxt());
         accountPlatformProfitDetail.setUniqueNo(String.valueOf(renterOrderCostDetail.getId()));
         accountPlatformProfitDetail.setOrderNo(renterOrderCostDetail.getOrderNo());
         settleOrdersDefinition.addPlatformProfit(accountPlatformProfitDetail);

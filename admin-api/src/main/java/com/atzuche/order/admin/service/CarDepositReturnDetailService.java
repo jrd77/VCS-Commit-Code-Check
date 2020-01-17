@@ -11,7 +11,7 @@ import com.atzuche.order.commons.CatConstants;
 import com.atzuche.order.commons.GlobalConstant;
 import com.atzuche.order.commons.LocalDateTimeUtils;
 import com.atzuche.order.commons.entity.orderDetailDto.*;
-import com.atzuche.order.commons.enums.RenterCashCodeEnum;
+import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.commons.enums.cashier.TransStatusEnum;
 import com.atzuche.order.open.service.FeignOrderDetailService;
 import com.autoyol.commons.web.ErrorCode;

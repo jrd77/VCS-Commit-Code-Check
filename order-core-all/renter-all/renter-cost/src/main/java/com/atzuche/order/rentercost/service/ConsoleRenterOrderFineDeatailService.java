@@ -53,6 +53,32 @@ public class ConsoleRenterOrderFineDeatailService{
         }
     	return consoleRenterOrderFineDeatailMapper.insertSelective(consoleFine);
     }
+    
+    //先查询遍历，是否存在。管理后台修改
+    public Integer saveOrUpdateConsoleRenterOrderFineDeatail(ConsoleRenterOrderFineDeatailEntity consoleFine) {
+        if(null == consoleFine) {
+            logger.warn("Not fund console renter order fine data.");
+            return 0;
+        }
+        
+        boolean isExists = false;
+        int id = 0;
+        List<ConsoleRenterOrderFineDeatailEntity> listFine =  consoleRenterOrderFineDeatailMapper.listConsoleRenterOrderFineDeatail(consoleFine.getOrderNo(), consoleFine.getMemNo());
+        for (ConsoleRenterOrderFineDeatailEntity consoleRenterOrderFineDeatailEntity : listFine) {
+			if(consoleFine.getFineType().intValue() == consoleRenterOrderFineDeatailEntity.getFineType().intValue()) {
+				//代表存在
+				isExists = true;
+				id = consoleRenterOrderFineDeatailMapper.updateByPrimaryKeySelective(consoleFine);
+			}
+		}
+        
+        //新增
+        if(!isExists) {
+        	id = consoleRenterOrderFineDeatailMapper.insertSelective(consoleFine);
+        }
+    	return id;
+    }
+    
 
 
     /**

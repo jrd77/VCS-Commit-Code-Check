@@ -7,7 +7,7 @@ import com.atzuche.order.commons.GlobalConstant;
 import com.atzuche.order.commons.LocalDateTimeUtils;
 import com.atzuche.order.commons.entity.dto.CostBaseDTO;
 import com.atzuche.order.commons.entity.dto.GetReturnCarOverCostReqDto;
-import com.atzuche.order.commons.enums.RenterCashCodeEnum;
+import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.transport.common.TransPortErrorCode;
 import com.atzuche.order.transport.entity.RenterOrderCostDetailEntity;
 import com.atzuche.order.transport.exception.OrderTransPortException;

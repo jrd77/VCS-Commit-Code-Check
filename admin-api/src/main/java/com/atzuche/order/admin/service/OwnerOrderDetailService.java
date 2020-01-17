@@ -50,7 +50,13 @@ public class OwnerOrderDetailService {
         }
         return responseObject;
     }
-
+    
+    /**
+     * 接口暂时不用，使用同租客的一套。
+     * @param orderNo
+     * @param ownerOrderNo
+     * @return
+     */
     public ResponseData<RenterOwnerPriceDTO> renterOwnerPrice(String orderNo, String ownerOrderNo) {
         ResponseData<RenterOwnerPriceDTO> responseObject = null;
         Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "获取车主租客调价明细");

@@ -2,7 +2,7 @@ package com.atzuche.order.accountrenterrentcost.service.notservice;
 
 import com.atzuche.order.accountrenterrentcost.exception.AccountRenterRentCostDetailException;
 import com.atzuche.order.accountrenterrentcost.vo.req.AccountRenterCostDetailReqVO;
-import com.atzuche.order.commons.enums.RenterCashCodeEnum;
+import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.commons.enums.cashier.PaySourceEnum;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
