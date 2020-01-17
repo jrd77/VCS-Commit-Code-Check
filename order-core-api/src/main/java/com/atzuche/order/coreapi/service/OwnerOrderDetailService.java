@@ -229,4 +229,12 @@ public class OwnerOrderDetailService {
         platformToOwnerDTO.setExtraMileage(extraMileage);
         return ResponseData.success(platformToOwnerDTO);
     }
+
+    public ResponseData<?> updateFien(FienAmtUpdateReqDTO fienAmtUpdateReqDTO) {
+        OwnerOrderFineDeatailEntity ownerOrderFineDeatailEntity = new OwnerOrderFineDeatailEntity();
+        ownerOrderFineDeatailEntity.setOwnerOrderNo(fienAmtUpdateReqDTO.getOwnerOrderNo());
+
+        ownerOrderFineDeatailService.updateByCashNoAndOwnerOrderNo(ownerOrderFineDeatailEntity);
+        return null;
+    }
 }
