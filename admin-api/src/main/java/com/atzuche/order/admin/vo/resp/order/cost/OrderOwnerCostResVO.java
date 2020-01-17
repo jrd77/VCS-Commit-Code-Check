@@ -76,7 +76,7 @@ public class OrderOwnerCostResVO {
 	@AutoDocProperty(value="车主券实际抵扣金额") ///
 	private String ownerCouponAmt = "0";
 	
-	@AutoDocProperty(value="租客租金补贴金额") ///
+	@AutoDocProperty(value="租客租金补贴金额") ///add 200116
 	private String ownerSubsidyRentAmt = "0";
 	
 	

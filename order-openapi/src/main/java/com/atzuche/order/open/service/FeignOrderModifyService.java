@@ -41,10 +41,19 @@ public interface FeignOrderModifyService {
     @PostMapping("/order/modifyconsole")
     ResponseData<?> modifyOrderForConsole(@Valid @RequestBody ModifyOrderReqVO modifyOrderReqVO);
 
+	/**
+	 * 同意或者拒绝租客的订单申请
+	 * @param req
+	 * @return
+	 */
 	@PostMapping("/order/modifyconfirm")
 	public ResponseData<?> ownerHandleModifyApplication(@Valid @RequestBody ModifyApplyHandleReq req);
 
-
+	/**
+	 * 修改订单前的费用计算
+	 * @param modifyOrderAppReq
+	 * @return
+	 */
 	@PostMapping("/order/modifyorderFee")
-	public ResponseData<ModifyOrderCompareVO> modifyOrderFee(@Valid @RequestBody ModifyOrderAppReqVO modifyOrderAppReq);
+	public ResponseData<ModifyOrderCompareVO> preModifyOrderFee(@Valid @RequestBody ModifyOrderAppReqVO modifyOrderAppReq);
 }

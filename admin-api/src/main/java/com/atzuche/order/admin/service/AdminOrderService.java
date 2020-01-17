@@ -1,21 +1,30 @@
 package com.atzuche.order.admin.service;
 
 import com.alibaba.fastjson.JSON;
+import com.atzuche.order.admin.controller.RenterInfoController;
 import com.atzuche.order.admin.exception.OrderCancelErrException;
 import com.atzuche.order.admin.exception.OrderCancelFailException;
 import com.atzuche.order.admin.exception.OrderModifyErrException;
 import com.atzuche.order.admin.exception.OrderModifyFailException;
+import com.atzuche.order.admin.vo.req.order.AdminModifyOrderReqVO;
 import com.atzuche.order.admin.vo.req.order.CancelOrderByPlatVO;
 import com.atzuche.order.admin.vo.req.order.CancelOrderVO;
 import com.atzuche.order.admin.vo.req.order.OrderModifyConfirmReqVO;
+import com.atzuche.order.admin.vo.resp.order.AdminModifyOrderFeeCompareVO;
+import com.atzuche.order.admin.vo.resp.order.AdminModifyOrderFeeVO;
 import com.atzuche.order.car.RenterCarDetailFailException;
 import com.atzuche.order.commons.CatConstants;
+import com.atzuche.order.commons.entity.orderDetailDto.OrderDetailReqDTO;
+import com.atzuche.order.commons.entity.orderDetailDto.OrderDetailRespDTO;
 import com.atzuche.order.commons.vo.req.AdminOrderCancelReqVO;
 import com.atzuche.order.commons.vo.req.CancelOrderReqVO;
 import com.atzuche.order.commons.vo.req.ModifyApplyHandleReq;
 import com.atzuche.order.commons.vo.req.ModifyOrderReqVO;
+import com.atzuche.order.open.service.FeignOrderDetailService;
 import com.atzuche.order.open.service.FeignOrderModifyService;
 import com.atzuche.order.open.service.FeignOrderUpdateService;
+import com.atzuche.order.open.vo.ModifyOrderAppReqVO;
+import com.atzuche.order.open.vo.ModifyOrderCompareVO;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
 import com.dianping.cat.Cat;
@@ -32,6 +41,9 @@ public class AdminOrderService {
     private FeignOrderUpdateService feignOrderUpdateService;
     @Autowired
     private FeignOrderModifyService feignOrderModifyService;
+
+    @Autowired
+    private FeignOrderDetailService feignOrderDetailService;
 
     public ResponseData cancelOrder(CancelOrderVO cancelOrderVO) {
         CancelOrderReqVO cancelOrderReqVO = new CancelOrderReqVO();
@@ -157,5 +169,79 @@ public class AdminOrderService {
         }finally {
             t.complete();
         }
+    }
+
+    public AdminModifyOrderFeeCompareVO preModifyOrderFee(AdminModifyOrderReqVO reqVO,String renterNo){
+        log.info("preModifyOrderFee method reqVO={},renterNo={}",JSON.toJSONString(reqVO),renterNo);
+        ResponseData<ModifyOrderCompareVO> responseObject = null;
+        Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "订单CoreAPI服务");
+        ModifyOrderAppReqVO modifyOrderAppReqVO = new ModifyOrderAppReqVO();
+        BeanUtils.copyProperties(reqVO,modifyOrderAppReqVO);
+        modifyOrderAppReqVO.setMemNo(renterNo);
+        try{
+            Cat.logEvent(CatConstants.FEIGN_METHOD,"feignOrderDetailService.getOrderDetail");
+            log.info("Feign 获取订单修改前的费用,param={}", JSON.toJSONString(modifyOrderAppReqVO));
+            Cat.logEvent(CatConstants.FEIGN_PARAM,JSON.toJSONString(modifyOrderAppReqVO));
+            responseObject =feignOrderModifyService.preModifyOrderFee(modifyOrderAppReqVO);
+            Cat.logEvent(CatConstants.FEIGN_RESULT,JSON.toJSONString(responseObject));
+            log.info("responseData is {}",JSON.toJSONString(responseObject));
+            if(responseObject==null||!ErrorCode.SUCCESS.getCode().equalsIgnoreCase(responseObject.getResCode())){
+
+                throw new RuntimeException("费用计算异常");
+            }
+            t.setStatus(Transaction.SUCCESS);
+            ModifyOrderCompareVO modifyOrderCompareVO = responseObject.getData();
+
+            AdminModifyOrderFeeCompareVO adminModifyOrderFeeCompareVO = new AdminModifyOrderFeeCompareVO();
+            AdminModifyOrderFeeVO before = new AdminModifyOrderFeeVO();
+            BeanUtils.copyProperties(modifyOrderCompareVO.getInitModifyOrderFeeVO().getModifyOrderCostVO(),before);
+            BeanUtils.copyProperties(modifyOrderCompareVO.getInitModifyOrderFeeVO().getModifyOrderDeductVO(),before);
+            BeanUtils.copyProperties(modifyOrderCompareVO.getInitModifyOrderFeeVO().getModifyOrderFineVO(),before);
+            adminModifyOrderFeeCompareVO.setBefore(before);
+
+            AdminModifyOrderFeeVO after = new AdminModifyOrderFeeVO();
+            BeanUtils.copyProperties(modifyOrderCompareVO.getUpdateModifyOrderFeeVO().getModifyOrderCostVO(),after);
+            BeanUtils.copyProperties(modifyOrderCompareVO.getUpdateModifyOrderFeeVO().getModifyOrderDeductVO(),after);
+            BeanUtils.copyProperties(modifyOrderCompareVO.getUpdateModifyOrderFeeVO().getModifyOrderFineVO(),after);
+            adminModifyOrderFeeCompareVO.setAfter(after);
+            return  adminModifyOrderFeeCompareVO;
+
+        }catch (Exception e){
+            log.error("Feign 获取订单修改前的费用,responseObject={},modifyOrderReq={}",JSON.toJSONString(responseObject),JSON.toJSONString(reqVO),e);
+            Cat.logError("Feign 获取订单修改前的费用",e);
+            throw e;
+        }finally {
+            t.complete();
+        }
+
+    }
+
+    public String getRenterMemNo(String orderNo){
+        OrderDetailReqDTO req = new OrderDetailReqDTO();
+        req.setOrderNo(orderNo);
+        ResponseData<OrderDetailRespDTO> responseObject = null;
+        Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "订单CoreAPI服务");
+
+        try{
+            Cat.logEvent(CatConstants.FEIGN_METHOD,"feignOrderDetailService.getOrderDetail");
+            log.info("Feign 获取订单详情,param={}", JSON.toJSONString(req));
+            Cat.logEvent(CatConstants.FEIGN_PARAM,JSON.toJSONString(req));
+             responseObject =feignOrderDetailService.getOrderDetail(req);
+            Cat.logEvent(CatConstants.FEIGN_RESULT,JSON.toJSONString(responseObject));
+            if(responseObject==null||!ErrorCode.SUCCESS.getCode().equalsIgnoreCase(responseObject.getResCode())){
+                throw new RenterInfoController.RenterNotFoundException(orderNo);
+            }
+            t.setStatus(Transaction.SUCCESS);
+            String memNo = responseObject.getData().getRenterMember().getMemNo();
+            return memNo;
+        }catch (Exception e){
+            log.error("Feign 管理后台替车主操作修改申请,responseObject={},modifyOrderReq={}",JSON.toJSONString(responseObject),JSON.toJSONString(req),e);
+            Cat.logError("Feign 管理后台替车主操作修改申请",e);
+            throw e;
+        }finally {
+            t.complete();
+        }
+
+
     }
 }

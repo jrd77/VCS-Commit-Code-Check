@@ -3,9 +3,11 @@ package com.atzuche.order.admin.controller;
 import com.alibaba.fastjson.JSON;
 import com.atzuche.order.admin.common.AdminUserUtil;
 import com.atzuche.order.admin.service.AdminOrderService;
+import com.atzuche.order.admin.vo.req.order.AdminModifyOrderReqVO;
 import com.atzuche.order.admin.vo.req.order.CancelOrderByPlatVO;
 import com.atzuche.order.admin.vo.req.order.CancelOrderVO;
 import com.atzuche.order.admin.vo.req.order.OrderModifyConfirmReqVO;
+import com.atzuche.order.admin.vo.resp.order.AdminModifyOrderFeeCompareVO;
 import com.atzuche.order.commons.entity.orderDetailDto.OrderDetailReqDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.OrderDetailRespDTO;
 import com.atzuche.order.commons.vo.req.ModifyOrderReqVO;
@@ -110,7 +112,7 @@ public class OrderController {
 
     @AutoDocVersion(version = "订单修改")
     @AutoDocGroup(group = "订单修改")
-    @AutoDocMethod(description = "租客的订单修改申请车主拒绝或者同意接口", value = "租客的订单修改申请车主拒绝或者同意接口",response = ResponseData.class)
+    @AutoDocMethod(description = "车主拒绝或者同意租客的订单修改申请接口", value = "车主拒绝或者同意租客的订单修改申请接口",response = ResponseData.class)
     @RequestMapping(value="console/order/modify/confirm",method = RequestMethod.POST)
     public ResponseData modifyApplicationConfirm(@Valid @RequestBody OrderModifyConfirmReqVO reqVO,BindingResult result){
         if(result.hasErrors()){
@@ -123,6 +125,28 @@ public class OrderController {
         return ResponseData.success();
 
     }
+
+    @AutoDocVersion(version = "订单修改")
+    @AutoDocGroup(group = "订单修改")
+    @AutoDocMethod(description = "订单修改前的费用对比", value = "订单修改前的费用对比",response = AdminModifyOrderFeeCompareVO.class)
+    @RequestMapping(value="console/order/modify/prefee",method = RequestMethod.POST)
+    public ResponseData<AdminModifyOrderFeeCompareVO> preModifyOrder(@Valid @RequestBody AdminModifyOrderReqVO reqVO,BindingResult bindingResult){
+        if(bindingResult.hasErrors()){
+            Optional<FieldError> error = bindingResult.getFieldErrors().stream().findFirst();
+            return ResponseData.createErrorCodeResponse(ErrorCode.INPUT_ERROR.getCode(), error.isPresent() ?
+                    error.get().getDefaultMessage() : ErrorCode.INPUT_ERROR.getText());
+        }
+
+        String renterNo = adminOrderService.getRenterMemNo(reqVO.getOrderNo());
+
+        AdminModifyOrderFeeCompareVO compareVO = adminOrderService.preModifyOrderFee(reqVO,renterNo);
+
+        return ResponseData.success(compareVO);
+
+
+    }
+
+
 
 
 }

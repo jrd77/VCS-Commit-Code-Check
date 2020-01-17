@@ -183,7 +183,7 @@ public class DeliveryCarService {
             BeanUtils.copyProperties(orderDeliveryVO.getOrderDeliveryDTO(), orderDeliveryEntity);
             if (type == DeliveryTypeEnum.ADD_TYPE.getValue().intValue()) {
                 orderDeliveryEntity.setOrderNoDelivery(codeUtils.createDeliveryNumber());
-                orderDeliveryEntity.setAheadOrDelayTimeInfo(getMinutes, returnMinutes);
+                orderDeliveryEntity.setAheadOrDelayTimeInfo(getMinutes, returnMinutes,orderDeliveryVO);
                 orderDeliveryEntity.setStatus(1);
                 renterOrderDeliveryService.insert(orderDeliveryEntity);
                 addHandoverCarInfo(orderDeliveryEntity, getMinutes, returnMinutes, UserTypeEnum.RENTER_TYPE.getValue().intValue());
@@ -242,14 +242,13 @@ public class DeliveryCarService {
         handoverCarInfoDTO.setCreateOp("");
         handoverCarInfoDTO.setOrderNo(orderDeliveryEntity.getOrderNo());
         handoverCarInfoDTO.setRenterOrderNo(orderDeliveryEntity.getRenterOrderNo());
-        handoverCarInfoDTO.setAheadTimeAndType(getMinutes, returnMinutes);
+        handoverCarInfoDTO.setAheadTimeAndType(getMinutes,returnMinutes,orderDeliveryEntity);
         handoverCarInfoDTO.setRealReturnAddr(orderDeliveryEntity.getRenterGetReturnAddr());
         handoverCarInfoDTO.setRealReturnAddrLat(orderDeliveryEntity.getRenterGetReturnAddrLat());
         handoverCarInfoDTO.setRealReturnAddrLon(orderDeliveryEntity.getRenterGetReturnAddrLon());
         handoverCarVO.setHandoverCarInfoDTO(handoverCarInfoDTO);
         handoverCarInfoDTO.setType(orderDeliveryEntity.getType().intValue() == 1 ? 3: 4);
         handoverCarService.addHandoverCarInfo(handoverCarVO, userType);
-
     }
 
     /**
