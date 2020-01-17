@@ -19,6 +19,9 @@ public class RenterWzDetailResVO {
     @AutoDocProperty("订单号")
     private String orderNo;
 
+    @AutoDocProperty("结算状态 0未结算 1已结算")
+    private String settleStatus;
+
     @AutoDocProperty(value="违章押金信息")
     private RenterWzInfoResVO info;
 

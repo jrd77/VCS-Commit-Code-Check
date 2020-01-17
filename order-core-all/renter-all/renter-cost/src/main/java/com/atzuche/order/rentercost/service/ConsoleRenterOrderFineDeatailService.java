@@ -66,9 +66,10 @@ public class ConsoleRenterOrderFineDeatailService{
         List<ConsoleRenterOrderFineDeatailEntity> listFine =  consoleRenterOrderFineDeatailMapper.listConsoleRenterOrderFineDeatail(consoleFine.getOrderNo(), consoleFine.getMemNo());
         for (ConsoleRenterOrderFineDeatailEntity consoleRenterOrderFineDeatailEntity : listFine) {
 			if(consoleFine.getFineType().intValue() == consoleRenterOrderFineDeatailEntity.getFineType().intValue()) {
+				consoleFine.setId(consoleRenterOrderFineDeatailEntity.getId());
+				id = consoleRenterOrderFineDeatailMapper.updateByPrimaryKeySelective(consoleFine);
 				//代表存在
 				isExists = true;
-				id = consoleRenterOrderFineDeatailMapper.updateByPrimaryKeySelective(consoleFine);
 			}
 		}
         

@@ -150,7 +150,7 @@ public class OrderCostDetailService {
 //        RenterMemberDTO renterMemberDTO = memberService.getRenterMemberInfo(orderEntity.getMemNoRenter());
 //        List<RenterMemberRightDTO> renterMemberRightDTOList = renterMemberDTO.getRenterMemberRightDTOList();
         //会员权益,从落库表中获取
-        RenterMemberDTO renterMemberDTO = renterMemberService.selectrenterMemberByRenterOrderNo(orderEntity.getMemNoRenter(), true);
+        RenterMemberDTO renterMemberDTO = renterMemberService.selectrenterMemberByRenterOrderNo(renterCostReqVO.getRenterOrderNo(), true);
         List<RenterMemberRightDTO> renterMemberRightDTOList = renterMemberDTO.getRenterMemberRightDTOList();
         //数据封装
         putTaskRight(reductTaskList,renterMemberRightDTOList);
@@ -167,11 +167,12 @@ public class OrderCostDetailService {
 
 	private void putTaskRight(List<ReductionTaskResVO> reductTaskList,
 			List<RenterMemberRightDTO> renterMemberRightDTOList) {
-		ReductionTaskResVO task = new ReductionTaskResVO();
+		
 		
 		for (RenterMemberRightDTO renterMemberRightDTO : renterMemberRightDTOList) {
 			//任务
 			if(renterMemberRightDTO.getRightType().intValue() == RightTypeEnum.TASK.getCode().intValue()) {
+				ReductionTaskResVO task = new ReductionTaskResVO();
 				task.setReductionItemGetRatio(renterMemberRightDTO.getRightValue());
 				task.setReductionItemName(renterMemberRightDTO.getRightName());
 				task.setReductionItemRule(renterMemberRightDTO.getRightDesc());
@@ -280,8 +281,12 @@ public class OrderCostDetailService {
 		//封装数据
 		RenterOrderCostDetailEntity extraDriverInsureAmtEntity = renterOrderCostCombineService.getExtraDriverInsureAmtEntity(extraDriverDTO);
 		//添加租客费用.
-		renterOrderCostDetailService.saveRenterOrderCostDetail(extraDriverInsureAmtEntity);
-		logger.info("附加驾驶人保险金额SUCCESS");
+		int i = renterOrderCostDetailService.saveOrUpdateRenterOrderCostDetail(extraDriverInsureAmtEntity);
+		if(i>0) {
+			logger.info("附加驾驶人保险金额SUCCESS");
+		}else {
+			logger.info("附加驾驶人保险金额FAILURE");
+		}
 		
 		//添加附加驾驶人记录
         //保存附加驾驶人信息
@@ -291,6 +296,7 @@ public class OrderCostDetailService {
 			dto.setId(commUseDriverInfoDTO.getId());
 			dto.setRealName(commUseDriverInfoDTO.getRealName());
 			dto.setMobile(commUseDriverInfoDTO.getMobile());
+			commUseDriverList.add(dto); //注意封装数据
 		}
         renterAdditionalDriverService.insertBatchAdditionalDriver(renterCostReqVO.getOrderNo(),
         		renterCostReqVO.getRenterOrderNo(),driverIds,commUseDriverList);
@@ -436,7 +442,9 @@ public class OrderCostDetailService {
 	    	OrderConsoleSubsidyDetailEntity record = orderConsoleSubsidyDetailService.buildData(costBaseDTO, Integer.valueOf(renterCostReqVO.getRenterToOwnerAdjustAmt()), targetEnum, sourceEnum, SubsidyTypeCodeEnum.ADJUST_AMT, cash);
 	    	orderConsoleSubsidyDetailService.saveOrUpdateOrderConsoleSubsidyDetailAdjust(record);
 	    	
-	   }else if(StringUtils.isNotBlank(renterCostReqVO.getOwnerToRenterAdjustAmt())) {
+	   }
+	   
+	   if(StringUtils.isNotBlank(renterCostReqVO.getOwnerToRenterAdjustAmt())) {
 		   SubsidySourceCodeEnum targetEnum = SubsidySourceCodeEnum.RENTER;
 		   SubsidySourceCodeEnum sourceEnum = SubsidySourceCodeEnum.OWNER;
 		   RenterCashCodeEnum cash = RenterCashCodeEnum.SUBSIDY_OWNERTORENTER_ADJUST;
