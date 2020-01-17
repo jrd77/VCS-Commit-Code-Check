@@ -985,7 +985,9 @@ public class RenterOrderCostCombineService {
                     Cat.logEvent(CatConstants.FEIGN_METHOD,"GetBackCityLimitFeignApi.isCityServiceLimit");
                     Long rentTimeLong = Long.valueOf(rentTimeLongStr.substring(0, 12));
                     Cat.logEvent(CatConstants.FEIGN_PARAM,"cityCode="+cityCode+"&rentTimeLong="+rentTimeLong);
+                    log.info("判断是否超运能入参:cityCode={},rentTimeLong={}",cityCode,rentTimeLong);
                     getFlgResponse = getBackCityLimitFeignApi.isCityServiceLimit(cityCode, rentTimeLong);
+                    log.info("判断是否超运能入参:cityCode={},rentTimeLong={}，结果：getFlgResponse={}",cityCode,rentTimeLong,JSON.toJSONString(getFlgResponse));
                     Cat.logEvent(CatConstants.FEIGN_RESULT,JSON.toJSONString(getFlgResponse));
                     if(getFlgResponse == null || getFlgResponse.getResCode() == null || !ErrorCode.SUCCESS.getCode().equals(getFlgResponse.getResCode())){
                         GetCarOverCostFailException getCarOverCostFailException = new GetCarOverCostFailException();
@@ -1043,7 +1045,9 @@ public class RenterOrderCostCombineService {
                     Cat.logEvent(CatConstants.FEIGN_METHOD,"GetBackCityLimitFeignApi.isCityServiceLimit");
                     long revertTimeLong = Long.valueOf(revertTimeLongStr.substring(0, 12));
                     Cat.logEvent(CatConstants.FEIGN_PARAM,"cityCode="+cityCode+"&revertTimeLong="+revertTimeLong);
+                    log.info("判断是否超运能入参:cityCode={},rentTimeLong={}",cityCode,revertTimeLong);
                     returnFlgResponse = getBackCityLimitFeignApi.isCityServiceLimit(cityCode, revertTimeLong);
+                    log.info("判断是否超运能入参:cityCode={},rentTimeLong={}，结果：getFlgResponse={}",cityCode,revertTimeLong,JSON.toJSONString(revertTimeLong));
                     Cat.logEvent(CatConstants.FEIGN_RESULT,JSON.toJSONString(returnFlgResponse));
                     if(returnFlgResponse == null || returnFlgResponse.getResCode() == null || !ErrorCode.SUCCESS.getCode().equals(returnFlgResponse.getResCode())){
                         throw new ReturnCarOverCostFailException();
