@@ -59,6 +59,15 @@ public class CashierDeductDebtReqVO {
     private String updateOp;
 
     /**
+     * 支付来源code
+     */
+    private String paySourceCode;
+    /**
+     * 支付来源
+     */
+    private String paySource;
+
+    /**
      * 参数详情
      */
     public void check() {

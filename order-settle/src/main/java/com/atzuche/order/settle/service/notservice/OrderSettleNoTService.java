@@ -1669,6 +1669,8 @@ public class OrderSettleNoTService {
             cashierDeductDebtReq.setAmt(settleCancelOrdersAccount.getRentSurplusWalletAmt());
             cashierDeductDebtReq.setRenterCashCodeEnum(RenterCashCodeEnum.SETTLE_RENT_WALLET_TO_HISTORY_AMT);
             cashierDeductDebtReq.setMemNo(settleOrders.getRenterMemNo());
+            cashierDeductDebtReq.setPaySource(PaySourceEnum.WALLET_PAY.getText());
+            cashierDeductDebtReq.setPaySourceCode(PaySourceEnum.WALLET_PAY.getCode());
             CashierDeductDebtResVO result = cashierService.deductDebtByRentCost(cashierDeductDebtReq);
             if(Objects.nonNull(result)){
                 //已抵扣抵扣金额
