@@ -110,7 +110,7 @@ public class SubmitOrderBeforeCostCalService {
         //抵扣公共信息抽取
         DeductContextDTO deductContext = orderCommonConver.initDeductContext(renterOrderCostRespDTO);
         deductContext.setOsVal(StringUtils.isBlank(orderReqVO.getOS()) ?
-                OsTypeEnum.OTHER.getOsVal() : OsTypeEnum.valueOf(orderReqVO.getOS()).getOsVal());
+                OsTypeEnum.OTHER.getOsVal() : OsTypeEnum.from(orderReqVO.getOS()).getOsVal());
         //车主券抵扣
         CarOwnerCouponReductionVO carOwnerCouponReductionVO =
                 renterOrderCalCostService.getCarOwnerCouponReductionVo(deductContext,
