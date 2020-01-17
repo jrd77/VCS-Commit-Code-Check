@@ -29,14 +29,14 @@ public class OrderStatusEventListener {
     },containerFactory = "rabbitListenerContainerFactory")
     public void process(Message message) {
         log.info("receive order status message: " + new String(message.getBody()));
-        OrderMessage orderMessage = JSONObject.parseObject(message.getBody(),OrderMessage.class);
+        OrderMessage orderMessage = JSONObject.parseObject(message.getBody(), OrderMessage.class);
         log.info("新订单状态总事件监听,入参orderMessage:[{}]", orderMessage.toString());
-            try {
-                sendPlatformSmsService.orderPaySms(orderMessage.getContext(), orderMessage.getPhone(), "大事件備注",null);
-                log.info("新订单status事件成功发送短信,----------->>>>>>内容：{},手机号:{}",orderMessage.getContext(),orderMessage.getPhone());
-            } catch (Exception e) {
-                log.info("新订单status事件发生异常,msg：[{}]",e.getMessage());
-                Cat.logError("新订单status事件发生异常",e);
-            }
+        try {
+            sendPlatformSmsService.orderPaySms(orderMessage.getContext(), orderMessage.getPhone(), "大事件備注", null);
+            log.info("新订单status事件成功发送短信,----------->>>>>>内容：{},手机号:{}", orderMessage.getContext(), orderMessage.getPhone());
+        } catch (Exception e) {
+            log.info("新订单status事件发生异常,msg：[{}]", e.getMessage());
+            Cat.logError("新订单status事件发生异常", e);
+        }
     }
 }
