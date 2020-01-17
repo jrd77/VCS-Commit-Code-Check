@@ -703,6 +703,11 @@ public class OrderDetailService {
             changeOwnerStatus = new OwnerOrderStatusDTO();
             BeanUtils.copyProperties(changeOwner,changeOwnerStatus);
         }
+
+        //申请信息
+
+
+
         orderStatusRespDTO.orderDTO = orderDTO;
         orderStatusRespDTO.orderStatusDTO = orderStatusDTO;
         orderStatusRespDTO.renterOrderStatusDTO = renterOrderDTO;
@@ -912,7 +917,7 @@ public class OrderDetailService {
     }
 
 
-    public ResponseData<List<OrderHistoryDTO>> dispatchHistory(String orderNo) {
+    public ResponseData<OrderHistoryListDTO> dispatchHistory(String orderNo) {
         List<OrderHistoryDTO> orderHistoryDTOS = new ArrayList<>();
         List<RenterOrderEntity> renterOrderEntities = renterOrderService.queryHostiryRenterOrderByOrderNo(orderNo);
         Map<String, RenterGoodsDetailDTO> rentergoodsMap = new HashMap<>();
@@ -985,6 +990,8 @@ public class OrderDetailService {
                     orderHistoryDTO.choiceCar = ChoiceCarEnum.getNameByCode(renterGoodsDetail.isChoiceCar()==true?1:0);
                     orderHistoryDTOS.add(orderHistoryDTO);
                 });
-        return ResponseData.success(orderHistoryDTOS);
+        OrderHistoryListDTO orderHistoryListDTO = new OrderHistoryListDTO();
+        orderHistoryListDTO.setOrderHistoryList(orderHistoryDTOS);
+        return ResponseData.success(orderHistoryListDTO);
     }
 }
