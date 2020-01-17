@@ -28,6 +28,8 @@ import com.atzuche.order.coreapi.utils.BizAreaUtil;
 import com.atzuche.order.delivery.service.delivery.DeliveryCarService;
 import com.atzuche.order.flow.service.OrderFlowService;
 import com.atzuche.order.mem.MemProxyService;
+import com.atzuche.order.mq.common.base.BaseProducer;
+import com.atzuche.order.mq.common.base.OrderMessage;
 import com.atzuche.order.owner.commodity.service.OwnerGoodsService;
 import com.atzuche.order.owner.mem.service.OwnerMemberService;
 import com.atzuche.order.ownercost.entity.OwnerOrderPurchaseDetailEntity;
@@ -53,6 +55,9 @@ import com.atzuche.order.renterwz.service.RenterOrderWzStatusService;
 import com.autoyol.car.api.model.dto.LocationDTO;
 import com.autoyol.car.api.model.dto.OrderInfoDTO;
 import com.autoyol.car.api.model.enums.OrderOperationTypeEnum;
+import com.autoyol.commons.utils.DateUtil;
+import com.autoyol.event.rabbit.neworder.OrderCreateFailMq;
+import com.autoyol.event.rabbit.neworder.OrderCreateMq;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -114,7 +119,10 @@ public class SubmitOrderService {
     @Autowired
     private StockService stockService;
     @Autowired
+    BaseProducer baseProducer;
+    @Autowired
     private RenterOrderWzStatusService renterOrderWzStatusService;
+
 
     /**
      * 提交订单
@@ -287,8 +295,7 @@ public class SubmitOrderService {
 
         //8.订单完成事件发送
         //TODO:发送下单成功事件
-
-
+        sendCreateOrderSuccess(parentOrderDTO.getOrderDTO(),orderReqVO);
         //end 组装接口返回
         OrderResVO orderResVO = new OrderResVO();
         orderResVO.setOrderNo(orderNo);
@@ -563,5 +570,28 @@ public class SubmitOrderService {
         submitOrderRiskCheckReqVO.setReqTime(LocalDateTimeUtils.localDateTimeToDate(reqTime));
         submitOrderRiskCheckReqVO.setWeekendPrice(weekendPrice);
         return submitOrderRiskCheckReqVO;
+    }
+
+    /**
+     * 发送下单事件
+     * @param orderReqVO
+     * @param orderDTO
+     */
+    public void sendCreateOrderSuccess(OrderDTO orderDTO,OrderReqVO orderReqVO){
+        //发送MQ时间
+        OrderCreateMq orderCreateMq = new OrderCreateMq();
+        orderCreateMq.setOrderNo(orderDTO.getOrderNo());
+        orderCreateMq.setBusinessChildType(orderReqVO.getBusinessChildType());
+        orderCreateMq.setCategory(orderReqVO.getOrderCategory());
+        orderCreateMq.setRentTime(DateUtil.asDate(orderReqVO.getRentTime().toLocalDate()));
+        orderCreateMq.setRevertTime(DateUtil.asDate(orderReqVO.getRevertTime().toLocalDate()));
+        orderCreateMq.setMemNo(Integer.valueOf(orderDTO.getMemNoRenter()));
+        orderCreateMq.setPlatformChildType(orderReqVO.getPlatformChildType());
+      //  orderCreateMq.setRiskReqId(orderDTO.getRiskAuditId());
+        OrderMessage orderMessage = OrderMessage.builder().build();
+        orderMessage.setPhone("13628645717");
+        orderMessage.setMessage("订单创建成功");
+        orderMessage.setMessage(orderCreateMq);
+        baseProducer.sendTopicMessage("auto-order-action","action.order.create",orderMessage);
     }
 }
