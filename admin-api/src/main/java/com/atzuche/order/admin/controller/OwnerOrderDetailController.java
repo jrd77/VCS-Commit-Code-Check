@@ -176,7 +176,7 @@ public class OwnerOrderDetailController {
         return responseData;
     }
 
-    @AutoDocMethod(description = "平台给车主的补贴", value = "平台给车的补贴", response = PlatformToOwnerSubsidyDTO.class)
+    @AutoDocMethod(description = "修改违约罚金", value = "修改违约罚金", response = ResponseData.class)
     @PostMapping("/console/owner/updateFien")
     public ResponseData<?> updateFineAmt(@Valid @RequestBody FienAmtUpdateReqDTO fienAmtUpdateReqDTO, BindingResult bindingResult){
         if (bindingResult.hasErrors()) {
