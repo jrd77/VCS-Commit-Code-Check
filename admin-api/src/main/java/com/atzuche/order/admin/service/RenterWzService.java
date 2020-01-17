@@ -261,7 +261,7 @@ public class RenterWzService {
         rs.setWithhold(withhold);
 
         //违章支付信息
-        RenterWzInfoResVO renterWzInfo = this.queryRenterWzInfoByOrderNo(orderNo,wzDepositMsg);
+        RenterWzInfoResVO renterWzInfo = this.queryRenterWzInfoByOrderNo(wzDepositMsg);
         rs.setInfo(renterWzInfo);
 
         return rs;
@@ -298,7 +298,7 @@ public class RenterWzService {
         return result;
     }
 
-    private RenterWzInfoResVO queryRenterWzInfoByOrderNo(String orderNo, WzDepositMsgResVO wzDepositMsg) {
+    private RenterWzInfoResVO queryRenterWzInfoByOrderNo(WzDepositMsgResVO wzDepositMsg) {
         RenterWzInfoResVO result = new RenterWzInfoResVO();
         if(wzDepositMsg == null){
             return result;
