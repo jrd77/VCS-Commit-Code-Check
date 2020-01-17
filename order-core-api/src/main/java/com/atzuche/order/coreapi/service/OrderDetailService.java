@@ -83,6 +83,8 @@ import java.util.stream.Collectors;
 @Service
 public class OrderDetailService {
     @Autowired
+    RenterOrderChangeApplyService renterOrderChangeApplyService;
+    @Autowired
     private OrderService orderService;
     @Autowired
     private RenterOrderService renterOrderService;
@@ -150,8 +152,7 @@ public class OrderDetailService {
     private DeliveryCarInfoPriceService deliveryCarInfoPriceService;
     @Autowired
     private OrderFlowService orderFlowService;
-    @Autowired
-    private RenterOrderChangeApplyService renterOrderChangeApplyService;
+
 
     public ResponseData<OrderDetailRespDTO> orderDetail(OrderDetailReqDTO orderDetailReqDTO){
         log.info("准备获取订单详情orderDetailReqDTO={}", JSON.toJSONString(orderDetailReqDTO));
@@ -1007,5 +1008,20 @@ public class OrderDetailService {
         OrderHistoryListDTO orderHistoryListDTO = new OrderHistoryListDTO();
         orderHistoryListDTO.setOrderHistoryList(orderHistoryDTOS);
         return ResponseData.success(orderHistoryListDTO);
+    }
+
+    /**
+     * 根据申请变更表中租客子订单号或者车主的会员号
+     * @param renterOrderNo
+     * @return
+     */
+    public String getOwnerMemNo(String renterOrderNo){
+        RenterOrderChangeApplyEntity renterOrderChangeApplyEntity = renterOrderChangeApplyService.getRenterOrderChangeApplyByRenterOrderNo(renterOrderNo);
+        String ownerOrderNo = renterOrderChangeApplyEntity.getOwnerOrderNo();
+
+        OwnerOrderEntity ownerOrderEntity = ownerOrderService.getOwnerOrderByOwnerOrderNo(ownerOrderNo);
+
+        return ownerOrderEntity.getMemNo();
+
     }
 }

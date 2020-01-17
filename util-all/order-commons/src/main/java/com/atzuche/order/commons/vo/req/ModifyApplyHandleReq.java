@@ -9,7 +9,7 @@ import org.hibernate.validator.constraints.NotBlank;
 @ToString
 public class ModifyApplyHandleReq {
 
-	@NotBlank(message="车主memNo不能为空")
+//	@NotBlank(message="车主memNo不能为空")
 	@AutoDocProperty(value="车主memNo,必填，",required=true)
 	private String memNo;
 	

@@ -8,9 +8,9 @@ import org.hibernate.validator.constraints.NotBlank;
  * @date 2020/1/17 2:05 下午
  **/
 public class OrderModifyConfirmReqVO {
-    @NotBlank(message="车主memNo不能为空")
-    @AutoDocProperty(value="车主memNo,必填，",required=true)
-    private String memNo;
+//    @NotBlank(message="车主memNo不能为空")
+//    @AutoDocProperty(value="车主memNo,必填，",required=true)
+//    private String memNo;
 
     @NotBlank(message="租客子单号")
     @AutoDocProperty(value="租客子单号,必填，",required=true)
