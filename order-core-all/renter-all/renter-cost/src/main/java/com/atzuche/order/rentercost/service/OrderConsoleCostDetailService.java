@@ -6,9 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.atzuche.order.commons.entity.dto.CostBaseDTO;
-import com.atzuche.order.commons.enums.ConsoleCostCashNoEnum;
 import com.atzuche.order.commons.enums.SubsidySourceCodeEnum;
 import com.atzuche.order.commons.enums.SubsidyTypeCodeEnum;
+import com.atzuche.order.commons.enums.cashcode.ConsoleCashCodeEnum;
 import com.atzuche.order.rentercost.entity.OrderConsoleCostDetailEntity;
 import com.atzuche.order.rentercost.entity.OrderConsoleSubsidyDetailEntity;
 import com.atzuche.order.rentercost.mapper.OrderConsoleCostDetailMapper;
@@ -62,7 +62,7 @@ public class OrderConsoleCostDetailService{
      * @param type 罚金类型枚举
      * @return ConsoleRenterOrderFineDeatailEntity
      */
-    public OrderConsoleCostDetailEntity buildData(CostBaseDTO costBaseDTO, Integer subsidyAmount, SubsidySourceCodeEnum target, SubsidySourceCodeEnum source, ConsoleCostCashNoEnum cash) {
+    public OrderConsoleCostDetailEntity buildData(CostBaseDTO costBaseDTO, Integer subsidyAmount, SubsidySourceCodeEnum target, SubsidySourceCodeEnum source, ConsoleCashCodeEnum cash) {
         if (subsidyAmount == null || subsidyAmount == 0) {
             return null;
         }

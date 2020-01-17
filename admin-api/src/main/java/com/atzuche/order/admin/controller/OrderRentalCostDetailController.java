@@ -49,7 +49,7 @@ public class OrderRentalCostDetailController {
 	OrderCostDetailService orderCostDetailService;
 	
 	@AutoDocMethod(description = "违约罚金 修改违约罚金", value = "违约罚金 修改违约罚金",response = ResponseData.class)
-    @PostMapping("/fineAmt/list")
+    @PostMapping("/fineAmt/update")
     public ResponseData<?> updatefineAmtListByOrderNo(@RequestBody RenterFineCostReqVO renterCostReqVO, HttpServletRequest request, HttpServletResponse response,BindingResult bindingResult) {
     	logger.info("updatefineAmtListByOrderNo controller params={}",renterCostReqVO.toString());
 		if (bindingResult.hasErrors()) {

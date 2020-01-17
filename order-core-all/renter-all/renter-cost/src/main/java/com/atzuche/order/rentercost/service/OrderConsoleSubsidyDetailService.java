@@ -6,9 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.atzuche.order.commons.entity.dto.CostBaseDTO;
-import com.atzuche.order.commons.enums.RenterCashCodeEnum;
 import com.atzuche.order.commons.enums.SubsidySourceCodeEnum;
 import com.atzuche.order.commons.enums.SubsidyTypeCodeEnum;
+import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.rentercost.entity.OrderConsoleSubsidyDetailEntity;
 import com.atzuche.order.rentercost.mapper.OrderConsoleSubsidyDetailMapper;
 
@@ -59,11 +59,11 @@ public class OrderConsoleSubsidyDetailService{
     	}
     	
     	//相同，保持相同
-    	RenterCashCodeEnum cashConvert = RenterCashCodeEnum.subsidy_ownerToRenterAdjust;
+    	RenterCashCodeEnum cashConvert = RenterCashCodeEnum.SUBSIDY_OWNERTORENTER_ADJUST;
     	if(record.getSubsidyCostCode().equals(cashConvert.getCashNo())) {
-    		cashConvert = RenterCashCodeEnum.subsidy_ownerToRenterAdjust;
-    	}else if(record.getSubsidyCostCode().equals(RenterCashCodeEnum.subsidy_renterToOwnerAdjust.getCashNo())) {  //租客给车主的调价
-    		cashConvert = RenterCashCodeEnum.subsidy_renterToOwnerAdjust;
+    		cashConvert = RenterCashCodeEnum.SUBSIDY_OWNERTORENTER_ADJUST;
+    	}else if(record.getSubsidyCostCode().equals(RenterCashCodeEnum.SUBSIDY_RENTERTOOWNER_ADJUST.getCashNo())) {  //租客给车主的调价
+    		cashConvert = RenterCashCodeEnum.SUBSIDY_RENTERTOOWNER_ADJUST;
     	}
     	
     	/**

@@ -1,6 +1,6 @@
 package com.atzuche.order.cashieraccount.vo.res;
 
-import com.atzuche.order.commons.enums.RenterCashCodeEnum;
+import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.commons.enums.cashier.PayTypeEnum;
 import com.autoyol.doc.annotation.AutoDocProperty;
 import com.google.common.collect.ImmutableList;
