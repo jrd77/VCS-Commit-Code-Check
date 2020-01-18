@@ -44,7 +44,7 @@ public class HandoverCarMileageListener {
             t.setStatus(Transaction.SUCCESS);
         } catch (Exception e) {
             t.setStatus(e);
-            Cat.logError("获取车主油耗和里程处理信息MQ 异常, e {}", e);
+            Cat.logError("获取车主油耗和里程处理信息MQ异常, e {}", e);
 
         } finally {
             t.complete();
