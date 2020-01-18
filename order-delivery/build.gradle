@@ -39,5 +39,6 @@ dependencies {
     compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jdk8', version: '2.10.0'
     compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.10.0'
     compile project(":order-mq")
+    compile project(":order-core-all:renter-all:renter-commodity")
 
 }
