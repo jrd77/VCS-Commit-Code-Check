@@ -21,6 +21,9 @@ public class OrderMessage<T> implements Serializable {
 	 */
 	private static final long serialVersionUID = 1L;
 
+    /**
+     * 需要发送的对象数据
+     */
 	private T message;
     /**
      *  参数（发送内容 废弃）
