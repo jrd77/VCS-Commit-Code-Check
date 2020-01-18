@@ -43,6 +43,10 @@ public interface OrderPhotoMapper {
 	 */
 	OrderPhotoEntity queryPhotoInfo(@Param("photoId") String photoId, @Param("photoType") String photoType);
 
+	int addRenYunUploadOrderPhoto(OrderPhotoEntity orderPhotoEntity);
+
+	OrderPhotoEntity selectObjectByParams(OrderPhotoEntity orderPhotoEntity);
+
 
 
 

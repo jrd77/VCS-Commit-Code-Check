@@ -16,6 +16,7 @@ public class OrderPhotoEntity {
 	private LocalDateTime createTime;
 	private LocalDateTime updateTime;
 	private String operator;
+	private Integer serialNumber;
 
 	
 
