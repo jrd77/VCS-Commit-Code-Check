@@ -799,18 +799,6 @@ public class OrderSettleNoTService {
                 accountOwnerCostSettleDetail.setUniqueNo(String.valueOf(orderConsoleSubsidyDetail.getId()));
                 accountOwnerCostSettleDetails.add(accountOwnerCostSettleDetail);
 
-                //罚金来源方 是平台
-                if(SubsidySourceCodeEnum.PLATFORM.getCode().equals(orderConsoleSubsidyDetail.getFineSubsidySourceCode())){
-                    AccountPlatformSubsidyDetailEntity entity = new AccountPlatformSubsidyDetailEntity();
-                    BeanUtils.copyProperties(orderConsoleSubsidyDetail,entity);
-                    entity.setSourceCode(OwnerCashCodeEnum.ACCOUNT_WHOLE_RENTER_FINE_COST.getCashNo());
-                    entity.setSourceDesc(OwnerCashCodeEnum.ACCOUNT_WHOLE_RENTER_FINE_COST.getTxt());
-                    entity.setUniqueNo(String.valueOf(orderConsoleSubsidyDetail.getId()));
-                    entity.setAmt(-fineAmount);
-                    entity.setSubsidyName(SubsidySourceCodeEnum.OWNER.getDesc());
-                    entity.setUniqueNo(String.valueOf(orderConsoleSubsidyDetail.getId()));
-                    settleOrdersDefinition.addPlatformSubsidy(entity);
-                }
                 //罚金补贴方 是平台
                 if(SubsidySourceCodeEnum.PLATFORM.getCode().equals(orderConsoleSubsidyDetail.getFineSubsidyCode())){
                     AccountPlatformProfitDetailEntity entity = new AccountPlatformProfitDetailEntity();
@@ -839,18 +827,18 @@ public class OrderSettleNoTService {
                 accountOwnerCostSettleDetail.setUniqueNo(String.valueOf(ownerOrderFineDeatail.getId()));
                 accountOwnerCostSettleDetails.add(accountOwnerCostSettleDetail);
 
-                //罚金来源方 是平台
-                if(SubsidySourceCodeEnum.PLATFORM.getCode().equals(ownerOrderFineDeatail.getFineSubsidySourceCode())){
-                    AccountPlatformSubsidyDetailEntity entity = new AccountPlatformSubsidyDetailEntity();
-                    BeanUtils.copyProperties(ownerOrderFineDeatail,entity);
-                    entity.setSourceCode(OwnerCashCodeEnum.ACCOUNT_WHOLE_RENTER_FINE_COST.getCashNo());
-                    entity.setSourceDesc(OwnerCashCodeEnum.ACCOUNT_WHOLE_RENTER_FINE_COST.getTxt());
-                    entity.setUniqueNo(String.valueOf(ownerOrderFineDeatail.getId()));
-                    entity.setAmt(-fineAmount);
-                    entity.setUniqueNo(String.valueOf(ownerOrderFineDeatail.getId()));
-                    entity.setSubsidyName(SubsidySourceCodeEnum.OWNER.getDesc());
-                    settleOrdersDefinition.addPlatformSubsidy(entity);
-                }
+//                //罚金来源方 是平台
+//                if(SubsidySourceCodeEnum.PLATFORM.getCode().equals(ownerOrderFineDeatail.getFineSubsidySourceCode())){
+//                    AccountPlatformSubsidyDetailEntity entity = new AccountPlatformSubsidyDetailEntity();
+//                    BeanUtils.copyProperties(ownerOrderFineDeatail,entity);
+//                    entity.setSourceCode(OwnerCashCodeEnum.ACCOUNT_WHOLE_RENTER_FINE_COST.getCashNo());
+//                    entity.setSourceDesc(OwnerCashCodeEnum.ACCOUNT_WHOLE_RENTER_FINE_COST.getTxt());
+//                    entity.setUniqueNo(String.valueOf(ownerOrderFineDeatail.getId()));
+//                    entity.setAmt(-fineAmount);
+//                    entity.setUniqueNo(String.valueOf(ownerOrderFineDeatail.getId()));
+//                    entity.setSubsidyName(SubsidySourceCodeEnum.OWNER.getDesc());
+//                    settleOrdersDefinition.addPlatformSubsidy(entity);
+//                }
                 //罚金补贴方 是平台
                 if(SubsidySourceCodeEnum.PLATFORM.getCode().equals(ownerOrderFineDeatail.getFineSubsidyCode())){
                     AccountPlatformProfitDetailEntity entity = new AccountPlatformProfitDetailEntity();
