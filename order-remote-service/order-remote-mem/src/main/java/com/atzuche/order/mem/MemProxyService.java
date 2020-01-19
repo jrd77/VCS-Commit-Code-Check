@@ -81,6 +81,7 @@ public class MemProxyService {
         }
 
         MemberTotalInfo memberTotalInfo = responseData.getData();
+        log.info("memInfo is {}",JSON.toJSONString(memberTotalInfo));
         MemberAuthInfo memberAuthInfo = memberTotalInfo.getMemberAuthInfo();
         MemberCoreInfo memberCoreInfo = memberTotalInfo.getMemberCoreInfo();
         MemberBaseInfo memberBaseInfo = memberTotalInfo.getMemberBaseInfo();
