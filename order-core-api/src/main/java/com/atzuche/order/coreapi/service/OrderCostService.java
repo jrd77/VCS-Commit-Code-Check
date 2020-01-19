@@ -9,6 +9,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import com.atzuche.order.delivery.vo.delivery.rep.OwnerGetAndReturnCarDTO;
+import com.atzuche.order.delivery.vo.delivery.rep.RenterGetAndReturnCarDTO;
+import com.autoyol.doc.util.StringUtil;
+import com.autoyol.platformcost.model.FeeResult;
 import org.apache.commons.beanutils.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -228,20 +232,24 @@ public class OrderCostService {
 		    /**
 		     * 交接车-油费
 		     */
-		    RenterOrderCostDetailEntity oilAmt = rentCost.getOilAmt();
-		    com.atzuche.order.commons.vo.res.rentcosts.RenterOrderCostDetailEntity oilAmtReal = new com.atzuche.order.commons.vo.res.rentcosts.RenterOrderCostDetailEntity();
-		    if(oilAmt != null) {
-		    	BeanUtils.copyProperties(oilAmtReal, oilAmt);
-		    }
+            RenterGetAndReturnCarDTO oilAmt = rentCost.getOilAmt();
+            com.atzuche.order.commons.vo.res.rentcosts.RenterOrderCostDetailEntity oilAmtReal = new com.atzuche.order.commons.vo.res.rentcosts.RenterOrderCostDetailEntity();
+            if(oilAmt != null) {
+                BeanUtils.copyProperties(oilAmtReal, oilAmt);
+                String oilDifferenceCrash = oilAmt.getOilDifferenceCrash();
+                oilDifferenceCrash = StringUtil.isBlank(oilDifferenceCrash)?"0":oilDifferenceCrash;
+                oilAmtReal.setTotalAmount(Integer.valueOf(oilDifferenceCrash));
+            }
 		    resVo.setOilAmt(oilAmtReal);
 
 		    /**
 		     * 交接车-获取超里程费用
 		     */
-		    RenterOrderCostDetailEntity mileageAmt = rentCost.getMileageAmt();
+            FeeResult mileageAmt = rentCost.getMileageAmt();
 		    com.atzuche.order.commons.vo.res.rentcosts.RenterOrderCostDetailEntity mileageAmtReal = new com.atzuche.order.commons.vo.res.rentcosts.RenterOrderCostDetailEntity();
 		    if(mileageAmt != null) {
 		    	BeanUtils.copyProperties(mileageAmtReal, mileageAmt);
+                mileageAmtReal.setTotalAmount(mileageAmt.getTotalFee());
 		    }
 		    resVo.setMileageAmt(mileageAmtReal);
 		    
@@ -490,11 +498,14 @@ public class OrderCostService {
 	    /**
 	     * 获取车主油费
 	     */
-	     com.atzuche.order.ownercost.entity.OwnerOrderPurchaseDetailEntity renterOrderCostDetail = ownerCosts.getRenterOrderCostDetail();  //海豹命名错误
+	     OwnerGetAndReturnCarDTO renterOrderCostDetail = ownerCosts.getOwnerGetAndReturnCarDTO();  //海豹命名错误
 	     OwnerOrderPurchaseDetailEntity renterOrderCostDetailReal = null;
 	     if(renterOrderCostDetail != null) {
 	    	 renterOrderCostDetailReal = new OwnerOrderPurchaseDetailEntity();
 	    	 BeanUtils.copyProperties(renterOrderCostDetailReal, renterOrderCostDetail);
+             String oilDifferenceCrash = renterOrderCostDetail.getOilDifferenceCrash();
+             oilDifferenceCrash = StringUtil.isBlank(oilDifferenceCrash)?"0":oilDifferenceCrash;
+             renterOrderCostDetailReal.setTotalAmount(Integer.valueOf(oilDifferenceCrash));
 	     }
 	     resVo.setOwnerOrderCostDetail(renterOrderCostDetailReal);
 	    

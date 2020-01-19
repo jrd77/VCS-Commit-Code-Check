@@ -80,7 +80,7 @@ public class OrderRenterCostResVO {
     /**
      * 交接车-获取超里程费用
      */
-    private RenterOrderCostDetailEntity mileageAmt;	
+    private RenterOrderCostDetailEntity mileageAmt;
     
     /**
      * 管理后台补贴

@@ -1,6 +1,8 @@
 package com.atzuche.order.settle.vo.req;
 
+import com.atzuche.order.delivery.vo.delivery.rep.RenterGetAndReturnCarDTO;
 import com.atzuche.order.rentercost.entity.*;
+import com.autoyol.platformcost.model.FeeResult;
 import lombok.Data;
 
 import java.util.List;
@@ -18,12 +20,12 @@ public class RentCosts {
     /**
      * 交接车-油费
      */
-    private RenterOrderCostDetailEntity oilAmt;
+    private RenterGetAndReturnCarDTO oilAmt;
 
     /**
      * 交接车-获取超里程费用
      */
-    private RenterOrderCostDetailEntity mileageAmt;
+    private FeeResult mileageAmt;
 
     /**
      * 补贴
