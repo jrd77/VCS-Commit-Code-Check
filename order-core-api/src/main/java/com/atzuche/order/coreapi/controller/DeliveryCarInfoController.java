@@ -84,7 +84,7 @@ public class DeliveryCarInfoController {
     }
 
     /**
-     * 获取取还车费用
+     * 获取车主取还车费用
      * @param carType
      * @return
      */

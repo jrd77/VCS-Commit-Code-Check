@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 
 import com.atzuche.order.delivery.vo.delivery.OrderDeliveryVO;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 
@@ -18,9 +19,9 @@ import lombok.Data;
 @Data
 public class RenterOrderDeliveryEntity implements Serializable {
 	private static final long serialVersionUID = 1L;
-	
+
 	/**
-	 * 
+	 *
 	 */
 	private Integer id;
 	/**
@@ -42,10 +43,12 @@ public class RenterOrderDeliveryEntity implements Serializable {
 	/**
 	 * 起租时间
 	 */
+	@JsonFormat(pattern="yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
 	private LocalDateTime rentTime;
 	/**
 	 * 归还时间
 	 */
+	@JsonFormat(pattern="yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
 	private LocalDateTime revertTime;
 	/**
 	 * 城市编码
