@@ -744,7 +744,7 @@ public class OrderSettleNoTService {
         }
         //1.7 获取车主油费
         OwnerGetAndReturnCarDTO ownerGetAndReturnCarDTO = ownerCosts.getOwnerGetAndReturnCarDTO();
-        if(Objects.nonNull(ownerGetAndReturnCarDTO) && StringUtil.isBlank(ownerGetAndReturnCarDTO.getCarOilDifferenceCrash())){
+        if(Objects.nonNull(ownerGetAndReturnCarDTO) && !StringUtil.isBlank(ownerGetAndReturnCarDTO.getCarOilDifferenceCrash())){
             AccountOwnerCostSettleDetailEntity accountOwnerCostSettleDetail = new AccountOwnerCostSettleDetailEntity();
             BeanUtils.copyProperties(ownerGetAndReturnCarDTO,accountOwnerCostSettleDetail);
             accountOwnerCostSettleDetail.setSourceCode(OwnerCashCodeEnum.ACCOUNT_OWNER_SETTLE_OIL_COST.getCashNo());
@@ -783,6 +783,18 @@ public class OrderSettleNoTService {
                     entity.setUniqueNo(String.valueOf(orderConsoleSubsidyDetail.getId()));
                     settleOrdersDefinition.addPlatformSubsidy(entity);
                 }
+                // 平台补贴 记录补贴
+                if(SubsidySourceCodeEnum.PLATFORM.getCode().equals(orderConsoleSubsidyDetail.getSubsidyTargetCode())){
+                    AccountPlatformSubsidyDetailEntity entity = new AccountPlatformSubsidyDetailEntity();
+                    BeanUtils.copyProperties(orderConsoleSubsidyDetail,entity);
+                    entity.setSourceCode(RenterCashCodeEnum.ACCOUNT_CONSOLE_RENTER_SUBSIDY_COST.getCashNo());
+                    entity.setSourceDesc(RenterCashCodeEnum.ACCOUNT_CONSOLE_RENTER_SUBSIDY_COST.getTxt());
+                    entity.setUniqueNo(String.valueOf(orderConsoleSubsidyDetail.getId()));
+                    entity.setAmt(-subsidyAmount);
+                    entity.setSubsidyName(SubsidySourceCodeEnum.OWNER.getDesc());
+                    entity.setUniqueNo(String.valueOf(orderConsoleSubsidyDetail.getId()));
+                    settleOrdersDefinition.addPlatformSubsidy(entity);
+                }
             }
         }
         //1.9 全局的车主订单罚金明细
@@ -799,20 +811,18 @@ public class OrderSettleNoTService {
                 accountOwnerCostSettleDetail.setUniqueNo(String.valueOf(orderConsoleSubsidyDetail.getId()));
                 accountOwnerCostSettleDetails.add(accountOwnerCostSettleDetail);
 
-                //罚金来源方 是平台
-                if(SubsidySourceCodeEnum.PLATFORM.getCode().equals(orderConsoleSubsidyDetail.getFineSubsidySourceCode())){
-                    AccountPlatformSubsidyDetailEntity entity = new AccountPlatformSubsidyDetailEntity();
+                //罚金补贴方 是平台
+                if(SubsidySourceCodeEnum.PLATFORM.getCode().equals(orderConsoleSubsidyDetail.getFineSubsidyCode())){
+                    AccountPlatformProfitDetailEntity entity = new AccountPlatformProfitDetailEntity();
                     BeanUtils.copyProperties(orderConsoleSubsidyDetail,entity);
                     entity.setSourceCode(OwnerCashCodeEnum.ACCOUNT_WHOLE_RENTER_FINE_COST.getCashNo());
                     entity.setSourceDesc(OwnerCashCodeEnum.ACCOUNT_WHOLE_RENTER_FINE_COST.getTxt());
                     entity.setUniqueNo(String.valueOf(orderConsoleSubsidyDetail.getId()));
                     entity.setAmt(-fineAmount);
-                    entity.setSubsidyName(SubsidySourceCodeEnum.OWNER.getDesc());
                     entity.setUniqueNo(String.valueOf(orderConsoleSubsidyDetail.getId()));
-                    settleOrdersDefinition.addPlatformSubsidy(entity);
+                    settleOrdersDefinition.addPlatformProfit(entity);
                 }
-                //罚金补贴方 是平台
-                if(SubsidySourceCodeEnum.PLATFORM.getCode().equals(orderConsoleSubsidyDetail.getFineSubsidyCode())){
+                if(SubsidySourceCodeEnum.PLATFORM.getCode().equals(orderConsoleSubsidyDetail.getFineSubsidySourceCode())){
                     AccountPlatformProfitDetailEntity entity = new AccountPlatformProfitDetailEntity();
                     BeanUtils.copyProperties(orderConsoleSubsidyDetail,entity);
                     entity.setSourceCode(OwnerCashCodeEnum.ACCOUNT_WHOLE_RENTER_FINE_COST.getCashNo());
@@ -839,7 +849,7 @@ public class OrderSettleNoTService {
                 accountOwnerCostSettleDetail.setUniqueNo(String.valueOf(ownerOrderFineDeatail.getId()));
                 accountOwnerCostSettleDetails.add(accountOwnerCostSettleDetail);
 
-                //罚金来源方 是平台
+//                //罚金来源方 是平台
                 if(SubsidySourceCodeEnum.PLATFORM.getCode().equals(ownerOrderFineDeatail.getFineSubsidySourceCode())){
                     AccountPlatformSubsidyDetailEntity entity = new AccountPlatformSubsidyDetailEntity();
                     BeanUtils.copyProperties(ownerOrderFineDeatail,entity);
@@ -922,6 +932,8 @@ public class OrderSettleNoTService {
                 accountRenterCostSettleDetail.setRenterOrderNo(settleOrders.getRenterOrderNo());
                 accountRenterCostSettleDetail.setMemNo(settleOrders.getRenterMemNo());
                 accountRenterCostSettleDetails.add(accountRenterCostSettleDetail);
+                //算平台收益
+                orderSettleNewService.addRenterGetAndReturnCarAmtToPlatform(accountRenterCostSettleDetail,settleOrdersDefinition);
             }
             //1.4 补贴
             List<RenterOrderSubsidyDetailEntity> renterOrderSubsidyDetails = rentCosts.getRenterOrderSubsidyDetails();
@@ -936,6 +948,17 @@ public class OrderSettleNoTService {
                     accountRenterCostSettleDetail.setAmt(renterOrderCostDetail.getSubsidyAmount());
                     accountRenterCostSettleDetails.add(accountRenterCostSettleDetail);
                     // 平台补贴 记录补贴
+                    if(SubsidySourceCodeEnum.PLATFORM.getCode().equals(renterOrderCostDetail.getSubsidyTargetCode())){
+                        AccountPlatformSubsidyDetailEntity entity = new AccountPlatformSubsidyDetailEntity();
+                        BeanUtils.copyProperties(renterOrderCostDetail,entity);
+                        entity.setSourceCode(RenterCashCodeEnum.ACCOUNT_RENTER_SUBSIDY_COST.getCashNo());
+                        entity.setSourceDesc(RenterCashCodeEnum.ACCOUNT_RENTER_SUBSIDY_COST.getTxt());
+                        entity.setUniqueNo(String.valueOf(renterOrderCostDetail.getId()));
+                        entity.setAmt(-renterOrderCostDetail.getSubsidyAmount());
+                        entity.setSubsidyName(SubsidySourceCodeEnum.RENTER.getDesc());
+                        settleOrdersDefinition.addPlatformSubsidy(entity);
+                    }
+                    // 平台补贴 记录补贴
                     if(SubsidySourceCodeEnum.PLATFORM.getCode().equals(renterOrderCostDetail.getSubsidySourceCode())){
                         AccountPlatformSubsidyDetailEntity entity = new AccountPlatformSubsidyDetailEntity();
                         BeanUtils.copyProperties(renterOrderCostDetail,entity);
@@ -946,7 +969,6 @@ public class OrderSettleNoTService {
                         entity.setSubsidyName(SubsidySourceCodeEnum.RENTER.getDesc());
                         settleOrdersDefinition.addPlatformSubsidy(entity);
                     }
-                    // 车主补贴 车主端下单已记录
                 }
             }
             //1.5租客罚金
@@ -963,18 +985,19 @@ public class OrderSettleNoTService {
                     accountRenterCostSettleDetails.add(accountRenterCostSettleDetail);
                     //罚金来源方 是平台
                     int fineAmount = renterOrderCostDetail.getFineAmount();
-                    if(SubsidySourceCodeEnum.PLATFORM.getCode().equals(renterOrderCostDetail.getFineSubsidySourceCode())&& fineAmount<0){
-                        AccountPlatformSubsidyDetailEntity entity = new AccountPlatformSubsidyDetailEntity();
+                    //罚金补贴方 是平台
+                    if(SubsidySourceCodeEnum.PLATFORM.getCode().equals(renterOrderCostDetail.getFineSubsidyCode())){
+                        AccountPlatformProfitDetailEntity entity = new AccountPlatformProfitDetailEntity();
                         BeanUtils.copyProperties(renterOrderCostDetail,entity);
                         entity.setSourceCode(RenterCashCodeEnum.ACCOUNT_RENTER_FINE_COST.getCashNo());
                         entity.setSourceDesc(RenterCashCodeEnum.ACCOUNT_RENTER_FINE_COST.getTxt());
                         entity.setUniqueNo(String.valueOf(renterOrderCostDetail.getId()));
                         entity.setAmt(-fineAmount);
-                        entity.setSubsidyName(SubsidySourceCodeEnum.RENTER.getDesc());
-                        settleOrdersDefinition.addPlatformSubsidy(entity);
+                        settleOrdersDefinition.addPlatformProfit(entity);
                     }
+
                     //罚金补贴方 是平台
-                    if(SubsidySourceCodeEnum.PLATFORM.getCode().equals(renterOrderCostDetail.getFineSubsidyCode())&& fineAmount>0){
+                    if(SubsidySourceCodeEnum.PLATFORM.getCode().equals(renterOrderCostDetail.getFineSubsidySourceCode())){
                         AccountPlatformProfitDetailEntity entity = new AccountPlatformProfitDetailEntity();
                         BeanUtils.copyProperties(renterOrderCostDetail,entity);
                         entity.setSourceCode(RenterCashCodeEnum.ACCOUNT_RENTER_FINE_COST.getCashNo());
@@ -1026,18 +1049,18 @@ public class OrderSettleNoTService {
 
                     //罚金来源方 是平台
                     int fineAmount = renterOrderCostDetail.getFineAmount();
-                    if(SubsidySourceCodeEnum.PLATFORM.getCode().equals(renterOrderCostDetail.getFineSubsidySourceCode()) && fineAmount<0){
-                        AccountPlatformSubsidyDetailEntity entity = new AccountPlatformSubsidyDetailEntity();
+                    //罚金补贴方 是平台
+                    if(SubsidySourceCodeEnum.PLATFORM.getCode().equals(renterOrderCostDetail.getFineSubsidyCode())){
+                        AccountPlatformProfitDetailEntity entity = new AccountPlatformProfitDetailEntity();
                         BeanUtils.copyProperties(renterOrderCostDetail,entity);
                         entity.setSourceCode(OwnerCashCodeEnum.ACCOUNT_WHOLE_RENTER_FINE_COST.getCashNo());
                         entity.setSourceDesc(OwnerCashCodeEnum.ACCOUNT_WHOLE_RENTER_FINE_COST.getTxt());
                         entity.setUniqueNo(String.valueOf(renterOrderCostDetail.getId()));
                         entity.setAmt(-fineAmount);
-                        entity.setSubsidyName(SubsidySourceCodeEnum.RENTER.getDesc());
-                        settleOrdersDefinition.addPlatformSubsidy(entity);
+                        settleOrdersDefinition.addPlatformProfit(entity);
                     }
                     //罚金补贴方 是平台
-                    if(SubsidySourceCodeEnum.PLATFORM.getCode().equals(renterOrderCostDetail.getFineSubsidyCode()) && fineAmount>0){
+                    if(SubsidySourceCodeEnum.PLATFORM.getCode().equals(renterOrderCostDetail.getFineSubsidySourceCode())){
                         AccountPlatformProfitDetailEntity entity = new AccountPlatformProfitDetailEntity();
                         BeanUtils.copyProperties(renterOrderCostDetail,entity);
                         entity.setSourceCode(OwnerCashCodeEnum.ACCOUNT_WHOLE_RENTER_FINE_COST.getCashNo());
@@ -1167,14 +1190,6 @@ public class OrderSettleNoTService {
         //应退结余 租车费用
         int rentCostSurplusAmt = settleOrdersAccount.getRentCostSurplusAmt();
         if(rentCostSurplusAmt>0){
-            //1 退还凹凸币 coinAmt为订单真实使用的凹凸币
-            int coinAmt = accountRenterCostSettleDetails.stream().filter(obj ->{
-                return RenterCashCodeEnum.AUTO_COIN_DEDUCT.getCashNo().equals(obj.getCostCode());
-            }).mapToInt(AccountRenterCostSettleDetailEntity::getAmt).sum();
-            if(coinAmt>0){
-                //退还多余凹凸币
-                accountRenterCostCoinService.settleAutoCoin(settleOrdersAccount.getRenterMemNo(),settleOrdersAccount.getOrderNo(),coinAmt);
-            }
             //退还租车费用
             if(rentCostSurplusAmt>0){
                 // 实付
@@ -1201,6 +1216,15 @@ public class OrderSettleNoTService {
             //记录 凹凸币/钱包退还 流水
             cashierSettleService.insertAccountRenterCostSettleDetails(renterCostSettleDetails);
         }
+        //1 退还凹凸币 coinAmt为订单真实使用的凹凸币
+        int coinAmt = accountRenterCostSettleDetails.stream().filter(obj ->{
+            return RenterCashCodeEnum.AUTO_COIN_DEDUCT.getCashNo().equals(obj.getCostCode());
+        }).mapToInt(AccountRenterCostSettleDetailEntity::getAmt).sum();
+        if(coinAmt>0){
+            //退还多余凹凸币
+            accountRenterCostCoinService.settleAutoCoin(settleOrdersAccount.getRenterMemNo(),settleOrdersAccount.getOrderNo(),coinAmt);
+        }
+
     }
     /**
      * 结算退还租车费用金额 费用明细
@@ -1419,6 +1443,7 @@ public class OrderSettleNoTService {
             int amt = rentCosts.getConsoleRenterOrderFineDeatails().stream().mapToInt(ConsoleRenterOrderFineDeatailEntity::getFineAmount).sum();
             rentFineAmt = rentFineAmt +amt;
         }
+
         // 计算凹凸币使用金额
         int renCoinAmt =0;
         if(Objects.nonNull(rentCosts) && !CollectionUtils.isEmpty(rentCosts.getRenterOrderSubsidyDetails())){
@@ -1437,6 +1462,57 @@ public class OrderSettleNoTService {
             int amt = ownerCosts.getConsoleRenterOrderFineDeatails().stream().mapToInt(ConsoleRenterOrderFineDeatailEntity::getFineAmount).sum();
             ownerFineAmt = ownerFineAmt +amt;
         }
+
+
+        //租客收入
+        int rentFineIncomeAmt = 0;
+        if(Objects.nonNull(rentCosts) && !CollectionUtils.isEmpty(rentCosts.getRenterOrderFineDeatails())){
+            int amt = rentCosts.getRenterOrderFineDeatails().stream().filter(obj ->{
+                return SubsidySourceCodeEnum.RENTER.getCode().equals(obj.getFineSubsidyCode());
+            }).mapToInt(RenterOrderFineDeatailEntity::getFineAmount).sum();
+            rentFineIncomeAmt = rentFineIncomeAmt +amt;
+        }
+        if(Objects.nonNull(rentCosts) && !CollectionUtils.isEmpty(rentCosts.getConsoleRenterOrderFineDeatails())){
+            int amt = rentCosts.getConsoleRenterOrderFineDeatails().stream().filter(obj ->{
+                return SubsidySourceCodeEnum.RENTER.getCode().equals(obj.getFineSubsidyCode());
+            }).mapToInt(ConsoleRenterOrderFineDeatailEntity::getFineAmount).sum();
+            rentFineIncomeAmt = rentFineIncomeAmt +amt;
+        }
+        //车主收入罚金
+        int ownerFineIncomeAmt = 0;
+        if(Objects.nonNull(ownerCosts) && !CollectionUtils.isEmpty(ownerCosts.getOwnerOrderFineDeatails())){
+            int amt = ownerCosts.getOwnerOrderFineDeatails().stream().filter(obj ->{
+                return SubsidySourceCodeEnum.OWNER.getCode().equals(obj.getFineSubsidyCode());
+            }).mapToInt(OwnerOrderFineDeatailEntity::getFineAmount).sum();
+            ownerFineIncomeAmt = ownerFineIncomeAmt +amt;
+        }
+        if(Objects.nonNull(ownerCosts) && !CollectionUtils.isEmpty(ownerCosts.getConsoleRenterOrderFineDeatails())){
+            int amt = ownerCosts.getConsoleRenterOrderFineDeatails().stream().filter(obj ->{
+                return SubsidySourceCodeEnum.OWNER.getCode().equals(obj.getFineSubsidyCode());
+            }).mapToInt(ConsoleRenterOrderFineDeatailEntity::getFineAmount).sum();
+            ownerFineIncomeAmt = ownerFineIncomeAmt +amt;
+        }
+        //平台罚金收入
+        int platformFineImconeAmt=0;
+        if(Objects.nonNull(ownerCosts) && !CollectionUtils.isEmpty(ownerCosts.getOwnerOrderFineDeatails())){
+            int amt = ownerCosts.getOwnerOrderFineDeatails().stream().filter(obj ->{
+                return SubsidySourceCodeEnum.PLATFORM.getCode().equals(obj.getFineSubsidyCode());
+            }).mapToInt(OwnerOrderFineDeatailEntity::getFineAmount).sum();
+            platformFineImconeAmt = platformFineImconeAmt +amt;
+        }
+        if(Objects.nonNull(ownerCosts) && !CollectionUtils.isEmpty(ownerCosts.getConsoleRenterOrderFineDeatails())){
+            int amt = ownerCosts.getConsoleRenterOrderFineDeatails().stream().filter(obj ->{
+                return SubsidySourceCodeEnum.PLATFORM.getCode().equals(obj.getFineSubsidyCode());
+            }).mapToInt(ConsoleRenterOrderFineDeatailEntity::getFineAmount).sum();
+            platformFineImconeAmt = platformFineImconeAmt +amt;
+        }
+        if(Objects.nonNull(rentCosts) && !CollectionUtils.isEmpty(rentCosts.getRenterOrderFineDeatails())){
+            int amt = rentCosts.getRenterOrderFineDeatails().stream().filter(obj ->{
+                return SubsidySourceCodeEnum.PLATFORM.getCode().equals(obj.getFineSubsidyCode());
+            }).mapToInt(RenterOrderFineDeatailEntity::getFineAmount).sum();
+            platformFineImconeAmt = platformFineImconeAmt +amt;
+        }
+
         settleCancelOrdersAccount.setOwnerFineAmt(ownerFineAmt);
         settleCancelOrdersAccount.setRentFineAmt(rentFineAmt);
         settleCancelOrdersAccount.setRentCostAmt(rentCostAmt);
@@ -1448,6 +1524,9 @@ public class OrderSettleNoTService {
         settleCancelOrdersAccount.setRenWalletAmt(rentWalletAmt);
         settleCancelOrdersAccount.setRentSurplusWalletAmt(rentWalletAmt);
         settleCancelOrdersAccount.setRenCoinAmt(renCoinAmt);
+        settleCancelOrdersAccount.setOwnerFineIncomeAmt(ownerFineIncomeAmt);
+        settleCancelOrdersAccount.setRentFineIncomeAmt(rentFineIncomeAmt);
+        settleCancelOrdersAccount.setPlatformFineImconeAmt(platformFineImconeAmt);
         return settleCancelOrdersAccount;
     }
 
@@ -1770,5 +1849,44 @@ public class OrderSettleNoTService {
             log.error("OrderSettleNoTService settleUndoCoupon error [{}]",e);
         }
 
+    }
+
+    /**
+     * 处理
+     * @param settleOrders
+     * @param settleCancelOrdersAccount
+     */
+    public void handleIncomeFine(SettleOrders settleOrders, SettleCancelOrdersAccount settleCancelOrdersAccount) {
+        // 租客罚金收益
+        if(settleCancelOrdersAccount.getRentFineIncomeAmt()>0){
+            AccountRenterCostSettleDetailEntity entity = new AccountRenterCostSettleDetailEntity();
+            entity.setOrderNo(settleOrders.getOrderNo());
+            entity.setMemNo(settleOrders.getRenterMemNo());
+            entity.setRenterOrderNo(settleOrders.getRenterOrderNo());
+            entity.setAmt(settleCancelOrdersAccount.getRentFineIncomeAmt());
+            entity.setType(1);
+            cashierSettleService.insertAccountRenterCostSettleDetail(entity);
+            walletProxyService.returnOrChargeWallet(settleOrders.getRenterMemNo(),settleOrders.getOrderNo(),settleCancelOrdersAccount.getRentFineIncomeAmt());
+        }
+        // 车主罚金收入
+        if(settleCancelOrdersAccount.getOwnerFineIncomeAmt()>0){
+            AccountOwnerIncomeExamineReqVO accountOwnerIncomeExamine = new AccountOwnerIncomeExamineReqVO();
+            accountOwnerIncomeExamine.setAmt(settleCancelOrdersAccount.getOwnerFineIncomeAmt());
+            accountOwnerIncomeExamine.setMemNo(settleOrders.getOwnerMemNo());
+            accountOwnerIncomeExamine.setOrderNo(settleOrders.getOrderNo());
+            accountOwnerIncomeExamine.setRemark("罚金收入");
+            cashierService.insertOwnerIncomeExamine(accountOwnerIncomeExamine);
+        }
+        // 平台罚金收入
+        if(settleCancelOrdersAccount.getPlatformFineImconeAmt()>0){
+            List<AccountPlatformProfitDetailEntity> accountPlatformProfitDetails = new ArrayList<>();
+            AccountPlatformProfitDetailEntity entity = new AccountPlatformProfitDetailEntity();
+            entity.setOrderNo(settleOrders.getOrderNo());
+            entity.setAmt(settleCancelOrdersAccount.getPlatformFineImconeAmt());
+            entity.setSourceDesc(RenterCashCodeEnum.ACCOUNT_RENTER_FINE_COST.getTxt());
+            entity.setSourceCode(RenterCashCodeEnum.ACCOUNT_RENTER_FINE_COST.getCashNo());
+            cashierSettleService.insertAccountPlatformProfitDetails(accountPlatformProfitDetails);
+
+        }
     }
 }

@@ -17,7 +17,8 @@ import com.autoyol.commons.web.ResponseData;
  *
  */
 //@FeignClient(url = "http://localhost:1412" ,name="order-center-api")  //本地测试
-@FeignClient(url = "http://10.0.3.235:1412" ,name="order-center-api")
+//@FeignClient(url = "http://10.0.3.235:1412" ,name="order-center-api")
+@FeignClient(name="order-center-api")
 public interface FeignOrderCostService {
 	
 	@PostMapping("/order/cost/renter/get")

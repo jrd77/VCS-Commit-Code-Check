@@ -31,9 +31,11 @@ import com.atzuche.order.parentorder.entity.OrderEntity;
 import com.atzuche.order.rentercost.entity.RenterOrderSubsidyDetailEntity;
 import com.atzuche.order.rentercost.entity.dto.RenterOrderSubsidyDetailDTO;
 import com.atzuche.order.rentercost.service.RenterOrderSubsidyDetailService;
+import com.atzuche.order.renterorder.entity.OrderTransferRecordEntity;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.atzuche.order.renterorder.entity.dto.OrderChangeItemDTO;
 import com.atzuche.order.renterorder.service.OrderChangeItemService;
+import com.atzuche.order.renterorder.service.OrderTransferRecordService;
 import com.atzuche.order.renterorder.service.RenterOrderChangeApplyService;
 import com.atzuche.order.renterorder.service.RenterOrderService;
 import com.autoyol.car.api.model.dto.LocationDTO;
@@ -66,6 +68,8 @@ public class ModifyOrderConfirmService {
 	private StockService stockService;
 	@Autowired
 	private RenterOrderChangeApplyService renterOrderChangeApplyService;
+	@Autowired
+	private OrderTransferRecordService orderTransferRecordService;
 	
 	/**
 	 * 自动同意
@@ -109,6 +113,8 @@ public class ModifyOrderConfirmService {
 		modifyOrderForOwnerService.modifyOrderForOwner(modifyOrderOwnerDTO, renterSubsidy);
 		// 处理租客订单信息
 		modifyOrderForRenterService.updateRenterOrderStatus(renterOrder.getOrderNo(), renterOrder.getRenterOrderNo(), initRenterOrder);
+		// 如果是换车增加一条换车记录
+		saveOrderTransferRecord(modifyOrderOwnerDTO, modifyOrderDTO);
 		// 更新历史未处理的申请记录为拒绝(管理后台修改订单逻辑)
 		renterOrderChangeApplyService.updateRenterOrderChangeApplyStatusByOrderNo(modifyOrderOwnerDTO.getOrderNo());
 		// 封装OrderReqContext对象
@@ -118,6 +124,34 @@ public class ModifyOrderConfirmService {
 		// 扣库存
 		cutCarStock(modifyOrderOwnerDTO, listChangeCode(modifyOrderDTO.getChangeItemList()));
 	}
+	
+	
+	/**
+	 * 保存换车记录
+	 * @param modifyOrderOwnerDTO
+	 * @param modifyOrderDTO
+	 */
+	public void saveOrderTransferRecord(ModifyOrderOwnerDTO modifyOrderOwnerDTO, ModifyOrderDTO modifyOrderDTO) {
+		if (modifyOrderOwnerDTO == null || modifyOrderDTO == null) {
+			return;
+		}
+		if (modifyOrderDTO.getTransferFlag() == null || !modifyOrderDTO.getTransferFlag()) {
+			return;
+		}
+		OwnerGoodsDetailDTO ownerGoodsDetailDTO = modifyOrderOwnerDTO.getOwnerGoodsDetailDTO();
+		if (ownerGoodsDetailDTO == null) {
+			return;
+		}
+		OrderTransferRecordEntity orderTransferRecordEntity = new OrderTransferRecordEntity();
+		orderTransferRecordEntity.setCarNo(ownerGoodsDetailDTO.getCarNo() == null ? null:String.valueOf(ownerGoodsDetailDTO.getCarNo()));
+		orderTransferRecordEntity.setCarPlateNum(ownerGoodsDetailDTO.getCarPlateNum());
+		orderTransferRecordEntity.setOperator(modifyOrderDTO.getOperator());
+		orderTransferRecordEntity.setMemNo(modifyOrderDTO.getMemNo());
+		orderTransferRecordEntity.setOrderNo(modifyOrderOwnerDTO.getOrderNo());
+		orderTransferRecordEntity.setSource(0);
+		orderTransferRecordService.saveOrderTransferRecord(orderTransferRecordEntity);
+	}
+	
 	
 	/**
 	 * 封装新增仁云订单需要的参数

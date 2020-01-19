@@ -1,14 +1,12 @@
 package com.atzuche.order.commons.enums.cashcode;
 
-import lombok.Getter;
-
 /*
  * @Author ZhangBin
  * @Date 2020/1/15 21:08
  * @Description: 后台管理补贴明细表费用编码枚举类
  * 收费序号,平台从30开头 平台 第一位：1，第二位：1正2负      1正2负 3可正可负   ->0可正可负，第三位：押金类型，第四位：分模块（区域），后4位是编码
  **/
-@Getter
+//@Getter	//反馈打了jar调不出来get set方法。
 public enum ConsoleCashCodeEnum {
 	//第一区域块 看第4位，从1开始。  后4位从0001开始
     TIME_OUT("31010001","车主超时费用"),
@@ -50,4 +48,14 @@ public enum ConsoleCashCodeEnum {
         this.cashNo = cashNo;
         this.txt = txt;
     }
+
+	public String getCashNo() {
+		return cashNo;
+	}
+
+	public String getTxt() {
+		return txt;
+	}
+    
+    
 }
