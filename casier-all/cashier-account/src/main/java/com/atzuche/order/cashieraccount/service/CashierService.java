@@ -203,11 +203,13 @@ public class CashierService {
         //2 抵扣
         AccountDeductDebtReqVO accountDeductDebt = new AccountDeductDebtReqVO();
         BeanUtils.copyProperties(cashierDeductDebtReqVO,accountDeductDebt);
+        accountDeductDebt.setSourceCode(cashierDeductDebtReqVO.getRenterCashCodeEnum().getCashNo());
+        accountDeductDebt.setSourceDetail(cashierDeductDebtReqVO.getRenterCashCodeEnum().getTxt());
         int debtedAmt = accountDebtService.deductDebt(accountDeductDebt);
         //3 记录结算费用抵扣记录
         PayedOrderRenterDepositWZDetailReqVO payedOrderRenterWZDepositDetail = new PayedOrderRenterDepositWZDetailReqVO();
         BeanUtils.copyProperties(cashierDeductDebtReqVO,payedOrderRenterWZDepositDetail);
-        payedOrderRenterWZDepositDetail.setAmt(debtedAmt);
+        payedOrderRenterWZDepositDetail.setAmt(-debtedAmt);
         int id = accountRenterWzDepositService.updateRenterWZDepositChange(payedOrderRenterWZDepositDetail);
         return new CashierDeductDebtResVO(cashierDeductDebtReqVO, debtedAmt,id);
     }
@@ -226,12 +228,14 @@ public class CashierService {
         //2 抵扣
         AccountDeductDebtReqVO accountDeductDebt = new AccountDeductDebtReqVO();
         BeanUtils.copyProperties(cashierDeductDebtReq,accountDeductDebt);
+        accountDeductDebt.setSourceCode(cashierDeductDebtReq.getRenterCashCodeEnum().getCashNo());
+        accountDeductDebt.setSourceDetail(cashierDeductDebtReq.getRenterCashCodeEnum().getTxt());
         //返回真实抵扣金额
         int debtedAmt = accountDebtService.deductDebt(accountDeductDebt);
         //3 记录押金资金明细 抵扣记录
         DetainRenterDepositReqVO detainRenterDepositReqVO = new DetainRenterDepositReqVO();
         BeanUtils.copyProperties(cashierDeductDebtReq,detainRenterDepositReqVO);
-        detainRenterDepositReqVO.setAmt(debtedAmt);
+        detainRenterDepositReqVO.setAmt(-debtedAmt);
         detainRenterDepositReqVO.setRenterCashCodeEnum(RenterCashCodeEnum.SETTLE_DEPOSIT_TO_HISTORY_AMT);
         int id = accountRenterDepositService.detainRenterDeposit(detainRenterDepositReqVO);
         // 4 记录结算费用 抵扣记录
@@ -240,7 +244,7 @@ public class CashierService {
         renterCostSettleDetail.setUniqueNo(String.valueOf(id));
         renterCostSettleDetail.setCostCode(RenterCashCodeEnum.SETTLE_DEPOSIT_TO_HISTORY_AMT.getCashNo());
         renterCostSettleDetail.setCostDetail(RenterCashCodeEnum.SETTLE_DEPOSIT_TO_HISTORY_AMT.getTxt());
-        renterCostSettleDetail.setAmt(-Math.abs(debtedAmt));
+        renterCostSettleDetail.setAmt(-debtedAmt);
         accountRenterCostSettleDetailNoTService.insertAccountRenterCostSettleDetail(renterCostSettleDetail);
         return new CashierDeductDebtResVO(cashierDeductDebtReq, debtedAmt,id);
     }
