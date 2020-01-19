@@ -3,6 +3,7 @@ package com.atzuche.order.admin.controller;
 import com.alibaba.fastjson.JSON;
 import com.atzuche.order.admin.common.AdminUserUtil;
 import com.atzuche.order.admin.service.AdminOrderService;
+import com.atzuche.order.admin.vo.req.AdminTransferCarReqVO;
 import com.atzuche.order.admin.vo.req.order.AdminModifyOrderReqVO;
 import com.atzuche.order.admin.vo.req.order.CancelOrderByPlatVO;
 import com.atzuche.order.admin.vo.req.order.CancelOrderVO;
@@ -12,15 +13,16 @@ import com.atzuche.order.commons.entity.orderDetailDto.OrderDetailReqDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.OrderDetailRespDTO;
 import com.atzuche.order.commons.vo.req.ModifyOrderReqVO;
 import com.atzuche.order.open.service.FeignOrderDetailService;
+import com.atzuche.order.open.vo.request.TransferReq;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.doc.annotation.AutoDocGroup;
 import com.autoyol.doc.annotation.AutoDocMethod;
 import com.autoyol.doc.annotation.AutoDocVersion;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -41,8 +43,8 @@ import java.util.Optional;
  **/
 @Slf4j
 @RestController
-public class OrderController {
-    private final static Logger logger = LoggerFactory.getLogger(OrderController.class);
+public class AdminOrderController {
+    private final static Logger logger = LoggerFactory.getLogger(AdminOrderController.class);
     
     @Autowired
     private AdminOrderService adminOrderService;
@@ -73,8 +75,8 @@ public class OrderController {
         String  memNo = detailRespDTO.getRenterMember().getMemNo();
         modifyOrderReqVO.setMemNo(memNo);
 
-        ResponseData responseData = adminOrderService.modifyOrder(modifyOrderReqVO);
-        return responseData;
+        adminOrderService.modifyOrder(modifyOrderReqVO);
+        return ResponseData.success();
     }
 
     @AutoDocVersion(version = "订单修改")
@@ -115,6 +117,7 @@ public class OrderController {
     @AutoDocMethod(description = "车主拒绝或者同意租客的订单修改申请接口", value = "车主拒绝或者同意租客的订单修改申请接口",response = ResponseData.class)
     @RequestMapping(value="console/order/modify/confirm",method = RequestMethod.POST)
     public ResponseData modifyApplicationConfirm(@Valid @RequestBody OrderModifyConfirmReqVO reqVO,BindingResult result){
+        log.info("reqVo is {}",reqVO);
         if(result.hasErrors()){
             Optional<FieldError> error = result.getFieldErrors().stream().findFirst();
             return ResponseData.createErrorCodeResponse(ErrorCode.INPUT_ERROR.getCode(), error.isPresent() ?
@@ -142,6 +145,27 @@ public class OrderController {
         AdminModifyOrderFeeCompareVO compareVO = adminOrderService.preModifyOrderFee(reqVO,renterNo);
 
         return ResponseData.success(compareVO);
+
+    }
+
+
+    @AutoDocVersion(version = "订单修改")
+    @AutoDocGroup(group = "订单修改")
+    @AutoDocMethod(description = "管理后台还车", value = "管理后台还车",response = AdminModifyOrderFeeCompareVO.class)
+    @RequestMapping(value="console/changeCar",method = RequestMethod.POST)
+    public ResponseData<AdminModifyOrderFeeCompareVO> changeCar(@Valid @RequestBody AdminTransferCarReqVO reqVO, BindingResult bindingResult){
+        if(bindingResult.hasErrors()){
+            Optional<FieldError> error = bindingResult.getFieldErrors().stream().findFirst();
+            return ResponseData.createErrorCodeResponse(ErrorCode.INPUT_ERROR.getCode(), error.isPresent() ?
+                    error.get().getDefaultMessage() : ErrorCode.INPUT_ERROR.getText());
+        }
+
+        TransferReq req = new TransferReq();
+        req.setOperator(AdminUserUtil.getAdminUser().getAuthName());
+        BeanUtils.copyProperties(reqVO,req);
+
+        adminOrderService.transferCar(req);
+        return ResponseData.success();
 
 
     }

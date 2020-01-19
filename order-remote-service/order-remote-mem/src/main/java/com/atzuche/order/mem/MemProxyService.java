@@ -26,6 +26,7 @@ import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -51,6 +52,7 @@ public class MemProxyService {
                 MemberSelectKeyEnum.MEMBER_ROLE_INFO.getKey(),
                 MemberSelectKeyEnum.MEMBER_ADDITION_INFO.getKey(),
                 MemberSelectKeyEnum.MEMBER_STATISTICS_INFO.getKey(),
+                MemberSelectKeyEnum.MEMBER_SECRET_INFO.getKey(),
                 MemberSelectKeyEnum.MEMBER_RELIEF_INFO.getKey());
         ResponseData<MemberTotalInfo> responseData = null;
         log.info("Feign 开始获取租客会员信息,memNo={}",memNo);
@@ -81,12 +83,14 @@ public class MemProxyService {
         }
 
         MemberTotalInfo memberTotalInfo = responseData.getData();
+        log.info("memInfo is {}",JSON.toJSONString(memberTotalInfo));
         MemberAuthInfo memberAuthInfo = memberTotalInfo.getMemberAuthInfo();
         MemberCoreInfo memberCoreInfo = memberTotalInfo.getMemberCoreInfo();
         MemberBaseInfo memberBaseInfo = memberTotalInfo.getMemberBaseInfo();
         MemberAdditionInfo memberAdditionInfo = memberTotalInfo.getMemberAdditionInfo();
         MemberStatisticsInfo memberStatisticsInfo = memberTotalInfo.getMemberStatisticsInfo();
         MemberRoleInfo memberRoleInfo = memberTotalInfo.getMemberRoleInfo();
+        MemberSecretInfo secretInfo = memberTotalInfo.getMemberSecretInfo();
 
         OrderRenterInfoDTO dto = new OrderRenterInfoDTO();
         dto.setMemNo(memNo);
@@ -95,7 +99,7 @@ public class MemProxyService {
         dto.setEmail(memberAuthInfo.getEmail());
         dto.setGender(convertGender(memberBaseInfo.getGender()));
         dto.setDriLicRecordNo(memberAuthInfo.getDriLicRecordNo());
-        dto.setIdNo(memberAuthInfo.getIdCard());
+        dto.setIdNo(secretInfo.getIdNo());
         dto.setCensusRegiste(memberBaseInfo.getCensusRegiste());
         dto.setCity(memberBaseInfo.getCity());
         dto.setProvince(memberBaseInfo.getProvince());
@@ -119,7 +123,8 @@ public class MemProxyService {
             try{
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
                 LocalDate date = LocalDate.parse(driLicFirstTime,formatter);
-                return String.valueOf(Duration.between(LocalDate.now(),date).toDays()/365f);
+                long between1 = ChronoUnit.DAYS.between(date, LocalDate.now());
+                return String.valueOf(between1/365);
             }catch (Exception e){
                 return "0";
             }

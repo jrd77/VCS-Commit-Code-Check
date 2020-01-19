@@ -57,6 +57,7 @@ public enum ErrorCode {
     IS_GET_CAR_OVER_ERROR("700006","取车是否超运能接口异常"),
     IS_RETURN_CAR_OVER_FAIL("700007","还车是否超运能获取失败"),
     IS_RETURN_CAR_OVER_ERROR("700008","还车是否超运能接口异常"),
+    REMOTE_CALL_FAIL("700008","远程操作失败"),
 
 
     FEIGN_MEMBER_DRIVER_fAIL("700100","获取附加驾驶人信息失败"),
@@ -87,7 +88,7 @@ public enum ErrorCode {
     ADMIN_ORDER_QUERY_HISTORY_FAIL("700120","查询历史订单列表失败"),
     ADMIN_CAR_DEPOSIT_QUERY_ERR("700121","车辆押金查询异常"),
     ADMIN_ORDER_MODIFY_ERR("700122","修改订单异常"),
-    ADMIN_ORDER_MODIFY_FAIL("700123","修啊给I订单失败"),
+    ADMIN_ORDER_MODIFY_FAIL("700123","修改订单异常"),
     NO_EFFECTIVE_ERR("700124","有效子订单异常"),
 
     OWNER_RENT_DETAIL_ERR("700125","获取车主租金详情异常"),

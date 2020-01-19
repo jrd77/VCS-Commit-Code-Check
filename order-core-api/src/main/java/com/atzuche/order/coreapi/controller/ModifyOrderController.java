@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import javax.validation.Valid;
 
+import com.atzuche.order.rentermem.service.RenterMemberService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
@@ -15,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.atzuche.order.open.vo.ModifyOrderAppReqVO;
 import com.atzuche.order.coreapi.entity.request.ModifyOrderReq;
-import com.atzuche.order.coreapi.entity.request.TransferReq;
+import com.atzuche.order.open.vo.request.TransferReq;
 import com.atzuche.order.open.vo.ModifyOrderCompareVO;
 import com.atzuche.order.coreapi.service.ModifyOrderFeeService;
 import com.atzuche.order.coreapi.service.ModifyOrderOwnerConfirmService;
@@ -35,6 +36,8 @@ public class ModifyOrderController {
 	private ModifyOrderOwnerConfirmService modifyOrderOwnerConfirmService;
 	@Autowired
 	private ModifyOrderFeeService modifyOrderFeeService;
+    @Autowired
+	private RenterMemberService renterMemberService;
 	
 	/**
 	 * 修改订单（APP端或H5端）
@@ -109,6 +112,9 @@ public class ModifyOrderController {
             return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), error.isPresent() ?
                     error.get().getDefaultMessage() : ErrorCode.INPUT_ERROR.getText());
         }
+
+        String memNo = renterMemberService.getRenterNoByOrderNo(transferReq.getOrderNo());
+        transferReq.setMemNo(memNo);
 
 		// 属性拷贝
 		ModifyOrderReq modifyOrderReq = new ModifyOrderReq();

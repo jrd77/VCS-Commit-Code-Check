@@ -62,7 +62,6 @@ public class OrderSettleService{
      * 车辆押金结算
      * 先注释调事务
      */
-
     public void settleOrder(String orderNo) {
         log.info("OrderSettleService settleOrder orderNo [{}]",orderNo);
         Transaction t = Cat.getProducer().newTransaction(CatConstants.FEIGN_CALL, "车俩结算服务");

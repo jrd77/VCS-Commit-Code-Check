@@ -5,6 +5,8 @@ import com.atzuche.order.admin.vo.resp.car.RenterInfoRespVO;
 import com.atzuche.order.commons.OrderException;
 import com.atzuche.order.commons.entity.orderDetailDto.OrderDetailReqDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.OrderDetailRespDTO;
+import com.atzuche.order.commons.entity.orderDetailDto.OwnerMemberDTO;
+import com.atzuche.order.commons.entity.orderDetailDto.RenterMemberDTO;
 import com.atzuche.order.mem.MemProxyService;
 import com.atzuche.order.mem.dto.OrderRenterInfoDTO;
 import com.atzuche.order.open.service.FeignOrderDetailService;
@@ -54,10 +56,13 @@ public class RenterInfoController {
         OrderDetailRespDTO detailRespDTO = respDTOResponseData.getData();
         String memNo = detailRespDTO.getRenterMember().getMemNo();
 
+
         OrderRenterInfoDTO orderRenterInfoDTO =  memProxyService.getRenterInfoByMemNo(memNo);
         RenterInfoRespVO respVO = new RenterInfoRespVO();
         BeanUtils.copyProperties(orderRenterInfoDTO,respVO);
         respVO.setReqAddr(detailRespDTO.getOrderSourceStat().getReqAddr());
+
+
         return ResponseData.success(respVO);
     }
 

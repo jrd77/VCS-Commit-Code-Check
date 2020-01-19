@@ -730,10 +730,13 @@ public class OrderDetailService {
         if(renterOrderNo != null){
             renterOrderChangeApply = renterOrderChangeApplyService.getRenterOrderChangeApplyByRenterOrderNo(renterOrderNo);
             renterOrderChangeApplyStatusDTO = new RenterOrderChangeApplyStatusDTO();
-            BeanUtils.copyProperties(renterOrderChangeApply,renterOrderChangeApplyStatusDTO);
-            LocalDateTime createTime = renterOrderChangeApply.getCreateTime();
-            String createTimeStr = LocalDateTimeUtils.localdateToString(createTime, GlobalConstant.FORMAT_DATE_STR1);
-            renterOrderChangeApplyStatusDTO.setCreateTimeStr(createTimeStr);
+            if(renterOrderChangeApply!=null) {
+                BeanUtils.copyProperties(renterOrderChangeApply, renterOrderChangeApplyStatusDTO);
+                LocalDateTime createTime = renterOrderChangeApply.getCreateTime();
+                String createTimeStr = LocalDateTimeUtils.localdateToString(createTime, GlobalConstant.FORMAT_DATE_STR1);
+                renterOrderChangeApplyStatusDTO.setCreateTimeStr(createTimeStr);
+            }
+
         }
         orderStatusRespDTO.orderDTO = orderDTO;
         orderStatusRespDTO.orderStatusDTO = orderStatusDTO;

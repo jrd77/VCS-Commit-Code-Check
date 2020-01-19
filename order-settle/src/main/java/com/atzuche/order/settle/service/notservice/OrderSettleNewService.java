@@ -2,6 +2,7 @@ package com.atzuche.order.settle.service.notservice;
 
 import java.util.List;
 
+import com.autoyol.platformcost.model.FeeResult;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -265,24 +266,7 @@ public class OrderSettleNewService {
     }
 
 
-    /**
-     * 交接车超历程费用
-     * @param mileageAmt
-     * @param settleOrdersDefinition
-     */
-    public void addMileageAmtToPlatformAndOwner(RenterOrderCostDetailEntity mileageAmt, SettleOrdersDefinition settleOrdersDefinition) {
-        if(RenterCashCodeEnum.ACCOUNT_RENTER_DELIVERY_MILEAGE_COST.getCashNo().equals(mileageAmt.getCostCode())){
-            int totalAmount = mileageAmt.getTotalAmount();
-            AccountOwnerCostSettleDetailEntity accountOwnerCostSettleDetailEntity = new AccountOwnerCostSettleDetailEntity();
-            accountOwnerCostSettleDetailEntity.setAmt(-totalAmount);
-            accountOwnerCostSettleDetailEntity.setSourceDetail(RenterCashCodeEnum.ACCOUNT_RENTER_DELIVERY_MILEAGE_COST.getTxt());
-            accountOwnerCostSettleDetailEntity.setSourceCode(RenterCashCodeEnum.ACCOUNT_RENTER_DELIVERY_MILEAGE_COST.getCashNo());
-            accountOwnerCostSettleDetailEntity.setUniqueNo(String.valueOf(mileageAmt.getId()));
-            accountOwnerCostSettleDetailEntity.setOrderNo(mileageAmt.getOrderNo());
-            accountOwnerCostSettleDetailEntity.setMemNo(mileageAmt.getMemNo());
-            settleOrdersDefinition.addOwnerCosts(accountOwnerCostSettleDetailEntity);
-        }
-    }
+
 
     /**
      * 车主端代管车服务费车主端代管车服务费 费用平台端冲账
