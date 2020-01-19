@@ -27,6 +27,7 @@ import com.atzuche.order.open.service.FeignOrderUpdateService;
 import com.atzuche.order.open.vo.ModifyOrderAppReqVO;
 import com.atzuche.order.open.vo.ModifyOrderCompareVO;
 import com.atzuche.order.open.vo.ModifyOrderFeeVO;
+import com.atzuche.order.open.vo.request.TransferReq;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
 import com.dianping.cat.Cat;
@@ -58,22 +59,12 @@ public class AdminOrderService {
             Cat.logEvent(CatConstants.FEIGN_PARAM,JSON.toJSONString(cancelOrderReqVO));
             responseObject = feignOrderUpdateService.cancelOrder(cancelOrderReqVO);
             Cat.logEvent(CatConstants.FEIGN_RESULT,JSON.toJSONString(responseObject));
-            if(responseObject == null || !ErrorCode.SUCCESS.getCode().equals(responseObject.getResCode())){
-                log.error("Feign 取消订单失败,responseObject={},cancelOrderReqVO={}",JSON.toJSONString(responseObject),JSON.toJSONString(cancelOrderReqVO));
-                OrderCancelFailException failException = new OrderCancelFailException();
-                Cat.logError("Feign 取消订单失败",failException);
-                throw failException;
-            }
+            checkResponse(responseObject);
             t.setStatus(Transaction.SUCCESS);
-        }catch (RenterCarDetailFailException e){
-            Cat.logError("Feign 取消订单失败",e);
-            t.setStatus(e);
-            throw e;
         }catch (Exception e){
            log.error("Feign 取消订单异常,responseObject={},cancelOrderReqVO={}",JSON.toJSONString(responseObject),JSON.toJSONString(cancelOrderReqVO),e);
-            OrderCancelErrException err = new OrderCancelErrException();
-            Cat.logError("Feign 取消订单异常",err);
-            throw err;
+            Cat.logError("Feign 取消订单异常",e);
+            throw e;
         }finally {
             t.complete();
         }
@@ -94,12 +85,7 @@ public class AdminOrderService {
             BeanUtils.copyProperties(platVO,adminOrderCancelReqVO);
             ResponseData responseObject = feignOrderUpdateService.adminCancelOrder(adminOrderCancelReqVO);
             Cat.logEvent(CatConstants.FEIGN_RESULT,JSON.toJSONString(responseObject));
-            if(responseObject == null || !ErrorCode.SUCCESS.getCode().equals(responseObject.getResCode())){
-                log.error("Feign 取消订单失败,responseObject={},cancelReq={}",JSON.toJSONString(responseObject),JSON.toJSONString(platVO));
-                OrderModifyFailException failException = new OrderModifyFailException();
-                Cat.logError("Feign 取消订单失败",failException);
-                throw failException;
-            }
+            checkResponse(responseObject);
             t.setStatus(Transaction.SUCCESS);
         }catch (RenterCarDetailFailException e){
             Cat.logError("Feign 取消订单失败",e);
@@ -124,18 +110,7 @@ public class AdminOrderService {
             Cat.logEvent(CatConstants.FEIGN_PARAM,JSON.toJSONString(modifyOrderReq));
             responseObject = feignOrderModifyService.modifyOrderForConsole(modifyOrderReq);
             Cat.logEvent(CatConstants.FEIGN_RESULT,JSON.toJSONString(responseObject));
-            if(responseObject == null || !ErrorCode.SUCCESS.getCode().equals(responseObject.getResCode())){
-                log.error("Feign 修改订单失败,responseObject={},modifyOrderReq={}",JSON.toJSONString(responseObject),JSON.toJSONString(modifyOrderReq));
-                RemoteCallException remoteCallException = null;
-                if(responseObject!=null){
-                    remoteCallException = new RemoteCallException(responseObject.getResCode(),responseObject.getResMsg(),responseObject.getData());
-                }else{
-                    remoteCallException = new RemoteCallException(com.atzuche.order.commons.enums.ErrorCode.REMOTE_CALL_FAIL.getCode(),
-                            com.atzuche.order.commons.enums.ErrorCode.REMOTE_CALL_FAIL.getText());
-                }
-                Cat.logError("Feign 修改订单失败",remoteCallException);
-                throw remoteCallException;
-            }
+            checkResponse(responseObject);
             t.setStatus(Transaction.SUCCESS);
         }catch (Exception e){
             log.error("Feign 修改订单异常,responseObject={},modifyOrderReq={}",JSON.toJSONString(responseObject),JSON.toJSONString(modifyOrderReq),e);
@@ -158,12 +133,7 @@ public class AdminOrderService {
             Cat.logEvent(CatConstants.FEIGN_PARAM,JSON.toJSONString(req));
             responseObject = feignOrderModifyService.ownerHandleModifyApplication(req);
             Cat.logEvent(CatConstants.FEIGN_RESULT,JSON.toJSONString(responseObject));
-            if(responseObject == null || !ErrorCode.SUCCESS.getCode().equals(responseObject.getResCode())){
-                log.error("Feign 管理后台替车主操作修改申请,responseObject={},modifyOrderReq={}",JSON.toJSONString(responseObject),JSON.toJSONString(req));
-                OrderModifyFailException failException = new OrderModifyFailException();
-                Cat.logError("Feign 管理后台替车主操作修改申请",failException);
-                throw failException;
-            }
+            checkResponse(responseObject);
             t.setStatus(Transaction.SUCCESS);
         }catch (Exception e){
             log.error("Feign 管理后台替车主操作修改申请,responseObject={},modifyOrderReq={}",JSON.toJSONString(responseObject),JSON.toJSONString(req),e);
@@ -188,10 +158,7 @@ public class AdminOrderService {
             responseObject =feignOrderModifyService.preModifyOrderFee(modifyOrderAppReqVO);
             Cat.logEvent(CatConstants.FEIGN_RESULT,JSON.toJSONString(responseObject));
             log.info("responseData is {}",JSON.toJSONString(responseObject));
-            if(responseObject==null||!ErrorCode.SUCCESS.getCode().equalsIgnoreCase(responseObject.getResCode())){
-
-                throw new RuntimeException("费用计算异常");
-            }
+            checkResponse(responseObject);
             t.setStatus(Transaction.SUCCESS);
             ModifyOrderCompareVO modifyOrderCompareVO = responseObject.getData();
 
@@ -256,9 +223,7 @@ public class AdminOrderService {
             Cat.logEvent(CatConstants.FEIGN_PARAM,JSON.toJSONString(req));
              responseObject =feignOrderDetailService.getOrderDetail(req);
             Cat.logEvent(CatConstants.FEIGN_RESULT,JSON.toJSONString(responseObject));
-            if(responseObject==null||!ErrorCode.SUCCESS.getCode().equalsIgnoreCase(responseObject.getResCode())){
-                throw new RenterInfoController.RenterNotFoundException(orderNo);
-            }
+            checkResponse(responseObject);
             t.setStatus(Transaction.SUCCESS);
             String memNo = responseObject.getData().getRenterMember().getMemNo();
             return memNo;
@@ -271,5 +236,38 @@ public class AdminOrderService {
         }
 
 
+    }
+
+    public void transferCar(TransferReq req) {
+        ResponseData<?> responseObject = null;
+        Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "订单CoreAPI服务");
+        try{
+            Cat.logEvent(CatConstants.FEIGN_METHOD,"feignOrderUpdateService.ownerHandleModifyApplication");
+            log.info("Feign 管理后台换车操作,param={}", JSON.toJSONString(req));
+            Cat.logEvent(CatConstants.FEIGN_PARAM,JSON.toJSONString(req));
+            responseObject = feignOrderModifyService.transfer(req);
+            Cat.logEvent(CatConstants.FEIGN_RESULT,JSON.toJSONString(responseObject));
+            checkResponse(responseObject);
+            t.setStatus(Transaction.SUCCESS);
+        }catch (Exception e){
+            log.error("Feign 管理后台换车操作,responseObject={},modifyOrderReq={}",JSON.toJSONString(responseObject),JSON.toJSONString(req),e);
+            Cat.logError("Feign 管理后台换车操作",e);
+            throw e;
+        }finally {
+            t.complete();
+        }
+    }
+
+    private void checkResponse(ResponseData responseObject){
+        if(responseObject==null||!ErrorCode.SUCCESS.getCode().equalsIgnoreCase(responseObject.getResCode())){
+            RemoteCallException remoteCallException = null;
+            if(responseObject!=null){
+                remoteCallException = new RemoteCallException(responseObject.getResCode(),responseObject.getResMsg(),responseObject.getData());
+            }else{
+                remoteCallException = new RemoteCallException(com.atzuche.order.commons.enums.ErrorCode.REMOTE_CALL_FAIL.getCode(),
+                        com.atzuche.order.commons.enums.ErrorCode.REMOTE_CALL_FAIL.getText());
+            }
+            throw remoteCallException;
+        }
     }
 }

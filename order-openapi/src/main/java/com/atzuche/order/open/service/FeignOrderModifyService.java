@@ -11,8 +11,10 @@ import com.atzuche.order.commons.vo.res.ModifyOrderMainResVO;
 import com.atzuche.order.commons.vo.res.ModifyOrderResVO;
 import com.atzuche.order.open.vo.ModifyOrderAppReqVO;
 import com.atzuche.order.open.vo.ModifyOrderCompareVO;
+import com.atzuche.order.open.vo.request.TransferReq;
 import com.autoyol.commons.web.ResponseData;
 import org.springframework.cloud.netflix.feign.FeignClient;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -56,4 +58,12 @@ public interface FeignOrderModifyService {
 	 */
 	@PostMapping("/order/modifyorderFee")
 	public ResponseData<ModifyOrderCompareVO> preModifyOrderFee(@Valid @RequestBody ModifyOrderAppReqVO modifyOrderAppReq);
+
+	/**
+	 * 换车
+	 * @param transferReq
+	 * @return
+	 */
+	@PostMapping("/order/transfer")
+	public ResponseData<?> transfer(@Valid @RequestBody TransferReq transferReq);
 }
