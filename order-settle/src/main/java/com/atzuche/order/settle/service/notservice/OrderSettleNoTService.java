@@ -1530,13 +1530,13 @@ public class OrderSettleNoTService {
             RenterCancelWZDepositCostReqVO vo = new RenterCancelWZDepositCostReqVO();
             BeanUtils.copyProperties(settleOrders,vo);
             vo.setMemNo(settleOrders.getRenterMemNo());
-            int debtAmt = rentDepositAmt + rentFineAmt;
+            int debtAmt = rentWzDepositAmt + rentFineAmt;
             //计算抵扣金额
-            int amt = debtAmt>=0?rentFineAmt:-rentDepositAmt;
+            int amt = debtAmt>=0?rentFineAmt:-rentWzDepositAmt;
             vo.setAmt(amt);
             //押金抵扣抵扣 罚金
             cashierSettleService.deductRentWzDepositToRentFine(vo);
-            rentFineAmt = rentDepositAmt + rentFineAmt;
+            rentFineAmt = rentWzDepositAmt + rentFineAmt;
             settleCancelOrdersAccount.setRentSurplusWzDepositAmt(settleCancelOrdersAccount.getRentSurplusWzDepositAmt()+amt);
         }
         //3 租客存在 罚金走历史欠款
