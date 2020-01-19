@@ -171,4 +171,9 @@ public class RabbitConfiguration {
 		return BindingBuilder.bind(wzCheLeHangInfoQueue()).to(wzCheLeHangInfoExchange()).with(RabbitMqEnums.WZ_CHE_LE_HANG_INFO.getRoutingKey());
 	}
 
+    @Bean
+	public Queue HandoverCarMilegeQueue(){
+		return new Queue("handover_car_oil_queue",true);
+	}
+
 }

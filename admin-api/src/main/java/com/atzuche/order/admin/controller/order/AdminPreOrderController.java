@@ -31,8 +31,8 @@ import java.util.List;
  * @date 2020/1/11 1:24 下午
  **/
 @RestController
-public class PreOrderController {
-    private final static Logger logger = LoggerFactory.getLogger(PreOrderController.class);
+public class AdminPreOrderController {
+    private final static Logger logger = LoggerFactory.getLogger(AdminPreOrderController.class);
     
 
     @Autowired

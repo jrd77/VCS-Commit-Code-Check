@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @date 2020/1/6 7:03 下午
  **/
 @RestController
-public class OrderDetailController {
+public class AdminOrderDetailController {
     @Autowired
     private OrderDetailService orderDetailService;
     @Autowired
