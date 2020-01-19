@@ -1463,13 +1463,54 @@ public class OrderSettleNoTService {
             ownerFineAmt = ownerFineAmt +amt;
         }
 
+
+        //租客收入
+        int rentFineIncomeAmt = 0;
+        if(Objects.nonNull(rentCosts) && !CollectionUtils.isEmpty(rentCosts.getRenterOrderFineDeatails())){
+            int amt = rentCosts.getRenterOrderFineDeatails().stream().filter(obj ->{
+                return SubsidySourceCodeEnum.RENTER.getCode().equals(obj.getFineSubsidyCode());
+            }).mapToInt(RenterOrderFineDeatailEntity::getFineAmount).sum();
+            rentFineIncomeAmt = rentFineIncomeAmt +amt;
+        }
+        if(Objects.nonNull(rentCosts) && !CollectionUtils.isEmpty(rentCosts.getConsoleRenterOrderFineDeatails())){
+            int amt = rentCosts.getConsoleRenterOrderFineDeatails().stream().filter(obj ->{
+                return SubsidySourceCodeEnum.RENTER.getCode().equals(obj.getFineSubsidyCode());
+            }).mapToInt(ConsoleRenterOrderFineDeatailEntity::getFineAmount).sum();
+            rentFineIncomeAmt = rentFineIncomeAmt +amt;
+        }
         //车主收入罚金
         int ownerFineIncomeAmt = 0;
-        if(Objects.nonNull(rentCosts) && !CollectionUtils.isEmpty(rentCosts.getRenterOrderFineDeatails())){
-            int amt = rentCosts.getConsoleRenterOrderFineDeatails().stream().filter(obj ->{
+        if(Objects.nonNull(ownerCosts) && !CollectionUtils.isEmpty(ownerCosts.getOwnerOrderFineDeatails())){
+            int amt = ownerCosts.getOwnerOrderFineDeatails().stream().filter(obj ->{
+                return SubsidySourceCodeEnum.OWNER.getCode().equals(obj.getFineSubsidyCode());
+            }).mapToInt(OwnerOrderFineDeatailEntity::getFineAmount).sum();
+            ownerFineIncomeAmt = ownerFineIncomeAmt +amt;
+        }
+        if(Objects.nonNull(ownerCosts) && !CollectionUtils.isEmpty(ownerCosts.getConsoleRenterOrderFineDeatails())){
+            int amt = ownerCosts.getConsoleRenterOrderFineDeatails().stream().filter(obj ->{
                 return SubsidySourceCodeEnum.OWNER.getCode().equals(obj.getFineSubsidyCode());
             }).mapToInt(ConsoleRenterOrderFineDeatailEntity::getFineAmount).sum();
             ownerFineIncomeAmt = ownerFineIncomeAmt +amt;
+        }
+        //平台罚金收入
+        int platformFineImconeAmt=0;
+        if(Objects.nonNull(ownerCosts) && !CollectionUtils.isEmpty(ownerCosts.getOwnerOrderFineDeatails())){
+            int amt = ownerCosts.getOwnerOrderFineDeatails().stream().filter(obj ->{
+                return SubsidySourceCodeEnum.PLATFORM.getCode().equals(obj.getFineSubsidyCode());
+            }).mapToInt(OwnerOrderFineDeatailEntity::getFineAmount).sum();
+            platformFineImconeAmt = platformFineImconeAmt +amt;
+        }
+        if(Objects.nonNull(ownerCosts) && !CollectionUtils.isEmpty(ownerCosts.getConsoleRenterOrderFineDeatails())){
+            int amt = ownerCosts.getConsoleRenterOrderFineDeatails().stream().filter(obj ->{
+                return SubsidySourceCodeEnum.PLATFORM.getCode().equals(obj.getFineSubsidyCode());
+            }).mapToInt(ConsoleRenterOrderFineDeatailEntity::getFineAmount).sum();
+            platformFineImconeAmt = platformFineImconeAmt +amt;
+        }
+        if(Objects.nonNull(rentCosts) && !CollectionUtils.isEmpty(rentCosts.getRenterOrderFineDeatails())){
+            int amt = rentCosts.getRenterOrderFineDeatails().stream().filter(obj ->{
+                return SubsidySourceCodeEnum.PLATFORM.getCode().equals(obj.getFineSubsidyCode());
+            }).mapToInt(RenterOrderFineDeatailEntity::getFineAmount).sum();
+            platformFineImconeAmt = platformFineImconeAmt +amt;
         }
 
         settleCancelOrdersAccount.setOwnerFineAmt(ownerFineAmt);
@@ -1483,6 +1524,9 @@ public class OrderSettleNoTService {
         settleCancelOrdersAccount.setRenWalletAmt(rentWalletAmt);
         settleCancelOrdersAccount.setRentSurplusWalletAmt(rentWalletAmt);
         settleCancelOrdersAccount.setRenCoinAmt(renCoinAmt);
+        settleCancelOrdersAccount.setOwnerFineIncomeAmt(ownerFineIncomeAmt);
+        settleCancelOrdersAccount.setRentFineIncomeAmt(rentFineIncomeAmt);
+        settleCancelOrdersAccount.setPlatformFineImconeAmt(platformFineImconeAmt);
         return settleCancelOrdersAccount;
     }
 
@@ -1805,5 +1849,44 @@ public class OrderSettleNoTService {
             log.error("OrderSettleNoTService settleUndoCoupon error [{}]",e);
         }
 
+    }
+
+    /**
+     * 处理
+     * @param settleOrders
+     * @param settleCancelOrdersAccount
+     */
+    public void handleIncomeFine(SettleOrders settleOrders, SettleCancelOrdersAccount settleCancelOrdersAccount) {
+        // 租客罚金收益
+        if(settleCancelOrdersAccount.getRentFineIncomeAmt()>0){
+            AccountRenterCostSettleDetailEntity entity = new AccountRenterCostSettleDetailEntity();
+            entity.setOrderNo(settleOrders.getOrderNo());
+            entity.setMemNo(settleOrders.getRenterMemNo());
+            entity.setRenterOrderNo(settleOrders.getRenterOrderNo());
+            entity.setAmt(settleCancelOrdersAccount.getRentFineIncomeAmt());
+            entity.setType(1);
+            cashierSettleService.insertAccountRenterCostSettleDetail(entity);
+            walletProxyService.returnOrChargeWallet(settleOrders.getRenterMemNo(),settleOrders.getOrderNo(),settleCancelOrdersAccount.getRentFineIncomeAmt());
+        }
+        // 车主罚金收入
+        if(settleCancelOrdersAccount.getOwnerFineIncomeAmt()>0){
+            AccountOwnerIncomeExamineReqVO accountOwnerIncomeExamine = new AccountOwnerIncomeExamineReqVO();
+            accountOwnerIncomeExamine.setAmt(settleCancelOrdersAccount.getOwnerFineIncomeAmt());
+            accountOwnerIncomeExamine.setMemNo(settleOrders.getOwnerMemNo());
+            accountOwnerIncomeExamine.setOrderNo(settleOrders.getOrderNo());
+            accountOwnerIncomeExamine.setRemark("罚金收入");
+            cashierService.insertOwnerIncomeExamine(accountOwnerIncomeExamine);
+        }
+        // 平台罚金收入
+        if(settleCancelOrdersAccount.getPlatformFineImconeAmt()>0){
+            List<AccountPlatformProfitDetailEntity> accountPlatformProfitDetails = new ArrayList<>();
+            AccountPlatformProfitDetailEntity entity = new AccountPlatformProfitDetailEntity();
+            entity.setOrderNo(settleOrders.getOrderNo());
+            entity.setAmt(settleCancelOrdersAccount.getPlatformFineImconeAmt());
+            entity.setSourceDesc(RenterCashCodeEnum.ACCOUNT_RENTER_FINE_COST.getTxt());
+            entity.setSourceCode(RenterCashCodeEnum.ACCOUNT_RENTER_FINE_COST.getCashNo());
+            cashierSettleService.insertAccountPlatformProfitDetails(accountPlatformProfitDetails);
+
+        }
     }
 }

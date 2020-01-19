@@ -27,6 +27,10 @@ public class AccountOwnerIncomeExamineReqVO {
      * 更新人
      */
     private String createOp;
+    /**
+     * 备注
+     */
+    private String remark;
 
 
     public void check() {

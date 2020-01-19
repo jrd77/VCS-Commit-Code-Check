@@ -15,7 +15,7 @@ public class SettleCancelOrdersAccount {
     /**
      * 平台收入罚金
      */
-    private int platformFineAmt;
+    private int platformFineImconeAmt;
     /** ***********************************************************************************车主端统计费用 统计费用 */
 
     /**
