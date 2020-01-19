@@ -184,5 +184,15 @@
 		and pay_flag in (1,2,4,5)
 		and is_delete = 0
 	</select>
+	
+	<select id="listOrderSupplementDetailByOrderNo" resultMap="BaseResultMap">
+		select <include refid="Base_Column_List" /> from order_supplement_detail where order_no = #{orderNo} 
+		and is_delete = 0
+	</select>
   	
+  	<update id="updateDeleteById">
+		update order_supplement_detail 
+		set `is_delete` = 1
+		where id = #{id}
+	</update>
 </mapper>
