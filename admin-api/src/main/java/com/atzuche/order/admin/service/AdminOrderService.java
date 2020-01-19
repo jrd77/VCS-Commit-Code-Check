@@ -16,6 +16,7 @@ import com.atzuche.order.car.RenterCarDetailFailException;
 import com.atzuche.order.commons.CatConstants;
 import com.atzuche.order.commons.entity.orderDetailDto.OrderDetailReqDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.OrderDetailRespDTO;
+import com.atzuche.order.commons.exceptions.RemoteCallException;
 import com.atzuche.order.commons.vo.req.AdminOrderCancelReqVO;
 import com.atzuche.order.commons.vo.req.CancelOrderReqVO;
 import com.atzuche.order.commons.vo.req.ModifyApplyHandleReq;
@@ -114,7 +115,7 @@ public class AdminOrderService {
     }
 
 
-    public ResponseData modifyOrder(ModifyOrderReqVO modifyOrderReq) {
+    public void modifyOrder(ModifyOrderReqVO modifyOrderReq) {
         ResponseData<?> responseObject = null;
         Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "租客商品信息");
         try{
@@ -125,24 +126,25 @@ public class AdminOrderService {
             Cat.logEvent(CatConstants.FEIGN_RESULT,JSON.toJSONString(responseObject));
             if(responseObject == null || !ErrorCode.SUCCESS.getCode().equals(responseObject.getResCode())){
                 log.error("Feign 修改订单失败,responseObject={},modifyOrderReq={}",JSON.toJSONString(responseObject),JSON.toJSONString(modifyOrderReq));
-                OrderModifyFailException failException = new OrderModifyFailException();
-                Cat.logError("Feign 修改订单失败",failException);
-                throw failException;
+                RemoteCallException remoteCallException = null;
+                if(responseObject!=null){
+                    remoteCallException = new RemoteCallException(responseObject.getResCode(),responseObject.getResMsg(),responseObject.getData());
+                }else{
+                    remoteCallException = new RemoteCallException(com.atzuche.order.commons.enums.ErrorCode.REMOTE_CALL_FAIL.getCode(),
+                            com.atzuche.order.commons.enums.ErrorCode.REMOTE_CALL_FAIL.getText());
+                }
+                Cat.logError("Feign 修改订单失败",remoteCallException);
+                throw remoteCallException;
             }
             t.setStatus(Transaction.SUCCESS);
-        }catch (RenterCarDetailFailException e){
-            Cat.logError("Feign 修改订单失败",e);
-            t.setStatus(e);
-            throw e;
         }catch (Exception e){
             log.error("Feign 修改订单异常,responseObject={},modifyOrderReq={}",JSON.toJSONString(responseObject),JSON.toJSONString(modifyOrderReq),e);
-            OrderModifyErrException err = new OrderModifyErrException();
-            Cat.logError("Feign 修改订单异常",err);
-            throw err;
+            Cat.logError("Feign 修改订单异常",e);
+            t.setStatus(e);
+            throw e;
         }finally {
             t.complete();
         }
-        return responseObject;
     }
 
     public void modificationConfirm(OrderModifyConfirmReqVO reqVO) {

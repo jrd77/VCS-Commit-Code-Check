@@ -72,8 +72,8 @@ public class AdminOrderController {
         String  memNo = detailRespDTO.getRenterMember().getMemNo();
         modifyOrderReqVO.setMemNo(memNo);
 
-        ResponseData responseData = adminOrderService.modifyOrder(modifyOrderReqVO);
-        return responseData;
+        adminOrderService.modifyOrder(modifyOrderReqVO);
+        return ResponseData.success();
     }
 
     @AutoDocVersion(version = "订单修改")
