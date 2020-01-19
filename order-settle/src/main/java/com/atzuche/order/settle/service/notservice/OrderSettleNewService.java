@@ -93,7 +93,7 @@ public class OrderSettleNewService {
         settleOrdersAccount.setOrderStatusDTO(orderStatusDTO);
         orderSettleNoTService.saveOrderStatusInfo(settleOrdersAccount);
         log.info("OrderSettleService settleOrdersDefinition settleOrdersAccount two [{}]", GsonUtils.toJson(settleOrdersAccount));
-        //16 退优惠卷
+        //16 退优惠卷 凹凸币
         orderSettleNoTService.settleUndoCoupon(settleOrders.getOrderNo(),settleOrders.getRentCosts().getRenterOrderSubsidyDetails());
         log.info("OrderSettleService settleUndoCoupon settleUndoCoupon one [{}]", GsonUtils.toJson(settleOrdersAccount));
         Cat.logEvent("settleUndoCoupon",GsonUtils.toJson(settleOrdersAccount));

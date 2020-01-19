@@ -926,7 +926,7 @@ public class OrderSettleNoTService {
                     accountRenterCostSettleDetail.setAmt(renterOrderCostDetail.getSubsidyAmount());
                     accountRenterCostSettleDetails.add(accountRenterCostSettleDetail);
                     // 平台补贴 记录补贴
-                    if(SubsidySourceCodeEnum.PLATFORM.getCode().equals(renterOrderCostDetail.getSubsidySourceCode())){
+                    if(SubsidySourceCodeEnum.PLATFORM.getCode().equals(renterOrderCostDetail.getSubsidyTargetCode())){
                         AccountPlatformSubsidyDetailEntity entity = new AccountPlatformSubsidyDetailEntity();
                         BeanUtils.copyProperties(renterOrderCostDetail,entity);
                         entity.setSourceCode(RenterCashCodeEnum.ACCOUNT_RENTER_SUBSIDY_COST.getCashNo());
@@ -1136,14 +1136,6 @@ public class OrderSettleNoTService {
         //应退结余 租车费用
         int rentCostSurplusAmt = settleOrdersAccount.getRentCostSurplusAmt();
         if(rentCostSurplusAmt>0){
-            //1 退还凹凸币 coinAmt为订单真实使用的凹凸币
-            int coinAmt = accountRenterCostSettleDetails.stream().filter(obj ->{
-                return RenterCashCodeEnum.AUTO_COIN_DEDUCT.getCashNo().equals(obj.getCostCode());
-            }).mapToInt(AccountRenterCostSettleDetailEntity::getAmt).sum();
-            if(coinAmt>0){
-                //退还多余凹凸币
-                accountRenterCostCoinService.settleAutoCoin(settleOrdersAccount.getRenterMemNo(),settleOrdersAccount.getOrderNo(),coinAmt);
-            }
             //退还租车费用
             if(rentCostSurplusAmt>0){
                 // 实付
@@ -1170,6 +1162,15 @@ public class OrderSettleNoTService {
             //记录 凹凸币/钱包退还 流水
             cashierSettleService.insertAccountRenterCostSettleDetails(renterCostSettleDetails);
         }
+        //1 退还凹凸币 coinAmt为订单真实使用的凹凸币
+        int coinAmt = accountRenterCostSettleDetails.stream().filter(obj ->{
+            return RenterCashCodeEnum.AUTO_COIN_DEDUCT.getCashNo().equals(obj.getCostCode());
+        }).mapToInt(AccountRenterCostSettleDetailEntity::getAmt).sum();
+        if(coinAmt>0){
+            //退还多余凹凸币
+            accountRenterCostCoinService.settleAutoCoin(settleOrdersAccount.getRenterMemNo(),settleOrdersAccount.getOrderNo(),coinAmt);
+        }
+
     }
     /**
      * 结算退还租车费用金额 费用明细
@@ -1388,6 +1389,7 @@ public class OrderSettleNoTService {
             int amt = rentCosts.getConsoleRenterOrderFineDeatails().stream().mapToInt(ConsoleRenterOrderFineDeatailEntity::getFineAmount).sum();
             rentFineAmt = rentFineAmt +amt;
         }
+
         // 计算凹凸币使用金额
         int renCoinAmt =0;
         if(Objects.nonNull(rentCosts) && !CollectionUtils.isEmpty(rentCosts.getRenterOrderSubsidyDetails())){
@@ -1406,6 +1408,16 @@ public class OrderSettleNoTService {
             int amt = ownerCosts.getConsoleRenterOrderFineDeatails().stream().mapToInt(ConsoleRenterOrderFineDeatailEntity::getFineAmount).sum();
             ownerFineAmt = ownerFineAmt +amt;
         }
+
+        //车主收入罚金
+        int ownerFineIncomeAmt = 0;
+        if(Objects.nonNull(rentCosts) && !CollectionUtils.isEmpty(rentCosts.getRenterOrderFineDeatails())){
+            int amt = rentCosts.getConsoleRenterOrderFineDeatails().stream().filter(obj ->{
+                return SubsidySourceCodeEnum.OWNER.getCode().equals(obj.getFineSubsidyCode());
+            }).mapToInt(ConsoleRenterOrderFineDeatailEntity::getFineAmount).sum();
+            ownerFineIncomeAmt = ownerFineIncomeAmt +amt;
+        }
+
         settleCancelOrdersAccount.setOwnerFineAmt(ownerFineAmt);
         settleCancelOrdersAccount.setRentFineAmt(rentFineAmt);
         settleCancelOrdersAccount.setRentCostAmt(rentCostAmt);
