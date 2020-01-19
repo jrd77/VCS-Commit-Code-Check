@@ -76,6 +76,5 @@ public class PayedOrderRenterDepositWZDetailReqVO {
         Assert.notNull(getMemNo(), ErrorCode.PARAMETER_ERROR.getText());
         Assert.notNull(getOrderNo(), ErrorCode.PARAMETER_ERROR.getText());
         Assert.notNull(getRenterCashCodeEnum(), ErrorCode.PARAMETER_ERROR.getText());
-        Assert.notNull(getUniqueNo(), ErrorCode.PARAMETER_ERROR.getText());
     }
 }
