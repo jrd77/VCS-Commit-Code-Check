@@ -197,7 +197,7 @@ public class CashierService {
         cashierDeductDebtReqVO.check();
         //1 查询历史总欠款
         int debtAmt = accountDebtService.getAccountDebtNumByMemNo(cashierDeductDebtReqVO.getMemNo());
-        if(debtAmt<=0){
+        if(debtAmt>=0){
             return null;
         }
         //2 抵扣
@@ -220,7 +220,7 @@ public class CashierService {
         cashierDeductDebtReq.check();
         //1 查询历史总欠款
         int debtAmt = accountDebtService.getAccountDebtNumByMemNo(cashierDeductDebtReq.getMemNo());
-        if(debtAmt<=0){
+        if(debtAmt>=0){
             return null;
         }
         //2 抵扣
