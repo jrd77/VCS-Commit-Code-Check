@@ -115,6 +115,7 @@ public class OrderController {
     @AutoDocMethod(description = "车主拒绝或者同意租客的订单修改申请接口", value = "车主拒绝或者同意租客的订单修改申请接口",response = ResponseData.class)
     @RequestMapping(value="console/order/modify/confirm",method = RequestMethod.POST)
     public ResponseData modifyApplicationConfirm(@Valid @RequestBody OrderModifyConfirmReqVO reqVO,BindingResult result){
+        log.info("reqVo is {}",reqVO);
         if(result.hasErrors()){
             Optional<FieldError> error = result.getFieldErrors().stream().findFirst();
             return ResponseData.createErrorCodeResponse(ErrorCode.INPUT_ERROR.getCode(), error.isPresent() ?

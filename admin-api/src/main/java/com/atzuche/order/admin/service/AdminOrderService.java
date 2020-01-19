@@ -25,6 +25,7 @@ import com.atzuche.order.open.service.FeignOrderModifyService;
 import com.atzuche.order.open.service.FeignOrderUpdateService;
 import com.atzuche.order.open.vo.ModifyOrderAppReqVO;
 import com.atzuche.order.open.vo.ModifyOrderCompareVO;
+import com.atzuche.order.open.vo.ModifyOrderFeeVO;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
 import com.dianping.cat.Cat;
@@ -192,17 +193,42 @@ public class AdminOrderService {
             t.setStatus(Transaction.SUCCESS);
             ModifyOrderCompareVO modifyOrderCompareVO = responseObject.getData();
 
+            log.info("modifyOrderCompareVo is {}",modifyOrderCompareVO);
+
+            ModifyOrderFeeVO initModifyOrderFeeVO = modifyOrderCompareVO.getInitModifyOrderFeeVO();
+            if(initModifyOrderFeeVO==null){
+                throw new RuntimeException("初始费用计算异常");
+            }
+            ModifyOrderFeeVO  updateModifyOrderFeeVO = modifyOrderCompareVO.getUpdateModifyOrderFeeVO();
+            if(updateModifyOrderFeeVO==null){
+                throw new RuntimeException("修改后费用计算异常");
+            }
+
+
             AdminModifyOrderFeeCompareVO adminModifyOrderFeeCompareVO = new AdminModifyOrderFeeCompareVO();
             AdminModifyOrderFeeVO before = new AdminModifyOrderFeeVO();
-            BeanUtils.copyProperties(modifyOrderCompareVO.getInitModifyOrderFeeVO().getModifyOrderCostVO(),before);
-            BeanUtils.copyProperties(modifyOrderCompareVO.getInitModifyOrderFeeVO().getModifyOrderDeductVO(),before);
-            BeanUtils.copyProperties(modifyOrderCompareVO.getInitModifyOrderFeeVO().getModifyOrderFineVO(),before);
+            if(initModifyOrderFeeVO.getModifyOrderCostVO()!=null) {
+                BeanUtils.copyProperties(initModifyOrderFeeVO.getModifyOrderCostVO(), before);
+            }
+            if(initModifyOrderFeeVO.getModifyOrderDeductVO()!=null) {
+                BeanUtils.copyProperties(initModifyOrderFeeVO.getModifyOrderDeductVO(), before);
+            }
+            if(initModifyOrderFeeVO.getModifyOrderFineVO()!=null) {
+                BeanUtils.copyProperties(initModifyOrderFeeVO.getModifyOrderFineVO(), before);
+            }
+
             adminModifyOrderFeeCompareVO.setBefore(before);
 
             AdminModifyOrderFeeVO after = new AdminModifyOrderFeeVO();
-            BeanUtils.copyProperties(modifyOrderCompareVO.getUpdateModifyOrderFeeVO().getModifyOrderCostVO(),after);
-            BeanUtils.copyProperties(modifyOrderCompareVO.getUpdateModifyOrderFeeVO().getModifyOrderDeductVO(),after);
-            BeanUtils.copyProperties(modifyOrderCompareVO.getUpdateModifyOrderFeeVO().getModifyOrderFineVO(),after);
+            if(updateModifyOrderFeeVO.getModifyOrderCostVO()!=null) {
+                BeanUtils.copyProperties(updateModifyOrderFeeVO.getModifyOrderCostVO(), after);
+            }
+            if(updateModifyOrderFeeVO.getModifyOrderDeductVO()!=null) {
+                BeanUtils.copyProperties(updateModifyOrderFeeVO.getModifyOrderDeductVO(), after);
+            }
+            if(updateModifyOrderFeeVO.getModifyOrderFineVO()!=null) {
+                BeanUtils.copyProperties(updateModifyOrderFeeVO.getModifyOrderFineVO(), after);
+            }
             adminModifyOrderFeeCompareVO.setAfter(after);
             return  adminModifyOrderFeeCompareVO;
 
