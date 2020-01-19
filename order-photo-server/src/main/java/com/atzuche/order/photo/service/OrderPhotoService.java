@@ -28,6 +28,7 @@ import java.awt.image.BufferedImage;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class OrderPhotoService {
@@ -183,4 +184,32 @@ public class OrderPhotoService {
 			transIllegalPhotoToRenyun(orderNo);
 		}
 	}
+
+	/**
+	 * 接受仁云上传的交接车 取还车照片数据
+	 */
+	public void recevieRenYunDeliveryCarPhoto(OrderPhotoEntity orderPhotoEntity){
+	    orderPhotoMapper.addRenYunUploadOrderPhoto(orderPhotoEntity);
+	}
+
+    /**
+     * 查询符合条件的交接车 取还车数据
+     * @param orderPhotoEntity
+     * @return
+     */
+	public OrderPhotoEntity selectObjectByParams(OrderPhotoEntity orderPhotoEntity){
+	    return orderPhotoMapper.selectObjectByParams(orderPhotoEntity);
+    }
+
+    /**
+     * 更新仁云 交接车 取还车数据
+     * @return
+     */
+    public void updateDeliveryCarPhotoInfo(String photoId,String path,String operator,String userType,String photoType){
+        orderPhotoMapper.updateUploadOrderPhoto(photoId,path,operator,userType,photoType);
+    }
+
+
+
+
 }

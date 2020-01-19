@@ -2,7 +2,7 @@ package com.atzuche.order.transport.common;
 
 /**
  * @author 胡春林
- * 超运能服务错误码
+ * 费用服务错误码
  */
 public enum TransPortErrorCode {
 

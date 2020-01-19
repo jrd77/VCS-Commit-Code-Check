@@ -37,7 +37,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 获取租客取还车费用
+ * 获取租客取还车费用（待优化  去掉DTO 入参出参用基础数据类型返回）
  */
 @Service
 @Slf4j
@@ -120,8 +120,6 @@ public class GetReturnCarCostProxyService {
         sumJudgeFreeFee = sumJudgeFreeFee == null ? 0:sumJudgeFreeFee;
         String sumJudgeFreeFeeStr = String.valueOf(sumJudgeFreeFee);
         log.info("取还车费用计算，租金+保险+不计免赔+手续费 sumJudgeFreeFee=[{}]", sumJudgeFreeFee);
-
-
 
         GetFbcFeeRequest getFbcFeeRequest = new GetFbcFeeRequest();
         List<GetFbcFeeRequestDetail> reqList = new ArrayList<>();
