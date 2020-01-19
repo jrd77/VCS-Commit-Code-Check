@@ -121,7 +121,7 @@ public class OrderSettleNewService {
         //5 费用明细先落库
         orderSettleNoTService.insertSettleOrders(settleOrdersDefinition);
 
-        //6 费用平账 平台收入 + 平台补贴 +  + 车主补贴 + 租客费用 + 租客补贴 = 0
+        //6 费用平账 平台收入 + 平台补贴 + 车主费用 + 车主补贴 + 租客费用 + 租客补贴 = 0
         int totleAmt = settleOrdersDefinition.getPlatformProfitAmt() + settleOrdersDefinition.getPlatformSubsidyAmt()
                 + settleOrdersDefinition.getOwnerCostAmt() + settleOrdersDefinition.getOwnerSubsidyAmt()
                 + settleOrdersDefinition.getRentCostAmt() + settleOrdersDefinition.getRentSubsidyAmt();
