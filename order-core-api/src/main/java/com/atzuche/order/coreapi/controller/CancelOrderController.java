@@ -5,6 +5,7 @@ import com.atzuche.order.commons.enums.DispatcherStatusEnum;
 import com.atzuche.order.commons.enums.PlatformCancelReasonEnum;
 import com.atzuche.order.commons.vo.req.AdminOrderCancelReqVO;
 import com.atzuche.order.commons.vo.req.CancelOrderReqVO;
+import com.atzuche.order.coreapi.service.CancelOrderFeeService;
 import com.atzuche.order.coreapi.service.CancelOrderService;
 import com.atzuche.order.coreapi.service.OwnerOrderFineApplyHandelService;
 import com.atzuche.order.coreapi.service.PlatformCancelOrderService;
@@ -44,6 +45,8 @@ public class CancelOrderController {
     private OwnerOrderFineApplyHandelService ownerOrderFineApplyHandelService;
     @Autowired
     private PlatformCancelOrderService platformCancelOrderService;
+    @Autowired
+    private CancelOrderFeeService cancelOrderFeeService;
 
 
     @AutoDocMethod(description = "取消订单", value = "取消订单")
@@ -85,6 +88,11 @@ public class CancelOrderController {
                 DispatcherStatusEnum.from(dispatcherStatus));
         return ResponseData.success(result);
     }
-
+    
+    @GetMapping("/cancelfee")
+    public ResponseData<?> cancelOrderFee(@RequestParam(value="orderNo",required = true) String orderNo) {
+    	Integer penalty = cancelOrderFeeService.getCancelPenalty(orderNo);
+    	return ResponseData.success(penalty);
+    }
 
 }
