@@ -744,7 +744,7 @@ public class OrderSettleNoTService {
         }
         //1.7 获取车主油费
         OwnerGetAndReturnCarDTO ownerGetAndReturnCarDTO = ownerCosts.getOwnerGetAndReturnCarDTO();
-        if(Objects.nonNull(ownerGetAndReturnCarDTO) && StringUtil.isBlank(ownerGetAndReturnCarDTO.getCarOilDifferenceCrash())){
+        if(Objects.nonNull(ownerGetAndReturnCarDTO) && !StringUtil.isBlank(ownerGetAndReturnCarDTO.getCarOilDifferenceCrash())){
             AccountOwnerCostSettleDetailEntity accountOwnerCostSettleDetail = new AccountOwnerCostSettleDetailEntity();
             BeanUtils.copyProperties(ownerGetAndReturnCarDTO,accountOwnerCostSettleDetail);
             accountOwnerCostSettleDetail.setSourceCode(OwnerCashCodeEnum.ACCOUNT_OWNER_SETTLE_OIL_COST.getCashNo());

@@ -1,5 +1,8 @@
 package com.atzuche.order.settle.service;
 
+import com.atzuche.order.commons.enums.account.SettleStatusEnum;
+import com.atzuche.order.commons.service.OrderPayCallBack;
+import com.atzuche.order.parentorder.service.OrderStatusService;
 import com.atzuche.order.renterorder.service.OrderCouponService;
 import com.atzuche.order.settle.service.notservice.OrderSettleNewService;
 import org.springframework.beans.BeanUtils;
@@ -33,7 +36,7 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @Slf4j
 public class OrderSettleService{
-    @Autowired private CashierSettleService cashierSettleService;
+    @Autowired private OrderStatusService orderStatusService;
     @Autowired private OrderSettleNoTService orderSettleNoTService;
     @Autowired private CashierService cashierService;
     @Autowired private OrderSettleNewService orderSettleNewService;
@@ -85,6 +88,10 @@ public class OrderSettleService{
             t.setStatus(Transaction.SUCCESS);
         } catch (Exception e) {
             log.error("OrderSettleService settleOrder,e={},",e);
+            OrderStatusDTO orderStatusDTO = new OrderStatusDTO();
+            orderStatusDTO.setOrderNo(orderNo);
+            orderStatusDTO.setSettleStatus(SettleStatusEnum.SETTL_FAIL.getCode());
+            orderStatusService.saveOrderStatusInfo(orderStatusDTO);
             t.setStatus(e);
             Cat.logError("结算失败  :{}",e);
             throw new RuntimeException("结算失败 ,不能结算");
