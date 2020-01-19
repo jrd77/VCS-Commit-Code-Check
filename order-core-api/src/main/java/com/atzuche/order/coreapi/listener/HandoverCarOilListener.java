@@ -31,7 +31,7 @@ public class HandoverCarOilListener {
      *
      * @param message
      */
-    @RabbitListener(queues = HANDOVER_CAR_OIL_RENYUN_QUEUE, containerFactory = "rabbitListenerContainerFactory")
+    //影响启动暂时注掉@RabbitListener(queues = HANDOVER_CAR_OIL_RENYUN_QUEUE, containerFactory = "rabbitListenerContainerFactory")
     public void onMessage(Message message) {
         LOGGER.info("HandoverCarOilListener process start param;[{}]", message.toString());
         Transaction t = Cat.getProducer().newTransaction(CatConstants.RABBIT_MQ_CALL, "获取仁云里程油耗信息MQ");
