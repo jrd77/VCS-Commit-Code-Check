@@ -18,7 +18,6 @@ import com.autoyol.doc.annotation.AutoDocGroup;
 import com.autoyol.doc.annotation.AutoDocMethod;
 import com.autoyol.doc.annotation.AutoDocVersion;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,8 +40,8 @@ import java.util.Optional;
  **/
 @Slf4j
 @RestController
-public class OrderController {
-    private final static Logger logger = LoggerFactory.getLogger(OrderController.class);
+public class AdminOrderController {
+    private final static Logger logger = LoggerFactory.getLogger(AdminOrderController.class);
     
     @Autowired
     private AdminOrderService adminOrderService;
