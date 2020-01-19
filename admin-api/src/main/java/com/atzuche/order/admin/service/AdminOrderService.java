@@ -194,15 +194,27 @@ public class AdminOrderService {
 
             AdminModifyOrderFeeCompareVO adminModifyOrderFeeCompareVO = new AdminModifyOrderFeeCompareVO();
             AdminModifyOrderFeeVO before = new AdminModifyOrderFeeVO();
-            BeanUtils.copyProperties(modifyOrderCompareVO.getInitModifyOrderFeeVO().getModifyOrderCostVO(),before);
-            BeanUtils.copyProperties(modifyOrderCompareVO.getInitModifyOrderFeeVO().getModifyOrderDeductVO(),before);
-            BeanUtils.copyProperties(modifyOrderCompareVO.getInitModifyOrderFeeVO().getModifyOrderFineVO(),before);
+            if (modifyOrderCompareVO.getInitModifyOrderFeeVO().getModifyOrderCostVO() != null) {
+            	BeanUtils.copyProperties(modifyOrderCompareVO.getInitModifyOrderFeeVO().getModifyOrderCostVO(),before);
+            }
+            if (modifyOrderCompareVO.getInitModifyOrderFeeVO().getModifyOrderDeductVO() != null) {
+            	BeanUtils.copyProperties(modifyOrderCompareVO.getInitModifyOrderFeeVO().getModifyOrderDeductVO(),before);
+            }
+            if (modifyOrderCompareVO.getInitModifyOrderFeeVO().getModifyOrderFineVO() != null) {
+            	BeanUtils.copyProperties(modifyOrderCompareVO.getInitModifyOrderFeeVO().getModifyOrderFineVO(),before);
+            }
             adminModifyOrderFeeCompareVO.setBefore(before);
 
             AdminModifyOrderFeeVO after = new AdminModifyOrderFeeVO();
-            BeanUtils.copyProperties(modifyOrderCompareVO.getUpdateModifyOrderFeeVO().getModifyOrderCostVO(),after);
-            BeanUtils.copyProperties(modifyOrderCompareVO.getUpdateModifyOrderFeeVO().getModifyOrderDeductVO(),after);
-            BeanUtils.copyProperties(modifyOrderCompareVO.getUpdateModifyOrderFeeVO().getModifyOrderFineVO(),after);
+            if (modifyOrderCompareVO.getUpdateModifyOrderFeeVO().getModifyOrderCostVO() != null) {
+            	BeanUtils.copyProperties(modifyOrderCompareVO.getUpdateModifyOrderFeeVO().getModifyOrderCostVO(),after);
+            }
+            if (modifyOrderCompareVO.getUpdateModifyOrderFeeVO().getModifyOrderDeductVO() != null) {
+            	BeanUtils.copyProperties(modifyOrderCompareVO.getUpdateModifyOrderFeeVO().getModifyOrderDeductVO(),after);
+            }
+            if (modifyOrderCompareVO.getUpdateModifyOrderFeeVO().getModifyOrderFineVO() != null) {
+            	BeanUtils.copyProperties(modifyOrderCompareVO.getUpdateModifyOrderFeeVO().getModifyOrderFineVO(),after);
+            }
             adminModifyOrderFeeCompareVO.setAfter(after);
             return  adminModifyOrderFeeCompareVO;
 
