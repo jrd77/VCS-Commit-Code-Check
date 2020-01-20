@@ -1046,7 +1046,7 @@ public class OrderCostDetailService {
             throw new Exception("获取订单数据(车主)为空");
         }
         
-        int rentAmt = ownerCostReqVO.getRentAmt()!=null?Integer.valueOf(ownerCostReqVO.getRentAmt()):0;
+        int rentAmt = ownerCostReqVO.getOwnerSubsidyRentAmt()!=null?Integer.valueOf(ownerCostReqVO.getOwnerSubsidyRentAmt()):0;
         
         
         SubsidySourceCodeEnum sourceEnum = SubsidySourceCodeEnum.OWNER; //固定
