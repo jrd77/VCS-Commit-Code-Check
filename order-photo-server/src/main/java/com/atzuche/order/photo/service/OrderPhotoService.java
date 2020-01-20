@@ -9,7 +9,7 @@ import com.atzuche.order.photo.dto.PhotoPathDTO;
 import com.atzuche.order.photo.enums.UserTypeEnum;
 import com.atzuche.order.photo.mapper.OrderPhotoMapper;
 import com.atzuche.order.photo.mq.AliyunMnsService;
-import com.atzuche.order.photo.util.SysConf;
+import com.atzuche.order.photo.util.oss.SysConf;
 import com.atzuche.order.photo.util.oss.OSSUtils;
 import com.atzuche.order.photo.vo.req.OrderUpdateRequestVO;
 import com.atzuche.order.photo.vo.resp.OrderViolationPhotoResponseVO;
@@ -22,7 +22,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.annotation.Resource;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.InputStream;

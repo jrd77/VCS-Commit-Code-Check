@@ -55,7 +55,10 @@ public class OrderRemarkLogService {
         orderRemarkLogEntity.setNumber(oldOrderRemarkEntity.getNumber());
         orderRemarkLogEntity.setDepartmentId(oldOrderRemarkEntity.getDepartmentId());
         String remarkContent = oldOrderRemarkEntity.getRemarkContent();
-        orderRemarkLogEntity.setRemarkContent(remarkContent);
+        if(orderRemarkLogEntity.getRemarkContent()==null){
+            orderRemarkLogEntity.setRemarkContent(remarkContent);
+        }
+
         orderRemarkLogMapper.addOrderRemarkLog(orderRemarkLogEntity);
     }
 
