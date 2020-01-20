@@ -575,7 +575,7 @@ public class OrderSettleNoTService {
         //2统计 车主结算费用明细， 补贴，费用总额
         handleOwnerAndPlatform(settleOrdersDefinition,settleOrders);
         //3统计 计算总费用
-        countCost(settleOrdersDefinition);
+        countCost(settleOrdersDefinition,settleOrders);
         return settleOrdersDefinition;
     }
 
@@ -583,7 +583,7 @@ public class OrderSettleNoTService {
      * 根据流水记录总账
      * @param settleOrdersDefinition
      */
-    private void countCost(SettleOrdersDefinition settleOrdersDefinition) {
+    private void countCost(SettleOrdersDefinition settleOrdersDefinition,SettleOrders settleOrders) {
         List<AccountRenterCostSettleDetailEntity> accountRenterCostSettleDetails = settleOrdersDefinition.getAccountRenterCostSettleDetails();
         //1租客总账
         if(!CollectionUtils.isEmpty(accountRenterCostSettleDetails)){
@@ -614,6 +614,9 @@ public class OrderSettleNoTService {
             int platformSubsidyAmt = accountPlatformSubsidyDetails.stream().mapToInt(AccountPlatformSubsidyDetailEntity::getAmt).sum();
             settleOrdersDefinition.setPlatformSubsidyAmt(platformSubsidyAmt);
         }
+        // 5 计算车主、租客交接车油费差
+        orderSettleNewService.addPlatFormAmt(settleOrdersDefinition,settleOrders);
+
     }
 
     /**
@@ -1309,7 +1312,7 @@ public class OrderSettleNoTService {
         if(settleOrdersAccount.getOwnerCostSurplusAmt()>0){
             CashierDeductDebtReqVO cashierDeductDebtReq = new CashierDeductDebtReqVO();
             BeanUtils.copyProperties(settleOrdersAccount,cashierDeductDebtReq);
-            cashierDeductDebtReq.setMemNo(settleOrdersAccount.getRenterMemNo());
+            cashierDeductDebtReq.setMemNo(settleOrdersAccount.getOwnerMemNo());
             cashierDeductDebtReq.setAmt(settleOrdersAccount.getOwnerCostSurplusAmt());
             cashierDeductDebtReq.setRenterCashCodeEnum(RenterCashCodeEnum.SETTLE_OWNER_INCOME_TO_HISTORY_AMT);
             CashierDeductDebtResVO result = cashierService.deductDebtByOwnerIncome(cashierDeductDebtReq);
@@ -1330,7 +1333,7 @@ public class OrderSettleNoTService {
         if(settleOrdersAccount.getOwnerCostSurplusAmt()>0){
             AccountOwnerIncomeExamineReqVO accountOwnerIncomeExamine = new AccountOwnerIncomeExamineReqVO();
             BeanUtils.copyProperties(settleOrdersAccount,accountOwnerIncomeExamine);
-            accountOwnerIncomeExamine.setMemNo(settleOrdersAccount.getRenterMemNo());
+            accountOwnerIncomeExamine.setMemNo(settleOrdersAccount.getOwnerMemNo());
             accountOwnerIncomeExamine.setAmt(settleOrdersAccount.getOwnerCostSurplusAmt());
             accountOwnerIncomeExamine.setMemNo(settleOrdersAccount.getOwnerMemNo());
             cashierService.insertOwnerIncomeExamine(accountOwnerIncomeExamine);
