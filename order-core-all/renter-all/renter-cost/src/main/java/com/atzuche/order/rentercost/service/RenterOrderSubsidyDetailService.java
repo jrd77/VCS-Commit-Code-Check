@@ -1,8 +1,10 @@
 package com.atzuche.order.rentercost.service;
 
+import com.atzuche.order.commons.entity.dto.CostBaseDTO;
 import com.atzuche.order.commons.enums.SubsidySourceCodeEnum;
 import com.atzuche.order.commons.enums.SubsidyTypeCodeEnum;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
+import com.atzuche.order.rentercost.entity.OrderConsoleSubsidyDetailEntity;
 import com.atzuche.order.rentercost.entity.RenterOrderSubsidyDetailEntity;
 import com.atzuche.order.rentercost.entity.dto.OrderCouponDTO;
 import com.atzuche.order.rentercost.entity.dto.RenterOrderSubsidyDetailDTO;
@@ -47,6 +49,67 @@ public class RenterOrderSubsidyDetailService {
     public Integer saveRenterOrderSubsidyDetail(RenterOrderSubsidyDetailEntity renterOrderSubsidyDetailEntity) {
         return renterOrderSubsidyDetailMapper.saveRenterOrderSubsidyDetail(renterOrderSubsidyDetailEntity);
     }
+    
+    
+    public int saveOrUpdateRenterOrderSubsidyDetail(RenterOrderSubsidyDetailEntity record) {
+    	List<RenterOrderSubsidyDetailEntity> list = listRenterOrderSubsidyDetail(record.getOrderNo(), record.getRenterOrderNo()); 
+    	boolean isExists = false;
+    	for (RenterOrderSubsidyDetailEntity renterOrderSubsidyDetailEntity : list) {
+			//存在
+    		if(renterOrderSubsidyDetailEntity.getSubsidySourceCode().equals(record.getSubsidySourceCode()) && renterOrderSubsidyDetailEntity.getSubsidyTargetCode().equals(record.getSubsidyTargetCode()) && renterOrderSubsidyDetailEntity.getSubsidyCostCode().equals(record.getSubsidyCostCode())) {
+    			record.setId(renterOrderSubsidyDetailEntity.getId());
+    			renterOrderSubsidyDetailMapper.updateByPrimaryKeySelective(record);
+    			isExists = true;
+			}
+		}
+    	
+    	if(!isExists) {
+    		//增加记录
+    		renterOrderSubsidyDetailMapper.saveRenterOrderSubsidyDetail(record);
+    	}
+    	
+    	
+    	return 1;
+    }
+    
+    /**
+     * 数据转化
+     * @param costBaseDTO 基础信息
+     * @param fineAmt 罚金金额
+     * @param code 罚金补贴方编码枚举
+     * @param source 罚金来源编码枚举
+     * @param type 罚金类型枚举
+     * @return ConsoleRenterOrderFineDeatailEntity
+     */
+    public RenterOrderSubsidyDetailEntity buildData(CostBaseDTO costBaseDTO, Integer subsidyAmount, SubsidySourceCodeEnum target, SubsidySourceCodeEnum source, SubsidyTypeCodeEnum type,RenterCashCodeEnum cash) {
+        if (subsidyAmount == null || subsidyAmount == 0) {
+            return null;
+        }
+        
+        RenterOrderSubsidyDetailEntity entity = new RenterOrderSubsidyDetailEntity();
+        // 补贴金额
+        entity.setSubsidyAmount(subsidyAmount);
+        
+        entity.setSubsidySourceCode(source.getCode());
+        entity.setSubsidySourceName(source.getDesc());
+        
+        entity.setSubsidyTargetCode(target.getCode());
+        entity.setSubsidyTargetName(target.getDesc());
+        
+        entity.setSubsidyTypeCode(type.getCode());
+        entity.setSubsidyTypeName(type.getDesc());
+        
+        entity.setSubsidyCostCode(cash.getCashNo());
+        entity.setSubsidyCostName(cash.getTxt());
+        
+        entity.setMemNo(costBaseDTO.getMemNo());
+        entity.setOrderNo(costBaseDTO.getOrderNo());
+        ///必传
+        entity.setRenterOrderNo(costBaseDTO.getRenterOrderNo());
+        return entity;
+    }
+    
+    
 
     /**
      * 批量保存租客补贴信息
