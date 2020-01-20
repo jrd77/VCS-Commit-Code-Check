@@ -99,9 +99,9 @@ public class OrderRemarkService {
         OrderRemarkEntity orderRemarkEntity = new OrderRemarkEntity();
         BeanUtils.copyProperties(orderRemarkUpdateRequestVO,orderRemarkEntity);
         orderRemarkEntity.setUpdateOp(AdminUserUtil.getAdminUser().getAuthName());
-        orderRemarkMapper.updateRemarkById(orderRemarkEntity);
         //保存操作日志
         orderRemarkLogService.addOrderRemarkLog(orderRemarkEntity, OperateTypeEnum.UPDATE.getType());
+        orderRemarkMapper.updateRemarkById(orderRemarkEntity);
     }
 
     /**

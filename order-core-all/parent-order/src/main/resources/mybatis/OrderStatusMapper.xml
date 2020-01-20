@@ -263,4 +263,9 @@
     <select id="getStatusByOrderNo" resultType="java.lang.Integer">
         select status from order_status where order_no = #{orderNo} and is_delete = 0
     </select>
+    
+    <update id="updateDispatchStatus">
+    	update order_status set dispatch_status = #{dispatchStatus}
+    	where order_no = #{orderNo}
+    </update>
 </mapper>

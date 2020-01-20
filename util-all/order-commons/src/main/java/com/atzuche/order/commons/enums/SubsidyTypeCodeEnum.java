@@ -33,7 +33,9 @@ public enum SubsidyTypeCodeEnum {
     
     RENT_COST_AMT("6","租车费用"),
     
-    ADJUST_AMT("6","调价费用")
+    ADJUST_AMT("7","调价费用"),
+    
+    CONSOLE_AMT("8","管理后台操作费用")
     ;
 
     private String code;

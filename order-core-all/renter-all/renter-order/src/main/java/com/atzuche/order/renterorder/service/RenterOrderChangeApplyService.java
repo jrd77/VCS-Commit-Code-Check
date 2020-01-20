@@ -2,6 +2,10 @@ package com.atzuche.order.renterorder.service;
 
 import com.atzuche.order.renterorder.entity.RenterOrderChangeApplyEntity;
 import com.atzuche.order.renterorder.mapper.RenterOrderChangeApplyMapper;
+
+import java.util.List;
+
+import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -25,7 +29,23 @@ public class RenterOrderChangeApplyService{
     public RenterOrderChangeApplyEntity getRenterOrderChangeApplyByRenterOrderNo(String renterOrderNo) {
     	return renterOrderChangeApplyMapper.getRenterOrderChangeApplyByRenterOrderNo(renterOrderNo);
     }
-
+    
+    
+    public RenterOrderChangeApplyEntity getRenterOrderApplyByRenterOrderNo(String renterOrderNo) {
+    	return renterOrderChangeApplyMapper.getRenterOrderApplyByRenterOrderNo(renterOrderNo);
+    }
+    
+    
+    
+    /**
+     * 根据主订单号查询修改记录列表
+     * @param orderNo
+     * @return
+     */
+    public List<RenterOrderChangeApplyEntity> selectALLByOrderNo(String orderNo){
+    	return renterOrderChangeApplyMapper.selectALLByOrderNo(orderNo);
+    }
+    
 
 
 
