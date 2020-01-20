@@ -1,6 +1,6 @@
 package com.atzuche.order.admin.controller.car;
 
-import com.atzuche.order.admin.exception.OrderAdminException;
+
 import com.atzuche.order.admin.service.car.CarService;
 import com.atzuche.order.admin.vo.req.car.CarBaseReqVO;
 import com.atzuche.order.admin.vo.resp.car.CarBusinessResVO;
@@ -32,18 +32,8 @@ public class CarController {
     @AutoDocMethod(description = "订单详细信息-查看车辆信息", value = "订单详细信息-查看车辆信息", response = CarDetailDTO.class)
     @GetMapping(value = "console/car/detail")
     public ResponseData <CarDetailDTO> getCarBusiness(@RequestParam("carNo")String carNo) {
-        try {
-            CarDetailDTO carBusiness = carProxyService.getCarDetail(carNo);
-            return ResponseData.success(carBusiness);
-        } catch (OrderAdminException e) {
-            logger.error("获取车辆运营信息异常[{}]", carNo, e);
-            Cat.logError("获取车辆运营信息异常[{" + carNo + "}]", e);
-            return new ResponseData <>(e.getErrorCode(), e.getErrorMsg());
-        } catch (Exception e) {
-            logger.error("获取车辆运营信息异常[{}]", carNo, e);
-            Cat.logError("获取车辆运营信息异常[{" + carNo + "}]", e);
-            return ResponseData.error();
-        }
+        CarDetailDTO carBusiness = carProxyService.getCarDetail(carNo);
+        return ResponseData.success(carBusiness);
     }
 
 

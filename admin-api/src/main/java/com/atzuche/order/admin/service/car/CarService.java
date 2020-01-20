@@ -1,9 +1,10 @@
 package com.atzuche.order.admin.service.car;
 
-import com.atzuche.order.admin.exception.OrderAdminException;
 import com.atzuche.order.admin.vo.resp.car.CarBusinessResVO;
 import com.atzuche.order.commons.DateUtils;
 import com.atzuche.order.commons.JsonUtil;
+import com.atzuche.order.commons.ResponseCheckUtil;
+import com.atzuche.order.commons.exceptions.RemoteCallException;
 import com.autoyol.car.api.feign.api.CarDetailQueryFeignApi;
 import com.autoyol.car.api.model.vo.CarBaseVO;
 import com.autoyol.car.api.model.vo.ResponseObject;
@@ -28,18 +29,8 @@ public class CarService {
     public CarBusinessResVO getCarBusiness(Integer carNo){
         CarBusinessResVO resVO = new CarBusinessResVO();
         ResponseObject<CarBaseVO> responseObject = carDetailQueryFeignApi.getCarDetailByCarNo(carNo);
-        if(Objects.isNull(responseObject)){
-            logger.error("carDetailQueryFeignApi.getCarDetailByCarNo,responseObject:{}", JsonUtil.toJson(responseObject));
-            throw new OrderAdminException(ERROR_CODE,ERROR_TXT);
-        }
-        if(!ErrorCode.SUCCESS.getCode().equals(responseObject.getResCode())){
-            throw new OrderAdminException(responseObject.getResCode(),responseObject.getResMsg());
-        }
+        checkResponse(responseObject);
         CarBaseVO carBaseVO = responseObject.getData();
-        if(Objects.isNull(carBaseVO)){
-            logger.error("carDetailQueryFeignApi.getCarDetailByCarNo,carBaseVO is null");
-            throw new OrderAdminException(ERROR_CODE,ERROR_TXT);
-        }
         resVO.setGetCarAddr(carBaseVO.getGetCarAddr());
         resVO.setLicenseOwer(carBaseVO.getLicenseOwer());
         resVO.setLicenseModel(carBaseVO.getLicenseModel());
@@ -60,6 +51,19 @@ public class CarService {
         resVO.setDayMileage(carBaseVO.getDayMileage());
         //
         return resVO;
+    }
+
+    public static void  checkResponse(ResponseObject responseObject){
+        if(responseObject==null||!ErrorCode.SUCCESS.getCode().equalsIgnoreCase(responseObject.getResCode())){
+            RemoteCallException remoteCallException = null;
+            if(responseObject!=null){
+                remoteCallException = new RemoteCallException(responseObject.getResCode(),responseObject.getResMsg(),responseObject.getData());
+            }else{
+                remoteCallException = new RemoteCallException(com.atzuche.order.commons.enums.ErrorCode.REMOTE_CALL_FAIL.getCode(),
+                        com.atzuche.order.commons.enums.ErrorCode.REMOTE_CALL_FAIL.getText());
+            }
+            throw remoteCallException;
+        }
     }
 
 }
