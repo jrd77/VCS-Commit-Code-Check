@@ -1187,19 +1187,6 @@ public class OrderSettleNoTService {
         //应退结余 租车费用 （包含 租车支付金额 和钱包抵扣）
         int rentCostSurplusAmt = settleOrdersAccount.getRentCostSurplusAmt();
         if(rentCostSurplusAmt>0){
-//            //退还租车费用
-//            if(rentCostSurplusAmt>0){
-//                // 实付
-//                int rentCostPayAmtFinal = settleOrdersAccount.getRentCostPayAmt();
-//                int returnAmt = rentCostSurplusAmt>rentCostPayAmtFinal?rentCostPayAmtFinal:-rentCostSurplusAmt;
-//                //退还剩余 租车费用
-//                CashierRefundApplyReqVO cashierRefundApplyReq = getCashierRefundApplyReqVO(settleOrdersAccount,-returnAmt);
-//                int id = cashierService.refundRentCost(cashierRefundApplyReq);
-//                AccountRenterCostSettleDetailEntity entity = getAccountRenterCostSettleDetailEntityForRentCost(settleOrdersAccount,-returnAmt,id);
-//                renterCostSettleDetails.add(entity);
-//                rentCostSurplusAmt = rentCostSurplusAmt-returnAmt;
-//                orderStatusDTO.setRentCarRefundStatus(OrderRefundStatusEnum.REFUNDING.getStatus());
-//            }
             //退还租车费用
             if(rentCostSurplusAmt>0){
                 //退还剩余 租车费用
