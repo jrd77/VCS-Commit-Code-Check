@@ -50,4 +50,8 @@ public class AccountPlatformProfitNoTService {
             throw new AccountPlatormException();
         }
     }
+
+    public void insertAccountPlatformProfitEntity(AccountPlatformProfitEntity accountPlatformProfitEntity) {
+        accountPlatformProfitMapper.insertSelective(accountPlatformProfitEntity);
+    }
 }
