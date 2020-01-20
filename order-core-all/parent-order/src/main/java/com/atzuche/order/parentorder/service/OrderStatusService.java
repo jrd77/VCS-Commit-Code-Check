@@ -86,4 +86,14 @@ public class OrderStatusService {
     public Integer getStatusByOrderNo(String orderNo) {
         return orderStatusMapper.getStatusByOrderNo(orderNo);
     }
+    
+    /**
+     * 更新调度状态
+     * @param orderNo
+     * @param dispatchStatus
+     * @return Integer
+     */
+    public Integer updateDispatchStatus(String orderNo, Integer dispatchStatus) {
+    	return orderStatusMapper.updateDispatchStatus(orderNo, dispatchStatus);
+    }
 }
