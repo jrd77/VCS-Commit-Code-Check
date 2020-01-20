@@ -36,8 +36,8 @@ public class AdminOrderDetailController {
             responseData.setResMsg("订单号不能为空");
             return responseData;
         }
-        ResponseData<OrderHistoryRespDTO> orderHistoryRespDTOResponseData = orderDetailService.listOrderHistory(orderNo);
-        return orderHistoryRespDTOResponseData;
+        OrderHistoryRespDTO orderHistoryRespDTOResponseData = orderDetailService.listOrderHistory(orderNo);
+        return ResponseData.success(orderHistoryRespDTOResponseData);
     }
 
     @AutoDocMethod(description = "车主子订单详情", value = "车主子订单详情",response = AdminOwnerOrderDetailDTO.class)

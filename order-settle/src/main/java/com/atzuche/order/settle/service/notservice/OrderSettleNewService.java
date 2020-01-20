@@ -93,7 +93,7 @@ public class OrderSettleNewService {
         settleOrdersAccount.setOrderStatusDTO(orderStatusDTO);
         orderSettleNoTService.saveOrderStatusInfo(settleOrdersAccount);
         log.info("OrderSettleService settleOrdersDefinition settleOrdersAccount two [{}]", GsonUtils.toJson(settleOrdersAccount));
-        //16 退优惠卷
+        //16 退优惠卷 凹凸币
         orderSettleNoTService.settleUndoCoupon(settleOrders.getOrderNo(),settleOrders.getRentCosts().getRenterOrderSubsidyDetails());
         log.info("OrderSettleService settleUndoCoupon settleUndoCoupon one [{}]", GsonUtils.toJson(settleOrdersAccount));
         Cat.logEvent("settleUndoCoupon",GsonUtils.toJson(settleOrdersAccount));
@@ -121,7 +121,7 @@ public class OrderSettleNewService {
         //5 费用明细先落库
         orderSettleNoTService.insertSettleOrders(settleOrdersDefinition);
 
-        //6 费用平账 平台收入 + 平台补贴 +  + 车主补贴 + 租客费用 + 租客补贴 = 0
+        //6 费用平账 平台收入 + 平台补贴 + 车主费用 + 车主补贴 + 租客费用 + 租客补贴 = 0
         int totleAmt = settleOrdersDefinition.getPlatformProfitAmt() + settleOrdersDefinition.getPlatformSubsidyAmt()
                 + settleOrdersDefinition.getOwnerCostAmt() + settleOrdersDefinition.getOwnerSubsidyAmt()
                 + settleOrdersDefinition.getRentCostAmt() + settleOrdersDefinition.getRentSubsidyAmt();
@@ -162,6 +162,17 @@ public class OrderSettleNewService {
             accountPlatformProfitDetail.setOrderNo(renterOrderCostDetail.getOrderNo());
             settleOrdersDefinition.addPlatformProfit(accountPlatformProfitDetail);
         }
+        //2 提前取车车服务费 费用收益方 平台   平台端记录冲账流水
+        if(RenterCashCodeEnum.SRV_GET_COST.getCashNo().equals(renterOrderCostDetail.getCostCode())){
+            int totalAmount = renterOrderCostDetail.getTotalAmount();
+            AccountPlatformProfitDetailEntity accountPlatformProfitDetail = new AccountPlatformProfitDetailEntity();
+            accountPlatformProfitDetail.setAmt(-totalAmount);
+            accountPlatformProfitDetail.setSourceCode(RenterCashCodeEnum.SRV_GET_COST.getCashNo());
+            accountPlatformProfitDetail.setSourceDesc(RenterCashCodeEnum.SRV_GET_COST.getTxt());
+            accountPlatformProfitDetail.setUniqueNo(String.valueOf(renterOrderCostDetail.getId()));
+            accountPlatformProfitDetail.setOrderNo(renterOrderCostDetail.getOrderNo());
+            settleOrdersDefinition.addPlatformProfit(accountPlatformProfitDetail);
+        }
         //3 平台保障费 费用收益方 平台   平台端记录冲账流水
         if(RenterCashCodeEnum.INSURE_TOTAL_PRICES.getCashNo().equals(renterOrderCostDetail.getCostCode())){
             int totalAmount = renterOrderCostDetail.getTotalAmount();
@@ -173,18 +184,7 @@ public class OrderSettleNewService {
             accountPlatformProfitDetail.setOrderNo(renterOrderCostDetail.getOrderNo());
             settleOrdersDefinition.addPlatformProfit(accountPlatformProfitDetail);
         }
-        //4 平台保障费 费用收益方 平台   平台端记录冲账流水
-        if(RenterCashCodeEnum.INSURE_TOTAL_PRICES.getCashNo().equals(renterOrderCostDetail.getCostCode())){
-            int totalAmount = renterOrderCostDetail.getTotalAmount();
-            AccountPlatformProfitDetailEntity accountPlatformProfitDetail = new AccountPlatformProfitDetailEntity();
-            accountPlatformProfitDetail.setAmt(-totalAmount);
-            accountPlatformProfitDetail.setSourceCode(RenterCashCodeEnum.INSURE_TOTAL_PRICES.getCashNo());
-            accountPlatformProfitDetail.setSourceDesc(RenterCashCodeEnum.INSURE_TOTAL_PRICES.getTxt());
-            accountPlatformProfitDetail.setUniqueNo(String.valueOf(renterOrderCostDetail.getId()));
-            accountPlatformProfitDetail.setOrderNo(renterOrderCostDetail.getOrderNo());
-            settleOrdersDefinition.addPlatformProfit(accountPlatformProfitDetail);
-        }
-        //5 平台保障费 费用收益方 平台   平台端记录冲账流水
+        //4 全面保障费 费用收益方 平台   平台端记录冲账流水
         if(RenterCashCodeEnum.ABATEMENT_INSURE.getCashNo().equals(renterOrderCostDetail.getCostCode())){
             int totalAmount = renterOrderCostDetail.getTotalAmount();
             AccountPlatformProfitDetailEntity accountPlatformProfitDetail = new AccountPlatformProfitDetailEntity();
@@ -195,7 +195,7 @@ public class OrderSettleNewService {
             accountPlatformProfitDetail.setOrderNo(renterOrderCostDetail.getOrderNo());
             settleOrdersDefinition.addPlatformProfit(accountPlatformProfitDetail);
         }
-        //6 附加驾驶人险 费用收益方 平台   平台端记录冲账流水
+        //5 附加驾驶人险 费用收益方 平台   平台端记录冲账流水
         if(RenterCashCodeEnum.EXTRA_DRIVER_INSURE.getCashNo().equals(renterOrderCostDetail.getCostCode())){
             int totalAmount = renterOrderCostDetail.getTotalAmount();
             AccountPlatformProfitDetailEntity accountPlatformProfitDetail = new AccountPlatformProfitDetailEntity();
@@ -206,7 +206,7 @@ public class OrderSettleNewService {
             accountPlatformProfitDetail.setOrderNo(renterOrderCostDetail.getOrderNo());
             settleOrdersDefinition.addPlatformProfit(accountPlatformProfitDetail);
         }
-        //7 手续费 平台   平台端记录冲账流水
+        //6 手续费 平台   平台端记录冲账流水
         if(RenterCashCodeEnum.FEE.getCashNo().equals(renterOrderCostDetail.getCostCode())){
             int totalAmount = renterOrderCostDetail.getTotalAmount();
             AccountPlatformProfitDetailEntity accountPlatformProfitDetail = new AccountPlatformProfitDetailEntity();
@@ -217,51 +217,39 @@ public class OrderSettleNewService {
             accountPlatformProfitDetail.setOrderNo(renterOrderCostDetail.getOrderNo());
             settleOrdersDefinition.addPlatformProfit(accountPlatformProfitDetail);
         }
-        //8 车主卷抵扣  车主  车主端记录冲账流水
-        if(RenterCashCodeEnum.OWNER_COUPON_OFFSET_COST.getCashNo().equals(renterOrderCostDetail.getCostCode())){
-            int totalAmount = renterOrderCostDetail.getTotalAmount();
-            AccountOwnerCostSettleDetailEntity accountOwnerCostSettleDetailEntity = new AccountOwnerCostSettleDetailEntity();
-            accountOwnerCostSettleDetailEntity.setAmt(-totalAmount);
-            accountOwnerCostSettleDetailEntity.setSourceDetail(RenterCashCodeEnum.OWNER_COUPON_OFFSET_COST.getTxt());
-            accountOwnerCostSettleDetailEntity.setSourceCode(RenterCashCodeEnum.OWNER_COUPON_OFFSET_COST.getCashNo());
-            accountOwnerCostSettleDetailEntity.setUniqueNo(String.valueOf(renterOrderCostDetail.getId()));
-            accountOwnerCostSettleDetailEntity.setOrderNo(renterOrderCostDetail.getOrderNo());
-            accountOwnerCostSettleDetailEntity.setMemNo(renterOrderCostDetail.getMemNo());
-            settleOrdersDefinition.addOwnerCosts(accountOwnerCostSettleDetailEntity);
-        }
-        //9 限时红包 TODO
-        //10 平台卷  平台   平台端记录冲账流水
+
+        //7 平台卷  平台   平台端记录冲账流水
         if(RenterCashCodeEnum.REAL_COUPON_OFFSET.getCashNo().equals(renterOrderCostDetail.getCostCode())){
             int totalAmount = renterOrderCostDetail.getTotalAmount();
-            AccountPlatformProfitDetailEntity accountPlatformProfitDetail = new AccountPlatformProfitDetailEntity();
-            accountPlatformProfitDetail.setAmt(-totalAmount);
-            accountPlatformProfitDetail.setSourceCode(RenterCashCodeEnum.REAL_COUPON_OFFSET.getCashNo());
-            accountPlatformProfitDetail.setSourceDesc(RenterCashCodeEnum.REAL_COUPON_OFFSET.getTxt());
-            accountPlatformProfitDetail.setUniqueNo(String.valueOf(renterOrderCostDetail.getId()));
-            accountPlatformProfitDetail.setOrderNo(renterOrderCostDetail.getOrderNo());
-            settleOrdersDefinition.addPlatformProfit(accountPlatformProfitDetail);
+            AccountPlatformSubsidyDetailEntity accountPlatformSubsidyDetail = new AccountPlatformSubsidyDetailEntity();
+            accountPlatformSubsidyDetail.setAmt(-totalAmount);
+            accountPlatformSubsidyDetail.setSourceCode(RenterCashCodeEnum.REAL_COUPON_OFFSET.getCashNo());
+            accountPlatformSubsidyDetail.setSourceDesc(RenterCashCodeEnum.REAL_COUPON_OFFSET.getTxt());
+            accountPlatformSubsidyDetail.setUniqueNo(String.valueOf(renterOrderCostDetail.getId()));
+            accountPlatformSubsidyDetail.setOrderNo(renterOrderCostDetail.getOrderNo());
+            settleOrdersDefinition.addPlatformSubsidy(accountPlatformSubsidyDetail);
         }
-        //11 取还车卷  平台   平台端记录冲账流水
+        //8 取还车卷  平台   平台端记录冲账流水
         if(RenterCashCodeEnum.GETCARFEE_COUPON_OFFSET.getCashNo().equals(renterOrderCostDetail.getCostCode())){
             int totalAmount = renterOrderCostDetail.getTotalAmount();
-            AccountPlatformProfitDetailEntity accountPlatformProfitDetail = new AccountPlatformProfitDetailEntity();
-            accountPlatformProfitDetail.setAmt(-totalAmount);
-            accountPlatformProfitDetail.setSourceCode(RenterCashCodeEnum.GETCARFEE_COUPON_OFFSET.getCashNo());
-            accountPlatformProfitDetail.setSourceDesc(RenterCashCodeEnum.GETCARFEE_COUPON_OFFSET.getTxt());
-            accountPlatformProfitDetail.setUniqueNo(String.valueOf(renterOrderCostDetail.getId()));
-            accountPlatformProfitDetail.setOrderNo(renterOrderCostDetail.getOrderNo());
-            settleOrdersDefinition.addPlatformProfit(accountPlatformProfitDetail);
+            AccountPlatformSubsidyDetailEntity accountPlatformSubsidyDetail = new AccountPlatformSubsidyDetailEntity();
+            accountPlatformSubsidyDetail.setAmt(-totalAmount);
+            accountPlatformSubsidyDetail.setSourceCode(RenterCashCodeEnum.GETCARFEE_COUPON_OFFSET.getCashNo());
+            accountPlatformSubsidyDetail.setSourceDesc(RenterCashCodeEnum.GETCARFEE_COUPON_OFFSET.getTxt());
+            accountPlatformSubsidyDetail.setUniqueNo(String.valueOf(renterOrderCostDetail.getId()));
+            accountPlatformSubsidyDetail.setOrderNo(renterOrderCostDetail.getOrderNo());
+            settleOrdersDefinition.addPlatformSubsidy(accountPlatformSubsidyDetail);
         }
-        //12 凹凸币  平台   平台端记录冲账流水
+        //9 凹凸币  平台   平台端记录冲账流水
         if(RenterCashCodeEnum.AUTO_COIN_DEDUCT.getCashNo().equals(renterOrderCostDetail.getCostCode())){
             int totalAmount = renterOrderCostDetail.getTotalAmount();
-            AccountPlatformProfitDetailEntity accountPlatformProfitDetail = new AccountPlatformProfitDetailEntity();
-            accountPlatformProfitDetail.setAmt(-totalAmount);
-            accountPlatformProfitDetail.setSourceCode(RenterCashCodeEnum.AUTO_COIN_DEDUCT.getCashNo());
-            accountPlatformProfitDetail.setSourceDesc(RenterCashCodeEnum.AUTO_COIN_DEDUCT.getTxt());
-            accountPlatformProfitDetail.setUniqueNo(String.valueOf(renterOrderCostDetail.getId()));
-            accountPlatformProfitDetail.setOrderNo(renterOrderCostDetail.getOrderNo());
-            settleOrdersDefinition.addPlatformProfit(accountPlatformProfitDetail);
+            AccountPlatformSubsidyDetailEntity accountPlatformSubsidyDetail = new AccountPlatformSubsidyDetailEntity();
+            accountPlatformSubsidyDetail.setAmt(-totalAmount);
+            accountPlatformSubsidyDetail.setSourceCode(RenterCashCodeEnum.AUTO_COIN_DEDUCT.getCashNo());
+            accountPlatformSubsidyDetail.setSourceDesc(RenterCashCodeEnum.AUTO_COIN_DEDUCT.getTxt());
+            accountPlatformSubsidyDetail.setUniqueNo(String.valueOf(renterOrderCostDetail.getId()));
+            accountPlatformSubsidyDetail.setOrderNo(renterOrderCostDetail.getOrderNo());
+            settleOrdersDefinition.addPlatformSubsidy(accountPlatformSubsidyDetail);
         }
     }
 
@@ -359,4 +347,14 @@ public class OrderSettleNewService {
     }
 
 
+    public void addRenterGetAndReturnCarAmtToPlatform(AccountRenterCostSettleDetailEntity accountRenterCostSettleDetail, SettleOrdersDefinition settleOrdersDefinition) {
+        int totalAmount = accountRenterCostSettleDetail.getAmt();
+        AccountPlatformProfitDetailEntity accountPlatformProfitDetail = new AccountPlatformProfitDetailEntity();
+        accountPlatformProfitDetail.setAmt(-totalAmount);
+        accountPlatformProfitDetail.setSourceCode(RenterCashCodeEnum.ACCOUNT_RENTER_DELIVERY_MILEAGE_COST.getCashNo());
+        accountPlatformProfitDetail.setSourceDesc(RenterCashCodeEnum.ACCOUNT_RENTER_DELIVERY_MILEAGE_COST.getTxt());
+        accountPlatformProfitDetail.setUniqueNo(String.valueOf(accountRenterCostSettleDetail.getId()));
+        accountPlatformProfitDetail.setOrderNo(accountRenterCostSettleDetail.getOrderNo());
+        settleOrdersDefinition.addPlatformProfit(accountPlatformProfitDetail);
+    }
 }

@@ -31,4 +31,6 @@ public interface OrderStatusMapper{
     int updateRenterOrderByOrderNo(OrderStatusEntity orderStatusEntity);
 
     Integer getStatusByOrderNo(@Param("orderNo") String orderNo);
+    
+    Integer updateDispatchStatus(@Param("orderNo") String orderNo, @Param("dispatchStatus") Integer dispatchStatus);
 }

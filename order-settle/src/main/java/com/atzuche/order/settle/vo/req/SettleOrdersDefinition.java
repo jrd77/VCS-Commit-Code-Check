@@ -81,7 +81,7 @@ public class SettleOrdersDefinition {
      */
     public void addPlatformProfit(AccountPlatformProfitDetailEntity accountPlatformProfitDetail){
         List<AccountPlatformProfitDetailEntity> accountPlatformProfitDetails = getAccountPlatformProfitDetails();
-        if(!CollectionUtils.isEmpty(accountPlatformProfitDetails)){
+        if(CollectionUtils.isEmpty(accountPlatformProfitDetails)){
             accountPlatformProfitDetails = new ArrayList<>();
         }
         accountPlatformProfitDetails.add(accountPlatformProfitDetail);
@@ -93,7 +93,7 @@ public class SettleOrdersDefinition {
      */
     public void addPlatformSubsidy(AccountPlatformSubsidyDetailEntity accountPlatformSubsidyDetail){
         List<AccountPlatformSubsidyDetailEntity> accountPlatformSubsidyDetailEntitys = getAccountPlatformSubsidyDetails();
-        if(!CollectionUtils.isEmpty(accountPlatformSubsidyDetailEntitys)){
+        if(CollectionUtils.isEmpty(accountPlatformSubsidyDetailEntitys)){
             accountPlatformSubsidyDetailEntitys = new ArrayList<>();
         }
         accountPlatformSubsidyDetailEntitys.add(accountPlatformSubsidyDetail);
@@ -106,7 +106,7 @@ public class SettleOrdersDefinition {
      */
     public void addRentCosts(AccountRenterCostSettleDetailEntity accountRenterCostSettleDetailEntity){
         List<AccountRenterCostSettleDetailEntity> accountRenterCostSettleDetailEntitys = getAccountRenterCostSettleDetails();
-        if(!CollectionUtils.isEmpty(accountRenterCostSettleDetailEntitys)){
+        if(CollectionUtils.isEmpty(accountRenterCostSettleDetailEntitys)){
             accountRenterCostSettleDetailEntitys = new ArrayList<>();
         }
         accountRenterCostSettleDetailEntitys.add(accountRenterCostSettleDetailEntity);
@@ -119,7 +119,7 @@ public class SettleOrdersDefinition {
      */
     public void addOwnerCosts(AccountOwnerCostSettleDetailEntity accountOwnerCostSettleDetailEntity){
         List<AccountOwnerCostSettleDetailEntity> accountOwnerCostSettleDetailEntitys = getAccountOwnerCostSettleDetails();
-        if(!CollectionUtils.isEmpty(accountOwnerCostSettleDetailEntitys)){
+        if(CollectionUtils.isEmpty(accountOwnerCostSettleDetailEntitys)){
             accountOwnerCostSettleDetailEntitys = new ArrayList<>();
         }
         accountOwnerCostSettleDetailEntitys.add(accountOwnerCostSettleDetailEntity);

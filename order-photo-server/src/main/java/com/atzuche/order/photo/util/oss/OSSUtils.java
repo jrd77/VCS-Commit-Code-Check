@@ -3,11 +3,11 @@ package com.atzuche.order.photo.util.oss;
 
 import com.aliyun.oss.OSSClient;
 import com.aliyun.oss.model.*;
-import com.atzuche.order.photo.util.SysConf;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.multipart.MultipartFile;
 import sun.misc.BASE64Decoder;
 
@@ -34,6 +34,7 @@ public class OSSUtils {
 	private static final String ACCESS_KEY = "6GNGlPXmKe3uKC1GQJs5avnRHuOeE2";
 	
     /** 普通bucket */
+	@Value("${oss.bucket}")
 	private static final String BUCKET = "at-images-test";
 	/** 需授权访问的 bucket */
 	private static final String BUCKET_AUTH = "veri-images-test";

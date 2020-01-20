@@ -3,10 +3,7 @@ package com.atzuche.order.rentercost.service;
 import com.alibaba.fastjson.JSON;
 import com.atzuche.config.client.api.*;
 import com.atzuche.config.common.entity.*;
-import com.atzuche.order.commons.CatConstants;
-import com.atzuche.order.commons.DateUtils;
-import com.atzuche.order.commons.GlobalConstant;
-import com.atzuche.order.commons.LocalDateTimeUtils;
+import com.atzuche.order.commons.*;
 import com.atzuche.order.commons.entity.dto.*;
 import com.atzuche.order.commons.enums.ChannelNameTypeEnum;
 import com.atzuche.order.commons.enums.SubsidySourceCodeEnum;
@@ -1123,22 +1120,14 @@ public class RenterOrderCostCombineService {
             Cat.logEvent(CatConstants.FEIGN_PARAM,JSON.toJSONString(reqParam));
             responseData = fetchBackCarFeeFeignService.getPriceCarHumanFeeRuleConfig(String.valueOf(cityCode),String.valueOf(LocalDateTimeUtils.localDateTimeToLong(LocalDateTime.now())));
             log.info("Feign 获取取还车超出运能附加金额结果:[{}],获取取还车超出运能附加金额入参:[{}]",JSON.toJSONString(responseData),JSON.toJSONString(reqParam));
-            if(responseData == null || responseData.getResCode()==null){
-                GetReturnOverCostFailException fail = new GetReturnOverCostFailException();
-                throw fail;
-            }
-            Cat.logEvent(CatConstants.FEIGN_RESULT,JSON.toJSONString(responseData));
+			Cat.logEvent(CatConstants.FEIGN_RESULT,JSON.toJSONString(responseData));
+            ResponseCheckUtil.checkResponse(responseData);
+
             t.setStatus(Transaction.SUCCESS);
-        }catch (GetReturnCostFailException e){
-            log.error("Feign 获取取还车超出运能附加金额失败",e);
-            Cat.logError("Feign 获取取还车超出运能附加金额失败！", e);
+        }catch (Exception e){
+            Cat.logError("Feign 获取取还车超出运能附加金额接口异常",e);
             t.setStatus(e);
             throw e;
-        }catch (Exception e){
-            GetReturnOverCostErrorException error = new GetReturnOverCostErrorException();
-            Cat.logError("Feign 获取取还车超出运能附加金额接口异常",error);
-            t.setStatus(error);
-            throw error;
         }
         if(ErrorCode.SUCCESS.getCode().equals(responseData.getResCode())){
             return responseData.getData().getHumanFee().intValue();
