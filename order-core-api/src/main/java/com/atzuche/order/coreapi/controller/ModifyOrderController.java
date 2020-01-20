@@ -1,6 +1,9 @@
 package com.atzuche.order.coreapi.controller;
 
+import com.atzuche.order.commons.entity.dto.OrderTransferRecordDTO;
 import com.atzuche.order.commons.vo.req.ModifyApplyHandleReq;
+
+import java.util.List;
 import java.util.Optional;
 
 import javax.validation.Valid;
@@ -10,14 +13,17 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.atzuche.order.open.vo.ModifyOrderAppReqVO;
 import com.atzuche.order.coreapi.entity.request.ModifyOrderReq;
 import com.atzuche.order.open.vo.request.TransferReq;
 import com.atzuche.order.open.vo.ModifyOrderCompareVO;
+import com.atzuche.order.coreapi.service.ModifyOrderConfirmService;
 import com.atzuche.order.coreapi.service.ModifyOrderFeeService;
 import com.atzuche.order.coreapi.service.ModifyOrderOwnerConfirmService;
 import com.atzuche.order.coreapi.service.ModifyOrderService;
@@ -38,6 +44,8 @@ public class ModifyOrderController {
 	private ModifyOrderFeeService modifyOrderFeeService;
     @Autowired
 	private RenterMemberService renterMemberService;
+    @Autowired
+    private ModifyOrderConfirmService modifyOrderConfirmService;
 	
 	/**
 	 * 修改订单（APP端或H5端）
@@ -145,4 +153,17 @@ public class ModifyOrderController {
 		BeanUtils.copyProperties(modifyOrderAppReq, modifyOrderReq);
 		return modifyOrderFeeService.getModifyOrderCompareVO(modifyOrderReq);
 	}
+	
+	
+	/**
+	 * 获取换车记录
+	 * @param orderNo
+	 * @return ResponseData<List<OrderTransferRecordDTO>>
+	 */
+	@GetMapping("/order/transferrecord/list")
+    public ResponseData<List<OrderTransferRecordDTO>> listTransferRecord(@RequestParam(value="orderNo",required = true) String orderNo) {
+		log.info("order/transferrecord/list orderNo=[{}]", orderNo);
+		List<OrderTransferRecordDTO> list = modifyOrderConfirmService.listOrderTransferRecordByOrderNo(orderNo);
+    	return ResponseData.success(list);
+    }
 }

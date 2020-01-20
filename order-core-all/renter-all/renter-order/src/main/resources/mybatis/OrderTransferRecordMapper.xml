@@ -25,6 +25,13 @@
 	`car_plate_num`, 	
 	`create_time`
 	</sql>
+	
+	
+	<select id="listOrderTransferRecordByOrderNo" resultMap="BaseResultMap">
+		select <include refid="Base_Column_List" /> from order_transfer_record where order_no = #{orderNo}
+		and is_delete = 0
+	</select>
+	
 
     <insert id="saveOrderTransferRecord" parameterType="com.atzuche.order.renterorder.entity.OrderTransferRecordEntity" useGeneratedKeys="true" keyProperty="id">
         insert into order_transfer_record  (

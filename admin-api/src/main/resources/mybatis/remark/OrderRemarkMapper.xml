@@ -24,7 +24,7 @@
 	</resultMap>
 
     <select id="getOrderRemarkOverview" resultMap="orderRemarkOverviewMap">
-        SELECT remark_type, COUNT(*) AS typeCount FROM order_remark where order_no = #{orderNo} and remark_type!=12 GROUP BY remark_type
+        SELECT remark_type, COUNT(*) AS typeCount FROM order_remark where order_no = #{orderNo} and remark_type!=12 and is_delete = 0 GROUP BY remark_type
     </select>
 
     <insert id="addOrderRemark" parameterType="com.atzuche.order.admin.entity.OrderRemarkEntity" useGeneratedKeys="true" keyProperty="remarkId">

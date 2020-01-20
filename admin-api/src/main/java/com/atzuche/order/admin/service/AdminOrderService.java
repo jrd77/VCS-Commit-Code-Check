@@ -1,11 +1,6 @@
 package com.atzuche.order.admin.service;
 
 import com.alibaba.fastjson.JSON;
-import com.atzuche.order.admin.controller.RenterInfoController;
-import com.atzuche.order.admin.exception.OrderCancelErrException;
-import com.atzuche.order.admin.exception.OrderCancelFailException;
-import com.atzuche.order.admin.exception.OrderModifyErrException;
-import com.atzuche.order.admin.exception.OrderModifyFailException;
 import com.atzuche.order.admin.vo.req.order.AdminModifyOrderReqVO;
 import com.atzuche.order.admin.vo.req.order.CancelOrderByPlatVO;
 import com.atzuche.order.admin.vo.req.order.CancelOrderVO;
@@ -64,6 +59,7 @@ public class AdminOrderService {
         }catch (Exception e){
            log.error("Feign 取消订单异常,responseObject={},cancelOrderReqVO={}",JSON.toJSONString(responseObject),JSON.toJSONString(cancelOrderReqVO),e);
             Cat.logError("Feign 取消订单异常",e);
+            t.setStatus(e);
             throw e;
         }finally {
             t.complete();
@@ -87,13 +83,10 @@ public class AdminOrderService {
             Cat.logEvent(CatConstants.FEIGN_RESULT,JSON.toJSONString(responseObject));
             checkResponse(responseObject);
             t.setStatus(Transaction.SUCCESS);
-        }catch (RenterCarDetailFailException e){
-            Cat.logError("Feign 取消订单失败",e);
-            t.setStatus(e);
-            throw e;
         }catch (Exception e){
             log.error("调用远程取消订单失败,param={}",platVO,e);
             Cat.logError("Feign 取消订单失败",e);
+            t.setStatus(e);
             throw e;
         }finally {
             t.complete();
@@ -138,6 +131,7 @@ public class AdminOrderService {
         }catch (Exception e){
             log.error("Feign 管理后台替车主操作修改申请,responseObject={},modifyOrderReq={}",JSON.toJSONString(responseObject),JSON.toJSONString(req),e);
             Cat.logError("Feign 管理后台替车主操作修改申请",e);
+            t.setStatus(e);
             throw e;
         }finally {
             t.complete();
@@ -204,6 +198,7 @@ public class AdminOrderService {
         }catch (Exception e){
             log.error("Feign 获取订单修改前的费用,responseObject={},modifyOrderReq={}",JSON.toJSONString(responseObject),JSON.toJSONString(reqVO),e);
             Cat.logError("Feign 获取订单修改前的费用",e);
+            t.setStatus(e);
             throw e;
         }finally {
             t.complete();
@@ -230,6 +225,7 @@ public class AdminOrderService {
         }catch (Exception e){
             log.error("Feign 管理后台替车主操作修改申请,responseObject={},modifyOrderReq={}",JSON.toJSONString(responseObject),JSON.toJSONString(req),e);
             Cat.logError("Feign 管理后台替车主操作修改申请",e);
+            t.setStatus(e);
             throw e;
         }finally {
             t.complete();
@@ -252,6 +248,7 @@ public class AdminOrderService {
         }catch (Exception e){
             log.error("Feign 管理后台换车操作,responseObject={},modifyOrderReq={}",JSON.toJSONString(responseObject),JSON.toJSONString(req),e);
             Cat.logError("Feign 管理后台换车操作",e);
+            t.setStatus(e);
             throw e;
         }finally {
             t.complete();
