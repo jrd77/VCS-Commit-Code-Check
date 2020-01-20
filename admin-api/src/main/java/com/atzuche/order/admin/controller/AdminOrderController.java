@@ -151,9 +151,9 @@ public class AdminOrderController {
 
     @AutoDocVersion(version = "订单修改")
     @AutoDocGroup(group = "订单修改")
-    @AutoDocMethod(description = "管理后台还车", value = "管理后台还车",response = AdminModifyOrderFeeCompareVO.class)
+    @AutoDocMethod(description = "管理后台换车", value = "管理后台换车")
     @RequestMapping(value="console/changeCar",method = RequestMethod.POST)
-    public ResponseData<AdminModifyOrderFeeCompareVO> changeCar(@Valid @RequestBody AdminTransferCarReqVO reqVO, BindingResult bindingResult){
+    public ResponseData<?> changeCar(@Valid @RequestBody AdminTransferCarReqVO reqVO, BindingResult bindingResult){
         if(bindingResult.hasErrors()){
             Optional<FieldError> error = bindingResult.getFieldErrors().stream().findFirst();
             return ResponseData.createErrorCodeResponse(ErrorCode.INPUT_ERROR.getCode(), error.isPresent() ?

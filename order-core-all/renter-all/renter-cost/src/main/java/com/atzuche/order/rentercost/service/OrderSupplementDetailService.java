@@ -13,8 +13,6 @@ import com.atzuche.order.rentercost.mapper.OrderSupplementDetailMapper;
 /**
  * 订单补付表
  *
- * @author ZhangBin
- * @date 2019-12-27 10:18:00
  */
 @Service
 public class OrderSupplementDetailService{
@@ -49,5 +47,18 @@ public class OrderSupplementDetailService{
      */
     public Integer updatePayFlagById(Integer id, Integer payFlag) {
     	return orderSupplementDetailMapper.updatePayFlagById(id, payFlag);
+    }
+    
+    /**
+     * 根据订单号获取补付记录
+     * @param orderNo
+     * @return List<OrderSupplementDetailEntity>
+     */
+    public List<OrderSupplementDetailEntity> listOrderSupplementDetailByOrderNo(String orderNo) {
+    	return orderSupplementDetailMapper.listOrderSupplementDetailByOrderNo(orderNo);
+    }
+    
+    public Integer updateDeleteById(Integer id) {
+    	return orderSupplementDetailMapper.updateDeleteById(id);
     }
 }

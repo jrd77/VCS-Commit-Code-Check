@@ -1,13 +1,11 @@
 package com.atzuche.order.commons.enums.cashcode;
 
-import lombok.Getter;
-
 /**
  * 收费序号,车主从20开头  车主 第一位：2， 第二位：1正2负 1正2负      1正2负 3可正可负   ->0可正可负，第三位：0，第四位：分模块（区域），后4位是编码
  * @author jing.huang
  *
  */
-@Getter
+//@Getter //反馈打了jar调不出来get set方法。
 public enum OwnerCashCodeEnum {
 	//第一区域块 看第4位，从1开始。  后4位从0001开始
 	RENT_AMT("21010001","租金"),
@@ -64,4 +62,14 @@ public enum OwnerCashCodeEnum {
 		this.cashNo = cashNo;
 		this.txt = txt;
 	}
+
+	public String getCashNo() {
+		return cashNo;
+	}
+
+	public String getTxt() {
+		return txt;
+	}
+	
+	
 }

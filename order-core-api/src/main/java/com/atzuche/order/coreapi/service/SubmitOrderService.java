@@ -46,6 +46,8 @@ import com.atzuche.order.rentercommodity.service.RenterGoodsService;
 import com.atzuche.order.rentercost.entity.RenterOrderCostDetailEntity;
 import com.atzuche.order.rentercost.entity.dto.OrderCouponDTO;
 import com.atzuche.order.rentermem.service.RenterMemberService;
+import com.atzuche.order.renterorder.entity.OrderTransferRecordEntity;
+import com.atzuche.order.renterorder.service.OrderTransferRecordService;
 import com.atzuche.order.renterorder.service.RenterOrderService;
 import com.atzuche.order.renterorder.vo.CouponAndAutoCoinResVO;
 import com.atzuche.order.renterorder.vo.RenterOrderCarDepositResVO;
@@ -122,6 +124,8 @@ public class SubmitOrderService {
     BaseProducer baseProducer;
     @Autowired
     private RenterOrderWzStatusService renterOrderWzStatusService;
+    @Autowired
+    private OrderTransferRecordService orderTransferRecordService;
 
 
     /**
@@ -293,6 +297,9 @@ public class SubmitOrderService {
         boolean deductionAotuCoinResult = couponAndCoinHandleService.deductionAotuCoin(autoCoinDeductReqVO);
         LOGGER.info("Deduct autoCoin result is:[{}]", deductionAotuCoinResult);
 
+        // 增加一条下单的换车记录
+        orderTransferRecordService.saveOrderTransferRecord(convertToOrderTransferRecordEntity(reqContext, orderNo));
+        
         //8.订单完成事件发送
         //TODO:发送下单成功事件
         sendCreateOrderSuccess(parentOrderDTO.getOrderDTO(),orderReqVO);
@@ -593,5 +600,33 @@ public class SubmitOrderService {
         orderMessage.setMessage("订单创建成功");
         orderMessage.setMessage(orderCreateMq);
         baseProducer.sendTopicMessage("auto-order-action","action.order.create",orderMessage);
+    }
+    
+    
+    /**
+     * 对象转换
+     * @param reqContext
+     * @param orderNo
+     * @return OrderTransferRecordEntity
+     */
+    public OrderTransferRecordEntity convertToOrderTransferRecordEntity(OrderReqContext reqContext, String orderNo) {
+    	if (reqContext == null) {
+    		return null;
+    	}
+    	RenterGoodsDetailDTO renterGoodsDetailDto = reqContext.getRenterGoodsDetailDto();
+    	if (renterGoodsDetailDto == null) {
+    		return null;
+    	}
+    	OrderTransferRecordEntity orderTransferRecordEntity = new OrderTransferRecordEntity();
+		orderTransferRecordEntity.setCarNo(renterGoodsDetailDto.getCarNo() == null ? null:String.valueOf(renterGoodsDetailDto.getCarNo()));
+		orderTransferRecordEntity.setCarPlateNum(renterGoodsDetailDto.getCarPlateNum());
+		orderTransferRecordEntity.setOperator("system");
+		RenterMemberDTO renterMemberDto = reqContext.getRenterMemberDto();
+		if (renterMemberDto != null) {
+			orderTransferRecordEntity.setMemNo(renterMemberDto.getMemNo());
+		}
+		orderTransferRecordEntity.setOrderNo(orderNo);
+		orderTransferRecordEntity.setSource(3);
+		return orderTransferRecordEntity;
     }
 }

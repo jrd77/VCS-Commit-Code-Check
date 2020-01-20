@@ -8,6 +8,7 @@ import com.atzuche.order.admin.util.StringUtil;
 import com.atzuche.order.admin.util.TimeUtil;
 import com.atzuche.order.admin.vo.req.orderSubmit.AdminTransReqVO;
 import com.atzuche.order.commons.CatConstants;
+import com.atzuche.order.commons.ResponseCheckUtil;
 import com.atzuche.order.commons.vo.req.AdminOrderReqVO;
 import com.atzuche.order.commons.vo.res.OrderResVO;
 import com.atzuche.order.open.service.FeignOrderAdminSubmitService;
@@ -41,25 +42,16 @@ public class OrderSubmitService {
             Cat.logEvent(CatConstants.FEIGN_PARAM,JSON.toJSONString(adminOrderReqVO));
             responseObject =  feignOrderAdminSubmitService.submitOrder(adminOrderReqParam);
             Cat.logEvent(CatConstants.FEIGN_RESULT,JSON.toJSONString(responseObject));
-            if(responseObject == null || !ErrorCode.SUCCESS.getCode().equals(responseObject.getResCode())){
-                log.error("Feign 后台管理系统下单失败,responseObject={}", JSON.toJSONString(responseObject));
-                OrderSubmitFailException failException = new OrderSubmitFailException();
-                Cat.logError("Feign 后台管理系统下单失败",failException);
-                throw failException;
-            }
+            ResponseCheckUtil.checkResponse(responseObject);
             t.setStatus(Transaction.SUCCESS);
-        }catch (OrderSubmitFailException e){
-            Cat.logError("Feign 后台管理系统下单失败",e);
-            t.setStatus(e);
-            throw e;
         }catch (Exception e){
             log.error("Feign 后台管理系统下单异常,responseObject={}", JSON.toJSONString(responseObject),e);
-            OrderSubmitErrException err = new OrderSubmitErrException();
-            Cat.logError("Feign 后台管理系统下单异常",err);
-            throw err;
+            Cat.logError("Feign 后台管理系统下单异常",e);
+            throw e;
         }finally {
             t.complete();
         }
+
         //3、返回结果
         ResponseData responseData = new ResponseData();
         responseData.setData(responseObject.getData());
