@@ -50,38 +50,37 @@ public class OrderStatusController {
         if (bindingResult.hasErrors()) {
             return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), ErrorCode.INPUT_ERROR.getText());
         }
-        //获取订单流转列表
-        OrderFlowRequestDTO orderFlowRequestDTO = new OrderFlowRequestDTO();
-        orderFlowRequestDTO.setOrderNo(orderStatusRequestVO.getOrderNo());
-        ResponseData<OrderFlowListResponseDTO> responseDataOrderFlowListResponseDTO = feignOrderFlowService.selectOrderFlowList(orderFlowRequestDTO);
-        OrderStatusListResponseVO orderStatusListResponseVO = new OrderStatusListResponseVO();
-        List<OrderStatusResponseVO> orderStatusList = new ArrayList();
-        OrderDetailReqDTO orderDetailReqDTO = new OrderDetailReqDTO();
-        orderDetailReqDTO.setOrderNo(orderStatusRequestVO.getOrderNo());
-        if(responseDataOrderFlowListResponseDTO.getResCode().equals(ErrorCode.SUCCESS.getCode())){
-            List<OrderFlowDTO>  orderFlowList = responseDataOrderFlowListResponseDTO.getData().getOrderFlowList();
-            if(!CollectionUtils.isEmpty(orderFlowList)) {
-                orderFlowList.forEach(orderFlowDTO -> {
-                    OrderStatusResponseVO orderStatusResponseVO = new OrderStatusResponseVO();
-                    orderStatusResponseVO.setChangeTime(orderFlowDTO.getCreateTime().toString());
-                    orderStatusResponseVO.setStatusDescription(orderFlowDTO.getOrderStatusDesc());
-                    orderStatusResponseVO.setSource(orderFlowDTO.getSource());
-                    orderStatusList.add(orderStatusResponseVO);
-                });
-            }
-            orderStatusListResponseVO.setOrderStatusList(orderStatusList);
-        }
 
-        //获取订单当前状态描述
+        logger.info("订单状态流转列表入参{}",orderStatusRequestVO);
+        OrderStatusListResponseVO orderStatusListResponseVO = new OrderStatusListResponseVO();
         try{
-            orderStatusListResponseVO.setStatusDescription("当前状态");
+            //获取订单流转列表
+            OrderFlowRequestDTO orderFlowRequestDTO = new OrderFlowRequestDTO();
+            orderFlowRequestDTO.setOrderNo(orderStatusRequestVO.getOrderNo());
+            ResponseData<OrderFlowListResponseDTO> responseDataOrderFlowListResponseDTO = feignOrderFlowService.selectOrderFlowList(orderFlowRequestDTO);
+            List<OrderStatusResponseVO> orderStatusList = new ArrayList();
+            OrderDetailReqDTO orderDetailReqDTO = new OrderDetailReqDTO();
+            orderDetailReqDTO.setOrderNo(orderStatusRequestVO.getOrderNo());
+            if(responseDataOrderFlowListResponseDTO.getResCode().equals(ErrorCode.SUCCESS.getCode())){
+                List<OrderFlowDTO>  orderFlowList = responseDataOrderFlowListResponseDTO.getData().getOrderFlowList();
+                if(!CollectionUtils.isEmpty(orderFlowList)) {
+                    orderFlowList.forEach(orderFlowDTO -> {
+                        OrderStatusResponseVO orderStatusResponseVO = new OrderStatusResponseVO();
+                        orderStatusResponseVO.setChangeTime(orderFlowDTO.getCreateTime().toString());
+                        orderStatusResponseVO.setStatusDescription(orderFlowDTO.getOrderStatusDesc());
+                        orderStatusResponseVO.setSource(orderFlowDTO.getSource());
+                        orderStatusList.add(orderStatusResponseVO);
+                    });
+                }
+                orderStatusListResponseVO.setOrderStatusList(orderStatusList);
+            }
+            //获取订单当前状态描述
             ResponseData<OrderStatusRespDTO> responseDataOrderStatusRespDTO = feignOrderDetailService.getOrderStatus(orderDetailReqDTO);
             if(responseDataOrderStatusRespDTO.getResCode().equals(ErrorCode.SUCCESS.getCode())){
-                //获取当前状态
-
+                orderStatusListResponseVO.setStatusDescription(String.valueOf(responseDataOrderStatusRespDTO.getData().getOrderStatusDTO().getStatus()));
             }
         }catch (Exception e) {
-
+            logger.info("订单状态流转列表异常{}",e);
         }
 
 
