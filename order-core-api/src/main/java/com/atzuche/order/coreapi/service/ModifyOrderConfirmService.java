@@ -10,8 +10,10 @@ import org.springframework.stereotype.Service;
 
 import com.atzuche.order.commons.LocalDateTimeUtils;
 import com.atzuche.order.commons.OrderReqContext;
+import com.atzuche.order.commons.entity.dto.OrderTransferRecordDTO;
 import com.atzuche.order.commons.entity.dto.OwnerGoodsDetailDTO;
 import com.atzuche.order.commons.enums.OrderChangeItemEnum;
+import com.atzuche.order.commons.enums.OrderTransferSourceEnum;
 import com.atzuche.order.commons.enums.SrvGetReturnEnum;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.commons.vo.req.OrderReqVO;
@@ -480,5 +482,33 @@ public class ModifyOrderConfirmService {
 		orderInfoDTO.setReturnCarAddress(returnCarAddress);
 		orderInfoDTO.setOperationType(OrderOperationTypeEnum.DDXGZQ.getType());
 		stockService.cutCarStock(orderInfoDTO);
+	}
+	
+	/**
+	 * 获取换车记录
+	 * @param orderNo
+	 * @return List<OrderTransferRecordDTO>
+	 */
+	public List<OrderTransferRecordDTO> listOrderTransferRecordByOrderNo(String orderNo) {
+		List<OrderTransferRecordEntity> list = orderTransferRecordService.listOrderTransferRecordByOrderNo(orderNo);
+		if (list != null && !list.isEmpty()) {
+			List<OrderTransferRecordDTO> listDTO = list.stream().map(transfer -> {
+				OrderTransferRecordDTO transDTO = new OrderTransferRecordDTO();
+				BeanUtils.copyProperties(transfer, transDTO);
+				if (OrderTransferSourceEnum.DISPATCH_TRANSFER.getCode().equals(transfer.getSource())) {
+					transDTO.setSourceDesc(OrderTransferSourceEnum.DISPATCH_TRANSFER.getDesc());
+				} else if (OrderTransferSourceEnum.NORMAL_TRANSFER.getCode().equals(transfer.getSource())) {
+					transDTO.setSourceDesc(OrderTransferSourceEnum.NORMAL_TRANSFER.getDesc());
+				} else if (OrderTransferSourceEnum.CPIC_TRANSFER.getCode().equals(transfer.getSource())) {
+					transDTO.setSourceDesc(OrderTransferSourceEnum.CPIC_TRANSFER.getDesc());
+				} else if (OrderTransferSourceEnum.CREATE_ORDER.getCode().equals(transfer.getSource())) {
+					transDTO.setSourceDesc(OrderTransferSourceEnum.CREATE_ORDER.getDesc());
+				}
+				transDTO.setCreateTime(CommonUtils.formatTime(transfer.getCreateTime(), CommonUtils.FORMAT_STR_DEFAULT));
+				return transDTO;
+			}).collect(Collectors.toList());
+			return listDTO;
+		}
+		return null;
 	}
 }
