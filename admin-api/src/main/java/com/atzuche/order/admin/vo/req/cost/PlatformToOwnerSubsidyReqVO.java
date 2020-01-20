@@ -33,7 +33,7 @@ public class PlatformToOwnerSubsidyReqVO {
     @AutoDocProperty("洗车费补贴")
     private String washCarSubsidyAmt;
     @AutoDocProperty("车上物品损失补贴")
-    private String CarGoodsLossSubsidyAmt;
+    private String carGoodsLossSubsidyAmt;
     @AutoDocProperty("延时补贴")
     private String delaySubsidyAmt;
     @AutoDocProperty("交通补贴")
