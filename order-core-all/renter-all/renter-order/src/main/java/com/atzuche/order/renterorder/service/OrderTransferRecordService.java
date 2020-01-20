@@ -1,5 +1,7 @@
 package com.atzuche.order.renterorder.service;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,5 +24,14 @@ public class OrderTransferRecordService {
 			return 1;
 		}
 		return orderTransferRecordMapper.saveOrderTransferRecord(orderTransferRecordEntity);
+	}
+	
+	/**
+	 * 获取订单换车记录
+	 * @param orderNo
+	 * @return List<OrderTransferRecordEntity>
+	 */
+	public List<OrderTransferRecordEntity> listOrderTransferRecordByOrderNo(String orderNo) {
+		return orderTransferRecordMapper.listOrderTransferRecordByOrderNo(orderNo);
 	}
 }

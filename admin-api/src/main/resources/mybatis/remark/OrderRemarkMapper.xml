@@ -104,7 +104,7 @@
 		follow_status,
 		follow_fail_reason,
 		dept_id
-		from order_remark where order_no = #{orderNo} and is_delete = 0
+		from order_remark where order_no = #{orderNo} and is_delete = 0 and remark_type!=12
 		<if test="departmentId != null and departmentId != ''">
 			and dept_id = #{departmentId}
 		</if>

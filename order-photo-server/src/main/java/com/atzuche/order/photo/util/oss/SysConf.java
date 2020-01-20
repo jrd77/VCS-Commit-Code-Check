@@ -1,4 +1,4 @@
-package com.atzuche.order.photo.util;
+package com.atzuche.order.photo.util.oss;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,58 +25,9 @@ public class SysConf {
 	
 	/** 1:正式环境，2：测试环境   */
 	public static final String ENV = getEnv(); //getEnv();
-	
 
-	//app真格服务访问地址
-    public static final String APP_SERVER_ADDRZG = getBundleString("app_server_addzg");
-
-	//仁云取还车接口地址
-    public static final String HROCLOUD_SERVER_URL = getBundleString("HrocloudServerUrl");
-    //web 地址
-    public static final String WEB_ADDR = getBundleString("web_addr");
-    //H5地址
-    public static final String H5_ADDR = getBundleString("h5_addr");
-    //短链获取
-    public static final String APP_SERVER_SHORTLINK = getBundleString("short_url");
-    
-	public static final String APP_SERVER_ADDR = getAppServerAddr();
-	public static final String APP_TEMP_SERVER_ADDR =ResourceBundle.getBundle(BUNDLE_NAME, Locale.CHINA).getString("appTempServer");
-	public static final String IM_CENTER_ADDR = getImCenterAddr();
-	
-	public static final String[] APP_SERVER_IPS = getAppServerIps();
-	
-	public static final String CON_SERVER_ADDR = getConServerAddr();
-	public static final String CON_IMAGE_DIR = getConImageDir();
-	
-	//===================== OSS 相关配置  ========================
-	/** OSS end point  */
-	public static final String OSS_END_POINT = "http://oss-cn-hangzhou.aliyuncs.com"; 
-	
-	public static final String OSS_BASE_URL = "oss-cn-hangzhou.aliyuncs.com"; 
-	
-	public static final String OSS_BUCKET = getOSSBucket();
-	public static final String OSS_BUCKET_AUTH = getOSSBucketAuth();
-	public static final String OSS_BUCKET_CAR_AUTH = getOSSBucketCarAuth();
-	
-	//====================== 短信 ==================================
-	public static final String SMS_MARKET_MSG_URL =  getBundleString("smsMarketMsgUrl");
-	public static final String SMS_MARKET_MT_URL =getBundleString("smsMarketMtUrl");//短信营销
-	public static final String SMS_ACCESS_KEY = getBundleString("smsAccessKey");
-	
-	//======================异常报警邮件发送地址 ==================================
-	public static final String[] EXCEPTION_MAIL_LIST = getExceptionWarnMailList();
-
-	//===================== 车辆审核通知URL ========================
-	public static final String CAR_APPROVE_NOTIFY_URL = getApproveNotifyUrl();
-	
-	//===================== 人员审核通知URL ========================
-	public static final String MEM_APPROVE_NOTIFY_URL = getMemApproveNotifyUrl();
-	
 	private SysConf(){}//私有构造函数（不允许实例化）
 
-	//===================== 保险相关         ============================================================
-	/** 保单存放目录  */
-	public static final String INSUR_POLICY_PATH = getInsurPolicyPath(); 
 	
 	public static final String INTERFACE_CALLBACK_URL = getBundleString("interface_callback_url");
 	
@@ -308,10 +259,6 @@ public class SysConf {
 			return mails;
 		}
 
-	private static String getMemApproveNotifyUrl()
-	{
-		return INTERFACE_CALLBACK_URL+"/ctrip/notifyRcv/manage/auth";
-	}
 
 
 	public static String getImCenterAddr() {

@@ -575,7 +575,7 @@ public class OrderSettleNoTService {
         //2统计 车主结算费用明细， 补贴，费用总额
         handleOwnerAndPlatform(settleOrdersDefinition,settleOrders);
         //3统计 计算总费用
-        countCost(settleOrdersDefinition);
+        countCost(settleOrdersDefinition,settleOrders);
         return settleOrdersDefinition;
     }
 
@@ -583,7 +583,7 @@ public class OrderSettleNoTService {
      * 根据流水记录总账
      * @param settleOrdersDefinition
      */
-    private void countCost(SettleOrdersDefinition settleOrdersDefinition) {
+    private void countCost(SettleOrdersDefinition settleOrdersDefinition,SettleOrders settleOrders) {
         List<AccountRenterCostSettleDetailEntity> accountRenterCostSettleDetails = settleOrdersDefinition.getAccountRenterCostSettleDetails();
         //1租客总账
         if(!CollectionUtils.isEmpty(accountRenterCostSettleDetails)){
@@ -614,6 +614,9 @@ public class OrderSettleNoTService {
             int platformSubsidyAmt = accountPlatformSubsidyDetails.stream().mapToInt(AccountPlatformSubsidyDetailEntity::getAmt).sum();
             settleOrdersDefinition.setPlatformSubsidyAmt(platformSubsidyAmt);
         }
+        // 5 计算车主、租客交接车油费差
+        orderSettleNewService.addPlatFormAmt(settleOrdersDefinition,settleOrders);
+
     }
 
     /**
@@ -1096,6 +1099,7 @@ public class OrderSettleNoTService {
             if(settleOrdersAccount.getDepositAmt()>0){
                 DeductDepositToRentCostReqVO vo = new DeductDepositToRentCostReqVO();
                 BeanUtils.copyProperties(settleOrders,vo);
+                vo.setMemNo(settleOrders.getRenterMemNo());
                 int debtAmt = settleOrdersAccount.getRentCostAmtFinal() + settleOrdersAccount.getRentCostPayAmt();
                 //真实抵扣金额
                 int amt = debtAmt+settleOrdersAccount.getDepositSurplusAmt()>=0?debtAmt:-settleOrdersAccount.getDepositSurplusAmt();
@@ -1115,6 +1119,7 @@ public class OrderSettleNoTService {
             int amt = settleOrdersAccount.getRentCostAmtFinal() + settleOrdersAccount.getRentCostPayAmt();
             AccountInsertDebtReqVO accountInsertDebt = new AccountInsertDebtReqVO();
             BeanUtils.copyProperties(settleOrders,accountInsertDebt);
+            accountInsertDebt.setMemNo(settleOrders.getRenterMemNo());
             accountInsertDebt.setType(DebtTypeEnum.SETTLE.getCode());
             accountInsertDebt.setAmt(amt);
             accountInsertDebt.setSourceCode(RenterCashCodeEnum.HISTORY_AMT.getCashNo());
@@ -1123,6 +1128,7 @@ public class OrderSettleNoTService {
             //2.2记录结算费用状态
             AccountRenterCostSettleDetailEntity entity = new AccountRenterCostSettleDetailEntity();
             BeanUtils.copyProperties(settleOrders,entity);
+            accountInsertDebt.setMemNo(settleOrders.getRenterMemNo());
             entity.setAmt(-amt);
             entity.setCostCode(RenterCashCodeEnum.HISTORY_AMT.getCashNo());
             entity.setCostDetail(RenterCashCodeEnum.HISTORY_AMT.getTxt());
@@ -1157,6 +1163,7 @@ public class OrderSettleNoTService {
         if(settleOrdersAccount.getDepositSurplusAmt()>0){
             CashierDeductDebtReqVO cashierDeductDebtReq = new CashierDeductDebtReqVO();
             BeanUtils.copyProperties(settleOrdersAccount,cashierDeductDebtReq);
+            cashierDeductDebtReq.setMemNo(settleOrdersAccount.getRenterMemNo());
             cashierDeductDebtReq.setAmt(settleOrdersAccount.getDepositSurplusAmt());
             cashierDeductDebtReq.setRenterCashCodeEnum(RenterCashCodeEnum.SETTLE_DEPOSIT_TO_HISTORY_AMT);
             CashierDeductDebtResVO result = cashierService.deductDebt(cashierDeductDebtReq);
@@ -1243,7 +1250,9 @@ public class OrderSettleNoTService {
         BeanUtils.copyProperties(settleOrdersAccount,vo);
         vo.setAmt(rentCostSurplusAmt);
         vo.setRemake("结算退还");
+        vo.setMemNo(settleOrdersAccount.getRenterMemNo());
         vo.setRenterCashCodeEnum(RenterCashCodeEnum.SETTLE_RENT_COST_TO_RETURN_AMT);
+        vo.setFlag(RenterCashCodeEnum.ACCOUNT_RENTER_RENT_COST.getCashNo());
         return vo;
     }
 
@@ -1272,6 +1281,7 @@ public class OrderSettleNoTService {
             //1退还租车押金
             CashierRefundApplyReqVO cashierRefundApply = new CashierRefundApplyReqVO();
             BeanUtils.copyProperties(settleOrdersAccount,cashierRefundApply);
+            cashierRefundApply.setMemNo(settleOrdersAccount.getRenterMemNo());
             cashierRefundApply.setAmt(-settleOrdersAccount.getDepositSurplusAmt());
             cashierRefundApply.setRenterCashCodeEnum(RenterCashCodeEnum.SETTLE_RENT_DEPOSIT_TO_RETURN_AMT);
             cashierRefundApply.setRemake(RenterCashCodeEnum.SETTLE_RENT_DEPOSIT_TO_RETURN_AMT.getTxt());
@@ -1281,6 +1291,7 @@ public class OrderSettleNoTService {
             // 2记录退还 租车押金 结算费用明细
             AccountRenterCostSettleDetailEntity entity = new AccountRenterCostSettleDetailEntity();
             BeanUtils.copyProperties(settleOrdersAccount,entity);
+            entity.setMemNo(settleOrdersAccount.getRenterMemNo());
             entity.setAmt(-settleOrdersAccount.getDepositSurplusAmt());
             entity.setCostCode(RenterCashCodeEnum.SETTLE_RENT_DEPOSIT_TO_RETURN_AMT.getCashNo());
             entity.setCostDetail(RenterCashCodeEnum.SETTLE_RENT_DEPOSIT_TO_RETURN_AMT.getTxt());
@@ -1301,6 +1312,7 @@ public class OrderSettleNoTService {
         if(settleOrdersAccount.getOwnerCostSurplusAmt()>0){
             CashierDeductDebtReqVO cashierDeductDebtReq = new CashierDeductDebtReqVO();
             BeanUtils.copyProperties(settleOrdersAccount,cashierDeductDebtReq);
+            cashierDeductDebtReq.setMemNo(settleOrdersAccount.getOwnerMemNo());
             cashierDeductDebtReq.setAmt(settleOrdersAccount.getOwnerCostSurplusAmt());
             cashierDeductDebtReq.setRenterCashCodeEnum(RenterCashCodeEnum.SETTLE_OWNER_INCOME_TO_HISTORY_AMT);
             CashierDeductDebtResVO result = cashierService.deductDebtByOwnerIncome(cashierDeductDebtReq);
@@ -1321,6 +1333,7 @@ public class OrderSettleNoTService {
         if(settleOrdersAccount.getOwnerCostSurplusAmt()>0){
             AccountOwnerIncomeExamineReqVO accountOwnerIncomeExamine = new AccountOwnerIncomeExamineReqVO();
             BeanUtils.copyProperties(settleOrdersAccount,accountOwnerIncomeExamine);
+            accountOwnerIncomeExamine.setMemNo(settleOrdersAccount.getOwnerMemNo());
             accountOwnerIncomeExamine.setAmt(settleOrdersAccount.getOwnerCostSurplusAmt());
             accountOwnerIncomeExamine.setMemNo(settleOrdersAccount.getOwnerMemNo());
             cashierService.insertOwnerIncomeExamine(accountOwnerIncomeExamine);

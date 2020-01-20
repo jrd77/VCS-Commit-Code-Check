@@ -10,8 +10,11 @@ import org.springframework.stereotype.Service;
 
 import com.atzuche.order.commons.LocalDateTimeUtils;
 import com.atzuche.order.commons.OrderReqContext;
+import com.atzuche.order.commons.entity.dto.OrderTransferRecordDTO;
 import com.atzuche.order.commons.entity.dto.OwnerGoodsDetailDTO;
+import com.atzuche.order.commons.enums.DispatcherStatusEnum;
 import com.atzuche.order.commons.enums.OrderChangeItemEnum;
+import com.atzuche.order.commons.enums.OrderTransferSourceEnum;
 import com.atzuche.order.commons.enums.SrvGetReturnEnum;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.commons.vo.req.OrderReqVO;
@@ -28,6 +31,7 @@ import com.atzuche.order.delivery.vo.delivery.CancelOrderDeliveryVO;
 import com.atzuche.order.delivery.vo.delivery.UpdateFlowOrderDTO;
 import com.atzuche.order.ownercost.entity.OwnerOrderEntity;
 import com.atzuche.order.parentorder.entity.OrderEntity;
+import com.atzuche.order.parentorder.service.OrderStatusService;
 import com.atzuche.order.rentercost.entity.RenterOrderSubsidyDetailEntity;
 import com.atzuche.order.rentercost.entity.dto.RenterOrderSubsidyDetailDTO;
 import com.atzuche.order.rentercost.service.RenterOrderSubsidyDetailService;
@@ -70,6 +74,8 @@ public class ModifyOrderConfirmService {
 	private RenterOrderChangeApplyService renterOrderChangeApplyService;
 	@Autowired
 	private OrderTransferRecordService orderTransferRecordService;
+	@Autowired
+	private OrderStatusService orderStatusService;
 	
 	/**
 	 * 自动同意
@@ -149,7 +155,10 @@ public class ModifyOrderConfirmService {
 		orderTransferRecordEntity.setMemNo(modifyOrderDTO.getMemNo());
 		orderTransferRecordEntity.setOrderNo(modifyOrderOwnerDTO.getOrderNo());
 		orderTransferRecordEntity.setSource(0);
+		// 保存换车记录
 		orderTransferRecordService.saveOrderTransferRecord(orderTransferRecordEntity);
+		// 更新调度状态
+		orderStatusService.updateDispatchStatus(modifyOrderOwnerDTO.getOrderNo(), DispatcherStatusEnum.DISPATCH_SUCCESS.getCode());
 	}
 	
 	
@@ -480,5 +489,33 @@ public class ModifyOrderConfirmService {
 		orderInfoDTO.setReturnCarAddress(returnCarAddress);
 		orderInfoDTO.setOperationType(OrderOperationTypeEnum.DDXGZQ.getType());
 		stockService.cutCarStock(orderInfoDTO);
+	}
+	
+	/**
+	 * 获取换车记录
+	 * @param orderNo
+	 * @return List<OrderTransferRecordDTO>
+	 */
+	public List<OrderTransferRecordDTO> listOrderTransferRecordByOrderNo(String orderNo) {
+		List<OrderTransferRecordEntity> list = orderTransferRecordService.listOrderTransferRecordByOrderNo(orderNo);
+		if (list != null && !list.isEmpty()) {
+			List<OrderTransferRecordDTO> listDTO = list.stream().map(transfer -> {
+				OrderTransferRecordDTO transDTO = new OrderTransferRecordDTO();
+				BeanUtils.copyProperties(transfer, transDTO);
+				if (OrderTransferSourceEnum.DISPATCH_TRANSFER.getCode().equals(transfer.getSource())) {
+					transDTO.setSourceDesc(OrderTransferSourceEnum.DISPATCH_TRANSFER.getDesc());
+				} else if (OrderTransferSourceEnum.NORMAL_TRANSFER.getCode().equals(transfer.getSource())) {
+					transDTO.setSourceDesc(OrderTransferSourceEnum.NORMAL_TRANSFER.getDesc());
+				} else if (OrderTransferSourceEnum.CPIC_TRANSFER.getCode().equals(transfer.getSource())) {
+					transDTO.setSourceDesc(OrderTransferSourceEnum.CPIC_TRANSFER.getDesc());
+				} else if (OrderTransferSourceEnum.CREATE_ORDER.getCode().equals(transfer.getSource())) {
+					transDTO.setSourceDesc(OrderTransferSourceEnum.CREATE_ORDER.getDesc());
+				}
+				transDTO.setCreateTime(CommonUtils.formatTime(transfer.getCreateTime(), CommonUtils.FORMAT_STR_DEFAULT));
+				return transDTO;
+			}).collect(Collectors.toList());
+			return listDTO;
+		}
+		return null;
 	}
 }

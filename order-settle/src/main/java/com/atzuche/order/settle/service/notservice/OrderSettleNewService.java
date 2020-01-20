@@ -2,6 +2,7 @@ package com.atzuche.order.settle.service.notservice;
 
 import java.util.List;
 
+import com.atzuche.order.commons.enums.cashcode.ConsoleCashCodeEnum;
 import com.autoyol.platformcost.model.FeeResult;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -158,6 +159,17 @@ public class OrderSettleNewService {
             accountPlatformProfitDetail.setAmt(-totalAmount);
             accountPlatformProfitDetail.setSourceCode(RenterCashCodeEnum.SRV_RETURN_COST.getCashNo());
             accountPlatformProfitDetail.setSourceDesc(RenterCashCodeEnum.SRV_RETURN_COST.getTxt());
+            accountPlatformProfitDetail.setUniqueNo(String.valueOf(renterOrderCostDetail.getId()));
+            accountPlatformProfitDetail.setOrderNo(renterOrderCostDetail.getOrderNo());
+            settleOrdersDefinition.addPlatformProfit(accountPlatformProfitDetail);
+        }
+        //2 提前取车车服务费 费用收益方 平台   平台端记录冲账流水
+        if(RenterCashCodeEnum.SRV_GET_COST.getCashNo().equals(renterOrderCostDetail.getCostCode())){
+            int totalAmount = renterOrderCostDetail.getTotalAmount();
+            AccountPlatformProfitDetailEntity accountPlatformProfitDetail = new AccountPlatformProfitDetailEntity();
+            accountPlatformProfitDetail.setAmt(-totalAmount);
+            accountPlatformProfitDetail.setSourceCode(RenterCashCodeEnum.SRV_GET_COST.getCashNo());
+            accountPlatformProfitDetail.setSourceDesc(RenterCashCodeEnum.SRV_GET_COST.getTxt());
             accountPlatformProfitDetail.setUniqueNo(String.valueOf(renterOrderCostDetail.getId()));
             accountPlatformProfitDetail.setOrderNo(renterOrderCostDetail.getOrderNo());
             settleOrdersDefinition.addPlatformProfit(accountPlatformProfitDetail);
@@ -345,5 +357,30 @@ public class OrderSettleNewService {
         accountPlatformProfitDetail.setUniqueNo(String.valueOf(accountRenterCostSettleDetail.getId()));
         accountPlatformProfitDetail.setOrderNo(accountRenterCostSettleDetail.getOrderNo());
         settleOrdersDefinition.addPlatformProfit(accountPlatformProfitDetail);
+    }
+
+    public void addPlatFormAmt(SettleOrdersDefinition settleOrdersDefinition,SettleOrders settleOrders) {
+        //租客交接车油费
+        int rentOilAmt = settleOrdersDefinition.getAccountRenterCostSettleDetails().stream().filter(obj ->{
+            return RenterCashCodeEnum.ACCOUNT_RENTER_DELIVERY_OIL_COST.getCashNo().equals(obj.getCostCode());
+        }).mapToInt(AccountRenterCostSettleDetailEntity::getAmt).sum();
+        //
+        //车主交接车油费
+        int ownerOilAmt = settleOrdersDefinition.getAccountRenterCostSettleDetails().stream().filter(obj ->{
+            return OwnerCashCodeEnum.ACCOUNT_OWNER_SETTLE_OIL_COST.getCashNo().equals(obj.getCostCode());
+        }).mapToInt(AccountRenterCostSettleDetailEntity::getAmt).sum();
+        //平台补贴油费
+        int platFormAmt = settleOrdersDefinition.getAccountPlatformSubsidyDetails().stream().filter(obj ->{
+            return RenterCashCodeEnum.SUBSIDY_OIL.getCashNo().equals(obj.getSourceCode());
+        }).mapToInt(AccountPlatformSubsidyDetailEntity::getAmt).sum();
+        int oilAmt = rentOilAmt + ownerOilAmt + platFormAmt;
+        if(oilAmt!=0){
+            AccountPlatformProfitDetailEntity accountPlatformProfitDetail = new AccountPlatformProfitDetailEntity();
+            accountPlatformProfitDetail.setAmt(-oilAmt);
+            accountPlatformProfitDetail.setSourceCode(RenterCashCodeEnum.SUBSIDY_OIL.getCashNo());
+            accountPlatformProfitDetail.setSourceDesc(RenterCashCodeEnum.SUBSIDY_OIL.getTxt());
+            accountPlatformProfitDetail.setOrderNo(settleOrders.getOrderNo());
+            settleOrdersDefinition.addPlatformProfit(accountPlatformProfitDetail);
+        }
     }
 }
