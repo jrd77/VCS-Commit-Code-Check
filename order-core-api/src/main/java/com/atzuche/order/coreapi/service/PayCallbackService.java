@@ -1,5 +1,6 @@
 package com.atzuche.order.coreapi.service;
 
+import com.atzuche.order.commons.enums.OrderPayStatusEnum;
 import com.atzuche.order.commons.enums.OrderStatusEnum;
 import com.atzuche.order.commons.enums.YesNoEnum;
 import com.atzuche.order.commons.service.OrderPayCallBack;
@@ -41,7 +42,7 @@ public class PayCallbackService implements OrderPayCallBack {
         }
         OrderStatusEntity entity = orderStatusService.getByOrderNo(orderNo);
         log.info("PayCallbackService sendDataMessageToRenYun param [{}]", GsonUtils.toJson(entity));
-        if(Objects.nonNull(entity) && Objects.nonNull(entity.getStatus()) && OrderStatusEnum.TO_GET_CAR.getStatus()==entity.getStatus()){
+        if(Objects.nonNull(entity) && Objects.nonNull(entity.getRentCarPayStatus()) && OrderPayStatusEnum.PAYED.getStatus()==entity.getRentCarPayStatus()){
             deliveryCarService.sendDataMessageToRenYun(renterOrderNo);
         }
         log.info("PayCallbackService callBack end param [{}]", GsonUtils.toJson(renterOrderNo));
