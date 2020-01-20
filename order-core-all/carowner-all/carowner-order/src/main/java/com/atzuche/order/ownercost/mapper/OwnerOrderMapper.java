@@ -41,5 +41,4 @@ public interface OwnerOrderMapper{
 	OwnerOrderEntity getOwnerOrderByOwnerOrderNo(@Param("ownerOrderNo")String ownerOrderNo);
 
     OwnerOrderEntity queryCancelOwnerOrderByOrderNoIsEffective(@Param("orderNo")String orderNo);
-
 }

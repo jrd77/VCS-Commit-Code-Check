@@ -20,6 +20,7 @@ import com.atzuche.order.accountrenterwzdepost.service.AccountRenterWzDepositSer
 import com.atzuche.order.accountrenterwzdepost.vo.res.AccountRenterWZDepositResVO;
 import com.atzuche.order.cashieraccount.service.CashierPayService;
 import com.atzuche.order.commons.enums.DeliveryOrderTypeEnum;
+import com.atzuche.order.commons.enums.OrderStatusEnum;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.commons.vo.res.ModifyOrderMainResVO;
 import com.atzuche.order.commons.vo.res.ModifyOrderResVO;
@@ -31,12 +32,15 @@ import com.atzuche.order.commons.vo.res.cost.RenterOrderSubsidyDetailResVO;
 import com.atzuche.order.commons.vo.res.order.RenterOrderResVO;
 import com.atzuche.order.delivery.entity.RenterOrderDeliveryEntity;
 import com.atzuche.order.delivery.service.RenterOrderDeliveryService;
+import com.atzuche.order.parentorder.service.OrderStatusService;
 import com.atzuche.order.rentercost.entity.RenterOrderCostDetailEntity;
 import com.atzuche.order.rentercost.entity.RenterOrderFineDeatailEntity;
 import com.atzuche.order.rentercost.entity.RenterOrderSubsidyDetailEntity;
 import com.atzuche.order.rentercost.service.RenterOrderCostDetailService;
 import com.atzuche.order.rentercost.service.RenterOrderSubsidyDetailService;
+import com.atzuche.order.renterorder.entity.RenterOrderChangeApplyEntity;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
+import com.atzuche.order.renterorder.service.RenterOrderChangeApplyService;
 import com.atzuche.order.renterorder.service.RenterOrderService;
 
 import lombok.extern.slf4j.Slf4j;
@@ -64,6 +68,10 @@ public class ModifyOrderQueryListService {
 	private RenterOrderSubsidyDetailService renterOrderSubsidyDetailService;
 	@Autowired
 	private RenterOrderService renterOrderService;
+	@Autowired
+	private RenterOrderChangeApplyService renterOrderChangeApplyService;
+	@Autowired
+	private OrderStatusService orderStatusService;
 	
 	
 	public ModifyOrderResVO queryModifyOrderList(String orderNo,String renterOrderNo) throws Exception{
@@ -151,6 +159,32 @@ public class ModifyOrderQueryListService {
 		//租客订单
 		//租客订单
 		List<RenterOrderEntity> rentLst = renterOrderService.queryRenterOrderByOrderNo(orderNo);
+		/**
+		 * 申请修改记录
+		 * 
+		 */
+//		List<RenterOrderChangeApplyEntity> rentApplyLst = renterOrderChangeApplyService.selectALLByOrderNo(orderNo);11
+		for (RenterOrderEntity renterOrderEntity : rentLst) {
+			RenterOrderChangeApplyEntity entity = renterOrderChangeApplyService.getRenterOrderApplyByRenterOrderNo(renterOrderEntity.getRenterOrderNo());
+			if(entity != null) {
+				//需要判定订单状态是否结束
+				Integer status = orderStatusService.getStatusByOrderNo(orderNo);
+				if(status != null && OrderStatusEnum.CLOSED.getStatus() == status.intValue()) {
+					renterOrderEntity.setAgreeFlag(3);
+				}else {
+					//审核状态:0-未处理，1-已同意，2-主动拒绝,3-自动拒绝
+					if(entity.getAuditStatus().intValue() == 2 || entity.getAuditStatus().intValue() == 3) {
+						//车主是否同意 0-未处理，1-已同意，2-已拒绝，3不处理 横线
+						renterOrderEntity.setAgreeFlag(2);
+					}else {
+						renterOrderEntity.setAgreeFlag(entity.getAuditStatus());
+					}
+				}
+			}
+		}
+		
+		
+		
 		List<RenterOrderResVO> rentLstReal = new ArrayList<RenterOrderResVO>();
 		if(rentLst != null) {
 			rentLst.stream().forEach(x->{

@@ -30,6 +30,8 @@ public enum OwnerCashCodeEnum {
     OWNER_TRAFFIC_SUBSIDY("22120006","车主交通费补贴"),
     OWNER_INCOME_SUBSIDY("22120007","车主收益补贴"),
     OWNER_WASH_CAR_SUBSIDY("22120008","车主洗车补贴"),
+    OWNER_OTHER_SUBSIDY("22120009","其他补贴"),
+    
     
     
     //第三区域块 看第4位，从3开始。  后4位从0001开始    后面是以此类推，确保费用编码不能重复。

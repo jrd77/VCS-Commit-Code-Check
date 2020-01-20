@@ -275,6 +275,9 @@ public class ModificationOrderService {
 		case 2:
 			flag = "已拒绝";
 			break;
+		case 3:
+			flag = "-";
+			break;
 		default:
 			break;
 		}

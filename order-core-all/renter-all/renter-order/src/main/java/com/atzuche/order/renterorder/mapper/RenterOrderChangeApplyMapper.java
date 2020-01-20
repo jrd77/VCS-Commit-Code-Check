@@ -18,7 +18,9 @@ public interface RenterOrderChangeApplyMapper{
     RenterOrderChangeApplyEntity selectByPrimaryKey(Integer id);
 
     List<RenterOrderChangeApplyEntity> selectALL();
-
+    
+    List<RenterOrderChangeApplyEntity> selectALLByOrderNo(@Param("orderNo") String orderNo);
+    
     int insert(RenterOrderChangeApplyEntity record);
     
     int saveRenterOrderChangeApply(RenterOrderChangeApplyEntity record);
@@ -30,6 +32,12 @@ public interface RenterOrderChangeApplyMapper{
     Integer updateRenterOrderChangeApplyStatus(@Param("id") Integer id, @Param("auditStatus") Integer auditStatus);
     
     RenterOrderChangeApplyEntity getRenterOrderChangeApplyByRenterOrderNo(@Param("renterOrderNo") String renterOrderNo);
+    /**
+     * 根据租客子订单号查询。申请记录
+     * @param renterOrderNo
+     * @return
+     */
+    RenterOrderChangeApplyEntity getRenterOrderApplyByRenterOrderNo(@Param("renterOrderNo") String renterOrderNo);
 
     Integer getRenterOrderChangeApplyCountByOrderNo(@Param("orderNo") String orderNo);
     
