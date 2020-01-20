@@ -1243,7 +1243,9 @@ public class OrderSettleNoTService {
         BeanUtils.copyProperties(settleOrdersAccount,vo);
         vo.setAmt(rentCostSurplusAmt);
         vo.setRemake("结算退还");
+        vo.setMemNo(settleOrdersAccount.getRenterMemNo());
         vo.setRenterCashCodeEnum(RenterCashCodeEnum.SETTLE_RENT_COST_TO_RETURN_AMT);
+        vo.setFlag(RenterCashCodeEnum.ACCOUNT_RENTER_RENT_COST.getCashNo());
         return vo;
     }
 

@@ -162,6 +162,17 @@ public class OrderSettleNewService {
             accountPlatformProfitDetail.setOrderNo(renterOrderCostDetail.getOrderNo());
             settleOrdersDefinition.addPlatformProfit(accountPlatformProfitDetail);
         }
+        //2 提前取车车服务费 费用收益方 平台   平台端记录冲账流水
+        if(RenterCashCodeEnum.SRV_GET_COST.getCashNo().equals(renterOrderCostDetail.getCostCode())){
+            int totalAmount = renterOrderCostDetail.getTotalAmount();
+            AccountPlatformProfitDetailEntity accountPlatformProfitDetail = new AccountPlatformProfitDetailEntity();
+            accountPlatformProfitDetail.setAmt(-totalAmount);
+            accountPlatformProfitDetail.setSourceCode(RenterCashCodeEnum.SRV_GET_COST.getCashNo());
+            accountPlatformProfitDetail.setSourceDesc(RenterCashCodeEnum.SRV_GET_COST.getTxt());
+            accountPlatformProfitDetail.setUniqueNo(String.valueOf(renterOrderCostDetail.getId()));
+            accountPlatformProfitDetail.setOrderNo(renterOrderCostDetail.getOrderNo());
+            settleOrdersDefinition.addPlatformProfit(accountPlatformProfitDetail);
+        }
         //3 平台保障费 费用收益方 平台   平台端记录冲账流水
         if(RenterCashCodeEnum.INSURE_TOTAL_PRICES.getCashNo().equals(renterOrderCostDetail.getCostCode())){
             int totalAmount = renterOrderCostDetail.getTotalAmount();
