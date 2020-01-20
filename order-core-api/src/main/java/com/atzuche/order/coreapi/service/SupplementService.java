@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.atzuche.order.commons.entity.dto.OrderSupplementDetailDTO;
+import com.atzuche.order.commons.enums.SupplementOpTypeEnum;
+import com.atzuche.order.commons.enums.SupplementTypeEnum;
 import com.atzuche.order.coreapi.modifyorder.exception.ModifyOrderParentOrderNotFindException;
 import com.atzuche.order.parentorder.entity.OrderEntity;
 import com.atzuche.order.parentorder.service.OrderService;
@@ -39,6 +41,8 @@ public class SupplementService {
 			throw new ModifyOrderParentOrderNotFindException();
 		}
 		supplementEntity.setMemNo(orderEntity.getMemNoRenter());
+		supplementEntity.setSupplementType(SupplementTypeEnum.MANUAL_CREATE.getCode());
+		supplementEntity.setOpType(SupplementOpTypeEnum.MANUAL_CREATE.getCode());
 		orderSupplementDetailService.saveOrderSupplementDetail(supplementEntity);
 	}
 	
