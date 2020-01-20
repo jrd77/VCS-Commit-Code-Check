@@ -12,6 +12,7 @@ import com.atzuche.order.commons.LocalDateTimeUtils;
 import com.atzuche.order.commons.OrderReqContext;
 import com.atzuche.order.commons.entity.dto.OrderTransferRecordDTO;
 import com.atzuche.order.commons.entity.dto.OwnerGoodsDetailDTO;
+import com.atzuche.order.commons.enums.DispatcherStatusEnum;
 import com.atzuche.order.commons.enums.OrderChangeItemEnum;
 import com.atzuche.order.commons.enums.OrderTransferSourceEnum;
 import com.atzuche.order.commons.enums.SrvGetReturnEnum;
@@ -30,6 +31,7 @@ import com.atzuche.order.delivery.vo.delivery.CancelOrderDeliveryVO;
 import com.atzuche.order.delivery.vo.delivery.UpdateFlowOrderDTO;
 import com.atzuche.order.ownercost.entity.OwnerOrderEntity;
 import com.atzuche.order.parentorder.entity.OrderEntity;
+import com.atzuche.order.parentorder.service.OrderStatusService;
 import com.atzuche.order.rentercost.entity.RenterOrderSubsidyDetailEntity;
 import com.atzuche.order.rentercost.entity.dto.RenterOrderSubsidyDetailDTO;
 import com.atzuche.order.rentercost.service.RenterOrderSubsidyDetailService;
@@ -72,6 +74,8 @@ public class ModifyOrderConfirmService {
 	private RenterOrderChangeApplyService renterOrderChangeApplyService;
 	@Autowired
 	private OrderTransferRecordService orderTransferRecordService;
+	@Autowired
+	private OrderStatusService orderStatusService;
 	
 	/**
 	 * 自动同意
@@ -151,7 +155,10 @@ public class ModifyOrderConfirmService {
 		orderTransferRecordEntity.setMemNo(modifyOrderDTO.getMemNo());
 		orderTransferRecordEntity.setOrderNo(modifyOrderOwnerDTO.getOrderNo());
 		orderTransferRecordEntity.setSource(0);
+		// 保存换车记录
 		orderTransferRecordService.saveOrderTransferRecord(orderTransferRecordEntity);
+		// 更新调度状态
+		orderStatusService.updateDispatchStatus(modifyOrderOwnerDTO.getOrderNo(), DispatcherStatusEnum.DISPATCH_SUCCESS.getCode());
 	}
 	
 	
