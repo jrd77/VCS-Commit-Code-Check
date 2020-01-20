@@ -12,7 +12,7 @@ public class PlatformToOwnerSubsidyDTO {
     @AutoDocProperty("洗车费补贴")
     private Integer washCarSubsidyAmt;
     @AutoDocProperty("车上物品损失补贴")
-    private Integer CarGoodsLossSubsidyAmt;
+    private Integer carGoodsLossSubsidyAmt;
     @AutoDocProperty("延时补贴")
     private Integer delaySubsidyAmt;
     @AutoDocProperty("交通补贴")
