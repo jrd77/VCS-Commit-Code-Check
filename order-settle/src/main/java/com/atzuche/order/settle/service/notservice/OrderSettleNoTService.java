@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 
 import com.atzuche.order.accountplatorm.entity.AccountPlatformProfitEntity;
 import com.atzuche.order.commons.enums.cashier.PaySourceEnum;
+import com.atzuche.order.commons.service.OrderPayCallBack;
 import com.atzuche.order.delivery.service.delivery.DeliveryCarInfoPriceService;
 import com.atzuche.order.delivery.vo.delivery.DeliveryOilCostVO;
 import com.atzuche.order.delivery.vo.delivery.rep.OwnerGetAndReturnCarDTO;
@@ -1092,7 +1093,7 @@ public class OrderSettleNoTService {
      * 租客费用结余 处理 （如果应付 大于实付，这个订单存在未支付信息，优先 押金抵扣，未支付信息）
      * @param settleOrdersAccount
      */
-    public void rentCostSettle(SettleOrders settleOrders , SettleOrdersAccount settleOrdersAccount) {
+    public void rentCostSettle(SettleOrders settleOrders , SettleOrdersAccount settleOrdersAccount,OrderPayCallBack callBack) {
         //1 如果租车费用计算应付总额大于 实际支付 车辆押金抵扣租车费用欠款
         if(settleOrdersAccount.getRentCostAmtFinal() + settleOrdersAccount.getRentCostPayAmt()<0){
             //1.1押金 抵扣 租车费用欠款
@@ -1110,7 +1111,7 @@ public class OrderSettleNoTService {
                 settleOrdersAccount.setDepositSurplusAmt(settleOrdersAccount.getDepositSurplusAmt() + amt);
                 // 实付费用加上 押金已抵扣部分
                 settleOrdersAccount.setRentCostPayAmt(settleOrdersAccount.getRentCostPayAmt() + Math.abs(amt));
-
+                callBack.callBackSettle(settleOrders.getOrderNo(),settleOrders.getRenterOrderNo());
             }
         }
         //2如果 步骤1 结算 应付还是大于实付  此订单产生历史欠款
