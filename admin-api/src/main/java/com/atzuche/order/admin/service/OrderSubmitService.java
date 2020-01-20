@@ -45,6 +45,7 @@ public class OrderSubmitService {
         }catch (Exception e){
             log.error("Feign 后台管理系统下单异常,responseObject={}", JSON.toJSONString(responseObject),e);
             Cat.logError("Feign 后台管理系统下单异常",e);
+            t.setStatus(e);
             throw e;
         }finally {
             t.complete();

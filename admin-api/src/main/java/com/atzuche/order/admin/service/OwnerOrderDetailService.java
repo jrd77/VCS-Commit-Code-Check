@@ -34,6 +34,7 @@ public class OwnerOrderDetailService {
         }catch (Exception e){
             log.error("Feign 获取租金明细异常,responseObject={},orderNo={}", JSON.toJSONString(responseObject),orderNo,e);
             Cat.logError("Feign 获取租金明细异常",e);
+            t.setStatus(e);
             throw e;
         }finally {
             t.complete();
@@ -61,6 +62,7 @@ public class OwnerOrderDetailService {
         }catch (Exception e){
             log.error("Feign 获取车主租客调价明细异常,responseObject={},orderNo={}", JSON.toJSONString(responseObject),orderNo,e);
             Cat.logError("Feign 获取车主租客调价明细异常",e);
+            t.setStatus(e);
             throw e;
         }finally {
             t.complete();
@@ -82,6 +84,7 @@ public class OwnerOrderDetailService {
         }catch (Exception e){
             log.error("Feign 获取服务费明细异常,responseObject={},orderNo={}", JSON.toJSONString(responseObject),orderNo,e);
             Cat.logError("Feign 获取服务费明细异常",e);
+            t.setStatus(e);
             throw e;
         }finally {
             t.complete();
@@ -103,6 +106,7 @@ public class OwnerOrderDetailService {
         }catch (Exception e){
             log.error("Feign 获取服务费明细异常,responseObject={},orderNo={}", JSON.toJSONString(responseObject),orderNo,e);
             Cat.logError("Feign 获取服务费明细异常",e);
+            t.setStatus(e);
             throw e;
         }finally {
             t.complete();
@@ -124,6 +128,7 @@ public class OwnerOrderDetailService {
         }catch (Exception e){
             log.error("Feign 获取车主付给平台的费用明细异常,responseObject={},orderNo={}", JSON.toJSONString(responseObject),orderNo,e);
             Cat.logError("Feign 获取车主付给平台的费用明细异常",e);
+            t.setStatus(e);
             throw e;
         }finally {
             t.complete();
@@ -145,6 +150,7 @@ public class OwnerOrderDetailService {
         }catch (Exception e){
             log.error("Feign 获取平台给车主的补贴明细异常,responseObject={},orderNo={}", JSON.toJSONString(responseObject),orderNo,e);
             Cat.logError("Feign 获取平台给车主的补贴明细异常",e);
+            t.setStatus(e);
             throw e;
         }finally {
             t.complete();
@@ -166,6 +172,7 @@ public class OwnerOrderDetailService {
         }catch (Exception e){
             log.error("Feign 获取修改罚金异常,responseObject={},fienAmtUpdateReqDTO={}", JSON.toJSONString(responseObject),JSON.toJSONString(fienAmtUpdateReqDTO),e);
             Cat.logError("Feign 获取修改罚金异常",e);
+            t.setStatus(e);
             throw e;
         }finally {
             t.complete();

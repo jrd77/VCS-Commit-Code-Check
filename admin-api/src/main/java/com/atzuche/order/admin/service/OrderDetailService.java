@@ -68,6 +68,7 @@ public class OrderDetailService {
         }catch (Exception e){
             log.error("Feign 获取人工调度历史订单列表异常,responseObject={},orderNo={}",JSON.toJSONString(responseObject),orderNo,e);
             Cat.logError("Feign 获取人工调度历史订单列表异常",e);
+            t.setStatus(e);
             throw e;
         }finally {
             t.complete();
