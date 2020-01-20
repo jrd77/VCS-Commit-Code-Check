@@ -3,6 +3,8 @@ package com.atzuche.order.cashieraccount.service;
 import java.util.List;
 import java.util.Objects;
 
+import com.atzuche.order.accountplatorm.entity.AccountPlatformProfitEntity;
+import com.atzuche.order.accountplatorm.service.notservice.AccountPlatformProfitNoTService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -76,6 +78,7 @@ public class CashierSettleService {
     @Autowired AccountOwnerCostSettleDetailNoTService accountOwnerCostSettleDetailNoTService;
     @Autowired AccountPlatformSubsidyDetailNoTService accountPlatformSubsidyDetailNoTService;
     @Autowired AccountPlatformProfitDetailNotService accountPlatformProfitDetailNotService;
+    @Autowired AccountPlatformProfitNoTService accountPlatformProfitNoTService;
     @Autowired private AccountRenterCostSettleNoTService accountRenterCostSettleNoTService;
     @Autowired private AccountRenterCostDetailNoTService accountRenterCostDetailNoTService;
     @Autowired private AccountOwnerCostSettleService accountOwnerCostSettleService;
@@ -390,5 +393,9 @@ public class CashierSettleService {
      */
     public void deductRentWzDepositToRentFine(RenterCancelWZDepositCostReqVO vo) {
         accountRenterWzDepositService.deductRentWzDepositToRentFine(vo);
+    }
+
+    public void insertAccountPlatformProfit(AccountPlatformProfitEntity accountPlatformProfitEntity) {
+        accountPlatformProfitNoTService.insertAccountPlatformProfitEntity(accountPlatformProfitEntity);
     }
 }

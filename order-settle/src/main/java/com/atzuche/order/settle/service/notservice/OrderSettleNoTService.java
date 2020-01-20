@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import com.atzuche.order.accountplatorm.entity.AccountPlatformProfitEntity;
 import com.atzuche.order.commons.enums.cashier.PaySourceEnum;
 import com.atzuche.order.delivery.service.delivery.DeliveryCarInfoPriceService;
 import com.atzuche.order.delivery.vo.delivery.DeliveryOilCostVO;
@@ -1857,36 +1858,44 @@ public class OrderSettleNoTService {
      * @param settleCancelOrdersAccount
      */
     public void handleIncomeFine(SettleOrders settleOrders, SettleCancelOrdersAccount settleCancelOrdersAccount) {
+        AccountPlatformProfitEntity accountPlatformProfitEntity = new AccountPlatformProfitEntity();
+        accountPlatformProfitEntity.setOrderNo(settleOrders.getOrderNo());
+        accountPlatformProfitEntity.setStatus(3);
+
         // 租客罚金收益
-        if(settleCancelOrdersAccount.getRentFineIncomeAmt()>0){
+        if(settleCancelOrdersAccount.getRentFineIncomeAmt()!=0){
             AccountRenterCostSettleDetailEntity entity = new AccountRenterCostSettleDetailEntity();
             entity.setOrderNo(settleOrders.getOrderNo());
             entity.setMemNo(settleOrders.getRenterMemNo());
             entity.setRenterOrderNo(settleOrders.getRenterOrderNo());
-            entity.setAmt(settleCancelOrdersAccount.getRentFineIncomeAmt());
+            entity.setAmt(-settleCancelOrdersAccount.getRentFineIncomeAmt());
             entity.setType(1);
             cashierSettleService.insertAccountRenterCostSettleDetail(entity);
             walletProxyService.returnOrChargeWallet(settleOrders.getRenterMemNo(),settleOrders.getOrderNo(),settleCancelOrdersAccount.getRentFineIncomeAmt());
         }
         // 车主罚金收入
-        if(settleCancelOrdersAccount.getOwnerFineIncomeAmt()>0){
+        if(settleCancelOrdersAccount.getOwnerFineIncomeAmt()!=0){
             AccountOwnerIncomeExamineReqVO accountOwnerIncomeExamine = new AccountOwnerIncomeExamineReqVO();
-            accountOwnerIncomeExamine.setAmt(settleCancelOrdersAccount.getOwnerFineIncomeAmt());
+            accountOwnerIncomeExamine.setAmt(-settleCancelOrdersAccount.getOwnerFineIncomeAmt());
             accountOwnerIncomeExamine.setMemNo(settleOrders.getOwnerMemNo());
             accountOwnerIncomeExamine.setOrderNo(settleOrders.getOrderNo());
             accountOwnerIncomeExamine.setRemark("罚金收入");
             cashierService.insertOwnerIncomeExamine(accountOwnerIncomeExamine);
+            accountPlatformProfitEntity.setOwnerIncomeAmt(-settleCancelOrdersAccount.getOwnerFineIncomeAmt());
         }
         // 平台罚金收入
-        if(settleCancelOrdersAccount.getPlatformFineImconeAmt()>0){
+        if(settleCancelOrdersAccount.getPlatformFineImconeAmt()!=0){
             List<AccountPlatformProfitDetailEntity> accountPlatformProfitDetails = new ArrayList<>();
             AccountPlatformProfitDetailEntity entity = new AccountPlatformProfitDetailEntity();
             entity.setOrderNo(settleOrders.getOrderNo());
-            entity.setAmt(settleCancelOrdersAccount.getPlatformFineImconeAmt());
+            entity.setAmt(-settleCancelOrdersAccount.getPlatformFineImconeAmt());
             entity.setSourceDesc(RenterCashCodeEnum.ACCOUNT_RENTER_FINE_COST.getTxt());
             entity.setSourceCode(RenterCashCodeEnum.ACCOUNT_RENTER_FINE_COST.getCashNo());
+            accountPlatformProfitDetails.add(entity);
             cashierSettleService.insertAccountPlatformProfitDetails(accountPlatformProfitDetails);
-
+            accountPlatformProfitEntity.setPlatformReceivableAmt(-settleCancelOrdersAccount.getPlatformFineImconeAmt());
+            accountPlatformProfitEntity.setPlatformReceivedAmt(-settleCancelOrdersAccount.getPlatformFineImconeAmt());
         }
+        cashierSettleService.insertAccountPlatformProfit(accountPlatformProfitEntity);
     }
 }
