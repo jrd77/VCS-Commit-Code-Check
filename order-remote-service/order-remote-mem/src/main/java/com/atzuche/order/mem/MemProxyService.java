@@ -3,6 +3,7 @@ package com.atzuche.order.mem;
 import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.CatConstants;
 import com.atzuche.order.commons.LocalDateTimeUtils;
+import com.atzuche.order.commons.ResponseCheckUtil;
 import com.atzuche.order.commons.entity.dto.*;
 import com.atzuche.order.commons.enums.MemberFlagEnum;
 import com.atzuche.order.commons.enums.OwnerMemRightEnum;
@@ -62,22 +63,13 @@ public class MemProxyService {
             String parameter = "memNo="+memNo+"&selectKey"+JSON.toJSONString(selectKey);
             Cat.logEvent(CatConstants.FEIGN_PARAM,parameter);
             responseData = memberDetailFeignService.getMemberSelectInfo(Integer.parseInt(memNo), selectKey);
-            if(responseData == null || !ErrorCode.SUCCESS.getCode().equals(responseData.getResCode()) || responseData.getData() == null){
-                log.error("Feign 获取租客会员信息失败,memNo={},responseData={}",memNo,JSON.toJSONString(responseData));
-                RenterMemberFailException renterMemberByFeignException = new RenterMemberFailException();
-                throw renterMemberByFeignException;
-            }
+            ResponseCheckUtil.checkResponse(responseData);
             t.setStatus(Transaction.SUCCESS);
-        }catch(RenterMemberFailException ex){
-            t.setStatus(ex);
-            Cat.logError("Feign 获取租客会员信息失败",ex);
-            throw ex;
         }catch (Exception e){
             log.error("Feign 获取租客会员信息失败,submitReqDto={},memNo={}",memNo,null,e);
-            RenterMemberErrException err = new RenterMemberErrException();
-            Cat.logError("Feign 获取租客会员信息失败",err);
+            Cat.logError("Feign 获取租客会员信息失败",e);
             t.setStatus(e);
-            throw err;
+            throw e;
         }finally {
             t.complete();
         }
@@ -155,9 +147,8 @@ public class MemProxyService {
      * 返回用户的会员号
      * @param mobile
      * @return
-     * @throws RenterMemberFailException
      */
-    public Integer getMemNoByMoile(String mobile)throws RenterMemberFailException{
+    public Integer getMemNoByMoile(String mobile){
         ResponseData<Integer> responseData = null;
         log.info("Feign 开始获取车主会员信息,mobile={}",mobile);
         Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "会员详情服务");
@@ -167,23 +158,15 @@ public class MemProxyService {
             Cat.logEvent(CatConstants.FEIGN_PARAM,parameter);
             responseData = memberDetailFeignService.getMemNoByMobile(Long.parseLong(mobile));
             Cat.logEvent(CatConstants.FEIGN_RESULT,JSON.toJSONString(responseData));
-            if(responseData == null || !ErrorCode.SUCCESS.getCode().equals(responseData.getResCode())){
-                log.error("Feign 获取车主会员信息失败,mobile={},orderContextDto={}",mobile, JSON.toJSONString(responseData));
-                OwnerMemberFailException failException = new OwnerMemberFailException();
-                throw failException;
-            }
+            ResponseCheckUtil.checkResponse(responseData);
             t.setStatus(Transaction.SUCCESS);
             return responseData.getData();
-        }catch (OwnerMemberFailException oe){
-            Cat.logError("Feign 获取车主会员信息失败",oe);
-            t.setStatus(oe);
-            throw oe;
         }
         catch (Exception e){
             t.setStatus(e);
             Cat.logError("Feign 获取车主会员信息失败",e);
-            log.error("Feign 获取车主会员信息失败,orderContextDto={},mobile={}",mobile,e);
-            throw new OwnerMemberErrException();
+            log.error("Feign 获取车主会员信息失败,Response={},mobile={}",responseData,mobile,e);
+            throw e;
         }finally {
             t.complete();
         }
@@ -192,7 +175,7 @@ public class MemProxyService {
 
 
     //获取车主会员信息
-    public OwnerMemberDTO getOwnerMemberInfo(String memNo) throws RenterMemberFailException {
+    public OwnerMemberDTO getOwnerMemberInfo(String memNo)   {
         List<String> selectKey = Arrays.asList(
                 MemberSelectKeyEnum.MEMBER_CORE_INFO.getKey(),
                 MemberSelectKeyEnum.MEMBER_BASE_INFO.getKey(),
@@ -209,22 +192,14 @@ public class MemProxyService {
             Cat.logEvent(CatConstants.FEIGN_PARAM,parameter);
             responseData = memberDetailFeignService.getMemberSelectInfo(Integer.valueOf(memNo), selectKey);
             Cat.logEvent(CatConstants.FEIGN_RESULT,JSON.toJSONString(responseData));
-            if(responseData == null || !ErrorCode.SUCCESS.getCode().equals(responseData.getResCode())){
-                log.error("Feign 获取车主会员信息失败,memNo={},orderContextDto={}",memNo, JSON.toJSONString(responseData));
-                OwnerMemberFailException failException = new OwnerMemberFailException();
-                throw failException;
-            }
+            ResponseCheckUtil.checkResponse(responseData);
             t.setStatus(Transaction.SUCCESS);
-        }catch (OwnerMemberFailException oe){
-            Cat.logError("Feign 获取车主会员信息失败",oe);
-            t.setStatus(oe);
-            throw oe;
         }
         catch (Exception e){
             t.setStatus(e);
             Cat.logError("Feign 获取车主会员信息失败",e);
-            log.error("Feign 获取车主会员信息失败,orderContextDto={},memNo={}",memNo,e);
-            throw new OwnerMemberErrException();
+            log.error("Feign 获取车主会员信息失败,Resonponse={},memNo={}",responseData,memNo,e);
+            throw e;
         }finally {
             t.complete();
         }
@@ -321,7 +296,7 @@ public class MemProxyService {
     }
 
     //获取租客会员信息
-    public RenterMemberDTO getRenterMemberInfo(String memNo) throws RenterMemberFailException {
+    public RenterMemberDTO getRenterMemberInfo(String memNo)  {
         List<String> selectKey = Arrays.asList(
                 MemberSelectKeyEnum.MEMBER_CORE_INFO.getKey(),
                 MemberSelectKeyEnum.MEMBER_AUTH_INFO.getKey(),
@@ -338,22 +313,13 @@ public class MemProxyService {
             String parameter = "memNo="+memNo+"&selectKey"+JSON.toJSONString(selectKey);
             Cat.logEvent(CatConstants.FEIGN_PARAM,parameter);
             responseData = memberDetailFeignService.getMemberSelectInfo(Integer.parseInt(memNo), selectKey);
-            if(responseData == null || !ErrorCode.SUCCESS.getCode().equals(responseData.getResCode()) || responseData.getData() == null){
-                log.error("Feign 获取租客会员信息失败,memNo={},responseData={}",memNo,JSON.toJSONString(responseData));
-                RenterMemberFailException renterMemberByFeignException = new RenterMemberFailException();
-                throw renterMemberByFeignException;
-            }
+            ResponseCheckUtil.checkResponse(responseData);
             t.setStatus(Transaction.SUCCESS);
-        }catch(RenterMemberFailException ex){
-            t.setStatus(ex);
-            Cat.logError("Feign 获取租客会员信息失败",ex);
-            throw ex;
         }catch (Exception e){
-            log.error("Feign 获取租客会员信息失败,submitReqDto={},memNo={}",memNo,null,e);
-            RenterMemberErrException err = new RenterMemberErrException();
-            Cat.logError("Feign 获取租客会员信息失败",err);
+            log.error("Feign 获取租客会员信息失败,ResponseData={},memNo={}",responseData,memNo,e);
+            Cat.logError("Feign 获取租客会员信息失败",e);
             t.setStatus(e);
-            throw err;
+            throw e;
         }finally {
             t.complete();
         }
@@ -471,7 +437,7 @@ public class MemProxyService {
         return renterMemberDto;
     }
 
-    /*
+    /**
      * @Author ZhangBin
      * @Date 2019/12/31 14:28
      * @Description: 根据会员号，获取常用驾驶人列表
@@ -487,33 +453,26 @@ public class MemProxyService {
             String parameter = "memNo="+memNo+"&selectKey"+JSON.toJSONString(selectKey);
             Cat.logEvent(CatConstants.FEIGN_PARAM,parameter);
             responseData = memberDetailFeignService.getMemberAdditionInfo(Integer.parseInt(memNo));
-            if(responseData == null || !ErrorCode.SUCCESS.getCode().equals(responseData.getResCode()) || responseData.getData() == null){
-                log.error("Feign 获取附加驾驶人信息失败,memNo={},responseData={}",memNo,JSON.toJSONString(responseData));
-                RenterDriverFailException failException = new RenterDriverFailException();
-                throw failException;
-            }
+            log.info("Feign 获取附加驾驶人信息 param={},response is {}",parameter,JSON.toJSONString(responseData));
+            ResponseCheckUtil.checkResponse(responseData);
+            MemberAdditionInfo memberAdditionInfo = responseData.getData();
+            List<CommUseDriverInfo> commUseDriverList = memberAdditionInfo.getCommUseDriverList();
+            List<CommUseDriverInfoDTO> CommUseDriverList = new ArrayList<>();
+            commUseDriverList.forEach(x->{
+                CommUseDriverInfoDTO commUseDriverInfoDTO = new CommUseDriverInfoDTO();
+                BeanUtils.copyProperties(x,commUseDriverInfoDTO);
+                CommUseDriverList.add(commUseDriverInfoDTO);
+            });
             t.setStatus(Transaction.SUCCESS);
-        }catch(RenterDriverFailException ex){
-            t.setStatus(ex);
-            Cat.logError("Feign 获取附加驾驶人信息失败",ex);
-            throw ex;
+            return CommUseDriverList;
         }catch (Exception e){
-            log.error("Feign 获取附加驾驶人信息失败,submitReqDto={},memNo={}",memNo,null,e);
-            RenterDriverErrException err = new RenterDriverErrException();
-            Cat.logError("Feign 获取附加驾驶人信息失败",err);
+            log.error("Feign 获取附加驾驶人信息失败,responseData={},memNo={}",memNo,responseData,e);
+            Cat.logError("Feign 获取附加驾驶人信息失败",e);
             t.setStatus(e);
-            throw err;
+            throw e;
         }finally {
             t.complete();
         }
-        MemberAdditionInfo memberAdditionInfo = responseData.getData();
-        List<CommUseDriverInfo> commUseDriverList = memberAdditionInfo.getCommUseDriverList();
-        List<CommUseDriverInfoDTO> CommUseDriverList = new ArrayList<>();
-        commUseDriverList.forEach(x->{
-            CommUseDriverInfoDTO commUseDriverInfoDTO = new CommUseDriverInfoDTO();
-            BeanUtils.copyProperties(x,commUseDriverInfoDTO);
-            CommUseDriverList.add(commUseDriverInfoDTO);
-        });
-        return CommUseDriverList;
+
     }
 }
