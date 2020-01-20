@@ -87,6 +87,7 @@ public class OrderSubmitService {
         param.setOrderCategory("1");
         param.setSceneCode("EX007");
         param.setSource("1");
+        param.setFreeDoubleTypeId("3");
 
         param.setMemNo(reqVO.getMemNo());
 
