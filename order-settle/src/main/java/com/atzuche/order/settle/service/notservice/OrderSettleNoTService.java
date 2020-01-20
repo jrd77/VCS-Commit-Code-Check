@@ -12,6 +12,8 @@ import com.atzuche.order.delivery.service.delivery.DeliveryCarInfoPriceService;
 import com.atzuche.order.delivery.vo.delivery.DeliveryOilCostVO;
 import com.atzuche.order.delivery.vo.delivery.rep.OwnerGetAndReturnCarDTO;
 import com.atzuche.order.delivery.vo.delivery.rep.RenterGetAndReturnCarDTO;
+import com.atzuche.order.ownercost.entity.*;
+import com.atzuche.order.ownercost.service.*;
 import com.autoyol.platformcost.model.FeeResult;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,17 +60,6 @@ import com.atzuche.order.delivery.vo.handover.HandoverCarRepVO;
 import com.atzuche.order.delivery.vo.handover.HandoverCarReqVO;
 import com.atzuche.order.flow.service.OrderFlowService;
 import com.atzuche.order.owner.commodity.service.OwnerGoodsService;
-import com.atzuche.order.ownercost.entity.OwnerOrderEntity;
-import com.atzuche.order.ownercost.entity.OwnerOrderFineDeatailEntity;
-import com.atzuche.order.ownercost.entity.OwnerOrderIncrementDetailEntity;
-import com.atzuche.order.ownercost.entity.OwnerOrderPurchaseDetailEntity;
-import com.atzuche.order.ownercost.entity.OwnerOrderSubsidyDetailEntity;
-import com.atzuche.order.ownercost.service.OwnerOrderCostCombineService;
-import com.atzuche.order.ownercost.service.OwnerOrderFineDeatailService;
-import com.atzuche.order.ownercost.service.OwnerOrderIncrementDetailService;
-import com.atzuche.order.ownercost.service.OwnerOrderPurchaseDetailService;
-import com.atzuche.order.ownercost.service.OwnerOrderService;
-import com.atzuche.order.ownercost.service.OwnerOrderSubsidyDetailService;
 import com.atzuche.order.parentorder.dto.OrderStatusDTO;
 import com.atzuche.order.parentorder.entity.OrderEntity;
 import com.atzuche.order.parentorder.entity.OrderStatusEntity;
@@ -121,7 +112,7 @@ public class OrderSettleNoTService {
     @Autowired private OwnerOrderSubsidyDetailService ownerOrderSubsidyDetailService;
     @Autowired private OwnerOrderPurchaseDetailService ownerOrderPurchaseDetailService;
     @Autowired private OwnerOrderIncrementDetailService ownerOrderIncrementDetailService;
-    @Autowired private RenterOrderCostCombineService renterOrderCostCombineService;
+    @Autowired private ConsoleOwnerOrderFineDeatailService consoleOwnerOrderFineDeatailService;
     @Autowired private HandoverCarService handoverCarService;
     @Autowired private OwnerGoodsService ownerGoodsService;
     @Autowired private RenterOrderService renterOrderService;
@@ -474,7 +465,7 @@ public class OrderSettleNoTService {
         //8 管理后台补贴 （租客车主共用表 ，会员号区分车主/租客）
         List<OrderConsoleSubsidyDetailEntity> orderConsoleSubsidyDetails = orderConsoleSubsidyDetailService.listOrderConsoleSubsidyDetailByOrderNoAndMemNo(settleOrders.getOrderNo(),settleOrders.getOwnerMemNo());
         //9 获取全局的车主订单罚金明细（租客车主共用表 ，会员号区分车主/租客）
-        List<ConsoleRenterOrderFineDeatailEntity> consoleRenterOrderFineDeatails = consoleRenterOrderFineDeatailService.listConsoleRenterOrderFineDeatail(settleOrders.getOrderNo(),settleOrders.getOwnerOrderNo());
+        List<ConsoleOwnerOrderFineDeatailEntity> consoleOwnerOrderFineDeatailEntitys = consoleOwnerOrderFineDeatailService.selectByOrderNo(settleOrders.getOrderNo());
         //10 车主罚金
         List<OwnerOrderFineDeatailEntity> ownerOrderFineDeatails = ownerOrderFineDeatailService.getOwnerOrderFineDeatailByOrderNo(settleOrders.getOrderNo());
 
@@ -486,7 +477,7 @@ public class OrderSettleNoTService {
         ownerCosts.setGpsCost(gpsCost);
         ownerCosts.setOwnerGetAndReturnCarDTO(ownerGetAndReturnCarDTO);
         ownerCosts.setOrderConsoleSubsidyDetails(orderConsoleSubsidyDetails);
-        ownerCosts.setConsoleRenterOrderFineDeatails(consoleRenterOrderFineDeatails);
+        ownerCosts.setConsoleOwnerOrderFineDeatailEntitys(consoleOwnerOrderFineDeatailEntitys);
         ownerCosts.setOwnerOrderFineDeatails(ownerOrderFineDeatails);
         settleOrders.setOwnerCosts(ownerCosts);
     }
@@ -799,38 +790,36 @@ public class OrderSettleNoTService {
             }
         }
         //1.9 全局的车主订单罚金明细
-        List<ConsoleRenterOrderFineDeatailEntity> consoleRenterOrderFineDeatails = ownerCosts.getConsoleRenterOrderFineDeatails();
-        if(!CollectionUtils.isEmpty(consoleRenterOrderFineDeatails)){
-            for(int i=0; i<consoleRenterOrderFineDeatails.size();i++){
-                ConsoleRenterOrderFineDeatailEntity orderConsoleSubsidyDetail = consoleRenterOrderFineDeatails.get(i);
+        List<ConsoleOwnerOrderFineDeatailEntity> consoleOwnerOrderFineDeatailEntitys = ownerCosts.getConsoleOwnerOrderFineDeatailEntitys();
+        if(!CollectionUtils.isEmpty(consoleOwnerOrderFineDeatailEntitys)){
+            for(int i=0; i<consoleOwnerOrderFineDeatailEntitys.size();i++){
+                ConsoleOwnerOrderFineDeatailEntity consoleOwnerOrderFineDeatailEntity = consoleOwnerOrderFineDeatailEntitys.get(i);
                 AccountOwnerCostSettleDetailEntity accountOwnerCostSettleDetail = new AccountOwnerCostSettleDetailEntity();
-                BeanUtils.copyProperties(orderConsoleSubsidyDetail,accountOwnerCostSettleDetail);
+                BeanUtils.copyProperties(consoleOwnerOrderFineDeatailEntity,accountOwnerCostSettleDetail);
                 accountOwnerCostSettleDetail.setSourceCode(OwnerCashCodeEnum.ACCOUNT_WHOLE_RENTER_FINE_COST.getCashNo());
                 accountOwnerCostSettleDetail.setSourceDetail(OwnerCashCodeEnum.ACCOUNT_WHOLE_RENTER_FINE_COST.getTxt());
-                int fineAmount = Objects.isNull(orderConsoleSubsidyDetail.getFineAmount())?0:orderConsoleSubsidyDetail.getFineAmount();
+                int fineAmount = Objects.isNull(consoleOwnerOrderFineDeatailEntity.getFineAmount())?0:consoleOwnerOrderFineDeatailEntity.getFineAmount();
                 accountOwnerCostSettleDetail.setAmt(fineAmount);
-                accountOwnerCostSettleDetail.setUniqueNo(String.valueOf(orderConsoleSubsidyDetail.getId()));
+                accountOwnerCostSettleDetail.setUniqueNo(String.valueOf(consoleOwnerOrderFineDeatailEntity.getId()));
                 accountOwnerCostSettleDetails.add(accountOwnerCostSettleDetail);
 
                 //罚金补贴方 是平台
-                if(SubsidySourceCodeEnum.PLATFORM.getCode().equals(orderConsoleSubsidyDetail.getFineSubsidyCode())){
+                if(SubsidySourceCodeEnum.PLATFORM.getCode().equals(consoleOwnerOrderFineDeatailEntity.getFineSubsidyCode())){
                     AccountPlatformProfitDetailEntity entity = new AccountPlatformProfitDetailEntity();
-                    BeanUtils.copyProperties(orderConsoleSubsidyDetail,entity);
+                    BeanUtils.copyProperties(consoleOwnerOrderFineDeatailEntity,entity);
                     entity.setSourceCode(OwnerCashCodeEnum.ACCOUNT_WHOLE_RENTER_FINE_COST.getCashNo());
                     entity.setSourceDesc(OwnerCashCodeEnum.ACCOUNT_WHOLE_RENTER_FINE_COST.getTxt());
-                    entity.setUniqueNo(String.valueOf(orderConsoleSubsidyDetail.getId()));
+                    entity.setUniqueNo(String.valueOf(consoleOwnerOrderFineDeatailEntity.getId()));
                     entity.setAmt(-fineAmount);
-                    entity.setUniqueNo(String.valueOf(orderConsoleSubsidyDetail.getId()));
                     settleOrdersDefinition.addPlatformProfit(entity);
                 }
-                if(SubsidySourceCodeEnum.PLATFORM.getCode().equals(orderConsoleSubsidyDetail.getFineSubsidySourceCode())){
+                if(SubsidySourceCodeEnum.PLATFORM.getCode().equals(consoleOwnerOrderFineDeatailEntity.getFineSubsidySourceCode())){
                     AccountPlatformProfitDetailEntity entity = new AccountPlatformProfitDetailEntity();
-                    BeanUtils.copyProperties(orderConsoleSubsidyDetail,entity);
+                    BeanUtils.copyProperties(consoleOwnerOrderFineDeatailEntity,entity);
                     entity.setSourceCode(OwnerCashCodeEnum.ACCOUNT_WHOLE_RENTER_FINE_COST.getCashNo());
                     entity.setSourceDesc(OwnerCashCodeEnum.ACCOUNT_WHOLE_RENTER_FINE_COST.getTxt());
-                    entity.setUniqueNo(String.valueOf(orderConsoleSubsidyDetail.getId()));
+                    entity.setUniqueNo(String.valueOf(consoleOwnerOrderFineDeatailEntity.getId()));
                     entity.setAmt(-fineAmount);
-                    entity.setUniqueNo(String.valueOf(orderConsoleSubsidyDetail.getId()));
                     settleOrdersDefinition.addPlatformProfit(entity);
                 }
             }
@@ -1410,11 +1399,12 @@ public class OrderSettleNoTService {
     public void getCancelOwnerCostSettleDetail(SettleOrders settleOrders) {
         OwnerCosts ownerCosts = new OwnerCosts();
         //1 获取全局的车主订单罚金明细（租客车主共用表 ，会员号区分车主/租客）
-        List<ConsoleRenterOrderFineDeatailEntity> consoleRenterOrderFineDeatails = consoleRenterOrderFineDeatailService.listConsoleRenterOrderFineDeatail(settleOrders.getOrderNo(),settleOrders.getOwnerMemNo());
+        List<ConsoleOwnerOrderFineDeatailEntity> consoleOwnerOrderFineDeatailEntitys = consoleOwnerOrderFineDeatailService.selectByOrderNo(settleOrders.getOrderNo());
+
         //2 车主罚金
         List<OwnerOrderFineDeatailEntity> ownerOrderFineDeatails = ownerOrderFineDeatailService.getOwnerOrderFineDeatailByOrderNo(settleOrders.getOrderNo());
         ownerCosts.setOwnerOrderFineDeatails(ownerOrderFineDeatails);
-        ownerCosts.setConsoleRenterOrderFineDeatails(consoleRenterOrderFineDeatails);
+        ownerCosts.setConsoleOwnerOrderFineDeatailEntitys(consoleOwnerOrderFineDeatailEntitys);
         settleOrders.setOwnerCosts(ownerCosts);
     }
 
@@ -1437,11 +1427,15 @@ public class OrderSettleNoTService {
         int rentFineAmt =0;
         RentCosts rentCosts = settleOrders.getRentCosts();
         if(Objects.nonNull(rentCosts) && !CollectionUtils.isEmpty(rentCosts.getRenterOrderFineDeatails())){
-            int amt = rentCosts.getRenterOrderFineDeatails().stream().mapToInt(RenterOrderFineDeatailEntity::getFineAmount).sum();
+            int amt = rentCosts.getRenterOrderFineDeatails().stream().filter(obj ->{
+                return SubsidySourceCodeEnum.RENTER.getCode().equals(obj.getFineSubsidySourceCode());
+            }).mapToInt(RenterOrderFineDeatailEntity::getFineAmount).sum();
             rentFineAmt = rentFineAmt +amt;
         }
         if(Objects.nonNull(rentCosts) && !CollectionUtils.isEmpty(rentCosts.getConsoleRenterOrderFineDeatails())){
-            int amt = rentCosts.getConsoleRenterOrderFineDeatails().stream().mapToInt(ConsoleRenterOrderFineDeatailEntity::getFineAmount).sum();
+            int amt = rentCosts.getConsoleRenterOrderFineDeatails().stream().filter(obj ->{
+                return SubsidySourceCodeEnum.RENTER.getCode().equals(obj.getFineSubsidySourceCode());
+            }).mapToInt(ConsoleRenterOrderFineDeatailEntity::getFineAmount).sum();
             rentFineAmt = rentFineAmt +amt;
         }
 
@@ -1456,11 +1450,15 @@ public class OrderSettleNoTService {
         int ownerFineAmt = 0;
         OwnerCosts ownerCosts = settleOrders.getOwnerCosts();
         if(Objects.nonNull(ownerCosts) && !CollectionUtils.isEmpty(ownerCosts.getOwnerOrderFineDeatails())){
-            int amt = ownerCosts.getOwnerOrderFineDeatails().stream().mapToInt(OwnerOrderFineDeatailEntity::getFineAmount).sum();
+            int amt = ownerCosts.getOwnerOrderFineDeatails().stream().filter(obj ->{
+                return SubsidySourceCodeEnum.OWNER.getCode().equals(obj.getFineSubsidySourceCode());
+            }).mapToInt(OwnerOrderFineDeatailEntity::getFineAmount).sum();
             ownerFineAmt = ownerFineAmt +amt;
         }
-        if(Objects.nonNull(ownerCosts) && !CollectionUtils.isEmpty(ownerCosts.getConsoleRenterOrderFineDeatails())){
-            int amt = ownerCosts.getConsoleRenterOrderFineDeatails().stream().mapToInt(ConsoleRenterOrderFineDeatailEntity::getFineAmount).sum();
+        if(Objects.nonNull(ownerCosts) && !CollectionUtils.isEmpty(ownerCosts.getConsoleOwnerOrderFineDeatailEntitys())){
+            int amt = ownerCosts.getConsoleOwnerOrderFineDeatailEntitys().stream().filter(obj ->{
+                return SubsidySourceCodeEnum.OWNER.getCode().equals(obj.getFineSubsidySourceCode());
+            }).mapToInt(ConsoleOwnerOrderFineDeatailEntity::getFineAmount).sum();
             ownerFineAmt = ownerFineAmt +amt;
         }
 
@@ -1487,30 +1485,24 @@ public class OrderSettleNoTService {
             }).mapToInt(OwnerOrderFineDeatailEntity::getFineAmount).sum();
             ownerFineIncomeAmt = ownerFineIncomeAmt +amt;
         }
-        if(Objects.nonNull(ownerCosts) && !CollectionUtils.isEmpty(ownerCosts.getConsoleRenterOrderFineDeatails())){
-            int amt = ownerCosts.getConsoleRenterOrderFineDeatails().stream().filter(obj ->{
+        if(Objects.nonNull(ownerCosts) && !CollectionUtils.isEmpty(ownerCosts.getConsoleOwnerOrderFineDeatailEntitys())){
+            int amt = ownerCosts.getConsoleOwnerOrderFineDeatailEntitys().stream().filter(obj ->{
                 return SubsidySourceCodeEnum.OWNER.getCode().equals(obj.getFineSubsidyCode());
-            }).mapToInt(ConsoleRenterOrderFineDeatailEntity::getFineAmount).sum();
+            }).mapToInt(ConsoleOwnerOrderFineDeatailEntity::getFineAmount).sum();
             ownerFineIncomeAmt = ownerFineIncomeAmt +amt;
         }
         //平台罚金收入
         int platformFineImconeAmt=0;
-        if(Objects.nonNull(ownerCosts) && !CollectionUtils.isEmpty(ownerCosts.getOwnerOrderFineDeatails())){
-            int amt = ownerCosts.getOwnerOrderFineDeatails().stream().filter(obj ->{
+        if(Objects.nonNull(ownerCosts) && !CollectionUtils.isEmpty(ownerCosts.getConsoleOwnerOrderFineDeatailEntitys())){
+            int amt = ownerCosts.getConsoleOwnerOrderFineDeatailEntitys().stream().filter(obj ->{
                 return SubsidySourceCodeEnum.PLATFORM.getCode().equals(obj.getFineSubsidyCode());
-            }).mapToInt(OwnerOrderFineDeatailEntity::getFineAmount).sum();
+            }).mapToInt(ConsoleOwnerOrderFineDeatailEntity::getFineAmount).sum();
             platformFineImconeAmt = platformFineImconeAmt +amt;
         }
-        if(Objects.nonNull(ownerCosts) && !CollectionUtils.isEmpty(ownerCosts.getConsoleRenterOrderFineDeatails())){
-            int amt = ownerCosts.getConsoleRenterOrderFineDeatails().stream().filter(obj ->{
+        if(Objects.nonNull(ownerCosts) && !CollectionUtils.isEmpty(rentCosts.getConsoleRenterOrderFineDeatails())){
+            int amt = rentCosts.getConsoleRenterOrderFineDeatails().stream().filter(obj ->{
                 return SubsidySourceCodeEnum.PLATFORM.getCode().equals(obj.getFineSubsidyCode());
             }).mapToInt(ConsoleRenterOrderFineDeatailEntity::getFineAmount).sum();
-            platformFineImconeAmt = platformFineImconeAmt +amt;
-        }
-        if(Objects.nonNull(rentCosts) && !CollectionUtils.isEmpty(rentCosts.getRenterOrderFineDeatails())){
-            int amt = rentCosts.getRenterOrderFineDeatails().stream().filter(obj ->{
-                return SubsidySourceCodeEnum.PLATFORM.getCode().equals(obj.getFineSubsidyCode());
-            }).mapToInt(RenterOrderFineDeatailEntity::getFineAmount).sum();
             platformFineImconeAmt = platformFineImconeAmt +amt;
         }
 
@@ -1868,7 +1860,7 @@ public class OrderSettleNoTService {
             entity.setOrderNo(settleOrders.getOrderNo());
             entity.setMemNo(settleOrders.getRenterMemNo());
             entity.setRenterOrderNo(settleOrders.getRenterOrderNo());
-            entity.setAmt(-settleCancelOrdersAccount.getRentFineIncomeAmt());
+            entity.setAmt(settleCancelOrdersAccount.getRentFineIncomeAmt());
             entity.setType(1);
             cashierSettleService.insertAccountRenterCostSettleDetail(entity);
             walletProxyService.returnOrChargeWallet(settleOrders.getRenterMemNo(),settleOrders.getOrderNo(),settleCancelOrdersAccount.getRentFineIncomeAmt());
@@ -1876,7 +1868,7 @@ public class OrderSettleNoTService {
         // 车主罚金收入
         if(settleCancelOrdersAccount.getOwnerFineIncomeAmt()!=0){
             AccountOwnerIncomeExamineReqVO accountOwnerIncomeExamine = new AccountOwnerIncomeExamineReqVO();
-            accountOwnerIncomeExamine.setAmt(-settleCancelOrdersAccount.getOwnerFineIncomeAmt());
+            accountOwnerIncomeExamine.setAmt(settleCancelOrdersAccount.getOwnerFineIncomeAmt());
             accountOwnerIncomeExamine.setMemNo(settleOrders.getOwnerMemNo());
             accountOwnerIncomeExamine.setOrderNo(settleOrders.getOrderNo());
             accountOwnerIncomeExamine.setRemark("罚金收入");
@@ -1888,13 +1880,13 @@ public class OrderSettleNoTService {
             List<AccountPlatformProfitDetailEntity> accountPlatformProfitDetails = new ArrayList<>();
             AccountPlatformProfitDetailEntity entity = new AccountPlatformProfitDetailEntity();
             entity.setOrderNo(settleOrders.getOrderNo());
-            entity.setAmt(-settleCancelOrdersAccount.getPlatformFineImconeAmt());
+            entity.setAmt(settleCancelOrdersAccount.getPlatformFineImconeAmt());
             entity.setSourceDesc(RenterCashCodeEnum.ACCOUNT_RENTER_FINE_COST.getTxt());
             entity.setSourceCode(RenterCashCodeEnum.ACCOUNT_RENTER_FINE_COST.getCashNo());
             accountPlatformProfitDetails.add(entity);
             cashierSettleService.insertAccountPlatformProfitDetails(accountPlatformProfitDetails);
-            accountPlatformProfitEntity.setPlatformReceivableAmt(-settleCancelOrdersAccount.getPlatformFineImconeAmt());
-            accountPlatformProfitEntity.setPlatformReceivedAmt(-settleCancelOrdersAccount.getPlatformFineImconeAmt());
+            accountPlatformProfitEntity.setPlatformReceivableAmt(settleCancelOrdersAccount.getPlatformFineImconeAmt());
+            accountPlatformProfitEntity.setPlatformReceivedAmt(settleCancelOrdersAccount.getPlatformFineImconeAmt());
         }
         cashierSettleService.insertAccountPlatformProfit(accountPlatformProfitEntity);
     }

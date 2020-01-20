@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 
 import com.atzuche.order.delivery.vo.delivery.rep.OwnerGetAndReturnCarDTO;
 import com.atzuche.order.delivery.vo.delivery.rep.RenterGetAndReturnCarDTO;
+import com.atzuche.order.ownercost.entity.ConsoleOwnerOrderFineDeatailEntity;
 import com.autoyol.doc.util.StringUtil;
 import com.autoyol.platformcost.model.FeeResult;
 import org.apache.commons.beanutils.BeanUtils;
@@ -366,7 +367,7 @@ public class OrderCostService {
 	  /**
 	     * 全局的车主订单罚金明细
 	     */
-	    List<com.atzuche.order.rentercost.entity.ConsoleRenterOrderFineDeatailEntity> consoleRenterOrderFineDeatails = ownerCosts.getConsoleRenterOrderFineDeatails();
+	    List<ConsoleOwnerOrderFineDeatailEntity> consoleRenterOrderFineDeatails = ownerCosts.getConsoleOwnerOrderFineDeatailEntitys();
 	    List<ConsoleRenterOrderFineDeatailEntity> consoleRenterOrderFineDeatailsReal = new ArrayList<ConsoleRenterOrderFineDeatailEntity>();
 	    if(consoleRenterOrderFineDeatails != null) {
 	    	consoleRenterOrderFineDeatails.stream().forEach(x->{
