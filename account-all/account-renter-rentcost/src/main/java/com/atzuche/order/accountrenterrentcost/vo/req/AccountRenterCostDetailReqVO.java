@@ -78,7 +78,7 @@ public class AccountRenterCostDetailReqVO {
         Assert.notNull(getMemNo(), ErrorCode.PARAMETER_ERROR.getText());
         Assert.notNull(getAmt(), ErrorCode.PARAMETER_ERROR.getText());
         Assert.notNull(getOrderNo(), ErrorCode.PARAMETER_ERROR.getText());
-        Assert.notNull(getPayType(), ErrorCode.PARAMETER_ERROR.getText());
+//        Assert.notNull(getPayType(), ErrorCode.PARAMETER_ERROR.getText());
         Assert.notNull(getPaySource(), ErrorCode.PARAMETER_ERROR.getText());
         Assert.notNull(getRenterCashCodeEnum(), ErrorCode.PARAMETER_ERROR.getText());
     }
