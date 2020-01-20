@@ -83,7 +83,7 @@ public class OrderSettleNewService {
         //10租客车辆押金/租客剩余租车费用 结余历史欠款
         orderSettleNoTService.repayHistoryDebtRent(settleOrdersAccount);
         //11 租客费用 退还
-        orderSettleNoTService.refundRentCost(settleOrdersAccount,settleOrdersDefinition.getAccountRenterCostSettleDetails(),orderStatusDTO);
+        orderSettleNoTService.refundRentCost(settleOrdersAccount,settleOrdersDefinition.getAccountRenterCostSettleDetails(),orderStatusDTO,settleOrders);
         //12 租客押金 退还
         orderSettleNoTService.refundDepositAmt(settleOrdersAccount,orderStatusDTO);
         //13车主收益 结余处理 历史欠款
@@ -370,9 +370,13 @@ public class OrderSettleNewService {
             return OwnerCashCodeEnum.ACCOUNT_OWNER_SETTLE_OIL_COST.getCashNo().equals(obj.getCostCode());
         }).mapToInt(AccountRenterCostSettleDetailEntity::getAmt).sum();
         //平台补贴油费
-        int platFormAmt = settleOrdersDefinition.getAccountPlatformSubsidyDetails().stream().filter(obj ->{
-            return RenterCashCodeEnum.SUBSIDY_OIL.getCashNo().equals(obj.getSourceCode());
-        }).mapToInt(AccountPlatformSubsidyDetailEntity::getAmt).sum();
+        int platFormAmt =0;
+        if(!CollectionUtils.isEmpty(settleOrdersDefinition.getAccountPlatformSubsidyDetails())){
+            platFormAmt = settleOrdersDefinition.getAccountPlatformSubsidyDetails().stream().filter(obj ->{
+                return RenterCashCodeEnum.SUBSIDY_OIL.getCashNo().equals(obj.getSourceCode());
+            }).mapToInt(AccountPlatformSubsidyDetailEntity::getAmt).sum();
+        }
+
         int oilAmt = rentOilAmt + ownerOilAmt + platFormAmt;
         if(oilAmt!=0){
             AccountPlatformProfitDetailEntity accountPlatformProfitDetail = new AccountPlatformProfitDetailEntity();
