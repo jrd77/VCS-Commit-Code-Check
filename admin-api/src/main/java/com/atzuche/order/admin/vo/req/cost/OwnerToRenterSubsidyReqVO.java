@@ -27,7 +27,7 @@ public class OwnerToRenterSubsidyReqVO {
     private String ownerOrderNo;
     
     @AutoDocProperty("租金补贴")
-    private String rentAmt;
+    private String ownerSubsidyRentAmt;
     
     
 }
