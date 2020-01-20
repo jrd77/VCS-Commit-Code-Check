@@ -373,10 +373,6 @@ public class OrderSettleNewService {
         int platFormAmt = settleOrdersDefinition.getAccountPlatformSubsidyDetails().stream().filter(obj ->{
             return RenterCashCodeEnum.SUBSIDY_OIL.getCashNo().equals(obj.getSourceCode());
         }).mapToInt(AccountPlatformSubsidyDetailEntity::getAmt).sum();
-        //平台补贴租客油费
-//        int platRentFormAmt = settleOrdersDefinition.getAccountPlatformSubsidyDetails().stream().filter(obj ->{
-//            return ConsoleCashCodeEnum.RENTER_OIL_FEE.getCashNo().equals(obj.getSourceCode());
-//        }).mapToInt(AccountPlatformSubsidyDetailEntity::getAmt).sum();
         int oilAmt = rentOilAmt + ownerOilAmt + platFormAmt;
         if(oilAmt!=0){
             AccountPlatformProfitDetailEntity accountPlatformProfitDetail = new AccountPlatformProfitDetailEntity();
