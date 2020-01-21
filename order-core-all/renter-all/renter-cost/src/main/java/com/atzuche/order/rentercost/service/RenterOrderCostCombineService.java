@@ -9,6 +9,7 @@ import com.atzuche.order.commons.enums.ChannelNameTypeEnum;
 import com.atzuche.order.commons.enums.SubsidySourceCodeEnum;
 import com.atzuche.order.commons.enums.SubsidyTypeCodeEnum;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
+import com.atzuche.order.commons.exceptions.RemoteCallException;
 import com.atzuche.order.rentercost.entity.*;
 import com.atzuche.order.rentercost.entity.dto.RenterOrderSubsidyDetailDTO;
 import com.atzuche.order.rentercost.entity.dto.*;
@@ -986,22 +987,13 @@ public class RenterOrderCostCombineService {
                     getFlgResponse = getBackCityLimitFeignApi.isCityServiceLimit(cityCode, rentTimeLong);
                     log.info("判断是否超运能入参:cityCode={},rentTimeLong={}，结果：getFlgResponse={}",cityCode,rentTimeLong,JSON.toJSONString(getFlgResponse));
                     Cat.logEvent(CatConstants.FEIGN_RESULT,JSON.toJSONString(getFlgResponse));
-                    if(getFlgResponse == null || getFlgResponse.getResCode() == null || !ErrorCode.SUCCESS.getCode().equals(getFlgResponse.getResCode())){
-                        GetCarOverCostFailException getCarOverCostFailException = new GetCarOverCostFailException();
-                        log.error("取车超运能获取失败",getCarOverCostFailException);
-                        throw getCarOverCostFailException;
-                    }
+                    checkResponse(getFlgResponse);
                     t.setStatus(Transaction.SUCCESS);
-                }catch (GetCarOverCostFailException oe){
-                    Cat.logError("Feign 取车超运能获取失败",oe);
-                    t.setStatus(oe);
-                    throw oe;
                 }catch (Exception e){
-                    GetCarOverCostErrorException getCarOverCostErrorException = new GetCarOverCostErrorException();
-                    log.error("Feign 取车超运能接口异常",getCarOverCostErrorException);
-                    Cat.logError("Feign 取车超运能接口异常",getCarOverCostErrorException);
-                    t.setStatus(getCarOverCostErrorException);
-                    throw getCarOverCostErrorException;
+                    log.error("Feign 取车超运能接口异常",e);
+                    Cat.logError("Feign 取车超运能接口异常",e);
+                    t.setStatus(e);
+                    throw e;
                 }finally {
                     t.complete();
                 }
@@ -1139,5 +1131,19 @@ public class RenterOrderCostCombineService {
         }
         return GlobalConstant.GET_RETURN_OVER_COST;
     }
+
+
+	public static void  checkResponse(ResponseObject responseObject){
+		if(responseObject==null||!ErrorCode.SUCCESS.getCode().equalsIgnoreCase(responseObject.getResCode())){
+			RemoteCallException remoteCallException = null;
+			if(responseObject!=null){
+				remoteCallException = new RemoteCallException(responseObject.getResCode(),responseObject.getResMsg(),responseObject.getData());
+			}else{
+				remoteCallException = new RemoteCallException(com.atzuche.order.commons.enums.ErrorCode.REMOTE_CALL_FAIL.getCode(),
+						com.atzuche.order.commons.enums.ErrorCode.REMOTE_CALL_FAIL.getText());
+			}
+			throw remoteCallException;
+		}
+	}
 
 }

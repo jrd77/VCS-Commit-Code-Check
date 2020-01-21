@@ -1,16 +1,13 @@
 package com.atzuche.order.transport.service;
 
 import com.alibaba.fastjson.JSON;
-import com.atzuche.order.commons.CatConstants;
-import com.atzuche.order.commons.DateUtils;
-import com.atzuche.order.commons.GlobalConstant;
-import com.atzuche.order.commons.LocalDateTimeUtils;
+import com.atzuche.order.commons.*;
 import com.atzuche.order.commons.entity.dto.CostBaseDTO;
 import com.atzuche.order.commons.entity.dto.GetReturnCarOverCostReqDto;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
+import com.atzuche.order.commons.exceptions.RemoteCallException;
 import com.atzuche.order.transport.common.TransPortErrorCode;
 import com.atzuche.order.transport.entity.RenterOrderCostDetailEntity;
-import com.atzuche.order.transport.exception.OrderTransPortException;
 import com.atzuche.order.transport.vo.GetReturnOverCostDTO;
 import com.atzuche.order.transport.vo.GetReturnOverTransportDTO;
 import com.autoyol.car.api.feign.api.GetBackCityLimitFeignApi;
@@ -99,22 +96,13 @@ public class TranSportProxyService {
                     Cat.logEvent(CatConstants.FEIGN_PARAM,"cityCode="+cityCode+"&rentTimeLong="+rentTimeLong);
                     getFlgResponse = getBackCityLimitFeignApi.isCityServiceLimit(cityCode, rentTimeLong);
                     Cat.logEvent(CatConstants.FEIGN_RESULT,JSON.toJSONString(getFlgResponse));
-                    if(getFlgResponse == null || getFlgResponse.getResCode() == null || !ErrorCode.SUCCESS.getCode().equals(getFlgResponse.getResCode())){
-                        OrderTransPortException getCarOverCostFailException = new OrderTransPortException(TransPortErrorCode.TRANS_PORT_ERROR);
-                        log.error("取车超运能获取失败",getCarOverCostFailException);
-                        throw getCarOverCostFailException;
-                    }
+                    ResponseObjectCheckUtil.checkResponse(getFlgResponse);
                     t.setStatus(Transaction.SUCCESS);
-                }catch (OrderTransPortException oe){
-                    Cat.logError("Feign 取车超运能获取失败",oe);
-                    t.setStatus(oe);
-                    throw oe;
                 }catch (Exception e){
-                    OrderTransPortException getCarOverCostErrorException = new OrderTransPortException(TransPortErrorCode.TRANS_PORT_ERROR);
-                    log.error("Feign 取车超运能接口异常",getCarOverCostErrorException);
-                    Cat.logError("Feign 取车超运能接口异常",getCarOverCostErrorException);
-                    t.setStatus(getCarOverCostErrorException);
-                    throw getCarOverCostErrorException;
+                    log.error("Feign 取车超运能接口异常",e);
+                    Cat.logError("Feign 取车超运能接口异常",e);
+                    t.setStatus(e);
+                    throw e;
                 }finally {
                     t.complete();
                 }
@@ -157,19 +145,12 @@ public class TranSportProxyService {
                     Cat.logEvent(CatConstants.FEIGN_PARAM,"cityCode="+cityCode+"&revertTimeLong="+revertTimeLong);
                     returnFlgResponse = getBackCityLimitFeignApi.isCityServiceLimit(cityCode, revertTimeLong);
                     Cat.logEvent(CatConstants.FEIGN_RESULT,JSON.toJSONString(returnFlgResponse));
-                    if(returnFlgResponse == null || returnFlgResponse.getResCode() == null || !ErrorCode.SUCCESS.getCode().equals(returnFlgResponse.getResCode())){
-                        throw new OrderTransPortException(TransPortErrorCode.TRANS_PORT_ERROR);
-                    }
+                    ResponseObjectCheckUtil.checkResponse(returnFlgResponse);
                     t.setStatus(Transaction.SUCCESS);
-                }catch (OrderTransPortException oe){
-                    Cat.logError("还车是否超运能获取失败",oe);
-                    t.setStatus(oe);
-                    throw oe;
                 }catch (Exception e){
-                    OrderTransPortException returnCarOverCostErrorException = new OrderTransPortException(TransPortErrorCode.TRANS_PORT_ERROR);
-                    Cat.logError("还车是否超运能接口异常",returnCarOverCostErrorException);
-                    t.setStatus(returnCarOverCostErrorException);
-                    throw returnCarOverCostErrorException;
+                    Cat.logError("还车是否超运能接口异常",e);
+                    t.setStatus(e);
+                    throw e;
                 }finally {
                     t.complete();
                 }
@@ -232,22 +213,13 @@ public class TranSportProxyService {
             Cat.logEvent(CatConstants.FEIGN_PARAM, JSON.toJSONString(reqParam));
             responseData = fetchBackCarFeeFeignService.getPriceCarHumanFeeRuleConfig(String.valueOf(cityCode), String.valueOf(LocalDateTimeUtils.localDateTimeToLong(LocalDateTime.now())));
             log.info("Feign 获取取还车超出运能附加金额结果:[{}],获取取还车超出运能附加金额入参:[{}]", JSON.toJSONString(responseData), JSON.toJSONString(reqParam));
-            if (responseData == null || responseData.getResCode() == null) {
-                OrderTransPortException fail = new OrderTransPortException(TransPortErrorCode.TRANS_PORT_ERROR.getValue(),"获取取还车超出运能附加金额失败");
-                throw fail;
-            }
+            ResponseCheckUtil.checkResponse(responseData);
             Cat.logEvent(CatConstants.FEIGN_RESULT, JSON.toJSONString(responseData));
             t.setStatus(Transaction.SUCCESS);
-        } catch (OrderTransPortException e) {
-            log.error("Feign 获取取还车超出运能附加金额失败", e);
-            Cat.logError("Feign 获取取还车超出运能附加金额失败！", e);
+        }  catch (Exception e) {
+            Cat.logError("Feign 获取取还车超出运能附加金额接口异常", e);
             t.setStatus(e);
             throw e;
-        } catch (Exception e) {
-            OrderTransPortException error = new OrderTransPortException(TransPortErrorCode.TRANS_PORT_ERROR);
-            Cat.logError("Feign 获取取还车超出运能附加金额接口异常", error);
-            t.setStatus(error);
-            throw error;
         }
         if (ErrorCode.SUCCESS.getCode().equals(responseData.getResCode())) {
             return responseData.getData().getHumanFee().intValue();
@@ -259,5 +231,6 @@ public class TranSportProxyService {
         }
         return GlobalConstant.GET_RETURN_OVER_COST;
     }
+
 }
 
