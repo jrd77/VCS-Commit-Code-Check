@@ -16,7 +16,7 @@ public class ModifyOrderReqVO {
 	private String orderNo;
 	
 	//@NotBlank(message="memNo不能为空")
-	@AutoDocProperty(value="memNo,必填，",required=true)
+	@AutoDocProperty(value="memNo,必填，")
 	private String memNo;
 	
 	@AutoDocProperty(value="补充全险是否开启，0：否，1：是")

@@ -9,6 +9,7 @@ import com.atzuche.order.admin.vo.req.order.CancelOrderByPlatVO;
 import com.atzuche.order.admin.vo.req.order.CancelOrderVO;
 import com.atzuche.order.admin.vo.req.order.OrderModifyConfirmReqVO;
 import com.atzuche.order.admin.vo.resp.order.AdminModifyOrderFeeCompareVO;
+import com.atzuche.order.commons.ResponseCheckUtil;
 import com.atzuche.order.commons.entity.orderDetailDto.OrderDetailReqDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.OrderDetailRespDTO;
 import com.atzuche.order.commons.vo.req.ModifyOrderReqVO;
@@ -67,13 +68,12 @@ public class AdminOrderController {
         reqDTO.setOrderNo(orderNo);
 
         ResponseData<OrderDetailRespDTO> respDTOResponseData =feignOrderDetailService.getOrderDetail(reqDTO);
-        if(respDTOResponseData==null||!ErrorCode.SUCCESS.getCode().equalsIgnoreCase(respDTOResponseData.getResCode())){
-            throw new RenterInfoController.RenterNotFoundException(orderNo);
-        }
+        ResponseCheckUtil.checkResponse(respDTOResponseData);
 
         OrderDetailRespDTO detailRespDTO = respDTOResponseData.getData();
         String  memNo = detailRespDTO.getRenterMember().getMemNo();
         modifyOrderReqVO.setMemNo(memNo);
+        modifyOrderReqVO.setConsoleFlag(true);
 
         adminOrderService.modifyOrder(modifyOrderReqVO);
         return ResponseData.success();

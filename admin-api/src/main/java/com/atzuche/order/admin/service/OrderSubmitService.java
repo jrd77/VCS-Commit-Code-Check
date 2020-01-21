@@ -36,8 +36,8 @@ public class OrderSubmitService {
         Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "后台管理系统下单");
         try{
             Cat.logEvent(CatConstants.FEIGN_METHOD,"feignOrderAdminSubmitService.submitOrder");
-            log.info("Feign 开始后台管理系统下单,adminOrderReqVO={}", adminOrderReqVO);
-            Cat.logEvent(CatConstants.FEIGN_PARAM,JSON.toJSONString(adminOrderReqVO));
+            log.info("Feign 开始后台管理系统下单,adminOrderReqVO={}", adminOrderReqParam);
+            Cat.logEvent(CatConstants.FEIGN_PARAM,JSON.toJSONString(adminOrderReqParam));
             responseObject =  feignOrderAdminSubmitService.submitOrder(adminOrderReqParam);
             Cat.logEvent(CatConstants.FEIGN_RESULT,JSON.toJSONString(responseObject));
             ResponseCheckUtil.checkResponse(responseObject);
@@ -79,15 +79,9 @@ public class OrderSubmitService {
 
         param.setUseSpecialPrice(reqVO.getUseSpecialPrice());
         param.setOperator(AdminUserUtil.getAdminUser().getAuthName());
-        param.setSpecialConsole("0");
-        param.setOfflineOrderStatus("0");
 
-        param.setPlatformParentType("7");
         param.setCityName(reqVO.getRentCity());
-        param.setOrderCategory("1");
-        param.setSceneCode("EX007");
-        param.setSource("1");
-        param.setFreeDoubleTypeId("3");
+
 
         param.setMemNo(reqVO.getMemNo());
 
@@ -98,7 +92,6 @@ public class OrderSubmitService {
         param.setDisCouponIds(reqVO.getDisCouponIds());
         param.setDriverIds(reqVO.getDriverIds());
         param.setLimitReductionId(reqVO.getLimitReductionId());
-        param.setFreeDoubleTypeId(reqVO.getFreeDoubleTypeId());
         param.setCarOwnerCouponNo(reqVO.getCarOwnerCouponNo());
 
         //布尔值的转化
@@ -136,6 +129,15 @@ public class OrderSubmitService {
         param.setLimitRedStatus(reqVO.getLimitRedStatus());
         param.setRentCity(reqVO.getRentCity());
         param.setOilType(reqVO.getOilType());
+
+        param.setOrderCategory("1");
+        param.setSceneCode("EX007");
+        param.setSource("1");
+        param.setFreeDoubleTypeId("3");
+        param.setSpecialConsole("0");
+        param.setOfflineOrderStatus("0");
+
+        param.setPlatformParentType("7");
 
         return param;
     }

@@ -1,6 +1,7 @@
 package com.atzuche.order.commons.vo.req;
 
 import com.autoyol.doc.annotation.AutoDocProperty;
+import lombok.Data;
 
 /**
  * 管理后台下单参数
@@ -8,6 +9,7 @@ import com.autoyol.doc.annotation.AutoDocProperty;
  * @author <a href="mailto:lianglin.sjtu@gmail.com">AndySjtu</a>
  * @date 2019/12/19 11:13 上午
  **/
+@Data
 public class AdminOrderReqVO extends NormalOrderReqVO {
 
     private static final long serialVersionUID = -8153539553994615179L;

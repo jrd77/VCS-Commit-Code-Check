@@ -7,9 +7,7 @@ import lombok.ToString;
 import java.io.Serializable;
 
 /**
- * 用车的条件
- * 计算费用
- * @author xiaoxu.wang
+ * 钱包的余额
  *
  *
  */
