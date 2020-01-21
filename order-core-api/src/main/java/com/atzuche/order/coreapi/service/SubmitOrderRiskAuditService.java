@@ -3,6 +3,7 @@ package com.atzuche.order.coreapi.service;
 import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.CatConstants;
 import com.atzuche.order.commons.LocalDateTimeUtils;
+import com.atzuche.order.commons.ResponseCheckUtil;
 import com.atzuche.order.coreapi.entity.vo.req.SubmitOrderRiskCheckReqVO;
 import com.atzuche.order.coreapi.submitOrder.exception.SubmitOrderException;
 import com.atzuche.order.coreapi.utils.BizAreaUtil;
@@ -57,21 +58,15 @@ public class SubmitOrderRiskAuditService {
                     JSON.toJSONString(responseData));
             Cat.logEvent(CatConstants.FEIGN_RESULT, JSON.toJSONString(responseData));
 
-            if (!StringUtils.equals(responseData.getResCode(), ErrorCode.SUCCESS.getCode())) {
-                throw new SubmitOrderException(responseData.getResCode(), responseData.getResMsg(), responseData.getData());
-            } else {
-                t.setStatus(Transaction.SUCCESS);
-                return String.valueOf(responseData.getData());
-            }
-        } catch (SubmitOrderException soe) {
-            logger.error("下单调用风控服务审核不通过.param is, reqVo:[{}]", req, soe);
-            t.setStatus(soe);
-            Cat.logError("下单调用风控服务审核不通过.", soe);
-            throw soe;
+            ResponseCheckUtil.checkResponse(responseData);
+
+            t.setStatus(Transaction.SUCCESS);
+            return String.valueOf(responseData.getData());
+
         } catch (Exception e) {
             logger.error("下单调用风控服务异常.param is, reqVo:[{}]", req, e);
-            t.setStatus(e);
             Cat.logError("下单调用风控服务异常.", e);
+            t.setStatus(e);
             throw e;
         } finally {
             t.complete();
