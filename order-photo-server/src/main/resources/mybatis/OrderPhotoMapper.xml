@@ -58,7 +58,7 @@
 	</delete>
 	<select id="queryWzcodeByOrderNo" resultType="java.lang.String">
 		select wzcode from renyun_send_illegal_info_log
-		where orderno=#{orderNo} order by id desc limit 1
+		where order_no=#{orderNo} order by id desc limit 1
 	</select>
 	<select id="queryIllegalPhotoByOrderNo" resultType="com.atzuche.order.photo.dto.PhotoPathDTO">
 		select user_type userType,path img
