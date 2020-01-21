@@ -22,6 +22,5 @@ public class CancelOrderByPlatVO {
     private String cancelType;
 
     @AutoDocProperty(value = "操作人", required = true)
-    @NotBlank(message = "操作人不能为空")
     private String operator;
 }

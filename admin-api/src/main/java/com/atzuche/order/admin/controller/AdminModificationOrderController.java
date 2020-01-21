@@ -20,9 +20,9 @@ import com.autoyol.doc.annotation.AutoDocVersion;
 @RequestMapping("/console/order/")
 @RestController
 @AutoDocVersion(version = "订单接口文档")
-public class ModificationOrderController {
+public class AdminModificationOrderController {
 
-    private static final Logger logger = LoggerFactory.getLogger(ModificationOrderController.class);
+    private static final Logger logger = LoggerFactory.getLogger(AdminModificationOrderController.class);
     @Autowired
     ModificationOrderService modificationOrderService;
     

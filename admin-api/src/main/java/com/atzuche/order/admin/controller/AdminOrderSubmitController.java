@@ -20,7 +20,7 @@ import javax.validation.Valid;
 @RequestMapping("/console/order")
 @RestController
 @AutoDocVersion(version = "下单")
-public class OrderSubmitController {
+public class AdminOrderSubmitController {
     @Autowired
     private OrderSubmitService orderSubmitService;
 
