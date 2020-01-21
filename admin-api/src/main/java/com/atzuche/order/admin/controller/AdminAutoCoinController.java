@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@RequestMapping("/console/order/")
+@RequestMapping("/console/")
 @RestController
 @AutoDocVersion(version = "订单接口文档")
 public class AutoCoinController {
