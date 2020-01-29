@@ -77,7 +77,9 @@ public class CarProxyService {
         }
     }
 
-    //获取租客商品信息
+    /**
+     * 获取租客商品信息
+     */
     public RenterGoodsDetailDTO getRenterGoodsDetail(CarDetailReqVO reqVO){
         OrderCarInfoParamDTO orderCarInfoParamDTO = new OrderCarInfoParamDTO();
         orderCarInfoParamDTO.setCarNo(Integer.parseInt(reqVO.getCarNo()));
