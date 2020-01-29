@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("settle")
 @Slf4j
-public class OrderSettleController {
+public class AdminOrderSettleController {
 
 	@Autowired
 	private OrderSettleService orderSettleService;

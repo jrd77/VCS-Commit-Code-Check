@@ -33,8 +33,8 @@ import com.dianping.cat.Cat;
 @RequestMapping("/console/ordercost/")
 @RestController
 @AutoDocVersion(version = "订单详细信息  租车费用  车主费用接口文档")
-public class OrderCostController {
-	private static final Logger logger = LoggerFactory.getLogger(OrderCostController.class);
+public class AdminOrderCostController {
+	private static final Logger logger = LoggerFactory.getLogger(AdminOrderCostController.class);
 	
 	@Autowired
 	OrderCostService orderCostService;

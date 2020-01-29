@@ -25,7 +25,7 @@ import java.time.format.DateTimeFormatter;
  * @date 2020/1/15 2:51 下午
  **/
 @RestController
-public class LogController {
+public class AdminLogController {
     @Autowired
     AdminLogService adminLogService;
 
