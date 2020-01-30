@@ -2,6 +2,7 @@ package com.atzuche.order.coreapi.service;
 
 import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.CatConstants;
+import com.atzuche.order.commons.ResponseCheckUtil;
 import com.atzuche.order.coreapi.submitOrder.exception.UniqueOrderNoException;
 import com.autoyol.api.UniqueNoFeignClient;
 import com.autoyol.commons.web.ErrorCode;
@@ -43,19 +44,18 @@ public class UniqueOrderNoService {
         Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "订单号创建服务");
         try {
             Cat.logEvent(CatConstants.FEIGN_PARAM, "ORDER_CENTER_RENTER_ORDER_NO");
+            Cat.logEvent(CatConstants.FEIGN_METHOD,"uniqueNoFeignClient.getUniqueNo");
             ResponseData<Object> response = uniqueNoFeignClient.getUniqueNo(UniqueNoTypeEnum.ORDER_CENTER_RENTER_ORDER_NO);
             LOGGER.info("Invoke UniqueOrderNoService.getOrderNo. result is,response:[{}]", JSON.toJSONString(response));
             Cat.logEvent(CatConstants.FEIGN_RESULT, JSON.toJSONString(response));
-            if (null != response && StringUtils.equals(ErrorCode.SUCCESS.getCode(), response.getResCode())) {
-                t.setStatus(Transaction.SUCCESS);
-                return String.valueOf(response.getData());
-            }
-            throw new UniqueOrderNoException();
+            ResponseCheckUtil.checkResponse(response);
+            t.setStatus(Transaction.SUCCESS);
+            return String.valueOf(response.getData());
         } catch (Exception e) {
             LOGGER.error("Feign 获取主订单号失败", e);
             t.setStatus(e);
             Cat.logError("Feign 获取主订单号失败", e);
-            throw new UniqueOrderNoException();
+            throw e;
         } finally {
             t.complete();
         }
@@ -71,19 +71,18 @@ public class UniqueOrderNoService {
         Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "订单号创建服务");
         try {
             Cat.logEvent(CatConstants.FEIGN_PARAM, "orderNo=" + orderNo + "&orderNoType=RENTER_NO");
+            Cat.logEvent(CatConstants.FEIGN_METHOD,"uniqueNoFeignClient.getChildOrderNoByOrderNo");
             ResponseData<Object> response = uniqueNoFeignClient.getChildOrderNoByOrderNo(orderNo, OrderNoTypeEnum.RENTER_NO);
             LOGGER.info("Invoke UniqueOrderNoService.getRenterOrderNo. result is,response:[{}]", JSON.toJSONString(response));
             Cat.logEvent(CatConstants.FEIGN_RESULT, JSON.toJSONString(response));
-            if (null != response && StringUtils.equals(ErrorCode.SUCCESS.getCode(), response.getResCode())) {
-                t.setStatus(Transaction.SUCCESS);
-                return String.valueOf(response.getData());
-            }
-            throw new UniqueOrderNoException();
+            ResponseCheckUtil.checkResponse(response);
+            t.setStatus(Transaction.SUCCESS);
+            return String.valueOf(response.getData());
         } catch (Exception e) {
             LOGGER.error("Feign 获取租客订单编码失败,order:[{}]", orderNo, e);
             t.setStatus(e);
             Cat.logError("Feign 获取租客订单编码失败", e);
-            throw new UniqueOrderNoException();
+            throw e;
         } finally {
             t.complete();
         }
@@ -99,19 +98,18 @@ public class UniqueOrderNoService {
         Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "订单号创建服务");
         try {
             Cat.logEvent(CatConstants.FEIGN_PARAM, "orderNo=" + orderNo + "&orderNoType=OWNER_NO");
+            Cat.logEvent(CatConstants.FEIGN_METHOD,"uniqueNoFeignClient.getChildOrderNoByOrderNo");
             ResponseData<Object> response = uniqueNoFeignClient.getChildOrderNoByOrderNo(orderNo, OrderNoTypeEnum.OWNER_NO);
             LOGGER.info("Invoke UniqueOrderNoService.getOwnerOrderNo. result is,response:[{}]", JSON.toJSONString(response));
             Cat.logEvent(CatConstants.FEIGN_RESULT, JSON.toJSONString(response));
-            if (null != response && StringUtils.equals(ErrorCode.SUCCESS.getCode(), response.getResCode())) {
-                t.setStatus(Transaction.SUCCESS);
-                return String.valueOf(response.getData());
-            }
-            throw new UniqueOrderNoException();
+            ResponseCheckUtil.checkResponse(response);
+            t.setStatus(Transaction.SUCCESS);
+            return String.valueOf(response.getData());
         } catch (Exception e) {
             LOGGER.error("Feign 获取车主订单编码失败,order:[{}]", orderNo, e);
             t.setStatus(e);
             Cat.logError("Feign 获取车主订单编码失败", e);
-            throw new UniqueOrderNoException();
+            throw e;
         } finally {
             t.complete();
         }

@@ -59,12 +59,8 @@ public class SubmitOrderController {
             return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), error.isPresent() ?
                     error.get().getDefaultMessage() : ErrorCode.INPUT_ERROR.getText());
         }
-        String memNo = normalOrderReqVO.getMemNo();
-        if (StringUtils.isBlank(memNo)) {
-            return new ResponseData<>(ErrorCode.NEED_LOGIN.getCode(), ErrorCode.NEED_LOGIN.getText());
-        }
-        OrderResVO orderResVO = null;
 
+        OrderResVO orderResVO = null;
         try{
             BeanCopier beanCopier = BeanCopier.create(NormalOrderReqVO.class, OrderReqVO.class, false);
             OrderReqVO orderReqVO = new OrderReqVO();

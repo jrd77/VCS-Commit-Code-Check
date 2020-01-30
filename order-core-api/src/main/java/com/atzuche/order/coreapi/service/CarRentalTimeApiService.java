@@ -11,6 +11,7 @@ import com.atzuche.order.coreapi.submitOrder.exception.RenterCarDetailFailExcept
 import com.atzuche.order.parentorder.entity.OrderEntity;
 import com.atzuche.order.parentorder.entity.OrderStatusEntity;
 import com.atzuche.order.renterorder.entity.OrderCouponEntity;
+import com.atzuche.order.transport.service.ResponseObjectCheckUtil;
 import com.autoyol.car.api.CarRentalTimeApi;
 import com.autoyol.car.api.model.dto.CarAddressDTO;
 import com.autoyol.car.api.model.dto.CarDispatchDTO;
@@ -78,29 +79,26 @@ public class CarRentalTimeApiService {
             ResponseObject<CarAddressDTO> responseObject = carRentalTimeApi.getCarRentTimeRange(carAddressDTO);
             Cat.logEvent(CatConstants.FEIGN_RESULT, JSON.toJSONString(responseObject));
             LOGGER.info("提前延后时间计算. result is,responseObject:[{}]", JSON.toJSONString(responseObject));
+            ResponseObjectCheckUtil.checkResponse(responseObject);
 
-            if (null == responseObject
-                    || null == responseObject.getData()
-                    || !StringUtils.equals(responseObject.getResCode(), ErrorCode.SUCCESS.getCode())) {
-                t.setStatus(new RenterCarDetailFailException(responseObject.getResCode(), responseObject.getResMsg()));
-            } else {
-                CarAddressDTO carAddress = responseObject.getData();
-                CarRentTimeRangeResVO carRentTimeRangeResVO = new CarRentTimeRangeResVO();
-                carRentTimeRangeResVO.setGetMinutes(carAddress.getGetMinutes());
-                carRentTimeRangeResVO.setReturnMinutes(carAddress.getReturnMinutes());
-                carRentTimeRangeResVO.setAdvanceStartDate(LocalDateTimeUtils.dateToLocalDateTime(carAddress.getAdvanceStartDate()));
-                carRentTimeRangeResVO.setDelayEndDate(LocalDateTimeUtils.dateToLocalDateTime(carAddress.getDelayEndDate()));
-                t.setStatus(Transaction.SUCCESS);
-                return carRentTimeRangeResVO;
-            }
+
+            CarAddressDTO carAddress = responseObject.getData();
+            CarRentTimeRangeResVO carRentTimeRangeResVO = new CarRentTimeRangeResVO();
+            carRentTimeRangeResVO.setGetMinutes(carAddress.getGetMinutes());
+            carRentTimeRangeResVO.setReturnMinutes(carAddress.getReturnMinutes());
+            carRentTimeRangeResVO.setAdvanceStartDate(LocalDateTimeUtils.dateToLocalDateTime(carAddress.getAdvanceStartDate()));
+            carRentTimeRangeResVO.setDelayEndDate(LocalDateTimeUtils.dateToLocalDateTime(carAddress.getDelayEndDate()));
+            t.setStatus(Transaction.SUCCESS);
+            return carRentTimeRangeResVO;
+
         } catch (Exception e) {
             t.setStatus(e);
-            LOGGER.info("提前延后时间计算异常.", e);
+            LOGGER.info("提前延后时间计算异常:reqVO is [{}]",reqVO, e);
             Cat.logError("提前延后时间计算异常.", e);
+            throw e;
         } finally {
             t.complete();
         }
-        return null;
     }
 
 
@@ -134,19 +132,24 @@ public class CarRentalTimeApiService {
 
             LOGGER.info("判断是否进入调度. result is,responseObject:[{}]", JSON.toJSONString(responseObject));
             Cat.logEvent(CatConstants.FEIGN_RESULT, JSON.toJSONString(responseObject));
+
+            ResponseObjectCheckUtil.checkResponse(responseObject);
+
             t.setStatus(Transaction.SUCCESS);
 
-            return !(null == responseObject
-                    || null == responseObject.getData() || !responseObject.getData()
-                    || !StringUtils.equals(responseObject.getResCode(), ErrorCode.SUCCESS.getCode()));
+            if(responseObject.getData()!=null){
+                return responseObject.getData();
+            }
+            return false;
+
         } catch (Exception e) {
             t.setStatus(e);
-            LOGGER.info("判断是否进入调度异常.", e);
+            LOGGER.info("判断是否进入调度异常.,reqVO=[{}]",reqVO, e);
             Cat.logError("判断是否进入调度异常.", e);
+            throw e;
         } finally {
             t.complete();
         }
-        return false;
     }
 
 
