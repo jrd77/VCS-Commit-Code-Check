@@ -83,7 +83,7 @@ public class HandoverCarInfoService {
      * @throws Exception
      */
     @Transactional(rollbackFor = Exception.class)
-    public void updateHandoverCarInfo(HandoverCarInfoReqVO handoverCarReqVO) throws Exception {
+    public void updateHandoverCarInfo(HandoverCarInfoReqVO handoverCarReqVO)  {
         logger.debug("参数：{}", ToStringBuilder.reflectionToString(handoverCarReqVO));
         if (Objects.isNull(handoverCarReqVO)) {
             throw new HandoverCarOrderException(DeliveryErrorCode.DELIVERY_PARAMS_ERROR.getValue(), "参数错误");

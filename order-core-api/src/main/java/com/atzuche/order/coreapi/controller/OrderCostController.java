@@ -7,6 +7,7 @@ import java.util.Optional;
 
 import javax.validation.Valid;
 
+import com.atzuche.order.commons.BindingResultUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -36,18 +37,9 @@ public class OrderCostController {
 	@PostMapping("/order/cost/renter/get")
 	public ResponseData<OrderRenterCostResVO> orderCostRenterGet(@Valid @RequestBody OrderCostReqVO req, BindingResult bindingResult) {
 		log.info("租客子订单费用详细 orderCostRenterGet params=[{}]", req.toString());
-		if (bindingResult.hasErrors()) {
-            Optional<FieldError> error = bindingResult.getFieldErrors().stream().findFirst();
-            return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), error.isPresent() ?
-                    error.get().getDefaultMessage() : ErrorCode.INPUT_ERROR.getText());
-        }
-		try {
-			OrderRenterCostResVO resVo = orderCostService.orderCostRenterGet(req);
-			return ResponseData.success(resVo);
-		} catch (Exception e) {
-			log.error("查询租客费用明细异常:",e);
-			return ResponseData.error();
-		}
+		BindingResultUtil.checkBindingResult(bindingResult);
+		OrderRenterCostResVO resVo = orderCostService.orderCostRenterGet(req);
+		return ResponseData.success(resVo);
 	}
 	
 	@PostMapping("/order/cost/owner/get")

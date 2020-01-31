@@ -1,5 +1,6 @@
 package com.atzuche.order.coreapi.controller;
 
+import com.atzuche.order.commons.BindingResultUtil;
 import com.atzuche.order.commons.vo.req.DeliveryCarPriceReqVO;
 import com.atzuche.order.commons.vo.res.delivery.DeliveryCarRepVO;
 import com.atzuche.order.commons.vo.res.delivery.DeliveryOilCostRepVO;
@@ -46,11 +47,7 @@ public class DeliveryCarInfoController {
     @PostMapping("/oil/getOilCrash")
     public ResponseData<DeliveryOilCostRepVO> getOilCostByRenterOrderNo(@RequestBody DeliveryCarPriceReqVO deliveryCarPriceReqVO, BindingResult bindingResult) {
         log.info("获取油费入参：{}", deliveryCarPriceReqVO.toString());
-        if (bindingResult.hasErrors()) {
-            Optional<FieldError> error = bindingResult.getFieldErrors().stream().findFirst();
-            return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), error.isPresent() ?
-                    error.get().getDefaultMessage() : ErrorCode.INPUT_ERROR.getText());
-        }
+        BindingResultUtil.checkBindingResult(bindingResult);
         try {
             DeliveryOilCostRepVO deliveryOilCostRepVO = DeliveryOilCostRepVO.builder().build();
             DeliveryOilCostVO deliveryOilCostVO = deliveryCarInfoPriceService.getOilCostByRenterOrderNo(deliveryCarPriceReqVO.getOrderNo(), deliveryCarPriceReqVO.getCarEngineType());

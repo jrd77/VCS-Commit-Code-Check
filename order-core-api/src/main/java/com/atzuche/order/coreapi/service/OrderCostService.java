@@ -14,7 +14,7 @@ import com.atzuche.order.delivery.vo.delivery.rep.RenterGetAndReturnCarDTO;
 import com.atzuche.order.ownercost.entity.ConsoleOwnerOrderFineDeatailEntity;
 import com.autoyol.doc.util.StringUtil;
 import com.autoyol.platformcost.model.FeeResult;
-import org.apache.commons.beanutils.BeanUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -89,7 +89,7 @@ public class OrderCostService {
 	@Autowired
 	private OrderSupplementDetailService orderSupplementDetailService;
 	
-	public OrderRenterCostResVO orderCostRenterGet(OrderCostReqVO req) throws Exception{
+	public OrderRenterCostResVO orderCostRenterGet(OrderCostReqVO req){
 		OrderRenterCostResVO resVo = new OrderRenterCostResVO();
 		
 		//参数定义
@@ -97,9 +97,7 @@ public class OrderCostService {
 		String memNo = req.getMemNo();
 		String renterOrderNo = req.getSubOrderNo();
 		//-------------------------------------------------------------------- 以下是主订单费用
-		/**
-		 * 根据订单号查询封装
-		 */
+		//根据订单号查询封装
 		//需补付金额
 		try {
 			int needIncrementAmt = cashierPayService.getRealRentCost(orderNo, memNo);  //getRealRentCost )  海豹提供

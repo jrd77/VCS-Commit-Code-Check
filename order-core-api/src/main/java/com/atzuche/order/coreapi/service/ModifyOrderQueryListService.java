@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.apache.commons.beanutils.BeanUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -74,7 +74,7 @@ public class ModifyOrderQueryListService {
 	private OrderStatusService orderStatusService;
 	
 	
-	public ModifyOrderResVO queryModifyOrderList(String orderNo,String renterOrderNo) throws Exception{
+	public ModifyOrderResVO queryModifyOrderList(String orderNo,String renterOrderNo) {
 		ModifyOrderResVO resVo = new ModifyOrderResVO();
 
 		//租客罚金列表
@@ -83,11 +83,7 @@ public class ModifyOrderQueryListService {
 		if(fineLst != null) {
 			fineLst.stream().forEach(x->{
 				RenterOrderFineDeatailResVO real = new RenterOrderFineDeatailResVO();
-        		try {
-					BeanUtils.copyProperties(real, x);
-				} catch (Exception e) {
-					log.error("对象属性赋值报错:",e);
-				}
+				BeanUtils.copyProperties(real,x);
         		fineLstReal.add(real);
             });
         }
@@ -117,11 +113,7 @@ public class ModifyOrderQueryListService {
         if(renterOrderCostDetailList != null) {
         	renterOrderCostDetailList.stream().forEach(x->{
         		RenterOrderCostDetailResVO real = new RenterOrderCostDetailResVO();
-        		try {
-					BeanUtils.copyProperties(real, x);
-				} catch (Exception e) {
-					log.error("对象属性赋值报错:",e);
-				}
+        		BeanUtils.copyProperties(real, x);
         		renterOrderCostDetailListReal.add(real);
             });
         }
@@ -132,11 +124,9 @@ public class ModifyOrderQueryListService {
         if(subsidyLst != null) {
         	subsidyLst.stream().forEach(x->{
         		RenterOrderSubsidyDetailResVO real = new RenterOrderSubsidyDetailResVO();
-        		try {
-					BeanUtils.copyProperties(real, x);
-				} catch (Exception e) {
-					log.error("对象属性赋值报错:",e);
-				}
+
+        		BeanUtils.copyProperties(real, x);
+
                 subsidyLstReal.add(real);
             });
         }
@@ -189,11 +179,9 @@ public class ModifyOrderQueryListService {
 		if(rentLst != null) {
 			rentLst.stream().forEach(x->{
 				RenterOrderResVO real = new RenterOrderResVO();
-        		try {
-					BeanUtils.copyProperties(real, x);
-				} catch (Exception e) {
-					log.error("对象属性赋值报错:",e);
-				}
+
+				BeanUtils.copyProperties(real, x);
+
         		rentLstReal.add(real);
             });
         }

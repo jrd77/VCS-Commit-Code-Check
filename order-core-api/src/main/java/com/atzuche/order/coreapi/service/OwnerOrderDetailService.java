@@ -55,7 +55,7 @@ public class OwnerOrderDetailService {
     @Autowired
     private OrderSettleService orderSettleService;
 
-    public ResponseData<OwnerRentDetailDTO> ownerRentDetail(String orderNo, String ownerOrderNo) {
+    public OwnerRentDetailDTO ownerRentDetail(String orderNo, String ownerOrderNo) {
         //主订单
         OrderEntity orderEntity = orderService.getOrderEntity(orderNo);
         if(orderEntity == null){
@@ -81,10 +81,10 @@ public class OwnerOrderDetailService {
         ownerRentDetailDTO.setReqTimeStr(orderDTO.getReqTime()!=null? LocalDateTimeUtils.localdateToString(orderDTO.getReqTime(), GlobalConstant.FORMAT_DATE_STR1):null);
         ownerRentDetailDTO.setRevertTimeStr(orderDTO.getExpRevertTime()!=null? LocalDateTimeUtils.localdateToString(orderDTO.getExpRevertTime(), GlobalConstant.FORMAT_DATE_STR1):null);
         ownerRentDetailDTO.setRentTimeStr(orderDTO.getExpRentTime()!=null?LocalDateTimeUtils.localdateToString(orderDTO.getExpRentTime(), GlobalConstant.FORMAT_DATE_STR1):null);
-        return ResponseData.success(ownerRentDetailDTO);
+        return ownerRentDetailDTO;
     }
 
-    public ResponseData<RenterOwnerPriceDTO> renterOwnerPrice(String orderNo, String ownerOrderNo) {
+    public RenterOwnerPriceDTO renterOwnerPrice(String orderNo, String ownerOrderNo) {
         //车主补贴
         List<OwnerOrderSubsidyDetailDTO> ownerOrderSubsidyDetailDTOS = new ArrayList<>();
         List<OwnerOrderSubsidyDetailEntity> ownerOrderSubsidyDetailEntities = ownerOrderSubsidyDetailService.listOwnerOrderSubsidyDetail(orderNo, ownerOrderNo);
@@ -95,11 +95,11 @@ public class OwnerOrderDetailService {
         });
         //补贴
         RenterOwnerPriceDTO renterOwnerPriceDTO = CostStatUtils.ownerRenterPrice(ownerOrderSubsidyDetailDTOS);
-        return ResponseData.success(renterOwnerPriceDTO);
+        return renterOwnerPriceDTO;
     }
 
 
-    public ResponseData<ServiceDetailDTO> serviceDetail(String orderNo, String ownerOrderNo) {
+    public ServiceDetailDTO serviceDetail(String orderNo, String ownerOrderNo) {
         OwnerGoodsDetailDTO ownerGoodsDetail = ownerGoodsService.getOwnerGoodsDetail(ownerOrderNo, false);
         OwnerCosts ownerCosts = orderSettleService.preOwnerSettleOrder(orderNo, ownerOrderNo);
 
@@ -123,10 +123,10 @@ public class OwnerOrderDetailService {
         serviceDetailDTO.setCarType(CarOwnerTypeEnum.getNameByCode(ownerGoodsDetail.getCarOwnerType()));
         serviceDetailDTO.setServiceRate(ownerGoodsDetail.getServiceRate());
         serviceDetailDTO.setServiceAmt(proxyExpenseTotalAmount + serviceExpenseTotalAmount);
-        return ResponseData.success(serviceDetailDTO);
+        return serviceDetailDTO;
     }
 
-    public ResponseData<PlatformToOwnerSubsidyDTO> platformToOwnerSubsidy(String orderNo, String ownerOrderNo) {
+    public PlatformToOwnerSubsidyDTO platformToOwnerSubsidy(String orderNo, String ownerOrderNo) {
         List<OwnerOrderSubsidyDetailDTO> ownerOrderSubsidyDetailDTOS = new ArrayList<>();
         List<OwnerOrderSubsidyDetailEntity> ownerOrderSubsidyDetailEntities = ownerOrderSubsidyDetailService.listOwnerOrderSubsidyDetail(orderNo, ownerOrderNo);
         ownerOrderSubsidyDetailEntities.stream().forEach(x->{
@@ -135,11 +135,11 @@ public class OwnerOrderDetailService {
             ownerOrderSubsidyDetailDTOS.add(ownerOrderSubsidyDetailDTO);
         });
         PlatformToOwnerSubsidyDTO platformToOwnerSubsidyDTO = getPlatformToOwnerSubsidyDTO(ownerOrderSubsidyDetailDTOS);
-        return ResponseData.success(platformToOwnerSubsidyDTO);
+        return platformToOwnerSubsidyDTO;
     }
 
 
-    public ResponseData<FienAmtDetailDTO> fienAmtDetail(String orderNo, String ownerOrderNo) {
+    public FienAmtDetailDTO fienAmtDetail(String orderNo, String ownerOrderNo) {
         List<OwnerOrderFineDeatailEntity> ownerOrderFineDeatailList = ownerOrderFineDeatailService.getOwnerOrderFineDeatailByOwnerOrderNo(ownerOrderNo);
         List<OwnerOrderFineDeatailDTO> ownerOrderFineDeatailDTOS = new ArrayList<>();
         Optional.ofNullable(ownerOrderFineDeatailList).orElseGet(ArrayList::new).forEach(x->{
@@ -161,7 +161,7 @@ public class OwnerOrderDetailService {
         fienAmtDetailDTO.setRenterDelayReturnCarFienAmt(renterDelayReturnCarFienAmt);
         fienAmtDetailDTO.setOwnerGetReturnCarFienCashNo(FineTypeEnum.GET_RETURN_CAR.getFineType());
         fienAmtDetailDTO.setOwnerModifyAddrAmtCashNo(FineTypeEnum.MODIFY_ADDRESS_FINE.getFineType());
-        return ResponseData.success(fienAmtDetailDTO);
+        return fienAmtDetailDTO;
     }
 
 
@@ -197,7 +197,7 @@ public class OwnerOrderDetailService {
         return platformToOwnerSubsidyDTO;
     }
 
-    public ResponseData<PlatformToOwnerDTO> platformToOwner(String orderNo, String ownerOrderNo) {
+    public PlatformToOwnerDTO platformToOwner(String orderNo, String ownerOrderNo) {
         List<OrderConsoleCostDetailEntity> list = orderConsoleCostDetailService.getOrderConsoleCostDetaiByOrderNo(orderNo);
         List<OrderConsoleCostDetailDTO> orderConsoleCostDetailDTOS = new ArrayList<>();
         Optional.ofNullable(list).orElseGet(ArrayList::new).forEach(x->{
@@ -228,10 +228,10 @@ public class OwnerOrderDetailService {
         platformToOwnerDTO.setDlayWait(dlayWait);
         platformToOwnerDTO.setStopCar(stopCar);
         platformToOwnerDTO.setExtraMileage(extraMileage);
-        return ResponseData.success(platformToOwnerDTO);
+        return platformToOwnerDTO;
     }
 
-    public ResponseData<?> updateFien(FienAmtUpdateReqDTO fienAmtUpdateReqDTO) {
+    public void updateFien(FienAmtUpdateReqDTO fienAmtUpdateReqDTO) {
         String ownerOrderNo = fienAmtUpdateReqDTO.getOwnerOrderNo();
         OwnerOrderFineDeatailEntity ownerOrderFineDeatailEntity = new OwnerOrderFineDeatailEntity();
         ownerOrderFineDeatailEntity.setOrderNo(fienAmtUpdateReqDTO.getOrderNo());
@@ -270,6 +270,5 @@ public class OwnerOrderDetailService {
         }else{
             ownerOrderFineDeatailService.updateByCashNoAndOwnerOrderNo(ownerOrderFineDeatailEntity);
         }
-        return ResponseData.success();
     }
 }

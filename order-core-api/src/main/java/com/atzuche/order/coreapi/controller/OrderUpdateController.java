@@ -1,5 +1,6 @@
 package com.atzuche.order.coreapi.controller;
 
+import com.atzuche.order.commons.BindingResultUtil;
 import com.atzuche.order.commons.entity.dto.RentCityAndRiskAccidentReqDTO;
 import com.atzuche.order.coreapi.service.OrderUpdateService;
 import com.autoyol.commons.web.ErrorCode;
@@ -25,13 +26,10 @@ public class OrderUpdateController {
 
     @PostMapping("/rentCityAndRiskAccident")
     public ResponseData<?> rentCityAndRiskAccident(@Valid @RequestBody RentCityAndRiskAccidentReqDTO rentCityAndRiskAccidentReqDTO, BindingResult bindingResult){
-        if (bindingResult.hasErrors()) {
-            Optional<FieldError> error = bindingResult.getFieldErrors().stream().findFirst();
-            return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), error.isPresent() ?
-                    error.get().getDefaultMessage() : ErrorCode.INPUT_ERROR.getText());
-        }
-        ResponseData<?> respData = orderUpdateService.rentCityAndRiskAccident(rentCityAndRiskAccidentReqDTO);
-        return respData;
+        log.info("rentCityAndRiskAccident param is {}",rentCityAndRiskAccidentReqDTO);
+        BindingResultUtil.checkBindingResult(bindingResult);
+        orderUpdateService.rentCityAndRiskAccident(rentCityAndRiskAccidentReqDTO);
+        return ResponseData.success();
     }
 
 }

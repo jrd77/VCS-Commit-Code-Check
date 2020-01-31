@@ -1,5 +1,6 @@
 package com.atzuche.order.coreapi.controller;
 
+import com.atzuche.order.commons.BindingResultUtil;
 import com.atzuche.order.commons.entity.dto.OrderTransferRecordDTO;
 import com.atzuche.order.commons.vo.req.ModifyApplyHandleReq;
 
@@ -56,11 +57,7 @@ public class ModifyOrderController {
 	@PostMapping("/order/modify")
 	public ResponseData<?> modifyOrder(@Valid @RequestBody ModifyOrderAppReqVO modifyOrderAppReq, BindingResult bindingResult) {
 		log.info("修改订单（APP端或H5端）modifyOrderAppReq=[{}]", modifyOrderAppReq);
-		if (bindingResult.hasErrors()) {
-            Optional<FieldError> error = bindingResult.getFieldErrors().stream().findFirst();
-            return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), error.isPresent() ?
-                    error.get().getDefaultMessage() : ErrorCode.INPUT_ERROR.getText());
-        }
+		BindingResultUtil.checkBindingResult(bindingResult);
         // 属性拷贝
         ModifyOrderReq modifyOrderReq = new ModifyOrderReq();
         BeanUtils.copyProperties(modifyOrderAppReq, modifyOrderReq);
@@ -77,11 +74,7 @@ public class ModifyOrderController {
     @PostMapping("/order/modifyconsole")
     public ResponseData<?> modifyOrderForConsole(@Valid @RequestBody ModifyOrderReq modifyOrderReq, BindingResult bindingResult) {
         log.info("修改订单（管理后台）modifyOrderReq=[{}] ", modifyOrderReq);
-        if (bindingResult.hasErrors()) {
-            Optional<FieldError> error = bindingResult.getFieldErrors().stream().findFirst();
-            return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), error.isPresent() ?
-                    error.get().getDefaultMessage() : ErrorCode.INPUT_ERROR.getText());
-        }
+		BindingResultUtil.checkBindingResult(bindingResult);
         // 设置为管理后台修改
         modifyOrderReq.setConsoleFlag(true);
         return modifyOrderService.modifyOrder(modifyOrderReq);
@@ -96,11 +89,8 @@ public class ModifyOrderController {
      */
     @PostMapping("/order/modifyconfirm")
     public ResponseData<?> ownerHandleModifyApplication(@Valid @RequestBody ModifyApplyHandleReq modifyApplyHandleReq, BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            Optional<FieldError> error = bindingResult.getFieldErrors().stream().findFirst();
-            return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), error.isPresent() ?
-                    error.get().getDefaultMessage() : ErrorCode.INPUT_ERROR.getText());
-        }
+		log.info("ownerHandleModifyApplication param is [{}]",modifyApplyHandleReq);
+    	BindingResultUtil.checkBindingResult(bindingResult);
         return modifyOrderOwnerConfirmService.modifyConfirm(modifyApplyHandleReq);
     }
 
@@ -115,11 +105,7 @@ public class ModifyOrderController {
     @PostMapping("/order/transfer")
     public ResponseData<?> transfer(@Valid @RequestBody TransferReq transferReq, BindingResult bindingResult) {
         log.info("换车操作transferReq=[{}] ", transferReq);
-        if (bindingResult.hasErrors()) {
-            Optional<FieldError> error = bindingResult.getFieldErrors().stream().findFirst();
-            return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), error.isPresent() ?
-                    error.get().getDefaultMessage() : ErrorCode.INPUT_ERROR.getText());
-        }
+		BindingResultUtil.checkBindingResult(bindingResult);
 
         String memNo = renterMemberService.getRenterNoByOrderNo(transferReq.getOrderNo());
         transferReq.setMemNo(memNo);
@@ -143,11 +129,7 @@ public class ModifyOrderController {
 	@PostMapping("/order/modifyorderFee")
 	public ResponseData<ModifyOrderCompareVO> modifyOrderFee(@Valid @RequestBody ModifyOrderAppReqVO modifyOrderAppReq, BindingResult bindingResult) {
 		log.info("修改前费用计算modifyOrderAppReq=[{}] ", modifyOrderAppReq);
-		if (bindingResult.hasErrors()) {
-            Optional<FieldError> error = bindingResult.getFieldErrors().stream().findFirst();
-            return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), error.isPresent() ?
-                    error.get().getDefaultMessage() : ErrorCode.INPUT_ERROR.getText());
-        }
+		BindingResultUtil.checkBindingResult(bindingResult);
 		// 属性拷贝
 		ModifyOrderReq modifyOrderReq = new ModifyOrderReq();
 		BeanUtils.copyProperties(modifyOrderAppReq, modifyOrderReq);
