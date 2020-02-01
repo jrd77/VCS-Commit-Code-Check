@@ -244,7 +244,7 @@ public class OrderCostDetailService {
 		
 		for (CommUseDriverInfoDTO commUseDriverInfoDTO : listCommUseDriverInfoDTO) {
 			CommUseDriverInfoDTO dto = new CommUseDriverInfoDTO();
-			BeanUtils.copyProperties(dto, commUseDriverInfoDTO);
+			BeanUtils.copyProperties(commUseDriverInfoDTO,dto);
 			//计算费用
 			String amt = "0";
 			RenterOrderCostDetailEntity extraDriverInsureAmtEntity = renterOrderCostCombineService.getExtraDriverInsureAmtEntity(extraDriverDTO);
@@ -774,7 +774,7 @@ public class OrderCostDetailService {
 
 
         OrderDTO orderDTO = new OrderDTO();
-        BeanUtils.copyProperties(orderDTO,orderEntity);
+        BeanUtils.copyProperties(orderEntity,orderDTO);
         renterRentDetailDTO.setReqTimeStr(orderDTO.getReqTime()!=null? LocalDateTimeUtils.localdateToString(orderDTO.getReqTime(), GlobalConstant.FORMAT_DATE_STR1):null);
         renterRentDetailDTO.setRevertTimeStr(orderDTO.getExpRevertTime()!=null? LocalDateTimeUtils.localdateToString(orderDTO.getExpRevertTime(), GlobalConstant.FORMAT_DATE_STR1):null);
         renterRentDetailDTO.setRentTimeStr(orderDTO.getExpRentTime()!=null?LocalDateTimeUtils.localdateToString(orderDTO.getExpRentTime(), GlobalConstant.FORMAT_DATE_STR1):null);

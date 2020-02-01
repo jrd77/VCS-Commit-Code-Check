@@ -9,6 +9,7 @@ import java.util.List;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 
 import com.atzuche.order.cashieraccount.entity.CashierEntity;
@@ -38,7 +39,7 @@ public class PaymentCashierService {
 		for (CashierEntity cashierEntity : lst) {
 			CashierResVO vo = new CashierResVO();
 			//数据转换
-			BeanUtils.copyProperties(vo, cashierEntity);
+			BeanUtils.copyProperties(cashierEntity,vo);
 			lstRet.add(vo);
 		}
 		return lstRet;

@@ -83,7 +83,7 @@ public class ModifyOrderQueryListService {
 		if(fineLst != null) {
 			fineLst.stream().forEach(x->{
 				RenterOrderFineDeatailResVO real = new RenterOrderFineDeatailResVO();
-				BeanUtils.copyProperties(real,x);
+				BeanUtils.copyProperties(x,real);
         		fineLstReal.add(real);
             });
         }
@@ -98,10 +98,10 @@ public class ModifyOrderQueryListService {
         RenterOrderDeliveryResVO renterOrderDeliveryReturnReal = new RenterOrderDeliveryResVO();
         
         if(renterOrderDeliveryGet != null) {
-        	BeanUtils.copyProperties(renterOrderDeliveryGetReal, renterOrderDeliveryGet);
+        	BeanUtils.copyProperties(renterOrderDeliveryGet,renterOrderDeliveryGetReal);
         }
         if(renterOrderDeliveryReturn != null) {
-        	BeanUtils.copyProperties(renterOrderDeliveryReturnReal, renterOrderDeliveryReturn);
+        	BeanUtils.copyProperties(renterOrderDeliveryReturn,renterOrderDeliveryReturnReal);
         }
         resVo.setRenterOrderDeliveryGet(renterOrderDeliveryGetReal);
         resVo.setRenterOrderDeliveryReturn(renterOrderDeliveryReturnReal);
@@ -113,7 +113,7 @@ public class ModifyOrderQueryListService {
         if(renterOrderCostDetailList != null) {
         	renterOrderCostDetailList.stream().forEach(x->{
         		RenterOrderCostDetailResVO real = new RenterOrderCostDetailResVO();
-        		BeanUtils.copyProperties(real, x);
+        		BeanUtils.copyProperties( x,real);
         		renterOrderCostDetailListReal.add(real);
             });
         }
@@ -125,7 +125,7 @@ public class ModifyOrderQueryListService {
         	subsidyLst.stream().forEach(x->{
         		RenterOrderSubsidyDetailResVO real = new RenterOrderSubsidyDetailResVO();
 
-        		BeanUtils.copyProperties(real, x);
+        		BeanUtils.copyProperties(x,real);
 
                 subsidyLstReal.add(real);
             });
@@ -180,7 +180,7 @@ public class ModifyOrderQueryListService {
 			rentLst.stream().forEach(x->{
 				RenterOrderResVO real = new RenterOrderResVO();
 
-				BeanUtils.copyProperties(real, x);
+				BeanUtils.copyProperties(x,real);
 
         		rentLstReal.add(real);
             });
@@ -191,7 +191,7 @@ public class ModifyOrderQueryListService {
         AccountRenterWZDepositResVO wzVo =  accountRenterWzDepositService.getAccountRenterWZDeposit(orderNo, memNo);
         com.atzuche.order.commons.vo.res.account.AccountRenterWZDepositResVO wzVoReal = new com.atzuche.order.commons.vo.res.account.AccountRenterWZDepositResVO();
         if(wzVo != null) {
-        	BeanUtils.copyProperties(wzVoReal, wzVo);
+        	BeanUtils.copyProperties(wzVo,wzVoReal);
         }else {
         	wzVoReal.setYingshouDeposit(0);
         }
@@ -201,7 +201,7 @@ public class ModifyOrderQueryListService {
         AccountRenterDepositResVO rentVo = accountRenterDepositService.getAccountRenterDepositEntity(orderNo, memNo);
         com.atzuche.order.commons.vo.res.account.AccountRenterDepositResVO rentVoReal = new com.atzuche.order.commons.vo.res.account.AccountRenterDepositResVO();
         if(rentVo != null) {
-        	BeanUtils.copyProperties(rentVoReal, rentVo);
+        	BeanUtils.copyProperties(rentVo,rentVoReal);
         }else {
         	rentVoReal.setYingfuDepositAmt(0);
         }
@@ -213,12 +213,12 @@ public class ModifyOrderQueryListService {
         for (AccountRenterCostDetailEntity accountRenterCostDetailEntity : lstCostDetail) {
         	if(RenterCashCodeEnum.WALLET_DEDUCT.equals(accountRenterCostDetailEntity.getSourceCode())) {
         		walletCostDetail = new AccountRenterCostDetailEntity();
-        		BeanUtils.copyProperties(walletCostDetail, accountRenterCostDetailEntity);
+        		BeanUtils.copyProperties(accountRenterCostDetailEntity,walletCostDetail);
         	}
 		}
         AccountRenterCostDetailResVO walletCostDetailReal = new AccountRenterCostDetailResVO();
         if(walletCostDetail != null) {
-        	BeanUtils.copyProperties(walletCostDetailReal, walletCostDetail);
+        	BeanUtils.copyProperties(walletCostDetail,walletCostDetailReal);
         }else {
         	walletCostDetailReal.setAmt(0); //默认值。
         }
