@@ -23,6 +23,7 @@ import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.atzuche.order.renterorder.service.OrderCouponService;
 import com.atzuche.order.renterorder.service.RenterOrderService;
 import com.atzuche.order.settle.service.OrderSettleService;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,6 +69,8 @@ public class OwnerRefuseOrderService {
     OrderSettleService orderSettleService;
     @Autowired
     OrderFlowService orderFlowService;
+    @Autowired
+    RefuseOrderCheckService refuseOrderCheckService;
 
 
 
@@ -77,9 +80,8 @@ public class OwnerRefuseOrderService {
      * @param reqVO 请求参数
      */
     public void refuse(RefuseOrderReqVO reqVO) {
-        //TODO:车主拒绝前置校验
-
-
+        //车主拒绝前置校验
+        refuseOrderCheckService.checkOwnerAgreeOrRefuseOrder(reqVO.getOrderNo(), StringUtils.isNotBlank(reqVO.getOperatorName()));
         //判断是都进入调度
         //获取订单信息
         OrderEntity orderEntity = orderService.getOrderEntity(reqVO.getOrderNo());

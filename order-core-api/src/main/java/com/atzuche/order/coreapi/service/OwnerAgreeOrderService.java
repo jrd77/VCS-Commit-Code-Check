@@ -8,6 +8,7 @@ import com.atzuche.order.parentorder.dto.OrderStatusDTO;
 import com.atzuche.order.parentorder.service.OrderStatusService;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.atzuche.order.renterorder.service.RenterOrderService;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +28,8 @@ public class OwnerAgreeOrderService {
 
     private static Logger logger = LoggerFactory.getLogger(OwnerAgreeOrderService.class);
 
+    @Autowired
+    RefuseOrderCheckService refuseOrderCheckService;
 
     @Autowired
     OrderStatusService orderStatusService;
@@ -45,8 +48,8 @@ public class OwnerAgreeOrderService {
      */
     @Transactional(rollbackFor = Exception.class)
     public void agree(AgreeOrderReqVO reqVO) {
-        //TODO:车主同意前置校验
-
+        //车主同意前置校验
+        refuseOrderCheckService.checkOwnerAgreeOrRefuseOrder(reqVO.getOrderNo(), StringUtils.isNotBlank(reqVO.getOperatorName()));
         //变更订单状态
         OrderStatusDTO orderStatusDTO = new OrderStatusDTO();
         orderStatusDTO.setOrderNo(reqVO.getOrderNo());
@@ -69,6 +72,8 @@ public class OwnerAgreeOrderService {
         //消息发送
         //TODO:发送车主同意事件
     }
+
+
 
 
 }
