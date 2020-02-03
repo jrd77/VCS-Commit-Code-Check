@@ -139,8 +139,8 @@ public class OwnerRefuseOrderService {
         ownerOrderService.updateChildStatusByOrderNo(reqVO.getOrderNo(), OwnerChildStatusEnum.END.getCode());
         //取消信息处理(order_cancel_reason)
         orderCancelReasonService.addOrderCancelReasonRecord(buildOrderCancelReasonEntity(reqVO.getOrderNo(), ownerOrderEntity.getOwnerOrderNo()));
-        //扣除库存
-        stockService.releaseCarStock(reqVO.getOrderNo(), goodsDetail.getCarNo());
+        //扣除库存(车主取消/拒绝时不释放库存)
+        //stockService.releaseCarStock(reqVO.getOrderNo(), goodsDetail.getCarNo());
 
         //TODO:发送车主拒绝事件
 
