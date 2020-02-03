@@ -175,10 +175,10 @@ public class DeliveryCarInfoPriceService {
         }
         //行驶里程
         try {
-            String ownerDrivingKM = String.valueOf(Math.abs(Integer.valueOf(ownerGetAndReturnCarDTO.getGetKM())) - Math.abs(Integer.valueOf(ownerGetAndReturnCarDTO.getReturnKM())));
+            String ownerDrivingKM = String.valueOf(Math.abs(Integer.valueOf(ownerGetAndReturnCarDTO.getReturnKM())) - Math.abs(Integer.valueOf(ownerGetAndReturnCarDTO.getGetKM())));
             int oilDifference = Math.abs(Integer.valueOf(ownerGetAndReturnCarDTO.getGetCarOil())) - Math.abs(Integer.valueOf(ownerGetAndReturnCarDTO.getReturnCarOil()));
             ownerGetAndReturnCarDTO.setDrivingKM(ownerDrivingKM);
-            ownerGetAndReturnCarDTO.setOilDifference(String.valueOf(oilDifference));
+            ownerGetAndReturnCarDTO.setOilDifference(String.valueOf(oilDifference)+"L");
             ownerGetAndReturnCarDTO.setOilDifferenceCrash(String.valueOf(MathUtil.mul(oilDifference,getOilPriceByCityCodeAndType(Integer.valueOf(cityCode), carEngineType))));
         }catch (Exception e)
         {
