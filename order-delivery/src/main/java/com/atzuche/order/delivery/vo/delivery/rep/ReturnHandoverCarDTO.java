@@ -14,12 +14,24 @@ public class ReturnHandoverCarDTO {
 
     @AutoDocProperty("车主默认取车地点")
     public String ownDefaultReturnCarAddr;
+    @AutoDocProperty("车主默认取车地点纬度")
+    public String ownDefaultReturnCarLat;
+    @AutoDocProperty("车主默认取车地点经度")
+    public String ownDefaultReturnCarLng;
     @AutoDocProperty("租客实际还车地址")
     public String renterRealReturnAddr;
+    @AutoDocProperty("租客实际还车地址经度")
+    public String renterRealReturnLat;
+    @AutoDocProperty("租客实际还车地址维度")
+    public String renterRealReturnLng;
     @AutoDocProperty("租客实际送车地址备注")
     public String renterRealGetRemark;
     @AutoDocProperty("车主实际收车地址")
     public String ownerRealGetAddr;
+    @AutoDocProperty("车主实际收车地址经度")
+    public String ownerRealGetLat;
+    @AutoDocProperty("车主实际收车地址纬度")
+    public String ownerRealGetLng;
     @AutoDocProperty("车主实际取车地址备注")
     public String ownerRealGetAddrReamrk;
     @AutoDocProperty("预计延后还车时间")
