@@ -1,6 +1,7 @@
 package com.atzuche.order.coreapi.controller;
 
 import com.alibaba.fastjson.JSON;
+import com.atzuche.order.commons.BindingResultUtil;
 import com.atzuche.order.commons.LocalDateTimeUtils;
 import com.atzuche.order.commons.OrderException;
 import com.atzuche.order.commons.vo.req.AdminOrderReqVO;
@@ -54,12 +55,12 @@ public class SubmitOrderController {
     @PostMapping("/normal/req")
     public ResponseData<OrderResVO> submitOrder(@Valid @RequestBody NormalOrderReqVO normalOrderReqVO, BindingResult bindingResult) throws Exception {
         LOGGER.info("Submit order.param is,normalOrderReqVO:[{}]", JSON.toJSONString(normalOrderReqVO));
-        if (bindingResult.hasErrors()) {
-            Optional<FieldError> error = bindingResult.getFieldErrors().stream().findFirst();
-            return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), error.isPresent() ?
-                    error.get().getDefaultMessage() : ErrorCode.INPUT_ERROR.getText());
-        }
+        BindingResultUtil.checkBindingResult(bindingResult);
 
+        String memNo = normalOrderReqVO.getMemNo();
+        if (StringUtils.isBlank(memNo)) {
+            return new ResponseData<>(ErrorCode.NEED_LOGIN.getCode(), ErrorCode.NEED_LOGIN.getText());
+        }
         OrderResVO orderResVO = null;
         try{
             BeanCopier beanCopier = BeanCopier.create(NormalOrderReqVO.class, OrderReqVO.class, false);
@@ -128,11 +129,7 @@ public class SubmitOrderController {
     public ResponseData<OrderResVO> submitOrder(@Valid @RequestBody AdminOrderReqVO adminOrderReqVO,
                                                 BindingResult bindingResult) {
         LOGGER.info("Submit order.param is,adminOrderReqVO:[{}]", JSON.toJSONString(adminOrderReqVO));
-        if (bindingResult.hasErrors()) {
-            Optional<FieldError> error = bindingResult.getFieldErrors().stream().findFirst();
-            return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), error.isPresent() ?
-                    error.get().getDefaultMessage() : ErrorCode.INPUT_ERROR.getText());
-        }
+        BindingResultUtil.checkBindingResult(bindingResult);
         String memNo = adminOrderReqVO.getMemNo();
         if (StringUtils.isBlank(memNo)) {
             return new ResponseData<>(ErrorCode.NEED_LOGIN.getCode(), ErrorCode.NEED_LOGIN.getText());

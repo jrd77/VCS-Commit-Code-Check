@@ -1,6 +1,7 @@
 package com.atzuche.order.coreapi.controller;
 
 import com.alibaba.fastjson.JSON;
+import com.atzuche.order.commons.BindingResultUtil;
 import com.atzuche.order.commons.vo.req.AgreeOrderReqVO;
 import com.atzuche.order.commons.vo.req.RefuseOrderReqVO;
 import com.atzuche.order.commons.vo.req.ReturnCarReqVO;
@@ -54,11 +55,7 @@ public class RefuseOrderController {
     public ResponseData<?> refuseOrder(@Valid @RequestBody RefuseOrderReqVO reqVO, BindingResult bindingResult) {
 
         LOGGER.info("Refuse order.param is,reqVO:[{}]", JSON.toJSONString(reqVO));
-        if (bindingResult.hasErrors()) {
-            Optional<FieldError> error = bindingResult.getFieldErrors().stream().findFirst();
-            return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), error.isPresent() ?
-                    error.get().getDefaultMessage() : ErrorCode.INPUT_ERROR.getText());
-        }
+        BindingResultUtil.checkBindingResult(bindingResult);
         ownerRefuseOrderService.refuse(reqVO);
         return ResponseData.success();
     }
@@ -69,11 +66,7 @@ public class RefuseOrderController {
     public ResponseData<?> agreeOrder(@Valid @RequestBody AgreeOrderReqVO reqVO, BindingResult bindingResult) {
 
         LOGGER.info("Agree order.param is,reqVO:[{}]", JSON.toJSONString(reqVO));
-        if (bindingResult.hasErrors()) {
-            Optional<FieldError> error = bindingResult.getFieldErrors().stream().findFirst();
-            return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), error.isPresent() ?
-                    error.get().getDefaultMessage() : ErrorCode.INPUT_ERROR.getText());
-        }
+        BindingResultUtil.checkBindingResult(bindingResult);
         ownerAgreeOrderService.agree(reqVO);
         return ResponseData.success();
     }
@@ -84,11 +77,7 @@ public class RefuseOrderController {
     public ResponseData<?> returnCar(@Valid @RequestBody ReturnCarReqVO reqVO, BindingResult bindingResult) {
 
         LOGGER.info("Owner return car.param is,reqVO:[{}]", JSON.toJSONString(reqVO));
-        if (bindingResult.hasErrors()) {
-            Optional<FieldError> error = bindingResult.getFieldErrors().stream().findFirst();
-            return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), error.isPresent() ?
-                    error.get().getDefaultMessage() : ErrorCode.INPUT_ERROR.getText());
-        }
+        BindingResultUtil.checkBindingResult(bindingResult);
         ownerReturnCarService.returnCar(reqVO);
         return ResponseData.success();
     }
