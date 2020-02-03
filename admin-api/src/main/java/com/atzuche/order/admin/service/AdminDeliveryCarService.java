@@ -7,6 +7,7 @@ import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
 import com.atzuche.order.commons.vo.req.handover.req.HandoverCarInfoReqDTO;
 import com.atzuche.order.commons.vo.req.handover.req.HandoverCarInfoReqVO;
 import com.atzuche.order.delivery.common.DeliveryErrorCode;
+import com.atzuche.order.delivery.entity.RenterHandoverCarInfoEntity;
 import com.atzuche.order.delivery.entity.RenterOrderDeliveryEntity;
 import com.atzuche.order.delivery.enums.CarTypeEnum;
 import com.atzuche.order.delivery.enums.OilCostTypeEnum;
@@ -14,6 +15,7 @@ import com.atzuche.order.delivery.exception.DeliveryOrderException;
 import com.atzuche.order.delivery.service.RenterOrderDeliveryService;
 import com.atzuche.order.delivery.service.delivery.DeliveryCarInfoService;
 import com.atzuche.order.delivery.service.handover.HandoverCarInfoService;
+import com.atzuche.order.delivery.service.handover.RenterHandoverCarService;
 import com.atzuche.order.delivery.vo.delivery.rep.*;
 import com.atzuche.order.delivery.vo.delivery.req.CarConditionPhotoUploadVO;
 import com.atzuche.order.delivery.vo.delivery.req.DeliveryCarRepVO;
@@ -42,6 +44,8 @@ public class AdminDeliveryCarService {
     @Autowired
     HandoverCarInfoService handoverCarInfoService;
     @Autowired
+    RenterHandoverCarService renterHandoverCarService;
+    @Autowired
     RenterCommodityService renterCommodityService;
     @Autowired
     RenterOrderDeliveryService renterOrderDeliveryService;
@@ -58,7 +62,7 @@ public class AdminDeliveryCarService {
     public DeliveryCarVO findDeliveryListByOrderNo(DeliveryCarRepVO deliveryCarDTO) {
         logger.info("入参deliveryCarDTO：[{}]", deliveryCarDTO.toString());
         // 获取租客商品信息
-        RenterOrderDeliveryEntity renterOrderDeliveryEntity = renterOrderDeliveryService.findRenterOrderByrOrderNo(deliveryCarDTO.getOrderNo(),1);
+        RenterHandoverCarInfoEntity renterOrderDeliveryEntity = renterHandoverCarService.selectObjectByOrderNo(deliveryCarDTO.getOrderNo(),1);
         if(null == renterOrderDeliveryEntity)
         {
             throw new DeliveryOrderException(DeliveryErrorCode.NO_DELIVERY_INFO);

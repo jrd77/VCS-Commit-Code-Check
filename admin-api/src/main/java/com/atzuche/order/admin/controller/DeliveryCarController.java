@@ -1,6 +1,7 @@
 package com.atzuche.order.admin.controller;
 
 import com.atzuche.order.admin.service.AdminDeliveryCarService;
+import com.atzuche.order.delivery.exception.DeliveryOrderException;
 import com.atzuche.order.delivery.vo.delivery.rep.DeliveryCarVO;
 import com.atzuche.order.delivery.vo.delivery.req.CarConditionPhotoUploadVO;
 import com.atzuche.order.delivery.vo.delivery.req.DeliveryCarRepVO;
@@ -41,7 +42,7 @@ public class DeliveryCarController extends BaseController {
     @AutoDocGroup(group = "管理后台取还车配送服务信息")
     @AutoDocMethod(description = "取还车配送", value = "取还车配送",response = DeliveryCarVO.class)
     @PostMapping("/delivery/list")
-    public ResponseData<?> findDeliveryListByOrderNo(@RequestBody DeliveryCarRepVO deliveryCarDTO) {
+    public ResponseData<DeliveryCarVO> findDeliveryListByOrderNo(@RequestBody DeliveryCarRepVO deliveryCarDTO) {
         if (null == deliveryCarDTO || StringUtils.isBlank(deliveryCarDTO.getOrderNo())) {
             return ResponseData.createErrorCodeResponse(ErrorCode.ORDER_NO_PARAM_ERROR.getCode(), "租客订单编号为空");
         }
@@ -51,6 +52,8 @@ public class DeliveryCarController extends BaseController {
                 return ResponseData.success(deliveryCarRepVO);
             }
             return ResponseData.success();
+        } catch (DeliveryOrderException ex) {
+            return ResponseData.createErrorCodeResponse(ex.getErrorCode(), ex.getMessage());
         } catch (Exception e) {
             log.error("取还车配送接口出现异常", e);
             Cat.logError("取还车配送接口出现异常", e);
