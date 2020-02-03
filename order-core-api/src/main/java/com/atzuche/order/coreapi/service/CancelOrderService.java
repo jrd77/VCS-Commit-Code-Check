@@ -6,7 +6,6 @@ import com.atzuche.order.commons.vo.req.CancelOrderReqVO;
 import com.atzuche.order.coreapi.common.conver.OrderCommonConver;
 import com.atzuche.order.coreapi.entity.dto.CancelOrderResDTO;
 import com.atzuche.order.delivery.service.delivery.DeliveryCarService;
-import com.atzuche.order.delivery.vo.delivery.CancelFlowOrderDTO;
 import com.atzuche.order.delivery.vo.delivery.CancelOrderDeliveryVO;
 import com.atzuche.order.settle.service.OrderSettleService;
 import org.apache.commons.lang3.StringUtils;
@@ -76,7 +75,7 @@ public class CancelOrderService {
         }
 
         //扣库存
-        if (null != res) {
+        if (null != res && StringUtils.equals(MemRoleEnum.RENTER.getCode(), cancelOrderReqVO.getMemRole())) {
             stockService.releaseCarStock(cancelOrderReqVO.getOrderNo(), res.getCarNo());
         }
 

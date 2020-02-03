@@ -2,7 +2,6 @@ package com.atzuche.order.coreapi.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.atzuche.order.car.CarProxyService;
-import com.atzuche.order.commons.BindingResultUtil;
 import com.atzuche.order.commons.LocalDateTimeUtils;
 import com.atzuche.order.commons.OrderException;
 import com.atzuche.order.commons.OrderReqContext;
@@ -40,7 +39,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
-import java.time.LocalDateTime;
 import java.util.Optional;
 
 /**
@@ -80,7 +78,11 @@ public class SubmitOrderController {
     @PostMapping("/normal/req")
     public ResponseData<OrderResVO> submitOrder(@Valid @RequestBody NormalOrderReqVO normalOrderReqVO, BindingResult bindingResult) throws Exception {
         LOGGER.info("Submit order.param is,normalOrderReqVO:[{}]", JSON.toJSONString(normalOrderReqVO));
-        BindingResultUtil.checkBindingResult(bindingResult);
+        if (bindingResult.hasErrors()) {
+            Optional<FieldError> error = bindingResult.getFieldErrors().stream().findFirst();
+            return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), error.isPresent() ?
+                    error.get().getDefaultMessage() : ErrorCode.INPUT_ERROR.getText());
+        }
 
         OrderResVO orderResVO = null;
 
@@ -95,14 +97,9 @@ public class SubmitOrderController {
                 LocalDateTimeUtils.DEFAULT_PATTERN));
 
         OrderReqContext context = buildOrderReqContext(orderReqVO);
-
         orderFilterChain.validate(context);
-
-
         try{
-
             orderResVO = submitOrderService.submitOrder(context);
-
             OrderRecordEntity orderRecordEntity = new OrderRecordEntity();
             orderRecordEntity.setErrorCode(ErrorCode.SUCCESS.getCode());
             orderRecordEntity.setErrorTxt(ErrorCode.SUCCESS.getText());
@@ -177,9 +174,7 @@ public class SubmitOrderController {
                 LocalDateTimeUtils.DEFAULT_PATTERN));
 
         OrderReqContext context = buildOrderReqContext(orderReqVO);
-
         orderFilterChain.validate(context);
-
         try{
             orderResVO = submitOrderService.submitOrder(context);
             OrderRecordEntity orderRecordEntity = new OrderRecordEntity();

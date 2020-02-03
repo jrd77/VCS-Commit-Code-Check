@@ -58,7 +58,6 @@ import com.autoyol.car.api.model.dto.LocationDTO;
 import com.autoyol.car.api.model.dto.OrderInfoDTO;
 import com.autoyol.car.api.model.enums.OrderOperationTypeEnum;
 import com.autoyol.commons.utils.DateUtil;
-import com.autoyol.event.rabbit.neworder.OrderCreateFailMq;
 import com.autoyol.event.rabbit.neworder.OrderCreateMq;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
