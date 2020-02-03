@@ -8,6 +8,8 @@ import com.atzuche.order.parentorder.dto.OrderStatusDTO;
 import com.atzuche.order.parentorder.service.OrderStatusService;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.atzuche.order.renterorder.service.RenterOrderService;
+import com.autoyol.car.api.model.dto.OrderInfoDTO;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,11 +54,6 @@ public class OwnerAgreeOrderService {
      */
     @Transactional(rollbackFor = Exception.class)
     public void agree(AgreeOrderReqVO reqVO) {
-        //TODO:车主同意前置校验
-
-        String orderNo = reqVO.getOrderNo();
-
-
         //车主同意前置校验
         refuseOrderCheckService.checkOwnerAgreeOrRefuseOrder(reqVO.getOrderNo(), StringUtils.isNotBlank(reqVO.getOperatorName()));
         //变更订单状态
