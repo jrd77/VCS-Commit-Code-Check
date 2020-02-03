@@ -9,7 +9,7 @@ import org.hibernate.validator.constraints.NotBlank;
  * @author pengcheng.fu
  * @date 2020/1/15 19:45
  */
-public class AdminOrderCancelReqVO extends BaseVO {
+public class AdminOrderCancelReqVO  {
 
     private static final long serialVersionUID = 2111449941876253623L;
 

@@ -27,6 +27,10 @@ public class OwnerGoodsService{
     @Autowired
     private OwnerGoodsPriceDetailMapper ownerGoodsPriceDetailMapper;
 
+    /**
+     * 保存车主端的商品信息
+     * @param ownerGoodsDetailDTO
+     */
     public void save(OwnerGoodsDetailDTO ownerGoodsDetailDTO){
 
         OwnerGoodsEntity goodsEntity = new OwnerGoodsEntity();

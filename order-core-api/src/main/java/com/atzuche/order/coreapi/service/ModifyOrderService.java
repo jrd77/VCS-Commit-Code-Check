@@ -761,7 +761,7 @@ public class ModifyOrderService {
 		List<RenterOrderSubsidyDetailDTO> subsidyList = getRenterSubsidyList(modifyOrderDTO, renterOrderCostReqDTO, modifyOrderDTO.getRenterSubsidyList(), initCostList, initSubsidyList);
 		renterOrderCostReqDTO.setSubsidyOutList(subsidyList);
 		// 获取计算好的费用信息
-		RenterOrderCostRespDTO renterOrderCostRespDTO = renterOrderCalCostService.getOrderCostAndDeailList(renterOrderCostReqDTO);
+		RenterOrderCostRespDTO renterOrderCostRespDTO = renterOrderCalCostService.calcBasicRenterOrderCostAndDeailList(renterOrderCostReqDTO);
 		renterOrderCostRespDTO.setOrderNo(modifyOrderDTO.getOrderNo());
 		renterOrderCostRespDTO.setRenterOrderNo(modifyOrderDTO.getRenterOrderNo());
 		renterOrderCostRespDTO.setMemNo(modifyOrderDTO.getMemNo());

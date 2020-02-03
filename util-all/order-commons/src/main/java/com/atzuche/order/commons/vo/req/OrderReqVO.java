@@ -205,6 +205,15 @@ public class OrderReqVO extends BaseVO {
     @AutoDocProperty(value = "限时红包面额(管理后台)")
     private String reductiAmt;
 
+    private LocalDateTime reqTime;
+
+    public LocalDateTime getReqTime() {
+        return reqTime;
+    }
+
+    public void setReqTime(LocalDateTime reqTime) {
+        this.reqTime = reqTime;
+    }
 
     public String getReductiAmt() {
         return reductiAmt;

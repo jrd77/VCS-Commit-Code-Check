@@ -78,12 +78,10 @@ public class RenterOrderCalCostService {
     private AccountRenterCostCoinService accountRenterCostCoinService;
 
     /**
-     * 获取费用项和费用明细列表
+     * 计算租客订单的基础费用项和费用明细列表，不包括各项减免
      *
-     * @author ZhangBin
-     * @date 2019/12/24 15:21
      **/
-    public RenterOrderCostRespDTO getOrderCostAndDeailList(RenterOrderCostReqDTO renterOrderCostReqDTO) {
+    public RenterOrderCostRespDTO calcBasicRenterOrderCostAndDeailList(RenterOrderCostReqDTO renterOrderCostReqDTO) {
 
         LOGGER.info("租客费用-费用聚合开始renterOrderCostReqDTO=[{}]", JSON.toJSONString(renterOrderCostReqDTO));
         CostBaseDTO costBaseDTO = renterOrderCostReqDTO.getCostBaseDTO();
