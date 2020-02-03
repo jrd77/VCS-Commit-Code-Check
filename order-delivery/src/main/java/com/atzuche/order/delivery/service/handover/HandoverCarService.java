@@ -246,11 +246,13 @@ public class HandoverCarService {
      * @return
      */
     public Boolean isReturnCar(String orderNo) {
+        boolean result = false;
         RenterHandoverCarInfoEntity renterHandoverCarInfoEntity = renterHandoverCarService.selectObjectByOrderNo(orderNo, 4);
         if (Objects.isNull(renterHandoverCarInfoEntity) || StringUtils.isBlank(renterHandoverCarInfoEntity.getMsgId())) {
-            return false;
+            return result;
         }
-        return true;
+        result = true;
+        return result;
     }
 
 

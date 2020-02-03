@@ -6,8 +6,11 @@ import com.atzuche.order.commons.entity.dto.GetReturnCarOverCostReqDto;
 import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
 import com.atzuche.order.commons.vo.req.handover.req.HandoverCarInfoReqDTO;
 import com.atzuche.order.commons.vo.req.handover.req.HandoverCarInfoReqVO;
+import com.atzuche.order.delivery.common.DeliveryErrorCode;
 import com.atzuche.order.delivery.entity.RenterOrderDeliveryEntity;
 import com.atzuche.order.delivery.enums.CarTypeEnum;
+import com.atzuche.order.delivery.enums.OilCostTypeEnum;
+import com.atzuche.order.delivery.exception.DeliveryOrderException;
 import com.atzuche.order.delivery.service.RenterOrderDeliveryService;
 import com.atzuche.order.delivery.service.delivery.DeliveryCarInfoService;
 import com.atzuche.order.delivery.service.handover.HandoverCarInfoService;
@@ -56,10 +59,15 @@ public class AdminDeliveryCarService {
         logger.info("入参deliveryCarDTO：[{}]", deliveryCarDTO.toString());
         // 获取租客商品信息
         RenterOrderDeliveryEntity renterOrderDeliveryEntity = renterOrderDeliveryService.findRenterOrderByrOrderNo(deliveryCarDTO.getOrderNo(),1);
+        if(null == renterOrderDeliveryEntity)
+        {
+            throw new DeliveryOrderException(DeliveryErrorCode.NO_DELIVERY_INFO);
+        }
         RenterGoodsDetailDTO renterGoodsDetailDTO = renterCommodityService.getRenterGoodsDetail(renterOrderDeliveryEntity.getRenterOrderNo(), false);
         OwnerGetAndReturnCarDTO ownerGetAndReturnCarDTO = OwnerGetAndReturnCarDTO.builder().build();
-        ownerGetAndReturnCarDTO.setRanLiao(String.valueOf(renterGoodsDetailDTO.getCarEngineType()));
-        ownerGetAndReturnCarDTO.setDayKM(String.valueOf(renterGoodsDetailDTO.getCarDayMileage().toString()));
+        ownerGetAndReturnCarDTO.setRanLiao(String.valueOf(OilCostTypeEnum.getOilCostType(renterGoodsDetailDTO.getCarEngineType())));
+        String daykM = renterGoodsDetailDTO.getCarDayMileage().intValue() == 0 ? "不限" :String.valueOf(renterGoodsDetailDTO.getCarDayMileage());
+        ownerGetAndReturnCarDTO.setDayKM(daykM);
         ownerGetAndReturnCarDTO.setOilContainer(String.valueOf(renterGoodsDetailDTO.getCarOilVolume()));
         boolean isEscrowCar = CarTypeEnum.isCarType(renterGoodsDetailDTO.getCarType());
         int carType = renterGoodsDetailDTO.getCarType();
