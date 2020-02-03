@@ -62,7 +62,7 @@ public class AdminDeliveryCarService {
     public DeliveryCarVO findDeliveryListByOrderNo(DeliveryCarRepVO deliveryCarDTO) {
         logger.info("入参deliveryCarDTO：[{}]", deliveryCarDTO.toString());
         // 获取租客商品信息
-        RenterHandoverCarInfoEntity renterOrderDeliveryEntity = renterHandoverCarService.selectObjectByOrderNo(deliveryCarDTO.getOrderNo(),1);
+        RenterHandoverCarInfoEntity renterOrderDeliveryEntity = renterHandoverCarService.selectObjectByOrderNo(deliveryCarDTO.getOrderNo(),4);
         if(null == renterOrderDeliveryEntity)
         {
             throw new DeliveryOrderException(DeliveryErrorCode.NO_DELIVERY_INFO);
@@ -121,7 +121,11 @@ public class AdminDeliveryCarService {
             deliveryReqDTO.setOwnerRealGetAddrReamrk(getHandoverCarDTO.getOwnRealGetRemark());
             deliveryReqDTO.setRenterRealGetAddrReamrk(getHandoverCarDTO.getRenterRealGetAddrReamrk());
             deliveryReqDTO.setRenterGetReturnAddr(getHandoverCarDTO.getRenterRealGetAddr());
-            deliveryReqDTO.setOwnerGetReturnAddr(getHandoverCarDTO.getOwnRealReturnAddr() );
+            deliveryReqDTO.setOwnerGetReturnAddr(getHandoverCarDTO.getOwnRealReturnAddr());
+            deliveryReqDTO.setOwnerGetReturnLat(getHandoverCarDTO.getOwnRealReturnLat());
+            deliveryReqDTO.setOwnerGetReturnLng(getHandoverCarDTO.getOwnRealReturnLng());
+            deliveryReqDTO.setRenterGetReturnLat(getHandoverCarDTO.getRenterRealGetLat());
+            deliveryReqDTO.setRenterGetReturnLng(getHandoverCarDTO.getRenterRealGetLng());
             deliveryReqVO.setGetDeliveryReqDTO(deliveryReqDTO);
         }
         if (Objects.nonNull(returnHandoverCarDTO)) {
@@ -132,6 +136,10 @@ public class AdminDeliveryCarService {
             renterDeliveryReqDTO.setOwnerRealGetAddrReamrk(returnHandoverCarDTO.getOwnerRealGetAddrReamrk());
             renterDeliveryReqDTO.setRenterGetReturnAddr(returnHandoverCarDTO.getRenterRealReturnAddr());
             renterDeliveryReqDTO.setOwnerGetReturnAddr(returnHandoverCarDTO.getOwnerRealGetAddr());
+            renterDeliveryReqDTO.setOwnerGetReturnLat(returnHandoverCarDTO.getOwnerRealGetLat());
+            renterDeliveryReqDTO.setOwnerGetReturnLng(returnHandoverCarDTO.getOwnerRealGetLng());
+            renterDeliveryReqDTO.setRenterGetReturnLat(returnHandoverCarDTO.getRenterRealReturnLat());
+            renterDeliveryReqDTO.setRenterGetReturnLng(returnHandoverCarDTO.getRenterRealReturnLng());
             deliveryReqVO.setRenterDeliveryReqDTO(renterDeliveryReqDTO);
         }
         return deliveryReqVO;
@@ -195,6 +203,8 @@ public class AdminDeliveryCarService {
         costBaseDTO.setOrderNo(renterOrderDeliveryEntity.getOrderNo());
         costBaseDTO.setRenterOrderNo(renterOrderDeliveryEntity.getRenterOrderNo());
         getReturnCarOverCostReqDto.setCostBaseDTO(costBaseDTO);
+        getReturnCarOverCostReqDto.setIsGetCarCost(true);
+        getReturnCarOverCostReqDto.setIsReturnCarCost(true);
         try {
             GetReturnOverCostDTO getReturnOverCostDTO = tranSportProxyService.getGetReturnOverCost(getReturnCarOverCostReqDto);
             boolean isGetOverTransport = getReturnOverCostDTO.getGetReturnOverTransportDTO().getIsGetOverTransport();
