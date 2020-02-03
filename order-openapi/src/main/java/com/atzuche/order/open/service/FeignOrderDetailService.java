@@ -13,16 +13,11 @@ import org.springframework.web.bind.annotation.*;
 //@FeignClient(url = "http://localhost:1412" ,name="order-center-api")
 @FeignClient(name="order-center-api")
 public interface FeignOrderDetailService {
-    /*
-     * @Author ZhangBin
-     * @Date 2020/1/8 21:06
-     * @Description: 获取订单详情
-     *
-     **/
+
     @RequestMapping(method = RequestMethod.POST, value = "/order/detail/query")
     ResponseData<OrderDetailRespDTO> getOrderDetail(@RequestBody OrderDetailReqDTO orderDetailReqDTO);
 
-    /*
+    /**
      * @Author ZhangBin
      * @Date 2020/1/8 21:06
      * @Description: 获取订单状态
@@ -31,7 +26,7 @@ public interface FeignOrderDetailService {
     @RequestMapping(method = RequestMethod.POST, value = "/order/detail/status")
     ResponseData<OrderStatusRespDTO> getOrderStatus(@RequestBody OrderDetailReqDTO orderDetailReqDTO);
 
-    /*
+    /**
      * @Author ZhangBin
      * @Date 2020/1/13 16:47
      * @Description:  获取历史订单列表
@@ -41,7 +36,7 @@ public interface FeignOrderDetailService {
     ResponseData<OrderHistoryRespDTO> orderHistory(@RequestBody OrderHistoryReqDTO orderHistoryReqDTO);
 
 
-    /*
+    /**
      * @Author ZhangBin
      * @Date 2020/1/13 16:47
      * @Description: 费用明细
@@ -51,7 +46,7 @@ public interface FeignOrderDetailService {
     ResponseData<OrderAccountDetailRespDTO> orderAccountDetail(@RequestBody OrderDetailReqDTO orderDetailReqDTO);
     
     
-    /*
+    /**
      * @Author ZhangBin
      * @Date 2020/1/15 16:20 
      * @Description: 车主子订单详情
