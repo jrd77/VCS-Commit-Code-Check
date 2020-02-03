@@ -1,5 +1,6 @@
 package com.atzuche.order.coreapi.service;
 
+import com.atzuche.order.commons.LocalDateTimeUtils;
 import com.atzuche.order.commons.enums.OrderStatusEnum;
 import com.atzuche.order.commons.enums.OwnerAgreeTypeEnum;
 import com.atzuche.order.commons.vo.req.AgreeOrderReqVO;
@@ -8,6 +9,9 @@ import com.atzuche.order.parentorder.dto.OrderStatusDTO;
 import com.atzuche.order.parentorder.service.OrderStatusService;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.atzuche.order.renterorder.service.RenterOrderService;
+import com.autoyol.car.api.model.dto.LocationDTO;
+import com.autoyol.car.api.model.dto.OrderInfoDTO;
+import com.autoyol.car.api.model.enums.OrderOperationTypeEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +41,11 @@ public class OwnerAgreeOrderService {
     @Autowired
     OrderFlowService orderFlowService;
 
+    @Autowired
+    StockService stockService;
+
+
+
 
     /**
      * 车主同意接单
@@ -46,6 +55,9 @@ public class OwnerAgreeOrderService {
     @Transactional(rollbackFor = Exception.class)
     public void agree(AgreeOrderReqVO reqVO) {
         //TODO:车主同意前置校验
+
+        String orderNo = reqVO.getOrderNo();
+
 
         //变更订单状态
         OrderStatusDTO orderStatusDTO = new OrderStatusDTO();
@@ -68,6 +80,12 @@ public class OwnerAgreeOrderService {
 
         //消息发送
         //TODO:发送车主同意事件
+    }
+
+    public void buildReqVO(String orderNo){
+        OrderInfoDTO orderInfoDTO = new OrderInfoDTO();
+        orderInfoDTO.setOrderNo(orderNo);
+        //TODO:
     }
 
 

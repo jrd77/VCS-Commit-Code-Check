@@ -85,7 +85,7 @@ public class BaseVO implements Serializable {
     private String androidID;
 
     @AutoDocProperty(value = "【公用参数】用户注册号")
-    @NotBlank(message = "")
+    @NotBlank(message = "会员号不能为空")
     private String memNo;
 
     @JsonProperty(value = "schema")
