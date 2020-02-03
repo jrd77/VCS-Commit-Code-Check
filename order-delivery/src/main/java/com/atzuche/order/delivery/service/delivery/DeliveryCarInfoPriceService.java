@@ -164,13 +164,13 @@ public class DeliveryCarInfoPriceService {
                 continue;
             }
             if (ownerHandoverCarInfoEntity.getType().intValue() == RenterHandoverCarTypeEnum.RENYUN_TO_RENTER.getValue().intValue()) {
-                ownerGetAndReturnCarDTO.setGetCarOil(String.valueOf(ownerHandoverCarInfoEntity.getOilNum()));
-                ownerGetAndReturnCarDTO.setGetKM(String.valueOf(ownerHandoverCarInfoEntity.getMileageNum()));
-                ownerGetAndReturnCarDTO.setRealGetTime(String.valueOf(ownerHandoverCarInfoEntity.getRealReturnTime()));
+                ownerGetAndReturnCarDTO.setGetCarOil(ownerHandoverCarInfoEntity.getOilNum() == null ? "0": String.valueOf(ownerHandoverCarInfoEntity.getOilNum()));
+                ownerGetAndReturnCarDTO.setGetKM(ownerHandoverCarInfoEntity.getMileageNum() == null ? "0": String.valueOf(ownerHandoverCarInfoEntity.getMileageNum()));
+                ownerGetAndReturnCarDTO.setRealGetTime(ownerHandoverCarInfoEntity.getRealReturnTime() == null ? "": String.valueOf(ownerHandoverCarInfoEntity.getRealReturnTime()));
             } else {
-                ownerGetAndReturnCarDTO.setReturnCarOil(String.valueOf(ownerHandoverCarInfoEntity.getOilNum()));
-                ownerGetAndReturnCarDTO.setReturnKM(String.valueOf(ownerHandoverCarInfoEntity.getMileageNum()));
-                ownerGetAndReturnCarDTO.setRealReturnTime(String.valueOf(ownerHandoverCarInfoEntity.getRealReturnTime()));
+                ownerGetAndReturnCarDTO.setReturnCarOil(ownerHandoverCarInfoEntity.getOilNum() == null ? "0":String.valueOf(ownerHandoverCarInfoEntity.getOilNum()));
+                ownerGetAndReturnCarDTO.setReturnKM(ownerHandoverCarInfoEntity.getMileageNum() == null ? "0":String.valueOf(ownerHandoverCarInfoEntity.getMileageNum()));
+                ownerGetAndReturnCarDTO.setRealReturnTime(ownerHandoverCarInfoEntity.getRealReturnTime() == null ? "":String.valueOf(ownerHandoverCarInfoEntity.getRealReturnTime()));
             }
         }
         //行驶里程
@@ -221,7 +221,7 @@ public class DeliveryCarInfoPriceService {
 
         }
         CostBaseDTO costBaseDTO = mileageAmtDTO.getCostBaseDTO();
-        if (costBaseDTO == null) {
+        if (costBaseDTO == null || costBaseDTO.getStartTime() == null) {
             log.error("getMileageAmtEntity 获取超里程费用mileageAmtDTO.costBaseDTO对象为空");
             Cat.logError("获取超里程费用mileageAmtDTO.costBaseDTO对象为空", new DeliveryOrderException(DeliveryErrorCode.DELIVERY_PARAMS_ERROR.getValue(),"获取超里程费用mileageAmtDTO对象为空"));
             feeResult.setTotalFee(0);
