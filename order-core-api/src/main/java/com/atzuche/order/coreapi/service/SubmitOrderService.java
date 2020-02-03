@@ -155,6 +155,7 @@ public class SubmitOrderService {
         //车主商品明细
         OwnerGoodsDetailDTO ownerGoodsDetailDTO = goodsService.getOwnerGoodsDetail(renterGoodsDetailDTO);
         reqContext.setOwnerGoodsDetailDto(ownerGoodsDetailDTO);
+
         //车主会员信息
         OwnerMemberDTO ownerMemberDTO = memberService.getOwnerMemberInfo(renterGoodsDetailDTO.getOwnerMemNo());
         reqContext.setOwnerMemberDto(ownerMemberDTO);
