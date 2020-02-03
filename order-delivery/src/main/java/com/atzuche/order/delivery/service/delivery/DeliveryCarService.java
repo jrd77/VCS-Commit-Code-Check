@@ -334,7 +334,7 @@ public class DeliveryCarService {
         orderDeliveryFlowEntity.setDayMileage(String.valueOf(renterGoodsDetailDTO.getCarDayMileage()));
         orderDeliveryFlowEntity.setTankCapacity(String.valueOf(renterGoodsDetailDTO.getCarOilVolume()));
         orderDeliveryFlowEntity.setOwnerGetAddr(renterGoodsDetailDTO.getCarRealAddr());
-        orderDeliveryFlowEntity.setOwnerReturnAddr(orderReqVO.getSrvGetAddr());
+        orderDeliveryFlowEntity.setOwnerReturnAddr(renterGoodsDetailDTO.getCarRealAddr());
 
         orderDeliveryVO.setOrderDeliveryDTO(orderDeliveryDTO);
         orderDeliveryVO.setRenterDeliveryAddrDTO(renterDeliveryAddrDTO);
