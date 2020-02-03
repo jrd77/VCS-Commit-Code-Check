@@ -45,6 +45,13 @@ public class AdminOrderService {
     public ResponseData cancelOrder(CancelOrderVO cancelOrderVO) {
         CancelOrderReqVO cancelOrderReqVO = new CancelOrderReqVO();
         BeanUtils.copyProperties(cancelOrderVO,cancelOrderReqVO);
+        if("1".equalsIgnoreCase(cancelOrderVO.getMemRole())){
+            String renterNo = getRenterMemNo(cancelOrderVO.getOrderNo());
+            cancelOrderReqVO.setMemNo(renterNo);
+        }else{
+            String ownerNo = getOwnerMemNo(cancelOrderReqVO.getOrderNo());
+            cancelOrderReqVO.setMemNo(ownerNo);
+        }
         ResponseData<?> responseObject = null;
         Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "租客商品信息");
         try{
@@ -220,6 +227,34 @@ public class AdminOrderService {
             checkResponse(responseObject);
             t.setStatus(Transaction.SUCCESS);
             String memNo = responseObject.getData().getRenterMember().getMemNo();
+            return memNo;
+        }catch (Exception e){
+            log.error("Feign 管理后台替车主操作修改申请,responseObject={},modifyOrderReq={}",JSON.toJSONString(responseObject),JSON.toJSONString(req),e);
+            Cat.logError("Feign 管理后台替车主操作修改申请",e);
+            t.setStatus(e);
+            throw e;
+        }finally {
+            t.complete();
+        }
+
+
+    }
+
+    public String getOwnerMemNo(String orderNo){
+        OrderDetailReqDTO req = new OrderDetailReqDTO();
+        req.setOrderNo(orderNo);
+        ResponseData<OrderDetailRespDTO> responseObject = null;
+        Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "订单CoreAPI服务");
+
+        try{
+            Cat.logEvent(CatConstants.FEIGN_METHOD,"feignOrderDetailService.getOrderDetail");
+            log.info("Feign 获取订单详情,param={}", JSON.toJSONString(req));
+            Cat.logEvent(CatConstants.FEIGN_PARAM,JSON.toJSONString(req));
+            responseObject =feignOrderDetailService.getOrderDetail(req);
+            Cat.logEvent(CatConstants.FEIGN_RESULT,JSON.toJSONString(responseObject));
+            checkResponse(responseObject);
+            t.setStatus(Transaction.SUCCESS);
+            String memNo = responseObject.getData().getOwnerMember().getMemNo();
             return memNo;
         }catch (Exception e){
             log.error("Feign 管理后台替车主操作修改申请,responseObject={},modifyOrderReq={}",JSON.toJSONString(responseObject),JSON.toJSONString(req),e);

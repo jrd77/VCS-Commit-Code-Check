@@ -22,7 +22,7 @@ public interface FeignOrderUpdateService {
     @RequestMapping(method = RequestMethod.POST, value = "/order/update/rentCityAndRiskAccident")
     ResponseData<?> updateRentCityAndRiskAccident(@RequestBody RentCityAndRiskAccidentReqDTO rentCityAndRiskAccidentReqDTO);
     
-    /*
+    /**
      * @Author ZhangBin
      * @Date 2020/1/14 14:30
      * @Description: 带租客/车主取消订单
