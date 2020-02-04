@@ -40,6 +40,8 @@ public class CancelOrderService {
     private DeliveryCarService deliveryCarService;
     @Autowired
     private OrderCommonConver orderCommonConver;
+    @Autowired
+    private CancelOrderCheckService cancelOrderCheckService;
 
     /**
      * 订单取消
@@ -48,8 +50,7 @@ public class CancelOrderService {
      */
     public void cancel(CancelOrderReqVO cancelOrderReqVO) {
         //公共校验
-        check();
-
+        cancelOrderCheckService.checkCancelOrder(cancelOrderReqVO.getOrderNo(), false);
         //取消处理
         CancelOrderResDTO res = null;
         if (StringUtils.equals(MemRoleEnum.RENTER.getCode(), cancelOrderReqVO.getMemRole())) {
@@ -95,14 +96,5 @@ public class CancelOrderService {
         //TODO:发送订单取消事件
 
     }
-
-
-    public void check() {
-        //TODO:订单取消公共校验
-
-    }
-
-
-
 
 }
