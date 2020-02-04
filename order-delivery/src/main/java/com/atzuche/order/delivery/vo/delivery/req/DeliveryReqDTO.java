@@ -15,9 +15,16 @@ public class DeliveryReqDTO {
 
     @AutoDocProperty("车主实际交车地址/车主实际收车地址")
     public String ownerGetReturnAddr;
+    @AutoDocProperty("车主实际交车地址/车主实际收车地址经度")
+    public String ownerGetReturnLat;
+    @AutoDocProperty("车主实际交车地址/车主实际收车地址纬度")
+    public String ownerGetReturnLng;
     @AutoDocProperty("租客实际送车地址/租客实际还车地址")
-    @NotBlank(message="租客实际送车地址/租客实际还车地址")
     public String renterGetReturnAddr;
+    @AutoDocProperty("租客实际送车地址/租客实际还车地址经度")
+    public String renterGetReturnLat;
+    @AutoDocProperty("租客实际送车地址/租客实际还车地址纬度")
+    public String renterGetReturnLng;
     @AutoDocProperty("租客实际送车地址备注")
     public String renterRealGetAddrReamrk;
     @AutoDocProperty("车主实际取车地址备注")
