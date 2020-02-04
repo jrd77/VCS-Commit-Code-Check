@@ -2,11 +2,10 @@ package com.atzuche.order.coreapi.service;
 
 import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
 import com.atzuche.order.commons.enums.*;
-import com.atzuche.order.commons.vo.req.AgreeOrderReqVO;
-import com.atzuche.order.commons.vo.req.OrderReqVO;
 import com.atzuche.order.commons.vo.req.RefuseOrderReqVO;
+import com.atzuche.order.coreapi.service.remote.CarRentalTimeApiProxyService;
+import com.atzuche.order.coreapi.service.remote.StockProxyService;
 import com.atzuche.order.delivery.service.delivery.DeliveryCarService;
-import com.atzuche.order.delivery.vo.delivery.CancelOrderDeliveryVO;
 import com.atzuche.order.flow.service.OrderFlowService;
 import com.atzuche.order.ownercost.entity.OwnerOrderEntity;
 import com.atzuche.order.ownercost.service.OwnerOrderService;
@@ -44,7 +43,7 @@ public class OwnerRefuseOrderService {
     private static Logger logger = LoggerFactory.getLogger(OwnerRefuseOrderService.class);
 
     @Autowired
-    CarRentalTimeApiService carRentalTimeApiService;
+    CarRentalTimeApiProxyService carRentalTimeApiService;
     @Autowired
     RenterOrderService renterOrderService;
     @Autowired
@@ -60,7 +59,7 @@ public class OwnerRefuseOrderService {
     @Autowired
     CouponAndCoinHandleService couponAndCoinHandleService;
     @Autowired
-    StockService stockService;
+    StockProxyService stockService;
     @Autowired
     DeliveryCarService deliveryCarService;
     @Autowired

@@ -12,6 +12,8 @@ import com.atzuche.order.coreapi.entity.vo.req.CarRentTimeRangeReqVO;
 import com.atzuche.order.coreapi.entity.vo.req.OwnerCouponBindReqVO;
 import com.atzuche.order.coreapi.entity.vo.res.CarRentTimeRangeResVO;
 import com.atzuche.order.coreapi.modifyorder.exception.ModifyOrderParameterException;
+import com.atzuche.order.coreapi.service.remote.CarRentalTimeApiProxyService;
+import com.atzuche.order.coreapi.service.remote.UniqueOrderNoProxyService;
 import com.atzuche.order.coreapi.utils.ModifyOrderUtils;
 import com.atzuche.order.delivery.entity.RenterOrderDeliveryEntity;
 import com.atzuche.order.delivery.service.RenterOrderDeliveryService;
@@ -64,7 +66,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class ModifyOrderService {
 	@Autowired
-	private UniqueOrderNoService uniqueOrderNoService;
+	private UniqueOrderNoProxyService uniqueOrderNoService;
 	@Autowired
 	private RenterOrderService renterOrderService;
 	@Autowired
@@ -108,7 +110,7 @@ public class ModifyOrderService {
 	@Autowired
 	private CouponAndCoinHandleService couponAndCoinHandleService;
 	@Autowired
-    private CarRentalTimeApiService carRentalTimeApiService;
+    private CarRentalTimeApiProxyService carRentalTimeApiService;
 	@Autowired
 	private AccountRenterCostCoinService accountRenterCostCoinService;
 	@Autowired
@@ -129,7 +131,7 @@ public class ModifyOrderService {
 		// 主单号
 		String orderNo = modifyOrderReq.getOrderNo();
 		// 获取租客新订单号
-		String renterOrderNo = uniqueOrderNoService.getRenterOrderNo(orderNo);
+		String renterOrderNo = uniqueOrderNoService.genRenterOrderNo(orderNo);
 		// 获取修改前有效租客子订单信息
 		RenterOrderEntity initRenterOrder = renterOrderService.getRenterOrderByOrderNoAndIsEffective(orderNo);
 		// 获取租客配送订单信息

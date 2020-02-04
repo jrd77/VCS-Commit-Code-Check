@@ -2,18 +2,16 @@ package com.atzuche.order.coreapi.service;
 
 import com.atzuche.order.commons.entity.dto.OwnerGoodsDetailDTO;
 import com.atzuche.order.commons.enums.CarOwnerTypeEnum;
-import com.atzuche.order.commons.enums.ErrorCode;
 import com.atzuche.order.commons.enums.OrderStatusEnum;
-import com.atzuche.order.coreapi.submitOrder.exception.OrderDetailException;
 import com.atzuche.order.coreapi.submitOrder.exception.RefuseOrderCheckException;
 import com.atzuche.order.owner.commodity.service.OwnerGoodsService;
 import com.atzuche.order.ownercost.entity.OwnerOrderEntity;
 import com.atzuche.order.ownercost.service.OwnerOrderService;
 import com.atzuche.order.parentorder.entity.OrderStatusEntity;
 import com.atzuche.order.parentorder.service.OrderStatusService;
+import com.autoyol.commons.web.ErrorCode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -41,7 +39,7 @@ public class RefuseOrderCheckService {
 
 
     /**
-     * 车主同意订单校验
+     * 车主同意/拒绝订单校验
      *
      * @param orderNo 主订单号
      * @param isConsoleInvoke 是否是管理后台请求操作:true,是 false,否
@@ -52,12 +50,13 @@ public class RefuseOrderCheckService {
             OwnerOrderEntity ownerOrderEntity = ownerOrderService.getOwnerOrderByOrderNoAndIsEffective(orderNo);
             if(null == ownerOrderEntity) {
                 logger.error("No valid owner order found. orderNo:[{}]", orderNo);
-                throw new RefuseOrderCheckException(ErrorCode.NO_EFFECTIVE_ERR);
+                throw new RefuseOrderCheckException(ErrorCode.ORDER_NOT_EXIST);
             }
             OwnerGoodsDetailDTO ownerGoodsDetail = ownerGoodsService.getOwnerGoodsDetail(ownerOrderEntity.getOwnerOrderNo(), false);
             if(null == ownerGoodsDetail) {
                 logger.error("No owner order product information found. ownerOrderNo:[{}]", ownerOrderEntity.getOwnerOrderNo());
-                throw new RefuseOrderCheckException(ErrorCode.OWNER_ORDER_GOODS_NOT_EXIST);
+                throw new RefuseOrderCheckException(com.atzuche.order.commons.enums.ErrorCode.OWNER_ORDER_GOODS_NOT_EXIST.getCode(),
+                        com.atzuche.order.commons.enums.ErrorCode.OWNER_ORDER_GOODS_NOT_EXIST.getText());
             }
 
             Integer carOwnerType = ownerGoodsDetail.getCarOwnerType();

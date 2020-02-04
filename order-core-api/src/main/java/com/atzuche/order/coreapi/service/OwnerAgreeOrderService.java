@@ -6,6 +6,7 @@ import com.atzuche.order.commons.enums.OrderStatusEnum;
 import com.atzuche.order.commons.enums.OwnerAgreeTypeEnum;
 import com.atzuche.order.commons.exceptions.OrderNotFoundException;
 import com.atzuche.order.commons.vo.req.AgreeOrderReqVO;
+import com.atzuche.order.coreapi.service.remote.StockProxyService;
 import com.atzuche.order.flow.service.OrderFlowService;
 import com.atzuche.order.owner.commodity.service.OwnerGoodsService;
 import com.atzuche.order.ownercost.entity.OwnerOrderEntity;
@@ -26,7 +27,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.Resource;
 import java.time.LocalDateTime;
 
 /**
@@ -53,7 +53,7 @@ public class OwnerAgreeOrderService {
     OrderFlowService orderFlowService;
 
     @Autowired
-    StockService stockService;
+    StockProxyService stockService;
 
     @Autowired
     private OrderService orderService;
@@ -124,7 +124,8 @@ public class OwnerAgreeOrderService {
             throw new OrderNotFoundException(orderNo);
         }
         OwnerGoodsDetailDTO ownerGoodsDetailDTO = ownerGoodsService.getOwnerGoodsDetail(orderNo,false);
-        orderInfoDTO.setCarNo(ownerGoodsDetailDTO.getCarNo());
+        logger.info("ownerGoodsDetailDTO is {}",ownerGoodsDetailDTO);
+        orderInfoDTO.setCarNo(Integer.parseInt(ownerOrderEntity.getGoodsCode()));
         orderInfoDTO.setCityCode(Integer.parseInt(orderEntity.getCityCode()));
         orderInfoDTO.setOldCarNo(null);
         orderInfoDTO.setOperationType(OrderOperationTypeEnum.ZCXD.getType());

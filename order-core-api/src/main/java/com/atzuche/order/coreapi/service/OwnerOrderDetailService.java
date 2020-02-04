@@ -15,7 +15,7 @@ import com.atzuche.order.commons.enums.FineSubsidyCodeEnum;
 import com.atzuche.order.commons.enums.FineTypeEnum;
 import com.atzuche.order.commons.enums.cashcode.ConsoleCashCodeEnum;
 import com.atzuche.order.commons.enums.cashcode.OwnerCashCodeEnum;
-import com.atzuche.order.coreapi.submitOrder.exception.OrderDetailException;
+import com.atzuche.order.commons.exceptions.OrderNotFoundException;
 import com.atzuche.order.owner.commodity.service.OwnerGoodsService;
 import com.atzuche.order.ownercost.entity.OwnerOrderFineDeatailEntity;
 import com.atzuche.order.ownercost.entity.OwnerOrderPurchaseDetailEntity;
@@ -60,7 +60,7 @@ public class OwnerOrderDetailService {
         OrderEntity orderEntity = orderService.getOrderEntity(orderNo);
         if(orderEntity == null){
             log.error("获取订单数据为空orderNo={}",orderNo);
-            throw new OrderDetailException();
+            throw new OrderNotFoundException(orderNo);
         }
         OwnerGoodsDetailDTO ownerGoodsDetail = ownerGoodsService.getOwnerGoodsDetail(ownerOrderNo, true);
         OwnerRentDetailDTO ownerRentDetailDTO = new OwnerRentDetailDTO();

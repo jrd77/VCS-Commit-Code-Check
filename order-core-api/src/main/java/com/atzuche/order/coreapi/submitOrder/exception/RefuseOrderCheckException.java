@@ -1,7 +1,7 @@
 package com.atzuche.order.coreapi.submitOrder.exception;
 
 import com.atzuche.order.commons.OrderException;
-import com.atzuche.order.commons.enums.ErrorCode;
+import com.autoyol.commons.web.ErrorCode;
 
 /**
  * RefuseOrderController 相关业务校验异常
