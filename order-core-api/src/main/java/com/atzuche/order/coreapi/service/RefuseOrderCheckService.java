@@ -45,7 +45,45 @@ public class RefuseOrderCheckService {
      * @param isConsoleInvoke 是否是管理后台请求操作:true,是 false,否
      */
     public void checkOwnerAgreeOrRefuseOrder(String orderNo, boolean isConsoleInvoke) {
-        //车辆类型校验(非后台同意)
+        //车辆类型校验(非后台)
+        checkCommonInfo(orderNo, isConsoleInvoke);
+        //订单状态校验
+        OrderStatusEntity orderStatusEntity = orderStatusService.getByOrderNo(orderNo);
+        if(null != orderStatusEntity && null != orderStatusEntity.getStatus()) {
+            if(OrderStatusEnum.TO_CONFIRM.getStatus() != orderStatusEntity.getStatus()) {
+                throw new RefuseOrderCheckException();
+            }
+        }
+    }
+
+
+    /**
+     * 车主操作还车校验
+     *
+     * @param orderNo 主订单号
+     * @param isConsoleInvoke 是否是管理后台请求操作:true,是 false,否
+     */
+    public void checkOwnerReturnCar(String orderNo, boolean isConsoleInvoke) {
+        //车辆类型校验(非后台)
+        checkCommonInfo(orderNo, isConsoleInvoke);
+        //订单状态校验
+        OrderStatusEntity orderStatusEntity = orderStatusService.getByOrderNo(orderNo);
+        if(null != orderStatusEntity && null != orderStatusEntity.getStatus()) {
+            if(OrderStatusEnum.TO_RETURN_CAR.getStatus() != orderStatusEntity.getStatus()) {
+                throw new RefuseOrderCheckException(ErrorCode.ORDER_DELAY_REVERTCAR_EXIST);
+            }
+        }
+    }
+
+
+    /**
+     * 公共信息校验
+     * <p>车辆类型校验</p>
+     *
+     * @param orderNo
+     * @param isConsoleInvoke
+     */
+    public void checkCommonInfo(String orderNo, boolean isConsoleInvoke)  {
         if(!isConsoleInvoke) {
             OwnerOrderEntity ownerOrderEntity = ownerOrderService.getOwnerOrderByOrderNoAndIsEffective(orderNo);
             if(null == ownerOrderEntity) {
@@ -70,17 +108,7 @@ public class RefuseOrderCheckService {
             } else {
                 logger.warn("Car owner type is empty. ownerOrderNo:[{}]", ownerOrderEntity.getOwnerOrderNo());
             }
-
-        }
-        //订单状态校验
-        OrderStatusEntity orderStatusEntity = orderStatusService.getByOrderNo(orderNo);
-
-        if(null != orderStatusEntity && null != orderStatusEntity.getStatus()) {
-            if(OrderStatusEnum.TO_CONFIRM.getStatus() != orderStatusEntity.getStatus()) {
-                throw new RefuseOrderCheckException();
-            }
         }
     }
-
 
 }
