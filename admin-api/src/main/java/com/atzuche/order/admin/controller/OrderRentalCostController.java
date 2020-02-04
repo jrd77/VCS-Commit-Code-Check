@@ -344,7 +344,7 @@ public class OrderRentalCostController {
      * @param rentalCostReqVO
      * @return
      */
-    
+
     @AutoDocGroup(group = "管理后台违约罚金")
     @AutoDocMethod(description = "违约罚金", value = "违约罚金",response = PenaltyContractVO.class)
     @PostMapping("/penaltyContract/list")

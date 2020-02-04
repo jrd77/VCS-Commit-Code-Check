@@ -7,11 +7,11 @@ package com.atzuche.order.delivery.enums;
 public enum OilCostTypeEnum {
 
 
-    NO92_GASOLINE(92, "92号汽油"),
-    NO95_GASOLINE(95, "95号汽油"),
-    NO0_GASOLINE(0, "0号柴油"),
+    NO92_GASOLINE(1, "92号汽油"),
+    NO95_GASOLINE(2, "95号汽油"),
+    NO0_GASOLINE(3, "0号柴油"),
     NO4_GASOLINE(4, "纯电动"),
-    NO98_GASOLINE(98, "98号汽油"),
+    NO98_GASOLINE(5, "98号汽油"),
     ;
 
     private Integer value;

@@ -2,6 +2,7 @@ package com.atzuche.order.coreapi.service;
 
 import java.util.List;
 
+import com.atzuche.order.commons.exceptions.OrderNotFoundException;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -38,7 +39,7 @@ public class SupplementService {
 		OrderEntity orderEntity = orderService.getOrderEntity(orderSupplementDetailDTO.getOrderNo());
 		if (orderEntity == null) {
 			Cat.logError("SupplementService.saveSupplement保存补付记录", new ModifyOrderParentOrderNotFindException());
-			throw new ModifyOrderParentOrderNotFindException();
+			throw new OrderNotFoundException(orderSupplementDetailDTO.getOrderNo());
 		}
 		supplementEntity.setMemNo(orderEntity.getMemNoRenter());
 		supplementEntity.setSupplementType(SupplementTypeEnum.MANUAL_CREATE.getCode());

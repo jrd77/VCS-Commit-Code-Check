@@ -67,7 +67,7 @@ public class CarDetailDTO {
     @AutoDocProperty("驱动方式文字释义")
     private String driveTypeTxt;
 
-    @AutoDocProperty(value="车辆等级")
+    @AutoDocProperty("车辆等级,1:A,2:B,3:C,4:D,5:D+,6:SUV A,7:SUV B,8:SUV C,9:SUV D,10:SUV D+,11:MPV")
     private Integer carLevel;
 
     @AutoDocProperty("发动机号")

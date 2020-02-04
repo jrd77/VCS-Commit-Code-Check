@@ -51,18 +51,18 @@ public class RefuseOrderCheckService {
         if(!isConsoleInvoke) {
             OwnerOrderEntity ownerOrderEntity = ownerOrderService.getOwnerOrderByOrderNoAndIsEffective(orderNo);
             if(null == ownerOrderEntity) {
-                logger.info("No valid owner order found. orderNo:[{}]", orderNo);
+                logger.error("No valid owner order found. orderNo:[{}]", orderNo);
                 throw new RefuseOrderCheckException(ErrorCode.NO_EFFECTIVE_ERR);
             }
             OwnerGoodsDetailDTO ownerGoodsDetail = ownerGoodsService.getOwnerGoodsDetail(ownerOrderEntity.getOwnerOrderNo(), false);
             if(null == ownerGoodsDetail) {
-                logger.info("No owner order product information found. ownerOrderNo:[{}]", ownerOrderEntity.getOwnerOrderNo());
+                logger.error("No owner order product information found. ownerOrderNo:[{}]", ownerOrderEntity.getOwnerOrderNo());
                 throw new RefuseOrderCheckException(ErrorCode.OWNER_ORDER_GOODS_NOT_EXIST);
             }
 
             Integer carOwnerType = ownerGoodsDetail.getCarOwnerType();
             if(null != carOwnerType) {
-                logger.info("Car owner type is :[{}]", carOwnerType);
+                logger.error("Car owner type is :[{}]", carOwnerType);
                 if(carOwnerType == CarOwnerTypeEnum.F.getCode()) {
                     throw new RefuseOrderCheckException(ErrorCode.MANAGED_CAR_CAN_NOT_OPT_TRANS);
                 } else if (carOwnerType == CarOwnerTypeEnum.G.getCode()) {
