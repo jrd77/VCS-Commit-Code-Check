@@ -4,6 +4,7 @@ import com.atzuche.order.admin.vo.req.autocoin.AutoCoinRequestVO;
 import com.atzuche.order.admin.vo.req.order.MainOrderRequestVO;
 import com.atzuche.order.admin.vo.resp.autocoin.AutoCoinResponseVO;
 import com.atzuche.order.admin.vo.resp.order.MainOrderResponseVO;
+import com.atzuche.order.commons.BindingResultUtil;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.doc.annotation.AutoDocMethod;
@@ -27,9 +28,8 @@ public class MainOrderController {
 	@AutoDocMethod(description = "获取主订单信息", value = "获取主订单信息", response = MainOrderResponseVO.class)
 	@GetMapping("main/information")
 	public ResponseData mainInformation(MainOrderRequestVO mainOrderRequestVO, BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), ErrorCode.INPUT_ERROR.getText());
-        }
+		BindingResultUtil.checkBindingResult(bindingResult);
+		//TODO:
 		return ResponseData.success(null);
 	}
 
