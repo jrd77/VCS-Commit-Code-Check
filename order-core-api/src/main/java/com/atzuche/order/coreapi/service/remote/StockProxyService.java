@@ -65,10 +65,11 @@ public class StockProxyService {
         ResponseObject<Boolean> responseObject  = null;
         Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "库存扣减");
         try{
-            Cat.logEvent(CatConstants.FEIGN_METHOD,"CarRentalTimeApi.checkCarStock");
+            Cat.logEvent(CatConstants.FEIGN_METHOD,"carRentalTimeApi.cutCarStock");
             log.info("Feign 开始扣减库存信息,orderInfoDTO={}", JSON.toJSONString(orderInfoDTO));
             Cat.logEvent(CatConstants.FEIGN_PARAM,JSON.toJSONString(orderInfoDTO));
             responseObject = carRentalTimeApi.cutCarStock(orderInfoDTO);
+            log.info("Fegin 开始扣减库存信息,返回结果:[{}]",JSON.toJSONString(responseObject));
             Cat.logEvent(CatConstants.FEIGN_RESULT,JSON.toJSONString(responseObject));
             checkResponse(responseObject);
             t.setStatus(Transaction.SUCCESS);
@@ -97,6 +98,7 @@ public class StockProxyService {
             log.info("Feign 开始释放库存信息,orderNo={}，carNo={}", orderNo,carNo);
             Cat.logEvent(CatConstants.FEIGN_PARAM,"orderNo="+orderNo+"&carNo="+carNo);
             responseObject = carRentalTimeApi.releaseCarStock(orderNo,carNo);
+            log.info("Fegin 开始库存释放信息,返回结果:[{}]",JSON.toJSONString(responseObject));
             Cat.logEvent(CatConstants.FEIGN_RESULT,JSON.toJSONString(responseObject));
             checkResponse(responseObject);
             t.setStatus(Transaction.SUCCESS);

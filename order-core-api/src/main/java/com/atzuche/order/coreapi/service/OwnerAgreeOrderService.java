@@ -124,7 +124,8 @@ public class OwnerAgreeOrderService {
             throw new OrderNotFoundException(orderNo);
         }
         OwnerGoodsDetailDTO ownerGoodsDetailDTO = ownerGoodsService.getOwnerGoodsDetail(orderNo,false);
-        orderInfoDTO.setCarNo(ownerGoodsDetailDTO.getCarNo());
+        logger.info("ownerGoodsDetailDTO is {}",ownerGoodsDetailDTO);
+        orderInfoDTO.setCarNo(Integer.parseInt(ownerOrderEntity.getGoodsCode()));
         orderInfoDTO.setCityCode(Integer.parseInt(orderEntity.getCityCode()));
         orderInfoDTO.setOldCarNo(null);
         orderInfoDTO.setOperationType(OrderOperationTypeEnum.ZCXD.getType());
