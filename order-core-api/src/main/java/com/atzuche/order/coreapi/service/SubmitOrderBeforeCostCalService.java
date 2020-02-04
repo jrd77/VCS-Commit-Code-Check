@@ -120,7 +120,7 @@ public class SubmitOrderBeforeCostCalService {
         CouponReductionVO couponReductionVO = renterOrderCalCostService.getCouponReductionVO(deductContext,
                 memAvailCouponRequestVO,
                 renterOrderReqVO.getDisCouponIds(),renterOrderReqVO.getGetCarFreeCouponId());
-        //TODO:凹凸币
+        //凹凸币
         AutoCoinReductionVO autoCoinReductionVO = renterOrderCalCostService.getAutoCoinReductionVO(deductContext,
                 orderReqVO.getMemNo(),
                 orderReqVO.getUseAutoCoin());
