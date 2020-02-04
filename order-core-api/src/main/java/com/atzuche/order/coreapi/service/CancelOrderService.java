@@ -5,6 +5,7 @@ import com.atzuche.order.commons.enums.MemRoleEnum;
 import com.atzuche.order.commons.vo.req.CancelOrderReqVO;
 import com.atzuche.order.coreapi.common.conver.OrderCommonConver;
 import com.atzuche.order.coreapi.entity.dto.CancelOrderResDTO;
+import com.atzuche.order.coreapi.service.remote.StockProxyService;
 import com.atzuche.order.delivery.service.delivery.DeliveryCarService;
 import com.atzuche.order.delivery.vo.delivery.CancelOrderDeliveryVO;
 import com.atzuche.order.settle.service.OrderSettleService;
@@ -35,7 +36,7 @@ public class CancelOrderService {
     @Autowired
     private OrderSettleService orderSettleService;
     @Autowired
-    private StockService stockService;
+    private StockProxyService stockService;
     @Autowired
     private DeliveryCarService deliveryCarService;
     @Autowired

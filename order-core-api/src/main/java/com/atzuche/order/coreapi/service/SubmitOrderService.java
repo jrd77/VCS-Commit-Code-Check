@@ -22,8 +22,10 @@ import com.atzuche.order.commons.vo.res.OrderResVO;
 import com.atzuche.order.coreapi.common.conver.OrderCommonConver;
 import com.atzuche.order.coreapi.entity.vo.req.AutoCoinDeductReqVO;
 import com.atzuche.order.coreapi.entity.vo.req.OwnerCouponBindReqVO;
-import com.atzuche.order.coreapi.entity.vo.req.SubmitOrderRiskCheckReqVO;
 import com.atzuche.order.coreapi.entity.vo.res.CarRentTimeRangeResVO;
+import com.atzuche.order.coreapi.service.remote.CarRentalTimeApiProxyService;
+import com.atzuche.order.coreapi.service.remote.StockProxyService;
+import com.atzuche.order.coreapi.service.remote.UniqueOrderNoProxyService;
 import com.atzuche.order.coreapi.utils.BizAreaUtil;
 import com.atzuche.order.delivery.service.delivery.DeliveryCarService;
 import com.atzuche.order.flow.service.OrderFlowService;
@@ -88,7 +90,7 @@ public class SubmitOrderService {
     @Autowired
     private CarProxyService goodsService;
     @Resource
-    private UniqueOrderNoService uniqueOrderNoService;
+    private UniqueOrderNoProxyService uniqueOrderNoService;
     @Resource
     private ParentOrderService parentOrderService;
     @Autowired
@@ -116,11 +118,11 @@ public class SubmitOrderService {
     @Autowired
     private SubmitOrderRiskAuditService submitOrderRiskAuditService;
     @Autowired
-    private CarRentalTimeApiService carRentalTimeApiService;
+    private CarRentalTimeApiProxyService carRentalTimeApiService;
     @Autowired
     private OrderCommonConver orderCommonConver;
     @Autowired
-    private StockService stockService;
+    private StockProxyService stockService;
     @Autowired
     BaseProducer baseProducer;
     @Autowired
@@ -141,16 +143,15 @@ public class SubmitOrderService {
         orderReqVO.setReqTime(LocalDateTime.now());
 
         //1.生成主订单号
-        String orderNo = uniqueOrderNoService.getOrderNo();
-
+        String orderNo = uniqueOrderNoService.genOrderNo();
 
         //提前延后时间计算
         CarRentTimeRangeResVO carRentTimeRangeResVO =
                 carRentalTimeApiService.getCarRentTimeRange(carRentalTimeApiService.buildCarRentTimeRangeReqVO(orderReqVO));
-        //3.生成主订单号
+
         //4.创建租客子订单
         //4.1.生成租客子订单号
-        String renterOrderNo = uniqueOrderNoService.getRenterOrderNo(orderNo);
+        String renterOrderNo = uniqueOrderNoService.genRenterOrderNo(orderNo);
         //4.2.调用租客订单模块处理租客订单相关业务
         RenterOrderResVO renterOrderResVO =
                 renterOrderService.generateRenterOrderInfo(orderCommonConver.buildRenterOrderReqVO(orderNo, renterOrderNo, context, carRentTimeRangeResVO));
@@ -185,7 +186,7 @@ public class SubmitOrderService {
 
         //5.创建车主子订单
         //5.1.生成车主子订单号
-        String ownerOrderNo = uniqueOrderNoService.getOwnerOrderNo(orderNo);
+        String ownerOrderNo = uniqueOrderNoService.genOwnerOrderNo(orderNo);
         //5.2.调用车主订单模块处理车主订单相关业务
         OwnerOrderReqDTO ownerOrderReqDTO = buildOwnerOrderReqDTO(orderNo, ownerOrderNo, context);
         ownerOrderReqDTO.setOwnerOrderSubsidyDetailEntity(buildOwnerOrderSubsidyDetailEntity(orderNo, ownerOrderNo,

@@ -155,6 +155,8 @@ public class DeliveryCarInfoService {
         CostBaseDTO costBaseDTO = new CostBaseDTO();
         costBaseDTO.setStartTime(renterOrderDeliveryEntity.getRentTime());
         costBaseDTO.setEndTime(renterOrderDeliveryEntity.getRevertTime());
+//        costBaseDTO.setStartTime(com.atzuche.order.commons.DateUtils.parseLocalDateTime("2020-02-25 09:00:00", com.atzuche.order.commons.DateUtils.DATE_DEFAUTE1));
+//        costBaseDTO.setEndTime(com.atzuche.order.commons.DateUtils.parseLocalDateTime("2020-03-01 21:00:00", com.atzuche.order.commons.DateUtils.DATE_DEFAUTE1));
         costBaseDTO.setOrderNo(renterOrderDeliveryEntity.getOrderNo());
         costBaseDTO.setRenterOrderNo(renterOrderDeliveryEntity.getRenterOrderNo());
         getReturnCarOverCostReqDto.setCostBaseDTO(costBaseDTO);
@@ -167,8 +169,10 @@ public class DeliveryCarInfoService {
             GetReturnOverCostDTO getReturnOverCostDTO = tranSportProxyService.getGetReturnOverCost(getReturnCarOverCostReqDto);
             isGetOverTransport = getReturnOverCostDTO.getGetReturnOverTransportDTO().getIsGetOverTransport() == true ? "1" : "0";
             isReturnOverTransport = getReturnOverCostDTO.getGetReturnOverTransportDTO().getIsReturnOverTransport() == true ? "1" : "0";
-            int chaoYunNengAddCrash = getReturnOverCostDTO.getGetReturnOverTransportDTO().getGetOverTransportFee() + getReturnOverCostDTO.getGetReturnOverTransportDTO().getNightGetOverTransportFee();
-            int returnChaoYunNengAddCrash = getReturnOverCostDTO.getGetReturnOverTransportDTO().getNightReturnOverTransportFee() + getReturnOverCostDTO.getGetReturnOverTransportDTO().getNightReturnOverTransportFee();
+            int nightGetOverTransportFee =  getReturnOverCostDTO.getGetReturnOverTransportDTO().getNightGetOverTransportFee() == null ? 0 : getReturnOverCostDTO.getGetReturnOverTransportDTO().getNightGetOverTransportFee();
+            int chaoYunNengAddCrash = getReturnOverCostDTO.getGetReturnOverTransportDTO().getGetOverTransportFee() + nightGetOverTransportFee;
+            int nightReturnOverTransportFee = getReturnOverCostDTO.getGetReturnOverTransportDTO().getNightReturnOverTransportFee() == null ? 0 : getReturnOverCostDTO.getGetReturnOverTransportDTO().getNightReturnOverTransportFee();
+            int returnChaoYunNengAddCrash = + getReturnOverCostDTO.getGetReturnOverTransportDTO().getReturnOverTransportFee() + nightReturnOverTransportFee;
             returnChaoYunNengAddCrashStr = String.valueOf(returnChaoYunNengAddCrash);
             chaoYunNengAddCrashStr = String.valueOf(chaoYunNengAddCrash);
         } catch (Exception e) {
@@ -227,7 +231,7 @@ public class DeliveryCarInfoService {
         RenterGetAndReturnCarDTO renterGetAndReturnCarDTO = RenterGetAndReturnCarDTO.builder().build();
         //车主取送信息
         ownerGetAndReturnCarDTO = deliveryCarInfoPriceService.createOwnerGetAndReturnCarDTO(ownerGetAndReturnCarDTO, ownerHandoverCarInfoEntities,carEngineType,cityCode);
-        int overMileageAmt = getDeliveryCarOverMileageAmt(ownerGetAndReturnCarDTO.getGetKM(), ownerGetAndReturnCarDTO.getReturnKM(), renterGoodsDetailDTO);
+        int overMileageAmt = getDeliveryCarOverMileageAmt(ownerGetAndReturnCarDTO, renterGoodsDetailDTO);
         ownerGetAndReturnCarDTO.setOverKNCrash(String.valueOf(overMileageAmt));
         OwnerGetAndReturnCarDTO ownerGetAndReturnCarDO = OwnerGetAndReturnCarDTO.builder().build();
         BeanUtils.copyProperties(ownerGetAndReturnCarDTO,ownerGetAndReturnCarDO);
@@ -241,6 +245,8 @@ public class DeliveryCarInfoService {
         }
         ownerHandoverCarInfoEntities = CommonUtil.copyList(ownerHandoverCarInfoList);
         OwnerGetAndReturnCarDTO getAndReturnCarDTO = deliveryCarInfoPriceService.createOwnerGetAndReturnCarDTO(ownerGetAndReturnCarDO,ownerHandoverCarInfoEntities,carEngineType,cityCode);
+        int renterOverMileageAmt = getDeliveryCarOverMileageAmt(ownerGetAndReturnCarDTO, renterGoodsDetailDTO);
+        renterGetAndReturnCarDTO.setOverKNCrash(String.valueOf(renterOverMileageAmt));
         BeanUtils.copyProperties(getAndReturnCarDTO, renterGetAndReturnCarDTO);
         ownerGetAndReturnCarDTO.setPlatFormOilServiceCharge(RenterFeeCalculatorUtils.calServiceChargeFee().getTotalFee().toString());
         if(org.apache.commons.lang3.StringUtils.isNotBlank(ownerGetAndReturnCarDTO.getCarOilDifferenceCrash())) {
@@ -306,20 +312,18 @@ public class DeliveryCarInfoService {
 
     /**
      * 获取超历程数据
-     * @param getMileage
-     * @param returnMileage
      */
-    public Integer getDeliveryCarOverMileageAmt(String getMileage, String returnMileage,RenterGoodsDetailDTO renterGoodsDetailDTO) {
+    public Integer getDeliveryCarOverMileageAmt(OwnerGetAndReturnCarDTO ownerGetAndReturnCarDTO,RenterGoodsDetailDTO renterGoodsDetailDTO) {
         try {
             MileageAmtDTO mileageAmtDTO = new MileageAmtDTO();
             mileageAmtDTO.setCarOwnerType(renterGoodsDetailDTO.getCarType());
             mileageAmtDTO.setDayMileage(renterGoodsDetailDTO.getCarDayMileage());
-            mileageAmtDTO.setGetmileage(Integer.valueOf(getMileage));
-            mileageAmtDTO.setReturnMileage(Integer.valueOf(returnMileage));
+            mileageAmtDTO.setGetmileage(Integer.valueOf(ownerGetAndReturnCarDTO.getGetKM()));
+            mileageAmtDTO.setReturnMileage(Integer.valueOf(ownerGetAndReturnCarDTO.getReturnKM()));
             mileageAmtDTO.setGuideDayPrice(renterGoodsDetailDTO.getCarGuideDayPrice());
             CostBaseDTO costBaseDTO = new CostBaseDTO();
-            costBaseDTO.setStartTime(renterGoodsDetailDTO.getRentTime());
-            costBaseDTO.setEndTime(renterGoodsDetailDTO.getRevertTime());
+            costBaseDTO.setStartTime(DateUtils.parseLocalDateTime(ownerGetAndReturnCarDTO.getRealGetTime(),DateUtils.DATE_DEFAUTE_4));
+            costBaseDTO.setEndTime(DateUtils.parseLocalDateTime(ownerGetAndReturnCarDTO.getRealReturnTime(),DateUtils.DATE_DEFAUTE_4));
             mileageAmtDTO.setCostBaseDTO(costBaseDTO);
             return deliveryCarInfoPriceService.getMileageAmtEntity(mileageAmtDTO).getTotalFee();
         } catch (Exception e) {

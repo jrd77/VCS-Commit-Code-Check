@@ -28,8 +28,8 @@ import com.atzuche.order.commons.entity.ownerOrderDetail.*;
 import com.atzuche.order.commons.enums.*;
 import com.atzuche.order.commons.enums.cashcode.OwnerCashCodeEnum;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
+import com.atzuche.order.commons.exceptions.OrderNotFoundException;
 import com.atzuche.order.coreapi.modifyorder.exception.NoEffectiveErrException;
-import com.atzuche.order.coreapi.submitOrder.exception.OrderDetailException;
 import com.atzuche.order.delivery.entity.OwnerHandoverCarInfoEntity;
 import com.atzuche.order.delivery.entity.RenterHandoverCarInfoEntity;
 import com.atzuche.order.delivery.entity.RenterOrderDeliveryEntity;
@@ -257,7 +257,7 @@ public class OrderDetailService {
         OrderEntity orderEntity = orderService.getOrderEntity(orderNo);
         if(orderEntity == null){
             log.error("获取订单数据为空orderNo={}",orderNo);
-            throw new OrderDetailException();
+            throw new OrderNotFoundException(orderNo);
         }
         //统计信息
         OrderSourceStatEntity orderSourceStatEntity = orderSourceStatService.selectByOrderNo(orderNo);
@@ -335,7 +335,7 @@ public class OrderDetailService {
         OrderEntity orderEntity = orderService.getOrderEntity(orderNo);
         if(orderEntity == null){
             log.error("获取订单数据为空orderNo={}",orderNo);
-            throw new OrderDetailException();
+            throw new OrderNotFoundException(orderNo);
         }
         OrderDTO orderDTO = new OrderDTO();
         BeanUtils.copyProperties(orderEntity,orderDTO);
@@ -419,7 +419,7 @@ public class OrderDetailService {
         OrderEntity orderEntity = orderService.getOrderEntity(orderNo);
         if(orderEntity == null){
             log.error("获取订单数据为空orderNo={}",orderNo);
-            throw new OrderDetailException();
+            throw new OrderNotFoundException(orderNo);
         }
 
         OrderDTO orderDTO = new OrderDTO();
@@ -675,7 +675,7 @@ public class OrderDetailService {
         OrderEntity orderEntity = orderService.getOrderEntity(orderNo);
         if(orderEntity == null){
             log.error("获取订单数据为空orderNo={}",orderNo);
-            throw new OrderDetailException();
+            throw new OrderNotFoundException(orderNo);
         }
         OrderDTO orderDTO = new OrderDTO();
         BeanUtils.copyProperties(orderEntity,orderDTO);
@@ -775,7 +775,7 @@ public class OrderDetailService {
         OrderEntity orderEntity = orderService.getOrderEntity(orderNo);
         if(orderEntity == null){
             log.error("获取订单数据为空orderNo={}",orderNo);
-            throw new OrderDetailException();
+            throw new OrderNotFoundException(orderNo);
         }
 
         OrderDTO orderDTO = new OrderDTO();

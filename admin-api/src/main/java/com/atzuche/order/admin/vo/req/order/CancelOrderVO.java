@@ -14,7 +14,7 @@ public class CancelOrderVO  {
     @NotBlank(message = "订单号不能为空")
     private String orderNo;
 
-    @AutoDocProperty(value = "使用角色:1.租客 2.车主", required = true)
+    @AutoDocProperty(value = "使用角色:1.车主 2.租客", required = true)
     @NotBlank(message = "使用角色不能为空")
     private String memRole;
 
