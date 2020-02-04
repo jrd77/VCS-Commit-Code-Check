@@ -4,7 +4,6 @@ import com.atzuche.order.commons.entity.dto.OwnerGoodsDetailDTO;
 import com.atzuche.order.commons.enums.CarOwnerTypeEnum;
 import com.atzuche.order.commons.enums.ErrorCode;
 import com.atzuche.order.commons.enums.OrderStatusEnum;
-import com.atzuche.order.coreapi.submitOrder.exception.OrderDetailException;
 import com.atzuche.order.coreapi.submitOrder.exception.RefuseOrderCheckException;
 import com.atzuche.order.owner.commodity.service.OwnerGoodsService;
 import com.atzuche.order.ownercost.entity.OwnerOrderEntity;

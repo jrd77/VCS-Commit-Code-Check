@@ -1,4 +1,4 @@
-package com.atzuche.order.coreapi.service;
+package com.atzuche.order.coreapi.service.remote;
 
 import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.CatConstants;
@@ -24,7 +24,7 @@ import org.springframework.stereotype.Service;
  **/
 @Service
 @Slf4j
-public class StockService {
+public class StockProxyService {
     @Autowired
     private CarRentalTimeApi carRentalTimeApi;
     

@@ -6,6 +6,7 @@ import com.atzuche.order.commons.entity.dto.CostBaseDTO;
 import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
 import com.atzuche.order.commons.enums.*;
 import com.atzuche.order.coreapi.entity.dto.CancelOrderResDTO;
+import com.atzuche.order.coreapi.service.remote.CarRentalTimeApiProxyService;
 import com.atzuche.order.flow.service.OrderFlowService;
 import com.atzuche.order.ownercost.entity.OwnerOrderEntity;
 import com.atzuche.order.ownercost.entity.OwnerOrderFineApplyEntity;
@@ -46,7 +47,7 @@ import java.time.LocalDateTime;
 public class OwnerCancelOrderService {
 
     @Autowired
-    private CarRentalTimeApiService carRentalTimeApiService;
+    private CarRentalTimeApiProxyService carRentalTimeApiService;
     @Autowired
     OrderCouponService orderCouponService;
     @Autowired

@@ -8,6 +8,8 @@ import com.atzuche.order.coreapi.entity.dto.ModifyOrderOwnerDTO;
 import com.atzuche.order.coreapi.entity.vo.req.CarRentTimeRangeReqVO;
 import com.atzuche.order.coreapi.entity.vo.res.CarRentTimeRangeResVO;
 import com.atzuche.order.coreapi.modifyorder.exception.ModifyOrderParameterException;
+import com.atzuche.order.coreapi.service.remote.CarRentalTimeApiProxyService;
+import com.atzuche.order.coreapi.service.remote.UniqueOrderNoProxyService;
 import com.atzuche.order.delivery.entity.RenterOrderDeliveryEntity;
 import com.atzuche.order.mem.MemProxyService;
 import com.atzuche.order.owner.commodity.service.OwnerCommodityService;
@@ -53,11 +55,11 @@ public class ModifyOrderForOwnerService {
 	@Autowired
 	private OwnerOrderCostService ownerOrderCostService;
 	@Autowired
-	private UniqueOrderNoService uniqueOrderNoService;
+	private UniqueOrderNoProxyService uniqueOrderNoService;
 	@Autowired
 	private OrderService orderService;
 	@Autowired
-    private CarRentalTimeApiService carRentalTimeApiService;
+    private CarRentalTimeApiProxyService carRentalTimeApiService;
 	@Autowired
     private MemProxyService memberService;
 
@@ -74,7 +76,7 @@ public class ModifyOrderForOwnerService {
 		// 主订单号
 		String orderNo = modifyOrderOwnerDTO.getOrderNo();
 		// 生成车主订单号
-		String ownerOrderNo = uniqueOrderNoService.getOwnerOrderNo(orderNo);
+		String ownerOrderNo = uniqueOrderNoService.genOwnerOrderNo(orderNo);
 		// 赋值车主订单号
 		modifyOrderOwnerDTO.setOwnerOrderNo(ownerOrderNo);
 		// 获取主订单信息

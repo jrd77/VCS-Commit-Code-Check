@@ -15,7 +15,7 @@ import com.atzuche.order.commons.vo.req.OrderReqVO;
 import com.atzuche.order.commons.vo.res.OrderResVO;
 import com.atzuche.order.coreapi.common.conver.OrderCommonConver;
 import com.atzuche.order.coreapi.filter.OrderFilterChain;
-import com.atzuche.order.coreapi.service.StockService;
+import com.atzuche.order.coreapi.service.remote.StockProxyService;
 import com.atzuche.order.coreapi.service.SubmitOrderService;
 import com.atzuche.order.mem.MemProxyService;
 import com.atzuche.order.parentorder.entity.OrderRecordEntity;
@@ -58,7 +58,7 @@ public class SubmitOrderController {
     @Autowired
     private OrderRecordService orderRecordService;
     @Autowired
-    private StockService stockService;
+    private StockProxyService stockService;
 
     @Autowired
     private MemProxyService memberService;

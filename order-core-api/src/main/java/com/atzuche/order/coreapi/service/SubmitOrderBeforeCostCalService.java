@@ -12,6 +12,7 @@ import com.atzuche.order.commons.vo.res.NormalOrderCostCalculateResVO;
 import com.atzuche.order.commons.vo.res.order.*;
 import com.atzuche.order.coreapi.common.conver.OrderCommonConver;
 import com.atzuche.order.coreapi.entity.vo.res.CarRentTimeRangeResVO;
+import com.atzuche.order.coreapi.service.remote.CarRentalTimeApiProxyService;
 import com.atzuche.order.mem.MemProxyService;
 import com.atzuche.order.rentercommodity.service.RenterCommodityService;
 import com.atzuche.order.renterorder.entity.dto.DeductContextDTO;
@@ -46,7 +47,7 @@ public class SubmitOrderBeforeCostCalService {
     @Autowired
     private RenterOrderCalCostService renterOrderCalCostService;
     @Autowired
-    private CarRentalTimeApiService carRentalTimeApiService;
+    private CarRentalTimeApiProxyService carRentalTimeApiService;
     @Autowired
     private OrderCommonConver orderCommonConver;
     @Autowired
