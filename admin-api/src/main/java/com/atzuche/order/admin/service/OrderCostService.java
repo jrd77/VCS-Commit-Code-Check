@@ -26,6 +26,7 @@ import com.atzuche.order.commons.vo.res.cost.RenterOrderSubsidyDetailResVO;
 import com.atzuche.order.commons.vo.res.ownercosts.OwnerOrderFineDeatailEntity;
 import com.atzuche.order.commons.vo.res.ownercosts.OwnerOrderIncrementDetailEntity;
 import com.atzuche.order.commons.vo.res.ownercosts.OwnerOrderPurchaseDetailEntity;
+import com.atzuche.order.commons.vo.res.ownercosts.OwnerOrderSubsidyDetailEntity;
 import com.atzuche.order.commons.vo.res.rentcosts.OrderConsoleSubsidyDetailEntity;
 import com.atzuche.order.commons.vo.res.rentcosts.OrderCouponEntity;
 import com.atzuche.order.commons.vo.res.rentcosts.OrderSupplementDetailEntity;
@@ -101,6 +102,7 @@ public class OrderCostService {
 				//油费,超里程
 				putOilBeyondMile(realVo,data);
 				
+//				111
 				//平台给租客的补贴
 				putConsoleSubsidy(realVo,data);
 				
@@ -191,15 +193,35 @@ public class OrderCostService {
 				platformSubsidyAmount += orderConsoleSubsidyDetailEntity.getSubsidyAmount().intValue();
 			}
 			
-			if("2".equals(orderConsoleSubsidyDetailEntity.getSubsidySourceName()) && "1".equals(orderConsoleSubsidyDetailEntity.getSubsidyTargetName())) {
+//			1111
+			///  从租客补贴表中获取，如下:租客补贴  20200205
+//			if("2".equals(orderConsoleSubsidyDetailEntity.getSubsidySourceName()) && "1".equals(orderConsoleSubsidyDetailEntity.getSubsidyTargetName())) {
+//				//车主给租客的补贴
+//				ownerSubsidyRentTotalAmount += orderConsoleSubsidyDetailEntity.getSubsidyAmount().intValue();
+//				//租金的补贴
+//				if(orderConsoleSubsidyDetailEntity.getSubsidyCostCode().equals(RenterCashCodeEnum.SUBSIDY_OWNER_TORENTER_RENTAMT.getCashNo())) {
+//					ownerSubsidyRentAmount += orderConsoleSubsidyDetailEntity.getSubsidyAmount().intValue();
+//				}
+//			}
+		}
+		
+		/**
+		 * 租客补贴 20200205
+		 */
+		List<RenterOrderSubsidyDetailResVO> subsidyLst = data.getSubsidyLst();
+		for (RenterOrderSubsidyDetailResVO renterOrderSubsidyDetailResVO : subsidyLst) {
+			
+			if("2".equals(renterOrderSubsidyDetailResVO.getSubsidySourceName()) && "1".equals(renterOrderSubsidyDetailResVO.getSubsidyTargetName())) {
 				//车主给租客的补贴
-				ownerSubsidyRentTotalAmount += orderConsoleSubsidyDetailEntity.getSubsidyAmount().intValue();
+				ownerSubsidyRentTotalAmount += renterOrderSubsidyDetailResVO.getSubsidyAmount().intValue();
 				//租金的补贴
-				if(orderConsoleSubsidyDetailEntity.getSubsidyCostCode().equals(RenterCashCodeEnum.SUBSIDY_OWNER_TORENTER_RENTAMT.getCashNo())) {
-					ownerSubsidyRentAmount += orderConsoleSubsidyDetailEntity.getSubsidyAmount().intValue();
+				if(renterOrderSubsidyDetailResVO.getSubsidyCostCode().equals(RenterCashCodeEnum.SUBSIDY_OWNER_TORENTER_RENTAMT.getCashNo())) {
+					ownerSubsidyRentAmount += renterOrderSubsidyDetailResVO.getSubsidyAmount().intValue();
 				}
 			}
 		}
+		
+		
 		
 		platformSubsidyTotalAmt = String.valueOf(platformSubsidyAmount);
 		platformSubsidyAmt = String.valueOf(platformSubsidyAmount);
@@ -666,6 +688,9 @@ public class OrderCostService {
 		 
 		 int platformSubsidyAmount = 0;
 		 int ownerSubsidyRentAmount = 0;
+		 /**
+		  * 管理后台补贴
+		  */
 		 List<OrderConsoleSubsidyDetailEntity> orderConsoleSubsidyDetails = data.getOrderConsoleSubsidyDetails();
 			for (OrderConsoleSubsidyDetailEntity orderConsoleSubsidyDetailEntity : orderConsoleSubsidyDetails) {
 				//`subsidy_source_name` varchar(16) DEFAULT NULL COMMENT '补贴来源方 1、租客 2、车主 3、平台',
@@ -674,13 +699,27 @@ public class OrderCostService {
 					platformSubsidyAmount += orderConsoleSubsidyDetailEntity.getSubsidyAmount().intValue();
 				}
 				
-				if("2".equals(orderConsoleSubsidyDetailEntity.getSubsidySourceName()) && "1".equals(orderConsoleSubsidyDetailEntity.getSubsidyTargetName())) {
+//				111 //从车主的补贴中获取，如下。车主补贴
+//				if("2".equals(orderConsoleSubsidyDetailEntity.getSubsidySourceName()) && "1".equals(orderConsoleSubsidyDetailEntity.getSubsidyTargetName())) {
+//					//租金的补贴
+//					if(orderConsoleSubsidyDetailEntity.getSubsidyCostCode().equals(RenterCashCodeEnum.SUBSIDY_OWNER_TORENTER_RENTAMT.getCashNo())) {
+//						ownerSubsidyRentAmount += orderConsoleSubsidyDetailEntity.getSubsidyAmount().intValue();
+//					}
+//				}
+				
+			}
+			
+			/**
+			 * 车主补贴 20200205
+			 */
+			List<OwnerOrderSubsidyDetailEntity> ownerOrderSubsidyDetail = data.getOwnerOrderSubsidyDetail();
+			for (OwnerOrderSubsidyDetailEntity ownerOrderSubsidyDetailEntity : ownerOrderSubsidyDetail) {
+				if("2".equals(ownerOrderSubsidyDetailEntity.getSubsidySourceName()) && "1".equals(ownerOrderSubsidyDetailEntity.getSubsidyTargetName())) {
 					//租金的补贴
-					if(orderConsoleSubsidyDetailEntity.getSubsidyCostCode().equals(RenterCashCodeEnum.SUBSIDY_OWNER_TORENTER_RENTAMT.getCashNo())) {
-						ownerSubsidyRentAmount += orderConsoleSubsidyDetailEntity.getSubsidyAmount().intValue();
+					if(ownerOrderSubsidyDetailEntity.getSubsidyCostCode().equals(RenterCashCodeEnum.SUBSIDY_OWNER_TORENTER_RENTAMT.getCashNo())) {
+						ownerSubsidyRentAmount += ownerOrderSubsidyDetailEntity.getSubsidyAmount().intValue();
 					}
 				}
-				
 			}
 		 
 			

@@ -36,9 +36,19 @@ public class CommUseDriverInfoDTO {
     
     ///附加驾驶人金额
     private String amt;
+    //管理后台操作人名称
+    private String consoleOperatorName;
     
     
-    public String getAmt() {
+    public String getConsoleOperatorName() {
+		return consoleOperatorName;
+	}
+
+	public void setConsoleOperatorName(String consoleOperatorName) {
+		this.consoleOperatorName = consoleOperatorName;
+	}
+
+	public String getAmt() {
 		return amt;
 	}
 
