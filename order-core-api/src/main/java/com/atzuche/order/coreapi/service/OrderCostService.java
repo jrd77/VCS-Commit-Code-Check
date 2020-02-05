@@ -237,11 +237,12 @@ public class OrderCostService {
                 BeanUtils.copyProperties(oilAmtReal, oilAmt);
                 String oilDifferenceCrash = oilAmt.getOilDifferenceCrash();
                 oilDifferenceCrash = StringUtil.isBlank(oilDifferenceCrash)?"0":oilDifferenceCrash;
-                oilAmtReal.setTotalAmount(Integer.valueOf(oilDifferenceCrash));
+                //oilDifferenceCrash may be "0.0" format
+                oilAmtReal.setTotalAmount((int)Float.parseFloat(oilDifferenceCrash));
             }
 		    resVo.setOilAmt(oilAmtReal);
 
-		    /**
+		    /*
 		     * 交接车-获取超里程费用
 		     */
             FeeResult mileageAmt = rentCost.getMileageAmt();
