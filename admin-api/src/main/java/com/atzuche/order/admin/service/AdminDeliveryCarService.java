@@ -2,6 +2,7 @@ package com.atzuche.order.admin.service;
 
 import com.atzuche.order.admin.vo.resp.cost.DistributionCostVO;
 import com.atzuche.order.commons.entity.dto.CostBaseDTO;
+import com.atzuche.order.commons.entity.dto.GetReturnCarCostReqDto;
 import com.atzuche.order.commons.entity.dto.GetReturnCarOverCostReqDto;
 import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
 import com.atzuche.order.commons.vo.req.handover.req.HandoverCarInfoReqDTO;
@@ -22,14 +23,18 @@ import com.atzuche.order.delivery.vo.delivery.req.DeliveryCarRepVO;
 import com.atzuche.order.delivery.vo.delivery.req.DeliveryReqDTO;
 import com.atzuche.order.delivery.vo.delivery.req.DeliveryReqVO;
 import com.atzuche.order.rentercommodity.service.RenterCommodityService;
+import com.atzuche.order.transport.service.GetReturnCarCostProxyService;
 import com.atzuche.order.transport.service.TranSportProxyService;
+import com.atzuche.order.transport.vo.GetReturnCostDTO;
 import com.atzuche.order.transport.vo.GetReturnOverCostDTO;
 import com.autoyol.platformcost.OwnerFeeCalculatorUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -51,6 +56,8 @@ public class AdminDeliveryCarService {
     RenterOrderDeliveryService renterOrderDeliveryService;
     @Autowired
     TranSportProxyService tranSportProxyService;
+    @Autowired
+    GetReturnCarCostProxyService getReturnCarCostProxyService;
 
     protected final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -186,37 +193,56 @@ public class AdminDeliveryCarService {
         logger.info("入参deliveryCarDTO：[{}]", deliveryCarDTO.toString());
         DistributionCostVO distributionCostVO = DistributionCostVO.builder().build();
         // 获取租客商品信息
-        RenterOrderDeliveryEntity renterOrderDeliveryEntity = renterOrderDeliveryService.findRenterOrderByrOrderNo(deliveryCarDTO.getOrderNo(), 1);
+        List<RenterOrderDeliveryEntity> renterOrderDeliveryEntityList = renterOrderDeliveryService.findRenterOrderListByOrderNo(deliveryCarDTO.getOrderNo());
+        if(CollectionUtils.isEmpty(renterOrderDeliveryEntityList))
+        {
+            return distributionCostVO;
+        }
+        RenterOrderDeliveryEntity renterOrderDeliveryEntity = renterOrderDeliveryEntityList.get(0);
         RenterGoodsDetailDTO renterGoodsDetailDTO = renterCommodityService.getRenterGoodsDetail(renterOrderDeliveryEntity.getRenterOrderNo(), false);
-        //取车费用
-        distributionCostVO.setGetCarAmt(String.valueOf(OwnerFeeCalculatorUtils.calOwnerSrvGetAmt(renterGoodsDetailDTO.getCarType(), 1)));
-        //还车费用
-        distributionCostVO.setRenturnCarAmt(String.valueOf(OwnerFeeCalculatorUtils.calOwnerSrvReturnAmt(renterGoodsDetailDTO.getCarType(), 2)));
-        //获取运能数据
-        //获取超运能
-        GetReturnCarOverCostReqDto getReturnCarOverCostReqDto = new GetReturnCarOverCostReqDto();
-        getReturnCarOverCostReqDto.setCityCode(Integer.valueOf(renterOrderDeliveryEntity.getCityCode()));
-        getReturnCarOverCostReqDto.setOrderType(1);
         CostBaseDTO costBaseDTO = new CostBaseDTO();
         costBaseDTO.setStartTime(renterOrderDeliveryEntity.getRentTime());
         costBaseDTO.setEndTime(renterOrderDeliveryEntity.getRevertTime());
         costBaseDTO.setOrderNo(renterOrderDeliveryEntity.getOrderNo());
         costBaseDTO.setRenterOrderNo(renterOrderDeliveryEntity.getRenterOrderNo());
+        GetReturnCarOverCostReqDto getReturnCarOverCostReqDto = new GetReturnCarOverCostReqDto();
+        GetReturnCarCostReqDto getReturnCarCostReqDto = new GetReturnCarCostReqDto();
+        getReturnCarCostReqDto.setCityCode(Integer.valueOf(renterOrderDeliveryEntity.getCityCode()));
+        getReturnCarCostReqDto.setIsPackageOrder(false);
+        getReturnCarCostReqDto.setCostBaseDTO(costBaseDTO);
+        renterOrderDeliveryEntityList.stream().forEach(renterOrderDelivery -> {
+            if(renterOrderDelivery.getType().intValue() == 1) {
+                getReturnCarCostReqDto.setSrvGetLat(renterOrderDelivery.getRenterGetReturnAddrLat());
+                getReturnCarCostReqDto.setSrvGetLon(renterOrderDelivery.getRenterGetReturnAddrLon());
+                getReturnCarCostReqDto.setIsGetCarCost(true);
+                getReturnCarOverCostReqDto.setIsGetCarCost(true);
+            }else {
+                getReturnCarCostReqDto.setSrvReturnLat(renterOrderDelivery.getRenterGetReturnAddrLat());
+                getReturnCarCostReqDto.setSrvReturnLon(renterOrderDelivery.getRenterGetReturnAddrLon());
+                getReturnCarOverCostReqDto.setIsReturnCarCost(true);
+                getReturnCarCostReqDto.setIsReturnCarCost(true);
+            }
+              });
+        getReturnCarCostReqDto.setCarRealLat(renterGoodsDetailDTO.getCarRealLat());
+        getReturnCarCostReqDto.setCarRealLon(renterGoodsDetailDTO.getCarRealLon());
+        getReturnCarCostReqDto.setCarShowLat(renterGoodsDetailDTO.getCarShowLat());
+        getReturnCarCostReqDto.setCarShowLon(renterGoodsDetailDTO.getCarShowLon());
+        GetReturnCostDTO getReturnCostDTO = getReturnCarCostProxyService.getReturnCarCost(getReturnCarCostReqDto);
+        if(Objects.nonNull(getReturnCostDTO)) {
+            distributionCostVO.setGetCarAmt(String.valueOf(getReturnCostDTO.getGetReturnResponseVO().getGetFee()));
+            distributionCostVO.setRenturnCarAmt(String.valueOf(getReturnCostDTO.getGetReturnResponseVO().getReturnFee()));
+        }
+        getReturnCarOverCostReqDto.setCityCode(Integer.valueOf(renterOrderDeliveryEntity.getCityCode()));
+        getReturnCarOverCostReqDto.setOrderType(1);
         getReturnCarOverCostReqDto.setCostBaseDTO(costBaseDTO);
-        getReturnCarOverCostReqDto.setIsGetCarCost(true);
-        getReturnCarOverCostReqDto.setIsReturnCarCost(true);
         try {
             GetReturnOverCostDTO getReturnOverCostDTO = tranSportProxyService.getGetReturnOverCost(getReturnCarOverCostReqDto);
-            boolean isGetOverTransport = getReturnOverCostDTO.getGetReturnOverTransportDTO().getIsGetOverTransport();
-            boolean isReturnOverTransport = getReturnOverCostDTO.getGetReturnOverTransportDTO().getIsReturnOverTransport();
-            if (isGetOverTransport) {
-                int chaoYunNengAddCrash = getReturnOverCostDTO.getGetReturnOverTransportDTO().getGetOverTransportFee() + getReturnOverCostDTO.getGetReturnOverTransportDTO().getNightGetOverTransportFee();
-                distributionCostVO.setGetCarChaoYunNeng(String.valueOf(chaoYunNengAddCrash));
-            }
-            if (isReturnOverTransport) {
-                int chaoYunNengAddCrash = getReturnOverCostDTO.getGetReturnOverTransportDTO().getNightReturnOverTransportFee() + getReturnOverCostDTO.getGetReturnOverTransportDTO().getNightReturnOverTransportFee();
-                distributionCostVO.setReturnCarChaoYunNeng(String.valueOf(chaoYunNengAddCrash));
-            }
+                int chaoYunNengAddCrash = getReturnOverCostDTO.getGetReturnOverTransportDTO().getGetOverTransportFee();
+                int nightGetOverTransportFee =  getReturnOverCostDTO.getGetReturnOverTransportDTO().getNightGetOverTransportFee() == null ? 0 : getReturnOverCostDTO.getGetReturnOverTransportDTO().getNightGetOverTransportFee();
+                distributionCostVO.setGetCarChaoYunNeng(String.valueOf(chaoYunNengAddCrash+nightGetOverTransportFee));
+                int returnChaoYunNengAddCrash = getReturnOverCostDTO.getGetReturnOverTransportDTO().getReturnOverTransportFee();
+                int nightReturnOverTransportFee = getReturnOverCostDTO.getGetReturnOverTransportDTO().getNightReturnOverTransportFee() == null ? 0 : getReturnOverCostDTO.getGetReturnOverTransportDTO().getNightReturnOverTransportFee();
+                distributionCostVO.setReturnCarChaoYunNeng(String.valueOf(returnChaoYunNengAddCrash+nightReturnOverTransportFee));
         } catch (Exception e) {
             logger.error("获取超运能异常，给默认值,cause:{}", e.getMessage());
             distributionCostVO.setReturnCarChaoYunNeng("0");
