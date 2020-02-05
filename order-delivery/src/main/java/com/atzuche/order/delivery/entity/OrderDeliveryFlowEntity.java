@@ -173,8 +173,6 @@ public class OrderDeliveryFlowEntity implements Serializable {
         if (orderType.intValue() == UsedDeliveryTypeEnum.USED.getValue().intValue()) {
             setServiceType(ServiceTypeEnum.TAKE_TYPE.getValue());
             setPickupAlsoCarAddr(orderDeliveryDTO.getRenterGetReturnAddr());
-
-
         } else {
             setServiceType(ServiceTypeEnum.BACK_TYPE.getValue());
             setPickupAlsoCarAddr(orderDeliveryDTO.getRenterGetReturnAddr());

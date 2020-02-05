@@ -170,7 +170,7 @@ public class DeliveryCarInfoService {
             int nightGetOverTransportFee =  getReturnOverCostDTO.getGetReturnOverTransportDTO().getNightGetOverTransportFee() == null ? 0 : getReturnOverCostDTO.getGetReturnOverTransportDTO().getNightGetOverTransportFee();
             int chaoYunNengAddCrash = getReturnOverCostDTO.getGetReturnOverTransportDTO().getGetOverTransportFee() + nightGetOverTransportFee;
             int nightReturnOverTransportFee = getReturnOverCostDTO.getGetReturnOverTransportDTO().getNightReturnOverTransportFee() == null ? 0 : getReturnOverCostDTO.getGetReturnOverTransportDTO().getNightReturnOverTransportFee();
-            int returnChaoYunNengAddCrash = + getReturnOverCostDTO.getGetReturnOverTransportDTO().getReturnOverTransportFee() + nightReturnOverTransportFee;
+            int returnChaoYunNengAddCrash =  getReturnOverCostDTO.getGetReturnOverTransportDTO().getReturnOverTransportFee() + nightReturnOverTransportFee;
             returnChaoYunNengAddCrashStr = String.valueOf(returnChaoYunNengAddCrash);
             chaoYunNengAddCrashStr = String.valueOf(chaoYunNengAddCrash);
         } catch (Exception e) {
