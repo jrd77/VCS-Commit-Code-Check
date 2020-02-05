@@ -106,6 +106,8 @@ public class RenterOrderCostDetailService{
 			if(renterOrderCostDetailEntity.getCostCode().equals(RenterCashCodeEnum.EXTRA_DRIVER_INSURE.getCashNo())) {
 				//根据ID修改
 				extraDriverInsureAmtEntity.setId(renterOrderCostDetailEntity.getId());
+				//不修改
+				extraDriverInsureAmtEntity.setCreateOp(null);
 				renterOrderCostDetailMapper.updateByPrimaryKeySelective(extraDriverInsureAmtEntity);
 				isExists = true;
 			}

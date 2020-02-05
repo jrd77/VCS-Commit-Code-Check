@@ -227,7 +227,6 @@ public class OrderRentalCostDetailController {
 		if (bindingResult.hasErrors()) {
             return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), ErrorCode.INPUT_ERROR.getText());
         }
-        
         try {
         	orderCostDetailService.updatePlatFormToOwnerListByOrderNo(ownerCostReqVO);
         	return ResponseData.success();
