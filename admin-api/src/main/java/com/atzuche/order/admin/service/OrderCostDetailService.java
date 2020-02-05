@@ -858,10 +858,21 @@ public class OrderCostDetailService {
                        LocalDate carDay = x.getCarDay();
                        x.setCarDayStr(carDay!=null?LocalDateTimeUtils.localdateToString(carDay):null);
                    });
-            renterRentDetailDTO.setDayAverageAmt(renterGoodsPriceDetailDTOList.get(0).getCarUnitPrice());
+            
+            //从renter_order_cost_detail获取 ，而不是从renter_goods_price_detail获取天价格。20200205 huangjing
+//            renterRentDetailDTO.setDayAverageAmt(renterGoodsPriceDetailDTOList.get(0).getCarUnitPrice());
             renterRentDetailDTO.setRenterGoodsPriceDetailDTOS(renterGoodsPriceDetailDTOList);
             renterRentDetailDTO.setCarPlateNum(renterGoodsDetail.getCarPlateNum());
         }
+        
+        //111 租客租金组成 日均价
+        List<RenterOrderCostDetailEntity> lstRenterCostDetail = renterOrderCostDetailService.listRenterOrderCostDetail(renterCostReqVO.getOrderNo(), renterCostReqVO.getRenterOrderNo());
+        for (RenterOrderCostDetailEntity renterOrderCostDetailEntity : lstRenterCostDetail) {
+			if(RenterCashCodeEnum.RENT_AMT.getCashNo().equals(renterOrderCostDetailEntity.getCostCode())) {
+				renterRentDetailDTO.setDayAverageAmt(renterOrderCostDetailEntity.getUnitPrice());
+				break;
+			}
+		}
 
 
         OrderDTO orderDTO = new OrderDTO();
