@@ -109,13 +109,8 @@ public enum ErrorCode {
     ADMIN_ORDER_QUERY_R_HISTORY_FAIL("700140","人工调度查询历史订单列表失败"),
     ADMIN_OWNER_UPDATE_FIEN_ERR("700141","修改车主罚金异常"),
     ADMIN_OWNER_UPDATE_FIEN_FAIL("700142","修改车主罚金失败"),
+    OWNER_ORDER_GOODS_NOT_EXIST("700143","车主订单商品信息为空。")
 
-
-
-    OWNER_COMFIRM_TRANS_FAILED("500044","无法进行车主同意/拒绝操作。"),
-    PROXY_CAR_CAN_NOT_OPT_TRANS("100569","抱歉，代管车不可对订单进行操作"),
-    MANAGED_CAR_CAN_NOT_OPT_TRANS("100669","抱歉，短租托管车不可对订单进行操作"),
-    OWNER_ORDER_GOODS_NOT_EXIST("500045","车主订单商品信息为空。")
     ;
 
     private String code;

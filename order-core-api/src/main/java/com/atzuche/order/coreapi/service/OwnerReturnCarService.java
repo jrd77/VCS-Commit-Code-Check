@@ -11,6 +11,7 @@ import com.atzuche.order.parentorder.dto.OrderStatusDTO;
 import com.atzuche.order.parentorder.service.OrderStatusService;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.atzuche.order.renterorder.service.RenterOrderService;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,13 +39,16 @@ public class OwnerReturnCarService {
     RenterOrderService renterOrderService;
     @Autowired
     OwnerOrderService ownerOrderService;
+    @Autowired
+    RefuseOrderCheckService refuseOrderCheckService;
 
     @Transactional(rollbackFor = Exception.class)
     public void returnCar(ReturnCarReqVO reqVO) {
 
-        //TODO:车主交车前置校验
+        //车主交车前置校验
+        refuseOrderCheckService.checkOwnerReturnCar(reqVO.getOrderNo(), StringUtils.isNotBlank(reqVO.getOperatorName()));
 
-        //更新主订单状态
+        //订单状态处理
         OrderStatusDTO orderStatusDTO = new OrderStatusDTO();
         orderStatusDTO.setOrderNo(reqVO.getOrderNo());
         orderStatusDTO.setStatus(OrderStatusEnum.TO_SETTLE.getStatus());
