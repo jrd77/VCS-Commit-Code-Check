@@ -42,6 +42,8 @@ public class OrderConsoleCostDetailService{
     	for (OrderConsoleCostDetailEntity orderConsoleCostDetailEntity : list) {
 			if(orderConsoleCostDetailEntity.getSubsidySourceCode().equals(record.getSubsidySourceCode()) && orderConsoleCostDetailEntity.getSubsidyTargetCode().equals(record.getSubsidyTargetCode()) && orderConsoleCostDetailEntity.getSubsidyTypeCode().equals(record.getSubsidyTypeCode())) {
 				record.setId(orderConsoleCostDetailEntity.getId());
+				//修改的话无需修改创建人
+    			record.setCreateOp(null);
 				orderConsoleCostDetailMapper.updateByPrimaryKeySelective(record);
 				isExists = true;
 			}

@@ -11,10 +11,10 @@ import javax.validation.constraints.NotNull;
  **/
 @Data
 public class DeductWalletVO {
-    @NotBlank
+    @NotBlank(message = "会员号不能为空")
     private String memNo;
-    @NotBlank
+    @NotBlank(message = "订单号不能为空")
     private String orderNo;
-    @NotNull
+    @NotNull(message = "amt不能为空")
     private Integer amt;
 }

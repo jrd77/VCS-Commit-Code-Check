@@ -49,6 +49,8 @@ public class OrderConsoleSubsidyDetailService{
 			//存在
     		if(orderConsoleSubsidyDetailEntity.getSubsidySourceCode().equals(record.getSubsidySourceCode()) && orderConsoleSubsidyDetailEntity.getSubsidyTargetCode().equals(record.getSubsidyTargetCode()) && orderConsoleSubsidyDetailEntity.getSubsidyCostCode().equals(record.getSubsidyCostCode())) {
     			record.setId(orderConsoleSubsidyDetailEntity.getId());
+    			//修改的话无需修改创建人
+    			record.setCreateOp(null);
     			orderConsoleSubsidyDetailMapper.updateByPrimaryKeySelective(record);
     			isExists = true;
 			}
