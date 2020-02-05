@@ -25,20 +25,20 @@ public class OrderPaySignReqVO {
      来自配置DataPayKindConstant.class
      */
     @AutoDocProperty("支付款项")
-    @NotNull
+    @NotNull(message = "payKind不能为空")
     private List<String> payKind         ;
 
     /**
      * 会员号
      */
     @AutoDocProperty("会员号")
-    @NotNull
+    @NotNull(message = "menNo不能为空")
     private String menNo;
     /**
      * orderNo
      */
     @AutoDocProperty("主订单号")
-    @NotNull
+    @NotNull(message = "orderNo不能为空")
     private String orderNo;
 
     /**
@@ -62,7 +62,7 @@ public class OrderPaySignReqVO {
      * 支付方式：transType "01"：消费，"02"：预授权， 消费方式："31"：消费撤销，"32"：预授权撤销，"03"：预授权完成，"04"：退货
      */
     @AutoDocProperty("支付方式：transType \"01\"：消费，\"02\"：预授权， 消费方式：\"31\"：消费撤销，\"32\"：预授权撤销，\"03\"：预授权完成，\"04\"：退货")
-    @NotNull
+    @NotNull(message = "payType不能为空")
     private String payType;
 
     /**
@@ -75,7 +75,7 @@ public class OrderPaySignReqVO {
      * 来源系统
      */
     @AutoDocProperty("来源系统(ANDROID ,IOS H5 ,WEB, MICROPROGRAM)")
-    @NotNull
+    @NotNull(message = "reqOs不能为空")
     private String reqOs;
 
     /**
@@ -91,7 +91,7 @@ public class OrderPaySignReqVO {
             "\t\t13. 微信支付(公众号)\n" +
             "\t\t14.连连支付\n" +
             "\t\t15. 微信支付(H5)")
-    @NotNull
+    @NotNull(message = "paySource不能为空")
     private String paySource;
 
     /**
