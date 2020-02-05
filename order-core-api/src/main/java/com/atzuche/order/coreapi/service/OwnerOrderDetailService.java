@@ -21,6 +21,7 @@ import com.atzuche.order.ownercost.entity.OwnerOrderFineDeatailEntity;
 import com.atzuche.order.ownercost.entity.OwnerOrderPurchaseDetailEntity;
 import com.atzuche.order.ownercost.entity.OwnerOrderSubsidyDetailEntity;
 import com.atzuche.order.ownercost.service.OwnerOrderFineDeatailService;
+import com.atzuche.order.ownercost.service.OwnerOrderPurchaseDetailService;
 import com.atzuche.order.ownercost.service.OwnerOrderSubsidyDetailService;
 import com.atzuche.order.parentorder.entity.OrderEntity;
 import com.atzuche.order.parentorder.service.OrderService;
@@ -54,6 +55,8 @@ public class OwnerOrderDetailService {
     private OrderConsoleCostDetailService orderConsoleCostDetailService;
     @Autowired
     private OrderSettleService orderSettleService;
+    
+    private OwnerOrderPurchaseDetailService ownerOrderPurchaseDetailService;
 
     public OwnerRentDetailDTO ownerRentDetail(String orderNo, String ownerOrderNo) {
         //主订单
@@ -71,10 +74,22 @@ public class OwnerOrderDetailService {
                        LocalDate carDay = x.getCarDay();
                        x.setCarDayStr(carDay!=null?LocalDateTimeUtils.localdateToString(carDay):null);
                    });
-            ownerRentDetailDTO.setDayAverageAmt(ownerGoodsPriceDetailDTOList.get(0).getCarUnitPrice());
+            //bugfix 不能从某天来获取，从owner_order_purchase_detail获取。20200205 huangjing
+//            ownerRentDetailDTO.setDayAverageAmt(ownerGoodsPriceDetailDTOList.get(0).getCarUnitPrice());
             ownerRentDetailDTO.setOwnerGoodsPriceDetailDTOS(ownerGoodsPriceDetailDTOList);
         }
-
+        
+        //111
+        ///车主租金组成 日均价的获取。20200205 huangjing
+        List<OwnerOrderPurchaseDetailEntity> lstPurchaseDetail = ownerOrderPurchaseDetailService.listOwnerOrderPurchaseDetail(orderNo, ownerOrderNo);
+        for (OwnerOrderPurchaseDetailEntity ownerOrderPurchaseDetailEntity : lstPurchaseDetail) {
+			if(OwnerCashCodeEnum.RENT_AMT.getCashNo().equals(ownerOrderPurchaseDetailEntity.getCostCode())) {
+				ownerRentDetailDTO.setDayAverageAmt(ownerOrderPurchaseDetailEntity.getUnitPrice());
+				break;
+			}
+		}
+        
+        
 
         OrderDTO orderDTO = new OrderDTO();
         BeanUtils.copyProperties(orderEntity,orderDTO);
