@@ -82,7 +82,7 @@ public enum RenterCashCodeEnum {
     CANCEL_WZ_DEPOSIT_TO_HISTORY_AMT("11130016","违章押金转历史欠款"),
     CANCEL_RENT_COST_TO_RETURN_AMT("11130017","取消租车费用退还"),
     ACCOUNT_RENTER_DETAIN_CAR_AMT("11130018","暂扣的租车费用"),
-    /////
+    ///// 暂扣的考虑以下的费用编码。
     ACCOUNT_RENTER_RENT_COST("11130019","租车费用"),
     ACCOUNT_RENTER_WZ_DEPOSIT("11130020","违章押金"),
     ACCOUNT_RENTER_DEPOSIT("11130021","车俩押金"),

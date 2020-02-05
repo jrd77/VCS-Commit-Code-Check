@@ -6,15 +6,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import com.atzuche.order.accountplatorm.entity.AccountPlatformProfitEntity;
-import com.atzuche.order.commons.enums.cashier.PaySourceEnum;
-import com.atzuche.order.delivery.service.delivery.DeliveryCarInfoPriceService;
-import com.atzuche.order.delivery.vo.delivery.DeliveryOilCostVO;
-import com.atzuche.order.delivery.vo.delivery.rep.OwnerGetAndReturnCarDTO;
-import com.atzuche.order.delivery.vo.delivery.rep.RenterGetAndReturnCarDTO;
-import com.atzuche.order.ownercost.entity.*;
-import com.atzuche.order.ownercost.service.*;
-import com.autoyol.platformcost.model.FeeResult;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,8 +14,10 @@ import org.springframework.util.CollectionUtils;
 import com.atzuche.order.accountownercost.entity.AccountOwnerCostSettleDetailEntity;
 import com.atzuche.order.accountownerincome.vo.req.AccountOwnerIncomeExamineReqVO;
 import com.atzuche.order.accountplatorm.entity.AccountPlatformProfitDetailEntity;
+import com.atzuche.order.accountplatorm.entity.AccountPlatformProfitEntity;
 import com.atzuche.order.accountplatorm.entity.AccountPlatformSubsidyDetailEntity;
 import com.atzuche.order.accountrenterdeposit.vo.req.OrderCancelRenterDepositReqVO;
+import com.atzuche.order.accountrenterdetain.service.notservice.AccountRenterDetainDetailNoTService;
 import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostDetailEntity;
 import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostSettleDetailEntity;
 import com.atzuche.order.accountrenterrentcost.vo.req.AccountRenterCostDetailReqVO;
@@ -51,15 +44,33 @@ import com.atzuche.order.commons.enums.account.debt.DebtTypeEnum;
 import com.atzuche.order.commons.enums.cashcode.OwnerCashCodeEnum;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.commons.enums.cashier.OrderRefundStatusEnum;
+import com.atzuche.order.commons.enums.cashier.PaySourceEnum;
 import com.atzuche.order.commons.enums.cashier.PayTypeEnum;
 import com.atzuche.order.delivery.entity.OwnerHandoverCarInfoEntity;
 import com.atzuche.order.delivery.entity.RenterHandoverCarInfoEntity;
 import com.atzuche.order.delivery.enums.RenterHandoverCarTypeEnum;
+import com.atzuche.order.delivery.service.delivery.DeliveryCarInfoPriceService;
 import com.atzuche.order.delivery.service.handover.HandoverCarService;
+import com.atzuche.order.delivery.vo.delivery.DeliveryOilCostVO;
+import com.atzuche.order.delivery.vo.delivery.rep.OwnerGetAndReturnCarDTO;
+import com.atzuche.order.delivery.vo.delivery.rep.RenterGetAndReturnCarDTO;
 import com.atzuche.order.delivery.vo.handover.HandoverCarRepVO;
 import com.atzuche.order.delivery.vo.handover.HandoverCarReqVO;
 import com.atzuche.order.flow.service.OrderFlowService;
 import com.atzuche.order.owner.commodity.service.OwnerGoodsService;
+import com.atzuche.order.ownercost.entity.ConsoleOwnerOrderFineDeatailEntity;
+import com.atzuche.order.ownercost.entity.OwnerOrderEntity;
+import com.atzuche.order.ownercost.entity.OwnerOrderFineDeatailEntity;
+import com.atzuche.order.ownercost.entity.OwnerOrderIncrementDetailEntity;
+import com.atzuche.order.ownercost.entity.OwnerOrderPurchaseDetailEntity;
+import com.atzuche.order.ownercost.entity.OwnerOrderSubsidyDetailEntity;
+import com.atzuche.order.ownercost.service.ConsoleOwnerOrderFineDeatailService;
+import com.atzuche.order.ownercost.service.OwnerOrderCostCombineService;
+import com.atzuche.order.ownercost.service.OwnerOrderFineDeatailService;
+import com.atzuche.order.ownercost.service.OwnerOrderIncrementDetailService;
+import com.atzuche.order.ownercost.service.OwnerOrderPurchaseDetailService;
+import com.atzuche.order.ownercost.service.OwnerOrderService;
+import com.atzuche.order.ownercost.service.OwnerOrderSubsidyDetailService;
 import com.atzuche.order.parentorder.dto.OrderStatusDTO;
 import com.atzuche.order.parentorder.entity.OrderEntity;
 import com.atzuche.order.parentorder.entity.OrderStatusEntity;
@@ -73,7 +84,6 @@ import com.atzuche.order.rentercost.entity.RenterOrderFineDeatailEntity;
 import com.atzuche.order.rentercost.entity.RenterOrderSubsidyDetailEntity;
 import com.atzuche.order.rentercost.service.ConsoleRenterOrderFineDeatailService;
 import com.atzuche.order.rentercost.service.OrderConsoleSubsidyDetailService;
-import com.atzuche.order.rentercost.service.RenterOrderCostCombineService;
 import com.atzuche.order.rentercost.service.RenterOrderCostDetailService;
 import com.atzuche.order.rentercost.service.RenterOrderFineDeatailService;
 import com.atzuche.order.rentercost.service.RenterOrderSubsidyDetailService;
@@ -88,9 +98,11 @@ import com.atzuche.order.settle.vo.req.SettleCancelOrdersAccount;
 import com.atzuche.order.settle.vo.req.SettleOrders;
 import com.atzuche.order.settle.vo.req.SettleOrdersAccount;
 import com.atzuche.order.settle.vo.req.SettleOrdersDefinition;
+import com.atzuche.order.settle.vo.req.SettleOrdersWz;
 import com.atzuche.order.wallet.WalletProxyService;
 import com.autoyol.autopay.gateway.constant.DataPayKindConstant;
 import com.autoyol.doc.util.StringUtil;
+import com.autoyol.platformcost.model.FeeResult;
 
 import lombok.extern.slf4j.Slf4j;
 //
@@ -99,7 +111,7 @@ import lombok.extern.slf4j.Slf4j;
 // */
 @Service
 @Slf4j
-public class OrderSettleNoTService {
+public class OrderWzSettleNoTService {
     @Autowired CashierNoTService cashierNoTService;
     @Autowired private CashierService cashierService;
     @Autowired private CashierSettleService cashierSettleService;
@@ -127,7 +139,83 @@ public class OrderSettleNoTService {
     @Autowired private OrderCouponService orderCouponService;
     @Autowired private OrderSettleNewService orderSettleNewService;
     @Autowired private DeliveryCarInfoPriceService deliveryCarInfoPriceService;
+    
+    @Autowired
+    private AccountRenterDetainDetailNoTService accountRenterDetainDetailNoTService;
+    private OrderWzSettleNewService orderWzSettleNewService;
+    
+    /**
+     * 初始化结算对象
+     * @param orderNo
+     */
+    public SettleOrdersWz initSettleOrders(String orderNo) {
+        //1 校验参数
+        if(StringUtil.isBlank(orderNo)){
+            throw new OrderSettleFlatAccountException();
+        }
+        RenterOrderEntity renterOrder = renterOrderService.getRenterOrderByOrderNoAndIsEffective(orderNo);
+        if(Objects.isNull(renterOrder) || Objects.isNull(renterOrder.getRenterOrderNo())){
+            throw new OrderSettleFlatAccountException();
+        }
 
+        // 2 校验订单状态 以及是否存在 理赔暂扣 存在不能进行结算 并CAT告警
+        this.check(renterOrder);
+        // 3 初始化数据
+
+        // 3.1获取租客子订单 和 租客会员号
+        String renterOrderNo = renterOrder.getRenterOrderNo();
+        String renterMemNo = renterOrder.getRenterMemNo();
+
+        SettleOrdersWz settleOrdersWz = new SettleOrdersWz();
+        settleOrdersWz.setOrderNo(orderNo);
+        settleOrdersWz.setRenterOrderNo(renterOrderNo);
+        settleOrdersWz.setRenterMemNo(renterMemNo);
+        settleOrdersWz.setRenterOrder(renterOrder);
+        return settleOrdersWz;
+    }
+    
+    /**
+     * 校验是否可以结算 校验订单状态 以及是否存在 理赔暂扣 存在不能进行结算 并CAT告警
+     * @param renterOrder
+     */
+    public void check(RenterOrderEntity renterOrder) {
+        // 1 订单校验是否可以结算
+        OrderStatusEntity orderStatus = orderStatusService.getByOrderNo(renterOrder.getOrderNo());
+        if(OrderStatusEnum.TO_SETTLE.getStatus() == orderStatus.getStatus()){
+            throw new RuntimeException("租客订单状态不是待结算，不能结算");
+        }
+        //2校验租客是否还车
+//        boolean isReturn = handoverCarService.isReturnCar(renterOrder.getOrderNo());
+//        if(!isReturn){
+//            throw new RuntimeException("租客未还车不能结算");
+//        }
+        //3 校验是否存在 理赔  存在不结算  这个跟违章是一起的。
+        boolean isClaim = cashierSettleService.getOrderClaim(renterOrder.getOrderNo());
+        if(isClaim){
+            throw new RuntimeException("租客存在理赔信息不能结算");
+        }
+        //3 是否存在 暂扣存在不结算
+//        boolean isDetain = cashierSettleService.getOrderDetain(renterOrder.getOrderNo());
+        /**
+         * 根据费用编码来判断是否暂扣。
+         */
+        boolean isDetain = accountRenterDetainDetailNoTService.isWzDepositDetain(renterOrder.getOrderNo());
+        if(isDetain){
+            throw new RuntimeException("租客存在暂扣信息不能结算");
+        }
+        //4 先查询  发现 有结算数据停止结算 手动处理
+        orderWzSettleNewService.checkIsSettle(renterOrder.getOrderNo());
+    }
+    
+    
+    
+    // ---------------------------------------------------------------------------------------------------------------------------------------------
+    
+    
+    
+    
+    
+    
     /**
      * 车辆结算
      * @param orderNo
@@ -187,73 +275,8 @@ public class OrderSettleNoTService {
 
 
 
-    /**
-     * 初始化结算对象
-     * @param orderNo
-     */
-    public SettleOrders initSettleOrders(String orderNo) {
-        //1 校验参数
-        if(StringUtil.isBlank(orderNo)){
-            throw new OrderSettleFlatAccountException();
-        }
-        RenterOrderEntity renterOrder = renterOrderService.getRenterOrderByOrderNoAndIsEffective(orderNo);
-        if(Objects.isNull(renterOrder) || Objects.isNull(renterOrder.getRenterOrderNo())){
-            throw new OrderSettleFlatAccountException();
-        }
-        OwnerOrderEntity ownerOrder = ownerOrderService.getOwnerOrderByOrderNoAndIsEffective(orderNo);
-        if(Objects.isNull(ownerOrder) || Objects.isNull(ownerOrder.getOwnerOrderNo())){
-            throw new OrderSettleFlatAccountException();
-        }
-
-        // 2 校验订单状态 以及是否存在 理赔暂扣 存在不能进行结算 并CAT告警
-        this.check(renterOrder);
-        // 3 初始化数据
-
-        // 3.1获取租客子订单 和 租客会员号
-        String renterOrderNo = renterOrder.getRenterOrderNo();
-        String renterMemNo = renterOrder.getRenterMemNo();
-        //3.2获取车主子订单 和 车主会员号
-        String ownerOrderNo = ownerOrder.getOwnerOrderNo();
-        String ownerMemNo = ownerOrder.getMemNo();
-
-        SettleOrders settleOrders = new SettleOrders();
-        settleOrders.setOrderNo(orderNo);
-        settleOrders.setRenterOrderNo(renterOrderNo);
-        settleOrders.setOwnerOrderNo(ownerOrderNo);
-        settleOrders.setRenterMemNo(renterMemNo);
-        settleOrders.setOwnerMemNo(ownerMemNo);
-        settleOrders.setRenterOrder(renterOrder);
-        settleOrders.setOwnerOrder(ownerOrder);
-        return settleOrders;
-    }
-    /**
-     * 校验是否可以结算 校验订单状态 以及是否存在 理赔暂扣 存在不能进行结算 并CAT告警
-     * @param renterOrder
-     */
-    public void check(RenterOrderEntity renterOrder) {
-        // 1 订单校验是否可以结算
-        OrderStatusEntity orderStatus = orderStatusService.getByOrderNo(renterOrder.getOrderNo());
-        if(OrderStatusEnum.TO_SETTLE.getStatus() == orderStatus.getStatus()){
-            throw new RuntimeException("租客订单状态不是待结算，不能结算");
-        }
-        //2校验租客是否还车
-        boolean isReturn = handoverCarService.isReturnCar(renterOrder.getOrderNo());
-//        if(!isReturn){
-//            throw new RuntimeException("租客未还车不能结算");
-//        }
-        //3 校验是否存在 理赔  存在不结算
-        boolean isClaim = cashierSettleService.getOrderClaim(renterOrder.getOrderNo());
-        if(isClaim){
-            throw new RuntimeException("租客存在理赔信息不能结算");
-        }
-        //3 是否存在 暂扣存在不结算
-        boolean isDetain = cashierSettleService.getOrderDetain(renterOrder.getOrderNo());
-        if(isDetain){
-            throw new RuntimeException("租客存在暂扣信息不能结算");
-        }
-        //4 先查询  发现 有结算数据停止结算 手动处理
-        orderSettleNewService.checkIsSettle(renterOrder.getOrderNo());
-    }
+    
+    
 
     /**
      *  租客返回基本信息
