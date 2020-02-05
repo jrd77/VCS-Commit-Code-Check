@@ -51,7 +51,7 @@ public class CarProxyService {
     }
 
     public CarDetailDTO getCarDetail(String carNo){
-        Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "租客商品信息");
+        Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "商品信息");
         ResponseObject<CarBaseVO> responseObject = null;
         try{
             Cat.logEvent(CatConstants.FEIGN_METHOD,"CarDetailQueryFeignApi.getCarDetail");
