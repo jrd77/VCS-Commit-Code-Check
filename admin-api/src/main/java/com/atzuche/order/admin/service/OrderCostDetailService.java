@@ -225,8 +225,10 @@ public class OrderCostDetailService {
       costBaseDTO.setEndTime(orderEntity.getExpRevertTime());
       extraDriverDTO.setCostBaseDTO(costBaseDTO);
       
+      List<String> lstDriverId = renterAdditionalDriverService.listDriverIdByRenterOrderNo(renterCostReqVO.getRenterOrderNo());
+      
       AdditionalDriverInsuranceVO resVo = new AdditionalDriverInsuranceVO();
-      putComUseDriverList(resVo,commUseDriverList,extraDriverDTO);
+      putComUseDriverList(resVo,commUseDriverList,extraDriverDTO,lstDriverId);
       
 		return resVo;
 	}
@@ -237,26 +239,34 @@ public class OrderCostDetailService {
 	 * @param commUseDriverList
 	 * @throws Exception
 	 */
-	private void putComUseDriverList(AdditionalDriverInsuranceVO resVo, List<CommUseDriverInfoDTO> commUseDriverList,ExtraDriverDTO extraDriverDTO) throws Exception {
-		List<CommUseDriverInfoDTO> listCommUseDriverInfoDTO = new ArrayList<CommUseDriverInfoDTO>();
-		List<String> driverIds = new ArrayList<String>();
-		driverIds.add("1");//默认一个
-		extraDriverDTO.setDriverIds(driverIds);
-		
-		for (CommUseDriverInfoDTO commUseDriverInfoDTO : listCommUseDriverInfoDTO) {
-			CommUseDriverInfoDTO dto = new CommUseDriverInfoDTO();
-			BeanUtils.copyProperties(commUseDriverInfoDTO,dto);
-			//计算费用
-			String amt = "0";
-			RenterOrderCostDetailEntity extraDriverInsureAmtEntity = renterOrderCostCombineService.getExtraDriverInsureAmtEntity(extraDriverDTO);
-			if(extraDriverInsureAmtEntity != null) {
-				amt = String.valueOf(extraDriverInsureAmtEntity.getTotalAmount());
+	private void putComUseDriverList(AdditionalDriverInsuranceVO resVo, List<CommUseDriverInfoDTO> commUseDriverList,ExtraDriverDTO extraDriverDTO,List<String> lstDriverId) throws Exception {
+		if(lstDriverId != null && lstDriverId.size() > 0) {
+			List<CommUseDriverInfoDTO> listCommUseDriverInfoDTO = new ArrayList<CommUseDriverInfoDTO>();
+			List<String> driverIds = new ArrayList<String>();
+			driverIds.add("1");//默认一个
+			extraDriverDTO.setDriverIds(driverIds);
+			///
+//			extraDriverDTO.setDriverIds(lstDriverId);
+			
+			for (CommUseDriverInfoDTO commUseDriverInfoDTO : commUseDriverList) {
+				//已经入库的lstDriverId
+				if(lstDriverId.contains(commUseDriverInfoDTO.getId().toString())) {
+					CommUseDriverInfoDTO dto = new CommUseDriverInfoDTO();
+					BeanUtils.copyProperties(commUseDriverInfoDTO,dto);
+					//计算费用
+					String amt = "0";
+					RenterOrderCostDetailEntity extraDriverInsureAmtEntity = renterOrderCostCombineService.getExtraDriverInsureAmtEntity(extraDriverDTO);
+					if(extraDriverInsureAmtEntity != null) {
+						amt = String.valueOf(extraDriverInsureAmtEntity.getTotalAmount());
+					}
+					dto.setAmt(amt);
+					listCommUseDriverInfoDTO.add(dto);
+				}
 			}
-			dto.setAmt(amt);
-			listCommUseDriverInfoDTO.add(dto);
+			
+			resVo.setListCommUseDriverInfoDTO(listCommUseDriverInfoDTO);
 		}
 		
-		resVo.setListCommUseDriverInfoDTO(listCommUseDriverInfoDTO);
 	}
 	
 	/**

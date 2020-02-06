@@ -2,12 +2,15 @@ package com.atzuche.order.commons.entity.dto;
 
 import com.autoyol.doc.annotation.AutoDocProperty;
 
+import lombok.ToString;
+
 import java.util.Date;
 
 /**
  * @author ：weixu.chen
  * @date ：Created in 2019/12/17 20:45
  */
+@ToString
 public class CommUseDriverInfoDTO {
 
     @AutoDocProperty(value = "主键id")
