@@ -38,7 +38,7 @@ public class CarController {
 
     @Autowired
     private CarProxyService carProxyService;
-
+    @Autowired
     private FeignRenterGoodsService feignRenterGoodsService;
 
     @AutoDocMethod(description = "订单详细信息-查看车辆信息", value = "订单详细信息-查看车辆信息", response = CarDetailDTO.class)

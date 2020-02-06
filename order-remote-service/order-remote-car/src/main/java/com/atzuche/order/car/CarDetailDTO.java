@@ -86,10 +86,10 @@ public class CarDetailDTO {
     @AutoDocProperty("行驶证注册年月")
     private String licenseDay;
     @AutoDocProperty("行驶证到期日")
-    @JsonFormat(pattern = "yyyyMMdd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date licenseExpire;
     @AutoDocProperty("保险到期日期（交强险）")
-    @JsonFormat(pattern = "yyyyMMdd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date insuranceExpire;
     @AutoDocProperty("取还车说明")
     private String getRevertExplain;

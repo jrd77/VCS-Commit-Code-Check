@@ -78,6 +78,9 @@ public class LocalDateTimeUtils {
      * @return
      */
     public static Date localDateTimeToDate(LocalDateTime dateTime) {
+        if(dateTime==null){
+            return null;
+        }
         return Date.from(dateTime.atZone(ZoneId.systemDefault()).toInstant());
     }
 

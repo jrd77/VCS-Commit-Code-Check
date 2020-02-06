@@ -213,7 +213,7 @@ public class DeliveryCarService {
 
         if (orderDeliveryVO.getRenterDeliveryAddrDTO() != null) {
             RenterDeliveryAddrEntity deliveryAddrEntity = new RenterDeliveryAddrEntity();
-            RenterDeliveryAddrEntity renterDeliveryAddrEntity = renterOrderDeliveryService.selectAddrByRenterOrderNo(deliveryAddrEntity.getRenterOrderNo());
+            RenterDeliveryAddrEntity renterDeliveryAddrEntity = renterOrderDeliveryService.selectAddrByRenterOrderNo(orderDeliveryVO.getRenterDeliveryAddrDTO().getRenterOrderNo());
             if (null == renterDeliveryAddrEntity) {
                 BeanUtils.copyProperties(orderDeliveryVO.getRenterDeliveryAddrDTO(), deliveryAddrEntity);
                 renterOrderDeliveryService.insertDeliveryAddr(deliveryAddrEntity);
