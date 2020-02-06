@@ -38,6 +38,7 @@ public class CommUseDriverInfoDTO {
     private String isAuth;
     
     ///附加驾驶人金额
+    @AutoDocProperty(value = "附加驾驶人金额")
     private String amt;
     //管理后台操作人名称
     private String consoleOperatorName;
@@ -122,18 +123,5 @@ public class CommUseDriverInfoDTO {
     public void setIsAuth(String isAuth) {
         this.isAuth = isAuth;
     }
-
-    @Override
-    public String toString() {
-        return "CommUseDriverInfo{" +
-                "id=" + id +
-                ", realName='" + realName + '\'' +
-                ", mobile=" + mobile +
-                ", idCard='" + idCard + '\'' +
-                ", driLicAllowCar='" + driLicAllowCar + '\'' +
-                ", validityStartDate=" + validityStartDate +
-                ", validityEndDate=" + validityEndDate +
-                ", isAuth='" + isAuth + '\'' +
-                '}';
-    }
+    
 }
