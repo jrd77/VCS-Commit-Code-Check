@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("/console/api/cost")
-public class OrderRentalCostController {
+public class AdminOrderRentalCostController {
 
     @Autowired
     private AdminDeliveryCarService deliveryCarInfoService;

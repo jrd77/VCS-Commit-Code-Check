@@ -28,7 +28,7 @@ import java.util.Objects;
 @RestController
 @RequestMapping("/console/api")
 @Slf4j
-public class DeliveryCarController extends BaseController {
+public class AdminDeliveryCarController extends BaseController {
 
     @Autowired
     private AdminDeliveryCarService deliveryCarInfoService;
