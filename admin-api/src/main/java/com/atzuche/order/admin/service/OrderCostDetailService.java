@@ -4,7 +4,9 @@
 package com.atzuche.order.admin.service;
 
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -37,6 +39,7 @@ import com.atzuche.order.commons.GlobalConstant;
 import com.atzuche.order.commons.LocalDateTimeUtils;
 import com.atzuche.order.commons.entity.dto.CommUseDriverInfoDTO;
 import com.atzuche.order.commons.entity.dto.CommUseDriverInfoSimpleDTO;
+import com.atzuche.order.commons.entity.dto.CommUseDriverInfoStringDateDTO;
 import com.atzuche.order.commons.entity.dto.CostBaseDTO;
 import com.atzuche.order.commons.entity.dto.ExtraDriverDTO;
 import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
@@ -228,9 +231,60 @@ public class OrderCostDetailService {
       List<String> lstDriverId = renterAdditionalDriverService.listDriverIdByRenterOrderNo(renterCostReqVO.getRenterOrderNo());
       
       AdditionalDriverInsuranceVO resVo = new AdditionalDriverInsuranceVO();
-      putComUseDriverList(resVo,commUseDriverList,extraDriverDTO,lstDriverId);
+      putComUseDriverListAlreaySave(resVo,commUseDriverList,extraDriverDTO,lstDriverId);
       
+      putComUseDriverList(resVo,commUseDriverList,extraDriverDTO,lstDriverId);
 		return resVo;
+	}
+	
+	/**
+	 * 已经保存的。
+	 * @param resVo
+	 * @param commUseDriverList
+	 * @param extraDriverDTO
+	 * @param lstDriverId
+	 * @throws Exception
+	 */
+	private void putComUseDriverListAlreaySave(AdditionalDriverInsuranceVO resVo, List<CommUseDriverInfoDTO> commUseDriverList,ExtraDriverDTO extraDriverDTO,List<String> lstDriverId) throws Exception {
+		if(lstDriverId != null && lstDriverId.size() > 0) {
+			List<CommUseDriverInfoStringDateDTO> listCommUseDriverInfoDTO = new ArrayList<CommUseDriverInfoStringDateDTO>();
+			List<String> driverIds = new ArrayList<String>();
+			driverIds.add("1");//默认一个
+			extraDriverDTO.setDriverIds(driverIds);
+			///
+//			extraDriverDTO.setDriverIds(lstDriverId);
+			
+			for (CommUseDriverInfoDTO commUseDriverInfoDTO : commUseDriverList) {
+				//已经入库的lstDriverId
+				if(lstDriverId.contains(commUseDriverInfoDTO.getId().toString())) {
+					CommUseDriverInfoStringDateDTO dto = new CommUseDriverInfoStringDateDTO();
+					//获取时间来转换
+					Date validityEndDate = commUseDriverInfoDTO.getValidityEndDate();
+					Date validityStartDate = commUseDriverInfoDTO.getValidityStartDate();
+					BeanUtils.copyProperties(commUseDriverInfoDTO,dto);
+					
+					LocalDate localDateEnd = validityEndDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+					String end = LocalDateTimeUtils.localdateToStringChinese(localDateEnd);
+					LocalDate localDateStart = validityStartDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+					String start = LocalDateTimeUtils.localdateToStringChinese(localDateStart);
+					//数据封装
+					dto.setValidityEndDate(end);
+					dto.setValidityStartDate(start);
+					
+					//计算费用
+					String amt = "0";
+					RenterOrderCostDetailEntity extraDriverInsureAmtEntity = renterOrderCostCombineService.getExtraDriverInsureAmtEntity(extraDriverDTO);
+					if(extraDriverInsureAmtEntity != null) {
+						amt = String.valueOf(extraDriverInsureAmtEntity.getTotalAmount());
+					}
+					dto.setAmt(amt);
+					listCommUseDriverInfoDTO.add(dto);
+				}
+			}
+			//已经保存的列表
+			resVo.setListCommUseDriverInfoAlreadySaveDTO(listCommUseDriverInfoDTO);
+		}
+		
 	}
 	
 	/**
@@ -241,7 +295,7 @@ public class OrderCostDetailService {
 	 */
 	private void putComUseDriverList(AdditionalDriverInsuranceVO resVo, List<CommUseDriverInfoDTO> commUseDriverList,ExtraDriverDTO extraDriverDTO,List<String> lstDriverId) throws Exception {
 		if(lstDriverId != null && lstDriverId.size() > 0) {
-			List<CommUseDriverInfoDTO> listCommUseDriverInfoDTO = new ArrayList<CommUseDriverInfoDTO>();
+			List<CommUseDriverInfoStringDateDTO> listCommUseDriverInfoDTO = new ArrayList<CommUseDriverInfoStringDateDTO>();
 			List<String> driverIds = new ArrayList<String>();
 			driverIds.add("1");//默认一个
 			extraDriverDTO.setDriverIds(driverIds);
@@ -250,9 +304,21 @@ public class OrderCostDetailService {
 			
 			for (CommUseDriverInfoDTO commUseDriverInfoDTO : commUseDriverList) {
 				//已经入库的lstDriverId
-				if(lstDriverId.contains(commUseDriverInfoDTO.getId().toString())) {
-					CommUseDriverInfoDTO dto = new CommUseDriverInfoDTO();
+				if(!lstDriverId.contains(commUseDriverInfoDTO.getId().toString())) {  //不存在的，则允许再次新增。
+					CommUseDriverInfoStringDateDTO dto = new CommUseDriverInfoStringDateDTO();
+					//获取时间来转换
+					Date validityEndDate = commUseDriverInfoDTO.getValidityEndDate();
+					Date validityStartDate = commUseDriverInfoDTO.getValidityStartDate();
 					BeanUtils.copyProperties(commUseDriverInfoDTO,dto);
+					
+					LocalDate localDateEnd = validityEndDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+					String end = LocalDateTimeUtils.localdateToStringChinese(localDateEnd);
+					LocalDate localDateStart = validityStartDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+					String start = LocalDateTimeUtils.localdateToStringChinese(localDateStart);
+					//数据封装
+					dto.setValidityEndDate(end);
+					dto.setValidityStartDate(start);
+					
 					//计算费用
 					String amt = "0";
 					RenterOrderCostDetailEntity extraDriverInsureAmtEntity = renterOrderCostCombineService.getExtraDriverInsureAmtEntity(extraDriverDTO);
@@ -335,8 +401,12 @@ public class OrderCostDetailService {
 			
 			commUseDriverList.add(dto); //注意封装数据
 		}
-        renterAdditionalDriverService.insertBatchAdditionalDriver(renterCostReqVO.getOrderNo(),
+//        renterAdditionalDriverService.insertBatchAdditionalDriver(renterCostReqVO.getOrderNo(),
+//        		renterCostReqVO.getRenterOrderNo(),driverIds,commUseDriverList);
+		
+        renterAdditionalDriverService.insertBatchAdditionalDriverBeforeDel(renterCostReqVO.getOrderNo(),
         		renterCostReqVO.getRenterOrderNo(),driverIds,commUseDriverList);
+        
         logger.info("保存附加驾驶人信息SUCCESS");
 	}
 	
