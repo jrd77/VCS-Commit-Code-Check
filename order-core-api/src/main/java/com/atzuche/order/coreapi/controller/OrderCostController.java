@@ -10,6 +10,7 @@ import javax.validation.Valid;
 import com.atzuche.order.cashieraccount.service.CashierQueryService;
 import com.atzuche.order.commons.BindingResultUtil;
 import com.atzuche.order.commons.exceptions.OrderNotFoundException;
+import com.atzuche.order.open.vo.RenterCostShortDetail;
 import com.atzuche.order.parentorder.entity.OrderEntity;
 import com.atzuche.order.parentorder.service.OrderService;
 import com.atzuche.order.rentercost.service.RenterCostFacadeService;
@@ -100,27 +101,9 @@ public class OrderCostController {
 
 		return ResponseData.success(shortDetail);
 
-
 	}
 
-	@ToString
-	@Data
-	public static class RenterCostShortDetail {
-		@AutoDocProperty(value = "订单号")
-		private String orderNo;
-		@AutoDocProperty(value = "租车总费用，不包括罚金")
-		private int totalRentCostAmt;
-		@AutoDocProperty(value = "罚金总额")
-		private int totalFineAmt;
-		@AutoDocProperty(value = "待支付押金总额")
-		private int toPayDeposit;
-		@AutoDocProperty(value = "待支付违章押金总额")
-		private int toPayWzDeposit;
-		@AutoDocProperty(value = "押金预计退还")
-		private int expReturnDeposit;
-		@AutoDocProperty(value = "违章押金预计退还")
-		private int expReturnWzDeposit;
-	}
+
 	
 	@PostMapping("/order/cost/owner/get")
 	public ResponseData<OrderOwnerCostResVO> orderCostOwnerGet(@Valid @RequestBody OrderCostReqVO req, BindingResult bindingResult) {
