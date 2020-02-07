@@ -29,6 +29,25 @@ public class OrderSupplementDetailService{
     public List<OrderSupplementDetailEntity> listOrderSupplementDetailByOrderNoAndMemNo(String orderNo, String memNo) {
     	return orderSupplementDetailMapper.listOrderSupplementDetailByOrderNoAndMemNo(orderNo, memNo);
     }
+
+    /**
+     * 返回补付的总额
+     * @param orderNo
+     * @param memNo
+     * @return
+     */
+    public int getTotalSupplementAmt(String orderNo,String memNo){
+        List<OrderSupplementDetailEntity> entityList = listOrderSupplementDetailByOrderNoAndMemNo(orderNo,memNo);
+        int total = 0;
+        for(OrderSupplementDetailEntity entity:entityList){
+            if(entity.getAmt()!=null){
+                total = total +entity.getAmt();
+            }
+        }
+        return total;
+    }
+
+
     
     /**
      * 保存租客补付记录

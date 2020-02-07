@@ -33,4 +33,6 @@ public class RenterGoodsController {
         return ResponseData.success(withoutPriceDTO);
     }
 
+
+
 }

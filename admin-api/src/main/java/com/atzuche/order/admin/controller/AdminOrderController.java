@@ -132,11 +132,7 @@ public class AdminOrderController {
     @AutoDocMethod(description = "订单修改前的费用对比", value = "订单修改前的费用对比",response = AdminModifyOrderFeeCompareVO.class)
     @RequestMapping(value="console/order/modify/prefee",method = RequestMethod.POST)
     public ResponseData<AdminModifyOrderFeeCompareVO> preModifyOrder(@Valid @RequestBody AdminModifyOrderReqVO reqVO,BindingResult bindingResult){
-        if(bindingResult.hasErrors()){
-            Optional<FieldError> error = bindingResult.getFieldErrors().stream().findFirst();
-            return ResponseData.createErrorCodeResponse(ErrorCode.INPUT_ERROR.getCode(), error.isPresent() ?
-                    error.get().getDefaultMessage() : ErrorCode.INPUT_ERROR.getText());
-        }
+        BindingResultUtil.checkBindingResult(bindingResult);
 
         String renterNo = adminOrderService.getRenterMemNo(reqVO.getOrderNo());
 
@@ -152,11 +148,7 @@ public class AdminOrderController {
     @AutoDocMethod(description = "管理后台换车", value = "管理后台换车")
     @RequestMapping(value="console/changeCar",method = RequestMethod.POST)
     public ResponseData<?> changeCar(@Valid @RequestBody AdminTransferCarReqVO reqVO, BindingResult bindingResult){
-        if(bindingResult.hasErrors()){
-            Optional<FieldError> error = bindingResult.getFieldErrors().stream().findFirst();
-            return ResponseData.createErrorCodeResponse(ErrorCode.INPUT_ERROR.getCode(), error.isPresent() ?
-                    error.get().getDefaultMessage() : ErrorCode.INPUT_ERROR.getText());
-        }
+        BindingResultUtil.checkBindingResult(bindingResult);
 
         TransferReq req = new TransferReq();
         req.setOperator(AdminUserUtil.getAdminUser().getAuthName());

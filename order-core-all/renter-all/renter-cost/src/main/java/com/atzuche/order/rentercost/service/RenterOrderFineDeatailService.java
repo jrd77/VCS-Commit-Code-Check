@@ -65,6 +65,23 @@ public class RenterOrderFineDeatailService{
     public List<RenterOrderFineDeatailEntity> listRenterOrderFineDeatail(String orderNo, String renterOrderNo) {
     	return renterOrderFineDeatailMapper.listRenterOrderFineDeatail(orderNo, renterOrderNo);
     }
+
+	/**
+	 * 获取某个子单的罚金总额
+	 * @param orderNo
+	 * @param renterNo
+	 * @return
+	 */
+	public int getTotalRenterOrderFineAmt(String orderNo, String renterOrderNo){
+		List<RenterOrderFineDeatailEntity> renterOrderFineDeatailEntities =  listRenterOrderFineDeatail(orderNo,renterOrderNo);
+		int totalAmt=0;
+		for(RenterOrderFineDeatailEntity renterOrderFineDeatailEntity:renterOrderFineDeatailEntities){
+			if(renterOrderFineDeatailEntity.getFineAmount()!=null) {
+				totalAmt = totalAmt + renterOrderFineDeatailEntity.getFineAmount();
+			}
+		}
+		return totalAmt;
+	}
     
     /**
      * 保存罚金记录
