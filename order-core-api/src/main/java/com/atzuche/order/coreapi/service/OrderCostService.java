@@ -307,7 +307,7 @@ public class OrderCostService {
 		return resVo;
 	}
 
-	public OrderOwnerCostResVO orderCostOwnerGet(OrderCostReqVO req) throws Exception {
+	public OrderOwnerCostResVO orderCostOwnerGet(OrderCostReqVO req)  {
 		OrderOwnerCostResVO resVo = new OrderOwnerCostResVO();
 		
 		//参数定义
@@ -344,7 +344,7 @@ public class OrderCostService {
 		return resVo;
 	}
 	
-	private void putOwnerCosts(OrderOwnerCostResVO resVo, OwnerCosts ownerCosts) throws Exception {
+	private void putOwnerCosts(OrderOwnerCostResVO resVo, OwnerCosts ownerCosts)  {
 		/**
 	     * 管理后台补贴
 	     */
