@@ -28,6 +28,17 @@ public class OrderConsoleCostDetailService{
     public List<OrderConsoleCostDetailEntity> getOrderConsoleCostDetaiByOrderNo(String orderNo){
             return orderConsoleCostDetailMapper.selectByOrderNo(orderNo);
     }
+
+    public int getTotalOrderConsoleCostAmt(String orderNo){
+        List<OrderConsoleCostDetailEntity> entityList = getOrderConsoleCostDetaiByOrderNo(orderNo);
+        int total = 0;
+        for(OrderConsoleCostDetailEntity entity: entityList){
+            if(entity.getSubsidyAmount()!=null) {
+                total = total + entity.getSubsidyAmount();
+            }
+        }
+        return total;
+    }
     
     
     /**

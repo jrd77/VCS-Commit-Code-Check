@@ -49,6 +49,16 @@ public class CashierQueryService {
         AccountRenterWzDepositEntity entity = accountRenterWzDepositNoTService.getAccountRenterWZDepositByOrder(orderNo);
         return entity;
     }
+
+    /**
+     * 获取应付的违章押金
+     * @param orderNo
+     * @return
+     */
+    public  int getTotalToPayWzDepositAmt(String orderNo){
+        AccountRenterWzDepositEntity entity = accountRenterWzDepositNoTService.getAccountRenterWZDepositByOrder(orderNo);
+        return entity.getYingshouDeposit()+entity.getShishouDeposit();
+    }
     public WzDepositMsgResVO queryWzDepositMsg(String orderNo){
         WzDepositMsgResVO result = new WzDepositMsgResVO();
         result.setOrderNo(orderNo);
@@ -84,6 +94,17 @@ public class CashierQueryService {
     public AccountRenterDepositEntity queryDeposit(String orderNo){
         AccountRenterDepositEntity entity = accountRenterDepositNoTService.queryDeposit(orderNo);
         return entity;
+    }
+
+    /**
+     * 获得订单应付的金额
+     * @param orderNo
+     * @return
+     */
+    public int getTotalToPayDepositAmt(String orderNo){
+        AccountRenterDepositEntity entity = accountRenterDepositNoTService.queryDeposit(orderNo);
+
+        return entity.getYingfuDepositAmt()+entity.getShifuDepositAmt();
     }
 
 }

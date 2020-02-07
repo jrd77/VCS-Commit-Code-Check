@@ -41,6 +41,23 @@ public class RenterOrderSubsidyDetailService {
     }
 
     /**
+     * 获取补贴的总额
+     * @param orderNo
+     * @param renterOrderNo
+     * @return
+     */
+    public int getTotalRenterOrderSubsidyAmt(String orderNo, String renterOrderNo){
+        List<RenterOrderSubsidyDetailEntity> entities = listRenterOrderSubsidyDetail(orderNo,renterOrderNo);
+        int total=0;
+        for(RenterOrderSubsidyDetailEntity entity:entities){
+            if(entity.getSubsidyAmount()!=null){
+                total = total+entity.getSubsidyAmount();
+            }
+        }
+        return total;
+    }
+
+    /**
      * 保存租客补贴信息
      *
      * @param renterOrderSubsidyDetailEntity 补贴明细

@@ -126,7 +126,7 @@ public class ModifyOrderService {
 	 * @return ResponseData
 	 */
 	@Transactional(rollbackFor=Exception.class)
-	public ResponseData<?> modifyOrder(ModifyOrderReq modifyOrderReq) {
+	public void modifyOrder(ModifyOrderReq modifyOrderReq) {
 		log.info("modifyOrder修改订单主逻辑入参modifyOrderReq=[{}]", modifyOrderReq);
 		// 主单号
 		String orderNo = modifyOrderReq.getOrderNo();
@@ -222,7 +222,6 @@ public class ModifyOrderService {
 		bindPlatformCoupon(modifyOrderDTO);
 		// 补扣凹凸币 
 		againAutoCoinDeduct(modifyOrderDTO, costDeductVO.getRenterSubsidyList());
-		return ResponseData.success();
 	}
 	
 	

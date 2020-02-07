@@ -40,6 +40,23 @@ public class ConsoleRenterOrderFineDeatailService{
     public List<ConsoleRenterOrderFineDeatailEntity> listConsoleRenterOrderFineDeatail(String orderNo, String memNo) {
     	return consoleRenterOrderFineDeatailMapper.listConsoleRenterOrderFineDeatail(orderNo, memNo);
     }
+
+    /**
+     * 获取某个租客某个订单的全局罚金
+     * @param orderNo
+     * @param memNo
+     * @return
+     */
+    public int getTotalConsoleFineAmt(String orderNo,String memNo){
+        List<ConsoleRenterOrderFineDeatailEntity> consoleRenterOrderFineDeatailEntityList = listConsoleRenterOrderFineDeatail(orderNo,memNo);
+        int total=0;
+        for(ConsoleRenterOrderFineDeatailEntity entity:consoleRenterOrderFineDeatailEntityList){
+            if(entity.getFineAmount()!=null) {
+                total = total + entity.getFineAmount();
+            }
+        }
+        return total;
+    }
     
     /**
      * 保存全局的租客订单罚金

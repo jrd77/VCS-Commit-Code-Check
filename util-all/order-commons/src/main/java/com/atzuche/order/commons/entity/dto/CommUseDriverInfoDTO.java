@@ -2,12 +2,15 @@ package com.atzuche.order.commons.entity.dto;
 
 import com.autoyol.doc.annotation.AutoDocProperty;
 
+import lombok.ToString;
+
 import java.util.Date;
 
 /**
  * @author ：weixu.chen
  * @date ：Created in 2019/12/17 20:45
  */
+@ToString
 public class CommUseDriverInfoDTO {
 
     @AutoDocProperty(value = "主键id")
@@ -35,6 +38,7 @@ public class CommUseDriverInfoDTO {
     private String isAuth;
     
     ///附加驾驶人金额
+    @AutoDocProperty(value = "附加驾驶人金额")
     private String amt;
     //管理后台操作人名称
     private String consoleOperatorName;
@@ -119,18 +123,5 @@ public class CommUseDriverInfoDTO {
     public void setIsAuth(String isAuth) {
         this.isAuth = isAuth;
     }
-
-    @Override
-    public String toString() {
-        return "CommUseDriverInfo{" +
-                "id=" + id +
-                ", realName='" + realName + '\'' +
-                ", mobile=" + mobile +
-                ", idCard='" + idCard + '\'' +
-                ", driLicAllowCar='" + driLicAllowCar + '\'' +
-                ", validityStartDate=" + validityStartDate +
-                ", validityEndDate=" + validityEndDate +
-                ", isAuth='" + isAuth + '\'' +
-                '}';
-    }
+    
 }

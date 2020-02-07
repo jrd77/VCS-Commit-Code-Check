@@ -359,6 +359,29 @@ public class CashierPayService{
         int rentAmtPayed = accountRenterCostSettleService.getCostPaidRent(orderNo,memNo);
         return rentAmt + rentAmtPayed;
     }
+    
+    /**
+     * 从getRentCost方法中剥离出来的。
+     * @param orderNo
+     * @param memNo
+     * @return
+     */
+    public int getRentCostYingfu(String orderNo,String memNo){
+        RenterOrderEntity renterOrderEntity = cashierNoTService.getRenterOrderNoByOrderNo(orderNo);
+
+        if(Objects.isNull(renterOrderEntity) || Objects.isNull(renterOrderEntity.getRenterOrderNo())){
+            return 0;
+        }
+        //查询应付租车费用列表
+        List<PayableVO> payableVOs = renterOrderCostCombineService.listPayableVO(orderNo,renterOrderEntity.getRenterOrderNo(),memNo);
+        //应付租车费用
+        int rentAmt = cashierNoTService.sumRentOrderCost(payableVOs);
+        //已付租车费用
+//        int rentAmtPayed = accountRenterCostSettleService.getCostPaidRent(orderNo,memNo);
+//        return rentAmt + rentAmtPayed;
+        return rentAmt;
+    }
+    
     public int getRealRentCost(String orderNo,String memNo){
         RenterOrderEntity renterOrderEntity = cashierNoTService.getRenterOrderNoByOrderNo(orderNo);
         if(Objects.isNull(renterOrderEntity) || Objects.isNull(renterOrderEntity.getRenterOrderNo())){
