@@ -11,7 +11,6 @@ import com.atzuche.order.commons.enums.account.SettleStatusEnum;
 import com.atzuche.order.parentorder.dto.OrderStatusDTO;
 import com.atzuche.order.parentorder.service.OrderStatusService;
 import com.atzuche.order.settle.service.notservice.OrderWzSettleNoTService;
-import com.atzuche.order.settle.vo.req.SettleOrdersDefinition;
 import com.atzuche.order.settle.vo.req.SettleOrdersWz;
 import com.autoyol.commons.utils.GsonUtils;
 import com.dianping.cat.Cat;
@@ -30,6 +29,8 @@ public class OrderWzSettleService {
 	private OrderWzSettleNoTService orderWzSettleNoTService;
 	@Autowired
 	private OrderStatusService orderStatusService;
+	@Autowired
+	OrderWzSettleNewService orderWzSettleNewService;
 	
 	
 	public void settleWzOrder(String orderNo) {
@@ -43,14 +44,12 @@ public class OrderWzSettleService {
             Cat.logEvent("settleOrders",GsonUtils.toJson(settleOrders));
 
             //2 无事务操作 查询租客车主费用明细 ，处理费用明细到 结算费用明细  并落库   然后平账校验
-            SettleOrdersDefinition settleOrdersDefinition = orderSettleNewService.settleOrderFirst(settleOrders);
-            log.info("OrderSettleService settleOrdersDefinition [{}]",GsonUtils.toJson(settleOrdersDefinition));
-            Cat.logEvent("settleOrders",GsonUtils.toJson(settleOrdersDefinition));
+            orderWzSettleNewService.settleOrderFirst(settleOrders);
+            log.info("OrderSettleService settleOrdersDefinition [{}]",GsonUtils.toJson(settleOrders));
+            Cat.logEvent("settleOrders",GsonUtils.toJson(settleOrders));
 
             //3 事务操作结算主逻辑  //开启事务
-            orderSettleNewService.settleOrder(settleOrders,settleOrdersDefinition);
-            log.info("OrderSettleService settleOrdersenced [{}]",GsonUtils.toJson(settleOrdersDefinition));
-            Cat.logEvent("settleOrdersenced",GsonUtils.toJson(settleOrdersDefinition));
+            orderWzSettleNewService.settleOrder(settleOrders);
 
             t.setStatus(Transaction.SUCCESS);
         } catch (Exception e) {

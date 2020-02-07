@@ -96,6 +96,15 @@ public class RenterOrderWzCostDetailService {
     public List<RenterOrderWzCostDetailEntity> queryInfosByOrderNo(String orderNo) {
         return renterOrderWzCostDetailMapper.queryInfosByOrderNo(orderNo);
     }
+    
+    /**
+     * 单个，不求和
+     * @param orderNo
+     * @return
+     */
+    public List<RenterOrderWzCostDetailEntity> queryInfosUnitByOrderNo(String orderNo) {
+        return renterOrderWzCostDetailMapper.queryInfosUnitByOrderNo(orderNo);
+    }
 
     /**
      * 查询能否违章能否结算

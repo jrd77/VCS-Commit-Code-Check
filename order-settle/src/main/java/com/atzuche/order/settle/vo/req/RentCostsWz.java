@@ -1,11 +1,10 @@
 package com.atzuche.order.settle.vo.req;
 
-import com.atzuche.order.delivery.vo.delivery.rep.RenterGetAndReturnCarDTO;
-import com.atzuche.order.rentercost.entity.*;
-import com.autoyol.platformcost.model.FeeResult;
-import lombok.Data;
-
 import java.util.List;
+
+import com.atzuche.order.renterwz.entity.RenterOrderWzCostDetailEntity;
+
+import lombok.Data;
 
 /**
  * 租客费用信息
@@ -15,7 +14,7 @@ public class RentCostsWz {
     /**
      * 查询租车费用(违章)
      */
-    private List<RenterOrderCostDetailEntity> renterOrderCostDetails;
+    private List<RenterOrderWzCostDetailEntity> renterOrderWzCostDetails;
 
 //    /**
 //     * 交接车-油费
@@ -30,20 +29,23 @@ public class RentCostsWz {
     /**
      * 补贴
      */
-    private List<RenterOrderSubsidyDetailEntity> renterOrderSubsidyDetails;
-
-    /**
-     * 租客罚金
-     */
-    private List<RenterOrderFineDeatailEntity> renterOrderFineDeatails;
-
-    /**
-     * 管理后台补贴
-     */
-    private List<OrderConsoleSubsidyDetailEntity> orderConsoleSubsidyDetails;
-
-    /**
-     * 获取全局的租客订单罚金明细
-     */
-    private List<ConsoleRenterOrderFineDeatailEntity> consoleRenterOrderFineDeatails;
+//    private List<RenterOrderSubsidyDetailEntity> renterOrderSubsidyDetails;
+//
+//    /**
+//     * 租客罚金
+//     */
+//    private List<RenterOrderFineDeatailEntity> renterOrderFineDeatails;
+//
+//    /**
+//     * 管理后台补贴
+//     */
+//    private List<OrderConsoleSubsidyDetailEntity> orderConsoleSubsidyDetails;
+//
+//    /**
+//     * 获取全局的租客订单罚金明细
+//     */
+//    private List<ConsoleRenterOrderFineDeatailEntity> consoleRenterOrderFineDeatails;
+    
+    
+    
 }

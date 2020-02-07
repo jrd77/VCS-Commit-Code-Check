@@ -4,8 +4,8 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
-import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostSettleDetailEntity;
 import com.atzuche.order.accountrenterwzdepost.entity.AccountRenterWzDepositCostSettleDetailEntity;
 import com.atzuche.order.accountrenterwzdepost.mapper.AccountRenterWzDepositCostSettleDetailMapper;
 
@@ -29,5 +29,21 @@ public class AccountRenterWzDepositCostSettleDetailNoTService {
     public List<AccountRenterWzDepositCostSettleDetailEntity> getAccountRenterWzDepositCostSettleDetail(String orderNo) {
         return accountRenterWzDepositCostSettleDetailMapper.selectByOrderNo(orderNo);
     }
+    
+    /**
+     * 落库
+     * @param accountRenterWzDepositCostSettleDetails
+     */
+	public void insertAccountRenterWzDepositCostSettleDetails(
+			List<AccountRenterWzDepositCostSettleDetailEntity> accountRenterWzDepositCostSettleDetails) {
+		
+		if(!CollectionUtils.isEmpty(accountRenterWzDepositCostSettleDetails)){
+            for(int i =0;i<accountRenterWzDepositCostSettleDetails.size();i++){
+            	AccountRenterWzDepositCostSettleDetailEntity entity = accountRenterWzDepositCostSettleDetails.get(i);
+            	accountRenterWzDepositCostSettleDetailMapper.insertSelective(entity);
+            }
+        }
+		
+	}
 
 }
