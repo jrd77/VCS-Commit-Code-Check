@@ -142,7 +142,7 @@ public class ModifyOrderQueryListService {
 		 * 根据订单号查询封装
 		 */
 		//需补付金额
-		int needIncrementAmt = cashierPayService.getRentCost(orderNo, memNo);
+		int needIncrementAmt = cashierPayService.getRentCostYingfu(orderNo, memNo);
 		resVo.setNeedIncrementAmt(needIncrementAmt);
 		
 		

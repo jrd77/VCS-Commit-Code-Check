@@ -204,7 +204,7 @@ public class CostStatUtils {
                 .stream()
                 .filter(x -> consoleCashCodeEnum.getCashNo().equals(x.getSubsidyTypeCode()))
                 .collect(Collectors.summingInt(OrderConsoleCostDetailDTO::getSubsidyAmount));
-        if(amt == null ){
+        if(amt != null ){
             return amt;
         }
         return 0;

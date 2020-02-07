@@ -238,11 +238,9 @@ public class AdminDeliveryCarService {
         try {
             GetReturnOverCostDTO getReturnOverCostDTO = tranSportProxyService.getGetReturnOverCost(getReturnCarOverCostReqDto);
                 int chaoYunNengAddCrash = getReturnOverCostDTO.getGetReturnOverTransportDTO().getGetOverTransportFee();
-                int nightGetOverTransportFee =  getReturnOverCostDTO.getGetReturnOverTransportDTO().getNightGetOverTransportFee() == null ? 0 : getReturnOverCostDTO.getGetReturnOverTransportDTO().getNightGetOverTransportFee();
-                distributionCostVO.setGetCarChaoYunNeng(String.valueOf(chaoYunNengAddCrash+nightGetOverTransportFee));
+                distributionCostVO.setGetCarChaoYunNeng(String.valueOf(chaoYunNengAddCrash));
                 int returnChaoYunNengAddCrash = getReturnOverCostDTO.getGetReturnOverTransportDTO().getReturnOverTransportFee();
-                int nightReturnOverTransportFee = getReturnOverCostDTO.getGetReturnOverTransportDTO().getNightReturnOverTransportFee() == null ? 0 : getReturnOverCostDTO.getGetReturnOverTransportDTO().getNightReturnOverTransportFee();
-                distributionCostVO.setReturnCarChaoYunNeng(String.valueOf(returnChaoYunNengAddCrash+nightReturnOverTransportFee));
+                distributionCostVO.setReturnCarChaoYunNeng(String.valueOf(returnChaoYunNengAddCrash));
         } catch (Exception e) {
             logger.error("获取超运能异常，给默认值,cause:{}", e.getMessage());
             distributionCostVO.setReturnCarChaoYunNeng("0");
