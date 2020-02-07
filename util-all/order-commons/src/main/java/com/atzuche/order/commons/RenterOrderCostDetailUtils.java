@@ -1,4 +1,4 @@
-package com.atzuche.order;
+package com.atzuche.order.commons;
 
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.commons.vo.res.rentcosts.RenterOrderCostDetailEntity;
