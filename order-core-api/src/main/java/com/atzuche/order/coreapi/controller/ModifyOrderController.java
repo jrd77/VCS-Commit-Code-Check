@@ -61,7 +61,9 @@ public class ModifyOrderController {
         // 属性拷贝
         ModifyOrderReq modifyOrderReq = new ModifyOrderReq();
         BeanUtils.copyProperties(modifyOrderAppReq, modifyOrderReq);
-        return modifyOrderService.modifyOrder(modifyOrderReq);
+        modifyOrderService.modifyOrder(modifyOrderReq);
+
+        return ResponseData.success();
     }
 
     /**
@@ -77,7 +79,9 @@ public class ModifyOrderController {
 		BindingResultUtil.checkBindingResult(bindingResult);
         // 设置为管理后台修改
         modifyOrderReq.setConsoleFlag(true);
-        return modifyOrderService.modifyOrder(modifyOrderReq);
+        modifyOrderService.modifyOrder(modifyOrderReq);
+
+        return ResponseData.success();
     }
 
     /**
@@ -91,7 +95,8 @@ public class ModifyOrderController {
     public ResponseData<?> ownerHandleModifyApplication(@Valid @RequestBody ModifyApplyHandleReq modifyApplyHandleReq, BindingResult bindingResult) {
 		log.info("ownerHandleModifyApplication param is [{}]",modifyApplyHandleReq);
     	BindingResultUtil.checkBindingResult(bindingResult);
-        return modifyOrderOwnerConfirmService.modifyConfirm(modifyApplyHandleReq);
+        modifyOrderOwnerConfirmService.modifyConfirm(modifyApplyHandleReq);
+		return ResponseData.success();
     }
 
 
@@ -117,7 +122,8 @@ public class ModifyOrderController {
 		modifyOrderReq.setConsoleFlag(true);
 		// 设置为换车操作
 		modifyOrderReq.setTransferFlag(true);
-		return modifyOrderService.modifyOrder(modifyOrderReq);
+		modifyOrderService.modifyOrder(modifyOrderReq);
+		return ResponseData.success();
 	}
 	
 	/**
@@ -133,7 +139,8 @@ public class ModifyOrderController {
 		// 属性拷贝
 		ModifyOrderReq modifyOrderReq = new ModifyOrderReq();
 		BeanUtils.copyProperties(modifyOrderAppReq, modifyOrderReq);
-		return modifyOrderFeeService.getModifyOrderCompareVO(modifyOrderReq);
+		ModifyOrderCompareVO modifyOrderCompareVO = modifyOrderFeeService.getModifyOrderCompareVO(modifyOrderReq);
+		return ResponseData.success(modifyOrderCompareVO);
 	}
 	
 	

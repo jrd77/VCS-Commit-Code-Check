@@ -1,4 +1,4 @@
-package com.atzuche.order.coreapi.service;
+package com.atzuche.order.coreapi.service.remote;
 
 import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.CatConstants;
@@ -16,7 +16,6 @@ import com.autoyol.car.api.model.dto.CarAddressDTO;
 import com.autoyol.car.api.model.dto.CarDispatchDTO;
 import com.autoyol.car.api.model.dto.LocationDTO;
 import com.autoyol.car.api.model.vo.ResponseObject;
-import com.autoyol.commons.web.ErrorCode;
 import com.dianping.cat.Cat;
 import com.dianping.cat.message.Transaction;
 import org.apache.commons.lang3.StringUtils;
@@ -34,9 +33,9 @@ import org.springframework.stereotype.Service;
  */
 
 @Service
-public class CarRentalTimeApiService {
+public class CarRentalTimeApiProxyService {
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(CarRentalTimeApiService.class);
+    private final static Logger LOGGER = LoggerFactory.getLogger(CarRentalTimeApiProxyService.class);
 
 
     @Autowired

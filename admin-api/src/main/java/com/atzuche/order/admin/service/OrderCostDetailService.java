@@ -4,7 +4,9 @@
 package com.atzuche.order.admin.service;
 
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -15,6 +17,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.atzuche.order.admin.common.AdminUserUtil;
 import com.atzuche.order.admin.vo.req.cost.AdditionalDriverInsuranceIdsReqVO;
 import com.atzuche.order.admin.vo.req.cost.OwnerToPlatformCostReqVO;
 import com.atzuche.order.admin.vo.req.cost.OwnerToRenterSubsidyReqVO;
@@ -36,6 +39,7 @@ import com.atzuche.order.commons.GlobalConstant;
 import com.atzuche.order.commons.LocalDateTimeUtils;
 import com.atzuche.order.commons.entity.dto.CommUseDriverInfoDTO;
 import com.atzuche.order.commons.entity.dto.CommUseDriverInfoSimpleDTO;
+import com.atzuche.order.commons.entity.dto.CommUseDriverInfoStringDateDTO;
 import com.atzuche.order.commons.entity.dto.CostBaseDTO;
 import com.atzuche.order.commons.entity.dto.ExtraDriverDTO;
 import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
@@ -224,10 +228,63 @@ public class OrderCostDetailService {
       costBaseDTO.setEndTime(orderEntity.getExpRevertTime());
       extraDriverDTO.setCostBaseDTO(costBaseDTO);
       
-      AdditionalDriverInsuranceVO resVo = new AdditionalDriverInsuranceVO();
-      putComUseDriverList(resVo,commUseDriverList,extraDriverDTO);
+      List<String> lstDriverId = renterAdditionalDriverService.listDriverIdByRenterOrderNo(renterCostReqVO.getRenterOrderNo());
       
+      AdditionalDriverInsuranceVO resVo = new AdditionalDriverInsuranceVO();
+      putComUseDriverListAlreaySave(resVo,commUseDriverList,extraDriverDTO,lstDriverId);
+      
+      putComUseDriverList(resVo,commUseDriverList,extraDriverDTO,lstDriverId);
 		return resVo;
+	}
+	
+	/**
+	 * 已经保存的。
+	 * @param resVo
+	 * @param commUseDriverList
+	 * @param extraDriverDTO
+	 * @param lstDriverId
+	 * @throws Exception
+	 */
+	private void putComUseDriverListAlreaySave(AdditionalDriverInsuranceVO resVo, List<CommUseDriverInfoDTO> commUseDriverList,ExtraDriverDTO extraDriverDTO,List<String> lstDriverId) throws Exception {
+		if(lstDriverId != null && lstDriverId.size() > 0) {
+			List<CommUseDriverInfoStringDateDTO> listCommUseDriverInfoDTO = new ArrayList<CommUseDriverInfoStringDateDTO>();
+			List<String> driverIds = new ArrayList<String>();
+			driverIds.add("1");//默认一个
+			extraDriverDTO.setDriverIds(driverIds);
+			///
+//			extraDriverDTO.setDriverIds(lstDriverId);
+			
+			for (CommUseDriverInfoDTO commUseDriverInfoDTO : commUseDriverList) {
+				//已经入库的lstDriverId
+				if(lstDriverId.contains(commUseDriverInfoDTO.getId().toString())) {
+					CommUseDriverInfoStringDateDTO dto = new CommUseDriverInfoStringDateDTO();
+					//获取时间来转换
+					Date validityEndDate = commUseDriverInfoDTO.getValidityEndDate();
+					Date validityStartDate = commUseDriverInfoDTO.getValidityStartDate();
+					BeanUtils.copyProperties(commUseDriverInfoDTO,dto);
+					
+					LocalDate localDateEnd = validityEndDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+					String end = LocalDateTimeUtils.localdateToStringChinese(localDateEnd);
+					LocalDate localDateStart = validityStartDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+					String start = LocalDateTimeUtils.localdateToStringChinese(localDateStart);
+					//数据封装
+					dto.setValidityEndDate(end);
+					dto.setValidityStartDate(start);
+					
+					//计算费用
+					String amt = "0";
+					RenterOrderCostDetailEntity extraDriverInsureAmtEntity = renterOrderCostCombineService.getExtraDriverInsureAmtEntity(extraDriverDTO);
+					if(extraDriverInsureAmtEntity != null) {
+						amt = String.valueOf(extraDriverInsureAmtEntity.getTotalAmount());
+					}
+					dto.setAmt(amt);
+					listCommUseDriverInfoDTO.add(dto);
+				}
+			}
+			//已经保存的列表
+			resVo.setListCommUseDriverInfoAlreadySaveDTO(listCommUseDriverInfoDTO);
+		}
+		
 	}
 	
 	/**
@@ -236,26 +293,46 @@ public class OrderCostDetailService {
 	 * @param commUseDriverList
 	 * @throws Exception
 	 */
-	private void putComUseDriverList(AdditionalDriverInsuranceVO resVo, List<CommUseDriverInfoDTO> commUseDriverList,ExtraDriverDTO extraDriverDTO) throws Exception {
-		List<CommUseDriverInfoDTO> listCommUseDriverInfoDTO = new ArrayList<CommUseDriverInfoDTO>();
-		List<String> driverIds = new ArrayList<String>();
-		driverIds.add("1");//默认一个
-		extraDriverDTO.setDriverIds(driverIds);
-		
-		for (CommUseDriverInfoDTO commUseDriverInfoDTO : listCommUseDriverInfoDTO) {
-			CommUseDriverInfoDTO dto = new CommUseDriverInfoDTO();
-			BeanUtils.copyProperties(commUseDriverInfoDTO,dto);
-			//计算费用
-			String amt = "0";
-			RenterOrderCostDetailEntity extraDriverInsureAmtEntity = renterOrderCostCombineService.getExtraDriverInsureAmtEntity(extraDriverDTO);
-			if(extraDriverInsureAmtEntity != null) {
-				amt = String.valueOf(extraDriverInsureAmtEntity.getTotalAmount());
+	private void putComUseDriverList(AdditionalDriverInsuranceVO resVo, List<CommUseDriverInfoDTO> commUseDriverList,ExtraDriverDTO extraDriverDTO,List<String> lstDriverId) throws Exception {
+		if(lstDriverId != null && lstDriverId.size() > 0) {
+			List<CommUseDriverInfoStringDateDTO> listCommUseDriverInfoDTO = new ArrayList<CommUseDriverInfoStringDateDTO>();
+			List<String> driverIds = new ArrayList<String>();
+			driverIds.add("1");//默认一个
+			extraDriverDTO.setDriverIds(driverIds);
+			///
+//			extraDriverDTO.setDriverIds(lstDriverId);
+			
+			for (CommUseDriverInfoDTO commUseDriverInfoDTO : commUseDriverList) {
+				//已经入库的lstDriverId
+				if(!lstDriverId.contains(commUseDriverInfoDTO.getId().toString())) {  //不存在的，则允许再次新增。
+					CommUseDriverInfoStringDateDTO dto = new CommUseDriverInfoStringDateDTO();
+					//获取时间来转换
+					Date validityEndDate = commUseDriverInfoDTO.getValidityEndDate();
+					Date validityStartDate = commUseDriverInfoDTO.getValidityStartDate();
+					BeanUtils.copyProperties(commUseDriverInfoDTO,dto);
+					
+					LocalDate localDateEnd = validityEndDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+					String end = LocalDateTimeUtils.localdateToStringChinese(localDateEnd);
+					LocalDate localDateStart = validityStartDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+					String start = LocalDateTimeUtils.localdateToStringChinese(localDateStart);
+					//数据封装
+					dto.setValidityEndDate(end);
+					dto.setValidityStartDate(start);
+					
+					//计算费用
+					String amt = "0";
+					RenterOrderCostDetailEntity extraDriverInsureAmtEntity = renterOrderCostCombineService.getExtraDriverInsureAmtEntity(extraDriverDTO);
+					if(extraDriverInsureAmtEntity != null) {
+						amt = String.valueOf(extraDriverInsureAmtEntity.getTotalAmount());
+					}
+					dto.setAmt(amt);
+					listCommUseDriverInfoDTO.add(dto);
+				}
 			}
-			dto.setAmt(amt);
-			listCommUseDriverInfoDTO.add(dto);
+			
+			resVo.setListCommUseDriverInfoDTO(listCommUseDriverInfoDTO);
 		}
 		
-		resVo.setListCommUseDriverInfoDTO(listCommUseDriverInfoDTO);
 	}
 	
 	/**
@@ -296,6 +373,13 @@ public class OrderCostDetailService {
 		//获取附加驾驶人保险金额
 		//封装数据
 		RenterOrderCostDetailEntity extraDriverInsureAmtEntity = renterOrderCostCombineService.getExtraDriverInsureAmtEntity(extraDriverDTO);
+		
+		//统一设置修改人名称。20200205 huangjing
+        String userName = AdminUserUtil.getAdminUser().getAuthName(); // 获取的管理后台的用户名。
+        extraDriverInsureAmtEntity.setUpdateOp(userName);
+        extraDriverInsureAmtEntity.setCreateOp(userName);
+        extraDriverInsureAmtEntity.setOperatorId(userName);
+        
 		//添加租客费用.
 		int i = renterOrderCostDetailService.saveOrUpdateRenterOrderCostDetail(extraDriverInsureAmtEntity);
 		if(i>0) {
@@ -312,10 +396,17 @@ public class OrderCostDetailService {
 			dto.setId(commUseDriverInfoDTO.getId());
 			dto.setRealName(commUseDriverInfoDTO.getRealName());
 			dto.setMobile(commUseDriverInfoDTO.getMobile());
+			//记录操作人
+			dto.setConsoleOperatorName(userName);
+			
 			commUseDriverList.add(dto); //注意封装数据
 		}
-        renterAdditionalDriverService.insertBatchAdditionalDriver(renterCostReqVO.getOrderNo(),
+//        renterAdditionalDriverService.insertBatchAdditionalDriver(renterCostReqVO.getOrderNo(),
+//        		renterCostReqVO.getRenterOrderNo(),driverIds,commUseDriverList);
+		
+        renterAdditionalDriverService.insertBatchAdditionalDriverBeforeDel(renterCostReqVO.getOrderNo(),
         		renterCostReqVO.getRenterOrderNo(),driverIds,commUseDriverList);
+        
         logger.info("保存附加驾驶人信息SUCCESS");
 	}
 	
@@ -466,6 +557,8 @@ public class OrderCostDetailService {
 	    	
 	    }
 	    
+	    String userName = AdminUserUtil.getAdminUser().getAuthName();  //获取的管理后台的用户名。
+	    
 	   /**	
 	    * 租客给车主的调价
 	    */
@@ -478,12 +571,20 @@ public class OrderCostDetailService {
 	    	costBaseDTO.setOrderNo(renterCostReqVO.getOrderNo());
 	    	costBaseDTO.setMemNo(orderEntity.getMemNoRenter());
 	    	OrderConsoleSubsidyDetailEntity record = orderConsoleSubsidyDetailService.buildData(costBaseDTO, -Integer.valueOf(renterCostReqVO.getRenterToOwnerAdjustAmt()), targetEnum, sourceEnum, SubsidyTypeCodeEnum.ADJUST_AMT, cash);
+	    	//
+			record.setCreateOp(userName);
+			record.setUpdateOp(userName);
+			record.setOperatorId(userName);
 	    	orderConsoleSubsidyDetailService.saveOrUpdateOrderConsoleSubsidyDetail(record);
 	    	
 	    	if(orderEntityOwner != null) {
 		    	//反向记录
 	    		costBaseDTO.setMemNo(orderEntityOwner.getMemNo());
 		    	OrderConsoleSubsidyDetailEntity recordConvert = orderConsoleSubsidyDetailService.buildData(costBaseDTO, Integer.valueOf(renterCostReqVO.getRenterToOwnerAdjustAmt()), targetEnum, sourceEnum, SubsidyTypeCodeEnum.ADJUST_AMT, cash);
+		    	//
+		    	recordConvert.setCreateOp(userName);
+		    	recordConvert.setUpdateOp(userName);
+		    	recordConvert.setOperatorId(userName);
 		    	orderConsoleSubsidyDetailService.saveOrUpdateOrderConsoleSubsidyDetail(recordConvert);
 	    	}
 	   }
@@ -501,12 +602,20 @@ public class OrderCostDetailService {
 	    	if(orderEntityOwner != null) {
 		    	costBaseDTO.setMemNo(orderEntityOwner.getMemNo());
 		    	OrderConsoleSubsidyDetailEntity record = orderConsoleSubsidyDetailService.buildData(costBaseDTO, -Integer.valueOf(renterCostReqVO.getOwnerToRenterAdjustAmt()), targetEnum, sourceEnum, SubsidyTypeCodeEnum.ADJUST_AMT, cash);
+		    	//
+				record.setCreateOp(userName);
+				record.setUpdateOp(userName);
+				record.setOperatorId(userName);
 		    	orderConsoleSubsidyDetailService.saveOrUpdateOrderConsoleSubsidyDetail(record);
 	    	}
 	    	
 	    	//反向记录
 	    	costBaseDTO.setMemNo(orderEntity.getMemNoRenter());
 	    	OrderConsoleSubsidyDetailEntity recordConvert = orderConsoleSubsidyDetailService.buildData(costBaseDTO, Integer.valueOf(renterCostReqVO.getOwnerToRenterAdjustAmt()), targetEnum, sourceEnum, SubsidyTypeCodeEnum.ADJUST_AMT, cash);
+	    	//
+	    	recordConvert.setCreateOp(userName);
+	    	recordConvert.setUpdateOp(userName);
+	    	recordConvert.setOperatorId(userName);
 	    	orderConsoleSubsidyDetailService.saveOrUpdateOrderConsoleSubsidyDetail(recordConvert);
 	   }
     	
@@ -588,8 +697,15 @@ public class OrderCostDetailService {
 		
 		 SubsidySourceCodeEnum target = SubsidySourceCodeEnum.PLATFORM;
 		 SubsidySourceCodeEnum source = SubsidySourceCodeEnum.RENTER;
+		 
+		 String userName = AdminUserUtil.getAdminUser().getAuthName();  //获取的管理后台的用户名。
+
 		if(StringUtils.isNotBlank(oliAmt)) {
 			OrderConsoleCostDetailEntity record = orderConsoleCostDetailService.buildData(costBaseDTO, Integer.valueOf(oliAmt), target, source, ConsoleCashCodeEnum.RENTER_OIL_FEE);
+			//
+			record.setCreateOp(userName);
+			record.setUpdateOp(userName);
+			record.setOperatorId(userName);
 			orderConsoleCostDetailService.saveOrUpdateOrderConsoleCostDetaiByOrderNo(record);
 			
 			//反向记录
@@ -599,6 +715,10 @@ public class OrderCostDetailService {
 		
 		if(StringUtils.isNotBlank(timeOut)) {
 			OrderConsoleCostDetailEntity record = orderConsoleCostDetailService.buildData(costBaseDTO, Integer.valueOf(timeOut), target, source, ConsoleCashCodeEnum.RENTER_TIME_OUT);
+			//
+			record.setCreateOp(userName);
+			record.setUpdateOp(userName);
+			record.setOperatorId(userName);
 			orderConsoleCostDetailService.saveOrUpdateOrderConsoleCostDetaiByOrderNo(record);
 			
 			//反向记录
@@ -608,6 +728,10 @@ public class OrderCostDetailService {
 		
 		if(StringUtils.isNotBlank(modifyOrderTimeAndAddrAmt)) {
 			OrderConsoleCostDetailEntity record = orderConsoleCostDetailService.buildData(costBaseDTO, Integer.valueOf(modifyOrderTimeAndAddrAmt), target, source, ConsoleCashCodeEnum.RENTER_MODIFY_ADDR_TIME);
+			//
+			record.setCreateOp(userName);
+			record.setUpdateOp(userName);
+			record.setOperatorId(userName);
 			orderConsoleCostDetailService.saveOrUpdateOrderConsoleCostDetaiByOrderNo(record);
 			
 			//反向记录
@@ -617,6 +741,10 @@ public class OrderCostDetailService {
 		
 		if(StringUtils.isNotBlank(carWash)) {
 			OrderConsoleCostDetailEntity record = orderConsoleCostDetailService.buildData(costBaseDTO, Integer.valueOf(carWash), target, source, ConsoleCashCodeEnum.RENTER_CAR_WASH);
+			//
+			record.setCreateOp(userName);
+			record.setUpdateOp(userName);
+			record.setOperatorId(userName);
 			orderConsoleCostDetailService.saveOrUpdateOrderConsoleCostDetaiByOrderNo(record);
 			
 			//反向记录
@@ -626,6 +754,10 @@ public class OrderCostDetailService {
 		
 		if(StringUtils.isNotBlank(dlayWait)) {
 			OrderConsoleCostDetailEntity record = orderConsoleCostDetailService.buildData(costBaseDTO, Integer.valueOf(dlayWait), target, source, ConsoleCashCodeEnum.RENTER_DLAY_WAIT);
+			//
+			record.setCreateOp(userName);
+			record.setUpdateOp(userName);
+			record.setOperatorId(userName);
 			orderConsoleCostDetailService.saveOrUpdateOrderConsoleCostDetaiByOrderNo(record);
 			
 			//反向记录
@@ -635,6 +767,10 @@ public class OrderCostDetailService {
 		
 		if(StringUtils.isNotBlank(stopCar)) {
 			OrderConsoleCostDetailEntity record = orderConsoleCostDetailService.buildData(costBaseDTO, Integer.valueOf(stopCar), target, source, ConsoleCashCodeEnum.RENTER_STOP_CAR);
+			//
+			record.setCreateOp(userName);
+			record.setUpdateOp(userName);
+			record.setOperatorId(userName);
 			orderConsoleCostDetailService.saveOrUpdateOrderConsoleCostDetaiByOrderNo(record);
 			
 			//反向记录
@@ -644,6 +780,10 @@ public class OrderCostDetailService {
 		
 		if(StringUtils.isNotBlank(extraMileage)) {
 			OrderConsoleCostDetailEntity record = orderConsoleCostDetailService.buildData(costBaseDTO, Integer.valueOf(extraMileage), target, source, ConsoleCashCodeEnum.RENTER_EXTRA_MILEAGE);
+			//
+			record.setCreateOp(userName);
+			record.setUpdateOp(userName);
+			record.setOperatorId(userName);
 			orderConsoleCostDetailService.saveOrUpdateOrderConsoleCostDetaiByOrderNo(record);
 			
 			//反向记录
@@ -681,8 +821,15 @@ public class OrderCostDetailService {
 			
 			 SubsidySourceCodeEnum target = SubsidySourceCodeEnum.PLATFORM;
 			 SubsidySourceCodeEnum source = SubsidySourceCodeEnum.OWNER;
+			 
+			 String userName = AdminUserUtil.getAdminUser().getAuthName();  //获取的管理后台的用户名。
+			 
 			if(StringUtils.isNotBlank(oliAmt)) {
 				OrderConsoleCostDetailEntity record = orderConsoleCostDetailService.buildData(costBaseDTO, Integer.valueOf(oliAmt), target, source, ConsoleCashCodeEnum.OIL_FEE);
+				//
+				record.setCreateOp(userName);
+				record.setUpdateOp(userName);
+				record.setOperatorId(userName);
 				orderConsoleCostDetailService.saveOrUpdateOrderConsoleCostDetaiByOrderNo(record);
 				
 				//反向记录
@@ -692,6 +839,10 @@ public class OrderCostDetailService {
 			
 			if(StringUtils.isNotBlank(timeOut)) {
 				OrderConsoleCostDetailEntity record = orderConsoleCostDetailService.buildData(costBaseDTO, Integer.valueOf(timeOut), target, source, ConsoleCashCodeEnum.TIME_OUT);
+				//
+				record.setCreateOp(userName);
+				record.setUpdateOp(userName);
+				record.setOperatorId(userName);
 				orderConsoleCostDetailService.saveOrUpdateOrderConsoleCostDetaiByOrderNo(record);
 				
 				//反向记录
@@ -701,6 +852,10 @@ public class OrderCostDetailService {
 			
 			if(StringUtils.isNotBlank(modifyOrderTimeAndAddrAmt)) {
 				OrderConsoleCostDetailEntity record = orderConsoleCostDetailService.buildData(costBaseDTO, Integer.valueOf(modifyOrderTimeAndAddrAmt), target, source, ConsoleCashCodeEnum.MODIFY_ADDR_TIME);
+				//
+				record.setCreateOp(userName);
+				record.setUpdateOp(userName);
+				record.setOperatorId(userName);
 				orderConsoleCostDetailService.saveOrUpdateOrderConsoleCostDetaiByOrderNo(record);
 				
 				//反向记录
@@ -710,6 +865,10 @@ public class OrderCostDetailService {
 			
 			if(StringUtils.isNotBlank(carWash)) {
 				OrderConsoleCostDetailEntity record = orderConsoleCostDetailService.buildData(costBaseDTO, Integer.valueOf(carWash), target, source, ConsoleCashCodeEnum.CAR_WASH);
+				//
+				record.setCreateOp(userName);
+				record.setUpdateOp(userName);
+				record.setOperatorId(userName);
 				orderConsoleCostDetailService.saveOrUpdateOrderConsoleCostDetaiByOrderNo(record);
 				
 				//反向记录
@@ -719,6 +878,10 @@ public class OrderCostDetailService {
 			
 			if(StringUtils.isNotBlank(dlayWait)) {
 				OrderConsoleCostDetailEntity record = orderConsoleCostDetailService.buildData(costBaseDTO, Integer.valueOf(dlayWait), target, source, ConsoleCashCodeEnum.DLAY_WAIT);
+				//
+				record.setCreateOp(userName);
+				record.setUpdateOp(userName);
+				record.setOperatorId(userName);
 				orderConsoleCostDetailService.saveOrUpdateOrderConsoleCostDetaiByOrderNo(record);
 				
 				//反向记录
@@ -728,6 +891,10 @@ public class OrderCostDetailService {
 			
 			if(StringUtils.isNotBlank(stopCar)) {
 				OrderConsoleCostDetailEntity record = orderConsoleCostDetailService.buildData(costBaseDTO, Integer.valueOf(stopCar), target, source, ConsoleCashCodeEnum.STOP_CAR);
+				//
+				record.setCreateOp(userName);
+				record.setUpdateOp(userName);
+				record.setOperatorId(userName);
 				orderConsoleCostDetailService.saveOrUpdateOrderConsoleCostDetaiByOrderNo(record);
 				
 				//反向记录
@@ -737,6 +904,10 @@ public class OrderCostDetailService {
 			
 			if(StringUtils.isNotBlank(extraMileage)) {
 				OrderConsoleCostDetailEntity record = orderConsoleCostDetailService.buildData(costBaseDTO, Integer.valueOf(extraMileage), target, source, ConsoleCashCodeEnum.EXTRA_MILEAGE);
+				//
+				record.setCreateOp(userName);
+				record.setUpdateOp(userName);
+				record.setOperatorId(userName);
 				orderConsoleCostDetailService.saveOrUpdateOrderConsoleCostDetaiByOrderNo(record);
 				
 				//反向记录
@@ -767,10 +938,21 @@ public class OrderCostDetailService {
                        LocalDate carDay = x.getCarDay();
                        x.setCarDayStr(carDay!=null?LocalDateTimeUtils.localdateToString(carDay):null);
                    });
-            renterRentDetailDTO.setDayAverageAmt(renterGoodsPriceDetailDTOList.get(0).getCarUnitPrice());
+            
+            //从renter_order_cost_detail获取 ，而不是从renter_goods_price_detail获取天价格。20200205 huangjing
+//            renterRentDetailDTO.setDayAverageAmt(renterGoodsPriceDetailDTOList.get(0).getCarUnitPrice());
             renterRentDetailDTO.setRenterGoodsPriceDetailDTOS(renterGoodsPriceDetailDTOList);
             renterRentDetailDTO.setCarPlateNum(renterGoodsDetail.getCarPlateNum());
         }
+        
+        //111 租客租金组成 日均价
+        List<RenterOrderCostDetailEntity> lstRenterCostDetail = renterOrderCostDetailService.listRenterOrderCostDetail(renterCostReqVO.getOrderNo(), renterCostReqVO.getRenterOrderNo());
+        for (RenterOrderCostDetailEntity renterOrderCostDetailEntity : lstRenterCostDetail) {
+			if(RenterCashCodeEnum.RENT_AMT.getCashNo().equals(renterOrderCostDetailEntity.getCostCode())) {
+				renterRentDetailDTO.setDayAverageAmt(renterOrderCostDetailEntity.getUnitPrice());
+				break;
+			}
+		}
 
 
         OrderDTO orderDTO = new OrderDTO();
@@ -859,6 +1041,12 @@ public class OrderCostDetailService {
 	        ConsoleRenterOrderFineDeatailEntity consoleRenterOrderFineDeatailEntity =
 	                consoleRenterOrderFineDeatailService.fineDataConvert(costBaseDTO, Integer.valueOf(renterBeforeReturnCarFineAmt),
 	                        FineSubsidyCodeEnum.PLATFORM, FineSubsidySourceCodeEnum.RENTER, FineTypeEnum.MODIFY_ADVANCE);
+	        
+	        //统一设置修改人名称。20200205 huangjing
+	        String userName = AdminUserUtil.getAdminUser().getAuthName(); // 获取的管理后台的用户名。
+	        consoleRenterOrderFineDeatailEntity.setUpdateOp(userName);
+	        consoleRenterOrderFineDeatailEntity.setCreateOp(userName);
+	        consoleRenterOrderFineDeatailEntity.setOperatorId(userName);
 	        consoleRenterOrderFineDeatailService.saveOrUpdateConsoleRenterOrderFineDeatail(consoleRenterOrderFineDeatailEntity);
 		}
 		
@@ -866,6 +1054,13 @@ public class OrderCostDetailService {
 	        ConsoleRenterOrderFineDeatailEntity consoleRenterOrderFineDeatailEntity =
 	                consoleRenterOrderFineDeatailService.fineDataConvert(costBaseDTO, Integer.valueOf(renterDelayReturnCarFineAmt),
 	                        FineSubsidyCodeEnum.PLATFORM, FineSubsidySourceCodeEnum.RENTER, FineTypeEnum.DELAY_FINE);
+	        
+	        //统一设置修改人名称。20200205 huangjing
+	        String userName = AdminUserUtil.getAdminUser().getAuthName(); // 获取的管理后台的用户名。
+	        consoleRenterOrderFineDeatailEntity.setUpdateOp(userName);
+	        consoleRenterOrderFineDeatailEntity.setCreateOp(userName);
+	        consoleRenterOrderFineDeatailEntity.setOperatorId(userName);
+	        
 	        consoleRenterOrderFineDeatailService.saveOrUpdateConsoleRenterOrderFineDeatail(consoleRenterOrderFineDeatailEntity);
 		}
 		
@@ -909,12 +1104,18 @@ public class OrderCostDetailService {
 		SubsidySourceCodeEnum sourceEnum = SubsidySourceCodeEnum.PLATFORM; //固定
     	SubsidySourceCodeEnum targetEnum = SubsidySourceCodeEnum.RENTER;
     	
+    	 String userName = AdminUserUtil.getAdminUser().getAuthName();  //获取的管理后台的用户名。
     	/**
     	 * 全局补贴
     	 */
 		//升级车辆补贴
 		if(dispatching != 0) {
 			OrderConsoleSubsidyDetailEntity record = orderConsoleSubsidyDetailService.buildData(costBaseDTO, dispatching, targetEnum, sourceEnum, SubsidyTypeCodeEnum.CONSOLE_AMT, RenterCashCodeEnum.SUBSIDY_DISPATCHING_AMT);
+			//
+			record.setCreateOp(userName);
+			record.setUpdateOp(userName);
+			record.setOperatorId(userName);
+			
 			orderConsoleSubsidyDetailService.saveOrUpdateOrderConsoleSubsidyDetail(record);
 			
 			//添加反向记录
@@ -924,6 +1125,10 @@ public class OrderCostDetailService {
 		
 		if(oil != 0) {
 			OrderConsoleSubsidyDetailEntity record = orderConsoleSubsidyDetailService.buildData(costBaseDTO, oil, targetEnum, sourceEnum, SubsidyTypeCodeEnum.CONSOLE_AMT, RenterCashCodeEnum.SUBSIDY_OIL);
+			//
+			record.setCreateOp(userName);
+			record.setUpdateOp(userName);
+			record.setOperatorId(userName);
 			orderConsoleSubsidyDetailService.saveOrUpdateOrderConsoleSubsidyDetail(record);
 			
 			//添加反向记录
@@ -933,6 +1138,10 @@ public class OrderCostDetailService {
 		
 		if(cleancar != 0) {
 			OrderConsoleSubsidyDetailEntity record = orderConsoleSubsidyDetailService.buildData(costBaseDTO, cleancar, targetEnum, sourceEnum, SubsidyTypeCodeEnum.CONSOLE_AMT, RenterCashCodeEnum.SUBSIDY_CLEANCAR);
+			//
+			record.setCreateOp(userName);
+			record.setUpdateOp(userName);
+			record.setOperatorId(userName);
 			orderConsoleSubsidyDetailService.saveOrUpdateOrderConsoleSubsidyDetail(record);
 			
 			//添加反向记录
@@ -942,6 +1151,10 @@ public class OrderCostDetailService {
 		
 		if(getReturnDelay != 0) {
 			OrderConsoleSubsidyDetailEntity record = orderConsoleSubsidyDetailService.buildData(costBaseDTO, getReturnDelay, targetEnum, sourceEnum, SubsidyTypeCodeEnum.CONSOLE_AMT, RenterCashCodeEnum.SUBSIDY_GETRETURNDELAY);
+			//
+			record.setCreateOp(userName);
+			record.setUpdateOp(userName);
+			record.setOperatorId(userName);
 			orderConsoleSubsidyDetailService.saveOrUpdateOrderConsoleSubsidyDetail(record);
 			
 			//添加反向记录
@@ -951,6 +1164,10 @@ public class OrderCostDetailService {
 		
 		if(delay != 0) {
 			OrderConsoleSubsidyDetailEntity record = orderConsoleSubsidyDetailService.buildData(costBaseDTO, delay, targetEnum, sourceEnum, SubsidyTypeCodeEnum.CONSOLE_AMT, RenterCashCodeEnum.SUBSIDY_DELAY);
+			//
+			record.setCreateOp(userName);
+			record.setUpdateOp(userName);
+			record.setOperatorId(userName);
 			orderConsoleSubsidyDetailService.saveOrUpdateOrderConsoleSubsidyDetail(record);
 			
 			//添加反向记录
@@ -960,6 +1177,10 @@ public class OrderCostDetailService {
 		
 		if(traffic != 0) {
 			OrderConsoleSubsidyDetailEntity record = orderConsoleSubsidyDetailService.buildData(costBaseDTO, traffic, targetEnum, sourceEnum, SubsidyTypeCodeEnum.CONSOLE_AMT, RenterCashCodeEnum.SUBSIDY_TRAFFIC);
+			//
+			record.setCreateOp(userName);
+			record.setUpdateOp(userName);
+			record.setOperatorId(userName);
 			orderConsoleSubsidyDetailService.saveOrUpdateOrderConsoleSubsidyDetail(record);
 			
 			//添加反向记录
@@ -969,6 +1190,10 @@ public class OrderCostDetailService {
 		
 		if(insure != 0) {
 			OrderConsoleSubsidyDetailEntity record = orderConsoleSubsidyDetailService.buildData(costBaseDTO, insure, targetEnum, sourceEnum, SubsidyTypeCodeEnum.CONSOLE_AMT, RenterCashCodeEnum.SUBSIDY_INSURE);
+			//
+			record.setCreateOp(userName);
+			record.setUpdateOp(userName);
+			record.setOperatorId(userName);
 			orderConsoleSubsidyDetailService.saveOrUpdateOrderConsoleSubsidyDetail(record);
 			
 			//添加反向记录
@@ -978,6 +1203,10 @@ public class OrderCostDetailService {
 		
 		if(rentamt != 0) {
 			OrderConsoleSubsidyDetailEntity record = orderConsoleSubsidyDetailService.buildData(costBaseDTO, rentamt, targetEnum, sourceEnum, SubsidyTypeCodeEnum.CONSOLE_AMT, RenterCashCodeEnum.SUBSIDY_RENTAMT);
+			//
+			record.setCreateOp(userName);
+			record.setUpdateOp(userName);
+			record.setOperatorId(userName);
 			orderConsoleSubsidyDetailService.saveOrUpdateOrderConsoleSubsidyDetail(record);
 			
 			//添加反向记录
@@ -987,6 +1216,10 @@ public class OrderCostDetailService {
 		
 		if(other != 0) {
 			OrderConsoleSubsidyDetailEntity record = orderConsoleSubsidyDetailService.buildData(costBaseDTO, other, targetEnum, sourceEnum, SubsidyTypeCodeEnum.CONSOLE_AMT, RenterCashCodeEnum.SUBSIDY_OTHER);
+			//
+			record.setCreateOp(userName);
+			record.setUpdateOp(userName);
+			record.setOperatorId(userName);
 			orderConsoleSubsidyDetailService.saveOrUpdateOrderConsoleSubsidyDetail(record);
 			
 			//添加反向记录
@@ -996,6 +1229,10 @@ public class OrderCostDetailService {
 		
 		if(abatement != 0) {
 			OrderConsoleSubsidyDetailEntity record = orderConsoleSubsidyDetailService.buildData(costBaseDTO, abatement, targetEnum, sourceEnum, SubsidyTypeCodeEnum.CONSOLE_AMT, RenterCashCodeEnum.SUBSIDY_ABATEMENT);
+			//
+			record.setCreateOp(userName);
+			record.setUpdateOp(userName);
+			record.setOperatorId(userName);
 			orderConsoleSubsidyDetailService.saveOrUpdateOrderConsoleSubsidyDetail(record);
 			
 			//添加反向记录
@@ -1005,6 +1242,10 @@ public class OrderCostDetailService {
 		
 		if(fee != 0) {
 			OrderConsoleSubsidyDetailEntity record = orderConsoleSubsidyDetailService.buildData(costBaseDTO, fee, targetEnum, sourceEnum, SubsidyTypeCodeEnum.CONSOLE_AMT, RenterCashCodeEnum.SUBSIDY_FEE);
+			//
+			record.setCreateOp(userName);
+			record.setUpdateOp(userName);
+			record.setOperatorId(userName);
 			orderConsoleSubsidyDetailService.saveOrUpdateOrderConsoleSubsidyDetail(record);
 			
 			//添加反向记录
@@ -1105,54 +1346,87 @@ public class OrderCostDetailService {
 		SubsidySourceCodeEnum sourceEnum = SubsidySourceCodeEnum.PLATFORM; //固定
     	SubsidySourceCodeEnum targetEnum = SubsidySourceCodeEnum.OWNER;
     	
+    	String userName = AdminUserUtil.getAdminUser().getAuthName();  //获取的管理后台的用户名。
     	/**
     	 * 全局补贴，单条记录
     	 */
 		//车主超里程补贴
 		if(mileageAmt != 0) {
 			OrderConsoleSubsidyDetailEntity record = orderConsoleSubsidyDetailService.buildDataOwner(costBaseDTO, mileageAmt, targetEnum, sourceEnum, SubsidyTypeCodeEnum.CONSOLE_AMT, OwnerCashCodeEnum.OWNER_MILEAGE_COST_SUBSIDY);
+			//
+			record.setCreateOp(userName);
+			record.setUpdateOp(userName);
+			record.setOperatorId(userName);
 			orderConsoleSubsidyDetailService.saveOrUpdateOrderConsoleSubsidyDetail(record);
 		}
 		
 		//车主油费补贴
 		if(oilSubsidyAmt != 0) {
 			OrderConsoleSubsidyDetailEntity record = orderConsoleSubsidyDetailService.buildDataOwner(costBaseDTO, oilSubsidyAmt, targetEnum, sourceEnum, SubsidyTypeCodeEnum.CONSOLE_AMT, OwnerCashCodeEnum.OWNER_OIL_SUBSIDY);
+			//
+			record.setCreateOp(userName);
+			record.setUpdateOp(userName);
+			record.setOperatorId(userName);
 			orderConsoleSubsidyDetailService.saveOrUpdateOrderConsoleSubsidyDetail(record);
 		}
 		
 		//车主物品损失补贴
 		if(carGoodsLossSubsidyAmt != 0) {
 			OrderConsoleSubsidyDetailEntity record = orderConsoleSubsidyDetailService.buildDataOwner(costBaseDTO, carGoodsLossSubsidyAmt, targetEnum, sourceEnum, SubsidyTypeCodeEnum.CONSOLE_AMT, OwnerCashCodeEnum.OWNER_GOODS_SUBSIDY);
+			//
+			record.setCreateOp(userName);
+			record.setUpdateOp(userName);
+			record.setOperatorId(userName);
 			orderConsoleSubsidyDetailService.saveOrUpdateOrderConsoleSubsidyDetail(record);
 		}
 		
 		//车主延时补贴
 		if(delaySubsidyAmt != 0) {
 			OrderConsoleSubsidyDetailEntity record = orderConsoleSubsidyDetailService.buildDataOwner(costBaseDTO, delaySubsidyAmt, targetEnum, sourceEnum, SubsidyTypeCodeEnum.CONSOLE_AMT, OwnerCashCodeEnum.OWNER_DELAY_SUBSIDY);
+			//
+			record.setCreateOp(userName);
+			record.setUpdateOp(userName);
+			record.setOperatorId(userName);
 			orderConsoleSubsidyDetailService.saveOrUpdateOrderConsoleSubsidyDetail(record);
 		}
 		
 		//车主交通费补贴
 		if(trafficSubsidyAmt != 0) {
 			OrderConsoleSubsidyDetailEntity record = orderConsoleSubsidyDetailService.buildDataOwner(costBaseDTO, trafficSubsidyAmt, targetEnum, sourceEnum, SubsidyTypeCodeEnum.CONSOLE_AMT, OwnerCashCodeEnum.OWNER_TRAFFIC_SUBSIDY);
+			//
+			record.setCreateOp(userName);
+			record.setUpdateOp(userName);
+			record.setOperatorId(userName);
 			orderConsoleSubsidyDetailService.saveOrUpdateOrderConsoleSubsidyDetail(record);
 		}
 		
 		//车主收益补贴
 		if(incomeSubsidyAmt != 0) {
 			OrderConsoleSubsidyDetailEntity record = orderConsoleSubsidyDetailService.buildDataOwner(costBaseDTO, incomeSubsidyAmt, targetEnum, sourceEnum, SubsidyTypeCodeEnum.CONSOLE_AMT, OwnerCashCodeEnum.OWNER_INCOME_SUBSIDY);
+			//
+			record.setCreateOp(userName);
+			record.setUpdateOp(userName);
+			record.setOperatorId(userName);
 			orderConsoleSubsidyDetailService.saveOrUpdateOrderConsoleSubsidyDetail(record);
 		}
 		
 		//车主洗车补贴
 		if(washCarSubsidyAmt != 0) {
 			OrderConsoleSubsidyDetailEntity record = orderConsoleSubsidyDetailService.buildDataOwner(costBaseDTO, washCarSubsidyAmt, targetEnum, sourceEnum, SubsidyTypeCodeEnum.CONSOLE_AMT, OwnerCashCodeEnum.OWNER_WASH_CAR_SUBSIDY);
+			//
+			record.setCreateOp(userName);
+			record.setUpdateOp(userName);
+			record.setOperatorId(userName);
 			orderConsoleSubsidyDetailService.saveOrUpdateOrderConsoleSubsidyDetail(record);
 		}
 		
 		//其他补贴
 		if(otherSubsidyAmt != 0) {
 			OrderConsoleSubsidyDetailEntity record = orderConsoleSubsidyDetailService.buildDataOwner(costBaseDTO, otherSubsidyAmt, targetEnum, sourceEnum, SubsidyTypeCodeEnum.CONSOLE_AMT, OwnerCashCodeEnum.OWNER_OTHER_SUBSIDY);
+			//
+			record.setCreateOp(userName);
+			record.setUpdateOp(userName);
+			record.setOperatorId(userName);
 			orderConsoleSubsidyDetailService.saveOrUpdateOrderConsoleSubsidyDetail(record);
 		}
 	}

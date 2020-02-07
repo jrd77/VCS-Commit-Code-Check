@@ -28,7 +28,7 @@ import java.util.Objects;
 @RestController
 @RequestMapping("/console/api")
 @Slf4j
-public class DeliveryCarController extends BaseController {
+public class AdminDeliveryCarController extends BaseController {
 
     @Autowired
     private AdminDeliveryCarService deliveryCarInfoService;
@@ -53,7 +53,7 @@ public class DeliveryCarController extends BaseController {
             }
             return ResponseData.success();
         } catch (DeliveryOrderException ex) {
-            return ResponseData.createErrorCodeResponse(ex.getErrorCode(), ex.getMessage());
+            return ResponseData.createErrorCodeResponse(ex.getMessage(),ex.getErrorCode());
         } catch (Exception e) {
             log.error("取还车配送接口出现异常", e);
             Cat.logError("取还车配送接口出现异常", e);

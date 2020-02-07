@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("/console/api/cost")
-public class OrderRentalCostController {
+public class AdminOrderRentalCostController {
 
     @Autowired
     private AdminDeliveryCarService deliveryCarInfoService;
@@ -286,6 +286,7 @@ public class OrderRentalCostController {
         if (null == rentalCostReqVO || StringUtils.isBlank(rentalCostReqVO.getOrderNo())) {
             return ResponseData.createErrorCodeResponse(ErrorCode.ORDER_NO_PARAM_ERROR.getCode(), "订单编号为空");
         }
+
         return ResponseData.success(deliveryCarInfoService.findDeliveryCostByOrderNo(rentalCostReqVO));
     }
 
@@ -344,7 +345,7 @@ public class OrderRentalCostController {
      * @param rentalCostReqVO
      * @return
      */
-    
+
     @AutoDocGroup(group = "管理后台违约罚金")
     @AutoDocMethod(description = "违约罚金", value = "违约罚金",response = PenaltyContractVO.class)
     @PostMapping("/penaltyContract/list")

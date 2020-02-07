@@ -43,12 +43,10 @@ public class RenterOrderDeliveryEntity implements Serializable {
 	/**
 	 * 起租时间
 	 */
-	@JsonFormat(pattern="yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
 	private LocalDateTime rentTime;
 	/**
 	 * 归还时间
 	 */
-	@JsonFormat(pattern="yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
 	private LocalDateTime revertTime;
 	/**
 	 * 城市编码

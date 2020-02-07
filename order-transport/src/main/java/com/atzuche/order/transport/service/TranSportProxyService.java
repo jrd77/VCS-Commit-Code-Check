@@ -100,7 +100,7 @@ public class TranSportProxyService {
                     t.setStatus(Transaction.SUCCESS);
                 }catch (Exception e){
                     log.error("Feign 取车超运能接口异常",e);
-                    Cat.logError("Feign 取车超运能接口异常",e);
+                    Cat.logError("Feign 取车超运能接口异常5",e);
                     t.setStatus(e);
                     throw e;
                 }finally {

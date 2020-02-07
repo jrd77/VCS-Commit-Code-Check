@@ -5,6 +5,7 @@ import com.atzuche.order.commons.enums.MemRoleEnum;
 import com.atzuche.order.commons.vo.req.CancelOrderReqVO;
 import com.atzuche.order.coreapi.common.conver.OrderCommonConver;
 import com.atzuche.order.coreapi.entity.dto.CancelOrderResDTO;
+import com.atzuche.order.coreapi.service.remote.StockProxyService;
 import com.atzuche.order.delivery.service.delivery.DeliveryCarService;
 import com.atzuche.order.delivery.vo.delivery.CancelOrderDeliveryVO;
 import com.atzuche.order.settle.service.OrderSettleService;
@@ -35,11 +36,13 @@ public class CancelOrderService {
     @Autowired
     private OrderSettleService orderSettleService;
     @Autowired
-    private StockService stockService;
+    private StockProxyService stockService;
     @Autowired
     private DeliveryCarService deliveryCarService;
     @Autowired
     private OrderCommonConver orderCommonConver;
+    @Autowired
+    private CancelOrderCheckService cancelOrderCheckService;
 
     /**
      * 订单取消
@@ -48,8 +51,7 @@ public class CancelOrderService {
      */
     public void cancel(CancelOrderReqVO cancelOrderReqVO) {
         //公共校验
-        check();
-
+        cancelOrderCheckService.checkCancelOrder(cancelOrderReqVO.getOrderNo(), false);
         //取消处理
         CancelOrderResDTO res = null;
         if (StringUtils.equals(MemRoleEnum.RENTER.getCode(), cancelOrderReqVO.getMemRole())) {
@@ -95,14 +97,5 @@ public class CancelOrderService {
         //TODO:发送订单取消事件
 
     }
-
-
-    public void check() {
-        //TODO:订单取消公共校验
-
-    }
-
-
-
 
 }

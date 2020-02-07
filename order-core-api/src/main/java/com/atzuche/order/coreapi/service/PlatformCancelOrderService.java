@@ -1,26 +1,12 @@
 package com.atzuche.order.coreapi.service;
 
-import com.atzuche.order.commons.constant.OrderConstant;
-import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
 import com.atzuche.order.commons.enums.*;
 import com.atzuche.order.coreapi.common.conver.OrderCommonConver;
 import com.atzuche.order.coreapi.entity.dto.CancelOrderResDTO;
+import com.atzuche.order.coreapi.service.remote.StockProxyService;
 import com.atzuche.order.delivery.service.delivery.DeliveryCarService;
 import com.atzuche.order.delivery.vo.delivery.CancelOrderDeliveryVO;
-import com.atzuche.order.flow.service.OrderFlowService;
-import com.atzuche.order.ownercost.service.OwnerOrderService;
-import com.atzuche.order.parentorder.dto.OrderStatusDTO;
 import com.atzuche.order.parentorder.entity.OrderCancelReasonEntity;
-import com.atzuche.order.parentorder.entity.OrderEntity;
-import com.atzuche.order.parentorder.entity.OrderStatusEntity;
-import com.atzuche.order.parentorder.service.OrderCancelReasonService;
-import com.atzuche.order.parentorder.service.OrderService;
-import com.atzuche.order.parentorder.service.OrderStatusService;
-import com.atzuche.order.rentercommodity.service.RenterGoodsService;
-import com.atzuche.order.renterorder.entity.OrderCouponEntity;
-import com.atzuche.order.renterorder.entity.RenterOrderEntity;
-import com.atzuche.order.renterorder.service.OrderCouponService;
-import com.atzuche.order.renterorder.service.RenterOrderService;
 import com.atzuche.order.settle.service.OrderSettleService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,7 +27,7 @@ public class PlatformCancelOrderService {
 
 
     @Autowired
-    private StockService stockService;
+    private StockProxyService stockService;
     @Autowired
     private PlatformCancelOrderHandleService platformCancelOrderHandleService;
     @Autowired

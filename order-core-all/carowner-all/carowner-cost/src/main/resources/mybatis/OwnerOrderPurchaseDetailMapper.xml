@@ -164,7 +164,7 @@
 		select <include refid="Base_Column_List" /> from owner_order_purchase_detail where 
 		order_no = #{orderNo}
 		and owner_order_no = #{ownerOrderNo}
-		and is_delete = 0
+		and is_delete = 0 order by id desc
 	</select>
 	
 	<insert id="saveOwnerOrderPurchaseDetailBatch">

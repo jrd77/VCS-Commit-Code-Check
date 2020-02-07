@@ -2,18 +2,16 @@ package com.atzuche.order.coreapi.service;
 
 import com.atzuche.order.commons.entity.dto.OwnerGoodsDetailDTO;
 import com.atzuche.order.commons.enums.CarOwnerTypeEnum;
-import com.atzuche.order.commons.enums.ErrorCode;
 import com.atzuche.order.commons.enums.OrderStatusEnum;
-import com.atzuche.order.coreapi.submitOrder.exception.OrderDetailException;
 import com.atzuche.order.coreapi.submitOrder.exception.RefuseOrderCheckException;
 import com.atzuche.order.owner.commodity.service.OwnerGoodsService;
 import com.atzuche.order.ownercost.entity.OwnerOrderEntity;
 import com.atzuche.order.ownercost.service.OwnerOrderService;
 import com.atzuche.order.parentorder.entity.OrderStatusEntity;
 import com.atzuche.order.parentorder.service.OrderStatusService;
+import com.autoyol.commons.web.ErrorCode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -41,28 +39,67 @@ public class RefuseOrderCheckService {
 
 
     /**
-     * 车主同意订单校验
+     * 车主同意/拒绝订单校验
      *
      * @param orderNo 主订单号
      * @param isConsoleInvoke 是否是管理后台请求操作:true,是 false,否
      */
     public void checkOwnerAgreeOrRefuseOrder(String orderNo, boolean isConsoleInvoke) {
-        //车辆类型校验(非后台同意)
+        //车辆类型校验(非后台)
+        checkCommonInfo(orderNo, isConsoleInvoke);
+        //订单状态校验
+        OrderStatusEntity orderStatusEntity = orderStatusService.getByOrderNo(orderNo);
+        if(null != orderStatusEntity && null != orderStatusEntity.getStatus()) {
+            if(OrderStatusEnum.TO_CONFIRM.getStatus() != orderStatusEntity.getStatus()) {
+                throw new RefuseOrderCheckException();
+            }
+        }
+    }
+
+
+    /**
+     * 车主操作还车校验
+     *
+     * @param orderNo 主订单号
+     * @param isConsoleInvoke 是否是管理后台请求操作:true,是 false,否
+     */
+    public void checkOwnerReturnCar(String orderNo, boolean isConsoleInvoke) {
+        //车辆类型校验(非后台)
+        checkCommonInfo(orderNo, isConsoleInvoke);
+        //订单状态校验
+        OrderStatusEntity orderStatusEntity = orderStatusService.getByOrderNo(orderNo);
+        if(null != orderStatusEntity && null != orderStatusEntity.getStatus()) {
+            if(OrderStatusEnum.TO_RETURN_CAR.getStatus() != orderStatusEntity.getStatus()) {
+                throw new RefuseOrderCheckException(ErrorCode.ORDER_DELAY_REVERTCAR_EXIST);
+            }
+        }
+    }
+
+
+    /**
+     * 公共信息校验
+     * <p>车辆类型校验</p>
+     *
+     * @param orderNo
+     * @param isConsoleInvoke
+     */
+    public void checkCommonInfo(String orderNo, boolean isConsoleInvoke)  {
         if(!isConsoleInvoke) {
             OwnerOrderEntity ownerOrderEntity = ownerOrderService.getOwnerOrderByOrderNoAndIsEffective(orderNo);
             if(null == ownerOrderEntity) {
-                logger.info("No valid owner order found. orderNo:[{}]", orderNo);
-                throw new RefuseOrderCheckException(ErrorCode.NO_EFFECTIVE_ERR);
+                logger.error("No valid owner order found. orderNo:[{}]", orderNo);
+                throw new RefuseOrderCheckException(ErrorCode.ORDER_NOT_EXIST);
             }
             OwnerGoodsDetailDTO ownerGoodsDetail = ownerGoodsService.getOwnerGoodsDetail(ownerOrderEntity.getOwnerOrderNo(), false);
             if(null == ownerGoodsDetail) {
-                logger.info("No owner order product information found. ownerOrderNo:[{}]", ownerOrderEntity.getOwnerOrderNo());
-                throw new RefuseOrderCheckException(ErrorCode.OWNER_ORDER_GOODS_NOT_EXIST);
+                logger.error("No owner order product information found. ownerOrderNo:[{}]", ownerOrderEntity.getOwnerOrderNo());
+                throw new RefuseOrderCheckException(com.atzuche.order.commons.enums.ErrorCode.OWNER_ORDER_GOODS_NOT_EXIST.getCode(),
+                        com.atzuche.order.commons.enums.ErrorCode.OWNER_ORDER_GOODS_NOT_EXIST.getText());
             }
 
             Integer carOwnerType = ownerGoodsDetail.getCarOwnerType();
             if(null != carOwnerType) {
-                logger.info("Car owner type is :[{}]", carOwnerType);
+                logger.error("Car owner type is :[{}]", carOwnerType);
                 if(carOwnerType == CarOwnerTypeEnum.F.getCode()) {
                     throw new RefuseOrderCheckException(ErrorCode.MANAGED_CAR_CAN_NOT_OPT_TRANS);
                 } else if (carOwnerType == CarOwnerTypeEnum.G.getCode()) {
@@ -71,17 +108,7 @@ public class RefuseOrderCheckService {
             } else {
                 logger.warn("Car owner type is empty. ownerOrderNo:[{}]", ownerOrderEntity.getOwnerOrderNo());
             }
-
-        }
-        //订单状态校验
-        OrderStatusEntity orderStatusEntity = orderStatusService.getByOrderNo(orderNo);
-
-        if(null != orderStatusEntity && null != orderStatusEntity.getStatus()) {
-            if(OrderStatusEnum.TO_CONFIRM.getStatus() != orderStatusEntity.getStatus()) {
-                throw new RefuseOrderCheckException();
-            }
         }
     }
-
 
 }

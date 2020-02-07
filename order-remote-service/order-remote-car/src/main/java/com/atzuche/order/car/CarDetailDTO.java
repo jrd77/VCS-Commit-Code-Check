@@ -1,6 +1,7 @@
 package com.atzuche.order.car;
 
 import com.autoyol.doc.annotation.AutoDocProperty;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import lombok.ToString;
 
@@ -36,7 +37,7 @@ public class CarDetailDTO {
     private Integer ownerNo;
     // 车辆gps信息
     @AutoDocProperty("车辆gps信息")
-    private Integer gps;
+    private String gps;
 
     // 品牌
     @AutoDocProperty("品牌")
@@ -67,7 +68,7 @@ public class CarDetailDTO {
     @AutoDocProperty("驱动方式文字释义")
     private String driveTypeTxt;
 
-    @AutoDocProperty(value="车辆等级")
+    @AutoDocProperty("车辆等级,1:A,2:B,3:C,4:D,5:D+,6:SUV A,7:SUV B,8:SUV C,9:SUV D,10:SUV D+,11:MPV")
     private Integer carLevel;
 
     @AutoDocProperty("发动机号")
@@ -85,8 +86,10 @@ public class CarDetailDTO {
     @AutoDocProperty("行驶证注册年月")
     private String licenseDay;
     @AutoDocProperty("行驶证到期日")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date licenseExpire;
     @AutoDocProperty("保险到期日期（交强险）")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date insuranceExpire;
     @AutoDocProperty("取还车说明")
     private String getRevertExplain;

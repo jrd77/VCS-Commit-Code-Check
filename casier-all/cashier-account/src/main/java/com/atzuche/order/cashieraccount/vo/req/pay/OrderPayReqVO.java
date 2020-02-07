@@ -24,20 +24,20 @@ public class OrderPayReqVO {
      来自配置DataPayKindConstant.class
      */
     @AutoDocProperty("支付款项")
-    @NotNull
+    @NotNull(message = "payKind不能为空")
     private List<String> payKind         ;
 
     /**
      * 会员号
      */
     @AutoDocProperty("会员号")
-    @NotNull
+    @NotNull(message = "会员号不能为空")
     private String menNo;
     /**
      * orderNo
      */
     @AutoDocProperty("主订单号")
-    @NotNull
+    @NotNull(message = "主订单号不能为空")
     private String orderNo;
 
     /**

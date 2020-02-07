@@ -28,6 +28,17 @@ public class OrderConsoleCostDetailService{
     public List<OrderConsoleCostDetailEntity> getOrderConsoleCostDetaiByOrderNo(String orderNo){
             return orderConsoleCostDetailMapper.selectByOrderNo(orderNo);
     }
+
+    public int getTotalOrderConsoleCostAmt(String orderNo){
+        List<OrderConsoleCostDetailEntity> entityList = getOrderConsoleCostDetaiByOrderNo(orderNo);
+        int total = 0;
+        for(OrderConsoleCostDetailEntity entity: entityList){
+            if(entity.getSubsidyAmount()!=null) {
+                total = total + entity.getSubsidyAmount();
+            }
+        }
+        return total;
+    }
     
     
     /**
@@ -42,6 +53,8 @@ public class OrderConsoleCostDetailService{
     	for (OrderConsoleCostDetailEntity orderConsoleCostDetailEntity : list) {
 			if(orderConsoleCostDetailEntity.getSubsidySourceCode().equals(record.getSubsidySourceCode()) && orderConsoleCostDetailEntity.getSubsidyTargetCode().equals(record.getSubsidyTargetCode()) && orderConsoleCostDetailEntity.getSubsidyTypeCode().equals(record.getSubsidyTypeCode())) {
 				record.setId(orderConsoleCostDetailEntity.getId());
+				//修改的话无需修改创建人
+    			record.setCreateOp(null);
 				orderConsoleCostDetailMapper.updateByPrimaryKeySelective(record);
 				isExists = true;
 			}

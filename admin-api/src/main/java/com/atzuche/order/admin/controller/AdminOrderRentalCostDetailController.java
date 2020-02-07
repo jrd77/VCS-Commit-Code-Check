@@ -45,8 +45,8 @@ import com.dianping.cat.Cat;
 @AutoDocVersion(version = "管理后台租客租车费用 租客费用页面 相关明细接口文档")
 @RestController
 @RequestMapping("/console/ordercost/detail/")
-public class OrderRentalCostDetailController {
-	private static final Logger logger = LoggerFactory.getLogger(OrderRentalCostDetailController.class);
+public class AdminOrderRentalCostDetailController {
+	private static final Logger logger = LoggerFactory.getLogger(AdminOrderRentalCostDetailController.class);
 	
 	@Autowired
 	OrderCostDetailService orderCostDetailService;
@@ -227,7 +227,6 @@ public class OrderRentalCostDetailController {
 		if (bindingResult.hasErrors()) {
             return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), ErrorCode.INPUT_ERROR.getText());
         }
-        
         try {
         	orderCostDetailService.updatePlatFormToOwnerListByOrderNo(ownerCostReqVO);
         	return ResponseData.success();

@@ -5,7 +5,7 @@ import com.atzuche.order.commons.OrderReqContext;
 import com.atzuche.order.commons.filter.OrderFilter;
 import com.atzuche.order.commons.filter.OrderFilterException;
 import com.atzuche.order.commons.vo.req.OrderReqVO;
-import com.atzuche.order.coreapi.service.StockService;
+import com.atzuche.order.coreapi.service.remote.StockProxyService;
 import com.autoyol.car.api.model.dto.LocationDTO;
 import com.autoyol.car.api.model.dto.OrderInfoDTO;
 import com.autoyol.car.api.model.enums.OrderOperationTypeEnum;
@@ -22,7 +22,7 @@ import org.springframework.stereotype.Service;
 @Service("stockFilter")
 public class StockFilter implements OrderFilter {
     @Autowired
-    private StockService stockService;
+    private StockProxyService stockService;
     private final static Logger logger = LoggerFactory.getLogger(StockFilter.class);
     
 

@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.atzuche.order.commons.exceptions.OrderNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,14 +46,14 @@ public class ModificationOrderService {
 	@Autowired
 	OrderService orderService;
 	
-	public ModificationOrderListResponseVO queryModifyList(ModificationOrderRequestVO modificationOrderRequestVO) throws Exception{
+	public ModificationOrderListResponseVO queryModifyList(ModificationOrderRequestVO modificationOrderRequestVO) {
 		ModificationOrderListResponseVO respVo = new ModificationOrderListResponseVO();
 		List<ModificationOrderResponseVO> modificationOrderList =  new ArrayList<ModificationOrderResponseVO>();
 		//主订单
         OrderEntity orderEntity = orderService.getOrderEntity(modificationOrderRequestVO.getOrderNo());
         if(orderEntity == null){
         	logger.error("获取订单数据为空orderNo={}",modificationOrderRequestVO.getOrderNo());
-            throw new Exception("获取订单数据为空");
+            throw new OrderNotFoundException(modificationOrderRequestVO.getOrderNo());
         }
         
 		ModifyOrderMainQueryReqVO req = new ModifyOrderMainQueryReqVO();
@@ -276,7 +277,7 @@ public class ModificationOrderService {
 			flag = "已拒绝";
 			break;
 		case 3:
-			flag = "-";
+			flag = "--";
 			break;
 		default:
 			break;

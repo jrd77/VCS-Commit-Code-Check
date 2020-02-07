@@ -8,6 +8,7 @@ import com.atzuche.order.admin.vo.req.order.OrderModifyConfirmReqVO;
 import com.atzuche.order.admin.vo.resp.order.AdminModifyOrderFeeCompareVO;
 import com.atzuche.order.admin.vo.resp.order.AdminModifyOrderFeeVO;
 import com.atzuche.order.commons.CatConstants;
+import com.atzuche.order.commons.entity.dto.OrderTransferRecordDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.OrderDetailReqDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.OrderDetailRespDTO;
 import com.atzuche.order.commons.exceptions.RemoteCallException;
@@ -30,6 +31,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Slf4j
 @Service
@@ -282,6 +285,29 @@ public class AdminOrderService {
         }catch (Exception e){
             log.error("Feign 管理后台换车操作,responseObject={},modifyOrderReq={}",JSON.toJSONString(responseObject),JSON.toJSONString(req),e);
             Cat.logError("Feign 管理后台换车操作",e);
+            t.setStatus(e);
+            throw e;
+        }finally {
+            t.complete();
+        }
+    }
+
+
+    public List<OrderTransferRecordDTO> listTransferRecord(String orderNo) {
+        ResponseData<List<OrderTransferRecordDTO>> responseObject = null;
+        Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "订单CoreAPI服务");
+        try{
+            Cat.logEvent(CatConstants.FEIGN_METHOD,"FeignOrderModifyService.listTransferRecord");
+            log.info("Feign 管理后台查询换车记录,param={}", JSON.toJSONString(orderNo));
+            Cat.logEvent(CatConstants.FEIGN_PARAM,JSON.toJSONString(orderNo));
+            responseObject = feignOrderModifyService.listTransferRecord(orderNo);
+            Cat.logEvent(CatConstants.FEIGN_RESULT,JSON.toJSONString(responseObject));
+            checkResponse(responseObject);
+            t.setStatus(Transaction.SUCCESS);
+            return responseObject.getData();
+        }catch (Exception e){
+            log.error("Feign 管理后台查询换车记录,responseObject={},req={}",JSON.toJSONString(responseObject),JSON.toJSONString(orderNo),e);
+            Cat.logError("Feign 管理后台查询换车记录",e);
             t.setStatus(e);
             throw e;
         }finally {

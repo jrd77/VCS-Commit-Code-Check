@@ -3,6 +3,7 @@ package com.atzuche.order.coreapi.service;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.atzuche.order.coreapi.service.remote.StockProxyService;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -25,7 +26,6 @@ import com.atzuche.order.coreapi.modifyorder.exception.TransferUseOwnerCouponExc
 import com.atzuche.order.owner.commodity.entity.OwnerGoodsEntity;
 import com.atzuche.order.owner.commodity.service.OwnerGoodsService;
 import com.atzuche.order.parentorder.entity.OrderEntity;
-import com.atzuche.order.renterorder.entity.RenterOrderChangeApplyEntity;
 import com.atzuche.order.renterorder.entity.dto.OrderChangeItemDTO;
 import com.atzuche.order.renterorder.service.RenterOrderChangeApplyService;
 import com.autoyol.car.api.model.dto.LocationDTO;
@@ -39,7 +39,7 @@ public class ModifyOrderCheckService {
 	@Autowired
 	private ModifyOrderConfirmService modifyOrderConfirmService;
 	@Autowired
-	private StockService stockService;
+	private StockProxyService stockService;
 	@Autowired
 	private RenterOrderChangeApplyService renterOrderChangeApplyService;
 	@Autowired

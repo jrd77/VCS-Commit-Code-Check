@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.atzuche.order.commons.vo.req.ModifyApplyHandleReq;
+import com.atzuche.order.coreapi.service.remote.StockProxyService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -69,7 +70,7 @@ public class ModifyOrderConfirmService {
 	@Autowired
 	private DeliveryCarService deliveryCarService;
 	@Autowired
-	private StockService stockService;
+	private StockProxyService stockService;
 	@Autowired
 	private RenterOrderChangeApplyService renterOrderChangeApplyService;
 	@Autowired

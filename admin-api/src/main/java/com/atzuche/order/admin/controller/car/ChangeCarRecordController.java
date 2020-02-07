@@ -12,20 +12,20 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 
-@RequestMapping("/console/changeCar")
-@RestController
-@AutoDocVersion(version = "订单详细信息 - 查看更换车辆记录接口文档")
-public class ChangeCarRecordController {
-
-    /**
-     * 老后台参考:
-     * com.autoyolConsole.controller.TransController.detail(String, String, HttpServletRequest)
-     * /autoyolConsole/src/main/webapp/WEB-INF/view/trans/detail.jsp
-     */
-    @AutoDocMethod(description = "查看更换车辆记录信息", value = "查看更换车辆记录信息", response = ChangeCarRecordRespVO.class)
-    @GetMapping(value = "/info")
-    public ResponseData<?> getChangeCarInfo(@Valid CarOrderReqVO reqVo, BindingResult bindingResult) {
-        return null;
-    }
-
-}
+//@RequestMapping("/console/changeCar")
+//@RestController
+//@AutoDocVersion(version = "订单详细信息 - 查看更换车辆记录接口文档")
+//public class ChangeCarRecordController {
+//
+//    /**
+//     * 老后台参考:
+//     * com.autoyolConsole.controller.TransController.detail(String, String, HttpServletRequest)
+//     * /autoyolConsole/src/main/webapp/WEB-INF/view/trans/detail.jsp
+//     */
+//    @AutoDocMethod(description = "查看更换车辆记录信息", value = "查看更换车辆记录信息", response = ChangeCarRecordRespVO.class)
+//    @GetMapping(value = "/info")
+//    public ResponseData<?> getChangeCarInfo(@Valid CarOrderReqVO reqVo, BindingResult bindingResult) {
+//        return null;
+//    }
+//
+//}

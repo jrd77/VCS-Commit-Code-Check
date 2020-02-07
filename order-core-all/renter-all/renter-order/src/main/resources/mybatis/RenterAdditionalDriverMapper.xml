@@ -36,7 +36,7 @@
 
 
 	<select id="selectByPrimaryKey" resultMap="BaseResultMap">
-		select <include refid="Base_Column_List" /> from renter_additional_driver where id = #{value}
+		select <include refid="Base_Column_List" /> from renter_additional_driver where id = #{value} and is_delete = 0
 	</select>
 
 	<insert id="insert" parameterType="com.atzuche.order.renterorder.entity.RenterAdditionalDriverEntity" useGeneratedKeys="true" keyProperty="id">
@@ -133,6 +133,14 @@
 		    </set>
 		where id = #{id}
 	</update>
+	
+	<!-- 先全部删除 -->
+		<update id="delByRenterOrderNo">
+		update renter_additional_driver  set	
+				`is_delete` = 1		
+		where renter_order_no = #{renterOrderNo} and is_delete = 0
+	</update>
+	
   	
   	<select id="listDriverIdByRenterOrderNo" resultType="String">
 		select driver_id from renter_additional_driver where renter_order_no = #{renterOrderNo}
@@ -144,7 +152,7 @@
         select
         <include refid="Base_Column_List"/>
         from renter_additional_driver
-        where renter_order_no=#{renterOrderNo}
+        where renter_order_no=#{renterOrderNo} and is_delete = 0 
     </select>
 
 </mapper>

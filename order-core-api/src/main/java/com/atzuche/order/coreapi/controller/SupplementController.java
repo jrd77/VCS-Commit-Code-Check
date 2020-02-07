@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import javax.validation.Valid;
 
+import com.atzuche.order.commons.BindingResultUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -38,11 +39,7 @@ public class SupplementController {
 	@PostMapping("/order/supplement/add")
 	public ResponseData<?> addSupplement(@Valid @RequestBody OrderSupplementDetailDTO orderSupplementDetailDTO, BindingResult bindingResult) {
 		log.info("order/supplement/add orderSupplementDetailDTO=[{}]", orderSupplementDetailDTO);
-		if (bindingResult.hasErrors()) {
-            Optional<FieldError> error = bindingResult.getFieldErrors().stream().findFirst();
-            return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), error.isPresent() ?
-                    error.get().getDefaultMessage() : ErrorCode.INPUT_ERROR.getText());
-        }
+		BindingResultUtil.checkBindingResult(bindingResult);
 		supplementService.saveSupplement(orderSupplementDetailDTO);
 		return ResponseData.success();
     }

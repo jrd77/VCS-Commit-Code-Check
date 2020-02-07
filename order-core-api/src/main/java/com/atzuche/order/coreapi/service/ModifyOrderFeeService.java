@@ -69,7 +69,7 @@ public class ModifyOrderFeeService {
 	 * @param modifyOrderReq
 	 * @return ResponseData<ModifyOrderCompareVO>
 	 */
-	public ResponseData<ModifyOrderCompareVO> getModifyOrderCompareVO(ModifyOrderReq modifyOrderReq) {
+	public ModifyOrderCompareVO getModifyOrderCompareVO(ModifyOrderReq modifyOrderReq) {
 		log.info("ModifyOrderFeeService.getModifyOrderCompareVO modifyOrderReq=[{}]", modifyOrderReq);
 		// 主订单号
 		String orderNo = modifyOrderReq.getOrderNo();
@@ -128,7 +128,7 @@ public class ModifyOrderFeeService {
 		ModifyOrderFeeVO updateModifyOrderFeeVO = getUpdateModifyOrderFeeVO(renterOrderCostRespDTO, renterFineList);
 		modifyOrderCompareVO.setInitModifyOrderFeeVO(initModifyOrderFeeVO);
 		modifyOrderCompareVO.setUpdateModifyOrderFeeVO(updateModifyOrderFeeVO);
-		return ResponseData.success(modifyOrderCompareVO);
+		return modifyOrderCompareVO;
 	}
 	
 	
