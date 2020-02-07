@@ -36,6 +36,12 @@ public interface RenterOrderWzCostDetailMapper{
 	 * @return 查询列表
 	 */
 	List<RenterOrderWzCostDetailEntity> queryInfosByOrderNo(@Param("orderNo") String orderNo);
+	/**
+	 * 明细
+	 * @param orderNo
+	 * @return
+	 */
+	List<RenterOrderWzCostDetailEntity> queryInfosUnitByOrderNo(@Param("orderNo") String orderNo);
 
 	/**
 	 * 修改
