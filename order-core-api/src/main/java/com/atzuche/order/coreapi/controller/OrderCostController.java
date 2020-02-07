@@ -108,18 +108,13 @@ public class OrderCostController {
 	@PostMapping("/order/cost/owner/get")
 	public ResponseData<OrderOwnerCostResVO> orderCostOwnerGet(@Valid @RequestBody OrderCostReqVO req, BindingResult bindingResult) {
 		log.info("车主子订单费用详细 orderCostOwnerGet params=[{}]", req.toString());
-		if (bindingResult.hasErrors()) {
-            Optional<FieldError> error = bindingResult.getFieldErrors().stream().findFirst();
-            return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), error.isPresent() ?
-                    error.get().getDefaultMessage() : ErrorCode.INPUT_ERROR.getText());
-        }
-		try {
-			OrderOwnerCostResVO resVo = orderCostService.orderCostOwnerGet(req);
-			return ResponseData.success(resVo);
-		} catch (Exception e) {
-			log.error("查询车主费用明细异常:",e);
-			return ResponseData.error();
-		}
+		BindingResultUtil.checkBindingResult(bindingResult);
+
+		OrderOwnerCostResVO resVo = orderCostService.orderCostOwnerGet(req);
+		return ResponseData.success(resVo);
+
 	}
+
+
 	
 }
