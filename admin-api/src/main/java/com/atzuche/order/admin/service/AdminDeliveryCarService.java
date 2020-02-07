@@ -1,10 +1,8 @@
 package com.atzuche.order.admin.service;
 
 import com.atzuche.order.admin.vo.resp.cost.DistributionCostVO;
-import com.atzuche.order.commons.entity.dto.CostBaseDTO;
-import com.atzuche.order.commons.entity.dto.GetReturnCarCostReqDto;
-import com.atzuche.order.commons.entity.dto.GetReturnCarOverCostReqDto;
 import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
+import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.commons.vo.req.handover.req.HandoverCarInfoReqDTO;
 import com.atzuche.order.commons.vo.req.handover.req.HandoverCarInfoReqVO;
 import com.atzuche.order.delivery.common.DeliveryErrorCode;
@@ -23,6 +21,8 @@ import com.atzuche.order.delivery.vo.delivery.req.DeliveryCarRepVO;
 import com.atzuche.order.delivery.vo.delivery.req.DeliveryReqDTO;
 import com.atzuche.order.delivery.vo.delivery.req.DeliveryReqVO;
 import com.atzuche.order.rentercommodity.service.RenterCommodityService;
+import com.atzuche.order.rentercost.entity.RenterOrderCostDetailEntity;
+import com.atzuche.order.rentercost.service.RenterOrderCostDetailService;
 import com.atzuche.order.transport.service.GetReturnCarCostProxyService;
 import com.atzuche.order.transport.service.TranSportProxyService;
 import com.atzuche.order.transport.vo.GetReturnCostDTO;
@@ -58,6 +58,9 @@ public class AdminDeliveryCarService {
     TranSportProxyService tranSportProxyService;
     @Autowired
     GetReturnCarCostProxyService getReturnCarCostProxyService;
+
+    @Autowired
+    RenterOrderCostDetailService renterOrderCostDetailService;
 
     protected final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -183,7 +186,6 @@ public class AdminDeliveryCarService {
         return handoverCarReqVO;
     }
 
-
     /**
      * 获取配送取还车信息
      * @param deliveryCarDTO
@@ -192,62 +194,99 @@ public class AdminDeliveryCarService {
     public DistributionCostVO findDeliveryCostByOrderNo(DeliveryCarRepVO deliveryCarDTO) {
         logger.info("入参deliveryCarDTO：[{}]", deliveryCarDTO.toString());
         DistributionCostVO distributionCostVO = DistributionCostVO.builder().build();
+        distributionCostVO.setReturnCarChaoYunNeng("0");
+        distributionCostVO.setGetCarChaoYunNeng("0");
+        distributionCostVO.setRenturnCarAmt("0");
+        distributionCostVO.setGetCarAmt("0");
         // 获取租客商品信息
         List<RenterOrderDeliveryEntity> renterOrderDeliveryEntityList = renterOrderDeliveryService.findRenterOrderListByOrderNo(deliveryCarDTO.getOrderNo());
-        if(CollectionUtils.isEmpty(renterOrderDeliveryEntityList))
-        {
+        if (CollectionUtils.isEmpty(renterOrderDeliveryEntityList)) {
             return distributionCostVO;
         }
-        RenterOrderDeliveryEntity renterOrderDeliveryEntity = renterOrderDeliveryEntityList.get(0);
-        RenterGoodsDetailDTO renterGoodsDetailDTO = renterCommodityService.getRenterGoodsDetail(renterOrderDeliveryEntity.getRenterOrderNo(), false);
-        CostBaseDTO costBaseDTO = new CostBaseDTO();
-        costBaseDTO.setStartTime(renterOrderDeliveryEntity.getRentTime());
-        costBaseDTO.setEndTime(renterOrderDeliveryEntity.getRevertTime());
-        costBaseDTO.setOrderNo(renterOrderDeliveryEntity.getOrderNo());
-        costBaseDTO.setRenterOrderNo(renterOrderDeliveryEntity.getRenterOrderNo());
-        GetReturnCarOverCostReqDto getReturnCarOverCostReqDto = new GetReturnCarOverCostReqDto();
-        GetReturnCarCostReqDto getReturnCarCostReqDto = new GetReturnCarCostReqDto();
-        getReturnCarCostReqDto.setCityCode(Integer.valueOf(renterOrderDeliveryEntity.getCityCode()));
-        getReturnCarCostReqDto.setIsPackageOrder(false);
-        getReturnCarCostReqDto.setCostBaseDTO(costBaseDTO);
-        renterOrderDeliveryEntityList.stream().forEach(renterOrderDelivery -> {
-            if(renterOrderDelivery.getType().intValue() == 1) {
-                getReturnCarCostReqDto.setSrvGetLat(renterOrderDelivery.getRenterGetReturnAddrLat());
-                getReturnCarCostReqDto.setSrvGetLon(renterOrderDelivery.getRenterGetReturnAddrLon());
-                getReturnCarCostReqDto.setIsGetCarCost(true);
-                getReturnCarOverCostReqDto.setIsGetCarCost(true);
-            }else {
-                getReturnCarCostReqDto.setSrvReturnLat(renterOrderDelivery.getRenterGetReturnAddrLat());
-                getReturnCarCostReqDto.setSrvReturnLon(renterOrderDelivery.getRenterGetReturnAddrLon());
-                getReturnCarOverCostReqDto.setIsReturnCarCost(true);
-                getReturnCarCostReqDto.setIsReturnCarCost(true);
-            }
-              });
-        getReturnCarCostReqDto.setCarRealLat(renterGoodsDetailDTO.getCarRealLat());
-        getReturnCarCostReqDto.setCarRealLon(renterGoodsDetailDTO.getCarRealLon());
-        getReturnCarCostReqDto.setCarShowLat(renterGoodsDetailDTO.getCarShowLat());
-        getReturnCarCostReqDto.setCarShowLon(renterGoodsDetailDTO.getCarShowLon());
-        GetReturnCostDTO getReturnCostDTO = getReturnCarCostProxyService.getReturnCarCost(getReturnCarCostReqDto);
-        if(Objects.nonNull(getReturnCostDTO)) {
-            distributionCostVO.setGetCarAmt(String.valueOf(getReturnCostDTO.getGetReturnResponseVO().getGetFee()));
-            distributionCostVO.setRenturnCarAmt(String.valueOf(getReturnCostDTO.getGetReturnResponseVO().getReturnFee()));
+
+        List<RenterOrderCostDetailEntity> list = renterOrderCostDetailService.listRenterOrderCostDetail(deliveryCarDTO.getOrderNo(), renterOrderDeliveryEntityList.get(0).getRenterOrderNo());
+        if (CollectionUtils.isEmpty(list)) {
+            return distributionCostVO;
         }
-        getReturnCarOverCostReqDto.setCityCode(Integer.valueOf(renterOrderDeliveryEntity.getCityCode()));
-        getReturnCarOverCostReqDto.setOrderType(1);
-        getReturnCarOverCostReqDto.setCostBaseDTO(costBaseDTO);
-        try {
-            GetReturnOverCostDTO getReturnOverCostDTO = tranSportProxyService.getGetReturnOverCost(getReturnCarOverCostReqDto);
-                int chaoYunNengAddCrash = getReturnOverCostDTO.getGetReturnOverTransportDTO().getGetOverTransportFee();
-                distributionCostVO.setGetCarChaoYunNeng(String.valueOf(chaoYunNengAddCrash));
-                int returnChaoYunNengAddCrash = getReturnOverCostDTO.getGetReturnOverTransportDTO().getReturnOverTransportFee();
-                distributionCostVO.setReturnCarChaoYunNeng(String.valueOf(returnChaoYunNengAddCrash));
-        } catch (Exception e) {
-            logger.error("获取超运能异常，给默认值,cause:{}", e.getMessage());
-            distributionCostVO.setReturnCarChaoYunNeng("0");
-            distributionCostVO.setGetCarChaoYunNeng("0");
-        }
+
+        list.stream().filter(r -> r.getCostCode().equals(RenterCashCodeEnum.SRV_GET_COST.getCashNo())).findFirst().ifPresent(getCrashVO -> {
+            distributionCostVO.setGetCarAmt(String.valueOf(getCrashVO.getUnitPrice()*getCrashVO.getCount()));
+        });
+        list.stream().filter(r -> r.getCostCode().equals(RenterCashCodeEnum.SRV_RETURN_COST.getCashNo())).findFirst().ifPresent(getCrashVO -> {
+            distributionCostVO.setRenturnCarAmt(String.valueOf(getCrashVO.getUnitPrice()*getCrashVO.getCount()));
+        });
+        list.stream().filter(r -> r.getCostCode().equals(RenterCashCodeEnum.GET_BLOCKED_RAISE_AMT.getCashNo())).findFirst().ifPresent(getCrashVO -> {
+            distributionCostVO.setGetCarChaoYunNeng(String.valueOf(getCrashVO.getUnitPrice()*getCrashVO.getCount()));
+        });
+        list.stream().filter(r -> r.getCostCode().equals(RenterCashCodeEnum.RETURN_BLOCKED_RAISE_AMT.getCashNo())).findFirst().ifPresent(getCrashVO -> {
+            distributionCostVO.setReturnCarChaoYunNeng(String.valueOf(getCrashVO.getUnitPrice()*getCrashVO.getCount()));
+        });
         return distributionCostVO;
     }
+//    /**
+//     * 获取配送取还车信息
+//     * @param deliveryCarDTO
+//     * @return
+//     */
+//    public DistributionCostVO findDeliveryCostByOrderNo(DeliveryCarRepVO deliveryCarDTO) {
+//        logger.info("入参deliveryCarDTO：[{}]", deliveryCarDTO.toString());
+//        DistributionCostVO distributionCostVO = DistributionCostVO.builder().build();
+//        // 获取租客商品信息
+//        List<RenterOrderDeliveryEntity> renterOrderDeliveryEntityList = renterOrderDeliveryService.findRenterOrderListByOrderNo(deliveryCarDTO.getOrderNo());
+//        if(CollectionUtils.isEmpty(renterOrderDeliveryEntityList))
+//        {
+//            return distributionCostVO;
+//        }
+//        RenterOrderDeliveryEntity renterOrderDeliveryEntity = renterOrderDeliveryEntityList.get(0);
+//        RenterGoodsDetailDTO renterGoodsDetailDTO = renterCommodityService.getRenterGoodsDetail(renterOrderDeliveryEntity.getRenterOrderNo(), false);
+//        CostBaseDTO costBaseDTO = new CostBaseDTO();
+//        costBaseDTO.setStartTime(renterOrderDeliveryEntity.getRentTime());
+//        costBaseDTO.setEndTime(renterOrderDeliveryEntity.getRevertTime());
+//        costBaseDTO.setOrderNo(renterOrderDeliveryEntity.getOrderNo());
+//        costBaseDTO.setRenterOrderNo(renterOrderDeliveryEntity.getRenterOrderNo());
+//        GetReturnCarOverCostReqDto getReturnCarOverCostReqDto = new GetReturnCarOverCostReqDto();
+//        GetReturnCarCostReqDto getReturnCarCostReqDto = new GetReturnCarCostReqDto();
+//        getReturnCarCostReqDto.setCityCode(Integer.valueOf(renterOrderDeliveryEntity.getCityCode()));
+//        getReturnCarCostReqDto.setIsPackageOrder(false);
+//        getReturnCarCostReqDto.setCostBaseDTO(costBaseDTO);
+//        renterOrderDeliveryEntityList.stream().forEach(renterOrderDelivery -> {
+//            if(renterOrderDelivery.getType().intValue() == 1) {
+//                getReturnCarCostReqDto.setSrvGetLat(renterOrderDelivery.getRenterGetReturnAddrLat());
+//                getReturnCarCostReqDto.setSrvGetLon(renterOrderDelivery.getRenterGetReturnAddrLon());
+//                getReturnCarCostReqDto.setIsGetCarCost(true);
+//                getReturnCarOverCostReqDto.setIsGetCarCost(true);
+//            }else {
+//                getReturnCarCostReqDto.setSrvReturnLat(renterOrderDelivery.getRenterGetReturnAddrLat());
+//                getReturnCarCostReqDto.setSrvReturnLon(renterOrderDelivery.getRenterGetReturnAddrLon());
+//                getReturnCarOverCostReqDto.setIsReturnCarCost(true);
+//                getReturnCarCostReqDto.setIsReturnCarCost(true);
+//            }
+//              });
+//        getReturnCarCostReqDto.setCarRealLat(renterGoodsDetailDTO.getCarRealLat());
+//        getReturnCarCostReqDto.setCarRealLon(renterGoodsDetailDTO.getCarRealLon());
+//        getReturnCarCostReqDto.setCarShowLat(renterGoodsDetailDTO.getCarShowLat());
+//        getReturnCarCostReqDto.setCarShowLon(renterGoodsDetailDTO.getCarShowLon());
+//        GetReturnCostDTO getReturnCostDTO = getReturnCarCostProxyService.getReturnCarCost(getReturnCarCostReqDto);
+//        if(Objects.nonNull(getReturnCostDTO)) {
+//            distributionCostVO.setGetCarAmt(String.valueOf(getReturnCostDTO.getGetReturnResponseVO().getGetFee()));
+//            distributionCostVO.setRenturnCarAmt(String.valueOf(getReturnCostDTO.getGetReturnResponseVO().getReturnFee()));
+//        }
+//        getReturnCarOverCostReqDto.setCityCode(Integer.valueOf(renterOrderDeliveryEntity.getCityCode()));
+//        getReturnCarOverCostReqDto.setOrderType(1);
+//        getReturnCarOverCostReqDto.setCostBaseDTO(costBaseDTO);
+//        try {
+//            GetReturnOverCostDTO getReturnOverCostDTO = tranSportProxyService.getGetReturnOverCost(getReturnCarOverCostReqDto);
+//                int chaoYunNengAddCrash = getReturnOverCostDTO.getGetReturnOverTransportDTO().getGetOverTransportFee();
+//                distributionCostVO.setGetCarChaoYunNeng(String.valueOf(chaoYunNengAddCrash));
+//                int returnChaoYunNengAddCrash = getReturnOverCostDTO.getGetReturnOverTransportDTO().getReturnOverTransportFee();
+//                distributionCostVO.setReturnCarChaoYunNeng(String.valueOf(returnChaoYunNengAddCrash));
+//        } catch (Exception e) {
+//            logger.error("获取超运能异常，给默认值,cause:{}", e.getMessage());
+//            distributionCostVO.setReturnCarChaoYunNeng("0");
+//            distributionCostVO.setGetCarChaoYunNeng("0");
+//        }
+//        return distributionCostVO;
+//    }
 
 
 
