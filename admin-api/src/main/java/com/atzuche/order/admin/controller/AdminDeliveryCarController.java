@@ -53,7 +53,10 @@ public class AdminDeliveryCarController extends BaseController {
             }
             return ResponseData.success();
         } catch (DeliveryOrderException ex) {
-            return ResponseData.createErrorCodeResponse(ex.getMessage(),ex.getErrorCode());
+            DeliveryCarVO deliveryCarVO = new DeliveryCarVO();
+            deliveryCarVO.setIsGetCar(0);
+            deliveryCarVO.setIsReturnCar(0);
+            return ResponseData.success(deliveryCarVO);
         } catch (Exception e) {
             log.error("取还车配送接口出现异常", e);
             Cat.logError("取还车配送接口出现异常", e);
