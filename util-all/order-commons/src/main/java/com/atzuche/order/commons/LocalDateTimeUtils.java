@@ -35,6 +35,11 @@ public class LocalDateTimeUtils {
      * 日期格式yyyy-MM-dd
      */
     public static String DATE_PATTERN = "yyyy-MM-dd";
+    
+    /**
+     * 日期格式yyyy年MM月dd日
+     */
+    public static String DATE_PATTERN_CHINESE = "yyyy年MM月dd日";
 
 
     /**
@@ -397,6 +402,22 @@ public class LocalDateTimeUtils {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_PATTERN);
         return localDate.format(formatter);
     }
+    
+    public static String localdateToStringChinese(LocalDate localDate) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_PATTERN_CHINESE);
+        return localDate.format(formatter);
+    }
+    /**
+     * 简化版本 20200207
+     * @param localDate
+     * @return
+     */
+    public static String localdateToStringChinese(Date date) {
+    	LocalDate localDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_PATTERN_CHINESE);
+        return localDate.format(formatter);
+    }
+    
 
     /**
      * 按照给定的格式获取昨天这个时候的时间日期字符串

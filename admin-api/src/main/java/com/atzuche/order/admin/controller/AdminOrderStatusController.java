@@ -1,8 +1,6 @@
 package com.atzuche.order.admin.controller;
 
-import com.atzuche.order.admin.vo.req.order.ModificationOrderRequestVO;
 import com.atzuche.order.admin.vo.req.order.OrderStatusRequestVO;
-import com.atzuche.order.admin.vo.resp.order.ModificationOrderListResponseVO;
 import com.atzuche.order.admin.vo.resp.order.OrderStatusListResponseVO;
 import com.atzuche.order.admin.vo.resp.order.OrderStatusResponseVO;
 import com.atzuche.order.commons.entity.dto.OrderFlowDTO;
@@ -18,12 +16,10 @@ import com.autoyol.doc.annotation.AutoDocMethod;
 import com.autoyol.doc.annotation.AutoDocVersion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -33,9 +29,9 @@ import java.util.List;
 @RequestMapping("/console/order/")
 @RestController
 @AutoDocVersion(version = "订单接口文档")
-public class OrderStatusController {
+public class AdminOrderStatusController {
 
-    private static final Logger logger = LoggerFactory.getLogger(OrderStatusController.class);
+    private static final Logger logger = LoggerFactory.getLogger(AdminOrderStatusController.class);
 
     @Autowired
 	private FeignOrderFlowService feignOrderFlowService;

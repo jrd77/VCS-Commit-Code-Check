@@ -53,6 +53,40 @@ public class RenterAdditionalDriverService {
 
 
     }
+    
+    /**
+     * 管理后台新增附加驾驶人，先逻辑删除，后新增。
+     * @param orderNo
+     * @param renterOrderNo
+     * @param driverIds
+     * @param commUseDriverList
+     */
+    public void insertBatchAdditionalDriverBeforeDel(String orderNo, String renterOrderNo, List<String> driverIds,List<CommUseDriverInfoDTO> commUseDriverList) {
+		if (!CollectionUtils.isEmpty(driverIds) && !CollectionUtils.isEmpty(commUseDriverList)) {
+			//先逻辑删除
+			int i = renterAdditionalDriverMapper.delByRenterOrderNo(renterOrderNo);
+			if(i > 0) {
+				//后新增
+				for (CommUseDriverInfoDTO commUseDriverInfo : commUseDriverList) {
+					if (null != commUseDriverInfo.getId() && driverIds.contains(commUseDriverInfo.getId().toString())) {
+						RenterAdditionalDriverEntity record = new RenterAdditionalDriverEntity();
+						record.setOrderNo(orderNo);
+						record.setRenterOrderNo(renterOrderNo);
+						record.setDriverId(String.valueOf(commUseDriverInfo.getId()));
+						record.setRealName(commUseDriverInfo.getRealName());
+						record.setPhone(String.valueOf(commUseDriverInfo.getMobile()));
+						//添加操作人
+						record.setCreateOp(commUseDriverInfo.getConsoleOperatorName());
+						record.setUpdateOp(commUseDriverInfo.getConsoleOperatorName());
+						renterAdditionalDriverMapper.insertSelective(record);
+					}
+				}
+			}
+		}
+
+		
+    }
+    
 
 
     /**

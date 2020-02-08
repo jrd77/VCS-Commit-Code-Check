@@ -30,7 +30,7 @@ import javax.validation.Valid;
 @Slf4j
 @RestController
 @AutoDocVersion(version = "管理后台违章押金信息")
-public class RenterWzController extends BaseController {
+public class AdminRenterWzController extends BaseController {
 
     @Resource
     private RenterWzService renterWzService;
