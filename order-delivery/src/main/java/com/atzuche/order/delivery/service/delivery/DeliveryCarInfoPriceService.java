@@ -177,7 +177,7 @@ public class DeliveryCarInfoPriceService {
             int oilDifference = Math.abs(Integer.valueOf(ownerGetAndReturnCarDTO.getGetCarOil())) - Math.abs(Integer.valueOf(ownerGetAndReturnCarDTO.getReturnCarOil()));
             ownerGetAndReturnCarDTO.setDrivingKM(ownerDrivingKM);
             ownerGetAndReturnCarDTO.setOilDifference(String.valueOf(oilDifference)+"L");
-            ownerGetAndReturnCarDTO.setOilDifferenceCrash(String.valueOf(MathUtil.mul(oilDifference,getOilPriceByCityCodeAndType(Integer.valueOf(cityCode), carEngineType))));
+            ownerGetAndReturnCarDTO.setOilDifferenceCrash(String.valueOf(MathUtil.mul(oilDifference,getOilPriceByCityCodeAndType(Integer.valueOf(cityCode), carEngineType)))+"元");
         }catch (Exception e)
         {
             log.error("设置参数失败,目前没有值");
