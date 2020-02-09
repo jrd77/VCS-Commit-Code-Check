@@ -72,4 +72,17 @@ public class CancelOrderCheckService {
         }
     }
 
+
+    public void checkOwnerCancelOrder(OrderStatusEntity orderStatusEntity) {
+
+        if(null != orderStatusEntity) {
+            //待调度的订单不能车主取消
+            if (null != orderStatusEntity.getStatus() && OrderStatusEnum.TO_DISPATCH.getStatus() == orderStatusEntity.getStatus()) {
+                throw new CancelOrderCheckException(ErrorCode.DISPATCHING_ORDER_STATUS_NOT_ALLOWED);
+            }
+        } else {
+            throw new CancelOrderCheckException(ErrorCode.ORDER_NOT_EXIST);
+        }
+    }
+
 }
