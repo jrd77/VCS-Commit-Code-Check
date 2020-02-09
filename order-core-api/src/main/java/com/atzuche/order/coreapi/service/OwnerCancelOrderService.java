@@ -177,6 +177,9 @@ public class OwnerCancelOrderService {
         //返回信息处理
         cancelOrderResDTO.setCarNo(goodsDetail.getCarNo());
         cancelOrderResDTO.setRentCarPayStatus(orderStatusEntity.getRentCarPayStatus());
+        cancelOrderResDTO.setCityCode(Integer.valueOf(orderEntity.getCityCode()));
+        cancelOrderResDTO.setRentTime(orderEntity.getExpRentTime());
+        cancelOrderResDTO.setRevertTime(orderEntity.getExpRevertTime());
         return cancelOrderResDTO;
     }
 

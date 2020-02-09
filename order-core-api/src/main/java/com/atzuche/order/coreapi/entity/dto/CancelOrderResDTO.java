@@ -2,6 +2,8 @@ package com.atzuche.order.coreapi.entity.dto;
 
 import lombok.Data;
 
+import java.time.LocalDateTime;
+
 /**
  * 取消订单返回信息
  *
@@ -56,5 +58,20 @@ public class CancelOrderResDTO {
      * 还车服务标识
      */
     private Boolean srvReturnFlag;
+
+    /**
+     * 订单城市编码
+     */
+    private Integer cityCode;
+
+    /**
+     * 订单租期开始时间
+     */
+    private LocalDateTime rentTime ;
+
+    /**
+     * 订单租期解释时间
+     */
+    private LocalDateTime revertTime ;
 
 }

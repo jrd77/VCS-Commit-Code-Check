@@ -1,6 +1,7 @@
 package com.atzuche.order.coreapi.service;
 
 import com.alibaba.fastjson.JSON;
+import com.atzuche.order.commons.LocalDateTimeUtils;
 import com.atzuche.order.commons.enums.MemRoleEnum;
 import com.atzuche.order.commons.vo.req.CancelOrderReqVO;
 import com.atzuche.order.coreapi.common.conver.OrderCommonConver;
@@ -8,7 +9,9 @@ import com.atzuche.order.coreapi.entity.dto.CancelOrderResDTO;
 import com.atzuche.order.coreapi.service.remote.StockProxyService;
 import com.atzuche.order.delivery.service.delivery.DeliveryCarService;
 import com.atzuche.order.delivery.vo.delivery.CancelOrderDeliveryVO;
+import com.atzuche.order.parentorder.entity.OrderEntity;
 import com.atzuche.order.settle.service.OrderSettleService;
+import com.autoyol.car.api.model.dto.OwnerCancelDTO;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,9 +79,14 @@ public class CancelOrderService {
             couponAndCoinHandleService.undoOwnerCoupon(cancelOrderReqVO.getOrderNo(), res.getOwnerCouponNo(), recover);
         }
 
-        //扣库存
+        //库存处理
         if (null != res) {
+            //释放库存(trans_filter)
             stockService.releaseCarStock(cancelOrderReqVO.getOrderNo(), res.getCarNo());
+            if(StringUtils.equals(MemRoleEnum.OWNER.getCode(), cancelOrderReqVO.getMemRole())) {
+                //锁定car_filter
+                stockService.ownerCancelStock(buildOwnerCancelDTO(cancelOrderReqVO.getOrderNo(), res));
+            }
         }
 
         if (null != res && null != res.getIsRefund() && res.getIsRefund()) {
@@ -96,6 +104,17 @@ public class CancelOrderService {
         //消息发送
         //TODO:发送订单取消事件
 
+    }
+
+    private OwnerCancelDTO buildOwnerCancelDTO(String orderNo, CancelOrderResDTO res){
+        OwnerCancelDTO ownerCancelDTO = new OwnerCancelDTO();
+        ownerCancelDTO.setOrderNo(orderNo);
+        ownerCancelDTO.setCarNo(res.getCarNo());
+        ownerCancelDTO.setCityCode(Integer.valueOf(res.getCityCode()));
+        ownerCancelDTO.setSource(2);
+        ownerCancelDTO.setStartDate(LocalDateTimeUtils.localDateTimeToDate(res.getRentTime()));
+        ownerCancelDTO.setEndDate(LocalDateTimeUtils.localDateTimeToDate(res.getRevertTime()));
+        return ownerCancelDTO;
     }
 
 }
