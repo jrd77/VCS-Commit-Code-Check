@@ -69,6 +69,7 @@ public class OrderOtherInformationController extends BaseController{
             logger.info(LogDescription.getLogDescription(DescriptionConstant.CONSOLE_ORDER_OTHER_INFORMATION_RENT_CITY_UPDATE, DescriptionConstant.INPUT_TEXT),orderRentCityRequestVO.toString());
             //调用订单服务修改租车城市
             RentCityAndRiskAccidentReqDTO rentCityAndRiskAccidentReqDTO = new RentCityAndRiskAccidentReqDTO();
+            rentCityAndRiskAccidentReqDTO.setOrderNo(orderRentCityRequestVO.getOrderNo());
             rentCityAndRiskAccidentReqDTO.setRentCity(orderRentCityRequestVO.getRentCity());
             ResponseData<?> responseData = feignOrderUpdateService.updateRentCityAndRiskAccident(rentCityAndRiskAccidentReqDTO);
             if(!ObjectUtils.isEmpty(responseData)) {
@@ -95,6 +96,7 @@ public class OrderOtherInformationController extends BaseController{
             logger.info(LogDescription.getLogDescription(DescriptionConstant.CONSOLE_ORDER_OTHER_INFORMATION_RISK_STATUS_UPDATE, DescriptionConstant.INPUT_TEXT),orderRiskStatusRequestVO.toString());
             //调用订单服务修改风控事故状态
             RentCityAndRiskAccidentReqDTO rentCityAndRiskAccidentReqDTO = new RentCityAndRiskAccidentReqDTO();
+            rentCityAndRiskAccidentReqDTO.setOrderNo(orderRiskStatusRequestVO.getOrderNo());
             rentCityAndRiskAccidentReqDTO.setIsRiskAccident(Integer.parseInt(orderRiskStatusRequestVO.getRiskAccidentStatus()));
             ResponseData<?> responseData = feignOrderUpdateService.updateRentCityAndRiskAccident(rentCityAndRiskAccidentReqDTO);
             if(!ObjectUtils.isEmpty(responseData)) {
