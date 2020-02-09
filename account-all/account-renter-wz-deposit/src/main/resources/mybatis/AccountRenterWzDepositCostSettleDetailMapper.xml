@@ -45,6 +45,10 @@
 	<select id="selectALL" resultMap="BaseResultMap">
 		select  <include refid="Base_Column_List" /> from account_renter_wz_deposit_cost_settle_detail order by id desc
 	</select>
+	
+	<select id="selectByOrderNo" resultMap="BaseResultMap">
+		select  <include refid="Base_Column_List" /> from account_renter_wz_deposit_cost_settle_detail where order_no = #{orderNo}
+	</select>
 
 
     <insert id="insertSelective" parameterType="com.atzuche.order.accountrenterwzdepost.entity.AccountRenterWzDepositCostSettleDetailEntity" useGeneratedKeys="true" keyProperty="id">

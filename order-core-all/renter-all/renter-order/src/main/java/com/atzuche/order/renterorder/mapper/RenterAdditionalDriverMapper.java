@@ -26,6 +26,13 @@ public interface RenterAdditionalDriverMapper{
     int updateByPrimaryKeySelective(RenterAdditionalDriverEntity record);
     
     List<String> listDriverIdByRenterOrderNo(@Param("renterOrderNo") String renterOrderNo);
+    
+    /**
+     * 逻辑删除is_delete
+     * @param renterOrderNo
+     * @return
+     */
+    int delByRenterOrderNo(@Param("renterOrderNo") String renterOrderNo);
 
     List<RenterAdditionalDriverEntity> selectByRenterOrderNo(@Param("renterOrderNo")String renterOrderNo);
 
