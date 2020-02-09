@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class RenterOrderCostDetailEntity implements Serializable {
+public class RenterOrderCostDetailDTO implements Serializable {
 
 
     private static final long serialVersionUID = 1L;

@@ -1,6 +1,6 @@
 package com.atzuche.order.transport.vo;
 
-import com.atzuche.order.transport.entity.RenterOrderCostDetailEntity;
+import com.atzuche.order.transport.entity.RenterOrderCostDetailDTO;
 import lombok.Data;
 import lombok.ToString;
 
@@ -17,7 +17,7 @@ public class GetReturnOverCostDTO {
     /**
      * 租客取还车超运能费用明细列表
      */
-    private List<RenterOrderCostDetailEntity> renterOrderCostDetailEntityList;
+    private List<RenterOrderCostDetailDTO> renterOrderCostDetailEntityList;
     /**
      * 可能需要用到的值
      */

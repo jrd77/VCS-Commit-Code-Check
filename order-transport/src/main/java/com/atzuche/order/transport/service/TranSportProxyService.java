@@ -5,9 +5,7 @@ import com.atzuche.order.commons.*;
 import com.atzuche.order.commons.entity.dto.CostBaseDTO;
 import com.atzuche.order.commons.entity.dto.GetReturnCarOverCostReqDto;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
-import com.atzuche.order.commons.exceptions.RemoteCallException;
-import com.atzuche.order.transport.common.TransPortErrorCode;
-import com.atzuche.order.transport.entity.RenterOrderCostDetailEntity;
+import com.atzuche.order.transport.entity.RenterOrderCostDetailDTO;
 import com.atzuche.order.transport.vo.GetReturnOverCostDTO;
 import com.atzuche.order.transport.vo.GetReturnOverTransportDTO;
 import com.autoyol.car.api.feign.api.GetBackCityLimitFeignApi;
@@ -57,7 +55,7 @@ public class TranSportProxyService {
 
     public GetReturnOverCostDTO getGetReturnOverCost(GetReturnCarOverCostReqDto getReturnCarOverCostReqDto) {
         GetReturnOverCostDTO getReturnOverCostDTO = new GetReturnOverCostDTO();
-        List<RenterOrderCostDetailEntity> renterOrderCostDetailEntityList = new ArrayList<>();
+        List<RenterOrderCostDetailDTO> renterOrderCostDetailEntityList = new ArrayList<>();
         CostBaseDTO costBaseDTO = getReturnCarOverCostReqDto.getCostBaseDTO();
         LocalDateTime rentTime = costBaseDTO.getStartTime();
         LocalDateTime revertTime = costBaseDTO.getEndTime();
@@ -116,7 +114,7 @@ public class TranSportProxyService {
                             //夜间
                             getReturnOverTransport.setNightGetOverTransportFee(overTransportFee==null?0:overTransportFee);
                         }
-                        RenterOrderCostDetailEntity renterOrderCostDetailEntity = new RenterOrderCostDetailEntity();
+                        RenterOrderCostDetailDTO renterOrderCostDetailEntity = new RenterOrderCostDetailDTO();
                         renterOrderCostDetailEntity.setOrderNo(costBaseDTO.getOrderNo());
                         renterOrderCostDetailEntity.setRenterOrderNo(costBaseDTO.getRenterOrderNo());
                         renterOrderCostDetailEntity.setMemNo(costBaseDTO.getMemNo());
@@ -164,7 +162,7 @@ public class TranSportProxyService {
                             //夜间
                             getReturnOverTransport.setNightReturnOverTransportFee(overTransportFee==null?0:overTransportFee);;
                         }
-                        RenterOrderCostDetailEntity renterOrderCostDetailEntity = new RenterOrderCostDetailEntity();
+                        RenterOrderCostDetailDTO renterOrderCostDetailEntity = new RenterOrderCostDetailDTO();
                         renterOrderCostDetailEntity.setOrderNo(costBaseDTO.getOrderNo());
                         renterOrderCostDetailEntity.setRenterOrderNo(costBaseDTO.getRenterOrderNo());
                         renterOrderCostDetailEntity.setMemNo(costBaseDTO.getMemNo());

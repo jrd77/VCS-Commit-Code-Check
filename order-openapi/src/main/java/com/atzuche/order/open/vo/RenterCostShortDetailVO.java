@@ -10,7 +10,7 @@ import lombok.ToString;
  **/
 @ToString
 @Data
-public  class RenterCostShortDetail {
+public  class RenterCostShortDetailVO {
     @AutoDocProperty(value = "订单号")
     private String orderNo;
     @AutoDocProperty(value = "租车总费用，不包括罚金")

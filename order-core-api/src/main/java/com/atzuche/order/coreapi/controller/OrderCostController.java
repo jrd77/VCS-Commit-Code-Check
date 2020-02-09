@@ -3,25 +3,19 @@
  */
 package com.atzuche.order.coreapi.controller;
 
-import java.util.Optional;
-
 import javax.validation.Valid;
 
 import com.atzuche.order.cashieraccount.service.CashierQueryService;
 import com.atzuche.order.commons.BindingResultUtil;
 import com.atzuche.order.commons.exceptions.OrderNotFoundException;
-import com.atzuche.order.open.vo.RenterCostShortDetail;
+import com.atzuche.order.open.vo.RenterCostShortDetailVO;
 import com.atzuche.order.parentorder.entity.OrderEntity;
 import com.atzuche.order.parentorder.service.OrderService;
 import com.atzuche.order.rentercost.service.RenterCostFacadeService;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.atzuche.order.renterorder.service.RenterOrderService;
-import com.autoyol.doc.annotation.AutoDocProperty;
-import lombok.Data;
-import lombok.ToString;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -31,7 +25,6 @@ import com.atzuche.order.commons.vo.req.OrderCostReqVO;
 import com.atzuche.order.commons.vo.res.OrderOwnerCostResVO;
 import com.atzuche.order.commons.vo.res.OrderRenterCostResVO;
 import com.atzuche.order.coreapi.service.OrderCostService;
-import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
 
 import lombok.extern.slf4j.Slf4j;
@@ -65,13 +58,32 @@ public class OrderCostController {
 		return ResponseData.success(resVo);
 	}
 
+	@GetMapping("/order/renter/cost/fullDetail")
+	public ResponseData<?> getRenterCostFullDetail(String orderNo){
+		OrderEntity orderEntity = orderService.getOrderEntity(orderNo);
+		if(orderEntity==null){
+			throw new OrderNotFoundException(orderNo);
+		}
+		String memNo = orderEntity.getMemNoRenter();
+		RenterOrderEntity renterOrderEntity = renterOrderService.getRenterOrderByOrderNoAndIsEffective(orderNo);
+		if(renterOrderEntity==null){
+			throw new OrderNotFoundException(orderNo);
+		}
+		String renterOrderNo = renterOrderEntity.getRenterOrderNo();
+
+
+
+		//FIXME:
+		return null;
+	}
+
 	/**
 	 * 获取租客的费用简况
 	 * @param orderNo
 	 * @return
 	 */
 	@GetMapping("/order/renter/cost/shortDetail")
-	public ResponseData<RenterCostShortDetail> getRenterCostShortDetail(String orderNo){
+	public ResponseData<RenterCostShortDetailVO> getRenterCostShortDetail(String orderNo){
          OrderEntity orderEntity = orderService.getOrderEntity(orderNo);
          if(orderEntity==null){
          	throw new OrderNotFoundException(orderNo);
@@ -89,7 +101,7 @@ public class OrderCostController {
 		 int toPayDepositAmt = cashierQueryService.getTotalToPayDepositAmt(orderNo);
 		 int toPayWzDepositAmt = cashierQueryService.getTotalToPayWzDepositAmt(orderNo);
 
-		RenterCostShortDetail shortDetail = new RenterCostShortDetail();
+		RenterCostShortDetailVO shortDetail = new RenterCostShortDetailVO();
 
 		shortDetail.setTotalRentCostAmt(-totalRentCostAmtWithoutFine);
 		shortDetail.setTotalFineAmt(-totalFineAmt);

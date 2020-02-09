@@ -12,6 +12,7 @@ import lombok.Data;
  * @date 2019-12-14 17:30:57
  * @Description:
  */
+@Deprecated
 @Data
 public class RenterOrderCostDetailEntity implements Serializable {
 	private static final long serialVersionUID = 1L;

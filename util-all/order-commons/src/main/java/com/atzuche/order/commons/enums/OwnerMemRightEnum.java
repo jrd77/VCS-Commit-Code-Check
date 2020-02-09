@@ -25,9 +25,9 @@ public enum OwnerMemRightEnum {
 
     STAFF("3","内部员工"),
 
-    CPIC_MEM("4","太保会员"),
-    OTA_MEM("5","OTA会员"),
-    INSURANCE_CLIENT("6","保险公司客户");
+    CPIC_MEM("7","太保会员"),
+    OTA_MEM("8","OTA会员"),
+    INSURANCE_CLIENT("9","保险公司客户");
 
     /**
      * 权益编码
