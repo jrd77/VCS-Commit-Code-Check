@@ -77,7 +77,7 @@ public class CancelOrderService {
         }
 
         //扣库存
-        if (null != res && StringUtils.equals(MemRoleEnum.RENTER.getCode(), cancelOrderReqVO.getMemRole())) {
+        if (null != res) {
             stockService.releaseCarStock(cancelOrderReqVO.getOrderNo(), res.getCarNo());
         }
 
