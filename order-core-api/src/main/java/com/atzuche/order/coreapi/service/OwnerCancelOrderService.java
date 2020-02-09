@@ -170,6 +170,7 @@ public class OwnerCancelOrderService {
         orderFlowService.inserOrderStatusChangeProcessInfo(orderNo, OrderStatusEnum.from(orderStatusDTO.getStatus()));
         if(null != ownerOrderEntity) {
             ownerOrderService.updateChildStatusByOrderNo(orderNo, OwnerChildStatusEnum.END.getCode());
+            ownerOrderService.updateDispatchReasonByOrderNo(orderNo,DispatcherReasonEnum.owner_cancel);
             //取消信息处理(order_cancel_reason)
             orderCancelReasonService.addOrderCancelReasonRecord(buildOrderCancelReasonEntity(orderNo,ownerOrderEntity.getOwnerOrderNo(),
                     cancelReason));

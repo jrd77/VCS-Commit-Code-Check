@@ -80,7 +80,7 @@ public class OwnerRefuseOrderService {
      *
      * @param reqVO 请求参数
      */
-    public void refuse(RefuseOrderReqVO reqVO) {
+    public void refuse(RefuseOrderReqVO reqVO, DispatcherReasonEnum dispatcherReason) {
         //车主拒绝前置校验
         refuseOrderCheckService.checkOwnerAgreeOrRefuseOrder(reqVO.getOrderNo(), StringUtils.isNotBlank(reqVO.getOperatorName()));
         //判断是都进入调度
@@ -140,6 +140,7 @@ public class OwnerRefuseOrderService {
         orderFlowService.inserOrderStatusChangeProcessInfo(reqVO.getOrderNo(),
                 OrderStatusEnum.from(orderStatusDTO.getStatus()));
         ownerOrderService.updateChildStatusByOrderNo(reqVO.getOrderNo(), OwnerChildStatusEnum.END.getCode());
+        ownerOrderService.updateDispatchReasonByOrderNo(reqVO.getOrderNo(), dispatcherReason);
         //取消信息处理(order_cancel_reason)
         orderCancelReasonService.addOrderCancelReasonRecord(buildOrderCancelReasonEntity(reqVO.getOrderNo(), ownerOrderEntity.getOwnerOrderNo()));
         //释放库存(车主取消/拒绝时不释放库存)
