@@ -74,6 +74,8 @@ public class OwnerCancelOrderService {
     OrderCancelReasonService orderCancelReasonService;
     @Autowired
     OwnerOrderFineApplyService ownerOrderFineApplyService;
+    @Autowired
+    CancelOrderCheckService cancelOrderCheckService;
 
     /**
      * 取消处理
@@ -84,8 +86,10 @@ public class OwnerCancelOrderService {
      */
     @Transactional(rollbackFor = Exception.class)
     public CancelOrderResDTO cancel(String orderNo, String cancelReason) {
-        //todo 校验
-
+        //获取订单状态信息
+        OrderStatusEntity orderStatusEntity = orderStatusService.getByOrderNo(orderNo);
+        //校验
+        cancelOrderCheckService.checkOwnerCancelOrder(orderStatusEntity);
         //获取订单信息
         OrderEntity orderEntity = orderService.getOrderEntity(orderNo);
         //获取租客订单信息
@@ -98,8 +102,7 @@ public class OwnerCancelOrderService {
                 renterOrderEntity.getRenterOrderNo());
         //获取车主订单信息
         OwnerOrderEntity ownerOrderEntity = ownerOrderService.getOwnerOrderByOrderNoAndIsEffective(orderNo);
-        //获取订单状态信息
-        OrderStatusEntity orderStatusEntity = orderStatusService.getByOrderNo(orderNo);
+
         //获取车主券信息
         OrderCouponEntity ownerCouponEntity = orderCouponService.getOwnerCouponByOrderNoAndRenterOrderNo(orderNo,
                 renterOrderEntity.getRenterOrderNo());
@@ -170,6 +173,7 @@ public class OwnerCancelOrderService {
         orderFlowService.inserOrderStatusChangeProcessInfo(orderNo, OrderStatusEnum.from(orderStatusDTO.getStatus()));
         if(null != ownerOrderEntity) {
             ownerOrderService.updateChildStatusByOrderNo(orderNo, OwnerChildStatusEnum.END.getCode());
+            ownerOrderService.updateDispatchReasonByOrderNo(orderNo,DispatcherReasonEnum.owner_cancel);
             //取消信息处理(order_cancel_reason)
             orderCancelReasonService.addOrderCancelReasonRecord(buildOrderCancelReasonEntity(orderNo,ownerOrderEntity.getOwnerOrderNo(),
                     cancelReason));
@@ -177,6 +181,9 @@ public class OwnerCancelOrderService {
         //返回信息处理
         cancelOrderResDTO.setCarNo(goodsDetail.getCarNo());
         cancelOrderResDTO.setRentCarPayStatus(orderStatusEntity.getRentCarPayStatus());
+        cancelOrderResDTO.setCityCode(Integer.valueOf(orderEntity.getCityCode()));
+        cancelOrderResDTO.setRentTime(orderEntity.getExpRentTime());
+        cancelOrderResDTO.setRevertTime(orderEntity.getExpRevertTime());
         return cancelOrderResDTO;
     }
 

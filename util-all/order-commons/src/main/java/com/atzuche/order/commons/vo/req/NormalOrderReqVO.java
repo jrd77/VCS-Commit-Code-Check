@@ -2,6 +2,7 @@ package com.atzuche.order.commons.vo.req;
 
 import com.autoyol.doc.annotation.AutoDocProperty;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.hibernate.validator.constraints.NotBlank;
 
 import javax.validation.constraints.NotNull;
@@ -14,6 +15,7 @@ import java.io.Serializable;
  * @date 2019/12/12 15:14
  **/
 @Data
+@EqualsAndHashCode(callSuper=true)
 public class NormalOrderReqVO extends BaseVO implements Serializable {
 
     private static final long serialVersionUID = -7311434304468158415L;

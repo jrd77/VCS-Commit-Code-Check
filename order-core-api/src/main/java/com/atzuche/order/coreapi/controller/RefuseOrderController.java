@@ -2,6 +2,7 @@ package com.atzuche.order.coreapi.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.BindingResultUtil;
+import com.atzuche.order.commons.enums.DispatcherReasonEnum;
 import com.atzuche.order.commons.vo.req.AgreeOrderReqVO;
 import com.atzuche.order.commons.vo.req.RefuseOrderReqVO;
 import com.atzuche.order.commons.vo.req.ReturnCarReqVO;
@@ -52,7 +53,7 @@ public class RefuseOrderController {
 
         LOGGER.info("Refuse order.param is,reqVO:[{}]", JSON.toJSONString(reqVO));
         BindingResultUtil.checkBindingResult(bindingResult);
-        ownerRefuseOrderService.refuse(reqVO);
+        ownerRefuseOrderService.refuse(reqVO, DispatcherReasonEnum.owner_refuse);
         return ResponseData.success();
     }
 
