@@ -57,6 +57,10 @@ public class OwnerMemberEntity implements Serializable {
 	 */
 	private Integer orderSuccessCount;
 	/**
+	 * 平台上架车辆数
+	 */
+	private Integer renterCarCount;
+	/**
 	 * 创建时间
 	 */
 	private LocalDateTime createTime;
