@@ -7,6 +7,7 @@ import com.atzuche.order.commons.exceptions.RemoteCallException;
 import com.atzuche.order.coreapi.submitOrder.exception.*;
 import com.autoyol.car.api.CarRentalTimeApi;
 import com.autoyol.car.api.model.dto.OrderInfoDTO;
+import com.autoyol.car.api.model.dto.OwnerCancelDTO;
 import com.autoyol.car.api.model.vo.ResponseObject;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
@@ -117,6 +118,38 @@ public class StockProxyService {
             throw releaseStockException;
         }
     }
+
+
+
+
+    /**
+     * @Author ZhangBin
+     * @Date 2020/2/9 17:34
+     * @Description: 锁定车辆可租时间(car_filter)
+     **/
+    public void ownerCancelStock(OwnerCancelDTO ownerCancel){
+        ResponseObject<Boolean> responseObject  = null;
+        Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "锁定车辆可租时间");
+        try{
+            Cat.logEvent(CatConstants.FEIGN_METHOD,"carRentalTimeApi.ownerCancelStock");
+            log.info("Feign 锁定车辆可租时间,ownerCancel:[{}]", JSON.toJSONString(ownerCancel));
+            Cat.logEvent(CatConstants.FEIGN_PARAM,JSON.toJSONString(ownerCancel));
+            responseObject = carRentalTimeApi.ownerCancelStock(ownerCancel);
+            log.info("Fegin 锁定车辆可租时间,返回结果:[{}]",JSON.toJSONString(responseObject));
+            Cat.logEvent(CatConstants.FEIGN_RESULT,JSON.toJSONString(responseObject));
+            checkResponse(responseObject);
+            t.setStatus(Transaction.SUCCESS);
+        }catch (Exception e){
+            log.error("Feign 锁定车辆可租时间异常,responseObject:[{}],ownerCancel:[{}]",JSON.toJSONString(responseObject),JSON.toJSONString(ownerCancel),e);
+            Cat.logError("Feign 锁定车辆可租时间异常",e);
+            t.setStatus(e);
+            throw e;
+        }finally {
+            t.complete();
+        }
+
+    }
+
 
     public static void  checkResponse(ResponseObject responseObject){
         if(responseObject==null||!ErrorCode.SUCCESS.getCode().equalsIgnoreCase(responseObject.getResCode())){

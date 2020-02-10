@@ -1,6 +1,7 @@
 package com.atzuche.order.coreapi.task;
 
 import com.atzuche.order.commons.CatConstants;
+import com.atzuche.order.commons.enums.DispatcherReasonEnum;
 import com.atzuche.order.commons.vo.req.RefuseOrderReqVO;
 import com.atzuche.order.coreapi.service.OrderSearchRemoteService;
 import com.atzuche.order.coreapi.service.OwnerRefuseOrderService;
@@ -55,8 +56,7 @@ public class OwnerRejectTask extends IJobHandler {
                 for (String orderNo : orderNos) {
                     RefuseOrderReqVO req = new RefuseOrderReqVO();
                     req.setOrderNo(orderNo);
-                    req.setOperatorName("System");
-                    ownerRefuseOrderService.refuse(req);
+                    ownerRefuseOrderService.refuse(req, DispatcherReasonEnum.timeout);
                 }
             }
             logger.info("结束执行 下单后15分钟，车主没有接单,自动拒单 ");
