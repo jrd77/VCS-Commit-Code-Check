@@ -11,9 +11,11 @@ import lombok.ToString;
  **/
 @Data
 @ToString
-public class RenterBasicCostDetailVO {
+public class RenterCostDetailVO {
     @AutoDocProperty(value = "订单号")
     private String orderNo;
+    @AutoDocProperty(value = "子单号")
+    private String renterOrderNo;
     @AutoDocProperty(value = "租客会员号")
     private String memNo;
     @AutoDocProperty(value = "租金总额")
@@ -24,24 +26,28 @@ public class RenterBasicCostDetailVO {
     private Integer abatementInsuranceAmt;
     @AutoDocProperty(value = "手续费")
     private Integer fee;
-    @AutoDocProperty(value = "取车服务费总额")
-    private Integer srvGetCostAmt;
-    @AutoDocProperty(value = "还车服务费总额")
-    private Integer srvReturnCostAmt;
+    @AutoDocProperty(value = "附加驾驶人保险总额")
+    private Integer extraDriverInsuranceAmt;
+
+    @AutoDocProperty(value = "配送费详情及其总额")
+    private RenterDeliveryFeeDetailVO deliveryFeeDetail;
+
     @AutoDocProperty(value = "超里程费用总额")
     private Integer mileageCostAmt;
     @AutoDocProperty(value = "油费总额")
     private Integer oilCostAmt;
-    @AutoDocProperty(value = "罚金总额")
-    private Integer fineAmt;
-    @AutoDocProperty(value = "附加驾驶人保险总额")
-    private Integer extraDriverInsuranceAmt;
-    @AutoDocProperty(value = "修改取还车罚金总额")
-    private Integer getReturnFineAmt;
-    @AutoDocProperty(value = "取车高峰运能费总额")
-    private Integer getBlockedRaiseAmt;
-    @AutoDocProperty(value = "还车高峰运能费总额")
-    private Integer returnBlockedRaiseAmt;
-    @AutoDocProperty(value = "取消违约金总额")
-    private Integer renterPenaltyAmt;
+    @AutoDocProperty(value = "罚金及其详情")
+    private RenterFineVO fineDetail;
+
+    @AutoDocProperty(value = "补贴及其详情")
+    private RenterSubsidyDetail subsidyDetail;
+
+
+
+
+
+
+
 }
+
+
