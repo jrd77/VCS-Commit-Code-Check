@@ -160,8 +160,10 @@ public class OrderSettleNoTService {
 
 
     public SettleOrders preInitSettleOrders(String orderNo,String renterOrderNo,String ownerOrderNo) {
+        log.info("orderNo={},renterOrderNo={},ownerOrderNo={}",orderNo,renterOrderNo,ownerOrderNo);
         SettleOrders settleOrders = new SettleOrders();
         settleOrders.setOrderNo(orderNo);
+
 
         //1 校验参数
         if(StringUtil.isBlank(orderNo)){

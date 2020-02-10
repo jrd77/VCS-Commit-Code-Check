@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 
+import com.atzuche.order.transport.service.GetReturnCarCostService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -69,6 +70,8 @@ public class DeliveryCarInfoService {
     GetReturnCarCostProxyService getReturnCarCostProxyService;
     @Autowired
     RenterCommodityService renterCommodityService;
+    @Autowired
+    GetReturnCarCostService getReturnCarCostService;
 
     /**
      * 获取配送相关信息（待优化）
@@ -120,6 +123,9 @@ public class DeliveryCarInfoService {
             createGetHandoverCar(getReturnCarCostReqDto,deliveryCarVO, renterOrderDeliveryEntity,carType,renterGoodsDetailDTO);
         }
         GetReturnCostDTO getReturnCostDTO = getReturnCarCostProxyService.getReturnCarCost(getReturnCarCostReqDto);
+        //GetReturnResponseVO getReturnResponseVO = deliveryCarInfoPriceService.getDeliveryCarFee(renterOrderDeliveryEntityList.get(0).getOrderNo());
+        //log.info(String.valueOf(getReturnResponseVO.getGetFee()));
+
         if(Objects.nonNull(getReturnCostDTO)) {
             deliveryCarVO.getGetHandoverCarDTO().setGetCarCrash(String.valueOf(getReturnCostDTO.getGetReturnResponseVO().getGetFee()));
             deliveryCarVO.getReturnHandoverCarDTO().setReturnCarCrash(String.valueOf(getReturnCostDTO.getGetReturnResponseVO().getReturnFee()));

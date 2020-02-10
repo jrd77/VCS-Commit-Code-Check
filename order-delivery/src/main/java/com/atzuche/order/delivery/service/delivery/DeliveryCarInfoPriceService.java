@@ -3,14 +3,10 @@ package com.atzuche.order.delivery.service.delivery;
 import com.atzuche.config.client.api.OilAverageCostConfigSDK;
 import com.atzuche.config.common.api.ConfigContext;
 import com.atzuche.config.common.entity.OilAverageCostEntity;
-import com.atzuche.order.commons.StringUtil;
 import com.atzuche.order.commons.entity.dto.CostBaseDTO;
 import com.atzuche.order.commons.entity.dto.MileageAmtDTO;
-import com.atzuche.order.commons.enums.cashcode.OwnerCashCodeEnum;
-import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.commons.vo.res.delivery.DistributionCostVO;
-import com.atzuche.order.commons.vo.res.ownercosts.OwnerOrderPurchaseDetailEntity;
-import com.atzuche.order.commons.vo.res.rentcosts.RenterOrderCostDetailEntity;
+import com.atzuche.order.commons.vo.res.delivery.RenterOrderDeliveryRepVO;
 import com.atzuche.order.delivery.common.DeliveryErrorCode;
 import com.atzuche.order.delivery.entity.OwnerHandoverCarInfoEntity;
 import com.atzuche.order.delivery.entity.RenterHandoverCarInfoEntity;
@@ -24,6 +20,8 @@ import com.atzuche.order.delivery.utils.MathUtil;
 import com.atzuche.order.delivery.vo.delivery.DeliveryOilCostVO;
 import com.atzuche.order.delivery.vo.delivery.rep.OwnerGetAndReturnCarDTO;
 import com.atzuche.order.delivery.vo.delivery.rep.RenterGetAndReturnCarDTO;
+import com.atzuche.order.transport.service.GetReturnCarCostService;
+import com.atzuche.order.transport.vo.GetReturnResponseVO;
 import com.autoyol.platformcost.CommonUtils;
 import com.autoyol.platformcost.OwnerFeeCalculatorUtils;
 import com.autoyol.platformcost.RenterFeeCalculatorUtils;
@@ -39,7 +37,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import java.time.Duration;
 import java.util.List;
 import java.util.Objects;
 
@@ -58,6 +55,8 @@ public class DeliveryCarInfoPriceService {
     OwnerHandoverCarService ownerHandoverCarService;
     @Autowired
     RenterHandoverCarService renterHandoverCarService;
+    @Autowired
+    GetReturnCarCostService getReturnCarCostService;
 
     @Value("${auto.cost.configHours}")
     private Integer configHours;
@@ -244,6 +243,28 @@ public class DeliveryCarInfoPriceService {
         Integer serviceExpense = OwnerFeeCalculatorUtils.calServiceExpense(rentAmt, serviceProportion);
         FeeResult feeResult = new FeeResult(serviceExpense, 1.0, serviceExpense);
         return feeResult;
+    }
+
+
+    /**
+     * 获取租客取还车费用数据
+     * @param orderNo
+     * @return
+     */
+    public GetReturnResponseVO getDeliveryCarFee(String orderNo){
+        List<RenterOrderDeliveryEntity> renterOrderDeliveryEntityList = renterOrderDeliveryService.findRenterOrderListByOrderNo(orderNo);
+        if (CollectionUtils.isEmpty(renterOrderDeliveryEntityList)) {
+            log.info("没有配送订单，获取不了相关的配送费用,orderNo:", orderNo);
+            return new GetReturnResponseVO();
+        }
+        List<RenterOrderDeliveryRepVO> renterOrderDeliveryRepVOList = Lists.newArrayList();
+        for (RenterOrderDeliveryEntity renterOrderDeliveryEntity : renterOrderDeliveryEntityList) {
+            RenterOrderDeliveryRepVO renterOrderDeliveryRepVO = new RenterOrderDeliveryRepVO();
+            BeanUtils.copyProperties(renterOrderDeliveryEntity, renterOrderDeliveryRepVO);
+            renterOrderDeliveryRepVOList.add(renterOrderDeliveryRepVO);
+        }
+        GetReturnResponseVO getReturnResponseVO = getReturnCarCostService.getDeliveryCarFee(orderNo, renterOrderDeliveryRepVOList);
+        return getReturnResponseVO;
     }
 
     /**

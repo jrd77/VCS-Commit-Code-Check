@@ -17,10 +17,7 @@ import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.atzuche.order.renterorder.service.RenterOrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.atzuche.order.commons.vo.req.OrderCostReqVO;
 import com.atzuche.order.commons.vo.res.OrderOwnerCostResVO;
@@ -60,7 +57,7 @@ public class OrderCostController {
 	}
 
 	@GetMapping("/order/renter/cost/fullDetail")
-	public ResponseData<RenterCostDetailVO> getRenterCostFullDetail(String orderNo){
+	public ResponseData<RenterCostDetailVO> getRenterCostFullDetail(@RequestParam("orderNo") String orderNo){
 		OrderEntity orderEntity = orderService.getOrderEntity(orderNo);
 		if(orderEntity==null){
 			throw new OrderNotFoundException(orderNo);
