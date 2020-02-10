@@ -3,7 +3,6 @@ package com.atzuche.order.admin.controller.cashier;
 import com.atzuche.order.cashieraccount.entity.CashierRefundApplyEntity;
 import com.atzuche.order.cashieraccount.service.CashierPayService;
 import com.atzuche.order.cashieraccount.service.notservice.CashierRefundApplyNoTService;
-import com.atzuche.order.coreapi.service.OrderSettle;
 import com.atzuche.order.settle.service.OrderSettleService;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.doc.annotation.AutoDocMethod;
@@ -30,7 +29,6 @@ public class SettleCashierController {
     CashierPayService cashierPayService;
     @Autowired
     CashierRefundApplyNoTService cashierRefundApplyNoTService;
-    @Autowired private OrderSettle orderSettle;
 
     /**
      * 手动车辆结算接口
@@ -41,7 +39,7 @@ public class SettleCashierController {
     @GetMapping("/deposit")
     public ResponseData<String> settleDeposit(@RequestParam("orderNo") String orderNo) {
         log.info("SettleCashierController deposit start param [{}]", orderNo);
-        orderSettle.settleOrder(orderNo);
+        orderSettleService.settleOrder(orderNo,null);
         log.info("SettleCashierController deposit end param [{}],result [{}]");
         return ResponseData.success();
     }
