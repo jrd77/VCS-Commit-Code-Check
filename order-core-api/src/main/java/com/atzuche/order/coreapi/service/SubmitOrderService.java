@@ -455,7 +455,7 @@ public class SubmitOrderService {
         ownerOrderSubsidyDetailEntity.setSubsidySourceName(SubsidySourceCodeEnum.OWNER.getDesc());
 
         ownerOrderSubsidyDetailEntity.setSubsidyTargetCode(SubsidySourceCodeEnum.RENTER.getCode());
-        ownerOrderSubsidyDetailEntity.setSubsidyTypeName(SubsidySourceCodeEnum.RENTER.getDesc());
+        ownerOrderSubsidyDetailEntity.setSubsidyTargetName(SubsidySourceCodeEnum.RENTER.getDesc());
         ownerOrderSubsidyDetailEntity.setSubsidyCostCode(RenterCashCodeEnum.OWNER_COUPON_OFFSET_COST.getCashNo());
         ownerOrderSubsidyDetailEntity.setSubsidyCostName(RenterCashCodeEnum.OWNER_COUPON_OFFSET_COST.getTxt());
         ownerOrderSubsidyDetailEntity.setSubsidyDesc("使用车主券抵扣租金");
