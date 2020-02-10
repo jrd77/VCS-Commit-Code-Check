@@ -1,11 +1,13 @@
 package com.atzuche.order.commons.entity.dto;
 
 import lombok.Data;
+import lombok.ToString;
 import org.hibernate.validator.constraints.NotBlank;
 
 import javax.validation.constraints.NotNull;
 
 @Data
+@ToString
 public class RentCityAndRiskAccidentReqDTO {
     /**
      * 主订单号

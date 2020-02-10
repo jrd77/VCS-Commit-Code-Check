@@ -83,7 +83,7 @@ public class HandoverCarInfoService {
      * @throws Exception
      */
     @Transactional(rollbackFor = Exception.class)
-    public void updateHandoverCarInfo(HandoverCarInfoReqVO handoverCarReqVO) throws Exception {
+    public void updateHandoverCarInfo(HandoverCarInfoReqVO handoverCarReqVO)  {
         logger.debug("参数：{}", ToStringBuilder.reflectionToString(handoverCarReqVO));
         if (Objects.isNull(handoverCarReqVO)) {
             throw new HandoverCarOrderException(DeliveryErrorCode.DELIVERY_PARAMS_ERROR.getValue(), "参数错误");
@@ -117,12 +117,10 @@ public class HandoverCarInfoService {
         if (deliveryReqVO.getGetDeliveryReqDTO() != null) {
             deliveryReqDTO = deliveryReqVO.getGetDeliveryReqDTO();
             updateDeliveryCarInfoByUsed(deliveryReqDTO, 1);
-            //更新取车备注信息
         }
         if (deliveryReqVO.getRenterDeliveryReqDTO() != null) {
             deliveryReqDTO = deliveryReqVO.getRenterDeliveryReqDTO();
             updateDeliveryCarInfoByUsed(deliveryReqDTO, 2);
-            //更新还车备注信息
         }
     }
 
@@ -157,7 +155,11 @@ public class HandoverCarInfoService {
         RenterDeliveryAddrDTO renterDeliveryAddrDTO = new RenterDeliveryAddrDTO();
         orderDeliveryDTO.setType(type);
         orderDeliveryDTO.setRenterGetReturnAddr(deliveryReqDTO.getRenterGetReturnAddr());
+        orderDeliveryDTO.setRenterGetReturnAddrLat(deliveryReqDTO.getRenterGetReturnLat());
+        orderDeliveryDTO.setRenterGetReturnAddrLon(deliveryReqDTO.getRenterGetReturnLng());
         orderDeliveryDTO.setOwnerGetReturnAddr(deliveryReqDTO.getOwnerGetReturnAddr());
+        orderDeliveryDTO.setOwnerGetReturnAddrLon(deliveryReqDTO.getOwnerGetReturnLat());
+        orderDeliveryDTO.setOwnerGetReturnAddrLat(deliveryReqDTO.getOwnerGetReturnLng());
         orderDeliveryDTO.setOrderNo(renterOrderDeliveryEntity.getOrderNo());
         orderDeliveryDTO.setRenterOrderNo(renterOrderDeliveryEntity.getRenterOrderNo());
         orderDeliveryDTO.setOwnerRealGetReturnRemark(deliveryReqDTO.getOwnerRealGetAddrReamrk());
@@ -167,7 +169,11 @@ public class HandoverCarInfoService {
         renterDeliveryAddrDTO.setRenterOrderNo(renterOrderDeliveryEntity.getRenterOrderNo());
         renterDeliveryAddrDTO.setExpReturnCarAddr(deliveryReqDTO.getOwnerGetReturnAddr());
         renterDeliveryAddrDTO.setActReturnCarAddr(deliveryReqDTO.getOwnerGetReturnAddr());
+        renterDeliveryAddrDTO.setActReturnCarLat(deliveryReqDTO.getOwnerGetReturnLat());
+        renterDeliveryAddrDTO.setActReturnCarLon(deliveryReqDTO.getOwnerGetReturnLng());
         renterDeliveryAddrDTO.setActGetCarAddr(deliveryReqDTO.getRenterGetReturnAddr());
+        renterDeliveryAddrDTO.setActGetCarLat(deliveryReqDTO.getRenterGetReturnLat());
+        renterDeliveryAddrDTO.setActGetCarLon(deliveryReqDTO.getRenterGetReturnLng());
         updateFlowOrderDTO.setOrdernumber(deliveryReqDTO.getOrderNo());
         updateFlowOrderDTO.setServicetype(type == 1 ? "take" : "back");
         updateFlowOrderDTO.setChangetype("ownerAddr");

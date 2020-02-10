@@ -4,6 +4,8 @@ import com.atzuche.order.accountrenterdetain.entity.AccountRenterDetainDetailEnt
 import com.atzuche.order.accountrenterdetain.exception.AccountRenterDetainDetailException;
 import com.atzuche.order.accountrenterdetain.mapper.AccountRenterDetainDetailMapper;
 import com.atzuche.order.accountrenterdetain.vo.req.DetainRenterDepositReqVO;
+import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
+
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -46,4 +48,24 @@ public class AccountRenterDetainDetailNoTService {
     public List<AccountRenterDetainDetailEntity> selectByOrderNo(String orderNo){
         return accountRenterDetainDetailMapper.selectByOrderNo(orderNo);
     }
+    
+    /**
+     * 判断违章押金是否暂扣
+     * @param orderNo
+     * @return
+     */
+    public boolean isWzDepositDetain(String orderNo){
+    	boolean isFlag= false;
+    	List<AccountRenterDetainDetailEntity> lst = accountRenterDetainDetailMapper.selectByOrderNo(orderNo);
+    	for (AccountRenterDetainDetailEntity accountRenterDetainDetailEntity : lst) {
+			if(accountRenterDetainDetailEntity.getSourceCode().toString().equals(RenterCashCodeEnum.ACCOUNT_RENTER_WZ_DEPOSIT.getCashNo())) {
+				isFlag = true;
+				break;
+			}
+		}
+    	
+    	
+    	return isFlag;
+    }
+    
 }

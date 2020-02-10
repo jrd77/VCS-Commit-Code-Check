@@ -36,6 +36,23 @@ public class OrderConsoleSubsidyDetailService{
     public List<OrderConsoleSubsidyDetailEntity> listOrderConsoleSubsidyDetailByOrderNoAndMemNo(String orderNo, String memNo) {
     	return orderConsoleSubsidyDetailMapper.listOrderConsoleSubsidyDetailByOrderNoAndMemNo(orderNo, memNo);
     }
+
+    /**
+     * 获取管理后台无条件补贴总额
+     * @param orderNo
+     * @param memNo
+     * @return
+     */
+    public int getTotalRenterOrderConsoleSubsidy(String orderNo, String memNo){
+        List<OrderConsoleSubsidyDetailEntity> entityList = listOrderConsoleSubsidyDetailByOrderNoAndMemNo(orderNo,memNo);
+        int total = 0;
+        for(OrderConsoleSubsidyDetailEntity entity:entityList){
+            if(entity.getSubsidyAmount()!=null){
+                total = total +entity.getSubsidyAmount();
+            }
+        }
+        return total;
+    }
     
     /**
      * 调价的公共方法，在一个方法内完成。
@@ -49,6 +66,8 @@ public class OrderConsoleSubsidyDetailService{
 			//存在
     		if(orderConsoleSubsidyDetailEntity.getSubsidySourceCode().equals(record.getSubsidySourceCode()) && orderConsoleSubsidyDetailEntity.getSubsidyTargetCode().equals(record.getSubsidyTargetCode()) && orderConsoleSubsidyDetailEntity.getSubsidyCostCode().equals(record.getSubsidyCostCode())) {
     			record.setId(orderConsoleSubsidyDetailEntity.getId());
+    			//修改的话无需修改创建人
+    			record.setCreateOp(null);
     			orderConsoleSubsidyDetailMapper.updateByPrimaryKeySelective(record);
     			isExists = true;
 			}

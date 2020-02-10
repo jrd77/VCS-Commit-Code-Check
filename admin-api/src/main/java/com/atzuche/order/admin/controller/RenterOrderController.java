@@ -4,6 +4,7 @@ import com.atzuche.order.admin.vo.req.order.MainOrderRequestVO;
 import com.atzuche.order.admin.vo.req.order.RenterOrderRequestVO;
 import com.atzuche.order.admin.vo.resp.order.MainOrderResponseVO;
 import com.atzuche.order.admin.vo.resp.order.RenterOrderListResponseVO;
+import com.atzuche.order.commons.BindingResultUtil;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.doc.annotation.AutoDocMethod;
@@ -27,9 +28,8 @@ public class RenterOrderController {
 	@AutoDocMethod(description = "获取子订单列表", value = "获取子订单列表", response = RenterOrderListResponseVO.class)
 	@GetMapping("renter/list")
 	public ResponseData renterList(RenterOrderRequestVO renterOrderRequestVO, BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), ErrorCode.INPUT_ERROR.getText());
-        }
+		BindingResultUtil.checkBindingResult(bindingResult);
+		//TODO:
 		return ResponseData.success(null);
 	}
 

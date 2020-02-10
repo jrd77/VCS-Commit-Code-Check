@@ -9,6 +9,8 @@ import com.atzuche.order.admin.vo.req.order.CancelOrderByPlatVO;
 import com.atzuche.order.admin.vo.req.order.CancelOrderVO;
 import com.atzuche.order.admin.vo.req.order.OrderModifyConfirmReqVO;
 import com.atzuche.order.admin.vo.resp.order.AdminModifyOrderFeeCompareVO;
+import com.atzuche.order.commons.BindingResultUtil;
+import com.atzuche.order.commons.ResponseCheckUtil;
 import com.atzuche.order.commons.entity.orderDetailDto.OrderDetailReqDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.OrderDetailRespDTO;
 import com.atzuche.order.commons.vo.req.ModifyOrderReqVO;
@@ -67,13 +69,12 @@ public class AdminOrderController {
         reqDTO.setOrderNo(orderNo);
 
         ResponseData<OrderDetailRespDTO> respDTOResponseData =feignOrderDetailService.getOrderDetail(reqDTO);
-        if(respDTOResponseData==null||!ErrorCode.SUCCESS.getCode().equalsIgnoreCase(respDTOResponseData.getResCode())){
-            throw new RenterInfoController.RenterNotFoundException(orderNo);
-        }
+        ResponseCheckUtil.checkResponse(respDTOResponseData);
 
         OrderDetailRespDTO detailRespDTO = respDTOResponseData.getData();
         String  memNo = detailRespDTO.getRenterMember().getMemNo();
         modifyOrderReqVO.setMemNo(memNo);
+        modifyOrderReqVO.setConsoleFlag(true);
 
         adminOrderService.modifyOrder(modifyOrderReqVO);
         return ResponseData.success();
@@ -103,11 +104,8 @@ public class AdminOrderController {
     @RequestMapping(value="console/order/cancel",method = RequestMethod.POST)
     public ResponseData cancelOrder(@Valid @RequestBody CancelOrderVO cancelOrderVO, BindingResult bindingResult)throws Exception{
         log.info("车主或者租客取消-reqVo={}", JSON.toJSONString(cancelOrderVO));
-        if (bindingResult.hasErrors()) {
-            Optional<FieldError> error = bindingResult.getFieldErrors().stream().findFirst();
-            return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), error.isPresent() ?
-                    error.get().getDefaultMessage() : ErrorCode.INPUT_ERROR.getText());
-        }
+        BindingResultUtil.checkBindingResult(bindingResult);
+
         ResponseData responseData = adminOrderService.cancelOrder(cancelOrderVO);
         return responseData;
     }
@@ -134,11 +132,7 @@ public class AdminOrderController {
     @AutoDocMethod(description = "订单修改前的费用对比", value = "订单修改前的费用对比",response = AdminModifyOrderFeeCompareVO.class)
     @RequestMapping(value="console/order/modify/prefee",method = RequestMethod.POST)
     public ResponseData<AdminModifyOrderFeeCompareVO> preModifyOrder(@Valid @RequestBody AdminModifyOrderReqVO reqVO,BindingResult bindingResult){
-        if(bindingResult.hasErrors()){
-            Optional<FieldError> error = bindingResult.getFieldErrors().stream().findFirst();
-            return ResponseData.createErrorCodeResponse(ErrorCode.INPUT_ERROR.getCode(), error.isPresent() ?
-                    error.get().getDefaultMessage() : ErrorCode.INPUT_ERROR.getText());
-        }
+        BindingResultUtil.checkBindingResult(bindingResult);
 
         String renterNo = adminOrderService.getRenterMemNo(reqVO.getOrderNo());
 
@@ -154,11 +148,7 @@ public class AdminOrderController {
     @AutoDocMethod(description = "管理后台换车", value = "管理后台换车")
     @RequestMapping(value="console/changeCar",method = RequestMethod.POST)
     public ResponseData<?> changeCar(@Valid @RequestBody AdminTransferCarReqVO reqVO, BindingResult bindingResult){
-        if(bindingResult.hasErrors()){
-            Optional<FieldError> error = bindingResult.getFieldErrors().stream().findFirst();
-            return ResponseData.createErrorCodeResponse(ErrorCode.INPUT_ERROR.getCode(), error.isPresent() ?
-                    error.get().getDefaultMessage() : ErrorCode.INPUT_ERROR.getText());
-        }
+        BindingResultUtil.checkBindingResult(bindingResult);
 
         TransferReq req = new TransferReq();
         req.setOperator(AdminUserUtil.getAdminUser().getAuthName());

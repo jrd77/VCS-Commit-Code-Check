@@ -16,7 +16,7 @@ public class OrderUpdateService {
     @Autowired
     private OrderStatusService orderStatusService;
 
-    public ResponseData<?> rentCityAndRiskAccident(RentCityAndRiskAccidentReqDTO rentCityAndRiskAccidentReqDTO) {
+    public void  rentCityAndRiskAccident(RentCityAndRiskAccidentReqDTO rentCityAndRiskAccidentReqDTO) {
         OrderEntity orderEntity = new OrderEntity();
         orderEntity.setOrderNo(rentCityAndRiskAccidentReqDTO.getOrderNo());
         orderEntity.setRentCity(rentCityAndRiskAccidentReqDTO.getRentCity());
@@ -26,7 +26,5 @@ public class OrderUpdateService {
         orderStatusEntity.setOrderNo(rentCityAndRiskAccidentReqDTO.getOrderNo());
         orderStatusEntity.setIsRiskAccident(rentCityAndRiskAccidentReqDTO.getIsRiskAccident());
         orderStatusService.updateRenterOrderByOrderNo(orderStatusEntity);
-
-        return ResponseData.success();
     }
 }

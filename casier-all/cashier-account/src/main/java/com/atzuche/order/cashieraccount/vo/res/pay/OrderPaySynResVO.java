@@ -1,11 +1,13 @@
 package com.atzuche.order.cashieraccount.vo.res.pay;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  * 支付系统回调 同步信息返回
  */
 @Data
+@EqualsAndHashCode(callSuper=true)
 public class OrderPaySynResVO extends OrderPayBaseResVO {
 
     /**

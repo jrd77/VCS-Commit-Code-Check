@@ -14,12 +14,24 @@ public class GetHandoverCarDTO {
 
     @AutoDocProperty("车主默认取车地点")
     public String ownDefaultGetCarAddr;
+    @AutoDocProperty("车主默认取车地点经度")
+    public String ownDefaultGetCarLat;
+    @AutoDocProperty("车主默认取车地点维度")
+    public String ownDefaultGetCarLng;
     @AutoDocProperty("车主实际交车地址")
     public String ownRealReturnAddr;
+    @AutoDocProperty("车主实际交车地址经度")
+    public String ownRealReturnLat;
+    @AutoDocProperty("车主实际交车地址维度")
+    public String ownRealReturnLng;
     @AutoDocProperty("车主实际取车地址备注")
     public String ownRealGetRemark;
     @AutoDocProperty("租客实际送车地址?应该是取车")
     public String renterRealGetAddr;
+    @AutoDocProperty("租客实际送车地址经度?应该是取车")
+    public String renterRealGetLat;
+    @AutoDocProperty("租客实际送车地址维度?应该是取车")
+    public String renterRealGetLng;
     @AutoDocProperty("租客实际送车地址备注?应该是取车")
     public String renterRealGetAddrReamrk;
     @AutoDocProperty("预计提前取车时间")

@@ -2,7 +2,7 @@ package com.atzuche.order.admin.vo.resp.cost;
 
 import java.util.List;
 
-import com.atzuche.order.commons.entity.dto.CommUseDriverInfoDTO;
+import com.atzuche.order.commons.entity.dto.CommUseDriverInfoStringDateDTO;
 import com.autoyol.doc.annotation.AutoDocProperty;
 
 import lombok.Data;
@@ -16,7 +16,9 @@ import lombok.ToString;
 @ToString
 public class AdditionalDriverInsuranceVO {
 	@AutoDocProperty("附加驾驶人列表")
-	List<CommUseDriverInfoDTO> listCommUseDriverInfoDTO;
+	List<CommUseDriverInfoStringDateDTO> listCommUseDriverInfoDTO;
+	@AutoDocProperty("已经保存的附加驾驶人列表")
+	List<CommUseDriverInfoStringDateDTO> listCommUseDriverInfoAlreadySaveDTO;
 	
 	
 //    @AutoDocProperty("姓名")

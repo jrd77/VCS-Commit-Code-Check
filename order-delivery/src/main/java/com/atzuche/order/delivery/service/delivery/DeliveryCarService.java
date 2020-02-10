@@ -213,7 +213,7 @@ public class DeliveryCarService {
 
         if (orderDeliveryVO.getRenterDeliveryAddrDTO() != null) {
             RenterDeliveryAddrEntity deliveryAddrEntity = new RenterDeliveryAddrEntity();
-            RenterDeliveryAddrEntity renterDeliveryAddrEntity = renterOrderDeliveryService.selectAddrByRenterOrderNo(deliveryAddrEntity.getRenterOrderNo());
+            RenterDeliveryAddrEntity renterDeliveryAddrEntity = renterOrderDeliveryService.selectAddrByRenterOrderNo(orderDeliveryVO.getRenterDeliveryAddrDTO().getRenterOrderNo());
             if (null == renterDeliveryAddrEntity) {
                 BeanUtils.copyProperties(orderDeliveryVO.getRenterDeliveryAddrDTO(), deliveryAddrEntity);
                 renterOrderDeliveryService.insertDeliveryAddr(deliveryAddrEntity);
@@ -334,7 +334,7 @@ public class DeliveryCarService {
         orderDeliveryFlowEntity.setDayMileage(String.valueOf(renterGoodsDetailDTO.getCarDayMileage()));
         orderDeliveryFlowEntity.setTankCapacity(String.valueOf(renterGoodsDetailDTO.getCarOilVolume()));
         orderDeliveryFlowEntity.setOwnerGetAddr(renterGoodsDetailDTO.getCarRealAddr());
-        orderDeliveryFlowEntity.setOwnerReturnAddr(orderReqVO.getSrvGetAddr());
+        orderDeliveryFlowEntity.setOwnerReturnAddr(renterGoodsDetailDTO.getCarRealAddr());
 
         orderDeliveryVO.setOrderDeliveryDTO(orderDeliveryDTO);
         orderDeliveryVO.setRenterDeliveryAddrDTO(renterDeliveryAddrDTO);

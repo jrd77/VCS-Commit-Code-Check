@@ -6,6 +6,7 @@ import com.atzuche.config.client.api.DefaultConfigContext;
 import com.atzuche.config.common.entity.CityEntity;
 import com.atzuche.order.commons.CatConstants;
 import com.atzuche.order.commons.LocalDateTimeUtils;
+import com.atzuche.order.commons.ResponseCheckUtil;
 import com.atzuche.order.commons.entity.dto.CostBaseDTO;
 import com.atzuche.order.commons.entity.dto.GetReturnCarCostReqDto;
 import com.atzuche.order.commons.entity.dto.RenterOrderSubsidyDetailDTO;
@@ -14,7 +15,6 @@ import com.atzuche.order.commons.enums.SubsidyTypeCodeEnum;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.commons.vo.res.rentcosts.RenterOrderCostDetailEntity;
 import com.atzuche.order.transport.common.TransPortErrorCode;
-import com.atzuche.order.transport.exception.GetReturnCostException;
 import com.atzuche.order.transport.utils.GetReturnCarCostNeedUtil;
 import com.atzuche.order.transport.vo.CityDTO;
 import com.atzuche.order.transport.vo.GetReturnCostDTO;
@@ -167,21 +167,13 @@ public class GetReturnCarCostProxyService {
             Cat.logEvent(CatConstants.FEIGN_PARAM,JSON.toJSONString(getFbcFeeRequest));
             responseData = fetchBackCarFeeFeignService.getFbcFee(getFbcFeeRequest);
             log.info("Feign 获取取还车费用结果:[{}],获取取还车费用入参:[{}]",JSON.toJSONString(responseData),JSON.toJSONString(getFbcFeeRequest));
-            if(responseData == null || responseData.getResCode()==null || !responseData.getResCode().equals(ErrorCode.SUCCESS.getCode())){
-                GetReturnCostException getReturnCostFailException = new GetReturnCostException(TransPortErrorCode.GET_RETURN_CAR_ERROR);
-                throw getReturnCostFailException;
-            }
+            ResponseCheckUtil.checkResponse(responseData);
             Cat.logEvent(CatConstants.FEIGN_RESULT,JSON.toJSONString(responseData));
             t.setStatus(Transaction.SUCCESS);
-        }catch (GetReturnCostException getReturnCostFailException){
-            Cat.logError("Feign 获取取还车费用失败！", getReturnCostFailException);
-            t.setStatus(getReturnCostFailException);
-            throw getReturnCostFailException;
         }catch (Exception e){
-            GetReturnCostException getReturnCostErrorException = new GetReturnCostException(TransPortErrorCode.GET_RETURN_CAR_ERROR);
-            Cat.logError("Feign 获取取还车费用接口异常",getReturnCostErrorException);
-            t.setStatus(getReturnCostErrorException);
-            throw getReturnCostErrorException;
+            Cat.logError("Feign 获取取还车费用接口异常",e);
+            t.setStatus(e);
+            throw e;
         }finally {
             t.complete();
         }

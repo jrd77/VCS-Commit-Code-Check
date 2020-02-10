@@ -472,7 +472,7 @@
     </select>
 
     <select id="queryCarInfoByOrderNoAndCarNo" resultMap="BaseResultMap">
-        select car_no,car_plate_num,car_brand_txt,car_type_txt,inspect_expire from renter_goods where order_no = #{orderNo} and car_no = #{carNo} and is_delete = 0 order by id desc limit 1
+        select * from renter_goods where order_no = #{orderNo} and car_no = #{carNo} and is_delete = 0 order by id desc limit 1
     </select>
 
 </mapper>

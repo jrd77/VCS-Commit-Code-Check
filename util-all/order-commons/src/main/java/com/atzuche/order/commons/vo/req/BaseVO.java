@@ -22,12 +22,8 @@ public class BaseVO implements Serializable {
 
     private static final long serialVersionUID = -7872969928507856739L;
 
-//    @AutoDocProperty(value = "【公用参数】请求id", required = true)
-//    @Length(max = 200, message = "requestId长度不能超过200")
-//    @NotBlank(message = "【公用参数】requestId不能为空")
-//    private String requestId;
 
-    @AutoDocProperty(value = "【公用参数】系统来源：当m站在下单前费用计算时传CREDITH5-ALIPAY或FUNDH5-ALIPAY来区分是否显示芝麻免押", hidden = true)
+    @AutoDocProperty(value = "【公用参数】系统来源：当m站在下单前费用计算时传CREDITH5-ALIPAY或FUNDH5-ALIPAY来区分是否显示芝麻免押")
     @Length(max = 200, message = "OS长度不能超过200")
     @JsonProperty(value = "OS")
     private String OS;
@@ -74,9 +70,6 @@ public class BaseVO implements Serializable {
     @Length(max = 200, message = "deviceName长度不能超过200")
     private String deviceName;
 
-    @AutoDocProperty(value = "【公用参数】用户token", hidden = true)
-    @Length(max = 200, message = "publicToken长度不能超过200")
-    private String publicToken;
 
     @AutoDocProperty(value = "【公用参数】app渠道id", hidden = true)
     @Length(max = 200, message = "AppChannelId长度不能超过200")
@@ -91,7 +84,8 @@ public class BaseVO implements Serializable {
     @AutoDocProperty(value = "【公用参数】安卓id,安卓需要组合mac,IMEI,androidID为唯一标识", hidden = true)
     private String androidID;
 
-    @AutoDocProperty(value = "【公用参数】用户注册号,拦截器里注入", hidden = true)
+    @AutoDocProperty(value = "【公用参数】用户注册号")
+    @NotBlank(message = "会员号不能为空")
     private String memNo;
 
     @JsonProperty(value = "schema")
@@ -183,13 +177,7 @@ public class BaseVO implements Serializable {
         this.deviceName = deviceName;
     }
 
-    public String getPublicToken() {
-        return publicToken;
-    }
 
-    public void setPublicToken(String publicToken) {
-        this.publicToken = publicToken;
-    }
 
     public String getAppChannelId() {
         return AppChannelId;
@@ -244,7 +232,6 @@ public class BaseVO implements Serializable {
                 ", publicCityCode='" + publicCityCode + '\'' +
                 ", appName='" + appName + '\'' +
                 ", deviceName='" + deviceName + '\'' +
-                ", publicToken='" + publicToken + '\'' +
                 ", AppChannelId='" + AppChannelId + '\'' +
                 ", mac='" + mac + '\'' +
                 ", androidID='" + androidID + '\'' +

@@ -3,8 +3,6 @@ package com.atzuche.order.cashieraccount.service;
 import java.util.List;
 import java.util.Objects;
 
-import com.atzuche.order.accountplatorm.entity.AccountPlatformProfitEntity;
-import com.atzuche.order.accountplatorm.service.notservice.AccountPlatformProfitNoTService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,8 +14,10 @@ import com.atzuche.order.accountownercost.service.AccountOwnerCostSettleService;
 import com.atzuche.order.accountownercost.service.notservice.AccountOwnerCostSettleDetailNoTService;
 import com.atzuche.order.accountownerincome.service.AccountOwnerIncomeService;
 import com.atzuche.order.accountplatorm.entity.AccountPlatformProfitDetailEntity;
+import com.atzuche.order.accountplatorm.entity.AccountPlatformProfitEntity;
 import com.atzuche.order.accountplatorm.entity.AccountPlatformSubsidyDetailEntity;
 import com.atzuche.order.accountplatorm.service.notservice.AccountPlatformProfitDetailNotService;
+import com.atzuche.order.accountplatorm.service.notservice.AccountPlatformProfitNoTService;
 import com.atzuche.order.accountplatorm.service.notservice.AccountPlatformSubsidyDetailNoTService;
 import com.atzuche.order.accountrenterclaim.entity.AccountRenterClaimCostSettleEntity;
 import com.atzuche.order.accountrenterclaim.service.notservice.AccountRenterClaimCostSettleNoTService;
@@ -37,8 +37,10 @@ import com.atzuche.order.accountrenterrentcost.service.notservice.AccountRenterC
 import com.atzuche.order.accountrenterrentcost.service.notservice.AccountRenterCostSettleNoTService;
 import com.atzuche.order.accountrenterrentcost.vo.req.AccountRenterCostDetailReqVO;
 import com.atzuche.order.accountrenterrentcost.vo.req.AccountRenterCostToFineReqVO;
+import com.atzuche.order.accountrenterwzdepost.entity.AccountRenterWzDepositCostSettleDetailEntity;
 import com.atzuche.order.accountrenterwzdepost.service.AccountRenterWzDepositCostService;
 import com.atzuche.order.accountrenterwzdepost.service.AccountRenterWzDepositService;
+import com.atzuche.order.accountrenterwzdepost.service.notservice.AccountRenterWzDepositCostSettleDetailNoTService;
 import com.atzuche.order.accountrenterwzdepost.service.notservice.AccountRenterWzDepositDetailNoTService;
 import com.atzuche.order.accountrenterwzdepost.service.notservice.AccountRenterWzDepositNoTService;
 import com.atzuche.order.accountrenterwzdepost.vo.req.RenterCancelWZDepositCostReqVO;
@@ -86,7 +88,9 @@ public class CashierSettleService {
     @Autowired private AccountRenterDetainCostNoTService accountRenterDetainCostNoTService;
     @Autowired private AccountRenterWzDepositDetailNoTService accountRenterWzDepositDetailNoTService;
     @Autowired private AccountRenterDepositDetailNoTService accountRenterDepositDetailNoTService;
-
+    
+    @Autowired
+    AccountRenterWzDepositCostSettleDetailNoTService accountRenterWzDepositCostSettleDetailNoTService;
 
     /**
      * 车辆结算
@@ -107,6 +111,14 @@ public class CashierSettleService {
         }
 
     }
+    
+    public void insertAccountRenterWzDepoistCostSettleDetails(List<AccountRenterWzDepositCostSettleDetailEntity> accountRenterWzDepositCostSettleDetails) {
+        if(!CollectionUtils.isEmpty(accountRenterWzDepositCostSettleDetails)){
+        	accountRenterWzDepositCostSettleDetailNoTService.insertAccountRenterWzDepositCostSettleDetails(accountRenterWzDepositCostSettleDetails);
+        }
+
+    }
+    
     public void insertAccountRenterCostSettleDetail(AccountRenterCostSettleDetailEntity entity) {
         if(Objects.nonNull(entity)){
             accountRenterCostSettleDetailNoTService.insertAccountRenterCostSettleDetail(entity);

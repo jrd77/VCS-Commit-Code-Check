@@ -41,7 +41,7 @@ public class ModifyOrderOwnerConfirmService {
 	 * @return ResponseData
 	 */
 	@Transactional(rollbackFor=Exception.class)
-	public ResponseData<?> modifyConfirm(ModifyApplyHandleReq modifyApplyHandleReq) {
+	public void modifyConfirm(ModifyApplyHandleReq modifyApplyHandleReq) {
 		log.info("ModifyOrderConfirmService.modifyConfirm modifyApplyHandleReq=[{}]", modifyApplyHandleReq);
 		if (modifyApplyHandleReq == null) {
 			log.error("ModifyOrderConfirmService.modifyConfirm车主处理修改申请报错参数为空");
@@ -68,6 +68,5 @@ public class ModifyOrderOwnerConfirmService {
 			// 拒绝
 			modifyOrderConfirmService.refuseModifyOrder(modifyConfirmDTO);
 		}
-		return ResponseData.success();
 	}
 }

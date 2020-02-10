@@ -16,8 +16,8 @@ import com.atzuche.order.commons.vo.res.cost.RenterOrderSubsidyDetailResVO;
 import com.atzuche.order.commons.vo.res.rentcosts.OrderConsoleSubsidyDetailEntity;
 import com.atzuche.order.commons.vo.res.rentcosts.OrderCouponEntity;
 import com.atzuche.order.commons.vo.res.rentcosts.OrderSupplementDetailEntity;
-import com.atzuche.order.commons.vo.res.rentcosts.RenterOrderCostDetailEntity;
 
+import com.atzuche.order.commons.vo.res.rentcosts.RenterOrderCostDetailEntity;
 import lombok.Data;
 
 /**

@@ -1,12 +1,12 @@
 package com.atzuche.order.coreapi.service;
 
+import com.atzuche.order.commons.LocalDateTimeUtils;
 import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
 import com.atzuche.order.commons.enums.*;
-import com.atzuche.order.commons.vo.req.AgreeOrderReqVO;
-import com.atzuche.order.commons.vo.req.OrderReqVO;
 import com.atzuche.order.commons.vo.req.RefuseOrderReqVO;
+import com.atzuche.order.coreapi.service.remote.CarRentalTimeApiProxyService;
+import com.atzuche.order.coreapi.service.remote.StockProxyService;
 import com.atzuche.order.delivery.service.delivery.DeliveryCarService;
-import com.atzuche.order.delivery.vo.delivery.CancelOrderDeliveryVO;
 import com.atzuche.order.flow.service.OrderFlowService;
 import com.atzuche.order.ownercost.entity.OwnerOrderEntity;
 import com.atzuche.order.ownercost.service.OwnerOrderService;
@@ -23,6 +23,8 @@ import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.atzuche.order.renterorder.service.OrderCouponService;
 import com.atzuche.order.renterorder.service.RenterOrderService;
 import com.atzuche.order.settle.service.OrderSettleService;
+import com.autoyol.car.api.model.dto.OwnerCancelDTO;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,7 +45,7 @@ public class OwnerRefuseOrderService {
     private static Logger logger = LoggerFactory.getLogger(OwnerRefuseOrderService.class);
 
     @Autowired
-    CarRentalTimeApiService carRentalTimeApiService;
+    CarRentalTimeApiProxyService carRentalTimeApiService;
     @Autowired
     RenterOrderService renterOrderService;
     @Autowired
@@ -59,7 +61,7 @@ public class OwnerRefuseOrderService {
     @Autowired
     CouponAndCoinHandleService couponAndCoinHandleService;
     @Autowired
-    StockService stockService;
+    StockProxyService stockService;
     @Autowired
     DeliveryCarService deliveryCarService;
     @Autowired
@@ -68,6 +70,8 @@ public class OwnerRefuseOrderService {
     OrderSettleService orderSettleService;
     @Autowired
     OrderFlowService orderFlowService;
+    @Autowired
+    RefuseOrderCheckService refuseOrderCheckService;
 
 
 
@@ -76,10 +80,9 @@ public class OwnerRefuseOrderService {
      *
      * @param reqVO 请求参数
      */
-    public void refuse(RefuseOrderReqVO reqVO) {
-        //TODO:车主拒绝前置校验
-
-
+    public void refuse(RefuseOrderReqVO reqVO, DispatcherReasonEnum dispatcherReason) {
+        //车主拒绝前置校验
+        refuseOrderCheckService.checkOwnerAgreeOrRefuseOrder(reqVO.getOrderNo(), StringUtils.isNotBlank(reqVO.getOperatorName()));
         //判断是都进入调度
         //获取订单信息
         OrderEntity orderEntity = orderService.getOrderEntity(reqVO.getOrderNo());
@@ -137,11 +140,13 @@ public class OwnerRefuseOrderService {
         orderFlowService.inserOrderStatusChangeProcessInfo(reqVO.getOrderNo(),
                 OrderStatusEnum.from(orderStatusDTO.getStatus()));
         ownerOrderService.updateChildStatusByOrderNo(reqVO.getOrderNo(), OwnerChildStatusEnum.END.getCode());
+        ownerOrderService.updateDispatchReasonByOrderNo(reqVO.getOrderNo(), dispatcherReason);
         //取消信息处理(order_cancel_reason)
         orderCancelReasonService.addOrderCancelReasonRecord(buildOrderCancelReasonEntity(reqVO.getOrderNo(), ownerOrderEntity.getOwnerOrderNo()));
-        //扣除库存
+        //释放库存(车主取消/拒绝时不释放库存)
         stockService.releaseCarStock(reqVO.getOrderNo(), goodsDetail.getCarNo());
-
+        //锁定车辆可租时间
+        stockService.ownerCancelStock(buildOwnerCancelDTO(reqVO.getOrderNo(), goodsDetail.getCarNo(), orderEntity));
         //TODO:发送车主拒绝事件
 
 
@@ -158,5 +163,15 @@ public class OwnerRefuseOrderService {
         return orderCancelReasonEntity;
     }
 
+    private OwnerCancelDTO buildOwnerCancelDTO(String orderNo,Integer carNo,OrderEntity orderEntity){
+        OwnerCancelDTO ownerCancelDTO = new OwnerCancelDTO();
+        ownerCancelDTO.setOrderNo(orderNo);
+        ownerCancelDTO.setCarNo(carNo);
+        ownerCancelDTO.setCityCode(Integer.valueOf(orderEntity.getCityCode()));
+        ownerCancelDTO.setSource(1);
+        ownerCancelDTO.setStartDate(LocalDateTimeUtils.localDateTimeToDate(orderEntity.getExpRentTime()));
+        ownerCancelDTO.setEndDate(LocalDateTimeUtils.localDateTimeToDate(orderEntity.getExpRevertTime()));
+        return ownerCancelDTO;
+    }
 
 }

@@ -1,6 +1,7 @@
 package com.atzuche.order.coreapi.controller;
 
 import com.alibaba.fastjson.JSON;
+import com.atzuche.order.commons.BindingResultUtil;
 import com.atzuche.order.commons.enums.DispatcherStatusEnum;
 import com.atzuche.order.commons.enums.PlatformCancelReasonEnum;
 import com.atzuche.order.commons.vo.req.AdminOrderCancelReqVO;
@@ -54,11 +55,7 @@ public class CancelOrderController {
     public ResponseData<?> cancelOrder(@Valid @RequestBody CancelOrderReqVO cancelOrderReqVO,
                                        BindingResult bindingResult) {
         LOGGER.info("Cancel order.param is,cancelOrderReqVO:[{}]", JSON.toJSONString(cancelOrderReqVO));
-        if (bindingResult.hasErrors()) {
-            Optional<FieldError> error = bindingResult.getFieldErrors().stream().findFirst();
-            return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), error.isPresent() ?
-                    error.get().getDefaultMessage() : ErrorCode.INPUT_ERROR.getText());
-        }
+        BindingResultUtil.checkBindingResult(bindingResult);
         cancelOrderService.cancel(cancelOrderReqVO);
         return ResponseData.success();
     }
@@ -68,11 +65,7 @@ public class CancelOrderController {
     public ResponseData<?> adminCancelOrder(@Valid @RequestBody AdminOrderCancelReqVO reqVO,
                                             BindingResult bindingResult) {
         LOGGER.info("User [{}] console cancel order.param is,reqVO:[{}]", reqVO.getOperator(), JSON.toJSONString(reqVO));
-        if (bindingResult.hasErrors()) {
-            Optional<FieldError> error = bindingResult.getFieldErrors().stream().findFirst();
-            return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), error.isPresent() ?
-                    error.get().getDefaultMessage() : ErrorCode.INPUT_ERROR.getText());
-        }
+        BindingResultUtil.checkBindingResult(bindingResult);
 
         platformCancelOrderService.cancel(reqVO.getOrderNo(), reqVO.getOperator(),
                 PlatformCancelReasonEnum.from(reqVO.getCancelType()));

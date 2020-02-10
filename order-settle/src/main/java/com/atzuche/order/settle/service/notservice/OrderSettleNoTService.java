@@ -24,6 +24,7 @@ import org.springframework.util.CollectionUtils;
 import com.atzuche.order.accountownercost.entity.AccountOwnerCostSettleDetailEntity;
 import com.atzuche.order.accountownerincome.vo.req.AccountOwnerIncomeExamineReqVO;
 import com.atzuche.order.accountplatorm.entity.AccountPlatformProfitDetailEntity;
+import com.atzuche.order.accountplatorm.entity.AccountPlatformProfitEntity;
 import com.atzuche.order.accountplatorm.entity.AccountPlatformSubsidyDetailEntity;
 import com.atzuche.order.accountrenterdeposit.vo.req.OrderCancelRenterDepositReqVO;
 import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostDetailEntity;
@@ -52,15 +53,33 @@ import com.atzuche.order.commons.enums.account.debt.DebtTypeEnum;
 import com.atzuche.order.commons.enums.cashcode.OwnerCashCodeEnum;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.commons.enums.cashier.OrderRefundStatusEnum;
+import com.atzuche.order.commons.enums.cashier.PaySourceEnum;
 import com.atzuche.order.commons.enums.cashier.PayTypeEnum;
 import com.atzuche.order.delivery.entity.OwnerHandoverCarInfoEntity;
 import com.atzuche.order.delivery.entity.RenterHandoverCarInfoEntity;
 import com.atzuche.order.delivery.enums.RenterHandoverCarTypeEnum;
+import com.atzuche.order.delivery.service.delivery.DeliveryCarInfoPriceService;
 import com.atzuche.order.delivery.service.handover.HandoverCarService;
+import com.atzuche.order.delivery.vo.delivery.DeliveryOilCostVO;
+import com.atzuche.order.delivery.vo.delivery.rep.OwnerGetAndReturnCarDTO;
+import com.atzuche.order.delivery.vo.delivery.rep.RenterGetAndReturnCarDTO;
 import com.atzuche.order.delivery.vo.handover.HandoverCarRepVO;
 import com.atzuche.order.delivery.vo.handover.HandoverCarReqVO;
 import com.atzuche.order.flow.service.OrderFlowService;
 import com.atzuche.order.owner.commodity.service.OwnerGoodsService;
+import com.atzuche.order.ownercost.entity.ConsoleOwnerOrderFineDeatailEntity;
+import com.atzuche.order.ownercost.entity.OwnerOrderEntity;
+import com.atzuche.order.ownercost.entity.OwnerOrderFineDeatailEntity;
+import com.atzuche.order.ownercost.entity.OwnerOrderIncrementDetailEntity;
+import com.atzuche.order.ownercost.entity.OwnerOrderPurchaseDetailEntity;
+import com.atzuche.order.ownercost.entity.OwnerOrderSubsidyDetailEntity;
+import com.atzuche.order.ownercost.service.ConsoleOwnerOrderFineDeatailService;
+import com.atzuche.order.ownercost.service.OwnerOrderCostCombineService;
+import com.atzuche.order.ownercost.service.OwnerOrderFineDeatailService;
+import com.atzuche.order.ownercost.service.OwnerOrderIncrementDetailService;
+import com.atzuche.order.ownercost.service.OwnerOrderPurchaseDetailService;
+import com.atzuche.order.ownercost.service.OwnerOrderService;
+import com.atzuche.order.ownercost.service.OwnerOrderSubsidyDetailService;
 import com.atzuche.order.parentorder.dto.OrderStatusDTO;
 import com.atzuche.order.parentorder.entity.OrderEntity;
 import com.atzuche.order.parentorder.entity.OrderStatusEntity;
@@ -74,7 +93,6 @@ import com.atzuche.order.rentercost.entity.RenterOrderFineDeatailEntity;
 import com.atzuche.order.rentercost.entity.RenterOrderSubsidyDetailEntity;
 import com.atzuche.order.rentercost.service.ConsoleRenterOrderFineDeatailService;
 import com.atzuche.order.rentercost.service.OrderConsoleSubsidyDetailService;
-import com.atzuche.order.rentercost.service.RenterOrderCostCombineService;
 import com.atzuche.order.rentercost.service.RenterOrderCostDetailService;
 import com.atzuche.order.rentercost.service.RenterOrderFineDeatailService;
 import com.atzuche.order.rentercost.service.RenterOrderSubsidyDetailService;
@@ -82,6 +100,7 @@ import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.atzuche.order.renterorder.service.OrderCouponService;
 import com.atzuche.order.renterorder.service.RenterOrderService;
 import com.atzuche.order.settle.exception.OrderSettleFlatAccountException;
+import com.atzuche.order.settle.service.OrderSettleNewService;
 import com.atzuche.order.settle.vo.req.AccountInsertDebtReqVO;
 import com.atzuche.order.settle.vo.req.OwnerCosts;
 import com.atzuche.order.settle.vo.req.RentCosts;
@@ -92,6 +111,7 @@ import com.atzuche.order.settle.vo.req.SettleOrdersDefinition;
 import com.atzuche.order.wallet.WalletProxyService;
 import com.autoyol.autopay.gateway.constant.DataPayKindConstant;
 import com.autoyol.doc.util.StringUtil;
+import com.autoyol.platformcost.model.FeeResult;
 
 import lombok.extern.slf4j.Slf4j;
 //
@@ -1411,6 +1431,9 @@ public class OrderSettleNoTService {
         rentCosts.setConsoleRenterOrderFineDeatails(consoleRenterOrderFineDeatails);
         settleOrders.setRentCosts(rentCosts);
     }
+
+
+
 
     /**
      * 查询所有车主罚金明细

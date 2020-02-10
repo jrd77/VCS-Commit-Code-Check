@@ -7,8 +7,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.beanutils.BeanUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 
 import com.atzuche.order.cashieraccount.entity.CashierEntity;
@@ -32,13 +33,13 @@ public class PaymentCashierService {
 	 * @throws InvocationTargetException 
 	 * @throws IllegalAccessException 
 	 */
-	public List<CashierResVO> queryPaymentList(String orderNo) throws Exception {
+	public List<CashierResVO> queryPaymentList(String orderNo)  {
 		List<CashierResVO> lstRet = new ArrayList<CashierResVO>();
 		List<CashierEntity> lst = cashierService.getCashierRentCostsByOrderNo(orderNo);
 		for (CashierEntity cashierEntity : lst) {
 			CashierResVO vo = new CashierResVO();
 			//数据转换
-			BeanUtils.copyProperties(vo, cashierEntity);
+			BeanUtils.copyProperties(cashierEntity,vo);
 			lstRet.add(vo);
 		}
 		return lstRet;

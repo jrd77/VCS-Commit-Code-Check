@@ -9,7 +9,7 @@ import com.atzuche.order.photo.dto.PhotoPathDTO;
 import com.atzuche.order.photo.enums.UserTypeEnum;
 import com.atzuche.order.photo.mapper.OrderPhotoMapper;
 import com.atzuche.order.photo.mq.AliyunMnsService;
-import com.atzuche.order.photo.util.oss.SysConf;
+import com.atzuche.order.photo.util.SysConfig;
 import com.atzuche.order.photo.util.oss.OSSUtils;
 import com.atzuche.order.photo.vo.req.OrderUpdateRequestVO;
 import com.atzuche.order.photo.vo.resp.OrderViolationPhotoResponseVO;
@@ -139,7 +139,7 @@ public class OrderPhotoService {
 				}
 				transIllegalPhotoBo.setImagePath(photoPathList);
 				//发送缴纳凭证MQ
-				aliyunMnsService.asyncSend̨MessageToQueue(JsonUtil.toJson(transIllegalPhotoBo), SysConf.MQ_AUTO_RENTER_VOUCHER_QUEUE,true);
+				aliyunMnsService.asyncSend̨MessageToQueue(JsonUtil.toJson(transIllegalPhotoBo), SysConfig.voucherQueue,true);
 			}
 			logger.info("发送违章凭证到仁云流程系统-结束");
 		}catch (Exception e){
