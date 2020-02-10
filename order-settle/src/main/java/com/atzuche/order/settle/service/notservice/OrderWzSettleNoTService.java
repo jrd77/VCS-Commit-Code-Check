@@ -883,6 +883,7 @@ public class OrderWzSettleNoTService {
                     accountRenterCostSettleDetail.setCostDetail(renterOrderCostDetail.getCostDesc());
                     accountRenterCostSettleDetail.setUniqueNo(String.valueOf(renterOrderCostDetail.getId()));
                     accountRenterCostSettleDetail.setAmt(renterOrderCostDetail.getTotalAmount());
+                    accountRenterCostSettleDetail.setId(null);
                     accountRenterCostSettleDetails.add(accountRenterCostSettleDetail);
                     // 租车费用
                     orderSettleNewService.addRentCostToPlatformAndOwner(renterOrderCostDetail,settleOrdersDefinition);
