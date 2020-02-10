@@ -1131,6 +1131,7 @@ public class OrderSettleNoTService {
                 settleOrdersAccount.setDepositSurplusAmt(settleOrdersAccount.getDepositSurplusAmt() + amt);
                 // 实付费用加上 押金已抵扣部分
                 settleOrdersAccount.setRentCostPayAmt(settleOrdersAccount.getRentCostPayAmt() + Math.abs(amt));
+                //更新订单费用处数据
                 callBack.callBackSettle(settleOrders.getOrderNo(),settleOrders.getRenterOrderNo());
             }
         }
@@ -1157,6 +1158,8 @@ public class OrderSettleNoTService {
             cashierSettleService.insertAccountRenterCostSettleDetail(entity);
             // 实付费用加上 历史欠款转移部分，存在欠款 1走历史欠款，2当前订单 账户拉平
             settleOrdersAccount.setRentCostPayAmt(settleOrdersAccount.getRentCostPayAmt() + Math.abs(amt));
+            //更新订单费用处数据
+            callBack.callBackSettle(settleOrders.getOrderNo(),settleOrders.getRenterOrderNo());
         }
     }
 
