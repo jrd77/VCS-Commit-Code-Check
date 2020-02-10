@@ -316,7 +316,7 @@ public class OrderSettleNewService {
     public void addGpsCostAmtToPlatform(OwnerOrderPurchaseDetailEntity renterOrderCostDetail, SettleOrdersDefinition settleOrdersDefinition) {
         int totalAmount = renterOrderCostDetail.getTotalAmount();
         AccountPlatformProfitDetailEntity accountPlatformProfitDetail = new AccountPlatformProfitDetailEntity();
-        accountPlatformProfitDetail.setAmt(-totalAmount);
+        accountPlatformProfitDetail.setAmt(totalAmount);
         accountPlatformProfitDetail.setSourceCode(OwnerCashCodeEnum.ACCOUNT_OWNER_GPS_COST.getCashNo());
         accountPlatformProfitDetail.setSourceDesc(OwnerCashCodeEnum.ACCOUNT_OWNER_GPS_COST.getTxt());
         accountPlatformProfitDetail.setUniqueNo(String.valueOf(renterOrderCostDetail.getId()));

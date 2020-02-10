@@ -1,11 +1,14 @@
 package com.atzuche.order.owner.commodity.service;
 
+import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.entity.dto.OwnerGoodsDetailDTO;
 import com.atzuche.order.commons.entity.dto.OwnerGoodsPriceDetailDTO;
 import com.atzuche.order.owner.commodity.entity.OwnerGoodsEntity;
 import com.atzuche.order.owner.commodity.entity.OwnerGoodsPriceDetailEntity;
 import com.atzuche.order.owner.commodity.mapper.OwnerGoodsMapper;
 import com.atzuche.order.owner.commodity.mapper.OwnerGoodsPriceDetailMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,6 +25,9 @@ import java.util.List;
  */
 @Service
 public class OwnerGoodsService{
+
+    private static Logger logger = LoggerFactory.getLogger(OwnerGoodsService.class);
+
     @Autowired
     private OwnerGoodsMapper ownerGoodsMapper;
     @Autowired
@@ -32,9 +38,11 @@ public class OwnerGoodsService{
      * @param ownerGoodsDetailDTO
      */
     public void save(OwnerGoodsDetailDTO ownerGoodsDetailDTO){
+        logger.info("Save owner goods detail.param is,ownerGoodsDetailDTO:[{}]", JSON.toJSONString(ownerGoodsDetailDTO));
 
         OwnerGoodsEntity goodsEntity = new OwnerGoodsEntity();
         BeanUtils.copyProperties(ownerGoodsDetailDTO,goodsEntity);
+        goodsEntity.setChoiceCar(ownerGoodsDetailDTO.isChoiceCar() ? 1 : 0);
         ownerGoodsMapper.insert(goodsEntity);
 
         List<OwnerGoodsPriceDetailDTO> goodsPriceDetailDtoList = ownerGoodsDetailDTO.getOwnerGoodsPriceDetailDTOList();

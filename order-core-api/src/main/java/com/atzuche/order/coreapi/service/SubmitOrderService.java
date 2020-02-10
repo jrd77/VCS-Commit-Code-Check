@@ -173,7 +173,7 @@ public class SubmitOrderService {
         RenterGoodsDetailDTO renterGoodsDetailDTO = context.getRenterGoodsDetailDto();
         renterGoodsDetailDTO.setOrderNo(orderNo);
         renterGoodsDetailDTO.setRenterOrderNo(renterOrderNo);
-        renterGoodsService.save(context.getRenterGoodsDetailDto());
+        renterGoodsService.save(renterGoodsDetailDTO);
 
         //4.5.租客信息处理
         //4.6.租客权益信息处理
@@ -386,7 +386,7 @@ public class SubmitOrderService {
         orderSourceStatDTO.setDevice(orderReqVO.getDeviceName());
         orderSourceStatDTO.setUseAutoCoin(orderReqVO.getUseAutoCoin());
         orderSourceStatDTO.setSpecialConsole(orderReqVO.getSpecialConsole()==null?0:Integer.valueOf(orderReqVO.getSpecialConsole()));
-
+        orderSourceStatDTO.setReqSource(null == orderReqVO.getReqSource() ? null : orderReqVO.getReqSource().toString());
         LOGGER.info("Build order source stat dto,result is ,orderSourceStatDTO:[{}]", JSON.toJSONString(orderSourceStatDTO));
         return orderSourceStatDTO;
     }
@@ -455,7 +455,7 @@ public class SubmitOrderService {
         ownerOrderSubsidyDetailEntity.setSubsidySourceName(SubsidySourceCodeEnum.OWNER.getDesc());
 
         ownerOrderSubsidyDetailEntity.setSubsidyTargetCode(SubsidySourceCodeEnum.RENTER.getCode());
-        ownerOrderSubsidyDetailEntity.setSubsidyTypeName(SubsidySourceCodeEnum.RENTER.getDesc());
+        ownerOrderSubsidyDetailEntity.setSubsidyTargetName(SubsidySourceCodeEnum.RENTER.getDesc());
         ownerOrderSubsidyDetailEntity.setSubsidyCostCode(RenterCashCodeEnum.OWNER_COUPON_OFFSET_COST.getCashNo());
         ownerOrderSubsidyDetailEntity.setSubsidyCostName(RenterCashCodeEnum.OWNER_COUPON_OFFSET_COST.getTxt());
         ownerOrderSubsidyDetailEntity.setSubsidyDesc("使用车主券抵扣租金");
