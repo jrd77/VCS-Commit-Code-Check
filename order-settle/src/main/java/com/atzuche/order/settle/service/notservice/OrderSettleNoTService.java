@@ -15,6 +15,7 @@ import com.atzuche.order.delivery.vo.delivery.rep.OwnerGetAndReturnCarDTO;
 import com.atzuche.order.delivery.vo.delivery.rep.RenterGetAndReturnCarDTO;
 import com.atzuche.order.ownercost.entity.*;
 import com.atzuche.order.ownercost.service.*;
+import com.atzuche.order.settle.vo.req.*;
 import com.autoyol.platformcost.model.FeeResult;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -101,13 +102,6 @@ import com.atzuche.order.renterorder.service.OrderCouponService;
 import com.atzuche.order.renterorder.service.RenterOrderService;
 import com.atzuche.order.settle.exception.OrderSettleFlatAccountException;
 import com.atzuche.order.settle.service.OrderSettleNewService;
-import com.atzuche.order.settle.vo.req.AccountInsertDebtReqVO;
-import com.atzuche.order.settle.vo.req.OwnerCosts;
-import com.atzuche.order.settle.vo.req.RentCosts;
-import com.atzuche.order.settle.vo.req.SettleCancelOrdersAccount;
-import com.atzuche.order.settle.vo.req.SettleOrders;
-import com.atzuche.order.settle.vo.req.SettleOrdersAccount;
-import com.atzuche.order.settle.vo.req.SettleOrdersDefinition;
 import com.atzuche.order.wallet.WalletProxyService;
 import com.autoyol.autopay.gateway.constant.DataPayKindConstant;
 import com.autoyol.doc.util.StringUtil;
@@ -362,13 +356,13 @@ public class OrderSettleNoTService {
                 if(RenterHandoverCarTypeEnum.OWNER_TO_RENTER.getValue().equals(renterHandoverCarInfo.getType())
                         ||  RenterHandoverCarTypeEnum.RENYUN_TO_RENTER.getValue().equals(renterHandoverCarInfo.getType())
                 ){
-                    mileageAmtDTO.setReturnMileage(Objects.isNull(renterHandoverCarInfo.getMileageNum())?0:renterHandoverCarInfo.getOilNum());
+                    mileageAmtDTO.setGetmileage(Objects.isNull(renterHandoverCarInfo.getMileageNum())?0:renterHandoverCarInfo.getMileageNum());
                 }
 
                 if(RenterHandoverCarTypeEnum.RENTER_TO_OWNER.getValue().equals(renterHandoverCarInfo.getType())
                         ||  RenterHandoverCarTypeEnum.RENTER_TO_RENYUN.getValue().equals(renterHandoverCarInfo.getType())
                 ){
-                    mileageAmtDTO.setGetmileage(Objects.isNull(renterHandoverCarInfo.getMileageNum())?0:renterHandoverCarInfo.getOilNum());
+                    mileageAmtDTO.setReturnMileage(Objects.isNull(renterHandoverCarInfo.getMileageNum())?0:renterHandoverCarInfo.getMileageNum());
 
                 }
             }
@@ -752,8 +746,9 @@ public class OrderSettleNoTService {
                 accountOwnerCostSettleDetail.setSourceCode(OwnerCashCodeEnum.ACCOUNT_OWNER_GPS_COST.getCashNo());
                 accountOwnerCostSettleDetail.setSourceDetail(OwnerCashCodeEnum.ACCOUNT_OWNER_GPS_COST.getTxt());
                 accountOwnerCostSettleDetail.setUniqueNo(String.valueOf(renterOrderCostDetail.getId()));
+                //gps返回正数  车主取负
                 int amt = Objects.isNull(renterOrderCostDetail.getTotalAmount())?0:renterOrderCostDetail.getTotalAmount();
-                accountOwnerCostSettleDetail.setAmt(amt);
+                accountOwnerCostSettleDetail.setAmt(-amt);
                 accountOwnerCostSettleDetail.setUniqueNo(String.valueOf(renterOrderCostDetail.getId()));
                 accountOwnerCostSettleDetails.add(accountOwnerCostSettleDetail);
                 // 获取gps服务费 费用平台端冲账
@@ -916,6 +911,7 @@ public class OrderSettleNoTService {
                     accountRenterCostSettleDetail.setCostDetail(renterOrderCostDetail.getCostDesc());
                     accountRenterCostSettleDetail.setUniqueNo(String.valueOf(renterOrderCostDetail.getId()));
                     accountRenterCostSettleDetail.setAmt(renterOrderCostDetail.getTotalAmount());
+                    accountRenterCostSettleDetail.setId(null);
                     accountRenterCostSettleDetails.add(accountRenterCostSettleDetail);
                     // 租车费用
                     orderSettleNewService.addRentCostToPlatformAndOwner(renterOrderCostDetail,settleOrdersDefinition);
@@ -930,7 +926,8 @@ public class OrderSettleNoTService {
                 accountRenterCostSettleDetail.setCostDetail(RenterCashCodeEnum.ACCOUNT_RENTER_DELIVERY_OIL_COST.getTxt());
                 String oilDifferenceCrash = oilAmt.getOilDifferenceCrash();
                 oilDifferenceCrash = StringUtil.isBlank(oilDifferenceCrash)?"0":oilDifferenceCrash;
-                accountRenterCostSettleDetail.setAmt(Integer.valueOf(oilDifferenceCrash));
+                // 兼容小数 小数部分舍弃 例如1.9 =》1
+                accountRenterCostSettleDetail.setAmt(Double.valueOf(oilDifferenceCrash).intValue());
                 accountRenterCostSettleDetail.setMemNo(settleOrders.getRenterMemNo());
                 accountRenterCostSettleDetail.setOrderNo(settleOrders.getOrderNo());
                 accountRenterCostSettleDetail.setRenterOrderNo(settleOrders.getRenterOrderNo());
@@ -1216,7 +1213,8 @@ public class OrderSettleNoTService {
             //退还租车费用
             if(rentCostSurplusAmt>0){
                 //退还剩余 租车费用
-                List<CashierRefundApplyReqVO> cashierRefundApplyReqs = getCancelCashierRefundApply(settleOrders,-rentCostSurplusAmt);
+                RefundApplyVO refundApplyVO = new RefundApplyVO(settleOrders,-rentCostSurplusAmt,RenterCashCodeEnum.ACCOUNT_RENTER_RENT_COST_REFUND,"结算订单退还");
+                List<CashierRefundApplyReqVO> cashierRefundApplyReqs = getCashierRefundApply(refundApplyVO);
                 if(!CollectionUtils.isEmpty(cashierRefundApplyReqs)){
                     for(int i=0;i<cashierRefundApplyReqs.size();i++){
                         CashierRefundApplyReqVO cashierRefundApplyReq = cashierRefundApplyReqs.get(i);
@@ -1700,7 +1698,8 @@ public class OrderSettleNoTService {
         //3 租车费用 退还
         if(settleCancelOrdersAccount.getRentSurplusCostAmt()>0){
             //退还剩余 租车费用
-            List<CashierRefundApplyReqVO> cashierRefundApplyReqs = getCancelCashierRefundApply(settleOrders,-settleCancelOrdersAccount.getRentSurplusCostAmt());
+            RefundApplyVO refundApplyVO = new RefundApplyVO(settleOrders,-settleCancelOrdersAccount.getRentSurplusCostAmt(),RenterCashCodeEnum.CANCEL_RENT_COST_TO_RETURN_AMT,"取消订单退还");
+            List<CashierRefundApplyReqVO> cashierRefundApplyReqs = getCashierRefundApply(refundApplyVO);
             if(!CollectionUtils.isEmpty(cashierRefundApplyReqs)){
                 for(int i=0;i<cashierRefundApplyReqs.size();i++){
                     cashierService.refundRentCost(cashierRefundApplyReqs.get(i));
@@ -1743,40 +1742,40 @@ public class OrderSettleNoTService {
         }
     }
 
-    /**
+     /**
      *   返回可退还租车费用
-     * @param settleOrders
-     * @param refundAmt
+     * @param refundApplyVO
      * @return
      */
-    private List<CashierRefundApplyReqVO> getCancelCashierRefundApply(SettleOrders settleOrders, int refundAmt) {
+    private List<CashierRefundApplyReqVO> getCashierRefundApply(RefundApplyVO refundApplyVO) {
+        int refundAmt = refundApplyVO.getRefundAmt();
         List<CashierRefundApplyReqVO> cashierRefundApplys = new ArrayList<>();
         //1 租车费用
-        CashierEntity cashierEntity = cashierNoTService.getCashierEntity(settleOrders.getOrderNo(),settleOrders.getRenterMemNo(), DataPayKindConstant.RENT_AMOUNT);
+        CashierEntity cashierEntity = cashierNoTService.getCashierEntity(refundApplyVO.getSettleOrders().getOrderNo(),refundApplyVO.getSettleOrders().getRenterMemNo(), DataPayKindConstant.RENT_AMOUNT);
         if(Objects.nonNull(cashierEntity) && Objects.nonNull(cashierEntity.getId()) && refundAmt<0){
             CashierRefundApplyReqVO vo = new CashierRefundApplyReqVO();
             BeanUtils.copyProperties(cashierEntity,vo);
             vo.setFlag(RenterCashCodeEnum.ACCOUNT_RENTER_RENT_COST.getCashNo());
-            vo.setRenterCashCodeEnum(RenterCashCodeEnum.CANCEL_RENT_COST_TO_RETURN_AMT);
+            vo.setRenterCashCodeEnum(refundApplyVO.getRenterCashCodeEnum());
             vo.setPaySource(PaySourceEnum.getFlagText(cashierEntity.getPaySource()));
             vo.setPayType(PayTypeEnum.getFlagText(cashierEntity.getPayType()));
-            vo.setRemake("取消订单退还");
+            vo.setRemake(refundApplyVO.getRemarke());
             int amt = refundAmt + cashierEntity.getPayAmt();
             vo.setAmt(amt>=0?refundAmt:-cashierEntity.getPayAmt());
             cashierRefundApplys.add(vo);
             refundAmt = refundAmt + cashierEntity.getPayAmt();
         }
         if(refundAmt<0){
-            List<CashierEntity> cashierEntitys = cashierNoTService.getCashierEntitys(settleOrders.getOrderNo(),settleOrders.getRenterMemNo(), DataPayKindConstant.RENT_INCREMENT);
+            List<CashierEntity> cashierEntitys = cashierNoTService.getCashierEntitys(refundApplyVO.getSettleOrders().getOrderNo(),refundApplyVO.getSettleOrders().getRenterMemNo(), DataPayKindConstant.RENT_INCREMENT);
             if(CollectionUtils.isEmpty(cashierEntitys)){
                 for(int i=0;i<cashierEntitys.size();i++){
                     if(refundAmt<0){
                         CashierRefundApplyReqVO vo = new CashierRefundApplyReqVO();
                         BeanUtils.copyProperties(cashierEntity,vo);
                         vo.setFlag(RenterCashCodeEnum.ACCOUNT_RENTER_RENT_COST.getCashNo());
-                        vo.setRenterCashCodeEnum(RenterCashCodeEnum.CANCEL_RENT_COST_TO_RETURN_AMT);
+                        vo.setRenterCashCodeEnum(refundApplyVO.getRenterCashCodeEnum());
                         vo.setPaySource(PaySourceEnum.getFlagText(cashierEntity.getPaySource()));
-                        vo.setRemake("取消订单退还");
+                        vo.setRemake(refundApplyVO.getRemarke());
                         int amt = refundAmt + cashierEntity.getPayAmt();
                         vo.setAmt(amt>=0?refundAmt:-cashierEntity.getPayAmt());
                         cashierRefundApplys.add(vo);
@@ -1864,9 +1863,6 @@ public class OrderSettleNoTService {
      * @param renterOrderSubsidyDetails 租客补贴 列表
      */
     public void settleUndoCoupon(String orderNo,List<RenterOrderSubsidyDetailEntity> renterOrderSubsidyDetails) {
-//        isUndoCoupon          是否撤销平台优惠券
-//        isUndoGetCarFeeCoupon 是否撤销送取服务券
-//        isUndoOwnerCoupon     是否撤销车主券
         boolean isUndoCoupon=false;
         boolean isUndoGetCarFeeCoupon=false;
         boolean isUndoOwnerCoupon=false;

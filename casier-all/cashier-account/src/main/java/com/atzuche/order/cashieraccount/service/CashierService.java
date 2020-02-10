@@ -292,12 +292,14 @@ public class CashierService {
         cashierDeductDebtReq.check();
         //1 查询历史总欠款
         int debtAmt = accountDebtService.getAccountDebtNumByMemNo(cashierDeductDebtReq.getMemNo());
-        if(debtAmt<=0){
+        if(debtAmt>=0){
             return null;
         }
         //2 抵扣
         AccountDeductDebtReqVO accountDeductDebt = new AccountDeductDebtReqVO();
         BeanUtils.copyProperties(cashierDeductDebtReq,accountDeductDebt);
+        accountDeductDebt.setSourceCode(cashierDeductDebtReq.getRenterCashCodeEnum().getCashNo());
+        accountDeductDebt.setSourceDetail(cashierDeductDebtReq.getRenterCashCodeEnum().getTxt());
         //真实抵扣金额 正值
         int debtedAmt = accountDebtService.deductDebt(accountDeductDebt);
         //3 记录车主结算费用总额 及 车主费用结算明细表
