@@ -214,7 +214,7 @@ public class MemProxyService {
         ownerMemberDto.setRealName(memberCoreInfo.getRealName());
         ownerMemberDto.setNickName(memberCoreInfo.getNickName());
         ownerMemberDto.setOrderSuccessCount(memberStatisticsInfo.getSuccessOrderNum());
-        //ownerMemberDto.setMemType();
+//        ownerMemberDto.setMemType();
         List<OwnerMemberRightDTO> rights = new ArrayList<>();
         MemberRoleInfo memberRoleInfo = memberTotalInfo.getMemberRoleInfo();
 
