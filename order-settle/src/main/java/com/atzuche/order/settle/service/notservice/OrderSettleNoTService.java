@@ -1131,7 +1131,10 @@ public class OrderSettleNoTService {
                 // 实付费用加上 押金已抵扣部分
                 settleOrdersAccount.setRentCostPayAmt(settleOrdersAccount.getRentCostPayAmt() + Math.abs(amt));
                 //更新订单费用处数据
-                callBack.callBackSettle(settleOrders.getOrderNo(),settleOrders.getRenterOrderNo());
+                if(Objects.nonNull(callBack)){
+                    callBack.callBackSettle(settleOrders.getOrderNo(),settleOrders.getRenterOrderNo());
+                }
+
             }
         }
         //2如果 步骤1 结算 应付还是大于实付  此订单产生历史欠款
@@ -1158,7 +1161,9 @@ public class OrderSettleNoTService {
             // 实付费用加上 历史欠款转移部分，存在欠款 1走历史欠款，2当前订单 账户拉平
             settleOrdersAccount.setRentCostPayAmt(settleOrdersAccount.getRentCostPayAmt() + Math.abs(amt));
             //更新订单费用处数据
-            callBack.callBackSettle(settleOrders.getOrderNo(),settleOrders.getRenterOrderNo());
+            if(Objects.nonNull(callBack)){
+                callBack.callBackSettle(settleOrders.getOrderNo(),settleOrders.getRenterOrderNo());
+            }
         }
     }
 

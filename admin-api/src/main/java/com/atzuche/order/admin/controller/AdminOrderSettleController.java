@@ -1,6 +1,5 @@
 package com.atzuche.order.admin.controller;
 
-import com.atzuche.order.coreapi.service.OrderSettle;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,8 +22,6 @@ public class AdminOrderSettleController {
 	private OrderSettleService orderSettleService;
 	@Autowired
 	private OrderWzSettleService orderWzSettleService;
-	@Autowired private OrderSettle orderSettle;
-
 
     /**
      * 手动车辆结算接口
@@ -35,7 +32,7 @@ public class AdminOrderSettleController {
     @GetMapping("/deposit")
     public ResponseData<String> settleDeposit(@RequestParam("orderNo") String orderNo) {
         log.info("OrderSettleController settleDeposit start param [{}]", orderNo);
-        orderSettle.settleOrder(orderNo);
+        orderSettleService.settleOrder(orderNo,null);
         log.info("CashierController getOrderPayableAmount end param [{}],result [{}]");
         return ResponseData.success();
     }
