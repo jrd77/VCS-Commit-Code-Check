@@ -67,7 +67,7 @@ public class RenterCancelOrderService {
      * @return CancelOrderResDTO 返回信息
      */
     @Transactional(rollbackFor = Exception.class)
-    public CancelOrderResDTO cancel(String orderNo, String cancelReason) {
+    public CancelOrderResDTO cancel(String orderNo, String cancelReason, boolean isConsoleInvoke) {
         //todo 校验
 
         //获取租客订单信息
