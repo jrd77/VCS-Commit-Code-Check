@@ -33,6 +33,7 @@
         <result property="updateOp" column="update_op"/>
         <result property="isDelete" column="is_delete"/>
         <result property="changeSource" column="change_source"/>
+        <result property="changeReason" column="change_reason"/>
     </resultMap>
 
 
@@ -65,6 +66,7 @@
 	`update_op`, 	
 	`is_delete`,
 	`change_source`,
+	`change_reason`,
 	`req_accept_time`
 	</sql>
 
@@ -158,6 +160,7 @@
             <if test="isEffective != null">`is_effective`, </if>
             <if test="isUseSpecialPrice != null">`is_use_special_price`, </if>
             <if test="changeSource != null">`change_source`, </if>
+            <if test="changeReason != null">`change_reason`, </if>
             <if test="isCancle != null">`is_cancle`, </if>
             <if test="reqAcceptTime != null">`req_accept_time`, </if>
             <if test="createOp != null">`create_op`, </if>
@@ -185,6 +188,7 @@
             <if test="isEffective != null">#{isEffective},  </if>
             <if test="isUseSpecialPrice != null">#{isUseSpecialPrice},  </if>
             <if test="changeSource != null">#{changeSource},  </if>
+            <if test="changeReason != null">#{changeReason},  </if>
             <if test="isCancle != null">#{isCancle},  </if>
             <if test="reqAcceptTime != null">#{reqAcceptTime},  </if>
             <if test="createOp != null">#{createOp},  </if>
