@@ -65,7 +65,7 @@ public class DeliveryCarInfoPriceService {
     /**
      * 根据类型获取所在城市的油价
      */
-    public Double getOilPriceByCityCodeAndType(Integer cityCode, Integer type) {
+    public Integer getOilPriceByCityCodeAndType(Integer cityCode, Integer type) {
 
         //目前获取到的EngineType全部为0  没有区分 所以暂时写死
         List<OilAverageCostEntity> oilAverageCostEntityList = oilAverageCostConfigSDK.getConfig(DeliveryCarInfoConfigContext.builder().build());
@@ -79,9 +79,9 @@ public class DeliveryCarInfoPriceService {
         int molecule = oilAverageCostEntity.getMolecule();
         int denominator = oilAverageCostEntity.getDenominator();
         if (denominator == 0) {
-           return  0d;
+           return  0;
         } else {
-            return MathUtil.div(molecule, denominator, 2);
+            return Integer.valueOf(String.valueOf(MathUtil.div(molecule, denominator, 0)));
         }
     }
 
