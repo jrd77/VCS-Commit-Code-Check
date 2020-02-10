@@ -1,8 +1,10 @@
 package com.atzuche.order.coreapi.service;
 
 import com.atzuche.order.commons.constant.OrderConstant;
+import com.atzuche.order.commons.enums.CarOwnerTypeEnum;
 import com.atzuche.order.commons.enums.OrderStatusEnum;
 import com.atzuche.order.coreapi.submitOrder.exception.CancelOrderCheckException;
+import com.atzuche.order.coreapi.submitOrder.exception.RefuseOrderCheckException;
 import com.atzuche.order.parentorder.entity.OrderStatusEntity;
 import com.atzuche.order.parentorder.service.OrderStatusService;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
@@ -73,16 +75,46 @@ public class CancelOrderCheckService {
     }
 
 
-    public void checkOwnerCancelOrder(OrderStatusEntity orderStatusEntity) {
+    /**
+     * 车主取消校验
+     *
+     * @param orderStatusEntity 订单状态信息
+     * @param carOwnerType 车辆类型
+     * @param isConsoleInvoke 是否是管理后台请求操作:true,是 false,否
+     */
+    public void checkOwnerCancelOrder(OrderStatusEntity orderStatusEntity,Integer carOwnerType,boolean isConsoleInvoke) {
 
         if(null != orderStatusEntity) {
-            //待调度的订单不能车主取消
-            if (null != orderStatusEntity.getStatus() && OrderStatusEnum.TO_DISPATCH.getStatus() == orderStatusEntity.getStatus()) {
-                throw new CancelOrderCheckException(ErrorCode.DISPATCHING_ORDER_STATUS_NOT_ALLOWED);
+            if (null != orderStatusEntity.getStatus()) {
+
+                //待确认的订单不能车主取消
+                if(OrderStatusEnum.TO_CONFIRM.getStatus() == orderStatusEntity.getStatus()) {
+                    throw new CancelOrderCheckException(ErrorCode.ORDER_STATUS_NOT_ALLOWED);
+                }
+
+                //待调度的订单不能车主取消
+                if(OrderStatusEnum.TO_DISPATCH.getStatus() == orderStatusEntity.getStatus()) {
+                    throw new CancelOrderCheckException(ErrorCode.DISPATCHING_ORDER_STATUS_NOT_ALLOWED);
+                }
             }
         } else {
             throw new CancelOrderCheckException(ErrorCode.ORDER_NOT_EXIST);
         }
+
+        if(!isConsoleInvoke) {
+            if(null != carOwnerType) {
+                logger.error("Car owner type is :[{}]", carOwnerType);
+                if(carOwnerType == CarOwnerTypeEnum.F.getCode()) {
+                    throw new RefuseOrderCheckException(ErrorCode.MANAGED_CAR_CAN_NOT_OPT_TRANS);
+                } else if (carOwnerType == CarOwnerTypeEnum.G.getCode()) {
+                    throw new RefuseOrderCheckException(ErrorCode.PROXY_CAR_CAN_NOT_OPT_TRANS);
+                }
+            } else {
+                logger.warn("Car owner type is empty. ");
+            }
+        }
+
+
     }
 
 }
