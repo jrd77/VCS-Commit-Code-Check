@@ -9,6 +9,7 @@ import com.dianping.cat.Cat;
 import com.dianping.cat.message.Transaction;
 import com.xxl.job.core.biz.model.ReturnT;
 import com.xxl.job.core.handler.IJobHandler;
+import com.xxl.job.core.handler.annotation.JobHandler;
 import com.xxl.job.core.log.XxlJobLogger;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
@@ -25,7 +26,8 @@ import java.util.List;
  * @author shisong
  * @date 2020/1/15
  */
-@Component("revertCar4HoursTask")
+@Component
+@JobHandler("revertCar4HoursTask")
 public class RevertCar4HoursAutoSettleTask extends IJobHandler{
 
     private Logger logger = LoggerFactory.getLogger(RevertCar4HoursAutoSettleTask.class);

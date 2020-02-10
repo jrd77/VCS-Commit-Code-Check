@@ -12,6 +12,7 @@ import com.dianping.cat.Cat;
 import com.dianping.cat.message.Transaction;
 import com.xxl.job.core.biz.model.ReturnT;
 import com.xxl.job.core.handler.IJobHandler;
+import com.xxl.job.core.handler.annotation.JobHandler;
 import com.xxl.job.core.log.XxlJobLogger;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
@@ -27,7 +28,8 @@ import java.util.List;
  *
  * @date 2020/1/3
  */
-@Component("orderRefundTask")
+@Component
+@JobHandler("orderRefundTask")
 public class OrderRefundTask extends IJobHandler {
 
     private Logger logger = LoggerFactory.getLogger(OrderRefundTask.class);
