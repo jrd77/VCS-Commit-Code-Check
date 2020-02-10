@@ -1,5 +1,6 @@
 package com.atzuche.order.settle.service;
 
+import com.atzuche.order.commons.service.OrderPayCallBack;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -57,7 +58,7 @@ public class OrderSettleService{
      * 车辆押金结算
      * 先注释调事务
      */
-    public void settleOrder(String orderNo,OrderPayCallBack callBack) {
+    public void settleOrder(String orderNo, OrderPayCallBack callBack) {
         log.info("OrderSettleService settleOrder orderNo [{}]",orderNo);
         Transaction t = Cat.getProducer().newTransaction(CatConstants.FEIGN_CALL, "车俩结算服务");
         try {

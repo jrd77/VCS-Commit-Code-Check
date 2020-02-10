@@ -321,7 +321,7 @@ public class CashierPayService{
         result.setAmt(amtRent + amtDeposit + amtWZDeposit);
         result.setMemNo(orderPayReqVO.getMenNo());
         result.setOrderNo(orderPayReqVO.getOrderNo());
-        result.setTitle("待支付金额：" +result.getAmt() + "，订单号："  + result.getOrderNo());
+        result.setTitle("待支付金额：" +Math.abs(result.getAmt()) + "，订单号："  + result.getOrderNo());
         result.setAccountPayAbles(accountPayAbles);
         //支付显示 文案处理
         handCopywriting(result,orderPayReqVO);
@@ -337,10 +337,10 @@ public class CashierPayService{
         result.setHints("请于1小时内完成支付，超时未支付订单将自动取消");
         String costText ="";
         if(orderPayReqVO.getPayKind().contains(DataPayKindConstant.RENT)){
-            costText =costText+"车辆押金"+result.getAmtDeposit();
+            costText =costText+"车辆押金"+ Math.abs(result.getAmtDeposit());
         }
         if(orderPayReqVO.getPayKind().contains(DataPayKindConstant.DEPOSIT)){
-            costText =costText+" 违章押金"+result.getAmtWzDeposit();
+            costText =costText+" 违章押金"+Math.abs(result.getAmtWzDeposit());
         }
         result.setCostText(costText);
 
