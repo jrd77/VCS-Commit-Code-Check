@@ -554,6 +554,8 @@ public class ModifyOrderService {
 		BeanUtils.copyProperties(modifyOrderReq, modifyOrderDTO);
 		// 设置租客子单号
 		modifyOrderDTO.setRenterOrderNo(renterOrderNo);
+		// 设置管理后台修改原因
+		modifyOrderDTO.setChangeReason(modifyOrderReq.getModifyReason());
 		// 是否使用全面保障
 		Integer abatementFlag = modifyOrderReq.getAbatementFlag();
 		if (abatementFlag == null) {
@@ -743,6 +745,8 @@ public class ModifyOrderService {
 		} else {
 			renterOrderNew.setChangeSource(ChangeSourceEnum.RENTER.getCode());
 		}
+		// 管理后台修改原因
+		renterOrderNew.setChangeReason(modifyOrderDTO.getChangeReason());
 		return renterOrderNew;
 	}
 	

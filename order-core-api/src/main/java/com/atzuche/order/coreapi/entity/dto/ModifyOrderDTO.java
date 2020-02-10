@@ -131,6 +131,10 @@ public class ModifyOrderDTO {
      */
     private String operator;
     /**
+     * 管理后台修改原因
+     */
+    private String changeReason;
+    /**
 	 * 租客费用补贴
 	 */
 	private List<RenterOrderSubsidyDetailDTO> renterSubsidyList;
