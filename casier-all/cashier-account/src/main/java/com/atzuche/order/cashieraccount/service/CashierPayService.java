@@ -24,6 +24,7 @@ import com.atzuche.order.commons.enums.OrderPayStatusEnum;
 import com.atzuche.order.commons.enums.OrderStatusEnum;
 import com.atzuche.order.commons.enums.YesNoEnum;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
+import com.atzuche.order.commons.exceptions.OrderNotFoundException;
 import com.atzuche.order.commons.service.OrderPayCallBack;
 import com.atzuche.order.flow.service.OrderFlowService;
 import com.atzuche.order.parentorder.dto.OrderStatusDTO;
@@ -320,7 +321,7 @@ public class CashierPayService{
         result.setAmt(amtRent + amtDeposit + amtWZDeposit);
         result.setMemNo(orderPayReqVO.getMenNo());
         result.setOrderNo(orderPayReqVO.getOrderNo());
-        result.setTitle("待支付金额：" +result.getAmt() + "，订单号："  + result.getOrderNo());
+        result.setTitle("待支付金额：" +Math.abs(result.getAmt()) + "，订单号："  + result.getOrderNo());
         result.setAccountPayAbles(accountPayAbles);
         //支付显示 文案处理
         handCopywriting(result,orderPayReqVO);
@@ -336,10 +337,10 @@ public class CashierPayService{
         result.setHints("请于1小时内完成支付，超时未支付订单将自动取消");
         String costText ="";
         if(orderPayReqVO.getPayKind().contains(DataPayKindConstant.RENT)){
-            costText =costText+"车辆押金"+result.getAmtDeposit();
+            costText =costText+"车辆押金"+ Math.abs(result.getAmtDeposit());
         }
         if(orderPayReqVO.getPayKind().contains(DataPayKindConstant.DEPOSIT)){
-            costText =costText+" 违章押金"+result.getAmtWzDeposit();
+            costText =costText+" 违章押金"+Math.abs(result.getAmtWzDeposit());
         }
         result.setCostText(costText);
 
@@ -384,8 +385,8 @@ public class CashierPayService{
     
     public int getRealRentCost(String orderNo,String memNo){
         RenterOrderEntity renterOrderEntity = cashierNoTService.getRenterOrderNoByOrderNo(orderNo);
-        if(Objects.isNull(renterOrderEntity) || Objects.isNull(renterOrderEntity.getRenterOrderNo())){
-            return 0;
+        if(renterOrderEntity==null){
+            throw new OrderNotFoundException(orderNo);
         }
         //查询应付租车费用列表
         List<PayableVO> payableVOs = renterOrderCostCombineService.listPayableVO(orderNo,renterOrderEntity.getRenterOrderNo(),memNo);

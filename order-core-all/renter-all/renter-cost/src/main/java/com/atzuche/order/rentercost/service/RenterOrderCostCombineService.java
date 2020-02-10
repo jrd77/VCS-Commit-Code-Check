@@ -504,12 +504,10 @@ public class RenterOrderCostCombineService {
 	 */
 	public PayableVO getPayable(String orderNo, String renterOrderNo, String memNo) {
 		// 租客应付
-		Integer payable = 0;
+		int payable = 0;
 		// 获取租客正常费用
-		Integer normalCost = getRenterNormalCost(orderNo, renterOrderNo);
-		if (normalCost != null) {
-			payable += normalCost;
-		}
+		int normalCost = getRenterNormalCost(orderNo, renterOrderNo);
+		payable += normalCost;
 		// 获取全局费用
 		Integer globalCost = getRenterGlobalCost(orderNo, memNo);
 		if (globalCost != null) {
@@ -531,23 +529,15 @@ public class RenterOrderCostCombineService {
 	 * @param renterOrderNo 租客订单号
 	 * @return Integer
 	 */
-	public Integer getRenterNormalCost(String orderNo, String renterOrderNo) {
+	public int getRenterNormalCost(String orderNo, String renterOrderNo) {
 		// 获取费用明细
-		List<RenterOrderCostDetailEntity> costList = renterOrderCostDetailService.listRenterOrderCostDetail(orderNo, renterOrderNo);
+		int basicRentTotalAmt = renterOrderCostDetailService.getTotalOrderCostAmt(orderNo, renterOrderNo);
 		// 获取补贴明细
-		List<RenterOrderSubsidyDetailEntity> subsidyList = renterOrderSubsidyDetailService.listRenterOrderSubsidyDetail(orderNo, renterOrderNo);
+		int subsidyTotalAmt= renterOrderSubsidyDetailService.getTotalRenterOrderSubsidyAmt(orderNo, renterOrderNo);
 		// 罚金
-		List<RenterOrderFineDeatailEntity> fineList = renterOrderFineDeatailService.listRenterOrderFineDeatail(orderNo, renterOrderNo);
-		Integer payable = 0;
-		if (costList != null && !costList.isEmpty()) {
-			payable += costList.stream().mapToInt(RenterOrderCostDetailEntity::getTotalAmount).sum();
-		}
-		if (subsidyList != null && !subsidyList.isEmpty()) {
-			payable += subsidyList.stream().mapToInt(RenterOrderSubsidyDetailEntity::getSubsidyAmount).sum();
-		}
-		if (fineList != null && !fineList.isEmpty()) {
-			payable += fineList.stream().mapToInt(RenterOrderFineDeatailEntity::getFineAmount).sum();
-		}
+		int fineTotalAmt = renterOrderFineDeatailService.getTotalRenterOrderFineAmt(orderNo, renterOrderNo);
+		int  payable = basicRentTotalAmt+subsidyTotalAmt+fineTotalAmt;
+		log.info("租客[orderNo={},renterOrderNo={}]正常应付:[toPay={}]",orderNo,renterOrderNo,payable);
 		return payable;
 	}
 	

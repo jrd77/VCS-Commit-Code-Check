@@ -55,6 +55,10 @@ public class ModifyOrderReq {
 	 */
 	private Boolean consoleFlag;
 	/**
+	 * 管理后台修改原因
+	 */
+	private String modifyReason;
+	/**
 	 * 使用取车服务标志 0-不使用，1-使用
 	 */
 	private Integer srvGetFlag;

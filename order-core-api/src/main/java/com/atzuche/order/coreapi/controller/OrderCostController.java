@@ -8,6 +8,7 @@ import javax.validation.Valid;
 import com.atzuche.order.cashieraccount.service.CashierQueryService;
 import com.atzuche.order.commons.BindingResultUtil;
 import com.atzuche.order.commons.exceptions.OrderNotFoundException;
+import com.atzuche.order.commons.vo.res.RenterCostDetailVO;
 import com.atzuche.order.open.vo.RenterCostShortDetailVO;
 import com.atzuche.order.parentorder.entity.OrderEntity;
 import com.atzuche.order.parentorder.service.OrderService;
@@ -16,10 +17,7 @@ import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.atzuche.order.renterorder.service.RenterOrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.atzuche.order.commons.vo.req.OrderCostReqVO;
 import com.atzuche.order.commons.vo.res.OrderOwnerCostResVO;
@@ -59,7 +57,7 @@ public class OrderCostController {
 	}
 
 	@GetMapping("/order/renter/cost/fullDetail")
-	public ResponseData<?> getRenterCostFullDetail(String orderNo){
+	public ResponseData<RenterCostDetailVO> getRenterCostFullDetail(@RequestParam("orderNo") String orderNo){
 		OrderEntity orderEntity = orderService.getOrderEntity(orderNo);
 		if(orderEntity==null){
 			throw new OrderNotFoundException(orderNo);
@@ -71,10 +69,9 @@ public class OrderCostController {
 		}
 		String renterOrderNo = renterOrderEntity.getRenterOrderNo();
 
+		RenterCostDetailVO renterBasicCostDetailVO = facadeService.getRenterCostFullDetail(orderNo,renterOrderNo,memNo);
 
-
-		//FIXME:
-		return null;
+		return ResponseData.success(renterBasicCostDetailVO);
 	}
 
 	/**

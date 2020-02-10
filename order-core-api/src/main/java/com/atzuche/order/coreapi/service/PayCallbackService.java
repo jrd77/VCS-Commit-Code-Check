@@ -48,4 +48,14 @@ public class PayCallbackService implements OrderPayCallBack {
         log.info("PayCallbackService callBack end param [{}]", GsonUtils.toJson(renterOrderNo));
 
     }
+
+    /**
+     * 结算订单 回调
+     * @param orderNo
+     * @param renterOrderNo
+     */
+    @Override
+    public void callBackSettle(String orderNo, String renterOrderNo) {
+        modifyOrderForRenterService.supplementPayPostProcess(orderNo,renterOrderNo);
+    }
 }

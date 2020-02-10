@@ -2,6 +2,9 @@ package com.atzuche.order.settle.service;
 
 import java.util.List;
 
+import com.atzuche.order.commons.enums.cashcode.ConsoleCashCodeEnum;
+import com.atzuche.order.commons.service.OrderPayCallBack;
+import com.autoyol.platformcost.model.FeeResult;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -52,7 +55,7 @@ public class OrderSettleNewService {
      * 结算逻辑
      */
     @Transactional(rollbackFor=Exception.class)
-    public void settleOrder(SettleOrders settleOrders,SettleOrdersDefinition settleOrdersDefinition) {
+    public void settleOrder(SettleOrders settleOrders, SettleOrdersDefinition settleOrdersDefinition,OrderPayCallBack callBack) {
         //7.1 租车费用  总费用 信息落库 并返回最新租车费用 实付
         AccountRenterCostSettleEntity accountRenterCostSettle = cashierSettleService.updateRentSettleCost(settleOrders.getOrderNo(),settleOrders.getRenterMemNo(), settleOrdersDefinition.getAccountRenterCostSettleDetails());
         log.info("OrderSettleService updateRentSettleCost [{}]",GsonUtils.toJson(accountRenterCostSettle));
@@ -78,7 +81,7 @@ public class OrderSettleNewService {
         OrderStatusDTO orderStatusDTO = new OrderStatusDTO();
         orderStatusDTO.setOrderNo(settleOrders.getOrderNo());
         //9 租客费用 结余处理
-        orderSettleNoTService.rentCostSettle(settleOrders,settleOrdersAccount);
+        orderSettleNoTService.rentCostSettle(settleOrders,settleOrdersAccount,callBack);
         //10租客车辆押金/租客剩余租车费用 结余历史欠款
         orderSettleNoTService.repayHistoryDebtRent(settleOrdersAccount);
         //11 租客费用 退还
