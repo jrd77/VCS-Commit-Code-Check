@@ -8,6 +8,7 @@ import javax.validation.Valid;
 import com.atzuche.order.cashieraccount.service.CashierQueryService;
 import com.atzuche.order.commons.BindingResultUtil;
 import com.atzuche.order.commons.exceptions.OrderNotFoundException;
+import com.atzuche.order.commons.vo.res.RenterCostDetailVO;
 import com.atzuche.order.open.vo.RenterCostShortDetailVO;
 import com.atzuche.order.parentorder.entity.OrderEntity;
 import com.atzuche.order.parentorder.service.OrderService;
@@ -59,7 +60,7 @@ public class OrderCostController {
 	}
 
 	@GetMapping("/order/renter/cost/fullDetail")
-	public ResponseData<?> getRenterCostFullDetail(String orderNo){
+	public ResponseData<RenterCostDetailVO> getRenterCostFullDetail(String orderNo){
 		OrderEntity orderEntity = orderService.getOrderEntity(orderNo);
 		if(orderEntity==null){
 			throw new OrderNotFoundException(orderNo);
@@ -71,10 +72,9 @@ public class OrderCostController {
 		}
 		String renterOrderNo = renterOrderEntity.getRenterOrderNo();
 
+		RenterCostDetailVO renterBasicCostDetailVO = facadeService.getRenterCostFullDetail(orderNo,renterOrderNo,memNo);
 
-
-		//FIXME:
-		return null;
+		return ResponseData.success(renterBasicCostDetailVO);
 	}
 
 	/**
