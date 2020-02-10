@@ -10,7 +10,7 @@ import lombok.ToString;
  **/
 @Data
 @ToString
-public class RenterSubsidyDetail {
+public class RenterSubsidyDetailVO {
     @AutoDocProperty(value = "平台优惠券补贴")
     private Integer platformCouponSubsidyAmt;
     @AutoDocProperty(value = "取还车优惠券补贴")

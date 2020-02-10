@@ -40,7 +40,7 @@ public class RenterCostDetailVO {
     private RenterFineVO fineDetail;
 
     @AutoDocProperty(value = "补贴及其详情")
-    private RenterSubsidyDetail subsidyDetail;
+    private RenterSubsidyDetailVO subsidyDetail;
 
 
 

@@ -5,16 +5,14 @@ import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.commons.vo.res.RenterCostDetailVO;
 import com.atzuche.order.commons.vo.res.RenterDeliveryFeeDetailVO;
 import com.atzuche.order.commons.vo.res.RenterFineVO;
-import com.atzuche.order.commons.vo.res.RenterSubsidyDetail;
+import com.atzuche.order.commons.vo.res.RenterSubsidyDetailVO;
 import com.atzuche.order.rentercost.entity.*;
 import com.atzuche.order.rentercost.utils.FineDetailUtils;
 import com.atzuche.order.rentercost.utils.OrderSubsidyDetailUtils;
 import com.atzuche.order.rentercost.utils.RenterOrderCostDetailUtils;
-import com.mysql.cj.x.protobuf.MysqlxCrud;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -104,18 +102,18 @@ public class RenterCostFacadeService {
         RenterFineVO renterFineVO = getRenterFineDetail(orderNo,renterOrderNo,memNo);
         basicCostDetailVO.setFineDetail(renterFineVO);
 
-        RenterSubsidyDetail subsidyDetail = getRenterSubsidyDetail(orderNo,renterOrderNo,memNo);
+        RenterSubsidyDetailVO subsidyDetail = getRenterSubsidyDetail(orderNo,renterOrderNo,memNo);
         basicCostDetailVO.setSubsidyDetail(subsidyDetail);
 
         //TODO:
         return basicCostDetailVO;
     }
 
-    public RenterSubsidyDetail getRenterSubsidyDetail(String orderNo,String renterOrderNo,String memNo){
+    public RenterSubsidyDetailVO getRenterSubsidyDetail(String orderNo, String renterOrderNo, String memNo){
         List<RenterOrderSubsidyDetailEntity> renterOrderSubsidyDetailEntityList = subsidyDetailService.listRenterOrderSubsidyDetail(orderNo,renterOrderNo);
         List<OrderConsoleSubsidyDetailEntity> consoleSubsidyDetailEntityList = consoleSubsidyDetailService.listOrderConsoleSubsidyDetailByOrderNoAndMemNo(orderNo,memNo);
 
-        RenterSubsidyDetail detail = new RenterSubsidyDetail();
+        RenterSubsidyDetailVO detail = new RenterSubsidyDetailVO();
 
         detail.setPlatformCouponSubsidyAmt(-OrderSubsidyDetailUtils.getRenterPlatCouponSubsidyAmt(renterOrderSubsidyDetailEntityList));
         detail.setOwnerCouponSubsidyAmt(-OrderSubsidyDetailUtils.getRenterOwnerCouponSubsidyAmt(renterOrderSubsidyDetailEntityList));
