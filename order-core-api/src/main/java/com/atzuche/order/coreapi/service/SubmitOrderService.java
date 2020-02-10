@@ -173,7 +173,7 @@ public class SubmitOrderService {
         RenterGoodsDetailDTO renterGoodsDetailDTO = context.getRenterGoodsDetailDto();
         renterGoodsDetailDTO.setOrderNo(orderNo);
         renterGoodsDetailDTO.setRenterOrderNo(renterOrderNo);
-        renterGoodsService.save(context.getRenterGoodsDetailDto());
+        renterGoodsService.save(renterGoodsDetailDTO);
 
         //4.5.租客信息处理
         //4.6.租客权益信息处理
