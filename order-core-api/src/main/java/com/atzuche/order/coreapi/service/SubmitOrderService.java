@@ -559,7 +559,7 @@ public class SubmitOrderService {
         orderCreateMq.setRevertTime(DateUtil.asDate(orderReqVO.getRevertTime().toLocalDate()));
         orderCreateMq.setMemNo(Integer.valueOf(orderDTO.getMemNoRenter()));
         orderCreateMq.setPlatformChildType(orderReqVO.getPlatformChildType());
-      //  orderCreateMq.setRiskReqId(orderDTO.getRiskAuditId());
+        orderCreateMq.setRiskReqId(orderDTO.getRiskAuditId());
         OrderMessage orderMessage = OrderMessage.builder().build();
         orderMessage.setPhone("13628645717");
         orderMessage.setMessage("订单创建成功");
