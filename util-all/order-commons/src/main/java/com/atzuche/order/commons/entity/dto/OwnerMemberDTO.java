@@ -54,5 +54,11 @@ public class OwnerMemberDTO {
     @AutoDocProperty("成功下单次数")
     private Integer orderSuccessCount;
 
+    /**
+     * 平台上架车辆数
+     */
+    @AutoDocProperty(value = "平台上架车辆数。")
+    private Integer haveCar;
+
     private List<OwnerMemberRightDTO> ownerMemberRightDTOList;
 }

@@ -3,11 +3,13 @@ package com.atzuche.order.coreapi.service;
 import com.atzuche.order.commons.constant.OrderConstant;
 import com.atzuche.order.commons.entity.dto.CancelFineAmtDTO;
 import com.atzuche.order.commons.entity.dto.CostBaseDTO;
+import com.atzuche.order.commons.entity.dto.OwnerGoodsDetailDTO;
 import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
 import com.atzuche.order.commons.enums.*;
 import com.atzuche.order.coreapi.entity.dto.CancelOrderResDTO;
 import com.atzuche.order.coreapi.service.remote.CarRentalTimeApiProxyService;
 import com.atzuche.order.flow.service.OrderFlowService;
+import com.atzuche.order.owner.commodity.service.OwnerGoodsService;
 import com.atzuche.order.ownercost.entity.OwnerOrderEntity;
 import com.atzuche.order.ownercost.entity.OwnerOrderFineApplyEntity;
 import com.atzuche.order.ownercost.entity.OwnerOrderFineDeatailEntity;
@@ -59,6 +61,8 @@ public class OwnerCancelOrderService {
     @Autowired
     OwnerOrderService ownerOrderService;
     @Autowired
+    OwnerGoodsService ownerGoodsService;
+    @Autowired
     OrderStatusService orderStatusService;
     @Autowired
     OrderService orderService;
@@ -85,11 +89,16 @@ public class OwnerCancelOrderService {
      * @return CancelOrderResDTO 返回信息
      */
     @Transactional(rollbackFor = Exception.class)
-    public CancelOrderResDTO cancel(String orderNo, String cancelReason) {
+    public CancelOrderResDTO cancel(String orderNo, String cancelReason, boolean isConsoleInvoke) {
         //获取订单状态信息
         OrderStatusEntity orderStatusEntity = orderStatusService.getByOrderNo(orderNo);
+        //获取车主订单信息
+        OwnerOrderEntity ownerOrderEntity = ownerOrderService.getOwnerOrderByOrderNoAndIsEffective(orderNo);
+        //获取车主订单商品信息
+        OwnerGoodsDetailDTO ownerGoodsDetail = ownerGoodsService.getOwnerGoodsDetail(ownerOrderEntity.getOwnerOrderNo(), false);
         //校验
-        cancelOrderCheckService.checkOwnerCancelOrder(orderStatusEntity);
+        cancelOrderCheckService.checkOwnerCancelOrder(orderStatusEntity,ownerGoodsDetail.getCarOwnerType(),isConsoleInvoke);
+        
         //获取订单信息
         OrderEntity orderEntity = orderService.getOrderEntity(orderNo);
         //获取租客订单信息
@@ -100,9 +109,6 @@ public class OwnerCancelOrderService {
         //获取租客订单费用明细
         RenterOrderCostEntity renterOrderCostEntity = renterOrderCostService.getByOrderNoAndRenterNo(orderNo,
                 renterOrderEntity.getRenterOrderNo());
-        //获取车主订单信息
-        OwnerOrderEntity ownerOrderEntity = ownerOrderService.getOwnerOrderByOrderNoAndIsEffective(orderNo);
-
         //获取车主券信息
         OrderCouponEntity ownerCouponEntity = orderCouponService.getOwnerCouponByOrderNoAndRenterOrderNo(orderNo,
                 renterOrderEntity.getRenterOrderNo());

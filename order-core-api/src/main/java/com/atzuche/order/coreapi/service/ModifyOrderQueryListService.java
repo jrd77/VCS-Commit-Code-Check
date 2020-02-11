@@ -106,7 +106,9 @@ public class ModifyOrderQueryListService {
         resVo.setRenterOrderDeliveryGet(renterOrderDeliveryGetReal);
         resVo.setRenterOrderDeliveryReturn(renterOrderDeliveryReturnReal);
         
-        
+        /**
+         * 从费用表中获取。
+         */
         //租客费用明细
         List<RenterOrderCostDetailEntity> renterOrderCostDetailList = renterOrderCostDetailService.listRenterOrderCostDetail(orderNo, renterOrderNo);
         List<RenterOrderCostDetailResVO> renterOrderCostDetailListReal = new ArrayList<RenterOrderCostDetailResVO>();
@@ -117,6 +119,8 @@ public class ModifyOrderQueryListService {
         		renterOrderCostDetailListReal.add(real);
             });
         }
+        //数据封装
+        resVo.setRenterOrderCostDetailList(renterOrderCostDetailListReal);
         
         //抵扣明细
     	List<RenterOrderSubsidyDetailEntity> subsidyLst = renterOrderSubsidyDetailService.listRenterOrderSubsidyDetail(orderNo, renterOrderNo);
@@ -142,7 +146,7 @@ public class ModifyOrderQueryListService {
 		 * 根据订单号查询封装
 		 */
 		//需补付金额
-		int needIncrementAmt = cashierPayService.getRentCostYingfu(orderNo, memNo);
+		int needIncrementAmt = cashierPayService.getRentCostBufu(orderNo, memNo);
 		resVo.setNeedIncrementAmt(needIncrementAmt);
 		
 		
@@ -170,6 +174,9 @@ public class ModifyOrderQueryListService {
 						renterOrderEntity.setAgreeFlag(entity.getAuditStatus());
 					}
 				}
+			}else {
+				//前端处理为 --
+				renterOrderEntity.setAgreeFlag(3);
 			}
 		}
 		

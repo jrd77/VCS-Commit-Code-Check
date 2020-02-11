@@ -33,6 +33,7 @@ public class OwnerMemberService{
     public void save(OwnerMemberDTO ownerMemberDto){
         OwnerMemberEntity ownerMemberEntity = new OwnerMemberEntity();
         BeanUtils.copyProperties(ownerMemberDto,ownerMemberEntity);
+        ownerMemberEntity.setRenterCarCount(ownerMemberDto.getHaveCar());
         ownerMemberMapper.insert(ownerMemberEntity);
 
         List<OwnerMemberRightEntity> list = new ArrayList<>();
