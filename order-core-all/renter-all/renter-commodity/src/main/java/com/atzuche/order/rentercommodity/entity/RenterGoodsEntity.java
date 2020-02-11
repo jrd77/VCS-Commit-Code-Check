@@ -1,5 +1,6 @@
 package com.atzuche.order.rentercommodity.entity;
 
+import com.autoyol.doc.annotation.AutoDocProperty;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -214,6 +215,10 @@ public class RenterGoodsEntity implements Serializable {
 	 * 年检到期日期
 	 */
 	private LocalDate inspectExpire;
+	/**
+	 * 最新公里数
+	 */
+	private Integer lastMileage;
 	/**
 	 * 创建时间
 	 */

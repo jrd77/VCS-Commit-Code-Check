@@ -17,6 +17,7 @@
         <result property="rentFlag" column="rent_flag"/>
         <result property="firstName" column="first_name"/>
         <result property="gender" column="gender"/>
+        <result property="idNo" column="id_no"/>
         <result property="idCardAuth" column="id_card_auth"/>
         <result property="driLicAuth" column="dri_lic_auth"/>
         <result property="driViceLicAuth" column="dri_vice_lic_auth"/>
@@ -45,6 +46,7 @@
 	`rent_flag`,
 	`first_name`,
 	`gender`,
+	`id_no`,
 	`id_card_auth`,
 	`dri_lic_auth`,
 	`dri_vice_lic_auth`,
@@ -79,6 +81,7 @@
         `rent_flag`,
         `first_name`,
         `gender`,
+        `id_no`,
         `id_card_auth`,
         `dri_lic_auth`,
         `dri_vice_lic_auth`,
@@ -102,6 +105,7 @@
         #{rentFlag},
         #{firstName},
         #{gender},
+        #{idNo},
         #{idCardAuth},
         #{driLicAuth},
         #{driViceLicAuth},
@@ -128,6 +132,7 @@
             <if test="rentFlag != null">`rent_flag`, </if>
             <if test="firstName != null">`first_name`, </if>
             <if test="gender != null">`gender`, </if>
+            <if test="idNo != null">`id_no`, </if>
             <if test="idCardAuth != null">`id_card_auth`, </if>
             <if test="driLicAuth != null">`dri_lic_auth`, </if>
             <if test="driViceLicAuth != null">`dri_vice_lic_auth`, </if>
@@ -150,6 +155,7 @@
             <if test="rentFlag != null">#{rentFlag},  </if>
             <if test="firstName != null">#{firstName},  </if>
             <if test="gender != null">#{gender},  </if>
+            <if test="idNo != null">#{idNo}, </if>
             <if test="idCardAuth != null">#{idCardAuth},  </if>
             <if test="driLicAuth != null">#{driLicAuth},  </if>
             <if test="driViceLicAuth != null">#{driViceLicAuth},  </if>
@@ -178,6 +184,7 @@
             <if test="rentFlag != null">`rent_flag` = #{rentFlag}, </if>
             <if test="firstName != null">`first_name` = #{firstName}, </if>
             <if test="gender != null">`gender` = #{gender}, </if>
+            <if test="idNo != null">`id_no` = #{idNo}, </if>
             <if test="idCardAuth != null">`id_card_auth` = #{idCardAuth}, </if>
             <if test="driLicAuth != null">`dri_lic_auth` = #{driLicAuth}, </if>
             <if test="driViceLicAuth != null">`dri_vice_lic_auth` = #{driViceLicAuth}, </if>
@@ -206,6 +213,7 @@
             `rent_flag` = #{rentFlag},
             `first_name` = #{firstName},
             `gender` = #{gender},
+            `id_no` = #{idNo},
             `id_card_auth` = #{idCardAuth},
             `dri_lic_auth` = #{driLicAuth},
             `dri_vice_lic_auth` = #{driViceLicAuth},
