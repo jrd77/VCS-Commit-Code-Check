@@ -10,6 +10,7 @@
         <result property="cashNo" column="cash_no"/>
         <result property="title" column="title"/>
         <result property="amt" column="amt"/>
+        <result property="requestPayCode" column="request_pay_code"/>
         <result property="opStatus" column="op_status"/>
         <result property="supplementType" column="supplement_type"/>
         <result property="opType" column="op_type"/>
@@ -30,6 +31,7 @@
 	`cash_no`, 	
 	`title`, 	
 	`amt`, 	
+	`request_pay_code`,
 	`op_status`, 	
 	`supplement_type`, 	
 	`op_type`, 	
@@ -95,6 +97,7 @@
 				<if test="cashNo != null">`cash_no`, </if>
 				<if test="title != null">`title`, </if>
 				<if test="amt != null">`amt`, </if>
+				<if test="requestPayCode != null">`request_pay_code`, </if>
 				<if test="opStatus != null">`op_status`, </if>
 				<if test="supplementType != null">`supplement_type`, </if>
 				<if test="opType != null">`op_type`, </if>
@@ -112,6 +115,7 @@
 				<if test="cashNo != null">#{cashNo},  </if>
 				<if test="title != null">#{title},  </if>
 				<if test="amt != null">#{amt},  </if>
+				<if test="requestPayCode != null">#{requestPayCode},  </if>
 				<if test="opStatus != null">#{opStatus},  </if>
 				<if test="supplementType != null">#{supplementType},  </if>
 				<if test="opType != null">#{opType},  </if>

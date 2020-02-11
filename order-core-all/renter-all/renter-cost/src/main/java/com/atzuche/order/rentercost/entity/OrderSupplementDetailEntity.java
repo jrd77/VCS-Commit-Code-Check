@@ -42,6 +42,10 @@ public class OrderSupplementDetailEntity implements Serializable {
 	 */
 	private Integer amt;
 	/**
+	 * 请款码
+	 */
+	private String requestPayCode;
+	/**
 	 * 操作状态:0,待提交 1,已生效 2,已失效 3,已撤回
 	 */
 	private Integer opStatus;
