@@ -79,6 +79,11 @@ public class RenterMemberDTO implements Serializable {
          */
         @AutoDocProperty(value="性别(1:男、2：女)",required=true)
         private Integer gender;
+        /**
+         * 身份证号码
+         */
+        @AutoDocProperty("身份证号码")
+        private String idNo;
     	/**
          * 身份证认证 0：未上传，1：已上传，2：已认证，3：认证不通过, 4:无效数据
          */
