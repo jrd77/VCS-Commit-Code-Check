@@ -954,6 +954,8 @@ public class OrderDetailService {
         Map<Integer,OwnerMemberDTO> ownerMemberMap = new HashMap<>();
         Map<String,OrderSourceStatEntity> orderSourceStatMap = new HashMap<>();
         Map<String,RenterOrderCostEntity> renterOrderCostEntityMap = new HashMap<>();
+        //主订单信息
+        OrderEntity orderEntity = orderService.getOrderEntity(orderNo);
         Optional.ofNullable(renterOrderEntities)
                 .orElseGet(ArrayList::new)
                 .stream()
@@ -1001,10 +1003,19 @@ public class OrderDetailService {
                     orderHistoryDTO.category = CategoryEnum.getNameByCode(orderSourceStatEntity.getCategory());
                     orderHistoryDTO.ownerName = ownerMemberDTO.getRealName();
                     orderHistoryDTO.ownerPhone = ownerMemberDTO.getPhone();
+                    orderHistoryDTO.cityCode = orderEntity.getCityCode();
+                    orderHistoryDTO.cityName = orderEntity.getCityName();
                     orderHistoryDTO.reqAdd = orderSourceStatEntity.getReqAddr();
                     orderHistoryDTO.rentTime = x.getExpRentTime()==null?null:LocalDateTimeUtils.localdateToString(x.getExpRentTime(),GlobalConstant.FORMAT_DATE_STR1);
                     orderHistoryDTO.revertTime = x.getExpRevertTime()==null?null:LocalDateTimeUtils.localdateToString(x.getExpRevertTime(),GlobalConstant.FORMAT_DATE_STR1);
-                    orderHistoryDTO.addr = null;
+
+                    //默认车辆显示地址,使用取车服务使用取车地址
+                    orderHistoryDTO.addr = renterGoodsDetail.getCarShowAddr();
+                    RenterOrderDeliveryEntity renterOrderDeliveryEntity = renterOrderDeliveryService.findRenterOrderByRenterOrderNo(x.getRenterOrderNo(),DeliveryOrderTypeEnum.GET_CAR.getCode());
+                    if(null != renterOrderDeliveryEntity){
+                        orderHistoryDTO.addr = renterOrderDeliveryEntity.getRenterGetReturnAddr();
+                    }
+
                     orderHistoryDTO.carTypeTxt = renterGoodsDetail.getCarTypeTxt();
                     orderHistoryDTO.carUseType = CarUseTypeEnum.getNameByCode(renterGoodsDetail.getCarUseType());
                     orderHistoryDTO.carGearboxType = GearboxTypeEnum.getNameByCode(renterGoodsDetail.getCarGearboxType());
