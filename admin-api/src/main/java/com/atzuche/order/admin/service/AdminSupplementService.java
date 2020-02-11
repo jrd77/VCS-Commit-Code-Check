@@ -64,6 +64,8 @@ public class AdminSupplementService {
             Cat.logEvent(CatConstants.FEIGN_METHOD,"AdminSupplementService.addSupplement");
             log.info("Feign 管理后台新增补付,param={}", JSON.toJSONString(req));
             Cat.logEvent(CatConstants.FEIGN_PARAM,JSON.toJSONString(req));
+            req.setOpStatus(1);
+            req.setPayFlag(1);
             responseObject = feignSupplementService.addSupplement(req);
             Cat.logEvent(CatConstants.FEIGN_RESULT,JSON.toJSONString(responseObject));
             checkResponse(responseObject);
