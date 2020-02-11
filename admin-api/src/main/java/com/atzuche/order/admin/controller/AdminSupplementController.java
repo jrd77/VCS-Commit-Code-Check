@@ -1,5 +1,6 @@
 package com.atzuche.order.admin.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,7 +21,6 @@ import com.atzuche.order.commons.entity.dto.OrderSupplementDetailDTO;
 import com.atzuche.order.commons.vo.res.rentcosts.OrderSupplementDetailEntity;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
-import com.autoyol.doc.annotation.AutoDocGroup;
 import com.autoyol.doc.annotation.AutoDocMethod;
 import com.autoyol.doc.annotation.AutoDocVersion;
 
@@ -34,7 +34,7 @@ public class AdminSupplementController {
 	private AdminSupplementService adminSupplementService;
 	
 	
-    @AutoDocMethod(description = "订单补付列表", value = "订单补付列表",response = ResponseData.class)
+    @AutoDocMethod(description = "订单补付列表", value = "订单补付列表",response = SupplementRecord.class)
     @RequestMapping(value="console/order/supplement/list",method = RequestMethod.GET)
     public ResponseData<List<OrderSupplementDetailEntity>> listSupplement(@RequestParam(value="orderNo",required = true) String orderNo){
         log.info("AdminSupplementController.listSupplement orderNo=[{}]", orderNo);
@@ -63,4 +63,21 @@ public class AdminSupplementController {
         adminSupplementService.delSupplement(id);
         return ResponseData.success();
     }
+    
+    
+    public static class SupplementRecord {
+		private List<OrderSupplementDetailEntity> list = new ArrayList<>();
+
+		public List<OrderSupplementDetailEntity> getList() {
+			return list;
+		}
+
+		public void setList(List<OrderSupplementDetailEntity> list) {
+			this.list = list;
+		}
+
+		public SupplementRecord(List<OrderSupplementDetailEntity> list) {
+			this.list = list;
+		}
+	}
 }

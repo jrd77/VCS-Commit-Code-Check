@@ -17,7 +17,7 @@ public class OrderSupplementDetailDTO {
 	 * 订单号
 	 */
 	@NotBlank(message="订单编号不能为空")
-	@AutoDocProperty(value="订单编号,必填，",required=true)
+	@AutoDocProperty(value="订单编号",required=true)
 	private String orderNo;
 	
 	/**
