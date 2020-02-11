@@ -2,6 +2,7 @@ package com.atzuche.order.detain.mapper;
 
 import com.atzuche.order.detain.entity.RenterEventDetainStatusEntity;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * 租客端暂扣处理状态表
@@ -18,4 +19,5 @@ public interface RenterEventDetainStatusMapper{
 
     int updateByPrimaryKeySelective(RenterEventDetainStatusEntity record);
 
+    RenterEventDetainStatusEntity selectByRentOrderNo(@Param("renterOrderNo") String renterOrderNo);
 }

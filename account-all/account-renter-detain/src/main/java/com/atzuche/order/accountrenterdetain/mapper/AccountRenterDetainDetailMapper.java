@@ -1,4 +1,5 @@
 package com.atzuche.order.accountrenterdetain.mapper;
+import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import org.apache.ibatis.annotations.Param;
 
 import com.atzuche.order.accountrenterdetain.entity.AccountRenterDetainDetailEntity;
@@ -27,4 +28,5 @@ public interface AccountRenterDetainDetailMapper{
    List<AccountRenterDetainDetailEntity> selectByOrderNo(@Param("orderNo")String orderNo);
 
 
+    List<AccountRenterDetainDetailEntity> selectByOrderNoAndRenterCash(@Param("orderNo")String orderNo,@Param("sourceCode") String sourceCode);
 }

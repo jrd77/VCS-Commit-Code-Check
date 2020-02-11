@@ -1,5 +1,7 @@
 package com.atzuche.order.detain.service;
 
+import com.atzuche.order.commons.enums.detain.DetainStatusEnum;
+import com.atzuche.order.detain.entity.RenterEventDetainEntity;
 import com.atzuche.order.detain.entity.RenterEventDetainStatusEntity;
 import com.atzuche.order.detain.mapper.RenterEventDetainStatusMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,5 +26,11 @@ public class RenterEventDetainStatusService{
             throw new RuntimeException("插入暂扣事件异常");
         }
         return result;
+    }
+
+    public void updateEventDetainStatus(RenterEventDetainEntity renterEventDetainEntity) {
+        RenterEventDetainStatusEntity ent = renterEventDetainStatusMapper.selectByRentOrderNo(renterEventDetainEntity.getRenterOrderNo());
+        ent.setStatus(DetainStatusEnum.DETAIN_CANCEL.getCode());
+        renterEventDetainStatusMapper.updateByPrimaryKeySelective(ent);
     }
 }

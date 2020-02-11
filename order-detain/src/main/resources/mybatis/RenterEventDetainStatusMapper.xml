@@ -86,6 +86,10 @@
 			</set>
 		where id = #{id} and version = #{version}
 	</update>
+    <select id="selectByRentOrderNo" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List" /> from renter_event_detain_status where renter_order_no = #{renterOrderNo}
 
-  	
+    </select>
+
+
 </mapper>

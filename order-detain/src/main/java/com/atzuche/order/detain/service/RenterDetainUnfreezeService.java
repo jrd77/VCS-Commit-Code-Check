@@ -1,5 +1,6 @@
 package com.atzuche.order.detain.service;
 
+import com.atzuche.order.detain.entity.RenterDetainUnfreezeEntity;
 import com.atzuche.order.detain.mapper.RenterDetainUnfreezeMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,4 +19,10 @@ public class RenterDetainUnfreezeService{
     private RenterDetainUnfreezeMapper renterDetainUnfreezeMapper;
 
 
+    public void insertDetainUnfreeze(RenterDetainUnfreezeEntity renterDetainUnfreezeEntity) {
+        int result = renterDetainUnfreezeMapper.insertSelective(renterDetainUnfreezeEntity);
+        if(result==0){
+            throw new RuntimeException("解冻失败");
+        }
+    }
 }

@@ -58,7 +58,7 @@ public class AccountRenterDetainDetailNoTService {
     	boolean isFlag= false;
     	List<AccountRenterDetainDetailEntity> lst = accountRenterDetainDetailMapper.selectByOrderNo(orderNo);
     	for (AccountRenterDetainDetailEntity accountRenterDetainDetailEntity : lst) {
-			if(accountRenterDetainDetailEntity.getSourceCode().toString().equals(RenterCashCodeEnum.ACCOUNT_RENTER_WZ_DEPOSIT.getCashNo())) {
+			if(accountRenterDetainDetailEntity.getSourceCode().equals(RenterCashCodeEnum.ACCOUNT_RENTER_WZ_DEPOSIT.getCashNo())) {
 				isFlag = true;
 				break;
 			}
@@ -67,5 +67,15 @@ public class AccountRenterDetainDetailNoTService {
     	
     	return isFlag;
     }
-    
+
+    /**
+     * 查询暂扣金额
+     * @param orderNo
+     * @param renterCashCode
+     * @return
+     */
+    public List<AccountRenterDetainDetailEntity> selectByOrderNoAndRenterCash(String orderNo, RenterCashCodeEnum renterCashCode) {
+        List<AccountRenterDetainDetailEntity> lst = accountRenterDetainDetailMapper.selectByOrderNoAndRenterCash(orderNo,renterCashCode.getCashNo());
+        return lst;
+    }
 }

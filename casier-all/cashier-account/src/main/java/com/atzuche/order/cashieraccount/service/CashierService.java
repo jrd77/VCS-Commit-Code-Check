@@ -120,8 +120,6 @@ public class CashierService {
      */
     @Transactional(rollbackFor=Exception.class)
     public void detainRenterDeposit(DetainRenterDepositReqVO detainRenterDepositReqVO){
-        AccountRenterDepositResVO vo = accountRenterDepositService.getAccountRenterDepositEntity(detainRenterDepositReqVO.getOrderNo(),detainRenterDepositReqVO.getMemNo());
-        detainRenterDepositReqVO.setAmt(vo.getSurplusDepositAmt());
         //1 扣除全部 剩余可用车辆押金
         int depositDetailId = accountRenterDepositService.detainRenterDeposit(detainRenterDepositReqVO);
         //2 暂扣表记录暂扣车辆押金
@@ -192,8 +190,6 @@ public class CashierService {
     @Transactional(rollbackFor=Exception.class)
     public void detainRenterWZDeposit(OrderRenterDepositWZDetainReqVO orderRenterDepositWZDetainReqVO){
         //1 违章账户金额扣除
-        AccountRenterWZDepositResVO vo = accountRenterWzDepositService.getAccountRenterWZDeposit(orderRenterDepositWZDetainReqVO.getOrderNo(),orderRenterDepositWZDetainReqVO.getMemNo());
-        orderRenterDepositWZDetainReqVO.setAmt(vo.getShouldReturnDeposit());
         int detailId = accountRenterWzDepositService.updateRenterWZDepositDetain(orderRenterDepositWZDetainReqVO);
         //2 暂扣记录表数据更新
         ChangeDetainRenterDepositReqVO changeDetainRenterDepositReqVO = getCangeDetainRenterWZDepositReqVO(orderRenterDepositWZDetainReqVO,detailId);
@@ -202,10 +198,10 @@ public class CashierService {
 
 
     /**
-     * 查询违章押金是否付清
+     * 查询暂扣金额
      */
-    public boolean isPayOffForRenterWZDeposit(String orderNo, String memNo){
-        return accountRenterWzDepositService.isPayOffForRenterWZDeposit(orderNo, memNo);
+    public int getRenterDetain(String orderNo,RenterCashCodeEnum renterCashCode){
+        return accountRenterDetainService.getRenterDetain(orderNo,renterCashCode);
     }
     /**
      * 查询违章押金
