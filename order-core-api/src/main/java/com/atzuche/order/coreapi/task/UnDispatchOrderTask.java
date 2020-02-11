@@ -54,7 +54,14 @@ public class UnDispatchOrderTask extends IJobHandler {
 
             if(CollectionUtils.isNotEmpty(orderNos)){
                 for (String orderNo : orderNos) {
-                    orderDispatchCancelService.dispatchCancelHandle(orderNo);
+                    try {
+                        logger.info("执行 待调度后4小时，仍未调度的订单,自动取消 orderNo:[{}]",orderNo);
+                        orderDispatchCancelService.dispatchCancelHandle(orderNo);
+                    } catch (Exception e) {
+                        XxlJobLogger.log("执行 待调度后4小时，仍未调度的订单,自动取消 异常:",e);
+                        logger.error("执行 待调度后4小时，仍未调度的订单,自动取消 异常 orderNo:[{}] ,e:[{}]",orderNo,e);
+                        Cat.logError("执行 待调度后4小时，仍未调度的订单,自动取消 异常",e);
+                    }
                 }
             }
             logger.info("结束执行 待调度后4小时，仍未调度的订单,自动取消 ");

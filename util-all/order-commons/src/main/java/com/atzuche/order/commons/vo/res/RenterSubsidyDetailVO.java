@@ -51,6 +51,74 @@ public class RenterSubsidyDetailVO {
     private Integer owner2RenterRentSubsidyAmt;
     @AutoDocProperty(value = "交通费补贴")
     private Integer trafficSubsidyAmt;
+    @AutoDocProperty(value = "补贴总额")
+    private Integer totalSubsidy;
+
+    public Integer getTotalSubsidy(){
+        int total=0;
+        if(platformCouponSubsidyAmt!=null){
+            total=total+platformCouponSubsidyAmt;
+        }
+        if(getCarCouponSubsidyAmt!=null){
+            total=total+getCarCouponSubsidyAmt;
+        }
+        if(ownerCouponSubsidyAmt!=null){
+            total=total+ownerCouponSubsidyAmt;
+        }
+        if(autoCoinSubsidyAmt!=null){
+            total=total+autoCoinSubsidyAmt;
+        }
+        if(updateSubsidyAmt!=null){
+            total=total+updateSubsidyAmt;
+        }
+        if(limitTimeSubsidyAmt!=null){
+            total=total+limitTimeSubsidyAmt;
+        }
+        if(rentSubsidyAmt!=null){
+            total=total+rentSubsidyAmt;
+        }
+
+        if(renter2OwnerSubsidyAmt!=null){
+            total=total+renter2OwnerSubsidyAmt;
+        }
+        if(owner2RenterSubsidyAmt!=null){
+            total=total+owner2RenterSubsidyAmt;
+        }
+        if(feeSubsidyAmt!=null){
+            total=total+feeSubsidyAmt;
+        }
+        if(abatementSubsidyAmt!=null){
+            total=total+abatementSubsidyAmt;
+        }
+        if(otherSubsidyAmt!=null){
+            total=total+otherSubsidyAmt;
+        }
+        if(insureSubsidyAmt!=null){
+            total=total+insureSubsidyAmt;
+        }
+        if(oilSubsidyAmt!=null){
+            total=total+oilSubsidyAmt;
+        }
+        if(delaySubsidyAmt!=null){
+            total=total+delaySubsidyAmt;
+        }
+        if(getReturnDelaySubsidyAmt!=null){
+            total=total+getReturnDelaySubsidyAmt;
+        }
+        if(cleanCarSubsidyAmt!=null){
+            total=total+cleanCarSubsidyAmt;
+        }
+        if(owner2RenterRentSubsidyAmt!=null){
+            total=total+owner2RenterRentSubsidyAmt;
+        }
+        if(trafficSubsidyAmt!=null){
+            total=total+trafficSubsidyAmt;
+        }
+
+        return total;
+    }
+
+
 
 
 
