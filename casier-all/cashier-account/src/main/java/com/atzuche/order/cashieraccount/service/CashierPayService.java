@@ -313,7 +313,7 @@ public class CashierPayService{
         //待支付总额
         int amtTotal = amtDeposit + amtWZDeposit + rentAmt;
         //实际待支付租车费用总额 即真实应付租车费用
-        Integer amtRent = rentAmt+rentAmtPayed;
+        int amtRent = rentAmt+rentAmtPayed;
         // 计算钱包 支付 目前支付抵扣租费费用
         int amtWallet =0;
         if(YesNoEnum.YES.getCode()==result.getIsUseWallet()){

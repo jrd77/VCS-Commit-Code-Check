@@ -18,7 +18,7 @@ public class AccountDebtResVO {
     /**
      * 总欠款
      */
-    private Integer debtAmt;
+    private int debtAmt;
     /**
      * 更新版本号
      */

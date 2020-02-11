@@ -74,7 +74,7 @@ public class AccountDebtDetailNoTService {
     public  List<AccountDebtDetailEntity> getDebtListByDebtAll(List<AccountDebtDetailEntity> accountDebtDetailAlls, AccountDeductDebtReqVO accountDeductDebt) {
         List<AccountDebtReceivableaDetailEntity> accountDebtReceivableaDetails = new ArrayList<>();
         int amt = accountDeductDebt.getAmt();
-        Integer realAmt = NumberUtils.INTEGER_ZERO;
+        int realAmt = NumberUtils.INTEGER_ZERO;
         List<AccountDebtDetailEntity>  accountDebtDetailTodos = new ArrayList<>();
         for(int i =0;i<accountDebtDetailAlls.size();i++){
             AccountDebtDetailEntity accountDebtDetailAll = accountDebtDetailAlls.get(i);

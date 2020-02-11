@@ -26,35 +26,35 @@ public class AccountRenterCostReqVO {
     /**
      * 手续费
      */
-    private Integer yongjinAmt;
+    private int yongjinAmt;
     /**
      * 基础保障费用
      */
-    private Integer basicEnsureAmount;
+    private int basicEnsureAmount;
     /**
      * 全面保障费用
      */
-    private Integer comprehensiveEnsureAmount;
+    private int comprehensiveEnsureAmount;
     /**
      * 附加驾驶人保证费用
      */
-    private Integer additionalDrivingEnsureAmount;
+    private int additionalDrivingEnsureAmount;
     /**
      * 其他费用
      */
-    private Integer otherAmt;
+    private int otherAmt;
     /**
      * 平台补贴费用
      */
-    private Integer platformSubsidyAmount;
+    private int platformSubsidyAmount;
     /**
      * 车主补贴费用
      */
-    private Integer carOwnerSubsidyAmount;
+    private int carOwnerSubsidyAmount;
     /**
      * 实付费用
      */
-    private Integer shifuAmt;
+    private int shifuAmt;
 
 
     /**
