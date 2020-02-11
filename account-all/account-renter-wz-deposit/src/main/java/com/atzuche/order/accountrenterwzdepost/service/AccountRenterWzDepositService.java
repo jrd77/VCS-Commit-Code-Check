@@ -4,10 +4,7 @@ import com.atzuche.order.accountrenterwzdepost.entity.AccountRenterWzDepositDeta
 import com.atzuche.order.accountrenterwzdepost.entity.AccountRenterWzDepositEntity;
 import com.atzuche.order.accountrenterwzdepost.service.notservice.AccountRenterWzDepositDetailNoTService;
 import com.atzuche.order.accountrenterwzdepost.service.notservice.AccountRenterWzDepositNoTService;
-import com.atzuche.order.accountrenterwzdepost.vo.req.CreateOrderRenterWZDepositReqVO;
-import com.atzuche.order.accountrenterwzdepost.vo.req.PayedOrderRenterDepositWZDetailReqVO;
-import com.atzuche.order.accountrenterwzdepost.vo.req.PayedOrderRenterWZDepositReqVO;
-import com.atzuche.order.accountrenterwzdepost.vo.req.RenterCancelWZDepositCostReqVO;
+import com.atzuche.order.accountrenterwzdepost.vo.req.*;
 import com.atzuche.order.accountrenterwzdepost.vo.res.AccountRenterWZDepositResVO;
 import com.atzuche.order.commons.enums.YesNoEnum;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
@@ -113,6 +110,24 @@ public class AccountRenterWzDepositService{
         accountRenterWzDepositNoTService.updateRenterWZDepositChange(payedOrderRenterWZDepositDetail);
         //添加押金资金进出明细
         return accountRenterWzDepositDetailNoTService.insertRenterWZDepositDetail(payedOrderRenterWZDepositDetail);
+    }
+    /**
+     * 违章押金资金进出 操作
+     */
+    public int updateRenterWZDepositDetain(OrderRenterDepositWZDetainReqVO orderRenterDepositWZDetainReqVO){
+        //1 参数校验
+        Assert.notNull(orderRenterDepositWZDetainReqVO, ErrorCode.PARAMETER_ERROR.getText());
+        orderRenterDepositWZDetainReqVO.check();
+        //2更新车辆押金  剩余押金 金额
+        accountRenterWzDepositNoTService.updateRenterWZDeposit(orderRenterDepositWZDetainReqVO);
+        //添加押金资金进出明细
+        AccountRenterWzDepositDetailEntity accountRenterDepositDetailEntity = new AccountRenterWzDepositDetailEntity();
+        BeanUtils.copyProperties(orderRenterDepositWZDetainReqVO,accountRenterDepositDetailEntity);
+        accountRenterDepositDetailEntity.setCostCode(orderRenterDepositWZDetainReqVO.getRenterCashCodeEnum().getCashNo());
+        accountRenterDepositDetailEntity.setCostDetail(orderRenterDepositWZDetainReqVO.getRenterCashCodeEnum().getTxt());
+        accountRenterDepositDetailEntity.setSourceCode(orderRenterDepositWZDetainReqVO.getRenterCashCodeEnum().getCashNo());
+        accountRenterDepositDetailEntity.setSourceDetail(orderRenterDepositWZDetainReqVO.getRenterCashCodeEnum().getTxt());
+        return accountRenterWzDepositDetailNoTService.insertRenterDepositDetailEntity(accountRenterDepositDetailEntity);
     }
 
     /**

@@ -3,10 +3,13 @@ package com.atzuche.order.cashieraccount.service;
 import com.atzuche.order.accountownercost.entity.AccountOwnerCostSettleDetailEntity;
 import com.atzuche.order.accountownercost.service.notservice.AccountOwnerCostSettleDetailNoTService;
 import com.atzuche.order.accountrenterdeposit.vo.res.AccountRenterDepositResVO;
+import com.atzuche.order.accountrenterdetain.service.AccountRenterDetainService;
+import com.atzuche.order.accountrenterdetain.vo.req.ChangeDetainRenterDepositReqVO;
 import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostSettleDetailEntity;
 import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostSettleEntity;
 import com.atzuche.order.accountrenterrentcost.service.notservice.AccountRenterCostSettleDetailNoTService;
 import com.atzuche.order.accountrenterrentcost.service.notservice.AccountRenterCostSettleNoTService;
+import com.atzuche.order.accountrenterwzdepost.vo.req.*;
 import com.atzuche.order.accountrenterwzdepost.vo.res.AccountRenterWZDepositResVO;
 import com.atzuche.order.cashieraccount.vo.res.pay.OrderPayCallBackSuccessVO;
 import com.atzuche.order.commons.enums.OrderPayStatusEnum;
@@ -27,7 +30,6 @@ import com.atzuche.order.accountownerincome.service.AccountOwnerIncomeService;
 import com.atzuche.order.accountownerincome.vo.req.AccountOwnerIncomeExamineOpReqVO;
 import com.atzuche.order.accountownerincome.vo.req.AccountOwnerIncomeExamineReqVO;
 import com.atzuche.order.accountrenterdeposit.service.AccountRenterDepositService;
-import com.atzuche.order.accountrenterdeposit.vo.req.CreateOrderRenterCostReqVO;
 import com.atzuche.order.accountrenterdeposit.vo.req.CreateOrderRenterDepositReqVO;
 import com.atzuche.order.accountrenterdeposit.vo.req.DetainRenterDepositReqVO;
 import com.atzuche.order.accountrenterdeposit.vo.req.PayedOrderRenterDepositReqVO;
@@ -36,10 +38,6 @@ import com.atzuche.order.accountrenterrentcost.vo.req.AccountRenterCostDetailReq
 import com.atzuche.order.accountrenterrentcost.vo.req.AccountRenterCostReqVO;
 import com.atzuche.order.accountrenterwzdepost.service.AccountRenterWzDepositCostService;
 import com.atzuche.order.accountrenterwzdepost.service.AccountRenterWzDepositService;
-import com.atzuche.order.accountrenterwzdepost.vo.req.CreateOrderRenterWZDepositReqVO;
-import com.atzuche.order.accountrenterwzdepost.vo.req.PayedOrderRenterDepositWZDetailReqVO;
-import com.atzuche.order.accountrenterwzdepost.vo.req.PayedOrderRenterWZDepositReqVO;
-import com.atzuche.order.accountrenterwzdepost.vo.req.RenterWZDepositCostReqVO;
 import com.atzuche.order.cashieraccount.entity.CashierEntity;
 import com.atzuche.order.cashieraccount.mapper.CashierMapper;
 import com.atzuche.order.cashieraccount.service.notservice.CashierNoTService;
@@ -90,8 +88,8 @@ public class CashierService {
     @Autowired private OrderStatusService orderStatusService;
     @Autowired private OrderFlowService orderFlowService;
     @Autowired private AccountRenterCostSettleNoTService accountRenterCostSettleNoTService;
-    @Autowired
-    private CashierMapper cashierMapper;
+    @Autowired private CashierMapper cashierMapper;
+    @Autowired private AccountRenterDetainService accountRenterDetainService;
 
     /**  *************************************** 租车费用 start****************************************************/
 
@@ -122,7 +120,37 @@ public class CashierService {
      */
     @Transactional(rollbackFor=Exception.class)
     public void detainRenterDeposit(DetainRenterDepositReqVO detainRenterDepositReqVO){
-        accountRenterDepositService.detainRenterDeposit(detainRenterDepositReqVO);
+        AccountRenterDepositResVO vo = accountRenterDepositService.getAccountRenterDepositEntity(detainRenterDepositReqVO.getOrderNo(),detainRenterDepositReqVO.getMemNo());
+        detainRenterDepositReqVO.setAmt(vo.getSurplusDepositAmt());
+        //1 扣除全部 剩余可用车辆押金
+        int depositDetailId = accountRenterDepositService.detainRenterDeposit(detainRenterDepositReqVO);
+        //2 暂扣表记录暂扣车辆押金
+        ChangeDetainRenterDepositReqVO changeDetainRenterDepositReqVO = getCangeDetainRenterDepositReqVO(detainRenterDepositReqVO,depositDetailId);
+        accountRenterDetainService.changeRenterDetainCost(changeDetainRenterDepositReqVO);
+    }
+
+    /**
+     * 构造暂扣资金参数
+     * @param detainRenterDepositReqVO
+     * @param depositDetailId
+     * @return
+     */
+    private ChangeDetainRenterDepositReqVO getCangeDetainRenterDepositReqVO(DetainRenterDepositReqVO detainRenterDepositReqVO,int depositDetailId) {
+        ChangeDetainRenterDepositReqVO result = new ChangeDetainRenterDepositReqVO();
+        BeanUtils.copyProperties(detainRenterDepositReqVO,result);
+        result.setIsDetain(YesNoEnum.YES);
+        result.setUniqueNo(String.valueOf(depositDetailId));
+        result.setRenterCashCodeEnum(RenterCashCodeEnum.ACCOUNT_DEPOSIT_DETAIN_CAR_AMT);
+        return result;
+    }
+
+    private ChangeDetainRenterDepositReqVO getCangeDetainRenterWZDepositReqVO(OrderRenterDepositWZDetainReqVO orderRenterDepositWZDetainReqVO, int detailId) {
+        ChangeDetainRenterDepositReqVO result = new ChangeDetainRenterDepositReqVO();
+        BeanUtils.copyProperties(orderRenterDepositWZDetainReqVO,result);
+        result.setIsDetain(YesNoEnum.YES);
+        result.setUniqueNo(String.valueOf(detailId));
+        result.setRenterCashCodeEnum(RenterCashCodeEnum.ACCOUNT_WZ_DEPOSIT_DETAIN_CAR_AMT);
+        return result;
     }
 
 
@@ -159,12 +187,20 @@ public class CashierService {
 
 
     /**
-     * 扣减/暂扣 车俩押金
+     * 扣减/暂扣 违章押金
      */
     @Transactional(rollbackFor=Exception.class)
-    public void detainRenterWZDeposit(PayedOrderRenterDepositWZDetailReqVO payedOrderRenterWZDepositDetail){
-        accountRenterWzDepositService.updateRenterWZDepositChange(payedOrderRenterWZDepositDetail);
+    public void detainRenterWZDeposit(OrderRenterDepositWZDetainReqVO orderRenterDepositWZDetainReqVO){
+        //1 违章账户金额扣除
+        AccountRenterWZDepositResVO vo = accountRenterWzDepositService.getAccountRenterWZDeposit(orderRenterDepositWZDetainReqVO.getOrderNo(),orderRenterDepositWZDetainReqVO.getMemNo());
+        orderRenterDepositWZDetainReqVO.setAmt(vo.getShouldReturnDeposit());
+        int detailId = accountRenterWzDepositService.updateRenterWZDepositDetain(orderRenterDepositWZDetainReqVO);
+        //2 暂扣记录表数据更新
+        ChangeDetainRenterDepositReqVO changeDetainRenterDepositReqVO = getCangeDetainRenterWZDepositReqVO(orderRenterDepositWZDetainReqVO,detailId);
+        accountRenterDetainService.changeRenterDetainCost(changeDetainRenterDepositReqVO);
     }
+
+
     /**
      * 查询违章押金是否付清
      */

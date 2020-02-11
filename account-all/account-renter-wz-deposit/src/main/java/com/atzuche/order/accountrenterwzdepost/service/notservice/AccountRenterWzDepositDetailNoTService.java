@@ -52,11 +52,12 @@ public class AccountRenterWzDepositDetailNoTService {
         return accountRenterWzDepositDetailMapper.findByOrderNo(orderNo);
     }
 
-    public void insertRenterDepositDetailEntity(AccountRenterWzDepositDetailEntity accountRenterDepositDetailEntity) {
+    public int insertRenterDepositDetailEntity(AccountRenterWzDepositDetailEntity accountRenterDepositDetailEntity) {
         int result = accountRenterWzDepositDetailMapper.insertSelective(accountRenterDepositDetailEntity);
         if(result==0){
             throw new PayOrderRenterWZDepositException();
         }
+        return result;
     }
 
     /**

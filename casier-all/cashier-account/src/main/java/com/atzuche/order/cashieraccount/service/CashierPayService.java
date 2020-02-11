@@ -346,13 +346,19 @@ public class CashierPayService{
      */
     private void handCopywriting(OrderPayableAmountResVO result,OrderPayReqVO orderPayReqVO) {
         result.setButtonName("去支付");
-        result.setHints("请于1小时内完成支付，超时未支付订单将自动取消");
+
         String costText ="";
         if(orderPayReqVO.getPayKind().contains(DataPayKindConstant.RENT)){
             costText =costText+"车辆押金"+ Math.abs(result.getAmtDeposit());
+            result.setHints("请于1小时内完成支付，超时未支付订单将自动取消");
         }
         if(orderPayReqVO.getPayKind().contains(DataPayKindConstant.DEPOSIT)){
             costText =costText+" 违章押金"+Math.abs(result.getAmtWzDeposit());
+            result.setHints("交易结束后24小时内，车辆押金将返还到支付账户");
+        }
+        if(orderPayReqVO.getPayKind().contains(DataPayKindConstant.RENT) && orderPayReqVO.getPayKind().contains(DataPayKindConstant.DEPOSIT)){
+            costText ="车辆押金"+ Math.abs(result.getAmtDeposit()) + " + " + " 违章押金"+Math.abs(result.getAmtWzDeposit());
+
         }
         result.setCostText(costText);
 

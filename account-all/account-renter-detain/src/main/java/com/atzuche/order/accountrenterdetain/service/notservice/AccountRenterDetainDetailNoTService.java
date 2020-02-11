@@ -3,7 +3,7 @@ package com.atzuche.order.accountrenterdetain.service.notservice;
 import com.atzuche.order.accountrenterdetain.entity.AccountRenterDetainDetailEntity;
 import com.atzuche.order.accountrenterdetain.exception.AccountRenterDetainDetailException;
 import com.atzuche.order.accountrenterdetain.mapper.AccountRenterDetainDetailMapper;
-import com.atzuche.order.accountrenterdetain.vo.req.DetainRenterDepositReqVO;
+import com.atzuche.order.accountrenterdetain.vo.req.ChangeDetainRenterDepositReqVO;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 
 import org.springframework.beans.BeanUtils;
@@ -29,10 +29,10 @@ public class AccountRenterDetainDetailNoTService {
      * 记录暂扣明细
      * @param detainRenterDeposit
      */
-    public void insertCostDetail(DetainRenterDepositReqVO detainRenterDeposit) {
+    public void insertCostDetail(ChangeDetainRenterDepositReqVO detainRenterDeposit) {
         AccountRenterDetainDetailEntity entity = new AccountRenterDetainDetailEntity();
         BeanUtils.copyProperties(detainRenterDeposit,entity);
-        entity.setSourceCode(Integer.parseInt(detainRenterDeposit.getRenterCashCodeEnum().getCashNo()));
+        entity.setSourceCode(detainRenterDeposit.getRenterCashCodeEnum().getCashNo());
         entity.setSourceDetail(detainRenterDeposit.getRenterCashCodeEnum().getTxt());
         int result = accountRenterDetainDetailMapper.insertSelective(entity);
         if(result==0){

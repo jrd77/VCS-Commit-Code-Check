@@ -39,7 +39,7 @@ public class AccountRenterDetainDetailEntity implements Serializable {
 	/**
 	 * 暂扣费用来源编码
 	 */
-	private Integer sourceCode;
+	private String sourceCode;
 	/**
 	 * 暂扣费用来源编码描述
 	 */
