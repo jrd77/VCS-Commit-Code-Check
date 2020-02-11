@@ -11,7 +11,7 @@
     <select id="findAll" resultMap="oilAverageCost">
         SELECT
         id,
-        engine_type
+        engine_type,
         molecule,
         denominator,
         city_code
