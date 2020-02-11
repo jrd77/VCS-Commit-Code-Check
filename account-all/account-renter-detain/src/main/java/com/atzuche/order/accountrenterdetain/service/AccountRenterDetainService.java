@@ -1,13 +1,17 @@
 package com.atzuche.order.accountrenterdetain.service;
 
+import com.atzuche.order.accountrenterdetain.entity.AccountRenterDetainDetailEntity;
 import com.atzuche.order.accountrenterdetain.service.notservice.AccountRenterDetainCostNoTService;
 import com.atzuche.order.accountrenterdetain.service.notservice.AccountRenterDetainDetailNoTService;
-import com.atzuche.order.accountrenterdetain.vo.req.DetainRenterDepositReqVO;
-import com.autoyol.cat.CatAnnotation;
+import com.atzuche.order.accountrenterdetain.vo.req.ChangeDetainRenterDepositReqVO;
+import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.autoyol.commons.web.ErrorCode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
+import org.springframework.util.CollectionUtils;
+
+import java.util.List;
 
 
 /**
@@ -33,7 +37,7 @@ public class AccountRenterDetainService {
     /**
      * 暂扣费用资金进出
      */
-    public void changeRenterDetainCost(DetainRenterDepositReqVO detainRenterDeposit){
+    public void changeRenterDetainCost(ChangeDetainRenterDepositReqVO detainRenterDeposit){
         //1校验
         Assert.notNull(detainRenterDeposit, ErrorCode.PARAMETER_ERROR.getText());
         detainRenterDeposit.check();
@@ -41,5 +45,19 @@ public class AccountRenterDetainService {
         accountRenterDetainCostNoTService.changeRenterDetainCost(detainRenterDeposit);
         //3 记录违章费用账户费用流水
         accountRenterDetainDetailNoTService.insertCostDetail(detainRenterDeposit);
+    }
+
+    /**
+     * 查询暂扣金额
+     * @param orderNo
+     * @param renterCashCode
+     * @return
+     */
+    public int getRenterDetain(String orderNo, RenterCashCodeEnum renterCashCode) {
+        List<AccountRenterDetainDetailEntity> entities = accountRenterDetainDetailNoTService.selectByOrderNoAndRenterCash(orderNo,renterCashCode);
+        if(CollectionUtils.isEmpty(entities)){
+            return 0;
+        }
+        return entities.stream().mapToInt(AccountRenterDetainDetailEntity::getAmt).sum();
     }
 }

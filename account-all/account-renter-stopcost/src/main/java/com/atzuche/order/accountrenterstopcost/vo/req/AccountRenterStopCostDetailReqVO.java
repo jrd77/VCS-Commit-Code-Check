@@ -23,7 +23,7 @@ public class AccountRenterStopCostDetailReqVO {
     /**
      * 入账金额
      */
-    private Integer amt;
+    private int amt;
     /**
      * 入账时间
      */

@@ -49,7 +49,7 @@ public class AccountDebtService{
      * @param memNo
      * @return
      */
-    public Integer getAccountDebtNumByMemNo(String memNo){
+    public int getAccountDebtNumByMemNo(String memNo){
         AccountDebtResVO res = getAccountDebtByMemNo(memNo);
         if(Objects.isNull(res) || Objects.isNull(res.getDebtAmt())){
             return NumberUtils.INTEGER_ZERO;

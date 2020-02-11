@@ -1,4 +1,4 @@
-package com.atzuche.order.accountrenterdetain.vo.req;
+package com.atzuche.order.accountrenterwzdepost.vo.req;
 
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.autoyol.commons.web.ErrorCode;
@@ -8,38 +8,56 @@ import org.springframework.util.Assert;
 import java.time.LocalDateTime;
 
 /**
- * 暂扣请求参数
+ * 支付成功 回调 押金进出明细
  */
 @Data
-public class DetainRenterDepositReqVO {
+public class OrderRenterDepositWZDetainReqVO {
+
     /**
      * 主订单号
      */
     private String orderNo;
     /**
-     * 会员号
+     *
      */
     private String memNo;
     /**
-     * 暂扣金额
+     * 支付方式
      */
-    private Integer amt;
+    private String payment;
     /**
-     * 暂扣时间
+     * 支付渠道
      */
-    private LocalDateTime time;
+    private String payChannel;
     /**
-     *暂扣来源
+     * 费用编码
+     */
+    private String costCode;
+    /**
+     * 费用描述
+     */
+    private String costDetail;
+    /**
+     * 入账金额
+     */
+    private int amt;
+
+    /**
+     * 押金扣除来源
      */
     private RenterCashCodeEnum renterCashCodeEnum;
     /**
-     * 暂扣凭证
+     * 预授权金额
+     */
+    private int authorizeAmt;
+    /**
+     * 预授权到期时间
+     */
+    private LocalDateTime authorizeExpireTime;
+    /**
+     * 收银凭证
      */
     private String uniqueNo;
-    /**
-     * 备注
-     */
-    private String remake;
 
     /**
      * 创建人
@@ -47,7 +65,7 @@ public class DetainRenterDepositReqVO {
     private String createOp;
 
     /**
-     * 更新人
+     *
      */
     private String updateOp;
 
@@ -58,10 +76,5 @@ public class DetainRenterDepositReqVO {
         Assert.notNull(getMemNo(), ErrorCode.PARAMETER_ERROR.getText());
         Assert.notNull(getOrderNo(), ErrorCode.PARAMETER_ERROR.getText());
         Assert.notNull(getRenterCashCodeEnum(), ErrorCode.PARAMETER_ERROR.getText());
-        Assert.notNull(getAmt(), ErrorCode.PARAMETER_ERROR.getText());
-        Assert.isTrue(getAmt()!=0, ErrorCode.PARAMETER_ERROR.getText());
-        Assert.notNull(getUniqueNo(), ErrorCode.PARAMETER_ERROR.getText());
-
-
     }
 }

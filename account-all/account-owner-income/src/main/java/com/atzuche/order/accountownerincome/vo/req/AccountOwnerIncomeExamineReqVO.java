@@ -22,7 +22,7 @@ public class AccountOwnerIncomeExamineReqVO {
     /**
      * 收益审核金额
      */
-    private Integer amt;
+    private int amt;
     /**
      * 更新人
      */

@@ -21,7 +21,7 @@ public class AccountPlatformProfitDetailReqVO {
     /**
      * 费用
      */
-    private Integer amt;
+    private int amt;
     /**
      * 费来源编码
      */

@@ -29,7 +29,7 @@ public class RenterWZDepositCostReqVO {
     /**
      * 金额
      */
-    private Integer amt;
+    private int amt;
     /**
      * 入账来源编码
      */

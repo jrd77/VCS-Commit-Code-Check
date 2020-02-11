@@ -37,16 +37,5 @@ public class AccountDebtReceivableaDetailNoTService {
         }
     }
 
-    /**
-     * 幂等校验
-     * @param sourceCode
-     * @param uniqueNo
-     * @return
-     */
-    public boolean idempotentByUniqueAndSourceCode(Integer sourceCode, String uniqueNo) {
-        AccountDebtReceivableaDetailEntity accountDebtReceivableaDetail = accountDebtReceivableaDetailMapper.selectByUniqueAndSourceCode(sourceCode,uniqueNo);
-        return Objects.nonNull(accountDebtReceivableaDetail) && Objects.nonNull(accountDebtReceivableaDetail.getId());
-    }
-
 
 }
