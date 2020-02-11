@@ -275,7 +275,7 @@ public class DeliveryCarInfoPriceService {
 
         @Override
         public boolean preConfig() {
-            return false;
+            return true;
         }
     }
 }

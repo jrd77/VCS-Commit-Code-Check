@@ -1,13 +1,22 @@
 package com.atzuche.order.delivery.controller;
 
+import com.atzuche.order.commons.BindingResultUtil;
+import com.atzuche.order.commons.vo.req.DeliveryCarPriceReqVO;
+import com.atzuche.order.commons.vo.res.delivery.DeliveryOilCostRepVO;
 import com.atzuche.order.delivery.common.DeliveryCarTask;
+import com.atzuche.order.delivery.service.delivery.DeliveryCarInfoPriceService;
 import com.atzuche.order.delivery.utils.DateUtils;
+import com.atzuche.order.delivery.vo.delivery.DeliveryOilCostVO;
 import com.atzuche.order.delivery.vo.delivery.RenYunFlowOrderDTO;
 import com.atzuche.order.mq.common.base.BaseProducer;
 import com.atzuche.order.mq.common.base.OrderMessage;
 import com.autoyol.commons.web.ResponseData;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -19,6 +28,7 @@ import java.util.Date;
  */
 @RestController
 @RequestMapping("/api")
+@Slf4j
 public class DeliveryController {
 
     @Autowired
@@ -26,6 +36,9 @@ public class DeliveryController {
 
     @Autowired
     DeliveryCarTask deliveryCarTask;
+
+    @Autowired
+    DeliveryCarInfoPriceService deliveryCarInfoPriceService;
     @PostMapping("/delivery/add")
     public ResponseData<?> add() {
 
@@ -111,5 +124,25 @@ public class DeliveryController {
 //        deliveryCarTask.addRenYunFlowOrderInfo(renYunFlowOrderDTO);
 //        return ResponseData.success();
 
+    }
+
+    /**
+     * 获取油费
+     * @param deliveryCarPriceReqVO
+     * @return
+     */
+    @PostMapping("/oil/getOilCrash")
+    public ResponseData<DeliveryOilCostRepVO> getOilCostByRenterOrderNo(@RequestBody DeliveryCarPriceReqVO deliveryCarPriceReqVO, BindingResult bindingResult) {
+        log.info("获取油费入参：{}", deliveryCarPriceReqVO.toString());
+        BindingResultUtil.checkBindingResult(bindingResult);
+        try {
+            DeliveryOilCostRepVO deliveryOilCostRepVO = DeliveryOilCostRepVO.builder().build();
+            DeliveryOilCostVO deliveryOilCostVO = deliveryCarInfoPriceService.getOilCostByRenterOrderNo(deliveryCarPriceReqVO.getOrderNo(), deliveryCarPriceReqVO.getCarEngineType());
+            BeanUtils.copyProperties(deliveryOilCostVO,deliveryOilCostRepVO);
+            return ResponseData.success(deliveryOilCostRepVO);
+        } catch (Exception e) {
+            log.error("获取油费异常:", e);
+            return ResponseData.error();
+        }
     }
 }
