@@ -351,6 +351,7 @@ public class MemProxyService {
         commUseDriverList.forEach(x->{
             CommUseDriverInfoDTO commUseDriverInfoDTO = new CommUseDriverInfoDTO();
             BeanUtils.copyProperties(x,commUseDriverInfoDTO);
+            commUseDriverInfoDTO.setMobile(null == x.getMobile() ? null : x.getMobile().toString());
             CommUseDriverList.add(commUseDriverInfoDTO);
         });
         renterMemberDto.setCommUseDriverList(CommUseDriverList);
