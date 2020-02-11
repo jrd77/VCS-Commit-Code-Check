@@ -50,7 +50,7 @@ public class AdminOrderSettleController {
         log.info("CashierController settleOrderCancel end param [{}],result [{}]");
         return ResponseData.success();
     }
-    
+
     /**
      * 手动车辆结算接口
      * @param orderNo
@@ -64,6 +64,6 @@ public class AdminOrderSettleController {
         log.info("OrderSettleController settleOrderWz end param [{}],result [{}]");
         return ResponseData.success();
     }
-    
+
 
 }

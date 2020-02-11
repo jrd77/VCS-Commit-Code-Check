@@ -3,6 +3,7 @@ package com.atzuche.order.admin.service;
 import com.atzuche.order.admin.vo.resp.cost.DistributionCostVO;
 import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
+import com.atzuche.order.commons.vo.req.ModifyOrderReqVO;
 import com.atzuche.order.commons.vo.req.handover.req.HandoverCarInfoReqDTO;
 import com.atzuche.order.commons.vo.req.handover.req.HandoverCarInfoReqVO;
 import com.atzuche.order.delivery.common.DeliveryErrorCode;
@@ -20,11 +21,16 @@ import com.atzuche.order.delivery.vo.delivery.req.CarConditionPhotoUploadVO;
 import com.atzuche.order.delivery.vo.delivery.req.DeliveryCarRepVO;
 import com.atzuche.order.delivery.vo.delivery.req.DeliveryReqDTO;
 import com.atzuche.order.delivery.vo.delivery.req.DeliveryReqVO;
+import com.atzuche.order.open.service.FeignOrderModifyService;
 import com.atzuche.order.rentercommodity.service.RenterCommodityService;
 import com.atzuche.order.rentercost.entity.RenterOrderCostDetailEntity;
 import com.atzuche.order.rentercost.service.RenterOrderCostDetailService;
+import com.atzuche.order.rentermem.service.RenterMemberService;
 import com.atzuche.order.transport.service.GetReturnCarCostProxyService;
 import com.atzuche.order.transport.service.TranSportProxyService;
+import com.autoyol.commons.web.ErrorCode;
+import com.autoyol.commons.web.ResponseData;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,6 +64,10 @@ public class AdminDeliveryCarService {
 
     @Autowired
     RenterOrderCostDetailService renterOrderCostDetailService;
+    @Autowired
+    FeignOrderModifyService feignOrderModifyService;
+    @Autowired
+    RenterMemberService renterMemberService;
 
     protected final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -112,9 +122,30 @@ public class AdminDeliveryCarService {
      */
     public void updateDeliveryCarInfo(DeliveryCarVO deliveryCarVO) throws Exception {
         logger.info("入参deliveryReqVO：[{}]", deliveryCarVO.toString());
-        handoverCarInfoService.updateDeliveryCarInfo( createParams(deliveryCarVO));
+        handoverCarInfoService.updateDeliveryCarInfo(createParams(deliveryCarVO));
+        ResponseData responseData = feignOrderModifyService.modifyOrderForConsole(createModifyOrderInfoParams(deliveryCarVO));
+        if (!responseData.getResCode().equals(ErrorCode.SUCCESS.getCode())) {
+            logger.info("修改订单失败，orderNo：[{}],cause:[{}]", deliveryCarVO.getOrderNo(), responseData.getResMsg());
+            throw new DeliveryOrderException(DeliveryErrorCode.DELIVERY_MOUDLE_ERROR.getValue(), "修改订单失败");
+        }
     }
 
+    /**
+     * 更新订单参数
+     * @param deliveryCarVO
+     * @return
+     */
+    public ModifyOrderReqVO createModifyOrderInfoParams(DeliveryCarVO deliveryCarVO){
+        String memNo = renterMemberService.getRenterNoByOrderNo(deliveryCarVO.getOrderNo());
+        ModifyOrderReqVO modifyOrderReqVO = new ModifyOrderReqVO();
+        modifyOrderReqVO.setOrderNo(deliveryCarVO.getOrderNo());
+        if(StringUtils.isNotBlank(memNo)) {
+            modifyOrderReqVO.setMemNo(memNo);
+        }
+        modifyOrderReqVO.setSrvGetFlag(deliveryCarVO.getIsGetCar());
+        modifyOrderReqVO.setSrvReturnFlag(deliveryCarVO.getIsReturnCar());
+        return modifyOrderReqVO;
+    }
 
     public DeliveryReqVO createParams(DeliveryCarVO deliveryCarVO) {
         //取车服务信息
@@ -123,7 +154,7 @@ public class AdminDeliveryCarService {
         ReturnHandoverCarDTO returnHandoverCarDTO = deliveryCarVO.getReturnHandoverCarDTO();
         if (Objects.nonNull(getHandoverCarDTO)) {
             DeliveryReqDTO deliveryReqDTO = new DeliveryReqDTO();
-            deliveryReqDTO.setIsUsedGetAndReturnCar("1");
+            deliveryReqDTO.setIsUsedGetAndReturnCar(String.valueOf(deliveryCarVO.getIsGetCar()));
             deliveryReqDTO.setOrderNo(deliveryCarVO.getOrderNo());
             deliveryReqDTO.setOwnerRealGetAddrReamrk(getHandoverCarDTO.getOwnRealGetRemark());
             deliveryReqDTO.setRenterRealGetAddrReamrk(getHandoverCarDTO.getRenterRealGetAddrReamrk());
@@ -137,7 +168,7 @@ public class AdminDeliveryCarService {
         }
         if (Objects.nonNull(returnHandoverCarDTO)) {
             DeliveryReqDTO renterDeliveryReqDTO = new DeliveryReqDTO();
-            renterDeliveryReqDTO.setIsUsedGetAndReturnCar("1");
+            renterDeliveryReqDTO.setIsUsedGetAndReturnCar(String.valueOf(deliveryCarVO.getIsReturnCar()));
             renterDeliveryReqDTO.setOrderNo(deliveryCarVO.getOrderNo());
             renterDeliveryReqDTO.setRenterRealGetAddrReamrk(returnHandoverCarDTO.getRenterRealGetRemark());
             renterDeliveryReqDTO.setOwnerRealGetAddrReamrk(returnHandoverCarDTO.getOwnerRealGetAddrReamrk());
