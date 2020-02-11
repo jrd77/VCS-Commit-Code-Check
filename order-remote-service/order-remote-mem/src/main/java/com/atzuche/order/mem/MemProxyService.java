@@ -182,7 +182,7 @@ public class MemProxyService {
                 MemberSelectKeyEnum.MEMBER_ROLE_INFO.getKey(),
                 MemberSelectKeyEnum.MEMBER_ADDITION_INFO.getKey(),
                 MemberSelectKeyEnum.MEMBER_STATISTICS_INFO.getKey(),
-                MemberSelectKeyEnum.MEMBER_RELIEF_INFO.getKey());
+                MemberSelectKeyEnum.MEMBER_RELIEF_INFO.getKey(),MemberSelectKeyEnum.MEMBER_SECRET_INFO.getKey());
         ResponseData<MemberTotalInfo> responseData = null;
         log.info("Feign 开始获取车主会员信息,memNo={}",memNo);
         Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "会员详情服务");
@@ -216,6 +216,7 @@ public class MemProxyService {
         ownerMemberDto.setOrderSuccessCount(memberStatisticsInfo.getSuccessOrderNum());
         ownerMemberDto.setHaveCar(null != memberTotalInfo.getMemberBaseInfo() ? memberTotalInfo.getMemberBaseInfo().getHaveCar() : 0);
         ownerMemberDto.setMemType(null != memberTotalInfo.getMemberRoleInfo() ? memberTotalInfo.getMemberRoleInfo().getMemberType() : null);
+        ownerMemberDto.setIdNo(memberTotalInfo.getMemberSecretInfo().getIdNo());
         List<OwnerMemberRightDTO> rights = new ArrayList<>();
         MemberRoleInfo memberRoleInfo = memberTotalInfo.getMemberRoleInfo();
 
@@ -305,7 +306,7 @@ public class MemProxyService {
                 MemberSelectKeyEnum.MEMBER_ROLE_INFO.getKey(),
                 MemberSelectKeyEnum.MEMBER_ADDITION_INFO.getKey(),
                 MemberSelectKeyEnum.MEMBER_STATISTICS_INFO.getKey(),
-                MemberSelectKeyEnum.MEMBER_RELIEF_INFO.getKey());
+                MemberSelectKeyEnum.MEMBER_RELIEF_INFO.getKey(),MemberSelectKeyEnum.MEMBER_SECRET_INFO.getKey());
         ResponseData<MemberTotalInfo> responseData = null;
         log.info("Feign 开始获取租客会员信息,memNo={}",memNo);
         Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "会员详情服务");
@@ -343,6 +344,7 @@ public class MemProxyService {
         renterMemberDto.setFirstName(memberBaseInfo.getFirstName());
         renterMemberDto.setGender(memberBaseInfo.getGender());
         renterMemberDto.setIdCardAuth(memberAuthInfo.getIdCardAuth());
+        renterMemberDto.setIdNo(memberTotalInfo.getMemberSecretInfo().getIdNo());
         renterMemberDto.setDriLicAuth(memberAuthInfo.getDriLicAuth());
         renterMemberDto.setDriViceLicAuth(memberAuthInfo.getDriViceLicAuth());
         renterMemberDto.setOrderSuccessCount(memberStatisticsInfo.getSuccessOrderNum());
