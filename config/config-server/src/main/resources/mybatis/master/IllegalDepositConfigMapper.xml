@@ -11,7 +11,7 @@
     <select id="findAll" resultMap="base">
         SELECT
         id,
-        city_code
+        city_code,
         lease_max,
         lease_min,
         deposit_amt

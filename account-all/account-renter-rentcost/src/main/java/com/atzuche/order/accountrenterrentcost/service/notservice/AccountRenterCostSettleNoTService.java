@@ -54,7 +54,7 @@ public class AccountRenterCostSettleNoTService {
         if(Objects.isNull(accountRenterCostSettle) || Objects.isNull(accountRenterCostSettle.getShifuAmt())){
             return NumberUtils.INTEGER_ZERO;
         }
-        Integer refundAmt = accountRenterCostSettle.getRefundAmt();
+        int refundAmt = accountRenterCostSettle.getRefundAmt();
         refundAmt = Objects.isNull(refundAmt)?0:refundAmt;
         return accountRenterCostSettle.getShifuAmt() + refundAmt;
     }

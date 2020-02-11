@@ -24,6 +24,6 @@ public class RenterCancelWZDepositCostReqVO {
     /**
      * 金额
      */
-    private Integer amt;
+    private int amt;
 
 }

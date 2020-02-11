@@ -54,15 +54,16 @@ public class CancelOrderService {
      */
     public void cancel(CancelOrderReqVO cancelOrderReqVO) {
         //公共校验
-        cancelOrderCheckService.checkCancelOrder(cancelOrderReqVO.getOrderNo(), false);
+        boolean isConsoleInvoke = StringUtils.isNotBlank(cancelOrderReqVO.getOperatorName());
+        cancelOrderCheckService.checkCancelOrder(cancelOrderReqVO.getOrderNo(),cancelOrderReqVO.getMemNo(), isConsoleInvoke);
         //取消处理
         CancelOrderResDTO res = null;
         if (StringUtils.equals(MemRoleEnum.RENTER.getCode(), cancelOrderReqVO.getMemRole())) {
             //租客取消
-            res = renterCancelOrderService.cancel(cancelOrderReqVO.getOrderNo(), cancelOrderReqVO.getCancelReason(),false);
+            res = renterCancelOrderService.cancel(cancelOrderReqVO.getOrderNo(), cancelOrderReqVO.getCancelReason(),isConsoleInvoke);
         } else if (StringUtils.equals(MemRoleEnum.OWNER.getCode(), cancelOrderReqVO.getMemRole())) {
             //车主取消
-            res = ownerCancelOrderService.cancel(cancelOrderReqVO.getOrderNo(), cancelOrderReqVO.getCancelReason(), false);
+            res = ownerCancelOrderService.cancel(cancelOrderReqVO.getOrderNo(), cancelOrderReqVO.getCancelReason(), isConsoleInvoke);
         }
 
         logger.info("res:[{}]", JSON.toJSONString(res));

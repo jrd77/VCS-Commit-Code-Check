@@ -177,7 +177,6 @@ public class CashierNoTService {
             Integer settleAmount = notifyDataVo.getSettleAmount()==null?0:Integer.parseInt(notifyDataVo.getSettleAmount());
             vo.setAuthorizeDepositAmt(settleAmount);
             vo.setSurplusAuthorizeDepositAmt(settleAmount);
-            detainRenterDeposit.setAuthorizeExpireTime(LocalDateTimeUtils.getDateAfter(vo.getPayTime(),30));
         }
         //TODO 预授权到期时间
         //车辆押金进出明细

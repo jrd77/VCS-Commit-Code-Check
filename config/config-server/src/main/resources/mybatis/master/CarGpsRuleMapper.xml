@@ -12,7 +12,7 @@
     <select id="findAll" resultMap="base">
         SELECT
         id,
-        start_date
+        start_date,
         serial_number,
         days,
         fees,rule_status

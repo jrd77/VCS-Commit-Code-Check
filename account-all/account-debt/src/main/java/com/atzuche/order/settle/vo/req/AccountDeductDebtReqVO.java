@@ -21,12 +21,12 @@ public class AccountDeductDebtReqVO {
     /**
      * 抵扣金额
      */
-    private Integer amt;
+    private int amt;
 
     /**
      * 真实抵扣金额
      */
-    private Integer realAmt;
+    private int realAmt;
 
     /**
      * 来源编码描述

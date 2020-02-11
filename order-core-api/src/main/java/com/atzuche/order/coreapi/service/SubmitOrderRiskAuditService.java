@@ -61,7 +61,7 @@ public class SubmitOrderRiskAuditService {
             ResponseCheckUtil.checkResponse(responseData);
 
             t.setStatus(Transaction.SUCCESS);
-            return String.valueOf(responseData.getData());
+            return responseData.getData().getRiskReqId();
 
         } catch (Exception e) {
             logger.error("下单调用风控服务异常.param is, reqVo:[{}]", req, e);

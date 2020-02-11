@@ -22,7 +22,7 @@ public class CreateOrderRenterWZDepositReqVO {
     /**
      * 应付押金总额
      */
-    private Integer yingfuDepositAmt;
+    private int yingfuDepositAmt;
     /**
      * 租车押金:01,违章押金:02,补付租车押金:03,坦客-租车费用:04,坦客-押金费用:05,充值:06,欠款:07,补付租车押金,管理后台v5.11:08,长租线上费用支付:09,PMS:10,默认:99
      */

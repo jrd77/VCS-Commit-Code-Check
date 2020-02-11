@@ -51,7 +51,7 @@ dependencies {
     compile("com.caucho:hessian:4.0.38")
     compile("com.autoframework:auto-mq-event:1.0-SNAPSHOT")
 
-    compile('com.autoyol.car:auto-car-service-api:2020020901-SNAPSHOT')
+    compile('com.autoyol.car:auto-car-service-api:2020021102-SNAPSHOT')
    
 
 //    compile project(":casier-all:cashier-account")
@@ -66,7 +66,6 @@ dependencies {
 	compile project(":order-core-all:renter-all:renter-cost")
 	compile project(":order-core-all:parent-order")
     compile project(":order-settle")
-//    compile project(":order-core-api")
 
     compile project(":order-remote-service:order-remote-mem")
     compile project(":order-remote-service:order-remote-car")

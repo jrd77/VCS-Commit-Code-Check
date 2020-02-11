@@ -5,6 +5,7 @@ import com.atzuche.order.accountrenterwzdepost.exception.AccountRenterWZDepositE
 import com.atzuche.order.accountrenterwzdepost.exception.PayOrderRenterWZDepositException;
 import com.atzuche.order.accountrenterwzdepost.mapper.AccountRenterWzDepositMapper;
 import com.atzuche.order.accountrenterwzdepost.vo.req.CreateOrderRenterWZDepositReqVO;
+import com.atzuche.order.accountrenterwzdepost.vo.req.OrderRenterDepositWZDetainReqVO;
 import com.atzuche.order.accountrenterwzdepost.vo.req.PayedOrderRenterDepositWZDetailReqVO;
 import com.atzuche.order.accountrenterwzdepost.vo.req.PayedOrderRenterWZDepositReqVO;
 import com.atzuche.order.accountrenterwzdepost.vo.res.AccountRenterWZDepositResVO;
@@ -90,7 +91,7 @@ public class AccountRenterWzDepositNoTService {
         }
     }
     /**
-     * 更新违章押金 剩余金额
+     * 更新违章押金 实退金额
      * @param payedOrderRenterWZDepositDetail
      */
     public void updateRenterWZDepositChange(PayedOrderRenterDepositWZDetailReqVO payedOrderRenterWZDepositDetail) {
@@ -110,8 +111,27 @@ public class AccountRenterWzDepositNoTService {
         if(Objects.nonNull(accountRenterDeposit.getRealReturnDeposit()) || accountRenterDeposit.getRealReturnDeposit()>Math.abs(payedOrderRenterWZDepositDetail.getAmt())){
             accountRenterDeposit.setRealReturnDeposit(accountRenterDeposit.getRealReturnDeposit() + payedOrderRenterWZDepositDetail.getAmt());
         }
-        accountRenterDeposit.setRealReturnDeposit(accountRenterDeposit.getRealReturnDeposit());
         int result =  accountRenterWzDepositMapper.updateByPrimaryKeySelective(accountRenterDeposit);
+        if(result==0){
+            throw new PayOrderRenterWZDepositException();
+        }
+    }
+
+    /**
+     * 更新违章押金 应退退金额
+     * @param vo
+     */
+    public void updateRenterWZDeposit(OrderRenterDepositWZDetainReqVO vo) {
+        AccountRenterWzDepositEntity accountRenterDepositEntity = accountRenterWzDepositMapper.selectByOrderAndMemNo(vo.getOrderNo(),vo.getMemNo());
+        if(Objects.isNull(accountRenterDepositEntity)){
+            throw new PayOrderRenterWZDepositException();
+        }
+        vo.setAmt(accountRenterDepositEntity.getShouldReturnDeposit());
+        AccountRenterWzDepositEntity accountRenterDeposit = new AccountRenterWzDepositEntity();
+        accountRenterDeposit.setId(accountRenterDepositEntity.getId());
+        accountRenterDeposit.setVersion(accountRenterDepositEntity.getVersion());
+        accountRenterDeposit.setShouldReturnDeposit(0);
+        int result = accountRenterWzDepositMapper.updateByPrimaryKeySelective(accountRenterDeposit);
         if(result==0){
             throw new PayOrderRenterWZDepositException();
         }

@@ -2,6 +2,7 @@ package com.atzuche.order.owner.mem.entity;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+
 import lombok.Data;
 
 
@@ -60,6 +61,10 @@ public class OwnerMemberEntity implements Serializable {
 	 * 平台上架车辆数
 	 */
 	private Integer renterCarCount;
+	/**
+	 * 身份证号码
+	 */
+	private String idNo;
 	/**
 	 * 创建时间
 	 */

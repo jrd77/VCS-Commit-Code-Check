@@ -449,13 +449,13 @@ public class OrderSettleNoTService {
 
         //1 车主端代管车服务费
         CostBaseDTO costBaseDTO= getCostBaseOwner(settleOrders.getOwnerOrder());
-        Integer rentAmt=settleOrders.getRenterOrderCost();
+        int rentAmt=settleOrders.getRenterOrderCost();
         //代管车服务费比例 商品
         Double proxyProportionDou= ownerGoodsDetail.getServiceRate();
         if(proxyProportionDou==null){
             proxyProportionDou = Double.valueOf(0.0);
         }
-        Integer proxyProportion = proxyProportionDou.intValue();
+        int proxyProportion = proxyProportionDou.intValue();
         OwnerOrderPurchaseDetailEntity proxyExpense = ownerOrderCostCombineService.getProxyExpense(costBaseDTO,rentAmt,proxyProportion);
         //2 车主端平台服务费
         //服务费比例 商品
@@ -463,7 +463,7 @@ public class OrderSettleNoTService {
         if(serviceRate==null){
             serviceRate = Double.valueOf(0.0);
         }
-        Integer serviceProportion = serviceRate.intValue();
+        int serviceProportion = serviceRate.intValue();
         OwnerOrderPurchaseDetailEntity serviceExpense = ownerOrderCostCombineService.getServiceExpense(costBaseDTO,rentAmt,serviceProportion);
         //3 获取车主补贴明细列表
         List<OwnerOrderSubsidyDetailEntity> ownerOrderSubsidyDetail = ownerOrderSubsidyDetailService.listOwnerOrderSubsidyDetail(settleOrders.getOrderNo(),settleOrders.getOwnerOrderNo());

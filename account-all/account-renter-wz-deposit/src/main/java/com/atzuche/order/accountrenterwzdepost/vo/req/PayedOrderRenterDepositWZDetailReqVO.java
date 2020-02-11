@@ -32,7 +32,7 @@ public class PayedOrderRenterDepositWZDetailReqVO {
     /**
      * 费用编码
      */
-    private Integer costCode;
+    private String costCode;
     /**
      * 费用描述
      */
@@ -40,7 +40,7 @@ public class PayedOrderRenterDepositWZDetailReqVO {
     /**
      * 入账金额
      */
-    private Integer amt;
+    private int amt;
 
     /**
      * 押金扣除来源
@@ -49,7 +49,7 @@ public class PayedOrderRenterDepositWZDetailReqVO {
     /**
      * 预授权金额
      */
-    private Integer authorizeAmt;
+    private int authorizeAmt;
     /**
      * 预授权到期时间
      */

@@ -146,26 +146,25 @@ public class CashierPayService{
             OrderStatusDTO orderStatusDTO = new OrderStatusDTO();
             BeanUtils.copyProperties(vo,orderStatusDTO);
             //当支付成功（当车辆押金，违章押金，租车费用都支付成功，更新订单状态 待取车），更新主订单状态待取车
-            if(isGetCar(orderStatusDTO)){
+            if(isChangeOrderStatus(orderStatusDTO)){
                 orderStatusDTO.setStatus(OrderStatusEnum.TO_GET_CAR.getStatus());
                 //记录订单流程
                 orderFlowService.inserOrderStatusChangeProcessInfo(orderStatusDTO.getOrderNo(), OrderStatusEnum.TO_GET_CAR);
             }
             orderStatusService.saveOrderStatusInfo(orderStatusDTO);
-            //更新配送 订单补付等信息
-            if(isGetCar(orderStatusDTO)){
+            //更新配送 订单补付等信息 只有订单状态为已支付
+            if(isGetCar(vo)){
                 callBack.callBack(vo.getOrderNo(),vo.getRenterOrderNo(),vo.getIsPayAgain());
             }
             log.info("payOrderCallBackSuccess saveOrderStatusInfo :[{}]", GsonUtils.toJson(orderStatusDTO));
         }
     }
-
     /**
      * 判断 租车费用 押金 违章押金 是否全部成功支付
      * @param orderStatusDTO
      * @return
      */
-    private Boolean isGetCar(OrderStatusDTO orderStatusDTO){
+    private Boolean isChangeOrderStatus(OrderStatusDTO orderStatusDTO){
         OrderStatusEntity entity = orderStatusService.getByOrderNo(orderStatusDTO.getOrderNo());
         boolean getCar = false;
         Integer rentCarPayStatus = Objects.isNull(orderStatusDTO.getRentCarPayStatus())?entity.getRentCarPayStatus():orderStatusDTO.getRentCarPayStatus();
@@ -173,9 +172,22 @@ public class CashierPayService{
         Integer wzPayStatus = Objects.isNull(orderStatusDTO.getWzPayStatus())?entity.getWzPayStatus():orderStatusDTO.getWzPayStatus();
         if(
                 (Objects.nonNull(rentCarPayStatus) && OrderPayStatusEnum.PAYED.getStatus() == rentCarPayStatus)&&
-                ( Objects.nonNull(depositPayStatus) && OrderPayStatusEnum.PAYED.getStatus() == depositPayStatus )&&
-                (Objects.nonNull(wzPayStatus)  && OrderPayStatusEnum.PAYED.getStatus() == wzPayStatus)
+                        ( Objects.nonNull(depositPayStatus) && OrderPayStatusEnum.PAYED.getStatus() == depositPayStatus )&&
+                        (Objects.nonNull(wzPayStatus)  && OrderPayStatusEnum.PAYED.getStatus() == wzPayStatus)
         ){
+            getCar =true;
+        }
+        return getCar;
+    }
+    /**
+     * 判断 租车费用 是否成功支付
+     * @param orderPayCallBackSuccessVO
+     * @return
+     */
+    private boolean isGetCar(OrderPayCallBackSuccessVO orderPayCallBackSuccessVO){
+        boolean getCar = false;
+        Integer rentCarPayStatus = orderPayCallBackSuccessVO.getRentCarPayStatus();
+        if(Objects.nonNull(rentCarPayStatus) && OrderPayStatusEnum.PAYED.getStatus() == rentCarPayStatus){
             getCar =true;
         }
         return getCar;
@@ -301,7 +313,7 @@ public class CashierPayService{
         //待支付总额
         int amtTotal = amtDeposit + amtWZDeposit + rentAmt;
         //实际待支付租车费用总额 即真实应付租车费用
-        Integer amtRent = rentAmt+rentAmtPayed;
+        int amtRent = rentAmt+rentAmtPayed;
         // 计算钱包 支付 目前支付抵扣租费费用
         int amtWallet =0;
         if(YesNoEnum.YES.getCode()==result.getIsUseWallet()){
@@ -334,13 +346,19 @@ public class CashierPayService{
      */
     private void handCopywriting(OrderPayableAmountResVO result,OrderPayReqVO orderPayReqVO) {
         result.setButtonName("去支付");
-        result.setHints("请于1小时内完成支付，超时未支付订单将自动取消");
+
         String costText ="";
         if(orderPayReqVO.getPayKind().contains(DataPayKindConstant.RENT)){
             costText =costText+"车辆押金"+ Math.abs(result.getAmtDeposit());
+            result.setHints("请于1小时内完成支付，超时未支付订单将自动取消");
         }
         if(orderPayReqVO.getPayKind().contains(DataPayKindConstant.DEPOSIT)){
             costText =costText+" 违章押金"+Math.abs(result.getAmtWzDeposit());
+            result.setHints("交易结束后24小时内，车辆押金将返还到支付账户");
+        }
+        if(orderPayReqVO.getPayKind().contains(DataPayKindConstant.RENT) && orderPayReqVO.getPayKind().contains(DataPayKindConstant.DEPOSIT)){
+            costText ="车辆押金"+ Math.abs(result.getAmtDeposit()) + " + " + " 违章押金"+Math.abs(result.getAmtWzDeposit());
+
         }
         result.setCostText(costText);
 

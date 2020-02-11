@@ -23,7 +23,7 @@ public class PayedOrderRenterWZDepositReqVO {
     /**
      * 实收违章押金
      */
-    private Integer shishouDeposit;
+    private int shishouDeposit;
     /**
      * 是否预授权
      */
