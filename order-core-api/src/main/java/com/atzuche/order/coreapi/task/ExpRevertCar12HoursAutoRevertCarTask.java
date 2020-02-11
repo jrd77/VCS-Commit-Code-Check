@@ -58,7 +58,14 @@ public class ExpRevertCar12HoursAutoRevertCarTask extends IJobHandler {
                     ReturnCarReqVO reqVO = new ReturnCarReqVO();
                     reqVO.setOrderNo(orderNo);
                     reqVO.setOperatorName("System");
-                    ownerReturnCarService.returnCar(reqVO);
+                    try {
+                        logger.info("执行 预计还车12小时后，自动还车 orderNo:[{}]",orderNo);
+                        ownerReturnCarService.returnCar(reqVO);
+                    } catch (Exception e) {
+                        XxlJobLogger.log("执行 预计还车12小时后，自动还车 异常:",e);
+                        logger.error("执行 预计还车12小时后，自动还车 异常orderNo:[{}] , e:[{}]",orderNo ,e);
+                        Cat.logError("执行 预计还车12小时后，自动还车 异常",e);
+                    }
                 }
             }
             logger.info("结束执行 预计还车12小时后，自动还车");

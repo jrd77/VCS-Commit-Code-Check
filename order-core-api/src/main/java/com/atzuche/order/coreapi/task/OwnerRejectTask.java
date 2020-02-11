@@ -58,7 +58,14 @@ public class OwnerRejectTask extends IJobHandler {
                 for (String orderNo : orderNos) {
                     RefuseOrderReqVO req = new RefuseOrderReqVO();
                     req.setOrderNo(orderNo);
-                    ownerRefuseOrderService.refuse(req, DispatcherReasonEnum.timeout);
+                    try {
+                        logger.info("执行 下单后15分钟，车主没有接单,自动拒单 orderNo:[{}]",orderNo);
+                        ownerRefuseOrderService.refuse(req, DispatcherReasonEnum.timeout);
+                    } catch (Exception e) {
+                        logger.error("执行 下单后15分钟，车主没有接单,自动拒单 异常 orderNo:[{}] , e:[{}]",orderNo,e);
+                        Cat.logError("执行 下单后15分钟，车主没有接单,自动拒单 异常",e);
+                        XxlJobLogger.log("结束执行 下单后15分钟，车主没有接单,自动拒单 异常:",e);
+                    }
                 }
             }
             logger.info("结束执行 下单后15分钟，车主没有接单,自动拒单 ");
