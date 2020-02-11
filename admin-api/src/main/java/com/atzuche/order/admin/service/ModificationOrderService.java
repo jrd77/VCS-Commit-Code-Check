@@ -104,7 +104,12 @@ public class ModificationOrderService {
 							
 							//需补付金额   需补付金额
 							putPaymentAmount(realVo,data,subData);
+						}else {
+							//未找到修改记录
+							realVo.setOperatorStatus(convertAgreeFlag(null));
 						}
+					}else { //未找到修改记录
+						realVo.setOperatorStatus(convertAgreeFlag(null));
 					}
 					//封装数据 
 					modificationOrderList.add(realVo);
@@ -253,18 +258,20 @@ public class ModificationOrderService {
 		realVo.setModificationTime(LocalDateTimeUtils.formatDateTime(renterOrderResVO.getCreateTime()));
 		realVo.setSource(convertSource(renterOrderResVO.getChangeSource()));
 		realVo.setModificationUser(renterOrderResVO.getCreateOp());
-		realVo.setModificationReason("---");
+		/// renter_order表change_reason字段获取 20200210
+		realVo.setModificationReason(renterOrderResVO.getChangeReason());
 		realVo.setRentTime(LocalDateTimeUtils.formatDateTime(renterOrderResVO.getExpRentTime()));
 		realVo.setRevertTime(LocalDateTimeUtils.formatDateTime(renterOrderResVO.getExpRevertTime()));
 		realVo.setTotalRentDay(calcTotalRentDay(renterOrderResVO.getExpRentTime(),renterOrderResVO.getExpRevertTime()));
 		realVo.setCarServiceInformation(convertCarGetReturn(renterOrderResVO));
+		//操作状态
 		realVo.setOperatorStatus(convertAgreeFlag(renterOrderResVO));
 	}
 	
 	private String convertAgreeFlag(RenterOrderResVO renterOrderResVO) {
-		String flag = "";
-		if(renterOrderResVO.getAgreeFlag() == null) {
-			return "---";
+		String flag = "--";
+		if(renterOrderResVO == null || renterOrderResVO.getAgreeFlag() == null) {
+			return "--";
 		}
 		switch (renterOrderResVO.getAgreeFlag()) {
 		case 0:
