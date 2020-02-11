@@ -80,7 +80,9 @@ public class RenterCostFacadeService {
                 orderNo,renterOrderNo,memNo,totalBsicRentCostAmt,totalSubsidyAmt,totalConsoleSubsidyAmt,totalConsoleCostAmt);
         return totalCost;
     }
-
+    
+    
+    ////全费用对象full
     public RenterCostDetailVO getRenterCostFullDetail(String orderNo, String renterOrderNo, String memNo){
         List<RenterOrderCostDetailEntity> renterOrderCostDetailEntityList = orderCostDetailService.getRenterOrderCostDetailList(orderNo,renterOrderNo);
         List<RenterOrderFineDeatailEntity> renterOrderFineDeatailEntityList=fineDeatailService.listRenterOrderFineDeatail(orderNo,renterOrderNo);

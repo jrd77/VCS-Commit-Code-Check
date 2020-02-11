@@ -36,7 +36,7 @@ public class SendEmailService {
             orderNoStr.append(orderNo);
             orderNoStr.append(",");
         }
-        orderNoStr = new StringBuilder(orderNoStr.substring(0, orderNos.size() - 1));
+        orderNoStr = new StringBuilder(orderNoStr.substring(0, orderNoStr.length() - 1));
         content += orderNoStr;
         content +="</body>\n" +
                 "</html>";

@@ -58,7 +58,14 @@ public class RevertCar4HoursAutoSettleTask extends IJobHandler{
 
             if(CollectionUtils.isNotEmpty(orderNos)){
                 for (String orderNo : orderNos) {
-                    orderSettle.settleOrder(orderNo);
+                    try {
+                        logger.info("执行 还车4小时后，自动结算 orderNo:[{}]",orderNo);
+                        orderSettle.settleOrder(orderNo);
+                    } catch (Exception e) {
+                        XxlJobLogger.log("执行 还车4小时后，自动结算 异常:",e);
+                        logger.error("执行 还车4小时后，自动结算 异常 orderNo:[{}] , e:[{}]",orderNo , e);
+                        Cat.logError("执行 还车4小时后，自动结算 异常",e);
+                    }
                 }
             }
             logger.info("结束执行 还车4小时后，自动结算");
