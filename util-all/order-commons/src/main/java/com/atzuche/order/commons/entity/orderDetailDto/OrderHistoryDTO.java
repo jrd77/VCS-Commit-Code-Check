@@ -13,7 +13,11 @@ public class OrderHistoryDTO {
     public String ownerName;
     @AutoDocProperty("车主手机号码")
     public String ownerPhone;
-    @AutoDocProperty("下单城市")
+    @AutoDocProperty("下单城市名称")
+    public String cityName;
+    @AutoDocProperty("下单城市编码")
+    public String cityCode;
+    @AutoDocProperty("下单地址")
     public String reqAdd;
     @AutoDocProperty("用车起始时间")
     public String rentTime;
