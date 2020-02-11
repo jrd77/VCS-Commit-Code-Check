@@ -94,7 +94,7 @@ public class AdminRenterWzController extends BaseController {
     }
 
     @PostMapping("/console/add/temporaryRefund")
-    @AutoDocMethod(description = "添加暂扣返还", value = "添加暂扣返还",response = ResponseData.class)
+    @AutoDocMethod(description = "暂扣/取消暂扣违章押金", value = "暂扣/取消暂扣违章押金",response = ResponseData.class)
     public ResponseData addTemporaryRefund(@Valid @RequestBody TemporaryRefundReqVO req, BindingResult bindingResult){
         if (bindingResult.hasErrors()) {
             return validate(bindingResult);

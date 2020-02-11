@@ -20,7 +20,7 @@ public class RenterWzWithholdResVO {
     @AutoDocProperty("剩余可用违章押金")
     private String shouldReturnDeposit;
 
-    @AutoDocProperty("预计暂扣金额")
+    @AutoDocProperty("预计扣款金额 文案变更")
     private String provisionalDeduction;
 
     @AutoDocProperty("预计抵扣租车费用")
@@ -53,10 +53,10 @@ public class RenterWzWithholdResVO {
     @AutoDocIgnoreProperty
     private Date deductionTime;
 
-    @AutoDocProperty("实际暂扣金额")
+    @AutoDocProperty("实际扣款金额 文案变更")
     private String shiJiZanKouJinE;
 
-    @AutoDocProperty("实际已退违章押金")
+    @AutoDocProperty("剩余可用违章押金 文案变更")
     private String shiJiYiTuiWeiZhangYaJin;
 
     @AutoDocProperty("实际抵扣租车费用")
@@ -64,4 +64,7 @@ public class RenterWzWithholdResVO {
 
     @AutoDocProperty("结算时抵扣历史欠款")
     private String jieSuanShiDiKouLiShiQianKuan;
+
+    @AutoDocProperty("违章押金暂扣状态 1：暂扣 2：取消暂扣")
+    private Integer detainStatus;
 }
