@@ -26,6 +26,7 @@ import com.atzuche.order.renterwz.service.WzTemporaryRefundLogService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.util.*;
@@ -214,13 +215,14 @@ public class RenterWzService {
 
     public void addTemporaryRefund(TemporaryRefundReqVO req) {
         //TODO 调用退款接口
-        WzTemporaryRefundLogEntity dto = new WzTemporaryRefundLogEntity();
+
+        /*WzTemporaryRefundLogEntity dto = new WzTemporaryRefundLogEntity();
         BeanUtils.copyProperties(req,dto);
         dto.setCreateTime(new Date());
         dto.setOperator(AdminUserUtil.getAdminUser().getAuthName());
         dto.setAmount(convertIntString(req.getAmount()));
         dto.setStatus(1);
-        wzTemporaryRefundLogService.save(dto);
+        wzTemporaryRefundLogService.save(dto);*/
     }
 
     private int convertIntString(String intStr){
@@ -250,14 +252,17 @@ public class RenterWzService {
         List<RenterWzCostDetailResVO> costDetails = getRenterWzCostDetailRes(orderNo);
         rs.setCostDetails(costDetails);
 
+        //获取预计/实际的暂扣金额 = 等于以下6项费用之和，协助违章处理费、凹凸代办服务费、不良用车处罚金、停运费、其他扣款、保险理赔
+        int zanKouAmount = this.getZanKouAmount(costDetails);
+
         //暂扣日志
-        List<TemporaryRefundLogResVO> temporaryRefundLogResVos = this.queryTemporaryRefundLogsByOrderNo(orderNo);
-        rs.setTemporaryRefundLogs(temporaryRefundLogResVos);
+        /*List<TemporaryRefundLogResVO> temporaryRefundLogResVos = this.queryTemporaryRefundLogsByOrderNo(orderNo);
+        rs.setTemporaryRefundLogs(temporaryRefundLogResVos);*/
 
         WzDepositMsgResVO wzDepositMsg = cashierQueryService.queryWzDepositMsg(orderNo);
 
         //违章押金暂扣处理
-        RenterWzWithholdResVO withhold = this.queryRenterWzWithhold(orderNo,rs.getSettleStatus(),orderStatus,wzDepositMsg);
+        RenterWzWithholdResVO withhold = this.queryRenterWzWithhold(orderNo,rs.getSettleStatus(),orderStatus,wzDepositMsg,zanKouAmount);
         rs.setWithhold(withhold);
 
         //违章支付信息
@@ -267,23 +272,37 @@ public class RenterWzService {
         return rs;
     }
 
+    private int getZanKouAmount(List<RenterWzCostDetailResVO> costDetails) {
+        if(CollectionUtils.isEmpty(costDetails)){
+            return 0;
+        }
+        return costDetails
+                .stream()
+                .filter(Objects::nonNull)
+                .filter(dto -> StringUtils.isNotBlank(dto.getAmount()))
+                .map(RenterWzCostDetailResVO::getAmount)
+                .mapToInt(Integer::parseInt)
+                .sum();
+    }
+
     private static final String UN_SETTLE = "0";
-    private RenterWzWithholdResVO queryRenterWzWithhold(String orderNo, String settleStatus, OrderStatusEntity orderStatus, WzDepositMsgResVO wzDepositMsg) {
+    private RenterWzWithholdResVO queryRenterWzWithhold(String orderNo, String settleStatus, OrderStatusEntity orderStatus, WzDepositMsgResVO wzDepositMsg, int zanKouAmount) {
         RenterWzWithholdResVO result = new RenterWzWithholdResVO();
         RenterOrderEntity renterOrder = renterOrderService.getRenterOrderByOrderNoAndIsEffective(orderNo);
         if(renterOrder != null && renterOrder.getActRevertTime() != null){
             result.setExpectSettleTimeStr(DateUtils.formate(renterOrder.getActRevertTime().plusDays(18L),DateUtils.DATE_DEFAUTE1));
         }
+        int wzDepositAmt = wzDepositMsg.getWzDepositAmt();
         if(UN_SETTLE.equals(settleStatus)){
             //未结算
-            result.setShouldReturnDeposit(String.valueOf(wzDepositMsg.getWzDepositSurplusAmt()));
-            result.setProvisionalDeduction(String.valueOf(wzDepositMsg.getDetainAmt()));
+            result.setShouldReturnDeposit(String.valueOf(wzDepositAmt - zanKouAmount));
+            result.setProvisionalDeduction(String.valueOf(zanKouAmount));
             result.setYuJiDiKouZuCheFee(String.valueOf(wzDepositMsg.getDetainCostAmt()));
             result.setActuallyProvisionalDeduction("0");
         }else{
             //已结算
-            result.setShiJiZanKouJinE(String.valueOf(wzDepositMsg.getDetainAmt()));
-            result.setShiJiYiTuiWeiZhangYaJin(String.valueOf(wzDepositMsg.getRefundAmt()));
+            result.setShiJiZanKouJinE(String.valueOf(zanKouAmount));
+            result.setShiJiYiTuiWeiZhangYaJin(String.valueOf(wzDepositAmt - zanKouAmount));
             result.setShiJiDiKouZuCheFee(String.valueOf(wzDepositMsg.getDetainCostAmt()));
             result.setJieSuanShiDiKouLiShiQianKuan(String.valueOf(wzDepositMsg.getDebtAmt()));
             result.setActuallyProvisionalDeduction(String.valueOf(wzDepositMsg.getDetainAmt()));
@@ -303,7 +322,7 @@ public class RenterWzService {
         if(wzDepositMsg == null){
             return result;
         }
-        result.setYingshouDeposit(String.valueOf(wzDepositMsg.getYingshouWzDepositAmt()));
+        result.setYingshouDeposit(String.valueOf(-wzDepositMsg.getYingshouWzDepositAmt()));
         result.setWzDeposit(String.valueOf(wzDepositMsg.getWzDepositAmt()));
         result.setWaiverAmount(String.valueOf(wzDepositMsg.getReductionAmt()));
         result.setTransStatusStr(wzDepositMsg.getPayStatus());
