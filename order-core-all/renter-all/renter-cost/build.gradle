@@ -16,7 +16,7 @@ dependencies {
     compile project(":util-all:fee-calculator")
     compile project(":util-all:order-commons")
     compile ("com.autoyol:fetchBackCarFeeService-api:feign-1.0.1-SNAPSHOT")
-    compile('com.autoyol.car:auto-car-service-api:2020020901-SNAPSHOT')
+    compile('com.autoyol.car:auto-car-service-api:2020021102-SNAPSHOT')
     compile('com.autoyol:auto-coin-service-api:1.0.3-SNAPSHOT')
     compile project(":config:config-client")
     //compile project(":casier-all:cashier-account")

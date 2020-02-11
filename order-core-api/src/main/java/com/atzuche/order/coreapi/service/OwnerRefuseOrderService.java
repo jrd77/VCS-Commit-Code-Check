@@ -82,7 +82,8 @@ public class OwnerRefuseOrderService {
      */
     public void refuse(RefuseOrderReqVO reqVO, DispatcherReasonEnum dispatcherReason) {
         //车主拒绝前置校验
-        refuseOrderCheckService.checkOwnerAgreeOrRefuseOrder(reqVO.getOrderNo(), StringUtils.isNotBlank(reqVO.getOperatorName()));
+        boolean isConsoleInvoke = dispatcherReason.getCode() == DispatcherReasonEnum.timeout.getCode() || StringUtils.isNotBlank(reqVO.getOperatorName());
+        refuseOrderCheckService.checkOwnerAgreeOrRefuseOrder(reqVO.getOrderNo(), isConsoleInvoke);
         //判断是都进入调度
         //获取订单信息
         OrderEntity orderEntity = orderService.getOrderEntity(reqVO.getOrderNo());

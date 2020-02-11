@@ -1,8 +1,11 @@
 package com.atzuche.order.renterorder.service;
 
+import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.entity.dto.CommUseDriverInfoDTO;
 import com.atzuche.order.renterorder.entity.RenterAdditionalDriverEntity;
 import com.atzuche.order.renterorder.mapper.RenterAdditionalDriverMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -18,6 +21,8 @@ import java.util.List;
  */
 @Service
 public class RenterAdditionalDriverService {
+    private static Logger logger = LoggerFactory.getLogger(RenterAdditionalDriverService.class);
+
     @Autowired
     private RenterAdditionalDriverMapper renterAdditionalDriverMapper;
 
@@ -32,6 +37,9 @@ public class RenterAdditionalDriverService {
      */
     public void insertBatchAdditionalDriver(String orderNo, String renterOrderNo, List<String> driverIds,
                                             List<CommUseDriverInfoDTO> commUseDriverList) {
+        logger.info("Batch insert additional driver.param is,orderNo:[{}],renterOrderNo:[{}],driverIds:[{}],commUseDriverList:[{}]",
+                orderNo, renterOrderNo, JSON.toJSON(driverIds), JSON.toJSON(commUseDriverList));
+
         if (!CollectionUtils.isEmpty(driverIds) && !CollectionUtils.isEmpty(commUseDriverList)) {
             for (CommUseDriverInfoDTO commUseDriverInfo : commUseDriverList) {
                 if (null != commUseDriverInfo.getId() && driverIds.contains(commUseDriverInfo.getId().toString())) {

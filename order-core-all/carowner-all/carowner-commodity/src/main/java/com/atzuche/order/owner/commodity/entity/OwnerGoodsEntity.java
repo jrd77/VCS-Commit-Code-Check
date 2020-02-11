@@ -247,4 +247,9 @@ public class OwnerGoodsEntity implements Serializable {
 	 */
 	private String year;
 
+	/**
+	 * 最新公里数
+	 */
+	private Integer lastMileage;
+
 }

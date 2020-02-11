@@ -39,6 +39,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 /**
@@ -96,6 +97,7 @@ public class SubmitOrderController {
         orderReqVO.setRevertTime(LocalDateTimeUtils.parseStringToDateTime(normalOrderReqVO.getRevertTime(),
                 LocalDateTimeUtils.DEFAULT_PATTERN));
 
+        orderReqVO.setReqTime(LocalDateTime.now());
         OrderReqContext context = buildOrderReqContext(orderReqVO);
         orderFilterChain.validate(context);
         try{

@@ -42,6 +42,30 @@ public class RenterCostDetailVO {
     @AutoDocProperty(value = "补贴及其详情")
     private RenterSubsidyDetailVO subsidyDetail;
 
+    @AutoDocProperty(value = "消费总额")
+    private int totalAmt;
+
+
+    public int getTotalAmt(){
+        int total= rentAmt+insuranceAmt+abatementInsuranceAmt+fee+extraDriverInsuranceAmt;
+        if(deliveryFeeDetail!=null){
+            total= total+deliveryFeeDetail.getDeliveryTotal();
+        }
+        if(mileageCostAmt!=null){
+            total= total+mileageCostAmt;
+        }
+        if(oilCostAmt!=null){
+            total= total+oilCostAmt;
+        }
+        if(fineDetail!=null){
+            total=total+fineDetail.getTotalFine();
+        }
+        if(subsidyDetail!=null){
+            total=total+subsidyDetail.getTotalSubsidy();
+        }
+        return totalAmt;
+    }
+
 
 
 
