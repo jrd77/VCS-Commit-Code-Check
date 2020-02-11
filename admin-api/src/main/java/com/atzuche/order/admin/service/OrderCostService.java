@@ -146,8 +146,8 @@ public class OrderCostService {
 		
 		int base = rentAmt + insure + drive + fine + adjust + oil + fee + insureAll + getReturnFee + rentPayToPlatform + beyondMile + addOil;
 		
-		//取反，显示为正数
-		realVo.setRentFeeBase(String.valueOf(-base));
+		//取反，显示为正数，因为是从realVo中获取，已经转义过了。
+		realVo.setRentFeeBase(String.valueOf(base));
 	}
 
 	private void putSupplementAmt(OrderRenterCostResVO realVo,
@@ -197,7 +197,6 @@ public class OrderCostService {
 			if("3".equals(orderConsoleSubsidyDetailEntity.getSubsidySourceCode()) && "1".equals(orderConsoleSubsidyDetailEntity.getSubsidyTargetCode())) {
 				platformSubsidyAmount += orderConsoleSubsidyDetailEntity.getSubsidyAmount().intValue();
 			}
-			
 //			1111
 			///  从租客补贴表中获取，如下:租客补贴  20200205
 //			if("2".equals(orderConsoleSubsidyDetailEntity.getSubsidySourceName()) && "1".equals(orderConsoleSubsidyDetailEntity.getSubsidyTargetName())) {
@@ -209,18 +208,20 @@ public class OrderCostService {
 //				}
 //			}
 			
-			//补贴来源方 1、租客 2、车主 3、平台
-			//补贴方名称 1、租客 2、车主 3、平台
-	    	//租客给车主的调价
+		}
+		
+		for (OrderConsoleSubsidyDetailEntity orderConsoleSubsidyDetailEntity : orderConsoleSubsidyDetails) {
 			if("1".equals(orderConsoleSubsidyDetailEntity.getSubsidySourceCode()) && "2".equals(orderConsoleSubsidyDetailEntity.getSubsidyTargetCode())){
+				//补贴来源方 1、租客 2、车主 3、平台
+				//补贴方名称 1、租客 2、车主 3、平台
+		    	//租客给车主的调价
 				if(RenterCashCodeEnum.SUBSIDY_RENTERTOOWNER_ADJUST.getCashNo().equals(orderConsoleSubsidyDetailEntity.getSubsidyCostCode())) {
 //					renterToOwnerAdjustAmount += orderConsoleSubsidyDetailEntity.getSubsidyAmount().intValue();
 					//不需要累计，只是查询记录
 					renterToOwnerAdjustAmount = Math.abs(orderConsoleSubsidyDetailEntity.getSubsidyAmount().intValue());
-					break;
+					break; //就是这个地方跳出去了
 				}
 			}
-			
 		}
 		
 		/**
@@ -293,20 +294,20 @@ public class OrderCostService {
 	}
 	
 	private void putRenterOrderDeposit(OrderRenterCostResVO realVo, com.atzuche.order.commons.vo.res.OrderRenterCostResVO data) {
-		realVo.setVehicleDeposit(data.getRentVo()!=null?String.valueOf(-data.getRentVo().getYingfuDepositAmt()):"---");
-		realVo.setViolationDeposit(data.getWzVo()!=null?String.valueOf(-data.getWzVo().getYingshouDeposit()):"---");
+		realVo.setVehicleDeposit(data.getRentVo()!=null && data.getRentVo().getYingfuDepositAmt() != null?String.valueOf(-data.getRentVo().getYingfuDepositAmt()):"---");
+		realVo.setViolationDeposit(data.getWzVo()!=null && data.getWzVo().getYingshouDeposit() != null?String.valueOf(-data.getWzVo().getYingshouDeposit()):"---");
 		//
-		realVo.setVehicleDepositYingshou(data.getRentVo()!=null?String.valueOf(-data.getRentVo().getYingfuDepositAmt()):"---");
-		realVo.setVehicleDepositShishou(data.getRentVo()!=null?String.valueOf(-data.getRentVo().getShifuDepositAmt()):"---");
+		realVo.setVehicleDepositYingshou(data.getRentVo()!=null && data.getRentVo().getYingfuDepositAmt() != null?String.valueOf(-data.getRentVo().getYingfuDepositAmt()):"---");
+		realVo.setVehicleDepositShishou(data.getRentVo()!=null && data.getRentVo().getShifuDepositAmt() != null?String.valueOf(-data.getRentVo().getShifuDepositAmt()):"---");
 		//海豹后面表里要加上的。 海豹的表里面有的 huangjing-todo
 		realVo.setVehicleDepositYingtui("---"); //data.getRentVo()!=null?String.valueOf(data.getRentVo().getYingfuDepositAmt()):"---"
 		realVo.setVehicleDepositShitui("---"); //data.getRentVo()!=null?String.valueOf(data.getRentVo().getYingfuDepositAmt()):"---"
 		//任务减免金额
-		realVo.setPlatformTaskFreeAmt(data.getRentVo()!=null?String.valueOf(data.getRentVo().getReductionAmt()):"---");
+		realVo.setPlatformTaskFreeAmt(data.getRentVo()!=null && data.getRentVo().getReductionAmt() != null?String.valueOf(data.getRentVo().getReductionAmt()):"---");
 		
 		//
-		realVo.setViolationDepositYingshou(data.getWzVo()!=null?String.valueOf(-data.getWzVo().getYingshouDeposit()):"---");
-		realVo.setViolationDepositShishou(data.getWzVo()!=null?String.valueOf(-data.getWzVo().getShishouDeposit()):"---");
+		realVo.setViolationDepositYingshou(data.getWzVo()!=null && data.getWzVo().getYingshouDeposit() != null?String.valueOf(-data.getWzVo().getYingshouDeposit()):"---");
+		realVo.setViolationDepositShishou(data.getWzVo()!=null && data.getWzVo().getShishouDeposit() != null?String.valueOf(-data.getWzVo().getShishouDeposit()):"---");
 		//海豹后面表里要加上的。 海豹的表里面有的 huangjing-todo
 		realVo.setViolationDepositYingtui("---");//data.getWzVo()!=null?String.valueOf(data.getWzVo().getYingshouDeposit()):"---"
 		realVo.setViolationDepositShitui("---");//data.getWzVo()!=null?String.valueOf(data.getWzVo().getYingshouDeposit()):"---"
@@ -386,7 +387,7 @@ public class OrderCostService {
 		realVo.setOwnerCouponTitle(ownerCouponTitle);
 		realVo.setGetReturnCouponTitle(getReturnCouponTitle);
 	}
-
+										
 	private void putRenterOrderCostDetail(OrderRenterCostResVO realVo, com.atzuche.order.commons.vo.res.OrderRenterCostResVO data) {
 		/**
 		 * 
@@ -474,7 +475,7 @@ public class OrderCostService {
 		realVo.setRentFeeYingshou(String.valueOf(-data.getNeedIncrementAmt()));
 		//实收
 		AccountRenterCostSettleResVO renterSettleVo = data.getRenterSettleVo();
-		realVo.setRentFeeShishou(renterSettleVo!=null?String.valueOf(renterSettleVo.getShifuAmt()):"---");
+		realVo.setRentFeeShishou(renterSettleVo!=null && renterSettleVo.getShifuAmt() != null?String.valueOf(renterSettleVo.getShifuAmt()):"---");
 		//海豹后面表里要加上的。 海豹的表里面有的
 		realVo.setRentFeeYingtui("---");//data.getWzVo()!=null?String.valueOf(data.getWzVo().getYingshouDeposit()):"---"
 		realVo.setRentFeeShitui("---");//data.getWzVo()!=null?String.valueOf(data.getWzVo().getYingshouDeposit()):"---"

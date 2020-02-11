@@ -15,6 +15,7 @@ import org.springframework.test.context.web.WebAppConfiguration;
 
 import com.atzuche.order.admin.AdminSpringBoot;
 import com.atzuche.order.admin.vo.req.cost.AdditionalDriverInsuranceIdsReqVO;
+import com.atzuche.order.admin.vo.req.cost.OwnerToRenterSubsidyReqVO;
 import com.atzuche.order.admin.vo.req.cost.RenterCostReqVO;
 import com.atzuche.order.admin.vo.resp.cost.AdditionalDriverInsuranceVO;
 import com.atzuche.order.commons.entity.dto.CommUseDriverInfoDTO;
@@ -137,7 +138,16 @@ public class OrderCostDetailServiceTest {
 
 	@Test
 	public void testOwnerToRenterRentAmtSubsidy() {
-		fail("Not yet implemented");
+		OwnerToRenterSubsidyReqVO ownerCostReqVO = new OwnerToRenterSubsidyReqVO();
+		ownerCostReqVO.setOrderNo("86392311200299");
+		ownerCostReqVO.setOwnerOrderNo("8639231120029910011");
+		ownerCostReqVO.setOwnerSubsidyRentAmt("20");
+		try {
+			orderCostDetailService.ownerToRenterRentAmtSubsidy(ownerCostReqVO);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	@Test
