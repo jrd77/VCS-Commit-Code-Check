@@ -55,9 +55,9 @@ public class OwnerOrderDetailService {
     private OrderConsoleCostDetailService orderConsoleCostDetailService;
     @Autowired
     private OrderSettleService orderSettleService;
-    
+    @Autowired
     private OwnerOrderPurchaseDetailService ownerOrderPurchaseDetailService;
-
+    
     public OwnerRentDetailDTO ownerRentDetail(String orderNo, String ownerOrderNo) {
         //主订单
         OrderEntity orderEntity = orderService.getOrderEntity(orderNo);
