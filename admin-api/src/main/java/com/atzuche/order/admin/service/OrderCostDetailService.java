@@ -304,7 +304,8 @@ public class OrderCostDetailService {
 			
 			for (CommUseDriverInfoDTO commUseDriverInfoDTO : commUseDriverList) {
 				//已经入库的lstDriverId
-				if(!lstDriverId.contains(commUseDriverInfoDTO.getId().toString())) {  //不存在的，则允许再次新增。
+				//允许全部的展示。@邵大宏 前端会做处理。20200211
+//				if(!lstDriverId.contains(commUseDriverInfoDTO.getId().toString())) {  //不存在的，则允许再次新增。
 					CommUseDriverInfoStringDateDTO dto = new CommUseDriverInfoStringDateDTO();
 					//获取时间来转换
 					Date validityEndDate = commUseDriverInfoDTO.getValidityEndDate();
@@ -327,7 +328,7 @@ public class OrderCostDetailService {
 					}
 					dto.setAmt(amt);
 					listCommUseDriverInfoDTO.add(dto);
-				}
+//				}
 			}
 			
 			resVo.setListCommUseDriverInfoDTO(listCommUseDriverInfoDTO);
