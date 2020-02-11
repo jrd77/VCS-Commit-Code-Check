@@ -62,7 +62,6 @@ public class RenterAutoCancelTask extends IJobHandler {
                     req.setCancelReason("下单后1小时，租客未支付租车费用,自动取消");
                     req.setMemRole("2");
                     req.setOperatorName("system");
-                    cancelOrderService.cancel(req);
                     try {
                         logger.info("执行 下单后1小时，租客未支付租车费用,自动取消 orderNo:[{}]",orderNo);
                         cancelOrderService.cancel(req);
