@@ -19,11 +19,6 @@ public class TemporaryRefundReqVO {
     @NotBlank(message = "订单号不能为空")
     private String orderNo;
 
-    @AutoDocProperty("暂扣返还金额")
-    @NotBlank(message = "暂扣返还金额不能为空")
-    private String amount;
-
-    @AutoDocProperty("暂扣返还原因")
-    private String reason;
-
+    @AutoDocProperty("违章押金暂扣状态 1：暂扣 2：取消暂扣")
+    private Integer detainStatus;
 }
