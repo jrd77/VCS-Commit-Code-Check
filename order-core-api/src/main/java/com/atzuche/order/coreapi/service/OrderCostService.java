@@ -155,7 +155,7 @@ public class OrderCostService {
 			fineLst.stream().forEach(x->{
 				RenterOrderFineDeatailResVO real = new RenterOrderFineDeatailResVO();
 	      		try {
-					BeanUtils.copyProperties(real, x);
+					BeanUtils.copyProperties(x,real);
 				} catch (Exception e) {
 					log.error("对象属性赋值报错:",e);
 				}
@@ -189,13 +189,15 @@ public class OrderCostService {
 	      	renterOrderCostDetailList.stream().forEach(x->{
 	      		RenterOrderCostDetailResVO real = new RenterOrderCostDetailResVO();
 	      		try {
-					BeanUtils.copyProperties(real, x);
+					BeanUtils.copyProperties(x,real);
 				} catch (Exception e) {
 					log.error("对象属性赋值报错:",e);
 				}
 	      		renterOrderCostDetailListReal.add(real);
 	          });
 	      }
+	      //数据封装 20200211
+	      resVo.setRenterOrderCostDetailList(renterOrderCostDetailListReal);
 	      
 	      //抵扣明细
 	  	List<RenterOrderSubsidyDetailEntity> subsidyLst = renterOrderSubsidyDetailService.listRenterOrderSubsidyDetail(orderNo, renterOrderNo);
@@ -204,7 +206,7 @@ public class OrderCostService {
 	      	subsidyLst.stream().forEach(x->{
 	      		RenterOrderSubsidyDetailResVO real = new RenterOrderSubsidyDetailResVO();
 	      		try {
-					BeanUtils.copyProperties(real, x);
+					BeanUtils.copyProperties(x,real);
 				} catch (Exception e) {
 					log.error("对象属性赋值报错:",e);
 				}
@@ -262,7 +264,7 @@ public class OrderCostService {
 		    	orderConsoleSubsidyDetails.stream().forEach(x->{
 		    		com.atzuche.order.commons.vo.res.rentcosts.OrderConsoleSubsidyDetailEntity real = new com.atzuche.order.commons.vo.res.rentcosts.OrderConsoleSubsidyDetailEntity();
 			      		try {
-							BeanUtils.copyProperties(real, x);
+							BeanUtils.copyProperties(x,real);
 						} catch (Exception e) {
 							log.error("对象属性赋值报错:",e);
 						}
@@ -279,7 +281,7 @@ public class OrderCostService {
 			  orderCouponList.stream().forEach(x->{
 				  com.atzuche.order.commons.vo.res.rentcosts.OrderCouponEntity real = new com.atzuche.order.commons.vo.res.rentcosts.OrderCouponEntity();
 		      		try {
-						BeanUtils.copyProperties(real, x);
+						BeanUtils.copyProperties(x, real);
 					} catch (Exception e) {
 						log.error("对象属性赋值报错:",e);
 					}
@@ -295,7 +297,7 @@ public class OrderCostService {
 			  supplementList.stream().forEach(x->{
 				  com.atzuche.order.commons.vo.res.rentcosts.OrderSupplementDetailEntity real = new com.atzuche.order.commons.vo.res.rentcosts.OrderSupplementDetailEntity();
 		      		try {
-						BeanUtils.copyProperties(real, x);
+						BeanUtils.copyProperties(x,real);
 					} catch (Exception e) {
 						log.error("对象属性赋值报错:",e);
 					}
@@ -332,7 +334,7 @@ public class OrderCostService {
 			  orderCouponList.stream().forEach(x->{
 				  com.atzuche.order.commons.vo.res.rentcosts.OrderCouponEntity real = new com.atzuche.order.commons.vo.res.rentcosts.OrderCouponEntity();
 		      		try {
-						BeanUtils.copyProperties(real, x);
+						BeanUtils.copyProperties(x,real);
 					} catch (Exception e) {
 						log.error("对象属性赋值报错:",e);
 					}
@@ -354,7 +356,7 @@ public class OrderCostService {
 	    	orderConsoleSubsidyDetails.stream().forEach(x->{
 	    		com.atzuche.order.commons.vo.res.rentcosts.OrderConsoleSubsidyDetailEntity real = new com.atzuche.order.commons.vo.res.rentcosts.OrderConsoleSubsidyDetailEntity();
 		      		try {
-						BeanUtils.copyProperties(real, x);
+						BeanUtils.copyProperties(x,real);
 					} catch (Exception e) {
 						log.error("对象属性赋值报错:",e);
 					}
@@ -372,7 +374,7 @@ public class OrderCostService {
 	    	consoleRenterOrderFineDeatails.stream().forEach(x->{
 	    		ConsoleRenterOrderFineDeatailEntity real = new ConsoleRenterOrderFineDeatailEntity();
 		      		try {
-						BeanUtils.copyProperties(real, x);
+						BeanUtils.copyProperties(x,real);
 					} catch (Exception e) {
 						log.error("对象属性赋值报错:",e);
 					}
@@ -391,7 +393,7 @@ public class OrderCostService {
 	    	ownerOrderFineDeatails.stream().forEach(x->{
 	    		OwnerOrderFineDeatailEntity real = new OwnerOrderFineDeatailEntity();
 		      		try {
-						BeanUtils.copyProperties(real, x);
+						BeanUtils.copyProperties(x,real);
 					} catch (Exception e) {
 						log.error("对象属性赋值报错:",e);
 					}
@@ -432,7 +434,7 @@ public class OrderCostService {
 		    	ownerOrderSubsidyDetail.stream().forEach(x->{
 		    		OwnerOrderSubsidyDetailEntity real = new OwnerOrderSubsidyDetailEntity();
 			      		try {
-							BeanUtils.copyProperties(real, x);
+							BeanUtils.copyProperties(x,real);
 						} catch (Exception e) {
 							log.error("对象属性赋值报错:",e);
 						}
@@ -450,7 +452,7 @@ public class OrderCostService {
 		    	ownerOrderPurchaseDetail.stream().forEach(x->{
 		    		OwnerOrderPurchaseDetailEntity real = new OwnerOrderPurchaseDetailEntity();
 			      		try {
-							BeanUtils.copyProperties(real, x);
+							BeanUtils.copyProperties(x,real);
 						} catch (Exception e) {
 							log.error("对象属性赋值报错:",e);
 						}
@@ -468,7 +470,7 @@ public class OrderCostService {
 		    	ownerOrderIncrementDetail.stream().forEach(x->{
 		    		OwnerOrderIncrementDetailEntity real = new OwnerOrderIncrementDetailEntity();
 			      		try {
-							BeanUtils.copyProperties(real, x);
+							BeanUtils.copyProperties(x,real);
 						} catch (Exception e) {
 							log.error("对象属性赋值报错:",e);
 						}
@@ -486,7 +488,7 @@ public class OrderCostService {
 		    	gpsCost.stream().forEach(x->{
 		    		OwnerOrderPurchaseDetailEntity real = new OwnerOrderPurchaseDetailEntity();
 			      		try {
-							BeanUtils.copyProperties(real, x);
+							BeanUtils.copyProperties(x,real);
 						} catch (Exception e) {
 							log.error("对象属性赋值报错:",e);
 						}

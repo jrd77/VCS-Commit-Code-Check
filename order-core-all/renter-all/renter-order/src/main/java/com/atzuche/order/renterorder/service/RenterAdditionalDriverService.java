@@ -82,9 +82,16 @@ public class RenterAdditionalDriverService {
 					}
 				}
 			}
+		}else {
+			//仅仅删除 20200211
+			delByRenterOrderNo(renterOrderNo);
 		}
 
 		
+    }
+    
+    public int delByRenterOrderNo(String renterOrderNo) {
+    	return renterAdditionalDriverMapper.delByRenterOrderNo(renterOrderNo);
     }
     
 
