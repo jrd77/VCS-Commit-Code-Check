@@ -85,6 +85,7 @@ public class CashierQueryService {
         result.setWzDepositSurplusAmt(wzDepositSurplusAmt);
         result.setDebtAmt(0);
         result.setRefundAmt(entity.getRealReturnDeposit());
+        result.setDebtStatus("1");
         return result;
     }
 
