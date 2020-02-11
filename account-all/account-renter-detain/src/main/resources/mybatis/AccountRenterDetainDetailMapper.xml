@@ -134,5 +134,11 @@
         from account_renter_detain_detail
         where order_no=#{orderNo}
     </select>
+    <select id="selectByOrderNoAndRenterCash" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from account_renter_detain_detail
+        where order_no=#{orderNo} and source_code = #{sourceCode}
+    </select>
 
 </mapper>

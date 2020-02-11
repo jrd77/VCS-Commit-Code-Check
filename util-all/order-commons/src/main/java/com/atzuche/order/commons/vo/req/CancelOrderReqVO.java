@@ -26,6 +26,8 @@ public class CancelOrderReqVO extends BaseVO implements Serializable {
     @AutoDocProperty(value = "取消原因")
     private String cancelReason;
 
+    @AutoDocProperty(value = "操作人")
+    private String operatorName;
 
     public String getOrderNo() {
         return orderNo;
@@ -49,5 +51,13 @@ public class CancelOrderReqVO extends BaseVO implements Serializable {
 
     public void setCancelReason(String cancelReason) {
         this.cancelReason = cancelReason;
+    }
+
+    public String getOperatorName() {
+        return operatorName;
+    }
+
+    public void setOperatorName(String operatorName) {
+        this.operatorName = operatorName;
     }
 }

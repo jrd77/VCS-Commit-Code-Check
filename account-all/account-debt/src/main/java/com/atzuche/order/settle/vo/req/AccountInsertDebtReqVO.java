@@ -34,7 +34,7 @@ public class AccountInsertDebtReqVO {
     /**
      * 订单欠款
      */
-    private Integer amt;
+    private int amt;
 
     /**
      * 历史欠款来源编码

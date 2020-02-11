@@ -26,7 +26,7 @@ public class DetainRenterDepositReqVO {
     /**
      * 转移金额
      */
-    private Integer amt;
+    private int amt;
     /**
      * 押金凭证
      */
@@ -48,9 +48,9 @@ public class DetainRenterDepositReqVO {
     private RenterCashCodeEnum renterCashCodeEnum;
 
     /**
-     * 预授权到期时间
+     * 备注
      */
-    private LocalDateTime authorizeExpireTime;
+    private String remake;
 
     /**
      * 参数校验

@@ -3,9 +3,11 @@ package com.atzuche.order.commons.entity.ownerOrderDetail;
 import com.atzuche.order.commons.entity.dto.OwnerGoodsPriceDetailDTO;
 import com.autoyol.doc.annotation.AutoDocProperty;
 import lombok.Data;
+import lombok.ToString;
 
 import java.util.List;
 
+@ToString
 @Data
 public class OwnerRentDetailDTO {
     @AutoDocProperty("请求时间")

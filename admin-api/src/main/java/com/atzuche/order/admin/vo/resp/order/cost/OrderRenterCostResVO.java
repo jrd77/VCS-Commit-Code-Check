@@ -6,11 +6,13 @@ package com.atzuche.order.admin.vo.resp.order.cost;
 import com.autoyol.doc.annotation.AutoDocProperty;
 
 import lombok.Data;
+import lombok.ToString;
 
 /**
  * @author jing.huang
  *
  */
+@ToString
 @Data
 public class OrderRenterCostResVO {
 	@AutoDocProperty(value="子订单编号")

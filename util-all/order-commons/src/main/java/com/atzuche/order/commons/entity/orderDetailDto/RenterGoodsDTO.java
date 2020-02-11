@@ -232,5 +232,8 @@ public class RenterGoodsDTO implements Serializable {
          */
         @AutoDocProperty(value="年份",required=true)
         private String year;
+
+        @AutoDocProperty(value="最新公里数")
+        private Integer lastMileage;
     					
 }

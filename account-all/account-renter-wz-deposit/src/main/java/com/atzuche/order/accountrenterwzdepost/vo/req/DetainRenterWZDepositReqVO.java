@@ -22,7 +22,7 @@ public class DetainRenterWZDepositReqVO {
     /**
      * 转移金额
      */
-    private Integer amt;
+    private int amt;
     /**
      * 押金凭证
      */

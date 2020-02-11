@@ -3,7 +3,7 @@ package com.atzuche.order.accountrenterdetain.service.notservice;
 import com.atzuche.order.accountrenterdetain.entity.AccountRenterDetainDetailEntity;
 import com.atzuche.order.accountrenterdetain.exception.AccountRenterDetainDetailException;
 import com.atzuche.order.accountrenterdetain.mapper.AccountRenterDetainDetailMapper;
-import com.atzuche.order.accountrenterdetain.vo.req.DetainRenterDepositReqVO;
+import com.atzuche.order.accountrenterdetain.vo.req.ChangeDetainRenterDepositReqVO;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 
 import org.springframework.beans.BeanUtils;
@@ -29,10 +29,10 @@ public class AccountRenterDetainDetailNoTService {
      * 记录暂扣明细
      * @param detainRenterDeposit
      */
-    public void insertCostDetail(DetainRenterDepositReqVO detainRenterDeposit) {
+    public void insertCostDetail(ChangeDetainRenterDepositReqVO detainRenterDeposit) {
         AccountRenterDetainDetailEntity entity = new AccountRenterDetainDetailEntity();
         BeanUtils.copyProperties(detainRenterDeposit,entity);
-        entity.setSourceCode(Integer.parseInt(detainRenterDeposit.getRenterCashCodeEnum().getCashNo()));
+        entity.setSourceCode(detainRenterDeposit.getRenterCashCodeEnum().getCashNo());
         entity.setSourceDetail(detainRenterDeposit.getRenterCashCodeEnum().getTxt());
         int result = accountRenterDetainDetailMapper.insertSelective(entity);
         if(result==0){
@@ -58,7 +58,7 @@ public class AccountRenterDetainDetailNoTService {
     	boolean isFlag= false;
     	List<AccountRenterDetainDetailEntity> lst = accountRenterDetainDetailMapper.selectByOrderNo(orderNo);
     	for (AccountRenterDetainDetailEntity accountRenterDetainDetailEntity : lst) {
-			if(accountRenterDetainDetailEntity.getSourceCode().toString().equals(RenterCashCodeEnum.ACCOUNT_RENTER_WZ_DEPOSIT.getCashNo())) {
+			if(accountRenterDetainDetailEntity.getSourceCode().equals(RenterCashCodeEnum.ACCOUNT_RENTER_WZ_DEPOSIT.getCashNo())) {
 				isFlag = true;
 				break;
 			}
@@ -67,5 +67,15 @@ public class AccountRenterDetainDetailNoTService {
     	
     	return isFlag;
     }
-    
+
+    /**
+     * 查询暂扣金额
+     * @param orderNo
+     * @param renterCashCode
+     * @return
+     */
+    public List<AccountRenterDetainDetailEntity> selectByOrderNoAndRenterCash(String orderNo, RenterCashCodeEnum renterCashCode) {
+        List<AccountRenterDetainDetailEntity> lst = accountRenterDetainDetailMapper.selectByOrderNoAndRenterCash(orderNo,renterCashCode.getCashNo());
+        return lst;
+    }
 }

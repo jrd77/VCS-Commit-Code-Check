@@ -57,6 +57,7 @@
         <result property="year" column="year"/>
         <result property="choiceCar" column="choice_car"/>
         <result property="sucessRate" column="sucess_rate"/>
+        <result property="lastMileage" column="last_mileage"/>
         <result property="createTime" column="create_time"/>
         <result property="createOp" column="create_op"/>
         <result property="updateTime" column="update_time"/>
@@ -118,6 +119,7 @@
 	`year`,
 	`choice_car`,
 	`sucess_rate`,
+	`last_mileage`,
 	`create_time`,
 	`create_op`,
 	`update_time`,
@@ -184,6 +186,7 @@
         `year`,
         `choice_car`,
         `sucess_rate`,
+        `last_mileage`,
         `create_op`,
         `update_op`
         )
@@ -240,6 +243,7 @@
         #{year},
         #{choiceCar},
         #{sucessRate},
+        #{lastMileage},
         #{createOp},
         #{updateOp}
         )
@@ -299,6 +303,7 @@
             <if test="year != null">`year`, </if>
             <if test="choiceCar != null">`choice_car`, </if>
             <if test="sucessRate != null">`sucess_rate`, </if>
+            <if test="lastMileage != null">`last_mileage`, </if>
             <if test="createOp != null">`create_op`, </if>
             <if test="updateOp != null">`update_op`, </if>
         </trim>
@@ -354,6 +359,7 @@
             <if test="year != null">#{year},  </if>
             <if test="choiceCar != null">#{choiceCar},  </if>
             <if test="sucessRate != null">#{sucessRate},  </if>
+            <if test="lastMileage != null">#{lastMileage}, </if>
             <if test="createOp != null">#{createOp},  </if>
             <if test="updateOp != null">#{updateOp},  </if>
         </trim>
@@ -411,6 +417,7 @@
             <if test="createOp != null">`create_op` = #{createOp}, </if>
             <if test="updateOp != null">`update_op` = #{updateOp}, </if>
             <if test="inspectExpire != null">`inspect_expire` = #{inspectExpire}, </if>
+            <if test="lastMileage != null">`last_mileage` = #{lastMileage}, </if>
             <if test="year != null">`year` = #{year}</if>
         </set>
         where id = #{id}
@@ -467,7 +474,8 @@
             `create_op` = #{createOp},
             `update_op` = #{updateOp},
             `inspect_expire` = #{inspectExpire},
-            `year` = #{year}
+            `year` = #{year},
+            `last_mileage` = #{lastMileage}
 
         </set>
         where id = #{id}

@@ -315,6 +315,9 @@ public class RenterGoodsDetailDTO {
     @AutoDocProperty(value="近10单成单率，存整数")
     private Integer sucessRate;
 
+    @AutoDocProperty(value="最新公里数")
+    private Integer lastMileage;
+
 
 
 }

@@ -28,7 +28,7 @@ public class AccountRenterWzDepositCostDetailNoTService {
     public void insertCostDetail(RenterWZDepositCostReqVO renterWZDepositCost) {
         AccountRenterWzDepositCostDetailEntity entity = new AccountRenterWzDepositCostDetailEntity();
         BeanUtils.copyProperties(renterWZDepositCost,entity);
-        entity.setSourceCode(Integer.parseInt(renterWZDepositCost.getRenterCashCodeEnum().getCashNo()));
+        entity.setSourceCode(renterWZDepositCost.getRenterCashCodeEnum().getCashNo());
         entity.setSourceDetail(renterWZDepositCost.getRenterCashCodeEnum().getTxt());
         int result = accountRenterWzDepositCostDetailMapper.insertSelective(entity);
         if(result==0){

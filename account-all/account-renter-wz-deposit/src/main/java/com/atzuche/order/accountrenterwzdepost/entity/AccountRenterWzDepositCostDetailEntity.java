@@ -47,7 +47,7 @@ public class AccountRenterWzDepositCostDetailEntity implements Serializable {
 	/**
 	 * 入账来源编码
 	 */
-	private Integer sourceCode;
+	private String sourceCode;
 	/**
 	 * 入账来源描述
 	 */
