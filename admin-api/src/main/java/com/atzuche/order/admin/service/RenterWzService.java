@@ -310,6 +310,8 @@ public class RenterWzService {
                 result.setRealSettleTimeStr(DateUtils.formate(orderStatus.getWzSettleTime(),DateUtils.DATE_DEFAUTE1));
             }
         }
+        //TODO  目前先写死 等待海豹接口
+        result.setDetainStatus(1);
         if(StringUtils.isNotBlank(wzDepositMsg.getDeductionTime())){
             result.setDeductionTimeStr(wzDepositMsg.getDeductionTime());
             result.setDeductionStatusStr(wzDepositMsg.getDebtStatus());
