@@ -41,7 +41,7 @@ public class AccountRenterCostDetailReqVO {
     /**
      * 入账金额
      */
-    private Integer amt;
+    private int amt;
     /**
      * 支付来源
      */
