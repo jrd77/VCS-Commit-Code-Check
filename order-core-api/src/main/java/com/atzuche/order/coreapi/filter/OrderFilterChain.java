@@ -26,9 +26,14 @@ public class OrderFilterChain implements OrderFilter, ApplicationContextAware {
 
     @PostConstruct
     private void init(){
+        /* 参数检测 */
        orderFilterList.add(applicationContext.getBean(ParamInputFilter.class));
+       /* 不能自己租自己 的车的检查 */
        orderFilterList.add(applicationContext.getBean(NotRentSelfCarFilter.class));
+       /* 库存检查 */
        orderFilterList.add(applicationContext.getBean(StockFilter.class));
+       /* 风控检查 */
+       orderFilterList.add(applicationContext.getBean(RiskAuditFilter.class));
     }
 
 

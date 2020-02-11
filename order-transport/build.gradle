@@ -16,7 +16,7 @@ dependencies {
     compile("commons-configuration:commons-configuration:1.8")
     compile('org.mybatis.spring.boot:mybatis-spring-boot-starter:1.1.1')
     compile 'com.aliyun.oss:aliyun-sdk-oss:2.8.3'
-    compile('com.autoyol.car:auto-car-service-api:2020020901-SNAPSHOT')
+    compile('com.autoyol.car:auto-car-service-api:2020021101-SNAPSHOT')
     compile ("com.autoyol:fetchBackCarFeeService-api:feign-1.0.1-SNAPSHOT")
     compile("commons-configuration:commons-configuration:1.8")
     compile project(":order-core-all:renter-all:renter-commodity")
