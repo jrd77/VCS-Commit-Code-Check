@@ -186,21 +186,19 @@ public class RenterDetain {
     /**
      * 查询订单暂扣信息
      * @param orderNo
-     * @param memNo
      * @return
      */
-    public RenterEventDetainStatusEntity getRenterDetain(String orderNo, String memNo) {
-        return renterEventDetainStatusService.getRenterDetainStatus(orderNo, memNo);
+    public RenterEventDetainStatusEntity getRenterDetain(String orderNo) {
+        return renterEventDetainStatusService.getRenterDetainStatus(orderNo);
     }
 
     /**
      * 查询订单暂扣信息
      * @param orderNo
-     * @param memNo
      * @return
      */
-    public String getRenterDetainStatus(String orderNo, String memNo) {
-        RenterEventDetainStatusEntity renterEventDetainStatus = this.getRenterDetain(orderNo,memNo);
+    public String getRenterDetainStatus(String orderNo) {
+        RenterEventDetainStatusEntity renterEventDetainStatus = this.getRenterDetain(orderNo);
         if(Objects.nonNull(renterEventDetainStatus) && Objects.nonNull(renterEventDetainStatus.getStatus())){
             return String.valueOf(renterEventDetainStatus.getStatus());
         }

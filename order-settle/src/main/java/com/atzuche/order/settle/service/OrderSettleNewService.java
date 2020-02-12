@@ -2,9 +2,16 @@ package com.atzuche.order.settle.service;
 
 import java.util.List;
 
+import com.atzuche.order.cashieraccount.service.CashierPayService;
+import com.atzuche.order.cashieraccount.vo.req.pay.OrderPayReqVO;
+import com.atzuche.order.cashieraccount.vo.res.OrderPayableAmountResVO;
+import com.atzuche.order.commons.enums.YesNoEnum;
 import com.atzuche.order.commons.enums.cashcode.ConsoleCashCodeEnum;
 import com.atzuche.order.commons.service.OrderPayCallBack;
+import com.autoyol.autopay.gateway.constant.DataPayKindConstant;
 import com.autoyol.platformcost.model.FeeResult;
+import com.google.common.collect.ImmutableList;
+import com.thoughtworks.xstream.mapper.ImmutableTypesMapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -49,6 +56,7 @@ public class OrderSettleNewService {
     @Autowired AccountPlatformProfitDetailNotService accountPlatformProfitDetailNotService;
     @Autowired private OrderSettleNoTService orderSettleNoTService;
     @Autowired private CashierSettleService cashierSettleService;
+    @Autowired private CashierPayService cashierPayService;
 
 
     /**
@@ -65,15 +73,21 @@ public class OrderSettleNewService {
         cashierSettleService.insertAccountOwnerCostSettle(settleOrders.getOrderNo(),settleOrders.getOwnerOrderNo(),settleOrders.getOwnerMemNo(),settleOrdersDefinition.getAccountOwnerCostSettleDetails());
         //8 获取租客 实付 车辆押金
         int depositAmt = cashierSettleService.getRentDeposit(settleOrders.getOrderNo(),settleOrders.getRenterMemNo());
+        int depositAmtRealPay = cashierSettleService.getRentDepositRealPay(settleOrders.getOrderNo(),settleOrders.getRenterMemNo());
         SettleOrdersAccount settleOrdersAccount = new SettleOrdersAccount();
         BeanUtils.copyProperties(settleOrders,settleOrdersAccount);
-        settleOrdersAccount.setRentCostAmtFinal(accountRenterCostSettle.getRentAmt());
+        //查询订单剩余应付
+        int rentCostAmtFinal = getRentCostAmtFinal(settleOrders);
+        settleOrdersAccount.setRentCostAmtFinal(rentCostAmtFinal + accountRenterCostSettle.getShifuAmt());
         settleOrdersAccount.setRentCostPayAmt(accountRenterCostSettle.getShifuAmt());
-        settleOrdersAccount.setDepositAmt(depositAmt);
+        settleOrdersAccount.setDepositAmt(depositAmtRealPay);
         settleOrdersAccount.setDepositSurplusAmt(depositAmt);
         settleOrdersAccount.setOwnerCostAmtFinal(settleOrdersDefinition.getOwnerCostAmtFinal());
         settleOrdersAccount.setOwnerCostSurplusAmt(settleOrdersDefinition.getOwnerCostAmtFinal());
-        int rentCostSurplusAmt = (accountRenterCostSettle.getRentAmt() + accountRenterCostSettle.getShifuAmt())<=0?0:(accountRenterCostSettle.getRentAmt() + accountRenterCostSettle.getShifuAmt());
+        //>0 表示 实付 大于应退 差值为应退（实付>0  应付小于0 getRentAmt 为所有租车费用明细含补贴 相加之和）
+        int rentCostSurplusAmt = (accountRenterCostSettle.getRentAmt() + accountRenterCostSettle.getShifuAmt())>0
+                ?(accountRenterCostSettle.getRentAmt() + accountRenterCostSettle.getShifuAmt())
+                :0;
         settleOrdersAccount.setRentCostSurplusAmt(rentCostSurplusAmt);
         log.info("OrderSettleService settleOrdersDefinition settleOrdersAccount one [{}]", GsonUtils.toJson(settleOrdersAccount));
         Cat.logEvent("settleOrdersAccount",GsonUtils.toJson(settleOrdersAccount));
@@ -100,6 +114,24 @@ public class OrderSettleNewService {
         orderSettleNoTService.settleUndoCoupon(settleOrders.getOrderNo(),settleOrders.getRentCosts().getRenterOrderSubsidyDetails());
         log.info("OrderSettleService settleUndoCoupon settleUndoCoupon one [{}]", GsonUtils.toJson(settleOrdersAccount));
         Cat.logEvent("settleUndoCoupon",GsonUtils.toJson(settleOrdersAccount));
+    }
+
+    /**
+     * 通过收银台查取  待支付金额
+     * @param settleOrders
+     * @return
+     */
+    private int getRentCostAmtFinal(SettleOrders settleOrders) {
+        OrderPayReqVO orderPayReqVO = new OrderPayReqVO();
+        orderPayReqVO.setOrderNo(settleOrders.getOrderNo());
+        orderPayReqVO.setMenNo(settleOrders.getRenterMemNo());
+        orderPayReqVO.setIsUseWallet(YesNoEnum.NO.getCode());
+        List<String> payKind = ImmutableList.of(
+                DataPayKindConstant.RENT,DataPayKindConstant.RENT_AMOUNT,DataPayKindConstant.DEPOSIT
+        );
+        orderPayReqVO.setPayKind(payKind);
+        OrderPayableAmountResVO vo = cashierPayService.getOrderPayableAmount(orderPayReqVO);
+        return vo.getAmt();
     }
 
     /**

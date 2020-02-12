@@ -3,6 +3,7 @@ package com.atzuche.order.cashieraccount.service;
 import java.util.List;
 import java.util.Objects;
 
+import com.atzuche.order.accountrenterdeposit.vo.res.AccountRenterDepositResVO;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -409,5 +410,19 @@ public class CashierSettleService {
 
     public void insertAccountPlatformProfit(AccountPlatformProfitEntity accountPlatformProfitEntity) {
         accountPlatformProfitNoTService.insertAccountPlatformProfitEntity(accountPlatformProfitEntity);
+    }
+
+    /**
+     * 查询实付租车押金
+     * @param orderNo
+     * @param renterMemNo
+     * @return
+     */
+    public int getRentDepositRealPay(String orderNo, String renterMemNo) {
+        AccountRenterDepositResVO vo = accountRenterDepositService.getAccountRenterDepositEntity(orderNo,renterMemNo);
+        if(Objects.isNull(vo) || Objects.isNull(vo.getShifuDepositAmt())){
+            return 0;
+        }
+        return vo.getShifuDepositAmt();
     }
 }

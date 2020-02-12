@@ -47,10 +47,9 @@ public class RenterEventDetainStatusService{
     /**
      * 查询订单暂扣信息
      * @param orderNo
-     * @param memNo
      * @return
      */
-    public RenterEventDetainStatusEntity getRenterDetainStatus(String orderNo, String memNo) {
+    public RenterEventDetainStatusEntity getRenterDetainStatus(String orderNo) {
         RenterEventDetainStatusEntity ent = renterEventDetainStatusMapper.selectByOrderNo(orderNo);
         return ent;
     }
