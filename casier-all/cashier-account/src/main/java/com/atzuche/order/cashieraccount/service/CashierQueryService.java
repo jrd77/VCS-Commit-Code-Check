@@ -94,11 +94,6 @@ public class CashierQueryService {
         result.setWzDepositSurplusAmt(wzDepositSurplusAmt);
         result.setDebtAmt(debtAmt);
         result.setRefundAmt(entity.getRealReturnDeposit());
-        //查询暂扣状态
-//        RenterEventDetainStatusEntity renterEventDetainStatus = renterDetain.getRenterDetainStatus(orderNo,entity.getMemNo());
-//        if(Objects.nonNull(renterEventDetainStatus) && Objects.nonNull(renterEventDetainStatus.getStatus())){
-//            result.setDetainStatus(String.valueOf(renterEventDetainStatus.getStatus()));
-//        }
         return result;
     }
 
