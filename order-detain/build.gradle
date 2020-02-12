@@ -12,8 +12,9 @@ repositories {
 }
 
 dependencies {
-    compile project(":util-all:order-commons")
-    compile project(":config")
+//    compile project(":util-all:order-commons")
+//    compile project(":config")
     compile project(":casier-all:cashier-account")
+//    compile project(":order-core-all:parent-order")
 
 }

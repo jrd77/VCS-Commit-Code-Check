@@ -17,8 +17,6 @@ import com.atzuche.order.commons.DateUtils;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.commons.enums.cashier.PayTypeEnum;
 import com.atzuche.order.commons.enums.cashier.TransStatusEnum;
-import com.atzuche.order.detain.entity.RenterEventDetainStatusEntity;
-import com.atzuche.order.detain.service.RenterDetain;
 import com.autoyol.autopay.gateway.constant.DataPayKindConstant;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,7 +42,6 @@ public class CashierQueryService {
     private AccountRenterDepositNoTService accountRenterDepositNoTService;
     @Autowired private CashierNoTService cashierNoTService;
     @Autowired private AccountRenterWzDepositDetailNoTService accountRenterWzDepositDetailNoTService;
-    @Autowired private RenterDetain renterDetain;
 
 
     /**
@@ -98,10 +95,10 @@ public class CashierQueryService {
         result.setDebtAmt(debtAmt);
         result.setRefundAmt(entity.getRealReturnDeposit());
         //查询暂扣状态
-        RenterEventDetainStatusEntity renterEventDetainStatus = renterDetain.getRenterDetainStatus(orderNo,entity.getMemNo());
-        if(Objects.nonNull(renterEventDetainStatus) && Objects.nonNull(renterEventDetainStatus.getStatus())){
-            result.setDetainStatus(String.valueOf(renterEventDetainStatus.getStatus()));
-        }
+//        RenterEventDetainStatusEntity renterEventDetainStatus = renterDetain.getRenterDetainStatus(orderNo,entity.getMemNo());
+//        if(Objects.nonNull(renterEventDetainStatus) && Objects.nonNull(renterEventDetainStatus.getStatus())){
+//            result.setDetainStatus(String.valueOf(renterEventDetainStatus.getStatus()));
+//        }
         return result;
     }
 

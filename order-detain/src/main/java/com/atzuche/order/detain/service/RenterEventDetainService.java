@@ -1,10 +1,12 @@
 package com.atzuche.order.detain.service;
 
 import com.atzuche.order.commons.enums.YesNoEnum;
+import com.atzuche.order.commons.enums.detain.DetailSourceEnum;
 import com.atzuche.order.detain.entity.RenterEventDetainEntity;
 import com.atzuche.order.detain.mapper.RenterEventDetainMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
 
 import java.util.Objects;
 
@@ -34,16 +36,16 @@ public class RenterEventDetainService{
     }
 
     /**
-     * 查询冻结记录
-     * @param renterDetainId
+     * 查询冻结记录 并修改冻结状态
      */
-    public RenterEventDetainEntity getEventDetainById(int renterDetainId) {
-        RenterEventDetainEntity entity = renterEventDetainMapper.selectByPrimaryKey(renterDetainId);
-        if(Objects.isNull(entity)){
-           throw new RuntimeException("暂扣记录不存在");
-        }
+    public RenterEventDetainEntity getEventDetainByOrderNoAndEvent(String orderNo, DetailSourceEnum eventType) {
+        RenterEventDetainEntity entity = renterEventDetainMapper.getEventDetainByOrderNoAndEvent(orderNo,eventType.getCode());
+        Assert.notNull(entity,"暂扣记录不存在");
+         //更新0:未冻结
         entity.setFreezeStatus(YesNoEnum.NO.getCode());
         renterEventDetainMapper.updateByPrimaryKeySelective(entity);
         return entity;
     }
+
+
 }
