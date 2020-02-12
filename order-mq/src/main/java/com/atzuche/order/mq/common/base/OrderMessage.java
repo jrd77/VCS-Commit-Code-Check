@@ -25,14 +25,7 @@ public class OrderMessage<T> implements Serializable {
      * 需要发送的对象数据
      */
 	private T message;
-    /**
-     *  参数（发送内容 废弃）
-     */
-	private String context;
-    /**
-     * 参数(发送目的地手机号 废弃)
-     */
-	private String phone;
+
 	/**
 	 * 发送短信的Map构成（对应的发送短信模版ID，对应的短信内容参数）
 	 */
