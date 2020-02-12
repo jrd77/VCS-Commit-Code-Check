@@ -1,4 +1,4 @@
-package com.atzuche.order.coreapi.enums;
+package com.atzuche.order.admin.enums;
 
 /**
  * OrderStatusEnums
