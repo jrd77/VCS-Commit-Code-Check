@@ -2,6 +2,7 @@ package com.atzuche.order.open.service;
 
 import com.atzuche.order.commons.entity.dto.OrderSupplementDetailDTO;
 import com.atzuche.order.commons.vo.res.rentcosts.OrderSupplementDetailEntity;
+import com.atzuche.order.commons.vo.res.rentcosts.SupplementVO;
 import com.autoyol.commons.web.ResponseData;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.validation.BindingResult;
@@ -29,7 +30,7 @@ public interface FeignSupplementService {
 
 
     @GetMapping("/order/supplement/list")
-    public ResponseData<List<OrderSupplementDetailEntity>> listSupplement(@RequestParam(value="orderNo",required = true) String orderNo);
+    public ResponseData<SupplementVO> listSupplement(@RequestParam(value="orderNo",required = true) String orderNo);
 
     @PostMapping("/order/supplement/del")
     public ResponseData<?> delSupplement(@RequestParam(value="id",required = true) Integer id);

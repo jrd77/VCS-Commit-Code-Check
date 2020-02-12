@@ -2,6 +2,9 @@ package com.atzuche.order.renterorder.entity;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.Date;
+
+import com.autoyol.doc.annotation.AutoDocProperty;
 import lombok.Data;
 
 
@@ -40,6 +43,26 @@ public class RenterAdditionalDriverEntity implements Serializable {
 	 * 附加驾驶人电话号码
 	 */
 	private String phone;
+	/**
+	 * 身份证
+	 */
+	private String idCard;
+
+	/**
+	 * 准驾车型
+	 */
+	private String driLicAllowCar;
+
+	@AutoDocProperty(value = "驾驶证有效起始日期")
+	/**
+	 * 驾驶证有效起始日期
+	 */
+	private Date validityStartDate;
+
+	/**
+	 * 驾驶证有效终止日期
+	 */
+	private Date validityEndDate;
 	/**
 	 * 是否有效
 	 */
