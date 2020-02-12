@@ -730,4 +730,36 @@ public class OrderSearchRemoteService {
         //被暂扣
         return violate.getIsDetain() != null && violate.getIsDetain().equals(1);
     }
+
+    public List<String> queryWaitingForCar() {
+        Transaction t = Cat.getProducer().newTransaction(CatConstants.FEIGN_CALL, "查询到达订单开始时,但仍是待取车状态的订单");
+        try {
+            ViolateVO req = new ViolateVO();
+            req.setPageNum(1);
+            req.setPageSize(10000);
+            req.setType("11");
+            Cat.logEvent(CatConstants.FEIGN_METHOD,"orderSearchService.violateProcessOrder");
+            Cat.logEvent(CatConstants.FEIGN_PARAM, JSON.toJSONString(req));
+            ResponseData<OrderVO<ViolateBO>> orderResponseData = orderSearchService.violateProcessOrder(req);
+            Cat.logEvent(CatConstants.FEIGN_RESULT, JSON.toJSONString(orderResponseData));
+            if(orderResponseData != null && orderResponseData.getResCode() != null
+                    && ErrorCode.SUCCESS.getCode().equals(orderResponseData.getResCode()) && orderResponseData.getData() != null){
+                List<ViolateBO> orderList = orderResponseData.getData().getOrderList();
+                if(CollectionUtils.isEmpty(orderList)){
+                    return new ArrayList<>();
+                }else{
+                    return  orderList.stream().map(ViolateBO::getOrderNo).collect(Collectors.toList());
+                }
+            }else{
+                return new ArrayList<>();
+            }
+        } catch (Exception e) {
+            logger.error("执行 查询到达订单开始时,但仍是待取车状态的订单 异常",e);
+            Cat.logError("执行 查询到达订单开始时,但仍是待取车状态的订单 异常",e);
+        }finally {
+            t.complete();
+        }
+        return new ArrayList<>();
+
+    }
 }
