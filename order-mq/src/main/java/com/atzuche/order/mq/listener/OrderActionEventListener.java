@@ -23,8 +23,8 @@ public class OrderActionEventListener {
     @Autowired
     MQSendPlatformSmsService sendPlatformSmsService;
 
-    @RabbitListener(bindings = {@QueueBinding(value = @Queue(value = "order_action_01", durable = "true"),
-            exchange = @Exchange(value = "auto-order-action", durable = "true", type = "topic"), key = "action.#")
+    @RabbitListener(bindings = {@QueueBinding(value = @Queue(value = "order_action_03", durable = "true"),
+            exchange = @Exchange(value = "auto-order-action", durable = "true", type = "topic"), key = "action.order.create4.#")
     },containerFactory = "rabbitListenerContainerFactory")
     public void process(Message message) {
         log.info("receive order action message: " + new String(message.getBody()));
