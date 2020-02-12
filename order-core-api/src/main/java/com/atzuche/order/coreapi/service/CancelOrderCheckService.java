@@ -49,7 +49,7 @@ public class CancelOrderCheckService {
             logger.error("No valid renter order found. orderNo:[{}]", orderNo);
             throw new CancelOrderCheckException(ErrorCode.ORDER_NOT_EXIST);
         }
-        if(!renterOrderEntity.getRenterMemNo().equals(memNo)){
+        if(!renterOrderEntity.getRenterMemNo().equals(memNo) && !isConsoleInvoke){
             logger.warn("order and memNo 不一致,[orderNo={},memNo={}]",orderNo,memNo);
             throw new CancelOrderCheckException(ErrorCode.ORDER_NOT_EXIST);
         }
