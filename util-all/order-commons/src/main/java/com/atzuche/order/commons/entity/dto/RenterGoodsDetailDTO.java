@@ -303,4 +303,21 @@ public class RenterGoodsDetailDTO {
     @AutoDocProperty("周末价格")
     private Integer weekendPrice;
 
+    @AutoDocProperty("车龄")
+    private Integer carAge;
+
+    @AutoDocProperty("是否沪牌（沪C不算）1：是，2：否")
+    private Integer isLocal;
+
+    @AutoDocProperty("是否为精选车（是否神马车辆）")
+    private boolean choiceCar;
+
+    @AutoDocProperty(value="近10单成单率，存整数")
+    private Integer sucessRate;
+
+    @AutoDocProperty(value="最新公里数")
+    private Integer lastMileage;
+
+
+
 }

@@ -10,7 +10,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-@FeignClient(url="http://10.0.3.235:1412",name = "order-center-api")
+//@FeignClient(url="http://10.0.3.235:1412",name = "order-center-api")
+@FeignClient(name = "order-center-api")
 public interface FeignOrderUpdateService {
     /*
      * @Author ZhangBin
@@ -21,7 +22,7 @@ public interface FeignOrderUpdateService {
     @RequestMapping(method = RequestMethod.POST, value = "/order/update/rentCityAndRiskAccident")
     ResponseData<?> updateRentCityAndRiskAccident(@RequestBody RentCityAndRiskAccidentReqDTO rentCityAndRiskAccidentReqDTO);
     
-    /*
+    /**
      * @Author ZhangBin
      * @Date 2020/1/14 14:30
      * @Description: 带租客/车主取消订单

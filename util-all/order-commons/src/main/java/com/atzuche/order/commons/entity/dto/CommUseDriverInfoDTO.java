@@ -2,12 +2,15 @@ package com.atzuche.order.commons.entity.dto;
 
 import com.autoyol.doc.annotation.AutoDocProperty;
 
+import lombok.ToString;
+
 import java.util.Date;
 
 /**
  * @author ：weixu.chen
  * @date ：Created in 2019/12/17 20:45
  */
+@ToString
 public class CommUseDriverInfoDTO {
 
     @AutoDocProperty(value = "主键id")
@@ -17,7 +20,7 @@ public class CommUseDriverInfoDTO {
     private String realName;
 
     @AutoDocProperty(value = "手机号")
-    private Long mobile;
+    private String mobile;
 
     @AutoDocProperty(value = "身份证")
     private String idCard;
@@ -33,8 +36,31 @@ public class CommUseDriverInfoDTO {
 
     @AutoDocProperty(value = "是否认证 0-未认证，1-认证通过，2认证失败")
     private String isAuth;
+    
+    ///附加驾驶人金额
+    @AutoDocProperty(value = "附加驾驶人金额")
+    private String amt;
+    //管理后台操作人名称
+    private String consoleOperatorName;
+    
+    
+    public String getConsoleOperatorName() {
+		return consoleOperatorName;
+	}
 
-    public Integer getId() {
+	public void setConsoleOperatorName(String consoleOperatorName) {
+		this.consoleOperatorName = consoleOperatorName;
+	}
+
+	public String getAmt() {
+		return amt;
+	}
+
+	public void setAmt(String amt) {
+		this.amt = amt;
+	}
+
+	public Integer getId() {
         return id;
     }
 
@@ -50,11 +76,11 @@ public class CommUseDriverInfoDTO {
         this.realName = realName;
     }
 
-    public Long getMobile() {
+    public String getMobile() {
         return mobile;
     }
 
-    public void setMobile(Long mobile) {
+    public void setMobile(String mobile) {
         this.mobile = mobile;
     }
 
@@ -97,18 +123,5 @@ public class CommUseDriverInfoDTO {
     public void setIsAuth(String isAuth) {
         this.isAuth = isAuth;
     }
-
-    @Override
-    public String toString() {
-        return "CommUseDriverInfo{" +
-                "id=" + id +
-                ", realName='" + realName + '\'' +
-                ", mobile=" + mobile +
-                ", idCard='" + idCard + '\'' +
-                ", driLicAllowCar='" + driLicAllowCar + '\'' +
-                ", validityStartDate=" + validityStartDate +
-                ", validityEndDate=" + validityEndDate +
-                ", isAuth='" + isAuth + '\'' +
-                '}';
-    }
+    
 }

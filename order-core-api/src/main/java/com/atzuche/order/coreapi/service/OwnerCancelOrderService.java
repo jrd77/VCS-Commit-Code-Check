@@ -3,10 +3,13 @@ package com.atzuche.order.coreapi.service;
 import com.atzuche.order.commons.constant.OrderConstant;
 import com.atzuche.order.commons.entity.dto.CancelFineAmtDTO;
 import com.atzuche.order.commons.entity.dto.CostBaseDTO;
+import com.atzuche.order.commons.entity.dto.OwnerGoodsDetailDTO;
 import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
 import com.atzuche.order.commons.enums.*;
 import com.atzuche.order.coreapi.entity.dto.CancelOrderResDTO;
+import com.atzuche.order.coreapi.service.remote.CarRentalTimeApiProxyService;
 import com.atzuche.order.flow.service.OrderFlowService;
+import com.atzuche.order.owner.commodity.service.OwnerGoodsService;
 import com.atzuche.order.ownercost.entity.OwnerOrderEntity;
 import com.atzuche.order.ownercost.entity.OwnerOrderFineApplyEntity;
 import com.atzuche.order.ownercost.entity.OwnerOrderFineDeatailEntity;
@@ -46,7 +49,7 @@ import java.time.LocalDateTime;
 public class OwnerCancelOrderService {
 
     @Autowired
-    private CarRentalTimeApiService carRentalTimeApiService;
+    private CarRentalTimeApiProxyService carRentalTimeApiService;
     @Autowired
     OrderCouponService orderCouponService;
     @Autowired
@@ -57,6 +60,8 @@ public class OwnerCancelOrderService {
     RenterOrderCostService renterOrderCostService;
     @Autowired
     OwnerOrderService ownerOrderService;
+    @Autowired
+    OwnerGoodsService ownerGoodsService;
     @Autowired
     OrderStatusService orderStatusService;
     @Autowired
@@ -73,6 +78,8 @@ public class OwnerCancelOrderService {
     OrderCancelReasonService orderCancelReasonService;
     @Autowired
     OwnerOrderFineApplyService ownerOrderFineApplyService;
+    @Autowired
+    CancelOrderCheckService cancelOrderCheckService;
 
     /**
      * 取消处理
@@ -82,9 +89,16 @@ public class OwnerCancelOrderService {
      * @return CancelOrderResDTO 返回信息
      */
     @Transactional(rollbackFor = Exception.class)
-    public CancelOrderResDTO cancel(String orderNo, String cancelReason) {
+    public CancelOrderResDTO cancel(String orderNo, String cancelReason, boolean isConsoleInvoke) {
+        //获取订单状态信息
+        OrderStatusEntity orderStatusEntity = orderStatusService.getByOrderNo(orderNo);
+        //获取车主订单信息
+        OwnerOrderEntity ownerOrderEntity = ownerOrderService.getOwnerOrderByOrderNoAndIsEffective(orderNo);
+        //获取车主订单商品信息
+        OwnerGoodsDetailDTO ownerGoodsDetail = ownerGoodsService.getOwnerGoodsDetail(ownerOrderEntity.getOwnerOrderNo(), false);
         //校验
-        check();
+        cancelOrderCheckService.checkOwnerCancelOrder(orderStatusEntity,ownerGoodsDetail.getCarOwnerType(),isConsoleInvoke);
+        
         //获取订单信息
         OrderEntity orderEntity = orderService.getOrderEntity(orderNo);
         //获取租客订单信息
@@ -95,10 +109,6 @@ public class OwnerCancelOrderService {
         //获取租客订单费用明细
         RenterOrderCostEntity renterOrderCostEntity = renterOrderCostService.getByOrderNoAndRenterNo(orderNo,
                 renterOrderEntity.getRenterOrderNo());
-        //获取车主订单信息
-        OwnerOrderEntity ownerOrderEntity = ownerOrderService.getOwnerOrderByOrderNoAndIsEffective(orderNo);
-        //获取订单状态信息
-        OrderStatusEntity orderStatusEntity = orderStatusService.getByOrderNo(orderNo);
         //获取车主券信息
         OrderCouponEntity ownerCouponEntity = orderCouponService.getOwnerCouponByOrderNoAndRenterOrderNo(orderNo,
                 renterOrderEntity.getRenterOrderNo());
@@ -169,6 +179,7 @@ public class OwnerCancelOrderService {
         orderFlowService.inserOrderStatusChangeProcessInfo(orderNo, OrderStatusEnum.from(orderStatusDTO.getStatus()));
         if(null != ownerOrderEntity) {
             ownerOrderService.updateChildStatusByOrderNo(orderNo, OwnerChildStatusEnum.END.getCode());
+            ownerOrderService.updateDispatchReasonByOrderNo(orderNo,DispatcherReasonEnum.owner_cancel);
             //取消信息处理(order_cancel_reason)
             orderCancelReasonService.addOrderCancelReasonRecord(buildOrderCancelReasonEntity(orderNo,ownerOrderEntity.getOwnerOrderNo(),
                     cancelReason));
@@ -176,16 +187,11 @@ public class OwnerCancelOrderService {
         //返回信息处理
         cancelOrderResDTO.setCarNo(goodsDetail.getCarNo());
         cancelOrderResDTO.setRentCarPayStatus(orderStatusEntity.getRentCarPayStatus());
+        cancelOrderResDTO.setCityCode(Integer.valueOf(orderEntity.getCityCode()));
+        cancelOrderResDTO.setRentTime(orderEntity.getExpRentTime());
+        cancelOrderResDTO.setRevertTime(orderEntity.getExpRevertTime());
         return cancelOrderResDTO;
     }
-
-
-    public void check() {
-        //TODO:车主取消校验
-
-
-    }
-
 
     /**
      * 组装计算取消订单罚金请求参数

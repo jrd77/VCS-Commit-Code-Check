@@ -1,13 +1,13 @@
 package com.atzuche.order.coreapi.task;
 
 import com.atzuche.order.commons.CatConstants;
-import com.atzuche.order.commons.vo.req.CancelOrderReqVO;
-import com.atzuche.order.coreapi.service.CancelOrderService;
+import com.atzuche.order.coreapi.service.OrderDispatchCancelService;
 import com.atzuche.order.coreapi.service.OrderSearchRemoteService;
 import com.dianping.cat.Cat;
 import com.dianping.cat.message.Transaction;
 import com.xxl.job.core.biz.model.ReturnT;
 import com.xxl.job.core.handler.IJobHandler;
+import com.xxl.job.core.handler.annotation.JobHandler;
 import com.xxl.job.core.log.XxlJobLogger;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
@@ -23,7 +23,8 @@ import java.util.List;
  * @author shisong
  * @date 2020/1/15
  */
-@Component("unDispatchOrderTask")
+@Component
+@JobHandler("unDispatchOrderTask")
 public class UnDispatchOrderTask extends IJobHandler {
 
     private Logger logger = LoggerFactory.getLogger(UnDispatchOrderTask.class);
@@ -32,10 +33,10 @@ public class UnDispatchOrderTask extends IJobHandler {
     private OrderSearchRemoteService orderSearchRemoteService;
 
     @Resource
-    private CancelOrderService cancelOrderService;
+    private OrderDispatchCancelService orderDispatchCancelService;
 
     @Override
-    public ReturnT<String> execute(String s) throws Exception {
+    public ReturnT<String> execute(String s){
         Transaction t = Cat.getProducer().newTransaction(CatConstants.XXL_JOB_CALL, "定时查询待调度后4小时，仍未调度的订单,自动取消 定时任务");
         try {
             Cat.logEvent(CatConstants.XXL_JOB_METHOD,"unDispatchOrderTask.execute");
@@ -53,12 +54,14 @@ public class UnDispatchOrderTask extends IJobHandler {
 
             if(CollectionUtils.isNotEmpty(orderNos)){
                 for (String orderNo : orderNos) {
-                    //TODO  查询上一笔取消方
-                    CancelOrderReqVO req = new CancelOrderReqVO();
-                    req.setOrderNo(orderNo);
-                    req.setCancelReason("待调度后4小时，仍未调度的订单,自动取消");
-                    req.setMemRole("1");
-                    cancelOrderService.cancel(req);
+                    try {
+                        logger.info("执行 待调度后4小时，仍未调度的订单,自动取消 orderNo:[{}]",orderNo);
+                        orderDispatchCancelService.dispatchCancelHandle(orderNo);
+                    } catch (Exception e) {
+                        XxlJobLogger.log("执行 待调度后4小时，仍未调度的订单,自动取消 异常:",e);
+                        logger.error("执行 待调度后4小时，仍未调度的订单,自动取消 异常 orderNo:[{}] ,e:[{}]",orderNo,e);
+                        Cat.logError("执行 待调度后4小时，仍未调度的订单,自动取消 异常",e);
+                    }
                 }
             }
             logger.info("结束执行 待调度后4小时，仍未调度的订单,自动取消 ");

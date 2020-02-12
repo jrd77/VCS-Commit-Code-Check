@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.rentercost.entity.RenterOrderCostDetailEntity;
 import com.atzuche.order.rentercost.entity.RenterOrderFineDeatailEntity;
 import com.atzuche.order.rentercost.mapper.RenterOrderCostDetailMapper;
@@ -26,6 +27,34 @@ public class RenterOrderCostDetailService{
     private RenterOrderCostDetailMapper renterOrderCostDetailMapper;
     @Autowired
     RenterOrderFineDeatailMapper renterOrderFineDeatailMapper;
+
+
+	/**
+	 * 返回子订单的租车费用明细
+	 * @param orderNo
+	 * @param renterOrderNo
+	 * @return
+	 */
+    public List<RenterOrderCostDetailEntity> getRenterOrderCostDetailList(String orderNo,String renterOrderNo){
+    	return renterOrderCostDetailMapper.listRenterOrderCostDetail(orderNo,renterOrderNo);
+	}
+
+	/**
+	 * 返回子订单的租车费用总额
+	 * @param orderNo
+	 * @param renterOrderNo
+	 * @return
+	 */
+	public int getTotalOrderCostAmt(String orderNo,String renterOrderNo){
+		List<RenterOrderCostDetailEntity> renterOrderCostDetailEntityList = getRenterOrderCostDetailList(orderNo,renterOrderNo);
+		int total =0;
+		for(RenterOrderCostDetailEntity entity:renterOrderCostDetailEntityList){
+            if(entity.getTotalAmount()!=null){
+            	total = total + entity.getTotalAmount();
+			}
+		}
+		return total;
+	}
     
     /**
      * 租客罚金列表
@@ -34,6 +63,8 @@ public class RenterOrderCostDetailService{
     	List<RenterOrderFineDeatailEntity> lst = renterOrderFineDeatailMapper.listRenterOrderFineDeatail(orderNo, renterOrderNo);
     	return lst;
     }
+
+
     
     /**
      * 保存费用明细
@@ -97,4 +128,23 @@ public class RenterOrderCostDetailService{
     	}
     	return list;
     }
+
+	public int saveOrUpdateRenterOrderCostDetail(RenterOrderCostDetailEntity extraDriverInsureAmtEntity) {
+		List<RenterOrderCostDetailEntity> list = listRenterOrderCostDetail(extraDriverInsureAmtEntity.getOrderNo(), extraDriverInsureAmtEntity.getRenterOrderNo());
+		boolean isExists = false;
+		for (RenterOrderCostDetailEntity renterOrderCostDetailEntity : list) {
+			if(renterOrderCostDetailEntity.getCostCode().equals(RenterCashCodeEnum.EXTRA_DRIVER_INSURE.getCashNo())) {
+				//根据ID修改
+				extraDriverInsureAmtEntity.setId(renterOrderCostDetailEntity.getId());
+				//不修改
+				extraDriverInsureAmtEntity.setCreateOp(null);
+				renterOrderCostDetailMapper.updateByPrimaryKeySelective(extraDriverInsureAmtEntity);
+				isExists = true;
+			}
+		}
+		if(!isExists) {
+			renterOrderCostDetailMapper.saveRenterOrderCostDetail(extraDriverInsureAmtEntity);
+		}
+		return 0;
+	}
 }

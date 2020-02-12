@@ -96,7 +96,7 @@ public class OwnerHandoverCarService implements IUpdateHandoverCarInfo {
      */
     @Transactional(rollbackFor = Exception.class)
     public Integer updateOwnerHandoverInfoByPrimaryKey(OwnerHandoverCarInfoEntity ownerHandoverCarInfoEntity) {
-        return ownerHandoverCarInfoMapper.updateByPrimaryKey(ownerHandoverCarInfoEntity);
+        return ownerHandoverCarInfoMapper.updateByPrimaryKeySelective(ownerHandoverCarInfoEntity);
     }
 
     /**

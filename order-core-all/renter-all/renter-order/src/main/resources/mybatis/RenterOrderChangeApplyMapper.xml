@@ -74,6 +74,12 @@
 		select  <include refid="Base_Column_List" /> from renter_order_change_apply order by id desc
 	</select>
 
+	<select id="selectALLByOrderNo" resultMap="BaseResultMap">
+		select  <include refid="Base_Column_List" /> from renter_order_change_apply 
+		where order_no = #{orderNo} 
+		and is_delete = 0 
+		order by id desc
+	</select>
 	 
 	<insert id="insert" parameterType="com.atzuche.order.renterorder.entity.RenterOrderChangeApplyEntity" useGeneratedKeys="true" keyProperty="id">
 		insert into renter_order_change_apply
@@ -276,6 +282,13 @@
   	<select id="getRenterOrderChangeApplyByRenterOrderNo" resultMap="BaseResultMap">
 		select <include refid="Base_Column_List" /> from renter_order_change_apply where renter_order_no = #{renterOrderNo}
 		and audit_status = 0
+		and is_delete = 0
+		order by id desc
+		limit 1
+	</select>
+	
+	<select id="getRenterOrderApplyByRenterOrderNo" resultMap="BaseResultMap">
+		select <include refid="Base_Column_List" /> from renter_order_change_apply where renter_order_no = #{renterOrderNo}
 		and is_delete = 0
 		order by id desc
 		limit 1

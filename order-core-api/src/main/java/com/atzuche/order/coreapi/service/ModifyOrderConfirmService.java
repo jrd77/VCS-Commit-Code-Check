@@ -3,21 +3,25 @@ package com.atzuche.order.coreapi.service;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.atzuche.order.commons.vo.req.ModifyApplyHandleReq;
+import com.atzuche.order.coreapi.service.remote.StockProxyService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.atzuche.order.commons.LocalDateTimeUtils;
 import com.atzuche.order.commons.OrderReqContext;
+import com.atzuche.order.commons.entity.dto.OrderTransferRecordDTO;
 import com.atzuche.order.commons.entity.dto.OwnerGoodsDetailDTO;
+import com.atzuche.order.commons.enums.DispatcherStatusEnum;
 import com.atzuche.order.commons.enums.OrderChangeItemEnum;
-import com.atzuche.order.commons.enums.RenterCashCodeEnum;
+import com.atzuche.order.commons.enums.OrderTransferSourceEnum;
 import com.atzuche.order.commons.enums.SrvGetReturnEnum;
+import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.commons.vo.req.OrderReqVO;
 import com.atzuche.order.coreapi.entity.dto.ModifyConfirmDTO;
 import com.atzuche.order.coreapi.entity.dto.ModifyOrderDTO;
 import com.atzuche.order.coreapi.entity.dto.ModifyOrderOwnerDTO;
-import com.atzuche.order.coreapi.entity.request.ModifyApplyHandleReq;
 import com.atzuche.order.coreapi.modifyorder.exception.ModifyOrderGoodNotExistException;
 import com.atzuche.order.coreapi.modifyorder.exception.ModifyOrderParameterException;
 import com.atzuche.order.delivery.entity.RenterOrderDeliveryEntity;
@@ -28,12 +32,15 @@ import com.atzuche.order.delivery.vo.delivery.CancelOrderDeliveryVO;
 import com.atzuche.order.delivery.vo.delivery.UpdateFlowOrderDTO;
 import com.atzuche.order.ownercost.entity.OwnerOrderEntity;
 import com.atzuche.order.parentorder.entity.OrderEntity;
+import com.atzuche.order.parentorder.service.OrderStatusService;
 import com.atzuche.order.rentercost.entity.RenterOrderSubsidyDetailEntity;
 import com.atzuche.order.rentercost.entity.dto.RenterOrderSubsidyDetailDTO;
 import com.atzuche.order.rentercost.service.RenterOrderSubsidyDetailService;
+import com.atzuche.order.renterorder.entity.OrderTransferRecordEntity;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.atzuche.order.renterorder.entity.dto.OrderChangeItemDTO;
 import com.atzuche.order.renterorder.service.OrderChangeItemService;
+import com.atzuche.order.renterorder.service.OrderTransferRecordService;
 import com.atzuche.order.renterorder.service.RenterOrderChangeApplyService;
 import com.atzuche.order.renterorder.service.RenterOrderService;
 import com.autoyol.car.api.model.dto.LocationDTO;
@@ -63,9 +70,13 @@ public class ModifyOrderConfirmService {
 	@Autowired
 	private DeliveryCarService deliveryCarService;
 	@Autowired
-	private StockService stockService;
+	private StockProxyService stockService;
 	@Autowired
 	private RenterOrderChangeApplyService renterOrderChangeApplyService;
+	@Autowired
+	private OrderTransferRecordService orderTransferRecordService;
+	@Autowired
+	private OrderStatusService orderStatusService;
 	
 	/**
 	 * 自动同意
@@ -109,6 +120,8 @@ public class ModifyOrderConfirmService {
 		modifyOrderForOwnerService.modifyOrderForOwner(modifyOrderOwnerDTO, renterSubsidy);
 		// 处理租客订单信息
 		modifyOrderForRenterService.updateRenterOrderStatus(renterOrder.getOrderNo(), renterOrder.getRenterOrderNo(), initRenterOrder);
+		// 如果是换车增加一条换车记录
+		saveOrderTransferRecord(modifyOrderOwnerDTO, modifyOrderDTO);
 		// 更新历史未处理的申请记录为拒绝(管理后台修改订单逻辑)
 		renterOrderChangeApplyService.updateRenterOrderChangeApplyStatusByOrderNo(modifyOrderOwnerDTO.getOrderNo());
 		// 封装OrderReqContext对象
@@ -116,8 +129,39 @@ public class ModifyOrderConfirmService {
 		// 通知仁云
 		noticeRenYun(modifyOrderDTO.getRenterOrderNo(), modifyOrderOwnerDTO, listChangeCode(modifyOrderDTO.getChangeItemList()), reqContext);
 		// 扣库存
-		//cutCarStock(modifyOrderOwnerDTO, listChangeCode(modifyOrderDTO.getChangeItemList()));
+		cutCarStock(modifyOrderOwnerDTO, listChangeCode(modifyOrderDTO.getChangeItemList()));
 	}
+	
+	
+	/**
+	 * 保存换车记录
+	 * @param modifyOrderOwnerDTO
+	 * @param modifyOrderDTO
+	 */
+	public void saveOrderTransferRecord(ModifyOrderOwnerDTO modifyOrderOwnerDTO, ModifyOrderDTO modifyOrderDTO) {
+		if (modifyOrderOwnerDTO == null || modifyOrderDTO == null) {
+			return;
+		}
+		if (modifyOrderDTO.getTransferFlag() == null || !modifyOrderDTO.getTransferFlag()) {
+			return;
+		}
+		OwnerGoodsDetailDTO ownerGoodsDetailDTO = modifyOrderOwnerDTO.getOwnerGoodsDetailDTO();
+		if (ownerGoodsDetailDTO == null) {
+			return;
+		}
+		OrderTransferRecordEntity orderTransferRecordEntity = new OrderTransferRecordEntity();
+		orderTransferRecordEntity.setCarNo(ownerGoodsDetailDTO.getCarNo() == null ? null:String.valueOf(ownerGoodsDetailDTO.getCarNo()));
+		orderTransferRecordEntity.setCarPlateNum(ownerGoodsDetailDTO.getCarPlateNum());
+		orderTransferRecordEntity.setOperator(modifyOrderDTO.getOperator());
+		orderTransferRecordEntity.setMemNo(modifyOrderDTO.getMemNo());
+		orderTransferRecordEntity.setOrderNo(modifyOrderOwnerDTO.getOrderNo());
+		orderTransferRecordEntity.setSource(0);
+		// 保存换车记录
+		orderTransferRecordService.saveOrderTransferRecord(orderTransferRecordEntity);
+		// 更新调度状态
+		orderStatusService.updateDispatchStatus(modifyOrderOwnerDTO.getOrderNo(), DispatcherStatusEnum.DISPATCH_SUCCESS.getCode());
+	}
+	
 	
 	/**
 	 * 封装新增仁云订单需要的参数
@@ -190,7 +234,7 @@ public class ModifyOrderConfirmService {
 		// 通知仁云
 		noticeRenYun(renterOrderNo, modifyOrderOwnerDTO, changeItemList, null);
 		// 扣库存
-		//cutCarStock(modifyOrderOwnerDTO, changeItemList);
+		cutCarStock(modifyOrderOwnerDTO, changeItemList);
 	}
 	
 	
@@ -414,14 +458,12 @@ public class ModifyOrderConfirmService {
 			throw new ModifyOrderParameterException();
 		}
 		// 修改项目
-		if (changeItemList == null || changeItemList.isEmpty()) {
-			return;
-		}
-		if (!changeItemList.contains(OrderChangeItemEnum.MODIFY_RENTTIME.getCode()) && 
-				!changeItemList.contains(OrderChangeItemEnum.MODIFY_REVERTTIME.getCode())) {
-			// 未修改租期,不需要校验库存
-			return;
-		}
+		/*
+		 * if (changeItemList == null || changeItemList.isEmpty()) { return; } if
+		 * (!changeItemList.contains(OrderChangeItemEnum.MODIFY_RENTTIME.getCode()) &&
+		 * !changeItemList.contains(OrderChangeItemEnum.MODIFY_REVERTTIME.getCode())) {
+		 * // 未修改租期,不需要校验库存 return; }
+		 */
 		OrderInfoDTO orderInfoDTO = new OrderInfoDTO();
 		orderInfoDTO.setOrderNo(modifyOrderOwnerDTO.getOrderNo());
 		orderInfoDTO.setCityCode(modifyOrderOwnerDTO.getCityCode() != null ? Integer.valueOf(modifyOrderOwnerDTO.getCityCode()):null);
@@ -448,5 +490,33 @@ public class ModifyOrderConfirmService {
 		orderInfoDTO.setReturnCarAddress(returnCarAddress);
 		orderInfoDTO.setOperationType(OrderOperationTypeEnum.DDXGZQ.getType());
 		stockService.cutCarStock(orderInfoDTO);
+	}
+	
+	/**
+	 * 获取换车记录
+	 * @param orderNo
+	 * @return List<OrderTransferRecordDTO>
+	 */
+	public List<OrderTransferRecordDTO> listOrderTransferRecordByOrderNo(String orderNo) {
+		List<OrderTransferRecordEntity> list = orderTransferRecordService.listOrderTransferRecordByOrderNo(orderNo);
+		if (list != null && !list.isEmpty()) {
+			List<OrderTransferRecordDTO> listDTO = list.stream().map(transfer -> {
+				OrderTransferRecordDTO transDTO = new OrderTransferRecordDTO();
+				BeanUtils.copyProperties(transfer, transDTO);
+				if (OrderTransferSourceEnum.DISPATCH_TRANSFER.getCode().equals(transfer.getSource())) {
+					transDTO.setSourceDesc(OrderTransferSourceEnum.DISPATCH_TRANSFER.getDesc());
+				} else if (OrderTransferSourceEnum.NORMAL_TRANSFER.getCode().equals(transfer.getSource())) {
+					transDTO.setSourceDesc(OrderTransferSourceEnum.NORMAL_TRANSFER.getDesc());
+				} else if (OrderTransferSourceEnum.CPIC_TRANSFER.getCode().equals(transfer.getSource())) {
+					transDTO.setSourceDesc(OrderTransferSourceEnum.CPIC_TRANSFER.getDesc());
+				} else if (OrderTransferSourceEnum.CREATE_ORDER.getCode().equals(transfer.getSource())) {
+					transDTO.setSourceDesc(OrderTransferSourceEnum.CREATE_ORDER.getDesc());
+				}
+				transDTO.setCreateTime(CommonUtils.formatTime(transfer.getCreateTime(), CommonUtils.FORMAT_STR_DEFAULT));
+				return transDTO;
+			}).collect(Collectors.toList());
+			return listDTO;
+		}
+		return null;
 	}
 }

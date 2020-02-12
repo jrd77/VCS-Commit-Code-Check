@@ -1,6 +1,6 @@
 package com.atzuche.order.cashieraccount.vo.req;
 
-import com.atzuche.order.commons.enums.RenterCashCodeEnum;
+import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.autoyol.commons.web.ErrorCode;
 import lombok.Data;
 import org.springframework.util.Assert;
@@ -20,6 +20,11 @@ public class CashierDeductDebtReqVO {
      * 结算剩余可抵扣金额
      */
     private Integer amt;
+
+    /**
+     * 订单
+     */
+    private String orderNo;
 
     /**
      * 租客子订单
@@ -52,6 +57,15 @@ public class CashierDeductDebtReqVO {
      * 更新人
      */
     private String updateOp;
+
+    /**
+     * 支付来源code
+     */
+    private String paySourceCode;
+    /**
+     * 支付来源
+     */
+    private String paySource;
 
     /**
      * 参数详情

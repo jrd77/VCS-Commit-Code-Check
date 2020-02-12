@@ -1,11 +1,13 @@
 package com.atzuche.order.accountrenterdeposit.vo.req;
 
-import com.atzuche.order.commons.enums.RenterCashCodeEnum;
-import com.autoyol.commons.web.ErrorCode;
-import lombok.Data;
+import java.time.LocalDateTime;
+
 import org.springframework.util.Assert;
 
-import java.time.LocalDateTime;
+import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
+import com.autoyol.commons.web.ErrorCode;
+
+import lombok.Data;
 
 /**
  * 暂扣/扣减 记录实付付车俩押金记录请求参数
@@ -24,7 +26,7 @@ public class DetainRenterDepositReqVO {
     /**
      * 转移金额
      */
-    private Integer amt;
+    private int amt;
     /**
      * 押金凭证
      */
@@ -46,9 +48,9 @@ public class DetainRenterDepositReqVO {
     private RenterCashCodeEnum renterCashCodeEnum;
 
     /**
-     * 预授权到期时间
+     * 备注
      */
-    private LocalDateTime authorizeExpireTime;
+    private String remake;
 
     /**
      * 参数校验

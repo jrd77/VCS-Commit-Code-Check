@@ -89,4 +89,23 @@ public class OwnerOrderFineDeatailService{
     public List<OwnerOrderFineDeatailEntity> getOwnerOrderFineDeatailByOwnerOrderNo(String ownerOrderNo) {
         return ownerOrderFineDeatailMapper.getOwnerOrderFineDeatailByOwnerOrderNo(ownerOrderNo);
     }
+    /*
+     * @Author ZhangBin
+     * @Date 2020/1/17 16:18
+     * @Description: 更具车主子订单和费用编码更新费用
+     *
+     **/
+    public int updateByCashNoAndOwnerOrderNo(OwnerOrderFineDeatailEntity ownerOrderFineDeatailEntity){
+        return ownerOrderFineDeatailMapper.updateByCashNoAndOwnerOrderNo(ownerOrderFineDeatailEntity);
+    }
+
+    /*
+     * @Author ZhangBin
+     * @Date 2020/1/17 16:52
+     * @Description: 更新编码和车主子订单号查询违约条款
+     *
+     **/
+    public OwnerOrderFineDeatailEntity getByCashNoAndOwnerOrderNo(String ownerOrderNo ,int fineType){
+        return ownerOrderFineDeatailMapper.getByCashNoAndOwnerOrderNo(ownerOrderNo,fineType);
+    }
 }

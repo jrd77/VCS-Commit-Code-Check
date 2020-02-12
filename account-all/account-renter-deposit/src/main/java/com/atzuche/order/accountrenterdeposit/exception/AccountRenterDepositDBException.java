@@ -13,4 +13,8 @@ public class AccountRenterDepositDBException extends OrderException {
     public AccountRenterDepositDBException() {
         super(ErrorCode.ACCOUT_RENTET_DEPOSIT_FAIL.getCode(),ErrorCode.ACCOUT_RENTET_DEPOSIT_FAIL.getCode());
     }
+
+    public AccountRenterDepositDBException(String errorCode, String errorMsg) {
+        super(errorCode, errorMsg);
+    }
 }

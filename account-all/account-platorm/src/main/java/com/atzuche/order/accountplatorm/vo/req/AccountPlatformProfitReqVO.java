@@ -20,39 +20,39 @@ public class AccountPlatformProfitReqVO {
     /**
      * 车主补贴金额
      */
-    private Integer ownerSubsidyAmt;
+    private int ownerSubsidyAmt;
     /**
      * 补贴车主金额
      */
-    private Integer subsidyOwnerAmt;
+    private int subsidyOwnerAmt;
     /**
      * 车主收益金额
      */
-    private Integer ownerIncomeAmt;
+    private int ownerIncomeAmt;
     /**
      * 租客费用
      */
-    private Integer renterCost;
+    private int renterCost;
     /**
      * 租客补贴金额
      */
-    private Integer renterSubsidyAmt;
+    private int renterSubsidyAmt;
     /**
      * 补贴租客金额
      */
-    private Integer subsidyRenterAmt;
+    private int subsidyRenterAmt;
     /**
      * 平台补贴
      */
-    private Integer platformSubsidyAmt;
+    private int platformSubsidyAmt;
     /**
      * 平台应收费用金额
      */
-    private Integer platformReceivableAmt;
+    private int platformReceivableAmt;
     /**
      * 平台实收费用金额
      */
-    private Integer platformReceivedAmt;
+    private int platformReceivedAmt;
 
     /**
      * 创建人

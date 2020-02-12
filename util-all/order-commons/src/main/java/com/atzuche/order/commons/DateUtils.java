@@ -5,10 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.text.ParseException;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAdjusters;
 import java.util.Date;
@@ -171,5 +168,14 @@ public class DateUtils {
         return localDateToDate(firstYear);
     }
 
+    public static long getDateLatterCompareNowScoend(LocalDateTime time,int num){
+        LocalDateTime timeLatter = time.plusHours(num);
+        LocalDateTime now = LocalDateTime.now();
+        if(timeLatter.isAfter(now)){
+            return 0;
+        }
+        Duration duration = Duration.between(timeLatter,now);
+        return duration.getSeconds();
+    }
 
 }

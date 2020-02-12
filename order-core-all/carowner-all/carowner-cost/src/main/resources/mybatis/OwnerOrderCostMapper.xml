@@ -151,5 +151,8 @@
 		</set>
 		where id = #{id}
 	</update>
-  	
+    <select id="getOwnerOrderCostByOwnerOrderNo" resultMap="BaseResultMap">
+        select  <include refid="Base_Column_List" /> from owner_order_cost where owner_order_no = #{ownerOrderNo} and is_delete = 0
+    </select>
+
 </mapper>

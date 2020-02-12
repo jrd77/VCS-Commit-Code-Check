@@ -22,7 +22,7 @@ public class AccountRenterCostToFineReqVO {
     /**
      * 租车费用
      */
-    private Integer amt;
+    private int amt;
     /**
      * 车主子订单
      */

@@ -1,6 +1,5 @@
 package com.atzuche.order.coreapi.service;
 
-import com.alibaba.fastjson.JSON;
 import com.atzuche.order.car.CarProxyService;
 import com.atzuche.order.commons.OrderReqContext;
 import com.atzuche.order.commons.entity.dto.OwnerGoodsDetailDTO;
@@ -8,13 +7,12 @@ import com.atzuche.order.commons.entity.dto.OwnerMemberDTO;
 import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
 import com.atzuche.order.commons.entity.dto.RenterMemberDTO;
 import com.atzuche.order.commons.enums.OsTypeEnum;
-import com.atzuche.order.commons.vo.req.NormalOrderCostCalculateReqVO;
 import com.atzuche.order.commons.vo.req.OrderReqVO;
 import com.atzuche.order.commons.vo.res.NormalOrderCostCalculateResVO;
 import com.atzuche.order.commons.vo.res.order.*;
 import com.atzuche.order.coreapi.common.conver.OrderCommonConver;
-import com.atzuche.order.coreapi.entity.vo.req.CarRentTimeRangeReqVO;
 import com.atzuche.order.coreapi.entity.vo.res.CarRentTimeRangeResVO;
+import com.atzuche.order.coreapi.service.remote.CarRentalTimeApiProxyService;
 import com.atzuche.order.mem.MemProxyService;
 import com.atzuche.order.rentercommodity.service.RenterCommodityService;
 import com.atzuche.order.renterorder.entity.dto.DeductContextDTO;
@@ -33,10 +31,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cglib.beans.BeanCopier;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 /**
  * 下单前费用计算
@@ -52,7 +47,7 @@ public class SubmitOrderBeforeCostCalService {
     @Autowired
     private RenterOrderCalCostService renterOrderCalCostService;
     @Autowired
-    private CarRentalTimeApiService carRentalTimeApiService;
+    private CarRentalTimeApiProxyService carRentalTimeApiService;
     @Autowired
     private OrderCommonConver orderCommonConver;
     @Autowired
@@ -105,12 +100,12 @@ public class SubmitOrderBeforeCostCalService {
         RenterOrderCostReqDTO renterOrderCostReqDTO =
                 renterOrderService.buildRenterOrderCostReqDTO(renterOrderReqVO);
         RenterOrderCostRespDTO renterOrderCostRespDTO =
-                renterOrderCalCostService.getOrderCostAndDeailList(renterOrderCostReqDTO);
+                renterOrderCalCostService.calcBasicRenterOrderCostAndDeailList(renterOrderCostReqDTO);
 
         //抵扣公共信息抽取
         DeductContextDTO deductContext = orderCommonConver.initDeductContext(renterOrderCostRespDTO);
         deductContext.setOsVal(StringUtils.isBlank(orderReqVO.getOS()) ?
-                OsTypeEnum.OTHER.getOsVal() : OsTypeEnum.valueOf(orderReqVO.getOS()).getOsVal());
+                OsTypeEnum.OTHER.getOsVal() : OsTypeEnum.from(orderReqVO.getOS()).getOsVal());
         //车主券抵扣
         CarOwnerCouponReductionVO carOwnerCouponReductionVO =
                 renterOrderCalCostService.getCarOwnerCouponReductionVo(deductContext,
@@ -125,7 +120,7 @@ public class SubmitOrderBeforeCostCalService {
         CouponReductionVO couponReductionVO = renterOrderCalCostService.getCouponReductionVO(deductContext,
                 memAvailCouponRequestVO,
                 renterOrderReqVO.getDisCouponIds(),renterOrderReqVO.getGetCarFreeCouponId());
-        //TODO:凹凸币
+        //凹凸币
         AutoCoinReductionVO autoCoinReductionVO = renterOrderCalCostService.getAutoCoinReductionVO(deductContext,
                 orderReqVO.getMemNo(),
                 orderReqVO.getUseAutoCoin());

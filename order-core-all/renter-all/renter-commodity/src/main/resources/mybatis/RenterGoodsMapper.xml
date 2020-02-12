@@ -39,6 +39,8 @@
         <result property="carRealAddr" column="car_real_addr"/>
         <result property="carRealLon" column="car_real_lon"/>
         <result property="carRealLat" column="car_real_lat"/>
+        <result property="oilTotalCalibration" column="oil_total_calibration"/>
+        <result property="gpsSerialNumber" column="gps_serial_number"/>
         <result property="carAddrIndex" column="car_addr_index"/>
         <result property="carGuideDayPrice" column="car_guide_day_price"/>
         <result property="stopCostRate" column="stop_cost_rate"/>
@@ -46,13 +48,17 @@
         <result property="frameNo" column="frame_no"/>
         <result property="engineNum" column="engine_num"/>
         <result property="year" column="year"/>
+        <result property="carAge" column="car_age"/>
+        <result property="isLocal" column="is_local"/>
+        <result property="choiceCar" column="choice_car"/>
+        <result property="sucessRate" column="sucess_rate"/>
+        <result property="inspectExpire" column="inspect_expire"/>
+        <result property="lastMileage" column="last_mileage"/>
         <result property="createTime" column="create_time"/>
         <result property="createOp" column="create_op"/>
         <result property="updateTime" column="update_time"/>
         <result property="updateOp" column="update_op"/>
         <result property="isDelete" column="is_delete"/>
-        <result property="oilTotalCalibration" column="oil_total_calibration"/>
-        <result property="inspectExpire" column="inspect_expire"/>
     </resultMap>
 
 
@@ -92,20 +98,26 @@
 	`car_real_addr`,
 	`car_real_lon`,
 	`car_real_lat`,
+	`oil_total_calibration`,
+	`gps_serial_number`,
 	`car_addr_index`,
 	`car_guide_day_price`,
-	`oil_total_calibration`,
 	`stop_cost_rate`,
 	`engine_source`,
 	`frame_no`,
 	`engine_num`,
 	`year`,
+	`car_age`,
+	`is_local`,
+	`choice_car`,
+	`sucess_rate`,
+	`inspect_expire`,
+	`last_mileage`,
 	`create_time`,
 	`create_op`,
 	`update_time`,
 	`update_op`,
-	`is_delete`,
-    `inspect_expire`
+	`is_delete`
 
 	</sql>
 
@@ -151,17 +163,23 @@
         `car_real_addr`,
         `car_real_lon`,
         `car_real_lat`,
+        `oil_total_calibration`,
+        `gps_serial_number`,
         `car_addr_index`,
         `car_guide_day_price`,
-        `oil_total_calibration`,
         `stop_cost_rate`,
         `engine_source`,
         `frame_no`,
         `engine_num`,
         `year`,
+        `car_age`,
+        `is_local`,
+        `choice_car`,
+        `sucess_rate`,
+        `inspect_expire`,
+        `last_mileage`,
         `create_op`,
-        `update_op`,
-        `inspect_expire`
+        `update_op`
         )
         values
         (
@@ -199,17 +217,23 @@
         #{carRealAddr},
         #{carRealLon},
         #{carRealLat},
+        #{oilTotalCalibration},
+        #{gpsSerialNumber},
         #{carAddrIndex},
         #{carGuideDayPrice},
-        #{oilTotalCalibration},
         #{stopCostRate},
         #{engineSource},
         #{frameNo},
         #{engineNum},
         #{year},
+        #{carAge},
+        #{isLocal},
+        #{choiceCar},
+        #{sucessRate},
+        #{inspectExpire},
+        #{lastMileage},
         #{createOp},
-        #{updateOp},
-        #{inspectExpire}
+        #{updateOp}
         )
     </insert>
 
@@ -250,20 +274,23 @@
             <if test="carRealAddr != null">`car_real_addr`, </if>
             <if test="carRealLon != null">`car_real_lon`, </if>
             <if test="carRealLat != null">`car_real_lat`, </if>
+            <if test="oilTotalCalibration != null">`oil_total_calibration`, </if>
+            <if test="gpsSerialNumber != null">`gps_serial_number`, </if>
             <if test="carAddrIndex != null">`car_addr_index`, </if>
             <if test="carGuideDayPrice != null">`car_guide_day_price`, </if>
-            <if test="oilTotalCalibration != null">`oil_total_calibration`, </if>
             <if test="stopCostRate != null">`stop_cost_rate`, </if>
             <if test="engineSource != null">`engine_source`, </if>
             <if test="frameNo != null">`frame_no`, </if>
             <if test="engineNum != null">`engine_num`, </if>
-            <if test="year != null">`year`,</if>
-            <if test="createTime != null">`create_time`, </if>
+            <if test="year != null">`year`, </if>
+            <if test="carAge != null">`car_age`, </if>
+            <if test="isLocal != null">`is_local`, </if>
+            <if test="choiceCar != null">`choice_car`, </if>
+            <if test="sucessRate != null">`sucess_rate`, </if>
+            <if test="inspectExpire != null">`inspect_expire`, </if>
+            <if test="lastMileage != null">`last_mileage`, </if>
             <if test="createOp != null">`create_op`, </if>
-            <if test="updateTime != null">`update_time`, </if>
             <if test="updateOp != null">`update_op`, </if>
-            <if test="isDelete != null">`is_delete`, </if>
-            <if test="inspectExpire != null">`inspect_expire` </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides="," >
             <if test="orderNo != null">#{orderNo},  </if>
@@ -300,20 +327,23 @@
             <if test="carRealAddr != null">#{carRealAddr},  </if>
             <if test="carRealLon != null">#{carRealLon},  </if>
             <if test="carRealLat != null">#{carRealLat},  </if>
+            <if test="oilTotalCalibration != null">#{oilTotalCalibration},  </if>
+            <if test="gpsSerialNumber != null">#{gpsSerialNumber},  </if>
             <if test="carAddrIndex != null">#{carAddrIndex},  </if>
             <if test="carGuideDayPrice != null">#{carGuideDayPrice},  </if>
-            <if test="oilTotalCalibration != null">#{oilTotalCalibration},  </if>
             <if test="stopCostRate != null">#{stopCostRate},  </if>
             <if test="engineSource != null">#{engineSource},  </if>
             <if test="frameNo != null">#{frameNo},  </if>
             <if test="engineNum != null">#{engineNum},  </if>
-            <if test="year != null">#{year},</if>
-            <if test="createTime != null">#{createTime},  </if>
+            <if test="year != null">#{year},  </if>
+            <if test="carAge != null">#{carAge},  </if>
+            <if test="isLocal != null">#{isLocal},  </if>
+            <if test="choiceCar != null">#{choiceCar},  </if>
+            <if test="sucessRate != null">#{sucessRate},  </if>
+            <if test="inspectExpire != null">#{inspectExpire},  </if>
+            <if test="lastMileage != null">#{lastMileage}, </if>
             <if test="createOp != null">#{createOp},  </if>
-            <if test="updateTime != null">#{updateTime},  </if>
             <if test="updateOp != null">#{updateOp},  </if>
-            <if test="isDelete != null">#{isDelete}, </if>
-            <if test="inspectExpire != null">#{inspectExpire} </if>
         </trim>
     </insert>
 
@@ -368,6 +398,7 @@
             <if test="updateTime != null">`update_time` = #{updateTime}, </if>
             <if test="updateOp != null">`update_op` = #{updateOp}, </if>
             <if test="inspectExpire != null">`inspect_expire` = #{inspectExpire}, </if>
+            <if test="lastMileage != null">`last_mileage` = #{lastMileage}, </if>
             <if test="isDelete != null">`is_delete` = #{isDelete}</if>
         </set>
         where id = #{id}
@@ -418,7 +449,8 @@
             `engine_source` = #{engineSource},
             `frame_no` = #{frameNo},
             `engine_num` = #{engineNum},
-            `year` = #{year}
+            `year` = #{year},
+            `last_mileage` = #{lastMileage},
             `create_time` = #{createTime},
             `create_op` = #{createOp},
             `update_time` = #{updateTime},
@@ -448,7 +480,7 @@
     </select>
 
     <select id="queryCarInfoByOrderNoAndCarNo" resultMap="BaseResultMap">
-        select car_no,car_plate_num,car_brand_txt,car_type_txt,inspect_expire from renter_goods where order_no = #{orderNo} and car_no = #{carNo} and is_delete = 0 order by id desc limit 1
+        select * from renter_goods where order_no = #{orderNo} and car_no = #{carNo} and is_delete = 0 order by id desc limit 1
     </select>
 
 </mapper>

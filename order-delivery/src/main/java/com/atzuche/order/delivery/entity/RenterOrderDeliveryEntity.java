@@ -4,6 +4,8 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
+import com.atzuche.order.delivery.vo.delivery.OrderDeliveryVO;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 
@@ -17,9 +19,9 @@ import lombok.Data;
 @Data
 public class RenterOrderDeliveryEntity implements Serializable {
 	private static final long serialVersionUID = 1L;
-	
+
 	/**
-	 * 
+	 *
 	 */
 	private Integer id;
 	/**
@@ -141,13 +143,16 @@ public class RenterOrderDeliveryEntity implements Serializable {
 	private String ownerRealGetReturnRemark;
 
 
-    public void setAheadOrDelayTimeInfo(Integer getMinutes, Integer returnMinutes) {
-        if (Objects.isNull(getMinutes) && Objects.isNull(returnMinutes)) {
-            setAheadOrDelayTime(0);
-        } else {
-            int aheadOrDelayTime = getMinutes == null ? returnMinutes : getMinutes;
-            setAheadOrDelayTime(aheadOrDelayTime);
-        }
+    public void setAheadOrDelayTimeInfo(Integer getMinutes, Integer returnMinutes,OrderDeliveryVO orderDeliveryVO) {
+		if (Objects.isNull(getMinutes) && Objects.isNull(returnMinutes)) {
+			setAheadOrDelayTime(0);
+		} else {
+			if (orderDeliveryVO.getOrderDeliveryDTO().getType().intValue() == 1) {
+				setAheadOrDelayTime(getMinutes);
+			} else {
+				setAheadOrDelayTime(returnMinutes);
+			}
+		}
 
-    }
+	}
 }

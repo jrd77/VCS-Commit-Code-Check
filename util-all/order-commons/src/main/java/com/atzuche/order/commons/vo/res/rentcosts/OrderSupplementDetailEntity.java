@@ -1,7 +1,10 @@
 package com.atzuche.order.commons.vo.res.rentcosts;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
+import java.util.Date;
+
+import com.autoyol.doc.annotation.AutoDocProperty;
+
 import lombok.Data;
 
 
@@ -19,27 +22,47 @@ public class OrderSupplementDetailEntity implements Serializable {
 	/**
 	 * 自增长序列号
 	 */
+	@AutoDocProperty(value="id")
 	private Integer id;
 	/**
 	 * 订单号
 	 */
+	@AutoDocProperty(value="订单号")
 	private String orderNo;
 	/**
 	 * 会员号
 	 */
+	@AutoDocProperty(value="会员号")
 	private String memNo;
+	
+	@AutoDocProperty(value="费用类型：1-补付费用，2-订单欠款")
+	private Integer cashType;
+	
+	@AutoDocProperty(value="费用类型文案")
+	private String cashTypeTxt;
+	
+	@AutoDocProperty(value="请款码")
+	private String requestPayCode;
 	/**
 	 * 费用编码
 	 */
+	@AutoDocProperty(value="费用编码")
 	private String cashNo;
 	/**
 	 * 补付名称
 	 */
+	@AutoDocProperty(value="补付名称")
 	private String title;
 	/**
 	 * 单项补付金额
 	 */
+	@AutoDocProperty(value="单项补付金额")
 	private Integer amt;
+	/**
+	 * 备注
+	 */
+	@AutoDocProperty(value="备注")
+	private String remark;
 	/**
 	 * 操作状态:0,待提交 1,已生效 2,已失效 3,已撤回
 	 */
@@ -53,17 +76,13 @@ public class OrderSupplementDetailEntity implements Serializable {
 	 */
 	private Integer opType;
 	/**
-	 * 备注
-	 */
-	private String remark;
-	/**
 	 * 支付状态:0.无需支付 1.未支付 2.已取消 3.已支付 4.支付中，5.支付失败 10.租车押金结算抵扣  20.违章押金结算抵扣
 	 */
 	private Integer payFlag;
 	/**
 	 * 创建时间
 	 */
-	private LocalDateTime createTime;
+	private Date createTime;
 	/**
 	 * 创建人
 	 */
@@ -71,7 +90,7 @@ public class OrderSupplementDetailEntity implements Serializable {
 	/**
 	 * 修改时间
 	 */
-	private LocalDateTime updateTime;
+	private Date updateTime;
 	/**
 	 * 修改人
 	 */

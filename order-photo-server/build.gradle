@@ -11,10 +11,9 @@ buildscript {
 
 apply plugin: 'dependency-management'
 apply plugin: 'org.springframework.boot'
-apply plugin: 'application'
+//apply plugin: 'application'
 apply plugin: 'war'
 apply plugin: 'application'
-
 mainClassName='com.autoyol.doc.parser.autodoc.AutoDocParser'
 
 
@@ -56,7 +55,7 @@ dependencies {
     compile("com.caucho:hessian:4.0.38")
     compile("com.autoframework:auto-mq-event:1.0-SNAPSHOT")
 
-    compile('com.autoyol.car:auto-car-service-api:2020011405-SNAPSHOT')
+    compile('com.autoyol.car:auto-car-service-api:2020021102-SNAPSHOT')
     compile 'com.aliyun.oss:aliyun-sdk-oss:2.8.3'
     compile('com.aliyun.mns:aliyun-sdk-mns:1.1.4')
     compile project(":order-core-all:renter-all:renter-commodity")

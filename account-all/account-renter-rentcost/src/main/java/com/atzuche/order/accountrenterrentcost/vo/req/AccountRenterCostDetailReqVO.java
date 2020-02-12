@@ -1,6 +1,6 @@
 package com.atzuche.order.accountrenterrentcost.vo.req;
 
-import com.atzuche.order.commons.enums.RenterCashCodeEnum;
+import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.autoyol.commons.web.ErrorCode;
 import lombok.Data;
 import org.springframework.util.Assert;
@@ -41,7 +41,7 @@ public class AccountRenterCostDetailReqVO {
     /**
      * 入账金额
      */
-    private Integer amt;
+    private int amt;
     /**
      * 支付来源
      */
@@ -78,7 +78,7 @@ public class AccountRenterCostDetailReqVO {
         Assert.notNull(getMemNo(), ErrorCode.PARAMETER_ERROR.getText());
         Assert.notNull(getAmt(), ErrorCode.PARAMETER_ERROR.getText());
         Assert.notNull(getOrderNo(), ErrorCode.PARAMETER_ERROR.getText());
-        Assert.notNull(getPayType(), ErrorCode.PARAMETER_ERROR.getText());
+//        Assert.notNull(getPayType(), ErrorCode.PARAMETER_ERROR.getText());
         Assert.notNull(getPaySource(), ErrorCode.PARAMETER_ERROR.getText());
         Assert.notNull(getRenterCashCodeEnum(), ErrorCode.PARAMETER_ERROR.getText());
     }

@@ -3,6 +3,7 @@ package com.atzuche.order.admin.vo.req.orderSubmit;
 import com.atzuche.order.commons.entity.request.ItemList;
 import com.autoyol.doc.annotation.AutoDocProperty;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.hibernate.validator.constraints.NotBlank;
 
 import javax.validation.constraints.NotNull;
@@ -13,6 +14,7 @@ import java.util.List;
  * @date 2020/1/5 5:56 下午
  **/
 @Data
+@EqualsAndHashCode(callSuper=true)
 public class AdminTransReqVO extends AdminReqBaseVO {
 
     @AutoDocProperty(value = "是否使用特供价")

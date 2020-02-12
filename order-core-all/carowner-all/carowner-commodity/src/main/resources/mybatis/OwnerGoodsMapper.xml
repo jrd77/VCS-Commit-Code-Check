@@ -51,13 +51,18 @@
         <result property="serviceRate" column="service_rate"/>
         <result property="moreLicenseFlag" column="more_license_flag"/>
         <result property="licenseExpire" column="license_expire"/>
+        <result property="inspectExpire" column="inspect_expire"/>
+        <result property="carAge" column="car_age"/>
+        <result property="isLocal" column="is_local"/>
+        <result property="year" column="year"/>
+        <result property="choiceCar" column="choice_car"/>
+        <result property="sucessRate" column="sucess_rate"/>
+        <result property="lastMileage" column="last_mileage"/>
         <result property="createTime" column="create_time"/>
         <result property="createOp" column="create_op"/>
         <result property="updateTime" column="update_time"/>
         <result property="updateOp" column="update_op"/>
         <result property="isDelete" column="is_delete"/>
-        <result property="year" column="year"/>
-        <result property="inspectExpire" column="inspect_expire"/>
     </resultMap>
 
 
@@ -108,13 +113,18 @@
 	`service_rate`,
 	`more_license_flag`,
 	`license_expire`,
+	`inspect_expire`,
+	`car_age`,
+	`is_local`,
+	`year`,
+	`choice_car`,
+	`sucess_rate`,
+	`last_mileage`,
 	`create_time`,
 	`create_op`,
 	`update_time`,
 	`update_op`,
-	`is_delete`,
-	`year`,
-    `inspect_expire`
+	`is_delete`
 	</sql>
 
 
@@ -170,10 +180,15 @@
         `service_rate`,
         `more_license_flag`,
         `license_expire`,
-        `create_op`,
-        `update_op`,
+        `inspect_expire`,
+        `car_age`,
+        `is_local`,
         `year`,
-        `inspect_expire`
+        `choice_car`,
+        `sucess_rate`,
+        `last_mileage`,
+        `create_op`,
+        `update_op`
         )
         values
         (
@@ -222,10 +237,15 @@
         #{serviceRate},
         #{moreLicenseFlag},
         #{licenseExpire},
-        #{createOp},
-        #{updateOp},
+        #{inspectExpire},
+        #{carAge},
+        #{isLocal},
         #{year},
-        #{inspectExpire}
+        #{choiceCar},
+        #{sucessRate},
+        #{lastMileage},
+        #{createOp},
+        #{updateOp}
         )
     </insert>
 
@@ -277,13 +297,15 @@
             <if test="serviceRate != null">`service_rate`, </if>
             <if test="moreLicenseFlag != null">`more_license_flag`, </if>
             <if test="licenseExpire != null">`license_expire`, </if>
-            <if test="createTime != null">`create_time`, </if>
-            <if test="createOp != null">`create_op`, </if>
-            <if test="updateTime != null">`update_time`, </if>
-            <if test="updateOp != null">`update_op`, </if>
-            <if test="isDelete != null">`is_delete`, </if>
+            <if test="inspectExpire != null">`inspect_expire`, </if>
+            <if test="carAge != null">`car_age`, </if>
+            <if test="isLocal != null">`is_local`, </if>
             <if test="year != null">`year`, </if>
-            <if test="inspectExpire != null">`inspect_expire` </if>
+            <if test="choiceCar != null">`choice_car`, </if>
+            <if test="sucessRate != null">`sucess_rate`, </if>
+            <if test="lastMileage != null">`last_mileage`, </if>
+            <if test="createOp != null">`create_op`, </if>
+            <if test="updateOp != null">`update_op`, </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides="," >
             <if test="orderNo != null">#{orderNo},  </if>
@@ -331,13 +353,15 @@
             <if test="serviceRate != null">#{serviceRate},  </if>
             <if test="moreLicenseFlag != null">#{moreLicenseFlag},  </if>
             <if test="licenseExpire != null">#{licenseExpire},  </if>
-            <if test="createTime != null">#{createTime},  </if>
+            <if test="inspectExpire != null">#{inspectExpire},  </if>
+            <if test="carAge != null">#{carAge},  </if>
+            <if test="isLocal != null">#{isLocal},  </if>
+            <if test="year != null">#{year},  </if>
+            <if test="choiceCar != null">#{choiceCar},  </if>
+            <if test="sucessRate != null">#{sucessRate},  </if>
+            <if test="lastMileage != null">#{lastMileage}, </if>
             <if test="createOp != null">#{createOp},  </if>
-            <if test="updateTime != null">#{updateTime},  </if>
             <if test="updateOp != null">#{updateOp},  </if>
-            <if test="isDelete != null">#{isDelete},  </if>
-            <if test="year != null">#{year}, </if>
-            <if test="inspectExpire != null">#{inspectExpire} </if>
         </trim>
     </insert>
 
@@ -393,6 +417,7 @@
             <if test="createOp != null">`create_op` = #{createOp}, </if>
             <if test="updateOp != null">`update_op` = #{updateOp}, </if>
             <if test="inspectExpire != null">`inspect_expire` = #{inspectExpire}, </if>
+            <if test="lastMileage != null">`last_mileage` = #{lastMileage}, </if>
             <if test="year != null">`year` = #{year}</if>
         </set>
         where id = #{id}
@@ -449,7 +474,8 @@
             `create_op` = #{createOp},
             `update_op` = #{updateOp},
             `inspect_expire` = #{inspectExpire},
-            `year` = #{year}
+            `year` = #{year},
+            `last_mileage` = #{lastMileage}
 
         </set>
         where id = #{id}
@@ -467,6 +493,11 @@
         select <include refid="Base_Column_List" /> from owner_goods where order_no = #{orderNo} 
         and is_delete = 0 
         order by id desc
+        limit 1
+    </select>
+    <select id="getOwnerGoodsByCarNo" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List" /> from owner_goods where car_no = #{carNo}
+        and is_delete = 0
         limit 1
     </select>
 

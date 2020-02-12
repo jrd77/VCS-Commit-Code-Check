@@ -1,10 +1,12 @@
 package com.atzuche.order.coreapi.controller;
 
 import com.alibaba.fastjson.JSON;
+import com.atzuche.order.commons.BindingResultUtil;
 import com.atzuche.order.commons.enums.DispatcherStatusEnum;
 import com.atzuche.order.commons.enums.PlatformCancelReasonEnum;
 import com.atzuche.order.commons.vo.req.AdminOrderCancelReqVO;
 import com.atzuche.order.commons.vo.req.CancelOrderReqVO;
+import com.atzuche.order.coreapi.service.CancelOrderFeeService;
 import com.atzuche.order.coreapi.service.CancelOrderService;
 import com.atzuche.order.coreapi.service.OwnerOrderFineApplyHandelService;
 import com.atzuche.order.coreapi.service.PlatformCancelOrderService;
@@ -44,6 +46,8 @@ public class CancelOrderController {
     private OwnerOrderFineApplyHandelService ownerOrderFineApplyHandelService;
     @Autowired
     private PlatformCancelOrderService platformCancelOrderService;
+    @Autowired
+    private CancelOrderFeeService cancelOrderFeeService;
 
 
     @AutoDocMethod(description = "取消订单", value = "取消订单")
@@ -51,11 +55,7 @@ public class CancelOrderController {
     public ResponseData<?> cancelOrder(@Valid @RequestBody CancelOrderReqVO cancelOrderReqVO,
                                        BindingResult bindingResult) {
         LOGGER.info("Cancel order.param is,cancelOrderReqVO:[{}]", JSON.toJSONString(cancelOrderReqVO));
-        if (bindingResult.hasErrors()) {
-            Optional<FieldError> error = bindingResult.getFieldErrors().stream().findFirst();
-            return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), error.isPresent() ?
-                    error.get().getDefaultMessage() : ErrorCode.INPUT_ERROR.getText());
-        }
+        BindingResultUtil.checkBindingResult(bindingResult);
         cancelOrderService.cancel(cancelOrderReqVO);
         return ResponseData.success();
     }
@@ -65,11 +65,7 @@ public class CancelOrderController {
     public ResponseData<?> adminCancelOrder(@Valid @RequestBody AdminOrderCancelReqVO reqVO,
                                             BindingResult bindingResult) {
         LOGGER.info("User [{}] console cancel order.param is,reqVO:[{}]", reqVO.getOperator(), JSON.toJSONString(reqVO));
-        if (bindingResult.hasErrors()) {
-            Optional<FieldError> error = bindingResult.getFieldErrors().stream().findFirst();
-            return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), error.isPresent() ?
-                    error.get().getDefaultMessage() : ErrorCode.INPUT_ERROR.getText());
-        }
+        BindingResultUtil.checkBindingResult(bindingResult);
 
         platformCancelOrderService.cancel(reqVO.getOrderNo(), reqVO.getOperator(),
                 PlatformCancelReasonEnum.from(reqVO.getCancelType()));
@@ -85,6 +81,11 @@ public class CancelOrderController {
                 DispatcherStatusEnum.from(dispatcherStatus));
         return ResponseData.success(result);
     }
-
+    
+    @GetMapping("/cancelfee")
+    public ResponseData<?> cancelOrderFee(@RequestParam(value="orderNo",required = true) String orderNo) {
+    	Integer penalty = cancelOrderFeeService.getCancelPenalty(orderNo);
+    	return ResponseData.success(penalty);
+    }
 
 }

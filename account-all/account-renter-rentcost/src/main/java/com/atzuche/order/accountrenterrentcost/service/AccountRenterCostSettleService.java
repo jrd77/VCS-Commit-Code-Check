@@ -12,7 +12,9 @@ import com.atzuche.order.accountrenterrentcost.vo.req.AccountRenterCostChangeReq
 import com.atzuche.order.accountrenterrentcost.vo.req.AccountRenterCostDetailReqVO;
 import com.atzuche.order.accountrenterrentcost.vo.req.AccountRenterCostReqVO;
 import com.atzuche.order.accountrenterrentcost.vo.req.AccountRenterCostToFineReqVO;
-import com.atzuche.order.commons.enums.RenterCashCodeEnum;
+import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
+import com.atzuche.order.commons.enums.cashier.PaySourceEnum;
+import com.atzuche.order.commons.enums.cashier.PayTypeEnum;
 import com.autoyol.commons.web.ErrorCode;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -115,8 +117,10 @@ public class AccountRenterCostSettleService{
         accountRenterCostDetail.setAmt(vo.getAmt());
         accountRenterCostDetail.setSourceCode(RenterCashCodeEnum.SETTLE_RENT_WALLET_COST_TO_FINE.getCashNo());
         accountRenterCostDetail.setSourceDetail(RenterCashCodeEnum.SETTLE_RENT_WALLET_COST_TO_FINE.getTxt());
-        accountRenterCostDetail.setPaySource(RenterCashCodeEnum.ACCOUNT_RENTER_RENT_COST.getTxt());
-        accountRenterCostDetail.setPaySourceCode(RenterCashCodeEnum.ACCOUNT_RENTER_RENT_COST.getCashNo());
+        accountRenterCostDetail.setPaySource(PaySourceEnum.WALLET_PAY.getText());
+        accountRenterCostDetail.setPaySourceCode(PaySourceEnum.WALLET_PAY.getCode());
+        accountRenterCostDetail.setPayType(PayTypeEnum.PUR_RETURN.getCode());
+        accountRenterCostDetail.setPayTypeCode(PayTypeEnum.PUR_RETURN.getText());
         accountRenterCostDetailNoTService.insertAccountRenterCostDetailEntity(accountRenterCostDetail);
     }
     

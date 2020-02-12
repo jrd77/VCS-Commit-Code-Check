@@ -31,7 +31,7 @@ dependencies {
     compile project(":config")
     compile project(":util-all:fee-calculator")
     compile 'com.aliyun.oss:aliyun-sdk-oss:2.8.3'
-    compile('com.autoyol.car:auto-car-service-api:2020011405-SNAPSHOT')
+    compile('com.autoyol.car:auto-car-service-api:2020021102-SNAPSHOT')
     compile project(":order-transport")
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.10.0'
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.10.0'
@@ -39,5 +39,6 @@ dependencies {
     compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jdk8', version: '2.10.0'
     compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.10.0'
     compile project(":order-mq")
+    compile project(":order-core-all:renter-all:renter-commodity")
 
 }

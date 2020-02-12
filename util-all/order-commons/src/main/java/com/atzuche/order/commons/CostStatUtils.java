@@ -8,10 +8,11 @@ package com.atzuche.order.commons;
 
 import com.atzuche.order.commons.entity.orderDetailDto.*;
 import com.atzuche.order.commons.entity.ownerOrderDetail.RenterOwnerPriceDTO;
-import com.atzuche.order.commons.enums.ConsoleCostCashNoEnum;
-import com.atzuche.order.commons.enums.OwnerCashCodeEnum;
-import com.atzuche.order.commons.enums.OwnerFineTypeEnum;
+import com.atzuche.order.commons.enums.FineTypeEnum;
 import com.atzuche.order.commons.enums.SubsidySourceCodeEnum;
+import com.atzuche.order.commons.enums.cashcode.ConsoleCashCodeEnum;
+import com.atzuche.order.commons.enums.cashcode.OwnerCashCodeEnum;
+import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -71,7 +72,7 @@ public class CostStatUtils {
         Integer amt = Optional.ofNullable(ownerOrderSubsidyDetailDTOS)
                 .orElseGet(ArrayList::new)
                 .stream()
-                .filter(x -> OwnerCashCodeEnum.OWNER_RENTER_PRICE.getCashNo().equals(x.getSubsidyCostCode()))
+                .filter(x -> RenterCashCodeEnum.SUBSIDY_OWNERTORENTER_ADJUST.getCashNo().equals(x.getSubsidyCostCode()))
                 .collect(Collectors.summingInt(OwnerOrderSubsidyDetailDTO::getSubsidyAmount));
         if(amt == null){
             amt = 0;
@@ -178,7 +179,7 @@ public class CostStatUtils {
      * @Description: 通过费用编码计算罚金
      *
      **/
-    public static int calOwnerFineByCashNo(OwnerFineTypeEnum ownerFineTypeEnum,List<OwnerOrderFineDeatailDTO> ownerOrderFineDeatailDTOS){
+    public static int calOwnerFineByCashNo(FineTypeEnum ownerFineTypeEnum, List<OwnerOrderFineDeatailDTO> ownerOrderFineDeatailDTOS){
         if(ownerOrderFineDeatailDTOS == null || ownerOrderFineDeatailDTOS.size()<=0){
             return 0;
         }
@@ -195,15 +196,15 @@ public class CostStatUtils {
         return amt;
     }
 
-    public static int calConsoleAmtByCashNo(ConsoleCostCashNoEnum consoleCostCashNoEnum,List<OrderConsoleCostDetailDTO> list) {
-        if(consoleCostCashNoEnum == null){
+    public static int calConsoleAmtByCashNo(ConsoleCashCodeEnum consoleCashCodeEnum,List<OrderConsoleCostDetailDTO> list) {
+        if(consoleCashCodeEnum == null){
             return 0;
         }
         Integer amt = Optional.ofNullable(list).orElseGet(ArrayList::new)
                 .stream()
-                .filter(x -> consoleCostCashNoEnum.getCashNo().equals(x.getSubsidyTypeCode()))
+                .filter(x -> consoleCashCodeEnum.getCashNo().equals(x.getSubsidyTypeCode()))
                 .collect(Collectors.summingInt(OrderConsoleCostDetailDTO::getSubsidyAmount));
-        if(amt == null ){
+        if(amt != null ){
             return amt;
         }
         return 0;

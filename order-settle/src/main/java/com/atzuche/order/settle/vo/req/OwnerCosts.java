@@ -1,9 +1,7 @@
 package com.atzuche.order.settle.vo.req;
 
-import com.atzuche.order.ownercost.entity.OwnerOrderFineDeatailEntity;
-import com.atzuche.order.ownercost.entity.OwnerOrderIncrementDetailEntity;
-import com.atzuche.order.ownercost.entity.OwnerOrderPurchaseDetailEntity;
-import com.atzuche.order.ownercost.entity.OwnerOrderSubsidyDetailEntity;
+import com.atzuche.order.delivery.vo.delivery.rep.OwnerGetAndReturnCarDTO;
+import com.atzuche.order.ownercost.entity.*;
 import com.atzuche.order.rentercost.entity.ConsoleRenterOrderFineDeatailEntity;
 import com.atzuche.order.rentercost.entity.OrderConsoleSubsidyDetailEntity;
 import lombok.Data;
@@ -46,7 +44,7 @@ public class OwnerCosts {
     /**
      * 获取车主油费
      */
-    private OwnerOrderPurchaseDetailEntity renterOrderCostDetail;
+    private OwnerGetAndReturnCarDTO ownerGetAndReturnCarDTO;
     /**
      * 管理后台补贴
      */
@@ -54,7 +52,7 @@ public class OwnerCosts {
     /**
      * 全局的车主订单罚金明细
      */
-    List<ConsoleRenterOrderFineDeatailEntity> consoleRenterOrderFineDeatails;
+    List<ConsoleOwnerOrderFineDeatailEntity> consoleOwnerOrderFineDeatailEntitys;
 
     /**
      * 车主订单罚金明细

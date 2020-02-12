@@ -4,12 +4,10 @@ import com.atzuche.order.commons.entity.dto.CancelFineAmtDTO;
 import com.atzuche.order.commons.entity.dto.CostBaseDTO;
 import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
 import com.atzuche.order.commons.enums.*;
-import com.atzuche.order.coreapi.common.conver.OrderCommonConver;
 import com.atzuche.order.coreapi.entity.dto.CancelOrderResDTO;
 import com.atzuche.order.flow.service.OrderFlowService;
 import com.atzuche.order.ownercost.entity.ConsoleOwnerOrderFineDeatailEntity;
 import com.atzuche.order.ownercost.entity.OwnerOrderEntity;
-import com.atzuche.order.ownercost.entity.OwnerOrderFineApplyEntity;
 import com.atzuche.order.ownercost.service.ConsoleOwnerOrderFineDeatailService;
 import com.atzuche.order.ownercost.service.OwnerOrderService;
 import com.atzuche.order.parentorder.dto.OrderStatusDTO;
@@ -69,9 +67,8 @@ public class RenterCancelOrderService {
      * @return CancelOrderResDTO 返回信息
      */
     @Transactional(rollbackFor = Exception.class)
-    public CancelOrderResDTO cancel(String orderNo, String cancelReason) {
-        //校验
-        check();
+    public CancelOrderResDTO cancel(String orderNo, String cancelReason, boolean isConsoleInvoke) {
+        //todo 校验
 
         //获取租客订单信息
         RenterOrderEntity renterOrderEntity = renterOrderService.getRenterOrderByOrderNoAndIsEffective(orderNo);
@@ -141,13 +138,6 @@ public class RenterCancelOrderService {
         cancelOrderResDTO.setOwnerCouponNo(null == ownerCouponEntity ? null : ownerCouponEntity.getCouponId());
         return cancelOrderResDTO;
     }
-
-    public void check() {
-        //TODO:租客取消校验
-
-
-    }
-
 
     /**
      * 组装计算取消订单罚金请求参数

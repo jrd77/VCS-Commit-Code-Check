@@ -26,6 +26,10 @@ public class RenterAdjustCostReqVO {
     @NotBlank(message="renterOrderNo不能为空")
     private String renterOrderNo;
     
+    @ApiModelProperty(value="车主子订单号",required=true)
+    @NotBlank(message="ownerOrderNo不能为空")
+    private String ownerOrderNo;
+    
     @ApiModelProperty(value="租客给车主的调价",required=true)
     @NotBlank(message="renterOrderNo不能为空")
     private String renterToOwnerAdjustAmt;

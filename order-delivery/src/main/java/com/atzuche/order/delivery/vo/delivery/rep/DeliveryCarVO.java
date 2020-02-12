@@ -1,6 +1,7 @@
 package com.atzuche.order.delivery.vo.delivery.rep;
 
 import com.autoyol.doc.annotation.AutoDocProperty;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 import lombok.ToString;
 

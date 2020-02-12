@@ -1,5 +1,6 @@
 package com.atzuche.order.commons.entity.orderDetailDto;
 
+import com.autoyol.doc.annotation.AutoDocProperty;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -56,5 +57,9 @@ public class OwnerMemberDTO implements Serializable {
          * 平台上架车辆数
          */
         private Integer renterCarCount;
+		/**
+		 * 身份证号码
+		 */
+		private String idNo;
     					
 }

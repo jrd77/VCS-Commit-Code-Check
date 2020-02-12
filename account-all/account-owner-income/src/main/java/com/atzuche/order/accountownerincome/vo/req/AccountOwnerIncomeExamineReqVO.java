@@ -22,11 +22,15 @@ public class AccountOwnerIncomeExamineReqVO {
     /**
      * 收益审核金额
      */
-    private Integer amt;
+    private int amt;
     /**
      * 更新人
      */
     private String createOp;
+    /**
+     * 备注
+     */
+    private String remark;
 
 
     public void check() {

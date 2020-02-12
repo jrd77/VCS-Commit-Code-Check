@@ -26,7 +26,7 @@ import com.atzuche.order.cashieraccount.mapper.CashierMapper;
 import com.atzuche.order.cashieraccount.vo.req.pay.OrderPaySignReqVO;
 import com.atzuche.order.commons.IpUtil;
 import com.atzuche.order.commons.LocalDateTimeUtils;
-import com.atzuche.order.commons.enums.RenterCashCodeEnum;
+import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.commons.enums.cashier.*;
 import com.atzuche.order.rentercost.entity.vo.PayableVO;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
@@ -177,7 +177,6 @@ public class CashierNoTService {
             Integer settleAmount = notifyDataVo.getSettleAmount()==null?0:Integer.parseInt(notifyDataVo.getSettleAmount());
             vo.setAuthorizeDepositAmt(settleAmount);
             vo.setSurplusAuthorizeDepositAmt(settleAmount);
-            detainRenterDeposit.setAuthorizeExpireTime(LocalDateTimeUtils.getDateAfter(vo.getPayTime(),30));
         }
         //TODO 预授权到期时间
         //车辆押金进出明细
@@ -185,7 +184,7 @@ public class CashierNoTService {
         Integer settleAmount = notifyDataVo.getSettleAmount()==null?0:Integer.parseInt(notifyDataVo.getSettleAmount());
         detainRenterDeposit.setAmt(settleAmount);
         detainRenterDeposit.setUniqueNo(notifyDataVo.getQn());
-        detainRenterDeposit.setRenterCashCodeEnum(RenterCashCodeEnum.CASHIER_RENTER_DEPOSIT);
+        detainRenterDeposit.setRenterCashCodeEnum(RenterCashCodeEnum.ACCOUNT_RENTER_DEPOSIT);
         vo.setDetainRenterDepositReqVO(detainRenterDeposit);
         return vo;
     }
@@ -264,7 +263,7 @@ public class CashierNoTService {
         PayedOrderRenterDepositWZDetailReqVO payedOrderRenterDepositDetail = new PayedOrderRenterDepositWZDetailReqVO();
         BeanUtils.copyProperties(notifyDataVo,payedOrderRenterDepositDetail);
         payedOrderRenterDepositDetail.setUniqueNo(notifyDataVo.getQn());
-        payedOrderRenterDepositDetail.setRenterCashCodeEnum(RenterCashCodeEnum.CASHIER_RENTER_WZ_DEPOSIT);
+        payedOrderRenterDepositDetail.setRenterCashCodeEnum(RenterCashCodeEnum.ACCOUNT_RENTER_WZ_DEPOSIT);
         payedOrderRenterDepositDetail.setPayChannel(notifyDataVo.getPaySource());
         payedOrderRenterDepositDetail.setPayment(notifyDataVo.getPayType());
         payedOrderRenterDepositDetail.setAmt(settleAmount);
@@ -290,6 +289,8 @@ public class CashierNoTService {
         accountRenterCostDetail.setTime(notifyDataVo.getOrderTime());
         accountRenterCostDetail.setAmt(settleAmount);
         accountRenterCostDetail.setRenterCashCodeEnum(renterCashCodeEnum);
+        accountRenterCostDetail.setPaySourceCode(notifyDataVo.getPaySource());
+        accountRenterCostDetail.setPaySource(PaySourceEnum.getFlagText(notifyDataVo.getPaySource()));
         vo.setAccountRenterCostDetailReqVO(accountRenterCostDetail);
         return vo;
     }

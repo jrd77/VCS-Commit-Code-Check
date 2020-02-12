@@ -227,6 +227,7 @@ config/build/resources/main/mybatis/
 config/build/
 config/out/
 order-flow/build/
+order-photo-server/doc/
 
 config/config-server/build/
 order-log/build/
@@ -296,3 +297,4 @@ order-log/.project
 order-settle/build/
 order-delivery/build
 order-wallet/order-wallet-server/build/
+order-detain/build/

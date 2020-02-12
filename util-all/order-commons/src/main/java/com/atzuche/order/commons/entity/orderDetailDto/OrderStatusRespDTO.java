@@ -32,4 +32,10 @@ public class OrderStatusRespDTO {
      * 改变中的车主订单状态
      */
     public OwnerOrderStatusDTO ownerOrderStatusChangeDTO;
+    /**
+     *申请状态
+     */
+    public RenterOrderChangeApplyStatusDTO renterOrderChangeApplyStatusDTO;
+
+
 }

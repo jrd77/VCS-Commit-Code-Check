@@ -36,10 +36,7 @@ public class AccountRenterDepositNoTService {
         AccountRenterDepositEntity accountRenterDepositEntity = new AccountRenterDepositEntity ();
         BeanUtils.copyProperties(createOrderRenterDepositReqVO,accountRenterDepositEntity);
         accountRenterDepositEntity.setFreeDepositType(createOrderRenterDepositReqVO.getFreeDepositType().getCode());
-        int result = accountRenterDepositMapper.insertSelective(accountRenterDepositEntity);
-        if(result==0){
-            throw new AccountRenterDepositDBException();
-        }
+        accountRenterDepositMapper.insertSelective(accountRenterDepositEntity);
     }
 
     /**
@@ -116,5 +113,15 @@ public class AccountRenterDepositNoTService {
 
     public void updateRenterDepositEntity(AccountRenterDepositEntity entity) {
         accountRenterDepositMapper.updateByPrimaryKeySelective(entity);
+    }
+
+    /**
+     * 查询车辆押金信息
+     * @param orderNo
+     * @return
+     */
+    public AccountRenterDepositEntity queryDeposit(String orderNo) {
+        AccountRenterDepositEntity accountRenterDepositEntity = accountRenterDepositMapper.selectByOrderNo(orderNo);
+        return accountRenterDepositEntity;
     }
 }

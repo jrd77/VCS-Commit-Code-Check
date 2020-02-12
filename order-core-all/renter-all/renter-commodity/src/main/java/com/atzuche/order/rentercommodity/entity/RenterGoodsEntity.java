@@ -1,5 +1,6 @@
 package com.atzuche.order.rentercommodity.entity;
 
+import com.autoyol.doc.annotation.AutoDocProperty;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -11,7 +12,7 @@ import java.time.LocalDateTime;
  * 租客商品概览表
  * 
  * @author ZhangBin
- * @date 2020-01-04 14:44:30
+ * @date 2020-01-17 11:30:32
  * @Description:
  */
 @Data
@@ -195,6 +196,30 @@ public class RenterGoodsEntity implements Serializable {
 	 */
 	private String year;
 	/**
+	 * 车龄
+	 */
+	private Integer carAge;
+	/**
+	 * 牌照 是否本地 1：是，2：否
+	 */
+	private Integer isLocal;
+	/**
+	 * 是都神马车辆 1：是，2：否
+	 */
+	private Integer choiceCar;
+    /**
+     * 近10单成单率
+     */
+    private Integer sucessRate;
+	/**
+	 * 年检到期日期
+	 */
+	private LocalDate inspectExpire;
+	/**
+	 * 最新公里数
+	 */
+	private Integer lastMileage;
+	/**
 	 * 创建时间
 	 */
 	private LocalDateTime createTime;
@@ -214,9 +239,5 @@ public class RenterGoodsEntity implements Serializable {
 	 * 0-正常，1-已逻辑删除
 	 */
 	private Integer isDelete;
-	/**
-	 * 年检到期时间
-	 */
-	private LocalDate inspectExpire;
 
 }

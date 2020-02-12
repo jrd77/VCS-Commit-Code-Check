@@ -3,15 +3,13 @@ package com.atzuche.order.rentercost.service;
 import com.alibaba.fastjson.JSON;
 import com.atzuche.config.client.api.*;
 import com.atzuche.config.common.entity.*;
-import com.atzuche.order.commons.CatConstants;
-import com.atzuche.order.commons.DateUtils;
-import com.atzuche.order.commons.GlobalConstant;
-import com.atzuche.order.commons.LocalDateTimeUtils;
+import com.atzuche.order.commons.*;
 import com.atzuche.order.commons.entity.dto.*;
 import com.atzuche.order.commons.enums.ChannelNameTypeEnum;
-import com.atzuche.order.commons.enums.RenterCashCodeEnum;
 import com.atzuche.order.commons.enums.SubsidySourceCodeEnum;
 import com.atzuche.order.commons.enums.SubsidyTypeCodeEnum;
+import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
+import com.atzuche.order.commons.exceptions.RemoteCallException;
 import com.atzuche.order.rentercost.entity.*;
 import com.atzuche.order.rentercost.entity.dto.RenterOrderSubsidyDetailDTO;
 import com.atzuche.order.rentercost.entity.dto.*;
@@ -506,12 +504,10 @@ public class RenterOrderCostCombineService {
 	 */
 	public PayableVO getPayable(String orderNo, String renterOrderNo, String memNo) {
 		// 租客应付
-		Integer payable = 0;
+		int payable = 0;
 		// 获取租客正常费用
-		Integer normalCost = getRenterNormalCost(orderNo, renterOrderNo);
-		if (normalCost != null) {
-			payable += normalCost;
-		}
+		int normalCost = getRenterNormalCost(orderNo, renterOrderNo);
+		payable += normalCost;
 		// 获取全局费用
 		Integer globalCost = getRenterGlobalCost(orderNo, memNo);
 		if (globalCost != null) {
@@ -533,23 +529,15 @@ public class RenterOrderCostCombineService {
 	 * @param renterOrderNo 租客订单号
 	 * @return Integer
 	 */
-	public Integer getRenterNormalCost(String orderNo, String renterOrderNo) {
+	public int getRenterNormalCost(String orderNo, String renterOrderNo) {
 		// 获取费用明细
-		List<RenterOrderCostDetailEntity> costList = renterOrderCostDetailService.listRenterOrderCostDetail(orderNo, renterOrderNo);
+		int basicRentTotalAmt = renterOrderCostDetailService.getTotalOrderCostAmt(orderNo, renterOrderNo);
 		// 获取补贴明细
-		List<RenterOrderSubsidyDetailEntity> subsidyList = renterOrderSubsidyDetailService.listRenterOrderSubsidyDetail(orderNo, renterOrderNo);
+		int subsidyTotalAmt= renterOrderSubsidyDetailService.getTotalRenterOrderSubsidyAmt(orderNo, renterOrderNo);
 		// 罚金
-		List<RenterOrderFineDeatailEntity> fineList = renterOrderFineDeatailService.listRenterOrderFineDeatail(orderNo, renterOrderNo);
-		Integer payable = 0;
-		if (costList != null && !costList.isEmpty()) {
-			payable += costList.stream().mapToInt(RenterOrderCostDetailEntity::getTotalAmount).sum();
-		}
-		if (subsidyList != null && !subsidyList.isEmpty()) {
-			payable += subsidyList.stream().mapToInt(RenterOrderSubsidyDetailEntity::getSubsidyAmount).sum();
-		}
-		if (fineList != null && !fineList.isEmpty()) {
-			payable += fineList.stream().mapToInt(RenterOrderFineDeatailEntity::getFineAmount).sum();
-		}
+		int fineTotalAmt = renterOrderFineDeatailService.getTotalRenterOrderFineAmt(orderNo, renterOrderNo);
+		int  payable = basicRentTotalAmt+subsidyTotalAmt+fineTotalAmt;
+		log.info("租客[orderNo={},renterOrderNo={}]正常应付:[toPay={}]",orderNo,renterOrderNo,payable);
 		return payable;
 	}
 	
@@ -985,24 +973,17 @@ public class RenterOrderCostCombineService {
                     Cat.logEvent(CatConstants.FEIGN_METHOD,"GetBackCityLimitFeignApi.isCityServiceLimit");
                     Long rentTimeLong = Long.valueOf(rentTimeLongStr.substring(0, 12));
                     Cat.logEvent(CatConstants.FEIGN_PARAM,"cityCode="+cityCode+"&rentTimeLong="+rentTimeLong);
+                    log.info("判断是否超运能入参:cityCode={},rentTimeLong={}",cityCode,rentTimeLong);
                     getFlgResponse = getBackCityLimitFeignApi.isCityServiceLimit(cityCode, rentTimeLong);
+                    log.info("判断是否超运能入参:cityCode={},rentTimeLong={}，结果：getFlgResponse={}",cityCode,rentTimeLong,JSON.toJSONString(getFlgResponse));
                     Cat.logEvent(CatConstants.FEIGN_RESULT,JSON.toJSONString(getFlgResponse));
-                    if(getFlgResponse == null || getFlgResponse.getResCode() == null || !ErrorCode.SUCCESS.getCode().equals(getFlgResponse.getResCode())){
-                        GetCarOverCostFailException getCarOverCostFailException = new GetCarOverCostFailException();
-                        log.error("取车超运能获取失败",getCarOverCostFailException);
-                        throw getCarOverCostFailException;
-                    }
+                    checkResponse(getFlgResponse);
                     t.setStatus(Transaction.SUCCESS);
-                }catch (GetCarOverCostFailException oe){
-                    Cat.logError("Feign 取车超运能获取失败",oe);
-                    t.setStatus(oe);
-                    throw oe;
                 }catch (Exception e){
-                    GetCarOverCostErrorException getCarOverCostErrorException = new GetCarOverCostErrorException();
-                    log.error("Feign 取车超运能接口异常",getCarOverCostErrorException);
-                    Cat.logError("Feign 取车超运能接口异常",getCarOverCostErrorException);
-                    t.setStatus(getCarOverCostErrorException);
-                    throw getCarOverCostErrorException;
+                    log.error("Feign 取车超运能接口异常",e);
+                    Cat.logError("Feign 取车超运能接口异常",e);
+                    t.setStatus(e);
+                    throw e;
                 }finally {
                     t.complete();
                 }
@@ -1043,7 +1024,9 @@ public class RenterOrderCostCombineService {
                     Cat.logEvent(CatConstants.FEIGN_METHOD,"GetBackCityLimitFeignApi.isCityServiceLimit");
                     long revertTimeLong = Long.valueOf(revertTimeLongStr.substring(0, 12));
                     Cat.logEvent(CatConstants.FEIGN_PARAM,"cityCode="+cityCode+"&revertTimeLong="+revertTimeLong);
+                    log.info("判断是否超运能入参:cityCode={},rentTimeLong={}",cityCode,revertTimeLong);
                     returnFlgResponse = getBackCityLimitFeignApi.isCityServiceLimit(cityCode, revertTimeLong);
+                    log.info("判断是否超运能入参:cityCode={},rentTimeLong={}，结果：getFlgResponse={}",cityCode,revertTimeLong,JSON.toJSONString(revertTimeLong));
                     Cat.logEvent(CatConstants.FEIGN_RESULT,JSON.toJSONString(returnFlgResponse));
                     if(returnFlgResponse == null || returnFlgResponse.getResCode() == null || !ErrorCode.SUCCESS.getCode().equals(returnFlgResponse.getResCode())){
                         throw new ReturnCarOverCostFailException();
@@ -1119,22 +1102,14 @@ public class RenterOrderCostCombineService {
             Cat.logEvent(CatConstants.FEIGN_PARAM,JSON.toJSONString(reqParam));
             responseData = fetchBackCarFeeFeignService.getPriceCarHumanFeeRuleConfig(String.valueOf(cityCode),String.valueOf(LocalDateTimeUtils.localDateTimeToLong(LocalDateTime.now())));
             log.info("Feign 获取取还车超出运能附加金额结果:[{}],获取取还车超出运能附加金额入参:[{}]",JSON.toJSONString(responseData),JSON.toJSONString(reqParam));
-            if(responseData == null || responseData.getResCode()==null){
-                GetReturnOverCostFailException fail = new GetReturnOverCostFailException();
-                throw fail;
-            }
-            Cat.logEvent(CatConstants.FEIGN_RESULT,JSON.toJSONString(responseData));
+			Cat.logEvent(CatConstants.FEIGN_RESULT,JSON.toJSONString(responseData));
+            ResponseCheckUtil.checkResponse(responseData);
+
             t.setStatus(Transaction.SUCCESS);
-        }catch (GetReturnCostFailException e){
-            log.error("Feign 获取取还车超出运能附加金额失败",e);
-            Cat.logError("Feign 获取取还车超出运能附加金额失败！", e);
+        }catch (Exception e){
+            Cat.logError("Feign 获取取还车超出运能附加金额接口异常",e);
             t.setStatus(e);
             throw e;
-        }catch (Exception e){
-            GetReturnOverCostErrorException error = new GetReturnOverCostErrorException();
-            Cat.logError("Feign 获取取还车超出运能附加金额接口异常",error);
-            t.setStatus(error);
-            throw error;
         }
         if(ErrorCode.SUCCESS.getCode().equals(responseData.getResCode())){
             return responseData.getData().getHumanFee().intValue();
@@ -1146,5 +1121,19 @@ public class RenterOrderCostCombineService {
         }
         return GlobalConstant.GET_RETURN_OVER_COST;
     }
+
+
+	public static void  checkResponse(ResponseObject responseObject){
+		if(responseObject==null||!ErrorCode.SUCCESS.getCode().equalsIgnoreCase(responseObject.getResCode())){
+			RemoteCallException remoteCallException = null;
+			if(responseObject!=null){
+				remoteCallException = new RemoteCallException(responseObject.getResCode(),responseObject.getResMsg(),responseObject.getData());
+			}else{
+				remoteCallException = new RemoteCallException(com.atzuche.order.commons.enums.ErrorCode.REMOTE_CALL_FAIL.getCode(),
+						com.atzuche.order.commons.enums.ErrorCode.REMOTE_CALL_FAIL.getText());
+			}
+			throw remoteCallException;
+		}
+	}
 
 }

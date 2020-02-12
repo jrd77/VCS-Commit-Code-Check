@@ -1,6 +1,7 @@
 package com.atzuche.order.coreapi.task;
 
 import com.atzuche.order.commons.CatConstants;
+import com.atzuche.order.commons.enums.DispatcherReasonEnum;
 import com.atzuche.order.commons.vo.req.RefuseOrderReqVO;
 import com.atzuche.order.coreapi.service.OrderSearchRemoteService;
 import com.atzuche.order.coreapi.service.OwnerRefuseOrderService;
@@ -8,6 +9,7 @@ import com.dianping.cat.Cat;
 import com.dianping.cat.message.Transaction;
 import com.xxl.job.core.biz.model.ReturnT;
 import com.xxl.job.core.handler.IJobHandler;
+import com.xxl.job.core.handler.annotation.JobHandler;
 import com.xxl.job.core.log.XxlJobLogger;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
@@ -23,7 +25,8 @@ import java.util.List;
  * @author shisong
  * @date 2020/1/15
  */
-@Component("ownerRejectTask")
+@Component
+@JobHandler("ownerRejectTask")
 public class OwnerRejectTask extends IJobHandler {
 
     private Logger logger = LoggerFactory.getLogger(OwnerRejectTask.class);
@@ -55,8 +58,14 @@ public class OwnerRejectTask extends IJobHandler {
                 for (String orderNo : orderNos) {
                     RefuseOrderReqVO req = new RefuseOrderReqVO();
                     req.setOrderNo(orderNo);
-                    req.setOperatorName("System");
-                    ownerRefuseOrderService.refuse(req);
+                    try {
+                        logger.info("执行 下单后15分钟，车主没有接单,自动拒单 orderNo:[{}]",orderNo);
+                        ownerRefuseOrderService.refuse(req, DispatcherReasonEnum.timeout);
+                    } catch (Exception e) {
+                        logger.error("执行 下单后15分钟，车主没有接单,自动拒单 异常 orderNo:[{}] , e:[{}]",orderNo,e);
+                        Cat.logError("执行 下单后15分钟，车主没有接单,自动拒单 异常",e);
+                        XxlJobLogger.log("结束执行 下单后15分钟，车主没有接单,自动拒单 异常:",e);
+                    }
                 }
             }
             logger.info("结束执行 下单后15分钟，车主没有接单,自动拒单 ");

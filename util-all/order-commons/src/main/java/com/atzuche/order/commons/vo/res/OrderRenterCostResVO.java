@@ -16,8 +16,8 @@ import com.atzuche.order.commons.vo.res.cost.RenterOrderSubsidyDetailResVO;
 import com.atzuche.order.commons.vo.res.rentcosts.OrderConsoleSubsidyDetailEntity;
 import com.atzuche.order.commons.vo.res.rentcosts.OrderCouponEntity;
 import com.atzuche.order.commons.vo.res.rentcosts.OrderSupplementDetailEntity;
-import com.atzuche.order.commons.vo.res.rentcosts.RenterOrderCostDetailEntity;
 
+import com.atzuche.order.commons.vo.res.rentcosts.RenterOrderCostDetailEntity;
 import lombok.Data;
 
 /**
@@ -80,7 +80,7 @@ public class OrderRenterCostResVO {
     /**
      * 交接车-获取超里程费用
      */
-    private RenterOrderCostDetailEntity mileageAmt;	
+    private RenterOrderCostDetailEntity mileageAmt;
     
     /**
      * 管理后台补贴

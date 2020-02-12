@@ -1,11 +1,14 @@
 package com.atzuche.order.coreapi.task;
 
 import com.atzuche.order.commons.CatConstants;
+import com.atzuche.order.commons.vo.req.ReturnCarReqVO;
 import com.atzuche.order.coreapi.service.OrderSearchRemoteService;
+import com.atzuche.order.coreapi.service.OwnerReturnCarService;
 import com.dianping.cat.Cat;
 import com.dianping.cat.message.Transaction;
 import com.xxl.job.core.biz.model.ReturnT;
 import com.xxl.job.core.handler.IJobHandler;
+import com.xxl.job.core.handler.annotation.JobHandler;
 import com.xxl.job.core.log.XxlJobLogger;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
@@ -21,13 +24,17 @@ import java.util.List;
  * @author shisong
  * @date 2020/1/15
  */
-@Component("expRevertCar12HoursAutoRevertCarTask")
+@Component
+@JobHandler("expRevertCar12HoursAutoRevertCarTask")
 public class ExpRevertCar12HoursAutoRevertCarTask extends IJobHandler {
 
     private Logger logger = LoggerFactory.getLogger(RevertCar4HoursAutoSettleTask.class);
 
     @Resource
     private OrderSearchRemoteService orderSearchRemoteService;
+
+    @Resource
+    private OwnerReturnCarService ownerReturnCarService;
 
     @Override
     public ReturnT<String> execute(String s) throws Exception {
@@ -48,7 +55,17 @@ public class ExpRevertCar12HoursAutoRevertCarTask extends IJobHandler {
 
             if(CollectionUtils.isNotEmpty(orderNos)){
                 for (String orderNo : orderNos) {
-                    //TODO 自动还车
+                    ReturnCarReqVO reqVO = new ReturnCarReqVO();
+                    reqVO.setOrderNo(orderNo);
+                    reqVO.setOperatorName("System");
+                    try {
+                        logger.info("执行 预计还车12小时后，自动还车 orderNo:[{}]",orderNo);
+                        ownerReturnCarService.returnCar(reqVO);
+                    } catch (Exception e) {
+                        XxlJobLogger.log("执行 预计还车12小时后，自动还车 异常:",e);
+                        logger.error("执行 预计还车12小时后，自动还车 异常orderNo:[{}] , e:[{}]",orderNo ,e);
+                        Cat.logError("执行 预计还车12小时后，自动还车 异常",e);
+                    }
                 }
             }
             logger.info("结束执行 预计还车12小时后，自动还车");

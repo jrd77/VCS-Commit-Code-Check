@@ -19,13 +19,15 @@ public class CancelOrderReqVO extends BaseVO implements Serializable {
     @NotBlank(message = "订单号不能为空")
     private String orderNo;
 
-    @AutoDocProperty(value = "使用角色:1.车主 2.租客 ", required = true)
+    @AutoDocProperty(value = "使用角色:1.车主 2.租客", required = true)
     @NotBlank(message = "使用角色不能为空")
     private String memRole;
 
     @AutoDocProperty(value = "取消原因")
     private String cancelReason;
 
+    @AutoDocProperty(value = "操作人")
+    private String operatorName;
 
     public String getOrderNo() {
         return orderNo;
@@ -49,5 +51,13 @@ public class CancelOrderReqVO extends BaseVO implements Serializable {
 
     public void setCancelReason(String cancelReason) {
         this.cancelReason = cancelReason;
+    }
+
+    public String getOperatorName() {
+        return operatorName;
+    }
+
+    public void setOperatorName(String operatorName) {
+        this.operatorName = operatorName;
     }
 }

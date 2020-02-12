@@ -8,13 +8,16 @@ import com.atzuche.order.commons.entity.dto.OwnerGoodsDetailDTO;
 import com.atzuche.order.commons.entity.dto.OwnerGoodsPriceDetailDTO;
 import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
 import com.atzuche.order.commons.entity.dto.RenterGoodsPriceDetailDTO;
+import com.atzuche.order.commons.exceptions.RemoteCallException;
 import com.autoyol.car.api.feign.api.CarDetailQueryFeignApi;
 import com.autoyol.car.api.model.dto.OrderCarInfoParamDTO;
 import com.autoyol.car.api.model.vo.*;
 import com.autoyol.commons.web.ErrorCode;
+import com.autoyol.commons.web.ResponseData;
 import com.dianping.cat.Cat;
 import com.dianping.cat.message.Transaction;
 import lombok.Data;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -49,7 +52,7 @@ public class CarProxyService {
     }
 
     public CarDetailDTO getCarDetail(String carNo){
-        Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "租客商品信息");
+        Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "商品信息");
         ResponseObject<CarBaseVO> responseObject = null;
         try{
             Cat.logEvent(CatConstants.FEIGN_METHOD,"CarDetailQueryFeignApi.getCarDetail");
@@ -57,13 +60,7 @@ public class CarProxyService {
             Cat.logEvent(CatConstants.FEIGN_PARAM,JSON.toJSONString(carNo));
             responseObject = carDetailQueryFeignApi.getCarDetailByCarNo(Integer.parseInt(carNo));
             Cat.logEvent(CatConstants.FEIGN_RESULT,JSON.toJSONString(responseObject));
-            if(responseObject == null || !ErrorCode.SUCCESS.getCode().equals(responseObject.getResCode())){
-                log.error("Feign 获取车辆信息失败,responseObject={},carNo={}",JSON.toJSONString(responseObject),JSON.toJSONString(carNo));
-                RenterCarDetailFailException failException = new RenterCarDetailFailException();
-                Cat.logError("Feign 获取车辆信息失败",failException);
-                throw failException;
-            }
-
+            checkResponse(responseObject);
             CarDetailDTO dto = new CarDetailDTO();
             CarBaseVO baseVO = responseObject.getData();
             log.info("baseVo is {}",baseVO);
@@ -71,21 +68,19 @@ public class CarProxyService {
             log.info("dto is {}",dto);
             t.setStatus(Transaction.SUCCESS);
             return dto;
-        }catch (RenterCarDetailFailException e){
-            Cat.logError("Feign 获取车辆信息失败",e);
-            t.setStatus(e);
-            throw e;
         }catch (Exception e){
             log.error("Feign 获取车辆信息异常,responseObject={},orderCarInfoParamDTO={}",JSON.toJSONString(responseObject),JSON.toJSONString(carNo),e);
-            RenterCarDetailErrException carDetailByFeignException = new RenterCarDetailErrException();
-            Cat.logError("Feign 获取车辆信息异常",carDetailByFeignException);
-            throw carDetailByFeignException;
+            Cat.logError("Feign 获取车辆信息异常",e);
+            t.setStatus(e);
+            throw e;
         }finally {
             t.complete();
         }
     }
 
-    //获取租客商品信息
+    /**
+     * 获取租客商品信息
+     */
     public RenterGoodsDetailDTO getRenterGoodsDetail(CarDetailReqVO reqVO){
         OrderCarInfoParamDTO orderCarInfoParamDTO = new OrderCarInfoParamDTO();
         orderCarInfoParamDTO.setCarNo(Integer.parseInt(reqVO.getCarNo()));
@@ -100,29 +95,22 @@ public class CarProxyService {
             log.info("Feign 开始获取车辆信息,orderCarInfoParamDTO={}", JSON.toJSONString(orderCarInfoParamDTO));
             Cat.logEvent(CatConstants.FEIGN_PARAM,JSON.toJSONString(orderCarInfoParamDTO));
             responseObject = carDetailQueryFeignApi.getCarDetailOfTransByCarNo(orderCarInfoParamDTO);
+            log.info("reponse is [{}]",JSON.toJSONString(responseObject));
             Cat.logEvent(CatConstants.FEIGN_RESULT,JSON.toJSONString(responseObject));
-            if(responseObject == null || !ErrorCode.SUCCESS.getCode().equals(responseObject.getResCode())){
-                log.error("Feign 获取车辆信息失败,responseObject={},orderCarInfoParamDTO={}",JSON.toJSONString(responseObject),JSON.toJSONString(orderCarInfoParamDTO));
-                RenterCarDetailFailException failException = new RenterCarDetailFailException();
-                Cat.logError("Feign 获取车辆信息失败",failException);
-                throw failException;
-            }
+            checkResponse(responseObject);
             t.setStatus(Transaction.SUCCESS);
-        }catch (RenterCarDetailFailException e){
-            Cat.logError("Feign 获取车辆信息失败",e);
-            t.setStatus(e);
-            throw e;
         }catch (Exception e){
             log.error("Feign 获取车辆信息异常,responseObject={},orderCarInfoParamDTO={}",JSON.toJSONString(responseObject),JSON.toJSONString(orderCarInfoParamDTO),e);
-            RenterCarDetailErrException carDetailByFeignException = new RenterCarDetailErrException();
-            Cat.logError("Feign 获取车辆信息异常",carDetailByFeignException);
-            throw carDetailByFeignException;
+            Cat.logError("Feign 获取车辆信息异常",e);
+            t.setStatus(e);
+            throw e;
         }finally {
             t.complete();
         }
 
         CarDetailVO data = responseObject.getData();
         List<CarInspectVO> carInspectS = data.getCarInspectS();
+        CarChargeLevelVO carChargeLevelVO = data.getCarChargeLevelVO();
         CarBaseVO carBaseVO = data.getCarBaseVO();
         CarDetectVO carDetect = data.getCarDetect();
         CarStewardVO carSteward = data.getCarSteward();
@@ -132,6 +120,10 @@ public class CarProxyService {
         List<CarGpsVO> carGpsVOS = data.getCarGpsVOS();
         TransReplyVO transReplyVO = carBaseVO.getTransReplyVO();
         RenterGoodsDetailDTO renterGoodsDetailDto = new RenterGoodsDetailDTO();
+        renterGoodsDetailDto.setCarAge(carBaseVO.getCarAge());
+        renterGoodsDetailDto.setSucessRate(carChargeLevelVO!=null?carChargeLevelVO.getSucessRate():null);
+        renterGoodsDetailDto.setIsLocal(carBaseVO.getIsLocal());
+        renterGoodsDetailDto.setChoiceCar(data.isChoiceCar());
         renterGoodsDetailDto.setRentTime(reqVO.getRentTime());
         renterGoodsDetailDto.setRevertTime(reqVO.getRevertTime());
         renterGoodsDetailDto.setReplyFlag(transReplyVO ==null || transReplyVO.getReplyFlag() == null ? 0: transReplyVO.getReplyFlag());
@@ -181,7 +173,7 @@ public class CarProxyService {
         CarInspectVO carInspectVO = carInspectS != null && carInspectS.size() > 0 ? carInspectS.get(0) : null;
         String inspectExpire = carInspectVO != null ? carInspectVO.getInspectExpire() : null;
         renterGoodsDetailDto.setInspectExpire(inspectExpire!=null?LocalDateTimeUtils.parseStringToLocalDate(inspectExpire):null);
-
+        renterGoodsDetailDto.setLastMileage(StringUtils.isNotBlank(carBaseVO.getLastMileage()) ? Integer.valueOf(carBaseVO.getLastMileage()) : 0);
         if (data.getCarModelParam() != null) {
             renterGoodsDetailDto.setCarInmsrp(data.getCarModelParam().getInmsrp());
         }
@@ -192,7 +184,7 @@ public class CarProxyService {
         String serialNumbers = Optional.ofNullable(carGpsVOS)
                 .orElseGet(ArrayList::new)
                 .stream()
-                .map(x -> x.getSerialNumber())
+                .map(x -> x.getSimNo())
                 .collect(Collectors.joining(","));
         renterGoodsDetailDto.setGpsSerialNumber(serialNumbers);
 
@@ -212,7 +204,7 @@ public class CarProxyService {
         return renterGoodsDetailDto;
     }
     //获取车主商品信息
-    public OwnerGoodsDetailDTO getOwnerGoodsDetail(RenterGoodsDetailDTO renterGoodsDetailDto) throws CarDetailByFeignException {
+    public OwnerGoodsDetailDTO getOwnerGoodsDetail(RenterGoodsDetailDTO renterGoodsDetailDto) {
         OwnerGoodsDetailDTO ownerGoodsDetailDto = new OwnerGoodsDetailDTO();
         BeanUtils.copyProperties(renterGoodsDetailDto, ownerGoodsDetailDto);
         ownerGoodsDetailDto.setMemNo(renterGoodsDetailDto.getOwnerMemNo());
@@ -245,5 +237,18 @@ public class CarProxyService {
     public static void main(String[] args) {
         LocalDate localDate = LocalDateTimeUtils.parseStringToLocalDate("2012-06-21");
         System.out.println(localDate);
+    }
+
+    public static void  checkResponse(ResponseObject responseObject){
+        if(responseObject==null||!ErrorCode.SUCCESS.getCode().equalsIgnoreCase(responseObject.getResCode())){
+            RemoteCallException remoteCallException = null;
+            if(responseObject!=null){
+                remoteCallException = new RemoteCallException(responseObject.getResCode(),responseObject.getResMsg(),responseObject.getData());
+            }else{
+                remoteCallException = new RemoteCallException(com.atzuche.order.commons.enums.ErrorCode.REMOTE_CALL_FAIL.getCode(),
+                        com.atzuche.order.commons.enums.ErrorCode.REMOTE_CALL_FAIL.getText());
+            }
+            throw remoteCallException;
+        }
     }
 }

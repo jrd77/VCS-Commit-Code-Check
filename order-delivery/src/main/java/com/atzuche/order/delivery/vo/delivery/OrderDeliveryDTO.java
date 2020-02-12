@@ -130,14 +130,19 @@ public class OrderDeliveryDTO {
      */
     public void setParamsTypeValue(OrderReqVO orderReqVO,Integer orderType) {
         if (orderType == UsedDeliveryTypeEnum.USED.getValue().intValue()) {
-           setRenterGetReturnAddr(orderReqVO.getSrvGetAddr());
-           setRenterGetReturnAddrLat(orderReqVO.getSrvGetLat());
-           setRenterGetReturnAddrLon(orderReqVO.getSrvGetLon());
+            setRenterGetReturnAddr(orderReqVO.getSrvGetAddr());
+            setRenterGetReturnAddrLat(orderReqVO.getSrvGetLat());
+            setRenterGetReturnAddrLon(orderReqVO.getSrvGetLon());
+            if (orderReqVO.getSrvGetFlag().intValue() == UsedDeliveryTypeEnum.USED.getValue().intValue()) {
+                setIsNotifyRenyun(UsedDeliveryTypeEnum.USED.getValue().intValue());
+            }
         } else {
             setRenterGetReturnAddr(orderReqVO.getSrvReturnAddr());
             setRenterGetReturnAddrLat(orderReqVO.getSrvReturnLat());
             setRenterGetReturnAddrLon(orderReqVO.getSrvReturnLon());
-
+            if (orderReqVO.getSrvReturnFlag().intValue() == UsedDeliveryTypeEnum.USED.getValue().intValue()) {
+                setIsNotifyRenyun(UsedDeliveryTypeEnum.USED.getValue().intValue());
+            }
         }
     }
 

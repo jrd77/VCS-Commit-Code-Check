@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.apache.commons.beanutils.BeanUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,7 +20,8 @@ import com.atzuche.order.accountrenterwzdepost.service.AccountRenterWzDepositSer
 import com.atzuche.order.accountrenterwzdepost.vo.res.AccountRenterWZDepositResVO;
 import com.atzuche.order.cashieraccount.service.CashierPayService;
 import com.atzuche.order.commons.enums.DeliveryOrderTypeEnum;
-import com.atzuche.order.commons.enums.RenterCashCodeEnum;
+import com.atzuche.order.commons.enums.OrderStatusEnum;
+import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.commons.vo.res.ModifyOrderMainResVO;
 import com.atzuche.order.commons.vo.res.ModifyOrderResVO;
 import com.atzuche.order.commons.vo.res.account.AccountRenterCostDetailResVO;
@@ -31,12 +32,15 @@ import com.atzuche.order.commons.vo.res.cost.RenterOrderSubsidyDetailResVO;
 import com.atzuche.order.commons.vo.res.order.RenterOrderResVO;
 import com.atzuche.order.delivery.entity.RenterOrderDeliveryEntity;
 import com.atzuche.order.delivery.service.RenterOrderDeliveryService;
+import com.atzuche.order.parentorder.service.OrderStatusService;
 import com.atzuche.order.rentercost.entity.RenterOrderCostDetailEntity;
 import com.atzuche.order.rentercost.entity.RenterOrderFineDeatailEntity;
 import com.atzuche.order.rentercost.entity.RenterOrderSubsidyDetailEntity;
 import com.atzuche.order.rentercost.service.RenterOrderCostDetailService;
 import com.atzuche.order.rentercost.service.RenterOrderSubsidyDetailService;
+import com.atzuche.order.renterorder.entity.RenterOrderChangeApplyEntity;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
+import com.atzuche.order.renterorder.service.RenterOrderChangeApplyService;
 import com.atzuche.order.renterorder.service.RenterOrderService;
 
 import lombok.extern.slf4j.Slf4j;
@@ -64,9 +68,13 @@ public class ModifyOrderQueryListService {
 	private RenterOrderSubsidyDetailService renterOrderSubsidyDetailService;
 	@Autowired
 	private RenterOrderService renterOrderService;
+	@Autowired
+	private RenterOrderChangeApplyService renterOrderChangeApplyService;
+	@Autowired
+	private OrderStatusService orderStatusService;
 	
 	
-	public ModifyOrderResVO queryModifyOrderList(String orderNo,String renterOrderNo) throws Exception{
+	public ModifyOrderResVO queryModifyOrderList(String orderNo,String renterOrderNo) {
 		ModifyOrderResVO resVo = new ModifyOrderResVO();
 
 		//租客罚金列表
@@ -75,11 +83,7 @@ public class ModifyOrderQueryListService {
 		if(fineLst != null) {
 			fineLst.stream().forEach(x->{
 				RenterOrderFineDeatailResVO real = new RenterOrderFineDeatailResVO();
-        		try {
-					BeanUtils.copyProperties(real, x);
-				} catch (Exception e) {
-					log.error("对象属性赋值报错:",e);
-				}
+				BeanUtils.copyProperties(x,real);
         		fineLstReal.add(real);
             });
         }
@@ -94,29 +98,29 @@ public class ModifyOrderQueryListService {
         RenterOrderDeliveryResVO renterOrderDeliveryReturnReal = new RenterOrderDeliveryResVO();
         
         if(renterOrderDeliveryGet != null) {
-        	BeanUtils.copyProperties(renterOrderDeliveryGetReal, renterOrderDeliveryGet);
+        	BeanUtils.copyProperties(renterOrderDeliveryGet,renterOrderDeliveryGetReal);
         }
         if(renterOrderDeliveryReturn != null) {
-        	BeanUtils.copyProperties(renterOrderDeliveryReturnReal, renterOrderDeliveryReturn);
+        	BeanUtils.copyProperties(renterOrderDeliveryReturn,renterOrderDeliveryReturnReal);
         }
         resVo.setRenterOrderDeliveryGet(renterOrderDeliveryGetReal);
         resVo.setRenterOrderDeliveryReturn(renterOrderDeliveryReturnReal);
         
-        
+        /**
+         * 从费用表中获取。
+         */
         //租客费用明细
         List<RenterOrderCostDetailEntity> renterOrderCostDetailList = renterOrderCostDetailService.listRenterOrderCostDetail(orderNo, renterOrderNo);
         List<RenterOrderCostDetailResVO> renterOrderCostDetailListReal = new ArrayList<RenterOrderCostDetailResVO>();
         if(renterOrderCostDetailList != null) {
         	renterOrderCostDetailList.stream().forEach(x->{
         		RenterOrderCostDetailResVO real = new RenterOrderCostDetailResVO();
-        		try {
-					BeanUtils.copyProperties(real, x);
-				} catch (Exception e) {
-					log.error("对象属性赋值报错:",e);
-				}
+        		BeanUtils.copyProperties( x,real);
         		renterOrderCostDetailListReal.add(real);
             });
         }
+        //数据封装
+        resVo.setRenterOrderCostDetailList(renterOrderCostDetailListReal);
         
         //抵扣明细
     	List<RenterOrderSubsidyDetailEntity> subsidyLst = renterOrderSubsidyDetailService.listRenterOrderSubsidyDetail(orderNo, renterOrderNo);
@@ -124,11 +128,9 @@ public class ModifyOrderQueryListService {
         if(subsidyLst != null) {
         	subsidyLst.stream().forEach(x->{
         		RenterOrderSubsidyDetailResVO real = new RenterOrderSubsidyDetailResVO();
-        		try {
-					BeanUtils.copyProperties(real, x);
-				} catch (Exception e) {
-					log.error("对象属性赋值报错:",e);
-				}
+
+        		BeanUtils.copyProperties(x,real);
+
                 subsidyLstReal.add(real);
             });
         }
@@ -144,22 +146,49 @@ public class ModifyOrderQueryListService {
 		 * 根据订单号查询封装
 		 */
 		//需补付金额
-		int needIncrementAmt = cashierPayService.getRentCost(orderNo, memNo);
+		int needIncrementAmt = cashierPayService.getRentCostBufu(orderNo, memNo);
 		resVo.setNeedIncrementAmt(needIncrementAmt);
 		
 		
 		//租客订单
 		//租客订单
 		List<RenterOrderEntity> rentLst = renterOrderService.queryRenterOrderByOrderNo(orderNo);
+		/**
+		 * 申请修改记录
+		 * 
+		 */
+//		List<RenterOrderChangeApplyEntity> rentApplyLst = renterOrderChangeApplyService.selectALLByOrderNo(orderNo);11
+		for (RenterOrderEntity renterOrderEntity : rentLst) {
+			RenterOrderChangeApplyEntity entity = renterOrderChangeApplyService.getRenterOrderApplyByRenterOrderNo(renterOrderEntity.getRenterOrderNo());
+			if(entity != null) {
+				//需要判定订单状态是否结束
+				Integer status = orderStatusService.getStatusByOrderNo(orderNo);
+				if(status != null && OrderStatusEnum.CLOSED.getStatus() == status.intValue()) {
+					renterOrderEntity.setAgreeFlag(3);
+				}else {
+					//审核状态:0-未处理，1-已同意，2-主动拒绝,3-自动拒绝
+					if(entity.getAuditStatus().intValue() == 2 || entity.getAuditStatus().intValue() == 3) {
+						//车主是否同意 0-未处理，1-已同意，2-已拒绝，3不处理 横线
+						renterOrderEntity.setAgreeFlag(2);
+					}else {
+						renterOrderEntity.setAgreeFlag(entity.getAuditStatus());
+					}
+				}
+			}else {
+				//前端处理为 --
+				renterOrderEntity.setAgreeFlag(3);
+			}
+		}
+		
+		
+		
 		List<RenterOrderResVO> rentLstReal = new ArrayList<RenterOrderResVO>();
 		if(rentLst != null) {
 			rentLst.stream().forEach(x->{
 				RenterOrderResVO real = new RenterOrderResVO();
-        		try {
-					BeanUtils.copyProperties(real, x);
-				} catch (Exception e) {
-					log.error("对象属性赋值报错:",e);
-				}
+
+				BeanUtils.copyProperties(x,real);
+
         		rentLstReal.add(real);
             });
         }
@@ -169,7 +198,7 @@ public class ModifyOrderQueryListService {
         AccountRenterWZDepositResVO wzVo =  accountRenterWzDepositService.getAccountRenterWZDeposit(orderNo, memNo);
         com.atzuche.order.commons.vo.res.account.AccountRenterWZDepositResVO wzVoReal = new com.atzuche.order.commons.vo.res.account.AccountRenterWZDepositResVO();
         if(wzVo != null) {
-        	BeanUtils.copyProperties(wzVoReal, wzVo);
+        	BeanUtils.copyProperties(wzVo,wzVoReal);
         }else {
         	wzVoReal.setYingshouDeposit(0);
         }
@@ -179,7 +208,7 @@ public class ModifyOrderQueryListService {
         AccountRenterDepositResVO rentVo = accountRenterDepositService.getAccountRenterDepositEntity(orderNo, memNo);
         com.atzuche.order.commons.vo.res.account.AccountRenterDepositResVO rentVoReal = new com.atzuche.order.commons.vo.res.account.AccountRenterDepositResVO();
         if(rentVo != null) {
-        	BeanUtils.copyProperties(rentVoReal, rentVo);
+        	BeanUtils.copyProperties(rentVo,rentVoReal);
         }else {
         	rentVoReal.setYingfuDepositAmt(0);
         }
@@ -191,12 +220,12 @@ public class ModifyOrderQueryListService {
         for (AccountRenterCostDetailEntity accountRenterCostDetailEntity : lstCostDetail) {
         	if(RenterCashCodeEnum.WALLET_DEDUCT.equals(accountRenterCostDetailEntity.getSourceCode())) {
         		walletCostDetail = new AccountRenterCostDetailEntity();
-        		BeanUtils.copyProperties(walletCostDetail, accountRenterCostDetailEntity);
+        		BeanUtils.copyProperties(accountRenterCostDetailEntity,walletCostDetail);
         	}
 		}
         AccountRenterCostDetailResVO walletCostDetailReal = new AccountRenterCostDetailResVO();
         if(walletCostDetail != null) {
-        	BeanUtils.copyProperties(walletCostDetailReal, walletCostDetail);
+        	BeanUtils.copyProperties(walletCostDetail,walletCostDetailReal);
         }else {
         	walletCostDetailReal.setAmt(0); //默认值。
         }

@@ -7,6 +7,7 @@ import java.util.Optional;
 
 import javax.validation.Valid;
 
+import com.atzuche.order.commons.BindingResultUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -38,28 +39,15 @@ public class ModifyOrderQueryListController {
 	@PostMapping("/order/modify/query")
 	public ResponseData<ModifyOrderResVO> queryModifyOrderList(@Valid @RequestBody ModifyOrderQueryReqVO req, BindingResult bindingResult) {
 		log.info("修改订单列表 ModifyOrderQueryReq params=[{}]", req.toString());
-		if (bindingResult.hasErrors()) {
-            Optional<FieldError> error = bindingResult.getFieldErrors().stream().findFirst();
-            return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), error.isPresent() ?
-                    error.get().getDefaultMessage() : ErrorCode.INPUT_ERROR.getText());
-        }
-		try {
-			ModifyOrderResVO resVo = modifyOrderQueryListService.queryModifyOrderList(req.getOrderNo(), req.getRenterOrderNo());
-			return ResponseData.success(resVo);
-		} catch (Exception e) {
-			log.error("查询租客修改订单列表异常:",e);
-			return ResponseData.error();
-		}
+		BindingResultUtil.checkBindingResult(bindingResult);
+		ModifyOrderResVO resVo = modifyOrderQueryListService.queryModifyOrderList(req.getOrderNo(), req.getRenterOrderNo());
+		return ResponseData.success(resVo);
 	}
 	
 	@PostMapping("/order/modify/get")
 	public ResponseData<ModifyOrderMainResVO> getModifyOrderMain(@Valid @RequestBody ModifyOrderMainQueryReqVO req, BindingResult bindingResult) {
 		log.info("修改订单列表 ModifyOrderQueryReq params=[{}]", req.toString());
-		if (bindingResult.hasErrors()) {
-            Optional<FieldError> error = bindingResult.getFieldErrors().stream().findFirst();
-            return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), error.isPresent() ?
-                    error.get().getDefaultMessage() : ErrorCode.INPUT_ERROR.getText());
-        }
+		BindingResultUtil.checkBindingResult(bindingResult);
 		try {
 			ModifyOrderMainResVO resVo = modifyOrderQueryListService.getModifyOrderMain(req.getOrderNo(), req.getMemNo());
 			return ResponseData.success(resVo);

@@ -25,4 +25,6 @@ public interface AccountRenterCostSettleDetailMapper{
     int updateByPrimaryKeySelective(AccountRenterCostSettleDetailEntity record);
 
     List<AccountRenterCostSettleDetailEntity> selectRenterCostSettleDetail(@Param("orderNo") String orderNo, @Param("memNo")String renterMemNo, @Param("costCode")String costCode);
+
+    List<AccountRenterCostSettleDetailEntity> selectRenterCostSettleDetailByOrderNo(@Param("orderNo")String orderNo);
 }

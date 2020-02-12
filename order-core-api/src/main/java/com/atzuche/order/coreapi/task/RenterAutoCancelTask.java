@@ -9,6 +9,7 @@ import com.dianping.cat.Cat;
 import com.dianping.cat.message.Transaction;
 import com.xxl.job.core.biz.model.ReturnT;
 import com.xxl.job.core.handler.IJobHandler;
+import com.xxl.job.core.handler.annotation.JobHandler;
 import com.xxl.job.core.log.XxlJobLogger;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
@@ -25,7 +26,8 @@ import java.util.List;
  * @author shisong
  * @date 2020/1/15
  */
-@Component("renterAutoCancelTask")
+@Component
+@JobHandler("renterAutoCancelTask")
 public class RenterAutoCancelTask extends IJobHandler {
 
     private Logger logger = LoggerFactory.getLogger(RenterAutoCancelTask.class);
@@ -58,8 +60,16 @@ public class RenterAutoCancelTask extends IJobHandler {
                     CancelOrderReqVO req = new CancelOrderReqVO();
                     req.setOrderNo(orderNo);
                     req.setCancelReason("下单后1小时，租客未支付租车费用,自动取消");
-                    req.setMemRole("1");
-                    cancelOrderService.cancel(req);
+                    req.setMemRole("2");
+                    req.setOperatorName("system");
+                    try {
+                        logger.info("执行 下单后1小时，租客未支付租车费用,自动取消 orderNo:[{}]",orderNo);
+                        cancelOrderService.cancel(req);
+                    } catch (Exception e) {
+                        XxlJobLogger.log("执行 下单后1小时，租客未支付租车费用,自动取消 异常:",e);
+                        logger.error("执行 下单后1小时，租客未支付租车费用,自动取消 异常 orderNo:[{}] , e:[{}]",orderNo,e);
+                        Cat.logError("执行 下单后1小时，租客未支付租车费用,自动取消 异常",e);
+                    }
                 }
             }
             logger.info("结束执行 下单后1小时，租客未支付租车费用,自动取消 ");

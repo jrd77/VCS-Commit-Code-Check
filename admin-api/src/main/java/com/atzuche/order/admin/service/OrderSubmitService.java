@@ -2,13 +2,11 @@ package com.atzuche.order.admin.service;
 
 import com.alibaba.fastjson.JSON;
 import com.atzuche.order.admin.common.AdminUserUtil;
-import com.atzuche.order.admin.exception.OrderSubmitErrException;
-import com.atzuche.order.admin.exception.OrderSubmitFailException;
 import com.atzuche.order.admin.util.StringUtil;
 import com.atzuche.order.admin.util.TimeUtil;
 import com.atzuche.order.admin.vo.req.orderSubmit.AdminTransReqVO;
-import com.atzuche.order.car.RenterCarDetailFailException;
 import com.atzuche.order.commons.CatConstants;
+import com.atzuche.order.commons.ResponseCheckUtil;
 import com.atzuche.order.commons.vo.req.AdminOrderReqVO;
 import com.atzuche.order.commons.vo.res.OrderResVO;
 import com.atzuche.order.open.service.FeignOrderAdminSubmitService;
@@ -38,29 +36,21 @@ public class OrderSubmitService {
         Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "后台管理系统下单");
         try{
             Cat.logEvent(CatConstants.FEIGN_METHOD,"feignOrderAdminSubmitService.submitOrder");
-            log.info("Feign 开始后台管理系统下单,adminOrderReqVO={}", adminOrderReqVO);
-            Cat.logEvent(CatConstants.FEIGN_PARAM,JSON.toJSONString(adminOrderReqVO));
+            log.info("Feign 开始后台管理系统下单,adminOrderReqVO={}", adminOrderReqParam);
+            Cat.logEvent(CatConstants.FEIGN_PARAM,JSON.toJSONString(adminOrderReqParam));
             responseObject =  feignOrderAdminSubmitService.submitOrder(adminOrderReqParam);
             Cat.logEvent(CatConstants.FEIGN_RESULT,JSON.toJSONString(responseObject));
-            if(responseObject == null || !ErrorCode.SUCCESS.getCode().equals(responseObject.getResCode())){
-                log.error("Feign 后台管理系统下单失败,responseObject={}", JSON.toJSONString(responseObject));
-                OrderSubmitFailException failException = new OrderSubmitFailException();
-                Cat.logError("Feign 后台管理系统下单失败",failException);
-                throw failException;
-            }
+            ResponseCheckUtil.checkResponse(responseObject);
             t.setStatus(Transaction.SUCCESS);
-        }catch (RenterCarDetailFailException e){
-            Cat.logError("Feign 后台管理系统下单失败",e);
-            t.setStatus(e);
-            throw e;
         }catch (Exception e){
             log.error("Feign 后台管理系统下单异常,responseObject={}", JSON.toJSONString(responseObject),e);
-            OrderSubmitErrException err = new OrderSubmitErrException();
-            Cat.logError("Feign 后台管理系统下单异常",err);
-            throw err;
+            Cat.logError("Feign 后台管理系统下单异常",e);
+            t.setStatus(e);
+            throw e;
         }finally {
             t.complete();
         }
+
         //3、返回结果
         ResponseData responseData = new ResponseData();
         responseData.setData(responseObject.getData());
@@ -89,14 +79,9 @@ public class OrderSubmitService {
 
         param.setUseSpecialPrice(reqVO.getUseSpecialPrice());
         param.setOperator(AdminUserUtil.getAdminUser().getAuthName());
-        param.setSpecialConsole("0");
-        param.setOfflineOrderStatus("0");
 
-        param.setPlatformParentType("7");
         param.setCityName(reqVO.getRentCity());
-        param.setOrderCategory("1");
-        param.setSceneCode("EX007");
-        param.setSource("1");
+
 
         param.setMemNo(reqVO.getMemNo());
 
@@ -107,7 +92,6 @@ public class OrderSubmitService {
         param.setDisCouponIds(reqVO.getDisCouponIds());
         param.setDriverIds(reqVO.getDriverIds());
         param.setLimitReductionId(reqVO.getLimitReductionId());
-        param.setFreeDoubleTypeId(reqVO.getFreeDoubleTypeId());
         param.setCarOwnerCouponNo(reqVO.getCarOwnerCouponNo());
 
         //布尔值的转化
@@ -145,6 +129,15 @@ public class OrderSubmitService {
         param.setLimitRedStatus(reqVO.getLimitRedStatus());
         param.setRentCity(reqVO.getRentCity());
         param.setOilType(reqVO.getOilType());
+
+        param.setOrderCategory("1");
+        param.setSceneCode("EX007");
+        param.setSource("1");
+        param.setFreeDoubleTypeId("3");
+        param.setSpecialConsole("0");
+        param.setOfflineOrderStatus("0");
+
+        param.setPlatformParentType("7");
 
         return param;
     }

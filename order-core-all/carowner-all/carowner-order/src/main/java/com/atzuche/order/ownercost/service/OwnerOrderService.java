@@ -3,6 +3,7 @@ package com.atzuche.order.ownercost.service;
 
 import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.entity.dto.CostBaseDTO;
+import com.atzuche.order.commons.enums.DispatcherReasonEnum;
 import com.atzuche.order.commons.enums.OwnerChildStatusEnum;
 import com.atzuche.order.ownercost.entity.OwnerOrderEntity;
 import com.atzuche.order.ownercost.entity.dto.OwnerOrderCostReqDTO;
@@ -64,6 +65,17 @@ public class OwnerOrderService {
     public Integer updateOwnerOrderInvalidById(Integer id) {
     	return ownerOrderMapper.updateOwnerOrderInvalidById(id);
     }
+
+    /**
+     * 依据主键更新车主订单信息
+     *
+     * @param ownerOrderEntity 车主订单信息
+     * @return Integer
+     */
+    public Integer updateOwnerOrderInfo(OwnerOrderEntity ownerOrderEntity){
+        return ownerOrderMapper.updateByPrimaryKey(ownerOrderEntity);
+    }
+
     
     /**
      * 保存车主子订单
@@ -126,5 +138,9 @@ public class OwnerOrderService {
 
     public Integer updateChildStatusByOrderNo(String orderNo, Integer childStatus){
         return ownerOrderMapper.updateChildStatusByOrderNo(orderNo, childStatus);
+    }
+
+    public Integer updateDispatchReasonByOrderNo(String orderNo, DispatcherReasonEnum dispatcherReasonEnum){
+        return ownerOrderMapper.updateDispatchReasonByOrderNo(orderNo, dispatcherReasonEnum.getCode());
     }
 }

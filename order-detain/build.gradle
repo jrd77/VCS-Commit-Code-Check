@@ -1,0 +1,19 @@
+plugins {
+    id 'java'
+}
+
+group 'com.atzuche'
+version '0.0.1-SNAPSHOT'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile project(":util-all:order-commons")
+    compile project(":config")
+    compile project(":casier-all:cashier-account")
+
+}

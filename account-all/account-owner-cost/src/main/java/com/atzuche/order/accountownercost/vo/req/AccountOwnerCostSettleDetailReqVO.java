@@ -27,11 +27,11 @@ public class AccountOwnerCostSettleDetailReqVO {
     /**
      * 金额
      */
-    private Integer amt;
+    private int amt;
     /**
      * 费用编码
      */
-    private Integer sourceCode;
+    private String sourceCode;
     /**
      * 费用来源描述
      */

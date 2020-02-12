@@ -6,11 +6,13 @@ package com.atzuche.order.admin.vo.resp.order.cost;
 import com.autoyol.doc.annotation.AutoDocProperty;
 
 import lombok.Data;
+import lombok.ToString;
 
 /**
  * @author jing.huang
  *
  */
+@ToString
 @Data
 public class OrderRenterCostResVO {
 	@AutoDocProperty(value="子订单编号")
@@ -21,6 +23,13 @@ public class OrderRenterCostResVO {
 
 	@AutoDocProperty(value="租车费用-实收")
 	private String rentFeeShishou;
+	
+	@AutoDocProperty(value="租车费用-应退")
+	private String rentFeeYingtui = "0";
+
+	@AutoDocProperty(value="租车费用-实退")
+	private String rentFeeShitui = "0";
+	
 	
 	@AutoDocProperty(value="租车费用-基础费用")  ///
 	private String rentFeeBase;
@@ -107,6 +116,13 @@ public class OrderRenterCostResVO {
 	
 	@AutoDocProperty(value="平台实际给租客的补贴") ///
 	private String platformSubsidyRealAmt;
+	
+	//--------------------------------------------
+	@AutoDocProperty(value="车主给租客的补贴") ///add 200116
+	private String ownerSubsidyTotalAmt;
+	
+	@AutoDocProperty(value="租客租金补贴") ///add 200116
+	private String ownerSubsidyRentAmt;
 	
 	//--------------------------------------------
 	@AutoDocProperty(value="车辆押金")

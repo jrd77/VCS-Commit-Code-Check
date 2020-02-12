@@ -1,12 +1,17 @@
 package com.atzuche.order.rentercommodity.service;
 
+import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
 import com.atzuche.order.commons.entity.dto.RenterGoodsPriceDetailDTO;
+import com.atzuche.order.commons.entity.orderDetailDto.RenterGoodsDTO;
+import com.atzuche.order.commons.exceptions.OrderNotFoundException;
 import com.atzuche.order.rentercommodity.entity.RenterGoodsEntity;
 import com.atzuche.order.rentercommodity.entity.RenterGoodsPriceDetailEntity;
 import com.atzuche.order.rentercommodity.mapper.RenterGoodsMapper;
 import com.atzuche.order.rentercommodity.mapper.RenterGoodsPriceDetailMapper;
 import lombok.Data;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,14 +28,20 @@ import java.util.List;
  */
 @Service
 public class RenterGoodsService{
+
+    private static Logger logger = LoggerFactory.getLogger(RenterGoodsService.class);
+
     @Autowired
     private RenterGoodsMapper renterGoodsMapper;
     @Autowired
     private RenterGoodsPriceDetailMapper renterGoodsPriceDetailMapper;
 
     public void save(RenterGoodsDetailDTO renterGoodsDetailDto){
+        logger.info("Save renter goods detail.param is,renterGoodsDetailDto:[{}]", JSON.toJSONString(renterGoodsDetailDto));
+
         RenterGoodsEntity goodsEntity = new RenterGoodsEntity();
         BeanUtils.copyProperties(renterGoodsDetailDto,goodsEntity);
+        goodsEntity.setChoiceCar(renterGoodsDetailDto.isChoiceCar() ? 1 : 0);
         renterGoodsMapper.insert(goodsEntity);
 
         List<RenterGoodsPriceDetailDTO> goodsPriceDetailDtoList = renterGoodsDetailDto.getRenterGoodsPriceDetailDTOList();
@@ -87,6 +98,7 @@ public class RenterGoodsService{
     public RenterGoodsEntity queryCarInfoByOrderNoAndCarNo(String orderNo, String carNo) {
         return renterGoodsMapper.queryCarInfoByOrderNoAndCarNo(orderNo,carNo);
     }
+
 
     @Data
     public static class JSONStr{

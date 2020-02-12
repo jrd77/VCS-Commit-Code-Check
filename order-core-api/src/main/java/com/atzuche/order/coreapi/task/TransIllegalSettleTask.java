@@ -2,11 +2,12 @@ package com.atzuche.order.coreapi.task;
 
 import com.atzuche.order.commons.CatConstants;
 import com.atzuche.order.coreapi.service.OrderSearchRemoteService;
-import com.atzuche.order.renterwz.vo.IllegalToDO;
+import com.atzuche.order.settle.service.OrderWzSettleService;
 import com.dianping.cat.Cat;
 import com.dianping.cat.message.Transaction;
 import com.xxl.job.core.biz.model.ReturnT;
 import com.xxl.job.core.handler.IJobHandler;
+import com.xxl.job.core.handler.annotation.JobHandler;
 import com.xxl.job.core.log.XxlJobLogger;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
@@ -22,13 +23,18 @@ import java.util.List;
  * @author shisong
  * @date 2020/1/15
  */
-@Component("transIllegalSettleTask")
+@Component
+@JobHandler("transIllegalSettleTask")
 public class TransIllegalSettleTask extends IJobHandler {
 
     private Logger logger = LoggerFactory.getLogger(TransIllegalSettleTask.class);
 
     @Resource
     private OrderSearchRemoteService orderSearchRemoteService;
+
+    @Resource
+    private OrderWzSettleService orderWzSettleService;
+
 
     @Override
     public ReturnT<String> execute(String s) throws Exception {
@@ -48,8 +54,16 @@ public class TransIllegalSettleTask extends IJobHandler {
             XxlJobLogger.log("查询 远程调用 查询按规则配置日期内完成的订单，获取待结算的对象列表 ,查询结果 models:" + list);
 
             if(CollectionUtils.isNotEmpty(list)){
-                //TODO 结算
-
+                for (String orderNo : list) {
+                    try {
+                        logger.info("结束执行 查询按规则配置日期内完成的订单，获取待结算的对象列表 ，查询能否结算 ");
+                        orderWzSettleService.settleWzOrder(orderNo);
+                    } catch (Exception e) {
+                        XxlJobLogger.log("执行 查询按规则配置日期内完成的订单，获取待结算的对象列表 ，查询能否结算 异常:",e);
+                        logger.error("执行 查询按规则配置日期内完成的订单，获取待结算的对象列表 ，查询能否结算 异常 orderNo:[{}] e:[{}]",orderNo ,e);
+                        Cat.logError("执行 查询按规则配置日期内完成的订单，获取待结算的对象列表 ，查询能否结算 异常",e);
+                    }
+                }
             }
             logger.info("结束执行 查询按规则配置日期内完成的订单，获取待结算的对象列表 ，查询能否结算 ");
             XxlJobLogger.log("结束执行 查询按规则配置日期内完成的订单，获取待结算的对象列表 ，查询能否结算 ");

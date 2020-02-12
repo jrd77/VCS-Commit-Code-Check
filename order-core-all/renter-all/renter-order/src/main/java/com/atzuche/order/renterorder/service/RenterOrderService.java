@@ -2,9 +2,10 @@ package com.atzuche.order.renterorder.service;
 
 import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.DateUtils;
+import com.atzuche.order.commons.constant.OrderConstant;
 import com.atzuche.order.commons.entity.dto.*;
-import com.atzuche.order.commons.enums.RenterCashCodeEnum;
 import com.atzuche.order.commons.enums.RenterChildStatusEnum;
+import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.rentercost.entity.RenterOrderCostDetailEntity;
 import com.atzuche.order.rentercost.entity.dto.OrderCouponDTO;
 import com.atzuche.order.rentercost.entity.dto.RenterOrderSubsidyDetailDTO;
@@ -19,7 +20,6 @@ import com.atzuche.order.renterorder.vo.platform.MemAvailCouponRequestVO;
 import com.autoyol.coupon.api.CouponSettleRequest;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.ibatis.annotations.Param;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -146,7 +146,7 @@ public class RenterOrderService {
         //1. 租车费用计算
         RenterOrderCostReqDTO renterOrderCostReqDTO = buildRenterOrderCostReqDTO(renterOrderReqVO);
         RenterOrderCostRespDTO renterOrderCostRespDTO =
-                renterOrderCalCostService.getOrderCostAndDeailList(renterOrderCostReqDTO);
+                renterOrderCalCostService.calcBasicRenterOrderCostAndDeailList(renterOrderCostReqDTO);
         renterOrderCostRespDTO.setMemNo(renterOrderReqVO.getMemNo());
         LOGGER.info("租客订单租车费用计算.result is, renterOrderCostRespDTO:[{}]", JSON.toJSONString(renterOrderCostRespDTO));
         DeductAndSubsidyContextDTO context = initDeductAndSubsidyContextDTO(renterOrderCostRespDTO, renterOrderReqVO);
@@ -196,7 +196,7 @@ public class RenterOrderService {
         record.setGoodsCode(String.valueOf(renterOrderReqVO.getCarNo()));
         record.setGoodsType("1");
         record.setAgreeFlag(null == renterOrderReqVO.getReplyFlag() ? 0 : renterOrderReqVO.getReplyFlag());
-        record.setReqAcceptTime(null == renterOrderReqVO.getReplyFlag() ? null : LocalDateTime.now());
+        record.setReqAcceptTime(record.getAgreeFlag() == OrderConstant.NO ? null : LocalDateTime.now());
         record.setIsUseCoin(renterOrderReqVO.getUseAutoCoin());
         record.setIsUseWallet(renterOrderReqVO.getUseBal());
         record.setAddDriver(CollectionUtils.isEmpty(renterOrderReqVO.getDriverIds()) ? 0 :

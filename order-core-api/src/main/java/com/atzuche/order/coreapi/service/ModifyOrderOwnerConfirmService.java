@@ -1,11 +1,12 @@
 package com.atzuche.order.coreapi.service;
 
+import com.atzuche.order.commons.vo.req.ModifyApplyHandleReq;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.atzuche.order.coreapi.entity.dto.ModifyConfirmDTO;
-import com.atzuche.order.coreapi.entity.request.ModifyApplyHandleReq;
 import com.atzuche.order.coreapi.modifyorder.exception.ModifyOrderChangeApplyNotFindException;
 import com.atzuche.order.coreapi.modifyorder.exception.ModifyOrderParameterException;
 import com.atzuche.order.renterorder.entity.RenterOrderChangeApplyEntity;
@@ -22,6 +23,9 @@ public class ModifyOrderOwnerConfirmService {
 	private ModifyOrderConfirmService modifyOrderConfirmService;
 	@Autowired
 	private RenterOrderChangeApplyService renterOrderChangeApplyService;
+
+	@Autowired
+	private OrderDetailService orderDetailService;
 	/**
 	 * 同意操作
 	 */
@@ -37,13 +41,17 @@ public class ModifyOrderOwnerConfirmService {
 	 * @return ResponseData
 	 */
 	@Transactional(rollbackFor=Exception.class)
-	public ResponseData<?> modifyConfirm(ModifyApplyHandleReq modifyApplyHandleReq) {
+	public void modifyConfirm(ModifyApplyHandleReq modifyApplyHandleReq) {
 		log.info("ModifyOrderConfirmService.modifyConfirm modifyApplyHandleReq=[{}]", modifyApplyHandleReq);
 		if (modifyApplyHandleReq == null) {
 			log.error("ModifyOrderConfirmService.modifyConfirm车主处理修改申请报错参数为空");
 			Cat.logError("ModifyOrderConfirmService.modifyConfirm车主处理修改申请报错", new ModifyOrderParameterException());
 			throw new ModifyOrderParameterException();
 		}
+        if(StringUtils.trimToNull(modifyApplyHandleReq.getMemNo())==null){
+        	modifyApplyHandleReq.setMemNo(orderDetailService.getOwnerMemNo(modifyApplyHandleReq.getModifyApplicationId()));
+		}
+
 		ModifyConfirmDTO modifyConfirmDTO = modifyOrderConfirmService.convertToModifyConfirmDTO(modifyApplyHandleReq);
 		RenterOrderChangeApplyEntity changeApply = renterOrderChangeApplyService.getRenterOrderChangeApplyByRenterOrderNo(modifyConfirmDTO.getRenterOrderNo());
 		if (changeApply == null) {
@@ -60,6 +68,5 @@ public class ModifyOrderOwnerConfirmService {
 			// 拒绝
 			modifyOrderConfirmService.refuseModifyOrder(modifyConfirmDTO);
 		}
-		return ResponseData.success();
 	}
 }

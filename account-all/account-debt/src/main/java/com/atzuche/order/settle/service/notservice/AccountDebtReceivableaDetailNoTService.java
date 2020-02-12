@@ -37,34 +37,5 @@ public class AccountDebtReceivableaDetailNoTService {
         }
     }
 
-    /**
-     * 幂等校验
-     * @param sourceCode
-     * @param uniqueNo
-     * @return
-     */
-    public boolean idempotentByUniqueAndSourceCode(Integer sourceCode, String uniqueNo) {
-        AccountDebtReceivableaDetailEntity accountDebtReceivableaDetail = accountDebtReceivableaDetailMapper.selectByUniqueAndSourceCode(sourceCode,uniqueNo);
-        return Objects.nonNull(accountDebtReceivableaDetail) && Objects.nonNull(accountDebtReceivableaDetail.getId());
-    }
 
-    /**
-     * 根据 历史待还详情  返回 欠款收款信息
-     *
-     * @param accountDebtDetails 本次待还 欠款信息
-     * @return
-     */
-    public List<AccountDebtReceivableaDetailEntity> getDebtReceivableaDetailsByDebtDetails(List<AccountDebtDetailEntity> accountDebtDetails, AccountDeductDebtReqVO accountDeductDebt) {
-        List<AccountDebtReceivableaDetailEntity> accountDebtReceivableaDetails = new ArrayList<>();
-        for(int i =0;i<accountDebtDetails.size();i++){
-            AccountDebtDetailEntity accountDebtDetailEntity = accountDebtDetails.get(i);
-            AccountDebtReceivableaDetailEntity accountDebtReceivableaDetail = new AccountDebtReceivableaDetailEntity();
-            BeanUtils.copyProperties(accountDeductDebt,accountDebtReceivableaDetail);
-            accountDebtReceivableaDetail.setTime(LocalDateTime.now());
-            accountDebtReceivableaDetail.setDebtDetailId(accountDebtDetailEntity.getId());
-            accountDebtReceivableaDetail.setOrderNo(accountDebtDetailEntity.getOrderNo());
-            accountDebtReceivableaDetails.add(accountDebtReceivableaDetail);
-        }
-        return accountDebtReceivableaDetails;
-    }
 }

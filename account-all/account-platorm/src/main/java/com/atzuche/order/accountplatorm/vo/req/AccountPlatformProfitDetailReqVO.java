@@ -1,6 +1,6 @@
 package com.atzuche.order.accountplatorm.vo.req;
 
-import com.atzuche.order.commons.enums.RenterCashCodeEnum;
+import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.autoyol.commons.web.ErrorCode;
 import lombok.Data;
 import org.springframework.util.Assert;
@@ -21,7 +21,7 @@ public class AccountPlatformProfitDetailReqVO {
     /**
      * 费用
      */
-    private Integer amt;
+    private int amt;
     /**
      * 费来源编码
      */

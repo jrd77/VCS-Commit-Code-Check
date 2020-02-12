@@ -42,7 +42,7 @@ dependencies {
     compile("com.caucho:hessian:4.0.38")
 
     compile('com.autoyol.unique:unique-no-feign:3.0-SNAPSHOT')
-    compile('com.autoyol.car:auto-car-service-api:2020011405-SNAPSHOT')
+    compile('com.autoyol.car:auto-car-service-api:2020021102-SNAPSHOT')
     compile('com.autoyol:riskCheckService-api:1.0.0-SNAPSHOT')
     compile project(":order-remote-service:order-remote-car")
 
@@ -77,9 +77,10 @@ dependencies {
     compile project(":order-coin")
     compile project(":order-remote-service:order-remote-mem")
 
-
     compile("com.fasterxml.jackson.module:jackson-module-parameter-names")
     compile("com.fasterxml.jackson.datatype:jackson-datatype-jdk8")
     compile("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
+
+    compile("com.autoframework:auto-mq-event:1.0-SNAPSHOT")
 
 }

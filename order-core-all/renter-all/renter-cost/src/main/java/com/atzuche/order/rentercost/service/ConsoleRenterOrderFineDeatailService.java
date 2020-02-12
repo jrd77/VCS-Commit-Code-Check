@@ -2,15 +2,15 @@ package com.atzuche.order.rentercost.service;
 
 import java.util.List;
 
-import com.atzuche.order.commons.entity.dto.CostBaseDTO;
-import com.atzuche.order.commons.enums.FineSubsidyCodeEnum;
-import com.atzuche.order.commons.enums.FineSubsidySourceCodeEnum;
-import com.atzuche.order.commons.enums.FineTypeEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.atzuche.order.commons.entity.dto.CostBaseDTO;
+import com.atzuche.order.commons.enums.FineSubsidyCodeEnum;
+import com.atzuche.order.commons.enums.FineSubsidySourceCodeEnum;
+import com.atzuche.order.commons.enums.FineTypeEnum;
 import com.atzuche.order.rentercost.entity.ConsoleRenterOrderFineDeatailEntity;
 import com.atzuche.order.rentercost.mapper.ConsoleRenterOrderFineDeatailMapper;
 
@@ -40,6 +40,23 @@ public class ConsoleRenterOrderFineDeatailService{
     public List<ConsoleRenterOrderFineDeatailEntity> listConsoleRenterOrderFineDeatail(String orderNo, String memNo) {
     	return consoleRenterOrderFineDeatailMapper.listConsoleRenterOrderFineDeatail(orderNo, memNo);
     }
+
+    /**
+     * 获取某个租客某个订单的全局罚金
+     * @param orderNo
+     * @param memNo
+     * @return
+     */
+    public int getTotalConsoleFineAmt(String orderNo,String memNo){
+        List<ConsoleRenterOrderFineDeatailEntity> consoleRenterOrderFineDeatailEntityList = listConsoleRenterOrderFineDeatail(orderNo,memNo);
+        int total=0;
+        for(ConsoleRenterOrderFineDeatailEntity entity:consoleRenterOrderFineDeatailEntityList){
+            if(entity.getFineAmount()!=null) {
+                total = total + entity.getFineAmount();
+            }
+        }
+        return total;
+    }
     
     /**
      * 保存全局的租客订单罚金
@@ -53,6 +70,37 @@ public class ConsoleRenterOrderFineDeatailService{
         }
     	return consoleRenterOrderFineDeatailMapper.insertSelective(consoleFine);
     }
+    
+    //先查询遍历，是否存在。管理后台修改
+    public Integer saveOrUpdateConsoleRenterOrderFineDeatail(ConsoleRenterOrderFineDeatailEntity consoleFine) {
+        if(null == consoleFine) {
+            logger.warn("Not fund console renter order fine data.");
+            return 0;
+        }
+        
+
+        
+        boolean isExists = false;
+        int id = 0;
+        List<ConsoleRenterOrderFineDeatailEntity> listFine =  consoleRenterOrderFineDeatailMapper.listConsoleRenterOrderFineDeatail(consoleFine.getOrderNo(), consoleFine.getMemNo());
+        for (ConsoleRenterOrderFineDeatailEntity consoleRenterOrderFineDeatailEntity : listFine) {
+			if(consoleFine.getFineType().intValue() == consoleRenterOrderFineDeatailEntity.getFineType().intValue()) {
+				consoleFine.setId(consoleRenterOrderFineDeatailEntity.getId());
+				//不修改
+				consoleFine.setCreateOp(null);
+				id = consoleRenterOrderFineDeatailMapper.updateByPrimaryKeySelective(consoleFine);
+				//代表存在
+				isExists = true;
+			}
+		}
+        
+        //新增
+        if(!isExists) {
+        	id = consoleRenterOrderFineDeatailMapper.insertSelective(consoleFine);
+        }
+    	return id;
+    }
+    
 
 
     /**

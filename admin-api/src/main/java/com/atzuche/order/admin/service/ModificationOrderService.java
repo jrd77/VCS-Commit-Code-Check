@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.atzuche.order.commons.exceptions.OrderNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +17,7 @@ import com.atzuche.order.admin.vo.req.order.ModificationOrderRequestVO;
 import com.atzuche.order.admin.vo.resp.order.ModificationOrderListResponseVO;
 import com.atzuche.order.admin.vo.resp.order.ModificationOrderResponseVO;
 import com.atzuche.order.commons.LocalDateTimeUtils;
-import com.atzuche.order.commons.enums.RenterCashCodeEnum;
+import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.commons.vo.req.ModifyOrderMainQueryReqVO;
 import com.atzuche.order.commons.vo.req.ModifyOrderQueryReqVO;
 import com.atzuche.order.commons.vo.res.ModifyOrderMainResVO;
@@ -45,14 +46,14 @@ public class ModificationOrderService {
 	@Autowired
 	OrderService orderService;
 	
-	public ModificationOrderListResponseVO queryModifyList(ModificationOrderRequestVO modificationOrderRequestVO) throws Exception{
+	public ModificationOrderListResponseVO queryModifyList(ModificationOrderRequestVO modificationOrderRequestVO) {
 		ModificationOrderListResponseVO respVo = new ModificationOrderListResponseVO();
 		List<ModificationOrderResponseVO> modificationOrderList =  new ArrayList<ModificationOrderResponseVO>();
 		//主订单
         OrderEntity orderEntity = orderService.getOrderEntity(modificationOrderRequestVO.getOrderNo());
         if(orderEntity == null){
         	logger.error("获取订单数据为空orderNo={}",modificationOrderRequestVO.getOrderNo());
-            throw new Exception("获取订单数据为空");
+            throw new OrderNotFoundException(modificationOrderRequestVO.getOrderNo());
         }
         
 		ModifyOrderMainQueryReqVO req = new ModifyOrderMainQueryReqVO();
@@ -103,7 +104,12 @@ public class ModificationOrderService {
 							
 							//需补付金额   需补付金额
 							putPaymentAmount(realVo,data,subData);
+						}else {
+							//未找到修改记录
+							realVo.setOperatorStatus(convertAgreeFlag(null));
 						}
+					}else { //未找到修改记录
+						realVo.setOperatorStatus(convertAgreeFlag(null));
 					}
 					//封装数据 
 					modificationOrderList.add(realVo);
@@ -252,18 +258,20 @@ public class ModificationOrderService {
 		realVo.setModificationTime(LocalDateTimeUtils.formatDateTime(renterOrderResVO.getCreateTime()));
 		realVo.setSource(convertSource(renterOrderResVO.getChangeSource()));
 		realVo.setModificationUser(renterOrderResVO.getCreateOp());
-		realVo.setModificationReason("---");
+		/// renter_order表change_reason字段获取 20200210
+		realVo.setModificationReason(renterOrderResVO.getChangeReason());
 		realVo.setRentTime(LocalDateTimeUtils.formatDateTime(renterOrderResVO.getExpRentTime()));
 		realVo.setRevertTime(LocalDateTimeUtils.formatDateTime(renterOrderResVO.getExpRevertTime()));
 		realVo.setTotalRentDay(calcTotalRentDay(renterOrderResVO.getExpRentTime(),renterOrderResVO.getExpRevertTime()));
 		realVo.setCarServiceInformation(convertCarGetReturn(renterOrderResVO));
+		//操作状态
 		realVo.setOperatorStatus(convertAgreeFlag(renterOrderResVO));
 	}
 	
 	private String convertAgreeFlag(RenterOrderResVO renterOrderResVO) {
-		String flag = "";
-		if(renterOrderResVO.getAgreeFlag() == null) {
-			return "---";
+		String flag = "--";
+		if(renterOrderResVO == null || renterOrderResVO.getAgreeFlag() == null) {
+			return "--";
 		}
 		switch (renterOrderResVO.getAgreeFlag()) {
 		case 0:
@@ -274,6 +282,9 @@ public class ModificationOrderService {
 			break;
 		case 2:
 			flag = "已拒绝";
+			break;
+		case 3:
+			flag = "--";
 			break;
 		default:
 			break;

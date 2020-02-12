@@ -29,23 +29,23 @@ public class AccountOwnerCostSettleReqVO {
     /**
      * 车主补贴费用
      */
-    private Integer subsidyAmt;
+    private int subsidyAmt;
     /**
      * 采购费用
      */
-    private Integer purchaseAmt;
+    private int purchaseAmt;
     /**
      * 增值订单费用
      */
-    private Integer incrementAmt;
+    private int incrementAmt;
     /**
      * 应收费用
      */
-    private Integer yingshouAmt;
+    private int yingshouAmt;
     /**
      * amt
      */
-    private Integer shishouAmt;
+    private int shishouAmt;
     /**
      * 创建人
      */

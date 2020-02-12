@@ -11,15 +11,17 @@ import com.atzuche.order.commons.entity.orderDetailDto.OwnerOrderFineDeatailDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.OwnerOrderSubsidyDetailDTO;
 import com.atzuche.order.commons.entity.ownerOrderDetail.*;
 import com.atzuche.order.commons.enums.CarOwnerTypeEnum;
-import com.atzuche.order.commons.enums.ConsoleCostCashNoEnum;
-import com.atzuche.order.commons.enums.OwnerCashCodeEnum;
-import com.atzuche.order.commons.enums.OwnerFineTypeEnum;
-import com.atzuche.order.coreapi.submitOrder.exception.OrderDetailException;
+import com.atzuche.order.commons.enums.FineSubsidyCodeEnum;
+import com.atzuche.order.commons.enums.FineTypeEnum;
+import com.atzuche.order.commons.enums.cashcode.ConsoleCashCodeEnum;
+import com.atzuche.order.commons.enums.cashcode.OwnerCashCodeEnum;
+import com.atzuche.order.commons.exceptions.OrderNotFoundException;
 import com.atzuche.order.owner.commodity.service.OwnerGoodsService;
 import com.atzuche.order.ownercost.entity.OwnerOrderFineDeatailEntity;
 import com.atzuche.order.ownercost.entity.OwnerOrderPurchaseDetailEntity;
 import com.atzuche.order.ownercost.entity.OwnerOrderSubsidyDetailEntity;
 import com.atzuche.order.ownercost.service.OwnerOrderFineDeatailService;
+import com.atzuche.order.ownercost.service.OwnerOrderPurchaseDetailService;
 import com.atzuche.order.ownercost.service.OwnerOrderSubsidyDetailService;
 import com.atzuche.order.parentorder.entity.OrderEntity;
 import com.atzuche.order.parentorder.service.OrderService;
@@ -53,13 +55,15 @@ public class OwnerOrderDetailService {
     private OrderConsoleCostDetailService orderConsoleCostDetailService;
     @Autowired
     private OrderSettleService orderSettleService;
-
-    public ResponseData<OwnerRentDetailDTO> ownerRentDetail(String orderNo, String ownerOrderNo) {
+    @Autowired
+    private OwnerOrderPurchaseDetailService ownerOrderPurchaseDetailService;
+    
+    public OwnerRentDetailDTO ownerRentDetail(String orderNo, String ownerOrderNo) {
         //主订单
         OrderEntity orderEntity = orderService.getOrderEntity(orderNo);
         if(orderEntity == null){
             log.error("获取订单数据为空orderNo={}",orderNo);
-            throw new OrderDetailException();
+            throw new OrderNotFoundException(orderNo);
         }
         OwnerGoodsDetailDTO ownerGoodsDetail = ownerGoodsService.getOwnerGoodsDetail(ownerOrderNo, true);
         OwnerRentDetailDTO ownerRentDetailDTO = new OwnerRentDetailDTO();
@@ -70,20 +74,32 @@ public class OwnerOrderDetailService {
                        LocalDate carDay = x.getCarDay();
                        x.setCarDayStr(carDay!=null?LocalDateTimeUtils.localdateToString(carDay):null);
                    });
-            ownerRentDetailDTO.setDayAverageAmt(ownerGoodsPriceDetailDTOList.get(0).getCarUnitPrice());
+            //bugfix 不能从某天来获取，从owner_order_purchase_detail获取。20200205 huangjing
+//            ownerRentDetailDTO.setDayAverageAmt(ownerGoodsPriceDetailDTOList.get(0).getCarUnitPrice());
             ownerRentDetailDTO.setOwnerGoodsPriceDetailDTOS(ownerGoodsPriceDetailDTOList);
         }
-
+        
+        //111
+        ///车主租金组成 日均价的获取。20200205 huangjing
+        List<OwnerOrderPurchaseDetailEntity> lstPurchaseDetail = ownerOrderPurchaseDetailService.listOwnerOrderPurchaseDetail(orderNo, ownerOrderNo);
+        for (OwnerOrderPurchaseDetailEntity ownerOrderPurchaseDetailEntity : lstPurchaseDetail) {
+			if(OwnerCashCodeEnum.RENT_AMT.getCashNo().equals(ownerOrderPurchaseDetailEntity.getCostCode())) {
+				ownerRentDetailDTO.setDayAverageAmt(ownerOrderPurchaseDetailEntity.getUnitPrice());
+				break;
+			}
+		}
+        
+        
 
         OrderDTO orderDTO = new OrderDTO();
         BeanUtils.copyProperties(orderEntity,orderDTO);
         ownerRentDetailDTO.setReqTimeStr(orderDTO.getReqTime()!=null? LocalDateTimeUtils.localdateToString(orderDTO.getReqTime(), GlobalConstant.FORMAT_DATE_STR1):null);
         ownerRentDetailDTO.setRevertTimeStr(orderDTO.getExpRevertTime()!=null? LocalDateTimeUtils.localdateToString(orderDTO.getExpRevertTime(), GlobalConstant.FORMAT_DATE_STR1):null);
         ownerRentDetailDTO.setRentTimeStr(orderDTO.getExpRentTime()!=null?LocalDateTimeUtils.localdateToString(orderDTO.getExpRentTime(), GlobalConstant.FORMAT_DATE_STR1):null);
-        return ResponseData.success(ownerRentDetailDTO);
+        return ownerRentDetailDTO;
     }
 
-    public ResponseData<RenterOwnerPriceDTO> renterOwnerPrice(String orderNo, String ownerOrderNo) {
+    public RenterOwnerPriceDTO renterOwnerPrice(String orderNo, String ownerOrderNo) {
         //车主补贴
         List<OwnerOrderSubsidyDetailDTO> ownerOrderSubsidyDetailDTOS = new ArrayList<>();
         List<OwnerOrderSubsidyDetailEntity> ownerOrderSubsidyDetailEntities = ownerOrderSubsidyDetailService.listOwnerOrderSubsidyDetail(orderNo, ownerOrderNo);
@@ -94,11 +110,11 @@ public class OwnerOrderDetailService {
         });
         //补贴
         RenterOwnerPriceDTO renterOwnerPriceDTO = CostStatUtils.ownerRenterPrice(ownerOrderSubsidyDetailDTOS);
-        return ResponseData.success(renterOwnerPriceDTO);
+        return renterOwnerPriceDTO;
     }
 
 
-    public ResponseData<ServiceDetailDTO> serviceDetail(String orderNo, String ownerOrderNo) {
+    public ServiceDetailDTO serviceDetail(String orderNo, String ownerOrderNo) {
         OwnerGoodsDetailDTO ownerGoodsDetail = ownerGoodsService.getOwnerGoodsDetail(ownerOrderNo, false);
         OwnerCosts ownerCosts = orderSettleService.preOwnerSettleOrder(orderNo, ownerOrderNo);
 
@@ -122,10 +138,10 @@ public class OwnerOrderDetailService {
         serviceDetailDTO.setCarType(CarOwnerTypeEnum.getNameByCode(ownerGoodsDetail.getCarOwnerType()));
         serviceDetailDTO.setServiceRate(ownerGoodsDetail.getServiceRate());
         serviceDetailDTO.setServiceAmt(proxyExpenseTotalAmount + serviceExpenseTotalAmount);
-        return ResponseData.success(serviceDetailDTO);
+        return serviceDetailDTO;
     }
 
-    public ResponseData<PlatformToOwnerSubsidyDTO> platformToOwnerSubsidy(String orderNo, String ownerOrderNo) {
+    public PlatformToOwnerSubsidyDTO platformToOwnerSubsidy(String orderNo, String ownerOrderNo) {
         List<OwnerOrderSubsidyDetailDTO> ownerOrderSubsidyDetailDTOS = new ArrayList<>();
         List<OwnerOrderSubsidyDetailEntity> ownerOrderSubsidyDetailEntities = ownerOrderSubsidyDetailService.listOwnerOrderSubsidyDetail(orderNo, ownerOrderNo);
         ownerOrderSubsidyDetailEntities.stream().forEach(x->{
@@ -134,11 +150,11 @@ public class OwnerOrderDetailService {
             ownerOrderSubsidyDetailDTOS.add(ownerOrderSubsidyDetailDTO);
         });
         PlatformToOwnerSubsidyDTO platformToOwnerSubsidyDTO = getPlatformToOwnerSubsidyDTO(ownerOrderSubsidyDetailDTOS);
-        return ResponseData.success(platformToOwnerSubsidyDTO);
+        return platformToOwnerSubsidyDTO;
     }
 
 
-    public ResponseData<FienAmtDetailDTO> fienAmtDetail(String orderNo, String ownerOrderNo) {
+    public FienAmtDetailDTO fienAmtDetail(String orderNo, String ownerOrderNo) {
         List<OwnerOrderFineDeatailEntity> ownerOrderFineDeatailList = ownerOrderFineDeatailService.getOwnerOrderFineDeatailByOwnerOrderNo(ownerOrderNo);
         List<OwnerOrderFineDeatailDTO> ownerOrderFineDeatailDTOS = new ArrayList<>();
         Optional.ofNullable(ownerOrderFineDeatailList).orElseGet(ArrayList::new).forEach(x->{
@@ -146,11 +162,11 @@ public class OwnerOrderDetailService {
             BeanUtils.copyProperties(x,ownerOrderFineDeatailDTO);
             ownerOrderFineDeatailDTOS.add(ownerOrderFineDeatailDTO);
         });
-        int ownerFine = CostStatUtils.calOwnerFineByCashNo(OwnerFineTypeEnum.OWNER_FINE, ownerOrderFineDeatailDTOS);
-        int ownerGetReturnCarFienAmt = CostStatUtils.calOwnerFineByCashNo(OwnerFineTypeEnum.MODIFY_ADDRESS_FINE, ownerOrderFineDeatailDTOS);
-        int ownerModifyAddrAmt = CostStatUtils.calOwnerFineByCashNo(OwnerFineTypeEnum.MODIFY_ADDRESS_FINE, ownerOrderFineDeatailDTOS);
-        int renterAdvanceReturnCarFienAmt = CostStatUtils.calOwnerFineByCashNo(OwnerFineTypeEnum.RENTER_ADVANCE_RETURN, ownerOrderFineDeatailDTOS);
-        int renterDelayReturnCarFienAmt = CostStatUtils.calOwnerFineByCashNo(OwnerFineTypeEnum.RENTER_DELAY_RETURN, ownerOrderFineDeatailDTOS);
+        int ownerFine = CostStatUtils.calOwnerFineByCashNo(FineTypeEnum.OWNER_FINE, ownerOrderFineDeatailDTOS);
+        int ownerGetReturnCarFienAmt = CostStatUtils.calOwnerFineByCashNo(FineTypeEnum.GET_RETURN_CAR, ownerOrderFineDeatailDTOS);
+        int ownerModifyAddrAmt = CostStatUtils.calOwnerFineByCashNo(FineTypeEnum.MODIFY_ADDRESS_FINE, ownerOrderFineDeatailDTOS);
+        int renterAdvanceReturnCarFienAmt = CostStatUtils.calOwnerFineByCashNo(FineTypeEnum.RENTER_ADVANCE_RETURN, ownerOrderFineDeatailDTOS);
+        int renterDelayReturnCarFienAmt = CostStatUtils.calOwnerFineByCashNo(FineTypeEnum.RENTER_DELAY_RETURN, ownerOrderFineDeatailDTOS);
 
         FienAmtDetailDTO fienAmtDetailDTO = new FienAmtDetailDTO();
         fienAmtDetailDTO.setOwnerFienAmt(ownerFine);
@@ -158,10 +174,10 @@ public class OwnerOrderDetailService {
         fienAmtDetailDTO.setOwnerModifyAddrAmt(ownerModifyAddrAmt);
         fienAmtDetailDTO.setRenterAdvanceReturnCarFienAmt(renterAdvanceReturnCarFienAmt);
         fienAmtDetailDTO.setRenterDelayReturnCarFienAmt(renterDelayReturnCarFienAmt);
-        return ResponseData.success(fienAmtDetailDTO);
+        fienAmtDetailDTO.setOwnerGetReturnCarFienCashNo(FineTypeEnum.GET_RETURN_CAR.getFineType());
+        fienAmtDetailDTO.setOwnerModifyAddrAmtCashNo(FineTypeEnum.MODIFY_ADDRESS_FINE.getFineType());
+        return fienAmtDetailDTO;
     }
-
-
 
 
     private PlatformToOwnerSubsidyDTO getPlatformToOwnerSubsidyDTO(List<OwnerOrderSubsidyDetailDTO> ownerOrderSubsidyDetailDTOS ){
@@ -196,7 +212,7 @@ public class OwnerOrderDetailService {
         return platformToOwnerSubsidyDTO;
     }
 
-    public ResponseData<PlatformToOwnerDTO> platformToOwner(String orderNo, String ownerOrderNo) {
+    public PlatformToOwnerDTO platformToOwner(String orderNo, String ownerOrderNo) {
         List<OrderConsoleCostDetailEntity> list = orderConsoleCostDetailService.getOrderConsoleCostDetaiByOrderNo(orderNo);
         List<OrderConsoleCostDetailDTO> orderConsoleCostDetailDTOS = new ArrayList<>();
         Optional.ofNullable(list).orElseGet(ArrayList::new).forEach(x->{
@@ -204,26 +220,70 @@ public class OwnerOrderDetailService {
             BeanUtils.copyProperties(x,orderConsoleCostDetailDTO);
             orderConsoleCostDetailDTOS.add(orderConsoleCostDetailDTO);
         });
-
-        int timeOut = CostStatUtils.calConsoleAmtByCashNo(ConsoleCostCashNoEnum.TIME_OUT, orderConsoleCostDetailDTOS);
-        int modifyOrderTimeAndAddrAmt = CostStatUtils.calConsoleAmtByCashNo(ConsoleCostCashNoEnum.MODIFY_ADDR_TIME, orderConsoleCostDetailDTOS);
-        int carWash = CostStatUtils.calConsoleAmtByCashNo(ConsoleCostCashNoEnum.CAR_WASH, orderConsoleCostDetailDTOS);
-        int dlayWait = CostStatUtils.calConsoleAmtByCashNo(ConsoleCostCashNoEnum.DLAY_WAIT, orderConsoleCostDetailDTOS);
-        int stopCar = CostStatUtils.calConsoleAmtByCashNo(ConsoleCostCashNoEnum.STOP_CAR, orderConsoleCostDetailDTOS);
-        int extraMileage = CostStatUtils.calConsoleAmtByCashNo(ConsoleCostCashNoEnum.EXTRA_MILEAGE, orderConsoleCostDetailDTOS);
-        OwnerCosts ownerCosts = orderSettleService.preOwnerSettleOrder(orderNo, ownerOrderNo);
-        OwnerOrderPurchaseDetailEntity renterOrderCostDetail = null;
-        if(ownerCosts != null){
-            renterOrderCostDetail = ownerCosts.getRenterOrderCostDetail();
-        }
+        
+        int oilFee = CostStatUtils.calConsoleAmtByCashNo(ConsoleCashCodeEnum.OIL_FEE, orderConsoleCostDetailDTOS);
+        int timeOut = CostStatUtils.calConsoleAmtByCashNo(ConsoleCashCodeEnum.TIME_OUT, orderConsoleCostDetailDTOS);
+        int modifyOrderTimeAndAddrAmt = CostStatUtils.calConsoleAmtByCashNo(ConsoleCashCodeEnum.MODIFY_ADDR_TIME, orderConsoleCostDetailDTOS);
+        int carWash = CostStatUtils.calConsoleAmtByCashNo(ConsoleCashCodeEnum.CAR_WASH, orderConsoleCostDetailDTOS);
+        int dlayWait = CostStatUtils.calConsoleAmtByCashNo(ConsoleCashCodeEnum.DLAY_WAIT, orderConsoleCostDetailDTOS);
+        int stopCar = CostStatUtils.calConsoleAmtByCashNo(ConsoleCashCodeEnum.STOP_CAR, orderConsoleCostDetailDTOS);
+        int extraMileage = CostStatUtils.calConsoleAmtByCashNo(ConsoleCashCodeEnum.EXTRA_MILEAGE, orderConsoleCostDetailDTOS);
+        //作为常量，不从计算的结果中获取。
+//        OwnerCosts ownerCosts = orderSettleService.preOwnerSettleOrder(orderNo, ownerOrderNo);
+//        OwnerOrderPurchaseDetailEntity renterOrderCostDetail = null;
+//        if(ownerCosts != null){
+//            renterOrderCostDetail = ownerCosts.getRenterOrderCostDetail();
+//        }
         PlatformToOwnerDTO platformToOwnerDTO = new PlatformToOwnerDTO();
-        platformToOwnerDTO.setOliAmt(renterOrderCostDetail!=null?renterOrderCostDetail.getTotalAmount():0);
+//        platformToOwnerDTO.setOliAmt(renterOrderCostDetail!=null?renterOrderCostDetail.getTotalAmount():0);
+        platformToOwnerDTO.setOliAmt(oilFee);
         platformToOwnerDTO.setTimeOut(timeOut);
         platformToOwnerDTO.setModifyOrderTimeAndAddrAmt(modifyOrderTimeAndAddrAmt);
         platformToOwnerDTO.setCarWash(carWash);
         platformToOwnerDTO.setDlayWait(dlayWait);
         platformToOwnerDTO.setStopCar(stopCar);
         platformToOwnerDTO.setExtraMileage(extraMileage);
-        return ResponseData.success(platformToOwnerDTO);
+        return platformToOwnerDTO;
+    }
+
+    public void updateFien(FienAmtUpdateReqDTO fienAmtUpdateReqDTO) {
+        String ownerOrderNo = fienAmtUpdateReqDTO.getOwnerOrderNo();
+        OwnerOrderFineDeatailEntity ownerOrderFineDeatailEntity = new OwnerOrderFineDeatailEntity();
+        ownerOrderFineDeatailEntity.setOrderNo(fienAmtUpdateReqDTO.getOrderNo());
+        ownerOrderFineDeatailEntity.setOwnerOrderNo(ownerOrderNo);
+        ownerOrderFineDeatailEntity.setMemNo(fienAmtUpdateReqDTO.getOwnerMemNo());
+        ownerOrderFineDeatailEntity.setFineType(fienAmtUpdateReqDTO.getOwnerGetReturnCarFienCashNo());
+        ownerOrderFineDeatailEntity.setFineAmount(fienAmtUpdateReqDTO.getOwnerGetReturnCarFienAmt());
+        ownerOrderFineDeatailEntity.setFineType(FineTypeEnum.GET_RETURN_CAR.getFineType());
+        ownerOrderFineDeatailEntity.setFineTypeDesc(FineTypeEnum.GET_RETURN_CAR.getFineTypeDesc());
+        OwnerOrderFineDeatailEntity getOwnerGetReturnCarFienCashNo = ownerOrderFineDeatailService.getByCashNoAndOwnerOrderNo(ownerOrderNo, fienAmtUpdateReqDTO.getOwnerGetReturnCarFienCashNo());
+        if(getOwnerGetReturnCarFienCashNo == null){
+            /*if(fienAmtUpdateReqDTO.getOwnerGetReturnCarFienAmt() == 0){
+                return ResponseData.success();
+            }*/
+            ownerOrderFineDeatailEntity.setFineSubsidyCode(FineSubsidyCodeEnum.PLATFORM.getFineSubsidyCode());
+            ownerOrderFineDeatailEntity.setFineSubsidyDesc(FineSubsidyCodeEnum.PLATFORM.getFineSubsidyDesc());
+            ownerOrderFineDeatailEntity.setFineSubsidySourceCode(FineSubsidyCodeEnum.OWNER.getFineSubsidyCode());
+            ownerOrderFineDeatailEntity.setFineSubsidySourceDesc(FineSubsidyCodeEnum.OWNER.getFineSubsidyDesc());
+            ownerOrderFineDeatailService.addOwnerOrderFineRecord(ownerOrderFineDeatailEntity);
+        }else{
+            ownerOrderFineDeatailService.updateByCashNoAndOwnerOrderNo(ownerOrderFineDeatailEntity);
+        }
+        ownerOrderFineDeatailEntity.setFineTypeDesc(FineTypeEnum.MODIFY_ADDRESS_FINE.getFineTypeDesc());
+        ownerOrderFineDeatailEntity.setFineType(fienAmtUpdateReqDTO.getOwnerModifyAddrAmtCashNo());
+        ownerOrderFineDeatailEntity.setFineAmount(fienAmtUpdateReqDTO.getOwnerModifyAddrAmt());
+        OwnerOrderFineDeatailEntity byCashNoAndOwnerOrderNo = ownerOrderFineDeatailService.getByCashNoAndOwnerOrderNo(ownerOrderNo, fienAmtUpdateReqDTO.getOwnerModifyAddrAmtCashNo());
+        if(byCashNoAndOwnerOrderNo == null){
+           /* if(fienAmtUpdateReqDTO.getOwnerModifyAddrAmt() == 0){
+                return ResponseData.success();
+            }*/
+            ownerOrderFineDeatailEntity.setFineSubsidyCode(FineSubsidyCodeEnum.PLATFORM.getFineSubsidyCode());
+            ownerOrderFineDeatailEntity.setFineSubsidyDesc(FineSubsidyCodeEnum.PLATFORM.getFineSubsidyDesc());
+            ownerOrderFineDeatailEntity.setFineSubsidySourceCode(FineSubsidyCodeEnum.OWNER.getFineSubsidyCode());
+            ownerOrderFineDeatailEntity.setFineSubsidySourceDesc(FineSubsidyCodeEnum.OWNER.getFineSubsidyDesc());
+            ownerOrderFineDeatailService.addOwnerOrderFineRecord(ownerOrderFineDeatailEntity);
+        }else{
+            ownerOrderFineDeatailService.updateByCashNoAndOwnerOrderNo(ownerOrderFineDeatailEntity);
+        }
     }
 }

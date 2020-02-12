@@ -1,6 +1,7 @@
 package com.atzuche.order.coreapi.controller;
 
 
+import com.atzuche.order.commons.BindingResultUtil;
 import com.atzuche.order.commons.entity.dto.OrderFlowListResponseDTO;
 import com.atzuche.order.commons.entity.dto.OrderFlowRequestDTO;
 import com.atzuche.order.flow.exception.OrderFlowException;
@@ -33,7 +34,7 @@ public class OrderFlowController {
     @PostMapping("/list")
     public ResponseData selectOrderFlowList(@Valid @RequestBody  OrderFlowRequestDTO orderFlowRequestDTO , BindingResult bindingResult) {
         //参数验证
-        validateParameter(bindingResult);
+        BindingResultUtil.checkBindingResult(bindingResult);
         try{
             OrderFlowListResponseDTO orderFlowListResponseVO = orderFlowService.selectOrderFlowListByOrderNo(orderFlowRequestDTO);
             return ResponseData.success(orderFlowListResponseVO);
@@ -44,16 +45,6 @@ public class OrderFlowController {
 
     }
 
-
-    /**
-     * 验证参数
-     * @param bindingResult
-     */
-    private void validateParameter(BindingResult bindingResult){
-        if(bindingResult.hasErrors()){
-            throw new OrderFlowException(ErrorCode.PARAMETER_ERROR.getCode(),bindingResult.getFieldError().getDefaultMessage());
-        }
-    }
 
 
 }

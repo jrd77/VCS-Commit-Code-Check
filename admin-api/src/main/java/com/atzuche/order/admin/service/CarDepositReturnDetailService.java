@@ -2,16 +2,14 @@ package com.atzuche.order.admin.service;
 
 
 import com.alibaba.fastjson.JSON;
-import com.atzuche.order.admin.exception.CarDepositQueryErrException;
-import com.atzuche.order.admin.exception.CarDepositQueryFailException;
 import com.atzuche.order.admin.vo.req.car.CarDepositReqVO;
 import com.atzuche.order.admin.vo.resp.car.CarDepositRespVo;
-import com.atzuche.order.car.RenterCarDetailFailException;
 import com.atzuche.order.commons.CatConstants;
 import com.atzuche.order.commons.GlobalConstant;
 import com.atzuche.order.commons.LocalDateTimeUtils;
+import com.atzuche.order.commons.ResponseCheckUtil;
 import com.atzuche.order.commons.entity.orderDetailDto.*;
-import com.atzuche.order.commons.enums.RenterCashCodeEnum;
+import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.commons.enums.cashier.TransStatusEnum;
 import com.atzuche.order.open.service.FeignOrderDetailService;
 import com.autoyol.commons.web.ErrorCode;
@@ -46,31 +44,20 @@ public class CarDepositReturnDetailService {
             Cat.logEvent(CatConstants.FEIGN_PARAM,JSON.toJSONString(orderDetailReqDTO));
             responseData = feignOrderDetailService.orderAccountDetail(orderDetailReqDTO);
             Cat.logEvent(CatConstants.FEIGN_RESULT,JSON.toJSONString(orderDetailReqDTO));
-            if(responseData == null || !ErrorCode.SUCCESS.getCode().equals(responseData.getResCode())){
-                log.error("Feign 获取费用详情失败,responseData={},orderDetailReqDTO={}",JSON.toJSONString(responseData),JSON.toJSONString(responseData));
-                CarDepositQueryFailException failException = new CarDepositQueryFailException();
-                Cat.logError("Feign 获取费用详情失败",failException);
-                throw failException;
-            }
+            ResponseCheckUtil.checkResponse(responseData);
             t.setStatus(Transaction.SUCCESS);
-        }catch (RenterCarDetailFailException e){
-            Cat.logError("Feign 获取费用详情失败",e);
-            t.setStatus(e);
-            throw e;
         }catch (Exception e){
             log.error("Feign 获取费用详情异常,responseData={},orderDetailReqDTO={}",JSON.toJSONString(responseData),JSON.toJSONString(responseData),e);
-            CarDepositQueryErrException err = new CarDepositQueryErrException();
-            Cat.logError("Feign 获取费用详情异常",err);
-            throw err;
+            Cat.logError("Feign 获取费用详情异常",e);
+            t.setStatus(e);
+            throw e;
         }finally {
             t.complete();
         }
         OrderAccountDetailRespDTO data = responseData.getData();
         OrderStatusDTO orderStatusDTO = data.orderStatusDTO;
         if(orderStatusDTO == null){
-            CarDepositQueryErrException carDepositQueryErrException = new CarDepositQueryErrException();
-            log.error("车辆押金获取失败", carDepositQueryErrException);
-            throw carDepositQueryErrException;
+            throw new RuntimeException("车辆押金获取失败:"+reqVo.getOrderNo());
         }
 
         AccountRenterDepositDTO accountRenterDepositDTO = data.getAccountRenterDepositDTO();

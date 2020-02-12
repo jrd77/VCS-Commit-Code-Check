@@ -23,7 +23,6 @@ public class SubmitOrderControllerTest {
         param.setPublicCityCode("");
         param.setAppName("appname");
         param.setDeviceName("123456777xxx");
-        param.setPublicToken("aba26195b8374b5ca586b1488c300a45");
         param.setAppChannelId("");
         param.setMac("");
         param.setAndroidID("xxxxxxx");

@@ -29,7 +29,7 @@
 	</insert>
 
 
-	<insert id="updateUploadOrderPhoto" parameterType="map">
+	<update id="updateUploadOrderPhoto" parameterType="map">
 		update
 		<if test="photoType==1||photoType==2">
 			order_car_condition_photo set path = #{path}, operator = #{operator}, user_type = #{userType} where id = #{photoId};
@@ -40,7 +40,7 @@
 		<if test="photoType==4">
 			renter_order_wz_illegal_photo set path = #{path}, create_op = #{operator},update_op = #{operator}, user_type = #{userType} where id = #{photoId};
 		</if>
-	</insert>
+	</update>
 
 	
 	<delete id="delOrderPhoto">
@@ -79,5 +79,19 @@
 		    from renter_order_wz_illegal_photo where id = #{photoId};
 		</if>
 	</select>
+
+	<insert id="addRenYunUploadOrderPhoto" parameterType="com.atzuche.order.photo.entity.OrderPhotoEntity">
+		INSERT INTO
+		<if test="photoType==1||photoType==2">
+			order_car_condition_photo(photo_type,path,user_type,order_no,serial_number,operator) VALUES(#{photoType},#{path},#{userType},#{orderNo},#{serialNumber},#{operator});
+		</if>
+	</insert>
+
+	<select id="selectObjectByParams" parameterType="com.atzuche.order.photo.entity.OrderPhotoEntity" resultType="com.atzuche.order.photo.entity.OrderPhotoEntity">
+		SELECT id,photo_type photoType,path,user_type userType,order_no orderNo,create_time createTime,update_time updateTime,operator FROM order_car_condition_photo
+		where order_no=#{orderNo} and photo_type=#{photoType} and user_type = #{userType} and serial_number = #{serialNumber}
+	</select>
+
+
 
 </mapper>

@@ -1,7 +1,10 @@
 package com.atzuche.order.rentercost.entity;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
+import java.util.Date;
+
+import com.autoyol.doc.annotation.AutoDocProperty;
+
 import lombok.Data;
 
 
@@ -29,6 +32,14 @@ public class OrderSupplementDetailEntity implements Serializable {
 	 */
 	private String memNo;
 	/**
+	 * 费用类型：1-补付费用，2-订单欠款
+	 */
+	private Integer cashType;
+	/**
+	 * 费用类型文案
+	 */
+	private String cashTypeTxt;
+	/**
 	 * 费用编码
 	 */
 	private String cashNo;
@@ -40,6 +51,10 @@ public class OrderSupplementDetailEntity implements Serializable {
 	 * 单项补付金额
 	 */
 	private Integer amt;
+	/**
+	 * 请款码
+	 */
+	private String requestPayCode;
 	/**
 	 * 操作状态:0,待提交 1,已生效 2,已失效 3,已撤回
 	 */
@@ -63,7 +78,7 @@ public class OrderSupplementDetailEntity implements Serializable {
 	/**
 	 * 创建时间
 	 */
-	private LocalDateTime createTime;
+	private Date createTime;
 	/**
 	 * 创建人
 	 */
@@ -71,7 +86,7 @@ public class OrderSupplementDetailEntity implements Serializable {
 	/**
 	 * 修改时间
 	 */
-	private LocalDateTime updateTime;
+	private Date updateTime;
 	/**
 	 * 修改人
 	 */

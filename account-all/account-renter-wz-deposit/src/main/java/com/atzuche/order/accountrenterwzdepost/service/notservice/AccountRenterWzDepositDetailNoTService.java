@@ -1,15 +1,16 @@
 package com.atzuche.order.accountrenterwzdepost.service.notservice;
 
-import com.atzuche.order.accountrenterwzdepost.entity.AccountRenterWzDepositDetailEntity;
-import com.atzuche.order.accountrenterwzdepost.exception.PayOrderRenterWZDepositException;
-import com.atzuche.order.accountrenterwzdepost.vo.req.PayedOrderRenterDepositWZDetailReqVO;
+import java.util.List;
+
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.atzuche.order.accountrenterwzdepost.mapper.AccountRenterWzDepositDetailMapper;
 import org.springframework.util.CollectionUtils;
 
-import java.util.List;
+import com.atzuche.order.accountrenterwzdepost.entity.AccountRenterWzDepositDetailEntity;
+import com.atzuche.order.accountrenterwzdepost.exception.PayOrderRenterWZDepositException;
+import com.atzuche.order.accountrenterwzdepost.mapper.AccountRenterWzDepositDetailMapper;
+import com.atzuche.order.accountrenterwzdepost.vo.req.PayedOrderRenterDepositWZDetailReqVO;
 
 
 /**
@@ -51,11 +52,12 @@ public class AccountRenterWzDepositDetailNoTService {
         return accountRenterWzDepositDetailMapper.findByOrderNo(orderNo);
     }
 
-    public void insertRenterDepositDetailEntity(AccountRenterWzDepositDetailEntity accountRenterDepositDetailEntity) {
+    public int insertRenterDepositDetailEntity(AccountRenterWzDepositDetailEntity accountRenterDepositDetailEntity) {
         int result = accountRenterWzDepositDetailMapper.insertSelective(accountRenterDepositDetailEntity);
         if(result==0){
             throw new PayOrderRenterWZDepositException();
         }
+        return result;
     }
 
     /**
@@ -71,4 +73,5 @@ public class AccountRenterWzDepositDetailNoTService {
         }
        return list.stream().mapToInt(AccountRenterWzDepositDetailEntity::getAmt).sum();
     }
+    
 }

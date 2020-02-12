@@ -1,5 +1,6 @@
 package com.atzuche.order.coreapi.service;
 
+import com.atzuche.order.commons.enums.OrderPayStatusEnum;
 import com.atzuche.order.commons.enums.OrderStatusEnum;
 import com.atzuche.order.commons.enums.YesNoEnum;
 import com.atzuche.order.commons.service.OrderPayCallBack;
@@ -41,10 +42,21 @@ public class PayCallbackService implements OrderPayCallBack {
         }
         OrderStatusEntity entity = orderStatusService.getByOrderNo(orderNo);
         log.info("PayCallbackService sendDataMessageToRenYun param [{}]", GsonUtils.toJson(entity));
-        if(Objects.nonNull(entity) && Objects.nonNull(entity.getStatus()) && OrderStatusEnum.TO_GET_CAR.getStatus()==entity.getStatus()){
+        //租车费用已支付 并且非补付支付
+        if(YesNoEnum.NO.getCode().equals(isPayAgain) && Objects.nonNull(entity) && Objects.nonNull(entity.getRentCarPayStatus()) && OrderPayStatusEnum.PAYED.getStatus()==entity.getRentCarPayStatus()){
             deliveryCarService.sendDataMessageToRenYun(renterOrderNo);
         }
         log.info("PayCallbackService callBack end param [{}]", GsonUtils.toJson(renterOrderNo));
 
+    }
+
+    /**
+     * 结算订单 回调
+     * @param orderNo
+     * @param renterOrderNo
+     */
+    @Override
+    public void callBackSettle(String orderNo, String renterOrderNo) {
+        modifyOrderForRenterService.supplementPayPostProcess(orderNo,renterOrderNo);
     }
 }

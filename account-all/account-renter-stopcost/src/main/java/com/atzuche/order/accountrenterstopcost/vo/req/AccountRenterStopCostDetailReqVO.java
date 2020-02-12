@@ -1,6 +1,6 @@
 package com.atzuche.order.accountrenterstopcost.vo.req;
 
-import com.atzuche.order.commons.enums.RenterCashCodeEnum;
+import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.autoyol.commons.web.ErrorCode;
 import lombok.Data;
 import org.springframework.util.Assert;
@@ -23,7 +23,7 @@ public class AccountRenterStopCostDetailReqVO {
     /**
      * 入账金额
      */
-    private Integer amt;
+    private int amt;
     /**
      * 入账时间
      */

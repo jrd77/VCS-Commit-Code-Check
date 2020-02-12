@@ -9,7 +9,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.apache.commons.beanutils.BeanUtils;
+import com.atzuche.order.delivery.vo.delivery.rep.OwnerGetAndReturnCarDTO;
+import com.atzuche.order.delivery.vo.delivery.rep.RenterGetAndReturnCarDTO;
+import com.atzuche.order.ownercost.entity.ConsoleOwnerOrderFineDeatailEntity;
+import com.autoyol.doc.util.StringUtil;
+import com.autoyol.platformcost.model.FeeResult;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,7 +27,7 @@ import com.atzuche.order.accountrenterwzdepost.service.AccountRenterWzDepositSer
 import com.atzuche.order.accountrenterwzdepost.vo.res.AccountRenterWZDepositResVO;
 import com.atzuche.order.cashieraccount.service.CashierPayService;
 import com.atzuche.order.commons.enums.DeliveryOrderTypeEnum;
-import com.atzuche.order.commons.enums.RenterCashCodeEnum;
+import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.commons.vo.req.OrderCostReqVO;
 import com.atzuche.order.commons.vo.res.OrderOwnerCostResVO;
 import com.atzuche.order.commons.vo.res.OrderRenterCostResVO;
@@ -84,7 +89,7 @@ public class OrderCostService {
 	@Autowired
 	private OrderSupplementDetailService orderSupplementDetailService;
 	
-	public OrderRenterCostResVO orderCostRenterGet(OrderCostReqVO req) throws Exception{
+	public OrderRenterCostResVO orderCostRenterGet(OrderCostReqVO req){
 		OrderRenterCostResVO resVo = new OrderRenterCostResVO();
 		
 		//参数定义
@@ -92,9 +97,7 @@ public class OrderCostService {
 		String memNo = req.getMemNo();
 		String renterOrderNo = req.getSubOrderNo();
 		//-------------------------------------------------------------------- 以下是主订单费用
-		/**
-		 * 根据订单号查询封装
-		 */
+		//根据订单号查询封装
 		//需补付金额
 		try {
 			int needIncrementAmt = cashierPayService.getRealRentCost(orderNo, memNo);  //getRealRentCost )  海豹提供
@@ -152,7 +155,7 @@ public class OrderCostService {
 			fineLst.stream().forEach(x->{
 				RenterOrderFineDeatailResVO real = new RenterOrderFineDeatailResVO();
 	      		try {
-					BeanUtils.copyProperties(real, x);
+					BeanUtils.copyProperties(x,real);
 				} catch (Exception e) {
 					log.error("对象属性赋值报错:",e);
 				}
@@ -186,13 +189,15 @@ public class OrderCostService {
 	      	renterOrderCostDetailList.stream().forEach(x->{
 	      		RenterOrderCostDetailResVO real = new RenterOrderCostDetailResVO();
 	      		try {
-					BeanUtils.copyProperties(real, x);
+					BeanUtils.copyProperties(x,real);
 				} catch (Exception e) {
 					log.error("对象属性赋值报错:",e);
 				}
 	      		renterOrderCostDetailListReal.add(real);
 	          });
 	      }
+	      //数据封装 20200211
+	      resVo.setRenterOrderCostDetailList(renterOrderCostDetailListReal);
 	      
 	      //抵扣明细
 	  	List<RenterOrderSubsidyDetailEntity> subsidyLst = renterOrderSubsidyDetailService.listRenterOrderSubsidyDetail(orderNo, renterOrderNo);
@@ -201,7 +206,7 @@ public class OrderCostService {
 	      	subsidyLst.stream().forEach(x->{
 	      		RenterOrderSubsidyDetailResVO real = new RenterOrderSubsidyDetailResVO();
 	      		try {
-					BeanUtils.copyProperties(real, x);
+					BeanUtils.copyProperties(x,real);
 				} catch (Exception e) {
 					log.error("对象属性赋值报错:",e);
 				}
@@ -228,20 +233,25 @@ public class OrderCostService {
 		    /**
 		     * 交接车-油费
 		     */
-		    RenterOrderCostDetailEntity oilAmt = rentCost.getOilAmt();
-		    com.atzuche.order.commons.vo.res.rentcosts.RenterOrderCostDetailEntity oilAmtReal = new com.atzuche.order.commons.vo.res.rentcosts.RenterOrderCostDetailEntity();
-		    if(oilAmt != null) {
-		    	BeanUtils.copyProperties(oilAmtReal, oilAmt);
-		    }
+            RenterGetAndReturnCarDTO oilAmt = rentCost.getOilAmt();
+            com.atzuche.order.commons.vo.res.rentcosts.RenterOrderCostDetailEntity oilAmtReal = new com.atzuche.order.commons.vo.res.rentcosts.RenterOrderCostDetailEntity();
+            if(oilAmt != null) {
+                BeanUtils.copyProperties(oilAmtReal, oilAmt);
+                String oilDifferenceCrash = oilAmt.getOilDifferenceCrash();
+                oilDifferenceCrash = StringUtil.isBlank(oilDifferenceCrash)?"0":oilDifferenceCrash;
+                //oilDifferenceCrash may be "0.0" format
+                oilAmtReal.setTotalAmount((int)Float.parseFloat(oilDifferenceCrash));
+            }
 		    resVo.setOilAmt(oilAmtReal);
 
-		    /**
+		    /*
 		     * 交接车-获取超里程费用
 		     */
-		    RenterOrderCostDetailEntity mileageAmt = rentCost.getMileageAmt();
+            FeeResult mileageAmt = rentCost.getMileageAmt();
 		    com.atzuche.order.commons.vo.res.rentcosts.RenterOrderCostDetailEntity mileageAmtReal = new com.atzuche.order.commons.vo.res.rentcosts.RenterOrderCostDetailEntity();
 		    if(mileageAmt != null) {
 		    	BeanUtils.copyProperties(mileageAmtReal, mileageAmt);
+                mileageAmtReal.setTotalAmount(mileageAmt.getTotalFee());
 		    }
 		    resVo.setMileageAmt(mileageAmtReal);
 		    
@@ -254,7 +264,7 @@ public class OrderCostService {
 		    	orderConsoleSubsidyDetails.stream().forEach(x->{
 		    		com.atzuche.order.commons.vo.res.rentcosts.OrderConsoleSubsidyDetailEntity real = new com.atzuche.order.commons.vo.res.rentcosts.OrderConsoleSubsidyDetailEntity();
 			      		try {
-							BeanUtils.copyProperties(real, x);
+							BeanUtils.copyProperties(x,real);
 						} catch (Exception e) {
 							log.error("对象属性赋值报错:",e);
 						}
@@ -271,7 +281,7 @@ public class OrderCostService {
 			  orderCouponList.stream().forEach(x->{
 				  com.atzuche.order.commons.vo.res.rentcosts.OrderCouponEntity real = new com.atzuche.order.commons.vo.res.rentcosts.OrderCouponEntity();
 		      		try {
-						BeanUtils.copyProperties(real, x);
+						BeanUtils.copyProperties(x, real);
 					} catch (Exception e) {
 						log.error("对象属性赋值报错:",e);
 					}
@@ -287,7 +297,7 @@ public class OrderCostService {
 			  supplementList.stream().forEach(x->{
 				  com.atzuche.order.commons.vo.res.rentcosts.OrderSupplementDetailEntity real = new com.atzuche.order.commons.vo.res.rentcosts.OrderSupplementDetailEntity();
 		      		try {
-						BeanUtils.copyProperties(real, x);
+						BeanUtils.copyProperties(x,real);
 					} catch (Exception e) {
 						log.error("对象属性赋值报错:",e);
 					}
@@ -299,7 +309,7 @@ public class OrderCostService {
 		return resVo;
 	}
 
-	public OrderOwnerCostResVO orderCostOwnerGet(OrderCostReqVO req) throws Exception {
+	public OrderOwnerCostResVO orderCostOwnerGet(OrderCostReqVO req)  {
 		OrderOwnerCostResVO resVo = new OrderOwnerCostResVO();
 		
 		//参数定义
@@ -324,7 +334,7 @@ public class OrderCostService {
 			  orderCouponList.stream().forEach(x->{
 				  com.atzuche.order.commons.vo.res.rentcosts.OrderCouponEntity real = new com.atzuche.order.commons.vo.res.rentcosts.OrderCouponEntity();
 		      		try {
-						BeanUtils.copyProperties(real, x);
+						BeanUtils.copyProperties(x,real);
 					} catch (Exception e) {
 						log.error("对象属性赋值报错:",e);
 					}
@@ -336,7 +346,7 @@ public class OrderCostService {
 		return resVo;
 	}
 	
-	private void putOwnerCosts(OrderOwnerCostResVO resVo, OwnerCosts ownerCosts) throws Exception {
+	private void putOwnerCosts(OrderOwnerCostResVO resVo, OwnerCosts ownerCosts)  {
 		/**
 	     * 管理后台补贴
 	     */
@@ -346,7 +356,7 @@ public class OrderCostService {
 	    	orderConsoleSubsidyDetails.stream().forEach(x->{
 	    		com.atzuche.order.commons.vo.res.rentcosts.OrderConsoleSubsidyDetailEntity real = new com.atzuche.order.commons.vo.res.rentcosts.OrderConsoleSubsidyDetailEntity();
 		      		try {
-						BeanUtils.copyProperties(real, x);
+						BeanUtils.copyProperties(x,real);
 					} catch (Exception e) {
 						log.error("对象属性赋值报错:",e);
 					}
@@ -358,13 +368,13 @@ public class OrderCostService {
 	  /**
 	     * 全局的车主订单罚金明细
 	     */
-	    List<com.atzuche.order.rentercost.entity.ConsoleRenterOrderFineDeatailEntity> consoleRenterOrderFineDeatails = ownerCosts.getConsoleRenterOrderFineDeatails();
+	    List<ConsoleOwnerOrderFineDeatailEntity> consoleRenterOrderFineDeatails = ownerCosts.getConsoleOwnerOrderFineDeatailEntitys();
 	    List<ConsoleRenterOrderFineDeatailEntity> consoleRenterOrderFineDeatailsReal = new ArrayList<ConsoleRenterOrderFineDeatailEntity>();
 	    if(consoleRenterOrderFineDeatails != null) {
 	    	consoleRenterOrderFineDeatails.stream().forEach(x->{
 	    		ConsoleRenterOrderFineDeatailEntity real = new ConsoleRenterOrderFineDeatailEntity();
 		      		try {
-						BeanUtils.copyProperties(real, x);
+						BeanUtils.copyProperties(x,real);
 					} catch (Exception e) {
 						log.error("对象属性赋值报错:",e);
 					}
@@ -383,7 +393,7 @@ public class OrderCostService {
 	    	ownerOrderFineDeatails.stream().forEach(x->{
 	    		OwnerOrderFineDeatailEntity real = new OwnerOrderFineDeatailEntity();
 		      		try {
-						BeanUtils.copyProperties(real, x);
+						BeanUtils.copyProperties(x,real);
 					} catch (Exception e) {
 						log.error("对象属性赋值报错:",e);
 					}
@@ -424,7 +434,7 @@ public class OrderCostService {
 		    	ownerOrderSubsidyDetail.stream().forEach(x->{
 		    		OwnerOrderSubsidyDetailEntity real = new OwnerOrderSubsidyDetailEntity();
 			      		try {
-							BeanUtils.copyProperties(real, x);
+							BeanUtils.copyProperties(x,real);
 						} catch (Exception e) {
 							log.error("对象属性赋值报错:",e);
 						}
@@ -442,7 +452,7 @@ public class OrderCostService {
 		    	ownerOrderPurchaseDetail.stream().forEach(x->{
 		    		OwnerOrderPurchaseDetailEntity real = new OwnerOrderPurchaseDetailEntity();
 			      		try {
-							BeanUtils.copyProperties(real, x);
+							BeanUtils.copyProperties(x,real);
 						} catch (Exception e) {
 							log.error("对象属性赋值报错:",e);
 						}
@@ -460,7 +470,7 @@ public class OrderCostService {
 		    	ownerOrderIncrementDetail.stream().forEach(x->{
 		    		OwnerOrderIncrementDetailEntity real = new OwnerOrderIncrementDetailEntity();
 			      		try {
-							BeanUtils.copyProperties(real, x);
+							BeanUtils.copyProperties(x,real);
 						} catch (Exception e) {
 							log.error("对象属性赋值报错:",e);
 						}
@@ -478,7 +488,7 @@ public class OrderCostService {
 		    	gpsCost.stream().forEach(x->{
 		    		OwnerOrderPurchaseDetailEntity real = new OwnerOrderPurchaseDetailEntity();
 			      		try {
-							BeanUtils.copyProperties(real, x);
+							BeanUtils.copyProperties(x,real);
 						} catch (Exception e) {
 							log.error("对象属性赋值报错:",e);
 						}
@@ -490,11 +500,14 @@ public class OrderCostService {
 	    /**
 	     * 获取车主油费
 	     */
-	     com.atzuche.order.ownercost.entity.OwnerOrderPurchaseDetailEntity renterOrderCostDetail = ownerCosts.getRenterOrderCostDetail();  //海豹命名错误
+	     OwnerGetAndReturnCarDTO renterOrderCostDetail = ownerCosts.getOwnerGetAndReturnCarDTO();  //海豹命名错误
 	     OwnerOrderPurchaseDetailEntity renterOrderCostDetailReal = null;
 	     if(renterOrderCostDetail != null) {
 	    	 renterOrderCostDetailReal = new OwnerOrderPurchaseDetailEntity();
 	    	 BeanUtils.copyProperties(renterOrderCostDetailReal, renterOrderCostDetail);
+             String oilDifferenceCrash = renterOrderCostDetail.getOilDifferenceCrash();
+             oilDifferenceCrash = StringUtil.isBlank(oilDifferenceCrash)?"0":oilDifferenceCrash;
+             renterOrderCostDetailReal.setTotalAmount(Integer.valueOf(oilDifferenceCrash));
 	     }
 	     resVo.setOwnerOrderCostDetail(renterOrderCostDetailReal);
 	    

@@ -1,19 +1,22 @@
 package com.atzuche.order.coreapi.service;
 
-import com.alibaba.fastjson.JSON;
-import com.atzuche.order.commons.enums.MemRoleEnum;
-import com.atzuche.order.commons.vo.req.CancelOrderReqVO;
-import com.atzuche.order.coreapi.common.conver.OrderCommonConver;
-import com.atzuche.order.coreapi.entity.dto.CancelOrderResDTO;
-import com.atzuche.order.delivery.service.delivery.DeliveryCarService;
-import com.atzuche.order.delivery.vo.delivery.CancelFlowOrderDTO;
-import com.atzuche.order.delivery.vo.delivery.CancelOrderDeliveryVO;
-import com.atzuche.order.settle.service.OrderSettleService;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import com.alibaba.fastjson.JSON;
+import com.atzuche.order.commons.LocalDateTimeUtils;
+import com.atzuche.order.commons.enums.MemRoleEnum;
+import com.atzuche.order.commons.vo.req.CancelOrderReqVO;
+import com.atzuche.order.coreapi.common.conver.OrderCommonConver;
+import com.atzuche.order.coreapi.entity.dto.CancelOrderResDTO;
+import com.atzuche.order.coreapi.service.remote.StockProxyService;
+import com.atzuche.order.delivery.service.delivery.DeliveryCarService;
+import com.atzuche.order.delivery.vo.delivery.CancelOrderDeliveryVO;
+import com.atzuche.order.settle.service.OrderSettleService;
+import com.autoyol.car.api.model.dto.OwnerCancelDTO;
 
 /**
  * 订单取消操作
@@ -36,11 +39,13 @@ public class CancelOrderService {
     @Autowired
     private OrderSettleService orderSettleService;
     @Autowired
-    private StockService stockService;
+    private StockProxyService stockService;
     @Autowired
     private DeliveryCarService deliveryCarService;
     @Autowired
     private OrderCommonConver orderCommonConver;
+    @Autowired
+    private CancelOrderCheckService cancelOrderCheckService;
 
     /**
      * 订单取消
@@ -49,16 +54,16 @@ public class CancelOrderService {
      */
     public void cancel(CancelOrderReqVO cancelOrderReqVO) {
         //公共校验
-        check();
-
+        boolean isConsoleInvoke = StringUtils.isNotBlank(cancelOrderReqVO.getOperatorName());
+        cancelOrderCheckService.checkCancelOrder(cancelOrderReqVO.getOrderNo(),cancelOrderReqVO.getMemNo(), isConsoleInvoke);
         //取消处理
         CancelOrderResDTO res = null;
         if (StringUtils.equals(MemRoleEnum.RENTER.getCode(), cancelOrderReqVO.getMemRole())) {
             //租客取消
-            res = renterCancelOrderService.cancel(cancelOrderReqVO.getOrderNo(), cancelOrderReqVO.getCancelReason());
+            res = renterCancelOrderService.cancel(cancelOrderReqVO.getOrderNo(), cancelOrderReqVO.getCancelReason(),isConsoleInvoke);
         } else if (StringUtils.equals(MemRoleEnum.OWNER.getCode(), cancelOrderReqVO.getMemRole())) {
             //车主取消
-            res = ownerCancelOrderService.cancel(cancelOrderReqVO.getOrderNo(), cancelOrderReqVO.getCancelReason());
+            res = ownerCancelOrderService.cancel(cancelOrderReqVO.getOrderNo(), cancelOrderReqVO.getCancelReason(), isConsoleInvoke);
         }
 
         logger.info("res:[{}]", JSON.toJSONString(res));
@@ -75,9 +80,14 @@ public class CancelOrderService {
             couponAndCoinHandleService.undoOwnerCoupon(cancelOrderReqVO.getOrderNo(), res.getOwnerCouponNo(), recover);
         }
 
-        //扣库存
+        //库存处理
         if (null != res) {
+            //释放库存(trans_filter)
             stockService.releaseCarStock(cancelOrderReqVO.getOrderNo(), res.getCarNo());
+            if(StringUtils.equals(MemRoleEnum.OWNER.getCode(), cancelOrderReqVO.getMemRole())) {
+                //锁定car_filter
+                stockService.ownerCancelStock(buildOwnerCancelDTO(cancelOrderReqVO.getOrderNo(), res));
+            }
         }
 
         if (null != res && null != res.getIsRefund() && res.getIsRefund()) {
@@ -97,13 +107,15 @@ public class CancelOrderService {
 
     }
 
-
-    public void check() {
-        //TODO:订单取消公共校验
-
+    private OwnerCancelDTO buildOwnerCancelDTO(String orderNo, CancelOrderResDTO res){
+        OwnerCancelDTO ownerCancelDTO = new OwnerCancelDTO();
+        ownerCancelDTO.setOrderNo(orderNo);
+        ownerCancelDTO.setCarNo(res.getCarNo());
+        ownerCancelDTO.setCityCode(Integer.valueOf(res.getCityCode()));
+        ownerCancelDTO.setSource(2);
+        ownerCancelDTO.setStartDate(LocalDateTimeUtils.localDateTimeToDate(res.getRentTime()));
+        ownerCancelDTO.setEndDate(LocalDateTimeUtils.localDateTimeToDate(res.getRevertTime()));
+        return ownerCancelDTO;
     }
-
-
-
 
 }

@@ -3,8 +3,10 @@ package com.atzuche.order.delivery.service.delivery;
 import com.atzuche.config.client.api.OilAverageCostConfigSDK;
 import com.atzuche.config.common.api.ConfigContext;
 import com.atzuche.config.common.entity.OilAverageCostEntity;
-import com.atzuche.order.commons.StringUtil;
+import com.atzuche.order.commons.entity.dto.CostBaseDTO;
+import com.atzuche.order.commons.entity.dto.MileageAmtDTO;
 import com.atzuche.order.commons.vo.res.delivery.DistributionCostVO;
+import com.atzuche.order.commons.vo.res.delivery.RenterOrderDeliveryRepVO;
 import com.atzuche.order.delivery.common.DeliveryErrorCode;
 import com.atzuche.order.delivery.entity.OwnerHandoverCarInfoEntity;
 import com.atzuche.order.delivery.entity.RenterHandoverCarInfoEntity;
@@ -18,18 +20,23 @@ import com.atzuche.order.delivery.utils.MathUtil;
 import com.atzuche.order.delivery.vo.delivery.DeliveryOilCostVO;
 import com.atzuche.order.delivery.vo.delivery.rep.OwnerGetAndReturnCarDTO;
 import com.atzuche.order.delivery.vo.delivery.rep.RenterGetAndReturnCarDTO;
+import com.atzuche.order.transport.service.GetReturnCarCostService;
+import com.atzuche.order.transport.vo.GetReturnResponseVO;
 import com.autoyol.platformcost.CommonUtils;
 import com.autoyol.platformcost.OwnerFeeCalculatorUtils;
+import com.autoyol.platformcost.RenterFeeCalculatorUtils;
+import com.autoyol.platformcost.model.FeeResult;
+import com.dianping.cat.Cat;
 import com.google.common.collect.Lists;
 import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import java.time.Duration;
 import java.util.List;
 import java.util.Objects;
 
@@ -48,16 +55,23 @@ public class DeliveryCarInfoPriceService {
     OwnerHandoverCarService ownerHandoverCarService;
     @Autowired
     RenterHandoverCarService renterHandoverCarService;
+    @Autowired
+    GetReturnCarCostService getReturnCarCostService;
+
+    @Value("${auto.cost.configHours}")
+    private Integer configHours;
 
 
     /**
      * 根据类型获取所在城市的油价
      */
-    public Double getOilPriceByCityCodeAndType(Integer cityCode, Integer type) {
+    public Integer getOilPriceByCityCodeAndType(Integer cityCode, Integer type) {
+
+        //目前获取到的EngineType全部为0  没有区分 所以暂时写死
         List<OilAverageCostEntity> oilAverageCostEntityList = oilAverageCostConfigSDK.getConfig(DeliveryCarInfoConfigContext.builder().build());
-        OilAverageCostEntity oilAverageCostEntity = oilAverageCostEntityList.stream().filter(r -> r.getCityCode() == cityCode.intValue() && r.getEngineType() == type.intValue()).findFirst().get();
+        OilAverageCostEntity oilAverageCostEntity = oilAverageCostEntityList.stream().filter(r -> r.getCityCode() == cityCode.intValue() && r.getEngineType() == 0).findFirst().get();
         if (Objects.isNull(oilAverageCostEntity)) {
-            oilAverageCostEntity = oilAverageCostEntityList.stream().filter(r -> r.getCityCode() == 0 && r.getEngineType() == type.intValue()).findFirst().get();
+            oilAverageCostEntity = oilAverageCostEntityList.stream().filter(r -> r.getCityCode() == 0 && r.getEngineType() == 0).findFirst().get();
         }
         if (Objects.isNull(oilAverageCostEntity)) {
             throw new DeliveryOrderException(DeliveryErrorCode.DELIVERY_PARAMS_ERROR.getValue(), "没有找到对应的城市油价");
@@ -65,9 +79,9 @@ public class DeliveryCarInfoPriceService {
         int molecule = oilAverageCostEntity.getMolecule();
         int denominator = oilAverageCostEntity.getDenominator();
         if (denominator == 0) {
-           return  0d;
+           return  0;
         } else {
-            return MathUtil.div(molecule, denominator, 2);
+            return Integer.valueOf(String.valueOf(MathUtil.div(molecule, denominator, 0)));
         }
     }
 
@@ -112,6 +126,7 @@ public class DeliveryCarInfoPriceService {
             log.info("获取油费等数据发生业务异常：{}", e.getErrorMsg());
         } catch (Exception ex) {
             log.info("获取油费等数据发生异常：{}", ex.getMessage());
+            Cat.logError("获取油费等数据发生异常",ex);
         }
         return DeliveryOilCostVO.builder().build();
     }
@@ -148,22 +163,20 @@ public class DeliveryCarInfoPriceService {
                 continue;
             }
             if (ownerHandoverCarInfoEntity.getType().intValue() == RenterHandoverCarTypeEnum.RENYUN_TO_RENTER.getValue().intValue()) {
-                ownerGetAndReturnCarDTO.setGetCarOil(String.valueOf(ownerHandoverCarInfoEntity.getOilNum()));
-                ownerGetAndReturnCarDTO.setGetKM(String.valueOf(ownerHandoverCarInfoEntity.getMileageNum()));
-                ownerGetAndReturnCarDTO.setRealGetTime(String.valueOf(ownerHandoverCarInfoEntity.getRealReturnTime()));
+                ownerGetAndReturnCarDTO.setGetCarOil(ownerHandoverCarInfoEntity.getOilNum() == null ? "0": String.valueOf(ownerHandoverCarInfoEntity.getOilNum()));
+                ownerGetAndReturnCarDTO.setGetKM(ownerHandoverCarInfoEntity.getMileageNum() == null ? "0": String.valueOf(ownerHandoverCarInfoEntity.getMileageNum()));
             } else {
-                ownerGetAndReturnCarDTO.setReturnCarOil(String.valueOf(ownerHandoverCarInfoEntity.getOilNum()));
-                ownerGetAndReturnCarDTO.setReturnKM(String.valueOf(ownerHandoverCarInfoEntity.getMileageNum()));
-                ownerGetAndReturnCarDTO.setRealReturnTime(String.valueOf(ownerHandoverCarInfoEntity.getRealReturnTime()));
+                ownerGetAndReturnCarDTO.setReturnCarOil(ownerHandoverCarInfoEntity.getOilNum() == null ? "0":String.valueOf(ownerHandoverCarInfoEntity.getOilNum()));
+                ownerGetAndReturnCarDTO.setReturnKM(ownerHandoverCarInfoEntity.getMileageNum() == null ? "0":String.valueOf(ownerHandoverCarInfoEntity.getMileageNum()));
             }
         }
         //行驶里程
         try {
-            String ownerDrivingKM = String.valueOf(Math.abs(Integer.valueOf(ownerGetAndReturnCarDTO.getGetKM())) - Math.abs(Integer.valueOf(ownerGetAndReturnCarDTO.getReturnKM())));
+            String ownerDrivingKM = String.valueOf(Math.abs(Integer.valueOf(ownerGetAndReturnCarDTO.getReturnKM())) - Math.abs(Integer.valueOf(ownerGetAndReturnCarDTO.getGetKM())));
             int oilDifference = Math.abs(Integer.valueOf(ownerGetAndReturnCarDTO.getGetCarOil())) - Math.abs(Integer.valueOf(ownerGetAndReturnCarDTO.getReturnCarOil()));
             ownerGetAndReturnCarDTO.setDrivingKM(ownerDrivingKM);
-            ownerGetAndReturnCarDTO.setOilDifference(String.valueOf(oilDifference));
-            ownerGetAndReturnCarDTO.setOilDifferenceCrash(String.valueOf(MathUtil.mul(oilDifference,getOilPriceByCityCodeAndType(Integer.valueOf(cityCode), carEngineType))));
+            ownerGetAndReturnCarDTO.setOilDifference(String.valueOf(oilDifference)+"L");
+            ownerGetAndReturnCarDTO.setOilDifferenceCrash(String.valueOf(MathUtil.mul(oilDifference,getOilPriceByCityCodeAndType(Integer.valueOf(cityCode), carEngineType)))+"元");
         }catch (Exception e)
         {
             log.error("设置参数失败,目前没有值");
@@ -173,7 +186,7 @@ public class DeliveryCarInfoPriceService {
 
 
     /**
-     * 获取取车还车费用
+     * 获取车主取车还车费用
      * @param carType
      * @return
      */
@@ -188,6 +201,73 @@ public class DeliveryCarInfoPriceService {
 
 
     /**
+     * 获取超里程费用
+     * @param mileageAmtDTO
+     * @return RenterOrderCostDetailEntity
+     */
+    public FeeResult getMileageAmtEntity(MileageAmtDTO mileageAmtDTO) {
+        FeeResult feeResult = new FeeResult();
+        feeResult.setUnitCount(1.0);
+        log.info("getMileageAmtEntity mileageAmtDTO=[{}]",mileageAmtDTO);
+        if (mileageAmtDTO == null) {
+            log.error("getMileageAmtEntity 获取超里程费用mileageAmtDTO对象为空");
+            Cat.logError("获取超里程费用mileageAmtDTO对象为空", new DeliveryOrderException(DeliveryErrorCode.DELIVERY_PARAMS_ERROR.getValue(),"获取超里程费用mileageAmtDTO对象为空"));
+            feeResult.setTotalFee(0);
+            feeResult.setUnitPrice(0);
+            return feeResult;
+
+        }
+        CostBaseDTO costBaseDTO = mileageAmtDTO.getCostBaseDTO();
+        if (costBaseDTO == null || costBaseDTO.getStartTime() == null) {
+            log.error("getMileageAmtEntity 获取超里程费用mileageAmtDTO.costBaseDTO对象为空");
+            Cat.logError("获取超里程费用mileageAmtDTO.costBaseDTO对象为空", new DeliveryOrderException(DeliveryErrorCode.DELIVERY_PARAMS_ERROR.getValue(),"获取超里程费用mileageAmtDTO对象为空"));
+            feeResult.setTotalFee(0);
+            feeResult.setUnitPrice(0);
+            return feeResult;
+        }
+        Integer mileageAmt = RenterFeeCalculatorUtils.calMileageAmt(mileageAmtDTO.getDayMileage(), mileageAmtDTO.getGuideDayPrice(),
+                mileageAmtDTO.getGetmileage(), mileageAmtDTO.getReturnMileage(), costBaseDTO.getStartTime(), costBaseDTO.getEndTime(), configHours);
+        feeResult.setTotalFee(mileageAmt);
+        feeResult.setUnitPrice(mileageAmt);
+        return feeResult;
+    }
+
+
+    /**
+     * 车主端平台服务费
+     * @param rentAmt 租金
+     * @param serviceProportion 服务费比例
+     * @return OwnerOrderPurchaseDetailEntity
+     */
+    public FeeResult getServiceExpense(Integer rentAmt, Integer serviceProportion) {
+        Integer serviceExpense = OwnerFeeCalculatorUtils.calServiceExpense(rentAmt, serviceProportion);
+        FeeResult feeResult = new FeeResult(serviceExpense, 1.0, serviceExpense);
+        return feeResult;
+    }
+
+
+    /**
+     * 获取租客取还车费用数据
+     * @param orderNo
+     * @return
+     */
+    public GetReturnResponseVO getDeliveryCarFee(String orderNo){
+        List<RenterOrderDeliveryEntity> renterOrderDeliveryEntityList = renterOrderDeliveryService.findRenterOrderListByOrderNo(orderNo);
+        if (CollectionUtils.isEmpty(renterOrderDeliveryEntityList)) {
+            log.info("没有配送订单，获取不了相关的配送费用,orderNo:", orderNo);
+            return new GetReturnResponseVO();
+        }
+        List<RenterOrderDeliveryRepVO> renterOrderDeliveryRepVOList = Lists.newArrayList();
+        for (RenterOrderDeliveryEntity renterOrderDeliveryEntity : renterOrderDeliveryEntityList) {
+            RenterOrderDeliveryRepVO renterOrderDeliveryRepVO = new RenterOrderDeliveryRepVO();
+            BeanUtils.copyProperties(renterOrderDeliveryEntity, renterOrderDeliveryRepVO);
+            renterOrderDeliveryRepVOList.add(renterOrderDeliveryRepVO);
+        }
+        GetReturnResponseVO getReturnResponseVO = getReturnCarCostService.getDeliveryCarFee(orderNo, renterOrderDeliveryRepVOList);
+        return getReturnResponseVO;
+    }
+
+    /**
      * 设置预环境
      */
     @Builder
@@ -195,7 +275,7 @@ public class DeliveryCarInfoPriceService {
 
         @Override
         public boolean preConfig() {
-            return false;
+            return true;
         }
     }
 }

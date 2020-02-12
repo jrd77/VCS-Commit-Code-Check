@@ -13,8 +13,6 @@ import com.atzuche.order.rentercost.mapper.OrderSupplementDetailMapper;
 /**
  * 订单补付表
  *
- * @author ZhangBin
- * @date 2019-12-27 10:18:00
  */
 @Service
 public class OrderSupplementDetailService{
@@ -31,6 +29,25 @@ public class OrderSupplementDetailService{
     public List<OrderSupplementDetailEntity> listOrderSupplementDetailByOrderNoAndMemNo(String orderNo, String memNo) {
     	return orderSupplementDetailMapper.listOrderSupplementDetailByOrderNoAndMemNo(orderNo, memNo);
     }
+
+    /**
+     * 返回补付的总额
+     * @param orderNo
+     * @param memNo
+     * @return
+     */
+    public int getTotalSupplementAmt(String orderNo,String memNo){
+        List<OrderSupplementDetailEntity> entityList = listOrderSupplementDetailByOrderNoAndMemNo(orderNo,memNo);
+        int total = 0;
+        for(OrderSupplementDetailEntity entity:entityList){
+            if(entity.getAmt()!=null){
+                total = total +entity.getAmt();
+            }
+        }
+        return total;
+    }
+
+
     
     /**
      * 保存租客补付记录
@@ -49,5 +66,18 @@ public class OrderSupplementDetailService{
      */
     public Integer updatePayFlagById(Integer id, Integer payFlag) {
     	return orderSupplementDetailMapper.updatePayFlagById(id, payFlag);
+    }
+    
+    /**
+     * 根据订单号获取补付记录
+     * @param orderNo
+     * @return List<OrderSupplementDetailEntity>
+     */
+    public List<OrderSupplementDetailEntity> listOrderSupplementDetailByOrderNo(String orderNo) {
+    	return orderSupplementDetailMapper.listOrderSupplementDetailByOrderNo(orderNo);
+    }
+    
+    public Integer updateDeleteById(Integer id) {
+    	return orderSupplementDetailMapper.updateDeleteById(id);
     }
 }

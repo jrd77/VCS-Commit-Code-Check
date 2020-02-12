@@ -1,6 +1,6 @@
 package com.atzuche.order.accountrenterwzdepost.vo.req;
 
-import com.atzuche.order.commons.enums.RenterCashCodeEnum;
+import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.autoyol.commons.web.ErrorCode;
 import lombok.Data;
 import org.springframework.util.Assert;
@@ -29,7 +29,7 @@ public class RenterWZDepositCostReqVO {
     /**
      * 金额
      */
-    private Integer amt;
+    private int amt;
     /**
      * 入账来源编码
      */

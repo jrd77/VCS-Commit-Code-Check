@@ -3,13 +3,12 @@ package com.atzuche.order.mem;
 import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.CatConstants;
 import com.atzuche.order.commons.LocalDateTimeUtils;
+import com.atzuche.order.commons.ResponseCheckUtil;
 import com.atzuche.order.commons.entity.dto.*;
 import com.atzuche.order.commons.enums.MemberFlagEnum;
-import com.atzuche.order.commons.enums.OwnerMemRightEnum;
-import com.atzuche.order.commons.enums.RenterMemRightEnum;
+import com.atzuche.order.commons.enums.MemRightEnum;
 import com.atzuche.order.commons.enums.RightTypeEnum;
 import com.atzuche.order.mem.dto.OrderRenterInfoDTO;
-import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.member.detail.api.MemberDetailFeignService;
 import com.autoyol.member.detail.enums.MemberSelectKeyEnum;
@@ -23,9 +22,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.text.SimpleDateFormat;
-import java.time.Duration;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -51,6 +50,7 @@ public class MemProxyService {
                 MemberSelectKeyEnum.MEMBER_ROLE_INFO.getKey(),
                 MemberSelectKeyEnum.MEMBER_ADDITION_INFO.getKey(),
                 MemberSelectKeyEnum.MEMBER_STATISTICS_INFO.getKey(),
+                MemberSelectKeyEnum.MEMBER_SECRET_INFO.getKey(),
                 MemberSelectKeyEnum.MEMBER_RELIEF_INFO.getKey());
         ResponseData<MemberTotalInfo> responseData = null;
         log.info("Feign 开始获取租客会员信息,memNo={}",memNo);
@@ -60,33 +60,26 @@ public class MemProxyService {
             String parameter = "memNo="+memNo+"&selectKey"+JSON.toJSONString(selectKey);
             Cat.logEvent(CatConstants.FEIGN_PARAM,parameter);
             responseData = memberDetailFeignService.getMemberSelectInfo(Integer.parseInt(memNo), selectKey);
-            if(responseData == null || !ErrorCode.SUCCESS.getCode().equals(responseData.getResCode()) || responseData.getData() == null){
-                log.error("Feign 获取租客会员信息失败,memNo={},responseData={}",memNo,JSON.toJSONString(responseData));
-                RenterMemberFailException renterMemberByFeignException = new RenterMemberFailException();
-                throw renterMemberByFeignException;
-            }
+            ResponseCheckUtil.checkResponse(responseData);
             t.setStatus(Transaction.SUCCESS);
-        }catch(RenterMemberFailException ex){
-            t.setStatus(ex);
-            Cat.logError("Feign 获取租客会员信息失败",ex);
-            throw ex;
         }catch (Exception e){
             log.error("Feign 获取租客会员信息失败,submitReqDto={},memNo={}",memNo,null,e);
-            RenterMemberErrException err = new RenterMemberErrException();
-            Cat.logError("Feign 获取租客会员信息失败",err);
+            Cat.logError("Feign 获取租客会员信息失败",e);
             t.setStatus(e);
-            throw err;
+            throw e;
         }finally {
             t.complete();
         }
 
         MemberTotalInfo memberTotalInfo = responseData.getData();
+        log.info("memInfo is {}",JSON.toJSONString(memberTotalInfo));
         MemberAuthInfo memberAuthInfo = memberTotalInfo.getMemberAuthInfo();
         MemberCoreInfo memberCoreInfo = memberTotalInfo.getMemberCoreInfo();
         MemberBaseInfo memberBaseInfo = memberTotalInfo.getMemberBaseInfo();
         MemberAdditionInfo memberAdditionInfo = memberTotalInfo.getMemberAdditionInfo();
         MemberStatisticsInfo memberStatisticsInfo = memberTotalInfo.getMemberStatisticsInfo();
         MemberRoleInfo memberRoleInfo = memberTotalInfo.getMemberRoleInfo();
+        MemberSecretInfo secretInfo = memberTotalInfo.getMemberSecretInfo();
 
         OrderRenterInfoDTO dto = new OrderRenterInfoDTO();
         dto.setMemNo(memNo);
@@ -95,7 +88,7 @@ public class MemProxyService {
         dto.setEmail(memberAuthInfo.getEmail());
         dto.setGender(convertGender(memberBaseInfo.getGender()));
         dto.setDriLicRecordNo(memberAuthInfo.getDriLicRecordNo());
-        dto.setIdNo(memberAuthInfo.getIdCard());
+        dto.setIdNo(secretInfo.getIdNo());
         dto.setCensusRegiste(memberBaseInfo.getCensusRegiste());
         dto.setCity(memberBaseInfo.getCity());
         dto.setProvince(memberBaseInfo.getProvince());
@@ -119,7 +112,8 @@ public class MemProxyService {
             try{
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
                 LocalDate date = LocalDate.parse(driLicFirstTime,formatter);
-                return String.valueOf(Duration.between(LocalDate.now(),date).toDays()/365f);
+                long between1 = ChronoUnit.DAYS.between(date, LocalDate.now());
+                return String.valueOf(between1/365);
             }catch (Exception e){
                 return "0";
             }
@@ -150,9 +144,8 @@ public class MemProxyService {
      * 返回用户的会员号
      * @param mobile
      * @return
-     * @throws RenterMemberFailException
      */
-    public Integer getMemNoByMoile(String mobile)throws RenterMemberFailException{
+    public Integer getMemNoByMoile(String mobile){
         ResponseData<Integer> responseData = null;
         log.info("Feign 开始获取车主会员信息,mobile={}",mobile);
         Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "会员详情服务");
@@ -162,23 +155,15 @@ public class MemProxyService {
             Cat.logEvent(CatConstants.FEIGN_PARAM,parameter);
             responseData = memberDetailFeignService.getMemNoByMobile(Long.parseLong(mobile));
             Cat.logEvent(CatConstants.FEIGN_RESULT,JSON.toJSONString(responseData));
-            if(responseData == null || !ErrorCode.SUCCESS.getCode().equals(responseData.getResCode())){
-                log.error("Feign 获取车主会员信息失败,mobile={},orderContextDto={}",mobile, JSON.toJSONString(responseData));
-                OwnerMemberFailException failException = new OwnerMemberFailException();
-                throw failException;
-            }
+            ResponseCheckUtil.checkResponse(responseData);
             t.setStatus(Transaction.SUCCESS);
             return responseData.getData();
-        }catch (OwnerMemberFailException oe){
-            Cat.logError("Feign 获取车主会员信息失败",oe);
-            t.setStatus(oe);
-            throw oe;
         }
         catch (Exception e){
             t.setStatus(e);
             Cat.logError("Feign 获取车主会员信息失败",e);
-            log.error("Feign 获取车主会员信息失败,orderContextDto={},mobile={}",mobile,e);
-            throw new OwnerMemberErrException();
+            log.error("Feign 获取车主会员信息失败,Response={},mobile={}",responseData,mobile,e);
+            throw e;
         }finally {
             t.complete();
         }
@@ -187,14 +172,14 @@ public class MemProxyService {
 
 
     //获取车主会员信息
-    public OwnerMemberDTO getOwnerMemberInfo(String memNo) throws RenterMemberFailException {
+    public OwnerMemberDTO getOwnerMemberInfo(String memNo)   {
         List<String> selectKey = Arrays.asList(
                 MemberSelectKeyEnum.MEMBER_CORE_INFO.getKey(),
                 MemberSelectKeyEnum.MEMBER_BASE_INFO.getKey(),
                 MemberSelectKeyEnum.MEMBER_ROLE_INFO.getKey(),
                 MemberSelectKeyEnum.MEMBER_ADDITION_INFO.getKey(),
                 MemberSelectKeyEnum.MEMBER_STATISTICS_INFO.getKey(),
-                MemberSelectKeyEnum.MEMBER_RELIEF_INFO.getKey());
+                MemberSelectKeyEnum.MEMBER_RELIEF_INFO.getKey(),MemberSelectKeyEnum.MEMBER_SECRET_INFO.getKey());
         ResponseData<MemberTotalInfo> responseData = null;
         log.info("Feign 开始获取车主会员信息,memNo={}",memNo);
         Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "会员详情服务");
@@ -204,22 +189,14 @@ public class MemProxyService {
             Cat.logEvent(CatConstants.FEIGN_PARAM,parameter);
             responseData = memberDetailFeignService.getMemberSelectInfo(Integer.valueOf(memNo), selectKey);
             Cat.logEvent(CatConstants.FEIGN_RESULT,JSON.toJSONString(responseData));
-            if(responseData == null || !ErrorCode.SUCCESS.getCode().equals(responseData.getResCode())){
-                log.error("Feign 获取车主会员信息失败,memNo={},orderContextDto={}",memNo, JSON.toJSONString(responseData));
-                OwnerMemberFailException failException = new OwnerMemberFailException();
-                throw failException;
-            }
+            ResponseCheckUtil.checkResponse(responseData);
             t.setStatus(Transaction.SUCCESS);
-        }catch (OwnerMemberFailException oe){
-            Cat.logError("Feign 获取车主会员信息失败",oe);
-            t.setStatus(oe);
-            throw oe;
         }
         catch (Exception e){
             t.setStatus(e);
             Cat.logError("Feign 获取车主会员信息失败",e);
-            log.error("Feign 获取车主会员信息失败,orderContextDto={},memNo={}",memNo,e);
-            throw new OwnerMemberErrException();
+            log.error("Feign 获取车主会员信息失败,Resonponse={},memNo={}",responseData,memNo,e);
+            throw e;
         }finally {
             t.complete();
         }
@@ -234,15 +211,17 @@ public class MemProxyService {
         ownerMemberDto.setRealName(memberCoreInfo.getRealName());
         ownerMemberDto.setNickName(memberCoreInfo.getNickName());
         ownerMemberDto.setOrderSuccessCount(memberStatisticsInfo.getSuccessOrderNum());
-        //ownerMemberDto.setMemType();
+        ownerMemberDto.setHaveCar(null != memberTotalInfo.getMemberBaseInfo() ? memberTotalInfo.getMemberBaseInfo().getHaveCar() : 0);
+        ownerMemberDto.setMemType(null != memberTotalInfo.getMemberRoleInfo() ? memberTotalInfo.getMemberRoleInfo().getMemberType() : null);
+        ownerMemberDto.setIdNo(memberTotalInfo.getMemberSecretInfo().getIdNo());
         List<OwnerMemberRightDTO> rights = new ArrayList<>();
         MemberRoleInfo memberRoleInfo = memberTotalInfo.getMemberRoleInfo();
 
         if(memberRoleInfo != null){
             if(memberRoleInfo.getInternalStaff()!=null){
                 OwnerMemberRightDTO internalStaff = new OwnerMemberRightDTO();
-                internalStaff.setRightCode(OwnerMemRightEnum.STAFF.getRightCode());
-                internalStaff.setRightName(OwnerMemRightEnum.STAFF.getRightName());
+                internalStaff.setRightCode(MemRightEnum.STAFF.getRightCode());
+                internalStaff.setRightName(MemRightEnum.STAFF.getRightName());
                 internalStaff.setRightValue(String.valueOf(memberRoleInfo.getInternalStaff()));
                 internalStaff.setRightType(RightTypeEnum.STAFF.getCode());
                 internalStaff.setRightDesc("是否是内部员工");
@@ -260,8 +239,8 @@ public class MemProxyService {
             }
             if(memberRoleInfo.getCpicMemberFlag() != null){
                 OwnerMemberRightDTO internalStaff = new OwnerMemberRightDTO();
-                internalStaff.setRightCode(OwnerMemRightEnum.CPIC_MEM.getRightCode());
-                internalStaff.setRightName(OwnerMemRightEnum.CPIC_MEM.getRightName());
+                internalStaff.setRightCode(MemRightEnum.CPIC_MEM.getRightCode());
+                internalStaff.setRightName(MemRightEnum.CPIC_MEM.getRightName());
                 internalStaff.setRightValue(String.valueOf(memberRoleInfo.getCpicMemberFlag()));
                 internalStaff.setRightType(RightTypeEnum.CPIC.getCode());
                 internalStaff.setRightDesc("是否太保会员");
@@ -273,8 +252,8 @@ public class MemProxyService {
             WxBindingTaskInfo wxBindingTaskInfo = memberReliefInfo.getWxBindingTaskInfo();
             if(wxBindingTaskInfo !=null){
                 OwnerMemberRightDTO internalStaff = new OwnerMemberRightDTO();
-                internalStaff.setRightCode(OwnerMemRightEnum.BIND_WECHAT.getRightCode());
-                internalStaff.setRightName(OwnerMemRightEnum.BIND_WECHAT.getRightName());
+                internalStaff.setRightCode(MemRightEnum.BIND_WECHAT.getRightCode());
+                internalStaff.setRightName(MemRightEnum.BIND_WECHAT.getRightName());
                 internalStaff.setRightValue(wxBindingTaskInfo.getReliefPercentage()==null?"0":String.valueOf(wxBindingTaskInfo.getReliefPercentage()));
                 internalStaff.setRightDesc(wxBindingTaskInfo.getTitle());
                 internalStaff.setRightType(RightTypeEnum.TASK.getCode());
@@ -283,8 +262,8 @@ public class MemProxyService {
             MemberLevelTaskInfo memberLevelTaskInfo = memberReliefInfo.getMemberLevelTaskInfo();
             if(memberLevelTaskInfo != null){
                 OwnerMemberRightDTO internalStaff = new OwnerMemberRightDTO();
-                internalStaff.setRightCode(OwnerMemRightEnum.MEMBER_LEVEL.getRightCode());
-                internalStaff.setRightName(OwnerMemRightEnum.MEMBER_LEVEL.getRightName());
+                internalStaff.setRightCode(MemRightEnum.MEMBER_LEVEL.getRightCode());
+                internalStaff.setRightName(MemRightEnum.MEMBER_LEVEL.getRightName());
                 internalStaff.setRightValue(memberLevelTaskInfo.getReliefPercentage()==null?"0":String.valueOf(memberLevelTaskInfo.getReliefPercentage()));
                 internalStaff.setRightDesc(memberLevelTaskInfo.getTitle());
                 internalStaff.setRightType(RightTypeEnum.TASK.getCode());
@@ -293,8 +272,8 @@ public class MemProxyService {
             InvitationTaskInfo invitationTaskInfo = memberReliefInfo.getInvitationTaskInfo();
             if(invitationTaskInfo != null){
                 OwnerMemberRightDTO internalStaff = new OwnerMemberRightDTO();
-                internalStaff.setRightCode(OwnerMemRightEnum.INVITE_FRIENDS.getRightCode());
-                internalStaff.setRightName(OwnerMemRightEnum.INVITE_FRIENDS.getRightName());
+                internalStaff.setRightCode(MemRightEnum.INVITE_FRIENDS.getRightCode());
+                internalStaff.setRightName(MemRightEnum.INVITE_FRIENDS.getRightName());
                 internalStaff.setRightValue(invitationTaskInfo.getReliefPercentage()==null?"0":String.valueOf(invitationTaskInfo.getReliefPercentage()));
                 internalStaff.setRightDesc(invitationTaskInfo.getTitle());
                 internalStaff.setRightType(RightTypeEnum.TASK.getCode());
@@ -303,8 +282,8 @@ public class MemProxyService {
             RentCarTaskInfo rentCarTaskInfo = memberReliefInfo.getRentCarTaskInfo();
             if(rentCarTaskInfo != null){
                 OwnerMemberRightDTO internalStaff = new OwnerMemberRightDTO();
-                internalStaff.setRightCode(OwnerMemRightEnum.SUCCESS_RENTCAR.getRightCode());
-                internalStaff.setRightName(OwnerMemRightEnum.SUCCESS_RENTCAR.getRightName());
+                internalStaff.setRightCode(MemRightEnum.SUCCESS_RENTCAR.getRightCode());
+                internalStaff.setRightName(MemRightEnum.SUCCESS_RENTCAR.getRightName());
                 internalStaff.setRightValue(rentCarTaskInfo.getReliefPercentage()==null?"0":String.valueOf(rentCarTaskInfo.getReliefPercentage()));
                 internalStaff.setRightDesc(rentCarTaskInfo.getTitle());
                 internalStaff.setRightType(RightTypeEnum.TASK.getCode());
@@ -316,7 +295,7 @@ public class MemProxyService {
     }
 
     //获取租客会员信息
-    public RenterMemberDTO getRenterMemberInfo(String memNo) throws RenterMemberFailException {
+    public RenterMemberDTO getRenterMemberInfo(String memNo)  {
         List<String> selectKey = Arrays.asList(
                 MemberSelectKeyEnum.MEMBER_CORE_INFO.getKey(),
                 MemberSelectKeyEnum.MEMBER_AUTH_INFO.getKey(),
@@ -324,7 +303,7 @@ public class MemProxyService {
                 MemberSelectKeyEnum.MEMBER_ROLE_INFO.getKey(),
                 MemberSelectKeyEnum.MEMBER_ADDITION_INFO.getKey(),
                 MemberSelectKeyEnum.MEMBER_STATISTICS_INFO.getKey(),
-                MemberSelectKeyEnum.MEMBER_RELIEF_INFO.getKey());
+                MemberSelectKeyEnum.MEMBER_RELIEF_INFO.getKey(),MemberSelectKeyEnum.MEMBER_SECRET_INFO.getKey());
         ResponseData<MemberTotalInfo> responseData = null;
         log.info("Feign 开始获取租客会员信息,memNo={}",memNo);
         Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "会员详情服务");
@@ -333,22 +312,13 @@ public class MemProxyService {
             String parameter = "memNo="+memNo+"&selectKey"+JSON.toJSONString(selectKey);
             Cat.logEvent(CatConstants.FEIGN_PARAM,parameter);
             responseData = memberDetailFeignService.getMemberSelectInfo(Integer.parseInt(memNo), selectKey);
-            if(responseData == null || !ErrorCode.SUCCESS.getCode().equals(responseData.getResCode()) || responseData.getData() == null){
-                log.error("Feign 获取租客会员信息失败,memNo={},responseData={}",memNo,JSON.toJSONString(responseData));
-                RenterMemberFailException renterMemberByFeignException = new RenterMemberFailException();
-                throw renterMemberByFeignException;
-            }
+            ResponseCheckUtil.checkResponse(responseData);
             t.setStatus(Transaction.SUCCESS);
-        }catch(RenterMemberFailException ex){
-            t.setStatus(ex);
-            Cat.logError("Feign 获取租客会员信息失败",ex);
-            throw ex;
         }catch (Exception e){
-            log.error("Feign 获取租客会员信息失败,submitReqDto={},memNo={}",memNo,null,e);
-            RenterMemberErrException err = new RenterMemberErrException();
-            Cat.logError("Feign 获取租客会员信息失败",err);
+            log.error("Feign 获取租客会员信息失败,ResponseData={},memNo={}",responseData,memNo,e);
+            Cat.logError("Feign 获取租客会员信息失败",e);
             t.setStatus(e);
-            throw err;
+            throw e;
         }finally {
             t.complete();
         }
@@ -371,6 +341,7 @@ public class MemProxyService {
         renterMemberDto.setFirstName(memberBaseInfo.getFirstName());
         renterMemberDto.setGender(memberBaseInfo.getGender());
         renterMemberDto.setIdCardAuth(memberAuthInfo.getIdCardAuth());
+        renterMemberDto.setIdNo(memberTotalInfo.getMemberSecretInfo().getIdNo());
         renterMemberDto.setDriLicAuth(memberAuthInfo.getDriLicAuth());
         renterMemberDto.setDriViceLicAuth(memberAuthInfo.getDriViceLicAuth());
         renterMemberDto.setOrderSuccessCount(memberStatisticsInfo.getSuccessOrderNum());
@@ -379,6 +350,7 @@ public class MemProxyService {
         commUseDriverList.forEach(x->{
             CommUseDriverInfoDTO commUseDriverInfoDTO = new CommUseDriverInfoDTO();
             BeanUtils.copyProperties(x,commUseDriverInfoDTO);
+            commUseDriverInfoDTO.setMobile(null == x.getMobile() ? null : x.getMobile().toString());
             CommUseDriverList.add(commUseDriverInfoDTO);
         });
         renterMemberDto.setCommUseDriverList(CommUseDriverList);
@@ -392,8 +364,8 @@ public class MemProxyService {
         if(memberRoleInfo != null){
             if(memberRoleInfo.getInternalStaff()!=null){
                 RenterMemberRightDTO internalStaff = new RenterMemberRightDTO();
-                internalStaff.setRightCode(RenterMemRightEnum.STAFF.getRightCode());
-                internalStaff.setRightName(RenterMemRightEnum.STAFF.getRightName());
+                internalStaff.setRightCode(MemRightEnum.STAFF.getRightCode());
+                internalStaff.setRightName(MemRightEnum.STAFF.getRightName());
                 internalStaff.setRightType(RightTypeEnum.STAFF.getCode());
                 internalStaff.setRightValue(String.valueOf(memberRoleInfo.getInternalStaff()));
                 internalStaff.setRightDesc("是否是内部员工");
@@ -411,8 +383,8 @@ public class MemProxyService {
             }
             if(memberRoleInfo.getCpicMemberFlag() != null){
                 RenterMemberRightDTO internalStaff = new RenterMemberRightDTO();
-                internalStaff.setRightCode(RenterMemRightEnum.CPIC_MEM.getRightCode());
-                internalStaff.setRightName(RenterMemRightEnum.CPIC_MEM.getRightName());
+                internalStaff.setRightCode(MemRightEnum.CPIC_MEM.getRightCode());
+                internalStaff.setRightName(MemRightEnum.CPIC_MEM.getRightName());
                 internalStaff.setRightValue(String.valueOf(memberRoleInfo.getCpicMemberFlag()));
                 internalStaff.setRightType(RightTypeEnum.CPIC.getCode());
                 internalStaff.setRightDesc("是否太保会员");
@@ -424,8 +396,8 @@ public class MemProxyService {
             WxBindingTaskInfo wxBindingTaskInfo = memberReliefInfo.getWxBindingTaskInfo();
             if(wxBindingTaskInfo !=null){
                 RenterMemberRightDTO internalStaff = new RenterMemberRightDTO();
-                internalStaff.setRightCode(RenterMemRightEnum.BIND_WECHAT.getRightCode());
-                internalStaff.setRightName(RenterMemRightEnum.BIND_WECHAT.getRightName());
+                internalStaff.setRightCode(MemRightEnum.BIND_WECHAT.getRightCode());
+                internalStaff.setRightName(MemRightEnum.BIND_WECHAT.getRightName());
                 internalStaff.setRightValue(wxBindingTaskInfo.getReliefPercentage()==null?"0":String.valueOf(wxBindingTaskInfo.getReliefPercentage()));
                 internalStaff.setRightType(RightTypeEnum.TASK.getCode());
                 internalStaff.setRightDesc(wxBindingTaskInfo.getTitle());
@@ -434,8 +406,8 @@ public class MemProxyService {
             MemberLevelTaskInfo memberLevelTaskInfo = memberReliefInfo.getMemberLevelTaskInfo();
             if(memberLevelTaskInfo != null){
                 RenterMemberRightDTO internalStaff = new RenterMemberRightDTO();
-                internalStaff.setRightCode(RenterMemRightEnum.MEMBER_LEVEL.getRightCode());
-                internalStaff.setRightName(RenterMemRightEnum.MEMBER_LEVEL.getRightName());
+                internalStaff.setRightCode(MemRightEnum.MEMBER_LEVEL.getRightCode());
+                internalStaff.setRightName(MemRightEnum.MEMBER_LEVEL.getRightName());
                 internalStaff.setRightValue(memberLevelTaskInfo.getReliefPercentage()==null?"0":String.valueOf(memberLevelTaskInfo.getReliefPercentage()));
                 internalStaff.setRightType(RightTypeEnum.TASK.getCode());
                 internalStaff.setRightDesc(memberLevelTaskInfo.getTitle());
@@ -444,8 +416,8 @@ public class MemProxyService {
             InvitationTaskInfo invitationTaskInfo = memberReliefInfo.getInvitationTaskInfo();
             if(invitationTaskInfo != null){
                 RenterMemberRightDTO internalStaff = new RenterMemberRightDTO();
-                internalStaff.setRightCode(RenterMemRightEnum.INVITE_FRIENDS.getRightCode());
-                internalStaff.setRightName(RenterMemRightEnum.INVITE_FRIENDS.getRightName());
+                internalStaff.setRightCode(MemRightEnum.INVITE_FRIENDS.getRightCode());
+                internalStaff.setRightName(MemRightEnum.INVITE_FRIENDS.getRightName());
                 internalStaff.setRightValue(invitationTaskInfo.getReliefPercentage()==null?"0":String.valueOf(invitationTaskInfo.getReliefPercentage()));
                 internalStaff.setRightType(RightTypeEnum.TASK.getCode());
                 internalStaff.setRightDesc(invitationTaskInfo.getTitle());
@@ -454,8 +426,8 @@ public class MemProxyService {
             RentCarTaskInfo rentCarTaskInfo = memberReliefInfo.getRentCarTaskInfo();
             if(rentCarTaskInfo != null){
                 RenterMemberRightDTO internalStaff = new RenterMemberRightDTO();
-                internalStaff.setRightCode(RenterMemRightEnum.SUCCESS_RENTCAR.getRightCode());
-                internalStaff.setRightName(RenterMemRightEnum.SUCCESS_RENTCAR.getRightName());
+                internalStaff.setRightCode(MemRightEnum.SUCCESS_RENTCAR.getRightCode());
+                internalStaff.setRightName(MemRightEnum.SUCCESS_RENTCAR.getRightName());
                 internalStaff.setRightValue(rentCarTaskInfo.getReliefPercentage()==null?"0":String.valueOf(rentCarTaskInfo.getReliefPercentage()));
                 internalStaff.setRightType(RightTypeEnum.TASK.getCode());
                 internalStaff.setRightDesc(rentCarTaskInfo.getTitle());
@@ -466,7 +438,7 @@ public class MemProxyService {
         return renterMemberDto;
     }
 
-    /*
+    /**
      * @Author ZhangBin
      * @Date 2019/12/31 14:28
      * @Description: 根据会员号，获取常用驾驶人列表
@@ -482,33 +454,26 @@ public class MemProxyService {
             String parameter = "memNo="+memNo+"&selectKey"+JSON.toJSONString(selectKey);
             Cat.logEvent(CatConstants.FEIGN_PARAM,parameter);
             responseData = memberDetailFeignService.getMemberAdditionInfo(Integer.parseInt(memNo));
-            if(responseData == null || !ErrorCode.SUCCESS.getCode().equals(responseData.getResCode()) || responseData.getData() == null){
-                log.error("Feign 获取附加驾驶人信息失败,memNo={},responseData={}",memNo,JSON.toJSONString(responseData));
-                RenterDriverFailException failException = new RenterDriverFailException();
-                throw failException;
-            }
+            log.info("Feign 获取附加驾驶人信息 param={},response is {}",parameter,JSON.toJSONString(responseData));
+            ResponseCheckUtil.checkResponse(responseData);
+            MemberAdditionInfo memberAdditionInfo = responseData.getData();
+            List<CommUseDriverInfo> commUseDriverList = memberAdditionInfo.getCommUseDriverList();
+            List<CommUseDriverInfoDTO> CommUseDriverList = new ArrayList<>();
+            commUseDriverList.forEach(x->{
+                CommUseDriverInfoDTO commUseDriverInfoDTO = new CommUseDriverInfoDTO();
+                BeanUtils.copyProperties(x,commUseDriverInfoDTO);
+                CommUseDriverList.add(commUseDriverInfoDTO);
+            });
             t.setStatus(Transaction.SUCCESS);
-        }catch(RenterDriverFailException ex){
-            t.setStatus(ex);
-            Cat.logError("Feign 获取附加驾驶人信息失败",ex);
-            throw ex;
+            return CommUseDriverList;
         }catch (Exception e){
-            log.error("Feign 获取附加驾驶人信息失败,submitReqDto={},memNo={}",memNo,null,e);
-            RenterDriverErrException err = new RenterDriverErrException();
-            Cat.logError("Feign 获取附加驾驶人信息失败",err);
+            log.error("Feign 获取附加驾驶人信息失败,responseData={},memNo={}",memNo,responseData,e);
+            Cat.logError("Feign 获取附加驾驶人信息失败",e);
             t.setStatus(e);
-            throw err;
+            throw e;
         }finally {
             t.complete();
         }
-        MemberAdditionInfo memberAdditionInfo = responseData.getData();
-        List<CommUseDriverInfo> commUseDriverList = memberAdditionInfo.getCommUseDriverList();
-        List<CommUseDriverInfoDTO> CommUseDriverList = new ArrayList<>();
-        commUseDriverList.forEach(x->{
-            CommUseDriverInfoDTO commUseDriverInfoDTO = new CommUseDriverInfoDTO();
-            BeanUtils.copyProperties(x,commUseDriverInfoDTO);
-            CommUseDriverList.add(commUseDriverInfoDTO);
-        });
-        return CommUseDriverList;
+
     }
 }

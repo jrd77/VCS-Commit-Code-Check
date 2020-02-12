@@ -117,6 +117,8 @@ public class RenterOrderResVO implements Serializable {
 	 * 修改方 1、后台管理 2、租客 3、车主
 	 */
 	private String changeSource;
+	//修改原因 20200210新增
+	private String changeReason;
     /**
      * 车主同意请求时间
      */
@@ -319,6 +321,12 @@ public class RenterOrderResVO implements Serializable {
 	}
 	public void setIsDelete(Integer isDelete) {
 		this.isDelete = isDelete;
+	}
+	public String getChangeReason() {
+		return changeReason;
+	}
+	public void setChangeReason(String changeReason) {
+		this.changeReason = changeReason;
 	}
 
 }
