@@ -86,4 +86,9 @@ public class WzDepositMsgResVO {
      * 扣款时间
      */
     private String deductionTime;
+
+    /**
+     * 暂扣状态 违章押金暂扣状态 1：暂扣 2：取消暂扣
+     */
+    private String detainStatus;
 }

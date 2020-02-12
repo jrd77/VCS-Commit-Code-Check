@@ -20,6 +20,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -90,7 +92,11 @@ public class AdminPreOrderController {
             PreOrderAdminResponseVO.CarDayPrice carDayPrice = new PreOrderAdminResponseVO.CarDayPrice();
             carDayPrice.setDay(dto.getCarDay().toString());
             carDayPrice.setPrice(dto.getCarUnitPrice().toString());
-            carDayPrice.setDesc("工作日");
+            if(isWorkDay(dto.getCarDay())) {
+                carDayPrice.setDesc("工作日");
+            }else{
+                carDayPrice.setDesc("周末");
+            }
             carDayPrices.add(carDayPrice);
         }
 
@@ -102,5 +108,14 @@ public class AdminPreOrderController {
 
         return ResponseData.success(responseVO);
 
+    }
+
+    public static boolean  isWorkDay(LocalDate localDate){
+        DayOfWeek dayOfWeek= localDate.getDayOfWeek();
+        if(dayOfWeek == DayOfWeek.SATURDAY || dayOfWeek == DayOfWeek.SUNDAY){
+            return false;
+        }else {
+            return true;
+        }
     }
 }

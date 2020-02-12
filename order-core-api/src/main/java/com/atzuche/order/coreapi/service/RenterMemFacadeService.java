@@ -29,7 +29,41 @@ public class RenterMemFacadeService {
         List<RenterMemberRightEntity> rightEntities= renterMemberRightService.findByOrderNoAndMemNo(orderNo);
         List<RenterAdditionalDriverEntity> additionalDriverEntities = renterAdditionalDriverService.listDriversByRenterOrderNo(renterOrderNo);
 
+
     }
+
+    /**
+     * 获得订单中租客的会员权益
+     * @param orderNo
+     * @return
+     */
+    public List<RenterMemberRightEntity> getRenterMemRight(String orderNo){
+        List<RenterMemberRightEntity> rightEntities= renterMemberRightService.findByOrderNoAndMemNo(orderNo);
+        return rightEntities;
+    }
+
+    /**
+     * 获得订单中的租客附加驾驶人信息
+     * @param renterOrderNo
+     * @return
+     */
+    public List<RenterAdditionalDriverEntity> getRenterOrderExtraDrivers(String renterOrderNo){
+        List<RenterAdditionalDriverEntity> additionalDriverEntities = renterAdditionalDriverService.listDriversByRenterOrderNo(renterOrderNo);
+        return additionalDriverEntities;
+    }
+
+    /**
+     * 获得订单会员信息
+     * @param orderNo
+     * @param renterNo
+     * @return
+     */
+    public RenterMemberEntity getRenterMemberInfo(String orderNo,String renterNo){
+        RenterMemberEntity renterMemberEntity = renterMemberService.queryRenterInfoByOrderNoAndRenterNo(orderNo,renterNo);
+        return renterMemberEntity;
+    }
+
+
 
 
 }
