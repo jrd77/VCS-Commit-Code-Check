@@ -17,10 +17,7 @@ public class UnfreezeRenterDetainVO {
      */
     private String renterOrderNo;
 
-    /**
-     * 租客会员号
-     */
-    private String memNo;
+
     /**
      * 暂扣部门ID
      */
@@ -33,7 +30,7 @@ public class UnfreezeRenterDetainVO {
     /**
      * 暂扣事件类型
      */
-    private int renterDetainId;
+    private DetailSourceEnum eventType;
 
     /**
      * 解冻原因

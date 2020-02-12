@@ -18,10 +18,6 @@ public class RenterDetainVO {
     private String renterOrderNo;
 
     /**
-     * 租客会员号
-     */
-    private String memNo;
-    /**
      * 暂扣部门ID
      */
     private Integer deptId;

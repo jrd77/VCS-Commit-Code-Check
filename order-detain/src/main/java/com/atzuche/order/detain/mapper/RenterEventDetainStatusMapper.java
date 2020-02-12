@@ -20,4 +20,6 @@ public interface RenterEventDetainStatusMapper{
     int updateByPrimaryKeySelective(RenterEventDetainStatusEntity record);
 
     RenterEventDetainStatusEntity selectByRentOrderNo(@Param("renterOrderNo") String renterOrderNo);
+
+    RenterEventDetainStatusEntity selectByOrderNo(@Param("orderNo") String orderNo);
 }
