@@ -5,6 +5,7 @@ import com.atzuche.config.common.api.ConfigContext;
 import com.atzuche.config.common.entity.OilAverageCostEntity;
 import com.atzuche.order.commons.entity.dto.CostBaseDTO;
 import com.atzuche.order.commons.entity.dto.MileageAmtDTO;
+import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
 import com.atzuche.order.commons.vo.res.delivery.DistributionCostVO;
 import com.atzuche.order.commons.vo.res.delivery.RenterOrderDeliveryRepVO;
 import com.atzuche.order.delivery.common.DeliveryErrorCode;
@@ -20,6 +21,7 @@ import com.atzuche.order.delivery.utils.MathUtil;
 import com.atzuche.order.delivery.vo.delivery.DeliveryOilCostVO;
 import com.atzuche.order.delivery.vo.delivery.rep.OwnerGetAndReturnCarDTO;
 import com.atzuche.order.delivery.vo.delivery.rep.RenterGetAndReturnCarDTO;
+import com.atzuche.order.rentercommodity.service.RenterCommodityService;
 import com.atzuche.order.transport.service.GetReturnCarCostService;
 import com.atzuche.order.transport.vo.GetReturnResponseVO;
 import com.autoyol.platformcost.CommonUtils;
@@ -60,18 +62,20 @@ public class DeliveryCarInfoPriceService {
 
     @Value("${auto.cost.configHours}")
     private Integer configHours;
+    @Autowired
+    RenterCommodityService renterCommodityService;
 
 
     /**
      * 根据类型获取所在城市的油价
      */
-    public Integer getOilPriceByCityCodeAndType(Integer cityCode, Integer type) {
+    public Double getOilPriceByCityCodeAndType(Integer cityCode, Integer type) {
 
         //目前获取到的EngineType全部为0  没有区分 所以暂时写死
         List<OilAverageCostEntity> oilAverageCostEntityList = oilAverageCostConfigSDK.getConfig(DeliveryCarInfoConfigContext.builder().build());
-        OilAverageCostEntity oilAverageCostEntity = oilAverageCostEntityList.stream().filter(r -> r.getCityCode() == cityCode.intValue() && r.getEngineType() == 0).findFirst().get();
+        OilAverageCostEntity oilAverageCostEntity = oilAverageCostEntityList.stream().filter(r -> r.getCityCode() == cityCode.intValue() && r.getEngineType() == type).findFirst().get();
         if (Objects.isNull(oilAverageCostEntity)) {
-            oilAverageCostEntity = oilAverageCostEntityList.stream().filter(r -> r.getCityCode() == 0 && r.getEngineType() == 0).findFirst().get();
+            oilAverageCostEntity = oilAverageCostEntityList.stream().filter(r -> r.getCityCode() == 0 && r.getEngineType() == type).findFirst().get();
         }
         if (Objects.isNull(oilAverageCostEntity)) {
             throw new DeliveryOrderException(DeliveryErrorCode.DELIVERY_PARAMS_ERROR.getValue(), "没有找到对应的城市油价");
@@ -79,9 +83,9 @@ public class DeliveryCarInfoPriceService {
         int molecule = oilAverageCostEntity.getMolecule();
         int denominator = oilAverageCostEntity.getDenominator();
         if (denominator == 0) {
-           return  0;
+           return  0d;
         } else {
-            return Integer.valueOf(String.valueOf(MathUtil.div(molecule, denominator, 0)));
+            return MathUtil.div(molecule, denominator, 2);
         }
     }
 
@@ -106,7 +110,9 @@ public class DeliveryCarInfoPriceService {
             if (StringUtils.isBlank(cityCode)) {
                 throw new DeliveryOrderException(DeliveryErrorCode.DELIVERY_PARAMS_ERROR.getValue(), "没有找到cityCode");
             }
+            RenterGoodsDetailDTO renterGoodsDetailDTO = renterCommodityService.getRenterGoodsDetail(renterOrderDelivery.getRenterOrderNo(), false);
             OwnerGetAndReturnCarDTO ownerGetAndReturnCarDTO = OwnerGetAndReturnCarDTO.builder().build();
+            ownerGetAndReturnCarDTO.setOilContainer(String.valueOf(renterGoodsDetailDTO.getCarOilVolume()));
             RenterGetAndReturnCarDTO renterGetAndReturnCarDTO = RenterGetAndReturnCarDTO.builder().build();
             //车主取送信息
             ownerGetAndReturnCarDTO = createOwnerGetAndReturnCarDTO(ownerGetAndReturnCarDTO, ownerHandoverCarInfoEntities, carEngineType, cityCode);
@@ -175,10 +181,12 @@ public class DeliveryCarInfoPriceService {
             String ownerDrivingKM = String.valueOf(Math.abs(Integer.valueOf(ownerGetAndReturnCarDTO.getReturnKM())) - Math.abs(Integer.valueOf(ownerGetAndReturnCarDTO.getGetKM())));
             int oilDifference = Math.abs(Integer.valueOf(ownerGetAndReturnCarDTO.getGetCarOil())) - Math.abs(Integer.valueOf(ownerGetAndReturnCarDTO.getReturnCarOil()));
             ownerGetAndReturnCarDTO.setDrivingKM(ownerDrivingKM);
-            ownerGetAndReturnCarDTO.setOilDifference(String.valueOf(oilDifference)+"L");
-            ownerGetAndReturnCarDTO.setOilDifferenceCrash(String.valueOf(MathUtil.mul(oilDifference,getOilPriceByCityCodeAndType(Integer.valueOf(cityCode), carEngineType)))+"元");
-        }catch (Exception e)
-        {
+            ownerGetAndReturnCarDTO.setOilDifference(String.valueOf(oilDifference) + "L");
+            String oilContainer = ownerGetAndReturnCarDTO.getOilContainer().contains("L") ? ownerGetAndReturnCarDTO.getOilContainer().replaceAll("L","") : ownerGetAndReturnCarDTO.getOilContainer();
+            double oilMiddleDataFee = MathUtil.mulByDouble(MathUtil.div(oilDifference, 16.0), Double.valueOf(oilContainer));
+            double oilDifferenceCrash = MathUtil.mulByDouble(oilMiddleDataFee, getOilPriceByCityCodeAndType(Integer.valueOf(cityCode), carEngineType));
+            ownerGetAndReturnCarDTO.setOilDifferenceCrash(String.valueOf(Double.valueOf(Math.floor(oilDifferenceCrash)).intValue()) + "元");
+        } catch (Exception e) {
             log.error("设置参数失败,目前没有值");
         }
         return ownerGetAndReturnCarDTO;

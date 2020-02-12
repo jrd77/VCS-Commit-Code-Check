@@ -319,7 +319,6 @@ public class RenYunFlowOrderDTO implements Serializable {
             setAlsocaraddr(orderDeliveryFlowEntity.getPickupAlsoCarAddr());
             setRealReturnCarLat(orderDeliveryFlowEntity.getRealReturnCarLat());
             setRealReturnCarLon(orderDeliveryFlowEntity.getRealReturnCarLon());
-
             setOwnerReturnAddr(orderDeliveryFlowEntity.getOwnerReturnAddr());
             setOwnerGetAddr(orderDeliveryFlowEntity.getOwnerGetAddr());
         }

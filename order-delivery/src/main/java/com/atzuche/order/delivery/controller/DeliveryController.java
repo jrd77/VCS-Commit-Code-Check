@@ -42,10 +42,10 @@ public class DeliveryController {
     @PostMapping("/delivery/add")
     public ResponseData<?> add() {
 
-        OrderMessage orderMessage =OrderMessage.builder().phone("13628645717").context("renterOptCancel").build();
-        baseProducer.sendTopicMessage("auto-order-action","action.order.create4",orderMessage);
+//        OrderMessage orderMessage =OrderMessage.builder().phone("13628645717").context("renterOptCancel").build();
+//        baseProducer.sendTopicMessage("auto-order-action","action.order.create4",orderMessage);
 
-        return null;
+//        return null;
 //        RenYunFlowOrderDTO renYunFlowOrderDTO = new RenYunFlowOrderDTO();
 //
 //        renYunFlowOrderDTO.setOrdernumber("65656565");
@@ -123,6 +123,7 @@ public class DeliveryController {
 //
 //        deliveryCarTask.addRenYunFlowOrderInfo(renYunFlowOrderDTO);
 //        return ResponseData.success();
+        return null;
 
     }
 
