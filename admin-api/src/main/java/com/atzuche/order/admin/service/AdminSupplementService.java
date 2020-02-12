@@ -10,6 +10,7 @@ import com.atzuche.order.commons.CatConstants;
 import com.atzuche.order.commons.entity.dto.OrderSupplementDetailDTO;
 import com.atzuche.order.commons.exceptions.RemoteCallException;
 import com.atzuche.order.commons.vo.res.rentcosts.OrderSupplementDetailEntity;
+import com.atzuche.order.commons.vo.res.rentcosts.SupplementVO;
 import com.atzuche.order.open.service.FeignSupplementService;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
@@ -30,8 +31,8 @@ public class AdminSupplementService {
 	 * @param orderNo
 	 * @return List<OrderSupplementDetailEntity>
 	 */
-	public List<OrderSupplementDetailEntity> listSupplement(String orderNo) {
-        ResponseData<List<OrderSupplementDetailEntity>> responseObject = null;
+	public SupplementVO listSupplement(String orderNo) {
+        ResponseData<SupplementVO> responseObject = null;
         Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "订单CoreAPI服务");
         try{
             Cat.logEvent(CatConstants.FEIGN_METHOD,"AdminSupplementService.listSupplement");
@@ -41,14 +42,23 @@ public class AdminSupplementService {
             Cat.logEvent(CatConstants.FEIGN_RESULT,JSON.toJSONString(responseObject));
             checkResponse(responseObject);
             t.setStatus(Transaction.SUCCESS);
-            List<OrderSupplementDetailEntity> list = responseObject.getData();
+            SupplementVO supplementVO = responseObject.getData();
+            if (supplementVO == null) {
+            	return null;
+            }
+            List<OrderSupplementDetailEntity> list = supplementVO.getList();
             if (list != null && !list.isEmpty()) {
             	for (OrderSupplementDetailEntity sup:list) {
             		// 管理后台展示取反
             		sup.setAmt(sup.getAmt() != null ? -sup.getAmt():0);
+            		if (sup.getCashType() != null && sup.getCashType() == 1) {
+            			sup.setCashTypeTxt("补付费用");
+            		} else if (sup.getCashType() != null && sup.getCashType() == 2) {
+            			sup.setCashTypeTxt("订单欠款");
+            		}
             	}
             }
-            return list;
+            return supplementVO;
         }catch (Exception e){
             log.error("Feign 管理后台查询补付列表,responseObject={},req={}",JSON.toJSONString(responseObject),JSON.toJSONString(orderNo),e);
             Cat.logError("Feign 管理后台查询补付列表",e);

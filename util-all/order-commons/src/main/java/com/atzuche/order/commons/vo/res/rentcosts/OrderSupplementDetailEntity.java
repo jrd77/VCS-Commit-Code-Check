@@ -35,6 +35,12 @@ public class OrderSupplementDetailEntity implements Serializable {
 	@AutoDocProperty(value="会员号")
 	private String memNo;
 	
+	@AutoDocProperty(value="费用类型：1-补付费用，2-订单欠款")
+	private Integer cashType;
+	
+	@AutoDocProperty(value="费用类型文案")
+	private String cashTypeTxt;
+	
 	@AutoDocProperty(value="请款码")
 	private String requestPayCode;
 	/**

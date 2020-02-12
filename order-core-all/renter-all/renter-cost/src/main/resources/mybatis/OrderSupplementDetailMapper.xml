@@ -7,6 +7,7 @@
         <result property="id" column="id"/>
         <result property="orderNo" column="order_no"/>
         <result property="memNo" column="mem_no"/>
+        <result property="cashType" column="cash_type"/>
         <result property="cashNo" column="cash_no"/>
         <result property="title" column="title"/>
         <result property="amt" column="amt"/>
@@ -27,7 +28,8 @@
 	<sql id="Base_Column_List">
 	`id`, 	
 	`order_no`, 	
-	`mem_no`, 	
+	`mem_no`, 
+	`cash_type`,	
 	`cash_no`, 	
 	`title`, 	
 	`amt`, 	
@@ -94,6 +96,7 @@
         <trim prefix="(" suffix=")" suffixOverrides="," >
 				<if test="orderNo != null">`order_no`, </if>
 				<if test="memNo != null">`mem_no`, </if>
+				<if test="cashType != null">`cash_type`, </if>
 				<if test="cashNo != null">`cash_no`, </if>
 				<if test="title != null">`title`, </if>
 				<if test="amt != null">`amt`, </if>
@@ -112,6 +115,7 @@
         <trim prefix="values (" suffix=")" suffixOverrides="," >
 				<if test="orderNo != null">#{orderNo},  </if>
 				<if test="memNo != null">#{memNo},  </if>
+				<if test="cashType != null">#{cashType},  </if>
 				<if test="cashNo != null">#{cashNo},  </if>
 				<if test="title != null">#{title},  </if>
 				<if test="amt != null">#{amt},  </if>

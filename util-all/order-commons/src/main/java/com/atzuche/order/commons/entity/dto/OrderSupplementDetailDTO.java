@@ -63,4 +63,9 @@ public class OrderSupplementDetailDTO {
 	 */
 	//@AutoDocProperty(value="单项补付金额",required=true)
 	private Integer payFlag;
+	
+	/**
+	 * 费用类型：1-补付费用，2-订单欠款
+	 */
+	private Integer cashType;
 }

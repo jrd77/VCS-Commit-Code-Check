@@ -3,6 +3,8 @@ package com.atzuche.order.rentercost.entity;
 import java.io.Serializable;
 import java.util.Date;
 
+import com.autoyol.doc.annotation.AutoDocProperty;
+
 import lombok.Data;
 
 
@@ -29,6 +31,14 @@ public class OrderSupplementDetailEntity implements Serializable {
 	 * 会员号
 	 */
 	private String memNo;
+	/**
+	 * 费用类型：1-补付费用，2-订单欠款
+	 */
+	private Integer cashType;
+	/**
+	 * 费用类型文案
+	 */
+	private String cashTypeTxt;
 	/**
 	 * 费用编码
 	 */
