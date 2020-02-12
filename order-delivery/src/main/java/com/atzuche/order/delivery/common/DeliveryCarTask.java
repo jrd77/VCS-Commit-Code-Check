@@ -1,5 +1,6 @@
 package com.atzuche.order.delivery.common;
 
+import com.atzuche.order.delivery.entity.RenterDeliveryAddrEntity;
 import com.atzuche.order.delivery.entity.RenterOrderDeliveryEntity;
 import com.atzuche.order.delivery.enums.ServiceTypeEnum;
 import com.atzuche.order.delivery.exception.DeliveryOrderException;
@@ -15,12 +16,14 @@ import com.atzuche.order.delivery.vo.delivery.RenYunFlowOrderDTO;
 import com.atzuche.order.delivery.vo.delivery.UpdateFlowOrderDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Objects;
 import java.util.concurrent.Future;
 
 /**
@@ -86,11 +89,16 @@ public class DeliveryCarTask {
     @Transactional(rollbackFor = Exception.class)
     public Future<Boolean> cancelOrderDelivery(String renterOrderNo, Integer serviceType,CancelOrderDeliveryVO cancelOrderDeliveryVO) {
         RenterOrderDeliveryEntity orderDeliveryEntity = renterOrderDeliveryService.findRenterOrderByRenterOrderNo(renterOrderNo, serviceType);
+
         if (null == orderDeliveryEntity) {
             log.info("没有找到该配送订单信息，renterOrderNo：{}",renterOrderNo);
             return new AsyncResult(false);
         }
         orderDeliveryEntity.setStatus(3);
+        orderDeliveryEntity.setIsNotifyRenyun(0);
+        orderDeliveryEntity.setRenterGetReturnAddr(orderDeliveryEntity.getOwnerGetReturnAddr());
+        orderDeliveryEntity.setRenterGetReturnAddrLat(orderDeliveryEntity.getOwnerGetReturnAddrLat());
+        orderDeliveryEntity.setRenterGetReturnAddrLon(orderDeliveryEntity.getOwnerGetReturnAddrLon());
         renterOrderDeliveryService.updateDeliveryByPrimaryKey(orderDeliveryEntity);
        return cancelRenYunFlowOrderInfo(cancelOrderDeliveryVO.getCancelFlowOrderDTO());
     }

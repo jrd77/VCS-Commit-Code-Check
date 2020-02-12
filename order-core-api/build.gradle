@@ -81,4 +81,6 @@ dependencies {
     compile("com.fasterxml.jackson.datatype:jackson-datatype-jdk8")
     compile("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
 
+    compile("com.autoframework:auto-mq-event:1.0-SNAPSHOT")
+
 }

@@ -42,11 +42,15 @@ public class CancelOrderCheckService {
      * @param orderNo 主订单号
      * @param isConsoleInvoke  是否是管理后台请求操作:true,是 false,否
      */
-    public void checkCancelOrder(String orderNo, boolean isConsoleInvoke) {
+    public void checkCancelOrder(String orderNo,String memNo, boolean isConsoleInvoke) {
 
         RenterOrderEntity renterOrderEntity = renterOrderService.getRenterOrderByOrderNoAndIsEffective(orderNo);
         if(null == renterOrderEntity) {
             logger.error("No valid renter order found. orderNo:[{}]", orderNo);
+            throw new CancelOrderCheckException(ErrorCode.ORDER_NOT_EXIST);
+        }
+        if(!renterOrderEntity.getRenterMemNo().equals(memNo)){
+            logger.warn("order and memNo 不一致,[orderNo={},memNo={}]",orderNo,memNo);
             throw new CancelOrderCheckException(ErrorCode.ORDER_NOT_EXIST);
         }
 

@@ -144,15 +144,15 @@ public class RenterOrderDeliveryEntity implements Serializable {
 
 
     public void setAheadOrDelayTimeInfo(Integer getMinutes, Integer returnMinutes,OrderDeliveryVO orderDeliveryVO) {
-        if (Objects.isNull(getMinutes) && Objects.isNull(returnMinutes)) {
-            setAheadOrDelayTime(0);
-        } else {
+		if (Objects.isNull(getMinutes) && Objects.isNull(returnMinutes)) {
+			setAheadOrDelayTime(0);
+		} else {
 			if (orderDeliveryVO.getOrderDeliveryDTO().getType().intValue() == 1) {
 				setAheadOrDelayTime(getMinutes);
 			} else {
 				setAheadOrDelayTime(returnMinutes);
 			}
-        }
+		}
 
-    }
+	}
 }

@@ -104,8 +104,7 @@ public class DeliveryCarInfoService {
                                                    RenterGoodsDetailDTO renterGoodsDetailDTO
                                                    ) {
         DeliveryCarVO deliveryCarVO = new DeliveryCarVO();
-        deliveryCarVO.setIsReturnCar(0);
-        deliveryCarVO.setIsGetCar(0);
+
         GetReturnCarCostReqDto getReturnCarCostReqDto = new GetReturnCarCostReqDto();
         for (RenterOrderDeliveryEntity renterOrderDeliveryEntity : renterOrderDeliveryEntityList) {
             if (null == renterOrderDeliveryEntity) {
@@ -113,9 +112,12 @@ public class DeliveryCarInfoService {
             }
             if(renterOrderDeliveryEntity.getType().intValue() == 1) {
                 getReturnCarCostReqDto.setIsGetCarCost(true);
+                deliveryCarVO.setIsGetCar(renterOrderDeliveryEntity.getIsNotifyRenyun());
+
                 ownerGetAndReturnCarDTO.setRealGetTime(DateUtils.formate(renterOrderDeliveryEntity.getRentTime().minusMinutes(renterOrderDeliveryEntity.getAheadOrDelayTime() == null ? 0 : renterOrderDeliveryEntity.getAheadOrDelayTime()),DateUtils.DATE_DEFAUTE_4));
             } else { //还车
                 getReturnCarCostReqDto.setIsReturnCarCost(true);
+                deliveryCarVO.setIsReturnCar(renterOrderDeliveryEntity.getIsNotifyRenyun());
                 ownerGetAndReturnCarDTO.setRealReturnTime(DateUtils.formate(renterOrderDeliveryEntity.getRevertTime().plusMinutes(renterOrderDeliveryEntity.getAheadOrDelayTime() == null ? 0 : renterOrderDeliveryEntity.getAheadOrDelayTime()),DateUtils.DATE_DEFAUTE_4));
             }
             getReturnCarCostReqDto.setCityCode(Integer.valueOf(renterOrderDeliveryEntity.getCityCode()));
@@ -199,7 +201,6 @@ public class DeliveryCarInfoService {
             getHandoverCarDTO.setOwnDefaultGetCarLat(renterGoodsDetailDTO.getCarRealLat());
             getHandoverCarDTO.setOwnRealReturnLng(renterGoodsDetailDTO.getCarRealLon());
             deliveryCarVO.setGetHandoverCarDTO(getHandoverCarDTO);
-            deliveryCarVO.setIsGetCar(1);
         } else if (renterOrderDeliveryEntity.getType() == 2 && renterOrderDeliveryEntity.getStatus() != 0) {
             ReturnHandoverCarDTO returnHandoverCarDTO = new ReturnHandoverCarDTO();
             returnHandoverCarDTO = returnHandoverCarInfo(returnHandoverCarDTO, renterOrderDeliveryEntity, carType);
@@ -217,7 +218,6 @@ public class DeliveryCarInfoService {
             returnHandoverCarDTO.setOwnDefaultReturnCarLat(renterGoodsDetailDTO.getCarRealLat());
             returnHandoverCarDTO.setOwnDefaultReturnCarLng(renterGoodsDetailDTO.getCarRealLon());
             deliveryCarVO.setReturnHandoverCarDTO(returnHandoverCarDTO);
-            deliveryCarVO.setIsReturnCar(1);
         }
     }
 
