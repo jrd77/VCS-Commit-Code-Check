@@ -15,7 +15,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.atzuche.order.coreapi.entity.request.ModifyApplyHandleReq;
 import com.atzuche.order.coreapi.entity.request.ModifyOrderAppReq;
 import com.atzuche.order.coreapi.entity.request.ModifyOrderReq;
-import com.atzuche.order.coreapi.service.ModifyOrderConfirmService;
+import com.atzuche.order.coreapi.entity.request.TransferReq;
+import com.atzuche.order.coreapi.service.ModifyOrderOwnerConfirmService;
 import com.atzuche.order.coreapi.service.ModifyOrderService;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
@@ -29,7 +30,7 @@ public class ModifyOrderController {
 	@Autowired
 	private ModifyOrderService modifyOrderService;
 	@Autowired
-	private ModifyOrderConfirmService modifyOrderConfirmService;
+	private ModifyOrderOwnerConfirmService modifyOrderOwnerConfirmService;
 	
 	/**
 	 * 修改订单（APP端或H5端）
@@ -83,6 +84,31 @@ public class ModifyOrderController {
             return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), error.isPresent() ?
                     error.get().getDefaultMessage() : ErrorCode.INPUT_ERROR.getText());
         }
-		return modifyOrderConfirmService.modifyConfirm(modifyApplyHandleReq);
+		return modifyOrderOwnerConfirmService.modifyConfirm(modifyApplyHandleReq);
+	}
+	
+	
+	/**
+	 * 换车操作
+	 * @param modifyOrderReq
+	 * @param bindingResult
+	 * @return ResponseData
+	 */
+	@PostMapping("/order/transfer")
+	public ResponseData<?> transfer(@Valid @RequestBody TransferReq transferReq, BindingResult bindingResult) {
+		log.info("换车操作transferReq=[{}] ", transferReq);
+		if (bindingResult.hasErrors()) {
+            Optional<FieldError> error = bindingResult.getFieldErrors().stream().findFirst();
+            return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), error.isPresent() ?
+                    error.get().getDefaultMessage() : ErrorCode.INPUT_ERROR.getText());
+        }
+		// 属性拷贝
+		ModifyOrderReq modifyOrderReq = new ModifyOrderReq();
+		BeanUtils.copyProperties(transferReq, modifyOrderReq);
+		// 设置为管理后台修改
+		modifyOrderReq.setConsoleFlag(true);
+		// 设置为换车操作
+		modifyOrderReq.setTransferFlag(true);
+		return modifyOrderService.modifyOrder(modifyOrderReq);
 	}
 }

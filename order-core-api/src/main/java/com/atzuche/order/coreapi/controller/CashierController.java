@@ -34,7 +34,7 @@ public class CashierController {
     public ResponseData<OrderPayableAmountResVO> getOrderPayableAmount(@Valid @RequestBody OrderPayReqVO orderPayReqVO) {
         log.info("CashierController getOrderPayableAmount start param [{}]", GsonUtils.toJson(orderPayReqVO));
         OrderPayableAmountResVO result = cashierPayService.getOrderPayableAmount(orderPayReqVO);
-        log.info("CashierController getOrderPayableAmount end param [{}],result [{}]", GsonUtils.toJson(orderPayReqVO),result);
+        log.info("CashierController getOrderPayableAmount end param [{}],result [{}]", GsonUtils.toJson(orderPayReqVO),GsonUtils.toJson(result));
         return ResponseData.success(result);
     }
     /**

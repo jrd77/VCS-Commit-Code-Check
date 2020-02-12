@@ -129,4 +129,12 @@ public interface RenterOrderWzDetailMapper{
 	 * @return 违章详情
 	 */
 	List<RenterOrderWzDetailEntity> findTransIllegalDetailByOrderNo(String orderNo);
+
+	/**
+	 * 查询 是否存在 违章记录
+	 * @param orderNo 订单号
+	 * @param illegalNum 主键
+	 * @return
+	 */
+    Integer getIllegalDetailCount(@Param("orderNo") String orderNo,@Param("illegalNum")  String illegalNum);
 }

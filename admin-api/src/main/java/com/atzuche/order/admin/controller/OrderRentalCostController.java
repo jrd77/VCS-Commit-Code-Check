@@ -1,17 +1,20 @@
 package com.atzuche.order.admin.controller;
 
+import com.atzuche.order.admin.service.AdminDeliveryCarService;
 import com.atzuche.order.admin.vo.req.cost.OwnerInComeReqVO;
 import com.atzuche.order.admin.vo.req.cost.RentalCostReqVO;
 import com.atzuche.order.admin.vo.resp.cost.*;
 import com.atzuche.order.admin.vo.resp.income.OwnerInComeRepVO;
 import com.atzuche.order.admin.vo.resp.income.OwnerToPlatFormVO;
 import com.atzuche.order.admin.vo.resp.income.PlatFormToOwnerVO;
+import com.atzuche.order.delivery.vo.delivery.req.DeliveryCarRepVO;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.doc.annotation.AutoDocGroup;
 import com.autoyol.doc.annotation.AutoDocMethod;
 import com.autoyol.doc.annotation.AutoDocVersion;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,10 +23,14 @@ import org.springframework.web.bind.annotation.RestController;
 /**
  * @author 胡春林
  * 租车费用相关接口
+ * 该类中注释掉的接口方法 分离挪动到 OrderRentalCostDetailController 租客费用明细类中。余下的保留不动。
  */
 @RestController
-@RequestMapping("/api/cost")
+@RequestMapping("/console/api/cost")
 public class OrderRentalCostController {
+
+    @Autowired
+    private AdminDeliveryCarService deliveryCarInfoService;
 
     /**
      * 查询租车费用
@@ -35,7 +42,7 @@ public class OrderRentalCostController {
     @AutoDocMethod(description = "租车费用", value = "租车费用",response = RentalCostRepVO.class)
     @PostMapping("/list")
     public ResponseData<?> findRentalCostListByOrderNo(@RequestBody RentalCostReqVO rentalCostReqVO) {
-        if (null == rentalCostReqVO || StringUtils.isBlank(rentalCostReqVO.getRenterOrderNo())) {
+        if (null == rentalCostReqVO || StringUtils.isBlank(rentalCostReqVO.getOrderNo())) {
             return ResponseData.createErrorCodeResponse(ErrorCode.ORDER_NO_PARAM_ERROR.getCode(), "租客子订单编号为空");
         }
         return ResponseData.success();
@@ -191,32 +198,32 @@ public class OrderRentalCostController {
      * @param ownerInComeReqVO
      * @return
      */
-    @AutoDocVersion(version = "管理后台租客车主互相调价")
-    @AutoDocGroup(group = "管理后台平台租客车主互相调价")
-    @AutoDocMethod(description = "租客车主互相调价", value = "租客车主互相调价",response = ResponseData.class)
-    @PostMapping("/priceAdjustment/list")
-    public ResponseData<?> findPriceAdjustmentListByOrderNo(@RequestBody OwnerInComeReqVO ownerInComeReqVO) {
+    @AutoDocVersion(version = "管理后台车主租客互相调价")
+    @AutoDocGroup(group = "管理后台平台车主租客互相调价")
+    @AutoDocMethod(description = "车主租客互相调价", value = "车主租客互相调价",response = ResponseData.class)
+    @PostMapping("/ownerPriceAdjustment/list")
+    public ResponseData<?> findOwnerPriceAdjustmentListByOrderNo(@RequestBody OwnerInComeReqVO ownerInComeReqVO) {
         if (null == ownerInComeReqVO || StringUtils.isBlank(ownerInComeReqVO.getOwnerOrderNo())) {
             return ResponseData.createErrorCodeResponse(ErrorCode.ORDER_NO_PARAM_ERROR.getCode(), "租客子订单编号为空");
         }
         return ResponseData.success();
     }
 
-    /**
-     * 违约罚金
-     * @param ownerInComeReqVO
-     * @return
-     */
-    @AutoDocVersion(version = "管理后台违约罚金")
-    @AutoDocGroup(group = "管理后台平台违约罚金")
-    @AutoDocMethod(description = "违约罚金", value = "违约罚金",response = ResponseData.class)
-    @PostMapping("/falsifyAmt/list")
-    public ResponseData<?> findfalsifyAmtListByOrderNo(@RequestBody OwnerInComeReqVO ownerInComeReqVO) {
-        if (null == ownerInComeReqVO || StringUtils.isBlank(ownerInComeReqVO.getOwnerOrderNo())) {
-            return ResponseData.createErrorCodeResponse(ErrorCode.ORDER_NO_PARAM_ERROR.getCode(), "租客子订单编号为空");
-        }
-        return ResponseData.success();
-    }
+//    /**
+//     * 违约罚金
+//     * @param ownerInComeReqVO
+//     * @return
+//     */
+//    @AutoDocVersion(version = "管理后台违约罚金")
+//    @AutoDocGroup(group = "管理后台平台违约罚金")
+//    @AutoDocMethod(description = "违约罚金", value = "违约罚金",response = ResponseData.class)
+//    @PostMapping("/falsifyAmt/list")
+//    public ResponseData<?> findfalsifyAmtListByOrderNo(@RequestBody OwnerInComeReqVO ownerInComeReqVO) {
+//        if (null == ownerInComeReqVO || StringUtils.isBlank(ownerInComeReqVO.getOwnerOrderNo())) {
+//            return ResponseData.createErrorCodeResponse(ErrorCode.ORDER_NO_PARAM_ERROR.getCode(), "租客子订单编号为空");
+//        }
+//        return ResponseData.success();
+//    }
 
     /**
      * 车主租金
@@ -239,32 +246,32 @@ public class OrderRentalCostController {
      * @param rentalCostReqVO
      * @return
      */
-    @AutoDocVersion(version = "管理后台减免明细")
-    @AutoDocGroup(group = "管理后台减免明细")
-    @AutoDocMethod(description = "减免明细", value = "减免明细",response = ResponseData.class)
-    @PostMapping("/waiverDetails/list")
-    public ResponseData<?> findWaiverDetailsListByOrderNo(@RequestBody RentalCostReqVO rentalCostReqVO) {
-        if (null == rentalCostReqVO || StringUtils.isBlank(rentalCostReqVO.getRenterOrderNo())) {
-            return ResponseData.createErrorCodeResponse(ErrorCode.ORDER_NO_PARAM_ERROR.getCode(), "租客子订单编号为空");
-        }
-        return ResponseData.success();
-    }
+//    @AutoDocVersion(version = "管理后台减免明细")
+//    @AutoDocGroup(group = "管理后台减免明细")
+//    @AutoDocMethod(description = "减免明细", value = "减免明细",response = ResponseData.class)
+//    @PostMapping("/waiverDetails/list")
+//    public ResponseData<?> findWaiverDetailsListByOrderNo(@RequestBody RentalCostReqVO rentalCostReqVO) {
+//        if (null == rentalCostReqVO || StringUtils.isBlank(rentalCostReqVO.getOrderNo())) {
+//            return ResponseData.createErrorCodeResponse(ErrorCode.ORDER_NO_PARAM_ERROR.getCode(), "租客子订单编号为空");
+//        }
+//        return ResponseData.success();
+//    }
 
     /**
      *平台给租客的补贴
      * @param rentalCostReqVO
      * @return
      */
-    @AutoDocVersion(version = "管理后台平台给租客的补贴")
-    @AutoDocGroup(group = "管理后台平台给租客的补贴")
-    @AutoDocMethod(description = "平台给租客的补贴", value = "平台给租客的补贴",response = ResponseData.class)
-    @PostMapping("/platFormToRenter/list")
-    public ResponseData<?> findPlatFormToRenterListByOrderNo(@RequestBody RentalCostReqVO rentalCostReqVO) {
-        if (null == rentalCostReqVO || StringUtils.isBlank(rentalCostReqVO.getRenterOrderNo())) {
-            return ResponseData.createErrorCodeResponse(ErrorCode.ORDER_NO_PARAM_ERROR.getCode(), "租客子订单编号为空");
-        }
-        return ResponseData.success();
-    }
+//    @AutoDocVersion(version = "管理后台平台给租客的补贴")
+//    @AutoDocGroup(group = "管理后台平台给租客的补贴")
+//    @AutoDocMethod(description = "平台给租客的补贴", value = "平台给租客的补贴",response = ResponseData.class)
+//    @PostMapping("/platFormToRenter/list")
+//    public ResponseData<?> findPlatFormToRenterListByOrderNo(@RequestBody RentalCostReqVO rentalCostReqVO) {
+//        if (null == rentalCostReqVO || StringUtils.isBlank(rentalCostReqVO.getOrderNo())) {
+//            return ResponseData.createErrorCodeResponse(ErrorCode.ORDER_NO_PARAM_ERROR.getCode(), "租客子订单编号为空");
+//        }
+//        return ResponseData.success();
+//    }
 
     /**
      *配送费用
@@ -273,13 +280,13 @@ public class OrderRentalCostController {
      */
     @AutoDocVersion(version = "管理后台平台给租客的补贴")
     @AutoDocGroup(group = "管理后台平台给租客的补贴")
-    @AutoDocMethod(description = "平台给租客的补贴", value = "平台给租客的补贴",response = DistributionCostVO.class)
+    @AutoDocMethod(description = "配送费用明细", value = "配送费用明细",response = DistributionCostVO.class)
     @PostMapping("/distributionCost/list")
-    public ResponseData<?> findDistributionCostListByOrderNo(@RequestBody RentalCostReqVO rentalCostReqVO) {
-        if (null == rentalCostReqVO || StringUtils.isBlank(rentalCostReqVO.getRenterOrderNo())) {
-            return ResponseData.createErrorCodeResponse(ErrorCode.ORDER_NO_PARAM_ERROR.getCode(), "租客子订单编号为空");
+    public ResponseData<?> findDistributionCostListByOrderNo(@RequestBody DeliveryCarRepVO rentalCostReqVO) {
+        if (null == rentalCostReqVO || StringUtils.isBlank(rentalCostReqVO.getOrderNo())) {
+            return ResponseData.createErrorCodeResponse(ErrorCode.ORDER_NO_PARAM_ERROR.getCode(), "订单编号为空");
         }
-        return ResponseData.success();
+        return ResponseData.success(deliveryCarInfoService.findDeliveryCostByOrderNo(rentalCostReqVO));
     }
 
 
@@ -288,16 +295,16 @@ public class OrderRentalCostController {
      * @param rentalCostReqVO
      * @return
      */
-    @AutoDocVersion(version = "管理后台租客租金")
-    @AutoDocGroup(group = "管理后台租客租金")
-    @AutoDocMethod(description = "租客租金", value = "租客租金",response = ResponseData.class)
-    @PostMapping("/tenantRent/list")
-    public ResponseData<?> findTenantRentListByOrderNo(@RequestBody RentalCostReqVO rentalCostReqVO) {
-        if (null == rentalCostReqVO || StringUtils.isBlank(rentalCostReqVO.getRenterOrderNo())) {
-            return ResponseData.createErrorCodeResponse(ErrorCode.ORDER_NO_PARAM_ERROR.getCode(), "租客子订单编号为空");
-        }
-        return ResponseData.success();
-    }
+//    @AutoDocVersion(version = "管理后台租客租金")
+//    @AutoDocGroup(group = "管理后台租客租金")
+//    @AutoDocMethod(description = "租客租金", value = "租客租金",response = ResponseData.class)
+//    @PostMapping("/tenantRent/list")
+//    public ResponseData<?> findTenantRentListByOrderNo(@RequestBody RentalCostReqVO rentalCostReqVO) {
+//        if (null == rentalCostReqVO || StringUtils.isBlank(rentalCostReqVO.getOrderNo())) {
+//            return ResponseData.createErrorCodeResponse(ErrorCode.ORDER_NO_PARAM_ERROR.getCode(), "租客子订单编号为空");
+//        }
+//        return ResponseData.success();
+//    }
 
 
     /**
@@ -305,44 +312,44 @@ public class OrderRentalCostController {
      * @param rentalCostReqVO
      * @return
      */
-    @AutoDocVersion(version = "管理后台附加驾驶员险")
-    @AutoDocGroup(group = "管理后台附加驾驶员险")
-    @AutoDocMethod(description = "附加驾驶员险", value = "附加驾驶员险",response = AdditionalDriverInsuranceVO.class)
-    @PostMapping("/additionalDriverInsurance/list")
-    public ResponseData<?> findAdditionalDriverInsuranceByOrderNo(@RequestBody RentalCostReqVO rentalCostReqVO) {
-        if (null == rentalCostReqVO || StringUtils.isBlank(rentalCostReqVO.getRenterOrderNo())) {
-            return ResponseData.createErrorCodeResponse(ErrorCode.ORDER_NO_PARAM_ERROR.getCode(), "租客子订单编号为空");
-        }
-        return ResponseData.success();
-    }
+//    @AutoDocVersion(version = "管理后台附加驾驶员险")
+//    @AutoDocGroup(group = "管理后台附加驾驶员险")
+//    @AutoDocMethod(description = "附加驾驶员险", value = "附加驾驶员险",response = AdditionalDriverInsuranceVO.class)
+//    @PostMapping("/additionalDriverInsurance/list")
+//    public ResponseData<?> findAdditionalDriverInsuranceByOrderNo(@RequestBody RentalCostReqVO rentalCostReqVO) {
+//        if (null == rentalCostReqVO || StringUtils.isBlank(rentalCostReqVO.getOrderNo())) {
+//            return ResponseData.createErrorCodeResponse(ErrorCode.ORDER_NO_PARAM_ERROR.getCode(), "租客子订单编号为空");
+//        }
+//        return ResponseData.success();
+//    }
 
     /**
      *附加驾驶员险
      * @param additionalDriverInsuranceVO
      * @return
      */
-    @AutoDocVersion(version = "管理后台附加驾驶员险")
-    @AutoDocGroup(group = "管理后台附加驾驶员险")
-    @AutoDocMethod(description = "新增附加驾驶员险", value = "新增附加驾驶员险",response = ResponseData.class)
-    @PostMapping("/additionalDriverInsurance/add")
-    public ResponseData<?> insertAdditionalDriverInsuranceByOrderNo(@RequestBody AdditionalDriverInsuranceVO additionalDriverInsuranceVO) {
-        if (null == additionalDriverInsuranceVO || StringUtils.isBlank(additionalDriverInsuranceVO.getRenterOrderNo())) {
-            return ResponseData.createErrorCodeResponse(ErrorCode.ORDER_NO_PARAM_ERROR.getCode(), "租客子订单编号为空");
-        }
-        return ResponseData.success();
-    }
+//    @AutoDocVersion(version = "管理后台附加驾驶员险")
+//    @AutoDocGroup(group = "管理后台附加驾驶员险")
+//    @AutoDocMethod(description = "新增附加驾驶员险", value = "新增附加驾驶员险",response = ResponseData.class)
+//    @PostMapping("/additionalDriverInsurance/add")
+//    public ResponseData<?> insertAdditionalDriverInsuranceByOrderNo(@RequestBody AdditionalDriverInsuranceVO additionalDriverInsuranceVO) {
+//        if (null == additionalDriverInsuranceVO || StringUtils.isBlank(additionalDriverInsuranceVO.getRenterOrderNo())) {
+//            return ResponseData.createErrorCodeResponse(ErrorCode.ORDER_NO_PARAM_ERROR.getCode(), "租客子订单编号为空");
+//        }
+//        return ResponseData.success();
+//    }
 
     /**
      *违约罚金
      * @param rentalCostReqVO
      * @return
      */
-    @AutoDocVersion(version = "管理后台违约罚金")
+    
     @AutoDocGroup(group = "管理后台违约罚金")
     @AutoDocMethod(description = "违约罚金", value = "违约罚金",response = PenaltyContractVO.class)
     @PostMapping("/penaltyContract/list")
     public ResponseData<?> findPenaltyContractByOrderNo(@RequestBody RentalCostReqVO rentalCostReqVO) {
-        if (null == rentalCostReqVO || StringUtils.isBlank(rentalCostReqVO.getRenterOrderNo())) {
+        if (null == rentalCostReqVO || StringUtils.isBlank(rentalCostReqVO.getOrderNo())) {
             return ResponseData.createErrorCodeResponse(ErrorCode.ORDER_NO_PARAM_ERROR.getCode(), "租客子订单编号为空");
         }
         return ResponseData.success();
@@ -369,64 +376,64 @@ public class OrderRentalCostController {
      * @param priceAdjustmentVO
      * @return
      */
-    @AutoDocVersion(version = "管理后台租客车主互相调价")
-    @AutoDocGroup(group = "管理后台租客车主互相调价")
-    @AutoDocMethod(description = "租客车主互相调价", value = "租客车主互相调价",response = ResponseData.class)
-    @PostMapping("/priceAdjustment/update")
-    public ResponseData<?> updatePriceAdjustmentByOrderNo(@RequestBody PriceAdjustmentVO priceAdjustmentVO) {
-        if (null == priceAdjustmentVO || StringUtils.isBlank(priceAdjustmentVO.getRenterOrderNo())) {
-            return ResponseData.createErrorCodeResponse(ErrorCode.ORDER_NO_PARAM_ERROR.getCode(), "租客子订单编号为空");
-        }
-        return ResponseData.success();
-    }
+//    @AutoDocVersion(version = "管理后台租客车主互相调价")
+//    @AutoDocGroup(group = "管理后台租客车主互相调价")
+//    @AutoDocMethod(description = "租客车主互相调价", value = "租客车主互相调价",response = ResponseData.class)
+//    @PostMapping("/priceAdjustment/update")
+//    public ResponseData<?> updatePriceAdjustmentByOrderNo(@RequestBody PriceAdjustmentVO priceAdjustmentVO) {
+//        if (null == priceAdjustmentVO || StringUtils.isBlank(priceAdjustmentVO.getRenterOrderNo())) {
+//            return ResponseData.createErrorCodeResponse(ErrorCode.ORDER_NO_PARAM_ERROR.getCode(), "租客子订单编号为空");
+//        }
+//        return ResponseData.success();
+//    }
 
     /**
      *租客车主互相调价
      * @param rentalCostReqVO
      * @return
      */
-    @AutoDocVersion(version = "管理后台租客车主互相调价")
-    @AutoDocGroup(group = "管理后台租客车主互相调价")
-    @AutoDocMethod(description = "租客车主互相调价", value = "租客车主互相调价",response = PriceAdjustmentVO.class)
-    @PostMapping("/renterPriceAdjustment/list")
-    public ResponseData<?> findPriceAdjustmentByOrderNo(@RequestBody RentalCostReqVO rentalCostReqVO) {
-        if (null == rentalCostReqVO || StringUtils.isBlank(rentalCostReqVO.getRenterOrderNo())) {
-            return ResponseData.createErrorCodeResponse(ErrorCode.ORDER_NO_PARAM_ERROR.getCode(), "租客子订单编号为空");
-        }
-        return ResponseData.success();
-    }
+//    @AutoDocVersion(version = "管理后台租客车主互相调价")
+//    @AutoDocGroup(group = "管理后台租客车主互相调价")
+//    @AutoDocMethod(description = "租客车主互相调价", value = "租客车主互相调价",response = PriceAdjustmentVO.class)
+//    @PostMapping("/renterPriceAdjustment/list")
+//    public ResponseData<?> findPriceAdjustmentByOrderNo(@RequestBody RentalCostReqVO rentalCostReqVO) {
+//        if (null == rentalCostReqVO || StringUtils.isBlank(rentalCostReqVO.getOrderNo())) {
+//            return ResponseData.createErrorCodeResponse(ErrorCode.ORDER_NO_PARAM_ERROR.getCode(), "租客子订单编号为空");
+//        }
+//        return ResponseData.success();
+//    }
 
     /**
      * 租客需支付给平台的费用
      * @param rentalCostReqVO
      * @return
      */
-    @AutoDocVersion(version = "管理后台租客需支付给平台的费用")
-    @AutoDocGroup(group = "管理后台平台租客需支付给平台的费用")
-    @AutoDocMethod(description = "租客需支付给平台的费用", value = "租客需支付给平台的费用",response = OwnerToPlatFormVO.class)
-    @PostMapping("/renterToPlatForm/list")
-    public ResponseData<?> findRenterToPlatFormListByOrderNo(@RequestBody RentalCostReqVO rentalCostReqVO) {
-        if (null == rentalCostReqVO || StringUtils.isBlank(rentalCostReqVO.getRenterOrderNo())) {
-            return ResponseData.createErrorCodeResponse(ErrorCode.ORDER_NO_PARAM_ERROR.getCode(), "租客子订单编号为空");
-        }
-        return ResponseData.success();
-    }
+//    @AutoDocVersion(version = "管理后台租客需支付给平台的费用")
+//    @AutoDocGroup(group = "管理后台平台租客需支付给平台的费用")
+//    @AutoDocMethod(description = "租客需支付给平台的费用", value = "租客需支付给平台的费用",response = OwnerToPlatFormVO.class)
+//    @PostMapping("/renterToPlatForm/list")
+//    public ResponseData<?> findRenterToPlatFormListByOrderNo(@RequestBody RentalCostReqVO rentalCostReqVO) {
+//        if (null == rentalCostReqVO || StringUtils.isBlank(rentalCostReqVO.getOrderNo())) {
+//            return ResponseData.createErrorCodeResponse(ErrorCode.ORDER_NO_PARAM_ERROR.getCode(), "租客子订单编号为空");
+//        }
+//        return ResponseData.success();
+//    }
 
     /**
      * 租客需支付给平台的费用
      * @param ownerToPlatFormVO
      * @return
      */
-    @AutoDocVersion(version = "管理后台租客需支付给平台的费用")
-    @AutoDocGroup(group = "管理后台平台租客需支付给平台的费用")
-    @AutoDocMethod(description = "租客需支付给平台的费用", value = "租客需支付给平台的费用",response = OwnerToPlatFormVO.class)
-    @PostMapping("/ownerToPlatForm/update")
-    public ResponseData<?> updateRenterToPlatFormListByOrderNo(@RequestBody OwnerToPlatFormVO ownerToPlatFormVO) {
-        if (null == ownerToPlatFormVO || StringUtils.isBlank(ownerToPlatFormVO.getRenterOrderNo())) {
-            return ResponseData.createErrorCodeResponse(ErrorCode.ORDER_NO_PARAM_ERROR.getCode(), "租客子订单编号为空");
-        }
-        return ResponseData.success();
-    }
+//    @AutoDocVersion(version = "管理后台租客需支付给平台的费用")
+//    @AutoDocGroup(group = "管理后台平台租客需支付给平台的费用")
+//    @AutoDocMethod(description = "租客需支付给平台的费用", value = "租客需支付给平台的费用",response = OwnerToPlatFormVO.class)
+//    @PostMapping("/ownerToPlatForm/update")
+//    public ResponseData<?> updateRenterToPlatFormListByOrderNo(@RequestBody OwnerToPlatFormVO ownerToPlatFormVO) {
+//        if (null == ownerToPlatFormVO || StringUtils.isBlank(ownerToPlatFormVO.getRenterOrderNo())) {
+//            return ResponseData.createErrorCodeResponse(ErrorCode.ORDER_NO_PARAM_ERROR.getCode(), "租客子订单编号为空");
+//        }
+//        return ResponseData.success();
+//    }
 
 
 

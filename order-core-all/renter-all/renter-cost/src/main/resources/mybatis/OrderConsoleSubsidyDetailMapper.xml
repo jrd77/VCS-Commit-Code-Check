@@ -232,5 +232,10 @@
 		and mem_no = #{memNo}
 		and is_delete = 0
 	</select>
+	
+	<delete id="deleteConsoleSubsidyByOrderNoAndCode">
+		DELETE FROM order_console_subsidy_detail WHERE order_no = #{orderNo}
+		AND subsidy_cost_code = #{subsidyCostCode}
+	</delete>
   	
 </mapper>

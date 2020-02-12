@@ -1,6 +1,8 @@
 package com.atzuche.order.coreapi.service;
 
 import com.alibaba.fastjson.JSON;
+import com.atzuche.order.accountownercost.entity.AccountOwnerCostSettleEntity;
+import com.atzuche.order.accountownercost.service.AccountOwnerCostSettleService;
 import com.atzuche.order.accountownerincome.entity.AccountOwnerIncomeDetailEntity;
 import com.atzuche.order.accountownerincome.service.notservice.AccountOwnerIncomeDetailNoTService;
 import com.atzuche.order.accountrenterdeposit.entity.AccountRenterDepositDetailEntity;
@@ -13,31 +15,35 @@ import com.atzuche.order.accountrenterdetain.service.notservice.AccountRenterDet
 import com.atzuche.order.accountrenterdetain.service.notservice.AccountRenterDetainDetailNoTService;
 import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostDetailEntity;
 import com.atzuche.order.accountrenterrentcost.service.notservice.AccountRenterCostDetailNoTService;
+import com.atzuche.order.commons.CostStatUtils;
+import com.atzuche.order.commons.GlobalConstant;
+import com.atzuche.order.commons.LocalDateTimeUtils;
 import com.atzuche.order.commons.OrderException;
 import com.atzuche.order.commons.entity.dto.OwnerMemberDTO;
 import com.atzuche.order.commons.entity.dto.OwnerMemberRightDTO;
 import com.atzuche.order.commons.entity.dto.RenterMemberDTO;
 import com.atzuche.order.commons.entity.dto.*;
 import com.atzuche.order.commons.entity.orderDetailDto.*;
-import com.atzuche.order.commons.enums.DeliveryOrderTypeEnum;
+import com.atzuche.order.commons.entity.ownerOrderDetail.*;
+import com.atzuche.order.commons.enums.*;
+import com.atzuche.order.coreapi.modifyorder.exception.NoEffectiveErrException;
 import com.atzuche.order.coreapi.submitOrder.exception.OrderDetailException;
 import com.atzuche.order.delivery.entity.OwnerHandoverCarInfoEntity;
 import com.atzuche.order.delivery.entity.RenterHandoverCarInfoEntity;
 import com.atzuche.order.delivery.entity.RenterOrderDeliveryEntity;
 import com.atzuche.order.delivery.enums.RenterHandoverCarTypeEnum;
 import com.atzuche.order.delivery.service.RenterOrderDeliveryService;
+import com.atzuche.order.delivery.service.delivery.DeliveryCarInfoPriceService;
 import com.atzuche.order.delivery.service.handover.OwnerHandoverCarService;
 import com.atzuche.order.delivery.service.handover.RenterHandoverCarService;
+import com.atzuche.order.delivery.vo.delivery.DeliveryOilCostVO;
+import com.atzuche.order.delivery.vo.delivery.rep.OwnerGetAndReturnCarDTO;
+import com.atzuche.order.flow.entity.OrderFlowEntity;
+import com.atzuche.order.flow.service.OrderFlowService;
 import com.atzuche.order.owner.commodity.service.OwnerGoodsService;
 import com.atzuche.order.owner.mem.service.OwnerMemberService;
-import com.atzuche.order.ownercost.entity.ConsoleOwnerOrderFineDeatailEntity;
-import com.atzuche.order.ownercost.entity.OwnerOrderEntity;
-import com.atzuche.order.ownercost.entity.OwnerOrderFineDeatailEntity;
-import com.atzuche.order.ownercost.entity.OwnerOrderPurchaseDetailEntity;
-import com.atzuche.order.ownercost.service.ConsoleOwnerOrderFineDeatailService;
-import com.atzuche.order.ownercost.service.OwnerOrderFineDeatailService;
-import com.atzuche.order.ownercost.service.OwnerOrderPurchaseDetailService;
-import com.atzuche.order.ownercost.service.OwnerOrderService;
+import com.atzuche.order.ownercost.entity.*;
+import com.atzuche.order.ownercost.service.*;
 import com.atzuche.order.parentorder.entity.OrderCancelReasonEntity;
 import com.atzuche.order.parentorder.entity.OrderEntity;
 import com.atzuche.order.parentorder.entity.OrderSourceStatEntity;
@@ -50,13 +56,17 @@ import com.atzuche.order.rentercommodity.service.RenterGoodsService;
 import com.atzuche.order.rentercost.entity.RenterOrderCostDetailEntity;
 import com.atzuche.order.rentercost.entity.RenterOrderCostEntity;
 import com.atzuche.order.rentercost.entity.RenterOrderFineDeatailEntity;
+import com.atzuche.order.rentercost.entity.RenterOrderSubsidyDetailEntity;
 import com.atzuche.order.rentercost.service.RenterOrderCostDetailService;
 import com.atzuche.order.rentercost.service.RenterOrderCostService;
 import com.atzuche.order.rentercost.service.RenterOrderFineDeatailService;
+import com.atzuche.order.rentercost.service.RenterOrderSubsidyDetailService;
 import com.atzuche.order.rentermem.service.RenterMemberService;
+import com.atzuche.order.renterorder.entity.OrderCouponEntity;
 import com.atzuche.order.renterorder.entity.RenterAdditionalDriverEntity;
 import com.atzuche.order.renterorder.entity.RenterDepositDetailEntity;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
+import com.atzuche.order.renterorder.service.OrderCouponService;
 import com.atzuche.order.renterorder.service.RenterAdditionalDriverService;
 import com.atzuche.order.renterorder.service.RenterDepositDetailService;
 import com.atzuche.order.renterorder.service.RenterOrderService;
@@ -67,6 +77,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -129,6 +140,20 @@ public class OrderDetailService {
     private OwnerOrderFineDeatailService ownerOrderFineDeatailService;
     @Autowired
     private RenterOrderFineDeatailService renterOrderFineDeatailService;
+    @Autowired
+    private RenterOrderSubsidyDetailService renterOrderSubsidyDetailService;
+    @Autowired
+    private OwnerOrderSubsidyDetailService ownerOrderSubsidyDetailService;
+    @Autowired
+    private OrderCouponService orderCouponService;
+    @Autowired
+    private OwnerOrderIncrementDetailService ownerOrderIncrementDetailService;
+    @Autowired
+    private AccountOwnerCostSettleService accountOwnerCostSettleService;
+    @Autowired
+    private DeliveryCarInfoPriceService deliveryCarInfoPriceService;
+    @Autowired
+    private OrderFlowService orderFlowService;
 
     public ResponseData<OrderDetailRespDTO> orderDetail(OrderDetailReqDTO orderDetailReqDTO){
         log.info("准备获取订单详情orderDetailReqDTO={}", JSON.toJSONString(orderDetailReqDTO));
@@ -232,8 +257,29 @@ public class OrderDetailService {
             log.error("获取订单数据为空orderNo={}",orderNo);
             throw new OrderDetailException();
         }
-        OrderDTO orderDTO = new OrderDTO();
-        BeanUtils.copyProperties(orderEntity,orderDTO);
+        //统计信息
+        OrderSourceStatEntity orderSourceStatEntity = orderSourceStatService.selectByOrderNo(orderNo);
+        OrderStatusEntity orderStatusEntity = orderStatusService.getByOrderNo(orderNo);
+        OrderFlowEntity orderFlowEntity = orderFlowService.getByOrderNoAndStatus(orderNo, orderStatusEntity.getStatus());
+        OrderDetailDTO orderDetailDTO = new OrderDetailDTO();
+        orderDetailDTO.statusUpdateTIme = null;
+        orderDetailDTO.orderStatus = OrderStatusEnum.getDescByStatus(orderStatusEntity.getStatus());
+        if(orderSourceStatEntity != null){
+            String category = CategoryEnum.getNameByCode(orderSourceStatEntity.getCategory());
+            String businessParentType = BusinessParentTypeEnum.getNameByCode(orderSourceStatEntity.getBusinessParentType());
+            String platformParentType = PlatformParentTypeEnum.getNameByCode(orderSourceStatEntity.getPlatformParentType());
+            String platformChildType = PlatformChildTypeEnum.getNameByCode(orderSourceStatEntity.getPlatformChildType());
+            orderDetailDTO.paySource = PaySourceEnum.getNameByCode(orderSourceStatEntity.getPaySource());
+            orderDetailDTO.orderSource = (category==null?"":category) + "/" + (businessParentType==null?"":businessParentType) + "/" + (platformParentType==null?"":platformParentType) + "/" + (platformChildType==null?"":platformChildType);
+        }
+        if(orderFlowEntity != null){
+            LocalDateTime createTime = orderFlowEntity.getCreateTime();
+            orderDetailDTO.totalRentTime = createTime != null ? LocalDateTimeUtils.localdateToString(createTime,GlobalConstant.FORMAT_DATE_STR1):null;
+        }
+        orderDetailDTO.rentTimeStr = LocalDateTimeUtils.localdateToString(orderEntity.getExpRentTime(),GlobalConstant.FORMAT_DATE_STR1);
+        orderDetailDTO.revertTimeStr = LocalDateTimeUtils.localdateToString(orderEntity.getExpRevertTime(),GlobalConstant.FORMAT_DATE_STR1);
+        orderDetailDTO.orderNo = orderNo;
+
 
         //租客历史订单
         List<RenterDetailDTO> renterDetailDTOS = new ArrayList<>();
@@ -243,6 +289,9 @@ public class OrderDetailService {
                 RenterDetailDTO renterDetailDTO = new RenterDetailDTO();
                 RenterOrderDTO renterOrderDTO = new RenterOrderDTO();
                 BeanUtils.copyProperties(x,renterOrderDTO);
+                renterOrderDTO.setIsEffectiveTxt(EffectiveEnum.getName(x.getIsEffective()));
+                renterOrderDTO.setExpRevertTimeStr(x.getExpRevertTime()!=null? LocalDateTimeUtils.localdateToString(x.getExpRevertTime(), GlobalConstant.FORMAT_DATE_STR1):null);
+                renterOrderDTO.setExpRentTimeStr(x.getExpRentTime()!=null?LocalDateTimeUtils.localdateToString(x.getExpRentTime(), GlobalConstant.FORMAT_DATE_STR1):null);
                 RenterGoodsDetailDTO renterGoodsDetail = renterGoodsService.getRenterGoodsDetail(x.getRenterOrderNo(), false);
                 RenterMemberDTO renterMemberDTO = renterMemberService.selectrenterMemberByRenterOrderNo(x.getRenterOrderNo(), false);
                 renterDetailDTO.setRenterOrderDTO(renterOrderDTO);
@@ -259,6 +308,9 @@ public class OrderDetailService {
                 OwnerDetailDTO ownerDetailDTO = new OwnerDetailDTO();
                 OwnerOrderDTO ownerOrderDTO = new OwnerOrderDTO();
                 BeanUtils.copyProperties(x,ownerOrderDTO);
+                ownerOrderDTO.setIsEffectiveTxt(EffectiveEnum.getName(x.getIsEffective()));
+                ownerOrderDTO.setExpRevertTimeStr(x.getExpRevertTime()!=null? LocalDateTimeUtils.localdateToString(x.getExpRevertTime(), GlobalConstant.FORMAT_DATE_STR1):null);
+                ownerOrderDTO.setExpRentTimeStr(x.getExpRentTime()!=null?LocalDateTimeUtils.localdateToString(x.getExpRentTime(), GlobalConstant.FORMAT_DATE_STR1):null);
                 OwnerMemberDTO ownerMemberDTO = ownerMemberService.selectownerMemberByOwnerOrderNo(x.getOwnerOrderNo(), false);
                 OwnerGoodsDetailDTO ownerGoodsDetail = ownerGoodsService.getOwnerGoodsDetail(x.getOwnerOrderNo(), false);
                 ownerDetailDTO.setOwnerOrderDTO(ownerOrderDTO);
@@ -268,7 +320,7 @@ public class OrderDetailService {
             });
         }
         OrderHistoryRespDTO orderHistoryRespDTO = new OrderHistoryRespDTO();
-        orderHistoryRespDTO.orderDTO = orderDTO;
+        orderHistoryRespDTO.orderDetailDTO = orderDetailDTO;
         orderHistoryRespDTO.ownerDetailDTOS = ownerDetailDTOS;
         orderHistoryRespDTO.renterDetailDTOS = renterDetailDTOS;
 
@@ -557,6 +609,25 @@ public class OrderDetailService {
             ownerOrderFineDeatailDTOS.add(ownerOrderFineDeatailDTO);
         });
 
+
+        //车主补贴
+        List<OwnerOrderSubsidyDetailDTO> ownerOrderSubsidyDetailDTOS = new ArrayList<>();
+        List<OwnerOrderSubsidyDetailEntity> ownerOrderSubsidyDetailEntities = ownerOrderSubsidyDetailService.listOwnerOrderSubsidyDetail(orderNo, ownerOrderNo);
+        ownerOrderSubsidyDetailEntities.stream().forEach(x->{
+            OwnerOrderSubsidyDetailDTO ownerOrderSubsidyDetailDTO = new OwnerOrderSubsidyDetailDTO();
+            BeanUtils.copyProperties(x,ownerOrderSubsidyDetailDTO);
+            ownerOrderSubsidyDetailDTOS.add(ownerOrderSubsidyDetailDTO);
+        });
+
+        //租客补贴
+        List<RenterOrderSubsidyDetailDTO> renterOrderSubsidyDetailDTOS = new ArrayList<>();
+        List<RenterOrderSubsidyDetailEntity> renterOrderSubsidyDetailEntities = renterOrderSubsidyDetailService.listRenterOrderSubsidyDetail(orderNo, renterOrderNo);
+        renterOrderSubsidyDetailEntities.stream().forEach(x->{
+            RenterOrderSubsidyDetailDTO renterOrderSubsidyDetailDTO = new RenterOrderSubsidyDetailDTO();
+            BeanUtils.copyProperties(x,renterOrderSubsidyDetailDTO);
+            renterOrderSubsidyDetailDTOS.add(renterOrderSubsidyDetailDTO);
+        });
+
         OrderDetailRespDTO orderDetailRespDTO = new OrderDetailRespDTO();
         orderDetailRespDTO.order = orderDTO;
         orderDetailRespDTO.renterOrder = renterOrderDTO;
@@ -581,6 +652,8 @@ public class OrderDetailService {
         orderDetailRespDTO.renterAdditionalDriverList = renterAdditionalDriverDTOList;
         orderDetailRespDTO.ownerOrderFineDeatailList = ownerOrderFineDeatailDTOS;
         orderDetailRespDTO.renterOrderFineDeatailList = renterOrderFineDeatailDTOS;
+        orderDetailRespDTO.renterOrderSubsidyDetailDTOS = renterOrderSubsidyDetailDTOS;
+        orderDetailRespDTO.ownerOrderSubsidyDetailDTOS = ownerOrderSubsidyDetailDTOS;
         return orderDetailRespDTO;
     }
 
@@ -654,5 +727,188 @@ public class OrderDetailService {
         }
         return null;
     }
+
+    /*
+     * @Author ZhangBin
+     * @Date 2020/1/15 15:49
+     * @Description: 车主订单详情
+     *
+     **/
+    public ResponseData<AdminOwnerOrderDetailDTO> adminOwnerOrderDetail(String ownerOrderNo,String orderNo) {
+        //主订单
+        OrderEntity orderEntity = orderService.getOrderEntity(orderNo);
+        if(orderEntity == null){
+            log.error("获取订单数据为空orderNo={}",orderNo);
+            throw new OrderDetailException();
+        }
+
+        OrderDTO orderDTO = new OrderDTO();
+        BeanUtils.copyProperties(orderEntity,orderDTO);
+        //车主罚金
+        List<OwnerOrderFineDeatailEntity> ownerOrderFineDeatailList = ownerOrderFineDeatailService.getOwnerOrderFineDeatailByOwnerOrderNo(ownerOrderNo);
+        List<OwnerOrderFineDeatailDTO> ownerOrderFineDeatailDTOS = new ArrayList<>();
+        ownerOrderFineDeatailList.stream().forEach(x->{
+            OwnerOrderFineDeatailDTO ownerOrderFineDeatailDTO = new OwnerOrderFineDeatailDTO();
+            BeanUtils.copyProperties(x,ownerOrderFineDeatailDTO);
+            ownerOrderFineDeatailDTOS.add(ownerOrderFineDeatailDTO);
+        });
+        //全局的车主订单罚金明细
+        List<ConsoleOwnerOrderFineDeatailEntity> consoleOwnerOrderFineDeatailList = consoleOwnerOrderFineDeatailService.selectByOrderNo(orderNo);
+        List<ConsoleOwnerOrderFineDeatailDTO> consoleOwnerOrderFineDeatailDTOList = new ArrayList<>();
+        consoleOwnerOrderFineDeatailList.stream().forEach(x->{
+            ConsoleOwnerOrderFineDeatailDTO consoleOwnerOrderFineDeatailDTO = new ConsoleOwnerOrderFineDeatailDTO();
+            BeanUtils.copyProperties(x,consoleOwnerOrderFineDeatailDTO);
+            consoleOwnerOrderFineDeatailDTOList.add(consoleOwnerOrderFineDeatailDTO);
+        });
+        //车主罚金
+        int ownerFienAmt = CostStatUtils.getOwnerFienAmt(ownerOrderFineDeatailDTOS, consoleOwnerOrderFineDeatailDTOList);
+
+        //车主租金
+        List<OwnerOrderPurchaseDetailEntity> ownerOrderPurchaseDetailList = ownerOrderPurchaseDetailService.listOwnerOrderPurchaseDetail(orderNo, ownerOrderNo);
+        List<OwnerOrderPurchaseDetailDTO> ownerOrderPurchaseDetailDTOList = new ArrayList<>();
+        ownerOrderPurchaseDetailList.stream().forEach(x->{
+            OwnerOrderPurchaseDetailDTO ownerOrderPurchaseDetailDTO = new OwnerOrderPurchaseDetailDTO();
+            BeanUtils.copyProperties(x,ownerOrderPurchaseDetailDTO);
+            ownerOrderPurchaseDetailDTOList.add(ownerOrderPurchaseDetailDTO);
+        });
+        //车主租金
+        int ownerRentAmt = CostStatUtils.getOwnerRentAmt(ownerOrderPurchaseDetailDTOList);
+
+        //车主补贴
+        List<OwnerOrderSubsidyDetailDTO> ownerOrderSubsidyDetailDTOS = new ArrayList<>();
+        List<OwnerOrderSubsidyDetailEntity> ownerOrderSubsidyDetailEntities = ownerOrderSubsidyDetailService.listOwnerOrderSubsidyDetail(orderNo, ownerOrderNo);
+        ownerOrderSubsidyDetailEntities.stream().forEach(x->{
+            OwnerOrderSubsidyDetailDTO ownerOrderSubsidyDetailDTO = new OwnerOrderSubsidyDetailDTO();
+            BeanUtils.copyProperties(x,ownerOrderSubsidyDetailDTO);
+            ownerOrderSubsidyDetailDTOS.add(ownerOrderSubsidyDetailDTO);
+        });
+        //补贴
+        RenterOwnerPriceDTO renterOwnerPriceDTO = CostStatUtils.ownerRenterPrice(ownerOrderSubsidyDetailDTOS);
+        //车主券补贴
+        OwnerOrderSubsidyDetailDTO ownerCoupon = CostStatUtils.ownerSubsidtyFilterByCashNo(RenterCashCodeEnum.OWNER_COUPON_OFFSET_COST.getCashNo(), ownerOrderSubsidyDetailDTOS);
+
+        //车主券
+        //租客订单
+        String renterOrderNo = null;
+        RenterOrderEntity renterOrderEntity = renterOrderService.getRenterOrderByOrderNoAndIsEffective(orderNo);
+        if(renterOrderNo == null){
+            NoEffectiveErrException noEffectiveErrException = new NoEffectiveErrException();
+            log.error("无有效子订单orderNo={}",orderNo);
+            throw noEffectiveErrException;
+        }
+        RenterOrderDTO renterOrderDTO = null;
+        if(renterOrderEntity != null){
+            renterOrderDTO = new RenterOrderDTO();
+            BeanUtils.copyProperties(renterOrderEntity,renterOrderDTO);
+            renterOrderNo = renterOrderNo==null?renterOrderEntity.getRenterOrderNo():renterOrderNo;
+        }
+        String ownerCouponName = "";
+        if(ownerCoupon != null){
+            OrderCouponEntity orderCouponEntity = orderCouponService.getOwnerCouponByOrderNoAndRenterOrderNo(orderNo,renterOrderNo);
+            ownerCouponName = orderCouponEntity.getCouponName();
+        }
+        //平台给车主的补贴
+        PlatformToOwnerSubsidyDTO platformToOwnerSubsidyDTO = getPlatformToOwnerSubsidyDTO(ownerOrderSubsidyDetailDTOS);
+
+        //车主配送服务费（车主增值订单）
+        List<OwnerOrderIncrementDetailEntity> ownerOrderIncrementDetailEntities = ownerOrderIncrementDetailService.listOwnerOrderIncrementDetail(orderNo, ownerOrderNo);
+        List<OwnerOrderIncrementDetailDTO> ownerOrderIncrementDetailDTOS = new ArrayList<>();
+        ownerOrderIncrementDetailEntities.stream().forEach(x->{
+            OwnerOrderIncrementDetailDTO ownerOrderIncrementDetailDTO = new OwnerOrderIncrementDetailDTO();
+            BeanUtils.copyProperties(x,ownerOrderIncrementDetailDTO);
+            ownerOrderIncrementDetailDTOS.add(ownerOrderIncrementDetailDTO);
+        });
+        int incrGetCarAmt = CostStatUtils.getIncrementByCashNo(OwnerCashCodeEnum.SRV_GET_COST_OWNER, ownerOrderIncrementDetailDTOS);
+        int incrReturnCarAmt = CostStatUtils.getIncrementByCashNo(OwnerCashCodeEnum.SRV_RETURN_COST_OWNER, ownerOrderIncrementDetailDTOS);
+
+        //车主收益
+        AccountOwnerCostSettleEntity accountOwnerCostSettleEntity = accountOwnerCostSettleService.getsettleAmtByOrderNo(orderNo, ownerOrderNo);
+
+        OwnerGoodsDetailDTO ownerGoodsDetail = ownerGoodsService.getOwnerGoodsDetail(ownerOrderNo, true);
+        OwnerRentDetailDTO ownerRentDetailDTO = new OwnerRentDetailDTO();
+        if(ownerGoodsDetail != null && ownerGoodsDetail.getOwnerGoodsPriceDetailDTOList()!=null && ownerGoodsDetail.getOwnerGoodsPriceDetailDTOList().size()>0){
+            List<OwnerGoodsPriceDetailDTO> ownerGoodsPriceDetailDTOList = ownerGoodsDetail.getOwnerGoodsPriceDetailDTOList();
+            ownerRentDetailDTO.setDayAverageAmt(ownerGoodsPriceDetailDTOList.get(0).getCarUnitPrice());
+            ownerRentDetailDTO.setOwnerGoodsPriceDetailDTOS(ownerGoodsPriceDetailDTOList);
+        }
+
+        ownerRentDetailDTO.setReqTimeStr(orderDTO.getReqTime()!=null?LocalDateTimeUtils.localdateToString(orderDTO.getReqTime(),GlobalConstant.FORMAT_DATE_STR1):null);
+        ownerRentDetailDTO.setRevertTimeStr(orderDTO.getExpRevertTime()!=null? LocalDateTimeUtils.localdateToString(orderDTO.getExpRevertTime(), GlobalConstant.FORMAT_DATE_STR1):null);
+        ownerRentDetailDTO.setRentTimeStr(orderDTO.getExpRentTime()!=null?LocalDateTimeUtils.localdateToString(orderDTO.getExpRentTime(), GlobalConstant.FORMAT_DATE_STR1):null);
+
+        //超里程费用 + 油费
+        DeliveryOilCostVO oilCostByRenterOrderNo = deliveryCarInfoPriceService.getOilCostByRenterOrderNo(orderNo, ownerGoodsDetail.getCarEngineType());
+        OwnerGetAndReturnCarDTO ownerGetAndReturnCarDTO = null;
+        if(oilCostByRenterOrderNo != null && oilCostByRenterOrderNo.getOwnerGetAndReturnCarDTO()!=null){
+            ownerGetAndReturnCarDTO = oilCostByRenterOrderNo.getOwnerGetAndReturnCarDTO();
+        }
+
+        ServiceDetailDTO serviceDetailDTO = new ServiceDetailDTO();
+        //serviceDetailDTO.setCarType(ownerGoodsDetail.getCarOwnerType());
+        //serviceDetailDTO.setServiceAmt(ownerGoodsDetail.getServiceRate());
+
+        AdminOwnerOrderDetailDTO adminOwnerOrderDetailDTO = new AdminOwnerOrderDetailDTO();
+        adminOwnerOrderDetailDTO.setExpIncome(null);
+        adminOwnerOrderDetailDTO.setSettleincome(accountOwnerCostSettleEntity!=null?accountOwnerCostSettleEntity.getIncomeAmt():null);
+        adminOwnerOrderDetailDTO.setIncome(null);
+        adminOwnerOrderDetailDTO.setRentAmt(ownerRentAmt);
+        adminOwnerOrderDetailDTO.setOwnerRentDetailDTO(ownerRentDetailDTO);
+        adminOwnerOrderDetailDTO.setFienAmt(ownerFienAmt);
+        adminOwnerOrderDetailDTO.setFienAmtDetailDTO(null);
+        adminOwnerOrderDetailDTO.setOwnerRenterPrice(renterOwnerPriceDTO.getOwnerToRenterPrice());
+        adminOwnerOrderDetailDTO.setRenterOwnerPriceDTO(renterOwnerPriceDTO);
+        adminOwnerOrderDetailDTO.setMileageAmt(ownerGetAndReturnCarDTO!=null?ownerGetAndReturnCarDTO.getOverKNCrash():"0");
+        adminOwnerOrderDetailDTO.setOilAmt(ownerGetAndReturnCarDTO!=null?ownerGetAndReturnCarDTO.getCarOwnerOilCrash():"0");
+        adminOwnerOrderDetailDTO.setOilServiceAmt(null);
+        adminOwnerOrderDetailDTO.setDeductionAmt(null);
+        adminOwnerOrderDetailDTO.setServiceAmt(null);
+        adminOwnerOrderDetailDTO.setServiceDetailDTO(serviceDetailDTO);
+        adminOwnerOrderDetailDTO.setPlatformOilServiceAmt(null);
+        adminOwnerOrderDetailDTO.setOwnerPayPlatformAmt(null);
+        adminOwnerOrderDetailDTO.setGpsServiceAmt(accountOwnerCostSettleEntity!=null?accountOwnerCostSettleEntity.getGpsAmt():0);
+        adminOwnerOrderDetailDTO.setGpsDepositAmt(null);
+        adminOwnerOrderDetailDTO.setDeliveryAmt(incrGetCarAmt + incrReturnCarAmt);
+        adminOwnerOrderDetailDTO.setRenterDiscountAmt(ownerCoupon.getSubsidyAmount());
+        adminOwnerOrderDetailDTO.setOwnerCouponName(ownerCouponName);
+        adminOwnerOrderDetailDTO.setOwnerCouponAmt(ownerCoupon==null?0:ownerCoupon.getSubsidyAmount());
+        adminOwnerOrderDetailDTO.setPlatformSubsidyAmt(platformToOwnerSubsidyDTO.getTotal());
+        adminOwnerOrderDetailDTO.setPlatformToOwnerSubsidyAmt(platformToOwnerSubsidyDTO.getTotal());
+        adminOwnerOrderDetailDTO.setPlatformToOwnerSubsidyDTO(platformToOwnerSubsidyDTO);
+        return ResponseData.success(adminOwnerOrderDetailDTO);
+    }
+
+
+    private PlatformToOwnerSubsidyDTO getPlatformToOwnerSubsidyDTO(List<OwnerOrderSubsidyDetailDTO> ownerOrderSubsidyDetailDTOS ){
+        int mileageAmt = CostStatUtils.ownerSubsidtyAmtFilterByCashNo(OwnerCashCodeEnum.OWNER_MILEAGE_COST_SUBSIDY, ownerOrderSubsidyDetailDTOS);
+        int oilSubsidyAmt = CostStatUtils.ownerSubsidtyAmtFilterByCashNo(OwnerCashCodeEnum.OWNER_OIL_SUBSIDY, ownerOrderSubsidyDetailDTOS);
+        int washCarSubsidyAmt = CostStatUtils.ownerSubsidtyAmtFilterByCashNo(OwnerCashCodeEnum.OWNER_WASH_CAR_SUBSIDY, ownerOrderSubsidyDetailDTOS);
+        int carGoodsLossSubsidyAmt = CostStatUtils.ownerSubsidtyAmtFilterByCashNo(OwnerCashCodeEnum.OWNER_GOODS_SUBSIDY, ownerOrderSubsidyDetailDTOS);
+        int delaySubsidyAmt = CostStatUtils.ownerSubsidtyAmtFilterByCashNo(OwnerCashCodeEnum.OWNER_DELAY_SUBSIDY, ownerOrderSubsidyDetailDTOS);
+        int trafficSubsidyAmt = CostStatUtils.ownerSubsidtyAmtFilterByCashNo(OwnerCashCodeEnum.OWNER_TRAFFIC_SUBSIDY, ownerOrderSubsidyDetailDTOS);
+        int incomeSubsidyAmt = CostStatUtils.ownerSubsidtyAmtFilterByCashNo(OwnerCashCodeEnum.OWNER_INCOME_SUBSIDY, ownerOrderSubsidyDetailDTOS);
+
+        List<OwnerOrderSubsidyDetailDTO> platformToOwnerSubsidyList = CostStatUtils.getPlatformToOwnerSubsidyList(ownerOrderSubsidyDetailDTOS);
+        int platformToOwnerAmt = CostStatUtils.calAmt(platformToOwnerSubsidyList);
+        int otherSubsidyAmt = platformToOwnerAmt - (
+            + mileageAmt
+            + oilSubsidyAmt
+            + washCarSubsidyAmt
+            + carGoodsLossSubsidyAmt
+            + delaySubsidyAmt
+            + trafficSubsidyAmt
+            + incomeSubsidyAmt);
+        PlatformToOwnerSubsidyDTO platformToOwnerSubsidyDTO = new PlatformToOwnerSubsidyDTO();
+        platformToOwnerSubsidyDTO.setMileageAmt(mileageAmt);
+        platformToOwnerSubsidyDTO.setOilSubsidyAmt(oilSubsidyAmt);
+        platformToOwnerSubsidyDTO.setWashCarSubsidyAmt(washCarSubsidyAmt);
+        platformToOwnerSubsidyDTO.setCarGoodsLossSubsidyAmt(carGoodsLossSubsidyAmt);
+        platformToOwnerSubsidyDTO.setDelaySubsidyAmt(delaySubsidyAmt);
+        platformToOwnerSubsidyDTO.setTrafficSubsidyAmt(trafficSubsidyAmt);
+        platformToOwnerSubsidyDTO.setIncomeSubsidyAmt(incomeSubsidyAmt);
+        platformToOwnerSubsidyDTO.setOtherSubsidyAmt(otherSubsidyAmt);
+        platformToOwnerSubsidyDTO.setTotal(platformToOwnerAmt);
+        return platformToOwnerSubsidyDTO;
+    }
+
 
 }

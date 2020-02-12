@@ -1,13 +1,23 @@
 package com.atzuche.order.admin.service;
 
+import com.alibaba.fastjson.JSON;
+import com.atzuche.order.admin.common.AdminUserUtil;
+import com.atzuche.order.admin.exception.OrderSubmitErrException;
+import com.atzuche.order.admin.exception.OrderSubmitFailException;
 import com.atzuche.order.admin.util.StringUtil;
 import com.atzuche.order.admin.util.TimeUtil;
 import com.atzuche.order.admin.vo.req.orderSubmit.AdminTransReqVO;
+import com.atzuche.order.car.RenterCarDetailFailException;
+import com.atzuche.order.commons.CatConstants;
 import com.atzuche.order.commons.vo.req.AdminOrderReqVO;
 import com.atzuche.order.commons.vo.res.OrderResVO;
 import com.atzuche.order.open.service.FeignOrderAdminSubmitService;
+import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
+import com.dianping.cat.Cat;
+import com.dianping.cat.message.Transaction;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -24,20 +34,47 @@ public class OrderSubmitService {
         //1、组装参数
         AdminOrderReqVO adminOrderReqParam = this.transDto(adminOrderReqVO,request);
 
-        //2、http发送
-        ResponseData<OrderResVO> orderDetail = feignOrderAdminSubmitService.getOrderDetail(adminOrderReqParam);
-        //HttpResult orderDetail = HttpUtil.doPostNotGzip("http://10.0.3.235:1412/order/admin/req", JSON.toJSONString(adminOrderReqParam));
-        //HttpResult orderDetail = HttpUtil.doPostNotGzip("http://localhost:7777/order/admin/req", JSON.toJSONString(adminOrderReqParam));
+        ResponseData<OrderResVO> responseObject = null;
+        Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "后台管理系统下单");
+        try{
+            Cat.logEvent(CatConstants.FEIGN_METHOD,"feignOrderAdminSubmitService.submitOrder");
+            log.info("Feign 开始后台管理系统下单,adminOrderReqVO={}", adminOrderReqVO);
+            Cat.logEvent(CatConstants.FEIGN_PARAM,JSON.toJSONString(adminOrderReqVO));
+            responseObject =  feignOrderAdminSubmitService.submitOrder(adminOrderReqParam);
+            Cat.logEvent(CatConstants.FEIGN_RESULT,JSON.toJSONString(responseObject));
+            if(responseObject == null || !ErrorCode.SUCCESS.getCode().equals(responseObject.getResCode())){
+                log.error("Feign 后台管理系统下单失败,responseObject={}", JSON.toJSONString(responseObject));
+                OrderSubmitFailException failException = new OrderSubmitFailException();
+                Cat.logError("Feign 后台管理系统下单失败",failException);
+                throw failException;
+            }
+            t.setStatus(Transaction.SUCCESS);
+        }catch (RenterCarDetailFailException e){
+            Cat.logError("Feign 后台管理系统下单失败",e);
+            t.setStatus(e);
+            throw e;
+        }catch (Exception e){
+            log.error("Feign 后台管理系统下单异常,responseObject={}", JSON.toJSONString(responseObject),e);
+            OrderSubmitErrException err = new OrderSubmitErrException();
+            Cat.logError("Feign 后台管理系统下单异常",err);
+            throw err;
+        }finally {
+            t.complete();
+        }
         //3、返回结果
         ResponseData responseData = new ResponseData();
-        responseData.setData(orderDetail.getData());
-        responseData.setResCode(orderDetail.getResCode());
-        responseData.setResMsg(orderDetail.getResMsg());
+        responseData.setData(responseObject.getData());
+        responseData.setResCode(responseObject.getResCode());
+        responseData.setResMsg(responseObject.getResMsg());
         return responseData;
     }
 
     private AdminOrderReqVO transDto(AdminTransReqVO reqVO, HttpServletRequest request){
-        String sceneCode = reqVO.getSceneCode();
+        //2、组装新的下单参数
+        AdminOrderReqVO param = new AdminOrderReqVO();
+
+        BeanUtils.copyProperties(reqVO,param);
+
         //1、参数转化
         //1.2 rentTime和revertTime的转化
         String rentTime = reqVO.getRentTime();
@@ -50,28 +87,18 @@ public class OrderSubmitService {
         String srcIp = StringUtil.getReqIpAddr(request);
         int srcPort = request.getRemotePort();
 
-        //2、组装新的下单参数
-        AdminOrderReqVO param = new AdminOrderReqVO();
-
         param.setUseSpecialPrice(reqVO.getUseSpecialPrice());
-        param.setOperator(reqVO.getOperator());
-        param.setSpecialConsole(reqVO.getSpecialConsole());
-        param.setOfflineOrderStatus(reqVO.getOfflineOrderStatus());
+        param.setOperator(AdminUserUtil.getAdminUser().getAuthName());
+        param.setSpecialConsole("0");
+        param.setOfflineOrderStatus("0");
 
-        param.setOrderCategory("1");
-        param.setBusinessParentType("5");
-        param.setBusinessChildType("");
         param.setPlatformParentType("7");
-        param.setPlatformChildType("");
-        param.setModuleName("order");
-        param.setFunctionName("order/admin/req");
-        param.setReqSource(1);
-        param.setReqVersion("10");
-        param.setReqOs("ReqOs");
-        param.setActivityId("ActivityId");
-        param.setRentReason("租个车还填啥原因啊！");
-        param.setCityName("上海");
-        param.setSource("admin");
+        param.setCityName(reqVO.getRentCity());
+        param.setOrderCategory("1");
+        param.setSceneCode("EX007");
+        param.setSource("1");
+
+        param.setMemNo(reqVO.getMemNo());
 
         //不计免赔
         param.setAbatement(abatement);
@@ -96,52 +123,29 @@ public class OrderSubmitService {
         param.setRevertTime(newRevertTime);
 
         //经纬度的转化
-        param.setPublicLongitude(StringUtil.convertLatOrLon(reqVO.getPublicLongitude()));
-        param.setPublicLatitude(StringUtil.convertLatOrLon(reqVO.getPublicLatitude()));
         param.setSrvGetLon(StringUtil.convertLatOrLon(reqVO.getSrvGetLon()));
         param.setSrvGetLat(StringUtil.convertLatOrLon(reqVO.getSrvGetLat()));
         param.setSrvReturnLon(StringUtil.convertLatOrLon(reqVO.getSrvReturnLon()));
         param.setSrvReturnLat(StringUtil.convertLatOrLon(reqVO.getSrvReturnLat()));
 
-        //ip、端口
-        param.setSrcIp(srcIp);
-        param.setSrcPort(srcPort);
-
-        //设备版本
-        param.setOS(reqVO.getOS());
-        param.setOsVersion(reqVO.getOsVersion());
-        param.setAppVersion(reqVO.getAppVersion());
-        param.setIMEI(reqVO.getIMEI());
-        param.setOAID(reqVO.getOAID());
-        param.setDeviceName(reqVO.getDeviceName());
-        param.setMac(reqVO.getMac());
 
         //其他
         param.setCarAddrIndex(reqVO.getCarAddrIndex());
-        param.setPublicCityCode(reqVO.getPublicCityCode());
-        param.setAppName(reqVO.getAppName());
-        param.setPublicToken(reqVO.getPublicToken());
-        param.setAppChannelId(reqVO.getAppChannelId());
-        param.setMemNo(reqVO.getMemNo()==null?reqVO.getMem_no():null);
+
+        param.setMemNo(reqVO.getMemNo());
         param.setCarNo(reqVO.getCarNo());
-        param.setSchema(reqVO.getSchema());
+
         param.setCityCode(reqVO.getCityCode());
-        param.setSceneCode(sceneCode);
-        param.setSource("3");
-        param.setSubSource(reqVO.getSubSource());
+
+
         param.setSrvGetAddr(reqVO.getSrvGetAddr());
         param.setSrvReturnAddr(reqVO.getSrvReturnAddr());
         param.setGetCarFreeCouponId(reqVO.getGetCarFreeCouponId());
         param.setFlightNo(reqVO.getFlightNo());
         param.setLimitRedStatus(reqVO.getLimitRedStatus());
         param.setRentCity(reqVO.getRentCity());
-        param.setQueryId(reqVO.getQueryId());
         param.setOilType(reqVO.getOilType());
-        param.setConPhone(reqVO.getConPhone());
-        param.setUtmSource(reqVO.getUtmSource());
-        param.setUtmMedium(reqVO.getUtmMedium());
-        param.setUtmTerm(reqVO.getUtmTerm());
-        param.setUtmCampaign(reqVO.getUtmCampaign());
+
         return param;
     }
 }

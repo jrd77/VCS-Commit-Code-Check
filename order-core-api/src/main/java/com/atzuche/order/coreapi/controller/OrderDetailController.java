@@ -1,6 +1,7 @@
 package com.atzuche.order.coreapi.controller;
 
 import com.atzuche.order.commons.entity.orderDetailDto.*;
+import com.atzuche.order.commons.entity.ownerOrderDetail.AdminOwnerOrderDetailDTO;
 import com.atzuche.order.coreapi.service.OrderDetailService;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
@@ -8,10 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.Optional;
@@ -33,6 +31,7 @@ public class OrderDetailController {
         ResponseData<OrderDetailRespDTO> respData = orderDetailService.orderDetail(orderDetailReqDTO);
         return respData;
     }
+
 
     @PostMapping("/orderAccountDetail")
     public ResponseData<OrderAccountDetailRespDTO> orderAccountDetail(@Valid @RequestBody OrderDetailReqDTO orderDetailReqDTO, BindingResult bindingResult){
@@ -63,5 +62,16 @@ public class OrderDetailController {
         }
         ResponseData<OrderHistoryRespDTO> respData = orderDetailService.orderHistory(orderHistoryReqDTO);
         return respData;
+    }
+    @GetMapping("/adminOwnerOrderDetail")
+    public ResponseData<AdminOwnerOrderDetailDTO> adminOwnerOrderDetail(@RequestParam("ownerOrderNo") String ownerOrderNo,@RequestParam("orderNo")String orderNo){
+        if(ownerOrderNo==null ||ownerOrderNo.trim().length()<=0){
+            ResponseData responseData = new ResponseData();
+            responseData.setResMsg("车主自订单号不能为空");
+            responseData.setResCode(ErrorCode.INPUT_ERROR.getCode());
+            return responseData;
+        }
+        ResponseData<AdminOwnerOrderDetailDTO> responseData = orderDetailService.adminOwnerOrderDetail(ownerOrderNo,orderNo);
+        return responseData;
     }
 }

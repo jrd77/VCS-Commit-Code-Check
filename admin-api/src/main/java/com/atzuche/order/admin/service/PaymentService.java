@@ -112,23 +112,31 @@ public class PaymentService {
 				if(StringUtils.isBlank(payTime)) {
 					LocalDateTime payTimeLdt = LocalDateTimeUtils.dateToLocalDateTime(new Date());
 					//中间段的。
+//					PaymentResponseVO vo = convertPaymentResponseVO(cashierEntity,payTimeLdt);
+//					afterDepositSettlementPaymentList.add(vo);
 					PaymentResponseVO vo = convertPaymentResponseVO(cashierEntity,payTimeLdt);
-					afterDepositSettlementPaymentList.add(vo);
+					beforeDepositSettlementPaymentList.add(vo);
 				}else {
 					/**
 					 * 根据支付时间来切换
 					 */
 					LocalDateTime payTimeLdt = LocalDateTimeUtils.parseStringToDateTime(payTime, "yyyyMMddHHmmss");
-					if(settleTime != null && payTimeLdt.isBefore(settleTime)) {
+					//未结算
+					if(settleTime == null) {
 						PaymentResponseVO vo = convertPaymentResponseVO(cashierEntity,payTimeLdt);
 						beforeDepositSettlementPaymentList.add(vo);
-					}else if(wzSettleTime != null && payTimeLdt.isAfter(wzSettleTime)) {
-						PaymentResponseVO vo = convertPaymentResponseVO(cashierEntity,payTimeLdt);
-						violationDepositSettlementPaymentList.add(vo);
 					}else {
-						//中间段的。
-						PaymentResponseVO vo = convertPaymentResponseVO(cashierEntity,payTimeLdt);
-						afterDepositSettlementPaymentList.add(vo);
+						if(settleTime != null && payTimeLdt.isBefore(settleTime)) {
+							PaymentResponseVO vo = convertPaymentResponseVO(cashierEntity,payTimeLdt);
+							beforeDepositSettlementPaymentList.add(vo);
+						}else if(wzSettleTime != null && payTimeLdt.isAfter(wzSettleTime)) {
+							PaymentResponseVO vo = convertPaymentResponseVO(cashierEntity,payTimeLdt);
+							violationDepositSettlementPaymentList.add(vo);
+						}else {
+							//中间段的。
+							PaymentResponseVO vo = convertPaymentResponseVO(cashierEntity,payTimeLdt);
+							afterDepositSettlementPaymentList.add(vo);
+						}
 					}
 				}
 			}

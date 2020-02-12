@@ -25,5 +25,7 @@ public interface OwnerGoodsMapper{
     int updateByPrimaryKeySelective(OwnerGoodsEntity record);
 
     OwnerGoodsEntity selectByOwnerOrderNo(@Param("ownerOrderNo")String ownerOrderNo);
+    
+    OwnerGoodsEntity getLastOwnerGoodsByOrderNo(@Param("orderNo")String orderNo);
 
 }

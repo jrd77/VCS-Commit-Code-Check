@@ -160,6 +160,8 @@
 				<if test="applyTime != null">`apply_time`, </if>
 				<if test="auditStatus != null">`audit_status`, </if>
 				<if test="auditTime != null">`audit_time`, </if>
+				<if test="rentTimeFlag != null">`rent_time_flag`, </if>
+				<if test="applySource != null">`apply_source`, </if>
 				<if test="createTime != null">`create_time`, </if>
 				<if test="createOp != null">`create_op`, </if>
 				<if test="updateTime != null">`update_time`, </if>
@@ -188,6 +190,8 @@
 				<if test="applyTime != null">#{applyTime},  </if>
 				<if test="auditStatus != null">#{auditStatus},  </if>
 				<if test="auditTime != null">#{auditTime},  </if>
+				<if test="rentTimeFlag != null">#{rentTimeFlag},  </if>
+				<if test="applySource != null">#{applySource},  </if>
 				<if test="createTime != null">#{createTime},  </if>
 				<if test="createOp != null">#{createOp},  </if>
 				<if test="updateTime != null">#{updateTime},  </if>
@@ -276,5 +280,17 @@
 		order by id desc
 		limit 1
 	</select>
+	
+	<select id="getRenterOrderChangeApplyCountByOrderNo" resultType="Integer">
+		select count(*) from renter_order_change_apply where order_no = #{orderNo}
+		and audit_status = 0
+		and is_delete = 0
+	</select>
+	
+	<update id="updateRenterOrderChangeApplyStatusByOrderNo">
+		update renter_order_change_apply set audit_status = 2
+		where order_no = #{orderNo}
+		and audit_status = 0
+	</update>
 	
 </mapper>

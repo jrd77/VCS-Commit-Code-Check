@@ -15,7 +15,7 @@ public class ModifyOrderReqVO {
 	@AutoDocProperty(value="订单编号,必填，",required=true)
 	private String orderNo;
 	
-	@NotBlank(message="memNo不能为空")
+	//@NotBlank(message="memNo不能为空")
 	@AutoDocProperty(value="memNo,必填，",required=true)
 	private String memNo;
 	
@@ -51,34 +51,44 @@ public class ModifyOrderReqVO {
 	/**
 	 * 是否是管理后台操作 true是，其他否
 	 */
+	@AutoDocProperty("是否是管理后台操作 true是，其他否")
 	private Boolean consoleFlag;
 	/**
 	 * 使用取车服务标志 0-不使用，1-使用
 	 */
+	@AutoDocProperty("使用取车服务标志 0-不使用，1-使用")
 	private Integer srvGetFlag;
 	/**
 	 * 使用还车服务标志0-不使用，1-使用
 	 */
+	@AutoDocProperty("使用还车服务标志0")
 	private Integer srvReturnFlag;
 	/**
 	 * 是否使用凹凸币0-否，1-是
 	 */
+	@AutoDocProperty("是否使用凹凸币0-否，1-是")
 	private Integer userCoinFlag;
 	/**
 	 * 车主券id
 	 */
+	@AutoDocProperty("车主券id")
 	private String carOwnerCouponId;
 	/**
 	 * 取还车优惠券id
 	 */
+	@AutoDocProperty("取还车优惠券id")
 	private String srvGetReturnCouponId;
 	/**
 	 * 平台优惠券id
 	 */
+	@AutoDocProperty("平台优惠券id")
 	private String platformCouponId;
 	/**
 	 * 租客费用补贴
 	 */
     @AutoDocProperty(value="租客费用补贴", hidden = true)
 	private List<RenterOrderSubsidyDetailDTO> renterSubsidyList;
+
+    @AutoDocProperty("修改原因")
+    private String modifyReason;
 }

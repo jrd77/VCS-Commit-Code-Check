@@ -34,28 +34,42 @@ public class RenYunDeliveryCarService {
      * 添加订单到仁云流程系统
      */
     public String addRenYunFlowOrderInfo(RenYunFlowOrderDTO renYunFlowOrderVO) {
-
-        String flowOrderMap = getFlowOrderMap(renYunFlowOrderVO);
-        String result = retryDeliveryCarService.sendHttpToRenYun(DeliveryConstants.ADD_FLOW_ORDER, flowOrderMap, DeliveryTypeEnum.ADD_TYPE.getValue().intValue());
-        return result;
+        try {
+            String flowOrderMap = getFlowOrderMap(renYunFlowOrderVO);
+            String result = retryDeliveryCarService.sendHttpToRenYun(DeliveryConstants.ADD_FLOW_ORDER, flowOrderMap, DeliveryTypeEnum.ADD_TYPE.getValue().intValue());
+            return result;
+        } catch (Exception e) {
+            log.error("添加订单到仁云流程系统请求仁云失败，失败原因：{}", e.getMessage());
+            return null;
+        }
     }
 
     /**
      * 更新订单到仁云流程系统
      */
     public String updateRenYunFlowOrderInfo(UpdateFlowOrderDTO updateFlowOrderDTO) {
-        String flowOrderMap = getFlowOrderMap(updateFlowOrderDTO);
-        String result = retryDeliveryCarService.sendHttpToRenYun(DeliveryConstants.CHANGE_FLOW_ORDER, flowOrderMap, DeliveryTypeEnum.UPDATE_TYPE.getValue().intValue());
-        return result;
+        try {
+            String flowOrderMap = getFlowOrderMap(updateFlowOrderDTO);
+            String result = retryDeliveryCarService.sendHttpToRenYun(DeliveryConstants.CHANGE_FLOW_ORDER, flowOrderMap, DeliveryTypeEnum.UPDATE_TYPE.getValue().intValue());
+            return result;
+        } catch (Exception e) {
+            log.error("更新订单到仁云流程系统请求仁云失败，失败原因：{}", e.getMessage());
+            return null;
+        }
     }
 
     /**
      * 取消订单到仁云流程系统
      */
     public String cancelRenYunFlowOrderInfo(CancelFlowOrderDTO cancelFlowOrderVO) {
-        String flowOrderMap = getFlowOrderMap(cancelFlowOrderVO);
-        String result = retryDeliveryCarService.sendHttpToRenYun(DeliveryConstants.CANCEL_FLOW_ORDER, flowOrderMap, DeliveryTypeEnum.CANCEL_TYPE.getValue().intValue());
-        return result;
+        try {
+            String flowOrderMap = getFlowOrderMap(cancelFlowOrderVO);
+            String result = retryDeliveryCarService.sendHttpToRenYun(DeliveryConstants.CANCEL_FLOW_ORDER, flowOrderMap, DeliveryTypeEnum.CANCEL_TYPE.getValue().intValue());
+            return result;
+        } catch (Exception e) {
+            log.error("取消订单到仁云流程系统请求仁云失败，失败原因：{}", e.getMessage());
+            return null;
+        }
     }
 
     /**

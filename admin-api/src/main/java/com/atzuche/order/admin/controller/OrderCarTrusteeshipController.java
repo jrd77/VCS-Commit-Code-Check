@@ -1,10 +1,12 @@
 package com.atzuche.order.admin.controller;
 
 import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
+import com.atzuche.order.delivery.common.DeliveryErrorCode;
 import com.atzuche.order.delivery.entity.OrderCarTrusteeshipEntity;
 import com.atzuche.order.delivery.entity.RenterOrderDeliveryEntity;
 import com.atzuche.order.delivery.service.OrderCarTrusteeshipService;
 import com.atzuche.order.delivery.service.RenterOrderDeliveryService;
+import com.atzuche.order.delivery.utils.CommonUtil;
 import com.atzuche.order.delivery.vo.trusteeship.OrderCarTrusteeshipReqVO;
 import com.atzuche.order.delivery.vo.trusteeship.OrderCarTrusteeshipVO;
 import com.atzuche.order.rentercommodity.service.RenterCommodityService;
@@ -68,6 +70,13 @@ public class OrderCarTrusteeshipController extends BaseController {
             BeanUtils.copyProperties(orderCarTrusteeshipVO, orderCarTrusteeshipEntity);
             orderCarTrusteeshipEntity.setOutDepotTime(DateUtil.asLocalDateTime(orderCarTrusteeshipVO.getOutDepotTime()));
             orderCarTrusteeshipEntity.setInDepotTime(DateUtil.asLocalDateTime(orderCarTrusteeshipVO.getInDepotTime()));
+            OrderCarTrusteeshipEntity orderNoAndCar = orderCarTrusteeshipService.selectObjectByOrderNoAndCar(orderCarTrusteeshipVO.getOrderNo(),orderCarTrusteeshipVO.getCarNo());
+            if(Objects.nonNull(orderNoAndCar))
+            {
+                CommonUtil.copyPropertiesIgnoreNull(orderCarTrusteeshipVO,orderNoAndCar);
+                orderCarTrusteeshipService.updateOrderCarTrusteeship(orderNoAndCar);
+                return ResponseData.success();
+            }
             int result = orderCarTrusteeshipService.insertOrderCarTrusteeship(orderCarTrusteeshipEntity);
             if (result > 0) {
                 return ResponseData.success();

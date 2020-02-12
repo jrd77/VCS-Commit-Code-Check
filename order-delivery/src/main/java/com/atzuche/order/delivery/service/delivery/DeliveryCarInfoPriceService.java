@@ -4,6 +4,7 @@ import com.atzuche.config.client.api.OilAverageCostConfigSDK;
 import com.atzuche.config.common.api.ConfigContext;
 import com.atzuche.config.common.entity.OilAverageCostEntity;
 import com.atzuche.order.commons.StringUtil;
+import com.atzuche.order.commons.vo.res.delivery.DistributionCostVO;
 import com.atzuche.order.delivery.common.DeliveryErrorCode;
 import com.atzuche.order.delivery.entity.OwnerHandoverCarInfoEntity;
 import com.atzuche.order.delivery.entity.RenterHandoverCarInfoEntity;
@@ -18,6 +19,7 @@ import com.atzuche.order.delivery.vo.delivery.DeliveryOilCostVO;
 import com.atzuche.order.delivery.vo.delivery.rep.OwnerGetAndReturnCarDTO;
 import com.atzuche.order.delivery.vo.delivery.rep.RenterGetAndReturnCarDTO;
 import com.autoyol.platformcost.CommonUtils;
+import com.autoyol.platformcost.OwnerFeeCalculatorUtils;
 import com.google.common.collect.Lists;
 import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
@@ -168,6 +170,22 @@ public class DeliveryCarInfoPriceService {
         }
         return ownerGetAndReturnCarDTO;
     }
+
+
+    /**
+     * 获取取车还车费用
+     * @param carType
+     * @return
+     */
+    public DistributionCostVO getDistributionCost(Integer carType) {
+        DistributionCostVO distributionCostVO = DistributionCostVO.builder().build();
+        //取车费用
+        distributionCostVO.setGetAmt(String.valueOf(OwnerFeeCalculatorUtils.calOwnerSrvGetAmt(carType, 1)));
+        //还车费用
+        distributionCostVO.setReturnAmt(String.valueOf(OwnerFeeCalculatorUtils.calOwnerSrvReturnAmt(carType, 2)));
+        return distributionCostVO;
+    }
+
 
     /**
      * 设置预环境

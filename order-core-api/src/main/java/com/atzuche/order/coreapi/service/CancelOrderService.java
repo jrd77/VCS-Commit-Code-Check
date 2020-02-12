@@ -1,13 +1,17 @@
 package com.atzuche.order.coreapi.service;
 
+import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.enums.MemRoleEnum;
 import com.atzuche.order.commons.vo.req.CancelOrderReqVO;
+import com.atzuche.order.coreapi.common.conver.OrderCommonConver;
 import com.atzuche.order.coreapi.entity.dto.CancelOrderResDTO;
 import com.atzuche.order.delivery.service.delivery.DeliveryCarService;
 import com.atzuche.order.delivery.vo.delivery.CancelFlowOrderDTO;
 import com.atzuche.order.delivery.vo.delivery.CancelOrderDeliveryVO;
 import com.atzuche.order.settle.service.OrderSettleService;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -21,23 +25,22 @@ import org.springframework.stereotype.Service;
 @Service
 public class CancelOrderService {
 
+    private static Logger logger = LoggerFactory.getLogger(CancelOrderService.class);
+
     @Autowired
     private RenterCancelOrderService renterCancelOrderService;
-
     @Autowired
     private OwnerCancelOrderService ownerCancelOrderService;
-
     @Autowired
     private CouponAndCoinHandleService couponAndCoinHandleService;
-
     @Autowired
     private OrderSettleService orderSettleService;
-
     @Autowired
     private StockService stockService;
-
     @Autowired
     private DeliveryCarService deliveryCarService;
+    @Autowired
+    private OrderCommonConver orderCommonConver;
 
     /**
      * 订单取消
@@ -58,11 +61,12 @@ public class CancelOrderService {
             res = ownerCancelOrderService.cancel(cancelOrderReqVO.getOrderNo(), cancelOrderReqVO.getCancelReason());
         }
 
+        logger.info("res:[{}]", JSON.toJSONString(res));
         //优惠券
         if (null != res && null != res.getIsReturnDisCoupon() && res.getIsReturnDisCoupon()) {
             //退还优惠券(平台券+送取服务券)
             couponAndCoinHandleService.undoPlatformCoupon(cancelOrderReqVO.getOrderNo());
-            couponAndCoinHandleService.undoPlatformCoupon(cancelOrderReqVO.getOrderNo());
+            couponAndCoinHandleService.undoGetCarFeeCoupon(cancelOrderReqVO.getOrderNo());
         }
         //订单取消（租客取消、车主取消、平台取消）如果使用了车主券且未支付，则退回否则不处理
         if (null != res && null != res.getIsReturnOwnerCoupon() && res.getIsReturnOwnerCoupon()) {
@@ -80,7 +84,8 @@ public class CancelOrderService {
             //通知收银台退款以及退还凹凸币和钱包
             orderSettleService.settleOrderCancel(cancelOrderReqVO.getOrderNo());
             //通知流程系统
-            CancelOrderDeliveryVO cancelOrderDeliveryVO = buildCancelOrderDeliveryVO(cancelOrderReqVO.getOrderNo(),
+            CancelOrderDeliveryVO cancelOrderDeliveryVO =
+                    orderCommonConver.buildCancelOrderDeliveryVO(cancelOrderReqVO.getOrderNo(),
                     res);
             if (null != cancelOrderDeliveryVO) {
                 deliveryCarService.cancelRenYunFlowOrderInfo(cancelOrderDeliveryVO);
@@ -99,34 +104,6 @@ public class CancelOrderService {
     }
 
 
-    /**
-     * 仁云流程系统请求信息处理
-     *
-     * @param orderNo 主订单号
-     * @param res     取消订单返回信息
-     * @return CancelOrderDeliveryVO 仁云流程系统请求信息
-     */
-    public CancelOrderDeliveryVO buildCancelOrderDeliveryVO(String orderNo, CancelOrderResDTO res) {
-        if (!res.getSrvGetFlag() && !res.getSrvReturnFlag()) {
-            return null;
-        }
-        String servicetype = "";
-        if (res.getSrvGetFlag() && res.getSrvReturnFlag()) {
-            servicetype = "all";
-        } else if (res.getSrvGetFlag()) {
-            servicetype = "take";
-        } else if (res.getSrvReturnFlag()) {
-            servicetype = "back";
-        }
-        CancelOrderDeliveryVO cancelOrderDeliveryVO = new CancelOrderDeliveryVO();
 
-        CancelFlowOrderDTO cancelFlowOrderDTO = new CancelFlowOrderDTO();
-        cancelFlowOrderDTO.setOrdernumber(orderNo);
-        cancelFlowOrderDTO.setServicetype(servicetype);
-
-        cancelOrderDeliveryVO.setRenterOrderNo(res.getRenterOrderNo());
-        cancelOrderDeliveryVO.setCancelFlowOrderDTO(cancelFlowOrderDTO);
-        return cancelOrderDeliveryVO;
-    }
 
 }

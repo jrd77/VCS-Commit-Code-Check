@@ -4,10 +4,12 @@ import com.atzuche.order.commons.entity.dto.CancelFineAmtDTO;
 import com.atzuche.order.commons.entity.dto.CostBaseDTO;
 import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
 import com.atzuche.order.commons.enums.*;
+import com.atzuche.order.coreapi.common.conver.OrderCommonConver;
 import com.atzuche.order.coreapi.entity.dto.CancelOrderResDTO;
 import com.atzuche.order.flow.service.OrderFlowService;
 import com.atzuche.order.ownercost.entity.ConsoleOwnerOrderFineDeatailEntity;
 import com.atzuche.order.ownercost.entity.OwnerOrderEntity;
+import com.atzuche.order.ownercost.entity.OwnerOrderFineApplyEntity;
 import com.atzuche.order.ownercost.service.ConsoleOwnerOrderFineDeatailService;
 import com.atzuche.order.ownercost.service.OwnerOrderService;
 import com.atzuche.order.parentorder.dto.OrderStatusDTO;
@@ -20,7 +22,9 @@ import com.atzuche.order.rentercost.entity.RenterOrderCostEntity;
 import com.atzuche.order.rentercost.entity.RenterOrderFineDeatailEntity;
 import com.atzuche.order.rentercost.service.RenterOrderCostService;
 import com.atzuche.order.rentercost.service.RenterOrderFineDeatailService;
+import com.atzuche.order.renterorder.entity.OrderCouponEntity;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
+import com.atzuche.order.renterorder.service.OrderCouponService;
 import com.atzuche.order.renterorder.service.RenterOrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -56,6 +60,8 @@ public class RenterCancelOrderService {
     private OrderCancelReasonService orderCancelReasonService;
     @Autowired
     private OrderStatusService orderStatusService;
+    @Autowired
+    private OrderCouponService orderCouponService;
 
     /**
      * 取消处理
@@ -79,6 +85,9 @@ public class RenterCancelOrderService {
         OwnerOrderEntity ownerOrderEntity = ownerOrderService.getOwnerOrderByOrderNoAndIsEffective(orderNo);
         //获取订单状态信息
         OrderStatusEntity orderStatusEntity = orderStatusService.getByOrderNo(orderNo);
+        //获取车主券信息
+        OrderCouponEntity ownerCouponEntity = orderCouponService.getOwnerCouponByOrderNoAndRenterOrderNo(orderNo,
+                renterOrderEntity.getRenterOrderNo());
 
         //罚金计算(罚金和收益)
         //租客罚金处理
@@ -104,11 +113,10 @@ public class RenterCancelOrderService {
         //落库
         //订单状态更新
         orderStatusService.saveOrderStatusInfo(buildOrderStatusDTO(orderNo));
-        renterOrderService.updateRenterOrderChildStatus(renterOrderEntity.getId(),
-                RenterChildStatusEnum.END.getCode());
+        renterOrderService.updateChildStatusByOrderNo(orderNo, RenterChildStatusEnum.END.getCode());
 
         if(null != ownerOrderEntity) {
-            ownerOrderService.updateOwnerOrderChildStatus(ownerOrderEntity.getId(), OwnerChildStatusEnum.END.getCode());
+            ownerOrderService.updateChildStatusByOrderNo(orderNo, OwnerChildStatusEnum.END.getCode());
         }
 
         orderFlowService.inserOrderStatusChangeProcessInfo(orderNo, OrderStatusEnum.CLOSED);
@@ -130,6 +138,7 @@ public class RenterCancelOrderService {
         cancelOrderResDTO.setRenterOrderNo(renterOrderEntity.getRenterOrderNo());
         cancelOrderResDTO.setSrvGetFlag(null != renterOrderEntity.getIsGetCar() && renterOrderEntity.getIsGetCar() == 1);
         cancelOrderResDTO.setSrvReturnFlag(null != renterOrderEntity.getIsReturnCar() && renterOrderEntity.getIsReturnCar() == 1);
+        cancelOrderResDTO.setOwnerCouponNo(null == ownerCouponEntity ? null : ownerCouponEntity.getCouponId());
         return cancelOrderResDTO;
     }
 

@@ -138,6 +138,7 @@ public class RenterCommodityService {
                     newRenterGoodsPriceList.add(renterGoods);
                 }
             });
+            renterGoodsDetailDTO.setRenterGoodsPriceDetailDTOList(newRenterGoodsPriceList);
         }else{//时间提前
             Map<LocalDateTime, List<RenterGoodsPriceDetailEntity>> dbRevertTimeGroup = dbGoodsPriceList
                     .stream()
@@ -178,8 +179,12 @@ public class RenterCommodityService {
                     });
                 }
             });
+
+            List<RenterGoodsPriceDetailDTO> collect = newRenterGoodsPriceList.stream()
+                    .filter(x -> x.getRevertTime().isEqual(revertTime) || x.getRevertTime().isBefore(revertTime))
+                    .collect(Collectors.toList());
+            renterGoodsDetailDTO.setRenterGoodsPriceDetailDTOList(collect);
         }
-        renterGoodsDetailDTO.setRenterGoodsPriceDetailDTOList(newRenterGoodsPriceList);
     }
 
     //初始化设置小时数和分组日期

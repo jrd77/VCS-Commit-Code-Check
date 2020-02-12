@@ -1,7 +1,7 @@
 package com.atzuche.order.admin.service;
 
 import com.alibaba.fastjson.JSON;
-import com.atzuche.order.admin.dto.AdminOwnerOrderDetailDTO;
+import com.atzuche.order.commons.entity.ownerOrderDetail.AdminOwnerOrderDetailDTO;
 import com.atzuche.order.admin.exception.OrderHistoryErrException;
 import com.atzuche.order.admin.exception.OrderHistoryFailException;
 import com.atzuche.order.car.RenterCarDetailFailException;
@@ -26,7 +26,7 @@ public class OrderDetailService {
     public ResponseData<OrderHistoryRespDTO> listOrderHistory(String orderNo){
         OrderHistoryReqDTO orderHistoryReqDTO = new OrderHistoryReqDTO();
         orderHistoryReqDTO.setOrderNo(orderNo);
-        orderHistoryReqDTO.setIsNeedOwnerOrderHistory(true);
+        orderHistoryReqDTO.setIsNeedRenterOrderHistory(true);
         orderHistoryReqDTO.setIsNeedOwnerOrderHistory(true);
         ResponseData<OrderHistoryRespDTO> responseObject = null;
         Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "获取历史订单列表");
@@ -58,7 +58,7 @@ public class OrderDetailService {
         return responseObject;
     }
 
-    public ResponseData<AdminOwnerOrderDetailDTO> ownerOrderDetail(String ownerOrderNo) {
+    public ResponseData<AdminOwnerOrderDetailDTO> ownerOrderDetail(String ownerOrderNo,String orderNo) {
 
         return null;
     }
