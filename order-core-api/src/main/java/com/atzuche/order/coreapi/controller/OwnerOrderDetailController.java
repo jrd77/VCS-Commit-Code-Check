@@ -119,7 +119,7 @@ public class OwnerOrderDetailController {
      *
      **/
     @GetMapping("/owner/platformToOwnerSubsidy")
-    public ResponseData<PlatformToOwnerSubsidyDTO> platformToOwnerSubsidy(@RequestParam("orderNo") String orderNo, @RequestParam("ownerOrderNo") String ownerOrderNo){
+    public ResponseData<PlatformToOwnerSubsidyDTO> platformToOwnerSubsidy(@RequestParam("orderNo") String orderNo, @RequestParam("ownerOrderNo") String ownerOrderNo,@RequestParam("memNo") String memNo){
         if(orderNo == null || orderNo.trim().length()<=0){
             throw new InputErrorException("主订单号不能为空");
         }
@@ -127,7 +127,7 @@ public class OwnerOrderDetailController {
         if(ownerOrderNo == null || ownerOrderNo.trim().length()<=0){
             throw new InputErrorException("车主订单号不能为空");
         }
-        PlatformToOwnerSubsidyDTO platformToOwnerSubsidyDTO = ownerOrderDetailService.platformToOwnerSubsidy(orderNo,ownerOrderNo);
+        PlatformToOwnerSubsidyDTO platformToOwnerSubsidyDTO = ownerOrderDetailService.platformToOwnerSubsidy(orderNo,ownerOrderNo,memNo);
         return ResponseData.success(platformToOwnerSubsidyDTO);
     }
 

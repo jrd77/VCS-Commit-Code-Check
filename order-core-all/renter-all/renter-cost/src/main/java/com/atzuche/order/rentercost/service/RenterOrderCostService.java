@@ -21,7 +21,10 @@ public class RenterOrderCostService{
         return renterOrderCostMapper.insert(renterOrderCostEntity);
     }
 
-
+    public Integer updateRenterOrderCost(RenterOrderCostEntity renterOrderCostEntity){
+        return renterOrderCostMapper.updateByPrimaryKeySelective(renterOrderCostEntity);
+    }
+    
     /**
      * 根据主订单号和租客订单号获取租客费用信息
      *

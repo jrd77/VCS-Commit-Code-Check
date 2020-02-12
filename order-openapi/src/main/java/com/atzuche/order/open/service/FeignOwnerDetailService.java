@@ -59,7 +59,7 @@ public interface FeignOwnerDetailService {
      *
      **/
     @GetMapping("/owner/platformToOwnerSubsidy")
-    ResponseData<PlatformToOwnerSubsidyDTO> platformToOwnerSubsidy(@RequestParam("orderNo") String orderNo, @RequestParam("ownerOrderNo") String ownerOrderNo);
+    ResponseData<PlatformToOwnerSubsidyDTO> platformToOwnerSubsidy(@RequestParam("orderNo") String orderNo, @RequestParam("ownerOrderNo") String ownerOrderNo,@RequestParam("memNo") String memNo);
 
     /*
      * @Author ZhangBin

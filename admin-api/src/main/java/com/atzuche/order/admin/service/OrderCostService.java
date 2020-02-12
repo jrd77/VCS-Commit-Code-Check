@@ -34,6 +34,7 @@ import com.atzuche.order.commons.vo.res.rentcosts.RenterOrderCostDetailEntity;
 import com.atzuche.order.open.service.FeignOrderCostService;
 import com.atzuche.order.parentorder.entity.OrderEntity;
 import com.atzuche.order.parentorder.service.OrderService;
+import com.atzuche.order.rentercost.entity.ConsoleRenterOrderFineDeatailEntity;
 import com.autoyol.commons.web.ResponseData;
 
 /**
@@ -280,17 +281,33 @@ public class OrderCostService {
 	private void putRenterOrderFine(OrderRenterCostResVO realVo, com.atzuche.order.commons.vo.res.OrderRenterCostResVO data) {
 		int carServiceFine = 0;
 		List<RenterOrderFineDeatailResVO> fineLst = data.getFineLst();
+		/*console_renter_order_fine_deatail    renter_order_fine_deatail  来源是租客的，累加求和*/
 		for (RenterOrderFineDeatailResVO renterOrderFineDeatailResVO : fineLst) {
 			//fine_type  罚金类型：1-修改订单取车违约金，2-修改订单还车违约金
-			if(renterOrderFineDeatailResVO.getFineType().intValue() == 1) {
+//			if(renterOrderFineDeatailResVO.getFineType().intValue() == 1) {
+//				carServiceFine += renterOrderFineDeatailResVO.getFineAmount().intValue();
+//			}
+//			if(renterOrderFineDeatailResVO.getFineType().intValue() == 2) {
+//				carServiceFine += renterOrderFineDeatailResVO.getFineAmount().intValue();
+//			}
+			
+			if("1".equals(renterOrderFineDeatailResVO.getFineSubsidySourceCode())) {
 				carServiceFine += renterOrderFineDeatailResVO.getFineAmount().intValue();
 			}
-			if(renterOrderFineDeatailResVO.getFineType().intValue() == 2) {
-				carServiceFine += renterOrderFineDeatailResVO.getFineAmount().intValue();
+			
+		}
+		
+		//从管理后台求和。 20200212
+		List<com.atzuche.order.commons.vo.res.rentcosts.ConsoleRenterOrderFineDeatailEntity> consoleFineLst = data.getConsoleFineLst();
+		for (com.atzuche.order.commons.vo.res.rentcosts.ConsoleRenterOrderFineDeatailEntity consoleRenterOrderFineDeatailEntity : consoleFineLst) {
+			if("1".equals(consoleRenterOrderFineDeatailEntity.getFineSubsidySourceCode())) {
+				carServiceFine += consoleRenterOrderFineDeatailEntity.getFineAmount().intValue();
 			}
 		}
-		//违约罚金
-		realVo.setCarServiceFine(String.valueOf(carServiceFine));
+		
+		
+		//违约罚金 显示求反，显示正数。
+		realVo.setCarServiceFine(String.valueOf(-carServiceFine));
 	}
 	
 	private void putRenterOrderDeposit(OrderRenterCostResVO realVo, com.atzuche.order.commons.vo.res.OrderRenterCostResVO data) {
