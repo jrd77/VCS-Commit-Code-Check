@@ -3,12 +3,15 @@ package com.atzuche.order.rentermem.service;
 import com.atzuche.order.commons.GlobalConstant;
 import com.atzuche.order.commons.entity.dto.RenterMemberRightDTO;
 import com.atzuche.order.commons.enums.MemberRightValueEnum;
-import com.atzuche.order.commons.enums.RenterMemRightEnum;
+import com.atzuche.order.commons.enums.MemRightEnum;
+import com.atzuche.order.rentermem.entity.RenterMemberRightEntity;
 import com.atzuche.order.rentermem.entity.dto.MemRightCarDepositAmtReqDTO;
 import com.atzuche.order.rentermem.entity.dto.MemRightCarDepositAmtRespDTO;
 import com.atzuche.order.rentermem.exception.CalCarDepositAmtException;
 import com.atzuche.order.rentermem.exception.CalWzDepositAmtException;
+import com.atzuche.order.rentermem.mapper.RenterMemberRightMapper;
 import com.dianping.cat.Cat;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -24,6 +27,9 @@ import java.util.stream.Collectors;
  */
 @Service
 public class RenterMemberRightService{
+
+    @Autowired
+    private RenterMemberRightMapper RenterMemberRightMapper;
 
     /**
      *
@@ -42,7 +48,7 @@ public class RenterMemberRightService{
         memRightCarDepositAmtRespDTO.setOriginalDepositAmt(originalDepositAmt);
         List<RenterMemberRightDTO> staff = memRightCarDepositAmtReqDTO.getRenterMemberRightDTOList()
                 .stream()
-                .filter(x -> RenterMemRightEnum.STAFF.getRightCode().equals(x.getRightCode()))
+                .filter(x -> MemRightEnum.STAFF.getRightCode().equals(x.getRightCode()))
                 .limit(1)
                 .collect(Collectors.toList());
         //内部员工
@@ -55,10 +61,10 @@ public class RenterMemberRightService{
         List<RenterMemberRightDTO> taskList = memRightCarDepositAmtReqDTO.getRenterMemberRightDTOList()
                 .stream()
                 .filter(x -> (
-                        RenterMemRightEnum.BIND_WECHAT.getRightCode().equals(x.getRightCode())
-                                || RenterMemRightEnum.INVITE_FRIENDS.getRightCode().equals(x.getRightCode())
-                                || RenterMemRightEnum.SUCCESS_RENTCAR.getRightCode().equals(x.getRightCode())
-                                || RenterMemRightEnum.MEMBER_LEVEL.getRightCode().equals(x.getRightCode())))
+                        MemRightEnum.BIND_WECHAT.getRightCode().equals(x.getRightCode())
+                                || MemRightEnum.INVITE_FRIENDS.getRightCode().equals(x.getRightCode())
+                                || MemRightEnum.SUCCESS_RENTCAR.getRightCode().equals(x.getRightCode())
+                                || MemRightEnum.MEMBER_LEVEL.getRightCode().equals(x.getRightCode())))
                 .collect(Collectors.toList());
         //外部员工
         double reductionRate = 0;
@@ -95,13 +101,23 @@ public class RenterMemberRightService{
         }
         List<RenterMemberRightDTO> staff = renterMemberRightDTOList
                 .stream()
-                .filter(x -> RenterMemRightEnum.STAFF.getRightCode().equals(x.getRightCode()))
+                .filter(x -> MemRightEnum.STAFF.getRightCode().equals(x.getRightCode()))
                 .limit(1)
                 .collect(Collectors.toList());
         if(staff!=null && staff.size()==1 && MemberRightValueEnum.OWN.getCode().equals(staff.get(0).getRightValue())){
             return GlobalConstant.MEMBER_RIGHT_STAFF_WZ_DEPOSIT;
         }
         return wzDepositAmt;
+    }
+
+    /**
+     * 返回订单相关的会员权益
+     * @param orderNo
+     * @return
+     */
+    public List<RenterMemberRightEntity> findByOrderNoAndMemNo(String orderNo){
+        List<RenterMemberRightEntity> rightEntities = RenterMemberRightMapper.selectByRenterOrderNo(orderNo);
+        return rightEntities;
     }
 
 }
