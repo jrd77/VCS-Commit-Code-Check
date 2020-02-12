@@ -1,5 +1,14 @@
 package com.atzuche.order.coreapi.service;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import com.atzuche.order.commons.CostStatUtils;
 import com.atzuche.order.commons.GlobalConstant;
 import com.atzuche.order.commons.LocalDateTimeUtils;
@@ -9,7 +18,13 @@ import com.atzuche.order.commons.entity.orderDetailDto.OrderConsoleCostDetailDTO
 import com.atzuche.order.commons.entity.orderDetailDto.OrderDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.OwnerOrderFineDeatailDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.OwnerOrderSubsidyDetailDTO;
-import com.atzuche.order.commons.entity.ownerOrderDetail.*;
+import com.atzuche.order.commons.entity.ownerOrderDetail.FienAmtDetailDTO;
+import com.atzuche.order.commons.entity.ownerOrderDetail.FienAmtUpdateReqDTO;
+import com.atzuche.order.commons.entity.ownerOrderDetail.OwnerRentDetailDTO;
+import com.atzuche.order.commons.entity.ownerOrderDetail.PlatformToOwnerDTO;
+import com.atzuche.order.commons.entity.ownerOrderDetail.PlatformToOwnerSubsidyDTO;
+import com.atzuche.order.commons.entity.ownerOrderDetail.RenterOwnerPriceDTO;
+import com.atzuche.order.commons.entity.ownerOrderDetail.ServiceDetailDTO;
 import com.atzuche.order.commons.enums.CarOwnerTypeEnum;
 import com.atzuche.order.commons.enums.FineSubsidyCodeEnum;
 import com.atzuche.order.commons.enums.FineTypeEnum;
@@ -26,19 +41,13 @@ import com.atzuche.order.ownercost.service.OwnerOrderSubsidyDetailService;
 import com.atzuche.order.parentorder.entity.OrderEntity;
 import com.atzuche.order.parentorder.service.OrderService;
 import com.atzuche.order.rentercost.entity.OrderConsoleCostDetailEntity;
+import com.atzuche.order.rentercost.entity.OrderConsoleSubsidyDetailEntity;
 import com.atzuche.order.rentercost.service.OrderConsoleCostDetailService;
+import com.atzuche.order.rentercost.service.OrderConsoleSubsidyDetailService;
 import com.atzuche.order.settle.service.OrderSettleService;
 import com.atzuche.order.settle.vo.req.OwnerCosts;
-import com.autoyol.commons.web.ResponseData;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
@@ -57,6 +66,8 @@ public class OwnerOrderDetailService {
     private OrderSettleService orderSettleService;
     @Autowired
     private OwnerOrderPurchaseDetailService ownerOrderPurchaseDetailService;
+    @Autowired
+    private OrderConsoleSubsidyDetailService orderConsoleSubsidyDetailService;
     
     public OwnerRentDetailDTO ownerRentDetail(String orderNo, String ownerOrderNo) {
         //主订单
@@ -141,15 +152,30 @@ public class OwnerOrderDetailService {
         return serviceDetailDTO;
     }
 
-    public PlatformToOwnerSubsidyDTO platformToOwnerSubsidy(String orderNo, String ownerOrderNo) {
-        List<OwnerOrderSubsidyDetailDTO> ownerOrderSubsidyDetailDTOS = new ArrayList<>();
-        List<OwnerOrderSubsidyDetailEntity> ownerOrderSubsidyDetailEntities = ownerOrderSubsidyDetailService.listOwnerOrderSubsidyDetail(orderNo, ownerOrderNo);
-        ownerOrderSubsidyDetailEntities.stream().forEach(x->{
-            OwnerOrderSubsidyDetailDTO ownerOrderSubsidyDetailDTO = new OwnerOrderSubsidyDetailDTO();
-            BeanUtils.copyProperties(x,ownerOrderSubsidyDetailDTO);
-            ownerOrderSubsidyDetailDTOS.add(ownerOrderSubsidyDetailDTO);
-        });
-        PlatformToOwnerSubsidyDTO platformToOwnerSubsidyDTO = getPlatformToOwnerSubsidyDTO(ownerOrderSubsidyDetailDTOS);
+    public PlatformToOwnerSubsidyDTO platformToOwnerSubsidy(String orderNo, String ownerOrderNo,String memNo) {
+    	//old code
+//        List<OwnerOrderSubsidyDetailDTO> ownerOrderSubsidyDetailDTOS = new ArrayList<>();
+//        List<OwnerOrderSubsidyDetailEntity> ownerOrderSubsidyDetailEntities = ownerOrderSubsidyDetailService.listOwnerOrderSubsidyDetail(orderNo, ownerOrderNo);
+//        ownerOrderSubsidyDetailEntities.stream().forEach(x->{
+//            OwnerOrderSubsidyDetailDTO ownerOrderSubsidyDetailDTO = new OwnerOrderSubsidyDetailDTO();
+//            BeanUtils.copyProperties(x,ownerOrderSubsidyDetailDTO);
+//            ownerOrderSubsidyDetailDTOS.add(ownerOrderSubsidyDetailDTO);
+//        });
+//      PlatformToOwnerSubsidyDTO platformToOwnerSubsidyDTO = getPlatformToOwnerSubsidyDTO(ownerOrderSubsidyDetailDTOS);
+    	
+    	
+        ///order_console_subsidy_detail
+        List<OrderConsoleSubsidyDetailEntity> lst = orderConsoleSubsidyDetailService.listOrderConsoleSubsidyDetailByOrderNoAndMemNo(orderNo, memNo);
+        
+        //转换
+        List<com.atzuche.order.commons.vo.res.rentcosts.OrderConsoleSubsidyDetailEntity> lstReal = new ArrayList<>();
+        lst.stream().forEach(x->{
+        	com.atzuche.order.commons.vo.res.rentcosts.OrderConsoleSubsidyDetailEntity entity = new com.atzuche.order.commons.vo.res.rentcosts.OrderConsoleSubsidyDetailEntity();
+		      BeanUtils.copyProperties(x,entity);
+		      lstReal.add(entity);
+		  });
+
+        PlatformToOwnerSubsidyDTO platformToOwnerSubsidyDTO = getPlatformToOwnerSubsidyList(lstReal);
         return platformToOwnerSubsidyDTO;
     }
 
@@ -179,7 +205,50 @@ public class OwnerOrderDetailService {
         return fienAmtDetailDTO;
     }
 
+    /*方法重载*/
+    private PlatformToOwnerSubsidyDTO getPlatformToOwnerSubsidyList(List<com.atzuche.order.commons.vo.res.rentcosts.OrderConsoleSubsidyDetailEntity> list){
+        int mileageAmt = CostStatUtils.orderConsoleSubsidtyAmtFilterByCashNo(OwnerCashCodeEnum.OWNER_MILEAGE_COST_SUBSIDY, list);
+        int oilSubsidyAmt = CostStatUtils.orderConsoleSubsidtyAmtFilterByCashNo(OwnerCashCodeEnum.OWNER_OIL_SUBSIDY, list);
+        int washCarSubsidyAmt = CostStatUtils.orderConsoleSubsidtyAmtFilterByCashNo(OwnerCashCodeEnum.OWNER_WASH_CAR_SUBSIDY, list);
+        int carGoodsLossSubsidyAmt = CostStatUtils.orderConsoleSubsidtyAmtFilterByCashNo(OwnerCashCodeEnum.OWNER_GOODS_SUBSIDY, list);
+        int delaySubsidyAmt = CostStatUtils.orderConsoleSubsidtyAmtFilterByCashNo(OwnerCashCodeEnum.OWNER_DELAY_SUBSIDY, list);
+        int trafficSubsidyAmt = CostStatUtils.orderConsoleSubsidtyAmtFilterByCashNo(OwnerCashCodeEnum.OWNER_TRAFFIC_SUBSIDY, list);
+        int incomeSubsidyAmt = CostStatUtils.orderConsoleSubsidtyAmtFilterByCashNo(OwnerCashCodeEnum.OWNER_INCOME_SUBSIDY, list);
+        int otherSubsidyAmt = CostStatUtils.orderConsoleSubsidtyAmtFilterByCashNo(OwnerCashCodeEnum.OWNER_OTHER_SUBSIDY, list);
 
+//        List<OwnerOrderSubsidyDetailDTO> platformToOwnerSubsidyList = CostStatUtils.getPlatformToOwnerSubsidyList(list);
+//        int platformToOwnerAmt = CostStatUtils.calAmt(platformToOwnerSubsidyList);
+//        int otherSubsidyAmt = platformToOwnerAmt - (
+//                + mileageAmt
+//                        + oilSubsidyAmt
+//                        + washCarSubsidyAmt
+//                        + carGoodsLossSubsidyAmt
+//                        + delaySubsidyAmt
+//                        + trafficSubsidyAmt
+//                        + incomeSubsidyAmt);
+       
+        int platformToOwnerAmt = 
+       mileageAmt
+      + oilSubsidyAmt
+      + washCarSubsidyAmt
+      + carGoodsLossSubsidyAmt
+      + delaySubsidyAmt
+      + trafficSubsidyAmt
+      + incomeSubsidyAmt + otherSubsidyAmt;
+        
+        PlatformToOwnerSubsidyDTO platformToOwnerSubsidyDTO = new PlatformToOwnerSubsidyDTO();
+        platformToOwnerSubsidyDTO.setMileageAmt(mileageAmt);
+        platformToOwnerSubsidyDTO.setOilSubsidyAmt(oilSubsidyAmt);
+        platformToOwnerSubsidyDTO.setWashCarSubsidyAmt(washCarSubsidyAmt);
+        platformToOwnerSubsidyDTO.setCarGoodsLossSubsidyAmt(carGoodsLossSubsidyAmt);
+        platformToOwnerSubsidyDTO.setDelaySubsidyAmt(delaySubsidyAmt);
+        platformToOwnerSubsidyDTO.setTrafficSubsidyAmt(trafficSubsidyAmt);
+        platformToOwnerSubsidyDTO.setIncomeSubsidyAmt(incomeSubsidyAmt);
+        platformToOwnerSubsidyDTO.setOtherSubsidyAmt(otherSubsidyAmt);
+        platformToOwnerSubsidyDTO.setTotal(platformToOwnerAmt);
+        return platformToOwnerSubsidyDTO;
+    }
+    
     private PlatformToOwnerSubsidyDTO getPlatformToOwnerSubsidyDTO(List<OwnerOrderSubsidyDetailDTO> ownerOrderSubsidyDetailDTOS ){
         int mileageAmt = CostStatUtils.ownerSubsidtyAmtFilterByCashNo(OwnerCashCodeEnum.OWNER_MILEAGE_COST_SUBSIDY, ownerOrderSubsidyDetailDTOS);
         int oilSubsidyAmt = CostStatUtils.ownerSubsidtyAmtFilterByCashNo(OwnerCashCodeEnum.OWNER_OIL_SUBSIDY, ownerOrderSubsidyDetailDTOS);

@@ -49,8 +49,10 @@ import com.atzuche.order.rentercost.entity.OrderSupplementDetailEntity;
 import com.atzuche.order.rentercost.entity.RenterOrderCostDetailEntity;
 import com.atzuche.order.rentercost.entity.RenterOrderFineDeatailEntity;
 import com.atzuche.order.rentercost.entity.RenterOrderSubsidyDetailEntity;
+import com.atzuche.order.rentercost.service.ConsoleRenterOrderFineDeatailService;
 import com.atzuche.order.rentercost.service.OrderSupplementDetailService;
 import com.atzuche.order.rentercost.service.RenterOrderCostDetailService;
+import com.atzuche.order.rentercost.service.RenterOrderFineDeatailService;
 import com.atzuche.order.rentercost.service.RenterOrderSubsidyDetailService;
 import com.atzuche.order.renterorder.entity.OrderCouponEntity;
 import com.atzuche.order.renterorder.service.OrderCouponService;
@@ -88,6 +90,10 @@ public class OrderCostService {
 	private OrderCouponService orderCouponService;
 	@Autowired
 	private OrderSupplementDetailService orderSupplementDetailService;
+	@Autowired
+	private ConsoleRenterOrderFineDeatailService consoleRenterOrderFineDeatailService;
+	@Autowired
+	private RenterOrderFineDeatailService renterOrderFineDeatailService;
 	
 	public OrderRenterCostResVO orderCostRenterGet(OrderCostReqVO req){
 		OrderRenterCostResVO resVo = new OrderRenterCostResVO();
@@ -113,7 +119,7 @@ public class OrderCostService {
         AccountRenterWZDepositResVO wzVo =  accountRenterWzDepositService.getAccountRenterWZDeposit(orderNo, memNo);
         com.atzuche.order.commons.vo.res.account.AccountRenterWZDepositResVO wzVoReal = new com.atzuche.order.commons.vo.res.account.AccountRenterWZDepositResVO();
         if(wzVo != null) {
-        	BeanUtils.copyProperties(wzVoReal, wzVo);
+        	BeanUtils.copyProperties(wzVo,wzVoReal);
         }else {
         	wzVoReal.setYingshouDeposit(0);
         }
@@ -123,7 +129,7 @@ public class OrderCostService {
         AccountRenterDepositResVO rentVo = accountRenterDepositService.getAccountRenterDepositEntity(orderNo, memNo);
         com.atzuche.order.commons.vo.res.account.AccountRenterDepositResVO rentVoReal = new com.atzuche.order.commons.vo.res.account.AccountRenterDepositResVO();
         if(rentVo != null) {
-        	BeanUtils.copyProperties(rentVoReal, rentVo);
+        	BeanUtils.copyProperties(rentVo,rentVoReal);
         }else {
         	rentVoReal.setYingfuDepositAmt(0);
         }
@@ -135,12 +141,12 @@ public class OrderCostService {
         for (AccountRenterCostDetailEntity accountRenterCostDetailEntity : lstCostDetail) {
         	if(RenterCashCodeEnum.WALLET_DEDUCT.equals(accountRenterCostDetailEntity.getSourceCode())) {
         		walletCostDetail = new AccountRenterCostDetailEntity();
-        		BeanUtils.copyProperties(walletCostDetail, accountRenterCostDetailEntity);
+        		BeanUtils.copyProperties(accountRenterCostDetailEntity,walletCostDetail);
         	}
 		}
         AccountRenterCostDetailResVO walletCostDetailReal = new AccountRenterCostDetailResVO();
         if(walletCostDetail != null) {
-        	BeanUtils.copyProperties(walletCostDetailReal, walletCostDetail);
+        	BeanUtils.copyProperties(walletCostDetail,walletCostDetailReal);
         }else {
         	walletCostDetailReal.setAmt(0); //默认值。
         }
@@ -149,7 +155,7 @@ public class OrderCostService {
         //-------------------------------------------------------------------- 以下是子订单费用
         
       //租客罚金列表
-		List<RenterOrderFineDeatailEntity> fineLst = renterOrderCostDetailService.queryRentOrderFineDetail(orderNo, renterOrderNo);
+		List<RenterOrderFineDeatailEntity> fineLst = renterOrderFineDeatailService.listRenterOrderFineDeatail(orderNo, renterOrderNo);
 		List<RenterOrderFineDeatailResVO> fineLstReal = new ArrayList<RenterOrderFineDeatailResVO>();
 		if(fineLst != null) {
 			fineLst.stream().forEach(x->{
@@ -164,6 +170,22 @@ public class OrderCostService {
 	      }
 		resVo.setFineLst(fineLstReal);
 		
+		//管理后台的。
+		List<com.atzuche.order.rentercost.entity.ConsoleRenterOrderFineDeatailEntity> consoleFineLst = consoleRenterOrderFineDeatailService.listConsoleRenterOrderFineDeatail(orderNo, memNo);
+		List<ConsoleRenterOrderFineDeatailEntity> consolefineLstReal = new ArrayList<ConsoleRenterOrderFineDeatailEntity>();
+		if(consoleFineLst != null) {
+			consoleFineLst.stream().forEach(x->{
+				ConsoleRenterOrderFineDeatailEntity real = new ConsoleRenterOrderFineDeatailEntity();
+	      		try {
+					BeanUtils.copyProperties(x,real);
+				} catch (Exception e) {
+					log.error("对象属性赋值报错:",e);
+				}
+	      		consolefineLstReal.add(real);
+	          });
+		}
+		//封装
+		resVo.setConsoleFineLst(consolefineLstReal);
 		
 		//配送订单
 	      List<RenterOrderDeliveryEntity> renterOrderDeliveryList = renterOrderDeliveryService.selectByRenterOrderNo(renterOrderNo);
@@ -173,10 +195,10 @@ public class OrderCostService {
 	      RenterOrderDeliveryResVO renterOrderDeliveryReturnReal = new RenterOrderDeliveryResVO();
 	      
 	      if(renterOrderDeliveryGet != null) {
-	      	BeanUtils.copyProperties(renterOrderDeliveryGetReal, renterOrderDeliveryGet);
+	      	BeanUtils.copyProperties(renterOrderDeliveryGet,renterOrderDeliveryGetReal);
 	      }
 	      if(renterOrderDeliveryReturn != null) {
-	      	BeanUtils.copyProperties(renterOrderDeliveryReturnReal, renterOrderDeliveryReturn);
+	      	BeanUtils.copyProperties(renterOrderDeliveryReturn,renterOrderDeliveryReturnReal);
 	      }
 	      resVo.setRenterOrderDeliveryGet(renterOrderDeliveryGetReal);
 	      resVo.setRenterOrderDeliveryReturn(renterOrderDeliveryReturnReal);
@@ -219,7 +241,7 @@ public class OrderCostService {
 	      AccountRenterCostSettleEntity arcse = accountRenterCostSettleService.selectByOrderNo(orderNo, memNo);
 	      AccountRenterCostSettleResVO  renterSettleVo = new AccountRenterCostSettleResVO();
 	      if(arcse != null) {
-		      	BeanUtils.copyProperties(renterSettleVo, arcse);
+		      	BeanUtils.copyProperties(arcse,renterSettleVo);
 		  }
 		  resVo.setRenterSettleVo(renterSettleVo);
 		  ///油费，超里程，加油服务费
@@ -236,7 +258,7 @@ public class OrderCostService {
             RenterGetAndReturnCarDTO oilAmt = rentCost.getOilAmt();
             com.atzuche.order.commons.vo.res.rentcosts.RenterOrderCostDetailEntity oilAmtReal = new com.atzuche.order.commons.vo.res.rentcosts.RenterOrderCostDetailEntity();
             if(oilAmt != null) {
-                BeanUtils.copyProperties(oilAmtReal, oilAmt);
+                BeanUtils.copyProperties(oilAmt,oilAmtReal);
                 String oilDifferenceCrash = oilAmt.getOilDifferenceCrash();
                 oilDifferenceCrash = StringUtil.isBlank(oilDifferenceCrash)?"0":oilDifferenceCrash;
                 //oilDifferenceCrash may be "0.0" format
@@ -250,7 +272,7 @@ public class OrderCostService {
             FeeResult mileageAmt = rentCost.getMileageAmt();
 		    com.atzuche.order.commons.vo.res.rentcosts.RenterOrderCostDetailEntity mileageAmtReal = new com.atzuche.order.commons.vo.res.rentcosts.RenterOrderCostDetailEntity();
 		    if(mileageAmt != null) {
-		    	BeanUtils.copyProperties(mileageAmtReal, mileageAmt);
+		    	BeanUtils.copyProperties(mileageAmt,mileageAmtReal);
                 mileageAmtReal.setTotalAmount(mileageAmt.getTotalFee());
 		    }
 		    resVo.setMileageAmt(mileageAmtReal);
@@ -410,7 +432,7 @@ public class OrderCostService {
 	     OwnerOrderPurchaseDetailEntity proxyExpenseReal = null;
 	     if(proxyExpense != null) {
 	    	 proxyExpenseReal = new OwnerOrderPurchaseDetailEntity();
-	    	 BeanUtils.copyProperties(proxyExpenseReal, proxyExpense);
+	    	 BeanUtils.copyProperties(proxyExpense,proxyExpenseReal);
 	     }
 	     resVo.setProxyExpense(proxyExpenseReal);
 	     
@@ -421,7 +443,7 @@ public class OrderCostService {
 	     OwnerOrderPurchaseDetailEntity serviceExpenseReal = null;
 	     if(serviceExpense != null) {
 	    	 serviceExpenseReal = new OwnerOrderPurchaseDetailEntity();
-	    	 BeanUtils.copyProperties(serviceExpenseReal, serviceExpense);
+	    	 BeanUtils.copyProperties(serviceExpense,serviceExpenseReal);
 	     }
 	     resVo.setServiceExpense(serviceExpenseReal);
 	     
@@ -504,7 +526,7 @@ public class OrderCostService {
 	     OwnerOrderPurchaseDetailEntity renterOrderCostDetailReal = null;
 	     if(renterOrderCostDetail != null) {
 	    	 renterOrderCostDetailReal = new OwnerOrderPurchaseDetailEntity();
-	    	 BeanUtils.copyProperties(renterOrderCostDetailReal, renterOrderCostDetail);
+	    	 BeanUtils.copyProperties(renterOrderCostDetail,renterOrderCostDetailReal);
              String oilDifferenceCrash = renterOrderCostDetail.getOilDifferenceCrash();
              oilDifferenceCrash = StringUtil.isBlank(oilDifferenceCrash)?"0":oilDifferenceCrash;
              renterOrderCostDetailReal.setTotalAmount(Integer.valueOf(oilDifferenceCrash));

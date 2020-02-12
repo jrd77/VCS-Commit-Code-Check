@@ -33,7 +33,7 @@ public class RenterEventDetainStatusEntity implements Serializable {
 	 */
 	private String renterOrderNo;
 	/**
-	 * 处理状态
+	 * 处理状态 处理状态 1：暂扣 2：取消暂扣
 	 */
 	private Integer status;
 	/**

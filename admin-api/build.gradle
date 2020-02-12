@@ -67,6 +67,7 @@ dependencies {
 	compile project(":order-core-all:parent-order")
     compile project(":order-settle")
     compile project(":order-detain")
+
     compile project(":order-remote-service:order-remote-mem")
     compile project(":order-remote-service:order-remote-car")
 }

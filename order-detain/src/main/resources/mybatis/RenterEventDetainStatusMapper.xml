@@ -90,6 +90,10 @@
         select <include refid="Base_Column_List" /> from renter_event_detain_status where renter_order_no = #{renterOrderNo}
 
     </select>
+    <select id="selectByOrderNo" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List" /> from renter_event_detain_status where order_no = #{orderNo}
+
+    </select>
 
 
 </mapper>

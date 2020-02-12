@@ -37,6 +37,7 @@ import com.atzuche.order.rentercost.entity.RenterOrderCostDetailEntity;
 import com.atzuche.order.rentercost.entity.RenterOrderFineDeatailEntity;
 import com.atzuche.order.rentercost.entity.RenterOrderSubsidyDetailEntity;
 import com.atzuche.order.rentercost.service.RenterOrderCostDetailService;
+import com.atzuche.order.rentercost.service.RenterOrderFineDeatailService;
 import com.atzuche.order.rentercost.service.RenterOrderSubsidyDetailService;
 import com.atzuche.order.renterorder.entity.RenterOrderChangeApplyEntity;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
@@ -72,13 +73,15 @@ public class ModifyOrderQueryListService {
 	private RenterOrderChangeApplyService renterOrderChangeApplyService;
 	@Autowired
 	private OrderStatusService orderStatusService;
+	@Autowired
+	private RenterOrderFineDeatailService renterOrderFineDeatailService;
 	
 	
 	public ModifyOrderResVO queryModifyOrderList(String orderNo,String renterOrderNo) {
 		ModifyOrderResVO resVo = new ModifyOrderResVO();
 
 		//租客罚金列表
-		List<RenterOrderFineDeatailEntity> fineLst = renterOrderCostDetailService.queryRentOrderFineDetail(orderNo, renterOrderNo);
+		List<RenterOrderFineDeatailEntity> fineLst = renterOrderFineDeatailService.listRenterOrderFineDeatail(orderNo, renterOrderNo);
 		List<RenterOrderFineDeatailResVO> fineLstReal = new ArrayList<RenterOrderFineDeatailResVO>();
 		if(fineLst != null) {
 			fineLst.stream().forEach(x->{
