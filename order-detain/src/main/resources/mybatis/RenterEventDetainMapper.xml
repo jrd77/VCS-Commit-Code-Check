@@ -110,7 +110,10 @@
 			</set>
 		where id = #{id} and version = #{version}
 	</update>
-	
+    <select id="getEventDetainByOrderNoAndEvent" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List" /> from renter_event_detain where order_no = #{orderNo} and event_type = #{eventType} limit 1
 
-  	
+    </select>
+
+
 </mapper>

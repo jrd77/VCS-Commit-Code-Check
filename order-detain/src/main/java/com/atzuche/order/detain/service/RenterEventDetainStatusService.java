@@ -7,6 +7,8 @@ import com.atzuche.order.detain.mapper.RenterEventDetainStatusMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.Objects;
 
 
 /**
@@ -21,7 +23,15 @@ public class RenterEventDetainStatusService{
     private RenterEventDetainStatusMapper renterEventDetainStatusMapper;
 
     public int saveEventDetainStatus(RenterEventDetainStatusEntity entity) {
-        int result = renterEventDetainStatusMapper.insertSelective(entity);
+        RenterEventDetainStatusEntity ent = renterEventDetainStatusMapper.selectByRentOrderNo(entity.getRenterOrderNo());
+        int result;
+        if(Objects.isNull(ent) || Objects.isNull(ent.getRenterOrderNo())){
+            result = renterEventDetainStatusMapper.insertSelective(entity);
+        }else {
+            entity.setId(ent.getId());
+            entity.setVersion(ent.getVersion());
+            result = renterEventDetainStatusMapper.updateByPrimaryKeySelective(entity);
+        }
         if(result==0){
             throw new RuntimeException("插入暂扣事件异常");
         }
@@ -32,5 +42,15 @@ public class RenterEventDetainStatusService{
         RenterEventDetainStatusEntity ent = renterEventDetainStatusMapper.selectByRentOrderNo(renterEventDetainEntity.getRenterOrderNo());
         ent.setStatus(DetainStatusEnum.DETAIN_CANCEL.getCode());
         renterEventDetainStatusMapper.updateByPrimaryKeySelective(ent);
+    }
+
+    /**
+     * 查询订单暂扣信息
+     * @param orderNo
+     * @return
+     */
+    public RenterEventDetainStatusEntity getRenterDetainStatus(String orderNo) {
+        RenterEventDetainStatusEntity ent = renterEventDetainStatusMapper.selectByOrderNo(orderNo);
+        return ent;
     }
 }

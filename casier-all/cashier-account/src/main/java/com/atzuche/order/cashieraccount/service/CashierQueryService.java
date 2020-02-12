@@ -14,12 +14,14 @@ import com.atzuche.order.cashieraccount.entity.CashierEntity;
 import com.atzuche.order.cashieraccount.service.notservice.CashierNoTService;
 import com.atzuche.order.cashieraccount.vo.res.WzDepositMsgResVO;
 import com.atzuche.order.commons.DateUtils;
+import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.commons.enums.cashier.PayTypeEnum;
 import com.atzuche.order.commons.enums.cashier.TransStatusEnum;
 import com.autoyol.autopay.gateway.constant.DataPayKindConstant;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.util.List;
 import java.util.Objects;
@@ -82,15 +84,16 @@ public class CashierQueryService {
         List<AccountRenterWzDepositDetailEntity> list = accountRenterWzDepositDetailNoTService.findByOrderNo(orderNo);
         //剩余可用违章押金
         int wzDepositSurplusAmt = list.stream().mapToInt(AccountRenterWzDepositDetailEntity::getAmt).sum();
-//        int debtAmt = list.stream().filter(obj ->{
-//
-//        }).mapToInt(AccountRenterWzDepositDetailEntity::getAmt).sum();
+        //结算时候抵扣历史欠款
+        int debtAmt = list.stream().filter(obj ->{
+            return RenterCashCodeEnum.CANCEL_WZ_DEPOSIT_TO_HISTORY_AMT.getCashNo().equals(obj.getCostCode());
+        }).mapToInt(AccountRenterWzDepositDetailEntity::getAmt).sum();
+
 
         result.setDebtStatus("成功");
         result.setWzDepositSurplusAmt(wzDepositSurplusAmt);
-        result.setDebtAmt(0);
+        result.setDebtAmt(debtAmt);
         result.setRefundAmt(entity.getRealReturnDeposit());
-        result.setDebtStatus("1");
         return result;
     }
 

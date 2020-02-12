@@ -10,6 +10,10 @@ import com.atzuche.order.cashieraccount.vo.res.WzDepositMsgResVO;
 import com.atzuche.order.commons.CompareHelper;
 import com.atzuche.order.commons.DateUtils;
 import com.atzuche.order.commons.enums.ErrorCode;
+import com.atzuche.order.commons.enums.detain.DetailSourceEnum;
+import com.atzuche.order.detain.service.RenterDetain;
+import com.atzuche.order.detain.vo.RenterDetainVO;
+import com.atzuche.order.detain.vo.UnfreezeRenterDetainVO;
 import com.atzuche.order.parentorder.entity.OrderStatusEntity;
 import com.atzuche.order.parentorder.service.OrderStatusService;
 import com.atzuche.order.rentercommodity.service.RenterGoodsService;
@@ -63,6 +67,9 @@ public class RenterWzService {
 
     @Resource
     private RenterOrderService renterOrderService;
+
+    @Resource
+    private RenterDetain renterDetain;
 
     private static final String WZ_OTHER_FINE_REMARK = "其他扣款备注";
     private static final String WZ_OTHER_FINE = "其他扣款";
@@ -213,8 +220,23 @@ public class RenterWzService {
         return wzCostLogs;
     }
 
+    private static final Integer DETAIN = 1;
+    private static final Integer UN_DETAIN = 2;
+
     public void addTemporaryRefund(TemporaryRefundReqVO req) {
-        //TODO 调用退款接口
+        //违章押金暂扣状态 1：暂扣 2：取消暂扣
+        Integer detainStatus = req.getDetainStatus();
+        if(DETAIN.equals(detainStatus)){
+            RenterDetainVO renterDetainVO = new RenterDetainVO();
+            renterDetainVO.setOrderNo(req.getOrderNo());
+            renterDetainVO.setEventType(DetailSourceEnum.WZ_DEPOSIT);
+            renterDetain.insertRenterDetain(renterDetainVO);
+        }else if(UN_DETAIN.equals(UN_DETAIN)){
+            UnfreezeRenterDetainVO unfreezeRenterDetainVO = new UnfreezeRenterDetainVO();
+            unfreezeRenterDetainVO.setOrderNo(req.getOrderNo());
+            unfreezeRenterDetainVO.setEventType(DetailSourceEnum.WZ_DEPOSIT);
+            renterDetain.unfreezeRenterDetain(unfreezeRenterDetainVO);
+        }
 
         /*WzTemporaryRefundLogEntity dto = new WzTemporaryRefundLogEntity();
         BeanUtils.copyProperties(req,dto);
@@ -310,8 +332,8 @@ public class RenterWzService {
                 result.setRealSettleTimeStr(DateUtils.formate(orderStatus.getWzSettleTime(),DateUtils.DATE_DEFAUTE1));
             }
         }
-        //TODO  目前先写死 等待海豹接口
-        result.setDetainStatus(1);
+        String renterDetainStatus = renterDetain.getRenterDetainStatus(orderNo);
+        result.setDetainStatus(renterDetainStatus);
         if(StringUtils.isNotBlank(wzDepositMsg.getDeductionTime())){
             result.setDeductionTimeStr(wzDepositMsg.getDeductionTime());
             result.setDeductionStatusStr(wzDepositMsg.getDebtStatus());

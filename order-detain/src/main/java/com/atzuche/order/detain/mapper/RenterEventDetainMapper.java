@@ -2,7 +2,8 @@ package com.atzuche.order.detain.mapper;
 
 import com.atzuche.order.detain.entity.RenterEventDetainEntity;
 import org.apache.ibatis.annotations.Mapper;
-import java.util.List;
+import org.apache.ibatis.annotations.Param;
+
 
 /**
  * 租客端暂扣处理事件表
@@ -19,4 +20,5 @@ public interface RenterEventDetainMapper{
 
     int updateByPrimaryKeySelective(RenterEventDetainEntity record);
 
+    RenterEventDetainEntity getEventDetainByOrderNoAndEvent(@Param("orderNo") String orderNo, @Param("eventType") Integer eventType);
 }
