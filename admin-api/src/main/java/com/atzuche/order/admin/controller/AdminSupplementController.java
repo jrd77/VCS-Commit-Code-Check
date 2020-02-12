@@ -1,7 +1,5 @@
 package com.atzuche.order.admin.controller;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 import javax.validation.Valid;
@@ -18,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.alibaba.fastjson.JSON;
 import com.atzuche.order.admin.service.AdminSupplementService;
 import com.atzuche.order.commons.entity.dto.OrderSupplementDetailDTO;
-import com.atzuche.order.commons.vo.res.rentcosts.OrderSupplementDetailEntity;
+import com.atzuche.order.commons.vo.res.rentcosts.SupplementVO;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.doc.annotation.AutoDocMethod;
@@ -34,11 +32,11 @@ public class AdminSupplementController {
 	private AdminSupplementService adminSupplementService;
 	
 	
-    @AutoDocMethod(description = "订单补付列表", value = "订单补付列表",response = SupplementRecord.class)
+    @AutoDocMethod(description = "订单补付列表", value = "订单补付列表",response = SupplementVO.class)
     @RequestMapping(value="console/order/supplement/list",method = RequestMethod.GET)
-    public ResponseData<SupplementRecord> listSupplement(@RequestParam(value="orderNo",required = true) String orderNo){
+    public ResponseData<SupplementVO> listSupplement(@RequestParam(value="orderNo",required = true) String orderNo){
         log.info("AdminSupplementController.listSupplement orderNo=[{}]", orderNo);
-        return ResponseData.success(new SupplementRecord(adminSupplementService.listSupplement(orderNo)));
+        return ResponseData.success(adminSupplementService.listSupplement(orderNo));
     }
 	
 	
@@ -63,21 +61,4 @@ public class AdminSupplementController {
         adminSupplementService.delSupplement(id);
         return ResponseData.success();
     }
-    
-    
-    public static class SupplementRecord {
-		private List<OrderSupplementDetailEntity> list = new ArrayList<>();
-
-		public List<OrderSupplementDetailEntity> getList() {
-			return list;
-		}
-
-		public void setList(List<OrderSupplementDetailEntity> list) {
-			this.list = list;
-		}
-
-		public SupplementRecord(List<OrderSupplementDetailEntity> list) {
-			this.list = list;
-		}
-	}
 }
