@@ -183,7 +183,7 @@ public class CarProxyService {
         String serialNumbers = Optional.ofNullable(carGpsVOS)
                 .orElseGet(ArrayList::new)
                 .stream()
-                .map(x -> x.getSerialNumber())
+                .map(x -> x.getSimNo())
                 .collect(Collectors.joining(","));
         renterGoodsDetailDto.setGpsSerialNumber(serialNumbers);
 
