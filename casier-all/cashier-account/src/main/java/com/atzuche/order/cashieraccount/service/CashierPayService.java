@@ -20,6 +20,7 @@ import com.atzuche.order.cashieraccount.vo.res.AccountPayAbleResVO;
 import com.atzuche.order.cashieraccount.vo.res.OrderPayableAmountResVO;
 import com.atzuche.order.cashieraccount.vo.res.pay.OrderPayCallBackSuccessVO;
 import com.atzuche.order.commons.CatConstants;
+import com.atzuche.order.commons.DateUtils;
 import com.atzuche.order.commons.enums.OrderPayStatusEnum;
 import com.atzuche.order.commons.enums.OrderStatusEnum;
 import com.atzuche.order.commons.enums.YesNoEnum;
@@ -346,19 +347,41 @@ public class CashierPayService{
      */
     private void handCopywriting(OrderPayableAmountResVO result,OrderPayReqVO orderPayReqVO) {
         result.setButtonName("去支付");
-
+        RenterOrderEntity renterOrderEntity = cashierNoTService.getRenterOrderNoByOrderNo(orderPayReqVO.getOrderNo());
+        // 租车费用倒计时 单位秒
+        long countdown=0L;
+        if(Objects.nonNull(renterOrderEntity) && Objects.nonNull(renterOrderEntity.getCreateTime())){
+            countdown = DateUtils.getDateLatterCompareNowScoend(renterOrderEntity.getCreateTime(),1);
+        }
         String costText ="";
+        //租车费用
+        if(orderPayReqVO.getPayKind().contains(DataPayKindConstant.RENT_AMOUNT) || orderPayReqVO.getPayKind().contains(DataPayKindConstant.RENT_INCREMENT)){
+            costText =costText+"租车费用"+ Math.abs(result.getAmtRent());
+            result.setHints("请于1小时内完成支付，超时未支付订单将自动取消");
+            result.setCountdown(countdown);
+        }
+        //车辆押金
         if(orderPayReqVO.getPayKind().contains(DataPayKindConstant.RENT)){
             costText =costText+"车辆押金"+ Math.abs(result.getAmtDeposit());
-            result.setHints("请于1小时内完成支付，超时未支付订单将自动取消");
+            result.setHints("交易结束后24小时内，车辆押金将返还到支付账户");
         }
+        //违章押金
         if(orderPayReqVO.getPayKind().contains(DataPayKindConstant.DEPOSIT)){
             costText =costText+" 违章押金"+Math.abs(result.getAmtWzDeposit());
             result.setHints("交易结束后24小时内，车辆押金将返还到支付账户");
         }
+        //车辆押金 + 违章押金
         if(orderPayReqVO.getPayKind().contains(DataPayKindConstant.RENT) && orderPayReqVO.getPayKind().contains(DataPayKindConstant.DEPOSIT)){
             costText ="车辆押金"+ Math.abs(result.getAmtDeposit()) + " + " + " 违章押金"+Math.abs(result.getAmtWzDeposit());
-
+            result.setHints("交易结束后24小时内，车辆押金将返还到支付账户");
+        }
+        //车辆押金 + 租车费用 一起支付
+        if(orderPayReqVO.getPayKind().contains(DataPayKindConstant.RENT) &&
+            (orderPayReqVO.getPayKind().contains(DataPayKindConstant.RENT_AMOUNT) || orderPayReqVO.getPayKind().contains(DataPayKindConstant.RENT_INCREMENT))
+        ){
+            costText ="租车费用"+ Math.abs(result.getAmtRent()) + " + " + " 车辆押金"+Math.abs(result.getAmtDeposit());
+            result.setHints("交易结束后24小时内，车辆押金将返还到支付账户");
+            result.setCountdown(countdown);
         }
         result.setCostText(costText);
 
