@@ -78,7 +78,7 @@ public class OrderSettleNewService {
         BeanUtils.copyProperties(settleOrders,settleOrdersAccount);
         //查询订单剩余应付
         int rentCostAmtFinal = getRentCostAmtFinal(settleOrders);
-        settleOrdersAccount.setRentCostAmtFinal(rentCostAmtFinal + accountRenterCostSettle.getShifuAmt());
+        settleOrdersAccount.setRentCostAmtFinal(-rentCostAmtFinal + accountRenterCostSettle.getShifuAmt());
         settleOrdersAccount.setRentCostPayAmt(accountRenterCostSettle.getShifuAmt());
         settleOrdersAccount.setDepositAmt(depositAmtRealPay);
         settleOrdersAccount.setDepositSurplusAmt(depositAmt);

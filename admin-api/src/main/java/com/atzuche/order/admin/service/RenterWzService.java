@@ -332,7 +332,7 @@ public class RenterWzService {
                 result.setRealSettleTimeStr(DateUtils.formate(orderStatus.getWzSettleTime(),DateUtils.DATE_DEFAUTE1));
             }
         }
-        String renterDetainStatus = renterDetain.getRenterDetainStatus(orderNo, null);
+        String renterDetainStatus = renterDetain.getRenterDetainStatus(orderNo);
         result.setDetainStatus(renterDetainStatus);
         if(StringUtils.isNotBlank(wzDepositMsg.getDeductionTime())){
             result.setDeductionTimeStr(wzDepositMsg.getDeductionTime());
