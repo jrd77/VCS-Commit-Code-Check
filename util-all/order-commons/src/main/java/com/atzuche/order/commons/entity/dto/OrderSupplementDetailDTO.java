@@ -30,7 +30,6 @@ public class OrderSupplementDetailDTO {
 	/**
 	 * 费用编码
 	 */
-	@NotBlank(message="请款码")
 	@AutoDocProperty(value="请款码",required=false)
 	private String requestPayCode;
 	
