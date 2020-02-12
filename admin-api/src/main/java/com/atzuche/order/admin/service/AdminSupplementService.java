@@ -41,7 +41,14 @@ public class AdminSupplementService {
             Cat.logEvent(CatConstants.FEIGN_RESULT,JSON.toJSONString(responseObject));
             checkResponse(responseObject);
             t.setStatus(Transaction.SUCCESS);
-            return responseObject.getData();
+            List<OrderSupplementDetailEntity> list = responseObject.getData();
+            if (list != null && !list.isEmpty()) {
+            	for (OrderSupplementDetailEntity sup:list) {
+            		// 管理后台展示取反
+            		sup.setAmt(sup.getAmt() != null ? -sup.getAmt():0);
+            	}
+            }
+            return list;
         }catch (Exception e){
             log.error("Feign 管理后台查询补付列表,responseObject={},req={}",JSON.toJSONString(responseObject),JSON.toJSONString(orderNo),e);
             Cat.logError("Feign 管理后台查询补付列表",e);
@@ -66,6 +73,8 @@ public class AdminSupplementService {
             Cat.logEvent(CatConstants.FEIGN_PARAM,JSON.toJSONString(req));
             req.setOpStatus(1);
             req.setPayFlag(1);
+            // 入库取反
+            req.setAmt(req.getAmt() != null ? -req.getAmt():0);
             responseObject = feignSupplementService.addSupplement(req);
             Cat.logEvent(CatConstants.FEIGN_RESULT,JSON.toJSONString(responseObject));
             checkResponse(responseObject);
