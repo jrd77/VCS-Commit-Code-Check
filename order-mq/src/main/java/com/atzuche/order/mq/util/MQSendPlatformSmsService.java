@@ -9,6 +9,7 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.util.*;
 
 /**
@@ -20,7 +21,7 @@ public class MQSendPlatformSmsService {
 
     private static final Logger logger = LoggerFactory.getLogger(MQSendPlatformSmsService.class);
 
-    @Autowired
+    @Resource(name = "orderSmsRabbitTemplate")
     private RabbitTemplate rabbitTemplate;
 
     /**

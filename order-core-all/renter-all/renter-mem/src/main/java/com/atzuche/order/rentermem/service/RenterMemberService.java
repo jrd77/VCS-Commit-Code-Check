@@ -81,4 +81,6 @@ public class RenterMemberService{
     public RenterMemberEntity queryRenterInfoByOrderNoAndRenterNo(String orderNo, String renterNo) {
         return renterMemberMapper.queryRenterInfoByOrderNoAndRenterNo(orderNo,renterNo);
     }
+
+
 }

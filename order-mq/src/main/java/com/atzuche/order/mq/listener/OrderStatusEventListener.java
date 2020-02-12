@@ -24,7 +24,7 @@ public class OrderStatusEventListener {
     @Autowired
     MQSendPlatformSmsService sendPlatformSmsService;
 
-    @RabbitListener(bindings = {@QueueBinding(value = @Queue(value = "order_status_02", durable = "true"),
+    @RabbitListener(bindings = {@QueueBinding(value = @Queue(value = "order_status_01", durable = "true"),
             exchange = @Exchange(value = "auto-order-status", durable = "true", type = "topic"), key = "status.#")
     },containerFactory = "rabbitListenerContainerFactory")
     public void process(Message message) {

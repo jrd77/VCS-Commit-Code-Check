@@ -45,7 +45,7 @@ public class RabbitMQConfig {
         connectionFactory.setUsername(username);
         connectionFactory.setPassword(password);
         connectionFactory.setVirtualHost("/");
-        //connectionFactory.setPublisherConfirms(true);
+        connectionFactory.setPublisherConfirms(true);
         return connectionFactory;
     }
 
@@ -54,6 +54,12 @@ public class RabbitMQConfig {
     public RabbitTemplate rabbitTemplate() {
         RabbitTemplate template = new RabbitTemplate(connectionFactory());
         template.setMessageConverter(jsonMessageConverter());
+        return template;
+    }
+
+    @Bean
+    public RabbitTemplate orderSmsRabbitTemplate() {
+        RabbitTemplate template = new RabbitTemplate(connectionFactory());
         return template;
     }
 
