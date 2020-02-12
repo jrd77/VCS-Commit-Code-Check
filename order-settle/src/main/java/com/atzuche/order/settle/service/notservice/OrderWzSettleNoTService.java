@@ -819,7 +819,7 @@ public class OrderWzSettleNoTService {
         }
         //1.10 查询车主罚金
         List<OwnerOrderFineDeatailEntity> ownerOrderFineDeatails = ownerCosts.getOwnerOrderFineDeatails();
-        if(CollectionUtils.isEmpty(ownerOrderFineDeatails)){
+        if(!CollectionUtils.isEmpty(ownerOrderFineDeatails)){
             for(int i=0; i<ownerOrderFineDeatails.size();i++){
                 OwnerOrderFineDeatailEntity ownerOrderFineDeatail = ownerOrderFineDeatails.get(i);
                 AccountOwnerCostSettleDetailEntity accountOwnerCostSettleDetail = new AccountOwnerCostSettleDetailEntity();
@@ -1768,7 +1768,7 @@ public class OrderWzSettleNoTService {
         }
         if(refundAmt<0){
             List<CashierEntity> cashierEntitys = cashierNoTService.getCashierEntitys(settleOrders.getOrderNo(),settleOrders.getRenterMemNo(), DataPayKindConstant.RENT_INCREMENT);
-            if(CollectionUtils.isEmpty(cashierEntitys)){
+            if(!CollectionUtils.isEmpty(cashierEntitys)){
                 for(int i=0;i<cashierEntitys.size();i++){
                     if(refundAmt<0){
                         CashierRefundApplyReqVO vo = new CashierRefundApplyReqVO();

@@ -79,7 +79,7 @@ public class AdminDeliveryCarService {
     public DeliveryCarVO findDeliveryListByOrderNo(DeliveryCarRepVO deliveryCarDTO) {
         logger.info("入参deliveryCarDTO：[{}]", deliveryCarDTO.toString());
         // 获取租客商品信息
-        RenterHandoverCarInfoEntity renterOrderDeliveryEntity = renterHandoverCarService.selectObjectByOrderNo(deliveryCarDTO.getOrderNo(),4);
+        RenterOrderDeliveryEntity renterOrderDeliveryEntity = renterOrderDeliveryService.findRenterOrderByrOrderNo(deliveryCarDTO.getOrderNo(),1);
         if(null == renterOrderDeliveryEntity)
         {
             throw new DeliveryOrderException(DeliveryErrorCode.NO_DELIVERY_INFO);

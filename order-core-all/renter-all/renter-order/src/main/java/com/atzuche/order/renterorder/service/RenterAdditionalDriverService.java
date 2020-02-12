@@ -49,6 +49,11 @@ public class RenterAdditionalDriverService {
                     record.setDriverId(String.valueOf(commUseDriverInfo.getId()));
                     record.setRealName(commUseDriverInfo.getRealName());
                     record.setPhone(String.valueOf(commUseDriverInfo.getMobile()));
+                    record.setIdCard(commUseDriverInfo.getIdCard());
+                    record.setDriLicAllowCar(commUseDriverInfo.getDriLicAllowCar());
+                    record.setValidityStartDate(commUseDriverInfo.getValidityStartDate());
+                    record.setValidityEndDate(commUseDriverInfo.getValidityEndDate());
+
                     //添加操作人
                     record.setCreateOp(commUseDriverInfo.getConsoleOperatorName());
                     record.setUpdateOp(commUseDriverInfo.getConsoleOperatorName());

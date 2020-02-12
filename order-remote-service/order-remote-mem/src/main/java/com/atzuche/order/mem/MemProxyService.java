@@ -6,11 +6,9 @@ import com.atzuche.order.commons.LocalDateTimeUtils;
 import com.atzuche.order.commons.ResponseCheckUtil;
 import com.atzuche.order.commons.entity.dto.*;
 import com.atzuche.order.commons.enums.MemberFlagEnum;
-import com.atzuche.order.commons.enums.OwnerMemRightEnum;
-import com.atzuche.order.commons.enums.RenterMemRightEnum;
+import com.atzuche.order.commons.enums.MemRightEnum;
 import com.atzuche.order.commons.enums.RightTypeEnum;
 import com.atzuche.order.mem.dto.OrderRenterInfoDTO;
-import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.member.detail.api.MemberDetailFeignService;
 import com.autoyol.member.detail.enums.MemberSelectKeyEnum;
@@ -24,7 +22,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.text.SimpleDateFormat;
-import java.time.Duration;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
@@ -223,8 +220,8 @@ public class MemProxyService {
         if(memberRoleInfo != null){
             if(memberRoleInfo.getInternalStaff()!=null){
                 OwnerMemberRightDTO internalStaff = new OwnerMemberRightDTO();
-                internalStaff.setRightCode(OwnerMemRightEnum.STAFF.getRightCode());
-                internalStaff.setRightName(OwnerMemRightEnum.STAFF.getRightName());
+                internalStaff.setRightCode(MemRightEnum.STAFF.getRightCode());
+                internalStaff.setRightName(MemRightEnum.STAFF.getRightName());
                 internalStaff.setRightValue(String.valueOf(memberRoleInfo.getInternalStaff()));
                 internalStaff.setRightType(RightTypeEnum.STAFF.getCode());
                 internalStaff.setRightDesc("是否是内部员工");
@@ -242,8 +239,8 @@ public class MemProxyService {
             }
             if(memberRoleInfo.getCpicMemberFlag() != null){
                 OwnerMemberRightDTO internalStaff = new OwnerMemberRightDTO();
-                internalStaff.setRightCode(OwnerMemRightEnum.CPIC_MEM.getRightCode());
-                internalStaff.setRightName(OwnerMemRightEnum.CPIC_MEM.getRightName());
+                internalStaff.setRightCode(MemRightEnum.CPIC_MEM.getRightCode());
+                internalStaff.setRightName(MemRightEnum.CPIC_MEM.getRightName());
                 internalStaff.setRightValue(String.valueOf(memberRoleInfo.getCpicMemberFlag()));
                 internalStaff.setRightType(RightTypeEnum.CPIC.getCode());
                 internalStaff.setRightDesc("是否太保会员");
@@ -255,8 +252,8 @@ public class MemProxyService {
             WxBindingTaskInfo wxBindingTaskInfo = memberReliefInfo.getWxBindingTaskInfo();
             if(wxBindingTaskInfo !=null){
                 OwnerMemberRightDTO internalStaff = new OwnerMemberRightDTO();
-                internalStaff.setRightCode(OwnerMemRightEnum.BIND_WECHAT.getRightCode());
-                internalStaff.setRightName(OwnerMemRightEnum.BIND_WECHAT.getRightName());
+                internalStaff.setRightCode(MemRightEnum.BIND_WECHAT.getRightCode());
+                internalStaff.setRightName(MemRightEnum.BIND_WECHAT.getRightName());
                 internalStaff.setRightValue(wxBindingTaskInfo.getReliefPercentage()==null?"0":String.valueOf(wxBindingTaskInfo.getReliefPercentage()));
                 internalStaff.setRightDesc(wxBindingTaskInfo.getTitle());
                 internalStaff.setRightType(RightTypeEnum.TASK.getCode());
@@ -265,8 +262,8 @@ public class MemProxyService {
             MemberLevelTaskInfo memberLevelTaskInfo = memberReliefInfo.getMemberLevelTaskInfo();
             if(memberLevelTaskInfo != null){
                 OwnerMemberRightDTO internalStaff = new OwnerMemberRightDTO();
-                internalStaff.setRightCode(OwnerMemRightEnum.MEMBER_LEVEL.getRightCode());
-                internalStaff.setRightName(OwnerMemRightEnum.MEMBER_LEVEL.getRightName());
+                internalStaff.setRightCode(MemRightEnum.MEMBER_LEVEL.getRightCode());
+                internalStaff.setRightName(MemRightEnum.MEMBER_LEVEL.getRightName());
                 internalStaff.setRightValue(memberLevelTaskInfo.getReliefPercentage()==null?"0":String.valueOf(memberLevelTaskInfo.getReliefPercentage()));
                 internalStaff.setRightDesc(memberLevelTaskInfo.getTitle());
                 internalStaff.setRightType(RightTypeEnum.TASK.getCode());
@@ -275,8 +272,8 @@ public class MemProxyService {
             InvitationTaskInfo invitationTaskInfo = memberReliefInfo.getInvitationTaskInfo();
             if(invitationTaskInfo != null){
                 OwnerMemberRightDTO internalStaff = new OwnerMemberRightDTO();
-                internalStaff.setRightCode(OwnerMemRightEnum.INVITE_FRIENDS.getRightCode());
-                internalStaff.setRightName(OwnerMemRightEnum.INVITE_FRIENDS.getRightName());
+                internalStaff.setRightCode(MemRightEnum.INVITE_FRIENDS.getRightCode());
+                internalStaff.setRightName(MemRightEnum.INVITE_FRIENDS.getRightName());
                 internalStaff.setRightValue(invitationTaskInfo.getReliefPercentage()==null?"0":String.valueOf(invitationTaskInfo.getReliefPercentage()));
                 internalStaff.setRightDesc(invitationTaskInfo.getTitle());
                 internalStaff.setRightType(RightTypeEnum.TASK.getCode());
@@ -285,8 +282,8 @@ public class MemProxyService {
             RentCarTaskInfo rentCarTaskInfo = memberReliefInfo.getRentCarTaskInfo();
             if(rentCarTaskInfo != null){
                 OwnerMemberRightDTO internalStaff = new OwnerMemberRightDTO();
-                internalStaff.setRightCode(OwnerMemRightEnum.SUCCESS_RENTCAR.getRightCode());
-                internalStaff.setRightName(OwnerMemRightEnum.SUCCESS_RENTCAR.getRightName());
+                internalStaff.setRightCode(MemRightEnum.SUCCESS_RENTCAR.getRightCode());
+                internalStaff.setRightName(MemRightEnum.SUCCESS_RENTCAR.getRightName());
                 internalStaff.setRightValue(rentCarTaskInfo.getReliefPercentage()==null?"0":String.valueOf(rentCarTaskInfo.getReliefPercentage()));
                 internalStaff.setRightDesc(rentCarTaskInfo.getTitle());
                 internalStaff.setRightType(RightTypeEnum.TASK.getCode());
@@ -367,8 +364,8 @@ public class MemProxyService {
         if(memberRoleInfo != null){
             if(memberRoleInfo.getInternalStaff()!=null){
                 RenterMemberRightDTO internalStaff = new RenterMemberRightDTO();
-                internalStaff.setRightCode(RenterMemRightEnum.STAFF.getRightCode());
-                internalStaff.setRightName(RenterMemRightEnum.STAFF.getRightName());
+                internalStaff.setRightCode(MemRightEnum.STAFF.getRightCode());
+                internalStaff.setRightName(MemRightEnum.STAFF.getRightName());
                 internalStaff.setRightType(RightTypeEnum.STAFF.getCode());
                 internalStaff.setRightValue(String.valueOf(memberRoleInfo.getInternalStaff()));
                 internalStaff.setRightDesc("是否是内部员工");
@@ -386,8 +383,8 @@ public class MemProxyService {
             }
             if(memberRoleInfo.getCpicMemberFlag() != null){
                 RenterMemberRightDTO internalStaff = new RenterMemberRightDTO();
-                internalStaff.setRightCode(RenterMemRightEnum.CPIC_MEM.getRightCode());
-                internalStaff.setRightName(RenterMemRightEnum.CPIC_MEM.getRightName());
+                internalStaff.setRightCode(MemRightEnum.CPIC_MEM.getRightCode());
+                internalStaff.setRightName(MemRightEnum.CPIC_MEM.getRightName());
                 internalStaff.setRightValue(String.valueOf(memberRoleInfo.getCpicMemberFlag()));
                 internalStaff.setRightType(RightTypeEnum.CPIC.getCode());
                 internalStaff.setRightDesc("是否太保会员");
@@ -399,8 +396,8 @@ public class MemProxyService {
             WxBindingTaskInfo wxBindingTaskInfo = memberReliefInfo.getWxBindingTaskInfo();
             if(wxBindingTaskInfo !=null){
                 RenterMemberRightDTO internalStaff = new RenterMemberRightDTO();
-                internalStaff.setRightCode(RenterMemRightEnum.BIND_WECHAT.getRightCode());
-                internalStaff.setRightName(RenterMemRightEnum.BIND_WECHAT.getRightName());
+                internalStaff.setRightCode(MemRightEnum.BIND_WECHAT.getRightCode());
+                internalStaff.setRightName(MemRightEnum.BIND_WECHAT.getRightName());
                 internalStaff.setRightValue(wxBindingTaskInfo.getReliefPercentage()==null?"0":String.valueOf(wxBindingTaskInfo.getReliefPercentage()));
                 internalStaff.setRightType(RightTypeEnum.TASK.getCode());
                 internalStaff.setRightDesc(wxBindingTaskInfo.getTitle());
@@ -409,8 +406,8 @@ public class MemProxyService {
             MemberLevelTaskInfo memberLevelTaskInfo = memberReliefInfo.getMemberLevelTaskInfo();
             if(memberLevelTaskInfo != null){
                 RenterMemberRightDTO internalStaff = new RenterMemberRightDTO();
-                internalStaff.setRightCode(RenterMemRightEnum.MEMBER_LEVEL.getRightCode());
-                internalStaff.setRightName(RenterMemRightEnum.MEMBER_LEVEL.getRightName());
+                internalStaff.setRightCode(MemRightEnum.MEMBER_LEVEL.getRightCode());
+                internalStaff.setRightName(MemRightEnum.MEMBER_LEVEL.getRightName());
                 internalStaff.setRightValue(memberLevelTaskInfo.getReliefPercentage()==null?"0":String.valueOf(memberLevelTaskInfo.getReliefPercentage()));
                 internalStaff.setRightType(RightTypeEnum.TASK.getCode());
                 internalStaff.setRightDesc(memberLevelTaskInfo.getTitle());
@@ -419,8 +416,8 @@ public class MemProxyService {
             InvitationTaskInfo invitationTaskInfo = memberReliefInfo.getInvitationTaskInfo();
             if(invitationTaskInfo != null){
                 RenterMemberRightDTO internalStaff = new RenterMemberRightDTO();
-                internalStaff.setRightCode(RenterMemRightEnum.INVITE_FRIENDS.getRightCode());
-                internalStaff.setRightName(RenterMemRightEnum.INVITE_FRIENDS.getRightName());
+                internalStaff.setRightCode(MemRightEnum.INVITE_FRIENDS.getRightCode());
+                internalStaff.setRightName(MemRightEnum.INVITE_FRIENDS.getRightName());
                 internalStaff.setRightValue(invitationTaskInfo.getReliefPercentage()==null?"0":String.valueOf(invitationTaskInfo.getReliefPercentage()));
                 internalStaff.setRightType(RightTypeEnum.TASK.getCode());
                 internalStaff.setRightDesc(invitationTaskInfo.getTitle());
@@ -429,8 +426,8 @@ public class MemProxyService {
             RentCarTaskInfo rentCarTaskInfo = memberReliefInfo.getRentCarTaskInfo();
             if(rentCarTaskInfo != null){
                 RenterMemberRightDTO internalStaff = new RenterMemberRightDTO();
-                internalStaff.setRightCode(RenterMemRightEnum.SUCCESS_RENTCAR.getRightCode());
-                internalStaff.setRightName(RenterMemRightEnum.SUCCESS_RENTCAR.getRightName());
+                internalStaff.setRightCode(MemRightEnum.SUCCESS_RENTCAR.getRightCode());
+                internalStaff.setRightName(MemRightEnum.SUCCESS_RENTCAR.getRightName());
                 internalStaff.setRightValue(rentCarTaskInfo.getReliefPercentage()==null?"0":String.valueOf(rentCarTaskInfo.getReliefPercentage()));
                 internalStaff.setRightType(RightTypeEnum.TASK.getCode());
                 internalStaff.setRightDesc(rentCarTaskInfo.getTitle());
