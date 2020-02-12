@@ -95,6 +95,7 @@ public class CarProxyService {
             log.info("Feign 开始获取车辆信息,orderCarInfoParamDTO={}", JSON.toJSONString(orderCarInfoParamDTO));
             Cat.logEvent(CatConstants.FEIGN_PARAM,JSON.toJSONString(orderCarInfoParamDTO));
             responseObject = carDetailQueryFeignApi.getCarDetailOfTransByCarNo(orderCarInfoParamDTO);
+            log.info("reponse is [{}]",JSON.toJSONString(responseObject));
             Cat.logEvent(CatConstants.FEIGN_RESULT,JSON.toJSONString(responseObject));
             checkResponse(responseObject);
             t.setStatus(Transaction.SUCCESS);

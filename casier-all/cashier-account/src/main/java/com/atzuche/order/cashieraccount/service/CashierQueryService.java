@@ -80,7 +80,12 @@ public class CashierQueryService {
         }
 
         List<AccountRenterWzDepositDetailEntity> list = accountRenterWzDepositDetailNoTService.findByOrderNo(orderNo);
+        //剩余可用违章押金
         int wzDepositSurplusAmt = list.stream().mapToInt(AccountRenterWzDepositDetailEntity::getAmt).sum();
+//        int debtAmt = list.stream().filter(obj ->{
+//
+//        }).mapToInt(AccountRenterWzDepositDetailEntity::getAmt).sum();
+
         result.setDebtStatus("成功");
         result.setWzDepositSurplusAmt(wzDepositSurplusAmt);
         result.setDebtAmt(0);
