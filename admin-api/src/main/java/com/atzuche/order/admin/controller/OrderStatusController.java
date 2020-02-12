@@ -1,5 +1,6 @@
 package com.atzuche.order.admin.controller;
 
+import com.atzuche.order.admin.enums.OrderStatusEnums;
 import com.atzuche.order.admin.vo.req.order.ModificationOrderRequestVO;
 import com.atzuche.order.admin.vo.req.order.OrderStatusRequestVO;
 import com.atzuche.order.admin.vo.resp.order.ModificationOrderListResponseVO;
@@ -77,7 +78,9 @@ public class OrderStatusController {
             //获取订单当前状态描述
             ResponseData<OrderStatusRespDTO> responseDataOrderStatusRespDTO = feignOrderDetailService.getOrderStatus(orderDetailReqDTO);
             if(responseDataOrderStatusRespDTO.getResCode().equals(ErrorCode.SUCCESS.getCode())){
-                orderStatusListResponseVO.setStatusDescription(String.valueOf(responseDataOrderStatusRespDTO.getData().getOrderStatusDTO().getStatus()));
+                Integer status=responseDataOrderStatusRespDTO.getData().getOrderStatusDTO().getStatus();
+                orderStatusListResponseVO.setStatusDescription(OrderStatusEnums.getDescriptionByStatus(status));
+
             }
         }catch (Exception e) {
             logger.info("订单状态流转列表异常{}",e);
