@@ -20,6 +20,8 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 /**
  * 暂扣服务
  */
@@ -165,5 +167,15 @@ public class RenterDetain {
         entity.setEventDesc(renterDetainVO.getEventDesc());
         entity.setFreezeStatus(YesNoEnum.YES.getCode());
         return entity;
+    }
+
+    /**
+     * 查询订单暂扣状态
+     * @param orderNo
+     * @param memNo
+     * @return
+     */
+    public RenterEventDetainStatusEntity getRenterDetainStatus(String orderNo, String memNo) {
+        return renterEventDetainStatusService.getRenterDetainStatus(orderNo, memNo);
     }
 }
