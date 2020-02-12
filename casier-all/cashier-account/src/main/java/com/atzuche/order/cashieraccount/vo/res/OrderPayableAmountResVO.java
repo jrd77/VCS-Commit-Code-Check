@@ -104,7 +104,7 @@ public class OrderPayableAmountResVO {
      * 支付时间倒计时 单位：秒
      */
     @AutoDocProperty("支付时间倒计时 单位：秒")
-    private int countdown;
+    private long countdown;
 
     /**
      * hints
