@@ -175,6 +175,7 @@ public class SubmitOrderController {
         orderReqVO.setRevertTime(LocalDateTimeUtils.parseStringToDateTime(adminOrderReqVO.getRevertTime(),
                 LocalDateTimeUtils.DEFAULT_PATTERN));
 
+        orderReqVO.setReqTime(LocalDateTime.now());
         OrderReqContext context = buildOrderReqContext(orderReqVO);
         orderFilterChain.validate(context);
         try{

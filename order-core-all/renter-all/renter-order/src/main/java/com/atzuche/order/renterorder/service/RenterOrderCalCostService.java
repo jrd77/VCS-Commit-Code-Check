@@ -398,10 +398,12 @@ public class RenterOrderCalCostService {
         if (null != result) {
             if (StringUtils.equals(ErrorCode.SUCCESS.getCode(), result.getResCode()) && null != result.getData()) {
                 OwnerDiscountCouponVO coupon = result.getData().getCouponDTO();
-                ownerCoupon.setCouponId(coupon.getCouponNo());
-                ownerCoupon.setCouponName(coupon.getCouponName()==null?"车主券":coupon.getCouponName());
-                ownerCoupon.setCouponDesc(coupon.getCouponText());
-                ownerCoupon.setAmount(null == coupon.getDiscount() ? 0 : coupon.getDiscount());
+                if (coupon != null) {
+                	ownerCoupon.setCouponId(coupon.getCouponNo());
+                    ownerCoupon.setCouponName(coupon.getCouponName()==null?"车主券":coupon.getCouponName());
+                    ownerCoupon.setCouponDesc(coupon.getCouponText());
+                    ownerCoupon.setAmount(null == coupon.getDiscount() ? 0 : coupon.getDiscount());
+                }
                 ownerCoupon.setCouponType(CouponTypeEnum.ORDER_COUPON_TYPE_OWNER.getCode());
                 //绑定后变更为已使用
                 ownerCoupon.setStatus(ownerCoupon.getAmount() > 0 ? OrderConstant.YES : OrderConstant.NO);
