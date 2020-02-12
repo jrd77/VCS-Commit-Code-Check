@@ -1,7 +1,6 @@
 package com.atzuche.order.rentercost.entity;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
 import java.util.Date;
 
 import lombok.Data;
@@ -69,7 +68,7 @@ public class OrderSupplementDetailEntity implements Serializable {
 	/**
 	 * 创建时间
 	 */
-	private LocalDateTime createTime;
+	private Date createTime;
 	/**
 	 * 创建人
 	 */
@@ -77,7 +76,7 @@ public class OrderSupplementDetailEntity implements Serializable {
 	/**
 	 * 修改时间
 	 */
-	private LocalDateTime updateTime;
+	private Date updateTime;
 	/**
 	 * 修改人
 	 */
