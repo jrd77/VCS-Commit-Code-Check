@@ -511,8 +511,8 @@ public class OrderSettleNoTService {
         String[] gpsSerialNumberArr = gpsSerialNumber.split(",");
         List<Integer> list = new ArrayList<>();
         for(int i=0;i<gpsSerialNumberArr.length;i++){
-            if(!StringUtil.isBlank(gpsSerialNumber)){
-                list.add(Integer.valueOf(gpsSerialNumber));
+            if(!StringUtil.isBlank(gpsSerialNumberArr[i])){
+                list.add(Integer.valueOf(gpsSerialNumberArr[i]));
             }
         }
         return list;

@@ -6,18 +6,24 @@ package com.atzuche.order.commons;
  *
  **/
 
-import com.atzuche.order.commons.entity.orderDetailDto.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import com.atzuche.order.commons.entity.orderDetailDto.ConsoleOwnerOrderFineDeatailDTO;
+import com.atzuche.order.commons.entity.orderDetailDto.OrderConsoleCostDetailDTO;
+import com.atzuche.order.commons.entity.orderDetailDto.OwnerOrderFineDeatailDTO;
+import com.atzuche.order.commons.entity.orderDetailDto.OwnerOrderIncrementDetailDTO;
+import com.atzuche.order.commons.entity.orderDetailDto.OwnerOrderPurchaseDetailDTO;
+import com.atzuche.order.commons.entity.orderDetailDto.OwnerOrderSubsidyDetailDTO;
 import com.atzuche.order.commons.entity.ownerOrderDetail.RenterOwnerPriceDTO;
 import com.atzuche.order.commons.enums.FineTypeEnum;
 import com.atzuche.order.commons.enums.SubsidySourceCodeEnum;
 import com.atzuche.order.commons.enums.cashcode.ConsoleCashCodeEnum;
 import com.atzuche.order.commons.enums.cashcode.OwnerCashCodeEnum;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import com.atzuche.order.commons.vo.res.rentcosts.OrderConsoleSubsidyDetailEntity;
 
 public class CostStatUtils {
 
@@ -121,6 +127,22 @@ public class CostStatUtils {
         }
         return collect.get(0).getSubsidyAmount();
     }
+    
+    ///add
+    public static int orderConsoleSubsidtyAmtFilterByCashNo(OwnerCashCodeEnum ownerCashCodeEnum,List<OrderConsoleSubsidyDetailEntity> list){
+        if(ownerCashCodeEnum == null){
+            return 0;
+        }
+        List<OrderConsoleSubsidyDetailEntity> collect = Optional.ofNullable(list).orElseGet(ArrayList::new)
+                .stream()
+                .filter(x -> ownerCashCodeEnum.getCashNo().equals(x.getSubsidyCostCode()))
+                .collect(Collectors.toList());
+        if(collect == null || collect.size()<=0){
+            return 0;
+        }
+        return collect.get(0).getSubsidyAmount();
+    }
+    
 
     /*
      * @Author ZhangBin
