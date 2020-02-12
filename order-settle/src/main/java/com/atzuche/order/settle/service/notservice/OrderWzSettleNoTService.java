@@ -1768,7 +1768,7 @@ public class OrderWzSettleNoTService {
         }
         if(refundAmt<0){
             List<CashierEntity> cashierEntitys = cashierNoTService.getCashierEntitys(settleOrders.getOrderNo(),settleOrders.getRenterMemNo(), DataPayKindConstant.RENT_INCREMENT);
-            if(CollectionUtils.isEmpty(cashierEntitys)){
+            if(!CollectionUtils.isEmpty(cashierEntitys)){
                 for(int i=0;i<cashierEntitys.size();i++){
                     if(refundAmt<0){
                         CashierRefundApplyReqVO vo = new CashierRefundApplyReqVO();
