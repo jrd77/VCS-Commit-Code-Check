@@ -4,11 +4,13 @@ import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.BindingResultUtil;
 import com.atzuche.order.commons.enums.DispatcherReasonEnum;
 import com.atzuche.order.commons.vo.req.AgreeOrderReqVO;
+import com.atzuche.order.commons.vo.req.GetCarReqVO;
 import com.atzuche.order.commons.vo.req.RefuseOrderReqVO;
 import com.atzuche.order.commons.vo.req.ReturnCarReqVO;
 import com.atzuche.order.coreapi.service.OwnerAgreeOrderService;
 import com.atzuche.order.coreapi.service.OwnerRefuseOrderService;
 import com.atzuche.order.coreapi.service.OwnerReturnCarService;
+import com.atzuche.order.coreapi.service.RenterGetCarService;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.doc.annotation.AutoDocMethod;
 import com.autoyol.doc.annotation.AutoDocVersion;
@@ -44,6 +46,9 @@ public class RefuseOrderController {
     @Autowired
     OwnerReturnCarService ownerReturnCarService;
 
+    @Autowired
+    RenterGetCarService renterGetCarService;
+
     private static final Logger LOGGER = LoggerFactory.getLogger(RefuseOrderController.class);
 
 
@@ -69,7 +74,7 @@ public class RefuseOrderController {
     }
 
 
-    @AutoDocMethod(description = "车主交车", value = "车主交车")
+    @AutoDocMethod(description = "车主交车", value = "车主交车(已还车)")
     @PostMapping("/normal/returnCar")
     public ResponseData<?> returnCar(@Valid @RequestBody ReturnCarReqVO reqVO, BindingResult bindingResult) {
 
@@ -78,4 +83,15 @@ public class RefuseOrderController {
         ownerReturnCarService.returnCar(reqVO);
         return ResponseData.success();
     }
+
+
+    @AutoDocMethod(description = "租客取车", value = "租客取车")
+    @PostMapping("/normal/getCar")
+    public ResponseData<?> getCar(@Valid @RequestBody GetCarReqVO reqVO, BindingResult bindingResult) {
+        LOGGER.info("Renter get car.param is,reqVO:[{}]", JSON.toJSONString(reqVO));
+        BindingResultUtil.checkBindingResult(bindingResult);
+        renterGetCarService.pickUpCar(reqVO);
+        return ResponseData.success();
+    }
+
 }
