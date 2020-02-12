@@ -819,7 +819,7 @@ public class OrderWzSettleNoTService {
         }
         //1.10 查询车主罚金
         List<OwnerOrderFineDeatailEntity> ownerOrderFineDeatails = ownerCosts.getOwnerOrderFineDeatails();
-        if(CollectionUtils.isEmpty(ownerOrderFineDeatails)){
+        if(!CollectionUtils.isEmpty(ownerOrderFineDeatails)){
             for(int i=0; i<ownerOrderFineDeatails.size();i++){
                 OwnerOrderFineDeatailEntity ownerOrderFineDeatail = ownerOrderFineDeatails.get(i);
                 AccountOwnerCostSettleDetailEntity accountOwnerCostSettleDetail = new AccountOwnerCostSettleDetailEntity();
