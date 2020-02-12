@@ -199,10 +199,10 @@ public class RenterDetain {
      * @param memNo
      * @return
      */
-    public Integer getRenterDetainStatus(String orderNo, String memNo) {
+    public String getRenterDetainStatus(String orderNo, String memNo) {
         RenterEventDetainStatusEntity renterEventDetainStatus = this.getRenterDetain(orderNo,memNo);
         if(Objects.nonNull(renterEventDetainStatus) && Objects.nonNull(renterEventDetainStatus.getStatus())){
-            return renterEventDetainStatus.getStatus();
+            return String.valueOf(renterEventDetainStatus.getStatus());
         }
         return null;
     }
