@@ -1,5 +1,6 @@
 package com.atzuche.order.coreapi.service;
 
+import com.atzuche.order.commons.constant.OrderConstant;
 import com.atzuche.order.commons.entity.dto.CancelFineAmtDTO;
 import com.atzuche.order.commons.entity.dto.CostBaseDTO;
 import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
@@ -88,24 +89,28 @@ public class RenterCancelOrderService {
 
         //罚金计算(罚金和收益)
         //租客罚金处理
-        CancelFineAmtDTO cancelFineAmt = buildCancelFineAmtDTO(renterOrderEntity,
-                renterOrderCostEntity, goodsDetail.getCarOwnerType());
-        int penalty = renterOrderFineDeatailService.calCancelFine(cancelFineAmt);
-        //罚租客补贴给车主
-        RenterOrderFineDeatailEntity renterOrderFineDeatailEntityOne =
-                renterOrderFineDeatailService.fineDataConvert(cancelFineAmt.getCostBaseDTO(), penalty, FineSubsidyCodeEnum.OWNER,
-                        FineSubsidySourceCodeEnum.RENTER, FineTypeEnum.CANCEL_FINE);
-        //罚租客补贴给平台(保险费)
-        if(orderStatusEntity.getStatus() >= OrderStatusEnum.TO_RETURN_CAR.getStatus() && orderStatusEntity.getStatus() != OrderStatusEnum.CLOSED.getStatus()) {
-            RenterOrderFineDeatailEntity renterOrderFineDeatailEntityTwo =
-                    renterOrderFineDeatailService.fineDataConvert(cancelFineAmt.getCostBaseDTO(), Math.abs(renterOrderCostEntity.getBasicEnsureAmount()), FineSubsidyCodeEnum.PLATFORM,
+        RenterOrderFineDeatailEntity renterOrderFineDetailEntityOne = null;
+        ConsoleOwnerOrderFineDeatailEntity consoleOwnerOrderFineDeatailEntity = null;
+        if(orderStatusEntity.getRentCarPayStatus() == OrderConstant.YES) {
+            CancelFineAmtDTO cancelFineAmt = buildCancelFineAmtDTO(renterOrderEntity,
+                    renterOrderCostEntity, goodsDetail.getCarOwnerType());
+            int penalty = renterOrderFineDeatailService.calCancelFine(cancelFineAmt);
+            //罚租客补贴给车主
+            renterOrderFineDetailEntityOne = renterOrderFineDeatailService.fineDataConvert(cancelFineAmt.getCostBaseDTO(), penalty, FineSubsidyCodeEnum.OWNER,
                             FineSubsidySourceCodeEnum.RENTER, FineTypeEnum.CANCEL_FINE);
-            renterOrderFineDeatailService.saveRenterOrderFineDeatail(renterOrderFineDeatailEntityTwo);
+
+            //罚租客补贴给平台(保险费)
+            if(orderStatusEntity.getStatus() >= OrderStatusEnum.TO_RETURN_CAR.getStatus() && orderStatusEntity.getStatus() != OrderStatusEnum.CLOSED.getStatus()) {
+                RenterOrderFineDeatailEntity renterOrderFineDetailEntityTwo =
+                        renterOrderFineDeatailService.fineDataConvert(cancelFineAmt.getCostBaseDTO(), Math.abs(renterOrderCostEntity.getBasicEnsureAmount()), FineSubsidyCodeEnum.PLATFORM,
+                                FineSubsidySourceCodeEnum.RENTER, FineTypeEnum.CANCEL_FINE);
+                renterOrderFineDeatailService.saveRenterOrderFineDeatail(renterOrderFineDetailEntityTwo);
+            }
+            //车主收益
+            consoleOwnerOrderFineDeatailEntity =
+                    consoleOwnerOrderFineDeatailService.fineDataConvert(cancelFineAmt.getCostBaseDTO(), penalty, FineSubsidyCodeEnum.OWNER,
+                            FineSubsidySourceCodeEnum.RENTER, FineTypeEnum.CANCEL_FINE);
         }
-        //车主收益
-        ConsoleOwnerOrderFineDeatailEntity consoleOwnerOrderFineDeatailEntity =
-                consoleOwnerOrderFineDeatailService.fineDataConvert(cancelFineAmt.getCostBaseDTO(), penalty, FineSubsidyCodeEnum.OWNER,
-                        FineSubsidySourceCodeEnum.RENTER, FineTypeEnum.CANCEL_FINE);
 
         //落库
         //订单状态更新
@@ -121,7 +126,7 @@ public class RenterCancelOrderService {
         orderCancelReasonService.addOrderCancelReasonRecord(buildOrderCancelReasonEntity(orderNo,renterOrderEntity.getRenterOrderNo(),
                 cancelReason));
 
-        renterOrderFineDeatailService.saveRenterOrderFineDeatail(renterOrderFineDeatailEntityOne);
+        renterOrderFineDeatailService.saveRenterOrderFineDeatail(renterOrderFineDetailEntityOne);
         consoleOwnerOrderFineDeatailService.addFineRecord(consoleOwnerOrderFineDeatailEntity);
 
 
