@@ -158,7 +158,7 @@ public class HandoverCarInfoService {
                 OrderDeliveryFlowEntity orderDeliveryFlow = deliveryFlowService.selectOrderDeliveryFlowByOrderNo(deliveryReqDTO.getOrderNo(),type == 1 ? "take" : "back");
                 orderDeliveryFlow.setServiceTypeInfo(type,orderDeliveryVO.getOrderDeliveryDTO());
                 orderDeliveryVO.setOrderDeliveryFlowEntity(orderDeliveryFlow);
-                deliveryCarInfoService.insertRenterDeliveryInfoAndDeliveryAddressInfo(null, null, orderDeliveryVO, DeliveryTypeEnum.UPDATE_TYPE.getValue().intValue());
+                deliveryCarInfoService.insertRenterDeliveryInfoAndDeliveryAddressInfo(null,null, orderDeliveryVO, DeliveryTypeEnum.UPDATE_TYPE.getValue().intValue());
                 RenYunFlowOrderDTO renYunFlowOrderDTO = deliveryCarInfoService.createRenYunDTO(orderDeliveryVO.getOrderDeliveryFlowEntity());
                 deliveryCarTask.addRenYunFlowOrderInfo(renYunFlowOrderDTO);
             }
