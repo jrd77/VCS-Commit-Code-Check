@@ -1,6 +1,8 @@
 package com.atzuche.order.settle.service;
 
 import com.atzuche.order.commons.service.OrderPayCallBack;
+import com.atzuche.order.mq.common.base.BaseProducer;
+import com.autoyol.event.rabbit.neworder.OrderSettlementMq;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,6 +35,7 @@ public class OrderSettleService{
     @Autowired private OrderSettleNoTService orderSettleNoTService;
     @Autowired private CashierService cashierService;
     @Autowired private OrderSettleNewService orderSettleNewService;
+    @Autowired private BaseProducer baseProducer;
     /**
      * 获取租客预结算数据 huangjing
      * @param orderNo
@@ -78,6 +81,7 @@ public class OrderSettleService{
             log.info("OrderSettleService settleOrdersenced [{}]",GsonUtils.toJson(settleOrdersDefinition));
             Cat.logEvent("settleOrdersenced",GsonUtils.toJson(settleOrdersDefinition));
 
+            OrderSettlementMq orderSettlementMq = new OrderSettlementMq();
             t.setStatus(Transaction.SUCCESS);
         } catch (Exception e) {
             log.error("OrderSettleService settleOrder,e={},",e);
