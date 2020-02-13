@@ -142,6 +142,16 @@ public class AdminDeliveryCarService {
         if(StringUtils.isNotBlank(memNo)) {
             modifyOrderReqVO.setMemNo(memNo);
         }
+        if(Objects.nonNull(deliveryCarVO.getGetHandoverCarDTO())) {
+            modifyOrderReqVO.setGetCarAddress(deliveryCarVO.getGetHandoverCarDTO().getRenterRealGetAddr());
+            modifyOrderReqVO.setGetCarLat(deliveryCarVO.getGetHandoverCarDTO().getRenterRealGetLat());
+            modifyOrderReqVO.setGetCarLon(deliveryCarVO.getGetHandoverCarDTO().getRenterRealGetLng());
+        }
+        if(Objects.nonNull(deliveryCarVO.getReturnHandoverCarDTO())) {
+            modifyOrderReqVO.setRevertCarAddress(deliveryCarVO.getReturnHandoverCarDTO().getRenterRealReturnAddr());
+            modifyOrderReqVO.setRevertCarLat(deliveryCarVO.getReturnHandoverCarDTO().getRenterRealReturnLat());
+            modifyOrderReqVO.setRevertCarLon(deliveryCarVO.getReturnHandoverCarDTO().getOwnerRealGetLng());
+        }
         modifyOrderReqVO.setSrvGetFlag(deliveryCarVO.getIsGetCar());
         modifyOrderReqVO.setSrvReturnFlag(deliveryCarVO.getIsReturnCar());
         return modifyOrderReqVO;
