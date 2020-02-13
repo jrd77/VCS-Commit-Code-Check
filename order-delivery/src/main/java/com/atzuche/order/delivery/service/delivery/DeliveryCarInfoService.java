@@ -234,6 +234,7 @@ public class DeliveryCarInfoService {
         ownerGetAndReturnCarDTO = deliveryCarInfoPriceService.createOwnerGetAndReturnCarDTO(ownerGetAndReturnCarDTO, ownerHandoverCarInfoEntities,carEngineType,cityCode);
         int overMileageAmt = getDeliveryCarOverMileageAmt(ownerGetAndReturnCarDTO, renterGoodsDetailDTO);
         ownerGetAndReturnCarDTO.setOverKNCrash(String.valueOf(overMileageAmt));
+        ownerGetAndReturnCarDTO.setOilContainer(ownerGetAndReturnCarDTO.getOilContainer()+"元");
         OwnerGetAndReturnCarDTO ownerGetAndReturnCarDO = OwnerGetAndReturnCarDTO.builder().build();
         BeanUtils.copyProperties(ownerGetAndReturnCarDTO,ownerGetAndReturnCarDO);
         //租客取送信息
@@ -249,6 +250,7 @@ public class DeliveryCarInfoService {
         int renterOverMileageAmt = getDeliveryCarOverMileageAmt(ownerGetAndReturnCarDTO, renterGoodsDetailDTO);
         renterGetAndReturnCarDTO.setOverKNCrash(String.valueOf(renterOverMileageAmt));
         BeanUtils.copyProperties(getAndReturnCarDTO, renterGetAndReturnCarDTO);
+        renterGetAndReturnCarDTO.setOilContainer(renterGetAndReturnCarDTO.getOilContainer()+"元");
         ownerGetAndReturnCarDTO.setPlatFormOilServiceCharge(RenterFeeCalculatorUtils.calServiceChargeFee().getTotalFee().toString()+"元");
         if(org.apache.commons.lang3.StringUtils.isNotBlank(ownerGetAndReturnCarDTO.getCarOilDifferenceCrash())) {
             renterGetAndReturnCarDTO.setCarOwnerOilCrash(ownerGetAndReturnCarDTO.getCarOilDifferenceCrash());
