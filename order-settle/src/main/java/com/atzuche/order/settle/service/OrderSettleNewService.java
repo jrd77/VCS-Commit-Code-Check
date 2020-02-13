@@ -8,7 +8,11 @@ import com.atzuche.order.cashieraccount.vo.res.OrderPayableAmountResVO;
 import com.atzuche.order.commons.enums.YesNoEnum;
 import com.atzuche.order.commons.enums.cashcode.ConsoleCashCodeEnum;
 import com.atzuche.order.commons.service.OrderPayCallBack;
+import com.atzuche.order.mq.common.base.BaseProducer;
+import com.atzuche.order.mq.common.base.OrderMessage;
 import com.autoyol.autopay.gateway.constant.DataPayKindConstant;
+import com.autoyol.event.rabbit.neworder.NewOrderMQActionEventEnum;
+import com.autoyol.event.rabbit.neworder.OrderSettlementMq;
 import com.autoyol.platformcost.model.FeeResult;
 import com.google.common.collect.ImmutableList;
 import com.thoughtworks.xstream.mapper.ImmutableTypesMapper;
@@ -57,6 +61,8 @@ public class OrderSettleNewService {
     @Autowired private OrderSettleNoTService orderSettleNoTService;
     @Autowired private CashierSettleService cashierSettleService;
     @Autowired private CashierPayService cashierPayService;
+    @Autowired private BaseProducer baseProducer;
+
 
 
     /**
@@ -420,5 +426,31 @@ public class OrderSettleNewService {
             accountPlatformProfitDetail.setOrderNo(settleOrders.getOrderNo());
             settleOrdersDefinition.addPlatformProfit(accountPlatformProfitDetail);
         }
+    }
+
+    /**
+     * 订单车辆结算成功事件
+     * @param orderNo
+     */
+    public void sendOrderSettleSuccessMq(String orderNo) {
+        OrderSettlementMq orderSettlementMq = new OrderSettlementMq();
+        orderSettlementMq.setStatus(0);
+        orderSettlementMq.setOrderNo(orderNo);
+        OrderMessage orderMessage = OrderMessage.builder().build();
+        orderMessage.setMessage(orderSettlementMq);
+        baseProducer.sendTopicMessage(NewOrderMQActionEventEnum.ORDER_SETTLEMENT_SUCCESS.exchange,NewOrderMQActionEventEnum.ORDER_SETTLEMENT_SUCCESS.routingKey,orderMessage);
+    }
+
+    /**
+     * 订单结算失败事件
+     * @param orderNo
+     */
+    public void sendOrderSettleFailMq(String orderNo) {
+        OrderSettlementMq orderSettlementMq = new OrderSettlementMq();
+        orderSettlementMq.setStatus(1);
+        orderSettlementMq.setOrderNo(orderNo);
+        OrderMessage orderMessage = OrderMessage.builder().build();
+        orderMessage.setMessage(orderSettlementMq);
+        baseProducer.sendTopicMessage(NewOrderMQActionEventEnum.ORDER_SETTLEMENT_FAIL.exchange,NewOrderMQActionEventEnum.ORDER_SETTLEMENT_FAIL.routingKey,orderMessage);
     }
 }
