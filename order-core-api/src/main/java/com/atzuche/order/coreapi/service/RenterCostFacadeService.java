@@ -1,15 +1,17 @@
-package com.atzuche.order.rentercost.service;
+package com.atzuche.order.coreapi.service;
 
+import com.atzuche.order.cashieraccount.service.CashierQueryService;
 import com.atzuche.order.commons.enums.SubsidySourceCodeEnum;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
-import com.atzuche.order.commons.vo.res.RenterCostDetailVO;
-import com.atzuche.order.commons.vo.res.RenterDeliveryFeeDetailVO;
-import com.atzuche.order.commons.vo.res.RenterFineVO;
-import com.atzuche.order.commons.vo.res.RenterSubsidyDetailVO;
+import com.atzuche.order.commons.vo.DepostiDetailVO;
+import com.atzuche.order.commons.vo.WzDepositDetailVO;
+import com.atzuche.order.commons.vo.res.*;
 import com.atzuche.order.rentercost.entity.*;
+import com.atzuche.order.rentercost.service.*;
 import com.atzuche.order.rentercost.utils.FineDetailUtils;
 import com.atzuche.order.rentercost.utils.OrderSubsidyDetailUtils;
 import com.atzuche.order.rentercost.utils.RenterOrderCostDetailUtils;
+import com.autoyol.doc.annotation.AutoDocProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +39,16 @@ public class RenterCostFacadeService {
     private OrderConsoleSubsidyDetailService consoleSubsidyDetailService;
     @Autowired
     private ConsoleRenterOrderFineDeatailService consoleRenterOrderFineDeatailService;
+
+    @Autowired
+    private WzCostFacadeService wzCostFacadeService;
+
+    @Autowired
+    private CashierQueryService cashierQueryService;
+
+    @Autowired
+    private SupplementService supplementService;
+
     
     private final static Logger logger = LoggerFactory.getLogger(RenterCostFacadeService.class);
     
@@ -107,6 +119,14 @@ public class RenterCostFacadeService {
         RenterSubsidyDetailVO subsidyDetail = getRenterSubsidyDetail(orderNo,renterOrderNo,memNo);
         basicCostDetailVO.setSubsidyDetail(subsidyDetail);
 
+        RenterWzCostVO wzCostVO = wzCostFacadeService.getRenterWzCostDetail(orderNo);
+        basicCostDetailVO.setWzCostDetail(wzCostVO);
+
+        WzDepositDetailVO wzDepositDetailVO = wzCostFacadeService.getWzDepostDetail(orderNo);
+        basicCostDetailVO.setWzDepositDetailVO(wzDepositDetailVO);
+
+        DepostiDetailVO depostiDetailVO = cashierQueryService.getRenterDepositVO(orderNo,memNo);
+        basicCostDetailVO.setDepostiDetailVO(depostiDetailVO);
         //TODO:
         return basicCostDetailVO;
     }
