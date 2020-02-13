@@ -5,6 +5,7 @@ import com.atzuche.order.admin.vo.req.order.AdminModifyOrderReqVO;
 import com.atzuche.order.admin.vo.req.order.CancelOrderByPlatVO;
 import com.atzuche.order.admin.vo.req.order.CancelOrderVO;
 import com.atzuche.order.admin.vo.req.order.OrderModifyConfirmReqVO;
+import com.atzuche.order.admin.vo.resp.MemAvailableCouponVO;
 import com.atzuche.order.admin.vo.resp.order.AdminModifyOrderFeeCompareVO;
 import com.atzuche.order.admin.vo.resp.order.AdminModifyOrderFeeVO;
 import com.atzuche.order.commons.CatConstants;
@@ -12,10 +13,10 @@ import com.atzuche.order.commons.entity.dto.OrderTransferRecordDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.OrderDetailReqDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.OrderDetailRespDTO;
 import com.atzuche.order.commons.exceptions.RemoteCallException;
-import com.atzuche.order.commons.vo.req.AdminOrderCancelReqVO;
-import com.atzuche.order.commons.vo.req.CancelOrderReqVO;
-import com.atzuche.order.commons.vo.req.ModifyApplyHandleReq;
-import com.atzuche.order.commons.vo.req.ModifyOrderReqVO;
+import com.atzuche.order.commons.vo.req.*;
+import com.atzuche.order.commons.vo.res.NormalOrderCostCalculateResVO;
+import com.atzuche.order.commons.vo.res.order.*;
+import com.atzuche.order.open.service.FeignOrderCostService;
 import com.atzuche.order.open.service.FeignOrderDetailService;
 import com.atzuche.order.open.service.FeignOrderModifyService;
 import com.atzuche.order.open.service.FeignOrderUpdateService;
@@ -32,6 +33,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -44,6 +46,73 @@ public class AdminOrderService {
 
     @Autowired
     private FeignOrderDetailService feignOrderDetailService;
+
+    @Autowired
+    private FeignOrderCostService feignOrderCostService;
+
+
+    public MemAvailableCouponVO getPreOrderCouponList(NormalOrderCostCalculateReqVO reqVO){
+        Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "订单CoreAPI");
+        MemAvailableCouponVO memAvailableCouponVO = new MemAvailableCouponVO();
+        try{
+            Cat.logEvent(CatConstants.FEIGN_METHOD,"feignOrderCostService.cancelOrder");
+            log.info("Feign 开始下单前费用试算,reqVO={}", JSON.toJSONString(reqVO));
+            Cat.logEvent(CatConstants.FEIGN_PARAM,JSON.toJSONString(reqVO));
+            ResponseData<NormalOrderCostCalculateResVO> responseObject = feignOrderCostService.submitOrderBeforeCostCalculate(reqVO);
+            log.info("response=[{}]",JSON.toJSONString(responseObject));
+            Cat.logEvent(CatConstants.FEIGN_RESULT,JSON.toJSONString(responseObject));
+            checkResponse(responseObject);
+            t.setStatus(Transaction.SUCCESS);
+            NormalOrderCostCalculateResVO resVO = responseObject.getData();
+            ReductionVO reductionVO = resVO.getReduction();
+            if(reductionVO!=null){
+                CouponReductionVO couponReductionVO = reductionVO.getCouponReduction();
+                CarOwnerCouponReductionVO carOwnerCouponReductionVO = reductionVO.getCarOwnerCouponReduction();
+                if(couponReductionVO!=null){
+                    List<DisCouponMemInfoVO> discoupons = couponReductionVO.getDiscoupons();
+                    if(discoupons!=null){
+                        memAvailableCouponVO.setPlatCouponList(extractNotGetCarCouponList(discoupons));
+                        memAvailableCouponVO.setGetCarCouponList(extractGetCarCouponList(discoupons));
+                    }
+
+                }
+                if(carOwnerCouponReductionVO!=null){
+                    List<CarOwnerCouponDetailVO>   availableCouponList = carOwnerCouponReductionVO.getAvailableCouponList();
+                    memAvailableCouponVO.setCarOwnerCouponDetailVOList(availableCouponList);
+                }
+            }
+            return memAvailableCouponVO;
+
+        }catch (Exception e){
+            log.error("调用远程开始下单前费用试算失败,param={}",reqVO,e);
+            Cat.logError("Feign 开始下单前费用试算失败",e);
+            t.setStatus(e);
+            throw e;
+        }finally {
+            t.complete();
+        }
+    }
+
+    private List<DisCouponMemInfoVO> extractGetCarCouponList(List<DisCouponMemInfoVO> discoupons) {
+        List<DisCouponMemInfoVO> list = new ArrayList<>();
+        for(DisCouponMemInfoVO vo:discoupons){
+            if("8".equals(vo.getPlatformCouponType())){
+                list.add(vo);
+            }
+        }
+        return list;
+    }
+
+    private List<DisCouponMemInfoVO> extractNotGetCarCouponList(List<DisCouponMemInfoVO> discoupons) {
+        List<DisCouponMemInfoVO> list = new ArrayList<>();
+        for(DisCouponMemInfoVO vo:discoupons){
+            if(!"8".equals(vo.getPlatformCouponType())){
+                list.add(vo);
+            }
+        }
+        return list;
+    }
+
 
     public ResponseData cancelOrder(CancelOrderVO cancelOrderVO) {
         CancelOrderReqVO cancelOrderReqVO = new CancelOrderReqVO();
