@@ -115,6 +115,7 @@ public class DeliveryCarService {
             return;
         }
         for(OrderDeliveryFlowEntity orderDeliveryFlowEntity : orderDeliveryFlowEntityList) {
+            log.info("开始组装仁云数据进行发送----->>>params:[{}]",orderDeliveryFlowEntity.toString());
             RenYunFlowOrderDTO renYunFlowOrderDTO = createRenYunDTO(orderDeliveryFlowEntity);
             if (Objects.isNull(renYunFlowOrderDTO)) {
                 continue;
