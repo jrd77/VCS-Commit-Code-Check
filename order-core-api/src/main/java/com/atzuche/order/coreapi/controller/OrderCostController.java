@@ -12,7 +12,7 @@ import com.atzuche.order.commons.vo.res.RenterCostDetailVO;
 import com.atzuche.order.open.vo.RenterCostShortDetailVO;
 import com.atzuche.order.parentorder.entity.OrderEntity;
 import com.atzuche.order.parentorder.service.OrderService;
-import com.atzuche.order.rentercost.service.RenterCostFacadeService;
+import com.atzuche.order.coreapi.service.RenterCostFacadeService;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.atzuche.order.renterorder.service.RenterOrderService;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -24,7 +24,7 @@ public class RenterOrderIllegalResVO {
     /**
      * 应付押金总额
      */
-    private Integer yingfuDepositAmt;
+    private int yingfuDepositAmt;
     /**
      * 免押方式
      */

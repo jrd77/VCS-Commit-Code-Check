@@ -1,8 +1,10 @@
 package com.atzuche.order.cashieraccount.service;
 
 import com.atzuche.order.accountrenterdeposit.entity.AccountRenterDepositEntity;
+import com.atzuche.order.accountrenterdeposit.service.AccountRenterDepositService;
 import com.atzuche.order.accountrenterdeposit.service.notservice.AccountRenterDepositNoTService;
 
+import com.atzuche.order.accountrenterdeposit.vo.res.AccountRenterDepositResVO;
 import com.atzuche.order.accountrenterwzdepost.entity.AccountRenterWzDepositCostEntity;
 import com.atzuche.order.accountrenterwzdepost.entity.AccountRenterWzDepositDetailEntity;
 import com.atzuche.order.accountrenterwzdepost.entity.AccountRenterWzDepositEntity;
@@ -14,11 +16,15 @@ import com.atzuche.order.cashieraccount.entity.CashierEntity;
 import com.atzuche.order.cashieraccount.service.notservice.CashierNoTService;
 import com.atzuche.order.cashieraccount.vo.res.WzDepositMsgResVO;
 import com.atzuche.order.commons.DateUtils;
+import com.atzuche.order.commons.LocalDateTimeUtils;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.commons.enums.cashier.PayTypeEnum;
 import com.atzuche.order.commons.enums.cashier.TransStatusEnum;
+import com.atzuche.order.commons.vo.DepostiDetailVO;
 import com.autoyol.autopay.gateway.constant.DataPayKindConstant;
+import com.autoyol.platformcost.LocalDateTimeUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -42,7 +48,29 @@ public class CashierQueryService {
     private AccountRenterDepositNoTService accountRenterDepositNoTService;
     @Autowired private CashierNoTService cashierNoTService;
     @Autowired private AccountRenterWzDepositDetailNoTService accountRenterWzDepositDetailNoTService;
+    @Autowired
+    private AccountRenterDepositService accountRenterDepositService;
 
+
+    /**
+     * 查询应收车辆押金
+     */
+    public AccountRenterDepositResVO getRenterDepositEntity(String orderNo, String memNo){
+        return accountRenterDepositService.getAccountRenterDepositEntity(orderNo, memNo);
+    }
+
+    public DepostiDetailVO getRenterDepositVO(String orderNo,String memNo){
+        AccountRenterDepositResVO renterDepositResVO = accountRenterDepositService.getAccountRenterDepositEntity(orderNo, memNo);
+        DepostiDetailVO depostiDetailVO = new DepostiDetailVO();
+        BeanUtils.copyProperties(renterDepositResVO,depostiDetailVO);
+        if(renterDepositResVO.getPayTime()!=null){
+            depostiDetailVO.setPayTime(LocalDateTimeUtils.localDateTimeToDate(renterDepositResVO.getPayTime()));
+        }
+        if(renterDepositResVO.getSettleTime()!=null){
+            depostiDetailVO.setSettleTime(LocalDateTimeUtils.localDateTimeToDate(renterDepositResVO.getSettleTime()));
+        }
+        return depostiDetailVO;
+    }
 
     /**
      * 查询违章押金

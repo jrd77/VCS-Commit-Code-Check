@@ -1,5 +1,7 @@
 package com.atzuche.order.commons.vo.res;
 
+import com.atzuche.order.commons.vo.DepostiDetailVO;
+import com.atzuche.order.commons.vo.WzDepositDetailVO;
 import com.autoyol.doc.annotation.AutoDocProperty;
 import lombok.Data;
 import lombok.ToString;
@@ -42,6 +44,15 @@ public class RenterCostDetailVO {
     @AutoDocProperty(value = "补贴及其详情")
     private RenterSubsidyDetailVO subsidyDetail;
 
+    @AutoDocProperty(value = "违章费用详情及其总额")
+    private RenterWzCostVO wzCostDetail;
+
+    @AutoDocProperty(value = "违章押金")
+    private WzDepositDetailVO wzDepositDetailVO;
+
+    @AutoDocProperty(value = "车辆押金")
+    private DepostiDetailVO depostiDetailVO;
+
     @AutoDocProperty(value = "消费总额")
     private int totalAmt;
 
@@ -62,6 +73,9 @@ public class RenterCostDetailVO {
         }
         if(subsidyDetail!=null){
             total=total+subsidyDetail.getTotalSubsidy();
+        }
+        if(wzCostDetail!=null){
+            total=total+wzCostDetail.getTotalWzCostAmt();
         }
         return totalAmt;
     }

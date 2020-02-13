@@ -1,8 +1,10 @@
 package com.atzuche.order.coreapi.service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.atzuche.order.commons.exceptions.OrderNotFoundException;
+import com.atzuche.order.commons.vo.OrderSupplementDetailVO;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -54,6 +56,17 @@ public class SupplementService {
 	 */
 	public List<OrderSupplementDetailEntity> listOrderSupplementDetailEntityByOrderNo(String orderNo) {
 		return orderSupplementDetailService.listOrderSupplementDetailByOrderNo(orderNo);
+	}
+
+	public List<OrderSupplementDetailVO> listOrderSupplementDetailVOByOrderNo(String orderNo){
+		List<OrderSupplementDetailEntity>  entityList = orderSupplementDetailService.listOrderSupplementDetailByOrderNo(orderNo);
+		List<OrderSupplementDetailVO> voList = new ArrayList<>();
+		for(OrderSupplementDetailEntity entity:entityList){
+			OrderSupplementDetailVO vo = new OrderSupplementDetailVO();
+			BeanUtils.copyProperties(entity,vo);
+			voList.add(vo);
+		}
+		return voList;
 	}
 	
 	/**

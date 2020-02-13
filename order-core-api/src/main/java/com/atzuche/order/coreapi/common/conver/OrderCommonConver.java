@@ -110,7 +110,7 @@ public class OrderCommonConver {
         carDetailReqVO.setCarNo(orderReqVO.getCarNo());
         carDetailReqVO.setRentTime(orderReqVO.getRentTime());
         carDetailReqVO.setRevertTime(orderReqVO.getRevertTime());
-        carDetailReqVO.setUseSpecialPrice(StringUtils.equals("0",
+        carDetailReqVO.setUseSpecialPrice(StringUtils.equals("1",
                 orderReqVO.getUseSpecialPrice()));
         return carDetailReqVO;
     }
