@@ -97,6 +97,7 @@ public class CashierPayService{
             //2 获取透传值 用户订单流程更新数据
             getExtendParamsParam(vo,batchNotifyDataVo);
            // 3 订单流程 数据更新
+            log.info("payCallBack OrderPayCallBackSuccessVO :[{}]", GsonUtils.toJson(vo));
             orderPayCallBack(vo,callBack);
         }
     }
