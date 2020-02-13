@@ -305,13 +305,13 @@ public class OwnerOrderDetailService {
 //        }
         PlatformToOwnerDTO platformToOwnerDTO = new PlatformToOwnerDTO();
 //        platformToOwnerDTO.setOliAmt(renterOrderCostDetail!=null?renterOrderCostDetail.getTotalAmount():0);
-        platformToOwnerDTO.setOliAmt(oilFee);
-        platformToOwnerDTO.setTimeOut(timeOut);
-        platformToOwnerDTO.setModifyOrderTimeAndAddrAmt(modifyOrderTimeAndAddrAmt);
-        platformToOwnerDTO.setCarWash(carWash);
-        platformToOwnerDTO.setDlayWait(dlayWait);
-        platformToOwnerDTO.setStopCar(stopCar);
-        platformToOwnerDTO.setExtraMileage(extraMileage);
+        platformToOwnerDTO.setOliAmt(String.valueOf(oilFee));
+        platformToOwnerDTO.setTimeOut(String.valueOf(timeOut));
+        platformToOwnerDTO.setModifyOrderTimeAndAddrAmt(String.valueOf(modifyOrderTimeAndAddrAmt));
+        platformToOwnerDTO.setCarWash(String.valueOf(carWash));
+        platformToOwnerDTO.setDlayWait(String.valueOf(dlayWait));
+        platformToOwnerDTO.setStopCar(String.valueOf(stopCar));
+        platformToOwnerDTO.setExtraMileage(String.valueOf(extraMileage));
         return platformToOwnerDTO;
     }
 
