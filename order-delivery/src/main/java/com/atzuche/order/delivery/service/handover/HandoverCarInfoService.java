@@ -148,6 +148,7 @@ public class HandoverCarInfoService {
             UpdateOrderDeliveryVO updateOrderDeliveryVO = createDeliveryCarInfoParams(renterOrderDeliveryEntity, deliveryReqDTO, type);
             if(renterOrderDeliveryEntity.getIsNotifyRenyun() == 1) {
                 deliveryCarInfoService.updateFlowOrderInfo(updateOrderDeliveryVO);
+                deliveryCarInfoService.updateRenYunFlowOrderInfo(updateOrderDeliveryVO.getUpdateFlowOrderDTO());
             }else {
                 //从关闭到开启 新增仁云记录数据 修改状态值
                 //开始新增数据并发送仁云
@@ -179,8 +180,8 @@ public class HandoverCarInfoService {
         orderDeliveryDTO.setRenterGetReturnAddrLat(deliveryReqDTO.getRenterGetReturnLat());
         orderDeliveryDTO.setRenterGetReturnAddrLon(deliveryReqDTO.getRenterGetReturnLng());
         orderDeliveryDTO.setOwnerGetReturnAddr(deliveryReqDTO.getOwnerGetReturnAddr());
-        orderDeliveryDTO.setOwnerGetReturnAddrLon(deliveryReqDTO.getOwnerGetReturnLat());
-        orderDeliveryDTO.setOwnerGetReturnAddrLat(deliveryReqDTO.getOwnerGetReturnLng());
+        orderDeliveryDTO.setOwnerGetReturnAddrLon(deliveryReqDTO.getOwnerGetReturnLng());
+        orderDeliveryDTO.setOwnerGetReturnAddrLat(deliveryReqDTO.getOwnerGetReturnLat());
         orderDeliveryDTO.setOrderNo(renterOrderDeliveryEntity.getOrderNo());
         orderDeliveryDTO.setRenterOrderNo(renterOrderDeliveryEntity.getRenterOrderNo());
         orderDeliveryDTO.setOwnerRealGetReturnRemark(deliveryReqDTO.getOwnerRealGetAddrReamrk());
