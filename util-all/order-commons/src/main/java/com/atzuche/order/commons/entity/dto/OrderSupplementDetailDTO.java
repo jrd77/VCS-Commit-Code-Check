@@ -46,6 +46,9 @@ public class OrderSupplementDetailDTO {
 	@AutoDocProperty(value="补付名称",required=false)
 	private String title;
 	
+	@AutoDocProperty(value="操作人")
+	private String createOp; 
+	
 	/**
 	 * 操作状态:0,待提交 1,已生效 2,已失效 3,已撤回
 	 */
