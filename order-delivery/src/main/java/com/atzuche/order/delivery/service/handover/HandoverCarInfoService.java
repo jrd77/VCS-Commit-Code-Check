@@ -180,8 +180,8 @@ public class HandoverCarInfoService {
         orderDeliveryDTO.setRenterGetReturnAddrLat(deliveryReqDTO.getRenterGetReturnLat());
         orderDeliveryDTO.setRenterGetReturnAddrLon(deliveryReqDTO.getRenterGetReturnLng());
         orderDeliveryDTO.setOwnerGetReturnAddr(deliveryReqDTO.getOwnerGetReturnAddr());
-        orderDeliveryDTO.setOwnerGetReturnAddrLon(deliveryReqDTO.getOwnerGetReturnLat());
-        orderDeliveryDTO.setOwnerGetReturnAddrLat(deliveryReqDTO.getOwnerGetReturnLng());
+        orderDeliveryDTO.setOwnerGetReturnAddrLon(deliveryReqDTO.getOwnerGetReturnLng());
+        orderDeliveryDTO.setOwnerGetReturnAddrLat(deliveryReqDTO.getOwnerGetReturnLat());
         orderDeliveryDTO.setOrderNo(renterOrderDeliveryEntity.getOrderNo());
         orderDeliveryDTO.setRenterOrderNo(renterOrderDeliveryEntity.getRenterOrderNo());
         orderDeliveryDTO.setOwnerRealGetReturnRemark(deliveryReqDTO.getOwnerRealGetAddrReamrk());
