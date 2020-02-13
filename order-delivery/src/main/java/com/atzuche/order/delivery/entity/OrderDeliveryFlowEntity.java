@@ -180,7 +180,7 @@ public class OrderDeliveryFlowEntity implements Serializable {
             setServiceType(ServiceTypeEnum.BACK_TYPE.getValue());
             setPickupAlsoCarAddr(orderDeliveryDTO.getRenterGetReturnAddr());
 			setRealReturnCarLat(orderDeliveryDTO.getRenterGetReturnAddrLat());
-			setRealReturnCarLon(orderDeliveryDTO.getRenterGetReturnAddrLat());
+			setRealReturnCarLon(orderDeliveryDTO.getRenterGetReturnAddrLon());
 			setOwnerReturnAddr(orderDeliveryDTO.getOwnerGetReturnAddr());
         }
     }
