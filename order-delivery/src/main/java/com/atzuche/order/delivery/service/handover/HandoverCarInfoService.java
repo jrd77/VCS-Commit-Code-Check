@@ -148,6 +148,7 @@ public class HandoverCarInfoService {
             UpdateOrderDeliveryVO updateOrderDeliveryVO = createDeliveryCarInfoParams(renterOrderDeliveryEntity, deliveryReqDTO, type);
             if(renterOrderDeliveryEntity.getIsNotifyRenyun() == 1) {
                 deliveryCarInfoService.updateFlowOrderInfo(updateOrderDeliveryVO);
+                deliveryCarInfoService.updateRenYunFlowOrderInfo(updateOrderDeliveryVO.getUpdateFlowOrderDTO());
             }else {
                 //从关闭到开启 新增仁云记录数据 修改状态值
                 //开始新增数据并发送仁云
