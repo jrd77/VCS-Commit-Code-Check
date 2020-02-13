@@ -9,6 +9,7 @@ import com.atzuche.order.cashieraccount.service.CashierQueryService;
 import com.atzuche.order.cashieraccount.vo.res.WzDepositMsgResVO;
 import com.atzuche.order.commons.CompareHelper;
 import com.atzuche.order.commons.DateUtils;
+import com.atzuche.order.commons.NumberUtils;
 import com.atzuche.order.commons.enums.ErrorCode;
 import com.atzuche.order.commons.enums.detain.DetailSourceEnum;
 import com.atzuche.order.detain.service.RenterDetain;
@@ -346,7 +347,7 @@ public class RenterWzService {
         if(wzDepositMsg == null){
             return result;
         }
-        result.setYingshouDeposit(String.valueOf(-wzDepositMsg.getYingshouWzDepositAmt()));
+        result.setYingshouDeposit(String.valueOf(NumberUtils.convertNumberToZhengshu(wzDepositMsg.getYingshouWzDepositAmt())));
         result.setWzDeposit(String.valueOf(wzDepositMsg.getWzDepositAmt()));
         result.setWaiverAmount(String.valueOf(wzDepositMsg.getReductionAmt()));
         result.setTransStatusStr(wzDepositMsg.getPayStatus());

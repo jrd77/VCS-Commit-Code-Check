@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 //@FeignClient(url="http://10.0.3.235:1412",name = "order-center-api")
-//@FeignClient(url="http://localhost:1412",name = "order-center-api")
-@FeignClient(name = "order-center-api")
+@FeignClient(url="http://localhost:1412",name = "order-center-api")
+//@FeignClient(name = "order-center-api")
 public interface FeignOwnerDetailService {
     /*
      * @Author ZhangBin

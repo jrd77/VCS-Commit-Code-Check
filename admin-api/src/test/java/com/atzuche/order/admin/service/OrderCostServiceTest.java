@@ -1,7 +1,5 @@
 package com.atzuche.order.admin.service;
 
-import static org.junit.Assert.fail;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,8 +8,10 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 
 import com.atzuche.order.admin.AdminSpringBoot;
+import com.atzuche.order.admin.vo.req.cost.OwnerCostReqVO;
 import com.atzuche.order.admin.vo.req.cost.RenterCostReqVO;
 import com.atzuche.order.admin.vo.resp.order.cost.OrderRenterCostResVO;
+import com.atzuche.order.commons.vo.res.OrderOwnerCostResVO;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 //@RunWith(SpringRunner.class)
@@ -36,7 +36,17 @@ public class OrderCostServiceTest {
 
 	@Test
 	public void testCalculateOwnerOrderCost() {
-		fail("Not yet implemented");
+		OwnerCostReqVO ownerCostReqVO = new OwnerCostReqVO();
+		ownerCostReqVO.setOrderNo("28804131200299");
+		ownerCostReqVO.setOwnerOrderNo("2880413120029910011");
+		com.atzuche.order.admin.vo.resp.order.cost.OrderOwnerCostResVO res = null;
+		try {
+			res = orderCostService.calculateOwnerOrderCost(ownerCostReqVO);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		System.err.println("res toString="+res.toString());
 	}
 
 }
