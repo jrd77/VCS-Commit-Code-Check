@@ -1,7 +1,11 @@
 package com.atzuche.order.admin.controller;
 
 import com.atzuche.order.admin.service.OwnerOrderDetailService;
+import com.atzuche.order.admin.vo.req.FienAmtUpdateReqVO;
+import com.atzuche.order.commons.BindingResultUtil;
 import com.atzuche.order.commons.entity.ownerOrderDetail.*;
+import com.atzuche.order.commons.enums.FineTypeEnum;
+import com.atzuche.order.commons.enums.cashcode.OwnerCashCodeEnum;
 import com.atzuche.order.ownercost.entity.OwnerOrderEntity;
 import com.atzuche.order.ownercost.service.OwnerOrderService;
 import com.autoyol.commons.web.ErrorCode;
@@ -9,6 +13,7 @@ import com.autoyol.commons.web.ResponseData;
 import com.autoyol.doc.annotation.AutoDocMethod;
 
 import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -195,13 +200,13 @@ public class OwnerOrderDetailController {
 
     @AutoDocMethod(description = "修改违约罚金", value = "修改违约罚金", response = ResponseData.class)
     @PostMapping("/console/owner/updateFien")
-    public ResponseData<?> updateFineAmt(@Valid @RequestBody FienAmtUpdateReqDTO fienAmtUpdateReqDTO, BindingResult bindingResult){
-        if (bindingResult.hasErrors()) {
-            Optional<FieldError> error = bindingResult.getFieldErrors().stream().findFirst();
-            return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), error.isPresent() ?
-                    error.get().getDefaultMessage() : ErrorCode.INPUT_ERROR.getText());
-        }
-        ResponseData<?> responseData = ownerOrderDetailService.updateFineAmt(fienAmtUpdateReqDTO);
+    public ResponseData<?> updateFineAmt(@Valid @RequestBody FienAmtUpdateReqVO fienAmtUpdateReqDTO, BindingResult bindingResult){
+        BindingResultUtil.checkBindingResult(bindingResult);
+        FienAmtUpdateReqDTO reqDTO = new FienAmtUpdateReqDTO();
+        BeanUtils.copyProperties(fienAmtUpdateReqDTO,reqDTO);
+        reqDTO.setOwnerGetReturnCarFienCashNo(FineTypeEnum.GET_RETURN_CAR.getFineType());
+        reqDTO.setOwnerModifyAddrAmtCashNo(FineTypeEnum.MODIFY_ADDRESS_FINE.getFineType());
+        ResponseData<?> responseData = ownerOrderDetailService.updateFineAmt(reqDTO);
         return responseData;
     }
 
