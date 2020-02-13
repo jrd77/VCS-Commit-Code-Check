@@ -117,7 +117,9 @@ public class AdminPreOrderController {
         return ResponseData.success(responseVO);
 
     }
-
+    @AutoDocVersion(version = "下单前确定页面")
+    @AutoDocGroup(group = "下单前确定页面")
+    @AutoDocMethod(description = "下单前确定页面的优惠券列表", value = "下单前确定页面的优惠券列表",response = MemAvailableCouponVO.class)
     @PostMapping("console/order/adminPreCoupons")
     public ResponseData<MemAvailableCouponVO> preOrderAdminCoupons(@RequestBody PreOrderReqVO request, BindingResult result){
         BindingResultUtil.checkBindingResult(result);
