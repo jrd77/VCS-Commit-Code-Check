@@ -1,30 +1,42 @@
 package com.atzuche.order.admin.controller.order;
 
+import com.atzuche.order.admin.PreOrderReqVO;
+import com.atzuche.order.admin.service.AdminOrderService;
 import com.atzuche.order.admin.vo.req.order.PreOrderAdminRequestVO;
+import com.atzuche.order.admin.vo.resp.MemAvailableCouponVO;
 import com.atzuche.order.admin.vo.resp.order.PreOrderAdminResponseVO;
 import com.atzuche.order.car.CarProxyService;
+import com.atzuche.order.coin.service.AutoCoinProxyService;
+import com.atzuche.order.commons.BindingResultUtil;
 import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
 import com.atzuche.order.commons.entity.dto.RenterGoodsPriceDetailDTO;
+import com.atzuche.order.commons.exceptions.InputErrorException;
+import com.atzuche.order.commons.vo.req.NormalOrderCostCalculateReqVO;
+import com.atzuche.order.wallet.WalletProxyService;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
 import com.atzuche.order.mem.MemProxyService;
 import com.autoyol.doc.annotation.AutoDocGroup;
 import com.autoyol.doc.annotation.AutoDocMethod;
+import com.autoyol.doc.annotation.AutoDocProperty;
 import com.autoyol.doc.annotation.AutoDocVersion;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.text.SimpleDateFormat;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -43,14 +55,21 @@ public class AdminPreOrderController {
     @Autowired
     private CarProxyService carProxyService;
 
+    @Autowired
+    private AdminOrderService adminOrderService;
+
+    @Autowired
+    private WalletProxyService walletProxyService;
+
+    @Autowired
+    private AutoCoinProxyService coinProxyService;
+
     @AutoDocVersion(version = "下单前确定页面")
     @AutoDocGroup(group = "下单前确定页面")
     @AutoDocMethod(description = "下单前确定页面展示", value = "下单前确定页面展示",response = PreOrderAdminResponseVO.class)
     @PostMapping("console/order/adminPre")
     public ResponseData<PreOrderAdminResponseVO> preOrderAdmin(@RequestBody PreOrderAdminRequestVO request, BindingResult result){
-        if (result.hasErrors()) {
-            return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), ErrorCode.INPUT_ERROR.getText());
-        }
+        BindingResultUtil.checkBindingResult(result);
 
         PreOrderAdminResponseVO responseVO = new PreOrderAdminResponseVO();
 
@@ -102,13 +121,70 @@ public class AdminPreOrderController {
 
         responseVO.setCarSpecialDayPrices(carDayPrices);
 
-        //TODO:
-        responseVO.setTotalWallet(0);
-        responseVO.setTotalAutoCoin(0);
+
+        responseVO.setTotalWallet(walletProxyService.getWalletByMemNo(memNo));
+        responseVO.setTotalAutoCoin(coinProxyService.getCrmCustPoint(memNo));
+
+        NormalOrderCostCalculateReqVO normalOrderCostCalculateReqVO = new NormalOrderCostCalculateReqVO();
+        BeanUtils.copyProperties(request,normalOrderCostCalculateReqVO);
+
+        normalOrderCostCalculateReqVO.setRentTime(date2String(string2Date(request.getRentTime(),"yyyyMMddHHmmss"),"yyyy-MM-dd HH:mm:ss"));
+        normalOrderCostCalculateReqVO.setRevertTime(date2String(string2Date(request.getRevertTime(),"yyyyMMddHHmmss"),"yyyy-MM-dd HH:mm:ss"));
+
+        normalOrderCostCalculateReqVO.setDisCouponId(request.getDisCouponIds());
+
+
+        normalOrderCostCalculateReqVO.setMemNo(memNo);
+        normalOrderCostCalculateReqVO.setOrderCategory("1");
+        normalOrderCostCalculateReqVO.setSceneCode("EX007");
+        normalOrderCostCalculateReqVO.setSource("1");
+        normalOrderCostCalculateReqVO.setPlatformParentType("7");
+
+        MemAvailableCouponVO memAvailableCouponVO = adminOrderService.getPreOrderCouponList(normalOrderCostCalculateReqVO);
+
+        responseVO.setPlatCouponList(memAvailableCouponVO.getPlatCouponList());
+        responseVO.setGetCarCouponList(memAvailableCouponVO.getGetCarCouponList());
+        responseVO.setCarOwnerCouponDetailVOList(memAvailableCouponVO.getCarOwnerCouponDetailVOList());
 
         return ResponseData.success(responseVO);
 
     }
+
+    public static Date string2Date(String dateStr,String pattern){
+        SimpleDateFormat dateFormat = new SimpleDateFormat(pattern);
+        try {
+            return dateFormat.parse(dateStr);
+        }catch (Exception e){
+            throw new InputErrorException(dateStr+"格式不对");
+        }
+    }
+
+    public static String date2String(Date date,String pattern){
+        SimpleDateFormat dateFormat = new SimpleDateFormat(pattern);
+        return dateFormat.format(date);
+    }
+
+
+    @AutoDocVersion(version = "下单前确定页面")
+    @AutoDocGroup(group = "下单前确定页面")
+    @AutoDocMethod(description = "下单前确定页面的优惠券列表", value = "下单前确定页面的优惠券列表",response = MemAvailableCouponVO.class)
+    @PostMapping("console/order/adminPreCoupons")
+    public ResponseData<MemAvailableCouponVO> preOrderAdminCoupons(@RequestBody PreOrderReqVO request, BindingResult result){
+        BindingResultUtil.checkBindingResult(result);
+        NormalOrderCostCalculateReqVO normalOrderCostCalculateReqVO = new NormalOrderCostCalculateReqVO();
+        BeanUtils.copyProperties(request,normalOrderCostCalculateReqVO);
+        normalOrderCostCalculateReqVO.setMemNo(request.getMemNo());
+        normalOrderCostCalculateReqVO.setOrderCategory("1");
+        normalOrderCostCalculateReqVO.setSceneCode("EX007");
+        normalOrderCostCalculateReqVO.setSource("1");
+        normalOrderCostCalculateReqVO.setPlatformParentType("7");
+
+        MemAvailableCouponVO memAvailableCouponVO = adminOrderService.getPreOrderCouponList(normalOrderCostCalculateReqVO);
+
+        return ResponseData.success(memAvailableCouponVO);
+    }
+
+
 
     public static boolean  isWorkDay(LocalDate localDate){
         DayOfWeek dayOfWeek= localDate.getDayOfWeek();
