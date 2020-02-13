@@ -5,11 +5,16 @@ import com.atzuche.order.coreapi.entity.vo.req.AutoCoinDeductReqVO;
 import com.atzuche.order.coreapi.entity.vo.req.OwnerCouponBindReqVO;
 import com.atzuche.order.renterorder.service.OwnerDiscountCouponService;
 import com.atzuche.order.renterorder.service.PlatformCouponService;
+import com.atzuche.order.renterorder.vo.owner.OwnerDiscountCouponVO;
+import com.autoyol.coupon.api.MemAvailCoupon;
+import com.autoyol.coupon.api.MemAvailCouponRequest;
+import com.autoyol.coupon.api.MemAvailCouponResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * 优惠券、凹凸币后续操作
@@ -139,6 +144,46 @@ public class CouponAndCoinHandleService {
         return platformCouponService.cancelGetCarFeeCoupon(orderNo) > 0;
     }
 
+
+    /**
+     * 获取租客有效的平台优惠券列表
+     *
+     * @param request 请求参数
+     * @return List<MemAvailCoupon>
+     */
+    public List<MemAvailCoupon> getMemPlatformCoupon(MemAvailCouponRequest request) {
+        MemAvailCouponResponse response = platformCouponService.findAvailMemCoupons(request);
+        if(null != response) {
+            return response.getAvailCoupons();
+        }
+        return null;
+    }
+
+    /**
+     * 获取租客有效的送取服务券列表
+     *
+     * @param request 请求参数
+     * @return List<MemAvailCoupon>
+     */
+    public List<MemAvailCoupon> getMemGetCarFeeCoupon(MemAvailCouponRequest request) {
+        MemAvailCouponResponse response = platformCouponService.findAvailMemCouponsV2(request);
+        if(null != response) {
+            return response.getAvailCoupons();
+        }
+        return null;
+    }
+
+    /**
+     * 获取租客有效的车主券列表
+     *
+     * @param rentAmt 租金
+     * @param memNo 租客会员号
+     * @param carNo 车辆注册号
+     * @return List<OwnerDiscountCouponVO>
+     */
+    public List<OwnerDiscountCouponVO> getMemOwnerCoupon(Integer rentAmt, Integer memNo, Integer carNo) {
+        return  ownerDiscountCouponService.getCouponList(rentAmt, memNo, carNo, null);
+    }
 
 
 
