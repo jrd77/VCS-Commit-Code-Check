@@ -1,5 +1,7 @@
 package com.atzuche.order.admin.service;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +16,7 @@ import com.atzuche.order.commons.vo.res.rentcosts.SupplementVO;
 import com.atzuche.order.open.service.FeignSupplementService;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
+import com.autoyol.platformcost.CommonUtils;
 import com.dianping.cat.Cat;
 import com.dianping.cat.message.Transaction;
 
@@ -56,6 +59,63 @@ public class AdminSupplementService {
             		} else if (sup.getCashType() != null && sup.getCashType() == 2) {
             			sup.setCashTypeTxt("订单欠款");
             		}
+            		if (sup.getOpStatus() != null) {
+            			if (sup.getOpStatus() == 0) {
+            				sup.setOpStatusTxt("待提交");
+            			} else if (sup.getOpStatus() == 1) {
+            				sup.setOpStatusTxt("已生效 ");
+            			} else if (sup.getOpStatus() == 2) {
+            				sup.setOpStatusTxt("已失效 ");
+            			} else if (sup.getOpStatus() == 3) {
+            				sup.setOpStatusTxt("已撤回");
+            			}
+            		}
+            		if (sup.getSupplementType() != null) {
+            			if (sup.getSupplementType() == 1) {
+            				sup.setSupplementTypeTxt("系统创建");
+            			} else if (sup.getSupplementType() == 2) {
+            				sup.setSupplementTypeTxt("手动创建");
+            			}
+            		}
+            		if (sup.getOpType() != null) {
+            			if (sup.getOpType() == 1) {
+            				sup.setOpTypeTxt("修改订单");
+            			} else if (sup.getOpType() == 2) {
+            				sup.setOpTypeTxt("车管家录入");
+            			} else if (sup.getOpType() == 3) {
+            				sup.setOpTypeTxt("租车押金结算");
+            			} else if (sup.getOpType() == 4) {
+            				sup.setOpTypeTxt("违章押金结算");
+            			} else if (sup.getOpType() == 5) {
+            				sup.setOpTypeTxt("手动添加");
+            			}
+            		}
+            		if (sup.getPayFlag() != null) {
+            			if (sup.getPayFlag() == 0) {
+            				sup.setPayFlagTxt("无需支付");
+            			} else if (sup.getPayFlag() == 1) {
+            				sup.setPayFlagTxt("未支付");
+            			} else if (sup.getPayFlag() == 2) {
+            				sup.setPayFlagTxt("已取消");
+            			} else if (sup.getPayFlag() == 3) {
+            				sup.setPayFlagTxt("已支付");
+            			} else if (sup.getPayFlag() == 4) {
+            				sup.setPayFlagTxt("支付中");
+            			} else if (sup.getPayFlag() == 5) {
+            				sup.setPayFlagTxt("支付失败");
+            			} else if (sup.getPayFlag() == 10) {
+            				sup.setPayFlagTxt("租车押金结算抵扣");
+            			} else if (sup.getPayFlag() == 20) {
+            				sup.setPayFlagTxt("违章押金结算抵扣");
+            			}
+            		}
+            		if (sup.getCreateTime() != null) {
+            			LocalDateTime createLocalDateTime = sup.getCreateTime().toInstant()
+            			        .atZone(ZoneId.systemDefault() )
+            			        .toLocalDateTime();
+            			sup.setCreateTimeTxt(CommonUtils.formatTime(createLocalDateTime, CommonUtils.FORMAT_STR_DEFAULT));
+            		}
+            		sup.setPayTypeTxt("消费");
             	}
             }
             return supplementVO;
