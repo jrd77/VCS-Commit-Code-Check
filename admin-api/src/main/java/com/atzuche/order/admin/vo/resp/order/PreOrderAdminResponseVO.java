@@ -1,5 +1,7 @@
 package com.atzuche.order.admin.vo.resp.order;
 
+import com.atzuche.order.commons.vo.res.order.CarOwnerCouponDetailVO;
+import com.atzuche.order.commons.vo.res.order.DisCouponMemInfoVO;
 import com.autoyol.doc.annotation.AutoDocProperty;
 import lombok.Data;
 import lombok.ToString;
@@ -26,12 +28,19 @@ public class PreOrderAdminResponseVO {
     @AutoDocProperty(value="特价车天单价")
     private List<CarDayPrice> carSpecialDayPrices = new ArrayList<>();
 
-    @AutoDocProperty(value="可用的平台券")
-    private List<CouponDTO> availablePlatCoupons = new ArrayList<>();
-    @AutoDocProperty(value="可用的取还车券")
-    private List<CouponDTO> availableGetCarCoupons = new ArrayList<>();
-    @AutoDocProperty(value="可用的车主券")
-    private List<CouponDTO> availableCarOwnerCoupons = new ArrayList<>();
+//    @AutoDocProperty(value="可用的平台券")
+//    private List<CouponDTO> availablePlatCoupons = new ArrayList<>();
+//    @AutoDocProperty(value="可用的取还车券")
+//    private List<CouponDTO> availableGetCarCoupons = new ArrayList<>();
+//    @AutoDocProperty(value="可用的车主券")
+//    private List<CouponDTO> availableCarOwnerCoupons = new ArrayList<>();
+
+    @AutoDocProperty(value = "车主券列表")
+    private List<CarOwnerCouponDetailVO> carOwnerCouponDetailVOList;
+    @AutoDocProperty(value = "平台优惠券列表，不包括取还车")
+    private List<DisCouponMemInfoVO> platCouponList;
+    @AutoDocProperty(value = "取还车优惠券列表")
+    private List<DisCouponMemInfoVO> getCarCouponList;
 
 
     @Data
