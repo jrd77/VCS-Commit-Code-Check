@@ -123,11 +123,11 @@ public class AdminDeliveryCarService {
     public void updateDeliveryCarInfo(DeliveryCarVO deliveryCarVO) throws Exception {
         logger.info("入参deliveryReqVO：[{}]", deliveryCarVO.toString());
         handoverCarInfoService.updateDeliveryCarInfo(createParams(deliveryCarVO));
-        ResponseData responseData = feignOrderModifyService.modifyOrderForConsole(createModifyOrderInfoParams(deliveryCarVO));
-        if (!responseData.getResCode().equals(ErrorCode.SUCCESS.getCode())) {
-            logger.info("修改订单失败，orderNo：[{}],cause:[{}]", deliveryCarVO.getOrderNo(), responseData.getResMsg());
-            return;
-        }
+//        ResponseData responseData = feignOrderModifyService.modifyOrderForConsole(createModifyOrderInfoParams(deliveryCarVO));
+//        if (!responseData.getResCode().equals(ErrorCode.SUCCESS.getCode())) {
+//            logger.info("修改订单失败，orderNo：[{}],cause:[{}]", deliveryCarVO.getOrderNo(), responseData.getResMsg());
+//            return;
+//        }
     }
 
     /**
