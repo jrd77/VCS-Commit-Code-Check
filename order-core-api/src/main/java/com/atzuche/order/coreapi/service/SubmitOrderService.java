@@ -561,13 +561,11 @@ public class SubmitOrderService {
         orderCreateMq.setPlatformChildType(orderReqVO.getPlatformChildType());
         orderCreateMq.setRiskReqId(orderDTO.getRiskAuditId());
         OrderMessage orderMessage = OrderMessage.builder().build();
-        orderMessage.setPhone("13628645717");
-        orderMessage.setMessage("订单创建成功");
         orderMessage.setMessage(orderCreateMq);
         baseProducer.sendTopicMessage("auto-order-action","action.order.create",orderMessage);
     }
-    
-    
+
+
     /**
      * 对象转换
      * @param reqContext
