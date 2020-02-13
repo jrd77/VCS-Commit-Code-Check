@@ -134,14 +134,14 @@ public class OwnerOrderDetailService {
         return responseObject;
     }
 
-    public ResponseData<PlatformToOwnerSubsidyDTO> platformToOwnerSubsidy(String orderNo, String ownerOrderNo) {
+    public ResponseData<PlatformToOwnerSubsidyDTO> platformToOwnerSubsidy(String orderNo, String ownerOrderNo,String memNo) {
         ResponseData<PlatformToOwnerSubsidyDTO> responseObject = null;
         Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "获取平台给车主的补贴明细");
         try{
             Cat.logEvent(CatConstants.FEIGN_METHOD,"feignOrderUpdateService.cancelOrder");
             log.info("Feign 开始获取平台给车主的补贴明细,orderNo={}", orderNo);
             Cat.logEvent(CatConstants.FEIGN_PARAM,orderNo);
-            responseObject =  feignOwnerDetailService.platformToOwnerSubsidy(orderNo,ownerOrderNo);
+            responseObject =  feignOwnerDetailService.platformToOwnerSubsidy(orderNo,ownerOrderNo,memNo);
             Cat.logEvent(CatConstants.FEIGN_RESULT,orderNo);
             ResponseCheckUtil.checkResponse(responseObject);
             t.setStatus(Transaction.SUCCESS);

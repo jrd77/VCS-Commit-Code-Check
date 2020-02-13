@@ -119,7 +119,8 @@ public class ModifyOrderService {
 	private OrderStatusService orderStatusService;
 	@Autowired
 	private OrderConsoleSubsidyDetailService orderConsoleSubsidyDetailService;
-
+	@Autowired
+	private ModifyOrderRiskService modifyOrderRiskService;
 	/**
 	 * 修改订单主逻辑（含换车）
 	 * @param modifyOrderReq
@@ -149,9 +150,6 @@ public class ModifyOrderService {
 		modifyOrderDTO.setRenterGoodsDetailDTO(renterGoodsDetailDTO);
 		// 获取组装后的新租客子单信息
 		RenterOrderEntity renterOrderNew = convertToRenterOrderEntity(modifyOrderDTO, initRenterOrder);
-		
-		// TODO 风控校验
-		
 		// 获取主订单信息
 		OrderEntity orderEntity = orderService.getOrderByOrderNoAndMemNo(orderNo, modifyOrderReq.getMemNo());
 		// 设置主订单信息
@@ -179,6 +177,8 @@ public class ModifyOrderService {
 		RenterOrderReqVO renterOrderReqVO = convertToRenterOrderReqVO(modifyOrderDTO, renterMemberDTO, renterGoodsDetailDTO, orderEntity, carRentTimeRangeResVO);
 		// 基础费用计算包含租金，手续费，基础保障费用，全面保障费用，附加驾驶人保障费用，取还车费用计算和超运能费用计算
 		RenterOrderCostRespDTO renterOrderCostRespDTO = getRenterOrderCostRespDTO(modifyOrderDTO, renterOrderReqVO, initCostList, initSubsidyList);
+		// 调用风控审核
+		modifyOrderRiskService.checkModifyRisk(modifyOrderDTO, renterOrderCostRespDTO);
 		// 获取修改订单违约金
 		List<RenterOrderFineDeatailEntity> renterFineList = getRenterFineList(modifyOrderDTO, initRenterOrder, deliveryList, renterOrderCostRespDTO);
 		// 封装基础信息对象

@@ -66,6 +66,14 @@ public class RenterOrderFineDeatailService{
     	return renterOrderFineDeatailMapper.listRenterOrderFineDeatail(orderNo, renterOrderNo);
     }
 
+    /**
+     * 租客罚金列表  与上面的方法重复。去掉
+     */
+//    public List<RenterOrderFineDeatailEntity> queryRentOrderFineDetail(String orderNo,String renterOrderNo) {
+//    	List<RenterOrderFineDeatailEntity> lst = renterOrderFineDeatailMapper.listRenterOrderFineDeatail(orderNo, renterOrderNo);
+//    	return lst;
+//    }
+    
 	/**
 	 * 获取某个子单的罚金总额
 	 * @param orderNo

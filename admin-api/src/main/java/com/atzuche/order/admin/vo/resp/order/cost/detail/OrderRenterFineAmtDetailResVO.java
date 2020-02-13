@@ -22,7 +22,7 @@ public class OrderRenterFineAmtDetailResVO {
 	@AutoDocProperty(value="租客延迟还车罚金")
 	private String renterDelayReturnCarFineAmt;
 	
-	@AutoDocProperty(value="租客违约罚金")
+	@AutoDocProperty(value="租客违约罚金(取消订单违约金)")
 	private String renterFineAmt;
 	
 	@AutoDocProperty(value="租客取还车违约金")

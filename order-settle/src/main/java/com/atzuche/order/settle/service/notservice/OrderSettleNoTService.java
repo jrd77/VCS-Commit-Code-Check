@@ -255,19 +255,19 @@ public class OrderSettleNoTService {
         }
         //2校验租客是否还车
         boolean isReturn = handoverCarService.isReturnCar(renterOrder.getOrderNo());
-//        if(!isReturn){
-//            throw new RuntimeException("租客未还车不能结算");
-//        }
+        if(!isReturn){
+            throw new RuntimeException("租客未还车不能结算");
+        }
         //3 校验是否存在 理赔  存在不结算
         boolean isClaim = cashierSettleService.getOrderClaim(renterOrder.getOrderNo());
         if(isClaim){
             throw new RuntimeException("租客存在理赔信息不能结算");
         }
         //3 是否存在 暂扣存在不结算
-        boolean isDetain = cashierSettleService.getOrderDetain(renterOrder.getOrderNo());
-        if(isDetain){
-            throw new RuntimeException("租客存在暂扣信息不能结算");
-        }
+//        boolean isDetain = cashierSettleService.getOrderDetain(renterOrder.getOrderNo());
+//        if(isDetain){
+//            throw new RuntimeException("租客存在暂扣信息不能结算");
+//        }
         //4 先查询  发现 有结算数据停止结算 手动处理
         orderSettleNewService.checkIsSettle(renterOrder.getOrderNo());
     }
@@ -511,8 +511,8 @@ public class OrderSettleNoTService {
         String[] gpsSerialNumberArr = gpsSerialNumber.split(",");
         List<Integer> list = new ArrayList<>();
         for(int i=0;i<gpsSerialNumberArr.length;i++){
-            if(!StringUtil.isBlank(gpsSerialNumber)){
-                list.add(Integer.valueOf(gpsSerialNumber));
+            if(!StringUtil.isBlank(gpsSerialNumberArr[i])){
+                list.add(Integer.valueOf(gpsSerialNumberArr[i]));
             }
         }
         return list;

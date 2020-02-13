@@ -23,16 +23,16 @@ public class OrderActionEventListener {
     @Autowired
     MQSendPlatformSmsService sendPlatformSmsService;
 
-    @RabbitListener(bindings = {@QueueBinding(value = @Queue(value = "order_action_01", durable = "true"),
-            exchange = @Exchange(value = "auto-order-action", durable = "true", type = "topic"), key = "action.#")
+    @RabbitListener(bindings = {@QueueBinding(value = @Queue(value = "order_action_03", durable = "true"),
+            exchange = @Exchange(value = "auto-order-action", durable = "true", type = "topic"), key = "action.order.create4.#")
     },containerFactory = "rabbitListenerContainerFactory")
     public void process(Message message) {
         log.info("receive order action message: " + new String(message.getBody()));
         OrderMessage orderMessage = JSONObject.parseObject(message.getBody(),OrderMessage.class);
         log.info("新订单动作总事件监听,入参orderMessage:[{}]", orderMessage.toString());
         try {
-            sendPlatformSmsService.orderPaySms(orderMessage.getContext(), orderMessage.getPhone(), "大事件備注",null);
-            log.info("新订单action事件成功发送短信,----------->>>>>>内容：{},手机号:{}",orderMessage.getContext(),orderMessage.getPhone());
+//            sendPlatformSmsService.orderPaySms(orderMessage.getContext(), orderMessage.getPhone(), "大事件備注",null);
+//            log.info("新订单action事件成功发送短信,----------->>>>>>内容：{},手机号:{}",orderMessage.getContext(),orderMessage.getPhone());
         } catch (Exception e) {
             log.info("新订单动作总事件监听发生异常,msg：[{}]",e.getMessage());
             Cat.logError("新订单动作总事件监听发生异常",e);

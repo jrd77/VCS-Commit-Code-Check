@@ -2,9 +2,13 @@ package com.atzuche.order.admin.controller;
 
 import com.atzuche.order.admin.service.OwnerOrderDetailService;
 import com.atzuche.order.commons.entity.ownerOrderDetail.*;
+import com.atzuche.order.ownercost.entity.OwnerOrderEntity;
+import com.atzuche.order.ownercost.service.OwnerOrderService;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.doc.annotation.AutoDocMethod;
+
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -17,6 +21,9 @@ import java.util.Optional;
 public class OwnerOrderDetailController {
     @Autowired
     private OwnerOrderDetailService ownerOrderDetailService;
+    @Autowired
+    private OwnerOrderService ownerOrderService;
+    
 
     /**
      * @Author ZhangBin
@@ -172,7 +179,17 @@ public class OwnerOrderDetailController {
             responseData.setResMsg("车主订单号不能为空");
             return responseData;
         }
-        ResponseData<PlatformToOwnerSubsidyDTO> responseData = ownerOrderDetailService.platformToOwnerSubsidy(orderNo,ownerOrderNo);
+        
+        //需要获取车主的会员号 20200212 huangjing
+        OwnerOrderEntity orderEntityOwner = null;  
+
+		    orderEntityOwner = ownerOrderService.getOwnerOrderByOwnerOrderNo(ownerOrderNo);
+	        if(orderEntityOwner == null){
+	        	//否则根据主订单号查询
+		    	orderEntityOwner = ownerOrderService.getOwnerOrderByOrderNoAndIsEffective(orderNo);
+	        }
+	    
+        ResponseData<PlatformToOwnerSubsidyDTO> responseData = ownerOrderDetailService.platformToOwnerSubsidy(orderNo,ownerOrderNo,orderEntityOwner.getMemNo());
         return responseData;
     }
 
