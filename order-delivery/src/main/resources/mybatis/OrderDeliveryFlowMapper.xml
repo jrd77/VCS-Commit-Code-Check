@@ -334,7 +334,7 @@
 	<select id="selectOrderDeliveryByOrderNo" resultMap="BaseResultMap">
 		select
 		<include refid="Base_Column_List"/>
-		from order_delivery_flow where order_no = #{orderNo} and service_type = #{serviceType}
+		from order_delivery_flow where order_no = #{orderNo} and service_type = #{serviceType} and is_delete = 0
 	</select>
 	<select id="selectOrderDeliveryByRenterOrderNo" resultMap="BaseResultMap">
 		select

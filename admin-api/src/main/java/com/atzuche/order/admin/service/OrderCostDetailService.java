@@ -70,12 +70,14 @@ import com.atzuche.order.rentercost.entity.ConsoleRenterOrderFineDeatailEntity;
 import com.atzuche.order.rentercost.entity.OrderConsoleCostDetailEntity;
 import com.atzuche.order.rentercost.entity.OrderConsoleSubsidyDetailEntity;
 import com.atzuche.order.rentercost.entity.RenterOrderCostDetailEntity;
+import com.atzuche.order.rentercost.entity.RenterOrderFineDeatailEntity;
 import com.atzuche.order.rentercost.entity.RenterOrderSubsidyDetailEntity;
 import com.atzuche.order.rentercost.service.ConsoleRenterOrderFineDeatailService;
 import com.atzuche.order.rentercost.service.OrderConsoleCostDetailService;
 import com.atzuche.order.rentercost.service.OrderConsoleSubsidyDetailService;
 import com.atzuche.order.rentercost.service.RenterOrderCostCombineService;
 import com.atzuche.order.rentercost.service.RenterOrderCostDetailService;
+import com.atzuche.order.rentercost.service.RenterOrderFineDeatailService;
 import com.atzuche.order.rentercost.service.RenterOrderSubsidyDetailService;
 import com.atzuche.order.rentermem.service.RenterMemberService;
 import com.atzuche.order.renterorder.entity.RenterDepositDetailEntity;
@@ -126,6 +128,7 @@ public class OrderCostDetailService {
     @Autowired
     RenterOrderService renterOrderService;
     
+    RenterOrderFineDeatailService renterOrderFineDeatailService;
     
 	public ReductionDetailResVO findReductionDetailsListByOrderNo(RenterCostReqVO renterCostReqVO) throws Exception {
 		ReductionDetailResVO resVo = new ReductionDetailResVO();
@@ -294,7 +297,7 @@ public class OrderCostDetailService {
 	 * @throws Exception
 	 */
 	private void putComUseDriverList(AdditionalDriverInsuranceVO resVo, List<CommUseDriverInfoDTO> commUseDriverList,ExtraDriverDTO extraDriverDTO,List<String> lstDriverId) throws Exception {
-		if(lstDriverId != null && lstDriverId.size() > 0) {
+//		if(lstDriverId != null && lstDriverId.size() > 0) {
 			List<CommUseDriverInfoStringDateDTO> listCommUseDriverInfoDTO = new ArrayList<CommUseDriverInfoStringDateDTO>();
 			List<String> driverIds = new ArrayList<String>();
 			driverIds.add("1");//默认一个
@@ -332,7 +335,7 @@ public class OrderCostDetailService {
 			}
 			
 			resVo.setListCommUseDriverInfoDTO(listCommUseDriverInfoDTO);
-		}
+//		}
 		
 	}
 	
@@ -984,7 +987,10 @@ public class OrderCostDetailService {
 		
 		 int renterBeforeReturnCarFineAmount=0;
 		 int renterDelayReturnCarFineAmount=0;
+		 
+		 //取消订单违约金。
 		 int renterFineAmount=0;
+		 //取还车违约金
 		 int renterGetReturnCarFineAmount=0;
 		List<ConsoleRenterOrderFineDeatailEntity> list = consoleRenterOrderFineDeatailService.listConsoleRenterOrderFineDeatail(renterCostReqVO.getOrderNo(), orderEntity.getMemNoRenter());
 		//累计求和
@@ -1002,10 +1008,33 @@ public class OrderCostDetailService {
 			}
 		}
 		
-		renterBeforeReturnCarFineAmt = String.valueOf(renterBeforeReturnCarFineAmount);
-		renterDelayReturnCarFineAmt = String.valueOf(renterDelayReturnCarFineAmount);
-		renterFineAmt = String.valueOf(renterFineAmount);
-		renterGetReturnCarFineAmt = String.valueOf(renterGetReturnCarFineAmount);
+		//还需要从renter_order_fine_deatail获取
+		//租客罚金列表
+		List<RenterOrderFineDeatailEntity> fineLst = renterOrderFineDeatailService.listRenterOrderFineDeatail(renterCostReqVO.getOrderNo(), renterCostReqVO.getRenterOrderNo());
+		//累计求和
+		for (RenterOrderFineDeatailEntity renterOrderFineDeatailEntity : fineLst) {
+			if(renterOrderFineDeatailEntity.getFineType().intValue() == FineTypeEnum.MODIFY_GET_FINE.getFineType().intValue()) {
+				renterGetReturnCarFineAmount += renterOrderFineDeatailEntity.getFineAmount().intValue();
+			}else if(renterOrderFineDeatailEntity.getFineType().intValue() == FineTypeEnum.MODIFY_RETURN_FINE.getFineType().intValue()) {
+				renterGetReturnCarFineAmount += renterOrderFineDeatailEntity.getFineAmount().intValue();
+			}else if(renterOrderFineDeatailEntity.getFineType().intValue() == FineTypeEnum.MODIFY_ADVANCE.getFineType().intValue()) {
+//				renterBeforeReturnCarFineAmount += renterOrderFineDeatailEntity.getFineAmount().intValue();
+				//暂时先归到这个里面来。因为是不同的来源，console_ 否则修改的时候会有问题。 20200212
+				renterFineAmount += renterOrderFineDeatailEntity.getFineAmount().intValue();
+			}else if(renterOrderFineDeatailEntity.getFineType().intValue() == FineTypeEnum.CANCEL_FINE.getFineType().intValue()) {
+				renterFineAmount += renterOrderFineDeatailEntity.getFineAmount().intValue();
+//			}else if(renterOrderFineDeatailEntity.getFineType().intValue() == FineTypeEnum.DELAY_FINE.getFineType().intValue()) {
+//				renterDelayReturnCarFineAmount += renterOrderFineDeatailEntity.getFineAmount().intValue();
+			}
+		}
+		
+		
+		
+		//取反,显示正数。
+		renterBeforeReturnCarFineAmt = renterBeforeReturnCarFineAmount<0?String.valueOf(-renterBeforeReturnCarFineAmount):String.valueOf(renterBeforeReturnCarFineAmount);
+		renterDelayReturnCarFineAmt = renterDelayReturnCarFineAmount<0?String.valueOf(-renterDelayReturnCarFineAmount):String.valueOf(renterDelayReturnCarFineAmount);
+		renterFineAmt = renterFineAmount<0?String.valueOf(-renterFineAmount):String.valueOf(renterFineAmount);
+		renterGetReturnCarFineAmt = renterGetReturnCarFineAmount<0?String.valueOf(-renterGetReturnCarFineAmount):String.valueOf(renterGetReturnCarFineAmount);
 		
 		
 		resVo.setRenterBeforeReturnCarFineAmt(renterBeforeReturnCarFineAmt);
@@ -1040,7 +1069,7 @@ public class OrderCostDetailService {
 		//租客收益处理
 		if(StringUtils.isNotBlank(renterBeforeReturnCarFineAmt)) {
 	        ConsoleRenterOrderFineDeatailEntity consoleRenterOrderFineDeatailEntity =
-	                consoleRenterOrderFineDeatailService.fineDataConvert(costBaseDTO, Integer.valueOf(renterBeforeReturnCarFineAmt),
+	                consoleRenterOrderFineDeatailService.fineDataConvert(costBaseDTO, -Integer.valueOf(renterBeforeReturnCarFineAmt),
 	                        FineSubsidyCodeEnum.PLATFORM, FineSubsidySourceCodeEnum.RENTER, FineTypeEnum.MODIFY_ADVANCE);
 	        
 	        //统一设置修改人名称。20200205 huangjing
@@ -1051,9 +1080,10 @@ public class OrderCostDetailService {
 	        consoleRenterOrderFineDeatailService.saveOrUpdateConsoleRenterOrderFineDeatail(consoleRenterOrderFineDeatailEntity);
 		}
 		
+		//保存入库为负数，来源为租客。
 		if(StringUtils.isNotBlank(renterDelayReturnCarFineAmt)) {
 	        ConsoleRenterOrderFineDeatailEntity consoleRenterOrderFineDeatailEntity =
-	                consoleRenterOrderFineDeatailService.fineDataConvert(costBaseDTO, Integer.valueOf(renterDelayReturnCarFineAmt),
+	                consoleRenterOrderFineDeatailService.fineDataConvert(costBaseDTO, -Integer.valueOf(renterDelayReturnCarFineAmt),
 	                        FineSubsidyCodeEnum.PLATFORM, FineSubsidySourceCodeEnum.RENTER, FineTypeEnum.DELAY_FINE);
 	        
 	        //统一设置修改人名称。20200205 huangjing

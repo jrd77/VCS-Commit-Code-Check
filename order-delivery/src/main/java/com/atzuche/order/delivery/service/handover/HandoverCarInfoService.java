@@ -1,15 +1,19 @@
 package com.atzuche.order.delivery.service.handover;
 
 import com.atzuche.order.commons.CommonUtils;
+import com.atzuche.order.commons.enums.SrvGetReturnEnum;
 import com.atzuche.order.commons.vo.req.handover.req.HandoverCarInfoReqDTO;
 import com.atzuche.order.commons.vo.req.handover.req.HandoverCarInfoReqVO;
 import com.atzuche.order.delivery.common.DeliveryCarTask;
 import com.atzuche.order.delivery.common.DeliveryErrorCode;
+import com.atzuche.order.delivery.entity.OrderDeliveryFlowEntity;
 import com.atzuche.order.delivery.entity.RenterOrderDeliveryEntity;
+import com.atzuche.order.delivery.enums.DeliveryTypeEnum;
 import com.atzuche.order.delivery.enums.UsedDeliveryTypeEnum;
 import com.atzuche.order.delivery.exception.DeliveryOrderException;
 import com.atzuche.order.delivery.exception.HandoverCarOrderException;
 import com.atzuche.order.delivery.mapper.RenterOrderDeliveryMapper;
+import com.atzuche.order.delivery.service.OrderDeliveryFlowService;
 import com.atzuche.order.delivery.service.delivery.DeliveryCarService;
 import com.atzuche.order.delivery.utils.OSSUtils;
 import com.atzuche.order.delivery.vo.delivery.*;
@@ -19,6 +23,7 @@ import com.atzuche.order.delivery.vo.delivery.req.DeliveryReqVO;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -50,6 +55,9 @@ public class HandoverCarInfoService {
     OwnerHandoverCarService ownerHandoverCarService;
     @Autowired
     RenterHandoverCarService renterHandoverCarService;
+    @Autowired
+    OrderDeliveryFlowService deliveryFlowService;
+
 
     /**
      * 上传交接车
@@ -135,13 +143,25 @@ public class HandoverCarInfoService {
             if (renterOrderDeliveryEntity.getStatus().intValue() != 3 && renterOrderDeliveryEntity.getIsNotifyRenyun() == 1) {
                 deliveryCarInfoService.cancelRenYunFlowOrderInfo(new CancelOrderDeliveryVO().setCancelFlowOrderDTO(new CancelFlowOrderDTO().setServicetype(type == 1 ? "take" : "back").setOrdernumber(renterOrderDeliveryEntity.getOrderNo())).setRenterOrderNo(renterOrderDeliveryEntity.getRenterOrderNo()));
             }
-        } else if (renterOrderDeliveryEntity != null && String.valueOf(UsedDeliveryTypeEnum.USED.getValue()).equals(deliveryReqDTO.getIsUsedGetAndReturnCar())) {
+        } else{
+            //本身就是开启的 修改地址 发送修改记录(仁云记录由修改订单功能触发)
             UpdateOrderDeliveryVO updateOrderDeliveryVO = createDeliveryCarInfoParams(renterOrderDeliveryEntity, deliveryReqDTO, type);
-            deliveryCarInfoService.updateFlowOrderInfo(updateOrderDeliveryVO);
-           // deliveryCarInfoService.updateRenYunFlowOrderInfo(updateOrderDeliveryVO.getUpdateFlowOrderDTO());
-
-        } else {
-            throw new DeliveryOrderException(DeliveryErrorCode.DELIVERY_PARAMS_ERROR.getValue(), "没有合适的参数");
+            if(renterOrderDeliveryEntity.getIsNotifyRenyun() == 1) {
+                deliveryCarInfoService.updateFlowOrderInfo(updateOrderDeliveryVO);
+            }else {
+                //从关闭到开启 新增仁云记录数据 修改状态值
+                //开始新增数据并发送仁云
+                OrderDeliveryVO orderDeliveryVO = new OrderDeliveryVO();
+                updateOrderDeliveryVO.getOrderDeliveryDTO().setIsNotifyRenyun(1);
+                orderDeliveryVO.setOrderDeliveryDTO(updateOrderDeliveryVO.getOrderDeliveryDTO());
+                orderDeliveryVO.setRenterDeliveryAddrDTO(updateOrderDeliveryVO.getRenterDeliveryAddrDTO());
+                OrderDeliveryFlowEntity orderDeliveryFlow = deliveryFlowService.selectOrderDeliveryFlowByOrderNo(deliveryReqDTO.getOrderNo(),type == 1 ? "take" : "back");
+                orderDeliveryFlow.setServiceTypeInfo(type,orderDeliveryVO.getOrderDeliveryDTO());
+                orderDeliveryVO.setOrderDeliveryFlowEntity(orderDeliveryFlow);
+                deliveryCarInfoService.insertRenterDeliveryInfoAndDeliveryAddressInfo(null, null, orderDeliveryVO, DeliveryTypeEnum.UPDATE_TYPE.getValue().intValue());
+                RenYunFlowOrderDTO renYunFlowOrderDTO = deliveryCarInfoService.createRenYunDTO(orderDeliveryVO.getOrderDeliveryFlowEntity());
+                deliveryCarTask.addRenYunFlowOrderInfo(renYunFlowOrderDTO);
+            }
         }
     }
 
