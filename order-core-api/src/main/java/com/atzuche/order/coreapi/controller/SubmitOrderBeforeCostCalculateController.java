@@ -89,10 +89,9 @@ public class SubmitOrderBeforeCostCalculateController {
                                           BindingResult bindingResult){
         LOGGER.info("Get a list of tenant coupons.param is,adminGetDisCouponListReqVo:[{}]", JSON.toJSONString(adminGetDisCouponListReqVo));
         BindingResultUtil.checkBindingResult(bindingResult);
-
-
-
-        return ResponseData.success(null);
+        AdminGetDisCouponListResVO resVO  = submitOrderBeforeCostCalService.getDisCouponListByOrderNo(adminGetDisCouponListReqVo);
+        LOGGER.info("Get a list of tenant coupons.result is,resVO:[{}]", JSON.toJSONString(resVO));
+        return ResponseData.success(resVO);
 
     }
 
