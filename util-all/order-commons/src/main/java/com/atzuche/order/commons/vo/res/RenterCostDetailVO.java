@@ -1,10 +1,13 @@
 package com.atzuche.order.commons.vo.res;
 
 import com.atzuche.order.commons.vo.DepostiDetailVO;
+import com.atzuche.order.commons.vo.OrderSupplementDetailVO;
 import com.atzuche.order.commons.vo.WzDepositDetailVO;
 import com.autoyol.doc.annotation.AutoDocProperty;
 import lombok.Data;
 import lombok.ToString;
+
+import java.util.List;
 
 /**
  * 租客基础费用，即没有减免过的费用，系统自动计算的费用
@@ -52,6 +55,9 @@ public class RenterCostDetailVO {
 
     @AutoDocProperty(value = "车辆押金")
     private DepostiDetailVO depostiDetailVO;
+
+    @AutoDocProperty(value = "补付列表")
+    private List<OrderSupplementDetailVO> supplementDetailVOList;
 
     @AutoDocProperty(value = "消费总额")
     private int totalAmt;
