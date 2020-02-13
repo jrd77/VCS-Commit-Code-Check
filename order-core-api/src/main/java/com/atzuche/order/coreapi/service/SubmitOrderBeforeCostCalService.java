@@ -7,6 +7,7 @@ import com.atzuche.order.commons.entity.dto.OwnerMemberDTO;
 import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
 import com.atzuche.order.commons.entity.dto.RenterMemberDTO;
 import com.atzuche.order.commons.enums.OsTypeEnum;
+import com.atzuche.order.commons.vo.req.AdminGetDisCouponListReqVO;
 import com.atzuche.order.commons.vo.req.OrderReqVO;
 import com.atzuche.order.commons.vo.res.NormalOrderCostCalculateResVO;
 import com.atzuche.order.commons.vo.res.order.*;
@@ -154,6 +155,22 @@ public class SubmitOrderBeforeCostCalService {
     }
 
 
+
+    /**
+     * 获取订单内租客优惠抵扣信息
+     * <p>可用平台券列表</p>
+     * <p>可用送取服务券列表</p>
+     * <p>可用车主券列表</p>
+     * <p>可用钱包余额</p>
+     *
+     * @param reqVO 请求参数
+     */
+    public void getDisCouponListByOrderNo(AdminGetDisCouponListReqVO reqVO){
+
+
+
+
+    }
 
 
 }

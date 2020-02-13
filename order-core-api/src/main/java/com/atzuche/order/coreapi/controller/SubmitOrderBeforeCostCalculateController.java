@@ -3,8 +3,10 @@ package com.atzuche.order.coreapi.controller;
 import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.BindingResultUtil;
 import com.atzuche.order.commons.LocalDateTimeUtils;
+import com.atzuche.order.commons.vo.req.AdminGetDisCouponListReqVO;
 import com.atzuche.order.commons.vo.req.NormalOrderCostCalculateReqVO;
 import com.atzuche.order.commons.vo.req.OrderReqVO;
+import com.atzuche.order.commons.vo.res.AdminGetDisCouponListResVO;
 import com.atzuche.order.commons.vo.res.NormalOrderCostCalculateResVO;
 import com.atzuche.order.coreapi.service.SubmitOrderBeforeCostCalService;
 import com.autoyol.commons.web.ErrorCode;
@@ -17,14 +19,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cglib.beans.BeanCopier;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
-import java.util.Optional;
 
 /**
  *
@@ -71,6 +71,30 @@ public class SubmitOrderBeforeCostCalculateController {
         return ResponseData.success(resVO);
     }
 
+
+    /**
+     * 获取订单内租客优惠抵扣信息
+     * <p>可用平台券列表</p>
+     * <p>可用送取服务券列表</p>
+     * <p>可用车主券列表</p>
+     * <p>可用钱包余额</p>
+     *
+     * @param adminGetDisCouponListReqVo 请求参数
+     * @param bindingResult 参数校验结果
+     * @return ResponseData<AdminGetDisCouponListResVO> 返回信息
+     */
+    @AutoDocMethod(description = "获取订单内租客优惠抵扣信息", value = "获取订单内租客优惠抵扣信息", response = AdminGetDisCouponListResVO.class)
+    @PostMapping("/admin/queryDisCouponByOrderNo")
+    public ResponseData<AdminGetDisCouponListResVO> getDisCouponListByOrderNo(@Valid @RequestBody AdminGetDisCouponListReqVO adminGetDisCouponListReqVo,
+                                          BindingResult bindingResult){
+        LOGGER.info("Get a list of tenant coupons.param is,adminGetDisCouponListReqVo:[{}]", JSON.toJSONString(adminGetDisCouponListReqVo));
+        BindingResultUtil.checkBindingResult(bindingResult);
+
+
+
+        return ResponseData.success(null);
+
+    }
 
 
 }
