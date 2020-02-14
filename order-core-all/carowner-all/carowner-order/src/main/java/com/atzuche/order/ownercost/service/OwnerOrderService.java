@@ -73,7 +73,7 @@ public class OwnerOrderService {
      * @return Integer
      */
     public Integer updateOwnerOrderInfo(OwnerOrderEntity ownerOrderEntity){
-        return ownerOrderMapper.updateByPrimaryKey(ownerOrderEntity);
+        return ownerOrderMapper.updateByPrimaryKeySelective(ownerOrderEntity);
     }
 
     
