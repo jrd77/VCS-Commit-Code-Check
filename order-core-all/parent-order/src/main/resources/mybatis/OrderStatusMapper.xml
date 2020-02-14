@@ -267,4 +267,9 @@
     	update order_status set dispatch_status = #{dispatchStatus}
     	where order_no = #{orderNo}
     </update>
+    
+    <update id="updateOrderStatus">
+    	update order_status set `status` = #{status}
+    	where order_no = #{orderNo}
+    </update>
 </mapper>
