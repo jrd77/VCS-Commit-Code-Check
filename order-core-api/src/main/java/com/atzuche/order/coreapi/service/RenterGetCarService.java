@@ -91,6 +91,7 @@ public class RenterGetCarService {
             ownerOrderService.updateOwnerOrderInfo(record);
         }
 
+        //TODO:发送租客取车事件
 
     }
 
