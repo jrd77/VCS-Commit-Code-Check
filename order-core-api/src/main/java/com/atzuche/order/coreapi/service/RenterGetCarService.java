@@ -1,18 +1,26 @@
 package com.atzuche.order.coreapi.service;
 
 import com.atzuche.order.commons.enums.OrderStatusEnum;
+import com.atzuche.order.commons.enums.OwnerChildStatusEnum;
+import com.atzuche.order.commons.enums.RenterChildStatusEnum;
 import com.atzuche.order.commons.vo.req.GetCarReqVO;
 import com.atzuche.order.coreapi.submitOrder.exception.RefuseOrderCheckException;
 import com.atzuche.order.flow.service.OrderFlowService;
+import com.atzuche.order.ownercost.entity.OwnerOrderEntity;
+import com.atzuche.order.ownercost.service.OwnerOrderService;
 import com.atzuche.order.parentorder.entity.OrderStatusEntity;
 import com.atzuche.order.parentorder.service.OrderService;
 import com.atzuche.order.parentorder.service.OrderStatusService;
+import com.atzuche.order.renterorder.entity.RenterOrderEntity;
+import com.atzuche.order.renterorder.service.RenterOrderService;
 import com.autoyol.commons.web.ErrorCode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
 
 /**
  * 租客取车操作
@@ -30,6 +38,12 @@ public class RenterGetCarService {
 
     @Autowired
     private OrderFlowService orderFlowService;
+
+    @Autowired
+    private RenterOrderService renterOrderService;
+
+    @Autowired
+    private OwnerOrderService ownerOrderService;
 
 
 
@@ -57,6 +71,27 @@ public class RenterGetCarService {
         logger.info("Update order status.result:[{}], orderNo:[{}]", result, reqVO.getOrderNo());
         //添加trans_flow
         orderFlowService.inserOrderStatusChangeProcessInfo(reqVO.getOrderNo(), OrderStatusEnum.TO_RETURN_CAR);
+        //更新实际取车时间
+        RenterOrderEntity renterOrderEntity =
+                renterOrderService.getRenterOrderByOrderNoAndIsEffective(reqVO.getOrderNo());
+        if (null != renterOrderEntity) {
+            RenterOrderEntity record = new RenterOrderEntity();
+            record.setId(renterOrderEntity.getId());
+            record.setActRentTime(LocalDateTime.now());
+            record.setUpdateOp(reqVO.getOperatorName());
+            renterOrderService.updateRenterOrderInfo(record);
+        }
+
+        OwnerOrderEntity ownerOrderEntity = ownerOrderService.getOwnerOrderByOrderNoAndIsEffective(reqVO.getOrderNo());
+        if (null != ownerOrderEntity) {
+            OwnerOrderEntity record = new OwnerOrderEntity();
+            record.setId(ownerOrderEntity.getId());
+            record.setActRentTime(LocalDateTime.now());
+            record.setUpdateOp(reqVO.getOperatorName());
+            ownerOrderService.updateOwnerOrderInfo(record);
+        }
+
+
     }
 
 
