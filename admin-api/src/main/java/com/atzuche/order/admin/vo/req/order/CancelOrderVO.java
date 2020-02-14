@@ -21,4 +21,8 @@ public class CancelOrderVO  {
     @AutoDocProperty(value = "取消原因")
     private String cancelReason;
 
+    @AutoDocProperty(value = "操作人")
+    @NotBlank(message = "操作人不能为空")
+    private String operatorName;
+
 }
