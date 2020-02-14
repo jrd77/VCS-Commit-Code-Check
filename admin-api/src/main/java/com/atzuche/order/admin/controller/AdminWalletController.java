@@ -26,7 +26,8 @@ public class AdminWalletController {
 	public ResponseData walletBalance(@RequestParam("memNo") String  memNo) {
         int left = walletProxyService.getWalletByMemNo(memNo);
         WalletBalanceVO walletResponseVO = new WalletBalanceVO();
-        walletResponseVO.setBalance(String.valueOf(left));
+        walletResponseVO.setBalance(left);
+        walletResponseVO.setMemNo(memNo);
 		return ResponseData.success(walletResponseVO);
 	}
 
