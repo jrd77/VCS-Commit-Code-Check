@@ -167,7 +167,7 @@ public class OrderCostDetailServiceTest {
 		OwnerToRenterSubsidyReqVO ownerCostReqVO = new OwnerToRenterSubsidyReqVO();
 		ownerCostReqVO.setOrderNo("86392311200299");
 		ownerCostReqVO.setOwnerOrderNo("8639231120029910011");
-		ownerCostReqVO.setOwnerSubsidyRentAmt("20");
+		ownerCostReqVO.setOwnerSubsidyRentAmt("0");
 		try {
 			orderCostDetailService.ownerToRenterRentAmtSubsidy(ownerCostReqVO);
 		} catch (Exception e) {

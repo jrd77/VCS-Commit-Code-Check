@@ -1355,8 +1355,9 @@ public class OrderCostDetailService {
 		costBaseDTO.setMemNo(orderEntityOwner.getMemNo());
 		///
 		costBaseDTO.setOwnerOrderNo(orderEntityOwner.getOwnerOrderNo());
-    	OwnerOrderSubsidyDetailEntity ownerOrderSubsidyDetailEntity =  ownerOrderSubsidyDetailService.buildData(costBaseDTO, -rentAmt, targetEnum, sourceEnum, SubsidyTypeCodeEnum.CONSOLE_AMT, RenterCashCodeEnum.SUBSIDY_OWNER_TORENTER_RENTAMT);
-		ownerOrderSubsidyDetailService.saveOrUpdateRenterOrderSubsidyDetail(ownerOrderSubsidyDetailEntity);
+		//修改金额为0的情况
+		OwnerOrderSubsidyDetailEntity ownerOrderSubsidyDetailEntity  =  ownerOrderSubsidyDetailService.buildData(costBaseDTO, -rentAmt, targetEnum, sourceEnum, SubsidyTypeCodeEnum.CONSOLE_AMT, RenterCashCodeEnum.SUBSIDY_OWNER_TORENTER_RENTAMT);
+    	ownerOrderSubsidyDetailService.saveOrUpdateRenterOrderSubsidyDetail(ownerOrderSubsidyDetailEntity);
     	
 		
     	//反向记录
