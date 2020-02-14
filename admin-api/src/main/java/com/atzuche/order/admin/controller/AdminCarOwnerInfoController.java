@@ -2,18 +2,24 @@ package com.atzuche.order.admin.controller;
 
 import com.atzuche.order.admin.vo.resp.car.CarOwnerInfoRespVO;
 import com.atzuche.order.car.CarProxyService;
+import com.atzuche.order.commons.enums.MemberFlagEnum;
 import com.atzuche.order.mem.MemProxyService;
 import com.atzuche.order.mem.dto.OrderRenterInfoDTO;
+import com.atzuche.order.owner.mem.entity.OwnerMemberEntity;
+import com.atzuche.order.owner.mem.service.OwnerMemberService;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.doc.annotation.AutoDocMethod;
 import com.autoyol.doc.annotation.AutoDocVersion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RequestMapping("/console/carOwner")
 @RestController
@@ -27,6 +33,7 @@ public class AdminCarOwnerInfoController {
 
     @Autowired
     private CarProxyService carProxyService;
+    @Autowired OwnerMemberService ownerMemberService;
 
 
     @AutoDocMethod(description = "查看车主信息接口信息", value = "查看车主信息接口信息", response = CarOwnerInfoRespVO.class)
@@ -44,8 +51,13 @@ public class AdminCarOwnerInfoController {
         respVO.setOwnerNo(orderRenterInfoDTO.getMemNo());
         respVO.setProvince(orderRenterInfoDTO.getProvince());
 
-
-        //TODO:车主等级
+        //车主等级
+        List<OwnerMemberEntity> ownerMemberEntitys = ownerMemberService.queryOwnerMemberEntityByOrderNoAndOwnerNo(orderNo,memNo);
+        if(!CollectionUtils.isEmpty(ownerMemberEntitys)){
+            ownerMemberEntitys.stream().filter(obj ->{
+                return MemberFlagEnum.VIP.getRightCode().equals(String.valueOf(obj.getMemType()));
+            }).findFirst().get();
+        }
         return ResponseData.success(respVO);
     }
 

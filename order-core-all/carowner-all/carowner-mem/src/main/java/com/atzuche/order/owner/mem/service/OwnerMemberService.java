@@ -85,4 +85,8 @@ public class OwnerMemberService{
     public OwnerMemberEntity queryOwnerInfoByOrderNoAndOwnerNo(String orderNo, String ownerNo) {
         return ownerMemberMapper.queryOwnerInfoByOrderNoAndOwnerNo(orderNo,ownerNo);
     }
+
+    public List<OwnerMemberEntity>  queryOwnerMemberEntityByOrderNoAndOwnerNo(String orderNo, String ownerNo) {
+        return ownerMemberMapper.queryOwnerMemberEntityByOrderNoAndOwnerNo(orderNo,ownerNo);
+    }
 }

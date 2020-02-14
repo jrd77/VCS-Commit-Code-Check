@@ -31,4 +31,6 @@ public interface OwnerMemberMapper{
     List<OwnerMemberEntity> queryMemNoAndPhoneByOrderList(@Param("orderNos") List<String> orderNos);
 
     OwnerMemberEntity queryOwnerInfoByOrderNoAndOwnerNo(@Param("orderNo") String orderNo,@Param("ownerNo") String ownerNo);
+
+    List<OwnerMemberEntity> queryOwnerMemberEntityByOrderNoAndOwnerNo(@Param("orderNo") String orderNo,@Param("ownerNo") String ownerNo);
 }
