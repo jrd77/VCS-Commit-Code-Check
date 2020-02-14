@@ -96,4 +96,14 @@ public class OrderStatusService {
     public Integer updateDispatchStatus(String orderNo, Integer dispatchStatus) {
     	return orderStatusMapper.updateDispatchStatus(orderNo, dispatchStatus);
     }
+    
+    /**
+     * 修改订单状态
+     * @param orderNo
+     * @param status
+     * @return Integer
+     */
+    public Integer updateOrderStatus(String orderNo, Integer status) {
+    	return orderStatusMapper.updateOrderStatus(orderNo, status);
+    }
 }
