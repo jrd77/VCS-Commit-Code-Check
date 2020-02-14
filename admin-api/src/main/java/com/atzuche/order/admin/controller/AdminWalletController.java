@@ -1,6 +1,6 @@
 package com.atzuche.order.admin.controller;
 
-import com.atzuche.order.admin.vo.resp.wallet.WalletResponseVO;
+import com.atzuche.order.admin.vo.resp.wallet.WalletBalanceVO;
 import com.atzuche.order.wallet.WalletProxyService;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.doc.annotation.AutoDocMethod;
@@ -21,12 +21,13 @@ public class AdminWalletController {
     private WalletProxyService walletProxyService;
 
 
-	@AutoDocMethod(description = "获取钱包余额", value = "获取钱包余额", response = WalletResponseVO.class)
+	@AutoDocMethod(description = "获取钱包余额", value = "获取钱包余额", response = WalletBalanceVO.class)
 	@GetMapping("/wallet/balance")
 	public ResponseData walletBalance(@RequestParam("memNo") String  memNo) {
         int left = walletProxyService.getWalletByMemNo(memNo);
-        WalletResponseVO walletResponseVO = new WalletResponseVO();
-        walletResponseVO.setBalance(String.valueOf(left));
+        WalletBalanceVO walletResponseVO = new WalletBalanceVO();
+        walletResponseVO.setBalance(left);
+        walletResponseVO.setMemNo(memNo);
 		return ResponseData.success(walletResponseVO);
 	}
 

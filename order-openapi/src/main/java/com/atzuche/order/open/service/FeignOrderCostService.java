@@ -37,7 +37,7 @@ public interface FeignOrderCostService {
 	 * @param reqVO
 	 * @return
 	 */
-	@PostMapping("/normal/pre/cost/calculate")
+	@PostMapping("/order/normal/pre/cost/calculate")
 	public ResponseData<NormalOrderCostCalculateResVO> submitOrderBeforeCostCalculate(@Valid @RequestBody NormalOrderCostCalculateReqVO reqVO);
 	
 }
