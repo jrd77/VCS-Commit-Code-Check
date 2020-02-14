@@ -1,15 +1,17 @@
 package com.atzuche.order.settle.service;
 
-import com.atzuche.order.commons.service.OrderPayCallBack;
-import com.atzuche.order.mq.common.base.BaseProducer;
-import com.autoyol.event.rabbit.neworder.OrderSettlementMq;
+import java.util.List;
+
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.atzuche.order.accountownercost.entity.AccountOwnerCostSettleDetailEntity;
 import com.atzuche.order.cashieraccount.service.CashierService;
 import com.atzuche.order.commons.CatConstants;
 import com.atzuche.order.commons.enums.account.SettleStatusEnum;
+import com.atzuche.order.commons.service.OrderPayCallBack;
 import com.atzuche.order.parentorder.dto.OrderStatusDTO;
 import com.atzuche.order.parentorder.service.OrderStatusService;
 import com.atzuche.order.settle.service.notservice.OrderSettleNoTService;
@@ -54,6 +56,19 @@ public class OrderSettleService{
     	SettleOrders settleOrders =  orderSettleNoTService.preInitSettleOrders(orderNo,null,ownerOrderNo);
         //3.5 查询所有车主费用明细 TODO 暂不支持 多个车主
     	orderSettleNoTService.getOwnerCostSettleDetail(settleOrders);
+    	
+    	//车主预计收益 200214
+    	SettleOrdersDefinition settleOrdersDefinition = new SettleOrdersDefinition();
+    	//2统计 车主结算费用明细， 补贴，费用总额
+    	orderSettleNoTService.handleOwnerAndPlatform(settleOrdersDefinition,settleOrders);
+        //2车主总账
+        List<AccountOwnerCostSettleDetailEntity> accountOwnerCostSettleDetails = settleOrdersDefinition.getAccountOwnerCostSettleDetails();
+        if(!CollectionUtils.isEmpty(accountOwnerCostSettleDetails)){
+            int ownerCostAmtFinal = accountOwnerCostSettleDetails.stream().mapToInt(AccountOwnerCostSettleDetailEntity::getAmt).sum();
+            settleOrders.getOwnerCosts().setOwnerCostAmtFinal(ownerCostAmtFinal);
+        }
+
+    	
     	return settleOrders.getOwnerCosts();
     }
     /**

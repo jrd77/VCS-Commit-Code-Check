@@ -41,12 +41,14 @@ import com.atzuche.order.delivery.service.RenterOrderDeliveryService;
 import com.atzuche.order.delivery.vo.delivery.rep.OwnerGetAndReturnCarDTO;
 import com.atzuche.order.delivery.vo.delivery.rep.RenterGetAndReturnCarDTO;
 import com.atzuche.order.ownercost.entity.ConsoleOwnerOrderFineDeatailEntity;
+import com.atzuche.order.rentercost.entity.OrderConsoleCostDetailEntity;
 import com.atzuche.order.rentercost.entity.OrderConsoleSubsidyDetailEntity;
 import com.atzuche.order.rentercost.entity.OrderSupplementDetailEntity;
 import com.atzuche.order.rentercost.entity.RenterOrderCostDetailEntity;
 import com.atzuche.order.rentercost.entity.RenterOrderFineDeatailEntity;
 import com.atzuche.order.rentercost.entity.RenterOrderSubsidyDetailEntity;
 import com.atzuche.order.rentercost.service.ConsoleRenterOrderFineDeatailService;
+import com.atzuche.order.rentercost.service.OrderConsoleCostDetailService;
 import com.atzuche.order.rentercost.service.OrderSupplementDetailService;
 import com.atzuche.order.rentercost.service.RenterOrderCostDetailService;
 import com.atzuche.order.rentercost.service.RenterOrderFineDeatailService;
@@ -96,6 +98,8 @@ public class OrderCostService {
 	private RenterOrderFineDeatailService renterOrderFineDeatailService;
 	@Autowired
 	private RenterDepositDetailService renterDepositDetailService;
+	@Autowired
+	private OrderConsoleCostDetailService orderConsoleCostDetailService;
 	
 	public OrderRenterCostResVO orderCostRenterGet(OrderCostReqVO req){
 		OrderRenterCostResVO resVo = new OrderRenterCostResVO();
@@ -179,6 +183,23 @@ public class OrderCostService {
 	          });
 	      }
 		resVo.setFineLst(fineLstReal);
+		
+		//
+		List<OrderConsoleCostDetailEntity> consoleCostLst = orderConsoleCostDetailService.getOrderConsoleCostDetaiByOrderNo(orderNo);
+		List<com.atzuche.order.commons.vo.res.rentcosts.OrderConsoleCostDetailEntity> consoleCostLstReal = new ArrayList<com.atzuche.order.commons.vo.res.rentcosts.OrderConsoleCostDetailEntity>();
+		if(consoleCostLst != null) {
+			consoleCostLst.stream().forEach(x->{
+				com.atzuche.order.commons.vo.res.rentcosts.OrderConsoleCostDetailEntity real = new com.atzuche.order.commons.vo.res.rentcosts.OrderConsoleCostDetailEntity();
+	      		try {
+					BeanUtils.copyProperties(x,real);
+				} catch (Exception e) {
+					log.error("对象属性赋值报错:",e);
+				}
+	      		consoleCostLstReal.add(real);
+	          });
+	      }
+		resVo.setOrderConsoleCostDetails(consoleCostLstReal);
+		
 		
 		//管理后台的。
 		List<com.atzuche.order.rentercost.entity.ConsoleRenterOrderFineDeatailEntity> consoleFineLst = consoleRenterOrderFineDeatailService.listConsoleRenterOrderFineDeatail(orderNo, memNo);
@@ -374,6 +395,23 @@ public class OrderCostService {
 		          });
 		      }
 		  resVo.setOrderCouponList(orderCouponListReal);
+		  
+		  ///
+			List<OrderConsoleCostDetailEntity> consoleCostLst = orderConsoleCostDetailService.getOrderConsoleCostDetaiByOrderNo(orderNo);
+			List<com.atzuche.order.commons.vo.res.rentcosts.OrderConsoleCostDetailEntity> consoleCostLstReal = new ArrayList<com.atzuche.order.commons.vo.res.rentcosts.OrderConsoleCostDetailEntity>();
+			if(consoleCostLst != null) {
+				consoleCostLst.stream().forEach(x->{
+					com.atzuche.order.commons.vo.res.rentcosts.OrderConsoleCostDetailEntity real = new com.atzuche.order.commons.vo.res.rentcosts.OrderConsoleCostDetailEntity();
+		      		try {
+						BeanUtils.copyProperties(x,real);
+					} catch (Exception e) {
+						log.error("对象属性赋值报错:",e);
+					}
+		      		consoleCostLstReal.add(real);
+		          });
+		      }
+			resVo.setOrderConsoleCostDetails(consoleCostLstReal);
+			
 		
 		return resVo;
 	}
@@ -543,6 +581,8 @@ public class OrderCostService {
 	     }
 	     resVo.setOwnerOrderCostDetail(renterOrderCostDetailReal);
 	    
+	     /*车主预计收益*/
+	     resVo.setOwnerCostAmtFinal(ownerCosts.getOwnerCostAmtFinal());
 	}
 
 	/**
