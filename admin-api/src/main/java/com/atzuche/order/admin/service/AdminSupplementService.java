@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson.JSON;
+import com.atzuche.order.admin.common.AdminUser;
+import com.atzuche.order.admin.common.AdminUserUtil;
 import com.atzuche.order.commons.CatConstants;
 import com.atzuche.order.commons.entity.dto.OrderSupplementDetailDTO;
 import com.atzuche.order.commons.exceptions.RemoteCallException;
@@ -145,6 +147,11 @@ public class AdminSupplementService {
             req.setPayFlag(1);
             // 入库取反
             req.setAmt(req.getAmt() != null ? -req.getAmt():0);
+            // 获取操作人
+            AdminUser adminUser = AdminUserUtil.getAdminUser();
+            if (adminUser != null) {
+            	req.setCreateOp(adminUser.getAuthName());
+            }
             responseObject = feignSupplementService.addSupplement(req);
             Cat.logEvent(CatConstants.FEIGN_RESULT,JSON.toJSONString(responseObject));
             checkResponse(responseObject);

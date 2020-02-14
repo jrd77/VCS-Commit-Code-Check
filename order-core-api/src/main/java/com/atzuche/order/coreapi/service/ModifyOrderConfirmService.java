@@ -31,6 +31,7 @@ import com.atzuche.order.delivery.service.delivery.DeliveryCarService;
 import com.atzuche.order.delivery.vo.delivery.CancelFlowOrderDTO;
 import com.atzuche.order.delivery.vo.delivery.CancelOrderDeliveryVO;
 import com.atzuche.order.delivery.vo.delivery.UpdateFlowOrderDTO;
+import com.atzuche.order.flow.service.OrderFlowService;
 import com.atzuche.order.ownercost.entity.OwnerOrderEntity;
 import com.atzuche.order.parentorder.entity.OrderEntity;
 import com.atzuche.order.parentorder.entity.OrderStatusEntity;
@@ -81,6 +82,8 @@ public class ModifyOrderConfirmService {
 	private OrderStatusService orderStatusService;
 	@Autowired
 	private ModifyOrderRabbitMQService modifyOrderRabbitMQService;
+	@Autowired
+	private OrderFlowService orderFlowService;
 	
 	private static final Integer ALREADY_PAY_SUCCESS = 1;
 	
@@ -185,7 +188,10 @@ public class ModifyOrderConfirmService {
 					ALREADY_PAY_SUCCESS.equals(wzPayStatus))) {
 				updOrderStatus = OrderStatusEnum.TO_PAY.getStatus();
 			}
+			// 修改订单状态
 			orderStatusService.updateOrderStatus(modifyOrderOwnerDTO.getOrderNo(), updOrderStatus);
+			// 增加订单状态流转
+			orderFlowService.inserOrderStatusChangeProcessInfo(modifyOrderOwnerDTO.getOrderNo(), OrderStatusEnum.from(updOrderStatus));
 		}
 	}
 	
