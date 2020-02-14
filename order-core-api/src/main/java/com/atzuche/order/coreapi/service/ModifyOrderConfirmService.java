@@ -15,6 +15,7 @@ import com.atzuche.order.commons.entity.dto.OrderTransferRecordDTO;
 import com.atzuche.order.commons.entity.dto.OwnerGoodsDetailDTO;
 import com.atzuche.order.commons.enums.DispatcherStatusEnum;
 import com.atzuche.order.commons.enums.OrderChangeItemEnum;
+import com.atzuche.order.commons.enums.OrderStatusEnum;
 import com.atzuche.order.commons.enums.OrderTransferSourceEnum;
 import com.atzuche.order.commons.enums.SrvGetReturnEnum;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
@@ -32,6 +33,7 @@ import com.atzuche.order.delivery.vo.delivery.CancelOrderDeliveryVO;
 import com.atzuche.order.delivery.vo.delivery.UpdateFlowOrderDTO;
 import com.atzuche.order.ownercost.entity.OwnerOrderEntity;
 import com.atzuche.order.parentorder.entity.OrderEntity;
+import com.atzuche.order.parentorder.entity.OrderStatusEntity;
 import com.atzuche.order.parentorder.service.OrderStatusService;
 import com.atzuche.order.rentercost.entity.RenterOrderSubsidyDetailEntity;
 import com.atzuche.order.rentercost.entity.dto.RenterOrderSubsidyDetailDTO;
@@ -79,6 +81,8 @@ public class ModifyOrderConfirmService {
 	private OrderStatusService orderStatusService;
 	@Autowired
 	private ModifyOrderRabbitMQService modifyOrderRabbitMQService;
+	
+	private static final Integer ALREADY_PAY_SUCCESS = 1;
 	
 	/**
 	 * 自动同意
@@ -164,6 +168,25 @@ public class ModifyOrderConfirmService {
 		orderTransferRecordService.saveOrderTransferRecord(orderTransferRecordEntity);
 		// 更新调度状态
 		orderStatusService.updateDispatchStatus(modifyOrderOwnerDTO.getOrderNo(), DispatcherStatusEnum.DISPATCH_SUCCESS.getCode());
+		// 查询订单状态
+		OrderStatusEntity orderStatus = orderStatusService.getByOrderNo(modifyOrderOwnerDTO.getOrderNo());
+		// 订单状态
+		Integer status = orderStatus.getStatus();
+		if (status != null && status.intValue() == OrderStatusEnum.TO_DISPATCH.getStatus()) {
+			// 租车费用支付状态:0,待支付 1,已支付
+			Integer rentCarPayStatus = orderStatus.getRentCarPayStatus();
+			// 车辆押金支付状态:0,待支付 1,已支付
+			Integer depositPayStatus = orderStatus.getDepositPayStatus();
+			// 违章押金支付状态:0,待支付 1,已支付
+			Integer wzPayStatus = orderStatus.getWzPayStatus();
+			Integer updOrderStatus = OrderStatusEnum.TO_GET_CAR.getStatus();
+			if (!(ALREADY_PAY_SUCCESS.equals(rentCarPayStatus) && 
+					ALREADY_PAY_SUCCESS.equals(depositPayStatus) && 
+					ALREADY_PAY_SUCCESS.equals(wzPayStatus))) {
+				updOrderStatus = OrderStatusEnum.TO_PAY.getStatus();
+			}
+			orderStatusService.updateOrderStatus(modifyOrderOwnerDTO.getOrderNo(), updOrderStatus);
+		}
 	}
 	
 	
