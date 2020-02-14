@@ -55,7 +55,7 @@ public class CancelOrderService {
     public void cancel(CancelOrderReqVO cancelOrderReqVO) {
         //公共校验
         boolean isConsoleInvoke = StringUtils.isNotBlank(cancelOrderReqVO.getOperatorName());
-        cancelOrderCheckService.checkCancelOrder(cancelOrderReqVO.getOrderNo(),cancelOrderReqVO.getMemNo(), isConsoleInvoke);
+        cancelOrderCheckService.checkCancelOrder(cancelOrderReqVO, isConsoleInvoke);
         //取消处理
         CancelOrderResDTO res = null;
         if (StringUtils.equals(MemRoleEnum.RENTER.getCode(), cancelOrderReqVO.getMemRole())) {

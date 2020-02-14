@@ -5,6 +5,7 @@ import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
 import com.atzuche.order.commons.enums.*;
 import com.atzuche.order.coreapi.entity.dto.CancelOrderResDTO;
 import com.atzuche.order.coreapi.service.remote.CarRentalTimeApiProxyService;
+import com.atzuche.order.coreapi.submitOrder.exception.CancelOrderCheckException;
 import com.atzuche.order.flow.service.OrderFlowService;
 import com.atzuche.order.ownercost.service.OwnerOrderService;
 import com.atzuche.order.parentorder.dto.OrderStatusDTO;
@@ -19,6 +20,7 @@ import com.atzuche.order.renterorder.entity.OrderCouponEntity;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.atzuche.order.renterorder.service.OrderCouponService;
 import com.atzuche.order.renterorder.service.RenterOrderService;
+import com.autoyol.commons.web.ErrorCode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,7 +67,16 @@ public class PlatformCancelOrderHandleService {
      */
     @Transactional(rollbackFor = Exception.class)
     public CancelOrderResDTO cancel(String orderNo, String operator, PlatformCancelReasonEnum cancelReasonEnum) {
-
+        //校验
+        //获取订单状态信息
+        OrderStatusEntity orderStatusEntity = orderStatusService.getByOrderNo(orderNo);
+        if(null != orderStatusEntity) {
+            //已结束的订单不能取消
+            if (null != orderStatusEntity.getStatus()
+                    && (OrderStatusEnum.CLOSED.getStatus() == orderStatusEntity.getStatus() || OrderStatusEnum.TO_SETTLE.getStatus() <= orderStatusEntity.getStatus())) {
+                throw new CancelOrderCheckException(ErrorCode.TRANS_CANCEL_DUPLICATE);
+            }
+        }
         //获取订单信息
         OrderEntity orderEntity = orderService.getOrderEntity(orderNo);
         //获取租客订单信息
@@ -73,13 +84,11 @@ public class PlatformCancelOrderHandleService {
         //获取租客订单商品明细
         RenterGoodsDetailDTO goodsDetail = renterGoodsService.getRenterGoodsDetail(renterOrderEntity.getRenterOrderNo()
                 , false);
-        //获取订单状态信息
-        OrderStatusEntity orderStatusEntity = orderStatusService.getByOrderNo(orderNo);
         //获取车主券信息
         OrderCouponEntity ownerCouponEntity = orderCouponService.getOwnerCouponByOrderNoAndRenterOrderNo(orderNo,
                 renterOrderEntity.getRenterOrderNo());
 
-        //TODO:后台取消进调度判定逻辑
+        //后台取消进调度判定逻辑
         boolean isDispatch =
                 carRentalTimeApiService.checkCarDispatch(carRentalTimeApiService.buildCarDispatchReqVO(orderEntity,
                         orderStatusEntity, ownerCouponEntity,null));
