@@ -46,7 +46,7 @@ public class OrderSupplementDetailDTO {
 	@AutoDocProperty(value="补付名称",required=false)
 	private String title;
 	
-	@AutoDocProperty(value="操作人")
+	//@AutoDocProperty(value="操作人")
 	private String createOp; 
 	
 	/**

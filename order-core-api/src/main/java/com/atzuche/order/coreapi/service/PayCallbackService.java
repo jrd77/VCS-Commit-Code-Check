@@ -44,7 +44,7 @@ public class PayCallbackService implements OrderPayCallBack {
         log.info("PayCallbackService sendDataMessageToRenYun param [{}]", GsonUtils.toJson(entity));
         //租车费用已支付 并且非补付支付
         if(!YesNoEnum.YES.getCode().equals(isPayAgain) && Objects.nonNull(entity) && Objects.nonNull(entity.getRentCarPayStatus()) && OrderPayStatusEnum.PAYED.getStatus()==entity.getRentCarPayStatus()){
-            log.info("PayCallbackService sendDataMessageToRenYun remote param [{}]", GsonUtils.toJson(entity));
+            log.info("PayCallbackService sendDataMessageToRenYun remote param [{}]", renterOrderNo);
             deliveryCarService.sendDataMessageToRenYun(renterOrderNo);
         }
         log.info("PayCallbackService callBack end param [{}]", GsonUtils.toJson(renterOrderNo));
