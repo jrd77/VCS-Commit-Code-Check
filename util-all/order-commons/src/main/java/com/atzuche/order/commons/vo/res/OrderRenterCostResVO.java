@@ -14,6 +14,7 @@ import com.atzuche.order.commons.vo.res.cost.RenterOrderDeliveryResVO;
 import com.atzuche.order.commons.vo.res.cost.RenterOrderFineDeatailResVO;
 import com.atzuche.order.commons.vo.res.cost.RenterOrderSubsidyDetailResVO;
 import com.atzuche.order.commons.vo.res.rentcosts.ConsoleRenterOrderFineDeatailEntity;
+import com.atzuche.order.commons.vo.res.rentcosts.OrderConsoleCostDetailEntity;
 import com.atzuche.order.commons.vo.res.rentcosts.OrderConsoleSubsidyDetailEntity;
 import com.atzuche.order.commons.vo.res.rentcosts.OrderCouponEntity;
 import com.atzuche.order.commons.vo.res.rentcosts.OrderSupplementDetailEntity;
@@ -75,7 +76,11 @@ public class OrderRenterCostResVO {
      */
     List<OrderConsoleSubsidyDetailEntity> orderConsoleSubsidyDetails;
     
-	
+    /*
+                *管理后台费用
+     */
+    List<OrderConsoleCostDetailEntity> orderConsoleCostDetails;
+    
 	// ---------------------------------------------------------------
 	private AccountRenterCostSettleResVO renterSettleVo;
 	

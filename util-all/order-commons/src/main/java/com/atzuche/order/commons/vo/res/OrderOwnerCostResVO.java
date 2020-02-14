@@ -78,4 +78,8 @@ public class OrderOwnerCostResVO {
      */
     List<OwnerOrderFineDeatailEntity> ownerOrderFineDeatails;
     
+    ///add huangjing  来源：SettleOrdersDefinition类字段。 200214
+    private int ownerCostAmtFinal;
+    ///
+    List<com.atzuche.order.commons.vo.res.rentcosts.OrderConsoleCostDetailEntity> orderConsoleCostDetails;
 }
