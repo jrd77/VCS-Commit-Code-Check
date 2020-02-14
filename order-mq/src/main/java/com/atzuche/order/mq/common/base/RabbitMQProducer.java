@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.util.UUID;
 
 /**
@@ -19,7 +20,7 @@ import java.util.UUID;
 @Slf4j
 public abstract class RabbitMQProducer implements RabbitTemplate.ConfirmCallback {
 
-    @Autowired
+    @Resource(name = "orderSmsRabbitTemplate")
     private RabbitTemplate rabbitTemplate;
 
     /**

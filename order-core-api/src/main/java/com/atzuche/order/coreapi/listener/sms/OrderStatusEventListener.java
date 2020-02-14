@@ -1,4 +1,4 @@
-package com.atzuche.order.mq.listener;
+package com.atzuche.order.coreapi.listener.sms;
 
 import com.alibaba.fastjson.JSONObject;
 import com.atzuche.order.mq.common.base.OrderMessage;
@@ -26,7 +26,7 @@ public class OrderStatusEventListener {
 
     @RabbitListener(bindings = {@QueueBinding(value = @Queue(value = "order_status_01", durable = "true"),
             exchange = @Exchange(value = "auto-order-status", durable = "true", type = "topic"), key = "status.#")
-    },containerFactory = "rabbitListenerContainerFactory")
+    },containerFactory = "orderRabbitListenerContainerFactory")
     public void process(Message message) {
         log.info("receive order status message: " + new String(message.getBody()));
         OrderMessage orderMessage = JSONObject.parseObject(message.getBody(), OrderMessage.class);

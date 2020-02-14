@@ -1,4 +1,4 @@
-package com.atzuche.order.mq.listener;
+package com.atzuche.order.coreapi.listener.sms;
 
 import com.alibaba.fastjson.JSONObject;
 import com.atzuche.order.mq.common.base.OrderMessage;
@@ -12,6 +12,7 @@ import org.springframework.amqp.rabbit.annotation.QueueBinding;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
 /**
  * @author 胡春林
  *  订单的总action事件处理
@@ -25,7 +26,7 @@ public class OrderActionEventListener {
 
     @RabbitListener(bindings = {@QueueBinding(value = @Queue(value = "order_action_03", durable = "true"),
             exchange = @Exchange(value = "auto-order-action", durable = "true", type = "topic"), key = "action.order.create4.#")
-    },containerFactory = "rabbitListenerContainerFactory")
+    },containerFactory = "orderRabbitListenerContainerFactory")
     public void process(Message message) {
         log.info("receive order action message: " + new String(message.getBody()));
         OrderMessage orderMessage = JSONObject.parseObject(message.getBody(),OrderMessage.class);

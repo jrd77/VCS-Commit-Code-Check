@@ -51,14 +51,14 @@ public class RabbitMQConfig {
 
     @Bean
     @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-    public RabbitTemplate rabbitTemplate() {
+    public RabbitTemplate orderSmsRabbitTemplate() {
         RabbitTemplate template = new RabbitTemplate(connectionFactory());
         template.setMessageConverter(jsonMessageConverter());
         return template;
     }
 
     @Bean
-    public RabbitTemplate orderSmsRabbitTemplate() {
+    public RabbitTemplate rabbitTemplate() {
         RabbitTemplate template = new RabbitTemplate(connectionFactory());
         return template;
     }
