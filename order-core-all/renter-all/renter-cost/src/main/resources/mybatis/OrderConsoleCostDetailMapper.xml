@@ -211,7 +211,7 @@
 		where id = #{id}
 	</update>
     <select id="selectByOrderNo" resultMap="BaseResultMap">
-        select <include refid="Base_Column_List" /> from order_console_cost_detail where order_no = #{orderNo}
+        select <include refid="Base_Column_List" /> from order_console_cost_detail where order_no = #{orderNo} and is_delete = 0
     </select>
 
 </mapper>

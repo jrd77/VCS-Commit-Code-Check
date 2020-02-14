@@ -17,7 +17,7 @@ public enum PaySourceEnum {
 
     public static String getNameByCode(String code){
         if(code == null){
-            return null;
+            return "线上"; //默认值。
         }
 
         PaySourceEnum[] values = PaySourceEnum.values();
@@ -26,6 +26,6 @@ public enum PaySourceEnum {
                 return values[i].name;
             }
         }
-        return null;
+        return "线上";
     }
 }

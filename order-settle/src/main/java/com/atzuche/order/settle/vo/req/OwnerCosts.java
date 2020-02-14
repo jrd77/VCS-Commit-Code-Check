@@ -58,4 +58,7 @@ public class OwnerCosts {
      * 车主订单罚金明细
      */
     List<OwnerOrderFineDeatailEntity> ownerOrderFineDeatails;
+    
+    ///add huangjing  来源：SettleOrdersDefinition类字段。 200214
+    private int ownerCostAmtFinal;
 }
