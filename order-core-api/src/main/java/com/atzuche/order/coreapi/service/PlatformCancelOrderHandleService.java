@@ -129,7 +129,7 @@ public class PlatformCancelOrderHandleService {
         ownerOrderService.updateChildStatusByOrderNo(orderNo, OwnerChildStatusEnum.END.getCode());
         //取消信息处理(order_cancel_reason)
         orderCancelReasonService.addOrderCancelReasonRecord(buildOrderCancelReasonEntity(orderNo,
-                cancelReasonEnum.getName()));
+                cancelReasonEnum.getCode()+":"+cancelReasonEnum.getName()));
 
         cancelOrderResDTO.setCarNo(goodsDetail.getCarNo());
         cancelOrderResDTO.setRentCarPayStatus(orderStatusEntity.getRentCarPayStatus());
