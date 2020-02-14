@@ -211,7 +211,7 @@ public class SubmitOrderBeforeCostCalService {
         int holidayAverage = 0;
         List<RenterOrderCostDetailEntity> renterOrderCostDetailEntities = renterOrderCostDetailService.getRenterOrderCostDetailList(reqVO.getOrderNo(), renterOrderNo);
         if(CollectionUtils.isNotEmpty(renterOrderCostDetailEntities)) {
-            Optional<RenterOrderCostDetailEntity> rentAmtOptional = renterOrderCostDetailEntities.stream().filter(cost -> cost.getCostCode().equals(RenterCashCodeEnum.RENT_AMT)).findFirst();
+            Optional<RenterOrderCostDetailEntity> rentAmtOptional = renterOrderCostDetailEntities.stream().filter(cost -> cost.getCostCode().equals(RenterCashCodeEnum.RENT_AMT.getCashNo())).findFirst();
             holidayAverage = rentAmtOptional.get().getUnitPrice();
         }
         int srvGetCost = 0;
