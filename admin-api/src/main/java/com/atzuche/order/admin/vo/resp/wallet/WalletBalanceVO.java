@@ -13,8 +13,9 @@ import java.io.Serializable;
  */
 @Data
 @ToString
-public class WalletResponseVO implements Serializable{
+public class WalletBalanceVO implements Serializable{
 	@AutoDocProperty(value="钱包余额")
-	private String balance;
-
+	private int balance;
+	@AutoDocProperty(value="会员号")
+	private String memNo;
 }
