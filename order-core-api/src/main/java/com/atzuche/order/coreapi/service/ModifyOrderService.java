@@ -121,6 +121,8 @@ public class ModifyOrderService {
 	private OrderConsoleSubsidyDetailService orderConsoleSubsidyDetailService;
 	@Autowired
 	private ModifyOrderRiskService modifyOrderRiskService;
+	@Autowired
+	private ModifyOrderRabbitMQService modifyOrderRabbitMQService;
 	/**
 	 * 修改订单主逻辑（含换车）
 	 * @param modifyOrderReq
@@ -222,6 +224,26 @@ public class ModifyOrderService {
 		bindPlatformCoupon(modifyOrderDTO);
 		// 补扣凹凸币 
 		againAutoCoinDeduct(modifyOrderDTO, costDeductVO.getRenterSubsidyList());
+		// 发送mq
+		sendModifyMQ(modifyOrderDTO);
+	}
+	
+	/**
+	 * 发mq
+	 * @param modifyOrderDTO
+	 */
+	public void sendModifyMQ(ModifyOrderDTO modifyOrderDTO) {
+		if (modifyOrderDTO.getTransferFlag() != null && modifyOrderDTO.getTransferFlag()) {
+			// 换车mq
+			modifyOrderRabbitMQService.sendOrderChangeCarMq(modifyOrderDTO);
+		} else if (modifyOrderDTO.getConsoleFlag() != null && modifyOrderDTO.getConsoleFlag()) {
+			// 管理后台修改订单mq
+			modifyOrderRabbitMQService.sendOrderPlatModifyMq(modifyOrderDTO);
+		} else {
+			// 租客发起修改申请mq
+			modifyOrderRabbitMQService.sendOrderRenterApplyModifyMq(modifyOrderDTO);
+		}
+		
 	}
 	
 	
