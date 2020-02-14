@@ -165,7 +165,7 @@ public class OrderConsoleSubsidyDetailService{
      * @return ConsoleRenterOrderFineDeatailEntity
      */
     public OrderConsoleSubsidyDetailEntity buildData(CostBaseDTO costBaseDTO, Integer subsidyAmount, SubsidySourceCodeEnum target, SubsidySourceCodeEnum source, SubsidyTypeCodeEnum type,RenterCashCodeEnum cash) {
-        if (subsidyAmount == null || subsidyAmount == 0) {
+        if (subsidyAmount == null ) { //|| subsidyAmount == 0
             return null;
         }
         
@@ -201,7 +201,7 @@ public class OrderConsoleSubsidyDetailService{
      * @return
      */
     public OrderConsoleSubsidyDetailEntity buildDataOwner(CostBaseDTO costBaseDTO, Integer subsidyAmount, SubsidySourceCodeEnum target, SubsidySourceCodeEnum source, SubsidyTypeCodeEnum type,OwnerCashCodeEnum cash) {
-        if (subsidyAmount == null || subsidyAmount == 0) {
+        if (subsidyAmount == null ) { //|| subsidyAmount == 0
             return null;
         }
         

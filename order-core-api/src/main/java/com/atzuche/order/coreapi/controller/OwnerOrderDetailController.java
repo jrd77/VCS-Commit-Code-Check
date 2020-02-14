@@ -7,12 +7,16 @@ import com.atzuche.order.coreapi.service.OwnerOrderDetailService;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
 import com.google.inject.internal.asm.$TypePath;
+
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
+@Slf4j
 @RestController
 public class OwnerOrderDetailController {
     @Autowired
@@ -82,13 +86,15 @@ public class OwnerOrderDetailController {
      **/
     @GetMapping("/owner/serviceDetail")
     public ResponseData<ServiceDetailDTO> serviceDetail(@RequestParam("orderNo") String orderNo, @RequestParam("ownerOrderNo") String ownerOrderNo){
-        if(orderNo == null || orderNo.trim().length()<=0){
+    	log.info("--------------- serviceDetail orderNo={},ownerOrderNo={}",orderNo,ownerOrderNo);
+    	if(orderNo == null || orderNo.trim().length()<=0){
             throw new InputErrorException("主订单号不能为空");
         }
 
         if(ownerOrderNo == null || ownerOrderNo.trim().length()<=0){
             throw new InputErrorException("车主订单号不能为空");
         }
+        
         ServiceDetailDTO serviceDetailDTO = ownerOrderDetailService.serviceDetail(orderNo,ownerOrderNo);
         return ResponseData.success(serviceDetailDTO);
     }

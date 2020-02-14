@@ -7,7 +7,6 @@ import com.atzuche.order.commons.vo.req.ModifyOrderReqVO;
 import com.atzuche.order.commons.vo.req.handover.req.HandoverCarInfoReqDTO;
 import com.atzuche.order.commons.vo.req.handover.req.HandoverCarInfoReqVO;
 import com.atzuche.order.delivery.common.DeliveryErrorCode;
-import com.atzuche.order.delivery.entity.RenterHandoverCarInfoEntity;
 import com.atzuche.order.delivery.entity.RenterOrderDeliveryEntity;
 import com.atzuche.order.delivery.enums.CarTypeEnum;
 import com.atzuche.order.delivery.enums.OilCostTypeEnum;
@@ -28,8 +27,6 @@ import com.atzuche.order.rentercost.service.RenterOrderCostDetailService;
 import com.atzuche.order.rentermem.service.RenterMemberService;
 import com.atzuche.order.transport.service.GetReturnCarCostProxyService;
 import com.atzuche.order.transport.service.TranSportProxyService;
-import com.autoyol.commons.web.ErrorCode;
-import com.autoyol.commons.web.ResponseData;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -250,16 +247,16 @@ public class AdminDeliveryCarService {
         }
 
         list.stream().filter(r -> r.getCostCode().equals(RenterCashCodeEnum.SRV_GET_COST.getCashNo())).findFirst().ifPresent(getCrashVO -> {
-            distributionCostVO.setGetCarAmt(String.valueOf(getCrashVO.getUnitPrice()*getCrashVO.getCount()));
+            distributionCostVO.setGetCarAmt(String.valueOf(getCrashVO.getUnitPrice() * getCrashVO.getCount()));
         });
         list.stream().filter(r -> r.getCostCode().equals(RenterCashCodeEnum.SRV_RETURN_COST.getCashNo())).findFirst().ifPresent(getCrashVO -> {
-            distributionCostVO.setRenturnCarAmt(String.valueOf(getCrashVO.getUnitPrice()*getCrashVO.getCount()));
+            distributionCostVO.setRenturnCarAmt(String.valueOf(getCrashVO.getUnitPrice() * getCrashVO.getCount()));
         });
         list.stream().filter(r -> r.getCostCode().equals(RenterCashCodeEnum.GET_BLOCKED_RAISE_AMT.getCashNo())).findFirst().ifPresent(getCrashVO -> {
-            distributionCostVO.setGetCarChaoYunNeng(String.valueOf(getCrashVO.getUnitPrice()*getCrashVO.getCount()));
+            distributionCostVO.setGetCarChaoYunNeng(String.valueOf(getCrashVO.getUnitPrice() * getCrashVO.getCount()));
         });
         list.stream().filter(r -> r.getCostCode().equals(RenterCashCodeEnum.RETURN_BLOCKED_RAISE_AMT.getCashNo())).findFirst().ifPresent(getCrashVO -> {
-            distributionCostVO.setReturnCarChaoYunNeng(String.valueOf(getCrashVO.getUnitPrice()*getCrashVO.getCount()));
+            distributionCostVO.setReturnCarChaoYunNeng(String.valueOf(getCrashVO.getUnitPrice() * getCrashVO.getCount()));
         });
         return distributionCostVO;
     }

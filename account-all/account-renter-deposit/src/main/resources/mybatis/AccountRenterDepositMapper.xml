@@ -18,6 +18,7 @@
         <result property="surplusCreditPayAmt" column="surplus_credit_pay_amt"/>
         <result property="surplusDepositAmt" column="surplus_deposit_amt"/>
         <result property="surplusAuthorizeDepositAmt" column="surplus_authorize_deposit_amt"/>
+        <result property="reductionAmt" column="reduction_amt"/>
         <result property="freeDepositType" column="free_deposit_type"/>
         <result property="version" column="version"/>
         <result property="createTime" column="create_time"/>

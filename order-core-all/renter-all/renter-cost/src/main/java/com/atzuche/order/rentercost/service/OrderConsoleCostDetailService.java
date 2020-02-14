@@ -77,7 +77,7 @@ public class OrderConsoleCostDetailService{
      * @return ConsoleRenterOrderFineDeatailEntity
      */
     public OrderConsoleCostDetailEntity buildData(CostBaseDTO costBaseDTO, Integer subsidyAmount, SubsidySourceCodeEnum target, SubsidySourceCodeEnum source, ConsoleCashCodeEnum cash) {
-        if (subsidyAmount == null || subsidyAmount == 0) {
+        if (subsidyAmount == null) {  // || subsidyAmount == 0
             return null;
         }
         

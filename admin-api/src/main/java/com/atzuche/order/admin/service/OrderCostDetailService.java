@@ -37,6 +37,7 @@ import com.atzuche.order.admin.vo.resp.order.cost.detail.RenterPriceAdjustmentRe
 import com.atzuche.order.commons.CostStatUtils;
 import com.atzuche.order.commons.GlobalConstant;
 import com.atzuche.order.commons.LocalDateTimeUtils;
+import com.atzuche.order.commons.NumberUtils;
 import com.atzuche.order.commons.entity.dto.CommUseDriverInfoDTO;
 import com.atzuche.order.commons.entity.dto.CommUseDriverInfoSimpleDTO;
 import com.atzuche.order.commons.entity.dto.CommUseDriverInfoStringDateDTO;
@@ -127,7 +128,7 @@ public class OrderCostDetailService {
     OwnerOrderSubsidyDetailService ownerOrderSubsidyDetailService;
     @Autowired
     RenterOrderService renterOrderService;
-    
+    @Autowired
     RenterOrderFineDeatailService renterOrderFineDeatailService;
     
 	public ReductionDetailResVO findReductionDetailsListByOrderNo(RenterCostReqVO renterCostReqVO) throws Exception {
@@ -278,7 +279,7 @@ public class OrderCostDetailService {
 					String amt = "0";
 					RenterOrderCostDetailEntity extraDriverInsureAmtEntity = renterOrderCostCombineService.getExtraDriverInsureAmtEntity(extraDriverDTO);
 					if(extraDriverInsureAmtEntity != null) {
-						amt = String.valueOf(extraDriverInsureAmtEntity.getTotalAmount());
+						amt = String.valueOf( NumberUtils.convertNumberToZhengshu(extraDriverInsureAmtEntity.getTotalAmount()));
 					}
 					dto.setAmt(amt);
 					listCommUseDriverInfoDTO.add(dto);
@@ -327,7 +328,7 @@ public class OrderCostDetailService {
 					String amt = "0";
 					RenterOrderCostDetailEntity extraDriverInsureAmtEntity = renterOrderCostCombineService.getExtraDriverInsureAmtEntity(extraDriverDTO);
 					if(extraDriverInsureAmtEntity != null) {
-						amt = String.valueOf(extraDriverInsureAmtEntity.getTotalAmount());
+						amt = String.valueOf( NumberUtils.convertNumberToZhengshu(extraDriverInsureAmtEntity.getTotalAmount()));
 					}
 					dto.setAmt(amt);
 					listCommUseDriverInfoDTO.add(dto);
@@ -365,6 +366,7 @@ public class OrderCostDetailService {
 	      extraDriverDTO.setCostBaseDTO(costBaseDTO);
 		  
 	      List<String> driverIds = new ArrayList<String>();
+	      //参数
 	      List<CommUseDriverInfoSimpleDTO> listCommUseDriverIds = renterCostReqVO.getListCommUseDriverIds();
 	      for (CommUseDriverInfoSimpleDTO commUseDriverInfoSimpleDTO : listCommUseDriverIds) {
 	    	  driverIds.add(String.valueOf(commUseDriverInfoSimpleDTO.getId()));
@@ -395,13 +397,26 @@ public class OrderCostDetailService {
 		//添加附加驾驶人记录
         //保存附加驾驶人信息
 		List<CommUseDriverInfoDTO> commUseDriverList = new ArrayList<CommUseDriverInfoDTO>();
+		
+        //租客会员信息
+		RenterMemberDTO renterMemberDTO = memberService.getRenterMemberInfo(orderEntity.getMemNoRenter());
+		List<CommUseDriverInfoDTO> commUseDriverListRemote = renterMemberDTO.getCommUseDriverList();  //远程调用
+      
+		//参数
 		for (CommUseDriverInfoSimpleDTO commUseDriverInfoDTO : listCommUseDriverIds) {
 			CommUseDriverInfoDTO dto = new CommUseDriverInfoDTO();
+			
+			CommUseDriverInfoDTO tmp = getCommUseDriverInfoDTOById(commUseDriverInfoDTO.getId(),commUseDriverListRemote);
+			//属性赋值
+			if(tmp != null) { //获取身份证号，准驾车型，开始时间和结束时间。该表字段是后面新加的。20200213
+				BeanUtils.copyProperties(tmp,dto);
+			}
 			dto.setId(commUseDriverInfoDTO.getId());
 			dto.setRealName(commUseDriverInfoDTO.getRealName());
 			dto.setMobile(commUseDriverInfoDTO.getMobile());
 			//记录操作人
 			dto.setConsoleOperatorName(userName);
+			
 			
 			commUseDriverList.add(dto); //注意封装数据
 		}
@@ -414,6 +429,18 @@ public class OrderCostDetailService {
         logger.info("保存附加驾驶人信息SUCCESS");
 	}
 	
+	private CommUseDriverInfoDTO getCommUseDriverInfoDTOById(Integer id,
+			List<CommUseDriverInfoDTO> commUseDriverListRemote) {
+		CommUseDriverInfoDTO tmp = null;
+		for (CommUseDriverInfoDTO commUseDriverInfoDTO : commUseDriverListRemote) {
+			if(id.intValue() == commUseDriverInfoDTO.getId().intValue()) {  //id相等。
+				tmp = commUseDriverInfoDTO;
+				break;
+			}
+		}
+		return tmp;
+	}
+
 	public PlatformToRenterSubsidyResVO findPlatFormToRenterListByOrderNo(RenterCostReqVO renterCostReqVO) throws Exception {
 		//根据费用编码获取
 		PlatformToRenterSubsidyResVO resVo = new PlatformToRenterSubsidyResVO();
@@ -1031,10 +1058,10 @@ public class OrderCostDetailService {
 		
 		
 		//取反,显示正数。
-		renterBeforeReturnCarFineAmt = renterBeforeReturnCarFineAmount<0?String.valueOf(-renterBeforeReturnCarFineAmount):String.valueOf(renterBeforeReturnCarFineAmount);
-		renterDelayReturnCarFineAmt = renterDelayReturnCarFineAmount<0?String.valueOf(-renterDelayReturnCarFineAmount):String.valueOf(renterDelayReturnCarFineAmount);
-		renterFineAmt = renterFineAmount<0?String.valueOf(-renterFineAmount):String.valueOf(renterFineAmount);
-		renterGetReturnCarFineAmt = renterGetReturnCarFineAmount<0?String.valueOf(-renterGetReturnCarFineAmount):String.valueOf(renterGetReturnCarFineAmount);
+		renterBeforeReturnCarFineAmt = String.valueOf(NumberUtils.convertNumberToZhengshu(renterBeforeReturnCarFineAmount));// renterBeforeReturnCarFineAmount<0?String.valueOf(-renterBeforeReturnCarFineAmount):String.valueOf(renterBeforeReturnCarFineAmount);
+		renterDelayReturnCarFineAmt = String.valueOf(NumberUtils.convertNumberToZhengshu(renterDelayReturnCarFineAmount));//renterDelayReturnCarFineAmount<0?String.valueOf(-renterDelayReturnCarFineAmount):String.valueOf(renterDelayReturnCarFineAmount);
+		renterFineAmt = String.valueOf(NumberUtils.convertNumberToZhengshu(renterFineAmount));//renterFineAmount<0?String.valueOf(-renterFineAmount):String.valueOf(renterFineAmount);
+		renterGetReturnCarFineAmt = String.valueOf(NumberUtils.convertNumberToZhengshu(renterGetReturnCarFineAmount)); //renterGetReturnCarFineAmount<0?String.valueOf(-renterGetReturnCarFineAmount):String.valueOf(renterGetReturnCarFineAmount);
 		
 		
 		resVo.setRenterBeforeReturnCarFineAmt(renterBeforeReturnCarFineAmt);
@@ -1328,8 +1355,9 @@ public class OrderCostDetailService {
 		costBaseDTO.setMemNo(orderEntityOwner.getMemNo());
 		///
 		costBaseDTO.setOwnerOrderNo(orderEntityOwner.getOwnerOrderNo());
-    	OwnerOrderSubsidyDetailEntity ownerOrderSubsidyDetailEntity =  ownerOrderSubsidyDetailService.buildData(costBaseDTO, -rentAmt, targetEnum, sourceEnum, SubsidyTypeCodeEnum.CONSOLE_AMT, RenterCashCodeEnum.SUBSIDY_OWNER_TORENTER_RENTAMT);
-		ownerOrderSubsidyDetailService.saveOrUpdateRenterOrderSubsidyDetail(ownerOrderSubsidyDetailEntity);
+		//修改金额为0的情况
+		OwnerOrderSubsidyDetailEntity ownerOrderSubsidyDetailEntity  =  ownerOrderSubsidyDetailService.buildData(costBaseDTO, -rentAmt, targetEnum, sourceEnum, SubsidyTypeCodeEnum.CONSOLE_AMT, RenterCashCodeEnum.SUBSIDY_OWNER_TORENTER_RENTAMT);
+    	ownerOrderSubsidyDetailService.saveOrUpdateRenterOrderSubsidyDetail(ownerOrderSubsidyDetailEntity);
     	
 		
     	//反向记录

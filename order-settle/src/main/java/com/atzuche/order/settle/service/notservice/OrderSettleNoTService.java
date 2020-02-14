@@ -510,11 +510,16 @@ public class OrderSettleNoTService {
         }
         String[] gpsSerialNumberArr = gpsSerialNumber.split(",");
         List<Integer> list = new ArrayList<>();
-        for(int i=0;i<gpsSerialNumberArr.length;i++){
-            if(!StringUtil.isBlank(gpsSerialNumberArr[i])){
-                list.add(Integer.valueOf(gpsSerialNumberArr[i]));
+        	for(int i=0;i<gpsSerialNumberArr.length;i++){
+                if(!StringUtil.isBlank(gpsSerialNumberArr[i])){
+                	try {
+                		list.add(Integer.valueOf(gpsSerialNumberArr[i]));
+                	} catch (Exception e) {
+            			log.error("封装gps序列号异常，跳过:",e);
+            		}
+                }
             }
-        }
+		
         return list;
     }
 

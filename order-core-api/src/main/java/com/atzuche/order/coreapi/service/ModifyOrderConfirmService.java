@@ -77,6 +77,8 @@ public class ModifyOrderConfirmService {
 	private OrderTransferRecordService orderTransferRecordService;
 	@Autowired
 	private OrderStatusService orderStatusService;
+	@Autowired
+	private ModifyOrderRabbitMQService modifyOrderRabbitMQService;
 	
 	/**
 	 * 自动同意
@@ -130,6 +132,8 @@ public class ModifyOrderConfirmService {
 		noticeRenYun(modifyOrderDTO.getRenterOrderNo(), modifyOrderOwnerDTO, listChangeCode(modifyOrderDTO.getChangeItemList()), reqContext);
 		// 扣库存
 		cutCarStock(modifyOrderOwnerDTO, listChangeCode(modifyOrderDTO.getChangeItemList()));
+		// 发送mq
+		modifyOrderRabbitMQService.sendOrderDelayMq(modifyOrderDTO);
 	}
 	
 	
@@ -235,7 +239,11 @@ public class ModifyOrderConfirmService {
 		noticeRenYun(renterOrderNo, modifyOrderOwnerDTO, changeItemList, null);
 		// 扣库存
 		cutCarStock(modifyOrderOwnerDTO, changeItemList);
+		// 发mq
+		modifyOrderRabbitMQService.sendOrderOwnerAgreeModifyMq(modifyOrderOwnerDTO);
+		modifyOrderRabbitMQService.sendOrderDelayOwnerMq(modifyOrderOwnerDTO);
 	}
+	
 	
 	
 	/**
@@ -244,6 +252,8 @@ public class ModifyOrderConfirmService {
 	 */
 	public void refuseModifyOrder(ModifyConfirmDTO modifyConfirmDTO) {
 		modifyOrderForRenterService.updateRefuseOrderStatus(modifyConfirmDTO.getRenterOrderNo());
+		// 发mq
+		modifyOrderRabbitMQService.sendOrderOwnerRefundModifyMq(modifyConfirmDTO);
 	}
 	
 	/**
