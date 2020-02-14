@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Objects;
 
 @RequestMapping("/console/carOwner")
 @RestController
@@ -52,11 +53,9 @@ public class AdminCarOwnerInfoController {
         respVO.setProvince(orderRenterInfoDTO.getProvince());
 
         //车主等级
-        List<OwnerMemberEntity> ownerMemberEntitys = ownerMemberService.queryOwnerMemberEntityByOrderNoAndOwnerNo(orderNo,memNo);
-        if(!CollectionUtils.isEmpty(ownerMemberEntitys)){
-            ownerMemberEntitys.stream().filter(obj ->{
-                return MemberFlagEnum.VIP.getRightCode().equals(String.valueOf(obj.getMemType()));
-            }).findFirst().get();
+        OwnerMemberEntity ownerMemberEntity = ownerMemberService.queryOwnerMemberEntityByOrderNoAndOwnerNo(orderNo,memNo);
+        if(Objects.nonNull(ownerMemberEntity)){
+            respVO.setMemLevel(MemberFlagEnum.getRightByIndex(ownerMemberEntity.getMemType()).getRightName());
         }
         return ResponseData.success(respVO);
     }
