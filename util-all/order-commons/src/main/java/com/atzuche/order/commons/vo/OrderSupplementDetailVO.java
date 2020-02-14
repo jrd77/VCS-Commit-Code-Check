@@ -1,11 +1,15 @@
 package com.atzuche.order.commons.vo;
 
 import com.autoyol.doc.annotation.AutoDocProperty;
+import lombok.Data;
+import lombok.ToString;
 
 /**
  * @author <a href="mailto:lianglin.sjtu@gmail.com">AndySjtu</a>
  * @date 2020/2/13 12:43 下午
  **/
+@Data
+@ToString
 public class OrderSupplementDetailVO {
     /**
      * 费用类型：1-补付费用，2-订单欠款

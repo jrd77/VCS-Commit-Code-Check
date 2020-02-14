@@ -50,7 +50,7 @@ public class OwnerOrderDetailService {
         ResponseData<RenterOwnerPriceDTO> responseObject = null;
         Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "获取车主租客调价明细");
         try{
-            Cat.logEvent(CatConstants.FEIGN_METHOD,"feignOrderUpdateService.cancelOrder");
+            Cat.logEvent(CatConstants.FEIGN_METHOD,"feignOwnerDetailService.renterOwnerPrice");
             log.info("Feign 开始获取车主租客调价明细,orderNo={}", orderNo);
             Cat.logEvent(CatConstants.FEIGN_PARAM,orderNo);
             responseObject =  feignOwnerDetailService.renterOwnerPrice(orderNo,ownerOrderNo);

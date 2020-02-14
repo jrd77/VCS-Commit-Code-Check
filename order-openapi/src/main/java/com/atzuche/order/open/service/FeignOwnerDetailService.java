@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 //@FeignClient(url="http://localhost:1412",name = "order-center-api")
 @FeignClient(name = "order-center-api")
 public interface FeignOwnerDetailService {
-    /*
+    /**
      * @Author ZhangBin
      * @Date 2020/1/15 21:29
      * @Description: 租金明细
@@ -20,7 +20,7 @@ public interface FeignOwnerDetailService {
      **/
     @GetMapping("/owner/ownerRentDetail")
     ResponseData<OwnerRentDetailDTO> ownerRentDetail(@RequestParam("orderNo") String orderNo, @RequestParam("ownerOrderNo") String ownerOrderNo);
-    /*
+    /**
      * @Author ZhangBin
      * @Date 2020/1/15 21:29
      * @Description: 车主租客调价明细
@@ -28,7 +28,7 @@ public interface FeignOwnerDetailService {
      **/
     @GetMapping("/owner/renterOwnerPrice")
     ResponseData<RenterOwnerPriceDTO> renterOwnerPrice(@RequestParam("orderNo") String orderNo, @RequestParam("ownerOrderNo") String ownerOrderNo);
-    /*
+    /**
      * @Author ZhangBin
      * @Date 2020/1/15 21:31
      * @Description: 违约罚金明细
@@ -36,7 +36,7 @@ public interface FeignOwnerDetailService {
      **/
     @GetMapping("/owner/fienAmtDetail")
     ResponseData<FienAmtDetailDTO> fienAmtDetail(@RequestParam("orderNo") String orderNo, @RequestParam("ownerOrderNo") String ownerOrderNo);
-    /*
+    /**
      * @Author ZhangBin
      * @Date 2020/1/15 21:31
      * @Description: 服务费明细
@@ -44,7 +44,7 @@ public interface FeignOwnerDetailService {
      **/
     @GetMapping("/owner/serviceDetail")
     ResponseData<ServiceDetailDTO> serviceDetail(@RequestParam("orderNo") String orderNo, @RequestParam("ownerOrderNo") String ownerOrderNo);
-    /*
+    /**
      * @Author ZhangBin
      * @Date 2020/1/15 21:37
      * @Description: 车主给平台的费用
@@ -52,7 +52,7 @@ public interface FeignOwnerDetailService {
      **/
     @GetMapping("/owner/platformToOwner")
     ResponseData<PlatformToOwnerDTO> platformToOwner(@RequestParam("orderNo") String orderNo, @RequestParam("ownerOrderNo") String ownerOrderNo);
-    /*
+    /**
      * @Author ZhangBin
      * @Date 2020/1/15 21:34
      * @Description: 平台给车主的补贴
