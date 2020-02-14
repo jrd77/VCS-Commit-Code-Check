@@ -33,4 +33,6 @@ public interface CashierRefundApplyMapper{
     CashierRefundApplyEntity selectRefundByType(@Param("orderNo")String orderNo,@Param("payKind")String payKind);
 
     List<CashierRefundApplyEntity> getCashierRefundApplyByTime(@Param("date")LocalDateTime date);
+
+    List<CashierRefundApplyEntity> getRefundApplyByOrderNo(@Param("orderNo")String orderNo);
 }

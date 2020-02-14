@@ -9,6 +9,8 @@ import com.atzuche.order.commons.entity.orderDetailDto.RenterMemberDTO;
 import com.atzuche.order.mem.MemProxyService;
 import com.atzuche.order.mem.dto.OrderRenterInfoDTO;
 import com.atzuche.order.open.service.FeignOrderDetailService;
+import com.atzuche.order.renterorder.entity.RenterAdditionalDriverEntity;
+import com.atzuche.order.renterorder.service.RenterAdditionalDriverService;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.doc.annotation.AutoDocMethod;
@@ -37,6 +39,8 @@ public class AdminRenterInfoController {
 
     @Autowired
     private MemProxyService memProxyService;
+    @Autowired
+    private RenterAdditionalDriverService renterAdditionalDriverService;
 
     @Autowired
     private FeignOrderDetailService feignOrderDetailService;
@@ -65,14 +69,15 @@ public class AdminRenterInfoController {
         BeanUtils.copyProperties(orderRenterInfoDTO,respVO);
         BeanUtils.copyProperties(renterMemberDTO,respVO);
         respVO.setReqAddr(detailRespDTO.getOrderSourceStat().getReqAddr());
-        respVO.setAdditionalDrivers(convert(renterAdditionalDriverDTOS));
+        List<RenterAdditionalDriverEntity> renterAdditionalDriverEntitys = renterAdditionalDriverService.listDriversByRenterOrderNo(detailRespDTO.getRenterOrder().getRenterOrderNo());
+        respVO.setAdditionalDrivers(convert(renterAdditionalDriverEntitys));
 
         return ResponseData.success(respVO);
     }
 
-    public static List<CommUseDriverInfo> convert(List<RenterAdditionalDriverDTO> dtos){
+    public static List<CommUseDriverInfo> convert(List<RenterAdditionalDriverEntity> dtos){
         List<CommUseDriverInfo> commUseDriverInfos = new ArrayList<>();
-        for(RenterAdditionalDriverDTO dto:dtos){
+        for(RenterAdditionalDriverEntity dto:dtos){
             CommUseDriverInfo commUseDriverInfo = new CommUseDriverInfo();
             BeanUtils.copyProperties(dto,commUseDriverInfo);
             commUseDriverInfos.add(commUseDriverInfo);
