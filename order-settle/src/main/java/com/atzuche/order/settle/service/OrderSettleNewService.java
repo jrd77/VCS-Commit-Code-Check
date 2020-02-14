@@ -1,6 +1,7 @@
 package com.atzuche.order.settle.service;
 
 import java.util.List;
+import java.util.Objects;
 
 import com.atzuche.order.cashieraccount.service.CashierPayService;
 import com.atzuche.order.cashieraccount.vo.req.pay.OrderPayReqVO;
@@ -10,7 +11,10 @@ import com.atzuche.order.commons.enums.cashcode.ConsoleCashCodeEnum;
 import com.atzuche.order.commons.service.OrderPayCallBack;
 import com.atzuche.order.mq.common.base.BaseProducer;
 import com.atzuche.order.mq.common.base.OrderMessage;
+import com.atzuche.order.rentercost.entity.*;
+import com.atzuche.order.settle.vo.req.RentCosts;
 import com.autoyol.autopay.gateway.constant.DataPayKindConstant;
+import com.autoyol.doc.util.StringUtil;
 import com.autoyol.event.rabbit.neworder.NewOrderMQActionEventEnum;
 import com.autoyol.event.rabbit.neworder.OrderSettlementMq;
 import com.autoyol.platformcost.model.FeeResult;
@@ -38,7 +42,6 @@ import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.ownercost.entity.OwnerOrderIncrementDetailEntity;
 import com.atzuche.order.ownercost.entity.OwnerOrderPurchaseDetailEntity;
 import com.atzuche.order.parentorder.dto.OrderStatusDTO;
-import com.atzuche.order.rentercost.entity.RenterOrderCostDetailEntity;
 import com.atzuche.order.settle.exception.OrderSettleFlatAccountException;
 import com.atzuche.order.settle.service.notservice.OrderSettleNoTService;
 import com.atzuche.order.settle.vo.req.SettleOrders;
@@ -451,5 +454,49 @@ public class OrderSettleNewService {
         OrderMessage orderMessage = OrderMessage.builder().build();
         orderMessage.setMessage(orderSettlementMq);
         baseProducer.sendTopicMessage(NewOrderMQActionEventEnum.ORDER_SETTLEMENT_FAIL.exchange,NewOrderMQActionEventEnum.ORDER_SETTLEMENT_FAIL.routingKey,orderMessage);
+    }
+
+    /**
+     * 查询 租客 应退金额
+     * @param rentCosts
+     * @return
+     */
+    public int getYingTuiRenterCost(RentCosts rentCosts) {
+        int renterCost=0;
+        // 租车费用
+        if(!CollectionUtils.isEmpty(rentCosts.getRenterOrderCostDetails())){
+            renterCost = renterCost +  rentCosts.getRenterOrderCostDetails().stream().mapToInt(RenterOrderCostDetailEntity::getTotalAmount).sum();
+        }
+        //交接车油费
+        if(Objects.nonNull(rentCosts.getOilAmt())){
+            String oilDifferenceCrash = rentCosts.getOilAmt().getOilDifferenceCrash();
+            if(!StringUtil.isBlank(oilDifferenceCrash)){
+                renterCost = renterCost + Integer.valueOf(oilDifferenceCrash);
+            }
+        }
+        //交接 超历程
+        if(Objects.nonNull(rentCosts.getMileageAmt())){
+            Integer totalFee = rentCosts.getMileageAmt().getTotalFee();
+            if(Objects.nonNull(totalFee)){
+                renterCost = renterCost + totalFee;
+            }
+        }
+        // 补贴
+        if(!CollectionUtils.isEmpty(rentCosts.getRenterOrderSubsidyDetails())){
+            renterCost = renterCost +  rentCosts.getRenterOrderSubsidyDetails().stream().mapToInt(RenterOrderSubsidyDetailEntity::getSubsidyAmount).sum();
+        }
+        //租客罚金
+        if(!CollectionUtils.isEmpty(rentCosts.getRenterOrderFineDeatails())){
+            renterCost = renterCost +  rentCosts.getRenterOrderFineDeatails().stream().mapToInt(RenterOrderFineDeatailEntity::getFineAmount).sum();
+        }
+        //管理后台补贴
+        if(!CollectionUtils.isEmpty(rentCosts.getOrderConsoleSubsidyDetails())){
+            renterCost = renterCost +  rentCosts.getOrderConsoleSubsidyDetails().stream().mapToInt(OrderConsoleSubsidyDetailEntity::getSubsidyAmount).sum();
+        }
+        //获取全局的租客订单罚金明细
+        if(!CollectionUtils.isEmpty(rentCosts.getConsoleRenterOrderFineDeatails())){
+            renterCost = renterCost +  rentCosts.getConsoleRenterOrderFineDeatails().stream().mapToInt(ConsoleRenterOrderFineDeatailEntity::getFineAmount).sum();
+        }
+        return renterCost;
     }
 }

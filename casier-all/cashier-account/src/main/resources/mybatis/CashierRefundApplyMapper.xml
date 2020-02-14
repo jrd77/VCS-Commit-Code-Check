@@ -171,6 +171,10 @@
         select <include refid="Base_Column_List" /> from cashier_refund_apply
         <![CDATA[ where status ='01' and create_time < #{date} limit 10 ]]>
     </select>
+    <select id="getRefundApplyByOrderNo" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List" /> from cashier_refund_apply
+        where  order_no = #{orderNo}
+    </select>
 
 
 </mapper>
