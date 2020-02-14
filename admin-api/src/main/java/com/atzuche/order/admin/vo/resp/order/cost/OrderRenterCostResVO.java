@@ -96,6 +96,14 @@ public class OrderRenterCostResVO {
 	@AutoDocProperty(value="送取服务券实际抵扣金额") ///
 	private String getReturnCouponAmt;
 	
+	@AutoDocProperty(value="是否使用送取服务券") ///
+	private String isUseGetReturnCoupon;
+	@AutoDocProperty(value="是否使用钱包") ///
+	private String isUseWallet;
+	@AutoDocProperty(value="是否使用凹凸币") ///
+	private String isUseAotuCoin;
+	
+	
 	@AutoDocProperty(value="钱包余额") ///
 	private String walletTotalAmt;
 	

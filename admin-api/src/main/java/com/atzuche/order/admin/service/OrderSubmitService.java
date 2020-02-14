@@ -15,6 +15,7 @@ import com.autoyol.commons.web.ResponseData;
 import com.dianping.cat.Cat;
 import com.dianping.cat.message.Transaction;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -97,8 +98,8 @@ public class OrderSubmitService {
         //布尔值的转化
         param.setSrvGetFlag(Integer.valueOf(reqVO.getSrvGetFlag()));
         param.setSrvReturnFlag(Integer.valueOf(reqVO.getSrvReturnFlag()));
-        param.setUseAutoCoin(Integer.valueOf(reqVO.getUseAutoCoin()));
-        param.setUseBal(Integer.valueOf(reqVO.getUseBal()));
+        param.setUseAutoCoin(StringUtils.isNotBlank(reqVO.getUseAutoCoin()) ? Integer.valueOf(reqVO.getUseAutoCoin()) : 0);
+        param.setUseBal(StringUtils.isNotBlank(reqVO.getUseBal()) ? Integer.valueOf(reqVO.getUseBal()) : 0);
         param.setUseAirportService(reqVO.getUseAirportService()!=null?Integer.valueOf(reqVO.getUseAirportService()):0);
         param.setIsLeaveCity(Integer.valueOf(reqVO.getIsLeaveCity()));
 

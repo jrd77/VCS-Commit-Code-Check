@@ -107,6 +107,14 @@ public class CashierRefundApplyNoTService {
     public CashierRefundApplyEntity selectorderNo(String orderNo,String payKind) {
         return cashierRefundApplyMapper.selectRefundByType(orderNo,payKind);
     }
+    /**
+     * 查询订单下所以退款
+     * @param orderNo
+     * @return
+     */
+    public List<CashierRefundApplyEntity> getRefundApplyByOrderNo(String orderNo) {
+        return cashierRefundApplyMapper.getRefundApplyByOrderNo(orderNo);
+    }
 
     public List<CashierRefundApplyEntity> selectorderNoWaitingAll() {
         //回去

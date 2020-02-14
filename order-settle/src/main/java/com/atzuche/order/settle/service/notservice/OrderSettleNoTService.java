@@ -646,7 +646,7 @@ public class OrderSettleNoTService {
      * @param settleOrdersDefinition
      * @param settleOrders
      */
-    private void handleOwnerAndPlatform(SettleOrdersDefinition settleOrdersDefinition, SettleOrders settleOrders) {
+    public void handleOwnerAndPlatform(SettleOrdersDefinition settleOrdersDefinition, SettleOrders settleOrders) {
         OwnerCosts ownerCosts = settleOrders.getOwnerCosts();
         //1车主费用明细
         List<AccountOwnerCostSettleDetailEntity> accountOwnerCostSettleDetails = new ArrayList<>();

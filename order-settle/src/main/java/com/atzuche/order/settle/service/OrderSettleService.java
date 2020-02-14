@@ -1,15 +1,29 @@
 package com.atzuche.order.settle.service;
 
+import com.atzuche.order.accountrenterdeposit.vo.res.AccountRenterDepositResVO;
+import com.atzuche.order.accountrenterwzdepost.vo.res.AccountRenterWZDepositResVO;
+import com.atzuche.order.cashieraccount.entity.CashierRefundApplyEntity;
+import com.atzuche.order.cashieraccount.service.CashierSettleService;
+import com.atzuche.order.cashieraccount.service.notservice.CashierRefundApplyNoTService;
 import com.atzuche.order.commons.service.OrderPayCallBack;
 import com.atzuche.order.mq.common.base.BaseProducer;
+import com.atzuche.order.renterorder.entity.RenterOrderEntity;
+import com.atzuche.order.renterorder.service.RenterOrderService;
+import com.atzuche.order.settle.exception.OrderSettleFlatAccountException;
+import com.atzuche.order.settle.vo.res.RenterCostVO;
+import com.autoyol.autopay.gateway.constant.DataPayKindConstant;
 import com.autoyol.event.rabbit.neworder.OrderSettlementMq;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.atzuche.order.accountownercost.entity.AccountOwnerCostSettleDetailEntity;
 import com.atzuche.order.cashieraccount.service.CashierService;
 import com.atzuche.order.commons.CatConstants;
 import com.atzuche.order.commons.enums.account.SettleStatusEnum;
+import com.atzuche.order.commons.service.OrderPayCallBack;
 import com.atzuche.order.parentorder.dto.OrderStatusDTO;
 import com.atzuche.order.parentorder.service.OrderStatusService;
 import com.atzuche.order.settle.service.notservice.OrderSettleNoTService;
@@ -23,6 +37,11 @@ import com.dianping.cat.Cat;
 import com.dianping.cat.message.Transaction;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.Assert;
+import org.springframework.util.CollectionUtils;
+
+import java.util.List;
+import java.util.Objects;
 
 /**
  * 车辆结算
@@ -35,6 +54,51 @@ public class OrderSettleService{
     @Autowired private OrderSettleNoTService orderSettleNoTService;
     @Autowired private CashierService cashierService;
     @Autowired private OrderSettleNewService orderSettleNewService;
+    @Autowired private RenterOrderService renterOrderService;
+    @Autowired private CashierSettleService cashierSettleService;
+    @Autowired private CashierRefundApplyNoTService cashierRefundApplyNoTService;
+
+
+
+    /**
+     * 查询所以费用
+     */
+    public RenterCostVO getRenterCostByOrderNo(String orderNo){
+        RenterOrderEntity renterOrder = renterOrderService.getRenterOrderByOrderNoAndIsEffective(orderNo);
+        Assert.notNull(renterOrder,"订单信息不存在");
+        Assert.notNull(renterOrder.getRenterOrderNo(),"订单信息不存在");
+
+        RenterCostVO vo = new RenterCostVO();
+        vo.setOrderNo(orderNo);
+        AccountRenterDepositResVO accountRenterDepositResVO = cashierService.getRenterDepositEntity(orderNo,renterOrder.getRenterMemNo());
+        int rentWzDepositAmt = cashierSettleService.getSurplusWZDepositCostAmt(orderNo,renterOrder.getRenterMemNo());
+        vo.setDepositCost(accountRenterDepositResVO.getSurplusDepositAmt());
+        vo.setDepositWzCost(rentWzDepositAmt);
+        RentCosts rentCosts = preRenterSettleOrder(orderNo, renterOrder.getRenterOrderNo());
+        if(Objects.nonNull(rentCosts)){
+            int renterCost =  orderSettleNewService.getYingTuiRenterCost(rentCosts);
+            vo.setRenterCost(renterCost);
+        }
+        List<CashierRefundApplyEntity> cashierRefundApplys = cashierRefundApplyNoTService.getRefundApplyByOrderNo(orderNo);
+        if(!CollectionUtils.isEmpty(cashierRefundApplys)){
+           // 获取实退 租车费用
+            int renterCostReal =  cashierRefundApplys.stream().filter(obj ->{
+                return DataPayKindConstant.RENT_AMOUNT.equals(obj.getPayKind()) || DataPayKindConstant.RENT_INCREMENT.equals(obj.getPayKind());
+            }).mapToInt(CashierRefundApplyEntity::getAmt).sum();
+            vo.setRenterCostReal(renterCostReal);
+            // 获取实退 车俩押金
+            int depositCostReal =  cashierRefundApplys.stream().filter(obj ->{
+                return DataPayKindConstant.RENT.equals(obj.getPayKind());
+            }).mapToInt(CashierRefundApplyEntity::getAmt).sum();
+            vo.setDepositCostReal(depositCostReal);
+            // 获取实退 违章押金
+            int depositWzCostReal =  cashierRefundApplys.stream().filter(obj ->{
+                return DataPayKindConstant.DEPOSIT.equals(obj.getPayKind());
+            }).mapToInt(CashierRefundApplyEntity::getAmt).sum();
+            vo.setDepositWzCostReal(depositWzCostReal);
+        }
+        return vo;
+    }
     /**
      * 获取租客预结算数据 huangjing
      * @param orderNo
@@ -54,6 +118,19 @@ public class OrderSettleService{
     	SettleOrders settleOrders =  orderSettleNoTService.preInitSettleOrders(orderNo,null,ownerOrderNo);
         //3.5 查询所有车主费用明细 TODO 暂不支持 多个车主
     	orderSettleNoTService.getOwnerCostSettleDetail(settleOrders);
+
+    	//车主预计收益 200214
+    	SettleOrdersDefinition settleOrdersDefinition = new SettleOrdersDefinition();
+    	//2统计 车主结算费用明细， 补贴，费用总额
+    	orderSettleNoTService.handleOwnerAndPlatform(settleOrdersDefinition,settleOrders);
+        //2车主总账
+        List<AccountOwnerCostSettleDetailEntity> accountOwnerCostSettleDetails = settleOrdersDefinition.getAccountOwnerCostSettleDetails();
+        if(!CollectionUtils.isEmpty(accountOwnerCostSettleDetails)){
+            int ownerCostAmtFinal = accountOwnerCostSettleDetails.stream().mapToInt(AccountOwnerCostSettleDetailEntity::getAmt).sum();
+            settleOrders.getOwnerCosts().setOwnerCostAmtFinal(ownerCostAmtFinal);
+        }
+
+
     	return settleOrders.getOwnerCosts();
     }
     /**
