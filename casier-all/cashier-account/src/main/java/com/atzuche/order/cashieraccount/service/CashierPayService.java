@@ -108,14 +108,19 @@ public class CashierPayService{
      * @param batchNotifyDataVo
      */
     private void getExtendParamsParam(OrderPayCallBackSuccessVO vo, BatchNotifyDataVo batchNotifyDataVo) {
-        if(Objects.nonNull(batchNotifyDataVo) && !CollectionUtils.isEmpty(batchNotifyDataVo.getLstNotifyDataVo()) && YesNoEnum.YES.getCode().equals(vo.getIsPayAgain())){
+        if(Objects.nonNull(batchNotifyDataVo) && !CollectionUtils.isEmpty(batchNotifyDataVo.getLstNotifyDataVo())){
             List<NotifyDataVo> notifyDataVos = batchNotifyDataVo.getLstNotifyDataVo();
             for(int i=0;i<notifyDataVos.size();i++){
                 NotifyDataVo notifyDataVo = notifyDataVos.get(i);
+                String renterOrderNo = notifyDataVo.getExtendParams();
+                //补付需要 子单号
                  if(Objects.nonNull(notifyDataVo) && DataPayKindConstant.RENT_INCREMENT.equals(notifyDataVo.getPayKind())){
-                     String renterOrderNo = notifyDataVo.getExtendParams();
                      //返回应付 （包含补付） 费用列表
                      vo.setRenterOrderNo(renterOrderNo);
+                }
+                if(Objects.nonNull(notifyDataVo) && DataPayKindConstant.RENT_AMOUNT.equals(notifyDataVo.getPayKind())){
+                    //返回应付 （包含补付） 费用列表
+                    vo.setRenterOrderNo(renterOrderNo);
                 }
             }
         }

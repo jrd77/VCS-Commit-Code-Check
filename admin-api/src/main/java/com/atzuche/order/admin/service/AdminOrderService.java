@@ -1,6 +1,7 @@
 package com.atzuche.order.admin.service;
 
 import com.alibaba.fastjson.JSON;
+import com.atzuche.order.admin.common.AdminUserUtil;
 import com.atzuche.order.admin.vo.req.order.AdminModifyOrderReqVO;
 import com.atzuche.order.admin.vo.req.order.CancelOrderByPlatVO;
 import com.atzuche.order.admin.vo.req.order.CancelOrderVO;
@@ -117,13 +118,14 @@ public class AdminOrderService {
     public ResponseData cancelOrder(CancelOrderVO cancelOrderVO) {
         CancelOrderReqVO cancelOrderReqVO = new CancelOrderReqVO();
         BeanUtils.copyProperties(cancelOrderVO,cancelOrderReqVO);
-        if("1".equalsIgnoreCase(cancelOrderVO.getMemRole())){
+        if("2".equalsIgnoreCase(cancelOrderVO.getMemRole())){
             String renterNo = getRenterMemNo(cancelOrderVO.getOrderNo());
             cancelOrderReqVO.setMemNo(renterNo);
         }else{
             String ownerNo = getOwnerMemNo(cancelOrderReqVO.getOrderNo());
             cancelOrderReqVO.setMemNo(ownerNo);
         }
+        cancelOrderReqVO.setOperatorName(AdminUserUtil.getAdminUser().getAuthName());
         ResponseData<?> responseObject = null;
         Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "租客商品信息");
         try{

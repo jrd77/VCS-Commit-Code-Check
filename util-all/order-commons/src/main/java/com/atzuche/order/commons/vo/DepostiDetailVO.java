@@ -87,4 +87,14 @@ public class DepostiDetailVO {
      */
     @AutoDocProperty(value = "免押方式(1:绑卡减免,2:芝麻减免,3:消费")
     private Integer freeDepositType;
+
+
+    public Integer getYingfuDepositAmt() {
+        if(yingfuDepositAmt!=null) {
+            return -yingfuDepositAmt;
+        }else{
+            return null;
+        }
+    }
+
 }

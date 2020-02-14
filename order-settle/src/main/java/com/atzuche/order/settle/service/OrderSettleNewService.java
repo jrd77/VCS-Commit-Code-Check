@@ -83,8 +83,7 @@ public class OrderSettleNewService {
         SettleOrdersAccount settleOrdersAccount = new SettleOrdersAccount();
         BeanUtils.copyProperties(settleOrders,settleOrdersAccount);
         //查询订单剩余应付
-        int rentCostAmtFinal = getRentCostAmtFinal(settleOrders);
-        settleOrdersAccount.setRentCostAmtFinal(rentCostAmtFinal - accountRenterCostSettle.getShifuAmt());
+        settleOrdersAccount.setRentCostAmtFinal(accountRenterCostSettle.getRentAmt());
         settleOrdersAccount.setRentCostPayAmt(accountRenterCostSettle.getShifuAmt());
         settleOrdersAccount.setDepositAmt(depositAmtRealPay);
         settleOrdersAccount.setDepositSurplusAmt(depositAmt);
@@ -123,7 +122,7 @@ public class OrderSettleNewService {
     }
 
     /**
-     * 通过收银台查取  待支付金额
+     * 通过收银台查取  待支付租车费用金额
      * @param settleOrders
      * @return
      */
@@ -133,7 +132,7 @@ public class OrderSettleNewService {
         orderPayReqVO.setMenNo(settleOrders.getRenterMemNo());
         orderPayReqVO.setIsUseWallet(YesNoEnum.NO.getCode());
         List<String> payKind = ImmutableList.of(
-                DataPayKindConstant.RENT,DataPayKindConstant.RENT_AMOUNT,DataPayKindConstant.DEPOSIT
+                DataPayKindConstant.RENT_AMOUNT
         );
         orderPayReqVO.setPayKind(payKind);
         OrderPayableAmountResVO vo = cashierPayService.getOrderPayableAmount(orderPayReqVO);
