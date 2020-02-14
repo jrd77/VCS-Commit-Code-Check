@@ -77,7 +77,7 @@ public class RenterGetCarService {
         if (null != renterOrderEntity) {
             RenterOrderEntity record = new RenterOrderEntity();
             record.setId(renterOrderEntity.getId());
-            record.setActRevertTime(LocalDateTime.now());
+            record.setActRentTime(LocalDateTime.now());
             record.setUpdateOp(reqVO.getOperatorName());
             renterOrderService.updateRenterOrderInfo(record);
         }
@@ -86,7 +86,7 @@ public class RenterGetCarService {
         if (null != ownerOrderEntity) {
             OwnerOrderEntity record = new OwnerOrderEntity();
             record.setId(ownerOrderEntity.getId());
-            record.setActRevertTime(LocalDateTime.now());
+            record.setActRentTime(LocalDateTime.now());
             record.setUpdateOp(reqVO.getOperatorName());
             ownerOrderService.updateOwnerOrderInfo(record);
         }
