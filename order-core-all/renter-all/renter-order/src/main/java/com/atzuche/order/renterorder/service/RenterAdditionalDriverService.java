@@ -77,8 +77,9 @@ public class RenterAdditionalDriverService {
     public void insertBatchAdditionalDriverBeforeDel(String orderNo, String renterOrderNo, List<String> driverIds,List<CommUseDriverInfoDTO> commUseDriverList) {
 		if (!CollectionUtils.isEmpty(driverIds) && !CollectionUtils.isEmpty(commUseDriverList)) {
 			//先逻辑删除
-			int i = renterAdditionalDriverMapper.delByRenterOrderNo(renterOrderNo);
-			if(i > 0) {
+			renterAdditionalDriverMapper.delByRenterOrderNo(renterOrderNo);
+			//如果是同一个人删除又添加，则i=0
+//			if(i > 0) {
 				//后新增
 				for (CommUseDriverInfoDTO commUseDriverInfo : commUseDriverList) {
 					if (null != commUseDriverInfo.getId() && driverIds.contains(commUseDriverInfo.getId().toString())) {
@@ -88,13 +89,18 @@ public class RenterAdditionalDriverService {
 						record.setDriverId(String.valueOf(commUseDriverInfo.getId()));
 						record.setRealName(commUseDriverInfo.getRealName());
 						record.setPhone(String.valueOf(commUseDriverInfo.getMobile()));
+						///
+						record.setIdCard(commUseDriverInfo.getIdCard());
+	                    record.setDriLicAllowCar(commUseDriverInfo.getDriLicAllowCar());
+	                    record.setValidityStartDate(commUseDriverInfo.getValidityStartDate());
+	                    record.setValidityEndDate(commUseDriverInfo.getValidityEndDate());
 						//添加操作人
 						record.setCreateOp(commUseDriverInfo.getConsoleOperatorName());
 						record.setUpdateOp(commUseDriverInfo.getConsoleOperatorName());
 						renterAdditionalDriverMapper.insertSelective(record);
 					}
 				}
-			}
+//			}
 		}else {
 			//仅仅删除 20200211
 			delByRenterOrderNo(renterOrderNo);

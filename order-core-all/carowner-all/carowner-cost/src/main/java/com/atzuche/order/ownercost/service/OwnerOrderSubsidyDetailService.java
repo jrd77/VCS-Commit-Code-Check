@@ -86,7 +86,7 @@ public class OwnerOrderSubsidyDetailService {
      * @return ConsoleRenterOrderFineDeatailEntity
      */
     public OwnerOrderSubsidyDetailEntity buildData(CostBaseDTO costBaseDTO, Integer subsidyAmount, SubsidySourceCodeEnum target, SubsidySourceCodeEnum source, SubsidyTypeCodeEnum type,RenterCashCodeEnum cash) {
-        if (subsidyAmount == null || subsidyAmount == 0) {
+        if (subsidyAmount == null) {  // || subsidyAmount == 0  允许修改为0
             return null;
         }
         

@@ -5,7 +5,6 @@ import static org.junit.Assert.fail;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.hibernate.validator.constraints.NotBlank;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,15 +14,13 @@ import org.springframework.test.context.web.WebAppConfiguration;
 
 import com.atzuche.order.admin.AdminSpringBoot;
 import com.atzuche.order.admin.vo.req.cost.AdditionalDriverInsuranceIdsReqVO;
+import com.atzuche.order.admin.vo.req.cost.OwnerToPlatformCostReqVO;
 import com.atzuche.order.admin.vo.req.cost.OwnerToRenterSubsidyReqVO;
 import com.atzuche.order.admin.vo.req.cost.RenterCostReqVO;
 import com.atzuche.order.admin.vo.resp.cost.AdditionalDriverInsuranceVO;
-import com.atzuche.order.commons.entity.dto.CommUseDriverInfoDTO;
+import com.atzuche.order.admin.vo.resp.order.cost.detail.OrderRenterFineAmtDetailResVO;
 import com.atzuche.order.commons.entity.dto.CommUseDriverInfoSimpleDTO;
 import com.atzuche.order.commons.entity.dto.CommUseDriverInfoStringDateDTO;
-import com.autoyol.doc.annotation.AutoDocProperty;
-
-import io.swagger.annotations.ApiModelProperty;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 //@RunWith(SpringRunner.class)
@@ -37,12 +34,48 @@ public class OrderCostDetailServiceTest {
 	public void testFindReductionDetailsListByOrderNo() {
 		fail("Not yet implemented");
 	}
+	
+	@Test
+	public void testFindfineAmtListByOrderNo() {
+		RenterCostReqVO renterCostReqVO = new RenterCostReqVO();
+		renterCostReqVO.setOrderNo("97525121200299");
+		renterCostReqVO.setRenterOrderNo("9752512120029910010");
+		try {
+			OrderRenterFineAmtDetailResVO res= orderCostDetailService.findfineAmtListByOrderNo(renterCostReqVO);
+			System.err.println("res toString="+res.toString());
+			
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	@Test
+	public void testUpdateOwnerToPlatFormListByOrderNo() {
+		OwnerToPlatformCostReqVO ownerCostReqVO = new OwnerToPlatformCostReqVO();
+		ownerCostReqVO.setOrderNo("28804131200299");
+		ownerCostReqVO.setOwnerOrderNo("2880413120029910011");
+		ownerCostReqVO.setOliAmt("10");
+		ownerCostReqVO.setTimeOut("30");
+		try {
+			orderCostDetailService.updateOwnerToPlatFormListByOrderNo(ownerCostReqVO);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
 
 	@Test
 	public void testFindAdditionalDriverInsuranceByOrderNo() {
 		RenterCostReqVO renterCostReqVO = new RenterCostReqVO();
-		renterCostReqVO.setOrderNo("79509160200299");
-		renterCostReqVO.setRenterOrderNo("7950916020029910010");
+//		renterCostReqVO.setOrderNo("79509160200299");
+//		renterCostReqVO.setRenterOrderNo("7950916020029910010");
+		
+		 String orderNo = "28804131200299";
+	     String renterOrderNo = "2880413120029910010";
+	     renterCostReqVO.setOrderNo(orderNo);
+	     renterCostReqVO.setRenterOrderNo(renterOrderNo);
 		try {
 			AdditionalDriverInsuranceVO vo = orderCostDetailService.findAdditionalDriverInsuranceByOrderNo(renterCostReqVO);
 			System.err.println("vo="+vo.toString());
@@ -65,8 +98,8 @@ public class OrderCostDetailServiceTest {
 
 	@Test
 	public void testInsertAdditionalDriverInsuranceByOrderNo() {
-		 String orderNo = "79509160200299";
-	     String renterOrderNo = "7950916020029910010";
+		 String orderNo = "28804131200299";
+	     String renterOrderNo = "2880413120029910010";
 		List<CommUseDriverInfoSimpleDTO> listCommUseDriverIds = new ArrayList<CommUseDriverInfoSimpleDTO>();
 		CommUseDriverInfoSimpleDTO dto = new CommUseDriverInfoSimpleDTO();
 		dto.setId(42);
@@ -111,20 +144,13 @@ public class OrderCostDetailServiceTest {
 		fail("Not yet implemented");
 	}
 
-	@Test
-	public void testUpdateOwnerToPlatFormListByOrderNo() {
-		fail("Not yet implemented");
-	}
 
 	@Test
 	public void testFindRenterRentAmtListByOrderNo() {
 		fail("Not yet implemented");
 	}
 
-	@Test
-	public void testFindfineAmtListByOrderNo() {
-		fail("Not yet implemented");
-	}
+
 
 	@Test
 	public void testUpdatefineAmtListByOrderNo() {
@@ -141,7 +167,7 @@ public class OrderCostDetailServiceTest {
 		OwnerToRenterSubsidyReqVO ownerCostReqVO = new OwnerToRenterSubsidyReqVO();
 		ownerCostReqVO.setOrderNo("86392311200299");
 		ownerCostReqVO.setOwnerOrderNo("8639231120029910011");
-		ownerCostReqVO.setOwnerSubsidyRentAmt("20");
+		ownerCostReqVO.setOwnerSubsidyRentAmt("0");
 		try {
 			orderCostDetailService.ownerToRenterRentAmtSubsidy(ownerCostReqVO);
 		} catch (Exception e) {

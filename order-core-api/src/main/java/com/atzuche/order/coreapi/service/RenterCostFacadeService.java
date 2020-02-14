@@ -4,6 +4,7 @@ import com.atzuche.order.cashieraccount.service.CashierQueryService;
 import com.atzuche.order.commons.enums.SubsidySourceCodeEnum;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.commons.vo.DepostiDetailVO;
+import com.atzuche.order.commons.vo.OrderSupplementDetailVO;
 import com.atzuche.order.commons.vo.WzDepositDetailVO;
 import com.atzuche.order.commons.vo.res.*;
 import com.atzuche.order.rentercost.entity.*;
@@ -127,6 +128,9 @@ public class RenterCostFacadeService {
 
         DepostiDetailVO depostiDetailVO = cashierQueryService.getRenterDepositVO(orderNo,memNo);
         basicCostDetailVO.setDepostiDetailVO(depostiDetailVO);
+
+        List<OrderSupplementDetailVO> orderSupplementDetailVOS = supplementService.listOrderSupplementDetailVOByOrderNo(orderNo);
+        basicCostDetailVO.setSupplementDetailVOList(orderSupplementDetailVOS);
         //TODO:
         return basicCostDetailVO;
     }

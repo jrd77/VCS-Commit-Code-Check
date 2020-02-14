@@ -35,7 +35,6 @@ public class OrderSettleService{
     @Autowired private OrderSettleNoTService orderSettleNoTService;
     @Autowired private CashierService cashierService;
     @Autowired private OrderSettleNewService orderSettleNewService;
-    @Autowired private BaseProducer baseProducer;
     /**
      * 获取租客预结算数据 huangjing
      * @param orderNo
@@ -80,8 +79,7 @@ public class OrderSettleService{
             orderSettleNewService.settleOrder(settleOrders,settleOrdersDefinition,callBack);
             log.info("OrderSettleService settleOrdersenced [{}]",GsonUtils.toJson(settleOrdersDefinition));
             Cat.logEvent("settleOrdersenced",GsonUtils.toJson(settleOrdersDefinition));
-
-            OrderSettlementMq orderSettlementMq = new OrderSettlementMq();
+            orderSettleNewService.sendOrderSettleSuccessMq(orderNo);
             t.setStatus(Transaction.SUCCESS);
         } catch (Exception e) {
             log.error("OrderSettleService settleOrder,e={},",e);
@@ -91,6 +89,7 @@ public class OrderSettleService{
             orderStatusService.saveOrderStatusInfo(orderStatusDTO);
             t.setStatus(e);
             Cat.logError("结算失败  :{}",e);
+            orderSettleNewService.sendOrderSettleFailMq(orderNo);
             throw new RuntimeException("结算失败 ,不能结算");
         } finally {
             t.complete();

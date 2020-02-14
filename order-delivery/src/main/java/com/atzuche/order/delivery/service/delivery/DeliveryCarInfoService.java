@@ -160,8 +160,6 @@ public class DeliveryCarInfoService {
         CostBaseDTO costBaseDTO = new CostBaseDTO();
         costBaseDTO.setStartTime(renterOrderDeliveryEntity.getRentTime());
         costBaseDTO.setEndTime(renterOrderDeliveryEntity.getRevertTime());
-//        costBaseDTO.setStartTime(com.atzuche.order.commons.DateUtils.parseLocalDateTime("2020-02-25 09:00:00", com.atzuche.order.commons.DateUtils.DATE_DEFAUTE1));
-//        costBaseDTO.setEndTime(com.atzuche.order.commons.DateUtils.parseLocalDateTime("2020-03-01 21:00:00", com.atzuche.order.commons.DateUtils.DATE_DEFAUTE1));
         costBaseDTO.setOrderNo(renterOrderDeliveryEntity.getOrderNo());
         costBaseDTO.setRenterOrderNo(renterOrderDeliveryEntity.getRenterOrderNo());
         getReturnCarOverCostReqDto.setCostBaseDTO(costBaseDTO);
@@ -234,7 +232,6 @@ public class DeliveryCarInfoService {
         ownerGetAndReturnCarDTO = deliveryCarInfoPriceService.createOwnerGetAndReturnCarDTO(ownerGetAndReturnCarDTO, ownerHandoverCarInfoEntities,carEngineType,cityCode);
         int overMileageAmt = getDeliveryCarOverMileageAmt(ownerGetAndReturnCarDTO, renterGoodsDetailDTO);
         ownerGetAndReturnCarDTO.setOverKNCrash(String.valueOf(overMileageAmt));
-        ownerGetAndReturnCarDTO.setOilContainer(ownerGetAndReturnCarDTO.getOilContainer()+"元");
         OwnerGetAndReturnCarDTO ownerGetAndReturnCarDO = OwnerGetAndReturnCarDTO.builder().build();
         BeanUtils.copyProperties(ownerGetAndReturnCarDTO,ownerGetAndReturnCarDO);
         //租客取送信息
@@ -250,7 +247,6 @@ public class DeliveryCarInfoService {
         int renterOverMileageAmt = getDeliveryCarOverMileageAmt(ownerGetAndReturnCarDTO, renterGoodsDetailDTO);
         renterGetAndReturnCarDTO.setOverKNCrash(String.valueOf(renterOverMileageAmt));
         BeanUtils.copyProperties(getAndReturnCarDTO, renterGetAndReturnCarDTO);
-        renterGetAndReturnCarDTO.setOilContainer(renterGetAndReturnCarDTO.getOilContainer()+"元");
         ownerGetAndReturnCarDTO.setPlatFormOilServiceCharge(RenterFeeCalculatorUtils.calServiceChargeFee().getTotalFee().toString()+"元");
         if(org.apache.commons.lang3.StringUtils.isNotBlank(ownerGetAndReturnCarDTO.getCarOilDifferenceCrash())) {
             renterGetAndReturnCarDTO.setCarOwnerOilCrash(ownerGetAndReturnCarDTO.getCarOilDifferenceCrash());

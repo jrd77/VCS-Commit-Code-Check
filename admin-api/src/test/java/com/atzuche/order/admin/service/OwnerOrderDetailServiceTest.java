@@ -11,6 +11,7 @@ import org.springframework.test.context.web.WebAppConfiguration;
 
 import com.atzuche.order.admin.AdminSpringBoot;
 import com.atzuche.order.commons.entity.ownerOrderDetail.OwnerRentDetailDTO;
+import com.atzuche.order.commons.entity.ownerOrderDetail.ServiceDetailDTO;
 import com.autoyol.commons.web.ResponseData;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -27,6 +28,14 @@ public class OwnerOrderDetailServiceTest {
 		OwnerRentDetailDTO dto = res.getData();
 		System.err.println("dto toString="+dto.toString());
 	}
+	
+	@Test
+	public void testServiceDetail() {
+		ResponseData<ServiceDetailDTO> dto = ownerOrderDetailService.serviceDetail("28804131200299", "2880413120029910011");
+		ServiceDetailDTO dt = dto.getData();
+		System.err.println("dt="+dt.toString());
+	}
+	
 
 	@Test
 	public void testRenterOwnerPrice() {
@@ -38,10 +47,7 @@ public class OwnerOrderDetailServiceTest {
 		fail("Not yet implemented");
 	}
 
-	@Test
-	public void testServiceDetail() {
-		fail("Not yet implemented");
-	}
+
 
 	@Test
 	public void testPlatformToOwner() {
