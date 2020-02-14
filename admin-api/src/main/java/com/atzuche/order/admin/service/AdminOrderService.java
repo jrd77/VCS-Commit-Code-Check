@@ -118,7 +118,7 @@ public class AdminOrderService {
     public ResponseData cancelOrder(CancelOrderVO cancelOrderVO) {
         CancelOrderReqVO cancelOrderReqVO = new CancelOrderReqVO();
         BeanUtils.copyProperties(cancelOrderVO,cancelOrderReqVO);
-        if("1".equalsIgnoreCase(cancelOrderVO.getMemRole())){
+        if("2".equalsIgnoreCase(cancelOrderVO.getMemRole())){
             String renterNo = getRenterMemNo(cancelOrderVO.getOrderNo());
             cancelOrderReqVO.setMemNo(renterNo);
         }else{
