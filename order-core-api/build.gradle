@@ -76,6 +76,7 @@ dependencies {
     compile project(":order-settle")
     compile project(":order-coin")
     compile project(":order-remote-service:order-remote-mem")
+    compile project(":order-mq")
 
     compile("com.fasterxml.jackson.module:jackson-module-parameter-names")
     compile("com.fasterxml.jackson.datatype:jackson-datatype-jdk8")
