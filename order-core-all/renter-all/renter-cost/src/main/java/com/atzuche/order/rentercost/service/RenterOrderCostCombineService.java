@@ -606,13 +606,14 @@ public class RenterOrderCostCombineService {
      *
      **/
     public GetReturnCostDTO getReturnCarCost(GetReturnCarCostReqDto getReturnCarCostReqDto) {
+		log.info("计算取还车费用getReturnCarCostReqDto:[{}]",JSON.toJSONString(getReturnCarCostReqDto));
         GetReturnCostDTO getReturnCostDto = new GetReturnCostDTO();
         List<RenterOrderCostDetailEntity> listCostDetail = new ArrayList<>();
         List<RenterOrderSubsidyDetailDTO> listCostSubsidy = new ArrayList<>();
         GetReturnResponseVO getReturnResponse = new GetReturnResponseVO();
 
         if(getReturnCarCostReqDto == null || (!getReturnCarCostReqDto.getIsGetCarCost() && !getReturnCarCostReqDto.getIsReturnCarCost())){
-            log.info("不需要计算取还车费用getReturnCarCostReqDto=[{}]",JSON.toJSONString(getReturnCarCostReqDto));
+            log.info("不需要计算取还车费用......");
             getReturnCostDto.setRenterOrderCostDetailEntityList(listCostDetail);
             getReturnCostDto.setRenterOrderSubsidyDetailDTOList(listCostSubsidy);
             getReturnCostDto.setGetReturnResponseVO(getReturnResponse);

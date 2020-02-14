@@ -26,9 +26,9 @@ public class RabbitConfiguration {
 
 	@Value("${spring.rabbitmq.virtual-host}")
 	private String virtualHost;
-
-	@Value("${spring.rabbitmq.consumer.count}")
-	private Integer consumerCount;
+//
+//	@Value("${spring.rabbitmq.consumer.count}")
+//	private Integer consumerCount;
 
 	@Bean
 	public ConnectionFactory connectionFactory() {        
@@ -49,7 +49,7 @@ public class RabbitConfiguration {
     public SimpleRabbitListenerContainerFactory rabbitListenerContainerFactory(ConnectionFactory connectionFactory) {
         SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
         factory.setConnectionFactory(connectionFactory);
-        factory.setConcurrentConsumers(consumerCount);
+        factory.setConcurrentConsumers(10);
         return factory;
     }
 
