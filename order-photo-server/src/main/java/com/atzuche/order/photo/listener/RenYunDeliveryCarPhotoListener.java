@@ -8,6 +8,8 @@ import com.autoyol.commons.utils.DateUtil;
 import com.autoyol.commons.utils.GsonUtils;
 import com.dianping.cat.Cat;
 import com.dianping.cat.message.Transaction;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.Message;
@@ -58,7 +60,6 @@ public class RenYunDeliveryCarPhotoListener {
                 orderPhotoEntity.setSerialNumber(0);
                 orderPhotoService.recevieRenYunDeliveryCarPhoto(orderPhotoEntity);
             }
-
             Cat.logEvent(CatConstants.RABBIT_MQ_METHOD, "RenYunDeliveryCarPhotoListener.process");
             Cat.logEvent(CatConstants.RABBIT_MQ_PARAM, handoverCarOilJson);
             t.setStatus(Transaction.SUCCESS);
@@ -72,4 +73,6 @@ public class RenYunDeliveryCarPhotoListener {
         LOGGER.info("-----获取交接车、取还车照片数据结束--------");
 
     }
+
 }
+

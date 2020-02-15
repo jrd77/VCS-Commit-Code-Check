@@ -13,6 +13,7 @@ import java.util.Date;
 @ToString
 public class DeliveryCarConditionPhotoVO {
 
+    private Integer id;
     private String path;
     private Integer userType;
     private Integer serialNumber;
