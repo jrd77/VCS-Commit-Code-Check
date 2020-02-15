@@ -51,6 +51,51 @@ public class CarProxyService {
         private LocalDateTime revertTime;
     }
 
+    @Data
+    public static class CarPriceDetail{
+        private List<CarPriceOfDayVO> carPriceOfDayVOList;
+        private String plateNum;
+    }
+
+    /**
+     * 获得车辆的价格参数
+     * @param reqVO
+     * @return
+     */
+    public CarPriceDetail getCarPriceDetail(CarDetailReqVO reqVO){
+        OrderCarInfoParamDTO orderCarInfoParamDTO = new OrderCarInfoParamDTO();
+        orderCarInfoParamDTO.setCarNo(Integer.parseInt(reqVO.getCarNo()));
+        orderCarInfoParamDTO.setCarAddressIndex(Integer.valueOf(reqVO.getAddrIndex()));
+        orderCarInfoParamDTO.setRentTime(LocalDateTimeUtils.localDateTimeToLong(reqVO.getRentTime()));
+        orderCarInfoParamDTO.setRevertTime(LocalDateTimeUtils.localDateTimeToLong(reqVO.getRevertTime()));
+        orderCarInfoParamDTO.setUseSpecialPrice(reqVO.useSpecialPrice);
+        ResponseObject<CarDetailVO> responseObject = null;
+        Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "租客商品信息");
+        try{
+            Cat.logEvent(CatConstants.FEIGN_METHOD,"CarDetailQueryFeignApi.getCarDetailOfTransByCarNo");
+            log.info("Feign 开始获取车辆信息,orderCarInfoParamDTO={}", JSON.toJSONString(orderCarInfoParamDTO));
+            Cat.logEvent(CatConstants.FEIGN_PARAM,JSON.toJSONString(orderCarInfoParamDTO));
+            responseObject = carDetailQueryFeignApi.getCarDetailOfTransByCarNo(orderCarInfoParamDTO);
+            log.info("reponse is [{}]",JSON.toJSONString(responseObject));
+            Cat.logEvent(CatConstants.FEIGN_RESULT,JSON.toJSONString(responseObject));
+            checkResponse(responseObject);
+            CarPriceDetail carPriceDetail = new CarPriceDetail();
+            carPriceDetail.setCarPriceOfDayVOList(responseObject.getData().getDaysPrice());
+            carPriceDetail.setPlateNum(responseObject.getData().getCarBaseVO().getPlateNum());
+            t.setStatus(Transaction.SUCCESS);
+
+            return carPriceDetail;
+        }catch (Exception e){
+            log.error("Feign 获取车辆信息异常,responseObject={},orderCarInfoParamDTO={}",JSON.toJSONString(responseObject),JSON.toJSONString(orderCarInfoParamDTO),e);
+            Cat.logError("Feign 获取车辆信息异常",e);
+            t.setStatus(e);
+            throw e;
+        }finally {
+            t.complete();
+        }
+
+    }
+
     public CarDetailDTO getCarDetail(String carNo){
         Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "商品信息");
         ResponseObject<CarBaseVO> responseObject = null;

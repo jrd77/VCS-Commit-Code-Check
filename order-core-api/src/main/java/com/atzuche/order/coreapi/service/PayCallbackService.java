@@ -4,6 +4,7 @@ import com.atzuche.order.commons.enums.OrderPayStatusEnum;
 import com.atzuche.order.commons.enums.OrderStatusEnum;
 import com.atzuche.order.commons.enums.YesNoEnum;
 import com.atzuche.order.commons.service.OrderPayCallBack;
+import com.atzuche.order.coreapi.service.mq.OrderStatusMqService;
 import com.atzuche.order.delivery.service.delivery.DeliveryCarService;
 import com.atzuche.order.parentorder.entity.OrderStatusEntity;
 import com.atzuche.order.parentorder.service.OrderStatusService;
@@ -12,6 +13,7 @@ import com.atzuche.order.renterorder.service.RenterOrderService;
 import com.atzuche.order.settle.exception.OrderSettleFlatAccountException;
 import com.autoyol.commons.utils.GsonUtils;
 import com.autoyol.doc.util.StringUtil;
+import com.autoyol.event.rabbit.neworder.NewOrderMQStatusEventEnum;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,18 +31,22 @@ public class PayCallbackService implements OrderPayCallBack {
     @Autowired ModifyOrderForRenterService modifyOrderForRenterService;
     @Autowired private DeliveryCarService deliveryCarService;
     @Autowired private OrderStatusService orderStatusService;
-
+    @Autowired private OrderStatusMqService orderStatusMqService;
     /**
      * ModifyOrderForRenterService.supplementPayPostProcess（修改订单补付回掉）
      */
     @Override
-    public void callBack(String orderNo,String renterOrderNo,Integer isPayAgain){
-        log.info("PayCallbackService callBack start param [{}] [{}]  [{}]",orderNo,renterOrderNo,isPayAgain);
+    public void callBack(String menNo,String orderNo,String renterOrderNo,Integer isPayAgain,YesNoEnum isGetCar){
+        log.info("PayCallbackService callBack start param [{}] [{}] [{}]  [{}] [{}]",menNo,orderNo,renterOrderNo,isPayAgain,isGetCar.getCode());
         if(YesNoEnum.YES.getCode().equals(isPayAgain) && !StringUtil.isBlank(renterOrderNo)){
             // 修改订单补付成功后回调
             modifyOrderForRenterService.supplementPayPostProcess(orderNo,renterOrderNo);
         }
         OrderStatusEntity entity = orderStatusService.getByOrderNo(orderNo);
+        if(YesNoEnum.YES.equals(isGetCar)){
+            log.info("PayCallbackService sendOrderStatusByOrderNo");
+            orderStatusMqService.sendOrderStatusByOrderNo(orderNo,menNo,OrderStatusEnum.TO_GET_CAR.getStatus(), NewOrderMQStatusEventEnum.ORDER_PREGETCAR);
+        }
         log.info("PayCallbackService sendDataMessageToRenYun param [{}]", GsonUtils.toJson(entity));
         //租车费用已支付 并且非补付支付
         if(!YesNoEnum.YES.getCode().equals(isPayAgain) && Objects.nonNull(entity) && Objects.nonNull(entity.getRentCarPayStatus()) && OrderPayStatusEnum.PAYED.getStatus()==entity.getRentCarPayStatus()){

@@ -136,7 +136,21 @@ public class DeliveryCarInfoService {
         String cityCode = renterOrderDelivery.getCityCode();
         String tenancy = String.valueOf(Duration.between(renterOrderDelivery.getRentTime(),renterOrderDelivery.getRevertTime()).toDays());
         ownerGetAndReturnCarDTO.setZuQi(tenancy);
-        deliveryCarVO = createDeliveryCarInfo(ownerGetAndReturnCarDTO, deliveryCarVO, ownerHandoverCarInfoEntities, renterHandoverCarInfoEntities, isEscrowCar,carEngineType,cityCode,renterGoodsDetailDTO);
+        deliveryCarVO = createDeliveryCarInfo(ownerGetAndReturnCarDTO, deliveryCarVO, ownerHandoverCarInfoEntities, renterHandoverCarInfoEntities, isEscrowCar, carEngineType, cityCode, renterGoodsDetailDTO);
+        if (deliveryCarVO.getIsGetCar() == 0) {
+            GetHandoverCarDTO getHandoverCarDO = new GetHandoverCarDTO();
+            getHandoverCarDO.setOwnDefaultGetCarAddr(deliveryCarVO.getGetHandoverCarDTO().getOwnDefaultGetCarAddr());
+            getHandoverCarDO.setOwnDefaultGetCarLat(deliveryCarVO.getGetHandoverCarDTO().getOwnDefaultGetCarLat());
+            getHandoverCarDO.setOwnRealReturnLng(deliveryCarVO.getGetHandoverCarDTO().getOwnDefaultGetCarLng());
+            deliveryCarVO.setGetHandoverCarDTO(getHandoverCarDO);
+        }
+        if (deliveryCarVO.getIsReturnCar() == 0) {
+            ReturnHandoverCarDTO returnHandoverCarDO = new ReturnHandoverCarDTO();
+            returnHandoverCarDO.setOwnDefaultReturnCarAddr(deliveryCarVO.getReturnHandoverCarDTO().getOwnDefaultReturnCarAddr());
+            returnHandoverCarDO.setOwnDefaultReturnCarLat(deliveryCarVO.getReturnHandoverCarDTO().getOwnDefaultReturnCarLat());
+            returnHandoverCarDO.setOwnDefaultReturnCarLng(deliveryCarVO.getReturnHandoverCarDTO().getOwnDefaultReturnCarLng());
+            deliveryCarVO.setReturnHandoverCarDTO(returnHandoverCarDO);
+        }
         return deliveryCarVO;
     }
 
@@ -248,7 +262,12 @@ public class DeliveryCarInfoService {
         getAndReturnCarDTO.setOverKNCrash(String.valueOf(renterOverMileageAmt));
         BeanUtils.copyProperties(getAndReturnCarDTO, renterGetAndReturnCarDTO);
         //车主平台加油服务费carOwnerOilCrash
-        ownerGetAndReturnCarDTO.setPlatFormOilServiceCharge(deliveryCarInfoPriceService.getOwnerPlatFormOilServiceCharge(Integer.valueOf(ownerGetAndReturnCarDTO.getReturnCarOil()),Integer.valueOf(renterGetAndReturnCarDTO.getGetCarOil()))+"元");
+        try {
+            ownerGetAndReturnCarDTO.setPlatFormOilServiceCharge(deliveryCarInfoPriceService.getOwnerPlatFormOilServiceCharge(Integer.valueOf(ownerGetAndReturnCarDTO.getReturnCarOil().contains("L") ? ownerGetAndReturnCarDTO.getReturnCarOil().replace("L", "") : ownerGetAndReturnCarDTO.getReturnCarOil()), Integer.valueOf(renterGetAndReturnCarDTO.getGetCarOil().contains("L") ? renterGetAndReturnCarDTO.getGetCarOil().replace("L", "") : renterGetAndReturnCarDTO.getGetCarOil())) + "元");
+        } catch (Exception e) {
+            log.info("获取平台加邮费出错，cause：【{}】", e.getMessage());
+            ownerGetAndReturnCarDTO.setPlatFormOilServiceCharge("0");
+        }
         renterGetAndReturnCarDTO.setCarOwnerOilCrash(renterGetAndReturnCarDTO.getOilDifferenceCrash());
         ownerGetAndReturnCarDTO.setCarOwnerAllOilCrash(ownerGetAndReturnCarDTO.getOilDifferenceCrash()+ownerGetAndReturnCarDTO.getPlatFormOilServiceCharge());
         if (isEscrowCar) {
@@ -326,7 +345,7 @@ public class DeliveryCarInfoService {
             mileageAmtDTO.setCostBaseDTO(costBaseDTO);
             return deliveryCarInfoPriceService.getMileageAmtEntity(mileageAmtDTO).getTotalFee();
         } catch (Exception e) {
-            log.error("获取超历程失败原因：{}", e.getMessage());
+            log.error("获取超历程失败原因:", e);
             return 0;
         }
 

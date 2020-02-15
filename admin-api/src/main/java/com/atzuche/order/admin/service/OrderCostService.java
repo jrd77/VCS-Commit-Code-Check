@@ -140,6 +140,9 @@ public class OrderCostService {
 		return realVo;
 	}
 	
+	/*
+	 * 租客支付给平台的费用
+	 */
 	private void putRenterToPlatformCost(OrderRenterCostResVO realVo,
 			com.atzuche.order.commons.vo.res.OrderRenterCostResVO data) {
 		int renterPayToPlatformAmt = 0;
@@ -154,24 +157,27 @@ public class OrderCostService {
 		}
 		
 		//数据封装
-		realVo.setRenterPayToPlatform(String.valueOf(renterPayToPlatformAmt));
+		realVo.setRenterPayToPlatform(String.valueOf(NumberUtils.convertNumberToZhengshu(renterPayToPlatformAmt)));
 	}
 	
+	/*
+	 * 车主支付给平台的费用
+	 */
 	private void putOwnerToPlatformCost(OrderOwnerCostResVO realVo,
 			com.atzuche.order.commons.vo.res.OrderOwnerCostResVO data) {
-		int renterPayToPlatformAmt = 0;
+		int ownerPayToPlatformAmt = 0;
 		
 		List<OrderConsoleCostDetailEntity> costDetails = data.getOrderConsoleCostDetails();
 		for (OrderConsoleCostDetailEntity entity : costDetails) {
 			//`subsidy_source_name` varchar(16) DEFAULT NULL COMMENT '补贴来源方 1、租客 2、车主 3、平台',
 			//  `subsidy_target_name` varchar(16) DEFAULT NULL COMMENT '补贴方名称 1、租客 2、车主 3、平台',
 			if("2".equals(entity.getSubsidySourceCode()) && "3".equals(entity.getSubsidyTargetCode())) {
-				renterPayToPlatformAmt += entity.getSubsidyAmount().intValue();
+				ownerPayToPlatformAmt += entity.getSubsidyAmount().intValue();
 			}
 		}
 		
 		//数据封装
-		realVo.setOwnerPayToPlatform(String.valueOf(renterPayToPlatformAmt));
+		realVo.setOwnerPayToPlatform(String.valueOf(NumberUtils.convertNumberToFushu(ownerPayToPlatformAmt)));
 	}
 
 	private void putRentFeeBase(OrderRenterCostResVO realVo,
@@ -445,10 +451,10 @@ public class OrderCostService {
 		realVo.setWalletAmt(String.valueOf(NumberUtils.convertNumberToFushu(walletAmt)));
 		//凹凸币
 		realVo.setAotuCoinAmt(String.valueOf(NumberUtils.convertNumberToFushu(aotuCoin)));
-		//钱包余额	暂不处理  下单的接口  huangjing-todo
+		//钱包余额	暂不处理  下单的接口  huangjing-todo do
 		int walletAmtLeft = walletProxyService.getWalletByMemNo(memNo);
 		realVo.setWalletTotalAmt(String.valueOf(walletAmtLeft));
-		//凹凸币余额   暂不处理 下单的接口 huangjing-todo
+		//凹凸币余额   暂不处理 下单的接口 huangjing-todo do
 		int autoCoinLeft = autoCoinProxyService.getCrmCustPoint(memNo);
 		realVo.setAotuCoinTotalAmt(String.valueOf(autoCoinLeft));
 		/*
@@ -644,10 +650,11 @@ public class OrderCostService {
 	private void putIncome(OrderOwnerCostResVO realVo, com.atzuche.order.commons.vo.res.OrderOwnerCostResVO data) {
 		//预计收益
 //		 String preIncomeAmt = "0";
-		 //结算收益 huangjingtodo
-		 String settleIncomeAmt = "0";  //最终收益 income_amt （海豹要加上）
+		 //结算收益 huangjingtodo     取account_owner_income_examine表
+//		 String settleIncomeAmt = "0";  //最终收益 income_amt （海豹要加上）
 		 
 		 int preIncomeAmtInt = data.getOwnerCostAmtFinal(); //直接取值。
+		 int settleIncomeAmtInt = data.getOwnerCostAmtSettleAfter();
 //		 int incomeAmt = Integer.valueOf(realVo.getIncomeAmt());
 //		 int platformDeductionAmt = Integer.valueOf(realVo.getPlatformDeductionAmt());
 //		 int couponDeductionAmount = Integer.valueOf(realVo.getCouponDeductionAmount());
@@ -656,7 +663,7 @@ public class OrderCostService {
 		 
 //		 preIncomeAmt = String.valueOf(NumberUtils.convertNumberToZhengshu(preIncomeAmtInt));
 		 realVo.setPreIncomeAmt(String.valueOf(preIncomeAmtInt));
-		 realVo.setSettleIncomeAmt(settleIncomeAmt);
+		 realVo.setSettleIncomeAmt(String.valueOf(settleIncomeAmtInt));
 		 
 	}
 
@@ -768,10 +775,13 @@ public class OrderCostService {
 	     /**
 	      * 加油服务费
 	      */
-	     OwnerOrderPurchaseDetailEntity ownerOrderCostDetail = data.getOwnerOrderCostDetail();
-	     if(ownerOrderCostDetail != null) {
-	    	 oil += ownerOrderCostDetail.getTotalAmount().intValue();
-	     }
+//	     OwnerOrderPurchaseDetailEntity ownerOrderCostDetail = data.getOwnerOrderCostDetail();
+//	     if(ownerOrderCostDetail != null) {
+//	    	 oil += ownerOrderCostDetail.getTotalAmount().intValue();
+//	     }
+	     //直接取值。 200215修改。
+	     oil = data.getOwnerOilDifferenceCrashAmt();
+	     
 	     /**
 	      * 获取gps服务费
 	      */

@@ -60,6 +60,7 @@ import com.autoyol.car.api.model.dto.LocationDTO;
 import com.autoyol.car.api.model.dto.OrderInfoDTO;
 import com.autoyol.car.api.model.enums.OrderOperationTypeEnum;
 import com.autoyol.commons.utils.DateUtil;
+import com.autoyol.event.rabbit.neworder.NewOrderMQActionEventEnum;
 import com.autoyol.event.rabbit.neworder.OrderCreateMq;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -123,8 +124,6 @@ public class SubmitOrderService {
     private OrderCommonConver orderCommonConver;
     @Autowired
     private StockProxyService stockService;
-    @Autowired
-    BaseProducer baseProducer;
     @Autowired
     private RenterOrderWzStatusService renterOrderWzStatusService;
     @Autowired
@@ -275,8 +274,6 @@ public class SubmitOrderService {
             orderInfoDTO.setOrderNo(orderNo);
             stockService.cutCarStock(orderInfoDTO);
         }
-
-        sendCreateOrderSuccess(parentOrderDTO.getOrderDTO(),orderReqVO);
         //end 组装接口返回
         OrderResVO orderResVO = new OrderResVO();
         orderResVO.setOrderNo(orderNo);
@@ -541,30 +538,6 @@ public class SubmitOrderService {
         LOGGER.info("Build AutoCoinDeductReqVO result is:[{}]", autoCoinDeductReqVO);
         return autoCoinDeductReqVO;
     }
-
-
-
-    /**
-     * 发送下单事件
-     * @param orderReqVO
-     * @param orderDTO
-     */
-    public void sendCreateOrderSuccess(OrderDTO orderDTO,OrderReqVO orderReqVO){
-        //发送MQ时间
-        OrderCreateMq orderCreateMq = new OrderCreateMq();
-        orderCreateMq.setOrderNo(orderDTO.getOrderNo());
-        orderCreateMq.setBusinessChildType(orderReqVO.getBusinessChildType());
-        orderCreateMq.setCategory(orderReqVO.getOrderCategory());
-        orderCreateMq.setRentTime(DateUtil.asDate(orderReqVO.getRentTime().toLocalDate()));
-        orderCreateMq.setRevertTime(DateUtil.asDate(orderReqVO.getRevertTime().toLocalDate()));
-        orderCreateMq.setMemNo(Integer.valueOf(orderDTO.getMemNoRenter()));
-        orderCreateMq.setPlatformChildType(orderReqVO.getPlatformChildType());
-        orderCreateMq.setRiskReqId(orderDTO.getRiskAuditId());
-        OrderMessage orderMessage = OrderMessage.builder().build();
-        orderMessage.setMessage(orderCreateMq);
-        baseProducer.sendTopicMessage("auto-order-action","action.order.create",orderMessage);
-    }
-
 
     /**
      * 对象转换

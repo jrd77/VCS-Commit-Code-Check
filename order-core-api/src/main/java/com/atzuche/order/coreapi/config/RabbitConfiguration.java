@@ -37,6 +37,8 @@ public class RabbitConfiguration {
 	@Value("${spring.rabbitmq.consumer.count}")
 	private Integer consumerCount;
 
+	public static final String DEFAULT_EXCHANGE = "order-oil-mq-exchange";
+
 	@Bean
 	public ConnectionFactory connectionFactory() {        
 		CachingConnectionFactory connectionFactory = new CachingConnectionFactory(host,port);        
@@ -172,11 +174,12 @@ public class RabbitConfiguration {
 	}
 
     @Bean
-	public Queue HandoverCarMilegeQueue(){
+	public Queue handoverCarMilegeQueue(){
 		return new Queue("handover_car_oil_queue",true);
 	}
+
 	@Bean
-	public Queue HandoverCarRenYunMilegeQueue(){
+	public Queue handoverCarRenYunMilegeQueue(){
 		return new Queue("handover_car_renYun_oil_queue",true);
 	}
 

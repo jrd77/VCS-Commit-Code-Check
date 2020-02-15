@@ -1,19 +1,19 @@
 package com.atzuche.order.coreapi.service;
 
 import com.atzuche.order.commons.enums.OrderStatusEnum;
-import com.atzuche.order.commons.enums.OwnerChildStatusEnum;
-import com.atzuche.order.commons.enums.RenterChildStatusEnum;
 import com.atzuche.order.commons.vo.req.GetCarReqVO;
+import com.atzuche.order.coreapi.service.mq.OrderActionMqService;
+import com.atzuche.order.coreapi.service.mq.OrderStatusMqService;
 import com.atzuche.order.coreapi.submitOrder.exception.RefuseOrderCheckException;
 import com.atzuche.order.flow.service.OrderFlowService;
 import com.atzuche.order.ownercost.entity.OwnerOrderEntity;
 import com.atzuche.order.ownercost.service.OwnerOrderService;
 import com.atzuche.order.parentorder.entity.OrderStatusEntity;
-import com.atzuche.order.parentorder.service.OrderService;
 import com.atzuche.order.parentorder.service.OrderStatusService;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.atzuche.order.renterorder.service.RenterOrderService;
 import com.autoyol.commons.web.ErrorCode;
+import com.autoyol.event.rabbit.neworder.NewOrderMQStatusEventEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,6 +44,12 @@ public class RenterGetCarService {
 
     @Autowired
     private OwnerOrderService ownerOrderService;
+
+    @Autowired
+    private OrderActionMqService orderActionMqService;
+
+    @Autowired
+    private OrderStatusMqService orderStatusMqService;
 
 
 
@@ -91,8 +97,10 @@ public class RenterGetCarService {
             ownerOrderService.updateOwnerOrderInfo(record);
         }
 
-        //TODO:发送租客取车事件
+        //发送租客取车事件
+        orderActionMqService.sendOrderRenterPickUpCarSuccess(reqVO.getOrderNo(), renterOrderEntity.getRenterMemNo());
 
+        orderStatusMqService.sendOrderStatusByOrderNo(reqVO.getOrderNo(),ownerOrderEntity.getMemNo(),orderStatusEntity.getStatus(), NewOrderMQStatusEventEnum.ORDER_PRERETURNCAR);
     }
 
 
