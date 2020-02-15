@@ -250,7 +250,7 @@ public class OrderSettleNoTService {
     public void check(RenterOrderEntity renterOrder) {
         // 1 订单校验是否可以结算
         OrderStatusEntity orderStatus = orderStatusService.getByOrderNo(renterOrder.getOrderNo());
-        if(OrderStatusEnum.TO_SETTLE.getStatus() == orderStatus.getStatus()){
+        if(OrderStatusEnum.TO_SETTLE.getStatus() != orderStatus.getStatus()){
             throw new RuntimeException("租客订单状态不是待结算，不能结算");
         }
         //2校验租客是否还车
@@ -940,7 +940,7 @@ public class OrderSettleNoTService {
             }
             //1.3 交接车-获取超里程费用
             FeeResult mileageAmt = rentCosts.getMileageAmt();
-            if(Objects.nonNull(mileageAmt) && Objects.nonNull(mileageAmt.getTotalFee())  && mileageAmt.getTotalFee()!=0){
+            if(Objects.nonNull(mileageAmt) && Objects.nonNull(mileageAmt.getTotalFee())){
                 AccountRenterCostSettleDetailEntity accountRenterCostSettleDetail = new AccountRenterCostSettleDetailEntity();
                 BeanUtils.copyProperties(mileageAmt,accountRenterCostSettleDetail);
                 accountRenterCostSettleDetail.setCostCode(RenterCashCodeEnum.ACCOUNT_RENTER_DELIVERY_MILEAGE_COST.getCashNo());
