@@ -175,5 +175,9 @@ public class RabbitConfiguration {
 	public Queue HandoverCarMilegeQueue(){
 		return new Queue("handover_car_oil_queue",true);
 	}
+	@Bean
+	public Queue HandoverCarRenYunMilegeQueue(){
+		return new Queue("handover_car_renYun_oil_queue",true);
+	}
 
 }

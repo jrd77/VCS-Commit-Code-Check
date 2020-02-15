@@ -21,7 +21,7 @@ public class MQSendPlatformSmsService {
 
     private static final Logger logger = LoggerFactory.getLogger(MQSendPlatformSmsService.class);
 
-    @Resource(name = "orderSmsRabbitTemplate")
+    @Autowired
     private RabbitTemplate rabbitTemplate;
 
     /**
