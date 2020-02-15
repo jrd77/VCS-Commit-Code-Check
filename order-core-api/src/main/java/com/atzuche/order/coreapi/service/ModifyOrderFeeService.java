@@ -16,6 +16,7 @@ import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.coreapi.entity.dto.ModifyOrderDTO;
 import com.atzuche.order.coreapi.entity.request.ModifyOrderReq;
 import com.atzuche.order.coreapi.entity.vo.CostDeductVO;
+import com.atzuche.order.coreapi.entity.vo.DispatchCarInfoVO;
 import com.atzuche.order.open.vo.ModifyOrderCompareVO;
 import com.atzuche.order.open.vo.ModifyOrderCostVO;
 import com.atzuche.order.open.vo.ModifyOrderDeductVO;
@@ -129,6 +130,73 @@ public class ModifyOrderFeeService {
 		modifyOrderCompareVO.setInitModifyOrderFeeVO(initModifyOrderFeeVO);
 		modifyOrderCompareVO.setUpdateModifyOrderFeeVO(updateModifyOrderFeeVO);
 		return modifyOrderCompareVO;
+	}
+	
+	
+	/**
+	 * 换车成本计算
+	 * @param modifyOrderReq
+	 * @return DispatchCarInfoVO
+	 */
+	public DispatchCarInfoVO getDispatchCarInfoVO(ModifyOrderReq modifyOrderReq) {
+		log.info("modifyOrder修改订单主逻辑入参modifyOrderReq=[{}]", modifyOrderReq);
+		// 主单号
+		String orderNo = modifyOrderReq.getOrderNo();
+		// 获取修改前有效租客子订单信息
+		RenterOrderEntity initRenterOrder = renterOrderService.getRenterOrderByOrderNoAndIsEffective(orderNo);
+		// 获取租客配送订单信息
+		List<RenterOrderDeliveryEntity> deliveryList = renterOrderDeliveryService.listRenterOrderDeliveryByRenterOrderNo(initRenterOrder.getRenterOrderNo());
+		// DTO包装
+		ModifyOrderDTO modifyOrderDTO = modifyOrderService.getModifyOrderDTO(modifyOrderReq, null, initRenterOrder, deliveryList);
+		log.info("ModifyOrderService.modifyOrder modifyOrderDTO=[{}]", modifyOrderDTO);
+		// 获取租客会员信息
+		RenterMemberDTO renterMemberDTO = modifyOrderService.getRenterMemberDTO(initRenterOrder.getRenterOrderNo(), null);
+		// 设置租客会员信息
+		modifyOrderDTO.setRenterMemberDTO(renterMemberDTO);
+		// 获取租客商品信息
+		RenterGoodsDetailDTO renterGoodsDetailDTO = modifyOrderService.getRenterGoodsDetailDTO(modifyOrderDTO, initRenterOrder);
+		// 设置商品信息
+		modifyOrderDTO.setRenterGoodsDetailDTO(renterGoodsDetailDTO);
+		// 获取主订单信息
+		OrderEntity orderEntity = orderService.getOrderByOrderNoAndMemNo(orderNo, modifyOrderReq.getMemNo());
+		// 设置主订单信息
+		modifyOrderDTO.setOrderEntity(orderEntity);
+		// 查询主订单状态
+		OrderStatusEntity orderStatusEntity = orderStatusService.getByOrderNo(orderNo);
+		// 设置订单状态
+		modifyOrderDTO.setOrderStatusEntity(orderStatusEntity);
+		// 设置城市编号
+		modifyOrderDTO.setCityCode(orderEntity.getCityCode());
+		log.info("ModifyOrderService.modifyOrder again modifyOrderDTO=[{}]", modifyOrderDTO);
+		// 获取修改前租客费用明细
+		List<RenterOrderCostDetailEntity> initCostList = renterOrderCostDetailService.listRenterOrderCostDetail(modifyOrderDTO.getOrderNo(), initRenterOrder.getRenterOrderNo());
+		// 获取修改前补贴信息
+		List<RenterOrderSubsidyDetailEntity> initSubsidyList = renterOrderSubsidyDetailService.listRenterOrderSubsidyDetail(modifyOrderDTO.getOrderNo(), initRenterOrder.getRenterOrderNo());
+		// 提前延后时间计算
+		CarRentTimeRangeResVO carRentTimeRangeResVO = modifyOrderService.getCarRentTimeRangeResVO(modifyOrderDTO);
+		// 设置提前延后时间
+		modifyOrderDTO.setCarRentTimeRangeResVO(carRentTimeRangeResVO);
+		// 封装计算用对象
+		RenterOrderReqVO renterOrderReqVO = modifyOrderService.convertToRenterOrderReqVO(modifyOrderDTO, renterMemberDTO, renterGoodsDetailDTO, orderEntity, carRentTimeRangeResVO);
+		// 基础费用计算包含租金，手续费，基础保障费用，全面保障费用，附加驾驶人保障费用，取还车费用计算和超运能费用计算
+		RenterOrderCostRespDTO renterOrderCostRespDTO = modifyOrderService.getRenterOrderCostRespDTO(modifyOrderDTO, renterOrderReqVO, initCostList, initSubsidyList);
+		// 获取修改订单违约金
+		List<RenterOrderFineDeatailEntity> renterFineList = modifyOrderService.getRenterFineList(modifyOrderDTO, initRenterOrder, deliveryList, renterOrderCostRespDTO);
+		// 封装基础信息对象
+		CostBaseDTO costBaseDTO = new CostBaseDTO(modifyOrderDTO.getOrderNo(), modifyOrderDTO.getRenterOrderNo(), modifyOrderDTO.getMemNo(), modifyOrderDTO.getRentTime(), modifyOrderDTO.getRevertTime());
+		// 获取抵扣补贴(含车主券，限时立减，取还车券，平台券和凹凸币)
+		CostDeductVO costDeductVO = modifyOrderService.getCostDeductVO(modifyOrderDTO, costBaseDTO, renterOrderCostRespDTO, renterOrderReqVO, orderEntity, initSubsidyList);
+		// 聚合租客补贴
+		renterOrderCostRespDTO.setRenterOrderSubsidyDetailDTOList(modifyOrderService.getPolymerizationSubsidy(renterOrderCostRespDTO, costDeductVO));
+		// 计算补付金额
+		Integer supplementAmt = modifyOrderService.getRenterSupplementAmt(modifyOrderDTO, initRenterOrder, renterOrderCostRespDTO, renterFineList);
+		DispatchCarInfoVO dispatchCarInfoVO = new DispatchCarInfoVO();
+		if (supplementAmt != null && supplementAmt > 0) {
+			dispatchCarInfoVO.setDispatchCarCost(supplementAmt);
+		} else {
+			dispatchCarInfoVO.setDispatchCarCost(0);
+		}
+		return dispatchCarInfoVO;
 	}
 	
 	

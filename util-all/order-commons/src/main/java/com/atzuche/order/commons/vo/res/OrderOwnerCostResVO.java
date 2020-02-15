@@ -51,7 +51,9 @@ public class OrderOwnerCostResVO {
     /**
      * 获取车主油费
      */
-     OwnerOrderPurchaseDetailEntity ownerOrderCostDetail;
+//     OwnerOrderPurchaseDetailEntity ownerOrderCostDetail;
+     private int ownerOilDifferenceCrashAmt;
+     
      //------------------------------------------------------------- 分割线
     /**
      * 管理后台补贴
@@ -80,6 +82,8 @@ public class OrderOwnerCostResVO {
     
     ///add huangjing  来源：SettleOrdersDefinition类字段。 200214
     private int ownerCostAmtFinal;
+    //settleIncomeAmt 结算金额，从account_owner_income_examine表中获取。 200215
+    private int ownerCostAmtSettleAfter;
     ///
     List<com.atzuche.order.commons.vo.res.rentcosts.OrderConsoleCostDetailEntity> orderConsoleCostDetails;
 }

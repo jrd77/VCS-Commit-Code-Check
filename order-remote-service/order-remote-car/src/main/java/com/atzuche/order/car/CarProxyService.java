@@ -168,6 +168,7 @@ public class CarProxyService {
         renterGoodsDetailDto.setCarAge(carBaseVO.getCarAge());
         renterGoodsDetailDto.setSucessRate(carChargeLevelVO!=null?carChargeLevelVO.getSucessRate():null);
         renterGoodsDetailDto.setIsLocal(carBaseVO.getIsLocal());
+        renterGoodsDetailDto.setModelTxt(carBaseVO.getModelTxt());
         renterGoodsDetailDto.setChoiceCar(data.isChoiceCar());
         renterGoodsDetailDto.setRentTime(reqVO.getRentTime());
         renterGoodsDetailDto.setRevertTime(reqVO.getRevertTime());
@@ -262,6 +263,7 @@ public class CarProxyService {
                 })
                 .collect(Collectors.toList());
         ownerGoodsDetailDto.setOwnerGoodsPriceDetailDTOList(ownerGoodsPriceList);
+        ownerGoodsDetailDto.setModelTxt(renterGoodsDetailDto.getModelTxt());
         return ownerGoodsDetailDto;
     }
     //获取车辆封面图片路径

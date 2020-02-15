@@ -15,5 +15,7 @@ public interface AccountOwnerIncomeExamineMapper{
     AccountOwnerIncomeExamineEntity selectByPrimaryKey(Integer id);
     int insertSelective(AccountOwnerIncomeExamineEntity record);
     int updateByPrimaryKeySelective(AccountOwnerIncomeExamineEntity record);
+    /*根据订单号查询*/
+	AccountOwnerIncomeExamineEntity selectByOrderNo(String orderNo);
 
 }

@@ -99,6 +99,10 @@ public class RenterGoodsService{
         return renterGoodsMapper.queryCarInfoByOrderNoAndCarNo(orderNo,carNo);
     }
 
+    public RenterGoodsEntity queryInfoByOrderNo(String orderNo) {
+        return renterGoodsMapper.queryInfoByOrderNo(orderNo);
+    }
+
 
     @Data
     public static class JSONStr{

@@ -1069,6 +1069,9 @@ public class ModifyOrderService {
 		if (initOrderCouponList != null && !initOrderCouponList.isEmpty()) {
 			couponMap = initOrderCouponList.stream().collect(Collectors.toMap(OrderCouponEntity::getCouponType, initCoupon -> initCoupon));
 		}
+		// 修改种类
+		List<OrderChangeItemDTO> changeItemList = modifyOrderDTO.getChangeItemList();
+		List<String> changeCodeList = modifyOrderConfirmService.listChangeCode(changeItemList);
 		// 获取车主券抵扣
 		OrderCouponEntity carOwnerCouponEntity = couponMap == null ? null:couponMap.get(CouponTypeEnum.ORDER_COUPON_TYPE_OWNER.getCode());
 		OrderCouponDTO ownerCoupon = getOwnerCoupon(costBaseDTO, renterOrderReqVO, surplusRentAmt, carOwnerCouponEntity);
@@ -1089,9 +1092,6 @@ public class ModifyOrderService {
 			int limitRedAmt = limitRedSubsidy.getSubsidyAmount() == null ? 0:limitRedSubsidy.getSubsidyAmount();
 			surplusRentAmt = surplusRentAmt - limitRedAmt;
 		}
-		// 修改种类
-		List<OrderChangeItemDTO> changeItemList = modifyOrderDTO.getChangeItemList();
-		List<String> changeCodeList = modifyOrderConfirmService.listChangeCode(changeItemList);
 		// 获取取还车券抵扣
 		OrderCouponDTO getCarFeeCoupon = null;
 		if (changeCodeList != null && !changeCodeList.isEmpty() && changeCodeList.contains(OrderChangeItemEnum.MODIFY_GETRETURNCOUPON.getCode())) {
