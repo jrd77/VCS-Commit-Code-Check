@@ -275,6 +275,22 @@ public class DeliveryCarInfoPriceService {
         return getReturnResponseVO;
     }
 
+
+    /**
+     * 车主平台加油服务费
+     * @return
+     */
+    public int getOwnerPlatFormOilServiceCharge(Integer ownerReturnOil,Integer renterGetOil){
+        try {
+            if (MathUtil.sub((ownerReturnOil / 16), 0.25d) <= 0 && renterGetOil > ownerReturnOil) {
+                return 25;
+            }
+        } catch (Exception e) {
+            log.info("获取平台加油服务费失败");
+        }
+        return 0;
+    }
+
     /**
      * 设置预环境
      */

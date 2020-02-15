@@ -51,4 +51,7 @@ public class OwnerGetAndReturnCarDTO {
     public String carOilServiceCharge;
     @AutoDocProperty("代管车-车主总油费")
     public String carOwnerOilCrash;
+    @AutoDocProperty("车主总油费")
+    public String carOwnerAllOilCrash;
+
 }
