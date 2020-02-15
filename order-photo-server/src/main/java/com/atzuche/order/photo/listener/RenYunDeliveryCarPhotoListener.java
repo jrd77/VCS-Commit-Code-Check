@@ -26,7 +26,7 @@ import java.util.Objects;
 public class RenYunDeliveryCarPhotoListener {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RenYunDeliveryCarPhotoListener.class);
-    private static final String REN_YUN_DELIVERY_CAR_PHOTO = "ren_yun_delivery_car_photo_queue";
+    private static final String REN_YUN_DELIVERY_CAR_PHOTO = "ren_yun_delivery_car_photo_queue1";
 
     @Autowired
     OrderPhotoService orderPhotoService;
@@ -48,17 +48,13 @@ public class RenYunDeliveryCarPhotoListener {
             orderPhotoEntity.setPath(deliveryCarConditionPhotoVO.getPath());
             orderPhotoEntity.setUserType(String.valueOf(deliveryCarConditionPhotoVO.getUserType()));
             orderPhotoEntity.setPhotoType(String.valueOf(deliveryCarConditionPhotoVO.getPhotoType()));
-            if(Objects.nonNull(deliveryCarConditionPhotoVO.getSerialNumber()))
-            {
-                //更新
-                OrderPhotoEntity orderPhoto = orderPhotoService.selectObjectByParams(orderPhotoEntity);
-                if(Objects.nonNull(orderPhoto))
-                {
-                    BeanUtils.copyProperties(orderPhotoEntity,orderPhoto);
-                    orderPhoto.setOperator("仁云传过来");
-                    orderPhotoService.updateDeliveryCarPhotoInfo(orderPhoto.getId(),orderPhoto.getPath(),orderPhoto.getOperator(),orderPhoto.getUserType(),orderPhoto.getPhotoType());
-                }
-            }else {
+            //更新
+            OrderPhotoEntity orderPhoto = orderPhotoService.selectObjectByParams(orderPhotoEntity);
+            if (Objects.nonNull(orderPhoto)) {
+                BeanUtils.copyProperties(orderPhotoEntity, orderPhoto);
+                orderPhoto.setOperator("仁云传过来");
+                orderPhotoService.updateDeliveryCarPhotoInfo(orderPhoto.getId(), orderPhoto.getPath(), orderPhoto.getOperator(), orderPhoto.getUserType(), orderPhoto.getPhotoType());
+            } else {
                 orderPhotoEntity.setSerialNumber(0);
                 orderPhotoService.recevieRenYunDeliveryCarPhoto(orderPhotoEntity);
             }
