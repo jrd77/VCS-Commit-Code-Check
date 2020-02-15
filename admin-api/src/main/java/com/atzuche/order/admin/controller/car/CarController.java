@@ -83,7 +83,9 @@ public class CarController {
         if(Objects.nonNull(ownerGoodsEntity) && Objects.nonNull(ownerGoodsEntity.getCarGuidePrice())){
             carBusiness.setGuidePrice(ownerGoodsEntity.getCarGuidePrice());
         }
-        //modelTxt TODO
+        if(Objects.nonNull(ownerGoodsEntity) && Objects.nonNull(ownerGoodsEntity.getModelTxt())){
+            carBusiness.setModelTxt(ownerGoodsEntity.getModelTxt());
+        }
         if(Objects.nonNull(ownerGoodsEntity) && Objects.nonNull(ownerGoodsEntity.getYear())){
             carBusiness.setYear(Integer.valueOf(ownerGoodsEntity.getYear()));
         }

@@ -317,7 +317,8 @@ public class RenterGoodsDetailDTO {
 
     @AutoDocProperty(value="最新公里数")
     private Integer lastMileage;
-
+    @AutoDocProperty("型号")
+    private String modelTxt;
 
 
 }
