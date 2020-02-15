@@ -128,9 +128,9 @@ public class DeliveryCarInfoPriceService {
             BeanUtils.copyProperties(ownerGetAndReturnCarDO, renterGetAndReturnCarDTO);
             return DeliveryOilCostVO.builder().ownerGetAndReturnCarDTO(ownerGetAndReturnCarDTO).renterGetAndReturnCarDTO(renterGetAndReturnCarDTO).build();
         } catch (DeliveryOrderException e) {
-            log.info("获取油费等数据发生业务异常：{}", e.getErrorMsg());
+            log.error("获取油费等数据发生业务异常：", e);
         } catch (Exception ex) {
-            log.info("获取油费等数据发生异常：{}", ex.getMessage());
+            log.error("获取油费等数据发生异常：", ex);
             Cat.logError("获取油费等数据发生异常",ex);
         }
         return DeliveryOilCostVO.builder().build();
@@ -150,7 +150,7 @@ public class DeliveryCarInfoPriceService {
             double originCarLat = Double.valueOf(renterOrderDeliveryEntity.getOwnerGetReturnAddrLon()).doubleValue();
             return CommonUtils.calcDistance(carLat, carLng, originCarLon, originCarLat);
         } catch (Exception e) {
-            log.info("换算取还车距离失败，cause:{}", e.getMessage());
+            log.info("换算取还车距离失败，cause:", e);
             return 0d;
         }
     }
