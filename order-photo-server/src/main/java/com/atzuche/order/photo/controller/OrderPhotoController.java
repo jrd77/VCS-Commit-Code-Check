@@ -3,22 +3,22 @@ package com.atzuche.order.photo.controller;
 
 import com.atzuche.order.photo.common.AdminUserUtil;
 import com.atzuche.order.photo.dto.OrderPhotoDTO;
+import com.atzuche.order.photo.dto.TransIllegalPhotoDTO;
 import com.atzuche.order.photo.enums.UserTypeEnum;
 import com.atzuche.order.photo.exception.OrderPhotoException;
 import com.atzuche.order.photo.service.OrderPhotoService;
 import com.atzuche.order.photo.util.oss.PicUtils;
-import com.atzuche.order.photo.vo.req.OrderDeleteRequestVO;
-import com.atzuche.order.photo.vo.req.OrderRequestVO;
-import com.atzuche.order.photo.vo.req.OrderUpdateRequestVO;
-import com.atzuche.order.photo.vo.req.OrderUploadRequestVO;
+import com.atzuche.order.photo.vo.req.*;
 import com.atzuche.order.photo.vo.resp.OrderPhotoResponseVO;
 import com.atzuche.order.photo.vo.resp.OrderViolationPhotoResponseVO;
+import com.autoyol.commons.utils.GsonUtils;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.doc.annotation.AutoDocMethod;
 import com.autoyol.doc.annotation.AutoDocVersion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
@@ -29,6 +29,7 @@ import javax.validation.Valid;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -199,5 +200,22 @@ public class OrderPhotoController{
             throw new OrderPhotoException(ErrorCode.PARAMETER_ERROR.getCode(),bindingResult.getFieldError().getDefaultMessage());
         }
     }
+    @Autowired
+	RabbitTemplate rabbitTemplate;
+
+	@GetMapping("/get")
+	@AutoDocMethod(description = "变更订单照片", value = "变更订单照片", response = ResponseData.class)
+	public void update()
+	{
+		DeliveryCarConditionPhotoVO transIllegalPhotoDTO = new DeliveryCarConditionPhotoVO();
+		transIllegalPhotoDTO.setUserType(1);
+		transIllegalPhotoDTO.setOrderNo(42139241200299L);
+		transIllegalPhotoDTO.setPath("42139241200299/1581668490412.jpg");
+		transIllegalPhotoDTO.setCreateTime(new Date());
+		transIllegalPhotoDTO.setPhotoType(1L);
+		transIllegalPhotoDTO.setSerialNumber(1);
+		transIllegalPhotoDTO.setUpdateTime(new Date());
+		rabbitTemplate.convertAndSend("ren_yun_delivery_car_photo_queue1",GsonUtils.toJson(transIllegalPhotoDTO));
+	}
 
 }

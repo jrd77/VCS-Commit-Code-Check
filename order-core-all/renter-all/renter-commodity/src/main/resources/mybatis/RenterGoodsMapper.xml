@@ -479,6 +479,10 @@
         select car_plate_num from renter_goods where order_no = #{orderNo} and is_delete = 0 order by id desc limit 1
     </select>
 
+    <select id="queryInfoByOrderNo" resultMap="BaseResultMap" parameterType="java.lang.String">
+        select * from renter_goods where order_no = #{orderNo} and is_delete = 0 order by id desc limit 1
+    </select>
+
     <select id="queryCarInfoByOrderNoAndCarNo" resultMap="BaseResultMap">
         select * from renter_goods where order_no = #{orderNo} and car_no = #{carNo} and is_delete = 0 order by id desc limit 1
     </select>

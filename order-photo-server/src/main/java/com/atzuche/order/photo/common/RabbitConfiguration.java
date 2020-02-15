@@ -62,14 +62,14 @@ public class RabbitConfiguration {
         return new Queue("ren_yun_delivery_car_photo_queue1", true);
     }
 
-    @Bean
-    public DirectExchange renYunDeliveryCarPhotoExchange() {
-        return new DirectExchange(DEFAULT_EXCHANGE);
-    }
-
-    @Bean
-    public Binding renYunDeliveryCarPhotoBind() {
-        return BindingBuilder.bind(renYunDeliveryCarPhotoQueue()).to(renYunDeliveryCarPhotoExchange()).with("routingKey_"+renYunDeliveryCarPhotoQueue().getName());
-    }
+//    @Bean
+//    public DirectExchange renYunDeliveryCarPhotoExchange() {
+//        return new DirectExchange(DEFAULT_EXCHANGE);
+//    }
+//
+//    @Bean
+//    public Binding renYunDeliveryCarPhotoBind() {
+//        return BindingBuilder.bind(renYunDeliveryCarPhotoQueue()).to(renYunDeliveryCarPhotoExchange()).with("routingKey_"+renYunDeliveryCarPhotoQueue().getName());
+//    }
 
 }

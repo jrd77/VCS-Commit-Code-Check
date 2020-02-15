@@ -179,37 +179,54 @@ public class RabbitConfiguration {
 	}
 
 	@Bean
-	public DirectExchange handoverCarMilegeExchange() {
-		return new DirectExchange(DEFAULT_EXCHANGE);
-	}
-
-	@Bean
-	public Binding handoverCarMilegeBind() {
-		return BindingBuilder.bind(handoverCarMilegeQueue()).to(handoverCarMilegeExchange()).with("routingKey"+ handoverCarMilegeQueue().getName());
-	}
-	@Bean
 	public Queue handoverCarRenYunMilegeQueue(){
 		return new Queue("handover_car_renYun_oil_queue",true);
 	}
 
+
 	@Bean
-	public DirectExchange handoverCarRenYunMilegeExchange() {
-		return new DirectExchange(DEFAULT_EXCHANGE);
+	public Queue orderPreReturnCarQueue() {
+		return new Queue(RabbitMqEnums.ORDER_PRERETURNCAR.getQueueName(), true);
 	}
 
 	@Bean
-	public Binding handoverCarRenYunMilegeBind() {
-		return BindingBuilder.bind(handoverCarRenYunMilegeQueue()).to(handoverCarRenYunMilegeExchange()).with("routingKey"+ handoverCarRenYunMilegeQueue().getName());
+	public TopicExchange orderPreReturnCarExchange() {
+		return new TopicExchange(RabbitMqEnums.ORDER_PRERETURNCAR.getExchange());
 	}
 
 	@Bean
-	public DirectExchange handoverCarQueueExchange() {
-		return new DirectExchange(DEFAULT_EXCHANGE);
+	public Binding orderPreReturnCarBind() {
+		return BindingBuilder.bind(orderPreReturnCarQueue()).to(orderPreReturnCarExchange()).with(RabbitMqEnums.ORDER_PRERETURNCAR.getRoutingKey());
 	}
 
 	@Bean
-	public Binding handoverCarQueueBind() {
-		return BindingBuilder.bind(handoverCarQueue()).to(handoverCarQueueExchange()).with("routingKey"+ handoverCarQueue().getName());
+	public Queue orderPreSettlementQueue() {
+		return new Queue(RabbitMqEnums.ORDER_PRESETTLEMENT.getQueueName(), true);
+	}
+
+	@Bean
+	public TopicExchange orderPreSettlementExchange() {
+		return new TopicExchange(RabbitMqEnums.ORDER_PRESETTLEMENT.getExchange());
+	}
+
+	@Bean
+	public Binding orderPreSettlementBind() {
+		return BindingBuilder.bind(orderPreSettlementQueue()).to(orderPreSettlementExchange()).with(RabbitMqEnums.ORDER_PRESETTLEMENT.getRoutingKey());
+	}
+
+	@Bean
+	public Queue orderEndQueue() {
+		return new Queue(RabbitMqEnums.ORDER_END.getQueueName(), true);
+	}
+
+	@Bean
+	public TopicExchange orderEndExchange() {
+		return new TopicExchange(RabbitMqEnums.ORDER_END.getExchange());
+	}
+
+	@Bean
+	public Binding orderEndBind() {
+		return BindingBuilder.bind(orderEndQueue()).to(orderEndExchange()).with(RabbitMqEnums.ORDER_END.getRoutingKey());
 	}
 
 }

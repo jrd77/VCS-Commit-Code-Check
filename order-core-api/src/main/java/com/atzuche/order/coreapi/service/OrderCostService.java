@@ -12,6 +12,8 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.atzuche.order.accountownerincome.entity.AccountOwnerIncomeExamineEntity;
+import com.atzuche.order.accountownerincome.service.notservice.AccountOwnerIncomeExamineNoTService;
 import com.atzuche.order.accountrenterdeposit.service.AccountRenterDepositService;
 import com.atzuche.order.accountrenterdeposit.vo.res.AccountRenterDepositResVO;
 import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostDetailEntity;
@@ -100,6 +102,8 @@ public class OrderCostService {
 	private RenterDepositDetailService renterDepositDetailService;
 	@Autowired
 	private OrderConsoleCostDetailService orderConsoleCostDetailService;
+	@Autowired
+	private AccountOwnerIncomeExamineNoTService accountOwnerIncomeExamineNoTService;
 	
 	public OrderRenterCostResVO orderCostRenterGet(OrderCostReqVO req){
 		OrderRenterCostResVO resVo = new OrderRenterCostResVO();
@@ -412,6 +416,13 @@ public class OrderCostService {
 		      }
 			resVo.setOrderConsoleCostDetails(consoleCostLstReal);
 			
+			///车主的结算后收益 200215
+			AccountOwnerIncomeExamineEntity examine = accountOwnerIncomeExamineNoTService.getAccountOwnerIncomeExamineByOrderNo(orderNo);
+			int ownerCostAmtSettleAfter = 0;
+			if(examine != null) {
+				ownerCostAmtSettleAfter = examine.getAmt().intValue();
+			}
+			resVo.setOwnerCostAmtSettleAfter(ownerCostAmtSettleAfter);
 		
 		return resVo;
 	}
@@ -570,16 +581,19 @@ public class OrderCostService {
 	    /**
 	     * 获取车主油费
 	     */
+		 int oilDifferenceCrashAmt = 0;
 	     OwnerGetAndReturnCarDTO renterOrderCostDetail = ownerCosts.getOwnerGetAndReturnCarDTO();  //海豹命名错误
-	     OwnerOrderPurchaseDetailEntity renterOrderCostDetailReal = null;
+//	     OwnerOrderPurchaseDetailEntity renterOrderCostDetailReal = null;
 	     if(renterOrderCostDetail != null) {
-	    	 renterOrderCostDetailReal = new OwnerOrderPurchaseDetailEntity();
-	    	 BeanUtils.copyProperties(renterOrderCostDetail,renterOrderCostDetailReal);
+//	    	 renterOrderCostDetailReal = new OwnerOrderPurchaseDetailEntity();
+//	    	 BeanUtils.copyProperties(renterOrderCostDetail,renterOrderCostDetailReal);  //不具备copy
              String oilDifferenceCrash = renterOrderCostDetail.getOilDifferenceCrash();
              oilDifferenceCrash = StringUtil.isBlank(oilDifferenceCrash)?"0":oilDifferenceCrash;
-             renterOrderCostDetailReal.setTotalAmount(Integer.valueOf(oilDifferenceCrash));
+//             renterOrderCostDetailReal.setTotalAmount(Integer.valueOf(oilDifferenceCrash));
+             oilDifferenceCrashAmt = Integer.valueOf(oilDifferenceCrash);
 	     }
-	     resVo.setOwnerOrderCostDetail(renterOrderCostDetailReal);
+//	     resVo.setOwnerOrderCostDetail(renterOrderCostDetailReal);
+	     resVo.setOwnerOilDifferenceCrashAmt(oilDifferenceCrashAmt);
 	    
 	     /*车主预计收益*/
 	     resVo.setOwnerCostAmtFinal(ownerCosts.getOwnerCostAmtFinal());
