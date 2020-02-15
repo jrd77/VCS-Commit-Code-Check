@@ -74,4 +74,10 @@ public class CancelOrderResDTO {
      */
     private LocalDateTime revertTime ;
 
+    /**
+     * 订单状态
+     */
+    private Integer status;
+
+
 }

@@ -74,6 +74,7 @@ public class OrderDispatchCancelHandleService {
         cancelOrderResDTO.setRenterOrderNo(renterOrderEntity.getRenterOrderNo());
         cancelOrderResDTO.setSrvGetFlag(null != renterOrderEntity.getIsGetCar() && renterOrderEntity.getIsGetCar() == 1);
         cancelOrderResDTO.setSrvReturnFlag(null != renterOrderEntity.getIsReturnCar() && renterOrderEntity.getIsReturnCar() == 1);
+        cancelOrderResDTO.setStatus(orderStatusDTO.getStatus());
         return cancelOrderResDTO;
     }
 }
