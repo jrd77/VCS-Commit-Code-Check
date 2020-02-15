@@ -1,6 +1,9 @@
 package com.atzuche.order.admin.vo.req;
 
 import com.autoyol.doc.annotation.AutoDocProperty;
+
+import lombok.Data;
+
 import org.hibernate.validator.constraints.NotBlank;
 
 import javax.validation.constraints.NotNull;
@@ -9,6 +12,7 @@ import javax.validation.constraints.NotNull;
  * @author <a href="mailto:lianglin.sjtu@gmail.com">AndySjtu</a>
  * @date 2020/2/13 7:52 下午
  **/
+@Data
 public class FienAmtUpdateReqVO {
     @NotBlank(message = "订单号不能为空")
 //    @NotNull(message = "订单号不能为空")

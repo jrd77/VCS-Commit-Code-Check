@@ -689,15 +689,15 @@ public class OrderCostDetailService {
 //        }
         
         
-        //封装数据
+        //封装数据  显示的时候需要显示正数，保存为负数
         RenterToPlatformVO resVo = new RenterToPlatformVO();
-        resVo.setOliAmt(String.valueOf(oil));
-        resVo.setTimeOut(String.valueOf(timeOut));
-        resVo.setModifyOrderTimeAndAddrAmt(String.valueOf(modifyOrderTimeAndAddrAmt));
-        resVo.setCarWash(String.valueOf(carWash));
-        resVo.setDlayWait(String.valueOf(dlayWait));
-        resVo.setStopCar(String.valueOf(stopCar));
-        resVo.setExtraMileage(String.valueOf(extraMileage));
+        resVo.setOliAmt(String.valueOf(NumberUtils.convertNumberToZhengshu(oil)));
+        resVo.setTimeOut(String.valueOf(NumberUtils.convertNumberToZhengshu(timeOut)));
+        resVo.setModifyOrderTimeAndAddrAmt(String.valueOf(NumberUtils.convertNumberToZhengshu(modifyOrderTimeAndAddrAmt)));
+        resVo.setCarWash(String.valueOf(NumberUtils.convertNumberToZhengshu(carWash)));
+        resVo.setDlayWait(String.valueOf(NumberUtils.convertNumberToZhengshu(dlayWait)));
+        resVo.setStopCar(String.valueOf(NumberUtils.convertNumberToZhengshu(stopCar)));
+        resVo.setExtraMileage(String.valueOf(NumberUtils.convertNumberToZhengshu(extraMileage)));
 		return resVo;
 	}
 	
@@ -732,7 +732,7 @@ public class OrderCostDetailService {
 		 String userName = AdminUserUtil.getAdminUser().getAuthName();  //获取的管理后台的用户名。
 
 		if(StringUtils.isNotBlank(oliAmt)) {
-			OrderConsoleCostDetailEntity record = orderConsoleCostDetailService.buildData(costBaseDTO, Integer.valueOf(oliAmt), target, source, ConsoleCashCodeEnum.RENTER_OIL_FEE);
+			OrderConsoleCostDetailEntity record = orderConsoleCostDetailService.buildData(costBaseDTO, -Integer.valueOf(oliAmt), target, source, ConsoleCashCodeEnum.RENTER_OIL_FEE);
 			//
 			record.setCreateOp(userName);
 			record.setUpdateOp(userName);
@@ -745,7 +745,7 @@ public class OrderCostDetailService {
 		}
 		
 		if(StringUtils.isNotBlank(timeOut)) {
-			OrderConsoleCostDetailEntity record = orderConsoleCostDetailService.buildData(costBaseDTO, Integer.valueOf(timeOut), target, source, ConsoleCashCodeEnum.RENTER_TIME_OUT);
+			OrderConsoleCostDetailEntity record = orderConsoleCostDetailService.buildData(costBaseDTO, -Integer.valueOf(timeOut), target, source, ConsoleCashCodeEnum.RENTER_TIME_OUT);
 			//
 			record.setCreateOp(userName);
 			record.setUpdateOp(userName);
@@ -758,7 +758,7 @@ public class OrderCostDetailService {
 		}
 		
 		if(StringUtils.isNotBlank(modifyOrderTimeAndAddrAmt)) {
-			OrderConsoleCostDetailEntity record = orderConsoleCostDetailService.buildData(costBaseDTO, Integer.valueOf(modifyOrderTimeAndAddrAmt), target, source, ConsoleCashCodeEnum.RENTER_MODIFY_ADDR_TIME);
+			OrderConsoleCostDetailEntity record = orderConsoleCostDetailService.buildData(costBaseDTO, -Integer.valueOf(modifyOrderTimeAndAddrAmt), target, source, ConsoleCashCodeEnum.RENTER_MODIFY_ADDR_TIME);
 			//
 			record.setCreateOp(userName);
 			record.setUpdateOp(userName);
@@ -771,7 +771,7 @@ public class OrderCostDetailService {
 		}
 		
 		if(StringUtils.isNotBlank(carWash)) {
-			OrderConsoleCostDetailEntity record = orderConsoleCostDetailService.buildData(costBaseDTO, Integer.valueOf(carWash), target, source, ConsoleCashCodeEnum.RENTER_CAR_WASH);
+			OrderConsoleCostDetailEntity record = orderConsoleCostDetailService.buildData(costBaseDTO, -Integer.valueOf(carWash), target, source, ConsoleCashCodeEnum.RENTER_CAR_WASH);
 			//
 			record.setCreateOp(userName);
 			record.setUpdateOp(userName);
@@ -784,7 +784,7 @@ public class OrderCostDetailService {
 		}
 		
 		if(StringUtils.isNotBlank(dlayWait)) {
-			OrderConsoleCostDetailEntity record = orderConsoleCostDetailService.buildData(costBaseDTO, Integer.valueOf(dlayWait), target, source, ConsoleCashCodeEnum.RENTER_DLAY_WAIT);
+			OrderConsoleCostDetailEntity record = orderConsoleCostDetailService.buildData(costBaseDTO, -Integer.valueOf(dlayWait), target, source, ConsoleCashCodeEnum.RENTER_DLAY_WAIT);
 			//
 			record.setCreateOp(userName);
 			record.setUpdateOp(userName);
@@ -797,7 +797,7 @@ public class OrderCostDetailService {
 		}
 		
 		if(StringUtils.isNotBlank(stopCar)) {
-			OrderConsoleCostDetailEntity record = orderConsoleCostDetailService.buildData(costBaseDTO, Integer.valueOf(stopCar), target, source, ConsoleCashCodeEnum.RENTER_STOP_CAR);
+			OrderConsoleCostDetailEntity record = orderConsoleCostDetailService.buildData(costBaseDTO, -Integer.valueOf(stopCar), target, source, ConsoleCashCodeEnum.RENTER_STOP_CAR);
 			//
 			record.setCreateOp(userName);
 			record.setUpdateOp(userName);
@@ -810,7 +810,7 @@ public class OrderCostDetailService {
 		}
 		
 		if(StringUtils.isNotBlank(extraMileage)) {
-			OrderConsoleCostDetailEntity record = orderConsoleCostDetailService.buildData(costBaseDTO, Integer.valueOf(extraMileage), target, source, ConsoleCashCodeEnum.RENTER_EXTRA_MILEAGE);
+			OrderConsoleCostDetailEntity record = orderConsoleCostDetailService.buildData(costBaseDTO, -Integer.valueOf(extraMileage), target, source, ConsoleCashCodeEnum.RENTER_EXTRA_MILEAGE);
 			//
 			record.setCreateOp(userName);
 			record.setUpdateOp(userName);
@@ -856,7 +856,7 @@ public class OrderCostDetailService {
 			 String userName = AdminUserUtil.getAdminUser().getAuthName();  //获取的管理后台的用户名。
 			 
 			if(StringUtils.isNotBlank(oliAmt)) {
-				OrderConsoleCostDetailEntity record = orderConsoleCostDetailService.buildData(costBaseDTO, Integer.valueOf(oliAmt), target, source, ConsoleCashCodeEnum.OIL_FEE);
+				OrderConsoleCostDetailEntity record = orderConsoleCostDetailService.buildData(costBaseDTO, -Integer.valueOf(oliAmt), target, source, ConsoleCashCodeEnum.OIL_FEE);
 				//
 				record.setCreateOp(userName);
 				record.setUpdateOp(userName);
@@ -869,7 +869,7 @@ public class OrderCostDetailService {
 			}
 			
 			if(StringUtils.isNotBlank(timeOut)) {
-				OrderConsoleCostDetailEntity record = orderConsoleCostDetailService.buildData(costBaseDTO, Integer.valueOf(timeOut), target, source, ConsoleCashCodeEnum.TIME_OUT);
+				OrderConsoleCostDetailEntity record = orderConsoleCostDetailService.buildData(costBaseDTO, -Integer.valueOf(timeOut), target, source, ConsoleCashCodeEnum.TIME_OUT);
 				//
 				record.setCreateOp(userName);
 				record.setUpdateOp(userName);
@@ -882,7 +882,7 @@ public class OrderCostDetailService {
 			}
 			
 			if(StringUtils.isNotBlank(modifyOrderTimeAndAddrAmt)) {
-				OrderConsoleCostDetailEntity record = orderConsoleCostDetailService.buildData(costBaseDTO, Integer.valueOf(modifyOrderTimeAndAddrAmt), target, source, ConsoleCashCodeEnum.MODIFY_ADDR_TIME);
+				OrderConsoleCostDetailEntity record = orderConsoleCostDetailService.buildData(costBaseDTO, -Integer.valueOf(modifyOrderTimeAndAddrAmt), target, source, ConsoleCashCodeEnum.MODIFY_ADDR_TIME);
 				//
 				record.setCreateOp(userName);
 				record.setUpdateOp(userName);
@@ -895,7 +895,7 @@ public class OrderCostDetailService {
 			}
 			
 			if(StringUtils.isNotBlank(carWash)) {
-				OrderConsoleCostDetailEntity record = orderConsoleCostDetailService.buildData(costBaseDTO, Integer.valueOf(carWash), target, source, ConsoleCashCodeEnum.CAR_WASH);
+				OrderConsoleCostDetailEntity record = orderConsoleCostDetailService.buildData(costBaseDTO, -Integer.valueOf(carWash), target, source, ConsoleCashCodeEnum.CAR_WASH);
 				//
 				record.setCreateOp(userName);
 				record.setUpdateOp(userName);
@@ -908,7 +908,7 @@ public class OrderCostDetailService {
 			}
 			
 			if(StringUtils.isNotBlank(dlayWait)) {
-				OrderConsoleCostDetailEntity record = orderConsoleCostDetailService.buildData(costBaseDTO, Integer.valueOf(dlayWait), target, source, ConsoleCashCodeEnum.DLAY_WAIT);
+				OrderConsoleCostDetailEntity record = orderConsoleCostDetailService.buildData(costBaseDTO, -Integer.valueOf(dlayWait), target, source, ConsoleCashCodeEnum.DLAY_WAIT);
 				//
 				record.setCreateOp(userName);
 				record.setUpdateOp(userName);
@@ -921,7 +921,7 @@ public class OrderCostDetailService {
 			}
 			
 			if(StringUtils.isNotBlank(stopCar)) {
-				OrderConsoleCostDetailEntity record = orderConsoleCostDetailService.buildData(costBaseDTO, Integer.valueOf(stopCar), target, source, ConsoleCashCodeEnum.STOP_CAR);
+				OrderConsoleCostDetailEntity record = orderConsoleCostDetailService.buildData(costBaseDTO, -Integer.valueOf(stopCar), target, source, ConsoleCashCodeEnum.STOP_CAR);
 				//
 				record.setCreateOp(userName);
 				record.setUpdateOp(userName);
@@ -934,7 +934,7 @@ public class OrderCostDetailService {
 			}
 			
 			if(StringUtils.isNotBlank(extraMileage)) {
-				OrderConsoleCostDetailEntity record = orderConsoleCostDetailService.buildData(costBaseDTO, Integer.valueOf(extraMileage), target, source, ConsoleCashCodeEnum.EXTRA_MILEAGE);
+				OrderConsoleCostDetailEntity record = orderConsoleCostDetailService.buildData(costBaseDTO, -Integer.valueOf(extraMileage), target, source, ConsoleCashCodeEnum.EXTRA_MILEAGE);
 				//
 				record.setCreateOp(userName);
 				record.setUpdateOp(userName);
