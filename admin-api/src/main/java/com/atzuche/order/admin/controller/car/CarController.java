@@ -12,6 +12,8 @@ import com.atzuche.order.commons.LocalDateTimeUtils;
 import com.atzuche.order.commons.ResponseCheckUtil;
 import com.atzuche.order.open.service.FeignRenterGoodsService;
 import com.atzuche.order.open.vo.RenterGoodWithoutPriceVO;
+import com.atzuche.order.owner.commodity.entity.OwnerGoodsEntity;
+import com.atzuche.order.owner.commodity.service.OwnerGoodsService;
 import com.autoyol.car.api.feign.api.CarDetailQueryFeignApi;
 import com.autoyol.car.api.model.vo.CarBaseVO;
 import com.autoyol.car.api.model.vo.ResponseObject;
@@ -28,6 +30,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.Objects;
 
 
 @RestController
@@ -35,7 +38,8 @@ import javax.validation.Valid;
 public class CarController {
 
     private  Logger logger = LoggerFactory.getLogger(getClass());
-
+    @Autowired
+    private OwnerGoodsService ownerGoodsService;
     @Autowired
     private CarProxyService carProxyService;
     @Autowired
@@ -50,7 +54,10 @@ public class CarController {
         carBusiness.setGps(renterGoodWithoutPriceVO.getGpsSerialNumber());
         carBusiness.setDayMileage(renterGoodWithoutPriceVO.getCarDayMileage());
         carBusiness.setEngineNum(renterGoodWithoutPriceVO.getEngineNum());
-        carBusiness.setLicenseExpire(LocalDateTimeUtils.localDateTimeToDate(renterGoodWithoutPriceVO.getLicenseExpire()));
+        OwnerGoodsEntity ownerGoodsEntity = ownerGoodsService.getLastOwnerGoodsByOrderNo(orderNo);
+        if(Objects.nonNull(ownerGoodsEntity) && Objects.nonNull(ownerGoodsEntity.getLicenseExpire())){
+            carBusiness.setLicenseExpire(LocalDateTimeUtils.localDateTimeToDate(ownerGoodsEntity.getLicenseExpire()));
+        }
 
         return ResponseData.success(carBusiness);
     }
