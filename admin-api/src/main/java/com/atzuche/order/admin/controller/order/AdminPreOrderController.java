@@ -8,11 +8,14 @@ import com.atzuche.order.admin.vo.resp.order.PreOrderAdminResponseVO;
 import com.atzuche.order.car.CarProxyService;
 import com.atzuche.order.coin.service.AutoCoinProxyService;
 import com.atzuche.order.commons.BindingResultUtil;
+import com.atzuche.order.commons.GlobalConstant;
+import com.atzuche.order.commons.LocalDateTimeUtils;
 import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
 import com.atzuche.order.commons.entity.dto.RenterGoodsPriceDetailDTO;
 import com.atzuche.order.commons.exceptions.InputErrorException;
 import com.atzuche.order.commons.vo.req.NormalOrderCostCalculateReqVO;
 import com.atzuche.order.wallet.WalletProxyService;
+import com.autoyol.car.api.model.vo.CarPriceOfDayVO;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
 import com.atzuche.order.mem.MemProxyService;
@@ -99,24 +102,30 @@ public class AdminPreOrderController {
         carDetailReqVO.setRentTime(rentTime);
         carDetailReqVO.setRevertTime(revertTime);
 
-        RenterGoodsDetailDTO renterGoodsDetailDTO = carProxyService.getRenterGoodsDetail(carDetailReqVO);
+        CarProxyService.CarPriceDetail carPriceDetail = carProxyService.getCarPriceDetail(carDetailReqVO);
 
-        responseVO.setCarPlatNo(renterGoodsDetailDTO.getCarPlateNum());
-        List<RenterGoodsPriceDetailDTO> renterGoodsPriceDetailDTOList = renterGoodsDetailDTO.getRenterGoodsPriceDetailDTOList();
+//        RenterGoodsDetailDTO renterGoodsDetailDTO = carProxyService.getRenterGoodsDetail(carDetailReqVO);
+//
+        responseVO.setCarPlatNo(carPriceDetail.getPlateNum());
+        List<CarPriceOfDayVO> renterGoodsPriceDetailDTOList = carPriceDetail.getCarPriceOfDayVOList();
 
         List<PreOrderAdminResponseVO.CarDayPrice> carDayPrices = new ArrayList<>();
 
-        for(RenterGoodsPriceDetailDTO dto:renterGoodsPriceDetailDTOList){
-            logger.info("dto is {}",dto);
+        for(CarPriceOfDayVO dto:renterGoodsPriceDetailDTOList){
             PreOrderAdminResponseVO.CarDayPrice carDayPrice = new PreOrderAdminResponseVO.CarDayPrice();
-            carDayPrice.setDay(dto.getCarDay().toString());
-            carDayPrice.setPrice(dto.getCarUnitPrice().toString());
-            if(isWorkDay(dto.getCarDay())) {
+            carDayPrice.setDay(dto.getDateStr());
+            carDayPrice.setPrice(String.valueOf(dto.getPrice()));
+            if(isWorkDay(LocalDateTimeUtils.parseStringToLocalDate(dto.getDateStr(), GlobalConstant.FORMAT_DATE_STR))) {
                 carDayPrice.setDesc("工作日");
             }else{
                 carDayPrice.setDesc("周末");
             }
-            carDayPrices.add(carDayPrice);
+            if(dto.getPrice().equals(dto.getHolidayPrice())||dto.getPrice().equals(dto.getDayPrice())) {
+                logger.info("无特供价");
+            }
+            else{
+                carDayPrices.add(carDayPrice);
+            }
         }
 
         responseVO.setCarSpecialDayPrices(carDayPrices);

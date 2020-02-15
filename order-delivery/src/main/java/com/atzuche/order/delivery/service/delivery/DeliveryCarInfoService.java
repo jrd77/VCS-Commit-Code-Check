@@ -326,7 +326,7 @@ public class DeliveryCarInfoService {
             mileageAmtDTO.setCostBaseDTO(costBaseDTO);
             return deliveryCarInfoPriceService.getMileageAmtEntity(mileageAmtDTO).getTotalFee();
         } catch (Exception e) {
-            log.error("获取超历程失败原因：{}", e.getMessage());
+            log.error("获取超历程失败原因:", e.getMessage());
             return 0;
         }
 
