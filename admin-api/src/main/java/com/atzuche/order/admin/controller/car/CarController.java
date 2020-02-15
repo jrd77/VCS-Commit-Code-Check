@@ -55,8 +55,55 @@ public class CarController {
         carBusiness.setDayMileage(renterGoodWithoutPriceVO.getCarDayMileage());
         carBusiness.setEngineNum(renterGoodWithoutPriceVO.getEngineNum());
         OwnerGoodsEntity ownerGoodsEntity = ownerGoodsService.getLastOwnerGoodsByOrderNo(orderNo);
+        //从owner_goods 表取已有数据
         if(Objects.nonNull(ownerGoodsEntity) && Objects.nonNull(ownerGoodsEntity.getLicenseExpire())){
             carBusiness.setLicenseExpire(LocalDateTimeUtils.localDateTimeToDate(ownerGoodsEntity.getLicenseExpire()));
+        }
+        if(Objects.nonNull(ownerGoodsEntity) && Objects.nonNull(ownerGoodsEntity.getCarUseType())){
+            carBusiness.setUseType(ownerGoodsEntity.getCarUseType());
+        }
+        if(Objects.nonNull(ownerGoodsEntity) && Objects.nonNull(ownerGoodsEntity.getCarOwnerType())){
+            carBusiness.setOwnerType(ownerGoodsEntity.getCarOwnerType());
+        }
+        if(Objects.nonNull(ownerGoodsEntity) && Objects.nonNull(ownerGoodsEntity.getCarRating())){
+            carBusiness.setRating(ownerGoodsEntity.getCarRating());
+        }
+        if(Objects.nonNull(ownerGoodsEntity) && Objects.nonNull(ownerGoodsEntity.getCarDesc())){
+            carBusiness.setCarDesc(ownerGoodsEntity.getCarDesc());
+        }
+        if(Objects.nonNull(ownerGoodsEntity) && Objects.nonNull(ownerGoodsEntity.getCarRealAddr())){
+            carBusiness.setGetCarAddr(ownerGoodsEntity.getCarRealAddr());
+        }
+        if(Objects.nonNull(ownerGoodsEntity) && Objects.nonNull(ownerGoodsEntity.getFrameNo())){
+            carBusiness.setFrameNo(ownerGoodsEntity.getFrameNo());
+        }
+        if(Objects.nonNull(ownerGoodsEntity) && Objects.nonNull(ownerGoodsEntity.getCarSurplusPrice())){
+            carBusiness.setSurplusPrice(ownerGoodsEntity.getCarSurplusPrice());
+        }
+        if(Objects.nonNull(ownerGoodsEntity) && Objects.nonNull(ownerGoodsEntity.getCarGuidePrice())){
+            carBusiness.setGuidePrice(ownerGoodsEntity.getCarGuidePrice());
+        }
+        //modelTxt TODO
+        if(Objects.nonNull(ownerGoodsEntity) && Objects.nonNull(ownerGoodsEntity.getYear())){
+            carBusiness.setYear(Integer.valueOf(ownerGoodsEntity.getYear()));
+        }
+        if(Objects.nonNull(ownerGoodsEntity) && Objects.nonNull(ownerGoodsEntity.getCarType())){
+            carBusiness.setType(String.valueOf(ownerGoodsEntity.getCarType()));
+        }
+        if(Objects.nonNull(ownerGoodsEntity) && Objects.nonNull(ownerGoodsEntity.getCarTypeTxt())){
+            carBusiness.setTypeTxt(ownerGoodsEntity.getCarTypeTxt());
+        }
+        if(Objects.nonNull(ownerGoodsEntity) && Objects.nonNull(ownerGoodsEntity.getCarBrandTxt())){
+            carBusiness.setBrandTxt(ownerGoodsEntity.getCarBrandTxt());
+        }
+        if(Objects.nonNull(ownerGoodsEntity) && Objects.nonNull(ownerGoodsEntity.getCarRealLat())){
+            carBusiness.setCityLat(Double.valueOf(ownerGoodsEntity.getCarRealLat()));
+        }
+        if(Objects.nonNull(ownerGoodsEntity) && Objects.nonNull(ownerGoodsEntity.getCarRealLon())){
+            carBusiness.setCityLon(Double.valueOf(ownerGoodsEntity.getCarRealLon()));
+        }
+        if(Objects.nonNull(ownerGoodsEntity) && Objects.nonNull(ownerGoodsEntity.getCarPlateNum())){
+            carBusiness.setPlateNum(ownerGoodsEntity.getCarPlateNum());
         }
 
         return ResponseData.success(carBusiness);
