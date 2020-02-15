@@ -141,6 +141,7 @@ public class RenterCancelOrderService {
         cancelOrderResDTO.setSrvGetFlag(null != renterOrderEntity.getIsGetCar() && renterOrderEntity.getIsGetCar() == 1);
         cancelOrderResDTO.setSrvReturnFlag(null != renterOrderEntity.getIsReturnCar() && renterOrderEntity.getIsReturnCar() == 1);
         cancelOrderResDTO.setOwnerCouponNo(null == ownerCouponEntity ? null : ownerCouponEntity.getCouponId());
+        cancelOrderResDTO.setStatus(OrderStatusEnum.CLOSED.getStatus());
         return cancelOrderResDTO;
     }
 

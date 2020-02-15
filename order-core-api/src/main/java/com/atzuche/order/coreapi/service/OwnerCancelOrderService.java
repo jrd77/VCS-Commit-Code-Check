@@ -192,6 +192,7 @@ public class OwnerCancelOrderService {
         cancelOrderResDTO.setCityCode(Integer.valueOf(orderEntity.getCityCode()));
         cancelOrderResDTO.setRentTime(orderEntity.getExpRentTime());
         cancelOrderResDTO.setRevertTime(orderEntity.getExpRevertTime());
+        cancelOrderResDTO.setStatus(orderStatusDTO.getStatus());
         return cancelOrderResDTO;
     }
 

@@ -3,11 +3,15 @@ package com.atzuche.order.coreapi.service;
 import com.atzuche.order.commons.enums.*;
 import com.atzuche.order.coreapi.common.conver.OrderCommonConver;
 import com.atzuche.order.coreapi.entity.dto.CancelOrderResDTO;
+import com.atzuche.order.coreapi.service.mq.OrderActionMqService;
+import com.atzuche.order.coreapi.service.mq.OrderStatusMqService;
 import com.atzuche.order.coreapi.service.remote.StockProxyService;
 import com.atzuche.order.delivery.service.delivery.DeliveryCarService;
 import com.atzuche.order.delivery.vo.delivery.CancelOrderDeliveryVO;
 import com.atzuche.order.parentorder.entity.OrderCancelReasonEntity;
 import com.atzuche.order.settle.service.OrderSettleService;
+import com.autoyol.event.rabbit.neworder.NewOrderMQActionEventEnum;
+import com.autoyol.event.rabbit.neworder.NewOrderMQStatusEventEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +42,10 @@ public class PlatformCancelOrderService {
     private DeliveryCarService deliveryCarService;
     @Autowired
     private OrderCommonConver orderCommonConver;
+    @Autowired
+    private OrderActionMqService orderActionMqService;
+    @Autowired
+    private OrderStatusMqService orderStatusMqService;
 
 
     /**
@@ -70,7 +78,13 @@ public class PlatformCancelOrderService {
                 }
             }
         }
-        //TODO:平台取消消息发送
+        //平台取消消息发送
+        orderActionMqService.sendCancelOrderSuccess(orderNo,null, CancelSourceEnum.PLATFORM, NewOrderMQActionEventEnum.ORDER_DELAY);
+        NewOrderMQStatusEventEnum newOrderMQStatusEventEnum = NewOrderMQStatusEventEnum.ORDER_END;
+        if(cancelOrderRes.getStatus() == OrderStatusEnum.TO_DISPATCH.getStatus()) {
+            newOrderMQStatusEventEnum = NewOrderMQStatusEventEnum.ORDER_PREDISPATCH;
+        }
+        orderStatusMqService.sendOrderStatusByOrderNo(orderNo,null,cancelOrderRes.getStatus(),newOrderMQStatusEventEnum);
     }
 
 

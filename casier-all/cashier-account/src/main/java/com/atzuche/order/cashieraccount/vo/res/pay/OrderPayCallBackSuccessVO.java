@@ -1,5 +1,6 @@
 package com.atzuche.order.cashieraccount.vo.res.pay;
 
+import com.atzuche.order.commons.enums.YesNoEnum;
 import com.autoyol.doc.annotation.AutoDocProperty;
 import lombok.Data;
 
@@ -40,6 +41,11 @@ public class OrderPayCallBackSuccessVO {
      * 租车费用是否 补付 1 是 0 否
      */
     private Integer isPayAgain;
+    /**
+     * 是否发送 订单状态MQ 1 是 0 否
+     * 租车费用  押金 违章押金  都是支付
+     */
+    private YesNoEnum isGetCar;
 
 
 }
