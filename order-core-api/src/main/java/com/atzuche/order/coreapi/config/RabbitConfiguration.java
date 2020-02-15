@@ -179,37 +179,7 @@ public class RabbitConfiguration {
 	}
 
 	@Bean
-	public DirectExchange handoverCarMilegeExchange() {
-		return new DirectExchange(DEFAULT_EXCHANGE);
-	}
-
-	@Bean
-	public Binding handoverCarMilegeBind() {
-		return BindingBuilder.bind(handoverCarMilegeQueue()).to(handoverCarMilegeExchange()).with("routingKey"+ handoverCarMilegeQueue().getName());
-	}
-	@Bean
 	public Queue handoverCarRenYunMilegeQueue(){
 		return new Queue("handover_car_renYun_oil_queue",true);
 	}
-
-	@Bean
-	public DirectExchange handoverCarRenYunMilegeExchange() {
-		return new DirectExchange(DEFAULT_EXCHANGE);
-	}
-
-	@Bean
-	public Binding handoverCarRenYunMilegeBind() {
-		return BindingBuilder.bind(handoverCarRenYunMilegeQueue()).to(handoverCarRenYunMilegeExchange()).with("routingKey"+ handoverCarRenYunMilegeQueue().getName());
-	}
-
-	@Bean
-	public DirectExchange handoverCarQueueExchange() {
-		return new DirectExchange(DEFAULT_EXCHANGE);
-	}
-
-	@Bean
-	public Binding handoverCarQueueBind() {
-		return BindingBuilder.bind(handoverCarQueue()).to(handoverCarQueueExchange()).with("routingKey"+ handoverCarQueue().getName());
-	}
-
 }
