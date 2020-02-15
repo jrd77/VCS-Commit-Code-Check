@@ -94,7 +94,7 @@ public class RetryDeliveryCarService {
             deliveryHttpLogEntity.setReturnStatusType("请求仁云出现问题");
             deliveryHttpLogEntity.setReturnTime(LocalDateTime.now());
             deliveryLogUtil.addDeliveryLog(deliveryHttpLogEntity);
-            log.error("请求仁云失败，失败原因：case:{}", e.getMessage());
+            log.error("请求仁云失败，失败原因：case:", e);
             Cat.logError("请求仁云失败，失败原因：case:" + e.getMessage(), e);
             throw new DeliveryOrderException(DeliveryErrorCode.SEND_REN_YUN_HTTP_ERROR);
         } finally {

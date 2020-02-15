@@ -388,7 +388,7 @@ public class RenterOrderCostCombineService {
                 }
             }
         } catch (Exception e) {
-            log.error("getCarSpecialCoefficientNew ex:",e);
+            log.warn("getCarSpecialCoefficientNew ex:",e.getMessage());
         }
         log.info("calc result carSpecialCoefficient=[{}],brandId=[{}],typeId=[{}]",carSpecialCoefficient,brand,type);
         return carSpecialCoefficient;
