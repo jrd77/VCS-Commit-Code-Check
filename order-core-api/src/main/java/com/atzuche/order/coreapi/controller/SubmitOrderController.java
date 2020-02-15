@@ -9,12 +9,15 @@ import com.atzuche.order.commons.entity.dto.OwnerGoodsDetailDTO;
 import com.atzuche.order.commons.entity.dto.OwnerMemberDTO;
 import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
 import com.atzuche.order.commons.entity.dto.RenterMemberDTO;
+import com.atzuche.order.commons.enums.OrderStatusEnum;
 import com.atzuche.order.commons.vo.req.AdminOrderReqVO;
 import com.atzuche.order.commons.vo.req.NormalOrderReqVO;
 import com.atzuche.order.commons.vo.req.OrderReqVO;
 import com.atzuche.order.commons.vo.res.OrderResVO;
 import com.atzuche.order.coreapi.common.conver.OrderCommonConver;
 import com.atzuche.order.coreapi.filter.OrderFilterChain;
+import com.atzuche.order.coreapi.service.mq.OrderActionMqService;
+import com.atzuche.order.coreapi.service.mq.OrderStatusMqService;
 import com.atzuche.order.coreapi.service.remote.StockProxyService;
 import com.atzuche.order.coreapi.service.SubmitOrderService;
 import com.atzuche.order.mem.MemProxyService;
@@ -25,6 +28,7 @@ import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.doc.annotation.AutoDocMethod;
 import com.autoyol.doc.annotation.AutoDocVersion;
+import com.autoyol.event.rabbit.neworder.NewOrderMQStatusEventEnum;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -75,6 +79,12 @@ public class SubmitOrderController {
     @Autowired
     private OrderFilterChain orderFilterChain;
 
+    @Autowired
+    private OrderActionMqService orderActionMqService;
+
+    @Autowired
+    private OrderStatusMqService orderStatusMqService;
+
     @AutoDocMethod(description = "提交订单", value = "提交订单", response = OrderResVO.class)
     @PostMapping("/normal/req")
     public ResponseData<OrderResVO> submitOrder(@Valid @RequestBody NormalOrderReqVO normalOrderReqVO, BindingResult bindingResult) throws Exception {
@@ -110,7 +120,13 @@ public class SubmitOrderController {
             orderRecordEntity.setParam(JSON.toJSONString(normalOrderReqVO));
             orderRecordEntity.setResult(JSON.toJSONString(orderResVO));
             orderRecordService.save(orderRecordEntity);
-            //TODO:发送订单成功的MQ事件
+            //发送订单成功的MQ事件
+            orderActionMqService.sendCreateOrderSuccess(orderResVO.getOrderNo(),context.getRiskAuditId(),orderReqVO);
+            NewOrderMQStatusEventEnum newOrderMQStatusEventEnum = NewOrderMQStatusEventEnum.ORDER_PRECONFIRM;
+            if(StringUtils.equals(orderResVO.getStatus(), String.valueOf(OrderStatusEnum.TO_PAY.getStatus()))) {
+                newOrderMQStatusEventEnum = NewOrderMQStatusEventEnum.ORDER_PREPAY;
+            }
+            orderStatusMqService.sendOrderStatusToCreate(orderResVO.getOrderNo(),orderResVO.getStatus(),orderReqVO,newOrderMQStatusEventEnum);
         }catch(OrderException orderException){
             String orderNo = orderResVO==null?"":orderResVO.getOrderNo();
             OrderRecordEntity orderRecordEntity = new OrderRecordEntity();
@@ -122,6 +138,8 @@ public class SubmitOrderController {
             orderRecordEntity.setResult(JSON.toJSONString(orderResVO));
             orderRecordService.save(orderRecordEntity);
 
+            //发送订单失败的MQ事件
+            orderActionMqService.sendCreateOrderFail(orderResVO.getOrderNo(),context.getRiskAuditId(),orderReqVO);
             //释放库存
             if(orderNo != null && orderNo.trim().length()>0){
                 Integer carNo = Integer.valueOf(normalOrderReqVO.getCarNo());
@@ -139,6 +157,8 @@ public class SubmitOrderController {
             orderRecordEntity.setResult(JSON.toJSONString(orderResVO));
             orderRecordService.save(orderRecordEntity);
 
+            //发送订单失败的MQ事件
+            orderActionMqService.sendCreateOrderFail(orderResVO.getOrderNo(),context.getRiskAuditId(),orderReqVO);
             //释放库存
             if(orderNo != null && orderNo.trim().length()>0){
                 Integer carNo = Integer.valueOf(normalOrderReqVO.getCarNo());
@@ -188,6 +208,14 @@ public class SubmitOrderController {
             orderRecordEntity.setParam(JSON.toJSONString(adminOrderReqVO));
             orderRecordEntity.setResult(JSON.toJSONString(orderResVO));
             orderRecordService.save(orderRecordEntity);
+
+            //发送订单成功的MQ事件
+            orderActionMqService.sendCreateOrderSuccess(orderResVO.getOrderNo(),context.getRiskAuditId(),orderReqVO);
+            NewOrderMQStatusEventEnum newOrderMQStatusEventEnum = NewOrderMQStatusEventEnum.ORDER_PRECONFIRM;
+            if(StringUtils.equals(orderResVO.getStatus(), String.valueOf(OrderStatusEnum.TO_PAY.getStatus()))) {
+                newOrderMQStatusEventEnum = NewOrderMQStatusEventEnum.ORDER_PREPAY;
+            }
+            orderStatusMqService.sendOrderStatusToCreate(orderResVO.getOrderNo(),orderResVO.getStatus(),orderReqVO,newOrderMQStatusEventEnum);
         }catch(OrderException orderException){
             OrderRecordEntity orderRecordEntity = new OrderRecordEntity();
             orderRecordEntity.setErrorCode(orderException.getErrorCode());
@@ -197,6 +225,9 @@ public class SubmitOrderController {
             orderRecordEntity.setParam(JSON.toJSONString(adminOrderReqVO));
             orderRecordEntity.setResult(JSON.toJSONString(orderResVO));
             orderRecordService.save(orderRecordEntity);
+
+            //发送订单成功的MQ事件
+            orderActionMqService.sendCreateOrderSuccess(orderResVO.getOrderNo(),context.getRiskAuditId(),orderReqVO);
             //释放库存
             String orderNo = orderResVO==null?"":orderResVO.getOrderNo();
             if(orderNo != null && orderNo.trim().length()>0){
@@ -213,6 +244,9 @@ public class SubmitOrderController {
             orderRecordEntity.setParam(JSON.toJSONString(adminOrderReqVO));
             orderRecordEntity.setResult(JSON.toJSONString(orderResVO));
             orderRecordService.save(orderRecordEntity);
+
+            //发送订单成功的MQ事件
+            orderActionMqService.sendCreateOrderSuccess(orderResVO.getOrderNo(),context.getRiskAuditId(),orderReqVO);
             //释放库存
             String orderNo = orderResVO==null?"":orderResVO.getOrderNo();
             if(orderNo != null && orderNo.trim().length()>0){

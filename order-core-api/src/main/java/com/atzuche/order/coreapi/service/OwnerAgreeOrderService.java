@@ -6,6 +6,8 @@ import com.atzuche.order.commons.enums.OrderStatusEnum;
 import com.atzuche.order.commons.enums.OwnerAgreeTypeEnum;
 import com.atzuche.order.commons.exceptions.OrderNotFoundException;
 import com.atzuche.order.commons.vo.req.AgreeOrderReqVO;
+import com.atzuche.order.coreapi.service.mq.OrderActionMqService;
+import com.atzuche.order.coreapi.service.mq.OrderStatusMqService;
 import com.atzuche.order.coreapi.service.remote.StockProxyService;
 import com.atzuche.order.flow.service.OrderFlowService;
 import com.atzuche.order.owner.commodity.service.OwnerGoodsService;
@@ -20,6 +22,7 @@ import com.atzuche.order.renterorder.service.RenterOrderService;
 import com.autoyol.car.api.model.dto.LocationDTO;
 import com.autoyol.car.api.model.dto.OrderInfoDTO;
 import com.autoyol.car.api.model.enums.OrderOperationTypeEnum;
+import com.autoyol.event.rabbit.neworder.NewOrderMQStatusEventEnum;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,9 +63,15 @@ public class OwnerAgreeOrderService {
 
     @Autowired
     private OwnerOrderService ownerOrderService;
+
     @Autowired
     private OwnerGoodsService ownerGoodsService;
 
+    @Autowired
+    private OrderActionMqService orderActionMqService;
+
+    @Autowired
+    private OrderStatusMqService orderStatusMqService;
 
 
 
@@ -76,8 +85,9 @@ public class OwnerAgreeOrderService {
         //车主同意前置校验
         refuseOrderCheckService.checkOwnerAgreeOrRefuseOrder(reqVO.getOrderNo(), StringUtils.isNotBlank(reqVO.getOperatorName()));
 
+        OwnerOrderEntity ownerOrderEntity = ownerOrderService.getOwnerOrderByOrderNoAndIsEffective(reqVO.getOrderNo());
         //扣减库存
-        OrderInfoDTO orderInfoDTO = buildReqVO(reqVO.getOrderNo());
+        OrderInfoDTO orderInfoDTO = buildReqVO(reqVO.getOrderNo(), ownerOrderEntity);
         stockService.cutCarStock(orderInfoDTO);
 
 
@@ -103,23 +113,26 @@ public class OwnerAgreeOrderService {
         //自动拒绝时间相交的订单
         //TODO:拒绝时间相交的订单
 
-        //消息发送
-        //TODO:发送车主同意事件
+        //发送车主同意事件
+        orderActionMqService.sendOwnerAgreeOrderSuccess(reqVO.getOrderNo(),ownerOrderEntity.getMemNo());
+        orderStatusMqService.sendOrderStatusByOrderNo(reqVO.getOrderNo(),ownerOrderEntity.getMemNo(),orderStatusDTO.getStatus(), NewOrderMQStatusEventEnum.ORDER_PREPAY);
+
     }
 
     /**
      * 构建扣减库存的请求参数
      * @param orderNo
+     * @param ownerOrderEntity
      * @return
      */
-    public OrderInfoDTO buildReqVO(String orderNo){
+    public OrderInfoDTO buildReqVO(String orderNo, OwnerOrderEntity ownerOrderEntity){
         OrderInfoDTO orderInfoDTO = new OrderInfoDTO();
         orderInfoDTO.setOrderNo(orderNo);
         OrderEntity orderEntity = orderService.getOrderEntity(orderNo);
         if(orderEntity==null){
             throw new OrderNotFoundException(orderNo);
         }
-        OwnerOrderEntity ownerOrderEntity = ownerOrderService.getOwnerOrderByOrderNoAndIsEffective(orderNo);
+
         if(ownerOrderEntity==null){
             throw new OrderNotFoundException(orderNo);
         }

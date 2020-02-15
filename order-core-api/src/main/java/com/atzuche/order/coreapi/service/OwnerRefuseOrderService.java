@@ -4,6 +4,8 @@ import com.atzuche.order.commons.LocalDateTimeUtils;
 import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
 import com.atzuche.order.commons.enums.*;
 import com.atzuche.order.commons.vo.req.RefuseOrderReqVO;
+import com.atzuche.order.coreapi.service.mq.OrderActionMqService;
+import com.atzuche.order.coreapi.service.mq.OrderStatusMqService;
 import com.atzuche.order.coreapi.service.remote.CarRentalTimeApiProxyService;
 import com.atzuche.order.coreapi.service.remote.StockProxyService;
 import com.atzuche.order.delivery.service.delivery.DeliveryCarService;
@@ -24,6 +26,7 @@ import com.atzuche.order.renterorder.service.OrderCouponService;
 import com.atzuche.order.renterorder.service.RenterOrderService;
 import com.atzuche.order.settle.service.OrderSettleService;
 import com.autoyol.car.api.model.dto.OwnerCancelDTO;
+import com.autoyol.event.rabbit.neworder.NewOrderMQStatusEventEnum;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,6 +75,10 @@ public class OwnerRefuseOrderService {
     OrderFlowService orderFlowService;
     @Autowired
     RefuseOrderCheckService refuseOrderCheckService;
+    @Autowired
+    OrderActionMqService orderActionMqService;
+    @Autowired
+    OrderStatusMqService orderStatusMqService;
 
 
 
@@ -148,8 +155,16 @@ public class OwnerRefuseOrderService {
         stockService.releaseCarStock(reqVO.getOrderNo(), goodsDetail.getCarNo());
         //锁定车辆可租时间
         stockService.ownerCancelStock(buildOwnerCancelDTO(reqVO.getOrderNo(), goodsDetail.getCarNo(), orderEntity));
-        //TODO:发送车主拒绝事件
 
+
+        //发送车主拒绝事件
+        orderActionMqService.sendOwnerRefundOrderSuccess(reqVO.getOrderNo(), ownerOrderEntity.getMemNo());
+
+        NewOrderMQStatusEventEnum newOrderMQStatusEventEnum = NewOrderMQStatusEventEnum.ORDER_END;
+        if(orderStatusDTO.getStatus() == OrderStatusEnum.TO_DISPATCH.getStatus()) {
+            newOrderMQStatusEventEnum = NewOrderMQStatusEventEnum.ORDER_PREDISPATCH;
+        }
+        orderStatusMqService.sendOrderStatusByOrderNo(reqVO.getOrderNo(),ownerOrderEntity.getMemNo(),orderStatusDTO.getStatus(),newOrderMQStatusEventEnum);
 
     }
 

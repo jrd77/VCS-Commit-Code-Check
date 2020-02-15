@@ -133,6 +133,7 @@ public class PlatformCancelOrderHandleService {
 
         cancelOrderResDTO.setCarNo(goodsDetail.getCarNo());
         cancelOrderResDTO.setRentCarPayStatus(orderStatusEntity.getRentCarPayStatus());
+        cancelOrderResDTO.setStatus(orderStatusDTO.getStatus());
         return cancelOrderResDTO;
     }
 
