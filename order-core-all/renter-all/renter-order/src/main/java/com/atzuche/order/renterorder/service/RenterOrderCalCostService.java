@@ -380,36 +380,55 @@ public class RenterOrderCalCostService {
 
         LOGGER.info("获取车主优惠券抵扣信息. param is,ownerCouponGetAndValidReqDTO:[{}]",
                 JSON.toJSONString(ownerCouponGetAndValidReqVO));
-        if (null == ownerCouponGetAndValidReqVO || StringUtils.isBlank(ownerCouponGetAndValidReqVO.getCouponNo()) || ooupon == null) {
+        if (null == ownerCouponGetAndValidReqVO || StringUtils.isBlank(ownerCouponGetAndValidReqVO.getCouponNo())) {
             return null;
         }
-
         OwnerCouponGetAndValidResultVO result =
                 ownerDiscountCouponService.getAndValidCoupon(ownerCouponGetAndValidReqVO.getOrderNo(),
                         ownerCouponGetAndValidReqVO.getRentAmt(), ownerCouponGetAndValidReqVO.getCouponNo(),
                         ownerCouponGetAndValidReqVO.getCarNo(), ownerCouponGetAndValidReqVO.getMark());
-        OrderCouponDTO ownerCoupon = new OrderCouponDTO();
-        ownerCoupon.setCouponId(ooupon.getCouponId());
-        ownerCoupon.setCouponName(ooupon.getCouponName());
-        ownerCoupon.setCouponDesc(ooupon.getCouponDesc());
-        ownerCoupon.setAmount(0);
-        ownerCoupon.setCouponType(CouponTypeEnum.ORDER_COUPON_TYPE_OWNER.getCode());
-        ownerCoupon.setStatus(OrderConstant.NO);
-        if (null != result) {
-            if (StringUtils.equals(ErrorCode.SUCCESS.getCode(), result.getResCode()) && null != result.getData()) {
-                OwnerDiscountCouponVO coupon = result.getData().getCouponDTO();
-                if (coupon != null) {
-                	ownerCoupon.setCouponId(coupon.getCouponNo());
-                    ownerCoupon.setCouponName(coupon.getCouponName()==null?"车主券":coupon.getCouponName());
-                    ownerCoupon.setCouponDesc(coupon.getCouponText());
-                    ownerCoupon.setAmount(null == coupon.getDiscount() ? 0 : coupon.getDiscount());
+        if (ooupon == null) {
+        	if (null != result) {
+                if (StringUtils.equals(ErrorCode.SUCCESS.getCode(), result.getResCode()) && null != result.getData()) {
+                    OwnerDiscountCouponVO coupon = result.getData().getCouponDTO();
+                    if (coupon != null) {
+                    	OrderCouponDTO ownerCoupon = new OrderCouponDTO();
+                    	ownerCoupon.setCouponId(coupon.getCouponNo());
+                        ownerCoupon.setCouponName(coupon.getCouponName()==null?"车主券":coupon.getCouponName());
+                        ownerCoupon.setCouponDesc(coupon.getCouponText());
+                        ownerCoupon.setAmount(null == coupon.getDiscount() ? 0 : coupon.getDiscount());
+                        ownerCoupon.setCouponType(CouponTypeEnum.ORDER_COUPON_TYPE_OWNER.getCode());
+                        //绑定后变更为已使用
+                        ownerCoupon.setStatus(ownerCoupon.getAmount() > 0 ? OrderConstant.YES : OrderConstant.NO);
+                        return ownerCoupon;
+                    }
                 }
-                ownerCoupon.setCouponType(CouponTypeEnum.ORDER_COUPON_TYPE_OWNER.getCode());
-                //绑定后变更为已使用
-                ownerCoupon.setStatus(ownerCoupon.getAmount() > 0 ? OrderConstant.YES : OrderConstant.NO);
             }
+        } else {
+        	OrderCouponDTO ownerCoupon = new OrderCouponDTO();
+            ownerCoupon.setCouponId(ooupon.getCouponId());
+            ownerCoupon.setCouponName(ooupon.getCouponName());
+            ownerCoupon.setCouponDesc(ooupon.getCouponDesc());
+            ownerCoupon.setAmount(0);
+            ownerCoupon.setCouponType(CouponTypeEnum.ORDER_COUPON_TYPE_OWNER.getCode());
+            ownerCoupon.setStatus(OrderConstant.NO);
+            if (null != result) {
+                if (StringUtils.equals(ErrorCode.SUCCESS.getCode(), result.getResCode()) && null != result.getData()) {
+                    OwnerDiscountCouponVO coupon = result.getData().getCouponDTO();
+                    if (coupon != null) {
+                    	ownerCoupon.setCouponId(coupon.getCouponNo());
+                        ownerCoupon.setCouponName(coupon.getCouponName()==null?"车主券":coupon.getCouponName());
+                        ownerCoupon.setCouponDesc(coupon.getCouponText());
+                        ownerCoupon.setAmount(null == coupon.getDiscount() ? 0 : coupon.getDiscount());
+                    }
+                    ownerCoupon.setCouponType(CouponTypeEnum.ORDER_COUPON_TYPE_OWNER.getCode());
+                    //绑定后变更为已使用
+                    ownerCoupon.setStatus(ownerCoupon.getAmount() > 0 ? OrderConstant.YES : OrderConstant.NO);
+                }
+            }
+            return ownerCoupon;
         }
-        return ownerCoupon;
+        return null;
     }
     
     
