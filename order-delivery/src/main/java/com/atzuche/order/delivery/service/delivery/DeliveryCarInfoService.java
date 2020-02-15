@@ -248,7 +248,13 @@ public class DeliveryCarInfoService {
         getAndReturnCarDTO.setOverKNCrash(String.valueOf(renterOverMileageAmt));
         BeanUtils.copyProperties(getAndReturnCarDTO, renterGetAndReturnCarDTO);
         //车主平台加油服务费carOwnerOilCrash
-        ownerGetAndReturnCarDTO.setPlatFormOilServiceCharge(deliveryCarInfoPriceService.getOwnerPlatFormOilServiceCharge(Integer.valueOf(ownerGetAndReturnCarDTO.getReturnCarOil()),Integer.valueOf(renterGetAndReturnCarDTO.getGetCarOil()))+"元");
+        try {
+            ownerGetAndReturnCarDTO.setPlatFormOilServiceCharge(deliveryCarInfoPriceService.getOwnerPlatFormOilServiceCharge(Integer.valueOf(ownerGetAndReturnCarDTO.getReturnCarOil().contains("L") ? ownerGetAndReturnCarDTO.getReturnCarOil().replace("L", "") : ownerGetAndReturnCarDTO.getReturnCarOil()), Integer.valueOf(renterGetAndReturnCarDTO.getGetCarOil().contains("L") ? renterGetAndReturnCarDTO.getGetCarOil().replace("L", "") : renterGetAndReturnCarDTO.getGetCarOil())) + "元");
+        }catch (Exception e)
+        {
+            log.info("获取平台加邮费出错，cause：【{}】",e.getMessage());
+            ownerGetAndReturnCarDTO.setPlatFormOilServiceCharge("0");
+        }
         renterGetAndReturnCarDTO.setCarOwnerOilCrash(renterGetAndReturnCarDTO.getOilDifferenceCrash());
         ownerGetAndReturnCarDTO.setCarOwnerAllOilCrash(ownerGetAndReturnCarDTO.getOilDifferenceCrash()+ownerGetAndReturnCarDTO.getPlatFormOilServiceCharge());
         if (isEscrowCar) {

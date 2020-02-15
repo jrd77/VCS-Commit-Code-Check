@@ -71,7 +71,6 @@ public class DeliveryCarInfoPriceService {
      */
     public Double getOilPriceByCityCodeAndType(Integer cityCode, Integer type) {
 
-        //目前获取到的EngineType全部为0  没有区分 所以暂时写死
         List<OilAverageCostEntity> oilAverageCostEntityList = oilAverageCostConfigSDK.getConfig(DeliveryCarInfoConfigContext.builder().build());
         OilAverageCostEntity oilAverageCostEntity = oilAverageCostEntityList.stream().filter(r -> r.getCityCode() == cityCode.intValue() && r.getEngineType() == type).findFirst().get();
         if (Objects.isNull(oilAverageCostEntity)) {
