@@ -71,7 +71,6 @@ public class DeliveryCarInfoPriceService {
      */
     public Double getOilPriceByCityCodeAndType(Integer cityCode, Integer type) {
 
-        //目前获取到的EngineType全部为0  没有区分 所以暂时写死
         List<OilAverageCostEntity> oilAverageCostEntityList = oilAverageCostConfigSDK.getConfig(DeliveryCarInfoConfigContext.builder().build());
         OilAverageCostEntity oilAverageCostEntity = oilAverageCostEntityList.stream().filter(r -> r.getCityCode() == cityCode.intValue() && r.getEngineType() == type).findFirst().get();
         if (Objects.isNull(oilAverageCostEntity)) {
@@ -273,6 +272,22 @@ public class DeliveryCarInfoPriceService {
         }
         GetReturnResponseVO getReturnResponseVO = getReturnCarCostService.getDeliveryCarFee(orderNo, renterOrderDeliveryRepVOList);
         return getReturnResponseVO;
+    }
+
+
+    /**
+     * 车主平台加油服务费
+     * @return
+     */
+    public int getOwnerPlatFormOilServiceCharge(Integer ownerReturnOil,Integer renterGetOil){
+        try {
+            if (MathUtil.sub((ownerReturnOil / 16), 0.25d) <= 0 && renterGetOil > ownerReturnOil) {
+                return 25;
+            }
+        } catch (Exception e) {
+            log.info("获取平台加油服务费失败");
+        }
+        return 0;
     }
 
     /**

@@ -135,6 +135,8 @@ public class OrderDeliveryDTO {
             setRenterGetReturnAddrLon(orderReqVO.getSrvGetLon());
             if (orderReqVO.getSrvGetFlag().intValue() == UsedDeliveryTypeEnum.USED.getValue().intValue()) {
                 setIsNotifyRenyun(UsedDeliveryTypeEnum.USED.getValue().intValue());
+            } else {
+                setIsNotifyRenyun(UsedDeliveryTypeEnum.NO_USED.getValue().intValue());
             }
         } else {
             setRenterGetReturnAddr(orderReqVO.getSrvReturnAddr());
@@ -142,6 +144,8 @@ public class OrderDeliveryDTO {
             setRenterGetReturnAddrLon(orderReqVO.getSrvReturnLon());
             if (orderReqVO.getSrvReturnFlag().intValue() == UsedDeliveryTypeEnum.USED.getValue().intValue()) {
                 setIsNotifyRenyun(UsedDeliveryTypeEnum.USED.getValue().intValue());
+            } else {
+                setIsNotifyRenyun(UsedDeliveryTypeEnum.NO_USED.getValue().intValue());
             }
         }
     }

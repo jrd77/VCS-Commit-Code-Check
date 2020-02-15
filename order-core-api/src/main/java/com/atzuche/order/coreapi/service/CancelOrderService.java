@@ -1,5 +1,11 @@
 package com.atzuche.order.coreapi.service;
 
+import com.atzuche.order.commons.enums.CancelSourceEnum;
+import com.atzuche.order.commons.enums.OrderStatusEnum;
+import com.atzuche.order.coreapi.service.mq.OrderActionMqService;
+import com.atzuche.order.coreapi.service.mq.OrderStatusMqService;
+import com.autoyol.event.rabbit.neworder.NewOrderMQActionEventEnum;
+import com.autoyol.event.rabbit.neworder.NewOrderMQStatusEventEnum;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,6 +52,10 @@ public class CancelOrderService {
     private OrderCommonConver orderCommonConver;
     @Autowired
     private CancelOrderCheckService cancelOrderCheckService;
+    @Autowired
+    private OrderActionMqService orderActionMqService;
+    @Autowired
+    private OrderStatusMqService orderStatusMqService;
 
     /**
      * 订单取消
@@ -102,9 +112,20 @@ public class CancelOrderService {
             }
         }
 
-        //消息发送
-        //TODO:发送订单取消事件
+        //发送订单取消事件
+        CancelSourceEnum cancelSourceEnum = CancelSourceEnum.OWNER;
+        NewOrderMQActionEventEnum actionEventEnum = NewOrderMQActionEventEnum.ORDER_FINISH;
+        if(StringUtils.equals(MemRoleEnum.RENTER.getCode(), cancelOrderReqVO.getMemRole())) {
+            cancelSourceEnum = CancelSourceEnum.RENTER;
+            actionEventEnum = NewOrderMQActionEventEnum.ORDER_CANCEL;
+        }
+        orderActionMqService.sendCancelOrderSuccess(cancelOrderReqVO.getOrderNo(), cancelOrderReqVO.getMemNo(), cancelSourceEnum, actionEventEnum);
 
+        NewOrderMQStatusEventEnum newOrderMQStatusEventEnum = NewOrderMQStatusEventEnum.ORDER_END;
+        if(res.getStatus() == OrderStatusEnum.TO_DISPATCH.getStatus()) {
+            newOrderMQStatusEventEnum = NewOrderMQStatusEventEnum.ORDER_PREDISPATCH;
+        }
+        orderStatusMqService.sendOrderStatusByOrderNo(cancelOrderReqVO.getOrderNo(),cancelOrderReqVO.getMemNo(),res.getStatus(),newOrderMQStatusEventEnum);
     }
 
     private OwnerCancelDTO buildOwnerCancelDTO(String orderNo, CancelOrderResDTO res){

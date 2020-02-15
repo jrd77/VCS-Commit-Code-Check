@@ -244,16 +244,22 @@ public class DeliveryCarInfoService {
         }
         ownerHandoverCarInfoEntities = CommonUtil.copyList(ownerHandoverCarInfoList);
         OwnerGetAndReturnCarDTO getAndReturnCarDTO = deliveryCarInfoPriceService.createOwnerGetAndReturnCarDTO(ownerGetAndReturnCarDO,ownerHandoverCarInfoEntities,carEngineType,cityCode);
-        int renterOverMileageAmt = getDeliveryCarOverMileageAmt(ownerGetAndReturnCarDTO, renterGoodsDetailDTO);
-        renterGetAndReturnCarDTO.setOverKNCrash(String.valueOf(renterOverMileageAmt));
+        int renterOverMileageAmt = getDeliveryCarOverMileageAmt(getAndReturnCarDTO, renterGoodsDetailDTO);
+        getAndReturnCarDTO.setOverKNCrash(String.valueOf(renterOverMileageAmt));
         BeanUtils.copyProperties(getAndReturnCarDTO, renterGetAndReturnCarDTO);
-        ownerGetAndReturnCarDTO.setPlatFormOilServiceCharge(RenterFeeCalculatorUtils.calServiceChargeFee().getTotalFee().toString()+"元");
-        if(org.apache.commons.lang3.StringUtils.isNotBlank(ownerGetAndReturnCarDTO.getCarOilDifferenceCrash())) {
-            renterGetAndReturnCarDTO.setCarOwnerOilCrash(ownerGetAndReturnCarDTO.getCarOilDifferenceCrash());
+        //车主平台加油服务费carOwnerOilCrash
+        try {
+            ownerGetAndReturnCarDTO.setPlatFormOilServiceCharge(deliveryCarInfoPriceService.getOwnerPlatFormOilServiceCharge(Integer.valueOf(ownerGetAndReturnCarDTO.getReturnCarOil().contains("L") ? ownerGetAndReturnCarDTO.getReturnCarOil().replace("L", "") : ownerGetAndReturnCarDTO.getReturnCarOil()), Integer.valueOf(renterGetAndReturnCarDTO.getGetCarOil().contains("L") ? renterGetAndReturnCarDTO.getGetCarOil().replace("L", "") : renterGetAndReturnCarDTO.getGetCarOil())) + "元");
+        }catch (Exception e)
+        {
+            log.info("获取平台加邮费出错，cause：【{}】",e.getMessage());
+            ownerGetAndReturnCarDTO.setPlatFormOilServiceCharge("0");
         }
+        renterGetAndReturnCarDTO.setCarOwnerOilCrash(renterGetAndReturnCarDTO.getOilDifferenceCrash());
+        ownerGetAndReturnCarDTO.setCarOwnerAllOilCrash(ownerGetAndReturnCarDTO.getOilDifferenceCrash()+ownerGetAndReturnCarDTO.getPlatFormOilServiceCharge());
         if (isEscrowCar) {
             ownerGetAndReturnCarDTO.setCarOilDifferenceCrash(ownerGetAndReturnCarDTO.getOilDifferenceCrash());
-            ownerGetAndReturnCarDTO.setCarOwnerOilCrash(ownerGetAndReturnCarDTO.getOilDifferenceCrash());
+            ownerGetAndReturnCarDTO.setCarOwnerOilCrash(ownerGetAndReturnCarDTO.getCarOwnerAllOilCrash());
         }
         deliveryCarVO.setOwnerGetAndReturnCarDTO(ownerGetAndReturnCarDTO);
         deliveryCarVO.setRenterGetAndReturnCarDTO(renterGetAndReturnCarDTO);

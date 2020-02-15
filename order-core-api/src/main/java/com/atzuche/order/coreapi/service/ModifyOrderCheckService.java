@@ -13,7 +13,9 @@ import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
 import com.atzuche.order.commons.entity.dto.RenterGoodsPriceDetailDTO;
 import com.atzuche.order.commons.entity.dto.RenterMemberDTO;
 import com.atzuche.order.commons.enums.OrderChangeItemEnum;
+import com.atzuche.order.commons.enums.OrderStatusEnum;
 import com.atzuche.order.coreapi.entity.dto.ModifyOrderDTO;
+import com.atzuche.order.coreapi.modifyorder.exception.ModifyOrderCurrentStatusNotSupportException;
 import com.atzuche.order.coreapi.modifyorder.exception.ModifyOrderDataNoChangeException;
 import com.atzuche.order.coreapi.modifyorder.exception.ModifyOrderExistTODOChangeApplyException;
 import com.atzuche.order.coreapi.modifyorder.exception.ModifyOrderGoodNotExistException;
@@ -26,6 +28,8 @@ import com.atzuche.order.coreapi.modifyorder.exception.TransferUseOwnerCouponExc
 import com.atzuche.order.owner.commodity.entity.OwnerGoodsEntity;
 import com.atzuche.order.owner.commodity.service.OwnerGoodsService;
 import com.atzuche.order.parentorder.entity.OrderEntity;
+import com.atzuche.order.parentorder.entity.OrderStatusEntity;
+import com.atzuche.order.parentorder.service.OrderStatusService;
 import com.atzuche.order.renterorder.entity.dto.OrderChangeItemDTO;
 import com.atzuche.order.renterorder.service.RenterOrderChangeApplyService;
 import com.autoyol.car.api.model.dto.LocationDTO;
@@ -44,6 +48,8 @@ public class ModifyOrderCheckService {
 	private RenterOrderChangeApplyService renterOrderChangeApplyService;
 	@Autowired
 	private OwnerGoodsService ownerGoodsService;
+	@Autowired
+	private OrderStatusService orderStatusService;
 	
 	/**
 	 * 库存校验
@@ -88,6 +94,8 @@ public class ModifyOrderCheckService {
 	 * @param modifyOrderDTO
 	 */
 	public void modifyMainCheck(ModifyOrderDTO modifyOrderDTO) {
+		// 校验当前订单状态是否支持修改
+		checkOrderStatus(modifyOrderDTO);
 		// 修改项目
 		List<OrderChangeItemDTO> changeItemList = modifyOrderDTO.getChangeItemList();
 		// 校验是否修改数据
@@ -114,6 +122,22 @@ public class ModifyOrderCheckService {
 		checkUserOwnerCoupon(modifyOrderDTO);
 		// 换车校验车辆
 		checkTransferCar(modifyOrderDTO);
+	}
+	
+	/**
+	 * 校验当前订单状态是否支持修改
+	 * @param modifyOrderDTO
+	 */
+	public void checkOrderStatus(ModifyOrderDTO modifyOrderDTO) {
+		// 查询订单状态
+		OrderStatusEntity orderStatus = orderStatusService.getByOrderNo(modifyOrderDTO.getOrderNo());
+		// 订单状态
+		Integer status = orderStatus.getStatus();
+		if (status != null && (status.intValue() >= OrderStatusEnum.TO_SETTLE.getStatus() || 
+				status.intValue() == OrderStatusEnum.CLOSED.getStatus())) {
+			Cat.logError("ModifyOrderCheckService.checkOrderStatus校验当前订单状态是否支持修改", new ModifyOrderCurrentStatusNotSupportException());
+			throw new ModifyOrderCurrentStatusNotSupportException();
+		}
 	}
 	
 	/**

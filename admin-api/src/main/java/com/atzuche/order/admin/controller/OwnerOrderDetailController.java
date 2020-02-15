@@ -186,7 +186,7 @@ public class OwnerOrderDetailController {
 
     @AutoDocMethod(description = "修改违约罚金", value = "修改违约罚金", response = ResponseData.class)
     @PostMapping("/console/owner/updateFien")
-    public ResponseData<?> updateFineAmt(@Valid @RequestBody FienAmtUpdateReqVO fienAmtUpdateReqDTO, BindingResult bindingResult){
+    public ResponseData<?> updateFineAmt(@RequestBody FienAmtUpdateReqVO fienAmtUpdateReqDTO, BindingResult bindingResult){  //@Valid 
         BindingResultUtil.checkBindingResult(bindingResult);
         FienAmtUpdateReqDTO reqDTO = new FienAmtUpdateReqDTO();
         BeanUtils.copyProperties(fienAmtUpdateReqDTO,reqDTO);
