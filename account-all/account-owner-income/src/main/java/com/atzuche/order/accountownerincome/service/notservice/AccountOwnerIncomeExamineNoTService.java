@@ -69,4 +69,8 @@ public class AccountOwnerIncomeExamineNoTService {
     public AccountOwnerIncomeExamineEntity getAccountOwnerIncomeExamineById(Integer accountOwnerIncomeExamineId) {
        return accountOwnerIncomeExamineMapper.selectByPrimaryKey(accountOwnerIncomeExamineId);
     }
+    
+    public AccountOwnerIncomeExamineEntity getAccountOwnerIncomeExamineByOrderNo(String orderNo) {
+        return accountOwnerIncomeExamineMapper.selectByOrderNo(orderNo);
+     }
 }
