@@ -204,8 +204,8 @@ public class OrderPhotoService {
      * 更新仁云 交接车 取还车数据
      * @return
      */
-    public void updateDeliveryCarPhotoInfo(String photoId,String path,String operator,String userType,String photoType){
-        orderPhotoMapper.updateUploadOrderPhoto(photoId,path,operator,userType,photoType);
+    public void updateDeliveryCarPhotoInfo(String photoId,String path,String operator,String userType,String photoType,Integer serialNumber){
+        orderPhotoMapper.updateUploadRenYunOrderPhoto(photoId,path,operator,userType,photoType,serialNumber);
     }
 
 

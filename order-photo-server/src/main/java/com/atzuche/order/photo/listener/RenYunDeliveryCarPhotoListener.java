@@ -52,14 +52,14 @@ public class RenYunDeliveryCarPhotoListener {
             orderPhotoEntity.setPath(deliveryCarConditionPhotoVO.getPath());
             orderPhotoEntity.setUserType(String.valueOf(deliveryCarConditionPhotoVO.getUserType()));
             orderPhotoEntity.setPhotoType(String.valueOf(deliveryCarConditionPhotoVO.getPhotoType()));
+            orderPhotoEntity.setSerialNumber(deliveryCarConditionPhotoVO.getSerialNumber());
             //更新
             OrderPhotoEntity orderPhoto = orderPhotoService.selectObjectByParams(orderPhotoEntity);
             if (Objects.nonNull(orderPhoto)) {
-                BeanUtils.copyProperties(orderPhotoEntity, orderPhoto);
-                orderPhoto.setOperator("仁云传过来");
-                orderPhotoService.updateDeliveryCarPhotoInfo(orderPhoto.getId(), orderPhoto.getPath(), orderPhoto.getOperator(), orderPhoto.getUserType(), orderPhoto.getPhotoType());
+                orderPhoto.setPath(orderPhotoEntity.getPath());
+                orderPhotoService.updateDeliveryCarPhotoInfo(orderPhoto.getId(), orderPhoto.getPath(), orderPhoto.getOperator(), orderPhoto.getUserType(), orderPhoto.getPhotoType(), orderPhoto.getSerialNumber());
             } else {
-                orderPhotoEntity.setSerialNumber(0);
+                orderPhotoEntity.setPhotoOperator(deliveryCarConditionPhotoVO.getUserType());
                 orderPhotoService.recevieRenYunDeliveryCarPhoto(orderPhotoEntity);
             }
             Cat.logEvent(CatConstants.RABBIT_MQ_METHOD, "RenYunDeliveryCarPhotoListener.process");

@@ -47,6 +47,8 @@ public interface OrderPhotoMapper {
 
 	OrderPhotoEntity selectObjectByParams(OrderPhotoEntity orderPhotoEntity);
 
+	void updateUploadRenYunOrderPhoto(@Param("photoId") String photoId, @Param("path") String path, @Param("operator") String operator, @Param("userType") String userType, @Param("photoType") String photoType,@Param("serialNumber") Integer serialNumber);
+
 
 
 
