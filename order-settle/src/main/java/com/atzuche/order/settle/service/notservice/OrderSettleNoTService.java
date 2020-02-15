@@ -940,7 +940,7 @@ public class OrderSettleNoTService {
             }
             //1.3 交接车-获取超里程费用
             FeeResult mileageAmt = rentCosts.getMileageAmt();
-            if(Objects.nonNull(mileageAmt) && Objects.nonNull(mileageAmt.getTotalFee())  && mileageAmt.getTotalFee()!=0){
+            if(Objects.nonNull(mileageAmt) && Objects.nonNull(mileageAmt.getTotalFee())){
                 AccountRenterCostSettleDetailEntity accountRenterCostSettleDetail = new AccountRenterCostSettleDetailEntity();
                 BeanUtils.copyProperties(mileageAmt,accountRenterCostSettleDetail);
                 accountRenterCostSettleDetail.setCostCode(RenterCashCodeEnum.ACCOUNT_RENTER_DELIVERY_MILEAGE_COST.getCashNo());
