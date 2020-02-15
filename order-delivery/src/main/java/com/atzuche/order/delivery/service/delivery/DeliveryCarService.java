@@ -244,10 +244,6 @@ public class DeliveryCarService {
         handoverCarInfoDTO.setRealReturnAddrLat(orderDeliveryEntity.getRenterGetReturnAddrLat());
         handoverCarInfoDTO.setRealReturnAddrLon(orderDeliveryEntity.getRenterGetReturnAddrLon());
         handoverCarVO.setHandoverCarInfoDTO(handoverCarInfoDTO);
-        handoverCarInfoDTO.setType(orderDeliveryEntity.getType().intValue() == 1 ? 3: 4);
-        if (orderDeliveryEntity.getIsNotifyRenyun().intValue() == 0) {
-            handoverCarInfoDTO.setType(orderDeliveryEntity.getType().intValue() == 1 ? 1 : 2);
-        }
         handoverCarService.addHandoverCarInfo(handoverCarVO, userType);
     }
 
