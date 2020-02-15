@@ -9,7 +9,6 @@ import com.atzuche.order.accountrenterwzdepost.vo.res.AccountRenterWZDepositResV
 import com.atzuche.order.cashieraccount.common.FasterJsonUtil;
 import com.atzuche.order.cashieraccount.entity.CashierEntity;
 import com.atzuche.order.cashieraccount.entity.CashierRefundApplyEntity;
-import com.atzuche.order.cashieraccount.exception.OrderPayCallBackAsnyException;
 import com.atzuche.order.cashieraccount.exception.OrderPaySignFailException;
 import com.atzuche.order.cashieraccount.service.notservice.CashierNoTService;
 import com.atzuche.order.cashieraccount.service.notservice.CashierRefundApplyNoTService;
@@ -19,7 +18,6 @@ import com.atzuche.order.cashieraccount.vo.req.pay.OrderPaySignReqVO;
 import com.atzuche.order.cashieraccount.vo.res.AccountPayAbleResVO;
 import com.atzuche.order.cashieraccount.vo.res.OrderPayableAmountResVO;
 import com.atzuche.order.cashieraccount.vo.res.pay.OrderPayCallBackSuccessVO;
-import com.atzuche.order.commons.CatConstants;
 import com.atzuche.order.commons.DateUtils;
 import com.atzuche.order.commons.enums.OrderPayStatusEnum;
 import com.atzuche.order.commons.enums.OrderStatusEnum;
@@ -35,7 +33,6 @@ import com.atzuche.order.rentercost.entity.vo.PayableVO;
 import com.atzuche.order.rentercost.service.RenterOrderCostCombineService;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.atzuche.order.wallet.WalletProxyService;
-import com.atzuche.order.wallet.api.OrderWalletFeignService;
 import com.autoyol.autopay.gateway.constant.DataPayKindConstant;
 import com.autoyol.autopay.gateway.util.MD5;
 import com.autoyol.autopay.gateway.vo.req.BatchNotifyDataVo;
@@ -43,11 +40,9 @@ import com.autoyol.autopay.gateway.vo.req.NotifyDataVo;
 import com.autoyol.autopay.gateway.vo.req.PayVo;
 import com.autoyol.autopay.gateway.vo.req.RefundVo;
 import com.autoyol.autopay.gateway.vo.res.AutoPayResultVo;
-import com.autoyol.cat.CatAnnotation;
 import com.autoyol.commons.utils.GsonUtils;
 import com.autoyol.commons.web.ErrorCode;
-import com.dianping.cat.Cat;
-import com.dianping.cat.message.Transaction;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,7 +54,6 @@ import org.springframework.util.CollectionUtils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 
 /**
@@ -83,7 +77,6 @@ public class CashierPayService{
     @Autowired CashierRefundApplyNoTService cashierRefundApplyNoTService;
     @Autowired private OrderStatusService orderStatusService;
     @Autowired private OrderFlowService orderFlowService;
-    @Autowired private CashierQueryService cashierQueryService;
 
 
     /**
@@ -155,13 +148,14 @@ public class CashierPayService{
             //当支付成功（当车辆押金，违章押金，租车费用都支付成功，更新订单状态 待取车），更新主订单状态待取车
             if(isChangeOrderStatus(orderStatusDTO)){
                 orderStatusDTO.setStatus(OrderStatusEnum.TO_GET_CAR.getStatus());
+                vo.setIsGetCar(YesNoEnum.YES);
                 //记录订单流程
                 orderFlowService.inserOrderStatusChangeProcessInfo(orderStatusDTO.getOrderNo(), OrderStatusEnum.TO_GET_CAR);
             }
             orderStatusService.saveOrderStatusInfo(orderStatusDTO);
             //更新配送 订单补付等信息 只有订单状态为已支付
             if(isGetCar(vo)){
-                callBack.callBack(vo.getOrderNo(),vo.getRenterOrderNo(),vo.getIsPayAgain());
+                callBack.callBack(vo.getMemNo(),vo.getOrderNo(),vo.getRenterOrderNo(),vo.getIsPayAgain(),vo.getIsGetCar());
             }
             log.info("payOrderCallBackSuccess saveOrderStatusInfo :[{}]", GsonUtils.toJson(orderStatusDTO));
         }
@@ -243,7 +237,7 @@ public class CashierPayService{
                    if(!CollectionUtils.isEmpty(payKind) && orderPayReqVO.getPayKind().contains(DataPayKindConstant.RENT_AMOUNT)){
                        //修改子订单费用信息
                        String renterOrderNo = getExtendParamsRentOrderNo(orderPayable);
-                       orderPayCallBack.callBack(orderPaySign.getOrderNo(),renterOrderNo,orderPayable.getIsPayAgain());
+                       orderPayCallBack.callBack(orderPaySign.getMenNo(),orderPaySign.getOrderNo(),renterOrderNo,orderPayable.getIsPayAgain(),YesNoEnum.NO);
                        return "";
                    }
 
