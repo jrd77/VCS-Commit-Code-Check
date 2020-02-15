@@ -621,7 +621,7 @@ public class OrderCostService {
 				//租客支付给平台的费用。console  200214
 				putOwnerToPlatformCost(realVo,data);
 				
-				//给租客的优惠（车主券）和平台补贴
+				//给租客的优惠（车主券）和平台补贴   调价
 				putPlatformSubsidyAndOwnerCoupon(realVo,data);
 				
 				//扣款
@@ -671,7 +671,7 @@ public class OrderCostService {
 		 String fineAmt;
 
 		//租客车主互相调价
-		 String adjustAmt = "0"; //默认
+//		 String adjustAmt = "0"; //默认
 		
 		//超里程费用
 		 String beyondMileAmt = "0";  //
@@ -727,7 +727,8 @@ public class OrderCostService {
 		 realVo.setIncomeAmt(incomeAmt);
 		 realVo.setRentAmt(rentAmt);
 		 realVo.setFineAmt(fineAmt);
-		 realVo.setAdjustAmt(adjustAmt);
+		 //值被覆盖了。。。
+//		 realVo.setAdjustAmt(adjustAmt);
 		 realVo.setBeyondMileAmt(beyondMileAmt);
 		 realVo.setOilAmt(oilAmt);
 		 realVo.setAddOilSrvAmt(addOilSrvAmt);
@@ -740,7 +741,7 @@ public class OrderCostService {
 		 
 		 String platformSrvFeeAmt = "0";
 		 String platformAddOilSrvAmt = "0";
-		 String ownerPayToPlatform = "0";
+//		 String ownerPayToPlatform = "0";
 		 String gpsAmt = "0";
 		 String gpsDeposit = "0";
 		 String carServiceSrvFee = "0"; 
@@ -801,7 +802,8 @@ public class OrderCostService {
 		 platformDeductionAmt = String.valueOf( NumberUtils.convertNumberToFushu(total));
 		 platformSrvFeeAmt = String.valueOf( NumberUtils.convertNumberToFushu(srvFee));
 		 platformAddOilSrvAmt = String.valueOf(NumberUtils.convertNumberToFushu(oil));
-		 ownerPayToPlatform = String.valueOf(NumberUtils.convertNumberToFushu(ownerPay));
+		 //被覆盖了。。。
+//		 ownerPayToPlatform = String.valueOf(NumberUtils.convertNumberToFushu(ownerPay));
 		 gpsAmt = String.valueOf(NumberUtils.convertNumberToFushu(gps));
 		 gpsDeposit = String.valueOf(gpsDepositAmt);
 		 carServiceSrvFee = String.valueOf(NumberUtils.convertNumberToFushu(getReturnCarFee));
@@ -810,7 +812,7 @@ public class OrderCostService {
 		 realVo.setPlatformDeductionAmt(platformDeductionAmt);
 		 realVo.setPlatformSrvFeeAmt(platformSrvFeeAmt);
 		 realVo.setPlatformAddOilSrvAmt(platformAddOilSrvAmt);
-		 realVo.setOwnerPayToPlatform(ownerPayToPlatform);
+//		 realVo.setOwnerPayToPlatform(ownerPayToPlatform);
 		 realVo.setGpsAmt(gpsAmt);
 		 realVo.setGpsDeposit(gpsDeposit);  //默认处理
 		 realVo.setCarServiceSrvFee(carServiceSrvFee);
@@ -875,7 +877,7 @@ public class OrderCostService {
 //							ownerToRenterAdjustAmount += orderConsoleSubsidyDetailEntity.getSubsidyAmount().intValue();
 						//不需要累计，只是查询记录
 						ownerToRenterAdjustAmount = Math.abs(orderConsoleSubsidyDetailEntity.getSubsidyAmount().intValue());
-						break;
+						break;  //因为有两条记录。只取一条就可以了。租客和车主的双向记录。
 					}
 				}
 		    }

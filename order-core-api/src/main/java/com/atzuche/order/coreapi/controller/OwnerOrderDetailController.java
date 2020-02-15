@@ -138,8 +138,8 @@ public class OwnerOrderDetailController {
     }
 
     @PostMapping("/owner/updateFien")
-    public ResponseData<?> updateFineAmt(@Valid @RequestBody FienAmtUpdateReqDTO fienAmtUpdateReqDTO, BindingResult bindingResult){
-        BindingResultUtil.checkBindingResult(bindingResult);
+    public ResponseData<?> updateFineAmt(@RequestBody FienAmtUpdateReqDTO fienAmtUpdateReqDTO){  //@Valid   , BindingResult bindingResult
+//        BindingResultUtil.checkBindingResult(bindingResult);
         ownerOrderDetailService.updateFien(fienAmtUpdateReqDTO);
         return ResponseData.success();
     }

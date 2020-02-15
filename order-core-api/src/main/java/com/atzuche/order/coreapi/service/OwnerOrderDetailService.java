@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import com.atzuche.order.commons.CostStatUtils;
 import com.atzuche.order.commons.GlobalConstant;
 import com.atzuche.order.commons.LocalDateTimeUtils;
+import com.atzuche.order.commons.NumberUtils;
 import com.atzuche.order.commons.entity.dto.OwnerGoodsDetailDTO;
 import com.atzuche.order.commons.entity.dto.OwnerGoodsPriceDetailDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.OrderConsoleCostDetailDTO;
@@ -107,6 +108,7 @@ public class OwnerOrderDetailService {
         ownerRentDetailDTO.setReqTimeStr(orderDTO.getReqTime()!=null? LocalDateTimeUtils.localdateToString(orderDTO.getReqTime(), GlobalConstant.FORMAT_DATE_STR1):null);
         ownerRentDetailDTO.setRevertTimeStr(orderDTO.getExpRevertTime()!=null? LocalDateTimeUtils.localdateToString(orderDTO.getExpRevertTime(), GlobalConstant.FORMAT_DATE_STR1):null);
         ownerRentDetailDTO.setRentTimeStr(orderDTO.getExpRentTime()!=null?LocalDateTimeUtils.localdateToString(orderDTO.getExpRentTime(), GlobalConstant.FORMAT_DATE_STR1):null);
+        ownerRentDetailDTO.setCarPlateNum(ownerGoodsDetail.getCarPlateNum());
         return ownerRentDetailDTO;
     }
 
@@ -305,13 +307,13 @@ public class OwnerOrderDetailService {
 //        }
         PlatformToOwnerDTO platformToOwnerDTO = new PlatformToOwnerDTO();
 //        platformToOwnerDTO.setOliAmt(renterOrderCostDetail!=null?renterOrderCostDetail.getTotalAmount():0);
-        platformToOwnerDTO.setOliAmt(String.valueOf(oilFee));
-        platformToOwnerDTO.setTimeOut(String.valueOf(timeOut));
-        platformToOwnerDTO.setModifyOrderTimeAndAddrAmt(String.valueOf(modifyOrderTimeAndAddrAmt));
-        platformToOwnerDTO.setCarWash(String.valueOf(carWash));
-        platformToOwnerDTO.setDlayWait(String.valueOf(dlayWait));
-        platformToOwnerDTO.setStopCar(String.valueOf(stopCar));
-        platformToOwnerDTO.setExtraMileage(String.valueOf(extraMileage));
+        platformToOwnerDTO.setOliAmt(String.valueOf(NumberUtils.convertNumberToZhengshu(oilFee)));
+        platformToOwnerDTO.setTimeOut(String.valueOf(NumberUtils.convertNumberToZhengshu(timeOut)));
+        platformToOwnerDTO.setModifyOrderTimeAndAddrAmt(String.valueOf(NumberUtils.convertNumberToZhengshu(modifyOrderTimeAndAddrAmt)));
+        platformToOwnerDTO.setCarWash(String.valueOf(NumberUtils.convertNumberToZhengshu(carWash)));
+        platformToOwnerDTO.setDlayWait(String.valueOf(NumberUtils.convertNumberToZhengshu(dlayWait)));
+        platformToOwnerDTO.setStopCar(String.valueOf(NumberUtils.convertNumberToZhengshu(stopCar)));
+        platformToOwnerDTO.setExtraMileage(String.valueOf(NumberUtils.convertNumberToZhengshu(extraMileage)));
         return platformToOwnerDTO;
     }
 

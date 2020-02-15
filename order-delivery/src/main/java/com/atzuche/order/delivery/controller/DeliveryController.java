@@ -5,11 +5,8 @@ import com.atzuche.order.commons.vo.req.DeliveryCarPriceReqVO;
 import com.atzuche.order.commons.vo.res.delivery.DeliveryOilCostRepVO;
 import com.atzuche.order.delivery.common.DeliveryCarTask;
 import com.atzuche.order.delivery.service.delivery.DeliveryCarInfoPriceService;
-import com.atzuche.order.delivery.utils.DateUtils;
 import com.atzuche.order.delivery.vo.delivery.DeliveryOilCostVO;
-import com.atzuche.order.delivery.vo.delivery.RenYunFlowOrderDTO;
 import com.atzuche.order.mq.common.base.BaseProducer;
-import com.atzuche.order.mq.common.base.OrderMessage;
 import com.autoyol.commons.web.ResponseData;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -20,7 +17,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Date;
 
 /**
  * @author 胡春林
@@ -41,7 +37,6 @@ public class DeliveryController {
     DeliveryCarInfoPriceService deliveryCarInfoPriceService;
     @PostMapping("/delivery/add")
     public ResponseData<?> add() {
-
 //        OrderMessage orderMessage =OrderMessage.builder().phone("13628645717").context("renterOptCancel").build();
 //        baseProducer.sendTopicMessage("auto-order-action","action.order.create4",orderMessage);
 
