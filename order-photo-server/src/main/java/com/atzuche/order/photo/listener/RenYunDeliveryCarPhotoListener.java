@@ -18,6 +18,8 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.Objects;
 
 /**
@@ -45,7 +47,7 @@ public class RenYunDeliveryCarPhotoListener {
             String handoverCarOilJson = new String(message.getBody());
             DeliveryCarConditionPhotoVO deliveryCarConditionPhotoVO = GsonUtils.convertObj(handoverCarOilJson, DeliveryCarConditionPhotoVO.class);
             OrderPhotoEntity orderPhotoEntity = new OrderPhotoEntity();
-            orderPhotoEntity.setCreateTime(DateUtil.asLocalDateTime(deliveryCarConditionPhotoVO.getCreateTime()));
+            orderPhotoEntity.setCreateTime(LocalDateTime.now());
             orderPhotoEntity.setOrderNo(String.valueOf(deliveryCarConditionPhotoVO.getOrderNo()));
             orderPhotoEntity.setPath(deliveryCarConditionPhotoVO.getPath());
             orderPhotoEntity.setUserType(String.valueOf(deliveryCarConditionPhotoVO.getUserType()));
