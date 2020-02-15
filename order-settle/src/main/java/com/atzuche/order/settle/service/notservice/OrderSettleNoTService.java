@@ -250,7 +250,7 @@ public class OrderSettleNoTService {
     public void check(RenterOrderEntity renterOrder) {
         // 1 订单校验是否可以结算
         OrderStatusEntity orderStatus = orderStatusService.getByOrderNo(renterOrder.getOrderNo());
-        if(OrderStatusEnum.TO_SETTLE.getStatus() == orderStatus.getStatus()){
+        if(OrderStatusEnum.TO_SETTLE.getStatus() != orderStatus.getStatus()){
             throw new RuntimeException("租客订单状态不是待结算，不能结算");
         }
         //2校验租客是否还车
