@@ -54,7 +54,7 @@ public class AdminCarOwnerInfoController {
 
         //车主等级
         OwnerMemberEntity ownerMemberEntity = ownerMemberService.queryOwnerMemberEntityByOrderNoAndOwnerNo(orderNo,memNo);
-        if(Objects.nonNull(ownerMemberEntity)){
+        if(Objects.nonNull(ownerMemberEntity) && Objects.nonNull(ownerMemberEntity.getMemType())){
             respVO.setMemLevel(MemberFlagEnum.getRightByIndex(ownerMemberEntity.getMemType()).getRightName());
         }
         return ResponseData.success(respVO);
