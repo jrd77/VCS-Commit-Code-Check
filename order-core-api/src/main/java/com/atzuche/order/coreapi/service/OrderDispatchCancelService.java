@@ -1,10 +1,14 @@
 package com.atzuche.order.coreapi.service;
 
+import com.atzuche.order.commons.enums.OrderStatusEnum;
 import com.atzuche.order.coreapi.common.conver.OrderCommonConver;
 import com.atzuche.order.coreapi.entity.dto.CancelOrderResDTO;
+import com.atzuche.order.coreapi.service.mq.OrderActionMqService;
+import com.atzuche.order.coreapi.service.mq.OrderStatusMqService;
 import com.atzuche.order.delivery.service.delivery.DeliveryCarService;
 import com.atzuche.order.delivery.vo.delivery.CancelOrderDeliveryVO;
 import com.atzuche.order.settle.service.OrderSettleService;
+import com.autoyol.event.rabbit.neworder.NewOrderMQStatusEventEnum;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -28,6 +32,10 @@ public class OrderDispatchCancelService {
     OrderCommonConver orderCommonConver;
     @Autowired
     DeliveryCarService deliveryCarService;
+    @Autowired
+    OrderActionMqService orderActionMqService;
+    @Autowired
+    OrderStatusMqService orderStatusMqService;
 
     /**
      * 调度取消
@@ -64,8 +72,8 @@ public class OrderDispatchCancelService {
             }
         }
 
-        //TODO:发送调度取消事件
-
-
+        //发送调度取消事件
+        orderActionMqService.sendOrderDispatchCancelSuccess(orderNo, null);
+        orderStatusMqService.sendOrderStatusByOrderNo(orderNo,null,cancelOrderRes.getStatus(),NewOrderMQStatusEventEnum.ORDER_END);
     }
 }
