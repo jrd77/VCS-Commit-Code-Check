@@ -20,4 +20,6 @@ public class OwnerRentDetailDTO {
     private Integer dayAverageAmt;
     @AutoDocProperty("一天一价列表")
     List<OwnerGoodsPriceDetailDTO> ownerGoodsPriceDetailDTOS;
+    @AutoDocProperty("车牌号")
+    private String carPlateNum;
 }
