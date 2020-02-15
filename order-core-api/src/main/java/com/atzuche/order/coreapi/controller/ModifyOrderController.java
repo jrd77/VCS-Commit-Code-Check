@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.atzuche.order.open.vo.ModifyOrderAppReqVO;
 import com.atzuche.order.coreapi.entity.request.ModifyOrderReq;
+import com.atzuche.order.coreapi.entity.vo.DispatchCarInfoVO;
 import com.atzuche.order.open.vo.request.TransferReq;
 import com.atzuche.order.open.vo.ModifyOrderCompareVO;
 import com.atzuche.order.coreapi.service.ModifyOrderConfirmService;
@@ -141,6 +142,30 @@ public class ModifyOrderController {
 		BeanUtils.copyProperties(modifyOrderAppReq, modifyOrderReq);
 		ModifyOrderCompareVO modifyOrderCompareVO = modifyOrderFeeService.getModifyOrderCompareVO(modifyOrderReq);
 		return ResponseData.success(modifyOrderCompareVO);
+	}
+	
+	
+	/**
+	 * 获取换车成本
+	 * @param transferReq
+	 * @param bindingResult
+	 * @return ResponseData<DispatchCarInfoVO>
+	 */
+	@PostMapping("/order/transferPreFee")
+	public ResponseData<DispatchCarInfoVO> getDispatchCarInfoVO(@Valid @RequestBody TransferReq transferReq, BindingResult bindingResult) {
+		log.info("换车操作transferReq=[{}] ", transferReq);
+		BindingResultUtil.checkBindingResult(bindingResult);
+        String memNo = renterMemberService.getRenterNoByOrderNo(transferReq.getOrderNo());
+        transferReq.setMemNo(memNo);
+		// 属性拷贝
+		ModifyOrderReq modifyOrderReq = new ModifyOrderReq();
+		BeanUtils.copyProperties(transferReq, modifyOrderReq);
+		// 设置为管理后台修改
+		modifyOrderReq.setConsoleFlag(true);
+		// 设置为换车操作
+		modifyOrderReq.setTransferFlag(true);
+		DispatchCarInfoVO dispatchCarInfoVO = modifyOrderFeeService.getDispatchCarInfoVO(modifyOrderReq);
+		return ResponseData.success(dispatchCarInfoVO);
 	}
 	
 	

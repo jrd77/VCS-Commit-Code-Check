@@ -32,4 +32,6 @@ public interface RenterGoodsMapper{
     String queryCarNumByOrderNo(@Param("orderNo") String orderNo);
 
     RenterGoodsEntity queryCarInfoByOrderNoAndCarNo(@Param("orderNo")String orderNo,@Param("carNo") String carNo);
+
+    RenterGoodsEntity queryInfoByOrderNo(@Param("orderNo")String orderNo);
 }

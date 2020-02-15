@@ -251,5 +251,9 @@ public class OwnerGoodsEntity implements Serializable {
 	 * 最新公里数
 	 */
 	private Integer lastMileage;
+    /**
+     * 车辆型号
+     */
+    private String modelTxt;
 
 }

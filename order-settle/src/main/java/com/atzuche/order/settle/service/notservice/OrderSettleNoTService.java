@@ -624,20 +624,21 @@ public class OrderSettleNoTService {
             int ownerSubsidyAmt = accountOwnerCostSettleDetails.stream().filter(obj ->{return obj.getAmt()<0;}).mapToInt(AccountOwnerCostSettleDetailEntity::getAmt).sum();
             settleOrdersDefinition.setOwnerSubsidyAmt(ownerSubsidyAmt);
         }
-        //3 平台收益总账
+        // 3 计算车主、租客交接车油费差
+        orderSettleNewService.addPlatFormAmt(settleOrdersDefinition,settleOrders);
+        //4 平台收益总账
         List<AccountPlatformProfitDetailEntity> accountPlatformProfitDetails = settleOrdersDefinition.getAccountPlatformProfitDetails();
         if(!CollectionUtils.isEmpty(accountPlatformProfitDetails)){
             int platformProfitAmt = accountPlatformProfitDetails.stream().mapToInt(AccountPlatformProfitDetailEntity::getAmt).sum();
             settleOrdersDefinition.setPlatformProfitAmt(platformProfitAmt);
         }
-        //4 平台补贴总额
+        //5 平台补贴总额
         List<AccountPlatformSubsidyDetailEntity> accountPlatformSubsidyDetails = settleOrdersDefinition.getAccountPlatformSubsidyDetails();
         if(!CollectionUtils.isEmpty(accountPlatformSubsidyDetails)){
             int platformSubsidyAmt = accountPlatformSubsidyDetails.stream().mapToInt(AccountPlatformSubsidyDetailEntity::getAmt).sum();
             settleOrdersDefinition.setPlatformSubsidyAmt(platformSubsidyAmt);
         }
-        // 5 计算车主、租客交接车油费差
-        orderSettleNewService.addPlatFormAmt(settleOrdersDefinition,settleOrders);
+
 
     }
 
