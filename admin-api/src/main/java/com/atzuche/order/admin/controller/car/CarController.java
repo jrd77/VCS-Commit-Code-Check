@@ -55,9 +55,10 @@ public class CarController {
         carBusiness.setDayMileage(renterGoodWithoutPriceVO.getCarDayMileage());
         carBusiness.setEngineNum(renterGoodWithoutPriceVO.getEngineNum());
         OwnerGoodsEntity ownerGoodsEntity = ownerGoodsService.getLastOwnerGoodsByOrderNo(orderNo);
-        //从owner_goods 表取已有数据
+        //从owner_goods 表取已有数据LocalDateTimeUtils.strToDateLong(date)
         if(Objects.nonNull(ownerGoodsEntity) && Objects.nonNull(ownerGoodsEntity.getLicenseExpire())){
-            carBusiness.setLicenseExpire(LocalDateTimeUtils.localDateTimeToDate(ownerGoodsEntity.getLicenseExpire()));
+            String date = LocalDateTimeUtils.formatDateTime(ownerGoodsEntity.getLicenseExpire());
+            carBusiness.setLicenseExpire(date);
         }
         if(Objects.nonNull(ownerGoodsEntity) && Objects.nonNull(ownerGoodsEntity.getCarUseType())){
             carBusiness.setUseType(ownerGoodsEntity.getCarUseType());
