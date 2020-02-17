@@ -25,10 +25,6 @@ public class ParamInputFilter implements OrderFilter {
         }
 
         if(null != orderReqVo.getSrvReturnFlag() && OrderConstant.YES == orderReqVo.getSrvReturnFlag()){
-            if(StringUtils.isBlank(orderReqVo.getSrvReturnAddr())){
-                throw new InputErrorException("使用还车服务还车地址不能为空");
-            }
-
             if(orderReqVo.getSrvReturnLon() == null || orderReqVo.getSrvReturnLon().trim().length()<=0
                     || orderReqVo.getSrvReturnLat() == null || orderReqVo.getSrvReturnLat().trim().length()<=0
                     || orderReqVo.getSrvReturnAddr() == null || orderReqVo.getSrvReturnAddr().trim().length()<=0){
@@ -37,11 +33,6 @@ public class ParamInputFilter implements OrderFilter {
         }
 
         if(null != orderReqVo.getSrvGetFlag() && OrderConstant.YES == orderReqVo.getSrvGetFlag()){
-
-            if(StringUtils.isBlank(orderReqVo.getSrvGetAddr())){
-                throw new InputErrorException("使用取车服务取车地址不能为空");
-            }
-
             if(orderReqVo.getSrvGetLon() == null || orderReqVo.getSrvGetLon().trim().length()<=0
                     || orderReqVo.getSrvGetLat() == null || orderReqVo.getSrvGetLat().trim().length()<=0
                     || orderReqVo.getSrvGetAddr() == null || orderReqVo.getSrvGetAddr().trim().length()<=0){
