@@ -5,6 +5,9 @@ import com.atzuche.order.accountrenterdeposit.service.AccountRenterDepositServic
 import com.atzuche.order.accountrenterdeposit.service.notservice.AccountRenterDepositNoTService;
 
 import com.atzuche.order.accountrenterdeposit.vo.res.AccountRenterDepositResVO;
+import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostDetailEntity;
+import com.atzuche.order.accountrenterrentcost.service.AccountRenterCostSettleService;
+import com.atzuche.order.accountrenterrentcost.service.notservice.AccountRenterCostDetailNoTService;
 import com.atzuche.order.accountrenterwzdepost.entity.AccountRenterWzDepositCostEntity;
 import com.atzuche.order.accountrenterwzdepost.entity.AccountRenterWzDepositDetailEntity;
 import com.atzuche.order.accountrenterwzdepost.entity.AccountRenterWzDepositEntity;
@@ -48,8 +51,9 @@ public class CashierQueryService {
     private AccountRenterDepositNoTService accountRenterDepositNoTService;
     @Autowired private CashierNoTService cashierNoTService;
     @Autowired private AccountRenterWzDepositDetailNoTService accountRenterWzDepositDetailNoTService;
-    @Autowired
-    private AccountRenterDepositService accountRenterDepositService;
+    @Autowired private AccountRenterDepositService accountRenterDepositService;
+    @Autowired private AccountRenterCostDetailNoTService accountRenterCostDetailNoTService;
+    @Autowired private AccountRenterCostSettleService accountRenterCostSettleService;
 
 
     /**
@@ -147,9 +151,17 @@ public class CashierQueryService {
      * @param orderNo
      * @return
      */
-    public int getRenterCostDetails(String orderNo){
-        AccountRenterDepositEntity entity = accountRenterDepositNoTService.queryDeposit(orderNo);
-        return entity.getYingfuDepositAmt()+entity.getShifuDepositAmt();
+    public List<AccountRenterCostDetailEntity> getRenterCostDetails(String orderNo){
+        return accountRenterCostDetailNoTService.getAccountRenterCostDetailsByOrderNo(orderNo);
+    }
+
+    /**
+     * 查询已付租车费用
+     * @param orderNo
+     * @return
+     */
+    public int getRenterCost(String orderNo,String memNo){
+        return accountRenterCostSettleService.getCostPaidRent(orderNo,memNo);
     }
 
 
