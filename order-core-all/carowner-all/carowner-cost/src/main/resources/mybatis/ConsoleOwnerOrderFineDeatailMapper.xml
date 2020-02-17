@@ -194,5 +194,12 @@
         from console_owner_order_fine_deatail
         where order_no=#{orderNo} and is_delete = 0
     </select>
+    
+    <select id="selectByOrderNoMemNo" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from console_owner_order_fine_deatail
+        where order_no=#{orderNo} and mem_no =#{memNo} and is_delete = 0
+    </select>
 
 </mapper>
