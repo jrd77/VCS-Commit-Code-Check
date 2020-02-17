@@ -73,4 +73,8 @@ public class AccountOwnerIncomeExamineNoTService {
     public AccountOwnerIncomeExamineEntity getAccountOwnerIncomeExamineByOrderNo(String orderNo) {
         return accountOwnerIncomeExamineMapper.selectByOrderNo(orderNo);
      }
+
+	public Integer getTotalAccountOwnerIncomeExamineByOrderNo(String orderNo) {
+		return accountOwnerIncomeExamineMapper.getTotalAccountOwnerIncomeExamineByOrderNo(orderNo);
+	}
 }

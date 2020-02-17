@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.atzuche.order.admin.service.GetReturnCarService;
 import com.atzuche.order.admin.vo.req.cost.GetReturnRequestVO;
 import com.atzuche.order.admin.vo.resp.cost.GetReturnCostVO;
+import com.atzuche.order.commons.BindingResultUtil;
 import com.atzuche.order.commons.LocalDateTimeUtils;
 import com.autoyol.commons.utils.StringUtils;
 import com.autoyol.commons.web.ErrorCode;
@@ -45,11 +47,12 @@ public class AdminGetReturnCarController {
 	@AutoDocMethod(description = "计算取车费用或还车费用", value = "计算取车费用或还车费用", response = GetReturnCostVO.class)
 //	@GetMapping("calculateGetOrReturnCost")
 	@RequestMapping(value="calculateGetOrReturnCost",method = RequestMethod.POST)
-	public ResponseData calculateGetOrReturnCost(@RequestBody GetReturnRequestVO getReturnRequestVO, HttpServletRequest request, HttpServletResponse response,BindingResult bindingResult) {
+	public ResponseData calculateGetOrReturnCost(@RequestBody @Validated GetReturnRequestVO getReturnRequestVO, HttpServletRequest request, HttpServletResponse response,BindingResult bindingResult) {
         logger.info("calculateGetOrReturnCost controller params={}",getReturnRequestVO.toString());
 		if (bindingResult.hasErrors()) {
             return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), ErrorCode.INPUT_ERROR.getText());
         }
+//        BindingResultUtil.checkBindingResult(bindingResult);
         
         try {
         	//前置检查

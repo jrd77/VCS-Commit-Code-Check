@@ -36,6 +36,11 @@ public class OwnerOrderDetailServiceTest {
 		System.err.println("dt="+dt.toString());
 	}
 	
+	@Test
+	public void testUpdateFineAmt() {
+//		ownerOrderDetailService.updateFineAmt(fienAmtUpdateReqDTO);
+	}
+	
 
 	@Test
 	public void testRenterOwnerPrice() {
@@ -59,9 +64,6 @@ public class OwnerOrderDetailServiceTest {
 		fail("Not yet implemented");
 	}
 
-	@Test
-	public void testUpdateFineAmt() {
-		fail("Not yet implemented");
-	}
+
 
 }

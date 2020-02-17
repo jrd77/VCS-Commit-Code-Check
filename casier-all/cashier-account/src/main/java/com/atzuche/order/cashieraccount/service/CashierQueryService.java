@@ -140,8 +140,17 @@ public class CashierQueryService {
      */
     public int getTotalToPayDepositAmt(String orderNo){
         AccountRenterDepositEntity entity = accountRenterDepositNoTService.queryDeposit(orderNo);
-
         return entity.getYingfuDepositAmt()+entity.getShifuDepositAmt();
     }
+    /**
+     * 查询租车费用 支付记录
+     * @param orderNo
+     * @return
+     */
+    public int getRenterCostDetails(String orderNo){
+        AccountRenterDepositEntity entity = accountRenterDepositNoTService.queryDeposit(orderNo);
+        return entity.getYingfuDepositAmt()+entity.getShifuDepositAmt();
+    }
+
 
 }

@@ -281,17 +281,20 @@ public class OrderCostService {
 		}
 		
 		for (OrderConsoleSubsidyDetailEntity orderConsoleSubsidyDetailEntity : orderConsoleSubsidyDetails) {
-			if("1".equals(orderConsoleSubsidyDetailEntity.getSubsidySourceCode()) && "2".equals(orderConsoleSubsidyDetailEntity.getSubsidyTargetCode())){
-				//补贴来源方 1、租客 2、车主 3、平台
-				//补贴方名称 1、租客 2、车主 3、平台
-		    	//租客给车主的调价
+			//补贴来源方 1、租客 2、车主 3、平台
+			//补贴方名称 1、租客 2、车主 3、平台
+			//租客给车主的调价
+			if("2".equals(orderConsoleSubsidyDetailEntity.getSubsidySourceCode()) && "1".equals(orderConsoleSubsidyDetailEntity.getSubsidyTargetCode())){
+				if(RenterCashCodeEnum.SUBSIDY_OWNERTORENTER_ADJUST.getCashNo().equals(orderConsoleSubsidyDetailEntity.getSubsidyCostCode())) {
+					renterToOwnerAdjustAmount += orderConsoleSubsidyDetailEntity.getSubsidyAmount().intValue();
+				}
+			}else if("1".equals(orderConsoleSubsidyDetailEntity.getSubsidySourceCode()) && "2".equals(orderConsoleSubsidyDetailEntity.getSubsidyTargetCode())){
 				if(RenterCashCodeEnum.SUBSIDY_RENTERTOOWNER_ADJUST.getCashNo().equals(orderConsoleSubsidyDetailEntity.getSubsidyCostCode())) {
-//					renterToOwnerAdjustAmount += orderConsoleSubsidyDetailEntity.getSubsidyAmount().intValue();
 					//不需要累计，只是查询记录
-					renterToOwnerAdjustAmount = Math.abs(orderConsoleSubsidyDetailEntity.getSubsidyAmount().intValue());
-					break; //就是这个地方跳出去了
+					renterToOwnerAdjustAmount += orderConsoleSubsidyDetailEntity.getSubsidyAmount().intValue();
 				}
 			}
+			
 		}
 		
 		/**
@@ -327,7 +330,7 @@ public class OrderCostService {
 		realVo.setOwnerSubsidyTotalAmt(ownerSubsidyTotalAmt);
 		realVo.setOwnerSubsidyRentAmt(ownerSubsidyRentAmt);
 		//租客给车主的调价 20200211
-		realVo.setAdjustAmt(String.valueOf( NumberUtils.convertNumberToZhengshu(renterToOwnerAdjustAmount)));
+		realVo.setAdjustAmt(String.valueOf( renterToOwnerAdjustAmount)); //NumberUtils.convertNumberToZhengshu(renterToOwnerAdjustAmount)
 		
 	}
 
@@ -879,15 +882,18 @@ public class OrderCostService {
 				}
 			}
 			
-			//调价
+
+			//调价  车主的会员号相同。 需要求和。
 			for (OrderConsoleSubsidyDetailEntity orderConsoleSubsidyDetailEntity : orderConsoleSubsidyDetails) {
 			  //车主给租客的调价
 				if("2".equals(orderConsoleSubsidyDetailEntity.getSubsidySourceCode()) && "1".equals(orderConsoleSubsidyDetailEntity.getSubsidyTargetCode())){
 					if(RenterCashCodeEnum.SUBSIDY_OWNERTORENTER_ADJUST.getCashNo().equals(orderConsoleSubsidyDetailEntity.getSubsidyCostCode())) {
-//							ownerToRenterAdjustAmount += orderConsoleSubsidyDetailEntity.getSubsidyAmount().intValue();
+						ownerToRenterAdjustAmount += orderConsoleSubsidyDetailEntity.getSubsidyAmount().intValue();
+					}
+				}else if("1".equals(orderConsoleSubsidyDetailEntity.getSubsidySourceCode()) && "2".equals(orderConsoleSubsidyDetailEntity.getSubsidyTargetCode())){
+					if(RenterCashCodeEnum.SUBSIDY_RENTERTOOWNER_ADJUST.getCashNo().equals(orderConsoleSubsidyDetailEntity.getSubsidyCostCode())) {
 						//不需要累计，只是查询记录
-						ownerToRenterAdjustAmount = Math.abs(orderConsoleSubsidyDetailEntity.getSubsidyAmount().intValue());
-						break;  //因为有两条记录。只取一条就可以了。租客和车主的双向记录。
+						ownerToRenterAdjustAmount += orderConsoleSubsidyDetailEntity.getSubsidyAmount().intValue();
 					}
 				}
 		    }
@@ -910,8 +916,8 @@ public class OrderCostService {
 			couponDeductionAmount = String.valueOf( NumberUtils.convertNumberToFushu(ownerCouponAmtInt + ownerSubsidyRentAmount));
 			ownerSubsidyRentAmt = String.valueOf( NumberUtils.convertNumberToFushu(ownerSubsidyRentAmount));
 			
-			//
-			ownerToRenterAdjustAmt = String.valueOf(NumberUtils.convertNumberToZhengshu(ownerToRenterAdjustAmount));
+			//存在正负号区别。
+			ownerToRenterAdjustAmt = String.valueOf(ownerToRenterAdjustAmount);  //NumberUtils.convertNumberToZhengshu(ownerToRenterAdjustAmount)
 			
 		 //抵扣  给租客的优惠
 		 realVo.setCouponDeductionAmount(couponDeductionAmount);
