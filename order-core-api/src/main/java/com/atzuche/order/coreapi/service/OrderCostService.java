@@ -449,20 +449,20 @@ public class OrderCostService {
 	  /**
 	     * 全局的车主订单罚金明细
 	     */
-	    List<ConsoleOwnerOrderFineDeatailEntity> consoleRenterOrderFineDeatails = ownerCosts.getConsoleOwnerOrderFineDeatailEntitys();
-	    List<ConsoleRenterOrderFineDeatailEntity> consoleRenterOrderFineDeatailsReal = new ArrayList<ConsoleRenterOrderFineDeatailEntity>();
-	    if(consoleRenterOrderFineDeatails != null) {
-	    	consoleRenterOrderFineDeatails.stream().forEach(x->{
-	    		ConsoleRenterOrderFineDeatailEntity real = new ConsoleRenterOrderFineDeatailEntity();
+	    List<ConsoleOwnerOrderFineDeatailEntity> consoleOwnerOrderFineDeatails = ownerCosts.getConsoleOwnerOrderFineDeatailEntitys();
+	    List<com.atzuche.order.commons.vo.res.ownercosts.ConsoleOwnerOrderFineDeatailEntity> consoleOwnerOrderFineDeatailsReal = new ArrayList<com.atzuche.order.commons.vo.res.ownercosts.ConsoleOwnerOrderFineDeatailEntity>();
+	    if(consoleOwnerOrderFineDeatails != null) {
+	    	consoleOwnerOrderFineDeatails.stream().forEach(x->{
+	    		com.atzuche.order.commons.vo.res.ownercosts.ConsoleOwnerOrderFineDeatailEntity real = new com.atzuche.order.commons.vo.res.ownercosts.ConsoleOwnerOrderFineDeatailEntity();
 		      		try {
 						BeanUtils.copyProperties(x,real);
 					} catch (Exception e) {
 						log.error("对象属性赋值报错:",e);
 					}
-		      		consoleRenterOrderFineDeatailsReal.add(real);
+		      		consoleOwnerOrderFineDeatailsReal.add(real);
 		          });
 		      }
-	    resVo.setConsoleRenterOrderFineDeatails(consoleRenterOrderFineDeatailsReal);
+	    resVo.setConsoleOwnerOrderFineDeatails(consoleOwnerOrderFineDeatailsReal);
 	    
 	    
 	    /**
