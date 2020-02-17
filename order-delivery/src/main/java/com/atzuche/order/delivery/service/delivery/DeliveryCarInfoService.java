@@ -151,6 +151,12 @@ public class DeliveryCarInfoService {
             returnHandoverCarDO.setOwnDefaultReturnCarLng(deliveryCarVO.getReturnHandoverCarDTO().getOwnDefaultReturnCarLng());
             deliveryCarVO.setReturnHandoverCarDTO(returnHandoverCarDO);
         }
+        if(deliveryCarVO.getIsGetCar() == 1 && deliveryCarVO.getIsReturnCar() == 0)
+        {
+            deliveryCarVO.getGetHandoverCarDTO().setOwnRealReturnAddr(deliveryCarVO.getReturnHandoverCarDTO().getOwnDefaultReturnCarAddr());
+            deliveryCarVO.getGetHandoverCarDTO().setOwnRealReturnLat(deliveryCarVO.getReturnHandoverCarDTO().getOwnDefaultReturnCarLat());
+            deliveryCarVO.getGetHandoverCarDTO().setOwnRealReturnLng(deliveryCarVO.getReturnHandoverCarDTO().getOwnDefaultReturnCarLng());
+        }
         return deliveryCarVO;
     }
 
