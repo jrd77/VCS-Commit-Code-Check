@@ -141,6 +141,9 @@ public class DeliveryCarInfoService {
             GetHandoverCarDTO getHandoverCarDO = new GetHandoverCarDTO();
             getHandoverCarDO.setOwnDefaultGetCarAddr(deliveryCarVO.getGetHandoverCarDTO().getOwnDefaultGetCarAddr());
             getHandoverCarDO.setOwnDefaultGetCarLat(deliveryCarVO.getGetHandoverCarDTO().getOwnDefaultGetCarLat());
+            getHandoverCarDO.setOwnDefaultGetCarLng(deliveryCarVO.getGetHandoverCarDTO().getOwnDefaultGetCarLng());
+            getHandoverCarDO.setOwnRealReturnAddr(deliveryCarVO.getGetHandoverCarDTO().getOwnDefaultGetCarAddr());
+            getHandoverCarDO.setOwnRealReturnLat(deliveryCarVO.getGetHandoverCarDTO().getOwnDefaultGetCarLat());
             getHandoverCarDO.setOwnRealReturnLng(deliveryCarVO.getGetHandoverCarDTO().getOwnDefaultGetCarLng());
             deliveryCarVO.setGetHandoverCarDTO(getHandoverCarDO);
         }
@@ -153,9 +156,7 @@ public class DeliveryCarInfoService {
         }
         if(deliveryCarVO.getIsGetCar() == 1 && deliveryCarVO.getIsReturnCar() == 0)
         {
-            deliveryCarVO.getGetHandoverCarDTO().setOwnRealReturnAddr(deliveryCarVO.getReturnHandoverCarDTO().getOwnDefaultReturnCarAddr());
-            deliveryCarVO.getGetHandoverCarDTO().setOwnRealReturnLat(deliveryCarVO.getReturnHandoverCarDTO().getOwnDefaultReturnCarLat());
-            deliveryCarVO.getGetHandoverCarDTO().setOwnRealReturnLng(deliveryCarVO.getReturnHandoverCarDTO().getOwnDefaultReturnCarLng());
+
         }
         return deliveryCarVO;
     }
