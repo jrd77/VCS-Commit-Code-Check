@@ -50,6 +50,9 @@
 		select <include refid="Base_Column_List" /> from account_owner_income_examine where order_no = #{orderNo} and is_delete = 0
 	</select>
 	
+	<select id="getTotalAccountOwnerIncomeExamineByOrderNo" resultType="java.lang.Integer">
+		select IFNULL(SUM(amt),0) from account_owner_income_examine where order_no = #{orderNo} and is_delete = 0
+	</select>
 
 	<insert id="insertSelective" parameterType="com.atzuche.order.accountownerincome.entity.AccountOwnerIncomeExamineEntity" useGeneratedKeys="true" keyProperty="id">
         insert into account_owner_income_examine
