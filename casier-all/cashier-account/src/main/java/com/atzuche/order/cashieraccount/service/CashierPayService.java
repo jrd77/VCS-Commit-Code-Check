@@ -387,6 +387,12 @@ public class CashierPayService{
 
     }
 
+    /**
+     * 查应付
+     * @param orderNo
+     * @param memNo
+     * @return
+     */
     public int getRentCost(String orderNo,String memNo){
         RenterOrderEntity renterOrderEntity = cashierNoTService.getRenterOrderNoByOrderNo(orderNo);
 
@@ -399,7 +405,7 @@ public class CashierPayService{
         int rentAmt = cashierNoTService.sumRentOrderCost(payableVOs);
         //已付租车费用
         int rentAmtPayed = accountRenterCostSettleService.getCostPaidRent(orderNo,memNo);
-        return rentAmt + rentAmtPayed;
+        return rentAmt - rentAmtPayed;
     }
     
     /**
