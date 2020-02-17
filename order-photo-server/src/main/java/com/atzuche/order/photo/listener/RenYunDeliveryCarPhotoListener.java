@@ -8,6 +8,8 @@ import com.autoyol.commons.utils.DateUtil;
 import com.autoyol.commons.utils.GsonUtils;
 import com.dianping.cat.Cat;
 import com.dianping.cat.message.Transaction;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.Message;
@@ -16,6 +18,8 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.Objects;
 
 /**
@@ -43,22 +47,21 @@ public class RenYunDeliveryCarPhotoListener {
             String handoverCarOilJson = new String(message.getBody());
             DeliveryCarConditionPhotoVO deliveryCarConditionPhotoVO = GsonUtils.convertObj(handoverCarOilJson, DeliveryCarConditionPhotoVO.class);
             OrderPhotoEntity orderPhotoEntity = new OrderPhotoEntity();
-            orderPhotoEntity.setCreateTime(DateUtil.asLocalDateTime(deliveryCarConditionPhotoVO.getCreateTime()));
+            orderPhotoEntity.setCreateTime(LocalDateTime.now());
             orderPhotoEntity.setOrderNo(String.valueOf(deliveryCarConditionPhotoVO.getOrderNo()));
             orderPhotoEntity.setPath(deliveryCarConditionPhotoVO.getPath());
             orderPhotoEntity.setUserType(String.valueOf(deliveryCarConditionPhotoVO.getUserType()));
             orderPhotoEntity.setPhotoType(String.valueOf(deliveryCarConditionPhotoVO.getPhotoType()));
+            orderPhotoEntity.setSerialNumber(deliveryCarConditionPhotoVO.getSerialNumber());
             //更新
             OrderPhotoEntity orderPhoto = orderPhotoService.selectObjectByParams(orderPhotoEntity);
             if (Objects.nonNull(orderPhoto)) {
-                BeanUtils.copyProperties(orderPhotoEntity, orderPhoto);
-                orderPhoto.setOperator("仁云传过来");
-                orderPhotoService.updateDeliveryCarPhotoInfo(orderPhoto.getId(), orderPhoto.getPath(), orderPhoto.getOperator(), orderPhoto.getUserType(), orderPhoto.getPhotoType());
+                orderPhoto.setPath(orderPhotoEntity.getPath());
+                orderPhotoService.updateDeliveryCarPhotoInfo(orderPhoto.getId(), orderPhoto.getPath(), orderPhoto.getOperator(), orderPhoto.getUserType(), orderPhoto.getPhotoType(), orderPhoto.getSerialNumber());
             } else {
-                orderPhotoEntity.setSerialNumber(0);
+                orderPhotoEntity.setPhotoOperator(deliveryCarConditionPhotoVO.getUserType());
                 orderPhotoService.recevieRenYunDeliveryCarPhoto(orderPhotoEntity);
             }
-
             Cat.logEvent(CatConstants.RABBIT_MQ_METHOD, "RenYunDeliveryCarPhotoListener.process");
             Cat.logEvent(CatConstants.RABBIT_MQ_PARAM, handoverCarOilJson);
             t.setStatus(Transaction.SUCCESS);
@@ -72,4 +75,6 @@ public class RenYunDeliveryCarPhotoListener {
         LOGGER.info("-----获取交接车、取还车照片数据结束--------");
 
     }
+
 }
+

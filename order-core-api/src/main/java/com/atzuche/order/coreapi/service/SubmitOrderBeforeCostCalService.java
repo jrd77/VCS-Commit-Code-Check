@@ -254,8 +254,8 @@ public class SubmitOrderBeforeCostCalService {
         AdminGetDisCouponListResVO resVO = new AdminGetDisCouponListResVO();
         resVO.setWalletBal(String.valueOf(balance));
         resVO.setOwnerDisCouponList(buildOwnerDisCoupon(ownerCoupons));
-        resVO.setPlatformCouponList(buildDisCoupon(platformCoupons));
-        resVO.setGetCarFeeDisCouponList(buildDisCoupon(getCarFeeCoupons));
+        resVO.setPlatformCouponList(buildDisCoupon(platformCoupons, 1));
+        resVO.setGetCarFeeDisCouponList(buildDisCoupon(getCarFeeCoupons, 2));
         return resVO;
 
     }
@@ -286,11 +286,15 @@ public class SubmitOrderBeforeCostCalService {
      * 优惠券信息转换
      *
      * @param list 优惠券列表
+     * @param opType 操作类型:1 优惠券 2 送取服务券
      * @return List<DisCoupon>
      */
-    private List<DisCoupon>  buildDisCoupon(List<MemAvailCoupon> list) {
+    private List<DisCoupon>  buildDisCoupon(List<MemAvailCoupon> list, int opType) {
         if(CollectionUtils.isNotEmpty(list)) {
             List<DisCoupon> coupons = new ArrayList<>();
+            if(2 == opType) {
+                list =  list.stream().filter(c -> c.getCouponType() == 8).collect(Collectors.toList());
+            }
             list.stream().forEach(c -> {
                 DisCoupon disCoupon = new DisCoupon();
                 disCoupon.setDisCouponId(c.getId());

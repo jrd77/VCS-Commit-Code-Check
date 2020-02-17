@@ -207,6 +207,8 @@ public class OrderPhotoController{
 	@AutoDocMethod(description = "变更订单照片", value = "变更订单照片", response = ResponseData.class)
 	public void update()
 	{
+
+	    //"path":"20/02/73544351200299/condition/b383761c-c10b-47b7-9c17-36e3f15853db.jpg","userType":2,"serialNumber":2,"orderNo":73544351200299,"photoType":2,"id":0,"createTime":"Feb 15, 2020 8:15:24 PM","updateTime":"Feb 15, 2020 8:15:24 PM"
 		DeliveryCarConditionPhotoVO transIllegalPhotoDTO = new DeliveryCarConditionPhotoVO();
 		transIllegalPhotoDTO.setUserType(1);
 		transIllegalPhotoDTO.setOrderNo(42139241200299L);

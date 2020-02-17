@@ -1,6 +1,7 @@
 package com.atzuche.order.delivery.service.handover;
 
 import com.atzuche.order.commons.vo.req.handover.req.HandoverCarInfoReqDTO;
+import com.atzuche.order.delivery.entity.OwnerHandoverCarInfoEntity;
 import com.atzuche.order.delivery.entity.RenterHandoverCarInfoEntity;
 import com.atzuche.order.delivery.entity.RenterHandoverCarRemarkEntity;
 import com.atzuche.order.delivery.enums.RenterHandoverCarTypeEnum;
@@ -34,18 +35,18 @@ public class RenterHandoverCarService implements IUpdateHandoverCarInfo {
     @Transactional(rollbackFor = Exception.class)
     @Override
     public void updateHandoverCarOilMileageNum(HandoverCarInfoReqDTO handoverCarInfoReqDTO) {
-        RenterHandoverCarInfoEntity renterHandoverCarReturnInfoEntity = selectObjectByOrderNo(handoverCarInfoReqDTO.getOrderNo(), RenterHandoverCarTypeEnum.RENTER_TO_RENYUN.getValue());
-        if (Objects.nonNull(renterHandoverCarReturnInfoEntity)) {
-            renterHandoverCarReturnInfoEntity.setOilNum(Integer.valueOf(handoverCarInfoReqDTO.getOwnReturnOil()));
-            renterHandoverCarReturnInfoEntity.setMileageNum(Integer.valueOf(handoverCarInfoReqDTO.getOwnReturnKM()));
-            updateRenterHandoverInfoByPrimaryKey(renterHandoverCarReturnInfoEntity);
-        }
-        RenterHandoverCarInfoEntity renterHandoverCarGetInfoEntity = selectObjectByOrderNo(handoverCarInfoReqDTO.getOrderNo(), RenterHandoverCarTypeEnum.RENYUN_TO_RENTER.getValue());
-        if (Objects.nonNull(renterHandoverCarGetInfoEntity)) {
-            renterHandoverCarGetInfoEntity.setOilNum(Integer.valueOf(handoverCarInfoReqDTO.getRenterReturnOil()));
-            renterHandoverCarGetInfoEntity.setMileageNum(Integer.valueOf(handoverCarInfoReqDTO.getRenterRetrunKM()));
-            updateRenterHandoverInfoByPrimaryKey(renterHandoverCarGetInfoEntity);
-        }
+
+        List<RenterHandoverCarInfoEntity> renterHandoverCarInfoEntityList = selectRenterByOrderNo(handoverCarInfoReqDTO.getOrderNo());
+        renterHandoverCarInfoEntityList.stream().forEach(r -> {
+            if (r.getType().intValue() == RenterHandoverCarTypeEnum.OWNER_TO_RENTER.getValue() || r.getType().intValue() == RenterHandoverCarTypeEnum.RENYUN_TO_RENTER.getValue()) {
+                r.setOilNum(Integer.valueOf(handoverCarInfoReqDTO.getRenterReturnOil()));
+                r.setMileageNum(Integer.valueOf(handoverCarInfoReqDTO.getRenterRetrunKM()));
+            } else if (r.getType().intValue() == RenterHandoverCarTypeEnum.RENTER_TO_OWNER.getValue() || r.getType().intValue() == RenterHandoverCarTypeEnum.RENTER_TO_RENYUN.getValue()) {
+                r.setOilNum(Integer.valueOf(handoverCarInfoReqDTO.getOwnReturnOil()));
+                r.setMileageNum(Integer.valueOf(handoverCarInfoReqDTO.getOwnReturnKM()));
+            }
+            updateRenterHandoverInfoByPrimaryKey(r);
+        });
     }
 
 

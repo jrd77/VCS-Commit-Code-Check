@@ -1,6 +1,7 @@
 package com.atzuche.order.coreapi.filter;
 
 import com.atzuche.order.commons.OrderReqContext;
+import com.atzuche.order.commons.constant.OrderConstant;
 import com.atzuche.order.commons.exceptions.InputErrorException;
 import com.atzuche.order.commons.filter.OrderFilter;
 import com.atzuche.order.commons.filter.OrderFilterException;
@@ -23,27 +24,18 @@ public class ParamInputFilter implements OrderFilter {
             throw new IllegalArgumentException("orderReqVO cannot be null");
         }
 
-        if("1".equals(orderReqVo.getSrvReturnFlag())){
-            if(StringUtils.isBlank(orderReqVo.getSrvReturnAddr())){
-                throw new InputErrorException("使用还车服务还车地址不能为空");
-            }
-
+        if(null != orderReqVo.getSrvReturnFlag() && OrderConstant.YES == orderReqVo.getSrvReturnFlag()){
             if(orderReqVo.getSrvReturnLon() == null || orderReqVo.getSrvReturnLon().trim().length()<=0
                     || orderReqVo.getSrvReturnLat() == null || orderReqVo.getSrvReturnLat().trim().length()<=0
-                    || orderReqVo.getSrvReturnAddr() == null || 	orderReqVo.getSrvReturnAddr().trim().length()<=0){
+                    || orderReqVo.getSrvReturnAddr() == null || orderReqVo.getSrvReturnAddr().trim().length()<=0){
                 throw new InputErrorException("还车经纬度或还车地址不能为空");
             }
         }
-        if("1".equals(orderReqVo.getSrvGetFlag())){
 
-
-            if(StringUtils.isBlank(orderReqVo.getSrvGetAddr())){
-                throw new InputErrorException("使用取车服务取车地址不能为空");
-            }
-
+        if(null != orderReqVo.getSrvGetFlag() && OrderConstant.YES == orderReqVo.getSrvGetFlag()){
             if(orderReqVo.getSrvGetLon() == null || orderReqVo.getSrvGetLon().trim().length()<=0
                     || orderReqVo.getSrvGetLat() == null || orderReqVo.getSrvGetLat().trim().length()<=0
-                    || orderReqVo.getSrvGetAddr() == null || 	orderReqVo.getSrvGetAddr().trim().length()<=0){
+                    || orderReqVo.getSrvGetAddr() == null || orderReqVo.getSrvGetAddr().trim().length()<=0){
                 throw new InputErrorException("取车经纬度或取车地址不能为空");
             }
         }

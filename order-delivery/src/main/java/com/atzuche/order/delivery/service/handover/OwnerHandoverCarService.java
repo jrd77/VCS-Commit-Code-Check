@@ -34,18 +34,18 @@ public class OwnerHandoverCarService implements IUpdateHandoverCarInfo {
     @Transactional(rollbackFor = Exception.class)
     @Override
     public void updateHandoverCarOilMileageNum(HandoverCarInfoReqDTO handoverCarInfoReqDTO) {
-        OwnerHandoverCarInfoEntity ownerHandoverCarReturnInfoEntity = selectObjectByOrderNo(handoverCarInfoReqDTO.getOrderNo(), RenterHandoverCarTypeEnum.RENTER_TO_RENYUN.getValue());
-        if(Objects.nonNull(ownerHandoverCarReturnInfoEntity)) {
-            ownerHandoverCarReturnInfoEntity.setOilNum(Integer.valueOf(handoverCarInfoReqDTO.getOwnReturnOil()));
-            ownerHandoverCarReturnInfoEntity.setMileageNum(Integer.valueOf(handoverCarInfoReqDTO.getOwnReturnKM()));
-            updateOwnerHandoverInfoByPrimaryKey(ownerHandoverCarReturnInfoEntity);
-        }
-        OwnerHandoverCarInfoEntity ownerHandoverCarGetInfoEntity = selectObjectByOrderNo(handoverCarInfoReqDTO.getOrderNo(), RenterHandoverCarTypeEnum.RENYUN_TO_RENTER.getValue());
-        if(Objects.nonNull(ownerHandoverCarGetInfoEntity)) {
-            ownerHandoverCarGetInfoEntity.setOilNum(Integer.valueOf(handoverCarInfoReqDTO.getRenterReturnOil()));
-            ownerHandoverCarGetInfoEntity.setMileageNum(Integer.valueOf(handoverCarInfoReqDTO.getRenterRetrunKM()));
-            updateOwnerHandoverInfoByPrimaryKey(ownerHandoverCarGetInfoEntity);
-        }
+
+        List<OwnerHandoverCarInfoEntity> ownerHandoverCarInfoEntityList = selectOwnerByOrderNo(handoverCarInfoReqDTO.getOrderNo());
+        ownerHandoverCarInfoEntityList.stream().forEach(r -> {
+            if (r.getType().intValue() == RenterHandoverCarTypeEnum.OWNER_TO_RENTER.getValue() || r.getType().intValue() == RenterHandoverCarTypeEnum.RENYUN_TO_RENTER.getValue()) {
+                r.setOilNum(Integer.valueOf(handoverCarInfoReqDTO.getRenterReturnOil()));
+                r.setMileageNum(Integer.valueOf(handoverCarInfoReqDTO.getRenterRetrunKM()));
+            } else if (r.getType().intValue() == RenterHandoverCarTypeEnum.RENTER_TO_OWNER.getValue() || r.getType().intValue() == RenterHandoverCarTypeEnum.RENTER_TO_RENYUN.getValue()) {
+                r.setOilNum(Integer.valueOf(handoverCarInfoReqDTO.getOwnReturnOil()));
+                r.setMileageNum(Integer.valueOf(handoverCarInfoReqDTO.getOwnReturnKM()));
+            }
+            updateOwnerHandoverInfoByPrimaryKey(r);
+        });
     }
 
 

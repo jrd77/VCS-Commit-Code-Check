@@ -18,6 +18,15 @@ public class OrderPhotoEntity {
 	private String operator;
 	private Integer serialNumber;
 
+
+    public void setPhotoOperator(Integer photoUserType) {
+        if (photoUserType.intValue() == 3) {
+            setOperator("平台");
+        } else {
+            setOperator(photoUserType.intValue() == 1 ? "租客" : "车主");
+        }
+    }
+
 	
 
 }

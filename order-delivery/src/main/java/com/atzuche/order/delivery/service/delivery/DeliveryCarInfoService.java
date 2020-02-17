@@ -191,7 +191,7 @@ public class DeliveryCarInfoService {
             returnChaoYunNengAddCrashStr = String.valueOf(returnChaoYunNengAddCrash);
             chaoYunNengAddCrashStr = String.valueOf(chaoYunNengAddCrash);
         } catch (Exception e) {
-            log.error("获取超运能异常，给默认值,cause:{}", e.getMessage());
+            log.error("获取超运能异常，给默认值,cause:{}", e);
             isGetOverTransport = "0";
             isReturnOverTransport = "0";
         }
@@ -202,7 +202,7 @@ public class DeliveryCarInfoService {
                 getHandoverCarDTO.setRenterRealGetAddrReamrk(renterOrderDeliveryEntity.getRenterRealGetReturnRemark());
                 getHandoverCarDTO.setOwnRealGetRemark(renterOrderDeliveryEntity.getOwnerRealGetReturnRemark());
             } catch (Exception e) {
-                log.error("备注获取失败");
+                log.error("备注获取失败",e);
             }
             getReturnCarCostReqDto.setSrvGetLat(renterOrderDeliveryEntity.getRenterGetReturnAddrLat());
             getReturnCarCostReqDto.setSrvGetLon(renterOrderDeliveryEntity.getRenterGetReturnAddrLon());
@@ -219,7 +219,7 @@ public class DeliveryCarInfoService {
                 returnHandoverCarDTO.setRenterRealGetRemark(renterOrderDeliveryEntity.getRenterRealGetReturnRemark());
                 returnHandoverCarDTO.setOwnerRealGetAddrReamrk(renterOrderDeliveryEntity.getOwnerRealGetReturnRemark());
             } catch (Exception e) {
-                log.error("备注获取失败");
+                log.error("备注获取失败",e);
             }
             getReturnCarCostReqDto.setSrvReturnLat(renterOrderDeliveryEntity.getRenterGetReturnAddrLat());
             getReturnCarCostReqDto.setSrvReturnLon(renterOrderDeliveryEntity.getRenterGetReturnAddrLon());
@@ -263,13 +263,13 @@ public class DeliveryCarInfoService {
         BeanUtils.copyProperties(getAndReturnCarDTO, renterGetAndReturnCarDTO);
         //车主平台加油服务费carOwnerOilCrash
         try {
-            ownerGetAndReturnCarDTO.setPlatFormOilServiceCharge(deliveryCarInfoPriceService.getOwnerPlatFormOilServiceCharge(Integer.valueOf(ownerGetAndReturnCarDTO.getReturnCarOil().contains("L") ? ownerGetAndReturnCarDTO.getReturnCarOil().replace("L", "") : ownerGetAndReturnCarDTO.getReturnCarOil()), Integer.valueOf(renterGetAndReturnCarDTO.getGetCarOil().contains("L") ? renterGetAndReturnCarDTO.getGetCarOil().replace("L", "") : renterGetAndReturnCarDTO.getGetCarOil())) + "元");
+            ownerGetAndReturnCarDTO.setPlatFormOilServiceCharge(deliveryCarInfoPriceService.getOwnerPlatFormOilServiceCharge(Integer.valueOf(ownerGetAndReturnCarDTO.getGetCarOil().contains("L") ? ownerGetAndReturnCarDTO.getGetCarOil().replace("L", "") : ownerGetAndReturnCarDTO.getGetCarOil()), Integer.valueOf(renterGetAndReturnCarDTO.getGetCarOil().contains("L") ? renterGetAndReturnCarDTO.getGetCarOil().replace("L", "") : renterGetAndReturnCarDTO.getGetCarOil())) + "元");
         } catch (Exception e) {
-            log.info("获取平台加邮费出错，cause：【{}】", e.getMessage());
+            log.info("获取平台加邮费出错，cause：[{}]", e);
             ownerGetAndReturnCarDTO.setPlatFormOilServiceCharge("0");
         }
         renterGetAndReturnCarDTO.setCarOwnerOilCrash(renterGetAndReturnCarDTO.getOilDifferenceCrash());
-        ownerGetAndReturnCarDTO.setCarOwnerAllOilCrash(ownerGetAndReturnCarDTO.getOilDifferenceCrash()+ownerGetAndReturnCarDTO.getPlatFormOilServiceCharge());
+        ownerGetAndReturnCarDTO.setCarOwnerAllOilCrash(String.valueOf(Integer.valueOf(ownerGetAndReturnCarDTO.getOilDifferenceCrash())+Integer.valueOf(ownerGetAndReturnCarDTO.getPlatFormOilServiceCharge())));
         if (isEscrowCar) {
             ownerGetAndReturnCarDTO.setCarOilDifferenceCrash(ownerGetAndReturnCarDTO.getOilDifferenceCrash());
             ownerGetAndReturnCarDTO.setCarOwnerOilCrash(ownerGetAndReturnCarDTO.getCarOwnerAllOilCrash());

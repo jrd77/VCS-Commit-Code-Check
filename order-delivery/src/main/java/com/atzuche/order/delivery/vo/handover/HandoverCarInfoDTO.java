@@ -114,10 +114,10 @@ public class HandoverCarInfoDTO {
         } else {
             if (orderDeliveryEntity.getType().intValue() == 1) {
                 setAheadTime(getMinutes);
-                setType(RenterHandoverCarTypeEnum.RENYUN_TO_RENTER.getValue().intValue());
+                setType(orderDeliveryEntity.getIsNotifyRenyun().intValue() == 1 ? 3 : 1);
             } else {
                 setAheadTime(returnMinutes);
-                setType(RenterHandoverCarTypeEnum.RENTER_TO_RENYUN.getValue().intValue());
+                setType(orderDeliveryEntity.getIsNotifyRenyun().intValue() == 1 ? 4 : 2);
             }
         }
     }

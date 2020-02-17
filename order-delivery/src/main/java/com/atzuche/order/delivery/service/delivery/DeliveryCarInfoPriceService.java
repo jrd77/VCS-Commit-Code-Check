@@ -167,7 +167,7 @@ public class DeliveryCarInfoPriceService {
             if (Objects.isNull(ownerHandoverCarInfoEntity.getType())) {
                 continue;
             }
-            if (ownerHandoverCarInfoEntity.getType().intValue() == RenterHandoverCarTypeEnum.RENYUN_TO_RENTER.getValue().intValue()) {
+            if (ownerHandoverCarInfoEntity.getType().intValue() == RenterHandoverCarTypeEnum.RENYUN_TO_RENTER.getValue().intValue() || ownerHandoverCarInfoEntity.getType().intValue() == RenterHandoverCarTypeEnum.OWNER_TO_RENTER.getValue().intValue()) {
                 ownerGetAndReturnCarDTO.setGetCarOil(ownerHandoverCarInfoEntity.getOilNum() == null ? "0": String.valueOf(ownerHandoverCarInfoEntity.getOilNum()));
                 ownerGetAndReturnCarDTO.setGetKM(ownerHandoverCarInfoEntity.getMileageNum() == null ? "0": String.valueOf(ownerHandoverCarInfoEntity.getMileageNum()));
             } else {

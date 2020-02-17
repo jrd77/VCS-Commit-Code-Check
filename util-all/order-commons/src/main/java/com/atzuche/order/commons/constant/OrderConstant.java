@@ -25,4 +25,9 @@ public class OrderConstant {
      */
     public static final Integer AUTO_COIN_DEDUCT_RATIO = 5;
 
+    /**
+     * 取送车优惠券的类型
+     */
+    private static final Integer GET_CAR_FREE_COUPON = 8;
+
 }
