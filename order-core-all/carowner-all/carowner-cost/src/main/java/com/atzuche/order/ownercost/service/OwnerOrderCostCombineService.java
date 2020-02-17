@@ -257,9 +257,15 @@ public class OwnerOrderCostCombineService {
 	 * @return OwnerOrderIncrementDetailEntity
 	 */
 	public OwnerOrderIncrementDetailEntity getServiceExpenseIncrement(CostBaseDTO costBaseDTO, Integer rentAmt, Integer serviceProportion) {
+		log.info("获取车主端平台服务费.param is,costBaseDTO:[{}],rentAmt:[{}],serviceProportion:[{}]",JSON.toJSONString(costBaseDTO),rentAmt,serviceProportion);
+		if(null == rentAmt || null == serviceProportion
+				|| rentAmt <= 0 || serviceProportion <= 0 || serviceProportion > 100 ) {
+			return null;
+		}
 		Integer serviceExpense = OwnerFeeCalculatorUtils.calServiceExpense(rentAmt, serviceProportion);
 		FeeResult feeResult = new FeeResult(serviceExpense, 1.0, serviceExpense);
 		OwnerOrderIncrementDetailEntity result = costBaseConvertIncrement(costBaseDTO, feeResult, OwnerCashCodeEnum.SERVICE_CHARGE);
+		log.info("获取车主端平台服务费.result is,result[{}]",JSON.toJSONString(result));
 		return result;
 	}
 	
@@ -276,7 +282,26 @@ public class OwnerOrderCostCombineService {
 		OwnerOrderPurchaseDetailEntity result = costBaseConvert(costBaseDTO, feeResult, OwnerCashCodeEnum.PROXY_CHARGE);
 		return result;
 	}
-	
+
+	/**
+	 * 车主端代管车服务费
+	 * @param costBaseDTO 基本信息
+	 * @param rentAmt 租金
+	 * @param serviceProxyProportion 代管服务费比例
+	 * @return OwnerOrderIncrementDetailEntity
+	 */
+	public OwnerOrderIncrementDetailEntity getProxyServiceExpenseIncrement(CostBaseDTO costBaseDTO, Integer rentAmt, Integer serviceProxyProportion) {
+		log.info("获取车主端代管车服务费.param is,costBaseDTO:[{}],rentAmt:[{}],serviceProxyProportion:[{}]",JSON.toJSONString(costBaseDTO),rentAmt,serviceProxyProportion);
+		if(null == rentAmt || null == serviceProxyProportion
+				|| rentAmt <= 0 || serviceProxyProportion <= 0 || serviceProxyProportion > 100 ) {
+			return null;
+		}
+		Integer proxyExpense = OwnerFeeCalculatorUtils.calProxyExpense(rentAmt, serviceProxyProportion);
+		FeeResult feeResult = new FeeResult(proxyExpense, 1.0, proxyExpense);
+		OwnerOrderIncrementDetailEntity result = costBaseConvertIncrement(costBaseDTO, feeResult, OwnerCashCodeEnum.PROXY_CHARGE);
+		log.info("获取车主端代管车服务费.result is,result[{}]",JSON.toJSONString(result));
+		return result;
+	}
 	
 	/**
 	 * 数据转化

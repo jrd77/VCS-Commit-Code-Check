@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -59,7 +60,16 @@ public class OwnerOrderCalCostService {
         log.info("下单-车主端-获取还车费用ownerOrderNo=[{}],ownerSrvReturnAmtEntity=[{}]",ownerOrderNo,ownerSrvReturnAmtEntity);
         int getTotalAmt = ownerSrvGetAmtEntity==null ? 0:ownerSrvGetAmtEntity.getTotalAmount();
         int returnAmt = ownerSrvReturnAmtEntity ==null ? 0:ownerSrvReturnAmtEntity.getTotalAmount();
-        int incrementAmt = getTotalAmt + returnAmt;
+
+
+        //平台服务费
+        OwnerOrderIncrementDetailEntity serviceExpenseEntity = ownerOrderCostCombineService.getServiceExpenseIncrement(costBaseDTO,rentAmt,ownerOrderCostReqDTO.getServiceRate().intValue());
+        int serviceExpense = null == serviceExpenseEntity ? 0 : serviceExpenseEntity.getTotalAmount();
+        //代管车服务费
+        OwnerOrderIncrementDetailEntity proxyServiceExpenseEntity = ownerOrderCostCombineService.getProxyServiceExpenseIncrement(costBaseDTO,rentAmt,ownerOrderCostReqDTO.getServiceProxyRate().intValue());
+        int proxyServiceExpense = null == proxyServiceExpenseEntity ? 0 : proxyServiceExpenseEntity.getTotalAmount();
+
+        int incrementAmt = getTotalAmt + returnAmt + serviceExpense + proxyServiceExpense;
 
         OwnerOrderCostEntity ownerOrderCostEntity = new OwnerOrderCostEntity();
         ownerOrderCostEntity.setOrderNo(orderNo);
@@ -71,7 +81,17 @@ public class OwnerOrderCalCostService {
         ownerOrderCostEntity.setVersion(0);
 
         log.info("下单-车主端-准备保存费用，入参ownerOrderNo=[{}]",ownerOrderNo);
-        List<OwnerOrderIncrementDetailEntity> ownerOrderIncrementDetailList = Arrays.asList(ownerSrvGetAmtEntity, ownerSrvReturnAmtEntity);
+        //List<OwnerOrderIncrementDetailEntity> ownerOrderIncrementDetailList = Arrays.asList(ownerSrvGetAmtEntity, ownerSrvReturnAmtEntity);
+        List<OwnerOrderIncrementDetailEntity> ownerOrderIncrementDetailList = new ArrayList<>();
+        ownerOrderIncrementDetailList.add(ownerSrvGetAmtEntity);
+        ownerOrderIncrementDetailList.add(ownerSrvReturnAmtEntity);
+        if(null != serviceExpenseEntity) {
+            ownerOrderIncrementDetailList.add(serviceExpenseEntity);
+        }
+
+        if(null != proxyServiceExpenseEntity) {
+            ownerOrderIncrementDetailList.add(proxyServiceExpenseEntity);
+        }
 
         log.info("下单-车主端-保存增值费用，入参ownerOrderIncrementDetailList=[{}]",JSON.toJSONString(ownerOrderIncrementDetailList));
         Integer IncrResult = ownerOrderIncrementDetailService.saveOwnerOrderIncrementDetailBatch(ownerOrderIncrementDetailList);

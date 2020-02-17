@@ -338,6 +338,7 @@ public class SubmitOrderService {
                 || Integer.parseInt(orderReqVO.getFreeDoubleTypeId()) == FreeDepositTypeEnum.CONSUME.getCode() ?
                 0 : 1);
         orderDTO.setIsOutCity(orderReqVO.getIsLeaveCity());
+        orderDTO.setRentCity(orderReqVO.getRentCity());
         orderDTO.setReqTime(reqTime);
         orderDTO.setIsUseAirPortService(orderReqVO.getUseAirportService());
         orderDTO.setFlightId(orderReqVO.getFlightNo());
@@ -415,7 +416,8 @@ public class SubmitOrderService {
 
         ownerOrderReqDTO.setReplyFlag(reqContext.getOwnerGoodsDetailDto().getReplyFlag());
         ownerOrderReqDTO.setCarOwnerType(reqContext.getOwnerGoodsDetailDto().getCarOwnerType());
-
+        ownerOrderReqDTO.setServiceRate(reqContext.getOwnerGoodsDetailDto().getServiceRate());
+        ownerOrderReqDTO.setServiceProxyRate(reqContext.getOwnerGoodsDetailDto().getServiceProxyRate());
 
         LOGGER.info("Build owner order reqDTO,result is ,ownerOrderReqDTO:[{}]",
                 JSON.toJSONString(ownerOrderReqDTO));

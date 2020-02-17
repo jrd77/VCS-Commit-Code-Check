@@ -8,6 +8,7 @@ import com.atzuche.order.commons.entity.dto.OwnerGoodsDetailDTO;
 import com.atzuche.order.commons.entity.dto.OwnerGoodsPriceDetailDTO;
 import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
 import com.atzuche.order.commons.entity.dto.RenterGoodsPriceDetailDTO;
+import com.atzuche.order.commons.enums.CarOwnerTypeEnum;
 import com.atzuche.order.commons.exceptions.RemoteCallException;
 import com.autoyol.car.api.feign.api.CarDetailQueryFeignApi;
 import com.autoyol.car.api.model.dto.OrderCarInfoParamDTO;
@@ -224,7 +225,17 @@ public class CarProxyService {
             renterGoodsDetailDto.setCarInmsrp(data.getCarModelParam().getInmsrp());
         }
         renterGoodsDetailDto.setStopCostRate(data.getStopCostRate()==null ? 0D:Double.valueOf(data.getStopCostRate()));
-        renterGoodsDetailDto.setServiceRate(data.getServerRate()==null ? 0D:Double.valueOf(data.getServerRate()));
+
+        renterGoodsDetailDto.setServiceRate(data.getServiceProportion() == null ? 0D : Double.valueOf(data.getServiceProportion()));
+        renterGoodsDetailDto.setServiceProxyRate(0D);
+        if(null != carBaseVO.getOwnerType()) {
+            if(CarOwnerTypeEnum.G.getCode() == carBaseVO.getOwnerType() || CarOwnerTypeEnum.H.getCode() == carBaseVO.getOwnerType()) {
+                //代管车
+                renterGoodsDetailDto.setServiceProxyRate(null == data.getServiceProxyProportion() ? 0D : Double.valueOf(data.getServiceProxyProportion()));
+                renterGoodsDetailDto.setServiceRate(0D);
+            }
+        }
+
         renterGoodsDetailDto.setCarGuideDayPrice(carBaseVO.getGuideDayPrice());
         renterGoodsDetailDto.setOilTotalCalibration(carBaseVO.getOilTotalCalibration());
         String serialNumbers = Optional.ofNullable(carGpsVOS)
