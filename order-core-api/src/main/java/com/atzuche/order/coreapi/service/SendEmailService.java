@@ -1,6 +1,6 @@
 package com.atzuche.order.coreapi.service;
 
-import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

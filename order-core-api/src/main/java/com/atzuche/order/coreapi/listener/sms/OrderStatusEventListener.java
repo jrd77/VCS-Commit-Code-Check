@@ -2,7 +2,6 @@ package com.atzuche.order.coreapi.listener.sms;
 
 import com.alibaba.fastjson.JSONObject;
 import com.atzuche.order.mq.common.base.OrderMessage;
-import com.atzuche.order.mq.util.MQSendPlatformSmsService;
 import com.dianping.cat.Cat;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Message;
@@ -10,8 +9,10 @@ import org.springframework.amqp.rabbit.annotation.Exchange;
 import org.springframework.amqp.rabbit.annotation.Queue;
 import org.springframework.amqp.rabbit.annotation.QueueBinding;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
+
+import java.util.Map;
 
 /**
  * @author 胡春林
@@ -19,10 +20,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Slf4j
-public class OrderStatusEventListener {
-
-    @Autowired
-    MQSendPlatformSmsService sendPlatformSmsService;
+public class OrderStatusEventListener extends SMSOrderBaseEventService{
 
     @RabbitListener(bindings = {@QueueBinding(value = @Queue(value = "order_status_01", durable = "true"),
             exchange = @Exchange(value = "auto-order-status", durable = "true", type = "topic"), key = "status.#")
@@ -32,11 +30,19 @@ public class OrderStatusEventListener {
         OrderMessage orderMessage = JSONObject.parseObject(message.getBody(), OrderMessage.class);
         log.info("新订单状态总事件监听,入参orderMessage:[{}]", orderMessage.toString());
         try {
-//            sendPlatformSmsService.orderPaySms(orderMessage.getContext(), orderMessage.getPhone(), "大事件備注", null);
-//            log.info("新订单status事件成功发送短信,----------->>>>>>内容：{},手机号:{}", orderMessage.getContext(), orderMessage.getPhone());
+            Map smsParamsMap = orderMessage.getMap();
+            if (CollectionUtils.isEmpty(smsParamsMap)) {
+                log.info("没有短信需要发送--->>>>orderMessage:[{}]", orderMessage.toString());
+                return;
+            }
+            if (!smsParamsMap.containsKey("orderNo")) {
+                log.info("缺少短信需要发送的订单号参数--->>>>orderMessage:[{}]", orderMessage.toString());
+                return;
+            }
+            sendShortMessage(smsParamsMap);
         } catch (Exception e) {
-            log.info("新订单status事件发生异常,msg：[{}]", e.getMessage());
-            Cat.logError("新订单status事件发生异常", e);
+            log.info("订单的总status事件发生异常,msg：[{}]", e);
+            Cat.logError("订单的总status事件发生异常", e);
         }
     }
 }
