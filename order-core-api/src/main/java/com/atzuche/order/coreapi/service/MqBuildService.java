@@ -39,7 +39,7 @@ public class MqBuildService {
 
         OrderBaseDataMq orderBaseDataMq = new OrderBaseDataMq();
         orderBaseDataMq.setCategory(orderEntity.getCategory().toString());
-        orderBaseDataMq.setMemNo(Integer.parseInt(memNo));
+        orderBaseDataMq.setMemNo(null != memNo ? Integer.parseInt(memNo) : null);
         orderBaseDataMq.setBusinessChildType(osse.getBusinessChildType());
         orderBaseDataMq.setBusinessParentType(osse.getBusinessParentType());
         orderBaseDataMq.setOrderNo(orderNo);
