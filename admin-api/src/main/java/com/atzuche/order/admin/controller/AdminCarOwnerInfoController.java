@@ -57,6 +57,9 @@ public class AdminCarOwnerInfoController {
         if(Objects.nonNull(ownerMemberEntity) && Objects.nonNull(ownerMemberEntity.getMemType())){
             respVO.setMemLevel(MemberFlagEnum.getRightByIndex(ownerMemberEntity.getMemType()).getRightName());
         }
+        if(Objects.nonNull(ownerMemberEntity) && Objects.nonNull(ownerMemberEntity.getPhone())){
+            respVO.setOwnerPhone(ownerMemberEntity.getPhone());
+        }
         return ResponseData.success(respVO);
     }
 
