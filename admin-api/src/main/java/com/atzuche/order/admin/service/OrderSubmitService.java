@@ -29,7 +29,7 @@ public class OrderSubmitService {
     @Autowired
     private FeignOrderAdminSubmitService feignOrderAdminSubmitService;
 
-    public ResponseData<OrderResVO> submit(AdminTransReqVO adminOrderReqVO, HttpServletRequest request) throws Exception {
+    public OrderResVO submit(AdminTransReqVO adminOrderReqVO, HttpServletRequest request) throws Exception {
         //1、组装参数
         AdminOrderReqVO adminOrderReqParam = this.transDto(adminOrderReqVO,request);
 
@@ -43,6 +43,7 @@ public class OrderSubmitService {
             Cat.logEvent(CatConstants.FEIGN_RESULT,JSON.toJSONString(responseObject));
             ResponseCheckUtil.checkResponse(responseObject);
             t.setStatus(Transaction.SUCCESS);
+            return responseObject.getData();
         }catch (Exception e){
             log.error("Feign 后台管理系统下单异常,responseObject={}", JSON.toJSONString(responseObject),e);
             Cat.logError("Feign 后台管理系统下单异常",e);
@@ -52,12 +53,6 @@ public class OrderSubmitService {
             t.complete();
         }
 
-        //3、返回结果
-        ResponseData responseData = new ResponseData();
-        responseData.setData(responseObject.getData());
-        responseData.setResCode(responseObject.getResCode());
-        responseData.setResMsg(responseObject.getResMsg());
-        return responseData;
     }
 
     private AdminOrderReqVO transDto(AdminTransReqVO reqVO, HttpServletRequest request){

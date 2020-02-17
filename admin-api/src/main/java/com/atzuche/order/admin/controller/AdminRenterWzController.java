@@ -6,6 +6,7 @@ import com.atzuche.order.admin.service.log.AdminLogService;
 import com.atzuche.order.admin.vo.req.renterWz.RenterWzCostReqVO;
 import com.atzuche.order.admin.vo.req.renterWz.TemporaryRefundReqVO;
 import com.atzuche.order.admin.vo.resp.renterWz.WzCostLogsResVO;
+import com.atzuche.order.commons.BindingResultUtil;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.doc.annotation.AutoDocMethod;
@@ -45,13 +46,9 @@ public class AdminRenterWzController extends BaseController {
             return ResponseData.createErrorCodeResponse(ErrorCode.ORDER_NO_PARAM_ERROR.getCode(), "订单编号为空");
         }
         RenterWzDetailResVO res = null;
-        try {
-            res = renterWzService.queryWzDetailByOrderNo(orderNo);
-        } catch (Exception e) {
-            log.error("违章押金信息 异常", e);
-            Cat.logError("违章押金信息 异常", e);
-            return ResponseData.error();
-        }
+
+        res = renterWzService.queryWzDetailByOrderNo(orderNo);
+
         return ResponseData.success(res);
     }
 
@@ -64,15 +61,11 @@ public class AdminRenterWzController extends BaseController {
         if(StringUtils.isBlank(costDetail.getOrderNo())){
             return ResponseData.createErrorCodeResponse(ErrorCode.ORDER_NO_PARAM_ERROR.getCode(), "订单编号为空");
         }
-        try {
-            renterWzService.updateWzCost(costDetail.getOrderNo(),costDetail.getCostDetails());
-            String opDesc = costDetail.toString();
-            adminLogService.insertLog(AdminOpTypeEnum.CHANGE_WZ_FEE,costDetail.getOrderNo(),opDesc);
-        } catch (Exception e) {
-            log.error("修改违章费用 异常", e);
-            Cat.logError("修改违章费用 异常", e);
-            return ResponseData.error();
-        }
+
+        renterWzService.updateWzCost(costDetail.getOrderNo(),costDetail.getCostDetails());
+        String opDesc = costDetail.toString();
+        adminLogService.insertLog(AdminOpTypeEnum.CHANGE_WZ_FEE,costDetail.getOrderNo(),opDesc);
+
         return ResponseData.success();
     }
 
@@ -82,30 +75,18 @@ public class AdminRenterWzController extends BaseController {
         if (StringUtils.isBlank(orderNo)) {
             return ResponseData.createErrorCodeResponse(ErrorCode.ORDER_NO_PARAM_ERROR.getCode(), "订单编号为空");
         }
-        WzCostLogsResVO res = null;
-        try {
-            res = renterWzService.queryWzCostLogsByOrderNo(orderNo);
-        } catch (Exception e) {
-            log.error("查询违章费用日志 异常", e);
-            Cat.logError("查询违章费用日志 异常", e);
-            return ResponseData.error();
-        }
+        WzCostLogsResVO res = renterWzService.queryWzCostLogsByOrderNo(orderNo);
+
         return ResponseData.success(res);
     }
 
     @PostMapping("/console/add/temporaryRefund")
     @AutoDocMethod(description = "暂扣/取消暂扣违章押金", value = "暂扣/取消暂扣违章押金",response = ResponseData.class)
     public ResponseData addTemporaryRefund(@Valid @RequestBody TemporaryRefundReqVO req, BindingResult bindingResult){
-        if (bindingResult.hasErrors()) {
-            return validate(bindingResult);
-        }
-        try {
-            renterWzService.addTemporaryRefund(req);
-        } catch (Exception e) {
-            log.error("添加暂扣返还 异常", e);
-            Cat.logError("添加暂扣返还 异常", e);
-            return ResponseData.error();
-        }
+        BindingResultUtil.checkBindingResult(bindingResult);
+
+        renterWzService.addTemporaryRefund(req);
+
         return ResponseData.success();
     }
 
