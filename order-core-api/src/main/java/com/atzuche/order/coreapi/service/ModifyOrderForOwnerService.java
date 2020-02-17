@@ -23,6 +23,7 @@ import com.atzuche.order.rentercost.entity.RenterOrderFineDeatailEntity;
 import com.atzuche.order.rentercost.entity.RenterOrderSubsidyDetailEntity;
 import com.atzuche.order.rentercost.service.RenterOrderFineDeatailService;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
+import com.autoyol.platformcost.CommonUtils;
 import com.dianping.cat.Cat;
 import lombok.extern.slf4j.Slf4j;
 
@@ -255,16 +256,23 @@ public class ModifyOrderForOwnerService {
 		OwnerOrderIncrementDetailEntity srvGetFeeEntity = ownerOrderCostCombineService.getOwnerSrvGetAmtEntity(costBaseDTO, ownerGoodsDetailDTO.getCarOwnerType(), modifyOrderOwnerDTO.getSrvGetFlag());
 		// 获取车主还车费用
 		OwnerOrderIncrementDetailEntity srvReturnFeeEntity = ownerOrderCostCombineService.getOwnerSrvReturnAmtEntity(costBaseDTO, ownerGoodsDetailDTO.getCarOwnerType(), modifyOrderOwnerDTO.getSrvReturnFlag());
-		// 平台服务费
+		// 平台服务费比例
 		Double serviceRate = ownerGoodsDetailDTO.getServiceRate();
-		if (serviceRate != null) {
+		// 代管车服务费比例
+		Double serviceProxyRate = ownerGoodsDetailDTO.getServiceProxyRate();
+		if (CommonUtils.isEscrowCar(ownerGoodsDetailDTO.getCarOwnerType())) {
+			serviceRate = serviceProxyRate;
+		}
+		if (serviceRate != null ) {
 			// 租金总和
 			Integer purchaseAmount = 0;
 			if (purchaseList != null && !purchaseList.isEmpty()) {
 				purchaseAmount = purchaseList.stream().mapToInt(OwnerOrderPurchaseDetailEntity::getTotalAmount).sum();
 			}
 			OwnerOrderIncrementDetailEntity serviceFeeEntity = ownerOrderCostCombineService.getServiceExpenseIncrement(costBaseDTO, purchaseAmount, serviceRate.intValue());
-			incrementList.add(serviceFeeEntity);
+			if (serviceFeeEntity != null) {
+				incrementList.add(serviceFeeEntity);
+			}
 		}
 		// gps费
 		String gpsSerialNumber = ownerGoodsDetailDTO.getGpsSerialNumber();
@@ -275,7 +283,9 @@ public class ModifyOrderForOwnerService {
 				lsGpsSerialNumber.add(Integer.valueOf(gpsSerials[i]));
 			}
 			List<OwnerOrderIncrementDetailEntity> gpsFeeList =  ownerOrderCostCombineService.getGpsServiceAmtIncrementEntity(costBaseDTO, lsGpsSerialNumber);
-			incrementList.addAll(gpsFeeList);
+			if (gpsFeeList != null && !gpsFeeList.isEmpty()) {
+				incrementList.addAll(gpsFeeList);
+			}
 		}
 		
 		incrementList.add(srvGetFeeEntity);
