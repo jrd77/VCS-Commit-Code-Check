@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import javax.validation.Valid;
 
+import com.atzuche.order.commons.BindingResultUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -43,11 +44,7 @@ public class AdminSupplementController {
     @AutoDocMethod(description = "新增补付", value = "新增补付",response = ResponseData.class)
     @RequestMapping(value="console/order/supplement/add",method = RequestMethod.POST)
     public ResponseData addSupplement(@Valid @RequestBody OrderSupplementDetailDTO orderSupplementDetailDTO, BindingResult bindingResult){
-        if (bindingResult.hasErrors()) {
-            Optional<FieldError> error = bindingResult.getFieldErrors().stream().findFirst();
-            return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), error.isPresent() ?
-                    error.get().getDefaultMessage() : ErrorCode.INPUT_ERROR.getText());
-        }
+        BindingResultUtil.checkBindingResult(bindingResult);
         log.info("AdminSupplementController.addSupplement orderSupplementDetailDTO=[{}]", JSON.toJSONString(orderSupplementDetailDTO));
         adminSupplementService.addSupplement(orderSupplementDetailDTO);
         return ResponseData.success();
