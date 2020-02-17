@@ -10,7 +10,8 @@ public enum CarOwnerTypeEnum {
     D(20,"托管车辆-交易用"),
     E(25,"托管车辆-工作用"),
     F(30,"短期托管车"),
-    G(35,"代管车辆");
+    G(35,"代管车辆"),
+    H(150,"代管车专供代步车");
     private int code;
     private String name;
 

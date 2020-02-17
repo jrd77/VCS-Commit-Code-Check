@@ -95,7 +95,7 @@ public class DeliveryCarTask {
             return new AsyncResult(false);
         }
         orderDeliveryEntity.setStatus(3);
-        orderDeliveryEntity.setIsNotifyRenyun(0);
+       // orderDeliveryEntity.setIsNotifyRenyun(0);
         orderDeliveryEntity.setRenterGetReturnAddr(orderDeliveryEntity.getOwnerGetReturnAddr());
         orderDeliveryEntity.setRenterGetReturnAddrLat(orderDeliveryEntity.getOwnerGetReturnAddrLat());
         orderDeliveryEntity.setRenterGetReturnAddrLon(orderDeliveryEntity.getOwnerGetReturnAddrLon());

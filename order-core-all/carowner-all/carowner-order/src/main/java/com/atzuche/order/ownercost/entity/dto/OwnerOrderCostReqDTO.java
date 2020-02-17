@@ -24,6 +24,15 @@ public class OwnerOrderCostReqDTO {
      */
     private Integer srvReturnFlag;
     /**
+     * 平台服务费比例（仅车主端有）
+     */
+    private Double serviceRate;
+
+    /**
+     * 代管车服务费比例（仅车主端有）
+     */
+    private Double serviceProxyRate;
+    /**
      * 租客端费用对应的明细
      */
     private OwnerOrderPurchaseDetailEntity ownerOrderPurchaseDetailEntity;

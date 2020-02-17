@@ -2,6 +2,7 @@ package com.atzuche.order.coreapi.service;
 
 import com.atzuche.order.car.CarProxyService;
 import com.atzuche.order.commons.entity.dto.*;
+import com.atzuche.order.commons.enums.FineTypeEnum;
 import com.atzuche.order.commons.enums.RenterChildStatusEnum;
 import com.atzuche.order.commons.enums.SrvGetReturnEnum;
 import com.atzuche.order.coreapi.entity.dto.ModifyOrderOwnerDTO;
@@ -18,16 +19,22 @@ import com.atzuche.order.ownercost.entity.*;
 import com.atzuche.order.ownercost.service.*;
 import com.atzuche.order.parentorder.entity.OrderEntity;
 import com.atzuche.order.parentorder.service.OrderService;
+import com.atzuche.order.rentercost.entity.RenterOrderFineDeatailEntity;
 import com.atzuche.order.rentercost.entity.RenterOrderSubsidyDetailEntity;
+import com.atzuche.order.rentercost.service.RenterOrderFineDeatailService;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
+import com.autoyol.platformcost.CommonUtils;
 import com.dianping.cat.Cat;
 import lombok.extern.slf4j.Slf4j;
+
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -62,13 +69,17 @@ public class ModifyOrderForOwnerService {
     private CarRentalTimeApiProxyService carRentalTimeApiService;
 	@Autowired
     private MemProxyService memberService;
+	@Autowired
+	private RenterOrderFineDeatailService renterOrderFineDeatailService;
+	@Autowired
+	private OwnerOrderFineDeatailService ownerOrderFineDeatailService;
 
 	/**
 	 * 租客修改订单重新下车主订单逻辑(相当于车主同意)
 	 * @param orderNo 主订单号
 	 * @return ResponseData
 	 */
-	public void modifyOrderForOwner(ModifyOrderOwnerDTO modifyOrderOwnerDTO, RenterOrderSubsidyDetailEntity renterSubsidy) {
+	public void modifyOrderForOwner(ModifyOrderOwnerDTO modifyOrderOwnerDTO, RenterOrderSubsidyDetailEntity renterSubsidy, String renterOrderNo) {
 		log.info("租客修改订单重新下车主订单modifyOrderOwnerDTO=[{}], renterSubsidy=[{}]", modifyOrderOwnerDTO, renterSubsidy);
 		if (modifyOrderOwnerDTO == null) {
 			throw new ModifyOrderParameterException();
@@ -102,12 +113,13 @@ public class ModifyOrderForOwnerService {
 		// 获取租金费用信息
 		List<OwnerOrderPurchaseDetailEntity> purchaseList = getOwnerOrderPurchaseDetailEntityList(costBaseDTO, ownerGoodsDetailDTO);
 		// 获取增值服务费用信息
-		List<OwnerOrderIncrementDetailEntity> incrementList = getOwnerOrderIncrementDetailEntityList(costBaseDTO, modifyOrderOwnerDTO, ownerGoodsDetailDTO);
+		List<OwnerOrderIncrementDetailEntity> incrementList = getOwnerOrderIncrementDetailEntityList(costBaseDTO, modifyOrderOwnerDTO, ownerGoodsDetailDTO, purchaseList);
 		// 获取车主补贴（车主券）
 		OwnerOrderSubsidyDetailEntity subsidyEntity = getOwnerOrderSubsidyDetailEntity(modifyOrderOwnerDTO, ownerMemberDTO, renterSubsidy);
+		// 获取车主罚金
+		OwnerOrderFineDeatailEntity ownerOrderFineDeatailEntity = getOwnerOrderFineDeatailEntity(modifyOrderOwnerDTO, renterOrderNo);
 		// 获取车主费用总账信息
 		OwnerOrderCostEntity ownerOrderCostEntity = getOwnerOrderCostEntity(costBaseDTO, purchaseList, incrementList, subsidyEntity);
-		
 		// 保存商品信息
 		ownerCommodityService.saveCommodity(ownerGoodsDetailDTO);
 		// 保存会员信息
@@ -118,12 +130,48 @@ public class ModifyOrderForOwnerService {
 		ownerOrderIncrementDetailService.saveOwnerOrderIncrementDetailBatch(incrementList);
 		// 保存补贴费用信息
 		ownerOrderSubsidyDetailService.saveOwnerOrderSubsidyDetail(subsidyEntity);
+		// 保存车主罚金
+		ownerOrderFineDeatailService.addOwnerOrderFineRecord(ownerOrderFineDeatailEntity);
 		// 保存车主费用总表
 		ownerOrderCostService.saveOwnerOrderCost(ownerOrderCostEntity);
 		// 保存新车主子单
 		ownerOrderService.saveOwnerOrder(ownerOrderEffective);
 		// 更新车主子订单状态
 		updateOwnerOrderStatus(modifyOrderOwnerDTO, ownerOrderEntity.getId());
+	}
+	
+	
+	/**
+	 * 获取对应的车主罚金
+	 * @param modifyOrderOwnerDTO
+	 * @param renterOrderNo
+	 * @return OwnerOrderFineDeatailEntity
+	 */
+	public OwnerOrderFineDeatailEntity getOwnerOrderFineDeatailEntity(ModifyOrderOwnerDTO modifyOrderOwnerDTO, String renterOrderNo) {
+		List<RenterOrderFineDeatailEntity> renterOrderFineDeatailEntities =  renterOrderFineDeatailService.listRenterOrderFineDeatail(modifyOrderOwnerDTO.getOrderNo(), renterOrderNo);
+		if (renterOrderFineDeatailEntities == null || renterOrderFineDeatailEntities.isEmpty()) {
+			return null;
+		}
+		OwnerOrderFineDeatailEntity ownerOrderFineDeatailEntity = null;
+		for(RenterOrderFineDeatailEntity renterOrderFineDeatailEntity:renterOrderFineDeatailEntities){
+			if(FineTypeEnum.MODIFY_ADVANCE.getFineType().equals(renterOrderFineDeatailEntity.getFineType())) {
+				ownerOrderFineDeatailEntity = new OwnerOrderFineDeatailEntity();
+				BeanUtils.copyProperties(renterOrderFineDeatailEntity, ownerOrderFineDeatailEntity);
+				ownerOrderFineDeatailEntity.setCreateOp(null);
+				ownerOrderFineDeatailEntity.setCreateTime(null);
+				ownerOrderFineDeatailEntity.setUpdateOp(null);
+				ownerOrderFineDeatailEntity.setCreateTime(null);
+				ownerOrderFineDeatailEntity.setId(null);
+				OwnerMemberDTO ownerMemberDTO = modifyOrderOwnerDTO.getOwnerMemberDTO();
+				if (ownerMemberDTO != null) {
+					ownerOrderFineDeatailEntity.setMemNo(ownerMemberDTO.getMemNo());
+				}
+				ownerOrderFineDeatailEntity.setOwnerOrderNo(modifyOrderOwnerDTO.getOwnerOrderNo());
+				ownerOrderFineDeatailEntity.setFineAmount(-renterOrderFineDeatailEntity.getFineAmount());
+				break;
+			}
+		}
+		return ownerOrderFineDeatailEntity;
 	}
 	
 	
@@ -202,12 +250,44 @@ public class ModifyOrderForOwnerService {
 	 * @param ownerGoodsDetailDTO
 	 * @return
 	 */
-	public List<OwnerOrderIncrementDetailEntity> getOwnerOrderIncrementDetailEntityList(CostBaseDTO costBaseDTO, ModifyOrderOwnerDTO modifyOrderOwnerDTO, OwnerGoodsDetailDTO ownerGoodsDetailDTO) {
+	public List<OwnerOrderIncrementDetailEntity> getOwnerOrderIncrementDetailEntityList(CostBaseDTO costBaseDTO, ModifyOrderOwnerDTO modifyOrderOwnerDTO, OwnerGoodsDetailDTO ownerGoodsDetailDTO, List<OwnerOrderPurchaseDetailEntity> purchaseList) {
 		List<OwnerOrderIncrementDetailEntity> incrementList = new ArrayList<OwnerOrderIncrementDetailEntity>();
 		// 获取车主取车费用
 		OwnerOrderIncrementDetailEntity srvGetFeeEntity = ownerOrderCostCombineService.getOwnerSrvGetAmtEntity(costBaseDTO, ownerGoodsDetailDTO.getCarOwnerType(), modifyOrderOwnerDTO.getSrvGetFlag());
 		// 获取车主还车费用
 		OwnerOrderIncrementDetailEntity srvReturnFeeEntity = ownerOrderCostCombineService.getOwnerSrvReturnAmtEntity(costBaseDTO, ownerGoodsDetailDTO.getCarOwnerType(), modifyOrderOwnerDTO.getSrvReturnFlag());
+		// 平台服务费比例
+		Double serviceRate = ownerGoodsDetailDTO.getServiceRate();
+		// 代管车服务费比例
+		Double serviceProxyRate = ownerGoodsDetailDTO.getServiceProxyRate();
+		if (CommonUtils.isEscrowCar(ownerGoodsDetailDTO.getCarOwnerType())) {
+			serviceRate = serviceProxyRate;
+		}
+		if (serviceRate != null ) {
+			// 租金总和
+			Integer purchaseAmount = 0;
+			if (purchaseList != null && !purchaseList.isEmpty()) {
+				purchaseAmount = purchaseList.stream().mapToInt(OwnerOrderPurchaseDetailEntity::getTotalAmount).sum();
+			}
+			OwnerOrderIncrementDetailEntity serviceFeeEntity = ownerOrderCostCombineService.getServiceExpenseIncrement(costBaseDTO, purchaseAmount, serviceRate.intValue());
+			if (serviceFeeEntity != null) {
+				incrementList.add(serviceFeeEntity);
+			}
+		}
+		// gps费
+		String gpsSerialNumber = ownerGoodsDetailDTO.getGpsSerialNumber();
+		if (StringUtils.isNotBlank(gpsSerialNumber)) {
+			String [] gpsSerials = gpsSerialNumber.split(",");
+			List<Integer> lsGpsSerialNumber = new ArrayList<Integer>();
+			for (int i=0;i<gpsSerials.length;i++) {
+				lsGpsSerialNumber.add(Integer.valueOf(gpsSerials[i]));
+			}
+			List<OwnerOrderIncrementDetailEntity> gpsFeeList =  ownerOrderCostCombineService.getGpsServiceAmtIncrementEntity(costBaseDTO, lsGpsSerialNumber);
+			if (gpsFeeList != null && !gpsFeeList.isEmpty()) {
+				incrementList.addAll(gpsFeeList);
+			}
+		}
+		
 		incrementList.add(srvGetFeeEntity);
 		incrementList.add(srvReturnFeeEntity);
 		return incrementList;

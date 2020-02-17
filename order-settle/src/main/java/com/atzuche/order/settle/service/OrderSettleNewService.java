@@ -126,13 +126,13 @@ public class OrderSettleNewService {
 
     /**
      * 通过收银台查取  待支付租车费用金额
-     * @param settleOrders
+     * @param orderNo memNo
      * @return
      */
-    private int getRentCostAmtFinal(SettleOrders settleOrders) {
+    public int getRentCostAmtFinal(String orderNo,String memNo) {
         OrderPayReqVO orderPayReqVO = new OrderPayReqVO();
-        orderPayReqVO.setOrderNo(settleOrders.getOrderNo());
-        orderPayReqVO.setMenNo(settleOrders.getRenterMemNo());
+        orderPayReqVO.setOrderNo(orderNo);
+        orderPayReqVO.setMenNo(memNo);
         orderPayReqVO.setIsUseWallet(YesNoEnum.NO.getCode());
         List<String> payKind = ImmutableList.of(
                 DataPayKindConstant.RENT_AMOUNT

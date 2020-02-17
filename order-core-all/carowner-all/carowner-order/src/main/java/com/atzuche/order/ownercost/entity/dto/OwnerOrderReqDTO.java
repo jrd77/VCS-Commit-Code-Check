@@ -66,6 +66,16 @@ public class OwnerOrderReqDTO {
     private Integer category;
 
     /**
+     * 平台服务费比例（仅车主端有）
+     */
+    private Double serviceRate;
+
+    /**
+     * 代管车服务费比例（仅车主端有）
+     */
+    private Double serviceProxyRate;
+
+    /**
      * 补贴费用明细（车主券）
      */
     private OwnerOrderSubsidyDetailEntity ownerOrderSubsidyDetailEntity;

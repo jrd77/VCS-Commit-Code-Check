@@ -183,6 +183,29 @@ public class OwnerOrderCostCombineService {
 	
 	
 	/**
+	 * 获取gps服务费
+	 * @param costBaseDTO 基本信息
+	 * @param lsGpsSerialNumber 车辆安装gps序列号列表
+	 * @return List<OwnerOrderIncrementDetailEntity>
+	 */
+	public List<OwnerOrderIncrementDetailEntity> getGpsServiceAmtIncrementEntity(CostBaseDTO costBaseDTO, List<Integer> lsGpsSerialNumber) {
+		log.info("getGpsServiceAmtEntity oilAmtDTO=[{}], lsGpsSerialNumber=[{}]",costBaseDTO,lsGpsSerialNumber);
+		if (costBaseDTO == null) {
+			log.error("getGpsServiceAmtEntity 获取gps服务费costBaseDTO对象为空");
+			Cat.logError("获取gps服务费costBaseDTO对象为空", new OwnerCostParameterException());
+			throw new OwnerCostParameterException();
+		}
+        List<CarGpsRuleEntity> lsRules = carGpsRuleConfigSDK.getConfig(new DefaultConfigContext());
+		log.info("config-gps服务费计费规则信息lsRules={}", JSON.toJSONString(lsRules));
+		List<FeeResult> feeList = OwnerFeeCalculatorUtils.calGpsServiceAmt(lsRules, lsGpsSerialNumber, costBaseDTO.getStartTime(), costBaseDTO.getEndTime());
+		if (feeList == null || feeList.isEmpty()) {
+			return null;
+		}
+		return feeList.stream().map(fr -> costBaseConvertIncrement(costBaseDTO, fr, OwnerCashCodeEnum.GPS_SERVICE_AMT)).collect(Collectors.toList());
+	}
+	
+	
+	/**
 	 * 计算车主取车服务费
 	 * @param costBaseDTO 基本信息
 	 * @param carOwnerType 车辆类型
@@ -227,6 +250,26 @@ public class OwnerOrderCostCombineService {
 	}
 	
 	/**
+	 * 车主端平台服务费
+	 * @param costBaseDTO 基本信息
+	 * @param rentAmt 租金
+	 * @param serviceProportion 服务费比例
+	 * @return OwnerOrderIncrementDetailEntity
+	 */
+	public OwnerOrderIncrementDetailEntity getServiceExpenseIncrement(CostBaseDTO costBaseDTO, Integer rentAmt, Integer serviceProportion) {
+		log.info("获取车主端平台服务费.param is,costBaseDTO:[{}],rentAmt:[{}],serviceProportion:[{}]",JSON.toJSONString(costBaseDTO),rentAmt,serviceProportion);
+		if(null == rentAmt || null == serviceProportion
+				|| rentAmt <= 0 || serviceProportion <= 0 || serviceProportion > 100 ) {
+			return null;
+		}
+		Integer serviceExpense = OwnerFeeCalculatorUtils.calServiceExpense(rentAmt, serviceProportion);
+		FeeResult feeResult = new FeeResult(serviceExpense, 1.0, serviceExpense);
+		OwnerOrderIncrementDetailEntity result = costBaseConvertIncrement(costBaseDTO, feeResult, OwnerCashCodeEnum.SERVICE_CHARGE);
+		log.info("获取车主端平台服务费.result is,result[{}]",JSON.toJSONString(result));
+		return result;
+	}
+	
+	/**
 	 * 车主端代管车服务费
 	 * @param costBaseDTO 基本信息
 	 * @param rentAmt 租金
@@ -239,7 +282,26 @@ public class OwnerOrderCostCombineService {
 		OwnerOrderPurchaseDetailEntity result = costBaseConvert(costBaseDTO, feeResult, OwnerCashCodeEnum.PROXY_CHARGE);
 		return result;
 	}
-	
+
+	/**
+	 * 车主端代管车服务费
+	 * @param costBaseDTO 基本信息
+	 * @param rentAmt 租金
+	 * @param serviceProxyProportion 代管服务费比例
+	 * @return OwnerOrderIncrementDetailEntity
+	 */
+	public OwnerOrderIncrementDetailEntity getProxyServiceExpenseIncrement(CostBaseDTO costBaseDTO, Integer rentAmt, Integer serviceProxyProportion) {
+		log.info("获取车主端代管车服务费.param is,costBaseDTO:[{}],rentAmt:[{}],serviceProxyProportion:[{}]",JSON.toJSONString(costBaseDTO),rentAmt,serviceProxyProportion);
+		if(null == rentAmt || null == serviceProxyProportion
+				|| rentAmt <= 0 || serviceProxyProportion <= 0 || serviceProxyProportion > 100 ) {
+			return null;
+		}
+		Integer proxyExpense = OwnerFeeCalculatorUtils.calProxyExpense(rentAmt, serviceProxyProportion);
+		FeeResult feeResult = new FeeResult(proxyExpense, 1.0, proxyExpense);
+		OwnerOrderIncrementDetailEntity result = costBaseConvertIncrement(costBaseDTO, feeResult, OwnerCashCodeEnum.PROXY_CHARGE);
+		log.info("获取车主端代管车服务费.result is,result[{}]",JSON.toJSONString(result));
+		return result;
+	}
 	
 	/**
 	 * 数据转化

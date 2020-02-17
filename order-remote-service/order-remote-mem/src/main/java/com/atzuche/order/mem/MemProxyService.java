@@ -9,6 +9,7 @@ import com.atzuche.order.commons.enums.MemberFlagEnum;
 import com.atzuche.order.commons.enums.MemRightEnum;
 import com.atzuche.order.commons.enums.RightTypeEnum;
 import com.atzuche.order.mem.dto.OrderRenterInfoDTO;
+import com.autoyol.commons.utils.GsonUtils;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.member.detail.api.MemberDetailFeignService;
 import com.autoyol.member.detail.enums.MemberSelectKeyEnum;
@@ -59,7 +60,9 @@ public class MemProxyService {
             Cat.logEvent(CatConstants.FEIGN_METHOD,"MemberDetailFeignService.getMemberSelectInfo");
             String parameter = "memNo="+memNo+"&selectKey"+JSON.toJSONString(selectKey);
             Cat.logEvent(CatConstants.FEIGN_PARAM,parameter);
+            log.info("MemProxyService getRenterInfoByMemNo start param  [{}]", memNo);
             responseData = memberDetailFeignService.getMemberSelectInfo(Integer.parseInt(memNo), selectKey);
+            log.info("MemProxyService getRenterInfoByMemNo end result [{}] [{}]", GsonUtils.toJson(responseData),memNo);
             ResponseCheckUtil.checkResponse(responseData);
             t.setStatus(Transaction.SUCCESS);
         }catch (Exception e){

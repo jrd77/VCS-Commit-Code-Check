@@ -225,10 +225,16 @@ public class OwnerGoodsDetailDTO {
     @AutoDocProperty("发动机号")
     private String engineNum;
     /**
-     * 平台服务费比例/代官车服务费比例（仅车主端有）
+     * 平台服务费比例（仅车主端有）
      */
     @AutoDocProperty("平台服务费比例")
     private Double serviceRate;
+
+    /**
+     * 代管车服务费比例（仅车主端有）
+     */
+    @AutoDocProperty("代管车服务费比例")
+    private Double serviceProxyRate;
 
     /**
      * 一天一价

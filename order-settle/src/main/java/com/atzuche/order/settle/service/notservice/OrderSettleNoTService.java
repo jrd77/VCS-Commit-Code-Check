@@ -451,7 +451,7 @@ public class OrderSettleNoTService {
         CostBaseDTO costBaseDTO= getCostBaseOwner(settleOrders.getOwnerOrder());
         int rentAmt=settleOrders.getRenterOrderCost();
         //代管车服务费比例 商品
-        Double proxyProportionDou= ownerGoodsDetail.getServiceRate();
+        Double proxyProportionDou= ownerGoodsDetail.getServiceProxyRate();
         if(proxyProportionDou==null){
             proxyProportionDou = Double.valueOf(0.0);
         }
