@@ -88,7 +88,7 @@
 	</insert>
 
 	<select id="selectObjectByParams" parameterType="com.atzuche.order.photo.entity.OrderPhotoEntity" resultType="com.atzuche.order.photo.entity.OrderPhotoEntity">
-		SELECT id,photo_type photoType,path,user_type userType,order_no orderNo,create_time createTime,update_time updateTime,operator,serialNumber FROM order_car_condition_photo
+		SELECT id,photo_type photoType,path,user_type userType,order_no orderNo,create_time createTime,update_time updateTime,operator,serial_number serialNumber FROM order_car_condition_photo
 		where order_no=#{orderNo} and photo_type=#{photoType} and user_type = #{userType} and serial_number = #{serialNumber}
 	</select>
 

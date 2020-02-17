@@ -53,8 +53,15 @@ public class RenYunDeliveryCarPhotoListener {
             orderPhotoEntity.setUserType(String.valueOf(deliveryCarConditionPhotoVO.getUserType()));
             orderPhotoEntity.setPhotoType(String.valueOf(deliveryCarConditionPhotoVO.getPhotoType()));
             orderPhotoEntity.setSerialNumber(deliveryCarConditionPhotoVO.getSerialNumber());
-            orderPhotoEntity.setPhotoOperator(deliveryCarConditionPhotoVO.getUserType());
-            orderPhotoService.recevieRenYunDeliveryCarPhoto(orderPhotoEntity);
+            //更新
+            OrderPhotoEntity orderPhoto = orderPhotoService.selectObjectByParams(orderPhotoEntity);
+            if (Objects.nonNull(orderPhoto)) {
+                orderPhoto.setPath(orderPhotoEntity.getPath());
+                orderPhotoService.updateDeliveryCarPhotoInfo(orderPhoto.getId(), orderPhoto.getPath(), orderPhoto.getOperator(), orderPhoto.getUserType(), orderPhoto.getPhotoType(), orderPhoto.getSerialNumber());
+            } else {
+                orderPhotoEntity.setPhotoOperator(deliveryCarConditionPhotoVO.getUserType());
+                orderPhotoService.recevieRenYunDeliveryCarPhoto(orderPhotoEntity);
+            }
             Cat.logEvent(CatConstants.RABBIT_MQ_METHOD, "RenYunDeliveryCarPhotoListener.process");
             Cat.logEvent(CatConstants.RABBIT_MQ_PARAM, handoverCarOilJson);
             t.setStatus(Transaction.SUCCESS);
