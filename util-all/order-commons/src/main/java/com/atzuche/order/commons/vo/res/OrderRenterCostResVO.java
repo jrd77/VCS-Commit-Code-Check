@@ -46,14 +46,33 @@ public class OrderRenterCostResVO {
 	private AccountRenterCostDetailResVO walletCostDetail;
 	
 	
-	///----------------------------------------------------------
+	///----------------------------------------------------------  6大块
 	/*
 	 * 租客罚金列表
 	 */
 	private List<RenterOrderFineDeatailResVO> fineLst;
 	/*管理后台罚金列表*/
 	private List<ConsoleRenterOrderFineDeatailEntity> consoleFineLst;
-	
+	/*
+	 * 租客费用明细列表
+	 */
+	private List<RenterOrderCostDetailResVO> renterOrderCostDetailList;
+    /*
+     *管理后台费用
+     */
+	List<OrderConsoleCostDetailEntity> orderConsoleCostDetails;
+
+	/*
+	 * 抵扣明细 补贴
+	 */
+	List<RenterOrderSubsidyDetailResVO> subsidyLst;
+    /*
+     * 管理后台补贴
+     */
+    List<OrderConsoleSubsidyDetailEntity> orderConsoleSubsidyDetails;
+    ///----------------------------------------------------------  6大块
+    
+    
 	/*
 	 * 取车配送
 	 */
@@ -62,24 +81,7 @@ public class OrderRenterCostResVO {
 	 * 还车配送
 	 */
 	private RenterOrderDeliveryResVO renterOrderDeliveryReturn;
-	/*
-	 * 租客费用明细列表
-	 */
-	private List<RenterOrderCostDetailResVO> renterOrderCostDetailList;
-	
-	/*
-	 * 抵扣明细
-	 */
-	List<RenterOrderSubsidyDetailResVO> subsidyLst;
-    /*
-     * 管理后台补贴
-     */
-    List<OrderConsoleSubsidyDetailEntity> orderConsoleSubsidyDetails;
-    
-    /*
-                *管理后台费用
-     */
-    List<OrderConsoleCostDetailEntity> orderConsoleCostDetails;
+
     
 	// ---------------------------------------------------------------
 	private AccountRenterCostSettleResVO renterSettleVo;

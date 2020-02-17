@@ -26,14 +26,16 @@ public class FienAmtUpdateReqDTO {
     @AutoDocProperty("车主取还车违约金")
 //    @NotNull(message = "车主取还车违约金不能为空")
     private Integer ownerGetReturnCarFienAmt;
+
+    @AutoDocProperty("车主修改地址费用")
+//    @NotNull(message = "车主修改地址费用不能为空")
+    private Integer ownerModifyAddrAmt;
+    
+    
     
     @AutoDocProperty("车主取还车违约金编码")
 //    @NotNull(message = "车主取还车违约金编码不能为空")
     private Integer ownerGetReturnCarFienCashNo;
-    
-    @AutoDocProperty("车主修改地址费用")
-//    @NotNull(message = "车主修改地址费用不能为空")
-    private Integer ownerModifyAddrAmt;
     
     @AutoDocProperty("车主取还车违约金编码")
 //    @NotNull(message = "车主取还车违约金编码不能为空")
