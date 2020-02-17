@@ -23,7 +23,7 @@ import javax.validation.Valid;
 import java.util.Optional;
 
 @RestController
-public class OwnerOrderDetailController {
+public class AdminOwnerOrderDetailController {
     @Autowired
     private OwnerOrderDetailService ownerOrderDetailService;
     @Autowired

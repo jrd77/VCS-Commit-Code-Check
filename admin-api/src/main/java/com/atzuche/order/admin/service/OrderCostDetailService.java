@@ -60,8 +60,10 @@ import com.atzuche.order.commons.enums.cashcode.ConsoleCashCodeEnum;
 import com.atzuche.order.commons.enums.cashcode.OwnerCashCodeEnum;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.mem.MemProxyService;
+import com.atzuche.order.ownercost.entity.ConsoleOwnerOrderFineDeatailEntity;
 import com.atzuche.order.ownercost.entity.OwnerOrderEntity;
 import com.atzuche.order.ownercost.entity.OwnerOrderSubsidyDetailEntity;
+import com.atzuche.order.ownercost.service.ConsoleOwnerOrderFineDeatailService;
 import com.atzuche.order.ownercost.service.OwnerOrderService;
 import com.atzuche.order.ownercost.service.OwnerOrderSubsidyDetailService;
 import com.atzuche.order.parentorder.entity.OrderEntity;
@@ -130,6 +132,8 @@ public class OrderCostDetailService {
     RenterOrderService renterOrderService;
     @Autowired
     RenterOrderFineDeatailService renterOrderFineDeatailService;
+    @Autowired
+    ConsoleOwnerOrderFineDeatailService consoleOwnerOrderFineDeatailService;
     
 	public ReductionDetailResVO findReductionDetailsListByOrderNo(RenterCostReqVO renterCostReqVO) throws Exception {
 		ReductionDetailResVO resVo = new ReductionDetailResVO();
@@ -1076,6 +1080,7 @@ public class OrderCostDetailService {
 	public void updatefineAmtListByOrderNo(RenterFineCostReqVO renterCostReqVO) throws Exception {
 		
 		CostBaseDTO costBaseDTO = new CostBaseDTO();
+		CostBaseDTO ownerCostDTO = new CostBaseDTO();
 		//根据订单号查询会员号
 		//主订单
         OrderEntity orderEntity = orderService.getOrderEntity(renterCostReqVO.getOrderNo());
@@ -1084,9 +1089,21 @@ public class OrderCostDetailService {
             throw new Exception("获取订单数据为空");
         }
         
+//    	车主会员号查询。
+    	OwnerOrderEntity orderEntityOwner = null;  
+    	//否则根据主订单号查询,有效的车主记录。
+    	orderEntityOwner = ownerOrderService.getOwnerOrderByOrderNoAndIsEffective(renterCostReqVO.getOrderNo());
+	    	
+	    
+        
 		//封装订单号和会员号
 		costBaseDTO.setOrderNo(renterCostReqVO.getOrderNo());
 		costBaseDTO.setMemNo(orderEntity.getMemNoRenter());
+		
+		if(orderEntityOwner != null) {
+			ownerCostDTO.setOrderNo(renterCostReqVO.getOrderNo());
+			ownerCostDTO.setMemNo(orderEntityOwner.getMemNo());
+		}
 		
 		//租客提前还车罚金
 		String renterBeforeReturnCarFineAmt = renterCostReqVO.getRenterBeforeReturnCarFineAmt();
@@ -1105,6 +1122,20 @@ public class OrderCostDetailService {
 	        consoleRenterOrderFineDeatailEntity.setCreateOp(userName);
 	        consoleRenterOrderFineDeatailEntity.setOperatorId(userName);
 	        consoleRenterOrderFineDeatailService.saveOrUpdateConsoleRenterOrderFineDeatail(consoleRenterOrderFineDeatailEntity);
+	        
+	        //当前存在的情况下，否则归平台。
+	        if(orderEntityOwner!=null) {
+		        //同时增加反向记录，算车主的收益  200217 通过平台中转
+	        	ConsoleOwnerOrderFineDeatailEntity ownerEntity =
+	        			consoleOwnerOrderFineDeatailService.fineDataConvert(ownerCostDTO, Integer.valueOf(renterBeforeReturnCarFineAmt),
+		                        FineSubsidyCodeEnum.OWNER, FineSubsidySourceCodeEnum.PLATFORM, FineTypeEnum.MODIFY_ADVANCE);
+		        
+		        ownerEntity.setUpdateOp(userName);
+		        ownerEntity.setCreateOp(userName);
+		        ownerEntity.setOperatorId(userName);
+		        consoleOwnerOrderFineDeatailService.saveOrUpdateConsoleRenterOrderFineDeatail(ownerEntity);
+	        }
+	        
 		}
 		
 		//保存入库为负数，来源为租客。
@@ -1120,6 +1151,21 @@ public class OrderCostDetailService {
 	        consoleRenterOrderFineDeatailEntity.setOperatorId(userName);
 	        
 	        consoleRenterOrderFineDeatailService.saveOrUpdateConsoleRenterOrderFineDeatail(consoleRenterOrderFineDeatailEntity);
+	        
+	        //当前存在的情况下，否则归平台。
+	        if(orderEntityOwner!=null) {
+		        //同时增加反向记录，算车主的收益  200217 通过平台中转
+		        ConsoleOwnerOrderFineDeatailEntity ownerEntity =
+	        			consoleOwnerOrderFineDeatailService.fineDataConvert(ownerCostDTO, Integer.valueOf(renterDelayReturnCarFineAmt),
+		                        FineSubsidyCodeEnum.OWNER, FineSubsidySourceCodeEnum.PLATFORM, FineTypeEnum.DELAY_FINE);
+		        
+		        ownerEntity.setUpdateOp(userName);
+		        ownerEntity.setCreateOp(userName);
+		        ownerEntity.setOperatorId(userName);
+		        consoleOwnerOrderFineDeatailService.saveOrUpdateConsoleRenterOrderFineDeatail(ownerEntity);
+		        
+	        }
+	        
 		}
 		
 	}

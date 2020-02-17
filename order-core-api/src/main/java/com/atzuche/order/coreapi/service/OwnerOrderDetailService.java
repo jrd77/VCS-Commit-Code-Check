@@ -50,6 +50,11 @@ import com.atzuche.order.settle.vo.req.OwnerCosts;
 
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * 车主费用明细
+ * @author jing.huang
+ *
+ */
 @Slf4j
 @Service
 public class OwnerOrderDetailService {

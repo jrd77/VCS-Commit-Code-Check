@@ -4,7 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.CatConstants;
 import com.atzuche.order.commons.ResponseCheckUtil;
 import com.atzuche.order.commons.entity.ownerOrderDetail.*;
-import com.atzuche.order.open.service.FeignOwnerDetailService;
+import com.atzuche.order.open.service.FeignOwnerOrderDetailService;
 import com.autoyol.commons.web.ResponseData;
 import com.dianping.cat.Cat;
 import com.dianping.cat.message.Transaction;
@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class OwnerOrderDetailService {
     @Autowired
-    private FeignOwnerDetailService feignOwnerDetailService;
+    private FeignOwnerOrderDetailService feignOwnerOrderDetailService;
 
     public ResponseData<OwnerRentDetailDTO> ownerRentDetail(String orderNo, String ownerOrderNo) {
         ResponseData<OwnerRentDetailDTO> responseObject = null;
@@ -25,7 +25,7 @@ public class OwnerOrderDetailService {
             Cat.logEvent(CatConstants.FEIGN_METHOD,"feignOrderUpdateService.cancelOrder");
             log.info("Feign 开始获取租金明细,orderNo={}", orderNo);
             Cat.logEvent(CatConstants.FEIGN_PARAM,orderNo);
-            responseObject =  feignOwnerDetailService.ownerRentDetail(orderNo,ownerOrderNo);
+            responseObject =  feignOwnerOrderDetailService.ownerRentDetail(orderNo,ownerOrderNo);
             Cat.logEvent(CatConstants.FEIGN_RESULT,orderNo);
             ResponseCheckUtil.checkResponse(responseObject);
             t.setStatus(Transaction.SUCCESS);
@@ -53,7 +53,7 @@ public class OwnerOrderDetailService {
             Cat.logEvent(CatConstants.FEIGN_METHOD,"feignOwnerDetailService.renterOwnerPrice");
             log.info("Feign 开始获取车主租客调价明细,orderNo={}", orderNo);
             Cat.logEvent(CatConstants.FEIGN_PARAM,orderNo);
-            responseObject =  feignOwnerDetailService.renterOwnerPrice(orderNo,ownerOrderNo);
+            responseObject =  feignOwnerOrderDetailService.renterOwnerPrice(orderNo,ownerOrderNo);
             Cat.logEvent(CatConstants.FEIGN_RESULT,orderNo);
             ResponseCheckUtil.checkResponse(responseObject);
             t.setStatus(Transaction.SUCCESS);
@@ -75,7 +75,7 @@ public class OwnerOrderDetailService {
             Cat.logEvent(CatConstants.FEIGN_METHOD,"feignOrderUpdateService.cancelOrder");
             log.info("Feign 开始获取服务费明细,orderNo={}", orderNo);
             Cat.logEvent(CatConstants.FEIGN_PARAM,orderNo);
-            responseObject =  feignOwnerDetailService.fienAmtDetail(orderNo,ownerOrderNo);
+            responseObject =  feignOwnerOrderDetailService.fienAmtDetail(orderNo,ownerOrderNo);
             Cat.logEvent(CatConstants.FEIGN_RESULT,orderNo);
             ResponseCheckUtil.checkResponse(responseObject);
             t.setStatus(Transaction.SUCCESS);
@@ -97,7 +97,7 @@ public class OwnerOrderDetailService {
             Cat.logEvent(CatConstants.FEIGN_METHOD,"feignOrderUpdateService.cancelOrder");
             log.info("Feign 开始获取服务费明细,orderNo={}", orderNo);
             Cat.logEvent(CatConstants.FEIGN_PARAM,orderNo);
-            responseObject =  feignOwnerDetailService.serviceDetail(orderNo,ownerOrderNo);
+            responseObject =  feignOwnerOrderDetailService.serviceDetail(orderNo,ownerOrderNo);
             Cat.logEvent(CatConstants.FEIGN_RESULT,orderNo);
             ResponseCheckUtil.checkResponse(responseObject);
             t.setStatus(Transaction.SUCCESS);
@@ -119,7 +119,7 @@ public class OwnerOrderDetailService {
             Cat.logEvent(CatConstants.FEIGN_METHOD,"feignOrderUpdateService.cancelOrder");
             log.info("Feign 开始获取车主付给平台的费用明细,orderNo={}", orderNo);
             Cat.logEvent(CatConstants.FEIGN_PARAM,orderNo);
-            responseObject =  feignOwnerDetailService.platformToOwner(orderNo,ownerOrderNo);
+            responseObject =  feignOwnerOrderDetailService.platformToOwner(orderNo,ownerOrderNo);
             Cat.logEvent(CatConstants.FEIGN_RESULT,orderNo);
             ResponseCheckUtil.checkResponse(responseObject);
             t.setStatus(Transaction.SUCCESS);
@@ -141,7 +141,7 @@ public class OwnerOrderDetailService {
             Cat.logEvent(CatConstants.FEIGN_METHOD,"feignOrderUpdateService.cancelOrder");
             log.info("Feign 开始获取平台给车主的补贴明细,orderNo={}", orderNo);
             Cat.logEvent(CatConstants.FEIGN_PARAM,orderNo);
-            responseObject =  feignOwnerDetailService.platformToOwnerSubsidy(orderNo,ownerOrderNo,memNo);
+            responseObject =  feignOwnerOrderDetailService.platformToOwnerSubsidy(orderNo,ownerOrderNo,memNo);
             Cat.logEvent(CatConstants.FEIGN_RESULT,orderNo);
             ResponseCheckUtil.checkResponse(responseObject);
             t.setStatus(Transaction.SUCCESS);
@@ -163,7 +163,7 @@ public class OwnerOrderDetailService {
             Cat.logEvent(CatConstants.FEIGN_METHOD,"feignOrderUpdateService.cancelOrder");
             log.info("Feign 开始获取修改罚金,fienAmtUpdateReqDTO={}", JSON.toJSONString(fienAmtUpdateReqDTO));
             Cat.logEvent(CatConstants.FEIGN_PARAM,JSON.toJSONString(fienAmtUpdateReqDTO));
-            responseObject =  feignOwnerDetailService.updateFineAmt(fienAmtUpdateReqDTO);
+            responseObject =  feignOwnerOrderDetailService.updateFineAmt(fienAmtUpdateReqDTO);
             Cat.logEvent(CatConstants.FEIGN_RESULT,JSON.toJSONString(fienAmtUpdateReqDTO));
             ResponseCheckUtil.checkResponse(responseObject);
             t.setStatus(Transaction.SUCCESS);
