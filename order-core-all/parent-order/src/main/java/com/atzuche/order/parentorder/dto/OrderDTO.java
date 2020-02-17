@@ -1,5 +1,6 @@
 package com.atzuche.order.parentorder.dto;
 
+import com.autoyol.doc.annotation.AutoDocProperty;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -53,6 +54,11 @@ public class OrderDTO {
      * 是否出市 0-否，1-是
      */
     private Integer isOutCity;
+
+    /**
+     * 用车城市,如果isLeaveCity=1，该字段代表去往的城市，否则就是本市
+     */
+    private String rentCity;
     /**
      * 是否免押 0-否，1-是
      */

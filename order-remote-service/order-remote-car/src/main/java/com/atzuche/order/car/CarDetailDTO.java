@@ -87,7 +87,7 @@ public class CarDetailDTO {
     private String licenseDay;
     @AutoDocProperty("行驶证到期日")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private Date licenseExpire;
+    private String licenseExpire;
     @AutoDocProperty("保险到期日期（交强险）")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date insuranceExpire;

@@ -28,6 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @RequestMapping("/console/renter")
 @RestController
@@ -80,6 +81,9 @@ public class AdminRenterInfoController {
         for(RenterAdditionalDriverEntity dto:dtos){
             CommUseDriverInfo commUseDriverInfo = new CommUseDriverInfo();
             BeanUtils.copyProperties(dto,commUseDriverInfo);
+            if(Objects.nonNull(dto.getPhone())){
+                commUseDriverInfo.setMobile(Long.valueOf(dto.getPhone()));
+            }
             commUseDriverInfos.add(commUseDriverInfo);
         }
         return commUseDriverInfos;
