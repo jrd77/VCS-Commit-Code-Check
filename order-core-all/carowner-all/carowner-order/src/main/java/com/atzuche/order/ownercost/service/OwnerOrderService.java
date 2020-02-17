@@ -117,6 +117,8 @@ public class OwnerOrderService {
         costBaseDTO.setOwnerOrderNo(ownerOrderReqDTO.getOwnerOrderNo());
         costBaseDTO.setMemNo(ownerOrderReqDTO.getMemNo());
         ownerOrderCostReqDTO.setCostBaseDTO(costBaseDTO);
+        ownerOrderCostReqDTO.setServiceRate(null == ownerOrderReqDTO.getServiceRate() ? 0D : ownerOrderReqDTO.getServiceRate());
+        ownerOrderCostReqDTO.setServiceProxyRate(null == ownerOrderReqDTO.getServiceProxyRate() ? 0D : ownerOrderReqDTO.getServiceProxyRate());
         log.info("下单-车主端-准备保存车主费用明细 ownerOrderNo=[{}],ownerOrderCostReqDTO=[{}]", ownerOrderReqDTO.getOwnerOrderNo(),JSON.toJSONString(ownerOrderCostReqDTO));
         ownerOrderCalCostService.getOrderCostAndDeailList(ownerOrderCostReqDTO);
 
