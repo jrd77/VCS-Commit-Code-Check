@@ -21,20 +21,51 @@ public class RenterCostVO {
     private int renterCostReal;
 
     /**
+     * 应收租车费用
+     */
+    private int renterCostYingshou;
+    /**
+     * 实收租车费用
+     */
+    private int renterCostShishou;
+    /**
+     * 补付租车费用
+     */
+    private int renterCostBufu;
+
+    /**
      * 实退押金
      */
     private int depositCostReal;
     /**
-     * 应付退押金
+     * 应退押金
      */
     private int depositCost;
+
+    /**
+     * 应付租车押金
+     */
+    private int depositCostYingfu;
+    /**
+     * 实付租车押金
+     */
+    private int depositCostShifu;
 
     /**
      * 实退违章押金
      */
     private int depositWzCostReal;
     /**
-     * 应付退违章押金
+     * 应退违章押金
      */
     private int depositWzCost;
+
+    /**
+     * 应付违章押金
+     */
+    private int depositWzCostYingFu;
+    /**
+     * 实付违章押金
+     */
+    private int depositWzCostShifu;
 }
