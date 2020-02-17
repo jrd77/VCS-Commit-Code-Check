@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 //@FeignClient(url="http://10.0.3.235:1412",name = "order-center-api")
 //@FeignClient(url="http://localhost:1412",name = "order-center-api")
 @FeignClient(name = "order-center-api")
-public interface FeignOwnerDetailService {
+public interface FeignOwnerOrderDetailService {
     /**
      * @Author ZhangBin
      * @Date 2020/1/15 21:29

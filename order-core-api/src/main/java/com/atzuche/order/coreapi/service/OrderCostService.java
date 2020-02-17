@@ -416,12 +416,12 @@ public class OrderCostService {
 		      }
 			resVo.setOrderConsoleCostDetails(consoleCostLstReal);
 			
-			///车主的结算后收益 200215
-			AccountOwnerIncomeExamineEntity examine = accountOwnerIncomeExamineNoTService.getAccountOwnerIncomeExamineByOrderNo(orderNo);
-			int ownerCostAmtSettleAfter = 0;
-			if(examine != null) {
-				ownerCostAmtSettleAfter = examine.getAmt().intValue();
-			}
+			///车主的结算后收益 200215  结算收益有多条记录的情况。
+//			AccountOwnerIncomeExamineEntity examine = accountOwnerIncomeExamineNoTService.getAccountOwnerIncomeExamineByOrderNo(orderNo);
+//			if(examine != null) {
+//				ownerCostAmtSettleAfter = examine.getAmt().intValue();
+//			}
+			Integer ownerCostAmtSettleAfter = accountOwnerIncomeExamineNoTService.getTotalAccountOwnerIncomeExamineByOrderNo(orderNo);
 			resVo.setOwnerCostAmtSettleAfter(ownerCostAmtSettleAfter);
 		
 		return resVo;

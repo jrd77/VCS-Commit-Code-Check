@@ -17,6 +17,7 @@ import com.atzuche.order.admin.vo.req.cost.AdditionalDriverInsuranceIdsReqVO;
 import com.atzuche.order.admin.vo.req.cost.OwnerToPlatformCostReqVO;
 import com.atzuche.order.admin.vo.req.cost.OwnerToRenterSubsidyReqVO;
 import com.atzuche.order.admin.vo.req.cost.RenterCostReqVO;
+import com.atzuche.order.admin.vo.req.cost.RenterFineCostReqVO;
 import com.atzuche.order.admin.vo.resp.cost.AdditionalDriverInsuranceVO;
 import com.atzuche.order.admin.vo.resp.order.cost.detail.OrderRenterFineAmtDetailResVO;
 import com.atzuche.order.commons.entity.dto.CommUseDriverInfoSimpleDTO;
@@ -49,6 +50,22 @@ public class OrderCostDetailServiceTest {
 			e.printStackTrace();
 		}
 	}
+	
+	@Test
+	public void testUpdatefineAmtListByOrderNo() {
+		RenterFineCostReqVO renterCostReqVO = new RenterFineCostReqVO();
+		renterCostReqVO.setOrderNo("28804131200299");
+		renterCostReqVO.setRenterOrderNo("2880413120029910010");
+		renterCostReqVO.setRenterBeforeReturnCarFineAmt("20");
+		renterCostReqVO.setRenterDelayReturnCarFineAmt("30");
+		try {
+			orderCostDetailService.updatefineAmtListByOrderNo(renterCostReqVO);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
 	
 	@Test
 	public void testUpdateOwnerToPlatFormListByOrderNo() {
@@ -152,10 +169,7 @@ public class OrderCostDetailServiceTest {
 
 
 
-	@Test
-	public void testUpdatefineAmtListByOrderNo() {
-		fail("Not yet implemented");
-	}
+
 
 	@Test
 	public void testUpdatePlatFormToRenterListByOrderNo() {
