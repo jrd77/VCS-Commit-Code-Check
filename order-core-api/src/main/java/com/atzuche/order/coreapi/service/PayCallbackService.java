@@ -45,7 +45,7 @@ public class PayCallbackService implements OrderPayCallBack {
         OrderStatusEntity entity = orderStatusService.getByOrderNo(orderNo);
         if(YesNoEnum.YES.equals(isGetCar)){
             log.info("PayCallbackService sendOrderStatusByOrderNo");
-            orderStatusMqService.sendOrderStatusByOrderNo(orderNo,menNo,OrderStatusEnum.TO_GET_CAR.getStatus(), NewOrderMQStatusEventEnum.ORDER_PREGETCAR);
+            orderStatusMqService.sendOrderStatusByOrderNo(orderNo,OrderStatusEnum.TO_GET_CAR.getStatus(), NewOrderMQStatusEventEnum.ORDER_PREGETCAR);
         }
         log.info("PayCallbackService sendDataMessageToRenYun param [{}]", GsonUtils.toJson(entity));
         //租车费用已支付 并且非补付支付
