@@ -26,8 +26,12 @@ import com.atzuche.order.cashieraccount.mapper.CashierMapper;
 import com.atzuche.order.cashieraccount.vo.req.pay.OrderPaySignReqVO;
 import com.atzuche.order.commons.IpUtil;
 import com.atzuche.order.commons.LocalDateTimeUtils;
+import com.atzuche.order.commons.enums.FineSubsidyCodeEnum;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.commons.enums.cashier.*;
+import com.atzuche.order.mq.common.base.BaseProducer;
+import com.atzuche.order.mq.common.base.OrderMessage;
+import com.atzuche.order.mq.enums.ShortMessageTypeEnum;
 import com.atzuche.order.rentercost.entity.vo.PayableVO;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.atzuche.order.renterorder.service.RenterOrderService;
@@ -42,6 +46,9 @@ import com.autoyol.autopay.gateway.vo.req.RefundVo;
 import com.autoyol.commons.utils.GsonUtils;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.doc.util.StringUtil;
+import com.autoyol.event.rabbit.neworder.NewOrderMQActionEventEnum;
+import com.autoyol.event.rabbit.neworder.OrderRefundMq;
+import com.autoyol.event.rabbit.neworder.OrderSettlementMq;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -55,6 +62,7 @@ import org.springframework.util.CollectionUtils;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 
@@ -79,6 +87,7 @@ public class CashierNoTService {
     AccountRenterCostSettleService accountRenterCostSettleService;
     @Value("${env_t}")
     private String env;
+    @Autowired private BaseProducer baseProducer;
 
 
     /**
@@ -527,5 +536,30 @@ public class CashierNoTService {
             return Collections.emptyList();
         }
         return cashierEntity;
+    }
+    /**
+     * 退款成功事件
+     * @param orderNo
+     */
+    public void sendOrderRefundSuccessMq(String orderNo, FineSubsidyCodeEnum type) {
+        OrderRefundMq orderSettlementMq = new OrderRefundMq();
+        orderSettlementMq.setType(Integer.valueOf(type.getFineSubsidyCode()));
+        orderSettlementMq.setOrderNo(orderNo);
+        OrderMessage orderMessage = OrderMessage.builder().build();
+        orderMessage.setMessage(orderSettlementMq);
+        //TODO 短信发送
+        baseProducer.sendTopicMessage(NewOrderMQActionEventEnum.ORDER_REFUND_SUCCESS.exchange,NewOrderMQActionEventEnum.ORDER_REFUND_SUCCESS.routingKey,orderMessage);
+    }
+    /**
+     * 退款失败事件
+     * @param orderNo
+     */
+    public void sendOrderRefundFailMq(String orderNo, FineSubsidyCodeEnum type) {
+        OrderRefundMq orderSettlementMq = new OrderRefundMq();
+        orderSettlementMq.setType(Integer.valueOf(type.getFineSubsidyCode()));
+        orderSettlementMq.setOrderNo(orderNo);
+        OrderMessage orderMessage = OrderMessage.builder().build();
+        orderMessage.setMessage(orderSettlementMq);
+        baseProducer.sendTopicMessage(NewOrderMQActionEventEnum.ORDER_REFUND_FAIL.exchange,NewOrderMQActionEventEnum.ORDER_REFUND_FAIL.routingKey,orderMessage);
     }
 }

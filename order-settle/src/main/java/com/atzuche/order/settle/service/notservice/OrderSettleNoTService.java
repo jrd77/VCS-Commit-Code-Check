@@ -254,9 +254,11 @@ public class OrderSettleNoTService {
             throw new RuntimeException("租客订单状态不是待结算，不能结算");
         }
         //2校验租客是否还车
-        boolean isReturn = handoverCarService.isReturnCar(renterOrder.getOrderNo());
-        if(!isReturn){
-            throw new RuntimeException("租客未还车不能结算");
+        if(Objects.nonNull(renterOrder.getIsReturnCar()) && renterOrder.getIsReturnCar()==1){
+            boolean isReturn = handoverCarService.isReturnCar(renterOrder.getOrderNo());
+            if(isReturn){
+                throw new RuntimeException("租客未还车不能结算");
+            }
         }
         //3 校验是否存在 理赔  存在不结算
         boolean isClaim = cashierSettleService.getOrderClaim(renterOrder.getOrderNo());
@@ -1768,8 +1770,8 @@ public class OrderSettleNoTService {
             BeanUtils.copyProperties(cashierEntity,vo);
             vo.setFlag(RenterCashCodeEnum.ACCOUNT_RENTER_RENT_COST.getCashNo());
             vo.setRenterCashCodeEnum(refundApplyVO.getRenterCashCodeEnum());
-            vo.setPaySource(PaySourceEnum.getFlagText(cashierEntity.getPaySource()));
-            vo.setPayType(PayTypeEnum.getFlagText(cashierEntity.getPayType()));
+            vo.setPaySource(cashierEntity.getPaySource());
+            vo.setPayType(cashierEntity.getPayType());
             vo.setRemake(refundApplyVO.getRemarke());
             int amt = refundAmt + cashierEntity.getPayAmt();
             vo.setAmt(amt>=0?refundAmt:-cashierEntity.getPayAmt());
@@ -1785,7 +1787,7 @@ public class OrderSettleNoTService {
                         BeanUtils.copyProperties(cashierEntity,vo);
                         vo.setFlag(RenterCashCodeEnum.ACCOUNT_RENTER_RENT_COST.getCashNo());
                         vo.setRenterCashCodeEnum(refundApplyVO.getRenterCashCodeEnum());
-                        vo.setPaySource(PaySourceEnum.getFlagText(cashierEntity.getPaySource()));
+                        vo.setPaySource(cashierEntity.getPaySource());
                         vo.setRemake(refundApplyVO.getRemarke());
                         int amt = refundAmt + cashierEntity.getPayAmt();
                         vo.setAmt(amt>=0?refundAmt:-cashierEntity.getPayAmt());
