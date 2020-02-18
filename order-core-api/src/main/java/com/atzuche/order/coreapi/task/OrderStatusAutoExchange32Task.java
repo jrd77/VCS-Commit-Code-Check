@@ -64,7 +64,7 @@ public class OrderStatusAutoExchange32Task extends IJobHandler {
                         logger.info("执行 到达订单开始时，将待取车变为待还车 orderNo:[{}]",orderNo);
                         renterGetCarService.pickUpCar(reqVO);
                     } catch (Exception e) {
-                        XxlJobLogger.log("执行 到达订单开始时，将待取车变为待还车 异常:",e);
+                        XxlJobLogger.log("执行 到达订单开始时，将待取车变为待还车 异常:" + e);
                         logger.error("执行 到达订单开始时，将待取车变为待还车 异常orderNo:[{}] , e:[{}]",orderNo ,e);
                         Cat.logError("执行 到达订单开始时，将待取车变为待还车 异常",e);
                     }
@@ -74,7 +74,7 @@ public class OrderStatusAutoExchange32Task extends IJobHandler {
             XxlJobLogger.log("结束执行 到达订单开始时，将待取车变为待还车");
             return SUCCESS;
         } catch (Exception e) {
-            XxlJobLogger.log("执行 到达订单开始时，将待取车变为待还车 异常:",e);
+            XxlJobLogger.log("执行 到达订单开始时，将待取车变为待还车 异常:" + e);
             logger.error("执行 到达订单开始时，将待取车变为待还车 异常",e);
             Cat.logError("执行 到达订单开始时，将待取车变为待还车 异常",e);
             return new ReturnT(FAIL.getCode(),e.toString());

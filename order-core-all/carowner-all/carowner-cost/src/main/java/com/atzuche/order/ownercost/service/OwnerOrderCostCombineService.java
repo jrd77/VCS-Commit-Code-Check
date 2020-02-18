@@ -258,8 +258,7 @@ public class OwnerOrderCostCombineService {
 	 */
 	public OwnerOrderIncrementDetailEntity getServiceExpenseIncrement(CostBaseDTO costBaseDTO, Integer rentAmt, Integer serviceProportion) {
 		log.info("获取车主端平台服务费.param is,costBaseDTO:[{}],rentAmt:[{}],serviceProportion:[{}]",JSON.toJSONString(costBaseDTO),rentAmt,serviceProportion);
-		if(null == rentAmt || null == serviceProportion
-				|| rentAmt <= 0 || serviceProportion <= 0 || serviceProportion > 100 ) {
+		if(null == rentAmt || null == serviceProportion || serviceProportion <= 0 || serviceProportion > 100 ) {
 			return null;
 		}
 		Integer serviceExpense = OwnerFeeCalculatorUtils.calServiceExpense(rentAmt, serviceProportion);

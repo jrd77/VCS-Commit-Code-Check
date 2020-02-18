@@ -1,5 +1,6 @@
 package com.atzuche.order.cashieraccount.service.remote;
 
+import com.atzuche.order.cashieraccount.exception.CashierRefundApplyException;
 import com.atzuche.order.cashieraccount.exception.DeductWalletRemoteException;
 import com.atzuche.order.commons.CatConstants;
 import com.autoyol.autopay.gateway.api.AutoPayGatewaySecondaryService;
@@ -25,7 +26,7 @@ public class RefundRemoteService {
      * @param refundVo
      */
     public AutoPayResultVo refundOrderPay(RefundVo refundVo) {
-        log.info("RefundRemoteService  refundOrderPay start 支付退款,walletDeduction：[{}]",GsonUtils.toJson(refundVo));
+        log.info("RefundRemoteService  refundOrderPay start 支付退款,refundVo：[{}]",GsonUtils.toJson(refundVo));
         Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "支付退款服务");
         try{
             Cat.logEvent(CatConstants.FEIGN_METHOD,"RefundRemoteService.refundOrderPay");
@@ -35,7 +36,7 @@ public class RefundRemoteService {
             log.info("RefundRemoteService  refundOrderPay end 支付退款,responseData：[{}]", GsonUtils.toJson(responseData));
             Cat.logEvent(CatConstants.FEIGN_RESULT, GsonUtils.toJson(responseData));
             if(responseData == null || !ErrorCode.SUCCESS.getCode().equals(responseData.getResCode())){
-                throw new DeductWalletRemoteException();
+                throw new CashierRefundApplyException();
             }
             AutoPayResultVo vo = responseData.getData();
             return vo;
@@ -43,7 +44,7 @@ public class RefundRemoteService {
             t.setStatus(e);
             Cat.logError("Feign 支付退款,e：[{}]",e);
             log.error("RefundRemoteService refundOrderPay Feign 支付退款,model：[{}],e：[{}]",GsonUtils.toJson(refundVo),e);
-            throw new DeductWalletRemoteException();
+            throw new CashierRefundApplyException();
         }finally {
             t.complete();
         }

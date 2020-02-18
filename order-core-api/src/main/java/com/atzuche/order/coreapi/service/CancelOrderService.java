@@ -119,13 +119,13 @@ public class CancelOrderService {
             cancelSourceEnum = CancelSourceEnum.RENTER;
             actionEventEnum = NewOrderMQActionEventEnum.ORDER_CANCEL;
         }
-        orderActionMqService.sendCancelOrderSuccess(cancelOrderReqVO.getOrderNo(), cancelOrderReqVO.getMemNo(), cancelSourceEnum, actionEventEnum);
+        orderActionMqService.sendCancelOrderSuccess(cancelOrderReqVO.getOrderNo(), cancelSourceEnum, actionEventEnum);
 
         NewOrderMQStatusEventEnum newOrderMQStatusEventEnum = NewOrderMQStatusEventEnum.ORDER_END;
         if(res.getStatus() == OrderStatusEnum.TO_DISPATCH.getStatus()) {
             newOrderMQStatusEventEnum = NewOrderMQStatusEventEnum.ORDER_PREDISPATCH;
         }
-        orderStatusMqService.sendOrderStatusByOrderNo(cancelOrderReqVO.getOrderNo(),cancelOrderReqVO.getMemNo(),res.getStatus(),newOrderMQStatusEventEnum);
+        orderStatusMqService.sendOrderStatusByOrderNo(cancelOrderReqVO.getOrderNo(),res.getStatus(),newOrderMQStatusEventEnum);
     }
 
     private OwnerCancelDTO buildOwnerCancelDTO(String orderNo, CancelOrderResDTO res){

@@ -33,6 +33,10 @@ public class OwnerOrderCostReqDTO {
      */
     private Double serviceProxyRate;
     /**
+     * GPS序号
+     */
+    private String gpsSerialNumber;
+    /**
      * 租客端费用对应的明细
      */
     private OwnerOrderPurchaseDetailEntity ownerOrderPurchaseDetailEntity;

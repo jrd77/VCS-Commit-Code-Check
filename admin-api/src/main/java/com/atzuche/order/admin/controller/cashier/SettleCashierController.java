@@ -62,7 +62,7 @@ public class SettleCashierController {
     /**
      * 手动退款
      */
-    @AutoDocMethod(value = "查询支付款项信息", description = "查询支付款项信息", response = String.class)
+    @AutoDocMethod(value = "手动退款", description = "手动退款", response = String.class)
     @GetMapping("/cashierRefundApply")
     public ResponseData<String> cashierRefundApply(@RequestParam("orderNo") String orderNo,@RequestParam("payKind") String payKind) {
         log.info("OrderSettleController cashierRefundApply start param [{}]", orderNo);

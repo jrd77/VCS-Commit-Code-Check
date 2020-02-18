@@ -83,7 +83,7 @@ public class RenterCostDetailVO {
         if(wzCostDetail!=null){
             total=total+wzCostDetail.getTotalWzCostAmt();
         }
-        return totalAmt;
+        return total;
     }
 
 

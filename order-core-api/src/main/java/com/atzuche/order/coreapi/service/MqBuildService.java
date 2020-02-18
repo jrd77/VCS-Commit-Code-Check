@@ -1,6 +1,8 @@
 package com.atzuche.order.coreapi.service;
 
 import com.atzuche.order.commons.LocalDateTimeUtils;
+import com.atzuche.order.ownercost.entity.OwnerOrderEntity;
+import com.atzuche.order.ownercost.service.OwnerOrderService;
 import com.atzuche.order.parentorder.entity.OrderEntity;
 import com.atzuche.order.parentorder.entity.OrderSourceStatEntity;
 import com.atzuche.order.parentorder.service.OrderService;
@@ -21,33 +23,35 @@ public class MqBuildService {
     private OrderSourceStatService orderSourceStatService;
     @Autowired
     private OrderService orderService;
-
     @Autowired
     private RenterOrderService renterOrderService;
+    @Autowired
+    private OwnerOrderService ownerOrderService;
 
     /**
      * 构建事件的基本属性
      * @param orderNo
-     * @param memNo
      * @return
      */
-    public OrderBaseDataMq buildOrderBaseDataMq(String orderNo,String memNo){
+    public OrderBaseDataMq buildOrderBaseDataMq(String orderNo){
         OrderSourceStatEntity osse = orderSourceStatService.selectByOrderNo(orderNo);
         OrderEntity orderEntity = orderService.getOrderEntity(orderNo);
         RenterOrderEntity renterOrderEntity = renterOrderService.getRenterOrderByOrderNoAndIsEffective(orderNo);
-
+        OwnerOrderEntity ownerOrderEntity = ownerOrderService.getOwnerOrderByOrderNoAndIsEffective(orderNo);
 
         OrderBaseDataMq orderBaseDataMq = new OrderBaseDataMq();
         orderBaseDataMq.setCategory(orderEntity.getCategory().toString());
-        orderBaseDataMq.setMemNo(null != memNo ? Integer.parseInt(memNo) : null);
+        orderBaseDataMq.setRenterMemNo(null != renterOrderEntity && null != renterOrderEntity.getRenterMemNo() ? Integer.parseInt(renterOrderEntity.getRenterMemNo()) : null);
+        orderBaseDataMq.setOwnerMemNo(null != ownerOrderEntity && null != ownerOrderEntity.getMemNo() ? Integer.valueOf(ownerOrderEntity.getMemNo()) : null);
         orderBaseDataMq.setBusinessChildType(osse.getBusinessChildType());
         orderBaseDataMq.setBusinessParentType(osse.getBusinessParentType());
         orderBaseDataMq.setOrderNo(orderNo);
         orderBaseDataMq.setPlatformChildType(osse.getPlatformChildType());
         orderBaseDataMq.setPlatformParentType(osse.getPlatformParentType());
         orderBaseDataMq.setCarNo(Integer.parseInt(renterOrderEntity.getGoodsCode()));
-        orderBaseDataMq.setRentTime(LocalDateTimeUtils.localDateTimeToDate(renterOrderEntity.getActRentTime()));
-        orderBaseDataMq.setRevertTime(LocalDateTimeUtils.localDateTimeToDate(renterOrderEntity.getActRevertTime()));
+
+        orderBaseDataMq.setRentTime(null != renterOrderEntity.getActRentTime() ? LocalDateTimeUtils.localDateTimeToDate(renterOrderEntity.getActRentTime()) : LocalDateTimeUtils.localDateTimeToDate(renterOrderEntity.getExpRentTime()));
+        orderBaseDataMq.setRevertTime(null != renterOrderEntity.getActRevertTime() ? LocalDateTimeUtils.localDateTimeToDate(renterOrderEntity.getActRevertTime()) : LocalDateTimeUtils.localDateTimeToDate(renterOrderEntity.getExpRevertTime()));
 
         return orderBaseDataMq;
     }

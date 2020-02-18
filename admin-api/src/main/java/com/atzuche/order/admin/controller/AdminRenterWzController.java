@@ -63,8 +63,12 @@ public class AdminRenterWzController extends BaseController {
         }
 
         renterWzService.updateWzCost(costDetail.getOrderNo(),costDetail.getCostDetails());
-        String opDesc = costDetail.toString();
-        adminLogService.insertLog(AdminOpTypeEnum.CHANGE_WZ_FEE,costDetail.getOrderNo(),opDesc);
+        try {
+            String opDesc = costDetail.toString();
+            adminLogService.insertLog(AdminOpTypeEnum.CHANGE_WZ_FEE, costDetail.getOrderNo(), opDesc);
+        }catch (Exception e){
+            log.warn("修改违章费用日志记录失败",e);
+        }
 
         return ResponseData.success();
     }
@@ -86,6 +90,11 @@ public class AdminRenterWzController extends BaseController {
         BindingResultUtil.checkBindingResult(bindingResult);
 
         renterWzService.addTemporaryRefund(req);
+        try{
+            adminLogService.insertLog(AdminOpTypeEnum.TEMPORARY_WZ_REFUND,req.getOrderNo(),req.toString());
+        }catch (Exception e){
+            log.warn("暂扣违章押金日志记录失败",e);
+        }
 
         return ResponseData.success();
     }

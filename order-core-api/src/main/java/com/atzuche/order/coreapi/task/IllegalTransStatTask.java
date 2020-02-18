@@ -67,7 +67,7 @@ public class IllegalTransStatTask extends IJobHandler {
             XxlJobLogger.log("结束执行 每天定时处理结算前15分钟订单，查询是否有违章记录 ");
             return SUCCESS;
         } catch (Exception e) {
-            XxlJobLogger.log("执行 每天定时处理结算前15分钟订单，查询是否有违章记录 异常:",e);
+            XxlJobLogger.log("执行 每天定时处理结算前15分钟订单，查询是否有违章记录 异常:" + e);
             logger.error("执行 每天定时处理结算前15分钟订单，查询是否有违章记录 异常",e);
             Cat.logError("执行 每天定时处理结算前15分钟订单，查询是否有违章记录 异常",e);
             return new ReturnT(FAIL.getCode(),e.toString());

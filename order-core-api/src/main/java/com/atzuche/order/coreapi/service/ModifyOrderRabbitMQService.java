@@ -63,7 +63,7 @@ public class ModifyOrderRabbitMQService {
 	        //发送MQ时间
 			OrderRenterApplyModifyMq mq = new OrderRenterApplyModifyMq();
 			mq.setOrderNo(orderNo);
-			mq.setMemNo(Integer.valueOf(modifyOrderDTO.getMemNo()));
+			mq.setRenterMemNo(Integer.valueOf(modifyOrderDTO.getMemNo()));
 			mq.setCategory(oe.getCategory() != null ? String.valueOf(oe.getCategory()):null);
 			mq.setBusinessParentType(osse.getBusinessParentType());
 			mq.setBusinessChildType(osse.getBusinessChildType());
@@ -101,7 +101,7 @@ public class ModifyOrderRabbitMQService {
 			//发送MQ
 			OrderOwnerAgreeModifyMq mq = new OrderOwnerAgreeModifyMq();
 			mq.setOrderNo(orderNo);
-			mq.setMemNo(Integer.valueOf(oe.getMemNoRenter()));
+			mq.setRenterMemNo(Integer.valueOf(oe.getMemNoRenter()));
 			mq.setCategory(oe.getCategory() != null ? String.valueOf(oe.getCategory()):null);
 			mq.setBusinessParentType(osse.getBusinessParentType());
 			mq.setBusinessChildType(osse.getBusinessChildType());
@@ -141,7 +141,7 @@ public class ModifyOrderRabbitMQService {
 			//发送MQ
 			OrderOwnerRefundModifyMq mq = new OrderOwnerRefundModifyMq();
 			mq.setOrderNo(orderNo);
-			mq.setMemNo(Integer.valueOf(renterOrder.getRenterMemNo()));
+			mq.setRenterMemNo(Integer.valueOf(renterOrder.getRenterMemNo()));
 			mq.setCategory(oe.getCategory() != null ? String.valueOf(oe.getCategory()):null);
 			mq.setBusinessParentType(osse.getBusinessParentType());
 			mq.setBusinessChildType(osse.getBusinessChildType());
@@ -179,7 +179,7 @@ public class ModifyOrderRabbitMQService {
 	        //发送MQ
 	        OrderPlatModifyMq mq = new OrderPlatModifyMq();
 			mq.setOrderNo(orderNo);
-			mq.setMemNo(Integer.valueOf(modifyOrderDTO.getMemNo()));
+			mq.setRenterMemNo(Integer.valueOf(modifyOrderDTO.getMemNo()));
 			mq.setCategory(oe.getCategory() != null ? String.valueOf(oe.getCategory()):null);
 			mq.setBusinessParentType(osse.getBusinessParentType());
 			mq.setBusinessChildType(osse.getBusinessChildType());
@@ -217,7 +217,7 @@ public class ModifyOrderRabbitMQService {
 	        //发送MQ
 	        OrderChangeCarMq mq = new OrderChangeCarMq();
 			mq.setOrderNo(orderNo);
-			mq.setMemNo(Integer.valueOf(modifyOrderDTO.getMemNo()));
+			mq.setRenterMemNo(Integer.valueOf(modifyOrderDTO.getMemNo()));
 			mq.setCategory(oe.getCategory() != null ? String.valueOf(oe.getCategory()):null);
 			mq.setBusinessParentType(osse.getBusinessParentType());
 			mq.setBusinessChildType(osse.getBusinessChildType());
@@ -261,7 +261,7 @@ public class ModifyOrderRabbitMQService {
 	        //发送MQ
 	        OrderDelayMq mq = new OrderDelayMq();
 			mq.setOrderNo(orderNo);
-			mq.setMemNo(Integer.valueOf(modifyOrderDTO.getMemNo()));
+			mq.setRenterMemNo(Integer.valueOf(modifyOrderDTO.getMemNo()));
 			mq.setCategory(oe.getCategory() != null ? String.valueOf(oe.getCategory()):null);
 			mq.setBusinessParentType(osse.getBusinessParentType());
 			mq.setBusinessChildType(osse.getBusinessChildType());
@@ -304,7 +304,7 @@ public class ModifyOrderRabbitMQService {
 			//发送MQ
 			OrderDelayMq mq = new OrderDelayMq();
 			mq.setOrderNo(orderNo);
-			mq.setMemNo(Integer.valueOf(oe.getMemNoRenter()));
+			mq.setRenterMemNo(Integer.valueOf(oe.getMemNoRenter()));
 			mq.setCategory(oe.getCategory() != null ? String.valueOf(oe.getCategory()):null);
 			mq.setBusinessParentType(osse.getBusinessParentType());
 			mq.setBusinessChildType(osse.getBusinessChildType());

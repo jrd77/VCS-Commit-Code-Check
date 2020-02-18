@@ -17,8 +17,16 @@ public  class RenterCostShortDetailVO {
     private int totalRentCostAmt;
     @AutoDocProperty(value = "罚金总额")
     private int totalFineAmt;
+    @AutoDocProperty(value = "应支付押金总额")
+    private int yingFuDeposit;
+    @AutoDocProperty(value = "实际支付押金总额")
+    private int shiFuDeposit;
     @AutoDocProperty(value = "待支付押金总额")
     private int toPayDeposit;
+    @AutoDocProperty(value = "应支付违章押金总额")
+    private int yingFuWzDeposit;
+    @AutoDocProperty(value = "实际支付违章押金总额")
+    private int shiFuWzDeposit;
     @AutoDocProperty(value = "待支付违章押金总额")
     private int toPayWzDeposit;
     @AutoDocProperty(value = "押金预计退还")

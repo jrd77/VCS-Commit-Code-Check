@@ -73,7 +73,7 @@ public class OrderDispatchCancelService {
         }
 
         //发送调度取消事件
-        orderActionMqService.sendOrderDispatchCancelSuccess(orderNo, null);
-        orderStatusMqService.sendOrderStatusByOrderNo(orderNo,null,cancelOrderRes.getStatus(),NewOrderMQStatusEventEnum.ORDER_END);
+        orderActionMqService.sendOrderDispatchCancelSuccess(orderNo);
+        orderStatusMqService.sendOrderStatusByOrderNo(orderNo,cancelOrderRes.getStatus(),NewOrderMQStatusEventEnum.ORDER_END);
     }
 }
