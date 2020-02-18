@@ -12,6 +12,7 @@ import com.atzuche.order.accountrenterrentcost.service.notservice.AccountRenterC
 import com.atzuche.order.accountrenterwzdepost.vo.req.*;
 import com.atzuche.order.accountrenterwzdepost.vo.res.AccountRenterWZDepositResVO;
 import com.atzuche.order.cashieraccount.vo.res.pay.OrderPayCallBackSuccessVO;
+import com.atzuche.order.commons.enums.FineSubsidyCodeEnum;
 import com.atzuche.order.commons.enums.OrderPayStatusEnum;
 import com.atzuche.order.commons.enums.OrderStatusEnum;
 import com.atzuche.order.commons.enums.YesNoEnum;
@@ -503,7 +504,8 @@ public class CashierService {
             orderStatusDTO.setRentCarRefundStatus(OrderRefundStatusEnum.REFUNDED.getStatus());
         }
         saveCancelOrderStatusInfo(orderStatusDTO);
-        //TODO 支付回调成功 push/或者短信 怎么处理
+        //TODO 退款回调成功 push/或者短信 怎么处理
+        cashierNoTService.sendOrderRefundSuccessMq(notifyDataVo.getOrderNo(), FineSubsidyCodeEnum.RENTER);
     }
 
     /**

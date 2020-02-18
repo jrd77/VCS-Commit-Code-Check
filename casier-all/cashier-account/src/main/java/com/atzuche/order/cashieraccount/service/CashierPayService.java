@@ -517,7 +517,7 @@ public class CashierPayService{
             NotifyDataVo notifyDataVo = new NotifyDataVo();
             BeanUtils.copyProperties(vo,notifyDataVo);
             notifyDataVo.setSettleAmount(vo.getRefundAmt());
-            //退款成功操作
+            //退款调用成功操作
             cashierService.refundCallBackSuccess(vo);
         }
     }
