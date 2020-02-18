@@ -2,6 +2,7 @@ package com.atzuche.order.settle.service;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Map;
 
 import com.atzuche.order.cashieraccount.service.CashierPayService;
 import com.atzuche.order.cashieraccount.vo.req.pay.OrderPayReqVO;
@@ -11,14 +12,17 @@ import com.atzuche.order.commons.enums.cashcode.ConsoleCashCodeEnum;
 import com.atzuche.order.commons.service.OrderPayCallBack;
 import com.atzuche.order.mq.common.base.BaseProducer;
 import com.atzuche.order.mq.common.base.OrderMessage;
+import com.atzuche.order.mq.enums.ShortMessageTypeEnum;
 import com.atzuche.order.rentercost.entity.*;
 import com.atzuche.order.settle.vo.req.RentCosts;
+import com.atzuche.order.mq.util.SmsParamsMapUtil;
 import com.autoyol.autopay.gateway.constant.DataPayKindConstant;
 import com.autoyol.doc.util.StringUtil;
 import com.autoyol.event.rabbit.neworder.NewOrderMQActionEventEnum;
 import com.autoyol.event.rabbit.neworder.OrderSettlementMq;
 import com.autoyol.platformcost.model.FeeResult;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Maps;
 import com.thoughtworks.xstream.mapper.ImmutableTypesMapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -440,6 +444,9 @@ public class OrderSettleNewService {
         orderSettlementMq.setOrderNo(orderNo);
         OrderMessage orderMessage = OrderMessage.builder().build();
         orderMessage.setMessage(orderSettlementMq);
+        //给车主租客发送支付成功短信
+        Map map = SmsParamsMapUtil.getParamsMap(orderNo, ShortMessageTypeEnum.PAY_RENT_CAR_DEPOSIT_2_RENTER.getValue(),ShortMessageTypeEnum.PAY_RENT_CAR_DEPOSIT_2_OWNER.getValue(),null);
+        orderMessage.setMap(map);
         baseProducer.sendTopicMessage(NewOrderMQActionEventEnum.ORDER_SETTLEMENT_SUCCESS.exchange,NewOrderMQActionEventEnum.ORDER_SETTLEMENT_SUCCESS.routingKey,orderMessage);
     }
 

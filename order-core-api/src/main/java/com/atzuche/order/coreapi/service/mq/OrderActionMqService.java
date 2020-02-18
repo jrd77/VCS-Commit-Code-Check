@@ -139,9 +139,9 @@ public class OrderActionMqService {
 
         OrderMessage orderMessage = OrderMessage.builder().build();
         orderMessage.setMessage(orderCreateMq);
-        logger.info("发送车主拒绝订单成功事件.mq:[exchange={},routingKey={}],message=[{}]",NewOrderMQActionEventEnum.ORDER_CHANGE_CAR.exchange, NewOrderMQActionEventEnum.ORDER_CHANGE_CAR.routingKey,
+        logger.info("发送车主拒绝订单成功事件.mq:[exchange={},routingKey={}],message=[{}]",NewOrderMQActionEventEnum.OWNER_ORDER_REFUND.exchange, NewOrderMQActionEventEnum.OWNER_ORDER_REFUND.routingKey,
                 JSON.toJSON(orderMessage));
-        baseProducer.sendTopicMessage(NewOrderMQActionEventEnum.ORDER_CHANGE_CAR.exchange,NewOrderMQActionEventEnum.ORDER_CHANGE_CAR.routingKey,orderMessage);
+        baseProducer.sendTopicMessage(NewOrderMQActionEventEnum.OWNER_ORDER_REFUND.exchange,NewOrderMQActionEventEnum.OWNER_ORDER_REFUND.routingKey,orderMessage);
     }
 
     /**

@@ -7,7 +7,11 @@ import com.atzuche.order.delivery.common.DeliveryCarTask;
 import com.atzuche.order.delivery.service.delivery.DeliveryCarInfoPriceService;
 import com.atzuche.order.delivery.vo.delivery.DeliveryOilCostVO;
 import com.atzuche.order.mq.common.base.BaseProducer;
+import com.atzuche.order.mq.common.base.OrderMessage;
+import com.atzuche.order.mq.enums.ShortMessageTypeEnum;
+import com.atzuche.order.mq.util.SmsParamsMapUtil;
 import com.autoyol.commons.web.ResponseData;
+import com.autoyol.event.rabbit.neworder.NewOrderMQActionEventEnum;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +20,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Map;
 
 
 /**
@@ -37,7 +43,14 @@ public class DeliveryController {
     DeliveryCarInfoPriceService deliveryCarInfoPriceService;
     @PostMapping("/delivery/add")
     public ResponseData<?> add() {
-//        OrderMessage orderMessage =OrderMessage.builder().phone("13628645717").context("renterOptCancel").build();
+
+        //给车主租客发送支付成功短信
+        OrderMessage orderMessage = OrderMessage.builder().build();
+        Map map = SmsParamsMapUtil.getParamsMap("46860271200299", ShortMessageTypeEnum.PAY_RENT_CAR_DEPOSIT_2_RENTER.getValue(),ShortMessageTypeEnum.PAY_RENT_CAR_DEPOSIT_2_OWNER.getValue(),null);
+        orderMessage.setMap(map);
+        baseProducer.sendTopicMessage(NewOrderMQActionEventEnum.ORDER_SETTLEMENT_SUCCESS.exchange,NewOrderMQActionEventEnum.ORDER_SETTLEMENT_SUCCESS.routingKey,orderMessage);
+
+// OrderMessage orderMessage =OrderMessage.builder().phone("13628645717").context("renterOptCancel").build();
 //        baseProducer.sendTopicMessage("auto-order-action","action.order.create4",orderMessage);
 
 //        return null;

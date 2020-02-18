@@ -22,8 +22,12 @@ public class RenterCostReqVO {
 	@AutoDocProperty(value="订单编号,必填，",required=true)
 	private String orderNo;
 	
+	//根据的是订单号和会员号查询的。下面两个子订单号参数实际并未用到。
     @ApiModelProperty(value="租客子订单号",required=true)
-    @NotBlank(message="renterOrderNo不能为空")
+//    @NotBlank(message="renterOrderNo不能为空")
     private String renterOrderNo;
     
+    @ApiModelProperty(value="车主子订单号",required=true)
+//    @NotBlank(message="ownerOrderNo不能为空")
+    private String ownerOrderNo;
 }
