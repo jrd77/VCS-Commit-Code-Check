@@ -196,6 +196,7 @@ public class SubmitOrderService {
         ownerOrderReqDTO.setShowRentTime(null == carRentTimeRangeResVO ? null : carRentTimeRangeResVO.getAdvanceStartDate());
         ownerOrderReqDTO.setShowRevertTime(null == carRentTimeRangeResVO ? null : carRentTimeRangeResVO.getDelayEndDate());
         ownerOrderReqDTO.setMemNo(renterGoodsDetailDTO.getOwnerMemNo());
+        ownerOrderReqDTO.setGpsSerialNumber(renterGoodsDetailDTO.getGpsSerialNumber());
         ownerOrderService.generateRenterOrderInfo(ownerOrderReqDTO);
         //5.3.接收车主订单返回信息
 
