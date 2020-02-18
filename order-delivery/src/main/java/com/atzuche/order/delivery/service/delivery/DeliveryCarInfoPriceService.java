@@ -157,7 +157,6 @@ public class DeliveryCarInfoPriceService {
 
     /**
      * 获取车主租客取送车信息
-     *
      * @param ownerGetAndReturnCarDTO
      * @param HandoverCarInfoEntities
      * @return
@@ -231,6 +230,26 @@ public class DeliveryCarInfoPriceService {
             feeResult.setTotalFee(0);
             feeResult.setUnitPrice(0);
             return feeResult;
+        }
+
+        int getKm = 0;
+        int returnKm = 0;
+        //获取车主取车还车油耗数据
+        if(null == mileageAmtDTO.getGetmileage() || mileageAmtDTO.getReturnMileage() == null)
+        {
+            List<RenterHandoverCarInfoEntity> renterHandoverCarInfoEntities = renterHandoverCarService.selectRenterByOrderNo(mileageAmtDTO.getCostBaseDTO().getOrderNo());
+            for (RenterHandoverCarInfoEntity renterHandoverCarInfoEntity : renterHandoverCarInfoEntities) {
+                if (Objects.isNull(renterHandoverCarInfoEntity.getType())) {
+                    continue;
+                }
+                if (renterHandoverCarInfoEntity.getType().intValue() == RenterHandoverCarTypeEnum.RENYUN_TO_RENTER.getValue().intValue() || renterHandoverCarInfoEntity.getType().intValue() == RenterHandoverCarTypeEnum.OWNER_TO_RENTER.getValue().intValue()) {
+                    getKm = renterHandoverCarInfoEntity.getMileageNum() == null ? 0 : renterHandoverCarInfoEntity.getMileageNum();
+                } else {
+                    returnKm = renterHandoverCarInfoEntity.getMileageNum() == null ? 0 : renterHandoverCarInfoEntity.getMileageNum();
+                }
+            }
+            mileageAmtDTO.setGetmileage(getKm);
+            mileageAmtDTO.setReturnMileage(returnKm);
         }
         Integer mileageAmt = RenterFeeCalculatorUtils.calMileageAmt(mileageAmtDTO.getDayMileage(), mileageAmtDTO.getGuideDayPrice(),
                 mileageAmtDTO.getGetmileage(), mileageAmtDTO.getReturnMileage(), costBaseDTO.getStartTime(), costBaseDTO.getEndTime(), configHours);
