@@ -87,9 +87,9 @@ public class OwnerReturnCarService {
         }
 
         //发送车主确认还车事件
-        orderActionMqService.sendOrderOwnerReturnCarSuccess(reqVO.getOrderNo(), ownerOrderEntity.getMemNo());
+        orderActionMqService.sendOrderOwnerReturnCarSuccess(reqVO.getOrderNo());
 
-        orderStatusMqService.sendOrderStatusByOrderNo(reqVO.getOrderNo(),ownerOrderEntity.getMemNo(),orderStatusDTO.getStatus(), NewOrderMQStatusEventEnum.ORDER_PRESETTLEMENT);
+        orderStatusMqService.sendOrderStatusByOrderNo(reqVO.getOrderNo(),orderStatusDTO.getStatus(), NewOrderMQStatusEventEnum.ORDER_PRESETTLEMENT);
     }
 
 }

@@ -114,8 +114,8 @@ public class OwnerAgreeOrderService {
         //TODO:拒绝时间相交的订单
 
         //发送车主同意事件
-        orderActionMqService.sendOwnerAgreeOrderSuccess(reqVO.getOrderNo(),ownerOrderEntity.getMemNo());
-        orderStatusMqService.sendOrderStatusByOrderNo(reqVO.getOrderNo(),ownerOrderEntity.getMemNo(),orderStatusDTO.getStatus(), NewOrderMQStatusEventEnum.ORDER_PREPAY);
+        orderActionMqService.sendOwnerAgreeOrderSuccess(reqVO.getOrderNo());
+        orderStatusMqService.sendOrderStatusByOrderNo(reqVO.getOrderNo(),orderStatusDTO.getStatus(), NewOrderMQStatusEventEnum.ORDER_PREPAY);
 
     }
 
