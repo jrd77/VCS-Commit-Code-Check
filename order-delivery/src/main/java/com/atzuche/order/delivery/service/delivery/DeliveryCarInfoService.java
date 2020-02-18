@@ -278,8 +278,7 @@ public class DeliveryCarInfoService {
         renterGetAndReturnCarDTO.setCarOwnerOilCrash(renterGetAndReturnCarDTO.getOilDifferenceCrash());
         String oilDifferenceCrashs = ownerGetAndReturnCarDTO.getOilDifferenceCrash();
         try {
-            ownerGetAndReturnCarDTO.setCarOwnerAllOilCrash("-"+String.valueOf(Integer.valueOf(oilDifferenceCrashs.contains("元") ? oilDifferenceCrashs.replace("元", "") : oilDifferenceCrashs) + Integer.valueOf(ownerGetAndReturnCarDTO.getPlatFormOilServiceCharge().contains("元") ? ownerGetAndReturnCarDTO.getPlatFormOilServiceCharge().replace("元", "") : ownerGetAndReturnCarDTO.getPlatFormOilServiceCharge())));
-            ownerGetAndReturnCarDTO.setOilDifferenceCrash("-"+ownerGetAndReturnCarDTO.getOilDifferenceCrash());
+            ownerGetAndReturnCarDTO.setCarOwnerAllOilCrash(String.valueOf(Integer.valueOf(oilDifferenceCrashs.contains("元") ? oilDifferenceCrashs.replace("元", "") : oilDifferenceCrashs) + Integer.valueOf(ownerGetAndReturnCarDTO.getPlatFormOilServiceCharge().contains("元") ? ownerGetAndReturnCarDTO.getPlatFormOilServiceCharge().replace("元", "") : ownerGetAndReturnCarDTO.getPlatFormOilServiceCharge())));
         }catch (Exception e)
         {
             log.info("获取车主总油耗出错",e);
