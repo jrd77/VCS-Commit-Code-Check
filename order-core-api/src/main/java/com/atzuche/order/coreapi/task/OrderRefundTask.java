@@ -41,43 +41,23 @@ public class OrderRefundTask extends IJobHandler {
 
     @Override
     public ReturnT<String> execute(String s) throws Exception {
-        Transaction t = Cat.getProducer().newTransaction(CatConstants.XXL_JOB_CALL, "退款服务");
-        try {
-            Cat.logEvent(CatConstants.XXL_JOB_METHOD,"OrderRefundTask.execute");
-            Cat.logEvent(CatConstants.XXL_JOB_PARAM,null);
-            logger.info("开始执行 退款订单任务");
-            XxlJobLogger.log("开始执行 每天定时处理 实际还车15天后系统自动生成，调用流程系统，查询是否有违章记录 定时器");
-            List<CashierRefundApplyEntity> list = cashierRefundApplyNoTService.selectorderNoWaitingAll();
-            logger.info("查询需要退换的 记录", GsonUtils.toJson(list));
-            if(CollectionUtils.isNotEmpty(list)){
-                for(int i =0;i<list.size();i++){
-                    Cat.logEvent(CatConstants.XXL_JOB_PARAM,GsonUtils.toJson(list));
-                    try {
-                        cashierPayService.refundOrderPay(list.get(i));
-                    }catch (Exception e) {
-                        XxlJobLogger.log("执行 退款操作异常 参数:{}",GsonUtils.toJson(list));
-                        XxlJobLogger.log("执行 退款操作异常 异常:",e);
-                        logger.error("执行 退款操作异常 异常 {},{}",GsonUtils.toJson(list),e);
-                        Cat.logError("执行 退款操作异常 异常 {}",e);
-                        t.setStatus(e);
-                    }
+        logger.info("开始执行 退款订单任务");
+        List<CashierRefundApplyEntity> list = cashierRefundApplyNoTService.selectorderNoWaitingAll();
+        logger.info("查询需要退换的 记录", GsonUtils.toJson(list));
+        if (CollectionUtils.isNotEmpty(list)) {
+            for (int i = 0; i < list.size(); i++) {
+                Cat.logEvent(CatConstants.XXL_JOB_PARAM, GsonUtils.toJson(list));
+                try {
+                    cashierPayService.refundOrderPay(list.get(i));
+                } catch (Exception e) {
+                    logger.error("执行 退款操作异常 异常 {},{}", GsonUtils.toJson(list.get(i)), e);
+                    Cat.logError("执行 退款操作异常 异常 {}", e);
                 }
             }
-
-            t.setStatus(Transaction.SUCCESS);
-            logger.info("结束执行 退款 ");
-            XxlJobLogger.log("结束执行 退款 ");
-            return SUCCESS;
-        } catch (Exception e) {
-            XxlJobLogger.log("执行 退款操作异常:",e);
-            logger.error("执行 退款操作异常",e);
-            Cat.logError("执行 退款操作异常",e);
-            t.setStatus(e);
-            return new ReturnT(FAIL.getCode(),e.toString());
-        } finally {
-            if (t != null) {
-                t.complete();
-            }
         }
+        logger.info("结束执行 退款 ");
+        XxlJobLogger.log("结束执行 退款 ");
+        return SUCCESS;
+
     }
 }
