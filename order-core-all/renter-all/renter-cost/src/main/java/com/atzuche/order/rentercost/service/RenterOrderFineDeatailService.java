@@ -317,7 +317,7 @@ public class RenterOrderFineDeatailService{
         } else {
             fineAmt = Math.round((initRentAmt - updRentAmt) * CommonUtils.FINE_AMT_RATIO_SMALL);
         }
-        RenterOrderFineDeatailEntity entity = fineDataConvert(costBaseDTO, fineAmt, FineSubsidyCodeEnum.PLATFORM, FineSubsidySourceCodeEnum.RENTER, FineTypeEnum.MODIFY_ADVANCE);
+        RenterOrderFineDeatailEntity entity = fineDataConvert(costBaseDTO, fineAmt, FineSubsidyCodeEnum.OWNER, FineSubsidySourceCodeEnum.RENTER, FineTypeEnum.MODIFY_ADVANCE);
         return entity;
     }
     
