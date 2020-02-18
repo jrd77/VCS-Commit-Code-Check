@@ -1,6 +1,7 @@
 package com.atzuche.order.coreapi.service.mq;
 
 import com.alibaba.fastjson.JSON;
+import com.atzuche.order.commons.LocalDateTimeUtils;
 import com.atzuche.order.commons.enums.CancelSourceEnum;
 import com.atzuche.order.commons.vo.req.OrderReqVO;
 import com.atzuche.order.coreapi.service.MqBuildService;
@@ -42,8 +43,8 @@ public class OrderActionMqService {
         orderCreateMq.setPlatformChildType(orderReqVO.getPlatformChildType());
         orderCreateMq.setBusinessParentType(orderReqVO.getBusinessParentType());
         orderCreateMq.setPlatformParentType(orderReqVO.getPlatformParentType());
-        orderCreateMq.setRentTime(DateUtil.asDate(orderReqVO.getRentTime().toLocalDate()));
-        orderCreateMq.setRevertTime(DateUtil.asDate(orderReqVO.getRevertTime().toLocalDate()));
+        orderCreateMq.setRentTime(LocalDateTimeUtils.localDateTimeToDate(orderReqVO.getRentTime()));
+        orderCreateMq.setRevertTime(LocalDateTimeUtils.localDateTimeToDate(orderReqVO.getRevertTime()));
         orderCreateMq.setMemNo(Integer.valueOf(orderReqVO.getMemNo()));
         orderCreateMq.setRiskReqId(riskAuditId);
         orderCreateMq.setCarNo(Integer.valueOf(orderReqVO.getCarNo()));
@@ -71,8 +72,8 @@ public class OrderActionMqService {
         orderCreateMq.setPlatformChildType(orderReqVO.getPlatformChildType());
         orderCreateMq.setBusinessParentType(orderReqVO.getBusinessParentType());
         orderCreateMq.setPlatformParentType(orderReqVO.getPlatformParentType());
-        orderCreateMq.setRentTime(DateUtil.asDate(orderReqVO.getRentTime().toLocalDate()));
-        orderCreateMq.setRevertTime(DateUtil.asDate(orderReqVO.getRevertTime().toLocalDate()));
+        orderCreateMq.setRentTime(LocalDateTimeUtils.localDateTimeToDate(orderReqVO.getRentTime()));
+        orderCreateMq.setRevertTime(LocalDateTimeUtils.localDateTimeToDate(orderReqVO.getRevertTime()));
         orderCreateMq.setMemNo(Integer.valueOf(orderReqVO.getMemNo()));
         orderCreateMq.setRiskReqId(riskAuditId);
         orderCreateMq.setCarNo(Integer.valueOf(orderReqVO.getCarNo()));

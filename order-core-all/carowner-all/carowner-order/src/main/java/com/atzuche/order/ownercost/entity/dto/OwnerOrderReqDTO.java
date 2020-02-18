@@ -76,6 +76,11 @@ public class OwnerOrderReqDTO {
     private Double serviceProxyRate;
 
     /**
+     * GPS序号
+     */
+    private String gpsSerialNumber;
+
+    /**
      * 补贴费用明细（车主券）
      */
     private OwnerOrderSubsidyDetailEntity ownerOrderSubsidyDetailEntity;
