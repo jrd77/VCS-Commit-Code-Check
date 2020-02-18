@@ -201,12 +201,16 @@ public class OwnerOrderDetailService {
             BeanUtils.copyProperties(x,ownerOrderFineDeatailDTO);
             ownerOrderFineDeatailDTOS.add(ownerOrderFineDeatailDTO);
         });
-        int ownerFine = CostStatUtils.calOwnerFineByCashNo(FineTypeEnum.OWNER_FINE, ownerOrderFineDeatailDTOS);
+//        int ownerFine = CostStatUtils.calOwnerFineByCashNo(FineTypeEnum.OWNER_FINE, ownerOrderFineDeatailDTOS);  //CANCEL_FINE
+        int ownerFine = CostStatUtils.calOwnerFineByCashNo(FineTypeEnum.CANCEL_FINE, ownerOrderFineDeatailDTOS);
         int ownerGetReturnCarFienAmt = CostStatUtils.calOwnerFineByCashNo(FineTypeEnum.GET_RETURN_CAR, ownerOrderFineDeatailDTOS);
         int ownerModifyAddrAmt = CostStatUtils.calOwnerFineByCashNo(FineTypeEnum.MODIFY_ADDRESS_FINE, ownerOrderFineDeatailDTOS);
         
-        int renterAdvanceReturnCarFienAmt = CostStatUtils.calOwnerFineByCashNo(FineTypeEnum.RENTER_ADVANCE_RETURN, ownerOrderFineDeatailDTOS);
-        int renterDelayReturnCarFienAmt = CostStatUtils.calOwnerFineByCashNo(FineTypeEnum.RENTER_DELAY_RETURN, ownerOrderFineDeatailDTOS);
+//        int renterAdvanceReturnCarFienAmt = CostStatUtils.calOwnerFineByCashNo(FineTypeEnum.RENTER_ADVANCE_RETURN, ownerOrderFineDeatailDTOS);
+//        int renterDelayReturnCarFienAmt = CostStatUtils.calOwnerFineByCashNo(FineTypeEnum.RENTER_DELAY_RETURN, ownerOrderFineDeatailDTOS);
+        
+        int renterAdvanceReturnCarFienAmt = CostStatUtils.calOwnerFineByCashNo(FineTypeEnum.MODIFY_ADVANCE, ownerOrderFineDeatailDTOS);
+        int renterDelayReturnCarFienAmt = CostStatUtils.calOwnerFineByCashNo(FineTypeEnum.DELAY_FINE, ownerOrderFineDeatailDTOS);
         
         //add by huangjing 200217
         List<ConsoleOwnerOrderFineDeatailEntity>  consoleOwnerOrderFineDeatailEntityList = consoleOwnerOrderFineDeatailService.selectByOrderNo(orderNo);
@@ -216,8 +220,9 @@ public class OwnerOrderDetailService {
             BeanUtils.copyProperties(x,consoleOwnerOrderFineDeatailDTO);
             consoleOwnerOrderFineDeatailDTOS.add(consoleOwnerOrderFineDeatailDTO);
         });
-        int consoleRenterAdvanceReturnCarFienAmt = CostStatUtils.calConsoleOwnerFineByCashNo(FineTypeEnum.RENTER_ADVANCE_RETURN, consoleOwnerOrderFineDeatailDTOS);
-        int consoleRenterDelayReturnCarFienAmt = CostStatUtils.calConsoleOwnerFineByCashNo(FineTypeEnum.RENTER_DELAY_RETURN, consoleOwnerOrderFineDeatailDTOS);
+        //费用编码不对
+        int consoleRenterAdvanceReturnCarFienAmt = CostStatUtils.calConsoleOwnerFineByCashNo(FineTypeEnum.MODIFY_ADVANCE, consoleOwnerOrderFineDeatailDTOS);
+        int consoleRenterDelayReturnCarFienAmt = CostStatUtils.calConsoleOwnerFineByCashNo(FineTypeEnum.DELAY_FINE, consoleOwnerOrderFineDeatailDTOS);
         
         
         FienAmtDetailDTO fienAmtDetailDTO = new FienAmtDetailDTO();
@@ -353,7 +358,7 @@ public class OwnerOrderDetailService {
         ownerOrderFineDeatailEntity.setOwnerOrderNo(ownerOrderNo);
         ownerOrderFineDeatailEntity.setMemNo(fienAmtUpdateReqDTO.getOwnerMemNo());
         ownerOrderFineDeatailEntity.setFineType(fienAmtUpdateReqDTO.getOwnerGetReturnCarFienCashNo());
-        ownerOrderFineDeatailEntity.setFineAmount(-fienAmtUpdateReqDTO.getOwnerGetReturnCarFienAmt());
+        ownerOrderFineDeatailEntity.setFineAmount(fienAmtUpdateReqDTO.getOwnerGetReturnCarFienAmt());
         ownerOrderFineDeatailEntity.setFineType(FineTypeEnum.GET_RETURN_CAR.getFineType());
         ownerOrderFineDeatailEntity.setFineTypeDesc(FineTypeEnum.GET_RETURN_CAR.getFineTypeDesc());
         OwnerOrderFineDeatailEntity getOwnerGetReturnCarFienCashNo = ownerOrderFineDeatailService.getByCashNoAndOwnerOrderNo(ownerOrderNo, fienAmtUpdateReqDTO.getOwnerGetReturnCarFienCashNo());
@@ -369,9 +374,11 @@ public class OwnerOrderDetailService {
         }else{
             ownerOrderFineDeatailService.updateByCashNoAndOwnerOrderNo(ownerOrderFineDeatailEntity);
         }
+        
+        //两处的金额前端录入什么值就保存什么值。
         ownerOrderFineDeatailEntity.setFineTypeDesc(FineTypeEnum.MODIFY_ADDRESS_FINE.getFineTypeDesc());
         ownerOrderFineDeatailEntity.setFineType(fienAmtUpdateReqDTO.getOwnerModifyAddrAmtCashNo());
-        ownerOrderFineDeatailEntity.setFineAmount(-fienAmtUpdateReqDTO.getOwnerModifyAddrAmt());
+        ownerOrderFineDeatailEntity.setFineAmount(fienAmtUpdateReqDTO.getOwnerModifyAddrAmt());
         OwnerOrderFineDeatailEntity byCashNoAndOwnerOrderNo = ownerOrderFineDeatailService.getByCashNoAndOwnerOrderNo(ownerOrderNo, fienAmtUpdateReqDTO.getOwnerModifyAddrAmtCashNo());
         if(byCashNoAndOwnerOrderNo == null){
            /* if(fienAmtUpdateReqDTO.getOwnerModifyAddrAmt() == 0){
