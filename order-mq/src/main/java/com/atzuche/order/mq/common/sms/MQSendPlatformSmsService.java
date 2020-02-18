@@ -15,7 +15,7 @@ import java.util.*;
  * @author ：weixu.chen
  * @date ：Created in 2019/11/8 17:31
  */
-@Service
+@Service(value = "smsMQSendPlatformSmsService")
 public class MQSendPlatformSmsService {
 
     private static final Logger logger = LoggerFactory.getLogger(MQSendPlatformSmsService.class);
