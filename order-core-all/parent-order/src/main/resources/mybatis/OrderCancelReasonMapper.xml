@@ -11,6 +11,7 @@
         <result property="cancelSource" column="cancel_source"/>
         <result property="dutySource" column="duty_source"/>
         <result property="cancelReason" column="cancel_reason"/>
+		<result property="appealFlag" column="appeal_flag"/>
         <result property="createTime" column="create_time"/>
         <result property="createOp" column="create_op"/>
         <result property="updateTime" column="update_time"/>
@@ -27,6 +28,7 @@
         `cancel_source`,
         `duty_source`,
         `cancel_reason`,
+        `appeal_flag`,
         `create_time`,
         `create_op`,
         `update_time`,
@@ -46,14 +48,16 @@
 				`operate_type`,
 				`cancel_source`,		
 				`duty_source`,		
-				`cancel_reason`
+				`cancel_reason`,
+				`appeal_flag`
         ) values (
 				#{orderNo},
                 #{subOrderNo},
 				#{operateType},
 				#{cancelSource}, 		
 				#{dutySource}, 		
-				#{cancelReason}
+				#{cancelReason},
+				#{appealFlag}
 			)
 	</insert>
 	
@@ -66,6 +70,7 @@
 				<if test="cancelSource != null">`cancel_source`, </if>
 				<if test="dutySource != null">`duty_source`, </if>
 				<if test="cancelReason != null">`cancel_reason`, </if>
+				<if test="appealFlag != null">`appeal_flag`, </if>
 				<if test="createTime != null">`create_time`, </if>
 				<if test="createOp != null">`create_op`, </if>
 				<if test="updateTime != null">`update_time`, </if>
@@ -79,6 +84,7 @@
                 <if test="cancelSource != null">#{cancelSource},  </if>
 				<if test="dutySource != null">#{dutySource},  </if>
 				<if test="cancelReason != null">#{cancelReason},  </if>
+				<if test="appealFlag != null">#{appealFlag}, </if>
 				<if test="createTime != null">#{createTime},  </if>
 				<if test="createOp != null">#{createOp},  </if>
 				<if test="updateTime != null">#{updateTime},  </if>
@@ -97,6 +103,7 @@
 				<if test="cancelSource != null">`cancel_source` = #{cancelSource}, </if>
 				<if test="dutySource != null">`duty_source` = #{dutySource}, </if>
 				<if test="cancelReason != null">`cancel_reason` = #{cancelReason}, </if>
+				<if test="appealFlag != null">`appeal_flag` = #{appealFlag}, </if>
 				<if test="createTime != null">`create_time` = #{createTime}, </if>
 				<if test="createOp != null">`create_op` = #{createOp}, </if>
 				<if test="updateTime != null">`update_time` = #{updateTime}, </if>
@@ -114,7 +121,8 @@
                 `operate_type` = #{operateType},
                 `cancel_source` = #{cancelSource},
 				`duty_source` = #{dutySource}, 		
-				`cancel_reason` = #{cancelReason}
+				`cancel_reason` = #{cancelReason},
+				`appeal_flag` = #{appealFlag}
 		    </set>
 		where id = #{id}
 	</update>

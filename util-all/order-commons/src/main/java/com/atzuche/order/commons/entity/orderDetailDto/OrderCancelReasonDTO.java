@@ -32,5 +32,9 @@ public class OrderCancelReasonDTO implements Serializable {
          * 取消原因
          */
         private String cancelReason;
+		/**
+		 * 是否申诉:0,否 1,是
+		 */
+		private Integer appealFlag;
     					
 }
