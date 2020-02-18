@@ -43,8 +43,8 @@ subprojects {
         // Apache Commons
         compile("org.apache.commons:commons-lang3:3.8.1")
         compile('org.projectlombok:lombok:1.18.8')
-        annotationProcessor 'org.projectlombok:lombok:1.18.8'
-        testAnnotationProcessor 'org.projectlombok:lombok:1.18.8'
+        //annotationProcessor 'org.projectlombok:lombok:1.18.8'
+        //testAnnotationProcessor 'org.projectlombok:lombok:1.18.8'
         testCompileOnly 'org.projectlombok:lombok:1.18.8'
         // 单元测试
         testCompile("org.springframework.boot:spring-boot-starter-test:$springBootVersion")

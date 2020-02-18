@@ -51,9 +51,16 @@ public class GetReturnCarService {
 		if("1".equals(flag)) {  //取车
 			getReturnCarCostReqDto.setIsGetCarCost(true);
 			getReturnCarCostReqDto.setIsReturnCarCost(false);
+			///
+			getReturnCarOverCostReqDto.setIsGetCarCost(true);
+			getReturnCarOverCostReqDto.setIsReturnCarCost(false);
+			
 		} else { //还车
 			getReturnCarCostReqDto.setIsGetCarCost(false);
 			getReturnCarCostReqDto.setIsReturnCarCost(true);
+			///
+			getReturnCarOverCostReqDto.setIsGetCarCost(false);
+			getReturnCarOverCostReqDto.setIsReturnCarCost(true);
 		}
 		getReturnCarCostReqDto.setCostBaseDTO(costBaseDTO);
 		getReturnCarCostReqDto.setSrvGetLat(vo.getGetCarLan());
