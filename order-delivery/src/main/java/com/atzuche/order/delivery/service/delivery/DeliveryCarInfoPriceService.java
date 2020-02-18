@@ -126,7 +126,7 @@ public class DeliveryCarInfoPriceService {
             }
             ownerGetAndReturnCarDO = createOwnerGetAndReturnCarDTO(ownerGetAndReturnCarDO, ownerHandoverCarInfoList, carEngineType, cityCode);
             BeanUtils.copyProperties(ownerGetAndReturnCarDO, renterGetAndReturnCarDTO);
-            ownerGetAndReturnCarDTO.setOilDifferenceCrash("-"+ownerGetAndReturnCarDTO.getOilDifferenceCrash());
+            ownerGetAndReturnCarDTO.setOilDifferenceCrash(ownerGetAndReturnCarDTO.getOilDifferenceCrash());
             return DeliveryOilCostVO.builder().ownerGetAndReturnCarDTO(ownerGetAndReturnCarDTO).renterGetAndReturnCarDTO(renterGetAndReturnCarDTO).build();
         } catch (DeliveryOrderException e) {
             log.error("获取油费等数据发生业务异常：", e);
