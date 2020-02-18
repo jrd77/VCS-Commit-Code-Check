@@ -40,11 +40,11 @@ public class HandoverCarOilController {
      * @return
      */
     @PostMapping("/oil/setOil")
-    public ResponseData<?> updateHandoverCarInfo(@Valid  @RequestBody HandoverCarInfoReqVO handoverCarReqVO, BindingResult bindingResult) {
+    public ResponseData<?> updateHandoverCarInfo(@RequestBody HandoverCarInfoReqVO handoverCarReqVO) {
 
         logger.info("updateHandoverCarInfo param is {}",handoverCarReqVO);
         
-        BindingResultUtil.checkBindingResult(bindingResult);
+       // BindingResultUtil.checkBindingResult(bindingResult);
 
         handoverCarInfoService.updateHandoverCarInfo(handoverCarReqVO);
         return ResponseData.success();

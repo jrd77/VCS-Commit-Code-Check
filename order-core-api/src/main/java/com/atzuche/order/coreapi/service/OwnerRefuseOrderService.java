@@ -158,13 +158,13 @@ public class OwnerRefuseOrderService {
 
 
         //发送车主拒绝事件
-        orderActionMqService.sendOwnerRefundOrderSuccess(reqVO.getOrderNo(), ownerOrderEntity.getMemNo());
+        orderActionMqService.sendOwnerRefundOrderSuccess(reqVO.getOrderNo());
 
         NewOrderMQStatusEventEnum newOrderMQStatusEventEnum = NewOrderMQStatusEventEnum.ORDER_END;
         if(orderStatusDTO.getStatus() == OrderStatusEnum.TO_DISPATCH.getStatus()) {
             newOrderMQStatusEventEnum = NewOrderMQStatusEventEnum.ORDER_PREDISPATCH;
         }
-        orderStatusMqService.sendOrderStatusByOrderNo(reqVO.getOrderNo(),ownerOrderEntity.getMemNo(),orderStatusDTO.getStatus(),newOrderMQStatusEventEnum);
+        orderStatusMqService.sendOrderStatusByOrderNo(reqVO.getOrderNo(),orderStatusDTO.getStatus(),newOrderMQStatusEventEnum);
 
     }
 

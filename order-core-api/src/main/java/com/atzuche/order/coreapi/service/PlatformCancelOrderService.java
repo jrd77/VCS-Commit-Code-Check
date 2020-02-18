@@ -79,12 +79,12 @@ public class PlatformCancelOrderService {
             }
         }
         //平台取消消息发送
-        orderActionMqService.sendCancelOrderSuccess(orderNo,null, CancelSourceEnum.PLATFORM, NewOrderMQActionEventEnum.ORDER_DELAY);
+        orderActionMqService.sendCancelOrderSuccess(orderNo, CancelSourceEnum.PLATFORM, NewOrderMQActionEventEnum.ORDER_DELAY);
         NewOrderMQStatusEventEnum newOrderMQStatusEventEnum = NewOrderMQStatusEventEnum.ORDER_END;
         if(cancelOrderRes.getStatus() == OrderStatusEnum.TO_DISPATCH.getStatus()) {
             newOrderMQStatusEventEnum = NewOrderMQStatusEventEnum.ORDER_PREDISPATCH;
         }
-        orderStatusMqService.sendOrderStatusByOrderNo(orderNo,null,cancelOrderRes.getStatus(),newOrderMQStatusEventEnum);
+        orderStatusMqService.sendOrderStatusByOrderNo(orderNo,cancelOrderRes.getStatus(),newOrderMQStatusEventEnum);
     }
 
 
