@@ -217,6 +217,24 @@ public class CostStatUtils {
         }
         return amt;
     }
+    
+    public static int calConsoleOwnerFineByCashNo(FineTypeEnum ownerFineTypeEnum, List<ConsoleOwnerOrderFineDeatailDTO> ownerOrderFineDeatailDTOS){
+        if(ownerOrderFineDeatailDTOS == null || ownerOrderFineDeatailDTOS.size()<=0){
+            return 0;
+        }
+        if(ownerFineTypeEnum == null){
+            return 0;
+        }
+        Integer amt = ownerOrderFineDeatailDTOS
+                .stream()
+                .filter(x -> ownerFineTypeEnum.getFineType().equals(x.getFineType()))
+                .collect(Collectors.summingInt(ConsoleOwnerOrderFineDeatailDTO::getFineAmount));
+        if(amt == null){
+            return 0;
+        }
+        return amt;
+    }
+    
 
     public static int calConsoleAmtByCashNo(ConsoleCashCodeEnum consoleCashCodeEnum,List<OrderConsoleCostDetailDTO> list) {
         if(consoleCashCodeEnum == null){

@@ -1,0 +1,85 @@
+package com.atzuche.order.mq.common.sms;
+
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Service;
+
+import java.lang.reflect.Field;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+/**
+ * @author 胡春林
+ * 发送短信数据
+ */
+@Service
+@Slf4j
+public class ShortMessageSendService {
+
+    private String reg = ("\\$(.+?)\\$");
+
+    /**
+     * 获取需要发送的SMS Map
+     * @param smsParamsMap   参数
+     * @param smsFieldNames  需要发送的参数字段名
+     * @param orderEntity    订单对象
+     * @param memberDTO      会员对象
+     * @param goodsDetailDTO 商品对象
+     * @return
+     */
+    public Map getSmsTemplateMap(Map smsParamsMap, List<String> smsFieldNames, Object orderEntity, Object memberDTO, Object goodsDetailDTO) {
+        Map smsTemplateFieldValus = Maps.newHashMap();
+        for (String smsFieldName : smsFieldNames) {
+            String smsFieldValue = getFieldValueByFieldName(smsFieldName, orderEntity) == null ? getFieldValueByFieldName(smsFieldName, memberDTO) : getFieldValueByFieldName(smsFieldName, orderEntity);
+            smsFieldValue = smsFieldValue == null ? getFieldValueByFieldName(smsFieldName, goodsDetailDTO) : smsFieldValue;
+            //如果都为空 继续往下找
+            if (StringUtils.isBlank(smsFieldValue)) {
+                smsFieldValue = String.valueOf(smsParamsMap.get(smsFieldName));
+            }
+            //如果任然为空 说明没传这个字段
+            if (StringUtils.isBlank(smsFieldValue)) {
+                continue;
+            }
+            smsTemplateFieldValus.put(smsFieldName, smsFieldValue);
+        }
+        return smsTemplateFieldValus;
+    }
+
+    /**
+     * 根据属性名获取属性值
+     * @param fieldName
+     * @param object
+     * @return
+     */
+    private String getFieldValueByFieldName(String fieldName, Object object) {
+        try {
+            fieldName = fieldName.substring(0, 1).toLowerCase() + fieldName.substring(1);
+            Field field = object.getClass().getDeclaredField(fieldName);
+            field.setAccessible(true);
+            return String.valueOf(field.get(object));
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    /**
+     * 获取需要取值得字段名
+     * @param smsTemplate
+     * @return
+     */
+    public List<String> getSMSTemplateFeild(String smsTemplate) {
+        Pattern patten = Pattern.compile(reg);
+        Matcher matcher = patten.matcher(smsTemplate);
+        List<String> matchFeilds = Lists.newArrayList();
+        while (matcher.find()) {
+            matchFeilds.add(matcher.group(1));
+        }
+        return matchFeilds;
+    }
+
+
+}

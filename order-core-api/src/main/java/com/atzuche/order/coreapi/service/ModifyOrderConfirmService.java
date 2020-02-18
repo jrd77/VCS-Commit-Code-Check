@@ -126,7 +126,7 @@ public class ModifyOrderConfirmService {
 			}
 		}
 		// 重新生成车主订单
-		modifyOrderForOwnerService.modifyOrderForOwner(modifyOrderOwnerDTO, renterSubsidy);
+		modifyOrderForOwnerService.modifyOrderForOwner(modifyOrderOwnerDTO, renterSubsidy, modifyOrderDTO.getRenterOrderNo());
 		// 处理租客订单信息
 		modifyOrderForRenterService.updateRenterOrderStatus(renterOrder.getOrderNo(), renterOrder.getRenterOrderNo(), initRenterOrder);
 		// 如果是换车增加一条换车记录
@@ -261,7 +261,7 @@ public class ModifyOrderConfirmService {
 		// 获取同意前有效的租客子订单
 		RenterOrderEntity initRenterOrder = renterOrderService.getRenterOrderByOrderNoAndIsEffective(orderNo);
 		// 重新生成车主订单
-		modifyOrderForOwnerService.modifyOrderForOwner(modifyOrderOwnerDTO, renterSubsidy);
+		modifyOrderForOwnerService.modifyOrderForOwner(modifyOrderOwnerDTO, renterSubsidy, renterOrderNo);
 		// 处理租客订单信息
 		modifyOrderForRenterService.updateRenterOrderStatus(orderNo, renterOrderNo, initRenterOrder);
 		// 通知仁云

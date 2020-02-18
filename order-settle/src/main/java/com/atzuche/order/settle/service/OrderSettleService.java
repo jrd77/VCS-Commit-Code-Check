@@ -1,11 +1,14 @@
 package com.atzuche.order.settle.service;
 
 import com.atzuche.order.accountrenterdeposit.vo.res.AccountRenterDepositResVO;
+import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostDetailEntity;
 import com.atzuche.order.accountrenterwzdepost.vo.res.AccountRenterWZDepositResVO;
 import com.atzuche.order.cashieraccount.entity.CashierRefundApplyEntity;
 import com.atzuche.order.cashieraccount.service.CashierPayService;
+import com.atzuche.order.cashieraccount.service.CashierQueryService;
 import com.atzuche.order.cashieraccount.service.CashierSettleService;
 import com.atzuche.order.cashieraccount.service.notservice.CashierRefundApplyNoTService;
+import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.commons.service.OrderPayCallBack;
 import com.atzuche.order.mq.common.base.BaseProducer;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
@@ -59,6 +62,7 @@ public class OrderSettleService{
     @Autowired private CashierSettleService cashierSettleService;
     @Autowired private CashierRefundApplyNoTService cashierRefundApplyNoTService;
     @Autowired private CashierPayService cashierPayService;
+    @Autowired private CashierQueryService cashierQueryService;
 
 
     /**
@@ -87,6 +91,16 @@ public class OrderSettleService{
         if(Objects.nonNull(rentCosts)){
             int renterCost =  orderSettleNewService.getYingTuiRenterCost(rentCosts);
             int yingfuAmt = cashierPayService.getRentCost(orderNo,renterOrder.getRenterMemNo());
+            List<AccountRenterCostDetailEntity> renterCostDetails = cashierQueryService.getRenterCostDetails(orderNo);
+            int renterCostAmtEd = cashierQueryService.getRenterCost(orderNo,renterOrder.getRenterMemNo());
+            if(!CollectionUtils.isEmpty(renterCostDetails)){
+                int bufuAmt = renterCostDetails.stream().filter(obj->{
+                    return RenterCashCodeEnum.WALLET_DEDUCT.getCashNo().equals(obj.getSourceCode());
+                }).mapToInt(AccountRenterCostDetailEntity::getAmt).sum();
+                vo.setRenterCostBufu(bufuAmt);
+            }
+            vo.setRenterCostYingshou(yingfuAmt);
+            vo.setRenterCostShishou(renterCostAmtEd);
             vo.setRenterCost(renterCost);
         }
         List<CashierRefundApplyEntity> cashierRefundApplys = cashierRefundApplyNoTService.getRefundApplyByOrderNo(orderNo);

@@ -22,10 +22,10 @@ import com.atzuche.order.commons.enums.CouponTypeEnum;
 import com.atzuche.order.commons.enums.cashcode.OwnerCashCodeEnum;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.commons.vo.req.OrderCostReqVO;
-import com.atzuche.order.commons.vo.res.account.AccountRenterCostSettleResVO;
 import com.atzuche.order.commons.vo.res.cost.RenterOrderCostDetailResVO;
 import com.atzuche.order.commons.vo.res.cost.RenterOrderFineDeatailResVO;
 import com.atzuche.order.commons.vo.res.cost.RenterOrderSubsidyDetailResVO;
+import com.atzuche.order.commons.vo.res.ownercosts.ConsoleOwnerOrderFineDeatailEntity;
 import com.atzuche.order.commons.vo.res.ownercosts.OwnerOrderFineDeatailEntity;
 import com.atzuche.order.commons.vo.res.ownercosts.OwnerOrderIncrementDetailEntity;
 import com.atzuche.order.commons.vo.res.ownercosts.OwnerOrderPurchaseDetailEntity;
@@ -33,7 +33,6 @@ import com.atzuche.order.commons.vo.res.ownercosts.OwnerOrderSubsidyDetailEntity
 import com.atzuche.order.commons.vo.res.rentcosts.OrderConsoleCostDetailEntity;
 import com.atzuche.order.commons.vo.res.rentcosts.OrderConsoleSubsidyDetailEntity;
 import com.atzuche.order.commons.vo.res.rentcosts.OrderCouponEntity;
-import com.atzuche.order.commons.vo.res.rentcosts.OrderSupplementDetailEntity;
 import com.atzuche.order.commons.vo.res.rentcosts.RenterOrderCostDetailEntity;
 import com.atzuche.order.open.service.FeignOrderCostService;
 import com.atzuche.order.ownercost.entity.OwnerOrderEntity;
@@ -42,6 +41,8 @@ import com.atzuche.order.parentorder.entity.OrderEntity;
 import com.atzuche.order.parentorder.service.OrderService;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.atzuche.order.renterorder.service.RenterOrderService;
+import com.atzuche.order.settle.service.OrderSettleService;
+import com.atzuche.order.settle.vo.res.RenterCostVO;
 import com.atzuche.order.wallet.WalletProxyService;
 import com.autoyol.commons.web.ResponseData;
 
@@ -66,6 +67,9 @@ public class OrderCostService {
 	private AutoCoinProxyService autoCoinProxyService;
 	@Autowired
 	private CashierPayService cashierPayService;
+	@Autowired
+	private OrderSettleService orderSettleService;
+	
 	/**
 	 * 
 	 * @param renterCostReqVO
@@ -85,6 +89,8 @@ public class OrderCostService {
 		req.setOrderNo(renterCostReqVO.getOrderNo());
 		req.setMemNo(orderEntity.getMemNoRenter());
 		req.setSubOrderNo(renterCostReqVO.getRenterOrderNo());
+		
+		RenterCostVO costVo = orderSettleService.getRenterCostByOrderNo(renterCostReqVO.getOrderNo());
 		
         ///子订单号
 		realVo.setRenterOrderNo(renterCostReqVO.getRenterOrderNo());
@@ -109,13 +115,13 @@ public class OrderCostService {
 				putRenterOrderDeduct(realVo,data,entity,orderEntity.getMemNoRenter());
 				
 				//租车押金和违章押金   车辆押金  违章押金
-				putRenterOrderDeposit(realVo,data);
+				putRenterOrderDeposit(realVo,data,costVo);
 				
 				//取还车服务违约金   renter_order_fine_deatail  取还车服务违约金
 				putRenterOrderFine(realVo,data);
 				
 				//租车费用应收@海豹   实收
-				putPaymentAmount(realVo,data);
+				putPaymentAmount(realVo,data,costVo);
 				
 				//油费,超里程
 				putOilBeyondMile(realVo,data);
@@ -127,7 +133,7 @@ public class OrderCostService {
 				//补付费用 
 				//需补付金额,跟修改订单的补付金额是同一个方法。
 				int needIncrementAmt = cashierPayService.getRentCostBufu(renterCostReqVO.getOrderNo(), renterCostReqVO.getRenterOrderNo());
-				putSupplementAmt(realVo,data,needIncrementAmt);
+				putSupplementAmt(realVo,data,needIncrementAmt,costVo);
 				
 				//租客支付给平台的费用。console  200214
 				putRenterToPlatformCost(realVo,data);
@@ -214,20 +220,26 @@ public class OrderCostService {
 	}
 
 	private void putSupplementAmt(OrderRenterCostResVO realVo,
-			com.atzuche.order.commons.vo.res.OrderRenterCostResVO data, int needIncrementAmt) {
+			com.atzuche.order.commons.vo.res.OrderRenterCostResVO data, int needIncrementAmt, RenterCostVO costVo) {
 		String paymentAmountShishou = "";
 		String paymentAmountYingshou = "";
 //		int yingshouAmt = 0;
-		int shishouAmt = 0;
-		List<OrderSupplementDetailEntity> supplementList = data.getSupplementList();
-		for (OrderSupplementDetailEntity orderSupplementDetailEntity : supplementList) {
-//			yingshouAmt += orderSupplementDetailEntity.getAmt().intValue();
-			if(orderSupplementDetailEntity.getPayFlag() == 0 || orderSupplementDetailEntity.getPayFlag() == 3 || orderSupplementDetailEntity.getPayFlag() == 10 || orderSupplementDetailEntity.getPayFlag() == 20) {
-				shishouAmt += orderSupplementDetailEntity.getAmt().intValue();
-			}
-		}
+		int shishouAmt = costVo.getRenterCostBufu();  //补付   实收
+		
+		/*
+		 * List<OrderSupplementDetailEntity> supplementList = data.getSupplementList();
+		 * for (OrderSupplementDetailEntity orderSupplementDetailEntity :
+		 * supplementList) { // yingshouAmt +=
+		 * orderSupplementDetailEntity.getAmt().intValue();
+		 * if(orderSupplementDetailEntity.getPayFlag() == 0 ||
+		 * orderSupplementDetailEntity.getPayFlag() == 3 ||
+		 * orderSupplementDetailEntity.getPayFlag() == 10 ||
+		 * orderSupplementDetailEntity.getPayFlag() == 20) { shishouAmt +=
+		 * orderSupplementDetailEntity.getAmt().intValue(); } }
+		 */
+		
 		//这个是管理后台的补付
-		paymentAmountShishou = String.valueOf( NumberUtils.convertNumberToZhengshu(shishouAmt));
+//		paymentAmountShishou = String.valueOf( NumberUtils.convertNumberToZhengshu(shishouAmt));
 //		paymentAmountYingshou = String.valueOf( NumberUtils.convertNumberToZhengshu(yingshouAmt));
 		
 
@@ -385,24 +397,41 @@ public class OrderCostService {
 	
 
 	
-	private void putRenterOrderDeposit(OrderRenterCostResVO realVo, com.atzuche.order.commons.vo.res.OrderRenterCostResVO data) {
+	private void putRenterOrderDeposit(OrderRenterCostResVO realVo, com.atzuche.order.commons.vo.res.OrderRenterCostResVO data, RenterCostVO costVo) {
 		realVo.setVehicleDeposit(data.getRentVo()!=null && data.getRentVo().getYingfuDepositAmt() != null?String.valueOf(NumberUtils.convertNumberToZhengshu(data.getRentVo().getYingfuDepositAmt())):"---");
 		realVo.setViolationDeposit(data.getWzVo()!=null && data.getWzVo().getYingshouDeposit() != null?String.valueOf(NumberUtils.convertNumberToZhengshu(data.getWzVo().getYingshouDeposit())):"---");
-		//
-		realVo.setVehicleDepositYingshou(data.getRentVo()!=null && data.getRentVo().getYingfuDepositAmt() != null?String.valueOf(NumberUtils.convertNumberToZhengshu(data.getRentVo().getYingfuDepositAmt())):"---");
-		realVo.setVehicleDepositShishou(data.getRentVo()!=null && data.getRentVo().getShifuDepositAmt() != null?String.valueOf(NumberUtils.convertNumberToZhengshu(data.getRentVo().getShifuDepositAmt())):"---");
-		//海豹后面表里要加上的。 海豹的表里面有的 huangjing-todo
-		realVo.setVehicleDepositYingtui("---"); //data.getRentVo()!=null?String.valueOf(data.getRentVo().getYingfuDepositAmt()):"---"
-		realVo.setVehicleDepositShitui("---"); //data.getRentVo()!=null?String.valueOf(data.getRentVo().getYingfuDepositAmt()):"---"
+		
 		//任务减免金额
 		realVo.setPlatformTaskFreeAmt(data.getRentVo()!=null && data.getRentVo().getReductionAmt() != null?String.valueOf(NumberUtils.convertNumberToZhengshu(data.getRentVo().getReductionAmt())):"---");
+				
+				
+		//
+//		realVo.setVehicleDepositYingshou(data.getRentVo()!=null && data.getRentVo().getYingfuDepositAmt() != null?String.valueOf(NumberUtils.convertNumberToZhengshu(data.getRentVo().getYingfuDepositAmt())):"---");
+//		realVo.setVehicleDepositShishou(data.getRentVo()!=null && data.getRentVo().getShifuDepositAmt() != null?String.valueOf(NumberUtils.convertNumberToZhengshu(data.getRentVo().getShifuDepositAmt())):"---");
+		//海豹后面表里要加上的。 海豹的表里面有的 huangjing-todo
+//		realVo.setVehicleDepositYingtui("---"); //data.getRentVo()!=null?String.valueOf(data.getRentVo().getYingfuDepositAmt()):"---"
+//		realVo.setVehicleDepositShitui("---"); //data.getRentVo()!=null?String.valueOf(data.getRentVo().getYingfuDepositAmt()):"---"
 		
 		//
-		realVo.setViolationDepositYingshou(data.getWzVo()!=null && data.getWzVo().getYingshouDeposit() != null?String.valueOf(NumberUtils.convertNumberToZhengshu(data.getWzVo().getYingshouDeposit())):"---");
-		realVo.setViolationDepositShishou(data.getWzVo()!=null && data.getWzVo().getShishouDeposit() != null?String.valueOf(NumberUtils.convertNumberToZhengshu(data.getWzVo().getShishouDeposit())):"---");
+//		realVo.setViolationDepositYingshou(data.getWzVo()!=null && data.getWzVo().getYingshouDeposit() != null?String.valueOf(NumberUtils.convertNumberToZhengshu(data.getWzVo().getYingshouDeposit())):"---");
+//		realVo.setViolationDepositShishou(data.getWzVo()!=null && data.getWzVo().getShishouDeposit() != null?String.valueOf(NumberUtils.convertNumberToZhengshu(data.getWzVo().getShishouDeposit())):"---");
 		//海豹后面表里要加上的。 海豹的表里面有的 huangjing-todo
-		realVo.setViolationDepositYingtui("---");//data.getWzVo()!=null?String.valueOf(data.getWzVo().getYingshouDeposit()):"---"
-		realVo.setViolationDepositShitui("---");//data.getWzVo()!=null?String.valueOf(data.getWzVo().getYingshouDeposit()):"---"
+//		realVo.setViolationDepositYingtui("---");//data.getWzVo()!=null?String.valueOf(data.getWzVo().getYingshouDeposit()):"---"
+//		realVo.setViolationDepositShitui("---");//data.getWzVo()!=null?String.valueOf(data.getWzVo().getYingshouDeposit()):"---"
+		
+		
+		//直接从海豹那边的调用
+		realVo.setVehicleDepositYingshou(String.valueOf(costVo.getDepositCostYingfu()));
+		realVo.setVehicleDepositShishou(String.valueOf(costVo.getDepositCostShifu()));
+		realVo.setVehicleDepositYingtui(String.valueOf(costVo.getDepositCost()));
+		realVo.setVehicleDepositShitui(String.valueOf(costVo.getDepositCostReal()));
+		
+		//直接从海豹那边的调用
+		realVo.setViolationDepositYingshou(String.valueOf(costVo.getDepositWzCostYingFu()));
+		realVo.setViolationDepositShishou(String.valueOf(costVo.getDepositWzCostShifu()));
+		realVo.setViolationDepositYingtui(String.valueOf(costVo.getDepositWzCost()));
+		realVo.setViolationDepositShitui(String.valueOf(costVo.getDepositWzCostReal()));
+				
 	}
 
 	private void putRenterOrderDeduct(OrderRenterCostResVO realVo, com.atzuche.order.commons.vo.res.OrderRenterCostResVO data, RenterOrderEntity entity, String memNo) {
@@ -572,17 +601,23 @@ public class OrderCostService {
 	 * 租客 租车费用
 	 * @param realVo
 	 * @param data
+	 * @param costVo 
 	 */
-	private void putPaymentAmount(OrderRenterCostResVO realVo, com.atzuche.order.commons.vo.res.OrderRenterCostResVO data) {
+	private void putPaymentAmount(OrderRenterCostResVO realVo, com.atzuche.order.commons.vo.res.OrderRenterCostResVO data, RenterCostVO costVo) {
 		//应收。
-		realVo.setRentFeeYingshou(String.valueOf(NumberUtils.convertNumberToZhengshu(data.getNeedIncrementAmt())));
+//		realVo.setRentFeeYingshou(String.valueOf(NumberUtils.convertNumberToZhengshu(data.getNeedIncrementAmt())));
 		//实收
-		AccountRenterCostSettleResVO renterSettleVo = data.getRenterSettleVo();
-		realVo.setRentFeeShishou(renterSettleVo!=null && renterSettleVo.getShifuAmt() != null?String.valueOf(NumberUtils.convertNumberToZhengshu(renterSettleVo.getShifuAmt())):"---");
+//		AccountRenterCostSettleResVO renterSettleVo = data.getRenterSettleVo();
+//		realVo.setRentFeeShishou(renterSettleVo!=null && renterSettleVo.getShifuAmt() != null?String.valueOf(NumberUtils.convertNumberToZhengshu(renterSettleVo.getShifuAmt())):"---");
 		//海豹后面表里要加上的。 海豹的表里面有的 huangjing-todo
-		realVo.setRentFeeYingtui("---");//data.getWzVo()!=null?String.valueOf(data.getWzVo().getYingshouDeposit()):"---"
-		realVo.setRentFeeShitui("---");//data.getWzVo()!=null?String.valueOf(data.getWzVo().getYingshouDeposit()):"---"
+//		realVo.setRentFeeYingtui("---");//data.getWzVo()!=null?String.valueOf(data.getWzVo().getYingshouDeposit()):"---"
+//		realVo.setRentFeeShitui("---");//data.getWzVo()!=null?String.valueOf(data.getWzVo().getYingshouDeposit()):"---"
 		
+		//直接从海豹那边的调用
+		realVo.setRentFeeYingshou(String.valueOf(costVo.getRenterCostYingshou()));
+		realVo.setRentFeeShishou(String.valueOf(costVo.getRenterCostShishou()));
+		realVo.setRentFeeYingtui(String.valueOf(costVo.getRenterCost()));
+		realVo.setRentFeeShitui(String.valueOf(costVo.getRenterCostReal()));
 	}
 	
 	
@@ -710,6 +745,16 @@ public class OrderCostService {
 				}
 			}
 		 }
+		 
+		 //求和
+		 List<ConsoleOwnerOrderFineDeatailEntity> consoleOwnerOrderFineDeatails = data.getConsoleOwnerOrderFineDeatails();
+		 for (ConsoleOwnerOrderFineDeatailEntity consoleOwnerOrderFineDeatailEntity : consoleOwnerOrderFineDeatails) {
+			 //罚金来源编码（车主/租客/平台）1-租客，2-车主，3-平台
+				if(consoleOwnerOrderFineDeatailEntity.getFineSubsidyCode().equals("2")) {
+					fineAmtInt += consoleOwnerOrderFineDeatailEntity.getFineAmount().intValue();
+				}
+		 }
+		 
 		 fineAmt = String.valueOf( NumberUtils.convertNumberToZhengshu(fineAmtInt));
 		 
 		 /**
