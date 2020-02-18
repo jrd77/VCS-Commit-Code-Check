@@ -113,6 +113,14 @@ public class GetReturnCarService {
 				}else {
 					respVo.setIsGetOverTransport(YesNoEnum.NO.getType());
 				}
+				
+				//封装数据
+				if(grot.getIsReturnOverTransport()) {
+					respVo.setIsReturnOverTransport(YesNoEnum.YES.getType());
+				}else {
+					respVo.setIsReturnOverTransport(YesNoEnum.NO.getType());
+				}
+				
 				respVo.setGetOverTransportFee(String.valueOf(grot.getGetOverTransportFee()));
 				respVo.setReturnOverTransportFee(String.valueOf(grot.getReturnOverTransportFee()));
 				respVo.setNightGetOverTransportFee(String.valueOf(grot.getNightGetOverTransportFee()));

@@ -29,7 +29,8 @@ public class GetReturnCarServiceTest {
 	public void testCalculateGetOrReturnCost() {
 		GetReturnRequestVO vo2 = new GetReturnRequestVO();
 		vo2.setCityCode("310100");
-		vo2.setFlag("1");
+//		vo2.setFlag("1");
+		vo2.setFlag("2");
 		vo2.setGetCarLan("31.239141");
 		vo2.setGetCarLon("121.484892");
 		vo2.setOrderType("1");
