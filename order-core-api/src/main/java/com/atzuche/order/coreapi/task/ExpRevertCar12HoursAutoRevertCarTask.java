@@ -62,7 +62,7 @@ public class ExpRevertCar12HoursAutoRevertCarTask extends IJobHandler {
                         logger.info("执行 预计还车12小时后，自动还车 orderNo:[{}]",orderNo);
                         ownerReturnCarService.returnCar(reqVO);
                     } catch (Exception e) {
-                        XxlJobLogger.log("执行 预计还车12小时后，自动还车 异常:",e);
+                        XxlJobLogger.log("执行 预计还车12小时后，自动还车 异常:"+ e);
                         logger.error("执行 预计还车12小时后，自动还车 异常orderNo:[{}] , e:[{}]",orderNo ,e);
                         Cat.logError("执行 预计还车12小时后，自动还车 异常",e);
                     }
@@ -72,7 +72,7 @@ public class ExpRevertCar12HoursAutoRevertCarTask extends IJobHandler {
             XxlJobLogger.log("结束执行 预计还车12小时后，自动还车");
             return SUCCESS;
         } catch (Exception e) {
-            XxlJobLogger.log("执行 预计还车12小时后，自动还车 异常:",e);
+            XxlJobLogger.log("执行 预计还车12小时后，自动还车 异常:"+ e);
             logger.error("执行 预计还车12小时后，自动还车 异常",e);
             Cat.logError("执行 预计还车12小时后，自动还车 异常",e);
             return new ReturnT(FAIL.getCode(),e.toString());

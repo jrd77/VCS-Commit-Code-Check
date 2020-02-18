@@ -66,7 +66,7 @@ public class RenterAutoCancelTask extends IJobHandler {
                         logger.info("执行 下单后1小时，租客未支付租车费用,自动取消 orderNo:[{}]",orderNo);
                         cancelOrderService.cancel(req);
                     } catch (Exception e) {
-                        XxlJobLogger.log("执行 下单后1小时，租客未支付租车费用,自动取消 异常:",e);
+                        XxlJobLogger.log("执行 下单后1小时，租客未支付租车费用,自动取消 异常:" + e);
                         logger.error("执行 下单后1小时，租客未支付租车费用,自动取消 异常 orderNo:[{}] , e:[{}]",orderNo,e);
                         Cat.logError("执行 下单后1小时，租客未支付租车费用,自动取消 异常",e);
                     }
@@ -76,7 +76,7 @@ public class RenterAutoCancelTask extends IJobHandler {
             XxlJobLogger.log("结束执行 下单后1小时，租客未支付租车费用,自动取消 ");
             return SUCCESS;
         } catch (Exception e) {
-            XxlJobLogger.log("执行 下单后1小时，租客未支付租车费用,自动取消 异常:",e);
+            XxlJobLogger.log("执行 下单后1小时，租客未支付租车费用,自动取消 异常:" + e);
             logger.error("执行 下单后1小时，租客未支付租车费用,自动取消 异常",e);
             Cat.logError("执行 下单后1小时，租客未支付租车费用,自动取消 异常",e);
             return new ReturnT(FAIL.getCode(),e.toString());
