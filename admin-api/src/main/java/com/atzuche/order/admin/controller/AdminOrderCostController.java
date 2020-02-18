@@ -104,8 +104,8 @@ public class AdminOrderCostController {
                 int serviceAmt = list.stream().filter(obj ->{
                     return OwnerCashCodeEnum.SERVICE_CHARGE.getCashNo().equals(obj.getCostCode());
                 }).mapToInt(OwnerOrderIncrementDetailEntity::getTotalAmount).sum();
-                resp.setGpsAmt(String.valueOf(gpsAmt));
-                resp.setPlatformSrvFeeAmt(String.valueOf(serviceAmt));
+                resp.setGpsAmt(String.valueOf(Math.abs(gpsAmt)));
+                resp.setPlatformSrvFeeAmt(String.valueOf(Math.abs(serviceAmt)));
             }else{
                 resp.setGpsAmt("0");
                 resp.setPlatformSrvFeeAmt("0");

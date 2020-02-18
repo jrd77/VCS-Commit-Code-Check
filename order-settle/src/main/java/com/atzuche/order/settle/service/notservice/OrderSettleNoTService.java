@@ -256,7 +256,7 @@ public class OrderSettleNoTService {
         //2校验租客是否还车
         if(Objects.nonNull(renterOrder.getIsReturnCar()) && renterOrder.getIsReturnCar()==1){
             boolean isReturn = handoverCarService.isReturnCar(renterOrder.getOrderNo());
-            if(isReturn){
+            if(!isReturn){
                 throw new RuntimeException("租客未还车不能结算");
             }
         }

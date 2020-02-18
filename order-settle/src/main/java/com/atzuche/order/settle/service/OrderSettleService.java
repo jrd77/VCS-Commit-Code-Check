@@ -17,6 +17,8 @@ import com.atzuche.order.settle.exception.OrderSettleFlatAccountException;
 import com.atzuche.order.settle.vo.res.RenterCostVO;
 import com.autoyol.autopay.gateway.constant.DataPayKindConstant;
 import com.autoyol.event.rabbit.neworder.OrderSettlementMq;
+
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -79,29 +81,32 @@ public class OrderSettleService{
         int rentWzDepositAmt = cashierSettleService.getSurplusWZDepositCostAmt(orderNo,renterOrder.getRenterMemNo());
         AccountRenterWZDepositResVO accountRenterWZDeposit = cashierService.getRenterWZDepositEntity(orderNo,renterOrder.getRenterMemNo());
         //车辆押金
-        vo.setDepositCost(accountRenterDepositResVO.getSurplusDepositAmt());
-        vo.setDepositCostShifu(accountRenterDepositResVO.getShifuDepositAmt());
-        vo.setDepositCostYingfu(accountRenterDepositResVO.getYingfuDepositAmt());
+        vo.setDepositCost(Math.abs(accountRenterDepositResVO.getSurplusDepositAmt()));
+        vo.setDepositCostShifu(Math.abs(accountRenterDepositResVO.getShifuDepositAmt()));
+        vo.setDepositCostYingfu(Math.abs(accountRenterDepositResVO.getYingfuDepositAmt()));
         //违章押金
-        vo.setDepositWzCost(rentWzDepositAmt);
-        vo.setDepositWzCostShifu(accountRenterWZDeposit.getShishouDeposit());
-        vo.setDepositWzCostYingFu(accountRenterWZDeposit.getYingshouDeposit());
+        vo.setDepositWzCost(Math.abs(rentWzDepositAmt));
+        vo.setDepositWzCostShifu(Math.abs(accountRenterWZDeposit.getShishouDeposit()));
+        vo.setDepositWzCostYingFu(Math.abs(accountRenterWZDeposit.getYingshouDeposit()));
         RentCosts rentCosts = preRenterSettleOrder(orderNo, renterOrder.getRenterOrderNo());
         //租车费用
         if(Objects.nonNull(rentCosts)){
-            int renterCost =  orderSettleNewService.getYingTuiRenterCost(rentCosts);
-            int yingfuAmt = cashierPayService.getRentCost(orderNo,renterOrder.getRenterMemNo());
+            //应付
+            int yingfuAmt =  orderSettleNewService.getYingfuRenterCost(rentCosts);
             List<AccountRenterCostDetailEntity> renterCostDetails = cashierQueryService.getRenterCostDetails(orderNo);
+            // 实付
             int renterCostAmtEd = cashierQueryService.getRenterCost(orderNo,renterOrder.getRenterMemNo());
             if(!CollectionUtils.isEmpty(renterCostDetails)){
-                int bufuAmt = renterCostDetails.stream().filter(obj->{
-                    return RenterCashCodeEnum.WALLET_DEDUCT.getCashNo().equals(obj.getSourceCode());
-                }).mapToInt(AccountRenterCostDetailEntity::getAmt).sum();
-                vo.setRenterCostBufu(bufuAmt);
+                //TODO
+//                int bufuAmt = renterCostDetails.stream().filter(obj->{
+//                    return RenterCashCodeEnum.WALLET_DEDUCT.getCashNo().equals(obj.getSourceCode());
+//                }).mapToInt(AccountRenterCostDetailEntity::getAmt).sum();
+                vo.setRenterCostBufu(0);
             }
-            vo.setRenterCostYingshou(yingfuAmt);
-            vo.setRenterCostShishou(renterCostAmtEd);
-            vo.setRenterCost(renterCost);
+            vo.setRenterCostYingshou(Math.abs(yingfuAmt));
+            vo.setRenterCostShishou(Math.abs(renterCostAmtEd));
+            int renterCost = yingfuAmt + renterCostAmtEd;
+            vo.setRenterCost(renterCost>0?renterCost:0);
         }
         List<CashierRefundApplyEntity> cashierRefundApplys = cashierRefundApplyNoTService.getRefundApplyByOrderNo(orderNo);
         if(!CollectionUtils.isEmpty(cashierRefundApplys)){
@@ -189,6 +194,7 @@ public class OrderSettleService{
             OrderStatusDTO orderStatusDTO = new OrderStatusDTO();
             orderStatusDTO.setOrderNo(orderNo);
             orderStatusDTO.setSettleStatus(SettleStatusEnum.SETTL_FAIL.getCode());
+            orderStatusDTO.setSettleTime(LocalDateTime.now());
             orderStatusService.saveOrderStatusInfo(orderStatusDTO);
             t.setStatus(e);
             Cat.logError("结算失败  :{}",e);
