@@ -156,6 +156,8 @@ public class OrderDetailService {
     @Autowired
     private OwnerOrderCostService ownerOrderCostService;
 
+    private static final String UNIT_HOUR = "小时";
+
 
     public ResponseData<OrderDetailRespDTO> orderDetail(OrderDetailReqDTO orderDetailReqDTO){
         log.info("准备获取订单详情orderDetailReqDTO={}", JSON.toJSONString(orderDetailReqDTO));
@@ -266,7 +268,7 @@ public class OrderDetailService {
         OrderDetailDTO orderDetailDTO = new OrderDetailDTO();
 
         orderDetailDTO.orderStatus = OrderStatusEnum.getDescByStatus(orderStatusEntity.getStatus());
-        orderDetailDTO.totalRentTime = String.valueOf(ChronoUnit.HOURS.between(orderEntity.getExpRentTime(), orderEntity.getExpRevertTime()));
+        orderDetailDTO.totalRentTime = ChronoUnit.HOURS.between(orderEntity.getExpRentTime(), orderEntity.getExpRevertTime()) + UNIT_HOUR;
         if(orderSourceStatEntity != null){
             String category = CategoryEnum.getNameByCode(orderSourceStatEntity.getCategory());
             String businessParentType = BusinessParentTypeEnum.getNameByCode(orderSourceStatEntity.getBusinessParentType());
