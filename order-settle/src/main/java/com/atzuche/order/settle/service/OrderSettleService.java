@@ -11,12 +11,16 @@ import com.atzuche.order.cashieraccount.service.notservice.CashierRefundApplyNoT
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.commons.service.OrderPayCallBack;
 import com.atzuche.order.mq.common.base.BaseProducer;
+import com.atzuche.order.rentercost.entity.OrderSupplementDetailEntity;
+import com.atzuche.order.rentercost.service.OrderSupplementDetailService;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.atzuche.order.renterorder.service.RenterOrderService;
 import com.atzuche.order.settle.exception.OrderSettleFlatAccountException;
 import com.atzuche.order.settle.vo.res.RenterCostVO;
 import com.autoyol.autopay.gateway.constant.DataPayKindConstant;
 import com.autoyol.event.rabbit.neworder.OrderSettlementMq;
+
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,7 +67,7 @@ public class OrderSettleService{
     @Autowired private CashierRefundApplyNoTService cashierRefundApplyNoTService;
     @Autowired private CashierPayService cashierPayService;
     @Autowired private CashierQueryService cashierQueryService;
-
+    @Autowired private OrderSupplementDetailService orderSupplementDetailService;
 
     /**
      * 查询所以费用
@@ -79,29 +83,49 @@ public class OrderSettleService{
         int rentWzDepositAmt = cashierSettleService.getSurplusWZDepositCostAmt(orderNo,renterOrder.getRenterMemNo());
         AccountRenterWZDepositResVO accountRenterWZDeposit = cashierService.getRenterWZDepositEntity(orderNo,renterOrder.getRenterMemNo());
         //车辆押金
-        vo.setDepositCost(accountRenterDepositResVO.getSurplusDepositAmt());
-        vo.setDepositCostShifu(accountRenterDepositResVO.getShifuDepositAmt());
-        vo.setDepositCostYingfu(accountRenterDepositResVO.getYingfuDepositAmt());
+        vo.setDepositCost(Math.abs(accountRenterDepositResVO.getSurplusDepositAmt()));
+        vo.setDepositCostShifu(Math.abs(accountRenterDepositResVO.getShifuDepositAmt()));
+        vo.setDepositCostYingfu(Math.abs(accountRenterDepositResVO.getYingfuDepositAmt()));
         //违章押金
-        vo.setDepositWzCost(rentWzDepositAmt);
-        vo.setDepositWzCostShifu(accountRenterWZDeposit.getShishouDeposit());
-        vo.setDepositWzCostYingFu(accountRenterWZDeposit.getYingshouDeposit());
+        vo.setDepositWzCost(Math.abs(rentWzDepositAmt));
+        vo.setDepositWzCostShifu(Math.abs(accountRenterWZDeposit.getShishouDeposit()));
+        vo.setDepositWzCostYingFu(Math.abs(accountRenterWZDeposit.getYingshouDeposit()));
         RentCosts rentCosts = preRenterSettleOrder(orderNo, renterOrder.getRenterOrderNo());
+        log.info("查询租客应收 getRenterCostByOrderNo rentCosts [{}]",GsonUtils.toJson(rentCosts));
         //租车费用
         if(Objects.nonNull(rentCosts)){
-            int renterCost =  orderSettleNewService.getYingTuiRenterCost(rentCosts);
-            int yingfuAmt = cashierPayService.getRentCost(orderNo,renterOrder.getRenterMemNo());
+            //应付
+            int yingfuAmt =  orderSettleNewService.getYingfuRenterCost(rentCosts);
             List<AccountRenterCostDetailEntity> renterCostDetails = cashierQueryService.getRenterCostDetails(orderNo);
+            // 实付
             int renterCostAmtEd = cashierQueryService.getRenterCost(orderNo,renterOrder.getRenterMemNo());
             if(!CollectionUtils.isEmpty(renterCostDetails)){
-                int bufuAmt = renterCostDetails.stream().filter(obj->{
-                    return RenterCashCodeEnum.WALLET_DEDUCT.getCashNo().equals(obj.getSourceCode());
-                }).mapToInt(AccountRenterCostDetailEntity::getAmt).sum();
-                vo.setRenterCostBufu(bufuAmt);
+                List<OrderSupplementDetailEntity> orderSupplementDetails = orderSupplementDetailService.listOrderSupplementDetailByOrderNo(orderNo);
+                if(!CollectionUtils.isEmpty(orderSupplementDetails)){
+                    int renterCostBufuShifu = orderSupplementDetails.stream().filter(obj ->{
+                        return Objects.nonNull(obj.getOpStatus()) && obj.getOpStatus()==1&&
+                                Objects.nonNull(obj.getCashType()) && obj.getCashType()==1&&
+                                Objects.nonNull(obj.getPayFlag()) && obj.getPayFlag()==3
+                                ;
+                    }).mapToInt(OrderSupplementDetailEntity::getAmt).sum();
+                    int renterCostBufuYingfu = orderSupplementDetails.stream().filter(obj ->{
+                        return Objects.nonNull(obj.getOpStatus()) && obj.getOpStatus()==1&&
+                                Objects.nonNull(obj.getCashType()) && obj.getCashType()==1&&
+                                Objects.nonNull(obj.getPayFlag()) && obj.getPayFlag()==1&&
+                                Objects.nonNull(obj.getPayFlag()) && obj.getPayFlag()==2&&
+                                Objects.nonNull(obj.getPayFlag()) && obj.getPayFlag()==3&&
+                                Objects.nonNull(obj.getPayFlag()) && obj.getPayFlag()==4&&
+                                Objects.nonNull(obj.getPayFlag()) && obj.getPayFlag()==5
+                                ;
+                    }).mapToInt(OrderSupplementDetailEntity::getAmt).sum();
+                    vo.setRenterCostBufu(renterCostBufuYingfu);
+                    vo.setRenterCostShishou(renterCostBufuShifu);
+                }
             }
-            vo.setRenterCostYingshou(yingfuAmt);
-            vo.setRenterCostShishou(renterCostAmtEd);
-            vo.setRenterCost(renterCost);
+            vo.setRenterCostYingshou(Math.abs(yingfuAmt));
+            vo.setRenterCostShishou(Math.abs(renterCostAmtEd));
+            int renterCost = yingfuAmt + renterCostAmtEd;
+            vo.setRenterCost(renterCost>0?renterCost:0);
         }
         List<CashierRefundApplyEntity> cashierRefundApplys = cashierRefundApplyNoTService.getRefundApplyByOrderNo(orderNo);
         if(!CollectionUtils.isEmpty(cashierRefundApplys)){
@@ -149,6 +173,7 @@ public class OrderSettleService{
     	SettleOrdersDefinition settleOrdersDefinition = new SettleOrdersDefinition();
     	//2统计 车主结算费用明细， 补贴，费用总额
     	orderSettleNoTService.handleOwnerAndPlatform(settleOrdersDefinition,settleOrders);
+    	log.info("preOwnerSettleOrder settleOrdersDefinition [{}]",GsonUtils.toJson(settleOrdersDefinition));
         //2车主总账
         List<AccountOwnerCostSettleDetailEntity> accountOwnerCostSettleDetails = settleOrdersDefinition.getAccountOwnerCostSettleDetails();
         if(!CollectionUtils.isEmpty(accountOwnerCostSettleDetails)){
@@ -189,6 +214,7 @@ public class OrderSettleService{
             OrderStatusDTO orderStatusDTO = new OrderStatusDTO();
             orderStatusDTO.setOrderNo(orderNo);
             orderStatusDTO.setSettleStatus(SettleStatusEnum.SETTL_FAIL.getCode());
+            orderStatusDTO.setSettleTime(LocalDateTime.now());
             orderStatusService.saveOrderStatusInfo(orderStatusDTO);
             t.setStatus(e);
             Cat.logError("结算失败  :{}",e);

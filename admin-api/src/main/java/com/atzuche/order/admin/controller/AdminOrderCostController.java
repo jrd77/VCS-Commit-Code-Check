@@ -15,6 +15,8 @@ import com.atzuche.order.delivery.vo.delivery.rep.RenterGetAndReturnCarDTO;
 import com.atzuche.order.delivery.vo.delivery.req.DeliveryCarRepVO;
 import com.atzuche.order.ownercost.entity.OwnerOrderIncrementDetailEntity;
 import com.atzuche.order.ownercost.service.OwnerOrderIncrementDetailService;
+import com.autoyol.commons.utils.GsonUtils;
+import com.autoyol.doc.util.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,13 +63,24 @@ public class AdminOrderCostController {
         try {
         	
         	OrderRenterCostResVO resp = orderCostService.calculateRenterOrderCost(renterCostReqVO);
+        	logger.info("calculateRenterOrderCost resp[{}]", GsonUtils.toJson(resp));
             // 计算油量和超里程费用
             DeliveryCarVO deliveryCarRepVO = getDeliveryCarVO(renterCostReqVO.getOrderNo());
+            logger.info("calculateRenterOrderCost deliveryCarRepVO[{}]", GsonUtils.toJson(deliveryCarRepVO));
             if(Objects.nonNull(deliveryCarRepVO) && Objects.nonNull(deliveryCarRepVO.getOwnerGetAndReturnCarDTO())){
                 RenterGetAndReturnCarDTO renterGetAndReturnCarDTO = deliveryCarRepVO.getRenterGetAndReturnCarDTO();
                 if(Objects.nonNull(renterGetAndReturnCarDTO)){
-                    resp.setOilAmt(renterGetAndReturnCarDTO.getOilDifferenceCrash());
-                    resp.setBeyondMileAmt(renterGetAndReturnCarDTO.getOverKNCrash());
+                    if(!StringUtil.isBlank(renterGetAndReturnCarDTO.getOilDifferenceCrash())){
+                        String oilDifferenceCrash =  renterGetAndReturnCarDTO.getOilDifferenceCrash();
+                        Integer oilAmt  = -Integer.valueOf(oilDifferenceCrash);
+                        resp.setOilAmt(oilAmt.toString());
+                    }
+                    if(!StringUtil.isBlank(renterGetAndReturnCarDTO.getOverKNCrash())){
+                        String overKNCrash =  renterGetAndReturnCarDTO.getOverKNCrash();
+                        Integer overKNCrashAmt  = -Integer.valueOf(overKNCrash);
+                        resp.setOilAmt(overKNCrashAmt.toString());
+                    }
+
                 }
             }
         	return ResponseData.success(resp);
@@ -104,8 +117,8 @@ public class AdminOrderCostController {
                 int serviceAmt = list.stream().filter(obj ->{
                     return OwnerCashCodeEnum.SERVICE_CHARGE.getCashNo().equals(obj.getCostCode());
                 }).mapToInt(OwnerOrderIncrementDetailEntity::getTotalAmount).sum();
-                resp.setGpsAmt(String.valueOf(gpsAmt));
-                resp.setPlatformSrvFeeAmt(String.valueOf(serviceAmt));
+                resp.setGpsAmt(String.valueOf(Math.abs(gpsAmt)));
+                resp.setPlatformSrvFeeAmt(String.valueOf(Math.abs(serviceAmt)));
             }else{
                 resp.setGpsAmt("0");
                 resp.setPlatformSrvFeeAmt("0");

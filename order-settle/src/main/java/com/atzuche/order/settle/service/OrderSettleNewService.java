@@ -1,5 +1,6 @@
 package com.atzuche.order.settle.service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Map;
@@ -7,7 +8,9 @@ import java.util.Map;
 import com.atzuche.order.cashieraccount.service.CashierPayService;
 import com.atzuche.order.cashieraccount.vo.req.pay.OrderPayReqVO;
 import com.atzuche.order.cashieraccount.vo.res.OrderPayableAmountResVO;
+import com.atzuche.order.commons.enums.OrderStatusEnum;
 import com.atzuche.order.commons.enums.YesNoEnum;
+import com.atzuche.order.commons.enums.account.SettleStatusEnum;
 import com.atzuche.order.commons.enums.cashcode.ConsoleCashCodeEnum;
 import com.atzuche.order.commons.service.OrderPayCallBack;
 import com.atzuche.order.mq.common.base.BaseProducer;
@@ -105,7 +108,10 @@ public class OrderSettleNewService {
         Cat.logEvent("settleOrdersAccount",GsonUtils.toJson(settleOrdersAccount));
 
         OrderStatusDTO orderStatusDTO = new OrderStatusDTO();
+        orderStatusDTO.setSettleTime(LocalDateTime.now());
         orderStatusDTO.setOrderNo(settleOrders.getOrderNo());
+        orderStatusDTO.setStatus(OrderStatusEnum.TO_WZ_SETTLE.getStatus());
+        orderStatusDTO.setSettleStatus(SettleStatusEnum.SETTLED.getCode());
         //9 租客费用 结余处理
         orderSettleNoTService.rentCostSettle(settleOrders,settleOrdersAccount,callBack);
         //10租客车辆押金/租客剩余租车费用 结余历史欠款
@@ -464,11 +470,11 @@ public class OrderSettleNewService {
     }
 
     /**
-     * 查询 租客 应退金额
+     * 查询 租客 应付金额
      * @param rentCosts
      * @return
      */
-    public int getYingTuiRenterCost(RentCosts rentCosts) {
+    public int getYingfuRenterCost(RentCosts rentCosts) {
         int renterCost=0;
         // 租车费用
         if(!CollectionUtils.isEmpty(rentCosts.getRenterOrderCostDetails())){
@@ -503,6 +509,10 @@ public class OrderSettleNewService {
         //获取全局的租客订单罚金明细
         if(!CollectionUtils.isEmpty(rentCosts.getConsoleRenterOrderFineDeatails())){
             renterCost = renterCost +  rentCosts.getConsoleRenterOrderFineDeatails().stream().mapToInt(ConsoleRenterOrderFineDeatailEntity::getFineAmount).sum();
+        }
+        //后台管理操作费用表（无条件补贴）
+        if(!CollectionUtils.isEmpty(rentCosts.getOrderConsoleCostDetailEntity())){
+            renterCost = renterCost +  rentCosts.getOrderConsoleCostDetailEntity().stream().mapToInt(OrderConsoleCostDetailEntity::getSubsidyAmount).sum();
         }
         return renterCost;
     }

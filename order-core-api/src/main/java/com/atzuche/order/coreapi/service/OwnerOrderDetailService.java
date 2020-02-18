@@ -4,7 +4,10 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
+import com.atzuche.order.ownercost.entity.*;
+import com.atzuche.order.ownercost.service.*;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -34,14 +37,6 @@ import com.atzuche.order.commons.enums.cashcode.ConsoleCashCodeEnum;
 import com.atzuche.order.commons.enums.cashcode.OwnerCashCodeEnum;
 import com.atzuche.order.commons.exceptions.OrderNotFoundException;
 import com.atzuche.order.owner.commodity.service.OwnerGoodsService;
-import com.atzuche.order.ownercost.entity.ConsoleOwnerOrderFineDeatailEntity;
-import com.atzuche.order.ownercost.entity.OwnerOrderFineDeatailEntity;
-import com.atzuche.order.ownercost.entity.OwnerOrderPurchaseDetailEntity;
-import com.atzuche.order.ownercost.entity.OwnerOrderSubsidyDetailEntity;
-import com.atzuche.order.ownercost.service.ConsoleOwnerOrderFineDeatailService;
-import com.atzuche.order.ownercost.service.OwnerOrderFineDeatailService;
-import com.atzuche.order.ownercost.service.OwnerOrderPurchaseDetailService;
-import com.atzuche.order.ownercost.service.OwnerOrderSubsidyDetailService;
 import com.atzuche.order.parentorder.entity.OrderEntity;
 import com.atzuche.order.parentorder.service.OrderService;
 import com.atzuche.order.rentercost.entity.OrderConsoleCostDetailEntity;
@@ -79,7 +74,8 @@ public class OwnerOrderDetailService {
     private OrderConsoleSubsidyDetailService orderConsoleSubsidyDetailService;
     @Autowired
     private ConsoleOwnerOrderFineDeatailService consoleOwnerOrderFineDeatailService;
-    
+    @Autowired
+    private OwnerOrderIncrementDetailService ownerOrderIncrementDetailService;
     
     public OwnerRentDetailDTO ownerRentDetail(String orderNo, String ownerOrderNo) {
         //主订单
@@ -140,28 +136,39 @@ public class OwnerOrderDetailService {
 
     public ServiceDetailDTO serviceDetail(String orderNo, String ownerOrderNo) {
         OwnerGoodsDetailDTO ownerGoodsDetail = ownerGoodsService.getOwnerGoodsDetail(ownerOrderNo, false);
-        OwnerCosts ownerCosts = orderSettleService.preOwnerSettleOrder(orderNo, ownerOrderNo);
+        //OwnerCosts ownerCosts = orderSettleService.preOwnerSettleOrder(orderNo, ownerOrderNo);
+        List<OwnerOrderIncrementDetailEntity> ownerOrderIncrementDetailList = ownerOrderIncrementDetailService.listOwnerOrderIncrementDetail(orderNo, ownerOrderNo);
 
+        List<OwnerOrderIncrementDetailEntity> collect = Optional.of(ownerOrderIncrementDetailList)
+                .orElseGet(ArrayList::new)
+                .stream()
+                .filter(x -> OwnerCashCodeEnum.SERVICE_CHARGE.getCashNo().equals(x.getCostCode()))
+                .collect(Collectors.toList());
+        Integer serviceAmt = 0;
+        if(collect != null && collect.size()>=1){
+            serviceAmt = collect.get(0).getTotalAmount();
+        }
         /**
          * 车主端代管车服务费
          */
-        OwnerOrderPurchaseDetailEntity proxyExpense = ownerCosts.getProxyExpense();
+        /*OwnerOrderPurchaseDetailEntity proxyExpense = ownerCosts.getProxyExpense();
         int proxyExpenseTotalAmount = 0;
         if(proxyExpense != null){
              proxyExpenseTotalAmount = proxyExpense.getTotalAmount();
-        }
+        }*/
         /**
          * 车主端平台服务费
          */
-       OwnerOrderPurchaseDetailEntity serviceExpense = ownerCosts.getServiceExpense();
+     /*  OwnerOrderPurchaseDetailEntity serviceExpense = ownerCosts.getServiceExpense();
        int serviceExpenseTotalAmount = 0;
        if(serviceExpense != null){
            serviceExpenseTotalAmount = serviceExpense.getTotalAmount();
-       }
+       }*/
         ServiceDetailDTO serviceDetailDTO = new ServiceDetailDTO();
         serviceDetailDTO.setCarType(CarOwnerTypeEnum.getNameByCode(ownerGoodsDetail.getCarOwnerType()));
         serviceDetailDTO.setServiceRate(ownerGoodsDetail.getServiceRate());
-        serviceDetailDTO.setServiceAmt(proxyExpenseTotalAmount + serviceExpenseTotalAmount);
+        //serviceDetailDTO.setServiceAmt(proxyExpenseTotalAmount + serviceExpenseTotalAmount);
+        serviceDetailDTO.setServiceAmt(serviceAmt);
         return serviceDetailDTO;
     }
 

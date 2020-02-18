@@ -29,9 +29,14 @@ public class RenterCostVO {
      */
     private int renterCostShishou;
     /**
-     * 补付租车费用
+     * 补付租车费用应付
      */
     private int renterCostBufu;
+
+    /**
+     * 补付租车费用实付
+     */
+    private int renterCostBufuShifu;
 
     /**
      * 实退押金
