@@ -61,7 +61,8 @@ public class SMSOrderBaseEventService {
             RenterOrderEntity renterOrderEntity = renterOrderService.getRenterOrderByOrderNoAndIsEffective(orderNo);
             RenterMemberDTO renterMemberDTO = renterMemberService.selectrenterMemberByRenterOrderNo(renterOrderEntity.getRenterOrderNo(), false);
             RenterGoodsDetailDTO renterGoodsDetailDTO = renterGoodsService.getRenterGoodsDetail(renterOrderEntity.getRenterOrderNo(), false);
-            sendShortMessageData(smsParamsMap, renterMemberDTO.getPhone(), renterOrderEntity, renterMemberDTO, renterGoodsDetailDTO);
+            String textCode = String.valueOf(smsParamsMap.get("renterFlag"));
+            sendShortMessageData(textCode,smsParamsMap, renterMemberDTO.getPhone(), renterOrderEntity, renterMemberDTO, renterGoodsDetailDTO);
 
         }
         if (StringUtils.isNotBlank(String.valueOf(smsParamsMap.get("ownerFlag")))) {
@@ -69,7 +70,8 @@ public class SMSOrderBaseEventService {
             OwnerOrderEntity ownerOrderEntity = ownerOrderService.getOwnerOrderByOrderNoAndIsEffective(orderNo);
             OwnerMemberDTO ownerMemberDTO = ownerMemberService.selectownerMemberByOwnerOrderNo(ownerOrderEntity.getOwnerOrderNo(), false);
             OwnerGoodsDetailDTO ownerGoodsDetailDTO = ownerGoodsService.getOwnerGoodsDetail(ownerOrderEntity.getOwnerOrderNo(), false);
-            sendShortMessageData(smsParamsMap, ownerMemberDTO.getPhone(), ownerOrderEntity, ownerMemberDTO, ownerGoodsDetailDTO);
+            String textCode = String.valueOf(smsParamsMap.get("ownerFlag"));
+            sendShortMessageData(textCode,smsParamsMap, ownerMemberDTO.getPhone(), ownerOrderEntity, ownerMemberDTO, ownerGoodsDetailDTO);
         }
     }
 
@@ -81,11 +83,10 @@ public class SMSOrderBaseEventService {
      * @param memberDTO
      * @param goodsDetailDTO
      */
-    public void sendShortMessageData(Map smsParamsMap, String phone, Object orderEntity, Object memberDTO, Object goodsDetailDTO) {
-        String textCode = String.valueOf(smsParamsMap.get("ownerFlag"));
+    public void sendShortMessageData(String textCode,Map smsParamsMap, String phone, Object orderEntity, Object memberDTO, Object goodsDetailDTO) {
         String renterTextCode = ShortMessageTypeEnum.getSmsTemplate(String.valueOf(textCode));
         if (StringUtils.isBlank(renterTextCode)) {
-            log.info("没有找到该textCode对应的消息模版，ownerFlag：{}", textCode);
+            log.info("没有找到该textCode对应的消息模版，textCodeFlag：{}", textCode);
             return;
         }
         List<String> smsFieldNames = shortMessageSendService.getSMSTemplateFeild(renterTextCode);
