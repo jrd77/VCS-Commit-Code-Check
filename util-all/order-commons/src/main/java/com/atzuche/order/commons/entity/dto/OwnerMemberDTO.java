@@ -66,5 +66,8 @@ public class OwnerMemberDTO {
     @AutoDocProperty("身份证号码")
     private String idNo;
 
+    @AutoDocProperty("平台上架车辆数")
+    private Integer renterCarCount;
+
     private List<OwnerMemberRightDTO> ownerMemberRightDTOList;
 }
