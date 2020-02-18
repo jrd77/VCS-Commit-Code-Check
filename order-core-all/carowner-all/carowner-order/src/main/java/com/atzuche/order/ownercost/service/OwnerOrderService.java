@@ -116,6 +116,8 @@ public class OwnerOrderService {
         costBaseDTO.setOrderNo(ownerOrderReqDTO.getOrderNo());
         costBaseDTO.setOwnerOrderNo(ownerOrderReqDTO.getOwnerOrderNo());
         costBaseDTO.setMemNo(ownerOrderReqDTO.getMemNo());
+        costBaseDTO.setStartTime(ownerOrderReqDTO.getExpRentTime());
+        costBaseDTO.setEndTime(ownerOrderReqDTO.getExpRevertTime());
         ownerOrderCostReqDTO.setCostBaseDTO(costBaseDTO);
         ownerOrderCostReqDTO.setServiceRate(null == ownerOrderReqDTO.getServiceRate() ? 0D : ownerOrderReqDTO.getServiceRate());
         ownerOrderCostReqDTO.setServiceProxyRate(null == ownerOrderReqDTO.getServiceProxyRate() ? 0D : ownerOrderReqDTO.getServiceProxyRate());
