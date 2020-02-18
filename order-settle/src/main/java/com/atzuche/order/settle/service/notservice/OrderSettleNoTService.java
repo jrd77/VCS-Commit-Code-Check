@@ -1768,8 +1768,8 @@ public class OrderSettleNoTService {
             BeanUtils.copyProperties(cashierEntity,vo);
             vo.setFlag(RenterCashCodeEnum.ACCOUNT_RENTER_RENT_COST.getCashNo());
             vo.setRenterCashCodeEnum(refundApplyVO.getRenterCashCodeEnum());
-            vo.setPaySource(PaySourceEnum.getFlagText(cashierEntity.getPaySource()));
-            vo.setPayType(PayTypeEnum.getFlagText(cashierEntity.getPayType()));
+            vo.setPaySource(cashierEntity.getPaySource());
+            vo.setPayType(cashierEntity.getPayType());
             vo.setRemake(refundApplyVO.getRemarke());
             int amt = refundAmt + cashierEntity.getPayAmt();
             vo.setAmt(amt>=0?refundAmt:-cashierEntity.getPayAmt());
@@ -1785,7 +1785,7 @@ public class OrderSettleNoTService {
                         BeanUtils.copyProperties(cashierEntity,vo);
                         vo.setFlag(RenterCashCodeEnum.ACCOUNT_RENTER_RENT_COST.getCashNo());
                         vo.setRenterCashCodeEnum(refundApplyVO.getRenterCashCodeEnum());
-                        vo.setPaySource(PaySourceEnum.getFlagText(cashierEntity.getPaySource()));
+                        vo.setPaySource(cashierEntity.getPaySource());
                         vo.setRemake(refundApplyVO.getRemarke());
                         int amt = refundAmt + cashierEntity.getPayAmt();
                         vo.setAmt(amt>=0?refundAmt:-cashierEntity.getPayAmt());

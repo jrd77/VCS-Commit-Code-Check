@@ -33,7 +33,7 @@ public class RefundRemoteService {
             String parameter = "model="+GsonUtils.toJson(refundVo);
             Cat.logEvent(CatConstants.FEIGN_PARAM,parameter);
             Response<AutoPayResultVo> responseData =  autoPayGatewaySecondaryService.routingRulesRefund(refundVo);
-            log.info("RefundRemoteService  refundOrderPay end 支付退款,responseData：[{}]", GsonUtils.toJson(responseData));
+            log.info("RefundRemoteService  refundOrderPay end 支付退款,param :[{}] ,responseData：[{}]",GsonUtils.toJson(refundVo), GsonUtils.toJson(responseData));
             Cat.logEvent(CatConstants.FEIGN_RESULT, GsonUtils.toJson(responseData));
             if(responseData == null || !ErrorCode.SUCCESS.getCode().equals(responseData.getResCode())){
                 throw new CashierRefundApplyException();
