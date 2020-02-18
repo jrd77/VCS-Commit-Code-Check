@@ -1758,8 +1758,8 @@ public class OrderWzSettleNoTService {
             BeanUtils.copyProperties(cashierEntity,vo);
             vo.setFlag(RenterCashCodeEnum.ACCOUNT_RENTER_RENT_COST.getCashNo());
             vo.setRenterCashCodeEnum(RenterCashCodeEnum.CANCEL_RENT_COST_TO_RETURN_AMT);
-            vo.setPaySource(PaySourceEnum.getFlagText(cashierEntity.getPaySource()));
-            vo.setPayType(PayTypeEnum.getFlagText(cashierEntity.getPayType()));
+            vo.setPaySource(cashierEntity.getPaySource());
+            vo.setPayType(cashierEntity.getPayType());
             vo.setRemake("取消订单退还");
             int amt = refundAmt + cashierEntity.getPayAmt();
             vo.setAmt(amt>=0?refundAmt:-cashierEntity.getPayAmt());
@@ -1775,7 +1775,7 @@ public class OrderWzSettleNoTService {
                         BeanUtils.copyProperties(cashierEntity,vo);
                         vo.setFlag(RenterCashCodeEnum.ACCOUNT_RENTER_RENT_COST.getCashNo());
                         vo.setRenterCashCodeEnum(RenterCashCodeEnum.CANCEL_RENT_COST_TO_RETURN_AMT);
-                        vo.setPaySource(PaySourceEnum.getFlagText(cashierEntity.getPaySource()));
+                        vo.setPaySource(cashierEntity.getPaySource());
                         vo.setRemake("取消订单退还");
                         int amt = refundAmt + cashierEntity.getPayAmt();
                         vo.setAmt(amt>=0?refundAmt:-cashierEntity.getPayAmt());
