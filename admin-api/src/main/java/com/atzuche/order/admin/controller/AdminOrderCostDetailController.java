@@ -241,14 +241,14 @@ public class AdminOrderCostDetailController {
     
 
     /**
-     *租客车主互相调价
+     *租客车主互相调价  租客和车主都是调用同一个接口
      * @param priceAdjustmentVO
      * @return
      */
     @AutoDocMethod(description = "租客车主互相调价 车主租客互相调价操作", value = "租客车主互相调价 车主租客互相调价操作",response = ResponseData.class)
     @PostMapping("renterPriceAdjustment/update")
-    public ResponseData<?> updateRenterPriceAdjustmentByOrderNo(@RequestBody @Validated RenterAdjustCostReqVO renterCostReqVO, HttpServletRequest request, HttpServletResponse response,BindingResult bindingResult) {
-    	logger.info("updateRenterPriceAdjustmentByOrderNo controller params={}",renterCostReqVO.toString());
+    public ResponseData<?> updateRenterPriceAdjustmentByOrderNo(@RequestBody  RenterAdjustCostReqVO renterCostReqVO, HttpServletRequest request, HttpServletResponse response,BindingResult bindingResult) {
+    	logger.info("updateRenterPriceAdjustmentByOrderNo controller params={}",renterCostReqVO.toString());  //@Validated
 		if (bindingResult.hasErrors()) {
             return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), ErrorCode.INPUT_ERROR.getText());
         }
@@ -267,14 +267,14 @@ public class AdminOrderCostDetailController {
     }
     
     /**
-     *租客车主互相调价
+     *租客车主互相调价   租客和车主都是调用同一个接口
      * @param rentalCostReqVO
      * @return    PriceAdjustmentVO
      */
     @AutoDocMethod(description = "租客车主互相调价 车主租客互相调价展示", value = "租客车主互相调价 车主租客互相调价展示",response = RenterPriceAdjustmentResVO.class)
     @PostMapping("renterPriceAdjustment/list")
-    public ResponseData<RenterPriceAdjustmentResVO> findRenterPriceAdjustmentByOrderNo(@RequestBody @Validated RenterCostReqVO renterCostReqVO, HttpServletRequest request, HttpServletResponse response,BindingResult bindingResult) {
-    	logger.info("findRenterPriceAdjustmentByOrderNo controller params={}",renterCostReqVO.toString());
+    public ResponseData<RenterPriceAdjustmentResVO> findRenterPriceAdjustmentByOrderNo(@RequestBody  RenterCostReqVO renterCostReqVO, HttpServletRequest request, HttpServletResponse response,BindingResult bindingResult) {
+    	logger.info("findRenterPriceAdjustmentByOrderNo controller params={}",renterCostReqVO.toString());  //@Validated
 		if (bindingResult.hasErrors()) {
             return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), ErrorCode.INPUT_ERROR.getText());
         }
