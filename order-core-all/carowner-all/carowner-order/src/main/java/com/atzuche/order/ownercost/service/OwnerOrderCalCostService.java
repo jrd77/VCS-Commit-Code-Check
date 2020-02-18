@@ -7,6 +7,7 @@ import com.atzuche.order.ownercost.entity.OwnerOrderIncrementDetailEntity;
 import com.atzuche.order.ownercost.entity.OwnerOrderPurchaseDetailEntity;
 import com.atzuche.order.ownercost.entity.dto.OwnerOrderCostReqDTO;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -68,6 +69,8 @@ public class OwnerOrderCalCostService {
         //代管车服务费
         OwnerOrderIncrementDetailEntity proxyServiceExpenseEntity = ownerOrderCostCombineService.getProxyServiceExpenseIncrement(costBaseDTO,rentAmt,ownerOrderCostReqDTO.getServiceProxyRate().intValue());
         int proxyServiceExpense = null == proxyServiceExpenseEntity ? 0 : proxyServiceExpenseEntity.getTotalAmount();
+        //GPS服务费
+        List<OwnerOrderIncrementDetailEntity> gpsServiceAmtIncrementEntity = ownerOrderCostCombineService.getGpsServiceAmtIncrementEntity(costBaseDTO,null);
 
         int incrementAmt = getTotalAmt + returnAmt + serviceExpense + proxyServiceExpense;
 
@@ -91,6 +94,10 @@ public class OwnerOrderCalCostService {
 
         if(null != proxyServiceExpenseEntity) {
             ownerOrderIncrementDetailList.add(proxyServiceExpenseEntity);
+        }
+
+        if(CollectionUtils.isNotEmpty(gpsServiceAmtIncrementEntity)) {
+            ownerOrderIncrementDetailList.addAll(gpsServiceAmtIncrementEntity);
         }
 
         log.info("下单-车主端-保存增值费用，入参ownerOrderIncrementDetailList=[{}]",JSON.toJSONString(ownerOrderIncrementDetailList));
