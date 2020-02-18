@@ -107,7 +107,7 @@ public class OrderCostController {
 		shortDetail.setYingFuDeposit(-depositEntity.getYingfuDepositAmt());
 		shortDetail.setShiFuDeposit(depositEntity.getShifuDepositAmt());
 		shortDetail.setYingFuWzDeposit(-wzDepositEntity.getYingshouDeposit());
-		shortDetail.setShiFuDeposit(wzDepositEntity.getShishouDeposit());
+		shortDetail.setShiFuWzDeposit(wzDepositEntity.getShishouDeposit());
 		shortDetail.setToPayDeposit(-(depositEntity.getYingfuDepositAmt()+depositEntity.getShifuDepositAmt()));
 		shortDetail.setToPayWzDeposit(-(wzDepositEntity.getYingshouDeposit()+wzDepositEntity.getShishouDeposit()));
 		shortDetail.setExpReturnDeposit(depositEntity.getShifuDepositAmt());
