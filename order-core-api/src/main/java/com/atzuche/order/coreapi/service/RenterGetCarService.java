@@ -98,9 +98,9 @@ public class RenterGetCarService {
         }
 
         //发送租客取车事件
-        orderActionMqService.sendOrderRenterPickUpCarSuccess(reqVO.getOrderNo(), renterOrderEntity.getRenterMemNo());
+        orderActionMqService.sendOrderRenterPickUpCarSuccess(reqVO.getOrderNo());
 
-        orderStatusMqService.sendOrderStatusByOrderNo(reqVO.getOrderNo(),ownerOrderEntity.getMemNo(),orderStatusEntity.getStatus(), NewOrderMQStatusEventEnum.ORDER_PRERETURNCAR);
+        orderStatusMqService.sendOrderStatusByOrderNo(reqVO.getOrderNo(),orderStatusEntity.getStatus(), NewOrderMQStatusEventEnum.ORDER_PRERETURNCAR);
     }
 
 

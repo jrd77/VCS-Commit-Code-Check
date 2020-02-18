@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import javax.annotation.Resource;
 import java.util.List;
 import java.util.Map;
 
@@ -32,7 +33,7 @@ import java.util.Map;
 @Slf4j
 public class SMSOrderBaseEventService {
 
-    @Autowired
+    @Resource(name = "smsMQSendPlatformSmsService")
     MQSendPlatformSmsService sendPlatformSmsService;
     @Autowired
     RenterMemberService renterMemberService;
