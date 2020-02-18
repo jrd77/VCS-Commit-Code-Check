@@ -10,6 +10,7 @@ import com.atzuche.order.cashieraccount.vo.req.pay.OrderPayReqVO;
 import com.atzuche.order.cashieraccount.vo.res.OrderPayableAmountResVO;
 import com.atzuche.order.commons.enums.OrderStatusEnum;
 import com.atzuche.order.commons.enums.YesNoEnum;
+import com.atzuche.order.commons.enums.account.SettleStatusEnum;
 import com.atzuche.order.commons.enums.cashcode.ConsoleCashCodeEnum;
 import com.atzuche.order.commons.service.OrderPayCallBack;
 import com.atzuche.order.mq.common.base.BaseProducer;
@@ -110,6 +111,7 @@ public class OrderSettleNewService {
         orderStatusDTO.setSettleTime(LocalDateTime.now());
         orderStatusDTO.setOrderNo(settleOrders.getOrderNo());
         orderStatusDTO.setStatus(OrderStatusEnum.TO_WZ_SETTLE.getStatus());
+        orderStatusDTO.setSettleStatus(SettleStatusEnum.SETTLED.getCode());
         //9 租客费用 结余处理
         orderSettleNoTService.rentCostSettle(settleOrders,settleOrdersAccount,callBack);
         //10租客车辆押金/租客剩余租车费用 结余历史欠款
