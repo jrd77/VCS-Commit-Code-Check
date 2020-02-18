@@ -17,6 +17,7 @@ import com.atzuche.order.admin.vo.req.order.ModificationOrderRequestVO;
 import com.atzuche.order.admin.vo.resp.order.ModificationOrderListResponseVO;
 import com.atzuche.order.admin.vo.resp.order.ModificationOrderResponseVO;
 import com.atzuche.order.commons.LocalDateTimeUtils;
+import com.atzuche.order.commons.NumberUtils;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.commons.vo.req.ModifyOrderMainQueryReqVO;
 import com.atzuche.order.commons.vo.req.ModifyOrderQueryReqVO;
@@ -136,13 +137,13 @@ public class ModificationOrderService {
 			}
 		}
 		
-		realVo.setCarServiceFine(String.valueOf(carServiceFine));
+		realVo.setCarServiceFine(String.valueOf(NumberUtils.convertNumberToZhengshu(carServiceFine)));
 	}
 
 	private void putRenterOrderDeposit(ModificationOrderResponseVO realVo, ModifyOrderMainResVO data,
 			ModifyOrderResVO subData) {
-		realVo.setVehicleDeposit(data.getRentVo()!=null?String.valueOf(data.getRentVo().getYingfuDepositAmt()):"---");
-		realVo.setViolationDeposit(data.getWzVo()!=null?String.valueOf(data.getWzVo().getYingshouDeposit()):"---");
+		realVo.setVehicleDeposit(data.getRentVo()!=null?String.valueOf(NumberUtils.convertNumberToZhengshu(data.getRentVo().getYingfuDepositAmt())):"---");
+		realVo.setViolationDeposit(data.getWzVo()!=null?String.valueOf(NumberUtils.convertNumberToZhengshu(data.getWzVo().getYingshouDeposit())):"---");
 	}
 
 	private void putRenterOrderDeduct(ModificationOrderResponseVO realVo, ModifyOrderMainResVO data,
@@ -171,7 +172,7 @@ public class ModificationOrderService {
 			}
 		}
 		int deductionAmount = plateformCoupon + ownerCoupon + aotuCoin + walletAmt;
-		realVo.setDeductionAmount(String.valueOf(deductionAmount));
+		realVo.setDeductionAmount(String.valueOf(NumberUtils.convertNumberToFushu(deductionAmount)));  //负数
 	}
 
 	private void putRenterOrderGetReturn(ModificationOrderResponseVO realVo, ModifyOrderMainResVO data,
@@ -243,12 +244,12 @@ public class ModificationOrderService {
 				}
 			}
 		}
-		realVo.setRentAmount(String.valueOf(rentAmount));
-		realVo.setInsuranceAmount(String.valueOf(insuranceAmount));
-		realVo.setSupperInsuranceAmount(String.valueOf(supperInsuranceAmount));
-		realVo.setAdditionalDriverInsuranceAmount(String.valueOf(additionalDriverInsuranceAmount));
-		realVo.setServiceCharge(String.valueOf(serviceCharge));
-		realVo.setCarServiceFee(String.valueOf(carServiceFee));
+		realVo.setRentAmount(String.valueOf(NumberUtils.convertNumberToZhengshu(rentAmount)));
+		realVo.setInsuranceAmount(String.valueOf(NumberUtils.convertNumberToZhengshu(insuranceAmount)));
+		realVo.setSupperInsuranceAmount(String.valueOf(NumberUtils.convertNumberToZhengshu(supperInsuranceAmount)));
+		realVo.setAdditionalDriverInsuranceAmount(String.valueOf(NumberUtils.convertNumberToZhengshu(additionalDriverInsuranceAmount)));
+		realVo.setServiceCharge(String.valueOf(NumberUtils.convertNumberToZhengshu(serviceCharge)));
+		realVo.setCarServiceFee(String.valueOf(NumberUtils.convertNumberToZhengshu(carServiceFee)));
 		
 	}
 

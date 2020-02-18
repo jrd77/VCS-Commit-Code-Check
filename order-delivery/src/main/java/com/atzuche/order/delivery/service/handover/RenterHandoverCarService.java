@@ -8,6 +8,7 @@ import com.atzuche.order.delivery.enums.RenterHandoverCarTypeEnum;
 import com.atzuche.order.delivery.mapper.RenterHandoverCarInfoMapper;
 import com.atzuche.order.delivery.mapper.RenterHandoverCarRemarkMapper;
 import com.atzuche.order.delivery.service.handover.interfaces.IUpdateHandoverCarInfo;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,11 +40,19 @@ public class RenterHandoverCarService implements IUpdateHandoverCarInfo {
         List<RenterHandoverCarInfoEntity> renterHandoverCarInfoEntityList = selectRenterByOrderNo(handoverCarInfoReqDTO.getOrderNo());
         renterHandoverCarInfoEntityList.stream().forEach(r -> {
             if (r.getType().intValue() == RenterHandoverCarTypeEnum.OWNER_TO_RENTER.getValue() || r.getType().intValue() == RenterHandoverCarTypeEnum.RENYUN_TO_RENTER.getValue()) {
-                r.setOilNum(Integer.valueOf(handoverCarInfoReqDTO.getRenterReturnOil()));
-                r.setMileageNum(Integer.valueOf(handoverCarInfoReqDTO.getRenterRetrunKM()));
+                if (StringUtils.isNotBlank(handoverCarInfoReqDTO.getRenterReturnOil()) && !handoverCarInfoReqDTO.getRenterReturnOil().equals("0")) {
+                    r.setOilNum(Integer.valueOf(handoverCarInfoReqDTO.getRenterReturnOil()));
+                }
+                if (StringUtils.isNotBlank(handoverCarInfoReqDTO.getRenterRetrunKM()) && !handoverCarInfoReqDTO.getRenterRetrunKM().equals("0")) {
+                    r.setMileageNum(Integer.valueOf(handoverCarInfoReqDTO.getRenterRetrunKM()));
+                }
             } else if (r.getType().intValue() == RenterHandoverCarTypeEnum.RENTER_TO_OWNER.getValue() || r.getType().intValue() == RenterHandoverCarTypeEnum.RENTER_TO_RENYUN.getValue()) {
-                r.setOilNum(Integer.valueOf(handoverCarInfoReqDTO.getOwnReturnOil()));
-                r.setMileageNum(Integer.valueOf(handoverCarInfoReqDTO.getOwnReturnKM()));
+                if (StringUtils.isNotBlank(handoverCarInfoReqDTO.getOwnReturnOil()) && !handoverCarInfoReqDTO.getOwnReturnOil().equals("0")) {
+                    r.setOilNum(Integer.valueOf(handoverCarInfoReqDTO.getOwnReturnOil()));
+                }
+                if (StringUtils.isNotBlank(handoverCarInfoReqDTO.getOwnReturnKM()) && !handoverCarInfoReqDTO.getOwnReturnKM().equals("0")) {
+                    r.setMileageNum(Integer.valueOf(handoverCarInfoReqDTO.getOwnReturnKM()));
+                }
             }
             updateRenterHandoverInfoByPrimaryKey(r);
         });
