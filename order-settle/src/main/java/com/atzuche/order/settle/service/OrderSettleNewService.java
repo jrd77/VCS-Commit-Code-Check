@@ -510,6 +510,10 @@ public class OrderSettleNewService {
         if(!CollectionUtils.isEmpty(rentCosts.getConsoleRenterOrderFineDeatails())){
             renterCost = renterCost +  rentCosts.getConsoleRenterOrderFineDeatails().stream().mapToInt(ConsoleRenterOrderFineDeatailEntity::getFineAmount).sum();
         }
+        //后台管理操作费用表（无条件补贴）
+        if(!CollectionUtils.isEmpty(rentCosts.getRenterOrderCostDetails())){
+            renterCost = renterCost +  rentCosts.getRenterOrderCostDetails().stream().mapToInt(RenterOrderCostDetailEntity::getTotalAmount).sum();
+        }
         return renterCost;
     }
 }

@@ -29,6 +29,10 @@ public class OrderConsoleCostDetailService{
             return orderConsoleCostDetailMapper.selectByOrderNo(orderNo);
     }
 
+    public List<OrderConsoleCostDetailEntity> selectByOrderNoAndMemNo(String orderNo,String memNo){
+        return orderConsoleCostDetailMapper.selectByOrderNoAndMemNo(orderNo,memNo);
+    }
+
     public int getTotalOrderConsoleCostAmt(String orderNo){
         List<OrderConsoleCostDetailEntity> entityList = getOrderConsoleCostDetaiByOrderNo(orderNo);
         int total = 0;

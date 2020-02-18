@@ -46,4 +46,9 @@ public class RentCosts {
      * 获取全局的租客订单罚金明细
      */
     private List<ConsoleRenterOrderFineDeatailEntity> consoleRenterOrderFineDeatails;
+
+    /**
+     * 后台管理操作费用表（无条件补贴）
+     */
+    List<OrderConsoleCostDetailEntity> orderConsoleCostDetailEntity;
 }
