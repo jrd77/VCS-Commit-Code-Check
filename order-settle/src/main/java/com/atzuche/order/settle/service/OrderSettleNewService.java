@@ -511,8 +511,8 @@ public class OrderSettleNewService {
             renterCost = renterCost +  rentCosts.getConsoleRenterOrderFineDeatails().stream().mapToInt(ConsoleRenterOrderFineDeatailEntity::getFineAmount).sum();
         }
         //后台管理操作费用表（无条件补贴）
-        if(!CollectionUtils.isEmpty(rentCosts.getRenterOrderCostDetails())){
-            renterCost = renterCost +  rentCosts.getRenterOrderCostDetails().stream().mapToInt(RenterOrderCostDetailEntity::getTotalAmount).sum();
+        if(!CollectionUtils.isEmpty(rentCosts.getOrderConsoleCostDetailEntity())){
+            renterCost = renterCost +  rentCosts.getOrderConsoleCostDetailEntity().stream().mapToInt(OrderConsoleCostDetailEntity::getSubsidyAmount).sum();
         }
         return renterCost;
     }

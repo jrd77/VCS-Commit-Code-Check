@@ -15,6 +15,7 @@ import com.atzuche.order.delivery.vo.delivery.rep.RenterGetAndReturnCarDTO;
 import com.atzuche.order.delivery.vo.delivery.req.DeliveryCarRepVO;
 import com.atzuche.order.ownercost.entity.OwnerOrderIncrementDetailEntity;
 import com.atzuche.order.ownercost.service.OwnerOrderIncrementDetailService;
+import com.autoyol.commons.utils.GsonUtils;
 import com.autoyol.doc.util.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,8 +63,10 @@ public class AdminOrderCostController {
         try {
         	
         	OrderRenterCostResVO resp = orderCostService.calculateRenterOrderCost(renterCostReqVO);
+        	logger.info("calculateRenterOrderCost resp[{}]", GsonUtils.toJson(resp));
             // 计算油量和超里程费用
             DeliveryCarVO deliveryCarRepVO = getDeliveryCarVO(renterCostReqVO.getOrderNo());
+            logger.info("calculateRenterOrderCost deliveryCarRepVO[{}]", GsonUtils.toJson(deliveryCarRepVO));
             if(Objects.nonNull(deliveryCarRepVO) && Objects.nonNull(deliveryCarRepVO.getOwnerGetAndReturnCarDTO())){
                 RenterGetAndReturnCarDTO renterGetAndReturnCarDTO = deliveryCarRepVO.getRenterGetAndReturnCarDTO();
                 if(Objects.nonNull(renterGetAndReturnCarDTO)){
