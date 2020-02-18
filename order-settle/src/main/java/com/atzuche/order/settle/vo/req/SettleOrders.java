@@ -1,8 +1,11 @@
 package com.atzuche.order.settle.vo.req;
 
 import com.atzuche.order.ownercost.entity.OwnerOrderEntity;
+import com.atzuche.order.rentercost.entity.OrderConsoleCostDetailEntity;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import lombok.Data;
+
+import java.util.List;
 
 /**
  * 订单结算对象

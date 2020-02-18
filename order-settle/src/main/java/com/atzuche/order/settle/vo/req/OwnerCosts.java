@@ -3,6 +3,7 @@ package com.atzuche.order.settle.vo.req;
 import com.atzuche.order.delivery.vo.delivery.rep.OwnerGetAndReturnCarDTO;
 import com.atzuche.order.ownercost.entity.*;
 import com.atzuche.order.rentercost.entity.ConsoleRenterOrderFineDeatailEntity;
+import com.atzuche.order.rentercost.entity.OrderConsoleCostDetailEntity;
 import com.atzuche.order.rentercost.entity.OrderConsoleSubsidyDetailEntity;
 import lombok.Data;
 
@@ -58,6 +59,11 @@ public class OwnerCosts {
      * 车主订单罚金明细
      */
     List<OwnerOrderFineDeatailEntity> ownerOrderFineDeatails;
+
+    /**
+     * 后台管理操作费用表（无条件补贴）
+     */
+    List<OrderConsoleCostDetailEntity> orderConsoleCostDetailEntity;
     
     ///add huangjing  来源：SettleOrdersDefinition类字段。 200214
     private int ownerCostAmtFinal;

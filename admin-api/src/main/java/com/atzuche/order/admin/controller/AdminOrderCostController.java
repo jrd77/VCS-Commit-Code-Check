@@ -15,6 +15,7 @@ import com.atzuche.order.delivery.vo.delivery.rep.RenterGetAndReturnCarDTO;
 import com.atzuche.order.delivery.vo.delivery.req.DeliveryCarRepVO;
 import com.atzuche.order.ownercost.entity.OwnerOrderIncrementDetailEntity;
 import com.atzuche.order.ownercost.service.OwnerOrderIncrementDetailService;
+import com.autoyol.doc.util.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,8 +67,17 @@ public class AdminOrderCostController {
             if(Objects.nonNull(deliveryCarRepVO) && Objects.nonNull(deliveryCarRepVO.getOwnerGetAndReturnCarDTO())){
                 RenterGetAndReturnCarDTO renterGetAndReturnCarDTO = deliveryCarRepVO.getRenterGetAndReturnCarDTO();
                 if(Objects.nonNull(renterGetAndReturnCarDTO)){
-                    resp.setOilAmt(renterGetAndReturnCarDTO.getOilDifferenceCrash());
-                    resp.setBeyondMileAmt(renterGetAndReturnCarDTO.getOverKNCrash());
+                    if(!StringUtil.isBlank(renterGetAndReturnCarDTO.getOilDifferenceCrash())){
+                        String oilDifferenceCrash =  renterGetAndReturnCarDTO.getOilDifferenceCrash();
+                        Integer oilAmt  = -Integer.valueOf(oilDifferenceCrash);
+                        resp.setOilAmt(oilAmt.toString());
+                    }
+                    if(!StringUtil.isBlank(renterGetAndReturnCarDTO.getOverKNCrash())){
+                        String overKNCrash =  renterGetAndReturnCarDTO.getOverKNCrash();
+                        Integer overKNCrashAmt  = -Integer.valueOf(overKNCrash);
+                        resp.setOilAmt(overKNCrashAmt.toString());
+                    }
+
                 }
             }
         	return ResponseData.success(resp);

@@ -91,6 +91,7 @@ public class OrderSettleService{
         vo.setDepositWzCostShifu(Math.abs(accountRenterWZDeposit.getShishouDeposit()));
         vo.setDepositWzCostYingFu(Math.abs(accountRenterWZDeposit.getYingshouDeposit()));
         RentCosts rentCosts = preRenterSettleOrder(orderNo, renterOrder.getRenterOrderNo());
+        log.info("查询租客应收 getRenterCostByOrderNo rentCosts [{}]",GsonUtils.toJson(rentCosts));
         //租车费用
         if(Objects.nonNull(rentCosts)){
             //应付
