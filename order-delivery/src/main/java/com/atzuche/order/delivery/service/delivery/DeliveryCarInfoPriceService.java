@@ -126,6 +126,7 @@ public class DeliveryCarInfoPriceService {
             }
             ownerGetAndReturnCarDO = createOwnerGetAndReturnCarDTO(ownerGetAndReturnCarDO, ownerHandoverCarInfoList, carEngineType, cityCode);
             BeanUtils.copyProperties(ownerGetAndReturnCarDO, renterGetAndReturnCarDTO);
+            ownerGetAndReturnCarDTO.setOilDifferenceCrash("-"+ownerGetAndReturnCarDTO.getOilDifferenceCrash());
             return DeliveryOilCostVO.builder().ownerGetAndReturnCarDTO(ownerGetAndReturnCarDTO).renterGetAndReturnCarDTO(renterGetAndReturnCarDTO).build();
         } catch (DeliveryOrderException e) {
             log.error("获取油费等数据发生业务异常：", e);
@@ -231,30 +232,10 @@ public class DeliveryCarInfoPriceService {
             feeResult.setUnitPrice(0);
             return feeResult;
         }
-
-        int getKm = 0;
-        int returnKm = 0;
-        //获取车主取车还车油耗数据
-        if(null == mileageAmtDTO.getGetmileage() || mileageAmtDTO.getReturnMileage() == null)
-        {
-            List<RenterHandoverCarInfoEntity> renterHandoverCarInfoEntities = renterHandoverCarService.selectRenterByOrderNo(mileageAmtDTO.getCostBaseDTO().getOrderNo());
-            for (RenterHandoverCarInfoEntity renterHandoverCarInfoEntity : renterHandoverCarInfoEntities) {
-                if (Objects.isNull(renterHandoverCarInfoEntity.getType())) {
-                    continue;
-                }
-                if (renterHandoverCarInfoEntity.getType().intValue() == RenterHandoverCarTypeEnum.RENYUN_TO_RENTER.getValue().intValue() || renterHandoverCarInfoEntity.getType().intValue() == RenterHandoverCarTypeEnum.OWNER_TO_RENTER.getValue().intValue()) {
-                    getKm = renterHandoverCarInfoEntity.getMileageNum() == null ? 0 : renterHandoverCarInfoEntity.getMileageNum();
-                } else {
-                    returnKm = renterHandoverCarInfoEntity.getMileageNum() == null ? 0 : renterHandoverCarInfoEntity.getMileageNum();
-                }
-            }
-            mileageAmtDTO.setGetmileage(getKm);
-            mileageAmtDTO.setReturnMileage(returnKm);
-        }
         Integer mileageAmt = RenterFeeCalculatorUtils.calMileageAmt(mileageAmtDTO.getDayMileage(), mileageAmtDTO.getGuideDayPrice(),
                 mileageAmtDTO.getGetmileage(), mileageAmtDTO.getReturnMileage(), costBaseDTO.getStartTime(), costBaseDTO.getEndTime(), configHours);
-        feeResult.setTotalFee(mileageAmt);
-        feeResult.setUnitPrice(mileageAmt);
+        feeResult.setTotalFee(-mileageAmt);
+        feeResult.setUnitPrice(-mileageAmt);
         return feeResult;
     }
 
