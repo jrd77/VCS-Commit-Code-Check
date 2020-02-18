@@ -5,6 +5,8 @@ package com.atzuche.order.coreapi.controller;
 
 import javax.validation.Valid;
 
+import com.atzuche.order.accountrenterdeposit.entity.AccountRenterDepositEntity;
+import com.atzuche.order.accountrenterwzdepost.entity.AccountRenterWzDepositEntity;
 import com.atzuche.order.cashieraccount.service.CashierQueryService;
 import com.atzuche.order.commons.BindingResultUtil;
 import com.atzuche.order.commons.exceptions.OrderNotFoundException;
@@ -95,17 +97,21 @@ public class OrderCostController {
 		 int totalRentCostAmtWithoutFine = facadeService.getTotalRenterCostWithoutFine(orderNo,renterOrderNo,memNo);
 		 int totalFineAmt = facadeService.getTotalFine(orderNo,renterOrderNo,memNo);
 
-		 int toPayDepositAmt = cashierQueryService.getTotalToPayDepositAmt(orderNo);
-		 int toPayWzDepositAmt = cashierQueryService.getTotalToPayWzDepositAmt(orderNo);
+		AccountRenterDepositEntity depositEntity = cashierQueryService.getTotalToPayDepositAmt(orderNo);
+		AccountRenterWzDepositEntity wzDepositEntity = cashierQueryService.getTotalToPayWzDepositAmt(orderNo);
 
 		RenterCostShortDetailVO shortDetail = new RenterCostShortDetailVO();
 
 		shortDetail.setTotalRentCostAmt(-totalRentCostAmtWithoutFine);
 		shortDetail.setTotalFineAmt(-totalFineAmt);
-		shortDetail.setToPayDeposit(-toPayDepositAmt);
-		shortDetail.setToPayWzDeposit(-toPayWzDepositAmt);
-		shortDetail.setExpReturnDeposit(-toPayDepositAmt);
-		shortDetail.setExpReturnWzDeposit(-toPayWzDepositAmt);
+		shortDetail.setYingFuDeposit(-depositEntity.getYingfuDepositAmt());
+		shortDetail.setShiFuDeposit(depositEntity.getShifuDepositAmt());
+		shortDetail.setYingFuWzDeposit(-wzDepositEntity.getYingshouDeposit());
+		shortDetail.setShiFuDeposit(wzDepositEntity.getShishouDeposit());
+		shortDetail.setToPayDeposit(-(depositEntity.getYingfuDepositAmt()+depositEntity.getShifuDepositAmt()));
+		shortDetail.setToPayWzDeposit(-(wzDepositEntity.getYingshouDeposit()+wzDepositEntity.getShishouDeposit()));
+		shortDetail.setExpReturnDeposit(depositEntity.getShifuDepositAmt());
+		shortDetail.setExpReturnWzDeposit(wzDepositEntity.getShishouDeposit());
 		shortDetail.setOrderNo(orderNo);
 
 		return ResponseData.success(shortDetail);

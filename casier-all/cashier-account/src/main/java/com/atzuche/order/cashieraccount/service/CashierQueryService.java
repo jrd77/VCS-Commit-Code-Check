@@ -89,9 +89,9 @@ public class CashierQueryService {
      * @param orderNo
      * @return
      */
-    public  int getTotalToPayWzDepositAmt(String orderNo){
+    public  AccountRenterWzDepositEntity getTotalToPayWzDepositAmt(String orderNo){
         AccountRenterWzDepositEntity entity = accountRenterWzDepositNoTService.getAccountRenterWZDepositByOrder(orderNo);
-        return entity.getYingshouDeposit()+entity.getShishouDeposit();
+        return entity;
     }
     public WzDepositMsgResVO queryWzDepositMsg(String orderNo){
         WzDepositMsgResVO result = new WzDepositMsgResVO();
@@ -142,9 +142,9 @@ public class CashierQueryService {
      * @param orderNo
      * @return
      */
-    public int getTotalToPayDepositAmt(String orderNo){
+    public AccountRenterDepositEntity getTotalToPayDepositAmt(String orderNo){
         AccountRenterDepositEntity entity = accountRenterDepositNoTService.queryDeposit(orderNo);
-        return entity.getYingfuDepositAmt()+entity.getShifuDepositAmt();
+        return entity;
     }
     /**
      * 查询租车费用 支付记录
