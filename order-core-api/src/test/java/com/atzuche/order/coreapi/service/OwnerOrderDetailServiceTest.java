@@ -9,6 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 
+import com.atzuche.order.commons.entity.ownerOrderDetail.FienAmtDetailDTO;
 import com.atzuche.order.commons.entity.ownerOrderDetail.PlatformToOwnerDTO;
 import com.atzuche.order.commons.entity.ownerOrderDetail.ServiceDetailDTO;
 import com.atzuche.order.coreapi.TemplateApplication;
@@ -20,6 +21,13 @@ import com.atzuche.order.coreapi.TemplateApplication;
 public class OwnerOrderDetailServiceTest {
 	@Autowired
 	OwnerOrderDetailService ownerOrderDetailService;
+	
+	@Test
+	public void testFienAmtDetail() {
+		FienAmtDetailDTO detail = ownerOrderDetailService.fienAmtDetail("28804131200299", "2880413120029910011");
+		System.err.println("detail toString=" + detail.toString());
+		
+	}
 	
 	@Test
 	public void testOwnerRentDetail() {
@@ -42,10 +50,7 @@ public class OwnerOrderDetailServiceTest {
 		fail("Not yet implemented");
 	}
 
-	@Test
-	public void testFienAmtDetail() {
-		fail("Not yet implemented");
-	}
+	
 
 	@Test
 	public void testPlatformToOwner() {

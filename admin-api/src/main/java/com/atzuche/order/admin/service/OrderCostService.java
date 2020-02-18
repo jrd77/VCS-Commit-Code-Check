@@ -243,8 +243,8 @@ public class OrderCostService {
 //		paymentAmountYingshou = String.valueOf( NumberUtils.convertNumberToZhengshu(yingshouAmt));
 		
 
-		//海豹提供
-		paymentAmountShishou = String.valueOf( NumberUtils.convertNumberToZhengshu(shishouAmt));
+		//海豹提供  
+		paymentAmountShishou = String.valueOf(shishouAmt); //NumberUtils.convertNumberToZhengshu(shishouAmt)
 		//总额补付
 		paymentAmountYingshou = String.valueOf( NumberUtils.convertNumberToZhengshu(needIncrementAmt));
 		realVo.setPaymentAmountShishou(paymentAmountShishou);
