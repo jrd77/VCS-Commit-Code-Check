@@ -46,8 +46,9 @@ public class MqBuildService {
         orderBaseDataMq.setPlatformChildType(osse.getPlatformChildType());
         orderBaseDataMq.setPlatformParentType(osse.getPlatformParentType());
         orderBaseDataMq.setCarNo(Integer.parseInt(renterOrderEntity.getGoodsCode()));
-        orderBaseDataMq.setRentTime(LocalDateTimeUtils.localDateTimeToDate(renterOrderEntity.getActRentTime()));
-        orderBaseDataMq.setRevertTime(LocalDateTimeUtils.localDateTimeToDate(renterOrderEntity.getActRevertTime()));
+
+        orderBaseDataMq.setRentTime(null != renterOrderEntity.getActRentTime() ? LocalDateTimeUtils.localDateTimeToDate(renterOrderEntity.getActRentTime()) : LocalDateTimeUtils.localDateTimeToDate(renterOrderEntity.getExpRentTime()));
+        orderBaseDataMq.setRevertTime(null != renterOrderEntity.getActRevertTime() ? LocalDateTimeUtils.localDateTimeToDate(renterOrderEntity.getActRevertTime()) : LocalDateTimeUtils.localDateTimeToDate(renterOrderEntity.getExpRevertTime()));
 
         return orderBaseDataMq;
     }
