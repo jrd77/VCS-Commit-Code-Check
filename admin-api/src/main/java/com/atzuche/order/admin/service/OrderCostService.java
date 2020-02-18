@@ -755,7 +755,8 @@ public class OrderCostService {
 				}
 		 }
 		 
-		 fineAmt = String.valueOf( NumberUtils.convertNumberToZhengshu(fineAmtInt));
+		 //存在正负号。
+		 fineAmt = String.valueOf( fineAmtInt);  //NumberUtils.convertNumberToZhengshu()
 		 
 		 /**
 		     * 获取车主费用列表
@@ -808,6 +809,7 @@ public class OrderCostService {
 		 int gpsDepositAmt = 0;  //默认
 		 int getReturnCarFee = 0;  //配送,增值订单
 		 
+		 /*代管车服务费*/
 		 OwnerOrderPurchaseDetailEntity proxyExpense = data.getProxyExpense();
 		 if(proxyExpense != null) {
 			 srvFee = proxyExpense.getTotalAmount();
