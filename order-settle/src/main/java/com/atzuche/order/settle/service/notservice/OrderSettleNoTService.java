@@ -254,9 +254,11 @@ public class OrderSettleNoTService {
             throw new RuntimeException("租客订单状态不是待结算，不能结算");
         }
         //2校验租客是否还车
-        boolean isReturn = handoverCarService.isReturnCar(renterOrder.getOrderNo());
-        if(!isReturn){
-            throw new RuntimeException("租客未还车不能结算");
+        if(Objects.nonNull(renterOrder.getIsReturnCar()) && renterOrder.getIsReturnCar()==1){
+            boolean isReturn = handoverCarService.isReturnCar(renterOrder.getOrderNo());
+            if(isReturn){
+                throw new RuntimeException("租客未还车不能结算");
+            }
         }
         //3 校验是否存在 理赔  存在不结算
         boolean isClaim = cashierSettleService.getOrderClaim(renterOrder.getOrderNo());
