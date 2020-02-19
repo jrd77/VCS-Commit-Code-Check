@@ -381,6 +381,24 @@ public class CashierService {
         accountRenterDepositService.updateOrderDepositSettle(detainRenterDepositReqVO);
         return depositDetailId;
     }
+    
+    @Transactional(rollbackFor=Exception.class)
+    public int refundWzDeposit(CashierRefundApplyReqVO cashierRefundApplyReq){
+        Assert.notNull(cashierRefundApplyReq, ErrorCode.PARAMETER_ERROR.getText());
+        cashierRefundApplyReq.check();
+        //1 记录退还记录
+        Integer id = cashierRefundApplyNoTService.insertRefundDeposit(cashierRefundApplyReq);
+        //2 记录费用平账
+        DetainRenterWZDepositReqVO detainRenterDepositReqVO = new DetainRenterWZDepositReqVO();
+        BeanUtils.copyProperties(cashierRefundApplyReq,detainRenterDepositReqVO);
+        detainRenterDepositReqVO.setUniqueNo(id.toString());
+        //2 押金账户资金转移接口
+        int depositDetailId = accountRenterWzDepositService.detainRenterDeposit(detainRenterDepositReqVO);
+        // 3 更新押金结算状态
+        accountRenterWzDepositService.updateOrderDepositSettle(detainRenterDepositReqVO);
+        return depositDetailId;
+    }
+    
     /**
      * 结算退还租车费用
      */

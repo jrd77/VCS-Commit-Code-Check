@@ -766,12 +766,12 @@ public class OrderSettleNoTService {
         }
         //1.7 获取车主油费
         OwnerGetAndReturnCarDTO ownerGetAndReturnCarDTO = ownerCosts.getOwnerGetAndReturnCarDTO();
-        if(Objects.nonNull(ownerGetAndReturnCarDTO) && !StringUtil.isBlank(ownerGetAndReturnCarDTO.getCarOilDifferenceCrash())){
+        if(Objects.nonNull(ownerGetAndReturnCarDTO) && !StringUtil.isBlank(ownerGetAndReturnCarDTO.getOilDifferenceCrash())){
             AccountOwnerCostSettleDetailEntity accountOwnerCostSettleDetail = new AccountOwnerCostSettleDetailEntity();
             BeanUtils.copyProperties(ownerGetAndReturnCarDTO,accountOwnerCostSettleDetail);
             accountOwnerCostSettleDetail.setSourceCode(OwnerCashCodeEnum.ACCOUNT_OWNER_SETTLE_OIL_COST.getCashNo());
             accountOwnerCostSettleDetail.setSourceDetail(OwnerCashCodeEnum.ACCOUNT_OWNER_SETTLE_OIL_COST.getTxt());
-            String carOilDifferenceCrash = ownerGetAndReturnCarDTO.getCarOilDifferenceCrash();
+            String carOilDifferenceCrash = ownerGetAndReturnCarDTO.getOilDifferenceCrash();
             accountOwnerCostSettleDetail.setAmt(Integer.valueOf(carOilDifferenceCrash));
             accountOwnerCostSettleDetail.setMemNo(settleOrders.getOwnerMemNo());
             accountOwnerCostSettleDetail.setOrderNo(settleOrders.getOrderNo());
