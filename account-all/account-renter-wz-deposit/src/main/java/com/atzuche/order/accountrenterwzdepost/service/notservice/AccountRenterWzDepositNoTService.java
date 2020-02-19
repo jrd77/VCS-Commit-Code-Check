@@ -1,19 +1,22 @@
 package com.atzuche.order.accountrenterwzdepost.service.notservice;
 
+import java.time.LocalDateTime;
+import java.util.Objects;
+
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import com.atzuche.order.accountrenterwzdepost.entity.AccountRenterWzDepositEntity;
 import com.atzuche.order.accountrenterwzdepost.exception.AccountRenterWZDepositException;
 import com.atzuche.order.accountrenterwzdepost.exception.PayOrderRenterWZDepositException;
 import com.atzuche.order.accountrenterwzdepost.mapper.AccountRenterWzDepositMapper;
 import com.atzuche.order.accountrenterwzdepost.vo.req.CreateOrderRenterWZDepositReqVO;
+import com.atzuche.order.accountrenterwzdepost.vo.req.DetainRenterWZDepositReqVO;
 import com.atzuche.order.accountrenterwzdepost.vo.req.OrderRenterDepositWZDetainReqVO;
 import com.atzuche.order.accountrenterwzdepost.vo.req.PayedOrderRenterDepositWZDetailReqVO;
 import com.atzuche.order.accountrenterwzdepost.vo.req.PayedOrderRenterWZDepositReqVO;
-import com.atzuche.order.accountrenterwzdepost.vo.res.AccountRenterWZDepositResVO;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import java.util.Objects;
+import com.atzuche.order.commons.enums.account.SettleStatusEnum;
 
 
 /**
@@ -116,7 +119,35 @@ public class AccountRenterWzDepositNoTService {
             throw new PayOrderRenterWZDepositException();
         }
     }
+    
+    /**
+     * 更新车辆押金 剩余金额
+     * @param detainRenterDepositReqVO
+     */
+    public void updateRenterWzDepositChange(DetainRenterWZDepositReqVO detainRenterDepositReqVO) {
+        AccountRenterWzDepositEntity accountRenterDepositEntity = accountRenterWzDepositMapper.selectByOrderAndMemNo(detainRenterDepositReqVO.getOrderNo(),detainRenterDepositReqVO.getMemNo());
+        if(Objects.isNull(accountRenterDepositEntity)){
+            throw new PayOrderRenterWZDepositException();
+        }
+        //TODO
+        //计算剩余可扣金额押金总和
+        int surplusAmt = accountRenterDepositEntity.getShishouDeposit();
+        if(-detainRenterDepositReqVO.getAmt() + surplusAmt<0){
+            //可用 剩余押金 不足
+            throw new PayOrderRenterWZDepositException();
+        }
+        AccountRenterWzDepositEntity accountRenterDeposit = new AccountRenterWzDepositEntity();
+        accountRenterDeposit.setId(accountRenterDepositEntity.getId());
+        accountRenterDeposit.setVersion(accountRenterDepositEntity.getVersion());
+        //押金剩余金额  应退
+        accountRenterDeposit.setShouldReturnDeposit(accountRenterDepositEntity.getShishouDeposit() - Math.abs(detainRenterDepositReqVO.getAmt()));
 
+        int result =  accountRenterWzDepositMapper.updateByPrimaryKeySelective(accountRenterDeposit);
+        if(result==0){
+            throw new PayOrderRenterWZDepositException();
+        }
+    }
+    
     /**
      * 更新违章押金 应退退金额
      * @param vo
@@ -136,4 +167,22 @@ public class AccountRenterWzDepositNoTService {
             throw new PayOrderRenterWZDepositException();
         }
     }
+
+	
+	public void updateOrderDepositSettle(String memNo, String orderNo) {
+        AccountRenterWzDepositEntity accountRenterDepositEntity = accountRenterWzDepositMapper.selectByOrderAndMemNo(orderNo,memNo);
+        if(Objects.isNull(accountRenterDepositEntity)){
+            throw new PayOrderRenterWZDepositException();
+        }
+        AccountRenterWzDepositEntity entity = new AccountRenterWzDepositEntity();
+        entity.setId(accountRenterDepositEntity.getId());
+        entity.setVersion(accountRenterDepositEntity.getVersion());
+        entity.setSettleStatus(SettleStatusEnum.SETTLED.getCode());
+        entity.setSettleTime(LocalDateTime.now());
+        int result = accountRenterWzDepositMapper.updateByPrimaryKeySelective(entity);
+        if(result == 0){
+            throw new PayOrderRenterWZDepositException();
+        }
+    }
+	
 }

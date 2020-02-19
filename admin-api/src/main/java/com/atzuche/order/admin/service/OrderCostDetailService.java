@@ -1392,7 +1392,8 @@ public class OrderCostDetailService {
         }
         
         int rentAmt = ownerCostReqVO.getOwnerSubsidyRentAmt()!=null?Integer.valueOf(ownerCostReqVO.getOwnerSubsidyRentAmt()):0;
-        
+        //不管输入正负号，按系统逻辑都按正数，保存的按负数来处理。逻辑转换
+        rentAmt = NumberUtils.convertNumberToZhengshu(rentAmt);
         
         SubsidySourceCodeEnum sourceEnum = SubsidySourceCodeEnum.OWNER; //固定
     	SubsidySourceCodeEnum targetEnum = SubsidySourceCodeEnum.RENTER;
@@ -1402,7 +1403,7 @@ public class OrderCostDetailService {
 		///
 		costBaseDTO.setOwnerOrderNo(orderEntityOwner.getOwnerOrderNo());
 		//修改金额为0的情况,前端传什么值，保存什么值。
-		OwnerOrderSubsidyDetailEntity ownerOrderSubsidyDetailEntity  =  ownerOrderSubsidyDetailService.buildData(costBaseDTO, rentAmt, targetEnum, sourceEnum, SubsidyTypeCodeEnum.CONSOLE_AMT, RenterCashCodeEnum.SUBSIDY_OWNER_TORENTER_RENTAMT);
+		OwnerOrderSubsidyDetailEntity ownerOrderSubsidyDetailEntity  =  ownerOrderSubsidyDetailService.buildData(costBaseDTO, -rentAmt, targetEnum, sourceEnum, SubsidyTypeCodeEnum.CONSOLE_AMT, RenterCashCodeEnum.SUBSIDY_OWNER_TORENTER_RENTAMT);
     	ownerOrderSubsidyDetailService.saveOrUpdateRenterOrderSubsidyDetail(ownerOrderSubsidyDetailEntity);
     	
 		

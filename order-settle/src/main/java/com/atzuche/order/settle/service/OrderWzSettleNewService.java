@@ -1,5 +1,6 @@
 package com.atzuche.order.settle.service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -22,6 +23,8 @@ import com.atzuche.order.accountrenterwzdepost.entity.AccountRenterWzDepositCost
 import com.atzuche.order.accountrenterwzdepost.service.notservice.AccountRenterWzDepositCostSettleDetailNoTService;
 import com.atzuche.order.cashieraccount.service.CashierSettleService;
 import com.atzuche.order.cashieraccount.service.notservice.CashierNoTService;
+import com.atzuche.order.commons.enums.OrderStatusEnum;
+import com.atzuche.order.commons.enums.account.SettleStatusEnum;
 import com.atzuche.order.commons.enums.cashcode.OwnerCashCodeEnum;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.ownercost.entity.OwnerOrderIncrementDetailEntity;
@@ -132,6 +135,11 @@ public class OrderWzSettleNewService {
 
         OrderStatusDTO orderStatusDTO = new OrderStatusDTO();
         orderStatusDTO.setOrderNo(settleOrders.getOrderNo());
+        ///add 
+        orderStatusDTO.setWzSettleTime(LocalDateTime.now());
+        orderStatusDTO.setStatus(OrderStatusEnum.TO_CLAIM_SETTLE.getStatus());
+        orderStatusDTO.setWzSettleStatus(SettleStatusEnum.SETTLED.getCode());
+        
         //10租客车辆押金/租客剩余租车费用 结余历史欠款
         orderWzSettleNoTService.repayWzHistoryDebtRent(settleOrdersAccount);
         //12 租客押金 退还
