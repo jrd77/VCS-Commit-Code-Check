@@ -191,10 +191,11 @@ public class OrderSettleService{
     public void settleOrder(String orderNo, OrderPayCallBack callBack) {
         log.info("OrderSettleService settleOrder orderNo [{}]",orderNo);
         Transaction t = Cat.getProducer().newTransaction(CatConstants.FEIGN_CALL, "车俩结算服务");
+        SettleOrders settleOrders = null;
         try {
             Cat.logEvent("settleOrder",orderNo);
             //1 初始化操作 校验操作
-            SettleOrders settleOrders =  orderSettleNoTService.initSettleOrders(orderNo);
+            settleOrders =  orderSettleNoTService.initSettleOrders(orderNo);
             log.info("OrderSettleService settleOrders settleOrders [{}]",GsonUtils.toJson(settleOrders));
             Cat.logEvent("settleOrders",GsonUtils.toJson(settleOrders));
 
@@ -207,7 +208,7 @@ public class OrderSettleService{
             orderSettleNewService.settleOrder(settleOrders,settleOrdersDefinition,callBack);
             log.info("OrderSettleService settleOrdersenced [{}]",GsonUtils.toJson(settleOrdersDefinition));
             Cat.logEvent("settleOrdersenced",GsonUtils.toJson(settleOrdersDefinition));
-            orderSettleNewService.sendOrderSettleSuccessMq(orderNo,settleOrders.getRenterMemNo(),settleOrders.getRentCosts());
+            orderSettleNewService.sendOrderSettleMq(orderNo,settleOrders.getRenterMemNo(),settleOrders.getRentCosts(),0);
             t.setStatus(Transaction.SUCCESS);
         } catch (Exception e) {
             log.error("OrderSettleService settleOrder,e={},",e);
@@ -218,7 +219,7 @@ public class OrderSettleService{
             orderStatusService.saveOrderStatusInfo(orderStatusDTO);
             t.setStatus(e);
             Cat.logError("结算失败  :{}",e);
-            orderSettleNewService.sendOrderSettleFailMq(orderNo);
+            orderSettleNewService.sendOrderSettleMq(orderNo,settleOrders.getRenterMemNo(),settleOrders.getRentCosts(),1);
             throw new RuntimeException("结算失败 ,不能结算");
         } finally {
             t.complete();

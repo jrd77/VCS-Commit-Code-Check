@@ -443,10 +443,11 @@ public class OrderSettleNewService {
     }
 
     /**
-     * 订单车辆结算成功事件
+     * 订单车辆结算事件
+     * flag  0：成功 1：失败
      * @param orderNo
      */
-    public void sendOrderSettleSuccessMq(String orderNo,String renterMemNo,RentCosts rentCosts) {
+    public void sendOrderSettleMq(String orderNo,String renterMemNo,RentCosts rentCosts,int status) {
         AccountRenterCostSettleEntity entity=cashierSettleService.getAccountRenterCostSettleEntity(orderNo,renterMemNo);
         OrderSettlementMq orderSettlementMq = new OrderSettlementMq();
         if(Objects.nonNull(entity) && Objects.nonNull(entity)){
@@ -490,11 +491,17 @@ public class OrderSettleNewService {
             orderSettlementMq.setHolidayAverage(String.valueOf(price));
             orderSettlementMq.setRentAmt(String.valueOf(rentAmt));
         }
-        orderSettlementMq.setStatus(0);
+        orderSettlementMq.setStatus(status);
         orderSettlementMq.setOrderNo(orderNo);
         OrderMessage orderMessage = OrderMessage.builder().build();
         orderMessage.setMessage(orderSettlementMq);
-        baseProducer.sendTopicMessage(NewOrderMQActionEventEnum.ORDER_SETTLEMENT_SUCCESS.exchange,NewOrderMQActionEventEnum.ORDER_SETTLEMENT_SUCCESS.routingKey,orderMessage);
+        NewOrderMQActionEventEnum eventEnum = null;
+        if(status==0){
+            eventEnum = NewOrderMQActionEventEnum.ORDER_SETTLEMENT_SUCCESS;
+        }else{
+            eventEnum = NewOrderMQActionEventEnum.ORDER_SETTLEMENT_FAIL;
+        }
+        baseProducer.sendTopicMessage(eventEnum.exchange,eventEnum.routingKey,orderMessage);
     }
     /**
      * 订单违章结算成功事件
@@ -509,18 +516,6 @@ public class OrderSettleNewService {
         baseProducer.sendTopicMessage(NewOrderMQActionEventEnum.ORDER_WZ_SETTLEMENT_SUCCESS.exchange,NewOrderMQActionEventEnum.ORDER_WZ_SETTLEMENT_SUCCESS.routingKey,orderMessage);
     }
 
-    /**
-     * 订单结算失败事件
-     * @param orderNo
-     */
-    public void sendOrderSettleFailMq(String orderNo) {
-        OrderSettlementMq orderSettlementMq = new OrderSettlementMq();
-        orderSettlementMq.setStatus(1);
-        orderSettlementMq.setOrderNo(orderNo);
-        OrderMessage orderMessage = OrderMessage.builder().build();
-        orderMessage.setMessage(orderSettlementMq);
-        baseProducer.sendTopicMessage(NewOrderMQActionEventEnum.ORDER_SETTLEMENT_FAIL.exchange,NewOrderMQActionEventEnum.ORDER_SETTLEMENT_FAIL.routingKey,orderMessage);
-    }
     /**
      * 订单结算失败事件
      * @param orderNo

@@ -215,8 +215,6 @@ public class OrderSettleNoTService {
             throw new OrderSettleFlatAccountException();
         }
 
-        // 2 校验订单状态 以及是否存在 理赔暂扣 存在不能进行结算 并CAT告警
-        this.check(renterOrder);
         // 3 初始化数据
 
         // 3.1获取租客子订单 和 租客会员号
@@ -234,6 +232,8 @@ public class OrderSettleNoTService {
         settleOrders.setOwnerMemNo(ownerMemNo);
         settleOrders.setRenterOrder(renterOrder);
         settleOrders.setOwnerOrder(ownerOrder);
+        // 2 校验订单状态 以及是否存在 理赔暂扣 存在不能进行结算 并CAT告警
+        this.check(renterOrder);
         return settleOrders;
     }
     /**
