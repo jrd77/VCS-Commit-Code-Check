@@ -18,7 +18,7 @@ dependencies {
     compile 'com.rabbitmq:amqp-client:4.0.3'
     compile project(":util-all:order-commons")
     compile("org.apache.commons:commons-collections4:4.0")
-    compile("com.autoframework:auto-mq-event:1.0-SNAPSHOT")
+    compile("com.autoframework:auto-mq-event:1.0.1-SNAPSHOT")
 
 }
 
