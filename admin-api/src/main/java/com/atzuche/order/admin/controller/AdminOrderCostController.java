@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 import com.atzuche.order.admin.service.AdminDeliveryCarService;
 import com.atzuche.order.commons.enums.cashcode.OwnerCashCodeEnum;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
+import com.atzuche.order.delivery.service.delivery.DeliveryCarInfoPriceService;
 import com.atzuche.order.delivery.vo.delivery.rep.DeliveryCarVO;
 import com.atzuche.order.delivery.vo.delivery.rep.OwnerGetAndReturnCarDTO;
 import com.atzuche.order.delivery.vo.delivery.rep.RenterGetAndReturnCarDTO;
@@ -131,7 +132,9 @@ public class AdminOrderCostController {
                     resp.setOilAmt(ownerGetAndReturnCarDTO.getOilDifferenceCrash());
                     resp.setBeyondMileAmt(ownerGetAndReturnCarDTO.getOverKNCrash());
                 }
+                resp.setPlatformAddOilSrvAmt(ownerGetAndReturnCarDTO.getPlatFormOilServiceCharge());
             }
+            //TODO 车载押金 没有
         	logger.info("resp = " + resp.toString());
         	return ResponseData.success(resp);
 		} catch (Exception e) {
