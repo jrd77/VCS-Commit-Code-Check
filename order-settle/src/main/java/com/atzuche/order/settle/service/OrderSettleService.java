@@ -207,7 +207,7 @@ public class OrderSettleService{
             orderSettleNewService.settleOrder(settleOrders,settleOrdersDefinition,callBack);
             log.info("OrderSettleService settleOrdersenced [{}]",GsonUtils.toJson(settleOrdersDefinition));
             Cat.logEvent("settleOrdersenced",GsonUtils.toJson(settleOrdersDefinition));
-            orderSettleNewService.sendOrderSettleSuccessMq(orderNo);
+            orderSettleNewService.sendOrderSettleSuccessMq(orderNo,settleOrders.getRenterMemNo());
             t.setStatus(Transaction.SUCCESS);
         } catch (Exception e) {
             log.error("OrderSettleService settleOrder,e={},",e);
