@@ -1,21 +1,26 @@
 package com.atzuche.order.accountrenterwzdepost.service;
 
-import com.atzuche.order.accountrenterwzdepost.entity.AccountRenterWzDepositDetailEntity;
-import com.atzuche.order.accountrenterwzdepost.entity.AccountRenterWzDepositEntity;
-import com.atzuche.order.accountrenterwzdepost.service.notservice.AccountRenterWzDepositDetailNoTService;
-import com.atzuche.order.accountrenterwzdepost.service.notservice.AccountRenterWzDepositNoTService;
-import com.atzuche.order.accountrenterwzdepost.vo.req.*;
-import com.atzuche.order.accountrenterwzdepost.vo.res.AccountRenterWZDepositResVO;
-import com.atzuche.order.commons.enums.YesNoEnum;
-import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
-import com.autoyol.cat.CatAnnotation;
-import com.autoyol.commons.web.ErrorCode;
+import java.util.Objects;
+
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
-import java.util.Objects;
+import com.atzuche.order.accountrenterwzdepost.entity.AccountRenterWzDepositDetailEntity;
+import com.atzuche.order.accountrenterwzdepost.entity.AccountRenterWzDepositEntity;
+import com.atzuche.order.accountrenterwzdepost.service.notservice.AccountRenterWzDepositDetailNoTService;
+import com.atzuche.order.accountrenterwzdepost.service.notservice.AccountRenterWzDepositNoTService;
+import com.atzuche.order.accountrenterwzdepost.vo.req.CreateOrderRenterWZDepositReqVO;
+import com.atzuche.order.accountrenterwzdepost.vo.req.DetainRenterWZDepositReqVO;
+import com.atzuche.order.accountrenterwzdepost.vo.req.OrderRenterDepositWZDetainReqVO;
+import com.atzuche.order.accountrenterwzdepost.vo.req.PayedOrderRenterDepositWZDetailReqVO;
+import com.atzuche.order.accountrenterwzdepost.vo.req.PayedOrderRenterWZDepositReqVO;
+import com.atzuche.order.accountrenterwzdepost.vo.req.RenterCancelWZDepositCostReqVO;
+import com.atzuche.order.accountrenterwzdepost.vo.res.AccountRenterWZDepositResVO;
+import com.atzuche.order.commons.enums.YesNoEnum;
+import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
+import com.autoyol.commons.web.ErrorCode;
 
 
 /**
@@ -143,4 +148,28 @@ public class AccountRenterWzDepositService{
         accountRenterDepositDetailEntity.setSourceDetail(RenterCashCodeEnum.SETTLE_RENT_WZ_DEPOSIT_COST_TO_FINE.getTxt());
         accountRenterWzDepositDetailNoTService.insertRenterDepositDetailEntity(accountRenterDepositDetailEntity);
     }
+
+	
+	/**
+     * 账户违章押金转出
+     * @param detainRenterDepositReqVO
+     */
+    public int detainRenterDeposit(DetainRenterWZDepositReqVO detainRenterDepositReqVO) {
+        //1 参数校验
+        Assert.notNull(detainRenterDepositReqVO, ErrorCode.PARAMETER_ERROR.getText());
+        detainRenterDepositReqVO.check();  
+        //2更新车辆押金  剩余押金 金额
+        accountRenterWzDepositNoTService.updateRenterWzDepositChange(detainRenterDepositReqVO);
+        //添加押金资金进出明细
+        int id = accountRenterWzDepositDetailNoTService.insertRenterDepositDetail(detainRenterDepositReqVO);
+        return id;
+    }
+    
+	public void updateOrderDepositSettle(DetainRenterWZDepositReqVO detainRenterDepositReqVO) {
+		accountRenterWzDepositNoTService.updateOrderDepositSettle(detainRenterDepositReqVO.getMemNo(),detainRenterDepositReqVO.getOrderNo());
+	}
+	
+
+    
+    
 }

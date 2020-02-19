@@ -189,7 +189,7 @@ public class OrderWzSettleNoTService {
     public void check(RenterOrderEntity renterOrder) {
         // 1 订单校验是否可以结算
         OrderStatusEntity orderStatus = orderStatusService.getByOrderNo(renterOrder.getOrderNo());
-        if(OrderStatusEnum.TO_SETTLE.getStatus() != orderStatus.getStatus()){
+        if(OrderStatusEnum.TO_WZ_SETTLE.getStatus() != orderStatus.getStatus()){
             throw new RuntimeException("租客订单状态不是待结算，不能结算");
         }
         //2校验租客是否还车
@@ -1157,7 +1157,7 @@ public class OrderWzSettleNoTService {
             cashierDeductDebtReq.setMemNo(settleOrdersAccount.getRenterMemNo());
             cashierDeductDebtReq.setAmt(settleOrdersAccount.getDepositSurplusAmt());
             cashierDeductDebtReq.setRenterCashCodeEnum(RenterCashCodeEnum.SETTLE_WZ_TO_HISTORY_AMT);
-            CashierDeductDebtResVO result = cashierService.deductDebt(cashierDeductDebtReq);
+            CashierDeductDebtResVO result = cashierService.deductWZDebt(cashierDeductDebtReq);
             if(Objects.nonNull(result)){
                 //已抵扣抵扣金额
                 int deductAmt = result.getDeductAmt();
@@ -1316,7 +1316,7 @@ public class OrderWzSettleNoTService {
             cashierRefundApply.setRemake(RenterCashCodeEnum.SETTLE_WZ_DEPOSIT_TO_RETURN_AMT.getTxt());
             cashierRefundApply.setFlag(RenterCashCodeEnum.ACCOUNT_RENTER_WZ_DEPOSIT.getCashNo());
             cashierRefundApply.setType(SysOrHandEnum.SYSTEM.getStatus());
-            int id =cashierService.refundDeposit(cashierRefundApply);
+            int id =cashierService.refundWzDeposit(cashierRefundApply);
             
             // 2记录退还 租车押金 结算费用明细
 //            AccountRenterCostSettleDetailEntity entity = new AccountRenterCostSettleDetailEntity();

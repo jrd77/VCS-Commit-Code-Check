@@ -10,6 +10,7 @@ import org.springframework.util.CollectionUtils;
 import com.atzuche.order.accountrenterwzdepost.entity.AccountRenterWzDepositDetailEntity;
 import com.atzuche.order.accountrenterwzdepost.exception.PayOrderRenterWZDepositException;
 import com.atzuche.order.accountrenterwzdepost.mapper.AccountRenterWzDepositDetailMapper;
+import com.atzuche.order.accountrenterwzdepost.vo.req.DetainRenterWZDepositReqVO;
 import com.atzuche.order.accountrenterwzdepost.vo.req.PayedOrderRenterDepositWZDetailReqVO;
 
 
@@ -73,5 +74,18 @@ public class AccountRenterWzDepositDetailNoTService {
         }
        return list.stream().mapToInt(AccountRenterWzDepositDetailEntity::getAmt).sum();
     }
+
+
+	public int insertRenterDepositDetail(DetainRenterWZDepositReqVO detainRenterDepositReqVO) {
+		 AccountRenterWzDepositDetailEntity accountRenterDepositDetailEntity = new AccountRenterWzDepositDetailEntity();
+         BeanUtils.copyProperties(detainRenterDepositReqVO,accountRenterDepositDetailEntity);
+         accountRenterDepositDetailEntity.setSourceCode(detainRenterDepositReqVO.getRenterCashCodeEnum().getCashNo());
+         accountRenterDepositDetailEntity.setSourceDetail(detainRenterDepositReqVO.getRenterCashCodeEnum().getTxt());
+         int result = accountRenterWzDepositDetailMapper.insertSelective(accountRenterDepositDetailEntity);
+         if(result==0){
+            throw new PayOrderRenterWZDepositException();
+         }
+         return accountRenterDepositDetailEntity.getId();
+	}
     
 }
