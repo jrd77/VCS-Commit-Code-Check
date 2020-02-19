@@ -450,9 +450,6 @@ public class OrderSettleNewService {
         orderSettlementMq.setOrderNo(orderNo);
         OrderMessage orderMessage = OrderMessage.builder().build();
         orderMessage.setMessage(orderSettlementMq);
-        //给车主租客发送支付成功短信
-        Map map = SmsParamsMapUtil.getParamsMap(orderNo, ShortMessageTypeEnum.PAY_RENT_CAR_DEPOSIT_2_RENTER.getValue(),ShortMessageTypeEnum.PAY_RENT_CAR_DEPOSIT_2_OWNER.getValue(),null);
-        orderMessage.setMap(map);
         baseProducer.sendTopicMessage(NewOrderMQActionEventEnum.ORDER_SETTLEMENT_SUCCESS.exchange,NewOrderMQActionEventEnum.ORDER_SETTLEMENT_SUCCESS.routingKey,orderMessage);
     }
 
