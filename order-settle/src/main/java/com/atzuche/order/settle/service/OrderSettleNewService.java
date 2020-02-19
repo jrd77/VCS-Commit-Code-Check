@@ -447,11 +447,15 @@ public class OrderSettleNewService {
      */
     public void sendOrderSettleSuccessMq(String orderNo,String renterMemNo) {
         AccountRenterCostSettleEntity entity=cashierSettleService.getAccountRenterCostSettleEntity(orderNo,renterMemNo);
+        OrderSettlementMq orderSettlementMq = new OrderSettlementMq();
         if(Objects.nonNull(entity) && Objects.nonNull(entity)){
-
+            String rentAmt = Objects.nonNull(entity.getRentAmt())?String.valueOf(entity.getRentAmt()):"0";
+            orderSettlementMq.setRentAmt(rentAmt);
+            String insureTotalPrices = Objects.nonNull(entity.getBasicEnsureAmount())?String.valueOf(entity.getBasicEnsureAmount()):"0";
+            orderSettlementMq.setInsureTotalPrices(insureTotalPrices);
         }
 
-        OrderSettlementMq orderSettlementMq = new OrderSettlementMq();
+
         orderSettlementMq.setStatus(0);
         orderSettlementMq.setOrderNo(orderNo);
         OrderMessage orderMessage = OrderMessage.builder().build();
