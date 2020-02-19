@@ -332,8 +332,9 @@ public class OrderCostService {
 		platformSubsidyRealAmt = String.valueOf( NumberUtils.convertNumberToFushu(platformSubsidyAmount));
 		///车主给租客的租金补贴
 		ownerSubsidyTotalAmt = String.valueOf( NumberUtils.convertNumberToFushu(ownerSubsidyRentTotalAmount));
+		//文本框中填入负数，保存负数，暂不处理
+//		ownerSubsidyRentAmt = String.valueOf( ownerSubsidyRentAmount);  //NumberUtils.convertNumberToFushu()
 		ownerSubsidyRentAmt = String.valueOf( NumberUtils.convertNumberToFushu(ownerSubsidyRentAmount));
-		
 		
 		realVo.setPlatformSubsidyTotalAmt(platformSubsidyTotalAmt);
 		realVo.setPlatformSubsidyRealAmt(platformSubsidyRealAmt);
@@ -342,7 +343,8 @@ public class OrderCostService {
 		realVo.setOwnerSubsidyTotalAmt(ownerSubsidyTotalAmt);
 		realVo.setOwnerSubsidyRentAmt(ownerSubsidyRentAmt);
 		//租客给车主的调价 20200211
-		realVo.setAdjustAmt(String.valueOf( renterToOwnerAdjustAmount)); //NumberUtils.convertNumberToZhengshu(renterToOwnerAdjustAmount)
+		//bugfix:AUT-5118    取反，租客的调价为“显示正数” 租客的调价收益 “显示负数”
+		realVo.setAdjustAmt(String.valueOf( -renterToOwnerAdjustAmount)); //NumberUtils.convertNumberToZhengshu(renterToOwnerAdjustAmount)
 		
 	}
 

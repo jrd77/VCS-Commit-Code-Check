@@ -126,6 +126,7 @@ public class DeliveryCarInfoPriceService {
             }
             ownerGetAndReturnCarDO = createOwnerGetAndReturnCarDTO(ownerGetAndReturnCarDO, ownerHandoverCarInfoList, carEngineType, cityCode);
             BeanUtils.copyProperties(ownerGetAndReturnCarDO, renterGetAndReturnCarDTO);
+            ownerGetAndReturnCarDTO.setOilDifferenceCrash(ownerGetAndReturnCarDTO.getOilDifferenceCrash());
             return DeliveryOilCostVO.builder().ownerGetAndReturnCarDTO(ownerGetAndReturnCarDTO).renterGetAndReturnCarDTO(renterGetAndReturnCarDTO).build();
         } catch (DeliveryOrderException e) {
             log.error("获取油费等数据发生业务异常：", e);
@@ -157,7 +158,6 @@ public class DeliveryCarInfoPriceService {
 
     /**
      * 获取车主租客取送车信息
-     *
      * @param ownerGetAndReturnCarDTO
      * @param HandoverCarInfoEntities
      * @return
@@ -234,8 +234,8 @@ public class DeliveryCarInfoPriceService {
         }
         Integer mileageAmt = RenterFeeCalculatorUtils.calMileageAmt(mileageAmtDTO.getDayMileage(), mileageAmtDTO.getGuideDayPrice(),
                 mileageAmtDTO.getGetmileage(), mileageAmtDTO.getReturnMileage(), costBaseDTO.getStartTime(), costBaseDTO.getEndTime(), configHours);
-        feeResult.setTotalFee(mileageAmt);
-        feeResult.setUnitPrice(mileageAmt);
+        feeResult.setTotalFee(-mileageAmt);
+        feeResult.setUnitPrice(-mileageAmt);
         return feeResult;
     }
 
