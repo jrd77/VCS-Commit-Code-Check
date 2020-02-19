@@ -114,6 +114,18 @@ public class AccountRenterDepositService{
         int id = accountRenterDepositDetailNoTService.insertRenterDepositDetail(detainRenterDepositReqVO);
         return id;
     }
+    
+    public int detainRenterWzDeposit(DetainRenterDepositReqVO detainRenterDepositReqVO) {
+        //1 参数校验
+        Assert.notNull(detainRenterDepositReqVO, ErrorCode.PARAMETER_ERROR.getText());
+        detainRenterDepositReqVO.check();
+        //2更新车辆押金  剩余押金 金额
+        accountRenterDepositNoTService.updateRenterDepositChange(detainRenterDepositReqVO);
+        //添加押金资金进出明细
+        int id = accountRenterDepositDetailNoTService.insertRenterDepositDetail(detainRenterDepositReqVO);
+        return id;
+    }
+    
 
     public void updateRenterDepositUniqueNo(String uniqueNo, int renterDepositDetailId) {
         accountRenterDepositDetailNoTService.updateRenterDepositUniqueNo(uniqueNo,renterDepositDetailId);
