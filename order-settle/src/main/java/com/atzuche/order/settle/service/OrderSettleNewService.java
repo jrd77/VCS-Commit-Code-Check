@@ -418,9 +418,9 @@ public class OrderSettleNewService {
         }).mapToInt(AccountRenterCostSettleDetailEntity::getAmt).sum();
         //
         //车主交接车油费
-        int ownerOilAmt = settleOrdersDefinition.getAccountRenterCostSettleDetails().stream().filter(obj ->{
-            return OwnerCashCodeEnum.ACCOUNT_OWNER_SETTLE_OIL_COST.getCashNo().equals(obj.getCostCode());
-        }).mapToInt(AccountRenterCostSettleDetailEntity::getAmt).sum();
+        int ownerOilAmt = settleOrdersDefinition.getAccountOwnerCostSettleDetails().stream().filter(obj ->{
+            return OwnerCashCodeEnum.ACCOUNT_OWNER_SETTLE_OIL_COST.getCashNo().equals(obj.getSourceCode());
+        }).mapToInt(AccountOwnerCostSettleDetailEntity::getAmt).sum();
         //平台补贴油费
         int platFormAmt =0;
         if(!CollectionUtils.isEmpty(settleOrdersDefinition.getAccountPlatformSubsidyDetails())){
