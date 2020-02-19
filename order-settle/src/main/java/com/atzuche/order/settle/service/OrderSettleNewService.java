@@ -1,6 +1,7 @@
 package com.atzuche.order.settle.service;
 
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Map;
@@ -445,17 +446,50 @@ public class OrderSettleNewService {
      * 订单车辆结算成功事件
      * @param orderNo
      */
-    public void sendOrderSettleSuccessMq(String orderNo,String renterMemNo) {
+    public void sendOrderSettleSuccessMq(String orderNo,String renterMemNo,RentCosts rentCosts) {
         AccountRenterCostSettleEntity entity=cashierSettleService.getAccountRenterCostSettleEntity(orderNo,renterMemNo);
         OrderSettlementMq orderSettlementMq = new OrderSettlementMq();
         if(Objects.nonNull(entity) && Objects.nonNull(entity)){
-            String rentAmt = Objects.nonNull(entity.getRentAmt())?String.valueOf(entity.getRentAmt()):"0";
-            orderSettlementMq.setRentAmt(rentAmt);
+
             String insureTotalPrices = Objects.nonNull(entity.getBasicEnsureAmount())?String.valueOf(entity.getBasicEnsureAmount()):"0";
             orderSettlementMq.setInsureTotalPrices(insureTotalPrices);
+            String abatementInsure = Objects.nonNull(entity.getComprehensiveEnsureAmount())?String.valueOf(entity.getComprehensiveEnsureAmount()):"0";
+            orderSettlementMq.setAbatementInsure(abatementInsure);
         }
+        int subsidyPlamtAmt=0;
+        int subsidyOwnerAmt=0;
+        if(!CollectionUtils.isEmpty(rentCosts.getOrderConsoleSubsidyDetails())){
+            subsidyPlamtAmt = subsidyPlamtAmt + rentCosts.getOrderConsoleSubsidyDetails().stream().filter(obj ->{
+                return RenterCashCodeEnum.REAL_COUPON_OFFSET.getCashNo().equals(obj.getSubsidyTypeCode());
+            }).mapToInt(OrderConsoleSubsidyDetailEntity::getSubsidyAmount).sum();
+             subsidyOwnerAmt = subsidyOwnerAmt + rentCosts.getOrderConsoleSubsidyDetails().stream().filter(obj ->{
+                return RenterCashCodeEnum.OWNER_COUPON_OFFSET_COST.getCashNo().equals(obj.getSubsidyTypeCode());
+            }).mapToInt(OrderConsoleSubsidyDetailEntity::getSubsidyAmount).sum();
+        }
+        if(!CollectionUtils.isEmpty(rentCosts.getRenterOrderSubsidyDetails())){
+            subsidyPlamtAmt = subsidyPlamtAmt + rentCosts.getRenterOrderSubsidyDetails().stream().filter(obj ->{
+                return RenterCashCodeEnum.REAL_COUPON_OFFSET.getCashNo().equals(obj.getSubsidyTypeCode());
+            }).mapToInt(RenterOrderSubsidyDetailEntity::getSubsidyAmount).sum();
+            subsidyOwnerAmt = subsidyOwnerAmt + rentCosts.getRenterOrderSubsidyDetails().stream().filter(obj ->{
+                return RenterCashCodeEnum.OWNER_COUPON_OFFSET_COST.getCashNo().equals(obj.getSubsidyTypeCode());
+            }).mapToInt(RenterOrderSubsidyDetailEntity::getSubsidyAmount).sum();
+        }
+        orderSettlementMq.setPlatformCouponDeductionAmount(String.valueOf(subsidyPlamtAmt));
+        orderSettlementMq.setOwnerCouponDeductionAmount(String.valueOf(subsidyOwnerAmt));
 
+        //查询租车费用  过滤租金 取 日均价 多个的话 按id倒叙  取第一个
+        if(!CollectionUtils.isEmpty(rentCosts.getRenterOrderCostDetails())){
+           int price = rentCosts.getRenterOrderCostDetails().stream().filter(obj ->{
+                return RenterCashCodeEnum.RENT_AMT.getCashNo().equals(obj.getCostCode());
+            }).sorted(Comparator.comparing(RenterOrderCostDetailEntity::getId).reversed())
+                    .limit(1).mapToInt(RenterOrderCostDetailEntity::getUnitPrice).sum();
 
+            int rentAmt = rentCosts.getRenterOrderCostDetails().stream().filter(obj ->{
+                return RenterCashCodeEnum.RENT_AMT.getCashNo().equals(obj.getCostCode());
+            }).mapToInt(RenterOrderCostDetailEntity::getTotalAmount).sum();
+            orderSettlementMq.setHolidayAverage(String.valueOf(price));
+            orderSettlementMq.setRentAmt(String.valueOf(rentAmt));
+        }
         orderSettlementMq.setStatus(0);
         orderSettlementMq.setOrderNo(orderNo);
         OrderMessage orderMessage = OrderMessage.builder().build();
