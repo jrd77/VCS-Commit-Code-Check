@@ -347,11 +347,11 @@ public class DeliveryCarInfoService {
     public Integer getDeliveryCarOverMileageAmt(OwnerGetAndReturnCarDTO ownerGetAndReturnCarDTO,RenterGoodsDetailDTO renterGoodsDetailDTO) {
         try {
             MileageAmtDTO mileageAmtDTO = new MileageAmtDTO();
-            mileageAmtDTO.setCarOwnerType(renterGoodsDetailDTO.getCarType());
+            mileageAmtDTO.setCarOwnerType(renterGoodsDetailDTO.getCarOwnerType());
             mileageAmtDTO.setDayMileage(renterGoodsDetailDTO.getCarDayMileage());
             mileageAmtDTO.setGetmileage(Integer.valueOf(ownerGetAndReturnCarDTO.getGetKM()));
             mileageAmtDTO.setReturnMileage(Integer.valueOf(ownerGetAndReturnCarDTO.getReturnKM()));
-            mileageAmtDTO.setGuideDayPrice(renterGoodsDetailDTO.getCarGuideDayPrice());
+            mileageAmtDTO.setGuideDayPrice(renterGoodsDetailDTO.getCarGuidePrice());
             CostBaseDTO costBaseDTO = new CostBaseDTO();
             costBaseDTO.setStartTime(DateUtils.parseLocalDateTime(ownerGetAndReturnCarDTO.getRealGetTime(),DateUtils.DATE_DEFAUTE_4));
             costBaseDTO.setEndTime(DateUtils.parseLocalDateTime(ownerGetAndReturnCarDTO.getRealReturnTime(),DateUtils.DATE_DEFAUTE_4));
