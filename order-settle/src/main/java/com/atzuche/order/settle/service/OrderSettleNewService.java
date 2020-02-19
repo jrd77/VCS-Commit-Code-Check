@@ -445,7 +445,12 @@ public class OrderSettleNewService {
      * 订单车辆结算成功事件
      * @param orderNo
      */
-    public void sendOrderSettleSuccessMq(String orderNo) {
+    public void sendOrderSettleSuccessMq(String orderNo,String renterMemNo) {
+        AccountRenterCostSettleEntity entity=cashierSettleService.getAccountRenterCostSettleEntity(orderNo,renterMemNo);
+        if(Objects.nonNull(entity) && Objects.nonNull(entity)){
+
+        }
+
         OrderSettlementMq orderSettlementMq = new OrderSettlementMq();
         orderSettlementMq.setStatus(0);
         orderSettlementMq.setOrderNo(orderNo);
