@@ -155,6 +155,12 @@ public class CashierSettleService {
             accountPlatformProfitDetailNotService.insertAccountPlatformProfitDetails(accountPlatformProfitDetails);
         }
     }
+    /**
+     * 查询租车费用
+     */
+    public AccountRenterCostSettleEntity getAccountRenterCostSettleEntity(String orderNo,String renterMemNo){
+      return accountRenterCostSettleNoTService.getCostPaidRentSettle(orderNo,renterMemNo);
+    }
 
     /**
      * 计算租客 租车费用  平台补贴费用  车主补贴费用 手续费 基础保障费用 等 并落库
