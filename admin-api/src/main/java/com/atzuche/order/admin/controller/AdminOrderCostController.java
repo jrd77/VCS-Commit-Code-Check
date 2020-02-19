@@ -51,7 +51,7 @@ public class AdminOrderCostController {
 	
 	@Autowired
 	OrderCostService orderCostService;
-	
+
 	@AutoDocMethod(description = "计算租客子订单费用", value = "计算租客子订单费用", response = OrderRenterCostResVO.class)
 	@RequestMapping(value="calculateRenterOrderCost",method = RequestMethod.POST)
 	public ResponseData calculateRenterOrderCost(@RequestBody @Validated RenterCostReqVO renterCostReqVO, HttpServletRequest request, HttpServletResponse response,BindingResult bindingResult) {
@@ -67,7 +67,7 @@ public class AdminOrderCostController {
             // 计算油量和超里程费用
             DeliveryCarVO deliveryCarRepVO = getDeliveryCarVO(renterCostReqVO.getOrderNo());
             logger.info("calculateRenterOrderCost deliveryCarRepVO[{}]", GsonUtils.toJson(deliveryCarRepVO));
-            if(Objects.nonNull(deliveryCarRepVO) && Objects.nonNull(deliveryCarRepVO.getOwnerGetAndReturnCarDTO())){
+            if(Objects.nonNull(deliveryCarRepVO) && Objects.nonNull(deliveryCarRepVO.getRenterGetAndReturnCarDTO())){
                 RenterGetAndReturnCarDTO renterGetAndReturnCarDTO = deliveryCarRepVO.getRenterGetAndReturnCarDTO();
                 if(Objects.nonNull(renterGetAndReturnCarDTO)){
                     if(!StringUtil.isBlank(renterGetAndReturnCarDTO.getOilDifferenceCrash())){
@@ -78,7 +78,7 @@ public class AdminOrderCostController {
                     if(!StringUtil.isBlank(renterGetAndReturnCarDTO.getOverKNCrash())){
                         String overKNCrash =  renterGetAndReturnCarDTO.getOverKNCrash();
                         Integer overKNCrashAmt  = -Integer.valueOf(overKNCrash);
-                        resp.setOilAmt(overKNCrashAmt.toString());
+                        resp.setBeyondMileAmt(overKNCrashAmt.toString());
                     }
 
                 }
