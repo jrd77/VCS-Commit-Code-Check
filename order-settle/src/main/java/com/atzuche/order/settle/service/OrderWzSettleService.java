@@ -31,6 +31,7 @@ public class OrderWzSettleService {
 	private OrderStatusService orderStatusService;
 	@Autowired
 	OrderWzSettleNewService orderWzSettleNewService;
+    @Autowired private OrderSettleNewService orderSettleNewService;
 	
 	
 	public void settleWzOrder(String orderNo) {
@@ -50,7 +51,7 @@ public class OrderWzSettleService {
 
             //3 事务操作结算主逻辑  //开启事务
             orderWzSettleNewService.settleOrder(settleOrders);
-
+            orderSettleNewService.sendOrderWzSettleSuccessMq(orderNo);
             t.setStatus(Transaction.SUCCESS);
         } catch (Exception e) {
             log.error("OrderSettleService settleOrder,e={},",e);
@@ -61,6 +62,7 @@ public class OrderWzSettleService {
             orderStatusDTO.setOrderNo(orderNo);
             orderStatusDTO.setWzSettleStatus(SettleStatusEnum.SETTL_FAIL.getCode());
             orderStatusService.saveOrderStatusInfo(orderStatusDTO);
+            orderSettleNewService.sendOrderWzSettleFailMq(orderNo);
             t.setStatus(e);
             Cat.logError("结算失败  :{}",e);
             throw new RuntimeException("结算失败 ,不能结算");

@@ -23,6 +23,7 @@ import com.autoyol.autopay.gateway.constant.DataPayKindConstant;
 import com.autoyol.doc.util.StringUtil;
 import com.autoyol.event.rabbit.neworder.NewOrderMQActionEventEnum;
 import com.autoyol.event.rabbit.neworder.OrderSettlementMq;
+import com.autoyol.event.rabbit.neworder.OrderWzSettlementMq;
 import com.autoyol.platformcost.model.FeeResult;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
@@ -450,10 +451,19 @@ public class OrderSettleNewService {
         orderSettlementMq.setOrderNo(orderNo);
         OrderMessage orderMessage = OrderMessage.builder().build();
         orderMessage.setMessage(orderSettlementMq);
-        //给车主租客发送支付成功短信
-        Map map = SmsParamsMapUtil.getParamsMap(orderNo, ShortMessageTypeEnum.PAY_RENT_CAR_DEPOSIT_2_RENTER.getValue(),ShortMessageTypeEnum.PAY_RENT_CAR_DEPOSIT_2_OWNER.getValue(),null);
-        orderMessage.setMap(map);
         baseProducer.sendTopicMessage(NewOrderMQActionEventEnum.ORDER_SETTLEMENT_SUCCESS.exchange,NewOrderMQActionEventEnum.ORDER_SETTLEMENT_SUCCESS.routingKey,orderMessage);
+    }
+    /**
+     * 订单违章结算成功事件
+     * @param orderNo
+     */
+    public void sendOrderWzSettleSuccessMq(String orderNo) {
+        OrderWzSettlementMq orderSettlementMq = new OrderWzSettlementMq();
+        orderSettlementMq.setStatus(0);
+        orderSettlementMq.setOrderNo(orderNo);
+        OrderMessage orderMessage = OrderMessage.builder().build();
+        orderMessage.setMessage(orderSettlementMq);
+        baseProducer.sendTopicMessage(NewOrderMQActionEventEnum.ORDER_WZ_SETTLEMENT_SUCCESS.exchange,NewOrderMQActionEventEnum.ORDER_WZ_SETTLEMENT_SUCCESS.routingKey,orderMessage);
     }
 
     /**
@@ -467,6 +477,18 @@ public class OrderSettleNewService {
         OrderMessage orderMessage = OrderMessage.builder().build();
         orderMessage.setMessage(orderSettlementMq);
         baseProducer.sendTopicMessage(NewOrderMQActionEventEnum.ORDER_SETTLEMENT_FAIL.exchange,NewOrderMQActionEventEnum.ORDER_SETTLEMENT_FAIL.routingKey,orderMessage);
+    }
+    /**
+     * 订单结算失败事件
+     * @param orderNo
+     */
+    public void sendOrderWzSettleFailMq(String orderNo) {
+        OrderWzSettlementMq orderSettlementMq = new OrderWzSettlementMq();
+        orderSettlementMq.setStatus(1);
+        orderSettlementMq.setOrderNo(orderNo);
+        OrderMessage orderMessage = OrderMessage.builder().build();
+        orderMessage.setMessage(orderSettlementMq);
+        baseProducer.sendTopicMessage(NewOrderMQActionEventEnum.ORDER_WZ_SETTLEMENT_FAIL.exchange,NewOrderMQActionEventEnum.ORDER_WZ_SETTLEMENT_FAIL.routingKey,orderMessage);
     }
 
     /**
