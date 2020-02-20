@@ -126,7 +126,8 @@ public class SubmitOrderController {
             if(StringUtils.equals(orderResVO.getStatus(), String.valueOf(OrderStatusEnum.TO_PAY.getStatus()))) {
                 newOrderMQStatusEventEnum = NewOrderMQStatusEventEnum.ORDER_PREPAY;
             }
-            orderStatusMqService.sendOrderStatusToCreate(orderResVO.getOrderNo(),context.getOwnerMemberDto().getMemNo(),orderResVO.getStatus(),orderReqVO,newOrderMQStatusEventEnum);
+            String ownerMemNo = null != context.getOwnerMemberDto() ? context.getOwnerMemberDto().getMemNo() : null;
+            orderStatusMqService.sendOrderStatusToCreate(orderResVO.getOrderNo(),ownerMemNo,orderResVO.getStatus(),orderReqVO,newOrderMQStatusEventEnum);
         }catch(OrderException orderException){
             String orderNo = orderResVO==null?"":orderResVO.getOrderNo();
             OrderRecordEntity orderRecordEntity = new OrderRecordEntity();
@@ -139,7 +140,8 @@ public class SubmitOrderController {
             orderRecordService.save(orderRecordEntity);
 
             //发送订单失败的MQ事件
-            orderActionMqService.sendCreateOrderFail(orderResVO.getOrderNo(),context.getOwnerMemberDto().getMemNo(),context.getRiskAuditId(),orderReqVO);
+            String ownerMemNo = null != context.getOwnerMemberDto() ? context.getOwnerMemberDto().getMemNo() : null;
+            orderActionMqService.sendCreateOrderFail(orderNo,ownerMemNo,context.getRiskAuditId(),orderReqVO);
             //释放库存
             if(orderNo != null && orderNo.trim().length()>0){
                 Integer carNo = Integer.valueOf(normalOrderReqVO.getCarNo());
@@ -158,7 +160,8 @@ public class SubmitOrderController {
             orderRecordService.save(orderRecordEntity);
 
             //发送订单失败的MQ事件
-            orderActionMqService.sendCreateOrderFail(orderResVO.getOrderNo(),context.getOwnerMemberDto().getMemNo(),context.getRiskAuditId(),orderReqVO);
+            String ownerMemNo = null != context.getOwnerMemberDto() ? context.getOwnerMemberDto().getMemNo() : null;
+            orderActionMqService.sendCreateOrderFail(orderNo,ownerMemNo,context.getRiskAuditId(),orderReqVO);
             //释放库存
             if(orderNo != null && orderNo.trim().length()>0){
                 Integer carNo = Integer.valueOf(normalOrderReqVO.getCarNo());
@@ -218,27 +221,30 @@ public class SubmitOrderController {
             if(StringUtils.equals(orderResVO.getStatus(), String.valueOf(OrderStatusEnum.TO_PAY.getStatus()))) {
                 newOrderMQStatusEventEnum = NewOrderMQStatusEventEnum.ORDER_PREPAY;
             }
-            orderStatusMqService.sendOrderStatusToCreate(orderResVO.getOrderNo(),context.getOwnerMemberDto().getMemNo(),orderResVO.getStatus(),orderReqVO,newOrderMQStatusEventEnum);
+            String ownerMemNo = null != context.getOwnerMemberDto() ? context.getOwnerMemberDto().getMemNo() : null;
+            orderStatusMqService.sendOrderStatusToCreate(orderResVO.getOrderNo(),ownerMemNo,orderResVO.getStatus(),orderReqVO,newOrderMQStatusEventEnum);
         }catch(OrderException orderException){
+            String orderNo = orderResVO==null?"":orderResVO.getOrderNo();
             OrderRecordEntity orderRecordEntity = new OrderRecordEntity();
             orderRecordEntity.setErrorCode(orderException.getErrorCode());
             orderRecordEntity.setErrorTxt(orderException.getErrorMsg());
             orderRecordEntity.setMemNo(adminOrderReqVO.getMemNo());
-            orderRecordEntity.setOrderNo(orderResVO==null?"":orderResVO.getOrderNo());
+            orderRecordEntity.setOrderNo(orderNo);
             orderRecordEntity.setParam(JSON.toJSONString(adminOrderReqVO));
             orderRecordEntity.setResult(JSON.toJSONString(orderResVO));
             orderRecordService.save(orderRecordEntity);
 
-            //发送订单成功的MQ事件
-            orderActionMqService.sendCreateOrderSuccess(orderResVO.getOrderNo(),context.getOwnerMemberDto().getMemNo(),context.getRiskAuditId(),orderReqVO);
+            //发送订单失败的MQ事件
+            String ownerMemNo = null != context.getOwnerMemberDto() ? context.getOwnerMemberDto().getMemNo() : null;
+            orderActionMqService.sendCreateOrderFail(orderNo,ownerMemNo,context.getRiskAuditId(),orderReqVO);
             //释放库存
-            String orderNo = orderResVO==null?"":orderResVO.getOrderNo();
             if(orderNo != null && orderNo.trim().length()>0){
                 Integer carNo = Integer.valueOf(adminOrderReqVO.getCarNo());
                 stockService.releaseCarStock(orderNo,carNo);
             }
             throw orderException;
         }catch (Exception e){
+            String orderNo = orderResVO==null?"":orderResVO.getOrderNo();
             OrderRecordEntity orderRecordEntity = new OrderRecordEntity();
             orderRecordEntity.setErrorCode(ErrorCode.SYS_ERROR.getCode());
             orderRecordEntity.setErrorTxt(ErrorCode.SYS_ERROR.getText());
@@ -248,10 +254,9 @@ public class SubmitOrderController {
             orderRecordEntity.setResult(JSON.toJSONString(orderResVO));
             orderRecordService.save(orderRecordEntity);
 
-            //发送订单成功的MQ事件
-            orderActionMqService.sendCreateOrderSuccess(orderResVO.getOrderNo(),context.getOwnerMemberDto().getMemNo(),context.getRiskAuditId(),orderReqVO);
-            //释放库存
-            String orderNo = orderResVO==null?"":orderResVO.getOrderNo();
+            //发送订单失败的MQ事件
+            String ownerMemNo = null != context.getOwnerMemberDto() ? context.getOwnerMemberDto().getMemNo() : null;
+            orderActionMqService.sendCreateOrderFail(orderNo,ownerMemNo,context.getRiskAuditId(),orderReqVO);
             if(orderNo != null && orderNo.trim().length()>0){
                 Integer carNo = Integer.valueOf(adminOrderReqVO.getCarNo());
                 stockService.releaseCarStock(orderNo,carNo);
