@@ -42,7 +42,7 @@ dependencies {
     compile("com.caucho:hessian:4.0.38")
 
     compile('com.autoyol.unique:unique-no-feign:3.1-SNAPSHOT')
-    compile('com.autoyol.car:auto-car-service-api:2020021701-SNAPSHOT')
+    compile('com.autoyol.car:auto-car-service-api:2020022001-SNAPSHOT')
     compile('com.autoyol:riskCheckService-api:1.0.0-SNAPSHOT')
     compile project(":order-remote-service:order-remote-car")
 
