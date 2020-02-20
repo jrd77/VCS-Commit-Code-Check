@@ -51,8 +51,8 @@ public class UniqueOrderNoProxyService {
 
             String orderNo = String.valueOf(response.getData());
             if(StringUtils.isBlank(orderNo)) {
-                RemoteCallException remoteCallException = new RemoteCallException(com.atzuche.order.commons.enums.ErrorCode.REMOTE_CALL_FAIL.getCode(),
-                        com.atzuche.order.commons.enums.ErrorCode.REMOTE_CALL_FAIL.getText());
+                RemoteCallException remoteCallException = new RemoteCallException(com.atzuche.order.commons.enums.ErrorCode.ORDER_RENTER_ORDERNO_CREATE_ERROR.getCode(),
+                        com.atzuche.order.commons.enums.ErrorCode.ORDER_RENTER_ORDERNO_CREATE_ERROR.getText());
                 t.setStatus(remoteCallException);
                 throw remoteCallException;
             }
