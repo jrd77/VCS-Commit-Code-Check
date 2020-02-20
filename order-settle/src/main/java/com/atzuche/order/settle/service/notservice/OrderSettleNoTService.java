@@ -488,11 +488,8 @@ public class OrderSettleNoTService {
         //11后台管理操作费用表（无条件补贴）
         List<OrderConsoleCostDetailEntity> orderConsoleCostDetailEntity = orderConsoleCostDetailService.selectByOrderNoAndMemNo(settleOrders.getOrderNo(),settleOrders.getOwnerMemNo());
         //12 加油服务费
-        RenterGoodsDetailDTO renterGoodsDetail = renterGoodsService.getRenterGoodsDetail(settleOrders.getRenterOrderNo(),Boolean.TRUE);
-        DeliveryOilCostVO deliveryOilCostRentVO = deliveryCarInfoPriceService.getOilCostByRenterOrderNo(settleOrders.getOrderNo(),renterGoodsDetail.getCarEngineType());
-        RenterGetAndReturnCarDTO renterGetAndReturnCarDTO = Objects.isNull(deliveryOilCostVO)?null:deliveryOilCostRentVO.getRenterGetAndReturnCarDTO();
 
-        int ownerPlatFormOilService = deliveryCarInfoPriceService.getOwnerPlatFormOilServiceCharge(Integer.valueOf(ownerGetAndReturnCarDTO.getGetCarOil().contains("L") ? ownerGetAndReturnCarDTO.getGetCarOil().replace("L", "") : ownerGetAndReturnCarDTO.getGetCarOil()), Integer.valueOf(renterGetAndReturnCarDTO.getGetCarOil().contains("L") ? renterGetAndReturnCarDTO.getGetCarOil().replace("L", "") : renterGetAndReturnCarDTO.getGetCarOil()));
+        int ownerPlatFormOilService = deliveryCarInfoPriceService.getOwnerPlatFormOilServiceChargeByOrderNo(settleOrders.getOrderNo());
         ownerCosts.setProxyExpense(proxyExpense);
         ownerCosts.setServiceExpense(serviceExpense);
         ownerCosts.setOwnerOrderSubsidyDetail(ownerOrderSubsidyDetail);
@@ -937,6 +934,27 @@ public class OrderSettleNoTService {
                     settleOrdersDefinition.addPlatformProfit(entity);
                 }
             }
+        }
+        //1.12平台加油服务费
+        int ownerPlatFormOilService = ownerCosts.getOwnerPlatFormOilService();
+        {
+            //记录车主结算费用明细
+            AccountOwnerCostSettleDetailEntity accountOwnerCostSettleDetail = new AccountOwnerCostSettleDetailEntity();
+            accountOwnerCostSettleDetail.setOrderNo(settleOrders.getOrderNo());
+            accountOwnerCostSettleDetail.setOwnerOrderNo(settleOrders.getOwnerOrderNo());
+            accountOwnerCostSettleDetail.setMemNo(settleOrders.getOwnerMemNo());
+            accountOwnerCostSettleDetail.setAmt(-ownerPlatFormOilService);
+            accountOwnerCostSettleDetail.setSourceCode(OwnerCashCodeEnum.OWNER_PLANT_OIL_SERVICE_FEE.getCashNo());
+            accountOwnerCostSettleDetail.setSourceDetail(OwnerCashCodeEnum.OWNER_PLANT_OIL_SERVICE_FEE.getTxt());
+            accountOwnerCostSettleDetails.add(accountOwnerCostSettleDetail);
+            //记录平台收益
+            AccountPlatformSubsidyDetailEntity entity = new AccountPlatformSubsidyDetailEntity();
+            entity.setOrderNo(settleOrders.getOrderNo());
+            entity.setSourceCode(OwnerCashCodeEnum.OWNER_PLANT_OIL_SERVICE_FEE.getCashNo());
+            entity.setSourceDesc(OwnerCashCodeEnum.OWNER_PLANT_OIL_SERVICE_FEE.getTxt());
+            entity.setAmt(ownerPlatFormOilService);
+            entity.setSubsidyName(SubsidySourceCodeEnum.OWNER.getDesc());
+            settleOrdersDefinition.addPlatformSubsidy(entity);
         }
         settleOrdersDefinition.setAccountOwnerCostSettleDetails(accountOwnerCostSettleDetails);
     }
