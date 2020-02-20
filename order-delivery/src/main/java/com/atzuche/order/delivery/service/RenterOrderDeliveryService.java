@@ -80,6 +80,16 @@ public class RenterOrderDeliveryService {
     }
 
     /**
+     * 根据子订单号和类型
+     * @param renterOrderNo
+     * @param type
+     * @return
+     */
+    public RenterOrderDeliveryEntity findRenterOrderByRenterOrderNoHistory(String renterOrderNo, Integer type) {
+        return renterOrderDeliveryMapper.findRenterOrderByRenterOrderNoHistory(renterOrderNo, type);
+    }
+
+    /**
      * 根据ID更新状态值(取消配送订单)
      * @param id
      * @return
