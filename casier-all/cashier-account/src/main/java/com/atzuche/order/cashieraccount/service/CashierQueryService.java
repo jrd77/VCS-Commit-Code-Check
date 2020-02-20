@@ -1,5 +1,8 @@
 package com.atzuche.order.cashieraccount.service;
 
+import com.atzuche.order.accountownerincome.entity.AccountOwnerIncomeDetailEntity;
+import com.atzuche.order.accountownerincome.entity.AccountOwnerIncomeExamineEntity;
+import com.atzuche.order.accountownerincome.service.AccountOwnerIncomeService;
 import com.atzuche.order.accountrenterdeposit.entity.AccountRenterDepositEntity;
 import com.atzuche.order.accountrenterdeposit.service.AccountRenterDepositService;
 import com.atzuche.order.accountrenterdeposit.service.notservice.AccountRenterDepositNoTService;
@@ -24,6 +27,7 @@ import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.commons.enums.cashier.PayTypeEnum;
 import com.atzuche.order.commons.enums.cashier.TransStatusEnum;
 import com.atzuche.order.commons.vo.DepostiDetailVO;
+import com.atzuche.order.commons.vo.res.account.income.AccountOwnerIncomeRealResVO;
 import com.autoyol.autopay.gateway.constant.DataPayKindConstant;
 import com.autoyol.platformcost.LocalDateTimeUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -54,6 +58,7 @@ public class CashierQueryService {
     @Autowired private AccountRenterDepositService accountRenterDepositService;
     @Autowired private AccountRenterCostDetailNoTService accountRenterCostDetailNoTService;
     @Autowired private AccountRenterCostSettleService accountRenterCostSettleService;
+    @Autowired private AccountOwnerIncomeService accountOwnerIncomeService;
 
 
     /**
@@ -164,5 +169,25 @@ public class CashierQueryService {
         return accountRenterCostSettleService.getCostPaidRent(orderNo,memNo);
     }
 
+    /**
+     * 查询订单  车主 真实收益和 待审核收益
+     * @param orderNo
+     * @return
+     */
+    public AccountOwnerIncomeRealResVO getOwnerRealIncomeByOrder(String orderNo){
+        AccountOwnerIncomeRealResVO resVO = new AccountOwnerIncomeRealResVO();
+        resVO.setOrderNo(orderNo);
+        List<AccountOwnerIncomeDetailEntity> accountOwnerIncomeDetails = accountOwnerIncomeService.getOwnerRealIncomeByOrder(orderNo);
+        if(!CollectionUtils.isEmpty(accountOwnerIncomeDetails)){
+            int incomeAmt = accountOwnerIncomeDetails.stream().mapToInt(AccountOwnerIncomeDetailEntity::getAmt).sum();
+            resVO.setIncomeAmt(incomeAmt);
+        }
+        List<AccountOwnerIncomeExamineEntity> accountOwnerIncomeExamines = accountOwnerIncomeService.getOwnerIncomeByOrder(orderNo);
+        if(!CollectionUtils.isEmpty(accountOwnerIncomeExamines)){
+            int incomeExamineAmt = accountOwnerIncomeExamines.stream().mapToInt(AccountOwnerIncomeExamineEntity::getAmt).sum();
+            resVO.setIncomeExamineAmt(incomeExamineAmt);
+        }
+        return resVO;
+    }
 
 }

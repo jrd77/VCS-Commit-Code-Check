@@ -1,5 +1,6 @@
 package com.atzuche.order.accountownerincome.service;
 
+import com.atzuche.order.accountownerincome.entity.AccountOwnerIncomeExamineEntity;
 import com.atzuche.order.accountownerincome.service.notservice.AccountOwnerIncomeDetailNoTService;
 import com.atzuche.order.accountownerincome.service.notservice.AccountOwnerIncomeExamineNoTService;
 import com.atzuche.order.accountownerincome.service.notservice.AccountOwnerIncomeNoTService;
@@ -12,6 +13,8 @@ import com.autoyol.commons.web.ErrorCode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
+
+import java.util.List;
 
 
 /**
@@ -68,8 +71,18 @@ public class AccountOwnerIncomeService{
     }
 
     /**
-     * 收益提现
+     * 查询订单车主收益，明细
      */
-    public void cashOwnerIncome() {
+    public List<AccountOwnerIncomeDetailEntity> getOwnerRealIncomeByOrder(String orderNo) {
+        List<AccountOwnerIncomeDetailEntity> list = accountOwnerIncomeDetailNoTService.selectByOrderNo(orderNo);
+        return list;
+    }
+
+    /**
+     * 查询订单车主收益待审核明细
+     */
+    public List<AccountOwnerIncomeExamineEntity> getOwnerIncomeByOrder(String orderNo) {
+        List<AccountOwnerIncomeExamineEntity> list = accountOwnerIncomeExamineNoTService.getAccountOwnerIncomeExamineByOrderNo(orderNo);
+        return list;
     }
 }
