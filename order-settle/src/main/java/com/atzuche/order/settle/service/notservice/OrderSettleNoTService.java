@@ -7,6 +7,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import com.atzuche.order.accountplatorm.entity.AccountPlatformProfitEntity;
+import com.atzuche.order.commons.enums.account.CostTypeEnum;
 import com.atzuche.order.commons.enums.cashier.PaySourceEnum;
 import com.atzuche.order.commons.service.OrderPayCallBack;
 import com.atzuche.order.delivery.service.delivery.DeliveryCarInfoPriceService;
@@ -697,6 +698,8 @@ public class OrderSettleNoTService {
                 accountOwnerCostSettleDetail.setSourceCode(renterOrderCostDetail.getSubsidyCostCode());
                 accountOwnerCostSettleDetail.setSourceDetail(renterOrderCostDetail.getSubsidyCostName());
                 accountOwnerCostSettleDetail.setUniqueNo(String.valueOf(renterOrderCostDetail.getId()));
+                CostTypeEnum costTypeEnum = getCostTypeEnumBySubsidy(renterOrderCostDetail.getSubsidySourceCode());
+                accountOwnerCostSettleDetail.setCostType(costTypeEnum.getCode());
                 int subsidyAmount = Objects.isNull(renterOrderCostDetail.getSubsidyAmount())?0:renterOrderCostDetail.getSubsidyAmount();
                 accountOwnerCostSettleDetail.setAmt(subsidyAmount);
                 accountOwnerCostSettleDetails.add(accountOwnerCostSettleDetail);
@@ -791,6 +794,8 @@ public class OrderSettleNoTService {
                 accountOwnerCostSettleDetail.setSourceCode(orderConsoleSubsidyDetail.getSubsidyCostCode());
                 accountOwnerCostSettleDetail.setSourceDetail(orderConsoleSubsidyDetail.getSubsidyCostName());
                 accountOwnerCostSettleDetail.setUniqueNo(String.valueOf(orderConsoleSubsidyDetail.getId()));
+                CostTypeEnum costTypeEnum = getCostTypeEnumBySubsidy(orderConsoleSubsidyDetail.getSubsidySourceCode());
+                accountOwnerCostSettleDetail.setCostType(costTypeEnum.getCode());
                 int subsidyAmount = Objects.isNull(orderConsoleSubsidyDetail.getSubsidyAmount())?0:orderConsoleSubsidyDetail.getSubsidyAmount();
                 accountOwnerCostSettleDetail.setAmt(subsidyAmount);
                 accountOwnerCostSettleDetail.setUniqueNo(String.valueOf(orderConsoleSubsidyDetail.getId()));
@@ -833,6 +838,8 @@ public class OrderSettleNoTService {
                 accountOwnerCostSettleDetail.setSourceDetail(consoleOwnerOrderFineDeatailEntity.getFineTypeDesc());
                 int fineAmount = Objects.isNull(consoleOwnerOrderFineDeatailEntity.getFineAmount())?0:consoleOwnerOrderFineDeatailEntity.getFineAmount();
                 accountOwnerCostSettleDetail.setAmt(fineAmount);
+                CostTypeEnum costTypeEnum = getCostTypeEnumByFine(consoleOwnerOrderFineDeatailEntity.getFineSubsidySourceCode());
+                accountOwnerCostSettleDetail.setCostType(costTypeEnum.getCode());
                 accountOwnerCostSettleDetail.setUniqueNo(String.valueOf(consoleOwnerOrderFineDeatailEntity.getId()));
                 accountOwnerCostSettleDetails.add(accountOwnerCostSettleDetail);
 
@@ -867,7 +874,8 @@ public class OrderSettleNoTService {
                 accountOwnerCostSettleDetail.setSourceCode(String.valueOf(ownerOrderFineDeatail.getFineType()));
                 accountOwnerCostSettleDetail.setSourceDetail(ownerOrderFineDeatail.getFineTypeDesc());
                 int fineAmount = Objects.isNull(ownerOrderFineDeatail.getFineAmount())?0:ownerOrderFineDeatail.getFineAmount();
-
+                CostTypeEnum costTypeEnum = getCostTypeEnumByFine(ownerOrderFineDeatail.getFineSubsidySourceCode());
+                accountOwnerCostSettleDetail.setCostType(costTypeEnum.getCode());
                 accountOwnerCostSettleDetail.setAmt(fineAmount);
                 accountOwnerCostSettleDetail.setUniqueNo(String.valueOf(ownerOrderFineDeatail.getId()));
                 accountOwnerCostSettleDetails.add(accountOwnerCostSettleDetail);
@@ -906,7 +914,8 @@ public class OrderSettleNoTService {
                 accountOwnerCostSettleDetail.setSourceCode(orderConsoleCostDetail.getSubsidyTypeCode());
                 accountOwnerCostSettleDetail.setSourceDetail(orderConsoleCostDetail.getSubsidTypeName());
                 int fineAmount = Objects.isNull(orderConsoleCostDetail.getSubsidyAmount())?0:orderConsoleCostDetail.getSubsidyAmount();
-
+                CostTypeEnum costTypeEnum = getCostTypeEnumByConsoleCost(orderConsoleCostDetail.getSubsidyTargetCode());
+                accountOwnerCostSettleDetail.setCostType(costTypeEnum.getCode());
                 accountOwnerCostSettleDetail.setAmt(fineAmount);
                 accountOwnerCostSettleDetail.setUniqueNo(String.valueOf(orderConsoleCostDetail.getId()));
                 accountOwnerCostSettleDetails.add(accountOwnerCostSettleDetail);
@@ -1030,6 +1039,8 @@ public class OrderSettleNoTService {
                     accountRenterCostSettleDetail.setCostDetail(renterOrderCostDetail.getSubsidyCostName());
                     accountRenterCostSettleDetail.setUniqueNo(String.valueOf(renterOrderCostDetail.getId()));
                     accountRenterCostSettleDetail.setAmt(renterOrderCostDetail.getSubsidyAmount());
+                    CostTypeEnum costTypeEnum = getCostTypeEnumBySubsidy(renterOrderCostDetail.getSubsidySourceCode());
+                    accountRenterCostSettleDetail.setType(costTypeEnum.getCode());
                     accountRenterCostSettleDetails.add(accountRenterCostSettleDetail);
                     // 平台补贴 记录补贴
                     if(SubsidySourceCodeEnum.PLATFORM.getCode().equals(renterOrderCostDetail.getSubsidyTargetCode())){
@@ -1066,6 +1077,8 @@ public class OrderSettleNoTService {
                     accountRenterCostSettleDetail.setCostDetail(renterOrderCostDetail.getFineTypeDesc());
                     accountRenterCostSettleDetail.setUniqueNo(String.valueOf(renterOrderCostDetail.getId()));
                     accountRenterCostSettleDetail.setAmt(renterOrderCostDetail.getFineAmount());
+                    CostTypeEnum costTypeEnum = getCostTypeEnumByFine(renterOrderCostDetail.getFineSubsidySourceCode());
+                    accountRenterCostSettleDetail.setType(costTypeEnum.getCode());
                     accountRenterCostSettleDetails.add(accountRenterCostSettleDetail);
                     //罚金来源方 是平台
                     int fineAmount = renterOrderCostDetail.getFineAmount();
@@ -1103,6 +1116,8 @@ public class OrderSettleNoTService {
                     accountRenterCostSettleDetail.setCostDetail(renterOrderCostDetail.getSubsidyCostName());
                     accountRenterCostSettleDetail.setUniqueNo(String.valueOf(renterOrderCostDetail.getId()));
                     accountRenterCostSettleDetail.setAmt(renterOrderCostDetail.getSubsidyAmount());
+                    CostTypeEnum costTypeEnum = getCostTypeEnumBySubsidy(renterOrderCostDetail.getSubsidySourceCode());
+                    accountRenterCostSettleDetail.setType(costTypeEnum.getCode());
                     accountRenterCostSettleDetails.add(accountRenterCostSettleDetail);
                     // 平台补贴 记录补贴
                     int subsidyAmount = renterOrderCostDetail.getSubsidyAmount();
@@ -1129,6 +1144,8 @@ public class OrderSettleNoTService {
                     accountRenterCostSettleDetail.setCostDetail(renterOrderCostDetail.getFineTypeDesc());
                     accountRenterCostSettleDetail.setUniqueNo(String.valueOf(renterOrderCostDetail.getId()));
                     accountRenterCostSettleDetail.setAmt(renterOrderCostDetail.getFineAmount());
+                    CostTypeEnum costTypeEnum = getCostTypeEnumByFine(renterOrderCostDetail.getFineSubsidySourceCode());
+                    accountRenterCostSettleDetail.setType(costTypeEnum.getCode());
                     accountRenterCostSettleDetails.add(accountRenterCostSettleDetail);
 
                     //罚金来源方 是平台
@@ -1166,6 +1183,8 @@ public class OrderSettleNoTService {
                     accountRenterCostSettleDetail.setCostDetail(renterOrderCostDetail.getSubsidTypeName());
                     accountRenterCostSettleDetail.setUniqueNo(String.valueOf(renterOrderCostDetail.getId()));
                     accountRenterCostSettleDetail.setAmt(renterOrderCostDetail.getSubsidyAmount());
+                    CostTypeEnum costTypeEnum = getCostTypeEnumByConsoleCost(renterOrderCostDetail.getSubsidySourceCode());
+                    accountRenterCostSettleDetail.setType(costTypeEnum.getCode());
                     accountRenterCostSettleDetails.add(accountRenterCostSettleDetail);
 
                     //罚金来源方 是平台
@@ -1195,7 +1214,43 @@ public class OrderSettleNoTService {
         }
         settleOrdersDefinition.setAccountRenterCostSettleDetails(accountRenterCostSettleDetails);
     }
+    public CostTypeEnum getCostTypeEnumByConsoleCost(String fineSubsidyCode){
+        CostTypeEnum costTypeEnum = CostTypeEnum.OWNER_CONSOLE_COST;
 
+        if(SubsidySourceCodeEnum.OWNER.getCode().equals(fineSubsidyCode)){
+            costTypeEnum = CostTypeEnum.OWNER_CONSOLE_COST;
+        }
+        if(SubsidySourceCodeEnum.RENTER.getCode().equals(fineSubsidyCode)){
+            costTypeEnum = CostTypeEnum.RENTER_CONSOLE_COST;
+        }
+        return costTypeEnum;
+    }
+    public CostTypeEnum getCostTypeEnumBySubsidy(String fineSubsidyCode){
+        CostTypeEnum costTypeEnum = CostTypeEnum.OWNER_SUBSIDY;
+        if(SubsidySourceCodeEnum.PLATFORM.getCode().equals(fineSubsidyCode)){
+            costTypeEnum = CostTypeEnum.CONSOLE_SUBSIDY;
+        }
+        if(SubsidySourceCodeEnum.OWNER.getCode().equals(fineSubsidyCode)){
+            costTypeEnum = CostTypeEnum.OWNER_SUBSIDY;
+        }
+        if(SubsidySourceCodeEnum.RENTER.getCode().equals(fineSubsidyCode)){
+            costTypeEnum = CostTypeEnum.RENTER_SUBSIDY;
+        }
+        return costTypeEnum;
+    }
+    public CostTypeEnum getCostTypeEnumByFine(String fineSubsidyCode){
+        CostTypeEnum costTypeEnum = CostTypeEnum.OWNER_FINE;
+        if(SubsidySourceCodeEnum.PLATFORM.getCode().equals(fineSubsidyCode)){
+            costTypeEnum = CostTypeEnum.CONSOLE_FINE;
+        }
+        if(SubsidySourceCodeEnum.OWNER.getCode().equals(fineSubsidyCode)){
+            costTypeEnum = CostTypeEnum.OWNER_FINE;
+        }
+        if(SubsidySourceCodeEnum.RENTER.getCode().equals(fineSubsidyCode)){
+            costTypeEnum = CostTypeEnum.RENTER_FINE;
+        }
+        return costTypeEnum;
+    }
     /**
      * 结算明细记录落库
      * @param settleOrdersDefinition
