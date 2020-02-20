@@ -10,6 +10,7 @@ import com.atzuche.order.commons.ResponseCheckUtil;
 import com.atzuche.order.commons.vo.req.AdminOrderReqVO;
 import com.atzuche.order.commons.vo.res.OrderResVO;
 import com.atzuche.order.open.service.FeignOrderAdminSubmitService;
+import com.atzuche.order.open.service.FeignOrderCostService;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
 import com.dianping.cat.Cat;
@@ -27,7 +28,7 @@ import javax.servlet.http.HttpServletRequest;
 public class OrderSubmitService {
 
     @Autowired
-    private FeignOrderAdminSubmitService feignOrderAdminSubmitService;
+    private FeignOrderCostService feignOrderAdminSubmitService;
 
     public OrderResVO submit(AdminTransReqVO adminOrderReqVO, HttpServletRequest request) throws Exception {
         //1、组装参数
