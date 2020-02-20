@@ -64,6 +64,11 @@ public class OwnerCosts {
      * 后台管理操作费用表（无条件补贴）
      */
     List<OrderConsoleCostDetailEntity> orderConsoleCostDetailEntity;
+
+    /**
+     * 平台加油服务费用
+     */
+    private int ownerPlatFormOilService;
     
     ///add huangjing  来源：SettleOrdersDefinition类字段。 200214
     private int ownerCostAmtFinal;

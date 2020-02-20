@@ -49,7 +49,6 @@
 	<insert id="insertSelective" parameterType="com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostSettleDetailEntity" useGeneratedKeys="true" keyProperty="id">
         insert into account_renter_cost_settle_detail
         <trim prefix="(" suffix=")" suffixOverrides="," >
-            <if test="id != null">`id`, </if>
             <if test="orderNo != null">`order_no`, </if>
             <if test="renterOrderNo != null">`renter_order_no`, </if>
             <if test="memNo != null">`mem_no`, </if>
@@ -65,7 +64,6 @@
             <if test="isDelete != null">`is_delete` </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides="," >
-            <if test="id != null">#{id},  </if>
             <if test="orderNo != null">#{orderNo},  </if>
             <if test="renterOrderNo != null">#{renterOrderNo},  </if>
             <if test="memNo != null">#{memNo},  </if>
