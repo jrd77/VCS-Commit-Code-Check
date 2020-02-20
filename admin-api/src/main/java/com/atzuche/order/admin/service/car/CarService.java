@@ -34,7 +34,7 @@ public class CarService {
         resVO.setGetCarAddr(carBaseVO.getGetCarAddr());
         resVO.setLicenseOwer(carBaseVO.getLicenseOwer());
         resVO.setLicenseModel(carBaseVO.getLicenseModel());
-        Date licenseExpire = carBaseVO.getLicenseExpire();
+        Date licenseExpire = carBaseVO.getLicenseExpireDate();
         if(licenseExpire!=null){
             resVO.setLicenseExpire(DateUtils.formate(licenseExpire, DateUtils.fmt_yyyyMMdd));
         }
