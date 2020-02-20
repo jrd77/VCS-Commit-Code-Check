@@ -285,7 +285,28 @@ public class DeliveryCarInfoPriceService {
                 return 25;
             }
         } catch (Exception e) {
-            log.info("获取平台加油服务费失败");
+            log.info("获取平台加油服务费失败",e);
+        }
+        return 0;
+    }
+
+
+    /**
+     * 车主平台加油服务费
+     *
+     * @return
+     */
+    public Integer getOwnerPlatFormOilServiceChargeByOrderNo(String orderNo) {
+        try {
+            List<OwnerHandoverCarInfoEntity> ownerHandoverCarInfoEntities = ownerHandoverCarService.selectOwnerByOrderNo(orderNo);
+            List<RenterHandoverCarInfoEntity> renterHandoverCarInfoEntities = renterHandoverCarService.selectRenterByOrderNo(orderNo);
+            int ownerReturnOil = ownerHandoverCarInfoEntities.stream().filter(r -> r.getType() == 4).findFirst().get().getOilNum();
+            int renterGetOil = renterHandoverCarInfoEntities.stream().filter(r -> r.getType() == 3).findFirst().get().getOilNum();
+            if (MathUtil.sub((ownerReturnOil / 16), 0.25d) <= 0 && renterGetOil > ownerReturnOil) {
+                return 25;
+            }
+        } catch (Exception e) {
+            log.info("获取平台加油服务费失败", e);
         }
         return 0;
     }

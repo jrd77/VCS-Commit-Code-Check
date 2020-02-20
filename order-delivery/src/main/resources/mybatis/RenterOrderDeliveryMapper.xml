@@ -318,7 +318,12 @@
 		from renter_order_delivery where renter_order_no = #{renterOrderNo}
 		and type = #{type} and is_delete = 0
 	</select>
-
+	<select id="findRenterOrderByRenterOrderNoHistory" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List"/>
+		from renter_order_delivery where renter_order_no = #{renterOrderNo}
+		and type = #{type}
+	</select>
 	<select id="findRenterOrderByrOrderNo" resultMap="BaseResultMap">
 		select
 		<include refid="Base_Column_List"/>

@@ -1013,7 +1013,7 @@ public class OrderDetailService {
 
                     //默认车辆显示地址,使用取车服务使用取车地址
                     orderHistoryDTO.addr = renterGoodsDetail.getCarShowAddr();
-                    RenterOrderDeliveryEntity renterOrderDeliveryEntity = renterOrderDeliveryService.findRenterOrderByRenterOrderNo(x.getRenterOrderNo(),DeliveryOrderTypeEnum.GET_CAR.getCode());
+                    RenterOrderDeliveryEntity renterOrderDeliveryEntity = renterOrderDeliveryService.findRenterOrderByRenterOrderNoHistory(x.getRenterOrderNo(),DeliveryOrderTypeEnum.GET_CAR.getCode());
                     if(null != renterOrderDeliveryEntity){
                         orderHistoryDTO.addr = renterOrderDeliveryEntity.getRenterGetReturnAddr();
                     }
