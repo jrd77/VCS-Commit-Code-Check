@@ -229,4 +229,34 @@ public class RabbitConfiguration {
 		return BindingBuilder.bind(orderEndQueue()).to(orderEndExchange()).with(RabbitMqEnums.ORDER_END.getRoutingKey());
 	}
 
+	@Bean
+	public Queue orderWzSettlementSuccessQueue() {
+		return new Queue(RabbitMqEnums.ORDER_WZ_SETTLEMENT_SUCCESS.getQueueName(), true);
+	}
+
+	@Bean
+	public TopicExchange orderWzSettlementSuccessExchange() {
+		return new TopicExchange(RabbitMqEnums.ORDER_WZ_SETTLEMENT_SUCCESS.getExchange());
+	}
+
+	@Bean
+	public Binding orderWzSettlementSuccessBind() {
+		return BindingBuilder.bind(orderWzSettlementSuccessQueue()).to(orderWzSettlementSuccessExchange()).with(RabbitMqEnums.ORDER_WZ_SETTLEMENT_SUCCESS.getRoutingKey());
+	}
+
+	@Bean
+	public Queue orderWzSettlementFailQueue() {
+		return new Queue(RabbitMqEnums.ORDER_WZ_SETTLEMENT_FAIL.getQueueName(), true);
+	}
+
+	@Bean
+	public TopicExchange orderWzSettlementFailExchange() {
+		return new TopicExchange(RabbitMqEnums.ORDER_WZ_SETTLEMENT_FAIL.getExchange());
+	}
+
+	@Bean
+	public Binding orderWzSettlementFailBind() {
+		return BindingBuilder.bind(orderWzSettlementFailQueue()).to(orderWzSettlementFailExchange()).with(RabbitMqEnums.ORDER_WZ_SETTLEMENT_FAIL.getRoutingKey());
+	}
+
 }
