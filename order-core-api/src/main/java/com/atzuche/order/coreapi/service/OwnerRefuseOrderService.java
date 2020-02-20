@@ -1,6 +1,7 @@
 package com.atzuche.order.coreapi.service;
 
 import com.atzuche.order.commons.LocalDateTimeUtils;
+import com.atzuche.order.commons.constant.OrderConstant;
 import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
 import com.atzuche.order.commons.enums.*;
 import com.atzuche.order.commons.vo.req.RefuseOrderReqVO;
@@ -89,7 +90,7 @@ public class OwnerRefuseOrderService {
      */
     public void refuse(RefuseOrderReqVO reqVO, DispatcherReasonEnum dispatcherReason) {
         //车主拒绝前置校验
-        boolean isConsoleInvoke = dispatcherReason.getCode() == DispatcherReasonEnum.timeout.getCode() || StringUtils.isNotBlank(reqVO.getOperatorName());
+        boolean isConsoleInvoke = dispatcherReason.getCode() == DispatcherReasonEnum.timeout.getCode() || (null != reqVO.getIsConsoleInvoke() && OrderConstant.YES == reqVO.getIsConsoleInvoke());
         refuseOrderCheckService.checkOwnerAgreeOrRefuseOrder(reqVO.getOrderNo(), isConsoleInvoke);
         //判断是都进入调度
         //获取订单信息
