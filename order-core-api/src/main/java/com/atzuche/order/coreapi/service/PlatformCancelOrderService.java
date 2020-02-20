@@ -12,6 +12,7 @@ import com.atzuche.order.parentorder.entity.OrderCancelReasonEntity;
 import com.atzuche.order.settle.service.OrderSettleService;
 import com.autoyol.event.rabbit.neworder.NewOrderMQActionEventEnum;
 import com.autoyol.event.rabbit.neworder.NewOrderMQStatusEventEnum;
+import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -79,7 +80,7 @@ public class PlatformCancelOrderService {
             }
         }
         //平台取消消息发送
-        orderActionMqService.sendCancelOrderSuccess(orderNo, CancelSourceEnum.PLATFORM, NewOrderMQActionEventEnum.ORDER_DELAY);
+        orderActionMqService.sendCancelOrderSuccess(orderNo, CancelSourceEnum.PLATFORM, NewOrderMQActionEventEnum.ORDER_DELAY, Maps.newHashMap());
         NewOrderMQStatusEventEnum newOrderMQStatusEventEnum = NewOrderMQStatusEventEnum.ORDER_END;
         if(cancelOrderRes.getStatus() == OrderStatusEnum.TO_DISPATCH.getStatus()) {
             newOrderMQStatusEventEnum = NewOrderMQStatusEventEnum.ORDER_PREDISPATCH;

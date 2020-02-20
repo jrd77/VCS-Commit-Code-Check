@@ -1,14 +1,10 @@
 package com.atzuche.order.coreapi.controller;
 
-import com.atzuche.order.commons.BindingResultUtil;
-import com.atzuche.order.commons.StringUtil;
 import com.atzuche.order.commons.vo.req.handover.rep.HandoverCarRespVO;
 import com.atzuche.order.commons.vo.req.handover.req.HandoverCarInfoReqVO;
 import com.atzuche.order.delivery.service.handover.HandoverCarInfoService;
 import com.atzuche.order.delivery.service.handover.HandoverCarService;
-import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
-import com.dianping.cat.Cat;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -43,9 +39,6 @@ public class HandoverCarOilController {
     public ResponseData<?> updateHandoverCarInfo(@RequestBody HandoverCarInfoReqVO handoverCarReqVO) {
 
         logger.info("updateHandoverCarInfo param is {}",handoverCarReqVO);
-        
-       // BindingResultUtil.checkBindingResult(bindingResult);
-
         handoverCarInfoService.updateHandoverCarInfo(handoverCarReqVO);
         return ResponseData.success();
 
