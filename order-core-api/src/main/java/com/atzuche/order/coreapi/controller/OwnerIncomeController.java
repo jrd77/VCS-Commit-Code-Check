@@ -28,7 +28,7 @@ public class OwnerIncomeController {
      * @return
      */
     @AutoDocMethod(value = "查询车主收益信息", description = "查询车主收益信息", response = AccountOwnerIncomeRealResVO.class)
-    @PostMapping("/getOwnerIncomeByOrder")
+    @GetMapping("/getOwnerIncomeByOrder")
     public ResponseData<AccountOwnerIncomeRealResVO> getOwnerIncomeByOrder(@RequestParam("orderNo") String orderNo) {
         log.info("OwnerIncomeController getOwnerIncomeByOrder start param [{}]", orderNo);
         AccountOwnerIncomeRealResVO resVO = cashierQueryService.getOwnerRealIncomeByOrder(orderNo);
