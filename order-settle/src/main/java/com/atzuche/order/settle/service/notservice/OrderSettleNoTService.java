@@ -215,8 +215,6 @@ public class OrderSettleNoTService {
             throw new OrderSettleFlatAccountException();
         }
 
-        // 2 校验订单状态 以及是否存在 理赔暂扣 存在不能进行结算 并CAT告警
-        this.check(renterOrder);
         // 3 初始化数据
 
         // 3.1获取租客子订单 和 租客会员号
@@ -234,6 +232,8 @@ public class OrderSettleNoTService {
         settleOrders.setOwnerMemNo(ownerMemNo);
         settleOrders.setRenterOrder(renterOrder);
         settleOrders.setOwnerOrder(ownerOrder);
+        // 2 校验订单状态 以及是否存在 理赔暂扣 存在不能进行结算 并CAT告警
+        this.check(renterOrder);
         return settleOrders;
     }
     /**
@@ -487,7 +487,12 @@ public class OrderSettleNoTService {
 
         //11后台管理操作费用表（无条件补贴）
         List<OrderConsoleCostDetailEntity> orderConsoleCostDetailEntity = orderConsoleCostDetailService.selectByOrderNoAndMemNo(settleOrders.getOrderNo(),settleOrders.getOwnerMemNo());
+        //12 加油服务费
+        RenterGoodsDetailDTO renterGoodsDetail = renterGoodsService.getRenterGoodsDetail(settleOrders.getRenterOrderNo(),Boolean.TRUE);
+        DeliveryOilCostVO deliveryOilCostRentVO = deliveryCarInfoPriceService.getOilCostByRenterOrderNo(settleOrders.getOrderNo(),renterGoodsDetail.getCarEngineType());
+        RenterGetAndReturnCarDTO renterGetAndReturnCarDTO = Objects.isNull(deliveryOilCostVO)?null:deliveryOilCostRentVO.getRenterGetAndReturnCarDTO();
 
+        int ownerPlatFormOilService = deliveryCarInfoPriceService.getOwnerPlatFormOilServiceCharge(Integer.valueOf(ownerGetAndReturnCarDTO.getGetCarOil().contains("L") ? ownerGetAndReturnCarDTO.getGetCarOil().replace("L", "") : ownerGetAndReturnCarDTO.getGetCarOil()), Integer.valueOf(renterGetAndReturnCarDTO.getGetCarOil().contains("L") ? renterGetAndReturnCarDTO.getGetCarOil().replace("L", "") : renterGetAndReturnCarDTO.getGetCarOil()));
         ownerCosts.setProxyExpense(proxyExpense);
         ownerCosts.setServiceExpense(serviceExpense);
         ownerCosts.setOwnerOrderSubsidyDetail(ownerOrderSubsidyDetail);
@@ -499,6 +504,7 @@ public class OrderSettleNoTService {
         ownerCosts.setConsoleOwnerOrderFineDeatailEntitys(consoleOwnerOrderFineDeatailEntitys);
         ownerCosts.setOwnerOrderFineDeatails(ownerOrderFineDeatails);
         ownerCosts.setOrderConsoleCostDetailEntity(orderConsoleCostDetailEntity);
+        ownerCosts.setOwnerPlatFormOilService(ownerPlatFormOilService);
         settleOrders.setOwnerCosts(ownerCosts);
     }
 
@@ -522,7 +528,7 @@ public class OrderSettleNoTService {
             		}
                 }
             }
-		
+
         return list;
     }
 
@@ -643,8 +649,8 @@ public class OrderSettleNoTService {
         }
 
 
-    }
 
+    }
     /**
      * 统计 车主结算费用明细， 补贴，费用总额
      * @param settleOrdersDefinition
@@ -893,7 +899,7 @@ public class OrderSettleNoTService {
                 }
             }
         }
-        //1.11
+        //1.11 平台无脑费用
         List<OrderConsoleCostDetailEntity> orderConsoleCostDetails = ownerCosts.getOrderConsoleCostDetailEntity();
         if(!CollectionUtils.isEmpty(orderConsoleCostDetails)){
             for(int i=0; i<orderConsoleCostDetails.size();i++){
@@ -932,7 +938,6 @@ public class OrderSettleNoTService {
                 }
             }
         }
-
         settleOrdersDefinition.setAccountOwnerCostSettleDetails(accountOwnerCostSettleDetails);
     }
 
