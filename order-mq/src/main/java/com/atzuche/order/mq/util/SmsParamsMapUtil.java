@@ -16,7 +16,6 @@ public class SmsParamsMapUtil {
 
     /**
      * 组装基础数据
-     *
      * @param orderNo    订单号
      * @param renterTextCodeFlag 租客textCode
      * @param ownerTextCodeFlag  车主textCode
