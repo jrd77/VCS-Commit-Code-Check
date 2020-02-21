@@ -134,6 +134,9 @@ public class DateUtils {
     }
 
     public static Date localDateTimeToDate(LocalDateTime time){
+        if(time == null){
+            return null;
+        }
         ZoneId zone = ZoneId.systemDefault();
         Instant instant = time.atZone(zone).toInstant();
         return Date.from(instant);

@@ -4,8 +4,11 @@ import com.atzuche.order.commons.enums.CancelSourceEnum;
 import com.atzuche.order.commons.enums.OrderStatusEnum;
 import com.atzuche.order.coreapi.service.mq.OrderActionMqService;
 import com.atzuche.order.coreapi.service.mq.OrderStatusMqService;
+import com.atzuche.order.mq.enums.ShortMessageTypeEnum;
+import com.atzuche.order.mq.util.SmsParamsMapUtil;
 import com.autoyol.event.rabbit.neworder.NewOrderMQActionEventEnum;
 import com.autoyol.event.rabbit.neworder.NewOrderMQStatusEventEnum;
+import com.google.common.collect.Maps;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,6 +26,8 @@ import com.atzuche.order.delivery.service.delivery.DeliveryCarService;
 import com.atzuche.order.delivery.vo.delivery.CancelOrderDeliveryVO;
 import com.atzuche.order.settle.service.OrderSettleService;
 import com.autoyol.car.api.model.dto.OwnerCancelDTO;
+
+import java.util.Map;
 
 /**
  * 订单取消操作
@@ -113,14 +118,15 @@ public class CancelOrderService {
         }
 
         //发送订单取消事件
+        Map map = Maps.newHashMap();
         CancelSourceEnum cancelSourceEnum = CancelSourceEnum.OWNER;
         NewOrderMQActionEventEnum actionEventEnum = NewOrderMQActionEventEnum.ORDER_FINISH;
         if(StringUtils.equals(MemRoleEnum.RENTER.getCode(), cancelOrderReqVO.getMemRole())) {
             cancelSourceEnum = CancelSourceEnum.RENTER;
             actionEventEnum = NewOrderMQActionEventEnum.ORDER_CANCEL;
+            map = SmsParamsMapUtil.getParamsMap(cancelOrderReqVO.getOrderNo(), ShortMessageTypeEnum.EXEMPT_PREORDER_AUTO_CANCEL_ORDER_2_RENTER.getValue(),ShortMessageTypeEnum.EXEMPT_PREORDER_AUTO_CANCEL_ORDER_2_OWNER.getValue(),null);
         }
-        orderActionMqService.sendCancelOrderSuccess(cancelOrderReqVO.getOrderNo(), cancelSourceEnum, actionEventEnum);
-
+        orderActionMqService.sendCancelOrderSuccess(cancelOrderReqVO.getOrderNo(), cancelSourceEnum, actionEventEnum,map);
         NewOrderMQStatusEventEnum newOrderMQStatusEventEnum = NewOrderMQStatusEventEnum.ORDER_END;
         if(res.getStatus() == OrderStatusEnum.TO_DISPATCH.getStatus()) {
             newOrderMQStatusEventEnum = NewOrderMQStatusEventEnum.ORDER_PREDISPATCH;
