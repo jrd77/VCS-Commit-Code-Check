@@ -20,6 +20,8 @@ import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.commons.enums.cashier.OrderRefundStatusEnum;
 import com.atzuche.order.commons.enums.cashier.TransStatusEnum;
 import com.atzuche.order.flow.service.OrderFlowService;
+import com.atzuche.order.mq.common.base.BaseProducer;
+import com.atzuche.order.mq.common.base.OrderMessage;
 import com.atzuche.order.parentorder.dto.OrderStatusDTO;
 import com.atzuche.order.parentorder.entity.OrderStatusEntity;
 import com.atzuche.order.parentorder.service.OrderStatusService;
@@ -53,6 +55,7 @@ import com.autoyol.autopay.gateway.vo.req.NotifyDataVo;
 import com.autoyol.autopay.gateway.vo.res.AutoPayResultVo;
 import com.autoyol.commons.utils.GsonUtils;
 import com.autoyol.commons.web.ErrorCode;
+import com.autoyol.event.rabbit.neworder.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -91,6 +94,8 @@ public class CashierService {
     @Autowired private AccountRenterCostSettleNoTService accountRenterCostSettleNoTService;
     @Autowired private CashierMapper cashierMapper;
     @Autowired private AccountRenterDetainService accountRenterDetainService;
+    @Autowired
+    private BaseProducer baseProducer;
 
     /**  *************************************** 租车费用 start****************************************************/
 
@@ -580,6 +585,7 @@ public class CashierService {
             //2 收银台记录更新
             cashierNoTService.updataCashierAndRenterDeposit(notifyDataVo,payedOrderRenterDeposit);
             vo.setDepositPayStatus(OrderPayStatusEnum.PAYED.getStatus());
+            sendOrderPayDepositSuccess(NewOrderMQActionEventEnum.RENTER_ORDER_PAYFEESUCCESS,2,vo);
         }
         //1.2 违章押金 02
         if(Objects.nonNull(notifyDataVo) && DataPayKindConstant.DEPOSIT.equals(notifyDataVo.getPayKind())){
@@ -588,6 +594,7 @@ public class CashierService {
             //2 收银台记录更新
             cashierNoTService.updataCashierAndRenterWzDeposit(notifyDataVo,payedOrderRenterWZDeposit);
             vo.setWzPayStatus(OrderPayStatusEnum.PAYED.getStatus());
+            sendOrderPayDepositSuccess(NewOrderMQActionEventEnum.RENTER_ORDER_PAYFEESUCCESS,1,vo);
         }
         //1.3 租车费用
         if(Objects.nonNull(notifyDataVo) && DataPayKindConstant.RENT_AMOUNT.equals(notifyDataVo.getPayKind()) ){
@@ -596,6 +603,7 @@ public class CashierService {
             //2 收银台记录更新
             cashierNoTService.updataCashierAndRenterCost(notifyDataVo,accountRenterCostReq);
             vo.setRentCarPayStatus(OrderPayStatusEnum.PAYED.getStatus());
+            sendOrderPayRentCostSuccess(NewOrderMQActionEventEnum.RENTER_ORDER_PAYSUCCESS,vo);
         }
         //1.4 补付租车费用
         if(Objects.nonNull(notifyDataVo) && DataPayKindConstant.RENT_INCREMENT.equals(notifyDataVo.getPayKind()) ){
@@ -605,12 +613,53 @@ public class CashierService {
             cashierNoTService.updataCashierAndRenterCost(notifyDataVo,accountRenterCostReq);
             vo.setRentCarPayStatus(OrderPayStatusEnum.PAYED.getStatus());
             vo.setIsPayAgain(YesNoEnum.YES.getCode());
+            sendOrderPayRentCostSuccess(NewOrderMQActionEventEnum.RENTER_ORDER_PAYSUCCESS,vo);
+
         }
 
-        //TODO 支付回调成功 push/或者短信 怎么处理
+
 
     }
-
+    /**
+     * 发送订单支付成功事件 （支付押金/违章押金成功）
+     * type 1 违章押金 2 车辆押金
+     */
+    public void sendOrderPayDepositSuccess(NewOrderMQActionEventEnum event,int type,OrderPayCallBackSuccessVO vo){
+        log.info("sendOrderPayDepositSuccess start [{}] ,[{}] ,[{}]",event,type,GsonUtils.toJson(vo));
+        OrderRenterPayAmtSuccessMq orderRenterPayAmtSuccessMq = new OrderRenterPayAmtSuccessMq();
+        orderRenterPayAmtSuccessMq.setOrderNo(vo.getOrderNo());
+        orderRenterPayAmtSuccessMq.setRenterMemNo(Integer.valueOf(vo.getMemNo()));
+        orderRenterPayAmtSuccessMq.setType(type);
+        OrderMessage orderMessage = OrderMessage.builder().build();
+        orderMessage.setMessage(orderRenterPayAmtSuccessMq);
+        log.info("发送订单支付成功事件 （支付押金/违章押金成功）.mq:,message=[{}]",event,
+                GsonUtils.toJson(orderMessage));
+        // TODO 需要发短信
+        try {
+            baseProducer.sendTopicMessage(event.exchange,event.routingKey,orderMessage);
+        } catch (Exception e) {
+            log.error("支付押金成功，但事件发送失败 error [{}] ,[{}] ,[{}],[{}]",event,type,GsonUtils.toJson(vo),e);
+        }
+    }
+    /**
+     * 发送订单支付成功事件 （租车费用）
+     */
+    public void sendOrderPayRentCostSuccess(NewOrderMQActionEventEnum event,OrderPayCallBackSuccessVO vo){
+        log.info("sendOrderPayRentCostSuccess start [{}] ,[{}]",event,GsonUtils.toJson(vo));
+        OrderRenterPaySuccessMq orderRenterPay = new OrderRenterPaySuccessMq();
+        orderRenterPay.setOrderNo(vo.getOrderNo());
+        orderRenterPay.setRenterMemNo(Integer.valueOf(vo.getMemNo()));
+        OrderMessage orderMessage = OrderMessage.builder().build();
+        orderMessage.setMessage(orderRenterPay);
+        log.info("发送订单支付成功事件 （支付押金/违章押金成功）.mq:,message=[{}]",event,
+                GsonUtils.toJson(orderMessage));
+        // TODO 需要发短信
+        try {
+            baseProducer.sendTopicMessage(event.exchange,event.routingKey,orderMessage);
+        } catch (Exception e) {
+            log.error("支付租车费用成功，但事件发送失败 error [{}] ,[{}] ,[{}]",event,GsonUtils.toJson(vo),e);
+        }
+    }
     /**
      * 当支付成功（当车辆押金，违章押金，租车费用都支付成功，更新订单状态 待取车），更新主订单状态待取车
      * @param orderStatusDTO
