@@ -180,16 +180,18 @@ public class CashierQueryService {
      * @param orderNo
      * @return
      */
-    public AccountOwnerIncomeRealResVO getOwnerRealIncomeByOrder(String orderNo){
+    public AccountOwnerIncomeRealResVO getOwnerRealIncomeByOrder(String orderNo,String memNo){
         AccountOwnerIncomeRealResVO resVO = new AccountOwnerIncomeRealResVO();
         resVO.setOrderNo(orderNo);
-        List<AccountOwnerIncomeDetailEntity> accountOwnerIncomeDetails = accountOwnerIncomeService.getOwnerRealIncomeByOrder(orderNo);
+        //查询收益审核后收益
+        List<AccountOwnerIncomeDetailEntity> accountOwnerIncomeDetails = accountOwnerIncomeService.getOwnerRealIncomeByOrder(orderNo,memNo);
         if(!CollectionUtils.isEmpty(accountOwnerIncomeDetails)){
             int incomeAmt = accountOwnerIncomeDetails.stream().mapToInt(AccountOwnerIncomeDetailEntity::getAmt).sum();
             resVO.setIncomeAmt(incomeAmt);
         }
         boolean exsitPassed = false;
-        List<AccountOwnerIncomeExamineEntity> accountOwnerIncomeExamines = accountOwnerIncomeService.getOwnerIncomeByOrder(orderNo);
+        //查询待审核收益
+        List<AccountOwnerIncomeExamineEntity> accountOwnerIncomeExamines = accountOwnerIncomeService.getOwnerIncomeByOrder(orderNo,memNo);
         if(!CollectionUtils.isEmpty(accountOwnerIncomeExamines)){
             int incomeExamineAmt = accountOwnerIncomeExamines.stream().mapToInt(AccountOwnerIncomeExamineEntity::getAmt).sum();
             resVO.setIncomeExamineAmt(incomeExamineAmt);
@@ -200,7 +202,7 @@ public class CashierQueryService {
         }
 
         //查询车主罚金
-        List<AccountOwnerCostSettleDetailEntity> accountOwnerCostSettleDetails = accountOwnerCostSettleDetailNoTService.getAccountOwnerCostSettleDetails(orderNo);
+        List<AccountOwnerCostSettleDetailEntity> accountOwnerCostSettleDetails = accountOwnerCostSettleDetailNoTService.getAccountOwnerCostSettleDetails(orderNo,memNo);
         // 车主结算记录存在 且 车主收益 已审核通过  返回  罚金 金额
         if(!CollectionUtils.isEmpty(accountOwnerCostSettleDetails) && exsitPassed){
             int cancelFineAmt =  accountOwnerCostSettleDetails.stream().filter(obj ->{

@@ -2,6 +2,7 @@ package com.atzuche.order.cashieraccount.service;
 
 import com.atzuche.order.accountownercost.entity.AccountOwnerCostSettleDetailEntity;
 import com.atzuche.order.accountownercost.service.notservice.AccountOwnerCostSettleDetailNoTService;
+import com.atzuche.order.accountownerincome.entity.AccountOwnerIncomeExamineEntity;
 import com.atzuche.order.accountrenterdeposit.vo.res.AccountRenterDepositResVO;
 import com.atzuche.order.accountrenterdetain.service.AccountRenterDetainService;
 import com.atzuche.order.accountrenterdetain.vo.req.ChangeDetainRenterDepositReqVO;
@@ -19,6 +20,9 @@ import com.atzuche.order.commons.enums.YesNoEnum;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.commons.enums.cashier.OrderRefundStatusEnum;
 import com.atzuche.order.commons.enums.cashier.TransStatusEnum;
+import com.atzuche.order.commons.vo.req.income.AccountOwnerIncomeExamineOpReqVO;
+import com.atzuche.order.commons.vo.req.income.AccountOwnerIncomeExamineReqVO;
+import com.atzuche.order.commons.vo.res.account.income.AdjustOwnerIncomeResVO;
 import com.atzuche.order.flow.service.OrderFlowService;
 import com.atzuche.order.mq.common.base.BaseProducer;
 import com.atzuche.order.mq.common.base.OrderMessage;
@@ -32,8 +36,7 @@ import com.atzuche.order.settle.vo.req.AccountDeductDebtReqVO;
 import com.atzuche.order.settle.vo.req.AccountInsertDebtReqVO;
 import com.atzuche.order.settle.vo.res.AccountDebtResVO;
 import com.atzuche.order.accountownerincome.service.AccountOwnerIncomeService;
-import com.atzuche.order.accountownerincome.vo.req.AccountOwnerIncomeExamineOpReqVO;
-import com.atzuche.order.accountownerincome.vo.req.AccountOwnerIncomeExamineReqVO;
+
 import com.atzuche.order.accountrenterdeposit.service.AccountRenterDepositService;
 import com.atzuche.order.accountrenterdeposit.vo.req.CreateOrderRenterDepositReqVO;
 import com.atzuche.order.accountrenterdeposit.vo.req.DetainRenterDepositReqVO;
@@ -465,8 +468,19 @@ public class CashierService {
     /**
      * 收益审核通过 更新车主收益信息
      */
-    public void examineOwnerIncomeExamine(AccountOwnerIncomeExamineOpReqVO accountOwnerIncomeExamineOpReq){
-        accountOwnerIncomeService.examineOwnerIncomeExamine(accountOwnerIncomeExamineOpReq);
+    public AdjustOwnerIncomeResVO examineOwnerIncomeExamine(AccountOwnerIncomeExamineOpReqVO accountOwnerIncomeExamineOpReq){
+        AdjustOwnerIncomeResVO vo = new  AdjustOwnerIncomeResVO();
+        BeanUtils.copyProperties(accountOwnerIncomeExamineOpReq,vo);
+        int id = accountOwnerIncomeService.examineOwnerIncomeExamine(accountOwnerIncomeExamineOpReq);
+        vo.setAccountOwnerIncomeDetailId(id);
+        return vo;
+    }
+
+    /**
+     * 查询收益信息
+     */
+    public List<AccountOwnerIncomeExamineEntity> getOwnerIncomeByOrderAndType(String orderNo, String memNo, int type){
+        return accountOwnerIncomeService.getOwnerIncomeByOrderAndType(orderNo,memNo,type);
     }
 
 

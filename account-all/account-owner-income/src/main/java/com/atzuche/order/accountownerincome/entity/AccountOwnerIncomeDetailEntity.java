@@ -44,7 +44,7 @@ public class AccountOwnerIncomeDetailEntity implements Serializable {
 	/**
 	 * 收益费用编码
 	 */
-	private Integer costCode;
+	private String costCode;
 	/**
 	 * 收益费用编码描述
 	 */
