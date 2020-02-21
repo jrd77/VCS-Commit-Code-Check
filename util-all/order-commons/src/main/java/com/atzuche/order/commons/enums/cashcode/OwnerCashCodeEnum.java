@@ -18,6 +18,8 @@ public enum OwnerCashCodeEnum {
 	OWNER_MODIFY_SRV_ADDR_COST("22010008","车主修改取还车地址总费用"),
 	SRV_GET_COST_OWNER("22010009","车主取车服务费"),
 	SRV_RETURN_COST_OWNER("22010010","车主还车服务费"),
+    OWNER_PLANT_OIL_SERVICE_FEE("22010011","平台加油服务费"),
+
 //    OWNER_RENTER_PRICE("22020041","租客车主相互调价"),  //????
 
 
@@ -31,7 +33,7 @@ public enum OwnerCashCodeEnum {
     OWNER_INCOME_SUBSIDY("22120007","车主收益补贴"),
     OWNER_WASH_CAR_SUBSIDY("22120008","车主洗车补贴"),
     OWNER_OTHER_SUBSIDY("22120009","其他补贴"),
-    
+
     
     
     //第三区域块 看第4位，从3开始。  后4位从0001开始    后面是以此类推，确保费用编码不能重复。
@@ -45,7 +47,7 @@ public enum OwnerCashCodeEnum {
     ACCOUNT_OWNER_INCREMENT_COST("21130008","车主增值服务费用"),
     ACCOUNT_OWNER_GPS_COST("21130009","gps服务费"),
     ACCOUNT_OWNER_SETTLE_OIL_COST("21130010","车主油费"),
-    
+
 
   //第四区域块 看第4位，从4开始。  后4位从0001开始    后面是以此类推，确保费用编码不能重复。
 	;

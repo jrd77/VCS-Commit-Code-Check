@@ -3,6 +3,9 @@ package com.atzuche.order.cashieraccount.service;
 import java.util.List;
 import java.util.Objects;
 
+import com.atzuche.order.accountrenterdeposit.vo.res.AccountRenterDepositResVO;
+import com.atzuche.order.commons.enums.SubsidySourceCodeEnum;
+import com.atzuche.order.commons.enums.account.CostTypeEnum;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -182,11 +185,11 @@ public class CashierSettleService {
         if(!CollectionUtils.isEmpty(accountRenterCostSettleDetails)){
             // 平台补贴费用
             int platformSubsidyAmount = accountRenterCostSettleDetails.stream().filter(obj ->{
-                return RenterCashCodeEnum.ACCOUNT_CONSOLE_RENTER_SUBSIDY_COST.getCashNo().equals(obj.getCostCode());
+                return CostTypeEnum.CONSOLE_SUBSIDY.getCode().equals(obj.getType());
             }).mapToInt(AccountRenterCostSettleDetailEntity::getAmt).sum();
             //车主补贴费用
             int carOwnerSubsidyAmount = accountRenterCostSettleDetails.stream().filter(obj ->{
-                return RenterCashCodeEnum.ACCOUNT_RENTER_SUBSIDY_COST.getCashNo().equals(obj.getCostCode());
+                return CostTypeEnum.OWNER_SUBSIDY.getCode().equals(obj.getType());
             }).mapToInt(AccountRenterCostSettleDetailEntity::getAmt).sum();
             //附加驾驶人保证费用
             int additionalDrivingEnsureAmount = accountRenterCostSettleDetails.stream().filter(obj ->{
@@ -219,7 +222,7 @@ public class CashierSettleService {
 
 
     }
-    
+
     /**
      * 计算租客 租车费用  平台补贴费用  车主补贴费用 手续费 基础保障费用 等 并落库
      * @param account_renter_wz_deposit_cost
@@ -230,7 +233,7 @@ public class CashierSettleService {
     	if(Objects.isNull(depositEntity) || Objects.isNull(depositEntity.getId())){
             throw new RenterWZDepositCostException() ;
         }
-    	
+
     	AccountRenterWzDepositCostEntity entity = accountRenterWzDepositCostNoTService.queryWzDeposit(orderNo,renterMemNo);
         if(Objects.isNull(entity) || Objects.isNull(entity.getId())){
 //            throw new AccountRenterRentCostSettleException() ;
@@ -241,7 +244,7 @@ public class CashierSettleService {
         	entity.setShifuAmt(depositEntity.getShishouDeposit()); //需要获取实付金额
         	entity.setDebtAmt(0); //当前默认为0，后续产生欠款的时候，需要回写该字段。
         	entity.setIsDelete(0);
-        	
+
         	//新增记录
         	accountRenterWzDepositCostNoTService.insertAccountRenterWzDepositCost(entity);
         }else {
@@ -257,7 +260,7 @@ public class CashierSettleService {
 
 
     }
-    
+
 
     /**
      * 结算返回租客 实付车辆押金
@@ -298,7 +301,7 @@ public class CashierSettleService {
         entity.setUniqueNo(String.valueOf(renterDepositDetailId));
         insertAccountRenterCostSettleDetail(entity);
     }
-    
+
     /**
      * 结算时候，应付金额大于实付金额，存在欠款，车辆押金抵扣
      */
@@ -308,7 +311,7 @@ public class CashierSettleService {
         BeanUtils.copyProperties(vo,detainRenterDepositReqVO);
         detainRenterDepositReqVO.setRenterCashCodeEnum(RenterCashCodeEnum.SETTLE_WZ_DEPOSIT_TO_WZ_COST);
         int renterDepositDetailId = accountRenterWzDepositService.detainRenterDeposit(detainRenterDepositReqVO);
-        
+
         //2 记录 更新 租客户头 租车费用
         AccountRenterWzCostDetailReqVO accountRenterCostChangeReqVO = new AccountRenterWzCostDetailReqVO();
         BeanUtils.copyProperties(detainRenterDepositReqVO,accountRenterCostChangeReqVO);
@@ -316,10 +319,10 @@ public class CashierSettleService {
         accountRenterCostChangeReqVO.setAmt(Math.abs(vo.getAmt()));
         accountRenterCostChangeReqVO.setRenterCashCodeEnum(RenterCashCodeEnum.ACCOUNT_RENTER_WZ_DEPOSIT);
         int rentCostDetailId = accountRenterWzDepositCostService.deductDepositToRentCost(accountRenterCostChangeReqVO);
-   
+
         //3 更新押金流水 UniqueNo 字段
         accountRenterWzDepositService.updateRenterDepositUniqueNo(String.valueOf(rentCostDetailId),renterDepositDetailId);
-        
+
         //wzTotalCost-todo
         // 4 租客结算费用明细 落库  account_renter_wz_deposit_cost_settle_detail 表结构不同。。 先记入费用总表
         AccountRenterCostSettleDetailEntity entity = new AccountRenterCostSettleDetailEntity();
@@ -330,9 +333,9 @@ public class CashierSettleService {
         entity.setUniqueNo(String.valueOf(renterDepositDetailId));
         entity.setType(10); //默认10
         insertAccountRenterCostSettleDetail(entity);
-        
+
     }
-    
+
 
     /**
      * 根据订单号 和会员号 查询 订单 钱包支付租车费用金额
@@ -361,8 +364,9 @@ public class CashierSettleService {
             int serviceExpenseAmt =accountOwnerCostSettleDetails.stream().filter(obj ->{return OwnerCashCodeEnum.ACCOUNT_OWNER_SERVICE_EXPENSE_COST.getCashNo().equals(obj.getSourceCode());})
                     .mapToInt(AccountOwnerCostSettleDetailEntity::getAmt).sum();
             //3获取车主补贴
-            int subsidyAmount =accountOwnerCostSettleDetails.stream().filter(obj ->{return OwnerCashCodeEnum.ACCOUNT_OWNER_SUBSIDY_COST.getCashNo().equals(obj.getSourceCode());})
-                    .mapToInt(AccountOwnerCostSettleDetailEntity::getAmt).sum();
+            int subsidyAmount =accountOwnerCostSettleDetails.stream().filter(obj ->{
+                return CostTypeEnum.OWNER_SUBSIDY.getCode().equals(obj.getCostType());
+            }).mapToInt(AccountOwnerCostSettleDetailEntity::getAmt).sum();
             //4获取车主费用
             int purchaseAmt =accountOwnerCostSettleDetails.stream().filter(obj ->{return OwnerCashCodeEnum.ACCOUNT_OWNER_DEBT.getCashNo().equals(obj.getSourceCode());})
                     .mapToInt(AccountOwnerCostSettleDetailEntity::getAmt).sum();
@@ -370,17 +374,24 @@ public class CashierSettleService {
             int incrementAmt =accountOwnerCostSettleDetails.stream().filter(obj ->{return OwnerCashCodeEnum.ACCOUNT_OWNER_INCREMENT_COST.getCashNo().equals(obj.getSourceCode());})
                     .mapToInt(AccountOwnerCostSettleDetailEntity::getAmt).sum();
             //6 获取gps服务费
-            int gpsAmt =accountOwnerCostSettleDetails.stream().filter(obj ->{return OwnerCashCodeEnum.ACCOUNT_OWNER_GPS_COST.getCashNo().equals(obj.getSourceCode());})
+            int gpsAmt =accountOwnerCostSettleDetails.stream().filter(obj ->{return OwnerCashCodeEnum.GPS_SERVICE_AMT.getCashNo().equals(obj.getSourceCode());})
                     .mapToInt(AccountOwnerCostSettleDetailEntity::getAmt).sum();
             //7 获取车主油费
             int oilAmt =accountOwnerCostSettleDetails.stream().filter(obj ->{return OwnerCashCodeEnum.ACCOUNT_OWNER_SETTLE_OIL_COST.getCashNo().equals(obj.getSourceCode());})
                     .mapToInt(AccountOwnerCostSettleDetailEntity::getAmt).sum();
             //8 管理后台补贴
-            int consoleSubsidyAmt =accountOwnerCostSettleDetails.stream().filter(obj ->{return RenterCashCodeEnum.ACCOUNT_CONSOLE_RENTER_SUBSIDY_COST.getCashNo().equals(obj.getSourceCode());})
-                    .mapToInt(AccountOwnerCostSettleDetailEntity::getAmt).sum();
+            int consoleSubsidyAmt =accountOwnerCostSettleDetails.stream().filter(obj ->{
+                return CostTypeEnum.CONSOLE_SUBSIDY.getCode().equals(obj.getCostType());
+            }).mapToInt(AccountOwnerCostSettleDetailEntity::getAmt).sum();
             //9 全局的车主订单罚金明细
-            int consoleFineAmt =accountOwnerCostSettleDetails.stream().filter(obj ->{return OwnerCashCodeEnum.ACCOUNT_WHOLE_RENTER_FINE_COST.getCashNo().equals(obj.getSourceCode());})
-                    .mapToInt(AccountOwnerCostSettleDetailEntity::getAmt).sum();
+            int consoleFineAmt =accountOwnerCostSettleDetails.stream().filter(obj ->{
+                return CostTypeEnum.CONSOLE_FINE.getCode().equals(obj.getCostType());
+            }).mapToInt(AccountOwnerCostSettleDetailEntity::getAmt).sum();
+            //车主罚金
+            int fineAmt =accountOwnerCostSettleDetails.stream().filter(obj ->{
+                return CostTypeEnum.OWNER_FINE.getCode().equals(obj.getCostType());
+            }).mapToInt(AccountOwnerCostSettleDetailEntity::getAmt).sum();
+
             entity.setProxyExpenseAmt(proxyExpenseAmt);
             entity.setServiceExpenseAmt(serviceExpenseAmt);
             entity.setSubsidyAmt(subsidyAmount);
@@ -390,6 +401,7 @@ public class CashierSettleService {
             entity.setOilAmt(oilAmt);
             entity.setConsoleSubsidyAmt(consoleSubsidyAmt);
             entity.setConsoleFineAmt(consoleFineAmt);
+            entity.setFineAmt(fineAmt);
             log.info("OrderSettleService insertAccountOwnerCostSettle [{}]", GsonUtils.toJson(entity));
             Cat.logEvent("insertAccountOwnerCostSettle",GsonUtils.toJson(entity));
             accountOwnerCostSettleService.insertAccountOwnerCostSettle(entity);
