@@ -28,6 +28,11 @@ public class AccountOwnerIncomeExamineEntity implements Serializable {
 	 * 主订单号
 	 */
 	private String orderNo;
+
+    /**
+     * 主订单号
+     */
+    private String ownerOrderNo;
 	/**
 	 * 收益审核金额
 	 */
