@@ -7,6 +7,7 @@
         <result property="id" column="id"/>
         <result property="memNo" column="mem_no"/>
         <result property="orderNo" column="order_no"/>
+        <result property="ownerOrderNo" column="owner_order_no"/>
         <result property="amt" column="amt"/>
         <result property="time" column="time"/>
         <result property="detail" column="detail"/>
@@ -27,8 +28,9 @@
 	<sql id="Base_Column_List">
 	`id`, 	
 	`mem_no`, 	
-	`order_no`, 	
-	`amt`, 	
+	`order_no`,
+	`owner_order_no`,
+	`amt`,
 	`time`, 	
 	`detail`, 	
 	`cost_code`, 	
@@ -55,6 +57,7 @@
         <trim prefix="(" suffix=")" suffixOverrides="," >
             <if test="memNo != null">`mem_no`, </if>
             <if test="orderNo != null">`order_no`, </if>
+            <if test="ownerOrderNo != null">`owner_order_no`, </if>
             <if test="amt != null">`amt`, </if>
             <if test="time != null">`time`, </if>
             <if test="detail != null">`detail`, </if>
@@ -73,6 +76,7 @@
         <trim prefix="values (" suffix=")" suffixOverrides="," >
             <if test="memNo != null">#{memNo},  </if>
             <if test="orderNo != null">#{orderNo},  </if>
+            <if test="ownerOrderNo != null">#{ownerOrderNo},  </if>
             <if test="amt != null">#{amt},  </if>
             <if test="time != null">#{time},  </if>
             <if test="detail != null">#{detail},  </if>
