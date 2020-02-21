@@ -19,6 +19,7 @@ import com.atzuche.order.cashieraccount.vo.req.DeductDepositToRentCostReqVO;
 import com.atzuche.order.cashieraccount.vo.res.CashierDeductDebtResVO;
 import com.atzuche.order.commons.enums.OrderStatusEnum;
 import com.atzuche.order.commons.enums.SysOrHandEnum;
+import com.atzuche.order.commons.enums.account.SettleStatusEnum;
 import com.atzuche.order.commons.enums.account.debt.DebtTypeEnum;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.commons.enums.cashier.OrderRefundStatusEnum;
@@ -104,7 +105,7 @@ public class OrderWzSettleNoTService {
     public void check(RenterOrderEntity renterOrder) {
         // 1 订单校验是否可以结算
         OrderStatusEntity orderStatus = orderStatusService.getByOrderNo(renterOrder.getOrderNo());
-        if(OrderStatusEnum.TO_WZ_SETTLE.getStatus() != orderStatus.getStatus()){
+        if(OrderStatusEnum.TO_WZ_SETTLE.getStatus() != orderStatus.getStatus() || SettleStatusEnum.SETTLEING.getCode() !=  orderStatus.getWzSettleStatus()){
             throw new RuntimeException("租客订单状态不是待结算，不能结算");
         }
         //3 校验是否存在 理赔  存在不结算  这个跟违章是一起的。
