@@ -1,12 +1,14 @@
 package com.atzuche.order.accountrenterwzdepost.service.notservice;
 
-import com.atzuche.order.accountrenterwzdepost.entity.AccountRenterWzDepositCostDetailEntity;
-import com.atzuche.order.accountrenterwzdepost.exception.RenterWZDepositCostException;
-import com.atzuche.order.accountrenterwzdepost.vo.req.RenterWZDepositCostReqVO;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import com.atzuche.order.accountrenterwzdepost.entity.AccountRenterWzDepositCostDetailEntity;
+import com.atzuche.order.accountrenterwzdepost.exception.RenterWZDepositCostException;
 import com.atzuche.order.accountrenterwzdepost.mapper.AccountRenterWzDepositCostDetailMapper;
+import com.atzuche.order.accountrenterwzdepost.vo.req.AccountRenterWzCostDetailReqVO;
+import com.atzuche.order.accountrenterwzdepost.vo.req.RenterWZDepositCostReqVO;
 
 
 /**
@@ -36,4 +38,18 @@ public class AccountRenterWzDepositCostDetailNoTService {
         }
 
     }
+
+
+	public int insertAccountRenterCostDetail(AccountRenterWzCostDetailReqVO accountRenterCostDetailReqVO) {
+		AccountRenterWzDepositCostDetailEntity accountRenterCostDetail = new AccountRenterWzDepositCostDetailEntity();
+        BeanUtils.copyProperties(accountRenterCostDetailReqVO,accountRenterCostDetail);
+        accountRenterCostDetail.setSourceCode(accountRenterCostDetailReqVO.getRenterCashCodeEnum().getCashNo());
+        accountRenterCostDetail.setSourceDetail(accountRenterCostDetailReqVO.getRenterCashCodeEnum().getTxt());
+        int result = accountRenterWzDepositCostDetailMapper.insertSelective(accountRenterCostDetail);
+        if(result==0){
+            throw new RenterWZDepositCostException();
+        }
+        return accountRenterCostDetail.getId();
+	}
+	
 }

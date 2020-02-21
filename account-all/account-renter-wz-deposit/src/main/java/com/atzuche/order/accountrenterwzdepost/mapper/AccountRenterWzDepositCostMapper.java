@@ -23,5 +23,5 @@ public interface AccountRenterWzDepositCostMapper{
 
     AccountRenterWzDepositCostEntity getWZDepositCostAmt(@Param("orderNo") String orderNo,@Param("memNo") String memNo);
 
-    AccountRenterWzDepositCostEntity selectByOrderNo(@Param("orderNo") String orderNo);
+    AccountRenterWzDepositCostEntity selectByOrderNo(@Param("orderNo") String orderNo,@Param("memNo") String memNo);
 }

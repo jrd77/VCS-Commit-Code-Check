@@ -1,14 +1,14 @@
 package com.atzuche.order.accountrenterwzdepost.service;
 
-import com.atzuche.order.accountrenterwzdepost.service.notservice.AccountRenterWzDepositCostDetailNoTService;
-import com.atzuche.order.accountrenterwzdepost.service.notservice.AccountRenterWzDepositCostNoTService;
-import com.atzuche.order.accountrenterwzdepost.service.notservice.AccountRenterWzDepositCostSettleDetailNoTService;
-import com.atzuche.order.accountrenterwzdepost.vo.req.RenterWZDepositCostReqVO;
-import com.autoyol.commons.web.ErrorCode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.atzuche.order.accountrenterwzdepost.mapper.AccountRenterWzDepositCostMapper;
 import org.springframework.util.Assert;
+
+import com.atzuche.order.accountrenterwzdepost.service.notservice.AccountRenterWzDepositCostDetailNoTService;
+import com.atzuche.order.accountrenterwzdepost.service.notservice.AccountRenterWzDepositCostNoTService;
+import com.atzuche.order.accountrenterwzdepost.vo.req.AccountRenterWzCostDetailReqVO;
+import com.atzuche.order.accountrenterwzdepost.vo.req.RenterWZDepositCostReqVO;
+import com.autoyol.commons.web.ErrorCode;
 
 
 /**
@@ -37,4 +37,8 @@ public class AccountRenterWzDepositCostService{
         //3 记录违章费用账户费用流水
         accountRenterWzDepositCostDetailNoTService.insertCostDetail(renterWZDepositCost);
     }
+
+	public int deductDepositToRentCost(AccountRenterWzCostDetailReqVO accountRenterCostChangeReqVO) {
+		return accountRenterWzDepositCostDetailNoTService.insertAccountRenterCostDetail(accountRenterCostChangeReqVO);
+	}
 }
