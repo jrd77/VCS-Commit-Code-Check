@@ -97,7 +97,7 @@
         select
         <include refid="Base_Column_List"/>
         from account_owner_income_detail
-        where order_no=#{orderNo}
+        where order_no=#{orderNo} and mem_no=#{memNo}
         and is_delete = 0
     </select>
 

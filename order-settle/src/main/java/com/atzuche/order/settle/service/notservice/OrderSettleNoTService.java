@@ -234,14 +234,14 @@ public class OrderSettleNoTService {
         settleOrders.setRenterOrder(renterOrder);
         settleOrders.setOwnerOrder(ownerOrder);
         // 2 校验订单状态 以及是否存在 理赔暂扣 存在不能进行结算 并CAT告警
-        this.check(renterOrder);
+        this.check(renterOrder,settleOrders);
         return settleOrders;
     }
     /**
      * 校验是否可以结算 校验订单状态 以及是否存在 理赔暂扣 存在不能进行结算 并CAT告警
      * @param renterOrder
      */
-    public void check(RenterOrderEntity renterOrder) {
+    public void check(RenterOrderEntity renterOrder,SettleOrders settleOrders) {
         // 1 订单校验是否可以结算
         OrderStatusEntity orderStatus = orderStatusService.getByOrderNo(renterOrder.getOrderNo());
         if(OrderStatusEnum.TO_SETTLE.getStatus() != orderStatus.getStatus()){
@@ -265,7 +265,7 @@ public class OrderSettleNoTService {
 //            throw new RuntimeException("租客存在暂扣信息不能结算");
 //        }
         //4 先查询  发现 有结算数据停止结算 手动处理
-        orderSettleNewService.checkIsSettle(renterOrder.getOrderNo());
+        orderSettleNewService.checkIsSettle(renterOrder.getOrderNo(),settleOrders);
     }
 
     /**

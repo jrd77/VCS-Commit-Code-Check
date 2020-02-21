@@ -71,8 +71,8 @@ public class AccountOwnerIncomeExamineNoTService {
        return accountOwnerIncomeExamineMapper.selectByPrimaryKey(accountOwnerIncomeExamineId);
     }
     
-    public List<AccountOwnerIncomeExamineEntity> getAccountOwnerIncomeExamineByOrderNo(String orderNo) {
-        return accountOwnerIncomeExamineMapper.selectByOrderNo(orderNo);
+    public List<AccountOwnerIncomeExamineEntity> getAccountOwnerIncomeExamineByOrderNo(String orderNo,String memNo) {
+        return accountOwnerIncomeExamineMapper.selectByOrderNo(orderNo,memNo);
      }
 
 	public Integer getTotalAccountOwnerIncomeExamineByOrderNo(String orderNo) {

@@ -49,7 +49,7 @@
 	</select>
 	
 	<select id="selectByOrderNo" resultMap="BaseResultMap">
-		select <include refid="Base_Column_List" /> from account_owner_income_examine where order_no = #{orderNo} and is_delete = 0
+		select <include refid="Base_Column_List" /> from account_owner_income_examine where order_no = #{orderNo} and mem_no = #{memNo} and is_delete = 0
 	</select>
 	
 	<select id="getTotalAccountOwnerIncomeExamineByOrderNo" resultType="java.lang.Integer">

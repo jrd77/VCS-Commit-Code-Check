@@ -2,6 +2,7 @@ package com.atzuche.order.accountownerincome.mapper;
 
 import com.atzuche.order.accountownerincome.entity.AccountOwnerIncomeExamineEntity;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -18,7 +19,7 @@ public interface AccountOwnerIncomeExamineMapper{
     int insertSelective(AccountOwnerIncomeExamineEntity record);
     int updateByPrimaryKeySelective(AccountOwnerIncomeExamineEntity record);
     /*根据订单号查询*/
-    List<AccountOwnerIncomeExamineEntity> selectByOrderNo(String orderNo);
+    List<AccountOwnerIncomeExamineEntity> selectByOrderNo(@Param("orderNo") String orderNo, @Param("memNo")String memNo);
 	int getTotalAccountOwnerIncomeExamineByOrderNo(String orderNo);
 
 }

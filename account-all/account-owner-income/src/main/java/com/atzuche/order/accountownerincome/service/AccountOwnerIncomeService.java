@@ -73,16 +73,16 @@ public class AccountOwnerIncomeService{
     /**
      * 查询订单车主收益，明细
      */
-    public List<AccountOwnerIncomeDetailEntity> getOwnerRealIncomeByOrder(String orderNo) {
-        List<AccountOwnerIncomeDetailEntity> list = accountOwnerIncomeDetailNoTService.selectByOrderNo(orderNo);
+    public List<AccountOwnerIncomeDetailEntity> getOwnerRealIncomeByOrder(String orderNo,String memNo) {
+        List<AccountOwnerIncomeDetailEntity> list = accountOwnerIncomeDetailNoTService.selectByOrderNo(orderNo,memNo);
         return list;
     }
 
     /**
      * 查询订单车主收益待审核明细
      */
-    public List<AccountOwnerIncomeExamineEntity> getOwnerIncomeByOrder(String orderNo) {
-        List<AccountOwnerIncomeExamineEntity> list = accountOwnerIncomeExamineNoTService.getAccountOwnerIncomeExamineByOrderNo(orderNo);
+    public List<AccountOwnerIncomeExamineEntity> getOwnerIncomeByOrder(String orderNo,String memNo) {
+        List<AccountOwnerIncomeExamineEntity> list = accountOwnerIncomeExamineNoTService.getAccountOwnerIncomeExamineByOrderNo(orderNo,memNo);
         return list;
     }
 }

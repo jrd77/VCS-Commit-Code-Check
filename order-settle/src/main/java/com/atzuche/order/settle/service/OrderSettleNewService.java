@@ -381,11 +381,11 @@ public class OrderSettleNewService {
      *  先查询  发现 有结算数据停止结算 手动处理
      * @param orderNo
      */
-    public void checkIsSettle(String orderNo) {
+    public void checkIsSettle(String orderNo,SettleOrders settleOrders) {
         List<AccountRenterCostSettleDetailEntity> accountRenterCostSettleDetailEntitys = accountRenterCostSettleDetailNoTService.getAccountRenterCostSettleDetail(orderNo);
         List<AccountPlatformProfitDetailEntity> accountPlatformProfitDetailEntitys = accountPlatformProfitDetailNotService.getPlatformProfitDetails(orderNo);
         List<AccountPlatformSubsidyDetailEntity> accountPlatformSubsidyDetailEntitys = accountPlatformSubsidyDetailNoTService.getPlatformSubsidyDetails(orderNo);
-        List<AccountOwnerCostSettleDetailEntity> accountOwnerCostSettleDetailEntitys = accountOwnerCostSettleDetailNoTService.getAccountOwnerCostSettleDetails(orderNo);
+        List<AccountOwnerCostSettleDetailEntity> accountOwnerCostSettleDetailEntitys = accountOwnerCostSettleDetailNoTService.getAccountOwnerCostSettleDetails(orderNo,settleOrders.getOwnerMemNo());
 
         if(!CollectionUtils.isEmpty(accountRenterCostSettleDetailEntitys)){
             throw new RuntimeException("有结算数据停止结算");

@@ -19,5 +19,5 @@ public interface AccountOwnerCostSettleDetailMapper{
 
     int insertSelective(AccountOwnerCostSettleDetailEntity record);
 
-    List<AccountOwnerCostSettleDetailEntity> getAccountOwnerCostSettleDetails(@Param("orderNo") String orderNo);
+    List<AccountOwnerCostSettleDetailEntity> getAccountOwnerCostSettleDetails(@Param("orderNo") String orderNo,@Param("memNo")String memNo);
 }

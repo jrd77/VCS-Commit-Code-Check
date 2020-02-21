@@ -60,7 +60,7 @@ public class AccountOwnerIncomeDetailNoTService {
     }
 
 
-    public List<AccountOwnerIncomeDetailEntity> selectByOrderNo(String orderNo){
-        return accountOwnerIncomeDetailMapper.selectByOrderNo(orderNo);
+    public List<AccountOwnerIncomeDetailEntity> selectByOrderNo(String orderNo,String memNo){
+        return accountOwnerIncomeDetailMapper.selectByOrderNo(orderNo,memNo);
     }
 }
