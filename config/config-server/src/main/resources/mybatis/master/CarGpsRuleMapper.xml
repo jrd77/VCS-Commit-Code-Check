@@ -16,6 +16,6 @@
         serial_number,
         days,
         fees,rule_status
-        FROM car_gps_rule
+        FROM car_gps_rule where rule_status=1
     </select>
 </mapper>

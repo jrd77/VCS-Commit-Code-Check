@@ -7,6 +7,8 @@ import com.atzuche.order.commons.vo.req.OrderReqVO;
 import com.atzuche.order.coreapi.service.MqBuildService;
 import com.atzuche.order.mq.common.base.BaseProducer;
 import com.atzuche.order.mq.common.base.OrderMessage;
+import com.atzuche.order.mq.enums.ShortMessageTypeEnum;
+import com.atzuche.order.mq.util.SmsParamsMapUtil;
 import com.autoyol.event.rabbit.neworder.*;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -14,6 +16,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.Map;
 
 @Service
 public class OrderActionMqService {
@@ -96,7 +100,7 @@ public class OrderActionMqService {
      * @param cancelSourceEnum 取消来源
      * @param actionEventEnum
      */
-    public void sendCancelOrderSuccess(String orderNo, CancelSourceEnum cancelSourceEnum, NewOrderMQActionEventEnum actionEventEnum){
+    public void sendCancelOrderSuccess(String orderNo, CancelSourceEnum cancelSourceEnum, NewOrderMQActionEventEnum actionEventEnum,Map map){
         OrderBaseDataMq orderBaseDataMq = mqBuildService.buildOrderBaseDataMq(orderNo);
         OrderCancelMq orderCreateMq = new OrderCancelMq();
         BeanUtils.copyProperties(orderBaseDataMq, orderCreateMq);
@@ -106,6 +110,7 @@ public class OrderActionMqService {
         orderMessage.setMessage(orderCreateMq);
         logger.info("发送取消订单成功事件.mq:[exchange={},routingKey={}],message=[{}]",actionEventEnum.exchange, actionEventEnum.routingKey,
                 JSON.toJSON(orderMessage));
+        orderMessage.setMap(map);
         baseProducer.sendTopicMessage(actionEventEnum.exchange,actionEventEnum.routingKey,orderMessage);
     }
 
@@ -124,6 +129,9 @@ public class OrderActionMqService {
         orderMessage.setMessage(orderCreateMq);
         logger.info("发送车主同意订单成功事件.mq:[exchange={},routingKey={}],message=[{}]",NewOrderMQActionEventEnum.ORDER_MODIFY.exchange, NewOrderMQActionEventEnum.ORDER_MODIFY.routingKey,
                 JSON.toJSON(orderMessage));
+        //车主同意SMS
+        Map map = SmsParamsMapUtil.getParamsMap(orderNo, ShortMessageTypeEnum.NOTIFY_RENTER_TRANS_REQACCEPTED.getValue(),null,null);
+        orderMessage.setMap(map);
         baseProducer.sendTopicMessage(NewOrderMQActionEventEnum.ORDER_MODIFY.exchange,NewOrderMQActionEventEnum.ORDER_MODIFY.routingKey,orderMessage);
     }
 
@@ -194,6 +202,9 @@ public class OrderActionMqService {
 
         OrderMessage orderMessage = OrderMessage.builder().build();
         orderMessage.setMessage(orderCreateMq);
+        //租客还车
+        Map map = SmsParamsMapUtil.getParamsMap(orderNo, ShortMessageTypeEnum.CAR_RENTALEND_2_RENTER.getValue(),null,null);
+        orderMessage.setMap(map);
         logger.info("发送订单车主确认还车成功事件.mq:[exchange={},routingKey={}],message=[{}]",NewOrderMQActionEventEnum.OWNER_CONFIRM_RETURNCAR.exchange, NewOrderMQActionEventEnum.OWNER_CONFIRM_RETURNCAR.routingKey,
                 JSON.toJSON(orderMessage));
         baseProducer.sendTopicMessage(NewOrderMQActionEventEnum.OWNER_CONFIRM_RETURNCAR.exchange,NewOrderMQActionEventEnum.OWNER_CONFIRM_RETURNCAR.routingKey,orderMessage);

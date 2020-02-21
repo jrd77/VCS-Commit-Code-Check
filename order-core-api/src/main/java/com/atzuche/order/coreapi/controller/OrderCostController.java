@@ -10,8 +10,11 @@ import com.atzuche.order.accountrenterwzdepost.entity.AccountRenterWzDepositEnti
 import com.atzuche.order.cashieraccount.service.CashierQueryService;
 import com.atzuche.order.commons.BindingResultUtil;
 import com.atzuche.order.commons.exceptions.OrderNotFoundException;
+import com.atzuche.order.commons.exceptions.OwnerOrderNotFoundException;
 import com.atzuche.order.commons.vo.res.RenterCostDetailVO;
 import com.atzuche.order.open.vo.RenterCostShortDetailVO;
+import com.atzuche.order.ownercost.entity.OwnerOrderEntity;
+import com.atzuche.order.ownercost.service.OwnerOrderService;
 import com.atzuche.order.parentorder.entity.OrderEntity;
 import com.atzuche.order.parentorder.service.OrderService;
 import com.atzuche.order.coreapi.service.RenterCostFacadeService;
@@ -48,6 +51,9 @@ public class OrderCostController {
 	private RenterOrderService renterOrderService;
 
 	@Autowired
+	private OwnerOrderService ownerOrderService;
+
+	@Autowired
 	private CashierQueryService cashierQueryService;
 	
 	@PostMapping("/order/cost/renter/get")
@@ -74,6 +80,35 @@ public class OrderCostController {
 		RenterCostDetailVO renterBasicCostDetailVO = facadeService.getRenterCostFullDetail(orderNo,renterOrderNo,memNo);
 
 		return ResponseData.success(renterBasicCostDetailVO);
+	}
+
+	public ResponseData getCarOwnerIncomeFullDetail(@RequestParam("orderNo")String orderNo,@RequestParam("ownerNo")String ownerNo){
+		OrderEntity orderEntity = orderService.getOrderEntity(orderNo);
+		if(orderEntity==null){
+			throw new OrderNotFoundException(orderNo);
+		}
+
+		OwnerOrderEntity ownerOrderEntity = ownerOrderService.getOwnerOrderByOrderNoAndIsEffective(orderNo);
+		if(ownerOrderEntity==null){
+			throw new OwnerOrderNotFoundException(orderNo);
+		}
+
+		if(!ownerNo.equals(ownerOrderEntity.getMemNo())){
+           log.warn("查到的车主号码:{}和前端请求的车主号码:{}不一致",ownerOrderEntity.getMemNo(),ownerNo);
+           throw new OwnerOrderNotFoundException(orderNo);
+		}
+
+
+
+
+
+
+
+
+
+
+		//FIXME:
+        return null;
 	}
 
 	/**
