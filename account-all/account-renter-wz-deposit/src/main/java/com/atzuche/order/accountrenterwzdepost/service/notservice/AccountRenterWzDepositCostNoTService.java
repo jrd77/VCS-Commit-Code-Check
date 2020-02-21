@@ -64,8 +64,16 @@ public class AccountRenterWzDepositCostNoTService {
      * 查询违章押金
      * @param orderNo
      */
-    public AccountRenterWzDepositCostEntity queryWzDeposit(String orderNo) {
-        AccountRenterWzDepositCostEntity entity = accountRenterWzDepositCostMapper.selectByOrderNo(orderNo);
+    public AccountRenterWzDepositCostEntity queryWzDeposit(String orderNo,String memNo) {
+        AccountRenterWzDepositCostEntity entity = accountRenterWzDepositCostMapper.selectByOrderNo(orderNo,memNo);
         return entity;
     }
+    
+	public int insertAccountRenterWzDepositCost(AccountRenterWzDepositCostEntity entity) {
+		return accountRenterWzDepositCostMapper.insertSelective(entity);
+	}
+	
+	public int updateAccountRenterWzDepositCost(AccountRenterWzDepositCostEntity entity) {
+		return accountRenterWzDepositCostMapper.updateByPrimaryKeySelective(entity);
+	}
 }

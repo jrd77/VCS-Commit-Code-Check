@@ -168,7 +168,10 @@ public class AccountRenterWzDepositService{
 	public void updateOrderDepositSettle(DetainRenterWZDepositReqVO detainRenterDepositReqVO) {
 		accountRenterWzDepositNoTService.updateOrderDepositSettle(detainRenterDepositReqVO.getMemNo(),detainRenterDepositReqVO.getOrderNo());
 	}
-	
+	public void updateRenterDepositUniqueNo(String uniqueNo, int renterDepositDetailId) {
+		accountRenterWzDepositDetailNoTService.updateRenterDepositUniqueNo(uniqueNo,renterDepositDetailId);
+	}
+
 
     
     
