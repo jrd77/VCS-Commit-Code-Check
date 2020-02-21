@@ -140,4 +140,13 @@ public class RenterOrderDeliveryService {
     public List<RenterOrderDeliveryEntity> findRenterOrderListByOrderNo(String orderNo) {
         return renterOrderDeliveryMapper.findRenterOrderListByorderNo(orderNo);
     }
+    
+    /**
+     * 更新配送订单信息(有选择的更新)
+     * @param renterDeliveryAddrEntity
+     * @return Integer
+     */
+    public Integer updateByPrimaryKeySelective(RenterOrderDeliveryEntity renterOrderDeliveryEntity) {
+    	return renterOrderDeliveryMapper.updateByPrimaryKeySelective(renterOrderDeliveryEntity);
+    }
 }
