@@ -448,6 +448,7 @@ public class OrderSettleNewService {
      * @param orderNo
      */
     public void sendOrderSettleMq(String orderNo,String renterMemNo,RentCosts rentCosts,int status) {
+        log.info("sendOrderSettleMq start [{}],[{}],[{}],[{}]",orderNo,renterMemNo,GsonUtils.toJson(rentCosts),status);
         AccountRenterCostSettleEntity entity=cashierSettleService.getAccountRenterCostSettleEntity(orderNo,renterMemNo);
         OrderSettlementMq orderSettlementMq = new OrderSettlementMq();
         if(Objects.nonNull(entity) && Objects.nonNull(entity)){
@@ -502,20 +503,25 @@ public class OrderSettleNewService {
             eventEnum = NewOrderMQActionEventEnum.ORDER_SETTLEMENT_FAIL;
         }
         //TODO 发短信
+        log.info("sendOrderSettleMq remote start [{}],[{}]",eventEnum,GsonUtils.toJson(orderMessage));
         baseProducer.sendTopicMessage(eventEnum.exchange,eventEnum.routingKey,orderMessage);
+        log.info("sendOrderSettleMq remote start [{}],[{}]",eventEnum,GsonUtils.toJson(orderMessage));
     }
     /**
      * 订单违章结算成功事件
      * @param orderNo
      */
     public void sendOrderWzSettleSuccessMq(String orderNo) {
+        log.info("sendOrderWzSettleSuccessMq start [{}]",orderNo);
         OrderWzSettlementMq orderSettlementMq = new OrderWzSettlementMq();
         orderSettlementMq.setStatus(0);
         orderSettlementMq.setOrderNo(orderNo);
         OrderMessage orderMessage = OrderMessage.builder().build();
         orderMessage.setMessage(orderSettlementMq);
         //TODO 发短信
+        log.info("sendOrderWzSettleSuccessMq remote start [{}] ,[{}] ",GsonUtils.toJson(orderMessage),NewOrderMQActionEventEnum.ORDER_WZ_SETTLEMENT_SUCCESS);
         baseProducer.sendTopicMessage(NewOrderMQActionEventEnum.ORDER_WZ_SETTLEMENT_SUCCESS.exchange,NewOrderMQActionEventEnum.ORDER_WZ_SETTLEMENT_SUCCESS.routingKey,orderMessage);
+        log.info("sendOrderWzSettleSuccessMq remote end [{}]",orderNo);
     }
 
     /**
@@ -523,13 +529,17 @@ public class OrderSettleNewService {
      * @param orderNo
      */
     public void sendOrderWzSettleFailMq(String orderNo) {
+        log.info("sendOrderWzSettleFailMq start [{}]",orderNo);
         OrderWzSettlementMq orderSettlementMq = new OrderWzSettlementMq();
         orderSettlementMq.setStatus(1);
         orderSettlementMq.setOrderNo(orderNo);
         OrderMessage orderMessage = OrderMessage.builder().build();
         orderMessage.setMessage(orderSettlementMq);
         //TODO 发短信
+        log.info("sendOrderWzSettleFailMq remote start [{}] ,[{}] ",GsonUtils.toJson(orderMessage),NewOrderMQActionEventEnum.ORDER_WZ_SETTLEMENT_FAIL);
         baseProducer.sendTopicMessage(NewOrderMQActionEventEnum.ORDER_WZ_SETTLEMENT_FAIL.exchange,NewOrderMQActionEventEnum.ORDER_WZ_SETTLEMENT_FAIL.routingKey,orderMessage);
+        log.info("sendOrderWzSettleFailMq remote end [{}]",orderNo);
+
     }
 
     /**

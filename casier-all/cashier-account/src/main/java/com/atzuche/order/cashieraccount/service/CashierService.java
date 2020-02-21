@@ -605,7 +605,7 @@ public class CashierService {
             //2 收银台记录更新
             cashierNoTService.updataCashierAndRenterCost(notifyDataVo,accountRenterCostReq);
             vo.setRentCarPayStatus(OrderPayStatusEnum.PAYED.getStatus());
-            sendOrderPayRentCostSuccess(NewOrderMQActionEventEnum.RENTER_ORDER_PAYSUCCESS,vo);
+            sendOrderPayRentCostSuccess(NewOrderMQActionEventEnum.RENTER_ORDER_PAYSUCCESS,vo,1);
         }
         //1.4 补付租车费用
         if(Objects.nonNull(notifyDataVo) && DataPayKindConstant.RENT_INCREMENT.equals(notifyDataVo.getPayKind()) ){
@@ -615,7 +615,7 @@ public class CashierService {
             cashierNoTService.updataCashierAndRenterCost(notifyDataVo,accountRenterCostReq);
             vo.setRentCarPayStatus(OrderPayStatusEnum.PAYED.getStatus());
             vo.setIsPayAgain(YesNoEnum.YES.getCode());
-            sendOrderPayRentCostSuccess(NewOrderMQActionEventEnum.RENTER_ORDER_PAYSUCCESS,vo);
+            sendOrderPayRentCostSuccess(NewOrderMQActionEventEnum.RENTER_ORDER_PAYSUCCESS,vo,2);
 
         }
 
@@ -645,10 +645,12 @@ public class CashierService {
     }
     /**
      * 发送订单支付成功事件 （租车费用）
+     *   1：租车费用  2：租车补付费用
      */
-    public void sendOrderPayRentCostSuccess(NewOrderMQActionEventEnum event,OrderPayCallBackSuccessVO vo){
+    public void sendOrderPayRentCostSuccess(NewOrderMQActionEventEnum event,OrderPayCallBackSuccessVO vo,Integer type){
         log.info("sendOrderPayRentCostSuccess start [{}] ,[{}]",event,GsonUtils.toJson(vo));
         OrderRenterPaySuccessMq orderRenterPay = new OrderRenterPaySuccessMq();
+        orderRenterPay.setType(type);
         orderRenterPay.setOrderNo(vo.getOrderNo());
         orderRenterPay.setRenterMemNo(Integer.valueOf(vo.getMemNo()));
         OrderMessage orderMessage = OrderMessage.builder().build();
