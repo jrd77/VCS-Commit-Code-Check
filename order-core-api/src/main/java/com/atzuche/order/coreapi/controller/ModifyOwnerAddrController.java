@@ -47,7 +47,7 @@ public class ModifyOwnerAddrController {
 	 * @return ResponseData
 	 */
 	@PostMapping("/order/owner/modify/updateaddr")
-	public ResponseData<GetReturnCarInfoVO> updateOwnerAddrInfo(@Validated({Second.class}) @RequestBody OwnerTransAddressReqVO ownerTransAddressReqVO, BindingResult bindingResult) {
+	public ResponseData<?> updateOwnerAddrInfo(@Validated({Second.class}) @RequestBody OwnerTransAddressReqVO ownerTransAddressReqVO, BindingResult bindingResult) {
 		log.info("车主修改交接车地址ownerTransAddressReqVO=[{}] ", ownerTransAddressReqVO);
 		BindingResultUtil.checkBindingResult(bindingResult);
 		modifyOwnerAddrService.updateOwnerAddr(ownerTransAddressReqVO);
