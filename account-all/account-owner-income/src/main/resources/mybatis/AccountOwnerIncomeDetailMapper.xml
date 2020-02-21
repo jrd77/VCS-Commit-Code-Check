@@ -27,8 +27,8 @@
 	<sql id="Base_Column_List">
 	`id`, 	
 	`mem_no`, 	
-	`order_no`, 	
-	`amt`, 	
+	`order_no`,
+	`amt`,
 	`time`, 	
 	`detail`, 	
 	`cost_code`, 	
@@ -55,6 +55,7 @@
         <trim prefix="(" suffix=")" suffixOverrides="," >
             <if test="memNo != null">`mem_no`, </if>
             <if test="orderNo != null">`order_no`, </if>
+
             <if test="amt != null">`amt`, </if>
             <if test="time != null">`time`, </if>
             <if test="detail != null">`detail`, </if>
@@ -73,6 +74,7 @@
         <trim prefix="values (" suffix=")" suffixOverrides="," >
             <if test="memNo != null">#{memNo},  </if>
             <if test="orderNo != null">#{orderNo},  </if>
+
             <if test="amt != null">#{amt},  </if>
             <if test="time != null">#{time},  </if>
             <if test="detail != null">#{detail},  </if>

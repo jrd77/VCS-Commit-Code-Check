@@ -28,6 +28,7 @@ public class AccountOwnerIncomeDetailEntity implements Serializable {
 	 * 主订单号
 	 */
 	private String orderNo;
+
 	/**
 	 * 收益金额
 	 */

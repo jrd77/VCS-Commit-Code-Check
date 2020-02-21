@@ -7,6 +7,7 @@
         <result property="id" column="id"/>
         <result property="memNo" column="mem_no"/>
         <result property="orderNo" column="order_no"/>
+        <result property="ownerOrderNo" column="owner_order_no"/>
         <result property="amt" column="amt"/>
         <result property="detail" column="detail"/>
         <result property="status" column="status"/>
@@ -25,7 +26,8 @@
 	<sql id="Base_Column_List">
 	`id`, 	
 	`mem_no`, 	
-	`order_no`, 	
+	`order_no`,
+	`owner_order_no`,
 	`amt`, 	
 	`detail`, 	
 	`status`, 	
@@ -59,6 +61,7 @@
         <trim prefix="(" suffix=")" suffixOverrides="," >
             <if test="memNo != null">`mem_no`, </if>
             <if test="orderNo != null">`order_no`, </if>
+            <if test="ownerOrderNo != null">`owner_order_no`, </if>
             <if test="amt != null">`amt`, </if>
             <if test="detail != null">`detail`, </if>
             <if test="status != null">`status`, </if>
@@ -75,6 +78,7 @@
         <trim prefix="values (" suffix=")" suffixOverrides="," >
             <if test="memNo != null">#{memNo},  </if>
             <if test="orderNo != null">#{orderNo},  </if>
+            <if test="ownerOrderNo != null">#{ownerOrderNo},  </if>
             <if test="amt != null">#{amt},  </if>
             <if test="detail != null">#{detail},  </if>
             <if test="status != null">#{status},  </if>
@@ -95,6 +99,7 @@
 		<set>
 				<if test="memNo != null">`mem_no` = #{memNo}, </if>
 				<if test="orderNo != null">`order_no` = #{orderNo}, </if>
+                <if test="ownerOrderNo != null">`owner_order_no` = #{ownerOrderNo}, </if>
 				<if test="amt != null">`amt` = #{amt}, </if>
 				<if test="detail != null">`detail` = #{detail}, </if>
 				<if test="status != null">`status` = #{status}, </if>
