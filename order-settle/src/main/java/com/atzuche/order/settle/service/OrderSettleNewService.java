@@ -501,6 +501,7 @@ public class OrderSettleNewService {
         }else{
             eventEnum = NewOrderMQActionEventEnum.ORDER_SETTLEMENT_FAIL;
         }
+        //TODO 发短信
         baseProducer.sendTopicMessage(eventEnum.exchange,eventEnum.routingKey,orderMessage);
     }
     /**
@@ -513,6 +514,7 @@ public class OrderSettleNewService {
         orderSettlementMq.setOrderNo(orderNo);
         OrderMessage orderMessage = OrderMessage.builder().build();
         orderMessage.setMessage(orderSettlementMq);
+        //TODO 发短信
         baseProducer.sendTopicMessage(NewOrderMQActionEventEnum.ORDER_WZ_SETTLEMENT_SUCCESS.exchange,NewOrderMQActionEventEnum.ORDER_WZ_SETTLEMENT_SUCCESS.routingKey,orderMessage);
     }
 
@@ -526,6 +528,7 @@ public class OrderSettleNewService {
         orderSettlementMq.setOrderNo(orderNo);
         OrderMessage orderMessage = OrderMessage.builder().build();
         orderMessage.setMessage(orderSettlementMq);
+        //TODO 发短信
         baseProducer.sendTopicMessage(NewOrderMQActionEventEnum.ORDER_WZ_SETTLEMENT_FAIL.exchange,NewOrderMQActionEventEnum.ORDER_WZ_SETTLEMENT_FAIL.routingKey,orderMessage);
     }
 
