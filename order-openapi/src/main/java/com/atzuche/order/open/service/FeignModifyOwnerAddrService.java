@@ -20,5 +20,5 @@ public interface FeignModifyOwnerAddrService {
 	public ResponseData<GetReturnCarInfoVO> getOwnerAddrInfo(@Valid @RequestBody OwnerTransAddressReqVO ownerTransAddressReqVO);
 
 	@PostMapping("/order/owner/modify/updateaddr")
-	public ResponseData<GetReturnCarInfoVO> updateOwnerAddrInfo(@Validated({Second.class}) @RequestBody OwnerTransAddressReqVO ownerTransAddressReqVO);
+	public ResponseData<?> updateOwnerAddrInfo(@Validated({Second.class}) @RequestBody OwnerTransAddressReqVO ownerTransAddressReqVO);
 }
