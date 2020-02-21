@@ -109,10 +109,10 @@ public class AccountRenterWzDepositNoTService {
         AccountRenterWzDepositEntity accountRenterDeposit = new AccountRenterWzDepositEntity();
         accountRenterDeposit.setId(accountRenterDepositEntity.getId());
         accountRenterDeposit.setVersion(accountRenterDepositEntity.getVersion());
-        accountRenterDeposit.setRealReturnDeposit(accountRenterDepositEntity.getRealReturnDeposit());
+        accountRenterDeposit.setShouldReturnDeposit(accountRenterDepositEntity.getShishouDeposit()); //实收，默认是全部要退的。     应退
 
         if(Objects.nonNull(accountRenterDeposit.getRealReturnDeposit()) || accountRenterDeposit.getRealReturnDeposit()>Math.abs(payedOrderRenterWZDepositDetail.getAmt())){
-            accountRenterDeposit.setRealReturnDeposit(accountRenterDeposit.getRealReturnDeposit() + payedOrderRenterWZDepositDetail.getAmt());
+            accountRenterDeposit.setShouldReturnDeposit(accountRenterDeposit.getRealReturnDeposit() + payedOrderRenterWZDepositDetail.getAmt());
         }
         int result =  accountRenterWzDepositMapper.updateByPrimaryKeySelective(accountRenterDeposit);
         if(result==0){
@@ -132,7 +132,7 @@ public class AccountRenterWzDepositNoTService {
         //TODO
         //计算剩余可扣金额押金总和
         int surplusAmt = accountRenterDepositEntity.getShishouDeposit();
-        if(-detainRenterDepositReqVO.getAmt() + surplusAmt<0){
+        if(detainRenterDepositReqVO.getAmt() + surplusAmt<0){
             //可用 剩余押金 不足
             throw new PayOrderRenterWZDepositException();
         }

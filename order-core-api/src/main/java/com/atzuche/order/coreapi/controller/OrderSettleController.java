@@ -29,5 +29,14 @@ public class OrderSettleController {
         log.info("OrderSettleController depositSettle end ");
         return ResponseData.success();
 	}
-
+    
+    @AutoDocMethod(description = "违章押金结算", value = "违章押金结算")
+	@GetMapping("/wzDepositSettle")
+	public ResponseData wzDepositSettle(@RequestParam("orderNo") String orderNo){
+        log.info("OrderSettleController wz depositSettle start param [{}]", orderNo);
+        orderSettle.settleWzOrder(orderNo);
+        log.info("OrderSettleController wz depositSettle end ");
+        return ResponseData.success();
+	}
+    
 }

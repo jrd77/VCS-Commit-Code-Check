@@ -243,7 +243,9 @@ public class CashierService {
         BeanUtils.copyProperties(cashierDeductDebtReqVO,accountDeductDebt);
         accountDeductDebt.setSourceCode(cashierDeductDebtReqVO.getRenterCashCodeEnum().getCashNo());
         accountDeductDebt.setSourceDetail(cashierDeductDebtReqVO.getRenterCashCodeEnum().getTxt());
+        //公共抵扣方法。
         int debtedAmt = accountDebtService.deductDebt(accountDeductDebt);
+        
         //3 记录结算费用抵扣记录
         PayedOrderRenterDepositWZDetailReqVO payedOrderRenterWZDepositDetail = new PayedOrderRenterDepositWZDetailReqVO();
         BeanUtils.copyProperties(cashierDeductDebtReqVO,payedOrderRenterWZDepositDetail);

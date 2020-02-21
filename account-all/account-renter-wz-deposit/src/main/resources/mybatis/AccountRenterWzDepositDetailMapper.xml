@@ -55,7 +55,31 @@
 	<select id="findByOrderNo" resultMap="BaseResultMap">
 		select  <include refid="Base_Column_List" /> from account_renter_wz_deposit_detail where order_no=#{orderNo} and is_delete=0 order by id desc
 	</select>
-
+	
+	<update id="updateByPrimaryKeySelective" parameterType="com.atzuche.order.accountrenterwzdepost.entity.AccountRenterWzDepositEntity">
+		update account_renter_wz_deposit_detail
+		<set>
+				<if test="orderNo != null">`order_no` = #{orderNo}, </if>
+	            <if test="memNo != null">`mem_no` = #{memNo}, </if>
+	            <if test="payment != null">`payment` = #{payment}, </if>
+	            <if test="payChannel != null">`pay_channel` = #{payChannel}, </if>
+	            <if test="costCode != null">`cost_code` = #{costCode}, </if>
+	            <if test="costDetail != null">`cost_detail` = #{costDetail}, </if>
+	            <if test="amt != null">`amt` = #{amt}, </if>
+	            <if test="sourceCode != null">`source_code` = #{sourceCode}, </if>
+	            <if test="sourceDetail != null">`source_detail` = #{sourceDetail}, </if>
+	            <if test="authorizeAmt != null">`authorize_amt` = #{authorizeAmt}, </if>
+	            <if test="authorizeExpireTime != null">`authorize_expire_time` = #{authorizeExpireTime}, </if>
+	            <if test="uniqueNo != null">`unique_no` = #{uniqueNo}, </if>
+	            <if test="createTime != null">`create_time` = #{createTime}, </if>
+	            <if test="createOp != null">`create_op` = #{createOp}, </if>
+	            <if test="updateTime != null">`update_time` = #{updateTime}, </if>
+	            <if test="updateOp != null">`update_op` = #{updateOp}, </if>
+	            <if test="isDelete != null">`is_delete` = #{isDelete} </if>
+			</set>
+		where id = #{id}
+	</update>
+	
 
     <insert id="insertSelective" parameterType="com.atzuche.order.accountrenterwzdepost.entity.AccountRenterWzDepositDetailEntity" useGeneratedKeys="true" keyProperty="id">
         insert into account_renter_wz_deposit_detail

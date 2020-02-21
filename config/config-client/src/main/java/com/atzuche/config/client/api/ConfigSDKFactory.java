@@ -75,6 +75,7 @@ public class ConfigSDKFactory implements ConfigService {
             ConfigItemDTO preConfigItemDTO = getConfig(configName,true);
             preConfigValues.put(configName,configItemDTO);
         }
+        inited=true;
     }
 
     /**
