@@ -4,9 +4,9 @@ import com.atzuche.order.accountownerincome.exception.AccountOwnerIncomeExamineE
 import com.atzuche.order.accountownerincome.entity.AccountOwnerIncomeExamineEntity;
 import com.atzuche.order.accountownerincome.exception.AccountOwnerIncomeSettleException;
 import com.atzuche.order.accountownerincome.mapper.AccountOwnerIncomeExamineMapper;
-import com.atzuche.order.accountownerincome.vo.req.AccountOwnerIncomeExamineOpReqVO;
-import com.atzuche.order.accountownerincome.vo.req.AccountOwnerIncomeExamineReqVO;
 import com.atzuche.order.commons.enums.account.income.AccountOwnerIncomeExamineStatus;
+import com.atzuche.order.commons.vo.req.income.AccountOwnerIncomeExamineOpReqVO;
+import com.atzuche.order.commons.vo.req.income.AccountOwnerIncomeExamineReqVO;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +35,9 @@ public class AccountOwnerIncomeExamineNoTService {
     public void insertOwnerIncomeExamine(AccountOwnerIncomeExamineReqVO accountOwnerIncomeExamineReq) {
         AccountOwnerIncomeExamineEntity accountOwnerIncomeExamineEntity = new AccountOwnerIncomeExamineEntity();
         BeanUtils.copyProperties(accountOwnerIncomeExamineReq,accountOwnerIncomeExamineEntity);
-        accountOwnerIncomeExamineEntity.setStatus(AccountOwnerIncomeExamineStatus.WAIT_EXAMINE.getStatus());
+        accountOwnerIncomeExamineEntity.setAmt(accountOwnerIncomeExamineReq.getAmt());
+        accountOwnerIncomeExamineEntity.setStatus(accountOwnerIncomeExamineReq.getStatus().getStatus());
+        accountOwnerIncomeExamineEntity.setType(accountOwnerIncomeExamineReq.getType().getStatus());
         accountOwnerIncomeExamineEntity.setVersion(NumberUtils.INTEGER_ONE);
         accountOwnerIncomeExamineEntity.setIsDelete(NumberUtils.INTEGER_ZERO);
 
@@ -78,4 +80,15 @@ public class AccountOwnerIncomeExamineNoTService {
 	public Integer getTotalAccountOwnerIncomeExamineByOrderNo(String orderNo) {
 		return accountOwnerIncomeExamineMapper.getTotalAccountOwnerIncomeExamineByOrderNo(orderNo);
 	}
+
+    /**
+     * 查询收益类型
+     * @param orderNo
+     * @param memNo
+     * @param type
+     * @return
+     */
+    public List<AccountOwnerIncomeExamineEntity> getOwnerIncomeByOrderAndType(String orderNo, String memNo, int type) {
+        return accountOwnerIncomeExamineMapper.getOwnerIncomeByOrderAndType(orderNo,memNo,type);
+    }
 }

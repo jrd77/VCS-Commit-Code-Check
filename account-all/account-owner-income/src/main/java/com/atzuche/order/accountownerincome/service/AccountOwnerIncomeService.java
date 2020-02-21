@@ -5,9 +5,9 @@ import com.atzuche.order.accountownerincome.service.notservice.AccountOwnerIncom
 import com.atzuche.order.accountownerincome.service.notservice.AccountOwnerIncomeExamineNoTService;
 import com.atzuche.order.accountownerincome.service.notservice.AccountOwnerIncomeNoTService;
 import com.atzuche.order.accountownerincome.entity.AccountOwnerIncomeDetailEntity;
-import com.atzuche.order.accountownerincome.vo.req.AccountOwnerIncomeExamineOpReqVO;
-import com.atzuche.order.accountownerincome.vo.req.AccountOwnerIncomeExamineReqVO;
 import com.atzuche.order.commons.enums.account.income.AccountOwnerIncomeExamineStatus;
+import com.atzuche.order.commons.vo.req.income.AccountOwnerIncomeExamineOpReqVO;
+import com.atzuche.order.commons.vo.req.income.AccountOwnerIncomeExamineReqVO;
 import com.autoyol.cat.CatAnnotation;
 import com.autoyol.commons.web.ErrorCode;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,7 +54,7 @@ public class AccountOwnerIncomeService{
     /**
      * 收益审核通过 更新车主收益信息
      */
-    public void examineOwnerIncomeExamine(AccountOwnerIncomeExamineOpReqVO accountOwnerIncomeExamineOpReq){
+    public int examineOwnerIncomeExamine(AccountOwnerIncomeExamineOpReqVO accountOwnerIncomeExamineOpReq){
         //1参数校验
         Assert.notNull(accountOwnerIncomeExamineOpReq, ErrorCode.PARAMETER_ERROR.getText());
         accountOwnerIncomeExamineOpReq.check();
@@ -66,8 +66,9 @@ public class AccountOwnerIncomeService{
             AccountOwnerIncomeDetailEntity accountOwnerIncomeDetail = accountOwnerIncomeDetailNoTService.insertAccountOwnerIncomeDetail(accountOwnerIncomeExamineOpReq);
             //3.2 更新车主收益总和
             accountOwnerIncomeNoTService.updateOwnerIncomeAmt(accountOwnerIncomeDetail);
+            return accountOwnerIncomeDetail.getId();
         }
-
+        return 0;
     }
 
     /**
@@ -83,6 +84,14 @@ public class AccountOwnerIncomeService{
      */
     public List<AccountOwnerIncomeExamineEntity> getOwnerIncomeByOrder(String orderNo,String memNo) {
         List<AccountOwnerIncomeExamineEntity> list = accountOwnerIncomeExamineNoTService.getAccountOwnerIncomeExamineByOrderNo(orderNo,memNo);
+        return list;
+    }
+
+    /**
+     * 查询订单车主收益待审核明细
+     */
+    public List<AccountOwnerIncomeExamineEntity> getOwnerIncomeByOrderAndType(String orderNo,String memNo,int type) {
+        List<AccountOwnerIncomeExamineEntity> list = accountOwnerIncomeExamineNoTService.getOwnerIncomeByOrderAndType(orderNo,memNo,type);
         return list;
     }
 }

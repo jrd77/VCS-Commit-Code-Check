@@ -183,12 +183,14 @@ public class CashierQueryService {
     public AccountOwnerIncomeRealResVO getOwnerRealIncomeByOrder(String orderNo,String memNo){
         AccountOwnerIncomeRealResVO resVO = new AccountOwnerIncomeRealResVO();
         resVO.setOrderNo(orderNo);
+        //查询收益审核后收益
         List<AccountOwnerIncomeDetailEntity> accountOwnerIncomeDetails = accountOwnerIncomeService.getOwnerRealIncomeByOrder(orderNo,memNo);
         if(!CollectionUtils.isEmpty(accountOwnerIncomeDetails)){
             int incomeAmt = accountOwnerIncomeDetails.stream().mapToInt(AccountOwnerIncomeDetailEntity::getAmt).sum();
             resVO.setIncomeAmt(incomeAmt);
         }
         boolean exsitPassed = false;
+        //查询待审核收益
         List<AccountOwnerIncomeExamineEntity> accountOwnerIncomeExamines = accountOwnerIncomeService.getOwnerIncomeByOrder(orderNo,memNo);
         if(!CollectionUtils.isEmpty(accountOwnerIncomeExamines)){
             int incomeExamineAmt = accountOwnerIncomeExamines.stream().mapToInt(AccountOwnerIncomeExamineEntity::getAmt).sum();

@@ -1,4 +1,4 @@
-package com.atzuche.order.accountownerincome.vo.req;
+package com.atzuche.order.commons.vo.req.income;
 
 import com.atzuche.order.commons.enums.account.income.AccountOwnerIncomeExamineStatus;
 import com.autoyol.commons.web.ErrorCode;
@@ -16,6 +16,12 @@ public class AccountOwnerIncomeExamineOpReqVO {
      * 会员号
      */
     private String memNo;
+
+    /**
+     * 主订单号
+     */
+    private String orderNo;
+
 
     /**
      * 车主审核收益信息
@@ -38,17 +44,13 @@ public class AccountOwnerIncomeExamineOpReqVO {
     private String opName;
 
     /**
-     * 备注
-     */
-    private String remark;
-
-    /**
      * 更新人
      */
     private String updateOp;
 
     public void check() {
         Assert.notNull(getMemNo(), ErrorCode.PARAMETER_ERROR.getText());
+        Assert.notNull(getOrderNo(), ErrorCode.PARAMETER_ERROR.getText());
         Assert.notNull(getStatus(), ErrorCode.PARAMETER_ERROR.getText());
         Assert.notNull(getAccountOwnerIncomeExamineId(), ErrorCode.PARAMETER_ERROR.getText());
 

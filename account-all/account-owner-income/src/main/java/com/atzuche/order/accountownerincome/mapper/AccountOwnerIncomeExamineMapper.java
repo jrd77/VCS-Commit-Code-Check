@@ -22,4 +22,5 @@ public interface AccountOwnerIncomeExamineMapper{
     List<AccountOwnerIncomeExamineEntity> selectByOrderNo(@Param("orderNo") String orderNo, @Param("memNo")String memNo);
 	int getTotalAccountOwnerIncomeExamineByOrderNo(String orderNo);
 
+    List<AccountOwnerIncomeExamineEntity> getOwnerIncomeByOrderAndType(@Param("orderNo") String orderNo, @Param("memNo")String memNo, @Param("memNo")int type);
 }
