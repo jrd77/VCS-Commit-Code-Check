@@ -7,7 +7,7 @@ import lombok.Data;
 /**
  * 计算费用统计
  */
-@Data
+//@Data
 public class SettleOrdersAccount {
 
 
@@ -77,4 +77,135 @@ public class SettleOrdersAccount {
      */
     private OrderStatusDTO orderStatusDTO;
 
+
+	public int getOwnerCostAmtFinal() {
+		return ownerCostAmtFinal;
+	}
+
+
+	public void setOwnerCostAmtFinal(int ownerCostAmtFinal) {
+		this.ownerCostAmtFinal = ownerCostAmtFinal;
+	}
+
+
+	public int getOwnerCostSurplusAmt() {
+		return ownerCostSurplusAmt;
+	}
+
+
+	public void setOwnerCostSurplusAmt(int ownerCostSurplusAmt) {
+		this.ownerCostSurplusAmt = ownerCostSurplusAmt;
+	}
+
+
+	public int getRentCostAmtFinal() {
+		return rentCostAmtFinal;
+	}
+
+
+	public void setRentCostAmtFinal(int rentCostAmtFinal) {
+		this.rentCostAmtFinal = rentCostAmtFinal;
+	}
+
+
+	public int getRentCostPayAmt() {
+		return rentCostPayAmt;
+	}
+
+
+	public void setRentCostPayAmt(int rentCostPayAmt) {
+		this.rentCostPayAmt = rentCostPayAmt;
+	}
+
+
+	public int getRentCostSurplusAmt() {
+		return rentCostSurplusAmt;
+	}
+
+
+	public void setRentCostSurplusAmt(int rentCostSurplusAmt) {
+		this.rentCostSurplusAmt = rentCostSurplusAmt;
+	}
+
+
+	public int getDepositAmt() {
+		return depositAmt;
+	}
+
+
+	public void setDepositAmt(int depositAmt) {
+		this.depositAmt = depositAmt;
+	}
+
+
+	public int getDepositSurplusAmt() {
+		return depositSurplusAmt;
+	}
+
+
+	public void setDepositSurplusAmt(int depositSurplusAmt) {
+		this.depositSurplusAmt = depositSurplusAmt;
+	}
+
+
+	public String getOrderNo() {
+		return orderNo;
+	}
+
+
+	public void setOrderNo(String orderNo) {
+		this.orderNo = orderNo;
+	}
+
+
+	public String getRenterOrderNo() {
+		return renterOrderNo;
+	}
+
+
+	public void setRenterOrderNo(String renterOrderNo) {
+		this.renterOrderNo = renterOrderNo;
+	}
+
+
+	public String getOwnerOrderNo() {
+		return ownerOrderNo;
+	}
+
+
+	public void setOwnerOrderNo(String ownerOrderNo) {
+		this.ownerOrderNo = ownerOrderNo;
+	}
+
+
+	public String getRenterMemNo() {
+		return renterMemNo;
+	}
+
+
+	public void setRenterMemNo(String renterMemNo) {
+		this.renterMemNo = renterMemNo;
+	}
+
+
+	public String getOwnerMemNo() {
+		return ownerMemNo;
+	}
+
+
+	public void setOwnerMemNo(String ownerMemNo) {
+		this.ownerMemNo = ownerMemNo;
+	}
+
+
+	public OrderStatusDTO getOrderStatusDTO() {
+		return orderStatusDTO;
+	}
+
+
+	public void setOrderStatusDTO(OrderStatusDTO orderStatusDTO) {
+		this.orderStatusDTO = orderStatusDTO;
+	}
+
+    
 }

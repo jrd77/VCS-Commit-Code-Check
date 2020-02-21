@@ -3,6 +3,8 @@
  */
 package com.atzuche.order.settle.service;
 
+import java.time.LocalDateTime;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -31,12 +33,13 @@ public class OrderWzSettleService {
 	private OrderStatusService orderStatusService;
 	@Autowired
 	OrderWzSettleNewService orderWzSettleNewService;
-    @Autowired private OrderSettleNewService orderSettleNewService;
+    @Autowired 
+    private OrderSettleNewService orderSettleNewService;
 	
 	
 	public void settleWzOrder(String orderNo) {
-		log.info("OrderSettleService settleOrder orderNo [{}]",orderNo);
-        Transaction t = Cat.getProducer().newTransaction(CatConstants.FEIGN_CALL, "车俩结算服务");
+		log.info("OrderWzSettleService settleOrder orderNo [{}]",orderNo);
+        Transaction t = Cat.getProducer().newTransaction(CatConstants.FEIGN_CALL, "违章结算服务");
         try {
             Cat.logEvent("settleOrder",orderNo);
             //1 初始化操作 校验操作
@@ -54,18 +57,19 @@ public class OrderWzSettleService {
             orderSettleNewService.sendOrderWzSettleSuccessMq(orderNo);
             t.setStatus(Transaction.SUCCESS);
         } catch (Exception e) {
-            log.error("OrderSettleService settleOrder,e={},",e);
+            log.error("OrderWzSettleService settleOrder,e={},",e);
             /**
              * 结算失败，更新结算标识字段。 违章押金结算失败
              */
             OrderStatusDTO orderStatusDTO = new OrderStatusDTO();
             orderStatusDTO.setOrderNo(orderNo);
             orderStatusDTO.setWzSettleStatus(SettleStatusEnum.SETTL_FAIL.getCode());
+            orderStatusDTO.setSettleTime(LocalDateTime.now());
             orderStatusService.saveOrderStatusInfo(orderStatusDTO);
             orderSettleNewService.sendOrderWzSettleFailMq(orderNo);
             t.setStatus(e);
             Cat.logError("结算失败  :{}",e);
-            throw new RuntimeException("结算失败 ,不能结算");
+            throw new RuntimeException("违章结算失败 ,不能结算");
         } finally {
             t.complete();
         }

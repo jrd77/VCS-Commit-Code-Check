@@ -24,5 +24,7 @@ public interface AccountRenterWzDepositDetailMapper{
 
     int insertSelective(AccountRenterWzDepositDetailEntity record);
 
+	void updateByPrimaryKeySelective(AccountRenterWzDepositDetailEntity entity);
+
 
 }

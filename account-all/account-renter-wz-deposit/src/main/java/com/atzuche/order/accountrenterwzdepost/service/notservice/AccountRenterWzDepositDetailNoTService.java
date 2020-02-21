@@ -87,5 +87,14 @@ public class AccountRenterWzDepositDetailNoTService {
          }
          return accountRenterDepositDetailEntity.getId();
 	}
+
+
+	public void updateRenterDepositUniqueNo(String uniqueNo, int renterDepositDetailId) {
+		AccountRenterWzDepositDetailEntity entity = new AccountRenterWzDepositDetailEntity();
+        entity.setId(renterDepositDetailId);
+        entity.setUniqueNo(uniqueNo);
+        accountRenterWzDepositDetailMapper.updateByPrimaryKeySelective(entity);
+		
+	}
     
 }
