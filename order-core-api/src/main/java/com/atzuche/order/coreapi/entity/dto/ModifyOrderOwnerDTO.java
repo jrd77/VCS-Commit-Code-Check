@@ -1,9 +1,11 @@
 package com.atzuche.order.coreapi.entity.dto;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import com.atzuche.order.commons.entity.dto.OwnerGoodsDetailDTO;
 import com.atzuche.order.commons.entity.dto.OwnerMemberDTO;
+import com.atzuche.order.delivery.entity.RenterOrderDeliveryEntity;
 import com.atzuche.order.ownercost.entity.OwnerOrderEntity;
 
 import lombok.Data;
@@ -89,5 +91,9 @@ public class ModifyOrderOwnerDTO {
      * 车主会员信息
      */
     private OwnerMemberDTO ownerMemberDTO;
+    /**
+     * 配送信息
+     */
+    private List<RenterOrderDeliveryEntity> deliveryList;
     
 }

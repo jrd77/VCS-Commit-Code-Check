@@ -1,5 +1,7 @@
-package com.atzuche.order.commons.vo;
+package com.atzuche.order.coreapi.entity.vo;
 
+import com.atzuche.order.commons.vo.CarBasicInfo;
+import com.atzuche.order.coreapi.entity.dto.ModifyOrderOwnerDTO;
 import com.autoyol.doc.annotation.AutoDocIgnoreProperty;
 import com.autoyol.doc.annotation.AutoDocProperty;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -65,6 +67,9 @@ public class GetReturnCarInfoVO implements Serializable{
 
     @AutoDocIgnoreProperty
     private Boolean isCurrentReturnCarAddress;
+    
+    @AutoDocIgnoreProperty
+    private ModifyOrderOwnerDTO modifyOrderOwnerDTO;
     
     public String getCityCode() {
         return cityCode;
@@ -209,4 +214,13 @@ public class GetReturnCarInfoVO implements Serializable{
     public void setCurrentReturnCarAddress(Boolean currentReturnCarAddress) {
         isCurrentReturnCarAddress = currentReturnCarAddress;
     }
+
+	public ModifyOrderOwnerDTO getModifyOrderOwnerDTO() {
+		return modifyOrderOwnerDTO;
+	}
+
+	public void setModifyOrderOwnerDTO(ModifyOrderOwnerDTO modifyOrderOwnerDTO) {
+		this.modifyOrderOwnerDTO = modifyOrderOwnerDTO;
+	}
+    
 }
