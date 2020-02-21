@@ -135,23 +135,23 @@ public class DeliveryController {
 
     }
 
-    /**
-     * 获取油费
-     * @param deliveryCarPriceReqVO
-     * @return
-     */
-    @PostMapping("/oil/getOilCrash")
-    public ResponseData<DeliveryOilCostRepVO> getOilCostByRenterOrderNo(@RequestBody DeliveryCarPriceReqVO deliveryCarPriceReqVO, BindingResult bindingResult) {
-        log.info("获取油费入参：{}", deliveryCarPriceReqVO.toString());
-        BindingResultUtil.checkBindingResult(bindingResult);
-        try {
-            DeliveryOilCostRepVO deliveryOilCostRepVO = DeliveryOilCostRepVO.builder().build();
-            DeliveryOilCostVO deliveryOilCostVO = deliveryCarInfoPriceService.getOilCostByRenterOrderNo(deliveryCarPriceReqVO.getOrderNo(), deliveryCarPriceReqVO.getCarEngineType());
-            BeanUtils.copyProperties(deliveryOilCostVO,deliveryOilCostRepVO);
-            return ResponseData.success(deliveryOilCostRepVO);
-        } catch (Exception e) {
-            log.error("获取油费异常:", e);
-            return ResponseData.error();
-        }
-    }
+//    /**
+//     * 获取油费
+//     * @param deliveryCarPriceReqVO
+//     * @return
+//     */
+//    @PostMapping("/oil/getOilCrash")
+//    public ResponseData<DeliveryOilCostRepVO> getOilCostByRenterOrderNo(@RequestBody DeliveryCarPriceReqVO deliveryCarPriceReqVO, BindingResult bindingResult) {
+//        log.info("获取油费入参：{}", deliveryCarPriceReqVO.toString());
+//        BindingResultUtil.checkBindingResult(bindingResult);
+//        try {
+//            DeliveryOilCostRepVO deliveryOilCostRepVO = DeliveryOilCostRepVO.builder().build();
+//            DeliveryOilCostVO deliveryOilCostVO = deliveryCarInfoPriceService.getOilCostByRenterOrderNo(deliveryCarPriceReqVO.getOrderNo(), deliveryCarPriceReqVO.getCarEngineType());
+//            BeanUtils.copyProperties(deliveryOilCostVO,deliveryOilCostRepVO);
+//            return ResponseData.success(deliveryOilCostRepVO);
+//        } catch (Exception e) {
+//            log.error("获取油费异常:", e);
+//            return ResponseData.error();
+//        }
+//    }
 }

@@ -26,6 +26,8 @@ import com.atzuche.order.commons.vo.res.account.income.AdjustOwnerIncomeResVO;
 import com.atzuche.order.flow.service.OrderFlowService;
 import com.atzuche.order.mq.common.base.BaseProducer;
 import com.atzuche.order.mq.common.base.OrderMessage;
+import com.atzuche.order.mq.enums.ShortMessageTypeEnum;
+import com.atzuche.order.mq.util.SmsParamsMapUtil;
 import com.atzuche.order.parentorder.dto.OrderStatusDTO;
 import com.atzuche.order.parentorder.entity.OrderStatusEntity;
 import com.atzuche.order.parentorder.service.OrderStatusService;
@@ -69,6 +71,7 @@ import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 
@@ -650,11 +653,14 @@ public class CashierService {
         orderMessage.setMessage(orderRenterPayAmtSuccessMq);
         log.info("发送订单支付成功事件 （支付押金/违章押金成功）.mq:,message=[{}]",event,
                 GsonUtils.toJson(orderMessage));
-        // TODO 需要发短信
         try {
-            baseProducer.sendTopicMessage(event.exchange,event.routingKey,orderMessage);
+            String renterTextCode = type == 1 ? ShortMessageTypeEnum.PAY_ILLEGAL_DEPOSIT_2_RENTER.getValue() : ShortMessageTypeEnum.PAY_RENT_CAR_DEPOSIT_2_RENTER.getValue();
+            String ownerTextCode = type == 1 ? ShortMessageTypeEnum.PAY_ILLEGAL_DEPOSIT_2_OWNERSERVICE.getValue() : ShortMessageTypeEnum.PAY_RENT_CAR_DEPOSIT_2_OWNER.getValue();
+            Map map = SmsParamsMapUtil.getParamsMap(vo.getOrderNo(), renterTextCode, ownerTextCode, null);
+            orderMessage.setMap(map);
+            baseProducer.sendTopicMessage(event.exchange, event.routingKey, orderMessage);
         } catch (Exception e) {
-            log.error("支付押金成功，但事件发送失败 error [{}] ,[{}] ,[{}],[{}]",event,type,GsonUtils.toJson(vo),e);
+            log.error("支付押金成功，但事件发送失败 error [{}] ,[{}] ,[{}],[{}]", event, type, GsonUtils.toJson(vo), e);
         }
     }
     /**
@@ -671,9 +677,8 @@ public class CashierService {
         orderMessage.setMessage(orderRenterPay);
         log.info("发送订单支付成功事件 （支付押金/违章押金成功）.mq:,message=[{}]",event,
                 GsonUtils.toJson(orderMessage));
-        // TODO 需要发短信
         try {
-            baseProducer.sendTopicMessage(event.exchange,event.routingKey,orderMessage);
+            baseProducer.sendTopicMessage(event.exchange, event.routingKey, orderMessage);
         } catch (Exception e) {
             log.error("支付租车费用成功，但事件发送失败 error [{}] ,[{}] ,[{}]",event,GsonUtils.toJson(vo),e);
         }
