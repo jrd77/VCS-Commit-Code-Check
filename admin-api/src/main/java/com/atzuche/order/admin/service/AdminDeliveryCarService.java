@@ -160,6 +160,11 @@ public class AdminDeliveryCarService {
         GetHandoverCarDTO getHandoverCarDTO = deliveryCarVO.getGetHandoverCarDTO();
         ReturnHandoverCarDTO returnHandoverCarDTO = deliveryCarVO.getReturnHandoverCarDTO();
         if (Objects.nonNull(getHandoverCarDTO)) {
+            if(StringUtils.isBlank(getHandoverCarDTO.getRenterRealGetAddr()) || StringUtils.isBlank(getHandoverCarDTO.getOwnRealReturnAddr()))
+            {
+                logger.info("取车地址相关信息不能为空");
+                throw new DeliveryOrderException(DeliveryErrorCode.DELIVERY_PARAMS_ERROR);
+            }
             DeliveryReqDTO deliveryReqDTO = new DeliveryReqDTO();
             deliveryReqDTO.setIsUsedGetAndReturnCar(String.valueOf(deliveryCarVO.getIsGetCar()));
             deliveryReqDTO.setOrderNo(deliveryCarVO.getOrderNo());
@@ -175,6 +180,11 @@ public class AdminDeliveryCarService {
             deliveryReqVO.setGetDeliveryReqDTO(deliveryReqDTO);
         }
         if (Objects.nonNull(returnHandoverCarDTO)) {
+            if(StringUtils.isBlank(returnHandoverCarDTO.getRenterRealReturnAddr()) || StringUtils.isBlank(returnHandoverCarDTO.getOwnerRealGetAddr()))
+            {
+                logger.info("还车地址相关信息不能为空");
+                throw new DeliveryOrderException(DeliveryErrorCode.DELIVERY_PARAMS_ERROR);
+            }
             DeliveryReqDTO renterDeliveryReqDTO = new DeliveryReqDTO();
             renterDeliveryReqDTO.setIsUsedGetAndReturnCar(String.valueOf(deliveryCarVO.getIsReturnCar()));
             renterDeliveryReqDTO.setOrderNo(deliveryCarVO.getOrderNo());
