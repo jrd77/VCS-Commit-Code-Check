@@ -242,7 +242,7 @@ public class CashierSettleService {
         	entity.setMemNo(renterMemNo);
         	entity.setYingfuAmt(wzTotalAmt);
         	entity.setShifuAmt(depositEntity.getShishouDeposit()); //需要获取实付金额
-        	entity.setDebtAmt(0); //当前默认为0，后续产生欠款的时候，需要回写该字段。
+        	entity.setDebtAmt(wzTotalAmt-depositEntity.getShishouDeposit()>0?(wzTotalAmt-depositEntity.getShishouDeposit()):0); //当前默认为0，后续产生欠款的时候，需要回写该字段。
         	entity.setIsDelete(0);
 
         	//新增记录
@@ -253,6 +253,9 @@ public class CashierSettleService {
         	if(!(entity.getShifuAmt() != null && entity.getShifuAmt().intValue() != 0)) {
         		//没有数据的时候才赋值。
         		entity.setShifuAmt(depositEntity.getShishouDeposit()); //需要获取实付金额
+        		entity.setDebtAmt(wzTotalAmt-depositEntity.getShishouDeposit()>0?(wzTotalAmt-depositEntity.getShishouDeposit()):0); //当前默认为0，后续产生欠款的时候，需要回写该字段。
+        	}else { //存在的情况下，重新计算欠款。
+        		entity.setDebtAmt(wzTotalAmt-entity.getShifuAmt()>0?(wzTotalAmt-entity.getShifuAmt()):0); //当前默认为0，后续产生欠款的时候，需要回写该字段。
         	}
         	accountRenterWzDepositCostNoTService.updateAccountRenterWzDepositCost(entity);
         }
