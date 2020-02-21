@@ -738,17 +738,25 @@ public class OrderSettleNoTService {
         if(!CollectionUtils.isEmpty(ownerOrderIncrementDetail)){
             for(int i=0; i<ownerOrderIncrementDetail.size();i++){
                 OwnerOrderIncrementDetailEntity renterOrderCostDetail = ownerOrderIncrementDetail.get(i);
-                AccountOwnerCostSettleDetailEntity accountOwnerCostSettleDetail = new AccountOwnerCostSettleDetailEntity();
-                BeanUtils.copyProperties(renterOrderCostDetail,accountOwnerCostSettleDetail);
-                accountOwnerCostSettleDetail.setSourceCode(renterOrderCostDetail.getCostCode());
-                accountOwnerCostSettleDetail.setSourceDetail(renterOrderCostDetail.getCostDesc());
-                accountOwnerCostSettleDetail.setUniqueNo(String.valueOf(renterOrderCostDetail.getId()));
-                int amt = Objects.isNull(renterOrderCostDetail.getTotalAmount())?0:renterOrderCostDetail.getTotalAmount();
-                accountOwnerCostSettleDetail.setAmt(amt);
-                accountOwnerCostSettleDetail.setUniqueNo(String.valueOf(renterOrderCostDetail.getId()));
-                accountOwnerCostSettleDetails.add(accountOwnerCostSettleDetail);
-                // 获取车主增值服务费用列表 费用平台端冲账
-                orderSettleNewService.addOwnerOrderIncrementAmtToPlatform(renterOrderCostDetail,settleOrdersDefinition);
+                // GPS 和 平台服务费  下单已落库  结算 实时算 故排除这两种费用
+                // TODO 待这两种费用存值确认后 再处理
+                if(
+                        !OwnerCashCodeEnum.GPS_SERVICE_AMT.getCashNo().equals(renterOrderCostDetail.getCostCode()) &&
+                        ! OwnerCashCodeEnum.SERVICE_CHARGE.getCashNo().equals(renterOrderCostDetail.getCostCode())
+                ){
+                    AccountOwnerCostSettleDetailEntity accountOwnerCostSettleDetail = new AccountOwnerCostSettleDetailEntity();
+                    BeanUtils.copyProperties(renterOrderCostDetail,accountOwnerCostSettleDetail);
+                    accountOwnerCostSettleDetail.setSourceCode(renterOrderCostDetail.getCostCode());
+                    accountOwnerCostSettleDetail.setSourceDetail(renterOrderCostDetail.getCostDesc());
+                    accountOwnerCostSettleDetail.setUniqueNo(String.valueOf(renterOrderCostDetail.getId()));
+                    int amt = Objects.isNull(renterOrderCostDetail.getTotalAmount())?0:renterOrderCostDetail.getTotalAmount();
+                    accountOwnerCostSettleDetail.setAmt(amt);
+                    accountOwnerCostSettleDetail.setUniqueNo(String.valueOf(renterOrderCostDetail.getId()));
+                    accountOwnerCostSettleDetails.add(accountOwnerCostSettleDetail);
+                    // 获取车主增值服务费用列表 费用平台端冲账
+                    orderSettleNewService.addOwnerOrderIncrementAmtToPlatform(renterOrderCostDetail,settleOrdersDefinition);
+                }
+
             }
         }
         //1.6 获取gps服务费
