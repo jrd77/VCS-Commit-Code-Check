@@ -9,7 +9,7 @@ import lombok.Data;
  * 车主收益待审核表
  * 
  * @author ZhangBin
- * @date 2019-12-17 16:44:05
+ * @date 2020-02-21 20:20:35
  * @Description:
  */
 @Data
@@ -28,11 +28,10 @@ public class AccountOwnerIncomeExamineEntity implements Serializable {
 	 * 主订单号
 	 */
 	private String orderNo;
-
-    /**
-     * 主订单号
-     */
-    private String ownerOrderNo;
+	/**
+	 * 车主子订单
+	 */
+	private String ownerOrderNo;
 	/**
 	 * 收益审核金额
 	 */
@@ -42,9 +41,13 @@ public class AccountOwnerIncomeExamineEntity implements Serializable {
 	 */
 	private String detail;
 	/**
-	 * 审核状态 审核状态1,待审核 2,审核通过 3,审核拒绝
+	 * 审核状态1,待审核 2,审核通过 3,审核拒绝
 	 */
 	private Integer status;
+	/**
+	 * 类型，1收益，2调账
+	 */
+	private Integer type;
 	/**
 	 * 审核人
 	 */

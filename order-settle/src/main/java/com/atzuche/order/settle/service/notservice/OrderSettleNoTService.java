@@ -8,8 +8,11 @@ import java.util.stream.Collectors;
 
 import com.atzuche.order.accountplatorm.entity.AccountPlatformProfitEntity;
 import com.atzuche.order.commons.enums.account.CostTypeEnum;
+import com.atzuche.order.commons.enums.account.income.AccountOwnerIncomeExamineStatus;
+import com.atzuche.order.commons.enums.account.income.AccountOwnerIncomeExamineType;
 import com.atzuche.order.commons.enums.cashier.PaySourceEnum;
 import com.atzuche.order.commons.service.OrderPayCallBack;
+import com.atzuche.order.commons.vo.req.income.AccountOwnerIncomeExamineReqVO;
 import com.atzuche.order.delivery.service.delivery.DeliveryCarInfoPriceService;
 import com.atzuche.order.delivery.vo.delivery.DeliveryOilCostVO;
 import com.atzuche.order.delivery.vo.delivery.rep.OwnerGetAndReturnCarDTO;
@@ -26,7 +29,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import com.atzuche.order.accountownercost.entity.AccountOwnerCostSettleDetailEntity;
-import com.atzuche.order.accountownerincome.vo.req.AccountOwnerIncomeExamineReqVO;
 import com.atzuche.order.accountplatorm.entity.AccountPlatformProfitDetailEntity;
 import com.atzuche.order.accountplatorm.entity.AccountPlatformProfitEntity;
 import com.atzuche.order.accountplatorm.entity.AccountPlatformSubsidyDetailEntity;
@@ -234,14 +236,14 @@ public class OrderSettleNoTService {
         settleOrders.setRenterOrder(renterOrder);
         settleOrders.setOwnerOrder(ownerOrder);
         // 2 校验订单状态 以及是否存在 理赔暂扣 存在不能进行结算 并CAT告警
-        this.check(renterOrder);
+        this.check(renterOrder,settleOrders);
         return settleOrders;
     }
     /**
      * 校验是否可以结算 校验订单状态 以及是否存在 理赔暂扣 存在不能进行结算 并CAT告警
      * @param renterOrder
      */
-    public void check(RenterOrderEntity renterOrder) {
+    public void check(RenterOrderEntity renterOrder,SettleOrders settleOrders) {
         // 1 订单校验是否可以结算
         OrderStatusEntity orderStatus = orderStatusService.getByOrderNo(renterOrder.getOrderNo());
         if(OrderStatusEnum.TO_SETTLE.getStatus() != orderStatus.getStatus()){
@@ -265,7 +267,7 @@ public class OrderSettleNoTService {
 //            throw new RuntimeException("租客存在暂扣信息不能结算");
 //        }
         //4 先查询  发现 有结算数据停止结算 手动处理
-        orderSettleNewService.checkIsSettle(renterOrder.getOrderNo());
+        orderSettleNewService.checkIsSettle(renterOrder.getOrderNo(),settleOrders);
     }
 
     /**
@@ -1542,6 +1544,11 @@ public class OrderSettleNoTService {
             accountOwnerIncomeExamine.setMemNo(settleOrdersAccount.getOwnerMemNo());
             accountOwnerIncomeExamine.setAmt(settleOrdersAccount.getOwnerCostSurplusAmt());
             accountOwnerIncomeExamine.setMemNo(settleOrdersAccount.getOwnerMemNo());
+            accountOwnerIncomeExamine.setRemark("结算收益");
+            accountOwnerIncomeExamine.setDetail("结算收益");
+            accountOwnerIncomeExamine.setOwnerOrderNo(settleOrdersAccount.getOwnerOrderNo());
+            accountOwnerIncomeExamine.setStatus(AccountOwnerIncomeExamineStatus.WAIT_EXAMINE);
+            accountOwnerIncomeExamine.setType(AccountOwnerIncomeExamineType.OWNER_INCOME);
             cashierService.insertOwnerIncomeExamine(accountOwnerIncomeExamine);
         }
 
@@ -1620,7 +1627,7 @@ public class OrderSettleNoTService {
      */
     public void getCancelOwnerCostSettleDetail(SettleOrders settleOrders) {
         OwnerCosts ownerCosts = new OwnerCosts();
-        //1 获取全局的车主订单罚金明细（租客车主共用表 ，会员号区分车主/租客）
+        //1 获取全局的车主订单罚金明细
         List<ConsoleOwnerOrderFineDeatailEntity> consoleOwnerOrderFineDeatailEntitys = consoleOwnerOrderFineDeatailService.selectByOrderNo(settleOrders.getOrderNo());
 
         //2 车主罚金
@@ -2092,6 +2099,10 @@ public class OrderSettleNoTService {
             accountOwnerIncomeExamine.setMemNo(settleOrders.getOwnerMemNo());
             accountOwnerIncomeExamine.setOrderNo(settleOrders.getOrderNo());
             accountOwnerIncomeExamine.setRemark("罚金收入");
+            accountOwnerIncomeExamine.setDetail("罚金收入");
+            accountOwnerIncomeExamine.setOwnerOrderNo(settleOrders.getOwnerOrderNo());
+            accountOwnerIncomeExamine.setStatus(AccountOwnerIncomeExamineStatus.WAIT_EXAMINE);
+            accountOwnerIncomeExamine.setType(AccountOwnerIncomeExamineType.OWNER_INCOME);
             cashierService.insertOwnerIncomeExamine(accountOwnerIncomeExamine);
             accountPlatformProfitEntity.setOwnerIncomeAmt(-settleCancelOrdersAccount.getOwnerFineIncomeAmt());
         }

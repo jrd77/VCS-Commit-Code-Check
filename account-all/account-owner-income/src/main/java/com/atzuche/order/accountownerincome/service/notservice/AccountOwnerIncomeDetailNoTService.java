@@ -4,12 +4,13 @@ import com.atzuche.order.accountownerincome.entity.AccountOwnerIncomeDetailEntit
 import com.atzuche.order.accountownerincome.entity.AccountOwnerIncomeExamineEntity;
 import com.atzuche.order.accountownerincome.exception.AccountOwnerIncomeExamineException;
 import com.atzuche.order.accountownerincome.mapper.AccountOwnerIncomeDetailMapper;
-import com.atzuche.order.accountownerincome.vo.req.AccountOwnerIncomeExamineOpReqVO;
 import com.atzuche.order.commons.enums.account.income.AccountOwnerIncomeDetailType;
-import com.atzuche.order.commons.enums.account.income.AccountOwnerIncomeExamineStatus;
-import com.atzuche.order.commons.enums.account.income.OrderCoseSourceCode;
+import com.atzuche.order.commons.enums.cashcode.OwnerCashCodeEnum;
+import com.atzuche.order.commons.vo.req.income.AccountOwnerIncomeExamineOpReqVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
+import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -30,28 +31,26 @@ public class AccountOwnerIncomeDetailNoTService {
     private AccountOwnerIncomeExamineNoTService accountOwnerIncomeExamineNoTService;
 
 
-    public AccountOwnerIncomeDetailEntity insertAccountOwnerIncomeDetail(AccountOwnerIncomeExamineOpReqVO accountOwnerIncomeExamineOpReq) {
+    public AccountOwnerIncomeDetailEntity insertAccountOwnerIncomeDetail(AccountOwnerIncomeExamineOpReqVO vo) {
         //1 查询审核通过的  收益审核信息
-        AccountOwnerIncomeExamineEntity accountOwnerIncomeExamine = accountOwnerIncomeExamineNoTService.getAccountOwnerIncomeExamineById(accountOwnerIncomeExamineOpReq.getAccountOwnerIncomeExamineId());
-        if(Objects.isNull(accountOwnerIncomeExamine) || Objects.isNull(accountOwnerIncomeExamine.getId())){
+        List<AccountOwnerIncomeExamineEntity> accountOwnerIncomeExamines = accountOwnerIncomeExamineNoTService.getAccountOwnerIncomeExamineByOrderNo(vo.getOrderNo(),vo.getMemNo());
+        if(CollectionUtils.isEmpty(accountOwnerIncomeExamines)){
             throw new AccountOwnerIncomeExamineException();
         }
-        //1.1 审核不通过 抛异常 不能增加收益
-        if(!AccountOwnerIncomeExamineStatus.PASS_EXAMINE.equals(accountOwnerIncomeExamine.getStatus())){
-            throw new AccountOwnerIncomeExamineException();
-        }
+        int amt  = accountOwnerIncomeExamines.stream().mapToInt(AccountOwnerIncomeExamineEntity::getAmt).sum();
+        Assert.isTrue(amt>0,"车主收益金额不合法");
         LocalDateTime now = LocalDateTime.now();
         AccountOwnerIncomeDetailEntity accountOwnerIncomeDetail = new AccountOwnerIncomeDetailEntity();
-        accountOwnerIncomeDetail.setAmt(accountOwnerIncomeExamine.getAmt());
-        accountOwnerIncomeDetail.setIncomeExamineId(accountOwnerIncomeExamine.getId());
-        accountOwnerIncomeDetail.setCreateOp(accountOwnerIncomeExamineOpReq.getOpName());
-        accountOwnerIncomeDetail.setDetail(accountOwnerIncomeExamineOpReq.getDetail());
-        accountOwnerIncomeDetail.setMemNo(accountOwnerIncomeExamine.getMemNo());
-        accountOwnerIncomeDetail.setOrderNo(accountOwnerIncomeExamine.getOrderNo());
+        accountOwnerIncomeDetail.setAmt(amt);
+        accountOwnerIncomeDetail.setIncomeExamineId(vo.getAccountOwnerIncomeExamineId());
+        accountOwnerIncomeDetail.setCreateOp(vo.getOpName());
+        accountOwnerIncomeDetail.setDetail(vo.getDetail());
+        accountOwnerIncomeDetail.setMemNo(vo.getMemNo());
+        accountOwnerIncomeDetail.setOrderNo(vo.getOrderNo());
         accountOwnerIncomeDetail.setTime(now);
         accountOwnerIncomeDetail.setType(AccountOwnerIncomeDetailType.INCOME.getType());
-        accountOwnerIncomeDetail.setCostCode(OrderCoseSourceCode.OWNER_COST_SETTLE.getCode());
-        accountOwnerIncomeDetail.setCostDetail(OrderCoseSourceCode.OWNER_COST_SETTLE.getDesc());
+        accountOwnerIncomeDetail.setCostCode(OwnerCashCodeEnum.ACCOUNT_OWNER_INCOME.getCashNo());
+        accountOwnerIncomeDetail.setCostDetail(OwnerCashCodeEnum.ACCOUNT_OWNER_INCOME.getTxt());
         int result = accountOwnerIncomeDetailMapper.insertSelective(accountOwnerIncomeDetail);
         if(result==0){
             throw new AccountOwnerIncomeExamineException();
@@ -60,7 +59,7 @@ public class AccountOwnerIncomeDetailNoTService {
     }
 
 
-    public List<AccountOwnerIncomeDetailEntity> selectByOrderNo(String orderNo){
-        return accountOwnerIncomeDetailMapper.selectByOrderNo(orderNo);
+    public List<AccountOwnerIncomeDetailEntity> selectByOrderNo(String orderNo,String memNo){
+        return accountOwnerIncomeDetailMapper.selectByOrderNo(orderNo,memNo);
     }
 }
