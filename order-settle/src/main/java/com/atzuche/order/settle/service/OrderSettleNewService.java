@@ -507,40 +507,9 @@ public class OrderSettleNewService {
         baseProducer.sendTopicMessage(eventEnum.exchange,eventEnum.routingKey,orderMessage);
         log.info("sendOrderSettleMq remote start [{}],[{}]",eventEnum,GsonUtils.toJson(orderMessage));
     }
-    /**
-     * 订单违章结算成功事件
-     * @param orderNo
-     */
-    public void sendOrderWzSettleSuccessMq(String orderNo) {
-        log.info("sendOrderWzSettleSuccessMq start [{}]",orderNo);
-        OrderWzSettlementMq orderSettlementMq = new OrderWzSettlementMq();
-        orderSettlementMq.setStatus(0);
-        orderSettlementMq.setOrderNo(orderNo);
-        OrderMessage orderMessage = OrderMessage.builder().build();
-        orderMessage.setMessage(orderSettlementMq);
-        //TODO 发短信
-        log.info("sendOrderWzSettleSuccessMq remote start [{}] ,[{}] ",GsonUtils.toJson(orderMessage),NewOrderMQActionEventEnum.ORDER_WZ_SETTLEMENT_SUCCESS);
-        baseProducer.sendTopicMessage(NewOrderMQActionEventEnum.ORDER_WZ_SETTLEMENT_SUCCESS.exchange,NewOrderMQActionEventEnum.ORDER_WZ_SETTLEMENT_SUCCESS.routingKey,orderMessage);
-        log.info("sendOrderWzSettleSuccessMq remote end [{}]",orderNo);
-    }
+    
 
-    /**
-     * 订单结算失败事件
-     * @param orderNo
-     */
-    public void sendOrderWzSettleFailMq(String orderNo) {
-        log.info("sendOrderWzSettleFailMq start [{}]",orderNo);
-        OrderWzSettlementMq orderSettlementMq = new OrderWzSettlementMq();
-        orderSettlementMq.setStatus(1);
-        orderSettlementMq.setOrderNo(orderNo);
-        OrderMessage orderMessage = OrderMessage.builder().build();
-        orderMessage.setMessage(orderSettlementMq);
-        //TODO 发短信
-        log.info("sendOrderWzSettleFailMq remote start [{}] ,[{}] ",GsonUtils.toJson(orderMessage),NewOrderMQActionEventEnum.ORDER_WZ_SETTLEMENT_FAIL);
-        baseProducer.sendTopicMessage(NewOrderMQActionEventEnum.ORDER_WZ_SETTLEMENT_FAIL.exchange,NewOrderMQActionEventEnum.ORDER_WZ_SETTLEMENT_FAIL.routingKey,orderMessage);
-        log.info("sendOrderWzSettleFailMq remote end [{}]",orderNo);
-
-    }
+    
 
     /**
      * 查询 租客 应付金额

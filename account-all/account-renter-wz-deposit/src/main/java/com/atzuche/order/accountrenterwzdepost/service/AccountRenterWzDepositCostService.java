@@ -38,7 +38,7 @@ public class AccountRenterWzDepositCostService{
         accountRenterWzDepositCostDetailNoTService.insertCostDetail(renterWZDepositCost);
     }
 
-	public int deductDepositToRentCost(AccountRenterWzCostDetailReqVO accountRenterCostChangeReqVO) {
+	public int deductDepositToWzCostDetail(AccountRenterWzCostDetailReqVO accountRenterCostChangeReqVO) {
 		return accountRenterWzDepositCostDetailNoTService.insertAccountRenterCostDetail(accountRenterCostChangeReqVO);
 	}
 }
