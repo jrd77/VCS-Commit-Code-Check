@@ -232,33 +232,7 @@ public class CashierService {
     /**  ***************************************** 违章押金 end *************************************************     */
 
     /**  ***************************************** 历史欠款 start  *************************************************    */
-    /**
-     * 7）违章押金抵扣历史欠款
-     */
-    @Transactional(rollbackFor=Exception.class)
-    public CashierDeductDebtResVO deductWZDebt(CashierDeductDebtReqVO cashierDeductDebtReqVO){
-        Assert.notNull(cashierDeductDebtReqVO, ErrorCode.PARAMETER_ERROR.getText());
-        cashierDeductDebtReqVO.check();
-        //1 查询历史总欠款
-        int debtAmt = accountDebtService.getAccountDebtNumByMemNo(cashierDeductDebtReqVO.getMemNo());
-        if(debtAmt>=0){
-            return null;
-        }
-        //2 抵扣
-        AccountDeductDebtReqVO accountDeductDebt = new AccountDeductDebtReqVO();
-        BeanUtils.copyProperties(cashierDeductDebtReqVO,accountDeductDebt);
-        accountDeductDebt.setSourceCode(cashierDeductDebtReqVO.getRenterCashCodeEnum().getCashNo());
-        accountDeductDebt.setSourceDetail(cashierDeductDebtReqVO.getRenterCashCodeEnum().getTxt());
-        //公共抵扣方法。
-        int debtedAmt = accountDebtService.deductDebt(accountDeductDebt);
-        
-        //3 记录结算费用抵扣记录
-        PayedOrderRenterDepositWZDetailReqVO payedOrderRenterWZDepositDetail = new PayedOrderRenterDepositWZDetailReqVO();
-        BeanUtils.copyProperties(cashierDeductDebtReqVO,payedOrderRenterWZDepositDetail);
-        payedOrderRenterWZDepositDetail.setAmt(-debtedAmt);
-        int id = accountRenterWzDepositService.updateRenterWZDepositChange(payedOrderRenterWZDepositDetail);
-        return new CashierDeductDebtResVO(cashierDeductDebtReqVO, debtedAmt,id);
-    }
+   
     /**
      * 7）押金抵扣历史欠款
      */
@@ -395,22 +369,7 @@ public class CashierService {
         return depositDetailId;
     }
     
-    @Transactional(rollbackFor=Exception.class)
-    public int refundWzDeposit(CashierRefundApplyReqVO cashierRefundApplyReq){
-        Assert.notNull(cashierRefundApplyReq, ErrorCode.PARAMETER_ERROR.getText());
-        cashierRefundApplyReq.check();
-        //1 记录退还记录
-        Integer id = cashierRefundApplyNoTService.insertRefundDeposit(cashierRefundApplyReq);
-        //2 记录费用平账
-        DetainRenterWZDepositReqVO detainRenterDepositReqVO = new DetainRenterWZDepositReqVO();
-        BeanUtils.copyProperties(cashierRefundApplyReq,detainRenterDepositReqVO);
-        detainRenterDepositReqVO.setUniqueNo(id.toString());
-        //2 押金账户资金转移接口
-        int depositDetailId = accountRenterWzDepositService.detainRenterDeposit(detainRenterDepositReqVO);
-        // 3 更新押金结算状态
-        accountRenterWzDepositService.updateOrderDepositSettle(detainRenterDepositReqVO);
-        return depositDetailId;
-    }
+    
     
     /**
      * 结算退还租车费用

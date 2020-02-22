@@ -21,7 +21,7 @@ public enum ShortMessageTypeEnum {
     NOTIFY_RENTER_TRANS_REQACCEPTEDPACKAGE("NotifyRenterTransReqAcceptedPackage", "恭喜您已成功提交订单，请在1小时内支付租车押金，否则订单将被取消。如果订单时间需要提前或延后，请进入订单详情点击“修改订单“，车主同意后即可生效。"),
     NOTIFY_RENTER_TRANS_REQACCEPTEDPACKAGE_SPECIAL_TIME("NotifyRenterTransReqAcceptedPackage_special_time", "恭喜您已成功提交订单，请在1小时内支付租车押金，否则订单将被取消。如果订单时间需要提前或延后，请进入订单详情点击“修改订单“，车主同意后即可生效。租期包含10.1-10.7期间的订单，违章查询周期延长至33天，因违章查询周期延长，违章押金使用预授权、信用减免、绑卡免押的订单，违章押金将在期间转为消费，待订单查询无违章后原路退还。"),
     NOTIFY_RENTER_TRANS_REQACCEPTED_SPECIAL_TIME("NotifyRenterTransReqAccepted_special_time", "车主已接受您对“ #carBrand##carType#”(车牌#carPlateNum#)的租车订单，请在1小时内支付租车押金，否则订单将被取消。如果订单时间需要提前或延后，请进入APP订单详情点击“修改订单“，车主同意后即可生效。租期包含10.1-10.7期间的订单，违章查询周期延长至33天，因违章查询周期延长，违章押金使用预授权、信用减免、绑卡免押的订单，违章押金将在期间转为消费，待订单查询无违章后原路退还"),
-    PAY_ILLEGAL_DEPOSIT_2_OWNERSERVICE("PayIllegalDeposit2OwnerService", "$realName$预订您“$CarBrand$”(车牌$CarPlateNum$)(订单号：$orderNo$)的违章押金支付成功$NewMsg$ 101002021"),
+    PAY_ILLEGAL_DEPOSIT_2_OWNERSERVICE("PayIllegalDeposit2OwnerService", "$realName$预订您“$CarBrand$”(车牌$CarPlateNum$)(订单号：$orderNo$)的违章押金支付成功 101002021"),
     PAY_ILLEGAL_DEPOSIT_2_RENTER("PayIllegalDeposit2Renter", "您预订“$CarBrand$”(车牌$CarPlateNum$）(订单号：$orderNo$)违章押金付费成功10100202"),
     PAY_ILLEGAL_DEPOSIT_CANCEL_OWNER("PayIllegalDepositCancelOwner", "因租客未能完成违章押金支付，您$CarPlateNum$的订单已取消，请不要将车辆交于租客"),
     PAY_ILLEGAL_DEPOSIT_CANCEL_OWNERNEWYEAR("PayIllegalDepositCancelOwnerNewYear", "$realName$，由于租客未在取车时间前支付违章押金，您的“$CarBrand$”(车牌$CarPlateNum$)的订单已经自动取消(订单号：$orderNo$，取车时间：$RentTime$)，请不要将车辆交于租客，根据违约金规则（春节订单条款），您将获得最多500元违约金补偿。10100202"),

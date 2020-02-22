@@ -3,9 +3,6 @@ package com.atzuche.order.cashieraccount.service;
 import java.util.List;
 import java.util.Objects;
 
-import com.atzuche.order.accountrenterdeposit.vo.res.AccountRenterDepositResVO;
-import com.atzuche.order.commons.enums.SubsidySourceCodeEnum;
-import com.atzuche.order.commons.enums.account.CostTypeEnum;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -41,13 +38,9 @@ import com.atzuche.order.accountrenterrentcost.service.notservice.AccountRenterC
 import com.atzuche.order.accountrenterrentcost.service.notservice.AccountRenterCostSettleNoTService;
 import com.atzuche.order.accountrenterrentcost.vo.req.AccountRenterCostDetailReqVO;
 import com.atzuche.order.accountrenterrentcost.vo.req.AccountRenterCostToFineReqVO;
-import com.atzuche.order.accountrenterwzdepost.entity.AccountRenterWzDepositCostEntity;
 import com.atzuche.order.accountrenterwzdepost.entity.AccountRenterWzDepositCostSettleDetailEntity;
-import com.atzuche.order.accountrenterwzdepost.entity.AccountRenterWzDepositEntity;
-import com.atzuche.order.accountrenterwzdepost.exception.RenterWZDepositCostException;
 import com.atzuche.order.accountrenterwzdepost.service.AccountRenterWzDepositCostService;
 import com.atzuche.order.accountrenterwzdepost.service.AccountRenterWzDepositService;
-import com.atzuche.order.accountrenterwzdepost.service.notservice.AccountRenterWzDepositCostNoTService;
 import com.atzuche.order.accountrenterwzdepost.service.notservice.AccountRenterWzDepositCostSettleDetailNoTService;
 import com.atzuche.order.accountrenterwzdepost.service.notservice.AccountRenterWzDepositDetailNoTService;
 import com.atzuche.order.accountrenterwzdepost.service.notservice.AccountRenterWzDepositNoTService;
@@ -57,6 +50,7 @@ import com.atzuche.order.accountrenterwzdepost.vo.req.RenterCancelWZDepositCostR
 import com.atzuche.order.cashieraccount.service.notservice.CashierNoTService;
 import com.atzuche.order.cashieraccount.service.notservice.CashierRefundApplyNoTService;
 import com.atzuche.order.cashieraccount.vo.req.DeductDepositToRentCostReqVO;
+import com.atzuche.order.commons.enums.account.CostTypeEnum;
 import com.atzuche.order.commons.enums.cashcode.OwnerCashCodeEnum;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.rentercost.service.RenterOrderCostCombineService;
@@ -96,14 +90,23 @@ public class CashierSettleService {
     @Autowired private AccountOwnerCostSettleService accountOwnerCostSettleService;
     @Autowired private AccountRenterClaimCostSettleNoTService accountRenterClaimCostSettleNoTService;
     @Autowired private AccountRenterDetainCostNoTService accountRenterDetainCostNoTService;
-    @Autowired private AccountRenterWzDepositDetailNoTService accountRenterWzDepositDetailNoTService;
+    
     @Autowired private AccountRenterDepositDetailNoTService accountRenterDepositDetailNoTService;
     
     @Autowired
     AccountRenterWzDepositCostSettleDetailNoTService accountRenterWzDepositCostSettleDetailNoTService;
-    @Autowired
-    AccountRenterWzDepositCostNoTService accountRenterWzDepositCostNoTService;
-
+    @Autowired 
+    private AccountRenterWzDepositDetailNoTService accountRenterWzDepositDetailNoTService;
+    
+    /**
+	 	* 查询实付 违章押金金额()
+	 * @param orderNo
+	 * @param renterMemNo
+	 * @return
+	 */
+	public int getSurplusWZDepositCostAmt(String orderNo, String renterMemNo) {
+	    return accountRenterWzDepositDetailNoTService.getSurplusWZDepositCostAmt(orderNo,renterMemNo);
+	}
     /**
      * 车辆结算
      * @param orderNo
@@ -223,43 +226,7 @@ public class CashierSettleService {
 
     }
 
-    /**
-     * 计算租客 租车费用  平台补贴费用  车主补贴费用 手续费 基础保障费用 等 并落库
-     * @param account_renter_wz_deposit_cost
-     */
-    public AccountRenterWzDepositCostEntity updateWzRentSettleCost(String orderNo,String renterMemNo,int wzTotalAmt) {
-    	//account_renter_wz_deposit
-    	AccountRenterWzDepositEntity depositEntity = accountRenterWzDepositNoTService.getAccountRenterWZDeposit(orderNo, renterMemNo);
-    	if(Objects.isNull(depositEntity) || Objects.isNull(depositEntity.getId())){
-            throw new RenterWZDepositCostException() ;
-        }
-
-    	AccountRenterWzDepositCostEntity entity = accountRenterWzDepositCostNoTService.queryWzDeposit(orderNo,renterMemNo);
-        if(Objects.isNull(entity) || Objects.isNull(entity.getId())){
-//            throw new AccountRenterRentCostSettleException() ;
-        	entity = new AccountRenterWzDepositCostEntity();
-        	entity.setOrderNo(orderNo);
-        	entity.setMemNo(renterMemNo);
-        	entity.setYingfuAmt(wzTotalAmt);
-        	entity.setShifuAmt(depositEntity.getShishouDeposit()); //需要获取实付金额
-        	entity.setDebtAmt(0); //当前默认为0，后续产生欠款的时候，需要回写该字段。
-        	entity.setIsDelete(0);
-
-        	//新增记录
-        	accountRenterWzDepositCostNoTService.insertAccountRenterWzDepositCost(entity);
-        }else {
-        	//修改记录
-        	entity.setYingfuAmt(wzTotalAmt);
-        	if(!(entity.getShifuAmt() != null && entity.getShifuAmt().intValue() != 0)) {
-        		//没有数据的时候才赋值。
-        		entity.setShifuAmt(depositEntity.getShishouDeposit()); //需要获取实付金额
-        	}
-        	accountRenterWzDepositCostNoTService.updateAccountRenterWzDepositCost(entity);
-        }
-        return entity;
-
-
-    }
+    
 
 
     /**
@@ -302,39 +269,7 @@ public class CashierSettleService {
         insertAccountRenterCostSettleDetail(entity);
     }
 
-    /**
-     * 结算时候，应付金额大于实付金额，存在欠款，车辆押金抵扣
-     */
-    public void deductWzDepositToRentCost(DeductDepositToRentCostReqVO vo) {
-        // 1 记录押金流水记录
-    	DetainRenterWZDepositReqVO detainRenterDepositReqVO = new DetainRenterWZDepositReqVO();
-        BeanUtils.copyProperties(vo,detainRenterDepositReqVO);
-        detainRenterDepositReqVO.setRenterCashCodeEnum(RenterCashCodeEnum.SETTLE_WZ_DEPOSIT_TO_WZ_COST);
-        int renterDepositDetailId = accountRenterWzDepositService.detainRenterDeposit(detainRenterDepositReqVO);
-
-        //2 记录 更新 租客户头 租车费用
-        AccountRenterWzCostDetailReqVO accountRenterCostChangeReqVO = new AccountRenterWzCostDetailReqVO();
-        BeanUtils.copyProperties(detainRenterDepositReqVO,accountRenterCostChangeReqVO);
-        accountRenterCostChangeReqVO.setUniqueNo(String.valueOf(renterDepositDetailId));
-        accountRenterCostChangeReqVO.setAmt(Math.abs(vo.getAmt()));
-        accountRenterCostChangeReqVO.setRenterCashCodeEnum(RenterCashCodeEnum.ACCOUNT_RENTER_WZ_DEPOSIT);
-        int rentCostDetailId = accountRenterWzDepositCostService.deductDepositToRentCost(accountRenterCostChangeReqVO);
-
-        //3 更新押金流水 UniqueNo 字段
-        accountRenterWzDepositService.updateRenterDepositUniqueNo(String.valueOf(rentCostDetailId),renterDepositDetailId);
-
-        //wzTotalCost-todo
-        // 4 租客结算费用明细 落库  account_renter_wz_deposit_cost_settle_detail 表结构不同。。 先记入费用总表
-        AccountRenterCostSettleDetailEntity entity = new AccountRenterCostSettleDetailEntity();
-        BeanUtils.copyProperties(vo,entity);
-        entity.setAmt(Math.abs(vo.getAmt()));
-        entity.setCostCode(RenterCashCodeEnum.SETTLE_WZ_DEPOSIT_TO_WZ_COST.getCashNo());
-        entity.setCostDetail(RenterCashCodeEnum.SETTLE_WZ_DEPOSIT_TO_WZ_COST.getTxt());
-        entity.setUniqueNo(String.valueOf(renterDepositDetailId));
-        entity.setType(10); //默认10
-        insertAccountRenterCostSettleDetail(entity);
-
-    }
+    
 
 
     /**
@@ -445,15 +380,7 @@ public class CashierSettleService {
         return accountRenterWzDepositNoTService.getAccountRenterWZDepositAmt(orderNo,renterMemNo);
     }
 
-    /**
-     * 查询实付 违章押金金额()
-     * @param orderNo
-     * @param renterMemNo
-     * @return
-     */
-    public int getSurplusWZDepositCostAmt(String orderNo, String renterMemNo) {
-        return accountRenterWzDepositDetailNoTService.getSurplusWZDepositCostAmt(orderNo,renterMemNo);
-    }
+    
 
     /**
      * 查询实付 租车费用

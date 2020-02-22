@@ -28,7 +28,11 @@ public class OrderSettleTest {
 	public void testSettleWzOrder() {
 		//orderSettle.settleWzOrder("78133341200299");
 		//52083341200299
-		orderSettle.settleWzOrder("52083341200299");
+//		orderSettle.settleWzOrder("52083341200299");
+		//52125202200299
+		//orderSettle.settleWzOrder("52125202200299");
+		//61175312200299
+		orderSettle.settleWzOrder("61175312200299");
 	}
 
 }
