@@ -22,8 +22,22 @@
         <result property="updateOperator" column="update_operator"/>
     </resultMap>
 
-	<select id="findAll" resultType="com.atzuche.config.common.entity.ServicePointEntity">
-		select * from service_point
+	<select id="findAll" resultMap="servicePointMap">
+		select id,
+            address_title,
+            address_content,
+            lat,
+            lon,
+            city_code,
+            city_name,
+            is_exact,
+            is_airport,
+            get_return_flag,
+            del_flag,
+            create_time,
+            create_operator,
+            update_time,
+            update_operator from service_point
 	</select>
 
 </mapper>

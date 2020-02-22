@@ -27,7 +27,7 @@ public class ServicePointService implements ConfigService{
     public ConfigItemDTO getConfig() {
         List<ServicePointEntity> list = mapper.findAll();
         ConfigItemDTO configItemDTO = new ConfigItemDTO();
-        configItemDTO.setConfigClass(CityEntity.class);
+        configItemDTO.setConfigClass(ServicePointEntity.class);
         configItemDTO.setConfigName(CONFIG_NAME);
         configItemDTO.setConfigType(ConfigConstants.TABLE_TYPE);
         configItemDTO.setConfigValue(JSON.toJSONString(list));

@@ -46,4 +46,6 @@ public class ServicePointConfigSDK {
         logger.error("configNot found for address={},lat={},lon={}",address,lat,lon);
         throw new ConfigNotFoundException("ConfigNotFound:address="+address+",lat="+lat+",lon="+lon);
     }
+
+
 }
