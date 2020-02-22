@@ -1,9 +1,7 @@
 package com.atzuche.order.delivery.common;
 
-import com.atzuche.order.delivery.entity.RenterDeliveryAddrEntity;
 import com.atzuche.order.delivery.entity.RenterOrderDeliveryEntity;
 import com.atzuche.order.delivery.enums.ServiceTypeEnum;
-import com.atzuche.order.delivery.exception.DeliveryOrderException;
 import com.atzuche.order.delivery.service.MailSendService;
 import com.atzuche.order.delivery.service.RenterOrderDeliveryService;
 import com.atzuche.order.delivery.service.delivery.RenYunDeliveryCarService;
@@ -16,14 +14,12 @@ import com.atzuche.order.delivery.vo.delivery.RenYunFlowOrderDTO;
 import com.atzuche.order.delivery.vo.delivery.UpdateFlowOrderDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Objects;
 import java.util.concurrent.Future;
 
 /**
@@ -128,7 +124,7 @@ public class DeliveryCarTask {
                 mailSendService.sendSimpleEmail(toEmails, EmailConstants.PROCESS_SYSTEM_NOTICE_SUBJECT, content);
             }
         } catch (Exception e) {
-            log.info("发送邮件失败---->>>>{}:", e.getMessage());
+            log.info("发送邮件失败---->>>>{}:", e);
         }
     }
 

@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 
 /**
  * @author 胡春林
- * 获取车主修改后的里程油耗
+ * 获取租客车主修改后的里程油耗
  */
 @Service
 public class HandoverCarMileageListener {

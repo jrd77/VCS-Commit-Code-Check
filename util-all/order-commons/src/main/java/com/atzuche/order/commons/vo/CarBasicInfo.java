@@ -37,6 +37,10 @@ public class CarBasicInfo implements Serializable{
 
     @AutoDocProperty(value = "【5.6新增】前端显示话术")
     private String toast;
+    /**
+     * 车主类型:5个人车主、10租赁公司、15其他 、20托管车辆-交易用、25托管车辆-工作用、30短期托管车、35代管车辆
+     */
+    private Integer carOwnerType;
 
     public String getPlateNum() {
         return plateNum;
@@ -105,4 +109,11 @@ public class CarBasicInfo implements Serializable{
 	public void setToast(String toast) {
 		this.toast = toast;
 	}
+	public Integer getCarOwnerType() {
+		return carOwnerType;
+	}
+	public void setCarOwnerType(Integer carOwnerType) {
+		this.carOwnerType = carOwnerType;
+	}
+	
 }

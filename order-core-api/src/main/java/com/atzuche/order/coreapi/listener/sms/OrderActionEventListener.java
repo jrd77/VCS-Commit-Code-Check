@@ -22,8 +22,8 @@ import java.util.Map;
 @Slf4j
 public class OrderActionEventListener extends SMSOrderBaseEventService{
 
-    @RabbitListener(bindings = {@QueueBinding(value = @Queue(value = "order_action_05", durable = "true"),
-            exchange = @Exchange(value = "auto-order-action", durable = "true", type = "topic"), key = "action.order.settlement.#")
+    @RabbitListener(bindings = {@QueueBinding(value = @Queue(value = "order_action_01", durable = "true"),
+            exchange = @Exchange(value = "auto-order-action", durable = "true", type = "topic"), key = "action.#")
     }, containerFactory = "orderRabbitListenerContainerFactory")
     public void process(Message message) {
         log.info("receive order action message: " + new String(message.getBody()));

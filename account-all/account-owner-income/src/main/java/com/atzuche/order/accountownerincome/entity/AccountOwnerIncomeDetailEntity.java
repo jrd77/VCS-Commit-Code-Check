@@ -28,6 +28,7 @@ public class AccountOwnerIncomeDetailEntity implements Serializable {
 	 * 主订单号
 	 */
 	private String orderNo;
+
 	/**
 	 * 收益金额
 	 */
@@ -43,7 +44,7 @@ public class AccountOwnerIncomeDetailEntity implements Serializable {
 	/**
 	 * 收益费用编码
 	 */
-	private Integer costCode;
+	private String costCode;
 	/**
 	 * 收益费用编码描述
 	 */

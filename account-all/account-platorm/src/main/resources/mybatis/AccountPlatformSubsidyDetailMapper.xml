@@ -46,34 +46,33 @@
 
 	
 	<insert id="insertSelective" parameterType="com.atzuche.order.accountplatorm.entity.AccountPlatformSubsidyDetailEntity" useGeneratedKeys="true" keyProperty="id">
-		insert into account_platform_subsidy_detail
-		(
-				<if test="orderNo != null">`order_no`, </if>
-				<if test="amt != null">`amt`, </if>
-				<if test="sourceCode != null">`source_code`, </if>
-				<if test="sourceDesc != null">`source_desc`, </if>
-				<if test="uniqueNo != null">`unique_no`, </if>
-				<if test="subsidyName != null">`subsidy_name`, </if>
-				<if test="createTime != null">`create_time`, </if>
-				<if test="createOp != null">`create_op`, </if>
-				<if test="updateTime != null">`update_time`, </if>
-				<if test="updateOp != null">`update_op`, </if>
-				<if test="isDelete != null">`is_delete` </if>
-			)
-		values
-		(
-				<if test="orderNo != null">#{orderNo},  </if>
-				<if test="amt != null">#{amt},  </if>
-				<if test="sourceCode != null">#{sourceCode},  </if>
-				<if test="sourceDesc != null">#{sourceDesc},  </if>
-				<if test="uniqueNo != null">#{uniqueNo},  </if>
-				<if test="subsidyName != null">#{subsidyName},  </if>
-				<if test="createTime != null">#{createTime},  </if>
-				<if test="createOp != null">#{createOp},  </if>
-				<if test="updateTime != null">#{updateTime},  </if>
-				<if test="updateOp != null">#{updateOp},  </if>
-				<if test="isDelete != null">#{isDelete} </if>
-			)
+        insert into account_platform_subsidy_detail
+        <trim prefix="(" suffix=")" suffixOverrides="," >
+            <if test="orderNo != null">`order_no`, </if>
+            <if test="amt != null">`amt`, </if>
+            <if test="sourceCode != null">`source_code`, </if>
+            <if test="sourceDesc != null">`source_desc`, </if>
+            <if test="uniqueNo != null">`unique_no`, </if>
+            <if test="subsidyName != null">`subsidy_name`, </if>
+            <if test="createTime != null">`create_time`, </if>
+            <if test="createOp != null">`create_op`, </if>
+            <if test="updateTime != null">`update_time`, </if>
+            <if test="updateOp != null">`update_op`, </if>
+            <if test="isDelete != null">`is_delete` </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides="," >
+            <if test="orderNo != null">#{orderNo},  </if>
+            <if test="amt != null">#{amt},  </if>
+            <if test="sourceCode != null">#{sourceCode},  </if>
+            <if test="sourceDesc != null">#{sourceDesc},  </if>
+            <if test="uniqueNo != null">#{uniqueNo},  </if>
+            <if test="subsidyName != null">#{subsidyName},  </if>
+            <if test="createTime != null">#{createTime},  </if>
+            <if test="createOp != null">#{createOp},  </if>
+            <if test="updateTime != null">#{updateTime},  </if>
+            <if test="updateOp != null">#{updateOp},  </if>
+            <if test="isDelete != null">#{isDelete} </if>
+        </trim>
 	</insert>
 	
 	 

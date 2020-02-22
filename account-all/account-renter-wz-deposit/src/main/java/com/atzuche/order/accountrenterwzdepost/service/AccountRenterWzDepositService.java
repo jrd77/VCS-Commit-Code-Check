@@ -111,9 +111,9 @@ public class AccountRenterWzDepositService{
         //1 参数校验
         Assert.notNull(payedOrderRenterWZDepositDetail, ErrorCode.PARAMETER_ERROR.getText());
         payedOrderRenterWZDepositDetail.check();
-        //2更新车辆押金  剩余押金 金额
+        //2更新违章押金  剩余押金 金额
         accountRenterWzDepositNoTService.updateRenterWZDepositChange(payedOrderRenterWZDepositDetail);
-        //添加押金资金进出明细
+        //添加违章押金资金进出明细
         return accountRenterWzDepositDetailNoTService.insertRenterWZDepositDetail(payedOrderRenterWZDepositDetail);
     }
     /**
@@ -154,13 +154,13 @@ public class AccountRenterWzDepositService{
      * 账户违章押金转出
      * @param detainRenterDepositReqVO
      */
-    public int detainRenterDeposit(DetainRenterWZDepositReqVO detainRenterDepositReqVO) {
+    public int detainRenterWzDeposit(DetainRenterWZDepositReqVO detainRenterDepositReqVO) {
         //1 参数校验
         Assert.notNull(detainRenterDepositReqVO, ErrorCode.PARAMETER_ERROR.getText());
         detainRenterDepositReqVO.check();  
-        //2更新车辆押金  剩余押金 金额
+        //2更新违章押金  剩余押金 金额
         accountRenterWzDepositNoTService.updateRenterWzDepositChange(detainRenterDepositReqVO);
-        //添加押金资金进出明细
+        //添加违章押金资金进出明细
         int id = accountRenterWzDepositDetailNoTService.insertRenterDepositDetail(detainRenterDepositReqVO);
         return id;
     }
@@ -168,7 +168,10 @@ public class AccountRenterWzDepositService{
 	public void updateOrderDepositSettle(DetainRenterWZDepositReqVO detainRenterDepositReqVO) {
 		accountRenterWzDepositNoTService.updateOrderDepositSettle(detainRenterDepositReqVO.getMemNo(),detainRenterDepositReqVO.getOrderNo());
 	}
-	
+	public void updateRenterDepositUniqueNo(String uniqueNo, int renterDepositDetailId) {
+		accountRenterWzDepositDetailNoTService.updateRenterDepositUniqueNo(uniqueNo,renterDepositDetailId);
+	}
+
 
     
     

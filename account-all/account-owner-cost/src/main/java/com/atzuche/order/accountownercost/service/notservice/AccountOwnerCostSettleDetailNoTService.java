@@ -69,7 +69,7 @@ public class AccountOwnerCostSettleDetailNoTService {
      * @param orderNo
      * @return
      */
-    public List<AccountOwnerCostSettleDetailEntity> getAccountOwnerCostSettleDetails(String orderNo) {
-        return accountOwnerCostSettleDetailMapper.getAccountOwnerCostSettleDetails(orderNo);
+    public List<AccountOwnerCostSettleDetailEntity> getAccountOwnerCostSettleDetails(String orderNo,String memNo) {
+        return accountOwnerCostSettleDetailMapper.getAccountOwnerCostSettleDetails(orderNo,memNo);
     }
 }

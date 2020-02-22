@@ -111,27 +111,31 @@ public class RenterCostFacadeService {
         basicCostDetailVO.setAbatementInsuranceAmt(-RenterOrderCostDetailUtils.getAbatementInsuranceAmt(renterOrderCostDetailEntityList));
         basicCostDetailVO.setExtraDriverInsuranceAmt(-RenterOrderCostDetailUtils.getExtraDriverInsureAmt(renterOrderCostDetailEntityList));
 
+        //取送车费用
         RenterDeliveryFeeDetailVO deliveryFeeDetailVO = getRenterDeliveryFeeDetail(renterOrderCostDetailEntityList);
         basicCostDetailVO.setDeliveryFeeDetail(deliveryFeeDetailVO);
 
+        //罚金费用
         RenterFineVO renterFineVO = getRenterFineDetail(orderNo,renterOrderNo,memNo);
         basicCostDetailVO.setFineDetail(renterFineVO);
 
+        //补贴费用
         RenterSubsidyDetailVO subsidyDetail = getRenterSubsidyDetail(orderNo,renterOrderNo,memNo);
         basicCostDetailVO.setSubsidyDetail(subsidyDetail);
 
+        //违章费用
         RenterWzCostVO wzCostVO = wzCostFacadeService.getRenterWzCostDetail(orderNo);
         basicCostDetailVO.setWzCostDetail(wzCostVO);
-
+        //违章押金
         WzDepositDetailVO wzDepositDetailVO = wzCostFacadeService.getWzDepostDetail(orderNo);
         basicCostDetailVO.setWzDepositDetailVO(wzDepositDetailVO);
-
+        //押金
         DepostiDetailVO depostiDetailVO = cashierQueryService.getRenterDepositVO(orderNo,memNo);
         basicCostDetailVO.setDepostiDetailVO(depostiDetailVO);
 
         List<OrderSupplementDetailVO> orderSupplementDetailVOS = supplementService.listOrderSupplementDetailVOByOrderNo(orderNo);
         basicCostDetailVO.setSupplementDetailVOList(orderSupplementDetailVOS);
-        //TODO:
+        //TODO: 超里程费用和油费没有计算
         return basicCostDetailVO;
     }
 
