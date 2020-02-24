@@ -18,6 +18,5 @@ public interface FeignOrderAdminSubmitService {
      * @Description: 后台管理系统下单
      *
      **/
-    @RequestMapping(method = RequestMethod.POST, value = "/order/admin/req")
-    ResponseData<OrderResVO> submitOrder(@RequestBody AdminOrderReqVO adminOrderReqVO);
+
 }

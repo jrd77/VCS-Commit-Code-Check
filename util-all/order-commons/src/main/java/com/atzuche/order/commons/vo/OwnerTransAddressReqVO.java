@@ -1,8 +1,8 @@
 package com.atzuche.order.commons.vo;
 
+import com.atzuche.order.commons.group.Second;
 import com.autoyol.doc.annotation.AutoDocProperty;
 import org.hibernate.validator.constraints.NotBlank;
-
 import java.io.Serializable;
 
 public class OwnerTransAddressReqVO implements Serializable {
@@ -18,27 +18,27 @@ public class OwnerTransAddressReqVO implements Serializable {
     private String memNo;
 
 	@AutoDocProperty(value = "取车地址描述,如:乐山路33号")
-	@NotBlank(message = "取车地址不能为空")
+	@NotBlank(message = "取车地址不能为空", groups = Second.class)
 	private String getCarAddressText;
 
 	@AutoDocProperty(value = "还车地址描述,如:乐山路33号")
-	@NotBlank(message = "还车地址不能为空")
+	@NotBlank(message = "还车地址不能为空", groups = Second.class)
     private String returnCarAddressText;
 
     @AutoDocProperty(value = "取车地址-经度")
-	@NotBlank(message = "取车地址-经度不能为空")
+	@NotBlank(message = "取车地址-经度不能为空", groups = Second.class)
     private String srvGetLon;
 
     @AutoDocProperty(value = "取车地址-纬度")
-	@NotBlank(message = "取车地址-纬度不能为空")
+	@NotBlank(message = "取车地址-纬度不能为空", groups = Second.class)
     private String srvGetLat;
 
     @AutoDocProperty(value = "还车地址-经度")
-	@NotBlank(message = "还车地址-经度不能为空")
+	@NotBlank(message = "还车地址-经度不能为空", groups = Second.class)
     private String srvReturnLon;
 
     @AutoDocProperty(value = "还车地址-纬度")
-	@NotBlank(message = "还车地址-纬度不能为空")
+	@NotBlank(message = "还车地址-纬度不能为空", groups = Second.class)
     private String srvReturnLat;
 
 	@AutoDocProperty(value = "收费金额回传,用户校验提交时费用是否变更,仅校验提交前不收费,提交后收费的情况")
@@ -128,4 +128,13 @@ public class OwnerTransAddressReqVO implements Serializable {
 	public void setChargeAmount(String chargeAmount) {
 		this.chargeAmount = chargeAmount;
 	}
+
+	@Override
+	public String toString() {
+		return "OwnerTransAddressReqVO [orderNo=" + orderNo + ", memNo=" + memNo + ", getCarAddressText="
+				+ getCarAddressText + ", returnCarAddressText=" + returnCarAddressText + ", srvGetLon=" + srvGetLon
+				+ ", srvGetLat=" + srvGetLat + ", srvReturnLon=" + srvReturnLon + ", srvReturnLat=" + srvReturnLat
+				+ ", chargeAmount=" + chargeAmount + ", consoleInvoke=" + consoleInvoke + "]";
+	}
+	
 }

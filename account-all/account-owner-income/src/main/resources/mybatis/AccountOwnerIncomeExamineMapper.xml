@@ -7,9 +7,11 @@
         <result property="id" column="id"/>
         <result property="memNo" column="mem_no"/>
         <result property="orderNo" column="order_no"/>
+        <result property="ownerOrderNo" column="owner_order_no"/>
         <result property="amt" column="amt"/>
         <result property="detail" column="detail"/>
         <result property="status" column="status"/>
+        <result property="type" column="type"/>
         <result property="opName" column="op_name"/>
         <result property="time" column="time"/>
         <result property="remark" column="remark"/>
@@ -25,10 +27,12 @@
 	<sql id="Base_Column_List">
 	`id`, 	
 	`mem_no`, 	
-	`order_no`, 	
+	`order_no`,
+	`owner_order_no`,
 	`amt`, 	
 	`detail`, 	
-	`status`, 	
+	`status`,
+	`type`,
 	`op_name`, 	
 	`time`, 	
 	`remark`, 	
@@ -47,7 +51,7 @@
 	</select>
 	
 	<select id="selectByOrderNo" resultMap="BaseResultMap">
-		select <include refid="Base_Column_List" /> from account_owner_income_examine where order_no = #{orderNo} and is_delete = 0
+		select <include refid="Base_Column_List" /> from account_owner_income_examine where order_no = #{orderNo} and mem_no = #{memNo} and is_delete = 0
 	</select>
 	
 	<select id="getTotalAccountOwnerIncomeExamineByOrderNo" resultType="java.lang.Integer">
@@ -59,9 +63,11 @@
         <trim prefix="(" suffix=")" suffixOverrides="," >
             <if test="memNo != null">`mem_no`, </if>
             <if test="orderNo != null">`order_no`, </if>
+            <if test="ownerOrderNo != null">`owner_order_no`, </if>
             <if test="amt != null">`amt`, </if>
             <if test="detail != null">`detail`, </if>
             <if test="status != null">`status`, </if>
+            <if test="type != null">`type`, </if>
             <if test="opName != null">`op_name`, </if>
             <if test="time != null">`time`, </if>
             <if test="remark != null">`remark`, </if>
@@ -75,9 +81,11 @@
         <trim prefix="values (" suffix=")" suffixOverrides="," >
             <if test="memNo != null">#{memNo},  </if>
             <if test="orderNo != null">#{orderNo},  </if>
+            <if test="ownerOrderNo != null">#{ownerOrderNo},  </if>
             <if test="amt != null">#{amt},  </if>
             <if test="detail != null">#{detail},  </if>
             <if test="status != null">#{status},  </if>
+            <if test="type != null">#{type},  </if>
             <if test="opName != null">#{opName},  </if>
             <if test="time != null">#{time},  </if>
             <if test="remark != null">#{remark},  </if>
@@ -95,9 +103,11 @@
 		<set>
 				<if test="memNo != null">`mem_no` = #{memNo}, </if>
 				<if test="orderNo != null">`order_no` = #{orderNo}, </if>
+                <if test="ownerOrderNo != null">`owner_order_no` = #{ownerOrderNo}, </if>
 				<if test="amt != null">`amt` = #{amt}, </if>
 				<if test="detail != null">`detail` = #{detail}, </if>
 				<if test="status != null">`status` = #{status}, </if>
+                <if test="type != null">`type` = #{type}, </if>
 				<if test="opName != null">`op_name` = #{opName}, </if>
 				<if test="time != null">`time` = #{time}, </if>
 				<if test="remark != null">`remark` = #{remark}, </if>
@@ -110,6 +120,10 @@
 			</set>
 		where id = #{id} and  version = #{version}
 	</update>
-	
+    <select id="getOwnerIncomeByOrderAndType" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List" /> from account_owner_income_examine
+        where order_no = #{orderNo} and mem_no = #{memNo} and type = #{type} and is_delete = 0
+    </select>
+
 
 </mapper>

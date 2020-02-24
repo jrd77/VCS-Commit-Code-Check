@@ -381,11 +381,11 @@ public class OrderSettleNewService {
      *  先查询  发现 有结算数据停止结算 手动处理
      * @param orderNo
      */
-    public void checkIsSettle(String orderNo) {
+    public void checkIsSettle(String orderNo,SettleOrders settleOrders) {
         List<AccountRenterCostSettleDetailEntity> accountRenterCostSettleDetailEntitys = accountRenterCostSettleDetailNoTService.getAccountRenterCostSettleDetail(orderNo);
         List<AccountPlatformProfitDetailEntity> accountPlatformProfitDetailEntitys = accountPlatformProfitDetailNotService.getPlatformProfitDetails(orderNo);
         List<AccountPlatformSubsidyDetailEntity> accountPlatformSubsidyDetailEntitys = accountPlatformSubsidyDetailNoTService.getPlatformSubsidyDetails(orderNo);
-        List<AccountOwnerCostSettleDetailEntity> accountOwnerCostSettleDetailEntitys = accountOwnerCostSettleDetailNoTService.getAccountOwnerCostSettleDetails(orderNo);
+        List<AccountOwnerCostSettleDetailEntity> accountOwnerCostSettleDetailEntitys = accountOwnerCostSettleDetailNoTService.getAccountOwnerCostSettleDetails(orderNo,settleOrders.getOwnerMemNo());
 
         if(!CollectionUtils.isEmpty(accountRenterCostSettleDetailEntitys)){
             throw new RuntimeException("有结算数据停止结算");
@@ -448,6 +448,7 @@ public class OrderSettleNewService {
      * @param orderNo
      */
     public void sendOrderSettleMq(String orderNo,String renterMemNo,RentCosts rentCosts,int status) {
+        log.info("sendOrderSettleMq start [{}],[{}],[{}],[{}]",orderNo,renterMemNo,GsonUtils.toJson(rentCosts),status);
         AccountRenterCostSettleEntity entity=cashierSettleService.getAccountRenterCostSettleEntity(orderNo,renterMemNo);
         OrderSettlementMq orderSettlementMq = new OrderSettlementMq();
         if(Objects.nonNull(entity) && Objects.nonNull(entity)){
@@ -501,33 +502,14 @@ public class OrderSettleNewService {
         }else{
             eventEnum = NewOrderMQActionEventEnum.ORDER_SETTLEMENT_FAIL;
         }
+        //TODO 发短信
+        log.info("sendOrderSettleMq remote start [{}],[{}]",eventEnum,GsonUtils.toJson(orderMessage));
         baseProducer.sendTopicMessage(eventEnum.exchange,eventEnum.routingKey,orderMessage);
+        log.info("sendOrderSettleMq remote start [{}],[{}]",eventEnum,GsonUtils.toJson(orderMessage));
     }
-    /**
-     * 订单违章结算成功事件
-     * @param orderNo
-     */
-    public void sendOrderWzSettleSuccessMq(String orderNo) {
-        OrderWzSettlementMq orderSettlementMq = new OrderWzSettlementMq();
-        orderSettlementMq.setStatus(0);
-        orderSettlementMq.setOrderNo(orderNo);
-        OrderMessage orderMessage = OrderMessage.builder().build();
-        orderMessage.setMessage(orderSettlementMq);
-        baseProducer.sendTopicMessage(NewOrderMQActionEventEnum.ORDER_WZ_SETTLEMENT_SUCCESS.exchange,NewOrderMQActionEventEnum.ORDER_WZ_SETTLEMENT_SUCCESS.routingKey,orderMessage);
-    }
+    
 
-    /**
-     * 订单结算失败事件
-     * @param orderNo
-     */
-    public void sendOrderWzSettleFailMq(String orderNo) {
-        OrderWzSettlementMq orderSettlementMq = new OrderWzSettlementMq();
-        orderSettlementMq.setStatus(1);
-        orderSettlementMq.setOrderNo(orderNo);
-        OrderMessage orderMessage = OrderMessage.builder().build();
-        orderMessage.setMessage(orderSettlementMq);
-        baseProducer.sendTopicMessage(NewOrderMQActionEventEnum.ORDER_WZ_SETTLEMENT_FAIL.exchange,NewOrderMQActionEventEnum.ORDER_WZ_SETTLEMENT_FAIL.routingKey,orderMessage);
-    }
+    
 
     /**
      * 查询 租客 应付金额

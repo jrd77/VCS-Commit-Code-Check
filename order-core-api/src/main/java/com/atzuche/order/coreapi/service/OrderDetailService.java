@@ -550,7 +550,7 @@ public class OrderDetailService {
         });
 
         //车主收益
-        List<AccountOwnerIncomeDetailEntity> accountOwnerIncomeDetailList = accountOwnerIncomeDetailNoTService.selectByOrderNo(orderNo);
+        List<AccountOwnerIncomeDetailEntity> accountOwnerIncomeDetailList = accountOwnerIncomeDetailNoTService.selectByOrderNo(orderNo,ownerOrderEntity.getMemNo());
         List<AccountOwnerIncomeDetailDTO> accountOwnerIncomeDetailDTOList = new ArrayList<>();
         accountOwnerIncomeDetailList.stream().forEach(x->{
             AccountOwnerIncomeDetailDTO accountOwnerIncomeDetailDTO = new AccountOwnerIncomeDetailDTO();

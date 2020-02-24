@@ -16,36 +16,4 @@ public class RentCostsWz {
      */
     private List<RenterOrderWzCostDetailEntity> renterOrderWzCostDetails;
 
-//    /**
-//     * 交接车-油费
-//     */
-//    private RenterGetAndReturnCarDTO oilAmt;
-//
-//    /**
-//     * 交接车-获取超里程费用
-//     */
-//    private FeeResult mileageAmt;
-
-    /**
-     * 补贴
-     */
-//    private List<RenterOrderSubsidyDetailEntity> renterOrderSubsidyDetails;
-//
-//    /**
-//     * 租客罚金
-//     */
-//    private List<RenterOrderFineDeatailEntity> renterOrderFineDeatails;
-//
-//    /**
-//     * 管理后台补贴
-//     */
-//    private List<OrderConsoleSubsidyDetailEntity> orderConsoleSubsidyDetails;
-//
-//    /**
-//     * 获取全局的租客订单罚金明细
-//     */
-//    private List<ConsoleRenterOrderFineDeatailEntity> consoleRenterOrderFineDeatails;
-    
-    
-    
 }

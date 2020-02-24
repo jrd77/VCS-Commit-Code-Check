@@ -3,12 +3,14 @@ package com.atzuche.order.coreapi.service.remote;
 import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.CatConstants;
 import com.atzuche.order.commons.ResponseCheckUtil;
+import com.atzuche.order.commons.exceptions.RemoteCallException;
 import com.autoyol.api.UniqueNoFeignClient;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.enums.OrderNoTypeEnum;
 import com.autoyol.enums.UniqueNoTypeEnum;
 import com.dianping.cat.Cat;
 import com.dianping.cat.message.Transaction;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -46,13 +48,22 @@ public class UniqueOrderNoProxyService {
             Cat.logEvent(CatConstants.FEIGN_RESULT, JSON.toJSONString(response));
             ResponseCheckUtil.checkResponse(response);
             t.setStatus(Transaction.SUCCESS);
-            return String.valueOf(response.getData());
-        } catch (Exception e) {
+
+            String orderNo = String.valueOf(response.getData());
+            if(StringUtils.isBlank(orderNo)) {
+                RemoteCallException remoteCallException = new RemoteCallException(com.atzuche.order.commons.enums.ErrorCode.ORDER_RENTER_ORDERNO_CREATE_ERROR.getCode(),
+                        com.atzuche.order.commons.enums.ErrorCode.ORDER_RENTER_ORDERNO_CREATE_ERROR.getText());
+                t.setStatus(remoteCallException);
+                throw remoteCallException;
+            }
+            return orderNo;
+        }  catch (Exception e) {
             LOGGER.error("Feign 获取主订单号失败", e);
             t.setStatus(e);
             Cat.logError("Feign 获取主订单号失败", e);
             throw e;
-        } finally {
+        }
+        finally {
             t.complete();
         }
     }

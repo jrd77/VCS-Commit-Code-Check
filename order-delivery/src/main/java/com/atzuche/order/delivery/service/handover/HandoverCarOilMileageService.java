@@ -53,8 +53,8 @@ public class HandoverCarOilMileageService {
                 renterHandoverCarInfoReqDTO.setOwnReturnOil(mileageOilOperateVo.getOil());
                 renterHandoverCarInfoReqDTO.setOwnReturnKM(mileageOilOperateVo.getKms());
             } else {
-                ownerHandoverCarInfoReqDTO.setOwnReturnOil(mileageOilOperateVo.getKms());
-                ownerHandoverCarInfoReqDTO.setOwnReturnKM(mileageOilOperateVo.getOil());
+                ownerHandoverCarInfoReqDTO.setOwnReturnOil(mileageOilOperateVo.getOil());
+                ownerHandoverCarInfoReqDTO.setOwnReturnKM(mileageOilOperateVo.getKms());
             }
         }
         else {

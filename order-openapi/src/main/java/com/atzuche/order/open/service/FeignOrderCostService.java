@@ -3,8 +3,10 @@
  */
 package com.atzuche.order.open.service;
 
+import com.atzuche.order.commons.vo.req.AdminOrderReqVO;
 import com.atzuche.order.commons.vo.req.NormalOrderCostCalculateReqVO;
 import com.atzuche.order.commons.vo.res.NormalOrderCostCalculateResVO;
+import com.atzuche.order.commons.vo.res.OrderResVO;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,6 +16,8 @@ import com.atzuche.order.commons.vo.req.OrderCostReqVO;
 import com.atzuche.order.commons.vo.res.OrderOwnerCostResVO;
 import com.atzuche.order.commons.vo.res.OrderRenterCostResVO;
 import com.autoyol.commons.web.ResponseData;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.validation.Valid;
 
@@ -39,5 +43,7 @@ public interface FeignOrderCostService {
 	 */
 	@PostMapping("/order/normal/pre/cost/calculate")
 	public ResponseData<NormalOrderCostCalculateResVO> submitOrderBeforeCostCalculate(@Valid @RequestBody NormalOrderCostCalculateReqVO reqVO);
-	
+
+	@PostMapping("/order/admin/req")
+	public ResponseData<OrderResVO> submitOrder(@RequestBody AdminOrderReqVO adminOrderReqVO);
 }

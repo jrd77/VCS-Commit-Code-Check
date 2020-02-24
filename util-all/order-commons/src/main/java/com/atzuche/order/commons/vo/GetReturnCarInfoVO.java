@@ -65,7 +65,7 @@ public class GetReturnCarInfoVO implements Serializable{
 
     @AutoDocIgnoreProperty
     private Boolean isCurrentReturnCarAddress;
-
+    
     public String getCityCode() {
         return cityCode;
     }

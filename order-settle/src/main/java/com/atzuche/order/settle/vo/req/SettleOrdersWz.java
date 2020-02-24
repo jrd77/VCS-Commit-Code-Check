@@ -1,13 +1,13 @@
 package com.atzuche.order.settle.vo.req;
 
-import com.atzuche.order.ownercost.entity.OwnerOrderEntity;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
+
 import lombok.Data;
 
 /**
  * 订单违章结算对象
  */
-@Data
+//@Data
 public class SettleOrdersWz {
     /**
      * 主订单号
@@ -28,7 +28,7 @@ public class SettleOrdersWz {
     private int renterOrderCostWz;
 
     /**
-     * 租客费用明细
+     * 租客违章费用明细
      */
     private RentCostsWz rentCostsWz;
 
@@ -36,5 +36,55 @@ public class SettleOrdersWz {
      *  租客订单信息
      */
     RenterOrderEntity renterOrder;
+
+	public String getOrderNo() {
+		return orderNo;
+	}
+
+	public void setOrderNo(String orderNo) {
+		this.orderNo = orderNo;
+	}
+
+	public String getRenterOrderNo() {
+		return renterOrderNo;
+	}
+
+	public void setRenterOrderNo(String renterOrderNo) {
+		this.renterOrderNo = renterOrderNo;
+	}
+
+	public String getRenterMemNo() {
+		return renterMemNo;
+	}
+
+	public void setRenterMemNo(String renterMemNo) {
+		this.renterMemNo = renterMemNo;
+	}
+
+	public int getRenterOrderCostWz() {
+		return renterOrderCostWz;
+	}
+
+	public void setRenterOrderCostWz(int renterOrderCostWz) {
+		this.renterOrderCostWz = renterOrderCostWz;
+	}
+
+	public RentCostsWz getRentCostsWz() {
+		return rentCostsWz;
+	}
+
+	public void setRentCostsWz(RentCostsWz rentCostsWz) {
+		this.rentCostsWz = rentCostsWz;
+	}
+
+	public RenterOrderEntity getRenterOrder() {
+		return renterOrder;
+	}
+
+	public void setRenterOrder(RenterOrderEntity renterOrder) {
+		this.renterOrder = renterOrder;
+	}
+    
+    
 
 }

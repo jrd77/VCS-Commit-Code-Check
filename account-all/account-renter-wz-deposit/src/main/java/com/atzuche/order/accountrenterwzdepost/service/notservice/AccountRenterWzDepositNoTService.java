@@ -98,7 +98,7 @@ public class AccountRenterWzDepositNoTService {
      * @param payedOrderRenterWZDepositDetail
      */
     public void updateRenterWZDepositChange(PayedOrderRenterDepositWZDetailReqVO payedOrderRenterWZDepositDetail) {
-        AccountRenterWzDepositEntity accountRenterDepositEntity = accountRenterWzDepositMapper.selectByOrderAndMemNo(payedOrderRenterWZDepositDetail.getOrderNo(),payedOrderRenterWZDepositDetail.getMemNo());
+    	AccountRenterWzDepositEntity accountRenterDepositEntity = accountRenterWzDepositMapper.selectByOrderAndMemNo(payedOrderRenterWZDepositDetail.getOrderNo(),payedOrderRenterWZDepositDetail.getMemNo());
         if(Objects.isNull(accountRenterDepositEntity)){
             throw new PayOrderRenterWZDepositException();
         }
@@ -109,10 +109,13 @@ public class AccountRenterWzDepositNoTService {
         AccountRenterWzDepositEntity accountRenterDeposit = new AccountRenterWzDepositEntity();
         accountRenterDeposit.setId(accountRenterDepositEntity.getId());
         accountRenterDeposit.setVersion(accountRenterDepositEntity.getVersion());
+        //抵扣1元欠款的时候，第一次执行为1999，第二次退款1999的时候，这个地方又被修改为1
+//        accountRenterDeposit.setShouldReturnDeposit(accountRenterDepositEntity.getShishouDeposit() - Math.abs(payedOrderRenterWZDepositDetail.getAmt())); //实收，默认是全部要退的。     应退
         accountRenterDeposit.setRealReturnDeposit(accountRenterDepositEntity.getRealReturnDeposit());
 
+        //实退，是在退款的环节来考虑的。
         if(Objects.nonNull(accountRenterDeposit.getRealReturnDeposit()) || accountRenterDeposit.getRealReturnDeposit()>Math.abs(payedOrderRenterWZDepositDetail.getAmt())){
-            accountRenterDeposit.setRealReturnDeposit(accountRenterDeposit.getRealReturnDeposit() + payedOrderRenterWZDepositDetail.getAmt());
+            accountRenterDeposit.setShouldReturnDeposit(accountRenterDeposit.getRealReturnDeposit() + payedOrderRenterWZDepositDetail.getAmt());
         }
         int result =  accountRenterWzDepositMapper.updateByPrimaryKeySelective(accountRenterDeposit);
         if(result==0){
@@ -132,7 +135,7 @@ public class AccountRenterWzDepositNoTService {
         //TODO
         //计算剩余可扣金额押金总和
         int surplusAmt = accountRenterDepositEntity.getShishouDeposit();
-        if(-detainRenterDepositReqVO.getAmt() + surplusAmt<0){
+        if(detainRenterDepositReqVO.getAmt() + surplusAmt<0){
             //可用 剩余押金 不足
             throw new PayOrderRenterWZDepositException();
         }
@@ -140,8 +143,9 @@ public class AccountRenterWzDepositNoTService {
         accountRenterDeposit.setId(accountRenterDepositEntity.getId());
         accountRenterDeposit.setVersion(accountRenterDepositEntity.getVersion());
         //押金剩余金额  应退
-        accountRenterDeposit.setShouldReturnDeposit(accountRenterDepositEntity.getShishouDeposit() - Math.abs(detainRenterDepositReqVO.getAmt()));
-
+        //accountRenterDeposit.setShouldReturnDeposit(accountRenterDepositEntity.getShishouDeposit() - Math.abs(detainRenterDepositReqVO.getAmt()));
+        accountRenterDeposit.setShouldReturnDeposit(detainRenterDepositReqVO.getAmt());
+        
         int result =  accountRenterWzDepositMapper.updateByPrimaryKeySelective(accountRenterDeposit);
         if(result==0){
             throw new PayOrderRenterWZDepositException();
@@ -161,7 +165,11 @@ public class AccountRenterWzDepositNoTService {
         AccountRenterWzDepositEntity accountRenterDeposit = new AccountRenterWzDepositEntity();
         accountRenterDeposit.setId(accountRenterDepositEntity.getId());
         accountRenterDeposit.setVersion(accountRenterDepositEntity.getVersion());
-        accountRenterDeposit.setShouldReturnDeposit(0);
+//        accountRenterDeposit.setShouldReturnDeposit(0);
+      //押金剩余金额  应退
+        //accountRenterDeposit.setShouldReturnDeposit(accountRenterDepositEntity.getShishouDeposit() - Math.abs(vo.getAmt()));
+        accountRenterDeposit.setShouldReturnDeposit(vo.getAmt());
+        
         int result = accountRenterWzDepositMapper.updateByPrimaryKeySelective(accountRenterDeposit);
         if(result==0){
             throw new PayOrderRenterWZDepositException();

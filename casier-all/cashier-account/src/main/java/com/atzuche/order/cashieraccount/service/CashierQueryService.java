@@ -1,5 +1,7 @@
 package com.atzuche.order.cashieraccount.service;
 
+import com.atzuche.order.accountownercost.entity.AccountOwnerCostSettleDetailEntity;
+import com.atzuche.order.accountownercost.service.notservice.AccountOwnerCostSettleDetailNoTService;
 import com.atzuche.order.accountownerincome.entity.AccountOwnerIncomeDetailEntity;
 import com.atzuche.order.accountownerincome.entity.AccountOwnerIncomeExamineEntity;
 import com.atzuche.order.accountownerincome.service.AccountOwnerIncomeService;
@@ -23,6 +25,8 @@ import com.atzuche.order.cashieraccount.service.notservice.CashierNoTService;
 import com.atzuche.order.cashieraccount.vo.res.WzDepositMsgResVO;
 import com.atzuche.order.commons.DateUtils;
 import com.atzuche.order.commons.LocalDateTimeUtils;
+import com.atzuche.order.commons.enums.FineTypeEnum;
+import com.atzuche.order.commons.enums.account.income.AccountOwnerIncomeExamineStatus;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.commons.enums.cashier.PayTypeEnum;
 import com.atzuche.order.commons.enums.cashier.TransStatusEnum;
@@ -38,6 +42,7 @@ import org.springframework.util.CollectionUtils;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 
 /**
@@ -59,6 +64,7 @@ public class CashierQueryService {
     @Autowired private AccountRenterCostDetailNoTService accountRenterCostDetailNoTService;
     @Autowired private AccountRenterCostSettleService accountRenterCostSettleService;
     @Autowired private AccountOwnerIncomeService accountOwnerIncomeService;
+    @Autowired private AccountOwnerCostSettleDetailNoTService accountOwnerCostSettleDetailNoTService;
 
 
     /**
@@ -174,18 +180,39 @@ public class CashierQueryService {
      * @param orderNo
      * @return
      */
-    public AccountOwnerIncomeRealResVO getOwnerRealIncomeByOrder(String orderNo){
+    public AccountOwnerIncomeRealResVO getOwnerRealIncomeByOrder(String orderNo,String memNo){
         AccountOwnerIncomeRealResVO resVO = new AccountOwnerIncomeRealResVO();
         resVO.setOrderNo(orderNo);
-        List<AccountOwnerIncomeDetailEntity> accountOwnerIncomeDetails = accountOwnerIncomeService.getOwnerRealIncomeByOrder(orderNo);
+        //查询收益审核后收益
+        List<AccountOwnerIncomeDetailEntity> accountOwnerIncomeDetails = accountOwnerIncomeService.getOwnerRealIncomeByOrder(orderNo,memNo);
         if(!CollectionUtils.isEmpty(accountOwnerIncomeDetails)){
             int incomeAmt = accountOwnerIncomeDetails.stream().mapToInt(AccountOwnerIncomeDetailEntity::getAmt).sum();
             resVO.setIncomeAmt(incomeAmt);
         }
-        List<AccountOwnerIncomeExamineEntity> accountOwnerIncomeExamines = accountOwnerIncomeService.getOwnerIncomeByOrder(orderNo);
+        boolean exsitPassed = false;
+        //查询待审核收益
+        List<AccountOwnerIncomeExamineEntity> accountOwnerIncomeExamines = accountOwnerIncomeService.getOwnerIncomeByOrder(orderNo,memNo);
         if(!CollectionUtils.isEmpty(accountOwnerIncomeExamines)){
             int incomeExamineAmt = accountOwnerIncomeExamines.stream().mapToInt(AccountOwnerIncomeExamineEntity::getAmt).sum();
             resVO.setIncomeExamineAmt(incomeExamineAmt);
+            List<AccountOwnerIncomeExamineEntity> ownerIncomeExaminesPassed = accountOwnerIncomeExamines.stream().filter(obj ->{
+                return AccountOwnerIncomeExamineStatus.PASS_EXAMINE.getStatus()==obj.getStatus();
+            }).collect(Collectors.toList());
+            exsitPassed = !CollectionUtils.isEmpty(ownerIncomeExaminesPassed);
+        }
+
+        //查询车主罚金
+        List<AccountOwnerCostSettleDetailEntity> accountOwnerCostSettleDetails = accountOwnerCostSettleDetailNoTService.getAccountOwnerCostSettleDetails(orderNo,memNo);
+        // 车主结算记录存在 且 车主收益 已审核通过  返回  罚金 金额
+        if(!CollectionUtils.isEmpty(accountOwnerCostSettleDetails) && exsitPassed){
+            int cancelFineAmt =  accountOwnerCostSettleDetails.stream().filter(obj ->{
+                return FineTypeEnum.CANCEL_FINE.getFineType().equals(Integer.valueOf(obj.getSourceCode()));
+            }).mapToInt(AccountOwnerCostSettleDetailEntity::getAmt).sum();
+            int getCarAndReturnCarFineAmt =  accountOwnerCostSettleDetails.stream().filter(obj ->{
+                return FineTypeEnum.GET_RETURN_CAR.getFineType().equals(Integer.valueOf(obj.getSourceCode()));
+            }).mapToInt(AccountOwnerCostSettleDetailEntity::getAmt).sum();
+            resVO.setCancelFineAmt(cancelFineAmt);
+            resVO.setGetCarAndReturnCarFineAmt(getCarAndReturnCarFineAmt);
         }
         return resVO;
     }
