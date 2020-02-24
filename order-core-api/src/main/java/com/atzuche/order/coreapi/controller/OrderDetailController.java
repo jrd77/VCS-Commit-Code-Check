@@ -72,4 +72,23 @@ public class OrderDetailController {
         return responseData;
     }
 
+    @GetMapping("ownerOrderDetail")
+    public ResponseData<OwnerOrderDetailRespDTO> ownerOrderDetail(@RequestParam("orderNo") String orderNo,
+                                                                  @RequestParam("ownerOrderNo") String ownerOrderNo,
+                                                                  @RequestParam("ownerMemNo") String ownerMemNo){
+        if(orderNo == null || orderNo.trim().length()<=0){
+            ResponseData responseData = new ResponseData();
+            responseData.setResCode(ErrorCode.INPUT_ERROR.getCode());
+            responseData.setResMsg("订单号不能为空");
+            return responseData;
+        }
+        if((ownerOrderNo == null || ownerOrderNo.trim().length()<=0) && (ownerMemNo == null || ownerMemNo.trim().length()<=0)){
+            ResponseData responseData = new ResponseData();
+            responseData.setResCode(ErrorCode.INPUT_ERROR.getCode());
+            responseData.setResMsg("车主子订单号或车主会员号必须有一个不为空！");
+            return responseData;
+        }
+        ResponseData<OwnerOrderDetailRespDTO> responseData = orderDetailService.ownerOrderDetail(orderNo,ownerOrderNo,ownerMemNo);
+        return responseData;
+    }
 }
