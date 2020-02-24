@@ -2,10 +2,8 @@ package com.atzuche.order.admin.service;
 
 import com.alibaba.fastjson.JSON;
 import com.atzuche.order.admin.common.AdminUserUtil;
-import com.atzuche.order.admin.vo.req.order.AdminModifyOrderReqVO;
-import com.atzuche.order.admin.vo.req.order.CancelOrderByPlatVO;
-import com.atzuche.order.admin.vo.req.order.CancelOrderVO;
-import com.atzuche.order.admin.vo.req.order.OrderModifyConfirmReqVO;
+import com.atzuche.order.admin.enums.YesNoEnum;
+import com.atzuche.order.admin.vo.req.order.*;
 import com.atzuche.order.admin.vo.resp.MemAvailableCouponVO;
 import com.atzuche.order.admin.vo.resp.order.AdminModifyOrderFeeCompareVO;
 import com.atzuche.order.admin.vo.resp.order.AdminModifyOrderFeeVO;
@@ -385,6 +383,65 @@ public class AdminOrderService {
             t.complete();
         }
     }
+
+    public ResponseData agreeOrder(OwnerAgreeOrRefuseOrderReqVO reqVO) {
+        AgreeOrderReqVO agreeOrderReqVO = new AgreeOrderReqVO();
+        BeanUtils.copyProperties(reqVO,agreeOrderReqVO);
+        agreeOrderReqVO.setOperatorName(AdminUserUtil.getAdminUser().getAuthName());
+        agreeOrderReqVO.setIsConsoleInvoke(Integer.valueOf(YesNoEnum.YES.getType()));
+        ResponseData<?> responseObject = null;
+        Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "订单中心服务");
+        try{
+            Cat.logEvent(CatConstants.FEIGN_METHOD,"feignOrderUpdateService.adminOwnerAgreeOrder");
+            log.info("Feign 开始车主同意订单,agreeOrderReqVO:[{}]", JSON.toJSONString(agreeOrderReqVO));
+            Cat.logEvent(CatConstants.FEIGN_PARAM,JSON.toJSONString(agreeOrderReqVO));
+            responseObject = feignOrderUpdateService.adminOwnerAgreeOrder(agreeOrderReqVO);
+            log.info("Feign 返回车主同意订单,responseObject:[{}]", JSON.toJSONString(responseObject));
+            Cat.logEvent(CatConstants.FEIGN_RESULT,JSON.toJSONString(responseObject));
+            checkResponse(responseObject);
+            t.setStatus(Transaction.SUCCESS);
+        }catch (Exception e){
+            log.error("Feign 车主同意订单异常,responseObject:[{}],agreeOrderReqVO:[{}]",JSON.toJSONString(responseObject),
+                    JSON.toJSONString(agreeOrderReqVO),e);
+            Cat.logError("Feign 车主同意订单异常",e);
+            t.setStatus(e);
+            throw e;
+        }finally {
+            t.complete();
+        }
+        return responseObject;
+    }
+
+
+    public ResponseData refuseOrder(OwnerAgreeOrRefuseOrderReqVO reqVO) {
+        RefuseOrderReqVO refuseOrderReqVO = new RefuseOrderReqVO();
+        BeanUtils.copyProperties(reqVO,refuseOrderReqVO);
+        refuseOrderReqVO.setOperatorName(AdminUserUtil.getAdminUser().getAuthName());
+        refuseOrderReqVO.setIsConsoleInvoke(Integer.valueOf(YesNoEnum.YES.getType()));
+
+        ResponseData<?> responseObject = null;
+        Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "订单中心服务");
+        try{
+            Cat.logEvent(CatConstants.FEIGN_METHOD,"feignOrderUpdateService.adminOwnerRefuseOrder");
+            log.info("Feign 开始车主拒绝订单,refuseOrderReqVO={}", JSON.toJSONString(refuseOrderReqVO));
+            Cat.logEvent(CatConstants.FEIGN_PARAM,JSON.toJSONString(refuseOrderReqVO));
+            responseObject = feignOrderUpdateService.adminOwnerRefuseOrder(refuseOrderReqVO);
+            log.info("Feign 返回车主拒绝订单,responseObject:[{}]", JSON.toJSONString(responseObject));
+            Cat.logEvent(CatConstants.FEIGN_RESULT,JSON.toJSONString(responseObject));
+            checkResponse(responseObject);
+            t.setStatus(Transaction.SUCCESS);
+        }catch (Exception e){
+            log.error("Feign 车主拒绝订单异常,responseObject={},refuseOrderReqVO={}",JSON.toJSONString(responseObject),JSON.toJSONString(refuseOrderReqVO),e);
+            Cat.logError("Feign 车主拒绝订单异常",e);
+            t.setStatus(e);
+            throw e;
+        }finally {
+            t.complete();
+        }
+        return responseObject;
+    }
+
+
 
     private void checkResponse(ResponseData responseObject){
         if(responseObject==null||!ErrorCode.SUCCESS.getCode().equalsIgnoreCase(responseObject.getResCode())){
