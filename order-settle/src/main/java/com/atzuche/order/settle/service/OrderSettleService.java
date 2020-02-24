@@ -192,11 +192,11 @@ public class OrderSettleService{
     public void settleOrder(String orderNo, OrderPayCallBack callBack) {
         log.info("OrderSettleService settleOrder orderNo [{}]",orderNo);
         Transaction t = Cat.getProducer().newTransaction(CatConstants.FEIGN_CALL, "车俩结算服务");
-        SettleOrders settleOrders = null;
+        SettleOrders settleOrders = new SettleOrders();
         try {
             Cat.logEvent("settleOrder",orderNo);
             //1 初始化操作 校验操作
-            settleOrders =  orderSettleNoTService.initSettleOrders(orderNo);
+            orderSettleNoTService.initSettleOrders(orderNo,settleOrders);
             log.info("OrderSettleService settleOrders settleOrders [{}]",GsonUtils.toJson(settleOrders));
             Cat.logEvent("settleOrders",GsonUtils.toJson(settleOrders));
 
