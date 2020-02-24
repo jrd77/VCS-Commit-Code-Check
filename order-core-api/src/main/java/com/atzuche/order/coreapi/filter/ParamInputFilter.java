@@ -39,6 +39,5 @@ public class ParamInputFilter implements OrderFilter {
                 throw new InputErrorException("取车经纬度或取车地址不能为空");
             }
         }
-
     }
 }

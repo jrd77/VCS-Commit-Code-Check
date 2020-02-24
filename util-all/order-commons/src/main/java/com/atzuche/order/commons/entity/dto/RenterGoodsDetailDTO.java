@@ -326,6 +326,6 @@ public class RenterGoodsDetailDTO {
     private Integer lastMileage;
     @AutoDocProperty("型号")
     private String modelTxt;
-
-
+    @AutoDocProperty("是否在平台显示 1：是，2：不是")
+    private Integer isPlatformShow;
 }
