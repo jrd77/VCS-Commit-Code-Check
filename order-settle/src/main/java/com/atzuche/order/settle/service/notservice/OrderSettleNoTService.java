@@ -258,13 +258,13 @@ public class OrderSettleNoTService {
         if(OrderStatusEnum.TO_SETTLE.getStatus() != orderStatus.getStatus()){
             throw new RuntimeException("租客订单状态不是待结算，不能结算");
         }
-        //2校验租客是否还车
-        if(Objects.nonNull(renterOrder.getIsReturnCar()) && renterOrder.getIsReturnCar()==1){
-            boolean isReturn = handoverCarService.isReturnCar(renterOrder.getOrderNo());
-            if(!isReturn){
-                throw new RuntimeException("租客未还车不能结算");
-            }
-        }
+//        //2校验租客是否还车
+//        if(Objects.nonNull(renterOrder.getIsReturnCar()) && renterOrder.getIsReturnCar()==1){
+//            boolean isReturn = handoverCarService.isReturnCar(renterOrder.getOrderNo());
+//            if(!isReturn){
+//                throw new RuntimeException("租客未还车不能结算");
+//            }
+//        }
         //3 校验是否存在 理赔  存在不结算
         boolean isClaim = cashierSettleService.getOrderClaim(renterOrder.getOrderNo());
         if(isClaim){
@@ -1870,9 +1870,9 @@ public class OrderSettleNoTService {
      */
     public void refundCancelCost(SettleOrders settleOrders, SettleCancelOrdersAccount settleCancelOrdersAccount,OrderStatusDTO orderStatusDTO) {
         //1退还凹凸币
-//        if(settleCancelOrdersAccount.getRenCoinAmt()>0){
-//            accountRenterCostCoinService.settleAutoCoin(settleOrders.getRenterMemNo(),settleOrders.getOrderNo(),settleCancelOrdersAccount.getRenCoinAmt());
-//        }
+        if(settleCancelOrdersAccount.getRenCoinAmt()>0){
+            accountRenterCostCoinService.settleAutoCoin(settleOrders.getRenterMemNo(),settleOrders.getOrderNo(),settleCancelOrdersAccount.getRenCoinAmt());
+        }
         //2 退还 钱包金额
         if(settleCancelOrdersAccount.getRentSurplusWalletAmt()>0){
             walletProxyService.returnOrChargeWallet(settleOrders.getRenterMemNo(),settleOrders.getOrderNo(),settleCancelOrdersAccount.getRentSurplusWalletAmt());

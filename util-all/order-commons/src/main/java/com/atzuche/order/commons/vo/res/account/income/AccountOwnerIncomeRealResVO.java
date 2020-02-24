@@ -100,4 +100,11 @@ public class AccountOwnerIncomeRealResVO {
      */
     @AutoDocProperty("平台加油服务费")
     private int platformRefuelServiceCharge;
+
+
+    /**
+     * 结算车主收益明细
+     */
+    @AutoDocProperty("结算车主收益明细")
+    private List<AccountOwnerSettleCostDetailResVO> ownerSettleCostDetailResVOs;
 }
