@@ -675,8 +675,8 @@ public class OrderSettleNoTService {
             if(Objects.nonNull(proxyExpense) && Objects.nonNull(proxyExpense.getTotalAmount()) && proxyExpense.getTotalAmount()!=0){
                 AccountOwnerCostSettleDetailEntity accountOwnerCostSettleDetail = new AccountOwnerCostSettleDetailEntity();
                 BeanUtils.copyProperties(proxyExpense,accountOwnerCostSettleDetail);
-                accountOwnerCostSettleDetail.setSourceCode(OwnerCashCodeEnum.ACCOUNT_OWNER_PROXY_EXPENSE_COST.getCashNo());
-                accountOwnerCostSettleDetail.setSourceDetail(OwnerCashCodeEnum.ACCOUNT_OWNER_PROXY_EXPENSE_COST.getTxt());
+                accountOwnerCostSettleDetail.setSourceCode(OwnerCashCodeEnum.PROXY_CHARGE.getCashNo());
+                accountOwnerCostSettleDetail.setSourceDetail(OwnerCashCodeEnum.PROXY_CHARGE.getTxt());
                 accountOwnerCostSettleDetail.setUniqueNo(String.valueOf(proxyExpense.getId()));
                 int amt = Objects.isNull(proxyExpense.getTotalAmount())?0:proxyExpense.getTotalAmount();
                 accountOwnerCostSettleDetail.setAmt(amt);
@@ -690,8 +690,8 @@ public class OrderSettleNoTService {
         if(Objects.nonNull(serviceExpense) && Objects.nonNull(serviceExpense.getTotalAmount()) && serviceExpense.getTotalAmount()!=0){
             AccountOwnerCostSettleDetailEntity accountOwnerCostSettleDetail = new AccountOwnerCostSettleDetailEntity();
             BeanUtils.copyProperties(serviceExpense,accountOwnerCostSettleDetail);
-            accountOwnerCostSettleDetail.setSourceCode(OwnerCashCodeEnum.ACCOUNT_OWNER_SERVICE_EXPENSE_COST.getCashNo());
-            accountOwnerCostSettleDetail.setSourceDetail(OwnerCashCodeEnum.ACCOUNT_OWNER_SERVICE_EXPENSE_COST.getTxt());
+            accountOwnerCostSettleDetail.setSourceCode(OwnerCashCodeEnum.SERVICE_CHARGE.getCashNo());
+            accountOwnerCostSettleDetail.setSourceDetail(OwnerCashCodeEnum.SERVICE_CHARGE.getTxt());
             accountOwnerCostSettleDetail.setUniqueNo(String.valueOf(serviceExpense.getId()));
             int amt = Objects.isNull(serviceExpense.getTotalAmount())?0:serviceExpense.getTotalAmount();
             accountOwnerCostSettleDetail.setAmt(amt);
