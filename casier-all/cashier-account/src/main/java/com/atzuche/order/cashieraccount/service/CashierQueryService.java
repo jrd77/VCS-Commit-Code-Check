@@ -26,7 +26,9 @@ import com.atzuche.order.cashieraccount.vo.res.WzDepositMsgResVO;
 import com.atzuche.order.commons.DateUtils;
 import com.atzuche.order.commons.LocalDateTimeUtils;
 import com.atzuche.order.commons.enums.FineTypeEnum;
+import com.atzuche.order.commons.enums.account.CostTypeEnum;
 import com.atzuche.order.commons.enums.account.income.AccountOwnerIncomeExamineStatus;
+import com.atzuche.order.commons.enums.cashcode.OwnerCashCodeEnum;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.commons.enums.cashier.PayTypeEnum;
 import com.atzuche.order.commons.enums.cashier.TransStatusEnum;
@@ -189,7 +191,7 @@ public class CashierQueryService {
             int incomeAmt = accountOwnerIncomeDetails.stream().mapToInt(AccountOwnerIncomeDetailEntity::getAmt).sum();
             resVO.setIncomeAmt(incomeAmt);
         }
-        boolean exsitPassed = false;
+//        boolean exsitPassed = false;
         //查询待审核收益
         List<AccountOwnerIncomeExamineEntity> accountOwnerIncomeExamines = accountOwnerIncomeService.getOwnerIncomeByOrder(orderNo,memNo);
         if(!CollectionUtils.isEmpty(accountOwnerIncomeExamines)){
@@ -198,23 +200,66 @@ public class CashierQueryService {
             List<AccountOwnerIncomeExamineEntity> ownerIncomeExaminesPassed = accountOwnerIncomeExamines.stream().filter(obj ->{
                 return AccountOwnerIncomeExamineStatus.PASS_EXAMINE.getStatus()==obj.getStatus();
             }).collect(Collectors.toList());
-            exsitPassed = !CollectionUtils.isEmpty(ownerIncomeExaminesPassed);
+//            exsitPassed = !CollectionUtils.isEmpty(ownerIncomeExaminesPassed);
         }
 
         //查询车主罚金
         List<AccountOwnerCostSettleDetailEntity> accountOwnerCostSettleDetails = accountOwnerCostSettleDetailNoTService.getAccountOwnerCostSettleDetails(orderNo,memNo);
         // 车主结算记录存在 且 车主收益 已审核通过  返回  罚金 金额
-        if(!CollectionUtils.isEmpty(accountOwnerCostSettleDetails) && exsitPassed){
+        if(!CollectionUtils.isEmpty(accountOwnerCostSettleDetails)){
+            //油费
+            int oilCost=  accountOwnerCostSettleDetails.stream().filter(obj ->{
+                return OwnerCashCodeEnum.OIL_COST_OWNER.getCashNo().equals(obj.getSourceCode());
+            }).mapToInt(AccountOwnerCostSettleDetailEntity::getAmt).sum();
+            //取消订单罚金
             int cancelFineAmt =  accountOwnerCostSettleDetails.stream().filter(obj ->{
-                return FineTypeEnum.CANCEL_FINE.getFineType().equals(Integer.valueOf(obj.getSourceCode()));
+                return FineTypeEnum.CANCEL_FINE.getFineType().equals(Integer.valueOf(obj.getSourceCode())) && getOwnerFineCostType(obj.getCostType());
             }).mapToInt(AccountOwnerCostSettleDetailEntity::getAmt).sum();
-            int getCarAndReturnCarFineAmt =  accountOwnerCostSettleDetails.stream().filter(obj ->{
-                return FineTypeEnum.GET_RETURN_CAR.getFineType().equals(Integer.valueOf(obj.getSourceCode()));
+            //提前还车违约金
+            int fineAmt =  accountOwnerCostSettleDetails.stream().filter(obj ->{
+                return FineTypeEnum.RENTER_ADVANCE_RETURN.getFineType().equals(Integer.valueOf(obj.getSourceCode()))&& getOwnerFineCostType(obj.getCostType());
             }).mapToInt(AccountOwnerCostSettleDetailEntity::getAmt).sum();
-            resVO.setCancelFineAmt(cancelFineAmt);
-            resVO.setGetCarAndReturnCarFineAmt(getCarAndReturnCarFineAmt);
+            //违约金收益
+            int fineYield = accountOwnerCostSettleDetails.stream().filter(obj ->{
+                return getOwnerFineCostType(obj.getCostType());
+            }).mapToInt(AccountOwnerCostSettleDetailEntity::getAmt).sum();
+            //历史欠款
+            int ownerDebt = accountOwnerCostSettleDetails.stream().filter(obj ->{
+                return RenterCashCodeEnum.SETTLE_OWNER_INCOME_TO_HISTORY_AMT.getCashNo().equals(obj.getSourceCode());
+            }).mapToInt(AccountOwnerCostSettleDetailEntity::getAmt).sum();
+            //取还车违约金
+            int getCarAndReturnCarFineAmt = accountOwnerCostSettleDetails.stream().filter(obj ->{
+                return FineTypeEnum.GET_RETURN_CAR.getFineType().equals(Integer.valueOf(obj.getSourceCode()))&& getOwnerFineCostType(obj.getCostType());
+            }).mapToInt(AccountOwnerCostSettleDetailEntity::getAmt).sum();
+            //平台加油服务费
+            int platformRefuelServiceCharge  = accountOwnerCostSettleDetails.stream().filter(obj ->{
+                return OwnerCashCodeEnum.OWNER_PLANT_OIL_SERVICE_FEE.getCashNo().equals(obj.getSourceCode());
+
+            }).mapToInt(AccountOwnerCostSettleDetailEntity::getAmt).sum();
+            resVO.setOilCost(oilCost);
+            resVO.setCancelOrderPenalty(cancelFineAmt);
+            resVO.setOwnerModifySrvAddrCost(getCarAndReturnCarFineAmt);
+            resVO.setFineAmt(fineAmt);
+            resVO.setFineYield(fineYield);
+            resVO.setOwnerDebt(ownerDebt);
+            resVO.setPlatformRefuelServiceCharge(platformRefuelServiceCharge);
         }
         return resVO;
     }
 
+    /**
+     * 判断车主结算明细 是否是罚金费用 记录
+     */
+    private boolean getOwnerFineCostType(Integer costType){
+        boolean result = false;
+        if(CostTypeEnum.CONSOLE_FINE.getCode().equals(costType)){
+            result = true;
+        }if(CostTypeEnum.OWNER_FINE.getCode().equals(costType)){
+            result = true;
+        }
+        if(CostTypeEnum.RENTER_FINE.getCode().equals(costType)){
+            result = true;
+        }
+        return result;
+    }
 }

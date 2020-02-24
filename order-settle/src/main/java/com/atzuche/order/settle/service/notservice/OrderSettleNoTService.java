@@ -214,7 +214,7 @@ public class OrderSettleNoTService {
      * 初始化结算对象
      * @param orderNo
      */
-    public SettleOrders initSettleOrders(String orderNo) {
+    public SettleOrders initSettleOrders(String orderNo,SettleOrders settleOrders) {
         //1 校验参数
         if(StringUtil.isBlank(orderNo)){
             throw new OrderSettleFlatAccountException();
@@ -237,7 +237,6 @@ public class OrderSettleNoTService {
         String ownerOrderNo = ownerOrder.getOwnerOrderNo();
         String ownerMemNo = ownerOrder.getMemNo();
 
-        SettleOrders settleOrders = new SettleOrders();
         settleOrders.setOrderNo(orderNo);
         settleOrders.setRenterOrderNo(renterOrderNo);
         settleOrders.setOwnerOrderNo(ownerOrderNo);
