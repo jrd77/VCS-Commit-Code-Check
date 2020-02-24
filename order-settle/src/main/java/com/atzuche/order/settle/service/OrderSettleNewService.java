@@ -504,7 +504,7 @@ public class OrderSettleNewService {
         //TODO 发短信
         log.info("sendOrderSettleMq remote start [{}],[{}]",eventEnum,GsonUtils.toJson(orderMessage));
         baseProducer.sendTopicMessage(eventEnum.exchange,eventEnum.routingKey,orderMessage);
-        log.info("sendOrderSettleMq remote start [{}],[{}]",eventEnum,GsonUtils.toJson(orderMessage));
+        log.info("sendOrderSettleMq remote end [{}],[{}]",eventEnum,GsonUtils.toJson(orderMessage));
     }
     
 
