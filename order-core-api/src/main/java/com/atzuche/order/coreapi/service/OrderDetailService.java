@@ -4,7 +4,9 @@ import com.alibaba.fastjson.JSON;
 import com.atzuche.order.accountownercost.entity.AccountOwnerCostSettleEntity;
 import com.atzuche.order.accountownercost.service.AccountOwnerCostSettleService;
 import com.atzuche.order.accountownerincome.entity.AccountOwnerIncomeDetailEntity;
+import com.atzuche.order.accountownerincome.entity.AccountOwnerIncomeExamineEntity;
 import com.atzuche.order.accountownerincome.service.notservice.AccountOwnerIncomeDetailNoTService;
+import com.atzuche.order.accountownerincome.service.notservice.AccountOwnerIncomeExamineNoTService;
 import com.atzuche.order.accountrenterdeposit.entity.AccountRenterDepositDetailEntity;
 import com.atzuche.order.accountrenterdeposit.entity.AccountRenterDepositEntity;
 import com.atzuche.order.accountrenterdeposit.service.AccountRenterDepositService;
@@ -154,9 +156,10 @@ public class OrderDetailService {
     private DeliveryCarInfoPriceService deliveryCarInfoPriceService;
     @Autowired
     private OrderFlowService orderFlowService;
-
     @Autowired
     private OwnerOrderCostService ownerOrderCostService;
+    @Autowired
+    private AccountOwnerIncomeExamineNoTService accountOwnerIncomeExamineNoTService;
 
     private static final String UNIT_HOUR = "小时";
 
@@ -783,7 +786,14 @@ public class OrderDetailService {
             ownerOrderCostDTO = new OwnerOrderCostDTO();
             BeanUtils.copyProperties(ownerOrderCostEntity,ownerOrderCostDTO);
         }
-
+        //车主收益审核
+        List<AccountOwnerIncomeExamineEntity> accountOwnerIncomeExamineEntities = accountOwnerIncomeExamineNoTService.selectByOwnerOrderNo(ownerOrderNo);
+        List<AccountOwnerIncomeExamineDTO> accountOwnerIncomeExamineDTOS = new ArrayList<>();
+        accountOwnerIncomeExamineEntities.stream().forEach(x->{
+            AccountOwnerIncomeExamineDTO accountOwnerIncomeExamineDTO = new AccountOwnerIncomeExamineDTO();
+            BeanUtils.copyProperties(x,accountOwnerIncomeExamineDTO);
+            accountOwnerIncomeExamineDTOS.add(accountOwnerIncomeExamineDTO);
+        });
         OrderDetailRespDTO orderDetailRespDTO = new OrderDetailRespDTO();
         orderDetailRespDTO.order = orderDTO;
         orderDetailRespDTO.renterOrder = renterOrderDTO;
@@ -811,6 +821,7 @@ public class OrderDetailService {
         orderDetailRespDTO.renterOrderSubsidyDetailDTOS = renterOrderSubsidyDetailDTOS;
         orderDetailRespDTO.ownerOrderSubsidyDetailDTOS = ownerOrderSubsidyDetailDTOS;
         orderDetailRespDTO.ownerOrderCostDTO = ownerOrderCostDTO;
+        orderDetailRespDTO.accountOwnerIncomeExamineDTOS = accountOwnerIncomeExamineDTOS;
         return orderDetailRespDTO;
     }
 
