@@ -4,6 +4,8 @@ import com.autoyol.doc.annotation.AutoDocProperty;
 import lombok.Data;
 import lombok.ToString;
 
+import static com.atzuche.order.commons.FeeUtil.minusFee;
+
 /**
  * @author <a href="mailto:lianglin.sjtu@gmail.com">AndySjtu</a>
  * @date 2020/1/17 4:47 下午
@@ -113,4 +115,72 @@ public class AdminModifyOrderFeeVO {
      */
     @AutoDocProperty(value = "还车服务违约金")
     private Integer returnFineAmt;
+
+    public Integer getRentAmt() {
+        return minusFee(rentAmt);
+    }
+
+    public Integer getPoundageAmt() {
+        return minusFee(poundageAmt);
+    }
+
+    public Integer getInsuranceAmt() {
+        return minusFee(insuranceAmt);
+    }
+
+    public Integer getAbatementAmt() {
+        return minusFee(abatementAmt);
+    }
+
+    public Integer getTotalDriverFee() {
+        return minusFee(totalDriverFee);
+    }
+
+    public Integer getGetCost() {
+        return minusFee(getCost);
+    }
+
+    public Integer getReturnCost() {
+        return minusFee(returnCost);
+    }
+
+    public Integer getGetBlockedRaiseAmt() {
+        return minusFee(getBlockedRaiseAmt);
+    }
+
+    public Integer getReturnBlockedRaiseAmt() {
+        return minusFee(returnBlockedRaiseAmt);
+    }
+
+    public Integer getOwnerCouponOffsetCost() {
+        return minusFee(ownerCouponOffsetCost);
+    }
+
+    public Integer getReductionAmt() {
+        return minusFee(reductionAmt);
+    }
+
+    public Integer getDiscouponAmt() {
+        return minusFee(discouponAmt);
+    }
+
+    public Integer getGetCarFeeDiscouponOffsetAmt() {
+        return minusFee(getCarFeeDiscouponOffsetAmt);
+    }
+
+    public Integer getAutoCoinDeductibleAmt() {
+        return minusFee(autoCoinDeductibleAmt);
+    }
+
+    public Integer getPenaltyAmt() {
+        return minusFee(penaltyAmt);
+    }
+
+    public Integer getGetFineAmt() {
+        return minusFee(getFineAmt);
+    }
+
+    public Integer getReturnFineAmt() {
+        return minusFee(returnFineAmt);
+    }
 }
