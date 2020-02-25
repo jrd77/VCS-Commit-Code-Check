@@ -60,7 +60,7 @@ public class CancelOrderController {
         return ResponseData.success();
     }
 
-    @AutoDocMethod(description = "管理后台取消订单", value = "管理后台取消订单")
+    @AutoDocMethod(description = "管理后台取消订单(平台取消)", value = "管理后台取消订单(平台取消)")
     @PostMapping("/admin/cancel")
     public ResponseData<?> adminCancelOrder(@Valid @RequestBody AdminOrderCancelReqVO reqVO,
                                             BindingResult bindingResult) {
