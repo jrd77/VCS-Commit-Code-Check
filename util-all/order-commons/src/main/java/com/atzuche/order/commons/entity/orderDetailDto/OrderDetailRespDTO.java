@@ -35,5 +35,5 @@ public class OrderDetailRespDTO {
     public List<RenterOrderSubsidyDetailDTO> renterOrderSubsidyDetailDTOS;
     public List<OwnerOrderSubsidyDetailDTO> ownerOrderSubsidyDetailDTOS;
     public OwnerOrderCostDTO ownerOrderCostDTO;
-    public AccountOwnerIncomeExamineDTO accountOwnerIncomeExamineDTO;
+    public List<AccountOwnerIncomeExamineDTO> accountOwnerIncomeExamineDTOS;
 }
