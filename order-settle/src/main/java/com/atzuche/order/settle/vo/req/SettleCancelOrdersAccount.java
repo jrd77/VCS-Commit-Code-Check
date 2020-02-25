@@ -1,6 +1,12 @@
 package com.atzuche.order.settle.vo.req;
 
+import com.atzuche.order.accountownercost.entity.AccountOwnerCostSettleDetailEntity;
+import com.atzuche.order.accountplatorm.entity.AccountPlatformSubsidyDetailEntity;
 import lombok.Data;
+import org.springframework.util.CollectionUtils;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -82,4 +88,24 @@ public class SettleCancelOrdersAccount {
      * 租客实付凹凸币金额
      */
     private int renCoinAmt;
+
+
+    /**
+     * 车主费用明细
+     */
+    private List<AccountOwnerCostSettleDetailEntity> accountOwnerCostSettleDetails;
+
+
+    /**
+     * 车主费用明细 添加
+     * @param accountOwnerCostSettleDetail
+     */
+    public void addOwnerCostSettleDetail(AccountOwnerCostSettleDetailEntity accountOwnerCostSettleDetail){
+        List<AccountOwnerCostSettleDetailEntity> accountOwnerCostSettleDetails = getAccountOwnerCostSettleDetails();
+        if(CollectionUtils.isEmpty(accountOwnerCostSettleDetails)){
+            accountOwnerCostSettleDetails = new ArrayList<>();
+        }
+        accountOwnerCostSettleDetails.add(accountOwnerCostSettleDetail);
+        setAccountOwnerCostSettleDetails(accountOwnerCostSettleDetails);
+    }
 }

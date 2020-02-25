@@ -14,5 +14,5 @@ repositories {
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
     compile project(":util-all:order-commons")
-    compile('com.autoyol.car:auto-car-service-api:2020022001-SNAPSHOT')
+    compile('com.autoyol.car:auto-car-service-api:2020022002-SNAPSHOT')
 }

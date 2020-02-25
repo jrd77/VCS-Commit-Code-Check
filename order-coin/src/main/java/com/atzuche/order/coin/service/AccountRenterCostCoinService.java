@@ -138,7 +138,7 @@ public class AccountRenterCostCoinService {
         requestVO.setChargeAutoCoin(amt);
         boolean deductFlag = autoCoinProxyService.deduct(requestVO);
         if(deductFlag){
-            insertDeductLog(memNo, renterOrderNo, amt);
+            insertDeductLog(memNo,orderNo, renterOrderNo, amt);
             logger.info("success deduct auto coin and insert db:memNo={},orderNo={},renterOderNo={},amt={}",memNo,orderNo,renterOrderNo,amt);
         }else{
             logger.warn("cannot deduct auto coin:memNo={},orderNo={},renterOderNo={},amt={}",memNo,orderNo,renterOrderNo,amt);
@@ -151,10 +151,11 @@ public class AccountRenterCostCoinService {
      * @param renterOrderNo
      * @param amt
      */
-    private void insertDeductLog(String memNo, String renterOrderNo, int amt) {
+    private void insertDeductLog(String memNo,String orderNo, String renterOrderNo, int amt) {
         AccountRenterCostCoinEntity entity = new AccountRenterCostCoinEntity();
         entity.setAmt(amt*AUTO_COIN_RATIO);
         entity.setMemNo(memNo);
+        entity.setOrderNo(orderNo);
         entity.setRemark("订单抵扣");
         entity.setRenterOrderNo(renterOrderNo);
         entity.setOrderType(1);

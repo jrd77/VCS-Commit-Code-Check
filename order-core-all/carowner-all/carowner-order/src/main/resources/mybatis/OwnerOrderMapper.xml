@@ -286,5 +286,13 @@
     <update id="updateDispatchReasonByOrderNo">
 		update owner_order set dispatch_reason = #{dispatchReason} where order_no = #{orderNo} and is_delete = 0
 	</update>
+    <select id="getOwnerByMemNoAndOrderNo" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List" /> from owner_order where order_no = #{orderNo}
+        and is_effective = 1
+        and is_cancel = 0
+        and is_delete = 0
+        and child_status = 0
+        and mem_no = #{ownerMemNo}
+    </select>
 
 </mapper>
