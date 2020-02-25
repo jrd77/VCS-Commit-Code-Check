@@ -40,4 +40,9 @@ public class GlobalConstant {
     public static final String NEW_ORDER_NO_SUFFIX = "99";
     public static final int NEW_ORDER_NO_LEN = 14;
 
+    //虚拟车辆号
+    public static final String DISTRIBUTE_VIRTUAL_CARNO = "999999994";
+
+    public static final String CONSOLE_SITE = "EX007"; //后台管理系统
+    public static final String H5_CPIC_CAR="EX011";//*  H5-出险代步车
 }

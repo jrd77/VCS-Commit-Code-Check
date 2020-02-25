@@ -320,8 +320,8 @@ public class OrderSettleNewService {
         int totalAmount = proxyExpense.getTotalAmount();
         AccountPlatformProfitDetailEntity accountPlatformProfitDetail = new AccountPlatformProfitDetailEntity();
         accountPlatformProfitDetail.setAmt(-totalAmount);
-        accountPlatformProfitDetail.setSourceCode(OwnerCashCodeEnum.ACCOUNT_OWNER_PROXY_EXPENSE_COST.getCashNo());
-        accountPlatformProfitDetail.setSourceDesc(OwnerCashCodeEnum.ACCOUNT_OWNER_PROXY_EXPENSE_COST.getTxt());
+        accountPlatformProfitDetail.setSourceCode(OwnerCashCodeEnum.PROXY_CHARGE.getCashNo());
+        accountPlatformProfitDetail.setSourceDesc(OwnerCashCodeEnum.PROXY_CHARGE.getTxt());
         accountPlatformProfitDetail.setUniqueNo(String.valueOf(proxyExpense.getId()));
         accountPlatformProfitDetail.setOrderNo(proxyExpense.getOrderNo());
         settleOrdersDefinition.addPlatformProfit(accountPlatformProfitDetail);
@@ -337,8 +337,8 @@ public class OrderSettleNewService {
         int totalAmount = serviceExpense.getTotalAmount();
         AccountPlatformProfitDetailEntity accountPlatformProfitDetail = new AccountPlatformProfitDetailEntity();
         accountPlatformProfitDetail.setAmt(-totalAmount);
-        accountPlatformProfitDetail.setSourceCode(OwnerCashCodeEnum.ACCOUNT_OWNER_SERVICE_EXPENSE_COST.getCashNo());
-        accountPlatformProfitDetail.setSourceDesc(OwnerCashCodeEnum.ACCOUNT_OWNER_SERVICE_EXPENSE_COST.getTxt());
+        accountPlatformProfitDetail.setSourceCode(OwnerCashCodeEnum.SERVICE_CHARGE.getCashNo());
+        accountPlatformProfitDetail.setSourceDesc(OwnerCashCodeEnum.SERVICE_CHARGE.getTxt());
         accountPlatformProfitDetail.setUniqueNo(String.valueOf(serviceExpense.getId()));
         accountPlatformProfitDetail.setOrderNo(serviceExpense.getOrderNo());
         settleOrdersDefinition.addPlatformProfit(accountPlatformProfitDetail);
@@ -369,8 +369,8 @@ public class OrderSettleNewService {
         int totalAmount = renterOrderCostDetail.getTotalAmount();
         AccountPlatformProfitDetailEntity accountPlatformProfitDetail = new AccountPlatformProfitDetailEntity();
         accountPlatformProfitDetail.setAmt(totalAmount);
-        accountPlatformProfitDetail.setSourceCode(OwnerCashCodeEnum.ACCOUNT_OWNER_GPS_COST.getCashNo());
-        accountPlatformProfitDetail.setSourceDesc(OwnerCashCodeEnum.ACCOUNT_OWNER_GPS_COST.getTxt());
+        accountPlatformProfitDetail.setSourceCode(renterOrderCostDetail.getCostCode());
+        accountPlatformProfitDetail.setSourceDesc(renterOrderCostDetail.getCostCodeDesc());
         accountPlatformProfitDetail.setUniqueNo(String.valueOf(renterOrderCostDetail.getId()));
         accountPlatformProfitDetail.setOrderNo(renterOrderCostDetail.getOrderNo());
         settleOrdersDefinition.addPlatformProfit(accountPlatformProfitDetail);
@@ -452,7 +452,6 @@ public class OrderSettleNewService {
         AccountRenterCostSettleEntity entity=cashierSettleService.getAccountRenterCostSettleEntity(orderNo,renterMemNo);
         OrderSettlementMq orderSettlementMq = new OrderSettlementMq();
         if(Objects.nonNull(entity) && Objects.nonNull(entity)){
-
             String insureTotalPrices = Objects.nonNull(entity.getBasicEnsureAmount())?String.valueOf(entity.getBasicEnsureAmount()):"0";
             orderSettlementMq.setInsureTotalPrices(insureTotalPrices);
             String abatementInsure = Objects.nonNull(entity.getComprehensiveEnsureAmount())?String.valueOf(entity.getComprehensiveEnsureAmount()):"0";
@@ -460,7 +459,7 @@ public class OrderSettleNewService {
         }
         int subsidyPlamtAmt=0;
         int subsidyOwnerAmt=0;
-        if(!CollectionUtils.isEmpty(rentCosts.getOrderConsoleSubsidyDetails())){
+        if(Objects.nonNull(rentCosts) && !CollectionUtils.isEmpty(rentCosts.getOrderConsoleSubsidyDetails())){
             subsidyPlamtAmt = subsidyPlamtAmt + rentCosts.getOrderConsoleSubsidyDetails().stream().filter(obj ->{
                 return RenterCashCodeEnum.REAL_COUPON_OFFSET.getCashNo().equals(obj.getSubsidyTypeCode());
             }).mapToInt(OrderConsoleSubsidyDetailEntity::getSubsidyAmount).sum();
@@ -468,7 +467,7 @@ public class OrderSettleNewService {
                 return RenterCashCodeEnum.OWNER_COUPON_OFFSET_COST.getCashNo().equals(obj.getSubsidyTypeCode());
             }).mapToInt(OrderConsoleSubsidyDetailEntity::getSubsidyAmount).sum();
         }
-        if(!CollectionUtils.isEmpty(rentCosts.getRenterOrderSubsidyDetails())){
+        if(Objects.nonNull(rentCosts) && !CollectionUtils.isEmpty(rentCosts.getRenterOrderSubsidyDetails())){
             subsidyPlamtAmt = subsidyPlamtAmt + rentCosts.getRenterOrderSubsidyDetails().stream().filter(obj ->{
                 return RenterCashCodeEnum.REAL_COUPON_OFFSET.getCashNo().equals(obj.getSubsidyTypeCode());
             }).mapToInt(RenterOrderSubsidyDetailEntity::getSubsidyAmount).sum();
@@ -480,7 +479,7 @@ public class OrderSettleNewService {
         orderSettlementMq.setOwnerCouponDeductionAmount(String.valueOf(subsidyOwnerAmt));
 
         //查询租车费用  过滤租金 取 日均价 多个的话 按id倒叙  取第一个
-        if(!CollectionUtils.isEmpty(rentCosts.getRenterOrderCostDetails())){
+        if(Objects.nonNull(rentCosts) && !CollectionUtils.isEmpty(rentCosts.getRenterOrderCostDetails())){
            int price = rentCosts.getRenterOrderCostDetails().stream().filter(obj ->{
                 return RenterCashCodeEnum.RENT_AMT.getCashNo().equals(obj.getCostCode());
             }).sorted(Comparator.comparing(RenterOrderCostDetailEntity::getId).reversed())
@@ -505,7 +504,7 @@ public class OrderSettleNewService {
         //TODO 发短信
         log.info("sendOrderSettleMq remote start [{}],[{}]",eventEnum,GsonUtils.toJson(orderMessage));
         baseProducer.sendTopicMessage(eventEnum.exchange,eventEnum.routingKey,orderMessage);
-        log.info("sendOrderSettleMq remote start [{}],[{}]",eventEnum,GsonUtils.toJson(orderMessage));
+        log.info("sendOrderSettleMq remote end [{}],[{}]",eventEnum,GsonUtils.toJson(orderMessage));
     }
     
 

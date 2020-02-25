@@ -214,7 +214,7 @@ public class OrderSettleNoTService {
      * 初始化结算对象
      * @param orderNo
      */
-    public SettleOrders initSettleOrders(String orderNo) {
+    public SettleOrders initSettleOrders(String orderNo,SettleOrders settleOrders) {
         //1 校验参数
         if(StringUtil.isBlank(orderNo)){
             throw new OrderSettleFlatAccountException();
@@ -237,7 +237,6 @@ public class OrderSettleNoTService {
         String ownerOrderNo = ownerOrder.getOwnerOrderNo();
         String ownerMemNo = ownerOrder.getMemNo();
 
-        SettleOrders settleOrders = new SettleOrders();
         settleOrders.setOrderNo(orderNo);
         settleOrders.setRenterOrderNo(renterOrderNo);
         settleOrders.setOwnerOrderNo(ownerOrderNo);
@@ -259,13 +258,13 @@ public class OrderSettleNoTService {
         if(OrderStatusEnum.TO_SETTLE.getStatus() != orderStatus.getStatus()){
             throw new RuntimeException("租客订单状态不是待结算，不能结算");
         }
-        //2校验租客是否还车
-        if(Objects.nonNull(renterOrder.getIsReturnCar()) && renterOrder.getIsReturnCar()==1){
-            boolean isReturn = handoverCarService.isReturnCar(renterOrder.getOrderNo());
-            if(!isReturn){
-                throw new RuntimeException("租客未还车不能结算");
-            }
-        }
+//        //2校验租客是否还车
+//        if(Objects.nonNull(renterOrder.getIsReturnCar()) && renterOrder.getIsReturnCar()==1){
+//            boolean isReturn = handoverCarService.isReturnCar(renterOrder.getOrderNo());
+//            if(!isReturn){
+//                throw new RuntimeException("租客未还车不能结算");
+//            }
+//        }
         //3 校验是否存在 理赔  存在不结算
         boolean isClaim = cashierSettleService.getOrderClaim(renterOrder.getOrderNo());
         if(isClaim){
@@ -676,8 +675,8 @@ public class OrderSettleNoTService {
             if(Objects.nonNull(proxyExpense) && Objects.nonNull(proxyExpense.getTotalAmount()) && proxyExpense.getTotalAmount()!=0){
                 AccountOwnerCostSettleDetailEntity accountOwnerCostSettleDetail = new AccountOwnerCostSettleDetailEntity();
                 BeanUtils.copyProperties(proxyExpense,accountOwnerCostSettleDetail);
-                accountOwnerCostSettleDetail.setSourceCode(OwnerCashCodeEnum.ACCOUNT_OWNER_PROXY_EXPENSE_COST.getCashNo());
-                accountOwnerCostSettleDetail.setSourceDetail(OwnerCashCodeEnum.ACCOUNT_OWNER_PROXY_EXPENSE_COST.getTxt());
+                accountOwnerCostSettleDetail.setSourceCode(OwnerCashCodeEnum.PROXY_CHARGE.getCashNo());
+                accountOwnerCostSettleDetail.setSourceDetail(OwnerCashCodeEnum.PROXY_CHARGE.getTxt());
                 accountOwnerCostSettleDetail.setUniqueNo(String.valueOf(proxyExpense.getId()));
                 int amt = Objects.isNull(proxyExpense.getTotalAmount())?0:proxyExpense.getTotalAmount();
                 accountOwnerCostSettleDetail.setAmt(amt);
@@ -691,8 +690,8 @@ public class OrderSettleNoTService {
         if(Objects.nonNull(serviceExpense) && Objects.nonNull(serviceExpense.getTotalAmount()) && serviceExpense.getTotalAmount()!=0){
             AccountOwnerCostSettleDetailEntity accountOwnerCostSettleDetail = new AccountOwnerCostSettleDetailEntity();
             BeanUtils.copyProperties(serviceExpense,accountOwnerCostSettleDetail);
-            accountOwnerCostSettleDetail.setSourceCode(OwnerCashCodeEnum.ACCOUNT_OWNER_SERVICE_EXPENSE_COST.getCashNo());
-            accountOwnerCostSettleDetail.setSourceDetail(OwnerCashCodeEnum.ACCOUNT_OWNER_SERVICE_EXPENSE_COST.getTxt());
+            accountOwnerCostSettleDetail.setSourceCode(OwnerCashCodeEnum.SERVICE_CHARGE.getCashNo());
+            accountOwnerCostSettleDetail.setSourceDetail(OwnerCashCodeEnum.SERVICE_CHARGE.getTxt());
             accountOwnerCostSettleDetail.setUniqueNo(String.valueOf(serviceExpense.getId()));
             int amt = Objects.isNull(serviceExpense.getTotalAmount())?0:serviceExpense.getTotalAmount();
             accountOwnerCostSettleDetail.setAmt(amt);
@@ -1720,12 +1719,26 @@ public class OrderSettleNoTService {
         int ownerFineIncomeAmt = 0;
         if(Objects.nonNull(ownerCosts) && !CollectionUtils.isEmpty(ownerCosts.getOwnerOrderFineDeatails())){
             int amt = ownerCosts.getOwnerOrderFineDeatails().stream().filter(obj ->{
+                AccountOwnerCostSettleDetailEntity entity = new AccountOwnerCostSettleDetailEntity();
+                BeanUtils.copyProperties(obj,entity);
+                entity.setCostType(getCostTypeEnumBySubsidy(obj.getFineSubsidySourceCode()).getCode());
+                entity.setSourceCode(String.valueOf(obj.getFineType()));
+                entity.setSourceDetail(obj.getFineTypeDesc());
+                entity.setAmt(obj.getFineAmount());
+                settleCancelOrdersAccount.addOwnerCostSettleDetail(entity);
                 return SubsidySourceCodeEnum.OWNER.getCode().equals(obj.getFineSubsidyCode());
             }).mapToInt(OwnerOrderFineDeatailEntity::getFineAmount).sum();
             ownerFineIncomeAmt = ownerFineIncomeAmt +amt;
         }
         if(Objects.nonNull(ownerCosts) && !CollectionUtils.isEmpty(ownerCosts.getConsoleOwnerOrderFineDeatailEntitys())){
             int amt = ownerCosts.getConsoleOwnerOrderFineDeatailEntitys().stream().filter(obj ->{
+                AccountOwnerCostSettleDetailEntity entity = new AccountOwnerCostSettleDetailEntity();
+                BeanUtils.copyProperties(obj,entity);
+                entity.setCostType(getCostTypeEnumBySubsidy(obj.getFineSubsidySourceCode()).getCode());
+                entity.setSourceCode(String.valueOf(obj.getFineType()));
+                entity.setSourceDetail(obj.getFineTypeDesc());
+                entity.setAmt(obj.getFineAmount());
+                settleCancelOrdersAccount.addOwnerCostSettleDetail(entity);
                 return SubsidySourceCodeEnum.OWNER.getCode().equals(obj.getFineSubsidyCode());
             }).mapToInt(ConsoleOwnerOrderFineDeatailEntity::getFineAmount).sum();
             ownerFineIncomeAmt = ownerFineIncomeAmt +amt;
@@ -1871,9 +1884,9 @@ public class OrderSettleNoTService {
      */
     public void refundCancelCost(SettleOrders settleOrders, SettleCancelOrdersAccount settleCancelOrdersAccount,OrderStatusDTO orderStatusDTO) {
         //1退还凹凸币
-//        if(settleCancelOrdersAccount.getRenCoinAmt()>0){
-//            accountRenterCostCoinService.settleAutoCoin(settleOrders.getRenterMemNo(),settleOrders.getOrderNo(),settleCancelOrdersAccount.getRenCoinAmt());
-//        }
+        if(settleCancelOrdersAccount.getRenCoinAmt()>0){
+            accountRenterCostCoinService.settleAutoCoin(settleOrders.getRenterMemNo(),settleOrders.getOrderNo(),settleCancelOrdersAccount.getRenCoinAmt());
+        }
         //2 退还 钱包金额
         if(settleCancelOrdersAccount.getRentSurplusWalletAmt()>0){
             walletProxyService.returnOrChargeWallet(settleOrders.getRenterMemNo(),settleOrders.getOrderNo(),settleCancelOrdersAccount.getRentSurplusWalletAmt());
@@ -2108,12 +2121,15 @@ public class OrderSettleNoTService {
             accountOwnerIncomeExamine.setAmt(settleCancelOrdersAccount.getOwnerFineIncomeAmt());
             accountOwnerIncomeExamine.setMemNo(settleOrders.getOwnerMemNo());
             accountOwnerIncomeExamine.setOrderNo(settleOrders.getOrderNo());
+            accountOwnerIncomeExamine.setOwnerOrderNo(settleOrders.getOwnerOrderNo());
             accountOwnerIncomeExamine.setRemark("罚金收入");
             accountOwnerIncomeExamine.setDetail("罚金收入");
             accountOwnerIncomeExamine.setOwnerOrderNo(settleOrders.getOwnerOrderNo());
             accountOwnerIncomeExamine.setStatus(AccountOwnerIncomeExamineStatus.WAIT_EXAMINE);
             accountOwnerIncomeExamine.setType(AccountOwnerIncomeExamineType.OWNER_INCOME);
             cashierService.insertOwnerIncomeExamine(accountOwnerIncomeExamine);
+            //租车费用结算明细 落库
+            cashierSettleService.insertAccountOwnerCostSettleDetails(settleCancelOrdersAccount.getAccountOwnerCostSettleDetails());
             accountPlatformProfitEntity.setOwnerIncomeAmt(-settleCancelOrdersAccount.getOwnerFineIncomeAmt());
         }
         // 平台罚金收入

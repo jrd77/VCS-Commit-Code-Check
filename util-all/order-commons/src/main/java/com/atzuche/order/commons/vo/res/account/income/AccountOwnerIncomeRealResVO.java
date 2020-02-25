@@ -24,17 +24,9 @@ public class AccountOwnerIncomeRealResVO {
     @AutoDocProperty("车主订单真实收益总额")
     private int incomeAmt;
 
-    /**
-     * 取消订单违约金
-     */
-    @AutoDocProperty("取消订单违约金")
-    private int cancelFineAmt;
 
-    /**
-     * 取换车服务违约金
-     */
-    @AutoDocProperty("取换车服务违约金")
-    private int getCarAndReturnCarFineAmt;
+
+
 
     /**
      * 车主订单完结待审核收益总额
@@ -42,18 +34,77 @@ public class AccountOwnerIncomeRealResVO {
     @AutoDocProperty("车主订单完结待审核收益总额")
     private int incomeExamineAmt;
 
-//    /**
-//     * 车主收益明细
-//     */
-//    @AutoDocProperty("车主收益明细")
-//    List<AccountOwnerIncomeDetailEntity> accountOwnerIncomeDetails;
-//    /**
-//     * 车主待审核收益明细
-//     */
-//    @AutoDocProperty("车主待审核收益明细")
-//    List<AccountOwnerIncomeExamineEntity> accountOwnerIncomeExamines;
+
+    /**
+     * 油费
+     */
+    @AutoDocProperty("油费")
+    private int oilCost;
+
+    /**
+     * 租客给车主调价
+     */
+    @AutoDocProperty("租客给车主调价")
+    private int renterAdjustPrice;
+
+    /**
+     * 车主给租客调价
+     */
+    @AutoDocProperty("租客给车主调价")
+    private int ownerAdjustPrice;
+
+    /**
+     * 取还车服务违约金
+     */
+    @AutoDocProperty("取还车服务违约金")
+    private int ownerModifySrvAddrCost;
+
+    /**
+     * 提前还车违约金
+     */
+    @AutoDocProperty("提前还车违约金")
+    private int fineAmt;
+
+    /**
+     * 违约金收益
+     */
+    @AutoDocProperty("违约金收益")
+    private int fineYield;
+
+    /**
+     * 停运费
+     */
+    @AutoDocProperty("停运费")
+    private int offStreamCost;
+
+    /**
+     * 车主支付给平台的费用
+     */
+    @AutoDocProperty("车主支付给平台的费用")
+    private int ownerPayPlatform;
+
+    /**
+     * 历史欠款
+     */
+    @AutoDocProperty("历史欠款")
+    private int ownerDebt;
+
+    /**
+     * 取消订单违约金
+     */
+    @AutoDocProperty("取消订单违约金")
+    private int cancelOrderPenalty;
+
+    /**
+     * 平台加油服务费
+     */
+    @AutoDocProperty("平台加油服务费")
+    private int platformRefuelServiceCharge;
 
 
-
-
+    /**
+     * 结算车主收益明细
+     */
+    @AutoDocProperty("结算车主收益明细")
+    private List<AccountOwnerSettleCostDetailResVO> ownerSettleCostDetailResVOs;
 }

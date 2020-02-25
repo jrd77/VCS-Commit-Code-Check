@@ -293,10 +293,10 @@ public class CashierSettleService {
         entity.setOwnerOrderNo(ownerOrderNo);
         if(!CollectionUtils.isEmpty(accountOwnerCostSettleDetails)){
             //1车主端代管车服务费
-            int proxyExpenseAmt =accountOwnerCostSettleDetails.stream().filter(obj ->{return OwnerCashCodeEnum.ACCOUNT_OWNER_PROXY_EXPENSE_COST.getCashNo().equals(obj.getSourceCode());})
+            int proxyExpenseAmt =accountOwnerCostSettleDetails.stream().filter(obj ->{return OwnerCashCodeEnum.PROXY_CHARGE.getCashNo().equals(obj.getSourceCode());})
                     .mapToInt(AccountOwnerCostSettleDetailEntity::getAmt).sum();
             //2车主端平台服务费
-            int serviceExpenseAmt =accountOwnerCostSettleDetails.stream().filter(obj ->{return OwnerCashCodeEnum.ACCOUNT_OWNER_SERVICE_EXPENSE_COST.getCashNo().equals(obj.getSourceCode());})
+            int serviceExpenseAmt =accountOwnerCostSettleDetails.stream().filter(obj ->{return OwnerCashCodeEnum.SERVICE_CHARGE.getCashNo().equals(obj.getSourceCode());})
                     .mapToInt(AccountOwnerCostSettleDetailEntity::getAmt).sum();
             //3获取车主补贴
             int subsidyAmount =accountOwnerCostSettleDetails.stream().filter(obj ->{

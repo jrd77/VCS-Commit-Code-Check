@@ -43,4 +43,6 @@ public interface OwnerOrderMapper{
     OwnerOrderEntity queryCancelOwnerOrderByOrderNoIsEffective(@Param("orderNo")String orderNo);
 
     Integer updateDispatchReasonByOrderNo(@Param("orderNo") String orderNo, @Param("dispatchReason") String dispatchReason);
+
+    OwnerOrderEntity getOwnerByMemNoAndOrderNo(@Param("orderNo")String orderNo, @Param("ownerMemNo") String ownerMemNo);
 }

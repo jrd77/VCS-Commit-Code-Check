@@ -27,13 +27,32 @@ public class OrderFilterChain implements OrderFilter, ApplicationContextAware {
     @PostConstruct
     private void init(){
         /* 参数检测 */
-       orderFilterList.add(applicationContext.getBean(ParamInputFilter.class));
-       /* 不能自己租自己 的车的检查 */
-       orderFilterList.add(applicationContext.getBean(NotRentSelfCarFilter.class));
-       /* 库存检查 */
-       orderFilterList.add(applicationContext.getBean(StockFilter.class));
-       /* 风控检查 */
-       orderFilterList.add(applicationContext.getBean(RiskAuditFilter.class));
+        orderFilterList.add(applicationContext.getBean(ParamInputFilter.class));
+        /*经纬度转换校验*/
+        orderFilterList.add(applicationContext.getBean(ConvertLatOrLonFilter.class));
+        /*免押方式校验*/
+        orderFilterList.add(applicationContext.getBean(FreeDepositModeFilter.class));
+        /* 不能自己租自己 的车的检查 */
+        orderFilterList.add(applicationContext.getBean(NotRentSelfCarFilter.class));
+        /*平台显示校验*/
+        orderFilterList.add(applicationContext.getBean(PlatformShowFilter.class));
+        /*取还车时间校验*/
+        orderFilterList.add(applicationContext.getBean(RentRevertTimeCheckFilter.class));
+        /*取还车服务起租时间需大于4小时校验*/
+        orderFilterList.add(applicationContext.getBean(RenterTime4HourFilter.class));
+        /*车辆设置校验*/
+        orderFilterList.add(applicationContext.getBean(CarSettingCheckFilter.class));
+        /*城市凹凸服务点判断*/
+        orderFilterList.add(applicationContext.getBean(CityLonLatFilter.class));
+        /*机场服务点校验*/
+        orderFilterList.add(applicationContext.getBean(AirportServiceFilter.class));
+        /*15分钟内重复下单校验*/
+       /* orderFilterList.add(applicationContext.getBean(WaitOwner15minuteReplyFilter.class));*/
+        /* 库存检查 */
+        orderFilterList.add(applicationContext.getBean(StockFilter.class));
+        /* 风控检查 */
+        orderFilterList.add(applicationContext.getBean(RiskAuditFilter.class));
+
     }
 
 

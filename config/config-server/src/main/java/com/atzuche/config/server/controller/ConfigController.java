@@ -41,4 +41,5 @@ public class ConfigController {
          List<String> configNames = configFactory.getAllConfigNames();
          return ResponseData.success(configNames);
      }
+
 }

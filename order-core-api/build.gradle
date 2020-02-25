@@ -19,7 +19,6 @@ mainClassName = 'com.autoyol.doc.parser.autodoc.AutoDocParser'
 dependencies {
     compile project(":order-openapi")
     compile project(":config:config-client")
-
     implementation "com.autoyol:auto-web-starter:1.0-SNAPSHOT"
     compile 'org.springframework.boot:spring-boot-starter-web'
 	compile('org.springframework.boot:spring-boot-starter-actuator')
@@ -42,7 +41,7 @@ dependencies {
     compile("com.caucho:hessian:4.0.38")
 
     compile('com.autoyol.unique:unique-no-feign:3.1-SNAPSHOT')
-    compile('com.autoyol.car:auto-car-service-api:2020022001-SNAPSHOT')
+    compile('com.autoyol.car:auto-car-service-api:2020022002-SNAPSHOT')
     compile('com.autoyol:riskCheckService-api:1.0.0-SNAPSHOT')
     compile project(":order-remote-service:order-remote-car")
 
@@ -82,7 +81,7 @@ dependencies {
     compile("com.fasterxml.jackson.datatype:jackson-datatype-jdk8")
     compile("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
 
-    compile("com.autoframework:auto-mq-event:1.0-SNAPSHOT")
+    compile("com.autoframework:auto-mq-event:1.0.2-SNAPSHOT")
     
     compile('com.autoyol.cardistance:car-distance:0.0.4-20190613-SNAPSHOT')
 
