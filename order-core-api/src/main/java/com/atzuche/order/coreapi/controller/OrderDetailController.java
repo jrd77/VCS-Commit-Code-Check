@@ -91,4 +91,17 @@ public class OrderDetailController {
         ResponseData<OwnerOrderDetailRespDTO> responseData = orderDetailService.ownerOrderDetail(orderNo,ownerOrderNo,ownerMemNo);
         return responseData;
     }
+
+    @GetMapping("/renterOrderDetail")
+    public ResponseData<OwnerOrderDetailRespDTO> renterOrderDetail(@RequestParam("orderNo") String orderNo,
+                                                                  @RequestParam(name = "renterOrderNo",required = false) String renterOrderNo){
+        if(orderNo == null || orderNo.trim().length()<=0){
+            ResponseData responseData = new ResponseData();
+            responseData.setResCode(ErrorCode.INPUT_ERROR.getCode());
+            responseData.setResMsg("订单号不能为空");
+            return responseData;
+        }
+        ResponseData<OwnerOrderDetailRespDTO> responseData = orderDetailService.renterOrderDetail(orderNo,renterOrderNo);
+        return responseData;
+    }
 }

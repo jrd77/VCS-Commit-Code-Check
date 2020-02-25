@@ -279,6 +279,156 @@ public class OrderDetailService {
         return responseData;
     }
 
+    public ResponseData<OwnerOrderDetailRespDTO> renterOrderDetail(String orderNo, String renterOrderNo) {
+        log.info("准备获取订单详情orderNo={},ownerOrderNo={}", orderNo,renterOrderNo);
+        ResponseData responseData = new ResponseData();
+        try{
+            RenterOrderDetailRespDTO renterOrderDetailRespDTO = renterOrderDetailProxy(orderNo,renterOrderNo);
+            responseData.setResCode(ErrorCode.SUCCESS.getCode());
+            responseData.setData(renterOrderDetailRespDTO);
+            responseData.setResMsg(ErrorCode.SUCCESS.getText());
+        }catch (OrderException e){
+            log.error("租客订单详情转化失败orderNo={},renterOrderNo={}", orderNo,renterOrderNo,e);
+            responseData.setResCode(e.getErrorCode());
+            responseData.setData(null);
+            responseData.setResMsg(e.getErrorMsg());
+        }catch (Exception e){
+            log.error("租客订单详情转化异常orderNo={},renterOrderNo={}", orderNo,renterOrderNo,e);
+            responseData.setResCode(ErrorCode.SYS_ERROR.getCode());
+            responseData.setData(null);
+            responseData.setResMsg(ErrorCode.SYS_ERROR.getText());
+        }
+        return responseData;
+    }
+
+    private RenterOrderDetailRespDTO renterOrderDetailProxy(String orderNo, String renterOrderNo) {
+        //主订单
+        OrderEntity orderEntity = orderService.getOrderEntity(orderNo);
+        if(orderEntity == null){
+            log.error("获取订单数据为空orderNo={}",orderNo);
+            throw new OrderNotFoundException(orderNo);
+        }
+
+        OrderDTO orderDTO = new OrderDTO();
+        BeanUtils.copyProperties(orderEntity,orderDTO);
+
+        //租客订单
+        String newRenterOrderNo = renterOrderNo;
+        RenterOrderDTO renterOrderDTO = null;
+        RenterOrderEntity renterOrderEntity = null;
+        if(renterOrderNo!=null && renterOrderNo.trim().length()>0){
+            renterOrderEntity = renterOrderService.getRenterOrderByRenterOrderNo(renterOrderNo);
+        }else{
+            renterOrderEntity = renterOrderService.getRenterOrderByOrderNoAndIsEffective(orderNo);
+        }
+        if(renterOrderEntity != null){
+            renterOrderDTO = new RenterOrderDTO();
+            BeanUtils.copyProperties(renterOrderEntity,renterOrderDTO);
+            newRenterOrderNo = renterOrderEntity.getRenterOrderNo();
+        }
+
+        //租客商品
+        RenterGoodsDetailDTO renterGoodsDetail = renterGoodsService.getRenterGoodsDetail(newRenterOrderNo, false);
+        RenterGoodsDTO renterGoodsDTO = null;
+        if(renterGoodsDetail != null){
+            renterGoodsDTO = new RenterGoodsDTO();
+            BeanUtils.copyProperties(renterGoodsDetail,renterGoodsDTO);
+        }
+        //会员权益
+        RenterMemberDTO renterMemberDTO = renterMemberService.selectrenterMemberByRenterOrderNo(newRenterOrderNo, true);
+        com.atzuche.order.commons.entity.orderDetailDto.RenterMemberDTO renterMember = new com.atzuche.order.commons.entity.orderDetailDto.RenterMemberDTO();
+        BeanUtils.copyProperties(renterMemberDTO,renterMember);
+        List<com.atzuche.order.commons.entity.dto.RenterMemberRightDTO> renterMemberRightDTOList = renterMemberDTO.getRenterMemberRightDTOList();
+        List<com.atzuche.order.commons.entity.orderDetailDto.RenterMemberRightDTO> renterMemberRightDTOS = new ArrayList<>();
+        renterMemberRightDTOList.stream().forEach(x->{
+            com.atzuche.order.commons.entity.orderDetailDto.RenterMemberRightDTO renterMemberRightDTO = new com.atzuche.order.commons.entity.orderDetailDto.RenterMemberRightDTO();
+            BeanUtils.copyProperties(x,renterMemberRightDTO);
+            renterMemberRightDTOS.add(renterMemberRightDTO);
+        });
+        //租客费用
+        RenterOrderCostEntity renterOrderCostEntity = renterOrderCostService.getByOrderNoAndRenterNo(orderNo, newRenterOrderNo);
+        RenterOrderCostDTO renterOrderCostDTO = new RenterOrderCostDTO();
+        BeanUtils.copyProperties(renterOrderCostEntity,renterOrderCostDTO);
+
+        //租客交接车
+        RenterHandoverCarInfoEntity renterHandoverCarInfoEntity = renterHandoverCarInfoService.selectByRenterOrderNoAndType(newRenterOrderNo, RenterHandoverCarTypeEnum.OWNER_TO_RENTER.getValue());
+        RenterHandoverCarInfoDTO renterHandoverCarInfoDTO = null;
+        if(renterHandoverCarInfoEntity != null){
+            renterHandoverCarInfoDTO = new RenterHandoverCarInfoDTO();
+            BeanUtils.copyProperties(renterHandoverCarInfoEntity,renterHandoverCarInfoDTO);
+        }
+        //租客订单费用明细
+        List<RenterOrderCostDetailEntity> renterOrderCostDetailList = renterOrderCostDetailService.listRenterOrderCostDetail(orderNo, newRenterOrderNo);
+        List<RenterOrderCostDetailDTO> renterOrderCostDetailDTOS = new ArrayList<>();
+        renterOrderCostDetailList.stream().forEach(x->{
+            RenterOrderCostDetailDTO renterOrderCostDetailDTO = new RenterOrderCostDetailDTO();
+            BeanUtils.copyProperties(x,renterOrderCostDetailDTO);
+            renterOrderCostDetailDTOS.add(renterOrderCostDetailDTO);
+        });
+        //租客订单费用明细
+        List<RenterOrderCostDetailDTO> RenterOrderCostDetailDTOList = new ArrayList<>();
+        renterOrderCostDetailList.stream().forEach(x->{
+            RenterOrderCostDetailDTO renterOrderCostDetailDTO = new RenterOrderCostDetailDTO();
+            BeanUtils.copyProperties(x,renterOrderCostDetailDTO);
+            RenterOrderCostDetailDTOList.add(renterOrderCostDetailDTO);
+        });
+        //配送订单
+        List<RenterOrderDeliveryEntity> renterOrderDeliveryList = renterOrderDeliveryService.selectByRenterOrderNo(newRenterOrderNo);
+        RenterOrderDeliveryEntity renterOrderDeliveryGet = filterDeliveryOrderByType(renterOrderDeliveryList, DeliveryOrderTypeEnum.GET_CAR);
+        RenterOrderDeliveryEntity renterOrderDeliveryReturn = filterDeliveryOrderByType(renterOrderDeliveryList, DeliveryOrderTypeEnum.RETURN_CAR);
+        RenterOrderDeliveryDTO renterOrderDeliveryGetDto = null;
+        if(renterOrderDeliveryGet != null){
+            renterOrderDeliveryGetDto = new RenterOrderDeliveryDTO();
+            BeanUtils.copyProperties(renterOrderDeliveryGet,renterOrderDeliveryGetDto);
+        }
+        RenterOrderDeliveryDTO renterOrderDeliveryReturnDto =  null;
+        if(renterOrderDeliveryReturn != null){
+            renterOrderDeliveryReturnDto = new RenterOrderDeliveryDTO();
+            BeanUtils.copyProperties(renterOrderDeliveryReturn,renterOrderDeliveryReturnDto);
+        }
+        //附加驾驶人
+        List<RenterAdditionalDriverEntity> renterAdditionalDriverList = renterAdditionalDriverService.listDriversByRenterOrderNo(newRenterOrderNo);
+        List<RenterAdditionalDriverDTO>  renterAdditionalDriverDTOList = new ArrayList<>();
+        renterAdditionalDriverList.stream().forEach(x->{
+            RenterAdditionalDriverDTO renterAdditionalDriverDTO = new RenterAdditionalDriverDTO();
+            BeanUtils.copyProperties(x,renterAdditionalDriverDTO);
+            renterAdditionalDriverDTOList.add(renterAdditionalDriverDTO);
+        });
+
+        //租客罚金
+        List<RenterOrderFineDeatailEntity> renterOrderFineDeatailList = renterOrderFineDeatailService.getRenterOrderFineDeatailByOwnerOrderNo(newRenterOrderNo);
+        List<RenterOrderFineDeatailDTO> renterOrderFineDeatailDTOS = new ArrayList<>();
+        renterOrderFineDeatailList.stream().forEach(x->{
+            RenterOrderFineDeatailDTO renterOrderFineDeatailDTO = new RenterOrderFineDeatailDTO();
+            BeanUtils.copyProperties(x,renterOrderFineDeatailDTO);
+            renterOrderFineDeatailDTOS.add(renterOrderFineDeatailDTO);
+        });
+
+        //租客补贴
+        List<RenterOrderSubsidyDetailDTO> renterOrderSubsidyDetailDTOS = new ArrayList<>();
+        List<RenterOrderSubsidyDetailEntity> renterOrderSubsidyDetailEntities = renterOrderSubsidyDetailService.listRenterOrderSubsidyDetail(orderNo, newRenterOrderNo);
+        renterOrderSubsidyDetailEntities.stream().forEach(x->{
+            RenterOrderSubsidyDetailDTO renterOrderSubsidyDetailDTO = new RenterOrderSubsidyDetailDTO();
+            BeanUtils.copyProperties(x,renterOrderSubsidyDetailDTO);
+            renterOrderSubsidyDetailDTOS.add(renterOrderSubsidyDetailDTO);
+        });
+        RenterOrderDetailRespDTO renterOrderDetailRespDTO = new RenterOrderDetailRespDTO();
+        renterOrderDetailRespDTO.order = orderDTO;
+        renterOrderDetailRespDTO.renterOrder = renterOrderDTO;
+        renterOrderDetailRespDTO.renterGoods = renterGoodsDTO;
+        renterOrderDetailRespDTO.renterOrderDeliveryGet = renterOrderDeliveryGetDto;
+        renterOrderDetailRespDTO.renterOrderDeliveryReturn = renterOrderDeliveryReturnDto;
+        renterOrderDetailRespDTO.renterMember = renterMember;
+        renterOrderDetailRespDTO.renterOrderCost = renterOrderCostDTO;
+        renterOrderDetailRespDTO.renterHandoverCarInfo = renterHandoverCarInfoDTO;
+        renterOrderDetailRespDTO.renterMemberRightList = renterMemberRightDTOS;
+        renterOrderDetailRespDTO.renterOrderCostDetailList = renterOrderCostDetailDTOS;
+        renterOrderDetailRespDTO.renterAdditionalDriverList = renterAdditionalDriverDTOList;
+        renterOrderDetailRespDTO.renterOrderFineDeatailList = renterOrderFineDeatailDTOS;
+        renterOrderDetailRespDTO.renterOrderSubsidyDetailDTOS = renterOrderSubsidyDetailDTOS;
+        return renterOrderDetailRespDTO;
+    }
+
     private OwnerOrderDetailRespDTO ownerOrderDetailProxy(String orderNo, String ownerOrderNo, String ownerMemNo){
         //主订单
         OrderEntity orderEntity = orderService.getOrderEntity(orderNo);
@@ -689,7 +839,7 @@ public class OrderDetailService {
             BeanUtils.copyProperties(ownerHandoverCarInfoEntity,ownerHandoverCarInfoDTO);
         }
 
-        //车主订单费用明细
+        //租客订单费用明细
         List<RenterOrderCostDetailEntity> renterOrderCostDetailList = renterOrderCostDetailService.listRenterOrderCostDetail(orderNo, renterOrderNo);
         List<RenterOrderCostDetailDTO> renterOrderCostDetailDTOS = new ArrayList<>();
         renterOrderCostDetailList.stream().forEach(x->{
