@@ -34,6 +34,7 @@ import com.atzuche.order.commons.enums.cashier.PayTypeEnum;
 import com.atzuche.order.commons.enums.cashier.TransStatusEnum;
 import com.atzuche.order.commons.vo.DepostiDetailVO;
 import com.atzuche.order.commons.vo.res.account.income.AccountOwnerIncomeRealResVO;
+import com.atzuche.order.commons.vo.res.account.income.AccountOwnerSettleCostDetailResVO;
 import com.autoyol.autopay.gateway.constant.DataPayKindConstant;
 import com.autoyol.platformcost.LocalDateTimeUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -42,6 +43,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -244,6 +246,16 @@ public class CashierQueryService {
             resVO.setOwnerDebt(ownerDebt);
             resVO.setPlatformRefuelServiceCharge(platformRefuelServiceCharge);
         }
+        List<AccountOwnerSettleCostDetailResVO> ownerSettleCostDetailResVOs = new ArrayList<>();
+        if(!CollectionUtils.isEmpty(accountOwnerCostSettleDetails)){
+            for(int i =0;i<accountOwnerCostSettleDetails.size();i++){
+                AccountOwnerSettleCostDetailResVO vo = new AccountOwnerSettleCostDetailResVO();
+                AccountOwnerCostSettleDetailEntity entity = accountOwnerCostSettleDetails.get(i);
+                BeanUtils.copyProperties(entity,vo);
+                ownerSettleCostDetailResVOs.add(vo);
+            }
+        }
+        resVO.setOwnerSettleCostDetailResVOs(ownerSettleCostDetailResVOs);
         return resVO;
     }
 

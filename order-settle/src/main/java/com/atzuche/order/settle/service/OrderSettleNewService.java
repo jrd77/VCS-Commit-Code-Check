@@ -320,8 +320,8 @@ public class OrderSettleNewService {
         int totalAmount = proxyExpense.getTotalAmount();
         AccountPlatformProfitDetailEntity accountPlatformProfitDetail = new AccountPlatformProfitDetailEntity();
         accountPlatformProfitDetail.setAmt(-totalAmount);
-        accountPlatformProfitDetail.setSourceCode(OwnerCashCodeEnum.ACCOUNT_OWNER_PROXY_EXPENSE_COST.getCashNo());
-        accountPlatformProfitDetail.setSourceDesc(OwnerCashCodeEnum.ACCOUNT_OWNER_PROXY_EXPENSE_COST.getTxt());
+        accountPlatformProfitDetail.setSourceCode(OwnerCashCodeEnum.PROXY_CHARGE.getCashNo());
+        accountPlatformProfitDetail.setSourceDesc(OwnerCashCodeEnum.PROXY_CHARGE.getTxt());
         accountPlatformProfitDetail.setUniqueNo(String.valueOf(proxyExpense.getId()));
         accountPlatformProfitDetail.setOrderNo(proxyExpense.getOrderNo());
         settleOrdersDefinition.addPlatformProfit(accountPlatformProfitDetail);
@@ -337,8 +337,8 @@ public class OrderSettleNewService {
         int totalAmount = serviceExpense.getTotalAmount();
         AccountPlatformProfitDetailEntity accountPlatformProfitDetail = new AccountPlatformProfitDetailEntity();
         accountPlatformProfitDetail.setAmt(-totalAmount);
-        accountPlatformProfitDetail.setSourceCode(OwnerCashCodeEnum.ACCOUNT_OWNER_SERVICE_EXPENSE_COST.getCashNo());
-        accountPlatformProfitDetail.setSourceDesc(OwnerCashCodeEnum.ACCOUNT_OWNER_SERVICE_EXPENSE_COST.getTxt());
+        accountPlatformProfitDetail.setSourceCode(OwnerCashCodeEnum.SERVICE_CHARGE.getCashNo());
+        accountPlatformProfitDetail.setSourceDesc(OwnerCashCodeEnum.SERVICE_CHARGE.getTxt());
         accountPlatformProfitDetail.setUniqueNo(String.valueOf(serviceExpense.getId()));
         accountPlatformProfitDetail.setOrderNo(serviceExpense.getOrderNo());
         settleOrdersDefinition.addPlatformProfit(accountPlatformProfitDetail);
@@ -369,8 +369,8 @@ public class OrderSettleNewService {
         int totalAmount = renterOrderCostDetail.getTotalAmount();
         AccountPlatformProfitDetailEntity accountPlatformProfitDetail = new AccountPlatformProfitDetailEntity();
         accountPlatformProfitDetail.setAmt(totalAmount);
-        accountPlatformProfitDetail.setSourceCode(OwnerCashCodeEnum.ACCOUNT_OWNER_GPS_COST.getCashNo());
-        accountPlatformProfitDetail.setSourceDesc(OwnerCashCodeEnum.ACCOUNT_OWNER_GPS_COST.getTxt());
+        accountPlatformProfitDetail.setSourceCode(renterOrderCostDetail.getCostCode());
+        accountPlatformProfitDetail.setSourceDesc(renterOrderCostDetail.getCostCodeDesc());
         accountPlatformProfitDetail.setUniqueNo(String.valueOf(renterOrderCostDetail.getId()));
         accountPlatformProfitDetail.setOrderNo(renterOrderCostDetail.getOrderNo());
         settleOrdersDefinition.addPlatformProfit(accountPlatformProfitDetail);
@@ -504,7 +504,7 @@ public class OrderSettleNewService {
         //TODO 发短信
         log.info("sendOrderSettleMq remote start [{}],[{}]",eventEnum,GsonUtils.toJson(orderMessage));
         baseProducer.sendTopicMessage(eventEnum.exchange,eventEnum.routingKey,orderMessage);
-        log.info("sendOrderSettleMq remote start [{}],[{}]",eventEnum,GsonUtils.toJson(orderMessage));
+        log.info("sendOrderSettleMq remote end [{}],[{}]",eventEnum,GsonUtils.toJson(orderMessage));
     }
     
 
