@@ -121,4 +121,7 @@ public class RenterMemberDTO {
      */
     @AutoDocProperty("会员来源")
     private String outerSource;
+
+    @AutoDocProperty(value = "驾驶证准驾车型（驾照）")
+    private String driLicAllowCar;
 }

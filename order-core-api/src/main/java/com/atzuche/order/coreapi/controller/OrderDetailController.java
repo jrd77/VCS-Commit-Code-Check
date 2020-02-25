@@ -72,10 +72,10 @@ public class OrderDetailController {
         return responseData;
     }
 
-    @GetMapping("ownerOrderDetail")
+    @GetMapping("/ownerOrderDetail")
     public ResponseData<OwnerOrderDetailRespDTO> ownerOrderDetail(@RequestParam("orderNo") String orderNo,
-                                                                  @RequestParam("ownerOrderNo") String ownerOrderNo,
-                                                                  @RequestParam("ownerMemNo") String ownerMemNo){
+                                                                  @RequestParam(name = "ownerOrderNo",required = false) String ownerOrderNo,
+                                                                  @RequestParam(name = "ownerMemNo",required = false) String ownerMemNo){
         if(orderNo == null || orderNo.trim().length()<=0){
             ResponseData responseData = new ResponseData();
             responseData.setResCode(ErrorCode.INPUT_ERROR.getCode());
