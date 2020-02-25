@@ -18,4 +18,5 @@ public class OwnerOrderDetailRespDTO {
     public List<OwnerOrderFineDeatailDTO> ownerOrderFineDeatailList;
     public List<OwnerOrderSubsidyDetailDTO> ownerOrderSubsidyDetailDTOS;
     public OwnerOrderCostDTO ownerOrderCostDTO;
+    public List<AccountOwnerIncomeExamineDTO> accountOwnerIncomeExamineDTOS;
 }
