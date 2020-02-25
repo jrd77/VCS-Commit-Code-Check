@@ -48,6 +48,8 @@ public class OrderFilterChain implements OrderFilter, ApplicationContextAware {
         orderFilterList.add(applicationContext.getBean(AirportServiceFilter.class));
         /*15分钟内重复下单校验*/
        /* orderFilterList.add(applicationContext.getBean(WaitOwner15minuteReplyFilter.class));*/
+        /*准驾车型校验*/
+        orderFilterList.add(applicationContext.getBean(CheckSuitCarAndDriLicFilter.class));
         /* 库存检查 */
         orderFilterList.add(applicationContext.getBean(StockFilter.class));
         /* 风控检查 */

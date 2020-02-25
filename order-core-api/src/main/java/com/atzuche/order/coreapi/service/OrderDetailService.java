@@ -385,6 +385,15 @@ public class OrderDetailService {
             ownerOrderCostDTO = new OwnerOrderCostDTO();
             BeanUtils.copyProperties(ownerOrderCostEntity,ownerOrderCostDTO);
         }
+
+        //车主收益审核
+        List<AccountOwnerIncomeExamineEntity> accountOwnerIncomeExamineEntities = accountOwnerIncomeExamineNoTService.selectByOwnerOrderNo(ownerOrderNo);
+        List<AccountOwnerIncomeExamineDTO> accountOwnerIncomeExamineDTOS = new ArrayList<>();
+        accountOwnerIncomeExamineEntities.stream().forEach(x->{
+            AccountOwnerIncomeExamineDTO accountOwnerIncomeExamineDTO = new AccountOwnerIncomeExamineDTO();
+            BeanUtils.copyProperties(x,accountOwnerIncomeExamineDTO);
+            accountOwnerIncomeExamineDTOS.add(accountOwnerIncomeExamineDTO);
+        });
         OwnerOrderDetailRespDTO ownerOrderDetailRespDTO = new OwnerOrderDetailRespDTO();
         ownerOrderDetailRespDTO.order = orderDTO;
         ownerOrderDetailRespDTO.ownerOrder = ownerOrderDTO;
@@ -398,6 +407,7 @@ public class OrderDetailService {
         ownerOrderDetailRespDTO.ownerOrderFineDeatailList = ownerOrderFineDeatailDTOS;
         ownerOrderDetailRespDTO.ownerOrderSubsidyDetailDTOS = ownerOrderSubsidyDetailDTOS;
         ownerOrderDetailRespDTO.ownerOrderCostDTO = ownerOrderCostDTO;
+        ownerOrderDetailRespDTO.accountOwnerIncomeExamineDTOS = accountOwnerIncomeExamineDTOS;
         return ownerOrderDetailRespDTO;
     }
     private OrderHistoryRespDTO orderHistoryProxy(OrderHistoryReqDTO orderHistoryReqDTO) {
