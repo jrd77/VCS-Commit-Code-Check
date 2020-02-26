@@ -182,7 +182,7 @@ public class DeliveryCarInfoPriceService {
             if(2 == type.intValue()) {
                 oilDifference = Math.abs(Integer.valueOf(ownerGetAndReturnCarDTO.getGetCarOil())) - Math.abs(Integer.valueOf(ownerGetAndReturnCarDTO.getReturnCarOil()));
             }else {
-                oilDifference = Math.abs(Integer.valueOf(ownerGetAndReturnCarDTO.getGetCarOil())) - Math.abs(Integer.valueOf(ownerGetAndReturnCarDTO.getReturnCarOil()));
+                oilDifference = Math.abs(Integer.valueOf(ownerGetAndReturnCarDTO.getReturnCarOil())) - Math.abs(Integer.valueOf(ownerGetAndReturnCarDTO.getGetCarOil()));
             }
             ownerGetAndReturnCarDTO.setDrivingKM(ownerDrivingKM);
             ownerGetAndReturnCarDTO.setOilDifference(String.valueOf(oilDifference) + "L");
@@ -301,10 +301,15 @@ public class DeliveryCarInfoPriceService {
      *
      * @return
      */
-    public Integer getOwnerPlatFormOilServiceChargeByOrderNo(String orderNo) {
+    public int getOwnerPlatFormOilServiceChargeByOrderNo(String orderNo) {
         try {
             List<OwnerHandoverCarInfoEntity> ownerHandoverCarInfoEntities = ownerHandoverCarService.selectOwnerByOrderNo(orderNo);
             List<RenterHandoverCarInfoEntity> renterHandoverCarInfoEntities = renterHandoverCarService.selectRenterByOrderNo(orderNo);
+            if(renterHandoverCarInfoEntities.get(0).getType().intValue() != 4 || renterHandoverCarInfoEntities.get(0).getType().intValue() != 3)
+            {
+                log.info("不是配送订单，没有车主平台加油服务费");
+                return 0;
+            }
             int ownerReturnOil = ownerHandoverCarInfoEntities.stream().filter(r -> r.getType() == 4).findFirst().get().getOilNum();
             int renterGetOil = renterHandoverCarInfoEntities.stream().filter(r -> r.getType() == 3).findFirst().get().getOilNum();
             if (MathUtil.sub((ownerReturnOil / 16), 0.25d) <= 0 && renterGetOil > ownerReturnOil) {
