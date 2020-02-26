@@ -103,4 +103,9 @@ public class ModifyOrderReq {
 	 */
     @AutoDocProperty(value="租客费用补贴", hidden = true)
 	private List<RenterOrderSubsidyDetailDTO> renterSubsidyList;
+    
+    /**
+     * 是否扫码还车的修改还车时间
+     */
+    private Boolean scanCodeFlag;
 }
