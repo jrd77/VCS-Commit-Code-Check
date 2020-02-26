@@ -60,7 +60,7 @@ public class RetryDeliveryCarService {
         deliveryHttpLogEntity.setUpdateTime(LocalDateTime.now());
         Transaction t = Cat.newTransaction(CatConstants.URL_CALL, "取送车服务通知");
         try {
-            Cat.logEvent(CatConstants.URL_PARAM,JSON.toJSONString(deliveryHttpLogEntity));
+            Cat.logEvent(CatConstants.URL_PARAM,url+":"+JSON.toJSONString(object));
             Cat.logMetricForCount(DeliveryConstants.REQUEST_REN_YUN_TYPE_PREFIX);
             HttpHeaders httpHeaders = new HttpHeaders();
             httpHeaders.set("Content-Type",MediaType.APPLICATION_FORM_URLENCODED_VALUE);
