@@ -162,4 +162,8 @@ public class ModifyOrderDTO {
 	 * 提前延后时间
 	 */
 	private CarRentTimeRangeResVO carRentTimeRangeResVO;
+	/**
+     * 是否扫码还车的修改还车时间
+     */
+    private Boolean scanCodeFlag;
 }

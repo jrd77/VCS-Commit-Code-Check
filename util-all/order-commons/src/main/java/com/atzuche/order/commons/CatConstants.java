@@ -7,6 +7,12 @@ package com.atzuche.order.commons;
 public class CatConstants {
     public static final String FEIGN_CALL="Feign";
 
+    public static final String URL_CALL="URL.Call";
+
+    public static final String URL_PARAM="URL.Param";
+
+    public static final String URL_RESULT="URL.Result";
+
     public static final String FEIGN_METHOD="Feign.Method";
 
     public static final String FEIGN_PARAM="Feign.Param";

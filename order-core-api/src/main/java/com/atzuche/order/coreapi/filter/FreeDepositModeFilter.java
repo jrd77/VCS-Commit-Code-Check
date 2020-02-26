@@ -22,7 +22,7 @@ public class FreeDepositModeFilter implements OrderFilter {
     public void validate(OrderReqContext context) throws OrderFilterException {
         OrderReqVO orderReqVO = context.getOrderReqVO();
         String freeDoubleTypeId = orderReqVO.getFreeDoubleTypeId() == null ? null: orderReqVO.getFreeDoubleTypeId();
-        int appVersion = orderReqVO.getAppVersion() != null ? Integer.valueOf(orderReqVO.getAppVersion()) : 0;
+        int appVersion = orderReqVO.getAppVersion() != null ? Double.valueOf(orderReqVO.getAppVersion()).intValue() : 0;
         String os =  orderReqVO.getOS() != null ? orderReqVO.getOS().toLowerCase() : "";
         if (("Android".equalsIgnoreCase(os) && appVersion >= 100) || ("IOS".equalsIgnoreCase(os) && appVersion >= 95)) {
             if (org.apache.commons.lang.StringUtils.isBlank(freeDoubleTypeId)) {
@@ -38,5 +38,10 @@ public class FreeDepositModeFilter implements OrderFilter {
                 throw new FreeDepositModeException(ErrorCode.FREE_DOUBLE_NOT_BIND_ERROR);
             }
         }*/
+    }
+
+
+    public static void main(String[] args) {
+        System.out.println(Integer.valueOf("108.0"));
     }
 }

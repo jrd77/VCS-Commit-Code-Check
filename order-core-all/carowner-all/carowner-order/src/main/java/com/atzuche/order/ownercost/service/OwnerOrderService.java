@@ -148,4 +148,8 @@ public class OwnerOrderService {
     public Integer updateDispatchReasonByOrderNo(String orderNo, DispatcherReasonEnum dispatcherReasonEnum){
         return ownerOrderMapper.updateDispatchReasonByOrderNo(orderNo, dispatcherReasonEnum.getCode());
     }
+
+    public OwnerOrderEntity getOwnerByMemNoAndOrderNo(String orderNo, String ownerMemNo) {
+        return ownerOrderMapper.getOwnerByMemNoAndOrderNo(orderNo, ownerMemNo);
+    }
 }

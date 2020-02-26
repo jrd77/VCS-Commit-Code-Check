@@ -328,4 +328,6 @@ public class RenterGoodsDetailDTO {
     private String modelTxt;
     @AutoDocProperty("是否在平台显示 1：是，2：不是")
     private Integer isPlatformShow;
+    @AutoDocProperty("座位数 2-7 8为7座以上")
+    private Integer seatNum;
 }

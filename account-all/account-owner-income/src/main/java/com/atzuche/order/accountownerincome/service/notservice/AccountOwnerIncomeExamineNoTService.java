@@ -91,4 +91,14 @@ public class AccountOwnerIncomeExamineNoTService {
     public List<AccountOwnerIncomeExamineEntity> getOwnerIncomeByOrderAndType(String orderNo, String memNo, int type) {
         return accountOwnerIncomeExamineMapper.getOwnerIncomeByOrderAndType(orderNo,memNo,type);
     }
+    /*
+     * @Author ZhangBin
+     * @Date 2020/2/25 12:28
+     * @Description: 根据车主子订单好查询
+     *
+     **/
+    public List<AccountOwnerIncomeExamineEntity> selectByOwnerOrderNo(String ownerOrderNo) {
+        return accountOwnerIncomeExamineMapper.selectByOwnerOrderNo(ownerOrderNo);
+    }
+
 }
