@@ -44,7 +44,6 @@ import com.atzuche.order.renterorder.service.*;
 import com.atzuche.order.renterorder.vo.RenterOrderReqVO;
 import com.atzuche.order.renterorder.vo.owner.OwnerCouponGetAndValidReqVO;
 import com.atzuche.order.renterorder.vo.platform.MemAvailCouponRequestVO;
-import com.autoyol.commons.web.ResponseData;
 import com.autoyol.coupon.api.CouponSettleRequest;
 import com.autoyol.platformcost.CommonUtils;
 import com.dianping.cat.Cat;
@@ -233,6 +232,10 @@ public class ModifyOrderService {
 	 * @param modifyOrderDTO
 	 */
 	public void sendModifyMQ(ModifyOrderDTO modifyOrderDTO) {
+		if (modifyOrderDTO.getScanCodeFlag() != null && modifyOrderDTO.getScanCodeFlag()) {
+			// 扫码还车不管
+			return;
+		}
 		if (modifyOrderDTO.getTransferFlag() != null && modifyOrderDTO.getTransferFlag()) {
 			// 换车mq
 			modifyOrderRabbitMQService.sendOrderChangeCarMq(modifyOrderDTO);
@@ -769,6 +772,12 @@ public class ModifyOrderService {
 		}
 		// 管理后台修改原因
 		renterOrderNew.setChangeReason(modifyOrderDTO.getChangeReason());
+		if (modifyOrderDTO.getScanCodeFlag() != null && modifyOrderDTO.getScanCodeFlag()) {
+			// 扫码还车
+			renterOrderNew.setActRevertTime(modifyOrderDTO.getRevertTime());
+			renterOrderNew.setExpRevertTime(renterOrderEntity.getExpRevertTime());
+
+		}
 		return renterOrderNew;
 	}
 	
