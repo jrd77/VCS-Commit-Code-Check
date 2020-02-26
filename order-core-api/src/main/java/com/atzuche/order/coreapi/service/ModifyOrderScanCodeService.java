@@ -63,6 +63,7 @@ public class ModifyOrderScanCodeService {
 		// 调确认还车
 		ReturnCarReqVO returnCarReqVO = new ReturnCarReqVO();
 		returnCarReqVO.setOrderNo(modifyOrderScanCodeVO.getOrderNo());
+		returnCarReqVO.setRevertTime(modifyOrderScanCodeVO.getRevertTime());
 		ownerReturnCarService.returnCar(returnCarReqVO);
 	}
 }
