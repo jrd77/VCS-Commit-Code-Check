@@ -1,15 +1,25 @@
 package com.atzuche.order.coreapi.service;
 
+import com.alibaba.fastjson.JSON;
+import com.atzuche.order.commons.LocalDateTimeUtils;
 import com.atzuche.order.commons.constant.OrderConstant;
 import com.atzuche.order.commons.entity.dto.OwnerGoodsDetailDTO;
 import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
 import com.atzuche.order.commons.enums.CancelSourceEnum;
+import com.atzuche.order.commons.enums.MemRoleEnum;
 import com.atzuche.order.commons.enums.OrderStatusEnum;
 import com.atzuche.order.commons.vo.req.AdminCancelOrderReqVO;
+import com.atzuche.order.commons.vo.req.AdminOrderCancelJudgeDutyReqVO;
+import com.atzuche.order.commons.vo.req.CancelOrderReqVO;
+import com.atzuche.order.coreapi.common.conver.OrderCommonConver;
 import com.atzuche.order.coreapi.entity.CancelOrderReqContext;
 import com.atzuche.order.coreapi.entity.dto.CancelOrderReqDTO;
+import com.atzuche.order.coreapi.entity.dto.CancelOrderResDTO;
 import com.atzuche.order.coreapi.service.mq.OrderActionMqService;
 import com.atzuche.order.coreapi.service.mq.OrderStatusMqService;
+import com.atzuche.order.coreapi.service.remote.StockProxyService;
+import com.atzuche.order.delivery.service.delivery.DeliveryCarService;
+import com.atzuche.order.delivery.vo.delivery.CancelOrderDeliveryVO;
 import com.atzuche.order.mq.enums.ShortMessageTypeEnum;
 import com.atzuche.order.mq.util.SmsParamsMapUtil;
 import com.atzuche.order.owner.commodity.service.OwnerGoodsService;
@@ -26,6 +36,7 @@ import com.atzuche.order.renterorder.entity.OrderCouponEntity;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.atzuche.order.renterorder.service.OrderCouponService;
 import com.atzuche.order.renterorder.service.RenterOrderService;
+import com.autoyol.car.api.model.dto.OwnerCancelDTO;
 import com.autoyol.event.rabbit.neworder.NewOrderMQActionEventEnum;
 import com.autoyol.event.rabbit.neworder.NewOrderMQStatusEventEnum;
 import com.google.common.collect.Maps;
@@ -36,18 +47,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.alibaba.fastjson.JSON;
-import com.atzuche.order.commons.LocalDateTimeUtils;
-import com.atzuche.order.commons.enums.MemRoleEnum;
-import com.atzuche.order.commons.vo.req.CancelOrderReqVO;
-import com.atzuche.order.coreapi.common.conver.OrderCommonConver;
-import com.atzuche.order.coreapi.entity.dto.CancelOrderResDTO;
-import com.atzuche.order.coreapi.service.remote.StockProxyService;
-import com.atzuche.order.delivery.service.delivery.DeliveryCarService;
-import com.atzuche.order.delivery.vo.delivery.CancelOrderDeliveryVO;
-import com.atzuche.order.settle.service.OrderSettleService;
-import com.autoyol.car.api.model.dto.OwnerCancelDTO;
-
+import java.time.LocalDateTime;
 import java.util.Map;
 
 /**
@@ -69,8 +69,6 @@ public class CancelOrderService {
     @Autowired
     private CouponAndCoinHandleService couponAndCoinHandleService;
     @Autowired
-    private OrderSettleService orderSettleService;
-    @Autowired
     private StockProxyService stockService;
     @Autowired
     private DeliveryCarService deliveryCarService;
@@ -82,6 +80,7 @@ public class CancelOrderService {
     private OrderActionMqService orderActionMqService;
     @Autowired
     private OrderStatusMqService orderStatusMqService;
+
     @Autowired
     private OrderService orderService;
     @Autowired
@@ -98,148 +97,92 @@ public class CancelOrderService {
     private OwnerOrderService ownerOrderService;
     @Autowired
     private OwnerGoodsService ownerGoodsService;
-
+    @Autowired
+    private CancelOrderJudgeDutyService cancelOrderJudgeDutyService;
 
 
     /**
-     * 订单取消
+     * 取消订单
+     * <p>走自动判责逻辑</p>
      *
      * @param cancelOrderReqVO 请求参数
      */
     public void cancel(CancelOrderReqVO cancelOrderReqVO) {
         //参数转换处理
         CancelOrderReqDTO cancelOrderReqDTO = new CancelOrderReqDTO();
-        BeanUtils.copyProperties(cancelOrderReqVO,cancelOrderReqDTO);
+        BeanUtils.copyProperties(cancelOrderReqVO, cancelOrderReqDTO);
         //兼容定时任务校验
-        cancelOrderReqDTO.setConsoleInvoke(StringUtils.equals(OrderConstant.SYSTEM_OPERATOR_JOB,cancelOrderReqVO.getOperatorName()));
+        cancelOrderReqDTO.setConsoleInvoke(StringUtils.equals(OrderConstant.SYSTEM_OPERATOR_JOB, cancelOrderReqVO.getOperatorName()));
         CancelOrderReqContext reqContext = buildCancelOrderReqContext(cancelOrderReqDTO);
         //公共校验
         cancelOrderCheckService.checkCancelOrder(reqContext);
-
-        //TODO A 订单取消逻辑处理
-        //TODO A.1 订单取消
-
-        //TODO A.2 优惠券处理
-
-        //TODO A.3 车主券处理
-
-        //TODO A.4 库存处理
-
-        //TODO A.5 退款处理
-
-        //TODO A.6 仁云流程系统
-
-        //TODO B 订单责任判定处理
-
-
-        //TODO C mq消息处理
-        //TODO C.1 行为MQ发送
-        //TODO C.2 状态MQ发送
-        //TODO C.3 短信MQ发送
-
-
-
-
-
-
-
-
-
-
-
-
         //取消处理
+        LocalDateTime cancelReqTime = LocalDateTime.now();
         CancelOrderResDTO res = null;
         if (StringUtils.equals(MemRoleEnum.RENTER.getCode(), cancelOrderReqVO.getMemRole())) {
             //租客取消
-            res = renterCancelOrderService.cancel(cancelOrderReqVO.getOrderNo(), cancelOrderReqVO.getCancelReason(),
-                    false);
+            res = renterCancelOrderService.cancel(cancelReqTime, reqContext);
         } else if (StringUtils.equals(MemRoleEnum.OWNER.getCode(), cancelOrderReqVO.getMemRole())) {
             //车主取消
-            res = ownerCancelOrderService.cancel(cancelOrderReqVO.getOrderNo(), cancelOrderReqVO.getCancelReason(),
-                    false);
+            res = ownerCancelOrderService.cancel(cancelReqTime, reqContext);
+        } else {
+            logger.warn("Invalid cancel operation. param is,cancelOrderReqVO:[{}]", JSON.toJSONString(cancelOrderReqVO));
         }
-
-        logger.info("res:[{}]", JSON.toJSONString(res));
-        //优惠券
-        if (null != res && null != res.getIsReturnDisCoupon() && res.getIsReturnDisCoupon()) {
-            //退还优惠券(平台券+送取服务券)
-            couponAndCoinHandleService.undoPlatformCoupon(cancelOrderReqVO.getOrderNo());
-            couponAndCoinHandleService.undoGetCarFeeCoupon(cancelOrderReqVO.getOrderNo());
+        //取消责任处理
+        if(null != res) {
+            cancelOrderJudgeDutyService.judgeDuty(res.getWrongdoer(), res.getIsDispatch(), cancelReqTime,
+                    reqContext);
         }
-        //订单取消（租客取消、车主取消、平台取消）如果使用了车主券且未支付，则退回否则不处理
-        if (null != res && null != res.getIsReturnOwnerCoupon() && res.getIsReturnOwnerCoupon()) {
-            //退还车主券
-            String recover = null == res.getRentCarPayStatus() || res.getRentCarPayStatus() == 0 ? "1" : "0";
-            couponAndCoinHandleService.undoOwnerCoupon(cancelOrderReqVO.getOrderNo(), res.getOwnerCouponNo(), recover);
-        }
-
-        //库存处理
-        if (null != res) {
-            //释放库存(trans_filter)
-            stockService.releaseCarStock(cancelOrderReqVO.getOrderNo(), res.getCarNo());
-            if(StringUtils.equals(MemRoleEnum.OWNER.getCode(), cancelOrderReqVO.getMemRole())) {
-                //锁定car_filter
-                stockService.ownerCancelStock(buildOwnerCancelDTO(cancelOrderReqVO.getOrderNo(), res));
-            }
-        }
-
-        if (null != res && null != res.getIsRefund() && res.getIsRefund()) {
-            //通知收银台退款以及退还凹凸币和钱包
-            orderSettleService.settleOrderCancel(cancelOrderReqVO.getOrderNo());
-            //通知流程系统
-            CancelOrderDeliveryVO cancelOrderDeliveryVO =
-                    orderCommonConver.buildCancelOrderDeliveryVO(cancelOrderReqVO.getOrderNo(),
-                    res);
-            if (null != cancelOrderDeliveryVO) {
-                deliveryCarService.cancelRenYunFlowOrderInfo(cancelOrderDeliveryVO);
-            }
-        }
-
-        //发送订单取消事件
-        Map map = Maps.newHashMap();
-        CancelSourceEnum cancelSourceEnum = CancelSourceEnum.OWNER;
-        NewOrderMQActionEventEnum actionEventEnum = NewOrderMQActionEventEnum.ORDER_FINISH;
-        if(StringUtils.equals(MemRoleEnum.RENTER.getCode(), cancelOrderReqVO.getMemRole())) {
-            cancelSourceEnum = CancelSourceEnum.RENTER;
-            actionEventEnum = NewOrderMQActionEventEnum.ORDER_CANCEL;
-            map = SmsParamsMapUtil.getParamsMap(cancelOrderReqVO.getOrderNo(), ShortMessageTypeEnum.EXEMPT_PREORDER_AUTO_CANCEL_ORDER_2_RENTER.getValue(),ShortMessageTypeEnum.EXEMPT_PREORDER_AUTO_CANCEL_ORDER_2_OWNER.getValue(),null);
-        }
-        orderActionMqService.sendCancelOrderSuccess(cancelOrderReqVO.getOrderNo(), cancelSourceEnum, actionEventEnum,map);
-        NewOrderMQStatusEventEnum newOrderMQStatusEventEnum = NewOrderMQStatusEventEnum.ORDER_END;
-        if(null != res && res.getStatus() == OrderStatusEnum.TO_DISPATCH.getStatus()) {
-            newOrderMQStatusEventEnum = NewOrderMQStatusEventEnum.ORDER_PREDISPATCH;
-        }
-        orderStatusMqService.sendOrderStatusByOrderNo(cancelOrderReqVO.getOrderNo(),res.getStatus(),newOrderMQStatusEventEnum);
+        //后续处理
+        cancelSuccessHandle(cancelOrderReqVO.getOrderNo(), cancelOrderReqVO.getMemRole(), res);
+        //发送MQ消息
+        cancelSuccessSendMq(cancelOrderReqVO.getOrderNo(), cancelOrderReqVO.getMemRole(), res);
     }
 
 
     /**
      * 管理后台代取消订单
+     * <p>走手动判责逻辑</p>
      *
      * @param adminCancelOrderReqVO 请求参数
      */
     public void cancel(AdminCancelOrderReqVO adminCancelOrderReqVO) {
         //参数转换处理
         CancelOrderReqDTO cancelOrderReqDTO = new CancelOrderReqDTO();
-        BeanUtils.copyProperties(adminCancelOrderReqVO,cancelOrderReqDTO);
+        BeanUtils.copyProperties(adminCancelOrderReqVO, cancelOrderReqDTO);
         cancelOrderReqDTO.setConsoleInvoke(true);
         CancelOrderReqContext reqContext = buildCancelOrderReqContext(cancelOrderReqDTO);
         //公共校验
         cancelOrderCheckService.checkCancelOrder(reqContext);
+        //取消处理
+        LocalDateTime cancelReqTime = LocalDateTime.now();
+        CancelOrderResDTO res = null;
+        if (StringUtils.equals(MemRoleEnum.RENTER.getCode(), adminCancelOrderReqVO.getMemRole())) {
+            //租客取消
+            res = renterCancelOrderService.cancel(cancelReqTime, reqContext);
+        } else if (StringUtils.equals(MemRoleEnum.OWNER.getCode(), adminCancelOrderReqVO.getMemRole())) {
+            //车主取消
+            res = ownerCancelOrderService.cancel(cancelReqTime, reqContext);
+        } else {
+            logger.warn("Invalid cancel operation. param is,adminCancelOrderReqVO:[{}]", JSON.toJSONString(adminCancelOrderReqVO));
+        }
+        //后续处理
+        cancelSuccessHandle(adminCancelOrderReqVO.getOrderNo(), adminCancelOrderReqVO.getMemRole(), res);
+        //发送MQ消息
+        cancelSuccessSendMq(adminCancelOrderReqVO.getOrderNo(), adminCancelOrderReqVO.getMemRole(), res);
+
+    }
 
 
-        //TODO 订单取消逻辑处理
+    /**
+     * 取消订单手动判责
+     *
+     * @param reqVO 请求参数
+     */
+    public void orderCancelJudgeDuty(AdminOrderCancelJudgeDutyReqVO reqVO) {
+        //todo 校验
 
-        //TODO 取消订单后续操作
-
-        //TODO 订单责任判定处理
-
-        //TODO mq消息处理
-        //TODO 行为MQ发送
-        //TODO 状态MQ发送
-        //TODO 短信MQ发送
-
+        
 
 
 
@@ -247,55 +190,77 @@ public class CancelOrderService {
 
 
 
-    private void cancelSuccessHandle() {
 
-        //TODO 优惠券处理
 
-        //TODO 车主券处理
 
-        //TODO 库存处理
 
-        //TODO 仁云流程系统
+    /**
+     * 取消成功后续操作
+     *
+     * @param orderNo 订单号
+     * @param memRole 取消角色
+     * @param res     取消逻辑返回数据
+     */
+    private void cancelSuccessHandle(String orderNo, String memRole, CancelOrderResDTO res) {
+        logger.info("取消成功后续操作.orderNo:[{}],memRole:[{}],res:[{}]", orderNo, memRole, JSON.toJSONString(res));
+        if (null != res) {
+            //优惠券
+            if (null != res.getIsDispatch() && !res.getIsDispatch()) {
+                //退还优惠券(平台券+送取服务券)
+                couponAndCoinHandleService.undoPlatformCoupon(orderNo);
+                couponAndCoinHandleService.undoGetCarFeeCoupon(orderNo);
+            }
+            //订单取消（租客取消、车主取消、平台取消）如果使用了车主券且未支付，则退回否则不处理
+            if (null != res.getIsDispatch() && !res.getIsDispatch()) {
+                //退还车主券
+                int recover = null == res.getRentCarPayStatus() || res.getRentCarPayStatus() == 0 ?
+                        OrderConstant.YES : OrderConstant.NO;
+                couponAndCoinHandleService.undoOwnerCoupon(orderNo, res.getOwnerCouponNo(), String.valueOf(recover));
+            }
+
+            //释放库存(trans_filter)
+            stockService.releaseCarStock(orderNo, res.getCarNo());
+            if (StringUtils.equals(MemRoleEnum.OWNER.getCode(), memRole)) {
+                //锁定car_filter
+                stockService.ownerCancelStock(buildOwnerCancelDTO(orderNo, res));
+            }
+
+            //通知流程系统
+            CancelOrderDeliveryVO cancelOrderDeliveryVO = orderCommonConver.buildCancelOrderDeliveryVO(orderNo, res);
+            if (null != cancelOrderDeliveryVO) {
+                deliveryCarService.cancelRenYunFlowOrderInfo(cancelOrderDeliveryVO);
+            }
+
+
+        }
     }
 
     /**
-     * 撤销优惠券
+     * 取消成功后发送MQ消息
      *
      * @param orderNo 订单号
+     * @param memRole 取消角色
+     * @param res     取消逻辑返回结果
      */
-    private void undoCoupon(String orderNo) {
-        //撤销平台优惠券
-        couponAndCoinHandleService.undoPlatformCoupon(orderNo);
-        //撤销送取服务
-        couponAndCoinHandleService.undoGetCarFeeCoupon(orderNo);
-    }
+    private void cancelSuccessSendMq(String orderNo, String memRole, CancelOrderResDTO res) {
+        if (null != res) {
+            //订单取消MQ
+            Map map = Maps.newHashMap();
+            CancelSourceEnum cancelSourceEnum = CancelSourceEnum.OWNER;
+            NewOrderMQActionEventEnum actionEventEnum = NewOrderMQActionEventEnum.ORDER_FINISH;
+            if (StringUtils.equals(MemRoleEnum.RENTER.getCode(), memRole)) {
+                cancelSourceEnum = CancelSourceEnum.RENTER;
+                actionEventEnum = NewOrderMQActionEventEnum.ORDER_CANCEL;
+                map = SmsParamsMapUtil.getParamsMap(orderNo, ShortMessageTypeEnum.EXEMPT_PREORDER_AUTO_CANCEL_ORDER_2_RENTER.getValue(), ShortMessageTypeEnum.EXEMPT_PREORDER_AUTO_CANCEL_ORDER_2_OWNER.getValue(), null);
+            }
+            orderActionMqService.sendCancelOrderSuccess(orderNo, cancelSourceEnum, actionEventEnum, map);
 
-    /**
-     * 撤销车主券
-     *
-     * @param orderNo 订单号
-     * @param rentCarPayStatus 租车费用支付状态
-     * @param ownerCouponNo 车主券码
-     */
-    private void undoOwnerCoupon(String orderNo, Integer rentCarPayStatus, String ownerCouponNo){
-        //退还车主券
-        String recover = null == rentCarPayStatus || rentCarPayStatus == 0 ? "1" : "0";
-        couponAndCoinHandleService.undoOwnerCoupon(orderNo, ownerCouponNo, recover);
-    }
-
-    /**
-     * 库存处理
-     *
-     * @param orderNo 订单号
-     * @param memRole 操作角色
-     * @param res 取消逻辑返回结果
-     */
-    private void stockHandle(String orderNo, String memRole, CancelOrderResDTO res) {
-        //释放库存(trans_filter)
-        stockService.releaseCarStock(orderNo, res.getCarNo());
-        if(StringUtils.equals(MemRoleEnum.OWNER.getCode(), memRole)) {
-            //锁定car_filter
-            stockService.ownerCancelStock(buildOwnerCancelDTO(memRole, res));
+            //订单状态变更MQ
+            NewOrderMQStatusEventEnum newOrderMqStatusEventEnum = NewOrderMQStatusEventEnum.ORDER_END;
+            if (res.getStatus() == OrderStatusEnum.TO_DISPATCH.getStatus()) {
+                newOrderMqStatusEventEnum = NewOrderMQStatusEventEnum.ORDER_PREDISPATCH;
+            }
+            orderStatusMqService.sendOrderStatusByOrderNo(orderNo, res.getStatus(), newOrderMqStatusEventEnum);
         }
     }
 
@@ -304,10 +269,10 @@ public class CancelOrderService {
      * 构建OwnerCancelDTO
      *
      * @param orderNo 订单号
-     * @param res 取消逻辑返回结果
+     * @param res     取消逻辑返回结果
      * @return OwnerCancelDTO
      */
-    private OwnerCancelDTO buildOwnerCancelDTO(String orderNo, CancelOrderResDTO res){
+    private OwnerCancelDTO buildOwnerCancelDTO(String orderNo, CancelOrderResDTO res) {
         OwnerCancelDTO ownerCancelDTO = new OwnerCancelDTO();
         ownerCancelDTO.setOrderNo(orderNo);
         ownerCancelDTO.setCarNo(res.getCarNo());
@@ -325,7 +290,7 @@ public class CancelOrderService {
      * @param cancelOrderReqDTO 请求参数
      * @return CancelOrderReqContext
      */
-    private CancelOrderReqContext buildCancelOrderReqContext(CancelOrderReqDTO cancelOrderReqDTO){
+    private CancelOrderReqContext buildCancelOrderReqContext(CancelOrderReqDTO cancelOrderReqDTO) {
         CancelOrderReqContext context = new CancelOrderReqContext();
         context.setCancelOrderReqDTO(cancelOrderReqDTO);
 
@@ -354,7 +319,7 @@ public class CancelOrderService {
 
         OrderCouponEntity ownerCouponEntity =
                 orderCouponService.getOwnerCouponByOrderNoAndRenterOrderNo(cancelOrderReqDTO.getOrderNo(),
-                renterOrderEntity.getRenterOrderNo());
+                        renterOrderEntity.getRenterOrderNo());
         context.setOwnerCouponEntity(ownerCouponEntity);
 
         return context;

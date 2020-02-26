@@ -91,7 +91,7 @@ public class CancelOrderController {
                 JSON.toJSONString(reqVO));
         BindingResultUtil.checkBindingResult(bindingResult);
 
-
+        cancelOrderService.orderCancelJudgeDuty(reqVO);
         return ResponseData.success();
     }
 

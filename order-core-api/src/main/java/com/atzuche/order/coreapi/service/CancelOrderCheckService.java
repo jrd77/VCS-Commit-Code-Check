@@ -1,6 +1,7 @@
 package com.atzuche.order.coreapi.service;
 
 import com.atzuche.order.commons.constant.OrderConstant;
+import com.atzuche.order.commons.entity.dto.OwnerGoodsDetailDTO;
 import com.atzuche.order.commons.enums.CarOwnerTypeEnum;
 import com.atzuche.order.commons.enums.MemRoleEnum;
 import com.atzuche.order.commons.enums.OrderStatusEnum;
@@ -96,21 +97,16 @@ public class CancelOrderCheckService {
 
     /**
      * 车主取消校验
-     *
-     * @param orderStatusEntity 订单状态信息
-     * @param carOwnerType 车辆类型
-     * @param isConsoleInvoke 是否是管理后台请求操作:true,是 false,否
+     * @param reqContext 取消订单请求参数
      */
-    public void checkOwnerCancelOrder(OrderStatusEntity orderStatusEntity,Integer carOwnerType,boolean isConsoleInvoke) {
-
+    public void checkOwnerCancelOrder(CancelOrderReqContext reqContext) {
+        OrderStatusEntity orderStatusEntity = reqContext.getOrderStatusEntity();
         if(null != orderStatusEntity) {
             if (null != orderStatusEntity.getStatus()) {
-
                 //待确认的订单不能车主取消
                 if(OrderStatusEnum.TO_CONFIRM.getStatus() == orderStatusEntity.getStatus()) {
                     throw new CancelOrderCheckException(ErrorCode.ORDER_STATUS_NOT_ALLOWED);
                 }
-
                 //待调度的订单不能车主取消
                 if(OrderStatusEnum.TO_DISPATCH.getStatus() == orderStatusEntity.getStatus()) {
                     throw new CancelOrderCheckException(ErrorCode.DISPATCHING_ORDER_STATUS_NOT_ALLOWED);
@@ -120,12 +116,14 @@ public class CancelOrderCheckService {
             throw new CancelOrderCheckException(ErrorCode.ORDER_NOT_EXIST);
         }
 
-        if(!isConsoleInvoke) {
-            if(null != carOwnerType) {
-                logger.error("Car owner type is :[{}]", carOwnerType);
-                if(carOwnerType == CarOwnerTypeEnum.F.getCode()) {
+        CancelOrderReqDTO orderReqDTO = reqContext.getCancelOrderReqDTO();
+        if(!orderReqDTO.getConsoleInvoke()) {
+            OwnerGoodsDetailDTO ownerGoodsDetailDTO = reqContext.getOwnerGoodsDetailDTO();
+            if(null != ownerGoodsDetailDTO.getCarOwnerType()) {
+                logger.error("Car owner type is :[{}]", ownerGoodsDetailDTO.getCarOwnerType());
+                if(ownerGoodsDetailDTO.getCarOwnerType() == CarOwnerTypeEnum.F.getCode()) {
                     throw new RefuseOrderCheckException(ErrorCode.MANAGED_CAR_CAN_NOT_OPT_TRANS);
-                } else if (carOwnerType == CarOwnerTypeEnum.G.getCode()) {
+                } else if (ownerGoodsDetailDTO.getCarOwnerType() == CarOwnerTypeEnum.G.getCode()) {
                     throw new RefuseOrderCheckException(ErrorCode.PROXY_CAR_CAN_NOT_OPT_TRANS);
                 }
             } else {
