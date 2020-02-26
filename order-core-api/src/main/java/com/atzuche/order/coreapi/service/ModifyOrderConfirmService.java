@@ -133,14 +133,17 @@ public class ModifyOrderConfirmService {
 		saveOrderTransferRecord(modifyOrderOwnerDTO, modifyOrderDTO);
 		// 更新历史未处理的申请记录为拒绝(管理后台修改订单逻辑)
 		renterOrderChangeApplyService.updateRenterOrderChangeApplyStatusByOrderNo(modifyOrderOwnerDTO.getOrderNo());
-		// 封装OrderReqContext对象
-		OrderReqContext reqContext = getOrderReqContext(modifyOrderDTO, modifyOrderOwnerDTO);
-		// 通知仁云
-		noticeRenYun(modifyOrderDTO.getRenterOrderNo(), modifyOrderOwnerDTO, listChangeCode(modifyOrderDTO.getChangeItemList()), reqContext);
-		// 扣库存
-		cutCarStock(modifyOrderOwnerDTO, listChangeCode(modifyOrderDTO.getChangeItemList()));
-		// 发送mq
-		modifyOrderRabbitMQService.sendOrderDelayMq(modifyOrderDTO);
+		if (modifyOrderDTO.getScanCodeFlag() == null || !modifyOrderDTO.getScanCodeFlag()) {
+			// 扫码还车不管
+			// 封装OrderReqContext对象
+			OrderReqContext reqContext = getOrderReqContext(modifyOrderDTO, modifyOrderOwnerDTO);
+			// 通知仁云
+			noticeRenYun(modifyOrderDTO.getRenterOrderNo(), modifyOrderOwnerDTO, listChangeCode(modifyOrderDTO.getChangeItemList()), reqContext);
+			// 扣库存
+			cutCarStock(modifyOrderOwnerDTO, listChangeCode(modifyOrderDTO.getChangeItemList()));
+			// 发送mq
+			modifyOrderRabbitMQService.sendOrderDelayMq(modifyOrderDTO);
+		}
 	}
 	
 	
