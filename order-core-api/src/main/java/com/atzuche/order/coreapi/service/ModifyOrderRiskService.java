@@ -44,6 +44,10 @@ public class ModifyOrderRiskService {
 	private OrderSourceStatService orderSourceStatService;
 	
 	public void checkModifyRisk(ModifyOrderDTO modifyOrderDTO, RenterOrderCostRespDTO renterOrderCostRespDTO) {
+		if (modifyOrderDTO.getScanCodeFlag() != null && modifyOrderDTO.getScanCodeFlag()) {
+			// 扫码还车不校验
+			return;
+		}
 		LocalDateTime initRevertTime = modifyOrderDTO.getOrderEntity().getExpRevertTime();
 		LocalDateTime updRevertTime = modifyOrderDTO.getRevertTime();
 		if (modifyOrderDTO.getTransferFlag() != null && modifyOrderDTO.getTransferFlag()) {

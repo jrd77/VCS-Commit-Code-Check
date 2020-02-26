@@ -5,7 +5,6 @@ import com.atzuche.order.commons.entity.dto.OrderTransferRecordDTO;
 import com.atzuche.order.commons.vo.req.ModifyApplyHandleReq;
 
 import java.util.List;
-import java.util.Optional;
 
 import javax.validation.Valid;
 
@@ -13,7 +12,6 @@ import com.atzuche.order.rentermem.service.RenterMemberService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -25,11 +23,12 @@ import com.atzuche.order.coreapi.entity.request.ModifyOrderReq;
 import com.atzuche.order.coreapi.entity.vo.DispatchCarInfoVO;
 import com.atzuche.order.open.vo.request.TransferReq;
 import com.atzuche.order.open.vo.ModifyOrderCompareVO;
+import com.atzuche.order.open.vo.ModifyOrderScanCodeVO;
 import com.atzuche.order.coreapi.service.ModifyOrderConfirmService;
 import com.atzuche.order.coreapi.service.ModifyOrderFeeService;
 import com.atzuche.order.coreapi.service.ModifyOrderOwnerConfirmService;
+import com.atzuche.order.coreapi.service.ModifyOrderScanCodeService;
 import com.atzuche.order.coreapi.service.ModifyOrderService;
-import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
 import lombok.extern.slf4j.Slf4j;
 
@@ -48,6 +47,8 @@ public class ModifyOrderController {
 	private RenterMemberService renterMemberService;
     @Autowired
     private ModifyOrderConfirmService modifyOrderConfirmService;
+    @Autowired
+    private ModifyOrderScanCodeService modifyOrderScanCodeService;
 	
 	/**
 	 * 修改订单（APP端或H5端）
@@ -179,5 +180,20 @@ public class ModifyOrderController {
 		log.info("order/transferrecord/list orderNo=[{}]", orderNo);
 		List<OrderTransferRecordDTO> list = modifyOrderConfirmService.listOrderTransferRecordByOrderNo(orderNo);
     	return ResponseData.success(list);
+    }
+	
+	
+	/**
+	 * 扫码还车（车主确认结算方式）
+	 * @param modifyOrderScanCodeVO
+	 * @param bindingResult
+	 * @return ResponseData
+	 */
+	@PostMapping("/order/scan/confirm")
+	public ResponseData<?> confirmScanCode(@Valid @RequestBody ModifyOrderScanCodeVO modifyOrderScanCodeVO, BindingResult bindingResult) {
+		log.info(" 扫码还车（车主确认结算方式）modifyOrderScanCodeVO=[{}]", modifyOrderScanCodeVO);
+		BindingResultUtil.checkBindingResult(bindingResult);
+		modifyOrderScanCodeService.confirmScanCode(modifyOrderScanCodeVO);
+        return ResponseData.success();
     }
 }

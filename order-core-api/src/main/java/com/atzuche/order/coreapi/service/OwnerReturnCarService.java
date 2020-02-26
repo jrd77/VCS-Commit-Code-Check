@@ -14,6 +14,8 @@ import com.atzuche.order.parentorder.service.OrderStatusService;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.atzuche.order.renterorder.service.RenterOrderService;
 import com.autoyol.event.rabbit.neworder.NewOrderMQStatusEventEnum;
+import com.autoyol.platformcost.CommonUtils;
+
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,7 +65,11 @@ public class OwnerReturnCarService {
         orderStatusService.saveOrderStatusInfo(orderStatusDTO);
         //添加order_flow记录
         orderFlowService.inserOrderStatusChangeProcessInfo(reqVO.getOrderNo(), OrderStatusEnum.TO_SETTLE);
-
+        // 实际还车时间
+        LocalDateTime actRevertTime = LocalDateTime.now();
+        if (StringUtils.isNotBlank(reqVO.getRevertTime())) {
+        	actRevertTime = CommonUtils.parseTime(reqVO.getRevertTime(), CommonUtils.FORMAT_STR_LONG);
+        }
         //更新子订单状态以及实际还车时间
         RenterOrderEntity renterOrderEntity =
                 renterOrderService.getRenterOrderByOrderNoAndIsEffective(reqVO.getOrderNo());
@@ -71,7 +77,7 @@ public class OwnerReturnCarService {
             RenterOrderEntity record = new RenterOrderEntity();
             record.setId(renterOrderEntity.getId());
             record.setChildStatus(RenterChildStatusEnum.FINISH.getCode());
-            record.setActRevertTime(LocalDateTime.now());
+            record.setActRevertTime(actRevertTime);
             record.setUpdateOp(reqVO.getOperatorName());
             renterOrderService.updateRenterOrderInfo(record);
         }
@@ -81,7 +87,7 @@ public class OwnerReturnCarService {
             OwnerOrderEntity record = new OwnerOrderEntity();
             record.setId(ownerOrderEntity.getId());
             record.setChildStatus(OwnerChildStatusEnum.FINISH.getCode());
-            record.setActRevertTime(LocalDateTime.now());
+            record.setActRevertTime(actRevertTime);
             record.setUpdateOp(reqVO.getOperatorName());
             ownerOrderService.updateOwnerOrderInfo(record);
         }

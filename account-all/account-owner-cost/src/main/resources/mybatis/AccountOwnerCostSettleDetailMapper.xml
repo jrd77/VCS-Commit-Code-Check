@@ -78,7 +78,7 @@
         </trim>
 	</insert>
     <select id="getAccountOwnerCostSettleDetails" resultMap="BaseResultMap">
-        select <include refid="Base_Column_List" /> from account_owner_cost_settle_detail where order_no = #{orderNo} and mem_no = #{memNo}
+        select <include refid="Base_Column_List" /> from account_owner_cost_settle_detail where order_no = #{orderNo} and mem_no = #{memNo} and is_delete = 0 
     </select>
 
 
