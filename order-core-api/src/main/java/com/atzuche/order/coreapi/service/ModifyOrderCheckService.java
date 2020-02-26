@@ -65,6 +65,10 @@ public class ModifyOrderCheckService {
 		 * !changeCodeList.contains(OrderChangeItemEnum.MODIFY_REVERTTIME.getCode())) {
 		 * // 未修改租期,不需要校验库存 return; }
 		 */
+		if (modifyOrderDTO.getScanCodeFlag() != null && modifyOrderDTO.getScanCodeFlag()) {
+			// 扫码还车不校验
+			return;
+		}
 		OrderInfoDTO orderInfoDTO = new OrderInfoDTO();
 		orderInfoDTO.setOrderNo(modifyOrderDTO.getOrderNo());
 		orderInfoDTO.setCityCode(modifyOrderDTO.getCityCode() != null ? Integer.valueOf(modifyOrderDTO.getCityCode()):null);
@@ -94,6 +98,10 @@ public class ModifyOrderCheckService {
 	 * @param modifyOrderDTO
 	 */
 	public void modifyMainCheck(ModifyOrderDTO modifyOrderDTO) {
+		if (modifyOrderDTO.getScanCodeFlag() != null && modifyOrderDTO.getScanCodeFlag()) {
+			// 扫码还车不校验
+			return;
+		}
 		// 校验当前订单状态是否支持修改
 		checkOrderStatus(modifyOrderDTO);
 		// 修改项目
