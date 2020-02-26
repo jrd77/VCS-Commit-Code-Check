@@ -1,5 +1,6 @@
 plugins {
     id 'java'
+    id 'groovy'
 }
 
 group 'com.atzuche'
@@ -13,4 +14,8 @@ repositories {
 
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
+    compile "org.codehaus.groovy:groovy-all:2.5.7"
+    testCompile "org.spockframework:spock-core:1.3-groovy-2.5"
+    compile project(":config:config-client")
+
 }

@@ -1,16 +1,75 @@
-plugins {
-    id 'java'
+buildscript {
+    repositories {
+        maven{url "http://10.0.3.208:8081/nexus/content/groups/public/"}
+        maven{url "http://maven.aliyun.com/nexus/content/groups/public/"}
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.autoyol.tool:dependency-management:1.0-SNAPSHOT'
+    }
 }
+
+apply plugin: 'dependency-management'
+apply plugin: 'org.springframework.boot'
+apply plugin: 'application'
+apply plugin: 'war'
+apply plugin: 'application'
+
+mainClassName='com.autoyol.doc.parser.autodoc.AutoDocParser'
+
 
 group 'com.atzuche'
-version '0.0.1-SNAPSHOT'
+version '1.0.0-SNAPSHOT'
+sourceCompatibility = '1.8'
+targetCompatibility = 1.8
 
-sourceCompatibility = 1.8
 
-repositories {
-    mavenCentral()
-}
 
 dependencies {
-    testCompile group: 'junit', name: 'junit', version: '4.12'
+    compile project(":order-openapi")
+    compile project(":config:config-client")
+
+    compile "com.autoyol:auto-web-starter:1.0-SNAPSHOT"
+    compile 'org.springframework.boot:spring-boot-starter-web'
+    compile('org.springframework.boot:spring-boot-starter-actuator')
+    compile('org.springframework.boot:spring-boot-starter-aop')
+	compile 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
+    compile 'org.springframework.cloud:spring-cloud-starter-sleuth'
+    compile('org.mybatis.spring.boot:mybatis-spring-boot-starter:1.1.1')
+    compile("com.autoyol.tools:prop-encrypt-spring-boot-starter:0.0.1-SNAPSHOT")
+    compile('mysql:mysql-connector-java')
+    compile('com.ctrip.framework.apollo:apollo-client:0.11.0-SNAPSHOT')
+    compile ("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
+    compile("org.mybatis:mybatis-typehandlers-jsr310:1.0.1")
+    compile('net.coobird:thumbnailator:0.4.8')
+	compile("com.autoyol:cat-starter:0.0.1-SNAPSHOT")
+//	compile('org.springframework.boot:spring-boot-starter-data-redis')
+    testCompile 'org.springframework.boot:spring-boot-starter-test'
+    compile("com.autoyol:auto-doc:1.0-SNAPSHOT"){
+        exclude module:'servlet-api'
+    }
+    compile("com.caucho:hessian:4.0.38")
+    compile("com.autoframework:auto-mq-event:1.0.2-SNAPSHOT")
+
+    compile('com.autoyol.car:auto-car-service-api:2020022002-SNAPSHOT')
+   
+
+//    compile project(":casier-all:cashier-account")
+
+
+    compile project(":util-all:fee-calculator")
+    compile project(":util-all:order-commons")
+    compile project(":order-delivery")
+    compile project(":order-core-all:renter-all:renter-wz")
+    compile project(":order-core-all:renter-all:renter-mem")
+    compile project(":order-core-all:renter-all:renter-commodity")
+	compile project(":order-core-all:renter-all:renter-cost")
+	compile project(":order-core-all:parent-order")
+    compile project(":order-settle")
+    compile project(":order-detain")
+
+    compile project(":order-remote-service:order-remote-mem")
+    compile project(":order-remote-service:order-remote-car")
+    compile project(":order-core-all:carowner-all:carowner-mem")
+
 }

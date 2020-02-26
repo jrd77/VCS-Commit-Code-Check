@@ -1,0 +1,30 @@
+plugins {
+    id 'java'
+}
+
+group 'com.atzuche'
+version '0.0.1-SNAPSHOT'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile project(":util-all:order-commons")
+    compile project(":config")
+    compile project(":casier-all:cashier-account")
+    compile project(":order-core-all:carowner-all:carowner-cost")
+    compile project(":order-core-all:carowner-all:carowner-order")
+	compile project(":order-delivery")
+    compile project(":order-core-all:carowner-all:carowner-commodity")
+    compile project(":order-coin")
+    compile project(":order-core-all:parent-order")
+    compile project(":order-core-all:renter-all:renter-commodity")
+    compile project(":order-flow")
+    compile project(":order-core-all:carowner-all:carowner-penalty")
+	compile project(":order-core-all:renter-all:renter-wz")
+
+
+}

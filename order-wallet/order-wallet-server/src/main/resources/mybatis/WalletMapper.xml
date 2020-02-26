@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.atzuche.order.wallet.server.mapper.WalletMapper">
+    <resultMap id="base" type="com.atzuche.order.wallet.server.entity.WalletEntity">
+        <result column="mem_no"  property="memNo"/>
+        <result column="balance" property="balance"/>
+        <result column="pay_balance" property="payBalance"/>
+        <result column="give_balance" property="giveBalance"/>
+
+    </resultMap>
+    <update id="updateWallet" parameterType="com.atzuche.order.wallet.server.entity.WalletEntity">
+        update wallet
+        set balance=balance-#{expPay}-#{expGive},
+        pay_balance=pay_balance-#{expPay},
+        give_balance=give_balance-#{expGive} where mem_no=#{memNo} and balance>=#{expPay}+#{expGive}
+    </update>
+
+    <select id="getWalletByMemNo" resultMap="base">
+        select mem_no,ifnull(balance,0) as balance ,pay_balance,give_balance from wallet where mem_no=#{memNo} limit 1;
+    </select>
+</mapper>

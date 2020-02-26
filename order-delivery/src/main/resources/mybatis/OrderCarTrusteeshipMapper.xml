@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.atzuche.order.delivery.mapper.OrderCarTrusteeshipMapper">
+
+    <resultMap type="com.atzuche.order.delivery.entity.OrderCarTrusteeshipEntity" id="BaseResultMap">
+        <result property="id" column="id"/>
+        <result property="orderNo" column="order_no"/>
+        <result property="carNo" column="car_no"/>
+        <result property="trusteeshipName" column="trusteeship_name"/>
+        <result property="trusteeshipTelephone" column="trusteeship_telephone"/>
+        <result property="outDepotTime" column="out_depot_time"/>
+        <result property="inDepotTime" column="in_depot_time"/>
+        <result property="outDepotMileage" column="out_depot_mileage"/>
+        <result property="inDepotMileage" column="in_depot_mileage"/>
+        <result property="outDepotoimass" column="out_depot_oimass"/>
+        <result property="inDepotOimass" column="in_depot_oimass"/>
+        <result property="inDepotDamage" column="in_depot_damage"/>
+        <result property="drivingLicenseJoin" column="driving_license_join"/>
+        <result property="carKeyJoin" column="car_key_join"/>
+        <result property="createOp" column="create_op"/>
+        <result property="updateOp" column="update_op"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="isDelete" column="is_delete"/>
+        <result property="oilScale" column="oil_scale"/>
+    </resultMap>
+
+
+	<sql id="Base_Column_List">
+	`id`, 	
+	`order_no`, 	
+	`car_no`, 	
+	`trusteeship_name`, 	
+	`trusteeship_telephone`, 	
+	`out_depot_time`, 	
+	`in_depot_time`, 	
+	`out_depot_mileage`, 	
+	`in_depot_mileage`, 	
+	`out_depot_oimass`, 	
+	`in_depot_oimass`, 	
+	`in_depot_damage`, 	
+	`driving_license_join`, 	
+	`car_key_join`, 	
+	`create_op`, 	
+	`update_op`, 	
+	`create_time`, 	
+	`update_time`, 	
+	`is_delete`, 	
+	`oil_scale`	
+
+	</sql>
+
+
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap">
+		select <include refid="Base_Column_List" /> from order_car_trusteeship where id = #{value}
+	</select>
+
+	<insert id="insert" parameterType="com.atzuche.order.delivery.entity.OrderCarTrusteeshipEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into order_car_trusteeship
+		(
+				`order_no`,		
+				`car_no`,		
+				`trusteeship_name`,		
+				`trusteeship_telephone`,		
+				`out_depot_time`,		
+				`in_depot_time`,		
+				`out_depot_mileage`,		
+				`in_depot_mileage`,		
+				`out_depot_oimass`,		
+				`in_depot_oimass`,		
+				`in_depot_damage`,		
+				`driving_license_join`,		
+				`car_key_join`,		
+				`create_op`,		
+				`update_op`,		
+				`create_time`,		
+				`update_time`,		
+				`is_delete`,		
+				`oil_scale`		
+			)
+		values
+		(
+				#{orderNo}, 		
+				#{carNo}, 		
+				#{trusteeshipName}, 		
+				#{trusteeshipTelephone}, 		
+				#{outDepotTime}, 		
+				#{inDepotTime}, 		
+				#{outDepotMileage}, 		
+				#{inDepotMileage}, 		
+				#{outDepotOimass}, 		
+				#{inDepotOimass}, 		
+				#{inDepotDamage}, 		
+				#{drivingLicenseJoin}, 		
+				#{carKeyJoin}, 		
+				#{createOp}, 		
+				#{updateOp}, 		
+				#{createTime}, 		
+				#{updateTime}, 		
+				#{isDelete}, 		
+				#{oilScale}		
+			)
+	</insert>
+	
+	<insert id="insertSelective" parameterType="com.atzuche.order.delivery.entity.OrderCarTrusteeshipEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into order_car_trusteeship
+            <trim prefix="(" suffix=")" suffixOverrides="," >
+				<if test="orderNo != null">`order_no`, </if>
+				<if test="carNo != null">`car_no`, </if>
+				<if test="trusteeshipName != null">`trusteeship_name`, </if>
+				<if test="trusteeshipTelephone != null">`trusteeship_telephone`, </if>
+				<if test="outDepotTime != null">`out_depot_time`, </if>
+				<if test="inDepotTime != null">`in_depot_time`, </if>
+				<if test="outDepotMileage != null">`out_depot_mileage`, </if>
+				<if test="inDepotMileage != null">`in_depot_mileage`, </if>
+				<if test="outDepotOimass != null">`out_depot_oimass`, </if>
+				<if test="inDepotOimass != null">`in_depot_oimass`, </if>
+				<if test="inDepotDamage != null">`in_depot_damage`, </if>
+				<if test="drivingLicenseJoin != null">`driving_license_join`, </if>
+				<if test="carKeyJoin != null">`car_key_join`, </if>
+				<if test="createOp != null">`create_op`, </if>
+				<if test="updateOp != null">`update_op`, </if>
+				<if test="createTime != null">`create_time`, </if>
+				<if test="updateTime != null">`update_time`, </if>
+				<if test="isDelete != null">`is_delete`, </if>
+				<if test="oilScale != null">`oil_scale` </if>
+	        </trim>
+            <trim prefix="values (" suffix=")" suffixOverrides="," >
+				<if test="orderNo != null">#{orderNo},  </if>
+				<if test="carNo != null">#{carNo},  </if>
+				<if test="trusteeshipName != null">#{trusteeshipName},  </if>
+				<if test="trusteeshipTelephone != null">#{trusteeshipTelephone},  </if>
+				<if test="outDepotTime != null">#{outDepotTime},  </if>
+				<if test="inDepotTime != null">#{inDepotTime},  </if>
+				<if test="outDepotMileage != null">#{outDepotMileage},  </if>
+				<if test="inDepotMileage != null">#{inDepotMileage},  </if>
+				<if test="outDepotOimass != null">#{outDepotOimass},  </if>
+				<if test="inDepotOimass != null">#{inDepotOimass},  </if>
+				<if test="inDepotDamage != null">#{inDepotDamage},  </if>
+				<if test="drivingLicenseJoin != null">#{drivingLicenseJoin},  </if>
+				<if test="carKeyJoin != null">#{carKeyJoin},  </if>
+				<if test="createOp != null">#{createOp},  </if>
+				<if test="updateOp != null">#{updateOp},  </if>
+				<if test="createTime != null">#{createTime},  </if>
+				<if test="updateTime != null">#{updateTime},  </if>
+				<if test="isDelete != null">#{isDelete},  </if>
+				<if test="oilScale != null">#{oilScale} </if>
+	        </trim>
+	</insert>
+	
+	 
+	<update id="updateByPrimaryKeySelective" parameterType="com.atzuche.order.delivery.entity.OrderCarTrusteeshipEntity">
+		update order_car_trusteeship 
+		<set>
+				<if test="orderNo != null">`order_no` = #{orderNo}, </if>
+				<if test="carNo != null">`car_no` = #{carNo}, </if>
+				<if test="trusteeshipName != null">`trusteeship_name` = #{trusteeshipName}, </if>
+				<if test="trusteeshipTelephone != null">`trusteeship_telephone` = #{trusteeshipTelephone}, </if>
+				<if test="outDepotTime != null">`out_depot_time` = #{outDepotTime}, </if>
+				<if test="inDepotTime != null">`in_depot_time` = #{inDepotTime}, </if>
+				<if test="outDepotMileage != null">`out_depot_mileage` = #{outDepotMileage}, </if>
+				<if test="inDepotMileage != null">`in_depot_mileage` = #{inDepotMileage}, </if>
+				<if test="outDepotOimass != null">`out_depot_oimass` = #{outDepotOimass}, </if>
+				<if test="inDepotOimass != null">`in_depot_oimass` = #{inDepotOimass}, </if>
+				<if test="inDepotDamage != null">`in_depot_damage` = #{inDepotDamage}, </if>
+				<if test="drivingLicenseJoin != null">`driving_license_join` = #{drivingLicenseJoin}, </if>
+				<if test="carKeyJoin != null">`car_key_join` = #{carKeyJoin}, </if>
+				<if test="createOp != null">`create_op` = #{createOp}, </if>
+				<if test="updateOp != null">`update_op` = #{updateOp}, </if>
+				<if test="createTime != null">`create_time` = #{createTime}, </if>
+				<if test="updateTime != null">`update_time` = #{updateTime}, </if>
+				<if test="isDelete != null">`is_delete` = #{isDelete}, </if>
+				<if test="oilScale != null">`oil_scale` = #{oilScale}</if>
+			</set>
+		where id = #{id}
+	</update>
+	
+	<update id="updateByPrimaryKey" parameterType="com.atzuche.order.delivery.entity.OrderCarTrusteeshipEntity">
+		update order_car_trusteeship 
+		<set>
+				`order_no` = #{orderNo}, 		
+				`car_no` = #{carNo}, 		
+				`trusteeship_name` = #{trusteeshipName}, 		
+				`trusteeship_telephone` = #{trusteeshipTelephone}, 		
+				`out_depot_time` = #{outDepotTime}, 		
+				`in_depot_time` = #{inDepotTime}, 		
+				`out_depot_mileage` = #{outDepotMileage}, 		
+				`in_depot_mileage` = #{inDepotMileage}, 		
+				`out_depot_oimass` = #{outDepotOimass}, 		
+				`in_depot_oimass` = #{inDepotOimass}, 		
+				`in_depot_damage` = #{inDepotDamage}, 		
+				`driving_license_join` = #{drivingLicenseJoin}, 		
+				`car_key_join` = #{carKeyJoin}, 		
+				`create_op` = #{createOp}, 		
+				`update_op` = #{updateOp}, 		
+				`create_time` = #{createTime}, 		
+				`update_time` = #{updateTime}, 		
+				`is_delete` = #{isDelete}, 		
+				`oil_scale` = #{oilScale}		
+	
+		</set>
+		where id = #{id}
+	</update>
+	<select id="selectObjectByOrderNoAndType" resultMap="BaseResultMap">
+		select <include refid="Base_Column_List" /> from order_car_trusteeship where order_no = #{orderNo} and car_no = #{carNo} and is_delete = 0
+	</select>
+  	
+</mapper>

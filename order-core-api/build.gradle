@@ -1,16 +1,88 @@
-plugins {
-    id 'java'
+buildscript {
+    repositories {
+        maven{url "http://10.0.3.208:8081/nexus/content/groups/public/"}
+        maven{url "http://maven.aliyun.com/nexus/content/groups/public/"}
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.autoyol.tool:dependency-management:1.0-SNAPSHOT'
+    }
 }
 
-group 'com.atzuche'
-version '0.0.1-SNAPSHOT'
+apply plugin: 'dependency-management'
+apply plugin: 'org.springframework.boot'
+apply plugin: 'application'
+apply plugin: 'war'
 
-sourceCompatibility = 1.8
-
-repositories {
-    mavenCentral()
-}
+mainClassName = 'com.autoyol.doc.parser.autodoc.AutoDocParser'
 
 dependencies {
-    testCompile group: 'junit', name: 'junit', version: '4.12'
+    compile project(":order-openapi")
+    compile project(":config:config-client")
+    implementation "com.autoyol:auto-web-starter:1.0-SNAPSHOT"
+    compile 'org.springframework.boot:spring-boot-starter-web'
+	compile('org.springframework.boot:spring-boot-starter-actuator')
+	compile('org.springframework.boot:spring-boot-starter-aop')
+//	compile 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
+    compile 'org.springframework.cloud:spring-cloud-starter-sleuth'
+	compile('org.mybatis.spring.boot:mybatis-spring-boot-starter:1.1.1')
+	compile("com.autoyol.tools:prop-encrypt-spring-boot-starter:0.0.1-SNAPSHOT")
+	compile('mysql:mysql-connector-java')
+    compile('com.ctrip.framework.apollo:apollo-client:0.11.0-SNAPSHOT')
+    compile("com.autoyol:search-order-info-api:6.8-SNAPSHOT")
+    compile('com.xuxueli:xxl-job-core:2.0.1-SNAPSHOT')
+    compile('com.autoyol.xxljob:xxljob-starter:2.0.1-SNAPSHOT')
+//	compile("com.autoyol:cat-starter:0.0.1-SNAPSHOT")
+//	compile('org.springframework.boot:spring-boot-starter-data-redis')
+    testCompile 'org.springframework.boot:spring-boot-starter-test'
+	compile("com.autoyol:auto-doc:1.0-SNAPSHOT"){
+            exclude module:'servlet-api'
+        }
+    compile("com.caucho:hessian:4.0.38")
+
+    compile('com.autoyol.unique:unique-no-feign:3.1-SNAPSHOT')
+    compile('com.autoyol.car:auto-car-service-api:2020022002-SNAPSHOT')
+    compile('com.autoyol:riskCheckService-api:1.0.0-SNAPSHOT')
+    compile project(":order-remote-service:order-remote-car")
+
+
+    compile project(":config")
+    compile project(":casier-all:cashier-account")
+
+    compile project(":order-core-all:renter-all:renter-claim")
+    compile project(":order-core-all:renter-all:renter-commodity")
+    compile project(":order-core-all:renter-all:renter-cost")
+    compile project(":order-core-all:renter-all:renter-detain")
+    compile project(":order-core-all:renter-all:renter-handover")
+    compile project(":order-core-all:renter-all:renter-mem")
+    compile project(":order-core-all:renter-all:renter-order")
+    compile project(":order-core-all:renter-all:renter-penalty")
+    compile project(":order-core-all:renter-all:renter-wz")
+    
+    compile project(":order-core-all:carowner-all:carowner-commodity")
+    compile project(":order-core-all:carowner-all:carowner-cost")
+    compile project(":order-core-all:carowner-all:carowner-delivery")
+    compile project(":order-core-all:carowner-all:carowner-mem")
+    compile project(":order-core-all:carowner-all:carowner-order")
+    compile project(":order-core-all:carowner-all:carowner-penalty")
+
+    compile project(":order-core-all:parent-order")
+    
+	compile project(":util-all:fee-calculator")
+    compile project(":util-all:order-commons")
+    compile project(":order-delivery")
+    compile project(":order-flow")
+    compile project(":order-settle")
+    compile project(":order-coin")
+    compile project(":order-remote-service:order-remote-mem")
+    compile project(":order-mq")
+
+    compile("com.fasterxml.jackson.module:jackson-module-parameter-names")
+    compile("com.fasterxml.jackson.datatype:jackson-datatype-jdk8")
+    compile("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
+
+    compile("com.autoframework:auto-mq-event:1.0.2-SNAPSHOT")
+    
+    compile('com.autoyol.cardistance:car-distance:0.0.4-20190613-SNAPSHOT')
+
 }

@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.atzuche.order.parentorder.mapper.OrderCancelReasonMapper">
+
+    <resultMap type="com.atzuche.order.parentorder.entity.OrderCancelReasonEntity" id="BaseResultMap">
+        <result property="id" column="id"/>
+        <result property="orderNo" column="order_no"/>
+        <result property="subOrderNo" column="sub_order_no"/>
+        <result property="operateType" column="operate_type"/>
+        <result property="cancelSource" column="cancel_source"/>
+        <result property="dutySource" column="duty_source"/>
+        <result property="cancelReason" column="cancel_reason"/>
+		<result property="appealFlag" column="appeal_flag"/>
+        <result property="createTime" column="create_time"/>
+        <result property="createOp" column="create_op"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="updateOp" column="update_op"/>
+        <result property="isDelete" column="is_delete"/>
+    </resultMap>
+
+
+	<sql id="Base_Column_List">
+        `id`,
+        `order_no`,
+        `sub_order_no`,
+        `operate_type`,
+        `cancel_source`,
+        `duty_source`,
+        `cancel_reason`,
+        `appeal_flag`,
+        `create_time`,
+        `create_op`,
+        `update_time`,
+        `update_op`,
+        `is_delete`
+	</sql>
+
+
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap">
+		select <include refid="Base_Column_List" /> from order_cancel_reason where id = #{value}
+	</select>
+
+	<insert id="insert" parameterType="com.atzuche.order.parentorder.entity.OrderCancelReasonEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into order_cancel_reason (
+				`order_no`,
+				`sub_order_no`,
+				`operate_type`,
+				`cancel_source`,		
+				`duty_source`,		
+				`cancel_reason`,
+				`appeal_flag`
+        ) values (
+				#{orderNo},
+                #{subOrderNo},
+				#{operateType},
+				#{cancelSource}, 		
+				#{dutySource}, 		
+				#{cancelReason},
+				#{appealFlag}
+			)
+	</insert>
+	
+	<insert id="insertSelective" parameterType="com.atzuche.order.parentorder.entity.OrderCancelReasonEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into order_cancel_reason
+            <trim prefix="(" suffix=")" suffixOverrides="," >
+				<if test="orderNo != null">`order_no`, </if>
+                <if test="subOrderNo != null">`sub_order_no`, </if>
+                <if test="operateType != null">`operate_type`, </if>
+				<if test="cancelSource != null">`cancel_source`, </if>
+				<if test="dutySource != null">`duty_source`, </if>
+				<if test="cancelReason != null">`cancel_reason`, </if>
+				<if test="appealFlag != null">`appeal_flag`, </if>
+				<if test="createTime != null">`create_time`, </if>
+				<if test="createOp != null">`create_op`, </if>
+				<if test="updateTime != null">`update_time`, </if>
+				<if test="updateOp != null">`update_op`, </if>
+				<if test="isDelete != null">`is_delete` </if>
+	        </trim>
+            <trim prefix="values (" suffix=")" suffixOverrides="," >
+				<if test="orderNo != null">#{orderNo},  </if>
+				<if test="subOrderNo != null">#{subOrderNo},  </if>
+                <if test="operateType != null">#{operateType}, </if>
+                <if test="cancelSource != null">#{cancelSource},  </if>
+				<if test="dutySource != null">#{dutySource},  </if>
+				<if test="cancelReason != null">#{cancelReason},  </if>
+				<if test="appealFlag != null">#{appealFlag}, </if>
+				<if test="createTime != null">#{createTime},  </if>
+				<if test="createOp != null">#{createOp},  </if>
+				<if test="updateTime != null">#{updateTime},  </if>
+				<if test="updateOp != null">#{updateOp},  </if>
+				<if test="isDelete != null">#{isDelete} </if>
+	        </trim>
+	</insert>
+	
+	 
+	<update id="updateByPrimaryKeySelective" parameterType="com.atzuche.order.parentorder.entity.OrderCancelReasonEntity">
+		update order_cancel_reason 
+		    <set>
+				<if test="orderNo != null">`order_no` = #{orderNo}, </if>
+				<if test="subOrderNo != null">`sub_order_no` = #{subOrderNo}, </if>
+                <if test="operateType != null">`operate_type` = #{operateType}, </if>
+				<if test="cancelSource != null">`cancel_source` = #{cancelSource}, </if>
+				<if test="dutySource != null">`duty_source` = #{dutySource}, </if>
+				<if test="cancelReason != null">`cancel_reason` = #{cancelReason}, </if>
+				<if test="appealFlag != null">`appeal_flag` = #{appealFlag}, </if>
+				<if test="createTime != null">`create_time` = #{createTime}, </if>
+				<if test="createOp != null">`create_op` = #{createOp}, </if>
+				<if test="updateTime != null">`update_time` = #{updateTime}, </if>
+				<if test="updateOp != null">`update_op` = #{updateOp}, </if>
+				<if test="isDelete != null">`is_delete` = #{isDelete}</if>
+			</set>
+		where id = #{id}
+	</update>
+	
+	<update id="updateByPrimaryKey" parameterType="com.atzuche.order.parentorder.entity.OrderCancelReasonEntity">
+		update order_cancel_reason 
+		    <set>
+				`order_no` = #{orderNo},
+				`sub_order_no` = #{subOrderNo},
+                `operate_type` = #{operateType},
+                `cancel_source` = #{cancelSource},
+				`duty_source` = #{dutySource}, 		
+				`cancel_reason` = #{cancelReason},
+				`appeal_flag` = #{appealFlag}
+		    </set>
+		where id = #{id}
+	</update>
+
+<!--auto generated by MybatisCodeHelper on 2020-01-09-->
+    <select id="selectByOrderNo" resultMap="BaseResultMap">
+        select
+            <include refid="Base_Column_List"/>
+        from order_cancel_reason
+        where order_no=#{orderNo}
+        and is_delete = 0
+        limit 1
+    </select>
+
+</mapper>
