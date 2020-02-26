@@ -125,6 +125,9 @@
         select <include refid="Base_Column_List" /> from account_debt_detail where mem_no = #{memNo}
         and <![CDATA[ order_debt_amt + repaid_debt_amt <>0 ]]>
     </select>
-
+	
+	<select id="listAccountDebtDetailEntity" resultMap="BaseResultMap">
+		select <include refid="Base_Column_List" /> from account_debt_detail where mem_no = #{memNo} and order_no = #{orderNo} and is_delete = 0  
+	</select>
 
 </mapper>
