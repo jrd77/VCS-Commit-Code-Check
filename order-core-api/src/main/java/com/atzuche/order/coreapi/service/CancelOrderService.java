@@ -25,8 +25,10 @@ import com.atzuche.order.mq.util.SmsParamsMapUtil;
 import com.atzuche.order.owner.commodity.service.OwnerGoodsService;
 import com.atzuche.order.ownercost.entity.OwnerOrderEntity;
 import com.atzuche.order.ownercost.service.OwnerOrderService;
+import com.atzuche.order.parentorder.entity.OrderCancelReasonEntity;
 import com.atzuche.order.parentorder.entity.OrderEntity;
 import com.atzuche.order.parentorder.entity.OrderStatusEntity;
+import com.atzuche.order.parentorder.service.OrderCancelReasonService;
 import com.atzuche.order.parentorder.service.OrderService;
 import com.atzuche.order.parentorder.service.OrderStatusService;
 import com.atzuche.order.rentercommodity.service.RenterGoodsService;
@@ -99,6 +101,8 @@ public class CancelOrderService {
     private OwnerGoodsService ownerGoodsService;
     @Autowired
     private CancelOrderJudgeDutyService cancelOrderJudgeDutyService;
+    @Autowired
+    private OrderCancelReasonService orderCancelReasonService;
 
 
     /**
@@ -129,7 +133,7 @@ public class CancelOrderService {
             logger.warn("Invalid cancel operation. param is,cancelOrderReqVO:[{}]", JSON.toJSONString(cancelOrderReqVO));
         }
         //取消责任处理
-        if(null != res) {
+        if (null != res) {
             cancelOrderJudgeDutyService.judgeDuty(res.getWrongdoer(), res.getIsDispatch(), cancelReqTime,
                     reqContext);
         }
@@ -180,19 +184,22 @@ public class CancelOrderService {
      * @param reqVO 请求参数
      */
     public void orderCancelJudgeDuty(AdminOrderCancelJudgeDutyReqVO reqVO) {
-        //todo 校验
-
-        
-
-
+        //参数转换处理
+        CancelOrderReqDTO cancelOrderReqDTO = new CancelOrderReqDTO();
+        BeanUtils.copyProperties(reqVO, cancelOrderReqDTO);
+        cancelOrderReqDTO.setConsoleInvoke(true);
+        CancelOrderReqContext reqContext = buildCancelOrderReqContext(cancelOrderReqDTO);
+        OrderCancelReasonEntity orderCancelReasonEntity = orderCancelReasonService.selectByOrderNo(reqVO.getOrderNo());
+        reqContext.setOrderCancelReasonEntity(orderCancelReasonEntity);
+        //公共校验
+        cancelOrderCheckService.checkOrderCancelJudgeDuty(reqContext);
+        //责任判定
+        boolean isDispatch =
+                reqContext.getOrderStatusEntity().getIsDispatch() == OrderConstant.YES && reqContext.getOrderStatusEntity().getDispatchStatus() != 3;
+        cancelOrderJudgeDutyService.judgeDuty(Integer.valueOf(reqVO.getWrongdoer()), isDispatch, orderCancelReasonEntity.getCancelReqTime()
+                , reqContext);
 
     }
-
-
-
-
-
-
 
     /**
      * 取消成功后续操作

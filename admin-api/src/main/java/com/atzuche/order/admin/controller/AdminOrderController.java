@@ -136,6 +136,18 @@ public class AdminOrderController {
 
     @AutoDocVersion(version = "订单修改")
     @AutoDocGroup(group = "订单修改")
+    @AutoDocMethod(description = "取消订单责任判定", value = "取消订单责任判定",response = ResponseData.class)
+    @RequestMapping(value="console/order/cancel/judgeDuty",method = RequestMethod.POST)
+    public ResponseData refuseOrder(@Valid @RequestBody CancelOrderJudgeDutyReqVO reqVO,
+                                    BindingResult bindingResult){
+        log.info("取消订单责任判定-reqVo={}", JSON.toJSONString(reqVO));
+        BindingResultUtil.checkBindingResult(bindingResult);
+        return adminOrderService.cancelOrderJudgeDuty(reqVO);
+    }
+
+
+    @AutoDocVersion(version = "订单修改")
+    @AutoDocGroup(group = "订单修改")
     @AutoDocMethod(description = "车主拒绝或者同意租客的订单修改申请接口", value = "车主拒绝或者同意租客的订单修改申请接口",response = ResponseData.class)
     @RequestMapping(value="console/order/modify/confirm",method = RequestMethod.POST)
     public ResponseData modifyApplicationConfirm(@Valid @RequestBody OrderModifyConfirmReqVO reqVO,BindingResult result){

@@ -4,6 +4,7 @@ import com.atzuche.order.commons.entity.dto.OwnerGoodsDetailDTO;
 import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
 import com.atzuche.order.coreapi.entity.dto.CancelOrderReqDTO;
 import com.atzuche.order.ownercost.entity.OwnerOrderEntity;
+import com.atzuche.order.parentorder.entity.OrderCancelReasonEntity;
 import com.atzuche.order.parentorder.entity.OrderEntity;
 import com.atzuche.order.parentorder.entity.OrderStatusEntity;
 import com.atzuche.order.rentercost.entity.RenterOrderCostEntity;
@@ -66,6 +67,10 @@ public class CancelOrderReqContext {
      */
     private OwnerGoodsDetailDTO ownerGoodsDetailDTO;
 
+    /**
+     * 订单取消信息
+     */
+    private OrderCancelReasonEntity orderCancelReasonEntity;
 
 
 

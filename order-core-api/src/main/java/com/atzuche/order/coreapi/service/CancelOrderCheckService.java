@@ -10,6 +10,7 @@ import com.atzuche.order.coreapi.entity.dto.CancelOrderReqDTO;
 import com.atzuche.order.coreapi.submitOrder.exception.CancelOrderCheckException;
 import com.atzuche.order.coreapi.submitOrder.exception.RefuseOrderCheckException;
 import com.atzuche.order.ownercost.entity.OwnerOrderEntity;
+import com.atzuche.order.parentorder.entity.OrderCancelReasonEntity;
 import com.atzuche.order.parentorder.entity.OrderStatusEntity;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.autoyol.commons.web.ErrorCode;
@@ -133,5 +134,28 @@ public class CancelOrderCheckService {
 
 
     }
+
+
+    public void checkOrderCancelJudgeDuty(CancelOrderReqContext reqContext) {
+        OrderStatusEntity orderStatusEntity = reqContext.getOrderStatusEntity();
+        if(null != orderStatusEntity) {
+            if (null != orderStatusEntity.getStatus() && orderStatusEntity.getStatus() != OrderStatusEnum.CLOSED.getStatus()) {
+                throw new RefuseOrderCheckException(ErrorCode.ORDER_STATUS_NOT_ALLOWED);
+            }
+
+            if(null != orderStatusEntity.getRentCarPayStatus() && orderStatusEntity.getRentCarPayStatus() != OrderConstant.YES) {
+                throw new RefuseOrderCheckException(ErrorCode.ORDER_PAY_NOT_SUCC);
+            }
+        } else {
+            throw new RefuseOrderCheckException(ErrorCode.ORDER_NOT_EXIST);
+        }
+
+        OrderCancelReasonEntity orderCancelReasonEntity = reqContext.getOrderCancelReasonEntity();
+        if(null != orderCancelReasonEntity && null != orderCancelReasonEntity.getDutySource()) {
+            throw new RefuseOrderCheckException(ErrorCode.CANNOT_REPEAT_OPERATION);
+        }
+
+    }
+
 
 }

@@ -152,6 +152,7 @@ public class CancelOrderJudgeDutyService {
             OrderCancelReasonEntity record = new OrderCancelReasonEntity();
             record.setId(orderCancelReasonEntity.getId());
             record.setDutySource(wrongdoer);
+            record.setUpdateOp(cancelOrderReqDTO.getOperatorName());
             orderCancelReasonService.updateOrderCancelReasonRecord(record);
         }
 

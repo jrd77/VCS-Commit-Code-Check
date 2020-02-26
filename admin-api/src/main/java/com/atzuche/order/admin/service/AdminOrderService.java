@@ -442,6 +442,33 @@ public class AdminOrderService {
     }
 
 
+    public ResponseData cancelOrderJudgeDuty(CancelOrderJudgeDutyReqVO reqVO) {
+        AdminOrderCancelJudgeDutyReqVO adminOrderCancelJudgeDutyReqVO = new AdminOrderCancelJudgeDutyReqVO();
+        BeanUtils.copyProperties(reqVO,adminOrderCancelJudgeDutyReqVO);
+        adminOrderCancelJudgeDutyReqVO.setOperatorName(AdminUserUtil.getAdminUser().getAuthName());
+
+        ResponseData<?> responseObject = null;
+        Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "订单中心服务");
+        try{
+            Cat.logEvent(CatConstants.FEIGN_METHOD,"feignOrderUpdateService.adminCancelOrderJudgeDuty");
+            log.info("Feign 开始责任判定,refuseOrderReqVO={}", JSON.toJSONString(adminOrderCancelJudgeDutyReqVO));
+            Cat.logEvent(CatConstants.FEIGN_PARAM,JSON.toJSONString(adminOrderCancelJudgeDutyReqVO));
+            responseObject = feignOrderUpdateService.adminCancelOrderJudgeDuty(adminOrderCancelJudgeDutyReqVO);
+            log.info("Feign 返回责任判定,responseObject:[{}]", JSON.toJSONString(responseObject));
+            Cat.logEvent(CatConstants.FEIGN_RESULT,JSON.toJSONString(responseObject));
+            checkResponse(responseObject);
+            t.setStatus(Transaction.SUCCESS);
+        }catch (Exception e){
+            log.error("Feign 责任判定异常,responseObject={},adminOrderCancelJudgeDutyReqVO={}",JSON.toJSONString(responseObject),JSON.toJSONString(adminOrderCancelJudgeDutyReqVO),e);
+            Cat.logError("Feign 责任判定异常",e);
+            t.setStatus(e);
+            throw e;
+        }finally {
+            t.complete();
+        }
+        return responseObject;
+    }
+
 
     private void checkResponse(ResponseData responseObject){
         if(responseObject==null||!ErrorCode.SUCCESS.getCode().equalsIgnoreCase(responseObject.getResCode())){
