@@ -42,6 +42,40 @@ public class AccountDebtDetailNoTService {
         }
         return result;
     }
+    
+    public List<AccountDebtDetailEntity> listAccountDebtDetailEntity(String orderNo,String memNo){
+        List<AccountDebtDetailEntity> result = accountDebtDetailMapper.listAccountDebtDetailEntity(orderNo, memNo);
+        if(CollectionUtils.isEmpty(result)){
+           return Collections.emptyList();
+        }
+        return result;
+    }
+    
+    
+    /**
+     * 考虑到结算有多条记录的情况。
+     * @param orderNo
+     * @param memNo
+     * @return
+     */
+    public AccountDebtDetailEntity getTotalAccountDebtDetailEntity(String orderNo,String memNo){
+    	AccountDebtDetailEntity accountDebtDetailEntity = null;
+        List<AccountDebtDetailEntity> result = accountDebtDetailMapper.listAccountDebtDetailEntity(orderNo, memNo);
+        if(!CollectionUtils.isEmpty(result)){
+           accountDebtDetailEntity = result.get(0);
+           for (int i = 1; i < result.size(); i++) {  //从第一个开始
+        	   AccountDebtDetailEntity tmp = result.get(i);
+        	   //金额累加
+        	   accountDebtDetailEntity.setCurrentDebtAmt(accountDebtDetailEntity.getCurrentDebtAmt() + tmp.getCurrentDebtAmt());
+        	   accountDebtDetailEntity.setOrderDebtAmt(accountDebtDetailEntity.getOrderDebtAmt() + tmp.getOrderDebtAmt());
+        	   accountDebtDetailEntity.setRepaidDebtAmt(accountDebtDetailEntity.getRepaidDebtAmt() + tmp.getRepaidDebtAmt());
+           }
+        }
+        
+        return accountDebtDetailEntity;//返回空对象
+    }
+    
+    
 
     public void updateAlreadyDeductDebt(List<AccountDebtDetailEntity> accountDebtDetails) {
        for(int i=0;i<accountDebtDetails.size();i++){
