@@ -80,9 +80,6 @@ dependencies {
     compile("com.fasterxml.jackson.module:jackson-module-parameter-names")
     compile("com.fasterxml.jackson.datatype:jackson-datatype-jdk8")
     compile("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
-
-    compile("com.autoframework:auto-mq-event:1.0.2-SNAPSHOT")
-    
     compile('com.autoyol.cardistance:car-distance:0.0.4-20190613-SNAPSHOT')
 
 }
