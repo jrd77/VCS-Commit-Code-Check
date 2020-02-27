@@ -19,6 +19,9 @@ public class ReturnCarReqVO extends BaseVO {
 
     @AutoDocProperty(value = "操作人")
     private String operatorName;
+    
+    @AutoDocProperty(value="还车时间,格式 yyyyMMddHHmmss")
+    private String revertTime;
 
     public String getOrderNo() {
         return orderNo;
@@ -35,4 +38,13 @@ public class ReturnCarReqVO extends BaseVO {
     public void setOperatorName(String operatorName) {
         this.operatorName = operatorName;
     }
+
+	public String getRevertTime() {
+		return revertTime;
+	}
+
+	public void setRevertTime(String revertTime) {
+		this.revertTime = revertTime;
+	}
+    
 }

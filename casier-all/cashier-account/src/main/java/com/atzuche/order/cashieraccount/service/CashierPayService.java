@@ -459,7 +459,7 @@ public class CashierPayService{
                     AccountRenterDepositResVO accountRenterDeposit = cashierService.getRenterDepositEntity(orderPaySign.getOrderNo(),orderPaySign.getMenNo());
                     Integer payId = Objects.isNull(accountRenterDeposit)?0:accountRenterDeposit.getId();
                     String payIdStr = Objects.isNull(payId)?"":String.valueOf(payId);
-                    PayVo vo = cashierNoTService.getPayVO(cashierEntity,orderPaySign,payVO.getAmtDeposit(),payVO.getTitle(),DataPayKindConstant.RENT,payIdStr,GsonUtils.toJson(accountRenterDeposit));
+                    PayVo vo = cashierNoTService.getPayVO(cashierEntity,orderPaySign,payVO.getAmtDeposit(),payVO.getTitle(),DataPayKindConstant.RENT,payIdStr,GsonUtils.toJson(accountRenterDeposit),accountRenterDeposit.getFreeDepositType());
                     String payMd5 = MD5.MD5Encode(FasterJsonUtil.toJson(vo));
                     vo.setPayMd5(payMd5);
                     payVo.add(vo);
@@ -470,7 +470,7 @@ public class CashierPayService{
                     AccountRenterWZDepositResVO accountRenterWZDepositRes = cashierService.getRenterWZDepositEntity(orderPaySign.getOrderNo(),orderPaySign.getMenNo());
                     Integer payId = Objects.isNull(accountRenterWZDepositRes)?0:accountRenterWZDepositRes.getId();
                     String payIdStr = Objects.isNull(payId)?"":String.valueOf(payId);
-                    PayVo vo = cashierNoTService.getPayVO(cashierEntity,orderPaySign,payVO.getAmtWzDeposit(),payVO.getTitle(),DataPayKindConstant.DEPOSIT,payIdStr,GsonUtils.toJson(accountRenterWZDepositRes));
+                    PayVo vo = cashierNoTService.getPayVO(cashierEntity,orderPaySign,payVO.getAmtWzDeposit(),payVO.getTitle(),DataPayKindConstant.DEPOSIT,payIdStr,GsonUtils.toJson(accountRenterWZDepositRes),accountRenterWZDepositRes.getFreeDepositType());
                     String payMd5 = MD5.MD5Encode(FasterJsonUtil.toJson(vo));
                     vo.setPayMd5(payMd5);
                     payVo.add(vo);
@@ -478,7 +478,7 @@ public class CashierPayService{
             }
         }
 
-        //待付租车费用
+        //待付租车费用   租车费用默认是消费
         if(orderPaySign.getPayKind().contains(DataPayKindConstant.RENT_AMOUNT) && payVO.getAmtRent()<0){
             //待付租车费用
             int amt = payVO.getAmtRent();
@@ -486,7 +486,7 @@ public class CashierPayService{
             AccountRenterCostSettleEntity entity = cashierService.getAccountRenterCostSettle(orderPaySign.getOrderNo(),orderPaySign.getMenNo());
             Integer payId = Objects.isNull(entity)?0:entity.getId();
             String payIdStr = Objects.isNull(payId)?"":String.valueOf(payId);
-            PayVo vo = cashierNoTService.getPayVO(null,orderPaySign,payVO.getAmtRent(),payVO.getTitle(),payKind,payIdStr,GsonUtils.toJson(entity));
+            PayVo vo = cashierNoTService.getPayVO(null,orderPaySign,payVO.getAmtRent(),payVO.getTitle(),payKind,payIdStr,GsonUtils.toJson(entity),3);
             String paySn = cashierNoTService.getCashierRentCostPaySn(orderPaySign.getOrderNo(),orderPaySign.getMenNo());
             vo.setPaySn(paySn);
             String renterOrderNo = getExtendParamsRentOrderNo(payVO);

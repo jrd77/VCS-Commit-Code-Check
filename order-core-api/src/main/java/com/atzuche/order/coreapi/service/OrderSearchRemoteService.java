@@ -4,6 +4,9 @@ import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.CatConstants;
 import com.atzuche.order.commons.DateUtils;
 import com.atzuche.order.coreapi.entity.dto.SuccessOrderStaCount;
+import com.atzuche.order.coreapi.listener.sms.SMSOrderBaseEventService;
+import com.atzuche.order.mq.enums.ShortMessageTypeEnum;
+import com.atzuche.order.mq.util.SmsParamsMapUtil;
 import com.atzuche.order.parentorder.service.OrderService;
 import com.atzuche.order.parentorder.service.OrderStatusService;
 import com.atzuche.order.rentercommodity.service.RenterGoodsService;
@@ -23,9 +26,12 @@ import com.autoyol.search.vo.OrderVO;
 import com.autoyol.search.vo.ViolateVO;
 import com.dianping.cat.Cat;
 import com.dianping.cat.message.Transaction;
+import com.google.common.collect.Maps;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -65,6 +71,12 @@ public class OrderSearchRemoteService {
 
     @Resource
     private OrderService orderService;
+
+    @Autowired
+    SMSOrderBaseEventService smsOrderBaseEventService;
+
+    @Value("${violation.h5.url}")
+    private String h5Url;
 
     private static final List<Integer> CITIES = Arrays.asList(330100,320100,310100,110100,440100,440300);
 
@@ -760,6 +772,18 @@ public class OrderSearchRemoteService {
             t.complete();
         }
         return new ArrayList<>();
+
+    }
+
+    /**
+     * 發送一小時未支付租车押金
+     * @param orderNo
+     */
+    public void sendSmsData(String orderNo) {
+        Map paramsMap = Maps.newConcurrentMap();
+        paramsMap.put("indexUrl", h5Url);
+        Map map = SmsParamsMapUtil.getParamsMap(orderNo, ShortMessageTypeEnum.EXEMPT_PREORDER_AUTO_CANCEL_ORDER_2_RENTER.getValue(), ShortMessageTypeEnum.EXEMPT_PREORDER_AUTO_CANCEL_ORDER_2_OWNER.getValue(), paramsMap);
+        smsOrderBaseEventService.sendShortMessage(map);
 
     }
 }

@@ -29,8 +29,8 @@ import java.util.Map;
  * @author 胡春林
  * 新订单短信基础service
  */
-@Service
 @Slf4j
+@Service(value = "smsOrderBaseEventService")
 public class SMSOrderBaseEventService {
 
     @Resource(name = "smsMQSendPlatformSmsService")

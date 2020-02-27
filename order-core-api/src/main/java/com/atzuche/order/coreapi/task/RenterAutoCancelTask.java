@@ -4,10 +4,14 @@ import com.atzuche.order.commons.CatConstants;
 import com.atzuche.order.commons.constant.OrderConstant;
 import com.atzuche.order.commons.vo.req.CancelOrderReqVO;
 import com.atzuche.order.commons.vo.req.RefuseOrderReqVO;
+import com.atzuche.order.coreapi.listener.sms.SMSOrderBaseEventService;
 import com.atzuche.order.coreapi.service.CancelOrderService;
 import com.atzuche.order.coreapi.service.OrderSearchRemoteService;
+import com.atzuche.order.mq.enums.ShortMessageTypeEnum;
+import com.atzuche.order.mq.util.SmsParamsMapUtil;
 import com.dianping.cat.Cat;
 import com.dianping.cat.message.Transaction;
+import com.google.common.collect.Maps;
 import com.xxl.job.core.biz.model.ReturnT;
 import com.xxl.job.core.handler.IJobHandler;
 import com.xxl.job.core.handler.annotation.JobHandler;
@@ -16,10 +20,12 @@ import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Map;
 
 /**
  * RenterAutoCancelTask
@@ -66,6 +72,8 @@ public class RenterAutoCancelTask extends IJobHandler {
                     try {
                         logger.info("执行 下单后1小时，租客未支付租车费用,自动取消 orderNo:[{}]",orderNo);
                         cancelOrderService.cancel(req);
+                        //發送sms
+                        orderSearchRemoteService.sendSmsData(orderNo);
                     } catch (Exception e) {
                         XxlJobLogger.log("执行 下单后1小时，租客未支付租车费用,自动取消 异常:" + e);
                         logger.error("执行 下单后1小时，租客未支付租车费用,自动取消 异常 orderNo:[{}] , e:[{}]",orderNo,e);
