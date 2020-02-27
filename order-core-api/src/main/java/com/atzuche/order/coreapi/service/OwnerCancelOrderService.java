@@ -26,6 +26,7 @@ import com.atzuche.order.rentercost.service.RenterOrderFineDeatailService;
 import com.atzuche.order.renterorder.entity.OrderCouponEntity;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.atzuche.order.renterorder.service.RenterOrderService;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -132,6 +133,10 @@ public class OwnerCancelOrderService {
                     ownerOrderEntity.getOwnerOrderNo(),
                     cancelOrderReqDTO.getCancelReason());
             orderCancelReasonEntity.setCancelReqTime(cancelReqTime);
+            if(cancelOrderReqDTO.getConsoleInvoke() && !StringUtils.equals(OrderConstant.SYSTEM_OPERATOR_JOB,
+                    cancelOrderReqDTO.getOperatorName())) {
+                orderCancelReasonEntity.setCancelSource(CancelSourceEnum.INSTEAD_OF_OWNER.getCode());
+            }
             orderCancelReasonService.addOrderCancelReasonRecord(orderCancelReasonEntity);
         }
         //返回信息处理
