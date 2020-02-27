@@ -9,6 +9,7 @@ public class OwnerOrderDetailRespDTO {
     public OrderDTO order;
     public OrderStatusDTO orderStatus;
     public OrderSourceStatDTO orderSourceStat;
+    public RenterMemberDTO renterMemberDTO;
     public OwnerOrderDTO ownerOrder;
     public OwnerGoodsDTO ownerGoods;
     public OwnerMemberDTO ownerMember;

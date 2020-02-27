@@ -455,6 +455,22 @@ public class OrderDetailService {
             orderSourceStatDTO = new OrderSourceStatDTO();
             BeanUtils.copyProperties(orderSourceStatEntity,orderSourceStatDTO);
         }
+        //租客订单
+
+        com.atzuche.order.commons.entity.orderDetailDto.RenterMemberDTO renterMember = null;
+        RenterOrderEntity renterOrderEntity = renterOrderService.getRenterOrderByOrderNoAndIsEffective(orderNo);
+        RenterOrderDTO renterOrderDTO = null;
+        if(renterOrderEntity != null){
+            //renterOrderDTO = new RenterOrderDTO();
+            //BeanUtils.copyProperties(renterOrderEntity,renterOrderDTO);
+            //会员
+            RenterMemberDTO renterMemberDTO = renterMemberService.selectrenterMemberByRenterOrderNo(renterOrderEntity.getRenterOrderNo(), false);
+            renterMember = new com.atzuche.order.commons.entity.orderDetailDto.RenterMemberDTO();
+            BeanUtils.copyProperties(renterMemberDTO,renterMember);
+        }
+
+
+
         //车主订单
         String newOwnerOrderNo = ownerOrderNo;
         String newOwnerMemNo = ownerMemNo;
@@ -569,10 +585,13 @@ public class OrderDetailService {
             BeanUtils.copyProperties(x,accountOwnerIncomeExamineDTO);
             accountOwnerIncomeExamineDTOS.add(accountOwnerIncomeExamineDTO);
         });
+
+
         OwnerOrderDetailRespDTO ownerOrderDetailRespDTO = new OwnerOrderDetailRespDTO();
         ownerOrderDetailRespDTO.order = orderDTO;
         ownerOrderDetailRespDTO.orderStatus = orderStatusDTO;
         ownerOrderDetailRespDTO.orderSourceStat = orderSourceStatDTO;
+        ownerOrderDetailRespDTO.renterMemberDTO = renterMember;
         ownerOrderDetailRespDTO.ownerOrder = ownerOrderDTO;
         ownerOrderDetailRespDTO.ownerGoods = ownerGoodsDTO;
         ownerOrderDetailRespDTO.ownerMember = ownerMember;
