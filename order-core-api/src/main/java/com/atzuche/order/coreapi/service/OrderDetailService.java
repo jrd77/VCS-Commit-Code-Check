@@ -439,6 +439,22 @@ public class OrderDetailService {
 
         OrderDTO orderDTO = new OrderDTO();
         BeanUtils.copyProperties(orderEntity,orderDTO);
+
+
+        //订单状态
+        OrderStatusEntity orderStatusEntity = orderStatusService.getByOrderNo(orderNo);
+        OrderStatusDTO orderStatusDTO = null;
+        if(orderStatusEntity != null){
+            orderStatusDTO = new OrderStatusDTO();
+            BeanUtils.copyProperties(orderStatusEntity,orderStatusDTO);
+        }
+        //统计信息
+        OrderSourceStatEntity orderSourceStatEntity = orderSourceStatService.selectByOrderNo(orderNo);
+        OrderSourceStatDTO orderSourceStatDTO = new OrderSourceStatDTO();
+        if(orderSourceStatEntity != null){
+            orderSourceStatDTO = new OrderSourceStatDTO();
+            BeanUtils.copyProperties(orderSourceStatEntity,orderSourceStatDTO);
+        }
         //车主订单
         String newOwnerOrderNo = ownerOrderNo;
         String newOwnerMemNo = ownerMemNo;
@@ -555,6 +571,8 @@ public class OrderDetailService {
         });
         OwnerOrderDetailRespDTO ownerOrderDetailRespDTO = new OwnerOrderDetailRespDTO();
         ownerOrderDetailRespDTO.order = orderDTO;
+        ownerOrderDetailRespDTO.orderStatus = orderStatusDTO;
+        ownerOrderDetailRespDTO.orderSourceStat = orderSourceStatDTO;
         ownerOrderDetailRespDTO.ownerOrder = ownerOrderDTO;
         ownerOrderDetailRespDTO.ownerGoods = ownerGoodsDTO;
         ownerOrderDetailRespDTO.ownerMember = ownerMember;

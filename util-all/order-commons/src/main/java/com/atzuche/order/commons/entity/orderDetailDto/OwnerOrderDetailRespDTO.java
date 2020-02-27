@@ -7,6 +7,8 @@ import java.util.List;
 @Data
 public class OwnerOrderDetailRespDTO {
     public OrderDTO order;
+    public OrderStatusDTO orderStatus;
+    public OrderSourceStatDTO orderSourceStat;
     public OwnerOrderDTO ownerOrder;
     public OwnerGoodsDTO ownerGoods;
     public OwnerMemberDTO ownerMember;
