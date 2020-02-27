@@ -1,14 +1,19 @@
 package com.atzuche.order.mq.common.sms;
 
+import com.atzuche.order.mq.enums.PushMessageTypeEnum;
+import com.atzuche.order.mq.enums.PushParamsTypeEnum;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Field;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -55,7 +60,7 @@ public class ShortMessageSendService {
      * @param object
      * @return
      */
-    private String getFieldValueByFieldName(String fieldName, Object object) {
+    public String getFieldValueByFieldName(String fieldName, Object object) {
         try {
             fieldName = fieldName.substring(0, 1).toLowerCase() + fieldName.substring(1);
             Field field = object.getClass().getDeclaredField(fieldName);
@@ -80,6 +85,30 @@ public class ShortMessageSendService {
         }
         return matchFeilds;
     }
+
+    /**
+     * 还原push所需得参数key
+     * @param pushParamsMap
+     * @return
+     */
+    public Map replacePushParamsMapKey(Map pushParamsMap) {
+        if (MapUtils.isNotEmpty(pushParamsMap)) {
+            Map map = Maps.newHashMap();
+            Set<String> msgDataFieldKey = pushParamsMap.keySet();
+            Iterator<String> iterable = msgDataFieldKey.iterator();
+            while (iterable.hasNext()) {
+                String fieldKey = iterable.next();
+                if (StringUtils.isNotBlank(PushParamsTypeEnum.getFeildName(fieldKey))) {
+                    map.put(fieldKey, map.get(fieldKey));
+                }
+            }
+            return map;
+        }
+        return null;
+    }
+
+
+
 
 
 }
