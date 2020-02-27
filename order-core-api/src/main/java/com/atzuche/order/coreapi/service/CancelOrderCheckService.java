@@ -139,8 +139,10 @@ public class CancelOrderCheckService {
     public void checkOrderCancelJudgeDuty(CancelOrderReqContext reqContext) {
         OrderStatusEntity orderStatusEntity = reqContext.getOrderStatusEntity();
         if(null != orderStatusEntity) {
-            if (null != orderStatusEntity.getStatus() && orderStatusEntity.getStatus() != OrderStatusEnum.CLOSED.getStatus()) {
-                throw new RefuseOrderCheckException(ErrorCode.ORDER_STATUS_NOT_ALLOWED);
+            if (null != orderStatusEntity.getStatus()) {
+                if(orderStatusEntity.getStatus() != OrderStatusEnum.CLOSED.getStatus() && orderStatusEntity.getStatus() != OrderStatusEnum.TO_DISPATCH.getStatus() ) {
+                    throw new RefuseOrderCheckException(ErrorCode.ORDER_STATUS_NOT_ALLOWED);
+                }
             }
 
             if(null != orderStatusEntity.getRentCarPayStatus() && orderStatusEntity.getRentCarPayStatus() != OrderConstant.YES) {

@@ -1,6 +1,7 @@
 package com.atzuche.order.coreapi.service;
 
 import com.alibaba.fastjson.JSON;
+import com.atzuche.order.commons.CatConstants;
 import com.atzuche.order.commons.LocalDateTimeUtils;
 import com.atzuche.order.commons.constant.OrderConstant;
 import com.atzuche.order.commons.entity.dto.OwnerGoodsDetailDTO;
@@ -38,9 +39,12 @@ import com.atzuche.order.renterorder.entity.OrderCouponEntity;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.atzuche.order.renterorder.service.OrderCouponService;
 import com.atzuche.order.renterorder.service.RenterOrderService;
+import com.atzuche.order.settle.service.OrderSettleService;
 import com.autoyol.car.api.model.dto.OwnerCancelDTO;
 import com.autoyol.event.rabbit.neworder.NewOrderMQActionEventEnum;
 import com.autoyol.event.rabbit.neworder.NewOrderMQStatusEventEnum;
+import com.dianping.cat.Cat;
+import com.dianping.cat.message.Transaction;
 import com.google.common.collect.Maps;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -103,6 +107,8 @@ public class CancelOrderService {
     private CancelOrderJudgeDutyService cancelOrderJudgeDutyService;
     @Autowired
     private OrderCancelReasonService orderCancelReasonService;
+    @Autowired
+    private OrderSettleService orderSettleService;
 
 
     /**
@@ -136,6 +142,25 @@ public class CancelOrderService {
         if (null != res) {
             cancelOrderJudgeDutyService.judgeDuty(res.getWrongdoer(), res.getIsDispatch(), cancelReqTime,
                     reqContext);
+            if(!res.getIsDispatch()) {
+                //通知结算计算凹凸币和钱包等
+                logger.info("取消订单责任判定后进行结算,orderNo:[{}]",cancelOrderReqDTO.getOrderNo());
+                Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "结算服务");
+                try{
+                    Cat.logEvent(CatConstants.FEIGN_METHOD,"orderSettleService.settleOrderCancel");
+                    Cat.logEvent(CatConstants.FEIGN_PARAM,cancelOrderReqDTO.getOrderNo());
+                    boolean result = orderSettleService.settleOrderCancel(cancelOrderReqDTO.getOrderNo());
+                    logger.info("取消订单责任判定后进行结算,result:[{}]",result);
+                    Cat.logEvent(CatConstants.FEIGN_RESULT,String.valueOf(result));
+                    t.setStatus(Transaction.SUCCESS);
+                } catch (Exception e){
+                    logger.error("取消订单责任判定后进行结算异常. order:[{}]", cancelOrderReqDTO.getOrderNo(), e);
+                    Cat.logError("取消订单责任判定后进行结算异常.order: "+cancelOrderReqDTO.getOrderNo(), e);
+                    t.setStatus(e);
+                } finally {
+                    t.complete();
+                }
+            }
         }
         //后续处理
         cancelSuccessHandle(cancelOrderReqVO.getOrderNo(), cancelOrderReqVO.getMemRole(), res);
@@ -199,6 +224,26 @@ public class CancelOrderService {
         cancelOrderJudgeDutyService.judgeDuty(Integer.valueOf(reqVO.getWrongdoer()), isDispatch, orderCancelReasonEntity.getCancelReqTime()
                 , reqContext);
 
+        if(!isDispatch) {
+            //通知结算计算凹凸币和钱包等
+            logger.info("手动责任判定后进行结算,orderNo:[{}]",cancelOrderReqDTO.getOrderNo());
+            Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "结算服务");
+            try{
+                Cat.logEvent(CatConstants.FEIGN_METHOD,"orderSettleService.settleOrderCancel");
+                Cat.logEvent(CatConstants.FEIGN_PARAM,cancelOrderReqDTO.getOrderNo());
+                boolean result = orderSettleService.settleOrderCancel(cancelOrderReqDTO.getOrderNo());
+                logger.info("手动责任判定后进行结算,result:[{}]",result);
+                Cat.logEvent(CatConstants.FEIGN_RESULT,String.valueOf(result));
+                t.setStatus(Transaction.SUCCESS);
+            } catch (Exception e){
+                logger.error("手动责任判定后进行结算异常. order:[{}]", cancelOrderReqDTO.getOrderNo(), e);
+                Cat.logError("手动责任判定后进行结算异常.order: "+cancelOrderReqDTO.getOrderNo(), e);
+                t.setStatus(e);
+            } finally {
+                t.complete();
+            }
+        }
+
     }
 
     /**
@@ -216,13 +261,17 @@ public class CancelOrderService {
                 //退还优惠券(平台券+送取服务券)
                 couponAndCoinHandleService.undoPlatformCoupon(orderNo);
                 couponAndCoinHandleService.undoGetCarFeeCoupon(orderNo);
-            }
-            //订单取消（租客取消、车主取消、平台取消）如果使用了车主券且未支付，则退回否则不处理
-            if (null != res.getIsDispatch() && !res.getIsDispatch()) {
-                //退还车主券
+
+                //订单取消（租客取消、车主取消、平台取消）如果使用了车主券且未支付，则退回否则不处理
                 int recover = null == res.getRentCarPayStatus() || res.getRentCarPayStatus() == 0 ?
                         OrderConstant.YES : OrderConstant.NO;
                 couponAndCoinHandleService.undoOwnerCoupon(orderNo, res.getOwnerCouponNo(), String.valueOf(recover));
+
+                //通知流程系统
+                CancelOrderDeliveryVO cancelOrderDeliveryVO = orderCommonConver.buildCancelOrderDeliveryVO(orderNo, res);
+                if (null != cancelOrderDeliveryVO) {
+                    deliveryCarService.cancelRenYunFlowOrderInfo(cancelOrderDeliveryVO);
+                }
             }
 
             //释放库存(trans_filter)
@@ -231,14 +280,6 @@ public class CancelOrderService {
                 //锁定car_filter
                 stockService.ownerCancelStock(buildOwnerCancelDTO(orderNo, res));
             }
-
-            //通知流程系统
-            CancelOrderDeliveryVO cancelOrderDeliveryVO = orderCommonConver.buildCancelOrderDeliveryVO(orderNo, res);
-            if (null != cancelOrderDeliveryVO) {
-                deliveryCarService.cancelRenYunFlowOrderInfo(cancelOrderDeliveryVO);
-            }
-
-
         }
     }
 

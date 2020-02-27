@@ -5,7 +5,10 @@ import com.atzuche.order.commons.entity.dto.CancelFineAmtDTO;
 import com.atzuche.order.commons.entity.dto.CostBaseDTO;
 import com.atzuche.order.commons.entity.dto.OwnerGoodsDetailDTO;
 import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
-import com.atzuche.order.commons.enums.*;
+import com.atzuche.order.commons.enums.CancelOrderDutyEnum;
+import com.atzuche.order.commons.enums.FineSubsidyCodeEnum;
+import com.atzuche.order.commons.enums.FineSubsidySourceCodeEnum;
+import com.atzuche.order.commons.enums.FineTypeEnum;
 import com.atzuche.order.coreapi.entity.CancelOrderReqContext;
 import com.atzuche.order.coreapi.entity.dto.CancelOrderReqDTO;
 import com.atzuche.order.ownercost.entity.ConsoleOwnerOrderFineDeatailEntity;
@@ -24,7 +27,6 @@ import com.atzuche.order.rentercost.entity.RenterOrderFineDeatailEntity;
 import com.atzuche.order.rentercost.service.ConsoleRenterOrderFineDeatailService;
 import com.atzuche.order.rentercost.service.RenterOrderFineDeatailService;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
-import com.atzuche.order.settle.service.OrderSettleService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,8 +57,6 @@ public class CancelOrderJudgeDutyService {
     private ConsoleRenterOrderFineDeatailService consoleRenterOrderFineDeatailService;
     @Autowired
     private OwnerOrderFineApplyService ownerOrderFineApplyService;
-    @Autowired
-    private OrderSettleService orderSettleService;
     @Autowired
     private OrderCancelReasonService orderCancelReasonService;
 
@@ -155,12 +155,6 @@ public class CancelOrderJudgeDutyService {
             record.setUpdateOp(cancelOrderReqDTO.getOperatorName());
             orderCancelReasonService.updateOrderCancelReasonRecord(record);
         }
-
-        if(!isDispatch) {
-            //通知结算计算凹凸币和钱包等
-            orderSettleService.settleOrderCancel(cancelOrderReqDTO.getOrderNo());
-        }
-
     }
 
 
