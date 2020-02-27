@@ -496,7 +496,7 @@ public class OrderDetailService {
             accountOwnerIncomeDetailDTOList.add(accountOwnerIncomeDetailDTO);
         });
         //车主租金
-        List<OwnerOrderPurchaseDetailEntity> ownerOrderPurchaseDetailList = ownerOrderPurchaseDetailService.listOwnerOrderPurchaseDetail(orderNo, ownerOrderNo);
+        List<OwnerOrderPurchaseDetailEntity> ownerOrderPurchaseDetailList = ownerOrderPurchaseDetailService.listOwnerOrderPurchaseDetail(orderNo, newOwnerMemNo);
         List<OwnerOrderPurchaseDetailDTO> ownerOrderPurchaseDetailDTOList = new ArrayList<>();
         ownerOrderPurchaseDetailList.stream().forEach(x->{
             OwnerOrderPurchaseDetailDTO ownerOrderPurchaseDetailDTO = new OwnerOrderPurchaseDetailDTO();
@@ -536,6 +536,15 @@ public class OrderDetailService {
             BeanUtils.copyProperties(ownerOrderCostEntity,ownerOrderCostDTO);
         }
 
+        //车主配送服务费（车主增值订单）
+        List<OwnerOrderIncrementDetailEntity> ownerOrderIncrementDetailEntities = ownerOrderIncrementDetailService.listOwnerOrderIncrementDetail(orderNo, newOwnerOrderNo);
+        List<OwnerOrderIncrementDetailDTO> ownerOrderIncrementDetailDTOS = new ArrayList<>();
+        ownerOrderIncrementDetailEntities.stream().forEach(x->{
+            OwnerOrderIncrementDetailDTO ownerOrderIncrementDetailDTO = new OwnerOrderIncrementDetailDTO();
+            BeanUtils.copyProperties(x,ownerOrderIncrementDetailDTO);
+            ownerOrderIncrementDetailDTOS.add(ownerOrderIncrementDetailDTO);
+        });
+
         //车主收益审核
         List<AccountOwnerIncomeExamineEntity> accountOwnerIncomeExamineEntities = accountOwnerIncomeExamineNoTService.selectByOwnerOrderNo(ownerOrderNo);
         List<AccountOwnerIncomeExamineDTO> accountOwnerIncomeExamineDTOS = new ArrayList<>();
@@ -558,6 +567,7 @@ public class OrderDetailService {
         ownerOrderDetailRespDTO.ownerOrderSubsidyDetailDTOS = ownerOrderSubsidyDetailDTOS;
         ownerOrderDetailRespDTO.ownerOrderCostDTO = ownerOrderCostDTO;
         ownerOrderDetailRespDTO.accountOwnerIncomeExamineDTOS = accountOwnerIncomeExamineDTOS;
+        ownerOrderDetailRespDTO.ownerOrderIncrementDetailDTOS = ownerOrderIncrementDetailDTOS;
         return ownerOrderDetailRespDTO;
     }
     private OrderHistoryRespDTO orderHistoryProxy(OrderHistoryReqDTO orderHistoryReqDTO) {
