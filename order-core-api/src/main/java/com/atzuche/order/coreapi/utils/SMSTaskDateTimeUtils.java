@@ -4,6 +4,8 @@ import com.atzuche.order.commons.DateUtils;
 import com.google.common.collect.Maps;
 import org.springframework.stereotype.Component;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.*;
 
 /**
@@ -20,10 +22,10 @@ public class SMSTaskDateTimeUtils {
      * @param hours
      * @return {minTime, maxTime}
      */
-    public static Map<String, Date> getLimitTimeBeforeHours(int hours) {
+    public static Map<String, Date> getLimitTimeBeforeHours(double hours) {
         Calendar calendar = new GregorianCalendar();
         System.out.println(DateUtils.formate(calendar.getTime(), DateUtils.DATE_DEFAUTE1));
-        calendar.add(Calendar.MINUTE, (hours * 60 - 5));
+        calendar.add(Calendar.MINUTE, (Double.valueOf(hours * 60).intValue() - 5));
         Date minTime = calendar.getTime();
         calendar.add(Calendar.MINUTE, 15);
         Date maxTime = calendar.getTime();
@@ -31,5 +33,34 @@ public class SMSTaskDateTimeUtils {
         map.put("minTime", minTime);
         map.put("maxTime", maxTime);
         return map;
+    }
+
+    public static Boolean isArriveRentTime(Date rentTime,double hours)
+    {
+        boolean result = false;
+        Map<String, Date> dateMap = getLimitTimeBeforeHours(hours);
+        long minTime = 0L;
+        long maxTime = 0L;
+        if (dateMap.containsKey("minTime")) {
+            minTime = (dateMap.get("minTime")).getTime();
+        }
+        if (dateMap.containsKey("maxTime")) {
+            maxTime = (dateMap.get("maxTime")).getTime();
+        }
+        if (rentTime.getTime() > minTime && rentTime.getTime() < maxTime) {
+            result = true;
+            return result;
+        }
+        return result;
+    }
+
+    public static long getDateLatterCompareNowScoend(LocalDateTime time, int num){
+        LocalDateTime timeLatter = time.plusMinutes(num);
+        LocalDateTime now = LocalDateTime.now();
+        if(timeLatter.isAfter(now)){
+            return 0;
+        }
+        Duration duration = Duration.between(timeLatter,now);
+        return duration.toMinutes();
     }
 }

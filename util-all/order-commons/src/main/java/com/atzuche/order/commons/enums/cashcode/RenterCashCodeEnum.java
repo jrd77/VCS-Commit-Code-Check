@@ -66,9 +66,9 @@ public enum RenterCashCodeEnum {
 	//	第三区域块 看第4位，从3开始。  后4位从0001开始
     ACCOUNT_WALLET_COST("11130001","个人钱包"),
     CASHIER_RENTER_COST("11130002","租车费用"),
-    SETTLE_DEPOSIT_TO_RENT_COST("11130003","车俩押金转租车费用"),
+    SETTLE_DEPOSIT_TO_RENT_COST("11130003","车辆押金转租车费用"),
     SETTLE_RENT_COST_TO_HISTORY_AMT("11130004","租车费用转历史欠款"),
-    SETTLE_DEPOSIT_TO_HISTORY_AMT("11130005","车俩押金转历史欠款"),
+    SETTLE_DEPOSIT_TO_HISTORY_AMT("11130005","车辆押金转历史欠款"),
     SETTLE_RENT_COST_TO_RETURN_AMT("11130006","结算租车费用退还"),
     SETTLE_RENT_DEPOSIT_TO_RETURN_AMT("11130007","结算租车押金退还"),
     SETTLE_WZ_DEPOSIT_TO_RETURN_AMT("11130008","结算违章押金退还"),
@@ -86,7 +86,7 @@ public enum RenterCashCodeEnum {
     ///// 暂扣的考虑以下的费用编码。
     ACCOUNT_RENTER_RENT_COST("11130019","租车费用"),
     ACCOUNT_RENTER_WZ_DEPOSIT("11130020","违章押金"),
-    ACCOUNT_RENTER_DEPOSIT("11130021","车俩押金"),
+    ACCOUNT_RENTER_DEPOSIT("11130021","车辆押金"),
     SETTLE_RENT_WALLET_TO_HISTORY_AMT("11130022","租车钱包费用转历史欠款"),
     SETTLE_WZ_TO_HISTORY_AMT("11130023","违章押金转历史欠款"),
 

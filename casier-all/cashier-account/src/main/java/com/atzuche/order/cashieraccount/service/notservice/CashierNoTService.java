@@ -322,9 +322,10 @@ public class CashierNoTService {
      * 构造参数 PayVo (押金、违章押金)
      * @param cashierEntity
      * @param orderPaySign
+     * @param freeDepositType  免押方式(1:绑卡减免,2:芝麻减免,3:消费) 
      * @return
      */
-    public PayVo getPayVO(CashierEntity cashierEntity,OrderPaySignReqVO orderPaySign,int amt ,String title,String payKind,String payIdStr ,String extendParams) {
+    public PayVo getPayVO(CashierEntity cashierEntity,OrderPaySignReqVO orderPaySign,int amt ,String title,String payKind,String payIdStr ,String extendParams,int freeDepositType) {
         PayVo vo = new PayVo();
         Integer paySn = (Objects.isNull(cashierEntity)|| Objects.isNull(cashierEntity.getPaySn()))?0:cashierEntity.getPaySn();
         vo.setInternalNo("1");
@@ -341,7 +342,11 @@ public class CashierNoTService {
         vo.setPaySn(String.valueOf(paySn));
         vo.setPaySource(orderPaySign.getPaySource());
         vo.setPayTitle(title);
-        vo.setPayType(orderPaySign.getPayType());
+        if(freeDepositType == 2) {
+        	vo.setPayType(DataPayTypeConstant.PAY_PRE); //预授权的方式。
+        }else {
+        	vo.setPayType(orderPaySign.getPayType());
+        }
         vo.setReqIp(IpUtil.getLocalIp());
         vo.setAtpaySign(StringUtils.EMPTY);
         return vo;

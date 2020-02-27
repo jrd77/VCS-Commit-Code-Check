@@ -439,6 +439,38 @@ public class OrderDetailService {
 
         OrderDTO orderDTO = new OrderDTO();
         BeanUtils.copyProperties(orderEntity,orderDTO);
+
+
+        //订单状态
+        OrderStatusEntity orderStatusEntity = orderStatusService.getByOrderNo(orderNo);
+        OrderStatusDTO orderStatusDTO = null;
+        if(orderStatusEntity != null){
+            orderStatusDTO = new OrderStatusDTO();
+            BeanUtils.copyProperties(orderStatusEntity,orderStatusDTO);
+        }
+        //统计信息
+        OrderSourceStatEntity orderSourceStatEntity = orderSourceStatService.selectByOrderNo(orderNo);
+        OrderSourceStatDTO orderSourceStatDTO = new OrderSourceStatDTO();
+        if(orderSourceStatEntity != null){
+            orderSourceStatDTO = new OrderSourceStatDTO();
+            BeanUtils.copyProperties(orderSourceStatEntity,orderSourceStatDTO);
+        }
+        //租客订单
+
+        com.atzuche.order.commons.entity.orderDetailDto.RenterMemberDTO renterMember = null;
+        RenterOrderEntity renterOrderEntity = renterOrderService.getRenterOrderByOrderNoAndIsEffective(orderNo);
+        RenterOrderDTO renterOrderDTO = null;
+        if(renterOrderEntity != null){
+            //renterOrderDTO = new RenterOrderDTO();
+            //BeanUtils.copyProperties(renterOrderEntity,renterOrderDTO);
+            //会员
+            RenterMemberDTO renterMemberDTO = renterMemberService.selectrenterMemberByRenterOrderNo(renterOrderEntity.getRenterOrderNo(), false);
+            renterMember = new com.atzuche.order.commons.entity.orderDetailDto.RenterMemberDTO();
+            BeanUtils.copyProperties(renterMemberDTO,renterMember);
+        }
+
+
+
         //车主订单
         String newOwnerOrderNo = ownerOrderNo;
         String newOwnerMemNo = ownerMemNo;
@@ -496,7 +528,7 @@ public class OrderDetailService {
             accountOwnerIncomeDetailDTOList.add(accountOwnerIncomeDetailDTO);
         });
         //车主租金
-        List<OwnerOrderPurchaseDetailEntity> ownerOrderPurchaseDetailList = ownerOrderPurchaseDetailService.listOwnerOrderPurchaseDetail(orderNo, ownerOrderNo);
+        List<OwnerOrderPurchaseDetailEntity> ownerOrderPurchaseDetailList = ownerOrderPurchaseDetailService.listOwnerOrderPurchaseDetail(orderNo, newOwnerMemNo);
         List<OwnerOrderPurchaseDetailDTO> ownerOrderPurchaseDetailDTOList = new ArrayList<>();
         ownerOrderPurchaseDetailList.stream().forEach(x->{
             OwnerOrderPurchaseDetailDTO ownerOrderPurchaseDetailDTO = new OwnerOrderPurchaseDetailDTO();
@@ -536,6 +568,15 @@ public class OrderDetailService {
             BeanUtils.copyProperties(ownerOrderCostEntity,ownerOrderCostDTO);
         }
 
+        //车主配送服务费（车主增值订单）
+        List<OwnerOrderIncrementDetailEntity> ownerOrderIncrementDetailEntities = ownerOrderIncrementDetailService.listOwnerOrderIncrementDetail(orderNo, newOwnerOrderNo);
+        List<OwnerOrderIncrementDetailDTO> ownerOrderIncrementDetailDTOS = new ArrayList<>();
+        ownerOrderIncrementDetailEntities.stream().forEach(x->{
+            OwnerOrderIncrementDetailDTO ownerOrderIncrementDetailDTO = new OwnerOrderIncrementDetailDTO();
+            BeanUtils.copyProperties(x,ownerOrderIncrementDetailDTO);
+            ownerOrderIncrementDetailDTOS.add(ownerOrderIncrementDetailDTO);
+        });
+
         //车主收益审核
         List<AccountOwnerIncomeExamineEntity> accountOwnerIncomeExamineEntities = accountOwnerIncomeExamineNoTService.selectByOwnerOrderNo(ownerOrderNo);
         List<AccountOwnerIncomeExamineDTO> accountOwnerIncomeExamineDTOS = new ArrayList<>();
@@ -544,8 +585,13 @@ public class OrderDetailService {
             BeanUtils.copyProperties(x,accountOwnerIncomeExamineDTO);
             accountOwnerIncomeExamineDTOS.add(accountOwnerIncomeExamineDTO);
         });
+
+
         OwnerOrderDetailRespDTO ownerOrderDetailRespDTO = new OwnerOrderDetailRespDTO();
         ownerOrderDetailRespDTO.order = orderDTO;
+        ownerOrderDetailRespDTO.orderStatus = orderStatusDTO;
+        ownerOrderDetailRespDTO.orderSourceStat = orderSourceStatDTO;
+        ownerOrderDetailRespDTO.renterMemberDTO = renterMember;
         ownerOrderDetailRespDTO.ownerOrder = ownerOrderDTO;
         ownerOrderDetailRespDTO.ownerGoods = ownerGoodsDTO;
         ownerOrderDetailRespDTO.ownerMember = ownerMember;
@@ -558,6 +604,7 @@ public class OrderDetailService {
         ownerOrderDetailRespDTO.ownerOrderSubsidyDetailDTOS = ownerOrderSubsidyDetailDTOS;
         ownerOrderDetailRespDTO.ownerOrderCostDTO = ownerOrderCostDTO;
         ownerOrderDetailRespDTO.accountOwnerIncomeExamineDTOS = accountOwnerIncomeExamineDTOS;
+        ownerOrderDetailRespDTO.ownerOrderIncrementDetailDTOS = ownerOrderIncrementDetailDTOS;
         return ownerOrderDetailRespDTO;
     }
     private OrderHistoryRespDTO orderHistoryProxy(OrderHistoryReqDTO orderHistoryReqDTO) {
