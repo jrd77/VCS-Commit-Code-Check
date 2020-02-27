@@ -112,7 +112,7 @@ public class RenterOrderCalCostService {
         //获取平台保障费
         RenterOrderCostDetailEntity insurAmtEntity = renterOrderCostCombineService.getInsurAmtEntity(renterOrderCostReqDTO.getInsurAmtDTO());
         List<RenterOrderSubsidyDetailDTO> insurAmtSubSidy = subsidyOutGroup.get(RenterCashCodeEnum.INSURE_TOTAL_PRICES.getCashNo());
-        int insurAmtSubSidyAmt = insurAmtSubSidy == null ? 0 : insurAmtSubSidy.get(0).getSubsidyAmount();
+        int insurAmtSubSidyAmt = insurAmtSubSidy == null ? 0 : insurAmtSubSidy.stream().collect(Collectors.summingInt(RenterOrderSubsidyDetailDTO::getSubsidyAmount));
         int insurAmt = insurAmtEntity.getTotalAmount();
         insurAmt = insurAmt + insurAmtSubSidyAmt;
         renterOrderCostRespDTO.setBasicEnsureAmount(insurAmt);
@@ -125,7 +125,7 @@ public class RenterOrderCalCostService {
         //获取全面保障费
         List<RenterOrderCostDetailEntity> comprehensiveEnsureList = renterOrderCostCombineService.listAbatementAmtEntity(renterOrderCostReqDTO.getAbatementAmtDTO());
         List<RenterOrderSubsidyDetailDTO> comprehensiveEnsureSubsidy = subsidyOutGroup.get(RenterCashCodeEnum.ABATEMENT_INSURE.getCashNo());
-        int comprehensiveEnsureSubsidyAmount = comprehensiveEnsureSubsidy == null ? 0 : comprehensiveEnsureSubsidy.get(0).getSubsidyAmount();
+        int comprehensiveEnsureSubsidyAmount = comprehensiveEnsureSubsidy == null ? 0 : comprehensiveEnsureSubsidy.stream().collect(Collectors.summingInt(RenterOrderSubsidyDetailDTO::getSubsidyAmount));
         int comprehensiveEnsureAmount = comprehensiveEnsureList.stream().collect(Collectors.summingInt(RenterOrderCostDetailEntity::getTotalAmount));
         comprehensiveEnsureAmount = comprehensiveEnsureAmount + comprehensiveEnsureSubsidyAmount;
         renterOrderCostRespDTO.setComprehensiveEnsureAmount(comprehensiveEnsureAmount);

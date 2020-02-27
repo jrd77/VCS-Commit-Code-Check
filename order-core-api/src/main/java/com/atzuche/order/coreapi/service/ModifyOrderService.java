@@ -122,6 +122,8 @@ public class ModifyOrderService {
 	private ModifyOrderRiskService modifyOrderRiskService;
 	@Autowired
 	private ModifyOrderRabbitMQService modifyOrderRabbitMQService;
+	@Autowired
+	private InsurAbamentDiscountService insurAbamentDiscountService;
 	/**
 	 * 修改订单主逻辑（含换车）
 	 * @param modifyOrderReq
@@ -260,7 +262,7 @@ public class ModifyOrderService {
 		if (modifyOrderDTO.getTransferFlag() != null && modifyOrderDTO.getTransferFlag() && 
 				supplementAmt != null && supplementAmt > 0) {
 			// 如果是换车操作计算升级车辆补贴
-        	RenterOrderSubsidyDetailDTO subsidyDetail = convertToRenterOrderSubsidyDetailDTO(costBaseDTO, supplementAmt, SubsidyTypeCodeEnum.RENT_COST_AMT, 
+        	RenterOrderSubsidyDetailDTO subsidyDetail = insurAbamentDiscountService.convertToRenterOrderSubsidyDetailDTO(costBaseDTO, supplementAmt, SubsidyTypeCodeEnum.RENT_COST_AMT, 
         			SubsidySourceCodeEnum.PLATFORM, SubsidySourceCodeEnum.RENTER, RenterCashCodeEnum.DISPATCHING_AMT, "换车补贴");
         	OrderConsoleSubsidyDetailEntity consoleSubsidy = new OrderConsoleSubsidyDetailEntity();
         	BeanUtils.copyProperties(subsidyDetail, consoleSubsidy);
@@ -793,8 +795,13 @@ public class ModifyOrderService {
 	public RenterOrderCostRespDTO getRenterOrderCostRespDTO(ModifyOrderDTO modifyOrderDTO, RenterOrderReqVO renterOrderReqVO, List<RenterOrderCostDetailEntity> initCostList, List<RenterOrderSubsidyDetailEntity> initSubsidyList) {
 		// 构建参数
 		RenterOrderCostReqDTO renterOrderCostReqDTO = renterOrderService.buildRenterOrderCostReqDTO(renterOrderReqVO);
+		// 获取平台保障费和全面保障费折扣补贴
+		List<RenterOrderSubsidyDetailDTO> insurDiscountSubsidyList = insurAbamentDiscountService.getInsureDiscountSubsidy(renterOrderCostReqDTO, modifyOrderDTO.getRenterSubsidyList());
 		// 获取费用补贴列表
-		List<RenterOrderSubsidyDetailDTO> subsidyList = getRenterSubsidyList(modifyOrderDTO, renterOrderCostReqDTO, modifyOrderDTO.getRenterSubsidyList(), initCostList, initSubsidyList);
+		List<RenterOrderSubsidyDetailDTO> subsidyList = getRenterSubsidyList(modifyOrderDTO, renterOrderCostReqDTO, modifyOrderDTO.getRenterSubsidyList(), initCostList, initSubsidyList, insurDiscountSubsidyList);
+		if (insurDiscountSubsidyList != null && !insurDiscountSubsidyList.isEmpty()) {
+			subsidyList.addAll(insurDiscountSubsidyList);
+		}
 		renterOrderCostReqDTO.setSubsidyOutList(subsidyList);
 		// 获取计算好的费用信息
 		RenterOrderCostRespDTO renterOrderCostRespDTO = renterOrderCalCostService.calcBasicRenterOrderCostAndDeailList(renterOrderCostReqDTO);
@@ -804,6 +811,7 @@ public class ModifyOrderService {
 		return renterOrderCostRespDTO;
 	}
 	
+	
 	/**
 	 * 获取费用补贴列表
 	 * @param renterOrderCostReqDTO
@@ -812,12 +820,12 @@ public class ModifyOrderService {
 	 * @param initSubsidyList
 	 * @return List<RenterOrderSubsidyDetailDTO>
 	 */
-	public List<RenterOrderSubsidyDetailDTO> getRenterSubsidyList(ModifyOrderDTO modifyOrderDTO, RenterOrderCostReqDTO renterOrderCostReqDTO, List<RenterOrderSubsidyDetailDTO> renterSubsidyList, List<RenterOrderCostDetailEntity> initCostList, List<RenterOrderSubsidyDetailEntity> initSubsidyList) {
-		if (modifyOrderDTO == null) {
-			return null;
-		}
+	public List<RenterOrderSubsidyDetailDTO> getRenterSubsidyList(ModifyOrderDTO modifyOrderDTO, RenterOrderCostReqDTO renterOrderCostReqDTO, List<RenterOrderSubsidyDetailDTO> renterSubsidyList, List<RenterOrderCostDetailEntity> initCostList, List<RenterOrderSubsidyDetailEntity> initSubsidyList, List<RenterOrderSubsidyDetailDTO> insurDiscountSubsidyList) {
 		if (renterSubsidyList == null) {
 			renterSubsidyList = new ArrayList<RenterOrderSubsidyDetailDTO>();
+		}
+		if (modifyOrderDTO == null) {
+			return renterSubsidyList;
 		}
 		if (modifyOrderDTO.getTransferFlag() != null && modifyOrderDTO.getTransferFlag()) {
 			// 换车操作
@@ -836,6 +844,9 @@ public class ModifyOrderService {
 			//获取平台保障费
 	        RenterOrderCostDetailEntity insurAmtEntity = renterOrderCostCombineService.getInsurAmtEntity(renterOrderCostReqDTO.getInsurAmtDTO());
 	        Integer insurAmt = insurAmtEntity.getTotalAmount();
+	        if (insurDiscountSubsidyList != null) {
+	        	insurAmt += insurDiscountSubsidyList.stream().filter(cost -> {return RenterCashCodeEnum.INSURE_TOTAL_PRICES.getCashNo().equals(cost.getSubsidyCostCode());}).mapToInt(RenterOrderSubsidyDetailDTO::getSubsidyAmount).sum();
+	        }
 	        // 修改前平台保障费
 	        Integer initInsurAmt = 0;
 	        if (initCostList != null && !initCostList.isEmpty()) {
@@ -847,7 +858,7 @@ public class ModifyOrderService {
 	        if (insurAmt != null && initInsurAmt != null && Math.abs(initInsurAmt) > Math.abs(insurAmt)) {
 	        	Integer subsidyAmount = Math.abs(insurAmt) - Math.abs(initInsurAmt);
 	        	// 产生补贴
-	        	RenterOrderSubsidyDetailDTO subsidyDetail = convertToRenterOrderSubsidyDetailDTO(renterOrderCostReqDTO.getCostBaseDTO(), subsidyAmount, SubsidyTypeCodeEnum.INSURE_AMT, 
+	        	RenterOrderSubsidyDetailDTO subsidyDetail = insurAbamentDiscountService.convertToRenterOrderSubsidyDetailDTO(renterOrderCostReqDTO.getCostBaseDTO(), subsidyAmount, SubsidyTypeCodeEnum.INSURE_AMT, 
 	        			SubsidySourceCodeEnum.RENTER, SubsidySourceCodeEnum.PLATFORM, RenterCashCodeEnum.INSURE_TOTAL_PRICES, "修改订单平台保障费不退还");
 	        	renterSubsidyList.add(subsidyDetail);
 	        }
@@ -856,6 +867,9 @@ public class ModifyOrderService {
 			//获取全面保障费
 	        List<RenterOrderCostDetailEntity> comprehensiveEnsureList = renterOrderCostCombineService.listAbatementAmtEntity(renterOrderCostReqDTO.getAbatementAmtDTO());
 	        Integer comprehensiveEnsureAmount = comprehensiveEnsureList.stream().collect(Collectors.summingInt(RenterOrderCostDetailEntity::getTotalAmount));
+	        if (insurDiscountSubsidyList != null) {
+	        	comprehensiveEnsureAmount += insurDiscountSubsidyList.stream().filter(cost -> {return RenterCashCodeEnum.ABATEMENT_INSURE.getCashNo().equals(cost.getSubsidyCostCode());}).mapToInt(RenterOrderSubsidyDetailDTO::getSubsidyAmount).sum();
+	        }
 	        // 修改前全面保障费
 	        Integer initAbatementAmt = 0;
 	        if (initCostList != null && !initCostList.isEmpty()) {
@@ -867,7 +881,7 @@ public class ModifyOrderService {
 	        if (comprehensiveEnsureAmount != null && initAbatementAmt != null && Math.abs(initAbatementAmt) > Math.abs(comprehensiveEnsureAmount)) {
 	        	Integer subsidyAmount = Math.abs(comprehensiveEnsureAmount) - Math.abs(initAbatementAmt);
 	        	// 产生补贴
-	        	RenterOrderSubsidyDetailDTO subsidyDetail = convertToRenterOrderSubsidyDetailDTO(renterOrderCostReqDTO.getCostBaseDTO(), subsidyAmount, SubsidyTypeCodeEnum.ABATEMENT_INSURE, 
+	        	RenterOrderSubsidyDetailDTO subsidyDetail = insurAbamentDiscountService.convertToRenterOrderSubsidyDetailDTO(renterOrderCostReqDTO.getCostBaseDTO(), subsidyAmount, SubsidyTypeCodeEnum.ABATEMENT_INSURE, 
 	        			SubsidySourceCodeEnum.RENTER, SubsidySourceCodeEnum.PLATFORM, RenterCashCodeEnum.ABATEMENT_INSURE, "修改订单全面保障费不退还");
 	        	renterSubsidyList.add(subsidyDetail);
 	        }
@@ -898,7 +912,7 @@ public class ModifyOrderService {
         if (rentAmt != null && initRentAmt != null && Math.abs(initRentAmt) < Math.abs(rentAmt)) {
         	Integer subsidyAmount = Math.abs(rentAmt) - Math.abs(initRentAmt);
         	// 产生补贴
-        	RenterOrderSubsidyDetailDTO subsidyDetail = convertToRenterOrderSubsidyDetailDTO(renterOrderCostReqDTO.getCostBaseDTO(), subsidyAmount, SubsidyTypeCodeEnum.RENT_AMT, 
+        	RenterOrderSubsidyDetailDTO subsidyDetail = insurAbamentDiscountService.convertToRenterOrderSubsidyDetailDTO(renterOrderCostReqDTO.getCostBaseDTO(), subsidyAmount, SubsidyTypeCodeEnum.RENT_AMT, 
         			SubsidySourceCodeEnum.PLATFORM, SubsidySourceCodeEnum.RENTER, RenterCashCodeEnum.RENT_AMT, "换车补贴");
         	renterSubsidyList.add(subsidyDetail);
         }
@@ -916,7 +930,7 @@ public class ModifyOrderService {
         if (insurAmt != null && initInsurAmt != null && Math.abs(initInsurAmt) < Math.abs(insurAmt)) {
         	Integer subsidyAmount = Math.abs(insurAmt) - Math.abs(initInsurAmt);
         	// 产生补贴
-        	RenterOrderSubsidyDetailDTO subsidyDetail = convertToRenterOrderSubsidyDetailDTO(renterOrderCostReqDTO.getCostBaseDTO(), subsidyAmount, SubsidyTypeCodeEnum.INSURE_AMT, 
+        	RenterOrderSubsidyDetailDTO subsidyDetail = insurAbamentDiscountService.convertToRenterOrderSubsidyDetailDTO(renterOrderCostReqDTO.getCostBaseDTO(), subsidyAmount, SubsidyTypeCodeEnum.INSURE_AMT, 
         			SubsidySourceCodeEnum.PLATFORM, SubsidySourceCodeEnum.RENTER, RenterCashCodeEnum.INSURE_TOTAL_PRICES, "换车补贴");
         	renterSubsidyList.add(subsidyDetail);
         }
@@ -935,42 +949,12 @@ public class ModifyOrderService {
         if (comprehensiveEnsureAmount != null && initAbatementAmt != null && Math.abs(initAbatementAmt) < Math.abs(comprehensiveEnsureAmount)) {
         	Integer subsidyAmount = Math.abs(comprehensiveEnsureAmount) - Math.abs(initAbatementAmt);
         	// 产生补贴
-        	RenterOrderSubsidyDetailDTO subsidyDetail = convertToRenterOrderSubsidyDetailDTO(renterOrderCostReqDTO.getCostBaseDTO(), subsidyAmount, SubsidyTypeCodeEnum.ABATEMENT_INSURE, 
+        	RenterOrderSubsidyDetailDTO subsidyDetail = insurAbamentDiscountService.convertToRenterOrderSubsidyDetailDTO(renterOrderCostReqDTO.getCostBaseDTO(), subsidyAmount, SubsidyTypeCodeEnum.ABATEMENT_INSURE, 
         			SubsidySourceCodeEnum.PLATFORM, SubsidySourceCodeEnum.RENTER, RenterCashCodeEnum.ABATEMENT_INSURE, "换车补贴");
         	renterSubsidyList.add(subsidyDetail);
         }
         
         return renterSubsidyList;
-	}
-	
-	
-	/**
-	 * 封装费用补贴对象
-	 * @param costBaseDTO
-	 * @param subsidyAmount
-	 * @param type
-	 * @param source
-	 * @param targe
-	 * @param cash
-	 * @param subsidyDesc
-	 * @return RenterOrderSubsidyDetailDTO
-	 */
-	public RenterOrderSubsidyDetailDTO convertToRenterOrderSubsidyDetailDTO(CostBaseDTO costBaseDTO, Integer subsidyAmount, SubsidyTypeCodeEnum type, SubsidySourceCodeEnum source, SubsidySourceCodeEnum targe, RenterCashCodeEnum cash, String subsidyDesc) {
-		RenterOrderSubsidyDetailDTO subd = new RenterOrderSubsidyDetailDTO();
-		subd.setMemNo(costBaseDTO.getMemNo());
-		subd.setOrderNo(costBaseDTO.getOrderNo());
-		subd.setRenterOrderNo(costBaseDTO.getRenterOrderNo());
-		subd.setSubsidyAmount(subsidyAmount);
-		subd.setSubsidyCostCode(cash.getCashNo());
-		subd.setSubsidyCostName(cash.getTxt());
-		subd.setSubsidyDesc(subsidyDesc);
-		subd.setSubsidySourceCode(source.getCode());
-		subd.setSubsidySourceName(source.getDesc());
-		subd.setSubsidyTargetCode(targe.getCode());
-		subd.setSubsidyTargetName(targe.getDesc());
-		subd.setSubsidyTypeCode(type.getCode());
-		subd.setSubsidyTypeName(type.getDesc());
-		return subd;
 	}
 	
 	

@@ -27,11 +27,13 @@ import com.atzuche.order.parentorder.entity.OrderEntity;
 import com.atzuche.order.parentorder.service.OrderService;
 import com.atzuche.order.rentercommodity.service.RenterCommodityService;
 import com.atzuche.order.rentercost.entity.RenterOrderCostDetailEntity;
+import com.atzuche.order.rentercost.entity.dto.RenterOrderSubsidyDetailDTO;
 import com.atzuche.order.rentercost.service.RenterOrderCostDetailService;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.atzuche.order.renterorder.entity.dto.DeductContextDTO;
 import com.atzuche.order.renterorder.entity.dto.RenterOrderCostReqDTO;
 import com.atzuche.order.renterorder.entity.dto.RenterOrderCostRespDTO;
+import com.atzuche.order.renterorder.service.InsurAbamentDiscountService;
 import com.atzuche.order.renterorder.service.RenterOrderCalCostService;
 import com.atzuche.order.renterorder.service.RenterOrderCostHandleService;
 import com.atzuche.order.renterorder.service.RenterOrderService;
@@ -94,6 +96,8 @@ public class SubmitOrderBeforeCostCalService {
     private RenterOrderCostDetailService renterOrderCostDetailService;
     @Autowired
     private CouponAndCoinHandleService couponAndCoinHandleService;
+    @Autowired
+    private InsurAbamentDiscountService insurAbamentDiscountService;
 
 
 
@@ -131,7 +135,10 @@ public class SubmitOrderBeforeCostCalService {
                 carRentTimeRangeResVO);
         RenterOrderCostReqDTO renterOrderCostReqDTO =
                 renterOrderService.buildRenterOrderCostReqDTO(renterOrderReqVO);
-        RenterOrderCostRespDTO renterOrderCostRespDTO =
+        // 获取平台保障费和全面保障费折扣补贴
+ 		List<RenterOrderSubsidyDetailDTO> insurDiscountSubsidyList = insurAbamentDiscountService.getInsureDiscountSubsidy(renterOrderCostReqDTO, null);
+ 		renterOrderCostReqDTO.setSubsidyOutList(insurDiscountSubsidyList);
+ 		RenterOrderCostRespDTO renterOrderCostRespDTO =
                 renterOrderCalCostService.calcBasicRenterOrderCostAndDeailList(renterOrderCostReqDTO);
 
         //抵扣公共信息抽取
@@ -170,7 +177,7 @@ public class SubmitOrderBeforeCostCalService {
 
         //返回信息处理
         NormalOrderCostCalculateResVO res = new NormalOrderCostCalculateResVO();
-        res.setCostItemList(orderCommonConver.buildCostItemList(renterOrderCostRespDTO));
+        res.setCostItemList(orderCommonConver.buildCostItemList(renterOrderCostRespDTO, renterOrderReqVO));
         res.setTotalCost(orderCommonConver.buildTotalCostVO(res.getCostItemList()));
         res.setDeposit(orderCommonConver.buildDepositAmtVO(renterOrderCarDepositResVO));
         res.setIllegalDeposit(orderCommonConver.buildIllegalDepositVO(renterOrderIllegalResVO));
