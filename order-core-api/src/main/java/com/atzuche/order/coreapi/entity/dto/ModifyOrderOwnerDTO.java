@@ -96,4 +96,9 @@ public class ModifyOrderOwnerDTO {
      */
     private List<RenterOrderDeliveryEntity> deliveryList;
     
+    /**
+     * 是否扫码还车的修改还车时间
+     */
+    private Boolean scanCodeFlag;
+    
 }

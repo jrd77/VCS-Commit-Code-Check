@@ -51,7 +51,7 @@ public class OwnerIncomeController {
         Assert.notNull(orderNo,"主单号不能为空");
         Assert.notNull(memNo,"主单号不能为空");
         AccountOwnerIncomeRealResVO resVO = cashierQueryService.getOwnerRealIncomeByOrder(orderNo,memNo);
-        log.info("OwnerIncomeController getOrderPayableAmount end param [{}],result [{}]",orderNo,GsonUtils.toJson(resVO));
+        log.info("OwnerIncomeController getOwnerIncomeByOrder end param [{}],result [{}]",orderNo,GsonUtils.toJson(resVO));
         return ResponseData.success(resVO);
     }
     @AutoDocMethod(value = "调账成功车主收益接口", description = "调账成功车主收益接口")

@@ -2,6 +2,7 @@ package com.atzuche.order.delivery.service.delivery;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.atzuche.order.commons.CatConstants;
 import com.atzuche.order.delivery.common.DeliveryConstants;
 import com.atzuche.order.delivery.common.DeliveryErrorCode;
 import com.atzuche.order.delivery.config.RestTemplateConfig;
@@ -11,7 +12,6 @@ import com.atzuche.order.delivery.utils.DeliveryLogUtil;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
 import com.dianping.cat.Cat;
-import com.dianping.cat.CatConstants;
 import com.dianping.cat.message.Event;
 import com.dianping.cat.message.Transaction;
 import lombok.extern.slf4j.Slf4j;
@@ -47,7 +47,7 @@ public class RetryDeliveryCarService {
      *
      * @return
      */
-    @Retryable(value = DeliveryOrderException.class, backoff = @Backoff(delay = 1000L, multiplier = 1))
+    @Retryable(value = Exception.class, backoff = @Backoff(delay = 1000L, multiplier = 1))
     public String sendHttpToRenYun(String url, String object, Integer requestCode) {
         ResponseData responseData;
         DeliveryHttpLogEntity deliveryHttpLogEntity = new DeliveryHttpLogEntity();
@@ -58,17 +58,16 @@ public class RetryDeliveryCarService {
         deliveryHttpLogEntity.setRequestMethodType(HttpMethod.POST.ordinal());
         deliveryHttpLogEntity.setSendTime(LocalDateTime.now());
         deliveryHttpLogEntity.setUpdateTime(LocalDateTime.now());
-        Transaction t = Cat.newTransaction(CatConstants.TYPE_URL, DeliveryConstants.REQUEST_REN_YUN_TYPE_PREFIX);
+        Transaction t = Cat.newTransaction(CatConstants.URL_CALL, "取送车服务通知");
         try {
-            Cat.logEvent(DeliveryConstants.REQUEST_REN_YUN_TYPE_PREFIX + requestCode + ":order:param", "requestParam",
-                    Event.SUCCESS, "params=" + object + "...");
-            Cat.logMetricForCount(DeliveryConstants.REQUEST_REN_YUN_TYPE_PREFIX);
+            Cat.logEvent(CatConstants.URL_PARAM,"url="+url+","+JSON.toJSONString(object));
             HttpHeaders httpHeaders = new HttpHeaders();
             httpHeaders.set("Content-Type",MediaType.APPLICATION_FORM_URLENCODED_VALUE);
             httpHeaders.set("user-agent", DeliveryConstants.USER_AGENT_OPERATECENTER);
             HttpEntity httpEntity = new HttpEntity(httpHeaders);
             log.info("参数params：{}",object);
             String responseStr = restTemplateConfig.restTemplate().postForObject(url+"?"+object, httpEntity, String.class);
+            Cat.logEvent(CatConstants.URL_RESULT,responseStr);
             responseData =  JSONObject.parseObject(responseStr,ResponseData.class);
             if (ErrorCode.SUCCESS.getCode().equals(responseData.getResCode())) {
                 deliveryHttpLogEntity.setReturnStatusCode(ErrorCode.SUCCESS.getCode());
@@ -77,6 +76,7 @@ public class RetryDeliveryCarService {
                 deliveryHttpLogEntity.setReturnTime(LocalDateTime.now());
                 deliveryLogUtil.addDeliveryLog(deliveryHttpLogEntity);
                 log.info("请求仁云成功，各参数返回值,url:{},params:{},result:{}", url, JSON.toJSONString(object), JSON.toJSONString(responseData));
+                t.setStatus(Transaction.SUCCESS);
                 return JSONObject.toJSONString(responseData);
             } else {
                 deliveryHttpLogEntity.setReturnStatusCode(ErrorCode.FAILED.getCode());
@@ -85,8 +85,8 @@ public class RetryDeliveryCarService {
                 deliveryHttpLogEntity.setReturnTime(LocalDateTime.now());
                 deliveryLogUtil.addDeliveryLog(deliveryHttpLogEntity);
                 log.info("请求仁云失败，各参数返回值,url:{},params:{},result:{}", url, JSON.toJSONString(object), JSON.toJSONString(responseData));
+                throw new DeliveryOrderException(DeliveryErrorCode.SEND_REN_YUN_HTTP_ERROR);
             }
-            t.setStatus(Transaction.SUCCESS);
         } catch (Exception e) {
             t.setStatus(e);
             deliveryHttpLogEntity.setReturnStatusCode(ErrorCode.SYS_ERROR.getCode());
@@ -96,10 +96,10 @@ public class RetryDeliveryCarService {
             deliveryLogUtil.addDeliveryLog(deliveryHttpLogEntity);
             log.error("请求仁云失败，失败原因：case:", e);
             Cat.logError("请求仁云失败，失败原因：case:" + e.getMessage(), e);
-            throw new DeliveryOrderException(DeliveryErrorCode.SEND_REN_YUN_HTTP_ERROR);
+            throw e;
+
         } finally {
             t.complete();
         }
-        return JSONObject.toJSONString(responseData);
     }
 }

@@ -34,6 +34,12 @@ public class AccountRenterWZDepositResVO {
      * 是否预授权
      */
     private Integer isAuthorize;
+    
+    /**
+     * 免押方式
+     */
+    private Integer freeDepositType;
+    
     /**
      * 是否免押
      */

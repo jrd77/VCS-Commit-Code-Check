@@ -58,7 +58,7 @@ public class OrderPayableAmountResVO {
     /**
      * 应付租车费用明细
      */
-    @AutoDocProperty("应付租车费用明细")
+    @AutoDocProperty("租车费应付用明细")
     List<PayableVO> payableVOs;
 
     /**
@@ -69,7 +69,7 @@ public class OrderPayableAmountResVO {
     /**
      * 应付租车车俩押金
      */
-    @AutoDocProperty("应付租车车俩押金")
+    @AutoDocProperty("应付租车车辆押金")
     private int amtDeposit;
     /**
      * 应付租车违章押金
