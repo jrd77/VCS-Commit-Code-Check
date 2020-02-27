@@ -37,7 +37,7 @@ public class AdminOrderSettleController {
     public ResponseData<String> settleDeposit(@RequestParam("orderNo") String orderNo) {
         log.info("OrderSettleController settleDeposit start param [{}]", orderNo);
         ResponseData result = feignOrderSettleService.depositSettle(orderNo);
-        log.info("CashierController getOrderPayableAmount end param [{}],result [{}]",orderNo,result);
+        log.info("CashierController settleDeposit end param [{}],result [{}]",orderNo,result);
         return result;
     }
 

@@ -40,6 +40,7 @@ public class CashierController {
         log.info("CashierController getOrderPayableAmount end param [{}],result [{}]", GsonUtils.toJson(orderPayReqVO),GsonUtils.toJson(result));
         return ResponseData.success(result);
     }
+    
     /**
      * 收银支付获取支付签名串
      * @param orderPaySign
