@@ -69,10 +69,8 @@ public interface FeignOrderDetailService {
      * @Description: 车主订单详情
      *
      **/
-    @GetMapping("/order/detail/ownerOrderDetail")
-    public ResponseData<OwnerOrderDetailRespDTO> ownerOrderDetail(@RequestParam("orderNo") String orderNo,
-                                                                  @RequestParam(name = "ownerOrderNo",required = false) String ownerOrderNo,
-                                                                  @RequestParam(name = "ownerMemNo",required = false) String ownerMemNo);
+    @PostMapping("/order/detail/ownerOrderDetail")
+    public ResponseData<OwnerOrderDetailRespDTO> ownerOrderDetail(@RequestBody OrderOwnerDetailReqDTO orderOwnerDetailReqDTO);
     /*
      * @Author ZhangBin
      * @Date 2020/2/27 11:02
