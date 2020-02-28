@@ -15,7 +15,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
+import org.springframework.util.StringUtils;
 
 import com.atzuche.order.cashieraccount.mapper.CashierRefundApplyMapper;
 
@@ -44,7 +44,10 @@ public class CashierRefundApplyNoTService {
     public int insertRefundDeposit(CashierRefundApplyReqVO cashierRefundApplyReq) {
         CashierRefundApplyEntity cashierRefundApplyEntity = new CashierRefundApplyEntity();
         BeanUtils.copyProperties(cashierRefundApplyReq,cashierRefundApplyEntity);
-        cashierRefundApplyEntity.setStatus(CashierRefundApplyStatus.WAITING_FOR_REFUND.getCode());
+        if(org.apache.commons.lang.StringUtils.isBlank(cashierRefundApplyReq.getStatus())) {
+        	//默认值处理，否则以传过来的数据为准。
+        	cashierRefundApplyEntity.setStatus(CashierRefundApplyStatus.WAITING_FOR_REFUND.getCode());
+        }
         cashierRefundApplyEntity.setSourceCode(cashierRefundApplyReq.getRenterCashCodeEnum().getCashNo());
         cashierRefundApplyEntity.setSourceDetail(cashierRefundApplyReq.getRenterCashCodeEnum().getTxt());
         String payMd5 = MD5.MD5Encode(FasterJsonUtil.toJson(cashierRefundApplyEntity));
@@ -52,7 +55,7 @@ public class CashierRefundApplyNoTService {
         cashierRefundApplyEntity.setPayMd5(payMd5);
 //        CashierRefundApplyEntity entity = cashierRefundApplyMapper.selectRefundByQn(cashierRefundApplyReq.getMemNo(),cashierRefundApplyReq.getOrderNo(),cashierRefundApplyReq.getQn());
         CashierRefundApplyEntity entity = cashierRefundApplyMapper.selectRefundByMd5(cashierRefundApplyReq.getMemNo(),cashierRefundApplyReq.getOrderNo(),payMd5);
-
+        //判断是否已经存在。
         if(Objects.nonNull(entity) && Objects.nonNull(entity.getId())){
             return entity.getId();
         }
@@ -84,6 +87,8 @@ public class CashierRefundApplyNoTService {
             if(result==0){
                 throw new OrderPayRefundCallBackAsnyException();
             }
+            //4.如果是预授权完成的操作成功，检测该订单是否存在预授权解冻的记录。修改status=01退款中。 todo huangjing
+            
         }
     }
 

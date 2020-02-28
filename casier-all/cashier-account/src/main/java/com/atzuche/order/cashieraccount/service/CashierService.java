@@ -1,17 +1,50 @@
 package com.atzuche.order.cashieraccount.service;
 
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
+import org.springframework.util.CollectionUtils;
+
 import com.atzuche.order.accountownercost.entity.AccountOwnerCostSettleDetailEntity;
 import com.atzuche.order.accountownercost.service.notservice.AccountOwnerCostSettleDetailNoTService;
 import com.atzuche.order.accountownerincome.entity.AccountOwnerIncomeExamineEntity;
+import com.atzuche.order.accountownerincome.service.AccountOwnerIncomeService;
+import com.atzuche.order.accountrenterdeposit.service.AccountRenterDepositService;
+import com.atzuche.order.accountrenterdeposit.vo.req.CreateOrderRenterDepositReqVO;
+import com.atzuche.order.accountrenterdeposit.vo.req.DetainRenterDepositReqVO;
+import com.atzuche.order.accountrenterdeposit.vo.req.PayedOrderRenterDepositReqVO;
 import com.atzuche.order.accountrenterdeposit.vo.res.AccountRenterDepositResVO;
 import com.atzuche.order.accountrenterdetain.service.AccountRenterDetainService;
 import com.atzuche.order.accountrenterdetain.vo.req.ChangeDetainRenterDepositReqVO;
 import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostSettleDetailEntity;
 import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostSettleEntity;
+import com.atzuche.order.accountrenterrentcost.service.AccountRenterCostSettleService;
 import com.atzuche.order.accountrenterrentcost.service.notservice.AccountRenterCostSettleDetailNoTService;
 import com.atzuche.order.accountrenterrentcost.service.notservice.AccountRenterCostSettleNoTService;
-import com.atzuche.order.accountrenterwzdepost.vo.req.*;
+import com.atzuche.order.accountrenterrentcost.vo.req.AccountRenterCostDetailReqVO;
+import com.atzuche.order.accountrenterrentcost.vo.req.AccountRenterCostReqVO;
+import com.atzuche.order.accountrenterwzdepost.service.AccountRenterWzDepositCostService;
+import com.atzuche.order.accountrenterwzdepost.service.AccountRenterWzDepositService;
+import com.atzuche.order.accountrenterwzdepost.vo.req.CreateOrderRenterWZDepositReqVO;
+import com.atzuche.order.accountrenterwzdepost.vo.req.OrderRenterDepositWZDetainReqVO;
+import com.atzuche.order.accountrenterwzdepost.vo.req.PayedOrderRenterDepositWZDetailReqVO;
+import com.atzuche.order.accountrenterwzdepost.vo.req.PayedOrderRenterWZDepositReqVO;
+import com.atzuche.order.accountrenterwzdepost.vo.req.RenterWZDepositCostReqVO;
 import com.atzuche.order.accountrenterwzdepost.vo.res.AccountRenterWZDepositResVO;
+import com.atzuche.order.cashieraccount.entity.CashierEntity;
+import com.atzuche.order.cashieraccount.exception.SettleAmountException;
+import com.atzuche.order.cashieraccount.mapper.CashierMapper;
+import com.atzuche.order.cashieraccount.service.notservice.CashierNoTService;
+import com.atzuche.order.cashieraccount.service.notservice.CashierRefundApplyNoTService;
+import com.atzuche.order.cashieraccount.vo.req.CashierDeductDebtReqVO;
+import com.atzuche.order.cashieraccount.vo.req.CashierRefundApplyReqVO;
+import com.atzuche.order.cashieraccount.vo.res.CashierDeductDebtResVO;
 import com.atzuche.order.cashieraccount.vo.res.pay.OrderPayCallBackSuccessVO;
 import com.atzuche.order.commons.enums.FineSubsidyCodeEnum;
 import com.atzuche.order.commons.enums.OrderPayStatusEnum;
@@ -32,48 +65,23 @@ import com.atzuche.order.mq.util.SmsParamsMapUtil;
 import com.atzuche.order.parentorder.dto.OrderStatusDTO;
 import com.atzuche.order.parentorder.entity.OrderStatusEntity;
 import com.atzuche.order.parentorder.service.OrderStatusService;
+import com.atzuche.order.rentercost.service.RenterOrderCostCombineService;
 import com.atzuche.order.settle.service.AccountDebtService;
 import com.atzuche.order.settle.vo.req.AccountDeductDebtReqVO;
 import com.atzuche.order.settle.vo.req.AccountInsertDebtReqVO;
 import com.atzuche.order.settle.vo.res.AccountDebtResVO;
-import com.atzuche.order.accountownerincome.service.AccountOwnerIncomeService;
-
-import com.atzuche.order.accountrenterdeposit.service.AccountRenterDepositService;
-import com.atzuche.order.accountrenterdeposit.vo.req.CreateOrderRenterDepositReqVO;
-import com.atzuche.order.accountrenterdeposit.vo.req.DetainRenterDepositReqVO;
-import com.atzuche.order.accountrenterdeposit.vo.req.PayedOrderRenterDepositReqVO;
-import com.atzuche.order.accountrenterrentcost.service.AccountRenterCostSettleService;
-import com.atzuche.order.accountrenterrentcost.vo.req.AccountRenterCostDetailReqVO;
-import com.atzuche.order.accountrenterrentcost.vo.req.AccountRenterCostReqVO;
-import com.atzuche.order.accountrenterwzdepost.service.AccountRenterWzDepositCostService;
-import com.atzuche.order.accountrenterwzdepost.service.AccountRenterWzDepositService;
-import com.atzuche.order.cashieraccount.entity.CashierEntity;
-import com.atzuche.order.cashieraccount.mapper.CashierMapper;
-import com.atzuche.order.cashieraccount.service.notservice.CashierNoTService;
-import com.atzuche.order.cashieraccount.service.notservice.CashierRefundApplyNoTService;
-import com.atzuche.order.cashieraccount.vo.req.CashierDeductDebtReqVO;
-import com.atzuche.order.cashieraccount.vo.req.CashierRefundApplyReqVO;
-import com.atzuche.order.cashieraccount.vo.res.CashierDeductDebtResVO;
-import com.atzuche.order.rentercost.service.RenterOrderCostCombineService;
 import com.autoyol.autopay.gateway.constant.DataPayKindConstant;
 import com.autoyol.autopay.gateway.constant.DataPayTypeConstant;
 import com.autoyol.autopay.gateway.vo.req.NotifyDataVo;
 import com.autoyol.autopay.gateway.vo.res.AutoPayResultVo;
 import com.autoyol.commons.utils.GsonUtils;
 import com.autoyol.commons.web.ErrorCode;
-import com.autoyol.event.rabbit.neworder.*;
+import com.autoyol.event.rabbit.neworder.NewOrderMQActionEventEnum;
+import com.autoyol.event.rabbit.neworder.OrderRenterPayAmtSuccessMq;
+import com.autoyol.event.rabbit.neworder.OrderRenterPaySuccessMq;
+import com.dianping.cat.Cat;
+
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.Assert;
-import org.springframework.util.CollectionUtils;
-
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 
 
 /**
@@ -370,6 +378,16 @@ public class CashierService {
         return depositDetailId;
     }
     
+//    @Transactional(rollbackFor=Exception.class)
+    public int refundDepositPreAuth(CashierRefundApplyReqVO cashierRefundApplyReq){
+        Assert.notNull(cashierRefundApplyReq, ErrorCode.PARAMETER_ERROR.getText());
+        cashierRefundApplyReq.check();
+        //1 记录退还记录
+        Integer id = cashierRefundApplyNoTService.insertRefundDeposit(cashierRefundApplyReq);
+        return id;
+    }
+    
+    
     
     
     /**
@@ -415,6 +433,16 @@ public class CashierService {
         payedOrderRenterWZDepositDetail.setUniqueNo(id.toString());
         accountRenterWzDepositService.updateRenterWZDepositChange(payedOrderRenterWZDepositDetail);
     }
+    
+//    @Transactional(rollbackFor=Exception.class)
+    public int refundWZDepositPreAuth(CashierRefundApplyReqVO cashierRefundApplyReq){
+        Assert.notNull(cashierRefundApplyReq, ErrorCode.PARAMETER_ERROR.getText());
+        cashierRefundApplyReq.check();
+        //1 记录退还记录
+        Integer id = cashierRefundApplyNoTService.insertRefundDeposit(cashierRefundApplyReq);
+        return id;
+    }
+    
     /**  ***************************************** 退还押金 end ************************************************* */
 
     /**  ***************************************** 车主收益 start ************************************************* */
@@ -475,7 +503,14 @@ public class CashierService {
                 NotifyDataVo notifyDataVo = lstNotifyDataVo.get(i);
                 //2支付成功回调
                 if(DataPayTypeConstant.PAY_PUR.equals(notifyDataVo.getPayType()) || DataPayTypeConstant.PAY_PRE.equals(notifyDataVo.getPayType())){
-                    payOrderCallBackSuccess(notifyDataVo,vo);
+                	Integer settleAmount = notifyDataVo.getSettleAmount()==null?0:Integer.parseInt(notifyDataVo.getSettleAmount());
+                	if(settleAmount.intValue() == 0) {
+                		//金额为0的异常情况。
+                		Cat.logError(new SettleAmountException());
+                		log.error("支付异步通知rabbitmq接收到的金额为0异常,params=[{}],程序终止。",GsonUtils.toJson(notifyDataVo));
+                	}else {
+                		payOrderCallBackSuccess(notifyDataVo,vo);
+                	}
                 }
             }
         }
@@ -493,6 +528,7 @@ public class CashierService {
         if(Objects.isNull(notifyDataVo) || !TransStatusEnum.PAY_SUCCESS.getCode().equals(notifyDataVo.getTransStatus())){
             return;
         }
+        //更新退款申请表的状态。
         cashierRefundApplyNoTService.updateRefundDepositSuccess(notifyDataVo);
         OrderStatusDTO orderStatusDTO = new OrderStatusDTO();
         orderStatusDTO.setOrderNo(notifyDataVo.getOrderNo());

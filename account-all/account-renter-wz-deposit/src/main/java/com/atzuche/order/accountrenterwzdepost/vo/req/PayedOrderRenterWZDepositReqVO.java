@@ -28,6 +28,30 @@ public class PayedOrderRenterWZDepositReqVO {
      * 是否预授权
      */
     private Integer isAuthorize;
+    // 200228 新加以下5个字段。
+    /**
+     * 预授权金额
+     */
+    private Integer authorizeDepositAmt;
+    /**
+     * 信用支付金额
+     */
+    private Integer creditPayAmt;
+    /**
+     * 剩余押金总额
+     */
+    private Integer surplusDepositAmt;
+    /**
+     * 剩余预授权金额
+     */
+    private Integer surplusAuthorizeDepositAmt;
+    
+    /**
+     * 剩余信用支付金额
+     */
+    private Integer surplusCreditPayAmt;
+    
+    
     /**
      * 是否免押
      */

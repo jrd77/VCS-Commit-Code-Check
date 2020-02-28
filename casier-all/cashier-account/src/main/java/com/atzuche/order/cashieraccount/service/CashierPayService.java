@@ -43,6 +43,7 @@ import com.autoyol.autopay.gateway.vo.res.AutoPayResultVo;
 import com.autoyol.commons.utils.GsonUtils;
 import com.autoyol.commons.web.ErrorCode;
 
+import ch.qos.logback.classic.Logger;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -507,18 +508,22 @@ public class CashierPayService{
         if(Objects.isNull(cashierRefundApply) || Objects.isNull(cashierRefundApply.getId())){
             return;
         }
-        //更新退款次数
+        //更新退款次数，最多允许退3次。 num<3 LIMIT 100
         cashierRefundApplyNoTService.updateCashierRefundApplyEntity(cashierRefundApply);
         //2 构造退款参数
         RefundVo refundVo = cashierNoTService.getRefundVo(cashierRefundApply);
        //3退款
         AutoPayResultVo vo = refundRemoteService.refundOrderPay(refundVo);
         if(Objects.nonNull(vo)){
+        	log.info("退款返回的结果vo=[{}],params=[{}]",GsonUtils.toJson(vo),GsonUtils.toJson(refundVo));
+        	
             NotifyDataVo notifyDataVo = new NotifyDataVo();
             BeanUtils.copyProperties(vo,notifyDataVo);
             notifyDataVo.setSettleAmount(vo.getRefundAmt());
             //退款调用成功操作
             cashierService.refundCallBackSuccess(vo);
+        }else {
+        	log.error("退款返回的结果vo为null异常,params=[{}]",GsonUtils.toJson(refundVo));
         }
     }
 

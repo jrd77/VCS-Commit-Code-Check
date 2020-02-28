@@ -45,6 +45,7 @@ import com.atzuche.order.commons.enums.account.income.AccountOwnerIncomeExamineS
 import com.atzuche.order.commons.enums.account.income.AccountOwnerIncomeExamineType;
 import com.atzuche.order.commons.enums.cashcode.OwnerCashCodeEnum;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
+import com.atzuche.order.commons.enums.cashier.CashierRefundApplyStatus;
 import com.atzuche.order.commons.enums.cashier.OrderRefundStatusEnum;
 import com.atzuche.order.commons.enums.cashier.PaySourceEnum;
 import com.atzuche.order.commons.enums.cashier.PayTypeEnum;
@@ -108,6 +109,7 @@ import com.atzuche.order.settle.vo.req.SettleOrdersAccount;
 import com.atzuche.order.settle.vo.req.SettleOrdersDefinition;
 import com.atzuche.order.wallet.WalletProxyService;
 import com.autoyol.autopay.gateway.constant.DataPayKindConstant;
+import com.autoyol.autopay.gateway.constant.DataPayTypeConstant;
 import com.autoyol.doc.util.StringUtil;
 import com.autoyol.platformcost.model.FeeResult;
 
@@ -1620,6 +1622,8 @@ public class OrderSettleNoTService {
         List<ConsoleRenterOrderFineDeatailEntity> consoleRenterOrderFineDeatails = consoleRenterOrderFineDeatailService.listConsoleRenterOrderFineDeatail(settleOrders.getOrderNo(),settleOrders.getRenterMemNo());
         //3 补贴包含凹凸币信息
         List<RenterOrderSubsidyDetailEntity> renterOrderSubsidyDetails = renterOrderSubsidyDetailService.listRenterOrderSubsidyDetail(settleOrders.getOrderNo(),settleOrders.getRenterOrderNo());
+        //4.`order_console_subsidy_detail` 管理后台对租客的补贴?? todo zhangbin
+        
         RentCosts rentCosts = new RentCosts();
         rentCosts.setRenterOrderSubsidyDetails(renterOrderSubsidyDetails);
         rentCosts.setRenterOrderFineDeatails(renterOrderFineDeatails);
@@ -1641,6 +1645,8 @@ public class OrderSettleNoTService {
 
         //2 车主罚金
         List<OwnerOrderFineDeatailEntity> ownerOrderFineDeatails = ownerOrderFineDeatailService.getOwnerOrderFineDeatailByOrderNo(settleOrders.getOrderNo());
+        //不考虑补贴? 车主和管理后台补贴? 非正常的结算，异常终止，可以理解为管理后台的都不计算。只考虑违约金的情况。
+        
         ownerCosts.setOwnerOrderFineDeatails(ownerOrderFineDeatails);
         ownerCosts.setConsoleOwnerOrderFineDeatailEntitys(consoleOwnerOrderFineDeatailEntitys);
         settleOrders.setOwnerCosts(ownerCosts);
@@ -1920,13 +1926,53 @@ public class OrderSettleNoTService {
 
             CashierRefundApplyReqVO cashierRefundApply = new CashierRefundApplyReqVO();
             BeanUtils.copyProperties(cashierEntity,cashierRefundApply);
-            cashierRefundApply.setAmt(-settleCancelOrdersAccount.getRentSurplusDepositAmt());
-            cashierRefundApply.setRenterCashCodeEnum(RenterCashCodeEnum.CANCEL_RENT_DEPOSIT_TO_RETURN_AMT);
-            cashierRefundApply.setRemake(RenterCashCodeEnum.CANCEL_RENT_DEPOSIT_TO_RETURN_AMT.getTxt());
-            cashierRefundApply.setFlag(RenterCashCodeEnum.ACCOUNT_RENTER_DEPOSIT.getCashNo());
-            cashierRefundApply.setType(SysOrHandEnum.SYSTEM.getStatus());
-            cashierRefundApply.setQn(cashierEntity.getQn());
-            cashierService.refundDeposit(cashierRefundApply);
+            
+            
+            //预授权处理
+            if(cashierEntity != null && DataPayTypeConstant.PAY_PRE.equals(cashierEntity.getPayType())) {
+            	//全部解冻
+            	boolean isFastRefund = (cashierEntity.getPayAmt() - Math.abs(settleCancelOrdersAccount.getRentSurplusDepositAmt()) <= 0);
+            	
+            	//预授权  退款就是解冻，余下的就是预授权完成
+            	cashierRefundApply.setPayType(DataPayTypeConstant.PRE_VOID); //解冻
+            	cashierRefundApply.setAmt(-settleCancelOrdersAccount.getRentSurplusDepositAmt());
+                cashierRefundApply.setRenterCashCodeEnum(RenterCashCodeEnum.CANCEL_RENT_DEPOSIT_TO_RETURN_AMT);
+                cashierRefundApply.setRemake(RenterCashCodeEnum.CANCEL_RENT_DEPOSIT_TO_RETURN_AMT.getTxt());
+                cashierRefundApply.setFlag(RenterCashCodeEnum.ACCOUNT_RENTER_DEPOSIT.getCashNo());
+                cashierRefundApply.setType(SysOrHandEnum.SYSTEM.getStatus());
+                cashierRefundApply.setQn(cashierEntity.getQn());
+                //需要在预授权完成之后再做解冻操作
+                if(!isFastRefund) {
+                	cashierRefundApply.setStatus(CashierRefundApplyStatus.STOP_FOR_REFUND.getCode());
+                }
+                
+                cashierService.refundDeposit(cashierRefundApply);
+                
+                //添加预授权完成记录 
+                if(cashierEntity.getPayAmt() - Math.abs(settleCancelOrdersAccount.getRentSurplusDepositAmt()) > 0) {
+	                cashierRefundApply.setPayType(DataPayTypeConstant.PRE_FINISH); //预授权完成
+	            	cashierRefundApply.setAmt( cashierEntity.getPayAmt() - Math.abs(settleCancelOrdersAccount.getRentSurplusDepositAmt()) );
+	                cashierRefundApply.setRenterCashCodeEnum(RenterCashCodeEnum.CANCEL_RENT_DEPOSIT_TO_RETURN_AMT);
+	                cashierRefundApply.setRemake(RenterCashCodeEnum.CANCEL_RENT_DEPOSIT_TO_RETURN_AMT.getTxt());
+	                cashierRefundApply.setFlag(RenterCashCodeEnum.ACCOUNT_RENTER_DEPOSIT.getCashNo());
+	                cashierRefundApply.setType(SysOrHandEnum.SYSTEM.getStatus());
+	                cashierRefundApply.setQn(cashierEntity.getQn());
+	                cashierService.refundDepositPreAuth(cashierRefundApply);  //仅仅提交预授权完成记录
+                }
+                
+            }else {
+            	//消费
+            	//退货
+            	cashierRefundApply.setPayType(DataPayTypeConstant.PUR_RETURN); //退货
+            	cashierRefundApply.setAmt(-settleCancelOrdersAccount.getRentSurplusDepositAmt());
+                cashierRefundApply.setRenterCashCodeEnum(RenterCashCodeEnum.CANCEL_RENT_DEPOSIT_TO_RETURN_AMT);
+                cashierRefundApply.setRemake(RenterCashCodeEnum.CANCEL_RENT_DEPOSIT_TO_RETURN_AMT.getTxt());
+                cashierRefundApply.setFlag(RenterCashCodeEnum.ACCOUNT_RENTER_DEPOSIT.getCashNo());
+                cashierRefundApply.setType(SysOrHandEnum.SYSTEM.getStatus());
+                cashierRefundApply.setQn(cashierEntity.getQn());
+                cashierService.refundDeposit(cashierRefundApply);
+            }
+            
             orderStatusDTO.setDepositRefundStatus(OrderRefundStatusEnum.REFUNDING.getStatus());
         }
         // 5 违章押金退还
@@ -1934,16 +1980,57 @@ public class OrderSettleNoTService {
             CashierEntity cashierEntity = cashierNoTService.getCashierEntity(settleOrders.getOrderNo(),settleOrders.getRenterMemNo(), DataPayKindConstant.RENT);
             CashierRefundApplyReqVO cashierRefundApply = new CashierRefundApplyReqVO();
             BeanUtils.copyProperties(cashierEntity,cashierRefundApply);
+            
+            
+          //预授权处理
+            if(cashierEntity != null && DataPayTypeConstant.PAY_PRE.equals(cashierEntity.getPayType())) {
+            	//全部解冻
+            	boolean isFastRefund = (cashierEntity.getPayAmt() - Math.abs(settleCancelOrdersAccount.getRentSurplusWzDepositAmt()) <= 0);
 
-            cashierRefundApply.setAmt(-settleCancelOrdersAccount.getRentSurplusWzDepositAmt());
-            cashierRefundApply.setRenterCashCodeEnum(RenterCashCodeEnum.CANCEL_RENT_WZ_DEPOSIT_TO_RETURN_AMT);
-            cashierRefundApply.setRemake(RenterCashCodeEnum.CANCEL_RENT_WZ_DEPOSIT_TO_RETURN_AMT.getTxt());
-            cashierRefundApply.setFlag(RenterCashCodeEnum.ACCOUNT_RENTER_WZ_DEPOSIT.getCashNo());
-            cashierRefundApply.setType(SysOrHandEnum.SYSTEM.getStatus());
-            cashierRefundApply.setQn(cashierEntity.getQn());
-            cashierRefundApply.setPayKind(DataPayKindConstant.DEPOSIT);
-
-            cashierService.refundWZDeposit(cashierRefundApply);
+            	//预授权  退款就是解冻，余下的就是预授权完成
+            	cashierRefundApply.setPayType(DataPayTypeConstant.PRE_VOID); //解冻
+            	cashierRefundApply.setAmt(-settleCancelOrdersAccount.getRentSurplusWzDepositAmt());
+                cashierRefundApply.setRenterCashCodeEnum(RenterCashCodeEnum.CANCEL_RENT_WZ_DEPOSIT_TO_RETURN_AMT);
+                cashierRefundApply.setRemake(RenterCashCodeEnum.CANCEL_RENT_WZ_DEPOSIT_TO_RETURN_AMT.getTxt());
+                cashierRefundApply.setFlag(RenterCashCodeEnum.ACCOUNT_RENTER_WZ_DEPOSIT.getCashNo());
+                cashierRefundApply.setType(SysOrHandEnum.SYSTEM.getStatus());
+                cashierRefundApply.setQn(cashierEntity.getQn());
+                cashierRefundApply.setPayKind(DataPayKindConstant.DEPOSIT);
+                
+                //需要在预授权完成之后再做解冻操作
+                if(!isFastRefund) {
+                	cashierRefundApply.setStatus(CashierRefundApplyStatus.STOP_FOR_REFUND.getCode());
+                }
+                
+                cashierService.refundWZDeposit(cashierRefundApply);
+                
+                //添加预授权完成记录 
+                if(cashierEntity.getPayAmt() - Math.abs(settleCancelOrdersAccount.getRentSurplusWzDepositAmt()) > 0) {
+	                cashierRefundApply.setPayType(DataPayTypeConstant.PRE_FINISH); //预授权完成
+	            	cashierRefundApply.setAmt( cashierEntity.getPayAmt() - Math.abs(settleCancelOrdersAccount.getRentSurplusWzDepositAmt()) );
+	            	cashierRefundApply.setRenterCashCodeEnum(RenterCashCodeEnum.CANCEL_RENT_WZ_DEPOSIT_TO_RETURN_AMT);
+	                cashierRefundApply.setRemake(RenterCashCodeEnum.CANCEL_RENT_WZ_DEPOSIT_TO_RETURN_AMT.getTxt());
+	                cashierRefundApply.setFlag(RenterCashCodeEnum.ACCOUNT_RENTER_WZ_DEPOSIT.getCashNo());
+	                cashierRefundApply.setType(SysOrHandEnum.SYSTEM.getStatus());
+	                cashierRefundApply.setQn(cashierEntity.getQn());
+	                cashierRefundApply.setPayKind(DataPayKindConstant.DEPOSIT);
+	                cashierService.refundWZDepositPreAuth(cashierRefundApply);  //仅仅提交预授权完成记录 
+                }
+                
+            }else {
+            	//消费
+            	//退货
+            	cashierRefundApply.setPayType(DataPayTypeConstant.PUR_RETURN); //退货
+            	cashierRefundApply.setAmt(-settleCancelOrdersAccount.getRentSurplusWzDepositAmt());
+                cashierRefundApply.setRenterCashCodeEnum(RenterCashCodeEnum.CANCEL_RENT_WZ_DEPOSIT_TO_RETURN_AMT);
+                cashierRefundApply.setRemake(RenterCashCodeEnum.CANCEL_RENT_WZ_DEPOSIT_TO_RETURN_AMT.getTxt());
+                cashierRefundApply.setFlag(RenterCashCodeEnum.ACCOUNT_RENTER_WZ_DEPOSIT.getCashNo());
+                cashierRefundApply.setType(SysOrHandEnum.SYSTEM.getStatus());
+                cashierRefundApply.setQn(cashierEntity.getQn());
+                cashierRefundApply.setPayKind(DataPayKindConstant.DEPOSIT);
+                cashierService.refundWZDeposit(cashierRefundApply);
+            }
+            
             orderStatusDTO.setWzRefundStatus(OrderRefundStatusEnum.REFUNDING.getStatus());
         }
     }
@@ -1999,7 +2086,7 @@ public class OrderSettleNoTService {
      * 租客还历史欠款
      */
     public void repayHistoryDebtRentCancel(SettleOrders settleOrders, SettleCancelOrdersAccount settleCancelOrdersAccount) {
-        //钱包抵扣历史欠款
+        //钱包抵扣历史欠款?? todo zhangbin
         if(settleCancelOrdersAccount.getRentSurplusWalletAmt()>0){
             CashierDeductDebtReqVO cashierDeductDebtReq = new CashierDeductDebtReqVO();
             BeanUtils.copyProperties(settleOrders,cashierDeductDebtReq);
@@ -2115,7 +2202,7 @@ public class OrderSettleNoTService {
             cashierSettleService.insertAccountRenterCostSettleDetail(entity);
             walletProxyService.returnOrChargeWallet(settleOrders.getRenterMemNo(),settleOrders.getOrderNo(),settleCancelOrdersAccount.getRentFineIncomeAmt());
         }
-        // 车主罚金收入
+        // 车主罚金收入，走收益审核列表。
         if(settleCancelOrdersAccount.getOwnerFineIncomeAmt()!=0){
             AccountOwnerIncomeExamineReqVO accountOwnerIncomeExamine = new AccountOwnerIncomeExamineReqVO();
             accountOwnerIncomeExamine.setAmt(settleCancelOrdersAccount.getOwnerFineIncomeAmt());

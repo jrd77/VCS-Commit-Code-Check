@@ -120,6 +120,7 @@ public class OrderWzSettleNoTService {
             cashierRefundApply.setType(SysOrHandEnum.SYSTEM.getStatus());
             int id =cashierWzSettleService.refundWzDeposit(cashierRefundApply);
             
+            
           //wzTotalCost-todo
             //account_renter_wz_deposit_cost_settle_detail  违章费用结算明细表 跟租车的有些区别。不记录。  都往费用表里面记录！！
             // 2记录退还 租车押金 结算费用明细
