@@ -22,6 +22,8 @@ import com.atzuche.order.commons.enums.OrderStatusEnum;
 import com.atzuche.order.commons.enums.account.SettleStatusEnum;
 import com.atzuche.order.mq.common.base.BaseProducer;
 import com.atzuche.order.mq.common.base.OrderMessage;
+import com.atzuche.order.ownercost.entity.OwnerOrderEntity;
+import com.atzuche.order.ownercost.service.OwnerOrderService;
 import com.atzuche.order.parentorder.dto.OrderStatusDTO;
 import com.atzuche.order.parentorder.entity.OrderStatusEntity;
 import com.atzuche.order.parentorder.service.OrderStatusService;
@@ -66,13 +68,16 @@ public class OrderWzSettleNewService {
 	private AccountRenterDetainDetailNoTService accountRenterDetainDetailNoTService;
 	@Autowired
 	private RenterOrderWzSettleFlagService renterOrderWzSettleFlagService;
-
+	@Autowired
+	private OwnerOrderService ownerOrderService;
 	/**
 	 * 初始化结算对象
 	 * 
 	 * @param orderNo
 	 */
 	public SettleOrdersWz initSettleOrders(String orderNo) {
+		SettleOrdersWz settleOrdersWz = new SettleOrdersWz();
+		
 		// 1 校验参数
 		if (StringUtil.isBlank(orderNo)) {
 			throw new OrderSettleFlatAccountException();
@@ -81,7 +86,26 @@ public class OrderWzSettleNewService {
 		if (Objects.isNull(renterOrder) || Objects.isNull(renterOrder.getRenterOrderNo())) {
 			throw new OrderSettleFlatAccountException();
 		}
-
+		
+		//发送mq发送车主会员号信息预留。
+		OwnerOrderEntity ownerOrder = ownerOrderService.getOwnerOrderByOrderNoAndIsEffective(orderNo);
+//        if(Objects.isNull(ownerOrder) || Objects.isNull(ownerOrder.getOwnerOrderNo())){
+//            throw new OrderSettleFlatAccountException();
+//        }
+		if(!Objects.isNull(ownerOrder)) {
+			
+			String ownerOrderNo = ownerOrder.getOwnerOrderNo();
+	        String ownerMemNo = ownerOrder.getMemNo();
+	        
+			settleOrdersWz.setOwnerOrderNo(ownerOrderNo);
+			settleOrdersWz.setOwnerMemNo(ownerMemNo);
+			settleOrdersWz.setOwnerOrder(ownerOrder);
+		}else {
+			//默认
+			settleOrdersWz.setOwnerMemNo("0");
+			settleOrdersWz.setOwnerOrderNo("0");
+		}
+        
 		// 2 校验订单状态 以及是否存在 理赔暂扣 存在不能进行结算 并CAT告警
 		this.check(renterOrder);
 		// 3 初始化数据
@@ -90,7 +114,7 @@ public class OrderWzSettleNewService {
 		String renterOrderNo = renterOrder.getRenterOrderNo();
 		String renterMemNo = renterOrder.getRenterMemNo();
 
-		SettleOrdersWz settleOrdersWz = new SettleOrdersWz();
+		
 		settleOrdersWz.setOrderNo(orderNo);
 		settleOrdersWz.setRenterOrderNo(renterOrderNo);
 		settleOrdersWz.setRenterMemNo(renterMemNo);
@@ -289,13 +313,17 @@ public class OrderWzSettleNewService {
 	 * 
 	 * @param orderNo
 	 */
-	public void sendOrderWzSettleSuccessMq(String orderNo) {
+	public void sendOrderWzSettleSuccessMq(String orderNo,String renterMemNo,String ownerMemNo) {
 		log.info("sendOrderWzSettleSuccessMq start [{}]", orderNo);
 		OrderWzSettlementMq orderSettlementMq = new OrderWzSettlementMq();
 		orderSettlementMq.setStatus(0);
 		orderSettlementMq.setOrderNo(orderNo);
+		//新增参数车主号，租客号。
+		orderSettlementMq.setRenterMemNo(Integer.valueOf(renterMemNo));
+		orderSettlementMq.setOwnerMemNo(Integer.valueOf(ownerMemNo));
 		OrderMessage orderMessage = OrderMessage.builder().build();
 		orderMessage.setMessage(orderSettlementMq);
+		
 		// TODO 发短信
 		log.info("sendOrderWzSettleSuccessMq remote start [{}] ,[{}] ", GsonUtils.toJson(orderMessage),
 				NewOrderMQActionEventEnum.ORDER_WZ_SETTLEMENT_SUCCESS);
@@ -309,11 +337,14 @@ public class OrderWzSettleNewService {
 	 * 
 	 * @param orderNo
 	 */
-	public void sendOrderWzSettleFailMq(String orderNo) {
+	public void sendOrderWzSettleFailMq(String orderNo,String renterMemNo,String ownerMemNo) {
 		log.info("sendOrderWzSettleFailMq start [{}]", orderNo);
 		OrderWzSettlementMq orderSettlementMq = new OrderWzSettlementMq();
 		orderSettlementMq.setStatus(1);
 		orderSettlementMq.setOrderNo(orderNo);
+		//新增参数车主号，租客号。
+		orderSettlementMq.setRenterMemNo(Integer.valueOf(renterMemNo));
+		orderSettlementMq.setOwnerMemNo(Integer.valueOf(ownerMemNo));
 		OrderMessage orderMessage = OrderMessage.builder().build();
 		orderMessage.setMessage(orderSettlementMq);
 		// TODO 发短信
