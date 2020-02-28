@@ -7,6 +7,8 @@ import java.util.List;
 
 import javax.validation.Valid;
 
+import com.atzuche.order.commons.vo.res.*;
+import com.autoyol.commons.web.ErrorCode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,10 +25,6 @@ import com.atzuche.order.commons.exceptions.OrderNotFoundException;
 import com.atzuche.order.commons.exceptions.OwnerOrderNotFoundException;
 import com.atzuche.order.commons.vo.req.OrderCostReqVO;
 import com.atzuche.order.commons.vo.req.OwnerCostSettleDetailReqVO;
-import com.atzuche.order.commons.vo.res.OrderOwnerCostResVO;
-import com.atzuche.order.commons.vo.res.OrderRenterCostResVO;
-import com.atzuche.order.commons.vo.res.OwnerCostSettleDetailVO;
-import com.atzuche.order.commons.vo.res.RenterCostDetailVO;
 import com.atzuche.order.coreapi.service.OrderCostService;
 import com.atzuche.order.coreapi.service.OwnerCostFacadeService;
 import com.atzuche.order.coreapi.service.RenterCostFacadeService;
@@ -92,6 +90,23 @@ public class OrderCostController {
 
 		return ResponseData.success(renterBasicCostDetailVO);
 	}
+	@GetMapping("/order/owner/cost/fullDetail")
+	public ResponseData<OwnerCostDetailVO> getRenterCostFullDetail(@RequestParam("orderNo") String orderNo,
+																   @RequestParam("ownerOrderNo") String ownerOrderNo,
+																   @RequestParam("ownerMemNo") String ownerMemNo){
+		OrderEntity orderEntity = orderService.getOrderEntity(orderNo);
+		if(orderEntity==null){
+			throw new OrderNotFoundException(orderNo);
+		}
+		if((ownerOrderNo == null || ownerOrderNo.trim().length()<=0) && (ownerMemNo == null || ownerMemNo.trim().length()<=0)){
+			ResponseData responseData = new ResponseData();
+			responseData.setResCode(ErrorCode.INPUT_ERROR.getCode());
+			responseData.setResMsg("车主子订单号或车主会员号必须有一个不为空！");
+			return responseData;
+		}
+		OwnerCostDetailVO ownerCostDetailVO = ownerCostFacadeService.getOwnerCostFullDetail(orderNo,ownerOrderNo,ownerMemNo);
+		return ResponseData.success(ownerCostDetailVO);
+	}
 
 	public ResponseData getCarOwnerIncomeFullDetail(@RequestParam("orderNo")String orderNo,@RequestParam("ownerNo")String ownerNo){
 		OrderEntity orderEntity = orderService.getOrderEntity(orderNo);
@@ -121,6 +136,9 @@ public class OrderCostController {
 		//FIXME:
         return null;
 	}
+
+
+
 
 	/**
 	 * 获取租客的费用简况
