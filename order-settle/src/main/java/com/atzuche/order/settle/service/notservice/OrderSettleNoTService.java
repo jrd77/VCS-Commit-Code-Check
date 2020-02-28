@@ -350,7 +350,7 @@ public class OrderSettleNoTService {
         mileageAmtDTO.setCostBaseDTO(costBaseDTO);
 
         mileageAmtDTO.setCarOwnerType(renterGoodsDetail.getCarOwnerType());
-        mileageAmtDTO.setGuideDayPrice(renterGoodsDetail.getCarGuidePrice());
+        mileageAmtDTO.setGuideDayPrice(renterGoodsDetail.getCarGuideDayPrice());
         mileageAmtDTO.setDayMileage(renterGoodsDetail.getCarDayMileage());
 
         //默认值0  取/还 车里程数

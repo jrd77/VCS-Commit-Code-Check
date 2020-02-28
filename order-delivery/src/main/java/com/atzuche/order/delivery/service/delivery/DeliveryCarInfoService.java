@@ -6,8 +6,10 @@ import java.util.List;
 import java.util.Objects;
 
 import com.atzuche.order.transport.service.GetReturnCarCostService;
+import com.autoyol.platformcost.CommonUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.atzuche.order.commons.entity.dto.CostBaseDTO;
@@ -72,6 +74,8 @@ public class DeliveryCarInfoService {
     RenterCommodityService renterCommodityService;
     @Autowired
     GetReturnCarCostService getReturnCarCostService;
+    @Value("${auto.cost.configHours}")
+    private Integer configHours;
 
     /**
      * 获取配送相关信息（待优化）
@@ -134,7 +138,7 @@ public class DeliveryCarInfoService {
         //取车时的所在城市
         RenterOrderDeliveryEntity renterOrderDelivery = renterOrderDeliveryEntityList.stream().filter(r->r.getType() == 1).findFirst().get();
         String cityCode = renterOrderDelivery.getCityCode();
-        String tenancy = String.valueOf(Duration.between(renterOrderDelivery.getRentTime(),renterOrderDelivery.getRevertTime()).toDays());
+        String  tenancy = CommonUtils.getRentDays(renterOrderDelivery.getRentTime(), renterOrderDelivery.getRevertTime(), configHours).toString();
         ownerGetAndReturnCarDTO.setZuQi(tenancy);
         deliveryCarVO = createDeliveryCarInfo(ownerGetAndReturnCarDTO, deliveryCarVO, ownerHandoverCarInfoEntities, renterHandoverCarInfoEntities, isEscrowCar, carEngineType, cityCode, renterGoodsDetailDTO);
         if (deliveryCarVO.getIsGetCar() == 0) {
