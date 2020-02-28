@@ -70,7 +70,7 @@ public interface FeignOrderDetailService {
      *
      **/
     @PostMapping("/order/detail/ownerOrderDetail")
-    public ResponseData<OwnerOrderDetailRespDTO> ownerOrderDetail(@RequestBody OrderOwnerDetailReqDTO orderOwnerDetailReqDTO);
+    public ResponseData<OrderDetailRespDTO> ownerOrderDetail(@RequestBody OrderOwnerDetailReqDTO orderOwnerDetailReqDTO);
     /*
      * @Author ZhangBin
      * @Date 2020/2/27 11:02
@@ -78,6 +78,6 @@ public interface FeignOrderDetailService {
      * 
      **/
     @GetMapping("/order/detail/renterOrderDetail")
-    public ResponseData<OwnerOrderDetailRespDTO> renterOrderDetail(@RequestParam("orderNo") String orderNo,
+    public ResponseData<RenterOrderDetailRespDTO> renterOrderDetail(@RequestParam("orderNo") String orderNo,
                                                                    @RequestParam(name = "renterOrderNo",required = false) String renterOrderNo);
 }
