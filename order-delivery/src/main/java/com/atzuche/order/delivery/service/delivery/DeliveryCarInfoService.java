@@ -351,7 +351,7 @@ public class DeliveryCarInfoService {
             mileageAmtDTO.setDayMileage(renterGoodsDetailDTO.getCarDayMileage());
             mileageAmtDTO.setGetmileage(Integer.valueOf(ownerGetAndReturnCarDTO.getGetKM()));
             mileageAmtDTO.setReturnMileage(Integer.valueOf(ownerGetAndReturnCarDTO.getReturnKM()));
-            mileageAmtDTO.setGuideDayPrice(renterGoodsDetailDTO.getCarGuidePrice());
+            mileageAmtDTO.setGuideDayPrice(renterGoodsDetailDTO.getCarGuideDayPrice());
             CostBaseDTO costBaseDTO = new CostBaseDTO();
             costBaseDTO.setStartTime(DateUtils.parseLocalDateTime(ownerGetAndReturnCarDTO.getRealGetTime(),DateUtils.DATE_DEFAUTE_4));
             costBaseDTO.setEndTime(DateUtils.parseLocalDateTime(ownerGetAndReturnCarDTO.getRealReturnTime(),DateUtils.DATE_DEFAUTE_4));
