@@ -291,7 +291,6 @@
         and is_effective = 1
         and is_cancel = 0
         and is_delete = 0
-        and child_status = 0
         and mem_no = #{ownerMemNo}
     </select>
 
