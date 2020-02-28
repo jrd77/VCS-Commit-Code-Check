@@ -209,7 +209,7 @@ public class OrderSettleService{
             orderSettleNewService.settleOrder(settleOrders,settleOrdersDefinition,callBack);
             log.info("OrderSettleService settleOrdersenced [{}]",GsonUtils.toJson(settleOrdersDefinition));
             Cat.logEvent("settleOrdersenced",GsonUtils.toJson(settleOrdersDefinition));
-            orderSettleNewService.sendOrderSettleMq(orderNo,settleOrders.getRenterMemNo(),settleOrders.getRentCosts(),0);
+            orderSettleNewService.sendOrderSettleMq(orderNo,settleOrders.getRenterMemNo(),settleOrders.getRentCosts(),0,settleOrders.getOwnerMemNo());
             t.setStatus(Transaction.SUCCESS);
         } catch (Exception e) {
             log.error("OrderSettleService settleOrder,e={},",e);
@@ -220,7 +220,7 @@ public class OrderSettleService{
             orderStatusService.saveOrderStatusInfo(orderStatusDTO);
             t.setStatus(e);
             Cat.logError("结算失败  :{}",e);
-            orderSettleNewService.sendOrderSettleMq(orderNo,settleOrders.getRenterMemNo(),settleOrders.getRentCosts(),1);
+            orderSettleNewService.sendOrderSettleMq(orderNo,settleOrders.getRenterMemNo(),settleOrders.getRentCosts(),1,settleOrders.getOwnerMemNo());
             throw new RuntimeException("结算失败 ,不能结算");
         } finally {
             t.complete();
