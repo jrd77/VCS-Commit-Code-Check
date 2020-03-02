@@ -11,7 +11,7 @@ import java.io.Serializable;
  * @author pengcheng.fu
  * @date 2020/2/25 11:55
  */
-public class AdminCancelOrderReqVO extends BaseVO implements Serializable {
+public class AdminCancelOrderReqVO extends BaseVO {
 
     private static final long serialVersionUID = 6012677342611619028L;
 

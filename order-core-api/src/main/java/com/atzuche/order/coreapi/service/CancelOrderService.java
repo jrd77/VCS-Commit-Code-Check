@@ -175,11 +175,11 @@ public class CancelOrderService {
      *
      * @param adminCancelOrderReqVO 请求参数
      */
-    public void cancel(AdminCancelOrderReqVO adminCancelOrderReqVO) {
+    public void cancel(AdminCancelOrderReqVO adminCancelOrderReqVO, boolean isConsoleInvoke) {
         //参数转换处理
         CancelOrderReqDTO cancelOrderReqDTO = new CancelOrderReqDTO();
         BeanUtils.copyProperties(adminCancelOrderReqVO, cancelOrderReqDTO);
-        cancelOrderReqDTO.setConsoleInvoke(true);
+        cancelOrderReqDTO.setConsoleInvoke(isConsoleInvoke);
         CancelOrderReqContext reqContext = buildCancelOrderReqContext(cancelOrderReqDTO);
         //公共校验
         cancelOrderCheckService.checkCancelOrder(reqContext);

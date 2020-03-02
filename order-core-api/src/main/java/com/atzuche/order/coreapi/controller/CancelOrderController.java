@@ -4,14 +4,8 @@ import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.BindingResultUtil;
 import com.atzuche.order.commons.enums.DispatcherStatusEnum;
 import com.atzuche.order.commons.enums.PlatformCancelReasonEnum;
-import com.atzuche.order.commons.vo.req.AdminCancelOrderReqVO;
-import com.atzuche.order.commons.vo.req.AdminOrderCancelJudgeDutyReqVO;
-import com.atzuche.order.commons.vo.req.AdminOrderPlatformCancelReqVO;
-import com.atzuche.order.commons.vo.req.CancelOrderReqVO;
-import com.atzuche.order.coreapi.service.CancelOrderFeeService;
-import com.atzuche.order.coreapi.service.CancelOrderService;
-import com.atzuche.order.coreapi.service.OwnerOrderFineApplyHandelService;
-import com.atzuche.order.coreapi.service.PlatformCancelOrderService;
+import com.atzuche.order.commons.vo.req.*;
+import com.atzuche.order.coreapi.service.*;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.doc.annotation.AutoDocMethod;
 import com.autoyol.doc.annotation.AutoDocVersion;
@@ -45,6 +39,8 @@ public class CancelOrderController {
     private PlatformCancelOrderService platformCancelOrderService;
     @Autowired
     private CancelOrderFeeService cancelOrderFeeService;
+    @Autowired
+    private CancelOrderAppealService cancelOrderAppealService;
 
 
     @AutoDocMethod(description = "取消订单(车主/租客取消订单)", value = "取消订单(车主/租客取消订单)")
@@ -60,19 +56,19 @@ public class CancelOrderController {
     @AutoDocMethod(description = "取消订单(平台代车主/租客取消订单)", value = "取消订单(平台代车主/租客取消订单)")
     @PostMapping("/admin/cancel")
     public ResponseData<?> adminCancelOrder(@Valid @RequestBody AdminCancelOrderReqVO adminCancelOrderReqVO,
-                                       BindingResult bindingResult) {
+                                            BindingResult bindingResult) {
         LOGGER.info("User [{}] console cancel order.param is,adminCancelOrderReqVO:[{}]", adminCancelOrderReqVO.getOperatorName(),
                 JSON.toJSONString(adminCancelOrderReqVO));
         BindingResultUtil.checkBindingResult(bindingResult);
 
-        cancelOrderService.cancel(adminCancelOrderReqVO);
+        cancelOrderService.cancel(adminCancelOrderReqVO, true);
         return ResponseData.success();
     }
 
     @AutoDocMethod(description = "管理后台取消订单(平台取消)", value = "管理后台取消订单(平台取消)")
     @PostMapping("/admin/platform/cancel")
     public ResponseData<?> adminPlatformCancelOrder(@Valid @RequestBody AdminOrderPlatformCancelReqVO reqVO,
-                                            BindingResult bindingResult) {
+                                                    BindingResult bindingResult) {
         LOGGER.info("User [{}] console platform cancel order.param is,reqVO:[{}]", reqVO.getOperator(),
                 JSON.toJSONString(reqVO));
         BindingResultUtil.checkBindingResult(bindingResult);
@@ -86,7 +82,7 @@ public class CancelOrderController {
     @AutoDocMethod(description = "管理后台责任判定", value = "管理后台责任判定")
     @PostMapping("/admin/judgeDuty")
     public ResponseData<?> adminCancelOrderJudgeDuty(@Valid @RequestBody AdminOrderCancelJudgeDutyReqVO reqVO,
-                                                    BindingResult bindingResult) {
+                                                     BindingResult bindingResult) {
         LOGGER.info("User [{}] console order judge duty.param is,reqVO:[{}]", reqVO.getOperatorName(),
                 JSON.toJSONString(reqVO));
         BindingResultUtil.checkBindingResult(bindingResult);
@@ -95,7 +91,15 @@ public class CancelOrderController {
         return ResponseData.success();
     }
 
+    @AutoDocMethod(description = "订单取消申诉接口", value = "订单取消申诉接口")
+    @PostMapping("/normal/appeal")
+    public ResponseData<?> orderCancelAppeal(@Valid @RequestBody OrderCancelAppealReqVO reqVO, BindingResult bindingResult) {
+        LOGGER.info("Cancel order appeal.param is,reqVO:[{}]", JSON.toJSONString(reqVO));
+        BindingResultUtil.checkBindingResult(bindingResult);
 
+        cancelOrderAppealService.appeal(reqVO);
+        return ResponseData.success();
+    }
 
 
     @AutoDocMethod(description = "测试车主取消订单进度后续操作", value = "测试车主取消订单进度后续操作")
@@ -106,11 +110,11 @@ public class CancelOrderController {
                 DispatcherStatusEnum.from(dispatcherStatus));
         return ResponseData.success(result);
     }
-    
+
     @GetMapping("/cancelfee")
-    public ResponseData<?> cancelOrderFee(@RequestParam(value="orderNo",required = true) String orderNo) {
-    	Integer penalty = cancelOrderFeeService.getCancelPenalty(orderNo);
-    	return ResponseData.success(penalty);
+    public ResponseData<?> cancelOrderFee(@RequestParam(value = "orderNo", required = true) String orderNo) {
+        Integer penalty = cancelOrderFeeService.getCancelPenalty(orderNo);
+        return ResponseData.success(penalty);
     }
 
 }
