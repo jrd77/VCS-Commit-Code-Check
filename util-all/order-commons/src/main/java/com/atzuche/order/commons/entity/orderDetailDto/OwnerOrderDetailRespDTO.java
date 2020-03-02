@@ -7,6 +7,9 @@ import java.util.List;
 @Data
 public class OwnerOrderDetailRespDTO {
     public OrderDTO order;
+    public OrderStatusDTO orderStatus;
+    public OrderSourceStatDTO orderSourceStat;
+    public RenterMemberDTO renterMemberDTO;
     public OwnerOrderDTO ownerOrder;
     public OwnerGoodsDTO ownerGoods;
     public OwnerMemberDTO ownerMember;
@@ -19,4 +22,5 @@ public class OwnerOrderDetailRespDTO {
     public List<OwnerOrderSubsidyDetailDTO> ownerOrderSubsidyDetailDTOS;
     public OwnerOrderCostDTO ownerOrderCostDTO;
     public List<AccountOwnerIncomeExamineDTO> accountOwnerIncomeExamineDTOS;
+    public List<OwnerOrderIncrementDetailDTO> ownerOrderIncrementDetailDTOS;
 }

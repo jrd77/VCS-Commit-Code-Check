@@ -30,4 +30,9 @@ public class OrderMessage<T> implements Serializable {
 	 * 发送短信的Map构成（对应的发送短信模版ID，对应的短信内容参数）
 	 */
 	private Map map;
+
+	/**
+	 * 发送push通知
+	 */
+	private Map pushMap;
 }

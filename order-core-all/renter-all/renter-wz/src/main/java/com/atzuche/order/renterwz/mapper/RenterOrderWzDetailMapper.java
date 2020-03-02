@@ -121,7 +121,7 @@ public interface RenterOrderWzDetailMapper{
 	 * @param carNo 车牌号
 	 * @return 违章数量
 	 */
-    Integer queryIllegalCountByCarNoAndOrders(@Param("orders") List<String> orders,@Param("carNo") String carNo);
+    Integer queryIllegalCountByCarNoAndOrders(@Param("orderNos") List<String> orders,@Param("carNo") String carNo);
 
 	/**
 	 * 查询违章详情

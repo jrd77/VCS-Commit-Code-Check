@@ -1,8 +1,7 @@
 package com.atzuche.order.settle.vo.req;
 
+import com.atzuche.order.ownercost.entity.OwnerOrderEntity;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
-
-import lombok.Data;
 
 /**
  * 订单违章结算对象
@@ -36,6 +35,45 @@ public class SettleOrdersWz {
      *  租客订单信息
      */
     RenterOrderEntity renterOrder;
+    
+    ///预留字段，违章结算跟车主无关。
+    /**
+	* 车主订单号
+	*/
+	private String ownerOrderNo;
+	/**
+	* 车主会员号
+	*/
+	private String ownerMemNo;
+	/**
+	* 车主订单信息
+	*/
+	OwnerOrderEntity ownerOrder;
+	
+	
+	public String getOwnerOrderNo() {
+		return ownerOrderNo;
+	}
+
+	public void setOwnerOrderNo(String ownerOrderNo) {
+		this.ownerOrderNo = ownerOrderNo;
+	}
+
+	public String getOwnerMemNo() {
+		return ownerMemNo;
+	}
+
+	public void setOwnerMemNo(String ownerMemNo) {
+		this.ownerMemNo = ownerMemNo;
+	}
+
+	public OwnerOrderEntity getOwnerOrder() {
+		return ownerOrder;
+	}
+
+	public void setOwnerOrder(OwnerOrderEntity ownerOrder) {
+		this.ownerOrder = ownerOrder;
+	}
 
 	public String getOrderNo() {
 		return orderNo;

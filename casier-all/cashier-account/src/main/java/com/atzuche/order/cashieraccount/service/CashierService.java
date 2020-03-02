@@ -26,6 +26,7 @@ import com.atzuche.order.commons.vo.res.account.income.AdjustOwnerIncomeResVO;
 import com.atzuche.order.flow.service.OrderFlowService;
 import com.atzuche.order.mq.common.base.BaseProducer;
 import com.atzuche.order.mq.common.base.OrderMessage;
+import com.atzuche.order.mq.enums.PushMessageTypeEnum;
 import com.atzuche.order.mq.enums.ShortMessageTypeEnum;
 import com.atzuche.order.mq.util.SmsParamsMapUtil;
 import com.atzuche.order.parentorder.dto.OrderStatusDTO;
@@ -634,6 +635,11 @@ public class CashierService {
         orderRenterPay.setRenterMemNo(Integer.valueOf(vo.getMemNo()));
         OrderMessage orderMessage = OrderMessage.builder().build();
         orderMessage.setMessage(orderRenterPay);
+        //push车主租客已支付费用
+        if (1 == type) {
+            Map map = SmsParamsMapUtil.getParamsMap(vo.getOrderNo(), PushMessageTypeEnum.RENTER_PAY_CAR_SUCCESS.getValue(), PushMessageTypeEnum.RENTER_PAY_CAR_2_OWNER.getValue(), null);
+            orderMessage.setPushMap(map);
+        }
         log.info("发送订单支付成功事件 （支付押金/违章押金成功）.mq:,message=[{}]",event,
                 GsonUtils.toJson(orderMessage));
         try {

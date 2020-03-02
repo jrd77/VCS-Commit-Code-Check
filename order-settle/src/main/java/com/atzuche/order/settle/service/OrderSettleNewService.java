@@ -447,7 +447,7 @@ public class OrderSettleNewService {
      * flag  0：成功 1：失败
      * @param orderNo
      */
-    public void sendOrderSettleMq(String orderNo,String renterMemNo,RentCosts rentCosts,int status) {
+    public void sendOrderSettleMq(String orderNo,String renterMemNo,RentCosts rentCosts,int status,String ownerMemNo) {
         log.info("sendOrderSettleMq start [{}],[{}],[{}],[{}]",orderNo,renterMemNo,GsonUtils.toJson(rentCosts),status);
         AccountRenterCostSettleEntity entity=cashierSettleService.getAccountRenterCostSettleEntity(orderNo,renterMemNo);
         OrderSettlementMq orderSettlementMq = new OrderSettlementMq();
@@ -493,6 +493,9 @@ public class OrderSettleNewService {
         }
         orderSettlementMq.setStatus(status);
         orderSettlementMq.setOrderNo(orderNo);
+        ///增加租客会员号，车主会员号 200228
+        orderSettlementMq.setRenterMemNo(Integer.valueOf(renterMemNo));
+        orderSettlementMq.setOwnerMemNo(Integer.valueOf(ownerMemNo));
         OrderMessage orderMessage = OrderMessage.builder().build();
         orderMessage.setMessage(orderSettlementMq);
         NewOrderMQActionEventEnum eventEnum = null;

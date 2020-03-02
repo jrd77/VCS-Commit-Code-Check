@@ -35,10 +35,11 @@ public class OrderWzSettleService {
 	public void settleWzOrder(String orderNo) {
 		log.info("OrderWzSettleService settleOrder orderNo [{}]",orderNo);
         Transaction t = Cat.getProducer().newTransaction(CatConstants.FEIGN_CALL, "违章结算服务");
+        SettleOrdersWz settleOrders = new  SettleOrdersWz();
         try {
             Cat.logEvent("settleOrder",orderNo);
             //1 初始化操作 校验操作
-            SettleOrdersWz settleOrders =  orderWzSettleNewService.initSettleOrders(orderNo);
+            settleOrders = orderWzSettleNewService.initSettleOrders(orderNo);
             log.info("OrderSettleService settleOrders init data settleOrders [{}]",GsonUtils.toJson(settleOrders));
             Cat.logEvent("settleOrders",GsonUtils.toJson(settleOrders));
 
@@ -54,7 +55,7 @@ public class OrderWzSettleService {
             
             Cat.logEvent("settleOrders",GsonUtils.toJson(settleOrders));
             
-            orderWzSettleNewService.sendOrderWzSettleSuccessMq(orderNo);
+            orderWzSettleNewService.sendOrderWzSettleSuccessMq(orderNo,settleOrders.getRenterMemNo(),settleOrders.getOwnerMemNo());
             t.setStatus(Transaction.SUCCESS);
         } catch (Exception e) {
             log.error("OrderWzSettleService settleOrder,e={},",e);
@@ -66,7 +67,7 @@ public class OrderWzSettleService {
             orderStatusDTO.setWzSettleStatus(SettleStatusEnum.SETTL_FAIL.getCode());
             orderStatusDTO.setSettleTime(LocalDateTime.now());
             orderStatusService.saveOrderStatusInfo(orderStatusDTO);
-            orderWzSettleNewService.sendOrderWzSettleFailMq(orderNo);
+            orderWzSettleNewService.sendOrderWzSettleFailMq(orderNo,settleOrders.getRenterMemNo(),settleOrders.getOwnerMemNo());
             t.setStatus(e);
             Cat.logError("结算失败  :{}",e);
             throw new RuntimeException("违章结算失败 ,不能结算");
