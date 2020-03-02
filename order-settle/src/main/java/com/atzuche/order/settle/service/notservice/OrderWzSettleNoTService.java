@@ -9,13 +9,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostSettleDetailEntity;
+import com.atzuche.order.cashieraccount.entity.CashierEntity;
 import com.atzuche.order.cashieraccount.service.CashierWzSettleService;
+import com.atzuche.order.cashieraccount.service.notservice.CashierNoTService;
 import com.atzuche.order.cashieraccount.vo.req.CashierDeductDebtReqVO;
 import com.atzuche.order.cashieraccount.vo.req.CashierRefundApplyReqVO;
 import com.atzuche.order.cashieraccount.vo.req.DeductDepositToRentCostReqVO;
 import com.atzuche.order.cashieraccount.vo.res.CashierDeductDebtResVO;
 import com.atzuche.order.commons.enums.OrderStatusEnum;
-import com.atzuche.order.commons.enums.SysOrHandEnum;
 import com.atzuche.order.commons.enums.account.debt.DebtTypeEnum;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.commons.enums.cashier.OrderRefundStatusEnum;
@@ -28,6 +29,8 @@ import com.atzuche.order.settle.vo.req.AccountInsertDebtReqVO;
 import com.atzuche.order.settle.vo.req.RentCostsWz;
 import com.atzuche.order.settle.vo.req.SettleOrdersAccount;
 import com.atzuche.order.settle.vo.req.SettleOrdersWz;
+import com.autoyol.autopay.gateway.constant.DataPayKindConstant;
+import com.autoyol.autopay.gateway.constant.DataPayTypeConstant;
 import com.autoyol.commons.utils.GsonUtils;
 
 import lombok.extern.slf4j.Slf4j;
@@ -52,7 +55,9 @@ public class OrderWzSettleNoTService {
 
     @Autowired
     RenterOrderWzCostDetailService renterOrderWzCostDetailService;
-
+    @Autowired 
+    CashierNoTService cashierNoTService;
+    
     /**
      * 查询租客费用明细
      * @param settleOrders
@@ -112,13 +117,27 @@ public class OrderWzSettleNoTService {
             //1退还违章押金
             CashierRefundApplyReqVO cashierRefundApply = new CashierRefundApplyReqVO();
             BeanUtils.copyProperties(settleOrdersAccount,cashierRefundApply);
-            cashierRefundApply.setMemNo(settleOrdersAccount.getRenterMemNo());
-            cashierRefundApply.setAmt(-settleOrdersAccount.getDepositSurplusAmt());
-            cashierRefundApply.setRenterCashCodeEnum(RenterCashCodeEnum.SETTLE_WZ_DEPOSIT_TO_RETURN_AMT);
-            cashierRefundApply.setRemake(RenterCashCodeEnum.SETTLE_WZ_DEPOSIT_TO_RETURN_AMT.getTxt());
-            cashierRefundApply.setFlag(RenterCashCodeEnum.ACCOUNT_RENTER_WZ_DEPOSIT.getCashNo());
-            cashierRefundApply.setType(SysOrHandEnum.SYSTEM.getStatus());
-            int id =cashierWzSettleService.refundWzDeposit(cashierRefundApply);
+//            cashierRefundApply.setMemNo(settleOrdersAccount.getRenterMemNo());
+//            cashierRefundApply.setAmt(-settleOrdersAccount.getDepositSurplusAmt());
+//            cashierRefundApply.setRenterCashCodeEnum(RenterCashCodeEnum.SETTLE_WZ_DEPOSIT_TO_RETURN_AMT);
+//            cashierRefundApply.setRemake(RenterCashCodeEnum.SETTLE_WZ_DEPOSIT_TO_RETURN_AMT.getTxt());
+//            cashierRefundApply.setFlag(RenterCashCodeEnum.ACCOUNT_RENTER_WZ_DEPOSIT.getCashNo());
+//            cashierRefundApply.setType(SysOrHandEnum.SYSTEM.getStatus());
+//            int id =cashierWzSettleService.refundWzDeposit(cashierRefundApply);
+            
+        	//方法重构
+            CashierEntity cashierEntity = cashierNoTService.getCashierEntity(settleOrdersAccount.getOrderNo(),settleOrdersAccount.getRenterMemNo(), DataPayKindConstant.DEPOSIT);
+            BeanUtils.copyProperties(cashierEntity,cashierRefundApply);
+            
+            //预授权处理
+            int id = 0;
+            if(cashierEntity != null && DataPayTypeConstant.PAY_PRE.equals(cashierEntity.getPayType())) {
+            	id = cashierWzSettleService.refundWzDepositPreAuthAll(settleOrdersAccount.getDepositSurplusAmt(), cashierEntity, cashierRefundApply, RenterCashCodeEnum.SETTLE_WZ_DEPOSIT_TO_RETURN_AMT);
+            }else {
+            	//消费
+            	//退货
+            	id = cashierWzSettleService.refundWzDepositPurchase(settleOrdersAccount.getDepositSurplusAmt(), cashierEntity, cashierRefundApply,RenterCashCodeEnum.SETTLE_WZ_DEPOSIT_TO_RETURN_AMT);
+            }
             
             
           //wzTotalCost-todo

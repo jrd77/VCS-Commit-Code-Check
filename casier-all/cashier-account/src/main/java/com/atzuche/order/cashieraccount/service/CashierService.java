@@ -49,8 +49,10 @@ import com.atzuche.order.cashieraccount.vo.res.pay.OrderPayCallBackSuccessVO;
 import com.atzuche.order.commons.enums.FineSubsidyCodeEnum;
 import com.atzuche.order.commons.enums.OrderPayStatusEnum;
 import com.atzuche.order.commons.enums.OrderStatusEnum;
+import com.atzuche.order.commons.enums.SysOrHandEnum;
 import com.atzuche.order.commons.enums.YesNoEnum;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
+import com.atzuche.order.commons.enums.cashier.CashierRefundApplyStatus;
 import com.atzuche.order.commons.enums.cashier.OrderRefundStatusEnum;
 import com.atzuche.order.commons.enums.cashier.TransStatusEnum;
 import com.atzuche.order.commons.vo.req.income.AccountOwnerIncomeExamineOpReqVO;
@@ -421,7 +423,7 @@ public class CashierService {
      * 退还违章押金
      */
     @Transactional(rollbackFor=Exception.class)
-    public void refundWZDeposit(CashierRefundApplyReqVO cashierRefundApplyReq){
+    public int refundWZDeposit(CashierRefundApplyReqVO cashierRefundApplyReq){
         Assert.notNull(cashierRefundApplyReq, ErrorCode.PARAMETER_ERROR.getText());
         cashierRefundApplyReq.check();
 
@@ -432,6 +434,8 @@ public class CashierService {
         BeanUtils.copyProperties(cashierRefundApplyReq,payedOrderRenterWZDepositDetail);
         payedOrderRenterWZDepositDetail.setUniqueNo(id.toString());
         accountRenterWzDepositService.updateRenterWZDepositChange(payedOrderRenterWZDepositDetail);
+        
+        return id;
     }
     
 //    @Transactional(rollbackFor=Exception.class)
@@ -443,6 +447,157 @@ public class CashierService {
         return id;
     }
     
+    /**
+     * 租车押金预授权退款
+     * @param rentSurplusDepositAmt
+     * @param cashierEntity
+     * @param cashierRefundApply
+     * @param cashCode
+     */
+    public int refundDepositPreAuthAll(int rentSurplusDepositAmt, CashierEntity cashierEntity, CashierRefundApplyReqVO cashierRefundApply,RenterCashCodeEnum cashCode) {
+		//是否存在预授权完成操作
+		boolean isExistsPreAuthFinish = (cashierEntity.getPayAmt() - Math.abs(rentSurplusDepositAmt) > 0);
+		
+		int id = 0;
+		//预授权解冻，金额不允许为0
+		//考虑全额预授权解冻
+		if(Math.abs(rentSurplusDepositAmt) != 0){
+			//超出金额的做限制,退款的超出做全额解冻。
+			int refundAmt = -rentSurplusDepositAmt;
+			if(Math.abs(refundAmt) > cashierEntity.getPayAmt()) {
+				refundAmt = cashierEntity.getPayAmt();
+			}
+			
+			//预授权  退款就是解冻，余下的就是预授权完成
+			cashierRefundApply.setPayType(DataPayTypeConstant.PRE_VOID); //解冻
+			cashierRefundApply.setAmt(refundAmt);
+		    cashierRefundApply.setRenterCashCodeEnum(cashCode);
+		    cashierRefundApply.setRemake(cashCode.getTxt());
+		    cashierRefundApply.setFlag(RenterCashCodeEnum.ACCOUNT_RENTER_DEPOSIT.getCashNo());
+		    cashierRefundApply.setType(SysOrHandEnum.SYSTEM.getStatus());
+		    cashierRefundApply.setQn(cashierEntity.getQn());
+		    cashierRefundApply.setPayKind(DataPayKindConstant.RENT);
+		    //需要在预授权完成之后再做解冻操作
+		    if(isExistsPreAuthFinish) {  //存在预授权完成的时候，暂停解冻。
+		    	cashierRefundApply.setStatus(CashierRefundApplyStatus.STOP_FOR_REFUND.getCode());
+		    }
+		    
+		    id = this.refundDeposit(cashierRefundApply);
+		}
+		
+		//添加预授权完成记录,金额不允许为0 
+		//考虑全额预授权完成
+		//预授权完成金额不会比 支付的金额大
+		if(isExistsPreAuthFinish) {  // > 0
+		    cashierRefundApply.setPayType(DataPayTypeConstant.PRE_FINISH); //预授权完成
+			cashierRefundApply.setAmt( cashierEntity.getPayAmt() - Math.abs(rentSurplusDepositAmt) );
+		    cashierRefundApply.setRenterCashCodeEnum(cashCode);
+		    cashierRefundApply.setRemake(cashCode.getTxt());
+		    cashierRefundApply.setFlag(RenterCashCodeEnum.ACCOUNT_RENTER_DEPOSIT.getCashNo());
+		    cashierRefundApply.setType(SysOrHandEnum.SYSTEM.getStatus());
+		    cashierRefundApply.setQn(cashierEntity.getQn());
+		    cashierRefundApply.setPayKind(DataPayKindConstant.RENT);
+		    id = this.refundDepositPreAuth(cashierRefundApply);  //仅仅提交预授权完成记录
+		}
+		
+		return id;
+	}
+    
+    /**
+     * 租车押金消费退款
+     * @param rentSurplusDepositAmt
+     * @param cashierEntity
+     * @param cashierRefundApply
+     * @param cashCode
+     */
+    public int refundDepositPurchase(int rentSurplusDepositAmt,
+			CashierEntity cashierEntity, CashierRefundApplyReqVO cashierRefundApply,RenterCashCodeEnum cashCode) {
+		cashierRefundApply.setPayType(DataPayTypeConstant.PUR_RETURN); //退货
+		cashierRefundApply.setAmt(-rentSurplusDepositAmt);
+		cashierRefundApply.setRenterCashCodeEnum(cashCode);
+		cashierRefundApply.setRemake(cashCode.getTxt());
+		cashierRefundApply.setFlag(RenterCashCodeEnum.ACCOUNT_RENTER_DEPOSIT.getCashNo());
+		cashierRefundApply.setType(SysOrHandEnum.SYSTEM.getStatus());
+		cashierRefundApply.setQn(cashierEntity.getQn());
+		return this.refundDeposit(cashierRefundApply);
+	}
+    
+    /**
+     * 违章押金预授权退款方法
+     * @param rentSurplusWzDepositAmt
+     * @param cashierEntity
+     * @param cashierRefundApply
+     * @param cashCode
+     */
+    public int refundWzDepositPreAuthAll(int rentSurplusWzDepositAmt,CashierEntity cashierEntity, CashierRefundApplyReqVO cashierRefundApply,RenterCashCodeEnum cashCode) {
+		//是否存在预授权完成操作
+		boolean isExistsPreAuthFinish = (cashierEntity.getPayAmt() - Math.abs(rentSurplusWzDepositAmt) > 0);
+		int id = 0;
+		
+		//预授权  退款就是解冻，余下的就是预授权完成
+		//预授权解冻，金额不允许为0
+		//考虑全额预授权解冻
+		if(Math.abs(rentSurplusWzDepositAmt) != 0){
+			//超出金额的做限制,退款的超出做全额解冻。
+			int refundAmt = -rentSurplusWzDepositAmt;
+			if(Math.abs(refundAmt) > cashierEntity.getPayAmt()) {
+				refundAmt = cashierEntity.getPayAmt();
+			}
+			
+			cashierRefundApply.setPayType(DataPayTypeConstant.PRE_VOID); //解冻
+			cashierRefundApply.setAmt(refundAmt);
+		    cashierRefundApply.setRenterCashCodeEnum(cashCode);
+		    cashierRefundApply.setRemake(cashCode.getTxt());
+		    cashierRefundApply.setFlag(RenterCashCodeEnum.ACCOUNT_RENTER_WZ_DEPOSIT.getCashNo());
+		    cashierRefundApply.setType(SysOrHandEnum.SYSTEM.getStatus());
+		    cashierRefundApply.setQn(cashierEntity.getQn());
+		    cashierRefundApply.setPayKind(DataPayKindConstant.DEPOSIT);
+		    
+		    //需要在预授权完成之后再做解冻操作
+		    if(isExistsPreAuthFinish) {
+		    	cashierRefundApply.setStatus(CashierRefundApplyStatus.STOP_FOR_REFUND.getCode());
+		    }
+		    
+		    id = this.refundWZDeposit(cashierRefundApply);
+		}
+		
+		//添加预授权完成记录 
+		//添加预授权完成记录,金额不允许为0 
+		//考虑全额预授权完成
+		if(isExistsPreAuthFinish) {
+		    cashierRefundApply.setPayType(DataPayTypeConstant.PRE_FINISH); //预授权完成
+			cashierRefundApply.setAmt( cashierEntity.getPayAmt() - Math.abs(rentSurplusWzDepositAmt) );
+			cashierRefundApply.setRenterCashCodeEnum(cashCode);
+		    cashierRefundApply.setRemake(cashCode.getTxt());
+		    cashierRefundApply.setFlag(RenterCashCodeEnum.ACCOUNT_RENTER_WZ_DEPOSIT.getCashNo());
+		    cashierRefundApply.setType(SysOrHandEnum.SYSTEM.getStatus());
+		    cashierRefundApply.setQn(cashierEntity.getQn());
+		    cashierRefundApply.setPayKind(DataPayKindConstant.DEPOSIT);
+		    id = this.refundWZDepositPreAuth(cashierRefundApply);  //仅仅提交预授权完成记录 
+		}
+		return id;
+	}
+    
+    /**
+     * 违章押金的消费退货处理
+     * @param rentSurplusWzDepositAmt
+     * @param cashierEntity
+     * @param cashierRefundApply
+     * @param cashCode
+     */
+	public int refundWzDepositPurchase(int rentSurplusWzDepositAmt,
+			CashierEntity cashierEntity, CashierRefundApplyReqVO cashierRefundApply,RenterCashCodeEnum cashCode) {
+		cashierRefundApply.setPayType(DataPayTypeConstant.PUR_RETURN); //退货
+		cashierRefundApply.setAmt(-rentSurplusWzDepositAmt);
+		cashierRefundApply.setRenterCashCodeEnum(cashCode);
+		cashierRefundApply.setRemake(cashCode.getTxt());
+		cashierRefundApply.setFlag(RenterCashCodeEnum.ACCOUNT_RENTER_WZ_DEPOSIT.getCashNo());
+		cashierRefundApply.setType(SysOrHandEnum.SYSTEM.getStatus());
+		cashierRefundApply.setQn(cashierEntity.getQn());
+		cashierRefundApply.setPayKind(DataPayKindConstant.DEPOSIT);
+		return this.refundWZDeposit(cashierRefundApply);
+	}
+	
     /**  ***************************************** 退还押金 end ************************************************* */
 
     /**  ***************************************** 车主收益 start ************************************************* */

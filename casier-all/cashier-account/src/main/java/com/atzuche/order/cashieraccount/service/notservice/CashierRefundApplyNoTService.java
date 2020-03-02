@@ -7,10 +7,14 @@ import com.atzuche.order.cashieraccount.exception.OrderPayRefundCallBackAsnyExce
 import com.atzuche.order.cashieraccount.vo.req.CashierRefundApplyReqVO;
 import com.atzuche.order.commons.enums.cashier.CashierRefundApplyStatus;
 import com.autoyol.autopay.gateway.constant.DataPayKindConstant;
+import com.autoyol.autopay.gateway.constant.DataPayTypeConstant;
 import com.autoyol.autopay.gateway.util.MD5;
 import com.autoyol.autopay.gateway.vo.req.NotifyDataVo;
 import com.autoyol.autopay.gateway.vo.res.AutoPayResultVo;
 import com.autoyol.doc.util.StringUtil;
+
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,6 +34,7 @@ import java.util.Objects;
  * @author ZhangBin
  * @date 2019-12-11 11:17:59
  */
+@Slf4j
 @Service
 public class CashierRefundApplyNoTService {
     @Autowired
@@ -87,8 +92,23 @@ public class CashierRefundApplyNoTService {
             if(result==0){
                 throw new OrderPayRefundCallBackAsnyException();
             }
-            //4.如果是预授权完成的操作成功，检测该订单是否存在预授权解冻的记录。修改status=01退款中。 todo huangjing
-            
+            //4.如果是预授权完成的操作成功，检测该订单是否存在预授权解冻的记录。修改status=01退款中。 todo huangjing  do  200302
+            if(DataPayTypeConstant.PRE_FINISH.equals(cashierRefundApplyEntity.getPayType())) {
+            	//当前是预授权完成的记录，同时查询该笔订单是否存在预授权解冻的记录，修改状态为01 退款中。
+            	List<CashierRefundApplyEntity> listCashierRefundApply = cashierRefundApplyMapper.getRefundApplyByOrderNo(cashierRefundApplyEntity.getOrderNo());
+            	//按组来切分（租车押金或违章押金）
+            	for (CashierRefundApplyEntity cashierRefundApplyEntity2 : listCashierRefundApply) {
+					if(cashierRefundApplyEntity.getPayKind().equals(cashierRefundApplyEntity2.getPayKind())
+							&& DataPayTypeConstant.PRE_VOID.equals(cashierRefundApplyEntity2.getPayType()) 
+							&& CashierRefundApplyStatus.STOP_FOR_REFUND.equals(cashierRefundApplyEntity2.getStatus())
+							) {  //预授权解冻
+						//需要修改该条记录为 退款中
+						cashierRefundApplyEntity2.setStatus(CashierRefundApplyStatus.WAITING_FOR_REFUND.getCode());
+						int i = cashierRefundApplyMapper.updateByPrimaryKeySelective(cashierRefundApplyEntity2);
+						log.info("预授权完成成功之后，遍历该订单查询预授权解冻记录。需要根据是押金或违章押金来区分，params=[{}],result=[{}]",cashierRefundApplyEntity2.toString(),i);
+					}
+				}
+            }
         }
     }
 
