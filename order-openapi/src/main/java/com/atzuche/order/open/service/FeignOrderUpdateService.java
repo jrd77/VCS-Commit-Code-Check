@@ -84,4 +84,14 @@ public interface FeignOrderUpdateService {
     public ResponseData<?> adminOwnerRefuseOrder(@RequestBody RefuseOrderReqVO reqVO) ;
 
 
+    /**
+     * 取消订单申诉
+     *
+     * @param orderCancelAppealReqVO 请求参数
+     * @return ResponseData<?>
+     */
+    @PostMapping("/order/normal/appeal")
+    public ResponseData<?> orderCancelAppeal(@RequestBody OrderCancelAppealReqVO orderCancelAppealReqVO);
+
+
 }
