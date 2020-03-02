@@ -33,6 +33,10 @@ public class PayedOrderRenterDepositReqVO {
      */
     private Integer shifuDepositAmt;
     /**
+     * 是否预授权，0否1是
+     */
+    private Integer isAuthorize;
+    /**
      * 预授权金额
      */
     private Integer authorizeDepositAmt;
@@ -48,6 +52,12 @@ public class PayedOrderRenterDepositReqVO {
      * 剩余预授权金额
      */
     private Integer surplusAuthorizeDepositAmt;
+    
+    /**
+     * 剩余信用支付金额
+     */
+    private Integer surplusCreditPayAmt;
+    
     /**
      * 开启免押
      */
