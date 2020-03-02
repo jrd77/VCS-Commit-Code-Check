@@ -49,7 +49,8 @@ public class RenterHandoverCarService implements IUpdateHandoverCarInfo {
                 if (StringUtils.isNotBlank(handoverCarInfoReqDTO.getRenterRetrunKM()) && !handoverCarInfoReqDTO.getRenterRetrunKM().equals("0")) {
                     r.setMileageNum(Integer.valueOf(handoverCarInfoReqDTO.getRenterRetrunKM()));
                 }
-            } else if (r.getType().intValue() == RenterHandoverCarTypeEnum.RENTER_TO_OWNER.getValue() || r.getType().intValue() == RenterHandoverCarTypeEnum.RENTER_TO_RENYUN.getValue()) {
+            }
+            else if (r.getType().intValue() == RenterHandoverCarTypeEnum.RENTER_TO_OWNER.getValue() || r.getType().intValue() == RenterHandoverCarTypeEnum.RENTER_TO_RENYUN.getValue()) {
                 if (StringUtils.isNotBlank(handoverCarInfoReqDTO.getOwnReturnOil()) && !handoverCarInfoReqDTO.getOwnReturnOil().equals("0")) {
                     r.setOilNum(Integer.valueOf(handoverCarInfoReqDTO.getOwnReturnOil()));
                 }
