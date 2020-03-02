@@ -1,7 +1,9 @@
 package com.atzuche.order.coreapi.service;
 
 import com.atzuche.order.commons.LocalDateTimeUtils;
+import com.atzuche.order.commons.constant.OrderConstant;
 import com.atzuche.order.commons.entity.dto.OwnerGoodsDetailDTO;
+import com.atzuche.order.commons.enums.DispatcherReasonEnum;
 import com.atzuche.order.commons.enums.OrderStatusEnum;
 import com.atzuche.order.commons.enums.OwnerAgreeTypeEnum;
 import com.atzuche.order.commons.exceptions.OrderNotFoundException;
@@ -82,8 +84,9 @@ public class OwnerAgreeOrderService {
      */
     @Transactional(rollbackFor = Exception.class)
     public void agree(AgreeOrderReqVO reqVO) {
+        boolean isConsoleInvoke = null != reqVO.getIsConsoleInvoke() && OrderConstant.YES == reqVO.getIsConsoleInvoke();
         //车主同意前置校验
-        refuseOrderCheckService.checkOwnerAgreeOrRefuseOrder(reqVO.getOrderNo(), StringUtils.isNotBlank(reqVO.getOperatorName()));
+        refuseOrderCheckService.checkOwnerAgreeOrRefuseOrder(reqVO.getOrderNo(), isConsoleInvoke);
 
         OwnerOrderEntity ownerOrderEntity = ownerOrderService.getOwnerOrderByOrderNoAndIsEffective(reqVO.getOrderNo());
         //扣减库存

@@ -24,6 +24,17 @@ public enum CancelSourceEnum {
      **/
     PLATFORM(3, "平台"),
 
+    /**
+     * 平台代租客取消
+     **/
+    INSTEAD_OF_RENTER(4, "平台代租客取消"),
+
+
+    /**
+     * 平台代车主取消
+     **/
+    INSTEAD_OF_OWNER(5, "平台代车主取消")
+
     ;
 
 

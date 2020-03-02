@@ -66,15 +66,13 @@ public class OrderDispatchCancelHandleService {
 
         //返回信息处理
         CancelOrderResDTO cancelOrderResDTO = new CancelOrderResDTO();
-        cancelOrderResDTO.setIsReturnDisCoupon(true);
-        cancelOrderResDTO.setIsReturnOwnerCoupon(true);
         cancelOrderResDTO.setOwnerCouponNo(null == ownerCouponEntity ? null : ownerCouponEntity.getCouponId());
-        cancelOrderResDTO.setIsRefund(true);
         cancelOrderResDTO.setRentCarPayStatus(orderStatusEntity.getRentCarPayStatus());
         cancelOrderResDTO.setRenterOrderNo(renterOrderEntity.getRenterOrderNo());
         cancelOrderResDTO.setSrvGetFlag(null != renterOrderEntity.getIsGetCar() && renterOrderEntity.getIsGetCar() == 1);
         cancelOrderResDTO.setSrvReturnFlag(null != renterOrderEntity.getIsReturnCar() && renterOrderEntity.getIsReturnCar() == 1);
         cancelOrderResDTO.setStatus(orderStatusDTO.getStatus());
+        cancelOrderResDTO.setIsDispatch(false);
         return cancelOrderResDTO;
     }
 }

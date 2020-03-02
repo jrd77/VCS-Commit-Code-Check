@@ -28,6 +28,11 @@ public class OrderConstant {
     /**
      * 取送车优惠券的类型
      */
-    private static final Integer GET_CAR_FREE_COUPON = 8;
+    public static final Integer GET_CAR_FREE_COUPON = 8;
+
+    /**
+     * 定时任务操作人
+     */
+    public static String SYSTEM_OPERATOR_JOB = "system_job";
 
 }
