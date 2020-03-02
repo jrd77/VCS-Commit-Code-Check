@@ -27,15 +27,20 @@ import com.atzuche.order.accountrenterwzdepost.service.notservice.AccountRenterW
 import com.atzuche.order.accountrenterwzdepost.vo.req.AccountRenterWzCostDetailReqVO;
 import com.atzuche.order.accountrenterwzdepost.vo.req.DetainRenterWZDepositReqVO;
 import com.atzuche.order.accountrenterwzdepost.vo.req.PayedOrderRenterDepositWZDetailReqVO;
+import com.atzuche.order.cashieraccount.entity.CashierEntity;
 import com.atzuche.order.cashieraccount.service.notservice.CashierRefundApplyNoTService;
 import com.atzuche.order.cashieraccount.vo.req.CashierDeductDebtReqVO;
 import com.atzuche.order.cashieraccount.vo.req.CashierRefundApplyReqVO;
 import com.atzuche.order.cashieraccount.vo.req.DeductDepositToRentCostReqVO;
 import com.atzuche.order.cashieraccount.vo.res.CashierDeductDebtResVO;
+import com.atzuche.order.commons.enums.SysOrHandEnum;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
+import com.atzuche.order.commons.enums.cashier.CashierRefundApplyStatus;
 import com.atzuche.order.settle.service.AccountDebtService;
 import com.atzuche.order.settle.vo.req.AccountDeductDebtReqVO;
 import com.atzuche.order.settle.vo.req.AccountInsertDebtReqVO;
+import com.autoyol.autopay.gateway.constant.DataPayKindConstant;
+import com.autoyol.autopay.gateway.constant.DataPayTypeConstant;
 import com.autoyol.commons.utils.GsonUtils;
 import com.autoyol.commons.web.ErrorCode;
 
@@ -191,6 +196,96 @@ public class CashierWzSettleService {
         accountRenterWzDepositService.updateOrderDepositSettle(detainRenterDepositReqVO);
         return depositDetailId;
     }
+    
+    //仅仅新增记录。
+    public int refundWzDepositPreAuth(CashierRefundApplyReqVO cashierRefundApplyReq){
+        Assert.notNull(cashierRefundApplyReq, ErrorCode.PARAMETER_ERROR.getText());
+        cashierRefundApplyReq.check();
+        //1 记录退还记录
+        Integer id = cashierRefundApplyNoTService.insertRefundDeposit(cashierRefundApplyReq);
+        return id;
+    }
+    
+    
+    /////从CashierService代码
+    /**
+     * 违章押金预授权退款方法
+     * @param rentSurplusWzDepositAmt
+     * @param cashierEntity
+     * @param cashierRefundApply
+     * @param cashCode
+     */
+    public int refundWzDepositPreAuthAll(int rentSurplusWzDepositAmt,CashierEntity cashierEntity, CashierRefundApplyReqVO cashierRefundApply,RenterCashCodeEnum cashCode) {
+		//是否存在预授权完成操作
+		boolean isExistsPreAuthFinish = (cashierEntity.getPayAmt() - Math.abs(rentSurplusWzDepositAmt) > 0);
+		int id = 0;
+		
+		//预授权  退款就是解冻，余下的就是预授权完成
+		//预授权解冻，金额不允许为0
+		//考虑全额预授权解冻
+		if(Math.abs(rentSurplusWzDepositAmt) != 0){
+			//超出金额的做限制,退款的超出做全额解冻。
+			int refundAmt = -rentSurplusWzDepositAmt;
+			if(Math.abs(refundAmt) > cashierEntity.getPayAmt()) {
+				refundAmt = cashierEntity.getPayAmt();
+			}
+			
+			cashierRefundApply.setPayType(DataPayTypeConstant.PRE_VOID); //解冻
+			cashierRefundApply.setAmt(refundAmt);
+		    cashierRefundApply.setRenterCashCodeEnum(cashCode);
+		    cashierRefundApply.setRemake(cashCode.getTxt());
+		    cashierRefundApply.setFlag(RenterCashCodeEnum.ACCOUNT_RENTER_WZ_DEPOSIT.getCashNo());
+		    cashierRefundApply.setType(SysOrHandEnum.SYSTEM.getStatus());
+		    cashierRefundApply.setQn(cashierEntity.getQn());
+		    cashierRefundApply.setPayKind(DataPayKindConstant.DEPOSIT);
+		    
+		    //需要在预授权完成之后再做解冻操作
+		    if(isExistsPreAuthFinish) {
+		    	cashierRefundApply.setStatus(CashierRefundApplyStatus.STOP_FOR_REFUND.getCode());
+		    }
+		    
+		    id = this.refundWzDeposit(cashierRefundApply);
+		}
+		
+		//添加预授权完成记录 
+		//添加预授权完成记录,金额不允许为0 
+		//考虑全额预授权完成
+		if(isExistsPreAuthFinish) {
+		    cashierRefundApply.setPayType(DataPayTypeConstant.PRE_FINISH); //预授权完成
+			cashierRefundApply.setAmt( cashierEntity.getPayAmt() - Math.abs(rentSurplusWzDepositAmt) );
+			cashierRefundApply.setRenterCashCodeEnum(cashCode);
+		    cashierRefundApply.setRemake(cashCode.getTxt());
+		    cashierRefundApply.setFlag(RenterCashCodeEnum.ACCOUNT_RENTER_WZ_DEPOSIT.getCashNo());
+		    cashierRefundApply.setType(SysOrHandEnum.SYSTEM.getStatus());
+		    cashierRefundApply.setQn(cashierEntity.getQn());
+		    cashierRefundApply.setPayKind(DataPayKindConstant.DEPOSIT);
+		    id = this.refundWzDepositPreAuth(cashierRefundApply);  //仅仅提交预授权完成记录 
+		}
+		return id;
+	}
+    
+    /**
+     * 违章押金的消费退货处理
+     * @param rentSurplusWzDepositAmt
+     * @param cashierEntity
+     * @param cashierRefundApply
+     * @param cashCode
+     */
+	public int refundWzDepositPurchase(int rentSurplusWzDepositAmt,
+			CashierEntity cashierEntity, CashierRefundApplyReqVO cashierRefundApply,RenterCashCodeEnum cashCode) {
+        //缺少会员号,已经通过beanutils方式赋值。
+		cashierRefundApply.setPayType(DataPayTypeConstant.PUR_RETURN); //退货
+		cashierRefundApply.setAmt(-rentSurplusWzDepositAmt);
+		cashierRefundApply.setRenterCashCodeEnum(cashCode);
+		cashierRefundApply.setRemake(cashCode.getTxt());
+		cashierRefundApply.setFlag(RenterCashCodeEnum.ACCOUNT_RENTER_WZ_DEPOSIT.getCashNo());
+		cashierRefundApply.setType(SysOrHandEnum.SYSTEM.getStatus());
+		cashierRefundApply.setQn(cashierEntity.getQn());
+		cashierRefundApply.setPayKind(DataPayKindConstant.DEPOSIT);
+		return this.refundWzDeposit(cashierRefundApply);
+	}
+	
+	
     
     /**
      	* 用户订单结算 产生历史欠款

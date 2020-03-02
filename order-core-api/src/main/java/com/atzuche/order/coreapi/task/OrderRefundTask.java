@@ -46,12 +46,13 @@ public class OrderRefundTask extends IJobHandler {
         logger.info("查询需要退换的 记录", GsonUtils.toJson(list));
         if (CollectionUtils.isNotEmpty(list)) {
             for (int i = 0; i < list.size(); i++) {
-                Cat.logEvent(CatConstants.XXL_JOB_PARAM, GsonUtils.toJson(list));
+                Cat.logEvent(CatConstants.XXL_JOB_PARAM, GsonUtils.toJson(list.get(i)));
                 try {
                     cashierPayService.refundOrderPay(list.get(i));
                 } catch (Exception e) {
                     logger.error("执行 退款操作异常 异常 {},{}", GsonUtils.toJson(list.get(i)), e);
                     Cat.logError("执行 退款操作异常 异常 {}", e);
+                    XxlJobLogger.log("执行 退款操作异常 异常 {},{}", GsonUtils.toJson(list.get(i)));
                 }
             }
         }

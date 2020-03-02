@@ -20,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.swing.text.html.Option;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -66,7 +67,8 @@ public class CarDepositReturnDetailService {
         AccountRenterDetainCostDTO accountRenterDetainCostDTO = data.getAccountRenterDetainCostDTO();
         List<AccountRenterDetainDetailDTO> accountRenterDetainDetailDTOList = data.getAccountRenterDetainDetailDTOList();
         List<AccountRenterCostDetailDTO> accountRenterCostDetailDTOS = data.getAccountRenterCostDetailDTOS();
-        List<AccountRenterDepositDetailDTO> accountRenterDepositDetailDTOList = data.getAccountRenterDepositDetailDTOList();
+       // List<AccountRenterDepositDetailDTO> accountRenterDepositDetailDTOList = data.getAccountRenterDepositDetailDTOList();
+        List<AccountDebtReceivableaDetailDTO> accountDebtReceivableaDetailDTOS = data.getAccountDebtReceivableaDetailDTOS();
 
 
         List<AccountRenterDetainDetailDTO> rentCarAmtDtoList = accountRenterDetainDetailDTOList.stream()
@@ -81,10 +83,11 @@ public class CarDepositReturnDetailService {
                 .filter(x -> RenterCashCodeEnum.SETTLE_DEPOSIT_TO_RENT_COST.equals(x.getSourceCode()))
                 .collect(Collectors.summingInt(AccountRenterCostDetailDTO::getAmt));
 
-        Integer depositToHistoryAmt = Optional.ofNullable(accountRenterDepositDetailDTOList).orElseGet(ArrayList::new).stream()
+        /*Integer depositToHistoryAmt = Optional.ofNullable(accountRenterDepositDetailDTOList).orElseGet(ArrayList::new).stream()
                 .filter(x -> RenterCashCodeEnum.SETTLE_DEPOSIT_TO_HISTORY_AMT.equals(x.getSourceCode()))
-                .collect(Collectors.summingInt(AccountRenterDepositDetailDTO::getAmt));
-
+                .collect(Collectors.summingInt(AccountRenterDepositDetailDTO::getAmt));*/
+        Integer depositToHistoryAmt = Optional.ofNullable(accountDebtReceivableaDetailDTOS).orElseGet(ArrayList::new).stream()
+                .collect(Collectors.summingInt(AccountDebtReceivableaDetailDTO::getAmt));
 
         String depositType = "";
         String payType = "";
@@ -130,7 +133,7 @@ public class CarDepositReturnDetailService {
         carDepositRespVo.setSurplusDepositAmt(accountRenterDepositDTO.getSurplusDepositAmt());
         carDepositRespVo.setRealDeductionRentCarAmt(depositToCarAmt);
         carDepositRespVo.setExpDeductionRentCarAmt(0);
-        carDepositRespVo.setDeductionHistoryAmt(depositToHistoryAmt);
+        carDepositRespVo.setDeductionHistoryAmt(depositToHistoryAmt==null?0:depositToHistoryAmt);
         carDepositRespVo.setExpSettleTime(expSettleTime);
         carDepositRespVo.setActSettleTime(actSettleTime);
         carDepositRespVo.setActDetainAmt(accountRenterDetainCostDTO==null?0:accountRenterDetainCostDTO.getAmt());

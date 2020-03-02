@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * 租客费用信息
  */
-@Data
+//@Data
 public class RentCosts {
     /**
      * 查询租车费用
@@ -51,4 +51,71 @@ public class RentCosts {
      * 后台管理操作费用表（无条件补贴）
      */
     List<OrderConsoleCostDetailEntity> orderConsoleCostDetailEntity;
+
+	public List<RenterOrderCostDetailEntity> getRenterOrderCostDetails() {
+		return renterOrderCostDetails;
+	}
+
+	public void setRenterOrderCostDetails(List<RenterOrderCostDetailEntity> renterOrderCostDetails) {
+		this.renterOrderCostDetails = renterOrderCostDetails;
+	}
+
+	public RenterGetAndReturnCarDTO getOilAmt() {
+		return oilAmt;
+	}
+
+	public void setOilAmt(RenterGetAndReturnCarDTO oilAmt) {
+		this.oilAmt = oilAmt;
+	}
+
+	public FeeResult getMileageAmt() {
+		return mileageAmt;
+	}
+
+	public void setMileageAmt(FeeResult mileageAmt) {
+		this.mileageAmt = mileageAmt;
+	}
+
+	public List<RenterOrderSubsidyDetailEntity> getRenterOrderSubsidyDetails() {
+		return renterOrderSubsidyDetails;
+	}
+
+	public void setRenterOrderSubsidyDetails(List<RenterOrderSubsidyDetailEntity> renterOrderSubsidyDetails) {
+		this.renterOrderSubsidyDetails = renterOrderSubsidyDetails;
+	}
+
+	public List<RenterOrderFineDeatailEntity> getRenterOrderFineDeatails() {
+		return renterOrderFineDeatails;
+	}
+
+	public void setRenterOrderFineDeatails(List<RenterOrderFineDeatailEntity> renterOrderFineDeatails) {
+		this.renterOrderFineDeatails = renterOrderFineDeatails;
+	}
+
+	public List<OrderConsoleSubsidyDetailEntity> getOrderConsoleSubsidyDetails() {
+		return orderConsoleSubsidyDetails;
+	}
+
+	public void setOrderConsoleSubsidyDetails(List<OrderConsoleSubsidyDetailEntity> orderConsoleSubsidyDetails) {
+		this.orderConsoleSubsidyDetails = orderConsoleSubsidyDetails;
+	}
+
+	public List<ConsoleRenterOrderFineDeatailEntity> getConsoleRenterOrderFineDeatails() {
+		return consoleRenterOrderFineDeatails;
+	}
+
+	public void setConsoleRenterOrderFineDeatails(
+			List<ConsoleRenterOrderFineDeatailEntity> consoleRenterOrderFineDeatails) {
+		this.consoleRenterOrderFineDeatails = consoleRenterOrderFineDeatails;
+	}
+
+	public List<OrderConsoleCostDetailEntity> getOrderConsoleCostDetailEntity() {
+		return orderConsoleCostDetailEntity;
+	}
+
+	public void setOrderConsoleCostDetailEntity(List<OrderConsoleCostDetailEntity> orderConsoleCostDetailEntity) {
+		this.orderConsoleCostDetailEntity = orderConsoleCostDetailEntity;
+	}
+    
+    
 }
