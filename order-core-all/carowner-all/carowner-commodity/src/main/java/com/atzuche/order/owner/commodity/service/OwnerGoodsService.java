@@ -104,4 +104,9 @@ public class OwnerGoodsService{
     public OwnerGoodsEntity getOwnerGoodsByCarNo(Integer carNo){
         return ownerGoodsMapper.getOwnerGoodsByCarNo(carNo);
     }
+
+
+    public OwnerGoodsEntity getOwnerGoodsByCarNoAndOrderNo(Integer carNo,String orderNo){
+        return ownerGoodsMapper.getOwnerGoodsByCarNoAndOrderNo(carNo,orderNo);
+    }
 }
