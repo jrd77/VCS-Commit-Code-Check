@@ -467,7 +467,7 @@ public class RenterOrderCostCombineService {
 	
 	
 	/**
-	 * 获取应付记录
+	 * 获取应付记录 (仍然保留)
 	 * @param orderNo 主订单号
 	 * @param renterOrderNo 租客子订单号
 	 * @param memNo 会员号
@@ -493,6 +493,65 @@ public class RenterOrderCostCombineService {
 		}
 		return payableList;
 	}
+	
+	/**
+	 * 租车费用支付
+	 * @param orderNo
+	 * @param renterOrderNo
+	 * @param memNo
+	 * @return
+	 */
+	public List<PayableVO> listPayablebBasePayVO(String orderNo, String renterOrderNo, String memNo) {
+		List<PayableVO> payableList = new ArrayList<PayableVO>();
+		if (StringUtils.isNotBlank(renterOrderNo)) {
+			payableList.add(getPayable(orderNo, renterOrderNo, memNo));
+		}
+//		List<OrderSupplementDetailEntity> supplementList = orderSupplementDetailService.listOrderSupplementDetailByOrderNoAndMemNo(orderNo, memNo);
+//		if (supplementList != null && !supplementList.isEmpty()) {
+//			List<PayableVO> suppList = supplementList.stream().map(supplement -> {
+//				PayableVO payableVO = new PayableVO();
+//				payableVO.setAmt(supplement.getAmt());
+//				payableVO.setOrderNo(orderNo);
+//				payableVO.setTitle(supplement.getTitle());
+//				payableVO.setType(2);
+//				payableVO.setUniqueNo(String.valueOf(supplement.getId()));
+//				return payableVO;
+//			}).collect(Collectors.toList());
+//			payableList.addAll(suppList);
+//		}
+		return payableList;
+	}
+	
+	
+	/**
+	 * 
+	 * @param orderNo
+	 * @param renterOrderNo
+	 * @param memNo
+	 * @return
+	 */
+	public List<PayableVO> listPayableSupplementVO(String orderNo, String renterOrderNo, String memNo) {
+		List<PayableVO> payableList = new ArrayList<PayableVO>();
+//		if (StringUtils.isNotBlank(renterOrderNo)) {
+//			payableList.add(getPayable(orderNo, renterOrderNo, memNo));
+//		}
+		//补付
+		List<OrderSupplementDetailEntity> supplementList = orderSupplementDetailService.listOrderSupplementDetailByOrderNoAndMemNo(orderNo, memNo);
+		if (supplementList != null && !supplementList.isEmpty()) {
+			List<PayableVO> suppList = supplementList.stream().map(supplement -> {
+				PayableVO payableVO = new PayableVO();
+				payableVO.setAmt(supplement.getAmt());
+				payableVO.setOrderNo(orderNo);
+				payableVO.setTitle(supplement.getTitle());
+				payableVO.setType(2);
+				payableVO.setUniqueNo(String.valueOf(supplement.getId()));
+				return payableVO;
+			}).collect(Collectors.toList());
+			payableList.addAll(suppList);
+		}
+		return payableList;
+	}
+	
 	
 	
 	/**

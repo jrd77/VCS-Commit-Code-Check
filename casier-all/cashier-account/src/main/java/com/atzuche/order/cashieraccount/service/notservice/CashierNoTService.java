@@ -494,10 +494,12 @@ public class CashierNoTService {
      * 返回租车费用补付记录数
      * @param orderNo
      * @param menNo
+     * @param payKind   按消费来处理。
      * @return
      */
-    public String getCashierRentCostPaySn(String orderNo, String menNo) {
-        List<CashierEntity> sashierEntitys = cashierMapper.getCashierRentCosts(orderNo,menNo,DataPayKindConstant.RENT_AMOUNT,DataPayTypeConstant.PAY_PUR);
+    public String getCashierRentCostPaySn(String orderNo, String menNo, String payKind) {
+//        List<CashierEntity> sashierEntitys = cashierMapper.getCashierRentCosts(orderNo,menNo,DataPayKindConstant.RENT_AMOUNT,DataPayTypeConstant.PAY_PUR);
+    	List<CashierEntity> sashierEntitys = cashierMapper.getCashierRentCosts(orderNo,menNo,payKind,DataPayTypeConstant.PAY_PUR);
         if(CollectionUtils.isEmpty(sashierEntitys)){
             return "1";
         }
