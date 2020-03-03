@@ -73,9 +73,9 @@ public class CancelOrderAppealService {
             carOwnerType = goodsDetailDTO.getCarOwnerType();
         }
         //车辆类型校验
-        if(null != carOwnerType) {
+        if (null != carOwnerType) {
             logger.info("Car owner type is :[{}]", carOwnerType);
-            if(carOwnerType == CarOwnerTypeEnum.F.getCode()) {
+            if (carOwnerType == CarOwnerTypeEnum.F.getCode()) {
                 throw new RefuseOrderCheckException(ErrorCode.MANAGED_CAR_CAN_NOT_OPT_TRANS);
             } else if (carOwnerType == CarOwnerTypeEnum.G.getCode()) {
                 throw new RefuseOrderCheckException(ErrorCode.PROXY_CAR_CAN_NOT_OPT_TRANS);
@@ -84,17 +84,25 @@ public class CancelOrderAppealService {
             logger.warn("Car owner type is empty.");
         }
 
-        OrderCancelAppealEntity record = buildOrderCancelAppealEntity(reqVO,subOrderNo);
+        OrderCancelAppealEntity record = buildOrderCancelAppealEntity(reqVO, subOrderNo);
         int result = orderCancelAppealService.addOrderCancelAppeal(record);
-
-        //取消订单处理(走管理后台取消流程)
-        AdminCancelOrderReqVO adminCancelOrderReqVO = new AdminCancelOrderReqVO();
-        BeanUtils.copyProperties(reqVO, adminCancelOrderReqVO);
-        adminCancelOrderReqVO.setOperatorName("H5SystemOperator");
-        cancelOrderService.cancel(adminCancelOrderReqVO, false);
+        if (result > 0) {
+            //取消订单处理(走管理后台取消流程)
+            AdminCancelOrderReqVO adminCancelOrderReqVO = new AdminCancelOrderReqVO();
+            BeanUtils.copyProperties(reqVO, adminCancelOrderReqVO);
+            adminCancelOrderReqVO.setOperatorName("H5SystemOperator");
+            cancelOrderService.cancel(adminCancelOrderReqVO, false);
+        }
     }
 
 
+    /**
+     * 构建申诉信息
+     *
+     * @param reqVO      申诉请求信息
+     * @param subOrderNo 子订单号
+     * @return OrderCancelAppealEntity 申诉信息
+     */
     private OrderCancelAppealEntity buildOrderCancelAppealEntity(OrderCancelAppealReqVO reqVO, String subOrderNo) {
         OrderCancelAppealEntity orderCancelAppealEntity = new OrderCancelAppealEntity();
         orderCancelAppealEntity.setOrderNo(reqVO.getOrderNo());
@@ -104,7 +112,6 @@ public class CancelOrderAppealService {
         orderCancelAppealEntity.setAppealReason(reqVO.getAppealReason());
         return orderCancelAppealEntity;
     }
-
 
 
 }

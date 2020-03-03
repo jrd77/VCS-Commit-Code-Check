@@ -18,8 +18,10 @@ import com.atzuche.order.ownercost.entity.OwnerOrderFineDeatailEntity;
 import com.atzuche.order.ownercost.service.ConsoleOwnerOrderFineDeatailService;
 import com.atzuche.order.ownercost.service.OwnerOrderFineApplyService;
 import com.atzuche.order.ownercost.service.OwnerOrderFineDeatailService;
+import com.atzuche.order.parentorder.entity.OrderCancelAppealEntity;
 import com.atzuche.order.parentorder.entity.OrderCancelReasonEntity;
 import com.atzuche.order.parentorder.entity.OrderStatusEntity;
+import com.atzuche.order.parentorder.service.OrderCancelAppealService;
 import com.atzuche.order.parentorder.service.OrderCancelReasonService;
 import com.atzuche.order.rentercost.entity.ConsoleRenterOrderFineDeatailEntity;
 import com.atzuche.order.rentercost.entity.RenterOrderCostEntity;
@@ -59,6 +61,8 @@ public class CancelOrderJudgeDutyService {
     private OwnerOrderFineApplyService ownerOrderFineApplyService;
     @Autowired
     private OrderCancelReasonService orderCancelReasonService;
+    @Autowired
+    private OrderCancelAppealService orderCancelAppealService;
 
     @Transactional(rollbackFor = Exception.class)
     public void judgeDuty(Integer wrongdoer , Boolean isDispatch,
@@ -144,7 +148,17 @@ public class CancelOrderJudgeDutyService {
 
 
         }
-
+        //更新申述信息
+        OrderCancelAppealEntity orderCancelAppealEntity =
+                orderCancelAppealService.selectByOrderNo(cancelOrderReqDTO.getOrderNo());
+        int appealFlag = OrderConstant.NO;
+        if(null != orderCancelAppealEntity) {
+            appealFlag = OrderConstant.YES;
+            OrderCancelAppealEntity record = new OrderCancelAppealEntity();
+            record.setId(orderCancelAppealEntity.getId());
+            record.setIsWrongdoer(OrderConstant.YES);
+            orderCancelAppealService.updateOrderCancelAppeal(record);
+        }
         //更新取消订单责任方
         OrderCancelReasonEntity orderCancelReasonEntity =
                 orderCancelReasonService.selectByOrderNo(cancelOrderReqDTO.getOrderNo());
@@ -152,9 +166,11 @@ public class CancelOrderJudgeDutyService {
             OrderCancelReasonEntity record = new OrderCancelReasonEntity();
             record.setId(orderCancelReasonEntity.getId());
             record.setDutySource(wrongdoer);
+            record.setAppealFlag(appealFlag);
             record.setUpdateOp(cancelOrderReqDTO.getOperatorName());
             orderCancelReasonService.updateOrderCancelReasonRecord(record);
         }
+
     }
 
 
