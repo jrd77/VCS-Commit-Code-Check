@@ -25,6 +25,9 @@ public class CostItemVO {
 
     @AutoDocProperty(value = "费用项总金额")
     private Integer totalAmount;
+    
+    @AutoDocProperty(value = "平台保障费和全面保障费的折扣,例如：0.7")
+    private Double discount;
 
     public String getCostCode() {
         return costCode;
@@ -65,4 +68,13 @@ public class CostItemVO {
     public void setTotalAmount(Integer totalAmount) {
         this.totalAmount = totalAmount;
     }
+
+	public Double getDiscount() {
+		return discount;
+	}
+
+	public void setDiscount(Double discount) {
+		this.discount = discount;
+	}
+    
 }
