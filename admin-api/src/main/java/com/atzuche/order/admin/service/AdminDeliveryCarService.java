@@ -250,12 +250,12 @@ public class AdminDeliveryCarService {
         distributionCostVO.setRenturnCarAmt("0");
         distributionCostVO.setGetCarAmt("0");
         // 获取租客商品信息
-        RenterOrderEntity renterOrderEntity = renterOrderService.getRenterOrderByOrderNoAndIsEffective(deliveryCarDTO.getOrderNo());
-        if(null == renterOrderEntity)
-        {
-            return distributionCostVO;
-        }
-        List<RenterOrderCostDetailEntity> list = renterOrderCostDetailService.listRenterOrderCostDetail(deliveryCarDTO.getOrderNo(), renterOrderEntity.getRenterOrderNo());
+//        RenterOrderEntity renterOrderEntity = renterOrderService.getRenterOrderByOrderNoAndIsEffective(deliveryCarDTO.getOrderNo());
+//        if(null == renterOrderEntity)
+//        {
+//            return distributionCostVO;
+//        }
+        List<RenterOrderCostDetailEntity> list = renterOrderCostDetailService.listRenterOrderCostDetail(deliveryCarDTO.getOrderNo(), deliveryCarDTO.getRenterOrderNo());
         if (CollectionUtils.isEmpty(list)) {
             return distributionCostVO;
         }
