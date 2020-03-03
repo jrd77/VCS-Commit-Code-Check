@@ -1,5 +1,6 @@
 package com.atzuche.order.delivery.service.handover;
 
+import com.alibaba.fastjson.JSONObject;
 import com.atzuche.order.commons.vo.req.handover.req.HandoverCarInfoReqDTO;
 import com.atzuche.order.delivery.entity.OwnerHandoverCarInfoEntity;
 import com.atzuche.order.delivery.entity.OwnerHandoverCarRemarkEntity;
@@ -7,6 +8,7 @@ import com.atzuche.order.delivery.enums.RenterHandoverCarTypeEnum;
 import com.atzuche.order.delivery.mapper.OwnerHandoverCarInfoMapper;
 import com.atzuche.order.delivery.mapper.OwnerHandoverCarRemarkMapper;
 import com.atzuche.order.delivery.service.handover.interfaces.IUpdateHandoverCarInfo;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,6 +21,7 @@ import java.util.Objects;
  * @author 胡春林
  * 车主端交接车信息
  */
+@Slf4j
 @Service
 public class OwnerHandoverCarService implements IUpdateHandoverCarInfo {
 
@@ -53,6 +56,7 @@ public class OwnerHandoverCarService implements IUpdateHandoverCarInfo {
                     r.setMileageNum(Integer.valueOf(handoverCarInfoReqDTO.getOwnReturnKM()));
                 }
             }
+            log.info("车主更新油耗里程--->>>>:handoverCarInfoReqDTO:[{}],r-->>[{}]",handoverCarInfoReqDTO.toString(), JSONObject.toJSONString(r));
             updateOwnerHandoverInfoByPrimaryKey(r);
         });
     }

@@ -13,7 +13,6 @@ public enum TransStatusEnum {
     PAY_FAIL("03","失败"),
 
 
-
     ;
 
     private String code;

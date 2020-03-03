@@ -3,7 +3,19 @@
  */
 package com.atzuche.order.coreapi.controller;
 
+import java.util.List;
+
 import javax.validation.Valid;
+
+import com.atzuche.order.commons.vo.res.*;
+import com.autoyol.commons.web.ErrorCode;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.atzuche.order.accountrenterdeposit.entity.AccountRenterDepositEntity;
 import com.atzuche.order.accountrenterwzdepost.entity.AccountRenterWzDepositEntity;
@@ -11,23 +23,18 @@ import com.atzuche.order.cashieraccount.service.CashierQueryService;
 import com.atzuche.order.commons.BindingResultUtil;
 import com.atzuche.order.commons.exceptions.OrderNotFoundException;
 import com.atzuche.order.commons.exceptions.OwnerOrderNotFoundException;
-import com.atzuche.order.commons.vo.res.RenterCostDetailVO;
+import com.atzuche.order.commons.vo.req.OrderCostReqVO;
+import com.atzuche.order.commons.vo.req.OwnerCostSettleDetailReqVO;
+import com.atzuche.order.coreapi.service.OrderCostService;
+import com.atzuche.order.coreapi.service.OwnerCostFacadeService;
+import com.atzuche.order.coreapi.service.RenterCostFacadeService;
 import com.atzuche.order.open.vo.RenterCostShortDetailVO;
 import com.atzuche.order.ownercost.entity.OwnerOrderEntity;
 import com.atzuche.order.ownercost.service.OwnerOrderService;
 import com.atzuche.order.parentorder.entity.OrderEntity;
 import com.atzuche.order.parentorder.service.OrderService;
-import com.atzuche.order.coreapi.service.RenterCostFacadeService;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.atzuche.order.renterorder.service.RenterOrderService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
-
-import com.atzuche.order.commons.vo.req.OrderCostReqVO;
-import com.atzuche.order.commons.vo.res.OrderOwnerCostResVO;
-import com.atzuche.order.commons.vo.res.OrderRenterCostResVO;
-import com.atzuche.order.coreapi.service.OrderCostService;
 import com.autoyol.commons.web.ResponseData;
 
 import lombok.extern.slf4j.Slf4j;
@@ -55,6 +62,8 @@ public class OrderCostController {
 
 	@Autowired
 	private CashierQueryService cashierQueryService;
+	@Autowired
+	private OwnerCostFacadeService ownerCostFacadeService;
 	
 	@PostMapping("/order/cost/renter/get")
 	public ResponseData<OrderRenterCostResVO> orderCostRenterGet(@Valid @RequestBody OrderCostReqVO req, BindingResult bindingResult) {
@@ -80,6 +89,23 @@ public class OrderCostController {
 		RenterCostDetailVO renterBasicCostDetailVO = facadeService.getRenterCostFullDetail(orderNo,renterOrderNo,memNo);
 
 		return ResponseData.success(renterBasicCostDetailVO);
+	}
+	@GetMapping("/order/owner/cost/fullDetail")
+	public ResponseData<OwnerCostDetailVO> getRenterCostFullDetail(@RequestParam("orderNo") String orderNo,
+																   @RequestParam("ownerOrderNo") String ownerOrderNo,
+																   @RequestParam("ownerMemNo") String ownerMemNo){
+		OrderEntity orderEntity = orderService.getOrderEntity(orderNo);
+		if(orderEntity==null){
+			throw new OrderNotFoundException(orderNo);
+		}
+		if((ownerOrderNo == null || ownerOrderNo.trim().length()<=0) && (ownerMemNo == null || ownerMemNo.trim().length()<=0)){
+			ResponseData responseData = new ResponseData();
+			responseData.setResCode(ErrorCode.INPUT_ERROR.getCode());
+			responseData.setResMsg("车主子订单号或车主会员号必须有一个不为空！");
+			return responseData;
+		}
+		OwnerCostDetailVO ownerCostDetailVO = ownerCostFacadeService.getOwnerCostFullDetail(orderNo,ownerOrderNo,ownerMemNo);
+		return ResponseData.success(ownerCostDetailVO);
 	}
 
 	public ResponseData getCarOwnerIncomeFullDetail(@RequestParam("orderNo")String orderNo,@RequestParam("ownerNo")String ownerNo){
@@ -110,6 +136,9 @@ public class OrderCostController {
 		//FIXME:
         return null;
 	}
+
+
+
 
 	/**
 	 * 获取租客的费用简况
@@ -164,7 +193,23 @@ public class OrderCostController {
 		return ResponseData.success(resVo);
 
 	}
-
-
 	
+	@GetMapping("/order/owner/cost/settle/detail/get")
+	public ResponseData<OwnerCostSettleDetailVO> getOwnerCostSettleDetail(@RequestParam("orderNo") String orderNo,@RequestParam("ownerNo") String ownerNo){
+		OrderEntity orderEntity = orderService.getOrderEntity(orderNo);
+		if(orderEntity==null){
+			throw new OrderNotFoundException(orderNo);
+		}
+		OwnerCostSettleDetailVO ownerCostSettleDetailVO = ownerCostFacadeService.getOwnerCostSettleDetail(orderNo,ownerNo);
+		return ResponseData.success(ownerCostSettleDetailVO);
+	}
+	
+	
+	@PostMapping("/order/owner/cost/settle/detail/list")
+	public ResponseData<List<OwnerCostSettleDetailVO>> listOwnerCostSettleDetail(@RequestBody OwnerCostSettleDetailReqVO req){
+		List<OwnerCostSettleDetailVO> listVo = ownerCostFacadeService.listOwnerCostSettleDetail(req);
+		return ResponseData.success(listVo);
+	}
+	
+
 }

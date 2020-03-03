@@ -22,6 +22,7 @@ import com.autoyol.coupon.api.CouponSettleRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -57,6 +58,9 @@ public class RenterOrderService {
 
     @Resource
     private RenterAdditionalDriverService renterAdditionalDriverService;
+    
+    @Autowired
+    private InsurAbamentDiscountService insurAbamentDiscountService;
 
 
     public List<RenterOrderEntity> listAgreeRenterOrderByOrderNo(String orderNo) {
@@ -145,6 +149,9 @@ public class RenterOrderService {
         RenterOrderResVO renterOrderResVO = new RenterOrderResVO();
         //1. 租车费用计算
         RenterOrderCostReqDTO renterOrderCostReqDTO = buildRenterOrderCostReqDTO(renterOrderReqVO);
+        // 获取平台保障费和全面保障费折扣补贴
+  		List<RenterOrderSubsidyDetailDTO> insurDiscountSubsidyList = insurAbamentDiscountService.getInsureDiscountSubsidy(renterOrderCostReqDTO, null);
+  		renterOrderCostReqDTO.setSubsidyOutList(insurDiscountSubsidyList);
         RenterOrderCostRespDTO renterOrderCostRespDTO =
                 renterOrderCalCostService.calcBasicRenterOrderCostAndDeailList(renterOrderCostReqDTO);
         renterOrderCostRespDTO.setMemNo(renterOrderReqVO.getMemNo());

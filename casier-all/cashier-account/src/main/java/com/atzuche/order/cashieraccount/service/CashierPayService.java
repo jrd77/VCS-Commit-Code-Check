@@ -43,6 +43,7 @@ import com.autoyol.autopay.gateway.vo.res.AutoPayResultVo;
 import com.autoyol.commons.utils.GsonUtils;
 import com.autoyol.commons.web.ErrorCode;
 
+import ch.qos.logback.classic.Logger;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -459,7 +460,7 @@ public class CashierPayService{
                     AccountRenterDepositResVO accountRenterDeposit = cashierService.getRenterDepositEntity(orderPaySign.getOrderNo(),orderPaySign.getMenNo());
                     Integer payId = Objects.isNull(accountRenterDeposit)?0:accountRenterDeposit.getId();
                     String payIdStr = Objects.isNull(payId)?"":String.valueOf(payId);
-                    PayVo vo = cashierNoTService.getPayVO(cashierEntity,orderPaySign,payVO.getAmtDeposit(),payVO.getTitle(),DataPayKindConstant.RENT,payIdStr,GsonUtils.toJson(accountRenterDeposit));
+                    PayVo vo = cashierNoTService.getPayVO(cashierEntity,orderPaySign,payVO.getAmtDeposit(),payVO.getTitle(),DataPayKindConstant.RENT,payIdStr,GsonUtils.toJson(accountRenterDeposit),accountRenterDeposit.getFreeDepositType());
                     String payMd5 = MD5.MD5Encode(FasterJsonUtil.toJson(vo));
                     vo.setPayMd5(payMd5);
                     payVo.add(vo);
@@ -470,7 +471,7 @@ public class CashierPayService{
                     AccountRenterWZDepositResVO accountRenterWZDepositRes = cashierService.getRenterWZDepositEntity(orderPaySign.getOrderNo(),orderPaySign.getMenNo());
                     Integer payId = Objects.isNull(accountRenterWZDepositRes)?0:accountRenterWZDepositRes.getId();
                     String payIdStr = Objects.isNull(payId)?"":String.valueOf(payId);
-                    PayVo vo = cashierNoTService.getPayVO(cashierEntity,orderPaySign,payVO.getAmtWzDeposit(),payVO.getTitle(),DataPayKindConstant.DEPOSIT,payIdStr,GsonUtils.toJson(accountRenterWZDepositRes));
+                    PayVo vo = cashierNoTService.getPayVO(cashierEntity,orderPaySign,payVO.getAmtWzDeposit(),payVO.getTitle(),DataPayKindConstant.DEPOSIT,payIdStr,GsonUtils.toJson(accountRenterWZDepositRes),accountRenterWZDepositRes.getFreeDepositType());
                     String payMd5 = MD5.MD5Encode(FasterJsonUtil.toJson(vo));
                     vo.setPayMd5(payMd5);
                     payVo.add(vo);
@@ -478,7 +479,7 @@ public class CashierPayService{
             }
         }
 
-        //待付租车费用
+        //待付租车费用   租车费用默认是消费
         if(orderPaySign.getPayKind().contains(DataPayKindConstant.RENT_AMOUNT) && payVO.getAmtRent()<0){
             //待付租车费用
             int amt = payVO.getAmtRent();
@@ -486,7 +487,7 @@ public class CashierPayService{
             AccountRenterCostSettleEntity entity = cashierService.getAccountRenterCostSettle(orderPaySign.getOrderNo(),orderPaySign.getMenNo());
             Integer payId = Objects.isNull(entity)?0:entity.getId();
             String payIdStr = Objects.isNull(payId)?"":String.valueOf(payId);
-            PayVo vo = cashierNoTService.getPayVO(null,orderPaySign,payVO.getAmtRent(),payVO.getTitle(),payKind,payIdStr,GsonUtils.toJson(entity));
+            PayVo vo = cashierNoTService.getPayVO(null,orderPaySign,payVO.getAmtRent(),payVO.getTitle(),payKind,payIdStr,GsonUtils.toJson(entity),3);
             String paySn = cashierNoTService.getCashierRentCostPaySn(orderPaySign.getOrderNo(),orderPaySign.getMenNo());
             vo.setPaySn(paySn);
             String renterOrderNo = getExtendParamsRentOrderNo(payVO);
@@ -507,18 +508,22 @@ public class CashierPayService{
         if(Objects.isNull(cashierRefundApply) || Objects.isNull(cashierRefundApply.getId())){
             return;
         }
-        //更新退款次数
+        //更新退款次数，最多允许退3次。 num<3 LIMIT 100
         cashierRefundApplyNoTService.updateCashierRefundApplyEntity(cashierRefundApply);
         //2 构造退款参数
         RefundVo refundVo = cashierNoTService.getRefundVo(cashierRefundApply);
        //3退款
         AutoPayResultVo vo = refundRemoteService.refundOrderPay(refundVo);
         if(Objects.nonNull(vo)){
+        	log.info("退款返回的结果vo=[{}],params=[{}]",GsonUtils.toJson(vo),GsonUtils.toJson(refundVo));
+        	
             NotifyDataVo notifyDataVo = new NotifyDataVo();
             BeanUtils.copyProperties(vo,notifyDataVo);
             notifyDataVo.setSettleAmount(vo.getRefundAmt());
             //退款调用成功操作
             cashierService.refundCallBackSuccess(vo);
+        }else {
+        	log.error("退款返回的结果vo为null异常,params=[{}]",GsonUtils.toJson(refundVo));
         }
     }
 

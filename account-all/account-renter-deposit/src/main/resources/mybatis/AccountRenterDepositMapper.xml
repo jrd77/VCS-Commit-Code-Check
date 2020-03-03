@@ -13,6 +13,7 @@
         <result property="settleTime" column="settle_time"/>
         <result property="yingfuDepositAmt" column="yingfu_deposit_amt"/>
         <result property="shifuDepositAmt" column="shifu_deposit_amt"/>
+        <result property="isAuthorize" column="is_authorize"/>
         <result property="authorizeDepositAmt" column="authorize_deposit_amt"/>
         <result property="creditPayAmt" column="credit_pay_amt"/>
         <result property="surplusCreditPayAmt" column="surplus_credit_pay_amt"/>
@@ -39,6 +40,7 @@
 	`settle_time`, 	
 	`yingfu_deposit_amt`, 	
 	`shifu_deposit_amt`, 	
+	 is_authorize,
 	`authorize_deposit_amt`, 	
 	`credit_pay_amt`,
 	 surplus_credit_pay_amt,
@@ -70,6 +72,7 @@
             <if test="settleTime != null">`settle_time`, </if>
             <if test="yingfuDepositAmt != null">`yingfu_deposit_amt`, </if>
             <if test="shifuDepositAmt != null">`shifu_deposit_amt`, </if>
+            <if test="isAuthorize != null">is_authorize,</if>
             <if test="authorizeDepositAmt != null">`authorize_deposit_amt`, </if>
             <if test="creditPayAmt != null">`credit_pay_amt`, </if>
             <if test="surplusCreditPayAmt != null">`surplus_credit_pay_amt`, </if>
@@ -93,6 +96,7 @@
             <if test="settleTime != null">#{settleTime},  </if>
             <if test="yingfuDepositAmt != null">#{yingfuDepositAmt},  </if>
             <if test="shifuDepositAmt != null">#{shifuDepositAmt},  </if>
+            <if test="isAuthorize != null">#{isAuthorize}, </if>
             <if test="authorizeDepositAmt != null">#{authorizeDepositAmt},  </if>
             <if test="creditPayAmt != null">#{creditPayAmt},  </if>
             <if test="surplusCreditPayAmt != null">#{surplusCreditPayAmt},  </if>
@@ -120,6 +124,7 @@
 				<if test="settleTime != null">`settle_time` = #{settleTime}, </if>
 				<if test="yingfuDepositAmt != null">`yingfu_deposit_amt` = #{yingfuDepositAmt}, </if>
 				<if test="shifuDepositAmt != null">`shifu_deposit_amt` = #{shifuDepositAmt}, </if>
+				<if test="isAuthorize != null">is_authorize = #{isAuthorize}, </if>
 				<if test="authorizeDepositAmt != null">`authorize_deposit_amt` = #{authorizeDepositAmt}, </if>
 				<if test="creditPayAmt != null">`credit_pay_amt` = #{creditPayAmt}, </if>
                 <if test="surplusCreditPayAmt != null">`surplus_credit_pay_amt` = #{creditPayAmt}, </if>

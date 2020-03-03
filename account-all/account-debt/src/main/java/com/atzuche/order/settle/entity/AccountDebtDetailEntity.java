@@ -2,7 +2,10 @@ package com.atzuche.order.settle.entity;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 
 /**
@@ -13,6 +16,8 @@ import lombok.Data;
  * @Description:
  */
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class AccountDebtDetailEntity implements Serializable {
 	private static final long serialVersionUID = 1L;
 	

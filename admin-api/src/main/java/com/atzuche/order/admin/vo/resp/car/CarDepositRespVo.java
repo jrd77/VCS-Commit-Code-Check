@@ -54,4 +54,5 @@ public class CarDepositRespVo {
 
     @AutoDocProperty("扣款时间（最新暂扣信息）")
     private String actDetainTime;
+
 }

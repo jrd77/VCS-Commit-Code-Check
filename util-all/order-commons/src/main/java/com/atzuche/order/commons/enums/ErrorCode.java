@@ -14,9 +14,9 @@ public enum ErrorCode {
 
     ACCOUT_RENTER_CLAIM_DETAIL("881001","租客理赔费用操作失败"),
 
-    ACCOUT_RENTET_DEPOSIT_FAIL("961001","车俩应收押金操作失败"),
-    ACCOUT_RENTET_COST_FAIL("961004","车俩租车费用收银台操作失败"),
-    CHANGE_ACCOUT_RENTET_DEPOSIT_FAIL("961003","车俩押金资金进出操作失败"),
+    ACCOUT_RENTET_DEPOSIT_FAIL("961001","车辆应收押金操作失败"),
+    ACCOUT_RENTET_COST_FAIL("961004","车辆租车费用收银台操作失败"),
+    CHANGE_ACCOUT_RENTET_DEPOSIT_FAIL("961003","车辆押金资金进出操作失败"),
 
     ACCOUT_RENTER_DETAIL_DETAIL("891001","暂扣押金失败"),
 
@@ -38,7 +38,8 @@ public enum ErrorCode {
     CASHIER_PAY_CALL_BACK_FAIL("981004","支付系统支付回调操作失败"),
     CASHIER_PAY_SIGN_PARAM_ERRER("981007","支付参数签名失败"),
     CASHIER_PAY_SIGN_FAIL_ERRER("981009","没有待支付记录"),
-
+    CASHIER_PAY_SETTLEAMT_FAIL_ERRER("981010","支付系统返回的支付金额异常"),
+    
 
     ORDER_SETTLE_FLAT_ACCOUNT("811001","结算费用未平账"),
 

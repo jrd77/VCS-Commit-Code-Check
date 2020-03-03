@@ -83,22 +83,28 @@ public class OrderSettleNewService {
     @Transactional(rollbackFor=Exception.class)
     public void settleOrder(SettleOrders settleOrders, SettleOrdersDefinition settleOrdersDefinition,OrderPayCallBack callBack) {
         //7.1 租车费用  总费用 信息落库 并返回最新租车费用 实付
+    	//account_Renter_Cost_Settle 租客费用及其结算总表 shifu           
         AccountRenterCostSettleEntity accountRenterCostSettle = cashierSettleService.updateRentSettleCost(settleOrders.getOrderNo(),settleOrders.getRenterMemNo(), settleOrdersDefinition.getAccountRenterCostSettleDetails());
         log.info("OrderSettleService updateRentSettleCost [{}]",GsonUtils.toJson(accountRenterCostSettle));
         Cat.logEvent("updateRentSettleCost",GsonUtils.toJson(accountRenterCostSettle));
 
         //7.2 车主 费用 落库表
         cashierSettleService.insertAccountOwnerCostSettle(settleOrders.getOrderNo(),settleOrders.getOwnerOrderNo(),settleOrders.getOwnerMemNo(),settleOrdersDefinition.getAccountOwnerCostSettleDetails());
-        //8 获取租客 实付 车辆押金
+        //8 获取租客 实付 车辆押金  
+        //从AccountRenterDepositDetail租车押金资金明细表中求和。
         int depositAmt = cashierSettleService.getRentDeposit(settleOrders.getOrderNo(),settleOrders.getRenterMemNo());
+        //从租车押金accountRenterDeposit总表中查询 shifu
         int depositAmtRealPay = cashierSettleService.getRentDepositRealPay(settleOrders.getOrderNo(),settleOrders.getRenterMemNo());
+        
         SettleOrdersAccount settleOrdersAccount = new SettleOrdersAccount();
         BeanUtils.copyProperties(settleOrders,settleOrdersAccount);
         //查询订单剩余应付
         settleOrdersAccount.setRentCostAmtFinal(accountRenterCostSettle.getRentAmt());
         settleOrdersAccount.setRentCostPayAmt(accountRenterCostSettle.getShifuAmt());
+        
         settleOrdersAccount.setDepositAmt(depositAmtRealPay);
         settleOrdersAccount.setDepositSurplusAmt(depositAmt);
+        
         settleOrdersAccount.setOwnerCostAmtFinal(settleOrdersDefinition.getOwnerCostAmtFinal());
         settleOrdersAccount.setOwnerCostSurplusAmt(settleOrdersDefinition.getOwnerCostAmtFinal());
         //>0 表示 实付 大于应退 差值为应退（实付>0  应付小于0 getRentAmt 为所有租车费用明细含补贴 相加之和）
@@ -447,7 +453,7 @@ public class OrderSettleNewService {
      * flag  0：成功 1：失败
      * @param orderNo
      */
-    public void sendOrderSettleMq(String orderNo,String renterMemNo,RentCosts rentCosts,int status) {
+    public void sendOrderSettleMq(String orderNo,String renterMemNo,RentCosts rentCosts,int status,String ownerMemNo) {
         log.info("sendOrderSettleMq start [{}],[{}],[{}],[{}]",orderNo,renterMemNo,GsonUtils.toJson(rentCosts),status);
         AccountRenterCostSettleEntity entity=cashierSettleService.getAccountRenterCostSettleEntity(orderNo,renterMemNo);
         OrderSettlementMq orderSettlementMq = new OrderSettlementMq();
@@ -493,6 +499,9 @@ public class OrderSettleNewService {
         }
         orderSettlementMq.setStatus(status);
         orderSettlementMq.setOrderNo(orderNo);
+        ///增加租客会员号，车主会员号 200228
+        orderSettlementMq.setRenterMemNo(Integer.valueOf(renterMemNo));
+        orderSettlementMq.setOwnerMemNo(Integer.valueOf(ownerMemNo));
         OrderMessage orderMessage = OrderMessage.builder().build();
         orderMessage.setMessage(orderSettlementMq);
         NewOrderMQActionEventEnum eventEnum = null;
