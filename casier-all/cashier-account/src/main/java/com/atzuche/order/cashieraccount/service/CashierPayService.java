@@ -293,7 +293,7 @@ public class CashierPayService{
         int rentAmt =0;
         //已付租车费用
         int rentAmtPayed = 0;
-        if(orderPayReqVO.getPayKind().contains(DataPayKindConstant.RENT_AMOUNT)){
+        if(orderPayReqVO.getPayKind().contains(DataPayKindConstant.RENT_AMOUNT)){  //修改订单的补付
             List<PayableVO> payableVOs = renterOrderCostCombineService.listPayableVO(orderPayReqVO.getOrderNo(),renterOrderEntity.getRenterOrderNo(),orderPayReqVO.getMenNo());
             result.setPayableVOs(payableVOs);
             //应付租车费用
@@ -312,6 +312,8 @@ public class CashierPayService{
                 }
             }
         }
+        
+        
         //待支付总额
         int amtTotal = amtDeposit + amtWZDeposit + rentAmt;
         //实际待支付租车费用总额 即真实应付租车费用
