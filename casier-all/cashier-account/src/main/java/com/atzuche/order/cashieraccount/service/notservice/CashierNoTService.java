@@ -454,8 +454,7 @@ public class CashierNoTService {
         //1更新收银台,收银台的支付或退款记录都需要记录下来。
         boolean bool = updataCashier(notifyDataVo);
         //退款的时候，结算记录已经添加了资金进出明细。只有支付的时候才记录。
-        if(bool && DataPayTypeConstant.PAY_PUR.equals(notifyDataVo.getPayType())
-        		&& DataPayTypeConstant.PAY_PRE.equals(notifyDataVo.getPayType())
+        if(bool && ( DataPayTypeConstant.PAY_PUR.equals(notifyDataVo.getPayType()) || DataPayTypeConstant.PAY_PRE.equals(notifyDataVo.getPayType()) )
         		&& "00".equals(notifyDataVo.getTransStatus())){
             //2 租车押金 更新数据
             accountRenterDepositService.updateRenterDeposit(payedOrderRenterDeposit);
@@ -471,8 +470,7 @@ public class CashierNoTService {
     public void updataCashierAndRenterWzDeposit(NotifyDataVo notifyDataVo, PayedOrderRenterWZDepositReqVO payedOrderRenterWZDeposit) {
         //1更新收银台
         boolean bool = updataCashier(notifyDataVo);
-        if(bool && DataPayTypeConstant.PAY_PUR.equals(notifyDataVo.getPayType())
-        		&& DataPayTypeConstant.PAY_PRE.equals(notifyDataVo.getPayType())
+        if(bool && ( DataPayTypeConstant.PAY_PUR.equals(notifyDataVo.getPayType()) || DataPayTypeConstant.PAY_PRE.equals(notifyDataVo.getPayType()) )
         		&& "00".equals(notifyDataVo.getTransStatus())){
             //2 违章押金 更新数据
             accountRenterWzDepositService.updateRenterWZDeposit(payedOrderRenterWZDeposit);
@@ -488,8 +486,7 @@ public class CashierNoTService {
     public void updataCashierAndRenterCost(NotifyDataVo notifyDataVo,AccountRenterCostReqVO accountRenterCostReq) {
         //1更新收银台
         boolean bool = updataCashier(notifyDataVo);
-        if(bool && DataPayTypeConstant.PAY_PUR.equals(notifyDataVo.getPayType())
-        		&& DataPayTypeConstant.PAY_PRE.equals(notifyDataVo.getPayType())
+        if(bool && ( DataPayTypeConstant.PAY_PUR.equals(notifyDataVo.getPayType()) || DataPayTypeConstant.PAY_PRE.equals(notifyDataVo.getPayType()) )
         		&& "00".equals(notifyDataVo.getTransStatus())){  //考虑支付成功
             //2  实收租车费用落库 更新数据
             accountRenterCostSettleService.insertRenterCostDetail(accountRenterCostReq);
