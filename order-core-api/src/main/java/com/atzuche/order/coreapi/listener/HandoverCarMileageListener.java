@@ -38,7 +38,7 @@ public class HandoverCarMileageListener {
         try {
             String oilMileageData = new String(message.getBody());
             MileageOilVO mileageOilVO = GsonUtils.convertObj(oilMileageData, MileageOilVO.class);
-            handoverCarOilMileageService.saveMileageOil(mileageOilVO);
+           // handoverCarOilMileageService.saveMileageOil(mileageOilVO);
             Cat.logEvent(CatConstants.RABBIT_MQ_METHOD, "HandoverCarOilListener.process");
             Cat.logEvent(CatConstants.RABBIT_MQ_PARAM, oilMileageData);
             t.setStatus(Transaction.SUCCESS);
