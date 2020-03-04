@@ -30,7 +30,5 @@ public class CatLogRecord {
         Cat.logError(name, e);
         Cat.logMetricForCount(name);
         Cat.logEvent(CatConstant.URL, url, CatConstant.FAILED, object.toString());
-        Cat.logMetricForCount(name);
-        Cat.logEvent(CatConstant.URL, url, Event.SUCCESS, object.toString());
     }
 }
