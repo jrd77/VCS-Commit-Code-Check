@@ -1,6 +1,5 @@
 buildscript {
     repositories {
-    	mavenLocal()
         maven{url "http://10.0.3.208:8081/nexus/content/groups/public/"}
         maven{url "http://maven.aliyun.com/nexus/content/groups/public/"}
         mavenCentral()
