@@ -36,7 +36,7 @@ public class SettleCashierController {
      * @param orderNo
      * @return
      */
-    @AutoDocMethod(value = "查询支付款项信息", description = "查询支付款项信息", response = String.class)
+    @AutoDocMethod(value = "手动订单车辆押金结算", description = "手动订单车辆押金结算", response = String.class)
     @GetMapping("/deposit")
     public ResponseData<String> settleDeposit(@RequestParam("orderNo") String orderNo) {
         log.info("SettleCashierController deposit start param [{}]", orderNo);
@@ -46,11 +46,11 @@ public class SettleCashierController {
     }
 
     /**
-     * 手动车辆结算接口
+     * 订单取消结算
      * @param orderNo
      * @return
      */
-    @AutoDocMethod(value = "查询支付款项信息", description = "查询支付款项信息", response = String.class)
+    @AutoDocMethod(value = "订单取消结算", description = "订单取消结算", response = String.class)
     @GetMapping("/settleOrderCancel")
     public ResponseData<String> settleOrderCancel(@RequestParam("orderNo") String orderNo) {
         log.info("SettleCashierController settleOrderCancel start param [{}]", orderNo);
@@ -65,7 +65,7 @@ public class SettleCashierController {
     @AutoDocMethod(value = "手动退款", description = "手动退款", response = String.class)
     @GetMapping("/cashierRefundApply")
     public ResponseData<String> cashierRefundApply(@RequestParam("orderNo") String orderNo,@RequestParam("payKind") String payKind) {
-        log.info("OrderSettleController cashierRefundApply start param [{}]", orderNo);
+        log.info("OrderSettleController cashierRefundApply start param orderNo=[{}],payKind={}", orderNo,payKind);
         CashierRefundApplyEntity cashierRefundApply = cashierRefundApplyNoTService.selectorderNo(orderNo,payKind);
         cashierPayService.refundOrderPay(cashierRefundApply);
         log.info("CashierController cashierRefundApply end param [{}],result [{}]");

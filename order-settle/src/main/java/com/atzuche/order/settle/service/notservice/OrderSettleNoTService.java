@@ -1,16 +1,5 @@
 package com.atzuche.order.settle.service.notservice;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
-
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
-
 import com.atzuche.order.accountownercost.entity.AccountOwnerCostSettleDetailEntity;
 import com.atzuche.order.accountplatorm.entity.AccountPlatformProfitDetailEntity;
 import com.atzuche.order.accountplatorm.entity.AccountPlatformProfitEntity;
@@ -31,21 +20,15 @@ import com.atzuche.order.cashieraccount.vo.req.CashierRefundApplyReqVO;
 import com.atzuche.order.cashieraccount.vo.req.DeductDepositToRentCostReqVO;
 import com.atzuche.order.cashieraccount.vo.res.CashierDeductDebtResVO;
 import com.atzuche.order.coin.service.AccountRenterCostCoinService;
-import com.atzuche.order.commons.entity.dto.CostBaseDTO;
-import com.atzuche.order.commons.entity.dto.MileageAmtDTO;
-import com.atzuche.order.commons.entity.dto.OilAmtDTO;
-import com.atzuche.order.commons.entity.dto.OwnerGoodsDetailDTO;
-import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
+import com.atzuche.order.commons.entity.dto.*;
 import com.atzuche.order.commons.enums.OrderStatusEnum;
 import com.atzuche.order.commons.enums.SubsidySourceCodeEnum;
-import com.atzuche.order.commons.enums.SysOrHandEnum;
 import com.atzuche.order.commons.enums.account.CostTypeEnum;
 import com.atzuche.order.commons.enums.account.debt.DebtTypeEnum;
 import com.atzuche.order.commons.enums.account.income.AccountOwnerIncomeExamineStatus;
 import com.atzuche.order.commons.enums.account.income.AccountOwnerIncomeExamineType;
 import com.atzuche.order.commons.enums.cashcode.OwnerCashCodeEnum;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
-import com.atzuche.order.commons.enums.cashier.CashierRefundApplyStatus;
 import com.atzuche.order.commons.enums.cashier.OrderRefundStatusEnum;
 import com.atzuche.order.commons.enums.cashier.PaySourceEnum;
 import com.atzuche.order.commons.enums.cashier.PayTypeEnum;
@@ -63,57 +46,38 @@ import com.atzuche.order.delivery.vo.handover.HandoverCarRepVO;
 import com.atzuche.order.delivery.vo.handover.HandoverCarReqVO;
 import com.atzuche.order.flow.service.OrderFlowService;
 import com.atzuche.order.owner.commodity.service.OwnerGoodsService;
-import com.atzuche.order.ownercost.entity.ConsoleOwnerOrderFineDeatailEntity;
-import com.atzuche.order.ownercost.entity.OwnerOrderEntity;
-import com.atzuche.order.ownercost.entity.OwnerOrderFineDeatailEntity;
-import com.atzuche.order.ownercost.entity.OwnerOrderIncrementDetailEntity;
-import com.atzuche.order.ownercost.entity.OwnerOrderPurchaseDetailEntity;
-import com.atzuche.order.ownercost.entity.OwnerOrderSubsidyDetailEntity;
-import com.atzuche.order.ownercost.service.ConsoleOwnerOrderFineDeatailService;
-import com.atzuche.order.ownercost.service.OwnerOrderCostCombineService;
-import com.atzuche.order.ownercost.service.OwnerOrderFineDeatailService;
-import com.atzuche.order.ownercost.service.OwnerOrderIncrementDetailService;
-import com.atzuche.order.ownercost.service.OwnerOrderPurchaseDetailService;
-import com.atzuche.order.ownercost.service.OwnerOrderService;
-import com.atzuche.order.ownercost.service.OwnerOrderSubsidyDetailService;
+import com.atzuche.order.ownercost.entity.*;
+import com.atzuche.order.ownercost.service.*;
 import com.atzuche.order.parentorder.dto.OrderStatusDTO;
 import com.atzuche.order.parentorder.entity.OrderEntity;
 import com.atzuche.order.parentorder.entity.OrderStatusEntity;
 import com.atzuche.order.parentorder.service.OrderService;
 import com.atzuche.order.parentorder.service.OrderStatusService;
 import com.atzuche.order.rentercommodity.service.RenterGoodsService;
-import com.atzuche.order.rentercost.entity.ConsoleRenterOrderFineDeatailEntity;
-import com.atzuche.order.rentercost.entity.OrderConsoleCostDetailEntity;
-import com.atzuche.order.rentercost.entity.OrderConsoleSubsidyDetailEntity;
-import com.atzuche.order.rentercost.entity.RenterOrderCostDetailEntity;
-import com.atzuche.order.rentercost.entity.RenterOrderFineDeatailEntity;
-import com.atzuche.order.rentercost.entity.RenterOrderSubsidyDetailEntity;
-import com.atzuche.order.rentercost.service.ConsoleRenterOrderFineDeatailService;
-import com.atzuche.order.rentercost.service.OrderConsoleCostDetailService;
-import com.atzuche.order.rentercost.service.OrderConsoleSubsidyDetailService;
-import com.atzuche.order.rentercost.service.RenterOrderCostDetailService;
-import com.atzuche.order.rentercost.service.RenterOrderFineDeatailService;
-import com.atzuche.order.rentercost.service.RenterOrderSubsidyDetailService;
+import com.atzuche.order.rentercost.entity.*;
+import com.atzuche.order.rentercost.service.*;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.atzuche.order.renterorder.service.OrderCouponService;
 import com.atzuche.order.renterorder.service.RenterOrderService;
 import com.atzuche.order.settle.exception.OrderSettleFlatAccountException;
 import com.atzuche.order.settle.service.OrderSettleNewService;
-import com.atzuche.order.settle.vo.req.AccountInsertDebtReqVO;
-import com.atzuche.order.settle.vo.req.OwnerCosts;
-import com.atzuche.order.settle.vo.req.RefundApplyVO;
-import com.atzuche.order.settle.vo.req.RentCosts;
-import com.atzuche.order.settle.vo.req.SettleCancelOrdersAccount;
-import com.atzuche.order.settle.vo.req.SettleOrders;
-import com.atzuche.order.settle.vo.req.SettleOrdersAccount;
-import com.atzuche.order.settle.vo.req.SettleOrdersDefinition;
+import com.atzuche.order.settle.vo.req.*;
 import com.atzuche.order.wallet.WalletProxyService;
 import com.autoyol.autopay.gateway.constant.DataPayKindConstant;
 import com.autoyol.autopay.gateway.constant.DataPayTypeConstant;
 import com.autoyol.doc.util.StringUtil;
 import com.autoyol.platformcost.model.FeeResult;
-
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 //
 ///**
 // * 订单结算
@@ -1636,9 +1600,9 @@ public class OrderSettleNoTService {
         List<RenterOrderFineDeatailEntity> renterOrderFineDeatails = renterOrderFineDeatailService.listRenterOrderFineDeatail(settleOrders.getOrderNo(),settleOrders.getRenterOrderNo());
         //2 获取全局的租客订单罚金明细（租客车主共用表 ，会员号区分车主/租客）
         List<ConsoleRenterOrderFineDeatailEntity> consoleRenterOrderFineDeatails = consoleRenterOrderFineDeatailService.listConsoleRenterOrderFineDeatail(settleOrders.getOrderNo(),settleOrders.getRenterMemNo());
-        //3 补贴包含凹凸币信息
+        //3 补贴包含凹凸币信息(这里其实只需要凹凸币的补贴)
         List<RenterOrderSubsidyDetailEntity> renterOrderSubsidyDetails = renterOrderSubsidyDetailService.listRenterOrderSubsidyDetail(settleOrders.getOrderNo(),settleOrders.getRenterOrderNo());
-        //4.`order_console_subsidy_detail` 管理后台对租客的补贴?? todo zhangbin
+        //4.`order_console_subsidy_detail` 管理后台对租客的补贴不用管
         
         RentCosts rentCosts = new RentCosts();
         rentCosts.setRenterOrderSubsidyDetails(renterOrderSubsidyDetails);
@@ -1674,26 +1638,30 @@ public class OrderSettleNoTService {
      * @return
      */
     public SettleCancelOrdersAccount initSettleCancelOrdersAccount(SettleOrders settleOrders) {
+        String orderNo = settleOrders.getOrderNo();
+        String renterMemNo = settleOrders.getRenterMemNo();
         SettleCancelOrdersAccount settleCancelOrdersAccount = new SettleCancelOrdersAccount();
         // 实付车俩押金金额
-        int rentDepositAmt = cashierSettleService.getRentDeposit(settleOrders.getOrderNo(),settleOrders.getRenterMemNo());
+        int rentDepositAmt = cashierSettleService.getRentDeposit(orderNo, renterMemNo);
         // 实付钱包金额
-        int rentWalletAmt = cashierSettleService.getRentCostPayByWallet(settleOrders.getOrderNo(),settleOrders.getRenterMemNo());
+        int rentWalletAmt = cashierSettleService.getRentCostPayByWallet(orderNo, renterMemNo);
         // 实付违章押金金额
-        int rentWzDepositAmt = cashierSettleService.getSurplusWZDepositCostAmt(settleOrders.getOrderNo(),settleOrders.getRenterMemNo());
+        int rentWzDepositAmt = cashierSettleService.getSurplusWZDepositCostAmt(orderNo, renterMemNo);
         // 查询实付租车费用金额
-        int rentCostAmt = cashierSettleService.getCostPaidRentRefundAmt(settleOrders.getOrderNo(),settleOrders.getRenterMemNo());
+        int rentCostAmt = cashierSettleService.getCostPaidRentRefundAmt(orderNo, renterMemNo);
         // 计算租客罚金
         int rentFineAmt =0;
         RentCosts rentCosts = settleOrders.getRentCosts();
         if(Objects.nonNull(rentCosts) && !CollectionUtils.isEmpty(rentCosts.getRenterOrderFineDeatails())){
             int amt = rentCosts.getRenterOrderFineDeatails().stream().filter(obj ->{
+                //TODO zhangbin 过滤的时候-->只过滤出租客并且是取消订单的违约金
                 return SubsidySourceCodeEnum.RENTER.getCode().equals(obj.getFineSubsidySourceCode());
             }).mapToInt(RenterOrderFineDeatailEntity::getFineAmount).sum();
             rentFineAmt = rentFineAmt +amt;
         }
         if(Objects.nonNull(rentCosts) && !CollectionUtils.isEmpty(rentCosts.getConsoleRenterOrderFineDeatails())){
             int amt = rentCosts.getConsoleRenterOrderFineDeatails().stream().filter(obj ->{
+                //TODO zhangbin 过滤的时候-->只过滤出租客并且是取消订单的违约金
                 return SubsidySourceCodeEnum.RENTER.getCode().equals(obj.getFineSubsidySourceCode());
             }).mapToInt(ConsoleRenterOrderFineDeatailEntity::getFineAmount).sum();
             rentFineAmt = rentFineAmt +amt;
@@ -1711,6 +1679,7 @@ public class OrderSettleNoTService {
         OwnerCosts ownerCosts = settleOrders.getOwnerCosts();
         if(Objects.nonNull(ownerCosts) && !CollectionUtils.isEmpty(ownerCosts.getOwnerOrderFineDeatails())){
             int amt = ownerCosts.getOwnerOrderFineDeatails().stream().filter(obj ->{
+                //TODO zhangbin 过滤的时候-->只过滤出租客并且是取消订单的违约金
                 return SubsidySourceCodeEnum.OWNER.getCode().equals(obj.getFineSubsidySourceCode());
             }).mapToInt(OwnerOrderFineDeatailEntity::getFineAmount).sum();
             ownerFineAmt = ownerFineAmt +amt;
@@ -1727,12 +1696,14 @@ public class OrderSettleNoTService {
         int rentFineIncomeAmt = 0;
         if(Objects.nonNull(rentCosts) && !CollectionUtils.isEmpty(rentCosts.getRenterOrderFineDeatails())){
             int amt = rentCosts.getRenterOrderFineDeatails().stream().filter(obj ->{
+                //TODO zhangbin 过滤的时候-->只过滤出租客并且是取消订单的违约金
                 return SubsidySourceCodeEnum.RENTER.getCode().equals(obj.getFineSubsidyCode());
             }).mapToInt(RenterOrderFineDeatailEntity::getFineAmount).sum();
             rentFineIncomeAmt = rentFineIncomeAmt +amt;
         }
         if(Objects.nonNull(rentCosts) && !CollectionUtils.isEmpty(rentCosts.getConsoleRenterOrderFineDeatails())){
             int amt = rentCosts.getConsoleRenterOrderFineDeatails().stream().filter(obj ->{
+                //TODO zhangbin 过滤的时候-->只过滤出租客并且是取消订单的违约金
                 return SubsidySourceCodeEnum.RENTER.getCode().equals(obj.getFineSubsidyCode());
             }).mapToInt(ConsoleRenterOrderFineDeatailEntity::getFineAmount).sum();
             rentFineIncomeAmt = rentFineIncomeAmt +amt;
@@ -1741,6 +1712,7 @@ public class OrderSettleNoTService {
         int ownerFineIncomeAmt = 0;
         if(Objects.nonNull(ownerCosts) && !CollectionUtils.isEmpty(ownerCosts.getOwnerOrderFineDeatails())){
             int amt = ownerCosts.getOwnerOrderFineDeatails().stream().filter(obj ->{
+                //TODO zhangbin 过滤的时候-->只过滤出租客并且是取消订单的违约金
                 AccountOwnerCostSettleDetailEntity entity = new AccountOwnerCostSettleDetailEntity();
                 BeanUtils.copyProperties(obj,entity);
                 entity.setCostType(getCostTypeEnumBySubsidy(obj.getFineSubsidySourceCode()).getCode());
@@ -1754,6 +1726,7 @@ public class OrderSettleNoTService {
         }
         if(Objects.nonNull(ownerCosts) && !CollectionUtils.isEmpty(ownerCosts.getConsoleOwnerOrderFineDeatailEntitys())){
             int amt = ownerCosts.getConsoleOwnerOrderFineDeatailEntitys().stream().filter(obj ->{
+                //TODO zhangbin 过滤的时候-->只过滤出租客并且是取消订单的违约金
                 AccountOwnerCostSettleDetailEntity entity = new AccountOwnerCostSettleDetailEntity();
                 BeanUtils.copyProperties(obj,entity);
                 entity.setCostType(getCostTypeEnumBySubsidy(obj.getFineSubsidySourceCode()).getCode());
@@ -1768,12 +1741,14 @@ public class OrderSettleNoTService {
         //平台罚金收入
         int platformFineImconeAmt=0;
         if(Objects.nonNull(ownerCosts) && !CollectionUtils.isEmpty(ownerCosts.getConsoleOwnerOrderFineDeatailEntitys())){
+            //TODO zhangbin 过滤的时候-->只过滤出租客并且是取消订单的违约金并且目标方式平台
             int amt = ownerCosts.getConsoleOwnerOrderFineDeatailEntitys().stream().filter(obj ->{
                 return SubsidySourceCodeEnum.PLATFORM.getCode().equals(obj.getFineSubsidyCode());
             }).mapToInt(ConsoleOwnerOrderFineDeatailEntity::getFineAmount).sum();
             platformFineImconeAmt = platformFineImconeAmt +amt;
         }
         if(Objects.nonNull(ownerCosts) && !CollectionUtils.isEmpty(rentCosts.getConsoleRenterOrderFineDeatails())){
+            //TODO zhangbin 过滤的时候-->只过滤出租客并且是取消订单的违约金并且目标方式平台
             int amt = rentCosts.getConsoleRenterOrderFineDeatails().stream().filter(obj ->{
                 return SubsidySourceCodeEnum.PLATFORM.getCode().equals(obj.getFineSubsidyCode());
             }).mapToInt(ConsoleRenterOrderFineDeatailEntity::getFineAmount).sum();
