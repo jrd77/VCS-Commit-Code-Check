@@ -5,6 +5,8 @@ import com.autoyol.platformcost.model.AbatementConfig;
 import com.autoyol.platformcost.model.CarPriceOfDay;
 import com.autoyol.platformcost.model.SphericalDistanceCoefficient;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDate;
@@ -15,6 +17,7 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringUtils;
 
+@Slf4j
 public class CommonUtils {
 	/**
 	 * 配置的一天小时
@@ -60,6 +63,11 @@ public class CommonUtils {
 	public static final String FORMAT_STR_DEFAULT = "yyyy-MM-dd HH:mm:ss";
 	
 	public static final String FORMAT_STR_LONG = "yyyyMMddHHmmss";
+	
+	public static final double INSURE_DISCOUNT_NORMAL = 1.0;
+	public static final double INSURE_DISCOUNT_DIS = 0.7;
+	/** 一天小时数  */
+	private static final int HOURS_PER_DAY = 24;
 	
     /**
                * 初始化全面保障费单价配置
@@ -650,6 +658,30 @@ public class CommonUtils {
 		}
 		DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(parseStr);     
         return LocalDateTime.parse(dateTime, dateTimeFormatter);
+	}
+	
+	/**
+	 * 获取平台保证费和全面保障费折扣
+	 * @param rentTime 取车时间
+	 * @param revertTime 还车时间
+	 * @return double
+	 */
+	public static double getInsureDiscount(LocalDateTime rentTime,LocalDateTime revertTime) {
+		if (rentTime == null || revertTime == null) {
+			return INSURE_DISCOUNT_NORMAL;
+		}
+		try {
+			Duration duration = Duration.between(rentTime,revertTime);
+			// 获取相差的分钟数
+			long minutes = duration.toMinutes();
+			// 如果24h制租期大于7天，平台保障费和全面保障费打7折
+			if (minutes >= HOURS_PER_DAY*7*60) {
+				return INSURE_DISCOUNT_DIS;
+			}
+		} catch (Exception e) {
+			log.error("CommonUtils.getInsureDiscount has exception rentTime=[{}],revertTime=[{}]",rentTime,revertTime,e);
+		}
+		return INSURE_DISCOUNT_NORMAL;
 	}
 	
 	public static void main(String[] args) {

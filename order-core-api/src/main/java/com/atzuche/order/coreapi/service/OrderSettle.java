@@ -25,6 +25,10 @@ public class OrderSettle {
         orderSettleService.settleOrder(orderNo,payCallbackService);
     }
     
+    public void settleOrderCancel(String orderNo) {
+    	orderSettleService.settleOrderCancel(orderNo);
+    }
+    
     public void settleWzOrder(String orderNo){
     	orderWzSettleService.settleWzOrder(orderNo);
     }

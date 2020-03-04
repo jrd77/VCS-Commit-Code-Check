@@ -1,16 +1,16 @@
 package com.atzuche.order.ownercost.entity;
 
-import lombok.Data;
-
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import lombok.Data;
 
 
 /**
- * 车主取消订单违约罚金
+ * 
  * 
  * @author ZhangBin
- * @date 2020-01-14 19:39:44
+ * @date 2020-03-02 16:16:15
+ * @Description:
  */
 @Data
 public class OwnerOrderFineApplyEntity implements Serializable {
@@ -32,6 +32,14 @@ public class OwnerOrderFineApplyEntity implements Serializable {
 	 * 会员号
 	 */
 	private Integer memNo;
+	/**
+	 * 罚金补贴方编码（车主/租客/平台）1-租客，2-车主，3-平台
+	 */
+	private String fineSubsidyCode;
+	/**
+	 * 罚金补贴描述
+	 */
+	private String fineSubsidyDesc;
 	/**
 	 * 罚金来源编码（车主/租客/平台）1-租客，2-车主，3-平台
 	 */

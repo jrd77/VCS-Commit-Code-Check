@@ -69,7 +69,7 @@ public class CashierRefundApplyReqVO {
     /**
      * 退款状态
      */
-    private Integer status;
+    private String status;
     /**
      * 支付流水号
      */

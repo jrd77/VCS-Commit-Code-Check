@@ -70,6 +70,8 @@ import com.atzuche.order.rentercost.service.RenterOrderSubsidyDetailService;
 import com.atzuche.order.rentermem.service.RenterMemberService;
 import com.atzuche.order.renterorder.entity.*;
 import com.atzuche.order.renterorder.service.*;
+import com.atzuche.order.settle.entity.AccountDebtReceivableaDetailEntity;
+import com.atzuche.order.settle.service.notservice.AccountDebtReceivableaDetailNoTService;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
 import lombok.extern.slf4j.Slf4j;
@@ -160,6 +162,8 @@ public class OrderDetailService {
     private OwnerOrderCostService ownerOrderCostService;
     @Autowired
     private AccountOwnerIncomeExamineNoTService accountOwnerIncomeExamineNoTService;
+    @Autowired
+    private AccountDebtReceivableaDetailNoTService accountDebtReceivableaDetailNoTService;
 
     private static final String UNIT_HOUR = "小时";
 
@@ -1156,6 +1160,14 @@ public class OrderDetailService {
             BeanUtils.copyProperties(x,accountRenterCostDetailDTO);
             accountRenterCostDetailDTOList.add(accountRenterCostDetailDTO);
         });
+        //入账的历史欠款
+        List<AccountDebtReceivableaDetailEntity> accountDebtReceivableaDetailEntities = accountDebtReceivableaDetailNoTService.getByOrderNoAndMemNo(orderNo, orderEntity.getMemNoRenter());
+        List<AccountDebtReceivableaDetailDTO> accountDebtReceivableaDetailDTOist = new ArrayList<>();
+        accountDebtReceivableaDetailEntities.stream().forEach(x->{
+            AccountDebtReceivableaDetailDTO accountDebtReceivableaDetailDTO = new AccountDebtReceivableaDetailDTO();
+            BeanUtils.copyProperties(x,accountDebtReceivableaDetailDTO);
+            accountDebtReceivableaDetailDTOist.add(accountDebtReceivableaDetailDTO);
+        });
 
         OrderAccountDetailRespDTO orderAccountDetailRespDTO = new OrderAccountDetailRespDTO();
         orderAccountDetailRespDTO.orderDTO = orderDTO;
@@ -1166,7 +1178,7 @@ public class OrderDetailService {
         orderAccountDetailRespDTO.accountRenterDetainCostDTO = accountRenterDetainCostDTO;
         orderAccountDetailRespDTO.accountRenterDetainDetailDTOList = accountRenterDetainDetailDTOList;
         orderAccountDetailRespDTO.accountRenterCostDetailDTOS = accountRenterCostDetailDTOList;
-
+        orderAccountDetailRespDTO.accountDebtReceivableaDetailDTOS = accountDebtReceivableaDetailDTOist;
         return orderAccountDetailRespDTO;
     }
 

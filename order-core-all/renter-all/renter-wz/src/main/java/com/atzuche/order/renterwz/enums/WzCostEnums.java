@@ -9,12 +9,12 @@ import org.apache.commons.lang3.StringUtils;
  * @date 2019/12/31
  */
 public enum WzCostEnums {
-    WZ_FINE(1,"100040","协助违章处理费","处理费备注"),
-    WZ_DYS_FINE(2,"100042","不良用车处罚金","服务费备注"),
-    WZ_SERVICE_COST(3,"100041","凹凸代办服务费","处罚金备注"),
-    WZ_STOP_COST(4,"100043","停运费","停运费备注"),
-    WZ_OTHER_FINE(5,"100044","其他扣款","其他扣款备注"),
-    INSURANCE_CLAIM(6,"100045","保险理赔","保险理赔备注"),
+    WZ_FINE(1,"11240040","协助违章处理费","处理费备注"),
+    WZ_DYS_FINE(2,"11240042","不良用车处罚金","服务费备注"),
+    WZ_SERVICE_COST(3,"11240041","凹凸代办服务费","处罚金备注"),
+    WZ_STOP_COST(4,"11240043","停运费","停运费备注"),
+    WZ_OTHER_FINE(5,"11240044","其他扣款","其他扣款备注"),
+    INSURANCE_CLAIM(6,"11240045","保险理赔","保险理赔备注"),
     ;
 
     private Integer type;
