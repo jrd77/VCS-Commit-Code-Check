@@ -267,6 +267,8 @@ public class OrderSettleService{
             orderSettleNoTService.handleOwnerFine(settleOrders,settleCancelOrdersAccount);
             Cat.logEvent("handleOwnerFine",GsonUtils.toJson(settleCancelOrdersAccount));
             log.info("OrderPayCallBack handleOwnerFine settleCancelOrdersAccount [{}] ",GsonUtils.toJson(settleCancelOrdersAccount));
+            
+            
             //7 租客罚金处理
             orderSettleNoTService.handleRentFine(settleOrders,settleCancelOrdersAccount);
             Cat.logEvent("handleRentFine",GsonUtils.toJson(settleCancelOrdersAccount));
@@ -275,7 +277,7 @@ public class OrderSettleService{
             orderSettleNoTService.repayHistoryDebtRentCancel(settleOrders,settleCancelOrdersAccount);
             Cat.logEvent("repayHistoryDebtRentCancel",GsonUtils.toJson(settleCancelOrdersAccount));
             log.info("OrderPayCallBack repayHistoryDebtRentCancel settleCancelOrdersAccount [{}] ",GsonUtils.toJson(settleCancelOrdersAccount));
-            //9 租客金额 退还 包含 凹凸币，钱包 租车费用 押金 违章押金 退还 （优惠卷退还 TODO）
+            //9 租客金额 退还 包含 凹凸币，钱包 租车费用 押金 违章押金 退还 （优惠券退还 TODO）
             orderSettleNoTService.refundCancelCost(settleOrders,settleCancelOrdersAccount,orderStatusDTO);
             Cat.logEvent("refundCancelCost",GsonUtils.toJson(settleCancelOrdersAccount));
             log.info("OrderPayCallBack refundCancelCost settleCancelOrdersAccount [{}] ",GsonUtils.toJson(settleCancelOrdersAccount));

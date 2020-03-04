@@ -10,6 +10,13 @@
         <result property="yingshouDeposit" column="yingshou_deposit"/>
         <result property="shishouDeposit" column="shishou_deposit"/>
         <result property="isAuthorize" column="is_authorize"/>
+        
+        <result property="authorizeDepositAmt" column="authorize_deposit_amt"/>
+        <result property="creditPayAmt" column="credit_pay_amt"/>
+        <result property="surplusCreditPayAmt" column="surplus_credit_pay_amt"/>
+        <result property="surplusDepositAmt" column="surplus_deposit_amt"/>
+        <result property="surplusAuthorizeDepositAmt" column="surplus_authorize_deposit_amt"/>
+        
         <result property="freeDepositType" column="free_deposit_type"/>
         <result property="shouldReturnDeposit" column="should_return_deposit"/>
         <result property="realReturnDeposit" column="real_return_deposit"/>
@@ -31,6 +38,11 @@
 	`yingshou_deposit`, 	
 	`shishou_deposit`, 	
 	`is_authorize`, 	
+	`authorize_deposit_amt`, 	
+	`credit_pay_amt`,
+	 surplus_credit_pay_amt,
+	`surplus_deposit_amt`, 	
+	`surplus_authorize_deposit_amt`, 
 	`free_deposit_type`,
 	`should_return_deposit`, 	
 	`real_return_deposit`, 	
@@ -59,6 +71,11 @@
             <if test="yingshouDeposit != null">`yingshou_deposit`, </if>
             <if test="shishouDeposit != null">`shishou_deposit`, </if>
             <if test="isAuthorize != null">`is_authorize`, </if>
+            <if test="authorizeDepositAmt != null">`authorize_deposit_amt`, </if>
+            <if test="creditPayAmt != null">`credit_pay_amt`, </if>
+            <if test="surplusCreditPayAmt != null">`surplus_credit_pay_amt`, </if>
+            <if test="surplusDepositAmt != null">`surplus_deposit_amt`, </if>
+            <if test="surplusAuthorizeDepositAmt != null">`surplus_authorize_deposit_amt`, </if>
             <if test="freeDepositType != null">`free_deposit_type`, </if>
             <if test="shouldReturnDeposit != null">`should_return_deposit`, </if>
             <if test="realReturnDeposit != null">`real_return_deposit`, </if>
@@ -77,6 +94,11 @@
             <if test="yingshouDeposit != null">#{yingshouDeposit},  </if>
             <if test="shishouDeposit != null">#{shishouDeposit},  </if>
             <if test="isAuthorize != null">#{isAuthorize},  </if>
+            <if test="authorizeDepositAmt != null">#{authorizeDepositAmt},  </if>
+            <if test="creditPayAmt != null">#{creditPayAmt},  </if>
+            <if test="surplusCreditPayAmt != null">#{surplusCreditPayAmt},  </if>
+            <if test="surplusDepositAmt != null">#{surplusDepositAmt},  </if>
+            <if test="surplusAuthorizeDepositAmt != null">#{surplusAuthorizeDepositAmt},  </if>
             <if test="freeDepositType != null">#{freeDepositType},  </if>
             <if test="shouldReturnDeposit != null">#{shouldReturnDeposit},  </if>
             <if test="realReturnDeposit != null">#{realReturnDeposit},  </if>
@@ -99,6 +121,12 @@
 				<if test="yingshouDeposit != null">`yingshou_deposit` = #{yingshouDeposit}, </if>
 				<if test="shishouDeposit != null">`shishou_deposit` = #{shishouDeposit}, </if>
 				<if test="isAuthorize != null">`is_authorize` = #{isAuthorize}, </if>
+				<if test="authorizeDepositAmt != null">`authorize_deposit_amt` = #{authorizeDepositAmt}, </if>
+				<if test="creditPayAmt != null">`credit_pay_amt` = #{creditPayAmt}, </if>
+                <if test="surplusCreditPayAmt != null">`surplus_credit_pay_amt` = #{creditPayAmt}, </if>
+                <if test="surplusDepositAmt != null">`surplus_deposit_amt` = #{surplusDepositAmt}, </if>
+				<if test="surplusAuthorizeDepositAmt != null">`surplus_authorize_deposit_amt` = #{surplusAuthorizeDepositAmt}, </if>
+				
 				<if test="freeDepositType != null">`free_deposit_type` = #{freeDepositType}, </if>
 				<if test="shouldReturnDeposit != null">`should_return_deposit` = #{shouldReturnDeposit}, </if>
 				<if test="realReturnDeposit != null">`real_return_deposit` = #{realReturnDeposit}, </if>

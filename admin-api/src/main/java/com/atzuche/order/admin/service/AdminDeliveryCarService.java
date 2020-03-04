@@ -25,6 +25,8 @@ import com.atzuche.order.rentercommodity.service.RenterCommodityService;
 import com.atzuche.order.rentercost.entity.RenterOrderCostDetailEntity;
 import com.atzuche.order.rentercost.service.RenterOrderCostDetailService;
 import com.atzuche.order.rentermem.service.RenterMemberService;
+import com.atzuche.order.renterorder.entity.RenterOrderEntity;
+import com.atzuche.order.renterorder.service.RenterOrderService;
 import com.atzuche.order.transport.service.GetReturnCarCostProxyService;
 import com.atzuche.order.transport.service.TranSportProxyService;
 import org.apache.commons.lang3.StringUtils;
@@ -65,6 +67,8 @@ public class AdminDeliveryCarService {
     FeignOrderModifyService feignOrderModifyService;
     @Autowired
     RenterMemberService renterMemberService;
+    @Autowired
+    RenterOrderService renterOrderService;
 
     protected final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -246,12 +250,12 @@ public class AdminDeliveryCarService {
         distributionCostVO.setRenturnCarAmt("0");
         distributionCostVO.setGetCarAmt("0");
         // 获取租客商品信息
-        List<RenterOrderDeliveryEntity> renterOrderDeliveryEntityList = renterOrderDeliveryService.findRenterOrderListByOrderNo(deliveryCarDTO.getOrderNo());
-        if (CollectionUtils.isEmpty(renterOrderDeliveryEntityList)) {
-            return distributionCostVO;
-        }
-
-        List<RenterOrderCostDetailEntity> list = renterOrderCostDetailService.listRenterOrderCostDetail(deliveryCarDTO.getOrderNo(), renterOrderDeliveryEntityList.get(0).getRenterOrderNo());
+//        RenterOrderEntity renterOrderEntity = renterOrderService.getRenterOrderByOrderNoAndIsEffective(deliveryCarDTO.getOrderNo());
+//        if(null == renterOrderEntity)
+//        {
+//            return distributionCostVO;
+//        }
+        List<RenterOrderCostDetailEntity> list = renterOrderCostDetailService.listRenterOrderCostDetail(deliveryCarDTO.getOrderNo(), deliveryCarDTO.getRenterOrderNo());
         if (CollectionUtils.isEmpty(list)) {
             return distributionCostVO;
         }

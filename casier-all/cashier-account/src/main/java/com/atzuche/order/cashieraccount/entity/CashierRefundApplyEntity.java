@@ -3,6 +3,7 @@ package com.atzuche.order.cashieraccount.entity;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import lombok.Data;
+import lombok.ToString;
 
 
 /**
@@ -12,6 +13,7 @@ import lombok.Data;
  * @date 2019-12-26 14:12:04
  * @Description:
  */
+@ToString
 @Data
 public class CashierRefundApplyEntity implements Serializable {
 	private static final long serialVersionUID = 1L;

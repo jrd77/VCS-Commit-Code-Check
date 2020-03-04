@@ -1,16 +1,15 @@
 package com.atzuche.order.commons.vo.res.rentcosts;
 
-import lombok.Data;
-
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import lombok.Data;
 
 
 /**
  * 后台管理操作费用表（无条件补贴）
  * 
  * @author ZhangBin
- * @date 2020-01-16 15:03:47
+ * @date 2020-03-02 16:31:58
  * @Description:
  */
 @Data
@@ -30,39 +29,47 @@ public class OrderConsoleCostDetailEntity implements Serializable {
 	 */
 	private String memNo;
 	/**
-	 * 补贴费用类型 1、租金 2、取还车费用 3、保险 4、不计免赔
+	 * 费用类型 1、租金 2、取还车费用 3、保险 4、不计免赔
 	 */
 	private String subsidTypeName;
 	/**
-	 * 补贴费用类型编码
+	 * 费用类型编码
 	 */
 	private String subsidyTypeCode;
 	/**
-	 * 补贴来源方编码 1、租客 2、车主 3、平台
+	 * 费用来源方编码 1、租客 2、车主 3、平台
 	 */
 	private String subsidySourceCode;
 	/**
-	 * 补贴来源方
+	 * 费用来源方
 	 */
 	private String subsidySourceName;
 	/**
-	 * 补贴方编码 1、租客 2、车主 3、平台
+	 * 费用方编码 1、租客 2、车主 3、平台
 	 */
 	private String subsidyTargetCode;
 	/**
-	 * 补贴方名称
+	 * 费用方名称
 	 */
 	private String subsidyTargetName;
 	/**
-	 * 补贴描述
+	 * 费用项名称 如：凹凸比、优惠券等
+	 */
+	private String subsidyCostName;
+	/**
+	 * 费用项编码
+	 */
+	private String subsidyCostCode;
+	/**
+	 * 费用描述
 	 */
 	private String subsidyDesc;
 	/**
-	 * 补贴金额
+	 * 费用金额
 	 */
 	private Integer subsidyAmount;
 	/**
-	 * 补贴凭证
+	 * 费用凭证
 	 */
 	private String subsidyVoucher;
 	/**

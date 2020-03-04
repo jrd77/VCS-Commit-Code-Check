@@ -16,13 +16,14 @@ import com.atzuche.order.coreapi.entity.dto.CancelOrderResDTO;
 import com.atzuche.order.coreapi.entity.vo.res.CarRentTimeRangeResVO;
 import com.atzuche.order.delivery.vo.delivery.CancelFlowOrderDTO;
 import com.atzuche.order.delivery.vo.delivery.CancelOrderDeliveryVO;
-import com.atzuche.order.ownercost.entity.OwnerOrderFineApplyEntity;
+import com.atzuche.order.rentercost.entity.RenterOrderCostDetailEntity;
 import com.atzuche.order.renterorder.entity.dto.DeductContextDTO;
 import com.atzuche.order.renterorder.entity.dto.RenterOrderCostRespDTO;
 import com.atzuche.order.renterorder.vo.RenterOrderCarDepositResVO;
 import com.atzuche.order.renterorder.vo.RenterOrderIllegalResVO;
 import com.atzuche.order.renterorder.vo.RenterOrderReqVO;
-import com.atzuche.order.renterorder.vo.owner.OwnerCouponReqVO;
+import com.autoyol.platformcost.CommonUtils;
+
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -121,7 +122,7 @@ public class OrderCommonConver {
      * @param renterOrderCostRespDTO 订单租车费用信息
      * @return List<CostItemVO>
      */
-    public List<CostItemVO> buildCostItemList(RenterOrderCostRespDTO renterOrderCostRespDTO) {
+    public List<CostItemVO> buildCostItemList(RenterOrderCostRespDTO renterOrderCostRespDTO, RenterOrderReqVO renterOrderReqVO) {
         logger.info("Build costItem list.param is,renterOrderCostRespDTO:[{}]", JSON.toJSONString(renterOrderCostRespDTO));
         if (null == renterOrderCostRespDTO || CollectionUtils.isEmpty(renterOrderCostRespDTO.getRenterOrderCostDetailDTOList())) {
             return null;
@@ -129,6 +130,10 @@ public class OrderCommonConver {
 
         List<CostItemVO> costItemList = new ArrayList<>();
         renterOrderCostRespDTO.getRenterOrderCostDetailDTOList().forEach(cost -> {
+        	if (RenterCashCodeEnum.INSURE_TOTAL_PRICES.getCashNo().equals(cost.getCostCode()) || 
+        			RenterCashCodeEnum.ABATEMENT_INSURE.getCashNo().equals(cost.getCostCode())) {
+        		return;
+        	}
             CostItemVO vo = new CostItemVO();
             vo.setCostCode(cost.getCostCode());
             vo.setCostDesc(cost.getCostDesc());
@@ -146,9 +151,89 @@ public class OrderCommonConver {
             costItemList.add(vo);
         });
 
+        // 获取保险和不计免赔的折扣
+ 		double insureDiscount = CommonUtils.getInsureDiscount(renterOrderReqVO.getRentTime(), renterOrderReqVO.getRevertTime());
+        // 平台保障费用项
+ 		costItemList.add(getInsurCostItemVO(renterOrderCostRespDTO, insureDiscount));
+ 		// 全面保障费用项
+ 		costItemList.add(getAbatementCostItemVO(renterOrderCostRespDTO, insureDiscount));
         logger.info("Build costItem list.result is,costItemList:[{}]", JSON.toJSONString(costItemList));
         return costItemList;
     }
+    
+    
+    /**
+     * 获取平台保障费费用项
+     * @param renterOrderCostRespDTO
+     * @param insureDiscount
+     * @return
+     */
+    private CostItemVO getInsurCostItemVO(RenterOrderCostRespDTO renterOrderCostRespDTO, Double insureDiscount) {
+    	if (renterOrderCostRespDTO == null) {
+    		return null;
+    	}
+    	List<RenterOrderCostDetailEntity> costDetailList = renterOrderCostRespDTO.getRenterOrderCostDetailDTOList();
+    	if (costDetailList == null || costDetailList.isEmpty()) {
+    		return null;
+    	}
+    	int unitPrice = 0;
+    	double count = 0.0;
+    	for (RenterOrderCostDetailEntity cost:costDetailList) {
+    		if (RenterCashCodeEnum.INSURE_TOTAL_PRICES.getCashNo().equals(cost.getCostCode())) {
+    			unitPrice = cost.getUnitPrice();
+    			count = cost.getCount();
+    			break;
+    		}
+    	}
+    	Integer basicEnsureAmount = renterOrderCostRespDTO.getBasicEnsureAmount();
+    	CostItemVO vo = new CostItemVO();
+    	vo.setCostCode(RenterCashCodeEnum.INSURE_TOTAL_PRICES.getCashNo());
+    	vo.setCostDesc(RenterCashCodeEnum.INSURE_TOTAL_PRICES.getTxt());
+    	vo.setCount(count);
+    	vo.setTotalAmount(basicEnsureAmount);
+    	vo.setUnitPrice(unitPrice);
+    	vo.setDiscount(insureDiscount);
+    	return vo;
+    }
+    
+    
+    /**
+     * 获取全面保障费费用项
+     * @param renterOrderCostRespDTO
+     * @param insureDiscount
+     * @return
+     */
+    private CostItemVO getAbatementCostItemVO(RenterOrderCostRespDTO renterOrderCostRespDTO, Double insureDiscount) {
+    	if (renterOrderCostRespDTO == null) {
+    		return null;
+    	}
+    	List<RenterOrderCostDetailEntity> costDetailList = renterOrderCostRespDTO.getRenterOrderCostDetailDTOList();
+    	if (costDetailList == null || costDetailList.isEmpty()) {
+    		return null;
+    	}
+    	int unitPrice = 0;
+    	double count = 0.0;
+    	int totalCost = 0;
+    	for (RenterOrderCostDetailEntity cost:costDetailList) {
+    		if (RenterCashCodeEnum.ABATEMENT_INSURE.getCashNo().equals(cost.getCostCode())) {
+    			count += cost.getCount();
+    			totalCost += cost.getTotalAmount();
+    		}
+    	}
+    	if (totalCost != 0 && count != 0.0) {
+    		unitPrice = (int) Math.ceil(Math.abs(totalCost)/count);
+    	}
+    	Integer comprehensiveEnsureAmount = renterOrderCostRespDTO.getComprehensiveEnsureAmount();
+    	CostItemVO vo = new CostItemVO();
+    	vo.setCostCode(RenterCashCodeEnum.ABATEMENT_INSURE.getCashNo());
+    	vo.setCostDesc(RenterCashCodeEnum.ABATEMENT_INSURE.getTxt());
+    	vo.setCount(count);
+    	vo.setTotalAmount(comprehensiveEnsureAmount);
+    	vo.setUnitPrice(unitPrice);
+    	vo.setDiscount(insureDiscount);
+    	return vo;
+    }
+    
 
     /**
      * 下单前费用计算--租车费用总计
