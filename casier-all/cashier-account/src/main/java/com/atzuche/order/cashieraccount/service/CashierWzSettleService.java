@@ -76,6 +76,9 @@ public class CashierWzSettleService {
     private AccountRenterWzDepositCostSettleDetailNoTService accountRenterWzDepositCostSettleDetailNoTService;
     @Autowired
     private AccountRenterWzDepositCostNoTService accountRenterWzDepositCostNoTService;
+
+
+
     
     /**
      * 根据订单号查询订单 理赔信息
@@ -134,14 +137,15 @@ public class CashierWzSettleService {
         
         //wzTotalCost-todo
         // 4 租客结算费用明细 落库  account_renter_wz_deposit_cost_settle_detail 表结构不同。。 先记入费用总表
-        AccountRenterCostSettleDetailEntity entity = new AccountRenterCostSettleDetailEntity();
+        AccountRenterWzDepositCostSettleDetailEntity entity = new AccountRenterWzDepositCostSettleDetailEntity();
         BeanUtils.copyProperties(vo,entity);
-        entity.setAmt(Math.abs(vo.getAmt()));
+        entity.setWzAmt(Math.abs(vo.getAmt()));
         entity.setCostCode(RenterCashCodeEnum.SETTLE_WZ_DEPOSIT_TO_WZ_COST.getCashNo());
         entity.setCostDetail(RenterCashCodeEnum.SETTLE_WZ_DEPOSIT_TO_WZ_COST.getTxt());
         entity.setUniqueNo(String.valueOf(renterDepositDetailId));
-        entity.setType(10); //默认10
-        insertAccountRenterCostSettleDetail(entity);
+        //默认10
+        entity.setType(10);
+        insertAccountRenterWzDepositCostSettleDetail(entity);
         log.info("(记录租客费用总账明细)新增租客COST明细表(抵扣费用)，accountRenterCostSettleDetailEntity params=[{}]",GsonUtils.toJson(entity));
     }
     
@@ -303,10 +307,14 @@ public class CashierWzSettleService {
     public int getSurplusWZDepositCostAmt(String orderNo, String renterMemNo) {
         return accountRenterWzDepositDetailNoTService.getSurplusWZDepositCostAmt(orderNo,renterMemNo);
     }
-    
+
     /**
      * 计算租客 租车费用  平台补贴费用  车主补贴费用 手续费 基础保障费用 等 并落库
-     * @param account_renter_wz_deposit_cost
+     *
+     * @param orderNo
+     * @param renterMemNo
+     * @param wzTotalAmt
+     * @return
      */
     public AccountRenterWzDepositCostEntity updateWzRentSettleCost(String orderNo,String renterMemNo,int wzTotalAmt) {
     	//account_renter_wz_deposit
@@ -344,16 +352,29 @@ public class CashierWzSettleService {
 
 
     }
-    
+
+
+    /**
+     * 批量新增违章费用结算信息
+     *
+     * @param accountRenterWzDepositCostSettleDetails 违章费用结算信息
+     */
     public void insertAccountRenterWzDepoistCostSettleDetails(List<AccountRenterWzDepositCostSettleDetailEntity> accountRenterWzDepositCostSettleDetails) {
         if(!CollectionUtils.isEmpty(accountRenterWzDepositCostSettleDetails)){
         	accountRenterWzDepositCostSettleDetailNoTService.insertAccountRenterWzDepositCostSettleDetails(accountRenterWzDepositCostSettleDetails);
         }
 
     }
+
+    /**
+     * 新增违章费用结算信息
+     *
+     * @param record 违章费用结算信息
+     * @return 成功记录数
+     */
+    public int insertAccountRenterWzDepositCostSettleDetail(AccountRenterWzDepositCostSettleDetailEntity record) {
+        return accountRenterWzDepositCostSettleDetailNoTService.insertAccountRenterWzDepositCostSettleDetail(record);
+    }
     
 
-    
-    // ---------------------------------------------------------------------------------------------
-    
 }
