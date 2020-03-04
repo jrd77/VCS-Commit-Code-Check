@@ -55,6 +55,9 @@ public class RenterOrderFineDeatailService{
     private SysConfigSDK sysConfigSDK;
     @Autowired
     private HolidaySettingSDK holidaySettingSDK;
+    
+    private static final int CANCEL_SPRING_FINE_DAYS = 7;
+    private static final int CANCEL_SPRING_FINE_LIMIT = 2000;
 
     /**
      * 获取罚金明细列表
@@ -361,6 +364,50 @@ public class RenterOrderFineDeatailService{
 		//违约罚金上限为500元
 		if (penalty > CommonUtils.CANCEL_FINE_LIMIT) {
             penalty = CommonUtils.CANCEL_FINE_LIMIT;
+        }
+		return penalty;
+    }
+    
+    
+    /**
+     * 计算取消订单违约金（春节）
+     * @param cancelFineAmtDTO
+     * @return int
+     */
+    public int calCancelFineSpringFestival(CancelFineAmtDTO cancelFineAmtDTO) {
+    	log.info("calCancelFine 春节计算取消订单违约金cancelFineAmtDTO[{}]", cancelFineAmtDTO);
+    	if (cancelFineAmtDTO == null) {
+    		return 0;
+    	}
+    	CostBaseDTO costBaseDTO = cancelFineAmtDTO.getCostBaseDTO();
+    	LocalDateTime rentTime = costBaseDTO.getStartTime();
+    	LocalDateTime cancelTime = cancelFineAmtDTO.getCancelTime();
+    	if (rentTime == null || cancelTime == null) {
+    		return 0;
+    	}
+    	Integer rentAmt = cancelFineAmtDTO.getRentAmt();
+    	if (rentAmt == null) {
+    		return 0;
+    	}
+    	int penalty = 0;
+    	// 提前7天取消
+        Integer beforeTransTimeSpan = CANCEL_SPRING_FINE_DAYS;
+        // 当前时间加7天
+		LocalDateTime beforeHour = cancelTime.plusDays(beforeTransTimeSpan);
+		// 交易开始前提前7天（含）以上不收取违约罚金/租客下普通订单且车辆类型为“代管车\无人代管车\短租托管车”时，取消规则按“交易开始前免费取消
+		if (beforeHour.isBefore(rentTime) || beforeHour.isEqual(rentTime) || CommonUtils.isEscrowCar(cancelFineAmtDTO.getOwnerType())) {
+
+		} else {
+			//交易开始前7天内，收取订单租金的30%作为违约罚金
+			penalty = (int) (rentAmt*CommonUtils.CANCEL_FINE_RATIO);
+		}
+		// 交易开始后取消交易，收取订单租金的100%作为违约罚金
+		if (cancelTime.isAfter(rentTime) || cancelTime.isEqual(rentTime)) {
+			penalty = rentAmt;
+		}
+		//违约罚金上限为2000元
+		if (penalty > CANCEL_SPRING_FINE_LIMIT) {
+            penalty = CANCEL_SPRING_FINE_LIMIT;
         }
 		return penalty;
     }
