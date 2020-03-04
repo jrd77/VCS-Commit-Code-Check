@@ -118,8 +118,8 @@ public class AdminOrderCostController {
                 int serviceAmt = list.stream().filter(obj ->{
                     return OwnerCashCodeEnum.SERVICE_CHARGE.getCashNo().equals(obj.getCostCode());
                 }).mapToInt(OwnerOrderIncrementDetailEntity::getTotalAmount).sum();
-                resp.setGpsAmt(String.valueOf(Math.abs(gpsAmt)));
-                resp.setPlatformSrvFeeAmt(String.valueOf(Math.abs(serviceAmt)));
+                resp.setGpsAmt(String.valueOf(-Math.abs(gpsAmt)));
+                resp.setPlatformSrvFeeAmt(String.valueOf(-Math.abs(serviceAmt)));
             }else{
                 resp.setGpsAmt("0");
                 resp.setPlatformSrvFeeAmt("0");
@@ -132,7 +132,8 @@ public class AdminOrderCostController {
                     resp.setOilAmt(ownerGetAndReturnCarDTO.getOilDifferenceCrash());
                     resp.setBeyondMileAmt(ownerGetAndReturnCarDTO.getOverKNCrash());
                 }
-                resp.setPlatformAddOilSrvAmt(ownerGetAndReturnCarDTO.getPlatFormOilServiceCharge());
+                //转换为负数
+                resp.setPlatformAddOilSrvAmt(String.valueOf(-Math.abs(Integer.valueOf(ownerGetAndReturnCarDTO.getPlatFormOilServiceCharge()))));
             }
             //TODO 车载押金 没有
         	logger.info("resp = " + resp.toString());
