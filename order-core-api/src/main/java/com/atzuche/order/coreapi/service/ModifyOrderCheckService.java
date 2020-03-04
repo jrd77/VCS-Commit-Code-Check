@@ -138,7 +138,10 @@ public class ModifyOrderCheckService {
 	 */
 	public void checkOrderStatus(ModifyOrderDTO modifyOrderDTO) {
 		// 查询订单状态
-		OrderStatusEntity orderStatus = orderStatusService.getByOrderNo(modifyOrderDTO.getOrderNo());
+		OrderStatusEntity orderStatus = modifyOrderDTO.getOrderStatusEntity();
+		if (orderStatus == null) {
+			return;
+		}
 		// 订单状态
 		Integer status = orderStatus.getStatus();
 		if (status != null && (status.intValue() >= OrderStatusEnum.TO_SETTLE.getStatus() || 

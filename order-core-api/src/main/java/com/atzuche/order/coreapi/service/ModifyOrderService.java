@@ -447,7 +447,11 @@ public class ModifyOrderService {
 	public void modifyPostProcess(ModifyOrderDTO modifyOrderDTO, RenterOrderEntity renterOrderNew, RenterOrderEntity initRenterOrder, Integer supplementAmt, List<RenterOrderSubsidyDetailDTO> renterOrderSubsidyDetailDTOList) {
 		// 管理后台操作标记
 		Boolean consoleFlag = modifyOrderDTO.getConsoleFlag();
-		if (consoleFlag != null && consoleFlag) {
+		// 订单状态
+		OrderStatusEntity orderStatus = modifyOrderDTO.getOrderStatusEntity();
+		// 租车费用支付状态:0,待支付 1,已支付
+		Integer rentCarPayStatus = orderStatus == null ? null:orderStatus.getRentCarPayStatus();
+		if ((consoleFlag != null && consoleFlag) || (rentCarPayStatus != null && rentCarPayStatus == 0)) {
 			// 直接同意
 			modifyOrderConfirmService.agreeModifyOrder(modifyOrderDTO, renterOrderNew, initRenterOrder, renterOrderSubsidyDetailDTOList);
 		} else {
