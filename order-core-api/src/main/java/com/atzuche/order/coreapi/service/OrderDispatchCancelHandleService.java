@@ -4,7 +4,9 @@ import com.atzuche.order.commons.constant.OrderConstant;
 import com.atzuche.order.commons.enums.DispatcherStatusEnum;
 import com.atzuche.order.commons.enums.OrderStatusEnum;
 import com.atzuche.order.commons.enums.RenterChildStatusEnum;
+import com.atzuche.order.coreapi.entity.dto.CancelOrderJudgeDutyResDTO;
 import com.atzuche.order.coreapi.entity.dto.CancelOrderResDTO;
+import com.atzuche.order.coreapi.service.mq.OrderActionMqService;
 import com.atzuche.order.flow.service.OrderFlowService;
 import com.atzuche.order.ownercost.service.OwnerOrderFineApplyService;
 import com.atzuche.order.parentorder.dto.OrderStatusDTO;
@@ -40,6 +42,10 @@ public class OrderDispatchCancelHandleService {
     RenterOrderService renterOrderService;
     @Autowired
     OrderCouponService orderCouponService;
+    @Autowired
+    HolidayService holidayService;
+    @Autowired
+    OrderActionMqService orderActionMqService;
 
     @Transactional(rollbackFor = Exception.class)
     public CancelOrderResDTO cancelDispatch(String orderNo) {
@@ -61,8 +67,19 @@ public class OrderDispatchCancelHandleService {
         orderFlowService.inserOrderStatusChangeProcessInfo(orderNo, OrderStatusEnum.from(orderStatusDTO.getStatus()));
         renterOrderService.updateChildStatusByOrderNo(orderNo, RenterChildStatusEnum.END.getCode());
 
+        //判断是否补贴罚金
+        CancelOrderJudgeDutyResDTO cancelOrderJudgeDutyResDTO =
+                holidayService.isSubsidyFineAmt(renterOrderEntity.getRenterMemNo(),
+                renterOrderEntity.getExpRentTime(),
+                renterOrderEntity.getExpRevertTime());
+
         //车主取消进调度,罚金后续处理
-        ownerOrderFineApplyHandelService.handleFineApplyRecord(orderNo, DispatcherStatusEnum.DISPATCH_FAIL);
+        ownerOrderFineApplyHandelService.handleFineApplyRecord(orderNo, DispatcherStatusEnum.DISPATCH_FAIL,
+                cancelOrderJudgeDutyResDTO.getIsSubsidyFineAmt());
+
+        //发送消息通知会员记录节假日取消次数
+        orderActionMqService.sendOrderCancelMemHolidayDeduct(orderNo,
+                cancelOrderJudgeDutyResDTO.getMemNo(),cancelOrderJudgeDutyResDTO.getHolidayId(),null);
 
         //返回信息处理
         CancelOrderResDTO cancelOrderResDTO = new CancelOrderResDTO();

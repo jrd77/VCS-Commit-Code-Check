@@ -1,5 +1,10 @@
 package com.atzuche.order.coreapi.service;
 
+import com.alibaba.fastjson.JSON;
+import com.atzuche.config.client.api.DefaultConfigContext;
+import com.atzuche.config.client.api.HolidaySettingSDK;
+import com.atzuche.config.common.entity.HolidaySettingEntity;
+import com.atzuche.order.commons.LocalDateTimeUtils;
 import com.atzuche.order.commons.constant.OrderConstant;
 import com.atzuche.order.commons.entity.dto.CancelFineAmtDTO;
 import com.atzuche.order.commons.entity.dto.CostBaseDTO;
@@ -34,8 +39,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 取消订单责任判定
@@ -65,7 +74,7 @@ public class CancelOrderJudgeDutyService {
     private OrderCancelAppealService orderCancelAppealService;
 
     @Transactional(rollbackFor = Exception.class)
-    public void judgeDuty(Integer wrongdoer , Boolean isDispatch,
+    public void judgeDuty(Integer wrongdoer , Boolean isDispatch, Boolean isSubsidyFineAmt,
                           LocalDateTime cancelReqTime, CancelOrderReqContext reqContext) {
         CancelOrderReqDTO cancelOrderReqDTO = reqContext.getCancelOrderReqDTO();
         OrderStatusEntity orderStatusEntity = reqContext.getOrderStatusEntity();
@@ -95,9 +104,11 @@ public class CancelOrderJudgeDutyService {
                 }
 
                 //车主收益(来自租客罚金)
-                consoleOwnerOrderFineDeatailEntity =
-                        consoleOwnerOrderFineDeatailService.fineDataConvert(cancelFineAmt.getCostBaseDTO(), penalty, FineSubsidyCodeEnum.OWNER,
-                                FineSubsidySourceCodeEnum.RENTER, FineTypeEnum.CANCEL_FINE);
+                if(isSubsidyFineAmt) {
+                    consoleOwnerOrderFineDeatailEntity =
+                            consoleOwnerOrderFineDeatailService.fineDataConvert(cancelFineAmt.getCostBaseDTO(), penalty, FineSubsidyCodeEnum.OWNER,
+                                    FineSubsidySourceCodeEnum.RENTER, FineTypeEnum.CANCEL_FINE);
+                }
             }
             renterOrderFineDeatailService.saveRenterOrderFineDeatail(renterOrderFineDetailEntityOne);
             consoleOwnerOrderFineDeatailService.addFineRecord(consoleOwnerOrderFineDeatailEntity);
@@ -137,10 +148,12 @@ public class CancelOrderJudgeDutyService {
                 ownerOrderFineDeatailService.addOwnerOrderFineRecord(ownerOrderFineDetailEntityOne);
 
                 //租客收益处理
-                ConsoleRenterOrderFineDeatailEntity consoleRenterOrderFineDeatailEntity =
-                        consoleRenterOrderFineDeatailService.fineDataConvert(cancelFineAmt.getCostBaseDTO(), penalty,
-                                FineSubsidyCodeEnum.RENTER, FineSubsidySourceCodeEnum.OWNER, FineTypeEnum.CANCEL_FINE);
-                consoleRenterOrderFineDeatailService.saveConsoleRenterOrderFineDeatail(consoleRenterOrderFineDeatailEntity);
+                if(isSubsidyFineAmt) {
+                    ConsoleRenterOrderFineDeatailEntity consoleRenterOrderFineDeatailEntity =
+                            consoleRenterOrderFineDeatailService.fineDataConvert(cancelFineAmt.getCostBaseDTO(), penalty,
+                                    FineSubsidyCodeEnum.RENTER, FineSubsidySourceCodeEnum.OWNER, FineTypeEnum.CANCEL_FINE);
+                    consoleRenterOrderFineDeatailService.saveConsoleRenterOrderFineDeatail(consoleRenterOrderFineDeatailEntity);
+                }
             }
 
         } else if (CancelOrderDutyEnum.CANCEL_ORDER_DUTY_PLATFORM.getCode() == wrongdoer) {
@@ -172,6 +185,15 @@ public class CancelOrderJudgeDutyService {
         }
 
     }
+
+
+
+
+
+
+
+
+
 
 
     /**

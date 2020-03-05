@@ -14,6 +14,7 @@ import com.atzuche.order.commons.vo.req.AdminOrderCancelJudgeDutyReqVO;
 import com.atzuche.order.commons.vo.req.CancelOrderReqVO;
 import com.atzuche.order.coreapi.common.conver.OrderCommonConver;
 import com.atzuche.order.coreapi.entity.CancelOrderReqContext;
+import com.atzuche.order.coreapi.entity.dto.CancelOrderJudgeDutyResDTO;
 import com.atzuche.order.coreapi.entity.dto.CancelOrderReqDTO;
 import com.atzuche.order.coreapi.entity.dto.CancelOrderResDTO;
 import com.atzuche.order.coreapi.service.mq.OrderActionMqService;
@@ -109,6 +110,8 @@ public class CancelOrderService {
     private OrderCancelReasonService orderCancelReasonService;
     @Autowired
     private OrderSettleService orderSettleService;
+    @Autowired
+    private HolidayService holidayService;
 
 
     /**
@@ -140,8 +143,13 @@ public class CancelOrderService {
         }
         //取消责任处理
         if (null != res) {
-            cancelOrderJudgeDutyService.judgeDuty(res.getWrongdoer(), res.getIsDispatch(), cancelReqTime,
-                    reqContext);
+            //判断是否补贴罚金
+            CancelOrderJudgeDutyResDTO cancelOrderJudgeDutyRes = holidayService.isSubsidyFineAmt(reqContext,res.getWrongdoer());
+            cancelOrderJudgeDutyService.judgeDuty(res.getWrongdoer(), res.getIsDispatch(), cancelOrderJudgeDutyRes.getIsSubsidyFineAmt(),
+                    cancelReqTime, reqContext);
+            //发送消息通知会员记录节假日取消次数
+            orderActionMqService.sendOrderCancelMemHolidayDeduct(cancelOrderReqVO.getOrderNo(),
+                    cancelOrderJudgeDutyRes.getMemNo(),cancelOrderJudgeDutyRes.getHolidayId(),cancelOrderReqVO.getOperatorName());
             if(!res.getIsDispatch()) {
                 //通知结算计算凹凸币和钱包等
                 logger.info("取消订单责任判定后进行结算,orderNo:[{}]",cancelOrderReqDTO.getOrderNo());
@@ -218,13 +226,17 @@ public class CancelOrderService {
         reqContext.setOrderCancelReasonEntity(orderCancelReasonEntity);
         //公共校验
         cancelOrderCheckService.checkOrderCancelJudgeDuty(reqContext);
+        //判断是否补贴罚金
+        CancelOrderJudgeDutyResDTO cancelOrderJudgeDutyRes = holidayService.isSubsidyFineAmt(reqContext,Integer.valueOf(reqVO.getWrongdoer()));
         //责任判定
         boolean isDispatch =
                 reqContext.getOrderStatusEntity().getIsDispatch() == OrderConstant.YES && reqContext.getOrderStatusEntity().getDispatchStatus() != 3;
-        cancelOrderJudgeDutyService.judgeDuty(Integer.valueOf(reqVO.getWrongdoer()), isDispatch, orderCancelReasonEntity.getCancelReqTime()
-                , reqContext);
-
+        cancelOrderJudgeDutyService.judgeDuty(Integer.valueOf(reqVO.getWrongdoer()), isDispatch,
+                cancelOrderJudgeDutyRes.getIsSubsidyFineAmt(), orderCancelReasonEntity.getCancelReqTime() , reqContext);
         if(!isDispatch) {
+            //发送消息通知会员记录节假日取消次数
+            orderActionMqService.sendOrderCancelMemHolidayDeduct(reqVO.getOrderNo(),
+                    cancelOrderJudgeDutyRes.getMemNo(),cancelOrderJudgeDutyRes.getHolidayId(),reqVO.getOperatorName());
             //通知结算计算凹凸币和钱包等
             logger.info("手动责任判定后进行结算,orderNo:[{}]",cancelOrderReqDTO.getOrderNo());
             Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "结算服务");
@@ -373,5 +385,6 @@ public class CancelOrderService {
         return context;
 
     }
+
 
 }
