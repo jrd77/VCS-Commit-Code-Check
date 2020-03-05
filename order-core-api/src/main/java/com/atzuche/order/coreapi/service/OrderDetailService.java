@@ -79,7 +79,6 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.security.acl.Owner;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
@@ -164,6 +163,9 @@ public class OrderDetailService {
     private AccountOwnerIncomeExamineNoTService accountOwnerIncomeExamineNoTService;
     @Autowired
     private AccountDebtReceivableaDetailNoTService accountDebtReceivableaDetailNoTService;
+    @Autowired
+    private ModifyOrderFeeService modifyOrderFeeService;
+
 
     private static final String UNIT_HOUR = "小时";
 
@@ -568,6 +570,23 @@ public class OrderDetailService {
             BeanUtils.copyProperties(x,accountOwnerIncomeExamineDTO);
             accountOwnerIncomeExamineDTOS.add(accountOwnerIncomeExamineDTO);
         });
+        //租客修改申请
+        RenterOrderChangeApplyEntity renterOrderChangeApplyEntity = renterOrderChangeApplyService.getByOwnerOrderNoAndAuditStatus(ownerOrderNo, 0);
+        RenterOrderChangeApplyDTO renterOrderChangeApplyDTO = null;
+
+        if(renterOrderChangeApplyEntity != null){
+            orderDetailRespDTO.changeApplyRenterOrderNo = renterOrderChangeApplyEntity.getRenterOrderNo();
+            orderDetailRespDTO.isChangeApply = true;
+            renterOrderChangeApplyDTO = new RenterOrderChangeApplyDTO();
+            BeanUtils.copyProperties(renterOrderChangeApplyEntity,renterOrderChangeApplyDTO);
+            Integer ownerRentAmt = 0;
+            try{
+                ownerRentAmt = modifyOrderFeeService.getOwnerRentAmt(renterOrderNo);
+            }catch (Exception e){
+                log.error("计算预算租金失败modifyOrderFeeService.getOwnerRentAmt renterOrderNo={}",renterOrderNo);
+            }
+            orderDetailRespDTO.changeApplyPreIncomAmt = ownerRentAmt;
+        }
 
         orderDetailRespDTO.orderStatus = orderStatusDTO;
         orderDetailRespDTO.orderSourceStat = orderSourceStatDTO;
@@ -593,6 +612,8 @@ public class OrderDetailService {
         orderDetailRespDTO.ownerOrderSubsidyDetailDTOS = ownerOrderSubsidyDetailDTOS;
         orderDetailRespDTO.ownerOrderCostDTO = ownerOrderCostDTO;
         orderDetailRespDTO.accountOwnerIncomeExamineDTOS = accountOwnerIncomeExamineDTOS;
+        orderDetailRespDTO.renterOrderChangeApplyDTO = renterOrderChangeApplyDTO;
+
         return orderDetailRespDTO;
     }
 

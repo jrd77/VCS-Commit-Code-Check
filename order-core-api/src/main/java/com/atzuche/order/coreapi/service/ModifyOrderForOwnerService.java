@@ -595,7 +595,9 @@ public class ModifyOrderForOwnerService {
 	public CostBaseDTO convertToCostBaseDTO(ModifyOrderOwnerDTO modifyOrderOwnerDTO, OwnerMemberDTO ownerMemberDTO) {
 		CostBaseDTO costBaseDTO = new CostBaseDTO();
 		costBaseDTO.setEndTime(modifyOrderOwnerDTO.getRevertTime());
-		costBaseDTO.setMemNo(ownerMemberDTO.getMemNo());
+		if (ownerMemberDTO != null) {
+			costBaseDTO.setMemNo(ownerMemberDTO.getMemNo());
+		}
 		costBaseDTO.setOrderNo(modifyOrderOwnerDTO.getOrderNo());
 		costBaseDTO.setOwnerOrderNo(modifyOrderOwnerDTO.getOwnerOrderNo());
 		costBaseDTO.setStartTime(modifyOrderOwnerDTO.getRentTime());

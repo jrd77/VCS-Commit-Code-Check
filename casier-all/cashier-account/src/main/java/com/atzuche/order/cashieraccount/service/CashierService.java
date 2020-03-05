@@ -1,16 +1,5 @@
 package com.atzuche.order.cashieraccount.service;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.Assert;
-import org.springframework.util.CollectionUtils;
-
 import com.atzuche.order.accountownercost.entity.AccountOwnerCostSettleDetailEntity;
 import com.atzuche.order.accountownercost.service.notservice.AccountOwnerCostSettleDetailNoTService;
 import com.atzuche.order.accountownerincome.entity.AccountOwnerIncomeExamineEntity;
@@ -31,11 +20,7 @@ import com.atzuche.order.accountrenterrentcost.vo.req.AccountRenterCostDetailReq
 import com.atzuche.order.accountrenterrentcost.vo.req.AccountRenterCostReqVO;
 import com.atzuche.order.accountrenterwzdepost.service.AccountRenterWzDepositCostService;
 import com.atzuche.order.accountrenterwzdepost.service.AccountRenterWzDepositService;
-import com.atzuche.order.accountrenterwzdepost.vo.req.CreateOrderRenterWZDepositReqVO;
-import com.atzuche.order.accountrenterwzdepost.vo.req.OrderRenterDepositWZDetainReqVO;
-import com.atzuche.order.accountrenterwzdepost.vo.req.PayedOrderRenterDepositWZDetailReqVO;
-import com.atzuche.order.accountrenterwzdepost.vo.req.PayedOrderRenterWZDepositReqVO;
-import com.atzuche.order.accountrenterwzdepost.vo.req.RenterWZDepositCostReqVO;
+import com.atzuche.order.accountrenterwzdepost.vo.req.*;
 import com.atzuche.order.accountrenterwzdepost.vo.res.AccountRenterWZDepositResVO;
 import com.atzuche.order.cashieraccount.entity.CashierEntity;
 import com.atzuche.order.cashieraccount.exception.SettleAmountException;
@@ -46,11 +31,7 @@ import com.atzuche.order.cashieraccount.vo.req.CashierDeductDebtReqVO;
 import com.atzuche.order.cashieraccount.vo.req.CashierRefundApplyReqVO;
 import com.atzuche.order.cashieraccount.vo.res.CashierDeductDebtResVO;
 import com.atzuche.order.cashieraccount.vo.res.pay.OrderPayCallBackSuccessVO;
-import com.atzuche.order.commons.enums.FineSubsidyCodeEnum;
-import com.atzuche.order.commons.enums.OrderPayStatusEnum;
-import com.atzuche.order.commons.enums.OrderStatusEnum;
-import com.atzuche.order.commons.enums.SysOrHandEnum;
-import com.atzuche.order.commons.enums.YesNoEnum;
+import com.atzuche.order.commons.enums.*;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.commons.enums.cashier.CashierRefundApplyStatus;
 import com.atzuche.order.commons.enums.cashier.OrderRefundStatusEnum;
@@ -82,8 +63,17 @@ import com.autoyol.event.rabbit.neworder.NewOrderMQActionEventEnum;
 import com.autoyol.event.rabbit.neworder.OrderRenterPayAmtSuccessMq;
 import com.autoyol.event.rabbit.neworder.OrderRenterPaySuccessMq;
 import com.dianping.cat.Cat;
-
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
+import org.springframework.util.CollectionUtils;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 
 /**
@@ -268,6 +258,8 @@ public class CashierService {
         BeanUtils.copyProperties(cashierDeductDebtReq,detainRenterDepositReqVO);
         detainRenterDepositReqVO.setAmt(-debtedAmt);
         detainRenterDepositReqVO.setRenterCashCodeEnum(RenterCashCodeEnum.SETTLE_DEPOSIT_TO_HISTORY_AMT);
+        //update account_renter_deposit
+        //insert account_renter_deposit_detail
         int id = accountRenterDepositService.detainRenterDeposit(detainRenterDepositReqVO);
         // 4 记录结算费用 抵扣记录
         AccountRenterCostSettleDetailEntity renterCostSettleDetail = new AccountRenterCostSettleDetailEntity();
@@ -276,6 +268,7 @@ public class CashierService {
         renterCostSettleDetail.setCostCode(RenterCashCodeEnum.SETTLE_DEPOSIT_TO_HISTORY_AMT.getCashNo());
         renterCostSettleDetail.setCostDetail(RenterCashCodeEnum.SETTLE_DEPOSIT_TO_HISTORY_AMT.getTxt());
         renterCostSettleDetail.setAmt(-debtedAmt);
+        //insert account_renter_cost_settle_detail
         accountRenterCostSettleDetailNoTService.insertAccountRenterCostSettleDetail(renterCostSettleDetail);
         return new CashierDeductDebtResVO(cashierDeductDebtReq, debtedAmt,id);
     }
@@ -286,7 +279,7 @@ public class CashierService {
     public CashierDeductDebtResVO deductDebtByRentCost(CashierDeductDebtReqVO cashierDeductDebtReq){
         Assert.notNull(cashierDeductDebtReq, ErrorCode.PARAMETER_ERROR.getText());
         cashierDeductDebtReq.check();
-        //1 查询历史总欠款
+        //1 查询历史总欠款  account_debt
         int debtAmt = accountDebtService.getAccountDebtNumByMemNo(cashierDeductDebtReq.getMemNo());
         if(debtAmt>=0){
             return null;
@@ -303,6 +296,7 @@ public class CashierService {
         BeanUtils.copyProperties(cashierDeductDebtReq,accountRenterCostChangeReqVO);
         accountRenterCostChangeReqVO.setAmt(-debtedAmt);
         accountRenterCostChangeReqVO.setRenterCashCodeEnum(RenterCashCodeEnum.SETTLE_RENT_COST_TO_HISTORY_AMT);
+        //insert  account_renter_cost_detail
         int id = accountRenterCostSettleService.deductDepositToRentCost(accountRenterCostChangeReqVO);
         // 4 记录结算费用 抵扣记录
         AccountRenterCostSettleDetailEntity renterCostSettleDetail = new AccountRenterCostSettleDetailEntity();
@@ -311,6 +305,7 @@ public class CashierService {
         renterCostSettleDetail.setCostCode(RenterCashCodeEnum.SETTLE_RENT_COST_TO_HISTORY_AMT.getCashNo());
         renterCostSettleDetail.setCostDetail(RenterCashCodeEnum.SETTLE_RENT_COST_TO_HISTORY_AMT.getTxt());
         renterCostSettleDetail.setAmt(-debtedAmt);
+        //insert account_renter_cost_settle_detail
         accountRenterCostSettleDetailNoTService.insertAccountRenterCostSettleDetail(renterCostSettleDetail);
         return new CashierDeductDebtResVO(cashierDeductDebtReq, debtedAmt,id);
     }
