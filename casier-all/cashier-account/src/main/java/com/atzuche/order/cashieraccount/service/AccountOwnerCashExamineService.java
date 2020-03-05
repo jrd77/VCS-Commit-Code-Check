@@ -11,6 +11,7 @@ import com.atzuche.order.accountownerincome.entity.AccountOwnerIncomeEntity;
 import com.atzuche.order.accountownerincome.service.notservice.AccountOwnerIncomeNoTService;
 import com.atzuche.order.cashieraccount.entity.AccountOwnerCashExamine;
 import com.atzuche.order.cashieraccount.exception.WithdrawalAmtException;
+import com.atzuche.order.cashieraccount.exception.WithdrawalBalanceNotEnoughException;
 import com.atzuche.order.cashieraccount.exception.WithdrawalTimesLimitException;
 import com.atzuche.order.cashieraccount.mapper.AccountOwnerCashExamineMapper;
 import com.atzuche.order.commons.entity.dto.BankCardDTO;
@@ -98,6 +99,9 @@ public class AccountOwnerCashExamineService {
 				incomeAmt = incomeEntity.getIncomeAmt();
 			}
 			incomeAmt = incomeAmt - surplusBalance;
+			if (incomeAmt < 0) {
+				throw new WithdrawalBalanceNotEnoughException();
+			}
 			incomeEntity.setIncomeAmt(incomeAmt);
 			accountOwnerIncomeNoTService.updateOwnerIncomeAmtForCashWith(incomeEntity);
 		}
