@@ -25,13 +25,13 @@ public class RenterOrderController {
     private static final Logger logger = LoggerFactory.getLogger(RenterOrderController.class);
 
 
-	@AutoDocMethod(description = "获取子订单列表", value = "获取子订单列表", response = RenterOrderListResponseVO.class)
-	@GetMapping("renter/list")
-	public ResponseData renterList(RenterOrderRequestVO renterOrderRequestVO, BindingResult bindingResult) {
-		BindingResultUtil.checkBindingResult(bindingResult);
-		//TODO:
-		return ResponseData.success(null);
-	}
+//	@AutoDocMethod(description = "获取子订单列表", value = "获取子订单列表", response = RenterOrderListResponseVO.class)
+//	@GetMapping("renter/list")
+//	public ResponseData renterList(RenterOrderRequestVO renterOrderRequestVO, BindingResult bindingResult) {
+//		BindingResultUtil.checkBindingResult(bindingResult);
+//		//TODO:
+//		return ResponseData.success(null);
+//	}
 
 
 

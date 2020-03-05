@@ -1,0 +1,277 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.atzuche.order.wallet.server.mapper.AccountMapper">
+  <resultMap id="BaseResultMap" type="com.atzuche.order.wallet.server.entity.AccountEntity">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="mem_no" jdbcType="INTEGER" property="memNo" />
+    <result column="card_no" jdbcType="VARCHAR" property="cardNo" />
+    <result column="card_holder" jdbcType="VARCHAR" property="cardHolder" />
+    <result column="card_type" jdbcType="INTEGER" property="cardType" />
+    <result column="bank_name" jdbcType="INTEGER" property="bankName" />
+    <result column="branch_bank_name" jdbcType="VARCHAR" property="branchBankName" />
+    <result column="add_cert" jdbcType="INTEGER" property="addCert" />
+    <result column="cert_type" jdbcType="INTEGER" property="certType" />
+    <result column="cert_no" jdbcType="VARCHAR" property="certNo" />
+    <result column="mobile" jdbcType="BIGINT" property="mobile" />
+    <result column="surplus" jdbcType="INTEGER" property="surplus" />
+    <result column="total_earn" jdbcType="INTEGER" property="totalEarn" />
+    <result column="total_pay" jdbcType="INTEGER" property="totalPay" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="icon_url" jdbcType="VARCHAR" property="iconUrl" />
+    <result column="province" jdbcType="VARCHAR" property="province" />
+    <result column="city" jdbcType="VARCHAR" property="city" />
+    <result column="city_code" jdbcType="VARCHAR" property="cityCode" />
+    <result column="is_new" jdbcType="BOOLEAN" property="isNew" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, mem_no, card_no, card_holder, card_type, bank_name, branch_bank_name, add_cert, 
+    cert_type, cert_no, mobile, surplus, total_earn, total_pay, create_time, update_time, 
+    icon_url, province, city, city_code, is_new
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from account
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <select id="findByMemNo" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from account where mem_no=#{memNo}
+  </select>
+
+  <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.atzuche.order.wallet.server.entity.AccountEntity" useGeneratedKeys="true">
+    insert into account (mem_no, card_no, card_holder, 
+      card_type, bank_name, branch_bank_name, 
+      add_cert, cert_type, cert_no, 
+      mobile, surplus, total_earn, 
+      total_pay, create_time, update_time, 
+      icon_url, province, city, 
+      city_code, is_new)
+    values (#{memNo,jdbcType=INTEGER}, #{cardNo,jdbcType=VARCHAR}, #{cardHolder,jdbcType=VARCHAR}, 
+      #{cardType,jdbcType=INTEGER}, #{bankName,jdbcType=INTEGER}, #{branchBankName,jdbcType=VARCHAR}, 
+      #{addCert,jdbcType=INTEGER}, #{certType,jdbcType=INTEGER}, #{certNo,jdbcType=VARCHAR}, 
+      #{mobile,jdbcType=BIGINT}, #{surplus,jdbcType=INTEGER}, #{totalEarn,jdbcType=INTEGER}, 
+      #{totalPay,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, 
+      #{iconUrl,jdbcType=VARCHAR}, #{province,jdbcType=VARCHAR}, #{city,jdbcType=VARCHAR}, 
+      #{cityCode,jdbcType=VARCHAR}, #{isNew,jdbcType=BOOLEAN})
+  </insert>
+  <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="com.atzuche.order.wallet.server.entity.AccountEntity" useGeneratedKeys="true">
+    insert into account
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="memNo != null">
+        mem_no,
+      </if>
+      <if test="cardNo != null">
+        card_no,
+      </if>
+      <if test="cardHolder != null">
+        card_holder,
+      </if>
+      <if test="cardType != null">
+        card_type,
+      </if>
+      <if test="bankName != null">
+        bank_name,
+      </if>
+      <if test="branchBankName != null">
+        branch_bank_name,
+      </if>
+      <if test="addCert != null">
+        add_cert,
+      </if>
+      <if test="certType != null">
+        cert_type,
+      </if>
+      <if test="certNo != null">
+        cert_no,
+      </if>
+      <if test="mobile != null">
+        mobile,
+      </if>
+      <if test="surplus != null">
+        surplus,
+      </if>
+      <if test="totalEarn != null">
+        total_earn,
+      </if>
+      <if test="totalPay != null">
+        total_pay,
+      </if>
+      <if test="createTime != null">
+        create_time,
+      </if>
+      <if test="updateTime != null">
+        update_time,
+      </if>
+      <if test="iconUrl != null">
+        icon_url,
+      </if>
+      <if test="province != null">
+        province,
+      </if>
+      <if test="city != null">
+        city,
+      </if>
+      <if test="cityCode != null">
+        city_code,
+      </if>
+      <if test="isNew != null">
+        is_new,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="memNo != null">
+        #{memNo,jdbcType=INTEGER},
+      </if>
+      <if test="cardNo != null">
+        #{cardNo,jdbcType=VARCHAR},
+      </if>
+      <if test="cardHolder != null">
+        #{cardHolder,jdbcType=VARCHAR},
+      </if>
+      <if test="cardType != null">
+        #{cardType,jdbcType=INTEGER},
+      </if>
+      <if test="bankName != null">
+        #{bankName,jdbcType=INTEGER},
+      </if>
+      <if test="branchBankName != null">
+        #{branchBankName,jdbcType=VARCHAR},
+      </if>
+      <if test="addCert != null">
+        #{addCert,jdbcType=INTEGER},
+      </if>
+      <if test="certType != null">
+        #{certType,jdbcType=INTEGER},
+      </if>
+      <if test="certNo != null">
+        #{certNo,jdbcType=VARCHAR},
+      </if>
+      <if test="mobile != null">
+        #{mobile,jdbcType=BIGINT},
+      </if>
+      <if test="surplus != null">
+        #{surplus,jdbcType=INTEGER},
+      </if>
+      <if test="totalEarn != null">
+        #{totalEarn,jdbcType=INTEGER},
+      </if>
+      <if test="totalPay != null">
+        #{totalPay,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="iconUrl != null">
+        #{iconUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="province != null">
+        #{province,jdbcType=VARCHAR},
+      </if>
+      <if test="city != null">
+        #{city,jdbcType=VARCHAR},
+      </if>
+      <if test="cityCode != null">
+        #{cityCode,jdbcType=VARCHAR},
+      </if>
+      <if test="isNew != null">
+        #{isNew,jdbcType=BOOLEAN},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.atzuche.order.wallet.server.entity.AccountEntity">
+    update account
+    <set>
+      <if test="memNo != null">
+        mem_no = #{memNo,jdbcType=INTEGER},
+      </if>
+      <if test="cardNo != null">
+        card_no = #{cardNo,jdbcType=VARCHAR},
+      </if>
+      <if test="cardHolder != null">
+        card_holder = #{cardHolder,jdbcType=VARCHAR},
+      </if>
+      <if test="cardType != null">
+        card_type = #{cardType,jdbcType=INTEGER},
+      </if>
+      <if test="bankName != null">
+        bank_name = #{bankName,jdbcType=INTEGER},
+      </if>
+      <if test="branchBankName != null">
+        branch_bank_name = #{branchBankName,jdbcType=VARCHAR},
+      </if>
+      <if test="addCert != null">
+        add_cert = #{addCert,jdbcType=INTEGER},
+      </if>
+      <if test="certType != null">
+        cert_type = #{certType,jdbcType=INTEGER},
+      </if>
+      <if test="certNo != null">
+        cert_no = #{certNo,jdbcType=VARCHAR},
+      </if>
+      <if test="mobile != null">
+        mobile = #{mobile,jdbcType=BIGINT},
+      </if>
+      <if test="surplus != null">
+        surplus = #{surplus,jdbcType=INTEGER},
+      </if>
+      <if test="totalEarn != null">
+        total_earn = #{totalEarn,jdbcType=INTEGER},
+      </if>
+      <if test="totalPay != null">
+        total_pay = #{totalPay,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null">
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="iconUrl != null">
+        icon_url = #{iconUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="province != null">
+        province = #{province,jdbcType=VARCHAR},
+      </if>
+      <if test="city != null">
+        city = #{city,jdbcType=VARCHAR},
+      </if>
+      <if test="cityCode != null">
+        city_code = #{cityCode,jdbcType=VARCHAR},
+      </if>
+      <if test="isNew != null">
+        is_new = #{isNew,jdbcType=BOOLEAN},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.atzuche.order.wallet.server.entity.AccountEntity">
+    update account
+    set mem_no = #{memNo,jdbcType=INTEGER},
+      card_no = #{cardNo,jdbcType=VARCHAR},
+      card_holder = #{cardHolder,jdbcType=VARCHAR},
+      card_type = #{cardType,jdbcType=INTEGER},
+      bank_name = #{bankName,jdbcType=INTEGER},
+      branch_bank_name = #{branchBankName,jdbcType=VARCHAR},
+      add_cert = #{addCert,jdbcType=INTEGER},
+      cert_type = #{certType,jdbcType=INTEGER},
+      cert_no = #{certNo,jdbcType=VARCHAR},
+      mobile = #{mobile,jdbcType=BIGINT},
+      surplus = #{surplus,jdbcType=INTEGER},
+      total_earn = #{totalEarn,jdbcType=INTEGER},
+      total_pay = #{totalPay,jdbcType=INTEGER},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      icon_url = #{iconUrl,jdbcType=VARCHAR},
+      province = #{province,jdbcType=VARCHAR},
+      city = #{city,jdbcType=VARCHAR},
+      city_code = #{cityCode,jdbcType=VARCHAR},
+      is_new = #{isNew,jdbcType=BOOLEAN}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

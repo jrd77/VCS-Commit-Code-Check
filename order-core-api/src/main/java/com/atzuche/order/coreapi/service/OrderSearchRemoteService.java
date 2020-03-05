@@ -3,6 +3,8 @@ package com.atzuche.order.coreapi.service;
 import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.CatConstants;
 import com.atzuche.order.commons.DateUtils;
+import com.atzuche.order.commons.ResponseCheckUtil;
+import com.atzuche.order.commons.exceptions.RemoteCallException;
 import com.atzuche.order.coreapi.entity.dto.SuccessOrderStaCount;
 import com.atzuche.order.coreapi.listener.sms.SMSOrderBaseEventService;
 import com.atzuche.order.mq.enums.ShortMessageTypeEnum;
@@ -18,6 +20,7 @@ import com.atzuche.order.renterwz.entity.WzQueryDayConfEntity;
 import com.atzuche.order.renterwz.service.WzQueryDayConfService;
 import com.atzuche.order.renterwz.vo.IllegalToDO;
 import com.autoyol.car.api.model.enums.OwnerTypeEnum;
+import com.autoyol.car.api.model.vo.ResponseObject;
 import com.autoyol.search.api.OrderSearchService;
 import com.autoyol.search.entity.ErrorCode;
 import com.autoyol.search.entity.ResponseData;
@@ -84,6 +87,7 @@ public class OrderSearchRemoteService {
     private static final LocalDateTime FESTIVAL_END_TIME = LocalDateTime.of(2019,10,7,23,59,59);
 
     public List<IllegalToDO> violateProcessOrder() {
+        //FIXME:需要修改成翻页
         Transaction t = Cat.getProducer().newTransaction(CatConstants.FEIGN_CALL, "每天定时查询当前进行中的订单");
         try {
             ViolateVO reqVO = new ViolateVO();
@@ -95,20 +99,18 @@ public class OrderSearchRemoteService {
             Cat.logEvent(CatConstants.FEIGN_PARAM, JSON.toJSONString(reqVO));
             ResponseData<OrderVO<ViolateBO>> orderResponseData = orderSearchService.violateProcessOrder(reqVO);
             Cat.logEvent(CatConstants.FEIGN_RESULT, JSON.toJSONString(orderResponseData));
-            if(orderResponseData != null && orderResponseData.getResCode() != null
-                    && ErrorCode.SUCCESS.getCode().equals(orderResponseData.getResCode()) && orderResponseData.getData() != null){
-                List<ViolateBO> orderList = orderResponseData.getData().getOrderList();
-                return convertDto(orderList);
-            }else{
-                return new ArrayList<>();
-            }
+            checkResponse(orderResponseData);
+            List<ViolateBO> orderList = orderResponseData.getData().getOrderList();
+            t.setStatus(Transaction.SUCCESS);
+            return convertDto(orderList);
         } catch (Exception e) {
             logger.error("执行 每天定时查询当前进行中的订单 异常",e);
             Cat.logError("执行 每天定时查询当前进行中的订单 异常",e);
+            t.setStatus(e);
+            throw e;
         }finally {
             t.complete();
         }
-        return new ArrayList<>();
     }
 
     public List<IllegalToDO> violateSettleOrder() {
@@ -773,6 +775,19 @@ public class OrderSearchRemoteService {
         }
         return new ArrayList<>();
 
+    }
+
+    public static void  checkResponse(ResponseData responseObject){
+        if(responseObject==null||!com.autoyol.commons.web.ErrorCode.SUCCESS.getCode().equalsIgnoreCase(responseObject.getResCode())){
+            RemoteCallException remoteCallException = null;
+            if(responseObject!=null){
+                remoteCallException = new RemoteCallException(responseObject.getResCode(),responseObject.getResMsg(),responseObject.getData());
+            }else{
+                remoteCallException = new RemoteCallException(com.atzuche.order.commons.enums.ErrorCode.REMOTE_CALL_FAIL.getCode(),
+                        com.atzuche.order.commons.enums.ErrorCode.REMOTE_CALL_FAIL.getText());
+            }
+            throw remoteCallException;
+        }
     }
 
     /**
