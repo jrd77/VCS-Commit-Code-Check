@@ -224,8 +224,17 @@ public class OrderSettleService{
      **/
     @Transactional(rollbackFor=Exception.class)
     public boolean settleOwnerOrderCancel(String orderNo,String ownerOrderNo,String ownerMemNo){
+        OrderStatusDTO orderStatusDTO = new OrderStatusDTO();
+        orderStatusDTO.setOrderNo(orderNo);
+
         return false;
     }
+
+    public boolean settleRenterOrderCancel(String orderNo,String renterOrderno,String renterMemNo){
+        return false;
+    }
+
+
 
 
     /**

@@ -604,7 +604,7 @@ public class OrderDetailService {
         orderDetailRespDTO.ownerOrderCostDTO = ownerOrderCostDTO;
         orderDetailRespDTO.accountOwnerIncomeExamineDTOS = accountOwnerIncomeExamineDTOS;
         orderDetailRespDTO.renterOrderChangeApplyDTO = renterOrderChangeApplyDTO;
-        orderDetailRespDTO.changeApplyPreIncomAmt = 0;
+        orderDetailRespDTO.changeApplyPreIncomAmt = 0;//TODO zhangbin 等待接口接入
         return orderDetailRespDTO;
     }
 
