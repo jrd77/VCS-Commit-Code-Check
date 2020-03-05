@@ -163,6 +163,8 @@ public class OrderDetailService {
     private AccountOwnerIncomeExamineNoTService accountOwnerIncomeExamineNoTService;
     @Autowired
     private AccountDebtReceivableaDetailNoTService accountDebtReceivableaDetailNoTService;
+    @Autowired
+    private ModifyOrderFeeService modifyOrderFeeService;
 
 
     private static final String UNIT_HOUR = "小时";
@@ -577,6 +579,13 @@ public class OrderDetailService {
             orderDetailRespDTO.isChangeApply = true;
             renterOrderChangeApplyDTO = new RenterOrderChangeApplyDTO();
             BeanUtils.copyProperties(renterOrderChangeApplyEntity,renterOrderChangeApplyDTO);
+            Integer ownerRentAmt = 0;
+            try{
+                ownerRentAmt = modifyOrderFeeService.getOwnerRentAmt(renterOrderNo);
+            }catch (Exception e){
+                log.error("计算预算租金失败modifyOrderFeeService.getOwnerRentAmt renterOrderNo={}",renterOrderNo);
+            }
+            orderDetailRespDTO.changeApplyPreIncomAmt = ownerRentAmt;
         }
 
         orderDetailRespDTO.orderStatus = orderStatusDTO;
@@ -604,7 +613,7 @@ public class OrderDetailService {
         orderDetailRespDTO.ownerOrderCostDTO = ownerOrderCostDTO;
         orderDetailRespDTO.accountOwnerIncomeExamineDTOS = accountOwnerIncomeExamineDTOS;
         orderDetailRespDTO.renterOrderChangeApplyDTO = renterOrderChangeApplyDTO;
-        orderDetailRespDTO.changeApplyPreIncomAmt = 0;//TODO zhangbin 等待接口接入
+
         return orderDetailRespDTO;
     }
 
