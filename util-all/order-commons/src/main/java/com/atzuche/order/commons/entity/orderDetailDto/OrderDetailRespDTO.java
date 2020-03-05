@@ -45,6 +45,6 @@ public class OrderDetailRespDTO {
     //租客修改订单申请表
     public RenterOrderChangeApplyDTO renterOrderChangeApplyDTO;
     //预计收益金额
-    public Integer preIncomAmt;
+    public Integer changeApplyPreIncomAmt;
 
 }

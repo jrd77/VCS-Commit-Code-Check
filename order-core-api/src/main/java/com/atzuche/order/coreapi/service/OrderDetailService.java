@@ -604,6 +604,7 @@ public class OrderDetailService {
         orderDetailRespDTO.ownerOrderCostDTO = ownerOrderCostDTO;
         orderDetailRespDTO.accountOwnerIncomeExamineDTOS = accountOwnerIncomeExamineDTOS;
         orderDetailRespDTO.renterOrderChangeApplyDTO = renterOrderChangeApplyDTO;
+        orderDetailRespDTO.changeApplyPreIncomAmt = 0;
         return orderDetailRespDTO;
     }
 
