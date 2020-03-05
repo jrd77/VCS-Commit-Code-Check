@@ -45,7 +45,6 @@ import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.atzuche.order.renterorder.entity.dto.RenterOrderCostRespDTO;
 import com.atzuche.order.renterorder.service.RenterOrderService;
 import com.atzuche.order.renterorder.vo.RenterOrderReqVO;
-import com.autoyol.commons.web.ResponseData;
 
 import lombok.extern.slf4j.Slf4j;
 
