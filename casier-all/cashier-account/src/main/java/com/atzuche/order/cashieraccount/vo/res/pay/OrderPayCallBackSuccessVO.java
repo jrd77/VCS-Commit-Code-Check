@@ -46,6 +46,20 @@ public class OrderPayCallBackSuccessVO {
      * 租车费用  押金 违章押金  都是支付
      */
     private YesNoEnum isGetCar;
+    
+    //退款状态变更 200304  
+    /**
+     * 租车费用支付状态（待支付、已支付）
+     */
+    private Integer rentCarRefundStatus;
 
-
+    /**
+     * 车辆押金支付状态
+     */
+    private Integer depositRefundStatus;
+    /**
+     * 违章押金支付状态
+     */
+    private Integer wzRefundStatus;
+    
 }

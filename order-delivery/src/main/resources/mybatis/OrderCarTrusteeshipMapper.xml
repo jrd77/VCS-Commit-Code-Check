@@ -13,7 +13,7 @@
         <result property="inDepotTime" column="in_depot_time"/>
         <result property="outDepotMileage" column="out_depot_mileage"/>
         <result property="inDepotMileage" column="in_depot_mileage"/>
-        <result property="outDepotoimass" column="out_depot_oimass"/>
+        <result property="outDepotOimass" column="out_depot_oimass"/>
         <result property="inDepotOimass" column="in_depot_oimass"/>
         <result property="inDepotDamage" column="in_depot_damage"/>
         <result property="drivingLicenseJoin" column="driving_license_join"/>

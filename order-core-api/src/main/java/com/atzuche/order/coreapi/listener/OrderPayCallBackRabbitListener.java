@@ -61,7 +61,35 @@ public class OrderPayCallBackRabbitListener {
         }
         log.info("OrderPayCallBack payCallBack end " );
     }
+    
+    //退款处理
+    @RabbitListener(bindings = {
+            @QueueBinding(value = @Queue(value = "refund.success.20", durable = "true"), exchange = @Exchange(value = "auto-refund", durable = "true", type = "topic"), key = "refund.success.20")})
+    public void refundCallBack(Message message) {
+        log.info("OrderPayCallBack refundCallBack start param;[{}]", message);
+        Transaction t = Cat.getProducer().newTransaction(CatConstants.RABBIT_MQ_CALL, "支付系统rabbitMQ异步回调refundCallBack");
 
+        try {
+            String orderPayAsynStr = new String(message.getBody());
+            Cat.logEvent(CatConstants.RABBIT_MQ_METHOD,"OrderPayCallBackRabbitConfig.refundCallBack");
+            Cat.logEvent(CatConstants.RABBIT_MQ_PARAM,orderPayAsynStr);
+
+            BatchNotifyDataVo batchNotifyDataVo = GsonUtils.convertObj(orderPayAsynStr, BatchNotifyDataVo.class);
+            String reqContent = FasterJsonUtil.toJson(batchNotifyDataVo);
+            String md5 =  MD5.MD5Encode(reqContent);
+            rabbitMsgLogService.insertRabbitMsgLog(message, RabbitBusinessTypeEnum.ORDER_PAY_CALL_BACK,orderPayAsynStr,md5);
+            cashierPayService.payCallBack(batchNotifyDataVo,payCallbackService);
+            t.setStatus(Transaction.SUCCESS);
+        } catch (Exception e) {
+            log.error("OrderPayCallBack refundCallBack,e={},message={}",e,message);
+            t.setStatus(e);
+            Cat.logError("MQ 接收 支付系统回调 失败 ,e :{}",e);
+        } finally {
+            t.complete();
+        }
+        log.info("OrderPayCallBack refundCallBack end " );
+    }
+    
 
 
 }
