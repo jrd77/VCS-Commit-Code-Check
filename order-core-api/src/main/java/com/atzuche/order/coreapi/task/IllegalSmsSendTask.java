@@ -50,11 +50,13 @@ public class IllegalSmsSendTask extends IJobHandler {
 
             logger.info("结束执行 查询违章待发短信，jPush通知和App推送信息 ");
             XxlJobLogger.log("结束执行 查询违章待发短信，jPush通知和App推送信息 ");
+            t.setStatus(Transaction.SUCCESS);
             return SUCCESS;
         } catch (Exception e) {
             XxlJobLogger.log("执行 查询违章待发短信，jPush通知和App推送信息 异常:"+ e);
             logger.error("执行 查询违章待发短信，jPush通知和App推送信息 异常",e);
             Cat.logError("执行 查询违章待发短信，jPush通知和App推送信息 异常",e);
+            t.setStatus(e);
             return new ReturnT(FAIL.getCode(),e.toString());
         } finally {
             if (t != null) {

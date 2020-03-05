@@ -63,11 +63,13 @@ public class UnPayViolationDepositTask extends IJobHandler {
             }
             logger.info("结束执行 查询订单开始仍未支付违章押金，发邮件 ");
             XxlJobLogger.log("结束执行 查询订单开始仍未支付违章押金，发邮件");
+            t.setStatus(Transaction.SUCCESS);
             return SUCCESS;
         } catch (Exception e) {
             XxlJobLogger.log("执行 查询订单开始仍未支付违章押金，发邮件 异常:"+ e);
             logger.error("执行 查询订单开始仍未支付违章押金，发邮件 异常",e);
             Cat.logError("执行 查询订单开始仍未支付违章押金，发邮件 异常",e);
+            t.setStatus(e);
             return new ReturnT(FAIL.getCode(),e.toString());
         } finally {
             if (t != null) {
