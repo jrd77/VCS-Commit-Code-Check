@@ -50,7 +50,7 @@ public class SMSOrderBaseEventService  extends OrderBaseEventService{
             return;
         }
         Map smsTemplateFieldValuesMap = shortMessageSendService.getSmsTemplateMap(smsParamsMap, smsFieldNames, orderEntity, memberDTO, goodsDetailDTO);
-        log.info("短信：textCode：[{}],待发送参数：[{}]", JSONObject.toJSONString(smsTemplateFieldValuesMap));
+        log.info("短信：textCode：[{}],待发送参数：[{}]",textCode, JSONObject.toJSONString(smsTemplateFieldValuesMap));
         sendPlatformSmsService.orderPaySms(textCode, phone, "发送新订单短信,手机号:" + phone, smsTemplateFieldValuesMap);
     }
 }
