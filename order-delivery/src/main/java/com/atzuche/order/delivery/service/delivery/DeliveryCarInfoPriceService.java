@@ -189,7 +189,8 @@ public class DeliveryCarInfoPriceService {
             String oilContainer = ownerGetAndReturnCarDTO.getOilContainer().contains("L") ? ownerGetAndReturnCarDTO.getOilContainer().replaceAll("L","") : ownerGetAndReturnCarDTO.getOilContainer();
             double oilMiddleDataFee = MathUtil.mulByDouble(MathUtil.div(oilDifference, 16.0), Double.valueOf(oilContainer));
             double oilDifferenceCrash = MathUtil.mulByDouble(oilMiddleDataFee, getOilPriceByCityCodeAndType(Integer.valueOf(cityCode), carEngineType));
-            ownerGetAndReturnCarDTO.setOilDifferenceCrash(String.valueOf(Double.valueOf(Math.floor(oilDifferenceCrash)).intValue()));
+            oilDifferenceCrash = oilDifferenceCrash > 0 ? Math.floor(oilDifferenceCrash) : Math.ceil(oilDifferenceCrash);
+            ownerGetAndReturnCarDTO.setOilDifferenceCrash(String.valueOf(Double.valueOf(oilDifferenceCrash).intValue()));
         } catch (Exception e) {
             log.error("设置参数失败,目前没有值");
         }
