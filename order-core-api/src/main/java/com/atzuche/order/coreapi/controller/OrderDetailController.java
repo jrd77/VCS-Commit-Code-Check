@@ -24,9 +24,9 @@ public class OrderDetailController {
     private OrderDetailService orderDetailService;
 
     @PostMapping("/query")
-    public ResponseData<OrderDetailRespDTO> orderDetail(@Valid @RequestBody OrderDetailReqDTO orderDetailReqDTO, BindingResult bindingResult){
+    public ResponseData<OrderDetailRespDTO> orderDetailByRenter(@Valid @RequestBody OrderDetailReqDTO orderDetailReqDTO, BindingResult bindingResult){
         BindingResultUtil.checkBindingResult(bindingResult);
-        ResponseData<OrderDetailRespDTO> respData = orderDetailService.orderDetail(orderDetailReqDTO);
+        ResponseData<OrderDetailRespDTO> respData = orderDetailService.orderDetailByRenter(orderDetailReqDTO);
         return respData;
     }
 
@@ -72,23 +72,25 @@ public class OrderDetailController {
         return responseData;
     }
 
-    @GetMapping("/ownerOrderDetail")
-    public ResponseData<OwnerOrderDetailRespDTO> ownerOrderDetail(@RequestParam("orderNo") String orderNo,
-                                                                  @RequestParam(name = "ownerOrderNo",required = false) String ownerOrderNo,
-                                                                  @RequestParam(name = "ownerMemNo",required = false) String ownerMemNo){
-        if(orderNo == null || orderNo.trim().length()<=0){
+    @PostMapping("/ownerOrderDetail")
+    public ResponseData<OrderDetailRespDTO> ownerOrderDetail(@Valid @RequestBody OrderOwnerDetailReqDTO orderOwnerDetailReqDTO){
+        //String orderNo = orderOwnerDetailReqDTO.getOrderNo();
+        String ownerMemNo = orderOwnerDetailReqDTO.getOwnerMemNo();
+        String ownerOrderNo = orderOwnerDetailReqDTO.getOwnerOrderNo();
+       /* if(orderNo == null || orderNo.trim().length()<=0){
             ResponseData responseData = new ResponseData();
             responseData.setResCode(ErrorCode.INPUT_ERROR.getCode());
             responseData.setResMsg("订单号不能为空");
             return responseData;
-        }
+        }*/
+
         if((ownerOrderNo == null || ownerOrderNo.trim().length()<=0) && (ownerMemNo == null || ownerMemNo.trim().length()<=0)){
             ResponseData responseData = new ResponseData();
             responseData.setResCode(ErrorCode.INPUT_ERROR.getCode());
             responseData.setResMsg("车主子订单号或车主会员号必须有一个不为空！");
             return responseData;
         }
-        ResponseData<OwnerOrderDetailRespDTO> responseData = orderDetailService.ownerOrderDetail(orderNo,ownerOrderNo,ownerMemNo);
+        ResponseData<OrderDetailRespDTO> responseData = orderDetailService.orderDetailByOwner(orderOwnerDetailReqDTO);
         return responseData;
     }
 

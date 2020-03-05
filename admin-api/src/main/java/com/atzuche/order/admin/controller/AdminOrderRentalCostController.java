@@ -42,8 +42,8 @@ public class AdminOrderRentalCostController {
     @AutoDocMethod(description = "配送费用明细", value = "配送费用明细",response = DistributionCostVO.class)
     @PostMapping("/distributionCost/list")
     public ResponseData<?> findDistributionCostListByOrderNo(@RequestBody DeliveryCarRepVO rentalCostReqVO) {
-        if (null == rentalCostReqVO || StringUtils.isBlank(rentalCostReqVO.getOrderNo())) {
-            return ResponseData.createErrorCodeResponse(ErrorCode.ORDER_NO_PARAM_ERROR.getCode(), "订单编号为空");
+        if (null == rentalCostReqVO || StringUtils.isBlank(rentalCostReqVO.getOrderNo()) || StringUtils.isBlank(rentalCostReqVO.getRenterOrderNo()) ) {
+            return ResponseData.createErrorCodeResponse(ErrorCode.ORDER_NO_PARAM_ERROR.getCode(), "订单编号/租客子订单号为空");
         }
 
         return ResponseData.success(deliveryCarInfoService.findDeliveryCostByOrderNo(rentalCostReqVO));

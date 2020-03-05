@@ -516,5 +516,12 @@
         and is_delete = 0
         limit 1
     </select>
+    <select id="getOwnerGoodsByCarNoAndOrderNo" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List" /> from owner_goods where car_no = #{carNo}
+        and `order_no` = #{orderNo}
+        and is_delete = 0
+        order by id desc
+        limit 1
+    </select>
 
 </mapper>

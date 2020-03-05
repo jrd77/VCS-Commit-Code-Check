@@ -171,24 +171,28 @@ public class CashierNoTService {
      */
     public PayedOrderRenterDepositReqVO getPayedOrderRenterDepositReq(NotifyDataVo notifyDataVo) {
         PayedOrderRenterDepositReqVO vo = new PayedOrderRenterDepositReqVO();
-        DetainRenterDepositReqVO detainRenterDeposit = new DetainRenterDepositReqVO();
         BeanUtils.copyProperties(notifyDataVo,vo);
         vo.setPayStatus(notifyDataVo.getTransStatus());
         vo.setPayTime(LocalDateTimeUtils.parseStringToDateTime(notifyDataVo.getOrderTime(),LocalDateTimeUtils.YYYYMMDDHHMMSSS_PATTERN));
         //"01"：消费
         if(DataPayTypeConstant.PAY_PUR.equals(notifyDataVo.getPayType())){
+        	vo.setIsAuthorize(0);
             Integer settleAmount = notifyDataVo.getSettleAmount()==null?0:Integer.parseInt(notifyDataVo.getSettleAmount());
             vo.setShifuDepositAmt(settleAmount);
             vo.setSurplusDepositAmt(settleAmount);
         }
         //"02"：预授权 TODO 预授权到期时间 （分为信用 和 芝麻）
         if(DataPayTypeConstant.PAY_PRE.equals(notifyDataVo.getPayType())){
-            Integer settleAmount = notifyDataVo.getSettleAmount()==null?0:Integer.parseInt(notifyDataVo.getSettleAmount());
-            vo.setAuthorizeDepositAmt(settleAmount);
-            vo.setSurplusAuthorizeDepositAmt(settleAmount);
+        	vo.setIsAuthorize(1);
+        	//区分双免和非双免,根据是否信用减免来区分
+        	putPayPreValue(notifyDataVo, vo);
+            
         }
+        
+        
         //TODO 预授权到期时间
         //车辆押金进出明细
+        DetainRenterDepositReqVO detainRenterDeposit = new DetainRenterDepositReqVO();
         BeanUtils.copyProperties(notifyDataVo,detainRenterDeposit);
         Integer settleAmount = notifyDataVo.getSettleAmount()==null?0:Integer.parseInt(notifyDataVo.getSettleAmount());
         detainRenterDeposit.setAmt(settleAmount);
@@ -197,6 +201,42 @@ public class CashierNoTService {
         vo.setDetainRenterDepositReqVO(detainRenterDeposit);
         return vo;
     }
+
+
+    /**
+     * 预授权赋值方法
+     * @param notifyDataVo
+     * @param vo
+     */
+	private void putPayPreValue(NotifyDataVo notifyDataVo, PayedOrderRenterDepositReqVO vo) {
+		if(Double.valueOf(notifyDataVo.getTotalFreezeCreditAmount()).doubleValue() == 0d) {   //考虑到带小数点的情况。
+			//预授权方式
+			Integer settleAmount = notifyDataVo.getSettleAmount()==null?0:Integer.parseInt(notifyDataVo.getSettleAmount());
+		    vo.setAuthorizeDepositAmt(settleAmount);
+		    vo.setSurplusAuthorizeDepositAmt(settleAmount);
+		}else {  
+			//存在信用支付的方式
+			if(Double.valueOf(notifyDataVo.getTotalFreezeFundAmount()).doubleValue() == 0d) {  
+				//全部按信用支付
+				Integer settleAmount = notifyDataVo.getSettleAmount()==null?0:Integer.parseInt(notifyDataVo.getSettleAmount());
+		        vo.setCreditPayAmt(settleAmount);
+		        vo.setSurplusCreditPayAmt(settleAmount);
+			}else {
+				//一半一半的情况，转换成整数。
+				Integer fundAmount = notifyDataVo.getTotalFreezeFundAmount()==null?0:Integer.parseInt(notifyDataVo.getTotalFreezeFundAmount());
+//		        vo.setShifuDepositAmt(fundAmount);
+//		        vo.setSurplusDepositAmt(fundAmount);
+				//存在一半一半的情况，预授权和信用是共存的， 信用和资金预授权是共存的。!!
+		        vo.setAuthorizeDepositAmt(fundAmount);
+			    vo.setSurplusAuthorizeDepositAmt(fundAmount);
+		        
+		        Integer creditAmount = notifyDataVo.getTotalFreezeCreditAmount()==null?0:Integer.parseInt(notifyDataVo.getTotalFreezeCreditAmount());
+		        vo.setCreditPayAmt(creditAmount);
+		        vo.setSurplusCreditPayAmt(creditAmount);
+		        
+			}
+		}
+	}
 
     /**
      * 更新收银台租车押金已支付
@@ -265,9 +305,24 @@ public class CashierNoTService {
     public PayedOrderRenterWZDepositReqVO getPayedOrderRenterWZDepositReq(NotifyDataVo notifyDataVo) {
         PayedOrderRenterWZDepositReqVO vo = new PayedOrderRenterWZDepositReqVO();
         BeanUtils.copyProperties(notifyDataVo,vo);
-        Integer settleAmount = notifyDataVo.getSettleAmount()==null?0:Integer.parseInt(notifyDataVo.getSettleAmount());
-        vo.setShishouDeposit(settleAmount);
-
+//        Integer settleAmount = notifyDataVo.getSettleAmount()==null?0:Integer.parseInt(notifyDataVo.getSettleAmount());
+//        vo.setShishouDeposit(settleAmount);
+        
+        //"01"：消费
+        if(DataPayTypeConstant.PAY_PUR.equals(notifyDataVo.getPayType())){
+        	vo.setIsAuthorize(0);
+            Integer settleAmount = notifyDataVo.getSettleAmount()==null?0:Integer.parseInt(notifyDataVo.getSettleAmount());
+            vo.setShishouDeposit(settleAmount);
+            vo.setSurplusDepositAmt(settleAmount);
+        }
+        //"02"：预授权 TODO 预授权到期时间 （分为信用 和 芝麻）
+        if(DataPayTypeConstant.PAY_PRE.equals(notifyDataVo.getPayType())){
+        	vo.setIsAuthorize(1);
+        	//区分双免和非双免,根据是否信用减免来区分
+        	putPayPreValue(notifyDataVo, vo);
+            
+        }
+        
         //违章押金进出明细
         PayedOrderRenterDepositWZDetailReqVO payedOrderRenterDepositDetail = new PayedOrderRenterDepositWZDetailReqVO();
         BeanUtils.copyProperties(notifyDataVo,payedOrderRenterDepositDetail);
@@ -275,10 +330,46 @@ public class CashierNoTService {
         payedOrderRenterDepositDetail.setRenterCashCodeEnum(RenterCashCodeEnum.ACCOUNT_RENTER_WZ_DEPOSIT);
         payedOrderRenterDepositDetail.setPayChannel(notifyDataVo.getPaySource());
         payedOrderRenterDepositDetail.setPayment(notifyDataVo.getPayType());
+        Integer settleAmount = notifyDataVo.getSettleAmount()==null?0:Integer.parseInt(notifyDataVo.getSettleAmount());
         payedOrderRenterDepositDetail.setAmt(settleAmount);
         vo.setPayedOrderRenterDepositDetailReqVO(payedOrderRenterDepositDetail);
         return vo;
     }
+    
+    
+    /**
+     * 预授权赋值方法
+     * @param notifyDataVo
+     * @param vo
+     */
+	private void putPayPreValue(NotifyDataVo notifyDataVo, PayedOrderRenterWZDepositReqVO vo) {
+		if(Double.valueOf(notifyDataVo.getTotalFreezeCreditAmount()).doubleValue() == 0d) {   
+			//预授权方式
+			Integer settleAmount = notifyDataVo.getSettleAmount()==null?0:Integer.parseInt(notifyDataVo.getSettleAmount());
+		    vo.setAuthorizeDepositAmt(settleAmount);
+		    vo.setSurplusAuthorizeDepositAmt(settleAmount);
+		}else {  //存在信用支付的方式
+			if(Double.valueOf(notifyDataVo.getTotalFreezeFundAmount()).doubleValue() == 0d) {  //全部按信用支付
+				Integer settleAmount = notifyDataVo.getSettleAmount()==null?0:Integer.parseInt(notifyDataVo.getSettleAmount());
+		        vo.setCreditPayAmt(settleAmount);
+		        vo.setSurplusCreditPayAmt(settleAmount);
+			}else {
+				//一半一半的情况
+				Integer fundAmount = notifyDataVo.getTotalFreezeFundAmount()==null?0:Integer.parseInt(notifyDataVo.getTotalFreezeFundAmount());
+//		        vo.setShishouDeposit(fundAmount);
+//		        vo.setSurplusDepositAmt(fundAmount);
+				//存在一半一半的情况，预授权和信用是共存的， 信用和资金预授权是共存的。!!
+		        vo.setAuthorizeDepositAmt(fundAmount);
+			    vo.setSurplusAuthorizeDepositAmt(fundAmount);
+		        
+		        Integer creditAmount = notifyDataVo.getTotalFreezeCreditAmount()==null?0:Integer.parseInt(notifyDataVo.getTotalFreezeCreditAmount());
+		        vo.setCreditPayAmt(creditAmount);
+		        vo.setSurplusCreditPayAmt(creditAmount);
+		        
+			}
+		}
+	}
+	
 
     /**
      * 支付成功异步回调 补付租车费用回调
@@ -360,9 +451,11 @@ public class CashierNoTService {
      * @param payedOrderRenterDeposit
      */
     public void updataCashierAndRenterDeposit(NotifyDataVo notifyDataVo, PayedOrderRenterDepositReqVO payedOrderRenterDeposit) {
-        //1更新收银台
+        //1更新收银台,收银台的支付或退款记录都需要记录下来。
         boolean bool = updataCashier(notifyDataVo);
-        if(bool){
+        //退款的时候，结算记录已经添加了资金进出明细。只有支付的时候才记录。
+        if(bool && ( DataPayTypeConstant.PAY_PUR.equals(notifyDataVo.getPayType()) || DataPayTypeConstant.PAY_PRE.equals(notifyDataVo.getPayType()) )
+        		&& "00".equals(notifyDataVo.getTransStatus())){
             //2 租车押金 更新数据
             accountRenterDepositService.updateRenterDeposit(payedOrderRenterDeposit);
         }
@@ -377,7 +470,8 @@ public class CashierNoTService {
     public void updataCashierAndRenterWzDeposit(NotifyDataVo notifyDataVo, PayedOrderRenterWZDepositReqVO payedOrderRenterWZDeposit) {
         //1更新收银台
         boolean bool = updataCashier(notifyDataVo);
-        if(bool){
+        if(bool && ( DataPayTypeConstant.PAY_PUR.equals(notifyDataVo.getPayType()) || DataPayTypeConstant.PAY_PRE.equals(notifyDataVo.getPayType()) )
+        		&& "00".equals(notifyDataVo.getTransStatus())){
             //2 违章押金 更新数据
             accountRenterWzDepositService.updateRenterWZDeposit(payedOrderRenterWZDeposit);
         }
@@ -392,7 +486,8 @@ public class CashierNoTService {
     public void updataCashierAndRenterCost(NotifyDataVo notifyDataVo,AccountRenterCostReqVO accountRenterCostReq) {
         //1更新收银台
         boolean bool = updataCashier(notifyDataVo);
-        if(bool){
+        if(bool && ( DataPayTypeConstant.PAY_PUR.equals(notifyDataVo.getPayType()) || DataPayTypeConstant.PAY_PRE.equals(notifyDataVo.getPayType()) )
+        		&& "00".equals(notifyDataVo.getTransStatus())){  //考虑支付成功
             //2  实收租车费用落库 更新数据
             accountRenterCostSettleService.insertRenterCostDetail(accountRenterCostReq);
         }
@@ -403,10 +498,12 @@ public class CashierNoTService {
      * 返回租车费用补付记录数
      * @param orderNo
      * @param menNo
+     * @param payKind   按消费来处理。
      * @return
      */
-    public String getCashierRentCostPaySn(String orderNo, String menNo) {
-        List<CashierEntity> sashierEntitys = cashierMapper.getCashierRentCosts(orderNo,menNo,DataPayKindConstant.RENT_AMOUNT,DataPayTypeConstant.PAY_PUR);
+    public String getCashierRentCostPaySn(String orderNo, String menNo, String payKind) {
+//        List<CashierEntity> sashierEntitys = cashierMapper.getCashierRentCosts(orderNo,menNo,DataPayKindConstant.RENT_AMOUNT,DataPayTypeConstant.PAY_PUR);
+    	List<CashierEntity> sashierEntitys = cashierMapper.getCashierRentCosts(orderNo,menNo,payKind,DataPayTypeConstant.PAY_PUR);
         if(CollectionUtils.isEmpty(sashierEntitys)){
             return "1";
         }
@@ -504,7 +601,8 @@ public class CashierNoTService {
         RefundVo refundVo = new RefundVo();
         BeanUtils.copyProperties(cashierRefundApply,refundVo);
         refundVo.setRefundId(cashierRefundApply.getId().toString());
-        refundVo.setPayType(DataPayTypeConstant.PUR_RETURN);
+//        refundVo.setPayType(DataPayTypeConstant.PUR_RETURN);
+        refundVo.setPayType(cashierRefundApply.getPayType());    //根据退款表中的记录来处理。这里不处理逻辑。
         refundVo.setReqIp(IpUtil.getLocalIp());
         refundVo.setPaySn(String.valueOf(cashierRefundApply.getNum()+1));
         refundVo.setExtendParams(GsonUtils.toJson(cashierRefundApply));

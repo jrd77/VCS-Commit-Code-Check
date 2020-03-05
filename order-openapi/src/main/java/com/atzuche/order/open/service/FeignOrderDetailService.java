@@ -63,4 +63,21 @@ public interface FeignOrderDetailService {
     @GetMapping("/order/detail/dispatchHistory")
     public ResponseData<OrderHistoryListDTO> dispatchHistory(@RequestParam("orderNo") String orderNo);
 
+    /*
+     * @Author ZhangBin
+     * @Date 2020/2/27 10:59
+     * @Description: 车主订单详情
+     *
+     **/
+    @PostMapping("/order/detail/ownerOrderDetail")
+    public ResponseData<OrderDetailRespDTO> ownerOrderDetail(@RequestBody OrderOwnerDetailReqDTO orderOwnerDetailReqDTO);
+    /*
+     * @Author ZhangBin
+     * @Date 2020/2/27 11:02
+     * @Description: 租客订单详情
+     * 
+     **/
+    @GetMapping("/order/detail/renterOrderDetail")
+    public ResponseData<RenterOrderDetailRespDTO> renterOrderDetail(@RequestParam("orderNo") String orderNo,
+                                                                   @RequestParam(name = "renterOrderNo",required = false) String renterOrderNo);
 }

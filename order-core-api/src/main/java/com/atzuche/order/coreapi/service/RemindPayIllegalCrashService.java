@@ -2,7 +2,9 @@ package com.atzuche.order.coreapi.service;
 
 import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.CatConstants;
+import com.atzuche.order.coreapi.listener.push.OrderSendMessageFactory;
 import com.atzuche.order.coreapi.listener.sms.SMSOrderBaseEventService;
+import com.atzuche.order.mq.enums.PushMessageTypeEnum;
 import com.atzuche.order.mq.enums.ShortMessageTypeEnum;
 import com.atzuche.order.mq.util.SmsParamsMapUtil;
 import com.autoyol.search.api.OrderSearchService;
@@ -38,6 +40,8 @@ public class RemindPayIllegalCrashService {
     private OrderSearchService orderSearchService;
     @Autowired
     SMSOrderBaseEventService smsOrderBaseEventService;
+    @Autowired
+    OrderSendMessageFactory orderSendMessageFactory;
 
     public List<ViolateBO> findProcessOrderInfo() {
 
@@ -88,6 +92,9 @@ public class RemindPayIllegalCrashService {
         paramsMap.put("PayType", typeName);
         Map map = SmsParamsMapUtil.getParamsMap(orderNo, ShortMessageTypeEnum.CANCEL_ORDER_2_RENTER.getValue(), null, paramsMap);
         smsOrderBaseEventService.sendShortMessage(map);
+        //发送push
+        Map pushMap = SmsParamsMapUtil.getParamsMap(orderNo, PushMessageTypeEnum.RENTER_NO_PAY_ILLEGAL_CANCEL.getValue(), PushMessageTypeEnum.RENTER_NO_PAY_ILLEGAL_2_OWNER.getValue(), null);
+        orderSendMessageFactory.sendPushMessage(pushMap);
     }
 
     /**

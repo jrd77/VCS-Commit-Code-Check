@@ -9,6 +9,7 @@ import lombok.Getter;
 public enum CashierRefundApplyStatus {
     RECEIVED_REFUND("00","已退款"),
     WAITING_FOR_REFUND("01","待退款"),
+    STOP_FOR_REFUND("02","暂停退款"),
             ;
 
     private String code;

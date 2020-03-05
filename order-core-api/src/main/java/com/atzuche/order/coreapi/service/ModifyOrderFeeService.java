@@ -9,11 +9,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.atzuche.order.commons.entity.dto.CostBaseDTO;
+import com.atzuche.order.commons.entity.dto.OwnerGoodsDetailDTO;
 import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
 import com.atzuche.order.commons.entity.dto.RenterMemberDTO;
 import com.atzuche.order.commons.enums.FineTypeEnum;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.coreapi.entity.dto.ModifyOrderDTO;
+import com.atzuche.order.coreapi.entity.dto.ModifyOrderOwnerDTO;
 import com.atzuche.order.coreapi.entity.request.ModifyOrderReq;
 import com.atzuche.order.coreapi.entity.vo.CostDeductVO;
 import com.atzuche.order.coreapi.entity.vo.DispatchCarInfoVO;
@@ -22,6 +24,9 @@ import com.atzuche.order.open.vo.ModifyOrderCostVO;
 import com.atzuche.order.open.vo.ModifyOrderDeductVO;
 import com.atzuche.order.open.vo.ModifyOrderFeeVO;
 import com.atzuche.order.open.vo.ModifyOrderFineVO;
+import com.atzuche.order.ownercost.entity.OwnerOrderEntity;
+import com.atzuche.order.ownercost.entity.OwnerOrderPurchaseDetailEntity;
+import com.atzuche.order.ownercost.service.OwnerOrderService;
 import com.atzuche.order.coreapi.entity.vo.res.CarRentTimeRangeResVO;
 import com.atzuche.order.delivery.entity.RenterOrderDeliveryEntity;
 import com.atzuche.order.delivery.service.RenterOrderDeliveryService;
@@ -40,7 +45,6 @@ import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.atzuche.order.renterorder.entity.dto.RenterOrderCostRespDTO;
 import com.atzuche.order.renterorder.service.RenterOrderService;
 import com.atzuche.order.renterorder.vo.RenterOrderReqVO;
-import com.autoyol.commons.web.ResponseData;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -64,6 +68,10 @@ public class ModifyOrderFeeService {
 	private OrderService orderService;
 	@Autowired
 	private OrderStatusService orderStatusService;
+	@Autowired
+	private ModifyOrderForOwnerService modifyOrderForOwnerService;
+	@Autowired
+	private OwnerOrderService ownerOrderService;
 
 	/**
 	 * 获取修改订单前后费用
@@ -397,5 +405,36 @@ public class ModifyOrderFeeService {
 			return 0;
 		}
 		return fineList.stream().filter(fine -> {return fineType.equals(fine.getFineType());}).mapToInt(RenterOrderFineDeatailEntity::getFineAmount).sum();
+	}
+	
+	
+	/**
+	 * 计算车主租金
+	 * @param renterOrderNo
+	 * @return
+	 */
+	public Integer getOwnerRentAmt(String renterOrderNo) {
+		// 获取租客修改申请表中已同意的租客子订单
+		RenterOrderEntity renterOrder = renterOrderService.getRenterOrderByRenterOrderNo(renterOrderNo);
+		// 获取租客配送订单信息
+		List<RenterOrderDeliveryEntity> deliveryList = renterOrderDeliveryService.listRenterOrderDeliveryByRenterOrderNo(renterOrderNo);
+		// 封装车主同意需要的对象
+		ModifyOrderOwnerDTO modifyOrderOwnerDTO = modifyOrderForOwnerService.getModifyOrderOwnerDTO(renterOrder, deliveryList);
+		// 主订单号
+		String orderNo = modifyOrderOwnerDTO.getOrderNo();
+		// 获取修改前有效车主订单信息
+		OwnerOrderEntity ownerOrderEntity = ownerOrderService.getOwnerOrderByOrderNoAndIsEffective(orderNo);
+		// 获取车主端商品详情
+		OwnerGoodsDetailDTO ownerGoodsDetailDTO = modifyOrderForOwnerService.getOwnerGoodsDetailDTO(modifyOrderOwnerDTO, ownerOrderEntity);
+		// 设置商品信息
+		modifyOrderOwnerDTO.setOwnerGoodsDetailDTO(ownerGoodsDetailDTO);
+		// 封装基本对象
+		CostBaseDTO costBaseDTO = modifyOrderForOwnerService.convertToCostBaseDTO(modifyOrderOwnerDTO, null);
+		// 获取租金费用信息
+		List<OwnerOrderPurchaseDetailEntity> purchaseList = modifyOrderForOwnerService.getOwnerOrderPurchaseDetailEntityList(costBaseDTO, ownerGoodsDetailDTO);
+		if (purchaseList == null || purchaseList.isEmpty()) {
+			return 0;
+		}
+		return purchaseList.stream().mapToInt(OwnerOrderPurchaseDetailEntity::getTotalAmount).sum();
 	}
 }

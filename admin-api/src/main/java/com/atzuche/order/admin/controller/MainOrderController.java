@@ -25,13 +25,13 @@ public class MainOrderController {
     private static final Logger logger = LoggerFactory.getLogger(MainOrderController.class);
 
 
-	@AutoDocMethod(description = "获取主订单信息", value = "获取主订单信息", response = MainOrderResponseVO.class)
-	@GetMapping("main/information")
-	public ResponseData mainInformation(MainOrderRequestVO mainOrderRequestVO, BindingResult bindingResult) {
-		BindingResultUtil.checkBindingResult(bindingResult);
-		//TODO:
-		return ResponseData.success(null);
-	}
+//	@AutoDocMethod(description = "获取主订单信息", value = "获取主订单信息", response = MainOrderResponseVO.class)
+//	@GetMapping("main/information")
+//	public ResponseData mainInformation(MainOrderRequestVO mainOrderRequestVO, BindingResult bindingResult) {
+//		BindingResultUtil.checkBindingResult(bindingResult);
+//		//TODO:
+//		return ResponseData.success(null);
+//	}
 
 
 

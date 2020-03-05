@@ -67,6 +67,8 @@ public class WzCostFacadeService {
             wzDepositDetailVO.setSettleTime(LocalDateTimeUtils.localDateTimeToDate(accountRenterWzDepositEntity.getSettleTime()));
         }
 
+        wzDepositDetailVO.setShouldReturnDeposit(wzDepositDetailVO.getShishouDeposit());
+
         return wzDepositDetailVO;
 
     }

@@ -36,6 +36,13 @@ public class AccountDebtReceivableaDetailNoTService {
             }
         }
     }
-
-
+    /*
+     * @Author ZhangBin
+     * @Date 2020/3/2 14:52
+     * @Description: 通过订单号和会员号查询已经抵扣的历史欠款
+     *
+     **/
+    public List<AccountDebtReceivableaDetailEntity> getByOrderNoAndMemNo(String orderNo, String memeNo){
+        return accountDebtReceivableaDetailMapper.getByOrderNoAndMemNo(orderNo,memeNo);
+    }
 }

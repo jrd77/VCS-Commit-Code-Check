@@ -63,7 +63,7 @@ public class AccountRenterCostCoinService {
         int totalExpense = countAutoCoinByOrderNo(orderNo);
         if(amt*AUTO_COIN_RATIO>totalExpense){
             int diff = amt-totalExpense/AUTO_COIN_RATIO;
-            doDeductAutoCoin(memNo,orderNo,renterOrderNo,diff);
+            doDeductAutoCoin(memNo,orderNo,renterOrderNo,diff*AUTO_COIN_RATIO);
         }else{
             logger.warn("扣减的凹凸币数值:{} 小于已扣金额:{}，不再进行扣减",amt*AUTO_COIN_RATIO,totalExpense);
         }
@@ -80,7 +80,7 @@ public class AccountRenterCostCoinService {
         if(totalExpense>deductAmt){
             //需要退换
             int diff = (totalExpense-deductAmt)*AUTO_COIN_RATIO;
-            boolean returnFlag = doReturnAutoCoin(memNo, orderNo, diff);
+            boolean returnFlag = doReturnAutoCoin(memNo, orderNo, diff*AUTO_COIN_RATIO);
             if(returnFlag){
                 insertReturnLog(memNo, diff);
             }

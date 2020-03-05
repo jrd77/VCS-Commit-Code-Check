@@ -3,9 +3,11 @@ package com.atzuche.order.coreapi.task;
 import com.atzuche.order.commons.CatConstants;
 import com.atzuche.order.commons.vo.req.CancelOrderReqVO;
 import com.atzuche.order.commons.vo.req.RefuseOrderReqVO;
+import com.atzuche.order.coreapi.listener.push.OrderSendMessageFactory;
 import com.atzuche.order.coreapi.listener.sms.SMSOrderBaseEventService;
 import com.atzuche.order.coreapi.service.CancelOrderService;
 import com.atzuche.order.coreapi.service.OrderSearchRemoteService;
+import com.atzuche.order.mq.enums.PushMessageTypeEnum;
 import com.atzuche.order.mq.enums.ShortMessageTypeEnum;
 import com.atzuche.order.mq.util.SmsParamsMapUtil;
 import com.dianping.cat.Cat;
@@ -44,6 +46,9 @@ public class RenterAutoCancelTask extends IJobHandler {
     @Resource
     private CancelOrderService cancelOrderService;
 
+    @Autowired
+    OrderSendMessageFactory orderSendMessageFactory;
+
     @Override
     public ReturnT<String> execute(String s) throws Exception {
         Transaction t = Cat.getProducer().newTransaction(CatConstants.XXL_JOB_CALL, "定时查询下单后1小时，租客未支付租车费用,自动取消 定时任务");
@@ -73,20 +78,27 @@ public class RenterAutoCancelTask extends IJobHandler {
                         cancelOrderService.cancel(req);
                         //發送sms
                         orderSearchRemoteService.sendSmsData(orderNo);
+                        //发送push
+                        Map map = SmsParamsMapUtil.getParamsMap(orderNo, PushMessageTypeEnum.RENTER_NO_PAY_CAR.getValue(), PushMessageTypeEnum.RENTER_NO_PAY_CAR_2_OWNER.getValue(), null);
+                        orderSendMessageFactory.sendPushMessage(map);
+
                     } catch (Exception e) {
                         XxlJobLogger.log("执行 下单后1小时，租客未支付租车费用,自动取消 异常:" + e);
                         logger.error("执行 下单后1小时，租客未支付租车费用,自动取消 异常 orderNo:[{}] , e:[{}]",orderNo,e);
                         Cat.logError("执行 下单后1小时，租客未支付租车费用,自动取消 异常",e);
+                        t.setStatus(e);
                     }
                 }
             }
             logger.info("结束执行 下单后1小时，租客未支付租车费用,自动取消 ");
             XxlJobLogger.log("结束执行 下单后1小时，租客未支付租车费用,自动取消 ");
+            t.setStatus(Transaction.SUCCESS);
             return SUCCESS;
         } catch (Exception e) {
             XxlJobLogger.log("执行 下单后1小时，租客未支付租车费用,自动取消 异常:" + e);
             logger.error("执行 下单后1小时，租客未支付租车费用,自动取消 异常",e);
             Cat.logError("执行 下单后1小时，租客未支付租车费用,自动取消 异常",e);
+            t.setStatus(e);
             return new ReturnT(FAIL.getCode(),e.toString());
         } finally {
             if (t != null) {
