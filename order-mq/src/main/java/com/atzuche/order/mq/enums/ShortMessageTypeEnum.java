@@ -17,10 +17,10 @@ public enum ShortMessageTypeEnum {
     EXEMPT_PREORDER_AUTO_CANCEL_ORDER_2_OWNER("ExemptPreOrderAutoCancelOrder2Owner", "因租客未能完成租车押金支付，您$CarPlateNum$订单已取消"),
     EXEMPT_PREORDER_AUTO_CANCEL_ORDER_2_RENTER("ExemptPreOrderAutoCancelOrder2Renter", "由于您未在规定时间内支付租车押金，您的订单已被取消。点击重新找车  $indexUrl$"),
     EXEMPT_PREORDER_PAYRENT_CAR_DEPOSIT_2_RENTER("ExemptPreorderPayRentCarDeposit2Renter", "您对“$CarBrand$”(车牌$CarPlateNum$)的租车订单(订单号：$orderNo$)租车押金已支付完毕10100202"),
-    NOTIFY_RENTER_TRANS_REQACCEPTED("NotifyRenterTransReqAccepted", "车主已接受您对“ #carBrand##carType#”(车牌#carPlateNum#)的租车订单，请在1小时内支付租车押金，否则订单将被取消。如果订单时间需要提前或延后，请进入APP订单详情点击“修改订单“，车主同意后即可生效。"),
+    NOTIFY_RENTER_TRANS_REQACCEPTED("NotifyRenterTransReqAccepted", "车主已接受您对“ $carBrand$$carType$”(车牌$carPlateNum$)的租车订单，请在1小时内支付租车押金，否则订单将被取消。如果订单时间需要提前或延后，请进入APP订单详情点击“修改订单“，车主同意后即可生效。"),
     NOTIFY_RENTER_TRANS_REQACCEPTEDPACKAGE("NotifyRenterTransReqAcceptedPackage", "恭喜您已成功提交订单，请在1小时内支付租车押金，否则订单将被取消。如果订单时间需要提前或延后，请进入订单详情点击“修改订单“，车主同意后即可生效。"),
     NOTIFY_RENTER_TRANS_REQACCEPTEDPACKAGE_SPECIAL_TIME("NotifyRenterTransReqAcceptedPackage_special_time", "恭喜您已成功提交订单，请在1小时内支付租车押金，否则订单将被取消。如果订单时间需要提前或延后，请进入订单详情点击“修改订单“，车主同意后即可生效。租期包含10.1-10.7期间的订单，违章查询周期延长至33天，因违章查询周期延长，违章押金使用预授权、信用减免、绑卡免押的订单，违章押金将在期间转为消费，待订单查询无违章后原路退还。"),
-    NOTIFY_RENTER_TRANS_REQACCEPTED_SPECIAL_TIME("NotifyRenterTransReqAccepted_special_time", "车主已接受您对“ #carBrand##carType#”(车牌#carPlateNum#)的租车订单，请在1小时内支付租车押金，否则订单将被取消。如果订单时间需要提前或延后，请进入APP订单详情点击“修改订单“，车主同意后即可生效。租期包含10.1-10.7期间的订单，违章查询周期延长至33天，因违章查询周期延长，违章押金使用预授权、信用减免、绑卡免押的订单，违章押金将在期间转为消费，待订单查询无违章后原路退还"),
+    NOTIFY_RENTER_TRANS_REQACCEPTED_SPECIAL_TIME("NotifyRenterTransReqAccepted_special_time", "车主已接受您对“ $carBrand$$carType$”(车牌$carPlateNum$)的租车订单，请在1小时内支付租车押金，否则订单将被取消。如果订单时间需要提前或延后，请进入APP订单详情点击“修改订单“，车主同意后即可生效。租期包含10.1-10.7期间的订单，违章查询周期延长至33天，因违章查询周期延长，违章押金使用预授权、信用减免、绑卡免押的订单，违章押金将在期间转为消费，待订单查询无违章后原路退还"),
     PAY_ILLEGAL_DEPOSIT_2_OWNERSERVICE("PayIllegalDeposit2OwnerService", "$realName$预订您“$CarBrand$”(车牌$CarPlateNum$)(订单号：$orderNo$)的违章押金支付成功 101002021"),
     PAY_ILLEGAL_DEPOSIT_2_RENTER("PayIllegalDeposit2Renter", "您预订“$CarBrand$”(车牌$CarPlateNum$）(订单号：$orderNo$)违章押金付费成功10100202"),
     PAY_ILLEGAL_DEPOSIT_CANCEL_OWNER("PayIllegalDepositCancelOwner", "因租客未能完成违章押金支付，您$CarPlateNum$的订单已取消，请不要将车辆交于租客"),
@@ -40,7 +40,7 @@ public enum ShortMessageTypeEnum {
     SELF_SUPPORT_RENT_DEPOSIT_PAID_NOTICE("SELF_SUPPORT_RENT_DEPOSIT_PAID_NOTICE", "您已成功支付凹凸自营车辆【$plateNum$】的租车押金，如有特殊用车需要请告诉我们 http://1t.click/hej，我们将竭力为您提供更舒适便捷的服务"),
     EXEMPT_PREORDER_REMIND_PAYRENT("ExemptPreOrderRemindPayRent", "您预订的($CarPlateNum$)的订单已被车主接受，取车时间：$RentTime$。请在$Minute$分钟内支付租车押金，否则订单将被系统取消。您可以使用信用卡或者借记卡进行支付，如遇困难可以借用亲友的银行卡。如信用卡额度不够，可致电银行客服提高信用卡临时额度，申请后一般即时生效。"),
     NO_EXEMPT_PREORDER_REMIND_PAYRENT("NoExemptPreOrderRemindPayRent", "您预订的($CarPlateNum$)的订单已被车主接受，取车时间：$RentTime$。请在$Minute$分钟内支付租车押金，否则订单将被系统取消。您可以使用信用卡或者借记卡进行支付，如遇困难可以借用亲友的银行卡。如信用卡额度不够，可致电银行客服提高信用卡临时额度，申请后一般即时生效。"),
-    ILLAGE_MAX_SCORE_LIMIT_TEXT("illageMaxScoreLimitText", "尊敬的用户，您在订单时间#time#中产生score分违章，请在租期内尽快消除违章记录，完成后必须将处罚决定书及缴款凭证通过APP“违章查询” #linkUrl1# 功能中上传，平台将暂扣您的所有押金待订单结束后15-20天再次查询，若无违章退还押金，请点击“违章内容” #linkUrl2# 查看具体违章信息10100202"),
+    ILLAGE_MAX_SCORE_LIMIT_TEXT("illageMaxScoreLimitText", "尊敬的用户，您在订单时间$time$中产生score分违章，请在租期内尽快消除违章记录，完成后必须将处罚决定书及缴款凭证通过APP“违章查询” $linkUrl1$ 功能中上传，平台将暂扣您的所有押金待订单结束后15-20天再次查询，若无违章退还押金，请点击“违章内容” $linkUrl2$ 查看具体违章信息10100202"),
     ;
 
     private String value;
