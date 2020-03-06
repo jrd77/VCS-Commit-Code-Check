@@ -272,4 +272,7 @@
     	update order_status set `status` = #{status}
     	where order_no = #{orderNo}
     </update>
+    <select id="queryInProcess" resultMap="BaseResultMap">
+        SELECT  <include refid="Base_Column_List" /> FROM order_status WHERE `status` NOT IN(512,0) AND is_delete = 0
+    </select>
 </mapper>
