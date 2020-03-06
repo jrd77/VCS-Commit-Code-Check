@@ -106,4 +106,8 @@ public class OrderStatusService {
     public Integer updateOrderStatus(String orderNo, Integer status) {
     	return orderStatusMapper.updateOrderStatus(orderNo, status);
     }
+
+    public List<OrderStatusEntity> queryInProcess() {
+        return orderStatusMapper.queryInProcess();
+    }
 }
