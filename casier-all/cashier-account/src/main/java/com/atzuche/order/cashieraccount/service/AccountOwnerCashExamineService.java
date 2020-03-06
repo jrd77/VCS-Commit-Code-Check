@@ -18,6 +18,7 @@ import com.atzuche.order.cashieraccount.mapper.AccountOwnerCashExamineMapper;
 import com.atzuche.order.commons.entity.dto.BankCardDTO;
 import com.atzuche.order.commons.entity.dto.CashWithdrawalSimpleMemberDTO;
 import com.atzuche.order.commons.vo.req.AccountOwnerCashExamineReqVO;
+import com.atzuche.order.wallet.api.MemBalanceVO;
 import com.autoyol.platformcost.CommonUtils;
 
 @Service
@@ -27,6 +28,8 @@ public class AccountOwnerCashExamineService {
 	private AccountOwnerCashExamineMapper accountOwnerCashExamineMapper;
 	@Autowired
 	private AccountOwnerIncomeNoTService accountOwnerIncomeNoTService;
+	@Autowired
+	private RemoteAccountService remoteAccountService;
 	// 每个账户每日可申请提现成功次数
 	private static final int DATE_WITHDRAWAL_MAX = 2;
 	private final static int FINALZERO = 0;
@@ -54,6 +57,15 @@ public class AccountOwnerCashExamineService {
 		BankCardDTO bankCard = null;
 		// 获取新订单系统的会员总收益
 		AccountOwnerIncomeEntity incomeEntity = accountOwnerIncomeNoTService.getOwnerIncome(req.getMemNo());
+		// 调远程获取老系统可提现余额
+		MemBalanceVO memBalanceVO = remoteAccountService.getMemBalance(req.getMemNo());
+		if (simpleMem == null) {
+			simpleMem = new CashWithdrawalSimpleMemberDTO();
+		}
+		simpleMem.setMemNo(req.getMemNo());
+		if (memBalanceVO != null && memBalanceVO.getBalance() != null) {
+			simpleMem.setBalance(memBalanceVO.getBalance());
+		}
 		// 检验
 		check(req, bankCard, simpleMem, incomeEntity);
 		// 抵扣老balance
@@ -103,7 +115,8 @@ public class AccountOwnerCashExamineService {
 			}
 		}
 		if (deductOldBalance > 0) {
-			// TODO 调服务抵扣老的balance
+			// 调服务抵扣老的balance
+			remoteAccountService.deductBalance(req.getMemNo(), deductOldBalance);
 		}
 		return deductOldBalance;
 	}
