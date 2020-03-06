@@ -1,15 +1,16 @@
 package com.atzuche.order.accountplatorm.entity;
 
+import lombok.Data;
+
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import lombok.Data;
 
 
 /**
  *  平台订单收益结算表
  * 
  * @author ZhangBin
- * @date 2019-12-21 15:29:40
+ * @date 2020-03-06 14:08:27
  * @Description:
  */
 @Data
@@ -24,6 +25,10 @@ public class AccountPlatformProfitEntity implements Serializable {
 	 * 主订单号
 	 */
 	private String orderNo;
+	/**
+	 * 车主子单号
+	 */
+	private String ownerOrderNo;
 	/**
 	 * 车主补贴金额
 	 */
@@ -65,7 +70,7 @@ public class AccountPlatformProfitEntity implements Serializable {
 	 */
 	private Integer version;
 	/**
-	 * 状态（违章结算/订单结算）
+	 * 状态（违章结算0/订单结算1/取消订单2）
 	 */
 	private Integer status;
 	/**

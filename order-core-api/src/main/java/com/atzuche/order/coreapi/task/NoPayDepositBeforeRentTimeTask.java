@@ -70,11 +70,13 @@ public class NoPayDepositBeforeRentTimeTask extends IJobHandler {
             }
             logger.info("结束执行 租客在取车时间前未支付租车押金或违章押金 ");
             XxlJobLogger.log("结束执行 租客在取车时间前未支付租车押金或违章押金 ");
+            t.setStatus(Transaction.SUCCESS);
             return SUCCESS;
         } catch (Exception e) {
             XxlJobLogger.log("执行 租客在取车时间前未支付租车押金或违章押金 异常:" + e);
             logger.error("执行 租客在取车时间前未支付租车押金或违章押金 异常", e);
             Cat.logError("执行 租客在取车时间前未支付租车押金或违章押金 异常", e);
+            t.setStatus(e);
             return new ReturnT(FAIL.getCode(), e.toString());
         } finally {
             if (t != null) {

@@ -65,16 +65,19 @@ public class RevertCar4HoursAutoSettleTask extends IJobHandler{
                         XxlJobLogger.log("执行 还车4小时后，自动结算 异常:" + e);
                         logger.error("执行 还车4小时后，自动结算 异常 orderNo:[{}] , e:[{}]",orderNo , e);
                         Cat.logError("执行 还车4小时后，自动结算 异常",e);
+                        t.setStatus(e);
                     }
                 }
             }
             logger.info("结束执行 还车4小时后，自动结算");
             XxlJobLogger.log("结束执行 还车4小时后，自动结算");
+            t.setStatus(Transaction.SUCCESS);
             return SUCCESS;
         } catch (Exception e) {
             XxlJobLogger.log("执行 还车4小时后，自动结算 异常:" + e);
             logger.error("执行 还车4小时后，自动结算 异常",e);
             Cat.logError("执行 还车4小时后，自动结算 异常",e);
+            t.setStatus(e);
             return new ReturnT(FAIL.getCode(),e.toString());
         } finally {
             if (t != null) {

@@ -219,6 +219,29 @@ public class OrderSettleService{
         }
         log.info("OrderPayCallBack payCallBack end " );
     }
+    /*
+     * @Author ZhangBin
+     * @Date 2020/3/5 10:20
+     * @Description: 订单取消-车主结算
+     * @param orderNo 主订单号
+     * @param ownerOrderNo 车主子订单号
+     * @param ownerMemNo 车主会员号
+     * @return
+     **/
+    @Transactional(rollbackFor=Exception.class)
+    public boolean settleOwnerOrderCancel(String orderNo,String ownerOrderNo,String ownerMemNo){
+        OrderStatusDTO orderStatusDTO = new OrderStatusDTO();
+        orderStatusDTO.setOrderNo(orderNo);
+
+        return false;
+    }
+
+    public boolean settleRenterOrderCancel(String orderNo,String renterOrderno,String renterMemNo){
+        return false;
+    }
+
+
+
 
     /**
      * 取消订单结算
@@ -237,11 +260,11 @@ public class OrderSettleService{
             SettleOrders settleOrders =  orderSettleNoTService.initCancelSettleOrders(orderNo);
             Cat.logEvent("settleOrderCancel",GsonUtils.toJson(settleOrders));
             log.info("OrderPayCallBack settleOrderCancel settleOrders [{}] ",GsonUtils.toJson(settleOrders));
-            //2 查询所有租客罚金明细  及 凹凸币补贴
+            //2 查询租客罚金明细  及 凹凸币补贴
             orderSettleNoTService.getCancelRenterCostSettleDetail(settleOrders);
             Cat.logEvent("settleOrders",GsonUtils.toJson(settleOrders));
             log.info("OrderPayCallBack settleOrderCancel settleOrders [{}] ",GsonUtils.toJson(settleOrders));
-            //3 查询所有车主罚金明细
+            //3 查询车主罚金明细
             orderSettleNoTService.getCancelOwnerCostSettleDetail(settleOrders);
             Cat.logEvent("settleOrdersFine",GsonUtils.toJson(settleOrders));
             log.info("OrderPayCallBack settleOrderCancel settleOrders [{}] ",GsonUtils.toJson(settleOrders));
@@ -249,35 +272,37 @@ public class OrderSettleService{
             SettleCancelOrdersAccount settleCancelOrdersAccount = orderSettleNoTService.initSettleCancelOrdersAccount(settleOrders);
             Cat.logEvent("settleCancelOrdersAccount",GsonUtils.toJson(settleCancelOrdersAccount));
             log.info("OrderPayCallBack settleCancelOrdersAccount settleCancelOrdersAccount [{}] ",GsonUtils.toJson(settleCancelOrdersAccount));
-
+            if(true)return false;
             //5 处理 租客 车主 平台 罚金收入（将三方金额统计到结算表中）
             orderSettleNoTService.handleIncomeFine(settleOrders,settleCancelOrdersAccount);
             Cat.logEvent("handleIncomeFine",GsonUtils.toJson(settleCancelOrdersAccount));
             log.info("OrderPayCallBack handleIncomeFine handleIncomeFine [{}] ",GsonUtils.toJson(settleCancelOrdersAccount));
 
-            //6 车主罚金处理
+            //6 车主罚金走历史欠款
             orderSettleNoTService.handleOwnerFine(settleOrders,settleCancelOrdersAccount);
             Cat.logEvent("handleOwnerFine",GsonUtils.toJson(settleCancelOrdersAccount));
             log.info("OrderPayCallBack handleOwnerFine settleCancelOrdersAccount [{}] ",GsonUtils.toJson(settleCancelOrdersAccount));
             
-            
-            //7 租客罚金处理
+            //7 租客罚金抵扣 钱包 > 租车费用 > 车辆押金 > 违章押金
             orderSettleNoTService.handleRentFine(settleOrders,settleCancelOrdersAccount);
             Cat.logEvent("handleRentFine",GsonUtils.toJson(settleCancelOrdersAccount));
             log.info("OrderPayCallBack handleRentFine settleCancelOrdersAccount [{}] ",GsonUtils.toJson(settleCancelOrdersAccount));
-            //8 租客还历史欠款
+
+            //8 租客历史欠款抵扣 钱包 > 租车费用 > 车辆押金 > 违章押金
             orderSettleNoTService.repayHistoryDebtRentCancel(settleOrders,settleCancelOrdersAccount);
             Cat.logEvent("repayHistoryDebtRentCancel",GsonUtils.toJson(settleCancelOrdersAccount));
             log.info("OrderPayCallBack repayHistoryDebtRentCancel settleCancelOrdersAccount [{}] ",GsonUtils.toJson(settleCancelOrdersAccount));
-            //9 租客金额 退还 包含 凹凸币，钱包 租车费用 押金 违章押金 退还 （优惠券退还 TODO）
+
+            //9 租客金额 退还 包含 凹凸币，钱包 租车费用 押金 违章押金 退还 （优惠券退还 ->不在结算中做,在取消订单中完成）
             orderSettleNoTService.refundCancelCost(settleOrders,settleCancelOrdersAccount,orderStatusDTO);
             Cat.logEvent("refundCancelCost",GsonUtils.toJson(settleCancelOrdersAccount));
             log.info("OrderPayCallBack refundCancelCost settleCancelOrdersAccount [{}] ",GsonUtils.toJson(settleCancelOrdersAccount));
+
             //10 修改订单状态表
             cashierService.saveCancelOrderStatusInfo(orderStatusDTO);
-
             log.info("OrderSettleService initSettleOrders settleOrders [{}]", GsonUtils.toJson(settleOrders));
             Cat.logEvent("settleOrders",GsonUtils.toJson(settleOrders));
+
         } catch (Exception e) {
             log.error("OrderSettleService settleOrderCancel,e={},",e);
             t.setStatus(e);
