@@ -25,6 +25,7 @@ repositories {
 
 dependencies {
     compile project(":config:config-common")
+    compile project(":util-all:order-commons")
     compile project(":order-wallet:order-wallet-api")
     testCompile group: 'junit', name: 'junit', version: '4.12'
     compile('org.mybatis.spring.boot:mybatis-spring-boot-starter:1.1.1')

@@ -30,9 +30,9 @@ public class AccountService {
             AccountVO accountVO = new AccountVO();
             BeanUtils.copyProperties(entity,accountVO);
             try {
-                accountVO.setCardNo(AESEncrypter.decrypt(entity.getCardNo()));
-                accountVO.setCardHolder(AESEncrypter.decrypt(entity.getCardHolder()));
-                accountVO.setCertNo(AESEncrypter.decrypt(entity.getCertNo()));
+                accountVO.setCardNoPlain(AESEncrypter.decrypt(entity.getCardNo()));
+                accountVO.setCardHolderPlain(AESEncrypter.decrypt(entity.getCardHolder()));
+                accountVO.setCertNoPlain(AESEncrypter.decrypt(entity.getCertNo()));
             }catch (Exception e){
                 e.printStackTrace();
             }

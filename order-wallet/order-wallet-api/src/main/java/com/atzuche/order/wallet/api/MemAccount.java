@@ -1,5 +1,6 @@
 package com.atzuche.order.wallet.api;
 
+import com.autoyol.doc.annotation.AutoDocProperty;
 import lombok.Data;
 import lombok.ToString;
 
@@ -13,6 +14,8 @@ import java.util.List;
 @Data
 @ToString
 public class MemAccount {
+    @AutoDocProperty(value = "会员号")
     private String memNo;
+    @AutoDocProperty(value = "绑卡的信息集合")
     private List<AccountVO> accounts = new ArrayList<>();
 }
