@@ -66,4 +66,19 @@ public class AccountOwnerIncomeNoTService {
             throw new AccountOwnerIncomeExamineException();
         }
     }
+    
+    
+    /**
+     * 更新车主收益(提现)
+     * @param accountOwnerIncomeDetail
+     */
+    public void updateOwnerIncomeAmtForCashWith(AccountOwnerIncomeEntity accountOwnerIncomeEntity) {
+        if(accountOwnerIncomeEntity == null){
+            throw new AccountOwnerIncomeExamineException();
+        }
+        int result = accountOwnerIncomeMapper.updateByPrimaryKey(accountOwnerIncomeEntity);
+        if(result==0){
+            throw new AccountOwnerIncomeExamineException();
+        }
+    }
 }
