@@ -143,7 +143,7 @@ public class OrderSettleService{
      */
     public RentCosts preRenterSettleOrder(String orderNo,String renterOrderNo) {
     	SettleOrders settleOrders =  orderSettleNoTService.preInitSettleOrders(orderNo,renterOrderNo,null);
-    	 //3.4 查询所有租客费用明细
+    	//3.4 查询所有租客费用明细
         orderSettleNoTService.getRenterCostSettleDetail(settleOrders);
         return settleOrders.getRentCosts();
     }
@@ -154,6 +154,9 @@ public class OrderSettleService{
      */
     public OwnerCosts preOwnerSettleOrder(String orderNo,String ownerOrderNo) {
     	SettleOrders settleOrders =  orderSettleNoTService.preInitSettleOrders(orderNo,null,ownerOrderNo);
+    	//1 查询所有租客费用明细  （需要计算车主的平台服务费，需要获取租金）
+//        orderSettleNoTService.getRenterCostSettleDetailSimpleForOwnerPlatformSrvFee(settleOrders);
+        
         //3.5 查询所有车主费用明细 TODO 暂不支持 多个车主
     	orderSettleNoTService.getOwnerCostSettleDetail(settleOrders);
 
@@ -164,12 +167,15 @@ public class OrderSettleService{
     	log.info("preOwnerSettleOrder settleOrdersDefinition [{}]",GsonUtils.toJson(settleOrdersDefinition));
         //2车主总账
         List<AccountOwnerCostSettleDetailEntity> accountOwnerCostSettleDetails = settleOrdersDefinition.getAccountOwnerCostSettleDetails();
+        for (AccountOwnerCostSettleDetailEntity accountOwnerCostSettleDetailEntity : accountOwnerCostSettleDetails) {
+			log.info("打印车主费用清单:"+accountOwnerCostSettleDetailEntity.toString());
+		}
         if(!CollectionUtils.isEmpty(accountOwnerCostSettleDetails)){
             int ownerCostAmtFinal = accountOwnerCostSettleDetails.stream().mapToInt(AccountOwnerCostSettleDetailEntity::getAmt).sum();
             settleOrders.getOwnerCosts().setOwnerCostAmtFinal(ownerCostAmtFinal);
         }
-
-
+        //封装车主会员号 200305 huangjing
+        settleOrders.getOwnerCosts().setOwnerNo(settleOrders.getOwnerMemNo());
     	return settleOrders.getOwnerCosts();
     }
     /**

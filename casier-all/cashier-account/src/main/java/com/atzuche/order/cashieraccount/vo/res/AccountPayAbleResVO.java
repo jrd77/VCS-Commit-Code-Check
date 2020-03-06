@@ -5,6 +5,7 @@ import com.atzuche.order.commons.enums.cashier.PayTypeEnum;
 import com.autoyol.doc.annotation.AutoDocProperty;
 import com.google.common.collect.ImmutableList;
 import lombok.Data;
+import lombok.ToString;
 
 import java.util.List;
 
@@ -12,6 +13,7 @@ import java.util.List;
  * 个人代付信息
  * @author haibao.yan
  */
+@ToString
 @Data
 public class AccountPayAbleResVO {
     /**

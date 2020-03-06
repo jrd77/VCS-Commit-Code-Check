@@ -12,7 +12,6 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.atzuche.order.accountownerincome.entity.AccountOwnerIncomeExamineEntity;
 import com.atzuche.order.accountownerincome.service.notservice.AccountOwnerIncomeExamineNoTService;
 import com.atzuche.order.accountrenterdeposit.service.AccountRenterDepositService;
 import com.atzuche.order.accountrenterdeposit.vo.res.AccountRenterDepositResVO;
@@ -63,6 +62,7 @@ import com.atzuche.order.settle.service.OrderSettleService;
 import com.atzuche.order.settle.vo.req.OwnerCosts;
 import com.atzuche.order.settle.vo.req.RentCosts;
 import com.autoyol.doc.util.StringUtil;
+import com.autoyol.platformcost.CommonUtils;
 import com.autoyol.platformcost.model.FeeResult;
 
 import lombok.extern.slf4j.Slf4j;
@@ -189,7 +189,7 @@ public class OrderCostService {
 		resVo.setFineLst(fineLstReal);
 		
 		//
-		List<OrderConsoleCostDetailEntity> consoleCostLst = orderConsoleCostDetailService.getOrderConsoleCostDetaiByOrderNo(orderNo);
+		List<OrderConsoleCostDetailEntity> consoleCostLst = orderConsoleCostDetailService.selectByOrderNoAndMemNo(orderNo,memNo);
 		List<com.atzuche.order.commons.vo.res.rentcosts.OrderConsoleCostDetailEntity> consoleCostLstReal = new ArrayList<com.atzuche.order.commons.vo.res.rentcosts.OrderConsoleCostDetailEntity>();
 		if(consoleCostLst != null) {
 			consoleCostLst.stream().forEach(x->{
@@ -375,8 +375,10 @@ public class OrderCostService {
 		String ownerOrderNo = req.getSubOrderNo();
 		// ----------------------------------------------------- 结算前查询
 		OwnerCosts ownerCosts = orderSettleService.preOwnerSettleOrder(orderNo,ownerOrderNo);
+		String ownerNo = "0";
 		if(ownerCosts != null) {
 			log.info("ownerCosts===============不为空");
+			ownerNo = ownerCosts.getOwnerNo();
 		}else {
 			log.info("ownerCosts===============为空");
 		}
@@ -401,7 +403,7 @@ public class OrderCostService {
 		  resVo.setOrderCouponList(orderCouponListReal);
 		  
 		  ///
-			List<OrderConsoleCostDetailEntity> consoleCostLst = orderConsoleCostDetailService.getOrderConsoleCostDetaiByOrderNo(orderNo);
+			List<OrderConsoleCostDetailEntity> consoleCostLst = orderConsoleCostDetailService.selectByOrderNoAndMemNo(orderNo,ownerNo);
 			List<com.atzuche.order.commons.vo.res.rentcosts.OrderConsoleCostDetailEntity> consoleCostLstReal = new ArrayList<com.atzuche.order.commons.vo.res.rentcosts.OrderConsoleCostDetailEntity>();
 			if(consoleCostLst != null) {
 				consoleCostLst.stream().forEach(x->{
@@ -582,21 +584,30 @@ public class OrderCostService {
 	     * 获取车主油费
 	     */
 		 int oilDifferenceCrashAmt = 0;
-	     OwnerGetAndReturnCarDTO renterOrderCostDetail = ownerCosts.getOwnerGetAndReturnCarDTO();  //海豹命名错误
-//	     OwnerOrderPurchaseDetailEntity renterOrderCostDetailReal = null;
-	     if(renterOrderCostDetail != null) {
-//	    	 renterOrderCostDetailReal = new OwnerOrderPurchaseDetailEntity();
-//	    	 BeanUtils.copyProperties(renterOrderCostDetail,renterOrderCostDetailReal);  //不具备copy
-             String oilDifferenceCrash = renterOrderCostDetail.getOilDifferenceCrash();
+	     OwnerGetAndReturnCarDTO ownerGetAndReturnCarDTO = ownerCosts.getOwnerGetAndReturnCarDTO();  //海豹命名错误
+	     if(ownerGetAndReturnCarDTO != null) {
+             String oilDifferenceCrash = ownerGetAndReturnCarDTO.getOilDifferenceCrash();
              oilDifferenceCrash = StringUtil.isBlank(oilDifferenceCrash)?"0":oilDifferenceCrash;
-//             renterOrderCostDetailReal.setTotalAmount(Integer.valueOf(oilDifferenceCrash));
              oilDifferenceCrashAmt = Integer.valueOf(oilDifferenceCrash);
 	     }
-//	     resVo.setOwnerOrderCostDetail(renterOrderCostDetailReal);
 	     resVo.setOwnerOilDifferenceCrashAmt(oilDifferenceCrashAmt);
-	    
+	    /**
+	              * 超里程费用
+	     */
+	     com.atzuche.order.ownercost.entity.OwnerOrderPurchaseDetailEntity mileageAmt = ownerCosts.getMileageAmt();
+	     if(mileageAmt != null) {
+	    	 //如果是代管车，该超里程显示为0，归平台收益。
+	    	 if (CommonUtils.isEscrowCar(ownerCosts.getCarOwnerType())) {
+	    		 resVo.setMileageAmt(0);
+	    	 }else {
+	    		 resVo.setMileageAmt(mileageAmt.getTotalAmount()!=null?mileageAmt.getTotalAmount():0);
+	    	 }
+	     }
+	     
 	     /*车主预计收益*/
 	     resVo.setOwnerCostAmtFinal(ownerCosts.getOwnerCostAmtFinal());
+	     //平台加油服务费
+	     resVo.setOwnerPlatFormOilService(ownerCosts.getOwnerPlatFormOilService());
 	}
 
 	/**

@@ -65,6 +65,11 @@
     <select id="selectByOrderNo" resultMap="BaseResultMap">
         select <include refid="Base_Column_List" /> from owner_order_fine_deatail where order_no = #{orderNo}
     </select>
+    
+    
+    <select id="selectByOrderNoOwnerOrderNo" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List" /> from owner_order_fine_deatail where order_no = #{orderNo} and owner_order_no = #{ownerOrderNo} and is_delete = 0 
+    </select>
 
 	<insert id="insert" parameterType="com.atzuche.order.ownercost.entity.OwnerOrderFineDeatailEntity" useGeneratedKeys="true" keyProperty="id">
 		insert into owner_order_fine_deatail (
