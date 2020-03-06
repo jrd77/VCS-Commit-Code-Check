@@ -93,12 +93,7 @@ public class AccountVO implements Serializable {
      */
     private Integer totalPay;
 
-    /**
-     * 创建时间
-     */
-    private LocalDateTime createTime;
 
-    private LocalDateTime updateTime;
 
     /**
      * icon图标路径
