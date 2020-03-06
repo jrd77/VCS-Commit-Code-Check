@@ -2,6 +2,7 @@ package com.atzuche.order.cashieraccount.service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,21 +56,36 @@ public class AccountOwnerCashExamineService {
 		AccountOwnerIncomeEntity incomeEntity = accountOwnerIncomeNoTService.getOwnerIncome(req.getMemNo());
 		// 检验
 		check(req, bankCard, simpleMem, incomeEntity);
-		// 抵扣brance
-		deductionBalance(req, simpleMem, incomeEntity);
+		// 抵扣老balance
+		int oldDeductAmt = deductionOldBalance(req, simpleMem, incomeEntity);
+		// 抵扣新balance
+		int newDeductAmt = deductionNewBalance(req, simpleMem, incomeEntity);
 		// 转换成提现记录
 		AccountOwnerCashExamine record = convertAccountOwnerCashExamine(req, bankCard, simpleMem);
-		// 保存提现记录
-		accountOwnerCashExamineMapper.insertSelective(record);
+		String nowDate = CommonUtils.formatTime(LocalDateTime.now(), CommonUtils.FORMAT_STR_LONG);
+		if (oldDeductAmt > 0) {
+			record.setSerialNumber(nowDate+"1"+req.getMemNo()+req.getAmt());
+			record.setBalanceFlag(0);
+			// 保存提现记录
+			accountOwnerCashExamineMapper.insertSelective(record);
+		}
+		if (newDeductAmt > 0) {
+			record.setId(null);
+			record.setSerialNumber(nowDate+"2"+req.getMemNo()+req.getAmt());
+			record.setBalanceFlag(1);
+			// 保存提现记录
+			accountOwnerCashExamineMapper.insertSelective(record);
+		}
 	}
 	
 	/**
-	 * 抵扣balance
+	 * 抵扣老balance
 	 * @param req
 	 * @param simpleMem
 	 * @param incomeEntity
+	 * @return int
 	 */
-	public void deductionBalance(AccountOwnerCashExamineReqVO req, CashWithdrawalSimpleMemberDTO simpleMem, AccountOwnerIncomeEntity incomeEntity) {
+	public int deductionOldBalance(AccountOwnerCashExamineReqVO req, CashWithdrawalSimpleMemberDTO simpleMem, AccountOwnerIncomeEntity incomeEntity) {
 		// 当前提现金额
 		int amt = StringUtils.isBlank(req.getAmt()) ? 0:Integer.valueOf(req.getAmt());
 		// 老系统可提现金额
@@ -79,18 +95,40 @@ public class AccountOwnerCashExamineService {
 		}
 		// 抵扣老的balance
 		int deductOldBalance = 0;
-		// 剩余可抵扣的
-		int surplusBalance = 0;
 		if (balance > 0) {
 			if (balance >= amt) {
 				deductOldBalance = amt;
 			} else {
 				deductOldBalance = balance;
-				surplusBalance = amt - balance;
 			}
 		}
 		if (deductOldBalance > 0) {
 			// TODO 调服务抵扣老的balance
+		}
+		return deductOldBalance;
+	}
+	
+	/**
+	 * 抵扣新balance
+	 * @param req
+	 * @param simpleMem
+	 * @param incomeEntity
+	 * @return int
+	 */
+	public int deductionNewBalance(AccountOwnerCashExamineReqVO req, CashWithdrawalSimpleMemberDTO simpleMem, AccountOwnerIncomeEntity incomeEntity) {
+		// 当前提现金额
+		int amt = StringUtils.isBlank(req.getAmt()) ? 0:Integer.valueOf(req.getAmt());
+		// 老系统可提现金额
+		int balance = 0;
+		if (simpleMem != null && simpleMem.getBalance() != null) {
+			balance = simpleMem.getBalance();
+		}
+		// 剩余可抵扣的
+		int surplusBalance = amt;
+		if (balance > 0 && balance < amt) {
+			surplusBalance = amt - balance;
+		} else if (balance >= amt) {
+			surplusBalance = 0;
 		}
 		if (surplusBalance > 0) {
 			// 抵扣新的balance
@@ -105,6 +143,7 @@ public class AccountOwnerCashExamineService {
 			incomeEntity.setIncomeAmt(incomeAmt);
 			accountOwnerIncomeNoTService.updateOwnerIncomeAmtForCashWith(incomeEntity);
 		}
+		return surplusBalance;
 	}
 	
 	
@@ -173,9 +212,9 @@ public class AccountOwnerCashExamineService {
 			record.setMobile(simpleMem.getMobile() == null ? null:Long.valueOf(simpleMem.getMobile()));
 			record.setRealName(simpleMem.getRealName());
 		}
-		String nowDate = CommonUtils.formatTime(LocalDateTime.now(), CommonUtils.FORMAT_STR_LONG);
-		record.setSerialNumber(nowDate+req.getMemNo()+req.getAmt());
 		record.setStatus(FINALZERO);
+		String uuid = UUID.randomUUID().toString().replace("-", "");
+		record.setRequestBatchCode(uuid);
 		return record;
 	}
 }

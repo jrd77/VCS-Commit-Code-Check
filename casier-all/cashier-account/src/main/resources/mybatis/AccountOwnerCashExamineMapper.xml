@@ -175,6 +175,15 @@
       <if test="isDelete != null" >
         is_delete,
       </if>
+      <if test="secondCleanFlag != null" >
+        second_clean_flag,
+      </if>
+      <if test="balanceFlag != null" >
+        balance_flag,
+      </if>
+      <if test="requestBatchCode != null" >
+        request_batch_code,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
       <if test="id != null" >
@@ -272,6 +281,15 @@
       </if>
       <if test="isDelete != null" >
         #{isDelete,jdbcType=TINYINT},
+      </if>
+      <if test="secondCleanFlag != null" >
+        #{secondCleanFlag},
+      </if>
+      <if test="balanceFlag != null" >
+        #{balanceFlag},
+      </if>
+      <if test="requestBatchCode != null" >
+        #{requestBatchCode},
       </if>
     </trim>
   </insert>

@@ -87,6 +87,12 @@ public class AccountOwnerCashExamine {
     private String updateOp;
 
     private Byte isDelete;
+    
+    private Integer secondCleanFlag;
+    
+    private Integer balanceFlag;
+    
+    private String requestBatchCode;
 
     public Integer getId() {
         return id;
@@ -364,6 +370,30 @@ public class AccountOwnerCashExamine {
 
 	public void setUpdateTimeStr(String updateTimeStr) {
 		this.updateTimeStr = updateTimeStr;
+	}
+
+	public Integer getSecondCleanFlag() {
+		return secondCleanFlag;
+	}
+
+	public void setSecondCleanFlag(Integer secondCleanFlag) {
+		this.secondCleanFlag = secondCleanFlag;
+	}
+
+	public Integer getBalanceFlag() {
+		return balanceFlag;
+	}
+
+	public void setBalanceFlag(Integer balanceFlag) {
+		this.balanceFlag = balanceFlag;
+	}
+
+	public String getRequestBatchCode() {
+		return requestBatchCode;
+	}
+
+	public void setRequestBatchCode(String requestBatchCode) {
+		this.requestBatchCode = requestBatchCode;
 	}
     
 }
