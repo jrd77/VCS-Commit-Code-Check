@@ -1,5 +1,6 @@
 package com.atzuche.order.coreapi.service;
 
+import com.atzuche.order.accountrenterrentcost.service.AccountRenterCostSettleService;
 import com.atzuche.order.car.CarProxyService;
 import com.atzuche.order.coin.service.AccountRenterCostCoinService;
 import com.atzuche.order.commons.entity.dto.*;
@@ -49,6 +50,8 @@ import com.autoyol.platformcost.CommonUtils;
 import com.dianping.cat.Cat;
 import lombok.extern.slf4j.Slf4j;
 import com.atzuche.order.mem.MemProxyService;
+import com.atzuche.order.open.vo.ModifyOrderFeeVO;
+
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -124,6 +127,10 @@ public class ModifyOrderService {
 	private ModifyOrderRabbitMQService modifyOrderRabbitMQService;
 	@Autowired
 	private InsurAbamentDiscountService insurAbamentDiscountService;
+	@Autowired
+	private ModifyOrderFeeService modifyOrderFeeService;
+	@Autowired
+	private AccountRenterCostSettleService accountRenterCostSettleService;
 	/**
 	 * 修改订单主逻辑（含换车）
 	 * @param modifyOrderReq
@@ -194,6 +201,8 @@ public class ModifyOrderService {
 		Integer supplementAmt = getRenterSupplementAmt(modifyOrderDTO, initRenterOrder, renterOrderCostRespDTO, renterFineList);
 		// 计算升级补贴（换车逻辑）
 		OrderConsoleSubsidyDetailEntity consoleSubsidy = getDispatchingAmtSubsidy(modifyOrderDTO, costBaseDTO, supplementAmt);
+		// 修改后费用
+		ModifyOrderFeeVO updateModifyOrderFeeVO = modifyOrderFeeService.getUpdateModifyOrderFeeVO(renterOrderCostRespDTO, renterFineList);
 		/////////////////////////////////////////// 入库 ////////////////////////////////////////
 		// 保存租客商品信息
 		renterGoodsService.save(renterGoodsDetailDTO);
@@ -216,7 +225,7 @@ public class ModifyOrderService {
 		// 保存配送订单信息
 		saveRenterDelivery(modifyOrderDTO);
 		// 修改后处理方法
-		modifyPostProcess(modifyOrderDTO, renterOrderNew, initRenterOrder, supplementAmt, renterOrderCostRespDTO.getRenterOrderSubsidyDetailDTOList());
+		modifyPostProcess(modifyOrderDTO, renterOrderNew, initRenterOrder, supplementAmt, renterOrderCostRespDTO.getRenterOrderSubsidyDetailDTOList(), updateModifyOrderFeeVO);
 		// 使用车主券
 		bindOwnerCoupon(modifyOrderDTO, renterOrderCostRespDTO);
 		// 使用取还车券
@@ -444,18 +453,22 @@ public class ModifyOrderService {
 	 * @param initRenterOrder
 	 * @param supplementAmt
 	 */
-	public void modifyPostProcess(ModifyOrderDTO modifyOrderDTO, RenterOrderEntity renterOrderNew, RenterOrderEntity initRenterOrder, Integer supplementAmt, List<RenterOrderSubsidyDetailDTO> renterOrderSubsidyDetailDTOList) {
+	public void modifyPostProcess(ModifyOrderDTO modifyOrderDTO, RenterOrderEntity renterOrderNew, RenterOrderEntity initRenterOrder, Integer supplementAmt, List<RenterOrderSubsidyDetailDTO> renterOrderSubsidyDetailDTOList, ModifyOrderFeeVO updateModifyOrderFeeVO) {
 		// 管理后台操作标记
 		Boolean consoleFlag = modifyOrderDTO.getConsoleFlag();
 		// 订单状态
 		OrderStatusEntity orderStatus = modifyOrderDTO.getOrderStatusEntity();
 		// 租车费用支付状态:0,待支付 1,已支付
 		Integer rentCarPayStatus = orderStatus == null ? null:orderStatus.getRentCarPayStatus();
+		// 已付租车费用(shifu  租车费用的实付)
+		int rentAmtPayed = accountRenterCostSettleService.getCostPaidRent(modifyOrderDTO.getOrderNo(),modifyOrderDTO.getMemNo());
+		// 应付
+		int payable = modifyOrderFeeService.getTotalRentCarFee(updateModifyOrderFeeVO);
 		if ((consoleFlag != null && consoleFlag) || (rentCarPayStatus != null && rentCarPayStatus == 0)) {
 			// 直接同意
 			modifyOrderConfirmService.agreeModifyOrder(modifyOrderDTO, renterOrderNew, initRenterOrder, renterOrderSubsidyDetailDTOList);
 		} else {
-			if (supplementAmt != null && supplementAmt <= 0) {
+			if ((supplementAmt != null && supplementAmt <= 0) || rentAmtPayed > Math.abs(payable)) {
 				// 不需要补付
 				modifyOrderForRenterService.supplementPayPostProcess(modifyOrderDTO.getOrderNo(), modifyOrderDTO.getRenterOrderNo(), modifyOrderDTO, renterOrderSubsidyDetailDTOList);
 			}
