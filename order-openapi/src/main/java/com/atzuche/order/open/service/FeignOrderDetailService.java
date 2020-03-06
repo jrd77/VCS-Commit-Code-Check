@@ -81,10 +81,20 @@ public interface FeignOrderDetailService {
     @GetMapping("/order/detail/renterOrderDetail")
     public ResponseData<RenterOrderDetailRespDTO> renterOrderDetail(@RequestParam("orderNo") String orderNo,
                                                                    @RequestParam(name = "renterOrderNo",required = false) String renterOrderNo);
-
+    /*
+     * @Author ZhangBin
+     * @Date 2020/3/6 17:04
+     * @Description: 获取正在进行中的订单状态
+     *
+     **/
     @GetMapping("/order/detail/queryInProcess")
     public ResponseData<List<OrderStatusDTO>> queryInProcess();
-
+    /*
+     * @Author ZhangBin
+     * @Date 2020/3/6 17:04
+     * @Description: 通过车主订单号获取申请记录
+     *
+     **/
     @GetMapping("/order/detail/queryChangeApplyByOwnerOrderNo")
     public ResponseData<OrderDetailRespDTO> queryChangeApplyByOwnerOrderNo(String ownerOrderNo);
 }
