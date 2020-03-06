@@ -287,5 +287,16 @@
         </set>
         where order_no = #{orderNo}
     </update>
+    <select id="getByOrderNos" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from
+        `order`
+        where
+        order_no in
+        <foreach collection="orderNos" open="(" separator="," close=")" item="orderNo">
+            #{orderNo}
+        </foreach>
+    </select>
 
 </mapper>

@@ -1586,7 +1586,8 @@ public class OrderDetailService {
 
     }
 
-    public List<OrderStatusDTO> queryInProcess(){
+    public ProcessRespDTO queryInProcess(){
+        ProcessRespDTO processRespDTO = new ProcessRespDTO();
         List<OrderStatusEntity> orderStatusEntityList =  orderStatusService.queryInProcess();
         List<OrderStatusDTO> orderStatusDTOList = new ArrayList<>();
         orderStatusEntityList.stream().forEach(x->{
@@ -1594,7 +1595,22 @@ public class OrderDetailService {
             BeanUtils.copyProperties(x,orderStatusDTO);
             orderStatusDTOList.add(orderStatusDTO);
             });
-        return orderStatusDTOList;
+
+        List<String> orderNos = orderStatusEntityList
+                .stream()
+                .map(x -> x.getOrderNo())
+                .collect(Collectors.toList());
+        List<OrderEntity> orderEntityList = orderService.getByOrderNos(orderNos);
+        List<OrderDTO> orderDTOS = new ArrayList<>();
+        orderEntityList.stream().forEach(x->{
+            OrderDTO orderDTO = new OrderDTO();
+            BeanUtils.copyProperties(x,orderDTO);
+            orderDTOS.add(orderDTO);
+        });
+
+        processRespDTO.setOrderDTOs(orderDTOS);
+        processRespDTO.setOrderStatusDTOs(orderStatusDTOList);
+        return processRespDTO;
     }
 
     public OrderDetailRespDTO queryChangeApplyByOwnerOrderNo(String ownerOrderNo) {

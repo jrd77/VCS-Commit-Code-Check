@@ -13,7 +13,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.List;
 
 @Slf4j
 @RestController
@@ -106,9 +105,9 @@ public class OrderDetailController {
         return responseData;
     }
     @GetMapping("/queryInProcess")
-    public ResponseData<?> queryInProcess(){
-        List<OrderStatusDTO> orderStatusDTOList = orderDetailService.queryInProcess();
-        return ResponseData.success(orderStatusDTOList);
+    public ResponseData<ProcessRespDTO> queryInProcess(){
+        ProcessRespDTO processRespDTO = orderDetailService.queryInProcess();
+        return ResponseData.success(processRespDTO);
     }
     @GetMapping("/queryChangeApplyByOwnerOrderNo")
     public ResponseData<OrderDetailRespDTO> queryChangeApplyByOwnerOrderNo(@Param("ownerOrderNo") String ownerOrderNo){
