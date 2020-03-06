@@ -4,6 +4,7 @@ package com.atzuche.order.wallet.server.mapper;
 import com.atzuche.order.wallet.api.MemAccountStatVO;
 import com.atzuche.order.wallet.server.entity.AccountEntity;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 @Mapper
@@ -23,5 +24,5 @@ public interface AccountMapper {
 
     int updateByPrimaryKey(AccountEntity record);
 
-    List<MemAccountStatVO> statMemAccount(List<String> memNoList);
+    List<MemAccountStatVO> statMemAccount(@Param("memNoList") List<String> memNoList);
 }

@@ -54,7 +54,7 @@
       from account
       where mem_no in
       <foreach collection="memNoList" item="item" open="(" separator="," close=")">
-          #{memNo}
+          #{item}
       </foreach>
       group by mem_no
   </select>

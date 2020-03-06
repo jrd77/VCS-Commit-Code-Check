@@ -7,7 +7,7 @@
         <result column="balance" property="balance"/>
     </resultMap>
     <update id="deductBalance">
-        update member set balance=balance-#{deduct} where reg_no=#{memNo} and balance>deduct;
+        update member set balance=balance-#{deduct} where reg_no=#{memNo} and balance>#{deduct};
     </update>
 
     <select id="getByMemNo" resultMap="base">
