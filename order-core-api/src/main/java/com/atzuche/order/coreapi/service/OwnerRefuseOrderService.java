@@ -127,7 +127,7 @@ public class OwnerRefuseOrderService {
             //撤销优惠券
             //退还优惠券(平台券+送取服务券)
             couponAndCoinHandleService.undoPlatformCoupon(reqVO.getOrderNo());
-            couponAndCoinHandleService.undoPlatformCoupon(reqVO.getOrderNo());
+            couponAndCoinHandleService.undoGetCarFeeCoupon(reqVO.getOrderNo());
             //退还车主券
             if(null != ownerCouponEntity) {
                 String recover = null == orderStatusEntity.getRentCarPayStatus() || orderStatusEntity.getRentCarPayStatus() == 0 ? "1" : "0";
@@ -168,6 +168,19 @@ public class OwnerRefuseOrderService {
         orderStatusMqService.sendOrderStatusByOrderNo(reqVO.getOrderNo(),orderStatusDTO.getStatus(),newOrderMQStatusEventEnum);
 
     }
+
+
+    public void refuse() {
+        //TODO: 拒绝时间相交的订单
+
+
+
+
+    }
+
+
+
+
 
 
     private OrderCancelReasonEntity buildOrderCancelReasonEntity(String orderNo, String ownerOrderNo) {

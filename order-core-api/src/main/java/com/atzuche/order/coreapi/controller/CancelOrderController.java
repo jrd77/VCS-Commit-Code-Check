@@ -101,16 +101,6 @@ public class CancelOrderController {
         return ResponseData.success();
     }
 
-
-    @AutoDocMethod(description = "测试车主取消订单进度后续操作", value = "测试车主取消订单进度后续操作")
-    @PostMapping("/test/owner/cancel/{orderNo}/{dispatcherStatus}")
-    public ResponseData<?> ownerCancelOrder(@PathVariable("orderNo") String orderNo,
-                                            @PathVariable("dispatcherStatus") int dispatcherStatus) {
-        boolean result = ownerOrderFineApplyHandelService.handleFineApplyRecord(orderNo,
-                DispatcherStatusEnum.from(dispatcherStatus));
-        return ResponseData.success(result);
-    }
-
     @GetMapping("/cancelfee")
     public ResponseData<?> cancelOrderFee(@RequestParam(value = "orderNo", required = true) String orderNo) {
         Integer penalty = cancelOrderFeeService.getCancelPenalty(orderNo);

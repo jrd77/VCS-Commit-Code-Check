@@ -46,19 +46,19 @@ public class OwnerAgreeOrderService {
     private static Logger logger = LoggerFactory.getLogger(OwnerAgreeOrderService.class);
 
     @Autowired
-    RefuseOrderCheckService refuseOrderCheckService;
+    private RefuseOrderCheckService refuseOrderCheckService;
 
     @Autowired
-    OrderStatusService orderStatusService;
+    private OrderStatusService orderStatusService;
 
     @Autowired
-    RenterOrderService renterOrderService;
+    private RenterOrderService renterOrderService;
 
     @Autowired
-    OrderFlowService orderFlowService;
+    private OrderFlowService orderFlowService;
 
     @Autowired
-    StockProxyService stockService;
+    private StockProxyService stockService;
 
     @Autowired
     private OrderService orderService;
@@ -74,6 +74,9 @@ public class OwnerAgreeOrderService {
 
     @Autowired
     private OrderStatusMqService orderStatusMqService;
+
+    @Autowired
+    private OwnerRefuseOrderService ownerRefuseOrderService;
 
 
 
@@ -114,7 +117,9 @@ public class OwnerAgreeOrderService {
         renterOrderService.updateRenterOrderInfo(record);
 
         //自动拒绝时间相交的订单
-        //TODO:拒绝时间相交的订单
+        ownerRefuseOrderService.refuse();
+
+
 
         //发送车主同意事件
         orderActionMqService.sendOwnerAgreeOrderSuccess(reqVO.getOrderNo());
