@@ -1922,8 +1922,8 @@ public class OrderSettleNoTService {
             AccountRenterCostDetailReqVO accountRenterCostDetail = new AccountRenterCostDetailReqVO ();
             accountRenterCostDetail.setMemNo(settleOrders.getRenterMemNo());
             accountRenterCostDetail.setOrderNo(settleOrders.getOrderNo());
-            accountRenterCostDetail.setPaySource(com.atzuche.order.commons.enums.cashier.PaySourceEnum.WALLET_PAY.getText());
-            accountRenterCostDetail.setPaySourceCode(com.atzuche.order.commons.enums.cashier.PaySourceEnum.WALLET_PAY.getCode());
+            accountRenterCostDetail.setPaySource(PaySourceEnum.WALLET_PAY.getText());
+            accountRenterCostDetail.setPaySourceCode(PaySourceEnum.WALLET_PAY.getCode());
             accountRenterCostDetail.setRenterCashCodeEnum(RenterCashCodeEnum.CANCEL_RENT_COST_TO_RETURN_AMT);
             accountRenterCostDetail.setAmt(-settleCancelOrdersAccount.getRentSurplusWalletAmt());
             accountRenterCostDetail.setPayType(PayTypeEnum.PAY_PUR.getCode());
