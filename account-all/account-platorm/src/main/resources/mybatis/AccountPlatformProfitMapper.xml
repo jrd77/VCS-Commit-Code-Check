@@ -6,6 +6,7 @@
     <resultMap type="com.atzuche.order.accountplatorm.entity.AccountPlatformProfitEntity" id="BaseResultMap">
         <result property="id" column="id"/>
         <result property="orderNo" column="order_no"/>
+        <result property="ownerOrderNo" column="owner_order_no"/>
         <result property="ownerSubsidyAmt" column="owner_subsidy_amt"/>
         <result property="subsidyOwnerAmt" column="subsidy_owner_amt"/>
         <result property="ownerIncomeAmt" column="owner_income_amt"/>
@@ -28,7 +29,8 @@
 	<sql id="Base_Column_List">
 	`id`, 	
 	`order_no`, 	
-	`owner_subsidy_amt`, 	
+	`owner_order_no`,
+	`owner_subsidy_amt`,
 	`subsidy_owner_amt`, 	
 	`owner_income_amt`, 	
 	`renter_cost`, 	
@@ -56,6 +58,7 @@
         insert into account_platform_profit
         <trim prefix="(" suffix=")" suffixOverrides="," >
             <if test="orderNo != null">`order_no`, </if>
+            <if test="ownerOrderNo != null">`owner_order_no`, </if>
             <if test="ownerSubsidyAmt != null">`owner_subsidy_amt`, </if>
             <if test="subsidyOwnerAmt != null">`subsidy_owner_amt`, </if>
             <if test="ownerIncomeAmt != null">`owner_income_amt`, </if>
@@ -75,6 +78,7 @@
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides="," >
             <if test="orderNo != null">#{orderNo},  </if>
+            <if test="ownerOrderNo != null">#{ownerOrderNo},  </if>
             <if test="ownerSubsidyAmt != null">#{ownerSubsidyAmt},  </if>
             <if test="subsidyOwnerAmt != null">#{subsidyOwnerAmt},  </if>
             <if test="ownerIncomeAmt != null">#{ownerIncomeAmt},  </if>
@@ -98,6 +102,7 @@
 		update account_platform_profit 
 		<set>
 				<if test="orderNo != null">`order_no` = #{orderNo}, </if>
+                <if test="ownerOrderNo != null">`owner_order_no` = #{ownerOrderNo}, </if>
 				<if test="ownerSubsidyAmt != null">`owner_subsidy_amt` = #{ownerSubsidyAmt}, </if>
 				<if test="subsidyOwnerAmt != null">`subsidy_owner_amt` = #{subsidyOwnerAmt}, </if>
 				<if test="ownerIncomeAmt != null">`owner_income_amt` = #{ownerIncomeAmt}, </if>

@@ -19,8 +19,8 @@ import com.autoyol.commons.web.ResponseData;
 public interface FeignCashWithdrawalService {
 
 	@PostMapping("/account/withdraw")
-	public ResponseData<?> cashWithdraw(@Valid @RequestBody AccountOwnerCashExamineReqVO req, BindingResult bindingResult);
+	public ResponseData<?> cashWithdraw(@Valid @RequestBody AccountOwnerCashExamineReqVO req);
 	
 	@GetMapping("/account/withdraw/list")
-    public ResponseData<List<AccountOwnerCashExamineDTO>> listCashWithdrawal(@Valid @RequestBody SearchCashWithdrawalReqDTO req, BindingResult bindingResult);
+    public ResponseData<List<AccountOwnerCashExamineDTO>> listCashWithdrawal(@Valid @RequestBody SearchCashWithdrawalReqDTO req);
 }

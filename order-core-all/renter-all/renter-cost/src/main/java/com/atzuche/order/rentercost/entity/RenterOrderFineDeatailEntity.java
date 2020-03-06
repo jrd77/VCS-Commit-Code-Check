@@ -1,15 +1,16 @@
 package com.atzuche.order.rentercost.entity;
 
+import lombok.Data;
+
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import lombok.Data;
 
 
 /**
  * 租客订单罚金明细表
  * 
  * @author ZhangBin
- * @date 2019-12-23 11:44:27
+ * @date 2020-03-06 14:09:14
  * @Description:
  */
 @Data
@@ -37,7 +38,7 @@ public class RenterOrderFineDeatailEntity implements Serializable {
 	 */
 	private Integer fineAmount;
 	/**
-	 * 罚金补贴方编码（车主/租客/平台）
+	 * 罚金补贴方编码（车主/租客/平台）1-租客，2-车主，3-平台
 	 */
 	private String fineSubsidyCode;
 	/**
@@ -45,7 +46,7 @@ public class RenterOrderFineDeatailEntity implements Serializable {
 	 */
 	private String fineSubsidyDesc;
 	/**
-	 * 罚金来源编码（车主/租客/平台）
+	 * 罚金来源编码（车主/租客/平台）1-租客，2-车主，3-平台
 	 */
 	private String fineSubsidySourceCode;
 	/**
@@ -53,13 +54,21 @@ public class RenterOrderFineDeatailEntity implements Serializable {
 	 */
 	private String fineSubsidySourceDesc;
 	/**
-	 * 罚金类型
+	 * 罚金类型：1-修改订单取车违约金，2-修改订单还车违约金，3-修改订单提前还车违约金，4-取消订单违约金
 	 */
 	private Integer fineType;
 	/**
 	 * 罚金类型描述
 	 */
 	private String fineTypeDesc;
+	/**
+	 * 费用编码
+	 */
+	private String costCode;
+	/**
+	 * 费用名称
+	 */
+	private String costName;
 	/**
 	 * 操作人ID
 	 */

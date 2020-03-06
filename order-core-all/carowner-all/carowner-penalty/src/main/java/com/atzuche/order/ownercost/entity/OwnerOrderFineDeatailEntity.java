@@ -1,15 +1,16 @@
 package com.atzuche.order.ownercost.entity;
 
+import lombok.Data;
+
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import lombok.Data;
 
 
 /**
  * 车主订单罚金明细表
  * 
  * @author ZhangBin
- * @date 2020-01-09 11:30:07
+ * @date 2020-03-06 14:09:14
  * @Description:
  */
 @Data
@@ -53,13 +54,21 @@ public class OwnerOrderFineDeatailEntity implements Serializable {
 	 */
 	private String fineSubsidySourceDesc;
 	/**
-	 * 罚金类型：1-车主修改交接车地址罚金，4-取消订单违约金
+	 * 罚金类型：1-车主修改交接车地址罚金，3-修改订单提前还车违约金,4-取消订单违约金
 	 */
 	private Integer fineType;
 	/**
 	 * 罚金类型描述
 	 */
 	private String fineTypeDesc;
+	/**
+	 * 费用编码
+	 */
+	private String costCode;
+	/**
+	 * 费用名称
+	 */
+	private String costName;
 	/**
 	 * 操作人ID
 	 */
