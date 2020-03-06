@@ -1,6 +1,7 @@
 package com.atzuche.order.wallet.server.service;
 
 import com.atzuche.order.wallet.api.AccountVO;
+import com.atzuche.order.wallet.api.MemAccountStatVO;
 import com.atzuche.order.wallet.server.entity.AccountEntity;
 import com.atzuche.order.wallet.server.mapper.AccountMapper;
 import com.atzuche.order.wallet.server.util.AESEncrypter;
@@ -31,6 +32,13 @@ public class AccountService {
         AccountVO accountVO = convert(entity);
         return accountVO;
     }
+
+
+    public List<MemAccountStatVO> findByMemNo(List<String> memNoList){
+        return accountMapper.statMemAccount(memNoList);
+    }
+
+
 
 
 

@@ -1,6 +1,7 @@
 package com.atzuche.order.wallet.server.mapper;
 
 
+import com.atzuche.order.wallet.api.MemAccountStatVO;
 import com.atzuche.order.wallet.server.entity.AccountEntity;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -21,4 +22,6 @@ public interface AccountMapper {
     int updateByPrimaryKeySelective(AccountEntity record);
 
     int updateByPrimaryKey(AccountEntity record);
+
+    List<MemAccountStatVO> statMemAccount(List<String> memNoList);
 }
