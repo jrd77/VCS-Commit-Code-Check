@@ -65,7 +65,7 @@ public class RemoteAccountService {
             DeductBalanceVO deductBalanceVO = new DeductBalanceVO();
             deductBalanceVO.setMemNo(memNo);
             deductBalanceVO.setDeduct(deduct);
-            responseData = accountFeignService.deductBalance(deductBalanceVO, null);
+            responseData = accountFeignService.deductBalance(deductBalanceVO);
             ResponseCheckUtil.checkResponse(responseData);
             t.setStatus(Transaction.SUCCESS);
         }catch (Exception e){

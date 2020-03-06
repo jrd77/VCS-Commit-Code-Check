@@ -8,6 +8,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.atzuche.order.accountrenterrentcost.service.AccountRenterCostSettleService;
 import com.atzuche.order.commons.entity.dto.CostBaseDTO;
 import com.atzuche.order.commons.entity.dto.OwnerGoodsDetailDTO;
 import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
@@ -72,6 +73,8 @@ public class ModifyOrderFeeService {
 	private ModifyOrderForOwnerService modifyOrderForOwnerService;
 	@Autowired
 	private OwnerOrderService ownerOrderService;
+	@Autowired
+	private AccountRenterCostSettleService accountRenterCostSettleService;
 
 	/**
 	 * 获取修改订单前后费用
@@ -137,7 +140,56 @@ public class ModifyOrderFeeService {
 		ModifyOrderFeeVO updateModifyOrderFeeVO = getUpdateModifyOrderFeeVO(renterOrderCostRespDTO, renterFineList);
 		modifyOrderCompareVO.setInitModifyOrderFeeVO(initModifyOrderFeeVO);
 		modifyOrderCompareVO.setUpdateModifyOrderFeeVO(updateModifyOrderFeeVO);
+		modifyOrderCompareVO.setCleanSupplementAmt(0);
+		// 已付租车费用(shifu  租车费用的实付)
+		int rentAmtPayed = accountRenterCostSettleService.getCostPaidRent(orderNo,modifyOrderReq.getMemNo());
+		// 应付
+		int payable = getTotalRentCarFee(updateModifyOrderFeeVO);
+		if (rentAmtPayed > Math.abs(payable)) {
+			// 实付大于应付，不需要支付
+			modifyOrderCompareVO.setCleanSupplementAmt(1);
+		}
 		return modifyOrderCompareVO;
+	}
+	
+	
+	/**
+	 * 获取总费用
+	 * @param updateModifyOrderFeeVO
+	 * @return
+	 */
+	public int getTotalRentCarFee(ModifyOrderFeeVO updateModifyOrderFeeVO) {
+		if (updateModifyOrderFeeVO == null) {
+			return 0;
+		}
+		int totalRentCarFee = 0;
+		ModifyOrderCostVO modifyOrderCostVO = updateModifyOrderFeeVO.getModifyOrderCostVO();
+		if (modifyOrderCostVO != null) {
+			totalRentCarFee += (modifyOrderCostVO.getRentAmt() == null ? 0:modifyOrderCostVO.getRentAmt());
+			totalRentCarFee += (modifyOrderCostVO.getPoundageAmt() == null ? 0:modifyOrderCostVO.getPoundageAmt());
+			totalRentCarFee += (modifyOrderCostVO.getInsuranceAmt() == null ? 0:modifyOrderCostVO.getInsuranceAmt());
+			totalRentCarFee += (modifyOrderCostVO.getAbatementAmt() == null ? 0:modifyOrderCostVO.getAbatementAmt());
+			totalRentCarFee += (modifyOrderCostVO.getTotalDriverFee() == null ? 0:modifyOrderCostVO.getTotalDriverFee());
+			totalRentCarFee += (modifyOrderCostVO.getGetCost() == null ? 0:modifyOrderCostVO.getGetCost());
+			totalRentCarFee += (modifyOrderCostVO.getReturnCost() == null ? 0:modifyOrderCostVO.getReturnCost());
+			totalRentCarFee += (modifyOrderCostVO.getGetBlockedRaiseAmt() == null ? 0:modifyOrderCostVO.getGetBlockedRaiseAmt());
+			totalRentCarFee += (modifyOrderCostVO.getReturnBlockedRaiseAmt() == null ? 0:modifyOrderCostVO.getReturnBlockedRaiseAmt());
+		}
+		ModifyOrderDeductVO modifyOrderDeductVO = updateModifyOrderFeeVO.getModifyOrderDeductVO();
+		if (modifyOrderDeductVO != null) {
+			totalRentCarFee += (modifyOrderDeductVO.getOwnerCouponOffsetCost() == null ? 0:modifyOrderDeductVO.getOwnerCouponOffsetCost());
+			totalRentCarFee += (modifyOrderDeductVO.getReductionAmt() == null ? 0:modifyOrderDeductVO.getReductionAmt());
+			totalRentCarFee += (modifyOrderDeductVO.getDiscouponAmt() == null ? 0:modifyOrderDeductVO.getDiscouponAmt());
+			totalRentCarFee += (modifyOrderDeductVO.getGetCarFeeDiscouponOffsetAmt() == null ? 0:modifyOrderDeductVO.getGetCarFeeDiscouponOffsetAmt());
+			totalRentCarFee += (modifyOrderDeductVO.getAutoCoinDeductibleAmt() == null ? 0:modifyOrderDeductVO.getAutoCoinDeductibleAmt());
+		}
+		ModifyOrderFineVO modifyOrderFineVO = updateModifyOrderFeeVO.getModifyOrderFineVO();
+		if (modifyOrderFineVO != null) {
+			totalRentCarFee += (modifyOrderFineVO.getPenaltyAmt() == null ? 0:modifyOrderFineVO.getPenaltyAmt());
+			totalRentCarFee += (modifyOrderFineVO.getGetFineAmt() == null ? 0:modifyOrderFineVO.getGetFineAmt());
+			totalRentCarFee += (modifyOrderFineVO.getReturnFineAmt() == null ? 0:modifyOrderFineVO.getReturnFineAmt());
+		}
+		return totalRentCarFee;
 	}
 	
 	
