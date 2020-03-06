@@ -1,6 +1,7 @@
 package com.atzuche.order.coreapi.task;
 
 import com.atzuche.order.commons.CatConstants;
+import com.atzuche.order.commons.entity.orderDetailDto.OrderDTO;
 import com.atzuche.order.coreapi.service.RemindPayIllegalCrashService;
 import com.atzuche.order.coreapi.utils.SMSTaskDateTimeUtils;
 import com.atzuche.order.parentorder.entity.OrderStatusEntity;
@@ -40,11 +41,11 @@ public class NoPayRentCarHalfHoursTask extends IJobHandler {
             Cat.logEvent(CatConstants.XXL_JOB_PARAM, null);
             logger.info("开始执行 距离支付结束时间只有30分钟时，如还未支付租车押金  定时器");
             XxlJobLogger.log("开始执行 距离支付结束时间只有30分钟时，如还未支付租车押金定时器");
-            List<ViolateBO> orderNos = remindPayIllegalCrashService.findProcessOrderInfo();
+            List<OrderDTO> orderNos = remindPayIllegalCrashService.findProcessOrderInfo();
             if (CollectionUtils.isEmpty(orderNos)) {
                 return SUCCESS;
             }
-            for (ViolateBO violateBO : orderNos) {
+            for (OrderDTO violateBO : orderNos) {
                 OrderStatusEntity orderStatusEntity = orderStatusService.getByOrderNo(violateBO.getOrderNo());
                 if (orderStatusEntity.getRentCarPayStatus().intValue() == 0) {
                     if (SMSTaskDateTimeUtils.getDateLatterCompareNowScoend(orderStatusEntity.getCreateTime(), 60) == 30) {

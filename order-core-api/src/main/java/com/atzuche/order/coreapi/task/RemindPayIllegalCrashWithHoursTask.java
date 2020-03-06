@@ -2,6 +2,7 @@ package com.atzuche.order.coreapi.task;
 
 import com.atzuche.order.commons.CatConstants;
 import com.atzuche.order.commons.DateUtils;
+import com.atzuche.order.commons.entity.orderDetailDto.OrderDTO;
 import com.atzuche.order.commons.enums.OrderStatusEnum;
 import com.atzuche.order.commons.vo.req.CancelOrderReqVO;
 import com.atzuche.order.coreapi.listener.sms.SMSOrderBaseEventService;
@@ -53,26 +54,26 @@ public class RemindPayIllegalCrashWithHoursTask extends IJobHandler {
             Cat.logEvent(CatConstants.XXL_JOB_PARAM,null);
             logger.info("开始执行 取车时间前24小时、12小时、6小时、2小时、1小时、30分钟提醒支付违章押金  定时器");
             XxlJobLogger.log("开始执行 取车时间前24小时、12小时、6小时、2小时、1小时、30分钟提醒支付违章押金 定时器");
-            List<ViolateBO> orderNos = remindPayIllegalCrashService.findProcessOrderInfo();
+            List<OrderDTO> orderNos = remindPayIllegalCrashService.findProcessOrderInfo();
             if (CollectionUtils.isEmpty(orderNos)) {
                 return SUCCESS;
             }
-            for (ViolateBO violateBO : orderNos) {
+            for (OrderDTO violateBO : orderNos) {
                 OrderStatusEntity orderStatusEntity = orderStatusService.getByOrderNo(violateBO.getOrderNo());
                 if (orderStatusEntity.getDepositPayStatus().intValue() == 1 && orderStatusEntity.getWzPayStatus().intValue() == 0) {
                     //没有支付违章押金
-                    boolean is24HoursAgo = SMSTaskDateTimeUtils.isArriveRentTime(DateUtil.asDateTime(violateBO.getRentTime()), 24);
-                    remindPayIllegalCrashService.sendShortMessageData(is24HoursAgo, violateBO);
-                    boolean is12HoursAgo = SMSTaskDateTimeUtils.isArriveRentTime(DateUtil.asDateTime(violateBO.getRentTime()), 12);
-                    remindPayIllegalCrashService.sendShortMessageData(is12HoursAgo, violateBO);
-                    boolean is6HoursAgo = SMSTaskDateTimeUtils.isArriveRentTime(DateUtil.asDateTime(violateBO.getRentTime()), 6);
-                    remindPayIllegalCrashService.sendShortMessageData(is6HoursAgo, violateBO);
-                    boolean is2HoursAgo = SMSTaskDateTimeUtils.isArriveRentTime(DateUtil.asDateTime(violateBO.getRentTime()), 2);
-                    remindPayIllegalCrashService.sendShortMessageData(is2HoursAgo, violateBO);
-                    boolean is1HoursAgo = SMSTaskDateTimeUtils.isArriveRentTime(DateUtil.asDateTime(violateBO.getRentTime()), 1);
-                    remindPayIllegalCrashService.sendShortMessageData(is1HoursAgo, violateBO);
-                    boolean isHoursAgo = SMSTaskDateTimeUtils.isArriveRentTime(DateUtil.asDateTime(violateBO.getRentTime()), 0.5);
-                    remindPayIllegalCrashService.sendShortMessageData(isHoursAgo, violateBO);
+                    boolean is24HoursAgo = SMSTaskDateTimeUtils.isArriveRentTime(DateUtil.asDateTime(violateBO.getExpRentTime()), 24);
+                    remindPayIllegalCrashService.sendShortMessageData(is24HoursAgo, violateBO.getOrderNo());
+                    boolean is12HoursAgo = SMSTaskDateTimeUtils.isArriveRentTime(DateUtil.asDateTime(violateBO.getExpRentTime()), 12);
+                    remindPayIllegalCrashService.sendShortMessageData(is12HoursAgo, violateBO.getOrderNo());
+                    boolean is6HoursAgo = SMSTaskDateTimeUtils.isArriveRentTime(DateUtil.asDateTime(violateBO.getExpRentTime()), 6);
+                    remindPayIllegalCrashService.sendShortMessageData(is6HoursAgo, violateBO.getOrderNo());
+                    boolean is2HoursAgo = SMSTaskDateTimeUtils.isArriveRentTime(DateUtil.asDateTime(violateBO.getExpRentTime()), 2);
+                    remindPayIllegalCrashService.sendShortMessageData(is2HoursAgo, violateBO.getOrderNo());
+                    boolean is1HoursAgo = SMSTaskDateTimeUtils.isArriveRentTime(DateUtil.asDateTime(violateBO.getExpRentTime()), 1);
+                    remindPayIllegalCrashService.sendShortMessageData(is1HoursAgo, violateBO.getOrderNo());
+                    boolean isHoursAgo = SMSTaskDateTimeUtils.isArriveRentTime(DateUtil.asDateTime(violateBO.getExpRentTime()), 0.5);
+                    remindPayIllegalCrashService.sendShortMessageData(isHoursAgo, violateBO.getOrderNo());
                 }
             }
             logger.info("结束执行 取车时间前24小时、12小时、6小时、2小时、1小时、30分钟提醒支付违章押金 ");
