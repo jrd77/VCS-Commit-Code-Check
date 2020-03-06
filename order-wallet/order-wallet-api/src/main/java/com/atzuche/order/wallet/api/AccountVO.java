@@ -14,6 +14,8 @@ import java.time.LocalDateTime;
 @ToString
 public class AccountVO implements Serializable {
 
+    private Integer id;
+
     /**
      * 会员号
      */

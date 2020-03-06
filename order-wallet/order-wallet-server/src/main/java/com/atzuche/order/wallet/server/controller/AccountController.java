@@ -43,6 +43,16 @@ public class AccountController {
         return ResponseData.success(memAccount);
     }
 
+    @RequestMapping(value = "account/stat",method = RequestMethod.POST)
+    public ResponseData<MemAccountStatRespVO> statMemAccount(@Valid @RequestBody MemAccountStatReqVO reqVO,BindingResult result){
+        logger.info("statMemAccount param is [{}]",reqVO);
+        BindingResultUtil.checkBindingResult(result);
+        List<MemAccountStatVO> list = accountService.findByMemNo(reqVO.getMemNoList());
+        MemAccountStatRespVO respVO = new MemAccountStatRespVO();
+        respVO.setStatVOList(list);
+        return ResponseData.success(respVO);
+    }
+
     @RequestMapping(value = "account/id",method = RequestMethod.GET)
     public ResponseData<AccountVO> findAccountByMemNo(@RequestParam("id")Integer id)throws Exception{
         AccountVO accountVO = accountService.getById(id);
