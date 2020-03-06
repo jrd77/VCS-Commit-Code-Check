@@ -8,6 +8,8 @@ import java.util.List;
 @Mapper
 public interface AccountMapper {
 
+    AccountEntity getById(Integer id);
+
     List<AccountEntity> findByMemNo(String memNo);
 
     int insert(AccountEntity record);

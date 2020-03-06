@@ -24,6 +24,10 @@ public interface AccountFeignService {
     @RequestMapping(value = "account/get",method = RequestMethod.GET)
     public ResponseData<MemAccount> findAccountByMemNo(@RequestParam("memNo") String memNo);
 
+
+    @RequestMapping(value = "account/id",method = RequestMethod.GET)
+    public ResponseData<AccountVO> findAccountByMemNo(@RequestParam("id")Integer id);
+
     /**
      * 扣减用户的提现余额
      * @param deductBalanceVO

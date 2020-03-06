@@ -1,6 +1,7 @@
 package com.atzuche.order.wallet.server.controller;
 
 import com.atzuche.order.commons.BindingResultUtil;
+import com.atzuche.order.commons.exceptions.AccountNotExistException;
 import com.atzuche.order.commons.exceptions.InputErrorException;
 import com.atzuche.order.wallet.api.*;
 import com.atzuche.order.wallet.server.service.AccountService;
@@ -40,6 +41,15 @@ public class AccountController {
         memAccount.setMemNo(memNo);
         memAccount.setAccounts(accountVOList);
         return ResponseData.success(memAccount);
+    }
+
+    @RequestMapping(value = "account/id",method = RequestMethod.GET)
+    public ResponseData<AccountVO> findAccountByMemNo(@RequestParam("id")Integer id)throws Exception{
+        AccountVO accountVO = accountService.getById(id);
+        if(accountVO==null){
+            throw new AccountNotExistException("id="+id);
+        }
+        return ResponseData.success(accountVO);
     }
 
     @RequestMapping(value = "balance/deduct",method = RequestMethod.POST)
