@@ -581,9 +581,9 @@ public class OrderDetailService {
             BeanUtils.copyProperties(renterOrderChangeApplyEntity,renterOrderChangeApplyDTO);
             Integer ownerRentAmt = 0;
             try{
-                ownerRentAmt = modifyOrderFeeService.getOwnerRentAmt(renterOrderNo);
+                ownerRentAmt = modifyOrderFeeService.getOwnerRentAmt(renterOrderChangeApplyEntity.getRenterOrderNo());
             }catch (Exception e){
-                log.error("计算预算租金失败modifyOrderFeeService.getOwnerRentAmt renterOrderNo={}",renterOrderNo);
+                log.error("计算预算租金失败modifyOrderFeeService.getOwnerRentAmt renterOrderNo={}",renterOrderChangeApplyEntity.getRenterOrderNo());
             }
             orderDetailRespDTO.changeApplyPreIncomAmt = ownerRentAmt;
         }
@@ -1595,5 +1595,59 @@ public class OrderDetailService {
             orderStatusDTOList.add(orderStatusDTO);
             });
         return orderStatusDTOList;
+    }
+
+    public OrderDetailRespDTO queryChangeApplyByOwnerOrderNo(String ownerOrderNo) {
+        OrderDetailRespDTO orderDetailRespDTO = new OrderDetailRespDTO();
+        //主订单
+        OwnerOrderEntity ownerOrderEntity = ownerOrderService.getOwnerOrderByOwnerOrderNo(ownerOrderNo);
+        OwnerOrderDTO ownerOrderDTO = null;
+        if(ownerOrderEntity == null){
+            log.error("车主子订单号获取订单为空ownerOrderNo={}",ownerOrderNo);
+            throw new OwnerOrderNotFoundException(ownerOrderNo);
+        }
+        ownerOrderDTO = new OwnerOrderDTO();
+        BeanUtils.copyProperties(ownerOrderEntity,ownerOrderDTO);
+
+
+        //主订单
+        OrderEntity orderEntity = orderService.getOrderEntity(ownerOrderEntity.getOrderNo());
+        if(orderEntity == null){
+            log.error("获取订单数据为空orderNo={}",ownerOrderEntity.getOrderNo());
+            throw new OrderNotFoundException(ownerOrderEntity.getOrderNo());
+        }
+        OrderDTO orderDTO = new OrderDTO();
+        BeanUtils.copyProperties(orderEntity,orderDTO);
+
+        //订单状态
+        OrderStatusEntity orderStatusEntity = orderStatusService.getByOrderNo(orderEntity.getOrderNo());
+        OrderStatusDTO orderStatusDTO = null;
+        if(orderStatusEntity != null){
+            orderStatusDTO = new OrderStatusDTO();
+            BeanUtils.copyProperties(orderStatusEntity,orderStatusDTO);
+        }
+
+        //租客修改申请
+        RenterOrderChangeApplyEntity renterOrderChangeApplyEntity = renterOrderChangeApplyService.getByOwnerOrderNoAndAuditStatus(ownerOrderNo, 0);
+        RenterOrderChangeApplyDTO renterOrderChangeApplyDTO = null;
+
+        if(renterOrderChangeApplyEntity != null){
+            orderDetailRespDTO.changeApplyRenterOrderNo = renterOrderChangeApplyEntity.getRenterOrderNo();
+            orderDetailRespDTO.isChangeApply = true;
+            renterOrderChangeApplyDTO = new RenterOrderChangeApplyDTO();
+            BeanUtils.copyProperties(renterOrderChangeApplyEntity,renterOrderChangeApplyDTO);
+            Integer ownerRentAmt = 0;
+            try{
+                ownerRentAmt = modifyOrderFeeService.getOwnerRentAmt(renterOrderChangeApplyEntity.getRenterOrderNo());
+            }catch (Exception e){
+                log.error("计算预算租金失败modifyOrderFeeService.getOwnerRentAmt renterOrderNo={}",renterOrderChangeApplyEntity.getRenterOrderNo());
+            }
+            orderDetailRespDTO.changeApplyPreIncomAmt = ownerRentAmt;
+        }
+        orderDetailRespDTO.order = orderDTO;
+        orderDetailRespDTO.orderStatus = orderStatusDTO;
+        orderDetailRespDTO.ownerOrder = ownerOrderDTO;
+        orderDetailRespDTO.renterOrderChangeApplyDTO = renterOrderChangeApplyDTO;
+        return orderDetailRespDTO;
     }
 }

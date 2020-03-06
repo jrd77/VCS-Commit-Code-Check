@@ -84,4 +84,7 @@ public interface FeignOrderDetailService {
 
     @GetMapping("/order/detail/queryInProcess")
     public ResponseData<List<OrderStatusDTO>> queryInProcess();
+
+    @GetMapping("/order/detail/queryChangeApplyByOwnerOrderNo")
+    public ResponseData<OrderDetailRespDTO> queryChangeApplyByOwnerOrderNo(String ownerOrderNo);
 }
