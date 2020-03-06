@@ -22,7 +22,6 @@ import com.atzuche.order.accountrenterwzdepost.entity.AccountRenterWzDepositEnti
 import com.atzuche.order.cashieraccount.service.CashierQueryService;
 import com.atzuche.order.commons.BindingResultUtil;
 import com.atzuche.order.commons.exceptions.OrderNotFoundException;
-import com.atzuche.order.commons.exceptions.OwnerOrderNotFoundException;
 import com.atzuche.order.commons.vo.req.OrderCostReqVO;
 import com.atzuche.order.commons.vo.req.OwnerCostSettleDetailReqVO;
 import com.atzuche.order.coreapi.service.OrderCostService;

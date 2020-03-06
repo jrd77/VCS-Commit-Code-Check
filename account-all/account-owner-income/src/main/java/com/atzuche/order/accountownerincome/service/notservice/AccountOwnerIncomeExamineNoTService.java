@@ -1,12 +1,13 @@
 package com.atzuche.order.accountownerincome.service.notservice;
 
-import com.atzuche.order.accountownerincome.exception.AccountOwnerIncomeExamineException;
+import com.alibaba.fastjson.JSON;
 import com.atzuche.order.accountownerincome.entity.AccountOwnerIncomeExamineEntity;
+import com.atzuche.order.accountownerincome.exception.AccountOwnerIncomeExamineException;
 import com.atzuche.order.accountownerincome.exception.AccountOwnerIncomeSettleException;
 import com.atzuche.order.accountownerincome.mapper.AccountOwnerIncomeExamineMapper;
-import com.atzuche.order.commons.enums.account.income.AccountOwnerIncomeExamineStatus;
 import com.atzuche.order.commons.vo.req.income.AccountOwnerIncomeExamineOpReqVO;
 import com.atzuche.order.commons.vo.req.income.AccountOwnerIncomeExamineReqVO;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +24,7 @@ import java.util.Objects;
  * @author ZhangBin
  * @date 2019-12-11 17:44:19
  */
+@Slf4j
 @Service
 public class AccountOwnerIncomeExamineNoTService {
     @Autowired
@@ -42,7 +44,9 @@ public class AccountOwnerIncomeExamineNoTService {
         accountOwnerIncomeExamineEntity.setIsDelete(NumberUtils.INTEGER_ZERO);
 
         int result = accountOwnerIncomeExamineMapper.insertSelective(accountOwnerIncomeExamineEntity);
+        log.info("车主收益审核录入结果result={},accountOwnerIncomeExamineEntity={}",result, JSON.toJSONString(accountOwnerIncomeExamineEntity));
         if(result==0){
+            log.error("车主收益审核录入失败result={},accountOwnerIncomeExamineEntity={}",result,JSON.toJSONString(accountOwnerIncomeExamineEntity));
             throw new AccountOwnerIncomeSettleException();
         }
     }

@@ -1212,7 +1212,7 @@ public class OrderSettleNoTService {
         }
         return costTypeEnum;
     }
-    public CostTypeEnum getCostTypeEnumBySubsidy(String fineSubsidyCode){
+    public static CostTypeEnum getCostTypeEnumBySubsidy(String fineSubsidyCode){
         CostTypeEnum costTypeEnum = CostTypeEnum.OWNER_SUBSIDY;
         if(SubsidySourceCodeEnum.PLATFORM.getCode().equals(fineSubsidyCode)){
             costTypeEnum = CostTypeEnum.CONSOLE_SUBSIDY;
@@ -1628,14 +1628,13 @@ public class OrderSettleNoTService {
      * @param settleOrders
      */
     public void getCancelOwnerCostSettleDetail(SettleOrders settleOrders) {
-        OwnerCosts ownerCosts = new OwnerCosts();
         //1 获取全局的车主订单罚金明细
         List<ConsoleOwnerOrderFineDeatailEntity> consoleOwnerOrderFineDeatailEntitys = consoleOwnerOrderFineDeatailService.selectByOrderNo(settleOrders.getOrderNo());
-
         //2 车主罚金
         List<OwnerOrderFineDeatailEntity> ownerOrderFineDeatails = ownerOrderFineDeatailService.getOwnerOrderFineDeatailByOrderNo(settleOrders.getOrderNo());
         //不考虑补贴? 车主和管理后台补贴? 非正常的结算，异常终止，可以理解为管理后台的都不计算。只考虑违约金的情况。
-        
+
+        OwnerCosts ownerCosts = new OwnerCosts();
         ownerCosts.setOwnerOrderFineDeatails(ownerOrderFineDeatails);
         ownerCosts.setConsoleOwnerOrderFineDeatailEntitys(consoleOwnerOrderFineDeatailEntitys);
         settleOrders.setOwnerCosts(ownerCosts);
@@ -1769,7 +1768,7 @@ public class OrderSettleNoTService {
             }).mapToInt(ConsoleOwnerOrderFineDeatailEntity::getFineAmount).sum();
             platformFineImconeAmt = platformFineImconeAmt +amt;
         }
-        if(Objects.nonNull(ownerCosts) && !CollectionUtils.isEmpty(rentCosts.getRenterOrderFineDeatails())){
+        if(Objects.nonNull(rentCosts) && !CollectionUtils.isEmpty(rentCosts.getRenterOrderFineDeatails())){
             //过滤的时候-->只过滤出租客并且是取消订单的违约金并且目标方式平台
             int amt = rentCosts.getConsoleRenterOrderFineDeatails().stream().filter(obj ->{
                 return SubsidySourceCodeEnum.PLATFORM.getCode().equals(obj.getFineSubsidyCode()) && FineTypeEnum.CANCEL_FINE.getFineType().equals(obj.getFineType());
@@ -1793,6 +1792,7 @@ public class OrderSettleNoTService {
         settleCancelOrdersAccount.setPlatformFineImconeAmt(platformFineImconeAmt);
         return settleCancelOrdersAccount;
     }
+
 
     /**
      * 车主存在 罚金 走历史欠款

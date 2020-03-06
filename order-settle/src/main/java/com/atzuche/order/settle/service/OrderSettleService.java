@@ -32,6 +32,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -54,8 +55,8 @@ public class OrderSettleService{
     @Autowired private CashierPayService cashierPayService;
     @Autowired private CashierQueryService cashierQueryService;
     @Autowired private OrderSupplementDetailService orderSupplementDetailService;
-
-
+    @Autowired private OwnerOrderSettleService ownerOrderSettleService;
+    @Autowired private RenterOrderSettleService renterOrderSettleService;
     /**
      * 查询所以费用
      */
@@ -213,28 +214,6 @@ public class OrderSettleService{
         }
         log.info("OrderPayCallBack payCallBack end " );
     }
-    /*
-     * @Author ZhangBin
-     * @Date 2020/3/5 10:20
-     * @Description: 订单取消-车主结算
-     * @param orderNo 主订单号
-     * @param ownerOrderNo 车主子订单号
-     * @param ownerMemNo 车主会员号
-     * @return
-     **/
-    @Transactional(rollbackFor=Exception.class)
-    public boolean settleOwnerOrderCancel(String orderNo,String ownerOrderNo,String ownerMemNo){
-        OrderStatusDTO orderStatusDTO = new OrderStatusDTO();
-        orderStatusDTO.setOrderNo(orderNo);
-
-        return false;
-    }
-
-    public boolean settleRenterOrderCancel(String orderNo,String renterOrderno,String renterMemNo){
-        return false;
-    }
-
-
 
 
     /**
@@ -262,11 +241,11 @@ public class OrderSettleService{
             orderSettleNoTService.getCancelOwnerCostSettleDetail(settleOrders);
             Cat.logEvent("settleOrdersFine",GsonUtils.toJson(settleOrders));
             log.info("OrderPayCallBack settleOrderCancel settleOrders [{}] ",GsonUtils.toJson(settleOrders));
-            //4 查询 租客实际 付款金额（包含 租车费用，车俩押金，违章押金，钱包，罚金）
+            //4 查询 租客实际 付款金额（包含 租车费用，车俩押金，违章押金，钱包，罚金） 车主
             SettleCancelOrdersAccount settleCancelOrdersAccount = orderSettleNoTService.initSettleCancelOrdersAccount(settleOrders);
             Cat.logEvent("settleCancelOrdersAccount",GsonUtils.toJson(settleCancelOrdersAccount));
             log.info("OrderPayCallBack settleCancelOrdersAccount settleCancelOrdersAccount [{}] ",GsonUtils.toJson(settleCancelOrdersAccount));
-            if(true)return false;
+
             //5 处理 租客 车主 平台 罚金收入（将三方金额统计到结算表中）
             orderSettleNoTService.handleIncomeFine(settleOrders,settleCancelOrdersAccount);
             Cat.logEvent("handleIncomeFine",GsonUtils.toJson(settleCancelOrdersAccount));
@@ -307,4 +286,34 @@ public class OrderSettleService{
         }
         return true;
     }
+    /*
+     * @Author ZhangBin
+     * @Date 2020/3/6 11:47
+     * @Description: 订单取消-组合结算
+     *
+     **/
+    public void orderCancelSettleCombination(CancelOrderReqDTO cancelOrderReqDTO){
+        String orderNo = cancelOrderReqDTO.getOrderNo();
+        String ownerOrderNo = cancelOrderReqDTO.getOwnerOrderNo();
+        String renterOrderNo = cancelOrderReqDTO.getRenterOrderNo();
+        if(StringUtils.isEmpty(orderNo)){
+            log.error("主订单号不能为空");
+            return;
+        }
+        if(cancelOrderReqDTO.isSettleOwnerFlg() && StringUtils.isEmpty(ownerOrderNo)){
+            log.error("车主端结算，车主子订单号不能为空");
+            return;
+        }
+        if(cancelOrderReqDTO.isSettleRenterFlg() && StringUtils.isEmpty(renterOrderNo)){
+            log.error("租客端结算，租客子订单号不能为空");
+            return;
+        }
+        if(cancelOrderReqDTO.isSettleOwnerFlg()){
+            ownerOrderSettleService.settleOwnerOrderCancel(orderNo,ownerOrderNo);
+        }
+        if(cancelOrderReqDTO.isSettleRenterFlg()){
+            renterOrderSettleService.settleRenterOrderCancel(orderNo,renterOrderNo);
+        }
+    }
+
 }
