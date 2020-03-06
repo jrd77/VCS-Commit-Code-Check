@@ -292,6 +292,7 @@ public class OrderSettleService{
      * @Description: 订单取消-组合结算
      *
      **/
+    @Transactional(rollbackFor=Exception.class)
     public void orderCancelSettleCombination(CancelOrderReqDTO cancelOrderReqDTO){
         String orderNo = cancelOrderReqDTO.getOrderNo();
         String ownerOrderNo = cancelOrderReqDTO.getOwnerOrderNo();

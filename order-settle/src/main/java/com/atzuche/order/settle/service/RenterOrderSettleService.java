@@ -25,6 +25,7 @@ import com.atzuche.order.settle.vo.req.SettleOrders;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import java.util.Objects;
@@ -35,6 +36,7 @@ import java.util.Objects;
  * @Description: 租客端结算
  *
  **/
+@Service
 @Slf4j
 public class RenterOrderSettleService {
     @Autowired

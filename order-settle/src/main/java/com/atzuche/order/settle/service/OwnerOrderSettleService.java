@@ -29,7 +29,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
@@ -67,7 +66,6 @@ public class OwnerOrderSettleService {
      * @param ownerMemNo 车主会员号
      * @return
      **/
-    @Transactional(rollbackFor=Exception.class)
     public void settleOwnerOrderCancel(String orderNo,String ownerOrderNo){
         OrderStatusDTO orderStatusDTO = new OrderStatusDTO();
         orderStatusDTO.setOrderNo(orderNo);
@@ -195,6 +193,7 @@ public class OwnerOrderSettleService {
         AccountPlatformProfitEntity accountPlatformProfitEntity = new AccountPlatformProfitEntity();
         accountPlatformProfitEntity.setOrderNo(settleOrders.getOrderNo());
         accountPlatformProfitEntity.setStatus(PlatformProfitStatusEnum.CANCEL_SETTLE.getCode());
+        accountPlatformProfitEntity.setOwnerOrderNo(settleOrders.getOwnerOrderNo());
 
        //车主收益或者罚金的处理
         this.repayHistoryDebtOwner(settleOrders,settleCancelOrdersAccount);
@@ -214,7 +213,6 @@ public class OwnerOrderSettleService {
             accountPlatformProfitEntity.setPlatformReceivedAmt(settleCancelOrdersAccount.getPlatformFineImconeAmt());
         }
         //insert 结算总表 account_platform_profit(平台订单收益结算表)
-        //TODO  这里单边结算，是否需要知道是哪一个子订单结算的结果，是否应该插入车主子订单号
         cashierSettleService.insertAccountPlatformProfit(accountPlatformProfitEntity);
     }
     /*
