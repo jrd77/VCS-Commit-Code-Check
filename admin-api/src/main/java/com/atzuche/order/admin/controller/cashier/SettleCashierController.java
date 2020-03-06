@@ -60,7 +60,7 @@ public class SettleCashierController {
 
     @AutoDocMethod(value = "订单取消结算", description = "订单取消结算", response = String.class)
     @PostMapping("/orderCancelSettleCombination")
-    public ResponseData<?> orderCancelSettleCombination(CancelOrderReqDTO cancelOrderReqDTO){
+    public ResponseData<?> orderCancelSettleCombination(@RequestBody CancelOrderReqDTO cancelOrderReqDTO){
         log.info("取消订单-结算SettleCashierController.orderCancelSettleCombination cancelOrderReqDTO={}", JSON.toJSONString(cancelOrderReqDTO));
         orderSettleService.orderCancelSettleCombination(cancelOrderReqDTO);
         return ResponseData.success();
