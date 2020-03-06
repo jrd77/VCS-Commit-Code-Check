@@ -24,20 +24,35 @@ public interface AccountFeignService {
     @RequestMapping(value = "account/get",method = RequestMethod.GET)
     public ResponseData<MemAccount> findAccountByMemNo(@RequestParam("memNo") String memNo);
 
-
+    /**
+     * 根据account的id查询绑卡信息
+     * @param id
+     * @return
+     */
     @RequestMapping(value = "account/id",method = RequestMethod.GET)
     public ResponseData<AccountVO> findAccountByMemNo(@RequestParam("id")Integer id);
 
     /**
      * 扣减用户的提现余额
      * @param deductBalanceVO
-     * @param result
      * @return
      */
     @RequestMapping(value = "balance/deduct",method = RequestMethod.POST)
     public ResponseData deductBalance(@Valid @RequestBody DeductBalanceVO deductBalanceVO);
 
+    /**
+     * 查询用户列表中每个用户的绑卡数量
+     * @param reqVO
+     * @return
+     */
+    @RequestMapping(value = "account/stat",method = RequestMethod.POST)
+    public ResponseData<MemAccountStatRespVO> statMemAccount(@Valid @RequestBody MemAccountStatReqVO reqVO);
 
+    /**
+     * 获取用户可提现余额
+     * @param memNo
+     * @return
+     */
     @RequestMapping(value = "balance/get",method = RequestMethod.GET)
     public ResponseData<MemBalanceVO> getMemBalance(@RequestParam("memNo")String memNo);
 }
