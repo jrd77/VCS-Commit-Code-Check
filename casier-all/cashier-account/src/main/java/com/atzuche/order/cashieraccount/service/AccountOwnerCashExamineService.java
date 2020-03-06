@@ -52,9 +52,9 @@ public class AccountOwnerCashExamineService {
 		if (req == null) {
 			return;
 		}
-		String cardId = req.getCardId();
-		// TODO 根据id获取银行卡信息
-		BankCardDTO bankCard = null;
+		Integer cardId = StringUtils.isBlank(req.getCardId()) ? null:Integer.valueOf(req.getCardId());
+		// 根据id获取银行卡信息
+		BankCardDTO bankCard = remoteAccountService.findAccountById(cardId);
 		// 获取新订单系统的会员总收益
 		AccountOwnerIncomeEntity incomeEntity = accountOwnerIncomeNoTService.getOwnerIncome(req.getMemNo());
 		// 调远程获取老系统可提现余额

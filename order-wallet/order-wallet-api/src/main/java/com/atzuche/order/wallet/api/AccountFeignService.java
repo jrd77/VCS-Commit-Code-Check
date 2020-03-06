@@ -30,7 +30,7 @@ public interface AccountFeignService {
      * @return
      */
     @RequestMapping(value = "account/id",method = RequestMethod.GET)
-    public ResponseData<AccountVO> findAccountByMemNo(@RequestParam("id")Integer id);
+    public ResponseData<AccountVO> findAccountById(@RequestParam("id")Integer id);
 
     /**
      * 扣减用户的提现余额
