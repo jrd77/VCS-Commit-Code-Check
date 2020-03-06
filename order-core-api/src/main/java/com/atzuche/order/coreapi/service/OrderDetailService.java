@@ -486,7 +486,7 @@ public class OrderDetailService {
             ownerOrderPurchaseDetailDTOList.add(ownerOrderPurchaseDetailDTO);
         });
         //全局的车主订单罚金明细
-        List<ConsoleOwnerOrderFineDeatailEntity> consoleOwnerOrderFineDeatailList = consoleOwnerOrderFineDeatailService.selectByOrderNo(orderNo);
+        List<ConsoleOwnerOrderFineDeatailEntity> consoleOwnerOrderFineDeatailList = consoleOwnerOrderFineDeatailService.selectByOrderNo(orderNo,ownerMemberDTO.getMemNo());
         List<ConsoleOwnerOrderFineDeatailDTO> consoleOwnerOrderFineDeatailDTOList = new ArrayList<>();
         consoleOwnerOrderFineDeatailList.stream().forEach(x->{
             ConsoleOwnerOrderFineDeatailDTO consoleOwnerOrderFineDeatailDTO = new ConsoleOwnerOrderFineDeatailDTO();
@@ -946,7 +946,7 @@ public class OrderDetailService {
             ownerOrderPurchaseDetailDTOList.add(ownerOrderPurchaseDetailDTO);
         });
         //全局的车主订单罚金明细
-        List<ConsoleOwnerOrderFineDeatailEntity> consoleOwnerOrderFineDeatailList = consoleOwnerOrderFineDeatailService.selectByOrderNo(orderNo);
+        List<ConsoleOwnerOrderFineDeatailEntity> consoleOwnerOrderFineDeatailList = consoleOwnerOrderFineDeatailService.selectByOrderNo(orderNo,newOwnerMemNo);
         List<ConsoleOwnerOrderFineDeatailDTO> consoleOwnerOrderFineDeatailDTOList = new ArrayList<>();
         consoleOwnerOrderFineDeatailList.stream().forEach(x->{
             ConsoleOwnerOrderFineDeatailDTO consoleOwnerOrderFineDeatailDTO = new ConsoleOwnerOrderFineDeatailDTO();
@@ -1291,7 +1291,12 @@ public class OrderDetailService {
             log.error("获取订单数据为空orderNo={}",orderNo);
             throw new OrderNotFoundException(orderNo);
         }
-
+        OwnerOrderEntity entity = ownerOrderService.getOwnerOrderByOwnerOrderNo(ownerOrderNo);
+        if(entity == null){
+            log.error("获取订单数据子订单为空ownerOrderNo={}",ownerOrderNo);
+            throw new OrderNotFoundException(ownerOrderNo);
+        }
+        
         OrderDTO orderDTO = new OrderDTO();
         BeanUtils.copyProperties(orderEntity,orderDTO);
         //车主罚金
@@ -1303,7 +1308,7 @@ public class OrderDetailService {
             ownerOrderFineDeatailDTOS.add(ownerOrderFineDeatailDTO);
         });
         //全局的车主订单罚金明细
-        List<ConsoleOwnerOrderFineDeatailEntity> consoleOwnerOrderFineDeatailList = consoleOwnerOrderFineDeatailService.selectByOrderNo(orderNo);
+        List<ConsoleOwnerOrderFineDeatailEntity> consoleOwnerOrderFineDeatailList = consoleOwnerOrderFineDeatailService.selectByOrderNo(orderNo,entity.getMemNo());
         List<ConsoleOwnerOrderFineDeatailDTO> consoleOwnerOrderFineDeatailDTOList = new ArrayList<>();
         consoleOwnerOrderFineDeatailList.stream().forEach(x->{
             ConsoleOwnerOrderFineDeatailDTO consoleOwnerOrderFineDeatailDTO = new ConsoleOwnerOrderFineDeatailDTO();

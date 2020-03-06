@@ -27,7 +27,7 @@ public interface ConsoleOwnerOrderFineDeatailMapper{
     
     int updateByPrimaryKeySelective(ConsoleOwnerOrderFineDeatailEntity record);
 
-    List<ConsoleOwnerOrderFineDeatailEntity> selectByOrderNo(@Param("orderNo")String orderNo);
+//    List<ConsoleOwnerOrderFineDeatailEntity> selectByOrderNo(@Param("orderNo")String orderNo);
     
     List<ConsoleOwnerOrderFineDeatailEntity> selectByOrderNoMemNo(@Param("orderNo")String orderNo,@Param("memNo")String memNo);
     

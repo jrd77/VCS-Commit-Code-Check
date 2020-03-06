@@ -19,7 +19,8 @@ public enum OwnerCashCodeEnum {
 	SRV_GET_COST_OWNER("22010009","车主取车服务费"),
 	SRV_RETURN_COST_OWNER("22010010","车主还车服务费"),
     OWNER_PLANT_OIL_SERVICE_FEE("22010011","平台加油服务费"),
-
+    MILEAGE_COST_OWNER_PROXY("21010012","代管车超里程费用"),
+    
 //    OWNER_RENTER_PRICE("22020041","租客车主相互调价"),  //????
 
 

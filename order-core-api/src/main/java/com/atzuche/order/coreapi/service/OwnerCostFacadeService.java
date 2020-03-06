@@ -303,7 +303,7 @@ public class OwnerCostFacadeService {
         ownerCostDetailVO.setRentAmt(getPurchaseRentAmt(ownerOrderPurchaseDetailList));
 
         //全局的车主订单罚金明细
-        List<ConsoleOwnerOrderFineDeatailEntity> consoleOwnerOrderFineDeatailList = consoleOwnerOrderFineDeatailService.selectByOrderNo(orderNo);
+        List<ConsoleOwnerOrderFineDeatailEntity> consoleOwnerOrderFineDeatailList = consoleOwnerOrderFineDeatailService.selectByOrderNo(orderNo,ownerMemNo);
         //车主罚金
         List<OwnerOrderFineDeatailEntity> ownerOrderFineDeatailList = ownerOrderFineDeatailService.getOwnerOrderFineDeatailByOwnerOrderNo(newOwnerOrderNo);
         OwnerFineVO ownerFile = getOwnerFile(consoleOwnerOrderFineDeatailList, ownerOrderFineDeatailList);

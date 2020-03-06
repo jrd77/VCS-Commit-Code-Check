@@ -3,6 +3,7 @@ package com.atzuche.order.cashieraccount.vo.res;
 import com.atzuche.order.rentercost.entity.vo.PayableVO;
 import com.autoyol.doc.annotation.AutoDocProperty;
 import lombok.Data;
+import lombok.ToString;
 
 import java.util.List;
 
@@ -10,6 +11,7 @@ import java.util.List;
  * 个人代付信息
  * @author haibao.yan
  */
+@ToString
 //@Data
 public class OrderPayableAmountResVO {
 

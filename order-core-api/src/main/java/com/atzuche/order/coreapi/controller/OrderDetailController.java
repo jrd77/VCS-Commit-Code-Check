@@ -53,7 +53,7 @@ public class OrderDetailController {
     public ResponseData<AdminOwnerOrderDetailDTO> adminOwnerOrderDetail(@RequestParam("ownerOrderNo") String ownerOrderNo,@RequestParam("orderNo")String orderNo){
         if(ownerOrderNo==null ||ownerOrderNo.trim().length()<=0){
             ResponseData responseData = new ResponseData();
-            responseData.setResMsg("车主自订单号不能为空");
+            responseData.setResMsg("车主子订单号不能为空");
             responseData.setResCode(ErrorCode.INPUT_ERROR.getCode());
             return responseData;
         }
