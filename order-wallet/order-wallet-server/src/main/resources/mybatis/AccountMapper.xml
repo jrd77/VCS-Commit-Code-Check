@@ -40,6 +40,11 @@
     <include refid="Base_Column_List" />
     from account where mem_no=#{memNo}
   </select>
+  <select id="getById" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from account where id=#{id}
+  </select>
 
   <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.atzuche.order.wallet.server.entity.AccountEntity" useGeneratedKeys="true">
     insert into account (mem_no, card_no, card_holder, 
