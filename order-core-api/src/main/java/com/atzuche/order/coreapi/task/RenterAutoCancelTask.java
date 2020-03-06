@@ -76,8 +76,6 @@ public class RenterAutoCancelTask extends IJobHandler {
                     try {
                         logger.info("执行 下单后1小时，租客未支付租车费用,自动取消 orderNo:[{}]",orderNo);
                         cancelOrderService.cancel(req);
-                        //發送sms
-                        orderSearchRemoteService.sendSmsData(orderNo);
                         //发送push
                         Map map = SmsParamsMapUtil.getParamsMap(orderNo, PushMessageTypeEnum.RENTER_NO_PAY_CAR.getValue(), PushMessageTypeEnum.RENTER_NO_PAY_CAR_2_OWNER.getValue(), null);
                         orderSendMessageFactory.sendPushMessage(map);
