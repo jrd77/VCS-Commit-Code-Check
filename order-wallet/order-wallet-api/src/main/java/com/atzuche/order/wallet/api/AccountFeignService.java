@@ -31,7 +31,7 @@ public interface AccountFeignService {
      * @return
      */
     @RequestMapping(value = "balance/deduct",method = RequestMethod.POST)
-    public ResponseData deductBalance(@Valid @RequestBody DeductBalanceVO deductBalanceVO, BindingResult result);
+    public ResponseData deductBalance(@Valid @RequestBody DeductBalanceVO deductBalanceVO);
 
 
     @RequestMapping(value = "balance/get",method = RequestMethod.GET)
