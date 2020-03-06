@@ -22,14 +22,18 @@ import lombok.Data;
 @Data
 public class OrderOwnerCostResVO {
 	/**
-     * 车主端代管车服务费
+     * 车主端代管车服务费（暂不使用，从增值表中根据主订单号查询，结算实时计算）
      */
      OwnerOrderPurchaseDetailEntity proxyExpense;
     /**
-     * 车主端平台服务费
+     * 车主端平台服务费（暂不使用，从增值表中根据主订单号查询，结算实时计算）
      */
      OwnerOrderPurchaseDetailEntity serviceExpense;
-     
+     /**
+      * 获取gps服务费（暂不使用，从增值表中根据主订单号查询，结算实时计算）
+      */
+      List<OwnerOrderPurchaseDetailEntity> gpsCost;
+
      ///----------------------------------------------------------  6大块
     /**
      * 获取车主补贴明细列表
@@ -62,18 +66,8 @@ public class OrderOwnerCostResVO {
      List<OwnerOrderIncrementDetailEntity> ownerOrderIncrementDetail;
    ///----------------------------------------------------------  6大块
      
+   
 
-    /**
-     * 获取gps服务费
-     */
-     List<OwnerOrderPurchaseDetailEntity> gpsCost;
-
-    /**
-     * 获取车主油费
-     */
-//     OwnerOrderPurchaseDetailEntity ownerOrderCostDetail;
-     private int ownerOilDifferenceCrashAmt;
-     
      //------------------------------------------------------------- 分割线
 
 	/**
@@ -86,5 +80,17 @@ public class OrderOwnerCostResVO {
     private int ownerCostAmtFinal;
     //settleIncomeAmt 结算金额，从account_owner_income_examine表中获取。 200215
     private int ownerCostAmtSettleAfter;
-   
+    /**
+     * 平台加油服务费用
+     */
+    private int ownerPlatFormOilService;
+    /**
+     * 获取车主油费
+     */
+    private int ownerOilDifferenceCrashAmt;
+    /**
+     * 交接车-获取超里程费用（车主端依托租客的参数来计算。）
+     */
+    private int mileageAmt;
+    
 }

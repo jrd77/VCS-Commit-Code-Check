@@ -306,9 +306,9 @@ public class RenterOrderCostCombineService {
 		Integer mileageAmt = RenterFeeCalculatorUtils.calMileageAmt(mileageAmtDTO.getDayMileage(), mileageAmtDTO.getGuideDayPrice(), 
 				mileageAmtDTO.getGetmileage(), mileageAmtDTO.getReturnMileage(), costBaseDTO.getStartTime(), costBaseDTO.getEndTime(), configHours);
 		FeeResult feeResult = new FeeResult();
-		feeResult.setTotalFee(mileageAmt);
+		feeResult.setTotalFee(-mileageAmt);
 		feeResult.setUnitCount(1.0);
-		feeResult.setUnitPrice(mileageAmt);
+		feeResult.setUnitPrice(-mileageAmt);
 		RenterOrderCostDetailEntity result = costBaseConvert(costBaseDTO, feeResult, RenterCashCodeEnum.MILEAGE_COST_RENTER);
 		return result;
 	}

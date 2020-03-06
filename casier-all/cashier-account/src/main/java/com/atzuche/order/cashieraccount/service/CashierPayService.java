@@ -368,7 +368,7 @@ public class CashierPayService{
         result.setAmtWzDeposit(amtWZDeposit);
         result.setAmtTotal(amtTotal);
         result.setAmtPay(rentAmtPayed);
-        result.setAmt(amtRent + amtDeposit + amtWZDeposit);  //result.getAmt()取值。
+        result.setAmt(amtRent + amtIncrementRent + amtDeposit + amtWZDeposit);  //result.getAmt()取值。
         result.setMemNo(orderPayReqVO.getMenNo());
         result.setOrderNo(orderPayReqVO.getOrderNo());
         result.setTitle("待支付金额：" +Math.abs(result.getAmt()) + "，订单号："  + result.getOrderNo());
@@ -534,7 +534,8 @@ public class CashierPayService{
             String payMd5 = MD5.MD5Encode(FasterJsonUtil.toJson(vo));
             vo.setPayMd5(payMd5);
             payVo.add(vo);
-        }else if(orderPaySign.getPayKind().contains(DataPayKindConstant.RENT_INCREMENT) && payVO.getAmtIncrementRent()<0){
+        }
+        if(orderPaySign.getPayKind().contains(DataPayKindConstant.RENT_INCREMENT) && payVO.getAmtIncrementRent()<0){
             //待付租车费用
             int amt = payVO.getAmtIncrementRent();
             //统一按消费来处理(忽略前端的来值),消费考虑到车主拒绝修改订单会退款。仍然保持老系统的。 考虑收款及补充租车费用。

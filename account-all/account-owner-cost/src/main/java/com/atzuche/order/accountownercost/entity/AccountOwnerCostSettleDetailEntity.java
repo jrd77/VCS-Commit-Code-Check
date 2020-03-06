@@ -3,6 +3,7 @@ package com.atzuche.order.accountownercost.entity;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import lombok.Data;
+import lombok.ToString;
 
 
 /**
@@ -12,6 +13,7 @@ import lombok.Data;
  * @date 2019-12-17 16:33:28
  * @Description:
  */
+@ToString
 @Data
 public class AccountOwnerCostSettleDetailEntity implements Serializable {
 	private static final long serialVersionUID = 1L;

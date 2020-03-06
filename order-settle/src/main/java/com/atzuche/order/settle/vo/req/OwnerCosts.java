@@ -5,6 +5,8 @@ import com.atzuche.order.ownercost.entity.*;
 import com.atzuche.order.rentercost.entity.ConsoleRenterOrderFineDeatailEntity;
 import com.atzuche.order.rentercost.entity.OrderConsoleCostDetailEntity;
 import com.atzuche.order.rentercost.entity.OrderConsoleSubsidyDetailEntity;
+import com.autoyol.platformcost.model.FeeResult;
+
 import lombok.Data;
 
 import java.util.List;
@@ -13,7 +15,7 @@ import java.util.List;
  * 车主费用信息
  * @author haibao.yan
  */
-@Data
+//@Data
 public class OwnerCosts {
 
     /**
@@ -72,4 +74,144 @@ public class OwnerCosts {
     
     ///add huangjing  来源：SettleOrdersDefinition类字段。 200214
     private int ownerCostAmtFinal;
+    //车主会员号
+    private String ownerNo;
+    /**
+     * 交接车-获取超里程费用（车主端依托租客的参数来计算。）
+     */
+    private OwnerOrderPurchaseDetailEntity mileageAmt;
+    //车辆类型
+    private Integer carOwnerType;
+    
+    
+	public Integer getCarOwnerType() {
+		return carOwnerType;
+	}
+
+	public void setCarOwnerType(Integer carOwnerType) {
+		this.carOwnerType = carOwnerType;
+	}
+
+	public OwnerOrderPurchaseDetailEntity getMileageAmt() {
+		return mileageAmt;
+	}
+
+	public void setMileageAmt(OwnerOrderPurchaseDetailEntity mileageAmt) {
+		this.mileageAmt = mileageAmt;
+	}
+
+	public String getOwnerNo() {
+		return ownerNo;
+	}
+
+	public void setOwnerNo(String ownerNo) {
+		this.ownerNo = ownerNo;
+	}
+
+	public OwnerOrderPurchaseDetailEntity getProxyExpense() {
+		return proxyExpense;
+	}
+
+	public void setProxyExpense(OwnerOrderPurchaseDetailEntity proxyExpense) {
+		this.proxyExpense = proxyExpense;
+	}
+
+	public OwnerOrderPurchaseDetailEntity getServiceExpense() {
+		return serviceExpense;
+	}
+
+	public void setServiceExpense(OwnerOrderPurchaseDetailEntity serviceExpense) {
+		this.serviceExpense = serviceExpense;
+	}
+
+	public List<OwnerOrderSubsidyDetailEntity> getOwnerOrderSubsidyDetail() {
+		return ownerOrderSubsidyDetail;
+	}
+
+	public void setOwnerOrderSubsidyDetail(List<OwnerOrderSubsidyDetailEntity> ownerOrderSubsidyDetail) {
+		this.ownerOrderSubsidyDetail = ownerOrderSubsidyDetail;
+	}
+
+	public List<OwnerOrderPurchaseDetailEntity> getOwnerOrderPurchaseDetail() {
+		return ownerOrderPurchaseDetail;
+	}
+
+	public void setOwnerOrderPurchaseDetail(List<OwnerOrderPurchaseDetailEntity> ownerOrderPurchaseDetail) {
+		this.ownerOrderPurchaseDetail = ownerOrderPurchaseDetail;
+	}
+
+	public List<OwnerOrderIncrementDetailEntity> getOwnerOrderIncrementDetail() {
+		return ownerOrderIncrementDetail;
+	}
+
+	public void setOwnerOrderIncrementDetail(List<OwnerOrderIncrementDetailEntity> ownerOrderIncrementDetail) {
+		this.ownerOrderIncrementDetail = ownerOrderIncrementDetail;
+	}
+
+	public List<OwnerOrderPurchaseDetailEntity> getGpsCost() {
+		return gpsCost;
+	}
+
+	public void setGpsCost(List<OwnerOrderPurchaseDetailEntity> gpsCost) {
+		this.gpsCost = gpsCost;
+	}
+
+	public OwnerGetAndReturnCarDTO getOwnerGetAndReturnCarDTO() {
+		return ownerGetAndReturnCarDTO;
+	}
+
+	public void setOwnerGetAndReturnCarDTO(OwnerGetAndReturnCarDTO ownerGetAndReturnCarDTO) {
+		this.ownerGetAndReturnCarDTO = ownerGetAndReturnCarDTO;
+	}
+
+	public List<OrderConsoleSubsidyDetailEntity> getOrderConsoleSubsidyDetails() {
+		return orderConsoleSubsidyDetails;
+	}
+
+	public void setOrderConsoleSubsidyDetails(List<OrderConsoleSubsidyDetailEntity> orderConsoleSubsidyDetails) {
+		this.orderConsoleSubsidyDetails = orderConsoleSubsidyDetails;
+	}
+
+	public List<ConsoleOwnerOrderFineDeatailEntity> getConsoleOwnerOrderFineDeatailEntitys() {
+		return consoleOwnerOrderFineDeatailEntitys;
+	}
+
+	public void setConsoleOwnerOrderFineDeatailEntitys(
+			List<ConsoleOwnerOrderFineDeatailEntity> consoleOwnerOrderFineDeatailEntitys) {
+		this.consoleOwnerOrderFineDeatailEntitys = consoleOwnerOrderFineDeatailEntitys;
+	}
+
+	public List<OwnerOrderFineDeatailEntity> getOwnerOrderFineDeatails() {
+		return ownerOrderFineDeatails;
+	}
+
+	public void setOwnerOrderFineDeatails(List<OwnerOrderFineDeatailEntity> ownerOrderFineDeatails) {
+		this.ownerOrderFineDeatails = ownerOrderFineDeatails;
+	}
+
+	public List<OrderConsoleCostDetailEntity> getOrderConsoleCostDetailEntity() {
+		return orderConsoleCostDetailEntity;
+	}
+
+	public void setOrderConsoleCostDetailEntity(List<OrderConsoleCostDetailEntity> orderConsoleCostDetailEntity) {
+		this.orderConsoleCostDetailEntity = orderConsoleCostDetailEntity;
+	}
+
+	public int getOwnerPlatFormOilService() {
+		return ownerPlatFormOilService;
+	}
+
+	public void setOwnerPlatFormOilService(int ownerPlatFormOilService) {
+		this.ownerPlatFormOilService = ownerPlatFormOilService;
+	}
+
+	public int getOwnerCostAmtFinal() {
+		return ownerCostAmtFinal;
+	}
+
+	public void setOwnerCostAmtFinal(int ownerCostAmtFinal) {
+		this.ownerCostAmtFinal = ownerCostAmtFinal;
+	}
+    
+    
 }

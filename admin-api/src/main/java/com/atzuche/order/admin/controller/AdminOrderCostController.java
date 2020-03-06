@@ -52,7 +52,9 @@ public class AdminOrderCostController {
 	
 	@Autowired
 	OrderCostService orderCostService;
-
+    @Autowired
+    private AdminDeliveryCarService deliveryCarInfoService;
+    
 	@AutoDocMethod(description = "计算租客子订单费用", value = "计算租客子订单费用", response = OrderRenterCostResVO.class)
 	@RequestMapping(value="calculateRenterOrderCost",method = RequestMethod.POST)
 	public ResponseData calculateRenterOrderCost(@RequestBody @Validated RenterCostReqVO renterCostReqVO, HttpServletRequest request, HttpServletResponse response,BindingResult bindingResult) {
@@ -92,11 +94,7 @@ public class AdminOrderCostController {
 		}
 		
 	}
-
-    @Autowired
-    private OwnerOrderIncrementDetailService ownerOrderIncrementDetailService;
-    @Autowired
-    private AdminDeliveryCarService deliveryCarInfoService;
+	
 
 	@AutoDocMethod(description = "计算车主子订单费用", value = "计算车主子订单费用", response = OrderOwnerCostResVO.class)
 	@RequestMapping(value="calculateOwnerOrderCost",method = RequestMethod.POST)
@@ -107,34 +105,7 @@ public class AdminOrderCostController {
         }
         
         try {
-        	
         	OrderOwnerCostResVO resp = orderCostService.calculateOwnerOrderCost(ownerCostReqVO);
-            // 计算 Gps 和平台服务费
-        	List<OwnerOrderIncrementDetailEntity> list=  ownerOrderIncrementDetailService.listOwnerOrderIncrementDetail(ownerCostReqVO.getOrderNo(),ownerCostReqVO.getOwnerOrderNo());
-            if(!CollectionUtils.isEmpty(list)){
-                int gpsAmt = list.stream().filter(obj ->{
-                    return OwnerCashCodeEnum.GPS_SERVICE_AMT.getCashNo().equals(obj.getCostCode());
-                }).mapToInt(OwnerOrderIncrementDetailEntity::getTotalAmount).sum();
-                int serviceAmt = list.stream().filter(obj ->{
-                    return OwnerCashCodeEnum.SERVICE_CHARGE.getCashNo().equals(obj.getCostCode());
-                }).mapToInt(OwnerOrderIncrementDetailEntity::getTotalAmount).sum();
-                resp.setGpsAmt(String.valueOf(-Math.abs(gpsAmt)));
-                resp.setPlatformSrvFeeAmt(String.valueOf(-Math.abs(serviceAmt)));
-            }else{
-                resp.setGpsAmt("0");
-                resp.setPlatformSrvFeeAmt("0");
-            }
-            // 计算油量和超里程费用
-            DeliveryCarVO deliveryCarRepVO = getDeliveryCarVO(ownerCostReqVO.getOrderNo());
-            if(Objects.nonNull(deliveryCarRepVO) && Objects.nonNull(deliveryCarRepVO.getOwnerGetAndReturnCarDTO())){
-                OwnerGetAndReturnCarDTO ownerGetAndReturnCarDTO = deliveryCarRepVO.getOwnerGetAndReturnCarDTO();
-                if(Objects.nonNull(ownerGetAndReturnCarDTO)){
-                    resp.setOilAmt(ownerGetAndReturnCarDTO.getOilDifferenceCrash());
-                    resp.setBeyondMileAmt(ownerGetAndReturnCarDTO.getOverKNCrash());
-                }
-                //转换为负数
-                resp.setPlatformAddOilSrvAmt(String.valueOf(-Math.abs(Integer.valueOf(ownerGetAndReturnCarDTO.getPlatFormOilServiceCharge()))));
-            }
             //TODO 车载押金 没有
         	logger.info("resp = " + resp.toString());
         	return ResponseData.success(resp);
@@ -152,5 +123,6 @@ public class AdminOrderCostController {
         DeliveryCarVO deliveryCarRepVO = deliveryCarInfoService.findDeliveryListByOrderNo(deliveryCarDTO);
         return deliveryCarRepVO;
     }
+	
 
 }
