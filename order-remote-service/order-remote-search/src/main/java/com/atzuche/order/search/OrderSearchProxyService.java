@@ -97,6 +97,7 @@ public class OrderSearchProxyService {
             BeanUtils.copyProperties(o, orderInfoDTO);
             orderInfos.add(orderInfoDTO);
         });
+        logger.info("同意订单时拉取租期重叠的订单列表.orderInfos:[{}]",JSON.toJSONString(orderInfos));
         return orderInfos;
     }
 }
