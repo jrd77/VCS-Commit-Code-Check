@@ -27,7 +27,7 @@ public class OrderActionEventListener extends SMSOrderBaseEventService{
     @Autowired
     OrderSendMessageFactory orderSendMessageFactory;
 
-    @RabbitListener(bindings = {@QueueBinding(value = @Queue(value = "order_action_01", durable = "true"),
+    @RabbitListener(bindings = {@QueueBinding(value = @Queue(value = "order_action_06", durable = "true"),
             exchange = @Exchange(value = "auto-order-action", durable = "true", type = "topic"), key = "action.#")
     }, containerFactory = "orderRabbitListenerContainerFactory")
     public void process(Message message) {

@@ -1,16 +1,22 @@
 package com.atzuche.order.wallet.server.controller;
 
-import com.atzuche.order.wallet.api.AccountVO;
-import com.atzuche.order.wallet.api.MemAccount;
-import com.atzuche.order.wallet.api.TotalWalletVO;
+import com.atzuche.order.commons.BindingResultUtil;
+import com.atzuche.order.commons.exceptions.InputErrorException;
+import com.atzuche.order.wallet.api.*;
 import com.atzuche.order.wallet.server.service.AccountService;
+import com.atzuche.order.wallet.server.service.MemBalanceService;
 import com.autoyol.commons.web.ResponseData;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import javax.validation.Valid;
 import java.util.List;
 
 /**
@@ -19,9 +25,13 @@ import java.util.List;
  **/
 @Controller
 public class AccountController {
+    private final static Logger logger = LoggerFactory.getLogger(AccountController.class);
+    
 
     @Autowired
     private AccountService accountService;
+    @Autowired
+    private MemBalanceService memBalanceService;
 
     @RequestMapping(value = "account/get",method = RequestMethod.GET)
     public ResponseData<MemAccount> findAccountByMemNo(@RequestParam("memNo") String memNo)throws Exception{
@@ -30,5 +40,25 @@ public class AccountController {
         memAccount.setMemNo(memNo);
         memAccount.setAccounts(accountVOList);
         return ResponseData.success(memAccount);
+    }
+
+    @RequestMapping(value = "balance/deduct",method = RequestMethod.POST)
+    public ResponseData deductBalance(@Valid @RequestBody DeductBalanceVO deductBalanceVO, BindingResult result){
+        logger.info("deductBalance param is [{}]",deductBalanceVO);
+        BindingResultUtil.checkBindingResult(result);
+        if(deductBalanceVO.getDeduct()<=0){
+            throw new InputErrorException("扣减金额不能为负数:"+deductBalanceVO.getDeduct());
+        }
+        memBalanceService.deductBalance(deductBalanceVO.getMemNo(),deductBalanceVO.getDeduct());
+        return ResponseData.success();
+    }
+
+    @RequestMapping(value = "balance/get",method = RequestMethod.GET)
+    public ResponseData<MemBalanceVO> getMemBalance(@RequestParam("memNo")String memNo){
+        int total = memBalanceService.getTotalBalance(memNo);
+        MemBalanceVO memBalanceVO = new MemBalanceVO();
+        memBalanceVO.setBalance(total);
+        memBalanceVO.setMemNo(memNo);
+        return ResponseData.success(memBalanceVO);
     }
 }
