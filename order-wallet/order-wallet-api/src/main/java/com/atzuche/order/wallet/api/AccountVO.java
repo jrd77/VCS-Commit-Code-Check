@@ -13,7 +13,6 @@ import java.time.LocalDateTime;
 @Data
 @ToString
 public class AccountVO implements Serializable {
-    private Integer id;
 
     /**
      * 会员号
@@ -24,11 +23,19 @@ public class AccountVO implements Serializable {
      * 卡号
      */
     private String cardNo;
+    /**
+     * 卡号明文
+     */
+    private String cardNoPlain;
 
     /**
      * 持卡人
      */
     private String cardHolder;
+    /**
+     * 持卡人明文
+     */
+    private String cardHolderPlain;
 
     /**
      * 卡片类型，1：储蓄卡，2：信用卡
@@ -59,6 +66,10 @@ public class AccountVO implements Serializable {
      * 证件号
      */
     private String certNo;
+    /**
+     * 证件号明文
+     */
+    private String certNoPlain;
 
     /**
      * 手机号
