@@ -226,9 +226,10 @@
 		</set>
 		where id = #{id}
 	</update>
-    <select id="selectByOrderNo" resultMap="BaseResultMap">
+	<!-- 必须更新主订单号和会员号来查询 200305 huangjing -->
+<!--     <select id="selectByOrderNo" resultMap="BaseResultMap">
         select <include refid="Base_Column_List" /> from order_console_cost_detail where order_no = #{orderNo} and is_delete = 0
-    </select>
+    </select> -->
     <select id="selectByOrderNoAndMemNo" resultMap="BaseResultMap">
         select <include refid="Base_Column_List" /> from order_console_cost_detail where order_no = #{orderNo} and mem_no = #{memNo} and is_delete = 0
 

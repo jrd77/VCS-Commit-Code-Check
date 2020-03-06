@@ -62,4 +62,6 @@ public interface OrderMapper {
     OrderEntity getOrderByOrderNoAndMemNo(@Param("orderNo") String orderNo, @Param("memNo") String memNo);
 
     int updateByOrderNoSelective(OrderEntity orderEntity);
+
+    List<OrderEntity> getByOrderNos(@Param("orderNos")List<String> orderNos);
 }

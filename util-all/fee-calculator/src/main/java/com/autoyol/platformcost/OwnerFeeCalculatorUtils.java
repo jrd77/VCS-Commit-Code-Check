@@ -98,9 +98,10 @@ public class OwnerFeeCalculatorUtils {
 			radio = CommonUtils.MIN_Mileage;
 		}
 		Integer mileageAmt = (int) Math.ceil(CommonUtils.mul(distance, radio));  // 超出距离 * 系数
-		if (CommonUtils.isEscrowCar(carOwnerType)) {
-			mileageAmt = 0;
-		}
+		//在结算的时候，根据是否代管车，该费用是给车主还是给平台。 200306 huangjing
+//		if (CommonUtils.isEscrowCar(carOwnerType)) {
+//			mileageAmt = 0;
+//		}
 		return mileageAmt;
 	}
 	

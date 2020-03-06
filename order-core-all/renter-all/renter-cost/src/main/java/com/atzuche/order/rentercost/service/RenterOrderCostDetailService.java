@@ -10,9 +10,7 @@ import org.springframework.stereotype.Service;
 
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.rentercost.entity.RenterOrderCostDetailEntity;
-import com.atzuche.order.rentercost.entity.RenterOrderCostEntity;
 import com.atzuche.order.rentercost.mapper.RenterOrderCostDetailMapper;
-import com.atzuche.order.rentercost.mapper.RenterOrderFineDeatailMapper;
 
 
 /**
@@ -25,10 +23,6 @@ import com.atzuche.order.rentercost.mapper.RenterOrderFineDeatailMapper;
 public class RenterOrderCostDetailService{
     @Autowired
     private RenterOrderCostDetailMapper renterOrderCostDetailMapper;
-    @Autowired
-    RenterOrderFineDeatailMapper renterOrderFineDeatailMapper;
-    @Autowired
-    RenterOrderCostService renterOrderCostService;
 
 	/**
 	 * 返回子订单的租车费用明细
@@ -139,18 +133,9 @@ public class RenterOrderCostDetailService{
 		if(!isExists) {
 			renterOrderCostDetailMapper.saveRenterOrderCostDetail(extraDriverInsureAmtEntity);
 		}
-		//最后更新
-		updateExtraDriverInsureAmtEntity(extraDriverInsureAmtEntity);
-		return 0;
+		return 1;
 	}
 	
-	//更新附加驾驶人总表金额
-	public void updateExtraDriverInsureAmtEntity(RenterOrderCostDetailEntity extraDriverInsureAmtEntity) {
-		RenterOrderCostEntity entity = renterOrderCostService.getByOrderNoAndRenterNo(extraDriverInsureAmtEntity.getOrderNo(), extraDriverInsureAmtEntity.getRenterOrderNo());
-		if(entity != null) {
-			entity.setAdditionalDrivingEnsureAmount(extraDriverInsureAmtEntity.getTotalAmount());
-			renterOrderCostService.updateRenterOrderCost(entity);
-		}
-	}
+	
 	
 }

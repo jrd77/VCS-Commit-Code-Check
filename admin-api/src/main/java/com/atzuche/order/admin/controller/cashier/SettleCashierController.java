@@ -1,20 +1,19 @@
 package com.atzuche.order.admin.controller.cashier;
 
+import com.alibaba.fastjson.JSON;
 import com.atzuche.order.cashieraccount.entity.CashierRefundApplyEntity;
 import com.atzuche.order.cashieraccount.service.CashierPayService;
 import com.atzuche.order.cashieraccount.service.notservice.CashierRefundApplyNoTService;
 import com.atzuche.order.open.service.FeignOrderSettleService;
 import com.atzuche.order.settle.service.OrderSettleService;
+import com.atzuche.order.settle.vo.req.CancelOrderReqDTO;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.doc.annotation.AutoDocMethod;
 import com.autoyol.doc.annotation.AutoDocVersion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RequestMapping("/console/cashier/")
 @RestController
@@ -56,6 +55,14 @@ public class SettleCashierController {
         log.info("SettleCashierController settleOrderCancel start param [{}]", orderNo);
         orderSettleService.settleOrderCancel(orderNo);
         log.info("SettleCashierController settleOrderCancel end param [{}],result [{}]");
+        return ResponseData.success();
+    }
+
+    @AutoDocMethod(value = "订单取消-组合结算", description = "订单取消-组合结算", response = String.class)
+    @PostMapping("/orderCancelSettleCombination")
+    public ResponseData<?> orderCancelSettleCombination(@RequestBody CancelOrderReqDTO cancelOrderReqDTO){
+        log.info("取消订单-结算SettleCashierController.orderCancelSettleCombination cancelOrderReqDTO={}", JSON.toJSONString(cancelOrderReqDTO));
+        orderSettleService.orderCancelSettleCombination(cancelOrderReqDTO);
         return ResponseData.success();
     }
 

@@ -7,8 +7,6 @@ import com.autoyol.commons.web.ResponseData;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 //@FeignClient(name = "order-center-api")
 //@FeignClient(url = "http://10.0.3.235:1412" ,name="order-center-api")
 //@FeignClient(url = "http://localhost:1412" ,name="order-center-api")
@@ -81,7 +79,20 @@ public interface FeignOrderDetailService {
     @GetMapping("/order/detail/renterOrderDetail")
     public ResponseData<RenterOrderDetailRespDTO> renterOrderDetail(@RequestParam("orderNo") String orderNo,
                                                                    @RequestParam(name = "renterOrderNo",required = false) String renterOrderNo);
-
+    /*
+     * @Author ZhangBin
+     * @Date 2020/3/6 17:04
+     * @Description: 获取正在进行中的订单状态
+     *
+     **/
     @GetMapping("/order/detail/queryInProcess")
-    public ResponseData<List<OrderStatusDTO>> queryInProcess();
+    public ResponseData<ProcessRespDTO> queryInProcess();
+    /*
+     * @Author ZhangBin
+     * @Date 2020/3/6 17:04
+     * @Description: 通过车主订单号获取申请记录
+     *
+     **/
+    @GetMapping("/order/detail/queryChangeApplyByOwnerOrderNo")
+    public ResponseData<OrderDetailRespDTO> queryChangeApplyByOwnerOrderNo(String ownerOrderNo);
 }

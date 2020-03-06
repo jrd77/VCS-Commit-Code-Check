@@ -3,46 +3,44 @@
  */
 package com.atzuche.order.coreapi.service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
+import com.atzuche.order.accountownercost.entity.AccountOwnerCostSettleDetailEntity;
+import com.atzuche.order.accountownercost.service.notservice.AccountOwnerCostSettleDetailNoTService;
+import com.atzuche.order.accountownerincome.service.notservice.AccountOwnerIncomeExamineNoTService;
 import com.atzuche.order.commons.entity.orderDetailDto.OwnerOrderDTO;
 import com.atzuche.order.commons.enums.FineTypeEnum;
+import com.atzuche.order.commons.enums.account.CostTypeEnum;
+import com.atzuche.order.commons.enums.cashcode.ConsoleCashCodeEnum;
+import com.atzuche.order.commons.enums.cashcode.OwnerCashCodeEnum;
+import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
+import com.atzuche.order.commons.exceptions.InputErrorException;
 import com.atzuche.order.commons.exceptions.OwnerOrderDetailNotFoundException;
 import com.atzuche.order.commons.exceptions.OwnerOrderNotFoundException;
 import com.atzuche.order.commons.vo.OwnerFineVO;
 import com.atzuche.order.commons.vo.OwnerSubsidyDetailVO;
+import com.atzuche.order.commons.vo.req.OwnerCostSettleDetailDataVO;
+import com.atzuche.order.commons.vo.req.OwnerCostSettleDetailReqVO;
 import com.atzuche.order.commons.vo.res.OwnerCostDetailVO;
+import com.atzuche.order.commons.vo.res.OwnerCostSettleDetailVO;
 import com.atzuche.order.commons.vo.res.OwnerIncrementDetailVO;
 import com.atzuche.order.ownercost.entity.*;
 import com.atzuche.order.ownercost.service.*;
+import com.atzuche.order.parentorder.entity.OrderEntity;
+import com.atzuche.order.parentorder.service.OrderService;
 import com.atzuche.order.rentercost.entity.OrderConsoleSubsidyDetailEntity;
 import com.atzuche.order.rentercost.service.OrderConsoleSubsidyDetailService;
+import com.atzuche.order.settle.entity.AccountDebtDetailEntity;
+import com.atzuche.order.settle.service.notservice.AccountDebtDetailNoTService;
+import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import com.atzuche.order.accountownercost.entity.AccountOwnerCostSettleDetailEntity;
-import com.atzuche.order.accountownercost.service.notservice.AccountOwnerCostSettleDetailNoTService;
-import com.atzuche.order.accountownerincome.service.notservice.AccountOwnerIncomeExamineNoTService;
-import com.atzuche.order.commons.enums.account.CostTypeEnum;
-import com.atzuche.order.commons.enums.cashcode.ConsoleCashCodeEnum;
-import com.atzuche.order.commons.enums.cashcode.OwnerCashCodeEnum;
-import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
-import com.atzuche.order.commons.exceptions.InputErrorException;
-import com.atzuche.order.commons.exceptions.OrderNotFoundException;
-import com.atzuche.order.commons.vo.req.OwnerCostSettleDetailDataVO;
-import com.atzuche.order.commons.vo.req.OwnerCostSettleDetailReqVO;
-import com.atzuche.order.commons.vo.res.OwnerCostSettleDetailVO;
-import com.atzuche.order.parentorder.entity.OrderEntity;
-import com.atzuche.order.parentorder.service.OrderService;
-import com.atzuche.order.settle.entity.AccountDebtDetailEntity;
-import com.atzuche.order.settle.service.notservice.AccountDebtDetailNoTService;
-import com.google.common.collect.Lists;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * @author jing.huang
@@ -303,7 +301,7 @@ public class OwnerCostFacadeService {
         ownerCostDetailVO.setRentAmt(getPurchaseRentAmt(ownerOrderPurchaseDetailList));
 
         //全局的车主订单罚金明细
-        List<ConsoleOwnerOrderFineDeatailEntity> consoleOwnerOrderFineDeatailList = consoleOwnerOrderFineDeatailService.selectByOrderNo(orderNo);
+        List<ConsoleOwnerOrderFineDeatailEntity> consoleOwnerOrderFineDeatailList = consoleOwnerOrderFineDeatailService.selectByOrderNo(orderNo,ownerMemNo);
         //车主罚金
         List<OwnerOrderFineDeatailEntity> ownerOrderFineDeatailList = ownerOrderFineDeatailService.getOwnerOrderFineDeatailByOwnerOrderNo(newOwnerOrderNo);
         OwnerFineVO ownerFile = getOwnerFile(consoleOwnerOrderFineDeatailList, ownerOrderFineDeatailList);

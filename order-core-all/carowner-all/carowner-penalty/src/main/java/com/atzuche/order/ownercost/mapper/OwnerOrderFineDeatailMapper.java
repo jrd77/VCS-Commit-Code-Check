@@ -18,7 +18,9 @@ public interface OwnerOrderFineDeatailMapper{
     OwnerOrderFineDeatailEntity selectByPrimaryKey(Integer id);
 
     List<OwnerOrderFineDeatailEntity> selectByOrderNo(@Param("orderNo") String orderNo);
-
+    
+    List<OwnerOrderFineDeatailEntity> selectByOrderNoOwnerOrderNo(@Param("orderNo") String orderNo,@Param("ownerOrderNo")String ownerOrderNo);
+    
     int insert(OwnerOrderFineDeatailEntity record);
     
     int insertSelective(OwnerOrderFineDeatailEntity record);

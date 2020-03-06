@@ -12,6 +12,8 @@ import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.doc.annotation.AutoDocMethod;
 
+import lombok.extern.slf4j.Slf4j;
+
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.util.Optional;
 
+@Slf4j
 @RestController
 public class AdminOwnerOrderDetailController {
     @Autowired
@@ -177,7 +180,13 @@ public class AdminOwnerOrderDetailController {
 		    orderEntityOwner = ownerOrderService.getOwnerOrderByOwnerOrderNo(ownerOrderNo);
 	        if(orderEntityOwner == null){
 	        	//否则根据主订单号查询
-		    	orderEntityOwner = ownerOrderService.getOwnerOrderByOrderNoAndIsEffective(orderNo);
+//		    	orderEntityOwner = ownerOrderService.getOwnerOrderByOrderNoAndIsEffective(orderNo);
+	        	log.error("获取订单数据(车主)为空ownerOrderNo={}",ownerOrderNo);
+//	            throw new Exception("获取订单数据(车主)为空");
+	        	ResponseData responseData = new ResponseData();
+	            responseData.setResCode(ErrorCode.ORDER_NOT_EXIST.getCode());
+	            responseData.setResMsg("车主子订单号不存在");
+	            return responseData;
 	        }
 	    
         ResponseData<PlatformToOwnerSubsidyDTO> responseData = ownerOrderDetailService.platformToOwnerSubsidy(orderNo,ownerOrderNo,orderEntityOwner.getMemNo());
