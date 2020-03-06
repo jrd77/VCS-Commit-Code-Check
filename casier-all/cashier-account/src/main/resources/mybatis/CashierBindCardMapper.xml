@@ -130,5 +130,10 @@
 		</set>
 		where id = #{id}
 	</update>
+	
+	<select id="listCashierBindCardByMemNo" resultMap="BaseResultMap">
+		select <include refid="Base_Column_List" /> from cashier_bind_card where mem_no = #{memNo}
+		and is_delete = 0
+	</select>
   	
 </mapper>

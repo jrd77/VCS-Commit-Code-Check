@@ -64,6 +64,8 @@ public class CommonUtils {
 	
 	public static final String FORMAT_STR_LONG = "yyyyMMddHHmmss";
 	
+	public static final String FORMAT_STR_DATE = "yyyy-MM-dd";
+	
 	public static final double INSURE_DISCOUNT_NORMAL = 1.0;
 	public static final double INSURE_DISCOUNT_DIS = 0.7;
 	/** 一天小时数  */

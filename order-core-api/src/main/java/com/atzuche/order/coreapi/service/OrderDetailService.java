@@ -1286,7 +1286,7 @@ public class OrderDetailService {
      * @Author ZhangBin
      * @Date 2020/1/9 11:53
      * @Description: 过滤出取还车配送订单
-     * 
+     *
      **/
     private RenterOrderDeliveryEntity filterDeliveryOrderByType(List<RenterOrderDeliveryEntity> renterOrderDeliveryList, DeliveryOrderTypeEnum deliveryTypeEnum){
         List<RenterOrderDeliveryEntity> list = Optional.ofNullable(renterOrderDeliveryList).orElseGet(ArrayList::new)
@@ -1586,5 +1586,14 @@ public class OrderDetailService {
 
     }
 
-
+    public List<OrderStatusDTO> queryInProcess(){
+        List<OrderStatusEntity> orderStatusEntityList =  orderStatusService.queryInProcess();
+        List<OrderStatusDTO> orderStatusDTOList = new ArrayList<>();
+        orderStatusEntityList.stream().forEach(x->{
+            OrderStatusDTO orderStatusDTO = new OrderStatusDTO();
+            BeanUtils.copyProperties(x,orderStatusDTO);
+            orderStatusDTOList.add(orderStatusDTO);
+            });
+        return orderStatusDTOList;
+    }
 }

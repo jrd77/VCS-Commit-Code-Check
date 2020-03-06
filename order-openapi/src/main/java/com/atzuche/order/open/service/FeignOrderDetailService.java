@@ -3,10 +3,11 @@ package com.atzuche.order.open.service;
 
 import com.atzuche.order.commons.entity.orderDetailDto.*;
 import com.atzuche.order.commons.entity.ownerOrderDetail.AdminOwnerOrderDetailDTO;
-import com.atzuche.order.commons.entity.ownerOrderDetail.FienAmtUpdateReqDTO;
 import com.autoyol.commons.web.ResponseData;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 //@FeignClient(name = "order-center-api")
 //@FeignClient(url = "http://10.0.3.235:1412" ,name="order-center-api")
@@ -80,4 +81,7 @@ public interface FeignOrderDetailService {
     @GetMapping("/order/detail/renterOrderDetail")
     public ResponseData<RenterOrderDetailRespDTO> renterOrderDetail(@RequestParam("orderNo") String orderNo,
                                                                    @RequestParam(name = "renterOrderNo",required = false) String renterOrderNo);
+
+    @GetMapping("/order/detail/queryInProcess")
+    public ResponseData<List<OrderStatusDTO>> queryInProcess();
 }
