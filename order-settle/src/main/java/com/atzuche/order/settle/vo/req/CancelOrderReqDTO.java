@@ -18,12 +18,12 @@ public class CancelOrderReqDTO {
      * 当为true时，需传递orderNo、ownerOrderNo
      */
     @AutoDocProperty(value = "结算车主端标志，true：需要结算车主，false：不需要结算车主")
-    private boolean settleOwnerFlg;
+    private boolean settleOwnerFlg = false;
 
     /**
-     * 当为true时，需传递orderNo、renterOrderNo
+     * 当为true时，需传递orderNo、renterOrderNo、ownerOrderNo
      */
     @AutoDocProperty(value = "结算租客端标志，true：需要结算租客，false：不需要结算租客")
-    private boolean settleRenterFlg;
+    private boolean settleRenterFlg = false;
 
 }

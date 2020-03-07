@@ -19,6 +19,7 @@ import com.atzuche.order.rentercost.entity.OrderSupplementDetailEntity;
 import com.atzuche.order.rentercost.service.OrderSupplementDetailService;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.atzuche.order.renterorder.service.RenterOrderService;
+import com.atzuche.order.settle.exception.CancelOrderSettleParamException;
 import com.atzuche.order.settle.service.notservice.OrderSettleNoTService;
 import com.atzuche.order.settle.vo.req.*;
 import com.atzuche.order.settle.vo.res.RenterCostVO;
@@ -305,21 +306,21 @@ public class OrderSettleService{
         String renterOrderNo = cancelOrderReqDTO.getRenterOrderNo();
         if(StringUtils.isEmpty(orderNo)){
             log.error("主订单号不能为空");
-            return;
+            throw new CancelOrderSettleParamException();
         }
         if(cancelOrderReqDTO.isSettleOwnerFlg() && StringUtils.isEmpty(ownerOrderNo)){
             log.error("车主端结算，车主子订单号不能为空");
-            return;
+            throw new CancelOrderSettleParamException();
         }
-        if(cancelOrderReqDTO.isSettleRenterFlg() && StringUtils.isEmpty(renterOrderNo)){
-            log.error("租客端结算，租客子订单号不能为空");
-            return;
-        }
-        if(cancelOrderReqDTO.isSettleOwnerFlg()){
-            ownerOrderSettleService.settleOwnerOrderCancel(orderNo,ownerOrderNo);
+        if(cancelOrderReqDTO.isSettleRenterFlg() && (StringUtils.isEmpty(renterOrderNo) || StringUtils.isEmpty(ownerOrderNo))){
+            log.error("租客端结算，租客子订单号和车主子订单号不能为空");
+            throw new CancelOrderSettleParamException();
         }
         if(cancelOrderReqDTO.isSettleRenterFlg()){
+            ownerOrderSettleService.settleOwnerOrderCancel(orderNo,ownerOrderNo);
             renterOrderSettleService.settleRenterOrderCancel(orderNo,renterOrderNo);
+        }else{
+            ownerOrderSettleService.settleOwnerOrderCancel(orderNo,ownerOrderNo);
         }
     }
 
