@@ -99,7 +99,7 @@ public class ShortMessageSendService {
             while (iterable.hasNext()) {
                 String fieldKey = iterable.next();
                 if (StringUtils.isNotBlank(PushParamsTypeEnum.getFeildName(fieldKey))) {
-                    map.put(PushParamsTypeEnum.getFeildName(fieldKey), map.get(fieldKey));
+                    map.put(PushParamsTypeEnum.getFeildName(fieldKey), pushParamsMap.get(fieldKey));
                 }
             }
             return map;
