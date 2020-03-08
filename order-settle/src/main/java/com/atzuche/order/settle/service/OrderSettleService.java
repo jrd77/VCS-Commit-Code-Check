@@ -1,5 +1,16 @@
 package com.atzuche.order.settle.service;
 
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Objects;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
+
 import com.atzuche.order.accountownercost.entity.AccountOwnerCostSettleDetailEntity;
 import com.atzuche.order.accountrenterdeposit.vo.res.AccountRenterDepositResVO;
 import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostDetailEntity;
@@ -20,24 +31,22 @@ import com.atzuche.order.rentercost.service.OrderSupplementDetailService;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.atzuche.order.renterorder.service.RenterOrderService;
 import com.atzuche.order.settle.exception.CancelOrderSettleParamException;
+import com.atzuche.order.settle.exception.OrderSettleFlatAccountException;
+import com.atzuche.order.settle.service.notservice.OrderOwnerSettleNoTService;
 import com.atzuche.order.settle.service.notservice.OrderSettleNoTService;
-import com.atzuche.order.settle.vo.req.*;
+import com.atzuche.order.settle.vo.req.CancelOrderReqDTO;
+import com.atzuche.order.settle.vo.req.OwnerCosts;
+import com.atzuche.order.settle.vo.req.RentCosts;
+import com.atzuche.order.settle.vo.req.SettleCancelOrdersAccount;
+import com.atzuche.order.settle.vo.req.SettleOrders;
+import com.atzuche.order.settle.vo.req.SettleOrdersDefinition;
 import com.atzuche.order.settle.vo.res.RenterCostVO;
 import com.autoyol.autopay.gateway.constant.DataPayKindConstant;
 import com.autoyol.commons.utils.GsonUtils;
 import com.dianping.cat.Cat;
 import com.dianping.cat.message.Transaction;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.Assert;
-import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
 
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Objects;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * 车辆结算
@@ -53,11 +62,14 @@ public class OrderSettleService{
     @Autowired private RenterOrderService renterOrderService;
     @Autowired private CashierSettleService cashierSettleService;
     @Autowired private CashierRefundApplyNoTService cashierRefundApplyNoTService;
-    @Autowired private CashierPayService cashierPayService;
+//    @Autowired private CashierPayService cashierPayService;
     @Autowired private CashierQueryService cashierQueryService;
     @Autowired private OrderSupplementDetailService orderSupplementDetailService;
     @Autowired private OwnerOrderSettleService ownerOrderSettleService;
     @Autowired private RenterOrderSettleService renterOrderSettleService;
+    @Autowired
+    private OrderOwnerSettleNoTService orderOwnerSettleNoTService;
+    
     /**
      * 查询所以费用
      */
@@ -159,12 +171,12 @@ public class OrderSettleService{
 //        orderSettleNoTService.getRenterCostSettleDetailSimpleForOwnerPlatformSrvFee(settleOrders);
         
         //3.5 查询所有车主费用明细 TODO 暂不支持 多个车主
-    	orderSettleNoTService.getOwnerCostSettleDetail(settleOrders);
+    	orderOwnerSettleNoTService.getOwnerCostSettleDetail(settleOrders);
 
     	//车主预计收益 200214
     	SettleOrdersDefinition settleOrdersDefinition = new SettleOrdersDefinition();
     	//2统计 车主结算费用明细， 补贴，费用总额
-    	orderSettleNoTService.handleOwnerAndPlatform(settleOrdersDefinition,settleOrders);
+    	orderOwnerSettleNoTService.handleOwnerAndPlatform(settleOrdersDefinition,settleOrders);
     	log.info("preOwnerSettleOrder settleOrdersDefinition [{}]",GsonUtils.toJson(settleOrdersDefinition));
         //2车主总账
         List<AccountOwnerCostSettleDetailEntity> accountOwnerCostSettleDetails = settleOrdersDefinition.getAccountOwnerCostSettleDetails();
@@ -180,7 +192,8 @@ public class OrderSettleService{
     	return settleOrders.getOwnerCosts();
     }
     /**
-     * 车辆押金结算
+     * 车辆押金结算(默认租客)
+     * 需要平账检测，保持一个入口，仅仅结算结构上做调整。
      * 先注释调事务
      */
     public void settleOrder(String orderNo, OrderPayCallBack callBack) {
@@ -193,16 +206,53 @@ public class OrderSettleService{
             orderSettleNoTService.initSettleOrders(orderNo,settleOrders);
             log.info("OrderSettleService settleOrders settleOrders [{}]",GsonUtils.toJson(settleOrders));
             Cat.logEvent("settleOrders",GsonUtils.toJson(settleOrders));
+            
+            orderOwnerSettleNoTService.initSettleOrdersSeparateOwner(orderNo,settleOrders);
+            log.info("OrderSettleService settleOrders settleOrdersSeparateOwner [{}]",GsonUtils.toJson(settleOrders));
+            Cat.logEvent("settleOrdersSeparateOwner",GsonUtils.toJson(settleOrders));
+            /**
+             * 检查是否可以结算。 外置。
+             */
+            orderSettleNoTService.check(settleOrders);
+            
+            
+            
 
             //2 无事务操作 查询租客车主费用明细 ，处理费用明细到 结算费用明细  并落库   然后平账校验
-            SettleOrdersDefinition settleOrdersDefinition = orderSettleNewService.settleOrderFirst(settleOrders);
+            SettleOrdersDefinition settleOrdersDefinition = new SettleOrdersDefinition(); //外置对象。
+            orderSettleNoTService.settleOrderFirst(settleOrders,settleOrdersDefinition);
             log.info("OrderSettleService settleOrdersDefinition [{}]",GsonUtils.toJson(settleOrdersDefinition));
             Cat.logEvent("settleOrders",GsonUtils.toJson(settleOrdersDefinition));
+            
+            //2 无事务操作 查询租客车主费用明细 ，处理费用明细到 结算费用明细  并落库   然后平账校验
+            orderOwnerSettleNoTService.settleOrderFirstSeparateOwner(settleOrders,settleOrdersDefinition);
+            log.info("OrderSettleService settleOrdersDefinition [{}]",GsonUtils.toJson(settleOrdersDefinition));
+            Cat.logEvent("settleOrderSeparateOwner",GsonUtils.toJson(settleOrdersDefinition));
+            
+            /**
+             * 平账检测
+             */
+            //6 费用平账 平台收入 + 平台补贴 + 车主费用 + 车主补贴 + 租客费用 + 租客补贴 = 0
+            int totleAmt = settleOrdersDefinition.getPlatformProfitAmt() + settleOrdersDefinition.getPlatformSubsidyAmt()
+                    + settleOrdersDefinition.getOwnerCostAmt() + settleOrdersDefinition.getOwnerSubsidyAmt()
+                    + settleOrdersDefinition.getRentCostAmt() + settleOrdersDefinition.getRentSubsidyAmt();
+            if(totleAmt != 0){
+                Cat.logEvent("pingzhang","平账失败");
+                log.error("平账失败");
+                //TODO 走Cat告警
+                throw new OrderSettleFlatAccountException();
+            }
+            
 
             //3 事务操作结算主逻辑  //开启事务
-            orderSettleNewService.settleOrder(settleOrders,settleOrdersDefinition,callBack);
-            log.info("OrderSettleService settleOrdersenced [{}]",GsonUtils.toJson(settleOrdersDefinition));
-            Cat.logEvent("settleOrdersenced",GsonUtils.toJson(settleOrdersDefinition));
+            orderSettleNoTService.settleOrderAfter(settleOrders,settleOrdersDefinition,callBack);
+            log.info("OrderSettleService settleOrderAfter [{}]",GsonUtils.toJson(settleOrdersDefinition));
+            Cat.logEvent("settleOrderAfter",GsonUtils.toJson(settleOrdersDefinition));
+            
+            orderOwnerSettleNoTService.settleOrderAfterSeparateOwner(settleOrders,settleOrdersDefinition,callBack);
+            log.info("OrderSettleService settleOrderAfterSeparateOwner [{}]",GsonUtils.toJson(settleOrdersDefinition));
+            Cat.logEvent("settleOrderAfterSeparateOwner",GsonUtils.toJson(settleOrdersDefinition));
+            
             orderSettleNewService.sendOrderSettleMq(orderNo,settleOrders.getRenterMemNo(),settleOrders.getRentCosts(),0,settleOrders.getOwnerMemNo());
             t.setStatus(Transaction.SUCCESS);
         } catch (Exception e) {
@@ -221,7 +271,7 @@ public class OrderSettleService{
         }
         log.info("OrderPayCallBack payCallBack end " );
     }
-
+    
 
     /**
      * 取消订单结算
