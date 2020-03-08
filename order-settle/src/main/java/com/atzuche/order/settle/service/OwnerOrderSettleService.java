@@ -1,5 +1,14 @@
 package com.atzuche.order.settle.service;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
+
 import com.alibaba.fastjson.JSON;
 import com.atzuche.order.accountownercost.entity.AccountOwnerCostSettleDetailEntity;
 import com.atzuche.order.accountplatorm.entity.AccountPlatformProfitDetailEntity;
@@ -24,16 +33,14 @@ import com.atzuche.order.settle.exception.OwnerCancelSettleException;
 import com.atzuche.order.settle.service.notservice.AccountDebtDetailNoTService;
 import com.atzuche.order.settle.service.notservice.AccountDebtNoTService;
 import com.atzuche.order.settle.service.notservice.OrderSettleNoTService;
-import com.atzuche.order.settle.vo.req.*;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
+import com.atzuche.order.settle.service.notservice.OrderSettleProxyService;
+import com.atzuche.order.settle.vo.req.AccountInsertDebtReqVO;
+import com.atzuche.order.settle.vo.req.OwnerCosts;
+import com.atzuche.order.settle.vo.req.SettleCancelOrdersAccount;
+import com.atzuche.order.settle.vo.req.SettleOrders;
+import com.atzuche.order.settle.vo.req.SettleOrdersAccount;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import lombok.extern.slf4j.Slf4j;
 
 /*
  * @Author ZhangBin
@@ -48,6 +55,12 @@ public class OwnerOrderSettleService {
     private OwnerOrderService ownerOrderService;
     @Autowired
     private OrderSettleNoTService orderSettleNoTService;
+    @Autowired
+    private OrderOwnerSettleNewService orderOwnerSettleNewService;
+    
+    @Autowired
+    private OrderSettleProxyService orderSettleProxyService;
+    
     @Autowired
     private CashierSettleService cashierSettleService;
     @Autowired
@@ -131,7 +144,7 @@ public class OwnerOrderSettleService {
                 //过滤的时候-->只过滤出租客并且是取消订单的违约金
                 AccountOwnerCostSettleDetailEntity entity = new AccountOwnerCostSettleDetailEntity();
                 BeanUtils.copyProperties(obj,entity);
-                entity.setCostType(OrderSettleNoTService.getCostTypeEnumBySubsidy(obj.getFineSubsidySourceCode()).getCode());
+                entity.setCostType(orderSettleProxyService.getCostTypeEnumBySubsidy(obj.getFineSubsidySourceCode()).getCode());
                 entity.setSourceCode(String.valueOf(obj.getFineType()));
                 entity.setSourceDetail(obj.getFineTypeDesc());
                 entity.setAmt(obj.getFineAmount());
@@ -144,7 +157,7 @@ public class OwnerOrderSettleService {
             int amt = ownerCosts.getConsoleOwnerOrderFineDeatailEntitys().stream().filter(obj ->{
                 AccountOwnerCostSettleDetailEntity entity = new AccountOwnerCostSettleDetailEntity();
                 BeanUtils.copyProperties(obj,entity);
-                entity.setCostType(OrderSettleNoTService.getCostTypeEnumBySubsidy(obj.getFineSubsidySourceCode()).getCode());
+                entity.setCostType(orderSettleProxyService.getCostTypeEnumBySubsidy(obj.getFineSubsidySourceCode()).getCode());
                 entity.setSourceCode(String.valueOf(obj.getFineType()));
                 entity.setSourceDetail(obj.getFineTypeDesc());
                 entity.setAmt(obj.getFineAmount());
@@ -232,7 +245,7 @@ public class OwnerOrderSettleService {
             settleOrdersAccount.setOrderNo(settleOrders.getOrderNo());
             settleOrdersAccount.setOwnerOrderNo(settleOrders.getOwnerOrderNo());
             settleOrdersAccount.setOwnerMemNo(settleOrders.getOwnerMemNo());
-            orderSettleNoTService.repayHistoryDebtOwner(settleOrdersAccount);
+            orderOwnerSettleNewService.repayHistoryDebtOwner(settleOrdersAccount);
             log.info("取消订单-结算-车主端结算-车主收益开始抵扣历史欠款结束settleCancelOrdersAccount={},settleOrders={}",
                     JSON.toJSONString(settleCancelOrdersAccount),JSON.toJSONString(settleOrders));
             //历史欠款抵扣完之后还有剩余-->再走收益审核

@@ -1,6 +1,7 @@
 package com.atzuche.order.settle.vo.req;
 
 import com.atzuche.order.delivery.vo.delivery.rep.OwnerGetAndReturnCarDTO;
+import com.atzuche.order.delivery.vo.delivery.rep.RenterGetAndReturnCarDTO;
 import com.atzuche.order.ownercost.entity.*;
 import com.atzuche.order.rentercost.entity.ConsoleRenterOrderFineDeatailEntity;
 import com.atzuche.order.rentercost.entity.OrderConsoleCostDetailEntity;
@@ -49,6 +50,11 @@ public class OwnerCosts {
      */
     private OwnerGetAndReturnCarDTO ownerGetAndReturnCarDTO;
     /**
+     * 车主结算分离，需要计算油费差价，需要将租客的也计算出来。
+     * 需要平账，去掉。
+     */
+//    private RenterGetAndReturnCarDTO renterGetAndReturnCarDTO;
+    /**
      * 管理后台补贴
      */
     List<OrderConsoleSubsidyDetailEntity> orderConsoleSubsidyDetails;
@@ -76,14 +82,32 @@ public class OwnerCosts {
     private int ownerCostAmtFinal;
     //车主会员号
     private String ownerNo;
-    /**
+    
+    
+//    public RenterGetAndReturnCarDTO getRenterGetAndReturnCarDTO() {
+//		return renterGetAndReturnCarDTO;
+//	}
+//
+//	public void setRenterGetAndReturnCarDTO(RenterGetAndReturnCarDTO renterGetAndReturnCarDTO) {
+//		this.renterGetAndReturnCarDTO = renterGetAndReturnCarDTO;
+//	}
+
+	/**
      * 交接车-获取超里程费用（车主端依托租客的参数来计算。）
      */
-    private OwnerOrderPurchaseDetailEntity mileageAmt;
+    private FeeResult mileageAmt;
     //车辆类型
     private Integer carOwnerType;
     
     
+	public FeeResult getMileageAmt() {
+		return mileageAmt;
+	}
+
+	public void setMileageAmt(FeeResult mileageAmt) {
+		this.mileageAmt = mileageAmt;
+	}
+
 	public Integer getCarOwnerType() {
 		return carOwnerType;
 	}
@@ -92,13 +116,6 @@ public class OwnerCosts {
 		this.carOwnerType = carOwnerType;
 	}
 
-	public OwnerOrderPurchaseDetailEntity getMileageAmt() {
-		return mileageAmt;
-	}
-
-	public void setMileageAmt(OwnerOrderPurchaseDetailEntity mileageAmt) {
-		this.mileageAmt = mileageAmt;
-	}
 
 	public String getOwnerNo() {
 		return ownerNo;

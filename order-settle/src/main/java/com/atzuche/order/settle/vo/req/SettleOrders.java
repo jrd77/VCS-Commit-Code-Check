@@ -38,7 +38,7 @@ public class SettleOrders {
     /**
      * 租车费用
      */
-    private int renterOrderCost;
+//    private int renterOrderCost;
 
     /**
      * 租客费用明细
@@ -88,12 +88,12 @@ public class SettleOrders {
 	public void setOwnerMemNo(String ownerMemNo) {
 		this.ownerMemNo = ownerMemNo;
 	}
-	public int getRenterOrderCost() {
-		return renterOrderCost;
-	}
-	public void setRenterOrderCost(int renterOrderCost) {
-		this.renterOrderCost = renterOrderCost;
-	}
+//	public int getRenterOrderCost() {
+//		return renterOrderCost;
+//	}
+//	public void setRenterOrderCost(int renterOrderCost) {
+//		this.renterOrderCost = renterOrderCost;
+//	}
 	public RentCosts getRentCosts() {
 		return rentCosts;
 	}

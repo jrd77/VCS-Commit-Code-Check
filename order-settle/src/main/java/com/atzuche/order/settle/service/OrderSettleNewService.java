@@ -1,38 +1,13 @@
 package com.atzuche.order.settle.service;
 
-import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
-import java.util.Map;
 
-import com.atzuche.order.cashieraccount.service.CashierPayService;
-import com.atzuche.order.cashieraccount.vo.req.pay.OrderPayReqVO;
-import com.atzuche.order.cashieraccount.vo.res.OrderPayableAmountResVO;
-import com.atzuche.order.commons.enums.OrderStatusEnum;
-import com.atzuche.order.commons.enums.YesNoEnum;
-import com.atzuche.order.commons.enums.account.SettleStatusEnum;
-import com.atzuche.order.commons.enums.cashcode.ConsoleCashCodeEnum;
-import com.atzuche.order.commons.service.OrderPayCallBack;
-import com.atzuche.order.mq.common.base.BaseProducer;
-import com.atzuche.order.mq.common.base.OrderMessage;
-import com.atzuche.order.mq.enums.ShortMessageTypeEnum;
-import com.atzuche.order.rentercost.entity.*;
-import com.atzuche.order.settle.vo.req.RentCosts;
-import com.atzuche.order.mq.util.SmsParamsMapUtil;
-import com.autoyol.autopay.gateway.constant.DataPayKindConstant;
-import com.autoyol.doc.util.StringUtil;
-import com.autoyol.event.rabbit.neworder.NewOrderMQActionEventEnum;
-import com.autoyol.event.rabbit.neworder.OrderSettlementMq;
-import com.autoyol.event.rabbit.neworder.OrderWzSettlementMq;
-import com.autoyol.platformcost.model.FeeResult;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Maps;
-import com.thoughtworks.xstream.mapper.ImmutableTypesMapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import com.atzuche.order.accountownercost.entity.AccountOwnerCostSettleDetailEntity;
@@ -44,20 +19,48 @@ import com.atzuche.order.accountplatorm.service.notservice.AccountPlatformSubsid
 import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostSettleDetailEntity;
 import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostSettleEntity;
 import com.atzuche.order.accountrenterrentcost.service.notservice.AccountRenterCostSettleDetailNoTService;
+import com.atzuche.order.cashieraccount.entity.CashierEntity;
+import com.atzuche.order.cashieraccount.service.CashierPayService;
+import com.atzuche.order.cashieraccount.service.CashierService;
 import com.atzuche.order.cashieraccount.service.CashierSettleService;
 import com.atzuche.order.cashieraccount.service.notservice.CashierNoTService;
+import com.atzuche.order.cashieraccount.vo.req.CashierDeductDebtReqVO;
+import com.atzuche.order.cashieraccount.vo.req.CashierRefundApplyReqVO;
+import com.atzuche.order.cashieraccount.vo.req.DeductDepositToRentCostReqVO;
+import com.atzuche.order.cashieraccount.vo.req.pay.OrderPayReqVO;
+import com.atzuche.order.cashieraccount.vo.res.CashierDeductDebtResVO;
+import com.atzuche.order.cashieraccount.vo.res.OrderPayableAmountResVO;
+import com.atzuche.order.coin.service.AccountRenterCostCoinService;
+import com.atzuche.order.commons.enums.YesNoEnum;
+import com.atzuche.order.commons.enums.account.debt.DebtTypeEnum;
 import com.atzuche.order.commons.enums.cashcode.OwnerCashCodeEnum;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
-import com.atzuche.order.ownercost.entity.OwnerOrderIncrementDetailEntity;
-import com.atzuche.order.ownercost.entity.OwnerOrderPurchaseDetailEntity;
+import com.atzuche.order.commons.enums.cashier.OrderRefundStatusEnum;
+import com.atzuche.order.commons.service.OrderPayCallBack;
+import com.atzuche.order.mq.common.base.BaseProducer;
+import com.atzuche.order.mq.common.base.OrderMessage;
 import com.atzuche.order.parentorder.dto.OrderStatusDTO;
-import com.atzuche.order.settle.exception.OrderSettleFlatAccountException;
-import com.atzuche.order.settle.service.notservice.OrderSettleNoTService;
+import com.atzuche.order.rentercost.entity.ConsoleRenterOrderFineDeatailEntity;
+import com.atzuche.order.rentercost.entity.OrderConsoleCostDetailEntity;
+import com.atzuche.order.rentercost.entity.OrderConsoleSubsidyDetailEntity;
+import com.atzuche.order.rentercost.entity.RenterOrderCostDetailEntity;
+import com.atzuche.order.rentercost.entity.RenterOrderFineDeatailEntity;
+import com.atzuche.order.rentercost.entity.RenterOrderSubsidyDetailEntity;
+import com.atzuche.order.settle.service.notservice.OrderSettleProxyService;
+import com.atzuche.order.settle.vo.req.AccountInsertDebtReqVO;
+import com.atzuche.order.settle.vo.req.RefundApplyVO;
+import com.atzuche.order.settle.vo.req.RentCosts;
 import com.atzuche.order.settle.vo.req.SettleOrders;
 import com.atzuche.order.settle.vo.req.SettleOrdersAccount;
 import com.atzuche.order.settle.vo.req.SettleOrdersDefinition;
+import com.atzuche.order.wallet.WalletProxyService;
+import com.autoyol.autopay.gateway.constant.DataPayKindConstant;
+import com.autoyol.autopay.gateway.constant.DataPayTypeConstant;
 import com.autoyol.commons.utils.GsonUtils;
-import com.dianping.cat.Cat;
+import com.autoyol.doc.util.StringUtil;
+import com.autoyol.event.rabbit.neworder.NewOrderMQActionEventEnum;
+import com.autoyol.event.rabbit.neworder.OrderSettlementMq;
+import com.google.common.collect.ImmutableList;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -70,131 +73,289 @@ public class OrderSettleNewService {
     @Autowired AccountOwnerCostSettleDetailNoTService accountOwnerCostSettleDetailNoTService;
     @Autowired AccountPlatformSubsidyDetailNoTService accountPlatformSubsidyDetailNoTService;
     @Autowired AccountPlatformProfitDetailNotService accountPlatformProfitDetailNotService;
-    @Autowired private OrderSettleNoTService orderSettleNoTService;
+//    @Autowired private OrderSettleNoTService orderSettleNoTService;  //相互
     @Autowired private CashierSettleService cashierSettleService;
     @Autowired private CashierPayService cashierPayService;
     @Autowired private BaseProducer baseProducer;
-
-
+    @Autowired private CashierService cashierService;
+    @Autowired private AccountRenterCostCoinService accountRenterCostCoinService;
+    @Autowired private WalletProxyService walletProxyService;
+    @Autowired
+    private OrderSettleProxyService orderSettleProxyService;
 
     /**
-     * 结算逻辑
+     *  先查询  发现 有结算数据停止结算 手动处理
+     * @param orderNo
      */
-    @Transactional(rollbackFor=Exception.class)
-    public void settleOrder(SettleOrders settleOrders, SettleOrdersDefinition settleOrdersDefinition,OrderPayCallBack callBack) {
-        //7.1 租车费用  总费用 信息落库 并返回最新租车费用 实付
-    	//account_Renter_Cost_Settle 租客费用及其结算总表 shifu           
-        AccountRenterCostSettleEntity accountRenterCostSettle = cashierSettleService.updateRentSettleCost(settleOrders.getOrderNo(),settleOrders.getRenterMemNo(), settleOrdersDefinition.getAccountRenterCostSettleDetails());
-        log.info("OrderSettleService updateRentSettleCost [{}]",GsonUtils.toJson(accountRenterCostSettle));
-        Cat.logEvent("updateRentSettleCost",GsonUtils.toJson(accountRenterCostSettle));
+    public void checkIsSettle(String orderNo,SettleOrders settleOrders) {
+        List<AccountRenterCostSettleDetailEntity> accountRenterCostSettleDetailEntitys = accountRenterCostSettleDetailNoTService.getAccountRenterCostSettleDetail(orderNo);
+        List<AccountPlatformProfitDetailEntity> accountPlatformProfitDetailEntitys = accountPlatformProfitDetailNotService.getPlatformProfitDetails(orderNo);
+        List<AccountPlatformSubsidyDetailEntity> accountPlatformSubsidyDetailEntitys = accountPlatformSubsidyDetailNoTService.getPlatformSubsidyDetails(orderNo);
+        List<AccountOwnerCostSettleDetailEntity> accountOwnerCostSettleDetailEntitys = accountOwnerCostSettleDetailNoTService.getAccountOwnerCostSettleDetails(orderNo,settleOrders.getOwnerMemNo());
 
-        //7.2 车主 费用 落库表
-        cashierSettleService.insertAccountOwnerCostSettle(settleOrders.getOrderNo(),settleOrders.getOwnerOrderNo(),settleOrders.getOwnerMemNo(),settleOrdersDefinition.getAccountOwnerCostSettleDetails());
-        //8 获取租客 实付 车辆押金  
-        //从AccountRenterDepositDetail租车押金资金明细表中求和。
-        int depositAmt = cashierSettleService.getRentDeposit(settleOrders.getOrderNo(),settleOrders.getRenterMemNo());
-        //从租车押金accountRenterDeposit总表中查询 shifu
-        int depositAmtRealPay = cashierSettleService.getRentDepositRealPay(settleOrders.getOrderNo(),settleOrders.getRenterMemNo());
-        
-        SettleOrdersAccount settleOrdersAccount = new SettleOrdersAccount();
-        BeanUtils.copyProperties(settleOrders,settleOrdersAccount);
-        //查询订单剩余应付
-        settleOrdersAccount.setRentCostAmtFinal(accountRenterCostSettle.getRentAmt());
-        settleOrdersAccount.setRentCostPayAmt(accountRenterCostSettle.getShifuAmt());
-        
-        settleOrdersAccount.setDepositAmt(depositAmtRealPay);
-        settleOrdersAccount.setDepositSurplusAmt(depositAmt);
-        
-        settleOrdersAccount.setOwnerCostAmtFinal(settleOrdersDefinition.getOwnerCostAmtFinal());
-        settleOrdersAccount.setOwnerCostSurplusAmt(settleOrdersDefinition.getOwnerCostAmtFinal());
-        //>0 表示 实付 大于应退 差值为应退（实付>0  应付小于0 getRentAmt 为所有租车费用明细含补贴 相加之和）
-        int rentCostSurplusAmt = (accountRenterCostSettle.getRentAmt() + accountRenterCostSettle.getShifuAmt())>0
-                ?(accountRenterCostSettle.getRentAmt() + accountRenterCostSettle.getShifuAmt())
-                :0;
-        settleOrdersAccount.setRentCostSurplusAmt(rentCostSurplusAmt);
-        log.info("OrderSettleService settleOrdersDefinition settleOrdersAccount one [{}]", GsonUtils.toJson(settleOrdersAccount));
-        Cat.logEvent("settleOrdersAccount",GsonUtils.toJson(settleOrdersAccount));
+        if(!CollectionUtils.isEmpty(accountRenterCostSettleDetailEntitys)){
+            throw new RuntimeException("有结算数据停止结算");
+        }
+        if(!CollectionUtils.isEmpty(accountPlatformProfitDetailEntitys)){
+            throw new RuntimeException("有结算数据停止结算");
+        }
+        if(!CollectionUtils.isEmpty(accountPlatformSubsidyDetailEntitys)){
+            throw new RuntimeException("有结算数据停止结算");
+        }
+        if(!CollectionUtils.isEmpty(accountOwnerCostSettleDetailEntitys)){
+            throw new RuntimeException("有结算数据停止结算");
+        }
+    }
+    
+    /**
+     * 租客费用结余 处理 （如果应付 大于实付，这个订单存在未支付信息，优先 押金抵扣，未支付信息）
+     * @param settleOrdersAccount
+     */
+    public void rentCostSettle(SettleOrders settleOrders , SettleOrdersAccount settleOrdersAccount,OrderPayCallBack callBack) {
+        //1 如果租车费用计算应付总额大于 实际支付 车辆押金抵扣租车费用欠款
+        if(settleOrdersAccount.getRentCostAmtFinal() + settleOrdersAccount.getRentCostPayAmt()<0){
+            //1.1押金 抵扣 租车费用欠款
+            if(settleOrdersAccount.getDepositAmt()>0){
+                DeductDepositToRentCostReqVO vo = new DeductDepositToRentCostReqVO();
+                BeanUtils.copyProperties(settleOrders,vo);
+                vo.setMemNo(settleOrders.getRenterMemNo());
+                int debtAmt = settleOrdersAccount.getRentCostAmtFinal() + settleOrdersAccount.getRentCostPayAmt();
+                //真实抵扣金额
+                int amt = debtAmt+settleOrdersAccount.getDepositSurplusAmt()>=0?debtAmt:-settleOrdersAccount.getDepositSurplusAmt();
+                vo.setAmt(amt);
+                //车俩押金抵扣 租车费用金额 返回 已抵扣部分
+                cashierSettleService.deductDepositToRentCost(vo);
+                //计算剩余车俩押金
+                settleOrdersAccount.setDepositSurplusAmt(settleOrdersAccount.getDepositSurplusAmt() + amt);
+                // 实付费用加上 押金已抵扣部分
+                settleOrdersAccount.setRentCostPayAmt(settleOrdersAccount.getRentCostPayAmt() + Math.abs(amt));
+                //更新订单费用处数据
+                if(Objects.nonNull(callBack)){
+                    callBack.callBackSettle(settleOrders.getOrderNo(),settleOrders.getRenterOrderNo());
+                }
 
-        OrderStatusDTO orderStatusDTO = new OrderStatusDTO();
-        orderStatusDTO.setSettleTime(LocalDateTime.now());
-        orderStatusDTO.setOrderNo(settleOrders.getOrderNo());
-        orderStatusDTO.setStatus(OrderStatusEnum.TO_WZ_SETTLE.getStatus());
-        orderStatusDTO.setSettleStatus(SettleStatusEnum.SETTLED.getCode());
-        //9 租客费用 结余处理
-        orderSettleNoTService.rentCostSettle(settleOrders,settleOrdersAccount,callBack);
-        //10租客车辆押金/租客剩余租车费用 结余历史欠款
-        orderSettleNoTService.repayHistoryDebtRent(settleOrdersAccount);
-        //11 租客费用 退还
-        orderSettleNoTService.refundRentCost(settleOrdersAccount,settleOrdersDefinition.getAccountRenterCostSettleDetails(),orderStatusDTO,settleOrders);
-        //12 租客押金 退还
-        orderSettleNoTService.refundDepositAmt(settleOrdersAccount,orderStatusDTO);
-        //13车主收益 结余处理 历史欠款
-        orderSettleNoTService.repayHistoryDebtOwner(settleOrdersAccount);
-        //14 车主待审核收益落库
-        orderSettleNoTService.insertOwnerIncomeExamine(settleOrdersAccount);
-        //15 更新订单状态
-        settleOrdersAccount.setOrderStatusDTO(orderStatusDTO);
-        orderSettleNoTService.saveOrderStatusInfo(settleOrdersAccount);
-        log.info("OrderSettleService settleOrdersDefinition settleOrdersAccount two [{}]", GsonUtils.toJson(settleOrdersAccount));
-        //16 退优惠卷 凹凸币
-        orderSettleNoTService.settleUndoCoupon(settleOrders.getOrderNo(),settleOrders.getRentCosts().getRenterOrderSubsidyDetails());
-        log.info("OrderSettleService settleUndoCoupon settleUndoCoupon one [{}]", GsonUtils.toJson(settleOrdersAccount));
-        Cat.logEvent("settleUndoCoupon",GsonUtils.toJson(settleOrdersAccount));
+            }
+        }
+        //2如果 步骤1 结算 应付还是大于实付  此订单产生历史欠款
+        if(settleOrdersAccount.getRentCostAmtFinal() + settleOrdersAccount.getRentCostPayAmt()<0){
+            //2.1 记录历史欠款
+            int amt = settleOrdersAccount.getRentCostAmtFinal() + settleOrdersAccount.getRentCostPayAmt();
+            AccountInsertDebtReqVO accountInsertDebt = new AccountInsertDebtReqVO();
+            BeanUtils.copyProperties(settleOrders,accountInsertDebt);
+            accountInsertDebt.setMemNo(settleOrders.getRenterMemNo());
+            accountInsertDebt.setType(DebtTypeEnum.SETTLE.getCode());
+            accountInsertDebt.setAmt(amt);
+            accountInsertDebt.setSourceCode(RenterCashCodeEnum.HISTORY_AMT.getCashNo());
+            accountInsertDebt.setSourceDetail(RenterCashCodeEnum.HISTORY_AMT.getTxt());
+            int debtDetailId = cashierService.createDebt(accountInsertDebt);
+            //2.2记录结算费用状态
+            AccountRenterCostSettleDetailEntity entity = new AccountRenterCostSettleDetailEntity();
+            BeanUtils.copyProperties(settleOrders,entity);
+            entity.setMemNo(settleOrders.getRenterMemNo());
+            entity.setAmt(-amt);
+            entity.setCostCode(RenterCashCodeEnum.HISTORY_AMT.getCashNo());
+            entity.setCostDetail(RenterCashCodeEnum.HISTORY_AMT.getTxt());
+            entity.setUniqueNo(String.valueOf(debtDetailId));
+            cashierSettleService.insertAccountRenterCostSettleDetail(entity);
+            // 实付费用加上 历史欠款转移部分，存在欠款 1走历史欠款，2当前订单 账户拉平
+            settleOrdersAccount.setRentCostPayAmt(settleOrdersAccount.getRentCostPayAmt() + Math.abs(amt));
+            //更新订单费用处数据
+            if(Objects.nonNull(callBack)){
+                callBack.callBackSettle(settleOrders.getOrderNo(),settleOrders.getRenterOrderNo());
+            }
+        }
     }
 
     /**
-     * 通过收银台查取  待支付租车费用金额
-     * @param orderNo memNo
+     * 结算租客 还历史欠款
+     * @param settleOrdersAccount
+     */
+    public void repayHistoryDebtRent(SettleOrdersAccount settleOrdersAccount) {
+        // 1 存在 实付大于应付 先抵扣 历史欠款
+        if(settleOrdersAccount.getRentCostSurplusAmt()>0){
+            CashierDeductDebtReqVO cashierDeductDebtReq = new CashierDeductDebtReqVO();
+            BeanUtils.copyProperties(settleOrdersAccount,cashierDeductDebtReq);
+            cashierDeductDebtReq.setAmt(settleOrdersAccount.getRentCostSurplusAmt());
+            cashierDeductDebtReq.setRenterCashCodeEnum(RenterCashCodeEnum.SETTLE_RENT_COST_TO_HISTORY_AMT);
+            cashierDeductDebtReq.setMemNo(settleOrdersAccount.getRenterMemNo());
+            CashierDeductDebtResVO result = cashierService.deductDebtByRentCost(cashierDeductDebtReq);
+            if(Objects.nonNull(result)){
+                //已抵扣抵扣金额
+                int deductAmt = result.getDeductAmt();
+                //计算 还完历史欠款 剩余 应退 剩余租车费用
+                settleOrdersAccount.setRentCostSurplusAmt(settleOrdersAccount.getRentCostSurplusAmt() - deductAmt);
+            }
+        }
+        //车辆押金存在 且 租车费用没有抵扣完 ，使用车辆押金抵扣 历史欠款
+        if(settleOrdersAccount.getDepositSurplusAmt()>0){
+            CashierDeductDebtReqVO cashierDeductDebtReq = new CashierDeductDebtReqVO();
+            BeanUtils.copyProperties(settleOrdersAccount,cashierDeductDebtReq);
+            cashierDeductDebtReq.setMemNo(settleOrdersAccount.getRenterMemNo());
+            cashierDeductDebtReq.setAmt(settleOrdersAccount.getDepositSurplusAmt());
+            cashierDeductDebtReq.setRenterCashCodeEnum(RenterCashCodeEnum.SETTLE_DEPOSIT_TO_HISTORY_AMT);
+            CashierDeductDebtResVO result = cashierService.deductDebt(cashierDeductDebtReq);
+            if(Objects.nonNull(result)){
+                //已抵扣抵扣金额
+                int deductAmt = result.getDeductAmt();
+                //计算 还完历史欠款 剩余 应退 剩余车俩押金
+                settleOrdersAccount.setDepositSurplusAmt(settleOrdersAccount.getDepositSurplusAmt() - deductAmt);
+            }
+        }
+    }
+
+    /**
+     * 退还多余费用
+     * 退还优先级 钱包<消费
+     *
+     * @param settleOrdersAccount
+     */
+    public void refundRentCost(SettleOrdersAccount settleOrdersAccount,List<AccountRenterCostSettleDetailEntity> accountRenterCostSettleDetails,OrderStatusDTO orderStatusDTO,SettleOrders settleOrders) {
+        List<AccountRenterCostSettleDetailEntity> renterCostSettleDetails = new ArrayList<>();
+        //应退结余 租车费用 （包含 租车支付金额 和钱包抵扣）
+        int rentCostSurplusAmt = settleOrdersAccount.getRentCostSurplusAmt();
+        if(rentCostSurplusAmt>0){
+            //退还租车费用
+            if(rentCostSurplusAmt>0){
+                //退还剩余 租车费用
+                RefundApplyVO refundApplyVO = new RefundApplyVO(settleOrders,-rentCostSurplusAmt,RenterCashCodeEnum.ACCOUNT_RENTER_RENT_COST_REFUND,"结算订单退还");
+                List<CashierRefundApplyReqVO> cashierRefundApplyReqs = orderSettleProxyService.getCashierRefundApply(refundApplyVO);
+                if(!CollectionUtils.isEmpty(cashierRefundApplyReqs)){
+                    for(int i=0;i<cashierRefundApplyReqs.size();i++){
+                        CashierRefundApplyReqVO cashierRefundApplyReq = cashierRefundApplyReqs.get(i);
+                        int id =cashierService.refundRentCost(cashierRefundApplyReq);
+                        AccountRenterCostSettleDetailEntity entity = getAccountRenterCostSettleDetailEntityForRentCost(settleOrdersAccount,cashierRefundApplyReq.getAmt(),id);
+                        renterCostSettleDetails.add(entity);
+                    }
+                }
+                //计算 实际支付 金额 退钱总额
+                int returnAmt = cashierRefundApplyReqs.stream().mapToInt(CashierRefundApplyReqVO::getAmt).sum();
+                // 计算剩余待退
+                rentCostSurplusAmt = rentCostSurplusAmt+returnAmt;
+                orderStatusDTO.setRentCarRefundStatus(OrderRefundStatusEnum.REFUNDING.getStatus());
+            }
+
+            //2 查询钱包 比较
+            if(rentCostSurplusAmt>0){
+                int walletAmt = cashierSettleService.getRentCostPayByWallet(settleOrdersAccount.getOrderNo(),settleOrdersAccount.getRenterMemNo());
+                //计算应退钱包金额 并退还
+                int returnWalletAmt = rentCostSurplusAmt>walletAmt?walletAmt:rentCostSurplusAmt;
+                walletProxyService.returnOrChargeWallet(settleOrdersAccount.getRenterMemNo(),settleOrdersAccount.getOrderNo(),Math.abs(returnWalletAmt));
+                AccountRenterCostSettleDetailEntity entity = getAccountRenterCostSettleDetailEntityForWallet(settleOrdersAccount,-returnWalletAmt);
+                renterCostSettleDetails.add(entity);
+
+            }
+            //记录 凹凸币/钱包退还 流水
+            cashierSettleService.insertAccountRenterCostSettleDetails(renterCostSettleDetails);
+        }
+        //1 退还凹凸币 coinAmt为订单真实使用的凹凸币
+        int coinAmt = accountRenterCostSettleDetails.stream().filter(obj ->{
+            return RenterCashCodeEnum.AUTO_COIN_DEDUCT.getCashNo().equals(obj.getCostCode());
+        }).mapToInt(AccountRenterCostSettleDetailEntity::getAmt).sum();
+        if(coinAmt>0){
+            //退还多余凹凸币
+            accountRenterCostCoinService.settleAutoCoin(settleOrdersAccount.getRenterMemNo(),settleOrdersAccount.getOrderNo(),coinAmt);
+        }
+
+    }
+    
+    /**
+     * 退还剩余的 车辆押金
+     * @param settleOrdersAccount
+     */
+    public void refundDepositAmt(SettleOrdersAccount settleOrdersAccount,OrderStatusDTO orderStatusDTO) {
+        if(settleOrdersAccount.getDepositSurplusAmt()>0){
+            //1退还租车押金
+            CashierRefundApplyReqVO cashierRefundApply = new CashierRefundApplyReqVO();
+            BeanUtils.copyProperties(settleOrdersAccount,cashierRefundApply);
+//            cashierRefundApply.setMemNo(settleOrdersAccount.getRenterMemNo());
+//            cashierRefundApply.setAmt(-settleOrdersAccount.getDepositSurplusAmt());
+//            cashierRefundApply.setRenterCashCodeEnum(RenterCashCodeEnum.SETTLE_RENT_DEPOSIT_TO_RETURN_AMT);
+//            cashierRefundApply.setRemake(RenterCashCodeEnum.SETTLE_RENT_DEPOSIT_TO_RETURN_AMT.getTxt());
+//            cashierRefundApply.setFlag(RenterCashCodeEnum.ACCOUNT_RENTER_DEPOSIT.getCashNo());
+//            cashierRefundApply.setType(SysOrHandEnum.SYSTEM.getStatus());
+//            int id =cashierService.refundDeposit(cashierRefundApply);
+            
+          
+          //方法重构
+          CashierEntity cashierEntity = cashierNoTService.getCashierEntity(settleOrdersAccount.getOrderNo(),settleOrdersAccount.getRenterMemNo(), DataPayKindConstant.RENT);
+          BeanUtils.copyProperties(cashierEntity,cashierRefundApply);
+          
+          //预授权处理
+          int id = 0;
+          if(cashierEntity != null && DataPayTypeConstant.PAY_PRE.equals(cashierEntity.getPayType())) {
+          	id = cashierService.refundDepositPreAuthAll(settleOrdersAccount.getDepositSurplusAmt(), cashierEntity, cashierRefundApply, RenterCashCodeEnum.SETTLE_RENT_DEPOSIT_TO_RETURN_AMT);
+          }else {
+          	//消费
+          	//退货
+          	id = cashierService.refundDepositPurchase(settleOrdersAccount.getDepositSurplusAmt(), cashierEntity, cashierRefundApply,RenterCashCodeEnum.SETTLE_RENT_DEPOSIT_TO_RETURN_AMT);
+          }
+            
+            // 2记录退还 租车押金 结算费用明细
+            AccountRenterCostSettleDetailEntity entity = new AccountRenterCostSettleDetailEntity();
+            BeanUtils.copyProperties(settleOrdersAccount,entity);
+            entity.setMemNo(settleOrdersAccount.getRenterMemNo());
+            entity.setAmt(-settleOrdersAccount.getDepositSurplusAmt());
+            entity.setCostCode(RenterCashCodeEnum.SETTLE_RENT_DEPOSIT_TO_RETURN_AMT.getCashNo());
+            entity.setCostDetail(RenterCashCodeEnum.SETTLE_RENT_DEPOSIT_TO_RETURN_AMT.getTxt());
+            entity.setUniqueNo(String.valueOf(id));
+            cashierSettleService.insertAccountRenterCostSettleDetail(entity);
+            orderStatusDTO.setDepositRefundStatus(OrderRefundStatusEnum.REFUNDING.getStatus());
+
+        }
+
+    }
+    
+    // -------------------------------------------------------------------------------------------------------------
+    
+
+    /**
+     * 租车费用退还
+     * @param settleOrdersAccount
+     * @param rentCostSurplusAmt
      * @return
      */
-    public int getRentCostAmtFinal(String orderNo,String memNo) {
-        OrderPayReqVO orderPayReqVO = new OrderPayReqVO();
-        orderPayReqVO.setOrderNo(orderNo);
-        orderPayReqVO.setMenNo(memNo);
-        orderPayReqVO.setIsUseWallet(YesNoEnum.NO.getCode());
-        List<String> payKind = ImmutableList.of(
-                DataPayKindConstant.RENT_AMOUNT
-        );
-        orderPayReqVO.setPayKind(payKind);
-        OrderPayableAmountResVO vo = cashierPayService.getOrderPayableAmount(orderPayReqVO);
-        return vo.getAmt();
+    private CashierRefundApplyReqVO getCashierRefundApplyReqVO(SettleOrdersAccount settleOrdersAccount, int rentCostSurplusAmt) {
+        CashierRefundApplyReqVO vo = new CashierRefundApplyReqVO();
+        BeanUtils.copyProperties(settleOrdersAccount,vo);
+        vo.setAmt(rentCostSurplusAmt);
+        vo.setRemake("结算退还");
+        vo.setMemNo(settleOrdersAccount.getRenterMemNo());
+        vo.setRenterCashCodeEnum(RenterCashCodeEnum.SETTLE_RENT_COST_TO_RETURN_AMT);
+        vo.setFlag(RenterCashCodeEnum.ACCOUNT_RENTER_RENT_COST.getCashNo());
+        return vo;
     }
 
     /**
-     * 车辆结算  校验费用落库等无实物操作
+     * 结算退还钱包金额 费用明细
+     * @param settleOrdersAccount
+     * @param returnWalletAmt
+     * @return
      */
-    public SettleOrdersDefinition settleOrderFirst(SettleOrders settleOrders){
-        //1 查询所有租客费用明细
-        orderSettleNoTService.getRenterCostSettleDetail(settleOrders);
-        log.info("OrderSettleService getRenterCostSettleDetail settleOrders [{}]", GsonUtils.toJson(settleOrders));
-        Cat.logEvent("settleOrders",GsonUtils.toJson(settleOrders));
-
-        //3 查询所有车主费用明细 TODO 暂不支持 多个车主
-        orderSettleNoTService.getOwnerCostSettleDetail(settleOrders);
-        Cat.logEvent("getOwnerCostSettleDetail",GsonUtils.toJson(settleOrders));
-        log.info("OrderSettleService getOwnerCostSettleDetail settleOrders [{}]", GsonUtils.toJson(settleOrders));
-
-        //4 计算费用统计  资金统计
-        SettleOrdersDefinition settleOrdersDefinition = orderSettleNoTService.settleOrdersDefinition(settleOrders);
-        log.info("OrderSettleService settleOrdersDefinition settleOrdersDefinition [{}]", GsonUtils.toJson(settleOrdersDefinition));
-        Cat.logEvent("SettleOrdersDefinition",GsonUtils.toJson(settleOrdersDefinition));
-
-        //5 费用明细先落库
-        orderSettleNoTService.insertSettleOrders(settleOrdersDefinition);
-
-        //6 费用平账 平台收入 + 平台补贴 + 车主费用 + 车主补贴 + 租客费用 + 租客补贴 = 0
-        int totleAmt = settleOrdersDefinition.getPlatformProfitAmt() + settleOrdersDefinition.getPlatformSubsidyAmt()
-                + settleOrdersDefinition.getOwnerCostAmt() + settleOrdersDefinition.getOwnerSubsidyAmt()
-                + settleOrdersDefinition.getRentCostAmt() + settleOrdersDefinition.getRentSubsidyAmt();
-        if(totleAmt != 0){
-            Cat.logEvent("pingzhang","平账失败");
-            //TODO 走Cat告警
-            throw new OrderSettleFlatAccountException();
-        }
-        return settleOrdersDefinition;
+    private AccountRenterCostSettleDetailEntity getAccountRenterCostSettleDetailEntityForWallet(SettleOrdersAccount settleOrdersAccount, int returnWalletAmt) {
+        AccountRenterCostSettleDetailEntity entity = new AccountRenterCostSettleDetailEntity();
+        BeanUtils.copyProperties(settleOrdersAccount,entity);
+        entity.setAmt(returnWalletAmt);
+        entity.setCostCode(RenterCashCodeEnum.WALLET_DEDUCT.getCashNo());
+        entity.setCostDetail(RenterCashCodeEnum.WALLET_DEDUCT.getTxt());
+        return entity;
     }
-
-
+    
+    /**
+     * 结算退还租车费用金额 费用明细
+     * @param settleOrdersAccount
+     * @param rentCostSurplusAmt
+     * @return
+     */
+    private AccountRenterCostSettleDetailEntity getAccountRenterCostSettleDetailEntityForRentCost(SettleOrdersAccount settleOrdersAccount, int rentCostSurplusAmt, int id) {
+        AccountRenterCostSettleDetailEntity entity = new AccountRenterCostSettleDetailEntity();
+        BeanUtils.copyProperties(settleOrdersAccount,entity);
+        entity.setAmt(rentCostSurplusAmt);
+        entity.setCostCode(RenterCashCodeEnum.SETTLE_RENT_COST_TO_RETURN_AMT.getCashNo());
+        entity.setCostDetail(RenterCashCodeEnum.SETTLE_RENT_COST_TO_RETURN_AMT.getTxt());
+        entity.setUniqueNo(String.valueOf(id));
+        return entity;
+    }
+    
     /**
      * 租车费用 对应补贴冲账 记录
      * @param renterOrderCostDetail
@@ -313,101 +474,33 @@ public class OrderSettleNewService {
             settleOrdersDefinition.addPlatformSubsidy(accountPlatformSubsidyDetail);
         }
     }
-
-
-
+    
+    //----------------------------------------------------------------------------------------------------------------
+    
 
     /**
-     * 车主端代管车服务费车主端代管车服务费 费用平台端冲账
-     * @param proxyExpense
+     * 通过收银台查取  待支付租车费用金额
+     * @param orderNo memNo
+     * @return
+     */
+    public int getRentCostAmtFinal(String orderNo,String memNo) {
+        OrderPayReqVO orderPayReqVO = new OrderPayReqVO();
+        orderPayReqVO.setOrderNo(orderNo);
+        orderPayReqVO.setMenNo(memNo);
+        orderPayReqVO.setIsUseWallet(YesNoEnum.NO.getCode());
+        List<String> payKind = ImmutableList.of(
+                DataPayKindConstant.RENT_AMOUNT
+        );
+        orderPayReqVO.setPayKind(payKind);
+        OrderPayableAmountResVO vo = cashierPayService.getOrderPayableAmount(orderPayReqVO);
+        return vo.getAmt();
+    }
+
+    /***
+     * 在车主端处理，是根据是否代管车来处理，是代管车归平台，否则归车主。200308
+     * @param accountRenterCostSettleDetail
      * @param settleOrdersDefinition
      */
-    public void addProxyExpenseAmtToPlatform(OwnerOrderPurchaseDetailEntity proxyExpense, SettleOrdersDefinition settleOrdersDefinition) {
-        int totalAmount = proxyExpense.getTotalAmount();
-        AccountPlatformProfitDetailEntity accountPlatformProfitDetail = new AccountPlatformProfitDetailEntity();
-        accountPlatformProfitDetail.setAmt(-totalAmount);
-        accountPlatformProfitDetail.setSourceCode(OwnerCashCodeEnum.PROXY_CHARGE.getCashNo());
-        accountPlatformProfitDetail.setSourceDesc(OwnerCashCodeEnum.PROXY_CHARGE.getTxt());
-        accountPlatformProfitDetail.setUniqueNo(String.valueOf(proxyExpense.getId()));
-        accountPlatformProfitDetail.setOrderNo(proxyExpense.getOrderNo());
-        settleOrdersDefinition.addPlatformProfit(accountPlatformProfitDetail);
-
-    }
-
-    /**
-     * 车主端平台服务费 费用平台端冲账
-     * @param serviceExpense
-     * @param settleOrdersDefinition
-     */
-    public void addServiceExpenseAmtToPlatform(OwnerOrderPurchaseDetailEntity serviceExpense, SettleOrdersDefinition settleOrdersDefinition) {
-        int totalAmount = serviceExpense.getTotalAmount();
-        AccountPlatformProfitDetailEntity accountPlatformProfitDetail = new AccountPlatformProfitDetailEntity();
-        accountPlatformProfitDetail.setAmt(-totalAmount);
-        accountPlatformProfitDetail.setSourceCode(OwnerCashCodeEnum.SERVICE_CHARGE.getCashNo());
-        accountPlatformProfitDetail.setSourceDesc(OwnerCashCodeEnum.SERVICE_CHARGE.getTxt());
-        accountPlatformProfitDetail.setUniqueNo(String.valueOf(serviceExpense.getId()));
-        accountPlatformProfitDetail.setOrderNo(serviceExpense.getOrderNo());
-        settleOrdersDefinition.addPlatformProfit(accountPlatformProfitDetail);
-    }
-
-    /**
-     * 获取车主增值服务费用列表 费用平台端冲账
-     * @param renterOrderCostDetail
-     * @param settleOrdersDefinition
-     */
-    public void addOwnerOrderIncrementAmtToPlatform(OwnerOrderIncrementDetailEntity renterOrderCostDetail, SettleOrdersDefinition settleOrdersDefinition) {
-        int totalAmount = renterOrderCostDetail.getTotalAmount();
-        AccountPlatformProfitDetailEntity accountPlatformProfitDetail = new AccountPlatformProfitDetailEntity();
-        accountPlatformProfitDetail.setAmt(-totalAmount);
-        accountPlatformProfitDetail.setSourceCode(OwnerCashCodeEnum.ACCOUNT_OWNER_INCREMENT_COST.getCashNo());
-        accountPlatformProfitDetail.setSourceDesc(OwnerCashCodeEnum.ACCOUNT_OWNER_INCREMENT_COST.getTxt());
-        accountPlatformProfitDetail.setUniqueNo(String.valueOf(renterOrderCostDetail.getId()));
-        accountPlatformProfitDetail.setOrderNo(renterOrderCostDetail.getOrderNo());
-        settleOrdersDefinition.addPlatformProfit(accountPlatformProfitDetail);
-    }
-
-    /**
-     * 获取gps服务费 费用平台端冲账
-     * @param renterOrderCostDetail
-     * @param settleOrdersDefinition
-     */
-    public void addGpsCostAmtToPlatform(OwnerOrderPurchaseDetailEntity renterOrderCostDetail, SettleOrdersDefinition settleOrdersDefinition) {
-        int totalAmount = renterOrderCostDetail.getTotalAmount();
-        AccountPlatformProfitDetailEntity accountPlatformProfitDetail = new AccountPlatformProfitDetailEntity();
-        accountPlatformProfitDetail.setAmt(totalAmount);
-        accountPlatformProfitDetail.setSourceCode(renterOrderCostDetail.getCostCode());
-        accountPlatformProfitDetail.setSourceDesc(renterOrderCostDetail.getCostCodeDesc());
-        accountPlatformProfitDetail.setUniqueNo(String.valueOf(renterOrderCostDetail.getId()));
-        accountPlatformProfitDetail.setOrderNo(renterOrderCostDetail.getOrderNo());
-        settleOrdersDefinition.addPlatformProfit(accountPlatformProfitDetail);
-    }
-
-
-    /**
-     *  先查询  发现 有结算数据停止结算 手动处理
-     * @param orderNo
-     */
-    public void checkIsSettle(String orderNo,SettleOrders settleOrders) {
-        List<AccountRenterCostSettleDetailEntity> accountRenterCostSettleDetailEntitys = accountRenterCostSettleDetailNoTService.getAccountRenterCostSettleDetail(orderNo);
-        List<AccountPlatformProfitDetailEntity> accountPlatformProfitDetailEntitys = accountPlatformProfitDetailNotService.getPlatformProfitDetails(orderNo);
-        List<AccountPlatformSubsidyDetailEntity> accountPlatformSubsidyDetailEntitys = accountPlatformSubsidyDetailNoTService.getPlatformSubsidyDetails(orderNo);
-        List<AccountOwnerCostSettleDetailEntity> accountOwnerCostSettleDetailEntitys = accountOwnerCostSettleDetailNoTService.getAccountOwnerCostSettleDetails(orderNo,settleOrders.getOwnerMemNo());
-
-        if(!CollectionUtils.isEmpty(accountRenterCostSettleDetailEntitys)){
-            throw new RuntimeException("有结算数据停止结算");
-        }
-        if(!CollectionUtils.isEmpty(accountPlatformProfitDetailEntitys)){
-            throw new RuntimeException("有结算数据停止结算");
-        }
-        if(!CollectionUtils.isEmpty(accountPlatformSubsidyDetailEntitys)){
-            throw new RuntimeException("有结算数据停止结算");
-        }
-        if(!CollectionUtils.isEmpty(accountOwnerCostSettleDetailEntitys)){
-            throw new RuntimeException("有结算数据停止结算");
-        }
-    }
-
-
     public void addRenterGetAndReturnCarAmtToPlatform(AccountRenterCostSettleDetailEntity accountRenterCostSettleDetail, SettleOrdersDefinition settleOrdersDefinition) {
         int totalAmount = accountRenterCostSettleDetail.getAmt();
         AccountPlatformProfitDetailEntity accountPlatformProfitDetail = new AccountPlatformProfitDetailEntity();
@@ -419,34 +512,6 @@ public class OrderSettleNewService {
         settleOrdersDefinition.addPlatformProfit(accountPlatformProfitDetail);
     }
 
-    public void addPlatFormAmt(SettleOrdersDefinition settleOrdersDefinition,SettleOrders settleOrders) {
-        //租客交接车油费
-        int rentOilAmt = settleOrdersDefinition.getAccountRenterCostSettleDetails().stream().filter(obj ->{
-            return RenterCashCodeEnum.ACCOUNT_RENTER_DELIVERY_OIL_COST.getCashNo().equals(obj.getCostCode());
-        }).mapToInt(AccountRenterCostSettleDetailEntity::getAmt).sum();
-        //
-        //车主交接车油费
-        int ownerOilAmt = settleOrdersDefinition.getAccountOwnerCostSettleDetails().stream().filter(obj ->{
-            return OwnerCashCodeEnum.ACCOUNT_OWNER_SETTLE_OIL_COST.getCashNo().equals(obj.getSourceCode());
-        }).mapToInt(AccountOwnerCostSettleDetailEntity::getAmt).sum();
-        //平台补贴油费
-        int platFormAmt =0;
-        if(!CollectionUtils.isEmpty(settleOrdersDefinition.getAccountPlatformSubsidyDetails())){
-            platFormAmt = settleOrdersDefinition.getAccountPlatformSubsidyDetails().stream().filter(obj ->{
-                return RenterCashCodeEnum.SUBSIDY_OIL.getCashNo().equals(obj.getSourceCode());
-            }).mapToInt(AccountPlatformSubsidyDetailEntity::getAmt).sum();
-        }
-
-        int oilAmt = rentOilAmt + ownerOilAmt + platFormAmt;
-        if(oilAmt!=0){
-            AccountPlatformProfitDetailEntity accountPlatformProfitDetail = new AccountPlatformProfitDetailEntity();
-            accountPlatformProfitDetail.setAmt(-oilAmt);
-            accountPlatformProfitDetail.setSourceCode(RenterCashCodeEnum.SUBSIDY_OIL.getCashNo());
-            accountPlatformProfitDetail.setSourceDesc(RenterCashCodeEnum.SUBSIDY_OIL.getTxt());
-            accountPlatformProfitDetail.setOrderNo(settleOrders.getOrderNo());
-            settleOrdersDefinition.addPlatformProfit(accountPlatformProfitDetail);
-        }
-    }
 
     /**
      * 订单车辆结算事件
