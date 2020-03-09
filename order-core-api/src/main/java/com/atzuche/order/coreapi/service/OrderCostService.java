@@ -594,13 +594,13 @@ public class OrderCostService {
 	    /**
 	              * 超里程费用
 	     */
-	     com.atzuche.order.ownercost.entity.OwnerOrderPurchaseDetailEntity mileageAmt = ownerCosts.getMileageAmt();
+	     FeeResult mileageAmt = ownerCosts.getMileageAmt();
 	     if(mileageAmt != null) {
 	    	 //如果是代管车，该超里程显示为0，归平台收益。
 	    	 if (CommonUtils.isEscrowCar(ownerCosts.getCarOwnerType())) {
 	    		 resVo.setMileageAmt(0);
 	    	 }else {
-	    		 resVo.setMileageAmt(mileageAmt.getTotalAmount()!=null?mileageAmt.getTotalAmount():0);
+	    		 resVo.setMileageAmt(mileageAmt.getTotalFee()!=null?mileageAmt.getTotalFee():0);
 	    	 }
 	     }
 	     
