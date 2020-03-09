@@ -306,9 +306,9 @@ public class RenterOrderCostCombineService {
 		Integer mileageAmt = RenterFeeCalculatorUtils.calMileageAmt(mileageAmtDTO.getDayMileage(), mileageAmtDTO.getGuideDayPrice(), 
 				mileageAmtDTO.getGetmileage(), mileageAmtDTO.getReturnMileage(), costBaseDTO.getStartTime(), costBaseDTO.getEndTime(), configHours);
 		FeeResult feeResult = new FeeResult();
-		feeResult.setTotalFee(mileageAmt);
+		feeResult.setTotalFee(-mileageAmt);
 		feeResult.setUnitCount(1.0);
-		feeResult.setUnitPrice(mileageAmt);
+		feeResult.setUnitPrice(-mileageAmt);
 		RenterOrderCostDetailEntity result = costBaseConvert(costBaseDTO, feeResult, RenterCashCodeEnum.MILEAGE_COST_RENTER);
 		return result;
 	}
@@ -504,6 +504,27 @@ public class RenterOrderCostCombineService {
 	public List<PayableVO> listPayablebBasePayVO(String orderNo, String renterOrderNo, String memNo) {
 		List<PayableVO> payableList = new ArrayList<PayableVO>();
 		if (StringUtils.isNotBlank(renterOrderNo)) {
+			payableList.add(getPayableBasePay(orderNo, renterOrderNo, memNo));
+		}
+//		List<OrderSupplementDetailEntity> supplementList = orderSupplementDetailService.listOrderSupplementDetailByOrderNoAndMemNo(orderNo, memNo);
+//		if (supplementList != null && !supplementList.isEmpty()) {
+//			List<PayableVO> suppList = supplementList.stream().map(supplement -> {
+//				PayableVO payableVO = new PayableVO();
+//				payableVO.setAmt(supplement.getAmt());
+//				payableVO.setOrderNo(orderNo);
+//				payableVO.setTitle(supplement.getTitle());
+//				payableVO.setType(2);
+//				payableVO.setUniqueNo(String.valueOf(supplement.getId()));
+//				return payableVO;
+//			}).collect(Collectors.toList());
+//			payableList.addAll(suppList);
+//		}
+		return payableList;
+	}
+	
+	public List<PayableVO> listPayablebGlobalPayVO(String orderNo, String renterOrderNo, String memNo) {
+		List<PayableVO> payableList = new ArrayList<PayableVO>();
+		if (StringUtils.isNotBlank(renterOrderNo)) {
 			payableList.add(getPayable(orderNo, renterOrderNo, memNo));
 		}
 //		List<OrderSupplementDetailEntity> supplementList = orderSupplementDetailService.listOrderSupplementDetailByOrderNoAndMemNo(orderNo, memNo);
@@ -521,6 +542,7 @@ public class RenterOrderCostCombineService {
 //		}
 		return payableList;
 	}
+	
 	
 	
 	/**
@@ -555,7 +577,7 @@ public class RenterOrderCostCombineService {
 	
 	
 	/**
-	 * 获取租客应付(正常订单流转)
+	 * 获取租客应付(正常订单流转)  含全局的费用。
 	 * @param orderNo 主订单号
 	 * @param renterOrderNo 租客订单号
 	 * @param memNo 会员号
@@ -572,6 +594,27 @@ public class RenterOrderCostCombineService {
 		if (globalCost != null) {
 			payable += globalCost;
 		}
+		PayableVO payableVO = new PayableVO();
+		payableVO.setAmt(payable);
+		payableVO.setOrderNo(orderNo);
+		payableVO.setTitle("修改订单补付");
+		payableVO.setType(1);
+		payableVO.setUniqueNo(renterOrderNo);
+		return payableVO;
+	}
+	
+	public PayableVO getPayableBasePay(String orderNo, String renterOrderNo, String memNo) {
+		// 租客应付
+		int payable = 0;
+		// 获取租客正常费用
+		int normalCost = getRenterNormalCost(orderNo, renterOrderNo);
+		payable += normalCost;
+		// 获取全局费用，去掉全局费用，保持修改订单的需补付费用与租客修改订单的费用一致。
+		//全局费用从租车押金结算的租车押金中扣除。200304
+//		Integer globalCost = getRenterGlobalCost(orderNo, memNo);
+//		if (globalCost != null) {
+//			payable += globalCost;
+//		}
 		PayableVO payableVO = new PayableVO();
 		payableVO.setAmt(payable);
 		payableVO.setOrderNo(orderNo);

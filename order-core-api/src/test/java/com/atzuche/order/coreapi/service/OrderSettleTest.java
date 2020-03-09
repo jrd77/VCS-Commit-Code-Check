@@ -21,7 +21,8 @@ public class OrderSettleTest {
 	
 	@Test
 	public void testSettleOrder() {
-		fail("Not yet implemented");
+		
+		orderSettle.settleOrder("28261181200299");
 	}
 	
 	@Test

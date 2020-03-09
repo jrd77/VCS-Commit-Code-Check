@@ -62,16 +62,19 @@ public class TransIllegalSettleTask extends IJobHandler {
                         XxlJobLogger.log("执行 查询按规则配置日期内完成的订单，获取待结算的对象列表 ，查询能否结算 异常:"+ e);
                         logger.error("执行 查询按规则配置日期内完成的订单，获取待结算的对象列表 ，查询能否结算 异常 orderNo:[{}] e:[{}]",orderNo ,e);
                         Cat.logError("执行 查询按规则配置日期内完成的订单，获取待结算的对象列表 ，查询能否结算 异常",e);
+                        t.setStatus(e);
                     }
                 }
             }
             logger.info("结束执行 查询按规则配置日期内完成的订单，获取待结算的对象列表 ，查询能否结算 ");
             XxlJobLogger.log("结束执行 查询按规则配置日期内完成的订单，获取待结算的对象列表 ，查询能否结算 ");
+            t.setStatus(Transaction.SUCCESS);
             return SUCCESS;
         } catch (Exception e) {
             XxlJobLogger.log("执行 查询按规则配置日期内完成的订单，获取待结算的对象列表 ，查询能否结算 异常:"+ e);
             logger.error("执行 查询按规则配置日期内完成的订单，获取待结算的对象列表 ，查询能否结算 异常",e);
             Cat.logError("执行 查询按规则配置日期内完成的订单，获取待结算的对象列表 ，查询能否结算 异常",e);
+            t.setStatus(e);
             return new ReturnT(FAIL.getCode(),e.toString());
         } finally {
             if (t != null) {

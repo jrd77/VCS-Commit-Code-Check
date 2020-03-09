@@ -305,5 +305,13 @@
 		where order_no = #{orderNo}
 		and audit_status = 0
 	</update>
-	
+    <select id="getByOwnerOrderNoAndAuditStatus" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List" /> from renter_order_change_apply
+        where owner_order_no = #{ownerOrderNo}
+        and audit_status = #{auditStatus}
+        and is_delete = 0
+        order by id desc
+        limit 1
+    </select>
+
 </mapper>

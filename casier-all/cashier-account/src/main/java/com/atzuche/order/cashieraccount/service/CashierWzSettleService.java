@@ -1,15 +1,5 @@
 package com.atzuche.order.cashieraccount.service;
 
-import java.util.List;
-import java.util.Objects;
-
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.Assert;
-import org.springframework.util.CollectionUtils;
-
 import com.atzuche.order.accountrenterclaim.entity.AccountRenterClaimCostSettleEntity;
 import com.atzuche.order.accountrenterclaim.service.notservice.AccountRenterClaimCostSettleNoTService;
 import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostSettleDetailEntity;
@@ -43,8 +33,16 @@ import com.autoyol.autopay.gateway.constant.DataPayKindConstant;
 import com.autoyol.autopay.gateway.constant.DataPayTypeConstant;
 import com.autoyol.commons.utils.GsonUtils;
 import com.autoyol.commons.web.ErrorCode;
-
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
+import org.springframework.util.CollectionUtils;
+
+import java.util.List;
+import java.util.Objects;
 
 
 /**
@@ -174,6 +172,8 @@ public class CashierWzSettleService {
         PayedOrderRenterDepositWZDetailReqVO payedOrderRenterWZDepositDetail = new PayedOrderRenterDepositWZDetailReqVO();
         BeanUtils.copyProperties(cashierDeductDebtReqVO,payedOrderRenterWZDepositDetail);
         payedOrderRenterWZDepositDetail.setAmt(-debtedAmt);
+        //update account_renter_wz_deposit
+        //insert account_renter_wz_deposit_detail
         int id = accountRenterWzDepositService.updateRenterWZDepositChange(payedOrderRenterWZDepositDetail);
         log.info("(动账)更新违章押金和新增违章押金资金明细, params=[{}]",GsonUtils.toJson(payedOrderRenterWZDepositDetail));
         return new CashierDeductDebtResVO(cashierDeductDebtReqVO, debtedAmt,id);

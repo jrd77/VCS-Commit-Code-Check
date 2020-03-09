@@ -296,16 +296,17 @@ public class CashierPayService{
         //已付租车费用
         int rentAmtPayed = 0;
         //已付租车费用(shifu  租车费用的实付)
-        rentAmtPayed = accountRenterCostSettleService.getCostPaidRent(orderPayReqVO.getOrderNo(),orderPayReqVO.getMenNo());
+        //放在外面，对结果产生了影响。需要内置。
+//        rentAmtPayed = accountRenterCostSettleService.getCostPaidRent(orderPayReqVO.getOrderNo(),orderPayReqVO.getMenNo());
 
         if(orderPayReqVO.getPayKind().contains(DataPayKindConstant.RENT_AMOUNT)){  //修改订单的补付
-            List<PayableVO> payableVOs = renterOrderCostCombineService.listPayablebBasePayVO(orderPayReqVO.getOrderNo(),renterOrderEntity.getRenterOrderNo(),orderPayReqVO.getMenNo());
+            List<PayableVO> payableVOs = renterOrderCostCombineService.listPayablebGlobalPayVO(orderPayReqVO.getOrderNo(),renterOrderEntity.getRenterOrderNo(),orderPayReqVO.getMenNo());
             result.setPayableVOs(payableVOs);
             //应付租车费用（已经求和）
             rentAmt = cashierNoTService.sumRentOrderCost(payableVOs);
             
             //已付租车费用(shifu  租车费用的实付)
-//            rentAmtPayed = accountRenterCostSettleService.getCostPaidRent(orderPayReqVO.getOrderNo(),orderPayReqVO.getMenNo());
+            rentAmtPayed = accountRenterCostSettleService.getCostPaidRent(orderPayReqVO.getOrderNo(),orderPayReqVO.getMenNo());
             if(!CollectionUtils.isEmpty(payableVOs) && rentAmt+rentAmtPayed < 0){   // 
                 for(int i=0;i<payableVOs.size();i++){
                     PayableVO payableVO = payableVOs.get(i);
@@ -327,7 +328,7 @@ public class CashierPayService{
             //应付租车费用
             rentIncrementAmt = cashierNoTService.sumRentOrderCost(payableVOs);
             //已付租车费用(shifu  租车费用的实付)
-//            rentAmtPayed = accountRenterCostSettleService.getCostPaidRent(orderPayReqVO.getOrderNo(),orderPayReqVO.getMenNo());
+            rentAmtPayed = accountRenterCostSettleService.getCostPaidRent(orderPayReqVO.getOrderNo(),orderPayReqVO.getMenNo());
             if(!CollectionUtils.isEmpty(payableVOs) && rentIncrementAmt+rentAmtPayed < 0){   // +rentAmtPayed
                 for(int i=0;i<payableVOs.size();i++){
                     PayableVO payableVO = payableVOs.get(i);
@@ -367,7 +368,7 @@ public class CashierPayService{
         result.setAmtWzDeposit(amtWZDeposit);
         result.setAmtTotal(amtTotal);
         result.setAmtPay(rentAmtPayed);
-        result.setAmt(amtRent + amtDeposit + amtWZDeposit);
+        result.setAmt(amtRent + amtIncrementRent + amtDeposit + amtWZDeposit);  //result.getAmt()取值。
         result.setMemNo(orderPayReqVO.getMenNo());
         result.setOrderNo(orderPayReqVO.getOrderNo());
         result.setTitle("待支付金额：" +Math.abs(result.getAmt()) + "，订单号："  + result.getOrderNo());
@@ -533,7 +534,8 @@ public class CashierPayService{
             String payMd5 = MD5.MD5Encode(FasterJsonUtil.toJson(vo));
             vo.setPayMd5(payMd5);
             payVo.add(vo);
-        }else if(orderPaySign.getPayKind().contains(DataPayKindConstant.RENT_INCREMENT) && payVO.getAmtIncrementRent()<0){
+        }
+        if(orderPaySign.getPayKind().contains(DataPayKindConstant.RENT_INCREMENT) && payVO.getAmtIncrementRent()<0){
             //待付租车费用
             int amt = payVO.getAmtIncrementRent();
             //统一按消费来处理(忽略前端的来值),消费考虑到车主拒绝修改订单会退款。仍然保持老系统的。 考虑收款及补充租车费用。

@@ -12,6 +12,8 @@ import java.time.LocalDateTime;
 @Data
 public class OwnerIncomeExamineDetailVO {
 
+    private Integer id;
+
     /**
      * 会员号
      */

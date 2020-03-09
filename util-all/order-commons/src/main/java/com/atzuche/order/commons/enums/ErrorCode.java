@@ -46,6 +46,8 @@ public enum ErrorCode {
     GET_WALLETR_MSG("981005","查询钱包信息出错"),
     DEDUCT_WALLETR_MSG("981006","扣减钱包信息出错"),
     SETTLE_RETURN_WALLETR_MSG("981008","结算扣减钱包出错"),
+    NOT_ENOUGH_BALANCE("981009","提现余额不足"),
+    NOT_EXIST_ACCOUNT("981010","绑卡信息不存在"),
 
     ORDER_RENTER_ORDERNO_CREATE_ERROR("600001","订单编码创建异常"),
 
@@ -112,6 +114,8 @@ public enum ErrorCode {
     ADMIN_OWNER_UPDATE_FIEN_FAIL("700142","修改车主罚金失败"),
     OWNER_ORDER_GOODS_NOT_EXIST("700143","车主订单商品信息为空。"),
     OWNER_ORDER_NOT_FOUND_MEMNO("700144","车主订单获取失败"),
+    OWNER_SETTLE_ERR("700145","取消订单，车主端结算异常"),
+    RENTER_SETTLE_ERR("700146","取消订单，租客端结算异常"),
     RENT_TIME_LESS_CURR_TIME_2HOUR("500055","起租时间应晚于当前时间2小时"),
     REVERT_TIME_LESS_RENT_TIME_1HOUR("500056","“还车时间”应晚于“起租时间”1小时"),
     RENT_TIME_LESS_CURR_TIME("500006","起租时间应晚于当前时间"),

@@ -80,6 +80,7 @@ import com.atzuche.order.rentercost.service.OrderConsoleCostDetailService;
 import com.atzuche.order.rentercost.service.OrderConsoleSubsidyDetailService;
 import com.atzuche.order.rentercost.service.RenterOrderCostCombineService;
 import com.atzuche.order.rentercost.service.RenterOrderCostDetailService;
+import com.atzuche.order.rentercost.service.RenterOrderCostService;
 import com.atzuche.order.rentercost.service.RenterOrderFineDeatailService;
 import com.atzuche.order.rentercost.service.RenterOrderSubsidyDetailService;
 import com.atzuche.order.rentermem.service.RenterMemberService;
@@ -134,6 +135,8 @@ public class OrderCostDetailService {
     RenterOrderFineDeatailService renterOrderFineDeatailService;
     @Autowired
     ConsoleOwnerOrderFineDeatailService consoleOwnerOrderFineDeatailService;
+    @Autowired
+    RenterOrderCostService renterOrderCostService;
     
 	public ReductionDetailResVO findReductionDetailsListByOrderNo(RenterCostReqVO renterCostReqVO) throws Exception {
 		ReductionDetailResVO resVo = new ReductionDetailResVO();
@@ -393,6 +396,8 @@ public class OrderCostDetailService {
 		//添加租客费用.
 		int i = renterOrderCostDetailService.saveOrUpdateRenterOrderCostDetail(extraDriverInsureAmtEntity);
 		if(i>0) {
+			//最后更新  200305 huangjing
+			renterOrderCostService.updateExtraDriverInsureAmtEntity(extraDriverInsureAmtEntity);
 			logger.info("附加驾驶人保险金额SUCCESS");
 		}else {
 			logger.info("附加驾驶人保险金额FAILURE");
@@ -586,11 +591,12 @@ public class OrderCostDetailService {
 	        	logger.error("获取订单数据(车主)为空orderNo={}",renterCostReqVO.getOrderNo());
 	            throw new Exception("获取订单数据(车主)为空");
 	        }
-	    }else {
-	    	//否则根据主订单号查询
-	    	orderEntityOwner = ownerOrderService.getOwnerOrderByOrderNoAndIsEffective(renterCostReqVO.getOrderNo());
-	    	
 	    }
+//	    else {
+//	    	//否则根据主订单号查询
+//	    	orderEntityOwner = ownerOrderService.getOwnerOrderByOrderNoAndIsEffective(renterCostReqVO.getOrderNo());
+//	    	
+//	    }
 	    
 	    String userName = AdminUserUtil.getAdminUser().getAuthName();  //获取的管理后台的用户名。
 	    
@@ -665,7 +671,7 @@ public class OrderCostDetailService {
 	      }
 	      
 		String orderNo = renterCostReqVO.getOrderNo();
-		List<OrderConsoleCostDetailEntity> list = orderConsoleCostDetailService.getOrderConsoleCostDetaiByOrderNo(orderNo);
+		List<OrderConsoleCostDetailEntity> list = orderConsoleCostDetailService.selectByOrderNoAndMemNo(orderNo,orderEntity.getMemNoRenter());
         List<OrderConsoleCostDetailDTO> orderConsoleCostDetailDTOS = new ArrayList<>();
         Optional.ofNullable(list).orElseGet(ArrayList::new).forEach(x->{
             OrderConsoleCostDetailDTO orderConsoleCostDetailDTO = new OrderConsoleCostDetailDTO();

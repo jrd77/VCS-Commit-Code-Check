@@ -25,16 +25,16 @@ public class OrderConsoleCostDetailService{
     @Autowired
     private OrderConsoleCostDetailMapper orderConsoleCostDetailMapper;
 
-    public List<OrderConsoleCostDetailEntity> getOrderConsoleCostDetaiByOrderNo(String orderNo){
-            return orderConsoleCostDetailMapper.selectByOrderNo(orderNo);
-    }
+//    public List<OrderConsoleCostDetailEntity> getOrderConsoleCostDetaiByOrderNo(String orderNo){
+//            return orderConsoleCostDetailMapper.selectByOrderNo(orderNo);
+//    }
 
     public List<OrderConsoleCostDetailEntity> selectByOrderNoAndMemNo(String orderNo,String memNo){
         return orderConsoleCostDetailMapper.selectByOrderNoAndMemNo(orderNo,memNo);
     }
 
-    public int getTotalOrderConsoleCostAmt(String orderNo){
-        List<OrderConsoleCostDetailEntity> entityList = getOrderConsoleCostDetaiByOrderNo(orderNo);
+    public int getTotalOrderConsoleCostAmt(String orderNo,String memNo){
+    	List<OrderConsoleCostDetailEntity> entityList = selectByOrderNoAndMemNo(orderNo, memNo);
         int total = 0;
         for(OrderConsoleCostDetailEntity entity: entityList){
             if(entity.getSubsidyAmount()!=null) {
@@ -51,7 +51,7 @@ public class OrderConsoleCostDetailService{
      * @return
      */
     public int saveOrUpdateOrderConsoleCostDetaiByOrderNo(OrderConsoleCostDetailEntity record){
-    	List<OrderConsoleCostDetailEntity> list = orderConsoleCostDetailMapper.selectByOrderNo(record.getOrderNo());
+    	List<OrderConsoleCostDetailEntity> list = orderConsoleCostDetailMapper.selectByOrderNoAndMemNo(record.getOrderNo(),record.getMemNo());
     	
     	boolean isExists = false;
     	for (OrderConsoleCostDetailEntity orderConsoleCostDetailEntity : list) {

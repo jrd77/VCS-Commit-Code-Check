@@ -24,14 +24,14 @@ public class OrderResponsibilityController {
     private static final Logger logger = LoggerFactory.getLogger(OrderResponsibilityController.class);
 
 
-	@AutoDocMethod(description = "获取订单责任信息", value = "获取订单责任信息", response = OrderResponsibilityResponseVO.class)
-	@GetMapping("responsibility/information")
-	public ResponseData responsibilityInformation(OrderResponsibilityRequestVO orderResponsibilityRequestVO, BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), ErrorCode.INPUT_ERROR.getText());
-        }
-		return ResponseData.success(null);
-	}
+//	@AutoDocMethod(description = "获取订单责任信息", value = "获取订单责任信息", response = OrderResponsibilityResponseVO.class)
+//	@GetMapping("responsibility/information")
+//	public ResponseData responsibilityInformation(OrderResponsibilityRequestVO orderResponsibilityRequestVO, BindingResult bindingResult) {
+//        if (bindingResult.hasErrors()) {
+//            return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), ErrorCode.INPUT_ERROR.getText());
+//        }
+//		return ResponseData.success(null);
+//	}
 
 
 

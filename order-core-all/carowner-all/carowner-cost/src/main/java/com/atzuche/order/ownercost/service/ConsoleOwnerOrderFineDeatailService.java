@@ -66,9 +66,16 @@ public class ConsoleOwnerOrderFineDeatailService{
         fineEntity.setOrderNo(costBaseDTO.getOrderNo());
         return fineEntity;
     }
-
-    public List<ConsoleOwnerOrderFineDeatailEntity> selectByOrderNo(String orderNo){
-        return consoleOwnerOrderFineDeatailMapper.selectByOrderNo(orderNo);
+    
+    /**
+     * 方法升级，需要根据会员号来查询。
+     * @param orderNo
+     * @param memNo
+     * @return
+     */
+    public List<ConsoleOwnerOrderFineDeatailEntity> selectByOrderNo(String orderNo,String memNo){
+//        return consoleOwnerOrderFineDeatailMapper.selectByOrderNo(orderNo);
+    	return consoleOwnerOrderFineDeatailMapper.selectByOrderNoMemNo(orderNo, memNo);
     }
 
 

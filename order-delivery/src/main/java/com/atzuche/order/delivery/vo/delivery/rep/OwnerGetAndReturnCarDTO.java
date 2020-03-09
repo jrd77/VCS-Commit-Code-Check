@@ -44,7 +44,7 @@ public class OwnerGetAndReturnCarDTO {
     @AutoDocProperty("加油服务费")
     public String oilServiceCharge;
     @AutoDocProperty("平台加油服务费")
-    public String platFormOilServiceCharge;
+    public String platFormOilServiceCharge;  ///
     @AutoDocProperty("代管车-油量差价")
     public String carOilDifferenceCrash;
     @AutoDocProperty("代管车-加油服务费")

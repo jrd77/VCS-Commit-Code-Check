@@ -14,6 +14,8 @@
         <result property="fineSubsidySourceDesc" column="fine_subsidy_source_desc"/>
         <result property="fineType" column="fine_type"/>
         <result property="fineTypeDesc" column="fine_type_desc"/>
+        <result property="costCode" column="cost_code"/>
+        <result property="costName" column="cost_name"/>
         <result property="operatorId" column="operator_id"/>
         <result property="operator" column="operator"/>
         <result property="deptId" column="dept_id"/>
@@ -38,16 +40,18 @@
 	`fine_subsidy_source_desc`, 	
 	`fine_type`, 	
 	`fine_type_desc`, 	
-	`operator_id`, 	
-	`operator`, 	
-	`dept_id`, 	
-	`dept_name`, 	
-	`remark`, 	
-	`create_time`, 	
-	`create_op`, 	
-	`update_time`, 	
-	`update_op`, 	
-	`is_delete`	
+	`cost_code`,
+	`cost_name`,
+	`operator_id`,
+	`operator`,
+	`dept_id`,
+	`dept_name`,
+	`remark`,
+	`create_time`,
+	`create_op`,
+	`update_time`,
+	`update_op`,
+	`is_delete`
 
 	</sql>
 
@@ -57,50 +61,54 @@
 	</select>
 
 	<insert id="insert" parameterType="com.atzuche.order.ownercost.entity.ConsoleOwnerOrderFineDeatailEntity" useGeneratedKeys="true" keyProperty="id">
-		insert into console_owner_order_fine_deatail
-		(
-				`order_no`,		
-				`mem_no`,		
-				`fine_amount`,		
-				`fine_subsidy_code`,		
-				`fine_subsidy_desc`,		
-				`fine_subsidy_source_code`,		
-				`fine_subsidy_source_desc`,		
-				`fine_type`,		
-				`fine_type_desc`,		
-				`operator_id`,		
-				`operator`,		
-				`dept_id`,		
-				`dept_name`,		
-				`remark`,		
-				`create_time`,		
-				`create_op`,		
-				`update_time`,		
-				`update_op`,		
-				`is_delete`		
-			)
-		values
-		(
-				#{orderNo}, 		
-				#{memNo}, 		
-				#{fineAmount}, 		
-				#{fineSubsidyCode}, 		
-				#{fineSubsidyDesc}, 		
-				#{fineSubsidySourceCode}, 		
-				#{fineSubsidySourceDesc}, 		
-				#{fineType}, 		
-				#{fineTypeDesc}, 		
-				#{operatorId}, 		
-				#{operator}, 		
-				#{deptId}, 		
-				#{deptName}, 		
-				#{remark}, 		
-				#{createTime}, 		
-				#{createOp}, 		
-				#{updateTime}, 		
-				#{updateOp}, 		
-				#{isDelete}		
-			)
+        insert into console_owner_order_fine_deatail
+        (
+        `order_no`,
+        `mem_no`,
+        `fine_amount`,
+        `fine_subsidy_code`,
+        `fine_subsidy_desc`,
+        `fine_subsidy_source_code`,
+        `fine_subsidy_source_desc`,
+        `fine_type`,
+        `fine_type_desc`,
+        `cost_code`,
+        `cost_name`,
+        `operator_id`,
+        `operator`,
+        `dept_id`,
+        `dept_name`,
+        `remark`,
+        `create_time`,
+        `create_op`,
+        `update_time`,
+        `update_op`,
+        `is_delete`
+        )
+        values
+        (
+        #{orderNo},
+        #{memNo},
+        #{fineAmount},
+        #{fineSubsidyCode},
+        #{fineSubsidyDesc},
+        #{fineSubsidySourceCode},
+        #{fineSubsidySourceDesc},
+        #{fineType},
+        #{fineTypeDesc},
+        #{costCode},
+        #{costName},
+        #{operatorId},
+        #{operator},
+        #{deptId},
+        #{deptName},
+        #{remark},
+        #{createTime},
+        #{createOp},
+        #{updateTime},
+        #{updateOp},
+        #{isDelete}
+        )
 	</insert>
 	
 	<insert id="insertSelective" parameterType="com.atzuche.order.ownercost.entity.ConsoleOwnerOrderFineDeatailEntity" useGeneratedKeys="true" keyProperty="id">
@@ -113,6 +121,8 @@
 				<if test="fineSubsidyDesc != null">`fine_subsidy_desc`, </if>
 				<if test="fineSubsidySourceCode != null">`fine_subsidy_source_code`, </if>
 				<if test="fineSubsidySourceDesc != null">`fine_subsidy_source_desc`, </if>
+                <if test="costCode != null">`cost_code`, </if>
+                <if test="costName != null">`cost_name`, </if>
 				<if test="fineType != null">`fine_type`, </if>
 				<if test="fineTypeDesc != null">`fine_type_desc`, </if>
 				<if test="operator != null">`operator`, </if>
@@ -126,6 +136,8 @@
 				<if test="fineSubsidyDesc != null">#{fineSubsidyDesc},  </if>
 				<if test="fineSubsidySourceCode != null">#{fineSubsidySourceCode},  </if>
 				<if test="fineSubsidySourceDesc != null">#{fineSubsidySourceDesc},  </if>
+                <if test="costCode != null">#{costCode},  </if>
+                <if test="costName != null">#{costName},  </if>
 				<if test="fineType != null">#{fineType},  </if>
 				<if test="fineTypeDesc != null">#{fineTypeDesc},  </if>
 				<if test="operator != null">#{operator},  </if>
@@ -135,65 +147,71 @@
 	
 	 
 	<update id="updateByPrimaryKeySelective" parameterType="com.atzuche.order.ownercost.entity.ConsoleOwnerOrderFineDeatailEntity">
-		update console_owner_order_fine_deatail 
-		<set>
-				<if test="orderNo != null">`order_no` = #{orderNo}, </if>
-				<if test="memNo != null">`mem_no` = #{memNo}, </if>
-				<if test="fineAmount != null">`fine_amount` = #{fineAmount}, </if>
-				<if test="fineSubsidyCode != null">`fine_subsidy_code` = #{fineSubsidyCode}, </if>
-				<if test="fineSubsidyDesc != null">`fine_subsidy_desc` = #{fineSubsidyDesc}, </if>
-				<if test="fineSubsidySourceCode != null">`fine_subsidy_source_code` = #{fineSubsidySourceCode}, </if>
-				<if test="fineSubsidySourceDesc != null">`fine_subsidy_source_desc` = #{fineSubsidySourceDesc}, </if>
-				<if test="fineType != null">`fine_type` = #{fineType}, </if>
-				<if test="fineTypeDesc != null">`fine_type_desc` = #{fineTypeDesc}, </if>
-				<if test="operatorId != null">`operator_id` = #{operatorId}, </if>
-				<if test="operator != null">`operator` = #{operator}, </if>
-				<if test="deptId != null">`dept_id` = #{deptId}, </if>
-				<if test="deptName != null">`dept_name` = #{deptName}, </if>
-				<if test="remark != null">`remark` = #{remark}, </if>
-				<if test="createTime != null">`create_time` = #{createTime}, </if>
-				<if test="createOp != null">`create_op` = #{createOp}, </if>
-				<if test="updateTime != null">`update_time` = #{updateTime}, </if>
-				<if test="updateOp != null">`update_op` = #{updateOp}, </if>
-				<if test="isDelete != null">`is_delete` = #{isDelete}</if>
-			</set>
+		update console_owner_order_fine_deatail
+        <set>
+            <if test="orderNo != null">`order_no` = #{orderNo}, </if>
+            <if test="memNo != null">`mem_no` = #{memNo}, </if>
+            <if test="fineAmount != null">`fine_amount` = #{fineAmount}, </if>
+            <if test="fineSubsidyCode != null">`fine_subsidy_code` = #{fineSubsidyCode}, </if>
+            <if test="fineSubsidyDesc != null">`fine_subsidy_desc` = #{fineSubsidyDesc}, </if>
+            <if test="fineSubsidySourceCode != null">`fine_subsidy_source_code` = #{fineSubsidySourceCode}, </if>
+            <if test="fineSubsidySourceDesc != null">`fine_subsidy_source_desc` = #{fineSubsidySourceDesc}, </if>
+            <if test="fineType != null">`fine_type` = #{fineType}, </if>
+            <if test="fineTypeDesc != null">`fine_type_desc` = #{fineTypeDesc}, </if>
+            <if test="costCode != null">`cost_code` = #{costCode}, </if>
+            <if test="costName != null">`cost_name` = #{costName}, </if>
+            <if test="operatorId != null">`operator_id` = #{operatorId}, </if>
+            <if test="operator != null">`operator` = #{operator}, </if>
+            <if test="deptId != null">`dept_id` = #{deptId}, </if>
+            <if test="deptName != null">`dept_name` = #{deptName}, </if>
+            <if test="remark != null">`remark` = #{remark}, </if>
+            <if test="createTime != null">`create_time` = #{createTime}, </if>
+            <if test="createOp != null">`create_op` = #{createOp}, </if>
+            <if test="updateTime != null">`update_time` = #{updateTime}, </if>
+            <if test="updateOp != null">`update_op` = #{updateOp}, </if>
+            <if test="isDelete != null">`is_delete` = #{isDelete}</if>
+        </set>
 		where id = #{id}
 	</update>
 	
 	<update id="updateByPrimaryKey" parameterType="com.atzuche.order.ownercost.entity.ConsoleOwnerOrderFineDeatailEntity">
-		update console_owner_order_fine_deatail 
-		<set>
-				`order_no` = #{orderNo}, 		
-				`mem_no` = #{memNo}, 		
-				`fine_amount` = #{fineAmount}, 		
-				`fine_subsidy_code` = #{fineSubsidyCode}, 		
-				`fine_subsidy_desc` = #{fineSubsidyDesc}, 		
-				`fine_subsidy_source_code` = #{fineSubsidySourceCode}, 		
-				`fine_subsidy_source_desc` = #{fineSubsidySourceDesc}, 		
-				`fine_type` = #{fineType}, 		
-				`fine_type_desc` = #{fineTypeDesc}, 		
-				`operator_id` = #{operatorId}, 		
-				`operator` = #{operator}, 		
-				`dept_id` = #{deptId}, 		
-				`dept_name` = #{deptName}, 		
-				`remark` = #{remark}, 		
-				`create_time` = #{createTime}, 		
-				`create_op` = #{createOp}, 		
-				`update_time` = #{updateTime}, 		
-				`update_op` = #{updateOp}, 		
-				`is_delete` = #{isDelete}		
-	
-		</set>
-		where id = #{id}
+        update console_owner_order_fine_deatail
+        <set>
+            `order_no` = #{orderNo},
+            `mem_no` = #{memNo},
+            `fine_amount` = #{fineAmount},
+            `fine_subsidy_code` = #{fineSubsidyCode},
+            `fine_subsidy_desc` = #{fineSubsidyDesc},
+            `fine_subsidy_source_code` = #{fineSubsidySourceCode},
+            `fine_subsidy_source_desc` = #{fineSubsidySourceDesc},
+            `fine_type` = #{fineType},
+            `fine_type_desc` = #{fineTypeDesc},
+            `cost_code` = #{costCode},
+            `cost_name` = #{costName},
+            `operator_id` = #{operatorId},
+            `operator` = #{operator},
+            `dept_id` = #{deptId},
+            `dept_name` = #{deptName},
+            `remark` = #{remark},
+            `create_time` = #{createTime},
+            `create_op` = #{createOp},
+            `update_time` = #{updateTime},
+            `update_op` = #{updateOp},
+            `is_delete` = #{isDelete}
+
+        </set>
+        where id = #{id}
 	</update>
 
-<!--auto generated by MybatisCodeHelper on 2020-01-09-->
-    <select id="selectByOrderNo" resultMap="BaseResultMap">
+<!--auto generated by MybatisCodeHelper on 2020-01-09
+	需要根据主订单号和会员号来查询。200305 huangjing
+-->
+<!--     <select id="selectByOrderNo" resultMap="BaseResultMap">
         select
         <include refid="Base_Column_List"/>
         from console_owner_order_fine_deatail
         where order_no=#{orderNo} and is_delete = 0
-    </select>
+    </select> -->
     
     <select id="selectByOrderNoMemNo" resultMap="BaseResultMap">
         select

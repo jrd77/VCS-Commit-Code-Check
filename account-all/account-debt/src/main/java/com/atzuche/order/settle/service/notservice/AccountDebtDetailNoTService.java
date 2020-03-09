@@ -86,7 +86,12 @@ public class AccountDebtDetailNoTService {
        }
     }
 
-
+    public void insert(AccountDebtDetailEntity accountDebtDetailEntity){
+        int result = accountDebtDetailMapper.insert(accountDebtDetailEntity);
+        if(result==0){
+            throw new AccountInsertDebtDBException();
+        }
+    }
     public int insertDebtDetail(AccountInsertDebtReqVO accountInsertDebt) {
         AccountDebtDetailEntity accountDebtDetail = new AccountDebtDetailEntity();
         BeanUtils.copyProperties(accountInsertDebt,accountDebtDetail);

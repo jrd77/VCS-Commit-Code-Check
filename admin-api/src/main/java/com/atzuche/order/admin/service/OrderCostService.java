@@ -4,12 +4,14 @@
 package com.atzuche.order.admin.service;
 
 import java.util.List;
+import java.util.Objects;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import com.atzuche.order.admin.vo.req.cost.OwnerCostReqVO;
 import com.atzuche.order.admin.vo.req.cost.RenterCostReqVO;
@@ -34,8 +36,13 @@ import com.atzuche.order.commons.vo.res.rentcosts.OrderConsoleCostDetailEntity;
 import com.atzuche.order.commons.vo.res.rentcosts.OrderConsoleSubsidyDetailEntity;
 import com.atzuche.order.commons.vo.res.rentcosts.OrderCouponEntity;
 import com.atzuche.order.commons.vo.res.rentcosts.RenterOrderCostDetailEntity;
+import com.atzuche.order.delivery.service.delivery.DeliveryCarInfoPriceService;
+import com.atzuche.order.delivery.vo.delivery.rep.DeliveryCarVO;
+import com.atzuche.order.delivery.vo.delivery.rep.OwnerGetAndReturnCarDTO;
+import com.atzuche.order.delivery.vo.delivery.req.DeliveryCarRepVO;
 import com.atzuche.order.open.service.FeignOrderCostService;
 import com.atzuche.order.ownercost.entity.OwnerOrderEntity;
+import com.atzuche.order.ownercost.service.OwnerOrderIncrementDetailService;
 import com.atzuche.order.ownercost.service.OwnerOrderService;
 import com.atzuche.order.parentorder.entity.OrderEntity;
 import com.atzuche.order.parentorder.service.OrderService;
@@ -69,6 +76,12 @@ public class OrderCostService {
 	private CashierPayService cashierPayService;
 	@Autowired
 	private OrderSettleService orderSettleService;
+	@Autowired
+    private OwnerOrderIncrementDetailService ownerOrderIncrementDetailService;
+	@Autowired
+    private AdminDeliveryCarService deliveryCarInfoService;
+	@Autowired
+	private DeliveryCarInfoPriceService deliveryCarInfoPriceService;
 	
 	/**
 	 * 
@@ -639,11 +652,12 @@ public class OrderCostService {
 	        	logger.error("获取订单数据(车主)为空orderNo={}",ownerCostReqVO.getOrderNo());
 	            throw new Exception("获取订单数据(车主)为空");
 	        }
-	    }else {
-	    	//否则根据主订单号查询
-	    	orderEntityOwner = ownerOrderService.getOwnerOrderByOrderNoAndIsEffective(ownerCostReqVO.getOrderNo());
-	    	
 	    }
+//	    else {
+//	    	//否则根据主订单号查询
+//	    	orderEntityOwner = ownerOrderService.getOwnerOrderByOrderNoAndIsEffective(ownerCostReqVO.getOrderNo());
+//	    	
+//	    }
 	    
 		OrderCostReqVO req = new OrderCostReqVO();
 		req.setOrderNo(ownerCostReqVO.getOrderNo());
@@ -674,7 +688,7 @@ public class OrderCostService {
 				putPlatformDeductAmt(realVo,data);
 				
 				//收益
-				putBaseFee(realVo,data);
+				putBaseFee(realVo,data,ownerCostReqVO);
 				
 				//最后算
 				putIncome(realVo,data);
@@ -694,6 +708,7 @@ public class OrderCostService {
 //		 String settleIncomeAmt = "0";  //最终收益 income_amt （海豹要加上）
 		 
 		 int preIncomeAmtInt = data.getOwnerCostAmtFinal(); //直接取值。
+		 //是从结算表中求和获取。
 		 int settleIncomeAmtInt = data.getOwnerCostAmtSettleAfter();
 //		 int incomeAmt = Integer.valueOf(realVo.getIncomeAmt());
 //		 int platformDeductionAmt = Integer.valueOf(realVo.getPlatformDeductionAmt());
@@ -707,7 +722,7 @@ public class OrderCostService {
 		 
 	}
 
-	private void putBaseFee(OrderOwnerCostResVO realVo, com.atzuche.order.commons.vo.res.OrderOwnerCostResVO data) {
+	private void putBaseFee(OrderOwnerCostResVO realVo, com.atzuche.order.commons.vo.res.OrderOwnerCostResVO data,OwnerCostReqVO ownerCostReqVO) {
 		//收益
 		String incomeAmt;
 		
@@ -734,6 +749,7 @@ public class OrderCostService {
 		 int addOilSrvAmtInt = 0;
 		 int fineAmtInt = 0;
 		 int rentAmtInt = 0;
+		 
 		 int beyondMileAmtInt = 0;
 		 int oilAmtInt = 0;
 		 
@@ -742,9 +758,10 @@ public class OrderCostService {
 		 if(ownerOrderFineDeatails != null) {
 			 for (OwnerOrderFineDeatailEntity ownerOrderFineDeatailEntity : ownerOrderFineDeatails) {
 				 //罚金来源编码（车主/租客/平台）1-租客，2-车主，3-平台
-				if(ownerOrderFineDeatailEntity.getFineSubsidySourceCode().equals("2")) {
+				 //去掉该条件，修改订单提前还车违约金 该类是租客给车主的罚金。 200304
+//				if(ownerOrderFineDeatailEntity.getFineSubsidySourceCode().equals("2")) {
 					fineAmtInt += ownerOrderFineDeatailEntity.getFineAmount().intValue();
-				}
+//				}   
 			}
 		 }
 		 
@@ -768,16 +785,18 @@ public class OrderCostService {
 			 for (OwnerOrderPurchaseDetailEntity ownerOrderPurchaseDetailEntity : ownerOrderPurchaseDetail) {
 				 if(ownerOrderPurchaseDetailEntity.getCostCode().equals(OwnerCashCodeEnum.RENT_AMT.getCashNo())) {
 					 rentAmtInt += ownerOrderPurchaseDetailEntity.getTotalAmount().intValue();
-	    		   }else if(ownerOrderPurchaseDetailEntity.getCostCode().equals(OwnerCashCodeEnum.OIL_COST_OWNER.getCashNo())) {
-	    			   oilAmtInt += ownerOrderPurchaseDetailEntity.getTotalAmount().intValue();
-	    		   }else if(ownerOrderPurchaseDetailEntity.getCostCode().equals(OwnerCashCodeEnum.MILEAGE_COST_OWNER.getCashNo())) {
-	    			   beyondMileAmtInt += ownerOrderPurchaseDetailEntity.getTotalAmount().intValue();
-	    		   }
-			}
+	    		  }
+			 }
 		 }
+
 		 rentAmt = String.valueOf( NumberUtils.convertNumberToZhengshu(rentAmtInt));
-		 beyondMileAmt = String.valueOf( NumberUtils.convertNumberToZhengshu(beyondMileAmtInt));
-		 oilAmt = String.valueOf( NumberUtils.convertNumberToZhengshu(oilAmtInt));
+		 
+         oilAmtInt = data.getOwnerOilDifferenceCrashAmt();
+		 beyondMileAmtInt = data.getMileageAmt();
+         //车主油费和超里程费用，是可正可负。
+		 beyondMileAmt = String.valueOf(beyondMileAmtInt);
+		 oilAmt = String.valueOf(oilAmtInt);
+		 
 		 //统计
 		 incomeAmtInt = adjustAmtInt + addOilSrvAmtInt + fineAmtInt + rentAmtInt + beyondMileAmtInt + oilAmtInt;
 		 incomeAmt = String.valueOf( NumberUtils.convertNumberToZhengshu(incomeAmtInt));
@@ -797,32 +816,36 @@ public class OrderCostService {
 			com.atzuche.order.commons.vo.res.OrderOwnerCostResVO data) {
 		 String platformDeductionAmt = "0";
 		 
+//		 String ownerPayToPlatform = "0";
+		 
+		 //已经外置了
 		 String platformSrvFeeAmt = "0";
 		 String platformAddOilSrvAmt = "0";
-//		 String ownerPayToPlatform = "0";
 		 String gpsAmt = "0";
+		 
 		 String gpsDeposit = "0";
 		 String carServiceSrvFee = "0"; 
 		
 		 int srvFee = 0;
-		 int oil = 0;
-		 int ownerPay = 0;  //默认
+		 int oil = 0;  //平台加油服务费。
 		 int gps = 0;
+		 
+		 int ownerPay = 0;  //默认
 		 int gpsDepositAmt = 0;  //默认
 		 int getReturnCarFee = 0;  //配送,增值订单
 		 
 		 /*代管车服务费*/
-		 OwnerOrderPurchaseDetailEntity proxyExpense = data.getProxyExpense();
-		 if(proxyExpense != null) {
-			 srvFee = proxyExpense.getTotalAmount();
-		 }
-	    /**
-	     * 车主端平台服务费
-	     */
-	     OwnerOrderPurchaseDetailEntity serviceExpense = data.getServiceExpense();
-	     if(serviceExpense != null) {
-	    	 srvFee += serviceExpense.getTotalAmount();
-	     }
+//		 OwnerOrderPurchaseDetailEntity proxyExpense = data.getProxyExpense();
+//		 if(proxyExpense != null) {
+//			 srvFee = proxyExpense.getTotalAmount();
+//		 }
+//	    /**
+//	     * 车主端平台服务费
+//	     */
+//	     OwnerOrderPurchaseDetailEntity serviceExpense = data.getServiceExpense();
+//	     if(serviceExpense != null) {
+//	    	 srvFee += serviceExpense.getTotalAmount();
+//	     }
 	     
 	     /**
 	      * 加油服务费
@@ -832,17 +855,17 @@ public class OrderCostService {
 //	    	 oil += ownerOrderCostDetail.getTotalAmount().intValue();
 //	     }
 	     //直接取值。 200215修改。
-	     oil = data.getOwnerOilDifferenceCrashAmt();
+//	     oil = data.getOwnerOilDifferenceCrashAmt();
 	     
 	     /**
 	      * 获取gps服务费
 	      */
-	      List<OwnerOrderPurchaseDetailEntity> gpsCost = data.getGpsCost();
-	      if(gpsCost != null) {
-	    	  for (OwnerOrderPurchaseDetailEntity ownerOrderPurchaseDetailEntity : gpsCost) {
-	    		  gps += ownerOrderPurchaseDetailEntity.getTotalAmount().intValue();
-	    	  }
-		  }
+//	      List<OwnerOrderPurchaseDetailEntity> gpsCost = data.getGpsCost();
+//	      if(gpsCost != null) {
+//	    	  for (OwnerOrderPurchaseDetailEntity ownerOrderPurchaseDetailEntity : gpsCost) {
+//	    		  gps += ownerOrderPurchaseDetailEntity.getTotalAmount().intValue();
+//	    	  }
+//		  }
 	      
 	      /**
 	       * 获取车主增值服务费用列表
@@ -858,15 +881,40 @@ public class OrderCostService {
 	    	   }
 	       }
 	 
+	       //新
+	       // 计算 Gps 和平台服务费(直接取表中的记录。根据子订单号来查询。) 
+	       //代码重构，是data中获取，而不是重复查询。200306
+	       //之前海豹的代码在controller层重复查询。以重构到service层。
+       	List<OwnerOrderIncrementDetailEntity> list = data.getOwnerOrderIncrementDetail(); // //ownerOrderIncrementDetailService.listOwnerOrderIncrementDetail(ownerCostReqVO.getOrderNo(),ownerCostReqVO.getOwnerOrderNo());
+        if(!CollectionUtils.isEmpty(list)){
+            gps = list.stream().filter(obj ->{
+                return OwnerCashCodeEnum.GPS_SERVICE_AMT.getCashNo().equals(obj.getCostCode());
+            }).mapToInt(OwnerOrderIncrementDetailEntity::getTotalAmount).sum();
+            int serviceAmt = list.stream().filter(obj ->{
+                return OwnerCashCodeEnum.SERVICE_CHARGE.getCashNo().equals(obj.getCostCode());
+            }).mapToInt(OwnerOrderIncrementDetailEntity::getTotalAmount).sum();
+            int proxyServiceAmt = list.stream().filter(obj ->{
+                return OwnerCashCodeEnum.PROXY_CHARGE.getCashNo().equals(obj.getCostCode());
+            }).mapToInt(OwnerOrderIncrementDetailEntity::getTotalAmount).sum();
+            
+            srvFee = serviceAmt + proxyServiceAmt;
+        }
+
+        //计算平台加油服务费：(仅仅车主端有)
+//        统一从预结算中获取。
+//         int ownerPlatFormOilService = deliveryCarInfoPriceService.getOwnerPlatFormOilServiceChargeByOrderNo(ownerCostReqVO.getOrderNo());
+         oil = data.getOwnerPlatFormOilService();
 		 
+		 int total = ownerPay + gpsDepositAmt + getReturnCarFee + gps + oil + srvFee; //3项外置，也需要累加。
 		 
-		 int total = srvFee + oil + ownerPay + gps + gpsDepositAmt + getReturnCarFee;
 		 platformDeductionAmt = String.valueOf( NumberUtils.convertNumberToFushu(total));
+		 
 		 platformSrvFeeAmt = String.valueOf( NumberUtils.convertNumberToFushu(srvFee));
 		 platformAddOilSrvAmt = String.valueOf(NumberUtils.convertNumberToFushu(oil));
+		 gpsAmt = String.valueOf(NumberUtils.convertNumberToFushu(gps));
+		 
 		 //被覆盖了。。。
 //		 ownerPayToPlatform = String.valueOf(NumberUtils.convertNumberToFushu(ownerPay));
-		 gpsAmt = String.valueOf(NumberUtils.convertNumberToFushu(gps));
 		 gpsDeposit = String.valueOf(gpsDepositAmt);
 		 carServiceSrvFee = String.valueOf(NumberUtils.convertNumberToFushu(getReturnCarFee));
 		 
@@ -874,12 +922,20 @@ public class OrderCostService {
 		 realVo.setPlatformDeductionAmt(platformDeductionAmt);
 		 realVo.setPlatformSrvFeeAmt(platformSrvFeeAmt);
 		 realVo.setPlatformAddOilSrvAmt(platformAddOilSrvAmt);
-//		 realVo.setOwnerPayToPlatform(ownerPayToPlatform);
 		 realVo.setGpsAmt(gpsAmt);
+		 
+//		 realVo.setOwnerPayToPlatform(ownerPayToPlatform);
 		 realVo.setGpsDeposit(gpsDeposit);  //默认处理
 		 realVo.setCarServiceSrvFee(carServiceSrvFee);
 		 
 	}
+	
+//	private DeliveryCarVO getDeliveryCarVO(String orderNo){
+//        DeliveryCarRepVO deliveryCarDTO = new DeliveryCarRepVO();
+//        deliveryCarDTO.setOrderNo(orderNo);
+//        DeliveryCarVO deliveryCarRepVO = deliveryCarInfoService.findDeliveryListByOrderNo(deliveryCarDTO);
+//        return deliveryCarRepVO;
+//    }
 
 	private void putPlatformSubsidyAndOwnerCoupon(OrderOwnerCostResVO realVo,
 			com.atzuche.order.commons.vo.res.OrderOwnerCostResVO data) {
@@ -906,16 +962,7 @@ public class OrderCostService {
 				//  `subsidy_target_name` varchar(16) DEFAULT NULL COMMENT '补贴方名称 1、租客 2、车主 3、平台',
 				if("3".equals(orderConsoleSubsidyDetailEntity.getSubsidySourceCode()) && "2".equals(orderConsoleSubsidyDetailEntity.getSubsidyTargetCode())) {
 					platformSubsidyAmount += orderConsoleSubsidyDetailEntity.getSubsidyAmount().intValue();
-				}
-				
-//				111 //从车主的补贴中获取，如下。车主补贴
-//				if("2".equals(orderConsoleSubsidyDetailEntity.getSubsidySourceName()) && "1".equals(orderConsoleSubsidyDetailEntity.getSubsidyTargetName())) {
-//					//租金的补贴
-//					if(orderConsoleSubsidyDetailEntity.getSubsidyCostCode().equals(RenterCashCodeEnum.SUBSIDY_OWNER_TORENTER_RENTAMT.getCashNo())) {
-//						ownerSubsidyRentAmount += orderConsoleSubsidyDetailEntity.getSubsidyAmount().intValue();
-//					}
-//				}
-				
+				}	
 			}
 			
 			/**

@@ -1,5 +1,6 @@
 package com.atzuche.order.rentercost.service;
 
+import com.atzuche.order.rentercost.entity.RenterOrderCostDetailEntity;
 import com.atzuche.order.rentercost.entity.RenterOrderCostEntity;
 import com.atzuche.order.rentercost.mapper.RenterOrderCostMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +38,13 @@ public class RenterOrderCostService{
         return renterOrderCostMapper.selectByOrderNoAndRenterNo(orderNo, renterOrderNo);
     }
 
-
+    //更新附加驾驶人总表金额
+  	public void updateExtraDriverInsureAmtEntity(RenterOrderCostDetailEntity extraDriverInsureAmtEntity) {
+  		RenterOrderCostEntity entity = this.getByOrderNoAndRenterNo(extraDriverInsureAmtEntity.getOrderNo(), extraDriverInsureAmtEntity.getRenterOrderNo());
+  		if(entity != null) {
+  			entity.setAdditionalDrivingEnsureAmount(extraDriverInsureAmtEntity.getTotalAmount());
+  			this.updateRenterOrderCost(entity);
+  		}
+  	}
 
 }

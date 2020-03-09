@@ -116,5 +116,10 @@ public class OwnerOrderDTO implements Serializable {
          */
         @AutoDocProperty(value="取消者",required=true)
         private String cancleOp;
+        /**
+         * 创建时间
+         */
+        @AutoDocProperty(value="创建时间",required=true)
+        private LocalDateTime createTime;
     					
 }

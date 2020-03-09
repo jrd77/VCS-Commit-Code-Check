@@ -7,14 +7,12 @@ import com.atzuche.order.coreapi.service.OrderDetailService;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.List;
-import java.util.Optional;
 
 @Slf4j
 @RestController
@@ -53,7 +51,7 @@ public class OrderDetailController {
     public ResponseData<AdminOwnerOrderDetailDTO> adminOwnerOrderDetail(@RequestParam("ownerOrderNo") String ownerOrderNo,@RequestParam("orderNo")String orderNo){
         if(ownerOrderNo==null ||ownerOrderNo.trim().length()<=0){
             ResponseData responseData = new ResponseData();
-            responseData.setResMsg("车主自订单号不能为空");
+            responseData.setResMsg("车主子订单号不能为空");
             responseData.setResCode(ErrorCode.INPUT_ERROR.getCode());
             return responseData;
         }
@@ -105,5 +103,21 @@ public class OrderDetailController {
         }
         ResponseData<OwnerOrderDetailRespDTO> responseData = orderDetailService.renterOrderDetail(orderNo,renterOrderNo);
         return responseData;
+    }
+    @GetMapping("/queryInProcess")
+    public ResponseData<ProcessRespDTO> queryInProcess(){
+        ProcessRespDTO processRespDTO = orderDetailService.queryInProcess();
+        return ResponseData.success(processRespDTO);
+    }
+    @GetMapping("/queryChangeApplyByOwnerOrderNo")
+    public ResponseData<OrderDetailRespDTO> queryChangeApplyByOwnerOrderNo(@Param("ownerOrderNo") String ownerOrderNo){
+        if(ownerOrderNo == null || ownerOrderNo.trim().length()<=0){
+            ResponseData responseData = new ResponseData();
+            responseData.setResCode(ErrorCode.INPUT_ERROR.getCode());
+            responseData.setResMsg("车主子订单号不能为空");
+            return responseData;
+        }
+        OrderDetailRespDTO orderDetailRespDTO = orderDetailService.queryChangeApplyByOwnerOrderNo(ownerOrderNo);
+        return ResponseData.success(orderDetailRespDTO);
     }
 }
