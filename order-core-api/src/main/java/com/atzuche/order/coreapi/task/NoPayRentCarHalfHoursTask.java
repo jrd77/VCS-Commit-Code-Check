@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Component
@@ -48,7 +49,7 @@ public class NoPayRentCarHalfHoursTask extends IJobHandler {
             for (OrderDTO violateBO : orderNos) {
                 OrderStatusEntity orderStatusEntity = orderStatusService.getByOrderNo(violateBO.getOrderNo());
                 if (orderStatusEntity.getRentCarPayStatus().intValue() == 0) {
-                    if (SMSTaskDateTimeUtils.getDateLatterCompareNowScoend(orderStatusEntity.getCreateTime(), 60) == 30) {
+                    if (SMSTaskDateTimeUtils.getDateLatterCompareNowScoend(LocalDateTime.now(), 60) == 30) {
                         remindPayIllegalCrashService.sendNoPayCarShortMessageData(violateBO.getOrderNo());
                     }
                 }
