@@ -28,7 +28,6 @@ compileJava {
     options.compilerArgs << "-XDignore.symbol.file"
 }
 
-
 dependencies {
     compile project(":order-openapi")
     compile project(":config:config-client")

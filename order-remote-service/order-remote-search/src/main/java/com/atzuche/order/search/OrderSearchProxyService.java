@@ -53,6 +53,8 @@ public class OrderSearchProxyService {
         try {
             ByCarVO reqVO = new ByCarVO();
             BeanUtils.copyProperties(conflictOrderSearch, reqVO);
+            reqVO.setPageNum(1);
+            reqVO.setPageSize(1000);
             logger.info("Invoke remote method.param is,reqVO:[{}]", JSON.toJSONString(reqVO));
             Cat.logEvent(CatConstants.FEIGN_METHOD, "orderSearchService.byCarOrderInfo");
             Cat.logEvent(CatConstants.FEIGN_PARAM, JSON.toJSONString(reqVO));

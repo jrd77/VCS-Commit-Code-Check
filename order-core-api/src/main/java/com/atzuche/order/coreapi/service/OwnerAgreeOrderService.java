@@ -38,6 +38,7 @@ import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -146,13 +147,10 @@ public class OwnerAgreeOrderService {
             logger.warn("No overlapping orders found.");
             return 0;
         }
-        orderList = orderList.stream().filter(order -> order.getNewOrOldOrder() == 1).collect(Collectors.toList());
-        if (CollectionUtils.isEmpty(orderList)) {
-            logger.warn("No overlapping new orders found.");
-            return 0;
-        }
+        Map<Integer,List<com.atzuche.order.search.dto.OrderInfoDTO>> map =
+                orderList.stream().collect(Collectors.groupingBy(com.atzuche.order.search.dto.OrderInfoDTO::getNewOrOldOrder));
         int success = 0;
-        for (com.atzuche.order.search.dto.OrderInfoDTO orderInfoDTO : orderList) {
+        for (com.atzuche.order.search.dto.OrderInfoDTO orderInfoDTO : map.get(OrderConstant.YES)) {
             boolean result = false;
             try {
                 ownerRefuseOrderService.refuse(orderInfoDTO.getOrderNo());
@@ -168,8 +166,8 @@ public class OwnerAgreeOrderService {
         }
         logger.info("Successfully processed [{}] bars", success);
 
-        //todo 发送mq 通知老系统处理重叠订单
-
+        //发送mq 通知老系统处理重叠订单
+        orderActionMqService.sendOrderAgreeConflictNotice(map.get(OrderConstant.NO));
         return success;
     }
 

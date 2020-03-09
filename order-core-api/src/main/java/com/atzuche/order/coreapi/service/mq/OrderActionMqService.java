@@ -10,6 +10,7 @@ import com.atzuche.order.mq.common.base.BaseProducer;
 import com.atzuche.order.mq.common.base.OrderMessage;
 import com.atzuche.order.mq.enums.ShortMessageTypeEnum;
 import com.atzuche.order.mq.util.SmsParamsMapUtil;
+import com.atzuche.order.search.dto.OrderInfoDTO;
 import com.autoyol.event.rabbit.neworder.*;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -17,7 +18,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -243,5 +247,34 @@ public class OrderActionMqService {
 
     }
 
+
+    /**
+     * 发送通知,老系统处理重叠订单
+     *
+     * @param orderList 订单列表
+     */
+    public void sendOrderAgreeConflictNotice(List<OrderInfoDTO> orderList) {
+        if (CollectionUtils.isEmpty(orderList)) {
+            logger.warn("No overlapping old orders found.");
+            return;
+        }
+
+        List<String> orderNos = new ArrayList<>();
+        orderList.forEach(order -> {
+            orderNos.add(order.getOrderNo());
+        });
+
+        OrderAgreeConflictMq orderAgreeConflictMq = new OrderAgreeConflictMq();
+        orderAgreeConflictMq.setOrderNos(orderNos);
+
+        OrderMessage orderMessage = OrderMessage.builder().build();
+        orderMessage.setMessage(orderMessage);
+
+        logger.info("通知老系统处理重叠订单事件.mq:[exchange={},routingKey={}],message=[{}]",
+                NewOrderMQActionEventEnum.ORDER_AGREE_CONFLICT_NOTICE_OLD.exchange, NewOrderMQActionEventEnum.ORDER_AGREE_CONFLICT_NOTICE_OLD.routingKey,
+                JSON.toJSON(orderMessage));
+        baseProducer.sendTopicMessage(NewOrderMQActionEventEnum.ORDER_AGREE_CONFLICT_NOTICE_OLD.exchange, NewOrderMQActionEventEnum.ORDER_AGREE_CONFLICT_NOTICE_OLD.routingKey, orderMessage);
+
+    }
 
 }
