@@ -277,5 +277,10 @@ public class RenterOrderSettleService {
             //历史欠款 有就跟心欠款总额，没有就插入历史欠款。都需要添加欠款流水记录
             cashierService.createDebt(accountInsertDebt);
         }
+        //收益进入钱包
+        if(rentFineTotal > 0 ){
+            settleCancelOrdersAccount.setRentSurplusWalletAmt(settleCancelOrdersAccount.getRentSurplusWalletAmt() + rentFineTotal);
+        }
+
     }
 }
