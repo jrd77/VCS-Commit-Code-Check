@@ -17,6 +17,8 @@ import com.atzuche.order.accountrenterdetain.service.notservice.AccountRenterDet
 import com.atzuche.order.accountrenterdetain.service.notservice.AccountRenterDetainDetailNoTService;
 import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostDetailEntity;
 import com.atzuche.order.accountrenterrentcost.service.notservice.AccountRenterCostDetailNoTService;
+import com.atzuche.order.cashieraccount.entity.CashierEntity;
+import com.atzuche.order.cashieraccount.service.notservice.CashierNoTService;
 import com.atzuche.order.commons.CostStatUtils;
 import com.atzuche.order.commons.GlobalConstant;
 import com.atzuche.order.commons.LocalDateTimeUtils;
@@ -72,6 +74,7 @@ import com.atzuche.order.renterorder.entity.*;
 import com.atzuche.order.renterorder.service.*;
 import com.atzuche.order.settle.entity.AccountDebtReceivableaDetailEntity;
 import com.atzuche.order.settle.service.notservice.AccountDebtReceivableaDetailNoTService;
+import com.autoyol.autopay.gateway.constant.DataPayKindConstant;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
 import lombok.extern.slf4j.Slf4j;
@@ -165,6 +168,8 @@ public class OrderDetailService {
     private AccountDebtReceivableaDetailNoTService accountDebtReceivableaDetailNoTService;
     @Autowired
     private ModifyOrderFeeService modifyOrderFeeService;
+    @Autowired
+    private CashierNoTService cashierNoTService;
 
 
     private static final String UNIT_HOUR = "小时";
@@ -1190,6 +1195,12 @@ public class OrderDetailService {
             accountDebtReceivableaDetailDTOist.add(accountDebtReceivableaDetailDTO);
         });
 
+        CashierEntity cashierEntity = cashierNoTService.getCashierEntity(orderNo, accountRenterDepositEntity.getMemNo(), DataPayKindConstant.RENT);
+        CashierDTO cashierDTO = null;
+        if(cashierEntity != null){
+            cashierDTO = new CashierDTO();
+            BeanUtils.copyProperties(cashierEntity,cashierDTO);
+        }
         OrderAccountDetailRespDTO orderAccountDetailRespDTO = new OrderAccountDetailRespDTO();
         orderAccountDetailRespDTO.orderDTO = orderDTO;
         orderAccountDetailRespDTO.orderStatusDTO = orderStatusDTO;
@@ -1200,6 +1211,7 @@ public class OrderDetailService {
         orderAccountDetailRespDTO.accountRenterDetainDetailDTOList = accountRenterDetainDetailDTOList;
         orderAccountDetailRespDTO.accountRenterCostDetailDTOS = accountRenterCostDetailDTOList;
         orderAccountDetailRespDTO.accountDebtReceivableaDetailDTOS = accountDebtReceivableaDetailDTOist;
+        orderAccountDetailRespDTO.cashierDTO = cashierDTO;
         return orderAccountDetailRespDTO;
     }
 
