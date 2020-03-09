@@ -29,8 +29,6 @@ public class PushOrderBaseEventService extends OrderBaseEventService {
     @Autowired
     ShortMessageSendService shortMessageSendService;
 
-    private String orderDetailUrl;
-
     @Override
     public void sendShortMessageData(String textCode, Map smsParamsMap, String phone, Object orderEntity, Object memberDTO, Object goodsDetailDTO) {
         String renterTextCode = PushMessageTypeEnum.getSmsTemplate(String.valueOf(textCode));
