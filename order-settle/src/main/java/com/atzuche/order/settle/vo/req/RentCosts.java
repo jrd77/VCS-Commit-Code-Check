@@ -52,6 +52,30 @@ public class RentCosts {
      */
     List<OrderConsoleCostDetailEntity> orderConsoleCostDetailEntity;
 
+    /**
+              * 租客最终收益金额（应收）
+     */
+    private int renterCostAmtFinal;
+    //租客会员号
+    private String renterNo;
+    
+    
+	public String getRenterNo() {
+		return renterNo;
+	}
+
+	public void setRenterNo(String renterNo) {
+		this.renterNo = renterNo;
+	}
+
+	public int getRenterCostAmtFinal() {
+		return renterCostAmtFinal;
+	}
+
+	public void setRenterCostAmtFinal(int renterCostAmtFinal) {
+		this.renterCostAmtFinal = renterCostAmtFinal;
+	}
+
 	public List<RenterOrderCostDetailEntity> getRenterOrderCostDetails() {
 		return renterOrderCostDetails;
 	}

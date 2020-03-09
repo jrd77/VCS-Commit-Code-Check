@@ -103,7 +103,6 @@ public class OrderCostService {
 		req.setMemNo(orderEntity.getMemNoRenter());
 		req.setSubOrderNo(renterCostReqVO.getRenterOrderNo());
 		
-		RenterCostVO costVo = orderSettleService.getRenterCostByOrderNo(renterCostReqVO.getOrderNo());
 		
         ///子订单号
 		realVo.setRenterOrderNo(renterCostReqVO.getRenterOrderNo());
@@ -118,6 +117,9 @@ public class OrderCostService {
 		if(resData != null) {
 			com.atzuche.order.commons.vo.res.OrderRenterCostResVO data = resData.getData();
 			if(data != null) {
+				
+				int renterCostAmtFinal = data.getRenterCostAmtFinal();
+				RenterCostVO costVo = orderSettleService.getRenterCostByOrderNo(renterCostReqVO.getOrderNo(),renterCostReqVO.getRenterOrderNo(),orderEntity.getMemNoRenter(),renterCostAmtFinal);
 				
 				//租金费用  费用明细表renter_order_cost_detail   
 				putRenterOrderCostDetail(realVo,data);
