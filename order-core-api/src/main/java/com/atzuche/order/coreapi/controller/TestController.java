@@ -4,8 +4,10 @@ package com.atzuche.order.coreapi.controller;
 import com.alibaba.fastjson.JSON;
 import com.atzuche.config.client.api.CityConfigSDK;
 import com.atzuche.config.client.api.DefaultConfigContext;
+import com.atzuche.config.client.api.ServicePointConfigSDK;
 import com.atzuche.config.client.api.SysConstantSDK;
 import com.atzuche.config.common.entity.CityEntity;
+import com.atzuche.config.common.entity.ServicePointEntity;
 import com.atzuche.config.common.entity.SysContantEntity;
 import com.atzuche.order.cashieraccount.service.CashierService;
 import com.atzuche.order.cashieraccount.vo.req.CashierDeductDebtReqVO;
@@ -45,6 +47,8 @@ public class TestController {
     private CityConfigSDK cityConfigSDK;
     @Autowired
     private RenterCommodityService renterCommodityService;
+    @Autowired
+    private ServicePointConfigSDK servicePointConfigSDK;
 
     @GetMapping("/test")
     public String test(){
@@ -104,5 +108,11 @@ public class TestController {
         renterGoodsDetailDTO.setRenterGoodsPriceDetailDTOList(list);
         renterCommodityService.combination(renterGoodsDetailDTO);
         return renterGoodsDetailDTO;
+    }
+
+    @GetMapping("servicePointConfigSDKTest")
+    public Object servicePointConfigSDKTest(){
+        List<ServicePointEntity> config = servicePointConfigSDK.getConfig(new DefaultConfigContext());
+        return config;
     }
 }

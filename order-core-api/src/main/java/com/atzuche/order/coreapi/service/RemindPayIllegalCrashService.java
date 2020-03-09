@@ -100,4 +100,13 @@ public class RemindPayIllegalCrashService {
         smsOrderBaseEventService.sendShortMessage(map);
     }
 
+    /**
+     * 车主同意后-未支付租车押金-每15分钟提醒一次
+     * @param orderNo
+     */
+    public void sendNoPayCarCostShortMessageData(String orderNo,Map paramsMap) {
+        Map map = SmsParamsMapUtil.getParamsMap(orderNo, ShortMessageTypeEnum.NO_EXEMPT_PREORDER_REMIND_PAYRENT.getValue(), null, paramsMap);
+        smsOrderBaseEventService.sendShortMessage(map);
+    }
+
 }

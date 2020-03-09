@@ -1,17 +1,24 @@
 package com.atzuche.order.coreapi.service;
 
 import com.alibaba.fastjson.JSONObject;
+import com.atzuche.order.commons.DateUtils;
+import com.atzuche.order.coreapi.listener.push.OrderSendMessageFactory;
+import com.atzuche.order.mq.enums.ShortMessageTypeEnum;
+import com.atzuche.order.mq.util.SmsParamsMapUtil;
 import com.atzuche.order.renterwz.entity.RenterOrderWzDetailEntity;
 import com.atzuche.order.renterwz.entity.RenterOrderWzQueryRecordEntity;
 import com.atzuche.order.renterwz.service.*;
 import com.atzuche.order.renterwz.vo.HttpResult;
 import com.atzuche.order.renterwz.vo.IllegalToDO;
 import com.atzuche.order.renterwz.vo.Violation;
+import com.autoyol.commons.utils.DateUtil;
 import com.autoyol.commons.utils.GsonUtils;
 import com.autoyol.commons.web.ErrorCode;
+import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
@@ -51,6 +58,9 @@ public class IllegalToDoService {
 
     @Resource
     private RenterOrderWzFinishedTodoService renterOrderWzFinishedTodoService;
+
+    @Autowired
+    OrderSendMessageFactory orderSendMessageFactory;
 
     private static final String ORDER_CENTER_EXCHANGE = "auto-order-center-wz";
     private static final String ORDER_CENTER_WZ_QUERY_INFO_ROUTING_KEY = "order.center.wz.query.info.feedback";
@@ -137,6 +147,13 @@ public class IllegalToDoService {
             }
             if (decuct >= 6) {
                 rabbitTemplate.convertAndSend(ORDER_CENTER_WZ_WITHHOLD_EXCHANGE, ORDER_CENTER_WZ_WITHHOLD_ROUTING_KEY,orderNo );
+                Map paramsMap = Maps.newHashMap();
+                paramsMap.put("time", DateUtil.formatDate(dto.getRevertTime(), DateUtils.DATE_DEFAUTE1));
+                paramsMap.put("score", decuct);
+                paramsMap.put("linkUrl1", " ");
+                paramsMap.put("linkUrl2", " ");
+                Map map = SmsParamsMapUtil.getParamsMap(orderNo, ShortMessageTypeEnum.ILLAGE_MAX_SCORE_LIMIT_TEXT.getValue(), null, paramsMap);
+                orderSendMessageFactory.sendShortMessage(map);
             }
             //修改订单违章处理状态,5-未处理
             Integer nowWzDisposeStatus = renterOrderWzStatusService.getTransWzDisposeStatusByOrderNo(orderNo,carNumber);
