@@ -108,4 +108,8 @@ public class OrderRenterCostResVO {
 	 */
 	List<OrderSupplementDetailEntity> supplementList;
 	
+	/**
+	     * 租客最终收益金额（应收）
+	*/
+	private int renterCostAmtFinal; 
 }

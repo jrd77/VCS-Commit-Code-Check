@@ -284,6 +284,10 @@ public class OrderCostService {
 //		  com.atzuche.order.commons.vo.res.RentCosts rentCostsReal = new com.atzuche.order.commons.vo.res.RentCosts();
 //		  BeanUtils.copyProperties(rentCostsReal, rentCost);
 //		  resVo.setRentCosts(rentCostsReal);
+		  
+		  //租客费用统计 200309
+		  resVo.setRenterCostAmtFinal(rentCost.getRenterCostAmtFinal());
+		  
 		  /**
 		   * 简化处理 !!!
 		   */
