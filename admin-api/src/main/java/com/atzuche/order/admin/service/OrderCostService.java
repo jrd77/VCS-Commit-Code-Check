@@ -362,21 +362,14 @@ public class OrderCostService {
 		realVo.setAdjustAmt(String.valueOf( -renterToOwnerAdjustAmount)); //NumberUtils.convertNumberToZhengshu(renterToOwnerAdjustAmount)
 		
 	}
-
+	
 	private void putOilBeyondMile(OrderRenterCostResVO realVo,
 			com.atzuche.order.commons.vo.res.OrderRenterCostResVO data) {
-		RenterOrderCostDetailEntity oilAmt = data.getOilAmt();
-		if(oilAmt != null) {
-			realVo.setOilAmt(String.valueOf( NumberUtils.convertNumberToZhengshu(oilAmt.getTotalAmount())));
-		}else {
-			realVo.setOilAmt("0");
-		}
-		RenterOrderCostDetailEntity mileageAmt = data.getMileageAmt();
-		if(mileageAmt != null) {
-			realVo.setOilAmt(String.valueOf( NumberUtils.convertNumberToZhengshu(mileageAmt.getTotalAmount())));
-		}else {
-			realVo.setBeyondMileAmt("0");
-		}
+		int oilAmt = data.getOilAmt();
+		realVo.setOilAmt(String.valueOf( NumberUtils.convertNumberToZhengshu(oilAmt)));
+
+		int mileageAmt = data.getMileageAmt();
+		realVo.setBeyondMileAmt(String.valueOf( NumberUtils.convertNumberToZhengshu(mileageAmt)));
 	}
 
 	private void putRenterOrderFine(OrderRenterCostResVO realVo, com.atzuche.order.commons.vo.res.OrderRenterCostResVO data) {
