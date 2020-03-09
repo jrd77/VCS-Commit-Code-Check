@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -66,6 +67,74 @@ public class RenterAdditionalDriverService {
 
 
     }
+    
+    
+    /**
+     * 批量保存附加驾驶人信息（修改订单）
+     *
+     * @param orderNo           主订单号
+     * @param renterOrderNo     租客订单号
+     * @param initRentOrderNo	上笔生效的租客子单号
+     * @param driverIds         用户选择附加驾驶人信息
+     * @param commUseDriverList 租客可用附加驾驶人列表
+     */
+    public void insertBatchAdditionalDriver(String orderNo, String renterOrderNo, String initRentOrderNo, List<String> driverIds,
+                                            List<CommUseDriverInfoDTO> commUseDriverList) {
+        logger.info("Batch insert additional driver.param is,orderNo:[{}],renterOrderNo:[{}],driverIds:[{}],commUseDriverList:[{}]",
+                orderNo, renterOrderNo, JSON.toJSON(driverIds), JSON.toJSON(commUseDriverList));
+        if (driverIds == null || driverIds.isEmpty()) {
+        	return;
+        }
+        List<String> historyDriverList = new ArrayList<String>();
+        for (String driverId:driverIds) {
+        	boolean flag = true;
+    		if (commUseDriverList != null && !commUseDriverList.isEmpty()) {
+    			for (CommUseDriverInfoDTO commUseDriverInfo : commUseDriverList) {
+                    if (null != commUseDriverInfo.getId() && driverId.equals(commUseDriverInfo.getId().toString())) {
+                    	flag = false;
+                        RenterAdditionalDriverEntity record = new RenterAdditionalDriverEntity();
+                        record.setOrderNo(orderNo);
+                        record.setRenterOrderNo(renterOrderNo);
+                        record.setDriverId(String.valueOf(commUseDriverInfo.getId()));
+                        record.setRealName(commUseDriverInfo.getRealName());
+                        record.setPhone(String.valueOf(commUseDriverInfo.getMobile()));
+                        record.setIdCard(commUseDriverInfo.getIdCard());
+                        record.setDriLicAllowCar(commUseDriverInfo.getDriLicAllowCar());
+                        record.setValidityStartDate(commUseDriverInfo.getValidityStartDate());
+                        record.setValidityEndDate(commUseDriverInfo.getValidityEndDate());
+
+                        //添加操作人
+                        record.setCreateOp(commUseDriverInfo.getConsoleOperatorName());
+                        record.setUpdateOp(commUseDriverInfo.getConsoleOperatorName());
+                        renterAdditionalDriverMapper.insertSelective(record);
+                        break;
+                    }
+                }
+    		}
+    		if (flag) {
+    			historyDriverList.add(driverId);
+    		}
+    	}
+        if (historyDriverList.isEmpty()) {
+        	return;
+        }
+        // 获取已经购买的附加驾驶人信息
+        List<RenterAdditionalDriverEntity> initAddDriverList = listDriversByRenterOrderNo(initRentOrderNo);
+        if (initAddDriverList == null || initAddDriverList.isEmpty()) {
+        	return;
+        }
+        for (RenterAdditionalDriverEntity driverEntity:initAddDriverList) {
+        	if (driverEntity.getDriverId() != null && historyDriverList.contains(driverEntity.getDriverId())) {
+        		driverEntity.setRenterOrderNo(renterOrderNo);
+        		driverEntity.setId(null);
+        		driverEntity.setCreateTime(null);
+        		driverEntity.setUpdateTime(null);
+        		renterAdditionalDriverMapper.insertSelective(driverEntity);
+        	}
+        }
+        
+    }
+    
     
     /**
      * 管理后台新增附加驾驶人，先逻辑删除，后新增。
