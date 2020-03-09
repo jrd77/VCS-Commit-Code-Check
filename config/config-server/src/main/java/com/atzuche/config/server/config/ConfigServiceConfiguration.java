@@ -1,7 +1,6 @@
 package com.atzuche.config.server.config;
 
 import com.atzuche.config.server.service.*;
-import com.ctrip.framework.apollo.spi.ConfigFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
