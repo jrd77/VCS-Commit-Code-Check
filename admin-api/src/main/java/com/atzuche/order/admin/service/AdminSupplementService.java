@@ -117,6 +117,12 @@ public class AdminSupplementService {
             			        .toLocalDateTime();
             			sup.setCreateTimeTxt(CommonUtils.formatTime(createLocalDateTime, CommonUtils.FORMAT_STR_DEFAULT));
             		}
+            		if (sup.getPayTime() != null) {
+            			LocalDateTime createLocalDateTime = sup.getPayTime().toInstant()
+            			        .atZone(ZoneId.systemDefault() )
+            			        .toLocalDateTime();
+            			sup.setPayTimeTxt(CommonUtils.formatTime(createLocalDateTime, CommonUtils.FORMAT_STR_DEFAULT));
+            		}
             		sup.setPayTypeTxt("消费");
             	}
             }
