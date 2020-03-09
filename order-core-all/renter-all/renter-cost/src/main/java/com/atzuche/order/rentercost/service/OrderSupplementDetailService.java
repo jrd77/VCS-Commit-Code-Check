@@ -1,5 +1,6 @@
 package com.atzuche.order.rentercost.service;
 
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,8 +65,8 @@ public class OrderSupplementDetailService{
      * @param payFlag
      * @return Integer
      */
-    public Integer updatePayFlagById(Integer id, Integer payFlag) {
-    	return orderSupplementDetailMapper.updatePayFlagById(id, payFlag);
+    public Integer updatePayFlagById(Integer id, Integer payFlag, Date payTime) {
+    	return orderSupplementDetailMapper.updatePayFlagById(id, payFlag, payTime);
     }
     
     /**

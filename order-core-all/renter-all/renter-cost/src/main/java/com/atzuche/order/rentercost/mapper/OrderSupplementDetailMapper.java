@@ -1,5 +1,6 @@
 package com.atzuche.order.rentercost.mapper;
 
+import java.util.Date;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Mapper;
@@ -28,7 +29,7 @@ public interface OrderSupplementDetailMapper{
     
     List<OrderSupplementDetailEntity> listOrderSupplementDetailByOrderNoAndMemNo(@Param("orderNo") String orderNo,@Param("memNo") String memNo);
     
-    Integer updatePayFlagById(@Param("id") Integer id, @Param("payFlag") Integer payFlag);
+    Integer updatePayFlagById(@Param("id") Integer id, @Param("payFlag") Integer payFlag, @Param("payTime") Date payTime);
     
     List<OrderSupplementDetailEntity> listOrderSupplementDetailByOrderNo(@Param("orderNo") String orderNo);
     
