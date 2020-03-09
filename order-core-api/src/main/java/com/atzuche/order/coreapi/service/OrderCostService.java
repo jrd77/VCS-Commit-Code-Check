@@ -295,26 +295,34 @@ public class OrderCostService {
 		     * 交接车-油费
 		     */
             RenterGetAndReturnCarDTO oilAmt = rentCost.getOilAmt();
-            com.atzuche.order.commons.vo.res.rentcosts.RenterOrderCostDetailEntity oilAmtReal = new com.atzuche.order.commons.vo.res.rentcosts.RenterOrderCostDetailEntity();
+//            com.atzuche.order.commons.vo.res.rentcosts.RenterOrderCostDetailEntity oilAmtReal = new com.atzuche.order.commons.vo.res.rentcosts.RenterOrderCostDetailEntity();
+//            if(oilAmt != null) {
+//                BeanUtils.copyProperties(oilAmt,oilAmtReal);
+//                String oilDifferenceCrash = oilAmt.getOilDifferenceCrash();
+//                oilDifferenceCrash = StringUtil.isBlank(oilDifferenceCrash)?"0":oilDifferenceCrash;
+//                //oilDifferenceCrash may be "0.0" format
+//                oilAmtReal.setTotalAmount((int)Float.parseFloat(oilDifferenceCrash));
+//            }
+//		    resVo.setOilAmt(oilAmtReal);
             if(oilAmt != null) {
-                BeanUtils.copyProperties(oilAmt,oilAmtReal);
-                String oilDifferenceCrash = oilAmt.getOilDifferenceCrash();
-                oilDifferenceCrash = StringUtil.isBlank(oilDifferenceCrash)?"0":oilDifferenceCrash;
-                //oilDifferenceCrash may be "0.0" format
-                oilAmtReal.setTotalAmount((int)Float.parseFloat(oilDifferenceCrash));
+            	String oilDifferenceCrash = oilAmt.getOilDifferenceCrash();
+            	oilDifferenceCrash = StringUtil.isBlank(oilDifferenceCrash)?"0":oilDifferenceCrash;
+            	//oilDifferenceCrash may be "0.0" format
+            	resVo.setOilAmt((int)Float.parseFloat(oilDifferenceCrash));
             }
-		    resVo.setOilAmt(oilAmtReal);
 
 		    /*
 		     * 交接车-获取超里程费用
 		     */
             FeeResult mileageAmt = rentCost.getMileageAmt();
-		    com.atzuche.order.commons.vo.res.rentcosts.RenterOrderCostDetailEntity mileageAmtReal = new com.atzuche.order.commons.vo.res.rentcosts.RenterOrderCostDetailEntity();
-		    if(mileageAmt != null) {
-		    	BeanUtils.copyProperties(mileageAmt,mileageAmtReal);
-                mileageAmtReal.setTotalAmount(mileageAmt.getTotalFee());
-		    }
-		    resVo.setMileageAmt(mileageAmtReal);
+//		    com.atzuche.order.commons.vo.res.rentcosts.RenterOrderCostDetailEntity mileageAmtReal = new com.atzuche.order.commons.vo.res.rentcosts.RenterOrderCostDetailEntity();
+//		    if(mileageAmt != null) {
+//		    	BeanUtils.copyProperties(mileageAmt,mileageAmtReal);
+//                mileageAmtReal.setTotalAmount(mileageAmt.getTotalFee());
+//		    }
+            if(mileageAmt != null) {
+            	resVo.setMileageAmt(mileageAmt.getTotalFee());
+            }
 		    
 		    /**
 		     * 管理后台补贴
