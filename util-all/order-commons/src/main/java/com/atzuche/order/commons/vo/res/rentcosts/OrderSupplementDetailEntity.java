@@ -91,6 +91,12 @@ public class OrderSupplementDetailEntity implements Serializable {
 	private Integer payFlag;
 	@AutoDocProperty(value="支付状态文案")
 	private String payFlagTxt;
+	@AutoDocProperty(value="支付时间")
+	private String payTimeTxt;
+	/**
+	 * 支付时间
+	 */
+	private Date payTime;
 	@AutoDocProperty(value="支付类型文案")
 	private String payTypeTxt;
 	/**
