@@ -384,6 +384,18 @@ public class OrderSettleNewService {
             accountPlatformProfitDetail.setOrderNo(renterOrderCostDetail.getOrderNo());
             settleOrdersDefinition.addPlatformProfit(accountPlatformProfitDetail);
         }
+        //2.1 还车运能加价 200309
+        if(RenterCashCodeEnum.RETURN_BLOCKED_RAISE_AMT.getCashNo().equals(renterOrderCostDetail.getCostCode())){
+            int totalAmount = renterOrderCostDetail.getTotalAmount();
+            AccountPlatformProfitDetailEntity accountPlatformProfitDetail = new AccountPlatformProfitDetailEntity();
+            accountPlatformProfitDetail.setAmt(-totalAmount);
+            accountPlatformProfitDetail.setSourceCode(RenterCashCodeEnum.RETURN_BLOCKED_RAISE_AMT.getCashNo());
+            accountPlatformProfitDetail.setSourceDesc(RenterCashCodeEnum.RETURN_BLOCKED_RAISE_AMT.getTxt());
+            accountPlatformProfitDetail.setUniqueNo(String.valueOf(renterOrderCostDetail.getId()));
+            accountPlatformProfitDetail.setOrderNo(renterOrderCostDetail.getOrderNo());
+            settleOrdersDefinition.addPlatformProfit(accountPlatformProfitDetail);
+        }
+        
         //2 提前取车车服务费 费用收益方 平台   平台端记录冲账流水
         if(RenterCashCodeEnum.SRV_GET_COST.getCashNo().equals(renterOrderCostDetail.getCostCode())){
             int totalAmount = renterOrderCostDetail.getTotalAmount();
@@ -395,6 +407,18 @@ public class OrderSettleNewService {
             accountPlatformProfitDetail.setOrderNo(renterOrderCostDetail.getOrderNo());
             settleOrdersDefinition.addPlatformProfit(accountPlatformProfitDetail);
         }
+        //2.2 取车运能加价
+        if(RenterCashCodeEnum.GET_BLOCKED_RAISE_AMT.getCashNo().equals(renterOrderCostDetail.getCostCode())){
+            int totalAmount = renterOrderCostDetail.getTotalAmount();
+            AccountPlatformProfitDetailEntity accountPlatformProfitDetail = new AccountPlatformProfitDetailEntity();
+            accountPlatformProfitDetail.setAmt(-totalAmount);
+            accountPlatformProfitDetail.setSourceCode(RenterCashCodeEnum.GET_BLOCKED_RAISE_AMT.getCashNo());
+            accountPlatformProfitDetail.setSourceDesc(RenterCashCodeEnum.GET_BLOCKED_RAISE_AMT.getTxt());
+            accountPlatformProfitDetail.setUniqueNo(String.valueOf(renterOrderCostDetail.getId()));
+            accountPlatformProfitDetail.setOrderNo(renterOrderCostDetail.getOrderNo());
+            settleOrdersDefinition.addPlatformProfit(accountPlatformProfitDetail);
+        }
+        
         //3 平台保障费 费用收益方 平台   平台端记录冲账流水
         if(RenterCashCodeEnum.INSURE_TOTAL_PRICES.getCashNo().equals(renterOrderCostDetail.getCostCode())){
             int totalAmount = renterOrderCostDetail.getTotalAmount();
@@ -439,7 +463,8 @@ public class OrderSettleNewService {
             accountPlatformProfitDetail.setOrderNo(renterOrderCostDetail.getOrderNo());
             settleOrdersDefinition.addPlatformProfit(accountPlatformProfitDetail);
         }
-
+        
+        // ----------------------------------------- 平台补贴 -----------------------------------------
         //7 平台卷  平台   平台端记录冲账流水
         if(RenterCashCodeEnum.REAL_COUPON_OFFSET.getCashNo().equals(renterOrderCostDetail.getCostCode())){
             int totalAmount = renterOrderCostDetail.getTotalAmount();

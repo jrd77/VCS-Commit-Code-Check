@@ -136,7 +136,7 @@ public class OrderOwnerSettleNewService {
     public void addGpsCostAmtToPlatform(OwnerOrderPurchaseDetailEntity renterOrderCostDetail, SettleOrdersDefinition settleOrdersDefinition) {
         int totalAmount = renterOrderCostDetail.getTotalAmount();
         AccountPlatformProfitDetailEntity accountPlatformProfitDetail = new AccountPlatformProfitDetailEntity();
-        accountPlatformProfitDetail.setAmt(totalAmount);
+        accountPlatformProfitDetail.setAmt(Math.abs(totalAmount));
         accountPlatformProfitDetail.setSourceCode(renterOrderCostDetail.getCostCode());
         accountPlatformProfitDetail.setSourceDesc(renterOrderCostDetail.getCostCodeDesc());
         accountPlatformProfitDetail.setUniqueNo(String.valueOf(renterOrderCostDetail.getId()));
@@ -153,8 +153,10 @@ public class OrderOwnerSettleNewService {
         int totalAmount = renterOrderCostDetail.getTotalAmount();
         AccountPlatformProfitDetailEntity accountPlatformProfitDetail = new AccountPlatformProfitDetailEntity();
         accountPlatformProfitDetail.setAmt(-totalAmount);
+        //renterOrderCostDetail.getCostCode()  //暂不处理
         accountPlatformProfitDetail.setSourceCode(OwnerCashCodeEnum.ACCOUNT_OWNER_INCREMENT_COST.getCashNo());
         accountPlatformProfitDetail.setSourceDesc(OwnerCashCodeEnum.ACCOUNT_OWNER_INCREMENT_COST.getTxt());
+        
         accountPlatformProfitDetail.setUniqueNo(String.valueOf(renterOrderCostDetail.getId()));
         accountPlatformProfitDetail.setOrderNo(renterOrderCostDetail.getOrderNo());
         settleOrdersDefinition.addPlatformProfit(accountPlatformProfitDetail);
@@ -168,7 +170,7 @@ public class OrderOwnerSettleNewService {
     public void addServiceExpenseAmtToPlatform(OwnerOrderPurchaseDetailEntity serviceExpense, SettleOrdersDefinition settleOrdersDefinition) {
         int totalAmount = serviceExpense.getTotalAmount();
         AccountPlatformProfitDetailEntity accountPlatformProfitDetail = new AccountPlatformProfitDetailEntity();
-        accountPlatformProfitDetail.setAmt(-totalAmount);
+        accountPlatformProfitDetail.setAmt(Math.abs(totalAmount));  //正数
         accountPlatformProfitDetail.setSourceCode(OwnerCashCodeEnum.SERVICE_CHARGE.getCashNo());
         accountPlatformProfitDetail.setSourceDesc(OwnerCashCodeEnum.SERVICE_CHARGE.getTxt());
         accountPlatformProfitDetail.setUniqueNo(String.valueOf(serviceExpense.getId()));
@@ -184,7 +186,7 @@ public class OrderOwnerSettleNewService {
     public void addProxyExpenseAmtToPlatform(OwnerOrderPurchaseDetailEntity proxyExpense, SettleOrdersDefinition settleOrdersDefinition) {
         int totalAmount = proxyExpense.getTotalAmount();
         AccountPlatformProfitDetailEntity accountPlatformProfitDetail = new AccountPlatformProfitDetailEntity();
-        accountPlatformProfitDetail.setAmt(-totalAmount);
+        accountPlatformProfitDetail.setAmt(Math.abs(totalAmount));
         accountPlatformProfitDetail.setSourceCode(OwnerCashCodeEnum.PROXY_CHARGE.getCashNo());
         accountPlatformProfitDetail.setSourceDesc(OwnerCashCodeEnum.PROXY_CHARGE.getTxt());
         accountPlatformProfitDetail.setUniqueNo(String.valueOf(proxyExpense.getId()));
