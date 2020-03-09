@@ -13,6 +13,8 @@ import javax.validation.constraints.NotNull;
 @Data
 @ToString
 public class UpdateCarDepositBillVO {
+    @NotBlank(message = "订单号")
+    private String orderNo;
     @NotBlank(message = "车辆号")
     private String carNo;
     @NotNull(message = "新增的押金")
