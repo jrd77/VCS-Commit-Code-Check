@@ -6,6 +6,7 @@ package com.atzuche.order.mq.enums;
  */
 public enum MessageTypeEnum {
 
+    ORDER_MESSAGE("ddxx", "订单消息"),
     PLATFORM_NOTICE("pttz", "平台通知"),
     SYSTEM_MESSAGE("xtxx", "系统消息"),
     ;
