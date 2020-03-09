@@ -217,7 +217,7 @@ public class ModifyOrderService {
 		// 保存升级补贴
 		orderConsoleSubsidyDetailService.saveDispatchingSubsidy(orderNo, consoleSubsidy);
 		// 保存附加驾驶人信息
-		saveAdditionalDriver(modifyOrderDTO);
+		saveAdditionalDriver(modifyOrderDTO, initRenterOrder);
 		// 保存优惠券信息
 		orderCouponService.insertBatch(costDeductVO.getOrderCouponList());
 		// 保存修改项目
@@ -534,7 +534,7 @@ public class ModifyOrderService {
 	 * 保存附加驾驶人信息
 	 * @param modifyOrderDTO
 	 */
-	public void saveAdditionalDriver(ModifyOrderDTO modifyOrderDTO) {
+	public void saveAdditionalDriver(ModifyOrderDTO modifyOrderDTO, RenterOrderEntity initRenterOrder) {
 		// 附加驾驶人列表
 		List<String> driverIds = modifyOrderDTO.getDriverIds();
 		if (driverIds == null || driverIds.isEmpty()) {
@@ -543,7 +543,7 @@ public class ModifyOrderService {
 		// 获取附加驾驶人信息
 		List<CommUseDriverInfoDTO> useDriverList = memProxyService.getCommUseDriverList(modifyOrderDTO.getMemNo());
 		// 保存
-		renterAdditionalDriverService.insertBatchAdditionalDriver(modifyOrderDTO.getOrderNo(), modifyOrderDTO.getRenterOrderNo(), driverIds, useDriverList);
+		renterAdditionalDriverService.insertBatchAdditionalDriver(modifyOrderDTO.getOrderNo(), modifyOrderDTO.getRenterOrderNo(), initRenterOrder.getRenterOrderNo(), driverIds, useDriverList);
 	}
 	
 	
