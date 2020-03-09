@@ -29,6 +29,8 @@ public class PushOrderBaseEventService extends OrderBaseEventService {
     @Autowired
     ShortMessageSendService shortMessageSendService;
 
+    private String orderDetailUrl;
+
     @Override
     public void sendShortMessageData(String textCode, Map smsParamsMap, String phone, Object orderEntity, Object memberDTO, Object goodsDetailDTO) {
         String renterTextCode = PushMessageTypeEnum.getSmsTemplate(String.valueOf(textCode));
@@ -40,7 +42,7 @@ public class PushOrderBaseEventService extends OrderBaseEventService {
         Map pushParamsMap = Maps.newHashMap();
         pushParamsMap.put("event", textCode);
         pushParamsMap.put("memNo", shortMessageSendService.getFieldValueByFieldName("memNo", memberDTO));
-        pushParamsMap.put("messageType", MessageTypeEnum.SYSTEM_MESSAGE.getMessageType());
+        pushParamsMap.put("messageType", MessageTypeEnum.ORDER_MESSAGE.getMessageType());
         List<String> smsFieldNames = shortMessageSendService.getSMSTemplateFeild(renterTextCode);
         if (CollectionUtils.isEmpty(smsFieldNames)) {
             //没有参数 直接发。。
