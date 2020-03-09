@@ -48,7 +48,7 @@ public class NoPayRentCarHalfHoursTask extends IJobHandler {
             for (OrderDTO violateBO : orderNos) {
                 OrderStatusEntity orderStatusEntity = orderStatusService.getByOrderNo(violateBO.getOrderNo());
                 if (orderStatusEntity.getRentCarPayStatus().intValue() == 0) {
-                    if (SMSTaskDateTimeUtils.getDateLatterCompareNowScoend(orderStatusEntity.getCreateTime(), 60) == 30) {
+                    if (SMSTaskDateTimeUtils.getDateLatterCompareNowScoend(violateBO.getReqTime(), 60) == 30) {
                         remindPayIllegalCrashService.sendNoPayCarShortMessageData(violateBO.getOrderNo());
                     }
                 }
