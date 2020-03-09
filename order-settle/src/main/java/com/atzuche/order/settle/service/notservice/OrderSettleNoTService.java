@@ -383,7 +383,8 @@ public class OrderSettleNoTService {
 //                orderSettleNewService.addRenterGetAndReturnCarAmtToPlatform(accountRenterCostSettleDetail,settleOrdersDefinition);
             }
             
-            //1.5租客罚金
+            // ----------------------------------------------- 5大表 -----------------------------------------------
+            //1.4租客罚金
             List<RenterOrderFineDeatailEntity> renterOrderFineDeatails = rentCosts.getRenterOrderFineDeatails();
             if(!CollectionUtils.isEmpty(renterOrderFineDeatails)) {
                 for (int i = 0; i < renterOrderFineDeatails.size(); i++) {
@@ -423,7 +424,7 @@ public class OrderSettleNoTService {
                 }
             }
           
-            //1.7 获取全局的租客订单罚金明细
+            //1.5 获取全局的租客订单罚金明细
             List<ConsoleRenterOrderFineDeatailEntity> consoleRenterOrderFineDeatails = rentCosts.getConsoleRenterOrderFineDeatails();
             if(!CollectionUtils.isEmpty(consoleRenterOrderFineDeatails)) {
                 for (int i = 0; i < consoleRenterOrderFineDeatails.size(); i++) {
@@ -462,7 +463,7 @@ public class OrderSettleNoTService {
                     }
                 }
             }
-            // 1.8 后台管理操作费用表（无条件补贴）
+            // 1.6 后台管理操作费用表（无条件补贴）
             List<OrderConsoleCostDetailEntity> orderConsoleCostDetails = rentCosts.getOrderConsoleCostDetailEntity();
             if(!CollectionUtils.isEmpty(orderConsoleCostDetails)){
                 for (int i = 0; i < orderConsoleCostDetails.size(); i++) {
@@ -504,7 +505,7 @@ public class OrderSettleNoTService {
             
             // -----------------------------------------PlatformSubsidy  以上是PlatformProfit
             
-            //1.4 补贴
+            //1.7 补贴
             List<RenterOrderSubsidyDetailEntity> renterOrderSubsidyDetails = rentCosts.getRenterOrderSubsidyDetails();
             if(!CollectionUtils.isEmpty(renterOrderSubsidyDetails)) {
                 for (int i = 0; i < renterOrderSubsidyDetails.size(); i++) {
@@ -544,7 +545,7 @@ public class OrderSettleNoTService {
                     }
                 }
             }
-            //1.6 管理后台补贴
+            //1.8 管理后台补贴
             List<OrderConsoleSubsidyDetailEntity> orderConsoleSubsidyDetails = rentCosts.getOrderConsoleSubsidyDetails();
             if(!CollectionUtils.isEmpty(orderConsoleSubsidyDetails)) {
                 for (int i = 0; i < orderConsoleSubsidyDetails.size(); i++) {
