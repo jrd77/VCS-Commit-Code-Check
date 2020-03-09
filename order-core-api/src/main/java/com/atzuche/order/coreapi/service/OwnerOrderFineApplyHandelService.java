@@ -84,6 +84,9 @@ public class OwnerOrderFineApplyHandelService {
                                 Math.abs(ownerOrderFineApplyEntity.getFineAmount()), FineSubsidyCodeEnum.RENTER,
                                 FineSubsidySourceCodeEnum.OWNER, FineTypeEnum.CANCEL_FINE);
                 consoleRenterOrderFineDeatailService.saveConsoleRenterOrderFineDeatail(consoleRenterOrderFineDeatailEntity);
+            } else {
+                entity.setFineSubsidyCode(FineSubsidyCodeEnum.PLATFORM.getFineSubsidyCode());
+                entity.setFineSubsidyDesc(FineSubsidyCodeEnum.PLATFORM.getFineSubsidyDesc());
             }
         } else {
             logger.warn("Dispatcher status is invalid. orderNo:[{}],dispatcherStatus:[{}]", orderNo, dispatcherStatus);

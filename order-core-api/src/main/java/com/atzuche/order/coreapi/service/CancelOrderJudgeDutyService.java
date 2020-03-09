@@ -108,6 +108,11 @@ public class CancelOrderJudgeDutyService {
                     consoleOwnerOrderFineDeatailEntity =
                             consoleOwnerOrderFineDeatailService.fineDataConvert(cancelFineAmt.getCostBaseDTO(), penalty, FineSubsidyCodeEnum.OWNER,
                                     FineSubsidySourceCodeEnum.RENTER, FineTypeEnum.CANCEL_FINE);
+                } else {
+                    if(null != renterOrderFineDetailEntityOne) {
+                        renterOrderFineDetailEntityOne.setFineSubsidyCode(FineSubsidySourceCodeEnum.PLATFORM.getFineSubsidySourceCode());
+                        renterOrderFineDetailEntityOne.setFineSubsidyDesc(FineSubsidySourceCodeEnum.PLATFORM.getFineSubsidySourceDesc());
+                    }
                 }
             }
             renterOrderFineDeatailService.saveRenterOrderFineDeatail(renterOrderFineDetailEntityOne);
@@ -145,15 +150,20 @@ public class CancelOrderJudgeDutyService {
                 if (null != ownerOrderFineDetailEntityOne) {
                     ownerOrderFineDetailEntityOne.setOwnerOrderNo(ownerOrderEntity.getOwnerOrderNo());
                 }
-                ownerOrderFineDeatailService.addOwnerOrderFineRecord(ownerOrderFineDetailEntityOne);
-
                 //租客收益处理
                 if(isSubsidyFineAmt) {
                     ConsoleRenterOrderFineDeatailEntity consoleRenterOrderFineDeatailEntity =
                             consoleRenterOrderFineDeatailService.fineDataConvert(cancelFineAmt.getCostBaseDTO(), penalty,
                                     FineSubsidyCodeEnum.RENTER, FineSubsidySourceCodeEnum.OWNER, FineTypeEnum.CANCEL_FINE);
                     consoleRenterOrderFineDeatailService.saveConsoleRenterOrderFineDeatail(consoleRenterOrderFineDeatailEntity);
+                } else {
+                    if(null != ownerOrderFineDetailEntityOne) {
+                        ownerOrderFineDetailEntityOne.setFineSubsidyCode(FineSubsidySourceCodeEnum.PLATFORM.getFineSubsidySourceCode());
+                        ownerOrderFineDetailEntityOne.setFineSubsidyDesc(FineSubsidySourceCodeEnum.PLATFORM.getFineSubsidySourceDesc());
+                    }
                 }
+
+                ownerOrderFineDeatailService.addOwnerOrderFineRecord(ownerOrderFineDetailEntityOne);
             }
 
         } else if (CancelOrderDutyEnum.CANCEL_ORDER_DUTY_PLATFORM.getCode() == wrongdoer) {
