@@ -400,7 +400,7 @@ public class AdminOrderCostDetailController {
 
 
     @AutoDocMethod(description = "租客费用详情-弹窗", value = "租客费用详情-弹窗",response = ResponseData.class)
-    @PostMapping("ownerToRenterRentAmtSubsidy/renterOrderCostDetail")
+    @PostMapping("/renterOrderCostDetail")
     public ResponseData<RenterCostDetailDTO> renterOrderCostDetail(@RequestParam("orderNo") String orderNo) {
         logger.info("renterOrderCostDetail controller orderNo={}",orderNo);
         try {
