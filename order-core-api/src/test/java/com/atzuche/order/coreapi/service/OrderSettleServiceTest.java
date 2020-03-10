@@ -35,6 +35,7 @@ public class OrderSettleServiceTest {
 		//28261181200299
 		RentCosts cost = orderSettleService.preRenterSettleOrder("28261181200299", "2826118120029910010");
 		log.info("租客应收（未抵扣欠款）:"+cost.getRenterCostAmtFinal());
+		log.info("租客应收（超里程）:"+cost.getMileageAmt().toString());
 	}
 	
 	@Test

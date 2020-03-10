@@ -1,5 +1,8 @@
 package com.autoyol.platformcost.model;
 
+import lombok.ToString;
+
+@ToString
 public class FeeResult {
 	// 单价
 	private Integer unitPrice;
