@@ -729,8 +729,10 @@ public class OrderOwnerSettleNoTService {
       //2车主总账
       List<AccountOwnerCostSettleDetailEntity> accountOwnerCostSettleDetails = settleOrdersDefinition.getAccountOwnerCostSettleDetails();
       if(!CollectionUtils.isEmpty(accountOwnerCostSettleDetails)){
+    	  //车主结算的总费用
           int ownerCostAmtFinal = accountOwnerCostSettleDetails.stream().mapToInt(AccountOwnerCostSettleDetailEntity::getAmt).sum();
           settleOrdersDefinition.setOwnerCostAmtFinal(ownerCostAmtFinal);
+          
           int ownerCostAmt = accountOwnerCostSettleDetails.stream().filter(obj ->{return obj.getAmt()>0;}).mapToInt(AccountOwnerCostSettleDetailEntity::getAmt).sum();
           settleOrdersDefinition.setOwnerCostAmt(ownerCostAmt);
           int ownerSubsidyAmt = accountOwnerCostSettleDetails.stream().filter(obj ->{return obj.getAmt()<0;}).mapToInt(AccountOwnerCostSettleDetailEntity::getAmt).sum();

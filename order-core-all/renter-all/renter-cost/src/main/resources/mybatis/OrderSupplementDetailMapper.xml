@@ -22,6 +22,7 @@
         <result property="updateTime" column="update_time"/>
         <result property="updateOp" column="update_op"/>
         <result property="isDelete" column="is_delete"/>
+        <result property="payTime" column="pay_time"/>
     </resultMap>
 
 
@@ -43,7 +44,8 @@
 	`create_op`, 	
 	`update_time`, 	
 	`update_op`, 	
-	`is_delete`	
+	`is_delete`,
+	`pay_time`	
 
 	</sql>
 
@@ -182,6 +184,7 @@
 	<update id="updatePayFlagById">
 		update order_supplement_detail 
 		set `pay_flag` = #{payFlag}
+		<if test="payTime != null">, pay_time = #{payTime}</if>
 		where id = #{id}
 	</update>
 	

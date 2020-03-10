@@ -4,6 +4,9 @@ import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.entity.dto.CommUseDriverInfoDTO;
 import com.atzuche.order.renterorder.entity.RenterAdditionalDriverEntity;
 import com.atzuche.order.renterorder.mapper.RenterAdditionalDriverMapper;
+
+import jline.internal.Log;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -115,11 +118,13 @@ public class RenterAdditionalDriverService {
     			historyDriverList.add(driverId);
     		}
     	}
+        logger.info("additionalDriver historyDriverList=[{}]", historyDriverList);
         if (historyDriverList.isEmpty()) {
         	return;
         }
         // 获取已经购买的附加驾驶人信息
         List<RenterAdditionalDriverEntity> initAddDriverList = listDriversByRenterOrderNo(initRentOrderNo);
+        logger.info("additionalDriver initRentOrderNo=[{}], initAddDriverList=[{}]", initRentOrderNo, initAddDriverList);
         if (initAddDriverList == null || initAddDriverList.isEmpty()) {
         	return;
         }

@@ -87,7 +87,9 @@ public class RenterOrderChangeApplyService{
      * 更具订单号和审核状态查询
      * @return
      */
-    public RenterOrderChangeApplyEntity getByOwnerOrderNoAndAuditStatus(String ownerOrderNo,int auditStatus){
-        return renterOrderChangeApplyMapper.getByOwnerOrderNoAndAuditStatus(ownerOrderNo,auditStatus);
+    public List<RenterOrderChangeApplyEntity> getByOrderNo(String ownerOrderNo){
+        return renterOrderChangeApplyMapper.getByOrderNo(ownerOrderNo);
     }
+
+
 }

@@ -326,7 +326,7 @@ public class OrderSettleNoTService {
      * @param settleOrdersDefinition
      * @param settleOrders
      */
-    private void handleRentAndPlatform(SettleOrdersDefinition settleOrdersDefinition, SettleOrders settleOrders) {
+    public void handleRentAndPlatform(SettleOrdersDefinition settleOrdersDefinition, SettleOrders settleOrders) {
         //1 租客费用明细 整理
         RentCosts rentCosts = settleOrders.getRentCosts();
         List<AccountRenterCostSettleDetailEntity> accountRenterCostSettleDetails = settleOrdersDefinition.getAccountRenterCostSettleDetails();
@@ -601,6 +601,10 @@ public class OrderSettleNoTService {
         List<AccountRenterCostSettleDetailEntity> accountRenterCostSettleDetails = settleOrdersDefinition.getAccountRenterCostSettleDetails();
         //1租客总账
         if(!CollectionUtils.isEmpty(accountRenterCostSettleDetails)){
+        	//租客结算的总费用
+            int renterCostAmtFinal = accountRenterCostSettleDetails.stream().mapToInt(AccountRenterCostSettleDetailEntity::getAmt).sum();
+            settleOrdersDefinition.setRenterCostAmtFinal(renterCostAmtFinal);
+            
             int rentCostAmt = accountRenterCostSettleDetails.stream().filter(obj ->{return obj.getAmt()<0;}).mapToInt(AccountRenterCostSettleDetailEntity::getAmt).sum();
             settleOrdersDefinition.setRentCostAmt(rentCostAmt);
             int rentSubsidyAmt = accountRenterCostSettleDetails.stream().filter(obj ->{return obj.getAmt()>0;}).mapToInt(AccountRenterCostSettleDetailEntity::getAmt).sum();
@@ -781,6 +785,15 @@ public class OrderSettleNoTService {
 	        settleOrders.setOwnerMemNo(ownerMemNo);
 	        settleOrders.setOwnerOrder(ownerOrder);
 
+        } else { //查询有效的车主子订单
+	        OwnerOrderEntity ownerOrder = ownerOrderService.getOwnerOrderByOrderNoAndIsEffective(orderNo);
+	        if(Objects.isNull(ownerOrder) || Objects.isNull(ownerOrder.getOwnerOrderNo())){
+	        	throw new OrderSettleFlatAccountException();
+	        }
+	        String ownerMemNo = ownerOrder.getMemNo();
+		    settleOrders.setOwnerOrderNo(ownerOrderNo);
+		    settleOrders.setOwnerMemNo(ownerMemNo);
+		    settleOrders.setOwnerOrder(ownerOrder);
         }
 
         // 2 校验订单状态 以及是否存在 理赔暂扣 存在不能进行结算 并CAT告警

@@ -95,5 +95,9 @@ public class OrderSupplementDetailEntity implements Serializable {
 	 * 0-正常，1-已逻辑删除
 	 */
 	private Integer isDelete;
+	/**
+	 * 支付时间
+	 */
+	private Date payTime;
 
 }

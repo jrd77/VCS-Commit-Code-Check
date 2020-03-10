@@ -103,7 +103,6 @@ public class OrderCostService {
 		req.setMemNo(orderEntity.getMemNoRenter());
 		req.setSubOrderNo(renterCostReqVO.getRenterOrderNo());
 		
-		RenterCostVO costVo = orderSettleService.getRenterCostByOrderNo(renterCostReqVO.getOrderNo());
 		
         ///子订单号
 		realVo.setRenterOrderNo(renterCostReqVO.getRenterOrderNo());
@@ -118,6 +117,8 @@ public class OrderCostService {
 		if(resData != null) {
 			com.atzuche.order.commons.vo.res.OrderRenterCostResVO data = resData.getData();
 			if(data != null) {
+				int renterCostAmtFinal = data.getRenterCostAmtFinal();
+				RenterCostVO costVo = orderSettleService.getRenterCostByOrderNo(renterCostReqVO.getOrderNo(),renterCostReqVO.getRenterOrderNo(),orderEntity.getMemNoRenter(),renterCostAmtFinal);
 				
 				//租金费用  费用明细表renter_order_cost_detail   
 				putRenterOrderCostDetail(realVo,data);
@@ -139,7 +140,6 @@ public class OrderCostService {
 				//油费,超里程
 				putOilBeyondMile(realVo,data);
 				
-//				111
 				//平台给租客的补贴， 车主和租客的调价，车主给租客的租金补贴
 				putConsoleSubsidy(realVo,data);
 				
@@ -360,21 +360,14 @@ public class OrderCostService {
 		realVo.setAdjustAmt(String.valueOf( -renterToOwnerAdjustAmount)); //NumberUtils.convertNumberToZhengshu(renterToOwnerAdjustAmount)
 		
 	}
-
+	
 	private void putOilBeyondMile(OrderRenterCostResVO realVo,
 			com.atzuche.order.commons.vo.res.OrderRenterCostResVO data) {
-		RenterOrderCostDetailEntity oilAmt = data.getOilAmt();
-		if(oilAmt != null) {
-			realVo.setOilAmt(String.valueOf( NumberUtils.convertNumberToZhengshu(oilAmt.getTotalAmount())));
-		}else {
-			realVo.setOilAmt("0");
-		}
-		RenterOrderCostDetailEntity mileageAmt = data.getMileageAmt();
-		if(mileageAmt != null) {
-			realVo.setOilAmt(String.valueOf( NumberUtils.convertNumberToZhengshu(mileageAmt.getTotalAmount())));
-		}else {
-			realVo.setBeyondMileAmt("0");
-		}
+		int oilAmt = data.getOilAmt();
+		realVo.setOilAmt(String.valueOf( NumberUtils.convertNumberToZhengshu(oilAmt)));
+
+		int mileageAmt = data.getMileageAmt();
+		realVo.setBeyondMileAmt(String.valueOf( NumberUtils.convertNumberToZhengshu(mileageAmt)));
 	}
 
 	private void putRenterOrderFine(OrderRenterCostResVO realVo, com.atzuche.order.commons.vo.res.OrderRenterCostResVO data) {
