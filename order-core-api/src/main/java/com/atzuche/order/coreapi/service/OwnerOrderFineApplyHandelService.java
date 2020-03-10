@@ -38,9 +38,11 @@ public class OwnerOrderFineApplyHandelService {
 
 
     @Transactional(rollbackFor = Exception.class)
-    public boolean handleFineApplyRecord(String orderNo, DispatcherStatusEnum dispatcherStatus) {
-        logger.info("Handle owner order fine apply record. param is,orderNo:[{}],dispatcherStatus:[{}]",
-                orderNo, dispatcherStatus);
+    public boolean handleFineApplyRecord(String orderNo, DispatcherStatusEnum dispatcherStatus,
+                                         Boolean isSubsidyFineAmt) {
+        logger.info("Handle owner order fine apply record. param is,orderNo:[{}],dispatcherStatus:[{}]," +
+                        "isSubsidyFineAmt:[{}]",
+                orderNo, dispatcherStatus, isSubsidyFineAmt);
 
         OwnerOrderFineApplyEntity ownerOrderFineApplyEntity = ownerOrderFineApplyService.getByOrderNo(orderNo);
         if (null == ownerOrderFineApplyEntity) {
@@ -76,11 +78,16 @@ public class OwnerOrderFineApplyHandelService {
             costBaseDTO.setOrderNo(ownerOrderFineApplyEntity.getOrderNo());
             costBaseDTO.setMemNo(ownerOrderFineApplyEntity.getMemNo().toString());
 
-            ConsoleRenterOrderFineDeatailEntity consoleRenterOrderFineDeatailEntity =
-                    consoleRenterOrderFineDeatailService.fineDataConvert(costBaseDTO,
-                            Math.abs(ownerOrderFineApplyEntity.getFineAmount()), FineSubsidyCodeEnum.RENTER,
-                            FineSubsidySourceCodeEnum.OWNER, FineTypeEnum.CANCEL_FINE);
-            consoleRenterOrderFineDeatailService.saveConsoleRenterOrderFineDeatail(consoleRenterOrderFineDeatailEntity);
+            if(isSubsidyFineAmt) {
+                ConsoleRenterOrderFineDeatailEntity consoleRenterOrderFineDeatailEntity =
+                        consoleRenterOrderFineDeatailService.fineDataConvert(costBaseDTO,
+                                Math.abs(ownerOrderFineApplyEntity.getFineAmount()), FineSubsidyCodeEnum.RENTER,
+                                FineSubsidySourceCodeEnum.OWNER, FineTypeEnum.CANCEL_FINE);
+                consoleRenterOrderFineDeatailService.saveConsoleRenterOrderFineDeatail(consoleRenterOrderFineDeatailEntity);
+            } else {
+                entity.setFineSubsidyCode(FineSubsidyCodeEnum.PLATFORM.getFineSubsidyCode());
+                entity.setFineSubsidyDesc(FineSubsidyCodeEnum.PLATFORM.getFineSubsidyDesc());
+            }
         } else {
             logger.warn("Dispatcher status is invalid. orderNo:[{}],dispatcherStatus:[{}]", orderNo, dispatcherStatus);
             return false;
