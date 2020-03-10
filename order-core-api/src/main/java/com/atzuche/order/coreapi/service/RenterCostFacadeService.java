@@ -262,8 +262,8 @@ public class RenterCostFacadeService {
         RenterFineVO renterFineVO = getRenterFineDetail(orderNo,renterOrderNo,memNo);
         RenterSubsidyDetailVO renterSubsidyDetail = getRenterSubsidyDetail(orderNo, renterOrderNo, memNo);
         int rentWalletAmt = cashierSettleService.getRentCostPayByWallet(orderNo, memNo);
-        RenterCostVO renterCostVO = null;//orderSettleService.getRenterCostByOrderNo(orderNo);
         RentCosts rentCost = orderSettleService.preRenterSettleOrder(orderNo,renterOrderNo);
+        RenterCostVO renterCostVO = orderSettleService.getRenterCostByOrderNo(orderNo,renterOrderNo,renterOrderCostEntity.getMemNo(),rentCost.getRenterCostAmtFinal());
         String oilDifferenceCrash = rentCost.getOilAmt().getOilDifferenceCrash();
         oilDifferenceCrash = StringUtil.isBlank(oilDifferenceCrash)?"0":oilDifferenceCrash;
         int extraMileageFee = (rentCost == null || rentCost.getMileageAmt() == null)?0:rentCost.getMileageAmt().getTotalFee();
