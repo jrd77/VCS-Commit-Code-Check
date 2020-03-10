@@ -1703,16 +1703,22 @@ public class OrderDetailService {
     }
 
     private RenterOrderChangeApplyDTO filterByAuditStatus(List<RenterOrderChangeApplyEntity> list,int auditStatus){
-        Optional<RenterOrderChangeApplyEntity> first = Optional.ofNullable(list).orElseGet(ArrayList::new)
+        List<RenterOrderChangeApplyEntity> collect = Optional.ofNullable(list).orElseGet(ArrayList::new)
                 .stream()
                 .filter(x -> auditStatus == x.getAuditStatus())
-                .findFirst();
+                .collect(Collectors.toList());
 
-        if(first.isPresent()){
+        if(collect!=null && collect.size()>0){
             RenterOrderChangeApplyDTO renterOrderChangeApplyDTO = new RenterOrderChangeApplyDTO();
-            BeanUtils.copyProperties(first.get(),renterOrderChangeApplyDTO);
+            BeanUtils.copyProperties(collect.get(0),renterOrderChangeApplyDTO);
             return renterOrderChangeApplyDTO;
         }
         return null;
+    }
+
+    public static void main(String[] args) {
+        Object o = Optional.ofNullable(null).get();
+        System.out.println(Optional.ofNullable(1).isPresent());
+        System.out.println(o);
     }
 }
