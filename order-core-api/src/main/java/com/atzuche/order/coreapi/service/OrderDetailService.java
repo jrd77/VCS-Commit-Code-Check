@@ -1660,6 +1660,14 @@ public class OrderDetailService {
             BeanUtils.copyProperties(orderStatusEntity,orderStatusDTO);
         }
 
+        //车主费用
+        OwnerOrderCostEntity ownerOrderCostEntity = ownerOrderCostService.getOwnerOrderCostByOwnerOrderNo(ownerOrderNo);
+        OwnerOrderCostDTO ownerOrderCostDTO = null;
+        if(ownerOrderCostEntity != null){
+            ownerOrderCostDTO = new OwnerOrderCostDTO();
+            BeanUtils.copyProperties(ownerOrderCostEntity,ownerOrderCostDTO);
+        }
+
         //租客修改申请
         RenterOrderChangeApplyEntity renterOrderChangeApplyEntity = renterOrderChangeApplyService.getByOwnerOrderNoAndAuditStatus(ownerOrderNo, 0);
         RenterOrderChangeApplyDTO renterOrderChangeApplyDTO = null;
@@ -1681,6 +1689,7 @@ public class OrderDetailService {
         orderDetailRespDTO.orderStatus = orderStatusDTO;
         orderDetailRespDTO.ownerOrder = ownerOrderDTO;
         orderDetailRespDTO.renterOrderChangeApplyDTO = renterOrderChangeApplyDTO;
+        orderDetailRespDTO.ownerOrderCostDTO = ownerOrderCostDTO;
         return orderDetailRespDTO;
     }
 }
