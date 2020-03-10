@@ -779,4 +779,33 @@ public class OrderSearchRemoteService {
         smsOrderBaseEventService.sendShortMessage(map);
 
     }
+
+    public List<String> queryRenterOrderChangeApply() {
+        Transaction t = Cat.getProducer().newTransaction(CatConstants.FEIGN_CALL, "查询车主收到修改申请15分钟后没有操作的租客子订单号列表");
+        try {
+            ViolateVO req = new ViolateVO();
+            req.setPageNum(1);
+            req.setPageSize(10000);
+            req.setType("12");
+            Cat.logEvent(CatConstants.FEIGN_METHOD,"orderSearchService.violateProcessOrder");
+            Cat.logEvent(CatConstants.FEIGN_PARAM, JSON.toJSONString(req));
+            ResponseData<OrderVO<ViolateBO>> orderResponseData = orderSearchService.violateProcessOrder(req);
+            Cat.logEvent(CatConstants.FEIGN_RESULT, JSON.toJSONString(orderResponseData));
+            checkResponse(orderResponseData);
+            List<ViolateBO> orderList = orderResponseData.getData().getOrderList();
+            t.setStatus(Transaction.SUCCESS);
+            if(CollectionUtils.isEmpty(orderList)){
+                return new ArrayList<>();
+            }else{
+                return  orderList.stream().map(ViolateBO::getRenterOrderNo).collect(Collectors.toList());
+            }
+        } catch (Exception e) {
+            logger.error("执行 查询车主收到修改申请15分钟后没有操作的租客子订单号列表 异常",e);
+            Cat.logError("执行 查询车主收到修改申请15分钟后没有操作的租客子订单号列表 异常",e);
+            t.setStatus(e);
+            throw e;
+        }finally {
+            t.complete();
+        }
+    }
 }
