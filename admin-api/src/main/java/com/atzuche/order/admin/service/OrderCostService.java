@@ -117,7 +117,6 @@ public class OrderCostService {
 		if(resData != null) {
 			com.atzuche.order.commons.vo.res.OrderRenterCostResVO data = resData.getData();
 			if(data != null) {
-				logger.info("invoke feign get mileamt="+data.getMileageAmt());
 				int renterCostAmtFinal = data.getRenterCostAmtFinal();
 				RenterCostVO costVo = orderSettleService.getRenterCostByOrderNo(renterCostReqVO.getOrderNo(),renterCostReqVO.getRenterOrderNo(),orderEntity.getMemNoRenter(),renterCostAmtFinal);
 				
@@ -138,14 +137,9 @@ public class OrderCostService {
 				//租车费用应收@海豹   实收
 				putPaymentAmount(realVo,data,costVo);
 				
-				logger.info("invoke feign get mileamt2="+data.getMileageAmt());
-				logger.info("invoke feign get mileamt3="+realVo.getBeyondMileAmt());
 				//油费,超里程
 				putOilBeyondMile(realVo,data);
-				logger.info("invoke feign get mileamt4="+data.getMileageAmt());
-				logger.info("invoke feign get mileamt5="+realVo.getBeyondMileAmt());
 				
-//				111
 				//平台给租客的补贴， 车主和租客的调价，车主给租客的租金补贴
 				putConsoleSubsidy(realVo,data);
 				
@@ -159,9 +153,6 @@ public class OrderCostService {
 				
 				//rentFeeBase基础费用
 				putRentFeeBase(realVo,data);
-				
-				logger.info("invoke feign get mileamt6="+data.getMileageAmt());
-				logger.info("invoke feign get mileamt7="+realVo.getBeyondMileAmt());
 			}
 		}
 		
