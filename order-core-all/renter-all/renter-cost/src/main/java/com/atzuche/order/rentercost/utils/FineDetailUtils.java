@@ -200,7 +200,4 @@ public class FineDetailUtils {
         return getRenterOrderFineAmt(entityList,FineTypeEnum.GET_RETURN_CAR);
     }
 
-
-
-
 }

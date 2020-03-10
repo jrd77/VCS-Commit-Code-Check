@@ -9,6 +9,8 @@ public class OrderDetailDTO {
     public String statusUpdateTIme;
     @AutoDocProperty("订单状态")
     public String orderStatus;
+    @AutoDocProperty("订单状态")
+    public Integer status;
     @AutoDocProperty("支付来源（线上/线下）")
     public String paySource;
     @AutoDocProperty("总租期")

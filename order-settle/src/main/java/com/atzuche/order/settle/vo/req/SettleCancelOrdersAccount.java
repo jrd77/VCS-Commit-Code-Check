@@ -3,6 +3,7 @@ package com.atzuche.order.settle.vo.req;
 import com.atzuche.order.accountownercost.entity.AccountOwnerCostSettleDetailEntity;
 import lombok.Data;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -38,7 +39,7 @@ public class SettleCancelOrdersAccount {
     /**
      * 车主费用明细
      */
-    private List<AccountOwnerCostSettleDetailEntity> accountOwnerCostSettleDetails;
+    private List<AccountOwnerCostSettleDetailEntity> accountOwnerCostSettleDetails = new ArrayList<>();
 
     /**************************************************************************************** 租客端统计费用 */
     /**
