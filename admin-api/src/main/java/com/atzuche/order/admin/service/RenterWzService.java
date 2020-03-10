@@ -74,11 +74,11 @@ public class RenterWzService {
 
     private static final String WZ_OTHER_FINE_REMARK = "其他扣款备注";
     private static final String WZ_OTHER_FINE = "其他扣款";
-    private static final String WZ_OTHER_FINE_CODE = "100044";
+    private static final String WZ_OTHER_FINE_CODE = "11240044";
 
     private static final String INSURANCE_CLAIM_REMARK = "保险理赔备注";
     private static final String INSURANCE_CLAIM = "保险理赔";
-    private static final String INSURANCE_CLAIM_CODE = "100045";
+    private static final String INSURANCE_CLAIM_CODE = "11240045";
 
     private static final String REMARK = "remark";
     private static final String AMOUNT = "amount";
@@ -87,7 +87,7 @@ public class RenterWzService {
 
     private static final String RADIX_POINT = ".";
 
-    private static final List<String> COST_CODE_LIST = Arrays.asList("100040","100042","100041","100043","100044","100045");
+    private static final List<String> COST_CODE_LIST = Arrays.asList("11240040","11240041","11240042","11240043","11240044","11240045");
 
 
     public void updateWzCost(String orderNo, List<RenterWzCostDetailReqVO> costDetails) {

@@ -190,7 +190,7 @@ public class DeliveryCarInfoPriceService {
             double oilMiddleDataFee = MathUtil.mulByDouble(MathUtil.div(oilDifference, 16.0), Double.valueOf(oilContainer));
             double oilDifferenceCrash = MathUtil.mulByDouble(oilMiddleDataFee, getOilPriceByCityCodeAndType(Integer.valueOf(cityCode), carEngineType));
             log.info("油费数据----->>>>oilDifferenceCrash:[{}]",oilDifferenceCrash);
-            oilDifferenceCrash = oilDifferenceCrash > 0 ? Math.floor(oilDifferenceCrash) : Math.ceil(oilDifferenceCrash);
+            oilDifferenceCrash = oilDifferenceCrash > 0D ? Math.floor(oilDifferenceCrash) : Math.ceil(oilDifferenceCrash);
             ownerGetAndReturnCarDTO.setOilDifferenceCrash(String.valueOf(Double.valueOf(oilDifferenceCrash).intValue()));
         } catch (Exception e) {
             log.error("设置参数失败,目前没有值",e);
@@ -307,7 +307,7 @@ public class DeliveryCarInfoPriceService {
         try {
             List<OwnerHandoverCarInfoEntity> ownerHandoverCarInfoEntities = ownerHandoverCarService.selectOwnerByOrderNo(orderNo);
             List<RenterHandoverCarInfoEntity> renterHandoverCarInfoEntities = renterHandoverCarService.selectRenterByOrderNo(orderNo);
-            if(renterHandoverCarInfoEntities.get(0).getType().intValue() != 4 || renterHandoverCarInfoEntities.get(0).getType().intValue() != 3)
+            if(renterHandoverCarInfoEntities.get(0).getType().intValue() != 4 && renterHandoverCarInfoEntities.get(0).getType().intValue() != 3)
             {
                 log.info("不是配送订单，没有车主平台加油服务费");
                 return 0;

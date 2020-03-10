@@ -40,7 +40,7 @@ public class PushOrderBaseEventService extends OrderBaseEventService {
         Map pushParamsMap = Maps.newHashMap();
         pushParamsMap.put("event", textCode);
         pushParamsMap.put("memNo", shortMessageSendService.getFieldValueByFieldName("memNo", memberDTO));
-        pushParamsMap.put("messageType", MessageTypeEnum.SYSTEM_MESSAGE.getMessageType());
+        pushParamsMap.put("messageType", MessageTypeEnum.ORDER_MESSAGE.getMessageType());
         List<String> smsFieldNames = shortMessageSendService.getSMSTemplateFeild(renterTextCode);
         if (CollectionUtils.isEmpty(smsFieldNames)) {
             //没有参数 直接发。。

@@ -14,9 +14,9 @@ import org.springframework.util.StringUtils;
 import com.atzuche.order.accountownercost.entity.AccountOwnerCostSettleDetailEntity;
 import com.atzuche.order.accountrenterdeposit.vo.res.AccountRenterDepositResVO;
 import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostDetailEntity;
+import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostSettleDetailEntity;
 import com.atzuche.order.accountrenterwzdepost.vo.res.AccountRenterWZDepositResVO;
 import com.atzuche.order.cashieraccount.entity.CashierRefundApplyEntity;
-import com.atzuche.order.cashieraccount.service.CashierPayService;
 import com.atzuche.order.cashieraccount.service.CashierQueryService;
 import com.atzuche.order.cashieraccount.service.CashierService;
 import com.atzuche.order.cashieraccount.service.CashierSettleService;
@@ -73,16 +73,16 @@ public class OrderSettleService{
     /**
      * 查询所以费用
      */
-    public RenterCostVO getRenterCostByOrderNo(String orderNo){
-        RenterOrderEntity renterOrder = renterOrderService.getRenterOrderByOrderNoAndIsEffective(orderNo);
-        Assert.notNull(renterOrder,"订单信息不存在");
-        Assert.notNull(renterOrder.getRenterOrderNo(),"订单信息不存在");
+    public RenterCostVO getRenterCostByOrderNo(String orderNo,String renterOrderNo,String renterNo,int yingfuAmt){
+//        RenterOrderEntity renterOrder = renterOrderService.getRenterOrderByOrderNoAndIsEffective(orderNo);
+//        Assert.notNull(renterOrder,"订单信息不存在");
+//        Assert.notNull(renterOrder.getRenterOrderNo(),"订单信息不存在");
 
         RenterCostVO vo = new RenterCostVO();
         vo.setOrderNo(orderNo);
-        AccountRenterDepositResVO accountRenterDepositResVO = cashierService.getRenterDepositEntity(orderNo,renterOrder.getRenterMemNo());
-        int rentWzDepositAmt = cashierSettleService.getSurplusWZDepositCostAmt(orderNo,renterOrder.getRenterMemNo());
-        AccountRenterWZDepositResVO accountRenterWZDeposit = cashierService.getRenterWZDepositEntity(orderNo,renterOrder.getRenterMemNo());
+        AccountRenterDepositResVO accountRenterDepositResVO = cashierService.getRenterDepositEntity(orderNo,renterNo);
+        int rentWzDepositAmt = cashierSettleService.getSurplusWZDepositCostAmt(orderNo,renterNo);
+        AccountRenterWZDepositResVO accountRenterWZDeposit = cashierService.getRenterWZDepositEntity(orderNo,renterNo);
         //车辆押金
         vo.setDepositCost(Math.abs(accountRenterDepositResVO.getSurplusDepositAmt()));
         vo.setDepositCostShifu(Math.abs(accountRenterDepositResVO.getShifuDepositAmt()));
@@ -91,15 +91,20 @@ public class OrderSettleService{
         vo.setDepositWzCost(Math.abs(rentWzDepositAmt));
         vo.setDepositWzCostShifu(Math.abs(accountRenterWZDeposit.getShishouDeposit()));
         vo.setDepositWzCostYingFu(Math.abs(accountRenterWZDeposit.getYingshouDeposit()));
-        RentCosts rentCosts = preRenterSettleOrder(orderNo, renterOrder.getRenterOrderNo());
-        log.info("查询租客应收 getRenterCostByOrderNo rentCosts [{}]",GsonUtils.toJson(rentCosts));
+        
+        //避免重复调用。200306
+//        RentCosts rentCosts = preRenterSettleOrder(orderNo, renterOrderNo);
+//        log.info("查询租客应收 getRenterCostByOrderNo rentCosts [{}]",GsonUtils.toJson(rentCosts));
         //租车费用
-        if(Objects.nonNull(rentCosts)){
-            //应付
-            int yingfuAmt =  orderSettleNewService.getYingfuRenterCost(rentCosts);
+//        if(Objects.nonNull(rentCosts)){
+            //应付,超里程算重复了。
+//            int yingfuAmt =  orderSettleNewService.getYingfuRenterCost(rentCosts);
+        	//代码重构 200309 huangjing
+//        	int yingfuAmt = rentCosts.getRenterCostAmtFinal();
+        	
             List<AccountRenterCostDetailEntity> renterCostDetails = cashierQueryService.getRenterCostDetails(orderNo);
             // 实付
-            int renterCostAmtEd = cashierQueryService.getRenterCost(orderNo,renterOrder.getRenterMemNo());
+            int renterCostAmtEd = cashierQueryService.getRenterCost(orderNo,renterNo);
             if(!CollectionUtils.isEmpty(renterCostDetails)){
                 List<OrderSupplementDetailEntity> orderSupplementDetails = orderSupplementDetailService.listOrderSupplementDetailByOrderNo(orderNo);
                 if(!CollectionUtils.isEmpty(orderSupplementDetails)){
@@ -127,7 +132,8 @@ public class OrderSettleService{
             vo.setRenterCostShishou(Math.abs(renterCostAmtEd));
             int renterCost = yingfuAmt + renterCostAmtEd;
             vo.setRenterCost(renterCost>0?renterCost:0);
-        }
+//        }
+            
         List<CashierRefundApplyEntity> cashierRefundApplys = cashierRefundApplyNoTService.getRefundApplyByOrderNo(orderNo);
         if(!CollectionUtils.isEmpty(cashierRefundApplys)){
            // 获取实退 租车费用
@@ -158,6 +164,27 @@ public class OrderSettleService{
     	SettleOrders settleOrders =  orderSettleNoTService.preInitSettleOrders(orderNo,renterOrderNo,null);
     	//3.4 查询所有租客费用明细
         orderSettleNoTService.getRenterCostSettleDetail(settleOrders);
+        
+        SettleOrdersDefinition settleOrdersDefinition = new SettleOrdersDefinition();
+    	//2统计 车主结算费用明细， 补贴，费用总额
+    	orderSettleNoTService.handleRentAndPlatform(settleOrdersDefinition, settleOrders);
+    	log.info("preRenterSettleOrder settleOrdersDefinition [{}]",GsonUtils.toJson(settleOrdersDefinition));
+    	
+    	//租客总账
+        List<AccountRenterCostSettleDetailEntity> accountRenterCostSettleDetails = settleOrdersDefinition.getAccountRenterCostSettleDetails();
+        for (AccountRenterCostSettleDetailEntity accountRenterCostSettleDetailEntity : accountRenterCostSettleDetails) {
+			log.info("打印租客费用清单:"+accountRenterCostSettleDetailEntity.toString());
+		}
+        
+        //1租客总账
+        if(!CollectionUtils.isEmpty(accountRenterCostSettleDetails)){
+        	//租客结算的总费用
+            int renterCostAmtFinal = accountRenterCostSettleDetails.stream().mapToInt(AccountRenterCostSettleDetailEntity::getAmt).sum();
+//            settleOrdersDefinition.setRenterCostAmtFinal(renterCostAmtFinal);
+            settleOrders.getRentCosts().setRenterCostAmtFinal(renterCostAmtFinal);
+        }
+        //封装租客的会员号
+        settleOrders.getRentCosts().setRenterNo(settleOrders.getRenterMemNo());
         return settleOrders.getRentCosts();
     }
     

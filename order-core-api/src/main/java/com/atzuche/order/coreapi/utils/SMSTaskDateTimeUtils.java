@@ -57,7 +57,7 @@ public class SMSTaskDateTimeUtils {
     public static long getDateLatterCompareNowScoend(LocalDateTime time, int num){
         LocalDateTime timeLatter = time.plusMinutes(num);
         LocalDateTime now = LocalDateTime.now();
-        if(timeLatter.isAfter(now)){
+        if(now.isAfter(timeLatter)){
             return 0;
         }
         Duration duration = Duration.between(timeLatter,now);

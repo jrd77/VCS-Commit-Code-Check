@@ -38,9 +38,9 @@ public enum ShortMessageTypeEnum {
     REMIND_PAY_RENT_CAR_ILLEGAL_DEPOSITOWNER("RemindPayRentCarIllegalDepositOwner", "$realName$，您的“$CarBrand$”(车牌$CarPlateNum$)的一笔订单还未完成租车押金及违章押金支付(订单号：$orderNo$，取车时间：$RentTime$)。为了您的爱车安全，请不要将车辆交于租客。如果在取车时间前租客仍未完成租车押金及违章押金支付，订单将按租客违约取消处理。10100202"),
     REMIND_PAY_RENT_CAR_ILLEGAL_DEPOSITRENTER("RemindPayRentCarIllegalDepositRenter", "$realName$，您还未支付租用“$CarBrand$”(车牌$CarPlateNum$)订单的租车押金及违章押金(订单号：$orderNo$，取车时间：$RentTime$)。为了交易能正常开始，请尽快完成押金支付。如果在取车时间前未完成租车押金及违章押金支付，订单将按您违约取消处理。10100202"),
     SELF_SUPPORT_RENT_DEPOSIT_PAID_NOTICE("SELF_SUPPORT_RENT_DEPOSIT_PAID_NOTICE", "您已成功支付凹凸自营车辆【$plateNum$】的租车押金，如有特殊用车需要请告诉我们 http://1t.click/hej，我们将竭力为您提供更舒适便捷的服务"),
-    EXEMPT_PREORDER_REMIND_PAYRENT("ExemptPreOrderRemindPayRent", "您预订的($CarPlateNum$)的订单已被车主接受，取车时间：$RentTime$。请在$Minute$分钟内支付租车押金，否则订单将被系统取消。您可以使用信用卡或者借记卡进行支付，如遇困难可以借用亲友的银行卡。如信用卡额度不够，可致电银行客服提高信用卡临时额度，申请后一般即时生效。"),
-    NO_EXEMPT_PREORDER_REMIND_PAYRENT("NoExemptPreOrderRemindPayRent", "您预订的($CarPlateNum$)的订单已被车主接受，取车时间：$RentTime$。请在$Minute$分钟内支付租车押金，否则订单将被系统取消。您可以使用信用卡或者借记卡进行支付，如遇困难可以借用亲友的银行卡。如信用卡额度不够，可致电银行客服提高信用卡临时额度，申请后一般即时生效。"),
-    ILLAGE_MAX_SCORE_LIMIT_TEXT("illageMaxScoreLimitText", "尊敬的用户，您在订单时间$time$中产生score分违章，请在租期内尽快消除违章记录，完成后必须将处罚决定书及缴款凭证通过APP“违章查询” $linkUrl1$ 功能中上传，平台将暂扣您的所有押金待订单结束后15-20天再次查询，若无违章退还押金，请点击“违章内容” $linkUrl2$ 查看具体违章信息10100202"),
+    EXEMPT_PREORDER_REMIND_PAYRENT("ExemptPreOrderRemindPayRent", "您预订的($CarPlateNum$)的订单已被车主接受，取车时间：$ExpRentTime$。请在$Minute$分钟内支付租车押金，否则订单将被系统取消。您可以使用信用卡或者借记卡进行支付，如遇困难可以借用亲友的银行卡。如信用卡额度不够，可致电银行客服提高信用卡临时额度，申请后一般即时生效。"),
+    NO_EXEMPT_PREORDER_REMIND_PAYRENT("NoExemptPreOrderRemindPayRent", "您预订的($CarPlateNum$)的订单已被车主接受，取车时间：$ExpRentTime$。请在$Minute$分钟内支付租车押金，否则订单将被系统取消。您可以使用信用卡或者借记卡进行支付，如遇困难可以借用亲友的银行卡。如信用卡额度不够，可致电银行客服提高信用卡临时额度，申请后一般即时生效。"),
+    ILLAGE_MAX_SCORE_LIMIT_TEXT("illageMaxScoreLimitText", "尊敬的用户，您在订单时间$time$中产生$score$分违章，请在租期内尽快消除违章记录，完成后必须将处罚决定书及缴款凭证通过APP“违章查询” $linkUrl1$ 功能中上传，平台将暂扣您的所有押金待订单结束后15-20天再次查询，若无违章退还押金，请点击“违章内容” $linkUrl2$ 查看具体违章信息10100202"),
     ;
 
     private String value;

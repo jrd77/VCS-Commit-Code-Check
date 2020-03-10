@@ -56,18 +56,18 @@ public class NoPayDepositBeforeRentTimeTask extends IJobHandler {
             }
             for (OrderDTO violateBO : orderNos) {
                 OrderStatusEntity orderStatusEntity = orderStatusService.getByOrderNo(violateBO.getOrderNo());
-                if (orderStatusEntity.getDepositPayStatus().intValue() == 0 || orderStatusEntity.getWzPayStatus().intValue() == 0) {
-                    if (violateBO.getExpRentTime().isAfter(LocalDateTime.now())) {
+                if (orderStatusEntity.getStatus().intValue() < 8 && (orderStatusEntity.getDepositPayStatus().intValue() == 0 || orderStatusEntity.getWzPayStatus().intValue() == 0)) {
+                    if (violateBO.getExpRentTime().isBefore(LocalDateTime.now())) {
                         String typeName = orderStatusEntity.getDepositPayStatus().intValue() == 0 ? "租车押金" : "违章押金";
                         remindPayIllegalCrashService.sendNoPayShortMessageData(violateBO.getOrderNo(), typeName);
                         //取消订单
-                        CancelOrderReqVO req = new CancelOrderReqVO();
-                        req.setOrderNo(violateBO.getOrderNo());
-                        req.setCancelReason("租客在取车时间前未支付租车押金或违章押金,自动取消");
-                        req.setMemRole("2");
-                        req.setOperatorName("system");
-                        logger.info("执行 租客在取车时间前未支付租车押金或违章押金 orderNo:[{}]", violateBO.getOrderNo());
-                        cancelOrderService.cancel(req);
+//                        CancelOrderReqVO req = new CancelOrderReqVO();
+//                        req.setOrderNo(violateBO.getOrderNo());
+//                        req.setCancelReason("租客在取车时间前未支付租车押金或违章押金,自动取消");
+//                        req.setMemRole("2");
+//                        req.setOperatorName("system");
+//                        logger.info("执行 租客在取车时间前未支付租车押金或违章押金 orderNo:[{}]", violateBO.getOrderNo());
+//                        cancelOrderService.cancel(req);
                     }
                 }
             }

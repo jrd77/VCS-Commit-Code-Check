@@ -384,6 +384,18 @@ public class OrderSettleNewService {
             accountPlatformProfitDetail.setOrderNo(renterOrderCostDetail.getOrderNo());
             settleOrdersDefinition.addPlatformProfit(accountPlatformProfitDetail);
         }
+        //2.1 还车运能加价 200309
+        if(RenterCashCodeEnum.RETURN_BLOCKED_RAISE_AMT.getCashNo().equals(renterOrderCostDetail.getCostCode())){
+            int totalAmount = renterOrderCostDetail.getTotalAmount();
+            AccountPlatformProfitDetailEntity accountPlatformProfitDetail = new AccountPlatformProfitDetailEntity();
+            accountPlatformProfitDetail.setAmt(-totalAmount);
+            accountPlatformProfitDetail.setSourceCode(RenterCashCodeEnum.RETURN_BLOCKED_RAISE_AMT.getCashNo());
+            accountPlatformProfitDetail.setSourceDesc(RenterCashCodeEnum.RETURN_BLOCKED_RAISE_AMT.getTxt());
+            accountPlatformProfitDetail.setUniqueNo(String.valueOf(renterOrderCostDetail.getId()));
+            accountPlatformProfitDetail.setOrderNo(renterOrderCostDetail.getOrderNo());
+            settleOrdersDefinition.addPlatformProfit(accountPlatformProfitDetail);
+        }
+        
         //2 提前取车车服务费 费用收益方 平台   平台端记录冲账流水
         if(RenterCashCodeEnum.SRV_GET_COST.getCashNo().equals(renterOrderCostDetail.getCostCode())){
             int totalAmount = renterOrderCostDetail.getTotalAmount();
@@ -395,6 +407,18 @@ public class OrderSettleNewService {
             accountPlatformProfitDetail.setOrderNo(renterOrderCostDetail.getOrderNo());
             settleOrdersDefinition.addPlatformProfit(accountPlatformProfitDetail);
         }
+        //2.2 取车运能加价
+        if(RenterCashCodeEnum.GET_BLOCKED_RAISE_AMT.getCashNo().equals(renterOrderCostDetail.getCostCode())){
+            int totalAmount = renterOrderCostDetail.getTotalAmount();
+            AccountPlatformProfitDetailEntity accountPlatformProfitDetail = new AccountPlatformProfitDetailEntity();
+            accountPlatformProfitDetail.setAmt(-totalAmount);
+            accountPlatformProfitDetail.setSourceCode(RenterCashCodeEnum.GET_BLOCKED_RAISE_AMT.getCashNo());
+            accountPlatformProfitDetail.setSourceDesc(RenterCashCodeEnum.GET_BLOCKED_RAISE_AMT.getTxt());
+            accountPlatformProfitDetail.setUniqueNo(String.valueOf(renterOrderCostDetail.getId()));
+            accountPlatformProfitDetail.setOrderNo(renterOrderCostDetail.getOrderNo());
+            settleOrdersDefinition.addPlatformProfit(accountPlatformProfitDetail);
+        }
+        
         //3 平台保障费 费用收益方 平台   平台端记录冲账流水
         if(RenterCashCodeEnum.INSURE_TOTAL_PRICES.getCashNo().equals(renterOrderCostDetail.getCostCode())){
             int totalAmount = renterOrderCostDetail.getTotalAmount();
@@ -439,7 +463,8 @@ public class OrderSettleNewService {
             accountPlatformProfitDetail.setOrderNo(renterOrderCostDetail.getOrderNo());
             settleOrdersDefinition.addPlatformProfit(accountPlatformProfitDetail);
         }
-
+        
+        // ----------------------------------------- 平台补贴 -----------------------------------------
         //7 平台卷  平台   平台端记录冲账流水
         if(RenterCashCodeEnum.REAL_COUPON_OFFSET.getCashNo().equals(renterOrderCostDetail.getCostCode())){
             int totalAmount = renterOrderCostDetail.getTotalAmount();
@@ -585,7 +610,7 @@ public class OrderSettleNewService {
     
 
     /**
-     * 查询 租客 应付金额
+     * 查询 租客 应付金额     暂不使用。200309
      * @param rentCosts
      * @return
      */
@@ -595,20 +620,22 @@ public class OrderSettleNewService {
         if(!CollectionUtils.isEmpty(rentCosts.getRenterOrderCostDetails())){
             renterCost = renterCost +  rentCosts.getRenterOrderCostDetails().stream().mapToInt(RenterOrderCostDetailEntity::getTotalAmount).sum();
         }
-        //交接车油费
-        if(Objects.nonNull(rentCosts.getOilAmt())){
-            String oilDifferenceCrash = rentCosts.getOilAmt().getOilDifferenceCrash();
-            if(!StringUtil.isBlank(oilDifferenceCrash)){
-                renterCost = renterCost + Integer.valueOf(oilDifferenceCrash);
-            }
-        }
-        //交接 超历程
-        if(Objects.nonNull(rentCosts.getMileageAmt())){
-            Integer totalFee = rentCosts.getMileageAmt().getTotalFee();
-            if(Objects.nonNull(totalFee)){
-                renterCost = renterCost + totalFee;
-            }
-        }
+        
+        //计算重复,rentCosts.getRenterOrderCostDetails() 已经包含在里面了。
+//        //交接车油费
+//        if(Objects.nonNull(rentCosts.getOilAmt())){
+//            String oilDifferenceCrash = rentCosts.getOilAmt().getOilDifferenceCrash();
+//            if(!StringUtil.isBlank(oilDifferenceCrash)){
+//                renterCost = renterCost + Integer.valueOf(oilDifferenceCrash);
+//            }
+//        }
+//        //交接 超历程
+//        if(Objects.nonNull(rentCosts.getMileageAmt())){
+//            Integer totalFee = rentCosts.getMileageAmt().getTotalFee();
+//            if(Objects.nonNull(totalFee)){
+//                renterCost = renterCost + totalFee;
+//            }
+//        }
         // 补贴
         if(!CollectionUtils.isEmpty(rentCosts.getRenterOrderSubsidyDetails())){
             renterCost = renterCost +  rentCosts.getRenterOrderSubsidyDetails().stream().mapToInt(RenterOrderSubsidyDetailEntity::getSubsidyAmount).sum();

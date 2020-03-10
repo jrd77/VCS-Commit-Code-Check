@@ -326,7 +326,7 @@ public class OrderSettleNoTService {
      * @param settleOrdersDefinition
      * @param settleOrders
      */
-    private void handleRentAndPlatform(SettleOrdersDefinition settleOrdersDefinition, SettleOrders settleOrders) {
+    public void handleRentAndPlatform(SettleOrdersDefinition settleOrdersDefinition, SettleOrders settleOrders) {
         //1 租客费用明细 整理
         RentCosts rentCosts = settleOrders.getRentCosts();
         List<AccountRenterCostSettleDetailEntity> accountRenterCostSettleDetails = settleOrdersDefinition.getAccountRenterCostSettleDetails();
@@ -383,7 +383,8 @@ public class OrderSettleNoTService {
 //                orderSettleNewService.addRenterGetAndReturnCarAmtToPlatform(accountRenterCostSettleDetail,settleOrdersDefinition);
             }
             
-            //1.5租客罚金
+            // ----------------------------------------------- 5大表 -----------------------------------------------
+            //1.4租客罚金
             List<RenterOrderFineDeatailEntity> renterOrderFineDeatails = rentCosts.getRenterOrderFineDeatails();
             if(!CollectionUtils.isEmpty(renterOrderFineDeatails)) {
                 for (int i = 0; i < renterOrderFineDeatails.size(); i++) {
@@ -423,7 +424,7 @@ public class OrderSettleNoTService {
                 }
             }
           
-            //1.7 获取全局的租客订单罚金明细
+            //1.5 获取全局的租客订单罚金明细
             List<ConsoleRenterOrderFineDeatailEntity> consoleRenterOrderFineDeatails = rentCosts.getConsoleRenterOrderFineDeatails();
             if(!CollectionUtils.isEmpty(consoleRenterOrderFineDeatails)) {
                 for (int i = 0; i < consoleRenterOrderFineDeatails.size(); i++) {
@@ -462,7 +463,7 @@ public class OrderSettleNoTService {
                     }
                 }
             }
-            // 1.8 后台管理操作费用表（无条件补贴）
+            // 1.6 后台管理操作费用表（无条件补贴）
             List<OrderConsoleCostDetailEntity> orderConsoleCostDetails = rentCosts.getOrderConsoleCostDetailEntity();
             if(!CollectionUtils.isEmpty(orderConsoleCostDetails)){
                 for (int i = 0; i < orderConsoleCostDetails.size(); i++) {
@@ -504,7 +505,7 @@ public class OrderSettleNoTService {
             
             // -----------------------------------------PlatformSubsidy  以上是PlatformProfit
             
-            //1.4 补贴
+            //1.7 补贴
             List<RenterOrderSubsidyDetailEntity> renterOrderSubsidyDetails = rentCosts.getRenterOrderSubsidyDetails();
             if(!CollectionUtils.isEmpty(renterOrderSubsidyDetails)) {
                 for (int i = 0; i < renterOrderSubsidyDetails.size(); i++) {
@@ -544,7 +545,7 @@ public class OrderSettleNoTService {
                     }
                 }
             }
-            //1.6 管理后台补贴
+            //1.8 管理后台补贴
             List<OrderConsoleSubsidyDetailEntity> orderConsoleSubsidyDetails = rentCosts.getOrderConsoleSubsidyDetails();
             if(!CollectionUtils.isEmpty(orderConsoleSubsidyDetails)) {
                 for (int i = 0; i < orderConsoleSubsidyDetails.size(); i++) {
@@ -600,6 +601,10 @@ public class OrderSettleNoTService {
         List<AccountRenterCostSettleDetailEntity> accountRenterCostSettleDetails = settleOrdersDefinition.getAccountRenterCostSettleDetails();
         //1租客总账
         if(!CollectionUtils.isEmpty(accountRenterCostSettleDetails)){
+        	//租客结算的总费用
+            int renterCostAmtFinal = accountRenterCostSettleDetails.stream().mapToInt(AccountRenterCostSettleDetailEntity::getAmt).sum();
+            settleOrdersDefinition.setRenterCostAmtFinal(renterCostAmtFinal);
+            
             int rentCostAmt = accountRenterCostSettleDetails.stream().filter(obj ->{return obj.getAmt()<0;}).mapToInt(AccountRenterCostSettleDetailEntity::getAmt).sum();
             settleOrdersDefinition.setRentCostAmt(rentCostAmt);
             int rentSubsidyAmt = accountRenterCostSettleDetails.stream().filter(obj ->{return obj.getAmt()>0;}).mapToInt(AccountRenterCostSettleDetailEntity::getAmt).sum();
@@ -780,6 +785,15 @@ public class OrderSettleNoTService {
 	        settleOrders.setOwnerMemNo(ownerMemNo);
 	        settleOrders.setOwnerOrder(ownerOrder);
 
+        } else { //查询有效的车主子订单
+	        OwnerOrderEntity ownerOrder = ownerOrderService.getOwnerOrderByOrderNoAndIsEffective(orderNo);
+	        if(Objects.isNull(ownerOrder) || Objects.isNull(ownerOrder.getOwnerOrderNo())){
+	        	throw new OrderSettleFlatAccountException();
+	        }
+	        String ownerMemNo = ownerOrder.getMemNo();
+		    settleOrders.setOwnerOrderNo(ownerOrderNo);
+		    settleOrders.setOwnerMemNo(ownerMemNo);
+		    settleOrders.setOwnerOrder(ownerOrder);
         }
 
         // 2 校验订单状态 以及是否存在 理赔暂扣 存在不能进行结算 并CAT告警

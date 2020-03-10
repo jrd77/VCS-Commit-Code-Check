@@ -68,24 +68,24 @@ public class AdminOrderCostController {
         	OrderRenterCostResVO resp = orderCostService.calculateRenterOrderCost(renterCostReqVO);
         	logger.info("calculateRenterOrderCost resp[{}]", GsonUtils.toJson(resp));
             // 计算油量和超里程费用
-            DeliveryCarVO deliveryCarRepVO = getDeliveryCarVO(renterCostReqVO.getOrderNo());
-            logger.info("calculateRenterOrderCost deliveryCarRepVO[{}]", GsonUtils.toJson(deliveryCarRepVO));
-            if(Objects.nonNull(deliveryCarRepVO) && Objects.nonNull(deliveryCarRepVO.getRenterGetAndReturnCarDTO())){
-                RenterGetAndReturnCarDTO renterGetAndReturnCarDTO = deliveryCarRepVO.getRenterGetAndReturnCarDTO();
-                if(Objects.nonNull(renterGetAndReturnCarDTO)){
-                    if(!StringUtil.isBlank(renterGetAndReturnCarDTO.getOilDifferenceCrash())){
-                        String oilDifferenceCrash =  renterGetAndReturnCarDTO.getOilDifferenceCrash();
-                        Integer oilAmt  = -Integer.valueOf(oilDifferenceCrash);
-                        resp.setOilAmt(oilAmt.toString());
-                    }
-                    if(!StringUtil.isBlank(renterGetAndReturnCarDTO.getOverKNCrash())){
-                        String overKNCrash =  renterGetAndReturnCarDTO.getOverKNCrash();
-                        Integer overKNCrashAmt  = -Integer.valueOf(overKNCrash);
-                        resp.setBeyondMileAmt(overKNCrashAmt.toString());
-                    }
-
-                }
-            }
+//            DeliveryCarVO deliveryCarRepVO = getDeliveryCarVO(renterCostReqVO.getOrderNo());
+//            logger.info("calculateRenterOrderCost deliveryCarRepVO[{}]", GsonUtils.toJson(deliveryCarRepVO));
+//            if(Objects.nonNull(deliveryCarRepVO) && Objects.nonNull(deliveryCarRepVO.getRenterGetAndReturnCarDTO())){
+//                RenterGetAndReturnCarDTO renterGetAndReturnCarDTO = deliveryCarRepVO.getRenterGetAndReturnCarDTO();
+//                if(Objects.nonNull(renterGetAndReturnCarDTO)){
+//                    if(!StringUtil.isBlank(renterGetAndReturnCarDTO.getOilDifferenceCrash())){
+//                        String oilDifferenceCrash =  renterGetAndReturnCarDTO.getOilDifferenceCrash();
+//                        Integer oilAmt  = -Integer.valueOf(oilDifferenceCrash);
+//                        resp.setOilAmt(oilAmt.toString());
+//                    }
+//                    if(!StringUtil.isBlank(renterGetAndReturnCarDTO.getOverKNCrash())){
+//                        String overKNCrash =  renterGetAndReturnCarDTO.getOverKNCrash();
+//                        Integer overKNCrashAmt  = -Integer.valueOf(overKNCrash);
+//                        resp.setBeyondMileAmt(overKNCrashAmt.toString());
+//                    }
+//
+//                }
+//            }
         	return ResponseData.success(resp);
 		} catch (Exception e) {
 			Cat.logError("calculateRenterOrderCost exception params="+renterCostReqVO.toString(),e);
@@ -117,12 +117,12 @@ public class AdminOrderCostController {
 		
 	}
 
-	private DeliveryCarVO getDeliveryCarVO(String orderNo){
-        DeliveryCarRepVO deliveryCarDTO = new DeliveryCarRepVO();
-        deliveryCarDTO.setOrderNo(orderNo);
-        DeliveryCarVO deliveryCarRepVO = deliveryCarInfoService.findDeliveryListByOrderNo(deliveryCarDTO);
-        return deliveryCarRepVO;
-    }
+//	private DeliveryCarVO getDeliveryCarVO(String orderNo){
+//        DeliveryCarRepVO deliveryCarDTO = new DeliveryCarRepVO();
+//        deliveryCarDTO.setOrderNo(orderNo);
+//        DeliveryCarVO deliveryCarRepVO = deliveryCarInfoService.findDeliveryListByOrderNo(deliveryCarDTO);
+//        return deliveryCarRepVO;
+//    }
 	
 
 }
