@@ -576,21 +576,29 @@ public class OrderDetailService {
             accountOwnerIncomeExamineDTOS.add(accountOwnerIncomeExamineDTO);
         });
         //租客修改申请
-        RenterOrderChangeApplyEntity renterOrderChangeApplyEntity = renterOrderChangeApplyService.getByOwnerOrderNoAndAuditStatus(ownerOrderNo, 0);
-        RenterOrderChangeApplyDTO renterOrderChangeApplyDTO = null;
+        List<RenterOrderChangeApplyEntity> renterOrderChangeApplyEntityList = renterOrderChangeApplyService.getByOrderNo(orderNo);
 
-        if(renterOrderChangeApplyEntity != null){
-            orderDetailRespDTO.changeApplyRenterOrderNo = renterOrderChangeApplyEntity.getRenterOrderNo();
+        List<RenterOrderChangeApplyDTO> renterOrderChangeApplyDTOS = new ArrayList<>();
+        renterOrderChangeApplyEntityList.stream().forEach(x->{
+            RenterOrderChangeApplyDTO renterOrderChangeApplyDTO = new RenterOrderChangeApplyDTO();
+            BeanUtils.copyProperties(x,renterOrderChangeApplyDTO);
+            renterOrderChangeApplyDTOS.add(renterOrderChangeApplyDTO);
+        });
+
+        RenterOrderChangeApplyDTO renterOrderChangeApplyDTO = filterByAuditStatus(renterOrderChangeApplyEntityList, 0);
+        if(renterOrderChangeApplyDTO != null){
+            orderDetailRespDTO.changeApplyRenterOrderNo = renterOrderChangeApplyDTO.getRenterOrderNo();
             orderDetailRespDTO.isChangeApply = true;
-            renterOrderChangeApplyDTO = new RenterOrderChangeApplyDTO();
-            BeanUtils.copyProperties(renterOrderChangeApplyEntity,renterOrderChangeApplyDTO);
             Integer ownerRentAmt = 0;
             try{
-                ownerRentAmt = modifyOrderFeeService.getOwnerRentAmt(renterOrderChangeApplyEntity.getRenterOrderNo());
+                ownerRentAmt = modifyOrderFeeService.getOwnerRentAmt(renterOrderChangeApplyDTO.getRenterOrderNo());
             }catch (Exception e){
-                log.error("计算预算租金失败modifyOrderFeeService.getOwnerRentAmt renterOrderNo={}",renterOrderChangeApplyEntity.getRenterOrderNo());
+                log.error("计算预算租金失败modifyOrderFeeService.getOwnerRentAmt renterOrderNo={}",renterOrderChangeApplyDTO.getRenterOrderNo());
             }
             orderDetailRespDTO.changeApplyPreIncomAmt = ownerRentAmt;
+        }
+        if(filterByAuditStatus(renterOrderChangeApplyEntityList,3)!=null){
+            orderDetailRespDTO.isAutoRefuse = true;
         }
 
         orderDetailRespDTO.orderStatus = orderStatusDTO;
@@ -618,7 +626,7 @@ public class OrderDetailService {
         orderDetailRespDTO.ownerOrderCostDTO = ownerOrderCostDTO;
         orderDetailRespDTO.accountOwnerIncomeExamineDTOS = accountOwnerIncomeExamineDTOS;
         orderDetailRespDTO.renterOrderChangeApplyDTO = renterOrderChangeApplyDTO;
-
+        orderDetailRespDTO.renterOrderChangeApplyDTOS = renterOrderChangeApplyDTOS;
         return orderDetailRespDTO;
     }
 
@@ -1669,7 +1677,8 @@ public class OrderDetailService {
         }
 
         //租客修改申请
-        RenterOrderChangeApplyEntity renterOrderChangeApplyEntity = renterOrderChangeApplyService.getByOwnerOrderNoAndAuditStatus(ownerOrderNo, 0);
+        List<RenterOrderChangeApplyEntity> renterOrderChangeApplyEntityList = renterOrderChangeApplyService.getByOrderNo(orderEntity.getOrderNo());
+        RenterOrderChangeApplyDTO renterOrderChangeApplyEntity = filterByAuditStatus(renterOrderChangeApplyEntityList, 0);
         RenterOrderChangeApplyDTO renterOrderChangeApplyDTO = null;
 
         if(renterOrderChangeApplyEntity != null){
@@ -1691,5 +1700,19 @@ public class OrderDetailService {
         orderDetailRespDTO.renterOrderChangeApplyDTO = renterOrderChangeApplyDTO;
         orderDetailRespDTO.ownerOrderCostDTO = ownerOrderCostDTO;
         return orderDetailRespDTO;
+    }
+
+    private RenterOrderChangeApplyDTO filterByAuditStatus(List<RenterOrderChangeApplyEntity> list,int auditStatus){
+        Optional<RenterOrderChangeApplyEntity> first = Optional.ofNullable(list).orElseGet(ArrayList::new)
+                .stream()
+                .filter(x -> auditStatus == x.getAuditStatus())
+                .findFirst();
+
+        if(first.isPresent()){
+            RenterOrderChangeApplyDTO renterOrderChangeApplyDTO = new RenterOrderChangeApplyDTO();
+            BeanUtils.copyProperties(first.get(),renterOrderChangeApplyDTO);
+            return renterOrderChangeApplyDTO;
+        }
+        return null;
     }
 }
