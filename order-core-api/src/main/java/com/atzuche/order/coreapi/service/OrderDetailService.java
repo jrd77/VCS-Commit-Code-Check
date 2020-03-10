@@ -1055,7 +1055,7 @@ public class OrderDetailService {
         OrderStatusEntity orderStatusEntity = orderStatusService.getByOrderNo(orderNo);
         OrderFlowEntity orderFlowEntity = orderFlowService.getByOrderNoAndStatus(orderNo, orderStatusEntity.getStatus());
         OrderDetailDTO orderDetailDTO = new OrderDetailDTO();
-
+        orderDetailDTO.status = orderStatusEntity.getStatus();
         orderDetailDTO.orderStatus = OrderStatusEnum.getDescByStatus(orderStatusEntity.getStatus());
         orderDetailDTO.totalRentTime = ChronoUnit.HOURS.between(orderEntity.getExpRentTime(), orderEntity.getExpRevertTime()) + UNIT_HOUR;
         if(orderSourceStatEntity != null){
