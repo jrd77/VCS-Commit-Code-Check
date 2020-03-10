@@ -23,9 +23,12 @@ public class OrderCostServiceTest {
 	@Test
 	public void testCalculateRenterOrderCost() {
 		RenterCostReqVO renterCostReqVO = new RenterCostReqVO();
-		renterCostReqVO.setOrderNo("28804131200299");
-		renterCostReqVO.setRenterOrderNo("2880413120029910010");
+//		renterCostReqVO.setOrderNo("28804131200299");
+//		renterCostReqVO.setRenterOrderNo("2880413120029910010");
+		renterCostReqVO.setOrderNo("28261181200299");
+		renterCostReqVO.setRenterOrderNo("2826118120029910010");
 		try {
+			//"28261181200299", "2826118120029910010"
 			OrderRenterCostResVO res = orderCostService.calculateRenterOrderCost(renterCostReqVO);
 			System.err.println("res toString="+res.toString());
 		} catch (Exception e) {
