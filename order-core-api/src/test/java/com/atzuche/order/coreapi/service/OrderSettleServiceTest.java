@@ -12,6 +12,7 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import com.atzuche.order.coreapi.TemplateApplication;
 import com.atzuche.order.settle.service.OrderSettleService;
 import com.atzuche.order.settle.vo.req.OwnerCosts;
+import com.atzuche.order.settle.vo.req.RentCosts;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -31,9 +32,12 @@ public class OrderSettleServiceTest {
 
 	@Test
 	public void testPreRenterSettleOrder() {
-		fail("Not yet implemented");
+		//28261181200299
+		RentCosts cost = orderSettleService.preRenterSettleOrder("28261181200299", "2826118120029910010");
+		log.info("租客应收（未抵扣欠款）:"+cost.getRenterCostAmtFinal());
+		log.info("租客应收（超里程）:"+cost.getMileageAmt().toString());
 	}
-
+	
 	@Test
 	public void testPreOwnerSettleOrder() {
 //		OwnerCosts cost = orderSettleService.preOwnerSettleOrder("13004340300299", "1300434030029910011");

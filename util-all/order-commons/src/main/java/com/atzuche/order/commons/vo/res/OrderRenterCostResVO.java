@@ -91,12 +91,12 @@ public class OrderRenterCostResVO {
     /*
      * 交接车-油费
      */
-    private RenterOrderCostDetailEntity oilAmt;
+    private int oilAmt;
 
     /*
      * 交接车-获取超里程费用
      */
-    private RenterOrderCostDetailEntity mileageAmt;
+    private int mileageAmt;
     
 	/*
 	 * 优惠券
