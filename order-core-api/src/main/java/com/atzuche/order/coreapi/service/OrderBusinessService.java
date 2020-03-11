@@ -1,15 +1,20 @@
 package com.atzuche.order.coreapi.service;
 
 import com.alibaba.fastjson.JSON;
+import com.atzuche.order.commons.entity.dto.OwnerMemberDTO;
+import com.atzuche.order.commons.entity.dto.RenterMemberDTO;
 import com.atzuche.order.commons.enums.CloseEnum;
 import com.atzuche.order.commons.enums.NoticeSourceCodeEnum;
 import com.atzuche.order.commons.exceptions.NoticeSourceNotFoundException;
+import com.atzuche.order.commons.exceptions.OrderNotFoundException;
 import com.atzuche.order.commons.vo.req.OwnerUpdateSeeVO;
 import com.atzuche.order.commons.vo.req.RenterAndOwnerSeeOrderVO;
+import com.atzuche.order.owner.mem.service.OwnerMemberService;
 import com.atzuche.order.ownercost.entity.OwnerOrderEntity;
 import com.atzuche.order.ownercost.service.OwnerOrderService;
 import com.atzuche.order.parentorder.entity.OrderNoticeEntity;
 import com.atzuche.order.parentorder.service.OrderNoticeService;
+import com.atzuche.order.rentermem.service.RenterMemberService;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.atzuche.order.renterorder.service.RenterOrderService;
 import lombok.extern.slf4j.Slf4j;
@@ -29,6 +34,10 @@ public class OrderBusinessService {
     private OwnerOrderService ownerOrderService;
     @Autowired
     private RenterOrderService renterOrderService;
+    @Autowired
+    private OwnerMemberService ownerMemberService;
+    @Autowired
+    private RenterMemberService renterMemberService;
 
     public void renterAndOwnerSeeOrder(RenterAndOwnerSeeOrderVO renterAndOwnerSeeOrderVO) {
         String orderNo = renterAndOwnerSeeOrderVO.getOrderNo();
@@ -74,5 +83,23 @@ public class OrderBusinessService {
 
     public void ownerUpdateSee(OwnerUpdateSeeVO ownerUpdateSeeVO) {
         ownerOrderService.updateByMemeNo(ownerUpdateSeeVO.getOwnerMemNo());
+    }
+
+    public OwnerMemberDTO queryOwnerMemDetail(String orderNo) {
+        OwnerOrderEntity ownerOrderEntity = ownerOrderService.getOwnerOrderByOrderNoAndIsEffective(orderNo);
+        if(ownerOrderEntity == null){
+            throw new OrderNotFoundException(orderNo);
+        }
+        OwnerMemberDTO ownerMemberDTO = ownerMemberService.selectownerMemberByOwnerOrderNo(ownerOrderEntity.getOwnerOrderNo(), false);
+        return ownerMemberDTO;
+    }
+
+    public RenterMemberDTO queryRenterMemDetail(String orderNo) {
+        RenterOrderEntity renterOrderEntity = renterOrderService.getRenterOrderByOrderNoAndIsEffective(orderNo);
+        if(renterOrderEntity == null){
+            throw new OrderNotFoundException(orderNo);
+        }
+        RenterMemberDTO renterMemberDTO = renterMemberService.selectrenterMemberByRenterOrderNo(orderNo, false);
+        return renterMemberDTO;
     }
 }
