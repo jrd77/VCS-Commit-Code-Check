@@ -1,5 +1,6 @@
 package com.atzuche.order.open.service;
 
+import com.atzuche.order.open.vo.OfflinePayVO;
 import com.atzuche.order.open.vo.VirtualPayVO;
 import com.autoyol.commons.web.ResponseData;
 import org.springframework.cloud.netflix.feign.FeignClient;
@@ -18,4 +19,7 @@ public interface PayFeignService {
 
     @PostMapping("pay/virtual")
     public ResponseData virtualPay(@Valid @RequestBody VirtualPayVO virtualPayVO);
+
+
+    public ResponseData offlinePay(@Valid @RequestBody OfflinePayVO offlinePayVO);
 }
