@@ -19,6 +19,7 @@ public enum PaySourceEnum {
     LIANLIANPAY("14","连连支付(统一app和H5)"),
     WEIXIN_H5("15","微信H5"),
     ALIPAY_CREDIT("16","支付宝信用预授权免押，芝麻信用"),
+    VIRTUAL_PAY("91","虚拟支付"),
     DEFAULT("99","默认"),
 
     ;
@@ -45,6 +46,6 @@ public enum PaySourceEnum {
                 return paySourceEnum.text;
             }
         }
-        return null;
+        throw new RuntimeException("code:"+code+" is invalid");
     }
 }

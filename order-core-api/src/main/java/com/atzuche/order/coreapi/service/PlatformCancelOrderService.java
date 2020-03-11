@@ -63,12 +63,10 @@ public class PlatformCancelOrderService {
             //撤销库存处理
             stockService.releaseCarStock(orderNo, cancelOrderRes.getCarNo());
             //订单取消（租客取消、车主取消、平台取消）如果使用了车主券且未支付，则退回否则不处理
-            if (null != cancelOrderRes.getIsReturnOwnerCoupon() && cancelOrderRes.getIsReturnOwnerCoupon()) {
+            if (null != cancelOrderRes.getIsDispatch() && !cancelOrderRes.getIsDispatch()) {
                 //退还车主券
                 String recover = null == cancelOrderRes.getRentCarPayStatus() || cancelOrderRes.getRentCarPayStatus() == 0 ? "1" : "0";
                 couponAndCoinHandleService.undoOwnerCoupon(orderNo, cancelOrderRes.getOwnerCouponNo(), recover);
-            }
-            if (null != cancelOrderRes.getIsRefund() && cancelOrderRes.getIsRefund()) {
                 //通知收银台退款以及退还凹凸币和钱包
                 orderSettleService.settleOrderCancel(orderNo);
                 //通知流程系统

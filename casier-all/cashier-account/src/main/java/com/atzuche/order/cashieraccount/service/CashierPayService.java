@@ -7,14 +7,16 @@ import com.atzuche.order.accountrenterrentcost.service.AccountRenterCostSettleSe
 import com.atzuche.order.accountrenterwzdepost.service.AccountRenterWzDepositService;
 import com.atzuche.order.accountrenterwzdepost.vo.res.AccountRenterWZDepositResVO;
 import com.atzuche.order.cashieraccount.common.FasterJsonUtil;
+import com.atzuche.order.cashieraccount.common.PayCashTypeEnum;
+import com.atzuche.order.cashieraccount.common.VirtualPayTypeEnum;
 import com.atzuche.order.cashieraccount.entity.CashierEntity;
 import com.atzuche.order.cashieraccount.entity.CashierRefundApplyEntity;
 import com.atzuche.order.cashieraccount.exception.OrderPaySignFailException;
+import com.atzuche.order.cashieraccount.service.notservice.AccountVirtualPayService;
 import com.atzuche.order.cashieraccount.service.notservice.CashierNoTService;
 import com.atzuche.order.cashieraccount.service.notservice.CashierRefundApplyNoTService;
 import com.atzuche.order.cashieraccount.service.remote.RefundRemoteService;
-import com.atzuche.order.cashieraccount.vo.req.pay.OrderPayReqVO;
-import com.atzuche.order.cashieraccount.vo.req.pay.OrderPaySignReqVO;
+import com.atzuche.order.cashieraccount.vo.req.pay.*;
 import com.atzuche.order.cashieraccount.vo.res.AccountPayAbleResVO;
 import com.atzuche.order.cashieraccount.vo.res.OrderPayableAmountResVO;
 import com.atzuche.order.cashieraccount.vo.res.pay.OrderPayCallBackSuccessVO;
@@ -28,6 +30,7 @@ import com.atzuche.order.commons.service.OrderPayCallBack;
 import com.atzuche.order.flow.service.OrderFlowService;
 import com.atzuche.order.parentorder.dto.OrderStatusDTO;
 import com.atzuche.order.parentorder.entity.OrderStatusEntity;
+import com.atzuche.order.parentorder.service.OrderService;
 import com.atzuche.order.parentorder.service.OrderStatusService;
 import com.atzuche.order.rentercost.entity.vo.PayableVO;
 import com.atzuche.order.rentercost.service.RenterOrderCostCombineService;
@@ -79,6 +82,33 @@ public class CashierPayService{
     @Autowired CashierRefundApplyNoTService cashierRefundApplyNoTService;
     @Autowired private OrderStatusService orderStatusService;
     @Autowired private OrderFlowService orderFlowService;
+    @Autowired
+    private AccountVirtualPayService virtualPayService;
+
+
+
+    public void virtualPay(VirtualPayDTO virtualPayVO,OrderPayCallBack callBack){
+        VirtualNotifyDataVO notifyDataVo = new VirtualNotifyDataVO();
+        notifyDataVo.setOrderNo(virtualPayVO.getOrderNo());
+        notifyDataVo.setMemNo(virtualPayVO.getMemNo());
+        notifyDataVo.setAtappId("20");
+        notifyDataVo.setPayKind(virtualPayVO.getCashType().getValue());
+        notifyDataVo.setPayType(virtualPayVO.getPayType().getValue());
+        notifyDataVo.setPaySource("91");
+        notifyDataVo.setTransStatus("00");
+        notifyDataVo.setSettleAmount(String.valueOf(virtualPayVO.getPayAmt()));
+        notifyDataVo.setPayLine(2);
+        notifyDataVo.setVirtualAccountNo(virtualPayVO.getAccountEnum().getAccountNo());
+        notifyDataVo.setExtendParams(virtualPayVO.getRenterNo());
+
+
+        List<NotifyDataVo> list = new ArrayList<>();
+        list.add(notifyDataVo);
+        BatchNotifyDataVo batchNotifyDataVo = new BatchNotifyDataVo();
+        batchNotifyDataVo.setLstNotifyDataVo(list);
+
+        payCallBack(batchNotifyDataVo,callBack);
+    }
 
 
     /**

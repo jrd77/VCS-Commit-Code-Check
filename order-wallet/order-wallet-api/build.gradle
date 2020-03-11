@@ -1,11 +1,26 @@
+buildscript {
+    repositories {
+        mavenLocal()
+        maven{url "http://10.0.3.208:8081/nexus/content/groups/public/"}
+        maven{url "http://maven.aliyun.com/nexus/content/groups/public/"}
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.autoyol.tool:dependency-management:1.0-SNAPSHOT'
+    }
+}
+
 plugins {
     id 'java'
 }
+apply plugin: 'java'
+apply plugin: 'dependency-management'
 
 group 'com.atzuche'
 version '0.0.1-SNAPSHOT'
 
 sourceCompatibility = 1.8
+
 
 repositories {
     mavenCentral()
@@ -13,4 +28,16 @@ repositories {
 
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            groupId = 'com.atzuche'
+            artifactId = 'order-wallet-api'
+            version = '0.0.1-SNAPSHOT'
+            from components.java
+            artifact sourceJar
+        }
+    }
 }

@@ -17,7 +17,6 @@ public interface AccountRenterCostSettleDetailMapper{
 
     AccountRenterCostSettleDetailEntity selectByPrimaryKey(Integer id);
 
-
     int insertSelective(AccountRenterCostSettleDetailEntity record);
 
     int updateByPrimaryKey(AccountRenterCostSettleDetailEntity record);

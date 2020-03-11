@@ -1,6 +1,7 @@
 package com.atzuche.order.coreapi.service;
 
 import com.atzuche.order.commons.LocalDateTimeUtils;
+import com.atzuche.order.commons.constant.OrderConstant;
 import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
 import com.atzuche.order.commons.enums.*;
 import com.atzuche.order.commons.vo.req.RefuseOrderReqVO;
@@ -24,6 +25,9 @@ import com.atzuche.order.renterorder.entity.OrderCouponEntity;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.atzuche.order.renterorder.service.OrderCouponService;
 import com.atzuche.order.renterorder.service.RenterOrderService;
+import com.atzuche.order.search.OrderSearchProxyService;
+import com.atzuche.order.search.dto.ConflictOrderSearchReqDTO;
+import com.atzuche.order.search.dto.OrderInfoDTO;
 import com.atzuche.order.settle.service.OrderSettleService;
 import com.autoyol.car.api.model.dto.OwnerCancelDTO;
 import com.autoyol.event.rabbit.neworder.NewOrderMQStatusEventEnum;
@@ -32,8 +36,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 车主拒绝订单
@@ -81,15 +89,16 @@ public class OwnerRefuseOrderService {
     OrderStatusMqService orderStatusMqService;
 
 
-
     /**
      * 车主拒单
      *
-     * @param reqVO 请求参数
+     * @param reqVO            请求参数
+     * @param dispatcherReason 原因
      */
+    @Transactional(rollbackFor = Exception.class)
     public void refuse(RefuseOrderReqVO reqVO, DispatcherReasonEnum dispatcherReason) {
         //车主拒绝前置校验
-        boolean isConsoleInvoke = dispatcherReason.getCode() == DispatcherReasonEnum.timeout.getCode() || StringUtils.isNotBlank(reqVO.getOperatorName());
+        boolean isConsoleInvoke = dispatcherReason.getCode() == DispatcherReasonEnum.timeout.getCode() || (null != reqVO.getIsConsoleInvoke() && OrderConstant.YES == reqVO.getIsConsoleInvoke());
         refuseOrderCheckService.checkOwnerAgreeOrRefuseOrder(reqVO.getOrderNo(), isConsoleInvoke);
         //判断是都进入调度
         //获取订单信息
@@ -108,7 +117,7 @@ public class OwnerRefuseOrderService {
                 renterOrderEntity.getRenterOrderNo());
         boolean isDispatch =
                 carRentalTimeApiService.checkCarDispatch(carRentalTimeApiService.buildCarDispatchReqVO(orderEntity,
-                        orderStatusEntity, ownerCouponEntity,1));
+                        orderStatusEntity, ownerCouponEntity, 1));
 
         OrderStatusDTO orderStatusDTO = new OrderStatusDTO();
         orderStatusDTO.setOrderNo(reqVO.getOrderNo());
@@ -126,9 +135,9 @@ public class OwnerRefuseOrderService {
             //撤销优惠券
             //退还优惠券(平台券+送取服务券)
             couponAndCoinHandleService.undoPlatformCoupon(reqVO.getOrderNo());
-            couponAndCoinHandleService.undoPlatformCoupon(reqVO.getOrderNo());
+            couponAndCoinHandleService.undoGetCarFeeCoupon(reqVO.getOrderNo());
             //退还车主券
-            if(null != ownerCouponEntity) {
+            if (null != ownerCouponEntity) {
                 String recover = null == orderStatusEntity.getRentCarPayStatus() || orderStatusEntity.getRentCarPayStatus() == 0 ? "1" : "0";
                 couponAndCoinHandleService.undoOwnerCoupon(reqVO.getOrderNo(), ownerCouponEntity.getCouponId(), recover);
             }
@@ -150,7 +159,8 @@ public class OwnerRefuseOrderService {
         ownerOrderService.updateChildStatusByOrderNo(reqVO.getOrderNo(), OwnerChildStatusEnum.END.getCode());
         ownerOrderService.updateDispatchReasonByOrderNo(reqVO.getOrderNo(), dispatcherReason);
         //取消信息处理(order_cancel_reason)
-        orderCancelReasonService.addOrderCancelReasonRecord(buildOrderCancelReasonEntity(reqVO.getOrderNo(), ownerOrderEntity.getOwnerOrderNo()));
+        orderCancelReasonService.addOrderCancelReasonRecord(buildOrderCancelReasonEntity(reqVO.getOrderNo(),
+                ownerOrderEntity.getOwnerOrderNo(), "车主拒单"));
         //释放库存(车主取消/拒绝时不释放库存)
         stockService.releaseCarStock(reqVO.getOrderNo(), goodsDetail.getCarNo());
         //锁定车辆可租时间
@@ -161,25 +171,104 @@ public class OwnerRefuseOrderService {
         orderActionMqService.sendOwnerRefundOrderSuccess(reqVO.getOrderNo());
 
         NewOrderMQStatusEventEnum newOrderMQStatusEventEnum = NewOrderMQStatusEventEnum.ORDER_END;
-        if(orderStatusDTO.getStatus() == OrderStatusEnum.TO_DISPATCH.getStatus()) {
+        if (orderStatusDTO.getStatus() == OrderStatusEnum.TO_DISPATCH.getStatus()) {
             newOrderMQStatusEventEnum = NewOrderMQStatusEventEnum.ORDER_PREDISPATCH;
         }
-        orderStatusMqService.sendOrderStatusByOrderNo(reqVO.getOrderNo(),orderStatusDTO.getStatus(),newOrderMQStatusEventEnum);
+        orderStatusMqService.sendOrderStatusByOrderNo(reqVO.getOrderNo(), orderStatusDTO.getStatus(), newOrderMQStatusEventEnum);
 
     }
 
+    /**
+     * 车主同意订单拒绝租期重叠的其他订单
+     *
+     * @param orderNo 订单号
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public void refuse(String orderNo) {
+        //校验
+        refuseOrderCheckService.checkOwnerAgreeOrRefuseOrder(orderNo, true);
 
-    private OrderCancelReasonEntity buildOrderCancelReasonEntity(String orderNo, String ownerOrderNo) {
+        //订单状态变更
+        renterOrderService.updateChildStatusByOrderNo(orderNo, RenterChildStatusEnum.END.getCode());
+        ownerOrderService.updateChildStatusByOrderNo(orderNo, OwnerChildStatusEnum.END.getCode());
+
+        OrderStatusDTO orderStatusDTO = new OrderStatusDTO();
+        orderStatusDTO.setOrderNo(orderNo);
+        orderStatusDTO.setStatus(OrderStatusEnum.CLOSED.getStatus());
+        orderStatusService.saveOrderStatusInfo(orderStatusDTO);
+
+        //添加order_flow记录
+        orderFlowService.inserOrderStatusChangeProcessInfo(orderNo, OrderStatusEnum.from(orderStatusDTO.getStatus()));
+
+        //获取租客订单信息
+        RenterOrderEntity renterOrderEntity = renterOrderService.getRenterOrderByOrderNoAndIsEffective(orderNo);
+        //更新车主请求信息
+        RenterOrderEntity record = new RenterOrderEntity();
+        record.setId(renterOrderEntity.getId());
+        record.setReqAcceptTime(LocalDateTime.now());
+        record.setAgreeFlag(OwnerAgreeTypeEnum.REFUSE.getCode());
+        renterOrderService.updateRenterOrderInfo(record);
+
+        //更新车主拒单理由
+        ownerOrderService.updateDispatchReasonByOrderNo(orderNo, DispatcherReasonEnum.owner_refuse);
+
+        //获取车主订单信息
+        OwnerOrderEntity ownerOrderEntity = ownerOrderService.getOwnerOrderByOrderNoAndIsEffective(orderNo);
+        //订单结束原因信息更新
+        orderCancelReasonService.addOrderCancelReasonRecord(buildOrderCancelReasonEntity(orderNo,
+                ownerOrderEntity.getOwnerOrderNo(), "租期重叠车主拒单"));
+
+
+        //撤销优惠券
+        //退还优惠券(平台券+送取服务券)
+        couponAndCoinHandleService.undoPlatformCoupon(orderNo);
+        couponAndCoinHandleService.undoGetCarFeeCoupon(orderNo);
+        //获取订单状态信息
+        OrderStatusEntity orderStatusEntity = orderStatusService.getByOrderNo(orderNo);
+        //获取车主券信息
+        OrderCouponEntity ownerCouponEntity = orderCouponService.getOwnerCouponByOrderNoAndRenterOrderNo(orderNo,
+                renterOrderEntity.getRenterOrderNo());
+        //退还车主券
+        if (null != ownerCouponEntity) {
+            String recover = null == orderStatusEntity.getRentCarPayStatus() || orderStatusEntity.getRentCarPayStatus() == 0 ? "1" : "0";
+            couponAndCoinHandleService.undoOwnerCoupon(orderNo, ownerCouponEntity.getCouponId(), recover);
+        }
+        //通知收银台退还凹凸币和钱包
+        orderSettleService.settleOrderCancel(orderNo);
+        //发送车主拒绝事件
+        orderActionMqService.sendOwnerRefundOrderSuccess(orderNo);
+        orderStatusMqService.sendOrderStatusByOrderNo(orderNo, orderStatusDTO.getStatus(), NewOrderMQStatusEventEnum.ORDER_END);
+    }
+
+
+    /**
+     * 构建订单结束原因
+     *
+     * @param orderNo      订单号
+     * @param ownerOrderNo 车主订单号
+     * @param cancelReason 结束原因
+     * @return OrderCancelReasonEntity
+     */
+    private OrderCancelReasonEntity buildOrderCancelReasonEntity(String orderNo, String ownerOrderNo,
+                                                                 String cancelReason) {
         OrderCancelReasonEntity orderCancelReasonEntity = new OrderCancelReasonEntity();
         orderCancelReasonEntity.setOperateType(CancelOperateTypeEnum.REFUSE_ORDER.getCode());
-        orderCancelReasonEntity.setCancelReason("车主拒单");
+        orderCancelReasonEntity.setCancelReason(cancelReason);
         orderCancelReasonEntity.setCancelSource(CancelSourceEnum.OWNER.getCode());
         orderCancelReasonEntity.setOrderNo(orderNo);
         orderCancelReasonEntity.setSubOrderNo(ownerOrderNo);
         return orderCancelReasonEntity;
     }
 
-    private OwnerCancelDTO buildOwnerCancelDTO(String orderNo,Integer carNo,OrderEntity orderEntity){
+    /**
+     * 构建车主取消库存处理参数
+     *
+     * @param orderNo     订单号
+     * @param carNo       车辆号
+     * @param orderEntity 订单信息
+     * @return OwnerCancelDTO
+     */
+    private OwnerCancelDTO buildOwnerCancelDTO(String orderNo, Integer carNo, OrderEntity orderEntity) {
         OwnerCancelDTO ownerCancelDTO = new OwnerCancelDTO();
         ownerCancelDTO.setOrderNo(orderNo);
         ownerCancelDTO.setCarNo(carNo);

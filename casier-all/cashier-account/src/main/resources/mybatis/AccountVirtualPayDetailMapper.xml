@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.atzuche.order.cashieraccount.mapper.AccountVirtualPayDetailMapper">
+  <resultMap id="BaseResultMap" type="com.atzuche.order.cashieraccount.entity.AccountVirtualPayDetailEntity">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="account_no" jdbcType="VARCHAR" property="accountNo" />
+    <result column="account_name" jdbcType="VARCHAR" property="accountName" />
+    <result column="order_no" jdbcType="VARCHAR" property="orderNo" />
+    <result column="amt" jdbcType="INTEGER" property="amt" />
+    <result column="pay_type"  property="payType" />
+    <result column="pay_cash_type" property="payCashType"/>
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="create_op" jdbcType="VARCHAR" property="createOp" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="update_op" jdbcType="VARCHAR" property="updateOp" />
+    <result column="is_delete" jdbcType="TINYINT" property="isDelete" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, account_no, account_name, order_no, amt, pay_type, create_time, create_op, update_time, 
+    update_op, is_delete,pay_cash_type
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from account_virtual_pay_detail
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from account_virtual_pay_detail
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="com.atzuche.order.cashieraccount.entity.AccountVirtualPayDetailEntity" useGeneratedKeys="true">
+    insert into account_virtual_pay_detail
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="accountNo != null">
+        account_no,
+      </if>
+      <if test="accountName != null">
+        account_name,
+      </if>
+      <if test="orderNo != null">
+        order_no,
+      </if>
+      <if test="amt != null">
+        amt,
+      </if>
+      <if test="payType != null">
+        pay_type,
+      </if>
+      <if test="createTime != null">
+        create_time,
+      </if>
+      <if test="createOp != null">
+        create_op,
+      </if>
+      <if test="updateTime != null">
+        update_time,
+      </if>
+      <if test="updateOp != null">
+        update_op,
+      </if>
+      <if test="payCashType != null">
+        pay_cash_type,
+      </if>
+      <if test="isDelete != null">
+        is_delete,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="accountNo != null">
+        #{accountNo,jdbcType=VARCHAR},
+      </if>
+      <if test="accountName != null">
+        #{accountName,jdbcType=VARCHAR},
+      </if>
+      <if test="orderNo != null">
+        #{orderNo,jdbcType=VARCHAR},
+      </if>
+      <if test="amt != null">
+        #{amt,jdbcType=INTEGER},
+      </if>
+      <if test="payType != null">
+        #{payType},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createOp != null">
+        #{createOp,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null">
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateOp != null">
+        #{updateOp,jdbcType=VARCHAR},
+      </if>
+      <if test="payCashType != null">
+        #{payCashType},
+      </if>
+      <if test="isDelete != null">
+        #{isDelete,jdbcType=TINYINT},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.atzuche.order.cashieraccount.entity.AccountVirtualPayDetailEntity">
+    update account_virtual_pay_detail
+    <set>
+      <if test="accountNo != null">
+        account_no = #{accountNo,jdbcType=VARCHAR},
+      </if>
+      <if test="accountName != null">
+        account_name = #{accountName,jdbcType=VARCHAR},
+      </if>
+      <if test="orderNo != null">
+        order_no = #{orderNo,jdbcType=VARCHAR},
+      </if>
+      <if test="amt != null">
+        amt = #{amt,jdbcType=INTEGER},
+      </if>
+      <if test="payType != null">
+        pay_type = #{payType},
+      </if>
+      <if test="createTime != null">
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createOp != null">
+        create_op = #{createOp,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null">
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateOp != null">
+        update_op = #{updateOp,jdbcType=VARCHAR},
+      </if>
+      <if test="isDelete != null">
+        is_delete = #{isDelete,jdbcType=TINYINT},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

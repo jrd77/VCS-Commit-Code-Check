@@ -14,30 +14,21 @@ import java.time.LocalDateTime;
 @Data
 public class CancelOrderResDTO {
 
-    /**
-     * 是否通知退款
-     */
-    private Boolean isRefund;
 
     /**
-     * 是否退还优惠券(平台+送取服务)
+     * 订单号
      */
-    private Boolean isReturnDisCoupon;
+    private String orderNo;
 
     /**
-     * 是否退还车主券
+     * 租客订单号
      */
-    private Boolean isReturnOwnerCoupon;
+    private String renterOrderNo;
 
     /**
-     * 车主券编码
+     * 订单城市编码
      */
-    private String ownerCouponNo;
-
-    /**
-     * 租车费用支付状态
-     */
-    private Integer rentCarPayStatus;
+    private Integer cityCode;
 
     /**
      * 车辆注册号
@@ -45,9 +36,14 @@ public class CancelOrderResDTO {
     private Integer carNo;
 
     /**
-     * 租客订单号
+     * 是否进入调度
      */
-    private String renterOrderNo;
+    private Boolean isDispatch;
+
+    /**
+     * 租车费用支付状态
+     */
+    private Integer rentCarPayStatus;
 
     /**
      * 取车服务标识
@@ -60,24 +56,28 @@ public class CancelOrderResDTO {
     private Boolean srvReturnFlag;
 
     /**
-     * 订单城市编码
-     */
-    private Integer cityCode;
-
-    /**
      * 订单租期开始时间
      */
     private LocalDateTime rentTime ;
 
     /**
-     * 订单租期解释时间
+     * 订单租期截止时间
      */
     private LocalDateTime revertTime ;
 
     /**
-     * 订单状态
+     * 订单状态(最新订单状态)
      */
     private Integer status;
 
+    /**
+     * 取消订单责任方
+     */
+    private Integer wrongdoer;
+
+    /**
+     * 车主券编码
+     */
+    private String ownerCouponNo;
 
 }

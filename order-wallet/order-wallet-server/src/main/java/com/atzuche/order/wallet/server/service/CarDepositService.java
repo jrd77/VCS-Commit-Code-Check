@@ -2,6 +2,7 @@ package com.atzuche.order.wallet.server.service;
 
 import com.atzuche.order.commons.exceptions.CarNotFoundException;
 import com.atzuche.order.wallet.api.CarDepositVO;
+import com.atzuche.order.wallet.api.UpdateCarDepositBillVO;
 import com.atzuche.order.wallet.server.entity.CarDepositEntity;
 import com.atzuche.order.wallet.server.mapper.CarDepositMapper;
 import org.springframework.beans.BeanUtils;
@@ -41,11 +42,12 @@ public class CarDepositService {
         }
     }
 
-    public void updateCarDeposit(String carNo,Integer updateBill){
-        CarDepositEntity carDepositEntity = carDepositMapper.getCarDepositByCarNo(carNo);
+    public void updateCarDeposit(UpdateCarDepositBillVO billVO){
+        CarDepositEntity carDepositEntity = carDepositMapper.getCarDepositByCarNo(billVO.getCarNo());
         if(carDepositEntity==null){
-            throw new CarNotFoundException("regNo="+carNo);
+            throw new CarNotFoundException("regNo="+billVO.getCarNo());
         }
-        carDepositMapper.updateCarDepositBill(carNo,updateBill);
+        //FIXME:增加更新日志
+        carDepositMapper.updateCarDepositBill(billVO.getCarNo(),billVO.getUpdateBill());
     }
 }
