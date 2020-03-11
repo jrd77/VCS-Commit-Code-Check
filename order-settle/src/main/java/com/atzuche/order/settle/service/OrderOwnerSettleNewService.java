@@ -194,4 +194,22 @@ public class OrderOwnerSettleNewService {
         settleOrdersDefinition.addPlatformProfit(accountPlatformProfitDetail);
 
     }
+    
+    /**
+     * 获取车主gps押金用平台端冲账
+     * @param gpsDeposit
+     * @param settleOrdersDefinition
+     */
+    public void addGpsDepositIncrementAmtToPlatform(OwnerOrderIncrementDetailEntity gpsDeposit, SettleOrdersDefinition settleOrdersDefinition) {
+        int totalAmount = gpsDeposit.getTotalAmount();
+        AccountPlatformProfitDetailEntity accountPlatformProfitDetail = new AccountPlatformProfitDetailEntity();
+        accountPlatformProfitDetail.setAmt(-totalAmount);
+        //renterOrderCostDetail.getCostCode()  //暂不处理
+        accountPlatformProfitDetail.setSourceCode(OwnerCashCodeEnum.HW_DEPOSIT_DEBT.getCashNo());
+        accountPlatformProfitDetail.setSourceDesc(OwnerCashCodeEnum.HW_DEPOSIT_DEBT.getTxt());
+        
+        //accountPlatformProfitDetail.setUniqueNo(String.valueOf(gpsDeposit.getId()));
+        accountPlatformProfitDetail.setOrderNo(gpsDeposit.getOrderNo());
+        settleOrdersDefinition.addPlatformProfit(accountPlatformProfitDetail);
+    }
 }

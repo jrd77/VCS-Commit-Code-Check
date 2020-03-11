@@ -34,6 +34,11 @@ public class SettleOrders {
      * 车主会员号
      */
     private String ownerMemNo;
+    
+    /**
+     * 车辆注册号
+     */
+    private String carNo;
 
     /**
      * 租车费用
@@ -117,6 +122,12 @@ public class SettleOrders {
 	}
 	public void setOwnerOrder(OwnerOrderEntity ownerOrder) {
 		this.ownerOrder = ownerOrder;
+	}
+	public String getCarNo() {
+		return carNo;
+	}
+	public void setCarNo(String carNo) {
+		this.carNo = carNo;
 	}
     
     
