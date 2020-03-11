@@ -20,6 +20,6 @@ public interface PayFeignService {
     @PostMapping("pay/virtual")
     public ResponseData virtualPay(@Valid @RequestBody VirtualPayVO virtualPayVO);
 
-
+    @PostMapping("pay/offline")
     public ResponseData offlinePay(@Valid @RequestBody OfflinePayVO offlinePayVO);
 }
