@@ -36,14 +36,14 @@ public class AccountVirtualPayDetailEntity implements Serializable {
     private Integer amt;
 
     /**
-     * 操作类型:0-支付,-1退款
+     * 操作类型:01-支付,04退款
      */
-    private Integer payType;
+    private String payType;
 
     /**
-     * 支付类型 1-租金，2-押金，3-违章押金
+     * 支付类型 11-租金，2-押金，3-违章押金
      */
-    private Integer payCashType;
+    private String payCashType;
 
     /**
      * 操作时间

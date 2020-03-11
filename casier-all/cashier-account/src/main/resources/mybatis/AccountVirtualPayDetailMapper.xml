@@ -7,7 +7,7 @@
     <result column="account_name" jdbcType="VARCHAR" property="accountName" />
     <result column="order_no" jdbcType="VARCHAR" property="orderNo" />
     <result column="amt" jdbcType="INTEGER" property="amt" />
-    <result column="pay_type" jdbcType="INTEGER" property="payType" />
+    <result column="pay_type"  property="payType" />
     <result column="pay_cash_type" property="payCashType"/>
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
     <result column="create_op" jdbcType="VARCHAR" property="createOp" />
@@ -80,7 +80,7 @@
         #{amt,jdbcType=INTEGER},
       </if>
       <if test="payType != null">
-        #{payType,jdbcType=INTEGER},
+        #{payType},
       </if>
       <if test="createTime != null">
         #{createTime,jdbcType=TIMESTAMP},
@@ -118,7 +118,7 @@
         amt = #{amt,jdbcType=INTEGER},
       </if>
       <if test="payType != null">
-        pay_type = #{payType,jdbcType=INTEGER},
+        pay_type = #{payType},
       </if>
       <if test="createTime != null">
         create_time = #{createTime,jdbcType=TIMESTAMP},

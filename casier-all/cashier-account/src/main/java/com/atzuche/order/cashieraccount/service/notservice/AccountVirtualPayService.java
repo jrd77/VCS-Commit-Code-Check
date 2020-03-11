@@ -4,7 +4,7 @@ import com.atzuche.order.cashieraccount.entity.AccountVirtualPayDetailEntity;
 import com.atzuche.order.cashieraccount.entity.AccountVirtualPayEntity;
 import com.atzuche.order.cashieraccount.mapper.AccountVirtualPayDetailMapper;
 import com.atzuche.order.cashieraccount.mapper.AccountVirtualPayMapper;
-import com.atzuche.order.cashieraccount.vo.req.pay.VirtualPayVO;
+import com.atzuche.order.cashieraccount.vo.req.pay.VirtualPayDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,13 +27,13 @@ public class AccountVirtualPayService {
     private AccountVirtualPayMapper accountVirtualPayMapper;
 
     @Transactional(rollbackFor = RuntimeException.class)
-    public void addVirtualPayRecord(VirtualPayVO virtualPayVO){
+    public void addVirtualPayRecord(VirtualPayDTO virtualPayVO){
         insertDetail(virtualPayVO);
 
-        AccountVirtualPayEntity entity = accountVirtualPayMapper.selectByAccountNo(virtualPayVO.getAccountNo());
+        AccountVirtualPayEntity entity = accountVirtualPayMapper.selectByAccountNo(virtualPayVO.getAccountEnum().getAccountNo());
         if(entity==null){
             try {
-                initVirtualAccount(virtualPayVO.getAccountNo(), virtualPayVO.getAccountName());
+                initVirtualAccount(virtualPayVO.getAccountEnum().getAccountNo(), virtualPayVO.getAccountEnum().getAccountName());
             }catch (Exception e){
                 logger.warn("初始化失败，可能主键冲突造成",e);
             }
@@ -43,19 +43,19 @@ public class AccountVirtualPayService {
 
     }
 
-    private void insertDetail(VirtualPayVO virtualPayVO){
+    private void insertDetail(VirtualPayDTO virtualPayVO){
         AccountVirtualPayDetailEntity detailEntity = new AccountVirtualPayDetailEntity();
-        detailEntity.setAccountNo(virtualPayVO.getAccountNo());
-        detailEntity.setAccountName(virtualPayVO.getAccountName());
+        detailEntity.setAccountNo(virtualPayVO.getAccountEnum().getAccountNo());
+        detailEntity.setAccountName(virtualPayVO.getAccountEnum().getAccountName());
         detailEntity.setAmt(virtualPayVO.getPayAmt());
         detailEntity.setOrderNo(virtualPayVO.getOrderNo());
-        detailEntity.setPayType(0);
+        detailEntity.setPayType(virtualPayVO.getPayType().getValue());
         detailEntity.setPayCashType(virtualPayVO.getCashType().getValue());
         accountVirtualPayDetailMapper.insertSelective(detailEntity);
     }
 
-    private void deductAmt(VirtualPayVO virtualPayVO){
-        int count = accountVirtualPayMapper.deductAmt(virtualPayVO.getAccountNo(),virtualPayVO.getPayAmt());
+    private void deductAmt(VirtualPayDTO virtualPayVO){
+        int count = accountVirtualPayMapper.deductAmt(virtualPayVO.getAccountEnum().getAccountNo(),virtualPayVO.getPayAmt());
         if(count == 0){
             throw new RuntimeException("插入记录失败:"+virtualPayVO);
         }

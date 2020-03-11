@@ -24,6 +24,14 @@ public enum VirtualAccountEnum {
         this.accountName = accountName;
     }
 
+    public String getAccountNo() {
+        return accountNo;
+    }
+
+    public String getAccountName() {
+        return accountName;
+    }
+
     public static VirtualAccountEnum fromAccountNo(String accountNo){
         VirtualAccountEnum[] accountEnums = values();
         for(VirtualAccountEnum accountEnum:accountEnums){

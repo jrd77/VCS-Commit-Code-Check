@@ -98,9 +98,9 @@
             <if test="updateTime != null">`update_time`, </if>
             <if test="updateOp != null">`update_op`, </if>
             <if test="version != null">`version`, </if>
-            <if test="isDelete != null">`is_delete` </if>
-            <if test="payLine != null">`pay_line` </if>
-            <if test="virtualAccountNo != null">`virtual_account_no` </if>
+            <if test="isDelete != null">`is_delete`, </if>
+            <if test="payLine != null">`pay_line`, </if>
+            <if test="virtualAccountNo != null">`virtual_account_no`, </if>
             <if test="payChannel != null">`pay_channel` </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides="," >
@@ -127,9 +127,9 @@
             <if test="updateTime != null">#{updateTime},  </if>
             <if test="updateOp != null">#{updateOp},  </if>
             <if test="version != null">#{version},  </if>
-            <if test="isDelete != null">#{isDelete} </if>
-            <if test="payLine != null">#{payLine} </if>
-            <if test="virtualAccountNo != null">#{virtualAccountNo} </if>
+            <if test="isDelete != null">#{isDelete} ,</if>
+            <if test="payLine != null">#{payLine} ,</if>
+            <if test="virtualAccountNo != null">#{virtualAccountNo}, </if>
             <if test="payChannel != null">#{payChannel}</if>
         </trim>
     </insert>

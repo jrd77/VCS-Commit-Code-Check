@@ -37,7 +37,7 @@ public class PayCallbackService implements OrderPayCallBack {
      */
     @Override
     public void callBack(String menNo,String orderNo,String renterOrderNo,Integer isPayAgain,YesNoEnum isGetCar){
-        log.info("PayCallbackService callBack start param [{}] [{}] [{}]  [{}] [{}]",menNo,orderNo,renterOrderNo,isPayAgain,isGetCar.getCode());
+        log.info("PayCallbackService callBack start param [{}] [{}] [{}]  [{}] [{}]",menNo,orderNo,renterOrderNo,isPayAgain,isGetCar);
         if(YesNoEnum.YES.getCode().equals(isPayAgain) && !StringUtil.isBlank(renterOrderNo)){
             // 修改订单补付成功后回调
             modifyOrderForRenterService.supplementPayPostProcess(orderNo,renterOrderNo);
