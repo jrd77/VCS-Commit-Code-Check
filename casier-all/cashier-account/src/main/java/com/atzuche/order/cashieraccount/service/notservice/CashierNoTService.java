@@ -416,14 +416,16 @@ public class CashierNoTService {
      * @param freeDepositType  免押方式(1:绑卡减免,2:芝麻减免,3:消费) 
      * @return
      */
-    public PayVo getPayVO(CashierEntity cashierEntity,OrderPaySignReqVO orderPaySign,int amt ,String title,String payKind,String payIdStr ,String extendParams,int freeDepositType) {
+    public PayVo getPayVO(String orderNo,CashierEntity cashierEntity,OrderPaySignReqVO orderPaySign,int amt ,String title,String payKind,String payIdStr ,String extendParams,int freeDepositType) {
         PayVo vo = new PayVo();
         Integer paySn = (Objects.isNull(cashierEntity)|| Objects.isNull(cashierEntity.getPaySn()))?0:cashierEntity.getPaySn();
         vo.setInternalNo("1");
         vo.setExtendParams(extendParams);
         vo.setAtappId(DataAppIdConstant.APPID_SHORTRENT);
         vo.setMemNo(orderPaySign.getMenNo());
-        vo.setOrderNo(orderPaySign.getOrderNo());
+//        vo.setOrderNo(orderPaySign.getOrderNo());
+        //支持多订单号
+        vo.setOrderNo(orderNo);
         vo.setOpenId(orderPaySign.getOpenId());
         vo.setReqOs(orderPaySign.getReqOs());
         vo.setPayAmt(String.valueOf(Math.abs(amt)));

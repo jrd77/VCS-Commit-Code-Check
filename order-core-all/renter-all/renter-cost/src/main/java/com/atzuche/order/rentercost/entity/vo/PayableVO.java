@@ -2,7 +2,7 @@ package com.atzuche.order.rentercost.entity.vo;
 
 import lombok.Data;
 
-@Data
+//@Data
 public class PayableVO {
 
 	/**
@@ -25,4 +25,37 @@ public class PayableVO {
 	 * 金额
 	 */
 	private Integer amt;
+	
+	public String getOrderNo() {
+		return orderNo;
+	}
+	public void setOrderNo(String orderNo) {
+		this.orderNo = orderNo;
+	}
+	public String getUniqueNo() {
+		return uniqueNo;
+	}
+	public void setUniqueNo(String uniqueNo) {
+		this.uniqueNo = uniqueNo;
+	}
+	public Integer getType() {
+		return type;
+	}
+	public void setType(Integer type) {
+		this.type = type;
+	}
+	public String getTitle() {
+		return title;
+	}
+	public void setTitle(String title) {
+		this.title = title;
+	}
+	public Integer getAmt() {
+		return amt;
+	}
+	public void setAmt(Integer amt) {
+		this.amt = amt;
+	}
+	
+	
 }

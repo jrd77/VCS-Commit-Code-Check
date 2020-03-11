@@ -25,4 +25,6 @@ public interface AccountDebtDetailMapper{
     
     List<AccountDebtDetailEntity> listAccountDebtDetailEntity(@Param("orderNo") String orderNo,@Param("memNo") String memNo);
     
+    List<AccountDebtDetailEntity> getDebtListByOrderNo(@Param("orderNo") String orderNo,@Param("memNo") String memNo);
+    
 }

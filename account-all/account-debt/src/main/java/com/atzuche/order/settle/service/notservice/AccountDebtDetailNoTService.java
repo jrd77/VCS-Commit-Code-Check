@@ -43,6 +43,15 @@ public class AccountDebtDetailNoTService {
         return result;
     }
     
+    public List<AccountDebtDetailEntity> getDebtListByOrderNoMemNo(String orderNo,String memNo){
+        List<AccountDebtDetailEntity> result = accountDebtDetailMapper.getDebtListByOrderNo(orderNo,memNo);
+        if(CollectionUtils.isEmpty(result)){
+           return Collections.emptyList();
+        }
+        return result;
+    }
+    
+    
     public List<AccountDebtDetailEntity> listAccountDebtDetailEntity(String orderNo,String memNo){
         List<AccountDebtDetailEntity> result = accountDebtDetailMapper.listAccountDebtDetailEntity(orderNo, memNo);
         if(CollectionUtils.isEmpty(result)){
@@ -147,7 +156,7 @@ public class AccountDebtDetailNoTService {
                 accountDebtDetailAll.setCurrentDebtAmt(NumberUtils.INTEGER_ZERO);
                 break;
             }
-            if(amt<0){
+            if(amt<0){  //部分抵扣
 
                 AccountDebtReceivableaDetailEntity entity = new AccountDebtReceivableaDetailEntity();
                 BeanUtils.copyProperties(accountDebtDetailAll,entity);

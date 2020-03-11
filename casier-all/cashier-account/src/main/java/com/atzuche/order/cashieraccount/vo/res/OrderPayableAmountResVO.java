@@ -71,6 +71,12 @@ public class OrderPayableAmountResVO {
     
     @AutoDocProperty("应付修改订单补付租车费用")
     private int amtIncrementRent;
+    
+    @AutoDocProperty("应付补付租车费用")
+    private int amtIncrementRentSupplement;
+    
+    @AutoDocProperty("应付支付欠款费用")
+    private int amtIncrementRentDebt;
     /**
      * 应付租车车俩押金
      */
@@ -268,6 +274,23 @@ public class OrderPayableAmountResVO {
 
 	public void setHints(String hints) {
 		this.hints = hints;
+	}
+
+
+	public int getAmtIncrementRentDebt() {
+		return amtIncrementRentDebt;
+	}
+
+	public void setAmtIncrementRentDebt(int amtIncrementRentDebt) {
+		this.amtIncrementRentDebt = amtIncrementRentDebt;
+	}
+
+	public int getAmtIncrementRentSupplement() {
+		return amtIncrementRentSupplement;
+	}
+
+	public void setAmtIncrementRentSupplement(int amtIncrementRentSupplement) {
+		this.amtIncrementRentSupplement = amtIncrementRentSupplement;
 	}
     
     

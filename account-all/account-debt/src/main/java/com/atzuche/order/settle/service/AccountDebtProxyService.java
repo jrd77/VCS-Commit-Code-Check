@@ -1,9 +1,10 @@
+/**
+ * 
+ */
 package com.atzuche.order.settle.service;
 
 import java.util.List;
-import java.util.Objects;
 
-import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
@@ -14,60 +15,47 @@ import com.atzuche.order.settle.service.notservice.AccountDebtDetailNoTService;
 import com.atzuche.order.settle.service.notservice.AccountDebtNoTService;
 import com.atzuche.order.settle.service.notservice.AccountDebtReceivableaDetailNoTService;
 import com.atzuche.order.settle.vo.req.AccountDeductDebtReqVO;
-import com.atzuche.order.settle.vo.req.AccountInsertDebtReqVO;
-import com.atzuche.order.settle.vo.res.AccountDebtResVO;
 import com.autoyol.commons.web.ErrorCode;
 
+import lombok.extern.slf4j.Slf4j;
 
 /**
- * 个人历史总额表
+ * @author jing.huang
  *
- * @author ZhangBin
- * @date 2019-12-11 17:34:34
  */
+@Slf4j
 @Service
-public class AccountDebtService{
+public class AccountDebtProxyService {
     @Autowired
     private AccountDebtNoTService accountDebtNoTService;
     @Autowired
     private AccountDebtDetailNoTService accountDebtDetailNoTService;
     @Autowired
     private AccountDebtReceivableaDetailNoTService accountDebtReceivableaDetailNoTService;
-
-
+    
     /**
-     * 根据会员号查询用户总欠款信息
-     * @param memNo
+     * 支付欠款异步通知抵扣欠款
+     * @param orderNo
+     * @param payDebtAmt
+     * @param memNo  包括车主或租客
+     * @param qn
      * @return
      */
-    public AccountDebtResVO getAccountDebtByMemNo(String memNo) {
-        return accountDebtNoTService.getAccountDebtByMemNo(memNo);
-    }
-
-    /**
-     * 查看账户欠款总和
-     * @param memNo
-     * @return
-     */
-    public int getAccountDebtNumByMemNo(String memNo){
-        AccountDebtResVO res = getAccountDebtByMemNo(memNo);
-        if(Objects.isNull(res) || Objects.isNull(res.getDebtAmt())){
-            return NumberUtils.INTEGER_ZERO;
-        }
-        return res.getDebtAmt();
-    }
-
-    /**
-     * 抵扣历史欠款
-     *  正数
-     * @return
-     */
-    public int deductDebt(AccountDeductDebtReqVO accountDeductDebt) {
+    public int deductDebtByOrderNo(String orderNo,int payDebtAmt,String memNo,String qn) {
+    	log.info("payDebt notice deductDebtByOrderNo params orderNo=[{}],payDebtAmt=[{}],renterNo=[{}],qn=[{}]",orderNo,payDebtAmt,memNo,qn);
+    	//构造对象
+        AccountDeductDebtReqVO accountDeductDebt = new AccountDeductDebtReqVO();
+        accountDeductDebt.setSourceCode(RenterCashCodeEnum.PAY_DEBT_COST_TO_HISTORY_AMT.getCashNo());
+        accountDeductDebt.setSourceDetail(RenterCashCodeEnum.PAY_DEBT_COST_TO_HISTORY_AMT.getTxt());
+        accountDeductDebt.setAmt(payDebtAmt);
+        accountDeductDebt.setMemNo(memNo);
+        accountDeductDebt.setUniqueNo(qn);
+        
         // 1 参数校验
         Assert.notNull(accountDeductDebt, ErrorCode.PARAMETER_ERROR.getText());
         accountDeductDebt.check();
         // 2 查询用户所有待还的记录
-        List<AccountDebtDetailEntity> accountDebtDetailAlls =  accountDebtDetailNoTService.getDebtListByMemNo(accountDeductDebt.getMemNo());
+        List<AccountDebtDetailEntity> accountDebtDetailAlls =  accountDebtDetailNoTService.getDebtListByOrderNoMemNo(orderNo,memNo);
         //3 根据租客还款总额  从用户所有待还款记录中 过滤本次 待还款的记录
         List<AccountDebtDetailEntity> accountDebtDetails = accountDebtDetailNoTService.getDebtListByDebtAll(accountDebtDetailAlls,accountDeductDebt);
         //5更新欠款表 当前欠款数
@@ -79,21 +67,4 @@ public class AccountDebtService{
         return accountDeductDebt.getRealAmt();
     }
     
-    
-
-    /**
-     * 记录用户历史欠款
-     */
-    public int insertDebt(AccountInsertDebtReqVO accountInsertDebt){
-        //1校验
-        Assert.notNull(accountInsertDebt, ErrorCode.PARAMETER_ERROR.getText());
-        accountInsertDebt.check();
-        //2 查询账户欠款
-        accountDebtNoTService.productAccountDebt(accountInsertDebt);
-        //3 新增欠款明细
-        return accountDebtDetailNoTService.insertDebtDetail(accountInsertDebt);
-
-    }
-
-
 }

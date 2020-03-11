@@ -20,4 +20,6 @@ dependencies {
     compile('com.autoyol:auto-coin-service-api:1.0.3-SNAPSHOT')
     compile project(":config:config-client")
     //compile project(":casier-all:cashier-account")
+    compile project(":account-all:account-debt")
+    
 }
