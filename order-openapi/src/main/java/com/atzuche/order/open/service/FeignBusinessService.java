@@ -1,11 +1,11 @@
 package com.atzuche.order.open.service;
 
+import com.atzuche.order.commons.vo.req.OwnerUpdateSeeVO;
 import com.atzuche.order.commons.vo.req.RenterAndOwnerSeeOrderVO;
 import com.autoyol.commons.web.ResponseData;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 
 @FeignClient(name="order-center-api")
 public interface FeignBusinessService {
@@ -24,5 +24,5 @@ public interface FeignBusinessService {
      * @return
      */
     @PostMapping("/orderBusiness/ownerUpdateSee")
-    public ResponseData<?> ownerUpdateSee(@RequestParam("ownerMem") String ownerMem);
+    public ResponseData<?> ownerUpdateSee(@RequestBody OwnerUpdateSeeVO ownerUpdateSeeVO);
 }
