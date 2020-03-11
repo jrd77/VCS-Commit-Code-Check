@@ -1280,19 +1280,16 @@ public class OrderDetailService {
         }
 
         //申请信息
-        RenterOrderChangeApplyEntity renterOrderChangeApply = null;
         RenterOrderChangeApplyStatusDTO renterOrderChangeApplyStatusDTO = null;
-        if(renterOrderNo != null){
-            renterOrderChangeApply = renterOrderChangeApplyService.getRenterOrderChangeApplyByRenterOrderNo(renterOrderNo);
-            renterOrderChangeApplyStatusDTO = new RenterOrderChangeApplyStatusDTO();
-            if(renterOrderChangeApply!=null) {
-                BeanUtils.copyProperties(renterOrderChangeApply, renterOrderChangeApplyStatusDTO);
-                LocalDateTime createTime = renterOrderChangeApply.getCreateTime();
-                String createTimeStr = LocalDateTimeUtils.localdateToString(createTime, GlobalConstant.FORMAT_DATE_STR1);
-                renterOrderChangeApplyStatusDTO.setCreateTimeStr(createTimeStr);
-            }
-
+        RenterOrderChangeApplyEntity renterOrderChangeApply  = renterOrderChangeApplyService.getByOrderNoLimit(orderNo);
+        renterOrderChangeApplyStatusDTO = new RenterOrderChangeApplyStatusDTO();
+        if(renterOrderChangeApply!=null) {
+            BeanUtils.copyProperties(renterOrderChangeApply, renterOrderChangeApplyStatusDTO);
+            LocalDateTime createTime = renterOrderChangeApply.getCreateTime();
+            String createTimeStr = LocalDateTimeUtils.localdateToString(createTime, GlobalConstant.FORMAT_DATE_STR1);
+            renterOrderChangeApplyStatusDTO.setCreateTimeStr(createTimeStr);
         }
+
         orderStatusRespDTO.orderDTO = orderDTO;
         orderStatusRespDTO.orderStatusDTO = orderStatusDTO;
         orderStatusRespDTO.renterOrderStatusDTO = renterOrderDTO;
@@ -1716,9 +1713,5 @@ public class OrderDetailService {
         return null;
     }
 
-    public static void main(String[] args) {
-        Object o = Optional.ofNullable(null).get();
-        System.out.println(Optional.ofNullable(null));
-        System.out.println(o);
-    }
+
 }

@@ -111,6 +111,12 @@ public class OwnerOrderDTO implements Serializable {
          */
         @AutoDocProperty(value="待调度原因 1、车主主动拒单 2、超时拒单 3、车主取消订单",required=true)
         private String dispatchReason;
+    /**
+     * 订单是否查看,1:是，0：否
+     */
+        @AutoDocProperty(value = "订单是否查看,1:是，0：否")
+        private Integer seeFlag;
+
     	/**
          * 取消者
          */

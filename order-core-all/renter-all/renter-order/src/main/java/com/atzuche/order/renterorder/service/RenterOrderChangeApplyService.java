@@ -90,6 +90,11 @@ public class RenterOrderChangeApplyService{
     public List<RenterOrderChangeApplyEntity> getByOrderNo(String ownerOrderNo){
         return renterOrderChangeApplyMapper.getByOrderNo(ownerOrderNo);
     }
-
-
+    /**
+     * 更具订单号查询最大一条
+     * @return
+     */
+    public RenterOrderChangeApplyEntity getByOrderNoLimit(String orderNo){
+        return renterOrderChangeApplyMapper.getByOrderNoLimit(orderNo);
+    }
 }

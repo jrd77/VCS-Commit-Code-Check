@@ -8,6 +8,7 @@
         <result property="orderNo" column="order_no"/>
         <result property="renterOrderNo" column="renter_order_no"/>
         <result property="ownerOrderNo" column="owner_order_no"/>
+        <result property="rentTimeFlag" column="rent_time_flag"/>
         <result property="applyType" column="apply_type"/>
         <result property="rentBeforeTime" column="rent_before_time"/>
         <result property="rentAfterTime" column="rent_after_time"/>
@@ -38,7 +39,8 @@
 	`id`, 	
 	`order_no`, 	
 	`renter_order_no`, 	
-	`owner_order_no`, 	
+	`owner_order_no`,
+	`rent_time_flag`,
 	`apply_type`, 	
 	`rent_before_time`, 	
 	`rent_after_time`, 	
@@ -310,5 +312,11 @@
         where order_no = #{orderNo}
         and is_delete = 0
     </select>
-
+    <select id="getByOrderNoLimit" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List" /> from renter_order_change_apply
+        where order_no = #{orderNo}
+        and is_delete = 0
+        order by id desc
+        limit 1
+    </select>
 </mapper>
