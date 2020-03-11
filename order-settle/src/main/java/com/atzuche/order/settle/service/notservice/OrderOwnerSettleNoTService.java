@@ -224,7 +224,9 @@ public class OrderOwnerSettleNoTService {
         
         int proxyProportion = proxyProportionDou.intValue();
         OwnerOrderPurchaseDetailEntity proxyExpense = ownerOrderCostCombineService.getProxyExpense(costBaseDTO,rentAmt,proxyProportion);
-        
+        if (proxyExpense != null && proxyExpense.getTotalAmount() != null) {
+        	ownerIncomeAmt += -proxyExpense.getTotalAmount();
+        }
         
         //2 车主端平台服务费
         //服务费比例 商品
@@ -234,7 +236,9 @@ public class OrderOwnerSettleNoTService {
         }
         int serviceProportion = serviceRate.intValue();
         OwnerOrderPurchaseDetailEntity serviceExpense = ownerOrderCostCombineService.getServiceExpense(costBaseDTO,rentAmt,serviceProportion);
-        
+        if (serviceExpense != null && serviceExpense.getTotalAmount() != null) {
+        	ownerIncomeAmt += -serviceExpense.getTotalAmount();
+        }
         
         
         //3 获取车主补贴明细列表
@@ -245,14 +249,18 @@ public class OrderOwnerSettleNoTService {
         //5 获取车主增值服务费用列表
         List<OwnerOrderIncrementDetailEntity> ownerOrderIncrementDetail = ownerOrderIncrementDetailService.listOwnerOrderIncrementDetail(settleOrders.getOrderNo(),settleOrders.getOwnerOrderNo());
         if (ownerOrderIncrementDetail != null) {
-        	ownerIncomeAmt += ownerOrderIncrementDetail.stream().mapToInt(OwnerOrderIncrementDetailEntity::getTotalAmount).sum();
+        	ownerIncomeAmt += ownerOrderIncrementDetail.stream().filter(incr -> {return !OwnerCashCodeEnum.GPS_SERVICE_AMT.getCashNo().equals(incr.getCostCode()) &&
+                    ! OwnerCashCodeEnum.SERVICE_CHARGE.getCashNo().equals(incr.getCostCode()) && 
+                    ! OwnerCashCodeEnum.PROXY_CHARGE.getCashNo().equals(incr.getCostCode());}).mapToInt(OwnerOrderIncrementDetailEntity::getTotalAmount).sum();
         }
         // 6 获取gps服务费
         //车辆安装gps序列号列表 商品系统
         
         List<Integer> lsGpsSerialNumber = getLsGpsSerialNumber(ownerGoodsDetail.getGpsSerialNumber());
         List<OwnerOrderPurchaseDetailEntity> gpsCost =  ownerOrderCostCombineService.getGpsServiceAmtEntity(costBaseDTO,lsGpsSerialNumber);
-        
+        if (gpsCost != null) {
+        	ownerIncomeAmt += -gpsCost.stream().mapToInt(OwnerOrderPurchaseDetailEntity::getTotalAmount).sum();
+        }
         //7 获取车主油费 //（不含超里程）
         DeliveryOilCostVO deliveryOilCostVO = deliveryCarInfoPriceService.getOilCostByRenterOrderNo(settleOrders.getOrderNo(),ownerGoodsDetail.getCarEngineType());
         OwnerGetAndReturnCarDTO ownerGetAndReturnCarDTO = Objects.isNull(deliveryOilCostVO)?null:deliveryOilCostVO.getOwnerGetAndReturnCarDTO();
