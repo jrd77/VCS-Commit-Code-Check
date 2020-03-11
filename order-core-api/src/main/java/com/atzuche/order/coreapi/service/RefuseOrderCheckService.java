@@ -1,5 +1,6 @@
 package com.atzuche.order.coreapi.service;
 
+import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.entity.dto.OwnerGoodsDetailDTO;
 import com.atzuche.order.commons.enums.CarOwnerTypeEnum;
 import com.atzuche.order.commons.enums.OrderStatusEnum;
@@ -50,6 +51,8 @@ public class RefuseOrderCheckService {
         //订单状态校验
         OrderStatusEntity orderStatusEntity = orderStatusService.getByOrderNo(orderNo);
         if(null != orderStatusEntity && null != orderStatusEntity.getStatus()) {
+            logger.info("RefuseOrderCheckService.checkOwnerAgreeOrRefuseOrder.orderStatusEntity:[{}]",
+                    JSON.toJSONString(orderStatusEntity));
             if(OrderStatusEnum.TO_CONFIRM.getStatus() != orderStatusEntity.getStatus()) {
                 throw new RefuseOrderCheckException();
             }
