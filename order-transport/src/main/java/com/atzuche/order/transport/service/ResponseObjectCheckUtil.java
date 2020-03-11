@@ -1,8 +1,10 @@
 package com.atzuche.order.transport.service;
 
+import com.atzuche.order.commons.constant.OrderConstant;
 import com.atzuche.order.commons.exceptions.RemoteCallException;
 import com.autoyol.car.api.model.vo.ResponseObject;
 import com.autoyol.commons.web.ErrorCode;
+import org.springframework.util.ObjectUtils;
 
 /**
  * @author <a href="mailto:lianglin.sjtu@gmail.com">AndySjtu</a>
@@ -19,6 +21,21 @@ public class ResponseObjectCheckUtil {
                         com.atzuche.order.commons.enums.ErrorCode.REMOTE_CALL_FAIL.getText());
             }
             throw remoteCallException;
+        }
+    }
+
+
+
+    public static void checkCarDispatchResponse(ResponseObject responseObject){
+        if(ObjectUtils.isEmpty(responseObject)) {
+            throw new RemoteCallException(com.atzuche.order.commons.enums.ErrorCode.REMOTE_CALL_FAIL.getCode(),
+                    com.atzuche.order.commons.enums.ErrorCode.REMOTE_CALL_FAIL.getText());
+        }
+
+        if(!ErrorCode.SUCCESS.getCode().equalsIgnoreCase(responseObject.getResCode()) &&
+                !responseObject.getResCode().startsWith(OrderConstant.SPECIAL_ERROR_CODE_PREFIX)){
+            throw new RemoteCallException(com.atzuche.order.commons.enums.ErrorCode.REMOTE_CALL_FAIL.getCode(),
+                        com.atzuche.order.commons.enums.ErrorCode.REMOTE_CALL_FAIL.getText());
         }
     }
 }
