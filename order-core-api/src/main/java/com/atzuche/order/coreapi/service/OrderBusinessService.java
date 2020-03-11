@@ -99,7 +99,7 @@ public class OrderBusinessService {
         if(renterOrderEntity == null){
             throw new OrderNotFoundException(orderNo);
         }
-        RenterMemberDTO renterMemberDTO = renterMemberService.selectrenterMemberByRenterOrderNo(orderNo, false);
+        RenterMemberDTO renterMemberDTO = renterMemberService.selectrenterMemberByRenterOrderNo(renterOrderEntity.getRenterOrderNo(), false);
         return renterMemberDTO;
     }
 }
