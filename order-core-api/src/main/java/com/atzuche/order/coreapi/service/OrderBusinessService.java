@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.enums.CloseEnum;
 import com.atzuche.order.commons.enums.NoticeSourceCodeEnum;
 import com.atzuche.order.commons.exceptions.NoticeSourceNotFoundException;
+import com.atzuche.order.commons.vo.req.OwnerUpdateSeeVO;
 import com.atzuche.order.commons.vo.req.RenterAndOwnerSeeOrderVO;
 import com.atzuche.order.ownercost.entity.OwnerOrderEntity;
 import com.atzuche.order.ownercost.service.OwnerOrderService;
@@ -69,5 +70,9 @@ public class OrderBusinessService {
             return first.get();
         }
         return null;
+    }
+
+    public void ownerUpdateSee(OwnerUpdateSeeVO ownerUpdateSeeVO) {
+        ownerOrderService.updateByMemeNo(ownerUpdateSeeVO.getOwnerMemNo());
     }
 }

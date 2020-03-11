@@ -1,6 +1,7 @@
 package com.atzuche.order.coreapi.controller;
 
 import com.atzuche.order.commons.BindingResultUtil;
+import com.atzuche.order.commons.vo.req.OwnerUpdateSeeVO;
 import com.atzuche.order.commons.vo.req.RenterAndOwnerSeeOrderVO;
 import com.atzuche.order.coreapi.service.OrderBusinessService;
 import com.atzuche.order.parentorder.entity.OrderEntity;
@@ -32,6 +33,13 @@ public class OrderBusinessController {
             return ResponseData.error();
         }
         orderBusinessService.renterAndOwnerSeeOrder(renterAndOwnerSeeOrderVO);
+        return ResponseData.success();
+    }
+
+    @PostMapping("orderBusiness/ownerUpdateSee")
+    public ResponseData<?>  ownerUpdateSee(@RequestBody @Valid OwnerUpdateSeeVO ownerUpdateSeeVO, BindingResult bindingResult){
+        BindingResultUtil.checkBindingResult(bindingResult);
+        orderBusinessService.ownerUpdateSee(ownerUpdateSeeVO);
         return ResponseData.success();
     }
 }
