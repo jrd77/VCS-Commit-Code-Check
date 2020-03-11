@@ -21,6 +21,7 @@ import com.atzuche.order.cashieraccount.vo.res.AccountPayAbleResVO;
 import com.atzuche.order.cashieraccount.vo.res.OrderPayableAmountResVO;
 import com.atzuche.order.cashieraccount.vo.res.pay.OrderPayCallBackSuccessVO;
 import com.atzuche.order.commons.DateUtils;
+import com.atzuche.order.commons.LocalDateTimeUtils;
 import com.atzuche.order.commons.enums.OrderPayStatusEnum;
 import com.atzuche.order.commons.enums.OrderStatusEnum;
 import com.atzuche.order.commons.enums.YesNoEnum;
@@ -48,6 +49,7 @@ import com.autoyol.commons.utils.GsonUtils;
 import com.autoyol.commons.web.ErrorCode;
 
 import ch.qos.logback.classic.Logger;
+import com.autoyol.platformcost.LocalDateTimeUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,6 +58,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -100,6 +103,33 @@ public class CashierPayService{
         notifyDataVo.setPayLine(2);
         notifyDataVo.setVirtualAccountNo(virtualPayVO.getAccountEnum().getAccountNo());
         notifyDataVo.setExtendParams(virtualPayVO.getRenterNo());
+
+
+        List<NotifyDataVo> list = new ArrayList<>();
+        list.add(notifyDataVo);
+        BatchNotifyDataVo batchNotifyDataVo = new BatchNotifyDataVo();
+        batchNotifyDataVo.setLstNotifyDataVo(list);
+
+        payCallBack(batchNotifyDataVo,callBack);
+    }
+
+
+    public void offlinePay(OfflinePayDTO payVO,OrderPayCallBack callBack){
+        OfflineNotifyDataVO  notifyDataVo = new OfflineNotifyDataVO();
+        notifyDataVo.setOrderNo(payVO.getOrderNo());
+        notifyDataVo.setMemNo(payVO.getMemNo());
+        notifyDataVo.setAtappId("20");
+        notifyDataVo.setPayKind(payVO.getCashType().getValue());
+        notifyDataVo.setPayType(payVO.getPayType().getCode());
+        notifyDataVo.setPaySource("91");
+        notifyDataVo.setTransStatus("00");
+        notifyDataVo.setSettleAmount(String.valueOf(payVO.getPayAmt()));
+        notifyDataVo.setPayLine(1);
+        notifyDataVo.setExtendParams(payVO.getRenterNo());
+        notifyDataVo.setInternalNo(payVO.getInternalNo());
+        notifyDataVo.setQn(payVO.getQn());
+        notifyDataVo.setPayChannel(payVO.getPayChannel());
+        notifyDataVo.setOrderTime(LocalDateTimeUtils.formatDateTime(LocalDateTime.now(),LocalDateTimeUtils.YYYYMMDDHHMMSSS_PATTERN));
 
 
         List<NotifyDataVo> list = new ArrayList<>();

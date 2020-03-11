@@ -1,6 +1,7 @@
 package com.atzuche.order.cashieraccount.service;
 
 import com.atzuche.order.cashieraccount.service.notservice.AccountVirtualPayService;
+import com.atzuche.order.cashieraccount.vo.req.pay.OfflinePayDTO;
 import com.atzuche.order.cashieraccount.vo.req.pay.VirtualPayDTO;
 import com.atzuche.order.commons.service.OrderPayCallBack;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,5 +26,10 @@ public class VirtualPayService {
     public void pay(VirtualPayDTO virtualPayDTO, OrderPayCallBack orderPayCallBack) {
         accountVirtualPayService.addVirtualPayRecord(virtualPayDTO);
         cashierPayService.virtualPay(virtualPayDTO,orderPayCallBack);
+    }
+
+    @Transactional
+    public void offlinePay(OfflinePayDTO virtualPayDTO, OrderPayCallBack orderPayCallBack) {
+        cashierPayService.offlinePay(virtualPayDTO,orderPayCallBack);
     }
 }

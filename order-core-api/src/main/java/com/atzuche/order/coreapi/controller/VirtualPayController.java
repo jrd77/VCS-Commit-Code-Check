@@ -4,7 +4,10 @@ import com.atzuche.order.cashieraccount.common.PayCashTypeEnum;
 import com.atzuche.order.cashieraccount.common.VirtualAccountEnum;
 import com.atzuche.order.cashieraccount.common.VirtualPayTypeEnum;
 import com.atzuche.order.cashieraccount.service.VirtualPayService;
+import com.atzuche.order.cashieraccount.vo.req.pay.OfflinePayDTO;
 import com.atzuche.order.cashieraccount.vo.req.pay.VirtualPayDTO;
+import com.atzuche.order.commons.enums.cashier.PayTypeEnum;
+import com.atzuche.order.open.vo.OfflinePayVO;
 import com.atzuche.order.open.vo.VirtualPayVO;
 import com.atzuche.order.commons.BindingResultUtil;
 import com.atzuche.order.commons.exceptions.InputErrorException;
@@ -17,6 +20,7 @@ import com.atzuche.order.renterorder.service.RenterOrderService;
 import com.autoyol.commons.web.ResponseData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -71,6 +75,40 @@ public class VirtualPayController {
         virtualPayDTO.setRenterNo(renterOrderEntity.getRenterOrderNo());
 
         virtualPayService.pay(virtualPayDTO, payCallbackService);
+
+        return ResponseData.success();
+    }
+
+
+    @PostMapping("pay/offline")
+    public ResponseData  offlinePay(@Valid @RequestBody OfflinePayVO vo, BindingResult result) {
+        logger.info("virtualPay param is [{}]",vo);
+        BindingResultUtil.checkBindingResult(result);
+        if (vo.getPayAmt() <= 0) {
+            throw new InputErrorException("payAmt>=0:" + vo.getPayAmt());
+        }
+
+        OrderEntity orderEntity = orderService.getOrderEntity(vo.getOrderNo());
+        if (orderEntity == null) {
+            throw new OrderNotFoundException(vo.getOrderNo());
+        }
+
+        RenterOrderEntity renterOrderEntity =renterOrderService.getRenterOrderByOrderNoAndIsEffective(vo.getOrderNo());
+        if (renterOrderEntity == null) {
+            throw new OrderNotFoundException(vo.getOrderNo());
+        }
+
+        OfflinePayDTO dto = new OfflinePayDTO();
+        BeanUtils.copyProperties(vo,dto);
+        dto.setPayChannel(vo.getPayChannel());
+        dto.setCashType(PayCashTypeEnum.fromValue(vo.getCashType()));
+        dto.setOrderNo(vo.getOrderNo());
+        dto.setPayType(PayTypeEnum.PAY_PUR);
+        dto.setMemNo(orderEntity.getMemNoRenter());
+        dto.setPayAmt(vo.getPayAmt());
+        dto.setRenterNo(renterOrderEntity.getRenterOrderNo());
+
+        virtualPayService.offlinePay(dto, payCallbackService);
 
         return ResponseData.success();
     }
