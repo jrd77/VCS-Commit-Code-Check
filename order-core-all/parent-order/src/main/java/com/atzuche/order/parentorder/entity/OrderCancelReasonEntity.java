@@ -50,6 +50,12 @@ public class OrderCancelReasonEntity implements Serializable {
 	 * 是否申诉:0,否 1,是
 	 */
 	private Integer appealFlag;
+
+    /**
+     * 取消订单时间
+     */
+	private LocalDateTime cancelReqTime;
+
 	/**
 	 * 创建时间
 	 */

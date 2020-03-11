@@ -7,6 +7,7 @@ import com.atzuche.order.accountrenterdeposit.entity.AccountRenterDepositEntity;
 import com.atzuche.order.accountrenterwzdepost.entity.AccountRenterWzDepositEntity;
 import com.atzuche.order.cashieraccount.service.CashierQueryService;
 import com.atzuche.order.commons.BindingResultUtil;
+import com.atzuche.order.commons.entity.rentCost.RenterCostDetailDTO;
 import com.atzuche.order.commons.exceptions.OrderNotFoundException;
 import com.atzuche.order.commons.exceptions.OwnerOrderNotFoundException;
 import com.atzuche.order.commons.vo.req.OrderCostReqVO;
@@ -205,4 +206,17 @@ public class OrderCostController {
 	}
 	
 
+    @GetMapping("/order/renter/cost/detail")
+	public ResponseData<RenterCostDetailDTO> renterCostDetail(@RequestParam("orderNo") String orderNo){
+        OrderEntity orderEntity = orderService.getOrderEntity(orderNo);
+        if(orderEntity==null){
+            throw new OrderNotFoundException(orderNo);
+        }
+        RenterOrderEntity renterOrderEntity = renterOrderService.getRenterOrderByOrderNoAndIsEffective(orderNo);
+        if(renterOrderEntity==null){
+            throw new OrderNotFoundException(orderNo);
+        }
+        RenterCostDetailDTO renterCostDetailDTO = facadeService.renterCostDetail(orderNo,renterOrderEntity.getRenterOrderNo(),renterOrderEntity.getRenterMemNo());
+        return ResponseData.success(renterCostDetailDTO);
+    }
 }

@@ -1,18 +1,6 @@
 package com.atzuche.order.settle.service;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.CollectionUtils;
-
 import com.atzuche.order.accountrenterdetain.service.notservice.AccountRenterDetainDetailNoTService;
-import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostSettleDetailEntity;
 import com.atzuche.order.accountrenterwzdepost.entity.AccountRenterWzDepositCostEntity;
 import com.atzuche.order.accountrenterwzdepost.entity.AccountRenterWzDepositCostSettleDetailEntity;
 import com.atzuche.order.accountrenterwzdepost.service.notservice.AccountRenterWzDepositCostSettleDetailNoTService;
@@ -42,8 +30,17 @@ import com.autoyol.doc.util.StringUtil;
 import com.autoyol.event.rabbit.neworder.NewOrderMQActionEventEnum;
 import com.autoyol.event.rabbit.neworder.OrderWzSettlementMq;
 import com.dianping.cat.Cat;
-
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 @Service
 @Slf4j
@@ -200,8 +197,6 @@ public class OrderWzSettleNewService {
 
 				List<AccountRenterWzDepositCostSettleDetailEntity> accountRenterWzDepositCostSettleDetails = new ArrayList<AccountRenterWzDepositCostSettleDetailEntity>();
 
-				List<AccountRenterCostSettleDetailEntity> accountRenterCostSettleDetails = new ArrayList<AccountRenterCostSettleDetailEntity>();
-
 				for (int i = 0; i < renterOrderWzCostDetails.size(); i++) {
 					RenterOrderWzCostDetailEntity renterOrderWzCostDetail = renterOrderWzCostDetails.get(i);
 					AccountRenterWzDepositCostSettleDetailEntity accountRenterWzDepositCostSettleDetail = new AccountRenterWzDepositCostSettleDetailEntity();
@@ -210,35 +205,19 @@ public class OrderWzSettleNewService {
 					accountRenterWzDepositCostSettleDetail.setMemNo(String.valueOf(renterOrderWzCostDetail.getMemNo()));
 					accountRenterWzDepositCostSettleDetail.setUniqueNo(String.valueOf(renterOrderWzCostDetail.getId()));
 					accountRenterWzDepositCostSettleDetail.setPrice(renterOrderWzCostDetail.getAmount());
-					accountRenterWzDepositCostSettleDetail.setWzAmt(renterOrderWzCostDetail.getAmount());
-					accountRenterWzDepositCostSettleDetail.setUnit(1); // 默认1
+					accountRenterWzDepositCostSettleDetail.setWzAmt(NumberUtils.convertNumberToFushu(renterOrderWzCostDetail.getAmount()));
+					accountRenterWzDepositCostSettleDetail.setUnit(1);
+                    accountRenterWzDepositCostSettleDetail.setType(10);
+                    accountRenterWzDepositCostSettleDetail.setCostCode(renterOrderWzCostDetail.getCostCode());
+                    accountRenterWzDepositCostSettleDetail.setCostDetail(renterOrderWzCostDetail.getCostDesc());
 
 					accountRenterWzDepositCostSettleDetails.add(accountRenterWzDepositCostSettleDetail);
-
-					// 封装费用
-					// wzTotalCost-todo
-					AccountRenterCostSettleDetailEntity entity = new AccountRenterCostSettleDetailEntity();
-					BeanUtils.copyProperties(renterOrderWzCostDetail, entity);
-					entity.setType(10); // 代表违章
-					entity.setAmt(NumberUtils.convertNumberToFushu(renterOrderWzCostDetail.getAmount())); // 显示负数,代表的是支出
-					entity.setCostCode(renterOrderWzCostDetail.getCostCode());
-					entity.setCostDetail(renterOrderWzCostDetail.getCostDesc());
-					accountRenterCostSettleDetails.add(entity);
-
 				}
-
-				// 同时让租客费用总表里面记录。
 
 				if (accountRenterWzDepositCostSettleDetails.size() > 0) {
 					// 落库
 					cashierWzSettleService.insertAccountRenterWzDepoistCostSettleDetails(accountRenterWzDepositCostSettleDetails);
 					log.info("租客违章费用结算明细落库，orderNo=[{}]",settleOrders.getOrderNo());
-				}
-				
-				// wzTotalCost-todo
-				if (accountRenterCostSettleDetails.size() > 0) {
-					cashierWzSettleService.insertAccountRenterCostSettleDetails(accountRenterCostSettleDetails);
-					log.info("租客费用结算明细总表落库(flag默认为10)，orderNo=[{}]",settleOrders.getOrderNo());
 				}
 			}
 		}

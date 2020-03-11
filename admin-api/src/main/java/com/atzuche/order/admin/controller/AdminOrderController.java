@@ -4,10 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.atzuche.order.admin.common.AdminUserUtil;
 import com.atzuche.order.admin.service.AdminOrderService;
 import com.atzuche.order.admin.vo.req.AdminTransferCarReqVO;
-import com.atzuche.order.admin.vo.req.order.AdminModifyOrderReqVO;
-import com.atzuche.order.admin.vo.req.order.CancelOrderByPlatVO;
-import com.atzuche.order.admin.vo.req.order.CancelOrderVO;
-import com.atzuche.order.admin.vo.req.order.OrderModifyConfirmReqVO;
+import com.atzuche.order.admin.vo.req.order.*;
 import com.atzuche.order.admin.vo.resp.order.AdminModifyOrderFeeCompareVO;
 import com.atzuche.order.commons.BindingResultUtil;
 import com.atzuche.order.commons.ResponseCheckUtil;
@@ -109,6 +106,45 @@ public class AdminOrderController {
         ResponseData responseData = adminOrderService.cancelOrder(cancelOrderVO);
         return responseData;
     }
+
+
+    @AutoDocVersion(version = "订单修改")
+    @AutoDocGroup(group = "订单修改")
+    @AutoDocMethod(description = "车主同意订单", value = "车主同意订单",response = ResponseData.class)
+    @RequestMapping(value="console/order/owner/agree",method = RequestMethod.POST)
+    public ResponseData agreeOrder(@Valid @RequestBody OwnerAgreeOrRefuseOrderReqVO reqVO,
+                               BindingResult bindingResult){
+        log.info("车主同意订单-reqVo={}", JSON.toJSONString(reqVO));
+        BindingResultUtil.checkBindingResult(bindingResult);
+
+        return adminOrderService.agreeOrder(reqVO);
+    }
+
+
+    @AutoDocVersion(version = "订单修改")
+    @AutoDocGroup(group = "订单修改")
+    @AutoDocMethod(description = "车主拒绝订单", value = "车主拒绝订单",response = ResponseData.class)
+    @RequestMapping(value="console/order/owner/refuse",method = RequestMethod.POST)
+    public ResponseData refuseOrder(@Valid @RequestBody OwnerAgreeOrRefuseOrderReqVO reqVO,
+                                    BindingResult bindingResult){
+        log.info("车主拒绝订单-reqVo={}", JSON.toJSONString(reqVO));
+        BindingResultUtil.checkBindingResult(bindingResult);
+
+        return adminOrderService.refuseOrder(reqVO);
+    }
+
+
+    @AutoDocVersion(version = "订单修改")
+    @AutoDocGroup(group = "订单修改")
+    @AutoDocMethod(description = "取消订单责任判定", value = "取消订单责任判定",response = ResponseData.class)
+    @RequestMapping(value="console/order/cancel/judgeDuty",method = RequestMethod.POST)
+    public ResponseData refuseOrder(@Valid @RequestBody CancelOrderJudgeDutyReqVO reqVO,
+                                    BindingResult bindingResult){
+        log.info("取消订单责任判定-reqVo={}", JSON.toJSONString(reqVO));
+        BindingResultUtil.checkBindingResult(bindingResult);
+        return adminOrderService.cancelOrderJudgeDuty(reqVO);
+    }
+
 
     @AutoDocVersion(version = "订单修改")
     @AutoDocGroup(group = "订单修改")

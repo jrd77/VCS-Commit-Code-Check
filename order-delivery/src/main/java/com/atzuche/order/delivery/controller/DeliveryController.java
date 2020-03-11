@@ -1,11 +1,7 @@
 package com.atzuche.order.delivery.controller;
 
-import com.atzuche.order.commons.BindingResultUtil;
-import com.atzuche.order.commons.vo.req.DeliveryCarPriceReqVO;
-import com.atzuche.order.commons.vo.res.delivery.DeliveryOilCostRepVO;
 import com.atzuche.order.delivery.common.DeliveryCarTask;
 import com.atzuche.order.delivery.service.delivery.DeliveryCarInfoPriceService;
-import com.atzuche.order.delivery.vo.delivery.DeliveryOilCostVO;
 import com.atzuche.order.mq.common.base.BaseProducer;
 import com.atzuche.order.mq.common.base.OrderMessage;
 import com.atzuche.order.mq.enums.ShortMessageTypeEnum;
@@ -13,11 +9,8 @@ import com.atzuche.order.mq.util.SmsParamsMapUtil;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.event.rabbit.neworder.NewOrderMQActionEventEnum;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
