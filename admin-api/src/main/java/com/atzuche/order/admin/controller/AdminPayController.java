@@ -34,7 +34,8 @@ public class AdminPayController {
         payFeignService.virtualPay(virtualPayVO);
         return ResponseData.success();
     }
-
+    @AutoDocMethod(description = "线下支付", value = "线下支付")
+    @PostMapping("console/pay/offline")
     public ResponseData offlinePay(@Valid @RequestBody OfflinePayVO offlinePayVO, BindingResult result){
         BindingResultUtil.checkBindingResult(result);
         payFeignService.offlinePay(offlinePayVO);
