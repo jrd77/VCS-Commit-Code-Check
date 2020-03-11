@@ -72,12 +72,13 @@ public class DeliveryCarInfoPriceService {
     public Double getOilPriceByCityCodeAndType(Integer cityCode, Integer type) {
 
         List<OilAverageCostEntity> oilAverageCostEntityList = oilAverageCostConfigSDK.getConfig(DeliveryCarInfoConfigContext.builder().build());
-        OilAverageCostEntity oilAverageCostEntity = oilAverageCostEntityList.stream().filter(r -> r.getCityCode() == cityCode.intValue() && r.getEngineType() == type).findFirst().get();
+        OilAverageCostEntity oilAverageCostEntity = oilAverageCostEntityList.stream().filter(r -> r.getCityCode() == cityCode.intValue() && r.getEngineType() == type).findFirst().orElseGet(null);
         if (Objects.isNull(oilAverageCostEntity)) {
-            oilAverageCostEntity = oilAverageCostEntityList.stream().filter(r -> r.getCityCode() == 0 && r.getEngineType() == type).findFirst().get();
+            oilAverageCostEntity = oilAverageCostEntityList.stream().filter(r -> r.getCityCode() == 0 && r.getEngineType() == type).findFirst().orElseGet(null);
         }
         if (Objects.isNull(oilAverageCostEntity)) {
-            throw new DeliveryOrderException(DeliveryErrorCode.DELIVERY_PARAMS_ERROR.getValue(), "没有找到对应的城市油价");
+            log.info("没有找到对应的城市油价，油价查询为空，返回0");
+            return 0d;
         }
         int molecule = oilAverageCostEntity.getMolecule();
         int denominator = oilAverageCostEntity.getDenominator();

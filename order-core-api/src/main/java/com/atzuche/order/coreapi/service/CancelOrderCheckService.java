@@ -1,25 +1,24 @@
 package com.atzuche.order.coreapi.service;
 
 import com.atzuche.order.commons.constant.OrderConstant;
+import com.atzuche.order.commons.entity.dto.OwnerGoodsDetailDTO;
 import com.atzuche.order.commons.enums.CarOwnerTypeEnum;
 import com.atzuche.order.commons.enums.MemRoleEnum;
 import com.atzuche.order.commons.enums.OrderStatusEnum;
-import com.atzuche.order.commons.vo.req.CancelOrderReqVO;
+import com.atzuche.order.coreapi.entity.CancelOrderReqContext;
+import com.atzuche.order.coreapi.entity.dto.CancelOrderReqDTO;
 import com.atzuche.order.coreapi.submitOrder.exception.CancelOrderCheckException;
 import com.atzuche.order.coreapi.submitOrder.exception.RefuseOrderCheckException;
 import com.atzuche.order.ownercost.entity.OwnerOrderEntity;
-import com.atzuche.order.ownercost.service.OwnerOrderService;
+import com.atzuche.order.parentorder.entity.OrderCancelReasonEntity;
 import com.atzuche.order.parentorder.entity.OrderStatusEntity;
-import com.atzuche.order.parentorder.service.OrderStatusService;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
-import com.atzuche.order.renterorder.service.RenterOrderService;
 import com.autoyol.commons.web.ErrorCode;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
 import java.time.LocalDateTime;
 
 /**
@@ -34,58 +33,52 @@ public class CancelOrderCheckService {
 
     private static Logger logger = LoggerFactory.getLogger(CancelOrderCheckService.class);
 
-    @Resource
-    private RenterOrderService renterOrderService;
-
-    @Resource
-    private OwnerOrderService ownerOrderService;
-
-    @Resource
-    private OrderStatusService orderStatusService;
-
-
     /**
      * 车主/租客取消订单校验
      *
-     * @param cancelOrderReqVO 取消订单请求参数
-     * @param isConsoleInvoke  是否是管理后台请求操作:true,是 false,否
+     * @param reqContext 取消订单请求参数
      */
-    public void checkCancelOrder(CancelOrderReqVO cancelOrderReqVO, boolean isConsoleInvoke) {
-
-        RenterOrderEntity renterOrderEntity = renterOrderService.getRenterOrderByOrderNoAndIsEffective(cancelOrderReqVO.getOrderNo());
+    public void checkCancelOrder(CancelOrderReqContext reqContext) {
+        CancelOrderReqDTO cancelOrderReqDTO = reqContext.getCancelOrderReqDTO();
+        RenterOrderEntity renterOrderEntity = reqContext.getRenterOrderEntity();
         if(null == renterOrderEntity) {
-            logger.error("No valid renter order found. orderNo:[{}]", cancelOrderReqVO.getOrderNo());
+            logger.error("No valid renter order found. orderNo:[{}]", cancelOrderReqDTO.getOrderNo());
             throw new CancelOrderCheckException(ErrorCode.ORDER_NOT_EXIST);
         }
-        if(StringUtils.equals(MemRoleEnum.RENTER.getCode(), cancelOrderReqVO.getMemRole())
-                && !renterOrderEntity.getRenterMemNo().equals(cancelOrderReqVO.getMemNo())
-                && !isConsoleInvoke){
-            logger.warn("renter order and memNo 不一致,[orderNo={},memNo={}]",cancelOrderReqVO.getOrderNo(),cancelOrderReqVO.getMemNo());
+        if(StringUtils.equals(MemRoleEnum.RENTER.getCode(), cancelOrderReqDTO.getMemRole())
+                && !renterOrderEntity.getRenterMemNo().equals(cancelOrderReqDTO.getMemNo())
+                && !cancelOrderReqDTO.getConsoleInvoke()){
+            logger.error("Renter order and memNo 不一致,[orderNo={},memNo={}]",cancelOrderReqDTO.getOrderNo(),
+                    cancelOrderReqDTO.getMemNo());
             throw new CancelOrderCheckException(ErrorCode.ORDER_NOT_EXIST);
         }
 
-        OwnerOrderEntity ownerOrderEntity = ownerOrderService.getOwnerOrderByOrderNoAndIsEffective(cancelOrderReqVO.getOrderNo());
+        OwnerOrderEntity ownerOrderEntity = reqContext.getOwnerOrderEntity();
         if(null == ownerOrderEntity) {
-            logger.error("No valid owner order found. orderNo:[{}]", cancelOrderReqVO.getOrderNo());
+            logger.error("No valid owner order found. orderNo:[{}]", cancelOrderReqDTO.getOrderNo());
             throw new CancelOrderCheckException(ErrorCode.ORDER_NOT_EXIST);
         }
 
-        if(StringUtils.equals(MemRoleEnum.OWNER.getCode(), cancelOrderReqVO.getMemRole())
-                && !ownerOrderEntity.getMemNo().equals(cancelOrderReqVO.getMemNo())
-                && !isConsoleInvoke){
-            logger.warn("owner order and memNo 不一致,[orderNo={},memNo={}]",cancelOrderReqVO.getOrderNo(),cancelOrderReqVO.getMemNo());
+        if(StringUtils.equals(MemRoleEnum.OWNER.getCode(), cancelOrderReqDTO.getMemRole())
+                && !ownerOrderEntity.getMemNo().equals(cancelOrderReqDTO.getMemNo())
+                && !cancelOrderReqDTO.getConsoleInvoke()){
+            logger.error("Owner order and memNo 不一致,[orderNo={},memNo={}]",cancelOrderReqDTO.getOrderNo(),
+                    cancelOrderReqDTO.getMemNo());
             throw new CancelOrderCheckException(ErrorCode.ORDER_NOT_EXIST);
         }
 
-        OrderStatusEntity orderStatusEntity = orderStatusService.getByOrderNo(cancelOrderReqVO.getOrderNo());
+        OrderStatusEntity orderStatusEntity = reqContext.getOrderStatusEntity();
         if(null != orderStatusEntity) {
             //已结束的订单不能取消
-            if(null != orderStatusEntity.getStatus()
-                    && (OrderStatusEnum.CLOSED.getStatus() == orderStatusEntity.getStatus() || OrderStatusEnum.TO_SETTLE.getStatus() <= orderStatusEntity.getStatus() )) {
+            if(null != orderStatusEntity.getStatus() && OrderStatusEnum.CLOSED.getStatus() == orderStatusEntity.getStatus()) {
                 throw new CancelOrderCheckException(ErrorCode.TRANS_CANCEL_DUPLICATE);
             }
 
-            if(!isConsoleInvoke) {
+            if(null != orderStatusEntity.getStatus() && OrderStatusEnum.TO_SETTLE.getStatus() <= orderStatusEntity.getStatus()) {
+                throw new CancelOrderCheckException(ErrorCode.TRANS_CANCEL_DUPLICATE);
+            }
+
+            if(!cancelOrderReqDTO.getConsoleInvoke()) {
                 //进行中的订单不能取消
                 if(orderStatusEntity.getStatus() >= OrderStatusEnum.TO_RETURN_CAR.getStatus()
                         && null != orderStatusEntity.getIsDispatch()
@@ -105,21 +98,16 @@ public class CancelOrderCheckService {
 
     /**
      * 车主取消校验
-     *
-     * @param orderStatusEntity 订单状态信息
-     * @param carOwnerType 车辆类型
-     * @param isConsoleInvoke 是否是管理后台请求操作:true,是 false,否
+     * @param reqContext 取消订单请求参数
      */
-    public void checkOwnerCancelOrder(OrderStatusEntity orderStatusEntity,Integer carOwnerType,boolean isConsoleInvoke) {
-
+    public void checkOwnerCancelOrder(CancelOrderReqContext reqContext) {
+        OrderStatusEntity orderStatusEntity = reqContext.getOrderStatusEntity();
         if(null != orderStatusEntity) {
             if (null != orderStatusEntity.getStatus()) {
-
                 //待确认的订单不能车主取消
                 if(OrderStatusEnum.TO_CONFIRM.getStatus() == orderStatusEntity.getStatus()) {
                     throw new CancelOrderCheckException(ErrorCode.ORDER_STATUS_NOT_ALLOWED);
                 }
-
                 //待调度的订单不能车主取消
                 if(OrderStatusEnum.TO_DISPATCH.getStatus() == orderStatusEntity.getStatus()) {
                     throw new CancelOrderCheckException(ErrorCode.DISPATCHING_ORDER_STATUS_NOT_ALLOWED);
@@ -129,12 +117,14 @@ public class CancelOrderCheckService {
             throw new CancelOrderCheckException(ErrorCode.ORDER_NOT_EXIST);
         }
 
-        if(!isConsoleInvoke) {
-            if(null != carOwnerType) {
-                logger.error("Car owner type is :[{}]", carOwnerType);
-                if(carOwnerType == CarOwnerTypeEnum.F.getCode()) {
+        CancelOrderReqDTO orderReqDTO = reqContext.getCancelOrderReqDTO();
+        if(!orderReqDTO.getConsoleInvoke()) {
+            OwnerGoodsDetailDTO ownerGoodsDetailDTO = reqContext.getOwnerGoodsDetailDTO();
+            if(null != ownerGoodsDetailDTO.getCarOwnerType()) {
+                logger.error("Car owner type is :[{}]", ownerGoodsDetailDTO.getCarOwnerType());
+                if(ownerGoodsDetailDTO.getCarOwnerType() == CarOwnerTypeEnum.F.getCode()) {
                     throw new RefuseOrderCheckException(ErrorCode.MANAGED_CAR_CAN_NOT_OPT_TRANS);
-                } else if (carOwnerType == CarOwnerTypeEnum.G.getCode()) {
+                } else if (ownerGoodsDetailDTO.getCarOwnerType() == CarOwnerTypeEnum.G.getCode()) {
                     throw new RefuseOrderCheckException(ErrorCode.PROXY_CAR_CAN_NOT_OPT_TRANS);
                 }
             } else {
@@ -144,5 +134,30 @@ public class CancelOrderCheckService {
 
 
     }
+
+
+    public void checkOrderCancelJudgeDuty(CancelOrderReqContext reqContext) {
+        OrderStatusEntity orderStatusEntity = reqContext.getOrderStatusEntity();
+        if(null != orderStatusEntity) {
+            if (null != orderStatusEntity.getStatus()) {
+                if(orderStatusEntity.getStatus() != OrderStatusEnum.CLOSED.getStatus() && orderStatusEntity.getStatus() != OrderStatusEnum.TO_DISPATCH.getStatus() ) {
+                    throw new RefuseOrderCheckException(ErrorCode.ORDER_STATUS_NOT_ALLOWED);
+                }
+            }
+
+            if(null != orderStatusEntity.getRentCarPayStatus() && orderStatusEntity.getRentCarPayStatus() != OrderConstant.YES) {
+                throw new RefuseOrderCheckException(ErrorCode.ORDER_PAY_NOT_SUCC);
+            }
+        } else {
+            throw new RefuseOrderCheckException(ErrorCode.ORDER_NOT_EXIST);
+        }
+
+        OrderCancelReasonEntity orderCancelReasonEntity = reqContext.getOrderCancelReasonEntity();
+        if(null != orderCancelReasonEntity && null != orderCancelReasonEntity.getDutySource()) {
+            throw new RefuseOrderCheckException(ErrorCode.CANNOT_REPEAT_OPERATION);
+        }
+
+    }
+
 
 }
