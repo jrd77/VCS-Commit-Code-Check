@@ -19,7 +19,7 @@ public class RenterOrderChangeApplyStatusDTO {
      * 审核状态:0-未处理，1-已同意，2-主动拒绝,3-自动拒绝
      */
     @AutoDocProperty("审核状态:0-未处理，1-已同意，2-主动拒绝,3-自动拒绝")
-    private Integer audit_status;
+    private Integer auditStatus;
 
     @AutoDocProperty("创建时间 yyyy-Mm-dd HH:mm:ss")
     private String createTimeStr;

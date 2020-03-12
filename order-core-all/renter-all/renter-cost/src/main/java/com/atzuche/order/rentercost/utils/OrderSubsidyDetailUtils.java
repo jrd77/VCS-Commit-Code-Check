@@ -39,6 +39,44 @@ public class OrderSubsidyDetailUtils {
         }
         return total;
     }
+
+
+    /**
+     * 租客给平台的费用
+     * @param all
+     * @param subsidySourceCodeEnum
+     * @return
+     */
+    public static int getRenterSubsidyByCode(List<RenterOrderSubsidyDetailEntity> all,SubsidySourceCodeEnum subsidySourceCodeEnum,SubsidySourceCodeEnum subsidyTargetCodeEnum){
+        int total =0;
+        for(RenterOrderSubsidyDetailEntity detailEntity:all){
+            if(subsidySourceCodeEnum.getCode().equals(detailEntity.getSubsidySourceCode())
+                    && subsidyTargetCodeEnum.getCode().equals(detailEntity.getSubsidyTargetCode())
+                    &&detailEntity.getSubsidyAmount()!=null){
+                total = total+detailEntity.getSubsidyAmount();
+            }
+        }
+        return total;
+    }
+
+    /**
+     * 无条件的租客给平台的费用
+     * @param all
+     * @param subsidySourceCodeEnum
+     * @return
+     */
+    public static int getConsoleRenterSubsidyByCode(List<OrderConsoleSubsidyDetailEntity> all,SubsidySourceCodeEnum subsidySourceCodeEnum,SubsidySourceCodeEnum subsidyTargetCodeEnum){
+        int total =0;
+        for(OrderConsoleSubsidyDetailEntity detailEntity:all){
+            if(subsidySourceCodeEnum.getCode().equals(detailEntity.getSubsidySourceCode())
+                    && subsidyTargetCodeEnum.getCode().equals(detailEntity.getSubsidyTargetCode())
+                    &&detailEntity.getSubsidyAmount()!=null){
+                total = total+detailEntity.getSubsidyAmount();
+            }
+        }
+        return total;
+    }
+
     /**
      * 获得平台优惠券补贴金额
      * @param all
@@ -155,6 +193,5 @@ public class OrderSubsidyDetailUtils {
     public static List<RenterOrderSubsidyDetailEntity> getCarOwnerRenterSubsidyList(List<RenterOrderSubsidyDetailEntity> all){
         return getRenterSubsidyList(all,SubsidySourceCodeEnum.OWNER);
     }
-
 
 }

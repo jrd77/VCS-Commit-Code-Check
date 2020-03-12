@@ -46,4 +46,14 @@ public class AccountRenterWzDepositCostSettleDetailNoTService {
 		
 	}
 
+    /**
+     * 新增违章费用结算信息
+     *
+     * @param record 违章费用结算信息
+     * @return 成功记录数
+     */
+	public int insertAccountRenterWzDepositCostSettleDetail(AccountRenterWzDepositCostSettleDetailEntity record) {
+	    return accountRenterWzDepositCostSettleDetailMapper.insertSelective(record);
+    }
+
 }

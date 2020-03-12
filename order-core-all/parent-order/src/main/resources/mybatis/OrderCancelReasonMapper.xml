@@ -6,12 +6,14 @@
     <resultMap type="com.atzuche.order.parentorder.entity.OrderCancelReasonEntity" id="BaseResultMap">
         <result property="id" column="id"/>
         <result property="orderNo" column="order_no"/>
-        <result property="subOrderNo" column="sub_order_no"/>
+        <result property="renterOrderNo" column="renter_order_no"/>
+        <result property="ownerOrderNo" column="owner_order_no"/>
         <result property="operateType" column="operate_type"/>
         <result property="cancelSource" column="cancel_source"/>
         <result property="dutySource" column="duty_source"/>
         <result property="cancelReason" column="cancel_reason"/>
 		<result property="appealFlag" column="appeal_flag"/>
+        <result property="cancelReqTime" column="cancel_req_time"/>
         <result property="createTime" column="create_time"/>
         <result property="createOp" column="create_op"/>
         <result property="updateTime" column="update_time"/>
@@ -23,12 +25,14 @@
 	<sql id="Base_Column_List">
         `id`,
         `order_no`,
-        `sub_order_no`,
+        `renter_order_no`,
+        `owner_order_no`,
         `operate_type`,
         `cancel_source`,
         `duty_source`,
         `cancel_reason`,
         `appeal_flag`,
+        `cancel_req_time`,
         `create_time`,
         `create_op`,
         `update_time`,
@@ -43,34 +47,40 @@
 
 	<insert id="insert" parameterType="com.atzuche.order.parentorder.entity.OrderCancelReasonEntity" useGeneratedKeys="true" keyProperty="id">
 		insert into order_cancel_reason (
-				`order_no`,
-				`sub_order_no`,
-				`operate_type`,
-				`cancel_source`,		
-				`duty_source`,		
-				`cancel_reason`,
-				`appeal_flag`
+            `order_no`,
+            `renter_order_no`,
+            `owner_order_no`,
+            `operate_type`,
+            `cancel_source`,
+            `duty_source`,
+            `cancel_reason`,
+            `appeal_flag`,
+            `cancel_req_time`
         ) values (
-				#{orderNo},
-                #{subOrderNo},
-				#{operateType},
-				#{cancelSource}, 		
-				#{dutySource}, 		
-				#{cancelReason},
-				#{appealFlag}
-			)
+            #{orderNo},
+            #{renterOrderNo},
+            #{ownerOrderNo},
+            #{operateType},
+            #{cancelSource},
+            #{dutySource},
+            #{cancelReason},
+            #{appealFlag},
+            #{cancelReqTime}
+        )
 	</insert>
 	
 	<insert id="insertSelective" parameterType="com.atzuche.order.parentorder.entity.OrderCancelReasonEntity" useGeneratedKeys="true" keyProperty="id">
 		insert into order_cancel_reason
             <trim prefix="(" suffix=")" suffixOverrides="," >
 				<if test="orderNo != null">`order_no`, </if>
-                <if test="subOrderNo != null">`sub_order_no`, </if>
+                <if test="renterOrderNo != null">`renter_order_no`, </if>
+                <if test="ownerOrderNo != null">`owner_order_no`, </if>
                 <if test="operateType != null">`operate_type`, </if>
 				<if test="cancelSource != null">`cancel_source`, </if>
 				<if test="dutySource != null">`duty_source`, </if>
 				<if test="cancelReason != null">`cancel_reason`, </if>
 				<if test="appealFlag != null">`appeal_flag`, </if>
+                <if test="cancelReqTime != null">`cancel_req_time`, </if>
 				<if test="createTime != null">`create_time`, </if>
 				<if test="createOp != null">`create_op`, </if>
 				<if test="updateTime != null">`update_time`, </if>
@@ -79,12 +89,14 @@
 	        </trim>
             <trim prefix="values (" suffix=")" suffixOverrides="," >
 				<if test="orderNo != null">#{orderNo},  </if>
-				<if test="subOrderNo != null">#{subOrderNo},  </if>
+                <if test="renterOrderNo != null">#{renterOrderNo}, </if>
+                <if test="ownerOrderNo != null">#{ownerOrderNo}, </if>
                 <if test="operateType != null">#{operateType}, </if>
                 <if test="cancelSource != null">#{cancelSource},  </if>
 				<if test="dutySource != null">#{dutySource},  </if>
 				<if test="cancelReason != null">#{cancelReason},  </if>
 				<if test="appealFlag != null">#{appealFlag}, </if>
+                <if test="cancelReqTime != null">#{cancelReqTime}, </if>
 				<if test="createTime != null">#{createTime},  </if>
 				<if test="createOp != null">#{createOp},  </if>
 				<if test="updateTime != null">#{updateTime},  </if>
@@ -98,12 +110,14 @@
 		update order_cancel_reason 
 		    <set>
 				<if test="orderNo != null">`order_no` = #{orderNo}, </if>
-				<if test="subOrderNo != null">`sub_order_no` = #{subOrderNo}, </if>
+				<if test="renterOrderNo != null">`renter_order_no` = #{renterOrderNo}, </if>
+                <if test="ownerOrderNo != null">`owner_order_no` = #{ownerOrderNo}, </if>
                 <if test="operateType != null">`operate_type` = #{operateType}, </if>
 				<if test="cancelSource != null">`cancel_source` = #{cancelSource}, </if>
 				<if test="dutySource != null">`duty_source` = #{dutySource}, </if>
 				<if test="cancelReason != null">`cancel_reason` = #{cancelReason}, </if>
 				<if test="appealFlag != null">`appeal_flag` = #{appealFlag}, </if>
+                <if test="cancelReqTime != null">`cancel_req_time` = #{cancelReqTime}, </if>
 				<if test="createTime != null">`create_time` = #{createTime}, </if>
 				<if test="createOp != null">`create_op` = #{createOp}, </if>
 				<if test="updateTime != null">`update_time` = #{updateTime}, </if>
@@ -117,13 +131,15 @@
 		update order_cancel_reason 
 		    <set>
 				`order_no` = #{orderNo},
-				`sub_order_no` = #{subOrderNo},
+				`renter_order_no` = #{renterOrderNo},
+                `owner_order_no` = #{ownerOrderNo},
                 `operate_type` = #{operateType},
                 `cancel_source` = #{cancelSource},
 				`duty_source` = #{dutySource}, 		
 				`cancel_reason` = #{cancelReason},
-				`appeal_flag` = #{appealFlag}
-		    </set>
+				`appeal_flag` = #{appealFlag},
+                `cancel_req_time` = #{cancelReqTime}
+            </set>
 		where id = #{id}
 	</update>
 
@@ -134,7 +150,7 @@
         from order_cancel_reason
         where order_no=#{orderNo}
         and is_delete = 0
-        limit 1
+        order by id desc limit 1
     </select>
 
 </mapper>

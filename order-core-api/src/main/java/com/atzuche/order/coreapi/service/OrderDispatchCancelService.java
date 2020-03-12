@@ -47,18 +47,13 @@ public class OrderDispatchCancelService {
         CancelOrderResDTO cancelOrderRes = orderDispatchCancelHandleService.cancelDispatch(orderNo);
         //优惠券
         if (null != cancelOrderRes) {
-            if (null != cancelOrderRes.getIsReturnDisCoupon() && cancelOrderRes.getIsReturnDisCoupon()) {
+            if (null != cancelOrderRes.getIsDispatch() && !cancelOrderRes.getIsDispatch()) {
                 //退还优惠券(平台券+送取服务券)
                 couponAndCoinHandleService.undoPlatformCoupon(orderNo);
                 couponAndCoinHandleService.undoGetCarFeeCoupon(orderNo);
-            }
-
-            if (null != cancelOrderRes.getIsReturnOwnerCoupon() && cancelOrderRes.getIsReturnOwnerCoupon()) {
                 //退还车主券
                 String recover = null == cancelOrderRes.getRentCarPayStatus() || cancelOrderRes.getRentCarPayStatus() == 0 ? "1" : "0";
                 couponAndCoinHandleService.undoOwnerCoupon(orderNo, cancelOrderRes.getOwnerCouponNo(), recover);
-            }
-            if (null != cancelOrderRes.getIsRefund() && cancelOrderRes.getIsRefund()) {
                 //通知收银台退款以及退还凹凸币和钱包
                 orderSettleService.settleOrderCancel(orderNo);
 

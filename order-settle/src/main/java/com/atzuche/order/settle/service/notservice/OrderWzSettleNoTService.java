@@ -3,6 +3,7 @@ package com.atzuche.order.settle.service.notservice;
 import java.util.List;
 import java.util.Objects;
 
+import com.atzuche.order.accountrenterwzdepost.entity.AccountRenterWzDepositCostSettleDetailEntity;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -43,20 +44,19 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @Slf4j
 public class OrderWzSettleNoTService {
-
-    //更新订单状态和订单流转
-    @Autowired 
+    @Autowired
     private OrderStatusService orderStatusService;
     @Autowired
     private OrderFlowService orderFlowService;
-
-    @Autowired 
+    @Autowired
     private CashierWzSettleService cashierWzSettleService;
-
     @Autowired
     RenterOrderWzCostDetailService renterOrderWzCostDetailService;
     @Autowired 
     CashierNoTService cashierNoTService;
+
+
+
     
     /**
      * 查询租客费用明细
@@ -140,18 +140,18 @@ public class OrderWzSettleNoTService {
             }
             
             
-          //wzTotalCost-todo
+            //wzTotalCost-todo
             //account_renter_wz_deposit_cost_settle_detail  违章费用结算明细表 跟租车的有些区别。不记录。  都往费用表里面记录！！
             // 2记录退还 租车押金 结算费用明细
-            AccountRenterCostSettleDetailEntity entity = new AccountRenterCostSettleDetailEntity();
+            AccountRenterWzDepositCostSettleDetailEntity entity = new AccountRenterWzDepositCostSettleDetailEntity();
             BeanUtils.copyProperties(settleOrdersAccount,entity);
             entity.setMemNo(settleOrdersAccount.getRenterMemNo());
-            entity.setAmt(-settleOrdersAccount.getDepositSurplusAmt());
+            entity.setWzAmt(-settleOrdersAccount.getDepositSurplusAmt());
             entity.setCostCode(RenterCashCodeEnum.SETTLE_WZ_DEPOSIT_TO_RETURN_AMT.getCashNo());
             entity.setCostDetail(RenterCashCodeEnum.SETTLE_WZ_DEPOSIT_TO_RETURN_AMT.getTxt());
             entity.setUniqueNo(String.valueOf(id));
             entity.setType(10);
-            cashierWzSettleService.insertAccountRenterCostSettleDetail(entity);
+            cashierWzSettleService.insertAccountRenterWzDepositCostSettleDetail(entity);
             log.info("(记录租客费用总账明细)新增租客COST明细表(退款费用)，accountRenterCostSettleDetailEntity params=[{}]",GsonUtils.toJson(entity));
             
             orderStatusDTO.setWzRefundStatus(OrderRefundStatusEnum.REFUNDING.getStatus());
@@ -205,15 +205,16 @@ public class OrderWzSettleNoTService {
             
             //wzTotalCost-todo
             //2.2记录结算费用状态,    暂时都往租客费用总表里面记录吧
-            AccountRenterCostSettleDetailEntity entity = new AccountRenterCostSettleDetailEntity();
+            AccountRenterWzDepositCostSettleDetailEntity entity = new AccountRenterWzDepositCostSettleDetailEntity();
             BeanUtils.copyProperties(settleOrders,entity);
             entity.setMemNo(settleOrders.getRenterMemNo());
-            entity.setAmt(-amt);
+            entity.setWzAmt(-amt);
             entity.setCostCode(RenterCashCodeEnum.HISTORY_AMT.getCashNo());
             entity.setCostDetail(RenterCashCodeEnum.HISTORY_AMT.getTxt());
             entity.setUniqueNo(String.valueOf(debtDetailId));
             entity.setType(10);
-            cashierWzSettleService.insertAccountRenterCostSettleDetail(entity);
+
+            cashierWzSettleService.insertAccountRenterWzDepositCostSettleDetail(entity);
             log.info("(记录租客费用总账明细)新增租客COST明细表(产生欠款)，accountRenterCostSettleDetailEntity params=[{}]",GsonUtils.toJson(entity));
             
             // 实付费用加上 历史欠款转移部分，存在欠款 1走历史欠款，2当前订单 账户拉平

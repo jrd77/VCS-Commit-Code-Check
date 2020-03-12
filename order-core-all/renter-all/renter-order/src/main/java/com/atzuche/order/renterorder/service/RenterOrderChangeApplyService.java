@@ -87,7 +87,14 @@ public class RenterOrderChangeApplyService{
      * 更具订单号和审核状态查询
      * @return
      */
-    public RenterOrderChangeApplyEntity getByOwnerOrderNoAndAuditStatus(String ownerOrderNo,int auditStatus){
-        return renterOrderChangeApplyMapper.getByOwnerOrderNoAndAuditStatus(ownerOrderNo,auditStatus);
+    public List<RenterOrderChangeApplyEntity> getByOrderNo(String ownerOrderNo){
+        return renterOrderChangeApplyMapper.getByOrderNo(ownerOrderNo);
+    }
+    /**
+     * 更具订单号查询最大一条
+     * @return
+     */
+    public RenterOrderChangeApplyEntity getByOrderNoLimit(String orderNo){
+        return renterOrderChangeApplyMapper.getByOrderNoLimit(orderNo);
     }
 }

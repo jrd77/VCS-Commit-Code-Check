@@ -1,14 +1,5 @@
 package com.atzuche.order.settle.service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
-
 import com.alibaba.fastjson.JSON;
 import com.atzuche.order.accountownercost.entity.AccountOwnerCostSettleDetailEntity;
 import com.atzuche.order.accountplatorm.entity.AccountPlatformProfitDetailEntity;
@@ -34,13 +25,16 @@ import com.atzuche.order.settle.service.notservice.AccountDebtDetailNoTService;
 import com.atzuche.order.settle.service.notservice.AccountDebtNoTService;
 import com.atzuche.order.settle.service.notservice.OrderSettleNoTService;
 import com.atzuche.order.settle.service.notservice.OrderSettleProxyService;
-import com.atzuche.order.settle.vo.req.AccountInsertDebtReqVO;
-import com.atzuche.order.settle.vo.req.OwnerCosts;
-import com.atzuche.order.settle.vo.req.SettleCancelOrdersAccount;
-import com.atzuche.order.settle.vo.req.SettleOrders;
-import com.atzuche.order.settle.vo.req.SettleOrdersAccount;
-
+import com.atzuche.order.settle.vo.req.*;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 /*
  * @Author ZhangBin
@@ -279,7 +273,7 @@ public class OwnerOrderSettleService {
             accountInsertDebt.setMemNo(settleOrders.getOwnerMemNo());
             accountInsertDebt.setSourceCode(RenterCashCodeEnum.HISTORY_AMT.getCashNo());
             accountInsertDebt.setSourceDetail(RenterCashCodeEnum.HISTORY_AMT.getTxt());
-            accountInsertDebt.setAmt(settleCancelOrdersAccount.getOwnerFineAmt());
+            accountInsertDebt.setAmt(settleCancelOrdersAccount.getOwnerFineTotal());
             /*
                有历史欠款就更新欠款总金额，没有历史欠款就新增历史欠款  insert/update  account_debt
                添加历史欠款明细记录 insert  account_debt_detail

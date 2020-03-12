@@ -20,6 +20,9 @@ public class RefuseOrderReqVO extends BaseVO {
     @AutoDocProperty(value = "操作人")
     private String operatorName;
 
+    @AutoDocProperty(value = "管理后台请求特殊标识:0,否 1,是")
+    private Integer isConsoleInvoke;
+
     public String getOrderNo() {
         return orderNo;
     }
@@ -34,5 +37,13 @@ public class RefuseOrderReqVO extends BaseVO {
 
     public void setOperatorName(String operatorName) {
         this.operatorName = operatorName;
+    }
+
+    public Integer getIsConsoleInvoke() {
+        return isConsoleInvoke;
+    }
+
+    public void setIsConsoleInvoke(Integer isConsoleInvoke) {
+        this.isConsoleInvoke = isConsoleInvoke;
     }
 }

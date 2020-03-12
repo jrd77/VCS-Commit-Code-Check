@@ -3,63 +3,25 @@
  */
 package com.atzuche.order.admin.service;
 
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
-
-import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
+import com.alibaba.fastjson.JSON;
 import com.atzuche.order.admin.common.AdminUserUtil;
-import com.atzuche.order.admin.vo.req.cost.AdditionalDriverInsuranceIdsReqVO;
-import com.atzuche.order.admin.vo.req.cost.OwnerToPlatformCostReqVO;
-import com.atzuche.order.admin.vo.req.cost.OwnerToRenterSubsidyReqVO;
-import com.atzuche.order.admin.vo.req.cost.PlatformToOwnerSubsidyReqVO;
-import com.atzuche.order.admin.vo.req.cost.PlatformToRenterSubsidyReqVO;
-import com.atzuche.order.admin.vo.req.cost.RenterAdjustCostReqVO;
-import com.atzuche.order.admin.vo.req.cost.RenterCostReqVO;
-import com.atzuche.order.admin.vo.req.cost.RenterFineCostReqVO;
-import com.atzuche.order.admin.vo.req.cost.RenterToPlatformCostReqVO;
+import com.atzuche.order.admin.exception.RenterCostFailException;
+import com.atzuche.order.admin.vo.req.cost.*;
 import com.atzuche.order.admin.vo.resp.cost.AdditionalDriverInsuranceVO;
 import com.atzuche.order.admin.vo.resp.income.RenterToPlatformVO;
-import com.atzuche.order.admin.vo.resp.order.cost.detail.OrderRenterFineAmtDetailResVO;
-import com.atzuche.order.admin.vo.resp.order.cost.detail.PlatformToRenterSubsidyResVO;
-import com.atzuche.order.admin.vo.resp.order.cost.detail.ReductionDetailResVO;
-import com.atzuche.order.admin.vo.resp.order.cost.detail.ReductionTaskResVO;
-import com.atzuche.order.admin.vo.resp.order.cost.detail.RenterPriceAdjustmentResVO;
-import com.atzuche.order.commons.CostStatUtils;
-import com.atzuche.order.commons.GlobalConstant;
-import com.atzuche.order.commons.LocalDateTimeUtils;
-import com.atzuche.order.commons.NumberUtils;
-import com.atzuche.order.commons.entity.dto.CommUseDriverInfoDTO;
-import com.atzuche.order.commons.entity.dto.CommUseDriverInfoSimpleDTO;
-import com.atzuche.order.commons.entity.dto.CommUseDriverInfoStringDateDTO;
-import com.atzuche.order.commons.entity.dto.CostBaseDTO;
-import com.atzuche.order.commons.entity.dto.ExtraDriverDTO;
-import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
-import com.atzuche.order.commons.entity.dto.RenterGoodsPriceDetailDTO;
-import com.atzuche.order.commons.entity.dto.RenterMemberDTO;
-import com.atzuche.order.commons.entity.dto.RenterMemberRightDTO;
+import com.atzuche.order.admin.vo.resp.order.cost.detail.*;
+import com.atzuche.order.commons.*;
+import com.atzuche.order.commons.entity.dto.*;
 import com.atzuche.order.commons.entity.orderDetailDto.OrderConsoleCostDetailDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.OrderDTO;
 import com.atzuche.order.commons.entity.ownerOrderDetail.RenterRentDetailDTO;
-import com.atzuche.order.commons.enums.FineSubsidyCodeEnum;
-import com.atzuche.order.commons.enums.FineSubsidySourceCodeEnum;
-import com.atzuche.order.commons.enums.FineTypeEnum;
-import com.atzuche.order.commons.enums.RightTypeEnum;
-import com.atzuche.order.commons.enums.SubsidySourceCodeEnum;
-import com.atzuche.order.commons.enums.SubsidyTypeCodeEnum;
+import com.atzuche.order.commons.entity.rentCost.RenterCostDetailDTO;
+import com.atzuche.order.commons.enums.*;
 import com.atzuche.order.commons.enums.cashcode.ConsoleCashCodeEnum;
 import com.atzuche.order.commons.enums.cashcode.OwnerCashCodeEnum;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.mem.MemProxyService;
+import com.atzuche.order.open.service.FeignOrderCostService;
 import com.atzuche.order.ownercost.entity.ConsoleOwnerOrderFineDeatailEntity;
 import com.atzuche.order.ownercost.entity.OwnerOrderEntity;
 import com.atzuche.order.ownercost.entity.OwnerOrderSubsidyDetailEntity;
@@ -69,20 +31,8 @@ import com.atzuche.order.ownercost.service.OwnerOrderSubsidyDetailService;
 import com.atzuche.order.parentorder.entity.OrderEntity;
 import com.atzuche.order.parentorder.service.OrderService;
 import com.atzuche.order.rentercommodity.service.RenterGoodsService;
-import com.atzuche.order.rentercost.entity.ConsoleRenterOrderFineDeatailEntity;
-import com.atzuche.order.rentercost.entity.OrderConsoleCostDetailEntity;
-import com.atzuche.order.rentercost.entity.OrderConsoleSubsidyDetailEntity;
-import com.atzuche.order.rentercost.entity.RenterOrderCostDetailEntity;
-import com.atzuche.order.rentercost.entity.RenterOrderFineDeatailEntity;
-import com.atzuche.order.rentercost.entity.RenterOrderSubsidyDetailEntity;
-import com.atzuche.order.rentercost.service.ConsoleRenterOrderFineDeatailService;
-import com.atzuche.order.rentercost.service.OrderConsoleCostDetailService;
-import com.atzuche.order.rentercost.service.OrderConsoleSubsidyDetailService;
-import com.atzuche.order.rentercost.service.RenterOrderCostCombineService;
-import com.atzuche.order.rentercost.service.RenterOrderCostDetailService;
-import com.atzuche.order.rentercost.service.RenterOrderCostService;
-import com.atzuche.order.rentercost.service.RenterOrderFineDeatailService;
-import com.atzuche.order.rentercost.service.RenterOrderSubsidyDetailService;
+import com.atzuche.order.rentercost.entity.*;
+import com.atzuche.order.rentercost.service.*;
 import com.atzuche.order.rentermem.service.RenterMemberService;
 import com.atzuche.order.renterorder.entity.RenterDepositDetailEntity;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
@@ -90,11 +40,30 @@ import com.atzuche.order.renterorder.service.RenterAdditionalDriverService;
 import com.atzuche.order.renterorder.service.RenterDepositDetailService;
 import com.atzuche.order.renterorder.service.RenterOrderService;
 import com.atzuche.order.settle.service.OrderSettleService;
+import com.autoyol.commons.web.ErrorCode;
+import com.autoyol.commons.web.ResponseData;
+import com.dianping.cat.Cat;
+import com.dianping.cat.message.Transaction;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * @author jing.huang
  *
  */
+@Slf4j
 @Service
 public class OrderCostDetailService {
 	protected final Logger logger = LoggerFactory.getLogger(getClass());
@@ -137,6 +106,8 @@ public class OrderCostDetailService {
     ConsoleOwnerOrderFineDeatailService consoleOwnerOrderFineDeatailService;
     @Autowired
     RenterOrderCostService renterOrderCostService;
+    @Autowired
+    FeignOrderCostService feignOrderCostService;
     
 	public ReductionDetailResVO findReductionDetailsListByOrderNo(RenterCostReqVO renterCostReqVO) throws Exception {
 		ReductionDetailResVO resVo = new ReductionDetailResVO();
@@ -1543,4 +1514,28 @@ public class OrderCostDetailService {
 		}
 	}
 
+    public RenterCostDetailDTO renterOrderCostDetail(String orderNo) {
+        Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "获取租客费用详情");
+        ResponseData<RenterCostDetailDTO> responseData = null;
+        try{
+            Cat.logEvent(CatConstants.FEIGN_METHOD,"feignOrderUpdateService.cancelOrder");
+            log.info("Feign 开始获取获取租客费用详情,orderNo={}", orderNo);
+            Cat.logEvent(CatConstants.FEIGN_PARAM,orderNo);
+            responseData = feignOrderCostService.renterCostDetail(orderNo);
+            Cat.logEvent(CatConstants.FEIGN_RESULT,orderNo);
+            if(responseData ==null || !ErrorCode.SUCCESS.getCode().equals(responseData.getResCode())){
+                log.error("获取获取租客费用详情失败responseObject={},orderNo={}",JSON.toJSONString(responseData),orderNo);
+                throw new RenterCostFailException();
+            }
+            t.setStatus(Transaction.SUCCESS);
+            return responseData.getData();
+        }catch (Exception e){
+            log.error("Feign 获取租客费用详情,responseObject={},orderNo={}", JSON.toJSONString(responseData),orderNo,e);
+            Cat.logError("Feign 获取租客费用详情",e);
+            t.setStatus(e);
+            throw e;
+        }finally {
+            t.complete();
+        }
+    }
 }
