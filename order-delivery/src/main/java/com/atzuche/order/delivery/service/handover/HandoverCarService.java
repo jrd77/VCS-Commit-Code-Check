@@ -15,6 +15,7 @@ import com.atzuche.order.delivery.mapper.*;
 import com.atzuche.order.delivery.utils.CommonUtil;
 import com.atzuche.order.delivery.vo.handover.*;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -88,7 +89,9 @@ public class HandoverCarService {
         List<RenterHandoverCarInfoEntity> renterHandoverCarInfoEntities = renterHandoverCarService.selectRenterHandoverCarByOrderNo(handoverCarReqVO.getRenterOrderNo());
         List<OwnerHandoverCarInfoEntity> ownerHandoverCarInfoEntities = ownerHandoverCarService.selectOwnerHandoverCarByOrderNo(handoverCarReqVO.getOwnerOrderNo());
         HandoverCarRepVO handoverCarRepVO = new HandoverCarRepVO();
-        handoverCarRepVO.setOwnerHandoverCarInfoEntities(ownerHandoverCarInfoEntities);
+        if (CollectionUtils.isNotEmpty(ownerHandoverCarInfoEntities)) {
+            handoverCarRepVO.setOwnerHandoverCarInfoEntities(ownerHandoverCarInfoEntities);
+        }
         handoverCarRepVO.setRenterHandoverCarInfoEntities(renterHandoverCarInfoEntities);
         return handoverCarRepVO;
     }

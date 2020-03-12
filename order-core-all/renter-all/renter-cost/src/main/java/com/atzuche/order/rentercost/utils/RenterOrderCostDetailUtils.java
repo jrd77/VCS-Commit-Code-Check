@@ -117,6 +117,13 @@ public class RenterOrderCostDetailUtils {
         return getAmt(costDetailEntityList,RenterCashCodeEnum.RETURN_BLOCKED_RAISE_AMT);
     }
 
-
-
+    /**
+     * 获取配送费用
+     * @param costDetailEntityList
+     * @return
+     */
+    public static int getDistributionCost(List<RenterOrderCostDetailEntity> costDetailEntityList){
+        return getReturnBlockedRaiseAmt(costDetailEntityList) + getGetBlockedRaiseAmt(costDetailEntityList)
+                + getSrvReturnCostAmt(costDetailEntityList) + getSrvGetCostAmt(costDetailEntityList);
+    }
 }

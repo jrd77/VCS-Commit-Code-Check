@@ -204,6 +204,10 @@ public class RenterOrderSettleService {
 
         //2 租客收益与罚金对冲值
         int rentFineTotal = settleCancelOrdersAccount.getRentFineTotal();
+        //收益进入钱包
+        if(rentFineTotal > 0){
+            settleCancelOrdersAccount.setRentSurplusWalletAmt(settleCancelOrdersAccount.getRentSurplusWalletAmt() + rentFineTotal);
+        }
         //2.1 钱包抵罚金
         if(renWalletAmt>0 && rentFineTotal<0){
             AccountRenterCostToFineReqVO vo = new AccountRenterCostToFineReqVO();
@@ -277,5 +281,7 @@ public class RenterOrderSettleService {
             //历史欠款 有就跟心欠款总额，没有就插入历史欠款。都需要添加欠款流水记录
             cashierService.createDebt(accountInsertDebt);
         }
+
+
     }
 }

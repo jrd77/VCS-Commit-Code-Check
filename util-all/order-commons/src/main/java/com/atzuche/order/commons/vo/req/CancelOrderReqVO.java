@@ -23,7 +23,8 @@ public class CancelOrderReqVO extends BaseVO implements Serializable {
     @NotBlank(message = "使用角色不能为空")
     private String memRole;
 
-    @AutoDocProperty(value = "取消原因")
+    @AutoDocProperty(value = "取消原因", required = true)
+    @NotBlank(message = "取消原因不能为空")
     private String cancelReason;
 
     @AutoDocProperty(value = "操作人")

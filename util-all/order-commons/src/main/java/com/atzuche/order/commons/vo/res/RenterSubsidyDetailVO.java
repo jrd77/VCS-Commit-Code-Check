@@ -53,6 +53,8 @@ public class RenterSubsidyDetailVO {
     private Integer trafficSubsidyAmt;
     @AutoDocProperty(value = "补贴总额")
     private Integer totalSubsidy;
+    @AutoDocProperty(value = "租客给平台的费用")
+    private Integer renter2PlatformAmt;
 
     public Integer getTotalSubsidy(){
         int total=0;

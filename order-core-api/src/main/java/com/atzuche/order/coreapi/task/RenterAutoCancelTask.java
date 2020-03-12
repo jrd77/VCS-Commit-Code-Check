@@ -1,6 +1,7 @@
 package com.atzuche.order.coreapi.task;
 
 import com.atzuche.order.commons.CatConstants;
+import com.atzuche.order.commons.constant.OrderConstant;
 import com.atzuche.order.commons.vo.req.CancelOrderReqVO;
 import com.atzuche.order.commons.vo.req.RefuseOrderReqVO;
 import com.atzuche.order.coreapi.listener.push.OrderSendMessageFactory;
@@ -72,7 +73,7 @@ public class RenterAutoCancelTask extends IJobHandler {
                     req.setOrderNo(orderNo);
                     req.setCancelReason("下单后1小时，租客未支付租车费用,自动取消");
                     req.setMemRole("2");
-                    req.setOperatorName("system");
+                    req.setOperatorName(OrderConstant.SYSTEM_OPERATOR_JOB);
                     try {
                         logger.info("执行 下单后1小时，租客未支付租车费用,自动取消 orderNo:[{}]",orderNo);
                         cancelOrderService.cancel(req);

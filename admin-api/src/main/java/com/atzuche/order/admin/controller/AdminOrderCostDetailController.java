@@ -3,29 +3,8 @@
  */
 package com.atzuche.order.admin.controller;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
 import com.atzuche.order.admin.service.OrderCostDetailService;
-import com.atzuche.order.admin.vo.req.cost.AdditionalDriverInsuranceIdsReqVO;
-import com.atzuche.order.admin.vo.req.cost.OwnerToPlatformCostReqVO;
-import com.atzuche.order.admin.vo.req.cost.OwnerToRenterSubsidyReqVO;
-import com.atzuche.order.admin.vo.req.cost.PlatformToOwnerSubsidyReqVO;
-import com.atzuche.order.admin.vo.req.cost.PlatformToRenterSubsidyReqVO;
-import com.atzuche.order.admin.vo.req.cost.RenterAdjustCostReqVO;
-import com.atzuche.order.admin.vo.req.cost.RenterCostReqVO;
-import com.atzuche.order.admin.vo.req.cost.RenterFineCostReqVO;
-import com.atzuche.order.admin.vo.req.cost.RenterToPlatformCostReqVO;
+import com.atzuche.order.admin.vo.req.cost.*;
 import com.atzuche.order.admin.vo.resp.cost.AdditionalDriverInsuranceVO;
 import com.atzuche.order.admin.vo.resp.income.RenterToPlatformVO;
 import com.atzuche.order.admin.vo.resp.order.cost.detail.OrderRenterFineAmtDetailResVO;
@@ -33,11 +12,21 @@ import com.atzuche.order.admin.vo.resp.order.cost.detail.PlatformToRenterSubsidy
 import com.atzuche.order.admin.vo.resp.order.cost.detail.ReductionDetailResVO;
 import com.atzuche.order.admin.vo.resp.order.cost.detail.RenterPriceAdjustmentResVO;
 import com.atzuche.order.commons.entity.ownerOrderDetail.RenterRentDetailDTO;
+import com.atzuche.order.commons.entity.rentCost.RenterCostDetailDTO;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.doc.annotation.AutoDocMethod;
 import com.autoyol.doc.annotation.AutoDocVersion;
 import com.dianping.cat.Cat;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * @author jing.huang
@@ -408,7 +397,19 @@ public class AdminOrderCostDetailController {
 			return ResponseData.error();
 		}
     }
-    
-    
-    
+
+
+    @AutoDocMethod(description = "租客费用详情-弹窗", value = "租客费用详情-弹窗",response = RenterCostDetailDTO.class)
+    @GetMapping("/renterOrderCostDetail")
+    public ResponseData<RenterCostDetailDTO> renterOrderCostDetail(@RequestParam("orderNo") String orderNo) {
+        logger.info("renterOrderCostDetail controller orderNo={}",orderNo);
+        try {
+            RenterCostDetailDTO renterCostDetailDTO = orderCostDetailService.renterOrderCostDetail(orderNo);
+            return ResponseData.success(renterCostDetailDTO);
+        } catch (Exception e) {
+            Cat.logError("renterOrderCostDetail exception orderNo="+orderNo,e);
+            logger.error("renterOrderCostDetail exception orderNo="+orderNo,e);
+            return ResponseData.error();
+        }
+    }
 }

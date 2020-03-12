@@ -97,11 +97,9 @@ public class PlatformCancelOrderHandleService {
         orderStatusDTO.setOrderNo(orderNo);
 
         CancelOrderResDTO cancelOrderResDTO = new CancelOrderResDTO();
+        cancelOrderResDTO.setIsDispatch(isDispatch);
         if(isDispatch) {
             //进调度
-            cancelOrderResDTO.setIsReturnDisCoupon(false);
-            cancelOrderResDTO.setIsReturnOwnerCoupon(false);
-            cancelOrderResDTO.setIsRefund(false);
 
             //订单状态更新
             orderStatusDTO.setStatus(OrderStatusEnum.TO_DISPATCH.getStatus());
@@ -109,10 +107,7 @@ public class PlatformCancelOrderHandleService {
             orderStatusDTO.setDispatchStatus(DispatcherStatusEnum.DISPATCH_ING.getCode());
         } else {
             //不进调度
-            cancelOrderResDTO.setIsReturnDisCoupon(true);
-            cancelOrderResDTO.setIsReturnOwnerCoupon(true);
             cancelOrderResDTO.setOwnerCouponNo(null == ownerCouponEntity ? null : ownerCouponEntity.getCouponId());
-            cancelOrderResDTO.setIsRefund(true);
             cancelOrderResDTO.setRenterOrderNo(renterOrderEntity.getRenterOrderNo());
             cancelOrderResDTO.setSrvGetFlag(null != renterOrderEntity.getIsGetCar() && renterOrderEntity.getIsGetCar() == 1);
             cancelOrderResDTO.setSrvReturnFlag(null != renterOrderEntity.getIsReturnCar() && renterOrderEntity.getIsReturnCar() == 1);
@@ -134,6 +129,7 @@ public class PlatformCancelOrderHandleService {
         cancelOrderResDTO.setCarNo(goodsDetail.getCarNo());
         cancelOrderResDTO.setRentCarPayStatus(orderStatusEntity.getRentCarPayStatus());
         cancelOrderResDTO.setStatus(orderStatusDTO.getStatus());
+
         return cancelOrderResDTO;
     }
 

@@ -10,7 +10,6 @@ import com.atzuche.order.ownercost.entity.dto.OwnerOrderCostReqDTO;
 import com.atzuche.order.ownercost.entity.dto.OwnerOrderReqDTO;
 import com.atzuche.order.ownercost.mapper.OwnerOrderMapper;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -151,5 +150,9 @@ public class OwnerOrderService {
 
     public OwnerOrderEntity getOwnerByMemNoAndOrderNo(String orderNo, String ownerMemNo) {
         return ownerOrderMapper.getOwnerByMemNoAndOrderNo(orderNo, ownerMemNo);
+    }
+
+    public int updateByMemeNo(String ownerMem) {
+        return ownerOrderMapper.updateByMemeNo(ownerMem);
     }
 }

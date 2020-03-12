@@ -665,7 +665,7 @@ public class OrderSettleNewService {
     
 
     /**
-     * 查询 租客 应付金额
+     * 查询 租客 应付金额     暂不使用。200309
      * @param rentCosts
      * @return
      */
@@ -675,20 +675,22 @@ public class OrderSettleNewService {
         if(!CollectionUtils.isEmpty(rentCosts.getRenterOrderCostDetails())){
             renterCost = renterCost +  rentCosts.getRenterOrderCostDetails().stream().mapToInt(RenterOrderCostDetailEntity::getTotalAmount).sum();
         }
-        //交接车油费
-        if(Objects.nonNull(rentCosts.getOilAmt())){
-            String oilDifferenceCrash = rentCosts.getOilAmt().getOilDifferenceCrash();
-            if(!StringUtil.isBlank(oilDifferenceCrash)){
-                renterCost = renterCost + Integer.valueOf(oilDifferenceCrash);
-            }
-        }
-        //交接 超历程
-        if(Objects.nonNull(rentCosts.getMileageAmt())){
-            Integer totalFee = rentCosts.getMileageAmt().getTotalFee();
-            if(Objects.nonNull(totalFee)){
-                renterCost = renterCost + totalFee;
-            }
-        }
+        
+        //计算重复,rentCosts.getRenterOrderCostDetails() 已经包含在里面了。
+//        //交接车油费
+//        if(Objects.nonNull(rentCosts.getOilAmt())){
+//            String oilDifferenceCrash = rentCosts.getOilAmt().getOilDifferenceCrash();
+//            if(!StringUtil.isBlank(oilDifferenceCrash)){
+//                renterCost = renterCost + Integer.valueOf(oilDifferenceCrash);
+//            }
+//        }
+//        //交接 超历程
+//        if(Objects.nonNull(rentCosts.getMileageAmt())){
+//            Integer totalFee = rentCosts.getMileageAmt().getTotalFee();
+//            if(Objects.nonNull(totalFee)){
+//                renterCost = renterCost + totalFee;
+//            }
+//        }
         // 补贴
         if(!CollectionUtils.isEmpty(rentCosts.getRenterOrderSubsidyDetails())){
             renterCost = renterCost +  rentCosts.getRenterOrderSubsidyDetails().stream().mapToInt(RenterOrderSubsidyDetailEntity::getSubsidyAmount).sum();
