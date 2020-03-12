@@ -83,6 +83,10 @@ public class OwnerOrderEntity implements Serializable {
 	 * 是否有效 1-有效 0-无效
 	 */
 	private Integer isEffective;
+    /**
+     * 订单是否查看,1:是，0：否
+     */
+    private Integer seeFlag;
 	/**
 	 * 是否使用特供价 0-否，1-是
 	 */

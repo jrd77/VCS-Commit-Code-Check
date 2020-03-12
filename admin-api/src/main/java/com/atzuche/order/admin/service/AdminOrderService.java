@@ -389,6 +389,10 @@ public class AdminOrderService {
         BeanUtils.copyProperties(reqVO,agreeOrderReqVO);
         agreeOrderReqVO.setOperatorName(AdminUserUtil.getAdminUser().getAuthName());
         agreeOrderReqVO.setIsConsoleInvoke(Integer.valueOf(YesNoEnum.YES.getType()));
+
+        String ownerNo = getOwnerMemNo(reqVO.getOrderNo());
+        agreeOrderReqVO.setMemNo(ownerNo);
+
         ResponseData<?> responseObject = null;
         Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "订单中心服务");
         try{
@@ -419,6 +423,8 @@ public class AdminOrderService {
         refuseOrderReqVO.setOperatorName(AdminUserUtil.getAdminUser().getAuthName());
         refuseOrderReqVO.setIsConsoleInvoke(Integer.valueOf(YesNoEnum.YES.getType()));
 
+        String ownerNo = getOwnerMemNo(reqVO.getOrderNo());
+        refuseOrderReqVO.setMemNo(ownerNo);
         ResponseData<?> responseObject = null;
         Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "订单中心服务");
         try{

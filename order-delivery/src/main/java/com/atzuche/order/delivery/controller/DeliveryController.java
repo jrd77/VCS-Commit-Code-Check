@@ -4,6 +4,7 @@ import com.atzuche.order.delivery.common.DeliveryCarTask;
 import com.atzuche.order.delivery.service.delivery.DeliveryCarInfoPriceService;
 import com.atzuche.order.mq.common.base.BaseProducer;
 import com.atzuche.order.mq.common.base.OrderMessage;
+import com.atzuche.order.mq.enums.PushMessageTypeEnum;
 import com.atzuche.order.mq.enums.ShortMessageTypeEnum;
 import com.atzuche.order.mq.util.SmsParamsMapUtil;
 import com.autoyol.commons.web.ResponseData;
@@ -39,9 +40,15 @@ public class DeliveryController {
 
         //给车主租客发送支付成功短信
         OrderMessage orderMessage = OrderMessage.builder().build();
-        Map map = SmsParamsMapUtil.getParamsMap("46860271200299", ShortMessageTypeEnum.PAY_RENT_CAR_DEPOSIT_2_RENTER.getValue(),ShortMessageTypeEnum.PAY_RENT_CAR_DEPOSIT_2_OWNER.getValue(),null);
-        orderMessage.setMap(map);
+//        Map map = SmsParamsMapUtil.getParamsMap("46860271200299", ShortMessageTypeEnum.PAY_RENT_CAR_DEPOSIT_2_RENTER.getValue(),ShortMessageTypeEnum.PAY_RENT_CAR_DEPOSIT_2_OWNER.getValue(),null);
+//        orderMessage.setMap(map);
+        Map map = SmsParamsMapUtil.getParamsMap("17814260300299", PushMessageTypeEnum.RENTER_PAY_CAR_SUCCESS.getValue(), PushMessageTypeEnum.RENTER_PAY_CAR_2_OWNER.getValue(), null);
+        orderMessage.setPushMap(map);
         baseProducer.sendTopicMessage(NewOrderMQActionEventEnum.ORDER_SETTLEMENT_SUCCESS.exchange,NewOrderMQActionEventEnum.ORDER_SETTLEMENT_SUCCESS.routingKey,orderMessage);
+
+
+
+
 
 // OrderMessage orderMessage =OrderMessage.builder().phone("13628645717").context("renterOptCancel").build();
 //        baseProducer.sendTopicMessage("auto-order-action","action.order.create4",orderMessage);
