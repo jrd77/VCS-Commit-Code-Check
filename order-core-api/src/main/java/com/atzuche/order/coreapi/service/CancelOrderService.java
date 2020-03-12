@@ -222,7 +222,8 @@ public class CancelOrderService {
         BeanUtils.copyProperties(reqVO, cancelOrderReqDTO);
         cancelOrderReqDTO.setConsoleInvoke(true);
         CancelOrderReqContext reqContext = buildCancelOrderReqContext(cancelOrderReqDTO);
-        OrderCancelReasonEntity orderCancelReasonEntity = orderCancelReasonService.selectByOrderNo(reqVO.getOrderNo());
+        OrderCancelReasonEntity orderCancelReasonEntity = orderCancelReasonService.selectByOrderNo(reqVO.getOrderNo()
+                , reqContext.getRenterOrderEntity().getRenterOrderNo(), reqContext.getOwnerOrderEntity().getOwnerOrderNo());
         reqContext.setOrderCancelReasonEntity(orderCancelReasonEntity);
         //公共校验
         cancelOrderCheckService.checkOrderCancelJudgeDuty(reqContext);

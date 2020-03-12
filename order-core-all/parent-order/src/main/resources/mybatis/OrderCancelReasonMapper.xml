@@ -148,9 +148,23 @@
         select
             <include refid="Base_Column_List"/>
         from order_cancel_reason
-        where order_no=#{orderNo}
-        and is_delete = 0
+        where
+            order_no=#{orderNo}
+            and `renter_order_no` = #{renterOrderNo}
+            and `owner_order_no` = #{ownerOrderNo}
+            and is_delete = 0
         order by id desc limit 1
+    </select>
+
+
+    <select id="selectListByOrderNo" resultMap="BaseResultMap">
+        select
+            <include refid="Base_Column_List"/>
+        from order_cancel_reason
+        where
+            order_no=#{orderNo}
+            and is_delete = 0
+        order by id desc
     </select>
 
 </mapper>

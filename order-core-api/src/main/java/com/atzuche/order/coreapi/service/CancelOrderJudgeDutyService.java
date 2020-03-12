@@ -14,6 +14,7 @@ import com.atzuche.order.commons.enums.CancelOrderDutyEnum;
 import com.atzuche.order.commons.enums.FineSubsidyCodeEnum;
 import com.atzuche.order.commons.enums.FineSubsidySourceCodeEnum;
 import com.atzuche.order.commons.enums.FineTypeEnum;
+import com.atzuche.order.commons.vo.res.order.OrderJudgeDutyVO;
 import com.atzuche.order.coreapi.entity.CancelOrderReqContext;
 import com.atzuche.order.coreapi.entity.dto.CancelOrderReqDTO;
 import com.atzuche.order.ownercost.entity.ConsoleOwnerOrderFineDeatailEntity;
@@ -79,6 +80,7 @@ public class CancelOrderJudgeDutyService {
         CancelOrderReqDTO cancelOrderReqDTO = reqContext.getCancelOrderReqDTO();
         OrderStatusEntity orderStatusEntity = reqContext.getOrderStatusEntity();
         RenterOrderEntity renterOrderEntity = reqContext.getRenterOrderEntity();
+        OwnerOrderEntity ownerOrderEntity = reqContext.getOwnerOrderEntity();
         RenterOrderCostEntity renterOrderCostEntity = reqContext.getRenterOrderCostEntity();
         if (CancelOrderDutyEnum.CANCEL_ORDER_DUTY_RENTER.getCode() == wrongdoer) {
             //租客责任
@@ -119,7 +121,6 @@ public class CancelOrderJudgeDutyService {
             consoleOwnerOrderFineDeatailService.addFineRecord(consoleOwnerOrderFineDeatailEntity);
         } else if (CancelOrderDutyEnum.CANCEL_ORDER_DUTY_OWNER.getCode() == wrongdoer) {
             //车主责任
-            OwnerOrderEntity ownerOrderEntity = reqContext.getOwnerOrderEntity();
             OwnerGoodsDetailDTO goodsDetail = reqContext.getOwnerGoodsDetailDTO();
 
             CancelFineAmtDTO cancelFineAmt = buildCancelFineAmtDTO(renterOrderEntity,
@@ -184,7 +185,8 @@ public class CancelOrderJudgeDutyService {
         }
         //更新取消订单责任方
         OrderCancelReasonEntity orderCancelReasonEntity =
-                orderCancelReasonService.selectByOrderNo(cancelOrderReqDTO.getOrderNo());
+                orderCancelReasonService.selectByOrderNo(cancelOrderReqDTO.getOrderNo(),
+                        renterOrderEntity.getRenterOrderNo(), ownerOrderEntity.getOwnerOrderNo());
         if(null != orderCancelReasonEntity) {
             OrderCancelReasonEntity record = new OrderCancelReasonEntity();
             record.setId(orderCancelReasonEntity.getId());
@@ -197,7 +199,28 @@ public class CancelOrderJudgeDutyService {
     }
 
 
+    /**
+     * 根据订单号查询订单取消/申述记录
+     *
+     * @param orderNo 订单号
+     * @return List<OrderJudgeDutyVO>
+     */
+    public List<OrderJudgeDutyVO> queryOrderJudgeDutysByOrderNo(String orderNo) {
 
+        List<OrderCancelReasonEntity> records = orderCancelReasonService.selectListByOrderNo(orderNo);
+        if (CollectionUtils.isEmpty(records)) {
+            return new ArrayList<>();
+        }
+
+        List<OrderJudgeDutyVO> list = new ArrayList<>();
+        records.forEach(record -> {
+            OrderJudgeDutyVO orderJudgeDutyVO = new OrderJudgeDutyVO();
+
+
+        });
+
+        return list;
+    }
 
 
 

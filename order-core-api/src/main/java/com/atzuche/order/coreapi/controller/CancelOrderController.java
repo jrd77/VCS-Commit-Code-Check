@@ -6,6 +6,7 @@ import com.atzuche.order.commons.enums.DispatcherStatusEnum;
 import com.atzuche.order.commons.enums.PlatformCancelReasonEnum;
 import com.atzuche.order.commons.vo.req.*;
 import com.atzuche.order.commons.vo.res.AdminOrderJudgeDutyResVO;
+import com.atzuche.order.commons.vo.res.order.OrderJudgeDutyVO;
 import com.atzuche.order.coreapi.service.*;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.doc.annotation.AutoDocMethod;
@@ -13,10 +14,12 @@ import com.autoyol.doc.annotation.AutoDocVersion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.CollectionUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 /**
  * 取消
@@ -42,6 +45,8 @@ public class CancelOrderController {
     private CancelOrderFeeService cancelOrderFeeService;
     @Autowired
     private CancelOrderAppealService cancelOrderAppealService;
+    @Autowired
+    private CancelOrderJudgeDutyService cancelOrderJudgeDutyService;
 
 
     @AutoDocMethod(description = "取消订单(车主/租客取消订单)", value = "取消订单(车主/租客取消订单)")
@@ -99,7 +104,15 @@ public class CancelOrderController {
         LOGGER.info("Console order judge duty list.param is,reqVO:[{}]",
                 JSON.toJSONString(reqVO));
 
-
+        List<OrderJudgeDutyVO> orderJudgeDuties =
+                cancelOrderJudgeDutyService.queryOrderJudgeDutysByOrderNo(reqVO.getOrderNo());
+        LOGGER.info("Console order judge duty list.result is,orderJudgeDuties:[{}]",
+                JSON.toJSONString(orderJudgeDuties));
+        if(CollectionUtils.isEmpty(orderJudgeDuties)) {
+            return ResponseData.success();
+        }
+        AdminOrderJudgeDutyResVO resVO = new AdminOrderJudgeDutyResVO();
+        resVO.setOrderJudgeDuties(orderJudgeDuties);
         return ResponseData.success();
     }
 
