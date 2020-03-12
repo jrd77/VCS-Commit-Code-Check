@@ -160,6 +160,7 @@ public class OwnerRefuseOrderService {
         ownerOrderService.updateDispatchReasonByOrderNo(reqVO.getOrderNo(), dispatcherReason);
         //取消信息处理(order_cancel_reason)
         orderCancelReasonService.addOrderCancelReasonRecord(buildOrderCancelReasonEntity(reqVO.getOrderNo(),
+                renterOrderEntity.getRenterOrderNo(),
                 ownerOrderEntity.getOwnerOrderNo(), "车主拒单"));
         //释放库存(车主取消/拒绝时不释放库存)
         stockService.releaseCarStock(reqVO.getOrderNo(), goodsDetail.getCarNo());
@@ -217,6 +218,7 @@ public class OwnerRefuseOrderService {
         OwnerOrderEntity ownerOrderEntity = ownerOrderService.getOwnerOrderByOrderNoAndIsEffective(orderNo);
         //订单结束原因信息更新
         orderCancelReasonService.addOrderCancelReasonRecord(buildOrderCancelReasonEntity(orderNo,
+                renterOrderEntity.getRenterOrderNo(),
                 ownerOrderEntity.getOwnerOrderNo(), "租期重叠车主拒单"));
 
 
@@ -250,14 +252,17 @@ public class OwnerRefuseOrderService {
      * @param cancelReason 结束原因
      * @return OrderCancelReasonEntity
      */
-    private OrderCancelReasonEntity buildOrderCancelReasonEntity(String orderNo, String ownerOrderNo,
+    private OrderCancelReasonEntity buildOrderCancelReasonEntity(String orderNo,
+                                                                 String renterOrderNo,
+                                                                 String ownerOrderNo,
                                                                  String cancelReason) {
         OrderCancelReasonEntity orderCancelReasonEntity = new OrderCancelReasonEntity();
         orderCancelReasonEntity.setOperateType(CancelOperateTypeEnum.REFUSE_ORDER.getCode());
         orderCancelReasonEntity.setCancelReason(cancelReason);
         orderCancelReasonEntity.setCancelSource(CancelSourceEnum.OWNER.getCode());
         orderCancelReasonEntity.setOrderNo(orderNo);
-        orderCancelReasonEntity.setSubOrderNo(ownerOrderNo);
+        orderCancelReasonEntity.setRenterOrderNo(renterOrderNo);
+        orderCancelReasonEntity.setOwnerOrderNo(ownerOrderNo);
         return orderCancelReasonEntity;
     }
 
