@@ -36,4 +36,10 @@ public class OfflinePayVO implements Serializable {
     @AutoDocProperty(value = "支付类型:01消费，02预授权")
     @NotBlank(message = "支付类型不能为空")
     private String payType;
+    @AutoDocProperty(value = "支付来源:")
+    @NotBlank(message = "支付来源不能为空")
+    private String paySource;
+
+
+
 }

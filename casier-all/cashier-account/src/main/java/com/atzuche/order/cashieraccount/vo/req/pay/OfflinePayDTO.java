@@ -1,6 +1,7 @@
 package com.atzuche.order.cashieraccount.vo.req.pay;
 
 import com.atzuche.order.cashieraccount.common.PayCashTypeEnum;
+import com.atzuche.order.commons.enums.cashier.PaySourceEnum;
 import com.atzuche.order.commons.enums.cashier.PayTypeEnum;
 import com.autoyol.doc.annotation.AutoDocProperty;
 import lombok.Data;
@@ -37,4 +38,6 @@ public class OfflinePayDTO implements Serializable {
     private String memNo;
 
     private String renterNo;
+
+    private PaySourceEnum paySource;
 }

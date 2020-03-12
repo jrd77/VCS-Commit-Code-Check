@@ -182,24 +182,36 @@ public class PaymentService {
 		//00：钱包 ，01：手机银联 02.:新银联（含银联和applepay统一商户号） 06:支付宝支付， 07:微信支付(App), 3
 		//08:快捷支付（快钱） 11.快捷支付（H5）     
 		//仅仅是source值不同。 12:Apple Pay 13. 微信支付(公众号) 14.连连支付 15. 微信支付(H5)
-		if("07".equals(paySource)) {
-			return "微信APP";
-		}else if("13".equals(paySource)) {
-			return "微信公众号";
-		}else if("15".equals(paySource)) {
-			return "微信H5";
-		}else if("00".equals(paySource)) {
-			return "钱包";
-		}else if("01".equals(paySource) || "02".equals(paySource)) {
-			return "银联";
-		}else if("06".equals(paySource)) {
-			return "支付宝";
-		}else if("08".equals(paySource) || "09".equals(paySource) || "11".equals(paySource)) {
-			return "快捷支付";
-		}else if("12".equals(paySource)) {
-			return "Apple Pay";
+		String payName="未知";
+		switch (paySource){
+			case "00":payName="钱包支付";break;
+			case "01":payName="银联";break;
+			case "02":payName="线下支付";break;
+			case "06":payName="支付宝普通预授权";break;
+			case "07": payName="微信APP";break;
+			case "08": payName="快钱支付(统一app和H5)";break;
+			case "12": payName="Apple Pay";break;
+			case "13": payName="微信公众号";break;
+			case "14": payName="连连支付(统一app和H5)";break;
+			case "15": payName="微信H5";break;
+			case "16": payName="支付宝信用预授权免押，芝麻信用";break;
+			case "91": payName="虚拟支付";break;
+			case "21": payName="银联POS机";break;
+			case "22": payName="快钱POS机";break;
+			case "23": payName="转账";break;
+			case "24": payName="现金";break;
+			case "25": payName="银联后台";break;
+			case "26": payName="支付宝线下支付";break;
+			case "28": payName="押金延续";break;
+			case "29": payName="渠道支付";break;
+			case "30": payName="线下真实支付";break;
+			case "99": payName="默认";break;
+
+			default:payName="未知";
 		}
-		return "未知";
+
+
+		return payName;
 	}
 	
 	/**

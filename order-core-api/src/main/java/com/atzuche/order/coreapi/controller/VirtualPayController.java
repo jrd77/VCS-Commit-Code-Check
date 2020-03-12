@@ -6,6 +6,7 @@ import com.atzuche.order.cashieraccount.common.VirtualPayTypeEnum;
 import com.atzuche.order.cashieraccount.service.VirtualPayService;
 import com.atzuche.order.cashieraccount.vo.req.pay.OfflinePayDTO;
 import com.atzuche.order.cashieraccount.vo.req.pay.VirtualPayDTO;
+import com.atzuche.order.commons.enums.cashier.PaySourceEnum;
 import com.atzuche.order.commons.enums.cashier.PayTypeEnum;
 import com.atzuche.order.open.vo.OfflinePayVO;
 import com.atzuche.order.open.vo.VirtualPayVO;
@@ -107,6 +108,7 @@ public class VirtualPayController {
         dto.setMemNo(orderEntity.getMemNoRenter());
         dto.setPayAmt(vo.getPayAmt());
         dto.setRenterNo(renterOrderEntity.getRenterOrderNo());
+        dto.setPaySource(PaySourceEnum.from(vo.getPaySource()));
 
         virtualPayService.offlinePay(dto, payCallbackService);
 
