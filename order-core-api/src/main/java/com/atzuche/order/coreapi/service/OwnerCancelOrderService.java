@@ -130,6 +130,7 @@ public class OwnerCancelOrderService {
             //取消信息处理(order_cancel_reason)
             OrderCancelReasonEntity orderCancelReasonEntity =
                     buildOrderCancelReasonEntity(cancelOrderReqDTO.getOrderNo(),
+                    renterOrderEntity.getRenterOrderNo(),
                     ownerOrderEntity.getOwnerOrderNo(),
                     cancelOrderReqDTO.getCancelReason());
             orderCancelReasonEntity.setCancelReqTime(cancelReqTime);
@@ -177,14 +178,17 @@ public class OwnerCancelOrderService {
     }
 
 
-    private OrderCancelReasonEntity buildOrderCancelReasonEntity(String orderNo, String ownerOrderNo,
+    private OrderCancelReasonEntity buildOrderCancelReasonEntity(String orderNo,
+                                                                 String renterOrderNo,
+                                                                 String ownerOrderNo,
                                                                  String cancelReason) {
         OrderCancelReasonEntity orderCancelReasonEntity = new OrderCancelReasonEntity();
         orderCancelReasonEntity.setOperateType(CancelOperateTypeEnum.CANCEL_ORDER.getCode());
         orderCancelReasonEntity.setCancelReason(cancelReason);
         orderCancelReasonEntity.setCancelSource(CancelSourceEnum.OWNER.getCode());
         orderCancelReasonEntity.setOrderNo(orderNo);
-        orderCancelReasonEntity.setSubOrderNo(ownerOrderNo);
+        orderCancelReasonEntity.setRenterOrderNo(renterOrderNo);
+        orderCancelReasonEntity.setOwnerOrderNo(ownerOrderNo);
         return orderCancelReasonEntity;
     }
 
