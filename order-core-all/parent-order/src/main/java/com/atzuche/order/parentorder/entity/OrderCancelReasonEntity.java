@@ -13,10 +13,11 @@ import lombok.Data;
  */
 @Data
 public class OrderCancelReasonEntity implements Serializable {
+
 	private static final long serialVersionUID = 1L;
 	
 	/**
-	 * 
+	 * 主键
 	 */
 	private Integer id;
 	/**
@@ -25,9 +26,14 @@ public class OrderCancelReasonEntity implements Serializable {
 	private String orderNo;
 
     /**
-     * 租客/车主订单号(与取消方保持一致)
+     * 租客订单号(与取消方保持一致)
      */
-	private String subOrderNo;
+	private String renterOrderNo;
+
+    /**
+     * 车主订单号
+     */
+    private String ownerOrderNo;
 
     /**
      * 操作类型:1.取消订单 2.拒单
