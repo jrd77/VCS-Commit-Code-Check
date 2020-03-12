@@ -1,12 +1,14 @@
 package com.atzuche.order.commons.entity.dto;
 
 import com.autoyol.doc.annotation.AutoDocProperty;
+import lombok.Data;
 
 import java.util.List;
 
 /**
  * Created by dongdong.zhao on 2018/10/11.
  */
+@Data
 public class ReturnCarIncomeResultDTO{
 
     @AutoDocProperty(value = "结算方式信息")
