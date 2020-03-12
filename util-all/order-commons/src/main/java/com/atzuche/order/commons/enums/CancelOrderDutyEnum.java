@@ -35,4 +35,13 @@ public enum CancelOrderDutyEnum {
     }
 
 
+    public static CancelOrderDutyEnum from(Integer code) {
+        CancelOrderDutyEnum[] dutyEnums = values();
+        for (CancelOrderDutyEnum duty : dutyEnums) {
+            if (duty.code == code) {
+                return duty;
+            }
+        }
+        throw new RuntimeException("the value of code :" + code + " not supported,please check");
+    }
 }

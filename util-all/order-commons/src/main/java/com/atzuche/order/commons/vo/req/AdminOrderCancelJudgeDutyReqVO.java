@@ -16,9 +16,9 @@ public class AdminOrderCancelJudgeDutyReqVO implements Serializable {
 
     private static final long serialVersionUID = -973533239064189543L;
 
-    @AutoDocProperty(value = "订单号", required = true)
-    @NotBlank(message = "订单号不能为空")
-    private String orderNo;
+    @AutoDocProperty(value = "取消记录ID", required = true)
+    @NotBlank(message = "取消记录ID不能为空")
+    private String cancelOrderId;
 
     @AutoDocProperty(value = "责任方:1,租客责任 2,车主责任 6,双方无责、平台承担保险", required = true)
     @NotBlank(message = "责任方不能为空")
@@ -29,12 +29,12 @@ public class AdminOrderCancelJudgeDutyReqVO implements Serializable {
     private String operatorName;
 
 
-    public String getOrderNo() {
-        return orderNo;
+    public String getCancelOrderId() {
+        return cancelOrderId;
     }
 
-    public void setOrderNo(String orderNo) {
-        this.orderNo = orderNo;
+    public void setCancelOrderId(String cancelOrderId) {
+        this.cancelOrderId = cancelOrderId;
     }
 
     public String getWrongdoer() {
@@ -53,12 +53,4 @@ public class AdminOrderCancelJudgeDutyReqVO implements Serializable {
         this.operatorName = operatorName;
     }
 
-    @Override
-    public String toString() {
-        return "AdminOrderCancelJudgeDutyReqVO{" +
-                "orderNo='" + orderNo + '\'' +
-                ", wrongdoer='" + wrongdoer + '\'' +
-                ", operatorName='" + operatorName + '\'' +
-                '}';
-    }
 }
