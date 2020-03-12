@@ -5,6 +5,7 @@ import com.atzuche.order.commons.BindingResultUtil;
 import com.atzuche.order.commons.enums.DispatcherStatusEnum;
 import com.atzuche.order.commons.enums.PlatformCancelReasonEnum;
 import com.atzuche.order.commons.vo.req.*;
+import com.atzuche.order.commons.vo.res.AdminOrderJudgeDutyResVO;
 import com.atzuche.order.coreapi.service.*;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.doc.annotation.AutoDocMethod;
@@ -90,6 +91,18 @@ public class CancelOrderController {
         cancelOrderService.orderCancelJudgeDuty(reqVO);
         return ResponseData.success();
     }
+
+    @AutoDocMethod(description = "管理后台责任判定信息列表", value = "管理后台责任判定信息列表", response = AdminOrderJudgeDutyResVO.class)
+    @PostMapping("/admin/judgeDuty/list")
+    public ResponseData<AdminOrderJudgeDutyResVO> adminOrderJudgeDutyList(@Valid @RequestBody AdminOrderJudgeDutyReqVO reqVO,
+                                                                          BindingResult bindingResult) {
+        LOGGER.info("Console order judge duty list.param is,reqVO:[{}]",
+                JSON.toJSONString(reqVO));
+
+
+        return ResponseData.success();
+    }
+
 
     @AutoDocMethod(description = "订单取消申诉接口", value = "订单取消申诉接口")
     @PostMapping("/normal/appeal")
