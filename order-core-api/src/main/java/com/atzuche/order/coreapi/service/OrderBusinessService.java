@@ -3,6 +3,7 @@ package com.atzuche.order.coreapi.service;
 import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.entity.dto.OwnerMemberDTO;
 import com.atzuche.order.commons.entity.dto.RenterMemberDTO;
+import com.atzuche.order.commons.entity.dto.ReturnCarIncomeDTO;
 import com.atzuche.order.commons.enums.CloseEnum;
 import com.atzuche.order.commons.enums.NoticeSourceCodeEnum;
 import com.atzuche.order.commons.exceptions.NoticeSourceNotFoundException;
@@ -17,6 +18,7 @@ import com.atzuche.order.parentorder.service.OrderNoticeService;
 import com.atzuche.order.rentermem.service.RenterMemberService;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.atzuche.order.renterorder.service.RenterOrderService;
+import com.atzuche.order.settle.service.OrderSettleService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -38,6 +40,8 @@ public class OrderBusinessService {
     private OwnerMemberService ownerMemberService;
     @Autowired
     private RenterMemberService renterMemberService;
+    @Autowired
+    private OrderSettleService orderSettleService;
 
     public void renterAndOwnerSeeOrder(RenterAndOwnerSeeOrderVO renterAndOwnerSeeOrderVO) {
         String orderNo = renterAndOwnerSeeOrderVO.getOrderNo();
@@ -101,5 +105,14 @@ public class OrderBusinessService {
         }
         RenterMemberDTO renterMemberDTO = renterMemberService.selectrenterMemberByRenterOrderNo(renterOrderEntity.getRenterOrderNo(), false);
         return renterMemberDTO;
+    }
+
+    public ReturnCarIncomeDTO queryOwnerIncome(String orderNo) {
+        OwnerOrderEntity ownerOrderEntity = ownerOrderService.getOwnerOrderByOrderNoAndIsEffective(orderNo);
+        if(ownerOrderEntity == null){
+
+        }
+        //orderSettleService.preOwnerSettleOrder();
+        return null;
     }
 }
