@@ -185,6 +185,7 @@ public class OwnerRefuseOrderService {
      */
     @Transactional(rollbackFor = Exception.class)
     public void refuse(String orderNo) {
+        logger.info("A.refuse. param is,orderNo:[{}]",orderNo);
         //校验
         refuseOrderCheckService.checkOwnerAgreeOrRefuseOrder(orderNo, true);
 

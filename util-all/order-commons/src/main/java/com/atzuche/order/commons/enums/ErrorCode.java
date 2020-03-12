@@ -117,11 +117,13 @@ public enum ErrorCode {
     OWNER_SETTLE_ERR("700145","取消订单，车主端结算异常"),
     RENTER_SETTLE_ERR("700146","取消订单，租客端结算异常"),
     RENTER_COST_DETAIL_FAIL("700147","获取租客费用详情失败"),
+    NOTICE_SOURCE_ERR("700148","找不到对应的来源类型"),
     RENT_TIME_LESS_CURR_TIME_2HOUR("500055","起租时间应晚于当前时间2小时"),
     REVERT_TIME_LESS_RENT_TIME_1HOUR("500056","“还车时间”应晚于“起租时间”1小时"),
     RENT_TIME_LESS_CURR_TIME("500006","起租时间应晚于当前时间"),
     NO_RANGE_POINT("600040","地址不在范围内"),
     SERVICE_NOT_OPEN("988888","当前城市还未开放服务哦，我们会尽快开放哒~!"),
+
     ;
 
     private String code;

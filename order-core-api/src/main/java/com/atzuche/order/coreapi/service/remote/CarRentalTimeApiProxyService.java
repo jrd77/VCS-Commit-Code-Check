@@ -131,11 +131,12 @@ public class CarRentalTimeApiProxyService {
             LOGGER.info("判断是否进入调度. result is,responseObject:[{}]", JSON.toJSONString(responseObject));
             Cat.logEvent(CatConstants.FEIGN_RESULT, JSON.toJSONString(responseObject));
 
-            ResponseObjectCheckUtil.checkResponse(responseObject);
+
+            ResponseObjectCheckUtil.checkCarDispatchResponse(responseObject);
 
             t.setStatus(Transaction.SUCCESS);
 
-            if(responseObject.getData()!=null){
+            if(responseObject.getData() != null){
                 return responseObject.getData();
             }
             return false;

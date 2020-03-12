@@ -2,8 +2,8 @@ package com.atzuche.order.admin.enums;
 
 
 public enum YesNoEnum {
-    NO("0", "是"),
-    YES("1", "否");
+    NO("0", "否"),
+    YES("1", "是");
 
 
     private String type;
