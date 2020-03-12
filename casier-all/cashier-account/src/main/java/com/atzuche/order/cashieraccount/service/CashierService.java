@@ -53,6 +53,7 @@ import com.atzuche.order.settle.service.AccountDebtService;
 import com.atzuche.order.settle.vo.req.AccountDeductDebtReqVO;
 import com.atzuche.order.settle.vo.req.AccountInsertDebtReqVO;
 import com.atzuche.order.settle.vo.res.AccountDebtResVO;
+import com.atzuche.order.settle.vo.res.AccountOldDebtResVO;
 import com.autoyol.autopay.gateway.constant.DataPayKindConstant;
 import com.autoyol.autopay.gateway.constant.DataPayTypeConstant;
 import com.autoyol.autopay.gateway.vo.req.NotifyDataVo;
@@ -973,6 +974,78 @@ public class CashierService {
     
     public List<CashierEntity> getCashierRentCostsByOrderNo(String orderNo){
     	return cashierMapper.getCashierRentCostsByOrderNo(orderNo);
+    }
+    
+    
+    /**
+     * 老系统欠款抵扣操作(租车费用)
+     * @param debtRes
+     */
+    public void saveRentCostDebt(AccountOldDebtResVO debtRes) {
+    	//  记录租车费用资金 进出记录
+        AccountRenterCostDetailReqVO accountRenterCostChangeReqVO = new AccountRenterCostDetailReqVO();
+        accountRenterCostChangeReqVO.setMemNo(debtRes.getMemNo());
+        accountRenterCostChangeReqVO.setOrderNo(debtRes.getOrderNo());
+        accountRenterCostChangeReqVO.setAmt(-debtRes.getRealDebtAmt());
+        accountRenterCostChangeReqVO.setRenterCashCodeEnum(debtRes.getCahsCodeEnum());
+        // insert  account_renter_cost_detail
+        int id = accountRenterCostSettleService.deductDepositToRentCost(accountRenterCostChangeReqVO);
+        // 记录结算费用 抵扣记录
+        AccountRenterCostSettleDetailEntity renterCostSettleDetail = new AccountRenterCostSettleDetailEntity();
+        renterCostSettleDetail.setMemNo(debtRes.getMemNo());
+        renterCostSettleDetail.setOrderNo(debtRes.getOrderNo());
+        renterCostSettleDetail.setRenterOrderNo(debtRes.getRenterOrderNo());
+        renterCostSettleDetail.setUniqueNo(String.valueOf(id));
+        renterCostSettleDetail.setCostCode(debtRes.getCahsCodeEnum().getCashNo());
+        renterCostSettleDetail.setCostDetail(debtRes.getCahsCodeEnum().getTxt());
+        renterCostSettleDetail.setAmt(-debtRes.getRealDebtAmt());
+        // insert account_renter_cost_settle_detail
+        accountRenterCostSettleDetailNoTService.insertAccountRenterCostSettleDetail(renterCostSettleDetail);
+    }
+    
+    
+    /**
+     * 老系统欠款抵扣操作(车辆押金)
+     * @param debtRes
+     */
+    public void saveDepositDebt(AccountOldDebtResVO debtRes) {
+    	//  记录押金资金明细 抵扣记录
+        DetainRenterDepositReqVO detainRenterDepositReqVO = new DetainRenterDepositReqVO();
+        detainRenterDepositReqVO.setMemNo(debtRes.getMemNo());
+        detainRenterDepositReqVO.setOrderNo(debtRes.getOrderNo());
+        detainRenterDepositReqVO.setAmt(-debtRes.getRealDebtAmt());
+        detainRenterDepositReqVO.setRenterCashCodeEnum(debtRes.getCahsCodeEnum());
+        // update account_renter_deposit
+        // insert account_renter_deposit_detail
+        int id = accountRenterDepositService.detainRenterDeposit(detainRenterDepositReqVO);
+        // 记录结算费用 抵扣记录
+        AccountRenterCostSettleDetailEntity renterCostSettleDetail = new AccountRenterCostSettleDetailEntity();
+        renterCostSettleDetail.setMemNo(debtRes.getMemNo());
+        renterCostSettleDetail.setOrderNo(debtRes.getOrderNo());
+        renterCostSettleDetail.setRenterOrderNo(debtRes.getRenterOrderNo());
+        renterCostSettleDetail.setUniqueNo(String.valueOf(id));
+        renterCostSettleDetail.setCostCode(debtRes.getCahsCodeEnum().getCashNo());
+        renterCostSettleDetail.setCostDetail(debtRes.getCahsCodeEnum().getTxt());
+        renterCostSettleDetail.setAmt(-debtRes.getRealDebtAmt());
+        // insert account_renter_cost_settle_detail
+        accountRenterCostSettleDetailNoTService.insertAccountRenterCostSettleDetail(renterCostSettleDetail);
+    }
+    
+    
+    /**
+     * 老系统欠款抵扣操作（车主收益）
+     * @param debtRes
+     */
+    public void saveOwnerIncomeDebt(AccountOldDebtResVO debtRes) {
+    	//3 记录车主结算费用总额 及 车主费用结算明细表
+        AccountOwnerCostSettleDetailEntity entity = new AccountOwnerCostSettleDetailEntity();
+        entity.setMemNo(debtRes.getMemNo());
+        entity.setOrderNo(debtRes.getOrderNo());
+        entity.setOwnerOrderNo(debtRes.getOwnerOrderNo());
+        entity.setSourceCode(debtRes.getCahsCodeEnum().getCashNo());
+        entity.setSourceDetail(debtRes.getCahsCodeEnum().getTxt());
+        entity.setAmt(-debtRes.getRealDebtAmt());
+        int id = accountOwnerCostSettleDetailNoTService.insertAccountOwnerCostSettleDetail(entity);
     }
 
 }

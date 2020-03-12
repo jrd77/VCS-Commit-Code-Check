@@ -174,8 +174,11 @@ public class OrderOwnerSettleNoTService {
         Cat.logEvent("settleOrdersAccount",GsonUtils.toJson(settleOrdersAccount));
         
 
-        //13车主收益 结余处理 历史欠款
+        // 13.1车主收益 结余处理 历史欠款
         orderOwnerSettleNewService.repayHistoryDebtOwner(settleOrdersAccount);
+        // 13.2车主收益 结余处理 历史欠款
+        int oldTotalRealDebtAmt = orderOwnerSettleNewService.oldRepayHistoryDebtOwner(settleOrdersAccount);
+        settleOrders.setOwnerTotalOldRealDebtAmt(oldTotalRealDebtAmt);
         //14 车主待审核收益落库
         orderOwnerSettleNewService.insertOwnerIncomeExamine(settleOrdersAccount);
     }

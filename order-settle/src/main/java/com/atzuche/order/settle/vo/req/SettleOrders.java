@@ -63,6 +63,15 @@ public class SettleOrders {
      * 车主订单信息
      */
     OwnerOrderEntity ownerOrder;
+    /**
+     * 租客端抵扣老系统欠款总额
+     */
+    private Integer renterTotalOldRealDebtAmt;
+    /**
+     * 车主端抵扣老系统欠款总额
+     */
+    private Integer ownerTotalOldRealDebtAmt;
+    
 	public String getOrderNo() {
 		return orderNo;
 	}
@@ -129,6 +138,17 @@ public class SettleOrders {
 	public void setCarNo(String carNo) {
 		this.carNo = carNo;
 	}
-    
+	public Integer getRenterTotalOldRealDebtAmt() {
+		return renterTotalOldRealDebtAmt;
+	}
+	public void setRenterTotalOldRealDebtAmt(Integer renterTotalOldRealDebtAmt) {
+		this.renterTotalOldRealDebtAmt = renterTotalOldRealDebtAmt;
+	}
+	public Integer getOwnerTotalOldRealDebtAmt() {
+		return ownerTotalOldRealDebtAmt;
+	}
+	public void setOwnerTotalOldRealDebtAmt(Integer ownerTotalOldRealDebtAmt) {
+		this.ownerTotalOldRealDebtAmt = ownerTotalOldRealDebtAmt;
+	}
     
 }
