@@ -86,7 +86,10 @@ public class CarDepositReturnDetailService {
         /*Integer depositToHistoryAmt = Optional.ofNullable(accountRenterDepositDetailDTOList).orElseGet(ArrayList::new).stream()
                 .filter(x -> RenterCashCodeEnum.SETTLE_DEPOSIT_TO_HISTORY_AMT.equals(x.getSourceCode()))
                 .collect(Collectors.summingInt(AccountRenterDepositDetailDTO::getAmt));*/
-        Integer depositToHistoryAmt = Optional.ofNullable(accountDebtReceivableaDetailDTOS).orElseGet(ArrayList::new).stream()
+        Integer depositToHistoryAmt = Optional.ofNullable(accountDebtReceivableaDetailDTOS)
+                .orElseGet(ArrayList::new)
+                .stream()
+                .filter(x->RenterCashCodeEnum.SETTLE_DEPOSIT_TO_HISTORY_AMT.getCashNo().equals(x.getSourceCode()))
                 .collect(Collectors.summingInt(AccountDebtReceivableaDetailDTO::getAmt));
 
         String depositType = "";
