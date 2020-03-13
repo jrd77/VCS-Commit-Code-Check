@@ -141,4 +141,9 @@ public class RenterOrderEntity implements Serializable {
 	 */
 	private Integer isDelete;
 
+    /**
+     * 订单是否查看,1:是，0：否
+     */
+    private Integer seeFlag;
+
 }
