@@ -304,5 +304,8 @@
     <update id="updateByMemeNo">
         update owner_order set `see_flag` = 1  where `mem_no` = #{ownerMemNo}
     </update>
+    <delete id="updateChildStatusByOwnerOrderNo">
+        update owner_order set `child_status` = #{childStatus}  where `owner_order_no` = #{ownerOrderNo}
+    </delete>
 
 </mapper>

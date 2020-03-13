@@ -341,5 +341,8 @@
         select <include refid="Base_Column_List" /> from renter_order where order_no = #{orderNo}
         AND is_delete = 0
     </select>
+    <delete id="updateChildStatusByRenterOrderNo">
+        update renter_order set child_status = #{childStatus} where  `renter_order_no` = #{renterOrderNo}
+    </delete>
 
 </mapper>
