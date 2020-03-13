@@ -29,6 +29,9 @@
         <result property="updateOp" column="update_op"/>
         <result property="version" column="version"/>
         <result property="isDelete" column="is_delete"/>
+        <result property="payLine" column="pay_line"/>
+        <result property="payChannel" column="pay_channel"/>
+        <result property="virtualAccountNo" column="virtual_account_no"/>
     </resultMap>
 
 
@@ -57,7 +60,10 @@
 	`update_time`, 	
 	`update_op`, 	
 	`version`, 	
-	`is_delete`	
+	`is_delete`	,
+	pay_line,
+	pay_channel,
+	virtual_account_no
 
 	</sql>
 
@@ -93,6 +99,9 @@
             <if test="updateOp != null">`update_op`, </if>
             <if test="version != null">`version`, </if>
             <if test="isDelete != null">`is_delete` </if>
+            <if test="payLine != null">`pay_line` </if>
+            <if test="virtualAccountNo != null">`virtual_account_no` </if>
+            <if test="payChannel != null">`pay_channel` </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides="," >
             <if test="orderNo != null">#{orderNo},  </if>
@@ -119,6 +128,9 @@
             <if test="updateOp != null">#{updateOp},  </if>
             <if test="version != null">#{version},  </if>
             <if test="isDelete != null">#{isDelete} </if>
+            <if test="payLine != null">#{payLine} </if>
+            <if test="virtualAccountNo != null">#{virtualAccountNo} </if>
+            <if test="payChannel != null">#{payChannel}</if>
         </trim>
     </insert>
 

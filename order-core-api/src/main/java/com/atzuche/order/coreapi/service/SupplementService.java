@@ -46,6 +46,9 @@ public class SupplementService {
 		supplementEntity.setMemNo(orderEntity.getMemNoRenter());
 		supplementEntity.setSupplementType(SupplementTypeEnum.MANUAL_CREATE.getCode());
 		supplementEntity.setOpType(SupplementOpTypeEnum.MANUAL_CREATE.getCode());
+		if (orderSupplementDetailDTO.getAmt() >= 0) {
+			supplementEntity.setPayFlag(0);
+		}
 		orderSupplementDetailService.saveOrderSupplementDetail(supplementEntity);
 	}
 	

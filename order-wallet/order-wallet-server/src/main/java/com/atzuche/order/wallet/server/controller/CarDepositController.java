@@ -39,7 +39,7 @@ public class CarDepositController {
         if(updateCarDepositBillVO.getUpdateBill()<=0){
             throw new InputErrorException("updateBill<0:"+updateCarDepositBillVO.getUpdateBill());
         }
-        depositService.updateCarDeposit(updateCarDepositBillVO.getCarNo(),updateCarDepositBillVO.getUpdateBill());
+        depositService.updateCarDeposit(updateCarDepositBillVO);
         return ResponseData.success();
     }
 
