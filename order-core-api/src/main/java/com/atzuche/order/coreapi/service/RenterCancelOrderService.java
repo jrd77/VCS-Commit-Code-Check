@@ -7,6 +7,7 @@ import com.atzuche.order.coreapi.entity.CancelOrderReqContext;
 import com.atzuche.order.coreapi.entity.dto.CancelOrderReqDTO;
 import com.atzuche.order.coreapi.entity.dto.CancelOrderResDTO;
 import com.atzuche.order.flow.service.OrderFlowService;
+import com.atzuche.order.ownercost.entity.OwnerOrderEntity;
 import com.atzuche.order.ownercost.service.OwnerOrderService;
 import com.atzuche.order.parentorder.dto.OrderStatusDTO;
 import com.atzuche.order.parentorder.entity.OrderCancelReasonEntity;
@@ -63,6 +64,8 @@ public class RenterCancelOrderService {
         OrderStatusEntity orderStatusEntity = reqContext.getOrderStatusEntity();
         //获取车主券信息
         OrderCouponEntity ownerCouponEntity = reqContext.getOwnerCouponEntity();
+        //车主订单信息
+        OwnerOrderEntity ownerOrderEntity = reqContext.getOwnerOrderEntity();
 
         //订单状态更新
         orderStatusService.saveOrderStatusInfo(buildOrderStatusDTO(cancelOrderReqDTO.getOrderNo()));
@@ -72,7 +75,8 @@ public class RenterCancelOrderService {
         orderFlowService.inserOrderStatusChangeProcessInfo(cancelOrderReqDTO.getOrderNo(), OrderStatusEnum.CLOSED);
         //取消信息处理(order_cancel_reason)
         OrderCancelReasonEntity orderCancelReasonEntity = buildOrderCancelReasonEntity(cancelOrderReqDTO.getOrderNo(),
-                renterOrderEntity.getRenterOrderNo(),  cancelOrderReqDTO.getCancelReason());
+                renterOrderEntity.getRenterOrderNo(),ownerOrderEntity.getOwnerOrderNo(),
+                cancelOrderReqDTO.getCancelReason());
         orderCancelReasonEntity.setCancelReqTime(cancelReqTime);
         if(cancelOrderReqDTO.getConsoleInvoke() && !StringUtils.equals(OrderConstant.SYSTEM_OPERATOR_JOB,
                 cancelOrderReqDTO.getOperatorName())) {
@@ -107,13 +111,16 @@ public class RenterCancelOrderService {
     }
 
     private OrderCancelReasonEntity buildOrderCancelReasonEntity(String orderNo,
-                                                                 String renterOrderNo, String cancelReason) {
+                                                                 String renterOrderNo,
+                                                                 String ownerOrderNo,
+                                                                 String cancelReason) {
         OrderCancelReasonEntity orderCancelReasonEntity = new OrderCancelReasonEntity();
         orderCancelReasonEntity.setOperateType(CancelOperateTypeEnum.CANCEL_ORDER.getCode());
         orderCancelReasonEntity.setCancelReason(cancelReason);
         orderCancelReasonEntity.setCancelSource(CancelSourceEnum.RENTER.getCode());
         orderCancelReasonEntity.setOrderNo(orderNo);
-        orderCancelReasonEntity.setSubOrderNo(renterOrderNo);
+        orderCancelReasonEntity.setRenterOrderNo(renterOrderNo);
+        orderCancelReasonEntity.setOwnerOrderNo(ownerOrderNo);
         return orderCancelReasonEntity;
     }
 

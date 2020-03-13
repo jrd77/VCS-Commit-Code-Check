@@ -27,4 +27,8 @@ public class ModifyOrderCompareVO implements Serializable{
 	 * 补付金额是否清0标志:1-清0，0-不清
 	 */
 	private Integer cleanSupplementAmt; 
+	/**
+	 * 实付金额
+	 */
+	private Integer rentAmtPayed;
 }
