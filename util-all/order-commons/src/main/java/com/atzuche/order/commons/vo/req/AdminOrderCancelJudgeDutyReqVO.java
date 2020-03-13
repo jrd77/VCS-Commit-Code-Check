@@ -16,9 +16,17 @@ public class AdminOrderCancelJudgeDutyReqVO implements Serializable {
 
     private static final long serialVersionUID = -973533239064189543L;
 
-    @AutoDocProperty(value = "取消记录ID", required = true)
-    @NotBlank(message = "取消记录ID不能为空")
-    private String cancelOrderId;
+    @AutoDocProperty(value = "订单号", required = true)
+    @NotBlank(message = "订单号不能为空")
+    private String orderNo;
+
+    @AutoDocProperty(value = "租客订单号", required = true)
+    @NotBlank(message = "租客订单号不能为空")
+    private String renterOrderNo;
+
+    @AutoDocProperty(value = "车主订单号", required = true)
+    @NotBlank(message = "车主订单号不能为空")
+    private String ownerOrderNo;
 
     @AutoDocProperty(value = "责任方:1,租客责任 2,车主责任 6,双方无责、平台承担保险", required = true)
     @NotBlank(message = "责任方不能为空")
@@ -28,13 +36,28 @@ public class AdminOrderCancelJudgeDutyReqVO implements Serializable {
     @NotBlank(message = "操作人不能为空")
     private String operatorName;
 
-
-    public String getCancelOrderId() {
-        return cancelOrderId;
+    public String getOrderNo() {
+        return orderNo;
     }
 
-    public void setCancelOrderId(String cancelOrderId) {
-        this.cancelOrderId = cancelOrderId;
+    public void setOrderNo(String orderNo) {
+        this.orderNo = orderNo;
+    }
+
+    public String getRenterOrderNo() {
+        return renterOrderNo;
+    }
+
+    public void setRenterOrderNo(String renterOrderNo) {
+        this.renterOrderNo = renterOrderNo;
+    }
+
+    public String getOwnerOrderNo() {
+        return ownerOrderNo;
+    }
+
+    public void setOwnerOrderNo(String ownerOrderNo) {
+        this.ownerOrderNo = ownerOrderNo;
     }
 
     public String getWrongdoer() {

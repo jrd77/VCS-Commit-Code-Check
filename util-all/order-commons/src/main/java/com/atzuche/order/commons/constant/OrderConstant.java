@@ -33,7 +33,7 @@ public class OrderConstant {
     /**
      * 定时任务操作人
      */
-    public static String SYSTEM_OPERATOR_JOB = "System";
+    public static String SYSTEM_OPERATOR_JOB = "SystemJob";
 
     public static String SPECIAL_ERROR_CODE_PREFIX = "11106";
 

@@ -18,6 +18,16 @@ public class CancelOrderReqDTO {
     private String orderNo;
 
     /**
+     * 租客订单号
+     */
+    private String renterOrderNo;
+
+    /**
+     * 车主订单号
+     */
+    private String ownerOrderNo;
+
+    /**
      * 使用角色:1.车主 2.租客
      */
     private String memRole;
@@ -41,5 +51,10 @@ public class CancelOrderReqDTO {
      * 会员注册号
      */
     private String memNo;
+
+    /**
+     * 是否申诉:0,否 1,是
+     */
+    private Integer appealFlag;
 
 }

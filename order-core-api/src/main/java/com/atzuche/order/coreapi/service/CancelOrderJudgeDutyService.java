@@ -81,6 +81,8 @@ public class CancelOrderJudgeDutyService {
         RenterOrderEntity renterOrderEntity = reqContext.getRenterOrderEntity();
         OwnerOrderEntity ownerOrderEntity = reqContext.getOwnerOrderEntity();
         RenterOrderCostEntity renterOrderCostEntity = reqContext.getRenterOrderCostEntity();
+        int fineAmt = 0;
+        int insuranceFineAmt = 0;
         if (CancelOrderDutyEnum.CANCEL_ORDER_DUTY_RENTER.getCode() == wrongdoer) {
             //租客责任
             RenterGoodsDetailDTO goodsDetail = reqContext.getRenterGoodsDetailDTO();
@@ -92,12 +94,14 @@ public class CancelOrderJudgeDutyService {
                 cancelFineAmt.setCancelTime(cancelReqTime);
                 int penalty = renterOrderFineDeatailService.calCancelFine(cancelFineAmt);
 
+                fineAmt = penalty;
                 //罚租客补贴给车主
                 renterOrderFineDetailEntityOne = renterOrderFineDeatailService.fineDataConvert(cancelFineAmt.getCostBaseDTO(), penalty, FineSubsidyCodeEnum.OWNER,
                         FineSubsidySourceCodeEnum.RENTER, FineTypeEnum.CANCEL_FINE);
 
                 //罚租客补贴给平台(保险费)
                 if (!cancelReqTime.isBefore(renterOrderEntity.getExpRentTime())) {
+                    insuranceFineAmt = Math.abs(renterOrderCostEntity.getBasicEnsureAmount());
                     RenterOrderFineDeatailEntity renterOrderFineDetailEntityTwo =
                             renterOrderFineDeatailService.fineDataConvert(cancelFineAmt.getCostBaseDTO(), Math.abs(renterOrderCostEntity.getBasicEnsureAmount()), FineSubsidyCodeEnum.PLATFORM,
                                     FineSubsidySourceCodeEnum.RENTER, FineTypeEnum.CANCEL_FINE);
@@ -126,9 +130,10 @@ public class CancelOrderJudgeDutyService {
                     renterOrderCostEntity, goodsDetail.getCarOwnerType());
             cancelFineAmt.setCancelTime(cancelReqTime);
             int penalty = orderStatusEntity.getRentCarPayStatus() == OrderConstant.YES ? renterOrderFineDeatailService.calCancelFine(cancelFineAmt) : 0;
-
+            fineAmt = penalty;
             //罚车主补贴给平台(保险费)
             if (!cancelReqTime.isBefore(renterOrderEntity.getExpRentTime())) {
+                insuranceFineAmt = Math.abs(renterOrderCostEntity.getBasicEnsureAmount());
                 OwnerOrderFineDeatailEntity ownerOrderFineDeatailEntityTwo =
                         ownerOrderFineDeatailService.fineDataConvert(cancelFineAmt.getCostBaseDTO(), Math.abs(renterOrderCostEntity.getBasicEnsureAmount()),
                                 FineSubsidyCodeEnum.PLATFORM, FineSubsidySourceCodeEnum.OWNER, FineTypeEnum.CANCEL_FINE);
@@ -174,9 +179,7 @@ public class CancelOrderJudgeDutyService {
         //更新申述信息
         OrderCancelAppealEntity orderCancelAppealEntity =
                 orderCancelAppealService.selectByOrderNo(cancelOrderReqDTO.getOrderNo());
-        int appealFlag = OrderConstant.NO;
         if(null != orderCancelAppealEntity) {
-            appealFlag = OrderConstant.YES;
             OrderCancelAppealEntity record = new OrderCancelAppealEntity();
             record.setId(orderCancelAppealEntity.getId());
             record.setIsWrongdoer(OrderConstant.YES);
@@ -190,7 +193,8 @@ public class CancelOrderJudgeDutyService {
             OrderCancelReasonEntity record = new OrderCancelReasonEntity();
             record.setId(orderCancelReasonEntity.getId());
             record.setDutySource(wrongdoer);
-            record.setAppealFlag(appealFlag);
+            record.setFineAmt(fineAmt);
+            record.setInsuranceFineAmt(insuranceFineAmt);
             record.setUpdateOp(cancelOrderReqDTO.getOperatorName());
             orderCancelReasonService.updateOrderCancelReasonRecord(record);
         }

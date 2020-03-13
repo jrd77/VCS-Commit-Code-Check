@@ -2,6 +2,7 @@ package com.atzuche.order.coreapi.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.BindingResultUtil;
+import com.atzuche.order.commons.constant.OrderConstant;
 import com.atzuche.order.commons.enums.DispatcherStatusEnum;
 import com.atzuche.order.commons.enums.PlatformCancelReasonEnum;
 import com.atzuche.order.commons.vo.req.*;
@@ -59,6 +60,16 @@ public class CancelOrderController {
         return ResponseData.success();
     }
 
+    @AutoDocMethod(description = "订单取消申诉接口", value = "订单取消申诉接口")
+    @PostMapping("/normal/appeal")
+    public ResponseData<?> orderCancelAppeal(@Valid @RequestBody OrderCancelAppealReqVO reqVO, BindingResult bindingResult) {
+        LOGGER.info("Cancel order appeal.param is,reqVO:[{}]", JSON.toJSONString(reqVO));
+        BindingResultUtil.checkBindingResult(bindingResult);
+
+        cancelOrderAppealService.appeal(reqVO);
+        return ResponseData.success();
+    }
+
     @AutoDocMethod(description = "取消订单(平台代车主/租客取消订单)", value = "取消订单(平台代车主/租客取消订单)")
     @PostMapping("/admin/cancel")
     public ResponseData<?> adminCancelOrder(@Valid @RequestBody AdminCancelOrderReqVO adminCancelOrderReqVO,
@@ -67,7 +78,7 @@ public class CancelOrderController {
                 JSON.toJSONString(adminCancelOrderReqVO));
         BindingResultUtil.checkBindingResult(bindingResult);
 
-        cancelOrderService.cancel(adminCancelOrderReqVO, true);
+        cancelOrderService.cancel(adminCancelOrderReqVO, true, OrderConstant.NO, null);
         return ResponseData.success();
     }
 
@@ -113,17 +124,6 @@ public class CancelOrderController {
         }
         AdminOrderJudgeDutyResVO resVO = new AdminOrderJudgeDutyResVO();
         resVO.setOrderJudgeDuties(orderJudgeDuties);
-        return ResponseData.success();
-    }
-
-
-    @AutoDocMethod(description = "订单取消申诉接口", value = "订单取消申诉接口")
-    @PostMapping("/normal/appeal")
-    public ResponseData<?> orderCancelAppeal(@Valid @RequestBody OrderCancelAppealReqVO reqVO, BindingResult bindingResult) {
-        LOGGER.info("Cancel order appeal.param is,reqVO:[{}]", JSON.toJSONString(reqVO));
-        BindingResultUtil.checkBindingResult(bindingResult);
-
-        cancelOrderAppealService.appeal(reqVO);
         return ResponseData.success();
     }
 
