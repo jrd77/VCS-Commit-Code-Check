@@ -247,6 +247,7 @@ public class OrderSearchRemoteService {
             Cat.logEvent(CatConstants.FEIGN_RESULT, JSON.toJSONString(orderResponseData));
             checkResponse(orderResponseData);
             List<ViolateBO> orderList = orderResponseData.getData().getOrderList();
+            logger.info("执行 查询按规则配置日期内完成的订单，获取待查询违章的对象列表 [{}]",orderList);
             t.setStatus(Transaction.SUCCESS);
             return convertDto(orderList);
         } catch (Exception e) {
