@@ -11,6 +11,7 @@ import com.atzuche.order.commons.ResponseCheckUtil;
 import com.atzuche.order.commons.entity.orderDetailDto.OrderDetailReqDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.OrderDetailRespDTO;
 import com.atzuche.order.commons.vo.req.ModifyOrderReqVO;
+import com.atzuche.order.commons.vo.res.AdminOrderJudgeDutyResVO;
 import com.atzuche.order.open.service.FeignOrderDetailService;
 import com.atzuche.order.open.vo.request.TransferReq;
 import com.autoyol.commons.web.ErrorCode;
@@ -138,11 +139,23 @@ public class AdminOrderController {
     @AutoDocGroup(group = "订单修改")
     @AutoDocMethod(description = "取消订单责任判定", value = "取消订单责任判定",response = ResponseData.class)
     @RequestMapping(value="console/order/cancel/judgeDuty",method = RequestMethod.POST)
-    public ResponseData refuseOrder(@Valid @RequestBody CancelOrderJudgeDutyReqVO reqVO,
+    public ResponseData judgeDuty(@Valid @RequestBody CancelOrderJudgeDutyReqVO reqVO,
                                     BindingResult bindingResult){
         log.info("取消订单责任判定-reqVo={}", JSON.toJSONString(reqVO));
         BindingResultUtil.checkBindingResult(bindingResult);
         return adminOrderService.cancelOrderJudgeDuty(reqVO);
+    }
+
+
+    @AutoDocVersion(version = "订单修改")
+    @AutoDocGroup(group = "订单修改")
+    @AutoDocMethod(description = "取消订单责任判定列表(取消/申诉--手动/自动判责)", value = "取消订单责任判定列表(取消/申诉--手动/自动判责)", response = AdminOrderJudgeDutyResVO.class)
+    @RequestMapping(value = "console/order/cancel/judgeDuty/list", method = RequestMethod.POST)
+    public ResponseData<AdminOrderJudgeDutyResVO> judgeDutyList(@Valid @RequestBody CancelOrderJudgeDutyListReqVO reqVO,
+                                                                BindingResult bindingResult) {
+        log.info("取消/申诉--手动/自动判责列表-reqVo={}", JSON.toJSONString(reqVO));
+        BindingResultUtil.checkBindingResult(bindingResult);
+        return adminOrderService.cancelOrderJudgeDutyList(reqVO.getOrderNo());
     }
 
 
