@@ -24,6 +24,8 @@ import com.atzuche.order.coreapi.entity.vo.DispatchCarInfoVO;
 import com.atzuche.order.open.vo.request.TransferReq;
 import com.atzuche.order.open.vo.ModifyOrderCompareVO;
 import com.atzuche.order.open.vo.ModifyOrderScanCodeVO;
+import com.atzuche.order.open.vo.ModifyOrderScanPickUpVO;
+import com.atzuche.order.coreapi.service.ModifyOrderCheckService;
 import com.atzuche.order.coreapi.service.ModifyOrderConfirmService;
 import com.atzuche.order.coreapi.service.ModifyOrderFeeService;
 import com.atzuche.order.coreapi.service.ModifyOrderOwnerConfirmService;
@@ -49,6 +51,8 @@ public class ModifyOrderController {
     private ModifyOrderConfirmService modifyOrderConfirmService;
     @Autowired
     private ModifyOrderScanCodeService modifyOrderScanCodeService;
+    @Autowired
+    private ModifyOrderCheckService modifyOrderCheckService;
 	
 	/**
 	 * 修改订单（APP端或H5端）
@@ -184,6 +188,21 @@ public class ModifyOrderController {
 	
 	
 	/**
+	 * 扫码取车
+	 * @param modifyOrderScanPickUpVO
+	 * @param bindingResult
+	 * @return ResponseData
+	 */
+	@PostMapping("/order/scan/pickup")
+	public ResponseData<?> pickup(@Valid @RequestBody ModifyOrderScanPickUpVO modifyOrderScanPickUpVO, BindingResult bindingResult) {
+		log.info("扫码取车/order/scan/pickupmodifyOrderScanPickUpVO=[{}]", modifyOrderScanPickUpVO);
+		BindingResultUtil.checkBindingResult(bindingResult);
+		modifyOrderScanCodeService.pickUpScanCode(modifyOrderScanPickUpVO);
+        return ResponseData.success();
+    }
+	
+	
+	/**
 	 * 扫码还车（车主确认结算方式）
 	 * @param modifyOrderScanCodeVO
 	 * @param bindingResult
@@ -191,9 +210,23 @@ public class ModifyOrderController {
 	 */
 	@PostMapping("/order/scan/confirm")
 	public ResponseData<?> confirmScanCode(@Valid @RequestBody ModifyOrderScanCodeVO modifyOrderScanCodeVO, BindingResult bindingResult) {
-		log.info(" 扫码还车（车主确认结算方式）modifyOrderScanCodeVO=[{}]", modifyOrderScanCodeVO);
+		log.info("扫码还车/order/scan/confirm（车主确认结算方式）modifyOrderScanCodeVO=[{}]", modifyOrderScanCodeVO);
 		BindingResultUtil.checkBindingResult(bindingResult);
 		modifyOrderScanCodeService.confirmScanCode(modifyOrderScanCodeVO);
         return ResponseData.success();
+    }
+	
+	
+	/**
+	 * 修改订单校验
+	 * @param orderNo
+	 * @return ResponseData
+	 */
+	@GetMapping("/order/modify/check")
+    public ResponseData<?> modifyCheck(@RequestParam(value="orderNo",required = true) String orderNo, 
+    		@RequestParam(value="memNo",required = true) String memNo) {
+		log.info("order/modify/check orderNo=[{}]", orderNo);
+		modifyOrderCheckService.checkModifyOrderForApp(orderNo, memNo);
+    	return ResponseData.success();
     }
 }

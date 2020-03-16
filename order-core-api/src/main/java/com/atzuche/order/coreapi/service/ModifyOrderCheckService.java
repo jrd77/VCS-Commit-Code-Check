@@ -15,6 +15,8 @@ import com.atzuche.order.commons.entity.dto.RenterMemberDTO;
 import com.atzuche.order.commons.enums.OrderChangeItemEnum;
 import com.atzuche.order.commons.enums.OrderStatusEnum;
 import com.atzuche.order.coreapi.entity.dto.ModifyOrderDTO;
+import com.atzuche.order.coreapi.modifyorder.exception.ModifyOrderAlreadyOverException;
+import com.atzuche.order.coreapi.modifyorder.exception.ModifyOrderChangeApplyLimitException;
 import com.atzuche.order.coreapi.modifyorder.exception.ModifyOrderCurrentStatusNotSupportException;
 import com.atzuche.order.coreapi.modifyorder.exception.ModifyOrderDataNoChangeException;
 import com.atzuche.order.coreapi.modifyorder.exception.ModifyOrderExistTODOChangeApplyException;
@@ -23,12 +25,14 @@ import com.atzuche.order.coreapi.modifyorder.exception.ModifyOrderGoodPriceNotEx
 import com.atzuche.order.coreapi.modifyorder.exception.ModifyOrderMemberNotExistException;
 import com.atzuche.order.coreapi.modifyorder.exception.ModifyOrderParentOrderNotFindException;
 import com.atzuche.order.coreapi.modifyorder.exception.ModifyOrderRentOrRevertTimeException;
+import com.atzuche.order.coreapi.modifyorder.exception.ModifyOrderWaitReceiptException;
 import com.atzuche.order.coreapi.modifyorder.exception.TransferCarException;
 import com.atzuche.order.coreapi.modifyorder.exception.TransferUseOwnerCouponException;
 import com.atzuche.order.owner.commodity.entity.OwnerGoodsEntity;
 import com.atzuche.order.owner.commodity.service.OwnerGoodsService;
 import com.atzuche.order.parentorder.entity.OrderEntity;
 import com.atzuche.order.parentorder.entity.OrderStatusEntity;
+import com.atzuche.order.parentorder.service.OrderService;
 import com.atzuche.order.parentorder.service.OrderStatusService;
 import com.atzuche.order.renterorder.entity.dto.OrderChangeItemDTO;
 import com.atzuche.order.renterorder.service.RenterOrderChangeApplyService;
@@ -50,6 +54,10 @@ public class ModifyOrderCheckService {
 	private OwnerGoodsService ownerGoodsService;
 	@Autowired
 	private OrderStatusService orderStatusService;
+	@Autowired
+	private OrderService orderService;
+	
+	private static final int MODIFY_LIMIT_SIZE = 6;
 	
 	/**
 	 * 库存校验
@@ -245,6 +253,74 @@ public class ModifyOrderCheckService {
 			throw new ModifyOrderExistTODOChangeApplyException();
 		}
 	}
+	
+	
+	/**
+	 * app端校验接口
+	 * @param orderNo
+	 * @param memNo
+	 */
+	public void checkModifyOrderForApp(String orderNo, String memNo) {
+		// 校验主订单
+		checkOrderEntity(orderNo, memNo);
+		// 校验修改次数
+		checkModifyCount(orderNo);
+		// 查询主订单状态
+		checkModifyOrderStatus(orderNo);
+	}
+	
+	
+	/**
+	 * 校验主订单
+	 * @param orderNo
+	 * @param memNo
+	 */
+	public void checkOrderEntity(String orderNo, String memNo) {
+		// 获取主订单信息
+		OrderEntity orderEntity = orderService.getOrderByOrderNoAndMemNo(orderNo, memNo);
+		if (orderEntity == null) {
+			throw new ModifyOrderParentOrderNotFindException();
+		}
+	}
+	
+	
+	/**
+	 * 校验修改次数
+	 * @param orderNo
+	 */
+	public void checkModifyCount(String orderNo) {
+		Integer changeApplyCount = renterOrderChangeApplyService.getRenterOrderChangeApplyAllCountByOrderNo(orderNo);
+		changeApplyCount = changeApplyCount == null ? 0:changeApplyCount;
+		if (changeApplyCount >= MODIFY_LIMIT_SIZE) {
+			throw new ModifyOrderChangeApplyLimitException("您已申请修改过"+MODIFY_LIMIT_SIZE+"次订单，如有问题，请联系在线客服");
+		}
+	}
+	
+	
+	/**
+	 * 校验当前订单状态是否支持修改
+	 * @param modifyOrderDTO
+	 */
+	public void checkModifyOrderStatus(String orderNo) {
+		// 查询主订单状态
+		OrderStatusEntity orderStatus = orderStatusService.getByOrderNo(orderNo);
+		if (orderStatus == null) {
+			return;
+		}
+		// 订单状态
+		int status = orderStatus.getStatus() == null ? -1:orderStatus.getStatus();
+		if (status == OrderStatusEnum.TO_CONFIRM.getStatus()) {
+			throw new ModifyOrderWaitReceiptException();
+		}
+		if (status == OrderStatusEnum.COMPLETED.getStatus() || status == OrderStatusEnum.CLOSED.getStatus()) {
+			throw new ModifyOrderAlreadyOverException();
+		}
+		if (status >= OrderStatusEnum.TO_SETTLE.getStatus() || 
+				status == OrderStatusEnum.CLOSED.getStatus()) {
+			throw new ModifyOrderCurrentStatusNotSupportException();
+		}
+	}
+	
 	
 	/**
 	 * 使用车主券不允许换车
