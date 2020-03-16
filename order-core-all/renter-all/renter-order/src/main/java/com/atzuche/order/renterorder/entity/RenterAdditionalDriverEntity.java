@@ -6,6 +6,7 @@ import java.util.Date;
 
 import com.autoyol.doc.annotation.AutoDocProperty;
 import lombok.Data;
+import lombok.ToString;
 
 
 /**
@@ -16,6 +17,7 @@ import lombok.Data;
  * @Description:
  */
 @Data
+@ToString
 public class RenterAdditionalDriverEntity implements Serializable {
 	private static final long serialVersionUID = 1L;
 	

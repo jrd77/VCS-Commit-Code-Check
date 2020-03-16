@@ -1,9 +1,7 @@
 package com.atzuche.order.settle.vo.req;
 
 import com.atzuche.order.accountownercost.entity.AccountOwnerCostSettleDetailEntity;
-import com.atzuche.order.accountplatorm.entity.AccountPlatformSubsidyDetailEntity;
 import lombok.Data;
-import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,6 +31,15 @@ public class SettleCancelOrdersAccount {
      * 车主收入罚金金额 （来自租客或者平台的罚金补贴）
      */
     private int ownerFineIncomeAmt;
+    /**
+     * 车主收益与罚金对冲值 ownerFineAmt+ownerFineIncomeAmt
+     */
+    private int ownerFineTotal;
+
+    /**
+     * 车主费用明细
+     */
+    private List<AccountOwnerCostSettleDetailEntity> accountOwnerCostSettleDetails = new ArrayList<>();
 
     /**************************************************************************************** 租客端统计费用 */
     /**
@@ -43,6 +50,11 @@ public class SettleCancelOrdersAccount {
      * 租客收入罚金金额（来自车主或者平台的罚金补贴）
      */
     private int rentFineIncomeAmt;
+
+    /**
+     * 租客收益与罚金对冲值 rentFineAmt + rentFineIncomeAmt
+     */
+    private int rentFineTotal;
 
     /**
      * 租客实付租车费用
@@ -89,23 +101,4 @@ public class SettleCancelOrdersAccount {
      */
     private int renCoinAmt;
 
-
-    /**
-     * 车主费用明细
-     */
-    private List<AccountOwnerCostSettleDetailEntity> accountOwnerCostSettleDetails;
-
-
-    /**
-     * 车主费用明细 添加
-     * @param accountOwnerCostSettleDetail
-     */
-    public void addOwnerCostSettleDetail(AccountOwnerCostSettleDetailEntity accountOwnerCostSettleDetail){
-        List<AccountOwnerCostSettleDetailEntity> accountOwnerCostSettleDetails = getAccountOwnerCostSettleDetails();
-        if(CollectionUtils.isEmpty(accountOwnerCostSettleDetails)){
-            accountOwnerCostSettleDetails = new ArrayList<>();
-        }
-        accountOwnerCostSettleDetails.add(accountOwnerCostSettleDetail);
-        setAccountOwnerCostSettleDetails(accountOwnerCostSettleDetails);
-    }
 }

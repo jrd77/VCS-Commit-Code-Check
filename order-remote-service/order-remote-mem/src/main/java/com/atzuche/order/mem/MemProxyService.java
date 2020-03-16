@@ -16,6 +16,7 @@ import com.autoyol.member.detail.enums.MemberSelectKeyEnum;
 import com.autoyol.member.detail.vo.res.*;
 import com.dianping.cat.Cat;
 import com.dianping.cat.message.Transaction;
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -479,4 +480,101 @@ public class MemProxyService {
         }
 
     }
+
+
+    /**
+     * 获取简单的会员信息
+     * @param memNo
+     * @return CashWithdrawalSimpleMemberDTO
+     */
+    public CashWithdrawalSimpleMemberDTO getSimpleMemberInfo(String memNo)  {
+        List<String> selectKey = Arrays.asList(
+                MemberSelectKeyEnum.MEMBER_CORE_INFO.getKey(),
+                MemberSelectKeyEnum.MEMBER_AUTH_INFO.getKey(),
+                MemberSelectKeyEnum.MEMBER_ASSERTS_INFO.getKey());
+        ResponseData<MemberTotalInfo> responseData = null;
+        log.info("Feign 开始获取简单的会员信息,memNo={}",memNo);
+        Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "会员详情服务");
+        try{
+            Cat.logEvent(CatConstants.FEIGN_METHOD,"MemberDetailFeignService.getSimpleMemberInfo");
+            String parameter = "memNo="+memNo+"&selectKey"+JSON.toJSONString(selectKey);
+            Cat.logEvent(CatConstants.FEIGN_PARAM,parameter);
+            responseData = memberDetailFeignService.getMemberSelectInfo(Integer.parseInt(memNo), selectKey);
+            ResponseCheckUtil.checkResponse(responseData);
+            t.setStatus(Transaction.SUCCESS);
+        }catch (Exception e){
+            log.error("Feign 获取简单的会员信息失败,ResponseData={},memNo={}",responseData,memNo,e);
+            Cat.logError("Feign 获取简单的会员信息失败",e);
+            t.setStatus(e);
+            throw e;
+        }finally {
+            t.complete();
+        }
+
+        MemberTotalInfo memberTotalInfo = responseData.getData();
+        if (memberTotalInfo == null) {
+        	return null;
+        }
+        // 会员核心信息
+        MemberCoreInfo memberCoreInfo = memberTotalInfo.getMemberCoreInfo();
+        // 会员认证信息
+        MemberAuthInfo memberAuthInfo = memberTotalInfo.getMemberAuthInfo();
+        // 会员资产信息
+        MemberAssetsInfo memberAssetsInfo = memberTotalInfo.getMemberAssetsInfo();
+        CashWithdrawalSimpleMemberDTO simpleMem = new CashWithdrawalSimpleMemberDTO();
+        simpleMem.setMemNo(memNo);
+        if (memberCoreInfo != null) {
+        	simpleMem.setMobile(memberCoreInfo.getMobile() == null ? null:String.valueOf(memberCoreInfo.getMobile()));
+        	simpleMem.setRealName(memberCoreInfo.getRealName());
+        }
+        if (memberAuthInfo != null) {
+        	simpleMem.setIdCardAuth(memberAuthInfo.getIdCardAuth());
+        }
+        if (memberAssetsInfo != null) {
+        	simpleMem.setBalance(memberAssetsInfo.getBalance());
+        }
+        return simpleMem;
+    }
+
+
+    /**
+     * 获取会员假节日取消产生罚金次数
+     *
+     * @param memNo             会员号
+     * @param holidayCircleList 租期内节假日列表
+     * @return boolean true,累计超过X次补贴给平台 false,累计未超过X次补贴给车主/租客
+     */
+    public boolean countByHolidayCircleList(Integer memNo, List<Integer> holidayCircleList) {
+        log.info("Feign 开始获取会员假节日取消产生罚金次数.param is, memNo:[{}], holidayCircleList:[{}]", memNo, holidayCircleList);
+        if (CollectionUtils.isEmpty(holidayCircleList) || null == memNo) {
+            return false;
+        }
+        Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "会员服务");
+        ResponseData<Integer> responseData = null;
+        try {
+            Cat.logEvent(CatConstants.FEIGN_METHOD, "memberDetailFeignService.getHolidayDeductCount");
+            String parameter = "memNo=" + memNo + "&holidayCircleList" + JSON.toJSONString(holidayCircleList);
+            Cat.logEvent(CatConstants.FEIGN_PARAM, parameter);
+            responseData = memberDetailFeignService.getHolidayDeductCount(memNo, holidayCircleList);
+            log.info("获取会员假节日取消产生罚金次数.responseData:[{}]", JSON.toJSONString(responseData));
+            Cat.logEvent(CatConstants.FEIGN_RESULT, JSON.toJSONString(responseData));
+            t.setStatus(Transaction.SUCCESS);
+
+            if (null != responseData) {
+                Integer count = responseData.getData();
+                return null != count && count >= 2;
+            }
+        } catch (Exception e) {
+            log.error("Feign 获取会员假节日取消产生罚金次数失败,responseData={},memNo={}", memNo, responseData, e);
+            Cat.logError("Feign 获取会员假节日取消产生罚金次数失败", e);
+            t.setStatus(e);
+            throw e;
+        } finally {
+            t.complete();
+        }
+        return false;
+
+    }
+
+
 }

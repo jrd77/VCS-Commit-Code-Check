@@ -102,7 +102,8 @@ public class AccountRenterWzDepositNoTService {
         if(Objects.isNull(accountRenterDepositEntity)){
             throw new PayOrderRenterWZDepositException();
         }
-        if(payedOrderRenterWZDepositDetail.getAmt() + accountRenterDepositEntity.getShishouDeposit()<0){
+        //消费方式
+        if(accountRenterDepositEntity.getIsAuthorize() != null && accountRenterDepositEntity.getIsAuthorize().intValue() == 0 && payedOrderRenterWZDepositDetail.getAmt() + accountRenterDepositEntity.getShishouDeposit()<0){
             //可用 剩余押金 不足
             throw new PayOrderRenterWZDepositException();
         }
@@ -135,10 +136,14 @@ public class AccountRenterWzDepositNoTService {
         //TODO
         //计算剩余可扣金额押金总和
         int surplusAmt = accountRenterDepositEntity.getShishouDeposit();
-        if(detainRenterDepositReqVO.getAmt() + surplusAmt<0){
+        if (accountRenterDepositEntity.getIsAuthorize() != null
+                && accountRenterDepositEntity.getIsAuthorize() == 0
+                && detainRenterDepositReqVO.getAmt() + surplusAmt < 0) {
             //可用 剩余押金 不足
             throw new PayOrderRenterWZDepositException();
         }
+
+
         AccountRenterWzDepositEntity accountRenterDeposit = new AccountRenterWzDepositEntity();
         accountRenterDeposit.setId(accountRenterDepositEntity.getId());
         accountRenterDeposit.setVersion(accountRenterDepositEntity.getVersion());

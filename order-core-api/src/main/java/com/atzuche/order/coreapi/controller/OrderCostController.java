@@ -3,28 +3,16 @@
  */
 package com.atzuche.order.coreapi.controller;
 
-import java.util.List;
-
-import javax.validation.Valid;
-
-import com.atzuche.order.commons.vo.res.*;
-import com.autoyol.commons.web.ErrorCode;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
 import com.atzuche.order.accountrenterdeposit.entity.AccountRenterDepositEntity;
 import com.atzuche.order.accountrenterwzdepost.entity.AccountRenterWzDepositEntity;
 import com.atzuche.order.cashieraccount.service.CashierQueryService;
 import com.atzuche.order.commons.BindingResultUtil;
+import com.atzuche.order.commons.entity.rentCost.RenterCostDetailDTO;
 import com.atzuche.order.commons.exceptions.OrderNotFoundException;
 import com.atzuche.order.commons.exceptions.OwnerOrderNotFoundException;
 import com.atzuche.order.commons.vo.req.OrderCostReqVO;
 import com.atzuche.order.commons.vo.req.OwnerCostSettleDetailReqVO;
+import com.atzuche.order.commons.vo.res.*;
 import com.atzuche.order.coreapi.service.OrderCostService;
 import com.atzuche.order.coreapi.service.OwnerCostFacadeService;
 import com.atzuche.order.coreapi.service.RenterCostFacadeService;
@@ -35,9 +23,15 @@ import com.atzuche.order.parentorder.entity.OrderEntity;
 import com.atzuche.order.parentorder.service.OrderService;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.atzuche.order.renterorder.service.RenterOrderService;
+import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
-
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
+import java.util.List;
 
 /**
  * @author jing.huang
@@ -212,4 +206,17 @@ public class OrderCostController {
 	}
 	
 
+    @GetMapping("/order/renter/cost/detail")
+	public ResponseData<RenterCostDetailDTO> renterCostDetail(@RequestParam("orderNo") String orderNo){
+        OrderEntity orderEntity = orderService.getOrderEntity(orderNo);
+        if(orderEntity==null){
+            throw new OrderNotFoundException(orderNo);
+        }
+        RenterOrderEntity renterOrderEntity = renterOrderService.getRenterOrderByOrderNoAndIsEffective(orderNo);
+        if(renterOrderEntity==null){
+            throw new OrderNotFoundException(orderNo);
+        }
+        RenterCostDetailDTO renterCostDetailDTO = facadeService.renterCostDetail(orderNo,renterOrderEntity.getRenterOrderNo(),renterOrderEntity.getRenterMemNo());
+        return ResponseData.success(renterCostDetailDTO);
+    }
 }

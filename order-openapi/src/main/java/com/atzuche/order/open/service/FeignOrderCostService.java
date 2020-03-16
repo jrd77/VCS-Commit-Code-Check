@@ -3,21 +3,20 @@
  */
 package com.atzuche.order.open.service;
 
+import com.atzuche.order.commons.entity.rentCost.RenterCostDetailDTO;
 import com.atzuche.order.commons.vo.req.AdminOrderReqVO;
 import com.atzuche.order.commons.vo.req.NormalOrderCostCalculateReqVO;
-import com.atzuche.order.commons.vo.res.NormalOrderCostCalculateResVO;
-import com.atzuche.order.commons.vo.res.OrderResVO;
-import org.springframework.cloud.netflix.feign.FeignClient;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-
 import com.atzuche.order.commons.vo.req.OrderCostReqVO;
+import com.atzuche.order.commons.vo.res.NormalOrderCostCalculateResVO;
 import com.atzuche.order.commons.vo.res.OrderOwnerCostResVO;
 import com.atzuche.order.commons.vo.res.OrderRenterCostResVO;
+import com.atzuche.order.commons.vo.res.OrderResVO;
 import com.autoyol.commons.web.ResponseData;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.cloud.netflix.feign.FeignClient;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.validation.Valid;
 
@@ -46,4 +45,8 @@ public interface FeignOrderCostService {
 
 	@PostMapping("/order/admin/req")
 	public ResponseData<OrderResVO> submitOrder(@RequestBody AdminOrderReqVO adminOrderReqVO);
+
+    @GetMapping("/order/renter/cost/detail")
+    public ResponseData<RenterCostDetailDTO> renterCostDetail(@RequestParam("orderNo") String orderNo);
+
 }

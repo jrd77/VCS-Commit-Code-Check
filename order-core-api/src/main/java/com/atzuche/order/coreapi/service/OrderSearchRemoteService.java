@@ -3,6 +3,8 @@ package com.atzuche.order.coreapi.service;
 import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.CatConstants;
 import com.atzuche.order.commons.DateUtils;
+import com.atzuche.order.commons.ResponseCheckUtil;
+import com.atzuche.order.commons.exceptions.RemoteCallException;
 import com.atzuche.order.coreapi.entity.dto.SuccessOrderStaCount;
 import com.atzuche.order.coreapi.listener.sms.SMSOrderBaseEventService;
 import com.atzuche.order.mq.enums.ShortMessageTypeEnum;
@@ -18,6 +20,7 @@ import com.atzuche.order.renterwz.entity.WzQueryDayConfEntity;
 import com.atzuche.order.renterwz.service.WzQueryDayConfService;
 import com.atzuche.order.renterwz.vo.IllegalToDO;
 import com.autoyol.car.api.model.enums.OwnerTypeEnum;
+import com.autoyol.car.api.model.vo.ResponseObject;
 import com.autoyol.search.api.OrderSearchService;
 import com.autoyol.search.entity.ErrorCode;
 import com.autoyol.search.entity.ResponseData;
@@ -84,6 +87,7 @@ public class OrderSearchRemoteService {
     private static final LocalDateTime FESTIVAL_END_TIME = LocalDateTime.of(2019,10,7,23,59,59);
 
     public List<IllegalToDO> violateProcessOrder() {
+        //FIXME:需要修改成翻页
         Transaction t = Cat.getProducer().newTransaction(CatConstants.FEIGN_CALL, "每天定时查询当前进行中的订单");
         try {
             ViolateVO reqVO = new ViolateVO();
@@ -95,20 +99,18 @@ public class OrderSearchRemoteService {
             Cat.logEvent(CatConstants.FEIGN_PARAM, JSON.toJSONString(reqVO));
             ResponseData<OrderVO<ViolateBO>> orderResponseData = orderSearchService.violateProcessOrder(reqVO);
             Cat.logEvent(CatConstants.FEIGN_RESULT, JSON.toJSONString(orderResponseData));
-            if(orderResponseData != null && orderResponseData.getResCode() != null
-                    && ErrorCode.SUCCESS.getCode().equals(orderResponseData.getResCode()) && orderResponseData.getData() != null){
-                List<ViolateBO> orderList = orderResponseData.getData().getOrderList();
-                return convertDto(orderList);
-            }else{
-                return new ArrayList<>();
-            }
+            checkResponse(orderResponseData);
+            List<ViolateBO> orderList = orderResponseData.getData().getOrderList();
+            t.setStatus(Transaction.SUCCESS);
+            return convertDto(orderList);
         } catch (Exception e) {
             logger.error("执行 每天定时查询当前进行中的订单 异常",e);
             Cat.logError("执行 每天定时查询当前进行中的订单 异常",e);
+            t.setStatus(e);
+            throw e;
         }finally {
             t.complete();
         }
-        return new ArrayList<>();
     }
 
     public List<IllegalToDO> violateSettleOrder() {
@@ -122,20 +124,18 @@ public class OrderSearchRemoteService {
             Cat.logEvent(CatConstants.FEIGN_PARAM, JSON.toJSONString(reqVO));
             ResponseData<OrderVO<ViolateBO>> orderResponseData = orderSearchService.violateProcessOrder(reqVO);
             Cat.logEvent(CatConstants.FEIGN_RESULT, JSON.toJSONString(orderResponseData));
-            if(orderResponseData != null && orderResponseData.getResCode() != null
-                    && ErrorCode.SUCCESS.getCode().equals(orderResponseData.getResCode()) && orderResponseData.getData() != null){
-                List<ViolateBO> orderList = orderResponseData.getData().getOrderList();
-                return convertDto(orderList);
-            }else{
-                return new ArrayList<>();
-            }
+            checkResponse(orderResponseData);
+            List<ViolateBO> orderList = orderResponseData.getData().getOrderList();
+            t.setStatus(Transaction.SUCCESS);
+            return convertDto(orderList);
         } catch (Exception e) {
             logger.error("执行 每天定时处理结算前15分钟订单 异常",e);
             Cat.logError("执行 每天定时处理结算前15分钟订单 异常",e);
+            t.setStatus(e);
+            throw e;
         }finally {
             t.complete();
         }
-        return new ArrayList<>();
     }
 
      public List<IllegalToDO> violatePendingOrder() {
@@ -245,20 +245,19 @@ public class OrderSearchRemoteService {
             Cat.logEvent(CatConstants.FEIGN_PARAM, JSON.toJSONString(reqVO));
             ResponseData<OrderVO<ViolateBO>> orderResponseData = orderSearchService.violateProcessOrder(reqVO);
             Cat.logEvent(CatConstants.FEIGN_RESULT, JSON.toJSONString(orderResponseData));
-            if(orderResponseData != null && orderResponseData.getResCode() != null
-                    && ErrorCode.SUCCESS.getCode().equals(orderResponseData.getResCode()) && orderResponseData.getData() != null){
-                List<ViolateBO> orderList = orderResponseData.getData().getOrderList();
-                return convertDto(orderList);
-            }else{
-                return new ArrayList<>();
-            }
+            checkResponse(orderResponseData);
+            List<ViolateBO> orderList = orderResponseData.getData().getOrderList();
+            logger.info("执行 查询按规则配置日期内完成的订单，获取待查询违章的对象列表 [{}]",orderList);
+            t.setStatus(Transaction.SUCCESS);
+            return convertDto(orderList);
         } catch (Exception e) {
             logger.error("执行 查询按规则配置日期内完成的订单，获取待查询违章的对象列表 异常",e);
             Cat.logError("执行 查询按规则配置日期内完成的订单，获取待查询违章的对象列表 异常",e);
+            t.setStatus(e);
+            throw e;
         }finally {
             t.complete();
         }
-        return new ArrayList<>();
     }
 
     private List<IllegalToDO> convertDto(List<ViolateBO> orderList) {
@@ -480,19 +479,18 @@ public class OrderSearchRemoteService {
             Cat.logEvent(CatConstants.FEIGN_PARAM, JSON.toJSONString(reqVO));
             ResponseData<OrderVO<ViolateBO>> orderResponseData = orderSearchService.violateProcessOrder(reqVO);
             Cat.logEvent(CatConstants.FEIGN_RESULT, JSON.toJSONString(orderResponseData));
-            if(orderResponseData != null && orderResponseData.getResCode() != null
-                    && ErrorCode.SUCCESS.getCode().equals(orderResponseData.getResCode()) && orderResponseData.getData() != null){
-                return orderResponseData.getData().getOrderList();
-            }else{
-                return new ArrayList<>();
-            }
+            checkResponse(orderResponseData);
+            List<ViolateBO> orderList = orderResponseData.getData().getOrderList();
+            t.setStatus(Transaction.SUCCESS);
+            return orderList;
         } catch (Exception e) {
             logger.error("执行 查询按规则配置日期内完成的订单，获取待查询违章的对象列表 异常",e);
             Cat.logError("执行 查询按规则配置日期内完成的订单，获取待查询违章的对象列表 异常",e);
+            t.setStatus(e);
+            throw e;
         }finally {
             t.complete();
         }
-        return null;
     }
 
     public List<String> queryOrderNosWithOwnerHasNotAgree() {
@@ -506,24 +504,22 @@ public class OrderSearchRemoteService {
             Cat.logEvent(CatConstants.FEIGN_PARAM, JSON.toJSONString(reqVO));
             ResponseData<OrderVO<ViolateBO>> orderResponseData = orderSearchService.violateProcessOrder(reqVO);
             Cat.logEvent(CatConstants.FEIGN_RESULT, JSON.toJSONString(orderResponseData));
-            if(orderResponseData != null && orderResponseData.getResCode() != null
-                    && ErrorCode.SUCCESS.getCode().equals(orderResponseData.getResCode()) && orderResponseData.getData() != null){
-                List<ViolateBO> orderList = orderResponseData.getData().getOrderList();
-                if(CollectionUtils.isEmpty(orderList)){
-                    return new ArrayList<>();
-                }else{
-                    return  orderList.stream().map(ViolateBO::getOrderNo).collect(Collectors.toList());
-                }
-            }else{
+            checkResponse(orderResponseData);
+            List<ViolateBO> orderList = orderResponseData.getData().getOrderList();
+            t.setStatus(Transaction.SUCCESS);
+            if(CollectionUtils.isEmpty(orderList)){
                 return new ArrayList<>();
+            }else{
+                return  orderList.stream().map(ViolateBO::getOrderNo).collect(Collectors.toList());
             }
         } catch (Exception e) {
             logger.error("执行 查询下单后15分钟的订单 异常",e);
             Cat.logError("执行 查询下单后15分钟的订单 异常",e);
+            t.setStatus(e);
+            throw e;
         }finally {
             t.complete();
         }
-        return new ArrayList<>();
     }
 
     public List<String> queryOrderNosWithRenterAutoCancel() {
@@ -537,24 +533,22 @@ public class OrderSearchRemoteService {
             Cat.logEvent(CatConstants.FEIGN_PARAM, JSON.toJSONString(reqVO));
             ResponseData<OrderVO<ViolateBO>> orderResponseData = orderSearchService.violateProcessOrder(reqVO);
             Cat.logEvent(CatConstants.FEIGN_RESULT, JSON.toJSONString(orderResponseData));
-            if(orderResponseData != null && orderResponseData.getResCode() != null
-                    && ErrorCode.SUCCESS.getCode().equals(orderResponseData.getResCode()) && orderResponseData.getData() != null){
-                List<ViolateBO> orderList = orderResponseData.getData().getOrderList();
-                if(CollectionUtils.isEmpty(orderList)){
-                    return new ArrayList<>();
-                }else{
-                    return  orderList.stream().map(ViolateBO::getOrderNo).collect(Collectors.toList());
-                }
-            }else{
+            checkResponse(orderResponseData);
+            List<ViolateBO> orderList = orderResponseData.getData().getOrderList();
+            t.setStatus(Transaction.SUCCESS);
+            if(CollectionUtils.isEmpty(orderList)){
                 return new ArrayList<>();
+            }else{
+                return  orderList.stream().map(ViolateBO::getOrderNo).collect(Collectors.toList());
             }
         } catch (Exception e) {
             logger.error("执行 查询下单后1小时的订单 异常",e);
             Cat.logError("执行 查询下单后1小时的订单 异常",e);
+            t.setStatus(e);
+            throw e;
         }finally {
             t.complete();
         }
-        return new ArrayList<>();
     }
 
     public List<String> queryOrderNosWithUnDispatchOrder() {
@@ -568,24 +562,22 @@ public class OrderSearchRemoteService {
             Cat.logEvent(CatConstants.FEIGN_PARAM, JSON.toJSONString(reqVO));
             ResponseData<OrderVO<ViolateBO>> orderResponseData = orderSearchService.violateProcessOrder(reqVO);
             Cat.logEvent(CatConstants.FEIGN_RESULT, JSON.toJSONString(orderResponseData));
-            if(orderResponseData != null && orderResponseData.getResCode() != null
-                    && ErrorCode.SUCCESS.getCode().equals(orderResponseData.getResCode()) && orderResponseData.getData() != null){
-                List<ViolateBO> orderList = orderResponseData.getData().getOrderList();
-                if(CollectionUtils.isEmpty(orderList)){
-                    return new ArrayList<>();
-                }else{
-                    return  orderList.stream().map(ViolateBO::getOrderNo).collect(Collectors.toList());
-                }
-            }else{
+            checkResponse(orderResponseData);
+            List<ViolateBO> orderList = orderResponseData.getData().getOrderList();
+            t.setStatus(Transaction.SUCCESS);
+            if(CollectionUtils.isEmpty(orderList)){
                 return new ArrayList<>();
+            }else{
+                return  orderList.stream().map(ViolateBO::getOrderNo).collect(Collectors.toList());
             }
         } catch (Exception e) {
             logger.error("执行 查询待调度后4小时的订单 异常",e);
             Cat.logError("执行 查询待调度后4小时的订单 异常",e);
+            t.setStatus(e);
+            throw e;
         }finally {
             t.complete();
         }
-        return new ArrayList<>();
     }
 
     public List<String> queryOrderNosWithUnPayViolationDeposit() {
@@ -599,24 +591,22 @@ public class OrderSearchRemoteService {
             Cat.logEvent(CatConstants.FEIGN_PARAM, JSON.toJSONString(reqVO));
             ResponseData<OrderVO<ViolateBO>> orderResponseData = orderSearchService.violateProcessOrder(reqVO);
             Cat.logEvent(CatConstants.FEIGN_RESULT, JSON.toJSONString(orderResponseData));
-            if(orderResponseData != null && orderResponseData.getResCode() != null
-                    && ErrorCode.SUCCESS.getCode().equals(orderResponseData.getResCode()) && orderResponseData.getData() != null){
-                List<ViolateBO> orderList = orderResponseData.getData().getOrderList();
-                if(CollectionUtils.isEmpty(orderList)){
-                    return new ArrayList<>();
-                }else{
-                    return  orderList.stream().map(ViolateBO::getOrderNo).collect(Collectors.toList());
-                }
-            }else{
+            checkResponse(orderResponseData);
+            List<ViolateBO> orderList = orderResponseData.getData().getOrderList();
+            t.setStatus(Transaction.SUCCESS);
+            if(CollectionUtils.isEmpty(orderList)){
                 return new ArrayList<>();
+            }else{
+                return  orderList.stream().map(ViolateBO::getOrderNo).collect(Collectors.toList());
             }
         } catch (Exception e) {
             logger.error("执行 查询订单开始仍未支付违章押金的订单 异常",e);
             Cat.logError("执行 查询订单开始仍未支付违章押金的订单 异常",e);
+            t.setStatus(e);
+            throw e;
         }finally {
             t.complete();
         }
-        return new ArrayList<>();
     }
 
     public List<String> queryOrderNosWithRevertCar4Hours() {
@@ -630,24 +620,22 @@ public class OrderSearchRemoteService {
             Cat.logEvent(CatConstants.FEIGN_PARAM, JSON.toJSONString(reqVO));
             ResponseData<OrderVO<ViolateBO>> orderResponseData = orderSearchService.violateProcessOrder(reqVO);
             Cat.logEvent(CatConstants.FEIGN_RESULT, JSON.toJSONString(orderResponseData));
-            if(orderResponseData != null && orderResponseData.getResCode() != null
-                    && ErrorCode.SUCCESS.getCode().equals(orderResponseData.getResCode()) && orderResponseData.getData() != null){
-                List<ViolateBO> orderList = orderResponseData.getData().getOrderList();
-                if(CollectionUtils.isEmpty(orderList)){
-                    return new ArrayList<>();
-                }else{
-                    return  orderList.stream().map(ViolateBO::getOrderNo).collect(Collectors.toList());
-                }
-            }else{
+            checkResponse(orderResponseData);
+            List<ViolateBO> orderList = orderResponseData.getData().getOrderList();
+            t.setStatus(Transaction.SUCCESS);
+            if(CollectionUtils.isEmpty(orderList)){
                 return new ArrayList<>();
+            }else{
+                return  orderList.stream().map(ViolateBO::getOrderNo).collect(Collectors.toList());
             }
         } catch (Exception e) {
             logger.error("执行 查询还车4小时后的订单 异常",e);
             Cat.logError("执行 查询还车4小时后的订单 异常",e);
+            t.setStatus(e);
+            throw e;
         }finally {
             t.complete();
         }
-        return new ArrayList<>();
     }
 
     public List<String> queryOrderNosWithExpRevertCar12Hours() {
@@ -661,24 +649,22 @@ public class OrderSearchRemoteService {
             Cat.logEvent(CatConstants.FEIGN_PARAM, JSON.toJSONString(reqVO));
             ResponseData<OrderVO<ViolateBO>> orderResponseData = orderSearchService.violateProcessOrder(reqVO);
             Cat.logEvent(CatConstants.FEIGN_RESULT, JSON.toJSONString(orderResponseData));
-            if(orderResponseData != null && orderResponseData.getResCode() != null
-                    && ErrorCode.SUCCESS.getCode().equals(orderResponseData.getResCode()) && orderResponseData.getData() != null){
-                List<ViolateBO> orderList = orderResponseData.getData().getOrderList();
-                if(CollectionUtils.isEmpty(orderList)){
-                    return new ArrayList<>();
-                }else{
-                    return  orderList.stream().map(ViolateBO::getOrderNo).collect(Collectors.toList());
-                }
-            }else{
+            checkResponse(orderResponseData);
+            List<ViolateBO> orderList = orderResponseData.getData().getOrderList();
+            t.setStatus(Transaction.SUCCESS);
+            if(CollectionUtils.isEmpty(orderList)){
                 return new ArrayList<>();
+            }else{
+                return  orderList.stream().map(ViolateBO::getOrderNo).collect(Collectors.toList());
             }
         } catch (Exception e) {
             logger.error("执行 查询预计还车12小时后的订单 异常",e);
             Cat.logError("执行 查询预计还车12小时后的订单 异常",e);
+            t.setStatus(e);
+            throw e;
         }finally {
             t.complete();
         }
-        return new ArrayList<>();
     }
 
     public List<String> queryOrderNosWithTransIllegalSettle() {
@@ -708,27 +694,25 @@ public class OrderSearchRemoteService {
             Cat.logEvent(CatConstants.FEIGN_PARAM, JSON.toJSONString(reqVO));
             ResponseData<OrderVO<ViolateBO>> orderResponseData = orderSearchService.violateProcessOrder(reqVO);
             Cat.logEvent(CatConstants.FEIGN_RESULT, JSON.toJSONString(orderResponseData));
-            if(orderResponseData != null && orderResponseData.getResCode() != null
-                    && ErrorCode.SUCCESS.getCode().equals(orderResponseData.getResCode()) && orderResponseData.getData() != null){
-                List<ViolateBO> orderList = orderResponseData.getData().getOrderList();
-                if(CollectionUtils.isEmpty(orderList)){
-                    return new ArrayList<>();
-                }
-                orderList = orderList.stream().filter(this::filterCanSettle).collect(Collectors.toList());
-                if(CollectionUtils.isEmpty(orderList)){
-                    return new ArrayList<>();
-                }
-                return  orderList.stream().map(ViolateBO::getOrderNo).collect(Collectors.toList());
-            }else{
+            checkResponse(orderResponseData);
+            List<ViolateBO> orderList = orderResponseData.getData().getOrderList();
+            t.setStatus(Transaction.SUCCESS);
+            if(CollectionUtils.isEmpty(orderList)){
                 return new ArrayList<>();
             }
+            orderList = orderList.stream().filter(this::filterCanSettle).collect(Collectors.toList());
+            if(CollectionUtils.isEmpty(orderList)){
+                return new ArrayList<>();
+            }
+            return  orderList.stream().map(ViolateBO::getOrderNo).collect(Collectors.toList());
         } catch (Exception e) {
             logger.error("执行 查询可结算的订单 异常",e);
             Cat.logError("执行 查询可结算的订单 异常",e);
+            t.setStatus(e);
+            throw e;
         }finally {
             t.complete();
         }
-        return new ArrayList<>();
     }
 
     private boolean filterCanSettle(ViolateBO violate) {
@@ -754,25 +738,35 @@ public class OrderSearchRemoteService {
             Cat.logEvent(CatConstants.FEIGN_PARAM, JSON.toJSONString(req));
             ResponseData<OrderVO<ViolateBO>> orderResponseData = orderSearchService.violateProcessOrder(req);
             Cat.logEvent(CatConstants.FEIGN_RESULT, JSON.toJSONString(orderResponseData));
-            if(orderResponseData != null && orderResponseData.getResCode() != null
-                    && ErrorCode.SUCCESS.getCode().equals(orderResponseData.getResCode()) && orderResponseData.getData() != null){
-                List<ViolateBO> orderList = orderResponseData.getData().getOrderList();
-                if(CollectionUtils.isEmpty(orderList)){
-                    return new ArrayList<>();
-                }else{
-                    return  orderList.stream().map(ViolateBO::getOrderNo).collect(Collectors.toList());
-                }
-            }else{
+            checkResponse(orderResponseData);
+            List<ViolateBO> orderList = orderResponseData.getData().getOrderList();
+            t.setStatus(Transaction.SUCCESS);
+            if(CollectionUtils.isEmpty(orderList)){
                 return new ArrayList<>();
+            }else{
+                return  orderList.stream().map(ViolateBO::getOrderNo).collect(Collectors.toList());
             }
         } catch (Exception e) {
             logger.error("执行 查询到达订单开始时,但仍是待取车状态的订单 异常",e);
             Cat.logError("执行 查询到达订单开始时,但仍是待取车状态的订单 异常",e);
+            t.setStatus(e);
+            throw e;
         }finally {
             t.complete();
         }
-        return new ArrayList<>();
+    }
 
+    public static void  checkResponse(ResponseData responseObject){
+        if(responseObject==null||!com.autoyol.commons.web.ErrorCode.SUCCESS.getCode().equalsIgnoreCase(responseObject.getResCode())){
+            RemoteCallException remoteCallException = null;
+            if(responseObject!=null){
+                remoteCallException = new RemoteCallException(responseObject.getResCode(),responseObject.getResMsg(),responseObject.getData());
+            }else{
+                remoteCallException = new RemoteCallException(com.atzuche.order.commons.enums.ErrorCode.REMOTE_CALL_FAIL.getCode(),
+                        com.atzuche.order.commons.enums.ErrorCode.REMOTE_CALL_FAIL.getText());
+            }
+            throw remoteCallException;
+        }
     }
 
     /**
@@ -785,5 +779,34 @@ public class OrderSearchRemoteService {
         Map map = SmsParamsMapUtil.getParamsMap(orderNo, ShortMessageTypeEnum.EXEMPT_PREORDER_AUTO_CANCEL_ORDER_2_RENTER.getValue(), ShortMessageTypeEnum.EXEMPT_PREORDER_AUTO_CANCEL_ORDER_2_OWNER.getValue(), paramsMap);
         smsOrderBaseEventService.sendShortMessage(map);
 
+    }
+
+    public List<String> queryRenterOrderChangeApply() {
+        Transaction t = Cat.getProducer().newTransaction(CatConstants.FEIGN_CALL, "查询车主收到修改申请15分钟后没有操作的租客子订单号列表");
+        try {
+            ViolateVO req = new ViolateVO();
+            req.setPageNum(1);
+            req.setPageSize(10000);
+            req.setType("12");
+            Cat.logEvent(CatConstants.FEIGN_METHOD,"orderSearchService.violateProcessOrder");
+            Cat.logEvent(CatConstants.FEIGN_PARAM, JSON.toJSONString(req));
+            ResponseData<OrderVO<ViolateBO>> orderResponseData = orderSearchService.violateProcessOrder(req);
+            Cat.logEvent(CatConstants.FEIGN_RESULT, JSON.toJSONString(orderResponseData));
+            checkResponse(orderResponseData);
+            List<ViolateBO> orderList = orderResponseData.getData().getOrderList();
+            t.setStatus(Transaction.SUCCESS);
+            if(CollectionUtils.isEmpty(orderList)){
+                return new ArrayList<>();
+            }else{
+                return  orderList.stream().map(ViolateBO::getRenterOrderNo).collect(Collectors.toList());
+            }
+        } catch (Exception e) {
+            logger.error("执行 查询车主收到修改申请15分钟后没有操作的租客子订单号列表 异常",e);
+            Cat.logError("执行 查询车主收到修改申请15分钟后没有操作的租客子订单号列表 异常",e);
+            t.setStatus(e);
+            throw e;
+        }finally {
+            t.complete();
+        }
     }
 }

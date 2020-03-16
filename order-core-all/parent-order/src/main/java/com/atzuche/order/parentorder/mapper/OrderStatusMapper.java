@@ -35,4 +35,6 @@ public interface OrderStatusMapper{
     Integer updateDispatchStatus(@Param("orderNo") String orderNo, @Param("dispatchStatus") Integer dispatchStatus);
     
     Integer updateOrderStatus(@Param("orderNo") String orderNo, @Param("status") Integer status);
+
+    List<OrderStatusEntity> queryInProcess();
 }

@@ -2,17 +2,17 @@ package com.atzuche.order.coreapi.service;
 
 import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.CatConstants;
+import com.atzuche.order.commons.entity.orderDetailDto.OrderDTO;
+import com.atzuche.order.commons.entity.orderDetailDto.OrderStatusDTO;
+import com.atzuche.order.commons.entity.orderDetailDto.ProcessRespDTO;
 import com.atzuche.order.coreapi.listener.push.OrderSendMessageFactory;
 import com.atzuche.order.coreapi.listener.sms.SMSOrderBaseEventService;
 import com.atzuche.order.mq.enums.PushMessageTypeEnum;
 import com.atzuche.order.mq.enums.ShortMessageTypeEnum;
 import com.atzuche.order.mq.util.SmsParamsMapUtil;
-import com.autoyol.search.api.OrderSearchService;
-import com.autoyol.search.entity.ErrorCode;
-import com.autoyol.search.entity.ResponseData;
-import com.autoyol.search.entity.ViolateBO;
-import com.autoyol.search.vo.OrderVO;
-import com.autoyol.search.vo.ViolateVO;
+import com.atzuche.order.open.service.FeignOrderDetailService;
+import com.autoyol.commons.web.ErrorCode;
+import com.autoyol.commons.web.ResponseData;
 import com.dianping.cat.Cat;
 import com.dianping.cat.message.Transaction;
 import com.google.common.collect.Maps;
@@ -35,30 +35,24 @@ import java.util.Objects;
 public class RemindPayIllegalCrashService {
 
     private Logger logger = LoggerFactory.getLogger(RemindPayIllegalCrashService.class);
-
-    @Resource
-    private OrderSearchService orderSearchService;
     @Autowired
     SMSOrderBaseEventService smsOrderBaseEventService;
     @Autowired
     OrderSendMessageFactory orderSendMessageFactory;
+    @Autowired
+    FeignOrderDetailService feignOrderDetailService;
 
-    public List<ViolateBO> findProcessOrderInfo() {
+    public List<OrderDTO> findProcessOrderInfo() {
 
         Transaction t = Cat.getProducer().newTransaction(CatConstants.FEIGN_CALL, "每天定时查询当前进行中的订单");
         try {
-            ViolateVO reqVO = new ViolateVO();
-            reqVO.setPageNum(1);
-            reqVO.setPageSize(10000);
-            reqVO.setType("1");
             Cat.logEvent(CatConstants.FEIGN_METHOD, "orderSearchService.violateProcessOrder");
-            Cat.logEvent(CatConstants.FEIGN_PARAM, JSON.toJSONString(reqVO));
-            ResponseData<OrderVO<ViolateBO>> orderResponseData = orderSearchService.violateProcessOrder(reqVO);
+            ResponseData<ProcessRespDTO> orderResponseData = feignOrderDetailService.queryInProcess();
             Cat.logEvent(CatConstants.FEIGN_RESULT, JSON.toJSONString(orderResponseData));
             if (Objects.nonNull(orderResponseData) && orderResponseData.getResCode() != null
                     && ErrorCode.SUCCESS.getCode().equals(orderResponseData.getResCode())
                     && orderResponseData.getData() != null) {
-                List<ViolateBO> orderList = orderResponseData.getData().getOrderList();
+                List<OrderDTO> orderList  = orderResponseData.getData().getOrderDTOs();
                 if (CollectionUtils.isEmpty(orderList)) {
                     return new ArrayList<>();
                 } else {
@@ -76,9 +70,9 @@ public class RemindPayIllegalCrashService {
         return new ArrayList<>();
     }
 
-    public void sendShortMessageData(boolean condition, ViolateBO violateBO) {
+    public void sendShortMessageData(boolean condition, String orderNo) {
         if (condition) {
-            Map map = SmsParamsMapUtil.getParamsMap(violateBO.getOrderNo(), ShortMessageTypeEnum.REMIND_PAY_ILLEGAL_DEPOSIT_2_RENTER.getValue(), null, null);
+            Map map = SmsParamsMapUtil.getParamsMap(orderNo, ShortMessageTypeEnum.REMIND_PAY_ILLEGAL_DEPOSIT_2_RENTER.getValue(), null, null);
             smsOrderBaseEventService.sendShortMessage(map);
         }
     }
@@ -103,6 +97,15 @@ public class RemindPayIllegalCrashService {
      */
     public void sendNoPayCarShortMessageData(String orderNo) {
         Map map = SmsParamsMapUtil.getParamsMap(orderNo, ShortMessageTypeEnum.CANCLE_ORDER_WARNINGF_OR_FREEDEPOSIT.getValue(), null, null);
+        smsOrderBaseEventService.sendShortMessage(map);
+    }
+
+    /**
+     * 车主同意后-未支付租车押金-每15分钟提醒一次
+     * @param orderNo
+     */
+    public void sendNoPayCarCostShortMessageData(String orderNo,Map paramsMap) {
+        Map map = SmsParamsMapUtil.getParamsMap(orderNo, ShortMessageTypeEnum.NO_EXEMPT_PREORDER_REMIND_PAYRENT.getValue(), null, paramsMap);
         smsOrderBaseEventService.sendShortMessage(map);
     }
 

@@ -1,6 +1,7 @@
 package com.atzuche.order.commons.vo;
 
 import com.autoyol.doc.annotation.AutoDocProperty;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import lombok.ToString;
 
@@ -42,6 +43,7 @@ public class WzDepositDetailVO {
      * 结算时间
      */
     @AutoDocProperty(value = "结算时间")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date settleTime;
 
 

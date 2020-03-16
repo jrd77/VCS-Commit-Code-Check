@@ -140,5 +140,8 @@ public class RenterOrderDTO implements Serializable {
          */
         @AutoDocProperty(value="是否取消 0-正常，1-取消",required=true)
         private Integer isCancle;
+
+        @AutoDocProperty(value = "订单是否查看,1:是，0：否")
+        private Integer seeFlag;
     					
 }

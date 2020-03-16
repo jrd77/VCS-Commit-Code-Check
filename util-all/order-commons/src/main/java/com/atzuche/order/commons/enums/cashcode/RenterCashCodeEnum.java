@@ -105,6 +105,7 @@ public enum RenterCashCodeEnum {
     ACCOUNT_RENTER_DELIVERY_OIL_COST("21130026","交接车-油费"),
     ACCOUNT_RENTER_DELIVERY_MILEAGE_COST("21130027","交接车-获取超里程费用"),
     ACCOUNT_RENTER_FINE_COST("21130028","租客罚金"),
+//    ACCOUNT_RENTER_DELIVERY_MILEAGE_COST_PROXY("21130029","交接车-获取代管车超里程费用"),
     
   //第四区域块 看第4位，从4开始。  后4位从0001开始    后面是以此类推，确保费用编码不能重复。
     

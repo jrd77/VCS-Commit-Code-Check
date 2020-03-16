@@ -92,6 +92,19 @@ public class CashierEntity implements Serializable {
 	 * 支付流水号
 	 */
 	private String qn;
+
+	/**
+	 * 线上支付或者线下、虚拟支付（0-线上支付，1-线下支付，2-虚拟支付）
+	 */
+	private int payLine;
+	/**
+	 * 虚拟支付对应的成本账号
+	 */
+	private String virtualAccountNo;
+	/**
+	 * 线下支付的渠道名称
+	 */
+	private String payChannel;
 	/**
 	 * 创建时间
 	 */

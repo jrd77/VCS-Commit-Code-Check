@@ -25,5 +25,7 @@ public class OrderAccountDetailRespDTO {
     public List<AccountRenterCostDetailDTO> accountRenterCostDetailDTOS;
     @AutoDocProperty(value = "租客抵扣的历史欠款入账明细")
     public List<AccountDebtReceivableaDetailDTO> accountDebtReceivableaDetailDTOS;
+    @AutoDocProperty(value = "收银台")
+    public CashierDTO cashierDTO;
 
 }

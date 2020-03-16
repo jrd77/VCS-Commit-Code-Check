@@ -2,6 +2,8 @@ package com.atzuche.order.cashieraccount.mapper;
 
 import com.atzuche.order.cashieraccount.entity.CashierBindCardEntity;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
 import java.util.List;
 
 /**
@@ -22,5 +24,7 @@ public interface CashierBindCardMapper{
     int updateByPrimaryKey(CashierBindCardEntity record);
     
     int updateByPrimaryKeySelective(CashierBindCardEntity record);
+    
+    List<CashierBindCardEntity> listCashierBindCardByMemNo(@Param("memNo") String memNo);
 
 }

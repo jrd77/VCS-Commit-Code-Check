@@ -29,10 +29,10 @@ dependencies {
 	compile("com.autoyol.tools:prop-encrypt-spring-boot-starter:0.0.1-SNAPSHOT")
 	compile('mysql:mysql-connector-java')
     compile('com.ctrip.framework.apollo:apollo-client:0.11.0-SNAPSHOT')
-    compile("com.autoyol:search-order-info-api:6.8-SNAPSHOT")
+    compile("com.autoyol:search-order-info-api:8.0-SNAPSHOT")
     compile('com.xuxueli:xxl-job-core:2.0.1-SNAPSHOT')
     compile('com.autoyol.xxljob:xxljob-starter:2.0.1-SNAPSHOT')
-//	compile("com.autoyol:cat-starter:0.0.1-SNAPSHOT")
+	compile("com.autoyol:cat-starter:0.0.1-SNAPSHOT")
 //	compile('org.springframework.boot:spring-boot-starter-data-redis')
     testCompile 'org.springframework.boot:spring-boot-starter-test'
 	compile("com.autoyol:auto-doc:1.0-SNAPSHOT"){
@@ -41,7 +41,7 @@ dependencies {
     compile("com.caucho:hessian:4.0.38")
 
     compile('com.autoyol.unique:unique-no-feign:3.1-SNAPSHOT')
-    compile('com.autoyol.car:auto-car-service-api:2020022002-SNAPSHOT')
+    compile('com.autoyol.car:auto-car-service-api:2020030401-SNAPSHOT')
     compile('com.autoyol:riskCheckService-api:1.0.0-SNAPSHOT')
     compile project(":order-remote-service:order-remote-car")
 
@@ -75,6 +75,7 @@ dependencies {
     compile project(":order-settle")
     compile project(":order-coin")
     compile project(":order-remote-service:order-remote-mem")
+    compile project(":order-remote-service:order-remote-search")
     compile project(":order-mq")
 
     compile("com.fasterxml.jackson.module:jackson-module-parameter-names")

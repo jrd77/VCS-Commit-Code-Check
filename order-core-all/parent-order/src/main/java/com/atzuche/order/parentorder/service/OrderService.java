@@ -100,4 +100,8 @@ public class OrderService {
     public int updateOrderByOrderNo(OrderEntity orderEntity){
        return orderMapper.updateByOrderNoSelective(orderEntity);
     }
+
+    public List<OrderEntity> getByOrderNos(List<String> orderNos) {
+        return orderMapper.getByOrderNos(orderNos);
+    }
 }

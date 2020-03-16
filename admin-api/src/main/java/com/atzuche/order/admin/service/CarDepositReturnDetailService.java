@@ -10,9 +10,10 @@ import com.atzuche.order.commons.LocalDateTimeUtils;
 import com.atzuche.order.commons.ResponseCheckUtil;
 import com.atzuche.order.commons.entity.orderDetailDto.*;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
+import com.atzuche.order.commons.enums.cashier.PaySourceEnum;
+import com.atzuche.order.commons.enums.cashier.PayTypeEnum;
 import com.atzuche.order.commons.enums.cashier.TransStatusEnum;
 import com.atzuche.order.open.service.FeignOrderDetailService;
-import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
 import com.dianping.cat.Cat;
 import com.dianping.cat.message.Transaction;
@@ -20,7 +21,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.swing.text.html.Option;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -69,7 +69,7 @@ public class CarDepositReturnDetailService {
         List<AccountRenterCostDetailDTO> accountRenterCostDetailDTOS = data.getAccountRenterCostDetailDTOS();
        // List<AccountRenterDepositDetailDTO> accountRenterDepositDetailDTOList = data.getAccountRenterDepositDetailDTOList();
         List<AccountDebtReceivableaDetailDTO> accountDebtReceivableaDetailDTOS = data.getAccountDebtReceivableaDetailDTOS();
-
+        CashierDTO cashierDTO = data.getCashierDTO();
 
         List<AccountRenterDetainDetailDTO> rentCarAmtDtoList = accountRenterDetainDetailDTOList.stream()
                 .filter(x -> RenterCashCodeEnum.ACCOUNT_RENTER_DETAIN_CAR_AMT.equals(x.getSourceCode()))
@@ -86,12 +86,15 @@ public class CarDepositReturnDetailService {
         /*Integer depositToHistoryAmt = Optional.ofNullable(accountRenterDepositDetailDTOList).orElseGet(ArrayList::new).stream()
                 .filter(x -> RenterCashCodeEnum.SETTLE_DEPOSIT_TO_HISTORY_AMT.equals(x.getSourceCode()))
                 .collect(Collectors.summingInt(AccountRenterDepositDetailDTO::getAmt));*/
-        Integer depositToHistoryAmt = Optional.ofNullable(accountDebtReceivableaDetailDTOS).orElseGet(ArrayList::new).stream()
+        Integer depositToHistoryAmt = Optional.ofNullable(accountDebtReceivableaDetailDTOS)
+                .orElseGet(ArrayList::new)
+                .stream()
+                .filter(x->RenterCashCodeEnum.SETTLE_DEPOSIT_TO_HISTORY_AMT.getCashNo().equals(x.getSourceCode()))
                 .collect(Collectors.summingInt(AccountDebtReceivableaDetailDTO::getAmt));
 
         String depositType = "";
         String payType = "";
-        if(accountRenterDepositDTO.getAuthorizeDepositAmt() != null && accountRenterDepositDTO.getAuthorizeDepositAmt()!= 0){
+        /*if(accountRenterDepositDTO.getAuthorizeDepositAmt() != null && accountRenterDepositDTO.getAuthorizeDepositAmt()!= 0){
             depositType = "预授权";
             payType = "支付宝预授权支付";
         }else if(accountRenterDepositDTO.getCreditPayAmt() != null && accountRenterDepositDTO.getCreditPayAmt() != 0){
@@ -99,7 +102,12 @@ public class CarDepositReturnDetailService {
         }else{
             depositType = "消费";
             payType = "支付宝/微信";
+        }*/
+        if(cashierDTO != null){
+            depositType = PaySourceEnum.getFlagText(cashierDTO.getPaySource());
+            payType = PayTypeEnum.getFlagText(cashierDTO.getPayType());
         }
+
         String payStatus = accountRenterDepositDTO.getPayStatus();
         LocalDateTime actSettleTimeLocalDateTIme = orderStatusDTO.getSettleTime();
         String actSettleTime = "";
@@ -122,7 +130,7 @@ public class CarDepositReturnDetailService {
         CarDepositRespVo carDepositRespVo = new CarDepositRespVo();
         carDepositRespVo.setCarDepositMonty(renterDepositDetailDTO.getOriginalDepositAmt());
         carDepositRespVo.setOriginalTotalAmt(renterDepositDetailDTO.getReductionDepositAmt());
-        carDepositRespVo.setReceivableMonty(accountRenterDepositDTO.getYingfuDepositAmt());
+        carDepositRespVo.setReceivableMonty(Math.abs(accountRenterDepositDTO.getYingfuDepositAmt()));
 
         carDepositRespVo.setPayType(payType);
         carDepositRespVo.setDepositType(depositType);

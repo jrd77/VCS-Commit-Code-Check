@@ -1,14 +1,12 @@
 package com.atzuche.order.settle.service;
 
 import com.atzuche.order.settle.entity.AccountDebtDetailEntity;
-import com.atzuche.order.settle.entity.AccountDebtReceivableaDetailEntity;
 import com.atzuche.order.settle.service.notservice.AccountDebtDetailNoTService;
 import com.atzuche.order.settle.service.notservice.AccountDebtNoTService;
 import com.atzuche.order.settle.service.notservice.AccountDebtReceivableaDetailNoTService;
 import com.atzuche.order.settle.vo.req.AccountDeductDebtReqVO;
 import com.atzuche.order.settle.vo.req.AccountInsertDebtReqVO;
 import com.atzuche.order.settle.vo.res.AccountDebtResVO;
-import com.autoyol.cat.CatAnnotation;
 import com.autoyol.commons.web.ErrorCode;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -92,5 +90,6 @@ public class AccountDebtService{
         return accountDebtDetailNoTService.insertDebtDetail(accountInsertDebt);
 
     }
+
 
 }

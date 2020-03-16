@@ -42,4 +42,8 @@ public interface RenterOrderChangeApplyMapper{
     Integer getRenterOrderChangeApplyCountByOrderNo(@Param("orderNo") String orderNo);
     
     Integer updateRenterOrderChangeApplyStatusByOrderNo(@Param("orderNo") String orderNo);
+
+    List<RenterOrderChangeApplyEntity> getByOrderNo(@Param("orderNo") String orderNo);
+
+    RenterOrderChangeApplyEntity getByOrderNoLimit(@Param("orderNo") String orderNo);
 }

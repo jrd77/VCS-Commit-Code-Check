@@ -21,14 +21,14 @@ public class AdminOwnerOrderController {
     private static final Logger logger = LoggerFactory.getLogger(AdminOwnerOrderController.class);
 
 
-	@AutoDocMethod(description = "获取车主子订单列表", value = "获取车主子订单列表", response = OwnerOrderListResponseVO.class)
-	@GetMapping("owner/list")
-	public ResponseData ownerList(OwnerOrderRequestVO ownerOrderRequestVO, BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), ErrorCode.INPUT_ERROR.getText());
-        }
-		return ResponseData.success(null);
-	}
+//	@AutoDocMethod(description = "获取车主子订单列表", value = "获取车主子订单列表", response = OwnerOrderListResponseVO.class)
+//	@GetMapping("owner/list")
+//	public ResponseData ownerList(OwnerOrderRequestVO ownerOrderRequestVO, BindingResult bindingResult) {
+//        if (bindingResult.hasErrors()) {
+//            return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), ErrorCode.INPUT_ERROR.getText());
+//        }
+//		return ResponseData.success(null);
+//	}
 
 
 

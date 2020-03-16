@@ -22,6 +22,7 @@
         <result property="isEffective" column="is_effective"/>
         <result property="isUseSpecialPrice" column="is_use_special_price"/>
         <result property="dispatchReason" column="dispatch_reason"/>
+        <result property="seeFlag" column="see_flag"/>
         <result property="cancleOp" column="cancle_op"/>
         <result property="createTime" column="create_time"/>
         <result property="createOp" column="create_op"/>
@@ -50,6 +51,7 @@
 	`is_effective`,
 	`is_use_special_price`,
 	`dispatch_reason`,
+	`see_flag`,
 	`cancle_op`,
 	`create_time`,
 	`create_op`,
@@ -84,6 +86,7 @@
         `is_effective`,
         `is_use_special_price`,
         `dispatch_reason`,
+        `see_flag`,
         `cancle_op`,
         `create_op`,
         `update_op`
@@ -107,6 +110,7 @@
         #{isEffective},
         #{isUseSpecialPrice},
         #{dispatchReason},
+        #{seeFlag},
         #{cancleOp},
         #{createOp},
         #{updateOp}
@@ -133,6 +137,7 @@
             <if test="isEffective != null">`is_effective`, </if>
             <if test="isUseSpecialPrice != null">`is_use_special_price`, </if>
             <if test="dispatchReason != null">`dispatch_reason`, </if>
+            <if test="seeFlag != null">`see_flag`, </if>
             <if test="cancleOp != null">`cancle_op`, </if>
             <if test="createTime != null">`create_time`, </if>
             <if test="createOp != null">`create_op`, </if>
@@ -158,6 +163,7 @@
             <if test="isEffective != null">#{isEffective},  </if>
             <if test="isUseSpecialPrice != null">#{isUseSpecialPrice},  </if>
             <if test="dispatchReason != null">#{dispatchReason},  </if>
+            <if test="seeFlag != null">#{seeFlag},  </if>
             <if test="cancleOp != null">#{cancleOp},  </if>
             <if test="createTime != null">#{createTime},  </if>
             <if test="createOp != null">#{createOp},  </if>
@@ -188,6 +194,7 @@
             <if test="isEffective != null">`is_effective` = #{isEffective}, </if>
             <if test="isUseSpecialPrice != null">`is_use_special_price` = #{isUseSpecialPrice}, </if>
             <if test="dispatchReason != null">`dispatch_reason` = #{dispatchReason}, </if>
+            <if test="seeFlag != null">`see_flag` = #{seeFlag}, </if>
             <if test="cancleOp != null">`cancle_op` = #{cancleOp}, </if>
             <if test="createTime != null">`create_time` = #{createTime}, </if>
             <if test="createOp != null">`create_op` = #{createOp}, </if>
@@ -218,6 +225,7 @@
             `is_effective` = #{isEffective},
             `is_use_special_price` = #{isUseSpecialPrice},
             `dispatch_reason` = #{dispatchReason},
+            `see_flag` = #{seeFlag},
             `cancle_op` = #{cancleOp},
             `create_op` = #{createOp},
             `update_op` = #{updateOp},
@@ -293,5 +301,8 @@
         and is_delete = 0
         and mem_no = #{ownerMemNo}
     </select>
+    <update id="updateByMemeNo">
+        update owner_order set `see_flag` = 1  where `mem_no` = #{ownerMemNo}
+    </update>
 
 </mapper>

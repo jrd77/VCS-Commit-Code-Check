@@ -28,11 +28,9 @@ public class OrderSendMessageFactory {
 
     /**
      * 发送push、消息数据
-     * @param smsParamsMap
+     * @param pushParamsMap
      */
-    public void sendPushMessage(Map smsParamsMap) {
-        pushOrderBaseEventService.sendShortMessage(smsParamsMap);
-    }
+    public void sendPushMessage(Map pushParamsMap) { pushOrderBaseEventService.sendShortMessage(pushParamsMap); }
 
 
 

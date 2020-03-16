@@ -72,12 +72,13 @@ public class DeliveryCarInfoPriceService {
     public Double getOilPriceByCityCodeAndType(Integer cityCode, Integer type) {
 
         List<OilAverageCostEntity> oilAverageCostEntityList = oilAverageCostConfigSDK.getConfig(DeliveryCarInfoConfigContext.builder().build());
-        OilAverageCostEntity oilAverageCostEntity = oilAverageCostEntityList.stream().filter(r -> r.getCityCode() == cityCode.intValue() && r.getEngineType() == type).findFirst().get();
+        OilAverageCostEntity oilAverageCostEntity = oilAverageCostEntityList.stream().filter(r -> r.getCityCode() == cityCode.intValue() && r.getEngineType() == type).findFirst().orElseGet(null);
         if (Objects.isNull(oilAverageCostEntity)) {
-            oilAverageCostEntity = oilAverageCostEntityList.stream().filter(r -> r.getCityCode() == 0 && r.getEngineType() == type).findFirst().get();
+            oilAverageCostEntity = oilAverageCostEntityList.stream().filter(r -> r.getCityCode() == 0 && r.getEngineType() == type).findFirst().orElseGet(null);
         }
         if (Objects.isNull(oilAverageCostEntity)) {
-            throw new DeliveryOrderException(DeliveryErrorCode.DELIVERY_PARAMS_ERROR.getValue(), "没有找到对应的城市油价");
+            log.info("没有找到对应的城市油价，油价查询为空，返回0");
+            return 0d;
         }
         int molecule = oilAverageCostEntity.getMolecule();
         int denominator = oilAverageCostEntity.getDenominator();
@@ -189,9 +190,11 @@ public class DeliveryCarInfoPriceService {
             String oilContainer = ownerGetAndReturnCarDTO.getOilContainer().contains("L") ? ownerGetAndReturnCarDTO.getOilContainer().replaceAll("L","") : ownerGetAndReturnCarDTO.getOilContainer();
             double oilMiddleDataFee = MathUtil.mulByDouble(MathUtil.div(oilDifference, 16.0), Double.valueOf(oilContainer));
             double oilDifferenceCrash = MathUtil.mulByDouble(oilMiddleDataFee, getOilPriceByCityCodeAndType(Integer.valueOf(cityCode), carEngineType));
-            ownerGetAndReturnCarDTO.setOilDifferenceCrash(String.valueOf(Double.valueOf(Math.floor(oilDifferenceCrash)).intValue()));
+            log.info("油费数据----->>>>oilDifferenceCrash:[{}]",oilDifferenceCrash);
+            oilDifferenceCrash = oilDifferenceCrash > 0D ? Math.floor(oilDifferenceCrash) : Math.ceil(oilDifferenceCrash);
+            ownerGetAndReturnCarDTO.setOilDifferenceCrash(String.valueOf(Double.valueOf(oilDifferenceCrash).intValue()));
         } catch (Exception e) {
-            log.error("设置参数失败,目前没有值");
+            log.error("设置参数失败,目前没有值",e);
         }
         return ownerGetAndReturnCarDTO;
     }
@@ -305,7 +308,7 @@ public class DeliveryCarInfoPriceService {
         try {
             List<OwnerHandoverCarInfoEntity> ownerHandoverCarInfoEntities = ownerHandoverCarService.selectOwnerByOrderNo(orderNo);
             List<RenterHandoverCarInfoEntity> renterHandoverCarInfoEntities = renterHandoverCarService.selectRenterByOrderNo(orderNo);
-            if(renterHandoverCarInfoEntities.get(0).getType().intValue() != 4 || renterHandoverCarInfoEntities.get(0).getType().intValue() != 3)
+            if(renterHandoverCarInfoEntities.get(0).getType().intValue() != 4 && renterHandoverCarInfoEntities.get(0).getType().intValue() != 3)
             {
                 log.info("不是配送订单，没有车主平台加油服务费");
                 return 0;

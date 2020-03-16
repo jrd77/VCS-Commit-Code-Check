@@ -3,8 +3,8 @@ package com.atzuche.order.coreapi.listener.push;
 import com.alibaba.fastjson.JSONObject;
 import com.atzuche.order.mq.common.sms.ShortMessageSendService;
 import com.atzuche.order.mq.enums.MessageTypeEnum;
+import com.atzuche.order.mq.enums.PushMessageTypeEnum;
 import com.atzuche.order.mq.enums.PushParamsTypeEnum;
-import com.atzuche.order.mq.enums.ShortMessageTypeEnum;
 import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -31,7 +31,7 @@ public class PushOrderBaseEventService extends OrderBaseEventService {
 
     @Override
     public void sendShortMessageData(String textCode, Map smsParamsMap, String phone, Object orderEntity, Object memberDTO, Object goodsDetailDTO) {
-        String renterTextCode = ShortMessageTypeEnum.getSmsTemplate(String.valueOf(textCode));
+        String renterTextCode = PushMessageTypeEnum.getSmsTemplate(String.valueOf(textCode));
         if (StringUtils.isBlank(renterTextCode)) {
             log.info("没有找到该textCode对应的消息模版，textCodeFlag：{}", textCode);
             return;
@@ -40,7 +40,9 @@ public class PushOrderBaseEventService extends OrderBaseEventService {
         Map pushParamsMap = Maps.newHashMap();
         pushParamsMap.put("event", textCode);
         pushParamsMap.put("memNo", shortMessageSendService.getFieldValueByFieldName("memNo", memberDTO));
-        pushParamsMap.put("messageType", MessageTypeEnum.SYSTEM_MESSAGE.getMessageType());
+        pushParamsMap.put("picture", shortMessageSendService.getFieldValueByFieldName("carImageUrl", goodsDetailDTO));
+        log.info("车辆图片地址---->picture:[{}]",shortMessageSendService.getFieldValueByFieldName("carImageUrl", goodsDetailDTO));
+        pushParamsMap.put("messageType", MessageTypeEnum.ORDER_MESSAGE.getMessageType());
         List<String> smsFieldNames = shortMessageSendService.getSMSTemplateFeild(renterTextCode);
         if (CollectionUtils.isEmpty(smsFieldNames)) {
             //没有参数 直接发。。

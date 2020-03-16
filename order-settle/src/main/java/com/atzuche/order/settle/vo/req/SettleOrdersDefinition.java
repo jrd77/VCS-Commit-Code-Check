@@ -50,10 +50,15 @@ public class SettleOrdersDefinition {
     private int ownerSubsidyAmt;
 
     /**
-     * 车主最终收益金额
+     * 车主最终收益金额（预计收益）
      */
     private int ownerCostAmtFinal;
-
+    
+    /**
+     * 租客最终收益金额（应收） 200309
+     */
+    private int renterCostAmtFinal;
+    
     /**
      * 车主费用明细
      */
@@ -125,6 +130,14 @@ public class SettleOrdersDefinition {
         accountOwnerCostSettleDetailEntitys.add(accountOwnerCostSettleDetailEntity);
         setAccountOwnerCostSettleDetails(accountOwnerCostSettleDetailEntitys);
     }
+    
+    
+	public int getRenterCostAmtFinal() {
+		return renterCostAmtFinal;
+	}
+	public void setRenterCostAmtFinal(int renterCostAmtFinal) {
+		this.renterCostAmtFinal = renterCostAmtFinal;
+	}
 	public int getPlatformProfitAmt() {
 		return platformProfitAmt;
 	}
