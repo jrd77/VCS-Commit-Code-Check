@@ -20,8 +20,16 @@ public enum PaySourceEnum {
     WEIXIN_H5("15","微信H5"),
     ALIPAY_CREDIT("16","支付宝信用预授权免押，芝麻信用"),
     VIRTUAL_PAY("91","虚拟支付"),
-    DEFAULT("99","默认"),
-
+    UNIONPAY_POS("21","银联POS机"),
+    BILL99_POS("22","快钱POS机"),
+    TRANSFER("23","转账"),
+    CASH("24","现金"),
+    CHANNEL("29","渠道支付"),
+    UNIONPAY_BACK("25","银联后台"),
+    ALIPAY_OFFLINE("26","支付宝线下支付"),
+    DEPOSIT("28","押金延续"),
+    OFFLINEPAY("30","线下真实支付"),
+    DEFAULT("99","默认")
     ;
 
     private String code;
@@ -47,5 +55,15 @@ public enum PaySourceEnum {
             }
         }
         throw new RuntimeException("code:"+code+" is invalid");
+    }
+
+    public static PaySourceEnum from(String code){
+        PaySourceEnum[] values = values();
+        for(PaySourceEnum source:values){
+            if(source.getCode().equals(code)){
+                return source;
+            }
+        }
+        throw new RuntimeException("code:"+code+ " is invalid");
     }
 }
