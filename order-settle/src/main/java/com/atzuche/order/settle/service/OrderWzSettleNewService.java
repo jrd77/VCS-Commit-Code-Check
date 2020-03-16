@@ -270,10 +270,11 @@ public class OrderWzSettleNewService {
 		
 		
 		log.info("OrderSettleService repayWzHistoryDebtRent 抵扣历史欠款。settleOrdersAccount [{}]", GsonUtils.toJson(settleOrdersAccount));
-		// 2租客剩余违章押金 结余历史欠款
+		// 2.1租客剩余违章押金 结余历史欠款
 		orderWzSettleNoTService.repayWzHistoryDebtRent(settleOrdersAccount);
-		
-		
+		// 2.2违章押金抵扣老系统欠款
+		int totalwzDebtAmt = orderWzSettleNoTService.oldRepayWzHistoryDebtRent(settleOrdersAccount);
+		settleOrders.setTotalWzDebtAmt(totalwzDebtAmt);
 		log.info("OrderSettleService refundWzDepositAmt 退还违章押金。settleOrdersAccount [{}]", GsonUtils.toJson(settleOrdersAccount));
 		// 3 违章押金 退还
 		orderWzSettleNoTService.refundWzDepositAmt(settleOrdersAccount, orderStatusDTO);

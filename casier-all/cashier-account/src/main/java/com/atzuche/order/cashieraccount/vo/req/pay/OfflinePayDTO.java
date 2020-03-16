@@ -10,6 +10,7 @@ import org.hibernate.validator.constraints.NotBlank;
 
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
 /**
  * @author <a href="mailto:lianglin.sjtu@gmail.com">AndySjtu</a>
@@ -40,4 +41,7 @@ public class OfflinePayDTO implements Serializable {
     private String renterNo;
 
     private PaySourceEnum paySource;
+
+    private String payTime;
+
 }

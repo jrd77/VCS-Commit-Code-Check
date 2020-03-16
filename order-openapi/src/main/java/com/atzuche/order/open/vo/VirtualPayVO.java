@@ -17,7 +17,7 @@ public class VirtualPayVO {
     @AutoDocProperty(value = "订单号")
     @NotBlank(message = "订单号不能为空")
     private String orderNo;
-    @AutoDocProperty(value = "虚拟支付账号")
+    @AutoDocProperty(value = "虚拟支付账号，即成本来源")
     @NotBlank(message = "虚拟支付账号不能为空")
     private String accountNo;
     @NotNull(message = "支付金额不能为空")

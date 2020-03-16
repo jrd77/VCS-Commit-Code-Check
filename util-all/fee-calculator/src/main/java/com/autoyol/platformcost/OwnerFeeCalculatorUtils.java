@@ -2,10 +2,13 @@ package com.autoyol.platformcost;
 
 import com.atzuche.config.common.entity.CarGpsRuleEntity;
 import com.atzuche.config.common.entity.OilAverageCostEntity;
+import com.atzuche.order.commons.entity.dto.GpsDepositDTO;
 import com.autoyol.platformcost.enums.ExceptionCodeEnum;
 import com.autoyol.platformcost.exception.OwnerFeeCostException;
 import com.autoyol.platformcost.model.CarPriceOfDay;
 import com.autoyol.platformcost.model.FeeResult;
+
+import lombok.extern.slf4j.Slf4j;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -16,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+@Slf4j
 public class OwnerFeeCalculatorUtils {
 	
 	// gps 单日收取费用
@@ -301,6 +305,46 @@ public class OwnerFeeCalculatorUtils {
     		proxyExpense = 0; //收费比例为0，不收取代管车服务费
     	}
     	return proxyExpense;
+    }
+    
+    /**
+     * 计算车主gps押金
+     * @param gpsDepositDTO
+     * @return Integer
+     */
+    public static Integer calGpsDepositAmt(GpsDepositDTO gpsDepositDTO) {
+    	log.info("计算车主gps押金 calGpsDepositAmt gpsDepositDTO=[{}]", gpsDepositDTO);
+    	if (gpsDepositDTO == null) {
+    		return 0;
+    	}
+    	// GPS车载硬件押金扣除金额
+        int perGpsDepositAmt = 0;
+    	// 是否收取押金,1是， 2否
+    	Integer hwDepositFlag = gpsDepositDTO.getHwDepositFlag();
+    	// 车载硬件收取押金计费
+    	int hwDepositBill = gpsDepositDTO.getHwDepositBill() == null ? 0:gpsDepositDTO.getHwDepositBill();
+    	// 车载硬件收取押金金额
+    	int hwDepositTotal = gpsDepositDTO.getHwDepositTotal() == null ? 0:gpsDepositDTO.getHwDepositTotal();
+    	// 车主真实收益
+    	int ownerRealIncome = gpsDepositDTO.getOwnerRealIncome() == null ? 0:gpsDepositDTO.getOwnerRealIncome();
+    	if (hwDepositFlag != null && hwDepositFlag.equals(1) && hwDepositBill < hwDepositTotal) {
+    		// 收取gps押金
+            if (ownerRealIncome > 800) {
+            	perGpsDepositAmt = 400;
+            } else if (ownerRealIncome > 600) {
+            	perGpsDepositAmt = 300;
+            } else if (ownerRealIncome > 400) {
+            	perGpsDepositAmt = 200;
+            } else if (ownerRealIncome > 200) {
+            	perGpsDepositAmt = 100;
+            } else if (ownerRealIncome > 100) {
+            	perGpsDepositAmt = 50;
+            }
+            if ((perGpsDepositAmt + hwDepositBill) > hwDepositTotal) {
+            	perGpsDepositAmt = hwDepositTotal - hwDepositBill;
+            }
+    	}
+    	return perGpsDepositAmt;
     }
     
 }

@@ -40,6 +40,9 @@ public class OfflinePayVO implements Serializable {
     @NotBlank(message = "支付来源不能为空")
     private String paySource;
 
+    @AutoDocProperty(value = "支付时间，格式yyyyMMddHHmmss")
+    @NotBlank(message = "支付时间不能为空")
+    private String payTime;
 
 
 }

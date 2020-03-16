@@ -66,7 +66,7 @@ public class OrderSearchProxyService {
             }
 
             if (StringUtils.equals(response.getResCode(), ErrorCode.SUCCESS.getCode())) {
-                return buildOrderInfoDTO(response.getData());
+                return buildOrderInfoDTO(response.getData(),conflictOrderSearch.getOrderNo());
             }
             t.setStatus(Transaction.SUCCESS);
         } catch (Exception e) {
@@ -88,16 +88,18 @@ public class OrderSearchProxyService {
      * @param order 返回信息
      * @return List<OrderInfoDTO> 订单信息列表
      */
-    private List<OrderInfoDTO> buildOrderInfoDTO(OrderVO<ByCarBO> order) {
+    private List<OrderInfoDTO> buildOrderInfoDTO(OrderVO<ByCarBO> order,String orderNo) {
         List<ByCarBO> list = order.getOrderList();
         if (CollectionUtils.isEmpty(list)) {
             return new ArrayList<>();
         }
         List<OrderInfoDTO> orderInfos = new ArrayList<>();
         list.forEach(o -> {
-            OrderInfoDTO orderInfoDTO = new OrderInfoDTO();
-            BeanUtils.copyProperties(o, orderInfoDTO);
-            orderInfos.add(orderInfoDTO);
+            if(!StringUtils.equals(o.getOrderNo(),orderNo)) {
+                OrderInfoDTO orderInfoDTO = new OrderInfoDTO();
+                BeanUtils.copyProperties(o, orderInfoDTO);
+                orderInfos.add(orderInfoDTO);
+            }
         });
         logger.info("同意订单时拉取租期重叠的订单列表.orderInfos:[{}]",JSON.toJSONString(orderInfos));
         return orderInfos;

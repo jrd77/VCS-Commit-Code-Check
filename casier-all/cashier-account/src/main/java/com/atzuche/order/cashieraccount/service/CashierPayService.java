@@ -129,7 +129,7 @@ public class CashierPayService{
         notifyDataVo.setInternalNo(payVO.getInternalNo());
         notifyDataVo.setQn(payVO.getQn());
         notifyDataVo.setPayChannel(payVO.getPayChannel());
-        notifyDataVo.setOrderTime(LocalDateTimeUtils.formatDateTime(LocalDateTime.now(),LocalDateTimeUtils.YYYYMMDDHHMMSSS_PATTERN));
+        notifyDataVo.setOrderTime(payVO.getPayTime());
 
 
         List<NotifyDataVo> list = new ArrayList<>();

@@ -6,7 +6,8 @@
     <resultMap type="com.atzuche.order.parentorder.entity.OrderCancelReasonEntity" id="BaseResultMap">
         <result property="id" column="id"/>
         <result property="orderNo" column="order_no"/>
-        <result property="subOrderNo" column="sub_order_no"/>
+        <result property="renterOrderNo" column="renter_order_no"/>
+        <result property="ownerOrderNo" column="owner_order_no"/>
         <result property="operateType" column="operate_type"/>
         <result property="cancelSource" column="cancel_source"/>
         <result property="dutySource" column="duty_source"/>
@@ -24,7 +25,8 @@
 	<sql id="Base_Column_List">
         `id`,
         `order_no`,
-        `sub_order_no`,
+        `renter_order_no`,
+        `owner_order_no`,
         `operate_type`,
         `cancel_source`,
         `duty_source`,
@@ -46,7 +48,8 @@
 	<insert id="insert" parameterType="com.atzuche.order.parentorder.entity.OrderCancelReasonEntity" useGeneratedKeys="true" keyProperty="id">
 		insert into order_cancel_reason (
             `order_no`,
-            `sub_order_no`,
+            `renter_order_no`,
+            `owner_order_no`,
             `operate_type`,
             `cancel_source`,
             `duty_source`,
@@ -55,7 +58,8 @@
             `cancel_req_time`
         ) values (
             #{orderNo},
-            #{subOrderNo},
+            #{renterOrderNo},
+            #{ownerOrderNo},
             #{operateType},
             #{cancelSource},
             #{dutySource},
@@ -69,7 +73,8 @@
 		insert into order_cancel_reason
             <trim prefix="(" suffix=")" suffixOverrides="," >
 				<if test="orderNo != null">`order_no`, </if>
-                <if test="subOrderNo != null">`sub_order_no`, </if>
+                <if test="renterOrderNo != null">`renter_order_no`, </if>
+                <if test="ownerOrderNo != null">`owner_order_no`, </if>
                 <if test="operateType != null">`operate_type`, </if>
 				<if test="cancelSource != null">`cancel_source`, </if>
 				<if test="dutySource != null">`duty_source`, </if>
@@ -84,7 +89,8 @@
 	        </trim>
             <trim prefix="values (" suffix=")" suffixOverrides="," >
 				<if test="orderNo != null">#{orderNo},  </if>
-				<if test="subOrderNo != null">#{subOrderNo},  </if>
+                <if test="renterOrderNo != null">#{renterOrderNo}, </if>
+                <if test="ownerOrderNo != null">#{ownerOrderNo}, </if>
                 <if test="operateType != null">#{operateType}, </if>
                 <if test="cancelSource != null">#{cancelSource},  </if>
 				<if test="dutySource != null">#{dutySource},  </if>
@@ -104,7 +110,8 @@
 		update order_cancel_reason 
 		    <set>
 				<if test="orderNo != null">`order_no` = #{orderNo}, </if>
-				<if test="subOrderNo != null">`sub_order_no` = #{subOrderNo}, </if>
+				<if test="renterOrderNo != null">`renter_order_no` = #{renterOrderNo}, </if>
+                <if test="ownerOrderNo != null">`owner_order_no` = #{ownerOrderNo}, </if>
                 <if test="operateType != null">`operate_type` = #{operateType}, </if>
 				<if test="cancelSource != null">`cancel_source` = #{cancelSource}, </if>
 				<if test="dutySource != null">`duty_source` = #{dutySource}, </if>
@@ -124,7 +131,8 @@
 		update order_cancel_reason 
 		    <set>
 				`order_no` = #{orderNo},
-				`sub_order_no` = #{subOrderNo},
+				`renter_order_no` = #{renterOrderNo},
+                `owner_order_no` = #{ownerOrderNo},
                 `operate_type` = #{operateType},
                 `cancel_source` = #{cancelSource},
 				`duty_source` = #{dutySource}, 		
