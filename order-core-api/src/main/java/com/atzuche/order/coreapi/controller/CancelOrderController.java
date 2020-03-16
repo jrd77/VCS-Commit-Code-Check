@@ -114,7 +114,7 @@ public class CancelOrderController {
                                                                           BindingResult bindingResult) {
         LOGGER.info("Console order judge duty list.param is,reqVO:[{}]",
                 JSON.toJSONString(reqVO));
-
+        BindingResultUtil.checkBindingResult(bindingResult);
         List<OrderJudgeDutyVO> orderJudgeDuties =
                 cancelOrderJudgeDutyService.queryOrderJudgeDutysByOrderNo(reqVO.getOrderNo());
         LOGGER.info("Console order judge duty list.result is,orderJudgeDuties:[{}]",
@@ -124,8 +124,24 @@ public class CancelOrderController {
         }
         AdminOrderJudgeDutyResVO resVO = new AdminOrderJudgeDutyResVO();
         resVO.setOrderJudgeDuties(orderJudgeDuties);
+        return ResponseData.success(resVO);
+    }
+
+
+    @AutoDocMethod(description = "车主同意取消订单延时退款", value = "车主同意取消订单延时退款")
+    @PostMapping("/normal/cancle/delay/refund")
+    public ResponseData<?> cancelOrderDelayRefund(@Valid @RequestBody CancelOrderDelayRefundReqVO reqVO,
+                                                  BindingResult bindingResult) {
+        LOGGER.info("Owner agree cancel order delay refund.param is,reqVO:[{}]",
+                JSON.toJSONString(reqVO));
+        BindingResultUtil.checkBindingResult(bindingResult);
+
+
         return ResponseData.success();
     }
+
+
+
 
     @GetMapping("/cancelfee")
     public ResponseData<?> cancelOrderFee(@RequestParam(value = "orderNo", required = true) String orderNo) {
