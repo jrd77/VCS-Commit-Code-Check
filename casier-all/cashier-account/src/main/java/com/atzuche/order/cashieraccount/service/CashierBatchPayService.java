@@ -58,6 +58,7 @@ public class CashierBatchPayService {
 		
 		int amtTotal = 0;
 		int amtRent = 0;
+		int amtRentAfter = 0;
 		int amtIncrementRent =0;
 		int amtIncrementSupplementAmt = 0; 
 		int amtIncrementDebtAmt = 0;
@@ -95,6 +96,7 @@ public class CashierBatchPayService {
 
 	        //应付租车费用
 	        int rentAmt = 0;
+	        int rentAmtAfter = 0;
 	        int rentIncrementAmt = 0;
 	        int rentIncrementSupplementAmt = 0;
 	        int rentIncrementDebtAmt = 0;
@@ -134,6 +136,26 @@ public class CashierBatchPayService {
 	                    if(RenterCashCodeEnum.ACCOUNT_RENTER_RENT_COST_AGAIN.equals(type)){
 	                        result.setIsPayAgain(YesNoEnum.YES.getCode());
 	                    }
+	                    accountPayAbles.add(new AccountPayAbleResVO(orderNo,orderPayReqVO.getMenNo(),payableVO.getAmt(),type,payableVO.getTitle(),payableVO.getUniqueNo()));
+	                }
+	            }
+	        }
+	        
+	        //-----------------------------------------------------------------------------------
+	        if(orderPayReqVO.getPayKind().contains(DataPayKindConstant.RENT_AMOUNT_AFTER)){  //修改订单的补付
+	            List<PayableVO> payableVOs = renterOrderCostCombineService.listPayableGlobalVO(orderNo,renterOrderEntity.getRenterOrderNo(),orderPayReqVO.getMenNo());
+	            result.setPayableVOs(payableVOs);
+	            //应付租车费用（已经求和）
+	            rentAmtAfter = cashierNoTService.sumRentOrderCost(payableVOs);
+	            
+	            //已付租车费用(shifu  租车费用的实付)
+	            rentAmtPayed = accountRenterCostSettleService.getCostPaidRent(orderNo,orderPayReqVO.getMenNo());
+	            if(!CollectionUtils.isEmpty(payableVOs) && rentAmt+rentAmtPayed < 0){   // 
+	                for(int i=0;i<payableVOs.size();i++){
+	                    PayableVO payableVO = payableVOs.get(i);
+	                    //判断是租车费用、还是补付 租车费用 并记录 详情
+	                    RenterCashCodeEnum type = RenterCashCodeEnum.ACCOUNT_RENTER_RENT_COST_AFTER;
+	                    result.setIsPayAgain(YesNoEnum.YES.getCode());
 	                    accountPayAbles.add(new AccountPayAbleResVO(orderNo,orderPayReqVO.getMenNo(),payableVO.getAmt(),type,payableVO.getTitle(),payableVO.getUniqueNo()));
 	                }
 	            }
@@ -181,9 +203,11 @@ public class CashierBatchPayService {
 	        
 	        
 	        //待支付总额
-	         amtTotal += amtDeposit + amtWZDeposit + rentAmt + rentIncrementAmt + rentIncrementSupplementAmt + rentIncrementDebtAmt;
+	         amtTotal += amtDeposit + amtWZDeposit + rentAmt + rentAmtAfter + rentIncrementAmt + rentIncrementSupplementAmt + rentIncrementDebtAmt;
 	        //实际待支付租车费用总额 即真实应付租车费用
 	         amtRent += rentAmt + rentAmtPayed;
+	         amtRentAfter += rentAmtAfter + rentAmtPayed;
+	         
 	        //补付修改订单
 	         amtIncrementRent += rentIncrementAmt + rentAmtPayed;
 	        //管理后台补付
@@ -201,6 +225,7 @@ public class CashierBatchPayService {
         
         result.setAmtWallet(amtWallet);
         result.setAmtRent(amtRent);
+        result.setAmtRentAfter(amtRentAfter);
         result.setAmtIncrementRent(amtIncrementRent);
         ///add 管理后台补付，支付欠款 200311
         result.setAmtIncrementRentSupplement(amtIncrementSupplementAmt);

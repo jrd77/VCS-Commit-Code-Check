@@ -33,4 +33,5 @@ dependencies {
     compile('javax.mail:mail:1.4.7')
     //compile 'com.aliyun.oss:aliyun-sdk-oss:2.8.3'
     //compile("com.autoyol.shorturl:short-url-feign:2.0-SNAPSHOT")
+    compile 'com.autoyol:autoPayGatewaySecondary-api:1.1.2-SNAPSHOT'
 }

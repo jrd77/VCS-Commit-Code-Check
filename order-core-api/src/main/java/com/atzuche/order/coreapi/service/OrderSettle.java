@@ -12,7 +12,8 @@ import com.atzuche.order.settle.service.OrderWzSettleService;
 @Service
 public class OrderSettle {
     @Autowired OrderSettleService orderSettleService;
-    @Autowired PayCallbackService payCallbackService;
+    @Autowired 
+    PayCallbackService payCallbackService;
     
     @Autowired
     OrderWzSettleService orderWzSettleService;

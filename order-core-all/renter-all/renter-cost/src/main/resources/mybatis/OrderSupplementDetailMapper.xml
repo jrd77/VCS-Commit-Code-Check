@@ -185,8 +185,9 @@
 		update order_supplement_detail 
 		set `pay_flag` = #{payFlag}
 		<if test="payTime != null">, pay_time = #{payTime}</if>
-		where id = #{id}
+		where id = #{id} and amt = #{amt}
 	</update>
+	
 	
 	<select id="listOrderSupplementDetailByOrderNoAndMemNo" resultMap="BaseResultMap">
 		select <include refid="Base_Column_List" /> from order_supplement_detail where order_no = #{orderNo} 

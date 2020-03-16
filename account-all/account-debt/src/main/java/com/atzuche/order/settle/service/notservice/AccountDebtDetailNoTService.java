@@ -8,6 +8,7 @@ import com.atzuche.order.settle.vo.req.AccountInsertDebtReqVO;
 import com.atzuche.order.settle.entity.AccountDebtDetailEntity;
 import com.atzuche.order.settle.mapper.AccountDebtDetailMapper;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.assertj.core.util.Lists;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -50,6 +51,17 @@ public class AccountDebtDetailNoTService {
         }
         return result;
     }
+    
+    public List<AccountDebtDetailEntity> getDebtListById(String id){
+        AccountDebtDetailEntity entity = accountDebtDetailMapper.selectByPrimaryKey(Integer.valueOf(id));
+        List<AccountDebtDetailEntity> result = Lists.newArrayList();
+        result.add(entity);
+        if(CollectionUtils.isEmpty(result)){
+           return Collections.emptyList();
+        }
+        return result;
+    }
+    
     
     
     public List<AccountDebtDetailEntity> listAccountDebtDetailEntity(String orderNo,String memNo){

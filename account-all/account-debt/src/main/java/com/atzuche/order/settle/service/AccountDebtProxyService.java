@@ -67,4 +67,34 @@ public class AccountDebtProxyService {
         return accountDeductDebt.getRealAmt();
     }
     
+    //根据ID来更新
+    public int deductDebtByDebtId(String id,int payDebtAmt,String memNo,String qn) {
+    	log.info("payDebt notice deductDebtByOrderNo params id=[{}],payDebtAmt=[{}],renterNo=[{}],qn=[{}]",id,payDebtAmt,memNo,qn);
+    	//构造对象
+        AccountDeductDebtReqVO accountDeductDebt = new AccountDeductDebtReqVO();
+        accountDeductDebt.setSourceCode(RenterCashCodeEnum.PAY_DEBT_COST_TO_HISTORY_AMT.getCashNo());
+        accountDeductDebt.setSourceDetail(RenterCashCodeEnum.PAY_DEBT_COST_TO_HISTORY_AMT.getTxt());
+        accountDeductDebt.setAmt(payDebtAmt);
+        accountDeductDebt.setMemNo(memNo);
+        accountDeductDebt.setUniqueNo(qn);
+        
+        // 1 参数校验
+        Assert.notNull(accountDeductDebt, ErrorCode.PARAMETER_ERROR.getText());
+        accountDeductDebt.check();
+        // 2 查询ID待还的记录
+//        List<AccountDebtDetailEntity> accountDebtDetailAlls =  accountDebtDetailNoTService.getDebtListByOrderNoMemNo(orderNo,memNo);
+        List<AccountDebtDetailEntity> accountDebtDetailAlls =  accountDebtDetailNoTService.getDebtListById(id);
+        
+        //3 根据租客还款总额  从用户所有待还款记录中 过滤本次 待还款的记录
+        List<AccountDebtDetailEntity> accountDebtDetails = accountDebtDetailNoTService.getDebtListByDebtAll(accountDebtDetailAlls,accountDeductDebt);
+        //5更新欠款表 当前欠款数
+        accountDebtDetailNoTService.updateAlreadyDeductDebt(accountDebtDetails);
+        //6 记录欠款收款详情
+        accountDebtReceivableaDetailNoTService.insertAlreadyReceivablea(accountDeductDebt.getAccountDebtReceivableaDetails());
+        //7 更新总欠款表
+        accountDebtNoTService.deductAccountDebt(accountDeductDebt);
+        return accountDeductDebt.getRealAmt();
+    }
+    
+    
 }

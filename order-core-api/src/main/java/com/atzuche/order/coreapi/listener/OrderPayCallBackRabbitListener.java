@@ -29,7 +29,10 @@ import org.springframework.context.annotation.Configuration;
 public class OrderPayCallBackRabbitListener {
     @Autowired RabbitMsgLogService rabbitMsgLogService;
     @Autowired CashierPayService cashierPayService;
-    @Autowired PayCallbackService payCallbackService;
+    
+    //回调的处理类
+    @Autowired 
+    PayCallbackService payCallbackService;
 
     /**
      * 支付系统回调

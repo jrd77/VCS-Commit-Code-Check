@@ -1,5 +1,19 @@
 package com.atzuche.order.cashieraccount.service;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
+import org.springframework.util.CollectionUtils;
+import org.testng.collections.Lists;
+
 import com.atzuche.order.accountrenterdeposit.service.AccountRenterDepositService;
 import com.atzuche.order.accountrenterdeposit.vo.res.AccountRenterDepositResVO;
 import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostSettleEntity;
@@ -7,8 +21,6 @@ import com.atzuche.order.accountrenterrentcost.service.AccountRenterCostSettleSe
 import com.atzuche.order.accountrenterwzdepost.service.AccountRenterWzDepositService;
 import com.atzuche.order.accountrenterwzdepost.vo.res.AccountRenterWZDepositResVO;
 import com.atzuche.order.cashieraccount.common.FasterJsonUtil;
-import com.atzuche.order.cashieraccount.common.PayCashTypeEnum;
-import com.atzuche.order.cashieraccount.common.VirtualPayTypeEnum;
 import com.atzuche.order.cashieraccount.entity.CashierEntity;
 import com.atzuche.order.cashieraccount.entity.CashierRefundApplyEntity;
 import com.atzuche.order.cashieraccount.exception.OrderPaySignFailException;
@@ -16,7 +28,10 @@ import com.atzuche.order.cashieraccount.service.notservice.AccountVirtualPayServ
 import com.atzuche.order.cashieraccount.service.notservice.CashierNoTService;
 import com.atzuche.order.cashieraccount.service.notservice.CashierRefundApplyNoTService;
 import com.atzuche.order.cashieraccount.service.remote.RefundRemoteService;
-import com.atzuche.order.cashieraccount.vo.req.pay.*;
+import com.atzuche.order.cashieraccount.vo.req.pay.OrderPayReqVO;
+import com.atzuche.order.cashieraccount.vo.req.pay.OrderPaySignReqVO;
+import com.atzuche.order.cashieraccount.vo.req.pay.VirtualNotifyDataVO;
+import com.atzuche.order.cashieraccount.vo.req.pay.VirtualPayDTO;
 import com.atzuche.order.cashieraccount.vo.res.AccountPayAbleResVO;
 import com.atzuche.order.cashieraccount.vo.res.OrderPayableAmountResVO;
 import com.atzuche.order.cashieraccount.vo.res.pay.OrderPayCallBackSuccessVO;
@@ -30,7 +45,6 @@ import com.atzuche.order.commons.service.OrderPayCallBack;
 import com.atzuche.order.flow.service.OrderFlowService;
 import com.atzuche.order.parentorder.dto.OrderStatusDTO;
 import com.atzuche.order.parentorder.entity.OrderStatusEntity;
-import com.atzuche.order.parentorder.service.OrderService;
 import com.atzuche.order.parentorder.service.OrderStatusService;
 import com.atzuche.order.rentercost.entity.vo.PayableVO;
 import com.atzuche.order.rentercost.service.RenterOrderCostCombineService;
@@ -47,18 +61,7 @@ import com.autoyol.autopay.gateway.vo.res.AutoPayResultVo;
 import com.autoyol.commons.utils.GsonUtils;
 import com.autoyol.commons.web.ErrorCode;
 
-import ch.qos.logback.classic.Logger;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.Assert;
-import org.springframework.util.CollectionUtils;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
 
 
 /**
@@ -135,19 +138,52 @@ public class CashierPayService{
     private void getExtendParamsParam(OrderPayCallBackSuccessVO vo, BatchNotifyDataVo batchNotifyDataVo) {
         if(Objects.nonNull(batchNotifyDataVo) && !CollectionUtils.isEmpty(batchNotifyDataVo.getLstNotifyDataVo())){
             List<NotifyDataVo> notifyDataVos = batchNotifyDataVo.getLstNotifyDataVo();
+            //根据金额匹配来修改状态。
+        	List<NotifyDataVo> supplementIds = Lists.newArrayList();
+        	List<NotifyDataVo> debtIds = Lists.newArrayList();
+        	List<String> rentAmountAfterRenterOrderNos = Lists.newArrayList();
+
+        	//转换为集合的概念
             for(int i=0;i<notifyDataVos.size();i++){
                 NotifyDataVo notifyDataVo = notifyDataVos.get(i);
-                String renterOrderNo = notifyDataVo.getExtendParams();
-                //补付需要 子单号
-                 if(Objects.nonNull(notifyDataVo) && DataPayKindConstant.RENT_INCREMENT.equals(notifyDataVo.getPayKind())){
-                     //返回应付 （包含补付） 费用列表
-                     vo.setRenterOrderNo(renterOrderNo);
-                }
+                String extendParams = notifyDataVo.getExtendParams();
                 if(Objects.nonNull(notifyDataVo) && DataPayKindConstant.RENT_AMOUNT.equals(notifyDataVo.getPayKind())){
                     //返回应付 （包含补付） 费用列表
-                    vo.setRenterOrderNo(renterOrderNo);
+                    vo.setRenterOrderNo(extendParams);
+                }
+                //APP补付需要 子单号
+                if(Objects.nonNull(notifyDataVo) && DataPayKindConstant.RENT_INCREMENT.equals(notifyDataVo.getPayKind())){
+                    //返回应付 （包含补付） 费用列表
+                    vo.setRenterOrderNo(extendParams);
+                }
+                
+                // ------------------------------------------------------------------------------- 分割线
+                
+                if(Objects.nonNull(notifyDataVo) && DataPayKindConstant.RENT_AMOUNT_AFTER.equals(notifyDataVo.getPayKind())){
+                    //返回应付 （包含补付） 费用列表
+                	rentAmountAfterRenterOrderNos.add(extendParams);
+                }
+                
+                //管理后台修改订单补付 add 200312 
+                if(Objects.nonNull(notifyDataVo) && DataPayKindConstant.RENT_INCREMENT_CONSOLE.equals(notifyDataVo.getPayKind())){
+                    //返回应付 （包含补付） 费用列表
+//                	Map<String,Integer> map = new HashMap<String,Integer>();
+//                	map.put(extendParams, Integer.valueOf(notifyDataVo.getSettleAmount()));
+                	supplementIds.add(notifyDataVo);
+                }
+                //支付欠款 add 200312 
+                if(Objects.nonNull(notifyDataVo) && DataPayKindConstant.DEBT.equals(notifyDataVo.getPayKind())){
+                    //返回应付 （包含补付） 费用列表
+//                	Map<String,Integer> map = new HashMap<String,Integer>();
+//                	map.put(extendParams, Integer.valueOf(notifyDataVo.getSettleAmount()));
+                	debtIds.add(notifyDataVo);
                 }
             }
+            
+            //数据封装
+            vo.setRentAmountAfterRenterOrderNos(rentAmountAfterRenterOrderNos);
+            vo.setSupplementIds(supplementIds);
+            vo.setDebtIds(debtIds);
         }
     }
 
@@ -185,9 +221,16 @@ public class CashierPayService{
                 orderFlowService.inserOrderStatusChangeProcessInfo(orderStatusDTO.getOrderNo(), OrderStatusEnum.TO_GET_CAR);
             }
             orderStatusService.saveOrderStatusInfo(orderStatusDTO);
+            
             //更新配送 订单补付等信息 只有订单状态为已支付
+            //callback
             if(isGetCar(vo)){
-                callBack.callBack(vo.getMemNo(),vo.getOrderNo(),vo.getRenterOrderNo(),vo.getIsPayAgain(),vo.getIsGetCar());
+                //异步通知处理类
+            	callBack.callBack(vo.getMemNo(),vo.getOrderNo(),vo.getRenterOrderNo(),vo.getIsPayAgain(),vo.getIsGetCar());
+                
+            } else {  //补付总和
+            	callBack.callBack(vo.getMemNo(),vo.getOrderNo(),vo.getRentAmountAfterRenterOrderNos(),vo.getIsPayAgain(),vo.getIsGetCar(),
+                		vo.getSupplementIds(),vo.getDebtIds());
             }
             log.info("payOrderCallBackSuccess saveOrderStatusInfo :[{}]", GsonUtils.toJson(orderStatusDTO));
         }
@@ -325,6 +368,7 @@ public class CashierPayService{
         int rentIncrementAmt = 0;
         int rentIncrementSupplementAmt = 0;
         int rentIncrementDebtAmt = 0;
+        int rentAmtAfter = 0;
         
         //已付租车费用
         int rentAmtPayed = 0;
@@ -376,6 +420,29 @@ public class CashierPayService{
             }
         }
         
+        //---------------------------------------------------------------------------------------- 与RENT_AMOUNT分离
+        ///费用补付 
+        if(orderPayReqVO.getPayKind().contains(DataPayKindConstant.RENT_AMOUNT_AFTER)){  //管理后台修改订单的补付
+            List<PayableVO> payableVOs = renterOrderCostCombineService.listPayableGlobalVO(orderPayReqVO.getOrderNo(),renterOrderEntity.getRenterOrderNo(),orderPayReqVO.getMenNo());
+            result.setPayableVOs(payableVOs);
+            //应付租车费用（已经求和）
+            rentAmtAfter = cashierNoTService.sumRentOrderCost(payableVOs);
+            
+            //已付租车费用(shifu  租车费用的实付)
+            rentAmtPayed = accountRenterCostSettleService.getCostPaidRent(orderPayReqVO.getOrderNo(),orderPayReqVO.getMenNo());
+            if(!CollectionUtils.isEmpty(payableVOs) && rentAmtAfter+rentAmtPayed < 0){   // 
+                for(int i=0;i<payableVOs.size();i++){
+                    PayableVO payableVO = payableVOs.get(i);
+                    //判断是租车费用、还是补付 租车费用 并记录 详情
+//                    RenterCashCodeEnum type = rentAmtPayed>0?RenterCashCodeEnum.ACCOUNT_RENTER_RENT_COST_AGAIN:RenterCashCodeEnum.ACCOUNT_RENTER_RENT_COST;
+                    RenterCashCodeEnum type = RenterCashCodeEnum.ACCOUNT_RENTER_RENT_COST_AFTER;
+                    result.setIsPayAgain(YesNoEnum.YES.getCode());
+                    accountPayAbles.add(new AccountPayAbleResVO(orderPayReqVO.getOrderNo(),orderPayReqVO.getMenNo(),payableVO.getAmt(),type,payableVO.getTitle()));
+                }
+            }
+        }
+        
+        
         //管理后台补付，等于管理后台的补付   08
         if(orderPayReqVO.getPayKind().contains(DataPayKindConstant.RENT_INCREMENT_CONSOLE)){  //修改订单的补付
         	List<PayableVO> payableVOs = renterOrderCostCombineService.listPayableSupplementVO(orderPayReqVO.getOrderNo(),renterOrderEntity.getRenterOrderNo(),orderPayReqVO.getMenNo());
@@ -388,9 +455,9 @@ public class CashierPayService{
                     PayableVO payableVO = payableVOs.get(i);
                     //判断是租车费用、还是补付 租车费用 并记录 详情
                     RenterCashCodeEnum type = RenterCashCodeEnum.ACCOUNT_RENTER_SUPPLEMENT_COST_AGAIN;
-                    if(RenterCashCodeEnum.ACCOUNT_RENTER_SUPPLEMENT_COST_AGAIN.equals(type)){
+//                    if(RenterCashCodeEnum.ACCOUNT_RENTER_SUPPLEMENT_COST_AGAIN.equals(type)){
                         result.setIsPayAgain(YesNoEnum.YES.getCode());
-                    }
+//                    }
                     accountPayAbles.add(new AccountPayAbleResVO(orderPayReqVO.getOrderNo(),orderPayReqVO.getMenNo(),payableVO.getAmt(),type,payableVO.getTitle()));
                 }
             }
@@ -417,9 +484,10 @@ public class CashierPayService{
         
         
         //待支付总额
-        int amtTotal = amtDeposit + amtWZDeposit + rentAmt + rentIncrementAmt + rentIncrementSupplementAmt + rentIncrementDebtAmt;
+        int amtTotal = amtDeposit + amtWZDeposit + rentAmt + rentAmtAfter + rentIncrementAmt + rentIncrementSupplementAmt + rentIncrementDebtAmt;
         //实际待支付租车费用总额 即真实应付租车费用
         int amtRent = rentAmt + rentAmtPayed;
+        int amtRentAfter = rentAmtAfter + rentAmtPayed;
         //补付修改订单
         int amtIncrementRent = rentIncrementAmt + rentAmtPayed;
         //管理后台补付
@@ -438,6 +506,8 @@ public class CashierPayService{
         }
         result.setAmtWallet(amtWallet);
         result.setAmtRent(amtRent);
+        //补充
+        result.setAmtRentAfter(amtRentAfter);
         result.setAmtIncrementRent(amtIncrementRent);
         ///add 管理后台补付，支付欠款 200311
         result.setAmtIncrementRentSupplement(rentIncrementSupplementAmt);
@@ -636,6 +706,27 @@ public class CashierPayService{
                     vo.setPayMd5(payMd5);
                     payVo.add(vo);
                     
+                } else if(RenterCashCodeEnum.ACCOUNT_RENTER_RENT_COST_AFTER.equals(accountPayAbleResVO.getRenterCashCode())){
+                	////待付租车费用   租车费用默认是消费
+                	
+                    //待付租车费用
+                    int amt = payVO.getAmtRent();
+                    orderPaySign.setPayType(DataPayTypeConstant.PAY_PUR);
+                    //去掉该条件，根据入参来。
+//                        String payKind = YesNoEnum.YES.getCode().equals(payVO.getIsPayAgain())?DataPayKindConstant.RENT_INCREMENT:DataPayKindConstant.RENT_AMOUNT;
+                    String payKind = DataPayKindConstant.RENT_AMOUNT_AFTER;
+                    AccountRenterCostSettleEntity entity = cashierService.getAccountRenterCostSettle(orderNo,orderPaySign.getMenNo());
+                    Integer payId = Objects.isNull(entity)?0:entity.getId();
+                    String payIdStr = Objects.isNull(payId)?"":String.valueOf(payId);
+                    PayVo vo = cashierNoTService.getPayVO(orderNo,null,orderPaySign,payVO.getAmtRent(),payVO.getTitle(),payKind,payIdStr,GsonUtils.toJson(entity),3);
+                    String paySn = cashierNoTService.getCashierRentCostPaySn(orderNo,orderPaySign.getMenNo(),payKind);
+                    vo.setPaySn(paySn);
+                    String renterOrderNo = getExtendParamsRentOrderNo(payVO);
+                    vo.setExtendParams(renterOrderNo);
+                    vo.setPayTitle("待支付金额："+amt+"，订单号："+vo.getOrderNo());
+                    String payMd5 = MD5.MD5Encode(FasterJsonUtil.toJson(vo));
+                    vo.setPayMd5(payMd5);
+                    payVo.add(vo);
                 }else if(RenterCashCodeEnum.ACCOUNT_RENTER_SUPPLEMENT_COST_AGAIN.equals(accountPayAbleResVO.getRenterCashCode())){
                 	////管理后台补付
                     //待付租车费用

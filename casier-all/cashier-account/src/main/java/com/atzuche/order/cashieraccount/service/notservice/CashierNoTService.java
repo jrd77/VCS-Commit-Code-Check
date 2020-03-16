@@ -170,7 +170,7 @@ public class CashierNoTService {
      * @param notifyDataVo
      * @return
      */
-    public PayedOrderRenterDepositReqVO getPayedOrderRenterDepositReq(NotifyDataVo notifyDataVo) {
+    public PayedOrderRenterDepositReqVO getPayedOrderRenterDepositReq(NotifyDataVo notifyDataVo,RenterCashCodeEnum renterCashCodeEnum) {
         PayedOrderRenterDepositReqVO vo = new PayedOrderRenterDepositReqVO();
         BeanUtils.copyProperties(notifyDataVo,vo);
         vo.setPayStatus(notifyDataVo.getTransStatus());
@@ -189,8 +189,7 @@ public class CashierNoTService {
         	putPayPreValue(notifyDataVo, vo);
             
         }
-        
-        
+
         //TODO 预授权到期时间
         //车辆押金进出明细
         DetainRenterDepositReqVO detainRenterDeposit = new DetainRenterDepositReqVO();
@@ -198,7 +197,7 @@ public class CashierNoTService {
         Integer settleAmount = notifyDataVo.getSettleAmount()==null?0:Integer.parseInt(notifyDataVo.getSettleAmount());
         detainRenterDeposit.setAmt(settleAmount);
         detainRenterDeposit.setUniqueNo(notifyDataVo.getQn());
-        detainRenterDeposit.setRenterCashCodeEnum(RenterCashCodeEnum.ACCOUNT_RENTER_DEPOSIT);
+        detainRenterDeposit.setRenterCashCodeEnum(renterCashCodeEnum);
         vo.setDetainRenterDepositReqVO(detainRenterDeposit);
         return vo;
     }
@@ -353,7 +352,7 @@ public class CashierNoTService {
      * @param notifyDataVo
      * @return
      */
-    public PayedOrderRenterWZDepositReqVO getPayedOrderRenterWZDepositReq(NotifyDataVo notifyDataVo) {
+    public PayedOrderRenterWZDepositReqVO getPayedOrderRenterWZDepositReq(NotifyDataVo notifyDataVo,RenterCashCodeEnum renterCashCodeEnum) {
         PayedOrderRenterWZDepositReqVO vo = new PayedOrderRenterWZDepositReqVO();
         BeanUtils.copyProperties(notifyDataVo,vo);
 //        Integer settleAmount = notifyDataVo.getSettleAmount()==null?0:Integer.parseInt(notifyDataVo.getSettleAmount());
@@ -378,7 +377,7 @@ public class CashierNoTService {
         PayedOrderRenterDepositWZDetailReqVO payedOrderRenterDepositDetail = new PayedOrderRenterDepositWZDetailReqVO();
         BeanUtils.copyProperties(notifyDataVo,payedOrderRenterDepositDetail);
         payedOrderRenterDepositDetail.setUniqueNo(notifyDataVo.getQn());
-        payedOrderRenterDepositDetail.setRenterCashCodeEnum(RenterCashCodeEnum.ACCOUNT_RENTER_WZ_DEPOSIT);
+        payedOrderRenterDepositDetail.setRenterCashCodeEnum(renterCashCodeEnum);
         payedOrderRenterDepositDetail.setPayChannel(notifyDataVo.getPaySource());
         payedOrderRenterDepositDetail.setPayment(notifyDataVo.getPayType());
         Integer settleAmount = notifyDataVo.getSettleAmount()==null?0:Integer.parseInt(notifyDataVo.getSettleAmount());

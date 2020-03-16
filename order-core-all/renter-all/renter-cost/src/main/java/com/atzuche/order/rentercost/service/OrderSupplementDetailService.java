@@ -65,8 +65,8 @@ public class OrderSupplementDetailService{
      * @param payFlag
      * @return Integer
      */
-    public Integer updatePayFlagById(Integer id, Integer payFlag, Date payTime) {
-    	return orderSupplementDetailMapper.updatePayFlagById(id, payFlag, payTime);
+    public Integer updatePayFlagById(Integer id, Integer payFlag, Date payTime, Integer amt) {
+    	return orderSupplementDetailMapper.updatePayFlagById(id, payFlag, payTime,amt);
     }
     
     /**
