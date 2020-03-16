@@ -1,5 +1,6 @@
 package com.atzuche.order.coreapi.service;
 
+import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.entity.dto.CostBaseDTO;
 import com.atzuche.order.commons.enums.DispatcherStatusEnum;
 import com.atzuche.order.commons.enums.FineSubsidyCodeEnum;
@@ -38,20 +39,20 @@ public class OwnerOrderFineApplyHandelService {
 
 
     @Transactional(rollbackFor = Exception.class)
-    public boolean handleFineApplyRecord(String orderNo, DispatcherStatusEnum dispatcherStatus,
+    public boolean handleFineApplyRecord(OwnerOrderFineApplyEntity ownerOrderFineApplyEntity, DispatcherStatusEnum dispatcherStatus,
                                          Boolean isSubsidyFineAmt) {
         logger.info("Handle owner order fine apply record. param is,orderNo:[{}],dispatcherStatus:[{}]," +
                         "isSubsidyFineAmt:[{}]",
-                orderNo, dispatcherStatus, isSubsidyFineAmt);
+                JSON.toJSONString(ownerOrderFineApplyEntity), dispatcherStatus, isSubsidyFineAmt);
 
-        OwnerOrderFineApplyEntity ownerOrderFineApplyEntity = ownerOrderFineApplyService.getByOrderNo(orderNo);
+
         if (null == ownerOrderFineApplyEntity) {
-            logger.warn("Not fund ownerOrderFineApplyEntity. orderNo:[{}]", orderNo);
+            logger.warn("Not fund ownerOrderFineApplyEntity.");
             return false;
         }
 
         if (null == dispatcherStatus) {
-            logger.warn("Dispatcher status is empty. orderNo:[{}]", orderNo);
+            logger.warn("Dispatcher status is empty. ownerOrderFineApplyEntity:[{}]", JSON.toJSONString(ownerOrderFineApplyEntity));
             return false;
         }
 
@@ -89,7 +90,8 @@ public class OwnerOrderFineApplyHandelService {
                 entity.setFineSubsidyDesc(FineSubsidyCodeEnum.PLATFORM.getFineSubsidyDesc());
             }
         } else {
-            logger.warn("Dispatcher status is invalid. orderNo:[{}],dispatcherStatus:[{}]", orderNo, dispatcherStatus);
+            logger.warn("Dispatcher status is invalid. orderNo:[{}],dispatcherStatus:[{}]",
+                    ownerOrderFineApplyEntity.getOrderNo(), dispatcherStatus);
             return false;
         }
         //处理车主罚金信息

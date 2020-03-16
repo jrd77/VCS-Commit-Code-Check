@@ -4,16 +4,15 @@ import com.alibaba.fastjson.JSON;
 import com.atzuche.config.client.api.DefaultConfigContext;
 import com.atzuche.config.client.api.HolidaySettingSDK;
 import com.atzuche.config.common.entity.HolidaySettingEntity;
+import com.atzuche.order.commons.DateUtils;
 import com.atzuche.order.commons.LocalDateTimeUtils;
 import com.atzuche.order.commons.constant.OrderConstant;
 import com.atzuche.order.commons.entity.dto.CancelFineAmtDTO;
 import com.atzuche.order.commons.entity.dto.CostBaseDTO;
 import com.atzuche.order.commons.entity.dto.OwnerGoodsDetailDTO;
 import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
-import com.atzuche.order.commons.enums.CancelOrderDutyEnum;
-import com.atzuche.order.commons.enums.FineSubsidyCodeEnum;
-import com.atzuche.order.commons.enums.FineSubsidySourceCodeEnum;
-import com.atzuche.order.commons.enums.FineTypeEnum;
+import com.atzuche.order.commons.enums.*;
+import com.atzuche.order.commons.vo.res.order.OrderJudgeDutyVO;
 import com.atzuche.order.coreapi.entity.CancelOrderReqContext;
 import com.atzuche.order.coreapi.entity.dto.CancelOrderReqDTO;
 import com.atzuche.order.ownercost.entity.ConsoleOwnerOrderFineDeatailEntity;
@@ -40,6 +39,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -79,7 +79,10 @@ public class CancelOrderJudgeDutyService {
         CancelOrderReqDTO cancelOrderReqDTO = reqContext.getCancelOrderReqDTO();
         OrderStatusEntity orderStatusEntity = reqContext.getOrderStatusEntity();
         RenterOrderEntity renterOrderEntity = reqContext.getRenterOrderEntity();
+        OwnerOrderEntity ownerOrderEntity = reqContext.getOwnerOrderEntity();
         RenterOrderCostEntity renterOrderCostEntity = reqContext.getRenterOrderCostEntity();
+        int fineAmt = 0;
+        int insuranceFineAmt = 0;
         if (CancelOrderDutyEnum.CANCEL_ORDER_DUTY_RENTER.getCode() == wrongdoer) {
             //租客责任
             RenterGoodsDetailDTO goodsDetail = reqContext.getRenterGoodsDetailDTO();
@@ -91,12 +94,14 @@ public class CancelOrderJudgeDutyService {
                 cancelFineAmt.setCancelTime(cancelReqTime);
                 int penalty = renterOrderFineDeatailService.calCancelFine(cancelFineAmt);
 
+                fineAmt = penalty;
                 //罚租客补贴给车主
                 renterOrderFineDetailEntityOne = renterOrderFineDeatailService.fineDataConvert(cancelFineAmt.getCostBaseDTO(), penalty, FineSubsidyCodeEnum.OWNER,
                         FineSubsidySourceCodeEnum.RENTER, FineTypeEnum.CANCEL_FINE);
 
                 //罚租客补贴给平台(保险费)
                 if (!cancelReqTime.isBefore(renterOrderEntity.getExpRentTime())) {
+                    insuranceFineAmt = Math.abs(renterOrderCostEntity.getBasicEnsureAmount());
                     RenterOrderFineDeatailEntity renterOrderFineDetailEntityTwo =
                             renterOrderFineDeatailService.fineDataConvert(cancelFineAmt.getCostBaseDTO(), Math.abs(renterOrderCostEntity.getBasicEnsureAmount()), FineSubsidyCodeEnum.PLATFORM,
                                     FineSubsidySourceCodeEnum.RENTER, FineTypeEnum.CANCEL_FINE);
@@ -119,16 +124,16 @@ public class CancelOrderJudgeDutyService {
             consoleOwnerOrderFineDeatailService.addFineRecord(consoleOwnerOrderFineDeatailEntity);
         } else if (CancelOrderDutyEnum.CANCEL_ORDER_DUTY_OWNER.getCode() == wrongdoer) {
             //车主责任
-            OwnerOrderEntity ownerOrderEntity = reqContext.getOwnerOrderEntity();
             OwnerGoodsDetailDTO goodsDetail = reqContext.getOwnerGoodsDetailDTO();
 
             CancelFineAmtDTO cancelFineAmt = buildCancelFineAmtDTO(renterOrderEntity,
                     renterOrderCostEntity, goodsDetail.getCarOwnerType());
             cancelFineAmt.setCancelTime(cancelReqTime);
             int penalty = orderStatusEntity.getRentCarPayStatus() == OrderConstant.YES ? renterOrderFineDeatailService.calCancelFine(cancelFineAmt) : 0;
-
+            fineAmt = penalty;
             //罚车主补贴给平台(保险费)
             if (!cancelReqTime.isBefore(renterOrderEntity.getExpRentTime())) {
+                insuranceFineAmt = Math.abs(renterOrderCostEntity.getBasicEnsureAmount());
                 OwnerOrderFineDeatailEntity ownerOrderFineDeatailEntityTwo =
                         ownerOrderFineDeatailService.fineDataConvert(cancelFineAmt.getCostBaseDTO(), Math.abs(renterOrderCostEntity.getBasicEnsureAmount()),
                                 FineSubsidyCodeEnum.PLATFORM, FineSubsidySourceCodeEnum.OWNER, FineTypeEnum.CANCEL_FINE);
@@ -174,9 +179,7 @@ public class CancelOrderJudgeDutyService {
         //更新申述信息
         OrderCancelAppealEntity orderCancelAppealEntity =
                 orderCancelAppealService.selectByOrderNo(cancelOrderReqDTO.getOrderNo());
-        int appealFlag = OrderConstant.NO;
         if(null != orderCancelAppealEntity) {
-            appealFlag = OrderConstant.YES;
             OrderCancelAppealEntity record = new OrderCancelAppealEntity();
             record.setId(orderCancelAppealEntity.getId());
             record.setIsWrongdoer(OrderConstant.YES);
@@ -184,12 +187,14 @@ public class CancelOrderJudgeDutyService {
         }
         //更新取消订单责任方
         OrderCancelReasonEntity orderCancelReasonEntity =
-                orderCancelReasonService.selectByOrderNo(cancelOrderReqDTO.getOrderNo());
+                orderCancelReasonService.selectByOrderNo(cancelOrderReqDTO.getOrderNo(),
+                        renterOrderEntity.getRenterOrderNo(), ownerOrderEntity.getOwnerOrderNo());
         if(null != orderCancelReasonEntity) {
             OrderCancelReasonEntity record = new OrderCancelReasonEntity();
             record.setId(orderCancelReasonEntity.getId());
             record.setDutySource(wrongdoer);
-            record.setAppealFlag(appealFlag);
+            record.setFineAmt(fineAmt);
+            record.setInsuranceFineAmt(insuranceFineAmt);
             record.setUpdateOp(cancelOrderReqDTO.getOperatorName());
             orderCancelReasonService.updateOrderCancelReasonRecord(record);
         }
@@ -197,14 +202,43 @@ public class CancelOrderJudgeDutyService {
     }
 
 
+    /**
+     * 根据订单号查询订单取消/申述记录
+     *
+     * @param orderNo 订单号
+     * @return List<OrderJudgeDutyVO>
+     */
+    public List<OrderJudgeDutyVO> queryOrderJudgeDutysByOrderNo(String orderNo) {
 
+        List<OrderCancelReasonEntity> records = orderCancelReasonService.selectListByOrderNo(orderNo);
+        if (CollectionUtils.isEmpty(records)) {
+            return new ArrayList<>();
+        }
 
+        List<OrderJudgeDutyVO> list = new ArrayList<>();
+        records.stream().filter(reocrd -> StringUtils.endsWithIgnoreCase(reocrd.getOperateType(), "1")).forEach(record -> {
+            OrderJudgeDutyVO orderJudgeDutyVO = new OrderJudgeDutyVO();
+            orderJudgeDutyVO.setId(record.getId());
+            orderJudgeDutyVO.setOrderNo(record.getOrderNo());
+            orderJudgeDutyVO.setRenterOrderNo(record.getRenterOrderNo());
+            orderJudgeDutyVO.setOwnerOrderNo(record.getOwnerOrderNo());
+            orderJudgeDutyVO.setOperateName(getOptName(record));
+            orderJudgeDutyVO.setOptSource(getOptSource(record));
+            orderJudgeDutyVO.setOptReason(record.getCancelReason());
+            orderJudgeDutyVO.setOptTime(DateUtils.formate(record.getCreateTime(), DateUtils.DATE_DEFAUTE1));
+            orderJudgeDutyVO.setIsManualCondemn("1");
+            if (null != record.getDutySource()) {
+                orderJudgeDutyVO.setDutyource(CancelOrderDutyEnum.from(record.getDutySource()).getName());
+                orderJudgeDutyVO.setPenaltyAmt(String.valueOf(record.getFineAmt()));
+                orderJudgeDutyVO.setInsuranceAmt(String.valueOf(record.getInsuranceFineAmt()));
 
-
-
-
-
-
+                orderJudgeDutyVO.setJudgeDutyjOperator(record.getUpdateOp());
+                orderJudgeDutyVO.setJudgeDutyjOptTime(DateUtils.formate(record.getUpdateTime(), DateUtils.DATE_DEFAUTE1));
+                orderJudgeDutyVO.setIsManualCondemn("0");
+            }
+        });
+        return list;
+    }
 
     /**
      * 组装计算取消订单罚金请求参数
@@ -260,4 +294,43 @@ public class CancelOrderJudgeDutyService {
         return applyEntity;
     }
 
+    /**
+     * 获取操作名称
+     *
+     * @param record 取消记录
+     * @return String
+     */
+    private String getOptName(OrderCancelReasonEntity record) {
+        if (record.getAppealFlag() == OrderConstant.YES) {
+            return "申诉";
+        }
+
+        if (record.getCancelSource().intValue() == CancelSourceEnum.PLATFORM.getCode().intValue()) {
+            return "平台取消";
+        }
+
+        if (record.getCancelSource().intValue() == CancelSourceEnum.INSTEAD_OF_OWNER.getCode().intValue() ||
+                record.getCancelSource().intValue() == CancelSourceEnum.INSTEAD_OF_RENTER.getCode().intValue()) {
+            return CancelSourceEnum.from(record.getCancelSource()).getMsg();
+        }
+        return "取消订单";
+
+    }
+
+    /**
+     * 获取操作方
+     *
+     * @param record 取消记录
+     * @return String
+     */
+    private String getOptSource(OrderCancelReasonEntity record) {
+
+        if (record.getCancelSource().intValue() == CancelSourceEnum.INSTEAD_OF_OWNER.getCode().intValue() ||
+                record.getCancelSource().intValue() == CancelSourceEnum.INSTEAD_OF_RENTER.getCode().intValue() ||
+                record.getCancelSource().intValue() == CancelSourceEnum.PLATFORM.getCode().intValue()) {
+            return record.getCreateOp();
+        }
+        return CancelSourceEnum.from(record.getCancelSource()).getMsg();
+
+    }
 }

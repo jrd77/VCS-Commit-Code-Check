@@ -2,6 +2,7 @@ package com.atzuche.order.open.service;
 
 import com.atzuche.order.commons.entity.dto.RentCityAndRiskAccidentReqDTO;
 import com.atzuche.order.commons.vo.req.*;
+import com.atzuche.order.commons.vo.res.AdminOrderJudgeDutyResVO;
 import com.autoyol.commons.web.ResponseData;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -63,6 +64,17 @@ public interface FeignOrderUpdateService {
      */
     @PostMapping("/order/admin/judgeDuty")
     public ResponseData<?> adminCancelOrderJudgeDuty(@RequestBody AdminOrderCancelJudgeDutyReqVO judgeDutyReqVO);
+
+
+    /**
+     * 取消订单责任判定
+     * <p>管理后台调用，手动判责</p>
+     *
+     * @param judgeDutyReqVO 请求参数
+     * @return ResponseData<?>
+     */
+    @PostMapping("/order/admin/judgeDuty/list")
+    public ResponseData<AdminOrderJudgeDutyResVO> adminOrderJudgeDutyList(@RequestBody AdminOrderJudgeDutyReqVO judgeDutyReqVO);
 
 
     /**

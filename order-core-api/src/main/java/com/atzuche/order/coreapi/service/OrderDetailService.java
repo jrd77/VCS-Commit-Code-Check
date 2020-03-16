@@ -436,7 +436,8 @@ public class OrderDetailService {
         BeanUtils.copyProperties(renterOrderCostEntity,renterOrderCostDTO);
 
         //订单取消原因
-        OrderCancelReasonEntity orderCancelReasonEntity = orderCancelReasonService.selectByOrderNo(orderNo);
+        OrderCancelReasonEntity orderCancelReasonEntity = orderCancelReasonService.selectByOrderNo(orderNo,
+                renterOrderNo, ownerOrderNo);
         OrderCancelReasonDTO orderCancelReasonDTO = null;
         if(orderCancelReasonEntity != null){
             orderCancelReasonDTO = new OrderCancelReasonDTO();
