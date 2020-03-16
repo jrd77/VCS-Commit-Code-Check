@@ -1,5 +1,6 @@
 package com.atzuche.order.settle.service.notservice;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -26,10 +27,13 @@ import com.atzuche.order.parentorder.dto.OrderStatusDTO;
 import com.atzuche.order.parentorder.service.OrderStatusService;
 import com.atzuche.order.renterwz.entity.RenterOrderWzCostDetailEntity;
 import com.atzuche.order.renterwz.service.RenterOrderWzCostDetailService;
+import com.atzuche.order.settle.service.AccountDebtService;
 import com.atzuche.order.settle.vo.req.AccountInsertDebtReqVO;
+import com.atzuche.order.settle.vo.req.AccountOldDebtReqVO;
 import com.atzuche.order.settle.vo.req.RentCostsWz;
 import com.atzuche.order.settle.vo.req.SettleOrdersAccount;
 import com.atzuche.order.settle.vo.req.SettleOrdersWz;
+import com.atzuche.order.settle.vo.res.AccountOldDebtResVO;
 import com.autoyol.autopay.gateway.constant.DataPayKindConstant;
 import com.autoyol.autopay.gateway.constant.DataPayTypeConstant;
 import com.autoyol.commons.utils.GsonUtils;
@@ -54,7 +58,8 @@ public class OrderWzSettleNoTService {
     RenterOrderWzCostDetailService renterOrderWzCostDetailService;
     @Autowired 
     CashierNoTService cashierNoTService;
-
+    @Autowired
+    private AccountDebtService accountDebtService;
 
 
     
@@ -103,6 +108,41 @@ public class OrderWzSettleNoTService {
                 settleOrdersAccount.setDepositSurplusAmt(settleOrdersAccount.getDepositSurplusAmt() - deductAmt);
             }
         }
+    }
+    
+    /**
+     * 违章押金抵扣老系统欠款
+     * @param settleOrdersAccount
+     * @return int
+     */
+    public int oldRepayWzHistoryDebtRent(SettleOrdersAccount settleOrdersAccount) {
+    	List<AccountOldDebtReqVO> oldDebtList = new ArrayList<AccountOldDebtReqVO>();
+    	// 违章押金抵扣
+    	if (settleOrdersAccount.getDepositSurplusAmt() > 0) {
+    		AccountOldDebtReqVO accountOldDebtReqVO = new AccountOldDebtReqVO();
+    		accountOldDebtReqVO.setOrderNo(settleOrdersAccount.getOrderNo());
+    		accountOldDebtReqVO.setRenterOrderNo(settleOrdersAccount.getRenterOrderNo());
+    		accountOldDebtReqVO.setMemNo(settleOrdersAccount.getRenterMemNo());
+    		accountOldDebtReqVO.setSurplusAmt(settleOrdersAccount.getDepositSurplusAmt());
+    		accountOldDebtReqVO.setCahsCodeEnum(RenterCashCodeEnum.SETTLE_WZ_DEPOSIT_TO_OLD_HISTORY_AMT);
+    		oldDebtList.add(accountOldDebtReqVO);
+    	}
+    	// 抵扣老系统历史欠款
+    	List<AccountOldDebtResVO> debtResList = accountDebtService.deductOldDebt(oldDebtList);
+    	if (debtResList == null || debtResList.isEmpty()) {
+    		return 0;
+    	}
+    	int totalRealDebtAmt = 0;
+    	for (AccountOldDebtResVO debtRes:debtResList) {
+    		RenterCashCodeEnum cahsCodeEnum = debtRes.getCahsCodeEnum();
+    		totalRealDebtAmt += debtRes.getRealDebtAmt();
+    		if (cahsCodeEnum != null && cahsCodeEnum == RenterCashCodeEnum.SETTLE_WZ_DEPOSIT_TO_OLD_HISTORY_AMT) {
+    			// 违章押金
+    			cashierWzSettleService.saveDeductWZDebt(debtRes);
+    			settleOrdersAccount.setDepositSurplusAmt(settleOrdersAccount.getDepositSurplusAmt() - debtRes.getRealDebtAmt());
+    		}
+    	}
+    	return totalRealDebtAmt;
     }
     
     

@@ -29,6 +29,7 @@ import com.atzuche.order.commons.enums.cashier.CashierRefundApplyStatus;
 import com.atzuche.order.settle.service.AccountDebtService;
 import com.atzuche.order.settle.vo.req.AccountDeductDebtReqVO;
 import com.atzuche.order.settle.vo.req.AccountInsertDebtReqVO;
+import com.atzuche.order.settle.vo.res.AccountOldDebtResVO;
 import com.autoyol.autopay.gateway.constant.DataPayKindConstant;
 import com.autoyol.autopay.gateway.constant.DataPayTypeConstant;
 import com.autoyol.commons.utils.GsonUtils;
@@ -177,6 +178,23 @@ public class CashierWzSettleService {
         int id = accountRenterWzDepositService.updateRenterWZDepositChange(payedOrderRenterWZDepositDetail);
         log.info("(动账)更新违章押金和新增违章押金资金明细, params=[{}]",GsonUtils.toJson(payedOrderRenterWZDepositDetail));
         return new CashierDeductDebtResVO(cashierDeductDebtReqVO, debtedAmt,id);
+    }
+    
+    /**
+     * 保存违章押金抵扣老系统欠款
+     * @param debtRes
+     */
+    public void saveDeductWZDebt(AccountOldDebtResVO debtRes) {
+    	// 记录结算费用抵扣记录
+        PayedOrderRenterDepositWZDetailReqVO payedOrderRenterWZDepositDetail = new PayedOrderRenterDepositWZDetailReqVO();
+        payedOrderRenterWZDepositDetail.setOrderNo(debtRes.getOrderNo());
+        payedOrderRenterWZDepositDetail.setMemNo(debtRes.getMemNo());
+        payedOrderRenterWZDepositDetail.setRenterCashCodeEnum(debtRes.getCahsCodeEnum());
+        payedOrderRenterWZDepositDetail.setAmt(-debtRes.getRealDebtAmt());
+        //update account_renter_wz_deposit
+        //insert account_renter_wz_deposit_detail
+        int id = accountRenterWzDepositService.updateRenterWZDepositChange(payedOrderRenterWZDepositDetail);
+        log.info("(动账)更新违章押金和新增违章押金资金明细, params=[{}]",GsonUtils.toJson(payedOrderRenterWZDepositDetail));
     }
     
     

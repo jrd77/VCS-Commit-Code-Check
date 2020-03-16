@@ -705,8 +705,11 @@ public class OrderSettleNoTService {
         
         //9 租客费用 结余处理
         orderSettleNewService.rentCostSettle(settleOrders,settleOrdersAccount,callBack);
-        //10租客车辆押金/租客剩余租车费用 结余历史欠款
+        // 10.1租客车辆押金/租客剩余租车费用 结余历史欠款
         orderSettleNewService.repayHistoryDebtRent(settleOrdersAccount);
+        // 10.2 抵扣老系统欠款
+        int totalOldRealDebtAmt = orderSettleNewService.oldRepayHistoryDebtRent(settleOrdersAccount);
+        settleOrders.setRenterTotalOldRealDebtAmt(totalOldRealDebtAmt);
         //11 租客费用 退还
         orderSettleNewService.refundRentCost(settleOrdersAccount,settleOrdersDefinition.getAccountRenterCostSettleDetails(),orderStatusDTO,settleOrders);
         //12 租客押金 退还
