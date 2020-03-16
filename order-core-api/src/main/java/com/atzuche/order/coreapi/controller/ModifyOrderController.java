@@ -230,7 +230,7 @@ public class ModifyOrderController {
 	@GetMapping("/order/modify/check")
     public ResponseData<?> modifyCheck(@RequestParam(value="orderNo",required = true) String orderNo, 
     		@RequestParam(value="memNo",required = true) String memNo) {
-		log.info("order/modify/check orderNo=[{}]", orderNo);
+		log.info("order/modify/check orderNo=[{}],memNo=[{}]", orderNo, memNo);
 		modifyOrderCheckService.checkModifyOrderForApp(orderNo, memNo);
     	return ResponseData.success();
     }
@@ -243,7 +243,7 @@ public class ModifyOrderController {
 	 */
 	@GetMapping("/order/modify/applycount/get")
     public ResponseData<?> getApplyCount(@RequestParam(value="orderNo",required = true) String orderNo) {
-		log.info("order/modify/check orderNo=[{}]", orderNo);
+		log.info("/order/modify/applycount/get orderNo=[{}]", orderNo);
 		Integer changeApplyCount = renterOrderChangeApplyService.getRenterOrderChangeApplyAllCountByOrderNo(orderNo);
 		changeApplyCount = changeApplyCount == null ? 0:changeApplyCount;
     	return ResponseData.success(changeApplyCount);
