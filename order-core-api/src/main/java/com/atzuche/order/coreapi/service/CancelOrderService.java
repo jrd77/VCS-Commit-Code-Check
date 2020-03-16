@@ -17,6 +17,7 @@ import com.atzuche.order.coreapi.entity.CancelOrderReqContext;
 import com.atzuche.order.coreapi.entity.dto.CancelOrderJudgeDutyResDTO;
 import com.atzuche.order.coreapi.entity.dto.CancelOrderReqDTO;
 import com.atzuche.order.coreapi.entity.dto.CancelOrderResDTO;
+import com.atzuche.order.coreapi.entity.dto.JudgeDutyResDTO;
 import com.atzuche.order.coreapi.service.mq.OrderActionMqService;
 import com.atzuche.order.coreapi.service.mq.OrderStatusMqService;
 import com.atzuche.order.coreapi.service.remote.StockProxyService;
@@ -125,10 +126,12 @@ public class CancelOrderService {
         CancelOrderReqDTO cancelOrderReqDTO = new CancelOrderReqDTO();
         BeanUtils.copyProperties(cancelOrderReqVO, cancelOrderReqDTO);
         //兼容定时任务校验
-        cancelOrderReqDTO.setConsoleInvoke(StringUtils.equals(OrderConstant.SYSTEM_OPERATOR_JOB, cancelOrderReqVO.getOperatorName()));
+        cancelOrderReqDTO.setConsoleInvoke(false);
         CancelOrderReqContext reqContext = buildCancelOrderReqContext(cancelOrderReqDTO);
         //公共校验
-        cancelOrderCheckService.checkCancelOrder(reqContext);
+        if (!StringUtils.equals(OrderConstant.SYSTEM_OPERATOR_JOB, cancelOrderReqVO.getOperatorName())) {
+            cancelOrderCheckService.checkCancelOrder(reqContext);
+        }
         //取消处理
         LocalDateTime cancelReqTime = LocalDateTime.now();
         CancelOrderResDTO res = null;
@@ -145,33 +148,25 @@ public class CancelOrderService {
         if (null != res) {
             //判断是否补贴罚金
             CancelOrderJudgeDutyResDTO cancelOrderJudgeDutyRes = holidayService.isSubsidyFineAmt(reqContext, res.getWrongdoer());
-            cancelOrderJudgeDutyService.judgeDuty(res.getWrongdoer(), res.getIsDispatch(), cancelOrderJudgeDutyRes.getIsSubsidyFineAmt(),
+            JudgeDutyResDTO judgeDutyResDTO = cancelOrderJudgeDutyService.judgeDuty(res.getWrongdoer(),
+                    res.getIsDispatch(),
+                    cancelOrderJudgeDutyRes.getIsSubsidyFineAmt(),
                     cancelReqTime, reqContext);
             //发送消息通知会员记录节假日取消次数
             orderActionMqService.sendOrderCancelMemHolidayDeduct(cancelOrderReqVO.getOrderNo(),
                     cancelOrderJudgeDutyRes.getMemNo(), cancelOrderJudgeDutyRes.getHolidayId(), cancelOrderReqVO.getOperatorName());
-            if (!res.getIsDispatch()) {
+            if (judgeDutyResDTO.getIsNoticeSettle()) {
                 //通知结算计算凹凸币和钱包等
-                logger.info("取消订单责任判定后进行结算,orderNo:[{}]", cancelOrderReqDTO.getOrderNo());
-                Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "结算服务");
                 com.atzuche.order.settle.vo.req.CancelOrderReqDTO reqDTO =
-                        new com.atzuche.order.settle.vo.req.CancelOrderReqDTO();
+                        orderCommonConver.buildCancelOrderReqDTO(cancelOrderReqVO.getOrderNo(),
+                                reqContext.getRenterOrderEntity().getRenterOrderNo(),
+                                reqContext.getOwnerOrderEntity().getOwnerOrderNo(), false, true);
+                logger.info("取消订单责任判定后进行结算,reqDTO:[{}]", JSON.toJSONString(reqDTO));
                 try {
-                    Cat.logEvent(CatConstants.FEIGN_METHOD, "orderSettleService.orderCancelSettleCombination");
-                    reqDTO.setSettleRenterFlg(true);
-                    reqDTO.setOrderNo(cancelOrderReqVO.getOrderNo());
-                    reqDTO.setRenterOrderNo(reqContext.getRenterOrderEntity().getRenterOrderNo());
-                    reqDTO.setOwnerOrderNo(reqContext.getOwnerOrderEntity().getOwnerOrderNo());
-
-                    Cat.logEvent(CatConstants.FEIGN_PARAM, JSON.toJSONString(reqDTO));
                     orderSettleService.orderCancelSettleCombination(reqDTO);
-                    t.setStatus(Transaction.SUCCESS);
                 } catch (Exception e) {
                     logger.error("取消订单责任判定后进行结算异常. reqDTO:[{}]", JSON.toJSONString(reqDTO), e);
                     Cat.logError("取消订单责任判定后进行结算异常.reqDTO: " + JSON.toJSONString(reqDTO), e);
-                    t.setStatus(e);
-                } finally {
-                    t.complete();
                 }
             }
         }
@@ -243,33 +238,26 @@ public class CancelOrderService {
         //责任判定
         boolean isDispatch =
                 reqContext.getOrderStatusEntity().getIsDispatch() == OrderConstant.YES && reqContext.getOrderStatusEntity().getDispatchStatus() != 3;
-        cancelOrderJudgeDutyService.judgeDuty(Integer.valueOf(reqVO.getWrongdoer()), isDispatch,
+        JudgeDutyResDTO judgeDutyResDTO = cancelOrderJudgeDutyService.judgeDuty(Integer.valueOf(reqVO.getWrongdoer()),
+                isDispatch,
                 cancelOrderJudgeDutyRes.getIsSubsidyFineAmt(), orderCancelReasonEntity.getCancelReqTime(), reqContext);
         if (!isDispatch) {
             //发送消息通知会员记录节假日取消次数
             orderActionMqService.sendOrderCancelMemHolidayDeduct(reqVO.getOrderNo(),
                     cancelOrderJudgeDutyRes.getMemNo(), cancelOrderJudgeDutyRes.getHolidayId(), reqVO.getOperatorName());
-            //通知结算计算凹凸币和钱包等
-            logger.info("手动责任判定后进行结算,reqVO:[{}]", JSON.toJSONString(reqVO));
-            Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "结算服务");
-            com.atzuche.order.settle.vo.req.CancelOrderReqDTO reqDTO =
-                    new com.atzuche.order.settle.vo.req.CancelOrderReqDTO();
-            try {
-                Cat.logEvent(CatConstants.FEIGN_METHOD, "orderSettleService.orderCancelSettleCombination");
-                reqDTO.setSettleRenterFlg(true);
-                reqDTO.setOrderNo(reqVO.getOrderNo());
-                reqDTO.setRenterOrderNo(reqVO.getRenterOrderNo());
-                reqDTO.setOwnerOrderNo(reqVO.getOwnerOrderNo());
-                Cat.logEvent(CatConstants.FEIGN_PARAM, JSON.toJSONString(reqDTO));
-                orderSettleService.orderCancelSettleCombination(reqDTO);
-
-                t.setStatus(Transaction.SUCCESS);
-            } catch (Exception e) {
-                logger.error("手动责任判定后进行结算异常. reqDTO:[{}]", JSON.toJSONString(reqDTO), e);
-                Cat.logError("手动责任判定后进行结算异常.reqDTO: " + JSON.toJSONString(reqDTO), e);
-                t.setStatus(e);
-            } finally {
-                t.complete();
+            if (judgeDutyResDTO.getIsNoticeSettle()) {
+                //通知结算计算凹凸币和钱包等
+                com.atzuche.order.settle.vo.req.CancelOrderReqDTO reqDTO =
+                        orderCommonConver.buildCancelOrderReqDTO(reqVO.getOrderNo(),
+                                reqVO.getRenterOrderNo(),
+                                reqVO.getOwnerOrderNo(), false, true);
+                logger.info("取消订单责任判定后进行结算,reqDTO:[{}]", JSON.toJSONString(reqDTO));
+                try {
+                    orderSettleService.orderCancelSettleCombination(reqDTO);
+                } catch (Exception e) {
+                    logger.error("手动责任判定后进行结算异常. reqDTO:[{}]", JSON.toJSONString(reqDTO), e);
+                    Cat.logError("手动责任判定后进行结算异常.reqDTO: " + JSON.toJSONString(reqDTO), e);
+                }
             }
         }
 
