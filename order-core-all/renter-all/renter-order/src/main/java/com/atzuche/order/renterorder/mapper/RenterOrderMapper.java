@@ -55,5 +55,6 @@ public interface RenterOrderMapper{
 
     List<RenterOrderEntity> queryHostiryRenterOrderByOrderNo(@Param("orderNo") String orderNo);
 
-	
+    int updateChildStatusByRenterOrderNo(@Param("renterOrderNo") String renterOrderNo, @Param("childStatus") Integer childStatus);
+
 }

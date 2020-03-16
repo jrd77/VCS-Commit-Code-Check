@@ -147,6 +147,8 @@ public class AccountDebtDetailNoTService {
                 entity.setDebtDetailId(accountDebtDetailAll.getId());
                 entity.setAmt(-accountDebtDetailAll.getCurrentDebtAmt());
                 entity.setTime(LocalDateTime.now());
+                entity.setSourceCode(accountDeductDebt.getSourceCode());
+                entity.setSourceDetail(accountDeductDebt.getSourceDetail());
                 accountDebtReceivableaDetails.add(entity);
 
                 accountDebtDetailAll.setRepaidDebtAmt(accountDebtDetailAll.getRepaidDebtAmt()-accountDebtDetailAll.getCurrentDebtAmt());
@@ -160,6 +162,8 @@ public class AccountDebtDetailNoTService {
                 entity.setDebtDetailId(accountDebtDetailAll.getId());
                 entity.setTime(LocalDateTime.now());
                 entity.setAmt(-accountDebtDetailAll.getCurrentDebtAmt());
+                entity.setSourceCode(accountDeductDebt.getSourceCode());
+                entity.setSourceDetail(accountDeductDebt.getSourceDetail());
                 accountDebtReceivableaDetails.add(entity);
 
                 accountDebtDetailAll.setRepaidDebtAmt(accountDebtDetailAll.getRepaidDebtAmt()-accountDebtDetailAll.getCurrentDebtAmt());
@@ -175,6 +179,8 @@ public class AccountDebtDetailNoTService {
                 entity.setDebtDetailId(accountDebtDetailAll.getId());
                 entity.setTime(LocalDateTime.now());
                 entity.setAmt(-(accountDebtDetailAll.getCurrentDebtAmt()-amt));
+                entity.setSourceCode(accountDeductDebt.getSourceCode());
+                entity.setSourceDetail(accountDeductDebt.getSourceDetail());
                 accountDebtReceivableaDetails.add(entity);
 
                 accountDebtDetailAll.setRepaidDebtAmt(accountDebtDetailAll.getRepaidDebtAmt()-(accountDebtDetailAll.getCurrentDebtAmt()-amt));

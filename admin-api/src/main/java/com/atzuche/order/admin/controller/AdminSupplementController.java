@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.alibaba.fastjson.JSON;
 import com.atzuche.order.admin.service.AdminSupplementService;
+import com.atzuche.order.admin.vo.req.DelSupplementReqVO;
 import com.atzuche.order.commons.entity.dto.OrderSupplementDetailDTO;
 import com.atzuche.order.commons.vo.res.rentcosts.SupplementVO;
 import com.autoyol.commons.web.ErrorCode;
@@ -53,9 +54,10 @@ public class AdminSupplementController {
 	
     @AutoDocMethod(description = "删除补付", value = "删除补付",response = ResponseData.class)
     @RequestMapping(value="console/order/supplement/del",method = RequestMethod.POST)
-    public ResponseData delSupplement(@RequestParam(value="id",required = true) Integer id){
-        log.info("AdminSupplementController.delSupplement id=[{}]", id);
-        adminSupplementService.delSupplement(id);
+    public ResponseData delSupplement(@Valid @RequestBody DelSupplementReqVO delReq, BindingResult bindingResult){
+    	BindingResultUtil.checkBindingResult(bindingResult);
+        log.info("AdminSupplementController.delSupplement delReq=[{}]", delReq);
+        adminSupplementService.delSupplement(delReq.getId());
         return ResponseData.success();
     }
 }

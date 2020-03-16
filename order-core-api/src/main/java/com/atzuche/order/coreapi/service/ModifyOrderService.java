@@ -543,7 +543,7 @@ public class ModifyOrderService {
 		// 获取附加驾驶人信息
 		List<CommUseDriverInfoDTO> useDriverList = memProxyService.getCommUseDriverList(modifyOrderDTO.getMemNo());
 		// 保存
-		renterAdditionalDriverService.insertBatchAdditionalDriver(modifyOrderDTO.getOrderNo(), modifyOrderDTO.getRenterOrderNo(), initRenterOrder.getRenterOrderNo(), driverIds, useDriverList);
+		renterAdditionalDriverService.insertBatchAdditionalDriverForModify(modifyOrderDTO.getOrderNo(), modifyOrderDTO.getRenterOrderNo(), initRenterOrder.getRenterOrderNo(), driverIds, useDriverList);
 	}
 	
 	

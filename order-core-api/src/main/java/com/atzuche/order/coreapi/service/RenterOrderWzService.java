@@ -19,6 +19,7 @@ import com.atzuche.order.rentermem.service.RenterMemberService;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.atzuche.order.renterorder.service.RenterOrderService;
 import com.atzuche.order.renterwz.entity.*;
+import com.atzuche.order.renterwz.enums.WzCostEnums;
 import com.atzuche.order.renterwz.service.*;
 import com.atzuche.order.renterwz.vo.PhotoUploadVO;
 import com.autoyol.autopay.gateway.constant.DataPayKindConstant;
@@ -239,13 +240,6 @@ public class RenterOrderWzService {
         return result;
     }
 
-    private static final String WZ_FINE = "100040";
-    private static final String WZ_DYS_FINE = "100042";
-    private static final String WZ_SERVICE_COST = "100041";
-    private static final String WZ_STOP_COST = "100043";
-    private static final String WZ_OTHER_FINE = "100044";
-    private static final String INSURANCE_CLAIM = "100045";
-
     private IllegalOrderInfoResVO convertTo(RenterOrderWzStatusEntity wzStatusEntity, OwnerMemberEntity owner, RenterMemberEntity renter, RenterGoodsEntity car, OrderEntity order, List<RenterOrderWzCostDetailEntity> wzCosts, RenterOrderEntity renterOrder){
         IllegalOrderInfoResVO result = new IllegalOrderInfoResVO();
         if(wzStatusEntity != null){
@@ -258,17 +252,17 @@ public class RenterOrderWzService {
                 if(wzCost == null){
                     continue;
                 }
-                if(WZ_FINE.equalsIgnoreCase(wzCost.getCostCode())&& wzCost.getAmount() != null){
+                if(WzCostEnums.WZ_FINE.getCode().equalsIgnoreCase(wzCost.getCostCode())&& wzCost.getAmount() != null){
                     result.setWzFine(String.valueOf(wzCost.getAmount()));
-                }else if(WZ_DYS_FINE.equalsIgnoreCase(wzCost.getCostCode()) && wzCost.getAmount() != null){
+                }else if(WzCostEnums.WZ_DYS_FINE.getCode().equalsIgnoreCase(wzCost.getCostCode()) && wzCost.getAmount() != null){
                     result.setWzDysFine(String.valueOf(wzCost.getAmount()));
-                }else if(WZ_SERVICE_COST.equalsIgnoreCase(wzCost.getCostCode()) && wzCost.getAmount() != null){
+                }else if(WzCostEnums.WZ_SERVICE_COST.getCode().equalsIgnoreCase(wzCost.getCostCode()) && wzCost.getAmount() != null){
                     result.setWzServiceCost(String.valueOf(wzCost.getAmount()));
-                }else if(WZ_STOP_COST.equalsIgnoreCase(wzCost.getCostCode()) && wzCost.getAmount() != null){
+                }else if(WzCostEnums.WZ_STOP_COST.getCode().equalsIgnoreCase(wzCost.getCostCode()) && wzCost.getAmount() != null){
                     result.setWzOffStreamCost(String.valueOf(wzCost.getAmount()));
-                }else if(WZ_OTHER_FINE.equalsIgnoreCase(wzCost.getCostCode()) && wzCost.getAmount() != null){
+                }else if(WzCostEnums.WZ_OTHER_FINE.getCode().equalsIgnoreCase(wzCost.getCostCode()) && wzCost.getAmount() != null){
                     result.setOtherDeductionAmt(String.valueOf(wzCost.getAmount()));
-                }else if(INSURANCE_CLAIM.equalsIgnoreCase(wzCost.getCostCode()) && wzCost.getAmount() != null){
+                }else if(WzCostEnums.INSURANCE_CLAIM.getCode().equalsIgnoreCase(wzCost.getCostCode()) && wzCost.getAmount() != null){
                     result.setInsuranceClaimAmt(String.valueOf(wzCost.getAmount()));
                 }
             }

@@ -149,6 +149,7 @@ public class ModifyOrderFeeService {
 			// 实付大于应付，不需要支付
 			modifyOrderCompareVO.setCleanSupplementAmt(1);
 		}
+		modifyOrderCompareVO.setRentAmtPayed(rentAmtPayed);
 		return modifyOrderCompareVO;
 	}
 	

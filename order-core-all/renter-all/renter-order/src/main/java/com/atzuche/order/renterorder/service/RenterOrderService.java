@@ -525,4 +525,13 @@ public class RenterOrderService {
     public List<RenterOrderEntity> queryHostiryRenterOrderByOrderNo(String orderNo) {
         return renterOrderMapper.queryHostiryRenterOrderByOrderNo(orderNo);
     }
+    /*
+     * @Author ZhangBin
+     * @Date 2020/3/13 17:59
+     * @Description: 更具租客子订单号更新状态
+     *
+     **/
+    public int updateChildStatusByRenterOrderNo(String renterOrderNo,RenterChildStatusEnum  renterChildStatusEnum){
+        return renterOrderMapper.updateChildStatusByRenterOrderNo(renterOrderNo,renterChildStatusEnum.getCode());
+    }
 }

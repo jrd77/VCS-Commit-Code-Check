@@ -313,9 +313,9 @@ public class RenterCostFacadeService {
         rentCarCostStatics.shouldReceiveAmt = renterCostVO.getRenterCostYingshou();
         rentCarCostStatics.realReceiveAmt = renterCostVO.getRenterCostShishou();
         rentCarCostStatics.shouldRetreatAmt = renterCostVO.getRenterCost();
-        rentCarCostStatics.shouldDeductionAmt = 0;//TODO 待计算
+        rentCarCostStatics.shouldDeductionAmt = rentAmtShouldDeductionAmt(rentCarCostStatics);
         rentCarCostStatics.realRetreatAmt = renterCostVO.getRenterCostReal();
-        rentCarCostStatics.realDeductionAmt = 0;//TODO 待计算
+        rentCarCostStatics.realDeductionAmt = rentAmtShouldDeductionAmt(rentCarCostStatics);
         rentCarCostDTO.costStatisticsDTO = rentCarCostStatics;
 
         //2、车辆押金
@@ -464,5 +464,18 @@ public class RenterCostFacadeService {
             }
         }
         return deductionRentAmtDTO;
+    }
+
+    /**
+     * 租车费用应扣
+     * @param rentCarCostStatics
+     * @return
+     */
+    private int  rentAmtShouldDeductionAmt(CostStatisticsDTO rentCarCostStatics){
+        if(rentCarCostStatics.getShouldReceiveAmt() < rentCarCostStatics.getRealReceiveAmt()){
+            return rentCarCostStatics.getShouldReceiveAmt();
+        }else{
+            return rentCarCostStatics.getRealReceiveAmt();
+        }
     }
 }

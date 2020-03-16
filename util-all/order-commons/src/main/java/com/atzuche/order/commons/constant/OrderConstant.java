@@ -35,4 +35,6 @@ public class OrderConstant {
      */
     public static String SYSTEM_OPERATOR_JOB = "system_job";
 
+    public static String SPECIAL_ERROR_CODE_PREFIX = "11106";
+
 }

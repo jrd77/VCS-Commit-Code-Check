@@ -22,6 +22,7 @@
         <result property="dispatchStatus" column="dispatch_status"/>
         <result property="isClaims" column="is_claims"/>
         <result property="isDetain" column="is_detain"/>
+        <result property="isDetainWz" column="is_detain_wz"/>
         <result property="isWz" column="is_wz"/>
         <result property="isRiskAccident" column="is_risk_accident"/>
         <result property="status" column="status"/>
@@ -37,7 +38,7 @@
         `id`, `order_no`, `rent_car_pay_status`, `rent_car_refund_status`, `deposit_pay_status`,
          `deposit_refund_status`, `wz_pay_status`, `wz_refund_status`, `wz_settle_status`, `wz_settle_time`,
         `car_deposit_settle_status`, `car_deposit_settle_time`,  `settle_status`, `settle_time`,
-        `is_dispatch`,  `dispatch_status`, `is_claims`, `is_detain`, `is_wz`,`is_risk_accident`, `status`,
+        `is_dispatch`,  `dispatch_status`, `is_claims`, `is_detain`, `is_wz`,`is_detain_wz`, `is_risk_accident`, `status`,
         `create_time`, `create_op`, `update_time`, `update_op`, `is_delete`
 	</sql>
 
@@ -67,6 +68,7 @@
             `dispatch_status`,
             `is_claims`,
             `is_detain`,
+            `is_detain_wz`,
             `is_wz`,
             `is_risk_accident`,
             `status`,
@@ -93,6 +95,7 @@
             #{dispatchStatus},
             #{isClaims},
             #{isDetain},
+            #{isDetainWz},
             #{isWz},
             #{isRiskAccident},
             #{status},
@@ -124,6 +127,7 @@
             <if test="dispatchStatus != null">`dispatch_status`, </if>
             <if test="isClaims != null">`is_claims`, </if>
             <if test="isDetain != null">`is_detain`, </if>
+            <if test="isDetainWz != null">`is_detain_wz`, </if>
             <if test="isWz != null">`is_wz`, </if>
             <if test="isRiskAccident != null">`is_risk_accident`, </if>
             <if test="status != null">`status`, </if>
@@ -151,6 +155,7 @@
             <if test="dispatchStatus != null">#{dispatchStatus},  </if>
             <if test="isClaims != null">#{isClaims},  </if>
             <if test="isDetain != null">#{isDetain},  </if>
+            <if test="isDetainWz != null">#{isDetainWz},  </if>
             <if test="isWz != null">#{isWz},  </if>
             <if test="isRiskAccident != null">#{isRiskAccident}, </if>
             <if test="status != null">#{status},  </if>
@@ -183,6 +188,7 @@
                 <if test="dispatchStatus != null">`dispatch_status` = #{dispatchStatus}, </if>
                 <if test="isClaims != null">`is_claims` = #{isClaims}, </if>
                 <if test="isDetain != null">`is_detain` = #{isDetain}, </if>
+                <if test="isDetainWz != null">`is_detain_wz` = #{isDetainWz}, </if>
                 <if test="isWz != null">`is_wz` = #{isWz}, </if>
                 <if test="isRiskAccident != null">`is_risk_accident` = #{isRiskAccident}, </if>
                 <if test="status != null">`status` = #{status}, </if>
@@ -214,7 +220,8 @@
 				`is_dispatch` = #{isDispatch}, 		
 				`dispatch_status` = #{dispatchStatus}, 		
 				`is_claims` = #{isClaims}, 		
-				`is_detain` = #{isDetain}, 		
+				`is_detain` = #{isDetain},
+                `is_detain_wz` = #{isDetainWz},
 				`is_wz` = #{isWz},
                 `is_risk_accident` = #{isRiskAccident},
 				`status` = #{status}, 		
@@ -249,6 +256,7 @@
             <if test="dispatchStatus != null">`dispatch_status` = #{dispatchStatus}, </if>
             <if test="isClaims != null">`is_claims` = #{isClaims}, </if>
             <if test="isDetain != null">`is_detain` = #{isDetain}, </if>
+            <if test="isDetainWz != null">`is_detain_wz` = #{isDetainWz}, </if>
             <if test="isWz != null">`is_wz` = #{isWz}, </if>
             <if test="isRiskAccident != null">`is_risk_accident` = #{isRiskAccident}, </if>
             <if test="status != null">`status` = #{status}, </if>

@@ -1,16 +1,5 @@
 package com.atzuche.order.settle.service;
 
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Objects;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.Assert;
-import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
-
 import com.atzuche.order.accountownercost.entity.AccountOwnerCostSettleDetailEntity;
 import com.atzuche.order.accountrenterdeposit.vo.res.AccountRenterDepositResVO;
 import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostDetailEntity;
@@ -25,28 +14,31 @@ import com.atzuche.order.commons.CatConstants;
 import com.atzuche.order.commons.enums.account.SettleStatusEnum;
 import com.atzuche.order.commons.service.OrderPayCallBack;
 import com.atzuche.order.parentorder.dto.OrderStatusDTO;
+import com.atzuche.order.parentorder.entity.OrderStatusEntity;
 import com.atzuche.order.parentorder.service.OrderStatusService;
 import com.atzuche.order.rentercost.entity.OrderSupplementDetailEntity;
 import com.atzuche.order.rentercost.service.OrderSupplementDetailService;
-import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.atzuche.order.renterorder.service.RenterOrderService;
 import com.atzuche.order.settle.exception.CancelOrderSettleParamException;
 import com.atzuche.order.settle.exception.OrderSettleFlatAccountException;
 import com.atzuche.order.settle.service.notservice.OrderOwnerSettleNoTService;
 import com.atzuche.order.settle.service.notservice.OrderSettleNoTService;
-import com.atzuche.order.settle.vo.req.CancelOrderReqDTO;
-import com.atzuche.order.settle.vo.req.OwnerCosts;
-import com.atzuche.order.settle.vo.req.RentCosts;
-import com.atzuche.order.settle.vo.req.SettleCancelOrdersAccount;
-import com.atzuche.order.settle.vo.req.SettleOrders;
-import com.atzuche.order.settle.vo.req.SettleOrdersDefinition;
+import com.atzuche.order.settle.vo.req.*;
 import com.atzuche.order.settle.vo.res.RenterCostVO;
 import com.autoyol.autopay.gateway.constant.DataPayKindConstant;
 import com.autoyol.commons.utils.GsonUtils;
 import com.dianping.cat.Cat;
 import com.dianping.cat.message.Transaction;
-
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * 车辆结算
@@ -279,7 +271,8 @@ public class OrderSettleService{
             orderOwnerSettleNoTService.settleOrderAfterSeparateOwner(settleOrders,settleOrdersDefinition,callBack);
             log.info("OrderSettleService settleOrderAfterSeparateOwner [{}]",GsonUtils.toJson(settleOrdersDefinition));
             Cat.logEvent("settleOrderAfterSeparateOwner",GsonUtils.toJson(settleOrdersDefinition));
-            
+            // 调远程增加车辆gps押金
+            orderOwnerSettleNoTService.updateCarDeposit(settleOrders);
             orderSettleNewService.sendOrderSettleMq(orderNo,settleOrders.getRenterMemNo(),settleOrders.getRentCosts(),0,settleOrders.getOwnerMemNo());
             t.setStatus(Transaction.SUCCESS);
         } catch (Exception e) {
@@ -394,6 +387,11 @@ public class OrderSettleService{
             throw new CancelOrderSettleParamException();
         }
         if(cancelOrderReqDTO.isSettleRenterFlg()){
+            OrderStatusEntity orderStatusEntity = orderStatusService.getByOrderNo(orderNo);
+            if(orderStatusEntity != null && SettleStatusEnum.SETTLED.getCode().equals(orderStatusEntity.getSettleStatus())){
+                log.info("订单已经结算过orderNo={}",orderNo);
+                return;
+            }
             ownerOrderSettleService.settleOwnerOrderCancel(orderNo,ownerOrderNo);
             renterOrderSettleService.settleRenterOrderCancel(orderNo,renterOrderNo);
         }else{

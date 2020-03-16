@@ -6,11 +6,14 @@ import com.atzuche.order.accountrenterwzdepost.vo.req.RenterCancelWZDepositCostR
 import com.atzuche.order.cashieraccount.service.CashierService;
 import com.atzuche.order.cashieraccount.service.CashierSettleService;
 import com.atzuche.order.commons.enums.FineTypeEnum;
+import com.atzuche.order.commons.enums.RenterChildStatusEnum;
 import com.atzuche.order.commons.enums.SubsidySourceCodeEnum;
+import com.atzuche.order.commons.enums.account.SettleStatusEnum;
 import com.atzuche.order.commons.enums.account.debt.DebtTypeEnum;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.commons.exceptions.RenterOrderNotFoundException;
 import com.atzuche.order.parentorder.dto.OrderStatusDTO;
+import com.atzuche.order.parentorder.service.OrderStatusService;
 import com.atzuche.order.rentercost.entity.ConsoleRenterOrderFineDeatailEntity;
 import com.atzuche.order.rentercost.entity.RenterOrderFineDeatailEntity;
 import com.atzuche.order.rentercost.entity.RenterOrderSubsidyDetailEntity;
@@ -47,6 +50,8 @@ public class RenterOrderSettleService {
     private CashierSettleService cashierSettleService;
     @Autowired
     private CashierService cashierService;
+    @Autowired
+    private OrderStatusService orderStatusService;
 
     /*
      * @Author ZhangBin
@@ -90,12 +95,22 @@ public class RenterOrderSettleService {
             orderSettleNoTService.refundCancelCost(settleOrders,settleCancelOrdersAccount,orderStatusDTO);
 
             //10 修改订单状态表
-            cashierService.saveCancelOrderStatusInfo(orderStatusDTO);
+            updateOrderStatus(orderStatusDTO,renterOrderNo);
+
         }catch (Exception e){
             e.printStackTrace();
             log.error("订单取消-车主端结算异常orderNo={}，renterOrderNo={}，renterMemNo={}",orderNo,renterOrderNo,renterOrder.getRenterMemNo(),e);
             throw new RenterCancelSettleException();
         }
+    }
+
+    private void updateOrderStatus(OrderStatusDTO orderStatusDTO,String renterOrder){
+        //1更新 订单流转状态
+        orderStatusDTO.setSettleStatus(SettleStatusEnum.SETTLED.getCode());
+        orderStatusService.saveOrderStatusInfo(orderStatusDTO);
+
+        //更新租客订单状态
+        renterOrderService.updateChildStatusByRenterOrderNo(renterOrder, RenterChildStatusEnum.SETTLED);
     }
 
     private SettleCancelOrdersAccount initRenterSettleCancelOrdersAccount(SettleOrders settleOrders) {

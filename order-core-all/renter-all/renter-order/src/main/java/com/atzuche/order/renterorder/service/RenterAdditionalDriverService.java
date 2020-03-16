@@ -81,10 +81,10 @@ public class RenterAdditionalDriverService {
      * @param driverIds         用户选择附加驾驶人信息
      * @param commUseDriverList 租客可用附加驾驶人列表
      */
-    public void insertBatchAdditionalDriver(String orderNo, String renterOrderNo, String initRentOrderNo, List<String> driverIds,
+    public void insertBatchAdditionalDriverForModify(String orderNo, String renterOrderNo, String initRentOrderNo, List<String> driverIds,
                                             List<CommUseDriverInfoDTO> commUseDriverList) {
-        logger.info("Batch insert additional driver.param is,orderNo:[{}],renterOrderNo:[{}],driverIds:[{}],commUseDriverList:[{}]",
-                orderNo, renterOrderNo, JSON.toJSON(driverIds), JSON.toJSON(commUseDriverList));
+        logger.info("insertBatchAdditionalDriverForModify param is,orderNo:[{}],renterOrderNo:[{}],initRentOrderNo:[{}], driverIds:[{}],commUseDriverList:[{}]",
+                orderNo, renterOrderNo,initRentOrderNo, driverIds, commUseDriverList);
         if (driverIds == null || driverIds.isEmpty()) {
         	return;
         }
