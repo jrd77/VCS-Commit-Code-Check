@@ -89,6 +89,12 @@ public class OrderStatusEntity implements Serializable {
 	 * 是否暂扣  0-否，1-是
 	 */
 	private Integer isDetain;
+
+    /**
+     * 违章押金是否暂扣 0,否 1,是
+     */
+    private Integer isDetainWz;
+
 	/**
 	 * 是否违章 0-否，1-是
 	 */

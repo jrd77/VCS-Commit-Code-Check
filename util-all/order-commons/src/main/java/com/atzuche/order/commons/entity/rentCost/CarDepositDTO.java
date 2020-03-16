@@ -4,10 +4,7 @@ import com.autoyol.doc.annotation.AutoDocProperty;
 import lombok.Data;
 import lombok.ToString;
 
-/**
- * @author 胡春林
- * 车辆押金
- */
+
 @Data
 @ToString
 public class CarDepositDTO {
