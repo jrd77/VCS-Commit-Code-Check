@@ -941,7 +941,8 @@ public class CashierService {
         orderMessage.setMessage(orderRenterPay);
         //push车主租客已支付费用
         if (1 == type) {
-            Map map = SmsParamsMapUtil.getParamsMap(vo.getOrderNo(), PushMessageTypeEnum.RENTER_PAY_CAR_SUCCESS.getValue(), PushMessageTypeEnum.RENTER_PAY_CAR_2_OWNER.getValue(), null);
+            //aotu自营车辆类型？
+            Map map = SmsParamsMapUtil.getParamsMap(vo.getOrderNo(), null, PushMessageTypeEnum.RENTER_PAY_CAR_2_OWNER.getValue(), null);
             orderMessage.setPushMap(map);
         }
         log.info("发送订单支付成功事件 （支付押金/违章押金成功）.mq:,message=[{}]",event,
