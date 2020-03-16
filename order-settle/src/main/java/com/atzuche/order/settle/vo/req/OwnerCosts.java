@@ -44,6 +44,11 @@ public class OwnerCosts {
      * 获取gps服务费
      */
     private List<OwnerOrderPurchaseDetailEntity> gpsCost;
+    
+    /**
+     * gps押金
+     */
+    private OwnerOrderIncrementDetailEntity gpsDepositDetail;
 
     /**
      * 获取车主油费
@@ -171,6 +176,14 @@ public class OwnerCosts {
 
 	public void setGpsCost(List<OwnerOrderPurchaseDetailEntity> gpsCost) {
 		this.gpsCost = gpsCost;
+	}
+
+	public OwnerOrderIncrementDetailEntity getGpsDepositDetail() {
+		return gpsDepositDetail;
+	}
+
+	public void setGpsDepositDetail(OwnerOrderIncrementDetailEntity gpsDepositDetail) {
+		this.gpsDepositDetail = gpsDepositDetail;
 	}
 
 	public OwnerGetAndReturnCarDTO getOwnerGetAndReturnCarDTO() {

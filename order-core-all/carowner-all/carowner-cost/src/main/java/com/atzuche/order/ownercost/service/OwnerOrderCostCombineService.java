@@ -7,6 +7,7 @@ import com.atzuche.config.client.api.OilAverageCostConfigSDK;
 import com.atzuche.config.common.entity.CarGpsRuleEntity;
 import com.atzuche.config.common.entity.OilAverageCostEntity;
 import com.atzuche.order.commons.entity.dto.CostBaseDTO;
+import com.atzuche.order.commons.entity.dto.GpsDepositDTO;
 import com.atzuche.order.commons.entity.dto.MileageAmtDTO;
 import com.atzuche.order.commons.entity.dto.OilAmtDTO;
 import com.atzuche.order.commons.entity.dto.OwnerGoodsPriceDetailDTO;
@@ -14,12 +15,14 @@ import com.atzuche.order.commons.enums.cashcode.OwnerCashCodeEnum;
 import com.atzuche.order.ownercost.entity.OwnerOrderIncrementDetailEntity;
 import com.atzuche.order.ownercost.entity.OwnerOrderPurchaseDetailEntity;
 import com.atzuche.order.ownercost.exception.OwnerCostParameterException;
+import com.atzuche.order.wallet.api.CarDepositVO;
 import com.autoyol.platformcost.OwnerFeeCalculatorUtils;
 import com.autoyol.platformcost.model.CarPriceOfDay;
 import com.autoyol.platformcost.model.FeeResult;
 import com.dianping.cat.Cat;
 import lombok.extern.slf4j.Slf4j;
 
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -42,6 +45,8 @@ public class OwnerOrderCostCombineService {
     private Integer configHours;
     @Autowired
     private CarGpsRuleConfigSDK carGpsRuleConfigSDK;
+    @Autowired
+    private RemoteCarGpsDepositService remoteCarGpsDepositService;
 
 	/**
 	 * 获取租金对象列表
@@ -301,6 +306,54 @@ public class OwnerOrderCostCombineService {
 		log.info("获取车主端代管车服务费.result is,result[{}]",JSON.toJSONString(result));
 		return result;
 	}
+	
+	
+	/**
+	 * gps押金
+	 * @param costBaseDTO
+	 * @param carNo
+	 * @param ownerIncomeAmt
+	 * @return OwnerOrderIncrementDetailEntity
+	 */
+	public OwnerOrderIncrementDetailEntity getGpsDepositIncrement(CostBaseDTO costBaseDTO, String carNo, Integer ownerIncomeAmt) {
+		log.info("获取gps押金getGpsDepositIncrement.param is,costBaseDTO:[{}],carNo:[{}],ownerIncomeAmt:[{}]",JSON.toJSONString(costBaseDTO),carNo,ownerIncomeAmt);
+		GpsDepositDTO gpsDepositDTO = new GpsDepositDTO();
+		// 调远程获取gps押金信息
+		CarDepositVO carDepositVO = remoteCarGpsDepositService.getCarDepositByCarNo(carNo);
+		if (carDepositVO == null) {
+			return null;
+		}
+		gpsDepositDTO.setHwDepositBill(carDepositVO.getHwDepositBill());
+		gpsDepositDTO.setHwDepositFlag(carDepositVO.getHwDepositFlag());
+		gpsDepositDTO.setHwDepositTotal(carDepositVO.getHwDepositTotal());
+		gpsDepositDTO.setOwnerRealIncome(ownerIncomeAmt);
+		Integer gpsDepositAmt = OwnerFeeCalculatorUtils.calGpsDepositAmt(gpsDepositDTO);
+		if (gpsDepositAmt == null || gpsDepositAmt <= 0) {
+			return null;
+		}
+		FeeResult feeResult = new FeeResult(gpsDepositAmt, 1.0, gpsDepositAmt);
+		OwnerOrderIncrementDetailEntity result = costBaseConvertIncrement(costBaseDTO, feeResult, OwnerCashCodeEnum.HW_DEPOSIT_DEBT);
+		log.info("获取gps押金getGpsDepositIncrement.result is,result[{}]",JSON.toJSONString(result));
+		return result;
+	}
+	
+	/**
+	 * 更新车辆gps押金
+	 * @param orderNo
+	 * @param carNo
+	 * @param updateBill
+	 */
+	public void updateCarDeposit(String orderNo, String carNo, Integer updateBill) {
+		log.info("更新车辆gps押金OwnerOrderCostCombineService.updateCarDeposit,orderNo={},carNo={},updateBill={}",orderNo, carNo, updateBill);
+		if (StringUtils.isBlank(carNo)) {
+			return;
+		}
+		if (updateBill == null || updateBill <= 0) {
+			return;
+		}
+		remoteCarGpsDepositService.updateCarDeposit(orderNo, carNo, updateBill);
+	}
+	
 	
 	/**
 	 * 数据转化
