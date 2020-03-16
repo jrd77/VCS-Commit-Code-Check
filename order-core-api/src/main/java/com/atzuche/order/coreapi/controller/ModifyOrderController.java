@@ -9,6 +9,8 @@ import java.util.List;
 import javax.validation.Valid;
 
 import com.atzuche.order.rentermem.service.RenterMemberService;
+import com.atzuche.order.renterorder.service.RenterOrderChangeApplyService;
+
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
@@ -53,6 +55,8 @@ public class ModifyOrderController {
     private ModifyOrderScanCodeService modifyOrderScanCodeService;
     @Autowired
     private ModifyOrderCheckService modifyOrderCheckService;
+    @Autowired
+    private RenterOrderChangeApplyService renterOrderChangeApplyService;
 	
 	/**
 	 * 修改订单（APP端或H5端）
@@ -220,6 +224,7 @@ public class ModifyOrderController {
 	/**
 	 * 修改订单校验
 	 * @param orderNo
+	 * @param memNo
 	 * @return ResponseData
 	 */
 	@GetMapping("/order/modify/check")
@@ -228,5 +233,19 @@ public class ModifyOrderController {
 		log.info("order/modify/check orderNo=[{}]", orderNo);
 		modifyOrderCheckService.checkModifyOrderForApp(orderNo, memNo);
     	return ResponseData.success();
+    }
+	
+	
+	/**
+	 * 获取前端修改次数
+	 * @param orderNo
+	 * @return ResponseData
+	 */
+	@GetMapping("/order/modify/applycount/get")
+    public ResponseData<?> getApplyCount(@RequestParam(value="orderNo",required = true) String orderNo) {
+		log.info("order/modify/check orderNo=[{}]", orderNo);
+		Integer changeApplyCount = renterOrderChangeApplyService.getRenterOrderChangeApplyAllCountByOrderNo(orderNo);
+		changeApplyCount = changeApplyCount == null ? 0:changeApplyCount;
+    	return ResponseData.success(changeApplyCount);
     }
 }
