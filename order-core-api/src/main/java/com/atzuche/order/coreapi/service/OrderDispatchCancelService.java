@@ -8,6 +8,7 @@ import com.atzuche.order.coreapi.service.mq.OrderStatusMqService;
 import com.atzuche.order.delivery.service.delivery.DeliveryCarService;
 import com.atzuche.order.delivery.vo.delivery.CancelOrderDeliveryVO;
 import com.atzuche.order.settle.service.OrderSettleService;
+import com.atzuche.order.settle.vo.req.CancelOrderReqDTO;
 import com.autoyol.event.rabbit.neworder.NewOrderMQStatusEventEnum;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -55,7 +56,12 @@ public class OrderDispatchCancelService {
                 String recover = null == cancelOrderRes.getRentCarPayStatus() || cancelOrderRes.getRentCarPayStatus() == 0 ? "1" : "0";
                 couponAndCoinHandleService.undoOwnerCoupon(orderNo, cancelOrderRes.getOwnerCouponNo(), recover);
                 //通知收银台退款以及退还凹凸币和钱包
-                orderSettleService.settleOrderCancel(orderNo);
+                CancelOrderReqDTO reqDTO = new CancelOrderReqDTO();
+                reqDTO.setSettleRenterFlg(true);
+                reqDTO.setOrderNo(cancelOrderRes.getOrderNo());
+                reqDTO.setRenterOrderNo(cancelOrderRes.getRenterOrderNo());
+                reqDTO.setOwnerOrderNo(cancelOrderRes.getOwnerOrderNo());
+                orderSettleService.orderCancelSettleCombination(reqDTO);
 
                 //通知流程系统
                 CancelOrderDeliveryVO cancelOrderDeliveryVO =

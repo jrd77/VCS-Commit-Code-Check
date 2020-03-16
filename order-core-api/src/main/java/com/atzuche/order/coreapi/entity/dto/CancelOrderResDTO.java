@@ -26,6 +26,11 @@ public class CancelOrderResDTO {
     private String renterOrderNo;
 
     /**
+     * 车主订单号
+     */
+    private String ownerOrderNo;
+
+    /**
      * 订单城市编码
      */
     private Integer cityCode;

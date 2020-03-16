@@ -76,14 +76,15 @@ public class PlatformCancelOrderService {
                     deliveryCarService.cancelRenYunFlowOrderInfo(cancelOrderDeliveryVO);
                 }
             }
+
+            //平台取消消息发送
+            orderActionMqService.sendCancelOrderSuccess(orderNo, CancelSourceEnum.PLATFORM, NewOrderMQActionEventEnum.ORDER_DELAY, Maps.newHashMap());
+            NewOrderMQStatusEventEnum newOrderMqStatusEventEnum = NewOrderMQStatusEventEnum.ORDER_END;
+            if(cancelOrderRes.getStatus() == OrderStatusEnum.TO_DISPATCH.getStatus()) {
+                newOrderMqStatusEventEnum = NewOrderMQStatusEventEnum.ORDER_PREDISPATCH;
+            }
+            orderStatusMqService.sendOrderStatusByOrderNo(orderNo,cancelOrderRes.getStatus(),newOrderMqStatusEventEnum);
         }
-        //平台取消消息发送
-        orderActionMqService.sendCancelOrderSuccess(orderNo, CancelSourceEnum.PLATFORM, NewOrderMQActionEventEnum.ORDER_DELAY, Maps.newHashMap());
-        NewOrderMQStatusEventEnum newOrderMQStatusEventEnum = NewOrderMQStatusEventEnum.ORDER_END;
-        if(cancelOrderRes.getStatus() == OrderStatusEnum.TO_DISPATCH.getStatus()) {
-            newOrderMQStatusEventEnum = NewOrderMQStatusEventEnum.ORDER_PREDISPATCH;
-        }
-        orderStatusMqService.sendOrderStatusByOrderNo(orderNo,cancelOrderRes.getStatus(),newOrderMQStatusEventEnum);
     }
 
 

@@ -8,7 +8,11 @@ import com.atzuche.order.coreapi.entity.dto.CancelOrderJudgeDutyResDTO;
 import com.atzuche.order.coreapi.entity.dto.CancelOrderResDTO;
 import com.atzuche.order.coreapi.service.mq.OrderActionMqService;
 import com.atzuche.order.flow.service.OrderFlowService;
+import com.atzuche.order.ownercost.entity.OwnerOrderEntity;
+import com.atzuche.order.ownercost.entity.OwnerOrderFineApplyEntity;
 import com.atzuche.order.ownercost.service.OwnerOrderFineApplyService;
+import com.atzuche.order.ownercost.service.OwnerOrderFineDeatailService;
+import com.atzuche.order.ownercost.service.OwnerOrderService;
 import com.atzuche.order.parentorder.dto.OrderStatusDTO;
 import com.atzuche.order.parentorder.entity.OrderStatusEntity;
 import com.atzuche.order.parentorder.service.OrderCancelReasonService;
@@ -46,6 +50,10 @@ public class OrderDispatchCancelHandleService {
     HolidayService holidayService;
     @Autowired
     OrderActionMqService orderActionMqService;
+    @Autowired
+    OwnerOrderFineApplyService ownerOrderFineApplyService;
+    @Autowired
+    OwnerOrderService ownerOrderService;
 
     @Transactional(rollbackFor = Exception.class)
     public CancelOrderResDTO cancelDispatch(String orderNo) {
@@ -56,6 +64,8 @@ public class OrderDispatchCancelHandleService {
         OrderCouponEntity ownerCouponEntity = orderCouponService.getOwnerCouponByOrderNoAndRenterOrderNo(orderNo,
                 renterOrderEntity.getRenterOrderNo());
         OrderStatusEntity orderStatusEntity = orderStatusService.getByOrderNo(orderNo);
+        //获取车主订单信息
+        OwnerOrderEntity ownerOrderEntity = ownerOrderService.getOwnerOrderByOrderNoAndIsEffective(orderNo);
 
         //订单状态更新
         OrderStatusDTO orderStatusDTO = new OrderStatusDTO();
@@ -74,7 +84,8 @@ public class OrderDispatchCancelHandleService {
                 renterOrderEntity.getExpRevertTime());
 
         //车主取消进调度,罚金后续处理
-        ownerOrderFineApplyHandelService.handleFineApplyRecord(orderNo, DispatcherStatusEnum.DISPATCH_FAIL,
+        OwnerOrderFineApplyEntity ownerOrderFineApplyEntity = ownerOrderFineApplyService.getByOrderNo(orderNo);
+        ownerOrderFineApplyHandelService.handleFineApplyRecord(ownerOrderFineApplyEntity, DispatcherStatusEnum.DISPATCH_FAIL,
                 cancelOrderJudgeDutyResDTO.getIsSubsidyFineAmt());
 
         //发送消息通知会员记录节假日取消次数
@@ -90,6 +101,8 @@ public class OrderDispatchCancelHandleService {
         cancelOrderResDTO.setSrvReturnFlag(null != renterOrderEntity.getIsReturnCar() && renterOrderEntity.getIsReturnCar() == 1);
         cancelOrderResDTO.setStatus(orderStatusDTO.getStatus());
         cancelOrderResDTO.setIsDispatch(false);
+        cancelOrderResDTO.setOwnerOrderNo(null != ownerOrderFineApplyEntity ?
+                ownerOrderFineApplyEntity.getOwnerOrderNo() : ownerOrderEntity.getOwnerOrderNo());
         return cancelOrderResDTO;
     }
 }
