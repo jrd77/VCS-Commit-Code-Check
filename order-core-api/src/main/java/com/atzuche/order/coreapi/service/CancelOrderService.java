@@ -55,6 +55,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -273,33 +274,31 @@ public class CancelOrderService {
      *
      * @param reqVO 请求参数
      */
-    public void ownerAgreeDelayRefund(CancelOrderDelayRefundReqVO reqVO) {
+    public void ownerAgreeDelayRefund(CancelOrderDelayRefundReqVO reqVO, Integer refundRecordStatus) {
+        CancelOrderReqDTO cancelOrderReqDTO = new CancelOrderReqDTO();
+        BeanUtils.copyProperties(reqVO, cancelOrderReqDTO);
+        cancelOrderReqDTO.setConsoleInvoke(false);
+        cancelOrderReqDTO.setRefundRecordStatus(refundRecordStatus);
+        CancelOrderReqContext reqContext = buildSimpleCancelOrderReqContext(cancelOrderReqDTO);
         OrderRefundRecordEntity orderRefundRecordEntity = orderRefundRecordService.getByOrderNo(reqVO.getOrderNo());
-        CancelOrderReqContext reqContext = new CancelOrderReqContext();
         reqContext.setOrderRefundRecordEntity(orderRefundRecordEntity);
         //公共校验
         cancelOrderCheckService.delayRefundCheck(reqContext);
 
+        //通知结算退款
+        com.atzuche.order.settle.vo.req.CancelOrderReqDTO reqDTO =
+                orderCommonConver.buildCancelOrderReqDTO(reqVO.getOrderNo(),
+                        reqContext.getRenterOrderEntity().getRenterOrderNo(),
+                        reqContext.getOwnerOrderEntity().getOwnerOrderNo(), false, true);
+        orderSettleService.orderCancelSettleCombination(reqDTO);
 
-        //todo 更新orderRerundRecord、罚金记录、取消原因等
-
-
-        //todo 通知结算退款
-
-
-        //todo 发送MQ通知 撤销节假日统计
-
-
-
+        //更新orderRerundRecord、罚金记录、取消原因等
+        boolean result = ownerAgreeDelayRefundService.agreeDelayRefund(reqContext);
+        if (result) {
+            //发送MQ通知 撤销节假日统计
+            orderActionMqService.sendRevokeOrderCancelMemHolidayDeduct(reqVO.getOrderNo(), Integer.valueOf(reqVO.getMemNo()));
+        }
     }
-
-
-
-
-
-
-
-
 
 
     /**
@@ -438,6 +437,38 @@ public class CancelOrderService {
 
         return context;
 
+    }
+
+    /**
+     * 构建简洁公共请求参数
+     *
+     * @param cancelOrderReqDTO 请求参数
+     * @return CancelOrderReqContext
+     */
+    private CancelOrderReqContext buildSimpleCancelOrderReqContext(CancelOrderReqDTO cancelOrderReqDTO) {
+        CancelOrderReqContext context = new CancelOrderReqContext();
+        context.setCancelOrderReqDTO(cancelOrderReqDTO);
+
+        //租客订单信息
+        RenterOrderEntity renterOrderEntity;
+        if (StringUtils.isBlank(cancelOrderReqDTO.getRenterOrderNo())) {
+            renterOrderEntity = renterOrderService.getRenterOrderByOrderNoAndIsEffective(cancelOrderReqDTO.getOrderNo());
+        } else {
+            renterOrderEntity = renterOrderService.getRenterOrderByRenterOrderNo(cancelOrderReqDTO.getRenterOrderNo());
+        }
+        context.setRenterOrderEntity(renterOrderEntity);
+
+        //车主订单信息
+        OwnerOrderEntity ownerOrderEntity;
+        if (StringUtils.isBlank(cancelOrderReqDTO.getOwnerOrderNo())) {
+            ownerOrderEntity = ownerOrderService.getOwnerOrderByOrderNoAndIsEffective(cancelOrderReqDTO.getOrderNo());
+        } else {
+            ownerOrderEntity = ownerOrderService.getOwnerOrderByOwnerOrderNo(cancelOrderReqDTO.getOwnerOrderNo());
+        }
+        context.setOwnerOrderEntity(ownerOrderEntity);
+
+
+        return context;
     }
 
 

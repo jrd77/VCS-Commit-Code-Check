@@ -8,6 +8,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
+import java.util.List;
+
 
 /**
  * 订单取消退款延时记录处理
@@ -39,9 +42,18 @@ public class OrderRefundRecordService {
         }
     }
 
+    public int updateByPrimaryKeySelective(OrderRefundRecordEntity record) {
+        return orderRefundRecordMapper.updateByPrimaryKeySelective(record);
+    }
+
 
     public OrderRefundRecordEntity getByOrderNo(String orderNo) {
         return orderRefundRecordMapper.selectByOrderNo(orderNo);
+    }
+
+
+    public List<OrderRefundRecordEntity> findByCreateTime(Date date) {
+        return orderRefundRecordMapper.findByCreateTime(date);
     }
 
 

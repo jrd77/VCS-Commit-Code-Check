@@ -20,6 +20,10 @@ public class OrderConstant {
     public static final int NO = 0;
 
 
+    /**
+     * 0
+     */
+    public static final int ZERO = 0;
 
     /**
      * 1

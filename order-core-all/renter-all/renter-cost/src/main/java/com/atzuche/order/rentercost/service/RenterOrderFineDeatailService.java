@@ -444,4 +444,15 @@ public class RenterOrderFineDeatailService{
     public List<RenterOrderFineDeatailEntity> getRenterOrderFineDeatailByOwnerOrderNo(String renterOrderNo) {
         return renterOrderFineDeatailMapper.getRenterOrderFineDeatailByOwnerOrderNo(renterOrderNo);
     }
+
+
+    public RenterOrderFineDeatailEntity selectByCondition(String renterOrderNo, FineTypeEnum fineType,
+                                                          FineSubsidyCodeEnum fineSubsidyCode,
+                                                          FineSubsidySourceCodeEnum fineSubsidySourceCode) {
+
+        return renterOrderFineDeatailMapper.selectByCondition(renterOrderNo, fineType.getFineType(),
+                fineSubsidyCode.getFineSubsidyCode(), fineSubsidySourceCode.getFineSubsidySourceCode());
+
+    }
+
 }

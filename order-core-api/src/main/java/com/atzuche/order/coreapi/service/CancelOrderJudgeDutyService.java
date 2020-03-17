@@ -114,14 +114,17 @@ public class CancelOrderJudgeDutyService {
                             consoleOwnerOrderFineDeatailService.fineDataConvert(cancelFineAmt.getCostBaseDTO(), penalty, FineSubsidyCodeEnum.OWNER,
                                     FineSubsidySourceCodeEnum.RENTER, FineTypeEnum.CANCEL_FINE);
                     //延时退款，等待车主同意
-                    if (null != consoleOwnerOrderFineDeatailEntity && !cancelOrderReqDTO.getConsoleInvoke()) {
-                        OrderRefundRecordEntity orderRefundRecordEntity =
-                                orderRefundRecordService.orderRefundDataConvert(cancelOrderReqDTO.getOrderNo(),
-                                        cancelOrderReqDTO.getRenterOrderNo(), cancelOrderReqDTO.getOwnerOrderNo(), penalty);
-                        orderRefundRecordEntity.setCreateOp(OrderConstant.SYSTEM_OPERATOR);
-                        orderRefundRecordEntity.setUpdateOp(OrderConstant.SYSTEM_OPERATOR);
-                        orderRefundRecordService.saveOrderRefundRecord(orderRefundRecordEntity);
-                        isNoticeSettle = false;
+                    if (null != consoleOwnerOrderFineDeatailEntity) {
+                        consoleOwnerOrderFineDeatailEntity.setMemNo(ownerOrderEntity.getMemNo());
+                        if(!cancelOrderReqDTO.getConsoleInvoke()) {
+                            OrderRefundRecordEntity orderRefundRecordEntity =
+                                    orderRefundRecordService.orderRefundDataConvert(cancelOrderReqDTO.getOrderNo(),
+                                            cancelOrderReqDTO.getRenterOrderNo(), cancelOrderReqDTO.getOwnerOrderNo(), penalty);
+                            orderRefundRecordEntity.setCreateOp(OrderConstant.SYSTEM_OPERATOR);
+                            orderRefundRecordEntity.setUpdateOp(OrderConstant.SYSTEM_OPERATOR);
+                            orderRefundRecordService.saveOrderRefundRecord(orderRefundRecordEntity);
+                            isNoticeSettle = false;
+                        }
                     }
                 } else {
                     if (null != renterOrderFineDetailEntityOne) {
@@ -148,6 +151,7 @@ public class CancelOrderJudgeDutyService {
                         ownerOrderFineDeatailService.fineDataConvert(cancelFineAmt.getCostBaseDTO(), Math.abs(renterOrderCostEntity.getBasicEnsureAmount()),
                                 FineSubsidyCodeEnum.PLATFORM, FineSubsidySourceCodeEnum.OWNER, FineTypeEnum.CANCEL_FINE);
                 if (null != ownerOrderFineDeatailEntityTwo) {
+                    ownerOrderFineDeatailEntityTwo.setMemNo(ownerOrderEntity.getMemNo());
                     ownerOrderFineDeatailEntityTwo.setOwnerOrderNo(ownerOrderEntity.getOwnerOrderNo());
                 }
                 ownerOrderFineDeatailService.addOwnerOrderFineRecord(ownerOrderFineDeatailEntityTwo);
@@ -165,6 +169,7 @@ public class CancelOrderJudgeDutyService {
                         ownerOrderFineDeatailService.fineDataConvert(cancelFineAmt.getCostBaseDTO(), penalty,
                                 FineSubsidyCodeEnum.RENTER, FineSubsidySourceCodeEnum.OWNER, FineTypeEnum.CANCEL_FINE);
                 if (null != ownerOrderFineDetailEntityOne) {
+                    ownerOrderFineDetailEntityOne.setMemNo(ownerOrderEntity.getMemNo());
                     ownerOrderFineDetailEntityOne.setOwnerOrderNo(ownerOrderEntity.getOwnerOrderNo());
                 }
                 //租客收益处理

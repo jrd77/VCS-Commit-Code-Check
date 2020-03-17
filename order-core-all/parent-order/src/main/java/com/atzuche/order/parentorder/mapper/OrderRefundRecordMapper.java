@@ -2,6 +2,10 @@ package com.atzuche.order.parentorder.mapper;
 
 import com.atzuche.order.parentorder.entity.OrderRefundRecordEntity;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.Date;
+import java.util.List;
 
 /**
  * 订单取消退款延时记录库操作
@@ -59,5 +63,14 @@ public interface OrderRefundRecordMapper{
      * @return int 成功条数
      */
     int updateByPrimaryKeySelective(OrderRefundRecordEntity record);
+
+
+    /**
+     * 查询符合条件的退款记录
+     *
+     * @param date 时间切点
+     * @return List<OrderRefundRecordEntity>
+     */
+    List<OrderRefundRecordEntity> findByCreateTime(@Param("date") Date date);
 
 }

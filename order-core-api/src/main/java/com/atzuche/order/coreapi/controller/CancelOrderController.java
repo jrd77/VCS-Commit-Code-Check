@@ -135,7 +135,7 @@ public class CancelOrderController {
         LOGGER.info("Owner agree cancel order delay refund.param is,reqVO:[{}]",
                 JSON.toJSONString(reqVO));
         BindingResultUtil.checkBindingResult(bindingResult);
-        cancelOrderService.ownerAgreeDelayRefund(reqVO);
+        cancelOrderService.ownerAgreeDelayRefund(reqVO, OrderConstant.ONE);
         return ResponseData.success();
     }
 

@@ -131,5 +131,14 @@
 		    </set>
 		where id = #{id}
 	</update>
+
+
+    <select id="findByCreateTime" resultMap="BaseResultMap">
+        select
+            <include refid="Base_Column_List" />
+        from
+            order_refund_record
+        where #{date} > create_time and `status` = 0
+    </select>
   	
 </mapper>
