@@ -5,10 +5,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.atzuche.order.commons.vo.req.GetCarReqVO;
 import com.atzuche.order.commons.vo.req.ReturnCarReqVO;
 import com.atzuche.order.coreapi.entity.request.ModifyOrderReq;
 import com.atzuche.order.coreapi.modifyorder.exception.ModifyOwnerAddrOwnerOrderNotFindException;
 import com.atzuche.order.open.vo.ModifyOrderScanCodeVO;
+import com.atzuche.order.open.vo.ModifyOrderScanPickUpVO;
 import com.atzuche.order.ownercost.entity.OwnerOrderEntity;
 import com.atzuche.order.ownercost.service.OwnerOrderService;
 import com.atzuche.order.rentermem.service.RenterMemberService;
@@ -27,12 +29,35 @@ public class ModifyOrderScanCodeService {
 	private RenterMemberService renterMemberService;
 	@Autowired
 	private OwnerOrderService ownerOrderService;
+	@Autowired
+	private RenterGetCarService renterGetCarService;
 	
 	
 	// 1-按照订单结束时间结算
 	//private static final String SCAN_CODE_REVERT_TIME = "1";
 	// 2-按照实际还车时间结算
 	private static final String SCAN_CODE_REAL_REVERT_TIME = "2";
+	
+	/**
+	 * 扫码取车
+	 * @param modifyOrderScanPickUpVO
+	 */
+	public void pickUpScanCode(ModifyOrderScanPickUpVO modifyOrderScanPickUpVO) {
+		// 主订单号
+		String orderNo = modifyOrderScanPickUpVO.getOrderNo();
+		// 车主会员号
+		String ownerMemNo = modifyOrderScanPickUpVO.getOwnerMemNo() == null ? "":modifyOrderScanPickUpVO.getOwnerMemNo();
+		// 获取修改前有效车主订单信息
+		OwnerOrderEntity ownerOrderEntity = ownerOrderService.getOwnerOrderByOrderNoAndIsEffective(orderNo);
+		if (ownerOrderEntity == null || !ownerMemNo.equals(ownerOrderEntity.getMemNo())) {
+			throw new ModifyOwnerAddrOwnerOrderNotFindException();
+		}
+		// 确认取车
+		GetCarReqVO getCarReqVO = new GetCarReqVO();
+		getCarReqVO.setOrderNo(orderNo);
+		renterGetCarService.pickUpCar(getCarReqVO);
+	}
+	
 
 	/**
 	 * 扫码后车主确认还车
