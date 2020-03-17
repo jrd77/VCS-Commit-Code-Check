@@ -13,4 +13,5 @@ repositories {
 
 dependencies {
     compile project(":util-all:order-commons")
+    compile project(":order-wallet:order-wallet-api")
 }
