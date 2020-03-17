@@ -20,6 +20,22 @@ public class OrderConstant {
     public static final int NO = 0;
 
 
+
+    /**
+     * 1
+     */
+    public static final int ONE = 1;
+
+    /**
+     * 2
+     */
+    public static final int TWO = 2;
+
+
+
+
+
+
     /**
      * 凹凸币抵扣租金系数
      */

@@ -39,6 +39,12 @@ public class OrderRefundRecordService {
         }
     }
 
+
+    public OrderRefundRecordEntity getByOrderNo(String orderNo) {
+        return orderRefundRecordMapper.selectByOrderNo(orderNo);
+    }
+
+
     /**
      * 数据封装
      *

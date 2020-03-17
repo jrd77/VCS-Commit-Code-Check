@@ -11,7 +11,7 @@ import java.io.Serializable;
  * @author pengcheng.fu
  * @date 2020/3/16 16:11
  */
-public class CancelOrderDelayRefundReqVO extends BaseVO implements Serializable {
+public class CancelOrderDelayRefundReqVO implements Serializable {
 
     private static final long serialVersionUID = 868476159069119771L;
 
@@ -23,6 +23,9 @@ public class CancelOrderDelayRefundReqVO extends BaseVO implements Serializable 
     @NotBlank(message = "是否收取违约金不能为空")
     private String takePenalty;
 
+    @AutoDocProperty(value = "用户注册号")
+    @NotBlank(message = "会员号不能为空")
+    private String memNo;
 
     public String getOrderNo() {
         return orderNo;
@@ -38,5 +41,13 @@ public class CancelOrderDelayRefundReqVO extends BaseVO implements Serializable 
 
     public void setTakePenalty(String takePenalty) {
         this.takePenalty = takePenalty;
+    }
+
+    public String getMemNo() {
+        return memNo;
+    }
+
+    public void setMemNo(String memNo) {
+        this.memNo = memNo;
     }
 }

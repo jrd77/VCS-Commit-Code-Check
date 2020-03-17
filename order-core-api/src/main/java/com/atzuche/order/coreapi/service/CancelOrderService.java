@@ -1,7 +1,6 @@
 package com.atzuche.order.coreapi.service;
 
 import com.alibaba.fastjson.JSON;
-import com.atzuche.order.commons.CatConstants;
 import com.atzuche.order.commons.LocalDateTimeUtils;
 import com.atzuche.order.commons.constant.OrderConstant;
 import com.atzuche.order.commons.entity.dto.OwnerGoodsDetailDTO;
@@ -11,6 +10,7 @@ import com.atzuche.order.commons.enums.MemRoleEnum;
 import com.atzuche.order.commons.enums.OrderStatusEnum;
 import com.atzuche.order.commons.vo.req.AdminCancelOrderReqVO;
 import com.atzuche.order.commons.vo.req.AdminOrderCancelJudgeDutyReqVO;
+import com.atzuche.order.commons.vo.req.CancelOrderDelayRefundReqVO;
 import com.atzuche.order.commons.vo.req.CancelOrderReqVO;
 import com.atzuche.order.coreapi.common.conver.OrderCommonConver;
 import com.atzuche.order.coreapi.entity.CancelOrderReqContext;
@@ -30,8 +30,10 @@ import com.atzuche.order.ownercost.entity.OwnerOrderEntity;
 import com.atzuche.order.ownercost.service.OwnerOrderService;
 import com.atzuche.order.parentorder.entity.OrderCancelReasonEntity;
 import com.atzuche.order.parentorder.entity.OrderEntity;
+import com.atzuche.order.parentorder.entity.OrderRefundRecordEntity;
 import com.atzuche.order.parentorder.entity.OrderStatusEntity;
 import com.atzuche.order.parentorder.service.OrderCancelReasonService;
+import com.atzuche.order.parentorder.service.OrderRefundRecordService;
 import com.atzuche.order.parentorder.service.OrderService;
 import com.atzuche.order.parentorder.service.OrderStatusService;
 import com.atzuche.order.rentercommodity.service.RenterGoodsService;
@@ -46,7 +48,6 @@ import com.autoyol.car.api.model.dto.OwnerCancelDTO;
 import com.autoyol.event.rabbit.neworder.NewOrderMQActionEventEnum;
 import com.autoyol.event.rabbit.neworder.NewOrderMQStatusEventEnum;
 import com.dianping.cat.Cat;
-import com.dianping.cat.message.Transaction;
 import com.google.common.collect.Maps;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -113,6 +114,10 @@ public class CancelOrderService {
     private OrderSettleService orderSettleService;
     @Autowired
     private HolidayService holidayService;
+    @Autowired
+    private OrderRefundRecordService orderRefundRecordService;
+    @Autowired
+    private OwnerAgreeDelayRefundService ownerAgreeDelayRefundService;
 
 
     /**
@@ -262,6 +267,40 @@ public class CancelOrderService {
         }
 
     }
+
+    /**
+     * 车主同意取消订单违约罚金
+     *
+     * @param reqVO 请求参数
+     */
+    public void ownerAgreeDelayRefund(CancelOrderDelayRefundReqVO reqVO) {
+        OrderRefundRecordEntity orderRefundRecordEntity = orderRefundRecordService.getByOrderNo(reqVO.getOrderNo());
+        CancelOrderReqContext reqContext = new CancelOrderReqContext();
+        reqContext.setOrderRefundRecordEntity(orderRefundRecordEntity);
+        //公共校验
+        cancelOrderCheckService.delayRefundCheck(reqContext);
+
+
+        //todo 更新orderRerundRecord、罚金记录、取消原因等
+
+
+        //todo 通知结算退款
+
+
+        //todo 发送MQ通知 撤销节假日统计
+
+
+
+    }
+
+
+
+
+
+
+
+
+
 
     /**
      * 取消成功后续操作
