@@ -106,4 +106,14 @@ public interface FeignOrderUpdateService {
     public ResponseData<?> orderCancelAppeal(@RequestBody OrderCancelAppealReqVO orderCancelAppealReqVO);
 
 
+    /**
+     * 车主同意取消订单延时退款
+     *
+     * @param cancelOrderDelayRefundReqVO 请求参数
+     * @return ResponseData<?>
+     */
+    @PostMapping("/order/normal/cancle/delay/refund")
+    public ResponseData<?> cancelOrderDelayRefund(@RequestBody CancelOrderDelayRefundReqVO cancelOrderDelayRefundReqVO);
+
+
 }
