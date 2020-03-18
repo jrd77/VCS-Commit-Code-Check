@@ -327,7 +327,6 @@ public class OrderDetailService {
             BeanUtils.copyProperties(ownerOrderEntity,ownerOrderDTO);
             ownerOrderNo = ownerOrderEntity.getOwnerOrderNo();
         }
-
         //车主商品
         OwnerGoodsDetailDTO ownerGoodsDetail = ownerGoodsService.getOwnerGoodsDetail(ownerOrderNo, false);
         OwnerGoodsDTO ownerGoodsDTO = null;

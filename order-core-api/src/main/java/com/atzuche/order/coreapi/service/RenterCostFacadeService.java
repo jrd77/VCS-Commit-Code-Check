@@ -194,7 +194,7 @@ public class RenterCostFacadeService {
                 OrderSubsidyDetailUtils.getConsoleSubsidyAmt(consoleSubsidyDetailEntityList, SubsidySourceCodeEnum.RENTER,RenterCashCodeEnum.SUBSIDY_OWNERTORENTER_ADJUST)));
         detail.setOwner2RenterRentSubsidyAmt(-(OrderSubsidyDetailUtils.getRenterSubsidyAmt(renterOrderSubsidyDetailEntityList, RenterCashCodeEnum.SUBSIDY_OWNER_TORENTER_RENTAMT)+
                 OrderSubsidyDetailUtils.getConsoleSubsidyAmt(consoleSubsidyDetailEntityList, SubsidySourceCodeEnum.RENTER,RenterCashCodeEnum.SUBSIDY_OWNER_TORENTER_RENTAMT)));
-        detail.setAbatementSubsidyAmt(-(OrderSubsidyDetailUtils.getRenterSubsidyAmt(renterOrderSubsidyDetailEntityList, RenterCashCodeEnum.SUBSIDY_ABATEMENT)+
+        detail.setAbatementSubsidyAmt(-(OrderSubsidyDetailUtils.getRenterSubsidyAmt(renterOrderSubsidyDetailEntityList, RenterCashCodeEnum.ABATEMENT_INSURE)+
                 OrderSubsidyDetailUtils.getConsoleSubsidyAmt(consoleSubsidyDetailEntityList, SubsidySourceCodeEnum.RENTER,RenterCashCodeEnum.SUBSIDY_ABATEMENT)));
         detail.setCleanCarSubsidyAmt(-(OrderSubsidyDetailUtils.getRenterSubsidyAmt(renterOrderSubsidyDetailEntityList, RenterCashCodeEnum.SUBSIDY_CLEANCAR)+
                 OrderSubsidyDetailUtils.getConsoleSubsidyAmt(consoleSubsidyDetailEntityList, SubsidySourceCodeEnum.RENTER,RenterCashCodeEnum.SUBSIDY_CLEANCAR)));
@@ -202,7 +202,7 @@ public class RenterCostFacadeService {
                 OrderSubsidyDetailUtils.getConsoleSubsidyAmt(consoleSubsidyDetailEntityList, SubsidySourceCodeEnum.RENTER,RenterCashCodeEnum.SUBSIDY_DELAY)));
         detail.setFeeSubsidyAmt(-(OrderSubsidyDetailUtils.getRenterSubsidyAmt(renterOrderSubsidyDetailEntityList, RenterCashCodeEnum.SUBSIDY_FEE)+
                 OrderSubsidyDetailUtils.getConsoleSubsidyAmt(consoleSubsidyDetailEntityList, SubsidySourceCodeEnum.RENTER,RenterCashCodeEnum.SUBSIDY_FEE)));
-        detail.setInsureSubsidyAmt(-(OrderSubsidyDetailUtils.getRenterSubsidyAmt(renterOrderSubsidyDetailEntityList, RenterCashCodeEnum.SUBSIDY_INSURE)+
+        detail.setInsureSubsidyAmt(-(OrderSubsidyDetailUtils.getRenterSubsidyAmt(renterOrderSubsidyDetailEntityList, RenterCashCodeEnum.INSURE_TOTAL_PRICES)+
                 OrderSubsidyDetailUtils.getConsoleSubsidyAmt(consoleSubsidyDetailEntityList, SubsidySourceCodeEnum.RENTER,RenterCashCodeEnum.SUBSIDY_INSURE)));
         detail.setOilSubsidyAmt(-(OrderSubsidyDetailUtils.getRenterSubsidyAmt(renterOrderSubsidyDetailEntityList, RenterCashCodeEnum.SUBSIDY_OIL)+
                 OrderSubsidyDetailUtils.getConsoleSubsidyAmt(consoleSubsidyDetailEntityList, SubsidySourceCodeEnum.RENTER,RenterCashCodeEnum.SUBSIDY_OIL)));
