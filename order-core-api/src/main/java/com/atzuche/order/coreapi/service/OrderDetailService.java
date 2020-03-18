@@ -17,6 +17,8 @@ import com.atzuche.order.accountrenterdetain.service.notservice.AccountRenterDet
 import com.atzuche.order.accountrenterdetain.service.notservice.AccountRenterDetainDetailNoTService;
 import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostDetailEntity;
 import com.atzuche.order.accountrenterrentcost.service.notservice.AccountRenterCostDetailNoTService;
+import com.atzuche.order.accountrenterwzdepost.entity.AccountRenterWzDepositEntity;
+import com.atzuche.order.accountrenterwzdepost.service.notservice.AccountRenterWzDepositNoTService;
 import com.atzuche.order.cashieraccount.entity.CashierEntity;
 import com.atzuche.order.cashieraccount.service.notservice.CashierNoTService;
 import com.atzuche.order.commons.CostStatUtils;
@@ -170,6 +172,8 @@ public class OrderDetailService {
     private ModifyOrderFeeService modifyOrderFeeService;
     @Autowired
     private CashierNoTService cashierNoTService;
+    @Autowired
+    private AccountRenterWzDepositNoTService accountRenterWzDepositNoTService;
 
 
     private static final String UNIT_HOUR = "小时";
@@ -601,6 +605,21 @@ public class OrderDetailService {
         if(filterByAuditStatus(renterOrderChangeApplyEntityList,3)!=null){
             orderDetailRespDTO.isAutoRefuse = true;
         }
+        //租客押金
+        AccountRenterDepositEntity accountRenterDepositEntity = accountRenterDepositService.selectByOrderNo(orderNo);
+        AccountRenterDepositDTO accountRenterDepositDTO = null;
+        if(accountRenterDepositEntity != null){
+            accountRenterDepositDTO =  new AccountRenterDepositDTO();
+            BeanUtils.copyProperties(accountRenterDepositEntity,accountRenterDepositDTO);
+        }
+        //违章押金
+        AccountRenterWzDepositEntity accountRenterWzDepositEntity = accountRenterWzDepositNoTService.getAccountRenterWZDepositByOrder(orderNo);
+        AccountRenterWzDepositDTO accountRenterWzDepositDTO = null;
+        if(accountRenterWzDepositEntity != null){
+            accountRenterWzDepositDTO = new AccountRenterWzDepositDTO();
+            BeanUtils.copyProperties(accountRenterWzDepositEntity,accountRenterWzDepositDTO);
+        }
+
 
         orderDetailRespDTO.orderStatus = orderStatusDTO;
         orderDetailRespDTO.orderSourceStat = orderSourceStatDTO;
@@ -628,6 +647,8 @@ public class OrderDetailService {
         orderDetailRespDTO.accountOwnerIncomeExamineDTOS = accountOwnerIncomeExamineDTOS;
         orderDetailRespDTO.renterOrderChangeApplyDTO = renterOrderChangeApplyDTO;
         orderDetailRespDTO.renterOrderChangeApplyDTOS = renterOrderChangeApplyDTOS;
+        orderDetailRespDTO.accountRenterDepositDTO = accountRenterDepositDTO;
+        orderDetailRespDTO.accountRenterWzDepositDTO = accountRenterWzDepositDTO;
         return orderDetailRespDTO;
     }
 
