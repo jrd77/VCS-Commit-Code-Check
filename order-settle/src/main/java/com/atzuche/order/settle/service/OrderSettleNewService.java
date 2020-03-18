@@ -175,8 +175,10 @@ public class OrderSettleNewService {
      * @param settleOrdersAccount
      */
     public void repayHistoryDebtRent(SettleOrdersAccount settleOrdersAccount) {
+    	boolean rentCostVirtualPayFlag = settleOrdersAccount.getRentCostVirtualPayFlag() == null ? false:settleOrdersAccount.getRentCostVirtualPayFlag();
+    	boolean rentDepositVirtualPayFlag = settleOrdersAccount.getRentDepositVirtualPayFlag() == null ? false:settleOrdersAccount.getRentDepositVirtualPayFlag();
         // 1 存在 实付大于应付 先抵扣 历史欠款
-        if(settleOrdersAccount.getRentCostSurplusAmt()>0){
+        if(settleOrdersAccount.getRentCostSurplusAmt()>0 && !rentCostVirtualPayFlag){
             CashierDeductDebtReqVO cashierDeductDebtReq = new CashierDeductDebtReqVO();
             BeanUtils.copyProperties(settleOrdersAccount,cashierDeductDebtReq);
             cashierDeductDebtReq.setAmt(settleOrdersAccount.getRentCostSurplusAmt());
@@ -191,7 +193,7 @@ public class OrderSettleNewService {
             }
         }
         //车辆押金存在 且 租车费用没有抵扣完 ，使用车辆押金抵扣 历史欠款
-        if(settleOrdersAccount.getDepositSurplusAmt()>0){
+        if(settleOrdersAccount.getDepositSurplusAmt()>0 && !rentDepositVirtualPayFlag){
             CashierDeductDebtReqVO cashierDeductDebtReq = new CashierDeductDebtReqVO();
             BeanUtils.copyProperties(settleOrdersAccount,cashierDeductDebtReq);
             cashierDeductDebtReq.setMemNo(settleOrdersAccount.getRenterMemNo());
@@ -214,9 +216,11 @@ public class OrderSettleNewService {
      * @return int
      */
     public int oldRepayHistoryDebtRent(SettleOrdersAccount settleOrdersAccount) {
+    	boolean rentCostVirtualPayFlag = settleOrdersAccount.getRentCostVirtualPayFlag() == null ? false:settleOrdersAccount.getRentCostVirtualPayFlag();
+    	boolean rentDepositVirtualPayFlag = settleOrdersAccount.getRentDepositVirtualPayFlag() == null ? false:settleOrdersAccount.getRentDepositVirtualPayFlag();
     	List<AccountOldDebtReqVO> oldDebtList = new ArrayList<AccountOldDebtReqVO>();
     	// 租车费用抵扣
-    	if(settleOrdersAccount.getRentCostSurplusAmt() > 0) {
+    	if(settleOrdersAccount.getRentCostSurplusAmt() > 0 && !rentCostVirtualPayFlag) {
     		AccountOldDebtReqVO accountOldDebtReqVO = new AccountOldDebtReqVO();
     		accountOldDebtReqVO.setOrderNo(settleOrdersAccount.getOrderNo());
     		accountOldDebtReqVO.setRenterOrderNo(settleOrdersAccount.getRenterOrderNo());
@@ -226,7 +230,7 @@ public class OrderSettleNewService {
     		oldDebtList.add(accountOldDebtReqVO);
     	}
     	// 车辆押金抵扣
-    	if (settleOrdersAccount.getDepositSurplusAmt() > 0) {
+    	if (settleOrdersAccount.getDepositSurplusAmt() > 0 && !rentDepositVirtualPayFlag) {
     		AccountOldDebtReqVO accountOldDebtReqVO = new AccountOldDebtReqVO();
     		accountOldDebtReqVO.setOrderNo(settleOrdersAccount.getOrderNo());
     		accountOldDebtReqVO.setRenterOrderNo(settleOrdersAccount.getRenterOrderNo());

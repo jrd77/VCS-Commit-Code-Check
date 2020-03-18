@@ -71,6 +71,14 @@ public class SettleOrders {
      * 车主端抵扣老系统欠款总额
      */
     private Integer ownerTotalOldRealDebtAmt;
+    /**
+     * 租车费用是否虚拟支付
+     */
+    private Boolean rentCostVirtualPayFlag;
+    /**
+     * 车辆押金是否虚拟支付
+     */
+    private Boolean rentDepositVirtualPayFlag;
     
 	public String getOrderNo() {
 		return orderNo;
@@ -149,6 +157,18 @@ public class SettleOrders {
 	}
 	public void setOwnerTotalOldRealDebtAmt(Integer ownerTotalOldRealDebtAmt) {
 		this.ownerTotalOldRealDebtAmt = ownerTotalOldRealDebtAmt;
+	}
+	public Boolean getRentCostVirtualPayFlag() {
+		return rentCostVirtualPayFlag;
+	}
+	public void setRentCostVirtualPayFlag(Boolean rentCostVirtualPayFlag) {
+		this.rentCostVirtualPayFlag = rentCostVirtualPayFlag;
+	}
+	public Boolean getRentDepositVirtualPayFlag() {
+		return rentDepositVirtualPayFlag;
+	}
+	public void setRentDepositVirtualPayFlag(Boolean rentDepositVirtualPayFlag) {
+		this.rentDepositVirtualPayFlag = rentDepositVirtualPayFlag;
 	}
     
 }
