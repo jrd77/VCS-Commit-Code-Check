@@ -93,8 +93,9 @@ public class OrderWzSettleNoTService {
      * @param settleOrdersAccount
      */
     public void repayWzHistoryDebtRent(SettleOrdersAccount settleOrdersAccount) {
+    	boolean wzCostVirtualFlag = settleOrdersAccount.getWzCostVirtualFlag() == null ? false:settleOrdersAccount.getWzCostVirtualFlag();
         //车辆押金存在 且 租车费用没有抵扣完 ，使用车辆押金抵扣 历史欠款
-        if(settleOrdersAccount.getDepositSurplusAmt()>0){
+        if(settleOrdersAccount.getDepositSurplusAmt()>0 && !wzCostVirtualFlag){
             CashierDeductDebtReqVO cashierDeductDebtReq = new CashierDeductDebtReqVO();
             BeanUtils.copyProperties(settleOrdersAccount,cashierDeductDebtReq);
             cashierDeductDebtReq.setMemNo(settleOrdersAccount.getRenterMemNo());
@@ -116,9 +117,10 @@ public class OrderWzSettleNoTService {
      * @return int
      */
     public int oldRepayWzHistoryDebtRent(SettleOrdersAccount settleOrdersAccount) {
+    	boolean wzCostVirtualFlag = settleOrdersAccount.getWzCostVirtualFlag() == null ? false:settleOrdersAccount.getWzCostVirtualFlag();
     	List<AccountOldDebtReqVO> oldDebtList = new ArrayList<AccountOldDebtReqVO>();
     	// 违章押金抵扣
-    	if (settleOrdersAccount.getDepositSurplusAmt() > 0) {
+    	if (settleOrdersAccount.getDepositSurplusAmt() > 0 && !wzCostVirtualFlag) {
     		AccountOldDebtReqVO accountOldDebtReqVO = new AccountOldDebtReqVO();
     		accountOldDebtReqVO.setOrderNo(settleOrdersAccount.getOrderNo());
     		accountOldDebtReqVO.setRenterOrderNo(settleOrdersAccount.getRenterOrderNo());
