@@ -55,6 +55,11 @@ public class SettleOrdersWz {
 	 */
 	private Integer totalWzDebtAmt;
 	
+	/**
+	 * 违章押金是否虚拟支付
+	 */
+	private Boolean wzCostVirtualFlag;
+	
 	
 	public String getOwnerOrderNo() {
 		return ownerOrderNo;
@@ -135,6 +140,13 @@ public class SettleOrdersWz {
 	public void setTotalWzDebtAmt(Integer totalWzDebtAmt) {
 		this.totalWzDebtAmt = totalWzDebtAmt;
 	}
-    
+
+	public Boolean getWzCostVirtualFlag() {
+		return wzCostVirtualFlag;
+	}
+
+	public void setWzCostVirtualFlag(Boolean wzCostVirtualFlag) {
+		this.wzCostVirtualFlag = wzCostVirtualFlag;
+	}
 
 }

@@ -43,4 +43,5 @@ public class OfflinePayDTO implements Serializable {
     private PaySourceEnum paySource;
 
     private String payTime;
+
 }

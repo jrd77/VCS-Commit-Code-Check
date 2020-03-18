@@ -9,6 +9,10 @@
     <update id="deductBalance">
         update member set balance=balance-#{deduct} where reg_no=#{memNo} and balance>#{deduct};
     </update>
+    <update id="deductDebt">
+        update member set balance=balance+#{debt} where reg_no=#{memNo}
+    </update>
+
 
     <select id="getByMemNo" resultMap="base">
         select id,reg_no,balance from member where reg_no=#{memNo}
