@@ -92,9 +92,9 @@ public class FineDetailUtils {
      * @param entityList
      * @return
      */
-    public static int getRenterConsoleDelayReturnFineAmt(List<ConsoleRenterOrderFineDeatailEntity> entityList){
+   /* public static int getRenterConsoleDelayReturnFineAmt(List<ConsoleRenterOrderFineDeatailEntity> entityList){
         return getRenterConsoleFineAmt(entityList,FineTypeEnum.RENTER_DELAY_RETURN);
-    }
+    }*/
 
     /**
      * 获得取还车违约金罚金的总额
@@ -187,9 +187,9 @@ public class FineDetailUtils {
      * @param entityList
      * @return
      */
-    public static int getRenterOrderDelayReturnFineAmt(List<RenterOrderFineDeatailEntity> entityList){
+   /* public static int getRenterOrderDelayReturnFineAmt(List<RenterOrderFineDeatailEntity> entityList){
         return getRenterOrderFineAmt(entityList,FineTypeEnum.RENTER_DELAY_RETURN);
-    }
+    }*/
 
     /**
      * 获得取还车违约金罚金的总额
