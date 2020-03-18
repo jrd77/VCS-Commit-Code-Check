@@ -39,7 +39,15 @@ public class OrderSubsidyDetailUtils {
         }
         return total;
     }
-
+    public static int getConsoleRenterSubsidyAmt(List<OrderConsoleSubsidyDetailEntity> all, RenterCashCodeEnum cashCodeEnum){
+        int total=0;
+        for(OrderConsoleSubsidyDetailEntity detailEntity:all){
+            if(cashCodeEnum.getCashNo().equals(detailEntity.getSubsidyCostCode())&&detailEntity.getSubsidyAmount()!=null){
+                total = total+detailEntity.getSubsidyAmount();
+            }
+        }
+        return total;
+    }
 
     /**
      * 租客给平台的费用
@@ -125,10 +133,12 @@ public class OrderSubsidyDetailUtils {
      * @return
      */
     public static int getRenterUpateSubsidyAmt(List<RenterOrderSubsidyDetailEntity> all){
-        return getRenterSubsidyAmt(all,RenterCashCodeEnum.DISPATCHING_AMT);
+        return getRenterSubsidyAmt(all,RenterCashCodeEnum.SUBSIDY_DISPATCHING_AMT);
     }
 
-
+    public static int getConsoleRenterUpateSubsidyAmt(List<OrderConsoleSubsidyDetailEntity> all){
+        return getConsoleRenterSubsidyAmt(all,RenterCashCodeEnum.SUBSIDY_DISPATCHING_AMT);
+    }
 
     /**
      * 从Console租客订单补贴中获取所有和指定方（平台、车主）相关租客补贴
