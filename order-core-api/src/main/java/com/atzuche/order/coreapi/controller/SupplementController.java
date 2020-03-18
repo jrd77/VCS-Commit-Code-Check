@@ -19,6 +19,7 @@ import com.atzuche.order.commons.entity.dto.OrderSupplementDetailDTO;
 import com.atzuche.order.commons.enums.OrderSettleEnum;
 import com.atzuche.order.commons.enums.OrderStatusEnum;
 import com.atzuche.order.coreapi.entity.vo.SupplementVO;
+import com.atzuche.order.coreapi.modifyorder.exception.SupplementAmtException;
 import com.atzuche.order.coreapi.modifyorder.exception.SupplementCanNotSupportException;
 import com.atzuche.order.coreapi.service.SupplementService;
 import com.atzuche.order.parentorder.entity.OrderStatusEntity;
@@ -63,6 +64,10 @@ public class SupplementController {
 		} else {
 			// 订单状态异常
 			log.error("order/supplement/add 订单状态异常");
+		}
+		if (orderSupplementDetailDTO.getAmt() >= 0 && 
+				orderSupplementDetailDTO.getCashType() != null && orderSupplementDetailDTO.getCashType() == 2) {
+			throw new SupplementAmtException();
 		}
 		supplementService.saveSupplement(orderSupplementDetailDTO);
 		return ResponseData.success();

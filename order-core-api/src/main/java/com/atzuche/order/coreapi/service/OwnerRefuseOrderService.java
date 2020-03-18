@@ -125,8 +125,8 @@ public class OwnerRefuseOrderService {
             //进入调度
             //订单状态更新
             orderStatusDTO.setStatus(OrderStatusEnum.TO_DISPATCH.getStatus());
-            orderStatusDTO.setIsDispatch(1);
-            orderStatusDTO.setDispatchStatus(1);
+            orderStatusDTO.setIsDispatch(OrderConstant.YES);
+            orderStatusDTO.setDispatchStatus(OrderConstant.YES);
         } else {
             //不进调度
             orderStatusDTO.setStatus(OrderStatusEnum.CLOSED.getStatus());
@@ -159,9 +159,14 @@ public class OwnerRefuseOrderService {
         ownerOrderService.updateChildStatusByOrderNo(reqVO.getOrderNo(), OwnerChildStatusEnum.END.getCode());
         ownerOrderService.updateDispatchReasonByOrderNo(reqVO.getOrderNo(), dispatcherReason);
         //取消信息处理(order_cancel_reason)
-        orderCancelReasonService.addOrderCancelReasonRecord(buildOrderCancelReasonEntity(reqVO.getOrderNo(),
+        OrderCancelReasonEntity orderCancelReasonEntity = buildOrderCancelReasonEntity(reqVO.getOrderNo(),
                 renterOrderEntity.getRenterOrderNo(),
-                ownerOrderEntity.getOwnerOrderNo(), "车主拒单"));
+                ownerOrderEntity.getOwnerOrderNo(), "车主拒单");
+        orderCancelReasonEntity.setUpdateOp(StringUtils.isBlank(reqVO.getOperatorName()) ? OrderConstant.SYSTEM_OPERATOR :
+                reqVO.getOperatorName());
+        orderCancelReasonEntity.setCreateOp(orderCancelReasonEntity.getUpdateOp());
+        orderCancelReasonEntity.setCancelReqTime(LocalDateTime.now());
+        orderCancelReasonService.addOrderCancelReasonRecord(orderCancelReasonEntity);
         //释放库存(车主取消/拒绝时不释放库存)
         stockService.releaseCarStock(reqVO.getOrderNo(), goodsDetail.getCarNo());
         //锁定车辆可租时间
@@ -171,11 +176,11 @@ public class OwnerRefuseOrderService {
         //发送车主拒绝事件
         orderActionMqService.sendOwnerRefundOrderSuccess(reqVO.getOrderNo());
 
-        NewOrderMQStatusEventEnum newOrderMQStatusEventEnum = NewOrderMQStatusEventEnum.ORDER_END;
+        NewOrderMQStatusEventEnum newOrderMqStatusEventEnum = NewOrderMQStatusEventEnum.ORDER_END;
         if (orderStatusDTO.getStatus() == OrderStatusEnum.TO_DISPATCH.getStatus()) {
-            newOrderMQStatusEventEnum = NewOrderMQStatusEventEnum.ORDER_PREDISPATCH;
+            newOrderMqStatusEventEnum = NewOrderMQStatusEventEnum.ORDER_PREDISPATCH;
         }
-        orderStatusMqService.sendOrderStatusByOrderNo(reqVO.getOrderNo(), orderStatusDTO.getStatus(), newOrderMQStatusEventEnum);
+        orderStatusMqService.sendOrderStatusByOrderNo(reqVO.getOrderNo(), orderStatusDTO.getStatus(), newOrderMqStatusEventEnum);
 
     }
 
@@ -217,9 +222,13 @@ public class OwnerRefuseOrderService {
         //获取车主订单信息
         OwnerOrderEntity ownerOrderEntity = ownerOrderService.getOwnerOrderByOrderNoAndIsEffective(orderNo);
         //订单结束原因信息更新
-        orderCancelReasonService.addOrderCancelReasonRecord(buildOrderCancelReasonEntity(orderNo,
+        OrderCancelReasonEntity orderCancelReasonEntity = buildOrderCancelReasonEntity(orderNo,
                 renterOrderEntity.getRenterOrderNo(),
-                ownerOrderEntity.getOwnerOrderNo(), "租期重叠车主拒单"));
+                ownerOrderEntity.getOwnerOrderNo(), "租期重叠车主拒单");
+        orderCancelReasonEntity.setUpdateOp(OrderConstant.SYSTEM_OPERATOR);
+        orderCancelReasonEntity.setCreateOp(OrderConstant.SYSTEM_OPERATOR);
+        orderCancelReasonEntity.setCancelReqTime(LocalDateTime.now());
+        orderCancelReasonService.addOrderCancelReasonRecord(orderCancelReasonEntity);
 
 
         //撤销优惠券

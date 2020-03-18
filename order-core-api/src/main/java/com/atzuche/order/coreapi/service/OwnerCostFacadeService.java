@@ -340,7 +340,7 @@ public class OwnerCostFacadeService {
         ownerFineVO.setDelayFine(getOwnerFileByType(consoleFineList, orderFineList, FineTypeEnum.DELAY_FINE));
         ownerFineVO.setModifyAddressFine(getOwnerFileByType(consoleFineList, orderFineList, FineTypeEnum.MODIFY_ADDRESS_FINE));
         ownerFineVO.setRenterAdvanceReturn(getOwnerFileByType(consoleFineList, orderFineList, FineTypeEnum.RENTER_ADVANCE_RETURN));
-        ownerFineVO.setRenterDelayReturn(getOwnerFileByType(consoleFineList, orderFineList, FineTypeEnum.RENTER_DELAY_RETURN));
+        //ownerFineVO.setRenterDelayReturn(getOwnerFileByType(consoleFineList, orderFineList, FineTypeEnum.RENTER_DELAY_RETURN));
         ownerFineVO.setOwnerFine(getOwnerFileByType(consoleFineList, orderFineList, FineTypeEnum.OWNER_FINE));
         ownerFineVO.setGetReturnCar(getOwnerFileByType(consoleFineList, orderFineList, FineTypeEnum.GET_RETURN_CAR));
         return ownerFineVO;

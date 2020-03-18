@@ -37,6 +37,9 @@ public class OrderDetailRespDTO {
     public OwnerOrderCostDTO ownerOrderCostDTO;
     public List<AccountOwnerIncomeExamineDTO> accountOwnerIncomeExamineDTOS;
     public List<RenterOrderChangeApplyDTO> renterOrderChangeApplyDTOS;
+    public AccountRenterDepositDTO accountRenterDepositDTO;
+    public AccountRenterWzDepositDTO accountRenterWzDepositDTO;
+
 
     //变更申请的租客子订单号（application_id）
     public String changeApplyRenterOrderNo;
@@ -48,8 +51,5 @@ public class OrderDetailRespDTO {
     public RenterOrderChangeApplyDTO renterOrderChangeApplyDTO;
     //预计收益金额
     public Integer changeApplyPreIncomAmt;
-
-
-
 
 }

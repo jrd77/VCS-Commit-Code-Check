@@ -60,7 +60,7 @@ public class SMSTaskDateTimeUtils {
         if(now.isAfter(timeLatter)){
             return 0;
         }
-        Duration duration = Duration.between(timeLatter,now);
+        Duration duration = Duration.between(now,timeLatter);
         return duration.toMinutes();
     }
 }

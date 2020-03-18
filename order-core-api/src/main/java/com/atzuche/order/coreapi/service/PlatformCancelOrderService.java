@@ -64,6 +64,9 @@ public class PlatformCancelOrderService {
             stockService.releaseCarStock(orderNo, cancelOrderRes.getCarNo());
             //订单取消（租客取消、车主取消、平台取消）如果使用了车主券且未支付，则退回否则不处理
             if (null != cancelOrderRes.getIsDispatch() && !cancelOrderRes.getIsDispatch()) {
+                //退还优惠券(平台券+送取服务券)
+                couponAndCoinHandleService.undoPlatformCoupon(orderNo);
+                couponAndCoinHandleService.undoGetCarFeeCoupon(orderNo);
                 //退还车主券
                 String recover = null == cancelOrderRes.getRentCarPayStatus() || cancelOrderRes.getRentCarPayStatus() == 0 ? "1" : "0";
                 couponAndCoinHandleService.undoOwnerCoupon(orderNo, cancelOrderRes.getOwnerCouponNo(), recover);
@@ -76,14 +79,15 @@ public class PlatformCancelOrderService {
                     deliveryCarService.cancelRenYunFlowOrderInfo(cancelOrderDeliveryVO);
                 }
             }
+
+            //平台取消消息发送
+            orderActionMqService.sendCancelOrderSuccess(orderNo, CancelSourceEnum.PLATFORM, NewOrderMQActionEventEnum.ORDER_DELAY, Maps.newHashMap());
+            NewOrderMQStatusEventEnum newOrderMqStatusEventEnum = NewOrderMQStatusEventEnum.ORDER_END;
+            if(cancelOrderRes.getStatus() == OrderStatusEnum.TO_DISPATCH.getStatus()) {
+                newOrderMqStatusEventEnum = NewOrderMQStatusEventEnum.ORDER_PREDISPATCH;
+            }
+            orderStatusMqService.sendOrderStatusByOrderNo(orderNo,cancelOrderRes.getStatus(),newOrderMqStatusEventEnum);
         }
-        //平台取消消息发送
-        orderActionMqService.sendCancelOrderSuccess(orderNo, CancelSourceEnum.PLATFORM, NewOrderMQActionEventEnum.ORDER_DELAY, Maps.newHashMap());
-        NewOrderMQStatusEventEnum newOrderMQStatusEventEnum = NewOrderMQStatusEventEnum.ORDER_END;
-        if(cancelOrderRes.getStatus() == OrderStatusEnum.TO_DISPATCH.getStatus()) {
-            newOrderMQStatusEventEnum = NewOrderMQStatusEventEnum.ORDER_PREDISPATCH;
-        }
-        orderStatusMqService.sendOrderStatusByOrderNo(orderNo,cancelOrderRes.getStatus(),newOrderMQStatusEventEnum);
     }
 
 

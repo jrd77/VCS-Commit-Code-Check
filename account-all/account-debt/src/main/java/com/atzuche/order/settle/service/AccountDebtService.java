@@ -43,6 +43,8 @@ public class AccountDebtService{
     private AccountDebtDetailNoTService accountDebtDetailNoTService;
     @Autowired
     private AccountDebtReceivableaDetailNoTService accountDebtReceivableaDetailNoTService;
+    @Autowired
+    private RemoteOldSysDebtService remoteOldSysDebtService;
 
 
     /**
@@ -135,14 +137,15 @@ public class AccountDebtService{
     		return null;
     	}
     	// TODO 查询老系统欠款
-    	Integer oldDebtAmt = 0;
+    	String memNo = oldDebtList.get(0).getMemNo();
+    	Integer oldDebtAmt = remoteOldSysDebtService.getMemBalance(memNo);
     	log.info("老系统欠款 oldDebtAmt=[{}]", oldDebtAmt);
-    	if (oldDebtAmt == null || oldDebtAmt >= 0) {
+    	if (oldDebtAmt == null || oldDebtAmt == 0) {
     		// 老系统无欠款，无需抵扣
     		log.info("老系统无欠款，无需抵扣");
     		return null;
     	}
-    	oldDebtAmt = Math.abs(oldDebtAmt);
+    	//oldDebtAmt = Math.abs(oldDebtAmt);
     	// 返回对象列表
     	List<AccountOldDebtResVO> debtResList = new ArrayList<AccountOldDebtResVO>();
     	for (AccountOldDebtReqVO old:oldDebtList) {

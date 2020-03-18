@@ -62,9 +62,13 @@ public class OrderActionMqService {
 
         OrderMessage orderMessage = OrderMessage.builder().build();
         orderMessage.setMessage(orderCreateMq);
-        logger.info("发送下单成功事件.mq:[exchange={},routingKey={}],message=[{}]", NewOrderMQActionEventEnum.ORDER_CREATE.exchange, NewOrderMQActionEventEnum.ORDER_CREATE.routingKey,
+        logger.info("发送下单成功事件.mq:[exchange={},routingKey={}],message=[{}]",
+                NewOrderMQActionEventEnum.ORDER_CREATE.exchange,
+                NewOrderMQActionEventEnum.ORDER_CREATE.routingKey,
                 JSON.toJSON(orderMessage));
-        baseProducer.sendTopicMessage(NewOrderMQActionEventEnum.ORDER_CREATE.exchange, NewOrderMQActionEventEnum.ORDER_CREATE.routingKey, orderMessage);
+        baseProducer.sendTopicMessage(NewOrderMQActionEventEnum.ORDER_CREATE.exchange,
+                NewOrderMQActionEventEnum.ORDER_CREATE.routingKey,
+                orderMessage);
     }
 
 
@@ -93,9 +97,13 @@ public class OrderActionMqService {
 
         OrderMessage orderMessage = OrderMessage.builder().build();
         orderMessage.setMessage(orderCreateMq);
-        logger.info("发送下单失败事件.mq:[exchange={},routingKey={}],message=[{}]", NewOrderMQActionEventEnum.ORDER_CREATE_FAIL.exchange, NewOrderMQActionEventEnum.ORDER_CREATE_FAIL.routingKey,
+        logger.info("发送下单失败事件.mq:[exchange={},routingKey={}],message=[{}]",
+                NewOrderMQActionEventEnum.ORDER_CREATE_FAIL.exchange,
+                NewOrderMQActionEventEnum.ORDER_CREATE_FAIL.routingKey,
                 JSON.toJSON(orderMessage));
-        baseProducer.sendTopicMessage(NewOrderMQActionEventEnum.ORDER_CREATE_FAIL.exchange, NewOrderMQActionEventEnum.ORDER_CREATE_FAIL.routingKey, orderMessage);
+        baseProducer.sendTopicMessage(NewOrderMQActionEventEnum.ORDER_CREATE_FAIL.exchange,
+                NewOrderMQActionEventEnum.ORDER_CREATE_FAIL.routingKey,
+                orderMessage);
     }
 
     /**
@@ -132,7 +140,9 @@ public class OrderActionMqService {
 
         OrderMessage orderMessage = OrderMessage.builder().build();
         orderMessage.setMessage(orderCreateMq);
-        logger.info("发送车主同意订单成功事件.mq:[exchange={},routingKey={}],message=[{}]", NewOrderMQActionEventEnum.ORDER_MODIFY.exchange, NewOrderMQActionEventEnum.ORDER_MODIFY.routingKey,
+        logger.info("发送车主同意订单成功事件.mq:[exchange={},routingKey={}],message=[{}]",
+                NewOrderMQActionEventEnum.ORDER_MODIFY.exchange,
+                NewOrderMQActionEventEnum.ORDER_MODIFY.routingKey,
                 JSON.toJSON(orderMessage));
         //车主同意SMS
         Map map = SmsParamsMapUtil.getParamsMap(orderNo, ShortMessageTypeEnum.NOTIFY_RENTER_TRANS_REQACCEPTED.getValue(), null, null);
@@ -153,9 +163,13 @@ public class OrderActionMqService {
 
         OrderMessage orderMessage = OrderMessage.builder().build();
         orderMessage.setMessage(orderCreateMq);
-        logger.info("发送车主拒绝订单成功事件.mq:[exchange={},routingKey={}],message=[{}]", NewOrderMQActionEventEnum.OWNER_ORDER_REFUND.exchange, NewOrderMQActionEventEnum.OWNER_ORDER_REFUND.routingKey,
+        logger.info("发送车主拒绝订单成功事件.mq:[exchange={},routingKey={}],message=[{}]",
+                NewOrderMQActionEventEnum.OWNER_ORDER_REFUND.exchange,
+                NewOrderMQActionEventEnum.OWNER_ORDER_REFUND.routingKey,
                 JSON.toJSON(orderMessage));
-        baseProducer.sendTopicMessage(NewOrderMQActionEventEnum.OWNER_ORDER_REFUND.exchange, NewOrderMQActionEventEnum.OWNER_ORDER_REFUND.routingKey, orderMessage);
+        baseProducer.sendTopicMessage(NewOrderMQActionEventEnum.OWNER_ORDER_REFUND.exchange,
+                NewOrderMQActionEventEnum.OWNER_ORDER_REFUND.routingKey,
+                orderMessage);
     }
 
     /**
@@ -168,9 +182,13 @@ public class OrderActionMqService {
 
         OrderMessage orderMessage = OrderMessage.builder().build();
         orderMessage.setMessage(orderBaseDataMq);
-        logger.info("发送订单调度取消事件.mq:[exchange={},routingKey={}],message=[{}]", NewOrderMQActionEventEnum.ORDER_FAILCANCEL.exchange, NewOrderMQActionEventEnum.ORDER_FAILCANCEL.routingKey,
+        logger.info("发送订单调度取消事件.mq:[exchange={},routingKey={}],message=[{}]",
+                NewOrderMQActionEventEnum.ORDER_FAILCANCEL.exchange,
+                NewOrderMQActionEventEnum.ORDER_FAILCANCEL.routingKey,
                 JSON.toJSON(orderMessage));
-        baseProducer.sendTopicMessage(NewOrderMQActionEventEnum.ORDER_FAILCANCEL.exchange, NewOrderMQActionEventEnum.ORDER_FAILCANCEL.routingKey, orderMessage);
+        baseProducer.sendTopicMessage(NewOrderMQActionEventEnum.ORDER_FAILCANCEL.exchange,
+                NewOrderMQActionEventEnum.ORDER_FAILCANCEL.routingKey,
+                orderMessage);
     }
 
 
@@ -187,9 +205,13 @@ public class OrderActionMqService {
 
         OrderMessage orderMessage = OrderMessage.builder().build();
         orderMessage.setMessage(orderCreateMq);
-        logger.info("发送订单租客取车成功事件.mq:[exchange={},routingKey={}],message=[{}]", NewOrderMQActionEventEnum.RENTER_CONFIRM_GETCAR.exchange, NewOrderMQActionEventEnum.RENTER_CONFIRM_GETCAR.routingKey,
+        logger.info("发送订单租客取车成功事件.mq:[exchange={},routingKey={}],message=[{}]",
+                NewOrderMQActionEventEnum.RENTER_CONFIRM_GETCAR.exchange,
+                NewOrderMQActionEventEnum.RENTER_CONFIRM_GETCAR.routingKey,
                 JSON.toJSON(orderCreateMq));
-        baseProducer.sendTopicMessage(NewOrderMQActionEventEnum.RENTER_CONFIRM_GETCAR.exchange, NewOrderMQActionEventEnum.RENTER_CONFIRM_GETCAR.routingKey, orderMessage);
+        baseProducer.sendTopicMessage(NewOrderMQActionEventEnum.RENTER_CONFIRM_GETCAR.exchange,
+                NewOrderMQActionEventEnum.RENTER_CONFIRM_GETCAR.routingKey,
+                orderMessage);
     }
 
 
@@ -209,9 +231,13 @@ public class OrderActionMqService {
         //租客还车
         Map map = SmsParamsMapUtil.getParamsMap(orderNo, ShortMessageTypeEnum.CAR_RENTALEND_2_RENTER.getValue(), null, null);
         orderMessage.setMap(map);
-        logger.info("发送订单车主确认还车成功事件.mq:[exchange={},routingKey={}],message=[{}]", NewOrderMQActionEventEnum.OWNER_CONFIRM_RETURNCAR.exchange, NewOrderMQActionEventEnum.OWNER_CONFIRM_RETURNCAR.routingKey,
+        logger.info("发送订单车主确认还车成功事件.mq:[exchange={},routingKey={}],message=[{}]",
+                NewOrderMQActionEventEnum.OWNER_CONFIRM_RETURNCAR.exchange,
+                NewOrderMQActionEventEnum.OWNER_CONFIRM_RETURNCAR.routingKey,
                 JSON.toJSON(orderMessage));
-        baseProducer.sendTopicMessage(NewOrderMQActionEventEnum.OWNER_CONFIRM_RETURNCAR.exchange, NewOrderMQActionEventEnum.OWNER_CONFIRM_RETURNCAR.routingKey, orderMessage);
+        baseProducer.sendTopicMessage(NewOrderMQActionEventEnum.OWNER_CONFIRM_RETURNCAR.exchange,
+                NewOrderMQActionEventEnum.OWNER_CONFIRM_RETURNCAR.routingKey,
+                orderMessage);
     }
 
 
@@ -241,9 +267,44 @@ public class OrderActionMqService {
 
         OrderMessage orderMessage = OrderMessage.builder().build();
         orderMessage.setMessage(orderHolidayDeductMq);
-        logger.info("发送取消订单收取节假日罚金成功事件.mq:[exchange={},routingKey={}],message=[{}]", NewOrderMQActionEventEnum.ORDER_HOLIDAY_DEDUCT_SUCCESS.exchange, NewOrderMQActionEventEnum.ORDER_HOLIDAY_DEDUCT_SUCCESS.routingKey,
+        logger.info("发送取消订单收取节假日罚金成功事件.mq:[exchange={},routingKey={}],message=[{}]",
+                NewOrderMQActionEventEnum.ORDER_HOLIDAY_DEDUCT_SUCCESS.exchange,
+                NewOrderMQActionEventEnum.ORDER_HOLIDAY_DEDUCT_SUCCESS.routingKey,
                 JSON.toJSON(orderMessage));
-        baseProducer.sendTopicMessage(NewOrderMQActionEventEnum.ORDER_HOLIDAY_DEDUCT_SUCCESS.exchange, NewOrderMQActionEventEnum.ORDER_HOLIDAY_DEDUCT_SUCCESS.routingKey, orderMessage);
+        baseProducer.sendTopicMessage(NewOrderMQActionEventEnum.ORDER_HOLIDAY_DEDUCT_SUCCESS.exchange,
+                NewOrderMQActionEventEnum.ORDER_HOLIDAY_DEDUCT_SUCCESS.routingKey,
+                orderMessage);
+
+    }
+
+
+    /**
+     * 发送撤销取消订单收取节假日罚金事件
+     *
+     * @param orderNo 订单号
+     * @param memNo   会员号
+     */
+    public void sendRevokeOrderCancelMemHolidayDeduct(String orderNo, Integer memNo) {
+        if (null == memNo || StringUtils.isBlank(orderNo)) {
+            logger.warn("会员注册号为空.");
+            return;
+        }
+        OrderBaseDataMq orderBaseDataMq = mqBuildService.buildOrderBaseDataMq(orderNo);
+
+        OrderHolidayDeductMq orderHolidayDeductMq = new OrderHolidayDeductMq();
+        BeanUtils.copyProperties(orderBaseDataMq, orderHolidayDeductMq);
+        orderHolidayDeductMq.setMemNo(memNo);
+        orderHolidayDeductMq.setOperateName("H5SystemOperator");
+
+        OrderMessage orderMessage = OrderMessage.builder().build();
+        orderMessage.setMessage(orderHolidayDeductMq);
+        logger.info("发送撤销取消订单收取节假日罚金事件.mq:[exchange={},routingKey={}],message=[{}]",
+                NewOrderMQActionEventEnum.ORDER_HOLIDAY_DEDUCT_CANCEL.exchange,
+                NewOrderMQActionEventEnum.ORDER_HOLIDAY_DEDUCT_CANCEL.routingKey,
+                JSON.toJSON(orderMessage));
+        baseProducer.sendTopicMessage(NewOrderMQActionEventEnum.ORDER_HOLIDAY_DEDUCT_CANCEL.exchange,
+                NewOrderMQActionEventEnum.ORDER_HOLIDAY_DEDUCT_CANCEL.routingKey,
+                orderMessage);
 
     }
 
@@ -268,12 +329,15 @@ public class OrderActionMqService {
         orderAgreeConflictMq.setOrderNos(orderNos);
 
         OrderMessage orderMessage = OrderMessage.builder().build();
-        orderMessage.setMessage(orderMessage);
+        orderMessage.setMessage(orderAgreeConflictMq);
 
         logger.info("通知老系统处理重叠订单事件.mq:[exchange={},routingKey={}],message=[{}]",
-                NewOrderMQActionEventEnum.ORDER_AGREE_CONFLICT_NOTICE_OLD.exchange, NewOrderMQActionEventEnum.ORDER_AGREE_CONFLICT_NOTICE_OLD.routingKey,
+                NewOrderMQActionEventEnum.ORDER_AGREE_CONFLICT_NOTICE_OLD.exchange,
+                NewOrderMQActionEventEnum.ORDER_AGREE_CONFLICT_NOTICE_OLD.routingKey,
                 JSON.toJSON(orderMessage));
-        baseProducer.sendTopicMessage(NewOrderMQActionEventEnum.ORDER_AGREE_CONFLICT_NOTICE_OLD.exchange, NewOrderMQActionEventEnum.ORDER_AGREE_CONFLICT_NOTICE_OLD.routingKey, orderMessage);
+        baseProducer.sendTopicMessage(NewOrderMQActionEventEnum.ORDER_AGREE_CONFLICT_NOTICE_OLD.exchange,
+                NewOrderMQActionEventEnum.ORDER_AGREE_CONFLICT_NOTICE_OLD.routingKey,
+                orderMessage);
 
     }
 

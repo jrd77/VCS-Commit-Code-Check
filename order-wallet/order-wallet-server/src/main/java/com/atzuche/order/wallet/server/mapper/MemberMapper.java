@@ -14,4 +14,6 @@ public interface MemberMapper {
     BalanceEntity getByMemNo(String memNo);
 
     int deductBalance(@Param("memNo")String memNo,@Param("deduct")Integer balance);
+
+    int deductDebt(@Param("memNo")String memNo,@Param("debt")Integer debt);
 }

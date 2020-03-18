@@ -266,4 +266,18 @@
     <select id="getRenterOrderFineDeatailByOwnerOrderNo" resultMap="BaseResultMap">
         select <include refid="Base_Column_List" /> from renter_order_fine_deatail where renter_order_no = #{renterOrderNo}
     </select>
+
+    <!--适用于目前取消罚金种类单一情况，后续可以考虑使用费用编码处理-->
+    <select id="selectByCondition" resultMap="BaseResultMap">
+        select
+            <include refid="Base_Column_List" />
+        from renter_order_fine_deatail
+        where
+            renter_order_no = #{renterOrderNo}
+            and fine_type = #{fineType}
+            and fine_subsidy_source_code = #{fineSubsidySourceCode}
+            and fine_subsidy_code = #{fineSubsidyCode}
+            and is_delete = 0
+        limit 1
+    </select>
 </mapper>

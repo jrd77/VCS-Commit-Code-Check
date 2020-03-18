@@ -61,6 +61,8 @@ public class OrderSettleService{
     @Autowired private RenterOrderSettleService renterOrderSettleService;
     @Autowired
     private OrderOwnerSettleNoTService orderOwnerSettleNoTService;
+    @Autowired
+    private RemoteOldSysDebtService remoteOldSysDebtService;
     
     /**
      * 查询所以费用
@@ -273,6 +275,10 @@ public class OrderSettleService{
             Cat.logEvent("settleOrderAfterSeparateOwner",GsonUtils.toJson(settleOrdersDefinition));
             // 调远程增加车辆gps押金
             orderOwnerSettleNoTService.updateCarDeposit(settleOrders);
+            // 调远程抵扣老系统租客欠款
+            remoteOldSysDebtService.deductBalance(settleOrders.getRenterMemNo(), settleOrders.getRenterTotalOldRealDebtAmt());
+            // 调远程抵扣老系统车主欠款
+            remoteOldSysDebtService.deductBalance(settleOrders.getOwnerMemNo(), settleOrders.getOwnerTotalOldRealDebtAmt());
             orderSettleNewService.sendOrderSettleMq(orderNo,settleOrders.getRenterMemNo(),settleOrders.getRentCosts(),0,settleOrders.getOwnerMemNo());
             t.setStatus(Transaction.SUCCESS);
         } catch (Exception e) {

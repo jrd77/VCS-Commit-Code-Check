@@ -4,6 +4,8 @@ import com.atzuche.order.accountrenterdetain.service.notservice.AccountRenterDet
 import com.atzuche.order.accountrenterwzdepost.entity.AccountRenterWzDepositCostEntity;
 import com.atzuche.order.accountrenterwzdepost.entity.AccountRenterWzDepositCostSettleDetailEntity;
 import com.atzuche.order.accountrenterwzdepost.service.notservice.AccountRenterWzDepositCostSettleDetailNoTService;
+import com.atzuche.order.cashieraccount.entity.CashierEntity;
+import com.atzuche.order.cashieraccount.service.CashierService;
 import com.atzuche.order.cashieraccount.service.CashierWzSettleService;
 import com.atzuche.order.commons.NumberUtils;
 import com.atzuche.order.commons.enums.OrderStatusEnum;
@@ -67,6 +69,12 @@ public class OrderWzSettleNewService {
 	private RenterOrderWzSettleFlagService renterOrderWzSettleFlagService;
 	@Autowired
 	private OwnerOrderService ownerOrderService;
+	@Autowired
+	private CashierService cashierService;
+	// 违章押金
+	private static final String WZ_DEPOSIT_PAY_KIND = "02";
+	// 虚拟支付
+	private static final int PAY_LINE_VIRTUAL = 2;
 	/**
 	 * 初始化结算对象
 	 * 
@@ -116,6 +124,15 @@ public class OrderWzSettleNewService {
 		settleOrdersWz.setRenterOrderNo(renterOrderNo);
 		settleOrdersWz.setRenterMemNo(renterMemNo);
 		settleOrdersWz.setRenterOrder(renterOrder);
+		// 获取租客支付记录
+        List<CashierEntity> payList = cashierService.getCashierRentCostsByOrderNo(orderNo);
+        if (payList != null && !payList.isEmpty()) {
+        	for (CashierEntity cashier:payList) {
+        		if (WZ_DEPOSIT_PAY_KIND.equals(cashier.getPayKind()) && cashier.getPayLine() == PAY_LINE_VIRTUAL) {
+        			settleOrdersWz.setWzCostVirtualFlag(true);
+        		}
+        	}
+        }
 		return settleOrdersWz;
 	}
 
@@ -267,8 +284,9 @@ public class OrderWzSettleNewService {
 		// 1 租客违章费用 结余处理
 		log.info("OrderSettleService wzCostSettle 抵扣违章费用或产生违章欠款。settleOrders [{}], settleOrdersAccount [{}]", GsonUtils.toJson(settleOrders),GsonUtils.toJson(settleOrdersAccount));
 		orderWzSettleNoTService.wzCostSettle(settleOrders, settleOrdersAccount);
-		
-		
+
+
+
 		log.info("OrderSettleService repayWzHistoryDebtRent 抵扣历史欠款。settleOrdersAccount [{}]", GsonUtils.toJson(settleOrdersAccount));
 		// 2.1租客剩余违章押金 结余历史欠款
 		orderWzSettleNoTService.repayWzHistoryDebtRent(settleOrdersAccount);

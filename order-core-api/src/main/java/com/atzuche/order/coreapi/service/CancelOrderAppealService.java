@@ -1,5 +1,6 @@
 package com.atzuche.order.coreapi.service;
 
+import com.atzuche.order.commons.constant.OrderConstant;
 import com.atzuche.order.commons.entity.dto.OwnerGoodsDetailDTO;
 import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
 import com.atzuche.order.commons.enums.CarOwnerTypeEnum;
@@ -91,7 +92,7 @@ public class CancelOrderAppealService {
             AdminCancelOrderReqVO adminCancelOrderReqVO = new AdminCancelOrderReqVO();
             BeanUtils.copyProperties(reqVO, adminCancelOrderReqVO);
             adminCancelOrderReqVO.setOperatorName("H5SystemOperator");
-            cancelOrderService.cancel(adminCancelOrderReqVO, false);
+            cancelOrderService.cancel(adminCancelOrderReqVO, false, OrderConstant.YES, record.getAppealReason());
         }
     }
 

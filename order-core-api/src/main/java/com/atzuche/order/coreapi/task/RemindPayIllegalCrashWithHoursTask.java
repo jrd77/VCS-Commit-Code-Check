@@ -60,7 +60,7 @@ public class RemindPayIllegalCrashWithHoursTask extends IJobHandler {
             }
             for (OrderDTO violateBO : orderNos) {
                 OrderStatusEntity orderStatusEntity = orderStatusService.getByOrderNo(violateBO.getOrderNo());
-                if (orderStatusEntity.getWzPayStatus().intValue() == 0) {
+                if (orderStatusEntity.getWzPayStatus().intValue() == 0 && orderStatusEntity.getStatus().intValue() < 8) {
                     //没有支付违章押金
                     boolean is24HoursAgo = SMSTaskDateTimeUtils.isArriveRentTime(DateUtil.asDateTime(violateBO.getExpRentTime()), 24);
                     remindPayIllegalCrashService.sendShortMessageData(is24HoursAgo, violateBO.getOrderNo());

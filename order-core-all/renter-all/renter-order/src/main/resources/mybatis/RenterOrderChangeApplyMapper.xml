@@ -319,4 +319,9 @@
         order by id desc
         limit 1
     </select>
+    
+    <select id="getRenterOrderChangeApplyAllCountByOrderNo" resultType="Integer">
+		select count(*) from renter_order_change_apply where order_no = #{orderNo}
+		and is_delete = 0
+	</select>
 </mapper>

@@ -123,6 +123,13 @@ public class OrderSettleNoTService {
     @Autowired private DeliveryCarInfoPriceService deliveryCarInfoPriceService;
     @Autowired private OrderConsoleCostDetailService orderConsoleCostDetailService;
     
+    // 租车费用
+    private static final String RENT_COST_PAY_KIND = "11";
+    // 车辆押金
+    private static final String RENT_DEPOSIT_PAY_KIND = "01";
+    // 虚拟支付
+    private static final int VIRTUAL_PAYMENT = 2;
+    
     /**
      * 初始化结算对象
      * @param orderNo
@@ -154,6 +161,17 @@ public class OrderSettleNoTService {
         settleOrders.setRenterOrderNo(renterOrderNo);
         settleOrders.setRenterMemNo(renterMemNo);
         settleOrders.setRenterOrder(renterOrder);
+        // 获取租客支付记录
+        List<CashierEntity> payList = cashierService.getCashierRentCostsByOrderNo(orderNo);
+        if (payList != null && !payList.isEmpty()) {
+        	for (CashierEntity cashier:payList) {
+        		if (RENT_COST_PAY_KIND.equals(cashier.getPayKind()) && cashier.getPayLine() == VIRTUAL_PAYMENT) {
+        			settleOrders.setRentCostVirtualPayFlag(true);
+        		} else if (RENT_DEPOSIT_PAY_KIND.equals(cashier.getPayKind()) && cashier.getPayLine() == VIRTUAL_PAYMENT) {
+        			settleOrders.setRentDepositVirtualPayFlag(true);
+        		}
+        	}
+        }
         
 //        settleOrders.setOwnerOrder(ownerOrder);
 //        settleOrders.setOwnerOrderNo(ownerOrderNo);

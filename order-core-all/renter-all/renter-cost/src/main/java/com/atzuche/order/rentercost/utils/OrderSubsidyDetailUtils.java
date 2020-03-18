@@ -2,6 +2,7 @@ package com.atzuche.order.rentercost.utils;
 
 import com.atzuche.order.commons.enums.SubsidySourceCodeEnum;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
+import com.atzuche.order.rentercost.entity.OrderConsoleCostDetailEntity;
 import com.atzuche.order.rentercost.entity.OrderConsoleSubsidyDetailEntity;
 import com.atzuche.order.rentercost.entity.RenterOrderSubsidyDetailEntity;
 
@@ -39,7 +40,15 @@ public class OrderSubsidyDetailUtils {
         }
         return total;
     }
-
+    public static int getConsoleRenterSubsidyAmt(List<OrderConsoleSubsidyDetailEntity> all, RenterCashCodeEnum cashCodeEnum){
+        int total=0;
+        for(OrderConsoleSubsidyDetailEntity detailEntity:all){
+            if(cashCodeEnum.getCashNo().equals(detailEntity.getSubsidyCostCode())&&detailEntity.getSubsidyAmount()!=null){
+                total = total+detailEntity.getSubsidyAmount();
+            }
+        }
+        return total;
+    }
 
     /**
      * 租客给平台的费用
@@ -65,9 +74,9 @@ public class OrderSubsidyDetailUtils {
      * @param subsidySourceCodeEnum
      * @return
      */
-    public static int getConsoleRenterSubsidyByCode(List<OrderConsoleSubsidyDetailEntity> all,SubsidySourceCodeEnum subsidySourceCodeEnum,SubsidySourceCodeEnum subsidyTargetCodeEnum){
+    public static int getOrderConsoleCostDetail(List<com.atzuche.order.rentercost.entity.OrderConsoleCostDetailEntity> all, SubsidySourceCodeEnum subsidySourceCodeEnum, SubsidySourceCodeEnum subsidyTargetCodeEnum){
         int total =0;
-        for(OrderConsoleSubsidyDetailEntity detailEntity:all){
+        for(OrderConsoleCostDetailEntity detailEntity:all){
             if(subsidySourceCodeEnum.getCode().equals(detailEntity.getSubsidySourceCode())
                     && subsidyTargetCodeEnum.getCode().equals(detailEntity.getSubsidyTargetCode())
                     &&detailEntity.getSubsidyAmount()!=null){
@@ -128,7 +137,9 @@ public class OrderSubsidyDetailUtils {
         return getRenterSubsidyAmt(all,RenterCashCodeEnum.DISPATCHING_AMT);
     }
 
-
+    public static int getConsoleRenterUpateSubsidyAmt(List<OrderConsoleSubsidyDetailEntity> all){
+        return getConsoleRenterSubsidyAmt(all,RenterCashCodeEnum.SUBSIDY_DISPATCHING_AMT);
+    }
 
     /**
      * 从Console租客订单补贴中获取所有和指定方（平台、车主）相关租客补贴

@@ -220,4 +220,18 @@
         where order_no=#{orderNo} and mem_no =#{memNo} and is_delete = 0
     </select>
 
+    <select id="selectByCondition" resultMap="BaseResultMap">
+        select
+            <include refid="Base_Column_List"/>
+        from
+            console_owner_order_fine_deatail
+        where
+            order_no=#{orderNo}
+            and fine_type = #{fineType}
+            and fine_subsidy_source_code = #{fineSubsidySourceCode}
+            and fine_subsidy_code = #{fineSubsidyCode}
+            and is_delete = 0
+        limit 1
+    </select>
+
 </mapper>
