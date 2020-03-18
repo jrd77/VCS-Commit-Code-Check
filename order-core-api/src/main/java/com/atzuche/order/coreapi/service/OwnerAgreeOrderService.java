@@ -148,18 +148,20 @@ public class OwnerAgreeOrderService {
         Map<Integer,List<com.atzuche.order.search.dto.OrderInfoDTO>> map =
                 orderList.stream().collect(Collectors.groupingBy(com.atzuche.order.search.dto.OrderInfoDTO::getNewOrOldOrder));
         int success = 0;
-        for (com.atzuche.order.search.dto.OrderInfoDTO orderInfoDTO : map.get(OrderConstant.YES)) {
-            boolean result = false;
-            try {
-                ownerRefuseOrderService.refuse(orderInfoDTO.getOrderNo());
-                //后续异步操作可迁移至此
+        if(!CollectionUtils.isEmpty(map.get(OrderConstant.YES))) {
+            for (com.atzuche.order.search.dto.OrderInfoDTO orderInfoDTO : map.get(OrderConstant.YES)) {
+                boolean result = false;
+                try {
+                    ownerRefuseOrderService.refuse(orderInfoDTO.getOrderNo());
+                    //后续异步操作可迁移至此
 
-                result = true;
-            } catch (Exception e) {
-                logger.error("租期重叠处理异常.orderInfoDTO:[{}]", JSON.toJSONString(orderInfoDTO), e);
-            }
-            if (result) {
-                success = success + 1;
+                    result = true;
+                } catch (Exception e) {
+                    logger.error("租期重叠处理异常.orderInfoDTO:[{}]", JSON.toJSONString(orderInfoDTO), e);
+                }
+                if (result) {
+                    success = success + 1;
+                }
             }
         }
         logger.info("Successfully processed [{}] bars", success);
