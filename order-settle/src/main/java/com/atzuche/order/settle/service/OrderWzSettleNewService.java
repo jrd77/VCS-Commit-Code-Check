@@ -267,8 +267,9 @@ public class OrderWzSettleNewService {
 		// 1 租客违章费用 结余处理
 		log.info("OrderSettleService wzCostSettle 抵扣违章费用或产生违章欠款。settleOrders [{}], settleOrdersAccount [{}]", GsonUtils.toJson(settleOrders),GsonUtils.toJson(settleOrdersAccount));
 		orderWzSettleNoTService.wzCostSettle(settleOrders, settleOrdersAccount);
-		
-		
+
+
+
 		log.info("OrderSettleService repayWzHistoryDebtRent 抵扣历史欠款。settleOrdersAccount [{}]", GsonUtils.toJson(settleOrdersAccount));
 		// 2租客剩余违章押金 结余历史欠款
 		orderWzSettleNoTService.repayWzHistoryDebtRent(settleOrdersAccount);
