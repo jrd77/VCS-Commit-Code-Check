@@ -329,7 +329,7 @@ public class OrderActionMqService {
         orderAgreeConflictMq.setOrderNos(orderNos);
 
         OrderMessage orderMessage = OrderMessage.builder().build();
-        orderMessage.setMessage(orderMessage);
+        orderMessage.setMessage(orderAgreeConflictMq);
 
         logger.info("通知老系统处理重叠订单事件.mq:[exchange={},routingKey={}],message=[{}]",
                 NewOrderMQActionEventEnum.ORDER_AGREE_CONFLICT_NOTICE_OLD.exchange,
