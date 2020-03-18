@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.atzuche.violation.mapper.RenterOrderWzSettleFlagMapper">
+	<sql id="select_column">
+		id,order_no,car_plate_num,has_illegal,has_illegal_cost,settle_flag,settle_time,create_op,create_time,update_time,update_op,is_delete
+	</sql>
+
+	<resultMap id = "selectColumnMap" type="com.atzuche.violation.entity.RenterOrderWzSettleFlagEntity">
+		<result property="id" column="id"/>
+		<result property="orderNo" column="order_no"/>
+		<result property="carPlateNum" column="car_plate_num"/>
+		<result property="hasIllegal" column="has_illegal"/>
+		<result property="hasIllegalCost" column="has_illegal_cost"/>
+		<result property="settleFlag" column="settle_flag"/>
+		<result property="settleTime" column="settle_time"/>
+		<result property="createOp" column="create_op"/>
+		<result property="createTime" column="create_time"/>
+		<result property="updateTime" column="update_time"/>
+		<result property="updateOp" column="update_op"/>
+		<result property="isDelete" column="is_delete"/>
+	</resultMap>
+
+	<insert id="saveRenterOrderWzSettleFlag" parameterType="com.atzuche.violation.entity.RenterOrderWzSettleFlagEntity" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+		insert into renter_order_wz_settle_flag(
+			<if test="orderNo != null">
+				order_no,
+			</if>
+			<if test="carPlateNum != null">
+				car_plate_num,
+			</if>
+			<if test="hasIllegal != null">
+				has_illegal,
+			</if>
+			<if test="hasIllegalCost != null">
+				has_illegal_cost,
+			</if>
+			<if test="settleFlag != null">
+				settle_flag,
+			</if>
+			<if test="settleTime != null">
+				settle_time,
+			</if>
+			<if test="createOp != null">
+				create_op,
+			</if>
+			<if test="updateTime != null">
+				update_time,
+			</if>
+			<if test="updateOp != null">
+				update_op,
+			</if>
+			<if test="isDelete != null">
+				is_delete,
+			</if>
+			create_time
+		) values (
+			<if test="orderNo != null">
+				#{orderNo},
+			</if>
+			<if test="carPlateNum != null">
+				#{carPlateNum},
+			</if>
+			<if test="hasIllegal != null">
+				#{hasIllegal},
+			</if>
+			<if test="hasIllegalCost != null">
+				#{hasIllegalCost},
+			</if>
+			<if test="settleFlag != null">
+				#{settleFlag},
+			</if>
+			<if test="settleTime != null">
+				#{settleTime},
+			</if>
+			<if test="createOp != null">
+				#{createOp},
+			</if>
+			<if test="updateTime != null">
+				#{updateTime},
+			</if>
+			<if test="updateOp != null">
+				#{updateOp},
+			</if>
+			<if test="isDelete != null">
+				#{isDelete},
+			</if>
+			NOW())
+	</insert>
+
+	<select id="queryRenterOrderWzSettleFlagById" resultType="com.atzuche.violation.entity.RenterOrderWzSettleFlagEntity">
+		select <include refid="select_column" />
+		from renter_order_wz_settle_flag
+		where id = #{id} and is_delete = 0
+	</select>
+
+	<select id="getIllegalSettleInfosByOrderNo" resultMap="selectColumnMap">
+		select <include refid="select_column" />
+		from renter_order_wz_settle_flag
+		where order_no = #{orderNo}  and is_delete = 0 and ((has_illegal = 2 and has_illegal_cost =1) || (has_illegal = 3 and has_illegal_cost =0))
+	</select>
+
+	 <update id="updateRenterOrderWzSettleFlag" parameterType="com.atzuche.violation.entity.RenterOrderWzSettleFlagEntity">
+		update renter_order_wz_settle_flag set
+		<if test="orderNo != null">
+			order_no = #{orderNo},
+		</if>
+		<if test="carPlateNum != null">
+			car_plate_num = #{carPlateNum},
+		</if>
+		<if test="hasIllegal != null">
+			has_illegal = #{hasIllegal},
+		</if>
+		<if test="hasIllegalCost != null">
+			has_illegal_cost = #{hasIllegalCost},
+		</if>
+		<if test="settleFlag != null">
+			settle_flag = #{settleFlag},
+		</if>
+		<if test="settleTime != null">
+			settle_time = #{settleTime},
+		</if>
+		<if test="createOp != null">
+			create_op = #{createOp},
+		</if>
+		<if test="createTime != null">
+			create_time = #{createTime},
+		</if>
+		<if test="updateOp != null">
+			update_op = #{updateOp},
+		</if>
+		<if test="isDelete != null">
+			is_delete = #{isDelete},
+		</if>
+		update_time = NOW()
+		where id = #{id} and is_delete = 0
+	</update>
+
+	 <update id="deleteRenterOrderWzSettleFlagById" parameterType="java.lang.Long">
+		update renter_order_wz_settle_flag set
+		is_delete = 1,
+		update_time = NOW()
+		where id = #{id} and is_delete = 0
+	</update>
+
+	<update id="updateIsIllegal">
+        update renter_order_wz_settle_flag
+        set has_illegal = #{hasIllegal},
+            update_op = #{updateOp}
+        where order_no = #{orderNo}
+		and car_plate_num = #{carNum} and is_delete = 0
+    </update>
+
+	<select id="countByOrderNoAndCarNum" resultType="java.lang.Integer">
+        select count(*) from renter_order_wz_settle_flag where order_no=#{orderNo} and car_plate_num = #{carNum} and is_delete = 0
+    </select>
+
+	<select id="getIllegalSettleFlag" resultType="java.lang.Integer">
+        select settle_flag from renter_order_wz_settle_flag where order_no=#{orderNo} and car_plate_num = #{carNum} and is_delete = 0
+    </select>
+
+	<update id="updateIsIllegalCost">
+        update renter_order_wz_settle_flag
+        set has_illegal_cost = #{hasIllegalCost},
+        	update_op = #{updateOp}
+        where order_no = #{orderNo}
+        and car_plate_num = #{carNum} and is_delete = 0
+    </update>
+
+	<update id="updateSettleFlag">
+        update renter_order_wz_settle_flag
+        set settle_flag = #{settleFlag},
+			settle_time = NOW(),
+			update_op = #{updateOp}
+        where order_no = #{orderNo} and is_delete = 0
+    </update>
+
+</mapper>
