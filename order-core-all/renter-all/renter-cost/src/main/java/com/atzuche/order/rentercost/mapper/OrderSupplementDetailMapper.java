@@ -35,4 +35,8 @@ public interface OrderSupplementDetailMapper{
     
     Integer updateDeleteById(@Param("id") Integer id);
 
+	List<OrderSupplementDetailEntity> listOrderSupplementDetailByMemNo(String memNo);
+	
+	List<OrderSupplementDetailEntity> listOrderSupplementDetailByMemNoAndOrderNos(@Param("memNo") String memNo, @Param("orderNoList") List<String> orderNoList);
+	
 }

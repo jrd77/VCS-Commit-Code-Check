@@ -26,7 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author jing.huang
- * 	多个订单 支付的情况 (补付入口)
+ * 	多个订单 支付的情况 (补付入口)    暂不处理。目前需求按单个订单来补付。
  */
 @RestController
 @RequestMapping("cashier/batch")

@@ -1,9 +1,7 @@
 package com.atzuche.order.cashieraccount.service;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 import org.springframework.beans.BeanUtils;
@@ -28,6 +26,8 @@ import com.atzuche.order.cashieraccount.service.notservice.AccountVirtualPayServ
 import com.atzuche.order.cashieraccount.service.notservice.CashierNoTService;
 import com.atzuche.order.cashieraccount.service.notservice.CashierRefundApplyNoTService;
 import com.atzuche.order.cashieraccount.service.remote.RefundRemoteService;
+import com.atzuche.order.cashieraccount.vo.req.pay.OfflineNotifyDataVO;
+import com.atzuche.order.cashieraccount.vo.req.pay.OfflinePayDTO;
 import com.atzuche.order.cashieraccount.vo.req.pay.OrderPayReqVO;
 import com.atzuche.order.cashieraccount.vo.req.pay.OrderPaySignReqVO;
 import com.atzuche.order.cashieraccount.vo.req.pay.VirtualNotifyDataVO;
@@ -36,7 +36,6 @@ import com.atzuche.order.cashieraccount.vo.res.AccountPayAbleResVO;
 import com.atzuche.order.cashieraccount.vo.res.OrderPayableAmountResVO;
 import com.atzuche.order.cashieraccount.vo.res.pay.OrderPayCallBackSuccessVO;
 import com.atzuche.order.commons.DateUtils;
-import com.atzuche.order.commons.LocalDateTimeUtils;
 import com.atzuche.order.commons.enums.OrderPayStatusEnum;
 import com.atzuche.order.commons.enums.OrderStatusEnum;
 import com.atzuche.order.commons.enums.YesNoEnum;
@@ -63,20 +62,6 @@ import com.autoyol.commons.utils.GsonUtils;
 import com.autoyol.commons.web.ErrorCode;
 
 import lombok.extern.slf4j.Slf4j;
-import ch.qos.logback.classic.Logger;
-import com.autoyol.platformcost.LocalDateTimeUtil;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.Assert;
-import org.springframework.util.CollectionUtils;
-
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
 
 
 /**
@@ -507,7 +492,7 @@ public class CashierPayService{
         
         //支付欠款 
         if(orderPayReqVO.getPayKind().contains(DataPayKindConstant.DEBT)){  //修改订单的补付
-            List<PayableVO> payableVOs = renterOrderCostCombineService.listPayableDebtPayVO(orderPayReqVO.getOrderNo(),renterOrderEntity.getRenterOrderNo(),orderPayReqVO.getMenNo());
+            List<PayableVO> payableVOs = renterOrderCostCombineService.listPayableDebtPayVO(orderPayReqVO.getOrderNo(),orderPayReqVO.getMenNo());
             result.setPayableVOs(payableVOs);
             //应付租车费用（已经求和）
             rentIncrementDebtAmt = cashierNoTService.sumRentOrderCost(payableVOs);

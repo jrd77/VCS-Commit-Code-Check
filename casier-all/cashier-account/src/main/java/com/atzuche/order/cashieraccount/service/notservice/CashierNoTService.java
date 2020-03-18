@@ -61,6 +61,7 @@ import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -103,7 +104,27 @@ public class CashierNoTService {
         }
         return renterOrderEntity;
     }
-
+    
+    /**
+     * 根据会员号查询，to补付列表
+     * @param orderNo
+     * @return
+     */
+    public List<RenterOrderEntity> getRenterOrderNoByMemNo(String memNo){
+        List<RenterOrderEntity> listRenterOrderEntity =  renterOrderService.getRenterOrderByMemNoAndWaitPay(memNo);
+        if(CollectionUtils.isEmpty(listRenterOrderEntity)){
+           return new ArrayList<RenterOrderEntity>();
+        }
+        return listRenterOrderEntity;
+    }
+    
+    public List<RenterOrderEntity> getRenterOrderNoByMemNoAndOrderNos(String memNo,List<String> orderNoList){
+        List<RenterOrderEntity> listRenterOrderEntity =  renterOrderService.getRenterOrderByMemNoOrderNosAndWaitPay(memNo,orderNoList);
+        if(CollectionUtils.isEmpty(listRenterOrderEntity)){
+           return new ArrayList<RenterOrderEntity>();
+        }
+        return listRenterOrderEntity;
+    }
 
 
     /**

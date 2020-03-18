@@ -596,6 +596,7 @@ public class RenterOrderCostCombineService {
 		if (supplementList != null && !supplementList.isEmpty()) {
 			//支付状态:0.无需支付 1.未支付 2.已取消 3.已支付 4.支付中，5.支付失败 10.租车押金结算抵扣  20.违章押金结算抵扣
 			//op_status  操作状态:0,待提交 1,已生效 2,已失效 3,已撤回
+			//该条件SQL中已经包含。
 			List<PayableVO> suppList = supplementList.stream().filter(x -> x.getOpStatus().intValue() == 1 && (x.getPayFlag().intValue() == 1 || x.getPayFlag().intValue() == 4 || x.getPayFlag().intValue() == 5))
 					.map(supplement -> {
 				PayableVO payableVO = new PayableVO();
@@ -612,7 +613,7 @@ public class RenterOrderCostCombineService {
 	}
 	
 	
-	public List<PayableVO> listPayableDebtPayVO(String orderNo, String renterOrderNo, String memNo) {
+	public List<PayableVO> listPayableDebtPayVO(String orderNo, String memNo) {  //String renterOrderNo,
 		List<PayableVO> payableList = new ArrayList<PayableVO>();
 		
 		//支付欠款
@@ -632,6 +633,58 @@ public class RenterOrderCostCombineService {
 		}
 		return payableList;
 	}
+	
+	/**
+	 * 根据会员号查询。
+	 * @param memNo
+	 * @return
+	 */
+	public List<PayableVO> listPayableDebtPayVOByMemNo(String memNo) {  //String renterOrderNo,
+		List<PayableVO> payableList = new ArrayList<PayableVO>();
+		
+		//支付欠款
+		List<AccountDebtDetailEntity> accountDebtDetailAlls =  accountDebtDetailNoTService.getDebtListByMemNo(memNo);
+		
+		handleAccountDebtDetailAlls(payableList, accountDebtDetailAlls);
+		return payableList;
+	}
+	
+	/**
+	 * 根据会员号和订单号列表查询。
+	 * @param memNo
+	 * @param orderNoList
+	 * @return
+	 */
+	public List<PayableVO> listPayableDebtPayVOByMemNoAndOrderNos(String memNo,List<String> orderNoList) {  //String renterOrderNo,
+		List<PayableVO> payableList = new ArrayList<PayableVO>();
+		
+		//支付欠款
+		List<AccountDebtDetailEntity> accountDebtDetailAlls =  accountDebtDetailNoTService.getDebtListByMemNoAndOrderNos(memNo,orderNoList);
+		
+		handleAccountDebtDetailAlls(payableList, accountDebtDetailAlls);
+		return payableList;
+	}
+	
+	/**
+	 * 公共方法，数据封装。
+	 * @param payableList
+	 * @param accountDebtDetailAlls
+	 */
+	private void handleAccountDebtDetailAlls(List<PayableVO> payableList, List<AccountDebtDetailEntity> accountDebtDetailAlls) {
+		if (accountDebtDetailAlls != null && !accountDebtDetailAlls.isEmpty()) {
+			List<PayableVO> suppList = accountDebtDetailAlls.stream().map(debt -> {
+				PayableVO payableVO = new PayableVO();
+				payableVO.setAmt(debt.getCurrentDebtAmt());
+				payableVO.setOrderNo(debt.getOrderNo());
+				payableVO.setTitle(debt.getSourceDetail());
+				payableVO.setType(2);
+				payableVO.setUniqueNo(String.valueOf(debt.getId()));
+				return payableVO;
+			}).collect(Collectors.toList());
+			payableList.addAll(suppList);
+		}
+	}
+	
 	
 	/**
 	 * 获取租客应付(正常订单流转)  含全局的费用。

@@ -142,7 +142,7 @@ public class CashierBatchPayService {
 	        }
 	        
 	        //-----------------------------------------------------------------------------------
-	        if(orderPayReqVO.getPayKind().contains(DataPayKindConstant.RENT_AMOUNT_AFTER)){  //修改订单的补付
+	        if(orderPayReqVO.getPayKind().contains(DataPayKindConstant.RENT_AMOUNT_AFTER)){  //管理后台修改订单的补付
 	            List<PayableVO> payableVOs = renterOrderCostCombineService.listPayableGlobalVO(orderNo,renterOrderEntity.getRenterOrderNo(),orderPayReqVO.getMenNo());
 	            result.setPayableVOs(payableVOs);
 	            //应付租车费用（已经求和）
@@ -150,7 +150,7 @@ public class CashierBatchPayService {
 	            
 	            //已付租车费用(shifu  租车费用的实付)
 	            rentAmtPayed = accountRenterCostSettleService.getCostPaidRent(orderNo,orderPayReqVO.getMenNo());
-	            if(!CollectionUtils.isEmpty(payableVOs) && rentAmt+rentAmtPayed < 0){   // 
+	            if(!CollectionUtils.isEmpty(payableVOs) && rentAmtAfter+rentAmtPayed < 0){   // 
 	                for(int i=0;i<payableVOs.size();i++){
 	                    PayableVO payableVO = payableVOs.get(i);
 	                    //判断是租车费用、还是补付 租车费用 并记录 详情
@@ -162,7 +162,7 @@ public class CashierBatchPayService {
 	        }
 	        
 	        //管理后台补付，等于管理后台的补付   08
-	        if(orderPayReqVO.getPayKind().contains(DataPayKindConstant.RENT_INCREMENT_CONSOLE)){  //修改订单的补付
+	        if(orderPayReqVO.getPayKind().contains(DataPayKindConstant.RENT_INCREMENT_CONSOLE)){  //修改订单的补付supplement
 	        	List<PayableVO> payableVOs = renterOrderCostCombineService.listPayableSupplementVO(orderNo,renterOrderEntity.getRenterOrderNo(),orderPayReqVO.getMenNo());
 	            result.setPayableVOs(payableVOs);
 	            //应付租车费用,保存为负数
@@ -183,7 +183,7 @@ public class CashierBatchPayService {
 	        
 	        //支付欠款 
 	        if(orderPayReqVO.getPayKind().contains(DataPayKindConstant.DEBT)){  //修改订单的补付
-	            List<PayableVO> payableVOs = renterOrderCostCombineService.listPayableDebtPayVO(orderNo,renterOrderEntity.getRenterOrderNo(),orderPayReqVO.getMenNo());
+	            List<PayableVO> payableVOs = renterOrderCostCombineService.listPayableDebtPayVO(orderNo,orderPayReqVO.getMenNo());
 	            result.setPayableVOs(payableVOs);
 	            //应付租车费用（已经求和）
 	            rentIncrementDebtAmt = cashierNoTService.sumRentOrderCost(payableVOs);

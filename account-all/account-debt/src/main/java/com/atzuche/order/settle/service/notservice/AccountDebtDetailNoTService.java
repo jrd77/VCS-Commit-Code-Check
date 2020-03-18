@@ -44,6 +44,15 @@ public class AccountDebtDetailNoTService {
         return result;
     }
     
+    public List<AccountDebtDetailEntity> getDebtListByMemNoAndOrderNos(String memNo,List<String> orderNoList){
+        List<AccountDebtDetailEntity> result = accountDebtDetailMapper.getDebtListByMemNoAndOrderNos(memNo,orderNoList);
+        if(CollectionUtils.isEmpty(result)){
+           return Collections.emptyList();
+        }
+        return result;
+    }
+    
+    
     public List<AccountDebtDetailEntity> getDebtListByOrderNoMemNo(String orderNo,String memNo){
         List<AccountDebtDetailEntity> result = accountDebtDetailMapper.getDebtListByOrderNo(orderNo,memNo);
         if(CollectionUtils.isEmpty(result)){
