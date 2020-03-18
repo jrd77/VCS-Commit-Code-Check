@@ -1,6 +1,7 @@
 package com.atzuche.order.settle.service;
 
 import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.atzuche.order.commons.CatConstants;
@@ -18,6 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class RemoteOldSysDebtService {
 	
+	@Autowired
 	private DebtFeignService debtFeignService;
 
 	/**
