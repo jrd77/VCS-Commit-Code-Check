@@ -66,7 +66,8 @@ public class DebtService {
                 logger.info("deduct oldDebt amt=[{}],memNo=[{}]",amt,memNo);
                 deductOldDebt(memNo,amt);
             } else {
-                logger.info("deduct newDebt amt=[{}],memNo=[{}]",amt-oldDebt,memNo);
+                logger.info("deduct newDebt amt=[{}],oldDebt=[{}],memNo=[{}]",amt-oldDebt,oldDebt,memNo);
+                deductOldDebt(memNo,oldDebt);
                 deductNewDebt(memNo,amt-oldDebt);
             }
         }else{//无老欠款
