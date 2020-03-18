@@ -28,6 +28,8 @@ public  class RenterFineVO{
     @AutoDocProperty(value = "取还车违约金")
     private Integer getReturnCarFine;
 
+
+
     private Integer totalFine;
 
     public Integer getTotalFine(){

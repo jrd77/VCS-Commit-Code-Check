@@ -85,6 +85,8 @@ public class RenterCostFacadeService {
     private AccountRenterWzDepositNoTService accountRenterWzDepositNoTService;
     @Autowired
     private OrderStatusService orderStatusService;
+    @Autowired
+    private OrderConsoleCostDetailService orderConsoleCostDetailService;
 
     private final static Logger logger = LoggerFactory.getLogger(RenterCostFacadeService.class);
 
@@ -184,7 +186,7 @@ public class RenterCostFacadeService {
         detail.setAutoCoinSubsidyAmt(-OrderSubsidyDetailUtils.getRenterAutoCoinSubsidyAmt(renterOrderSubsidyDetailEntityList));
         detail.setGetCarCouponSubsidyAmt(-OrderSubsidyDetailUtils.getRenterGetCarFeeSubsidyAmt(renterOrderSubsidyDetailEntityList));
         detail.setLimitTimeSubsidyAmt(-OrderSubsidyDetailUtils.getRenterRealLimitDeductSubsidyAmt(renterOrderSubsidyDetailEntityList));
-        detail.setUpdateSubsidyAmt(-OrderSubsidyDetailUtils.getRenterUpateSubsidyAmt(renterOrderSubsidyDetailEntityList) + OrderSubsidyDetailUtils.getConsoleRenterUpateSubsidyAmt(consoleSubsidyDetailEntityList));
+        detail.setUpdateSubsidyAmt(-(OrderSubsidyDetailUtils.getRenterUpateSubsidyAmt(renterOrderSubsidyDetailEntityList) + OrderSubsidyDetailUtils.getConsoleRenterUpateSubsidyAmt(consoleSubsidyDetailEntityList)));
 
         detail.setRenter2OwnerSubsidyAmt(-(OrderSubsidyDetailUtils.getRenterSubsidyAmt(renterOrderSubsidyDetailEntityList, RenterCashCodeEnum.SUBSIDY_RENTERTOOWNER_ADJUST)+
                 OrderSubsidyDetailUtils.getConsoleSubsidyAmt(consoleSubsidyDetailEntityList, SubsidySourceCodeEnum.OWNER,RenterCashCodeEnum.SUBSIDY_RENTERTOOWNER_ADJUST)));
@@ -213,8 +215,9 @@ public class RenterCostFacadeService {
                 OrderSubsidyDetailUtils.getConsoleSubsidyAmt(consoleSubsidyDetailEntityList, SubsidySourceCodeEnum.RENTER,RenterCashCodeEnum.SUBSIDY_GETRETURNDELAY)));
         detail.setTrafficSubsidyAmt(-(OrderSubsidyDetailUtils.getRenterSubsidyAmt(renterOrderSubsidyDetailEntityList, RenterCashCodeEnum.SUBSIDY_TRAFFIC)+
                 OrderSubsidyDetailUtils.getConsoleSubsidyAmt(consoleSubsidyDetailEntityList, SubsidySourceCodeEnum.RENTER,RenterCashCodeEnum.SUBSIDY_TRAFFIC)));
-        detail.setRenter2PlatformAmt(OrderSubsidyDetailUtils.getRenterSubsidyByCode(renterOrderSubsidyDetailEntityList,SubsidySourceCodeEnum.RENTER,SubsidySourceCodeEnum.PLATFORM)+
-                OrderSubsidyDetailUtils.getConsoleRenterSubsidyByCode(consoleSubsidyDetailEntityList,SubsidySourceCodeEnum.RENTER,SubsidySourceCodeEnum.PLATFORM));
+
+        List<OrderConsoleCostDetailEntity> orderConsoleCostDetailEntityList = orderConsoleCostDetailService.selectByOrderNoAndMemNo(orderNo, memNo);
+        detail.setRenter2PlatformAmt(OrderSubsidyDetailUtils.getOrderConsoleCostDetail(orderConsoleCostDetailEntityList,SubsidySourceCodeEnum.RENTER,SubsidySourceCodeEnum.PLATFORM));
 
         return detail;
     }
@@ -286,7 +289,7 @@ public class RenterCostFacadeService {
         baseCostDTO.extraMileageFee = abs(extraMileageFee);
         baseCostDTO.oilFee = abs(oilFee);
         baseCostDTO.payToPlatFormFee = abs(renterSubsidyDetail.getRenter2PlatformAmt());
-        baseCostDTO.renterOWnerAdjustmentFee = abs(renterSubsidyDetail.getRenter2OwnerSubsidyAmt() + renterSubsidyDetail.getOwner2RenterSubsidyAmt());
+        baseCostDTO.renterOWnerAdjustmentFee = renterSubsidyDetail.getRenter2OwnerSubsidyAmt() + renterSubsidyDetail.getOwner2RenterSubsidyAmt();
         rentCarCostDTO.baseCostDTO = baseCostDTO;
         //1.2、优惠券抵扣
         CouponDeductionDTO couponDeductionDTO = new CouponDeductionDTO();
