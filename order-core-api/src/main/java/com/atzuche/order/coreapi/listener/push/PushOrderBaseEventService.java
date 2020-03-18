@@ -40,6 +40,8 @@ public class PushOrderBaseEventService extends OrderBaseEventService {
         Map pushParamsMap = Maps.newHashMap();
         pushParamsMap.put("event", textCode);
         pushParamsMap.put("memNo", shortMessageSendService.getFieldValueByFieldName("memNo", memberDTO));
+        pushParamsMap.put("picture", shortMessageSendService.getFieldValueByFieldName("carImageUrl", goodsDetailDTO));
+        log.info("车辆图片地址---->picture:[{}]",shortMessageSendService.getFieldValueByFieldName("carImageUrl", goodsDetailDTO));
         pushParamsMap.put("messageType", MessageTypeEnum.ORDER_MESSAGE.getMessageType());
         List<String> smsFieldNames = shortMessageSendService.getSMSTemplateFeild(renterTextCode);
         if (CollectionUtils.isEmpty(smsFieldNames)) {

@@ -13,6 +13,7 @@ import com.atzuche.order.commons.entity.orderDetailDto.OrderDetailReqDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.OrderDetailRespDTO;
 import com.atzuche.order.commons.exceptions.RemoteCallException;
 import com.atzuche.order.commons.vo.req.*;
+import com.atzuche.order.commons.vo.res.AdminOrderJudgeDutyResVO;
 import com.atzuche.order.commons.vo.res.NormalOrderCostCalculateResVO;
 import com.atzuche.order.commons.vo.res.order.*;
 import com.atzuche.order.open.service.FeignOrderCostService;
@@ -467,6 +468,33 @@ public class AdminOrderService {
         }catch (Exception e){
             log.error("Feign 责任判定异常,responseObject={},adminOrderCancelJudgeDutyReqVO={}",JSON.toJSONString(responseObject),JSON.toJSONString(adminOrderCancelJudgeDutyReqVO),e);
             Cat.logError("Feign 责任判定异常",e);
+            t.setStatus(e);
+            throw e;
+        }finally {
+            t.complete();
+        }
+        return responseObject;
+    }
+
+
+    public ResponseData<AdminOrderJudgeDutyResVO> cancelOrderJudgeDutyList(String orderNo) {
+        AdminOrderJudgeDutyReqVO adminOrderJudgeDutyReqVO = new AdminOrderJudgeDutyReqVO();
+        adminOrderJudgeDutyReqVO.setOrderNo(orderNo);
+
+        ResponseData<AdminOrderJudgeDutyResVO> responseObject = null;
+        Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "订单中心服务");
+        try{
+            Cat.logEvent(CatConstants.FEIGN_METHOD,"feignOrderUpdateService.adminOrderJudgeDutyList");
+            log.info("Feign 开始获取责任判定列表,adminOrderJudgeDutyReqVO={}", JSON.toJSONString(adminOrderJudgeDutyReqVO));
+            Cat.logEvent(CatConstants.FEIGN_PARAM,JSON.toJSONString(adminOrderJudgeDutyReqVO));
+            responseObject = feignOrderUpdateService.adminOrderJudgeDutyList(adminOrderJudgeDutyReqVO);
+            log.info("Feign 返回责任判定列表,responseObject:[{}]", JSON.toJSONString(responseObject));
+            Cat.logEvent(CatConstants.FEIGN_RESULT,JSON.toJSONString(responseObject));
+            checkResponse(responseObject);
+            t.setStatus(Transaction.SUCCESS);
+        }catch (Exception e){
+            log.error("Feign 获取责任判定列表异常,responseObject={},adminOrderJudgeDutyReqVO={}",JSON.toJSONString(responseObject),JSON.toJSONString(adminOrderJudgeDutyReqVO),e);
+            Cat.logError("Feign 获取责任判定列表异常",e);
             t.setStatus(e);
             throw e;
         }finally {

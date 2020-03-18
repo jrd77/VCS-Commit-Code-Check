@@ -23,14 +23,16 @@ public  class RenterFineVO{
     private Integer delayFine;
     @AutoDocProperty(value = "租客提前还车罚金")
     private Integer renterAdvanceReturnFine;
-    @AutoDocProperty(value = "租客延迟还车罚金")
-    private Integer renterDelayReturnFine;
+   //@AutoDocProperty(value = "租客延迟还车罚金")
+    //private Integer renterDelayReturnFine;
     @AutoDocProperty(value = "取还车违约金")
     private Integer getReturnCarFine;
+
+
 
     private Integer totalFine;
 
     public Integer getTotalFine(){
-        return modifyGetFine+modifyReturnFine+modifyAdvanceFine+cancelFine+delayFine+renterAdvanceReturnFine+renterDelayReturnFine+getReturnCarFine;
+        return modifyGetFine+modifyReturnFine+modifyAdvanceFine+cancelFine+delayFine+renterAdvanceReturnFine+/*renterDelayReturnFine+*/getReturnCarFine;
     }
 }

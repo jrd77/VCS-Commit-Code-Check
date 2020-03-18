@@ -49,7 +49,7 @@ public class AccountOwnerCashExamine {
     
     @AutoDocProperty(value="处理时间")
     private String updateTimeStr;
-    
+
     private Integer importFlag;
 
     private Integer resCode;
@@ -77,21 +77,21 @@ public class AccountOwnerCashExamine {
     private Integer handshakePullFlag;
 
     private Integer handshakeCheckFlag;
-    
+
     private LocalDateTime createTime;
-    
+
     private LocalDateTime updateTime;
-    
+
     private String createOp;
 
     private String updateOp;
 
     private Byte isDelete;
-    
+
     private Integer secondCleanFlag;
-    
+
     private Integer balanceFlag;
-    
+
     private String requestBatchCode;
 
     public Integer getId() {

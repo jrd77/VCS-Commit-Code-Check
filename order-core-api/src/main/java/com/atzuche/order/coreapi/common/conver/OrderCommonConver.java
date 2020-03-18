@@ -22,6 +22,7 @@ import com.atzuche.order.renterorder.entity.dto.RenterOrderCostRespDTO;
 import com.atzuche.order.renterorder.vo.RenterOrderCarDepositResVO;
 import com.atzuche.order.renterorder.vo.RenterOrderIllegalResVO;
 import com.atzuche.order.renterorder.vo.RenterOrderReqVO;
+import com.atzuche.order.settle.vo.req.CancelOrderReqDTO;
 import com.autoyol.platformcost.CommonUtils;
 
 import org.apache.commons.lang3.StringUtils;
@@ -130,10 +131,10 @@ public class OrderCommonConver {
 
         List<CostItemVO> costItemList = new ArrayList<>();
         renterOrderCostRespDTO.getRenterOrderCostDetailDTOList().forEach(cost -> {
-        	if (RenterCashCodeEnum.INSURE_TOTAL_PRICES.getCashNo().equals(cost.getCostCode()) || 
-        			RenterCashCodeEnum.ABATEMENT_INSURE.getCashNo().equals(cost.getCostCode())) {
-        		return;
-        	}
+            if (RenterCashCodeEnum.INSURE_TOTAL_PRICES.getCashNo().equals(cost.getCostCode()) ||
+                    RenterCashCodeEnum.ABATEMENT_INSURE.getCashNo().equals(cost.getCostCode())) {
+                return;
+            }
             CostItemVO vo = new CostItemVO();
             vo.setCostCode(cost.getCostCode());
             vo.setCostDesc(cost.getCostDesc());
@@ -152,88 +153,90 @@ public class OrderCommonConver {
         });
 
         // 获取保险和不计免赔的折扣
- 		double insureDiscount = CommonUtils.getInsureDiscount(renterOrderReqVO.getRentTime(), renterOrderReqVO.getRevertTime());
+        double insureDiscount = CommonUtils.getInsureDiscount(renterOrderReqVO.getRentTime(), renterOrderReqVO.getRevertTime());
         // 平台保障费用项
- 		costItemList.add(getInsurCostItemVO(renterOrderCostRespDTO, insureDiscount));
- 		// 全面保障费用项
- 		costItemList.add(getAbatementCostItemVO(renterOrderCostRespDTO, insureDiscount));
+        costItemList.add(getInsurCostItemVO(renterOrderCostRespDTO, insureDiscount));
+        // 全面保障费用项
+        costItemList.add(getAbatementCostItemVO(renterOrderCostRespDTO, insureDiscount));
         logger.info("Build costItem list.result is,costItemList:[{}]", JSON.toJSONString(costItemList));
         return costItemList;
     }
-    
-    
+
+
     /**
      * 获取平台保障费费用项
+     *
      * @param renterOrderCostRespDTO
      * @param insureDiscount
      * @return
      */
     private CostItemVO getInsurCostItemVO(RenterOrderCostRespDTO renterOrderCostRespDTO, Double insureDiscount) {
-    	if (renterOrderCostRespDTO == null) {
-    		return null;
-    	}
-    	List<RenterOrderCostDetailEntity> costDetailList = renterOrderCostRespDTO.getRenterOrderCostDetailDTOList();
-    	if (costDetailList == null || costDetailList.isEmpty()) {
-    		return null;
-    	}
-    	int unitPrice = 0;
-    	double count = 0.0;
-    	for (RenterOrderCostDetailEntity cost:costDetailList) {
-    		if (RenterCashCodeEnum.INSURE_TOTAL_PRICES.getCashNo().equals(cost.getCostCode())) {
-    			unitPrice = cost.getUnitPrice();
-    			count = cost.getCount();
-    			break;
-    		}
-    	}
-    	Integer basicEnsureAmount = renterOrderCostRespDTO.getBasicEnsureAmount();
-    	CostItemVO vo = new CostItemVO();
-    	vo.setCostCode(RenterCashCodeEnum.INSURE_TOTAL_PRICES.getCashNo());
-    	vo.setCostDesc(RenterCashCodeEnum.INSURE_TOTAL_PRICES.getTxt());
-    	vo.setCount(count);
-    	vo.setTotalAmount(basicEnsureAmount);
-    	vo.setUnitPrice(unitPrice);
-    	vo.setDiscount(insureDiscount);
-    	return vo;
+        if (renterOrderCostRespDTO == null) {
+            return null;
+        }
+        List<RenterOrderCostDetailEntity> costDetailList = renterOrderCostRespDTO.getRenterOrderCostDetailDTOList();
+        if (costDetailList == null || costDetailList.isEmpty()) {
+            return null;
+        }
+        int unitPrice = 0;
+        double count = 0.0;
+        for (RenterOrderCostDetailEntity cost : costDetailList) {
+            if (RenterCashCodeEnum.INSURE_TOTAL_PRICES.getCashNo().equals(cost.getCostCode())) {
+                unitPrice = cost.getUnitPrice();
+                count = cost.getCount();
+                break;
+            }
+        }
+        Integer basicEnsureAmount = renterOrderCostRespDTO.getBasicEnsureAmount();
+        CostItemVO vo = new CostItemVO();
+        vo.setCostCode(RenterCashCodeEnum.INSURE_TOTAL_PRICES.getCashNo());
+        vo.setCostDesc(RenterCashCodeEnum.INSURE_TOTAL_PRICES.getTxt());
+        vo.setCount(count);
+        vo.setTotalAmount(basicEnsureAmount);
+        vo.setUnitPrice(unitPrice);
+        vo.setDiscount(insureDiscount);
+        return vo;
     }
-    
-    
+
+
     /**
      * 获取全面保障费费用项
+     *
      * @param renterOrderCostRespDTO
      * @param insureDiscount
      * @return
      */
     private CostItemVO getAbatementCostItemVO(RenterOrderCostRespDTO renterOrderCostRespDTO, Double insureDiscount) {
-    	if (renterOrderCostRespDTO == null) {
-    		return null;
-    	}
-    	List<RenterOrderCostDetailEntity> costDetailList = renterOrderCostRespDTO.getRenterOrderCostDetailDTOList();
-    	if (costDetailList == null || costDetailList.isEmpty()) {
-    		return null;
-    	}
-    	int unitPrice = 0;
-    	double count = 0.0;
-    	int totalCost = 0;
-    	for (RenterOrderCostDetailEntity cost:costDetailList) {
-    		if (RenterCashCodeEnum.ABATEMENT_INSURE.getCashNo().equals(cost.getCostCode())) {
-    			count += cost.getCount();
-    			totalCost += cost.getTotalAmount();
-    		}
-    	}
-    	if (totalCost != 0 && count != 0.0) {
-    		unitPrice = (int) Math.ceil(Math.abs(totalCost)/count);
-    	}
-    	Integer comprehensiveEnsureAmount = renterOrderCostRespDTO.getComprehensiveEnsureAmount();
-    	CostItemVO vo = new CostItemVO();
-    	vo.setCostCode(RenterCashCodeEnum.ABATEMENT_INSURE.getCashNo());
-    	vo.setCostDesc(RenterCashCodeEnum.ABATEMENT_INSURE.getTxt());
-    	vo.setCount(count);
-    	vo.setTotalAmount(comprehensiveEnsureAmount);
-    	vo.setUnitPrice(unitPrice);
-    	vo.setDiscount(insureDiscount);
-    	return vo;
+        if (renterOrderCostRespDTO == null) {
+            return null;
+        }
+        List<RenterOrderCostDetailEntity> costDetailList = renterOrderCostRespDTO.getRenterOrderCostDetailDTOList();
+        if (costDetailList == null || costDetailList.isEmpty()) {
+            return null;
+        }
+        int unitPrice = 0;
+        double count = 0.0;
+        int totalCost = 0;
+        for (RenterOrderCostDetailEntity cost : costDetailList) {
+            if (RenterCashCodeEnum.ABATEMENT_INSURE.getCashNo().equals(cost.getCostCode())) {
+                count += cost.getCount();
+                totalCost += cost.getTotalAmount();
+            }
+        }
+        if (totalCost != 0 && count != 0.0) {
+            unitPrice = (int) Math.ceil(Math.abs(totalCost) / count);
+        }
+        Integer comprehensiveEnsureAmount = renterOrderCostRespDTO.getComprehensiveEnsureAmount();
+        CostItemVO vo = new CostItemVO();
+        vo.setCostCode(RenterCashCodeEnum.ABATEMENT_INSURE.getCashNo());
+        vo.setCostDesc(RenterCashCodeEnum.ABATEMENT_INSURE.getTxt());
+        vo.setCount(count);
+        vo.setTotalAmount(comprehensiveEnsureAmount);
+        vo.setUnitPrice(unitPrice);
+        vo.setDiscount(insureDiscount);
+        return vo;
     }
-    
+
 
     /**
      * 下单前费用计算--租车费用总计
@@ -351,5 +354,26 @@ public class OrderCommonConver {
         return cancelOrderDeliveryVO;
     }
 
+    /**
+     * 取消订单结算请求参数封装
+     *
+     * @param orderNo         订单号
+     * @param renterOrderNo   租客订单号
+     * @param ownerOrderNo    车主订单号
+     * @param settleOwnerFlg  车主订单结算标识
+     * @param settleRenterFlg 租客订单结算标识
+     * @return CancelOrderReqDTO
+     */
+    public CancelOrderReqDTO buildCancelOrderReqDTO(String orderNo, String renterOrderNo, String ownerOrderNo,
+                                                    Boolean settleOwnerFlg, Boolean settleRenterFlg) {
+
+        CancelOrderReqDTO reqDTO = new CancelOrderReqDTO();
+        reqDTO.setSettleRenterFlg(settleRenterFlg);
+        reqDTO.setSettleOwnerFlg(settleOwnerFlg);
+        reqDTO.setOrderNo(orderNo);
+        reqDTO.setRenterOrderNo(renterOrderNo);
+        reqDTO.setOwnerOrderNo(ownerOrderNo);
+        return reqDTO;
+    }
 
 }

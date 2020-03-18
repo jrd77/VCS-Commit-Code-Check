@@ -3,6 +3,7 @@ package com.atzuche.order.admin.util.oss;
 
 import com.aliyun.oss.OSSClient;
 import com.aliyun.oss.model.*;
+import com.atzuche.order.admin.util.SysConfig;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
@@ -29,8 +30,7 @@ import java.util.List;
 public class OSSUtils {
 	private static Logger logger = LoggerFactory.getLogger(OSSUtils.class);
 	
-	private static final String ACCESS_ID = "XakvqZLxRN1DR9Iy";
-	private static final String ACCESS_KEY = "6GNGlPXmKe3uKC1GQJs5avnRHuOeE2";
+
 	
     /** 普通bucket */
 	private static final String BUCKET = "at-images-test";
@@ -40,16 +40,12 @@ public class OSSUtils {
 	private static final String BUCKET_CAR_AUTH = "veri-images-car-test";
 	
     //OSS cilent
-    private static final OSSClient client = new OSSClient("http://oss-cn-hangzhou.aliyuncs.com", ACCESS_ID, ACCESS_KEY);
+	private static final OSSClient client = new OSSClient(SysConfig.ossEndpoint, SysConfig.ossAccessId, SysConfig.ossAccessKey);
     
 	private static MessageDigest MD5 = null;
 	
 	//----------------------------------------------------------------------------------------------------
-	
-	public static final String BUCKET_URL = "https://" + BUCKET + "." + "oss-cn-hangzhou.aliyuncs.com" + "/";
-	public static final String BUCKET_AUTH_URL = "http://" + BUCKET_AUTH + "." + "oss-cn-hangzhou.aliyuncs.com" + "/";
-	public static final String BUCKET_AUTH_CAR_URL = "http://" + BUCKET_CAR_AUTH + "." + "oss-cn-hangzhou.aliyuncs.com" + "/";
-	
+
 	
 	/** 车辆图片 （ car/YY/MM/"carNo"/"picName" ）  */
 	public static final String CAR_PIC_DIR = "car";

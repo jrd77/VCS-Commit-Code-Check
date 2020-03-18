@@ -1,5 +1,6 @@
 package com.atzuche.order.rentercost.utils;
 
+import com.atzuche.order.commons.enums.FineSubsidyCodeEnum;
 import com.atzuche.order.commons.enums.FineTypeEnum;
 import com.atzuche.order.commons.enums.SubsidySourceCodeEnum;
 import com.atzuche.order.rentercost.entity.ConsoleRenterOrderFineDeatailEntity;
@@ -92,9 +93,9 @@ public class FineDetailUtils {
      * @param entityList
      * @return
      */
-    public static int getRenterConsoleDelayReturnFineAmt(List<ConsoleRenterOrderFineDeatailEntity> entityList){
+   /* public static int getRenterConsoleDelayReturnFineAmt(List<ConsoleRenterOrderFineDeatailEntity> entityList){
         return getRenterConsoleFineAmt(entityList,FineTypeEnum.RENTER_DELAY_RETURN);
-    }
+    }*/
 
     /**
      * 获得取还车违约金罚金的总额
@@ -118,7 +119,7 @@ public class FineDetailUtils {
         int total =0;
         for(RenterOrderFineDeatailEntity entity:entityList){
             if(fineTypeEnum.getFineType().equals(entity.getFineType())&&entity.getFineAmount()!=null){
-                if(entity.getFineSubsidySourceCode().equals(SubsidySourceCodeEnum.RENTER.getCode())) {
+                if(entity.getFineSubsidySourceCode().equals(FineSubsidyCodeEnum.RENTER.getFineSubsidyCode())) {
                     total = total + entity.getFineAmount();
                 }
             }
@@ -187,9 +188,9 @@ public class FineDetailUtils {
      * @param entityList
      * @return
      */
-    public static int getRenterOrderDelayReturnFineAmt(List<RenterOrderFineDeatailEntity> entityList){
+   /* public static int getRenterOrderDelayReturnFineAmt(List<RenterOrderFineDeatailEntity> entityList){
         return getRenterOrderFineAmt(entityList,FineTypeEnum.RENTER_DELAY_RETURN);
-    }
+    }*/
 
     /**
      * 获得取还车违约金罚金的总额
@@ -199,5 +200,7 @@ public class FineDetailUtils {
     public static int getRenterOrderGetReturnCarFineAmt(List<RenterOrderFineDeatailEntity> entityList){
         return getRenterOrderFineAmt(entityList,FineTypeEnum.GET_RETURN_CAR);
     }
-
+    public static int getRenterOrderOwnerFineAmt(List<RenterOrderFineDeatailEntity> entityList){
+        return getRenterOrderFineAmt(entityList,FineTypeEnum.OWNER_FINE);
+    }
 }

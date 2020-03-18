@@ -97,4 +97,13 @@ public class RenterOrderChangeApplyService{
     public RenterOrderChangeApplyEntity getByOrderNoLimit(String orderNo){
         return renterOrderChangeApplyMapper.getByOrderNoLimit(orderNo);
     }
+    
+    /**
+     * 获取该订单的所有修改申请
+     * @param orderNo
+     * @return Integer
+     */
+    public Integer getRenterOrderChangeApplyAllCountByOrderNo(String orderNo) {
+    	return renterOrderChangeApplyMapper.getRenterOrderChangeApplyAllCountByOrderNo(orderNo);
+    }
 }

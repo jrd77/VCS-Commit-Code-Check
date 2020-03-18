@@ -78,6 +78,8 @@ public class RenterCancelOrderService {
                 renterOrderEntity.getRenterOrderNo(),ownerOrderEntity.getOwnerOrderNo(),
                 cancelOrderReqDTO.getCancelReason());
         orderCancelReasonEntity.setCancelReqTime(cancelReqTime);
+        orderCancelReasonEntity.setCreateOp(cancelOrderReqDTO.getOperatorName());
+        orderCancelReasonEntity.setAppealFlag(cancelOrderReqDTO.getAppealFlag());
         if(cancelOrderReqDTO.getConsoleInvoke() && !StringUtils.equals(OrderConstant.SYSTEM_OPERATOR_JOB,
                 cancelOrderReqDTO.getOperatorName())) {
             orderCancelReasonEntity.setCancelSource(CancelSourceEnum.INSTEAD_OF_RENTER.getCode());

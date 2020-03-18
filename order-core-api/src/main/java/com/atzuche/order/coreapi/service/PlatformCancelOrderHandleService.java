@@ -7,6 +7,7 @@ import com.atzuche.order.coreapi.entity.dto.CancelOrderResDTO;
 import com.atzuche.order.coreapi.service.remote.CarRentalTimeApiProxyService;
 import com.atzuche.order.coreapi.submitOrder.exception.CancelOrderCheckException;
 import com.atzuche.order.flow.service.OrderFlowService;
+import com.atzuche.order.ownercost.entity.OwnerOrderEntity;
 import com.atzuche.order.ownercost.service.OwnerOrderService;
 import com.atzuche.order.parentorder.dto.OrderStatusDTO;
 import com.atzuche.order.parentorder.entity.OrderCancelReasonEntity;
@@ -26,6 +27,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
 
 /**
  * 平台取消
@@ -76,6 +79,8 @@ public class PlatformCancelOrderHandleService {
                     && (OrderStatusEnum.CLOSED.getStatus() == orderStatusEntity.getStatus() || OrderStatusEnum.TO_SETTLE.getStatus() <= orderStatusEntity.getStatus())) {
                 throw new CancelOrderCheckException(ErrorCode.TRANS_CANCEL_DUPLICATE);
             }
+        } else {
+            throw new CancelOrderCheckException(ErrorCode.ORDER_NOT_EXIST);
         }
         //获取订单信息
         OrderEntity orderEntity = orderService.getOrderEntity(orderNo);
@@ -87,7 +92,8 @@ public class PlatformCancelOrderHandleService {
         //获取车主券信息
         OrderCouponEntity ownerCouponEntity = orderCouponService.getOwnerCouponByOrderNoAndRenterOrderNo(orderNo,
                 renterOrderEntity.getRenterOrderNo());
-
+        //获取车主订单信息
+        OwnerOrderEntity ownerOrderEntity = ownerOrderService.getOwnerOrderByOrderNoAndIsEffective(orderNo);
         //后台取消进调度判定逻辑
         boolean isDispatch =
                 carRentalTimeApiService.checkCarDispatch(carRentalTimeApiService.buildCarDispatchReqVO(orderEntity,
@@ -100,7 +106,6 @@ public class PlatformCancelOrderHandleService {
         cancelOrderResDTO.setIsDispatch(isDispatch);
         if(isDispatch) {
             //进调度
-
             //订单状态更新
             orderStatusDTO.setStatus(OrderStatusEnum.TO_DISPATCH.getStatus());
             orderStatusDTO.setIsDispatch(OrderConstant.YES);
@@ -123,8 +128,15 @@ public class PlatformCancelOrderHandleService {
         orderFlowService.inserOrderStatusChangeProcessInfo(orderNo, OrderStatusEnum.from(orderStatusDTO.getStatus()));
         ownerOrderService.updateChildStatusByOrderNo(orderNo, OwnerChildStatusEnum.END.getCode());
         //取消信息处理(order_cancel_reason)
-        orderCancelReasonService.addOrderCancelReasonRecord(buildOrderCancelReasonEntity(orderNo,
-                cancelReasonEnum.getCode()+":"+cancelReasonEnum.getName()));
+        OrderCancelReasonEntity orderCancelReasonEntity = buildOrderCancelReasonEntity(orderNo,
+                cancelReasonEnum.getCode()+":"+cancelReasonEnum.getName());
+        orderCancelReasonEntity.setCancelReqTime(LocalDateTime.now());
+        orderCancelReasonEntity.setAppealFlag(OrderConstant.NO);
+        orderCancelReasonEntity.setRenterOrderNo(renterOrderEntity.getRenterOrderNo());
+        orderCancelReasonEntity.setOwnerOrderNo(ownerOrderEntity.getOwnerOrderNo());
+        orderCancelReasonEntity.setCreateOp(operator);
+        orderCancelReasonEntity.setUpdateOp(operator);
+        orderCancelReasonService.addOrderCancelReasonRecord(orderCancelReasonEntity);
 
         cancelOrderResDTO.setCarNo(goodsDetail.getCarNo());
         cancelOrderResDTO.setRentCarPayStatus(orderStatusEntity.getRentCarPayStatus());

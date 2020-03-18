@@ -2,6 +2,7 @@ package com.atzuche.order.open.service;
 
 import com.atzuche.order.commons.entity.dto.RentCityAndRiskAccidentReqDTO;
 import com.atzuche.order.commons.vo.req.*;
+import com.atzuche.order.commons.vo.res.AdminOrderJudgeDutyResVO;
 import com.autoyol.commons.web.ResponseData;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -66,6 +67,17 @@ public interface FeignOrderUpdateService {
 
 
     /**
+     * 取消订单责任判定
+     * <p>管理后台调用，手动判责</p>
+     *
+     * @param judgeDutyReqVO 请求参数
+     * @return ResponseData<?>
+     */
+    @PostMapping("/order/admin/judgeDuty/list")
+    public ResponseData<AdminOrderJudgeDutyResVO> adminOrderJudgeDutyList(@RequestBody AdminOrderJudgeDutyReqVO judgeDutyReqVO);
+
+
+    /**
      * 车主同意订单
      *
      * @param reqVO 请求参数
@@ -92,6 +104,16 @@ public interface FeignOrderUpdateService {
      */
     @PostMapping("/order/normal/appeal")
     public ResponseData<?> orderCancelAppeal(@RequestBody OrderCancelAppealReqVO orderCancelAppealReqVO);
+
+
+    /**
+     * 车主同意取消订单延时退款
+     *
+     * @param cancelOrderDelayRefundReqVO 请求参数
+     * @return ResponseData<?>
+     */
+    @PostMapping("/order/normal/cancle/delay/refund")
+    public ResponseData<?> cancelOrderDelayRefund(@RequestBody CancelOrderDelayRefundReqVO cancelOrderDelayRefundReqVO);
 
 
 }
