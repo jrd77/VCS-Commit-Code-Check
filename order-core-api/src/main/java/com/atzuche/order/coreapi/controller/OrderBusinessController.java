@@ -4,6 +4,7 @@ import com.atzuche.order.commons.BindingResultUtil;
 import com.atzuche.order.commons.entity.dto.OwnerMemberDTO;
 import com.atzuche.order.commons.entity.dto.OwnerPreIncomRespDTO;
 import com.atzuche.order.commons.entity.dto.RenterMemberDTO;
+import com.atzuche.order.commons.entity.dto.ReturnCarIncomeResultDTO;
 import com.atzuche.order.commons.vo.req.OwnerUpdateSeeVO;
 import com.atzuche.order.commons.vo.req.RenterAndOwnerSeeOrderVO;
 import com.atzuche.order.coreapi.service.OrderBusinessService;
@@ -87,4 +88,15 @@ public class OrderBusinessController {
         return ResponseData.success(ownerPreIncomRespDTO);
     }
 
+    /*
+     * @Author ZhangBin
+     * @Date 2020/3/12 11:25
+     * @Description: 车主收益
+     *
+     **/
+    @GetMapping("/orderBusiness/queryOwnerIncome")
+    public ResponseData<ReturnCarIncomeResultDTO> queryOwnerIncome(@RequestParam(name = "orderNo",required = true) String orderNo){
+        ReturnCarIncomeResultDTO returnCarIncomeDTO = orderBusinessService.queryOwnerIncome(orderNo);
+        return ResponseData.success(returnCarIncomeDTO);
+    }
 }

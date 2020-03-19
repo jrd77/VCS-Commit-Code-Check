@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.entity.dto.OwnerMemberDTO;
 import com.atzuche.order.commons.entity.dto.OwnerPreIncomRespDTO;
 import com.atzuche.order.commons.entity.dto.RenterMemberDTO;
+import com.atzuche.order.commons.entity.dto.ReturnCarIncomeResultDTO;
 import com.atzuche.order.commons.enums.CloseEnum;
 import com.atzuche.order.commons.enums.NoticeSourceCodeEnum;
 import com.atzuche.order.commons.exceptions.NoticeSourceNotFoundException;
@@ -118,5 +119,25 @@ public class OrderBusinessService {
         OwnerPreIncomRespDTO ownerPreIncomRespDTO = new OwnerPreIncomRespDTO();
         ownerPreIncomRespDTO.setOwnerCostAmtFinal(ownerCosts.getOwnerCostAmtFinal());
         return ownerPreIncomRespDTO;
+    }
+
+    public ReturnCarIncomeResultDTO queryOwnerIncome(String orderNo) {
+        OwnerOrderEntity ownerOrderEntity = ownerOrderService.getOwnerOrderByOrderNoAndIsEffective(orderNo);
+        if(ownerOrderEntity == null){
+            log.error("找不到有效的车主子订单 orderNo={}",orderNo);
+            throw new OrderNotFoundException(orderNo);
+        }
+        ReturnCarIncomeResultDTO returnCarIncomeResultDTO = new ReturnCarIncomeResultDTO();
+        OwnerCosts ownerCosts = orderSettleService.preOwnerSettleOrder(orderNo, ownerOrderEntity.getOwnerOrderNo());
+        List<ReturnCarIncomeDTO> returnCarIncomeDTOS = new ArrayList<>();
+        ReturnCarIncomeDTO returnCarIncomeDTO = new ReturnCarIncomeDTO();
+        returnCarIncomeDTO.setSettleFlag("1");
+        returnCarIncomeDTO.setSettleTitle("按照订单结束时间结算");
+        returnCarIncomeDTO.setExpectIncome("预计收益：" + ownerCosts.getOwnerCostAmtFinal() + "元");
+        returnCarIncomeDTOS.add(returnCarIncomeDTO);
+        returnCarIncomeResultDTO.setNoticeText("为了避免纠纷，请主动与租客友好协商，有利于再次成单哦~");
+        returnCarIncomeResultDTO.setReturnCarIncomeDTOList(returnCarIncomeDTOS);
+        log.info("按照时间计算车主预计收益returnCarIncomeResultDTO={}",JSON.toJSONString(returnCarIncomeResultDTO));
+        return returnCarIncomeResultDTO;
     }
 }
