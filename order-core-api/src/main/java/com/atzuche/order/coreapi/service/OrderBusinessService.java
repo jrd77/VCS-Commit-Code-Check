@@ -2,6 +2,7 @@ package com.atzuche.order.coreapi.service;
 
 import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.entity.dto.OwnerMemberDTO;
+import com.atzuche.order.commons.entity.dto.OwnerPreIncomRespDTO;
 import com.atzuche.order.commons.entity.dto.RenterMemberDTO;
 import com.atzuche.order.commons.enums.CloseEnum;
 import com.atzuche.order.commons.enums.NoticeSourceCodeEnum;
@@ -101,5 +102,10 @@ public class OrderBusinessService {
         }
         RenterMemberDTO renterMemberDTO = renterMemberService.selectrenterMemberByRenterOrderNo(renterOrderEntity.getRenterOrderNo(), false);
         return renterMemberDTO;
+    }
+
+    public OwnerPreIncomRespDTO ownerPreIncom(String orderNo) {
+
+        return null;
     }
 }
