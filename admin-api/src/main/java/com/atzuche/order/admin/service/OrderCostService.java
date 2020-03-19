@@ -3,16 +3,6 @@
  */
 package com.atzuche.order.admin.service;
 
-import java.util.List;
-import java.util.Objects;
-
-import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
-
 import com.atzuche.order.admin.vo.req.cost.OwnerCostReqVO;
 import com.atzuche.order.admin.vo.req.cost.RenterCostReqVO;
 import com.atzuche.order.admin.vo.resp.order.cost.OrderOwnerCostResVO;
@@ -27,19 +17,11 @@ import com.atzuche.order.commons.vo.req.OrderCostReqVO;
 import com.atzuche.order.commons.vo.res.cost.RenterOrderCostDetailResVO;
 import com.atzuche.order.commons.vo.res.cost.RenterOrderFineDeatailResVO;
 import com.atzuche.order.commons.vo.res.cost.RenterOrderSubsidyDetailResVO;
-import com.atzuche.order.commons.vo.res.ownercosts.ConsoleOwnerOrderFineDeatailEntity;
-import com.atzuche.order.commons.vo.res.ownercosts.OwnerOrderFineDeatailEntity;
-import com.atzuche.order.commons.vo.res.ownercosts.OwnerOrderIncrementDetailEntity;
-import com.atzuche.order.commons.vo.res.ownercosts.OwnerOrderPurchaseDetailEntity;
-import com.atzuche.order.commons.vo.res.ownercosts.OwnerOrderSubsidyDetailEntity;
+import com.atzuche.order.commons.vo.res.ownercosts.*;
 import com.atzuche.order.commons.vo.res.rentcosts.OrderConsoleCostDetailEntity;
 import com.atzuche.order.commons.vo.res.rentcosts.OrderConsoleSubsidyDetailEntity;
 import com.atzuche.order.commons.vo.res.rentcosts.OrderCouponEntity;
-import com.atzuche.order.commons.vo.res.rentcosts.RenterOrderCostDetailEntity;
 import com.atzuche.order.delivery.service.delivery.DeliveryCarInfoPriceService;
-import com.atzuche.order.delivery.vo.delivery.rep.DeliveryCarVO;
-import com.atzuche.order.delivery.vo.delivery.rep.OwnerGetAndReturnCarDTO;
-import com.atzuche.order.delivery.vo.delivery.req.DeliveryCarRepVO;
 import com.atzuche.order.open.service.FeignOrderCostService;
 import com.atzuche.order.ownercost.entity.OwnerOrderEntity;
 import com.atzuche.order.ownercost.service.OwnerOrderIncrementDetailService;
@@ -52,6 +34,14 @@ import com.atzuche.order.settle.service.OrderSettleService;
 import com.atzuche.order.settle.vo.res.RenterCostVO;
 import com.atzuche.order.wallet.WalletProxyService;
 import com.autoyol.commons.web.ResponseData;
+import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
+
+import java.util.List;
 
 /**
  * @author jing.huang
@@ -145,7 +135,7 @@ public class OrderCostService {
 				
 				//补付费用 
 				//需补付金额,跟修改订单的补付金额是同一个方法。
-				int needIncrementAmt = cashierPayService.getRentCostBufu(renterCostReqVO.getOrderNo(), renterCostReqVO.getRenterOrderNo());
+				int needIncrementAmt = cashierPayService.getRentCostBufu(renterCostReqVO.getOrderNo(), orderEntity.getMemNoRenter());
 				putSupplementAmt(realVo,data,needIncrementAmt,costVo);
 				
 				//租客支付给平台的费用。console  200214
