@@ -91,4 +91,8 @@ public class ModifyOrderReqVO {
 
     @AutoDocProperty("修改原因")
     private String modifyReason;
+    /**
+     * 管理后台操作人
+     */
+    private String operator;
 }
