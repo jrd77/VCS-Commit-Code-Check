@@ -59,9 +59,7 @@ public class OrderWzSettleService {
             t.setStatus(Transaction.SUCCESS);
         } catch (Exception e) {
             log.error("OrderWzSettleService settleOrder,e={},",e);
-            /**
-             	* 结算失败，更新结算标识字段。 违章押金结算失败
-             */
+            //结算失败，更新结算标识字段。 违章押金结算失败
             OrderStatusDTO orderStatusDTO = new OrderStatusDTO();
             orderStatusDTO.setOrderNo(orderNo);
             orderStatusDTO.setWzSettleStatus(SettleStatusEnum.SETTL_FAIL.getCode());

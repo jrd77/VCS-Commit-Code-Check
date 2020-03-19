@@ -35,4 +35,21 @@ public interface OrderSupplementDetailMapper{
     
     Integer updateDeleteById(@Param("id") Integer id);
 
+    /**
+     * 获取未支付的补付信息
+     *
+     * @param orderNo 订单号
+     * @return List<OrderSupplementDetailEntity> 补付记录
+     */
+    List<OrderSupplementDetailEntity> selectNotPayByOrderNo(@Param("orderNo") String orderNo);
+
+    /**
+     * 更新补付记录操作状态
+     *
+     * @param id       主键
+     * @param opStatus 操作状态
+     * @return int 成功记录数
+     */
+    int updateOpStatusByPrimaryKey(@Param("id") Integer id, @Param("opStatus") Integer opStatus);
+
 }
