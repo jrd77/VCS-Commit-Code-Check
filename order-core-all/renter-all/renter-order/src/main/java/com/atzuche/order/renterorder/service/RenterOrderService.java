@@ -137,8 +137,16 @@ public class RenterOrderService {
     public RenterOrderEntity getRenterOrderByOrderNoAndWaitPay(String orderNo) {
         return renterOrderMapper.getRenterOrderByOrderNoAndWaitPay(orderNo);
     }
-
-
+    
+    //根据会员号查询
+    public List<RenterOrderEntity> getRenterOrderByMemNoAndWaitPay(String memNo) {
+        return renterOrderMapper.getRenterOrderByMemNoAndWaitPay(memNo);
+    }
+    
+    public List<RenterOrderEntity> getRenterOrderByMemNoOrderNosAndWaitPay(String memNo,List<String> orderNoList) {
+        return renterOrderMapper.getRenterOrderByMemNoOrderNosAndWaitPay(memNo,orderNoList);
+    }
+    
     /**
      * 生成租客订单
      *

@@ -1,6 +1,7 @@
 package com.atzuche.order.cashieraccount.service.notservice;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -68,6 +69,7 @@ import com.autoyol.event.rabbit.neworder.OrderRefundMq;
 import lombok.extern.slf4j.Slf4j;
 
 
+
 /**
  * 收银表
  *
@@ -104,6 +106,7 @@ public class CashierNoTService {
         }
         return renterOrderEntity;
     }
+
     /**
      * 收银台根据主单号 向订单模块查询子单号
      * @param orderNo
@@ -115,6 +118,28 @@ public class CashierNoTService {
             return new RenterOrderEntity();
         }
         return renterOrderEntity;
+	}
+
+    
+    /**
+     * 根据会员号查询，to补付列表
+     * @param orderNo
+     * @return
+     */
+    public List<RenterOrderEntity> getRenterOrderNoByMemNo(String memNo){
+        List<RenterOrderEntity> listRenterOrderEntity =  renterOrderService.getRenterOrderByMemNoAndWaitPay(memNo);
+        if(CollectionUtils.isEmpty(listRenterOrderEntity)){
+           return new ArrayList<RenterOrderEntity>();
+        }
+        return listRenterOrderEntity;
+    }
+    
+    public List<RenterOrderEntity> getRenterOrderNoByMemNoAndOrderNos(String memNo,List<String> orderNoList){
+        List<RenterOrderEntity> listRenterOrderEntity =  renterOrderService.getRenterOrderByMemNoOrderNosAndWaitPay(memNo,orderNoList);
+        if(CollectionUtils.isEmpty(listRenterOrderEntity)){
+           return new ArrayList<RenterOrderEntity>();
+        }
+        return listRenterOrderEntity;
     }
 
 
@@ -182,7 +207,7 @@ public class CashierNoTService {
      * @param notifyDataVo
      * @return
      */
-    public PayedOrderRenterDepositReqVO getPayedOrderRenterDepositReq(NotifyDataVo notifyDataVo) {
+    public PayedOrderRenterDepositReqVO getPayedOrderRenterDepositReq(NotifyDataVo notifyDataVo,RenterCashCodeEnum renterCashCodeEnum) {
         PayedOrderRenterDepositReqVO vo = new PayedOrderRenterDepositReqVO();
         BeanUtils.copyProperties(notifyDataVo,vo);
         vo.setPayStatus(notifyDataVo.getTransStatus());
@@ -201,8 +226,7 @@ public class CashierNoTService {
         	putPayPreValue(notifyDataVo, vo);
             
         }
-        
-        
+
         //TODO 预授权到期时间
         //车辆押金进出明细
         DetainRenterDepositReqVO detainRenterDeposit = new DetainRenterDepositReqVO();
@@ -210,7 +234,7 @@ public class CashierNoTService {
         Integer settleAmount = notifyDataVo.getSettleAmount()==null?0:Integer.parseInt(notifyDataVo.getSettleAmount());
         detainRenterDeposit.setAmt(settleAmount);
         detainRenterDeposit.setUniqueNo(notifyDataVo.getQn());
-        detainRenterDeposit.setRenterCashCodeEnum(RenterCashCodeEnum.ACCOUNT_RENTER_DEPOSIT);
+        detainRenterDeposit.setRenterCashCodeEnum(renterCashCodeEnum);
         vo.setDetainRenterDepositReqVO(detainRenterDeposit);
         return vo;
     }
@@ -365,7 +389,7 @@ public class CashierNoTService {
      * @param notifyDataVo
      * @return
      */
-    public PayedOrderRenterWZDepositReqVO getPayedOrderRenterWZDepositReq(NotifyDataVo notifyDataVo) {
+    public PayedOrderRenterWZDepositReqVO getPayedOrderRenterWZDepositReq(NotifyDataVo notifyDataVo,RenterCashCodeEnum renterCashCodeEnum) {
         PayedOrderRenterWZDepositReqVO vo = new PayedOrderRenterWZDepositReqVO();
         BeanUtils.copyProperties(notifyDataVo,vo);
 //        Integer settleAmount = notifyDataVo.getSettleAmount()==null?0:Integer.parseInt(notifyDataVo.getSettleAmount());
@@ -390,7 +414,7 @@ public class CashierNoTService {
         PayedOrderRenterDepositWZDetailReqVO payedOrderRenterDepositDetail = new PayedOrderRenterDepositWZDetailReqVO();
         BeanUtils.copyProperties(notifyDataVo,payedOrderRenterDepositDetail);
         payedOrderRenterDepositDetail.setUniqueNo(notifyDataVo.getQn());
-        payedOrderRenterDepositDetail.setRenterCashCodeEnum(RenterCashCodeEnum.ACCOUNT_RENTER_WZ_DEPOSIT);
+        payedOrderRenterDepositDetail.setRenterCashCodeEnum(renterCashCodeEnum);
         payedOrderRenterDepositDetail.setPayChannel(notifyDataVo.getPaySource());
         payedOrderRenterDepositDetail.setPayment(notifyDataVo.getPayType());
         Integer settleAmount = notifyDataVo.getSettleAmount()==null?0:Integer.parseInt(notifyDataVo.getSettleAmount());
@@ -479,14 +503,16 @@ public class CashierNoTService {
      * @param freeDepositType  免押方式(1:绑卡减免,2:芝麻减免,3:消费) 
      * @return
      */
-    public PayVo getPayVO(CashierEntity cashierEntity,OrderPaySignReqVO orderPaySign,int amt ,String title,String payKind,String payIdStr ,String extendParams,int freeDepositType) {
+    public PayVo getPayVO(String orderNo,CashierEntity cashierEntity,OrderPaySignReqVO orderPaySign,int amt ,String title,String payKind,String payIdStr ,String extendParams,int freeDepositType) {
         PayVo vo = new PayVo();
         Integer paySn = (Objects.isNull(cashierEntity)|| Objects.isNull(cashierEntity.getPaySn()))?0:cashierEntity.getPaySn();
         vo.setInternalNo("1");
         vo.setExtendParams(extendParams);
         vo.setAtappId(DataAppIdConstant.APPID_SHORTRENT);
         vo.setMemNo(orderPaySign.getMenNo());
-        vo.setOrderNo(orderPaySign.getOrderNo());
+//        vo.setOrderNo(orderPaySign.getOrderNo());
+        //支持多订单号
+        vo.setOrderNo(orderNo);
         vo.setOpenId(orderPaySign.getOpenId());
         vo.setReqOs(orderPaySign.getReqOs());
         vo.setPayAmt(String.valueOf(Math.abs(amt)));

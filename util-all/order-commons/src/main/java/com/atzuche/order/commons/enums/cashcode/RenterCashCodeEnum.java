@@ -83,6 +83,8 @@ public enum RenterCashCodeEnum {
     CANCEL_WZ_DEPOSIT_TO_HISTORY_AMT("11130016","违章押金转历史欠款"),
     CANCEL_RENT_COST_TO_RETURN_AMT("11130017","取消租车费用退还"),
     ACCOUNT_RENTER_DETAIN_CAR_AMT("11130018","暂扣租车费用"),
+    PAY_DEBT_COST_TO_HISTORY_AMT("11130019","支付欠款抵扣订单欠款"),
+    
     ///// 暂扣的考虑以下的费用编码。
     ACCOUNT_RENTER_RENT_COST("11130019","租车费用"),
     ACCOUNT_RENTER_WZ_DEPOSIT("11130020","违章押金"),
@@ -109,6 +111,10 @@ public enum RenterCashCodeEnum {
     ACCOUNT_RENTER_DELIVERY_OIL_COST("21130026","交接车-油费"),
     ACCOUNT_RENTER_DELIVERY_MILEAGE_COST("21130027","交接车-获取超里程费用"),
     ACCOUNT_RENTER_FINE_COST("21130028","租客罚金"),
+    ACCOUNT_RENTER_DEBT_COST_AGAIN("21130029","补付欠款费用"),
+    ACCOUNT_RENTER_SUPPLEMENT_COST_AGAIN("21130030","管理后台补付租车费用"),
+    ACCOUNT_RENTER_RENT_COST_AFTER("11130031","租车费用补充"),
+    
 //    ACCOUNT_RENTER_DELIVERY_MILEAGE_COST_PROXY("21130029","交接车-获取代管车超里程费用"),
     
   //第四区域块 看第4位，从4开始。  后4位从0001开始    后面是以此类推，确保费用编码不能重复。

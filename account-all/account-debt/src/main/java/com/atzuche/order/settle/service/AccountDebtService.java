@@ -1,5 +1,17 @@
 package com.atzuche.order.settle.service;
 
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
+
+import org.apache.commons.lang3.math.NumberUtils;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
+
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.settle.entity.AccountDebtDetailEntity;
 import com.atzuche.order.settle.entity.AccountDebtReceivableaDetailEntity;
@@ -14,17 +26,6 @@ import com.atzuche.order.settle.vo.res.AccountOldDebtResVO;
 import com.autoyol.commons.web.ErrorCode;
 
 import lombok.extern.slf4j.Slf4j;
-
-import org.apache.commons.lang3.math.NumberUtils;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.util.Assert;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 
 /**
@@ -89,6 +90,8 @@ public class AccountDebtService{
         accountDebtNoTService.deductAccountDebt(accountDeductDebt);
         return accountDeductDebt.getRealAmt();
     }
+    
+    
 
     /**
      * 记录用户历史欠款

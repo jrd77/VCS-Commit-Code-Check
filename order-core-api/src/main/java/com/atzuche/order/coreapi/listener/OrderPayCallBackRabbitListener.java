@@ -29,7 +29,10 @@ import org.springframework.context.annotation.Configuration;
 public class OrderPayCallBackRabbitListener {
     @Autowired RabbitMsgLogService rabbitMsgLogService;
     @Autowired CashierPayService cashierPayService;
-    @Autowired PayCallbackService payCallbackService;
+    
+    //回调的处理类
+    @Autowired 
+    PayCallbackService payCallbackService;
 
     /**
      * 支付系统回调
@@ -49,7 +52,9 @@ public class OrderPayCallBackRabbitListener {
             BatchNotifyDataVo batchNotifyDataVo = GsonUtils.convertObj(orderPayAsynStr, BatchNotifyDataVo.class);
             String reqContent = FasterJsonUtil.toJson(batchNotifyDataVo);
             String md5 =  MD5.MD5Encode(reqContent);
+            //mq消息落库
             rabbitMsgLogService.insertRabbitMsgLog(message, RabbitBusinessTypeEnum.ORDER_PAY_CALL_BACK,orderPayAsynStr,md5);
+            //回调处理
             cashierPayService.payCallBack(batchNotifyDataVo,payCallbackService);
             t.setStatus(Transaction.SUCCESS);
         } catch (Exception e) {

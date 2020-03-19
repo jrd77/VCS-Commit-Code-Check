@@ -1,21 +1,78 @@
 package com.atzuche.order.rentercost.service;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+
 import com.alibaba.fastjson.JSON;
-import com.atzuche.config.client.api.*;
-import com.atzuche.config.common.entity.*;
-import com.atzuche.order.commons.*;
-import com.atzuche.order.commons.entity.dto.*;
+import com.atzuche.config.client.api.CarParamHotBrandDepositSDK;
+import com.atzuche.config.client.api.CityConfigSDK;
+import com.atzuche.config.client.api.DefaultConfigContext;
+import com.atzuche.config.client.api.DepositConfigSDK;
+import com.atzuche.config.client.api.IllegalDepositConfigSDK;
+import com.atzuche.config.client.api.InsuranceConfigSDK;
+import com.atzuche.config.client.api.OilAverageCostConfigSDK;
+import com.atzuche.config.client.api.SysConstantSDK;
+import com.atzuche.config.common.entity.CarParamHotBrandDepositEntity;
+import com.atzuche.config.common.entity.CityEntity;
+import com.atzuche.config.common.entity.DepositConfigEntity;
+import com.atzuche.config.common.entity.IllegalDepositConfigEntity;
+import com.atzuche.config.common.entity.InsuranceConfigEntity;
+import com.atzuche.config.common.entity.OilAverageCostEntity;
+import com.atzuche.config.common.entity.SysContantEntity;
+import com.atzuche.order.commons.CatConstants;
+import com.atzuche.order.commons.DateUtils;
+import com.atzuche.order.commons.GlobalConstant;
+import com.atzuche.order.commons.LocalDateTimeUtils;
+import com.atzuche.order.commons.ResponseCheckUtil;
+import com.atzuche.order.commons.entity.dto.AbatementAmtDTO;
+import com.atzuche.order.commons.entity.dto.CostBaseDTO;
+import com.atzuche.order.commons.entity.dto.DepositAmtDTO;
+import com.atzuche.order.commons.entity.dto.ExtraDriverDTO;
+import com.atzuche.order.commons.entity.dto.GetReturnCarCostReqDto;
+import com.atzuche.order.commons.entity.dto.GetReturnCarOverCostReqDto;
+import com.atzuche.order.commons.entity.dto.IllegalDepositAmtDTO;
+import com.atzuche.order.commons.entity.dto.InsurAmtDTO;
+import com.atzuche.order.commons.entity.dto.MileageAmtDTO;
+import com.atzuche.order.commons.entity.dto.OilAmtDTO;
+import com.atzuche.order.commons.entity.dto.RentAmtDTO;
+import com.atzuche.order.commons.entity.dto.RenterGoodsPriceDetailDTO;
 import com.atzuche.order.commons.enums.ChannelNameTypeEnum;
 import com.atzuche.order.commons.enums.SubsidySourceCodeEnum;
 import com.atzuche.order.commons.enums.SubsidyTypeCodeEnum;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.commons.exceptions.RemoteCallException;
-import com.atzuche.order.rentercost.entity.*;
+import com.atzuche.order.rentercost.entity.ConsoleRenterOrderFineDeatailEntity;
+import com.atzuche.order.rentercost.entity.OrderConsoleSubsidyDetailEntity;
+import com.atzuche.order.rentercost.entity.OrderSupplementDetailEntity;
+import com.atzuche.order.rentercost.entity.RenterOrderCostDetailEntity;
+import com.atzuche.order.rentercost.entity.dto.CityDTO;
+import com.atzuche.order.rentercost.entity.dto.GetReturnCostDTO;
+import com.atzuche.order.rentercost.entity.dto.GetReturnOverCostDTO;
+import com.atzuche.order.rentercost.entity.dto.GetReturnOverTransportDTO;
 import com.atzuche.order.rentercost.entity.dto.RenterOrderSubsidyDetailDTO;
-import com.atzuche.order.rentercost.entity.dto.*;
 import com.atzuche.order.rentercost.entity.vo.GetReturnResponseVO;
 import com.atzuche.order.rentercost.entity.vo.PayableVO;
-import com.atzuche.order.rentercost.exception.*;
+import com.atzuche.order.rentercost.exception.GetReturnCostErrorException;
+import com.atzuche.order.rentercost.exception.GetReturnCostFailException;
+import com.atzuche.order.rentercost.exception.RenterCostParameterException;
+import com.atzuche.order.rentercost.exception.ReturnCarOverCostErrorException;
+import com.atzuche.order.rentercost.exception.ReturnCarOverCostFailException;
+import com.atzuche.order.settle.entity.AccountDebtDetailEntity;
+import com.atzuche.order.settle.service.notservice.AccountDebtDetailNoTService;
 import com.autoyol.car.api.feign.api.GetBackCityLimitFeignApi;
 import com.autoyol.car.api.model.vo.ResponseObject;
 import com.autoyol.commons.web.ErrorCode;
@@ -35,18 +92,8 @@ import com.autoyol.platformcost.model.CarPriceOfDay;
 import com.autoyol.platformcost.model.FeeResult;
 import com.dianping.cat.Cat;
 import com.dianping.cat.message.Transaction;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.*;
-import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Slf4j
@@ -83,6 +130,8 @@ public class RenterOrderCostCombineService {
 
     @Autowired
     private GetBackCityLimitFeignApi getBackCityLimitFeignApi;
+    @Autowired
+    private AccountDebtDetailNoTService accountDebtDetailNoTService;
 
     @Value("${auto.cost.getReturnOverTransportFee}")
     private Integer getReturnOverTransportFee;
@@ -94,8 +143,7 @@ public class RenterOrderCostCombineService {
     private Integer configHours;
     @Value("${auto.cost.unitExtraDriverInsure}")
     private Integer unitExtraDriverInsure;
-
-
+    
     private static final Integer [] ORDER_TYPES = {1,2};
 	
 	public static final List<RenterCashCodeEnum> RENTERCASHCODEENUM_LIST = new ArrayList<RenterCashCodeEnum>() {
@@ -491,59 +539,48 @@ public class RenterOrderCostCombineService {
 			}).collect(Collectors.toList());
 			payableList.addAll(suppList);
 		}
+		
+		return payableList;
+	}
+	
+	public List<PayableVO> listPayableGlobalVO(String orderNo, String renterOrderNo, String memNo) {
+		List<PayableVO> payableList = new ArrayList<PayableVO>();
+		if (StringUtils.isNotBlank(renterOrderNo)) {
+			payableList.add(getPayable(orderNo, renterOrderNo, memNo));
+		}
+		
+		//下单支付费用的时候，supplement是没有数据的。
+//		List<OrderSupplementDetailEntity> supplementList = orderSupplementDetailService.listOrderSupplementDetailByOrderNoAndMemNo(orderNo, memNo);
+//		if (supplementList != null && !supplementList.isEmpty()) {
+//			List<PayableVO> suppList = supplementList.stream().map(supplement -> {
+//				PayableVO payableVO = new PayableVO();
+//				payableVO.setAmt(supplement.getAmt());
+//				payableVO.setOrderNo(orderNo);
+//				payableVO.setTitle(supplement.getTitle());
+//				payableVO.setType(2);
+//				payableVO.setUniqueNo(String.valueOf(supplement.getId()));
+//				return payableVO;
+//			}).collect(Collectors.toList());
+//			payableList.addAll(suppList);
+//		}
+		
 		return payableList;
 	}
 	
 	/**
-	 * 租车费用支付
+	 * 	APP修改订单费用支付
 	 * @param orderNo
 	 * @param renterOrderNo
 	 * @param memNo
 	 * @return
 	 */
-	public List<PayableVO> listPayablebBasePayVO(String orderNo, String renterOrderNo, String memNo) {
+	public List<PayableVO> listPayableIncrementVO(String orderNo, String renterOrderNo, String memNo) {
 		List<PayableVO> payableList = new ArrayList<PayableVO>();
 		if (StringUtils.isNotBlank(renterOrderNo)) {
-			payableList.add(getPayableBasePay(orderNo, renterOrderNo, memNo));
+			payableList.add(getPayableIncrement(orderNo, renterOrderNo, memNo));
 		}
-//		List<OrderSupplementDetailEntity> supplementList = orderSupplementDetailService.listOrderSupplementDetailByOrderNoAndMemNo(orderNo, memNo);
-//		if (supplementList != null && !supplementList.isEmpty()) {
-//			List<PayableVO> suppList = supplementList.stream().map(supplement -> {
-//				PayableVO payableVO = new PayableVO();
-//				payableVO.setAmt(supplement.getAmt());
-//				payableVO.setOrderNo(orderNo);
-//				payableVO.setTitle(supplement.getTitle());
-//				payableVO.setType(2);
-//				payableVO.setUniqueNo(String.valueOf(supplement.getId()));
-//				return payableVO;
-//			}).collect(Collectors.toList());
-//			payableList.addAll(suppList);
-//		}
 		return payableList;
 	}
-	
-	public List<PayableVO> listPayablebGlobalPayVO(String orderNo, String renterOrderNo, String memNo) {
-		List<PayableVO> payableList = new ArrayList<PayableVO>();
-		if (StringUtils.isNotBlank(renterOrderNo)) {
-			payableList.add(getPayable(orderNo, renterOrderNo, memNo));
-		}
-//		List<OrderSupplementDetailEntity> supplementList = orderSupplementDetailService.listOrderSupplementDetailByOrderNoAndMemNo(orderNo, memNo);
-//		if (supplementList != null && !supplementList.isEmpty()) {
-//			List<PayableVO> suppList = supplementList.stream().map(supplement -> {
-//				PayableVO payableVO = new PayableVO();
-//				payableVO.setAmt(supplement.getAmt());
-//				payableVO.setOrderNo(orderNo);
-//				payableVO.setTitle(supplement.getTitle());
-//				payableVO.setType(2);
-//				payableVO.setUniqueNo(String.valueOf(supplement.getId()));
-//				return payableVO;
-//			}).collect(Collectors.toList());
-//			payableList.addAll(suppList);
-//		}
-		return payableList;
-	}
-	
-	
 	
 	/**
 	 * 
@@ -554,13 +591,14 @@ public class RenterOrderCostCombineService {
 	 */
 	public List<PayableVO> listPayableSupplementVO(String orderNo, String renterOrderNo, String memNo) {
 		List<PayableVO> payableList = new ArrayList<PayableVO>();
-//		if (StringUtils.isNotBlank(renterOrderNo)) {
-//			payableList.add(getPayable(orderNo, renterOrderNo, memNo));
-//		}
 		//补付
 		List<OrderSupplementDetailEntity> supplementList = orderSupplementDetailService.listOrderSupplementDetailByOrderNoAndMemNo(orderNo, memNo);
 		if (supplementList != null && !supplementList.isEmpty()) {
-			List<PayableVO> suppList = supplementList.stream().map(supplement -> {
+			//支付状态:0.无需支付 1.未支付 2.已取消 3.已支付 4.支付中，5.支付失败 10.租车押金结算抵扣  20.违章押金结算抵扣
+			//op_status  操作状态:0,待提交 1,已生效 2,已失效 3,已撤回
+			//该条件SQL中已经包含。
+			List<PayableVO> suppList = supplementList.stream().filter(x -> x.getOpStatus().intValue() == 1 && (x.getPayFlag().intValue() == 1 || x.getPayFlag().intValue() == 4 || x.getPayFlag().intValue() == 5))
+					.map(supplement -> {
 				PayableVO payableVO = new PayableVO();
 				payableVO.setAmt(supplement.getAmt());
 				payableVO.setOrderNo(orderNo);
@@ -574,6 +612,78 @@ public class RenterOrderCostCombineService {
 		return payableList;
 	}
 	
+	
+	public List<PayableVO> listPayableDebtPayVO(String orderNo, String memNo) {  //String renterOrderNo,
+		List<PayableVO> payableList = new ArrayList<PayableVO>();
+		
+		//支付欠款
+		List<AccountDebtDetailEntity> accountDebtDetailAlls =  accountDebtDetailNoTService.getDebtListByOrderNoMemNo(orderNo,memNo);
+		
+		if (accountDebtDetailAlls != null && !accountDebtDetailAlls.isEmpty()) {
+			List<PayableVO> suppList = accountDebtDetailAlls.stream().map(supplement -> {
+				PayableVO payableVO = new PayableVO();
+				payableVO.setAmt(supplement.getCurrentDebtAmt());
+				payableVO.setOrderNo(orderNo);
+				payableVO.setTitle(supplement.getSourceDetail());
+				payableVO.setType(2);
+				payableVO.setUniqueNo(String.valueOf(supplement.getId()));
+				return payableVO;
+			}).collect(Collectors.toList());
+			payableList.addAll(suppList);
+		}
+		return payableList;
+	}
+	
+	/**
+	 * 根据会员号查询。
+	 * @param memNo
+	 * @return
+	 */
+	public List<PayableVO> listPayableDebtPayVOByMemNo(String memNo) {  //String renterOrderNo,
+		List<PayableVO> payableList = new ArrayList<PayableVO>();
+		
+		//支付欠款
+		List<AccountDebtDetailEntity> accountDebtDetailAlls =  accountDebtDetailNoTService.getDebtListByMemNo(memNo);
+		
+		handleAccountDebtDetailAlls(payableList, accountDebtDetailAlls);
+		return payableList;
+	}
+	
+	/**
+	 * 根据会员号和订单号列表查询。
+	 * @param memNo
+	 * @param orderNoList
+	 * @return
+	 */
+	public List<PayableVO> listPayableDebtPayVOByMemNoAndOrderNos(String memNo,List<String> orderNoList) {  //String renterOrderNo,
+		List<PayableVO> payableList = new ArrayList<PayableVO>();
+		
+		//支付欠款
+		List<AccountDebtDetailEntity> accountDebtDetailAlls =  accountDebtDetailNoTService.getDebtListByMemNoAndOrderNos(memNo,orderNoList);
+		
+		handleAccountDebtDetailAlls(payableList, accountDebtDetailAlls);
+		return payableList;
+	}
+	
+	/**
+	 * 公共方法，数据封装。
+	 * @param payableList
+	 * @param accountDebtDetailAlls
+	 */
+	private void handleAccountDebtDetailAlls(List<PayableVO> payableList, List<AccountDebtDetailEntity> accountDebtDetailAlls) {
+		if (accountDebtDetailAlls != null && !accountDebtDetailAlls.isEmpty()) {
+			List<PayableVO> suppList = accountDebtDetailAlls.stream().map(debt -> {
+				PayableVO payableVO = new PayableVO();
+				payableVO.setAmt(debt.getCurrentDebtAmt());
+				payableVO.setOrderNo(debt.getOrderNo());
+				payableVO.setTitle(debt.getSourceDetail());
+				payableVO.setType(2);
+				payableVO.setUniqueNo(String.valueOf(debt.getId()));
+				return payableVO;
+			}).collect(Collectors.toList());
+			payableList.addAll(suppList);
+		}
+	}
 	
 	
 	/**
@@ -603,7 +713,7 @@ public class RenterOrderCostCombineService {
 		return payableVO;
 	}
 	
-	public PayableVO getPayableBasePay(String orderNo, String renterOrderNo, String memNo) {
+	public PayableVO getPayableIncrement(String orderNo, String renterOrderNo, String memNo) {
 		// 租客应付
 		int payable = 0;
 		// 获取租客正常费用

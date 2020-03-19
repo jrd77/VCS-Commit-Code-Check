@@ -13,6 +13,10 @@ import java.util.List;
  */
 @Data
 public class AccountDeductDebtReqVO {
+	/**
+	 * 订单号,处理支付欠款
+	 */
+	private String orderNo;
 
     /**
      * 会员号

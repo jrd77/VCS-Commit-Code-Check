@@ -23,7 +23,7 @@ public class RabbitMsgLogService {
     private RabbitMsgLogMapper rabbitMsgLogMapper;
 
 
-    public RabbitMsgLogEntity insertRabbitMsgLog(Message message, RabbitBusinessTypeEnum businessType, String toJson, String qn) {
+    public RabbitMsgLogEntity insertRabbitMsgLog(Message message, RabbitBusinessTypeEnum businessType, String toJson, String md5) {
         RabbitMsgLogEntity rabbitMsgLog = new RabbitMsgLogEntity();
         String exchange = message.getMessageProperties().getReceivedExchange();
         String queue = message.getMessageProperties().getConsumerQueue();
@@ -35,7 +35,7 @@ public class RabbitMsgLogService {
         rabbitMsgLog.setMqKey(mqKey);
         rabbitMsgLog.setMqQueue(queue);
         rabbitMsgLog.setMqMsg(toJson);
-        rabbitMsgLog.setUniqueNo(qn);
+        rabbitMsgLog.setUniqueNo(md5);
         rabbitMsgLogMapper.insert(rabbitMsgLog);
         return rabbitMsgLog;
     }

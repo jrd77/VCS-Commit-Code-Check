@@ -48,6 +48,11 @@ public class AccountPayAbleResVO {
      */
     @AutoDocProperty("支持的支付方式 （默认暂不支持预授权支付）")
     private List<String> payTypes;
+    
+	/**
+	 * 唯一编码
+	 */
+	private String uniqueNo;
 
     private AccountPayAbleResVO(){}
 
@@ -59,5 +64,16 @@ public class AccountPayAbleResVO {
         this.title = title;
         this.payTypes = ImmutableList.of(PayTypeEnum.PAY_PUR.getCode());
     }
+    
+    public AccountPayAbleResVO(String orderNo, String memNo, Integer amt, RenterCashCodeEnum renterCashCode,String title,String uniqueNo) {
+        this.orderNo = orderNo;
+        this.memNo = memNo;
+        this.amt = amt;
+        this.renterCashCode = renterCashCode;
+        this.title = title;
+        this.payTypes = ImmutableList.of(PayTypeEnum.PAY_PUR.getCode());
+        this.uniqueNo = uniqueNo;
+    }
+    
 
 }

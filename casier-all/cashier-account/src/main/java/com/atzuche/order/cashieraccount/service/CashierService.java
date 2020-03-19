@@ -751,6 +751,7 @@ public class CashierService {
     public void payOrderCallBackSuccess(NotifyDataVo notifyDataVo,OrderPayCallBackSuccessVO vo) {
         log.info("payOrderCallBackSuccess param :[{}]", GsonUtils.toJson(notifyDataVo));
         //没有成功的 不处理
+        //只处理成功的。
         if(Objects.isNull(notifyDataVo) || !TransStatusEnum.PAY_SUCCESS.getCode().equals(notifyDataVo.getTransStatus())){
             log.info("payOrderCallBackSuccess check fail :[{}]", GsonUtils.toJson(notifyDataVo));
             return;
@@ -760,76 +761,96 @@ public class CashierService {
         //1.1 租车押金 01
         if(Objects.nonNull(notifyDataVo) && DataPayKindConstant.RENT.equals(notifyDataVo.getPayKind())){
             //1 对象初始化转换
-            PayedOrderRenterDepositReqVO payedOrderRenterDeposit = cashierNoTService.getPayedOrderRenterDepositReq(notifyDataVo);
+            PayedOrderRenterDepositReqVO payedOrderRenterDeposit = cashierNoTService.getPayedOrderRenterDepositReq(notifyDataVo,RenterCashCodeEnum.ACCOUNT_RENTER_DEPOSIT);
             //2 收银台记录更新
             cashierNoTService.updataCashierAndRenterDeposit(notifyDataVo,payedOrderRenterDeposit);
-            //支付状态
-            if("00".equals(notifyDataVo.getTransStatus())) {
-	            vo.setDepositPayStatus(OrderPayStatusEnum.PAYED.getStatus());
-	            sendOrderPayDepositSuccess(NewOrderMQActionEventEnum.RENTER_ORDER_PAYFEESUCCESS,2,vo);
-            }else {
-            	//仍然待支付
-            	vo.setDepositPayStatus(OrderPayStatusEnum.PAYING.getStatus());
-//	            sendOrderPayDepositSuccess(NewOrderMQActionEventEnum.RENTER_ORDER_PAYFEESUCCESS,2,vo);
-            }
+            //支付状态，上面已经做了拦截判断。
+	        vo.setDepositPayStatus(OrderPayStatusEnum.PAYED.getStatus());
+	        sendOrderPayDepositSuccess(NewOrderMQActionEventEnum.RENTER_ORDER_PAYFEESUCCESS,2,vo);
+
         }
+        
         //1.2 违章押金 02
         if(Objects.nonNull(notifyDataVo) && DataPayKindConstant.DEPOSIT.equals(notifyDataVo.getPayKind())){
             //1 对象初始化转换
-            PayedOrderRenterWZDepositReqVO payedOrderRenterWZDeposit = cashierNoTService.getPayedOrderRenterWZDepositReq(notifyDataVo);
+            PayedOrderRenterWZDepositReqVO payedOrderRenterWZDeposit = cashierNoTService.getPayedOrderRenterWZDepositReq(notifyDataVo,RenterCashCodeEnum.ACCOUNT_RENTER_WZ_DEPOSIT);
             //2 收银台记录更新
             cashierNoTService.updataCashierAndRenterWzDeposit(notifyDataVo,payedOrderRenterWZDeposit);
             //支付状态
-            if("00".equals(notifyDataVo.getTransStatus())) {
-	            vo.setWzPayStatus(OrderPayStatusEnum.PAYED.getStatus());
-	            sendOrderPayDepositSuccess(NewOrderMQActionEventEnum.RENTER_ORDER_PAYFEESUCCESS,1,vo);
-            }else {
-            	vo.setWzPayStatus(OrderPayStatusEnum.PAYING.getStatus());
-//	            sendOrderPayDepositSuccess(NewOrderMQActionEventEnum.RENTER_ORDER_PAYFEESUCCESS,1,vo);
-            }
+	        vo.setWzPayStatus(OrderPayStatusEnum.PAYED.getStatus());
+	        sendOrderPayDepositSuccess(NewOrderMQActionEventEnum.RENTER_ORDER_PAYFEESUCCESS,1,vo);
         }
-        //1.3 租车费用
+        
+        //1.3 租车费用 11
         if(Objects.nonNull(notifyDataVo) && DataPayKindConstant.RENT_AMOUNT.equals(notifyDataVo.getPayKind()) ){
             //1 对象初始化转换
             AccountRenterCostReqVO accountRenterCostReq = cashierNoTService.getAccountRenterCostReq(notifyDataVo, RenterCashCodeEnum.ACCOUNT_RENTER_RENT_COST);
             //2 收银台记录更新
             cashierNoTService.updataCashierAndRenterCost(notifyDataVo,accountRenterCostReq);
             //支付状态
-            if("00".equals(notifyDataVo.getTransStatus())) {
-	            vo.setRentCarPayStatus(OrderPayStatusEnum.PAYED.getStatus());
-	            sendOrderPayRentCostSuccess(NewOrderMQActionEventEnum.RENTER_ORDER_PAYSUCCESS,vo,1);
-            }else {
-            	vo.setRentCarPayStatus(OrderPayStatusEnum.PAYING.getStatus());
-//            	sendOrderPayRentCostSuccess(NewOrderMQActionEventEnum.RENTER_ORDER_PAYSUCCESS,vo,1);  //失败事件
-            }
+	        vo.setRentCarPayStatus(OrderPayStatusEnum.PAYED.getStatus());
+	        sendOrderPayRentCostSuccess(NewOrderMQActionEventEnum.RENTER_ORDER_PAYSUCCESS,vo,1);
         }
-        //1.4 补付租车费用
+        
+        //1.4 补付租车费用 03
         if(Objects.nonNull(notifyDataVo) && DataPayKindConstant.RENT_INCREMENT.equals(notifyDataVo.getPayKind()) ){
             //1 对象初始化转换
             AccountRenterCostReqVO accountRenterCostReq = cashierNoTService.getAccountRenterCostReq(notifyDataVo, RenterCashCodeEnum.ACCOUNT_RENTER_RENT_COST_AGAIN);
             //2 收银台记录更新
             cashierNoTService.updataCashierAndRenterCost(notifyDataVo,accountRenterCostReq);
-            //支付状态
-            if("00".equals(notifyDataVo.getTransStatus())) {
-	            vo.setRentCarPayStatus(OrderPayStatusEnum.PAYED.getStatus());
-	            vo.setIsPayAgain(YesNoEnum.YES.getCode());
-	            sendOrderPayRentCostSuccess(NewOrderMQActionEventEnum.RENTER_ORDER_PAYSUCCESS,vo,2);
-            }else {
-            	vo.setRentCarPayStatus(OrderPayStatusEnum.PAYING.getStatus());
-	            vo.setIsPayAgain(YesNoEnum.YES.getCode());
-//	            sendOrderPayRentCostSuccess(NewOrderMQActionEventEnum.RENTER_ORDER_PAYSUCCESS,vo,2);
-            }
-            
+            //支付状态(callback需更新状态)
+	        vo.setRentCarPayStatus(OrderPayStatusEnum.PAYED.getStatus());
+	        vo.setIsPayAgain(YesNoEnum.YES.getCode());
+	        sendOrderPayRentCostSuccess(NewOrderMQActionEventEnum.RENTER_ORDER_PAYSUCCESS,vo,2);
         }
-
-
-
+        
+        //补充
+        if(Objects.nonNull(notifyDataVo) && DataPayKindConstant.RENT_AMOUNT_AFTER.equals(notifyDataVo.getPayKind()) ){
+            //1 对象初始化转换
+            AccountRenterCostReqVO accountRenterCostReq = cashierNoTService.getAccountRenterCostReq(notifyDataVo, RenterCashCodeEnum.ACCOUNT_RENTER_RENT_COST_AFTER);
+            //2 收银台记录更新
+            cashierNoTService.updataCashierAndRenterCost(notifyDataVo,accountRenterCostReq);
+            //支付状态（无需该状态）
+//	        vo.setRentCarPayStatus(OrderPayStatusEnum.PAYED.getStatus());
+//	        sendOrderPayRentCostSuccess(NewOrderMQActionEventEnum.RENTER_ORDER_PAYSUCCESS,vo,1);
+        }
+        
+        //1.5管理后台补付 add 200312 
+        if(Objects.nonNull(notifyDataVo) && DataPayKindConstant.RENT_INCREMENT_CONSOLE.equals(notifyDataVo.getPayKind())){
+            //1 对象初始化转换
+            AccountRenterCostReqVO accountRenterCostReq = cashierNoTService.getAccountRenterCostReq(notifyDataVo, RenterCashCodeEnum.ACCOUNT_RENTER_SUPPLEMENT_COST_AGAIN);
+            //2 收银台记录更新
+            cashierNoTService.updataCashierAndRenterCost(notifyDataVo,accountRenterCostReq);
+            //支付状态(callback需更新状态)
+//	        vo.setRentCarPayStatus(OrderPayStatusEnum.PAYED.getStatus());
+//	        vo.setIsPayAgain(YesNoEnum.YES.getCode());
+//	        sendOrderPayRentCostSuccess(NewOrderMQActionEventEnum.RENTER_ORDER_PAYSUCCESS,vo,2);
+        }
+        
+        //1.6支付欠款 add 200312 
+        if(Objects.nonNull(notifyDataVo) && DataPayKindConstant.DEBT.equals(notifyDataVo.getPayKind())){
+            //1 对象初始化转换
+            AccountRenterCostReqVO accountRenterCostReq = cashierNoTService.getAccountRenterCostReq(notifyDataVo, RenterCashCodeEnum.ACCOUNT_RENTER_DEBT_COST_AGAIN);
+            //2 收银台记录更新
+            cashierNoTService.updataCashierAndRenterCost(notifyDataVo,accountRenterCostReq);
+            //支付状态(callback需更新状态)
+//	        vo.setRentCarPayStatus(OrderPayStatusEnum.PAYED.getStatus());
+//	        vo.setIsPayAgain(YesNoEnum.YES.getCode());
+//	        sendOrderPayRentCostSuccess(NewOrderMQActionEventEnum.RENTER_ORDER_PAYSUCCESS,vo,2);
+        }
+        
     }
     
-    
+    /**
+     * 欠款，不存在退款
+     * 补付租车押金,管理后台。v5.11  ，不存在退款
+     * @param notifyDataVo
+     * @param vo
+     */
     public void refundOrderCallBackSuccess(NotifyDataVo notifyDataVo,OrderPayCallBackSuccessVO vo) {
         log.info("refundOrderCallBackSuccess param :[{}]", GsonUtils.toJson(notifyDataVo));
         //没有成功的 不处理
+        //只处理成功退款的记录。
         if(Objects.isNull(notifyDataVo) || !TransStatusEnum.PAY_SUCCESS.getCode().equals(notifyDataVo.getTransStatus())){
             log.info("refundOrderCallBackSuccess check fail :[{}]", GsonUtils.toJson(notifyDataVo));
             return;
@@ -839,33 +860,25 @@ public class CashierService {
         //1.1 租车押金 01
         if(Objects.nonNull(notifyDataVo) && DataPayKindConstant.RENT.equals(notifyDataVo.getPayKind())){
             //1 对象初始化转换
-            PayedOrderRenterDepositReqVO payedOrderRenterDeposit = cashierNoTService.getPayedOrderRenterDepositReq(notifyDataVo);
+            PayedOrderRenterDepositReqVO payedOrderRenterDeposit = cashierNoTService.getPayedOrderRenterDepositReq(notifyDataVo,RenterCashCodeEnum.ACCOUNT_RENTER_DEPOSIT);
             //2 收银台记录更新
             cashierNoTService.updataCashierAndRenterDeposit(notifyDataVo,payedOrderRenterDeposit);
             //支付状态
-            if("00".equals(notifyDataVo.getTransStatus())) {
-	            vo.setDepositRefundStatus(OrderRefundStatusEnum.REFUNDED.getStatus());
-	            sendOrderPayDepositSuccess(NewOrderMQActionEventEnum.ORDER_REFUND_SUCCESS,2,vo);
-            }else {
-            	vo.setDepositRefundStatus(OrderRefundStatusEnum.REFUNDING.getStatus());
-//	            sendOrderPayDepositSuccess(NewOrderMQActionEventEnum.ORDER_REFUND_FAIL,2,vo);
-            }
+	        vo.setDepositRefundStatus(OrderRefundStatusEnum.REFUNDED.getStatus());
+	        sendOrderPayDepositSuccess(NewOrderMQActionEventEnum.ORDER_REFUND_SUCCESS,2,vo);
         }
+        
         //1.2 违章押金 02
         if(Objects.nonNull(notifyDataVo) && DataPayKindConstant.DEPOSIT.equals(notifyDataVo.getPayKind())){
             //1 对象初始化转换
-            PayedOrderRenterWZDepositReqVO payedOrderRenterWZDeposit = cashierNoTService.getPayedOrderRenterWZDepositReq(notifyDataVo);
+            PayedOrderRenterWZDepositReqVO payedOrderRenterWZDeposit = cashierNoTService.getPayedOrderRenterWZDepositReq(notifyDataVo,RenterCashCodeEnum.ACCOUNT_RENTER_WZ_DEPOSIT);
             //2 收银台记录更新
             cashierNoTService.updataCashierAndRenterWzDeposit(notifyDataVo,payedOrderRenterWZDeposit);
             //支付状态
-            if("00".equals(notifyDataVo.getTransStatus())) {
-	            vo.setWzRefundStatus(OrderRefundStatusEnum.REFUNDED.getStatus());
-	            sendOrderPayDepositSuccess(NewOrderMQActionEventEnum.ORDER_REFUND_SUCCESS,1,vo);
-            }else {
-            	vo.setWzRefundStatus(OrderRefundStatusEnum.REFUNDING.getStatus());
-//	            sendOrderPayDepositSuccess(NewOrderMQActionEventEnum.ORDER_REFUND_FAIL,1,vo);
-            }
+	        vo.setWzRefundStatus(OrderRefundStatusEnum.REFUNDED.getStatus());
+	        sendOrderPayDepositSuccess(NewOrderMQActionEventEnum.ORDER_REFUND_SUCCESS,1,vo);
         }
+        
         //1.3 租车费用
         if(Objects.nonNull(notifyDataVo) && DataPayKindConstant.RENT_AMOUNT.equals(notifyDataVo.getPayKind()) ){
             //1 对象初始化转换
@@ -873,13 +886,8 @@ public class CashierService {
             //2 收银台记录更新
             cashierNoTService.updataCashierAndRenterCost(notifyDataVo,accountRenterCostReq);
             //支付状态
-            if("00".equals(notifyDataVo.getTransStatus())) {
-	            vo.setRentCarRefundStatus(OrderRefundStatusEnum.REFUNDED.getStatus());
-	            sendOrderPayRentCostSuccess(NewOrderMQActionEventEnum.ORDER_REFUND_SUCCESS,vo,1);
-            }else {
-            	vo.setRentCarRefundStatus(OrderRefundStatusEnum.REFUNDING.getStatus());
-//	            sendOrderPayRentCostSuccess(NewOrderMQActionEventEnum.ORDER_REFUND_FAIL,vo,1);
-            }
+	        vo.setRentCarRefundStatus(OrderRefundStatusEnum.REFUNDED.getStatus());
+	        sendOrderPayRentCostSuccess(NewOrderMQActionEventEnum.ORDER_REFUND_SUCCESS,vo,1);
         }
         
         //1.4 补付租车费用
@@ -889,19 +897,11 @@ public class CashierService {
             //2 收银台记录更新
             cashierNoTService.updataCashierAndRenterCost(notifyDataVo,accountRenterCostReq);
             //支付状态
-            if("00".equals(notifyDataVo.getTransStatus())) {
-	            vo.setRentCarRefundStatus(OrderRefundStatusEnum.REFUNDED.getStatus());
-	            vo.setIsPayAgain(YesNoEnum.YES.getCode());
-	            sendOrderPayRentCostSuccess(NewOrderMQActionEventEnum.ORDER_REFUND_SUCCESS,vo,2);
-            }else {
-            	vo.setRentCarRefundStatus(OrderRefundStatusEnum.REFUNDING.getStatus());
-	            vo.setIsPayAgain(YesNoEnum.YES.getCode());
-	            //失败事件暂不处理
-//	            sendOrderPayRentCostSuccess(NewOrderMQActionEventEnum.ORDER_REFUND_FAIL,vo,2);
-            }
-
+//	        vo.setRentCarRefundStatus(OrderRefundStatusEnum.REFUNDED.getStatus());
+	        vo.setIsPayAgain(YesNoEnum.YES.getCode());
+	        sendOrderPayRentCostSuccess(NewOrderMQActionEventEnum.ORDER_REFUND_SUCCESS,vo,2);
         }
-
+        
     }
     
     /**

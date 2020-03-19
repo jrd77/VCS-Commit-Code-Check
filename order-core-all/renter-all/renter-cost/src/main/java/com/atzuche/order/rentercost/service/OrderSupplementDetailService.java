@@ -1,12 +1,17 @@
 package com.atzuche.order.rentercost.service;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.atzuche.order.commons.enums.YesNoEnum;
+import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.rentercost.entity.OrderSupplementDetailEntity;
+import com.atzuche.order.rentercost.entity.vo.PayableVO;
 import com.atzuche.order.rentercost.mapper.OrderSupplementDetailMapper;
 
 
@@ -20,7 +25,6 @@ public class OrderSupplementDetailService{
     @Autowired
     private OrderSupplementDetailMapper orderSupplementDetailMapper;
 
-
     /**
      * 获取租客补付记录
      * @param orderNo 主订单号
@@ -30,7 +34,77 @@ public class OrderSupplementDetailService{
     public List<OrderSupplementDetailEntity> listOrderSupplementDetailByOrderNoAndMemNo(String orderNo, String memNo) {
     	return orderSupplementDetailMapper.listOrderSupplementDetailByOrderNoAndMemNo(orderNo, memNo);
     }
-
+    
+    /**
+     * 根据会员号查询补付列表
+     * @param memNo
+     * @return
+     */
+    public List<OrderSupplementDetailEntity> listOrderSupplementDetailByMemNo(String memNo) {
+    	List<OrderSupplementDetailEntity> lsEntity = orderSupplementDetailMapper.listOrderSupplementDetailByMemNo(memNo);
+    	return lsEntity;
+    }
+    
+    //封装管理后台修改
+    public OrderSupplementDetailEntity handleConsoleData(int amt,RenterCashCodeEnum cashCode,String memNo,String orderNo) {
+    	OrderSupplementDetailEntity entity = new OrderSupplementDetailEntity();
+    	entity.setAmt(amt);
+    	entity.setCashNo(cashCode.getCashNo());
+    	//费用类型：1-补付费用，2-订单欠款
+    	entity.setCashType(1);
+    	entity.setCashTypeTxt(cashCode.getTxt());
+    	entity.setMemNo(memNo);
+    	//操作状态:0,待提交 1,已生效 2,已失效 3,已撤回
+    	entity.setOpStatus(1);
+    	//操作类型:1,修改订单 2,车管家录入 3,租车押金结算 4,违章押金结算 5,手动添加
+    	entity.setOpType(5);
+    	entity.setOrderNo(orderNo);
+    	//支付状态:0.无需支付 1.未支付 2.已取消 3.已支付 4.支付中，5.支付失败 10.租车押金结算抵扣  20.违章押金结算抵扣
+    	entity.setPayFlag(1);
+    	entity.setRemark("动态添加记录");
+    	//补付类型:1,系统创建 2,手动创建
+    	entity.setSupplementType(2);
+    	entity.setTitle(cashCode.getTxt());
+    	return entity;
+    }
+    
+    
+    //封装欠款
+    public OrderSupplementDetailEntity handleDebtData(int amt,RenterCashCodeEnum cashCode,String memNo,String orderNo) {
+    	OrderSupplementDetailEntity entity = new OrderSupplementDetailEntity();
+    	entity.setAmt(amt);
+    	entity.setCashNo(cashCode.getCashNo());
+    	//费用类型：1-补付费用，2-订单欠款
+    	entity.setCashType(2);
+    	entity.setCashTypeTxt(cashCode.getTxt());
+    	entity.setMemNo(memNo);
+    	//操作状态:0,待提交 1,已生效 2,已失效 3,已撤回
+    	entity.setOpStatus(1);
+    	//操作类型:1,修改订单 2,车管家录入 3,租车押金结算 4,违章押金结算 5,手动添加
+    	entity.setOpType(5);
+    	entity.setOrderNo(orderNo);
+    	//支付状态:0.无需支付 1.未支付 2.已取消 3.已支付 4.支付中，5.支付失败 10.租车押金结算抵扣  20.违章押金结算抵扣
+    	entity.setPayFlag(1);
+    	entity.setRemark("动态添加记录");
+    	//补付类型:1,系统创建 2,手动创建
+    	entity.setSupplementType(2);
+    	entity.setTitle(cashCode.getTxt());
+    	return entity;
+    }
+    
+    
+    
+    /**
+     * 根据订单号和会员号，查询列表。统计选择补付的订单号集合数据。
+     * @param memNo
+     * @param orderNoList
+     * @return
+     */
+    public List<OrderSupplementDetailEntity> listOrderSupplementDetailByMemNoAndOrderNos(String memNo,List<String> orderNoList) {
+    	return orderSupplementDetailMapper.listOrderSupplementDetailByMemNoAndOrderNos(memNo, orderNoList);
+    }
+    
+    
     /**
      * 返回补付的总额
      * @param orderNo
@@ -65,8 +139,8 @@ public class OrderSupplementDetailService{
      * @param payFlag
      * @return Integer
      */
-    public Integer updatePayFlagById(Integer id, Integer payFlag, Date payTime) {
-    	return orderSupplementDetailMapper.updatePayFlagById(id, payFlag, payTime);
+    public Integer updatePayFlagById(Integer id, Integer payFlag, Date payTime, Integer amt) {
+    	return orderSupplementDetailMapper.updatePayFlagById(id, payFlag, payTime,amt);
     }
     
     /**
