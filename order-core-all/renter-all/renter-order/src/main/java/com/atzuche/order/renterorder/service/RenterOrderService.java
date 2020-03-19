@@ -527,4 +527,8 @@ public class RenterOrderService {
     public List<RenterOrderEntity> queryHostiryRenterOrderByOrderNo(String orderNo) {
         return renterOrderMapper.queryHostiryRenterOrderByOrderNo(orderNo);
     }
+
+    public RenterOrderEntity getRenterOrderNoByOrderNoAndFinish(String orderNo) {
+        return renterOrderMapper.getRenterOrderNoByOrderNoAndFinish(orderNo);
+    }
 }
