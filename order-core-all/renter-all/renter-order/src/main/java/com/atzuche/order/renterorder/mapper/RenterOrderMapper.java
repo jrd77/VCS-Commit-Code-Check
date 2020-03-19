@@ -57,4 +57,6 @@ public interface RenterOrderMapper{
 
     int updateChildStatusByRenterOrderNo(@Param("renterOrderNo") String renterOrderNo, @Param("childStatus") Integer childStatus);
 
+
+    RenterOrderEntity getRenterOrderNoByOrderNoAndFinish(@Param("orderNo")String orderNo);
 }

@@ -9,6 +9,7 @@ import com.atzuche.order.commons.entity.dto.OwnerGoodsDetailDTO;
 import com.atzuche.order.commons.entity.dto.OwnerMemberDTO;
 import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
 import com.atzuche.order.commons.entity.dto.RenterMemberDTO;
+import com.atzuche.order.commons.enums.ChangeSourceEnum;
 import com.atzuche.order.commons.enums.OrderStatusEnum;
 import com.atzuche.order.commons.vo.req.AdminOrderReqVO;
 import com.atzuche.order.commons.vo.req.NormalOrderReqVO;
@@ -108,6 +109,7 @@ public class SubmitOrderController {
                 LocalDateTimeUtils.DEFAULT_PATTERN));
 
         orderReqVO.setReqTime(LocalDateTime.now());
+        orderReqVO.setChangeSource(ChangeSourceEnum.RENTER.getCode());
         OrderReqContext context = buildOrderReqContext(orderReqVO);
         orderFilterChain.validate(context);
         try{
@@ -202,6 +204,7 @@ public class SubmitOrderController {
                 LocalDateTimeUtils.DEFAULT_PATTERN));
 
         orderReqVO.setReqTime(LocalDateTime.now());
+        orderReqVO.setChangeSource(ChangeSourceEnum.CONSOLE.getCode());
         OrderReqContext context = buildOrderReqContext(orderReqVO);
         orderFilterChain.validate(context);
         try{

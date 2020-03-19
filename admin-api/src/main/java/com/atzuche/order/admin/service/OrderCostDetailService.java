@@ -33,6 +33,7 @@ import com.atzuche.order.parentorder.service.OrderService;
 import com.atzuche.order.rentercommodity.service.RenterGoodsService;
 import com.atzuche.order.rentercost.entity.*;
 import com.atzuche.order.rentercost.service.*;
+import com.atzuche.order.rentercost.utils.OrderSubsidyDetailUtils;
 import com.atzuche.order.rentermem.service.RenterMemberService;
 import com.atzuche.order.renterorder.entity.RenterDepositDetailEntity;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
@@ -474,18 +475,26 @@ public class OrderCostDetailService {
 				}
 			}
 		}
-		
-		//数据封装
+
+        List<RenterOrderSubsidyDetailEntity> renterOrderSubsidyDetailEntityList = renterOrderSubsidyDetailService.listRenterOrderSubsidyDetail(renterCostReqVO.getOrderNo(),renterCostReqVO.getRenterOrderNo());
+        int renterUpateSubsidyAmt = OrderSubsidyDetailUtils.getRenterUpateSubsidyAmt(renterOrderSubsidyDetailEntityList);
+        int renterSubsidyAmt = OrderSubsidyDetailUtils.getRenterSubsidyAmt(renterOrderSubsidyDetailEntityList, RenterCashCodeEnum.INSURE_TOTAL_PRICES);
+        int abatementInsureAmt = OrderSubsidyDetailUtils.getRenterSubsidyAmt(renterOrderSubsidyDetailEntityList, RenterCashCodeEnum.ABATEMENT_INSURE);
+
+        //数据封装
 		resVo.setDispatchingSubsidy(String.valueOf(dispatching));
+        resVo.setDispatchingSubsidySystem(String.valueOf(renterUpateSubsidyAmt));
 	 	resVo.setOilSubsidy(String.valueOf(oil));
 	 	resVo.setCleanCarSubsidy(String.valueOf(cleancar));
 	 	resVo.setGetReturnDelaySubsidy(String.valueOf(getReturnDelay));
 	 	resVo.setDelaySubsidy(String.valueOf(delay));
 	 	resVo.setTrafficSubsidy(String.valueOf(traffic));
 	 	resVo.setInsureSubsidy(String.valueOf(insure));
+        resVo.setInsureSubsidySystem(String.valueOf(renterSubsidyAmt));
 	 	resVo.setRentAmtSubsidy(String.valueOf(rentamt));
 	 	resVo.setOtherSubsidy(String.valueOf(other));
 	 	resVo.setAbatementSubsidy(String.valueOf(abatement));
+        resVo.setAbatementSubsidySystem(String.valueOf(abatementInsureAmt));
 	 	resVo.setFeeSubsidy(String.valueOf(fee));
 		return resVo;
 	}

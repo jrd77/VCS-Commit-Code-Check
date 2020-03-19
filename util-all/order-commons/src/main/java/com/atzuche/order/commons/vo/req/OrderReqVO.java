@@ -206,6 +206,11 @@ public class OrderReqVO extends BaseVO {
     private String reductiAmt;
 
     private LocalDateTime reqTime;
+    
+    /**
+     * 来源
+     */
+    private String changeSource;
 
     public LocalDateTime getReqTime() {
         return reqTime;
@@ -654,4 +659,13 @@ public class OrderReqVO extends BaseVO {
     public void setOfflineOrderStatus(String offlineOrderStatus) {
         this.offlineOrderStatus = offlineOrderStatus;
     }
+
+	public String getChangeSource() {
+		return changeSource;
+	}
+
+	public void setChangeSource(String changeSource) {
+		this.changeSource = changeSource;
+	}
+    
 }

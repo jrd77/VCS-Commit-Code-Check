@@ -1,35 +1,13 @@
 package com.atzuche.order.coreapi.service;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-import com.atzuche.order.ownercost.entity.*;
-import com.atzuche.order.ownercost.service.*;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import com.atzuche.order.commons.CostStatUtils;
 import com.atzuche.order.commons.GlobalConstant;
 import com.atzuche.order.commons.LocalDateTimeUtils;
 import com.atzuche.order.commons.NumberUtils;
 import com.atzuche.order.commons.entity.dto.OwnerGoodsDetailDTO;
 import com.atzuche.order.commons.entity.dto.OwnerGoodsPriceDetailDTO;
-import com.atzuche.order.commons.entity.orderDetailDto.ConsoleOwnerOrderFineDeatailDTO;
-import com.atzuche.order.commons.entity.orderDetailDto.OrderConsoleCostDetailDTO;
-import com.atzuche.order.commons.entity.orderDetailDto.OrderDTO;
-import com.atzuche.order.commons.entity.orderDetailDto.OwnerOrderFineDeatailDTO;
-import com.atzuche.order.commons.entity.orderDetailDto.OwnerOrderSubsidyDetailDTO;
-import com.atzuche.order.commons.entity.ownerOrderDetail.FienAmtDetailDTO;
-import com.atzuche.order.commons.entity.ownerOrderDetail.FienAmtUpdateReqDTO;
-import com.atzuche.order.commons.entity.ownerOrderDetail.OwnerRentDetailDTO;
-import com.atzuche.order.commons.entity.ownerOrderDetail.PlatformToOwnerDTO;
-import com.atzuche.order.commons.entity.ownerOrderDetail.PlatformToOwnerSubsidyDTO;
-import com.atzuche.order.commons.entity.ownerOrderDetail.RenterOwnerPriceDTO;
-import com.atzuche.order.commons.entity.ownerOrderDetail.ServiceDetailDTO;
+import com.atzuche.order.commons.entity.orderDetailDto.*;
+import com.atzuche.order.commons.entity.ownerOrderDetail.*;
 import com.atzuche.order.commons.enums.CarOwnerTypeEnum;
 import com.atzuche.order.commons.enums.FineSubsidyCodeEnum;
 import com.atzuche.order.commons.enums.FineTypeEnum;
@@ -37,6 +15,8 @@ import com.atzuche.order.commons.enums.cashcode.ConsoleCashCodeEnum;
 import com.atzuche.order.commons.enums.cashcode.OwnerCashCodeEnum;
 import com.atzuche.order.commons.exceptions.OrderNotFoundException;
 import com.atzuche.order.owner.commodity.service.OwnerGoodsService;
+import com.atzuche.order.ownercost.entity.*;
+import com.atzuche.order.ownercost.service.*;
 import com.atzuche.order.parentorder.entity.OrderEntity;
 import com.atzuche.order.parentorder.service.OrderService;
 import com.atzuche.order.rentercost.entity.OrderConsoleCostDetailEntity;
@@ -44,9 +24,16 @@ import com.atzuche.order.rentercost.entity.OrderConsoleSubsidyDetailEntity;
 import com.atzuche.order.rentercost.service.OrderConsoleCostDetailService;
 import com.atzuche.order.rentercost.service.OrderConsoleSubsidyDetailService;
 import com.atzuche.order.settle.service.OrderSettleService;
-import com.atzuche.order.settle.vo.req.OwnerCosts;
-
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * 车主费用明细
@@ -411,5 +398,19 @@ public class OwnerOrderDetailService {
         }else{
             ownerOrderFineDeatailService.updateByCashNoAndOwnerOrderNo(ownerOrderFineDeatailEntity);
         }
+    }
+
+    public List<ConsoleOwnerOrderFineDeatailDTO> fienAmtDetailList(String orderNo, String ownerMemNo) {
+        List<ConsoleOwnerOrderFineDeatailEntity> list = consoleOwnerOrderFineDeatailService.selectByOrderNo(orderNo, ownerMemNo);
+        List<ConsoleOwnerOrderFineDeatailDTO> consoleOwnerOrderFineDeatailDTOS = new ArrayList<>();
+        Optional.ofNullable(list).orElseGet(ArrayList::new)
+                .stream()
+                .filter(x-> FineTypeEnum.MODIFY_ADDRESS_FINE.getFineType().equals(x.getFineType()))
+                .forEach(x->{
+            ConsoleOwnerOrderFineDeatailDTO dto = new ConsoleOwnerOrderFineDeatailDTO();
+            BeanUtils.copyProperties(x,dto);
+            consoleOwnerOrderFineDeatailDTOS.add(dto);
+        });
+        return consoleOwnerOrderFineDeatailDTOS;
     }
 }

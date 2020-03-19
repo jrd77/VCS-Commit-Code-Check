@@ -73,7 +73,7 @@ public class AdminOrderController {
         String  memNo = detailRespDTO.getRenterMember().getMemNo();
         modifyOrderReqVO.setMemNo(memNo);
         modifyOrderReqVO.setConsoleFlag(true);
-
+        modifyOrderReqVO.setOperator(AdminUserUtil.getAdminUser().getAuthName());
         adminOrderService.modifyOrder(modifyOrderReqVO);
         return ResponseData.success();
     }

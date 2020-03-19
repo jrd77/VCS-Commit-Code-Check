@@ -1,5 +1,16 @@
 package com.atzuche.order.cashieraccount.service;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
+import org.springframework.util.CollectionUtils;
+
 import com.atzuche.order.accountrenterdeposit.service.AccountRenterDepositService;
 import com.atzuche.order.accountrenterdeposit.vo.res.AccountRenterDepositResVO;
 import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostSettleEntity;
@@ -7,8 +18,6 @@ import com.atzuche.order.accountrenterrentcost.service.AccountRenterCostSettleSe
 import com.atzuche.order.accountrenterwzdepost.service.AccountRenterWzDepositService;
 import com.atzuche.order.accountrenterwzdepost.vo.res.AccountRenterWZDepositResVO;
 import com.atzuche.order.cashieraccount.common.FasterJsonUtil;
-import com.atzuche.order.cashieraccount.common.PayCashTypeEnum;
-import com.atzuche.order.cashieraccount.common.VirtualPayTypeEnum;
 import com.atzuche.order.cashieraccount.entity.CashierEntity;
 import com.atzuche.order.cashieraccount.entity.CashierRefundApplyEntity;
 import com.atzuche.order.cashieraccount.exception.OrderPaySignFailException;
@@ -16,12 +25,16 @@ import com.atzuche.order.cashieraccount.service.notservice.AccountVirtualPayServ
 import com.atzuche.order.cashieraccount.service.notservice.CashierNoTService;
 import com.atzuche.order.cashieraccount.service.notservice.CashierRefundApplyNoTService;
 import com.atzuche.order.cashieraccount.service.remote.RefundRemoteService;
-import com.atzuche.order.cashieraccount.vo.req.pay.*;
+import com.atzuche.order.cashieraccount.vo.req.pay.OfflineNotifyDataVO;
+import com.atzuche.order.cashieraccount.vo.req.pay.OfflinePayDTO;
+import com.atzuche.order.cashieraccount.vo.req.pay.OrderPayReqVO;
+import com.atzuche.order.cashieraccount.vo.req.pay.OrderPaySignReqVO;
+import com.atzuche.order.cashieraccount.vo.req.pay.VirtualNotifyDataVO;
+import com.atzuche.order.cashieraccount.vo.req.pay.VirtualPayDTO;
 import com.atzuche.order.cashieraccount.vo.res.AccountPayAbleResVO;
 import com.atzuche.order.cashieraccount.vo.res.OrderPayableAmountResVO;
 import com.atzuche.order.cashieraccount.vo.res.pay.OrderPayCallBackSuccessVO;
 import com.atzuche.order.commons.DateUtils;
-import com.atzuche.order.commons.LocalDateTimeUtils;
 import com.atzuche.order.commons.enums.OrderPayStatusEnum;
 import com.atzuche.order.commons.enums.OrderStatusEnum;
 import com.atzuche.order.commons.enums.YesNoEnum;
@@ -31,9 +44,10 @@ import com.atzuche.order.commons.service.OrderPayCallBack;
 import com.atzuche.order.flow.service.OrderFlowService;
 import com.atzuche.order.parentorder.dto.OrderStatusDTO;
 import com.atzuche.order.parentorder.entity.OrderStatusEntity;
-import com.atzuche.order.parentorder.service.OrderService;
 import com.atzuche.order.parentorder.service.OrderStatusService;
+import com.atzuche.order.rentercost.entity.OrderSupplementDetailEntity;
 import com.atzuche.order.rentercost.entity.vo.PayableVO;
+import com.atzuche.order.rentercost.service.OrderSupplementDetailService;
 import com.atzuche.order.rentercost.service.RenterOrderCostCombineService;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.atzuche.order.wallet.WalletProxyService;
@@ -48,20 +62,7 @@ import com.autoyol.autopay.gateway.vo.res.AutoPayResultVo;
 import com.autoyol.commons.utils.GsonUtils;
 import com.autoyol.commons.web.ErrorCode;
 
-import ch.qos.logback.classic.Logger;
-import com.autoyol.platformcost.LocalDateTimeUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.Assert;
-import org.springframework.util.CollectionUtils;
-
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
 
 
 /**
@@ -87,7 +88,8 @@ public class CashierPayService{
     @Autowired private OrderFlowService orderFlowService;
     @Autowired
     private AccountVirtualPayService virtualPayService;
-
+    @Autowired
+    private OrderSupplementDetailService orderSupplementDetailService;
 
 
     public void virtualPay(VirtualPayDTO virtualPayVO,OrderPayCallBack callBack){
@@ -139,6 +141,9 @@ public class CashierPayService{
 
         payCallBack(batchNotifyDataVo,callBack);
     }
+
+    
+
 
 
     /**
@@ -512,7 +517,7 @@ public class CashierPayService{
      * @return
      */
     public int getRentCostBufu(String orderNo,String memNo){
-        RenterOrderEntity renterOrderEntity = cashierNoTService.getRenterOrderNoByOrderNo(orderNo);
+        RenterOrderEntity renterOrderEntity = cashierNoTService.getRenterOrderNoByOrderNoAndFinish(orderNo);
 
         if(Objects.isNull(renterOrderEntity) || Objects.isNull(renterOrderEntity.getRenterOrderNo())){
             return 0;
@@ -523,8 +528,27 @@ public class CashierPayService{
         int rentAmt = cashierNoTService.sumRentOrderCost(payableVOs);
         //已付租车费用
         int rentAmtPayed = accountRenterCostSettleService.getCostPaidRent(orderNo,memNo);
-        return rentAmt - rentAmtPayed<0?0:(rentAmt - rentAmtPayed);
+        return Math.abs(rentAmt) - rentAmtPayed<0?0:(Math.abs(rentAmt) - rentAmtPayed);
     }
+
+    /*
+     * @Author ZhangBin
+     * @Date 2020/3/19 16:27
+     * @Description: 获取补付信息
+     *
+     **/
+    public int getRentCostBufuNew(String orderNo,String memNo){
+        /*RenterOrderEntity renterOrderEntity = cashierNoTService.getRenterOrderNoByOrderNoAndFinish(orderNo);
+
+        if(Objects.isNull(renterOrderEntity) || Objects.isNull(renterOrderEntity.getRenterOrderNo())){
+            return 0;
+        }*/
+        //查询应付租车费用列表
+        List<OrderSupplementDetailEntity> supplementList = orderSupplementDetailService.listOrderSupplementDetailByOrderNoAndMemNo(orderNo, memNo);
+        int sum = supplementList.stream().mapToInt(x -> x.getAmt()).sum();
+        return sum;
+    }
+
     
     public int getRealRentCost(String orderNo,String memNo){
         RenterOrderEntity renterOrderEntity = cashierNoTService.getRenterOrderNoByOrderNo(orderNo);

@@ -1,20 +1,15 @@
 package com.atzuche.order.coreapi.controller;
 
-import com.atzuche.order.commons.BindingResultUtil;
+import com.atzuche.order.commons.entity.orderDetailDto.ConsoleOwnerOrderFineDeatailDTO;
 import com.atzuche.order.commons.entity.ownerOrderDetail.*;
 import com.atzuche.order.commons.exceptions.InputErrorException;
 import com.atzuche.order.coreapi.service.OwnerOrderDetailService;
-import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
-import com.google.inject.internal.asm.$TypePath;
-
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -136,6 +131,20 @@ public class OwnerOrderDetailController {
         PlatformToOwnerSubsidyDTO platformToOwnerSubsidyDTO = ownerOrderDetailService.platformToOwnerSubsidy(orderNo,ownerOrderNo,memNo);
         return ResponseData.success(platformToOwnerSubsidyDTO);
     }
+
+    @GetMapping("/owner/fienAmtDetailList")
+    public ResponseData<List<ConsoleOwnerOrderFineDeatailDTO>> fienAmtDetailList(@RequestParam("orderNo") String orderNo, @RequestParam("ownerMemNo") String ownerMemNo){
+        if(orderNo == null || orderNo.trim().length()<=0){
+            throw new InputErrorException("主订单号不能为空");
+        }
+
+        if(ownerMemNo == null || ownerMemNo.trim().length()<=0){
+            throw new InputErrorException("车主会员号不能为空");
+        }
+        List<ConsoleOwnerOrderFineDeatailDTO> list = ownerOrderDetailService.fienAmtDetailList(orderNo,ownerMemNo);
+        return ResponseData.success(list);
+    }
+
 
     @PostMapping("/owner/updateFien")
     public ResponseData<?> updateFineAmt(@RequestBody FienAmtUpdateReqDTO fienAmtUpdateReqDTO){  //@Valid   , BindingResult bindingResult

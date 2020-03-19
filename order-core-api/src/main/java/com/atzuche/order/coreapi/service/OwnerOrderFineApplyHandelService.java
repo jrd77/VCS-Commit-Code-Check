@@ -79,7 +79,7 @@ public class OwnerOrderFineApplyHandelService {
             costBaseDTO.setOrderNo(ownerOrderFineApplyEntity.getOrderNo());
             costBaseDTO.setMemNo(ownerOrderFineApplyEntity.getMemNo().toString());
 
-            if(isSubsidyFineAmt) {
+            if(!isSubsidyFineAmt) {
                 ConsoleRenterOrderFineDeatailEntity consoleRenterOrderFineDeatailEntity =
                         consoleRenterOrderFineDeatailService.fineDataConvert(costBaseDTO,
                                 Math.abs(ownerOrderFineApplyEntity.getFineAmount()), FineSubsidyCodeEnum.RENTER,

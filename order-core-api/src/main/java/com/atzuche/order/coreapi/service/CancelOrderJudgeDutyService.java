@@ -109,7 +109,7 @@ public class CancelOrderJudgeDutyService {
                 }
 
                 //车主收益(来自租客罚金)
-                if (isSubsidyFineAmt) {
+                if (!isSubsidyFineAmt) {
                     consoleOwnerOrderFineDeatailEntity =
                             consoleOwnerOrderFineDeatailService.fineDataConvert(cancelFineAmt.getCostBaseDTO(), penalty, FineSubsidyCodeEnum.OWNER,
                                     FineSubsidySourceCodeEnum.RENTER, FineTypeEnum.CANCEL_FINE);
@@ -173,7 +173,7 @@ public class CancelOrderJudgeDutyService {
                     ownerOrderFineDetailEntityOne.setOwnerOrderNo(ownerOrderEntity.getOwnerOrderNo());
                 }
                 //租客收益处理
-                if (isSubsidyFineAmt) {
+                if (!isSubsidyFineAmt) {
                     ConsoleRenterOrderFineDeatailEntity consoleRenterOrderFineDeatailEntity =
                             consoleRenterOrderFineDeatailService.fineDataConvert(cancelFineAmt.getCostBaseDTO(), penalty,
                                     FineSubsidyCodeEnum.RENTER, FineSubsidySourceCodeEnum.OWNER, FineTypeEnum.CANCEL_FINE);

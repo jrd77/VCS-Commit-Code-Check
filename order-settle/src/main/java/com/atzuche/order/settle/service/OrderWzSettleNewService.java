@@ -55,14 +55,10 @@ public class OrderWzSettleNewService {
 	private OrderWzSettleNoTService orderWzSettleNoTService;
 	@Autowired
 	private BaseProducer baseProducer;
-	// 更新订单状态和订单流转
 	@Autowired
 	private OrderStatusService orderStatusService;
-
-	// 查询租客有效订单
 	@Autowired
 	private RenterOrderService renterOrderService;
-	// 判断是否暂扣
 	@Autowired
 	private AccountRenterDetainDetailNoTService accountRenterDetainDetailNoTService;
 	@Autowired
@@ -75,6 +71,9 @@ public class OrderWzSettleNewService {
 	private static final String WZ_DEPOSIT_PAY_KIND = "02";
 	// 虚拟支付
 	private static final int PAY_LINE_VIRTUAL = 2;
+	@Autowired
+    private OrderWzSettleSupplementHandleService orderWzSettleSupplementHandleService;
+
 	/**
 	 * 初始化结算对象
 	 * 
@@ -286,21 +285,24 @@ public class OrderWzSettleNewService {
 		orderWzSettleNoTService.wzCostSettle(settleOrders, settleOrdersAccount);
 
 
+		//抵扣未支付的补付费用
+        orderWzSettleSupplementHandleService.supplementCostHandle(settleOrders, settleOrdersAccount);
 
 		log.info("OrderSettleService repayWzHistoryDebtRent 抵扣历史欠款。settleOrdersAccount [{}]", GsonUtils.toJson(settleOrdersAccount));
+
 		// 2.1租客剩余违章押金 结余历史欠款
 		orderWzSettleNoTService.repayWzHistoryDebtRent(settleOrdersAccount);
 		// 2.2违章押金抵扣老系统欠款
 		int totalwzDebtAmt = orderWzSettleNoTService.oldRepayWzHistoryDebtRent(settleOrdersAccount);
 		settleOrders.setTotalWzDebtAmt(totalwzDebtAmt);
 		log.info("OrderSettleService refundWzDepositAmt 退还违章押金。settleOrdersAccount [{}]", GsonUtils.toJson(settleOrdersAccount));
-		// 3 违章押金 退还
+		// 违章押金 退还
 		orderWzSettleNoTService.refundWzDepositAmt(settleOrdersAccount, orderStatusDTO);
 		
 		
 		log.info("OrderSettleService 结算结束 settleOrdersAccount [{}],orderStatusDTO [{}]", GsonUtils.toJson(settleOrdersAccount),GsonUtils.toJson(orderStatusDTO));
 		
-		// 4 更新订单状态
+		// 更新订单状态
 		settleOrdersAccount.setOrderStatusDTO(orderStatusDTO);
 		orderWzSettleNoTService.saveOrderStatusInfo(settleOrdersAccount);
 		log.info("OrderSettleService settleOrdersDefinition settleOrdersAccount two [{}]",GsonUtils.toJson(settleOrdersAccount));
