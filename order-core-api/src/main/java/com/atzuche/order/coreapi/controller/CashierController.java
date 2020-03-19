@@ -1,20 +1,29 @@
 package com.atzuche.order.coreapi.controller;
 
+import javax.validation.Valid;
+
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.atzuche.order.cashieraccount.service.CashierPayService;
+import com.atzuche.order.cashieraccount.service.remote.PayRemoteService;
 import com.atzuche.order.cashieraccount.vo.req.pay.OrderPayReqVO;
 import com.atzuche.order.cashieraccount.vo.req.pay.OrderPaySignReqVO;
 import com.atzuche.order.cashieraccount.vo.res.OrderPayableAmountResVO;
 import com.atzuche.order.commons.BindingResultUtil;
 import com.atzuche.order.coreapi.service.PayCallbackService;
+import com.autoyol.autopay.gateway.vo.req.PrePlatformRequest;
+import com.autoyol.autopay.gateway.vo.res.PayResVo;
 import com.autoyol.commons.utils.GsonUtils;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.doc.annotation.AutoDocMethod;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @RequestMapping("cashier")
@@ -24,7 +33,8 @@ public class CashierController {
 	@Autowired
 	private CashierPayService cashierPayService;
     @Autowired PayCallbackService payCallbackService;
-
+    @Autowired
+    PayRemoteService payRemoteService;
 
     /**
      * 查询支付款项信息
@@ -38,8 +48,28 @@ public class CashierController {
         BindingResultUtil.checkBindingResult(bindingResult);
         OrderPayableAmountResVO result = cashierPayService.getOrderPayableAmount(orderPayReqVO);
         log.info("CashierController getOrderPayableAmount end param [{}],result [{}]", GsonUtils.toJson(orderPayReqVO),GsonUtils.toJson(result));
+        //调起支付平台获取收银台信息
+        PrePlatformRequest reqData = new PrePlatformRequest();
+        //赋值
+        putPrePlatformRequest(orderPayReqVO, result, reqData);
+		
+        PayResVo payResVo = payRemoteService.getPayPlatform(reqData);
+        if(payResVo != null) {
+        	BeanUtils.copyProperties(payResVo, result);
+        }
+        
         return ResponseData.success(result);
     }
+
+	private void putPrePlatformRequest(OrderPayReqVO orderPayReqVO, OrderPayableAmountResVO result,
+			PrePlatformRequest reqData) {
+		reqData.setAtappId(orderPayReqVO.getAtappId());
+        reqData.setInternalNo(orderPayReqVO.getInternalNo());
+        reqData.setPayAmt(String.valueOf(result.getAmtTotal()));  //支付金额
+        reqData.setPayKind(orderPayReqVO.getPayKind().get(0)); //默认取第一个。
+        reqData.setPayType(orderPayReqVO.getPayType());  //消费
+        reqData.setOrderNo(orderPayReqVO.getOrderNo());
+	}
     
     /**
      * 收银支付获取支付签名串

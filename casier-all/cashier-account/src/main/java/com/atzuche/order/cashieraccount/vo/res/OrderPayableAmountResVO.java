@@ -1,11 +1,13 @@
 package com.atzuche.order.cashieraccount.vo.res;
 
-import com.atzuche.order.rentercost.entity.vo.PayableVO;
-import com.autoyol.doc.annotation.AutoDocProperty;
-import lombok.Data;
-import lombok.ToString;
-
+import java.util.ArrayList;
 import java.util.List;
+
+import com.atzuche.order.rentercost.entity.vo.PayableVO;
+import com.autoyol.autopay.gateway.vo.res.PayInfoVo;
+import com.autoyol.doc.annotation.AutoDocProperty;
+
+import lombok.ToString;
 
 /**
  * 个人代付信息
@@ -126,6 +128,16 @@ public class OrderPayableAmountResVO {
     @AutoDocProperty("提示文案")
     private String hints;
     
+    // ---------------------------------支付收银台的扩展参数，兼容APP对接 ---------------------------------
+    private List<PayInfoVo> pays = new ArrayList<PayInfoVo>();  //支付渠道，列表集合。
+	private String amount; //支付金额(元)
+	private String payTitle; //支付订金/支付租车押金/支付违章押金，app显示用
+	private String payMemo;  //显示文案，根据支付项不同而不同（后台动态获取配置项）
+	private String payKind;  //支付类型
+	
+	//去掉订单号，该字段已经存在。
+//	private String orderNo; //订单号
+	
     
 	public int getAmtIncrementRent() {
 		return amtIncrementRent;

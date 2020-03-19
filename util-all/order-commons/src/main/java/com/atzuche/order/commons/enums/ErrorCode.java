@@ -39,7 +39,7 @@ public enum ErrorCode {
     CASHIER_PAY_SIGN_PARAM_ERRER("981007","支付参数签名失败"),
     CASHIER_PAY_SIGN_FAIL_ERRER("981009","没有待支付记录"),
     CASHIER_PAY_SETTLEAMT_FAIL_ERRER("981010","支付系统返回的支付金额异常"),
-    
+    CASHIER_PAY_APPLY("981011","支付收银台申请出错"),
 
     ORDER_SETTLE_FLAT_ACCOUNT("811001","结算费用未平账"),
 

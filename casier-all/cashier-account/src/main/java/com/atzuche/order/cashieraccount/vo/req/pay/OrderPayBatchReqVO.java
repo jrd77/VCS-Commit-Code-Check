@@ -53,6 +53,12 @@ public class OrderPayBatchReqVO {
 //    @AutoDocProperty("是否使用钱包 0-否，1-是")
 //    private Integer isUseWallet = new Integer(0);  //默认0
     
+    // ----------------- 获取收银台参数 -----------------
+	private String internalNo = "0";  //默认0
+	//来源
+	private String atappId;
+	private String payType;
+	
     /**
      * 参数校验
      */
