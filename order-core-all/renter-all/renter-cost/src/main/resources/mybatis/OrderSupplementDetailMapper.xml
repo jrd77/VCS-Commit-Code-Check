@@ -27,26 +27,25 @@
 
 
 	<sql id="Base_Column_List">
-	`id`, 	
-	`order_no`, 	
-	`mem_no`, 
-	`cash_type`,	
-	`cash_no`, 	
-	`title`, 	
-	`amt`, 	
-	`request_pay_code`,
-	`op_status`, 	
-	`supplement_type`, 	
-	`op_type`, 	
-	`remark`, 	
-	`pay_flag`, 	
-	`create_time`, 	
-	`create_op`, 	
-	`update_time`, 	
-	`update_op`, 	
-	`is_delete`,
-	`pay_time`	
-
+        `id`,
+        `order_no`,
+        `mem_no`,
+        `cash_type`,
+        `cash_no`,
+        `title`,
+        `amt`,
+        `request_pay_code`,
+        `op_status`,
+        `supplement_type`,
+        `op_type`,
+        `remark`,
+        `pay_flag`,
+        `create_time`,
+        `create_op`,
+        `update_time`,
+        `update_op`,
+        `is_delete`,
+        `pay_time`
 	</sql>
 
 
@@ -55,8 +54,7 @@
 	</select>
 
 	<insert id="insert" parameterType="com.atzuche.order.rentercost.entity.OrderSupplementDetailEntity" useGeneratedKeys="true" keyProperty="id">
-		insert into order_supplement_detail
-		(
+		insert into order_supplement_detail (
 				`order_no`,		
 				`mem_no`,		
 				`cash_no`,		
@@ -72,9 +70,7 @@
 				`update_time`,		
 				`update_op`,		
 				`is_delete`		
-			)
-		values
-		(
+        ) values (
 				#{orderNo}, 		
 				#{memNo}, 		
 				#{cashNo}, 		
@@ -90,12 +86,12 @@
 				#{updateTime}, 		
 				#{updateOp}, 		
 				#{isDelete}		
-			)
+        )
 	</insert>
 	
 	<insert id="insertSelective" parameterType="com.atzuche.order.rentercost.entity.OrderSupplementDetailEntity" useGeneratedKeys="true" keyProperty="id">
 		insert into order_supplement_detail
-        <trim prefix="(" suffix=")" suffixOverrides="," >
+            <trim prefix="(" suffix=")" suffixOverrides="," >
 				<if test="orderNo != null">`order_no`, </if>
 				<if test="memNo != null">`mem_no`, </if>
 				<if test="cashType != null">`cash_type`, </if>
@@ -113,8 +109,8 @@
 				<if test="updateTime != null">`update_time`, </if>
 				<if test="updateOp != null">`update_op`, </if>
 				<if test="isDelete != null">`is_delete` </if>
-        </trim>
-        <trim prefix="values (" suffix=")" suffixOverrides="," >
+            </trim>
+            <trim prefix="values (" suffix=")" suffixOverrides="," >
 				<if test="orderNo != null">#{orderNo},  </if>
 				<if test="memNo != null">#{memNo},  </if>
 				<if test="cashType != null">#{cashType},  </if>
@@ -132,13 +128,13 @@
 				<if test="updateTime != null">#{updateTime},  </if>
 				<if test="updateOp != null">#{updateOp},  </if>
 				<if test="isDelete != null">#{isDelete} </if>
-        </trim>
+            </trim>
 	</insert>
 	
 	 
 	<update id="updateByPrimaryKeySelective" parameterType="com.atzuche.order.rentercost.entity.OrderSupplementDetailEntity">
 		update order_supplement_detail 
-		<set>
+		    <set>
 				<if test="orderNo != null">`order_no` = #{orderNo}, </if>
 				<if test="memNo != null">`mem_no` = #{memNo}, </if>
 				<if test="cashNo != null">`cash_no` = #{cashNo}, </if>
@@ -160,7 +156,7 @@
 	
 	<update id="updateByPrimaryKey" parameterType="com.atzuche.order.rentercost.entity.OrderSupplementDetailEntity">
 		update order_supplement_detail 
-		<set>
+		    <set>
 				`order_no` = #{orderNo}, 		
 				`mem_no` = #{memNo}, 		
 				`cash_no` = #{cashNo}, 		
@@ -176,8 +172,7 @@
 				`update_time` = #{updateTime}, 		
 				`update_op` = #{updateOp}, 		
 				`is_delete` = #{isDelete}		
-	
-		</set>
+		    </set>
 		where id = #{id}
 	</update>
 	
@@ -206,4 +201,22 @@
 		set `is_delete` = 1
 		where id = #{id}
 	</update>
+
+
+    <select id="selectNotPayByOrderNo" resultMap="BaseResultMap">
+        select
+            <include refid="Base_Column_List" />
+        from
+            order_supplement_detail
+        where
+            order_no = #{orderNo}
+            and op_status = 1
+            and pay_flag in (1,4,5)
+            and is_delete = 0
+        order by amt
+    </select>
+
+    <update id="updateOpStatusByPrimaryKey">
+        update order_supplement_detail set `op_status` = #{opStatus} where id = #{id}
+    </update>
 </mapper>
