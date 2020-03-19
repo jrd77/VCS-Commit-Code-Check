@@ -30,6 +30,7 @@ public interface OrderSupplementDetailMapper{
     List<OrderSupplementDetailEntity> listOrderSupplementDetailByOrderNoAndMemNo(@Param("orderNo") String orderNo,@Param("memNo") String memNo);
     
     Integer updatePayFlagById(@Param("id") Integer id, @Param("payFlag") Integer payFlag, @Param("payTime") Date payTime,@Param("amt") Integer amt);
+    Integer updatePayFlagNewById(@Param("id") Integer id, @Param("payFlag") Integer payFlag, @Param("payTime") Date payTime);
     
     List<OrderSupplementDetailEntity> listOrderSupplementDetailByOrderNo(@Param("orderNo") String orderNo);
     

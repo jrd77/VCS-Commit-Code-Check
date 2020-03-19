@@ -143,6 +143,10 @@ public class OrderSupplementDetailService{
     	return orderSupplementDetailMapper.updatePayFlagById(id, payFlag, payTime,amt);
     }
     
+    public Integer updatePayFlagById(Integer id, Integer payFlag, Date payTime) {
+    	return orderSupplementDetailMapper.updatePayFlagNewById(id, payFlag, payTime);
+    }
+    
     /**
      * 根据订单号获取补付记录
      * @param orderNo
