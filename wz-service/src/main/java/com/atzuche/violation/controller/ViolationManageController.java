@@ -135,7 +135,7 @@ public class ViolationManageController {
         validateParameter(bindingResult);
         try{
             logger.info("新增违章入参:{}",violationAdditionRequestVO.toString());
-
+            violationManageService.saveRenterOrderWzDetail(violationAdditionRequestVO);
             CatLogRecord.successLog("新增违章成功","console/order/violation/add",violationAdditionRequestVO);
             return ResponseData.success();
         } catch (Exception e) {
@@ -153,7 +153,7 @@ public class ViolationManageController {
         validateParameter(bindingResult);
         try{
             logger.info("删除违章入参:{}",violationDeleteRequestVO.toString());
-
+            violationManageService.deleteRenterOrderWzDetailById(violationDeleteRequestVO);
             CatLogRecord.successLog("删除违章成功","console/order/violation/delete",violationDeleteRequestVO);
             return ResponseData.success();
         } catch (Exception e) {
@@ -165,35 +165,35 @@ public class ViolationManageController {
 
 
     @AutoDocMethod(description = "确认已处理", value = "确认已处理", response = ResponseData.class)
-    @PostMapping("/updateStatus")
-    public ResponseData updateStatus(@Valid @RequestBody ViolationDeleteRequestVO violationDeleteRequestVO, BindingResult bindingResult) {
+    @PostMapping("/confirm/handle")
+    public ResponseData updateConfirmStatus(@Valid @RequestBody ViolationConfirmRequestVO violationConfirmRequestVO, BindingResult bindingResult) {
         //参数验证
         validateParameter(bindingResult);
         try{
-            logger.info("确认已处理入参:{}",violationDeleteRequestVO.toString());
-
-            CatLogRecord.successLog("确认已处理成功","console/order/violation/updateStatus",violationDeleteRequestVO);
+            logger.info("确认已处理入参:{}",violationConfirmRequestVO.toString());
+            violationManageService.confirmHandle(violationConfirmRequestVO);
+            CatLogRecord.successLog("确认已处理成功","console/order/violation/confirm/handle",violationConfirmRequestVO);
             return ResponseData.success();
         } catch (Exception e) {
             logger.error("确认已处理异常:{}",e);
-            CatLogRecord.failLog("确认已处理异常","console/order/violation/updateStatus",violationDeleteRequestVO, e);
+            CatLogRecord.failLog("确认已处理异常","console/order/violation/confirm/handle",violationConfirmRequestVO, e);
             throw new ViolationManageException(ErrorCode.SYS_ERROR.getCode(),ErrorCode.SYS_ERROR.getText());
         }
     }
 
     @AutoDocMethod(description = "获取违章列表", value = "获取违章列表", response = ViolationInformationListResponseVO.class)
-    @GetMapping("/list")
+    @GetMapping("/detail/list")
     public ResponseData alterationLogList(@Valid @RequestBody ViolationListRequestVO violationListRequestVO, BindingResult bindingResult) {
         //参数验证
         validateParameter(bindingResult);
         try{
             logger.info("获取违章列表入参:{}",violationListRequestVO.toString());
-
-            CatLogRecord.successLog("获取违章列表成功","console/order/violation/list",violationListRequestVO);
+            violationManageService.selectViolationList(violationListRequestVO);
+            CatLogRecord.successLog("获取违章列表成功","console/order/violation/detail/list",violationListRequestVO);
             return ResponseData.success();
         } catch (Exception e) {
             logger.error("获取违章列表异常:{}",e);
-            CatLogRecord.failLog("获取违章列表异常","console/order/violation/list",violationListRequestVO, e);
+            CatLogRecord.failLog("获取违章列表异常","console/order/violation/detail/list",violationListRequestVO, e);
             throw new ViolationManageException(ErrorCode.SYS_ERROR.getCode(),ErrorCode.SYS_ERROR.getText());
         }
     }

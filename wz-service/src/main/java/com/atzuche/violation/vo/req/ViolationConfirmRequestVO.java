@@ -9,7 +9,7 @@ import lombok.ToString;
  */
 @Data
 @ToString
-public class ViolationDeleteRequestVO {
+public class ViolationConfirmRequestVO {
 
     @AutoDocProperty(value = "违章记录id")
     private String violationId;
