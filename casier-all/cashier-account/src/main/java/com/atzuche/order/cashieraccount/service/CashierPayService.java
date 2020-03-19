@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
-import org.testng.collections.Lists;
 
 import com.atzuche.order.accountrenterdeposit.service.AccountRenterDepositService;
 import com.atzuche.order.accountrenterdeposit.vo.res.AccountRenterDepositResVO;
@@ -172,9 +171,9 @@ public class CashierPayService{
         if(Objects.nonNull(batchNotifyDataVo) && !CollectionUtils.isEmpty(batchNotifyDataVo.getLstNotifyDataVo())){
             List<NotifyDataVo> notifyDataVos = batchNotifyDataVo.getLstNotifyDataVo();
             //根据金额匹配来修改状态。
-        	List<NotifyDataVo> supplementIds = Lists.newArrayList();
-        	List<NotifyDataVo> debtIds = Lists.newArrayList();
-        	List<String> rentAmountAfterRenterOrderNos = Lists.newArrayList();
+        	List<NotifyDataVo> supplementIds = new ArrayList<NotifyDataVo>();
+        	List<NotifyDataVo> debtIds = new ArrayList<NotifyDataVo>();
+        	List<String> rentAmountAfterRenterOrderNos = new ArrayList<String>();
 
         	//转换为集合的概念
             for(int i=0;i<notifyDataVos.size();i++){
