@@ -53,20 +53,18 @@ public class OrderWzSettleNewService {
 	private OrderWzSettleNoTService orderWzSettleNoTService;
 	@Autowired
 	private BaseProducer baseProducer;
-	// 更新订单状态和订单流转
 	@Autowired
 	private OrderStatusService orderStatusService;
-
-	// 查询租客有效订单
 	@Autowired
 	private RenterOrderService renterOrderService;
-	// 判断是否暂扣
 	@Autowired
 	private AccountRenterDetainDetailNoTService accountRenterDetainDetailNoTService;
 	@Autowired
 	private RenterOrderWzSettleFlagService renterOrderWzSettleFlagService;
 	@Autowired
 	private OwnerOrderService ownerOrderService;
+	@Autowired
+    private OrderWzSettleSupplementHandleService orderWzSettleSupplementHandleService;
 	/**
 	 * 初始化结算对象
 	 * 
@@ -269,20 +267,22 @@ public class OrderWzSettleNewService {
 		orderWzSettleNoTService.wzCostSettle(settleOrders, settleOrdersAccount);
 
 
+		//抵扣未支付的补付费用
+        orderWzSettleSupplementHandleService.supplementCostHandle(settleOrdersAccount);
 
 		log.info("OrderSettleService repayWzHistoryDebtRent 抵扣历史欠款。settleOrdersAccount [{}]", GsonUtils.toJson(settleOrdersAccount));
-		// 2租客剩余违章押金 结余历史欠款
+		// 租客剩余违章押金 结余历史欠款
 		orderWzSettleNoTService.repayWzHistoryDebtRent(settleOrdersAccount);
 		
 		
 		log.info("OrderSettleService refundWzDepositAmt 退还违章押金。settleOrdersAccount [{}]", GsonUtils.toJson(settleOrdersAccount));
-		// 3 违章押金 退还
+		// 违章押金 退还
 		orderWzSettleNoTService.refundWzDepositAmt(settleOrdersAccount, orderStatusDTO);
 		
 		
 		log.info("OrderSettleService 结算结束 settleOrdersAccount [{}],orderStatusDTO [{}]", GsonUtils.toJson(settleOrdersAccount),GsonUtils.toJson(orderStatusDTO));
 		
-		// 4 更新订单状态
+		// 更新订单状态
 		settleOrdersAccount.setOrderStatusDTO(orderStatusDTO);
 		orderWzSettleNoTService.saveOrderStatusInfo(settleOrdersAccount);
 		log.info("OrderSettleService settleOrdersDefinition settleOrdersAccount two [{}]",GsonUtils.toJson(settleOrdersAccount));

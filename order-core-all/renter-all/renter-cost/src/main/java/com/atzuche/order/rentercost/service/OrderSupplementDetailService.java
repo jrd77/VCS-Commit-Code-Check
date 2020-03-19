@@ -81,4 +81,27 @@ public class OrderSupplementDetailService{
     public Integer updateDeleteById(Integer id) {
     	return orderSupplementDetailMapper.updateDeleteById(id);
     }
+
+
+    /**
+     * 违章结算获取未支付的补付信息
+     *
+     * @param orderNo 订单号
+     * @return List<OrderSupplementDetailEntity> 补付记录
+     */
+    public List<OrderSupplementDetailEntity> queryNotPaySupplementByOrderNoAndMemNo(String orderNo) {
+        return orderSupplementDetailMapper.selectNotPayByOrderNo(orderNo);
+    }
+
+
+    /**
+     * 更新补付操作状态
+     *
+     * @param primaryKey 主键
+     * @param opStatus   操作状态
+     * @return int 操作记录数
+     */
+    public int updateOpStatusByPrimaryKey(Integer primaryKey, Integer opStatus) {
+        return orderSupplementDetailMapper.updateOpStatusByPrimaryKey(primaryKey, opStatus);
+    }
 }
