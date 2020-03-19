@@ -3,6 +3,7 @@ package com.atzuche.order.commons.entity.orderDetailDto;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
 
 /**
@@ -68,5 +69,9 @@ public class ConsoleOwnerOrderFineDeatailDTO implements Serializable {
          * 备注
          */
         private String remark;
-    					
+        /**
+         * 创建时间
+         */
+        private LocalDateTime createTime;
+
 }
