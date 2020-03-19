@@ -79,9 +79,9 @@ public class ViolationManageController {
         validateParameter(bindingResult);
         try{
             logger.info("获取违章信息变更记录入参:{}",violationInformationRequestVO.toString());
-
+            ViolationAlterationLogListResponseVO violationAlterationLogListResponseVO = violationManageService.selectAlterationLogList(violationInformationRequestVO);
             CatLogRecord.successLog("获取违章信息变更记录成功","console/order/violation/alteration/log/list",violationInformationRequestVO);
-            return ResponseData.success();
+            return ResponseData.success(violationAlterationLogListResponseVO);
         } catch (Exception e) {
             logger.error("获取违章信息变更记录异常:{}",e);
             CatLogRecord.failLog("获取违章信息变更记录异常","console/order/violation/alteration/log/list",violationInformationRequestVO, e);
@@ -97,7 +97,7 @@ public class ViolationManageController {
         validateParameter(bindingResult);
         try{
             logger.info("违章编辑入参:{}",violationAlterationRequestVO.toString());
-            rabbitTemplate.convertAndSend(ViolationRabbitMQEventEnum.ORDER_VIOLATION_CHANGE.exchange, ViolationRabbitMQEventEnum .ORDER_VIOLATION_CHANGE.routingKey, "");
+            //rabbitTemplate.convertAndSend(ViolationRabbitMQEventEnum.ORDER_VIOLATION_CHANGE.exchange, ViolationRabbitMQEventEnum .ORDER_VIOLATION_CHANGE.routingKey, "");
             violationManageService.updateViolationHandle(violationAlterationRequestVO);
             CatLogRecord.successLog("违章编辑处理成功","console/order/violation/update",violationAlterationRequestVO);
             return ResponseData.success();
@@ -107,6 +107,25 @@ public class ViolationManageController {
             throw new ViolationManageException(ErrorCode.SYS_ERROR.getCode(),ErrorCode.SYS_ERROR.getText());
         }
     }
+
+    @AutoDocMethod(description = "确认违章办理完成", value = "确认违章办理完成", response = ResponseData.class)
+    @PostMapping("/confirm/complete")
+    public ResponseData confirmComplete(@Valid @RequestBody ViolationCompleteRequestVO violationCompleteRequestVO, BindingResult bindingResult) {
+        //参数验证
+        validateParameter(bindingResult);
+        try{
+            logger.info("违章编辑入参:{}",violationCompleteRequestVO.toString());
+            //rabbitTemplate.convertAndSend(ViolationRabbitMQEventEnum.ORDER_VIOLATION_CHANGE.exchange, ViolationRabbitMQEventEnum .ORDER_VIOLATION_CHANGE.routingKey, "");
+            violationManageService.updateConfirmComplete(violationCompleteRequestVO);
+            CatLogRecord.successLog("违章编辑处理成功","console/order/violation/update",violationCompleteRequestVO);
+            return ResponseData.success();
+        } catch (Exception e) {
+            logger.error("违章编辑异常:{}",e);
+            CatLogRecord.failLog("违章编辑异常","console/order/violation/update",violationCompleteRequestVO, e);
+            throw new ViolationManageException(ErrorCode.SYS_ERROR.getCode(),ErrorCode.SYS_ERROR.getText());
+        }
+    }
+
 
 
     @AutoDocMethod(description = "新增违章", value = "新增违章", response = ResponseData.class)

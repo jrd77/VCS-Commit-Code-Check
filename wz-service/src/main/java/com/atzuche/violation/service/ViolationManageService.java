@@ -1,17 +1,20 @@
 package com.atzuche.violation.service;
 
+import com.atzuche.order.commons.DateUtils;
+import com.atzuche.order.commons.enums.YesNoEnum;
 import com.atzuche.order.renterwz.entity.RenterOrderWzCostDetailEntity;
+import com.atzuche.order.renterwz.entity.WzCostLogEntity;
 import com.atzuche.order.renterwz.service.RenterOrderWzCostDetailService;
+import com.atzuche.order.renterwz.service.WzCostLogService;
 import com.atzuche.violation.common.AdminUserUtil;
 import com.atzuche.violation.entity.AccountRenterWzDepositDetailEntity;
 import com.atzuche.violation.entity.AccountRenterWzDepositEntity;
 import com.atzuche.violation.entity.RenterOrderWzStatusEntity;
 import com.atzuche.violation.enums.WzCostEnums;
-import com.atzuche.violation.vo.req.RenterWzCostDetailReqVO;
-import com.atzuche.violation.vo.req.ViolationHandleAlterationRequestVO;
-import com.atzuche.violation.vo.req.ViolationHandleRequestVO;
-import com.atzuche.violation.vo.req.ViolationInformationRequestVO;
+import com.atzuche.violation.vo.req.*;
 import com.atzuche.violation.vo.resp.RenterWzCostDetailResVO;
+import com.atzuche.violation.vo.resp.ViolationAlterationLogListResponseVO;
+import com.atzuche.violation.vo.resp.ViolationAlterationLogResponseVO;
 import com.atzuche.violation.vo.resp.ViolationHandleInformationResponseVO;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -44,6 +47,8 @@ public class ViolationManageService {
     RenterOrderWzStatusService renterOrderWzStatusService;
     @Autowired
     AccountRenterWzDepositNoTService accountRenterWzDepositNoTService;
+    @Autowired
+    RenterOrderWzDetailService renterOrderWzDetailService;
 
 
 
@@ -55,6 +60,9 @@ public class ViolationManageService {
 
     @Autowired
     RenterWzService renterWzService;
+
+    @Autowired
+    WzCostLogService wzCostLogService;
 
 
     /**
@@ -187,6 +195,41 @@ public class ViolationManageService {
         renterOrderWzStatusService.updateOrderWzStatus(violationAlterationRequestVO);
 
     }
+
+    /**
+     * 获取违章修改日志列表
+     * @param violationInformationRequestVO
+     * @return
+     */
+    public ViolationAlterationLogListResponseVO selectAlterationLogList(ViolationInformationRequestVO violationInformationRequestVO){
+        ViolationAlterationLogListResponseVO violationAlterationLogListResponseVO = new ViolationAlterationLogListResponseVO();
+        List<ViolationAlterationLogResponseVO> logList = new ArrayList<>();
+        List<WzCostLogEntity> wzCostLogEntities = wzCostLogService.queryWzCostLogsByOrderNo(violationInformationRequestVO.getOrderNo());
+        if(!CollectionUtils.isEmpty(wzCostLogEntities)) {
+            wzCostLogEntities.forEach(wzCostLog -> {
+                ViolationAlterationLogResponseVO violationAlterationLogResponseVO = new ViolationAlterationLogResponseVO();
+                violationAlterationLogResponseVO.setContent(wzCostLog.getContent());
+                violationAlterationLogResponseVO.setCreateTime(DateUtils.formate(wzCostLog.getCreateTime(),DateUtils.DATE_DEFAUTE1 ));
+                violationAlterationLogResponseVO.setOperationType("订单扣款处理");
+                violationAlterationLogResponseVO.setOperator(wzCostLog.getOperator());
+                logList.add(violationAlterationLogResponseVO);
+            });
+        }
+        violationAlterationLogListResponseVO.setAlterationLogList(logList);
+        return violationAlterationLogListResponseVO;
+    }
+
+
+    /**
+     * 确认违章办理完成
+     * @param violationCompleteRequestVO
+     */
+    public void updateConfirmComplete(ViolationCompleteRequestVO violationCompleteRequestVO){
+        renterOrderWzStatusService.updateOrderWzStatus(violationCompleteRequestVO);
+        renterOrderWzDetailService.updateIllegalStatus(violationCompleteRequestVO.getOrderNo());
+        //记录日志
+    }
+
 
 
 

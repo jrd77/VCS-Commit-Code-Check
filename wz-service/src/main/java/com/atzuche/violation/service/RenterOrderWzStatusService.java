@@ -6,6 +6,7 @@ import com.atzuche.violation.common.AdminUserUtil;
 import com.atzuche.violation.entity.RenterOrderWzStatusEntity;
 import com.atzuche.violation.enums.WzStatusEnums;
 import com.atzuche.violation.mapper.RenterOrderWzStatusMapper;
+import com.atzuche.violation.vo.req.ViolationCompleteRequestVO;
 import com.atzuche.violation.vo.req.ViolationHandleAlterationRequestVO;
 import org.springframework.stereotype.Service;
 
@@ -78,6 +79,34 @@ public class RenterOrderWzStatusService {
 
         renterOrderWzStatusMapper.updateOrderWzStatus(renterOrderWzStatusEntity);
     }
+    /**
+     * 修改违章信息
+     * @param violationCompleteRequestVO
+     */
+    public void updateOrderWzStatus(ViolationCompleteRequestVO violationCompleteRequestVO) {
+        Integer managementMode = Integer.parseInt(violationCompleteRequestVO.getManagementMode());
+        RenterOrderWzStatusEntity renterOrderWzStatusEntity = new RenterOrderWzStatusEntity();
+        renterOrderWzStatusEntity.setOrderNo(violationCompleteRequestVO.getOrderNo());
+        Integer wzDisposeStatus=0;
+        if(managementMode== 1){
+            //租客
+            wzDisposeStatus = 50;//已处理-租客处理
+        }else if(managementMode==2){
+            //平台
+            wzDisposeStatus = 52;//已处理-平台处理
+        }else if(managementMode==3){
+            //车主
+            wzDisposeStatus = 51;//已处理-车主处理
+        }else if(managementMode == 4){
+            // 无数据
+            wzDisposeStatus = 45;//已处理-无数据
+        }
+        renterOrderWzStatusEntity.setStatus(wzDisposeStatus);
+        //更新违章完成时间
+        renterOrderWzStatusEntity.setWzHandleCompleteTime(new Date());
+        renterOrderWzStatusMapper.updateOrderWzStatus(renterOrderWzStatusEntity);
+    }
+
 
     /**
      * 修改违章状态
