@@ -547,7 +547,7 @@ public class MemProxyService {
     public boolean countByHolidayCircleList(Integer memNo, List<Integer> holidayCircleList) {
         log.info("Feign 开始获取会员假节日取消产生罚金次数.param is, memNo:[{}], holidayCircleList:[{}]", memNo, holidayCircleList);
         if (CollectionUtils.isEmpty(holidayCircleList) || null == memNo) {
-            return true;
+            return false;
         }
         Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "会员服务");
         ResponseData<Integer> responseData = null;

@@ -268,7 +268,7 @@ public class OrderWzSettleNewService {
 
 
 		//抵扣未支付的补付费用
-        orderWzSettleSupplementHandleService.supplementCostHandle(settleOrdersAccount);
+        orderWzSettleSupplementHandleService.supplementCostHandle(settleOrders, settleOrdersAccount);
 
 		log.info("OrderSettleService repayWzHistoryDebtRent 抵扣历史欠款。settleOrdersAccount [{}]", GsonUtils.toJson(settleOrdersAccount));
 		// 租客剩余违章押金 结余历史欠款
