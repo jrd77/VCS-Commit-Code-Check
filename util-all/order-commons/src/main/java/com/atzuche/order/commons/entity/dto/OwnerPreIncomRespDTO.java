@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 public class OwnerPreIncomRespDTO {
-    @AutoDocProperty(value = "车主收益")
+    @AutoDocProperty(value = "车预计收益")
     private Integer ownerCostAmtFinal;
 
 }

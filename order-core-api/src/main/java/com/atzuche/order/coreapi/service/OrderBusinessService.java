@@ -18,6 +18,8 @@ import com.atzuche.order.parentorder.service.OrderNoticeService;
 import com.atzuche.order.rentermem.service.RenterMemberService;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.atzuche.order.renterorder.service.RenterOrderService;
+import com.atzuche.order.settle.service.OrderSettleService;
+import com.atzuche.order.settle.vo.req.OwnerCosts;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -39,6 +41,8 @@ public class OrderBusinessService {
     private OwnerMemberService ownerMemberService;
     @Autowired
     private RenterMemberService renterMemberService;
+    @Autowired
+    private OrderSettleService orderSettleService;
 
     public void renterAndOwnerSeeOrder(RenterAndOwnerSeeOrderVO renterAndOwnerSeeOrderVO) {
         String orderNo = renterAndOwnerSeeOrderVO.getOrderNo();
@@ -105,7 +109,14 @@ public class OrderBusinessService {
     }
 
     public OwnerPreIncomRespDTO ownerPreIncom(String orderNo) {
-
-        return null;
+        OwnerOrderEntity ownerOrderEntity = ownerOrderService.getOwnerOrderByOrderNoAndIsEffective(orderNo);
+        if(ownerOrderEntity == null){
+            log.error("找不到有效的车主子订单 orderNo={}",orderNo);
+            throw new OrderNotFoundException(orderNo);
+        }
+        OwnerCosts ownerCosts = orderSettleService.preOwnerSettleOrder(orderNo, ownerOrderEntity.getOwnerOrderNo());
+        OwnerPreIncomRespDTO ownerPreIncomRespDTO = new OwnerPreIncomRespDTO();
+        ownerPreIncomRespDTO.setOwnerCostAmtFinal(ownerCosts.getOwnerCostAmtFinal());
+        return ownerPreIncomRespDTO;
     }
 }
