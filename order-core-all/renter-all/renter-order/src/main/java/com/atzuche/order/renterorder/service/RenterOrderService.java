@@ -217,6 +217,8 @@ public class RenterOrderService {
         record.setIsUseSpecialPrice(Integer.valueOf(renterOrderReqVO.getUseSpecialPrice()==null?"0":renterOrderReqVO.getUseSpecialPrice()));
         record.setChildStatus(RenterChildStatusEnum.PROCESS_ING.getCode());
         record.setRenterMemNo(renterOrderReqVO.getMemNo());
+        record.setCreateOp(renterOrderReqVO.getOperator());
+        record.setChangeSource(renterOrderReqVO.getChangeSource());
         renterOrderMapper.insertSelective(record);
         //保存租客订单费用、费用明细、补贴明细等
         renterOrderCostRespDTO.setRenterOrderSubsidyDetailDTOList(context.getOrderSubsidyDetailList());

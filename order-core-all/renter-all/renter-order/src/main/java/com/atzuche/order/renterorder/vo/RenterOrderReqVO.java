@@ -3,6 +3,8 @@ package com.atzuche.order.renterorder.vo;
 import com.atzuche.order.commons.entity.dto.CommUseDriverInfoDTO;
 import com.atzuche.order.commons.entity.dto.RenterGoodsPriceDetailDTO;
 import com.atzuche.order.commons.entity.dto.RenterMemberRightDTO;
+import com.autoyol.doc.annotation.AutoDocProperty;
+
 import lombok.Data;
 
 import java.io.Serializable;
@@ -261,6 +263,15 @@ public class RenterOrderReqVO implements Serializable {
      * 常用驾驶人列表
      */
     private List<CommUseDriverInfoDTO> commUseDriverList;
+    
+    /**
+     * 操作人(管理后台)
+     */
+    private String operator;
+    /**
+     * 来源
+     */
+    private String changeSource;
 
 
 }
