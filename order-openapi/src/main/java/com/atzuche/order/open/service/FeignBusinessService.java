@@ -37,12 +37,5 @@ public interface FeignBusinessService {
     @GetMapping("/orderBusiness/queryRenterMemDetail")
     public ResponseData<RenterMemberDTO> queryRenterMemDetail(String orderNo);
 
-    /*
-     * @Author ZhangBin
-     * @Date 2020/3/12 14:28
-     * @Description: 车主收益
-     *
-     **/
-    @GetMapping("/orderBusiness/queryOwnerIncome")
-    public ResponseData<ReturnCarIncomeResultDTO> queryOwnerIncome(String orderNo);
+
 }
