@@ -202,7 +202,7 @@ public class OwnerOrderDetailService {
                 FienDetailRespDTO fienDetailRespDTO = new FienDetailRespDTO();
                 fienDetailRespDTO.setCreateTimeStr(LocalDateTimeUtils.localdateToString(x.getCreateTime(), GlobalConstant.FORMAT_DATE_STR1));
                 fienDetailRespDTO.setAmt(x.getFineAmount());
-                fienDetailRespDTO.setOperater(x.getOperator() == null ? "车主" : x.getOperator());
+                fienDetailRespDTO.setOperater((x.getOperator() == null || x.getOperator().trim().length()<=0)? "车主" : x.getOperator());
                 return fienDetailRespDTO;
             }).collect(Collectors.toList());
             return collect;
