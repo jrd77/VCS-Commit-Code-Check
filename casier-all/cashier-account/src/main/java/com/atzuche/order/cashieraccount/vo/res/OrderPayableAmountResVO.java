@@ -315,6 +315,46 @@ public class OrderPayableAmountResVO {
 	public void setAmtRentAfter(int amtRentAfter) {
 		this.amtRentAfter = amtRentAfter;
 	}
+
+	public List<PayInfoVo> getPays() {
+		return pays;
+	}
+
+	public void setPays(List<PayInfoVo> pays) {
+		this.pays = pays;
+	}
+
+	public String getAmount() {
+		return amount;
+	}
+
+	public void setAmount(String amount) {
+		this.amount = amount;
+	}
+
+	public String getPayTitle() {
+		return payTitle;
+	}
+
+	public void setPayTitle(String payTitle) {
+		this.payTitle = payTitle;
+	}
+
+	public String getPayMemo() {
+		return payMemo;
+	}
+
+	public void setPayMemo(String payMemo) {
+		this.payMemo = payMemo;
+	}
+
+	public String getPayKind() {
+		return payKind;
+	}
+
+	public void setPayKind(String payKind) {
+		this.payKind = payKind;
+	}
     
     
 }

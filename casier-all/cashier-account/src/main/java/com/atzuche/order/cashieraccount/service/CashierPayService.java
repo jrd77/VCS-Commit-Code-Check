@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -370,6 +371,10 @@ public class CashierPayService{
         orderPayReqVO.check();
         //1 查询子单号
         RenterOrderEntity renterOrderEntity = cashierNoTService.getRenterOrderNoByOrderNo(orderPayReqVO.getOrderNo());
+        if(StringUtils.isBlank(renterOrderEntity.getRenterOrderNo())) {
+        	 throw new OrderNotFoundException(orderPayReqVO.getOrderNo()+"支付子订单号");
+        }
+        
         OrderPayableAmountResVO result = new OrderPayableAmountResVO();
         // 判断是否支持 钱包支付 、页面传入是否使用钱包标记 优先
         Integer isUseWallet = Objects.isNull(orderPayReqVO.getIsUseWallet())?renterOrderEntity.getIsUseWallet():orderPayReqVO.getIsUseWallet();
