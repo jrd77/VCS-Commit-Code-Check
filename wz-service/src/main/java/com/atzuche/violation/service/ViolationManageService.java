@@ -256,6 +256,7 @@ public class ViolationManageService {
         renterOrderWzDetail.setIllegalTime(DateUtils.parseDate(violationAdditionRequestVO.getViolationTime(), DateUtils.DATE_DEFAUTE1));
         renterOrderWzDetail.setOrderNo(violationAdditionRequestVO.getOrderNo());
         renterOrderWzDetail.setCarPlateNum(violationAdditionRequestVO.getPlateNum());
+        renterOrderWzDetail.setOrderFlag(1);
         renterOrderWzDetailService.saveRenterOrderWzDetail(renterOrderWzDetail);
         renterOrderWzSettleFlagService.updateIsIllegal(renterOrderWzDetail.getOrderNo(),renterOrderWzDetail.getCarPlateNum(),2, AdminUserUtil.getAdminUser().getAuthName());
         renterOrderWzStatusService.updateTransWzDisposeStatus(violationAdditionRequestVO.getOrderNo(),violationAdditionRequestVO.getPlateNum(),25);
@@ -363,9 +364,24 @@ public class ViolationManageService {
         RenterOrderWzStatusEntity renterOrderWzStatusEntity = new RenterOrderWzStatusEntity();
         Integer managementMode = Integer.parseInt(violationAlterationRequestVO.getManagementMode());
         renterOrderWzStatusEntity.setManagementMode(managementMode);
-        renterOrderWzStatusEntity.setWzHandleCompleteTime(DateUtils.parseDate(violationAlterationRequestVO.getWzHandleCompleteTime(), DateUtils.DATE_DEFAUTE));
-        renterOrderWzStatusEntity.setWzRenterLastTime(DateUtils.parseDate(violationAlterationRequestVO.getWzRenterLastTime(), DateUtils.DATE_DEFAUTE));
-        renterOrderWzStatusEntity.setWzPlatformLastTime(DateUtils.parseDate(violationAlterationRequestVO.getWzPlatformLastTime(), DateUtils.DATE_DEFAUTE));
+        String wzRenterLastTime = violationAlterationRequestVO.getWzRenterLastTime();
+        String wzPlatformLastTime = violationAlterationRequestVO.getWzPlatformLastTime();
+        String wzHandleCompleteTime = violationAlterationRequestVO.getWzHandleCompleteTime();
+        if(!ObjectUtils.isEmpty(wzRenterLastTime)){
+            //租客最晚处理时间
+            renterOrderWzStatusEntity.setWzRenterLastTime(DateUtils.parseDate(wzRenterLastTime, DateUtils.DATE_DEFAUTE));
+        }
+
+        if(!ObjectUtils.isEmpty(wzPlatformLastTime)){
+            //平台最晚处理时间
+            renterOrderWzStatusEntity.setWzPlatformLastTime(DateUtils.parseDate(wzPlatformLastTime, DateUtils.DATE_DEFAUTE));
+        }
+
+        if(!ObjectUtils.isEmpty(wzHandleCompleteTime)){
+            //办理完成时间
+            renterOrderWzStatusEntity.setWzHandleCompleteTime(DateUtils.parseDate(wzHandleCompleteTime, DateUtils.DATE_DEFAUTE));
+        }
+
         renterOrderWzStatusEntity.setWzRemarks( violationAlterationRequestVO.getWzRemarks());
 
         if(managementMode == 1){

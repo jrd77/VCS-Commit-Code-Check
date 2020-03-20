@@ -183,14 +183,14 @@ public class ViolationManageController {
 
     @AutoDocMethod(description = "获取违章列表", value = "获取违章列表", response = ViolationInformationListResponseVO.class)
     @GetMapping("/detail/list")
-    public ResponseData alterationLogList(@Valid @RequestBody ViolationListRequestVO violationListRequestVO, BindingResult bindingResult) {
+    public ResponseData alterationLogList(@Valid ViolationListRequestVO violationListRequestVO, BindingResult bindingResult) {
         //参数验证
         validateParameter(bindingResult);
         try{
             logger.info("获取违章列表入参:{}",violationListRequestVO.toString());
-            violationManageService.selectViolationList(violationListRequestVO);
+            ViolationInformationListResponseVO violationInformationListResponseVO = violationManageService.selectViolationList(violationListRequestVO);
             CatLogRecord.successLog("获取违章列表成功","console/order/violation/detail/list",violationListRequestVO);
-            return ResponseData.success();
+            return ResponseData.success(violationInformationListResponseVO);
         } catch (Exception e) {
             logger.error("获取违章列表异常:{}",e);
             CatLogRecord.failLog("获取违章列表异常","console/order/violation/detail/list",violationListRequestVO, e);
