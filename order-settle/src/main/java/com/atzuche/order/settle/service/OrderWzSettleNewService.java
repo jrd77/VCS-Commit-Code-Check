@@ -268,6 +268,8 @@ public class OrderWzSettleNewService {
 
 
 		//抵扣未支付的补付费用
+        log.info("OrderSettleService supplementCostHandle 抵扣补付记录。settleOrdersAccount [{}]",
+                GsonUtils.toJson(settleOrdersAccount));
         orderWzSettleSupplementHandleService.supplementCostHandle(settleOrders, settleOrdersAccount);
 
 		log.info("OrderSettleService repayWzHistoryDebtRent 抵扣历史欠款。settleOrdersAccount [{}]", GsonUtils.toJson(settleOrdersAccount));
