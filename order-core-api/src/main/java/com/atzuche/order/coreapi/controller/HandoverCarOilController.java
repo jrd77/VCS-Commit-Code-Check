@@ -80,11 +80,13 @@ public class HandoverCarOilController {
             }
         }else{
             List<OwnerHandoverCarRemarkEntity> ownerHandoverCarInfoEntities = handoverProData.getOwnerHandoverCarInfoEntities();
-            for (OwnerHandoverCarRemarkEntity ownerHandoverCarRemarkEntity : ownerHandoverCarInfoEntities) {
-                transProgressResVO = new TransProgressResVO();
-                transProgressResVO.setDescription(ownerHandoverCarRemarkEntity.getRemark());
-                transProgressResVO.setHandleTime(DateUtils.formate(ownerHandoverCarRemarkEntity.getUpdateTime(),DateUtils.DATE_DEFAUTE1));
-                list.add(transProgressResVO);
+            if(!CollectionUtils.isEmpty(ownerHandoverCarInfoEntities)){
+                for (OwnerHandoverCarRemarkEntity ownerHandoverCarRemarkEntity : ownerHandoverCarInfoEntities) {
+                    transProgressResVO = new TransProgressResVO();
+                    transProgressResVO.setDescription(ownerHandoverCarRemarkEntity.getRemark());
+                    transProgressResVO.setHandleTime(DateUtils.formate(ownerHandoverCarRemarkEntity.getUpdateTime(),DateUtils.DATE_DEFAUTE1));
+                    list.add(transProgressResVO);
+                }
             }
         }
         resVO.setList(list);
