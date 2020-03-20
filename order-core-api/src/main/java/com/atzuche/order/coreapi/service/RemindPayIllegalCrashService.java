@@ -46,7 +46,7 @@ public class RemindPayIllegalCrashService {
 
         Transaction t = Cat.getProducer().newTransaction(CatConstants.FEIGN_CALL, "每天定时查询当前进行中的订单");
         try {
-            Cat.logEvent(CatConstants.FEIGN_METHOD, "orderSearchService.violateProcessOrder");
+            Cat.logEvent(CatConstants.FEIGN_METHOD, "feignOrderDetailService.queryInProcess");
             ResponseData<ProcessRespDTO> orderResponseData = feignOrderDetailService.queryInProcess();
             Cat.logEvent(CatConstants.FEIGN_RESULT, JSON.toJSONString(orderResponseData));
             if (Objects.nonNull(orderResponseData) && orderResponseData.getResCode() != null
