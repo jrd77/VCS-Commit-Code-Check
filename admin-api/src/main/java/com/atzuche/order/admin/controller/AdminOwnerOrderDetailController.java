@@ -16,8 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @Slf4j
 @RestController
 public class AdminOwnerOrderDetailController {
@@ -99,9 +97,9 @@ public class AdminOwnerOrderDetailController {
      * @Description: 违约罚金明细
      *
      **/
-    @AutoDocMethod(description = "违约罚金明细列表", value = "违约罚金明细列表", response = FienDetailRespDTO.class)
+    @AutoDocMethod(description = "违约罚金明细列表", value = "违约罚金明细列表", response = FienDetailRespListDTO.class)
     @GetMapping("/console/owner/fienAmtDetailList")
-    public ResponseData<List<FienDetailRespDTO>> fienAmtDetailList(@RequestParam("orderNo") String orderNo, @RequestParam("ownerMemNo") String ownerMemNo){
+    public ResponseData<FienDetailRespListDTO> fienAmtDetailList(@RequestParam("orderNo") String orderNo, @RequestParam("ownerMemNo") String ownerMemNo){
         if(orderNo == null || orderNo.trim().length()<=0){
             ResponseData responseData = new ResponseData();
             responseData.setResCode(ErrorCode.INPUT_ERROR.getCode());
@@ -115,7 +113,7 @@ public class AdminOwnerOrderDetailController {
             responseData.setResMsg("车主会员号不能为空");
             return responseData;
         }
-        List<FienDetailRespDTO> fienDetailRespDTOS = ownerOrderDetailService.fienAmtDetailList(orderNo,ownerMemNo);
+        FienDetailRespListDTO fienDetailRespDTOS = ownerOrderDetailService.fienAmtDetailList(orderNo,ownerMemNo);
         return ResponseData.success(fienDetailRespDTOS);
     }
 

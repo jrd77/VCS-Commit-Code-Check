@@ -28,6 +28,8 @@ import com.atzuche.order.ownercost.service.OwnerOrderIncrementDetailService;
 import com.atzuche.order.ownercost.service.OwnerOrderService;
 import com.atzuche.order.parentorder.entity.OrderEntity;
 import com.atzuche.order.parentorder.service.OrderService;
+import com.atzuche.order.rentercost.entity.RenterOrderSubsidyDetailEntity;
+import com.atzuche.order.rentercost.utils.OrderSubsidyDetailUtils;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.atzuche.order.renterorder.service.RenterOrderService;
 import com.atzuche.order.settle.service.OrderSettleService;
@@ -37,10 +39,12 @@ import com.autoyol.commons.web.ResponseData;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -135,7 +139,7 @@ public class OrderCostService {
 				
 				//补付费用 
 				//需补付金额,跟修改订单的补付金额是同一个方法。
-				int needIncrementAmt = cashierPayService.getRentCostBufu(renterCostReqVO.getOrderNo(), orderEntity.getMemNoRenter());
+				int needIncrementAmt = cashierPayService.getRentCostBufuNew(renterCostReqVO.getOrderNo(), orderEntity.getMemNoRenter());
 				putSupplementAmt(realVo,data,needIncrementAmt,costVo);
 				
 				//租客支付给平台的费用。console  200214
@@ -276,7 +280,9 @@ public class OrderCostService {
 		int renterToOwnerAdjustAmount = 0;
 		
 		List<OrderConsoleSubsidyDetailEntity> orderConsoleSubsidyDetails = data.getOrderConsoleSubsidyDetails();
-		for (OrderConsoleSubsidyDetailEntity orderConsoleSubsidyDetailEntity : orderConsoleSubsidyDetails) {
+
+        List<RenterOrderSubsidyDetailResVO> subsidyLst1 = data.getSubsidyLst();
+        for (OrderConsoleSubsidyDetailEntity orderConsoleSubsidyDetailEntity : orderConsoleSubsidyDetails) {
 			//`subsidy_source_name` varchar(16) DEFAULT NULL COMMENT '补贴来源方 1、租客 2、车主 3、平台',
 			//  `subsidy_target_name` varchar(16) DEFAULT NULL COMMENT '补贴方名称 1、租客 2、车主 3、平台',
 			if("3".equals(orderConsoleSubsidyDetailEntity.getSubsidySourceCode()) && "1".equals(orderConsoleSubsidyDetailEntity.getSubsidyTargetCode())) {
@@ -294,7 +300,18 @@ public class OrderCostService {
 //			}
 			
 		}
-		
+        List<RenterOrderSubsidyDetailEntity> renterOrderSubsidyDetailEntityList = new ArrayList<>();
+        subsidyLst1.forEach(x->{
+            RenterOrderSubsidyDetailEntity renterOrderSubsidyDetailEntity = new RenterOrderSubsidyDetailEntity();
+            BeanUtils.copyProperties(x,renterOrderSubsidyDetailEntity);
+            renterOrderSubsidyDetailEntityList.add(renterOrderSubsidyDetailEntity);
+        });
+        int renterUpateSubsidyAmt = OrderSubsidyDetailUtils.getRenterUpateSubsidyAmt(renterOrderSubsidyDetailEntityList);
+        int renterSubsidyAmt = OrderSubsidyDetailUtils.getRenterSubsidyAmt(renterOrderSubsidyDetailEntityList, RenterCashCodeEnum.INSURE_TOTAL_PRICES);
+        int abatementInsureAmt = OrderSubsidyDetailUtils.getRenterSubsidyAmt(renterOrderSubsidyDetailEntityList, RenterCashCodeEnum.ABATEMENT_INSURE);
+        platformSubsidyAmount += (renterUpateSubsidyAmt+renterSubsidyAmt+abatementInsureAmt);
+
+
 		for (OrderConsoleSubsidyDetailEntity orderConsoleSubsidyDetailEntity : orderConsoleSubsidyDetails) {
 			//补贴来源方 1、租客 2、车主 3、平台
 			//补贴方名称 1、租客 2、车主 3、平台
@@ -315,7 +332,7 @@ public class OrderCostService {
 		/**
 		 * 租客补贴 20200205
 		 */
-		List<RenterOrderSubsidyDetailResVO> subsidyLst = data.getSubsidyLst();
+		List<RenterOrderSubsidyDetailResVO> subsidyLst = subsidyLst1;
 		for (RenterOrderSubsidyDetailResVO renterOrderSubsidyDetailResVO : subsidyLst) {
 			
 			if("2".equals(renterOrderSubsidyDetailResVO.getSubsidySourceCode()) && "1".equals(renterOrderSubsidyDetailResVO.getSubsidyTargetCode())) {

@@ -29,7 +29,9 @@ import com.atzuche.order.flow.service.OrderFlowService;
 import com.atzuche.order.parentorder.dto.OrderStatusDTO;
 import com.atzuche.order.parentorder.entity.OrderStatusEntity;
 import com.atzuche.order.parentorder.service.OrderStatusService;
+import com.atzuche.order.rentercost.entity.OrderSupplementDetailEntity;
 import com.atzuche.order.rentercost.entity.vo.PayableVO;
+import com.atzuche.order.rentercost.service.OrderSupplementDetailService;
 import com.atzuche.order.rentercost.service.RenterOrderCostCombineService;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.atzuche.order.wallet.WalletProxyService;
@@ -43,8 +45,6 @@ import com.autoyol.autopay.gateway.vo.req.RefundVo;
 import com.autoyol.autopay.gateway.vo.res.AutoPayResultVo;
 import com.autoyol.commons.utils.GsonUtils;
 import com.autoyol.commons.web.ErrorCode;
-
-import ch.qos.logback.classic.Logger;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -79,6 +79,8 @@ public class CashierPayService{
     @Autowired CashierRefundApplyNoTService cashierRefundApplyNoTService;
     @Autowired private OrderStatusService orderStatusService;
     @Autowired private OrderFlowService orderFlowService;
+    @Autowired
+    private OrderSupplementDetailService orderSupplementDetailService;
 
 
     /**
@@ -452,7 +454,7 @@ public class CashierPayService{
      * @return
      */
     public int getRentCostBufu(String orderNo,String memNo){
-        RenterOrderEntity renterOrderEntity = cashierNoTService.getRenterOrderNoByOrderNo(orderNo);
+        RenterOrderEntity renterOrderEntity = cashierNoTService.getRenterOrderNoByOrderNoAndFinish(orderNo);
 
         if(Objects.isNull(renterOrderEntity) || Objects.isNull(renterOrderEntity.getRenterOrderNo())){
             return 0;
@@ -463,8 +465,27 @@ public class CashierPayService{
         int rentAmt = cashierNoTService.sumRentOrderCost(payableVOs);
         //已付租车费用
         int rentAmtPayed = accountRenterCostSettleService.getCostPaidRent(orderNo,memNo);
-        return rentAmt - rentAmtPayed<0?0:(rentAmt - rentAmtPayed);
+        return Math.abs(rentAmt) - rentAmtPayed<0?0:(Math.abs(rentAmt) - rentAmtPayed);
     }
+
+    /*
+     * @Author ZhangBin
+     * @Date 2020/3/19 16:27
+     * @Description: 获取补付信息
+     *
+     **/
+    public int getRentCostBufuNew(String orderNo,String memNo){
+        /*RenterOrderEntity renterOrderEntity = cashierNoTService.getRenterOrderNoByOrderNoAndFinish(orderNo);
+
+        if(Objects.isNull(renterOrderEntity) || Objects.isNull(renterOrderEntity.getRenterOrderNo())){
+            return 0;
+        }*/
+        //查询应付租车费用列表
+        List<OrderSupplementDetailEntity> supplementList = orderSupplementDetailService.listOrderSupplementDetailByOrderNoAndMemNo(orderNo, memNo);
+        int sum = supplementList.stream().mapToInt(x -> x.getAmt()).sum();
+        return sum;
+    }
+
     
     public int getRealRentCost(String orderNo,String memNo){
         RenterOrderEntity renterOrderEntity = cashierNoTService.getRenterOrderNoByOrderNo(orderNo);

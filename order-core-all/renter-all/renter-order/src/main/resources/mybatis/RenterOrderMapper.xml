@@ -341,5 +341,13 @@
         select <include refid="Base_Column_List" /> from renter_order where order_no = #{orderNo}
         AND is_delete = 0
     </select>
+    <select id="getRenterOrderNoByOrderNoAndFinish" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List" /> from renter_order where order_no = #{orderNo}
+        and child_status = 0
+        and is_cancle = 0
+        and is_delete = 0
+        order by id desc
+        limit 1
+    </select>
 
 </mapper>
