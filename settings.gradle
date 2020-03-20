@@ -104,5 +104,4 @@ include 'order-photo-server'
 include 'order-mq'
 include 'order-detain'
 include 'wz-service'
-include 'wz-service'
 

@@ -24,6 +24,7 @@ version '1.0.0-SNAPSHOT'
 
 
 dependencies {
+
     compile "com.autoyol:auto-web-starter:1.0-SNAPSHOT"
 //	compile project(":other-api")
 //    compile 'org.springframework.boot:spring-boot-starter-web'
@@ -49,24 +50,23 @@ dependencies {
     compile 'com.github.pagehelper:pagehelper-spring-boot-starter:1.2.13'
     compile("com.autoframework:auto-mq-event:1.0.2-SNAPSHOT")
     compile 'org.springframework.amqp:spring-rabbit:1.7.5.RELEASE'
-    compile 'order-core-all:renter-all:renter-mem'
 
-
+    compile project(":config:config-client")
+    compile project(":config:config-common")
     compile project(":util-all:fee-calculator")
     compile project(":util-all:order-commons")
     compile project(":order-delivery")
     compile project(":order-core-all:renter-all:renter-wz")
-    compile project(":order-core-all:renter-all:renter-mem")
     compile project(":order-core-all:renter-all:renter-commodity")
     compile project(":order-core-all:renter-all:renter-cost")
     compile project(":order-core-all:parent-order")
     compile project(":order-core-all:renter-all:renter-order")
     compile project(":order-settle")
     compile project(":order-detain")
-
+    compile project(":order-core-all:renter-all:renter-mem")
 
     compile project(":order-remote-service:order-remote-mem")
     compile project(":order-remote-service:order-remote-car")
     compile project(":order-core-all:carowner-all:carowner-mem")
-    compile('com.autoyol.coupon:coupon-api:20200110-SNAPSHOT')
+
 }
