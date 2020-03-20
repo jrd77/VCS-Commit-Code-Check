@@ -69,4 +69,47 @@ public class RenterOrderWzDetailService {
     public Integer getIllegalDetailCount(String orderNo, String illegalNum) {
         return renterOrderWzDetailMapper.getIllegalDetailCount(orderNo,illegalNum);
     }
+
+    /**
+     * 变更违章为已处理状态
+     * @param orderNo 订单号
+     */
+    public void updateIllegalStatus(String orderNo){
+        renterOrderWzDetailMapper.updateIllegalStatus(orderNo);
+    }
+
+    /**
+     * 新增违章记录
+     * @param renterOrderWzDetail
+     * @return
+     */
+    public Integer saveRenterOrderWzDetail(RenterOrderWzDetailEntity renterOrderWzDetail){
+        return renterOrderWzDetailMapper.saveRenterOrderWzDetail(renterOrderWzDetail);
+    }
+
+    /**
+     * 删除违章记录
+     * @param id
+     * @return
+     */
+    public Integer deleteRenterOrderWzDetailById(Long id){
+        return renterOrderWzDetailMapper.deleteRenterOrderWzDetailById(id);
+    }
+
+    /**
+     * 变更违章为已处理状态
+     * @param id
+     * @return
+     */
+    public Integer updateIllegalStatusById(Long id){
+       return renterOrderWzDetailMapper.updateIllegalStatusById(id);
+    }
+
+    /**
+     *
+     * @return 查询列表
+     */
+   public List<RenterOrderWzDetailEntity> queryList(String orderNo){
+       return renterOrderWzDetailMapper.queryList(orderNo);
+   }
 }

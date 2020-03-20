@@ -128,6 +128,10 @@ public class HandoverCarRoutesEvent {
             HandoverCarRemarkDTO handoverCarRemarkDTO = new HandoverCarRemarkDTO();
             handoverCarRemarkDTO.setOrderNo(handoverCarRenYunVO.getOrderNo());
             handoverCarRemarkDTO.setRemark(handoverCarRenYunVO.getDescription());
+            handoverCarRemarkDTO.setRealName(handoverCarRenYunVO.getHeadName());
+            handoverCarRemarkDTO.setPhone(handoverCarRenYunVO.getHeadPhone());
+            handoverCarRemarkDTO.setType(type);
+            handoverCarRemarkDTO.setProId(handoverCarRenYunVO.getProId());
             handoverCarVO.setHandoverCarRemarkDTO(handoverCarRemarkDTO);
         }
         handoverCarVO.setHandoverCarInfoDTO(handoverCarInfoDTO);

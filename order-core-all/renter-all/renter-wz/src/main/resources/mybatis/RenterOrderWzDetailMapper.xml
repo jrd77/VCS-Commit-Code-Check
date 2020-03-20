@@ -191,10 +191,10 @@
 		where id = #{id} and is_delete = 0
 	</select>
 
-	<select id="queryList" resultType="com.atzuche.order.renterwz.entity.RenterOrderWzDetailEntity">
+	<select id="queryList" resultMap="selectColumnMap">
 		select <include refid="select_column" />
 		from renter_order_wz_detail
-		where is_delete = 0
+		where is_delete = 0 and order_no = #{orderNo}
 	</select>
 
 	 <update id="updateRenterOrderWzDetail" parameterType="com.atzuche.order.renterwz.entity.RenterOrderWzDetailEntity">
@@ -403,4 +403,19 @@
 		from renter_order_wz_detail
 		where order_no = #{orderNo} and order_flag = 1 and is_valid = 1 and id = #{illegalNum}
 	</select>
+
+	<update id="updateIllegalStatus" parameterType="java.lang.String">
+		UPDATE renter_order_wz_detail SET illegal_status = 1 WHERE order_no = #{orderNo}
+	</update>
+
+	<update id="updateIllegalStatusById" parameterType="java.lang.String">
+		UPDATE renter_order_wz_detail SET illegal_status = 1 WHERE id = #{id}
+	</update>
+
+	<select id="queryAllList" resultMap="selectColumnMap">
+		select <include refid="select_column" />
+		from renter_order_wz_detail
+		where is_delete = 0
+	</select>
+
 </mapper>

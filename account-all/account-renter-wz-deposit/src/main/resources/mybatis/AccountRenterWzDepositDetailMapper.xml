@@ -122,6 +122,10 @@
             <if test="isDelete != null">#{isDelete} </if>
         </trim>
     </insert>
+
+    <select id="findByOrderNoAndCode" resultMap="BaseResultMap">
+        select  <include refid="Base_Column_List" /> from account_renter_wz_deposit_detail where order_no=#{orderNo} and cost_code=#{costCode} and is_delete=0 order by id desc limit 1
+    </select>
 	
 
   	
