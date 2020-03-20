@@ -2,6 +2,7 @@ package com.atzuche.order.settle.service;
 
 import com.alibaba.fastjson.JSON;
 import com.atzuche.order.accountrenterwzdepost.service.AccountRenterWzDepositService;
+import com.atzuche.order.accountrenterwzdepost.vo.req.PayedOrderRenterDepositWZDetailReqVO;
 import com.atzuche.order.cashieraccount.service.CashierWzSettleService;
 import com.atzuche.order.commons.constant.OrderConstant;
 import com.atzuche.order.commons.enums.SupplemOpStatusEnum;
@@ -132,7 +133,12 @@ public class OrderWzSettleSupplementHandleService {
                     orderSupplementDetailService.updatePayFlagById(entity.getId(),
                             SupplementPayFlagEnum.PAY_FLAG_VIOLATION_DEPOSIT_SETTLE_DEDUCT.getCode(), null);
                     //todo 更新违章押金抵扣信息
-                    //accountRenterWzDepositService.updateRenterWZDepositChange();
+                    PayedOrderRenterDepositWZDetailReqVO payedOrderRenterWzDepositDetail =
+                            new PayedOrderRenterDepositWZDetailReqVO();
+                    payedOrderRenterWzDepositDetail.setOrderNo(settleOrders.getOrderNo());
+
+
+                    accountRenterWzDepositService.updateRenterWZDepositChange(payedOrderRenterWzDepositDetail);
                 });
             }
         }
