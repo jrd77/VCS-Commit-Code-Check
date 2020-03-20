@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.atzuche.order.commons.vo.req.handover.req.HandoverCarInfoReqDTO;
 import com.atzuche.order.delivery.entity.OwnerHandoverCarInfoEntity;
 import com.atzuche.order.delivery.entity.OwnerHandoverCarRemarkEntity;
+import com.atzuche.order.delivery.entity.RenterHandoverCarRemarkEntity;
 import com.atzuche.order.delivery.enums.RenterHandoverCarTypeEnum;
 import com.atzuche.order.delivery.mapper.OwnerHandoverCarInfoMapper;
 import com.atzuche.order.delivery.mapper.OwnerHandoverCarRemarkMapper;
@@ -161,6 +162,14 @@ public class OwnerHandoverCarService implements IUpdateHandoverCarInfo {
 
     public OwnerHandoverCarInfoEntity selectByRenterOrderNoAndType(String renterOrderNo, Integer type) {
         return ownerHandoverCarInfoMapper.selectByOwnerOrderNoAndType(renterOrderNo, type);
+    }
+    /**
+     * 根据流程ID获取
+     * @param orderNo
+     * @return
+     */
+    public List<OwnerHandoverCarRemarkEntity> selectProIdByOrderNo(String orderNo) {
+        return ownerHandoverCarRemarkMapper.selectProIdByOrderNo(orderNo);
     }
 
 }

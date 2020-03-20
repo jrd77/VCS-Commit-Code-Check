@@ -75,4 +75,12 @@ public class RenterOrderWzStatusService {
     public RenterOrderWzStatusEntity getOrderInfoByOrderNo(String orderNo) {
         return renterOrderWzStatusMapper.getOrderInfoByOrderNo(orderNo);
     }
+
+    /**
+     * 修改违章状态
+     * @param renterOrderWzStatusEntity
+     */
+    public void updateOrderWzStatus(RenterOrderWzStatusEntity renterOrderWzStatusEntity) {
+        renterOrderWzStatusMapper.updateOrderWzStatus(renterOrderWzStatusEntity);
+    }
 }

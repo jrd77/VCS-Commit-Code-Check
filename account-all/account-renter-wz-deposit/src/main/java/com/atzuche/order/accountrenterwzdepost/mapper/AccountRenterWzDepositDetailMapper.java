@@ -27,4 +27,12 @@ public interface AccountRenterWzDepositDetailMapper{
 	void updateByPrimaryKeySelective(AccountRenterWzDepositDetailEntity entity);
 
 
+    /**
+     * 获取指定订单号的结算违章押金流水记录
+     * @param entity
+     * @return
+     */
+    AccountRenterWzDepositDetailEntity findByOrderNoAndCode(AccountRenterWzDepositDetailEntity entity);
+
+
 }

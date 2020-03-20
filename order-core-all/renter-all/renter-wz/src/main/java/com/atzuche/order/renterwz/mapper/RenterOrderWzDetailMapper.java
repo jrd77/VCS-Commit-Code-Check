@@ -35,7 +35,7 @@ public interface RenterOrderWzDetailMapper{
 	 * 批量查询
 	 * @return 查询列表
 	 */
-	List<RenterOrderWzDetailEntity> queryList();
+	List<RenterOrderWzDetailEntity> queryList(String orderNo);
 
 	/**
 	 * 修改
@@ -137,4 +137,26 @@ public interface RenterOrderWzDetailMapper{
 	 * @return
 	 */
     Integer getIllegalDetailCount(@Param("orderNo") String orderNo,@Param("illegalNum")  String illegalNum);
+
+
+	/**
+	 * 变更违章为已处理状态
+	 * @param orderNo 订单号
+	 */
+	void updateIllegalStatus(String orderNo);
+
+
+	/**
+	 * 变更违章为已处理状态
+	 * @param id 违章id
+	 */
+	Integer updateIllegalStatusById(Long id);
+
+
+	/**
+	 * 批量查询
+	 * @return 查询列表
+	 */
+	List<RenterOrderWzDetailEntity> queryAllList();
+
 }
