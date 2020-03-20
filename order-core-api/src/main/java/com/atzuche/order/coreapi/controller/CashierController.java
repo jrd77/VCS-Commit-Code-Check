@@ -48,16 +48,18 @@ public class CashierController {
         BindingResultUtil.checkBindingResult(bindingResult);
         OrderPayableAmountResVO result = cashierPayService.getOrderPayableAmount(orderPayReqVO);
         log.info("CashierController getOrderPayableAmount end param [{}],result [{}]", GsonUtils.toJson(orderPayReqVO),GsonUtils.toJson(result));
-        //调起支付平台获取收银台信息
-        PrePlatformRequest reqData = new PrePlatformRequest();
-        //赋值
-        putPrePlatformRequest(orderPayReqVO, result, reqData);
-		
-        PayResVo payResVo = payRemoteService.getPayPlatform(reqData);
-        if(payResVo != null) {
-        	BeanUtils.copyProperties(payResVo, result);
+        //支付金额大于0
+        if(result.getAmtTotal() < 0) {  //带支付 为负数
+	        //调起支付平台获取收银台信息
+	        PrePlatformRequest reqData = new PrePlatformRequest();
+	        //赋值
+	        putPrePlatformRequest(orderPayReqVO, result, reqData);
+			
+	        PayResVo payResVo = payRemoteService.getPayPlatform(reqData);
+	        if(payResVo != null) {
+	        	BeanUtils.copyProperties(payResVo, result);
+	        }
         }
-        
         return ResponseData.success(result);
     }
 
@@ -65,7 +67,8 @@ public class CashierController {
 			PrePlatformRequest reqData) {
 		reqData.setAtappId(orderPayReqVO.getAtappId());
         reqData.setInternalNo(orderPayReqVO.getInternalNo());
-        reqData.setPayAmt(String.valueOf(result.getAmtTotal()));  //支付金额
+        //正数
+        reqData.setPayAmt(String.valueOf(Math.abs(result.getAmtTotal())));  //支付金额
         reqData.setPayKind(orderPayReqVO.getPayKind().get(0)); //默认取第一个。
         reqData.setPayType(orderPayReqVO.getPayType());  //消费
         reqData.setOrderNo(orderPayReqVO.getOrderNo());
