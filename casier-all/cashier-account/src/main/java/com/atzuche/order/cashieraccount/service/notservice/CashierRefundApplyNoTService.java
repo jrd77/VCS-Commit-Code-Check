@@ -1,11 +1,17 @@
 package com.atzuche.order.cashieraccount.service.notservice;
 
 import com.atzuche.order.cashieraccount.common.FasterJsonUtil;
+import com.atzuche.order.cashieraccount.common.VirtualAccountEnum;
+import com.atzuche.order.cashieraccount.common.VirtualPayTypeEnum;
+import com.atzuche.order.cashieraccount.entity.AccountVirtualPayDetailEntity;
 import com.atzuche.order.cashieraccount.entity.CashierRefundApplyEntity;
+import com.atzuche.order.cashieraccount.entity.OfflineRefundApplyEntity;
 import com.atzuche.order.cashieraccount.exception.CashierRefundApplyException;
 import com.atzuche.order.cashieraccount.exception.OrderPayRefundCallBackAsnyException;
 import com.atzuche.order.cashieraccount.vo.req.CashierRefundApplyReqVO;
+import com.atzuche.order.cashieraccount.vo.req.pay.VirtualPayDTO;
 import com.atzuche.order.commons.enums.cashier.CashierRefundApplyStatus;
+import com.atzuche.order.commons.enums.cashier.PayLineEnum;
 import com.autoyol.autopay.gateway.constant.DataPayKindConstant;
 import com.autoyol.autopay.gateway.constant.DataPayTypeConstant;
 import com.autoyol.autopay.gateway.util.MD5;
@@ -21,7 +27,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import com.atzuche.order.cashieraccount.mapper.AccountVirtualPayDetailMapper;
+import com.atzuche.order.cashieraccount.mapper.AccountVirtualPayMapper;
 import com.atzuche.order.cashieraccount.mapper.CashierRefundApplyMapper;
+import com.atzuche.order.cashieraccount.mapper.OfflineRefundApplyMapper;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -39,6 +48,12 @@ import java.util.Objects;
 public class CashierRefundApplyNoTService {
     @Autowired
     private CashierRefundApplyMapper cashierRefundApplyMapper;
+    @Autowired
+    private OfflineRefundApplyMapper offlineRefundApplyMapper;
+    @Autowired
+    private AccountVirtualPayDetailMapper accountVirtualPayDetailMapper;
+    @Autowired
+    private AccountVirtualPayMapper accountVirtualPayMapper;
 
     @Value("${refundWatingDays:1}") String refundWatingDays;
 
@@ -58,6 +73,20 @@ public class CashierRefundApplyNoTService {
         String payMd5 = MD5.MD5Encode(FasterJsonUtil.toJson(cashierRefundApplyEntity));
 
         cashierRefundApplyEntity.setPayMd5(payMd5);
+        Integer payLine = cashierRefundApplyReq.getPayLine();
+        // 0-线上支付，1-线下支付，2-虚拟支付
+        if (payLine != null && payLine == PayLineEnum.OFF_LINE_PAY.getCode()) {
+        	// 线下支付
+        	OfflineRefundApplyEntity record = new OfflineRefundApplyEntity();
+        	BeanUtils.copyProperties(cashierRefundApplyEntity, record);
+        	offlineRefundApplyMapper.insertSelective(record);
+        	return record.getId();
+        } else if (payLine != null && payLine == PayLineEnum.VIRTUAL_PAY.getCode()) {
+        	// 虚拟支付
+        	int virtualId = insertVirtualPayDetail(cashierRefundApplyReq);
+        	updateVirtualPay(cashierRefundApplyReq);
+        	return virtualId;
+        }
 //        CashierRefundApplyEntity entity = cashierRefundApplyMapper.selectRefundByQn(cashierRefundApplyReq.getMemNo(),cashierRefundApplyReq.getOrderNo(),cashierRefundApplyReq.getQn());
         CashierRefundApplyEntity entity = cashierRefundApplyMapper.selectRefundByMd5(cashierRefundApplyReq.getMemNo(),cashierRefundApplyReq.getOrderNo(),payMd5);
         //判断是否已经存在。
@@ -148,5 +177,46 @@ public class CashierRefundApplyNoTService {
         LocalDateTime date = now.plusDays(-refundWatingDaysLong);
         List<CashierRefundApplyEntity> result = cashierRefundApplyMapper.getCashierRefundApplyByTime(date);
         return result;
+    }
+    
+    /**
+     * 保存虚拟退款记录
+     * @param cashierRefundApplyReq
+     */
+    private int insertVirtualPayDetail(CashierRefundApplyReqVO cashierRefundApplyReq) {
+    	if (cashierRefundApplyReq == null) {
+    		return 0;
+    	}
+        AccountVirtualPayDetailEntity detailEntity = new AccountVirtualPayDetailEntity();
+        detailEntity.setAccountNo(cashierRefundApplyReq.getVirtualAccountNo());
+        try {
+        	detailEntity.setAccountName(VirtualAccountEnum.fromAccountNo(cashierRefundApplyReq.getVirtualAccountNo()).getAccountName());
+		} catch (Exception e) {
+			log.error("账号名转换出错virtualAccountNo=[{}]", cashierRefundApplyReq.getVirtualAccountNo(), e);
+		}
+        detailEntity.setAmt(cashierRefundApplyReq.getAmt());
+        detailEntity.setOrderNo(cashierRefundApplyReq.getOrderNo());
+        detailEntity.setPayType(VirtualPayTypeEnum.REFUND.getValue());
+        detailEntity.setPayCashType(cashierRefundApplyReq.getPayKind());
+        accountVirtualPayDetailMapper.insertSelective(detailEntity);
+        return detailEntity.getId();
+    }
+    
+    /**
+     * 更新虚拟账号成本
+     * @param cashierRefundApplyReq
+     */
+    private void updateVirtualPay(CashierRefundApplyReqVO cashierRefundApplyReq) {
+    	if (cashierRefundApplyReq == null) {
+    		return;
+    	}
+    	// 虚拟支付对应的成本账号
+    	String virtualAccountNo = cashierRefundApplyReq.getVirtualAccountNo();
+    	// 退款金额
+    	Integer amt = cashierRefundApplyReq.getAmt();
+    	if (org.apache.commons.lang.StringUtils.isBlank(virtualAccountNo) || amt == null) {
+    		return;
+    	}
+    	accountVirtualPayMapper.deductAmt(virtualAccountNo,amt);
     }
 }

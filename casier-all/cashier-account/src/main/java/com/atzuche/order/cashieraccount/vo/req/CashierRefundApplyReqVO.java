@@ -83,6 +83,15 @@ public class CashierRefundApplyReqVO {
      * 类型（系统退款/手工退款）
      */
     private Integer type;
+    
+    /**
+     * 0-线上支付，1-线下支付，2-虚拟支付
+     */
+    private Integer payLine;
+    /**
+	 * 虚拟支付对应的成本账号
+	 */
+	private String virtualAccountNo;
 
 
     /**
