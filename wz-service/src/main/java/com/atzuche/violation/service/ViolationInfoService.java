@@ -49,7 +49,7 @@ public class ViolationInfoService {
      * @return
      */
     public List<RenterOrderWzDetailResVO> detailList(ViolationDetailReqVO violationDetailReqVO){
-        List<RenterOrderWzDetailEntity> renterOrderWzDetailEntities = renterOrderWzDetailMapper.queryList();
+        List<RenterOrderWzDetailEntity> renterOrderWzDetailEntities = renterOrderWzDetailMapper.queryAllList();
         List<RenterOrderWzDetailResVO> renterOrderWzDetailResVOS = Lists.newArrayList();
         if (CollectionUtils.isEmpty(renterOrderWzDetailEntities)) {
             log.info("没有违章明细数据，violationDetailReqVO--->>>>[{}]", violationDetailReqVO.getOrderNo());
