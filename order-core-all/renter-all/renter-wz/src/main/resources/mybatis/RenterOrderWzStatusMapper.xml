@@ -76,7 +76,7 @@
 		where order_no=#{orderNo} and car_plate_num = #{carNum} and is_delete = 0
 	</update>
 
-	<select id="selectByOrderNo" parameterType="java.lang.Long" resultMap="selectColumnMap">
+	<select id="selectByOrderNo" resultMap="selectColumnMap">
 		select
 		<include refid="select_column"/>
 		from renter_order_wz_status
@@ -131,7 +131,8 @@
 
 
 	<update id="updateOrderWzStatus">
-		UPDATE renter_order_wz_status SET
+		UPDATE renter_order_wz_status
+		<trim prefix="set" suffixOverrides=",">
 		<if test="managementMode != null">
 			management_mode = #{managementMode},
 		</if>
@@ -157,8 +158,8 @@
 		<if test="wzPlatformLastTime != null">
 			wz_platform_last_time = #{wzPlatformLastTime},
 		</if>
-
-		WHERE order_no = #{orderNo} and car_plate_num = #{carNumber} and is_delete = 0
+		</trim>
+		WHERE order_no = #{orderNo} and car_plate_num = #{carPlateNum} and is_delete = 0
 	</update>
 
 </mapper>

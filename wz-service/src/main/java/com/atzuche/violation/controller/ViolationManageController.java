@@ -56,14 +56,14 @@ public class ViolationManageController {
 
     @AutoDocMethod(description = "获取违章信息", value = "获取违章信息", response = ViolationHandleInformationResponseVO.class)
     @GetMapping("/information")
-    public ResponseData information(@Valid @RequestBody ViolationInformationRequestVO violationInformationRequestVO, BindingResult bindingResult) {
+    public ResponseData information(@Valid ViolationInformationRequestVO violationInformationRequestVO, BindingResult bindingResult) {
         //参数验证
         validateParameter(bindingResult);
         try{
             logger.info("获取违章信息入参:{}",violationInformationRequestVO.toString());
-            violationManageService.getViolationHandleInformation(violationInformationRequestVO);
+            ViolationHandleInformationResponseVO violationHandleInformationResponseVO = violationManageService.getViolationHandleInformation(violationInformationRequestVO);
             CatLogRecord.successLog("获取违章信息成功","console/order/violation/information",violationInformationRequestVO);
-            return ResponseData.success();
+            return ResponseData.success(violationHandleInformationResponseVO);
         } catch (Exception e) {
             logger.error("获取违章信息异常:{}",e);
             CatLogRecord.failLog("获取违章信息异常","console/order/violation/information",violationInformationRequestVO, e);
@@ -74,17 +74,17 @@ public class ViolationManageController {
 
     @AutoDocMethod(description = "获取违章信息变更记录", value = "获取违章信息变更记录", response = ViolationAlterationLogListResponseVO.class)
     @GetMapping("/alteration/log/list")
-    public ResponseData alterationLogList(@Valid @RequestBody ViolationInformationRequestVO violationInformationRequestVO, BindingResult bindingResult) {
+    public ResponseData alterationLogList(@Valid ViolationAlterationLogRequestVO violationAlterationLogRequestVO, BindingResult bindingResult) {
         //参数验证
         validateParameter(bindingResult);
         try{
-            logger.info("获取违章信息变更记录入参:{}",violationInformationRequestVO.toString());
-            ViolationAlterationLogListResponseVO violationAlterationLogListResponseVO = violationManageService.selectAlterationLogList(violationInformationRequestVO);
-            CatLogRecord.successLog("获取违章信息变更记录成功","console/order/violation/alteration/log/list",violationInformationRequestVO);
+            logger.info("获取违章信息变更记录入参:{}",violationAlterationLogRequestVO.toString());
+            ViolationAlterationLogListResponseVO violationAlterationLogListResponseVO = violationManageService.selectAlterationLogList(violationAlterationLogRequestVO);
+            CatLogRecord.successLog("获取违章信息变更记录成功","console/order/violation/alteration/log/list",violationAlterationLogRequestVO);
             return ResponseData.success(violationAlterationLogListResponseVO);
         } catch (Exception e) {
             logger.error("获取违章信息变更记录异常:{}",e);
-            CatLogRecord.failLog("获取违章信息变更记录异常","console/order/violation/alteration/log/list",violationInformationRequestVO, e);
+            CatLogRecord.failLog("获取违章信息变更记录异常","console/order/violation/alteration/log/list",violationAlterationLogRequestVO, e);
             throw new ViolationManageException(ErrorCode.SYS_ERROR.getCode(),ErrorCode.SYS_ERROR.getText());
         }
     }
