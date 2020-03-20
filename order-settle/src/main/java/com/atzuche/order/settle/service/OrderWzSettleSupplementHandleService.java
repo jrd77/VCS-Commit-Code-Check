@@ -127,17 +127,14 @@ public class OrderWzSettleSupplementHandleService {
                     cashierWzSettleService.createWzDebt(accountInsertDebt);
                 });
             }
-
             if (CollectionUtils.isNotEmpty(deductList)) {
                 deductList.forEach(entity -> {
                     orderSupplementDetailService.updatePayFlagById(entity.getId(),
                             SupplementPayFlagEnum.PAY_FLAG_VIOLATION_DEPOSIT_SETTLE_DEDUCT.getCode(), null);
-                    //todo 更新违章押金抵扣信息
+                    // 更新违章押金抵扣信息
                     PayedOrderRenterDepositWZDetailReqVO payedOrderRenterWzDepositDetail =
-                            new PayedOrderRenterDepositWZDetailReqVO();
-                    payedOrderRenterWzDepositDetail.setOrderNo(settleOrders.getOrderNo());
-
-
+                            buildPayedOrderRenterDepositWzDetailReqVO(settleOrders, entity.getAmt());
+                    payedOrderRenterWzDepositDetail.setUniqueNo(String.valueOf(entity.getId()));
                     accountRenterWzDepositService.updateRenterWZDepositChange(payedOrderRenterWzDepositDetail);
                 });
             }
@@ -203,5 +200,22 @@ public class OrderWzSettleSupplementHandleService {
         supplement.setSupplementType(SupplementTypeEnum.SYSTEM_CREATE.getCode());
         supplement.setOpType(SupplementOpTypeEnum.ILLEGALSETTLE_CREATE.getCode());
         return supplement;
+    }
+
+    /**
+     * 违章抵扣信息
+     *
+     * @param settleOrders 结算订单信息
+     * @param amt 抵扣金额
+     * @return PayedOrderRenterDepositWZDetailReqVO
+     */
+    private PayedOrderRenterDepositWZDetailReqVO buildPayedOrderRenterDepositWzDetailReqVO(SettleOrdersWz settleOrders, int amt){
+        PayedOrderRenterDepositWZDetailReqVO payedOrderRenterDepositWzDetailReqVO =
+                new PayedOrderRenterDepositWZDetailReqVO();
+        payedOrderRenterDepositWzDetailReqVO.setOrderNo(settleOrders.getOrderNo());
+        payedOrderRenterDepositWzDetailReqVO.setMemNo(settleOrders.getRenterMemNo());
+        payedOrderRenterDepositWzDetailReqVO.setAmt(-amt);
+        payedOrderRenterDepositWzDetailReqVO.setRenterCashCodeEnum(RenterCashCodeEnum.SETTLE_WZ_TO_SUPPLEMENT_AMT);
+        return payedOrderRenterDepositWzDetailReqVO;
     }
 }

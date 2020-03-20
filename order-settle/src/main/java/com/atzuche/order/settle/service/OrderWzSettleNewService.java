@@ -274,7 +274,7 @@ public class OrderWzSettleNewService {
 
 		log.info("OrderSettleService repayWzHistoryDebtRent 抵扣历史欠款。settleOrdersAccount [{}]", GsonUtils.toJson(settleOrdersAccount));
 		// 租客剩余违章押金 结余历史欠款
-		//orderWzSettleNoTService.repayWzHistoryDebtRent(settleOrdersAccount);
+		orderWzSettleNoTService.repayWzHistoryDebtRent(settleOrdersAccount);
 		
 		
 		log.info("OrderSettleService refundWzDepositAmt 退还违章押金。settleOrdersAccount [{}]", GsonUtils.toJson(settleOrdersAccount));
