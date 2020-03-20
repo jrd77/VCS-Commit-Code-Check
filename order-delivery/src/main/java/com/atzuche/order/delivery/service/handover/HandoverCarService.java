@@ -13,6 +13,7 @@ import com.atzuche.order.delivery.exception.DeliveryOrderException;
 import com.atzuche.order.delivery.exception.HandoverCarOrderException;
 import com.atzuche.order.delivery.mapper.*;
 import com.atzuche.order.delivery.utils.CommonUtil;
+import com.atzuche.order.delivery.vo.delivery.HandoverProVO;
 import com.atzuche.order.delivery.vo.handover.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -157,6 +158,29 @@ public class HandoverCarService {
             throw new DeliveryOrderException(DeliveryErrorCode.DELIVERY_PARAMS_ERROR.getValue(), "您只能上传自己的取还车照片");
         }
         return true;
+    }
+
+
+    /**
+     * 获取车主租客交接车流程(外部调用)
+     * @param orderNo
+     * @return
+     */
+    public HandoverProVO getHandoverProData(String orderNo) {
+        HandoverProVO handoverProVO = HandoverProVO.builder().build();
+        try {
+            List<RenterHandoverCarRemarkEntity> renterHandoverCarRemarkEntities = renterHandoverCarService.selectProIdByOrderNo(orderNo);
+            List<OwnerHandoverCarRemarkEntity> ownerHandoverCarRemarkEntities = ownerHandoverCarService.selectProIdByOrderNo(orderNo);
+            if (CollectionUtils.isNotEmpty(renterHandoverCarRemarkEntities)) {
+                handoverProVO.setRenterHandoverCarInfoEntities(renterHandoverCarRemarkEntities);
+            }
+            if (CollectionUtils.isNotEmpty(ownerHandoverCarRemarkEntities)) {
+                handoverProVO.setOwnerHandoverCarInfoEntities(ownerHandoverCarRemarkEntities);
+            }
+        } catch (Exception e) {
+            log.info("获取交接车流程数据失败,e--->>>", e);
+        }
+        return handoverProVO;
     }
 
     /**

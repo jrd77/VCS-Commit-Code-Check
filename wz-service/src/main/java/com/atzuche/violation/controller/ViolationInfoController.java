@@ -1,12 +1,12 @@
 package com.atzuche.violation.controller;
 
+import com.atzuche.order.commons.vo.req.ViolationReqVO;
+import com.atzuche.order.commons.vo.res.ViolationResVO;
 import com.atzuche.violation.cat.CatLogRecord;
 import com.atzuche.violation.exception.ViolationManageException;
 import com.atzuche.violation.service.ViolationInfoService;
 import com.atzuche.violation.vo.req.ViolationDetailReqVO;
-import com.atzuche.violation.vo.req.ViolationReqVO;
 import com.atzuche.violation.vo.resp.RenterOrderWzDetailResVO;
-import com.atzuche.violation.vo.resp.ViolationResVO;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.doc.annotation.AutoDocMethod;
@@ -14,12 +14,17 @@ import com.autoyol.doc.annotation.AutoDocVersion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.CollectionUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+import java.util.List;
 
 /**
  * @author 胡春林
@@ -45,9 +50,13 @@ public class ViolationInfoController {
         validateParameter(bindingResult);
         try {
             logger.info("违章管理列表入参:{}", violationReqVO.toString());
-
+            List<ViolationResVO> violationResDesVOList = violationInfoService.list(violationReqVO);
+            if (CollectionUtils.isEmpty(violationResDesVOList)) {
+                logger.info("没有查到违章数据，violationDetailReqVO--->>>>[{}]", violationReqVO.getOrderNo());
+                return ResponseData.success();
+            }
             CatLogRecord.successLog("违章管理列表成功", "console/order/violation/list", violationReqVO);
-            return ResponseData.success();
+            return ResponseData.success(violationResDesVOList);
         } catch (Exception e) {
             logger.error("违章管理列表异常:{}", e);
             CatLogRecord.failLog("违章管理列表异常", "console/order/violation/list", violationReqVO, e);
@@ -68,9 +77,13 @@ public class ViolationInfoController {
         validateParameter(bindingResult);
         try {
             logger.info("违章明细管理列表入参:{}", violationDetailReqVO.toString());
-
+            List<RenterOrderWzDetailResVO> renterOrderWzDetailResVOS = violationInfoService.detailList(violationDetailReqVO);
+            if (CollectionUtils.isEmpty(renterOrderWzDetailResVOS)) {
+                logger.info("没有查到违章明细数据，violationDetailReqVO--->>>>[{}]", violationDetailReqVO.getOrderNo());
+                return ResponseData.success();
+            }
             CatLogRecord.successLog("违章明细管理列表成功", "console/order/violation/detailList", violationDetailReqVO);
-            return ResponseData.success();
+            return ResponseData.success(renterOrderWzDetailResVOS);
         } catch (Exception e) {
             logger.error("违章明细管理列表异常:{}", e);
             CatLogRecord.failLog("违章明细管理列表异常", "console/order/violation/detailList", violationDetailReqVO, e);
@@ -96,14 +109,20 @@ public class ViolationInfoController {
 
     /**
      * 导入违章管理列表
-     * @param batchFile
+     * @param file
      * @return
      */
     @AutoDocMethod(description = "导入违章管理列表数据excel", value = "导入违章管理列表数据excel", response = ResponseData.class)
     @PostMapping("/import")
-    public ResponseData importExcel(@RequestParam("batchFile") MultipartFile batchFile) {
+    public ResponseData importExcel(@RequestParam("xlsfile") MultipartFile file, HttpServletRequest request) {
         try {
             logger.info("导入导入违章管理列表数据excel开始");
+            if (null == file || file.isEmpty()) {
+                logger.info("没有导入文件");
+                return ResponseData.success();
+            }
+            String messageInfo = violationInfoService.importExcel(file, request);
+            ResponseData.createErrorCodeResponse(ErrorCode.SUCCESS.getCode(), messageInfo);
         } catch (Exception e) {
             logger.info("导入批量修改打款状态excel异常", e);
             throw new ViolationManageException(ErrorCode.SYS_ERROR.getCode(), ErrorCode.SYS_ERROR.getText());

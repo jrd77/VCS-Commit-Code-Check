@@ -1,6 +1,5 @@
-package com.atzuche.violation.vo.req;
+package com.atzuche.order.commons.vo.req;
 
-import com.atzuche.violation.common.BaseReqVO;
 import com.autoyol.doc.annotation.AutoDocProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
