@@ -69,4 +69,6 @@ public class OwnerHandoverCarRemarkEntity implements Serializable {
 	 */
 	private Integer isDelete;
 
+	private String proId;
+
 }
