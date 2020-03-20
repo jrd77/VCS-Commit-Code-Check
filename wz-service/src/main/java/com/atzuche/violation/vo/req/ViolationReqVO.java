@@ -1,8 +1,9 @@
 package com.atzuche.violation.vo.req;
 
-import com.atzuche.violation.common.BaseVO;
+import com.atzuche.violation.common.BaseReqVO;
 import com.autoyol.doc.annotation.AutoDocProperty;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 /**
@@ -11,7 +12,8 @@ import lombok.ToString;
  */
 @Data
 @ToString
-public class ViolationReqVO extends BaseVO {
+@EqualsAndHashCode(callSuper = true)
+public class ViolationReqVO extends BaseReqVO {
 
     @AutoDocProperty(value = "主订单号")
     private String orderNo;
@@ -31,7 +33,7 @@ public class ViolationReqVO extends BaseVO {
     private String violationStatus;
     @AutoDocProperty(value = "违章押金状态")
     private String violationCostStatus;
-    @AutoDocProperty(value = "违章缴纳凭证")
+    @AutoDocProperty(value = "违章缴纳凭证 0：无  1：有")
     private String violationPayStatus;
     @AutoDocProperty(value = "取车时间")
     private String getCarDate;
