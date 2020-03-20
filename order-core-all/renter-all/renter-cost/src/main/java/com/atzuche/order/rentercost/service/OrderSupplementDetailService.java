@@ -65,6 +65,9 @@ public class OrderSupplementDetailService{
     	//补付类型:1,系统创建 2,手动创建
     	entity.setSupplementType(2);
     	entity.setTitle(cashCode.getTxt());
+    	entity.setCreateOp("系统动态创建");
+    	entity.setCreateTime(new Date());
+    	
     	return entity;
     }
     
