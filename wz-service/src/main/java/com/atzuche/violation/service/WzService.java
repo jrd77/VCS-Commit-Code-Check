@@ -42,7 +42,7 @@ import java.util.*;
  * @date 2020/1/6
  */
 @Service
-public class RenterWzService {
+public class WzService {
 
     @Resource
     private RenterOrderWzCostDetailService renterOrderWzCostDetailService;

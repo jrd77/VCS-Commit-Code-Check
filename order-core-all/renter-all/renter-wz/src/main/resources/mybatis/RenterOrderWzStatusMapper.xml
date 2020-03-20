@@ -129,4 +129,36 @@
 		select * from renter_order_wz_status where order_no = #{orderNo} and is_delete = 0 order by id desc
 	</select>
 
+
+	<update id="updateOrderWzStatus">
+		UPDATE renter_order_wz_status SET
+		<if test="managementMode != null">
+			management_mode = #{managementMode},
+		</if>
+		<if test="statusDesc != null">
+			`status_desc` = #{statusDesc},
+		</if>
+		<if test="wzRemarks != null">
+			wz_remarks = #{wzRemarks},
+		</if>
+		<if test="updateOp != null">
+			update_op = #{updateOp},
+		</if>
+		<if test="status != null">
+			status = #{status},
+			wz_dispose_status_edit_time = now(),
+		</if>
+		<if test="wzHandleCompleteTime != null">
+			wz_handle_complete_time = #{wzHandleCompleteTime},
+		</if>
+		<if test="wzRenterLastTime != null">
+			wz_renter_last_time = #{wzRenterLastTime},
+		</if>
+		<if test="wzPlatformLastTime != null">
+			wz_platform_last_time = #{wzPlatformLastTime},
+		</if>
+
+		WHERE order_no = #{orderNo} and car_plate_num = #{carNumber} and is_delete = 0
+	</update>
+
 </mapper>

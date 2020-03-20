@@ -76,4 +76,22 @@ public class RenterOrderWzStatusEntity{
 	*0-正常，1-已逻辑删除
 	*/
 	private Integer isDelete;
+
+	/**
+	 * 租客最晚处理时间
+	 */
+	private Date wzRenterLastTime;
+
+	/**
+	 * 平台最晚处理时间
+	 */
+	private Date wzPlatformLastTime;
+
+
+	/**
+	 * 违章描述
+	 */
+	private String wzRemarks;
+
+
 }

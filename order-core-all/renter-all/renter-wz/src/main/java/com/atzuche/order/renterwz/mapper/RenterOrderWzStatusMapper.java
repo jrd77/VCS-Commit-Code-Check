@@ -108,4 +108,10 @@ public interface RenterOrderWzStatusMapper{
 	 * @return
 	 */
 	RenterOrderWzStatusEntity getOrderInfoByOrderNo(@Param("orderNo") String orderNo);
+
+	/**
+	 * 修改违章信息
+	 * @param renterOrderWzStatusEntity
+	 */
+	void updateOrderWzStatus(RenterOrderWzStatusEntity renterOrderWzStatusEntity);
 }

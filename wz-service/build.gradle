@@ -43,6 +43,7 @@ dependencies {
         exclude module:'servlet-api'
     }
     compile("org.apache.commons:commons-lang3:3.8.1")
+    compile("com.caucho:hessian:4.0.38")
 
     compile 'org.apache.poi:poi-ooxml:3.14'
     compile 'com.github.pagehelper:pagehelper-spring-boot-starter:1.2.13'
@@ -63,7 +64,9 @@ dependencies {
     compile project(":order-settle")
     compile project(":order-detain")
 
+
     compile project(":order-remote-service:order-remote-mem")
     compile project(":order-remote-service:order-remote-car")
     compile project(":order-core-all:carowner-all:carowner-mem")
+    compile('com.autoyol.coupon:coupon-api:20200110-SNAPSHOT')
 }
