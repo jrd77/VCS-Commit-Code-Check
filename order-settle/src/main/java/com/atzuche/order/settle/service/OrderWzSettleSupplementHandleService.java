@@ -1,6 +1,8 @@
 package com.atzuche.order.settle.service;
 
 import com.alibaba.fastjson.JSON;
+import com.atzuche.order.accountrenterwzdepost.service.AccountRenterWzDepositService;
+import com.atzuche.order.accountrenterwzdepost.vo.req.PayedOrderRenterDepositWZDetailReqVO;
 import com.atzuche.order.cashieraccount.service.CashierWzSettleService;
 import com.atzuche.order.commons.constant.OrderConstant;
 import com.atzuche.order.commons.enums.SupplemOpStatusEnum;
@@ -15,7 +17,6 @@ import com.atzuche.order.settle.vo.req.AccountInsertDebtReqVO;
 import com.atzuche.order.settle.vo.req.SettleOrdersAccount;
 import com.atzuche.order.settle.vo.req.SettleOrdersWz;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -41,6 +42,8 @@ public class OrderWzSettleSupplementHandleService {
     private OrderSupplementDetailService orderSupplementDetailService;
     @Autowired
     private CashierWzSettleService cashierWzSettleService;
+    @Autowired
+    private AccountRenterWzDepositService accountRenterWzDepositService;
 
     /**
      * 处理订单未支付的补付记录
@@ -124,13 +127,15 @@ public class OrderWzSettleSupplementHandleService {
                     cashierWzSettleService.createWzDebt(accountInsertDebt);
                 });
             }
-
             if (CollectionUtils.isNotEmpty(deductList)) {
                 deductList.forEach(entity -> {
                     orderSupplementDetailService.updatePayFlagById(entity.getId(),
                             SupplementPayFlagEnum.PAY_FLAG_VIOLATION_DEPOSIT_SETTLE_DEDUCT.getCode(), null);
-                    //todo 更新违章押金抵扣信息
-
+                    // 更新违章押金抵扣信息
+                    PayedOrderRenterDepositWZDetailReqVO payedOrderRenterWzDepositDetail =
+                            buildPayedOrderRenterDepositWzDetailReqVO(settleOrders, entity.getAmt());
+                    payedOrderRenterWzDepositDetail.setUniqueNo(String.valueOf(entity.getId()));
+                    accountRenterWzDepositService.updateRenterWZDepositChange(payedOrderRenterWzDepositDetail);
                 });
             }
         }
@@ -195,5 +200,22 @@ public class OrderWzSettleSupplementHandleService {
         supplement.setSupplementType(SupplementTypeEnum.SYSTEM_CREATE.getCode());
         supplement.setOpType(SupplementOpTypeEnum.ILLEGALSETTLE_CREATE.getCode());
         return supplement;
+    }
+
+    /**
+     * 违章抵扣信息
+     *
+     * @param settleOrders 结算订单信息
+     * @param amt 抵扣金额
+     * @return PayedOrderRenterDepositWZDetailReqVO
+     */
+    private PayedOrderRenterDepositWZDetailReqVO buildPayedOrderRenterDepositWzDetailReqVO(SettleOrdersWz settleOrders, int amt){
+        PayedOrderRenterDepositWZDetailReqVO payedOrderRenterDepositWzDetailReqVO =
+                new PayedOrderRenterDepositWZDetailReqVO();
+        payedOrderRenterDepositWzDetailReqVO.setOrderNo(settleOrders.getOrderNo());
+        payedOrderRenterDepositWzDetailReqVO.setMemNo(settleOrders.getRenterMemNo());
+        payedOrderRenterDepositWzDetailReqVO.setAmt(-amt);
+        payedOrderRenterDepositWzDetailReqVO.setRenterCashCodeEnum(RenterCashCodeEnum.SETTLE_WZ_TO_SUPPLEMENT_AMT);
+        return payedOrderRenterDepositWzDetailReqVO;
     }
 }
