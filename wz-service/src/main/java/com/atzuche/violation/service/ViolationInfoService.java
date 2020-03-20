@@ -56,7 +56,7 @@ public class ViolationInfoService {
             log.info("没有违章明细数据，violationDetailReqVO--->>>>[{}]", violationDetailReqVO.getOrderNo());
             return renterOrderWzDetailResVOS;
         }
-        renterOrderWzDetailResVOS.stream().forEach(r -> {
+        renterOrderWzDetailEntities.stream().forEach(r -> {
             RenterOrderWzDetailResVO renterOrderWzDetailRes = new RenterOrderWzDetailResVO();
             CommonUtil.copyPropertiesIgnoreNull(r, renterOrderWzDetailRes);
             renterOrderWzDetailResVOS.add(renterOrderWzDetailRes);
