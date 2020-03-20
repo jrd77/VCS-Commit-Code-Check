@@ -3,6 +3,7 @@ package com.atzuche.violation.controller;
 import com.atzuche.order.commons.vo.req.ViolationReqVO;
 import com.atzuche.order.commons.vo.res.ViolationResVO;
 import com.atzuche.violation.cat.CatLogRecord;
+import com.atzuche.violation.common.PageModel;
 import com.atzuche.violation.exception.ViolationManageException;
 import com.atzuche.violation.service.ViolationInfoService;
 import com.atzuche.violation.vo.req.ViolationDetailReqVO;
@@ -55,8 +56,9 @@ public class ViolationInfoController {
                 logger.info("没有查到违章数据，violationDetailReqVO--->>>>[{}]", violationReqVO.getOrderNo());
                 return ResponseData.success();
             }
+            PageModel pageModel = new PageModel(violationResDesVOList);
             CatLogRecord.successLog("违章管理列表成功", "console/order/violation/list", violationReqVO);
-            return ResponseData.success(violationResDesVOList);
+            return ResponseData.success(pageModel);
         } catch (Exception e) {
             logger.error("违章管理列表异常:{}", e);
             CatLogRecord.failLog("违章管理列表异常", "console/order/violation/list", violationReqVO, e);
