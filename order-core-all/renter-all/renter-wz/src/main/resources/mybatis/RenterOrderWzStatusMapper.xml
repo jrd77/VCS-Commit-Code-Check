@@ -160,5 +160,52 @@
 
 		WHERE order_no = #{orderNo} and car_plate_num = #{carNumber} and is_delete = 0
 	</update>
+    <select id="queryIllegalOrderList" parameterType="com.atzuche.order.commons.vo.req.ViolationReqVO" resultType="com.atzuche.order.commons.vo.res.ViolationResVO">
+        SELECT w.id,w.order_no as orderNo,f.rent_time as rentTime, IFNULL(p.id,0) as wzProcessedProof,
+        f.revert_time as revertTime, w.car_plate_num as plateNum,
+        f.frame_no as frameNo,f.engine_num as engineNo,
+        f.city_name as rentCity,w.status as wzStatus,
+        w.wz_handle_complete_time as wzStatusChangeTime,
+        w.create_time as enterWzManageTime, f.cities as onlineCity
+        FROM renter_order_wz_status w
+        LEFT JOIN renter_order_wz_finished_todo f on w.order_no = f.order_no and w.car_plate_num = f.car_plate_num
+        LEFT JOIN renter_order_wz_illegal_photo p on w.order_no = p.order_no and w.car_plate_num = p.car_plate_num
+        <where>
+            <if test="orderNo != null and orderNo != ''">
+                and w.order_no = #{orderNo}
+            </if>
+            <if test="useCarCity != null and useCarCity != ''">
+                and f.city_name = #{useCarCity}
+            </if>
+            <if test="carNo != null and carNo != ''">
+                and w.car_plate_num = #{carNo}
+            </if>
+            <if test="mixViolationManagerDate != null and mixViolationManagerDate != ''">
+                and w.wz_handle_complete_time >= #{mixViolationManagerDate}
+            </if>
+            <if test="maxViolationManagerDate != null and maxViolationManagerDate != ''">
+                and w.wz_handle_complete_time &lt;= #{maxViolationManagerDate}
+            </if>
+            <if test="violationInfo != null and violationInfo != ''">
+                and w.illegal_query = #{violationInfo}
+            </if>
+            <if test="violationStatus != null and violationStatus != ''">
+                and w.status = #{violationStatus}
+            </if>
+            <if test="getCarDate != null and getCarDate != ''">
+                and  DATE_FORMAT(f.rent_time,'%Y-%m-%d') = #{getCarDate}
+            </if>
+            <if test="returnCarDate != null and returnCarDate != ''">
+                and  DATE_FORMAT(f.revert_time,'%Y-%m-%d') = #{returnCarDate}
+            </if>
+            <if test="violationPayStatus != null and violationPayStatus != '0'">
+                and p.id is null
+            </if>
+            <if test="violationPayStatus != null and violationPayStatus != '1'">
+                and p.id is not null
+            </if>
+            and is_delete = 0
+        </where>
+    </select>
 
 </mapper>
