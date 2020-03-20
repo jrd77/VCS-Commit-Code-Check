@@ -39,7 +39,7 @@ public class OrderDetailRespDTO {
     public List<RenterOrderChangeApplyDTO> renterOrderChangeApplyDTOS;
     public AccountRenterDepositDTO accountRenterDepositDTO;
     public AccountRenterWzDepositDTO accountRenterWzDepositDTO;
-
+    public List<AccountRenterCostDetailDTO> accountRenterCostDetailDTO;
 
     //变更申请的租客子订单号（application_id）
     public String changeApplyRenterOrderNo;

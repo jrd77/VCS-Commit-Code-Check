@@ -186,7 +186,7 @@ public class OwnerOrderDetailService {
         return responseObject;
     }
 
-    public List<FienDetailRespDTO> fienAmtDetailList(String orderNo, String ownerMemNo) {
+    public FienDetailRespListDTO fienAmtDetailList(String orderNo, String ownerMemNo) {
         ResponseData<List<ConsoleOwnerOrderFineDeatailDTO>> responseObject = null;
         Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "获取罚金列表");
         try{
@@ -205,7 +205,9 @@ public class OwnerOrderDetailService {
                 fienDetailRespDTO.setOperater((x.getOperator() == null || x.getOperator().trim().length()<=0)? "车主" : x.getOperator());
                 return fienDetailRespDTO;
             }).collect(Collectors.toList());
-            return collect;
+            FienDetailRespListDTO fienDetailRespListDTO = new FienDetailRespListDTO();
+            fienDetailRespListDTO.setFienDetailRespDTOS(collect);
+            return fienDetailRespListDTO;
         }catch (Exception e){
             log.error("Feign 获取罚金列表详情异常,responseObject={}", JSON.toJSONString(responseObject),e);
             Cat.logError("Feign 获取修改罚金异常",e);
