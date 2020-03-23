@@ -22,7 +22,8 @@ public class OrderDetailRespDTO {
     public RenterOrderCostDTO renterOrderCost;
     public RenterHandoverCarInfoDTO renterHandoverCarInfo;
     public OwnerHandoverCarInfoDTO ownerHandoverCarInfo;
-    public List<OrderCancelReasonDTO> orderCancelReason;
+    //public OrderCancelReasonDTO orderCancelReason;
+    public List<OrderCancelReasonDTO> orderCancelReasons;
     public List<OwnerMemberRightDTO> ownerMemberRightList;
     public List<RenterMemberRightDTO> renterMemberRightList;
     public List<RenterOrderCostDetailDTO> renterOrderCostDetailList;

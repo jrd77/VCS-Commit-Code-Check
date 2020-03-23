@@ -647,7 +647,7 @@ public class OrderDetailService {
         orderDetailRespDTO.ownerMember = ownerMember;
         orderDetailRespDTO.renterOrderCost = renterOrderCostDTO;
         orderDetailRespDTO.renterHandoverCarInfo = renterHandoverCarInfoDTO;
-        orderDetailRespDTO.orderCancelReason = orderCancelReasonDTOS;
+        orderDetailRespDTO.orderCancelReasons = orderCancelReasonDTOS;
         orderDetailRespDTO.ownerMemberRightList = ownerMemberRightDTOS;
         orderDetailRespDTO.renterMemberRightList = renterMemberRightDTOS;
         orderDetailRespDTO.renterOrderCostDetailList = renterOrderCostDetailDTOS;
