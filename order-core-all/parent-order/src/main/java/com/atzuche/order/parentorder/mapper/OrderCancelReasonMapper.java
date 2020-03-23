@@ -34,4 +34,6 @@ public interface OrderCancelReasonMapper{
      * @return List<OrderCancelReasonEntity>
      */
     List<OrderCancelReasonEntity> selectListByOrderNo(@Param("orderNo")String orderNo);
+
+    List<OrderCancelReasonEntity> selectListByOrderNos(@Param("ownerOrderNos") List<String> ownerOrderNos);
 }

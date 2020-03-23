@@ -53,14 +53,8 @@ import com.atzuche.order.owner.commodity.service.OwnerGoodsService;
 import com.atzuche.order.owner.mem.service.OwnerMemberService;
 import com.atzuche.order.ownercost.entity.*;
 import com.atzuche.order.ownercost.service.*;
-import com.atzuche.order.parentorder.entity.OrderCancelReasonEntity;
-import com.atzuche.order.parentorder.entity.OrderEntity;
-import com.atzuche.order.parentorder.entity.OrderSourceStatEntity;
-import com.atzuche.order.parentorder.entity.OrderStatusEntity;
-import com.atzuche.order.parentorder.service.OrderCancelReasonService;
-import com.atzuche.order.parentorder.service.OrderService;
-import com.atzuche.order.parentorder.service.OrderSourceStatService;
-import com.atzuche.order.parentorder.service.OrderStatusService;
+import com.atzuche.order.parentorder.entity.*;
+import com.atzuche.order.parentorder.service.*;
 import com.atzuche.order.rentercommodity.entity.RenterGoodsEntity;
 import com.atzuche.order.rentercommodity.service.RenterGoodsService;
 import com.atzuche.order.rentercost.entity.RenterOrderCostDetailEntity;
@@ -174,6 +168,8 @@ public class OrderDetailService {
     private CashierNoTService cashierNoTService;
     @Autowired
     private AccountRenterWzDepositNoTService accountRenterWzDepositNoTService;
+    @Autowired
+    private OrderRefundRecordService orderRefundRecordService;
 
 
     private static final String UNIT_HOUR = "小时";
@@ -439,12 +435,24 @@ public class OrderDetailService {
         BeanUtils.copyProperties(renterOrderCostEntity,renterOrderCostDTO);
 
         //订单取消原因
-        OrderCancelReasonEntity orderCancelReasonEntity = orderCancelReasonService.selectByOrderNo(orderNo,
-                renterOrderNo, ownerOrderNo);
-        OrderCancelReasonDTO orderCancelReasonDTO = null;
-        if(orderCancelReasonEntity != null){
-            orderCancelReasonDTO = new OrderCancelReasonDTO();
-            BeanUtils.copyProperties(orderCancelReasonEntity,orderCancelReasonDTO);
+        List<OwnerOrderEntity> ownerOrderEntities = ownerOrderService.queryByOwnerOrderNoAndMemNo(orderNo,ownerMemberDTO.getMemNo());
+        List<OrderCancelReasonDTO> orderCancelReasonDTOS = new ArrayList<>();
+        if(ownerOrderEntities!=null && ownerOrderEntities.size()>0){
+            List<String> ownerOrderNos = ownerOrderEntities.stream().map(x -> x.getOwnerOrderNo()).collect(Collectors.toList());
+            List<OrderCancelReasonEntity> orderCancelReasonEntities = orderCancelReasonService.selectListByOrderNos(ownerOrderNos);
+            orderCancelReasonEntities.stream().forEach(x->{
+                OrderCancelReasonDTO  orderCancelReasonDTO = new OrderCancelReasonDTO();
+                BeanUtils.copyProperties(x,orderCancelReasonDTO);
+                orderCancelReasonDTOS.add(orderCancelReasonDTO);
+            });
+        }
+
+        //租客取消详情表
+        OrderRefundRecordEntity orderRefundRecordEntity = orderRefundRecordService.getByOrderNo(orderNo);
+        OrderRefundRecordDTO orderRefundRecordDTO = null;
+        if(orderRefundRecordEntity != null){
+            orderRefundRecordDTO = new OrderRefundRecordDTO();
+            BeanUtils.copyProperties(orderRefundRecordEntity,orderRefundRecordDTO);
         }
 
         //租客交接车
@@ -639,7 +647,7 @@ public class OrderDetailService {
         orderDetailRespDTO.ownerMember = ownerMember;
         orderDetailRespDTO.renterOrderCost = renterOrderCostDTO;
         orderDetailRespDTO.renterHandoverCarInfo = renterHandoverCarInfoDTO;
-        orderDetailRespDTO.orderCancelReason = orderCancelReasonDTO;
+        orderDetailRespDTO.orderCancelReason = orderCancelReasonDTOS;
         orderDetailRespDTO.ownerMemberRightList = ownerMemberRightDTOS;
         orderDetailRespDTO.renterMemberRightList = renterMemberRightDTOS;
         orderDetailRespDTO.renterOrderCostDetailList = renterOrderCostDetailDTOS;
@@ -658,6 +666,7 @@ public class OrderDetailService {
         orderDetailRespDTO.accountRenterDepositDTO = accountRenterDepositDTO;
         orderDetailRespDTO.accountRenterWzDepositDTO = accountRenterWzDepositDTO;
         orderDetailRespDTO.accountRenterCostDetailDTO = accountRenterCostDetailDTOS;
+        orderDetailRespDTO.orderRefundRecordDTO = orderRefundRecordDTO;
         return orderDetailRespDTO;
     }
 
@@ -1365,7 +1374,7 @@ public class OrderDetailService {
             log.error("获取订单数据子订单为空ownerOrderNo={}",ownerOrderNo);
             throw new OrderNotFoundException(ownerOrderNo);
         }
-        
+
         OrderDTO orderDTO = new OrderDTO();
         BeanUtils.copyProperties(orderEntity,orderDTO);
         //车主罚金

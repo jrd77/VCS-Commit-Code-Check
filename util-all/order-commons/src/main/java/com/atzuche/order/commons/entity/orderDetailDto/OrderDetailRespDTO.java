@@ -22,7 +22,7 @@ public class OrderDetailRespDTO {
     public RenterOrderCostDTO renterOrderCost;
     public RenterHandoverCarInfoDTO renterHandoverCarInfo;
     public OwnerHandoverCarInfoDTO ownerHandoverCarInfo;
-    public OrderCancelReasonDTO orderCancelReason;
+    public List<OrderCancelReasonDTO> orderCancelReason;
     public List<OwnerMemberRightDTO> ownerMemberRightList;
     public List<RenterMemberRightDTO> renterMemberRightList;
     public List<RenterOrderCostDetailDTO> renterOrderCostDetailList;
@@ -40,6 +40,7 @@ public class OrderDetailRespDTO {
     public AccountRenterDepositDTO accountRenterDepositDTO;
     public AccountRenterWzDepositDTO accountRenterWzDepositDTO;
     public List<AccountRenterCostDetailDTO> accountRenterCostDetailDTO;
+    public OrderRefundRecordDTO orderRefundRecordDTO;
 
     //变更申请的租客子订单号（application_id）
     public String changeApplyRenterOrderNo;

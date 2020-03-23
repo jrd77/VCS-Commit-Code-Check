@@ -305,4 +305,8 @@
         update owner_order set `see_flag` = 1  where `mem_no` = #{ownerMemNo}
     </update>
 
+    <select id="queryByOwnerOrderNoAndMemNo" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List" /> from owner_order where order_no =#{orderNo} and mem_no = #{ownerMemNo} and is_delete = 0
+    </select>
+
 </mapper>

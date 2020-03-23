@@ -47,4 +47,7 @@ public interface OwnerOrderMapper{
     OwnerOrderEntity getOwnerByMemNoAndOrderNo(@Param("orderNo")String orderNo, @Param("ownerMemNo") String ownerMemNo);
 
     int updateByMemeNo(@Param("ownerMemNo") String ownerMemNo);
+
+
+    List<OwnerOrderEntity> queryByOwnerOrderNoAndMemNo(@Param("orderNo") String orderNo, @Param("ownerMemNo") String ownerMemNo);
 }
