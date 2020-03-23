@@ -109,7 +109,7 @@ public class CancelOrderJudgeDutyService {
                 }
 
                 //车主收益(来自租客罚金)
-                if (isSubsidyFineAmt) {
+                if (!isSubsidyFineAmt) {
                     consoleOwnerOrderFineDeatailEntity =
                             consoleOwnerOrderFineDeatailService.fineDataConvert(cancelFineAmt.getCostBaseDTO(), penalty, FineSubsidyCodeEnum.OWNER,
                                     FineSubsidySourceCodeEnum.RENTER, FineTypeEnum.CANCEL_FINE);
@@ -173,7 +173,7 @@ public class CancelOrderJudgeDutyService {
                     ownerOrderFineDetailEntityOne.setOwnerOrderNo(ownerOrderEntity.getOwnerOrderNo());
                 }
                 //租客收益处理
-                if (isSubsidyFineAmt) {
+                if (!isSubsidyFineAmt) {
                     ConsoleRenterOrderFineDeatailEntity consoleRenterOrderFineDeatailEntity =
                             consoleRenterOrderFineDeatailService.fineDataConvert(cancelFineAmt.getCostBaseDTO(), penalty,
                                     FineSubsidyCodeEnum.RENTER, FineSubsidySourceCodeEnum.OWNER, FineTypeEnum.CANCEL_FINE);
@@ -236,7 +236,7 @@ public class CancelOrderJudgeDutyService {
         }
 
         List<OrderJudgeDutyVO> list = new ArrayList<>();
-        records.stream().filter(reocrd -> StringUtils.endsWithIgnoreCase(reocrd.getOperateType(), "1")).forEach(record -> {
+        records.stream().filter(reocrd -> "1".equals(reocrd.getOperateType())).forEach(record -> {
             OrderJudgeDutyVO orderJudgeDutyVO = new OrderJudgeDutyVO();
             orderJudgeDutyVO.setId(record.getId());
             orderJudgeDutyVO.setOrderNo(record.getOrderNo());
@@ -256,6 +256,8 @@ public class CancelOrderJudgeDutyService {
                 orderJudgeDutyVO.setJudgeDutyjOptTime(DateUtils.formate(record.getUpdateTime(), DateUtils.DATE_DEFAUTE1));
                 orderJudgeDutyVO.setIsManualCondemn("0");
             }
+
+            list.add(orderJudgeDutyVO);
         });
         return list;
     }

@@ -327,7 +327,6 @@ public class OrderDetailService {
             BeanUtils.copyProperties(ownerOrderEntity,ownerOrderDTO);
             ownerOrderNo = ownerOrderEntity.getOwnerOrderNo();
         }
-
         //车主商品
         OwnerGoodsDetailDTO ownerGoodsDetail = ownerGoodsService.getOwnerGoodsDetail(ownerOrderNo, false);
         OwnerGoodsDTO ownerGoodsDTO = null;
@@ -620,6 +619,15 @@ public class OrderDetailService {
             BeanUtils.copyProperties(accountRenterWzDepositEntity,accountRenterWzDepositDTO);
         }
 
+        //account租车费用
+        List<AccountRenterCostDetailEntity> accountRenterCostDetailEntityList = accountRenterCostDetailNoTService.getAccountRenterCostDetailsByOrderNo(orderNo);
+        List<AccountRenterCostDetailDTO> accountRenterCostDetailDTOS = new ArrayList<>();
+        accountRenterCostDetailEntityList.stream().forEach(x->{
+            AccountRenterCostDetailDTO accountRenterCostDetailDTO = new AccountRenterCostDetailDTO();
+            BeanUtils.copyProperties(x,accountRenterCostDetailDTO);
+            accountRenterCostDetailDTOS.add(accountRenterCostDetailDTO);
+        });
+
 
         orderDetailRespDTO.orderStatus = orderStatusDTO;
         orderDetailRespDTO.orderSourceStat = orderSourceStatDTO;
@@ -649,6 +657,7 @@ public class OrderDetailService {
         orderDetailRespDTO.renterOrderChangeApplyDTOS = renterOrderChangeApplyDTOS;
         orderDetailRespDTO.accountRenterDepositDTO = accountRenterDepositDTO;
         orderDetailRespDTO.accountRenterWzDepositDTO = accountRenterWzDepositDTO;
+        orderDetailRespDTO.accountRenterCostDetailDTO = accountRenterCostDetailDTOS;
         return orderDetailRespDTO;
     }
 

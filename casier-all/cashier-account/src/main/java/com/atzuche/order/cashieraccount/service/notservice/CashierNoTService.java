@@ -15,7 +15,6 @@ import com.atzuche.order.accountrenterwzdepost.service.AccountRenterWzDepositSer
 import com.atzuche.order.accountrenterwzdepost.vo.req.CreateOrderRenterWZDepositReqVO;
 import com.atzuche.order.accountrenterwzdepost.vo.req.PayedOrderRenterDepositWZDetailReqVO;
 import com.atzuche.order.accountrenterwzdepost.vo.req.PayedOrderRenterWZDepositReqVO;
-
 import com.atzuche.order.cashieraccount.common.AESUtil;
 import com.atzuche.order.cashieraccount.common.FasterJsonUtil;
 import com.atzuche.order.cashieraccount.entity.CashierEntity;
@@ -28,14 +27,16 @@ import com.atzuche.order.commons.IpUtil;
 import com.atzuche.order.commons.LocalDateTimeUtils;
 import com.atzuche.order.commons.enums.FineSubsidyCodeEnum;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
-import com.atzuche.order.commons.enums.cashier.*;
+import com.atzuche.order.commons.enums.cashier.PaySourceEnum;
+import com.atzuche.order.commons.enums.cashier.PayTypeEnum;
 import com.atzuche.order.mq.common.base.BaseProducer;
 import com.atzuche.order.mq.common.base.OrderMessage;
-import com.atzuche.order.mq.enums.ShortMessageTypeEnum;
 import com.atzuche.order.rentercost.entity.vo.PayableVO;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.atzuche.order.renterorder.service.RenterOrderService;
-import com.autoyol.autopay.gateway.constant.*;
+import com.autoyol.autopay.gateway.constant.DataAppIdConstant;
+import com.autoyol.autopay.gateway.constant.DataPayKindConstant;
+import com.autoyol.autopay.gateway.constant.DataPayTypeConstant;
 import com.autoyol.autopay.gateway.util.AESSecurityUtils;
 import com.autoyol.autopay.gateway.util.MD5;
 import com.autoyol.autopay.gateway.util.RSASecurityUtils;
@@ -48,7 +49,6 @@ import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.doc.util.StringUtil;
 import com.autoyol.event.rabbit.neworder.NewOrderMQActionEventEnum;
 import com.autoyol.event.rabbit.neworder.OrderRefundMq;
-import com.autoyol.event.rabbit.neworder.OrderSettlementMq;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -62,7 +62,6 @@ import org.springframework.util.CollectionUtils;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 
@@ -102,7 +101,18 @@ public class CashierNoTService {
         }
         return renterOrderEntity;
     }
-
+    /**
+     * 收银台根据主单号 向订单模块查询子单号
+     * @param orderNo
+     * @return
+     */
+    public RenterOrderEntity getRenterOrderNoByOrderNoAndFinish(String orderNo){
+        RenterOrderEntity renterOrderEntity =  renterOrderService.getRenterOrderNoByOrderNoAndFinish(orderNo);
+        if(Objects.isNull(renterOrderEntity) || StringUtil.isBlank(renterOrderEntity.getRenterOrderNo())){
+            return new RenterOrderEntity();
+        }
+        return renterOrderEntity;
+    }
 
 
     /**

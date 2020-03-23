@@ -5,24 +5,16 @@ import com.atzuche.order.admin.vo.req.FienAmtUpdateReqVO;
 import com.atzuche.order.commons.BindingResultUtil;
 import com.atzuche.order.commons.entity.ownerOrderDetail.*;
 import com.atzuche.order.commons.enums.FineTypeEnum;
-import com.atzuche.order.commons.enums.cashcode.OwnerCashCodeEnum;
 import com.atzuche.order.ownercost.entity.OwnerOrderEntity;
 import com.atzuche.order.ownercost.service.OwnerOrderService;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.doc.annotation.AutoDocMethod;
-
 import lombok.extern.slf4j.Slf4j;
-
-import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
-
-import javax.validation.Valid;
-import java.util.Optional;
 
 @Slf4j
 @RestController
@@ -97,6 +89,32 @@ public class AdminOwnerOrderDetailController {
         }
         ResponseData<FienAmtDetailDTO> responseData = ownerOrderDetailService.fienAmtDetail(orderNo,ownerOrderNo);
         return responseData;
+    }
+
+    /**
+     * @Author ZhangBin
+     * @Date 2020/1/15 21:31
+     * @Description: 违约罚金明细
+     *
+     **/
+    @AutoDocMethod(description = "违约罚金明细列表", value = "违约罚金明细列表", response = FienDetailRespListDTO.class)
+    @GetMapping("/console/owner/fienAmtDetailList")
+    public ResponseData<FienDetailRespListDTO> fienAmtDetailList(@RequestParam("orderNo") String orderNo, @RequestParam("ownerMemNo") String ownerMemNo){
+        if(orderNo == null || orderNo.trim().length()<=0){
+            ResponseData responseData = new ResponseData();
+            responseData.setResCode(ErrorCode.INPUT_ERROR.getCode());
+            responseData.setResMsg("主订单号不能为空");
+            return responseData;
+        }
+
+        if(ownerMemNo == null || ownerMemNo.trim().length()<=0){
+            ResponseData responseData = new ResponseData();
+            responseData.setResCode(ErrorCode.INPUT_ERROR.getCode());
+            responseData.setResMsg("车主会员号不能为空");
+            return responseData;
+        }
+        FienDetailRespListDTO fienDetailRespDTOS = ownerOrderDetailService.fienAmtDetailList(orderNo,ownerMemNo);
+        return ResponseData.success(fienDetailRespDTOS);
     }
 
     /**
