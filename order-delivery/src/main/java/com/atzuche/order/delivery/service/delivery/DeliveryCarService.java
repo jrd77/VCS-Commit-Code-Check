@@ -308,7 +308,7 @@ public class DeliveryCarService {
         orderDeliveryFlowEntity.setServiceTypeInfo(orderType, orderDeliveryDTO);
         orderDeliveryFlowEntity.setTermTime(renterGoodsDetailDTO.getRentTime());
         orderDeliveryFlowEntity.setReturnTime(renterGoodsDetailDTO.getRevertTime());
-        orderDeliveryFlowEntity.setCarNo(String.valueOf(renterGoodsDetailDTO.getCarNo()));
+        orderDeliveryFlowEntity.setCarNo(String.valueOf(renterGoodsDetailDTO.getCarPlateNum()));
         orderDeliveryFlowEntity.setVehicleModel(renterGoodsDetailDTO.getCarBrandTxt());
         orderDeliveryFlowEntity.setVehicleType(renterGoodsDetailDTO.getCarTypeTxt());
         orderDeliveryFlowEntity.setDeliveryCarCity(orderReqVO.getCityName());

@@ -39,4 +39,9 @@ public class HandoverCarRemarkDTO {
      * 备注人姓名
      */
     private String realName;
+
+    /**
+     * 对应流程系统步骤，第一步传1，以此类推
+     */
+    private String proId;
 }

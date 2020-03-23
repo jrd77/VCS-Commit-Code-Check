@@ -1,5 +1,7 @@
 package com.atzuche.order.renterwz.mapper;
 
+import com.atzuche.order.commons.vo.req.ViolationReqVO;
+import com.atzuche.order.commons.vo.res.ViolationResVO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -108,4 +110,15 @@ public interface RenterOrderWzStatusMapper{
 	 * @return
 	 */
 	RenterOrderWzStatusEntity getOrderInfoByOrderNo(@Param("orderNo") String orderNo);
+
+	/**
+	 * 修改违章信息
+	 * @param renterOrderWzStatusEntity
+	 */
+	void updateOrderWzStatus(RenterOrderWzStatusEntity renterOrderWzStatusEntity);
+	/**
+	 * 查询违章列表数据
+	 * @return 违章订单
+	 */
+	List<ViolationResVO> queryIllegalOrderList(ViolationReqVO violationReqVO);
 }

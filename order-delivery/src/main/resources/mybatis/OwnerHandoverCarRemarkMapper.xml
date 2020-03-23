@@ -17,6 +17,7 @@
         <result property="updateTime" column="update_time"/>
         <result property="updateOp" column="update_op"/>
         <result property="isDelete" column="is_delete"/>
+		<result property="proId" column="pro_id"/>
     </resultMap>
 
 
@@ -33,7 +34,8 @@
 	`create_op`, 	
 	`update_time`, 	
 	`update_op`, 	
-	`is_delete`	
+	`is_delete`,
+	`pro_id`
 
 	</sql>
 
@@ -56,7 +58,8 @@
 				`create_op`,		
 				`update_time`,		
 				`update_op`,		
-				`is_delete`		
+				`is_delete`,
+                `pro_id`
 			)
 		values
 		(
@@ -71,7 +74,8 @@
 				#{createOp}, 		
 				#{updateTime}, 		
 				#{updateOp}, 		
-				#{isDelete}		
+				#{isDelete},
+                #{proId}
 			)
 	</insert>
 	
@@ -89,7 +93,8 @@
 				<if test="createOp != null">`create_op`, </if>
 				<if test="updateTime != null">`update_time`, </if>
 				<if test="updateOp != null">`update_op`, </if>
-				<if test="isDelete != null">`is_delete` </if>
+				<if test="isDelete != null">`is_delete`, </if>
+                <if test="proId != null">`pro_id` </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides="," >
 				<if test="orderNo != null">#{orderNo},  </if>
@@ -103,7 +108,8 @@
 				<if test="createOp != null">#{createOp},  </if>
 				<if test="updateTime != null">#{updateTime},  </if>
 				<if test="updateOp != null">#{updateOp},  </if>
-				<if test="isDelete != null">#{isDelete} </if>
+				<if test="isDelete != null">#{isDelete},</if>
+                <if test="proId != null">#{proId}</if>
         </trim>
 	</insert>
 	
@@ -122,7 +128,8 @@
 				<if test="createOp != null">`create_op` = #{createOp}, </if>
 				<if test="updateTime != null">`update_time` = #{updateTime}, </if>
 				<if test="updateOp != null">`update_op` = #{updateOp}, </if>
-				<if test="isDelete != null">`is_delete` = #{isDelete}</if>
+				<if test="isDelete != null">`is_delete` = #{isDelete},</if>
+                <if test="proId != null">`pro_id` = #{proId}</if>
 			</set>
 		where id = #{id}
 	</update>
@@ -141,7 +148,8 @@
 				`create_op` = #{createOp}, 		
 				`update_time` = #{updateTime}, 		
 				`update_op` = #{updateOp}, 		
-				`is_delete` = #{isDelete}		
+				`is_delete` = #{isDelete},
+                `pro_id` = #{proId}
 	
 		</set>
 		where id = #{id}
@@ -174,4 +182,10 @@
 		from owner_handover_car_remark where order_no = #{orderNo}
 		and type = #{type} and is_delete = 0
 	</select>
+
+    <select id="selectProIdByOrderNo" resultMap="BaseResultMap">
+        select description as remark,DATE_FORMAT(max(update_time),'%Y-%m-%d %H:%i:%s') as updateTime from owner_handover_car_remark
+        where order_no = #{orderNo} and is_delete = 0
+        group by pro_id order by id desc
+    </select>
 </mapper>

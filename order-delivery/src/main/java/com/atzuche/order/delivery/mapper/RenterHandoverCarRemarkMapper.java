@@ -49,4 +49,10 @@ public interface RenterHandoverCarRemarkMapper{
      */
     RenterHandoverCarRemarkEntity findRemarkObjectByRenterOrderNo(@Param("renterOrderNo") String renterOrderNo, @Param("type") Integer type);
 
+    /**
+     * 获取流程数据
+     * @param orderNo
+     * @return
+     */
+    List<RenterHandoverCarRemarkEntity> selectProIdByOrderNo(@Param("orderNo") String orderNo);
 }

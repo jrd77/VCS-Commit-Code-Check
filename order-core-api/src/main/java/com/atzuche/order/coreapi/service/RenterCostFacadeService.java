@@ -370,7 +370,7 @@ public class RenterCostFacadeService {
         wzDepositDTO.costStatisticsDTO = wzCostStatisticsDTO;
 
         //4、租车费用结算后补付
-        int needIncrementAmt = cashierPayService.getRentCostBufu(orderNo, memNo);
+        int needIncrementAmt = cashierPayService.getRentCostBufuNew(orderNo, memNo);
         SettleMakeUpDTO settleMakeUpDTO = new SettleMakeUpDTO();
         settleMakeUpDTO.shouldReveiveAmt = Math.abs(needIncrementAmt);
         settleMakeUpDTO.realReveiveAmt = renterCostVO.getRenterCostBufuShifu();

@@ -103,7 +103,7 @@ public class AccountRenterWzDepositNoTService {
             throw new PayOrderRenterWZDepositException();
         }
         //消费方式
-        if(accountRenterDepositEntity.getIsAuthorize() != null && accountRenterDepositEntity.getIsAuthorize().intValue() == 0 && payedOrderRenterWZDepositDetail.getAmt() + accountRenterDepositEntity.getShishouDeposit()<0){
+        if(accountRenterDepositEntity.getIsAuthorize() != null && accountRenterDepositEntity.getIsAuthorize() == 0 && payedOrderRenterWZDepositDetail.getAmt() + accountRenterDepositEntity.getShishouDeposit()<0){
             //可用 剩余押金 不足
             throw new PayOrderRenterWZDepositException();
         }

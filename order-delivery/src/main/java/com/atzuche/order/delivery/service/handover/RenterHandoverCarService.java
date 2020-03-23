@@ -166,4 +166,13 @@ public class RenterHandoverCarService implements IUpdateHandoverCarInfo {
         return renterHandoverCarInfoMapper.selectByRenterOrderNoAndType(renterOrderNo, type);
     }
 
+    /**
+     * 根据流程ID获取
+     * @param orderNo
+     * @return
+     */
+    public List<RenterHandoverCarRemarkEntity> selectProIdByOrderNo(String orderNo) {
+        return renterHandoverCarRemarkMapper.selectProIdByOrderNo(orderNo);
+    }
+
 }
