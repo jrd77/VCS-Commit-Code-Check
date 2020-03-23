@@ -340,6 +340,7 @@
     <select id="queryHostiryRenterOrderByOrderNo" resultMap="BaseResultMap">
         select <include refid="Base_Column_List" /> from renter_order where order_no = #{orderNo}
         AND is_delete = 0
+        ORDER BY is_effective DESC,id DESC
     </select>
     <select id="getRenterOrderNoByOrderNoAndFinish" resultMap="BaseResultMap">
         select <include refid="Base_Column_List" /> from renter_order where order_no = #{orderNo}
