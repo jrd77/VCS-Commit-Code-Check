@@ -17,6 +17,7 @@ import com.atzuche.violation.vo.resp.ViolationExportResVO;
 import com.atzuche.violation.vo.resp.ViolationResDesVO;
 import com.autoyol.commons.utils.DateUtil;
 import com.autoyol.commons.utils.StringUtils;
+import com.github.pagehelper.PageHelper;
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -55,7 +56,7 @@ public class ViolationInfoService {
             log.info("没有违章明细数据，violationDetailReqVO--->>>>[{}]", violationDetailReqVO.getOrderNo());
             return renterOrderWzDetailResVOS;
         }
-        renterOrderWzDetailResVOS.stream().forEach(r -> {
+        renterOrderWzDetailEntities.stream().forEach(r -> {
             RenterOrderWzDetailResVO renterOrderWzDetailRes = new RenterOrderWzDetailResVO();
             CommonUtil.copyPropertiesIgnoreNull(r, renterOrderWzDetailRes);
             renterOrderWzDetailResVOS.add(renterOrderWzDetailRes);
@@ -69,6 +70,7 @@ public class ViolationInfoService {
      * @return
      */
     public List<ViolationResVO> list(ViolationReqVO violationReqVO) {
+        PageHelper.startPage(violationReqVO.getPageNum(),violationReqVO.getPageSize());
         List<ViolationResVO> violationResDesVOList = renterOrderWzStatusMapper.queryIllegalOrderList(violationReqVO);
         for (ViolationResVO violationResVO: violationResDesVOList) {
             violationResVO.setOrderType("普通订单");

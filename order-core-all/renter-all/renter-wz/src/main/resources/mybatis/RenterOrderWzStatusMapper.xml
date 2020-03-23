@@ -204,7 +204,7 @@
             <if test="violationPayStatus != null and violationPayStatus != '1'">
                 and p.id is not null
             </if>
-            and is_delete = 0
+            and w.is_delete = 0
         </where>
     </select>
 

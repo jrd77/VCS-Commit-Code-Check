@@ -1,21 +1,25 @@
 package com.atzuche.order.coreapi.controller;
 
+import com.atzuche.order.commons.DateUtils;
 import com.atzuche.order.commons.vo.req.handover.rep.HandoverCarRespVO;
+import com.atzuche.order.commons.vo.req.handover.rep.TransProgressListResVO;
+import com.atzuche.order.commons.vo.req.handover.rep.TransProgressResVO;
 import com.atzuche.order.commons.vo.req.handover.req.HandoverCarInfoReqVO;
+import com.atzuche.order.delivery.entity.OwnerHandoverCarRemarkEntity;
+import com.atzuche.order.delivery.entity.RenterHandoverCarRemarkEntity;
 import com.atzuche.order.delivery.service.handover.HandoverCarInfoService;
 import com.atzuche.order.delivery.service.handover.HandoverCarService;
+import com.atzuche.order.delivery.vo.delivery.HandoverProVO;
 import com.autoyol.commons.web.ResponseData;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.validation.BindingResult;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
-import java.util.Objects;
+import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 @Slf4j
@@ -52,6 +56,41 @@ public class HandoverCarOilController {
         return ResponseData.success(handoverCarRespVO);
 
 
+    }
+
+    @GetMapping("/trans/progress")
+    public ResponseData<TransProgressListResVO> queryProgress(@RequestParam("orderNo") String  orderNo, @RequestParam("userType") Integer  userType){
+        logger.info("updateHandoverCarInfo param is {}",orderNo);
+        HandoverProVO handoverProData = handoverCarService.getHandoverProData(orderNo);
+        if(handoverProData == null){
+            return ResponseData.success(null);
+        }
+        TransProgressListResVO resVO = new TransProgressListResVO();
+        List<TransProgressResVO> list = new ArrayList<>();
+        TransProgressResVO transProgressResVO = null;
+        if(userType.equals(1)){
+            List<RenterHandoverCarRemarkEntity> renterHandoverCarInfoEntities = handoverProData.getRenterHandoverCarInfoEntities();
+            if(!CollectionUtils.isEmpty(renterHandoverCarInfoEntities)){
+                for (RenterHandoverCarRemarkEntity renterHandoverCarInfoEntity : renterHandoverCarInfoEntities) {
+                    transProgressResVO = new TransProgressResVO();
+                    transProgressResVO.setDescription(renterHandoverCarInfoEntity.getRemark());
+                    transProgressResVO.setHandleTime(DateUtils.formate(renterHandoverCarInfoEntity.getUpdateTime(),DateUtils.DATE_DEFAUTE1));
+                    list.add(transProgressResVO);
+                }
+            }
+        }else{
+            List<OwnerHandoverCarRemarkEntity> ownerHandoverCarInfoEntities = handoverProData.getOwnerHandoverCarInfoEntities();
+            if(!CollectionUtils.isEmpty(ownerHandoverCarInfoEntities)){
+                for (OwnerHandoverCarRemarkEntity ownerHandoverCarRemarkEntity : ownerHandoverCarInfoEntities) {
+                    transProgressResVO = new TransProgressResVO();
+                    transProgressResVO.setDescription(ownerHandoverCarRemarkEntity.getRemark());
+                    transProgressResVO.setHandleTime(DateUtils.formate(ownerHandoverCarRemarkEntity.getUpdateTime(),DateUtils.DATE_DEFAUTE1));
+                    list.add(transProgressResVO);
+                }
+            }
+        }
+        resVO.setList(list);
+        return ResponseData.success(resVO);
     }
 
 

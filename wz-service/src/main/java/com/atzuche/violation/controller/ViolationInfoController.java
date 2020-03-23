@@ -3,6 +3,7 @@ package com.atzuche.violation.controller;
 import com.atzuche.order.commons.vo.req.ViolationReqVO;
 import com.atzuche.order.commons.vo.res.ViolationResVO;
 import com.atzuche.violation.cat.CatLogRecord;
+import com.atzuche.violation.common.PageModel;
 import com.atzuche.violation.exception.ViolationManageException;
 import com.atzuche.violation.service.ViolationInfoService;
 import com.atzuche.violation.vo.req.ViolationDetailReqVO;
@@ -55,10 +56,12 @@ public class ViolationInfoController {
                 logger.info("没有查到违章数据，violationDetailReqVO--->>>>[{}]", violationReqVO.getOrderNo());
                 return ResponseData.success();
             }
+            PageModel pageModel = new PageModel(violationResDesVOList);
             CatLogRecord.successLog("违章管理列表成功", "console/order/violation/list", violationReqVO);
-            return ResponseData.success(violationResDesVOList);
+            return ResponseData.success(pageModel);
         } catch (Exception e) {
-            logger.error("违章管理列表异常:{}", e);
+            e.printStackTrace();
+            logger.error("违章管理列表异常",e);
             CatLogRecord.failLog("违章管理列表异常", "console/order/violation/list", violationReqVO, e);
             throw new ViolationManageException(ErrorCode.SYS_ERROR.getCode(), ErrorCode.SYS_ERROR.getText());
         }
@@ -85,7 +88,7 @@ public class ViolationInfoController {
             CatLogRecord.successLog("违章明细管理列表成功", "console/order/violation/detailList", violationDetailReqVO);
             return ResponseData.success(renterOrderWzDetailResVOS);
         } catch (Exception e) {
-            logger.error("违章明细管理列表异常:{}", e);
+            logger.error("违章明细管理列表异常", e);
             CatLogRecord.failLog("违章明细管理列表异常", "console/order/violation/detailList", violationDetailReqVO, e);
             throw new ViolationManageException(ErrorCode.SYS_ERROR.getCode(), ErrorCode.SYS_ERROR.getText());
         }
@@ -103,7 +106,7 @@ public class ViolationInfoController {
         try {
             violationInfoService.export(violationReqVO, response);
         } catch (Exception e) {
-            logger.error("收益审核列表导出excel异常:{}", e.getMessage());
+            logger.error("收益审核列表导出excel异常", e);
         }
     }
 
