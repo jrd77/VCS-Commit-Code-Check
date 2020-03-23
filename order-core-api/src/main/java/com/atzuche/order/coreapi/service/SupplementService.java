@@ -91,7 +91,7 @@ public class SupplementService {
                 //判断是租车费用、还是补付 租车费用 并记录 详情
                 RenterCashCodeEnum type = RenterCashCodeEnum.ACCOUNT_RENTER_RENT_COST_AFTER;	                    
                 //数据封装
-                OrderSupplementDetailEntity entity = orderSupplementDetailService.handleConsoleData(payableVO.getAmt(), type, renterOrder.getRenterMemNo(), orderNo);
+                OrderSupplementDetailEntity entity = orderSupplementDetailService.handleConsoleData(rentAmtAfter+rentAmtPayed, type, renterOrder.getRenterMemNo(), orderNo);
                 if(entity != null) {
                 	list = list == null ? new ArrayList<OrderSupplementDetailEntity>():list;
                 	list.add(entity);
