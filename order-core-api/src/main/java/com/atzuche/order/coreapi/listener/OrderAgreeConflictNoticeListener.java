@@ -36,6 +36,7 @@ public class OrderAgreeConflictNoticeListener {
             RabbitConstants.ROUTINGKEY_ORDER_AGREE_CONFLICT_NEW)
     })
     public void process(Message message) {
+        logger.info("任务开始:message:[{}]",JSON.toJSONString(message));
         String msg = new String(message.getBody());
         try {
             logger.info("接收车主同意老订单通知处理租期重叠的新订单信息,msg:[{}]", msg);
