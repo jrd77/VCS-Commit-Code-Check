@@ -62,7 +62,7 @@ public class OrderWzSettleSupplementHandleService {
             List<OrderSupplementDetailEntity> deductList = new ArrayList<>();
             if (settleOrdersAccount.getDepositSurplusAmt() > OrderConstant.ZERO) {
                 int depositSurplusAmt = settleOrdersAccount.getDepositSurplusAmt();
-                int totalSupplementAmt = entityList.stream().mapToInt(OrderSupplementDetailEntity::getAmt).sum();
+                int totalSupplementAmt = Math.abs(entityList.stream().mapToInt(OrderSupplementDetailEntity::getAmt).sum());
                 if (settleOrdersAccount.getDepositSurplusAmt() >= totalSupplementAmt) {
                     // 更新补付记录支付状态(已完成抵扣的改为:20,违章押金结算抵扣)
                     deductList.addAll(entityList);
@@ -79,7 +79,6 @@ public class OrderWzSettleSupplementHandleService {
                                     debtList.add(entity);
                                 } else {
                                     if (depositSurplusAmt > OrderConstant.ZERO) {
-                                        depositSurplusAmt = OrderConstant.ZERO;
                                         // 临界点拆分,满足的部分进行抵扣；不满足的部分转入欠款
                                         orderSupplementDetailService.updateOpStatusByPrimaryKey(splitCriticalPoint.getId(),
                                                 SupplemOpStatusEnum.OP_STATUS_LOSE_EFFECT.getCode());
@@ -89,7 +88,7 @@ public class OrderWzSettleSupplementHandleService {
                                                         SupplementPayFlagEnum.PAY_FLAG_VIOLATION_DEPOSIT_SETTLE_DEDUCT.getCode(), "违章押金结算抵扣");
                                         orderSupplementDetailService.saveOrderSupplementDetail(supplementMeet);
                                         //需要转入欠款的部分
-                                        int debtAmt = splitCriticalPoint.getAmt() - depositSurplusAmt;
+                                        int debtAmt = Math.abs(splitCriticalPoint.getAmt()) - depositSurplusAmt;
                                         OrderSupplementDetailEntity supplementNotMeet =
                                                 buildOrderSupplementDetailEntity(splitCriticalPoint, debtAmt,
                                                         SupplementPayFlagEnum.PAY_FLAG_VIOLATION_DEPOSIT_SETTLE_INTO_DEBT.getCode(), "违章押金结算转欠款");
@@ -97,6 +96,7 @@ public class OrderWzSettleSupplementHandleService {
 
                                         debtList.add(supplementNotMeet);
                                         deductList.add(supplementMeet);
+                                        depositSurplusAmt = OrderConstant.ZERO;
                                     } else {
                                         // 临界点数据直接记欠款
                                         debtList.add(entity);
@@ -106,7 +106,7 @@ public class OrderWzSettleSupplementHandleService {
                             } else {
                                 // 临界点之前的数据直接记抵扣
                                 deductList.add(entity);
-                                depositSurplusAmt = depositSurplusAmt - entity.getAmt();
+                                depositSurplusAmt = depositSurplusAmt - Math.abs(entity.getAmt());
                             }
                         }
                     } else {
@@ -123,7 +123,7 @@ public class OrderWzSettleSupplementHandleService {
                 debtList.forEach(entity -> {
                     orderSupplementDetailService.updatePayFlagById(entity.getId(),
                             SupplementPayFlagEnum.PAY_FLAG_VIOLATION_DEPOSIT_SETTLE_INTO_DEBT.getCode(), null);
-                    AccountInsertDebtReqVO accountInsertDebt = buildAccountInsertDebtReqVO(settleOrders, -entity.getAmt());
+                    AccountInsertDebtReqVO accountInsertDebt = buildAccountInsertDebtReqVO(settleOrders, entity.getAmt());
                     cashierWzSettleService.createWzDebt(accountInsertDebt);
                 });
             }
@@ -133,7 +133,7 @@ public class OrderWzSettleSupplementHandleService {
                             SupplementPayFlagEnum.PAY_FLAG_VIOLATION_DEPOSIT_SETTLE_DEDUCT.getCode(), null);
                     // 更新违章押金抵扣信息
                     PayedOrderRenterDepositWZDetailReqVO payedOrderRenterWzDepositDetail =
-                            buildPayedOrderRenterDepositWzDetailReqVO(settleOrders, entity.getAmt());
+                            buildPayedOrderRenterDepositWzDetailReqVO(settleOrders, Math.abs(entity.getAmt()));
                     payedOrderRenterWzDepositDetail.setUniqueNo(String.valueOf(entity.getId()));
                     accountRenterWzDepositService.updateRenterWZDepositChange(payedOrderRenterWzDepositDetail);
                 });
@@ -151,7 +151,7 @@ public class OrderWzSettleSupplementHandleService {
     private OrderSupplementDetailEntity getSplitCriticalPoint(List<OrderSupplementDetailEntity> list, int surplusAmt) {
         int sum = 0;
         for (OrderSupplementDetailEntity entity : list) {
-            sum = sum + entity.getAmt();
+            sum = sum + Math.abs(entity.getAmt());
             if (sum > surplusAmt) {
                 return entity;
             }
@@ -194,7 +194,7 @@ public class OrderWzSettleSupplementHandleService {
         OrderSupplementDetailEntity supplement = new OrderSupplementDetailEntity();
         BeanUtils.copyProperties(splitCriticalPoint, supplement);
         supplement.setId(null);
-        supplement.setAmt(amt);
+        supplement.setAmt(-amt);
         supplement.setRemark(remark);
         supplement.setPayFlag(payFlag);
         supplement.setSupplementType(SupplementTypeEnum.SYSTEM_CREATE.getCode());

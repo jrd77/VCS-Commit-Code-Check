@@ -86,12 +86,12 @@ public class OrderStatusEntity implements Serializable {
 	 */
 	private Integer isClaims;
 	/**
-	 * 是否暂扣  0-否，1-是
+	 * 是否暂扣  0-否 1-是 2-撤销暂扣
 	 */
 	private Integer isDetain;
 
     /**
-     * 违章押金是否暂扣 0,否 1,是
+     * 违章押金是否暂扣 0-否 1-是 2-撤销暂扣
      */
     private Integer isDetainWz;
 
