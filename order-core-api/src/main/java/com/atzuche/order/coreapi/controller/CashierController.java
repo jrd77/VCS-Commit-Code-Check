@@ -2,6 +2,7 @@ package com.atzuche.order.coreapi.controller;
 
 import javax.validation.Valid;
 
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
@@ -48,8 +49,10 @@ public class CashierController {
         BindingResultUtil.checkBindingResult(bindingResult);
         OrderPayableAmountResVO result = cashierPayService.getOrderPayableAmount(orderPayReqVO);
         log.info("CashierController getOrderPayableAmount end param [{}],result [{}]", GsonUtils.toJson(orderPayReqVO),GsonUtils.toJson(result));
+        
         //支付金额大于0
-        if(result.getAmtTotal() < 0) {  //带支付 为负数
+        //入参未传递的化，不考虑收银台的数据获取。兼容该接口之前的支付宝小程序的调用。
+        if(StringUtils.isNotBlank(orderPayReqVO.getPayType()) && StringUtils.isNotBlank(orderPayReqVO.getAtappId()) && result.getAmtTotal() < 0) {  //带支付 为负数
 	        //调起支付平台获取收银台信息
 	        PrePlatformRequest reqData = new PrePlatformRequest();
 	        //赋值
