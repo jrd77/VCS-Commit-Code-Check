@@ -10,7 +10,8 @@ public enum AdminOpTypeEnum {
     CHANGE_WZ_FEE(3,"修改违章费用"),
     WZ_OP(4,"违章操作"),
     SUBMIT_ORDER(5,"下单"),
-    TEMPORARY_WZ_REFUND(6,"暂扣违章押金操作");
+    TEMPORARY_WZ_REFUND(6,"暂扣违章押金操作"),
+    TEMPORARY_CAR_DEPOSIT_REFUND(7,"暂扣租车押金操作");
     private int opCode;
     private String opType;
 
