@@ -1,9 +1,14 @@
 package com.atzuche.order.admin.controller.car;
 
 import com.alibaba.fastjson.JSON;
+import com.atzuche.order.admin.constant.AdminOpTypeEnum;
 import com.atzuche.order.admin.service.CarDepositReturnDetailService;
+import com.atzuche.order.admin.service.RenterWzService;
+import com.atzuche.order.admin.service.log.AdminLogService;
 import com.atzuche.order.admin.vo.req.car.CarDepositReqVO;
+import com.atzuche.order.admin.vo.req.renterWz.CarDepositTemporaryRefundReqVO;
 import com.atzuche.order.admin.vo.resp.car.CarDepositRespVo;
+import com.atzuche.order.commons.BindingResultUtil;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.doc.annotation.AutoDocMethod;
@@ -15,14 +20,20 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.annotation.Resource;
 import javax.validation.Valid;
 
 @Slf4j
 @RestController
 @AutoDocVersion(version = "车辆押金信息")
 public class CarDepositReturnDetailController {
+
     @Autowired
     private CarDepositReturnDetailService carDepositReturnDetailService;
+    @Resource
+    private RenterWzService renterWzService;
+    @Resource
+    private AdminLogService adminLogService;
 
     @AutoDocMethod(description = "【liujun】车辆押金信息", value = "车辆押金信息", response = CarDepositRespVo.class)
     @PostMapping(value = "/console/deposit/getCarDepositReturnDetail")
@@ -55,4 +66,18 @@ public class CarDepositReturnDetailController {
 
         return null;
     }*/
+
+    @AutoDocMethod(description = "暂扣/取消暂扣租车押金", value = "暂扣/取消暂扣租车押金",response = ResponseData.class)
+    @PostMapping("/console/save/carDeposit/temporaryRefund")
+    public ResponseData saveCarDepositTemporaryRefund(@Valid @RequestBody CarDepositTemporaryRefundReqVO req, BindingResult bindingResult){
+        BindingResultUtil.checkBindingResult(bindingResult);
+
+        renterWzService.saveCarDepositTemporaryRefund(req);
+        try{
+            adminLogService.insertLog(AdminOpTypeEnum.TEMPORARY_WZ_REFUND,req.getOrderNo(),req.toString());
+        }catch (Exception e){
+            log.warn("暂扣租车押金日志记录失败",e);
+        }
+        return ResponseData.success();
+    }
 }
