@@ -26,7 +26,7 @@ public class ViolationReqVO extends BaseReqVO {
     private String mixViolationManagerDate;
     @AutoDocProperty(value = "最大进入违章管理日期")
     private String maxViolationManagerDate;
-    @AutoDocProperty(value = "违章信息")
+    @AutoDocProperty(value = "违章信息 0：无违章  1：有违章")
     private String violationInfo;
     @AutoDocProperty(value = "违章处理状态")
     private String violationStatus;
