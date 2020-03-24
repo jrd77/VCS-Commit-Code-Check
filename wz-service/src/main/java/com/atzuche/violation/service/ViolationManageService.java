@@ -515,8 +515,24 @@ public class ViolationManageService {
         }
         renterOrderWzStatusEntity.setStatus(wzDisposeStatus);
         //更新违章完成时间
-        renterOrderWzStatusEntity.setWzHandleCompleteTime(new Date());
+        Date currentDate = new Date();
+        renterOrderWzStatusEntity.setWzHandleCompleteTime(currentDate);
         renterOrderWzStatusService.updateOrderWzStatus(renterOrderWzStatusEntity);
+        Map<String,String> paramNames = this.getViolationParamNamesByCode();
+        RenterOrderViolationLogVO  oldRenterOrderViolationLogVO = new RenterOrderViolationLogVO();
+        RenterOrderViolationLogVO  newRenterOrderViolationLogVO = new RenterOrderViolationLogVO();
+        newRenterOrderViolationLogVO.setWzHandleCompleteTime(DateUtils.formate(currentDate,DateUtils.DATE_DEFAUTE1));
+        CompareHelper<RenterOrderViolationLogVO> compareHelper = new CompareHelper<>(oldRenterOrderViolationLogVO,newRenterOrderViolationLogVO,paramNames);
+        String content="";
+        try{
+            content = compareHelper.compare();
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+        if(StringUtils.isNotBlank(content)){
+            //记录日志 并且做修改费用处理
+            saveWzCostLog(renterOrderWzStatusEntity.getOrderNo(), WZ_TIME_REMARK_CODE, content);
+        }
     }
 
     private Map<String, String> getViolationParamNamesByCode() {
