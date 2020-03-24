@@ -71,16 +71,10 @@ public class WzService {
     @Resource
     private RenterDetain renterDetain;
 
-    private static final String WZ_OTHER_FINE_REMARK = "其他扣款备注";
-    private static final String WZ_OTHER_FINE = "其他扣款";
-    private static final String WZ_OTHER_FINE_CODE = "11240044";
-
-    private static final String INSURANCE_CLAIM_REMARK = "保险理赔备注";
-    private static final String INSURANCE_CLAIM = "保险理赔";
-    private static final String INSURANCE_CLAIM_CODE = "11240045";
-
     private static final String REMARK = "remark";
     private static final String AMOUNT = "amount";
+
+
 
     private static final String SOURCE_TYPE_CONSOLE = "2";
 
@@ -94,11 +88,8 @@ public class WzService {
         if(orderStatus != null && orderStatus.getWzSettleStatus() != null && orderStatus.getWzSettleStatus().equals(1)){
             throw new AccountRenterDepositDBException(ErrorCode.RENTER_WZ_SETTLED.getCode(),ErrorCode.RENTER_WZ_SETTLED.getText());
         }
-        //只会处理其他扣款 和 保险理赔
+
         for (RenterWzCostDetailReqVO costDetail : costDetails) {
-            if(!WZ_OTHER_FINE_CODE.equals(costDetail.getCostCode()) && !INSURANCE_CLAIM_CODE.equals(costDetail.getCostCode())){
-                continue;
-            }
             RenterOrderWzCostDetailEntity fromDb = renterOrderWzCostDetailService.queryInfoByOrderAndCode(orderNo, costDetail.getCostCode());
             try {
                 RenterOrderWzCostDetailEntity fromApp = new RenterOrderWzCostDetailEntity();
@@ -163,7 +154,7 @@ public class WzService {
         return entity;
     }
 
-    private void saveWzCostLog(String orderNo, RenterWzCostDetailReqVO costDetail, String content) {
+    public void saveWzCostLog(String orderNo, RenterWzCostDetailReqVO costDetail, String content) {
         WzCostLogEntity wzCostLogEntity = new WzCostLogEntity();
         wzCostLogEntity.setContent(content);
         wzCostLogEntity.setCreateTime(new Date());
@@ -178,16 +169,36 @@ public class WzService {
             return null;
         }
         Map<String, String> map = new LinkedHashMap<>();
-        if(INSURANCE_CLAIM_CODE.equals(costCode)){
-            map.put(AMOUNT,INSURANCE_CLAIM);
-            map.put(REMARK,INSURANCE_CLAIM_REMARK);
+        if(WzCostEnums.INSURANCE_CLAIM.getCode().equals(costCode)){
+            map.put(AMOUNT,WzCostEnums.INSURANCE_CLAIM.getDesc());
+            map.put(REMARK,WzCostEnums.INSURANCE_CLAIM.getRemark());
         }
-        if(WZ_OTHER_FINE_CODE.equals(costCode)){
-            map.put(AMOUNT,WZ_OTHER_FINE);
-            map.put(REMARK,WZ_OTHER_FINE_REMARK);
+        if(WzCostEnums.WZ_OTHER_FINE.getCode().equals(costCode)){
+            map.put(AMOUNT,WzCostEnums.WZ_OTHER_FINE.getDesc());
+            map.put(REMARK,WzCostEnums.WZ_OTHER_FINE.getRemark());
+        }
+        if(WzCostEnums.WZ_DYS_FINE.getCode().equals(costCode)){
+            map.put(AMOUNT,WzCostEnums.WZ_DYS_FINE.getDesc());
+            map.put(REMARK,WzCostEnums.WZ_DYS_FINE.getRemark());
+        }
+        if(WzCostEnums.WZ_FINE.getCode().equals(costCode)){
+            map.put(AMOUNT,WzCostEnums.WZ_FINE.getDesc());
+            map.put(REMARK,WzCostEnums.WZ_FINE.getRemark());
+        }
+        if(WzCostEnums.WZ_SERVICE_COST.getCode().equals(costCode)){
+            map.put(AMOUNT,WzCostEnums.WZ_SERVICE_COST.getDesc());
+            map.put(REMARK,WzCostEnums.WZ_SERVICE_COST.getRemark());
+        }
+        if(WzCostEnums.WZ_STOP_COST.getCode().equals(costCode)){
+            map.put(AMOUNT,WzCostEnums.WZ_STOP_COST.getDesc());
+            map.put(REMARK,WzCostEnums.WZ_STOP_COST.getRemark());
         }
         return map;
     }
+
+
+
+
 
     public WzCostLogsResVO queryWzCostLogsByOrderNo(String orderNo) {
         List<WzCostLogEntity> wzCostLogEntities = wzCostLogService.queryWzCostLogsByOrderNo(orderNo);

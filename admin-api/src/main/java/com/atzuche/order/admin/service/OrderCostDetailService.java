@@ -975,12 +975,12 @@ public class OrderCostDetailService {
 			}
 		}
 
-
+        RenterOrderEntity renterOrderEntity = renterOrderService.getRenterOrderByRenterOrderNo(renterCostReqVO.getRenterOrderNo());
         OrderDTO orderDTO = new OrderDTO();
         BeanUtils.copyProperties(orderEntity,orderDTO);
-        renterRentDetailDTO.setReqTimeStr(orderDTO.getReqTime()!=null? LocalDateTimeUtils.localdateToString(orderDTO.getReqTime(), GlobalConstant.FORMAT_DATE_STR1):null);
-        renterRentDetailDTO.setRevertTimeStr(orderDTO.getExpRevertTime()!=null? LocalDateTimeUtils.localdateToString(orderDTO.getExpRevertTime(), GlobalConstant.FORMAT_DATE_STR1):null);
-        renterRentDetailDTO.setRentTimeStr(orderDTO.getExpRentTime()!=null?LocalDateTimeUtils.localdateToString(orderDTO.getExpRentTime(), GlobalConstant.FORMAT_DATE_STR1):null);
+        renterRentDetailDTO.setReqTimeStr(renterOrderEntity.getCreateTime()!=null? LocalDateTimeUtils.localdateToString(renterOrderEntity.getCreateTime(), GlobalConstant.FORMAT_DATE_STR1):null);
+        renterRentDetailDTO.setRevertTimeStr(renterOrderEntity.getExpRevertTime()!=null? LocalDateTimeUtils.localdateToString(renterOrderEntity.getExpRevertTime(), GlobalConstant.FORMAT_DATE_STR1):null);
+        renterRentDetailDTO.setRentTimeStr(renterOrderEntity.getExpRentTime()!=null?LocalDateTimeUtils.localdateToString(renterOrderEntity.getExpRentTime(), GlobalConstant.FORMAT_DATE_STR1):null);
         
         return renterRentDetailDTO;
 	}

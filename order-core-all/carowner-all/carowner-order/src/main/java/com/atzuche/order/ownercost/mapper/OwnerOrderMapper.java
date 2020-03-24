@@ -49,4 +49,7 @@ public interface OwnerOrderMapper{
     int updateByMemeNo(@Param("ownerMemNo") String ownerMemNo);
 
     int updateChildStatusByOwnerOrderNo(@Param("ownerOrderNo") String ownerOrderNo, @Param("childStatus") int childStatus);
+
+
+    List<OwnerOrderEntity> queryByOwnerOrderNoAndMemNo(@Param("orderNo") String orderNo, @Param("ownerMemNo") String ownerMemNo);
 }

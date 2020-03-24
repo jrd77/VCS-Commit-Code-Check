@@ -11,6 +11,7 @@ import com.atzuche.order.cashieraccount.service.CashierPayService;
 import com.atzuche.order.coin.service.AutoCoinProxyService;
 import com.atzuche.order.commons.NumberUtils;
 import com.atzuche.order.commons.enums.CouponTypeEnum;
+import com.atzuche.order.commons.enums.FineTypeEnum;
 import com.atzuche.order.commons.enums.cashcode.OwnerCashCodeEnum;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.commons.vo.req.OrderCostReqVO;
@@ -769,7 +770,7 @@ public class OrderCostService {
 		 List<ConsoleOwnerOrderFineDeatailEntity> consoleOwnerOrderFineDeatails = data.getConsoleOwnerOrderFineDeatails();
 		 for (ConsoleOwnerOrderFineDeatailEntity consoleOwnerOrderFineDeatailEntity : consoleOwnerOrderFineDeatails) {
 			 //罚金来源编码（车主/租客/平台）1-租客，2-车主，3-平台
-				if(consoleOwnerOrderFineDeatailEntity.getFineSubsidyCode().equals("2")) {
+				if(FineTypeEnum.MODIFY_ADDRESS_FINE.getFineType().equals(consoleOwnerOrderFineDeatailEntity.getFineType())) {
 					fineAmtInt += consoleOwnerOrderFineDeatailEntity.getFineAmount().intValue();
 				}
 		 }

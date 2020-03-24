@@ -41,4 +41,7 @@ public class OrderCancelReasonService{
         return orderCancelReasonMapper.selectListByOrderNo(orderNo);
     }
 
+    public List<OrderCancelReasonEntity> selectListByOrderNos(List<String> ownerOrderNos) {
+        return orderCancelReasonMapper.selectListByOrderNos(ownerOrderNos);
+    }
 }
