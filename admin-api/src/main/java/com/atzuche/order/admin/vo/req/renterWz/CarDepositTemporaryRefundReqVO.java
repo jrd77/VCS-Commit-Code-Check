@@ -19,8 +19,7 @@ public class CarDepositTemporaryRefundReqVO {
     @NotBlank(message = "订单号不能为空")
     private String orderNo;
 
-    @AutoDocProperty(value = "操作人", required = true)
-    @NotBlank(message = "操作人不能为空")
+    @AutoDocProperty(value = "操作人", hidden = true)
     private String operator;
 
     @AutoDocProperty(value = "风控-暂扣车辆押金 0-否 1-是")
