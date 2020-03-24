@@ -85,6 +85,7 @@ public class ViolationManageService {
         String orderNo = violationInformationRequestVO.getOrderNo();
         String plateNum = violationInformationRequestVO.getPlateNum();
         ViolationHandleInformationResponseVO violationHandleInformationResponseVO = new ViolationHandleInformationResponseVO();
+        violationHandleInformationResponseVO.setOrderNo(orderNo);
         AccountRenterWzDepositEntity entity = accountRenterWzDepositNoTService.getAccountRenterWZDepositByOrder(orderNo);
         List<RenterWzCostDetailResVO> costDetails = getRenterWzCostDetailRes(orderNo);
         int zanKouAmount = this.getZanKouAmount(costDetails);
@@ -120,14 +121,27 @@ public class ViolationManageService {
 
         if(!ObjectUtils.isEmpty(accountRenterWzDepositDetailEntity)){
             //违章押金退款时间
-            violationHandleInformationResponseVO.setViolationRefundTime(accountRenterWzDepositDetailEntity.getCreateTime().toString());
+            violationHandleInformationResponseVO.setViolationRefundTime(DateUtils.formate(accountRenterWzDepositDetailEntity.getCreateTime(), DateUtils.DATE_DEFAUTE1));
         }
-        //租客最晚处理时间
-        violationHandleInformationResponseVO.setWzRenterLastTime(renterOrderWzStatusEntity.getWzRenterLastTime().toString());
-        //平台最晚处理时间
-        violationHandleInformationResponseVO.setWzPlatformLastTime(renterOrderWzStatusEntity.getWzPlatformLastTime().toString());
-        //办理完成时间
-        violationHandleInformationResponseVO.setWzHandleCompleteTime(renterOrderWzStatusEntity.getWzHandleCompleteTime().toString());
+
+        Date wzRenterLastTime = renterOrderWzStatusEntity.getWzRenterLastTime();
+        Date wzPlatformLastTime = renterOrderWzStatusEntity.getWzPlatformLastTime();
+        Date wzHandleCompleteTime = renterOrderWzStatusEntity.getWzHandleCompleteTime();
+
+        if(!ObjectUtils.isEmpty(wzRenterLastTime)){
+            //租客最晚处理时间
+            violationHandleInformationResponseVO.setWzRenterLastTime(DateUtils.formate(wzRenterLastTime, DateUtils.DATE_DEFAUTE1));
+        }
+
+        if(!ObjectUtils.isEmpty(wzPlatformLastTime)){
+            //平台最晚处理时间
+            violationHandleInformationResponseVO.setWzPlatformLastTime(DateUtils.formate(wzPlatformLastTime, DateUtils.DATE_DEFAUTE1));
+        }
+
+        if(!ObjectUtils.isEmpty(wzHandleCompleteTime)){
+            //办理完成时间
+            violationHandleInformationResponseVO.setWzHandleCompleteTime(DateUtils.formate(wzHandleCompleteTime, DateUtils.DATE_DEFAUTE1));
+        }
 
         return violationHandleInformationResponseVO;
     }
@@ -197,13 +211,13 @@ public class ViolationManageService {
 
     /**
      * 获取违章修改日志列表
-     * @param violationInformationRequestVO
+     * @param violationAlterationLogRequestVO
      * @return
      */
-    public ViolationAlterationLogListResponseVO selectAlterationLogList(ViolationInformationRequestVO violationInformationRequestVO){
+    public ViolationAlterationLogListResponseVO selectAlterationLogList(ViolationAlterationLogRequestVO violationAlterationLogRequestVO){
         ViolationAlterationLogListResponseVO violationAlterationLogListResponseVO = new ViolationAlterationLogListResponseVO();
         List<ViolationAlterationLogResponseVO> logList = new ArrayList<>();
-        List<WzCostLogEntity> wzCostLogEntities = wzCostLogService.queryWzCostLogsByOrderNo(violationInformationRequestVO.getOrderNo());
+        List<WzCostLogEntity> wzCostLogEntities = wzCostLogService.queryWzCostLogsByOrderNo(violationAlterationLogRequestVO.getOrderNo());
         if(!CollectionUtils.isEmpty(wzCostLogEntities)) {
             wzCostLogEntities.forEach(wzCostLog -> {
                 ViolationAlterationLogResponseVO violationAlterationLogResponseVO = new ViolationAlterationLogResponseVO();
@@ -242,6 +256,7 @@ public class ViolationManageService {
         renterOrderWzDetail.setIllegalTime(DateUtils.parseDate(violationAdditionRequestVO.getViolationTime(), DateUtils.DATE_DEFAUTE1));
         renterOrderWzDetail.setOrderNo(violationAdditionRequestVO.getOrderNo());
         renterOrderWzDetail.setCarPlateNum(violationAdditionRequestVO.getPlateNum());
+        renterOrderWzDetail.setOrderFlag(1);
         renterOrderWzDetailService.saveRenterOrderWzDetail(renterOrderWzDetail);
         renterOrderWzSettleFlagService.updateIsIllegal(renterOrderWzDetail.getOrderNo(),renterOrderWzDetail.getCarPlateNum(),2, AdminUserUtil.getAdminUser().getAuthName());
         renterOrderWzStatusService.updateTransWzDisposeStatus(violationAdditionRequestVO.getOrderNo(),violationAdditionRequestVO.getPlateNum(),25);
@@ -349,9 +364,24 @@ public class ViolationManageService {
         RenterOrderWzStatusEntity renterOrderWzStatusEntity = new RenterOrderWzStatusEntity();
         Integer managementMode = Integer.parseInt(violationAlterationRequestVO.getManagementMode());
         renterOrderWzStatusEntity.setManagementMode(managementMode);
-        renterOrderWzStatusEntity.setWzHandleCompleteTime(DateUtils.parseDate(violationAlterationRequestVO.getWzHandleCompleteTime(), DateUtils.DATE_DEFAUTE));
-        renterOrderWzStatusEntity.setWzRenterLastTime(DateUtils.parseDate(violationAlterationRequestVO.getWzRenterLastTime(), DateUtils.DATE_DEFAUTE));
-        renterOrderWzStatusEntity.setWzPlatformLastTime(DateUtils.parseDate(violationAlterationRequestVO.getWzPlatformLastTime(), DateUtils.DATE_DEFAUTE));
+        String wzRenterLastTime = violationAlterationRequestVO.getWzRenterLastTime();
+        String wzPlatformLastTime = violationAlterationRequestVO.getWzPlatformLastTime();
+        String wzHandleCompleteTime = violationAlterationRequestVO.getWzHandleCompleteTime();
+        if(!ObjectUtils.isEmpty(wzRenterLastTime)){
+            //租客最晚处理时间
+            renterOrderWzStatusEntity.setWzRenterLastTime(DateUtils.parseDate(wzRenterLastTime, DateUtils.DATE_DEFAUTE));
+        }
+
+        if(!ObjectUtils.isEmpty(wzPlatformLastTime)){
+            //平台最晚处理时间
+            renterOrderWzStatusEntity.setWzPlatformLastTime(DateUtils.parseDate(wzPlatformLastTime, DateUtils.DATE_DEFAUTE));
+        }
+
+        if(!ObjectUtils.isEmpty(wzHandleCompleteTime)){
+            //办理完成时间
+            renterOrderWzStatusEntity.setWzHandleCompleteTime(DateUtils.parseDate(wzHandleCompleteTime, DateUtils.DATE_DEFAUTE));
+        }
+
         renterOrderWzStatusEntity.setWzRemarks( violationAlterationRequestVO.getWzRemarks());
 
         if(managementMode == 1){
