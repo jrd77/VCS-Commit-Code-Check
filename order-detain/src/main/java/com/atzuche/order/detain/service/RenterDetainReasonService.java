@@ -38,6 +38,7 @@ public class RenterDetainReasonService {
         int result;
         if (null == reasonEntity) {
             //新增
+            record.setCreateOp(record.getUpdateOp());
             result = renterDetainReasonMapper.insertSelective(record);
         } else {
             //修改

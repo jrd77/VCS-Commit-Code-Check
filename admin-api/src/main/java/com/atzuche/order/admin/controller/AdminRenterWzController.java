@@ -104,12 +104,13 @@ public class AdminRenterWzController extends BaseController {
     @AutoDocMethod(description = "暂扣/取消暂扣租车押金", value = "暂扣/取消暂扣租车押金",response = ResponseData.class)
     public ResponseData saveCarDepositTemporaryRefund(@Valid @RequestBody CarDepositTemporaryRefundReqVO req, BindingResult bindingResult){
         BindingResultUtil.checkBindingResult(bindingResult);
+
+        renterWzService.saveCarDepositTemporaryRefund(req);
         try{
             adminLogService.insertLog(AdminOpTypeEnum.TEMPORARY_WZ_REFUND,req.getOrderNo(),req.toString());
         }catch (Exception e){
-            log.warn("暂扣违章押金日志记录失败",e);
+            log.warn("暂扣租车押金日志记录失败",e);
         }
-
         return ResponseData.success();
     }
 }

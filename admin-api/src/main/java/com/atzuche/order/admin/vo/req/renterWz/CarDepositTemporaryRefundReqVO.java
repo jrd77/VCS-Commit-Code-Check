@@ -24,18 +24,21 @@ public class CarDepositTemporaryRefundReqVO {
     private String operator;
 
     @AutoDocProperty(value = "风控-暂扣车辆押金 0-否 1-是")
+    @NotBlank(message = "风控-暂扣车辆押金不能为空")
     private String fkDetainFlag;
 
     @AutoDocProperty(value = "风控-暂扣原因")
     private String fkDetainReason;
 
     @AutoDocProperty(value = "交易-暂扣车辆押金 0-否 1-是")
+    @NotBlank(message = "交易-暂扣车辆押金不能为空")
     private String jyDetainFlag;
 
     @AutoDocProperty(value = "交易-暂扣原因")
     private String jyDetainReason;
 
     @AutoDocProperty(value = "理赔-暂扣车辆押金 0-否 1-是")
+    @NotBlank(message = "理赔-暂扣车辆押金不能为空")
     private String lpDetainFlag;
 
     @AutoDocProperty(value = "理赔-暂扣原因")
