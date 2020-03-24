@@ -52,7 +52,7 @@ dependencies {
     compile project(":order-core-all:renter-all:renter-claim")
     compile project(":order-core-all:renter-all:renter-commodity")
     compile project(":order-core-all:renter-all:renter-cost")
-    compile project(":order-core-all:renter-all:renter-detain")
+    //compile project(":order-core-all:renter-all:renter-detain")
     compile project(":order-core-all:renter-all:renter-handover")
     compile project(":order-core-all:renter-all:renter-mem")
     compile project(":order-core-all:renter-all:renter-order")
