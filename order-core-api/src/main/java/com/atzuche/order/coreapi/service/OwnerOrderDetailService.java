@@ -199,7 +199,7 @@ public class OwnerOrderDetailService {
 //        int ownerFine = CostStatUtils.calOwnerFineByCashNo(FineTypeEnum.OWNER_FINE, ownerOrderFineDeatailDTOS);  //CANCEL_FINE
         int ownerFine = CostStatUtils.calOwnerFineByCashNo(FineTypeEnum.CANCEL_FINE, ownerOrderFineDeatailDTOS);
         int ownerGetReturnCarFienAmt = CostStatUtils.calOwnerFineByCashNo(FineTypeEnum.GET_RETURN_CAR, ownerOrderFineDeatailDTOS);
-        int ownerModifyAddrAmt = CostStatUtils.calOwnerFineByCashNo(FineTypeEnum.MODIFY_ADDRESS_FINE, ownerOrderFineDeatailDTOS);
+
         
 //        int renterAdvanceReturnCarFienAmt = CostStatUtils.calOwnerFineByCashNo(FineTypeEnum.RENTER_ADVANCE_RETURN, ownerOrderFineDeatailDTOS);
 //        int renterDelayReturnCarFienAmt = CostStatUtils.calOwnerFineByCashNo(FineTypeEnum.RENTER_DELAY_RETURN, ownerOrderFineDeatailDTOS);
@@ -209,6 +209,7 @@ public class OwnerOrderDetailService {
         
         //add by huangjing 200217
         OwnerOrderEntity entity = ownerOrderService.getOwnerOrderByOwnerOrderNo(ownerOrderNo);
+        int ownerModifyAddrAmt = 0;
         int consoleRenterAdvanceReturnCarFienAmt = 0;
         int consoleRenterDelayReturnCarFienAmt = 0;
         if(entity != null) {
@@ -219,7 +220,7 @@ public class OwnerOrderDetailService {
 	            BeanUtils.copyProperties(x,consoleOwnerOrderFineDeatailDTO);
 	            consoleOwnerOrderFineDeatailDTOS.add(consoleOwnerOrderFineDeatailDTO);
 	        });
-	        
+            ownerModifyAddrAmt = CostStatUtils.calConsoleOwnerFineByCashNo(FineTypeEnum.MODIFY_ADDRESS_FINE, consoleOwnerOrderFineDeatailDTOS);
 	        //费用编码不对
 	        consoleRenterAdvanceReturnCarFienAmt = CostStatUtils.calConsoleOwnerFineByCashNo(FineTypeEnum.MODIFY_ADVANCE, consoleOwnerOrderFineDeatailDTOS);
 	        consoleRenterDelayReturnCarFienAmt = CostStatUtils.calConsoleOwnerFineByCashNo(FineTypeEnum.DELAY_FINE, consoleOwnerOrderFineDeatailDTOS);
@@ -227,7 +228,6 @@ public class OwnerOrderDetailService {
         
         FienAmtDetailDTO fienAmtDetailDTO = new FienAmtDetailDTO();
         fienAmtDetailDTO.setOwnerFienAmt(ownerFine); //??如何取值
-        
         //取值OK
         fienAmtDetailDTO.setOwnerGetReturnCarFienAmt(ownerGetReturnCarFienAmt);
         fienAmtDetailDTO.setOwnerModifyAddrAmt(ownerModifyAddrAmt);
