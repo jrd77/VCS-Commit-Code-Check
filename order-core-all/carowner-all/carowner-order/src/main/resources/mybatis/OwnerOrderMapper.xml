@@ -278,7 +278,7 @@
     <select id="queryHostiryOwnerOrderByOrderNo" resultMap="BaseResultMap">
         select <include refid="Base_Column_List" /> from owner_order where order_no = #{orderNo}
         and is_delete = 0
-        order by id desc
+        ORDER BY is_effective DESC,id DESC
     </select>
     <select id="queryCancelOwnerOrderByOrderNoIsEffective" resultMap="BaseResultMap">
         select <include refid="Base_Column_List" /> from owner_order where order_no = #{orderNo}
@@ -307,5 +307,13 @@
     <delete id="updateChildStatusByOwnerOrderNo">
         update owner_order set `child_status` = #{childStatus}  where `owner_order_no` = #{ownerOrderNo}
     </delete>
+
+    <select id="queryByOwnerOrderNoAndMemNo" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List" /> from owner_order where order_no =#{orderNo}
+        and mem_no = #{ownerMemNo}
+        and is_delete = 0
+        and is_effective = 1
+        order by id desc
+    </select>
 
 </mapper>

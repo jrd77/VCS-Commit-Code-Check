@@ -9,8 +9,9 @@ import com.atzuche.order.accountrenterwzdepost.vo.res.AccountRenterWZDepositResV
 import com.atzuche.order.cashieraccount.service.CashierService;
 import com.atzuche.order.commons.enums.YesNoEnum;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
-import com.atzuche.order.commons.enums.detain.DetailSourceEnum;
-import com.atzuche.order.commons.enums.detain.DetainStatusEnum;
+import com.atzuche.order.commons.enums.detain.*;
+import com.atzuche.order.detain.dto.CarDepositTemporaryRefundReqDTO;
+import com.atzuche.order.detain.entity.RenterDetainReasonEntity;
 import com.atzuche.order.detain.entity.RenterDetainUnfreezeEntity;
 import com.atzuche.order.detain.entity.RenterEventDetainEntity;
 import com.atzuche.order.detain.entity.RenterEventDetainStatusEntity;
@@ -18,6 +19,7 @@ import com.atzuche.order.detain.vo.RenterDetainVO;
 import com.atzuche.order.detain.vo.UnfreezeRenterDetainVO;
 import com.atzuche.order.parentorder.entity.OrderEntity;
 import com.atzuche.order.parentorder.service.OrderService;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -39,6 +41,7 @@ public class RenterDetain {
     @Autowired
     AccountRenterWzDepositService accountRenterWzDepositService;
     @Autowired OrderService orderService;
+    @Autowired RenterDetainReasonService renterDetainReasonService;
 
 
     /**
@@ -204,4 +207,59 @@ public class RenterDetain {
         }
         return null;
     }
+
+    /**
+     * 保存租车押金暂扣原因信息
+     *
+     * @param req 请求参数
+     */
+    public void saveRenterDetainReason(CarDepositTemporaryRefundReqDTO req) {
+        //风控
+        RenterDetainReasonEntity fk = new RenterDetainReasonEntity();
+        fk.setOrderNo(req.getOrderNo());
+        fk.setDetainTypeCode(DetainTypeEnum.risk.getCode());
+        fk.setDetainTypeName(DetainTypeEnum.risk.getName());
+        if (StringUtils.isNotBlank(req.getFkDetainReason())) {
+            DetainRiskReasonEnum reason = DetainRiskReasonEnum.from(req.getFkDetainReason());
+            if (null != reason) {
+                fk.setDetainReasonCode(reason.getCode());
+                fk.setDetainReasonName(reason.getName());
+            }
+        }
+        fk.setDetainStatus(Integer.valueOf(req.getFkDetainFlag()));
+        fk.setUpdateOp(req.getOperator());
+        renterDetainReasonService.saveDetainReason(fk);
+        //交易
+        RenterDetainReasonEntity jy = new RenterDetainReasonEntity();
+        jy.setOrderNo(req.getOrderNo());
+        jy.setDetainTypeCode(DetainTypeEnum.trans.getCode());
+        jy.setDetainTypeName(DetainTypeEnum.trans.getName());
+        if (StringUtils.isNotBlank(req.getJyDetainReason())) {
+            DetainTransReasonEnum reason = DetainTransReasonEnum.from(req.getJyDetainReason());
+            if (null != reason) {
+                jy.setDetainReasonCode(reason.getCode());
+                jy.setDetainReasonName(reason.getName());
+            }
+        }
+        jy.setDetainStatus(Integer.valueOf(req.getJyDetainFlag()));
+        jy.setUpdateOp(req.getOperator());
+        renterDetainReasonService.saveDetainReason(jy);
+        //理赔
+        RenterDetainReasonEntity lp = new RenterDetainReasonEntity();
+        lp.setOrderNo(req.getOrderNo());
+        lp.setDetainTypeCode(DetainTypeEnum.claims.getCode());
+        lp.setDetainTypeName(DetainTypeEnum.claims.getName());
+        if (StringUtils.isNotBlank(req.getLpDetainReason())) {
+            DetainClaimsReasonEnum reason = DetainClaimsReasonEnum.from(req.getLpDetainReason());
+            if (null != reason) {
+                lp.setDetainReasonCode(reason.getCode());
+                lp.setDetainReasonName(reason.getName());
+            }
+        }
+        lp.setDetainStatus(Integer.valueOf(req.getLpDetainFlag()));
+        lp.setUpdateOp(req.getOperator());
+        renterDetainReasonService.saveDetainReason(lp);
+    }
+
+
 }

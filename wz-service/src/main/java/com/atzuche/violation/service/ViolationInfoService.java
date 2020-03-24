@@ -88,7 +88,7 @@ public class ViolationInfoService {
         log.info("查询出的数据,开始时间：{}",startTime);
         violationReqVO.setPageSize(1000);
         violationReqVO.setPageNum(1);
-        List<ViolationResVO> violationResDesVOList = renterOrderWzStatusMapper.queryIllegalOrderList(violationReqVO);
+        List<ViolationResVO> violationResDesVOList = list(violationReqVO);
         if(CollectionUtils.isEmpty(violationResDesVOList))
         {
             log.info("数据源为空,incomeAuditResponseVO:[{}]",violationResDesVOList.toString());
@@ -113,6 +113,8 @@ public class ViolationInfoService {
                     violationExportResVO.setId(String.valueOf(r.getId()));
                     violationExportResVOS.add(violationExportResVO);
                 });
+            } else {
+                violationExportResVOS.add(violationExportResVO);
             }
         }
         log.info("查询出的数据源总长：{},耗时：{}",violationExportResVOS.size() ,System.currentTimeMillis() - startTime);

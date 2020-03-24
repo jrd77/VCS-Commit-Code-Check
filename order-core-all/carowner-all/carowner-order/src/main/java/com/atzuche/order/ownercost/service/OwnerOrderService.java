@@ -158,4 +158,8 @@ public class OwnerOrderService {
     public int updateByMemeNo(String ownerMem) {
         return ownerOrderMapper.updateByMemeNo(ownerMem);
     }
+
+    public List<OwnerOrderEntity> queryByOwnerOrderNoAndMemNo(String ownerOrderNo,String ownerMemNo) {
+        return ownerOrderMapper.queryByOwnerOrderNoAndMemNo(ownerOrderNo,ownerMemNo);
+    }
 }
