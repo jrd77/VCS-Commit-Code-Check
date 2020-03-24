@@ -186,7 +186,7 @@ public class ViolationManageController {
     public ResponseData alterationLogList(@Valid ViolationListRequestVO violationListRequestVO, BindingResult bindingResult) {
         //参数验证
         validateParameter(bindingResult);
-        try{
+        try {
             logger.info("获取违章列表入参:{}",violationListRequestVO.toString());
             ViolationInformationListResponseVO violationInformationListResponseVO = violationManageService.selectViolationList(violationListRequestVO);
             CatLogRecord.successLog("获取违章列表成功","console/order/violation/detail/list",violationListRequestVO);
