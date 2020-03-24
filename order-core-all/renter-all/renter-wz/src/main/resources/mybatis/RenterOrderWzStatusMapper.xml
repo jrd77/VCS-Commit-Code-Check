@@ -175,18 +175,19 @@
 		LEFT JOIN renter_goods g on r.order_no = g.order_no
 		LEFT JOIN order_status s on w.order_no = s.order_no
         LEFT JOIN (SELECT order_no,count(1)cid FROM renter_order_wz_illegal_photo group by order_no)p ON(w.order_no = p.order_no)
-		LEFT JOIN deren_car_approach_citys f on w.order_no = f.order_no
-         WHERE
-            r.city_code IN (select city_code from wz_query_day_conf where illegal_query_day = 15)
-            AND DATE_ADD( DATE_FORMAT(LEFT(renter.act_revert_time,8),'%Y%m%d'),INTERVAL 15 DAY) &lt; NOW()
-            <!-- 进入违章管理日期-->
-            <if test="mixViolationManagerDate != null and mixViolationManagerDate != '' ">
-                AND  (DATE_ADD( DATE_FORMAT(renter.act_revert_time,'%Y%m%d'),INTERVAL 15 DAY) &gt;=#{mixViolationManagerDate})
-            </if>
-            <if test="maxViolationManagerDate != null and maxViolationManagerDate != '' ">
-                AND  (DATE_ADD( DATE_FORMAT(renter.act_revert_time,'%Y%m%d'),INTERVAL 15 DAY) &lt;=#{maxViolationManagerDate})
-            </if>
-            AND <include refid="whereCondition" />
+        LEFT JOIN deren_car_approach_citys f on w.order_no = f.order_no
+        WHERE
+        r.city_code IN (select city_code from wz_query_day_conf where illegal_query_day = 15)
+        AND DATE_ADD( DATE_FORMAT(LEFT(renter.act_revert_time,8),'%Y%m%d'),INTERVAL 15 DAY) &lt; NOW()
+        <!-- 进入违章管理日期-->
+        <if test="mixViolationManagerDate != null and mixViolationManagerDate != '' ">
+            AND (DATE_ADD( DATE_FORMAT(renter.act_revert_time,'%Y%m%d'),INTERVAL 15 DAY) &gt;=#{mixViolationManagerDate})
+        </if>
+        <if test="maxViolationManagerDate != null and maxViolationManagerDate != '' ">
+            AND (DATE_ADD( DATE_FORMAT(renter.act_revert_time,'%Y%m%d'),INTERVAL 15 DAY) &lt;=#{maxViolationManagerDate})
+        </if>
+        AND
+        <include refid="whereCondition"/>
         UNION ALL
         SELECT w.id,w.order_no as orderNo,renter.exp_rent_time as rentTime, IFNULL(p.cid,0) as wzProcessedProof,
         renter.exp_revert_time as revertTime, renter.act_revert_time as actualRevertTime, g.car_plate_num as plateNum,
@@ -213,7 +214,8 @@
         </if>
         AND <include refid="whereCondition" />
         ) a
-        order by renter.exp_revert_time desc
+        group by a.orderNo,a.plateNum
+        order by a.actualRevertTime desc
     </select>
 
     <sql id="whereCondition">
