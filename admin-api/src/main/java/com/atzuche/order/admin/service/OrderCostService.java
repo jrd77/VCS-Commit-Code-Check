@@ -769,7 +769,7 @@ public class OrderCostService {
 		 List<ConsoleOwnerOrderFineDeatailEntity> consoleOwnerOrderFineDeatails = data.getConsoleOwnerOrderFineDeatails();
 		 for (ConsoleOwnerOrderFineDeatailEntity consoleOwnerOrderFineDeatailEntity : consoleOwnerOrderFineDeatails) {
 			 //罚金来源编码（车主/租客/平台）1-租客，2-车主，3-平台
-				if(consoleOwnerOrderFineDeatailEntity.getFineSubsidyCode().equals("2")) {
+				if(consoleOwnerOrderFineDeatailEntity.getFineSubsidySourceCode().equals("2")) {
 					fineAmtInt += consoleOwnerOrderFineDeatailEntity.getFineAmount().intValue();
 				}
 		 }
