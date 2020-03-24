@@ -1,6 +1,21 @@
 package com.atzuche.order.coreapi.service;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
+
 import com.alibaba.fastjson.JSON;
+import com.atzuche.order.cashieraccount.service.CashierPayService;
+import com.atzuche.order.cashieraccount.vo.req.pay.OrderPaySignReqVO;
 import com.atzuche.order.commons.LocalDateTimeUtils;
 import com.atzuche.order.commons.constant.OrderConstant;
 import com.atzuche.order.commons.entity.dto.OwnerGoodsDetailDTO;
@@ -23,21 +38,13 @@ import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.atzuche.order.renterorder.service.RenterOrderService;
 import com.atzuche.order.search.OrderSearchProxyService;
 import com.atzuche.order.search.dto.ConflictOrderSearchReqDTO;
+import com.autoyol.autopay.gateway.constant.DataPayKindConstant;
+import com.autoyol.autopay.gateway.constant.DataPaySourceConstant;
 import com.autoyol.car.api.model.dto.LocationDTO;
 import com.autoyol.car.api.model.dto.OrderInfoDTO;
 import com.autoyol.car.api.model.enums.OrderOperationTypeEnum;
+import com.autoyol.commons.utils.GsonUtils;
 import com.autoyol.event.rabbit.neworder.NewOrderMQStatusEventEnum;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.CollectionUtils;
-
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * 车主同意接单
@@ -74,6 +81,10 @@ public class OwnerAgreeOrderService {
     private OwnerRefuseOrderService ownerRefuseOrderService;
     @Autowired
     private OrderSearchProxyService orderSearchProxyService;
+    @Autowired 
+    private PayCallbackService payCallbackService;
+    @Autowired
+    private CashierPayService cashierPayService;
 
 
     /**
@@ -119,7 +130,22 @@ public class OwnerAgreeOrderService {
         //发送车主同意事件
         orderActionMqService.sendOwnerAgreeOrderSuccess(reqVO.getOrderNo());
         orderStatusMqService.sendOrderStatusByOrderNo(reqVO.getOrderNo(), orderStatusDTO.getStatus(), NewOrderMQStatusEventEnum.ORDER_PREPAY);
+        
+        //如果是使用钱包，检测是否钱包全额抵扣，推动订单流程。huangjing 200324  刷新钱包
+       try {
+    	   if(renterOrderEntity != null && renterOrderEntity.getIsUseWallet().intValue() == 1) {
+	    	   OrderPaySignReqVO vo = cashierPayService.buildOrderPaySignReqVO(renterOrderEntity);
+	           String result = cashierPayService.getPaySignStr(vo,payCallbackService);
+	           logger.info("获取支付签名串result=[{}],params=[{}]",result,GsonUtils.toJson(vo));
+    	   }
+		} catch (Exception e) {
+			logger.error("刷新钱包支付抵扣");
+		}
+
     }
+
+
+	
 
 
     /**

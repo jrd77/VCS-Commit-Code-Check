@@ -2,11 +2,12 @@ package com.atzuche.order.cashieraccount.service;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
-import com.atzuche.order.commons.LocalDateTimeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +39,7 @@ import com.atzuche.order.cashieraccount.vo.req.pay.VirtualPayDTO;
 import com.atzuche.order.cashieraccount.vo.res.AccountPayAbleResVO;
 import com.atzuche.order.cashieraccount.vo.res.OrderPayableAmountResVO;
 import com.atzuche.order.cashieraccount.vo.res.pay.OrderPayCallBackSuccessVO;
-import com.atzuche.order.commons.DateUtils;
+import com.atzuche.order.commons.LocalDateTimeUtils;
 import com.atzuche.order.commons.enums.OrderPayStatusEnum;
 import com.atzuche.order.commons.enums.OrderStatusEnum;
 import com.atzuche.order.commons.enums.YesNoEnum;
@@ -56,6 +57,7 @@ import com.atzuche.order.rentercost.service.RenterOrderCostCombineService;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.atzuche.order.wallet.WalletProxyService;
 import com.autoyol.autopay.gateway.constant.DataPayKindConstant;
+import com.autoyol.autopay.gateway.constant.DataPaySourceConstant;
 import com.autoyol.autopay.gateway.constant.DataPayTypeConstant;
 import com.autoyol.autopay.gateway.util.MD5;
 import com.autoyol.autopay.gateway.vo.req.BatchNotifyDataVo;
@@ -578,25 +580,57 @@ public class CashierPayService{
         RenterOrderEntity renterOrderEntity = cashierNoTService.getRenterOrderNoByOrderNo(orderPayReqVO.getOrderNo());
         // 租车费用倒计时 单位秒
         long countdown=0L;
-        if(Objects.nonNull(renterOrderEntity) && Objects.nonNull(renterOrderEntity.getCreateTime())){
-            countdown = DateUtils.getDateLatterCompareNowScoend(renterOrderEntity.getCreateTime(),1);
-        }
+//        if(Objects.nonNull(renterOrderEntity) && Objects.nonNull(renterOrderEntity.getCreateTime())){
+//            countdown = DateUtils.getDateLatterCompareNowScoend(renterOrderEntity.getCreateTime(),1);
+//        }
         String costText ="";
         //租车费用
         if(orderPayReqVO.getPayKind().contains(DataPayKindConstant.RENT_AMOUNT) || orderPayReqVO.getPayKind().contains(DataPayKindConstant.RENT_INCREMENT)){
             costText =costText+"租车费用"+ Math.abs(result.getAmtRent()+result.getAmtIncrementRent());
             result.setHints("请于1小时内完成支付，超时未支付订单将自动取消");
+            
+            //同老订单的租车押金
+            if(Objects.nonNull(renterOrderEntity) && Objects.nonNull(renterOrderEntity.getCreateTime())){
+	            LocalDateTime reqTime = renterOrderEntity.getCreateTime();
+
+	            long secondRent = ChronoUnit.SECONDS.between(reqTime,LocalDateTime.now());
+                if (secondRent <= 60 * 60) {//小于等于1h
+                    countdown = secondRent;
+                }
+            }
             result.setCountdown(countdown);
+          
         }
         //车辆押金
         if(orderPayReqVO.getPayKind().contains(DataPayKindConstant.RENT)){
             costText =costText+"车辆押金"+ Math.abs(result.getAmtDeposit());
             result.setHints("交易结束后24小时内，车辆押金将返还到支付账户");
+            
+            //同老订单的违章押金
+            if(Objects.nonNull(renterOrderEntity) && Objects.nonNull(renterOrderEntity.getExpRentTime())){
+            	LocalDateTime rentTime = renterOrderEntity.getExpRentTime(); 
+                long secondRent = ChronoUnit.SECONDS.between(LocalDateTime.now(), rentTime);
+                if (secondRent <= 60 * 60) {//小于等于1h
+                    countdown = secondRent;
+                }
+            }
+            result.setCountdown(countdown);
         }
         //违章押金
         if(orderPayReqVO.getPayKind().contains(DataPayKindConstant.DEPOSIT)){
             costText =costText+" 违章押金"+Math.abs(result.getAmtWzDeposit());
             result.setHints("交易结束后24小时内，车辆押金将返还到支付账户");
+            
+            //同老订单的违章押金
+            if(Objects.nonNull(renterOrderEntity) && Objects.nonNull(renterOrderEntity.getExpRentTime())){
+            	LocalDateTime rentTime = renterOrderEntity.getExpRentTime(); 
+                long secondRent = ChronoUnit.SECONDS.between(LocalDateTime.now(), rentTime);
+                if (secondRent <= 60 * 60) {//小于等于1h
+                    countdown = secondRent;
+                }
+            }
+            result.setCountdown(countdown);
+            
         }
         //车辆押金 + 违章押金
         if(orderPayReqVO.getPayKind().contains(DataPayKindConstant.RENT) && orderPayReqVO.getPayKind().contains(DataPayKindConstant.DEPOSIT)){
@@ -868,6 +902,52 @@ public class CashierPayService{
         	log.error("退款返回的结果vo为null异常,params=[{}]",GsonUtils.toJson(refundVo));
         }
     }
+    
+    
+    /**
+     * 刷新钱包抵扣的参数封装
+     * @param renterOrderEntity
+     * @return
+     */
+    public OrderPaySignReqVO buildOrderPaySignReqVO(RenterOrderEntity renterOrderEntity) {
+		OrderPaySignReqVO vo = new OrderPaySignReqVO();
+		vo.setMenNo(String.valueOf(renterOrderEntity.getRenterMemNo()));
+		vo.setIsUseWallet(renterOrderEntity.getIsUseWallet());
+		vo.setOrderNo(renterOrderEntity.getOrderNo());
+		////配置参数
+		
+		List<String> payKinds = new ArrayList<String>();
+		payKinds.add(DataPayKindConstant.RENT_AMOUNT);
+		vo.setPayKind(payKinds);
+		//////////////////////////// 以上为公共参数
+		vo.setOperator(1);
+		vo.setOperatorName("COREAPI");
+		vo.setOpenId("");
+		vo.setPayType("01");   //默认 消费
+		vo.setReqOs("IOS");  //默认
+		vo.setPaySource(DataPaySourceConstant.ALIPAY);
+		return vo;
+	}
+    
+    public OrderPaySignReqVO buildOrderPaySignReqVO(String orderNo,String memNo,Integer isUseWallet) {
+		OrderPaySignReqVO vo = new OrderPaySignReqVO();
+		vo.setMenNo(memNo);
+		vo.setIsUseWallet(isUseWallet);
+		vo.setOrderNo(orderNo);
+		////配置参数
+		
+		List<String> payKinds = new ArrayList<String>();
+		payKinds.add(DataPayKindConstant.RENT_AMOUNT);
+		vo.setPayKind(payKinds);
+		//////////////////////////// 以上为公共参数
+		vo.setOperator(1);
+		vo.setOperatorName("COREAPI");
+		vo.setOpenId("");
+		vo.setPayType("01");   //默认 消费
+		vo.setReqOs("IOS");  //默认
+		vo.setPaySource(DataPaySourceConstant.ALIPAY);
+		return vo;
+	}
 
 }
 
