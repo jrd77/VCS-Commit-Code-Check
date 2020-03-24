@@ -10,10 +10,13 @@ import org.hibernate.validator.constraints.NotBlank;
  */
 @Data
 @ToString
-public class ViolationConfirmRequestVO {
+public class ViolationCompleteMqVO {
 
-    @AutoDocProperty(value = "违章记录id")
-    @NotBlank(message = "违章id不能为空")
-    private String violationId;
+    @AutoDocProperty(value = "主订单号")
+    @NotBlank(message = "主订单号不能为空")
+    private String orderNo;
+
+    @AutoDocProperty(value = "操作人")
+    private String operator;
 
 }
