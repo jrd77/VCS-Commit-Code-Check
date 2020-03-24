@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
  * @date 2019-12-11 18:13:12
  */
 @Service
-public class RenterDetainUnfreezeServiceProxy{
+public class RenterDetainUnfreezeService{
     @Autowired
     private RenterDetainUnfreezeMapper renterDetainUnfreezeMapper;
 
