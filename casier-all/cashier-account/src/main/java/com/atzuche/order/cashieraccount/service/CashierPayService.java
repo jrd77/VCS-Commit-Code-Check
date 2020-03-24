@@ -1,9 +1,12 @@
 package com.atzuche.order.cashieraccount.service;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import com.atzuche.order.commons.LocalDateTimeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -106,6 +109,8 @@ public class CashierPayService{
         notifyDataVo.setPayLine(2);
         notifyDataVo.setVirtualAccountNo(virtualPayVO.getAccountEnum().getAccountNo());
         notifyDataVo.setExtendParams(virtualPayVO.getRenterNo());
+        notifyDataVo.setOrderTime(LocalDateTime.now().format(DateTimeFormatter.ofPattern(LocalDateTimeUtils.YYYYMMDDHHMMSSS_PATTERN)));
+
 
 
         List<NotifyDataVo> list = new ArrayList<>();
