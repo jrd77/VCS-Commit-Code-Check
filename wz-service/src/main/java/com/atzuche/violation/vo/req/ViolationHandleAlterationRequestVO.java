@@ -3,6 +3,7 @@ package com.atzuche.violation.vo.req;
 import com.autoyol.doc.annotation.AutoDocProperty;
 import lombok.Data;
 import lombok.ToString;
+import org.hibernate.validator.constraints.NotBlank;
 
 @Data
 @ToString
@@ -10,6 +11,10 @@ public class ViolationHandleAlterationRequestVO {
 
     @AutoDocProperty(value = "订单号")
     private String orderNo; // 订单号
+
+    @AutoDocProperty(value = "车牌号")
+    @NotBlank(message = "车牌号不能为空")
+    private String plateNum;
 
     @AutoDocProperty(value = "其他扣款金额")
     private String otherDeductionAmt; //其他扣款金额
