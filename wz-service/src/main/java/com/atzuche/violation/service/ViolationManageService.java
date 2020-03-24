@@ -388,17 +388,17 @@ public class ViolationManageService {
         String wzHandleCompleteTime = violationAlterationRequestVO.getWzHandleCompleteTime();
         if(!ObjectUtils.isEmpty(wzRenterLastTime)){
             //租客最晚处理时间
-            renterOrderWzStatusEntity.setWzRenterLastTime(DateUtils.parseDate(wzRenterLastTime, DateUtils.DATE_DEFAUTE));
+            renterOrderWzStatusEntity.setWzRenterLastTime(DateUtils.parseDate(wzRenterLastTime, DateUtils.DATE_DEFAUTE1));
         }
 
         if(!ObjectUtils.isEmpty(wzPlatformLastTime)){
             //平台最晚处理时间
-            renterOrderWzStatusEntity.setWzPlatformLastTime(DateUtils.parseDate(wzPlatformLastTime, DateUtils.DATE_DEFAUTE));
+            renterOrderWzStatusEntity.setWzPlatformLastTime(DateUtils.parseDate(wzPlatformLastTime, DateUtils.DATE_DEFAUTE1));
         }
 
         if(!ObjectUtils.isEmpty(wzHandleCompleteTime)){
             //办理完成时间
-            renterOrderWzStatusEntity.setWzHandleCompleteTime(DateUtils.parseDate(wzHandleCompleteTime, DateUtils.DATE_DEFAUTE));
+            renterOrderWzStatusEntity.setWzHandleCompleteTime(DateUtils.parseDate(wzHandleCompleteTime, DateUtils.DATE_DEFAUTE1));
         }
 
         renterOrderWzStatusEntity.setWzRemarks( violationAlterationRequestVO.getWzRemarks());
