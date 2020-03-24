@@ -4,6 +4,8 @@ import com.atzuche.order.detain.entity.RenterDetainReasonEntity;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.List;
+
 /**
  * 租车押金暂扣原因表
  *
@@ -30,6 +32,15 @@ public interface RenterDetainReasonMapper {
      */
     RenterDetainReasonEntity selectByOrderNo(@Param("orderNo") String orderNo,
                                        @Param("detainTypeCode") String detainTypeCode);
+
+
+    /**
+     * 获取订单租车押金暂扣原因
+     *
+     * @param orderNo 订单号
+     * @return List<RenterDetainReasonEntity>
+     */
+    List<RenterDetainReasonEntity> selectListByOrderNo(String orderNo);
 
     /**
      * 新增数据

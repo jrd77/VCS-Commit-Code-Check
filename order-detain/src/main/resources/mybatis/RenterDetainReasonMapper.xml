@@ -37,7 +37,17 @@
         where
             `order_no` = #{orderNo}
             and `detain_type_code` = #{detainTypeCode}
+            and is_delete = 0
         limit 1
+    </select>
+
+    <select id="selectListByOrderNo" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from
+            renter_detain_reason
+        where
+        `order_no` = #{orderNo} and is_delete = 0
     </select>
 
 	<insert id="insert" parameterType="com.atzuche.order.detain.entity.RenterDetainReasonEntity" useGeneratedKeys="true" keyProperty="id">
