@@ -306,7 +306,11 @@
     </update>
 
     <select id="queryByOwnerOrderNoAndMemNo" resultMap="BaseResultMap">
-        select <include refid="Base_Column_List" /> from owner_order where order_no =#{orderNo} and mem_no = #{ownerMemNo} and is_delete = 0
+        select <include refid="Base_Column_List" /> from owner_order where order_no =#{orderNo}
+        and mem_no = #{ownerMemNo}
+        and is_delete = 0
+        and is_effective = 1
+        order by id desc
     </select>
 
 </mapper>

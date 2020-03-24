@@ -190,6 +190,11 @@
         <foreach collection="ownerOrderNos" item="ownerOrderNo" open="(" separator="," close=")">
             #{ownerOrderNo}
         </foreach>
+        order by field(owner_order_no,
+        <foreach collection="ownerOrderNos" item="ownerOrderNo" open="" separator="," close="">
+            #{ownerOrderNo}
+        </foreach>
+        )
         and is_delete = 0
     </select>
 
