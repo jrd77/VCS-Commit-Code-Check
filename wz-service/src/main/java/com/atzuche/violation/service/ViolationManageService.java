@@ -4,6 +4,7 @@ import com.atzuche.order.accountrenterwzdepost.entity.AccountRenterWzDepositDeta
 import com.atzuche.order.accountrenterwzdepost.entity.AccountRenterWzDepositEntity;
 import com.atzuche.order.accountrenterwzdepost.service.notservice.AccountRenterWzDepositDetailNoTService;
 import com.atzuche.order.accountrenterwzdepost.service.notservice.AccountRenterWzDepositNoTService;
+import com.atzuche.order.commons.CompareHelper;
 import com.atzuche.order.commons.DateUtils;
 import com.atzuche.order.renterwz.entity.RenterOrderWzCostDetailEntity;
 import com.atzuche.order.renterwz.entity.RenterOrderWzDetailEntity;
@@ -12,6 +13,7 @@ import com.atzuche.order.renterwz.entity.WzCostLogEntity;
 import com.atzuche.order.renterwz.service.*;
 import com.atzuche.violation.common.AdminUserUtil;
 import com.atzuche.violation.enums.WzCostEnums;
+import com.atzuche.violation.enums.WzManageMentEnums;
 import com.atzuche.violation.enums.WzStatusEnums;
 import com.atzuche.violation.vo.req.*;
 import com.atzuche.violation.vo.resp.*;
@@ -32,6 +34,21 @@ public class ViolationManageService {
     private static final Logger logger = LoggerFactory.getLogger(ViolationManageService.class);
     private static final int RENTER_HANDLE_WZ_DISPOSE_STATUS = 10;
     private static final int HAS_ILLEGAL_NO=3;
+    private static final String MANAGEMENT_MODE = "managementMode";
+    private static final String WZ_REMARKS = "wzRemarks";
+    private static final String MANAGEMENT_MODE_DESC = "违章处理方";
+    private static final String WZ_REMARKS_DESC = "违章处理备注";
+
+    private static final String WZ_HANDLE_COMPLETE_TIME = "wzHandleCompleteTime";
+    private static final String WZ_HANDLE_COMPLETE_TIME_DESC = "办理完成时间";
+
+    private static final String WZ_RENTER_LAST_TIME = "wzRenterLastTime";
+    private static final String WZ_RENTER_LAST_TIME_DESC = "租客最晚处理时间";
+
+    private static final String WZ_PLATFORM_LAST_TIME = "wzPlatformLastTime";
+    private static final String WZ_PLATFORM_LAST_TIME_DESC = "平台最晚处理时间";
+    private static final String WZ_TIME_REMARK_CODE = "11240999";
+
 
 
 
@@ -151,7 +168,7 @@ public class ViolationManageService {
      * 更新违章处理信息
      * @param violationAlterationRequestVO
      */
-    public void updateViolationHandle(ViolationHandleAlterationRequestVO violationAlterationRequestVO){
+    public void updateViolationHandle(ViolationHandleAlterationRequestVO violationAlterationRequestVO) throws Exception{
         List<RenterWzCostDetailReqVO > costDetails = new ArrayList<>();
         String orderNo = violationAlterationRequestVO.getOrderNo();
         //其他扣款
@@ -360,8 +377,10 @@ public class ViolationManageService {
      * 修改违章信息
      * @param violationAlterationRequestVO
      */
-    public void updateOrderWzStatus(ViolationHandleAlterationRequestVO violationAlterationRequestVO) {
+    public void updateOrderWzStatus(ViolationHandleAlterationRequestVO violationAlterationRequestVO) throws Exception {
         RenterOrderWzStatusEntity renterOrderWzStatusEntity = new RenterOrderWzStatusEntity();
+        renterOrderWzStatusEntity.setOrderNo(violationAlterationRequestVO.getOrderNo());
+        renterOrderWzStatusEntity.setCarPlateNum(violationAlterationRequestVO.getPlateNum());
         Integer managementMode = Integer.parseInt(violationAlterationRequestVO.getManagementMode());
         renterOrderWzStatusEntity.setManagementMode(managementMode);
         String wzRenterLastTime = violationAlterationRequestVO.getWzRenterLastTime();
@@ -398,7 +417,40 @@ public class ViolationManageService {
             renterOrderWzStatusEntity.setStatusDesc(WzStatusEnums.getStatusDesc(46));
         }
 
-        renterOrderWzStatusService.updateOrderWzStatus(renterOrderWzStatusEntity);
+        updateOrderWzStatus(renterOrderWzStatusEntity);
+    }
+
+    /**
+     * 修改违章状态信息及记录日志
+     * @param renterOrderWzStatusEntity
+     * @throws Exception
+     */
+    public void updateOrderWzStatus(RenterOrderWzStatusEntity renterOrderWzStatusEntity) throws Exception{
+        RenterOrderWzStatusEntity oldRenterOrderWzStatusEntity = renterOrderWzStatusService.selectByOrderNo(renterOrderWzStatusEntity.getOrderNo(),renterOrderWzStatusEntity.getCarPlateNum());
+        RenterOrderViolationLogVO oldRenterOrderViolationLogVO = new RenterOrderViolationLogVO();
+        RenterOrderViolationLogVO newRenterOrderViolationLogVO = new RenterOrderViolationLogVO();
+        BeanUtils.copyProperties(oldRenterOrderWzStatusEntity,oldRenterOrderViolationLogVO);
+        BeanUtils.copyProperties(renterOrderWzStatusEntity,newRenterOrderViolationLogVO);
+        oldRenterOrderViolationLogVO.setManagementMode(WzManageMentEnums.getStatusDesc(oldRenterOrderWzStatusEntity.getManagementMode()));
+        newRenterOrderViolationLogVO.setManagementMode(WzManageMentEnums.getStatusDesc(renterOrderWzStatusEntity.getManagementMode()));
+        Map<String,String> paramNames = this.getViolationParamNamesByCode();
+        CompareHelper<RenterOrderViolationLogVO> compareHelper = new CompareHelper<>(oldRenterOrderViolationLogVO,newRenterOrderViolationLogVO,paramNames);
+        String content = compareHelper.compare();
+        if(StringUtils.isNotBlank(content)){
+            //记录日志 并且做修改费用处理
+            saveWzCostLog(renterOrderWzStatusEntity.getOrderNo(), WZ_TIME_REMARK_CODE, content);
+            renterOrderWzStatusService.updateOrderWzStatus(renterOrderWzStatusEntity);
+        }
+    }
+
+    public void saveWzCostLog(String orderNo, String costCode, String content) {
+        WzCostLogEntity wzCostLogEntity = new WzCostLogEntity();
+        wzCostLogEntity.setContent(content);
+        wzCostLogEntity.setCreateTime(new Date());
+        wzCostLogEntity.setOperator(AdminUserUtil.getAdminUser().getAuthName());
+        wzCostLogEntity.setOrderNo(orderNo);
+        wzCostLogEntity.setCostCode(costCode);
+        wzCostLogService.save(wzCostLogEntity);
     }
 
 
@@ -451,6 +503,16 @@ public class ViolationManageService {
         //更新违章完成时间
         renterOrderWzStatusEntity.setWzHandleCompleteTime(new Date());
         renterOrderWzStatusService.updateOrderWzStatus(renterOrderWzStatusEntity);
+    }
+
+    private Map<String, String> getViolationParamNamesByCode() {
+        Map<String, String> map = new LinkedHashMap<>();
+        map.put(MANAGEMENT_MODE ,MANAGEMENT_MODE_DESC);
+        map.put(WZ_REMARKS,WZ_REMARKS_DESC);
+        map.put(WZ_HANDLE_COMPLETE_TIME,WZ_HANDLE_COMPLETE_TIME_DESC);
+        map.put(WZ_RENTER_LAST_TIME,WZ_RENTER_LAST_TIME_DESC);
+        map.put(WZ_PLATFORM_LAST_TIME,WZ_PLATFORM_LAST_TIME_DESC);
+        return map;
     }
 
 
