@@ -14,11 +14,13 @@ import org.springframework.stereotype.Service;
 import com.atzuche.order.accountrenterrentcost.service.AccountRenterCostSettleService;
 import com.atzuche.order.cashieraccount.service.notservice.CashierNoTService;
 import com.atzuche.order.commons.entity.dto.OrderSupplementDetailDTO;
+import com.atzuche.order.commons.enums.OrderStatusEnum;
 import com.atzuche.order.commons.enums.SupplementOpTypeEnum;
 import com.atzuche.order.commons.enums.SupplementTypeEnum;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.coreapi.modifyorder.exception.ModifyOrderParentOrderNotFindException;
 import com.atzuche.order.parentorder.entity.OrderEntity;
+import com.atzuche.order.parentorder.entity.OrderStatusEntity;
 import com.atzuche.order.parentorder.service.OrderService;
 import com.atzuche.order.rentercost.entity.OrderSupplementDetailEntity;
 import com.atzuche.order.rentercost.entity.vo.PayableVO;
@@ -74,7 +76,13 @@ public class SupplementService {
 	 * @param orderNo
 	 * @return List<OrderSupplementDetailEntity>
 	 */
-	public List<OrderSupplementDetailEntity> listOrderSupplementDetailEntityByOrderNo(String orderNo) {
+	public List<OrderSupplementDetailEntity> listOrderSupplementDetailEntityByOrderNo(String orderNo, OrderStatusEntity orderStatus) {
+		List<OrderSupplementDetailEntity> list = orderSupplementDetailService.listOrderSupplementDetailByOrderNo(orderNo);
+        // 订单状态
+		int status = orderStatus == null || orderStatus.getStatus() == null ? -1:orderStatus.getStatus();
+        if (status > OrderStatusEnum.TO_SETTLE.getStatus() || status == OrderStatusEnum.CLOSED.getStatus()) {
+        	return list;
+        }
 		// 获取修改前有效租客子订单信息
 		RenterOrderEntity renterOrder = renterOrderService.getRenterOrderByOrderNoAndIsEffective(orderNo);
 		List<PayableVO> payableVOs = renterOrderCostCombineService.listPayableGlobalVO(orderNo,renterOrder.getRenterOrderNo(),renterOrder.getRenterMemNo());
@@ -84,7 +92,6 @@ public class SupplementService {
         //已付租车费用(shifu  租车费用的实付)
         int rentAmtPayed = accountRenterCostSettleService.getCostPaidRent(orderNo,renterOrder.getRenterMemNo());
         
-        List<OrderSupplementDetailEntity> list = orderSupplementDetailService.listOrderSupplementDetailByOrderNo(orderNo);
         if(!CollectionUtils.isEmpty(payableVOs) && rentAmtAfter+rentAmtPayed < 0){   // 
         	RenterCashCodeEnum type = RenterCashCodeEnum.ACCOUNT_RENTER_RENT_COST_AFTER;	                    
             //数据封装

@@ -86,7 +86,7 @@ public class SupplementController {
 		// 获取订单结算状态
 		OrderStatusEntity orderStatus = orderStatusService.getByOrderNo(orderNo);
 		// 获取补付列表
-		List<OrderSupplementDetailEntity> list = supplementService.listOrderSupplementDetailEntityByOrderNo(orderNo);
+		List<OrderSupplementDetailEntity> list = supplementService.listOrderSupplementDetailEntityByOrderNo(orderNo,orderStatus);
 		supplementVO.setList(list);
 		if (orderStatus != null) {
 			if (orderStatus.getStatus() != null && orderStatus.getStatus().intValue() == OrderStatusEnum.CLOSED.getStatus()) {
