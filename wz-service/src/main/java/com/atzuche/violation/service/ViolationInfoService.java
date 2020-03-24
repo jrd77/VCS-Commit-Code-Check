@@ -1,6 +1,7 @@
 package com.atzuche.violation.service;
 
 import com.alibaba.fastjson.JSONObject;
+import com.atzuche.order.commons.enums.CarOwnerTypeEnum;
 import com.atzuche.order.commons.vo.req.ViolationReqVO;
 import com.atzuche.order.commons.vo.res.ViolationResVO;
 import com.atzuche.order.renterwz.entity.RenterOrderWzDetailEntity;
@@ -12,6 +13,8 @@ import com.atzuche.violation.common.FileUtil;
 import com.atzuche.violation.common.xlsx.ExportExcelUtil;
 import com.atzuche.violation.common.xlsx.ExportExcelWrapper;
 import com.atzuche.violation.common.xlsx.ImportExcel;
+import com.atzuche.violation.enums.WzInfoStatusEnum;
+import com.atzuche.violation.enums.WzStatusEnums;
 import com.atzuche.violation.vo.req.ViolationDetailReqVO;
 import com.atzuche.violation.vo.resp.RenterOrderWzDetailResVO;
 import com.atzuche.violation.vo.resp.ViolationExportResVO;
@@ -75,7 +78,14 @@ public class ViolationInfoService {
         List<ViolationResVO> violationResDesVOList = renterOrderWzStatusMapper.queryIllegalOrderList(violationReqVO);
         for (ViolationResVO violationResVO: violationResDesVOList) {
             violationResVO.setOrderType("普通订单");
-            violationResVO.setWzProcessedProof(violationResVO.getWzProcessedProof().equals("0") ? "无违章" : "有违章");
+            if (org.apache.commons.lang3.StringUtils.isNotBlank(violationResVO.getWzInfo())) {
+                violationResVO.setWzInfo(WzInfoStatusEnum.getStatusDesc(Integer.valueOf(violationResVO.getWzInfo())));
+            }
+            if (org.apache.commons.lang3.StringUtils.isNotBlank(violationResVO.getWzStatus())) {
+                violationResVO.setWzStatus(WzStatusEnums.getStatusDesc(Integer.valueOf(violationResVO.getWzStatus())));
+            }
+            violationResVO.setCarType(CarOwnerTypeEnum.getNameByCode(Integer.valueOf(violationResVO.getCarType())));
+            violationResVO.setWzProcessedProof(violationResVO.getWzProcessedProof().equals("0") ? "无" : "有");
         }
         return  violationResDesVOList;
     }
