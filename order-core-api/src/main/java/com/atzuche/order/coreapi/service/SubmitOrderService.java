@@ -4,7 +4,9 @@ import com.alibaba.fastjson.JSON;
 import com.atzuche.order.accountrenterdeposit.vo.req.CreateOrderRenterDepositReqVO;
 import com.atzuche.order.accountrenterwzdepost.vo.req.CreateOrderRenterWZDepositReqVO;
 import com.atzuche.order.car.CarProxyService;
+import com.atzuche.order.cashieraccount.service.CashierPayService;
 import com.atzuche.order.cashieraccount.service.CashierService;
+import com.atzuche.order.cashieraccount.vo.req.pay.OrderPaySignReqVO;
 import com.atzuche.order.commons.CommonUtils;
 import com.atzuche.order.commons.LocalDateTimeUtils;
 import com.atzuche.order.commons.OrderReqContext;
@@ -60,6 +62,7 @@ import com.autoyol.car.api.model.dto.LocationDTO;
 import com.autoyol.car.api.model.dto.OrderInfoDTO;
 import com.autoyol.car.api.model.enums.OrderOperationTypeEnum;
 import com.autoyol.commons.utils.DateUtil;
+import com.autoyol.commons.utils.GsonUtils;
 import com.autoyol.event.rabbit.neworder.NewOrderMQActionEventEnum;
 import com.autoyol.event.rabbit.neworder.OrderCreateMq;
 import org.apache.commons.lang3.StringUtils;
@@ -128,7 +131,10 @@ public class SubmitOrderService {
     private RenterOrderWzStatusService renterOrderWzStatusService;
     @Autowired
     private OrderTransferRecordService orderTransferRecordService;
-
+    @Autowired 
+    private PayCallbackService payCallbackService;
+    @Autowired
+    private CashierPayService cashierPayService;
 
     /**
      * 提交订单
@@ -239,6 +245,18 @@ public class SubmitOrderService {
         orderStatusDTO.setOrderNo(orderNo);
         if (null == renterGoodsDetailDTO.getReplyFlag() || renterGoodsDetailDTO.getReplyFlag() == OrderConstant.NO) {
             orderStatusDTO.setStatus(OrderStatusEnum.TO_CONFIRM.getStatus());
+            
+            //如果是使用钱包，检测是否钱包全额抵扣，推动订单流程。huangjing 200324  刷新钱包
+            try {
+         	   if(orderReqVO != null && orderReqVO.getUseBal().intValue() == 1) {
+     	    	   OrderPaySignReqVO vo = cashierPayService.buildOrderPaySignReqVO(orderNo, orderReqVO.getMemNo(), orderReqVO.getUseBal());
+     	           String result = cashierPayService.getPaySignStr(vo,payCallbackService);
+     	          LOGGER.info("获取支付签名串result=[{}],params=[{}]",result,GsonUtils.toJson(vo));
+         	   }
+     		} catch (Exception e) {
+     			LOGGER.error("刷新钱包支付抵扣");
+     		}
+            
         } else {
             orderStatusDTO.setStatus(OrderStatusEnum.TO_PAY.getStatus());
         }
