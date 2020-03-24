@@ -22,6 +22,7 @@ import com.atzuche.order.cashieraccount.vo.req.DeductDepositToRentCostReqVO;
 import com.atzuche.order.cashieraccount.vo.res.CashierDeductDebtResVO;
 import com.atzuche.order.coin.service.AccountRenterCostCoinService;
 import com.atzuche.order.commons.PlatformProfitStatusEnum;
+import com.atzuche.order.commons.constant.OrderConstant;
 import com.atzuche.order.commons.entity.dto.*;
 import com.atzuche.order.commons.enums.FineTypeEnum;
 import com.atzuche.order.commons.enums.OrderStatusEnum;
@@ -184,7 +185,7 @@ public class OrderSettleNoTService {
     
     /**
      * 校验是否可以结算 校验订单状态 以及是否存在 理赔暂扣 存在不能进行结算 并CAT告警
-     * @param renterOrder
+     * @param settleOrders
      */
     public void check(SettleOrders settleOrders) {
     	RenterOrderEntity renterOrder = settleOrders.getRenterOrder();
@@ -201,22 +202,23 @@ public class OrderSettleNoTService {
 //            }
 //        }
         //3 校验是否存在 理赔  存在不结算
-        boolean isClaim = cashierSettleService.getOrderClaim(renterOrder.getOrderNo());
-        if(isClaim){
+        //boolean isClaim = cashierSettleService.getOrderClaim(renterOrder.getOrderNo());
+        if(null != orderStatus.getIsClaims() && orderStatus.getIsClaims() == OrderConstant.YES){
             throw new RuntimeException("租客存在理赔信息不能结算");
         }
         //3 是否存在 暂扣存在不结算
-//        boolean isDetain = cashierSettleService.getOrderDetain(renterOrder.getOrderNo());
-//        if(isDetain){
-//            throw new RuntimeException("租客存在暂扣信息不能结算");
-//        }
+//      boolean isDetain = cashierSettleService.getOrderDetain(renterOrder.getOrderNo());
+        if (null != orderStatus.getIsDetain() && orderStatus.getIsDetain() == OrderConstant.YES) {
+            throw new RuntimeException("租客存在暂扣信息不能结算");
+        }
         //4 先查询  发现 有结算数据停止结算 手动处理
         orderSettleNewService.checkIsSettle(renterOrder.getOrderNo(),settleOrders);
     }
     
     /**
      * 车辆结算  校验费用落库等无实物操作
-     * @param settleOrdersDefinition2 
+     * @param settleOrders
+     * @param settleOrdersDefinition
      */
     public void settleOrderFirst(SettleOrders settleOrders, SettleOrdersDefinition settleOrdersDefinition){
         //1 查询所有租客费用明细
