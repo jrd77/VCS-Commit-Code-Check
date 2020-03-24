@@ -42,8 +42,7 @@ public class CarDepositReturnDetailController {
         if (bindingResult.hasErrors()) {
             return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), ErrorCode.INPUT_ERROR.getText());
         }
-        ResponseData<CarDepositRespVo>  respVoResponseData = carDepositReturnDetailService.getCarDepositReturnDetail(reqVo);
-        return respVoResponseData;
+        return carDepositReturnDetailService.getCarDepositReturnDetail(reqVo);
     }
 
     /*@AutoDocMethod(description = "【liujun】车辆押金暂扣处理", value = "车辆押金暂扣处理", response = CarDepositOtherRespVO.class)

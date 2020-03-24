@@ -27,5 +27,7 @@ public class OrderAccountDetailRespDTO {
     public List<AccountDebtReceivableaDetailDTO> accountDebtReceivableaDetailDTOS;
     @AutoDocProperty(value = "收银台")
     public CashierDTO cashierDTO;
+    @AutoDocProperty(value = "租车押金暂扣原因列表")
+    public  List<RenterDetainReasonDTO> detainReasons;
 
 }

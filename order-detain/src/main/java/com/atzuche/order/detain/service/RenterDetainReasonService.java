@@ -2,12 +2,18 @@ package com.atzuche.order.detain.service;
 
 import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.constant.OrderConstant;
+import com.atzuche.order.commons.entity.orderDetailDto.RenterDetainReasonDTO;
 import com.atzuche.order.detain.entity.RenterDetainReasonEntity;
 import com.atzuche.order.detain.mapper.RenterDetainReasonMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -49,5 +55,22 @@ public class RenterDetainReasonService {
         return result;
     }
 
+
+    public List<RenterDetainReasonDTO> getListByOrderNo(String orderNo) {
+        List<RenterDetainReasonEntity> list = renterDetainReasonMapper.selectListByOrderNo(orderNo);
+
+        if (CollectionUtils.isEmpty(list)) {
+            return null;
+        }
+
+        List<RenterDetainReasonDTO> reasonList = new ArrayList<>();
+        list.forEach(entity -> {
+            RenterDetainReasonDTO dto = new RenterDetainReasonDTO();
+            BeanUtils.copyProperties(entity, dto);
+            reasonList.add(dto);
+        });
+
+        return reasonList;
+    }
 
 }

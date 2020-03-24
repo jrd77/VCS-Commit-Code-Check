@@ -13,13 +13,16 @@ import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.commons.enums.cashier.PaySourceEnum;
 import com.atzuche.order.commons.enums.cashier.PayTypeEnum;
 import com.atzuche.order.commons.enums.cashier.TransStatusEnum;
+import com.atzuche.order.commons.enums.detain.DetainTypeEnum;
 import com.atzuche.order.open.service.FeignOrderDetailService;
 import com.autoyol.commons.web.ResponseData;
 import com.dianping.cat.Cat;
 import com.dianping.cat.message.Transaction;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -148,6 +151,31 @@ public class CarDepositReturnDetailService {
         carDepositRespVo.setActDetainStatus("成功");
         carDepositRespVo.setActDetainTime(detainTime);
 
+        detainReasonHandle(carDepositRespVo, data.getDetainReasons());
         return ResponseData.success(carDepositRespVo);
+    }
+
+
+    /**
+     * 租车押金暂扣原因处理
+     *
+     * @param res           返回信息
+     * @param detainReasons 暂扣原因列表
+     */
+    private void detainReasonHandle(CarDepositRespVo res, List<RenterDetainReasonDTO> detainReasons) {
+        if (!CollectionUtils.isEmpty(detainReasons)) {
+            detainReasons.forEach(r -> {
+                if (StringUtils.equals(r.getDetainTypeCode(), DetainTypeEnum.risk.getCode())) {
+                    res.setFkDetainFlag(r.getDetainStatus().toString());
+                    res.setFkDetainReason(r.getDetainReasonCode());
+                } else if (StringUtils.equals(r.getDetainTypeCode(), DetainTypeEnum.trans.getCode())) {
+                    res.setJyDetainFlag(r.getDetainReasonCode());
+                    res.setJyDetainReason(r.getDetainReasonCode());
+                } else if (StringUtils.equals(r.getDetainTypeCode(), DetainTypeEnum.claims.getCode())) {
+                    res.setLpDetainFlag(r.getDetainReasonCode());
+                    res.setLpDetainReason(r.getDetainReasonCode());
+                }
+            });
+        }
     }
 }

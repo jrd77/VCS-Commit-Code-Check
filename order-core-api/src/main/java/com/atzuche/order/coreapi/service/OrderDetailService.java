@@ -46,6 +46,7 @@ import com.atzuche.order.delivery.service.handover.OwnerHandoverCarService;
 import com.atzuche.order.delivery.service.handover.RenterHandoverCarService;
 import com.atzuche.order.delivery.vo.delivery.DeliveryOilCostVO;
 import com.atzuche.order.delivery.vo.delivery.rep.OwnerGetAndReturnCarDTO;
+import com.atzuche.order.detain.service.RenterDetainReasonService;
 import com.atzuche.order.flow.entity.OrderFlowEntity;
 import com.atzuche.order.flow.service.OrderFlowService;
 import com.atzuche.order.owner.commodity.entity.OwnerGoodsEntity;
@@ -170,6 +171,8 @@ public class OrderDetailService {
     private AccountRenterWzDepositNoTService accountRenterWzDepositNoTService;
     @Autowired
     private OrderRefundRecordService orderRefundRecordService;
+    @Autowired
+    private RenterDetainReasonService renterDetainReasonService;
 
 
     private static final String UNIT_HOUR = "小时";
@@ -1244,12 +1247,17 @@ public class OrderDetailService {
             accountDebtReceivableaDetailDTOist.add(accountDebtReceivableaDetailDTO);
         });
 
+        //收银台
         CashierEntity cashierEntity = cashierNoTService.getCashierEntity(orderNo, accountRenterDepositEntity.getMemNo(), DataPayKindConstant.RENT);
         CashierDTO cashierDTO = null;
         if(cashierEntity != null){
             cashierDTO = new CashierDTO();
             BeanUtils.copyProperties(cashierEntity,cashierDTO);
         }
+
+        //租车押金暂扣原因
+        List<RenterDetainReasonDTO> dtos = renterDetainReasonService.getListByOrderNo(orderNo);
+
         OrderAccountDetailRespDTO orderAccountDetailRespDTO = new OrderAccountDetailRespDTO();
         orderAccountDetailRespDTO.orderDTO = orderDTO;
         orderAccountDetailRespDTO.orderStatusDTO = orderStatusDTO;
@@ -1261,6 +1269,7 @@ public class OrderDetailService {
         orderAccountDetailRespDTO.accountRenterCostDetailDTOS = accountRenterCostDetailDTOList;
         orderAccountDetailRespDTO.accountDebtReceivableaDetailDTOS = accountDebtReceivableaDetailDTOist;
         orderAccountDetailRespDTO.cashierDTO = cashierDTO;
+        orderAccountDetailRespDTO.detainReasons = dtos;
         return orderAccountDetailRespDTO;
     }
 
