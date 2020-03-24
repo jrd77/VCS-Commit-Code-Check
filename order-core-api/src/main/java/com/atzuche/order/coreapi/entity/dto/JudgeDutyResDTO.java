@@ -16,6 +16,11 @@ public class JudgeDutyResDTO {
      */
     private Boolean isNoticeSettle;
 
+    /**
+     * 是否通知累加节假日取消次数
+     */
+    private Boolean isNoticeOrderCancelMemHolidayDeduct;
+
 
 
 }

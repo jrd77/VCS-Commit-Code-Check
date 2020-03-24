@@ -1,12 +1,14 @@
 package com.atzuche.violation.controller;
 
 import com.atzuche.violation.cat.CatLogRecord;
+import com.atzuche.violation.common.AdminUserUtil;
 import com.atzuche.violation.exception.ViolationManageException;
 import com.atzuche.violation.service.ViolationManageService;
 import com.atzuche.violation.vo.req.*;
 import com.atzuche.violation.vo.resp.ViolationAlterationLogListResponseVO;
 import com.atzuche.violation.vo.resp.ViolationHandleInformationResponseVO;
 import com.atzuche.violation.vo.resp.ViolationInformationListResponseVO;
+import com.autoyol.commons.utils.GsonUtils;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.doc.annotation.AutoDocMethod;
@@ -16,6 +18,7 @@ import com.autoyol.event.rabbit.violation.ViolationRabbitMQEventEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -97,8 +100,12 @@ public class ViolationManageController {
         validateParameter(bindingResult);
         try{
             logger.info("违章编辑入参:{}",violationAlterationRequestVO.toString());
-            //rabbitTemplate.convertAndSend(ViolationRabbitMQEventEnum.ORDER_VIOLATION_CHANGE.exchange, ViolationRabbitMQEventEnum .ORDER_VIOLATION_CHANGE.routingKey, "");
             violationManageService.updateViolationHandle(violationAlterationRequestVO);
+            ViolationCompleteMqVO violationCompleteMqVO = new ViolationCompleteMqVO();
+            BeanUtils.copyProperties(violationAlterationRequestVO, violationCompleteMqVO);
+            violationCompleteMqVO.setOperator(AdminUserUtil.getAdminUser().getAuthName());
+            String mqJson = GsonUtils.toJson(violationCompleteMqVO);
+            rabbitTemplate.convertAndSend(ViolationRabbitMQEventEnum.ORDER_VIOLATION_CHANGE.exchange, ViolationRabbitMQEventEnum .ORDER_VIOLATION_CHANGE.routingKey, mqJson);
             CatLogRecord.successLog("违章编辑处理成功","console/order/violation/update",violationAlterationRequestVO);
             return ResponseData.success();
         } catch (Exception e) {
@@ -114,14 +121,18 @@ public class ViolationManageController {
         //参数验证
         validateParameter(bindingResult);
         try{
-            logger.info("违章编辑入参:{}",violationCompleteRequestVO.toString());
-            //rabbitTemplate.convertAndSend(ViolationRabbitMQEventEnum.ORDER_VIOLATION_CHANGE.exchange, ViolationRabbitMQEventEnum .ORDER_VIOLATION_CHANGE.routingKey, "");
+            logger.info("确认违章办理完成入参:{}",violationCompleteRequestVO.toString());
             violationManageService.updateConfirmComplete(violationCompleteRequestVO);
-            CatLogRecord.successLog("违章编辑处理成功","console/order/violation/update",violationCompleteRequestVO);
+            ViolationCompleteMqVO violationCompleteMqVO = new ViolationCompleteMqVO();
+            BeanUtils.copyProperties(violationCompleteRequestVO, violationCompleteMqVO);
+            violationCompleteMqVO.setOperator(AdminUserUtil.getAdminUser().getAuthName());
+            String mqJson = GsonUtils.toJson(violationCompleteMqVO);
+            rabbitTemplate.convertAndSend(ViolationRabbitMQEventEnum.ORDER_VIOLATION_CHANGE.exchange, ViolationRabbitMQEventEnum .ORDER_VIOLATION_CHANGE.routingKey, mqJson);
+            CatLogRecord.successLog("确认违章办理完成成功","console/order/violation/confirm/complete",violationCompleteRequestVO);
             return ResponseData.success();
         } catch (Exception e) {
-            logger.error("违章编辑异常:{}",e);
-            CatLogRecord.failLog("违章编辑异常","console/order/violation/update",violationCompleteRequestVO, e);
+            logger.error("确认违章办理完成异常:{}",e);
+            CatLogRecord.failLog("确认违章办理完成异常","console/order/violation/confirm/complete",violationCompleteRequestVO, e);
             throw new ViolationManageException(ErrorCode.SYS_ERROR.getCode(),ErrorCode.SYS_ERROR.getText());
         }
     }

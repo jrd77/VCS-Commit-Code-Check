@@ -1,5 +1,7 @@
 package com.atzuche.violation.service;
 
+import com.alibaba.fastjson.JSONObject;
+import com.atzuche.order.commons.enums.CarOwnerTypeEnum;
 import com.atzuche.order.commons.vo.req.ViolationReqVO;
 import com.atzuche.order.commons.vo.res.ViolationResVO;
 import com.atzuche.order.renterwz.entity.RenterOrderWzDetailEntity;
@@ -11,6 +13,8 @@ import com.atzuche.violation.common.FileUtil;
 import com.atzuche.violation.common.xlsx.ExportExcelUtil;
 import com.atzuche.violation.common.xlsx.ExportExcelWrapper;
 import com.atzuche.violation.common.xlsx.ImportExcel;
+import com.atzuche.violation.enums.WzInfoStatusEnum;
+import com.atzuche.violation.enums.WzStatusEnums;
 import com.atzuche.violation.vo.req.ViolationDetailReqVO;
 import com.atzuche.violation.vo.resp.RenterOrderWzDetailResVO;
 import com.atzuche.violation.vo.resp.ViolationExportResVO;
@@ -74,7 +78,14 @@ public class ViolationInfoService {
         List<ViolationResVO> violationResDesVOList = renterOrderWzStatusMapper.queryIllegalOrderList(violationReqVO);
         for (ViolationResVO violationResVO: violationResDesVOList) {
             violationResVO.setOrderType("普通订单");
-            violationResVO.setWzProcessedProof(violationResVO.getWzProcessedProof().equals("0") ? "无违章" : "有违章");
+            if (org.apache.commons.lang3.StringUtils.isNotBlank(violationResVO.getWzInfo())) {
+                violationResVO.setWzInfo(WzInfoStatusEnum.getStatusDesc(Integer.valueOf(violationResVO.getWzInfo())));
+            }
+            if (org.apache.commons.lang3.StringUtils.isNotBlank(violationResVO.getWzStatus())) {
+                violationResVO.setWzStatus(WzStatusEnums.getStatusDesc(Integer.valueOf(violationResVO.getWzStatus())));
+            }
+            violationResVO.setCarType(CarOwnerTypeEnum.getNameByCode(Integer.valueOf(violationResVO.getCarType())));
+            violationResVO.setWzProcessedProof(violationResVO.getWzProcessedProof().equals("0") ? "无" : "有");
         }
         return  violationResDesVOList;
     }
@@ -120,7 +131,7 @@ public class ViolationInfoService {
         log.info("查询出的数据源总长：{},耗时：{}",violationExportResVOS.size() ,System.currentTimeMillis() - startTime);
         ExportExcelWrapper exportExcelWrapper = new ExportExcelWrapper();
         String[] fieldDescription = AnnotationHandler.getFeildDescription(ViolationResDesVO.class);
-        log.info("开始进行导出操作，导出的字段名：{}",fieldDescription.toString());
+        log.info("开始进行导出操作，导出的字段名：{}", JSONObject.toJSONString(fieldDescription));
         exportExcelWrapper.exportExcel("违章管理列表数据"+ DateUtil.formatDate(new Date(),DateUtil.BASIC_DATE_TIME_FORMAT),"违章管理列表数据",fieldDescription,violationExportResVOS,response, ExportExcelUtil.EXCEl_FILE_2007);
         log.info("导出成功：文件名：{}","违章管理列表数据"+ DateUtil.formatDate(new Date(),DateUtil.BASIC_DATE_TIME_FORMAT));
     }
@@ -134,13 +145,13 @@ public class ViolationInfoService {
     public String importExcel(MultipartFile file, HttpServletRequest request) {
         String messageInfo = "";
         try {
-            String UploadPath = FileUtil.uploadFile(file, request.getServletContext());
-            if (StringUtils.isBlank(UploadPath)) {
+            String uploadPath = FileUtil.uploadFile(file, request.getServletContext());
+            if (StringUtils.isBlank(uploadPath)) {
                 log.info("文件写入失败,fileName-->>", file.getOriginalFilename());
             }
             String path = request.getServletContext().getRealPath("/");
             ImportExcel poi = new ImportExcel();
-            List<List<String>> list = poi.read(path + UploadPath);
+            List<List<String>> list = poi.read(path + uploadPath);
             if (list == null || list.size() == 0) {
                 messageInfo = "您的excel没有数据";
             }

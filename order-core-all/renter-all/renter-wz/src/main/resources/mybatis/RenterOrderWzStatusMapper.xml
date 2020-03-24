@@ -161,52 +161,118 @@
 		</trim>
 		WHERE order_no = #{orderNo} and car_plate_num = #{carPlateNum} and is_delete = 0
 	</update>
-    <select id="queryIllegalOrderList" parameterType="com.atzuche.order.commons.vo.req.ViolationReqVO" resultType="com.atzuche.order.commons.vo.res.ViolationResVO">
-        SELECT w.id,w.order_no as orderNo,f.rent_time as rentTime, IFNULL(p.id,0) as wzProcessedProof,
-        f.revert_time as revertTime, w.car_plate_num as plateNum,
-        f.frame_no as frameNo,f.engine_num as engineNo,
-        f.city_name as rentCity,w.status as wzStatus,
+    <select id="queryIllegalOrderList" parameterType="com.atzuche.order.commons.vo.req.ViolationReqVO"
+			resultType="com.atzuche.order.commons.vo.res.ViolationResVO">
+        select a.* from (SELECT w.id,w.order_no as orderNo,renter.exp_rent_time as rentTime, IFNULL(p.cid,0) as wzProcessedProof,
+		renter.exp_revert_time as revertTime, renter.act_revert_time as actualRevertTime, g.car_plate_num as plateNum,
+        g.frame_no as frameNo,g.engine_num as engineNo,g.car_owner_type as carType,
+		r.rent_city as rentCity, w.status as wzStatus,
+        w.illegal_query as wzInfo,
         w.wz_handle_complete_time as wzStatusChangeTime,
-        w.create_time as enterWzManageTime, f.cities as onlineCity
-        FROM renter_order_wz_status w
-        LEFT JOIN renter_order_wz_finished_todo f on w.order_no = f.order_no and w.car_plate_num = f.car_plate_num
-        LEFT JOIN renter_order_wz_illegal_photo p on w.order_no = p.order_no and w.car_plate_num = p.car_plate_num
-        <where>
-            <if test="orderNo != null and orderNo != ''">
-                and w.order_no = #{orderNo}
-            </if>
-            <if test="useCarCity != null and useCarCity != ''">
-                and f.city_name = #{useCarCity}
-            </if>
-            <if test="carNo != null and carNo != ''">
-                and w.car_plate_num = #{carNo}
-            </if>
-            <if test="mixViolationManagerDate != null and mixViolationManagerDate != ''">
-                and w.wz_handle_complete_time >= #{mixViolationManagerDate}
-            </if>
-            <if test="maxViolationManagerDate != null and maxViolationManagerDate != ''">
-                and w.wz_handle_complete_time &lt;= #{maxViolationManagerDate}
-            </if>
-            <if test="violationInfo != null and violationInfo != ''">
-                and w.illegal_query = #{violationInfo}
-            </if>
-            <if test="violationStatus != null and violationStatus != ''">
-                and w.status = #{violationStatus}
-            </if>
-            <if test="getCarDate != null and getCarDate != ''">
-                and  DATE_FORMAT(f.rent_time,'%Y-%m-%d') = #{getCarDate}
-            </if>
-            <if test="returnCarDate != null and returnCarDate != ''">
-                and  DATE_FORMAT(f.revert_time,'%Y-%m-%d') = #{returnCarDate}
-            </if>
-            <if test="violationPayStatus != null and violationPayStatus != '0'">
-                and p.id is null
-            </if>
-            <if test="violationPayStatus != null and violationPayStatus != '1'">
-                and p.id is not null
-            </if>
-            and w.is_delete = 0
-        </where>
+        DATE_ADD( DATE_FORMAT(renter.act_revert_time,'%Y%m%d'),INTERVAL 15 DAY) AS enterWzManageTime,
+        f.cities as onlineCity
+        FROM `order` r
+		LEFT JOIN renter_order_wz_status w  on r.order_no = w.order_no
+		LEFT JOIN renter_order renter on w.order_no = renter.order_no
+		LEFT JOIN renter_goods g on r.order_no = g.order_no
+		LEFT JOIN order_status s on w.order_no = s.order_no
+        LEFT JOIN (SELECT order_no,count(1)cid FROM renter_order_wz_illegal_photo group by order_no)p ON(w.order_no = p.order_no)
+        LEFT JOIN deren_car_approach_citys f on w.order_no = f.order_no
+        WHERE
+        r.city_code IN (select city_code from wz_query_day_conf where illegal_query_day = 15)
+        AND DATE_ADD( DATE_FORMAT(renter.act_revert_time,'%Y%m%d'),INTERVAL 15 DAY) &lt; NOW()
+        <!-- 进入违章管理日期-->
+        <if test="mixViolationManagerDate != null and mixViolationManagerDate != '' ">
+            AND (DATE_ADD( DATE_FORMAT(renter.act_revert_time,'%Y%m%d'),INTERVAL 15 DAY) &gt;=#{mixViolationManagerDate})
+        </if>
+        <if test="maxViolationManagerDate != null and maxViolationManagerDate != '' ">
+            AND (DATE_ADD( DATE_FORMAT(renter.act_revert_time,'%Y%m%d'),INTERVAL 15 DAY) &lt;=#{maxViolationManagerDate})
+        </if>
+        <include refid="whereCondition"/>
+        UNION ALL
+        SELECT w.id,w.order_no as orderNo,renter.exp_rent_time as rentTime, IFNULL(p.cid,0) as wzProcessedProof,
+        renter.exp_revert_time as revertTime, renter.act_revert_time as actualRevertTime, g.car_plate_num as plateNum,
+        g.frame_no as frameNo,g.engine_num as engineNo,g.car_owner_type as carType,
+        r.rent_city as rentCity, w.status as wzStatus,
+        w.illegal_query as wzInfo,
+        w.wz_handle_complete_time as wzStatusChangeTime,
+        DATE_ADD( DATE_FORMAT(renter.act_revert_time,'%Y%m%d'),INTERVAL 30 DAY) AS enterWzManageTime,
+        f.cities as onlineCity
+        FROM `order` r
+        LEFT JOIN renter_order_wz_status w  on r.order_no = w.order_no
+        LEFT JOIN renter_order renter on w.order_no = renter.order_no
+        LEFT JOIN renter_goods g on r.order_no = g.order_no
+        LEFT JOIN order_status s on w.order_no = s.order_no
+        LEFT JOIN (SELECT order_no,count(1)cid FROM renter_order_wz_illegal_photo group by order_no)p ON(w.order_no = p.order_no)
+        LEFT JOIN deren_car_approach_citys f on w.order_no = f.order_no
+        WHERE
+        r.city_code IN (select city_code from wz_query_day_conf where illegal_query_day = 15)
+        AND DATE_ADD( DATE_FORMAT(renter.act_revert_time,'%Y%m%d'),INTERVAL 30 DAY) &lt; NOW()
+        <!-- 进入违章管理日期-->
+        <if test="mixViolationManagerDate != null and mixViolationManagerDate != '' ">
+            AND  (DATE_ADD( DATE_FORMAT(renter.act_revert_time,'%Y%m%d'),INTERVAL 30 DAY) &gt;=#{mixViolationManagerDate})
+        </if>
+        <if test="maxViolationManagerDate != null and maxViolationManagerDate != '' ">
+            AND  (DATE_ADD( DATE_FORMAT(renter.act_revert_time,'%Y%m%d'),INTERVAL 30 DAY) &lt;=#{maxViolationManagerDate})
+        </if>
+        <include refid="whereCondition" />
+        ) a
+        group by a.orderNo,a.plateNum
+        order by a.actualRevertTime desc
     </select>
+
+    <sql id="whereCondition">
+        <trim>
+        <if test="orderNo != null and orderNo != ''">
+            and w.order_no = #{orderNo}
+        </if>
+        <if test="useCarCity != null and useCarCity != ''">
+            and r.rent_city = #{useCarCity}
+        </if>
+        <if test="carType != null and carType != ''">
+            and g.car_owner_type = #{carType}
+        </if>
+        <if test="carNo != null and carNo != ''">
+            and w.car_plate_num = #{carNo}
+        </if>
+        <if test="violationCostStatus != null and violationCostStatus == '0'">
+            and s.wz_pay_status = 0
+        </if>
+        <if test="violationCostStatus != null and violationCostStatus == '1'">
+            and s.wz_pay_status = 1
+        </if>
+        <if test="violationCostStatus != null and violationCostStatus == '2'">
+            and s.wz_refund_status = 0
+        </if>
+        <if test="violationCostStatus != null and violationCostStatus == '3'">
+            and s.wz_refund_status = 1
+        </if>
+        <if test="violationInfo != null and violationInfo != ''">
+            and w.illegal_query = #{violationInfo}
+        </if>
+        <if test="violationStatus != null and violationStatus != ''">
+            and w.status = #{violationStatus}
+        </if>
+        <if test="getCarDate != null and getCarDate != ''">
+            and  DATE_FORMAT(f.rent_time,'%Y-%m-%d') = #{getCarDate}
+        </if>
+        <if test="returnCarDate != null and returnCarDate != ''">
+            and  DATE_FORMAT(f.revert_time,'%Y-%m-%d') = #{returnCarDate}
+        </if>
+        <if test="minExpReturnCarDate != null and minExpReturnCarDate != ''">
+            and  renter.act_revert_time  >= #{minExpReturnCarDate}
+        </if>
+        <if test="maxExpReturnCarDate != null and maxExpReturnCarDate != ''">
+            and  renter.act_revert_time &lt;= #{maxExpReturnCarDate}
+        </if>
+        <if test="violationPayStatus != null and violationPayStatus != '0'">
+            and p.cid is null
+        </if>
+        <if test="violationPayStatus != null and violationPayStatus != '1'">
+            and p.cid > 0
+        </if>
+        and w.is_delete = 0 and renter.is_effective = 1
+        </trim>
+    </sql>
 
 </mapper>

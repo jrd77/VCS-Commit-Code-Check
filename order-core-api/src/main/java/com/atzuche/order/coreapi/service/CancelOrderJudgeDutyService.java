@@ -119,7 +119,7 @@ public class CancelOrderJudgeDutyService {
                         if(!cancelOrderReqDTO.getConsoleInvoke()) {
                             OrderRefundRecordEntity orderRefundRecordEntity =
                                     orderRefundRecordService.orderRefundDataConvert(cancelOrderReqDTO.getOrderNo(),
-                                            cancelOrderReqDTO.getRenterOrderNo(), cancelOrderReqDTO.getOwnerOrderNo(), penalty);
+                                            renterOrderEntity.getRenterOrderNo(), ownerOrderEntity.getOwnerOrderNo(), penalty);
                             orderRefundRecordEntity.setCreateOp(OrderConstant.SYSTEM_OPERATOR);
                             orderRefundRecordEntity.setUpdateOp(OrderConstant.SYSTEM_OPERATOR);
                             orderRefundRecordService.saveOrderRefundRecord(orderRefundRecordEntity);
@@ -217,7 +217,7 @@ public class CancelOrderJudgeDutyService {
 
         JudgeDutyResDTO judgeDutyRes = new JudgeDutyResDTO();
         judgeDutyRes.setIsNoticeSettle(isNoticeSettle);
-
+        judgeDutyRes.setIsNoticeOrderCancelMemHolidayDeduct(fineAmt != 0);
         return judgeDutyRes;
     }
 
