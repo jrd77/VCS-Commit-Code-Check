@@ -62,7 +62,7 @@ public class TransRefundManageTask extends IJobHandler {
                 } catch (Exception e) {
                     logger.error("执行 车主同意取消订单任务 异常 {},{}", GsonUtils.toJson(refundRecordEntity), e);
                     Cat.logError("执行 车主同意取消订单任务 异常 {}", e);
-                    XxlJobLogger.log("执行 车主同意取消订单任务 异常 {},{}", GsonUtils.toJson(refundRecordEntity));
+                    XxlJobLogger.log("执行 车主同意取消订单任务 异常 {}", GsonUtils.toJson(refundRecordEntity));
                 }
             }
 

@@ -159,8 +159,11 @@ public class CancelOrderService {
                     cancelOrderJudgeDutyRes.getIsSubsidyFineAmt(),
                     cancelReqTime, reqContext);
             //发送消息通知会员记录节假日取消次数
-            orderActionMqService.sendOrderCancelMemHolidayDeduct(cancelOrderReqVO.getOrderNo(),
-                    cancelOrderJudgeDutyRes.getMemNo(), cancelOrderJudgeDutyRes.getHolidayId(), cancelOrderReqVO.getOperatorName());
+            if(null != judgeDutyResDTO.getIsNoticeOrderCancelMemHolidayDeduct() && judgeDutyResDTO.getIsNoticeOrderCancelMemHolidayDeduct()) {
+                orderActionMqService.sendOrderCancelMemHolidayDeduct(cancelOrderReqVO.getOrderNo(),
+                        cancelOrderJudgeDutyRes.getMemNo(), cancelOrderJudgeDutyRes.getHolidayId(), cancelOrderReqVO.getOperatorName());
+            }
+
             if (judgeDutyResDTO.getIsNoticeSettle()) {
                 //通知结算计算凹凸币和钱包等
                 com.atzuche.order.settle.vo.req.CancelOrderReqDTO reqDTO =
@@ -249,8 +252,10 @@ public class CancelOrderService {
                 cancelOrderJudgeDutyRes.getIsSubsidyFineAmt(), orderCancelReasonEntity.getCancelReqTime(), reqContext);
         if (!isDispatch) {
             //发送消息通知会员记录节假日取消次数
-            orderActionMqService.sendOrderCancelMemHolidayDeduct(reqVO.getOrderNo(),
-                    cancelOrderJudgeDutyRes.getMemNo(), cancelOrderJudgeDutyRes.getHolidayId(), reqVO.getOperatorName());
+            if(null != judgeDutyResDTO.getIsNoticeOrderCancelMemHolidayDeduct() && judgeDutyResDTO.getIsNoticeOrderCancelMemHolidayDeduct()) {
+                orderActionMqService.sendOrderCancelMemHolidayDeduct(reqVO.getOrderNo(),
+                        cancelOrderJudgeDutyRes.getMemNo(), cancelOrderJudgeDutyRes.getHolidayId(), reqVO.getOperatorName());
+            }
             if (judgeDutyResDTO.getIsNoticeSettle()) {
                 //通知结算计算凹凸币和钱包等
                 com.atzuche.order.settle.vo.req.CancelOrderReqDTO reqDTO =
@@ -283,7 +288,10 @@ public class CancelOrderService {
         OrderRefundRecordEntity orderRefundRecordEntity = orderRefundRecordService.getByOrderNo(reqVO.getOrderNo());
         reqContext.setOrderRefundRecordEntity(orderRefundRecordEntity);
         //公共校验
-        cancelOrderCheckService.delayRefundCheck(reqContext);
+        if(refundRecordStatus == OrderConstant.ONE) {
+            //非定时任务校验
+            cancelOrderCheckService.delayRefundCheck(reqContext);
+        }
 
         //通知结算退款
         com.atzuche.order.settle.vo.req.CancelOrderReqDTO reqDTO =
