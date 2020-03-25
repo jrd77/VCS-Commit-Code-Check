@@ -207,7 +207,7 @@
         LEFT JOIN (SELECT order_no,count(1)cid FROM renter_order_wz_illegal_photo group by order_no)p ON(w.order_no = p.order_no)
         LEFT JOIN deren_car_approach_citys f on w.order_no = f.order_no
         WHERE
-        r.city_code IN (select city_code from wz_query_day_conf where illegal_query_day = 15)
+        r.city_code IN (select city_code from wz_query_day_conf where illegal_query_day = 30)
         AND DATE_ADD( DATE_FORMAT(renter.act_revert_time,'%Y%m%d'),INTERVAL 30 DAY) &lt; NOW()
         <!-- 进入违章管理日期-->
         <if test="mixViolationManagerDate != null and mixViolationManagerDate != '' ">
@@ -218,7 +218,6 @@
         </if>
         <include refid="whereCondition" />
         ) a
-        group by a.orderNo,a.plateNum
         order by a.actualRevertTime desc
     </select>
 
@@ -273,6 +272,7 @@
             and p.cid > 0
         </if>
         and w.is_delete = 0 and renter.is_effective = 1
+        group by w.order_no,w.car_plate_num
         </trim>
     </sql>
 
