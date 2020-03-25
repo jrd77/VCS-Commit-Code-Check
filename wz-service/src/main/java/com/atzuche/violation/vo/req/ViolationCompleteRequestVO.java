@@ -17,6 +17,7 @@ public class ViolationCompleteRequestVO {
     private String orderNo;
 
     @AutoDocProperty(value = "违章处理方,1:租客自行办理违章 2:凹凸代为办理违章 3:车主自行办理 4:无数据")
+    @NotBlank(message = "违章处理方不能为空")
     private String managementMode; //违章处理方
 
 }

@@ -415,7 +415,7 @@
 	<select id="queryAllList" resultMap="selectColumnMap">
 		select <include refid="select_column" />
 		from renter_order_wz_detail
-		where is_delete = 0
+		where  order_no = #{orderNo} and is_delete = 0
 	</select>
 
 </mapper>

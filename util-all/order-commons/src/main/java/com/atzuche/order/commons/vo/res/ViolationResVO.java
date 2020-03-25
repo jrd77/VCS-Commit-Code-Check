@@ -48,4 +48,6 @@ public class ViolationResVO {
     private String enterWzManageTime;
     @AutoDocProperty(value = "途径城市")
     private String onlineCity;
+    @AutoDocProperty(value = "动力源 列表不显示此字段")
+    private String powerType;
 }

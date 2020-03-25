@@ -10,6 +10,7 @@ import org.hibernate.validator.constraints.NotBlank;
 public class ViolationHandleAlterationRequestVO {
 
     @AutoDocProperty(value = "订单号")
+    @NotBlank(message = "主订单号不能为空")
     private String orderNo; // 订单号
 
     @AutoDocProperty(value = "车牌号")
