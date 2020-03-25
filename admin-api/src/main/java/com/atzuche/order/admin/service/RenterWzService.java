@@ -258,13 +258,6 @@ public class RenterWzService {
             orderStatusEntity.setOrderNo(req.getOrderNo());
             orderStatusService.updateRenterOrderByOrderNo(orderStatusEntity);
         }
-        /*WzTemporaryRefundLogEntity dto = new WzTemporaryRefundLogEntity();
-        BeanUtils.copyProperties(req,dto);
-        dto.setCreateTime(new Date());
-        dto.setOperator(AdminUserUtil.getAdminUser().getAuthName());
-        dto.setAmount(convertIntString(req.getAmount()));
-        dto.setStatus(1);
-        wzTemporaryRefundLogService.save(dto);*/
     }
 
     /**

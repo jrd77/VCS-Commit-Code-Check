@@ -119,9 +119,10 @@ public class RenterDetain {
             cashierService.detainRenterDeposit(detainRenterDepositReqVO);
         }
         if(DetailSourceEnum.WZ_DEPOSIT.equals(renterDetainVO.getEventType())){
-            OrderRenterDepositWZDetainReqVO orderRenterDepositWZDetainReqVO = getDetainRenterWZDepositReqVO(renterDetainVO,orderEntity.getMemNoRenter());
-            orderRenterDepositWZDetainReqVO.setMemNo(orderEntity.getMemNoRenter());
-            cashierService.detainRenterWZDeposit(orderRenterDepositWZDetainReqVO);
+            OrderRenterDepositWZDetainReqVO orderRenterDepositWzDetainReqVO =
+                    getDetainRenterWZDepositReqVO(renterDetainVO,orderEntity.getMemNoRenter());
+            orderRenterDepositWzDetainReqVO.setMemNo(orderEntity.getMemNoRenter());
+            cashierService.detainRenterWZDeposit(orderRenterDepositWzDetainReqVO);
         }
     }
 

@@ -63,6 +63,7 @@ public class AccountRenterDetainCostNoTService {
             accountRenterDetainCostEntity.setVersion(OrderConstant.ZERO);
             accountRenterDetainCostEntity.setAmt(detainRenterDeposit.getAmt());
             accountRenterDetainCostEntity.setOrderNo(detainRenterDeposit.getOrderNo());
+            accountRenterDetainCostEntity.setMemNo(detainRenterDeposit.getMemNo());
             accountRenterDetainCostMapper.insertSelective(accountRenterDetainCostEntity);
         } else {
             accountRenterDetainCostEntity.setVersion(accountRenterWzDepositCost.getVersion());
