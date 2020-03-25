@@ -77,8 +77,7 @@ public class ConfigServiceConfiguration {
         return service;
     }
     @Bean
-    public ServicePointService registerServicePointService(@Autowired ConfigRegisterFactory factory,
-                                                           ServicePointService service){
+    public ServicePointService registerServicePointService(@Autowired ConfigRegisterFactory factory, ServicePointService service){
         factory.register(service);
         return service;
     }

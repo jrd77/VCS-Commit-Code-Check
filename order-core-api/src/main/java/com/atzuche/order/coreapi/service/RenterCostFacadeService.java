@@ -369,6 +369,7 @@ public class RenterCostFacadeService {
         wzCostStatisticsDTO.realRetreatAmt = renterCostVO.getDepositWzCostReal();   //wzDepositDetailVO.getRealReturnDeposit();
         wzDepositDTO.costStatisticsDTO = wzCostStatisticsDTO;
 
+
         //4、租车费用结算后补付
         int needIncrementAmt = cashierPayService.getRentCostBufuNew(orderNo, memNo);
         SettleMakeUpDTO settleMakeUpDTO = new SettleMakeUpDTO();
@@ -387,6 +388,7 @@ public class RenterCostFacadeService {
 
 
 
+
         //5、统计费用
         CostStatisticsDTO costStatisticsDTO = getCostStatistics(rentCarCostStatics, carDepositStatisticsDTO, wzCostStatisticsDTO,settleMakeUpDTO);
         RenterCostDetailDTO renterCostDetailDTO = new RenterCostDetailDTO();
@@ -396,6 +398,7 @@ public class RenterCostFacadeService {
         renterCostDetailDTO.wzDepositDTO = wzDepositDTO;
         renterCostDetailDTO.settleMakeUpDTO = settleMakeUpDTO;
         return renterCostDetailDTO;
+
     }
 
     public CostStatisticsDTO getCostStatistics(CostStatisticsDTO rentCar,CostStatisticsDTO carDeposit,CostStatisticsDTO wz,SettleMakeUpDTO settleMakeUpDTO){
