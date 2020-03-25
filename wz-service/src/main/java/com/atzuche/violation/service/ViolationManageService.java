@@ -276,7 +276,7 @@ public class ViolationManageService {
         renterOrderWzDetail.setOrderFlag(1);
         renterOrderWzDetailService.saveRenterOrderWzDetail(renterOrderWzDetail);
         renterOrderWzSettleFlagService.updateIsIllegal(renterOrderWzDetail.getOrderNo(),renterOrderWzDetail.getCarPlateNum(),2, AdminUserUtil.getAdminUser().getAuthName());
-        renterOrderWzStatusService.updateTransWzDisposeStatus(violationAdditionRequestVO.getOrderNo(),violationAdditionRequestVO.getPlateNum(),25);
+        renterOrderWzStatusService.updateTransWzDisposeStatusAndQueryStatus(violationAdditionRequestVO.getOrderNo(),violationAdditionRequestVO.getPlateNum(),25);
 
     }
 
