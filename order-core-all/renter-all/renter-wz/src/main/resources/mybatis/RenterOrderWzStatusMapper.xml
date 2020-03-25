@@ -16,6 +16,8 @@
 		<result property="statusDesc" column="status_desc"/>
 		<result property="managementMode" column="management_mode"/>
 		<result property="wzHandleCompleteTime" column="wz_handle_complete_time"/>
+		<result property="wzRenterLastTime" column="wz_renter_last_time"/>
+		<result property="wzRenterLastTime" column="wz_platform_last_time"/>
 		<result property="illegalQuery" column="illegal_query"/>
 		<result property="createTime" column="create_time"/>
 		<result property="createOp" column="create_op"/>

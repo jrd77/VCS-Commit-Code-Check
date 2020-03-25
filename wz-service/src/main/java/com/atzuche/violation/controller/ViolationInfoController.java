@@ -112,19 +112,19 @@ public class ViolationInfoController {
 
     /**
      * 导入违章管理列表
-     * @param file
+     * @param xlsfile
      * @return
      */
     @AutoDocMethod(description = "导入违章管理列表数据excel", value = "导入违章管理列表数据excel", response = ResponseData.class)
     @PostMapping("/import")
-    public ResponseData importExcel(@RequestParam("xlsfile") MultipartFile file, HttpServletRequest request) {
+    public ResponseData importExcel(@RequestParam("xlsfile") MultipartFile xlsfile, HttpServletRequest request) {
         try {
             logger.info("导入导入违章管理列表数据excel开始");
-            if (null == file || file.isEmpty()) {
+            if (null == xlsfile || xlsfile.isEmpty()) {
                 logger.info("没有导入文件");
                 return ResponseData.success();
             }
-            String messageInfo = violationInfoService.importExcel(file, request);
+            String messageInfo = violationInfoService.importExcel(xlsfile, request);
             ResponseData.createErrorCodeResponse(ErrorCode.SUCCESS.getCode(), messageInfo);
         } catch (Exception e) {
             logger.info("导入批量修改打款状态excel异常", e);
