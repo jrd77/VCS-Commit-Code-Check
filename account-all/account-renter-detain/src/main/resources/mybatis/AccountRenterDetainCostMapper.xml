@@ -68,12 +68,12 @@
 				<if test="orderNo != null">`order_no` = #{orderNo}, </if>
 				<if test="memNo != null">`mem_no` = #{memNo}, </if>
 				<if test="amt != null">`amt` = #{amt}, </if>
-				version = #{version},
 				<if test="createTime != null">`create_time` = #{createTime}, </if>
 				<if test="createOp != null">`create_op` = #{createOp}, </if>
 				<if test="updateTime != null">`update_time` = #{updateTime}, </if>
 				<if test="updateOp != null">`update_op` = #{updateOp}, </if>
 				<if test="isDelete != null">`is_delete` = #{isDelete}</if>
+                version = version + 1,
 			</set>
 		where id = #{id} and version = #{version}
 	</update>

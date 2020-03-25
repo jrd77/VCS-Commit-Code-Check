@@ -74,20 +74,17 @@ public class AccountRenterDepositNoTService {
         }
         //计算剩余可扣金额押金总和
         int surplusAmt = accountRenterDepositEntity.getSurplusDepositAmt();
-        if(-detainRenterDepositReqVO.getAmt() + surplusAmt<0){
+        if(-detainRenterDepositReqVO.getAmt() + surplusAmt < 0){
             //可用 剩余押金 不足
             throw new PayOrderRenterDepositDBException();
         }
+
         AccountRenterDepositEntity accountRenterDeposit = new AccountRenterDepositEntity();
         accountRenterDeposit.setId(accountRenterDepositEntity.getId());
         accountRenterDeposit.setVersion(accountRenterDepositEntity.getVersion());
         //押金剩余金额
-        accountRenterDeposit.setSurplusDepositAmt(accountRenterDepositEntity.getSurplusDepositAmt() - Math.abs(detainRenterDepositReqVO.getAmt()));
-
+        accountRenterDeposit.setSurplusDepositAmt(accountRenterDepositEntity.getSurplusDepositAmt() - detainRenterDepositReqVO.getAmt());
         int result =  accountRenterDepositMapper.updateByPrimaryKeySelective(accountRenterDeposit);
-        if(result==0){
-            throw new PayOrderRenterDepositDBException();
-        }
     }
 
     /**
