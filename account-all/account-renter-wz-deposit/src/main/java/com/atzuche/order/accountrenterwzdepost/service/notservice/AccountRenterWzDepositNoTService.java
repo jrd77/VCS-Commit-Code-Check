@@ -156,27 +156,24 @@ public class AccountRenterWzDepositNoTService {
             throw new PayOrderRenterWZDepositException();
         }
     }
-    
+
     /**
      * 更新违章押金 应退退金额
-     * @param vo
+     *
+     * @param vo 参数
      */
     public void updateRenterWZDeposit(OrderRenterDepositWZDetainReqVO vo) {
-        AccountRenterWzDepositEntity accountRenterDepositEntity = accountRenterWzDepositMapper.selectByOrderAndMemNo(vo.getOrderNo(),vo.getMemNo());
-        if(Objects.isNull(accountRenterDepositEntity)){
+        AccountRenterWzDepositEntity accountRenterDepositEntity = accountRenterWzDepositMapper.selectByOrderAndMemNo(vo.getOrderNo(), vo.getMemNo());
+        if (Objects.isNull(accountRenterDepositEntity)) {
             throw new PayOrderRenterWZDepositException();
         }
-        vo.setAmt(accountRenterDepositEntity.getShouldReturnDeposit());
         AccountRenterWzDepositEntity accountRenterDeposit = new AccountRenterWzDepositEntity();
         accountRenterDeposit.setId(accountRenterDepositEntity.getId());
         accountRenterDeposit.setVersion(accountRenterDepositEntity.getVersion());
-//        accountRenterDeposit.setShouldReturnDeposit(0);
-      //押金剩余金额  应退
-        //accountRenterDeposit.setShouldReturnDeposit(accountRenterDepositEntity.getShishouDeposit() - Math.abs(vo.getAmt()));
-        accountRenterDeposit.setShouldReturnDeposit(vo.getAmt());
-        
+        accountRenterDeposit.setSurplusDepositAmt(0);
+
         int result = accountRenterWzDepositMapper.updateByPrimaryKeySelective(accountRenterDeposit);
-        if(result==0){
+        if (result == 0) {
             throw new PayOrderRenterWZDepositException();
         }
     }

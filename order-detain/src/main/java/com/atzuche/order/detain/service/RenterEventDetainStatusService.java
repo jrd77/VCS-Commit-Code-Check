@@ -36,7 +36,7 @@ public class RenterEventDetainStatusService{
     }
 
     public void updateEventDetainStatus(RenterEventDetainEntity renterEventDetainEntity) {
-        RenterEventDetainStatusEntity ent = renterEventDetainStatusMapper.selectByRentOrderNo(renterEventDetainEntity.getRenterOrderNo());
+        RenterEventDetainStatusEntity ent = renterEventDetainStatusMapper.selectByOrderNo(renterEventDetainEntity.getOrderNo());
         ent.setStatus(DetainStatusEnum.DETAIN_CANCEL.getCode());
         renterEventDetainStatusMapper.updateByPrimaryKeySelective(ent);
     }
