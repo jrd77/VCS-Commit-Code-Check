@@ -4,6 +4,7 @@ import com.atzuche.order.accountrenterdetain.entity.AccountRenterDetainCostEntit
 import com.atzuche.order.accountrenterdetain.exception.AccountRenterDetainDetailException;
 import com.atzuche.order.accountrenterdetain.mapper.AccountRenterDetainCostMapper;
 import com.atzuche.order.accountrenterdetain.vo.req.ChangeDetainRenterDepositReqVO;
+import com.atzuche.order.commons.constant.OrderConstant;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -49,26 +50,25 @@ public class AccountRenterDetainCostNoTService {
 
     /**
      * 更新暂扣总额
-     * @param detainRenterDeposit
+     *
+     * @param detainRenterDeposit 暂扣信息
      */
     public void changeRenterDetainCost(ChangeDetainRenterDepositReqVO detainRenterDeposit) {
-        //1 校验
-        AccountRenterDetainCostEntity accountRenterWzDepositCost = accountRenterDetainCostMapper.getRenterDetainAmt(detainRenterDeposit.getOrderNo(),detainRenterDeposit.getMemNo());
-        if(Objects.isNull(accountRenterWzDepositCost) || Objects.isNull(accountRenterWzDepositCost.getAmt())){
+        if (detainRenterDeposit.getAmt() == 0) {
             throw new AccountRenterDetainDetailException();
         }
-        int amt = detainRenterDeposit.getAmt() + accountRenterWzDepositCost.getAmt();
-        if(amt<0){
-            throw new AccountRenterDetainDetailException();
-        }
-        // 2 更新违章费用账户余额
+        AccountRenterDetainCostEntity accountRenterWzDepositCost = accountRenterDetainCostMapper.getRenterDetainAmt(detainRenterDeposit.getOrderNo(), detainRenterDeposit.getMemNo());
         AccountRenterDetainCostEntity accountRenterDetainCostEntity = new AccountRenterDetainCostEntity();
-        accountRenterDetainCostEntity.setVersion(accountRenterWzDepositCost.getVersion());
-        accountRenterDetainCostEntity.setAmt(amt);
-        accountRenterDetainCostEntity.setId(accountRenterWzDepositCost.getId());
-        int result = accountRenterDetainCostMapper.updateByPrimaryKeySelective(accountRenterDetainCostEntity);
-        if(result==0){
-            throw new AccountRenterDetainDetailException();
+        if (null == accountRenterWzDepositCost) {
+            accountRenterDetainCostEntity.setVersion(OrderConstant.ZERO);
+            accountRenterDetainCostEntity.setAmt(detainRenterDeposit.getAmt());
+            accountRenterDetainCostEntity.setOrderNo(detainRenterDeposit.getOrderNo());
+            accountRenterDetainCostMapper.insertSelective(accountRenterDetainCostEntity);
+        } else {
+            accountRenterDetainCostEntity.setVersion(accountRenterWzDepositCost.getVersion());
+            accountRenterDetainCostEntity.setAmt(detainRenterDeposit.getAmt() + accountRenterWzDepositCost.getAmt());
+            accountRenterDetainCostEntity.setId(accountRenterWzDepositCost.getId());
+            accountRenterDetainCostMapper.updateByPrimaryKeySelective(accountRenterDetainCostEntity);
         }
     }
 }
