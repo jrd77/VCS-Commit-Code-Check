@@ -133,10 +133,10 @@ public class OwnerAgreeOrderService {
         
         //如果是使用钱包，检测是否钱包全额抵扣，推动订单流程。huangjing 200324  刷新钱包
        try {
-    	   if(renterOrderEntity != null && renterOrderEntity.getIsUseWallet().intValue() == 1) {
+    	   if(renterOrderEntity.getIsUseWallet() == OrderConstant.YES) {
 	    	   OrderPaySignReqVO vo = cashierPayService.buildOrderPaySignReqVO(renterOrderEntity);
-	           String result = cashierPayService.getPaySignStr(vo,payCallbackService);
-	           logger.info("获取支付签名串result=[{}],params=[{}]",result,GsonUtils.toJson(vo));
+	           cashierPayService.getPaySignStrNew(vo,payCallbackService);
+	           logger.info("获取支付签名串B.params=[{}]",GsonUtils.toJson(vo));
     	   }
 		} catch (Exception e) {
 			logger.error("刷新钱包支付抵扣");
