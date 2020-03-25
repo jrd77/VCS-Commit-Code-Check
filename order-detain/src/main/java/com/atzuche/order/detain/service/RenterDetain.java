@@ -136,7 +136,7 @@ public class RenterDetain {
         BeanUtils.copyProperties(renterDetainVO,result);
         result.setRenterCashCodeEnum(RenterCashCodeEnum.ACCOUNT_WZ_DEPOSIT_DETAIN_CAR_AMT);
         AccountRenterWZDepositResVO vo = accountRenterWzDepositService.getAccountRenterWZDeposit(renterDetainVO.getOrderNo(),memNo);
-        result.setAmt(vo.getShouldReturnDeposit());
+        result.setAmt(vo.getShishouDeposit());
         return result;
     }
 
@@ -149,7 +149,8 @@ public class RenterDetain {
         BeanUtils.copyProperties(renterDetainVO,result);
         result.setRenterCashCodeEnum(RenterCashCodeEnum.ACCOUNT_DEPOSIT_DETAIN_CAR_AMT);
         AccountRenterDepositResVO vo = accountRenterDepositService.getAccountRenterDepositEntity(renterDetainVO.getOrderNo(),memNo);
-        result.setAmt(vo.getSurplusDepositAmt());
+        result.setAmt(vo.getShifuDepositAmt());
+        result.setMemNo(memNo);
         return result;
     }
 
