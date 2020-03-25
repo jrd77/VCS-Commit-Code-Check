@@ -35,6 +35,11 @@ public class OrderConstant {
      */
     public static final int TWO = 2;
 
+    /**
+     * 3
+     */
+    public static final int THREE = 3;
+
 
 
 

@@ -8,6 +8,7 @@ import com.atzuche.order.commons.enums.*;
 import com.atzuche.order.coreapi.entity.CancelOrderReqContext;
 import com.atzuche.order.coreapi.entity.dto.CancelOrderReqDTO;
 import com.atzuche.order.coreapi.entity.dto.CancelOrderResDTO;
+import com.atzuche.order.coreapi.entity.dto.CheckCarDispatchResDTO;
 import com.atzuche.order.coreapi.service.remote.CarRentalTimeApiProxyService;
 import com.atzuche.order.flow.service.OrderFlowService;
 import com.atzuche.order.ownercost.entity.OwnerOrderEntity;
@@ -90,17 +91,17 @@ public class OwnerCancelOrderService {
         //获取车主券信息
         OrderCouponEntity ownerCouponEntity = reqContext.getOwnerCouponEntity();
         //调度判定
-        boolean isDispatch =
+        CheckCarDispatchResDTO checkCarDispatch =
                 carRentalTimeApiService.checkCarDispatch(carRentalTimeApiService.buildCarDispatchReqVO(orderEntity,
-                        orderStatusEntity, ownerCouponEntity, 2));
+                        orderStatusEntity, ownerCouponEntity, OrderConstant.TWO));
 
         CancelOrderResDTO cancelOrderResDTO = new CancelOrderResDTO();
         cancelOrderResDTO.setOrderNo(cancelOrderReqDTO.getOrderNo());
-        cancelOrderResDTO.setIsDispatch(isDispatch);
+        cancelOrderResDTO.setIsDispatch(null != checkCarDispatch.getIsDispatch() && checkCarDispatch.getIsDispatch());
 
         OrderStatusDTO orderStatusDTO = new OrderStatusDTO();
         orderStatusDTO.setOrderNo(cancelOrderReqDTO.getOrderNo());
-        if (isDispatch) {
+        if (null != checkCarDispatch.getIsDispatch() && checkCarDispatch.getIsDispatch()) {
             //取消进调度
             orderStatusDTO.setStatus(OrderStatusEnum.TO_DISPATCH.getStatus());
             orderStatusDTO.setIsDispatch(OrderConstant.YES);
