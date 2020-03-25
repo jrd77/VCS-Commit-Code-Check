@@ -163,11 +163,12 @@
 	</update>
     <select id="queryIllegalOrderList" parameterType="com.atzuche.order.commons.vo.req.ViolationReqVO"
 			resultType="com.atzuche.order.commons.vo.res.ViolationResVO">
-        select a.* from (SELECT w.id,w.order_no as orderNo,renter.exp_rent_time as rentTime, IFNULL(p.cid,0) as wzProcessedProof,
+        select a.* from
+		(SELECT w.id,w.order_no as orderNo,renter.exp_rent_time as rentTime, IFNULL(p.cid,0) as wzProcessedProof,
 		renter.exp_revert_time as revertTime, renter.act_revert_time as actualRevertTime, g.car_plate_num as plateNum,
         g.frame_no as frameNo,g.engine_num as engineNo,g.car_owner_type as carType,
 		r.rent_city as rentCity, w.status as wzStatus,
-        w.illegal_query as wzInfo,
+        w.illegal_query as wzInfo,g.car_engine_type as powerType,
         w.wz_handle_complete_time as wzStatusChangeTime,
         DATE_ADD( DATE_FORMAT(renter.act_revert_time,'%Y%m%d'),INTERVAL 15 DAY) AS enterWzManageTime,
         f.cities as onlineCity
@@ -194,7 +195,7 @@
         renter.exp_revert_time as revertTime, renter.act_revert_time as actualRevertTime, g.car_plate_num as plateNum,
         g.frame_no as frameNo,g.engine_num as engineNo,g.car_owner_type as carType,
         r.rent_city as rentCity, w.status as wzStatus,
-        w.illegal_query as wzInfo,
+        w.illegal_query as wzInfo,g.car_engine_type as powerType,
         w.wz_handle_complete_time as wzStatusChangeTime,
         DATE_ADD( DATE_FORMAT(renter.act_revert_time,'%Y%m%d'),INTERVAL 30 DAY) AS enterWzManageTime,
         f.cities as onlineCity
@@ -206,7 +207,7 @@
         LEFT JOIN (SELECT order_no,count(1)cid FROM renter_order_wz_illegal_photo group by order_no)p ON(w.order_no = p.order_no)
         LEFT JOIN deren_car_approach_citys f on w.order_no = f.order_no
         WHERE
-        r.city_code IN (select city_code from wz_query_day_conf where illegal_query_day = 15)
+        r.city_code IN (select city_code from wz_query_day_conf where illegal_query_day = 30)
         AND DATE_ADD( DATE_FORMAT(renter.act_revert_time,'%Y%m%d'),INTERVAL 30 DAY) &lt; NOW()
         <!-- 进入违章管理日期-->
         <if test="mixViolationManagerDate != null and mixViolationManagerDate != '' ">
@@ -217,7 +218,6 @@
         </if>
         <include refid="whereCondition" />
         ) a
-        group by a.orderNo,a.plateNum
         order by a.actualRevertTime desc
     </select>
 
@@ -272,6 +272,7 @@
             and p.cid > 0
         </if>
         and w.is_delete = 0 and renter.is_effective = 1
+        group by w.order_no,w.car_plate_num
         </trim>
     </sql>
 

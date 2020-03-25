@@ -16,7 +16,7 @@ public class ViolationCompleteMqVO {
     @NotBlank(message = "主订单号不能为空")
     private String orderNo;
 
-    @AutoDocProperty(value = "违操作人")
+    @AutoDocProperty(value = "操作人")
     private String operator;
 
 }
