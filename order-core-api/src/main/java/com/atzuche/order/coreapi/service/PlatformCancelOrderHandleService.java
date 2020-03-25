@@ -4,6 +4,8 @@ import com.atzuche.order.commons.constant.OrderConstant;
 import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
 import com.atzuche.order.commons.enums.*;
 import com.atzuche.order.coreapi.entity.dto.CancelOrderResDTO;
+import com.atzuche.order.coreapi.entity.dto.CheckCarDispatchResDTO;
+import com.atzuche.order.coreapi.entity.vo.req.CarDispatchReqVO;
 import com.atzuche.order.coreapi.service.remote.CarRentalTimeApiProxyService;
 import com.atzuche.order.coreapi.submitOrder.exception.CancelOrderCheckException;
 import com.atzuche.order.flow.service.OrderFlowService;
@@ -95,16 +97,18 @@ public class PlatformCancelOrderHandleService {
         //获取车主订单信息
         OwnerOrderEntity ownerOrderEntity = ownerOrderService.getOwnerOrderByOrderNoAndIsEffective(orderNo);
         //后台取消进调度判定逻辑
-        boolean isDispatch =
-                carRentalTimeApiService.checkCarDispatch(carRentalTimeApiService.buildCarDispatchReqVO(orderEntity,
-                        orderStatusEntity, ownerCouponEntity,null));
+        CarDispatchReqVO carDispatchReqVO = carRentalTimeApiService.buildCarDispatchReqVO(orderEntity,
+                orderStatusEntity, ownerCouponEntity,OrderConstant.THREE);
+        carDispatchReqVO.setPlateCode(cancelReasonEnum.getCode());
+        CheckCarDispatchResDTO checkCarDispatch =
+                carRentalTimeApiService.checkCarDispatch(carDispatchReqVO);
 
         OrderStatusDTO orderStatusDTO = new OrderStatusDTO();
         orderStatusDTO.setOrderNo(orderNo);
 
         CancelOrderResDTO cancelOrderResDTO = new CancelOrderResDTO();
-        cancelOrderResDTO.setIsDispatch(isDispatch);
-        if(isDispatch) {
+        cancelOrderResDTO.setIsDispatch(null != checkCarDispatch.getIsDispatch() && checkCarDispatch.getIsDispatch());
+        if(null != checkCarDispatch.getIsDispatch() && checkCarDispatch.getIsDispatch()) {
             //进调度
             //订单状态更新
             orderStatusDTO.setStatus(OrderStatusEnum.TO_DISPATCH.getStatus());

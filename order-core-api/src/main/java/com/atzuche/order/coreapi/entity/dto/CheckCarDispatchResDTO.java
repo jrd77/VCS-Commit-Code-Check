@@ -20,4 +20,16 @@ public class CheckCarDispatchResDTO {
      * 不进调度的原因
      */
     private String noDispatchReason;
+
+    public CheckCarDispatchResDTO() {
+    }
+
+    public CheckCarDispatchResDTO(Boolean isDispatch) {
+        this.isDispatch = isDispatch;
+    }
+
+    public CheckCarDispatchResDTO(Boolean isDispatch, String noDispatchReason) {
+        this.isDispatch = isDispatch;
+        this.noDispatchReason = noDispatchReason;
+    }
 }
