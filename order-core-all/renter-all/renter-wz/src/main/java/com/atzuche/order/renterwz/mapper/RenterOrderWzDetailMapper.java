@@ -157,6 +157,6 @@ public interface RenterOrderWzDetailMapper{
 	 * 批量查询
 	 * @return 查询列表
 	 */
-	List<RenterOrderWzDetailEntity> queryAllList();
+	List<RenterOrderWzDetailEntity> queryAllList(@Param("orderNo") String orderNo);
 
 }
