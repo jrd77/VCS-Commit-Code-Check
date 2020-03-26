@@ -303,7 +303,7 @@ public class DeliveryCarService {
         orderDeliveryDTO.setRentTime(orderReqContext.getOrderReqVO().getRentTime());
         orderDeliveryDTO.setRevertTime(orderReqContext.getOrderReqVO().getRevertTime());
         orderDeliveryDTO.setType(orderType);
-        orderDeliveryDTO.setParamsTypeValue(orderReqVO, orderType);
+        orderDeliveryDTO.setParamsTypeValue(orderReqVO, orderType,renterGoodsDetailDTO);
         //如果没有使用取还车服务则不需要flow数据 暂加入
         orderDeliveryFlowEntity.setRenterOrderNo(renterGoodsDetailDTO.getRenterOrderNo());
         orderDeliveryFlowEntity.setOrderNo(renterGoodsDetailDTO.getOrderNo());
