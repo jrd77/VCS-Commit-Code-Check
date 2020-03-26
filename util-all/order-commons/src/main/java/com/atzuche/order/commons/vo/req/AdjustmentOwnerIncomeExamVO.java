@@ -14,12 +14,12 @@ public class AdjustmentOwnerIncomeExamVO {
     /*
     * 调账金额
     * */
-    @NotNull(message = "调整金额不能为空")
+    @NotNull(message = "调账金额不能为空")
     private Integer adjustmentAmt;
     /*
     * 审核状态 2,审核通过 3,审核拒绝
      * */
-    @NotNull(message = "审核状态")
+    @NotNull(message = "审核状态不能为空")
     private Integer auditStatus;
     /*
     * 审核人

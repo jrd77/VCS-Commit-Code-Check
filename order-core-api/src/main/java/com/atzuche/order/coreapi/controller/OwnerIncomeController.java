@@ -4,6 +4,7 @@ import com.atzuche.order.accountownerincome.entity.AccountOwnerIncomeExamineEnti
 import com.atzuche.order.accountownerincome.service.notservice.AccountOwnerIncomeExamineNoTService;
 import com.atzuche.order.cashieraccount.service.CashierQueryService;
 import com.atzuche.order.cashieraccount.service.CashierService;
+import com.atzuche.order.commons.BindingResultUtil;
 import com.atzuche.order.commons.vo.req.AdjustmentOwnerIncomeExamVO;
 import com.atzuche.order.commons.vo.req.income.AccountOwnerIncomeExamineOpReqVO;
 import com.atzuche.order.commons.vo.req.income.AccountOwnerIncomeExamineReqVO;
@@ -19,6 +20,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -100,7 +102,8 @@ public class OwnerIncomeController {
 
     @AutoDocMethod(value = "调账收益录入接口", description = "调账收益录入接口")
     @PostMapping("/adjustmentOwnerIncomeExam")
-    public ResponseData adjustmentOwnerIncomeExam(@RequestBody @Valid AdjustmentOwnerIncomeExamVO adjustmentOwnerIncomeExamVO){
+    public ResponseData adjustmentOwnerIncomeExam(@RequestBody @Valid AdjustmentOwnerIncomeExamVO adjustmentOwnerIncomeExamVO, BindingResult bindingResult){
+        BindingResultUtil.checkBindingResult(bindingResult);
         log.info("OwnerIncomeController adjustmentOwnerIncome start param [{}]", GsonUtils.toJson(adjustmentOwnerIncomeExamVO));
         accountOwnerIncomeExamineNoTService.adjustmentOwnerIncomeExam(adjustmentOwnerIncomeExamVO);
         log.info("OwnerIncomeController adjustmentOwnerIncome end param [{}]",GsonUtils.toJson(adjustmentOwnerIncomeExamVO));
