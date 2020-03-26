@@ -132,14 +132,15 @@ public class OwnerAgreeOrderService {
         orderStatusMqService.sendOrderStatusByOrderNo(reqVO.getOrderNo(), orderStatusDTO.getStatus(), NewOrderMQStatusEventEnum.ORDER_PREPAY);
         
         //如果是使用钱包，检测是否钱包全额抵扣，推动订单流程。huangjing 200324  刷新钱包
+       OrderPaySignReqVO vo = null;
        try {
     	   if(renterOrderEntity.getIsUseWallet() == OrderConstant.YES) {
-	    	   OrderPaySignReqVO vo = cashierPayService.buildOrderPaySignReqVO(renterOrderEntity);
+	    	   vo = cashierPayService.buildOrderPaySignReqVO(renterOrderEntity);
 	           cashierPayService.getPaySignStrNew(vo,payCallbackService);
 	           logger.info("获取支付签名串B.params=[{}]",GsonUtils.toJson(vo));
     	   }
 		} catch (Exception e) {
-			logger.error("刷新钱包支付抵扣");
+			logger.error("刷新钱包支付抵扣:params=[{}]",(vo!=null)?GsonUtils.toJson(vo):"EMPTY",e);
 		}
 
     }
