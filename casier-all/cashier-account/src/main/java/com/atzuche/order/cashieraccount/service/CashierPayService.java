@@ -644,8 +644,16 @@ public class CashierPayService{
             //同老订单的租车押金
             if(Objects.nonNull(renterOrderEntity) && Objects.nonNull(renterOrderEntity.getCreateTime())){
 	            LocalDateTime reqTime = renterOrderEntity.getCreateTime();
-
-	            long secondRent = ChronoUnit.SECONDS.between(reqTime,LocalDateTime.now());
+	            LocalDateTime reqTimeNext = reqTime.plusHours(1);  //1小时为截止时间
+	            
+	            log.info("reqTime=" + reqTime);
+	            log.info("reqTimeNext=" + reqTimeNext);
+	            log.info("now="+LocalDateTime.now());
+	            
+	            //这样才可以倒计时，时间越来越少。
+	            long secondRent = ChronoUnit.SECONDS.between(LocalDateTime.now(),reqTimeNext);
+	            log.info("secondRent=" + secondRent);
+	            
                 if (secondRent <= 60 * 60) {//小于等于1h
                     countdown = secondRent;
                 }
