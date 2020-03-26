@@ -3,7 +3,9 @@ package com.atzuche.order.coreapi.service.remote;
 import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.CatConstants;
 import com.atzuche.order.commons.LocalDateTimeUtils;
+import com.atzuche.order.commons.constant.OrderConstant;
 import com.atzuche.order.commons.vo.req.OrderReqVO;
+import com.atzuche.order.coreapi.entity.dto.CheckCarDispatchResDTO;
 import com.atzuche.order.coreapi.entity.vo.req.CarDispatchReqVO;
 import com.atzuche.order.coreapi.entity.vo.req.CarRentTimeRangeReqVO;
 import com.atzuche.order.coreapi.entity.vo.res.CarRentTimeRangeResVO;
@@ -106,11 +108,11 @@ public class CarRentalTimeApiProxyService {
      * @param reqVO 请求参数
      * @return boolean true:可以 false:不可以
      */
-    public boolean checkCarDispatch(CarDispatchReqVO reqVO) {
+    public CheckCarDispatchResDTO checkCarDispatch(CarDispatchReqVO reqVO) {
         LOGGER.info("判断是否进入调度. param is,reqVO:[{}]", JSON.toJSONString(reqVO));
         if(null == reqVO) {
             LOGGER.warn("Check car dispatch param is empty.");
-            return false;
+            return new CheckCarDispatchResDTO(false);
         }
 
         CarDispatchDTO dispatch = new CarDispatchDTO();
@@ -130,17 +132,13 @@ public class CarRentalTimeApiProxyService {
 
             LOGGER.info("判断是否进入调度. result is,responseObject:[{}]", JSON.toJSONString(responseObject));
             Cat.logEvent(CatConstants.FEIGN_RESULT, JSON.toJSONString(responseObject));
-
-
             ResponseObjectCheckUtil.checkCarDispatchResponse(responseObject);
 
             t.setStatus(Transaction.SUCCESS);
-
-            if(responseObject.getData() != null){
-                return responseObject.getData();
+            if(responseObject.getResCode().startsWith(OrderConstant.SPECIAL_ERROR_CODE_PREFIX)) {
+                return new CheckCarDispatchResDTO(responseObject.getData(), responseObject.getResMsg());
             }
-            return false;
-
+            return new CheckCarDispatchResDTO(responseObject.getData());
         } catch (Exception e) {
             t.setStatus(e);
             LOGGER.info("判断是否进入调度异常.,reqVO=[{}]",reqVO, e);

@@ -83,6 +83,16 @@ public interface RenterOrderWzStatusMapper{
 	 */
 	void updateTransWzDisposeStatus(@Param("orderNo") String orderNo,@Param("carNumber") String carNumber,@Param("status") int wzDisposeStatus);
 
+
+	/**
+	 * 根据订单号和车牌号 修改违章状态及查询状态
+	 * @param orderNo 订单号
+	 * @param carNumber 车牌号
+	 * @param wzDisposeStatus 状态
+	 */
+	void updateTransWzDisposeStatusAndQueryStatus(@Param("orderNo") String orderNo,@Param("carNumber") String carNumber,@Param("status") int wzDisposeStatus);
+
+
 	/**
 	 * 根据订单号查询 违章处理状态信息
 	 * @param orderNo 订单号

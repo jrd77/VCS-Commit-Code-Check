@@ -53,6 +53,11 @@ public class RenterOrderWzStatusService {
         renterOrderWzStatusMapper.updateTransWzDisposeStatus(orderNo,carNumber,wzDisposeStatus);
     }
 
+    public void updateTransWzDisposeStatusAndQueryStatus(String orderNo, String carNumber, int wzDisposeStatus) {
+        renterOrderWzStatusMapper.updateTransWzDisposeStatusAndQueryStatus(orderNo,carNumber,wzDisposeStatus);
+    }
+
+
     public List<RenterOrderWzStatusEntity> queryInfosByOrderNo(String orderNo) {
         return renterOrderWzStatusMapper.queryInfosByOrderNo(orderNo);
     }

@@ -169,10 +169,10 @@ public class CarDepositReturnDetailService {
                     res.setFkDetainFlag(r.getDetainStatus().toString());
                     res.setFkDetainReason(r.getDetainReasonCode());
                 } else if (StringUtils.equals(r.getDetainTypeCode(), DetainTypeEnum.trans.getCode())) {
-                    res.setJyDetainFlag(r.getDetainReasonCode());
+                    res.setJyDetainFlag(r.getDetainStatus().toString());
                     res.setJyDetainReason(r.getDetainReasonCode());
                 } else if (StringUtils.equals(r.getDetainTypeCode(), DetainTypeEnum.claims.getCode())) {
-                    res.setLpDetainFlag(r.getDetainReasonCode());
+                    res.setLpDetainFlag(r.getDetainStatus().toString());
                     res.setLpDetainReason(r.getDetainReasonCode());
                 }
             });

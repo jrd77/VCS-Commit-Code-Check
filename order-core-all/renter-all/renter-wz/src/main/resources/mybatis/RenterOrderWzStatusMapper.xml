@@ -16,6 +16,8 @@
 		<result property="statusDesc" column="status_desc"/>
 		<result property="managementMode" column="management_mode"/>
 		<result property="wzHandleCompleteTime" column="wz_handle_complete_time"/>
+		<result property="wzRenterLastTime" column="wz_renter_last_time"/>
+		<result property="wzRenterLastTime" column="wz_platform_last_time"/>
 		<result property="illegalQuery" column="illegal_query"/>
 		<result property="createTime" column="create_time"/>
 		<result property="createOp" column="create_op"/>
@@ -107,6 +109,23 @@
 			management_mode = 1,
 		</if>
 		wz_dispose_status_edit_time = now()
+		WHERE order_no = #{orderNo} and car_plate_num = #{carNumber} and is_delete = 0
+	</update>
+
+	<update id="updateTransWzDisposeStatusAndQueryStatus">
+		UPDATE renter_order_wz_status SET
+		`status` = #{status},
+		<if test="status == 40">
+			management_mode = 2,
+		</if>
+		<if test="status == 10">
+			management_mode = 1,
+		</if>
+		<if test="status == 25">
+			management_mode = 1,
+		</if>
+		wz_dispose_status_edit_time = now(),
+		illegal_query = 4
 		WHERE order_no = #{orderNo} and car_plate_num = #{carNumber} and is_delete = 0
 	</update>
 
