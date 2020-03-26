@@ -18,6 +18,7 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -111,7 +112,7 @@ public class AccountOwnerIncomeExamineNoTService {
     public List<AccountOwnerIncomeExamineEntity> selectByOwnerOrderNo(String ownerOrderNo) {
         return accountOwnerIncomeExamineMapper.selectByOwnerOrderNo(ownerOrderNo);
     }
-
+    @Transactional
     public void adjustmentOwnerIncomeExam(AdjustmentOwnerIncomeExamVO adjustmentOwnerIncomeExamVO) {
         AccountOwnerIncomeExamineEntity accountOwnerIncomeExamineEntity = accountOwnerIncomeExamineMapper.selectByPrimaryKey(adjustmentOwnerIncomeExamVO.getExamineId());
         if(accountOwnerIncomeExamineEntity == null || accountOwnerIncomeExamineEntity.getId() == null){
@@ -139,20 +140,18 @@ public class AccountOwnerIncomeExamineNoTService {
         accountOwnerIncomeExamine.setOrderNo(accountOwnerIncomeExamineEntity.getOwnerOrderNo());
         accountOwnerIncomeExamine.setOrderNo(accountOwnerIncomeExamineEntity.getOrderNo());
         int i = accountOwnerIncomeExamineMapper.insertSelective(accountOwnerIncomeExamine);
+        if(i <=0){
+            OwnerIncomeExamineInsertException e = new OwnerIncomeExamineInsertException();
+            log.error("车主调账收益审核录入失败accountOwnerIncomeExamine={}",JSON.toJSONString(accountOwnerIncomeExamine),e);
+            throw e;
+        }
+        log.error("车主调账收益审核录入成功 i={}，accountOwnerIncomeExamine={}",i,JSON.toJSONString(accountOwnerIncomeExamine));
         AccountOwnerIncomeExamineEntity accountOwnerIncomeExamineEntityNew = new AccountOwnerIncomeExamineEntity();
         accountOwnerIncomeExamineEntityNew.setVersion(accountOwnerIncomeExamineEntity.getVersion());
         accountOwnerIncomeExamineEntityNew.setId(accountOwnerIncomeExamineEntity.getId());
         accountOwnerIncomeExamineEntityNew.setStatus(adjustmentOwnerIncomeExamVO.getAuditStatus());
         accountOwnerIncomeExamineEntityNew.setExamineId(adjustmentOwnerIncomeExamVO.getExamineId());
         accountOwnerIncomeExamineMapper.updateByPrimaryKeySelective(accountOwnerIncomeExamineEntityNew);
-
-        if(i <=0 ){
-            OwnerIncomeExamineInsertException e = new OwnerIncomeExamineInsertException();
-            log.error("车主调账收益审核录入失败accountOwnerIncomeExamine={}",JSON.toJSONString(accountOwnerIncomeExamine),e);
-            throw e;
-        }
-        log.error("车主调账收益审核录入成功 i={}，accountOwnerIncomeExamine={}",i,JSON.toJSONString(accountOwnerIncomeExamine));
-
         //审核通过后统计到收益表中
         if(AccountOwnerIncomeExamineStatus.PASS_EXAMINE.getStatus() == adjustmentOwnerIncomeExamVO.getAuditStatus()){
             int currIncomAmt = settAmt + adjustmentAmt;
