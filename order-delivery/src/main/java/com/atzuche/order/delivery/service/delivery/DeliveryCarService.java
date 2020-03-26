@@ -60,6 +60,8 @@ public class DeliveryCarService {
         }
         int getMinute = getMinutes == null ? 0 : getMinutes;
         int returnMinute = returnMinutes == null ? 0 : returnMinutes;
+        log.info("新增配送订单数据------>>>>> 租客地址信息 入参数：【{}】",
+                orderReqContext.getOrderReqVO().getSrvGetAddr());
         addRenYunFlowOrderInfo(getMinute, returnMinute, orderReqContext, UserTypeEnum.OWNER_TYPE.getValue().intValue());
         addRenYunFlowOrderInfo(getMinute, returnMinute, orderReqContext, UserTypeEnum.RENTER_TYPE.getValue().intValue());
     }

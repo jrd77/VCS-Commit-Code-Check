@@ -4,6 +4,7 @@ import com.atzuche.order.commons.vo.req.OrderReqVO;
 import com.atzuche.order.delivery.enums.UsedDeliveryTypeEnum;
 import lombok.Data;
 import lombok.ToString;
+import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDateTime;
 
@@ -12,6 +13,7 @@ import java.time.LocalDateTime;
  */
 @Data
 @ToString
+@Slf4j
 public class OrderDeliveryDTO {
 
     /**
@@ -133,6 +135,8 @@ public class OrderDeliveryDTO {
             setRenterGetReturnAddr(orderReqVO.getSrvGetAddr());
             setRenterGetReturnAddrLat(orderReqVO.getSrvGetLat());
             setRenterGetReturnAddrLon(orderReqVO.getSrvGetLon());
+            log.info("新增配送订单数据------>>>>> 租客地址信息 赋值：【{}】",
+                    getRenterGetReturnAddr());
             if (orderReqVO.getSrvGetFlag().intValue() == UsedDeliveryTypeEnum.USED.getValue().intValue()) {
                 setIsNotifyRenyun(UsedDeliveryTypeEnum.USED.getValue().intValue());
             } else {
@@ -142,6 +146,8 @@ public class OrderDeliveryDTO {
             setRenterGetReturnAddr(orderReqVO.getSrvReturnAddr());
             setRenterGetReturnAddrLat(orderReqVO.getSrvReturnLat());
             setRenterGetReturnAddrLon(orderReqVO.getSrvReturnLon());
+            log.info("新增配送订单数据------>>>>> 租客地址信息 赋值：【{}】",
+                    getRenterGetReturnAddr());
             if (orderReqVO.getSrvReturnFlag().intValue() == UsedDeliveryTypeEnum.USED.getValue().intValue()) {
                 setIsNotifyRenyun(UsedDeliveryTypeEnum.USED.getValue().intValue());
             } else {
