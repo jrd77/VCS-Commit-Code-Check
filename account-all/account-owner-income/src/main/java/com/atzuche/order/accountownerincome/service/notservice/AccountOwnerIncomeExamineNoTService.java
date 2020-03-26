@@ -5,6 +5,10 @@ import com.atzuche.order.accountownerincome.entity.AccountOwnerIncomeExamineEnti
 import com.atzuche.order.accountownerincome.exception.AccountOwnerIncomeExamineException;
 import com.atzuche.order.accountownerincome.exception.AccountOwnerIncomeSettleException;
 import com.atzuche.order.accountownerincome.mapper.AccountOwnerIncomeExamineMapper;
+import com.atzuche.order.commons.enums.account.income.AccountOwnerIncomeExamineType;
+import com.atzuche.order.commons.exceptions.OwnerIncomeExamineInsertException;
+import com.atzuche.order.commons.exceptions.OwnerIncomeExamineNotFoundException;
+import com.atzuche.order.commons.vo.req.AdjustmentOwnerIncomeExamVO;
 import com.atzuche.order.commons.vo.req.income.AccountOwnerIncomeExamineOpReqVO;
 import com.atzuche.order.commons.vo.req.income.AccountOwnerIncomeExamineReqVO;
 import lombok.extern.slf4j.Slf4j;
@@ -105,4 +109,29 @@ public class AccountOwnerIncomeExamineNoTService {
         return accountOwnerIncomeExamineMapper.selectByOwnerOrderNo(ownerOrderNo);
     }
 
+    public void adjustmentOwnerIncomeExam(AdjustmentOwnerIncomeExamVO adjustmentOwnerIncomeExamVO) {
+        AccountOwnerIncomeExamineEntity accountOwnerIncomeExamineEntity = accountOwnerIncomeExamineMapper.selectByPrimaryKey(adjustmentOwnerIncomeExamVO.getExamineId());
+        if(accountOwnerIncomeExamineEntity == null || accountOwnerIncomeExamineEntity.getId() == null){
+            throw new OwnerIncomeExamineNotFoundException();
+        }
+       AccountOwnerIncomeExamineEntity accountOwnerIncomeExamine = new AccountOwnerIncomeExamineEntity();
+       accountOwnerIncomeExamine.setAmt(adjustmentOwnerIncomeExamVO.getAdjustmentAmt());
+       accountOwnerIncomeExamine.setStatus(adjustmentOwnerIncomeExamVO.getAuditStatus());
+       accountOwnerIncomeExamine.setType(AccountOwnerIncomeExamineType.OWNER_ADJUSTMENT.getStatus());
+       accountOwnerIncomeExamine.setVersion(NumberUtils.INTEGER_ONE);
+       accountOwnerIncomeExamine.setDetail(AccountOwnerIncomeExamineType.OWNER_ADJUSTMENT.getDesc());
+       accountOwnerIncomeExamine.setOrderNo(accountOwnerIncomeExamineEntity.getOwnerOrderNo());
+       accountOwnerIncomeExamine.setOrderNo(accountOwnerIncomeExamineEntity.getOrderNo());
+       accountOwnerIncomeExamine.setOpName(adjustmentOwnerIncomeExamVO.getAuditOp());
+       accountOwnerIncomeExamine.setTime(LocalDateTime.now());
+       accountOwnerIncomeExamine.setRemark(AccountOwnerIncomeExamineType.OWNER_ADJUSTMENT.getDesc());
+       accountOwnerIncomeExamine.setExamineId(adjustmentOwnerIncomeExamVO.getExamineId());
+        int i = accountOwnerIncomeExamineMapper.insertSelective(accountOwnerIncomeExamine);
+        if(i <=0 ){
+            OwnerIncomeExamineInsertException e = new OwnerIncomeExamineInsertException();
+            log.error("车主调账收益录入失败accountOwnerIncomeExamine={}",JSON.toJSONString(accountOwnerIncomeExamine),e);
+            throw e;
+        }
+        log.error("车主调账收益录入成功 i={}，accountOwnerIncomeExamine={}",i,JSON.toJSONString(accountOwnerIncomeExamine));
+    }
 }

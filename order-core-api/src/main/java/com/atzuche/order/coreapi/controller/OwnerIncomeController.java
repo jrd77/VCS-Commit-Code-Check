@@ -1,10 +1,10 @@
 package com.atzuche.order.coreapi.controller;
 
 import com.atzuche.order.accountownerincome.entity.AccountOwnerIncomeExamineEntity;
+import com.atzuche.order.accountownerincome.service.notservice.AccountOwnerIncomeExamineNoTService;
 import com.atzuche.order.cashieraccount.service.CashierQueryService;
 import com.atzuche.order.cashieraccount.service.CashierService;
-import com.atzuche.order.cashieraccount.vo.req.pay.OrderPayReqVO;
-import com.atzuche.order.commons.entity.dto.OrderFlowListResponseDTO;
+import com.atzuche.order.commons.vo.req.AdjustmentOwnerIncomeExamVO;
 import com.atzuche.order.commons.vo.req.income.AccountOwnerIncomeExamineOpReqVO;
 import com.atzuche.order.commons.vo.req.income.AccountOwnerIncomeExamineReqVO;
 import com.atzuche.order.commons.vo.res.account.income.AccountOwnerIncomeRealResVO;
@@ -37,8 +37,8 @@ public class OwnerIncomeController {
     private CashierService cashierService;
 	@Autowired
 	private CashierQueryService cashierQueryService;
-
-
+    @Autowired
+    private AccountOwnerIncomeExamineNoTService accountOwnerIncomeExamineNoTService;
     /**
      * 查询车主收益信息
      * @param orderNo
@@ -98,4 +98,12 @@ public class OwnerIncomeController {
         return ResponseData.success(vo);
     }
 
+    @AutoDocMethod(value = "调账收益录入接口", description = "调账收益录入接口")
+    @PostMapping("/adjustmentOwnerIncomeExam")
+    public ResponseData adjustmentOwnerIncomeExam(@RequestBody @Valid AdjustmentOwnerIncomeExamVO adjustmentOwnerIncomeExamVO){
+        log.info("OwnerIncomeController adjustmentOwnerIncome start param [{}]", GsonUtils.toJson(adjustmentOwnerIncomeExamVO));
+        accountOwnerIncomeExamineNoTService.adjustmentOwnerIncomeExam(adjustmentOwnerIncomeExamVO);
+        log.info("OwnerIncomeController adjustmentOwnerIncome end param [{}]",GsonUtils.toJson(adjustmentOwnerIncomeExamVO));
+        return ResponseData.success();
+    }
 }
