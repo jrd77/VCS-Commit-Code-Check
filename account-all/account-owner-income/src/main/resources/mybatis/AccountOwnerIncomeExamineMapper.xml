@@ -14,6 +14,7 @@
         <result property="type" column="type"/>
         <result property="opName" column="op_name"/>
         <result property="time" column="time"/>
+        <result property="examineId" column="examine_id"/>
         <result property="remark" column="remark"/>
         <result property="version" column="version"/>
         <result property="createTime" column="create_time"/>
@@ -34,7 +35,8 @@
 	`status`,
 	`type`,
 	`op_name`, 	
-	`time`, 	
+	`time`,
+	`examine_id`,
 	`remark`, 	
 	`version`, 	
 	`create_time`, 	
@@ -72,6 +74,7 @@
             <if test="type != null">`type`, </if>
             <if test="opName != null">`op_name`, </if>
             <if test="time != null">`time`, </if>
+            <if test="examineId != null">`examine_id`, </if>
             <if test="remark != null">`remark`, </if>
             <if test="version != null">`version`, </if>
             <if test="createTime != null">`create_time`, </if>
@@ -90,6 +93,7 @@
             <if test="type != null">#{type},  </if>
             <if test="opName != null">#{opName},  </if>
             <if test="time != null">#{time},  </if>
+            <if test="examineId != null">#{examineId}, </if>
             <if test="remark != null">#{remark},  </if>
             <if test="version != null">#{version},  </if>
             <if test="createTime != null">#{createTime},  </if>
@@ -112,6 +116,7 @@
                 <if test="type != null">`type` = #{type}, </if>
 				<if test="opName != null">`op_name` = #{opName}, </if>
 				<if test="time != null">`time` = #{time}, </if>
+                <if test="examineId != null">`examine_id` = #{examineId}, </if>
 				<if test="remark != null">`remark` = #{remark}, </if>
                 version = version + 1,
 				<if test="createTime != null">`create_time` = #{createTime}, </if>

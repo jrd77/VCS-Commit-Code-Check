@@ -3,7 +3,6 @@
  */
 package com.atzuche.order.commons.enums.detain;
 
-import com.atzuche.order.commons.enums.cashier.PaySourceEnum;
 import lombok.Getter;
 
 import java.util.Objects;
@@ -14,6 +13,10 @@ import java.util.Objects;
  */
 @Getter
 public enum DetainStatusEnum {
+    /**
+     * 未暂扣
+     **/
+    NO_DETAIN(0, "未暂扣"),
 	/**
      * 暂扣
      **/
@@ -28,7 +31,7 @@ public enum DetainStatusEnum {
     /**
      * code
      */
-    private Integer code;
+    private int code;
     /**
      * msg
      */
@@ -39,20 +42,17 @@ public enum DetainStatusEnum {
         this.msg = msg;
     }
 
-    /**
-     * 根据code取text
-     * @param code
-     * @return
-     */
-    public static String getFlagText(String code){
-        if(Objects.isNull(code)){
+    public static DetainStatusEnum from(Integer code) {
+        if (Objects.isNull(code)) {
             return null;
         }
-        for(DetainStatusEnum detainStatusEnum :DetainStatusEnum.values()){
-            if(detainStatusEnum.code.equals(code)){
-                return detainStatusEnum.msg;
+        DetainStatusEnum[] enums = values();
+        for (DetainStatusEnum status : enums) {
+            if (status.code == code) {
+                return status;
             }
         }
-        return null;
+
+        throw new RuntimeException("the value of code :" + code + " not supported,please check");
     }
 }

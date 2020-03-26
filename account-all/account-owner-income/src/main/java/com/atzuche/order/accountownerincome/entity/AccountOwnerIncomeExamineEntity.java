@@ -1,8 +1,9 @@
 package com.atzuche.order.accountownerincome.entity;
 
+import lombok.Data;
+
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import lombok.Data;
 
 
 /**
@@ -56,6 +57,11 @@ public class AccountOwnerIncomeExamineEntity implements Serializable {
 	 * 审核时间
 	 */
 	private LocalDateTime time;
+    /*
+    *
+    * */
+	private Integer examineId;
+
 	/**
 	 * 备注
 	 */

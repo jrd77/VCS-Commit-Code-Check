@@ -118,6 +118,8 @@ public enum ErrorCode {
     RENTER_SETTLE_ERR("700146","取消订单，租客端结算异常"),
     RENTER_COST_DETAIL_FAIL("700147","获取租客费用详情失败"),
     NOTICE_SOURCE_ERR("700148","找不到对应的来源类型"),
+    OWNER_INCOM_EXAM_ERR("700149","车主结算收益审核记录不存在"),
+    OWNER_INCOM_EXAM_INSERT_ERR("700150","车主结算收益审核记录保存失败"),
     RENT_TIME_LESS_CURR_TIME_2HOUR("500055","起租时间应晚于当前时间2小时"),
     REVERT_TIME_LESS_RENT_TIME_1HOUR("500056","“还车时间”应晚于“起租时间”1小时"),
     RENT_TIME_LESS_CURR_TIME("500006","起租时间应晚于当前时间"),

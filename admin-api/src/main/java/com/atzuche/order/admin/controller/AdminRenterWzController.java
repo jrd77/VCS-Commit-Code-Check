@@ -45,10 +45,7 @@ public class AdminRenterWzController extends BaseController {
         if (StringUtils.isBlank(orderNo)) {
             return ResponseData.createErrorCodeResponse(ErrorCode.ORDER_NO_PARAM_ERROR.getCode(), "订单编号为空");
         }
-        RenterWzDetailResVO res = null;
-
-        res = renterWzService.queryWzDetailByOrderNo(orderNo);
-
+        RenterWzDetailResVO res = renterWzService.queryWzDetailByOrderNo(orderNo);
         return ResponseData.success(res);
     }
 
