@@ -112,6 +112,23 @@
 		WHERE order_no = #{orderNo} and car_plate_num = #{carNumber} and is_delete = 0
 	</update>
 
+	<update id="updateTransWzDisposeStatusAndQueryStatus">
+		UPDATE renter_order_wz_status SET
+		`status` = #{status},
+		<if test="status == 40">
+			management_mode = 2,
+		</if>
+		<if test="status == 10">
+			management_mode = 1,
+		</if>
+		<if test="status == 25">
+			management_mode = 1,
+		</if>
+		wz_dispose_status_edit_time = now(),
+		illegal_query = 4
+		WHERE order_no = #{orderNo} and car_plate_num = #{carNumber} and is_delete = 0
+	</update>
+
 	<select id="queryInfosByOrderNo" resultMap="selectColumnMap" parameterType="java.lang.String">
 		SELECT * FROM `renter_order_wz_status` WHERE order_no = #{orderNo} and is_delete = 0
 	</select>

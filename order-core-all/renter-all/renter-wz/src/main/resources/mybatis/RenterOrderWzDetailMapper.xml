@@ -313,6 +313,7 @@
 		AND code = #{code}
 		and car_plate_num = #{plateNum}
 		and is_valid=1
+		and is_delete = 0
 	</select>
 
 	<insert id="batchInsert" parameterType="list">
@@ -353,7 +354,7 @@
 			illegal_amt,
 			illegal_deduct,
 			is_sms
-		from renter_order_wz_detail where order_flag = 1 and order_no = #{orderNo} and car_plate_num = #{plateNum} and is_valid=1
+		from renter_order_wz_detail where order_flag = 1 and order_no = #{orderNo} and car_plate_num = #{plateNum} and is_valid=1 and is_delete = 0
 	</select>
 
 	<select id="findSendSmsIllegalRecord" resultMap="selectColumnMap">
@@ -366,7 +367,7 @@
 			illegal_deduct,
 			is_sms,
 			car_plate_num
-		from renter_order_wz_detail where order_flag = 1 and is_sms=0 and is_valid=1
+		from renter_order_wz_detail where order_flag = 1 and is_sms=0 and is_valid=1 and is_delete = 0
 	</select>
 
 	<select id="queryIllegalCountByCarNoAndOrders" resultType="java.lang.Integer">
@@ -374,6 +375,7 @@
 		from renter_order_wz_detail
 		where car_plate_num = #{carNo}
 		and is_valid=1
+		and is_delete = 0
 		and illegal_deduct &gt; 0
 		and order_no in
 		<foreach collection="orderNos" item="orderNo" separator="," close=")" open="(">
@@ -394,14 +396,14 @@
 		id,order_no,illegal_time,illegal_addr,illegal_reason,illegal_amt,illegal_deduct,create_time,
         order_flag,illegal_status,update_time
 		from renter_order_wz_detail
-		where order_no = #{orderNo}  and order_flag = 1 and is_valid=1
+		where order_no = #{orderNo}  and order_flag = 1 and is_valid=1 and is_delete = 0
 	</select>
 
 	<select id="getIllegalDetailCount" resultType="java.lang.Integer">
 		select
 		count(*)
 		from renter_order_wz_detail
-		where order_no = #{orderNo} and order_flag = 1 and is_valid = 1 and id = #{illegalNum}
+		where order_no = #{orderNo} and order_flag = 1 and is_valid = 1 and id = #{illegalNum} and is_delete = 0
 	</select>
 
 	<update id="updateIllegalStatus" parameterType="java.lang.String">
