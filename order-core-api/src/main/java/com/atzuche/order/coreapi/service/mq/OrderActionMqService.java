@@ -1,6 +1,7 @@
 package com.atzuche.order.coreapi.service.mq;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.atzuche.order.commons.LocalDateTimeUtils;
 import com.atzuche.order.commons.constant.OrderConstant;
 import com.atzuche.order.commons.enums.CancelSourceEnum;
@@ -147,6 +148,7 @@ public class OrderActionMqService {
         //车主同意SMS
         Map map = SmsParamsMapUtil.getParamsMap(orderNo, ShortMessageTypeEnum.NOTIFY_RENTER_TRANS_REQACCEPTED.getValue(), null, null);
         orderMessage.setMap(map);
+        logger.info("发送车主同意订单短信:{}", JSONObject.toJSONString(map));
         baseProducer.sendTopicMessage(NewOrderMQActionEventEnum.ORDER_MODIFY.exchange, NewOrderMQActionEventEnum.ORDER_MODIFY.routingKey, orderMessage);
     }
 

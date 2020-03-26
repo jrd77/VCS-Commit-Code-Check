@@ -54,4 +54,18 @@ public class CashWithdrawalController {
 		List<AccountOwnerCashExamine> list = cashWithdrawalService.listCashWithdrawal(req);
     	return ResponseData.success(list);
     }
+	
+	
+	/**
+	 * 获取可提现余额
+	 * @param req
+	 * @return ResponseData<?>
+	 */
+	@GetMapping("/account/withdraw/getbalance")
+    public ResponseData<?> getBalance(@Valid @RequestBody SearchCashWithdrawalReqDTO req, BindingResult bindingResult) {
+		log.info("获取可提现余额 req=[{}]", req);
+		BindingResultUtil.checkBindingResult(bindingResult);
+		Integer balance = cashWithdrawalService.getBalance(req);
+    	return ResponseData.success(balance);
+    }
 }
