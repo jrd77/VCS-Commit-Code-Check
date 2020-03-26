@@ -1,9 +1,9 @@
 package com.atzuche.order.accountrenterdetain.mapper;
-import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
-import org.apache.ibatis.annotations.Param;
 
 import com.atzuche.order.accountrenterdetain.entity.AccountRenterDetainDetailEntity;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
 import java.util.List;
 
 /**

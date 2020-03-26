@@ -395,25 +395,26 @@ public class RenterWzService {
             result.setExpectSettleTimeStr(DateUtils.formate(renterOrder.getActRevertTime().plusDays(18L),DateUtils.DATE_DEFAUTE1));
         }
         int wzDepositAmt = wzDepositMsg.getWzDepositAmt();
+
+        result.setDetainStatus(orderStatus.getIsDetainWz().toString());
+        result.setActuallyProvisionalDeduction(orderStatus.getIsDetainWz() == OrderConstant.YES ?
+                String.valueOf(wzDepositAmt) : "0");
         if(UN_SETTLE.equals(settleStatus)){
             //未结算
             result.setShouldReturnDeposit(String.valueOf(wzDepositAmt - zanKouAmount));
             result.setProvisionalDeduction(String.valueOf(zanKouAmount));
             result.setYuJiDiKouZuCheFee(String.valueOf(wzDepositMsg.getDetainCostAmt()));
-            result.setActuallyProvisionalDeduction("0");
         }else{
             //已结算
             result.setShiJiZanKouJinE(String.valueOf(zanKouAmount));
             result.setShiJiYiTuiWeiZhangYaJin(String.valueOf(wzDepositAmt - zanKouAmount));
             result.setShiJiDiKouZuCheFee(String.valueOf(wzDepositMsg.getDetainCostAmt()));
             result.setJieSuanShiDiKouLiShiQianKuan(String.valueOf(wzDepositMsg.getDebtAmt()));
-            result.setActuallyProvisionalDeduction(String.valueOf(wzDepositMsg.getDetainAmt()));
-            if(orderStatus != null && orderStatus.getWzSettleTime() != null){
+            if(orderStatus.getWzSettleTime() != null){
                 result.setRealSettleTimeStr(DateUtils.formate(orderStatus.getWzSettleTime(),DateUtils.DATE_DEFAUTE1));
             }
         }
-        String renterDetainStatus = renterDetain.getRenterDetainStatus(orderNo);
-        result.setDetainStatus(renterDetainStatus);
+
         if(StringUtils.isNotBlank(wzDepositMsg.getDeductionTime())){
             result.setDeductionTimeStr(wzDepositMsg.getDeductionTime());
             result.setDeductionStatusStr(wzDepositMsg.getDebtStatus());

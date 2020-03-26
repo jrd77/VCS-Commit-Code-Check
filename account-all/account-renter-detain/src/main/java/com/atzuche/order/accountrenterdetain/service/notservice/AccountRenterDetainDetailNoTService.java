@@ -10,6 +10,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 
@@ -34,6 +35,7 @@ public class AccountRenterDetainDetailNoTService {
         BeanUtils.copyProperties(detainRenterDeposit,entity);
         entity.setSourceCode(detainRenterDeposit.getRenterCashCodeEnum().getCashNo());
         entity.setSourceDetail(detainRenterDeposit.getRenterCashCodeEnum().getTxt());
+        entity.setTime(LocalDateTime.now());
         int result = accountRenterDetainDetailMapper.insertSelective(entity);
         if(result==0){
             throw new AccountRenterDetainDetailException();
