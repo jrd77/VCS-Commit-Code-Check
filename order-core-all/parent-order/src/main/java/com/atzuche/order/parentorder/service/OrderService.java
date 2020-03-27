@@ -104,4 +104,9 @@ public class OrderService {
     public List<OrderEntity> getByOrderNos(List<String> orderNos) {
         return orderMapper.getByOrderNos(orderNos);
     }
+
+    public List<String> getorderNoAll() {
+        List<String> orderNos = orderMapper.getorderNoAll();
+        return orderNos;
+    }
 }

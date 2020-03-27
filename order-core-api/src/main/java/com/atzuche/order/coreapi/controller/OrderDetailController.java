@@ -120,4 +120,11 @@ public class OrderDetailController {
         OrderDetailRespDTO orderDetailRespDTO = orderDetailService.queryChangeApplyByOwnerOrderNo(ownerOrderNo);
         return ResponseData.success(orderDetailRespDTO);
     }
+
+    @GetMapping("/getOrderNoAll")
+    public ResponseData<OrderNoListDTO> getOrderNoAll(){
+
+        OrderNoListDTO orderNoListDTO =  orderDetailService.getOrderNoAll();
+        return ResponseData.success(orderNoListDTO);
+    }
 }
