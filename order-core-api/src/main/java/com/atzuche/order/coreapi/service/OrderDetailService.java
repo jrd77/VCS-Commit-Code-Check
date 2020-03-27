@@ -25,6 +25,7 @@ import com.atzuche.order.commons.CostStatUtils;
 import com.atzuche.order.commons.GlobalConstant;
 import com.atzuche.order.commons.LocalDateTimeUtils;
 import com.atzuche.order.commons.OrderException;
+import com.atzuche.order.commons.constant.OrderConstant;
 import com.atzuche.order.commons.entity.dto.OwnerMemberDTO;
 import com.atzuche.order.commons.entity.dto.OwnerMemberRightDTO;
 import com.atzuche.order.commons.entity.dto.RenterMemberDTO;
@@ -1204,6 +1205,9 @@ public class OrderDetailService {
         if(accountRenterDepositEntity != null){
             accountRenterDepositDTO =  new AccountRenterDepositDTO();
             BeanUtils.copyProperties(accountRenterDepositEntity,accountRenterDepositDTO);
+            if(null != orderStatusEntity.getIsDetain() && orderStatusEntity.getIsDetain() == OrderConstant.YES) {
+                accountRenterDepositDTO.setSurplusDepositAmt(0);
+            }
         }
         //租客押金流水
         List<AccountRenterDepositDetailEntity> accountRenterDepositDetailEntityList = accountRenterDepositDetailNoTService.findByOrderNo(orderNo);
