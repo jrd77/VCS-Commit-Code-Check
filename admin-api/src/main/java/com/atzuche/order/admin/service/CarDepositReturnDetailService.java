@@ -76,7 +76,7 @@ public class CarDepositReturnDetailService {
         CashierDTO cashierDTO = data.getCashierDTO();
 
         List<AccountRenterDetainDetailDTO> rentCarAmtDtoList = accountRenterDetainDetailDTOList.stream()
-                .filter(x -> RenterCashCodeEnum.ACCOUNT_RENTER_DETAIN_CAR_AMT.getCashNo().equals(x.getSourceCode().toString()))
+                .filter(x -> RenterCashCodeEnum.ACCOUNT_DEPOSIT_DETAIN_CAR_AMT.getCashNo().equals(x.getSourceCode().toString()))
                 .collect(Collectors.toList());
         AccountRenterDetainDetailDTO accountRenterDetainDetailDTO = new AccountRenterDetainDetailDTO(0);
         int detainAmt = 0;
