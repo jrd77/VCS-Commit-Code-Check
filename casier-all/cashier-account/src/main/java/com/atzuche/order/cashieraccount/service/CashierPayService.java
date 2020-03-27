@@ -48,7 +48,9 @@ import com.atzuche.order.commons.exceptions.OrderNotFoundException;
 import com.atzuche.order.commons.service.OrderPayCallBack;
 import com.atzuche.order.flow.service.OrderFlowService;
 import com.atzuche.order.parentorder.dto.OrderStatusDTO;
+import com.atzuche.order.parentorder.entity.OrderEntity;
 import com.atzuche.order.parentorder.entity.OrderStatusEntity;
+import com.atzuche.order.parentorder.service.OrderService;
 import com.atzuche.order.parentorder.service.OrderStatusService;
 import com.atzuche.order.rentercost.entity.OrderSupplementDetailEntity;
 import com.atzuche.order.rentercost.entity.vo.PayableVO;
@@ -96,6 +98,8 @@ public class CashierPayService{
     private AccountVirtualPayService virtualPayService;
     @Autowired
     private OrderSupplementDetailService orderSupplementDetailService;
+    @Autowired
+    private OrderService orderService;
 
 
     public void virtualPay(VirtualPayDTO virtualPayVO,OrderPayCallBack callBack){
@@ -643,8 +647,26 @@ public class CashierPayService{
             result.setHints("请于1小时内完成支付，超时未支付订单将自动取消");
             
             //同老订单的租车押金
-            if(Objects.nonNull(renterOrderEntity) && Objects.nonNull(renterOrderEntity.getCreateTime())){
-	            LocalDateTime reqTime = renterOrderEntity.getCreateTime();
+            LocalDateTime reqTime = null;
+            /**
+             * # 2020-03-27 14:30:52   下单
+				# 2020-03-27 14:29:55   当前时间
+             */
+//            if(Objects.nonNull(renterOrderEntity) && Objects.nonNull(renterOrderEntity.getCreateTime())){
+//	            reqTime = renterOrderEntity.getCreateTime();
+//	            log.error("renterOrderEntity查询到记录,orderNo=[{}],reqTime=[{}]",orderPayReqVO.getOrderNo(),reqTime);
+//            	
+//            }else {
+            	OrderEntity orderEntity = orderService.getOrderEntity(orderPayReqVO.getOrderNo());
+            	if(Objects.nonNull(orderEntity) && Objects.nonNull(orderEntity.getReqTime())){
+	            	reqTime = orderEntity.getReqTime();
+	            	log.error("orderEntity查询到记录,orderNo=[{}],reqTime=[{}]",orderPayReqVO.getOrderNo(),reqTime);
+            	}else {
+            		log.error("orderEntity未查询到记录,orderNo=[{}]",orderPayReqVO.getOrderNo());
+            	}
+//            }
+            
+            if(reqTime != null) {
 	            LocalDateTime reqTimeNext = reqTime.plusHours(1);  //1小时为截止时间
 	            
 	            log.info("reqTime=" + reqTime);
@@ -655,10 +677,11 @@ public class CashierPayService{
 	            long secondRent = ChronoUnit.SECONDS.between(LocalDateTime.now(),reqTimeNext);
 	            log.info("secondRent=" + secondRent);
 	            
-                if (secondRent <= 60 * 60) {//小于等于1h
-                    countdown = secondRent;
-                }
+	            if (secondRent <= 60 * 60) {//小于等于1h
+	                countdown = secondRent;
+	            }
             }
+            
             result.setCountdown(countdown);
           
         }

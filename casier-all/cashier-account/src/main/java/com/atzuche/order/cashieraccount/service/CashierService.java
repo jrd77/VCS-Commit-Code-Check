@@ -135,7 +135,7 @@ public class CashierService {
     @Transactional(rollbackFor=Exception.class)
     public void detainRenterDeposit(DetainRenterDepositReqVO detainRenterDepositReqVO){
         //1 扣除全部 剩余可用车辆押金
-        int depositDetailId = accountRenterDepositService.detainRenterDeposit(detainRenterDepositReqVO);
+        int depositDetailId = accountRenterDepositService.detainRenterDepositNew(detainRenterDepositReqVO);
         //2 暂扣表记录暂扣车辆押金
         ChangeDetainRenterDepositReqVO changeDetainRenterDepositReqVO = getCangeDetainRenterDepositReqVO(detainRenterDepositReqVO,depositDetailId);
         accountRenterDetainService.changeRenterDetainCost(changeDetainRenterDepositReqVO);
@@ -717,9 +717,11 @@ public class CashierService {
     public void saveWalletPaylOrderStatusInfo( String orderNo){
         OrderStatusDTO orderStatusDTO = new OrderStatusDTO();
         orderStatusDTO.setOrderNo(orderNo);
+        orderStatusDTO.setRentCarPayStatus(OrderPayStatusEnum.PAYED.getStatus());  //默认值。
+        
+        //下单的时候查不出来?
         OrderStatusEntity entity = orderStatusService.getByOrderNo(orderNo);
         if(Objects.nonNull(entity)){
-            orderStatusDTO.setRentCarPayStatus(OrderPayStatusEnum.PAYED.getStatus());
             orderStatusDTO.setDepositPayStatus(entity.getDepositPayStatus());
             orderStatusDTO.setWzPayStatus(entity.getWzPayStatus());
             if(
@@ -731,6 +733,8 @@ public class CashierService {
                 orderFlowService.inserOrderStatusChangeProcessInfo(orderStatusDTO.getOrderNo(), OrderStatusEnum.TO_GET_CAR);
 
             }
+        } else {
+        	log.error("orderStatusEntity未查询到记录,orderNo=[{}]",orderNo);
         }
         //1更新 订单流转状态
         orderStatusService.saveOrderStatusInfo(orderStatusDTO);

@@ -128,10 +128,7 @@ public class SubmitOrderService {
     private RenterOrderWzStatusService renterOrderWzStatusService;
     @Autowired
     private OrderTransferRecordService orderTransferRecordService;
-    @Autowired 
-    private PayCallbackService payCallbackService;
-    @Autowired
-    private CashierPayService cashierPayService;
+
 
     /**
      * 提交订单
@@ -242,16 +239,6 @@ public class SubmitOrderService {
         orderStatusDTO.setOrderNo(orderNo);
         if (null == renterGoodsDetailDTO.getReplyFlag() || renterGoodsDetailDTO.getReplyFlag() == OrderConstant.NO) {
             orderStatusDTO.setStatus(OrderStatusEnum.TO_CONFIRM.getStatus());
-            //如果是使用钱包，检测是否钱包全额抵扣，推动订单流程。huangjing 200324  刷新钱包
-            try {
-         	   if(orderReqVO.getUseBal() == OrderConstant.YES) {
-     	    	   OrderPaySignReqVO vo = cashierPayService.buildOrderPaySignReqVO(orderNo, orderReqVO.getMemNo(), orderReqVO.getUseBal());
-     	           cashierPayService.getPaySignStrNew(vo,payCallbackService);
-     	          LOGGER.info("获取支付签名串A.params=[{}]",GsonUtils.toJson(vo));
-         	   }
-     		} catch (Exception e) {
-     			LOGGER.error("刷新钱包支付抵扣");
-     		}
         } else {
             orderStatusDTO.setStatus(OrderStatusEnum.TO_PAY.getStatus());
         }
