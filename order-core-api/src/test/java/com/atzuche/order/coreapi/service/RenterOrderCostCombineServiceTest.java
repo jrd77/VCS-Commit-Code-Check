@@ -36,7 +36,7 @@ public class RenterOrderCostCombineServiceTest {
 	@Autowired
 	private CashierNoTService cashierNoTService;
 	
-	String memNo = "";
+	String memNo = "474031391";
 	
 	private void handleRentIncrementDebtAmt(String memNo, List<OrderSupplementDetailEntity> lsEntity, List<PayableVO> payableVOs) {
 		 //应付租车费用（已经求和）
@@ -47,7 +47,7 @@ public class RenterOrderCostCombineServiceTest {
 		        //判断是租车费用、还是补付 租车费用 并记录 详情
 		        RenterCashCodeEnum type = RenterCashCodeEnum.ACCOUNT_RENTER_DEBT_COST_AGAIN;	                    
 		        //数据封装
-		        OrderSupplementDetailEntity entity = orderSupplementDetailService.handleDebtData(payableVO.getAmt(), type, memNo, payableVO.getOrderNo());
+		        OrderSupplementDetailEntity entity = orderSupplementDetailService.handleDebtData(-payableVO.getAmt(), type, memNo, payableVO.getOrderNo());
 		        if(entity != null) {
 		    		lsEntity.add(entity);
 		    	}
@@ -60,6 +60,22 @@ public class RenterOrderCostCombineServiceTest {
 		List<OrderSupplementDetailEntity> lsEntity = new ArrayList<OrderSupplementDetailEntity>();
 		//支付欠款,跟子订单号无关。根据会员号查询。区别:数据源
 		List<PayableVO> payableVOs = renterOrderCostCombineService.listPayableDebtPayVOByMemNo(memNo);
+        //已付租车费用(shifu  租车费用的实付)
+        handleRentIncrementDebtAmt(memNo, lsEntity, payableVOs);
+        for (OrderSupplementDetailEntity entity : lsEntity) {
+			log.info("entity="+entity.toString());
+		}
+    	log.info("===========================333补付记录OK");
+	}
+	
+	@Test
+	public void testListPayableDebtPayVOByMemNoAndOrderNos() {
+		List<String> orderNoList = new ArrayList();
+		orderNoList.add("28261181200299");
+		
+		List<OrderSupplementDetailEntity> lsEntity = new ArrayList<OrderSupplementDetailEntity>();
+		//支付欠款,跟子订单号无关。根据会员号查询。区别:数据源
+		List<PayableVO> payableVOs = renterOrderCostCombineService.listPayableDebtPayVOByMemNoAndOrderNos(memNo, orderNoList);
         //已付租车费用(shifu  租车费用的实付)
         handleRentIncrementDebtAmt(memNo, lsEntity, payableVOs);
         for (OrderSupplementDetailEntity entity : lsEntity) {
@@ -151,10 +167,7 @@ public class RenterOrderCostCombineServiceTest {
 
 
 
-	@Test
-	public void testListPayableDebtPayVOByMemNoAndOrderNos() {
-		fail("Not yet implemented");
-	}
+
 
 	@Test
 	public void testGetPayable() {
