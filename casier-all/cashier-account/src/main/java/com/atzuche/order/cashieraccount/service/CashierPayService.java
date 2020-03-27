@@ -268,9 +268,8 @@ public class CashierPayService{
                 //异步通知处理类
             	callBack.callBack(vo.getMemNo(),vo.getOrderNo(),vo.getRenterOrderNo(),vo.getIsPayAgain(),vo.getIsGetCar());
                 
-            } else {  //补付总和
-            	callBack.callBack(vo.getMemNo(),vo.getOrderNo(),vo.getRentAmountAfterRenterOrderNos(),vo.getIsPayAgain(),vo.getIsGetCar(),
-                		vo.getSupplementIds(),vo.getDebtIds());
+            } else {  //补付总和  vo.getMemNo(), vo.getIsPayAgain(),vo.getIsGetCar(),
+            	callBack.callBack(vo.getOrderNo(),vo.getRentAmountAfterRenterOrderNos(),vo.getSupplementIds(),vo.getDebtIds());
             }
             log.info("payOrderCallBackSuccess saveOrderStatusInfo :[{}]", GsonUtils.toJson(orderStatusDTO));
         }
@@ -352,7 +351,7 @@ public class CashierPayService{
                    if(!CollectionUtils.isEmpty(payKind) && orderPayReqVO.getPayKind().contains(DataPayKindConstant.RENT_AMOUNT)){
                        //修改子订单费用信息
                        String renterOrderNo = getExtendParamsRentOrderNo(orderPayable);
-                       orderPayCallBack.callBack(orderPaySign.getMenNo(),orderPaySign.getOrderNo(),renterOrderNo,orderPayable.getIsPayAgain(),YesNoEnum.YES);
+                       orderPayCallBack.callBack(orderPaySign.getMenNo(),orderPaySign.getOrderNo(),renterOrderNo,orderPayable.getIsPayAgain(),YesNoEnum.NO);
                        return "";
                    }
 
@@ -413,7 +412,7 @@ public class CashierPayService{
                     if (!CollectionUtils.isEmpty(payKind) && orderPayReqVO.getPayKind().contains(DataPayKindConstant.RENT_AMOUNT)) {
                         //修改子订单费用信息
                         String renterOrderNo = getExtendParamsRentOrderNo(orderPayable);
-                        orderPayCallBack.callBack(orderPaySign.getMenNo(), orderPaySign.getOrderNo(), renterOrderNo, orderPayable.getIsPayAgain(), YesNoEnum.YES);
+                        orderPayCallBack.callBack(orderPaySign.getMenNo(), orderPaySign.getOrderNo(), renterOrderNo, orderPayable.getIsPayAgain(), YesNoEnum.NO);
                     }
 
                 }
@@ -532,7 +531,7 @@ public class CashierPayService{
                     //判断是租车费用、还是补付 租车费用 并记录 详情
 //                    RenterCashCodeEnum type = rentAmtPayed>0?RenterCashCodeEnum.ACCOUNT_RENTER_RENT_COST_AGAIN:RenterCashCodeEnum.ACCOUNT_RENTER_RENT_COST;
                     RenterCashCodeEnum type = RenterCashCodeEnum.ACCOUNT_RENTER_RENT_COST_AFTER;
-                    result.setIsPayAgain(YesNoEnum.YES.getCode());
+                    result.setIsPayAgain(YesNoEnum.NO.getCode());
                     accountPayAbles.add(new AccountPayAbleResVO(orderPayReqVO.getOrderNo(),orderPayReqVO.getMenNo(),payableVO.getAmt(),type,payableVO.getTitle()));
                 }
             }
@@ -552,7 +551,7 @@ public class CashierPayService{
                     //判断是租车费用、还是补付 租车费用 并记录 详情
                     RenterCashCodeEnum type = RenterCashCodeEnum.ACCOUNT_RENTER_SUPPLEMENT_COST_AGAIN;
 //                    if(RenterCashCodeEnum.ACCOUNT_RENTER_SUPPLEMENT_COST_AGAIN.equals(type)){
-                        result.setIsPayAgain(YesNoEnum.YES.getCode());
+                        result.setIsPayAgain(YesNoEnum.NO.getCode());
 //                    }
                     accountPayAbles.add(new AccountPayAbleResVO(orderPayReqVO.getOrderNo(),orderPayReqVO.getMenNo(),payableVO.getAmt(),type,payableVO.getTitle()));
                 }
