@@ -648,11 +648,15 @@ public class CashierPayService{
             
             //同老订单的租车押金
             LocalDateTime reqTime = null;
-            if(Objects.nonNull(renterOrderEntity) && Objects.nonNull(renterOrderEntity.getCreateTime())){
-	            reqTime = renterOrderEntity.getCreateTime();
-	            log.error("renterOrderEntity查询到记录,orderNo=[{}],reqTime=[{}]",orderPayReqVO.getOrderNo(),reqTime);
-            	
-            }else {
+            /**
+             * # 2020-03-27 14:30:52   下单
+				# 2020-03-27 14:29:55   当前时间
+             */
+//            if(Objects.nonNull(renterOrderEntity) && Objects.nonNull(renterOrderEntity.getCreateTime())){
+//	            reqTime = renterOrderEntity.getCreateTime();
+//	            log.error("renterOrderEntity查询到记录,orderNo=[{}],reqTime=[{}]",orderPayReqVO.getOrderNo(),reqTime);
+//            	
+//            }else {
             	OrderEntity orderEntity = orderService.getOrderEntity(orderPayReqVO.getOrderNo());
             	if(Objects.nonNull(orderEntity) && Objects.nonNull(orderEntity.getReqTime())){
 	            	reqTime = orderEntity.getReqTime();
@@ -660,7 +664,7 @@ public class CashierPayService{
             	}else {
             		log.error("orderEntity未查询到记录,orderNo=[{}]",orderPayReqVO.getOrderNo());
             	}
-            }
+//            }
             
             if(reqTime != null) {
 	            LocalDateTime reqTimeNext = reqTime.plusHours(1);  //1小时为截止时间
