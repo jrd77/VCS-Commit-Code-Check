@@ -319,14 +319,13 @@
 		limit 1
 	</select>
 	
-	<!-- by memNo -->
+	<!-- by memNo  limit 1 去掉-->
 	<select id="getRenterOrderByMemNoAndWaitPay" resultMap="BaseResultMap">
 		select <include refid="Base_Column_List" /> from renter_order where renter_mem_no = #{memNo}
 		and child_status = 3
 		and is_cancle = 0
 		and is_delete = 0
 		order by id desc
-		limit 1
 	</select>
 	<select id="getRenterOrderByMemNoOrderNosAndWaitPay" resultMap="BaseResultMap">
 		select <include refid="Base_Column_List" /> from renter_order where renter_mem_no = #{memNo}
@@ -338,7 +337,6 @@
 			#{orderNo}
 		</foreach>
 		order by id desc
-		limit 1
 	</select>
 	
 	
