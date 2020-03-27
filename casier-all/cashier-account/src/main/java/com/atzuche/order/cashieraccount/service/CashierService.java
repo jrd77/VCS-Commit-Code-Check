@@ -717,9 +717,11 @@ public class CashierService {
     public void saveWalletPaylOrderStatusInfo( String orderNo){
         OrderStatusDTO orderStatusDTO = new OrderStatusDTO();
         orderStatusDTO.setOrderNo(orderNo);
+        orderStatusDTO.setRentCarPayStatus(OrderPayStatusEnum.PAYED.getStatus());  //默认值。
+        
+        //下单的时候查不出来?
         OrderStatusEntity entity = orderStatusService.getByOrderNo(orderNo);
         if(Objects.nonNull(entity)){
-            orderStatusDTO.setRentCarPayStatus(OrderPayStatusEnum.PAYED.getStatus());
             orderStatusDTO.setDepositPayStatus(entity.getDepositPayStatus());
             orderStatusDTO.setWzPayStatus(entity.getWzPayStatus());
             if(
