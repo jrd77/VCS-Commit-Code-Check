@@ -654,8 +654,12 @@ public class CashierPayService{
             	
             }else {
             	OrderEntity orderEntity = orderService.getOrderEntity(orderPayReqVO.getOrderNo());
-            	reqTime = orderEntity.getReqTime();
-            	log.error("orderEntity查询到记录,orderNo=[{}],reqTime=[{}]",orderPayReqVO.getOrderNo(),reqTime);
+            	if(Objects.nonNull(orderEntity) && Objects.nonNull(orderEntity.getReqTime())){
+	            	reqTime = orderEntity.getReqTime();
+	            	log.error("orderEntity查询到记录,orderNo=[{}],reqTime=[{}]",orderPayReqVO.getOrderNo(),reqTime);
+            	}else {
+            		log.error("orderEntity未查询到记录,orderNo=[{}]",orderPayReqVO.getOrderNo());
+            	}
             }
             
             if(reqTime != null) {
