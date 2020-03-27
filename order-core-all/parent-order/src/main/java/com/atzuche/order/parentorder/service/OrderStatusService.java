@@ -58,6 +58,10 @@ public class OrderStatusService {
     }
 
 
+    public int updateByPrimaryKeySelective(OrderStatusEntity record) {
+        return orderStatusMapper.updateByPrimaryKeySelective(record);
+    }
+
     /**
      * 组装主订单状态信息
      *

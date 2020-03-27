@@ -11,6 +11,7 @@ import com.atzuche.order.cashieraccount.service.CashierService;
 import com.atzuche.order.cashieraccount.service.CashierSettleService;
 import com.atzuche.order.cashieraccount.service.notservice.CashierRefundApplyNoTService;
 import com.atzuche.order.commons.CatConstants;
+import com.atzuche.order.commons.constant.OrderConstant;
 import com.atzuche.order.commons.enums.account.SettleStatusEnum;
 import com.atzuche.order.commons.service.OrderPayCallBack;
 import com.atzuche.order.parentorder.dto.OrderStatusDTO;
@@ -275,14 +276,17 @@ public class OrderSettleService{
             orderSettleNewService.sendOrderSettleMq(orderNo,settleOrders.getRenterMemNo(),settleOrders.getRentCosts(),0,settleOrders.getOwnerMemNo());
             t.setStatus(Transaction.SUCCESS);
         } catch (Exception e) {
-            log.error("OrderSettleService settleOrder,e={},",e);
-            OrderStatusDTO orderStatusDTO = new OrderStatusDTO();
-            orderStatusDTO.setOrderNo(orderNo);
-            orderStatusDTO.setSettleStatus(SettleStatusEnum.SETTL_FAIL.getCode());
-            orderStatusDTO.setSettleTime(LocalDateTime.now());
-            orderStatusService.saveOrderStatusInfo(orderStatusDTO);
+            log.error("OrderSettleService settleOrder,orderNo={},",orderNo, e);
+            OrderStatusEntity entity = orderStatusService.getByOrderNo(orderNo);
+            if(null != entity && entity.getIsDetain() != OrderConstant.YES) {
+                OrderStatusEntity record = new OrderStatusEntity();
+                record.setId(entity.getId());
+                record.setWzSettleStatus(SettleStatusEnum.SETTL_FAIL.getCode());
+                record.setSettleTime(LocalDateTime.now());
+                orderStatusService.updateByPrimaryKeySelective(record);
+            }
             t.setStatus(e);
-            Cat.logError("结算失败  :{}",e);
+            Cat.logError("结算失败  :orderNo="+orderNo, e);
             orderSettleNewService.sendOrderSettleMq(orderNo,settleOrders.getRenterMemNo(),settleOrders.getRentCosts(),1,settleOrders.getOwnerMemNo());
             throw new RuntimeException("结算失败 ,不能结算");
         } finally {
