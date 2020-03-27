@@ -42,7 +42,7 @@ public class AccountRenterDetainDetailDTO implements Serializable {
      * 暂扣费用来源编码
      */
     @AutoDocProperty(value="暂扣费用来源编码",required=true)
-    private Integer sourceCode;
+    private String sourceCode;
     /**
      * 暂扣费用来源编码描述
      */

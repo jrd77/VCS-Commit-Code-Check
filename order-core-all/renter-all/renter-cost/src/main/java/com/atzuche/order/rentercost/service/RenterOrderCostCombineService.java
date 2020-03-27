@@ -707,7 +707,7 @@ public class RenterOrderCostCombineService {
 		PayableVO payableVO = new PayableVO();
 		payableVO.setAmt(payable);
 		payableVO.setOrderNo(orderNo);
-		payableVO.setTitle("修改订单补付");
+		payableVO.setTitle("支付租车费用");  //修改订单补付
 		payableVO.setType(1);
 		payableVO.setUniqueNo(renterOrderNo);
 		return payableVO;
@@ -728,7 +728,7 @@ public class RenterOrderCostCombineService {
 		PayableVO payableVO = new PayableVO();
 		payableVO.setAmt(payable);
 		payableVO.setOrderNo(orderNo);
-		payableVO.setTitle("修改订单补付");
+		payableVO.setTitle("支付租车费用");  //修改订单补付
 		payableVO.setType(1);
 		payableVO.setUniqueNo(renterOrderNo);
 		return payableVO;

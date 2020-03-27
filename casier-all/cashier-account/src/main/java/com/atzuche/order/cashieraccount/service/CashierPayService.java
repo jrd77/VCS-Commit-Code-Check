@@ -268,9 +268,8 @@ public class CashierPayService{
                 //异步通知处理类
             	callBack.callBack(vo.getMemNo(),vo.getOrderNo(),vo.getRenterOrderNo(),vo.getIsPayAgain(),vo.getIsGetCar());
                 
-            } else {  //补付总和
-            	callBack.callBack(vo.getMemNo(),vo.getOrderNo(),vo.getRentAmountAfterRenterOrderNos(),vo.getIsPayAgain(),vo.getIsGetCar(),
-                		vo.getSupplementIds(),vo.getDebtIds());
+            } else {  //补付总和  vo.getMemNo(), vo.getIsPayAgain(),vo.getIsGetCar(),
+            	callBack.callBack(vo.getOrderNo(),vo.getRentAmountAfterRenterOrderNos(),vo.getSupplementIds(),vo.getDebtIds());
             }
             log.info("payOrderCallBackSuccess saveOrderStatusInfo :[{}]", GsonUtils.toJson(orderStatusDTO));
         }
@@ -532,7 +531,7 @@ public class CashierPayService{
                     //判断是租车费用、还是补付 租车费用 并记录 详情
 //                    RenterCashCodeEnum type = rentAmtPayed>0?RenterCashCodeEnum.ACCOUNT_RENTER_RENT_COST_AGAIN:RenterCashCodeEnum.ACCOUNT_RENTER_RENT_COST;
                     RenterCashCodeEnum type = RenterCashCodeEnum.ACCOUNT_RENTER_RENT_COST_AFTER;
-                    result.setIsPayAgain(YesNoEnum.YES.getCode());
+                    result.setIsPayAgain(YesNoEnum.NO.getCode());
                     accountPayAbles.add(new AccountPayAbleResVO(orderPayReqVO.getOrderNo(),orderPayReqVO.getMenNo(),payableVO.getAmt(),type,payableVO.getTitle()));
                 }
             }
@@ -552,7 +551,7 @@ public class CashierPayService{
                     //判断是租车费用、还是补付 租车费用 并记录 详情
                     RenterCashCodeEnum type = RenterCashCodeEnum.ACCOUNT_RENTER_SUPPLEMENT_COST_AGAIN;
 //                    if(RenterCashCodeEnum.ACCOUNT_RENTER_SUPPLEMENT_COST_AGAIN.equals(type)){
-                        result.setIsPayAgain(YesNoEnum.YES.getCode());
+                        result.setIsPayAgain(YesNoEnum.NO.getCode());
 //                    }
                     accountPayAbles.add(new AccountPayAbleResVO(orderPayReqVO.getOrderNo(),orderPayReqVO.getMenNo(),payableVO.getAmt(),type,payableVO.getTitle()));
                 }
@@ -578,18 +577,9 @@ public class CashierPayService{
             }
         }
         
-        
-        //待支付总额
-        int amtTotal = amtDeposit + amtWZDeposit + rentAmt + rentAmtAfter + rentIncrementAmt + rentIncrementSupplementAmt + rentIncrementDebtAmt;
         //实际待支付租车费用总额 即真实应付租车费用
         int amtRent = rentAmt + rentAmtPayed;
-        int amtRentAfter = rentAmtAfter + rentAmtPayed;
-        //补付修改订单
-        int amtIncrementRent = rentIncrementAmt + rentAmtPayed;
-        //管理后台补付
-        //支付欠款
-        
-        
+
         // 计算钱包 支付 目前支付抵扣租费费用
         int amtWallet =0;
         if(YesNoEnum.YES.getCode()==result.getIsUseWallet()){
@@ -600,6 +590,17 @@ public class CashierPayService{
             amtRent =  amtRent + amtWallet;
             accountPayAbles.add(new AccountPayAbleResVO(orderPayReqVO.getOrderNo(),orderPayReqVO.getMenNo(),amtWallet,RenterCashCodeEnum.ACCOUNT_WALLET_COST,RenterCashCodeEnum.ACCOUNT_WALLET_COST.getTxt()));
         }
+        
+
+        int amtRentAfter = rentAmtAfter + rentAmtPayed;
+        //补付修改订单
+        int amtIncrementRent = rentIncrementAmt + rentAmtPayed;
+        //管理后台补付
+        //支付欠款
+        //待支付总额
+        int amtTotal = amtDeposit + amtWZDeposit + amtRent + amtRentAfter + amtIncrementRent + rentIncrementSupplementAmt + rentIncrementDebtAmt;
+        
+
         result.setAmtWallet(amtWallet);
         result.setAmtRent(amtRent);
         //补充
@@ -834,7 +835,7 @@ public class CashierPayService{
                     vo.setPaySn(paySn);
                     String renterOrderNo = getExtendParamsRentOrderNo(payVO);
                     vo.setExtendParams(renterOrderNo);
-                    vo.setPayTitle("待支付金额："+amt+"，订单号："+vo.getOrderNo());
+                    vo.setPayTitle("待支付金额："+Math.abs(amt)+"，订单号："+vo.getOrderNo());
                     String payMd5 = MD5.MD5Encode(FasterJsonUtil.toJson(vo));
                     vo.setPayMd5(payMd5);
                     payVo.add(vo);
@@ -856,7 +857,7 @@ public class CashierPayService{
                     vo.setPaySn(paySn);
                     String renterOrderNo = getExtendParamsRentOrderNo(payVO);
                     vo.setExtendParams(renterOrderNo);
-                    vo.setPayTitle("待支付金额："+amt+"，订单号："+vo.getOrderNo());
+                    vo.setPayTitle("待支付金额："+Math.abs(amt)+"，订单号："+vo.getOrderNo());
                     String payMd5 = MD5.MD5Encode(FasterJsonUtil.toJson(vo));
                     vo.setPayMd5(payMd5);
                     payVo.add(vo);
@@ -878,7 +879,7 @@ public class CashierPayService{
                     vo.setPaySn(paySn);
                     String renterOrderNo = getExtendParamsRentOrderNo(payVO);
                     vo.setExtendParams(renterOrderNo);
-                    vo.setPayTitle("待支付金额："+amt+"，订单号："+vo.getOrderNo());
+                    vo.setPayTitle("待支付金额："+Math.abs(amt)+"，订单号："+vo.getOrderNo());
                     String payMd5 = MD5.MD5Encode(FasterJsonUtil.toJson(vo));
                     vo.setPayMd5(payMd5);
                     payVo.add(vo);
@@ -901,7 +902,7 @@ public class CashierPayService{
                     
 //                    String renterOrderNo = getExtendParamsRentOrderNo(payVO);   //扩展参数
                     vo.setExtendParams(accountPayAbleResVO.getUniqueNo());   //order_supplement_detail  id字段
-                    vo.setPayTitle("待支付金额："+amt+"，订单号："+vo.getOrderNo());
+                    vo.setPayTitle("待支付金额："+Math.abs(amt)+"，订单号："+vo.getOrderNo());
                     String payMd5 = MD5.MD5Encode(FasterJsonUtil.toJson(vo));
                     vo.setPayMd5(payMd5);
                     payVo.add(vo);
@@ -924,7 +925,7 @@ public class CashierPayService{
 //                    String renterOrderNo = getExtendParamsRentOrderNo(payVO);  //扩展参数
                     //覆盖扩展参数
                     vo.setExtendParams(accountPayAbleResVO.getUniqueNo()); //account_debt_detail id字段。
-                    vo.setPayTitle("待支付金额："+amt+"，订单号："+vo.getOrderNo());
+                    vo.setPayTitle("待支付金额："+Math.abs(amt)+"，订单号："+vo.getOrderNo());
                     String payMd5 = MD5.MD5Encode(FasterJsonUtil.toJson(vo));
                     vo.setPayMd5(payMd5);
                     payVo.add(vo);

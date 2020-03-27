@@ -60,6 +60,8 @@ public class DeliveryCarService {
         }
         int getMinute = getMinutes == null ? 0 : getMinutes;
         int returnMinute = returnMinutes == null ? 0 : returnMinutes;
+        log.info("新增配送订单数据------>>>>> 租客地址信息 入参数：【{}】",
+                orderReqContext.getOrderReqVO().getSrvGetAddr());
         addRenYunFlowOrderInfo(getMinute, returnMinute, orderReqContext, UserTypeEnum.OWNER_TYPE.getValue().intValue());
         addRenYunFlowOrderInfo(getMinute, returnMinute, orderReqContext, UserTypeEnum.RENTER_TYPE.getValue().intValue());
     }
@@ -301,7 +303,7 @@ public class DeliveryCarService {
         orderDeliveryDTO.setRentTime(orderReqContext.getOrderReqVO().getRentTime());
         orderDeliveryDTO.setRevertTime(orderReqContext.getOrderReqVO().getRevertTime());
         orderDeliveryDTO.setType(orderType);
-        orderDeliveryDTO.setParamsTypeValue(orderReqVO, orderType);
+        orderDeliveryDTO.setParamsTypeValue(orderReqVO, orderType,renterGoodsDetailDTO);
         //如果没有使用取还车服务则不需要flow数据 暂加入
         orderDeliveryFlowEntity.setRenterOrderNo(renterGoodsDetailDTO.getRenterOrderNo());
         orderDeliveryFlowEntity.setOrderNo(renterGoodsDetailDTO.getOrderNo());

@@ -1,9 +1,11 @@
 package com.atzuche.order.delivery.vo.delivery;
 
+import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
 import com.atzuche.order.commons.vo.req.OrderReqVO;
 import com.atzuche.order.delivery.enums.UsedDeliveryTypeEnum;
 import lombok.Data;
 import lombok.ToString;
+import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDateTime;
 
@@ -12,6 +14,7 @@ import java.time.LocalDateTime;
  */
 @Data
 @ToString
+@Slf4j
 public class OrderDeliveryDTO {
 
     /**
@@ -128,25 +131,33 @@ public class OrderDeliveryDTO {
      * 设置信息参数
      * @param orderType
      */
-    public void setParamsTypeValue(OrderReqVO orderReqVO,Integer orderType) {
+    public void setParamsTypeValue(OrderReqVO orderReqVO,Integer orderType,RenterGoodsDetailDTO renterGoodsDetailDTO) {
         if (orderType == UsedDeliveryTypeEnum.USED.getValue().intValue()) {
-            setRenterGetReturnAddr(orderReqVO.getSrvGetAddr());
-            setRenterGetReturnAddrLat(orderReqVO.getSrvGetLat());
-            setRenterGetReturnAddrLon(orderReqVO.getSrvGetLon());
             if (orderReqVO.getSrvGetFlag().intValue() == UsedDeliveryTypeEnum.USED.getValue().intValue()) {
                 setIsNotifyRenyun(UsedDeliveryTypeEnum.USED.getValue().intValue());
+                setRenterGetReturnAddr(orderReqVO.getSrvGetAddr());
+                setRenterGetReturnAddrLat(orderReqVO.getSrvGetLat());
+                setRenterGetReturnAddrLon(orderReqVO.getSrvGetLon());
             } else {
                 setIsNotifyRenyun(UsedDeliveryTypeEnum.NO_USED.getValue().intValue());
+                setRenterGetReturnAddr(renterGoodsDetailDTO.getCarRealAddr());
+                setRenterGetReturnAddrLat(renterGoodsDetailDTO.getCarRealLat());
+                setRenterGetReturnAddrLon(renterGoodsDetailDTO.getCarRealLon());
             }
+            log.info("新增配送订单数据------>>>>> 租客地址信息 赋值：【{}】", getRenterGetReturnAddr());
         } else {
-            setRenterGetReturnAddr(orderReqVO.getSrvReturnAddr());
-            setRenterGetReturnAddrLat(orderReqVO.getSrvReturnLat());
-            setRenterGetReturnAddrLon(orderReqVO.getSrvReturnLon());
             if (orderReqVO.getSrvReturnFlag().intValue() == UsedDeliveryTypeEnum.USED.getValue().intValue()) {
                 setIsNotifyRenyun(UsedDeliveryTypeEnum.USED.getValue().intValue());
+                setRenterGetReturnAddr(orderReqVO.getSrvReturnAddr());
+                setRenterGetReturnAddrLat(orderReqVO.getSrvReturnLat());
+                setRenterGetReturnAddrLon(orderReqVO.getSrvReturnLon());
             } else {
                 setIsNotifyRenyun(UsedDeliveryTypeEnum.NO_USED.getValue().intValue());
+                setRenterGetReturnAddr(renterGoodsDetailDTO.getCarRealAddr());
+                setRenterGetReturnAddrLat(renterGoodsDetailDTO.getCarRealLat());
+                setRenterGetReturnAddrLon(renterGoodsDetailDTO.getCarRealLon());
             }
+            log.info("新增配送订单数据------>>>>> 租客地址信息 赋值：【{}】", getRenterGetReturnAddr());
         }
     }
 

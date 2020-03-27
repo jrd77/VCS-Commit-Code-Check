@@ -12,6 +12,6 @@ public interface OrderPayCallBack {
     public void callBack(String menNo,String orderNo, String renterOrderNo, Integer isPayAgain, YesNoEnum isGetCar);
     
     //OrderPayCallBackSuccessVO vo
-    public void callBack(String menNo,String orderNo, List<String> renterOrderNo, Integer isPayAgain, YesNoEnum isGetCar, List<NotifyDataVo> supplementIds,List<NotifyDataVo> debtIds);
+    public void callBack(String orderNo, List<String> renterOrderNo, List<NotifyDataVo> supplementIds,List<NotifyDataVo> debtIds);
     public void callBackSettle(String orderNo,String renterOrderNo);
 }

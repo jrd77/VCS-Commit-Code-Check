@@ -64,4 +64,6 @@ public interface OrderMapper {
     int updateByOrderNoSelective(OrderEntity orderEntity);
 
     List<OrderEntity> getByOrderNos(@Param("orderNos")List<String> orderNos);
+
+    List<String> getorderNoAll();
 }

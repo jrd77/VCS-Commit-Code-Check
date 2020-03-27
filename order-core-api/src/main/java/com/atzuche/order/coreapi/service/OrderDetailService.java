@@ -1764,4 +1764,12 @@ public class OrderDetailService {
     }
 
 
+    public OrderNoListDTO getOrderNoAll() {
+        log.info("准备获取所有订单号");
+        OrderNoListDTO orderNoListDTO = new OrderNoListDTO();
+        List<String> orderNos = orderService.getorderNoAll();
+        log.info("获取所有订单号，当前订单数量 size={}",orderNos.size());
+        orderNoListDTO.setOrderNo(orderNos);
+        return orderNoListDTO;
+    }
 }
