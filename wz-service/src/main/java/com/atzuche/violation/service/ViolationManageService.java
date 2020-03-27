@@ -403,19 +403,22 @@ public class ViolationManageService {
 
         renterOrderWzStatusEntity.setWzRemarks( violationAlterationRequestVO.getWzRemarks());
 
-        if(managementMode == 1){
-            renterOrderWzStatusEntity.setStatus(25);
-            renterOrderWzStatusEntity.setStatusDesc(WzStatusEnums.getStatusDesc(25));
-        } else if (managementMode == 2) {
-            renterOrderWzStatusEntity.setStatus(26);
-            renterOrderWzStatusEntity.setStatusDesc(WzStatusEnums.getStatusDesc(26));
-        } else if (managementMode == 3) {
-            renterOrderWzStatusEntity.setStatus(40);
-            renterOrderWzStatusEntity.setStatusDesc(WzStatusEnums.getStatusDesc(40));
-        } else if (managementMode == 4) {
-            renterOrderWzStatusEntity.setStatus(46);
-            renterOrderWzStatusEntity.setStatusDesc(WzStatusEnums.getStatusDesc(46));
+        if(!org.springframework.util.StringUtils.isEmpty(managementMode)){
+            if(managementMode == 1){
+                renterOrderWzStatusEntity.setStatus(25);
+                renterOrderWzStatusEntity.setStatusDesc(WzStatusEnums.getStatusDesc(25));
+            } else if (managementMode == 2) {
+                renterOrderWzStatusEntity.setStatus(26);
+                renterOrderWzStatusEntity.setStatusDesc(WzStatusEnums.getStatusDesc(26));
+            } else if (managementMode == 3) {
+                renterOrderWzStatusEntity.setStatus(40);
+                renterOrderWzStatusEntity.setStatusDesc(WzStatusEnums.getStatusDesc(40));
+            } else if (managementMode == 4) {
+                renterOrderWzStatusEntity.setStatus(46);
+                renterOrderWzStatusEntity.setStatusDesc(WzStatusEnums.getStatusDesc(46));
+            }
         }
+
 
         RenterOrderWzStatusEntity oldRenterOrderWzStatusEntity = renterOrderWzStatusService.selectByOrderNo(renterOrderWzStatusEntity.getOrderNo(),renterOrderWzStatusEntity.getCarPlateNum());
         RenterOrderViolationLogVO oldRenterOrderViolationLogVO = new RenterOrderViolationLogVO();
