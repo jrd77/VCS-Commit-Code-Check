@@ -482,6 +482,7 @@ public class ViolationManageService {
         renterOrderWzStatusEntity.setOrderNo(orderNo);
         renterOrderWzStatusEntity.setCarPlateNum(carNumber);
         renterOrderWzStatusEntity.setStatus(wzDisposeStatus);
+        renterOrderWzStatusEntity.setIllegalQuery(3);//已处理无违章
         if(wzDisposeStatus == 40){
             renterOrderWzStatusEntity.setManagementMode(2);
         } else if (wzDisposeStatus == 10 || wzDisposeStatus == 25){
