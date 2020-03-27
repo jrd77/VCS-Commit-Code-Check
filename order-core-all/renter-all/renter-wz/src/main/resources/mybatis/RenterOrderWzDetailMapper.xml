@@ -371,7 +371,7 @@
 	</select>
 
 	<select id="queryIllegalCountByCarNoAndOrders" resultType="java.lang.Integer">
-		select count (*)
+		select count(*)
 		from renter_order_wz_detail
 		where car_plate_num = #{carNo}
 		and is_valid=1
