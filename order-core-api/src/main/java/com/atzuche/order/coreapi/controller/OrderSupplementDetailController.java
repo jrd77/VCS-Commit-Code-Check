@@ -62,6 +62,11 @@ public class OrderSupplementDetailController {
         	List<OrderSupplementDetailEntity> lsEntity = orderSupplementDetailService.listOrderSupplementDetailByMemNo(vo.getMemNo());
         	if(lsEntity == null) {
         		lsEntity = new ArrayList<OrderSupplementDetailEntity>();
+        	}else {
+        		for (OrderSupplementDetailEntity orderSupplementDetailEntity : lsEntity) {
+        			//正负号取反
+        			orderSupplementDetailEntity.setAmt(-orderSupplementDetailEntity.getAmt());
+				}
         	}
         	
         	//1 查询子单号 ,根据会员号查询。区别:数据源
@@ -130,8 +135,8 @@ public class OrderSupplementDetailController {
 		                PayableVO payableVO = payableVOs.get(i);
 		                //判断是租车费用、还是补付 租车费用 并记录 详情
 		                RenterCashCodeEnum type = RenterCashCodeEnum.ACCOUNT_RENTER_RENT_COST_AFTER;	                    
-		                //数据封装
-		                OrderSupplementDetailEntity entity = orderSupplementDetailService.handleConsoleData(payableVO.getAmt(), type, memNo, orderNo);
+		                //数据封装,正负号取反
+		                OrderSupplementDetailEntity entity = orderSupplementDetailService.handleConsoleData(-payableVO.getAmt(), type, memNo, orderNo);
 		                if(entity != null) {
 		            		lsEntity.add(entity);
 		            	}
@@ -149,8 +154,8 @@ public class OrderSupplementDetailController {
 		        PayableVO payableVO = payableVOs.get(i);
 		        //判断是租车费用、还是补付 租车费用 并记录 详情
 		        RenterCashCodeEnum type = RenterCashCodeEnum.ACCOUNT_RENTER_DEBT_COST_AGAIN;	                    
-		        //数据封装
-		        OrderSupplementDetailEntity entity = orderSupplementDetailService.handleDebtData(payableVO.getAmt(), type, memNo, payableVO.getOrderNo());
+		        //数据封装,正负号取反
+		        OrderSupplementDetailEntity entity = orderSupplementDetailService.handleDebtData(-payableVO.getAmt(), type, memNo, payableVO.getOrderNo());
 		        if(entity != null) {
 		    		lsEntity.add(entity);
 		    	}
