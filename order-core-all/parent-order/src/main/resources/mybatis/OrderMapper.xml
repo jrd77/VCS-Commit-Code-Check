@@ -299,7 +299,7 @@
         </foreach>
     </select>
     <select id="getorderNoAll" resultType="java.lang.String">
-        select orderNo from `order`
+        select `order_no` from `order`
     </select>
 
 </mapper>

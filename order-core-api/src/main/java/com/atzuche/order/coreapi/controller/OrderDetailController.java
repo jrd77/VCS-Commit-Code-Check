@@ -123,7 +123,6 @@ public class OrderDetailController {
 
     @GetMapping("/getOrderNoAll")
     public ResponseData<OrderNoListDTO> getOrderNoAll(){
-
         OrderNoListDTO orderNoListDTO =  orderDetailService.getOrderNoAll();
         return ResponseData.success(orderNoListDTO);
     }
