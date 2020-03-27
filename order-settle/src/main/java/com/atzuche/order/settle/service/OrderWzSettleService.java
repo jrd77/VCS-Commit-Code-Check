@@ -5,6 +5,8 @@ package com.atzuche.order.settle.service;
 
 import java.time.LocalDateTime;
 
+import com.atzuche.order.commons.constant.OrderConstant;
+import com.atzuche.order.parentorder.entity.OrderStatusEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -60,16 +62,19 @@ public class OrderWzSettleService {
             orderWzSettleNewService.sendOrderWzSettleSuccessMq(orderNo,settleOrders.getRenterMemNo(),settleOrders.getOwnerMemNo());
             t.setStatus(Transaction.SUCCESS);
         } catch (Exception e) {
-            log.error("OrderWzSettleService settleOrder,e={},",e);
+            log.error("OrderWzSettleService settleOrder,orderNo={},",orderNo, e);
             //结算失败，更新结算标识字段。 违章押金结算失败
-            OrderStatusDTO orderStatusDTO = new OrderStatusDTO();
-            orderStatusDTO.setOrderNo(orderNo);
-            orderStatusDTO.setWzSettleStatus(SettleStatusEnum.SETTL_FAIL.getCode());
-            orderStatusDTO.setSettleTime(LocalDateTime.now());
-            orderStatusService.saveOrderStatusInfo(orderStatusDTO);
+            OrderStatusEntity entity = orderStatusService.getByOrderNo(orderNo);
+            if(null != entity && entity.getIsDetainWz() != OrderConstant.YES) {
+                OrderStatusEntity record = new OrderStatusEntity();
+                record.setId(entity.getId());
+                record.setWzSettleStatus(SettleStatusEnum.SETTL_FAIL.getCode());
+                record.setSettleTime(LocalDateTime.now());
+                orderStatusService.updateByPrimaryKeySelective(record);
+            }
             orderWzSettleNewService.sendOrderWzSettleFailMq(orderNo,settleOrders.getRenterMemNo(),settleOrders.getOwnerMemNo());
             t.setStatus(e);
-            Cat.logError("结算失败  :{}",e);
+            Cat.logError("结算失败.orderNo="+orderNo,e);
             throw new RuntimeException("违章结算失败 ,不能结算");
         } finally {
             t.complete();

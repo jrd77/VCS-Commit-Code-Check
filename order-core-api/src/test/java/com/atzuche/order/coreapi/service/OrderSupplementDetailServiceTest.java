@@ -27,13 +27,41 @@ public class OrderSupplementDetailServiceTest {
 	@Autowired
 	OrderSupplementDetailService orderSupplementDetailService;
 	
-	String memNo = "";
+	String memNo = "546594423";
 	@Test
 	public void testListOrderSupplementDetailByMemNo() {
 		List<OrderSupplementDetailEntity> lsEntity = orderSupplementDetailService.listOrderSupplementDetailByMemNo(memNo);
     	if(lsEntity == null) {
     		lsEntity = new ArrayList<OrderSupplementDetailEntity>();
     	}
+    	for (OrderSupplementDetailEntity orderSupplementDetailEntity : lsEntity) {
+			//正负号取反
+			orderSupplementDetailEntity.setAmt(-orderSupplementDetailEntity.getAmt());
+		}
+    	
+    	for (OrderSupplementDetailEntity entity : lsEntity) {
+			log.info("entity="+entity.toString());
+		}
+    	log.info("===========================补付记录OK");
+	}
+	
+	@Test
+	public void testListOrderSupplementDetailByMemNoAndOrderNos() {
+		List<String> orderNoList = new ArrayList();
+		//51075381100299
+		orderNoList.add("51075381100299");
+		
+
+		
+		List<OrderSupplementDetailEntity> lsEntity = orderSupplementDetailService.listOrderSupplementDetailByMemNoAndOrderNos(memNo,orderNoList);
+    	if(lsEntity == null) {
+    		lsEntity = new ArrayList<OrderSupplementDetailEntity>();
+    	}
+    	for (OrderSupplementDetailEntity orderSupplementDetailEntity : lsEntity) {
+			//正负号取反
+			orderSupplementDetailEntity.setAmt(-orderSupplementDetailEntity.getAmt());
+		}
+    	
     	for (OrderSupplementDetailEntity entity : lsEntity) {
 			log.info("entity="+entity.toString());
 		}
@@ -57,10 +85,7 @@ public class OrderSupplementDetailServiceTest {
 		fail("Not yet implemented");
 	}
 
-	@Test
-	public void testListOrderSupplementDetailByMemNoAndOrderNos() {
-		fail("Not yet implemented");
-	}
+
 
 	@Test
 	public void testGetTotalSupplementAmt() {

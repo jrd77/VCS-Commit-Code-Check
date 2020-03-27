@@ -63,7 +63,7 @@ public class CashierNoTServiceTest {
 		                //判断是租车费用、还是补付 租车费用 并记录 详情
 		                RenterCashCodeEnum type = RenterCashCodeEnum.ACCOUNT_RENTER_RENT_COST_AFTER;	                    
 		                //数据封装
-		                OrderSupplementDetailEntity entity = orderSupplementDetailService.handleConsoleData(payableVO.getAmt(), type, memNo, orderNo);
+		                OrderSupplementDetailEntity entity = orderSupplementDetailService.handleConsoleData(-payableVO.getAmt(), type, memNo, orderNo);
 		                if(entity != null) {
 		            		lsEntity.add(entity);
 		            	}
@@ -90,6 +90,25 @@ public class CashierNoTServiceTest {
 	
 	
 	@Test
+	public void testGetRenterOrderNoByMemNoAndOrderNos() {
+		List<String> orderNoList = new ArrayList();
+		orderNoList.add("64231262300299");
+		orderNoList.add("43267162300299");
+		
+		//1 查询子单号 ,根据会员号查询。区别:数据源
+		List<OrderSupplementDetailEntity> lsEntity = new ArrayList<OrderSupplementDetailEntity>();
+        List<RenterOrderEntity> listRenterOrderEntity = cashierNoTService.getRenterOrderNoByMemNoAndOrderNos(memNo, orderNoList);
+        //管理后台修改订单
+        handleListRenterOrderEntity(memNo, lsEntity, listRenterOrderEntity);
+        for (OrderSupplementDetailEntity entity : lsEntity) {
+			log.info("entity="+entity.toString());
+		}
+    	log.info("===========================222补付记录OK");
+	}
+	
+	
+	
+	@Test
 	public void testGetRenterOrderNoByOrderNo() {
 		fail("Not yet implemented");
 	}
@@ -101,10 +120,7 @@ public class CashierNoTServiceTest {
 
 
 
-	@Test
-	public void testGetRenterOrderNoByMemNoAndOrderNos() {
-		fail("Not yet implemented");
-	}
+	
 
 	@Test
 	public void testGetCashierEntity() {

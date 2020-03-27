@@ -181,7 +181,6 @@ public class OwnerAgreeOrderService {
                 try {
                     ownerRefuseOrderService.refuse(orderInfoDTO.getOrderNo());
                     //后续异步操作可迁移至此
-
                     result = true;
                 } catch (Exception e) {
                     logger.error("租期重叠处理异常.orderInfoDTO:[{}]", JSON.toJSONString(orderInfoDTO), e);
