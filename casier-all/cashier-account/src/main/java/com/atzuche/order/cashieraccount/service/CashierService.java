@@ -733,6 +733,8 @@ public class CashierService {
                 orderFlowService.inserOrderStatusChangeProcessInfo(orderStatusDTO.getOrderNo(), OrderStatusEnum.TO_GET_CAR);
 
             }
+        } else {
+        	log.error("orderStatusEntity未查询到记录,orderNo=[{}]",orderNo);
         }
         //1更新 订单流转状态
         orderStatusService.saveOrderStatusInfo(orderStatusDTO);
