@@ -728,6 +728,7 @@ public class RenterOrderCostCombineService {
 		if (consoleFineList != null && !consoleFineList.isEmpty()) {
 			payable += consoleFineList.stream().mapToInt(ConsoleRenterOrderFineDeatailEntity::getFineAmount).sum();
 		}
+		log.info("租客[orderNo={},memNo={}]全局补贴和罚金求和:[toSubsidy={}]",orderNo,memNo,payable);
 		return payable;
 	}
 	

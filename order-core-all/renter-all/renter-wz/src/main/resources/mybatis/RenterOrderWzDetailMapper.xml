@@ -274,6 +274,27 @@
 		update_time = NOW()
 		where id = #{id} and is_delete = 0
 	</update>
+	<update id="updateRenterOrderWzDetailById" parameterType="com.atzuche.order.renterwz.entity.RenterOrderWzDetailEntity">
+		update renter_order_wz_detail set
+		<if test="illegalTime != null">
+			illegal_time = #{illegalTime},
+		</if>
+		<if test="illegalAddr != null">
+			illegal_addr = #{illegalAddr},
+		</if>
+		<if test="illegalReason != null">
+			illegal_reason = #{illegalReason},
+		</if>
+		<if test="illegalAmt != null">
+			illegal_amt = #{illegalAmt},
+		</if>
+		<if test="illegalDeduct != null">
+			illegal_deduct = #{illegalDeduct},
+		</if>
+		update_time = NOW()
+		where id = #{id} and is_delete = 0
+	</update>
+
 
 	 <update id="deleteRenterOrderWzDetailById" parameterType="java.lang.Long">
 		update renter_order_wz_detail set

@@ -165,6 +165,13 @@ public class ViolationInfoService {
             for (int i = 0; i < list.size(); i++) {
                 try {
                     List<String> cellList = list.get(i);
+                    renterOrderWzDetailEntity.setOrderNo(cellList.get(2));
+                    renterOrderWzDetailEntity.setCarPlateNum(cellList.get(5));
+                    renterOrderWzDetailEntity.setOrderFlag(1);
+                    renterOrderWzDetailEntity.setIsValid(1);
+                    renterOrderWzDetailEntity.setIsSms(0);
+                    renterOrderWzDetailEntity.setIsDelete(0);
+                    renterOrderWzDetailEntity.setUpdateTime(new Date());
                     renterOrderWzDetailEntity.setId(Long.valueOf(cellList.get(0)));
                     renterOrderWzDetailEntity.setIllegalTime(DateUtil.parseDate(cellList.get(9), "yyyy-MM-dd HH:mm:ss"));
                     renterOrderWzDetailEntity.setIllegalAmt(cellList.get(12));
@@ -197,14 +204,19 @@ public class ViolationInfoService {
         while (iterator.hasNext()){
             RenterOrderWzDetailEntity renterOrderWzDetailEntity = renterOrderWzDetailMapper.queryRenterOrderWzDetailById(iterator.next().getId());
             if (Objects.nonNull(renterOrderWzDetailEntity)) {
-                int result = renterOrderWzDetailMapper.updateRenterOrderWzDetail(renterOrderWzDetailEntity);
+                int result = renterOrderWzDetailMapper.updateRenterOrderWzDetailById(renterOrderWzDetailEntity);
                 if (result > 0) {
                     a++;
                 } else {
                     b++;
                 }
             } else {
-                b++;
+                int result = renterOrderWzDetailMapper.saveRenterOrderWzDetail(renterOrderWzDetailEntity);
+                if (result > 0) {
+                    a++;
+                } else {
+                    b++;
+                }
             }
         }
         importMsgInfo = "提示：" + a + "条导入成功。" + b + "条导入失败。";
