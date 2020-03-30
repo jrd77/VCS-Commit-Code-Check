@@ -1,55 +1,10 @@
 package com.atzuche.order.rentercost.service;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-
 import com.alibaba.fastjson.JSON;
-import com.atzuche.config.client.api.CarParamHotBrandDepositSDK;
-import com.atzuche.config.client.api.CityConfigSDK;
-import com.atzuche.config.client.api.DefaultConfigContext;
-import com.atzuche.config.client.api.DepositConfigSDK;
-import com.atzuche.config.client.api.IllegalDepositConfigSDK;
-import com.atzuche.config.client.api.InsuranceConfigSDK;
-import com.atzuche.config.client.api.OilAverageCostConfigSDK;
-import com.atzuche.config.client.api.SysConstantSDK;
-import com.atzuche.config.common.entity.CarParamHotBrandDepositEntity;
-import com.atzuche.config.common.entity.CityEntity;
-import com.atzuche.config.common.entity.DepositConfigEntity;
-import com.atzuche.config.common.entity.IllegalDepositConfigEntity;
-import com.atzuche.config.common.entity.InsuranceConfigEntity;
-import com.atzuche.config.common.entity.OilAverageCostEntity;
-import com.atzuche.config.common.entity.SysContantEntity;
-import com.atzuche.order.commons.CatConstants;
-import com.atzuche.order.commons.DateUtils;
-import com.atzuche.order.commons.GlobalConstant;
-import com.atzuche.order.commons.LocalDateTimeUtils;
-import com.atzuche.order.commons.ResponseCheckUtil;
-import com.atzuche.order.commons.entity.dto.AbatementAmtDTO;
-import com.atzuche.order.commons.entity.dto.CostBaseDTO;
-import com.atzuche.order.commons.entity.dto.DepositAmtDTO;
-import com.atzuche.order.commons.entity.dto.ExtraDriverDTO;
-import com.atzuche.order.commons.entity.dto.GetReturnCarCostReqDto;
-import com.atzuche.order.commons.entity.dto.GetReturnCarOverCostReqDto;
-import com.atzuche.order.commons.entity.dto.IllegalDepositAmtDTO;
-import com.atzuche.order.commons.entity.dto.InsurAmtDTO;
-import com.atzuche.order.commons.entity.dto.MileageAmtDTO;
-import com.atzuche.order.commons.entity.dto.OilAmtDTO;
-import com.atzuche.order.commons.entity.dto.RentAmtDTO;
-import com.atzuche.order.commons.entity.dto.RenterGoodsPriceDetailDTO;
+import com.atzuche.config.client.api.*;
+import com.atzuche.config.common.entity.*;
+import com.atzuche.order.commons.*;
+import com.atzuche.order.commons.entity.dto.*;
 import com.atzuche.order.commons.enums.ChannelNameTypeEnum;
 import com.atzuche.order.commons.enums.SubsidySourceCodeEnum;
 import com.atzuche.order.commons.enums.SubsidyTypeCodeEnum;
@@ -59,18 +14,11 @@ import com.atzuche.order.rentercost.entity.ConsoleRenterOrderFineDeatailEntity;
 import com.atzuche.order.rentercost.entity.OrderConsoleSubsidyDetailEntity;
 import com.atzuche.order.rentercost.entity.OrderSupplementDetailEntity;
 import com.atzuche.order.rentercost.entity.RenterOrderCostDetailEntity;
-import com.atzuche.order.rentercost.entity.dto.CityDTO;
-import com.atzuche.order.rentercost.entity.dto.GetReturnCostDTO;
-import com.atzuche.order.rentercost.entity.dto.GetReturnOverCostDTO;
-import com.atzuche.order.rentercost.entity.dto.GetReturnOverTransportDTO;
 import com.atzuche.order.rentercost.entity.dto.RenterOrderSubsidyDetailDTO;
+import com.atzuche.order.rentercost.entity.dto.*;
 import com.atzuche.order.rentercost.entity.vo.GetReturnResponseVO;
 import com.atzuche.order.rentercost.entity.vo.PayableVO;
-import com.atzuche.order.rentercost.exception.GetReturnCostErrorException;
-import com.atzuche.order.rentercost.exception.GetReturnCostFailException;
-import com.atzuche.order.rentercost.exception.RenterCostParameterException;
-import com.atzuche.order.rentercost.exception.ReturnCarOverCostErrorException;
-import com.atzuche.order.rentercost.exception.ReturnCarOverCostFailException;
+import com.atzuche.order.rentercost.exception.*;
 import com.atzuche.order.settle.entity.AccountDebtDetailEntity;
 import com.atzuche.order.settle.service.notservice.AccountDebtDetailNoTService;
 import com.autoyol.car.api.feign.api.GetBackCityLimitFeignApi;
@@ -85,15 +33,24 @@ import com.autoyol.feeservice.api.response.PriceFbcFeeResponseDetail;
 import com.autoyol.feeservice.api.response.PriceGetFbcFeeResponse;
 import com.autoyol.feeservice.api.vo.pricefetchback.PriceCarHumanFeeRule;
 import com.autoyol.platformcost.CommonUtils;
-import com.autoyol.platformcost.LocalDateTimeUtil;
 import com.autoyol.platformcost.RenterFeeCalculatorUtils;
 import com.autoyol.platformcost.model.CarDepositAmtVO;
 import com.autoyol.platformcost.model.CarPriceOfDay;
 import com.autoyol.platformcost.model.FeeResult;
 import com.dianping.cat.Cat;
 import com.dianping.cat.message.Transaction;
-
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -405,8 +362,7 @@ public class RenterOrderCostCombineService {
 			throw new RenterCostParameterException();
 		}
         List<DepositConfigEntity> depositList = depositConfigSDK.getConfig(new DefaultConfigContext());
-
-        double years = LocalDateTimeUtil.periodDays(depositAmtDTO.getLicenseDay(), LocalDate.now())/365D;
+        double years =(LocalDate.now().toEpochDay() - depositAmtDTO.getLicenseDay().toEpochDay())/365D;
         int surplusPriceProYear = CommonUtils.getSurplusPriceProYear(years);
         CarDepositAmtVO carDepositAmtVO = RenterFeeCalculatorUtils.calCarDepositAmt(depositAmtDTO.getCityCode(),
 				depositAmtDTO.getSurplusPrice(),
@@ -707,7 +663,7 @@ public class RenterOrderCostCombineService {
 		PayableVO payableVO = new PayableVO();
 		payableVO.setAmt(payable);
 		payableVO.setOrderNo(orderNo);
-		payableVO.setTitle("修改订单补付");
+		payableVO.setTitle("支付租车费用");  //修改订单补付
 		payableVO.setType(1);
 		payableVO.setUniqueNo(renterOrderNo);
 		return payableVO;
@@ -728,7 +684,7 @@ public class RenterOrderCostCombineService {
 		PayableVO payableVO = new PayableVO();
 		payableVO.setAmt(payable);
 		payableVO.setOrderNo(orderNo);
-		payableVO.setTitle("修改订单补付");
+		payableVO.setTitle("支付租车费用");  //修改订单补付
 		payableVO.setType(1);
 		payableVO.setUniqueNo(renterOrderNo);
 		return payableVO;
@@ -772,6 +728,7 @@ public class RenterOrderCostCombineService {
 		if (consoleFineList != null && !consoleFineList.isEmpty()) {
 			payable += consoleFineList.stream().mapToInt(ConsoleRenterOrderFineDeatailEntity::getFineAmount).sum();
 		}
+		log.info("租客[orderNo={},memNo={}]全局补贴和罚金求和:[toSubsidy={}]",orderNo,memNo,payable);
 		return payable;
 	}
 	

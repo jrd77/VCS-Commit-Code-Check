@@ -100,7 +100,7 @@ public class OwnerIncomeController {
         return ResponseData.success(vo);
     }
 
-    @AutoDocMethod(value = "调账收益录入接口", description = "调账收益录入接口")
+    @AutoDocMethod(value = "调账收益审核接口", description = "调账收益审核接口")
     @PostMapping("/adjustmentOwnerIncomeExam")
     public ResponseData adjustmentOwnerIncomeExam(@RequestBody @Valid AdjustmentOwnerIncomeExamVO adjustmentOwnerIncomeExamVO, BindingResult bindingResult){
         BindingResultUtil.checkBindingResult(bindingResult);

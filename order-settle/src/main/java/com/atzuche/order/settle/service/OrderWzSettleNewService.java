@@ -39,6 +39,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -333,8 +334,8 @@ public class OrderWzSettleNewService {
 		orderSettlementMq.setStatus(1);
 		orderSettlementMq.setOrderNo(orderNo);
 		//新增参数车主号，租客号。
-		orderSettlementMq.setRenterMemNo(Integer.valueOf(renterMemNo));
-		orderSettlementMq.setOwnerMemNo(Integer.valueOf(ownerMemNo));
+		orderSettlementMq.setRenterMemNo(!StringUtils.isEmpty(renterMemNo) ? Integer.valueOf(renterMemNo) : null);
+		orderSettlementMq.setOwnerMemNo(!StringUtils.isEmpty(ownerMemNo) ? Integer.valueOf(ownerMemNo) : null);
 		OrderMessage orderMessage = OrderMessage.builder().build();
 		orderMessage.setMessage(orderSettlementMq);
 		// TODO 发短信

@@ -102,7 +102,9 @@ public class AccountRenterDepositService{
 
     /**
      * 账户押金转出
-     * @param detainRenterDepositReqVO
+     *
+     * @param detainRenterDepositReqVO 参数
+     * @return int 成功条数
      */
     public int detainRenterDeposit(DetainRenterDepositReqVO detainRenterDepositReqVO) {
         //1 参数校验
@@ -113,18 +115,22 @@ public class AccountRenterDepositService{
         //添加押金资金进出明细
         return accountRenterDepositDetailNoTService.insertRenterDepositDetail(detainRenterDepositReqVO);
     }
-    
-    public int detainRenterWzDeposit(DetainRenterDepositReqVO detainRenterDepositReqVO) {
+
+
+    /**
+     * 账户押金转出
+     *
+     * @param detainRenterDepositReqVO 参数
+     * @return int 成功条数
+     */
+    public int detainRenterDepositNew(DetainRenterDepositReqVO detainRenterDepositReqVO) {
         //1 参数校验
         Assert.notNull(detainRenterDepositReqVO, ErrorCode.PARAMETER_ERROR.getText());
         detainRenterDepositReqVO.check();
-        //2更新车辆押金  剩余押金 金额
-        accountRenterDepositNoTService.updateRenterDepositChange(detainRenterDepositReqVO);
         //添加押金资金进出明细
-        int id = accountRenterDepositDetailNoTService.insertRenterDepositDetail(detainRenterDepositReqVO);
-        return id;
+        return accountRenterDepositDetailNoTService.insertRenterDepositDetail(detainRenterDepositReqVO);
     }
-    
+
 
     public void updateRenterDepositUniqueNo(String uniqueNo, int renterDepositDetailId) {
         accountRenterDepositDetailNoTService.updateRenterDepositUniqueNo(uniqueNo,renterDepositDetailId);

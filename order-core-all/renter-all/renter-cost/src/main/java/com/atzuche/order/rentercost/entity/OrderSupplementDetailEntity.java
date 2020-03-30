@@ -6,6 +6,7 @@ import java.util.Date;
 import com.autoyol.doc.annotation.AutoDocProperty;
 
 import lombok.Data;
+import lombok.ToString;
 
 
 /**
@@ -15,6 +16,7 @@ import lombok.Data;
  * @date 2019-12-27 10:18:00
  * @Description:
  */
+@ToString
 @Data
 public class OrderSupplementDetailEntity implements Serializable {
 	private static final long serialVersionUID = 1L;

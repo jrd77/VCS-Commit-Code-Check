@@ -82,11 +82,12 @@ public class PayCallbackService implements OrderPayCallBack {
 //        modifyOrderForRenterService.supplementPayPostProcess(orderNo,renterOrderNo);
     }
 
+    //Integer isPayAgain, YesNoEnum isGetCar,  去掉参数
+    //rentAmountAfterRenterOrderNo  管理后台修改增加的补付记录。
 	@Override
-	public void callBack(String menNo, String orderNo, List<String> rentAmountAfterRenterOrderNo, Integer isPayAgain,
-			YesNoEnum isGetCar, List<NotifyDataVo> supplementIds, List<NotifyDataVo> debtIds) {
+	public void callBack(String orderNo, List<String> rentAmountAfterRenterOrderNo, List<NotifyDataVo> supplementIds, List<NotifyDataVo> debtIds) {
 		//rentAmountAfterRenterOrderNo  无需处理
-		
+		log.info(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>补付回调通知处理:orderNo=[{}]",orderNo);
 		//更新supplement
 		for (NotifyDataVo vo : supplementIds) {
 			String id = vo.getExtendParams();

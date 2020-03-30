@@ -15,7 +15,9 @@ import com.atzuche.order.commons.entity.dto.OwnerGoodsDetailDTO;
 import com.atzuche.order.commons.entity.dto.OwnerMemberDTO;
 import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
 import com.atzuche.order.commons.entity.dto.RenterMemberDTO;
-import com.atzuche.order.commons.enums.*;
+import com.atzuche.order.commons.enums.OrderStatusEnum;
+import com.atzuche.order.commons.enums.SubsidySourceCodeEnum;
+import com.atzuche.order.commons.enums.SubsidyTypeCodeEnum;
 import com.atzuche.order.commons.enums.account.FreeDepositTypeEnum;
 import com.atzuche.order.commons.enums.cashcode.OwnerCashCodeEnum;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
@@ -32,8 +34,6 @@ import com.atzuche.order.coreapi.utils.BizAreaUtil;
 import com.atzuche.order.delivery.service.delivery.DeliveryCarService;
 import com.atzuche.order.flow.service.OrderFlowService;
 import com.atzuche.order.mem.MemProxyService;
-import com.atzuche.order.mq.common.base.BaseProducer;
-import com.atzuche.order.mq.common.base.OrderMessage;
 import com.atzuche.order.owner.commodity.service.OwnerGoodsService;
 import com.atzuche.order.owner.mem.service.OwnerMemberService;
 import com.atzuche.order.ownercost.entity.OwnerOrderPurchaseDetailEntity;
@@ -61,10 +61,7 @@ import com.atzuche.order.renterwz.service.RenterOrderWzStatusService;
 import com.autoyol.car.api.model.dto.LocationDTO;
 import com.autoyol.car.api.model.dto.OrderInfoDTO;
 import com.autoyol.car.api.model.enums.OrderOperationTypeEnum;
-import com.autoyol.commons.utils.DateUtil;
 import com.autoyol.commons.utils.GsonUtils;
-import com.autoyol.event.rabbit.neworder.NewOrderMQActionEventEnum;
-import com.autoyol.event.rabbit.neworder.OrderCreateMq;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -131,10 +128,7 @@ public class SubmitOrderService {
     private RenterOrderWzStatusService renterOrderWzStatusService;
     @Autowired
     private OrderTransferRecordService orderTransferRecordService;
-    @Autowired 
-    private PayCallbackService payCallbackService;
-    @Autowired
-    private CashierPayService cashierPayService;
+
 
     /**
      * 提交订单
@@ -142,7 +136,7 @@ public class SubmitOrderService {
      * @param context 下单请求信息
      * @return OrderResVO 下单返回结果
      */
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public OrderResVO submitOrder(OrderReqContext context) {
         OrderReqVO orderReqVO = context.getOrderReqVO();
         orderReqVO.setReqTime(LocalDateTime.now());
@@ -245,16 +239,6 @@ public class SubmitOrderService {
         orderStatusDTO.setOrderNo(orderNo);
         if (null == renterGoodsDetailDTO.getReplyFlag() || renterGoodsDetailDTO.getReplyFlag() == OrderConstant.NO) {
             orderStatusDTO.setStatus(OrderStatusEnum.TO_CONFIRM.getStatus());
-            //如果是使用钱包，检测是否钱包全额抵扣，推动订单流程。huangjing 200324  刷新钱包
-            try {
-         	   if(orderReqVO.getUseBal() == OrderConstant.YES) {
-     	    	   OrderPaySignReqVO vo = cashierPayService.buildOrderPaySignReqVO(orderNo, orderReqVO.getMemNo(), orderReqVO.getUseBal());
-     	           cashierPayService.getPaySignStrNew(vo,payCallbackService);
-     	          LOGGER.info("获取支付签名串A.params=[{}]",GsonUtils.toJson(vo));
-         	   }
-     		} catch (Exception e) {
-     			LOGGER.error("刷新钱包支付抵扣");
-     		}
         } else {
             orderStatusDTO.setStatus(OrderStatusEnum.TO_PAY.getStatus());
         }
@@ -560,8 +544,8 @@ public class SubmitOrderService {
 
     /**
      * 对象转换
-     * @param reqContext
-     * @param orderNo
+     * @param reqContext 请求参数
+     * @param orderNo 订单号
      * @return OrderTransferRecordEntity
      */
     public OrderTransferRecordEntity convertToOrderTransferRecordEntity(OrderReqContext reqContext, String orderNo) {

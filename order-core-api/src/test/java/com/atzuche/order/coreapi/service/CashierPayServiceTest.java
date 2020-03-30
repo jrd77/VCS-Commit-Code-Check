@@ -17,8 +17,12 @@ import com.atzuche.order.cashieraccount.vo.req.pay.OrderPayReqVO;
 import com.atzuche.order.cashieraccount.vo.req.pay.OrderPaySignReqVO;
 import com.atzuche.order.cashieraccount.vo.res.AccountPayAbleResVO;
 import com.atzuche.order.cashieraccount.vo.res.OrderPayableAmountResVO;
+import com.atzuche.order.commons.constant.OrderConstant;
 import com.atzuche.order.coreapi.TemplateApplication;
+import com.atzuche.order.renterorder.entity.RenterOrderEntity;
+import com.atzuche.order.renterorder.service.RenterOrderService;
 import com.autoyol.autopay.gateway.constant.DataPayKindConstant;
+import com.autoyol.commons.utils.GsonUtils;
 import com.google.common.collect.Lists;
 
 import lombok.extern.slf4j.Slf4j;
@@ -32,10 +36,27 @@ public class CashierPayServiceTest {
 	@Autowired
 	CashierPayService cashierPayService;
 	@Autowired PayCallbackService payCallbackService;
+	@Autowired
+	RenterOrderService renterOrderService;
 	
 	@Test
 	public void testPayCallBack() {
 		fail("Not yet implemented");
+	}
+	
+	@Test
+	public void testWallet() {
+		try {
+		      RenterOrderEntity renterOrderEntity =
+		                renterOrderService.getRenterOrderByOrderNoAndIsEffective("46512262300299");
+	    	   if(renterOrderEntity.getIsUseWallet() == OrderConstant.YES) {
+		    	   OrderPaySignReqVO vo = cashierPayService.buildOrderPaySignReqVO(renterOrderEntity);
+		           cashierPayService.getPaySignStrNew(vo,payCallbackService);
+		           log.info("获取支付签名串B.params=[{}]",GsonUtils.toJson(vo));
+	    	   }
+			} catch (Exception e) {
+				log.error("刷新钱包支付抵扣:",e);
+			}
 	}
 
 	@Test
