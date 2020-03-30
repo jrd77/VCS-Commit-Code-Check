@@ -45,6 +45,13 @@ public interface RenterOrderWzDetailMapper{
 	Integer updateRenterOrderWzDetail(RenterOrderWzDetailEntity renterOrderWzDetail);
 
 	/**
+	 * 修改
+	 * @param renterOrderWzDetail 修改实体
+	 * @return 成功条数
+	 */
+	Integer updateRenterOrderWzDetailById(RenterOrderWzDetailEntity renterOrderWzDetail);
+
+	/**
 	 * 根据主键删除
 	 * @param id 主键
 	 * @return 删除的数量
