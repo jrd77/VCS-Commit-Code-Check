@@ -69,7 +69,7 @@ public class OrderWzSettleService {
                 OrderStatusEntity record = new OrderStatusEntity();
                 record.setId(entity.getId());
                 record.setWzSettleStatus(SettleStatusEnum.SETTL_FAIL.getCode());
-                record.setSettleTime(LocalDateTime.now());
+                record.setWzSettleTime(LocalDateTime.now());
                 orderStatusService.updateByPrimaryKeySelective(record);
             }
             orderWzSettleNewService.sendOrderWzSettleFailMq(orderNo,settleOrders.getRenterMemNo(),settleOrders.getOwnerMemNo());
