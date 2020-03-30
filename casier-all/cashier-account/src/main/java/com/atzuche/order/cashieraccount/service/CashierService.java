@@ -785,6 +785,7 @@ public class CashierService {
 	        sendOrderPayDepositSuccess(NewOrderMQActionEventEnum.RENTER_ORDER_PAYFEESUCCESS,1,vo);
         }
         
+        // -------------------------------------------------------- 支付租车费用和APP修改订单补付组合,更新的是实收
         //1.3 租车费用 11
         if(Objects.nonNull(notifyDataVo) && DataPayKindConstant.RENT_AMOUNT.equals(notifyDataVo.getPayKind()) ){
             //1 对象初始化转换
@@ -808,6 +809,7 @@ public class CashierService {
 	        sendOrderPayRentCostSuccess(NewOrderMQActionEventEnum.RENTER_ORDER_PAYSUCCESS,vo,2);
         }
         
+        // -------------------------------------------------------- 三大补付组合,更新的都是实收
         //补充
         if(Objects.nonNull(notifyDataVo) && DataPayKindConstant.RENT_AMOUNT_AFTER.equals(notifyDataVo.getPayKind()) ){
             //1 对象初始化转换

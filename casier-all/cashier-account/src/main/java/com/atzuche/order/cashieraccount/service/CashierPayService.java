@@ -574,9 +574,9 @@ public class CashierPayService{
             	result.setPayableVOs(payableVOs);
             }
             //应付租车费用,保存为负数
-            rentIncrementSupplementAmt = cashierNoTService.sumRentOrderCost(payableVOs);
+            rentIncrementSupplementAmt = cashierNoTService.sumRentOrderCost(payableVOs);  
             //已付租车费用(shifu  租车费用的实付)
-            if(!CollectionUtils.isEmpty(payableVOs) && rentIncrementSupplementAmt < 0){ 
+            if(!CollectionUtils.isEmpty(payableVOs) && rentIncrementSupplementAmt < 0){    //大于0的情况就不考虑了。兼容负数的情况。
                 for(int i=0;i<payableVOs.size();i++){
                     PayableVO payableVO = payableVOs.get(i);
                     //判断是租车费用、还是补付 租车费用 并记录 详情
@@ -954,7 +954,8 @@ public class CashierPayService{
                     AccountRenterCostSettleEntity entity = cashierService.getAccountRenterCostSettle(orderNo,orderPaySign.getMenNo());
                     Integer payId = Objects.isNull(entity)?0:entity.getId();
                     String payIdStr = Objects.isNull(payId)?"":String.valueOf(payId);
-                    PayVo vo = cashierNoTService.getPayVO(orderNo,null,orderPaySign,amt,accountPayAbleResVO.getTitle(),payKind,payIdStr,GsonUtils.toJson(entity),3);
+                    //特殊处理
+                    PayVo vo = cashierNoTService.getPayVOForOrderSupplementDetail(orderNo,null,orderPaySign,(-amt),accountPayAbleResVO.getTitle(),payKind,payIdStr,GsonUtils.toJson(entity),3);
                     String paySn = cashierNoTService.getCashierRentCostPaySn(orderNo,orderPaySign.getMenNo(),payKind);
                     vo.setPaySn(paySn);
                     

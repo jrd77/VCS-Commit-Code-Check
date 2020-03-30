@@ -38,6 +38,9 @@ public class OrderPayCallBackRabbitListener {
      * 支付系统回调
      * MQ 异步回调
      */
+//    @RabbitListener(bindings = {
+//            @QueueBinding(value = @Queue(value = "pay.success.20test", durable = "true"), exchange = @Exchange(value = "auto-paytest", durable = "true", type = "topic"), key = "pay.success.20test")})
+    
     @RabbitListener(bindings = {
             @QueueBinding(value = @Queue(value = "pay.success.20", durable = "true"), exchange = @Exchange(value = "auto-pay", durable = "true", type = "topic"), key = "pay.success.20")})
     public void payCallBack(Message message) {
