@@ -1,4 +1,4 @@
-package com.atzuche.order.commons.filter.cost;
+package com.atzuche.order.coreapi.submitOrder.exception;
 
 import com.atzuche.order.commons.OrderException;
 

@@ -1,4 +1,4 @@
-package com.atzuche.order.commons.cost;
+package com.atzuche.order.coreapi.entity.dto.cost;
 
 import lombok.Data;
 

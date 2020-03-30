@@ -1,12 +1,10 @@
-package com.atzuche.order.coreapi.filter.cost;
+package com.atzuche.order.coreapi.submitOrder.filter.cost;
 
-import com.atzuche.order.commons.cost.OrderCostContext;
-import com.atzuche.order.commons.enums.OrderCategoryEnum;
-import com.atzuche.order.commons.filter.OrderFilter;
 import com.atzuche.order.commons.filter.OrderFilterException;
-import com.atzuche.order.commons.filter.cost.OrderCostFilter;
+import com.atzuche.order.coreapi.entity.dto.cost.OrderCostContext;
+import com.atzuche.order.coreapi.filter.cost.OrderCostFilter;
+import com.atzuche.order.coreapi.filter.cost.*;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -36,20 +34,19 @@ public class OrderCostFilterChain implements OrderCostFilter, ApplicationContext
     @PostConstruct
     private void init() {
         //租金
-        orderCostFilterList.add(null);
+        orderCostFilterList.add(applicationContext.getBean(OrderRentAmtFilter.class));
         //基础保险费
-        orderCostFilterList.add(null);
+        orderCostFilterList.add(applicationContext.getBean(OrderInsurAmtFilter.class));
         //全面保障费
-        orderCostFilterList.add(null);
+        orderCostFilterList.add(applicationContext.getBean(OrderAbatementAmtFilter.class));
         //附加驾驶人保险费
-        orderCostFilterList.add(null);
+        orderCostFilterList.add(applicationContext.getBean(OrderExtraDriverInsureAmtFilter.class));
         //手续费
-        orderCostFilterList.add(null);
+        orderCostFilterList.add(applicationContext.getBean(OrderServiceChargeFilter.class));
         //取还车服务费用
-        orderCostFilterList.add(null);
+        orderCostFilterList.add(applicationContext.getBean(OrderGetAndReturnCarCostFilter.class));
         //超运能溢价
-        orderCostFilterList.add(null);
-
+        orderCostFilterList.add(applicationContext.getBean(OrderOverTransportCapacityPremiumFilter.class));
     }
 
     @Override
