@@ -89,6 +89,7 @@ public class CarRentalTimeApiProxyService {
             carRentTimeRangeResVO.setAdvanceStartDate(LocalDateTimeUtils.dateToLocalDateTime(carAddress.getAdvanceStartDate()));
             carRentTimeRangeResVO.setDelayEndDate(LocalDateTimeUtils.dateToLocalDateTime(carAddress.getDelayEndDate()));
             t.setStatus(Transaction.SUCCESS);
+            LOGGER.info("提前延后时间计算. result is,carRentTimeRangeResVO:[{}]",JSON.toJSONString(carRentTimeRangeResVO));
             return carRentTimeRangeResVO;
 
         } catch (Exception e) {

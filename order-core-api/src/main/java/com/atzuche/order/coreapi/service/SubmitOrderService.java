@@ -299,13 +299,8 @@ public class SubmitOrderService {
         String orderNo = uniqueOrderNoService.genOrderNo();
         //生成租客订单号
         String renterOrderNo = uniqueOrderNoService.genRenterOrderNo(orderNo);
-
-
-
-
-
-
-
+        //生成车主子订单号
+        String ownerOrderNo = uniqueOrderNoService.genOwnerOrderNo(orderNo);
 
 
         OrderResVO orderResVO = new OrderResVO();
@@ -318,7 +313,7 @@ public class SubmitOrderService {
 
 
 
-        private OrderInfoDTO initOrderInfoDTO(OrderReqVO orderReqVO) {
+    private OrderInfoDTO initOrderInfoDTO(OrderReqVO orderReqVO) {
         OrderInfoDTO orderInfoDTO = new OrderInfoDTO();
         orderInfoDTO.setOrderNo(null);
         orderInfoDTO.setCityCode(Integer.valueOf(orderReqVO.getCityCode()));
