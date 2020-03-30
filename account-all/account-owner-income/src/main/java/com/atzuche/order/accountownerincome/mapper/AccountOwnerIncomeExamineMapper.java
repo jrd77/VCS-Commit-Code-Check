@@ -26,4 +26,5 @@ public interface AccountOwnerIncomeExamineMapper{
 
     List<AccountOwnerIncomeExamineEntity> selectByOwnerOrderNo(@Param("ownerOrderNo") String ownerOrderNo);
 
+    List<AccountOwnerIncomeExamineEntity> selectByExamineId(@Param("examineId") Integer examineId);
 }
