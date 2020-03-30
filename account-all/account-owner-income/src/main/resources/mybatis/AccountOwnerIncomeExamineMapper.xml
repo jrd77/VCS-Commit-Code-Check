@@ -131,7 +131,9 @@
         select <include refid="Base_Column_List" /> from account_owner_income_examine
         where order_no = #{orderNo} and mem_no = #{memNo} and type = #{type} and is_delete = 0
     </select>
-
+    <select id="selectByExamineId" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List" /> from account_owner_income_examine where examine_id = #{examineId} or id = #{examineId}
+    </select>
 
 
 </mapper>

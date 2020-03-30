@@ -120,6 +120,7 @@ public enum ErrorCode {
     NOTICE_SOURCE_ERR("700148","找不到对应的来源类型"),
     OWNER_INCOM_EXAM_ERR("700149","车主结算收益审核记录不存在"),
     OWNER_INCOM_EXAM_INSERT_ERR("700150","车主结算收益审核记录保存失败"),
+    OWNER_INCOM_AUDIT_REPEAT_FAIL("700151","车主收益重复审核错误"),
     RENT_TIME_LESS_CURR_TIME_2HOUR("500055","起租时间应晚于当前时间2小时"),
     REVERT_TIME_LESS_RENT_TIME_1HOUR("500056","“还车时间”应晚于“起租时间”1小时"),
     RENT_TIME_LESS_CURR_TIME("500006","起租时间应晚于当前时间"),

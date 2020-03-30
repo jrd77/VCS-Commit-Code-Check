@@ -1,9 +1,9 @@
 package com.atzuche.order.accountownerincome.service.notservice;
 
 import com.alibaba.fastjson.JSON;
-import com.atzuche.order.accountownerincome.entity.AccountOwnerIncomeDetailEntity;
 import com.atzuche.order.accountownerincome.entity.AccountOwnerIncomeExamineEntity;
 import com.atzuche.order.accountownerincome.exception.AccountOwnerIncomeExamineException;
+import com.atzuche.order.accountownerincome.exception.AccountOwnerIncomeExamineRepeatException;
 import com.atzuche.order.accountownerincome.exception.AccountOwnerIncomeSettleException;
 import com.atzuche.order.accountownerincome.mapper.AccountOwnerIncomeExamineMapper;
 import com.atzuche.order.commons.enums.account.income.AccountOwnerIncomeExamineStatus;
@@ -68,21 +68,30 @@ public class AccountOwnerIncomeExamineNoTService {
         if(Objects.isNull(accountOwnerIncomeExamine) || Objects.isNull(accountOwnerIncomeExamine.getId())){
             throw new AccountOwnerIncomeExamineException();
         }
+        if(AccountOwnerIncomeExamineStatus.PASS_EXAMINE.getStatus() == accountOwnerIncomeExamine.getStatus()){
+            log.error("车主收益审核已经通过，禁止二次审核accountOwnerIncomeExamineOpReq={}",JSON.toJSONString(accountOwnerIncomeExamineOpReq));
+            throw new AccountOwnerIncomeExamineRepeatException();
+        }
         LocalDateTime now = LocalDateTime.now();
         AccountOwnerIncomeExamineEntity accountOwnerIncomeExamineUpdate = new AccountOwnerIncomeExamineEntity();
         BeanUtils.copyProperties(accountOwnerIncomeExamineOpReq,accountOwnerIncomeExamineUpdate);
         accountOwnerIncomeExamineUpdate.setVersion(accountOwnerIncomeExamine.getVersion());
         accountOwnerIncomeExamineUpdate.setId(accountOwnerIncomeExamine.getId());
-        accountOwnerIncomeExamineUpdate.setStatus(accountOwnerIncomeExamineOpReq.getStatus().getStatus());
+        accountOwnerIncomeExamineUpdate.setStatus(accountOwnerIncomeExamineOpReq.getStatus());
         accountOwnerIncomeExamineUpdate.setTime(now);
         int result = accountOwnerIncomeExamineMapper.updateByPrimaryKeySelective(accountOwnerIncomeExamineUpdate);
         if(result==0){
             throw new AccountOwnerIncomeExamineException();
         }
     }
-
-    public AccountOwnerIncomeExamineEntity getAccountOwnerIncomeExamineById(Integer accountOwnerIncomeExamineId) {
-       return accountOwnerIncomeExamineMapper.selectByPrimaryKey(accountOwnerIncomeExamineId);
+    /*
+     * @Author ZhangBin
+     * @Date 2020/3/30 15:34
+     * @Description: 通过examineId查询
+     *
+     **/
+    public List<AccountOwnerIncomeExamineEntity> getAccountOwnerIncomeExamineById(Integer accountOwnerIncomeExamineId) {
+       return accountOwnerIncomeExamineMapper.selectByExamineId(accountOwnerIncomeExamineId);
     }
     
     public List<AccountOwnerIncomeExamineEntity> getAccountOwnerIncomeExamineByOrderNo(String orderNo,String memNo) {
@@ -119,12 +128,12 @@ public class AccountOwnerIncomeExamineNoTService {
             throw new OwnerIncomeExamineNotFoundException();
         }
         if(AccountOwnerIncomeExamineStatus.PASS_EXAMINE.getStatus() == accountOwnerIncomeExamineEntity.getStatus()){
-            log.info("已经审核通过,跳过二次审核 adjustmentOwnerIncomeExamVO={}",JSON.toJSONString(adjustmentOwnerIncomeExamVO));
+            log.info("已经审核通过,禁止二次审核 adjustmentOwnerIncomeExamVO={}",JSON.toJSONString(adjustmentOwnerIncomeExamVO));
             return;
         }
 
         int adjustmentAmt = adjustmentOwnerIncomeExamVO.getAdjustmentAmt();
-        Integer settAmt = accountOwnerIncomeExamineEntity.getAmt();
+        //Integer settAmt = accountOwnerIncomeExamineEntity.getAmt();
         AccountOwnerIncomeExamineEntity accountOwnerIncomeExamine = new AccountOwnerIncomeExamineEntity();
         accountOwnerIncomeExamine.setAmt(adjustmentAmt);
         accountOwnerIncomeExamine.setStatus(adjustmentOwnerIncomeExamVO.getAuditStatus());
@@ -149,11 +158,11 @@ public class AccountOwnerIncomeExamineNoTService {
         AccountOwnerIncomeExamineEntity accountOwnerIncomeExamineEntityNew = new AccountOwnerIncomeExamineEntity();
         accountOwnerIncomeExamineEntityNew.setVersion(accountOwnerIncomeExamineEntity.getVersion());
         accountOwnerIncomeExamineEntityNew.setId(accountOwnerIncomeExamineEntity.getId());
-        accountOwnerIncomeExamineEntityNew.setStatus(adjustmentOwnerIncomeExamVO.getAuditStatus());
+        //accountOwnerIncomeExamineEntityNew.setStatus(adjustmentOwnerIncomeExamVO.getAuditStatus());
         accountOwnerIncomeExamineEntityNew.setExamineId(adjustmentOwnerIncomeExamVO.getExamineId());
         accountOwnerIncomeExamineMapper.updateByPrimaryKeySelective(accountOwnerIncomeExamineEntityNew);
         //审核通过后统计到收益表中
-        if(AccountOwnerIncomeExamineStatus.PASS_EXAMINE.getStatus() == adjustmentOwnerIncomeExamVO.getAuditStatus()){
+        /*if(AccountOwnerIncomeExamineStatus.PASS_EXAMINE.getStatus() == adjustmentOwnerIncomeExamVO.getAuditStatus()){
             int currIncomAmt = settAmt + adjustmentAmt;
             log.info("车主调账收益审核更新车主收益 currIncomAmt={}",currIncomAmt);
             //更新收益
@@ -161,6 +170,6 @@ public class AccountOwnerIncomeExamineNoTService {
             accountOwnerIncomeDetailEntity.setMemNo(accountOwnerIncomeExamineEntity.getMemNo());
             accountOwnerIncomeDetailEntity.setAmt(currIncomAmt);
             accountOwnerIncomeNoTService.updateOwnerIncomeAmt(accountOwnerIncomeDetailEntity);
-        }
+        }*/
     }
 }
