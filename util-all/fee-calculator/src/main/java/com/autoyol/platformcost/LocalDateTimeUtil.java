@@ -174,4 +174,12 @@ public class LocalDateTimeUtil {
         return localDateList;
     }
 
+
+    public static void main(String[] args) {
+
+        //int days = Period.between(LocalDate.of(2013, 4, 12), LocalDate.of(2020, 3, 27)).getDays();
+        //System.out.println(days);
+        long l = LocalDate.of(2020, 1, 2).toEpochDay() - LocalDate.of(2019, 12, 29).toEpochDay();
+        System.out.println(l);
+    }
 }
