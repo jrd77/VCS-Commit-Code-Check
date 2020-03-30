@@ -3,26 +3,22 @@ package com.atzuche.order.coreapi.entity.dto.cost.res;
 import com.atzuche.order.rentercost.entity.RenterOrderCostDetailEntity;
 import lombok.Data;
 
-import java.util.List;
-
 /**
- * 租金信息
+ * 手续费
  *
  * @author pengcheng.fu
- * @date 2020/3/30 11:30
+ * @date 2020/3/30 15:35
  */
-
 @Data
-public class OrderRentAmtResDTO {
+public class OrderServiceChargeResDTO {
 
     /**
-     * 租金
+     * 手续费
      */
-    private Integer rentAmt;
+    private Integer serviceCharge;
 
     /**
-     * 租金明细
+     * 手续费明细
      */
-    private List<RenterOrderCostDetailEntity> details ;
-
+    private RenterOrderCostDetailEntity detail;
 }

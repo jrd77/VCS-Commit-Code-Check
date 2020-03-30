@@ -6,23 +6,23 @@ import lombok.Data;
 import java.util.List;
 
 /**
- * 租金信息
+ * 全面保障服务费
  *
  * @author pengcheng.fu
- * @date 2020/3/30 11:30
+ * @date 2020/3/30 15:11
  */
 
 @Data
-public class OrderRentAmtResDTO {
+public class OrderAbatementAmtResDTO {
+
 
     /**
-     * 租金
+     * 全面保障服务费
      */
-    private Integer rentAmt;
+    private Integer abatementAmt;
 
     /**
-     * 租金明细
+     * 全面保障服务费明细
      */
-    private List<RenterOrderCostDetailEntity> details ;
-
+    private List<RenterOrderCostDetailEntity> details;
 }

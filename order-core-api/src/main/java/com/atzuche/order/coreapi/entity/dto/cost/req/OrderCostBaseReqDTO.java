@@ -15,14 +15,32 @@ import java.time.LocalDateTime;
 public class OrderCostBaseReqDTO {
 
     /**
+     * 主订单号
+     */
+    private String orderNo;
+    /**
+     * 租客子订单号
+     */
+    private String renterOrderNo;
+    /**
+     * 车主子订单号
+     */
+    private String ownerOrderNo;
+    /**
+     * 租客会员号
+     */
+    private String memNo;
+    /**
+     * 车主会员号
+     */
+    private String ownerMemNo;
+    /**
      * 订单取车时间(yyyy-MM-dd HH:mm:ss)
      */
-    private LocalDateTime rentTime;
-
+    private LocalDateTime startTime;
     /**
      * 订单还车时间(yyyy-MM-dd HH:mm:ss)
      */
-    private LocalDateTime revertTime;
-
+    private LocalDateTime endTime;
 
 }

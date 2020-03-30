@@ -2,6 +2,8 @@ package com.atzuche.order.coreapi.entity.dto.cost.req;
 
 import lombok.Data;
 
+import java.util.List;
+
 /**
  * 计算附加驾驶人保险费参数
  *
@@ -10,4 +12,9 @@ import lombok.Data;
  */
 @Data
 public class OrderCostExtraDriverReqDTO {
+
+    /**
+     * 附加驾驶人id列表
+     */
+    private List<String> driverIds;
 }
