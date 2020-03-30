@@ -1,4 +1,4 @@
-package com.atzuche.order.coreapi.entity.dto.cost.dto.res;
+package com.atzuche.order.coreapi.entity.dto.cost.res;
 
 import com.atzuche.order.rentercost.entity.RenterOrderCostDetailEntity;
 import lombok.Data;

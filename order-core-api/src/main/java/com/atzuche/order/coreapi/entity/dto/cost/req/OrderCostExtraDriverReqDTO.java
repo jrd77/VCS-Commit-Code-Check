@@ -1,4 +1,4 @@
-package com.atzuche.order.coreapi.entity.dto.cost.dto.req;
+package com.atzuche.order.coreapi.entity.dto.cost.req;
 
 import lombok.Data;
 
