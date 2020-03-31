@@ -1,10 +1,5 @@
 package com.atzuche.order.rentercost.service;
 
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import com.atzuche.order.commons.entity.dto.CostBaseDTO;
 import com.atzuche.order.commons.enums.SubsidySourceCodeEnum;
 import com.atzuche.order.commons.enums.SubsidyTypeCodeEnum;
@@ -12,6 +7,10 @@ import com.atzuche.order.commons.enums.cashcode.OwnerCashCodeEnum;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.rentercost.entity.OrderConsoleSubsidyDetailEntity;
 import com.atzuche.order.rentercost.mapper.OrderConsoleSubsidyDetailMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 
 
@@ -81,7 +80,31 @@ public class OrderConsoleSubsidyDetailService{
     	
     	return 1;
     }
-    
+    public int saveOrUpdateOrderConsoleSubsidyDetailByMemNo(OrderConsoleSubsidyDetailEntity record) {
+        List<OrderConsoleSubsidyDetailEntity> list = listOrderConsoleSubsidyDetailByOrderNoAndMemNo(record.getOrderNo(), record.getMemNo());
+        boolean isExists = false;
+        for (OrderConsoleSubsidyDetailEntity orderConsoleSubsidyDetailEntity : list) {
+            //存在
+            if(orderConsoleSubsidyDetailEntity.getSubsidySourceCode().equals(record.getSubsidySourceCode())
+                    && orderConsoleSubsidyDetailEntity.getSubsidyTargetCode().equals(record.getSubsidyTargetCode())
+                    && orderConsoleSubsidyDetailEntity.getSubsidyCostCode().equals(record.getSubsidyCostCode())
+                    && orderConsoleSubsidyDetailEntity.getMemNo().equals(record.getMemNo())) {
+                record.setId(orderConsoleSubsidyDetailEntity.getId());
+                //修改的话无需修改创建人
+                record.setCreateOp(null);
+                orderConsoleSubsidyDetailMapper.updateByPrimaryKeySelective(record);
+                isExists = true;
+            }
+        }
+
+        if(!isExists) {
+            //增加记录
+            orderConsoleSubsidyDetailMapper.insertSelective(record);
+        }
+
+
+        return 1;
+    }
     
     /**
      * 调价的公共方法，在一个方法内完成。    使用上面的saveOrUpdateOrderConsoleSubsidyDetail方法。
