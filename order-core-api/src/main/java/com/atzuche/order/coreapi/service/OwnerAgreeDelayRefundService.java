@@ -7,7 +7,7 @@ import com.atzuche.order.commons.enums.FineSubsidySourceCodeEnum;
 import com.atzuche.order.commons.enums.FineTypeEnum;
 import com.atzuche.order.coreapi.entity.CancelOrderReqContext;
 import com.atzuche.order.coreapi.entity.dto.CancelOrderReqDTO;
-import com.atzuche.order.coreapi.submitOrder.exception.CancelOrderCheckException;
+import com.atzuche.order.coreapi.submit.exception.CancelOrderCheckException;
 import com.atzuche.order.ownercost.entity.ConsoleOwnerOrderFineDeatailEntity;
 import com.atzuche.order.ownercost.service.ConsoleOwnerOrderFineDeatailService;
 import com.atzuche.order.parentorder.entity.OrderCancelReasonEntity;
