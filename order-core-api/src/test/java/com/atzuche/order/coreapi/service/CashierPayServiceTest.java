@@ -92,16 +92,16 @@ public class CashierPayServiceTest {
 	public void testGetOrderPayableAmount() {
 		OrderPayReqVO orderPayReqVO = new OrderPayReqVO();
 		orderPayReqVO.setIsUseWallet(0);
-		orderPayReqVO.setMenNo("802589690");
-		orderPayReqVO.setOrderNo("47035250300299");
+		orderPayReqVO.setMenNo("40330022");
+		orderPayReqVO.setOrderNo("83902103300299");
 		List<String> payKinds = Lists.newArrayList();
 		payKinds.add("03");
 		orderPayReqVO.setPayKind(payKinds);
 		OrderPayableAmountResVO vo = cashierPayService.getOrderPayableAmount(orderPayReqVO);
-		log.info("vo="+vo.toString());
+		log.info("vo="+GsonUtils.toJson(vo));
 		List<AccountPayAbleResVO> ls = vo.getAccountPayAbles();
 		for (AccountPayAbleResVO accountPayAbleResVO : ls) {
-			log.info("accountPayAbleResVO = "+accountPayAbleResVO.toString());
+			log.info("accountPayAbleResVO = "+ GsonUtils.toJson(accountPayAbleResVO));
 		}
 	}
 

@@ -17,6 +17,7 @@ import com.atzuche.order.cashieraccount.vo.req.pay.OrderPayReqVO;
 import com.atzuche.order.cashieraccount.vo.req.pay.OrderPaySignReqVO;
 import com.atzuche.order.cashieraccount.vo.res.OrderPayableAmountResVO;
 import com.atzuche.order.commons.BindingResultUtil;
+import com.atzuche.order.commons.enums.ErrorCode;
 import com.atzuche.order.coreapi.service.PayCallbackService;
 import com.autoyol.autopay.gateway.vo.req.PrePlatformRequest;
 import com.autoyol.autopay.gateway.vo.res.PayResVo;
@@ -52,16 +53,24 @@ public class CashierController {
         
         //支付金额大于0
         //入参未传递的化，不考虑收银台的数据获取。兼容该接口之前的支付宝小程序的调用。
-        if(StringUtils.isNotBlank(orderPayReqVO.getPayType()) && StringUtils.isNotBlank(orderPayReqVO.getAtappId()) && result.getAmtTotal() < 0) {  //带支付 为负数
-	        //调起支付平台获取收银台信息
-	        PrePlatformRequest reqData = new PrePlatformRequest();
-	        //赋值
-	        putPrePlatformRequest(orderPayReqVO, result, reqData);
-			
-	        PayResVo payResVo = payRemoteService.getPayPlatform(reqData);
-	        if(payResVo != null) {
-	        	BeanUtils.copyProperties(payResVo, result);
-	        }
+        if(StringUtils.isNotBlank(orderPayReqVO.getPayType()) && StringUtils.isNotBlank(orderPayReqVO.getAtappId())) {  //带支付 为负数
+        	//AppServer端调用，小程序没有收银台。
+        	if(result.getAmtTotal() < 0) {
+		        //调起支付平台获取收银台信息
+		        PrePlatformRequest reqData = new PrePlatformRequest();
+		        //赋值
+		        putPrePlatformRequest(orderPayReqVO, result, reqData);
+				
+		        PayResVo payResVo = payRemoteService.getPayPlatform(reqData);
+		        if(payResVo != null) {
+		        	BeanUtils.copyProperties(payResVo, result);
+		        }
+        	}else {
+        		//金额异常的情况，  提示“没有待支付记录”
+        		return ResponseData.createErrorCodeResponse(ErrorCode.CASHIER_PAY_SIGN_FAIL_ERRER.getCode(), ErrorCode.CASHIER_PAY_SIGN_FAIL_ERRER.getText());
+        	}
+        }else {
+        	log.info("无需收银台参数的请求:params=[{}]",GsonUtils.toJson(orderPayReqVO));
         }
         return ResponseData.success(result);
     }
