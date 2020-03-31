@@ -1,10 +1,11 @@
-package com.atzuche.order.coreapi.submitOrder.exception;
+package com.atzuche.order.coreapi.submit.exception;
 
 import com.atzuche.order.commons.OrderException;
-import com.autoyol.commons.web.ErrorCode;
 
 public class SubmitOrderException extends OrderException {
 
+
+    private static final long serialVersionUID = -1066843266437250882L;
 
     public SubmitOrderException(String errorCode, String errorMsg) {
         super(errorCode, errorMsg);

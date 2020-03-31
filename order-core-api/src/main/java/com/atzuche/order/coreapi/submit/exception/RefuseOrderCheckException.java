@@ -1,4 +1,4 @@
-package com.atzuche.order.coreapi.submitOrder.exception;
+package com.atzuche.order.coreapi.submit.exception;
 
 import com.atzuche.order.commons.OrderException;
 import com.autoyol.commons.web.ErrorCode;
@@ -11,6 +11,8 @@ import com.autoyol.commons.web.ErrorCode;
  */
 public class RefuseOrderCheckException extends OrderException {
 
+
+    private static final long serialVersionUID = 7857594134974477358L;
 
     public RefuseOrderCheckException(String errorCode, String errorMsg) {
         super(errorCode, errorMsg);

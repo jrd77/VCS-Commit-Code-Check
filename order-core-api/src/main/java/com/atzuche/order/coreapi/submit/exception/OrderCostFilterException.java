@@ -1,4 +1,4 @@
-package com.atzuche.order.coreapi.submitOrder.exception;
+package com.atzuche.order.coreapi.submit.exception;
 
 import com.atzuche.order.commons.OrderException;
 

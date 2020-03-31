@@ -1,9 +1,11 @@
-package com.atzuche.order.coreapi.submitOrder.filter.cost;
+package com.atzuche.order.coreapi.submit.filter.cost;
 
+import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.filter.OrderFilterException;
 import com.atzuche.order.coreapi.entity.dto.cost.OrderCostContext;
 import com.atzuche.order.coreapi.filter.cost.OrderCostFilter;
-import com.atzuche.order.coreapi.filter.cost.*;
+import com.atzuche.order.coreapi.filter.cost.impl.*;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
@@ -21,7 +23,8 @@ import java.util.List;
  * @date 2020/2/3 9:44 上午
  **/
 @Service
-public class OrderCostFilterChain implements OrderCostFilter, ApplicationContextAware {
+@Slf4j
+public class OrderCostFilterChain implements ApplicationContextAware {
 
     private ApplicationContext applicationContext;
 
@@ -49,15 +52,15 @@ public class OrderCostFilterChain implements OrderCostFilter, ApplicationContext
         orderCostFilterList.add(applicationContext.getBean(OrderOverTransportCapacityPremiumFilter.class));
     }
 
-    @Override
     public void calculate(OrderCostContext context) throws OrderFilterException {
-
+        log.info("订单相关费用计算开始. context:[{}]", JSON.toJSONString(context));
         if (CollectionUtils.isEmpty(orderCostFilterList)) {
             throw new RuntimeException("Order cost filter list is empty.");
         }
         for (OrderCostFilter filter : orderCostFilterList) {
             filter.calculate(context);
         }
+        log.info("订单相关费用计算结束. context:[{}]", JSON.toJSONString(context));
     }
 
     @Override
