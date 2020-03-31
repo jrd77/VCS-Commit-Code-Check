@@ -28,7 +28,7 @@ dependencies {
     compile "com.autoyol:auto-web-starter:1.0-SNAPSHOT"
 //	compile project(":other-api")
 //    compile 'org.springframework.boot:spring-boot-starter-web'
-//	compile('org.springframework.boot:spring-boot-starter-actuator')
+	compile('org.springframework.boot:spring-boot-starter-actuator')
 //	compile('org.springframework.boot:spring-boot-starter-aop')
     compile 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
     compile 'org.springframework.cloud:spring-cloud-starter-sleuth'
