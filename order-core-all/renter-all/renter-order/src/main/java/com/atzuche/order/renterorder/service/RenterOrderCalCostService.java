@@ -374,7 +374,7 @@ public class RenterOrderCalCostService {
      * 计算车主券抵扣信息(修改订单用)
      *
      * @param ownerCouponGetAndValidReqVO 请求参数
-     * @param ooupon
+     * @param ooupon 券信息
      * @return OrderCouponDTO 订单优惠券信息
      */
     public OrderCouponDTO calOwnerCouponDeductInfo(OwnerCouponGetAndValidReqVO ownerCouponGetAndValidReqVO, OrderCouponEntity ooupon) {
