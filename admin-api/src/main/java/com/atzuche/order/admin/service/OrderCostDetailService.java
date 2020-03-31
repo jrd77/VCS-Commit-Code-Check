@@ -1115,10 +1115,13 @@ public class OrderCostDetailService {
 	        
 	        //统一设置修改人名称。20200205 huangjing
 	        String userName = AdminUserUtil.getAdminUser().getAuthName(); // 获取的管理后台的用户名。
-	        consoleRenterOrderFineDeatailEntity.setUpdateOp(userName);
-	        consoleRenterOrderFineDeatailEntity.setCreateOp(userName);
-	        consoleRenterOrderFineDeatailEntity.setOperatorId(userName);
-	        consoleRenterOrderFineDeatailService.saveOrUpdateConsoleRenterOrderFineDeatail(consoleRenterOrderFineDeatailEntity);
+            if(consoleRenterOrderFineDeatailEntity != null){
+                consoleRenterOrderFineDeatailEntity.setUpdateOp(userName);
+                consoleRenterOrderFineDeatailEntity.setCreateOp(userName);
+                consoleRenterOrderFineDeatailEntity.setOperatorId(userName);
+                consoleRenterOrderFineDeatailService.saveOrUpdateConsoleRenterOrderFineDeatail(consoleRenterOrderFineDeatailEntity);
+            }
+
 	        
 	        //当前存在的情况下，否则归平台。
 	        if(orderEntityOwner!=null) {
@@ -1126,11 +1129,13 @@ public class OrderCostDetailService {
 	        	ConsoleOwnerOrderFineDeatailEntity ownerEntity =
 	        			consoleOwnerOrderFineDeatailService.fineDataConvert(ownerCostDTO, Integer.valueOf(renterBeforeReturnCarFineAmt),
 		                        FineSubsidyCodeEnum.OWNER, FineSubsidySourceCodeEnum.PLATFORM, FineTypeEnum.MODIFY_ADVANCE);
-		        
-		        ownerEntity.setUpdateOp(userName);
-		        ownerEntity.setCreateOp(userName);
-		        ownerEntity.setOperatorId(userName);
-		        consoleOwnerOrderFineDeatailService.saveOrUpdateConsoleRenterOrderFineDeatail(ownerEntity);
+		        if(ownerEntity != null){
+                    ownerEntity.setUpdateOp(userName);
+                    ownerEntity.setCreateOp(userName);
+                    ownerEntity.setOperatorId(userName);
+                    consoleOwnerOrderFineDeatailService.saveOrUpdateConsoleRenterOrderFineDeatail(ownerEntity);
+                }
+
 	        }
 	        
 		}
@@ -1142,25 +1147,29 @@ public class OrderCostDetailService {
 	                        FineSubsidyCodeEnum.PLATFORM, FineSubsidySourceCodeEnum.RENTER, FineTypeEnum.DELAY_FINE);
 	        
 	        //统一设置修改人名称。20200205 huangjing
-	        String userName = AdminUserUtil.getAdminUser().getAuthName(); // 获取的管理后台的用户名。
-	        consoleRenterOrderFineDeatailEntity.setUpdateOp(userName);
-	        consoleRenterOrderFineDeatailEntity.setCreateOp(userName);
-	        consoleRenterOrderFineDeatailEntity.setOperatorId(userName);
-	        
-	        consoleRenterOrderFineDeatailService.saveOrUpdateConsoleRenterOrderFineDeatail(consoleRenterOrderFineDeatailEntity);
-	        
+            String userName = AdminUserUtil.getAdminUser().getAuthName(); // 获取的管理后台的用户名。
+            if(consoleRenterOrderFineDeatailEntity != null){
+
+                consoleRenterOrderFineDeatailEntity.setUpdateOp(userName);
+                consoleRenterOrderFineDeatailEntity.setCreateOp(userName);
+                consoleRenterOrderFineDeatailEntity.setOperatorId(userName);
+
+                consoleRenterOrderFineDeatailService.saveOrUpdateConsoleRenterOrderFineDeatail(consoleRenterOrderFineDeatailEntity);
+
+            }
+
 	        //当前存在的情况下，否则归平台。
 	        if(orderEntityOwner!=null) {
 		        //同时增加反向记录，算车主的收益  200217 通过平台中转
 		        ConsoleOwnerOrderFineDeatailEntity ownerEntity =
 	        			consoleOwnerOrderFineDeatailService.fineDataConvert(ownerCostDTO, Integer.valueOf(renterDelayReturnCarFineAmt),
 		                        FineSubsidyCodeEnum.OWNER, FineSubsidySourceCodeEnum.PLATFORM, FineTypeEnum.DELAY_FINE);
-		        
-		        ownerEntity.setUpdateOp(userName);
-		        ownerEntity.setCreateOp(userName);
-		        ownerEntity.setOperatorId(userName);
-		        consoleOwnerOrderFineDeatailService.saveOrUpdateConsoleRenterOrderFineDeatail(ownerEntity);
-		        
+		        if(ownerEntity != null){
+                    ownerEntity.setUpdateOp(userName);
+                    ownerEntity.setCreateOp(userName);
+                    ownerEntity.setOperatorId(userName);
+                    consoleOwnerOrderFineDeatailService.saveOrUpdateConsoleRenterOrderFineDeatail(ownerEntity);
+                }
 	        }
 	        
 		}
