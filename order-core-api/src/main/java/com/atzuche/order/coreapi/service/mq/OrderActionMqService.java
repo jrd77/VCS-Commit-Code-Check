@@ -124,7 +124,7 @@ public class OrderActionMqService {
         orderMessage.setMessage(orderCreateMq);
         logger.info("发送取消订单成功事件.mq:[exchange={},routingKey={}],message=[{}]", actionEventEnum.exchange, actionEventEnum.routingKey,
                 JSON.toJSON(orderMessage));
-        orderMessage.setMap(map);
+       // orderMessage.setMap(map);
         baseProducer.sendTopicMessage(actionEventEnum.exchange, actionEventEnum.routingKey, orderMessage);
     }
 

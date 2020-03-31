@@ -598,16 +598,16 @@ public class OrderCostDetailService {
 			record.setOperatorId(userName);
 	    	orderConsoleSubsidyDetailService.saveOrUpdateOrderConsoleSubsidyDetail(record);
 	    	
-	    	if(orderEntityOwner != null) {
+	    	/*if(orderEntityOwner != null) {*/
 		    	//反向记录
-	    		costBaseDTO.setMemNo(orderEntityOwner.getMemNo());
-		    	OrderConsoleSubsidyDetailEntity recordConvert = orderConsoleSubsidyDetailService.buildData(costBaseDTO, Integer.valueOf(renterCostReqVO.getRenterToOwnerAdjustAmt()), targetEnum, sourceEnum, SubsidyTypeCodeEnum.ADJUST_AMT, cash);
+	    		costBaseDTO.setMemNo(orderEntity.getMemNoRenter());
+		    	OrderConsoleSubsidyDetailEntity recordConvert = orderConsoleSubsidyDetailService.buildData(costBaseDTO, Integer.valueOf(renterCostReqVO.getRenterToOwnerAdjustAmt()),sourceEnum, targetEnum, SubsidyTypeCodeEnum.ADJUST_AMT, cash);
 		    	//
 		    	recordConvert.setCreateOp(userName);
 		    	recordConvert.setUpdateOp(userName);
 		    	recordConvert.setOperatorId(userName);
 		    	orderConsoleSubsidyDetailService.saveOrUpdateOrderConsoleSubsidyDetail(recordConvert);
-	    	}
+	    	/*}*/
 	   }
 	   
 	   /**

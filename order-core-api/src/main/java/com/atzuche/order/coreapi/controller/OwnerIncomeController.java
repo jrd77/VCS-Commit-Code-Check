@@ -80,7 +80,7 @@ public class OwnerIncomeController {
                                          @RequestParam("memNo") String memNo,
                                          @RequestParam("type") Integer type
     ){
-        log.info("OwnerIncomeController auditOwnerIncome start param [{}] [{}] [{}]", orderNo,memNo,type);
+        log.info("OwnerIncomeController getOwnerIncomeByOrderAndType start param [{}] [{}] [{}]", orderNo,memNo,type);
         OwnerIncomeExamineDetailResVO vo = new OwnerIncomeExamineDetailResVO();
         List<OwnerIncomeExamineDetailVO> ownerIncomeExamineDetails = new ArrayList<>();
         vo.setMemNo(memNo);
@@ -96,7 +96,7 @@ public class OwnerIncomeController {
             }
         }
         vo.setOwnerIncomeExamineDetailVO(ownerIncomeExamineDetails);
-        log.info("OwnerIncomeController auditOwnerIncome end param [{}] [{}]",orderNo,GsonUtils.toJson(vo));
+        log.info("OwnerIncomeController getOwnerIncomeByOrderAndType end param [{}] [{}]",orderNo,GsonUtils.toJson(vo));
         return ResponseData.success(vo);
     }
 

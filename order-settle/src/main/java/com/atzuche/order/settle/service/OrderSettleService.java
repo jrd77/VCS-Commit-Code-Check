@@ -281,7 +281,7 @@ public class OrderSettleService{
             if(null != entity && entity.getIsDetain() != OrderConstant.YES) {
                 OrderStatusEntity record = new OrderStatusEntity();
                 record.setId(entity.getId());
-                record.setWzSettleStatus(SettleStatusEnum.SETTL_FAIL.getCode());
+                record.setSettleStatus(SettleStatusEnum.SETTL_FAIL.getCode());
                 record.setSettleTime(LocalDateTime.now());
                 orderStatusService.updateByPrimaryKeySelective(record);
             }

@@ -153,7 +153,7 @@ public class IllegalToDoService {
                 paramsMap.put("linkUrl1", " ");
                 paramsMap.put("linkUrl2", " ");
                 Map map = SmsParamsMapUtil.getParamsMap(orderNo, ShortMessageTypeEnum.ILLAGE_MAX_SCORE_LIMIT_TEXT.getValue(), null, paramsMap);
-                orderSendMessageFactory.sendShortMessage(map);
+               // orderSendMessageFactory.sendShortMessage(map);
             }
             //修改订单违章处理状态,5-未处理
             Integer nowWzDisposeStatus = renterOrderWzStatusService.getTransWzDisposeStatusByOrderNo(orderNo,carNumber);
