@@ -145,7 +145,7 @@ public class OrderCostService {
         List<AccountRenterCostDetailEntity> lstCostDetail =  accountRenterCostSettleService.getAccountRenterCostDetailsByOrderNo(orderNo);
         AccountRenterCostDetailEntity walletCostDetail = null; //仅仅关心的是钱包的。
         for (AccountRenterCostDetailEntity accountRenterCostDetailEntity : lstCostDetail) {
-        	if(RenterCashCodeEnum.WALLET_DEDUCT.equals(accountRenterCostDetailEntity.getSourceCode()) && "00".equals(accountRenterCostDetailEntity.getPaySourceCode())) {
+        	if(RenterCashCodeEnum.ACCOUNT_RENTER_RENT_COST.getCashNo().equals(accountRenterCostDetailEntity.getSourceCode()) && "00".equals(accountRenterCostDetailEntity.getPaySourceCode())) {
         		walletCostDetail = new AccountRenterCostDetailEntity();
         		BeanUtils.copyProperties(accountRenterCostDetailEntity,walletCostDetail);
         	}
