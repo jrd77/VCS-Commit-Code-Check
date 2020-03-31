@@ -40,10 +40,10 @@ public class OrderConstant {
      */
     public static final int THREE = 3;
 
-
-
-
-
+    /**
+     * 1.0
+     */
+    public static final double D_ONE = 1.0;
 
     /**
      * 凹凸币抵扣租金系数

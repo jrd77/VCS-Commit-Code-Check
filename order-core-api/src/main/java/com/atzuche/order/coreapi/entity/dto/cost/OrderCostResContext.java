@@ -46,4 +46,14 @@ public class OrderCostResContext {
      * 超运能溢价信息
      */
     private OrderOverTransportCapacityPremiumResDTO orderOverTransportCapacityPremiumResDTO;
+
+    /**
+     * 基础保障费折扣信息
+     */
+    private OrderInsurAmtDeductionResDTO orderInsurAmtDeductionResDTO;
+
+    /**
+     * 全面保障服务信息
+     */
+    private OrderAbatementAmtDeductionResDTO orderAbatementAmtDeductionResDTO;
 }
