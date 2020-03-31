@@ -39,7 +39,7 @@ public enum ErrorCode {
     CASHIER_PAY_SIGN_PARAM_ERRER("981007","支付参数签名失败"),
     CASHIER_PAY_SIGN_FAIL_ERRER("981009","没有待支付记录"),
     CASHIER_PAY_SETTLEAMT_FAIL_ERRER("981010","支付系统返回的支付金额异常"),
-    
+    CASHIER_PAY_APPLY("981011","支付收银台申请出错"),
 
     ORDER_SETTLE_FLAT_ACCOUNT("811001","结算费用未平账"),
 
@@ -118,6 +118,9 @@ public enum ErrorCode {
     RENTER_SETTLE_ERR("700146","取消订单，租客端结算异常"),
     RENTER_COST_DETAIL_FAIL("700147","获取租客费用详情失败"),
     NOTICE_SOURCE_ERR("700148","找不到对应的来源类型"),
+    OWNER_INCOM_EXAM_ERR("700149","车主结算收益审核记录不存在"),
+    OWNER_INCOM_EXAM_INSERT_ERR("700150","车主结算收益审核记录保存失败"),
+    OWNER_INCOM_AUDIT_REPEAT_FAIL("700151","车主收益重复审核错误"),
     RENT_TIME_LESS_CURR_TIME_2HOUR("500055","起租时间应晚于当前时间2小时"),
     REVERT_TIME_LESS_RENT_TIME_1HOUR("500056","“还车时间”应晚于“起租时间”1小时"),
     RENT_TIME_LESS_CURR_TIME("500006","起租时间应晚于当前时间"),

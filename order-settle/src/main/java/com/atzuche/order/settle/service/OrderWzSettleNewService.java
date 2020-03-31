@@ -4,8 +4,11 @@ import com.atzuche.order.accountrenterdetain.service.notservice.AccountRenterDet
 import com.atzuche.order.accountrenterwzdepost.entity.AccountRenterWzDepositCostEntity;
 import com.atzuche.order.accountrenterwzdepost.entity.AccountRenterWzDepositCostSettleDetailEntity;
 import com.atzuche.order.accountrenterwzdepost.service.notservice.AccountRenterWzDepositCostSettleDetailNoTService;
+import com.atzuche.order.cashieraccount.entity.CashierEntity;
+import com.atzuche.order.cashieraccount.service.CashierService;
 import com.atzuche.order.cashieraccount.service.CashierWzSettleService;
 import com.atzuche.order.commons.NumberUtils;
+import com.atzuche.order.commons.constant.OrderConstant;
 import com.atzuche.order.commons.enums.OrderStatusEnum;
 import com.atzuche.order.commons.enums.account.SettleStatusEnum;
 import com.atzuche.order.mq.common.base.BaseProducer;
@@ -36,6 +39,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -53,81 +57,83 @@ public class OrderWzSettleNewService {
 	private OrderWzSettleNoTService orderWzSettleNoTService;
 	@Autowired
 	private BaseProducer baseProducer;
-	// 更新订单状态和订单流转
 	@Autowired
 	private OrderStatusService orderStatusService;
-
-	// 查询租客有效订单
 	@Autowired
 	private RenterOrderService renterOrderService;
-	// 判断是否暂扣
 	@Autowired
 	private AccountRenterDetainDetailNoTService accountRenterDetainDetailNoTService;
 	@Autowired
 	private RenterOrderWzSettleFlagService renterOrderWzSettleFlagService;
 	@Autowired
 	private OwnerOrderService ownerOrderService;
-	/**
-	 * 初始化结算对象
-	 * 
-	 * @param orderNo
-	 */
-	public SettleOrdersWz initSettleOrders(String orderNo) {
-		SettleOrdersWz settleOrdersWz = new SettleOrdersWz();
-		
-		// 1 校验参数
-		if (StringUtil.isBlank(orderNo)) {
-			throw new OrderSettleFlatAccountException();
-		}
-		RenterOrderEntity renterOrder = renterOrderService.getRenterOrderByOrderNoAndIsEffective(orderNo);
-		if (Objects.isNull(renterOrder) || Objects.isNull(renterOrder.getRenterOrderNo())) {
-			throw new OrderSettleFlatAccountException();
-		}
-		
-		//发送mq发送车主会员号信息预留。
-		OwnerOrderEntity ownerOrder = ownerOrderService.getOwnerOrderByOrderNoAndIsEffective(orderNo);
-//        if(Objects.isNull(ownerOrder) || Objects.isNull(ownerOrder.getOwnerOrderNo())){
-//            throw new OrderSettleFlatAccountException();
-//        }
-		if(!Objects.isNull(ownerOrder)) {
-			
-			String ownerOrderNo = ownerOrder.getOwnerOrderNo();
-	        String ownerMemNo = ownerOrder.getMemNo();
-	        
-			settleOrdersWz.setOwnerOrderNo(ownerOrderNo);
-			settleOrdersWz.setOwnerMemNo(ownerMemNo);
-			settleOrdersWz.setOwnerOrder(ownerOrder);
-		}else {
-			//默认
-			settleOrdersWz.setOwnerMemNo("0");
-			settleOrdersWz.setOwnerOrderNo("0");
-		}
-        
-		// 2 校验订单状态 以及是否存在 理赔暂扣 存在不能进行结算 并CAT告警
-		this.check(renterOrder);
-		// 3 初始化数据
+	@Autowired
+	private CashierService cashierService;
+	// 违章押金
+	private static final String WZ_DEPOSIT_PAY_KIND = "02";
+	// 虚拟支付
+	private static final int PAY_LINE_VIRTUAL = 2;
+	@Autowired
+    private OrderWzSettleSupplementHandleService orderWzSettleSupplementHandleService;
 
-		// 3.1获取租客子订单 和 租客会员号
-		String renterOrderNo = renterOrder.getRenterOrderNo();
-		String renterMemNo = renterOrder.getRenterMemNo();
+    /**
+     * 初始化结算对象
+     *
+     * @param orderNo
+     */
+    public SettleOrdersWz initSettleOrders(String orderNo) {
+        SettleOrdersWz settleOrdersWz = new SettleOrdersWz();
+        // 1 校验参数
+        if (StringUtil.isBlank(orderNo)) {
+            throw new OrderSettleFlatAccountException();
+        }
+        RenterOrderEntity renterOrder = renterOrderService.getRenterOrderByOrderNoAndIsEffective(orderNo);
+        if (Objects.isNull(renterOrder) || Objects.isNull(renterOrder.getRenterOrderNo())) {
+            throw new OrderSettleFlatAccountException();
+        }
 
-		
-		settleOrdersWz.setOrderNo(orderNo);
-		settleOrdersWz.setRenterOrderNo(renterOrderNo);
-		settleOrdersWz.setRenterMemNo(renterMemNo);
-		settleOrdersWz.setRenterOrder(renterOrder);
-		return settleOrdersWz;
-	}
+        //发送mq发送车主会员号信息预留。
+        OwnerOrderEntity ownerOrder = ownerOrderService.getOwnerOrderByOrderNoAndIsEffective(orderNo);
+        if (!Objects.isNull(ownerOrder)) {
+            settleOrdersWz.setOwnerOrderNo(ownerOrder.getOwnerOrderNo());
+            settleOrdersWz.setOwnerMemNo(ownerOrder.getMemNo());
+            settleOrdersWz.setOwnerOrder(ownerOrder);
+        } else {
+            //默认
+            settleOrdersWz.setOwnerMemNo("0");
+            settleOrdersWz.setOwnerOrderNo("0");
+        }
+        // 2 校验订单状态 以及是否存在 理赔暂扣 存在不能进行结算 并CAT告警
+        this.check(renterOrder);
+        // 3 初始化数据
+        // 3.1获取租客子订单 和 租客会员号
+        String renterOrderNo = renterOrder.getRenterOrderNo();
+        String renterMemNo = renterOrder.getRenterMemNo();
+
+        settleOrdersWz.setOrderNo(orderNo);
+        settleOrdersWz.setRenterOrderNo(renterOrderNo);
+        settleOrdersWz.setRenterMemNo(renterMemNo);
+        settleOrdersWz.setRenterOrder(renterOrder);
+        // 获取租客支付记录
+        List<CashierEntity> payList = cashierService.getCashierRentCostsByOrderNo(orderNo);
+        if (payList != null && !payList.isEmpty()) {
+            for (CashierEntity cashier : payList) {
+                if (WZ_DEPOSIT_PAY_KIND.equals(cashier.getPayKind()) && cashier.getPayLine() == PAY_LINE_VIRTUAL) {
+                    settleOrdersWz.setWzCostVirtualFlag(true);
+                }
+            }
+        }
+        return settleOrdersWz;
+    }
 
 	/**
 	 * 校验是否可以结算 校验订单状态 以及是否存在 理赔暂扣 存在不能进行结算 并CAT告警
 	 * 
-	 * @param renterOrder
+	 * @param renterOrder 租客订单信息
 	 */
 	public void check(RenterOrderEntity renterOrder) {
 		// 1 先查询 发现 有结算数据停止结算 手动处理
 		this.checkIsSettle(renterOrder.getOrderNo());
-		
 		// 2 校验是否存在 理赔 存在不结算 这个跟违章是一起的。
 		boolean isClaim = cashierWzSettleService.getOrderClaim(renterOrder.getOrderNo());
 		if (isClaim) {
@@ -136,13 +142,12 @@ public class OrderWzSettleNewService {
 		/*
 		 * 3.根据费用编码来判断是否暂扣。
 		 */
-		boolean isDetain = accountRenterDetainDetailNoTService.isWzDepositDetain(renterOrder.getOrderNo());
-		if (isDetain) {
+        OrderStatusEntity entity = orderStatusService.getByOrderNo(renterOrder.getOrderNo());
+		if (null == entity || entity.getIsDetainWz() == OrderConstant.YES) {
 			throw new RuntimeException("租客存在暂扣信息不能结算");
 		}
 		
 		//4.是否有仁云的推送数据
-		// com.atzuche.order.renterwz.service.RenterOrderWzCostDetailService#querySettleInfoByOrder
 		List<RenterOrderWzSettleFlagEntity> settleInfos = renterOrderWzSettleFlagService.getIllegalSettleInfosByOrderNo(renterOrder.getOrderNo());
 		// 过滤未结算和结算失败的
 		if (CollectionUtils.isEmpty(settleInfos)) {
@@ -267,21 +272,28 @@ public class OrderWzSettleNewService {
 		// 1 租客违章费用 结余处理
 		log.info("OrderSettleService wzCostSettle 抵扣违章费用或产生违章欠款。settleOrders [{}], settleOrdersAccount [{}]", GsonUtils.toJson(settleOrders),GsonUtils.toJson(settleOrdersAccount));
 		orderWzSettleNoTService.wzCostSettle(settleOrders, settleOrdersAccount);
-		
-		
+
+
+		//抵扣未支付的补付费用
+        log.info("OrderSettleService supplementCostHandle 抵扣补付记录。settleOrdersAccount [{}]",
+                GsonUtils.toJson(settleOrdersAccount));
+        orderWzSettleSupplementHandleService.supplementCostHandle(settleOrders, settleOrdersAccount);
+
 		log.info("OrderSettleService repayWzHistoryDebtRent 抵扣历史欠款。settleOrdersAccount [{}]", GsonUtils.toJson(settleOrdersAccount));
-		// 2租客剩余违章押金 结余历史欠款
+
+		// 2.1租客剩余违章押金 结余历史欠款
 		orderWzSettleNoTService.repayWzHistoryDebtRent(settleOrdersAccount);
-		
-		
+		// 2.2违章押金抵扣老系统欠款
+		int totalwzDebtAmt = orderWzSettleNoTService.oldRepayWzHistoryDebtRent(settleOrdersAccount);
+		settleOrders.setTotalWzDebtAmt(totalwzDebtAmt);
 		log.info("OrderSettleService refundWzDepositAmt 退还违章押金。settleOrdersAccount [{}]", GsonUtils.toJson(settleOrdersAccount));
-		// 3 违章押金 退还
+		// 违章押金 退还
 		orderWzSettleNoTService.refundWzDepositAmt(settleOrdersAccount, orderStatusDTO);
 		
 		
 		log.info("OrderSettleService 结算结束 settleOrdersAccount [{}],orderStatusDTO [{}]", GsonUtils.toJson(settleOrdersAccount),GsonUtils.toJson(orderStatusDTO));
 		
-		// 4 更新订单状态
+		// 更新订单状态
 		settleOrdersAccount.setOrderStatusDTO(orderStatusDTO);
 		orderWzSettleNoTService.saveOrderStatusInfo(settleOrdersAccount);
 		log.info("OrderSettleService settleOrdersDefinition settleOrdersAccount two [{}]",GsonUtils.toJson(settleOrdersAccount));
@@ -322,8 +334,8 @@ public class OrderWzSettleNewService {
 		orderSettlementMq.setStatus(1);
 		orderSettlementMq.setOrderNo(orderNo);
 		//新增参数车主号，租客号。
-		orderSettlementMq.setRenterMemNo(Integer.valueOf(renterMemNo));
-		orderSettlementMq.setOwnerMemNo(Integer.valueOf(ownerMemNo));
+		orderSettlementMq.setRenterMemNo(!StringUtils.isEmpty(renterMemNo) ? Integer.valueOf(renterMemNo) : null);
+		orderSettlementMq.setOwnerMemNo(!StringUtils.isEmpty(ownerMemNo) ? Integer.valueOf(ownerMemNo) : null);
 		OrderMessage orderMessage = OrderMessage.builder().build();
 		orderMessage.setMessage(orderSettlementMq);
 		// TODO 发短信

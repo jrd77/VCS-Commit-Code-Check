@@ -3,16 +3,6 @@
  */
 package com.atzuche.order.admin.service;
 
-import java.util.List;
-import java.util.Objects;
-
-import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
-
 import com.atzuche.order.admin.vo.req.cost.OwnerCostReqVO;
 import com.atzuche.order.admin.vo.req.cost.RenterCostReqVO;
 import com.atzuche.order.admin.vo.resp.order.cost.OrderOwnerCostResVO;
@@ -21,37 +11,42 @@ import com.atzuche.order.cashieraccount.service.CashierPayService;
 import com.atzuche.order.coin.service.AutoCoinProxyService;
 import com.atzuche.order.commons.NumberUtils;
 import com.atzuche.order.commons.enums.CouponTypeEnum;
+import com.atzuche.order.commons.enums.FineTypeEnum;
 import com.atzuche.order.commons.enums.cashcode.OwnerCashCodeEnum;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.commons.vo.req.OrderCostReqVO;
 import com.atzuche.order.commons.vo.res.cost.RenterOrderCostDetailResVO;
 import com.atzuche.order.commons.vo.res.cost.RenterOrderFineDeatailResVO;
 import com.atzuche.order.commons.vo.res.cost.RenterOrderSubsidyDetailResVO;
-import com.atzuche.order.commons.vo.res.ownercosts.ConsoleOwnerOrderFineDeatailEntity;
-import com.atzuche.order.commons.vo.res.ownercosts.OwnerOrderFineDeatailEntity;
-import com.atzuche.order.commons.vo.res.ownercosts.OwnerOrderIncrementDetailEntity;
-import com.atzuche.order.commons.vo.res.ownercosts.OwnerOrderPurchaseDetailEntity;
-import com.atzuche.order.commons.vo.res.ownercosts.OwnerOrderSubsidyDetailEntity;
+import com.atzuche.order.commons.vo.res.ownercosts.*;
 import com.atzuche.order.commons.vo.res.rentcosts.OrderConsoleCostDetailEntity;
 import com.atzuche.order.commons.vo.res.rentcosts.OrderConsoleSubsidyDetailEntity;
 import com.atzuche.order.commons.vo.res.rentcosts.OrderCouponEntity;
-import com.atzuche.order.commons.vo.res.rentcosts.RenterOrderCostDetailEntity;
 import com.atzuche.order.delivery.service.delivery.DeliveryCarInfoPriceService;
-import com.atzuche.order.delivery.vo.delivery.rep.DeliveryCarVO;
-import com.atzuche.order.delivery.vo.delivery.rep.OwnerGetAndReturnCarDTO;
-import com.atzuche.order.delivery.vo.delivery.req.DeliveryCarRepVO;
 import com.atzuche.order.open.service.FeignOrderCostService;
 import com.atzuche.order.ownercost.entity.OwnerOrderEntity;
 import com.atzuche.order.ownercost.service.OwnerOrderIncrementDetailService;
 import com.atzuche.order.ownercost.service.OwnerOrderService;
 import com.atzuche.order.parentorder.entity.OrderEntity;
 import com.atzuche.order.parentorder.service.OrderService;
+import com.atzuche.order.rentercost.entity.RenterOrderSubsidyDetailEntity;
+import com.atzuche.order.rentercost.utils.OrderSubsidyDetailUtils;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.atzuche.order.renterorder.service.RenterOrderService;
 import com.atzuche.order.settle.service.OrderSettleService;
 import com.atzuche.order.settle.vo.res.RenterCostVO;
 import com.atzuche.order.wallet.WalletProxyService;
 import com.autoyol.commons.web.ResponseData;
+import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author jing.huang
@@ -145,7 +140,7 @@ public class OrderCostService {
 				
 				//补付费用 
 				//需补付金额,跟修改订单的补付金额是同一个方法。
-				int needIncrementAmt = cashierPayService.getRentCostBufu(renterCostReqVO.getOrderNo(), renterCostReqVO.getRenterOrderNo());
+				int needIncrementAmt = cashierPayService.getRentCostBufuNew(renterCostReqVO.getOrderNo(), orderEntity.getMemNoRenter());
 				putSupplementAmt(realVo,data,needIncrementAmt,costVo);
 				
 				//租客支付给平台的费用。console  200214
@@ -286,7 +281,9 @@ public class OrderCostService {
 		int renterToOwnerAdjustAmount = 0;
 		
 		List<OrderConsoleSubsidyDetailEntity> orderConsoleSubsidyDetails = data.getOrderConsoleSubsidyDetails();
-		for (OrderConsoleSubsidyDetailEntity orderConsoleSubsidyDetailEntity : orderConsoleSubsidyDetails) {
+
+        List<RenterOrderSubsidyDetailResVO> subsidyLst1 = data.getSubsidyLst();
+        for (OrderConsoleSubsidyDetailEntity orderConsoleSubsidyDetailEntity : orderConsoleSubsidyDetails) {
 			//`subsidy_source_name` varchar(16) DEFAULT NULL COMMENT '补贴来源方 1、租客 2、车主 3、平台',
 			//  `subsidy_target_name` varchar(16) DEFAULT NULL COMMENT '补贴方名称 1、租客 2、车主 3、平台',
 			if("3".equals(orderConsoleSubsidyDetailEntity.getSubsidySourceCode()) && "1".equals(orderConsoleSubsidyDetailEntity.getSubsidyTargetCode())) {
@@ -304,7 +301,18 @@ public class OrderCostService {
 //			}
 			
 		}
-		
+        List<RenterOrderSubsidyDetailEntity> renterOrderSubsidyDetailEntityList = new ArrayList<>();
+        subsidyLst1.forEach(x->{
+            RenterOrderSubsidyDetailEntity renterOrderSubsidyDetailEntity = new RenterOrderSubsidyDetailEntity();
+            BeanUtils.copyProperties(x,renterOrderSubsidyDetailEntity);
+            renterOrderSubsidyDetailEntityList.add(renterOrderSubsidyDetailEntity);
+        });
+        int renterUpateSubsidyAmt = OrderSubsidyDetailUtils.getRenterUpateSubsidyAmt(renterOrderSubsidyDetailEntityList);
+        int renterSubsidyAmt = OrderSubsidyDetailUtils.getRenterSubsidyAmt(renterOrderSubsidyDetailEntityList, RenterCashCodeEnum.INSURE_TOTAL_PRICES);
+        int abatementInsureAmt = OrderSubsidyDetailUtils.getRenterSubsidyAmt(renterOrderSubsidyDetailEntityList, RenterCashCodeEnum.ABATEMENT_INSURE);
+        platformSubsidyAmount += (renterUpateSubsidyAmt+renterSubsidyAmt+abatementInsureAmt);
+
+
 		for (OrderConsoleSubsidyDetailEntity orderConsoleSubsidyDetailEntity : orderConsoleSubsidyDetails) {
 			//补贴来源方 1、租客 2、车主 3、平台
 			//补贴方名称 1、租客 2、车主 3、平台
@@ -325,7 +333,7 @@ public class OrderCostService {
 		/**
 		 * 租客补贴 20200205
 		 */
-		List<RenterOrderSubsidyDetailResVO> subsidyLst = data.getSubsidyLst();
+		List<RenterOrderSubsidyDetailResVO> subsidyLst = subsidyLst1;
 		for (RenterOrderSubsidyDetailResVO renterOrderSubsidyDetailResVO : subsidyLst) {
 			
 			if("2".equals(renterOrderSubsidyDetailResVO.getSubsidySourceCode()) && "1".equals(renterOrderSubsidyDetailResVO.getSubsidyTargetCode())) {
@@ -762,7 +770,7 @@ public class OrderCostService {
 		 List<ConsoleOwnerOrderFineDeatailEntity> consoleOwnerOrderFineDeatails = data.getConsoleOwnerOrderFineDeatails();
 		 for (ConsoleOwnerOrderFineDeatailEntity consoleOwnerOrderFineDeatailEntity : consoleOwnerOrderFineDeatails) {
 			 //罚金来源编码（车主/租客/平台）1-租客，2-车主，3-平台
-				if(consoleOwnerOrderFineDeatailEntity.getFineSubsidyCode().equals("2")) {
+				if(FineTypeEnum.MODIFY_ADDRESS_FINE.getFineType().equals(consoleOwnerOrderFineDeatailEntity.getFineType())) {
 					fineAmtInt += consoleOwnerOrderFineDeatailEntity.getFineAmount().intValue();
 				}
 		 }

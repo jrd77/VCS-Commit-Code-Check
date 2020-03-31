@@ -46,5 +46,10 @@ public class CarDispatchReqVO {
      */
     private Integer payFlag;
 
+    /**
+     * 平台取消原因对应的code值
+     */
+    private String plateCode;
+
 
 }

@@ -4,7 +4,9 @@ import com.alibaba.fastjson.JSON;
 import com.atzuche.order.accountrenterdeposit.vo.req.CreateOrderRenterDepositReqVO;
 import com.atzuche.order.accountrenterwzdepost.vo.req.CreateOrderRenterWZDepositReqVO;
 import com.atzuche.order.car.CarProxyService;
+import com.atzuche.order.cashieraccount.service.CashierPayService;
 import com.atzuche.order.cashieraccount.service.CashierService;
+import com.atzuche.order.cashieraccount.vo.req.pay.OrderPaySignReqVO;
 import com.atzuche.order.commons.CommonUtils;
 import com.atzuche.order.commons.LocalDateTimeUtils;
 import com.atzuche.order.commons.OrderReqContext;
@@ -13,7 +15,9 @@ import com.atzuche.order.commons.entity.dto.OwnerGoodsDetailDTO;
 import com.atzuche.order.commons.entity.dto.OwnerMemberDTO;
 import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
 import com.atzuche.order.commons.entity.dto.RenterMemberDTO;
-import com.atzuche.order.commons.enums.*;
+import com.atzuche.order.commons.enums.OrderStatusEnum;
+import com.atzuche.order.commons.enums.SubsidySourceCodeEnum;
+import com.atzuche.order.commons.enums.SubsidyTypeCodeEnum;
 import com.atzuche.order.commons.enums.account.FreeDepositTypeEnum;
 import com.atzuche.order.commons.enums.cashcode.OwnerCashCodeEnum;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
@@ -30,8 +34,6 @@ import com.atzuche.order.coreapi.utils.BizAreaUtil;
 import com.atzuche.order.delivery.service.delivery.DeliveryCarService;
 import com.atzuche.order.flow.service.OrderFlowService;
 import com.atzuche.order.mem.MemProxyService;
-import com.atzuche.order.mq.common.base.BaseProducer;
-import com.atzuche.order.mq.common.base.OrderMessage;
 import com.atzuche.order.owner.commodity.service.OwnerGoodsService;
 import com.atzuche.order.owner.mem.service.OwnerMemberService;
 import com.atzuche.order.ownercost.entity.OwnerOrderPurchaseDetailEntity;
@@ -59,9 +61,7 @@ import com.atzuche.order.renterwz.service.RenterOrderWzStatusService;
 import com.autoyol.car.api.model.dto.LocationDTO;
 import com.autoyol.car.api.model.dto.OrderInfoDTO;
 import com.autoyol.car.api.model.enums.OrderOperationTypeEnum;
-import com.autoyol.commons.utils.DateUtil;
-import com.autoyol.event.rabbit.neworder.NewOrderMQActionEventEnum;
-import com.autoyol.event.rabbit.neworder.OrderCreateMq;
+import com.autoyol.commons.utils.GsonUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -136,7 +136,7 @@ public class SubmitOrderService {
      * @param context 下单请求信息
      * @return OrderResVO 下单返回结果
      */
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public OrderResVO submitOrder(OrderReqContext context) {
         OrderReqVO orderReqVO = context.getOrderReqVO();
         orderReqVO.setReqTime(LocalDateTime.now());
@@ -281,6 +281,37 @@ public class SubmitOrderService {
         orderResVO.setStatus(String.valueOf(orderStatusDTO.getStatus()));
         return orderResVO;
     }
+
+
+    /**
+     * 长租订单提交
+     *
+     * @param context 下单请求信息
+     * @return OrderResVO 下单返回结果
+     */
+    public OrderResVO submitLongOrder(OrderReqContext context) {
+        OrderReqVO orderReqVO = context.getOrderReqVO();
+        orderReqVO.setReqTime(LocalDateTime.now());
+        //提前延后时间计算
+        CarRentTimeRangeResVO carRentTimeRangeResVO =
+                carRentalTimeApiService.getCarRentTimeRange(carRentalTimeApiService.buildCarRentTimeRangeReqVO(orderReqVO));
+        //生成主订单号
+        String orderNo = uniqueOrderNoService.genOrderNo();
+        //生成租客订单号
+        String renterOrderNo = uniqueOrderNoService.genRenterOrderNo(orderNo);
+        //生成车主子订单号
+        String ownerOrderNo = uniqueOrderNoService.genOwnerOrderNo(orderNo);
+
+
+        OrderResVO orderResVO = new OrderResVO();
+        orderResVO.setOrderNo(orderNo);
+        orderResVO.setStatus(null);
+        return orderResVO;
+    }
+
+
+
+
 
     private OrderInfoDTO initOrderInfoDTO(OrderReqVO orderReqVO) {
         OrderInfoDTO orderInfoDTO = new OrderInfoDTO();
@@ -544,8 +575,8 @@ public class SubmitOrderService {
 
     /**
      * 对象转换
-     * @param reqContext
-     * @param orderNo
+     * @param reqContext 请求参数
+     * @param orderNo 订单号
      * @return OrderTransferRecordEntity
      */
     public OrderTransferRecordEntity convertToOrderTransferRecordEntity(OrderReqContext reqContext, String orderNo) {

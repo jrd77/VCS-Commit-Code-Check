@@ -1,35 +1,13 @@
 package com.atzuche.order.coreapi.service;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-import com.atzuche.order.ownercost.entity.*;
-import com.atzuche.order.ownercost.service.*;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import com.atzuche.order.commons.CostStatUtils;
 import com.atzuche.order.commons.GlobalConstant;
 import com.atzuche.order.commons.LocalDateTimeUtils;
 import com.atzuche.order.commons.NumberUtils;
 import com.atzuche.order.commons.entity.dto.OwnerGoodsDetailDTO;
 import com.atzuche.order.commons.entity.dto.OwnerGoodsPriceDetailDTO;
-import com.atzuche.order.commons.entity.orderDetailDto.ConsoleOwnerOrderFineDeatailDTO;
-import com.atzuche.order.commons.entity.orderDetailDto.OrderConsoleCostDetailDTO;
-import com.atzuche.order.commons.entity.orderDetailDto.OrderDTO;
-import com.atzuche.order.commons.entity.orderDetailDto.OwnerOrderFineDeatailDTO;
-import com.atzuche.order.commons.entity.orderDetailDto.OwnerOrderSubsidyDetailDTO;
-import com.atzuche.order.commons.entity.ownerOrderDetail.FienAmtDetailDTO;
-import com.atzuche.order.commons.entity.ownerOrderDetail.FienAmtUpdateReqDTO;
-import com.atzuche.order.commons.entity.ownerOrderDetail.OwnerRentDetailDTO;
-import com.atzuche.order.commons.entity.ownerOrderDetail.PlatformToOwnerDTO;
-import com.atzuche.order.commons.entity.ownerOrderDetail.PlatformToOwnerSubsidyDTO;
-import com.atzuche.order.commons.entity.ownerOrderDetail.RenterOwnerPriceDTO;
-import com.atzuche.order.commons.entity.ownerOrderDetail.ServiceDetailDTO;
+import com.atzuche.order.commons.entity.orderDetailDto.*;
+import com.atzuche.order.commons.entity.ownerOrderDetail.*;
 import com.atzuche.order.commons.enums.CarOwnerTypeEnum;
 import com.atzuche.order.commons.enums.FineSubsidyCodeEnum;
 import com.atzuche.order.commons.enums.FineTypeEnum;
@@ -37,6 +15,8 @@ import com.atzuche.order.commons.enums.cashcode.ConsoleCashCodeEnum;
 import com.atzuche.order.commons.enums.cashcode.OwnerCashCodeEnum;
 import com.atzuche.order.commons.exceptions.OrderNotFoundException;
 import com.atzuche.order.owner.commodity.service.OwnerGoodsService;
+import com.atzuche.order.ownercost.entity.*;
+import com.atzuche.order.ownercost.service.*;
 import com.atzuche.order.parentorder.entity.OrderEntity;
 import com.atzuche.order.parentorder.service.OrderService;
 import com.atzuche.order.rentercost.entity.OrderConsoleCostDetailEntity;
@@ -44,9 +24,16 @@ import com.atzuche.order.rentercost.entity.OrderConsoleSubsidyDetailEntity;
 import com.atzuche.order.rentercost.service.OrderConsoleCostDetailService;
 import com.atzuche.order.rentercost.service.OrderConsoleSubsidyDetailService;
 import com.atzuche.order.settle.service.OrderSettleService;
-import com.atzuche.order.settle.vo.req.OwnerCosts;
-
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * 车主费用明细
@@ -109,14 +96,13 @@ public class OwnerOrderDetailService {
 				break;
 			}
 		}
-        
-        
+        OwnerOrderEntity ownerOrderEntity = ownerOrderService.getOwnerOrderByOwnerOrderNo(ownerOrderNo);
 
         OrderDTO orderDTO = new OrderDTO();
         BeanUtils.copyProperties(orderEntity,orderDTO);
-        ownerRentDetailDTO.setReqTimeStr(orderDTO.getReqTime()!=null? LocalDateTimeUtils.localdateToString(orderDTO.getReqTime(), GlobalConstant.FORMAT_DATE_STR1):null);
-        ownerRentDetailDTO.setRevertTimeStr(orderDTO.getExpRevertTime()!=null? LocalDateTimeUtils.localdateToString(orderDTO.getExpRevertTime(), GlobalConstant.FORMAT_DATE_STR1):null);
-        ownerRentDetailDTO.setRentTimeStr(orderDTO.getExpRentTime()!=null?LocalDateTimeUtils.localdateToString(orderDTO.getExpRentTime(), GlobalConstant.FORMAT_DATE_STR1):null);
+        ownerRentDetailDTO.setReqTimeStr(ownerOrderEntity.getCreateTime()!=null? LocalDateTimeUtils.localdateToString(ownerOrderEntity.getCreateTime(), GlobalConstant.FORMAT_DATE_STR1):null);
+        ownerRentDetailDTO.setRevertTimeStr(ownerOrderEntity.getExpRevertTime()!=null? LocalDateTimeUtils.localdateToString(ownerOrderEntity.getExpRevertTime(), GlobalConstant.FORMAT_DATE_STR1):null);
+        ownerRentDetailDTO.setRentTimeStr(ownerOrderEntity.getExpRentTime()!=null?LocalDateTimeUtils.localdateToString(ownerOrderEntity.getExpRentTime(), GlobalConstant.FORMAT_DATE_STR1):null);
         ownerRentDetailDTO.setCarPlateNum(ownerGoodsDetail.getCarPlateNum());
         return ownerRentDetailDTO;
     }
@@ -213,7 +199,7 @@ public class OwnerOrderDetailService {
 //        int ownerFine = CostStatUtils.calOwnerFineByCashNo(FineTypeEnum.OWNER_FINE, ownerOrderFineDeatailDTOS);  //CANCEL_FINE
         int ownerFine = CostStatUtils.calOwnerFineByCashNo(FineTypeEnum.CANCEL_FINE, ownerOrderFineDeatailDTOS);
         int ownerGetReturnCarFienAmt = CostStatUtils.calOwnerFineByCashNo(FineTypeEnum.GET_RETURN_CAR, ownerOrderFineDeatailDTOS);
-        int ownerModifyAddrAmt = CostStatUtils.calOwnerFineByCashNo(FineTypeEnum.MODIFY_ADDRESS_FINE, ownerOrderFineDeatailDTOS);
+
         
 //        int renterAdvanceReturnCarFienAmt = CostStatUtils.calOwnerFineByCashNo(FineTypeEnum.RENTER_ADVANCE_RETURN, ownerOrderFineDeatailDTOS);
 //        int renterDelayReturnCarFienAmt = CostStatUtils.calOwnerFineByCashNo(FineTypeEnum.RENTER_DELAY_RETURN, ownerOrderFineDeatailDTOS);
@@ -223,6 +209,7 @@ public class OwnerOrderDetailService {
         
         //add by huangjing 200217
         OwnerOrderEntity entity = ownerOrderService.getOwnerOrderByOwnerOrderNo(ownerOrderNo);
+        int ownerModifyAddrAmt = 0;
         int consoleRenterAdvanceReturnCarFienAmt = 0;
         int consoleRenterDelayReturnCarFienAmt = 0;
         if(entity != null) {
@@ -233,7 +220,7 @@ public class OwnerOrderDetailService {
 	            BeanUtils.copyProperties(x,consoleOwnerOrderFineDeatailDTO);
 	            consoleOwnerOrderFineDeatailDTOS.add(consoleOwnerOrderFineDeatailDTO);
 	        });
-	        
+            ownerModifyAddrAmt = CostStatUtils.calConsoleOwnerFineByCashNo(FineTypeEnum.MODIFY_ADDRESS_FINE, consoleOwnerOrderFineDeatailDTOS);
 	        //费用编码不对
 	        consoleRenterAdvanceReturnCarFienAmt = CostStatUtils.calConsoleOwnerFineByCashNo(FineTypeEnum.MODIFY_ADVANCE, consoleOwnerOrderFineDeatailDTOS);
 	        consoleRenterDelayReturnCarFienAmt = CostStatUtils.calConsoleOwnerFineByCashNo(FineTypeEnum.DELAY_FINE, consoleOwnerOrderFineDeatailDTOS);
@@ -241,7 +228,6 @@ public class OwnerOrderDetailService {
         
         FienAmtDetailDTO fienAmtDetailDTO = new FienAmtDetailDTO();
         fienAmtDetailDTO.setOwnerFienAmt(ownerFine); //??如何取值
-        
         //取值OK
         fienAmtDetailDTO.setOwnerGetReturnCarFienAmt(ownerGetReturnCarFienAmt);
         fienAmtDetailDTO.setOwnerModifyAddrAmt(ownerModifyAddrAmt);
@@ -411,5 +397,19 @@ public class OwnerOrderDetailService {
         }else{
             ownerOrderFineDeatailService.updateByCashNoAndOwnerOrderNo(ownerOrderFineDeatailEntity);
         }
+    }
+
+    public List<ConsoleOwnerOrderFineDeatailDTO> fienAmtDetailList(String orderNo, String ownerMemNo) {
+        List<ConsoleOwnerOrderFineDeatailEntity> list = consoleOwnerOrderFineDeatailService.selectByOrderNo(orderNo, ownerMemNo);
+        List<ConsoleOwnerOrderFineDeatailDTO> consoleOwnerOrderFineDeatailDTOS = new ArrayList<>();
+        Optional.ofNullable(list).orElseGet(ArrayList::new)
+                .stream()
+                .filter(x-> FineTypeEnum.MODIFY_ADDRESS_FINE.getFineType().equals(x.getFineType()))
+                .forEach(x->{
+            ConsoleOwnerOrderFineDeatailDTO dto = new ConsoleOwnerOrderFineDeatailDTO();
+            BeanUtils.copyProperties(x,dto);
+            consoleOwnerOrderFineDeatailDTOS.add(dto);
+        });
+        return consoleOwnerOrderFineDeatailDTOS;
     }
 }

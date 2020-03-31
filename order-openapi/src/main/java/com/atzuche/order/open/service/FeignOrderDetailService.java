@@ -95,4 +95,11 @@ public interface FeignOrderDetailService {
      **/
     @GetMapping("/order/detail/queryChangeApplyByOwnerOrderNo")
     public ResponseData<OrderDetailRespDTO> queryChangeApplyByOwnerOrderNo(String ownerOrderNo);
+
+    /**
+     * 获取所有订单号
+     * @return
+     */
+    @GetMapping("/order/detail/getOrderNoAll")
+    public ResponseData<OrderNoListDTO> getOrderNoAll();
 }

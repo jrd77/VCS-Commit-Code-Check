@@ -21,6 +21,31 @@ public class OrderConstant {
 
 
     /**
+     * 0
+     */
+    public static final int ZERO = 0;
+
+    /**
+     * 1
+     */
+    public static final int ONE = 1;
+
+    /**
+     * 2
+     */
+    public static final int TWO = 2;
+
+    /**
+     * 3
+     */
+    public static final int THREE = 3;
+
+
+
+
+
+
+    /**
      * 凹凸币抵扣租金系数
      */
     public static final Integer AUTO_COIN_DEDUCT_RATIO = 5;
@@ -33,7 +58,11 @@ public class OrderConstant {
     /**
      * 定时任务操作人
      */
-    public static String SYSTEM_OPERATOR_JOB = "system_job";
+    public static String SYSTEM_OPERATOR_JOB = "SystemJob";
+    /**
+     * 系统操作人
+     */
+    public static String SYSTEM_OPERATOR = "System";
 
     public static String SPECIAL_ERROR_CODE_PREFIX = "11106";
 

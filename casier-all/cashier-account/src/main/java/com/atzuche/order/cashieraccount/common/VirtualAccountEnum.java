@@ -6,7 +6,7 @@ package com.atzuche.order.cashieraccount.common;
  **/
 public enum VirtualAccountEnum {
     GSHD("GSHD","公司活动"),
-    HZYH("'HZYH'","'合作用户'"),
+    HZYH("HZYH","'合作用户'"),
     DBCSY("DBCSY","'代步车使用'"),
     VIP("VIP","VIP"),
     TEST("TEST","订单测试"),
@@ -22,6 +22,14 @@ public enum VirtualAccountEnum {
     VirtualAccountEnum(String accountNo, String accountName) {
         this.accountNo = accountNo;
         this.accountName = accountName;
+    }
+
+    public String getAccountNo() {
+        return accountNo;
+    }
+
+    public String getAccountName() {
+        return accountName;
     }
 
     public static VirtualAccountEnum fromAccountNo(String accountNo){

@@ -1,34 +1,11 @@
 package com.atzuche.order.coreapi.controller;
 
-import com.alibaba.fastjson.JSON;
-import com.atzuche.order.car.CarProxyService;
-import com.atzuche.order.commons.LocalDateTimeUtils;
-import com.atzuche.order.commons.OrderException;
-import com.atzuche.order.commons.OrderReqContext;
-import com.atzuche.order.commons.entity.dto.OwnerGoodsDetailDTO;
-import com.atzuche.order.commons.entity.dto.OwnerMemberDTO;
-import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
-import com.atzuche.order.commons.entity.dto.RenterMemberDTO;
-import com.atzuche.order.commons.enums.OrderStatusEnum;
-import com.atzuche.order.commons.vo.req.AdminOrderReqVO;
-import com.atzuche.order.commons.vo.req.NormalOrderReqVO;
-import com.atzuche.order.commons.vo.req.OrderReqVO;
-import com.atzuche.order.commons.vo.res.OrderResVO;
-import com.atzuche.order.coreapi.common.conver.OrderCommonConver;
-import com.atzuche.order.coreapi.filter.OrderFilterChain;
-import com.atzuche.order.coreapi.service.mq.OrderActionMqService;
-import com.atzuche.order.coreapi.service.mq.OrderStatusMqService;
-import com.atzuche.order.coreapi.service.remote.StockProxyService;
-import com.atzuche.order.coreapi.service.SubmitOrderService;
-import com.atzuche.order.mem.MemProxyService;
-import com.atzuche.order.parentorder.entity.OrderRecordEntity;
-import com.atzuche.order.parentorder.service.OrderRecordService;
-import com.atzuche.order.rentercommodity.service.RenterCommodityService;
-import com.autoyol.commons.web.ErrorCode;
-import com.autoyol.commons.web.ResponseData;
-import com.autoyol.doc.annotation.AutoDocMethod;
-import com.autoyol.doc.annotation.AutoDocVersion;
-import com.autoyol.event.rabbit.neworder.NewOrderMQStatusEventEnum;
+import java.time.LocalDateTime;
+import java.util.Optional;
+
+import javax.annotation.Resource;
+import javax.validation.Valid;
+
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,10 +18,41 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.annotation.Resource;
-import javax.validation.Valid;
-import java.time.LocalDateTime;
-import java.util.Optional;
+import com.alibaba.fastjson.JSON;
+import com.atzuche.order.car.CarProxyService;
+import com.atzuche.order.cashieraccount.service.CashierPayService;
+import com.atzuche.order.cashieraccount.vo.req.pay.OrderPaySignReqVO;
+import com.atzuche.order.commons.LocalDateTimeUtils;
+import com.atzuche.order.commons.OrderException;
+import com.atzuche.order.commons.OrderReqContext;
+import com.atzuche.order.commons.constant.OrderConstant;
+import com.atzuche.order.commons.entity.dto.OwnerGoodsDetailDTO;
+import com.atzuche.order.commons.entity.dto.OwnerMemberDTO;
+import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
+import com.atzuche.order.commons.entity.dto.RenterMemberDTO;
+import com.atzuche.order.commons.enums.ChangeSourceEnum;
+import com.atzuche.order.commons.enums.OrderStatusEnum;
+import com.atzuche.order.commons.vo.req.AdminOrderReqVO;
+import com.atzuche.order.commons.vo.req.NormalOrderReqVO;
+import com.atzuche.order.commons.vo.req.OrderReqVO;
+import com.atzuche.order.commons.vo.res.OrderResVO;
+import com.atzuche.order.coreapi.common.conver.OrderCommonConver;
+import com.atzuche.order.coreapi.filter.OrderFilterChain;
+import com.atzuche.order.coreapi.service.PayCallbackService;
+import com.atzuche.order.coreapi.service.SubmitOrderService;
+import com.atzuche.order.coreapi.service.mq.OrderActionMqService;
+import com.atzuche.order.coreapi.service.mq.OrderStatusMqService;
+import com.atzuche.order.coreapi.service.remote.StockProxyService;
+import com.atzuche.order.mem.MemProxyService;
+import com.atzuche.order.parentorder.entity.OrderRecordEntity;
+import com.atzuche.order.parentorder.service.OrderRecordService;
+import com.atzuche.order.rentercommodity.service.RenterCommodityService;
+import com.autoyol.commons.utils.GsonUtils;
+import com.autoyol.commons.web.ErrorCode;
+import com.autoyol.commons.web.ResponseData;
+import com.autoyol.doc.annotation.AutoDocMethod;
+import com.autoyol.doc.annotation.AutoDocVersion;
+import com.autoyol.event.rabbit.neworder.NewOrderMQStatusEventEnum;
 
 /**
  * 下单
@@ -84,6 +92,11 @@ public class SubmitOrderController {
 
     @Autowired
     private OrderStatusMqService orderStatusMqService;
+    @Autowired 
+    private PayCallbackService payCallbackService;
+    @Autowired
+    private CashierPayService cashierPayService;
+    
 
     @AutoDocMethod(description = "提交订单", value = "提交订单", response = OrderResVO.class)
     @PostMapping("/normal/req")
@@ -108,6 +121,7 @@ public class SubmitOrderController {
                 LocalDateTimeUtils.DEFAULT_PATTERN));
 
         orderReqVO.setReqTime(LocalDateTime.now());
+        orderReqVO.setChangeSource(ChangeSourceEnum.RENTER.getCode());
         OrderReqContext context = buildOrderReqContext(orderReqVO);
         orderFilterChain.validate(context);
         try{
@@ -120,6 +134,21 @@ public class SubmitOrderController {
             orderRecordEntity.setParam(JSON.toJSONString(normalOrderReqVO));
             orderRecordEntity.setResult(JSON.toJSONString(orderResVO));
             orderRecordService.save(orderRecordEntity);
+            
+            //自动接单的，刷新是否钱包支付抵扣
+          //如果是使用钱包，检测是否钱包全额抵扣，推动订单流程。huangjing 200324  刷新钱包
+            OrderPaySignReqVO vo = null;
+            try {
+            	//自动接单 并且 使用钱包
+         	   if(orderReqVO.getUseBal() == OrderConstant.YES && orderResVO.getStatus().equals(String.valueOf(OrderStatusEnum.TO_PAY.getStatus()))) {
+     	    	   vo = cashierPayService.buildOrderPaySignReqVO(orderResVO.getOrderNo(), orderReqVO.getMemNo(), orderReqVO.getUseBal());
+     	           cashierPayService.getPaySignStrNew(vo,payCallbackService);
+     	          LOGGER.info("(下单-自动接单)获取支付签名串A.params=[{}]",GsonUtils.toJson(vo));
+         	   }
+     		} catch (Exception e) {
+     			LOGGER.error("刷新钱包支付抵扣:params=[{}]",(vo!=null)?GsonUtils.toJson(vo):"EMPTY",e);
+     		}
+            
             //发送订单成功的MQ事件
             orderActionMqService.sendCreateOrderSuccess(orderResVO.getOrderNo(),context.getOwnerMemberDto().getMemNo(),context.getRiskAuditId(),orderReqVO);
             NewOrderMQStatusEventEnum newOrderMQStatusEventEnum = NewOrderMQStatusEventEnum.ORDER_PRECONFIRM;
@@ -128,6 +157,7 @@ public class SubmitOrderController {
             }
             String ownerMemNo = null != context.getOwnerMemberDto() ? context.getOwnerMemberDto().getMemNo() : null;
             orderStatusMqService.sendOrderStatusToCreate(orderResVO.getOrderNo(),ownerMemNo,orderResVO.getStatus(),orderReqVO,newOrderMQStatusEventEnum);
+            orderResVO.setReplyFlag(context.getOwnerGoodsDetailDto().getReplyFlag());
         }catch(OrderException orderException){
             String orderNo = orderResVO==null?"":orderResVO.getOrderNo();
             OrderRecordEntity orderRecordEntity = new OrderRecordEntity();
@@ -202,6 +232,7 @@ public class SubmitOrderController {
                 LocalDateTimeUtils.DEFAULT_PATTERN));
 
         orderReqVO.setReqTime(LocalDateTime.now());
+        orderReqVO.setChangeSource(ChangeSourceEnum.CONSOLE.getCode());
         OrderReqContext context = buildOrderReqContext(orderReqVO);
         orderFilterChain.validate(context);
         try{
@@ -214,7 +245,21 @@ public class SubmitOrderController {
             orderRecordEntity.setParam(JSON.toJSONString(adminOrderReqVO));
             orderRecordEntity.setResult(JSON.toJSONString(orderResVO));
             orderRecordService.save(orderRecordEntity);
-
+            
+            //自动接单的，刷新是否钱包支付抵扣
+            //如果是使用钱包，检测是否钱包全额抵扣，推动订单流程。huangjing 200324  刷新钱包
+            OrderPaySignReqVO vo = null;
+            try {
+              	//自动接单 并且 使用钱包
+           	   if(orderReqVO.getUseBal() == OrderConstant.YES && orderResVO.getStatus().equals(String.valueOf(OrderStatusEnum.TO_PAY.getStatus()))) {
+       	    	   vo = cashierPayService.buildOrderPaySignReqVO(orderResVO.getOrderNo(), orderReqVO.getMemNo(), orderReqVO.getUseBal());
+       	           cashierPayService.getPaySignStrNew(vo,payCallbackService);
+       	          LOGGER.info("(下单-自动接单)获取支付签名串A.params=[{}]",GsonUtils.toJson(vo));
+           	   }
+       		} catch (Exception e) {
+       			LOGGER.error("刷新钱包支付抵扣:params=[{}]",(vo!=null)?GsonUtils.toJson(vo):"EMPTY",e);
+       		}
+              
             //发送订单成功的MQ事件
             orderActionMqService.sendCreateOrderSuccess(orderResVO.getOrderNo(),context.getOwnerMemberDto().getMemNo(),context.getRiskAuditId(),orderReqVO);
             NewOrderMQStatusEventEnum newOrderMQStatusEventEnum = NewOrderMQStatusEventEnum.ORDER_PRECONFIRM;

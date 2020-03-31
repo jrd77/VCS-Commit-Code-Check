@@ -5,6 +5,7 @@ import com.atzuche.order.parentorder.mapper.OrderCancelReasonMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 
 
 /**
@@ -31,8 +32,16 @@ public class OrderCancelReasonService{
     }
 
 
-    public OrderCancelReasonEntity selectByOrderNo(String orderNo){
-        return orderCancelReasonMapper.selectByOrderNo(orderNo);
+    public OrderCancelReasonEntity selectByOrderNo(String orderNo,String renterOrderNo,String ownerOrderNo){
+        return orderCancelReasonMapper.selectByOrderNo(orderNo, renterOrderNo, ownerOrderNo);
     }
 
+
+    public List<OrderCancelReasonEntity> selectListByOrderNo(String orderNo) {
+        return orderCancelReasonMapper.selectListByOrderNo(orderNo);
+    }
+
+    public List<OrderCancelReasonEntity> selectListByOrderNos(List<String> ownerOrderNos) {
+        return orderCancelReasonMapper.selectListByOrderNos(ownerOrderNos);
+    }
 }

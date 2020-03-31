@@ -166,6 +166,7 @@ public class RenterOrderCalCostService {
         //获取取还车费用
         GetReturnCarCostReqDto getReturnCarCostReqDto = renterOrderCostReqDTO.getGetReturnCarCostReqDto();
         getReturnCarCostReqDto.setSumJudgeFreeFee(Math.abs(rentAmt + insurAmt + serviceAmount + comprehensiveEnsureAmount));
+
         GetReturnCostDTO returnCarCost = renterOrderCostCombineService.getReturnCarCost(getReturnCarCostReqDto);
         List<RenterOrderSubsidyDetailDTO> renterOrderSubsidyDetailDTOList = returnCarCost.getRenterOrderSubsidyDetailDTOList();
         List<RenterOrderSubsidyDetailDTO> getSubsidy = subsidyOutGroup.get(RenterCashCodeEnum.SRV_GET_COST.getCashNo());
@@ -373,7 +374,7 @@ public class RenterOrderCalCostService {
      * 计算车主券抵扣信息(修改订单用)
      *
      * @param ownerCouponGetAndValidReqVO 请求参数
-     * @param ooupon
+     * @param ooupon 券信息
      * @return OrderCouponDTO 订单优惠券信息
      */
     public OrderCouponDTO calOwnerCouponDeductInfo(OwnerCouponGetAndValidReqVO ownerCouponGetAndValidReqVO, OrderCouponEntity ooupon) {

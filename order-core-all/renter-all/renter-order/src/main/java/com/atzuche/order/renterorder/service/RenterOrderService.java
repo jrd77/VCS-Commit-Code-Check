@@ -137,8 +137,16 @@ public class RenterOrderService {
     public RenterOrderEntity getRenterOrderByOrderNoAndWaitPay(String orderNo) {
         return renterOrderMapper.getRenterOrderByOrderNoAndWaitPay(orderNo);
     }
-
-
+    
+    //根据会员号查询
+    public List<RenterOrderEntity> getRenterOrderByMemNoAndWaitPay(String memNo) {
+        return renterOrderMapper.getRenterOrderByMemNoAndWaitPay(memNo);
+    }
+    
+    public List<RenterOrderEntity> getRenterOrderByMemNoOrderNosAndWaitPay(String memNo,List<String> orderNoList) {
+        return renterOrderMapper.getRenterOrderByMemNoOrderNosAndWaitPay(memNo,orderNoList);
+    }
+    
     /**
      * 生成租客订单
      *
@@ -217,6 +225,8 @@ public class RenterOrderService {
         record.setIsUseSpecialPrice(Integer.valueOf(renterOrderReqVO.getUseSpecialPrice()==null?"0":renterOrderReqVO.getUseSpecialPrice()));
         record.setChildStatus(RenterChildStatusEnum.PROCESS_ING.getCode());
         record.setRenterMemNo(renterOrderReqVO.getMemNo());
+        record.setCreateOp(renterOrderReqVO.getOperator());
+        record.setChangeSource(renterOrderReqVO.getChangeSource());
         renterOrderMapper.insertSelective(record);
         //保存租客订单费用、费用明细、补贴明细等
         renterOrderCostRespDTO.setRenterOrderSubsidyDetailDTOList(context.getOrderSubsidyDetailList());
@@ -524,5 +534,19 @@ public class RenterOrderService {
      **/
     public List<RenterOrderEntity> queryHostiryRenterOrderByOrderNo(String orderNo) {
         return renterOrderMapper.queryHostiryRenterOrderByOrderNo(orderNo);
+    }
+
+    /*
+     * @Author ZhangBin
+     * @Date 2020/3/13 17:59
+     * @Description: 更具租客子订单号更新状态
+     *
+     **/
+    public int updateChildStatusByRenterOrderNo(String renterOrderNo,RenterChildStatusEnum  renterChildStatusEnum){
+        return renterOrderMapper.updateChildStatusByRenterOrderNo(renterOrderNo,renterChildStatusEnum.getCode());
+    }
+
+    public RenterOrderEntity getRenterOrderNoByOrderNoAndFinish(String orderNo) {
+        return renterOrderMapper.getRenterOrderNoByOrderNoAndFinish(orderNo);
     }
 }

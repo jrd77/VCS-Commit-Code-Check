@@ -2,6 +2,7 @@ package com.atzuche.order.admin.vo.resp.car;
 
 import com.autoyol.doc.annotation.AutoDocProperty;
 import lombok.Data;
+import org.hibernate.validator.constraints.NotBlank;
 
 @Data
 public class CarDepositRespVo {
@@ -54,5 +55,26 @@ public class CarDepositRespVo {
 
     @AutoDocProperty("扣款时间（最新暂扣信息）")
     private String actDetainTime;
+
+
+    @AutoDocProperty(value = "风控-暂扣车辆押金 0-否 1-是")
+    private String fkDetainFlag;
+
+    @AutoDocProperty(value = "风控-暂扣原因")
+    private String fkDetainReason;
+
+    @AutoDocProperty(value = "交易-暂扣车辆押金 0-否 1-是")
+    private String jyDetainFlag;
+
+    @AutoDocProperty(value = "交易-暂扣原因")
+    private String jyDetainReason;
+
+    @AutoDocProperty(value = "理赔-暂扣车辆押金 0-否 1-是")
+    private String lpDetainFlag;
+
+    @AutoDocProperty(value = "理赔-暂扣原因")
+    private String lpDetainReason;
+
+
 
 }

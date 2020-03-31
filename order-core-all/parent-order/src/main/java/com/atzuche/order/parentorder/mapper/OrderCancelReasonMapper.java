@@ -3,6 +3,8 @@ import com.atzuche.order.parentorder.entity.OrderCancelReasonEntity;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.List;
+
 /**
  * 订单取消原因
  * 
@@ -22,8 +24,16 @@ public interface OrderCancelReasonMapper{
     
     int updateByPrimaryKeySelective(OrderCancelReasonEntity record);
 
-    OrderCancelReasonEntity selectByOrderNo(@Param("orderNo")String orderNo);
+    OrderCancelReasonEntity selectByOrderNo(@Param("orderNo")String orderNo,@Param("renterOrderNo")String renterOrderNo,
+                                            @Param("ownerOrderNo")String ownerOrderNo);
 
 
+    /**
+     * 查询订单取消信息
+     * @param orderNo 订单号
+     * @return List<OrderCancelReasonEntity>
+     */
+    List<OrderCancelReasonEntity> selectListByOrderNo(@Param("orderNo")String orderNo);
 
+    List<OrderCancelReasonEntity> selectListByOrderNos(@Param("ownerOrderNos") List<String> ownerOrderNos);
 }

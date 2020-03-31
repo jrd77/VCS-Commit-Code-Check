@@ -22,6 +22,7 @@ import com.atzuche.order.cashieraccount.vo.req.DeductDepositToRentCostReqVO;
 import com.atzuche.order.cashieraccount.vo.res.CashierDeductDebtResVO;
 import com.atzuche.order.coin.service.AccountRenterCostCoinService;
 import com.atzuche.order.commons.PlatformProfitStatusEnum;
+import com.atzuche.order.commons.constant.OrderConstant;
 import com.atzuche.order.commons.entity.dto.*;
 import com.atzuche.order.commons.enums.FineTypeEnum;
 import com.atzuche.order.commons.enums.OrderStatusEnum;
@@ -123,6 +124,13 @@ public class OrderSettleNoTService {
     @Autowired private DeliveryCarInfoPriceService deliveryCarInfoPriceService;
     @Autowired private OrderConsoleCostDetailService orderConsoleCostDetailService;
     
+    // 租车费用
+    private static final String RENT_COST_PAY_KIND = "11";
+    // 车辆押金
+    private static final String RENT_DEPOSIT_PAY_KIND = "01";
+    // 虚拟支付
+    private static final int VIRTUAL_PAYMENT = 2;
+    
     /**
      * 初始化结算对象
      * @param orderNo
@@ -154,6 +162,17 @@ public class OrderSettleNoTService {
         settleOrders.setRenterOrderNo(renterOrderNo);
         settleOrders.setRenterMemNo(renterMemNo);
         settleOrders.setRenterOrder(renterOrder);
+        // 获取租客支付记录
+        List<CashierEntity> payList = cashierService.getCashierRentCostsByOrderNo(orderNo);
+        if (payList != null && !payList.isEmpty()) {
+        	for (CashierEntity cashier:payList) {
+        		if (RENT_COST_PAY_KIND.equals(cashier.getPayKind()) && cashier.getPayLine() == VIRTUAL_PAYMENT) {
+        			settleOrders.setRentCostVirtualPayFlag(true);
+        		} else if (RENT_DEPOSIT_PAY_KIND.equals(cashier.getPayKind()) && cashier.getPayLine() == VIRTUAL_PAYMENT) {
+        			settleOrders.setRentDepositVirtualPayFlag(true);
+        		}
+        	}
+        }
         
 //        settleOrders.setOwnerOrder(ownerOrder);
 //        settleOrders.setOwnerOrderNo(ownerOrderNo);
@@ -166,7 +185,7 @@ public class OrderSettleNoTService {
     
     /**
      * 校验是否可以结算 校验订单状态 以及是否存在 理赔暂扣 存在不能进行结算 并CAT告警
-     * @param renterOrder
+     * @param settleOrders
      */
     public void check(SettleOrders settleOrders) {
     	RenterOrderEntity renterOrder = settleOrders.getRenterOrder();
@@ -183,22 +202,23 @@ public class OrderSettleNoTService {
 //            }
 //        }
         //3 校验是否存在 理赔  存在不结算
-        boolean isClaim = cashierSettleService.getOrderClaim(renterOrder.getOrderNo());
-        if(isClaim){
+        //boolean isClaim = cashierSettleService.getOrderClaim(renterOrder.getOrderNo());
+        if(null != orderStatus.getIsClaims() && orderStatus.getIsClaims() == OrderConstant.YES){
             throw new RuntimeException("租客存在理赔信息不能结算");
         }
         //3 是否存在 暂扣存在不结算
-//        boolean isDetain = cashierSettleService.getOrderDetain(renterOrder.getOrderNo());
-//        if(isDetain){
-//            throw new RuntimeException("租客存在暂扣信息不能结算");
-//        }
+//      boolean isDetain = cashierSettleService.getOrderDetain(renterOrder.getOrderNo());
+        if (null != orderStatus.getIsDetain() && orderStatus.getIsDetain() == OrderConstant.YES) {
+            throw new RuntimeException("租客存在暂扣信息不能结算");
+        }
         //4 先查询  发现 有结算数据停止结算 手动处理
         orderSettleNewService.checkIsSettle(renterOrder.getOrderNo(),settleOrders);
     }
     
     /**
      * 车辆结算  校验费用落库等无实物操作
-     * @param settleOrdersDefinition2 
+     * @param settleOrders
+     * @param settleOrdersDefinition
      */
     public void settleOrderFirst(SettleOrders settleOrders, SettleOrdersDefinition settleOrdersDefinition){
         //1 查询所有租客费用明细
@@ -705,8 +725,11 @@ public class OrderSettleNoTService {
         
         //9 租客费用 结余处理
         orderSettleNewService.rentCostSettle(settleOrders,settleOrdersAccount,callBack);
-        //10租客车辆押金/租客剩余租车费用 结余历史欠款
+        // 10.1租客车辆押金/租客剩余租车费用 结余历史欠款
         orderSettleNewService.repayHistoryDebtRent(settleOrdersAccount);
+        // 10.2 抵扣老系统欠款
+        int totalOldRealDebtAmt = orderSettleNewService.oldRepayHistoryDebtRent(settleOrdersAccount);
+        settleOrders.setRenterTotalOldRealDebtAmt(totalOldRealDebtAmt);
         //11 租客费用 退还
         orderSettleNewService.refundRentCost(settleOrdersAccount,settleOrdersDefinition.getAccountRenterCostSettleDetails(),orderStatusDTO,settleOrders);
         //12 租客押金 退还

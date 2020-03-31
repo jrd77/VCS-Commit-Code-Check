@@ -76,7 +76,18 @@ public class SettleOrdersAccount {
      * 订单流转状态
      */
     private OrderStatusDTO orderStatusDTO;
-
+    /**
+     * 租车费用是否虚拟支付
+     */
+    private Boolean rentCostVirtualPayFlag;
+    /**
+     * 车辆押金是否虚拟支付
+     */
+    private Boolean rentDepositVirtualPayFlag;
+    /**
+	 * 违章押金是否虚拟支付
+	 */
+	private Boolean wzCostVirtualFlag;
 
 	public int getOwnerCostAmtFinal() {
 		return ownerCostAmtFinal;
@@ -207,5 +218,34 @@ public class SettleOrdersAccount {
 		this.orderStatusDTO = orderStatusDTO;
 	}
 
-    
+
+	public Boolean getRentCostVirtualPayFlag() {
+		return rentCostVirtualPayFlag;
+	}
+
+
+	public void setRentCostVirtualPayFlag(Boolean rentCostVirtualPayFlag) {
+		this.rentCostVirtualPayFlag = rentCostVirtualPayFlag;
+	}
+
+
+	public Boolean getRentDepositVirtualPayFlag() {
+		return rentDepositVirtualPayFlag;
+	}
+
+
+	public void setRentDepositVirtualPayFlag(Boolean rentDepositVirtualPayFlag) {
+		this.rentDepositVirtualPayFlag = rentDepositVirtualPayFlag;
+	}
+
+
+	public Boolean getWzCostVirtualFlag() {
+		return wzCostVirtualFlag;
+	}
+
+
+	public void setWzCostVirtualFlag(Boolean wzCostVirtualFlag) {
+		this.wzCostVirtualFlag = wzCostVirtualFlag;
+	}
+
 }

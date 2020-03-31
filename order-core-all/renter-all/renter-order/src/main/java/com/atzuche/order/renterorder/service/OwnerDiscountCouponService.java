@@ -2,9 +2,7 @@ package com.atzuche.order.renterorder.service;
 
 import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.CatConstants;
-import com.atzuche.order.renterorder.vo.owner.OwnerCouponGetAndValidResultVO;
-import com.atzuche.order.renterorder.vo.owner.OwnerCouponListResult;
-import com.atzuche.order.renterorder.vo.owner.OwnerDiscountCouponVO;
+import com.atzuche.order.renterorder.vo.owner.*;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
 import com.dianping.cat.Cat;
@@ -14,6 +12,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -34,6 +34,12 @@ import java.util.Map;
 public class OwnerDiscountCouponService {
 
     private static final Logger logger = LoggerFactory.getLogger(OwnerDiscountCouponService.class);
+
+    @Bean
+    public RestTemplate restTemplate(RestTemplateBuilder builder) {
+        // Do any additional configuration here
+        return builder.build();
+    }
 
     @Resource
     private RestTemplate restTemplate;
@@ -229,6 +235,44 @@ public class OwnerDiscountCouponService {
         }
 
         return new ArrayList<>();
+    }
+
+    /**
+     * 获取长租折扣信息
+     *
+     * @param reqVO 参数
+     * @return OwnerCouponLongResVO 长租折扣信息
+     */
+    public OwnerCouponLongResVO getLongOwnerCoupon(OwnerCouponLongReqVO reqVO) {
+        logger.info("Obtain owner coupon information for long lease orders.param is,reqVO:[{}]",
+                JSON.toJSONString(reqVO));
+
+        Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "车主券服务");
+        try {
+            Cat.logEvent(CatConstants.FEIGN_METHOD, "ownerCoupon/long/calcuteOwnerLongCoupon");
+            Cat.logEvent(CatConstants.FEIGN_PARAM, JSON.toJSONString(reqVO));
+            String json = restTemplate.postForObject(ownerCouponUrl + "/ownerCoupon/long/calcuteOwnerLongCoupon",
+                    reqVO, String.class);
+            logger.info("ownerCoupon/long/calcuteOwnerLongCoupon. result is:[{}]", json);
+            Cat.logEvent(CatConstants.FEIGN_RESULT, json);
+            t.setStatus(Transaction.SUCCESS);
+            if (StringUtils.isNotBlank(json)) {
+                ResponseData<OwnerCouponLongResVO> responseData = new Gson().fromJson(json, ResponseData.class);
+                if (null != responseData) {
+                    if (StringUtils.equals(ErrorCode.SUCCESS.getCode(), responseData.getResCode())) {
+                        return responseData.getData();
+                    }
+                }
+            }
+        } catch (Exception e) {
+            logger.info("getLongOwnerCoupon error. url:[{}],params:[{}]", ownerCouponUrl + "/ownerCoupon/long/calcuteOwnerLongCoupon",
+                    JSON.toJSONString(reqVO), e);
+            Cat.logError("Obtain owner coupon information for long lease orders. url:/ownerCoupon/long/calcuteOwnerLongCoupon,params:" + JSON.toJSONString(reqVO), e);
+            t.setStatus(e);
+        } finally {
+            t.complete();
+        }
+        return null;
     }
 
 }

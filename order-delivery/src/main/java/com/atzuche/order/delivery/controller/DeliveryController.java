@@ -5,7 +5,6 @@ import com.atzuche.order.delivery.service.delivery.DeliveryCarInfoPriceService;
 import com.atzuche.order.mq.common.base.BaseProducer;
 import com.atzuche.order.mq.common.base.OrderMessage;
 import com.atzuche.order.mq.enums.PushMessageTypeEnum;
-import com.atzuche.order.mq.enums.ShortMessageTypeEnum;
 import com.atzuche.order.mq.util.SmsParamsMapUtil;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.event.rabbit.neworder.NewOrderMQActionEventEnum;

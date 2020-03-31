@@ -5,10 +5,14 @@ package com.atzuche.order.cashieraccount.common;
  * @date 2020/3/10 11:43 上午
  **/
 public enum VirtualPayTypeEnum {
-    PAY(1),REFUND(-1);
-    private int value;
+    PAY("01"),REFUND("04");
+    private String value;
 
-    VirtualPayTypeEnum(int value) {
+    VirtualPayTypeEnum(String value) {
         this.value = value;
+    }
+
+    public String getValue() {
+        return value;
     }
 }

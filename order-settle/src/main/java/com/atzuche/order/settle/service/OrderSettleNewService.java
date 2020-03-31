@@ -48,11 +48,13 @@ import com.atzuche.order.rentercost.entity.RenterOrderFineDeatailEntity;
 import com.atzuche.order.rentercost.entity.RenterOrderSubsidyDetailEntity;
 import com.atzuche.order.settle.service.notservice.OrderSettleProxyService;
 import com.atzuche.order.settle.vo.req.AccountInsertDebtReqVO;
+import com.atzuche.order.settle.vo.req.AccountOldDebtReqVO;
 import com.atzuche.order.settle.vo.req.RefundApplyVO;
 import com.atzuche.order.settle.vo.req.RentCosts;
 import com.atzuche.order.settle.vo.req.SettleOrders;
 import com.atzuche.order.settle.vo.req.SettleOrdersAccount;
 import com.atzuche.order.settle.vo.req.SettleOrdersDefinition;
+import com.atzuche.order.settle.vo.res.AccountOldDebtResVO;
 import com.atzuche.order.wallet.WalletProxyService;
 import com.autoyol.autopay.gateway.constant.DataPayKindConstant;
 import com.autoyol.autopay.gateway.constant.DataPayTypeConstant;
@@ -82,6 +84,8 @@ public class OrderSettleNewService {
     @Autowired private WalletProxyService walletProxyService;
     @Autowired
     private OrderSettleProxyService orderSettleProxyService;
+    @Autowired
+    private AccountDebtService accountDebtService;
 
     /**
      *  先查询  发现 有结算数据停止结算 手动处理
@@ -171,8 +175,10 @@ public class OrderSettleNewService {
      * @param settleOrdersAccount
      */
     public void repayHistoryDebtRent(SettleOrdersAccount settleOrdersAccount) {
+    	boolean rentCostVirtualPayFlag = settleOrdersAccount.getRentCostVirtualPayFlag() == null ? false:settleOrdersAccount.getRentCostVirtualPayFlag();
+    	boolean rentDepositVirtualPayFlag = settleOrdersAccount.getRentDepositVirtualPayFlag() == null ? false:settleOrdersAccount.getRentDepositVirtualPayFlag();
         // 1 存在 实付大于应付 先抵扣 历史欠款
-        if(settleOrdersAccount.getRentCostSurplusAmt()>0){
+        if(settleOrdersAccount.getRentCostSurplusAmt()>0 && !rentCostVirtualPayFlag){
             CashierDeductDebtReqVO cashierDeductDebtReq = new CashierDeductDebtReqVO();
             BeanUtils.copyProperties(settleOrdersAccount,cashierDeductDebtReq);
             cashierDeductDebtReq.setAmt(settleOrdersAccount.getRentCostSurplusAmt());
@@ -187,7 +193,7 @@ public class OrderSettleNewService {
             }
         }
         //车辆押金存在 且 租车费用没有抵扣完 ，使用车辆押金抵扣 历史欠款
-        if(settleOrdersAccount.getDepositSurplusAmt()>0){
+        if(settleOrdersAccount.getDepositSurplusAmt()>0 && !rentDepositVirtualPayFlag){
             CashierDeductDebtReqVO cashierDeductDebtReq = new CashierDeductDebtReqVO();
             BeanUtils.copyProperties(settleOrdersAccount,cashierDeductDebtReq);
             cashierDeductDebtReq.setMemNo(settleOrdersAccount.getRenterMemNo());
@@ -202,6 +208,59 @@ public class OrderSettleNewService {
             }
         }
     }
+    
+    
+    /**
+     * 抵扣老系统欠款
+     * @param settleOrdersAccount
+     * @return int
+     */
+    public int oldRepayHistoryDebtRent(SettleOrdersAccount settleOrdersAccount) {
+    	boolean rentCostVirtualPayFlag = settleOrdersAccount.getRentCostVirtualPayFlag() == null ? false:settleOrdersAccount.getRentCostVirtualPayFlag();
+    	boolean rentDepositVirtualPayFlag = settleOrdersAccount.getRentDepositVirtualPayFlag() == null ? false:settleOrdersAccount.getRentDepositVirtualPayFlag();
+    	List<AccountOldDebtReqVO> oldDebtList = new ArrayList<AccountOldDebtReqVO>();
+    	// 租车费用抵扣
+    	if(settleOrdersAccount.getRentCostSurplusAmt() > 0 && !rentCostVirtualPayFlag) {
+    		AccountOldDebtReqVO accountOldDebtReqVO = new AccountOldDebtReqVO();
+    		accountOldDebtReqVO.setOrderNo(settleOrdersAccount.getOrderNo());
+    		accountOldDebtReqVO.setRenterOrderNo(settleOrdersAccount.getRenterOrderNo());
+    		accountOldDebtReqVO.setMemNo(settleOrdersAccount.getRenterMemNo());
+    		accountOldDebtReqVO.setSurplusAmt(settleOrdersAccount.getRentCostSurplusAmt());
+    		accountOldDebtReqVO.setCahsCodeEnum(RenterCashCodeEnum.SETTLE_RENT_COST_TO_OLD_HISTORY_AMT);
+    		oldDebtList.add(accountOldDebtReqVO);
+    	}
+    	// 车辆押金抵扣
+    	if (settleOrdersAccount.getDepositSurplusAmt() > 0 && !rentDepositVirtualPayFlag) {
+    		AccountOldDebtReqVO accountOldDebtReqVO = new AccountOldDebtReqVO();
+    		accountOldDebtReqVO.setOrderNo(settleOrdersAccount.getOrderNo());
+    		accountOldDebtReqVO.setRenterOrderNo(settleOrdersAccount.getRenterOrderNo());
+    		accountOldDebtReqVO.setMemNo(settleOrdersAccount.getRenterMemNo());
+    		accountOldDebtReqVO.setSurplusAmt(settleOrdersAccount.getDepositSurplusAmt());
+    		accountOldDebtReqVO.setCahsCodeEnum(RenterCashCodeEnum.SETTLE_DEPOSIT_TO_OLD_HISTORY_AMT);
+    		oldDebtList.add(accountOldDebtReqVO);
+    	}
+    	// 抵扣老系统历史欠款
+    	List<AccountOldDebtResVO> debtResList = accountDebtService.deductOldDebt(oldDebtList);
+    	if (debtResList == null || debtResList.isEmpty()) {
+    		return 0;
+    	}
+    	int totalRealDebtAmt = 0;
+    	for (AccountOldDebtResVO debtRes:debtResList) {
+    		RenterCashCodeEnum cahsCodeEnum = debtRes.getCahsCodeEnum();
+    		totalRealDebtAmt += debtRes.getRealDebtAmt();
+    		if (cahsCodeEnum != null && cahsCodeEnum == RenterCashCodeEnum.SETTLE_RENT_COST_TO_OLD_HISTORY_AMT) {
+    			// 租车费用
+    			cashierService.saveRentCostDebt(debtRes);
+    			settleOrdersAccount.setRentCostSurplusAmt(settleOrdersAccount.getRentCostSurplusAmt() - debtRes.getRealDebtAmt());
+    		} else if (cahsCodeEnum != null && cahsCodeEnum == RenterCashCodeEnum.SETTLE_DEPOSIT_TO_OLD_HISTORY_AMT) {
+    			// 车辆押金
+    			cashierService.saveDepositDebt(debtRes);
+    			settleOrdersAccount.setDepositSurplusAmt(settleOrdersAccount.getDepositSurplusAmt() - debtRes.getRealDebtAmt());
+    		}
+    	}
+    	return totalRealDebtAmt;
+    }
+    
 
     /**
      * 退还多余费用

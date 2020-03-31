@@ -1,6 +1,9 @@
 package com.atzuche.order.renterwz.service;
 
+import com.atzuche.order.commons.CompareHelper;
+import com.atzuche.order.renterwz.entity.RenterOrderWzCostDetailEntity;
 import com.atzuche.order.renterwz.entity.RenterOrderWzStatusEntity;
+import com.atzuche.order.renterwz.enums.WzCostEnums;
 import com.atzuche.order.renterwz.enums.WzStatusEnums;
 import com.atzuche.order.renterwz.mapper.RenterOrderWzStatusMapper;
 import org.springframework.stereotype.Service;
@@ -8,6 +11,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * RenterOrderWzStatusService
@@ -49,6 +53,11 @@ public class RenterOrderWzStatusService {
         renterOrderWzStatusMapper.updateTransWzDisposeStatus(orderNo,carNumber,wzDisposeStatus);
     }
 
+    public void updateTransWzDisposeStatusAndQueryStatus(String orderNo, String carNumber, int wzDisposeStatus) {
+        renterOrderWzStatusMapper.updateTransWzDisposeStatusAndQueryStatus(orderNo,carNumber,wzDisposeStatus);
+    }
+
+
     public List<RenterOrderWzStatusEntity> queryInfosByOrderNo(String orderNo) {
         return renterOrderWzStatusMapper.queryInfosByOrderNo(orderNo);
     }
@@ -74,5 +83,13 @@ public class RenterOrderWzStatusService {
 
     public RenterOrderWzStatusEntity getOrderInfoByOrderNo(String orderNo) {
         return renterOrderWzStatusMapper.getOrderInfoByOrderNo(orderNo);
+    }
+
+    /**
+     * 修改违章状态
+     * @param renterOrderWzStatusEntity
+     */
+    public void updateOrderWzStatus(RenterOrderWzStatusEntity renterOrderWzStatusEntity) {
+        renterOrderWzStatusMapper.updateOrderWzStatus(renterOrderWzStatusEntity);
     }
 }

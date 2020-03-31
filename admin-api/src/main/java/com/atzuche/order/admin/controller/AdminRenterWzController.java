@@ -3,16 +3,16 @@ package com.atzuche.order.admin.controller;
 import com.atzuche.order.admin.constant.AdminOpTypeEnum;
 import com.atzuche.order.admin.service.RenterWzService;
 import com.atzuche.order.admin.service.log.AdminLogService;
+import com.atzuche.order.admin.vo.req.renterWz.CarDepositTemporaryRefundReqVO;
 import com.atzuche.order.admin.vo.req.renterWz.RenterWzCostReqVO;
 import com.atzuche.order.admin.vo.req.renterWz.TemporaryRefundReqVO;
+import com.atzuche.order.admin.vo.resp.renterWz.RenterWzDetailResVO;
 import com.atzuche.order.admin.vo.resp.renterWz.WzCostLogsResVO;
 import com.atzuche.order.commons.BindingResultUtil;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.doc.annotation.AutoDocMethod;
 import com.autoyol.doc.annotation.AutoDocVersion;
-import com.atzuche.order.admin.vo.resp.renterWz.RenterWzDetailResVO;
-import com.dianping.cat.Cat;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.CollectionUtils;
@@ -45,10 +45,7 @@ public class AdminRenterWzController extends BaseController {
         if (StringUtils.isBlank(orderNo)) {
             return ResponseData.createErrorCodeResponse(ErrorCode.ORDER_NO_PARAM_ERROR.getCode(), "订单编号为空");
         }
-        RenterWzDetailResVO res = null;
-
-        res = renterWzService.queryWzDetailByOrderNo(orderNo);
-
+        RenterWzDetailResVO res = renterWzService.queryWzDetailByOrderNo(orderNo);
         return ResponseData.success(res);
     }
 

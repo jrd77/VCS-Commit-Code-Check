@@ -1,16 +1,5 @@
 package com.atzuche.order.settle.service;
 
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Objects;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.Assert;
-import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
-
 import com.atzuche.order.accountownercost.entity.AccountOwnerCostSettleDetailEntity;
 import com.atzuche.order.accountrenterdeposit.vo.res.AccountRenterDepositResVO;
 import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostDetailEntity;
@@ -22,31 +11,35 @@ import com.atzuche.order.cashieraccount.service.CashierService;
 import com.atzuche.order.cashieraccount.service.CashierSettleService;
 import com.atzuche.order.cashieraccount.service.notservice.CashierRefundApplyNoTService;
 import com.atzuche.order.commons.CatConstants;
+import com.atzuche.order.commons.constant.OrderConstant;
 import com.atzuche.order.commons.enums.account.SettleStatusEnum;
 import com.atzuche.order.commons.service.OrderPayCallBack;
 import com.atzuche.order.parentorder.dto.OrderStatusDTO;
+import com.atzuche.order.parentorder.entity.OrderStatusEntity;
 import com.atzuche.order.parentorder.service.OrderStatusService;
 import com.atzuche.order.rentercost.entity.OrderSupplementDetailEntity;
 import com.atzuche.order.rentercost.service.OrderSupplementDetailService;
-import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.atzuche.order.renterorder.service.RenterOrderService;
 import com.atzuche.order.settle.exception.CancelOrderSettleParamException;
 import com.atzuche.order.settle.exception.OrderSettleFlatAccountException;
 import com.atzuche.order.settle.service.notservice.OrderOwnerSettleNoTService;
 import com.atzuche.order.settle.service.notservice.OrderSettleNoTService;
-import com.atzuche.order.settle.vo.req.CancelOrderReqDTO;
-import com.atzuche.order.settle.vo.req.OwnerCosts;
-import com.atzuche.order.settle.vo.req.RentCosts;
-import com.atzuche.order.settle.vo.req.SettleCancelOrdersAccount;
-import com.atzuche.order.settle.vo.req.SettleOrders;
-import com.atzuche.order.settle.vo.req.SettleOrdersDefinition;
+import com.atzuche.order.settle.vo.req.*;
 import com.atzuche.order.settle.vo.res.RenterCostVO;
 import com.autoyol.autopay.gateway.constant.DataPayKindConstant;
 import com.autoyol.commons.utils.GsonUtils;
 import com.dianping.cat.Cat;
 import com.dianping.cat.message.Transaction;
-
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * 车辆结算
@@ -69,6 +62,8 @@ public class OrderSettleService{
     @Autowired private RenterOrderSettleService renterOrderSettleService;
     @Autowired
     private OrderOwnerSettleNoTService orderOwnerSettleNoTService;
+    @Autowired
+    private RemoteOldSysDebtService remoteOldSysDebtService;
     
     /**
      * 查询所以费用
@@ -237,16 +232,11 @@ public class OrderSettleService{
             orderOwnerSettleNoTService.initSettleOrdersSeparateOwner(orderNo,settleOrders);
             log.info("OrderSettleService settleOrders settleOrdersSeparateOwner [{}]",GsonUtils.toJson(settleOrders));
             Cat.logEvent("settleOrdersSeparateOwner",GsonUtils.toJson(settleOrders));
-            /**
-             * 检查是否可以结算。 外置。
-             */
+            //检查是否可以结算。 外置。
             orderSettleNoTService.check(settleOrders);
             
-            
-            
-
             //2 无事务操作 查询租客车主费用明细 ，处理费用明细到 结算费用明细  并落库   然后平账校验
-            SettleOrdersDefinition settleOrdersDefinition = new SettleOrdersDefinition(); //外置对象。
+            SettleOrdersDefinition settleOrdersDefinition = new SettleOrdersDefinition();
             orderSettleNoTService.settleOrderFirst(settleOrders,settleOrdersDefinition);
             log.info("OrderSettleService settleOrdersDefinition [{}]",GsonUtils.toJson(settleOrdersDefinition));
             Cat.logEvent("settleOrders",GsonUtils.toJson(settleOrdersDefinition));
@@ -256,9 +246,7 @@ public class OrderSettleService{
             log.info("OrderSettleService settleOrdersDefinition [{}]",GsonUtils.toJson(settleOrdersDefinition));
             Cat.logEvent("settleOrderSeparateOwner",GsonUtils.toJson(settleOrdersDefinition));
             
-            /**
-             * 平账检测
-             */
+            //平账检测
             //6 费用平账 平台收入 + 平台补贴 + 车主费用 + 车主补贴 + 租客费用 + 租客补贴 = 0
             int totleAmt = settleOrdersDefinition.getPlatformProfitAmt() + settleOrdersDefinition.getPlatformSubsidyAmt()
                     + settleOrdersDefinition.getOwnerCostAmt() + settleOrdersDefinition.getOwnerSubsidyAmt()
@@ -279,18 +267,26 @@ public class OrderSettleService{
             orderOwnerSettleNoTService.settleOrderAfterSeparateOwner(settleOrders,settleOrdersDefinition,callBack);
             log.info("OrderSettleService settleOrderAfterSeparateOwner [{}]",GsonUtils.toJson(settleOrdersDefinition));
             Cat.logEvent("settleOrderAfterSeparateOwner",GsonUtils.toJson(settleOrdersDefinition));
-            
+            // 调远程增加车辆gps押金
+            orderOwnerSettleNoTService.updateCarDeposit(settleOrders);
+            // 调远程抵扣老系统租客欠款
+            remoteOldSysDebtService.deductBalance(settleOrders.getRenterMemNo(), settleOrders.getRenterTotalOldRealDebtAmt());
+            // 调远程抵扣老系统车主欠款
+            remoteOldSysDebtService.deductBalance(settleOrders.getOwnerMemNo(), settleOrders.getOwnerTotalOldRealDebtAmt());
             orderSettleNewService.sendOrderSettleMq(orderNo,settleOrders.getRenterMemNo(),settleOrders.getRentCosts(),0,settleOrders.getOwnerMemNo());
             t.setStatus(Transaction.SUCCESS);
         } catch (Exception e) {
-            log.error("OrderSettleService settleOrder,e={},",e);
-            OrderStatusDTO orderStatusDTO = new OrderStatusDTO();
-            orderStatusDTO.setOrderNo(orderNo);
-            orderStatusDTO.setSettleStatus(SettleStatusEnum.SETTL_FAIL.getCode());
-            orderStatusDTO.setSettleTime(LocalDateTime.now());
-            orderStatusService.saveOrderStatusInfo(orderStatusDTO);
+            log.error("OrderSettleService settleOrder,orderNo={},",orderNo, e);
+            OrderStatusEntity entity = orderStatusService.getByOrderNo(orderNo);
+            if(null != entity && entity.getIsDetain() != OrderConstant.YES) {
+                OrderStatusEntity record = new OrderStatusEntity();
+                record.setId(entity.getId());
+                record.setSettleStatus(SettleStatusEnum.SETTL_FAIL.getCode());
+                record.setSettleTime(LocalDateTime.now());
+                orderStatusService.updateByPrimaryKeySelective(record);
+            }
             t.setStatus(e);
-            Cat.logError("结算失败  :{}",e);
+            Cat.logError("结算失败  :orderNo="+orderNo, e);
             orderSettleNewService.sendOrderSettleMq(orderNo,settleOrders.getRenterMemNo(),settleOrders.getRentCosts(),1,settleOrders.getOwnerMemNo());
             throw new RuntimeException("结算失败 ,不能结算");
         } finally {
@@ -394,6 +390,11 @@ public class OrderSettleService{
             throw new CancelOrderSettleParamException();
         }
         if(cancelOrderReqDTO.isSettleRenterFlg()){
+            OrderStatusEntity orderStatusEntity = orderStatusService.getByOrderNo(orderNo);
+            if(orderStatusEntity != null && SettleStatusEnum.SETTLED.getCode().equals(orderStatusEntity.getSettleStatus())){
+                log.info("订单已经结算过orderNo={}",orderNo);
+                return;
+            }
             ownerOrderSettleService.settleOwnerOrderCancel(orderNo,ownerOrderNo);
             renterOrderSettleService.settleRenterOrderCancel(orderNo,renterOrderNo);
         }else{

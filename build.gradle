@@ -10,9 +10,9 @@ allprojects {
     targetCompatibility = 1.8
 
     repositories {
-        mavenCentral()
         maven{url "http://10.0.3.208:8081/nexus/content/groups/public/"}
         maven{url "http://maven.aliyun.com/nexus/content/groups/public/"}
+        mavenCentral()
 
     }
 
@@ -49,9 +49,9 @@ subprojects {
         // 单元测试
         testCompile("org.springframework.boot:spring-boot-starter-test:$springBootVersion")
         testCompile("junit:junit:4.12")
-        
 
 
+        compile('org.springframework.boot:spring-boot-starter-actuator')
         compile "com.autoyol:auto-web-starter:1.0-SNAPSHOT"
         compile 'org.springframework.boot:spring-boot-starter-web'
         compile('org.springframework.boot:spring-boot-starter-actuator')

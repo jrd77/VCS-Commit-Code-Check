@@ -8,6 +8,7 @@ import com.atzuche.order.cashieraccount.service.CashierService;
 import com.atzuche.order.cashieraccount.service.CashierSettleService;
 import com.atzuche.order.commons.PlatformProfitStatusEnum;
 import com.atzuche.order.commons.enums.FineTypeEnum;
+import com.atzuche.order.commons.enums.OwnerChildStatusEnum;
 import com.atzuche.order.commons.enums.SubsidySourceCodeEnum;
 import com.atzuche.order.commons.enums.account.debt.DebtTypeEnum;
 import com.atzuche.order.commons.enums.account.income.AccountOwnerIncomeExamineStatus;
@@ -83,6 +84,11 @@ public class OwnerOrderSettleService {
                 log.error("车主子订单获取为空 ownerOrderNo={}",ownerOrderNo);
                 throw new OwnerOrderNotFoundException(ownerOrderNo);
             }
+            if(OwnerChildStatusEnum.SETTLED.getCode() ==  ownerOrder.getChildStatus()){
+                log.info("车主子订单号ownerOrderNo={}已经结算过",ownerOrderNo);
+                return;
+            }
+
             //1、获取子订单信息
             SettleOrders settleOrders = new SettleOrders();
             settleOrders.setOrderNo(orderNo);
@@ -95,16 +101,28 @@ public class OwnerOrderSettleService {
 
             //3、获取车主罚金与收益
             SettleCancelOrdersAccount settleCancelOrdersAccount = this.initOwnerSettleCancelOrdersAccount(settleOrders);
-
             //4、车主、平台罚金与收益处理
             this.platformAndOwnerIncomeFineHandler(settleOrders,settleCancelOrdersAccount);
 
+            //5、更新车主子订单状态
+            updateOwnerOrderChildStatus(ownerOrderNo);
         }catch (Exception e){
             e.printStackTrace();
             log.error("订单取消-车主端结算异常orderNo={}，ownerOrderNo={}，ownerMemNo={}",orderNo,ownerOrderNo,ownerOrder.getMemNo(),e);
             throw new OwnerCancelSettleException();
         }
     }
+    /*
+     * @Author ZhangBin
+     * @Date 2020/3/13 18:06
+     * @Description: 更新车主子订单状态
+     *
+     **/
+    public void updateOwnerOrderChildStatus(String ownerOrderNo){
+        ownerOrderService.updateChildStatusByOwnerOrderNo(ownerOrderNo, OwnerChildStatusEnum.SETTLED);
+    }
+
+
     /*
      * @Author ZhangBin
      * @Date 2020/3/6 10:47
@@ -114,7 +132,7 @@ public class OwnerOrderSettleService {
     private SettleCancelOrdersAccount initOwnerSettleCancelOrdersAccount(SettleOrders settleOrders) {
         OwnerCosts ownerCosts = settleOrders.getOwnerCosts();
         SettleCancelOrdersAccount settleCancelOrdersAccount = new SettleCancelOrdersAccount();
-        //车主罚金
+        //车主罚金(这里获取的金额 理论都是负值)
         int ownerFineAmt = 0;
         if(Objects.nonNull(ownerCosts) && !CollectionUtils.isEmpty(ownerCosts.getOwnerOrderFineDeatails())){
             int amt = ownerCosts.getOwnerOrderFineDeatails().stream().filter(obj ->{
@@ -218,9 +236,11 @@ public class OwnerOrderSettleService {
             cashierSettleService.insertAccountPlatformProfitDetails(accountPlatformProfitDetails);
             accountPlatformProfitEntity.setPlatformReceivableAmt(settleCancelOrdersAccount.getPlatformFineImconeAmt());
             accountPlatformProfitEntity.setPlatformReceivedAmt(settleCancelOrdersAccount.getPlatformFineImconeAmt());
+
+            //insert 结算总表 account_platform_profit(平台订单收益结算表)
+            cashierSettleService.insertAccountPlatformProfit(accountPlatformProfitEntity);
         }
-        //insert 结算总表 account_platform_profit(平台订单收益结算表)
-        cashierSettleService.insertAccountPlatformProfit(accountPlatformProfitEntity);
+
     }
     /*
      * @Author ZhangBin
@@ -266,7 +286,7 @@ public class OwnerOrderSettleService {
             }
         }else if(settleCancelOrdersAccount.getOwnerFineTotal() < 0 ){
             log.info("取消订单-结算-车主端结算-车主罚金走历史欠款settleCancelOrdersAccount={}",JSON.toJSONString(settleCancelOrdersAccount));
-            //当时罚金的时候，直接走历史欠款
+            //当是罚金的时候，直接走历史欠款
             AccountInsertDebtReqVO accountInsertDebt = new AccountInsertDebtReqVO();
             BeanUtils.copyProperties(settleOrders,accountInsertDebt);
             accountInsertDebt.setType(DebtTypeEnum.CANCEL.getCode());

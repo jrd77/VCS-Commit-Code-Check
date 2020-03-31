@@ -1,6 +1,7 @@
 package com.atzuche.order.commons.enums;
 
 import lombok.Getter;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * 取消订单使用角色
@@ -27,13 +28,13 @@ public enum CancelSourceEnum {
     /**
      * 平台代租客取消
      **/
-    INSTEAD_OF_RENTER(4, "平台代租客取消"),
+    INSTEAD_OF_RENTER(4, "代租客取消"),
 
 
     /**
      * 平台代车主取消
      **/
-    INSTEAD_OF_OWNER(5, "平台代车主取消")
+    INSTEAD_OF_OWNER(5, "代车主取消")
 
     ;
 
@@ -53,5 +54,19 @@ public enum CancelSourceEnum {
     CancelSourceEnum(Integer code, String msg) {
         this.code = code;
         this.msg = msg;
+    }
+
+
+    public static CancelSourceEnum from(Integer code) {
+        if(null == code) {
+            return null;
+        }
+        CancelSourceEnum[] sourceEnums = values();
+        for (CancelSourceEnum source : sourceEnums) {
+            if (source.code.intValue() == code.intValue()) {
+                return source;
+            }
+        }
+        throw new RuntimeException("the value of code :" + code + " not supported,please check");
     }
 }

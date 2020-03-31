@@ -60,6 +60,8 @@ public class DeliveryCarService {
         }
         int getMinute = getMinutes == null ? 0 : getMinutes;
         int returnMinute = returnMinutes == null ? 0 : returnMinutes;
+        log.info("新增配送订单数据------>>>>> 租客地址信息 入参数：【{}】",
+                orderReqContext.getOrderReqVO().getSrvGetAddr());
         addRenYunFlowOrderInfo(getMinute, returnMinute, orderReqContext, UserTypeEnum.OWNER_TYPE.getValue().intValue());
         addRenYunFlowOrderInfo(getMinute, returnMinute, orderReqContext, UserTypeEnum.RENTER_TYPE.getValue().intValue());
     }
@@ -111,7 +113,7 @@ public class DeliveryCarService {
         List<OrderDeliveryFlowEntity> orderDeliveryFlowEntityList = deliveryFlowService.selectOrderDeliveryFlowByOrderNo(renterOrderNo);
         if (CollectionUtils.isEmpty(orderDeliveryFlowEntityList)) {
             //不抛异常，直接return
-            log.info("没有找到当前子订单的仁云配送订单信息：renterOrderNo：{}",renterOrderNo.toString());
+            log.info("没有找到当前子订单的仁云配送订单信息：renterOrderNo：{}",renterOrderNo);
             return;
         }
         for(OrderDeliveryFlowEntity orderDeliveryFlowEntity : orderDeliveryFlowEntityList) {
@@ -301,14 +303,14 @@ public class DeliveryCarService {
         orderDeliveryDTO.setRentTime(orderReqContext.getOrderReqVO().getRentTime());
         orderDeliveryDTO.setRevertTime(orderReqContext.getOrderReqVO().getRevertTime());
         orderDeliveryDTO.setType(orderType);
-        orderDeliveryDTO.setParamsTypeValue(orderReqVO, orderType);
+        orderDeliveryDTO.setParamsTypeValue(orderReqVO, orderType,renterGoodsDetailDTO);
         //如果没有使用取还车服务则不需要flow数据 暂加入
         orderDeliveryFlowEntity.setRenterOrderNo(renterGoodsDetailDTO.getRenterOrderNo());
         orderDeliveryFlowEntity.setOrderNo(renterGoodsDetailDTO.getOrderNo());
         orderDeliveryFlowEntity.setServiceTypeInfo(orderType, orderDeliveryDTO);
         orderDeliveryFlowEntity.setTermTime(renterGoodsDetailDTO.getRentTime());
         orderDeliveryFlowEntity.setReturnTime(renterGoodsDetailDTO.getRevertTime());
-        orderDeliveryFlowEntity.setCarNo(String.valueOf(renterGoodsDetailDTO.getCarNo()));
+        orderDeliveryFlowEntity.setCarNo(String.valueOf(renterGoodsDetailDTO.getCarPlateNum()));
         orderDeliveryFlowEntity.setVehicleModel(renterGoodsDetailDTO.getCarBrandTxt());
         orderDeliveryFlowEntity.setVehicleType(renterGoodsDetailDTO.getCarTypeTxt());
         orderDeliveryFlowEntity.setDeliveryCarCity(orderReqVO.getCityName());

@@ -1,7 +1,10 @@
 package com.atzuche.order.cashieraccount.vo.res.pay;
 
+import java.util.List;
+
 import com.atzuche.order.commons.enums.YesNoEnum;
-import com.autoyol.doc.annotation.AutoDocProperty;
+import com.autoyol.autopay.gateway.vo.req.NotifyDataVo;
+
 import lombok.Data;
 
 /**
@@ -9,7 +12,15 @@ import lombok.Data;
  */
 @Data
 public class OrderPayCallBackSuccessVO {
-
+	/**
+	 * supplement 及debt_detail id字段，更新
+	 */
+	private List<NotifyDataVo> supplementIds;
+	
+	private List<NotifyDataVo> debtIds;
+	
+	private List<String> rentAmountAfterRenterOrderNos;
+	
     /**
      * memNo
      */

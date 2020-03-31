@@ -13,13 +13,17 @@ import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.commons.enums.cashier.PaySourceEnum;
 import com.atzuche.order.commons.enums.cashier.PayTypeEnum;
 import com.atzuche.order.commons.enums.cashier.TransStatusEnum;
+import com.atzuche.order.commons.enums.detain.DetainStatusEnum;
+import com.atzuche.order.commons.enums.detain.DetainTypeEnum;
 import com.atzuche.order.open.service.FeignOrderDetailService;
 import com.autoyol.commons.web.ResponseData;
 import com.dianping.cat.Cat;
 import com.dianping.cat.message.Transaction;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -72,11 +76,13 @@ public class CarDepositReturnDetailService {
         CashierDTO cashierDTO = data.getCashierDTO();
 
         List<AccountRenterDetainDetailDTO> rentCarAmtDtoList = accountRenterDetainDetailDTOList.stream()
-                .filter(x -> RenterCashCodeEnum.ACCOUNT_RENTER_DETAIN_CAR_AMT.equals(x.getSourceCode()))
+                .filter(x -> RenterCashCodeEnum.ACCOUNT_DEPOSIT_DETAIN_CAR_AMT.getCashNo().equals(x.getSourceCode().toString()))
                 .collect(Collectors.toList());
         AccountRenterDetainDetailDTO accountRenterDetainDetailDTO = new AccountRenterDetainDetailDTO(0);
-        if(rentCarAmtDtoList!= null && rentCarAmtDtoList.size()>=1){
+        int detainAmt = 0;
+        if(!CollectionUtils.isEmpty(rentCarAmtDtoList)){
             accountRenterDetainDetailDTO = rentCarAmtDtoList.get(0);
+            detainAmt = rentCarAmtDtoList.stream().mapToInt(AccountRenterDetainDetailDTO::getAmt).sum();
         }
 
         Integer depositToCarAmt = Optional.ofNullable(accountRenterCostDetailDTOS).orElseGet(ArrayList::new).stream()
@@ -144,10 +150,40 @@ public class CarDepositReturnDetailService {
         carDepositRespVo.setDeductionHistoryAmt(depositToHistoryAmt==null?0:depositToHistoryAmt);
         carDepositRespVo.setExpSettleTime(expSettleTime);
         carDepositRespVo.setActSettleTime(actSettleTime);
-        carDepositRespVo.setActDetainAmt(accountRenterDetainCostDTO==null?0:accountRenterDetainCostDTO.getAmt());
-        carDepositRespVo.setActDetainStatus("成功");
+
+        carDepositRespVo.setActDetainAmt(detainAmt);
+        DetainStatusEnum detainStatus = DetainStatusEnum.from(orderStatusDTO.getIsDetain());
+        if(null == detainStatus) {
+            detainStatus = DetainStatusEnum.NO_DETAIN;
+        }
+        carDepositRespVo.setActDetainStatus(detainStatus.getMsg());
         carDepositRespVo.setActDetainTime(detainTime);
 
+        detainReasonHandle(carDepositRespVo, data.getDetainReasons());
         return ResponseData.success(carDepositRespVo);
+    }
+
+
+    /**
+     * 租车押金暂扣原因处理
+     *
+     * @param res           返回信息
+     * @param detainReasons 暂扣原因列表
+     */
+    private void detainReasonHandle(CarDepositRespVo res, List<RenterDetainReasonDTO> detainReasons) {
+        if (!CollectionUtils.isEmpty(detainReasons)) {
+            detainReasons.forEach(r -> {
+                if (StringUtils.equals(r.getDetainTypeCode(), DetainTypeEnum.risk.getCode())) {
+                    res.setFkDetainFlag(r.getDetainStatus().toString());
+                    res.setFkDetainReason(r.getDetainReasonCode());
+                } else if (StringUtils.equals(r.getDetainTypeCode(), DetainTypeEnum.trans.getCode())) {
+                    res.setJyDetainFlag(r.getDetainStatus().toString());
+                    res.setJyDetainReason(r.getDetainReasonCode());
+                } else if (StringUtils.equals(r.getDetainTypeCode(), DetainTypeEnum.claims.getCode())) {
+                    res.setLpDetainFlag(r.getDetainStatus().toString());
+                    res.setLpDetainReason(r.getDetainReasonCode());
+                }
+            });
+        }
     }
 }

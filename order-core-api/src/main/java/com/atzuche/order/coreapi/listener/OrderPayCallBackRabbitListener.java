@@ -29,12 +29,18 @@ import org.springframework.context.annotation.Configuration;
 public class OrderPayCallBackRabbitListener {
     @Autowired RabbitMsgLogService rabbitMsgLogService;
     @Autowired CashierPayService cashierPayService;
-    @Autowired PayCallbackService payCallbackService;
+    
+    //回调的处理类
+    @Autowired 
+    PayCallbackService payCallbackService;
 
     /**
      * 支付系统回调
      * MQ 异步回调
      */
+//    @RabbitListener(bindings = {
+//            @QueueBinding(value = @Queue(value = "pay.success.20test", durable = "true"), exchange = @Exchange(value = "auto-paytest", durable = "true", type = "topic"), key = "pay.success.20test")})
+    
     @RabbitListener(bindings = {
             @QueueBinding(value = @Queue(value = "pay.success.20", durable = "true"), exchange = @Exchange(value = "auto-pay", durable = "true", type = "topic"), key = "pay.success.20")})
     public void payCallBack(Message message) {
@@ -49,7 +55,9 @@ public class OrderPayCallBackRabbitListener {
             BatchNotifyDataVo batchNotifyDataVo = GsonUtils.convertObj(orderPayAsynStr, BatchNotifyDataVo.class);
             String reqContent = FasterJsonUtil.toJson(batchNotifyDataVo);
             String md5 =  MD5.MD5Encode(reqContent);
+            //mq消息落库
             rabbitMsgLogService.insertRabbitMsgLog(message, RabbitBusinessTypeEnum.ORDER_PAY_CALL_BACK,orderPayAsynStr,md5);
+            //回调处理
             cashierPayService.payCallBack(batchNotifyDataVo,payCallbackService);
             t.setStatus(Transaction.SUCCESS);
         } catch (Exception e) {

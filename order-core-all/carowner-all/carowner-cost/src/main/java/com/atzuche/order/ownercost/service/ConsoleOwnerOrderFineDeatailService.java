@@ -2,6 +2,7 @@ package com.atzuche.order.ownercost.service;
 
 import java.util.List;
 
+import com.atzuche.order.commons.vo.res.rentcosts.RenterOrderFineDeatailEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -107,4 +108,16 @@ public class ConsoleOwnerOrderFineDeatailService{
         }
     	return id;
 	}
+
+
+
+
+    public ConsoleOwnerOrderFineDeatailEntity selectByCondition(String orderNo, FineTypeEnum fineType,
+                                                          FineSubsidyCodeEnum fineSubsidyCode,
+                                                          FineSubsidySourceCodeEnum fineSubsidySourceCode) {
+
+        return consoleOwnerOrderFineDeatailMapper.selectByCondition(orderNo, fineType.getFineType(),
+                fineSubsidyCode.getFineSubsidyCode(), fineSubsidySourceCode.getFineSubsidySourceCode());
+
+    }
 }

@@ -1,6 +1,7 @@
 package com.atzuche.order.admin.controller;
 
 import com.atzuche.order.admin.service.AdminDeliveryCarService;
+import com.atzuche.order.admin.service.log.AdminLogService;
 import com.atzuche.order.delivery.exception.DeliveryOrderException;
 import com.atzuche.order.delivery.vo.delivery.rep.DeliveryCarVO;
 import com.atzuche.order.delivery.vo.delivery.req.CarConditionPhotoUploadVO;
@@ -32,6 +33,9 @@ public class AdminDeliveryCarController extends BaseController {
 
     @Autowired
     private AdminDeliveryCarService deliveryCarInfoService;
+
+    @Autowired
+    private AdminLogService adminLogService;
 
     /**
      * 获取配送信息

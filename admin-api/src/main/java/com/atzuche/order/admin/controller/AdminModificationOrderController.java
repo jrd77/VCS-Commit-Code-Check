@@ -27,10 +27,10 @@ public class AdminModificationOrderController {
 
     private static final Logger logger = LoggerFactory.getLogger(AdminModificationOrderController.class);
     @Autowired
-    ModificationOrderService modificationOrderService;
+    private ModificationOrderService modificationOrderService;
 
     @Autowired
-	AdminOrderService adminOrderService;
+	private AdminOrderService adminOrderService;
     
 	@AutoDocMethod(description = "订单修改信息列表", value = "订单修改信息列表", response = ModificationOrderListResponseVO.class)
 	@RequestMapping(value="modifacion/infomation/list",method = RequestMethod.POST)

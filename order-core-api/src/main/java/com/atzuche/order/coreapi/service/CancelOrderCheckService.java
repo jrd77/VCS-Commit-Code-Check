@@ -7,10 +7,11 @@ import com.atzuche.order.commons.enums.MemRoleEnum;
 import com.atzuche.order.commons.enums.OrderStatusEnum;
 import com.atzuche.order.coreapi.entity.CancelOrderReqContext;
 import com.atzuche.order.coreapi.entity.dto.CancelOrderReqDTO;
-import com.atzuche.order.coreapi.submitOrder.exception.CancelOrderCheckException;
-import com.atzuche.order.coreapi.submitOrder.exception.RefuseOrderCheckException;
+import com.atzuche.order.coreapi.submit.exception.CancelOrderCheckException;
+import com.atzuche.order.coreapi.submit.exception.RefuseOrderCheckException;
 import com.atzuche.order.ownercost.entity.OwnerOrderEntity;
 import com.atzuche.order.parentorder.entity.OrderCancelReasonEntity;
+import com.atzuche.order.parentorder.entity.OrderRefundRecordEntity;
 import com.atzuche.order.parentorder.entity.OrderStatusEntity;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.autoyol.commons.web.ErrorCode;
@@ -159,5 +160,18 @@ public class CancelOrderCheckService {
 
     }
 
+
+    public void delayRefundCheck(CancelOrderReqContext reqContext) {
+        OrderRefundRecordEntity orderRefundRecordEntity = reqContext.getOrderRefundRecordEntity();
+        if (null == orderRefundRecordEntity) {
+            throw new RefuseOrderCheckException(ErrorCode.CURRENT_NOT_ALLOW_MODIFY_ADDRESS);
+        }
+        if (OrderConstant.ONE == orderRefundRecordEntity.getStatus()
+                || OrderConstant.TWO == orderRefundRecordEntity.getStatus()
+                || orderRefundRecordEntity.getCreateTime().plusHours(OrderConstant.ONE).isBefore(LocalDateTime.now())) {
+            throw new RefuseOrderCheckException(ErrorCode.CURRENT_NOT_ALLOW_MODIFY_ADDRESS.getCode(), "您已超时，订单状态已发生改变，请刷新后再试。");
+
+        }
+    }
 
 }

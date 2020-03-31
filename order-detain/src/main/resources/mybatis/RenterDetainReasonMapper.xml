@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.atzuche.order.detain.mapper.RenterDetainReasonMapper">
+
+    <resultMap type="com.atzuche.order.detain.entity.RenterDetainReasonEntity" id="BaseResultMap">
+        <result property="id" column="id"/>
+        <result property="orderNo" column="order_no"/>
+        <result property="detainTypeCode" column="detain_type_code"/>
+        <result property="detainTypeName" column="detain_type_name"/>
+        <result property="detainReasonCode" column="detain_reason_code"/>
+        <result property="detainReasonName" column="detain_reason_name"/>
+        <result property="detainStatus" column="detain_status"/>
+        <result property="createTime" column="create_time"/>
+        <result property="createOp" column="create_op"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="updateOp" column="update_op"/>
+        <result property="isDelete" column="is_delete"/>
+    </resultMap>
+
+
+	<sql id="Base_Column_List">
+        `id`, `order_no`, `detain_type_code`, `detain_type_name`, `detain_reason_code`, `detain_reason_name`, `detain_status`,
+        `create_time`, `create_op`, `update_time`, `update_op`, `is_delete`
+	</sql>
+
+
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap">
+		select <include refid="Base_Column_List" /> from renter_detain_reason where id = #{value}
+	</select>
+
+    <select id="selectByOrderNo" resultMap="BaseResultMap">
+        select
+            <include refid="Base_Column_List" />
+        from
+            renter_detain_reason
+        where
+            `order_no` = #{orderNo}
+            and `detain_type_code` = #{detainTypeCode}
+            and is_delete = 0
+        limit 1
+    </select>
+
+    <select id="selectListByOrderNo" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from
+            renter_detain_reason
+        where
+        `order_no` = #{orderNo} and is_delete = 0
+    </select>
+
+	<insert id="insert" parameterType="com.atzuche.order.detain.entity.RenterDetainReasonEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into renter_detain_reason (
+            `order_no`,
+            `detain_type_code`,
+            `detain_type_name`,
+            `detain_reason_code`,
+            `detain_reason_name`,
+            `detain_status`,
+            `create_op`,
+            `update_op`
+        ) values (
+            #{orderNo},
+            #{detainTypeCode},
+            #{detainTypeName},
+            #{detainReasonCode},
+            #{detainReasonName},
+            #{detainStatus},
+            #{createOp},
+            #{updateOp}
+        )
+	</insert>
+	
+	<insert id="insertSelective" parameterType="com.atzuche.order.detain.entity.RenterDetainReasonEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into renter_detain_reason
+            <trim prefix="(" suffix=")" suffixOverrides="," >
+				<if test="orderNo != null">`order_no`, </if>
+				<if test="detainTypeCode != null">`detain_type_code`, </if>
+				<if test="detainTypeName != null">`detain_type_name`, </if>
+				<if test="detainReasonCode != null">`detain_reason_code`, </if>
+				<if test="detainReasonName != null">`detain_reason_name`, </if>
+				<if test="detainStatus != null">`detain_status`, </if>
+				<if test="createTime != null">`create_time`, </if>
+				<if test="createOp != null">`create_op`, </if>
+				<if test="updateTime != null">`update_time`, </if>
+				<if test="updateOp != null">`update_op`, </if>
+				<if test="isDelete != null">`is_delete`, </if>
+	        </trim>
+            <trim prefix="values (" suffix=")" suffixOverrides="," >
+				<if test="orderNo != null">#{orderNo},  </if>
+				<if test="detainTypeCode != null">#{detainTypeCode},  </if>
+				<if test="detainTypeName != null">#{detainTypeName},  </if>
+				<if test="detainReasonCode != null">#{detainReasonCode},  </if>
+				<if test="detainReasonName != null">#{detainReasonName},  </if>
+				<if test="detainStatus != null">#{detainStatus},  </if>
+				<if test="createTime != null">#{createTime},  </if>
+				<if test="createOp != null">#{createOp},  </if>
+				<if test="updateTime != null">#{updateTime},  </if>
+				<if test="updateOp != null">#{updateOp},  </if>
+				<if test="isDelete != null">#{isDelete}, </if>
+	        </trim>
+	</insert>
+	
+	 
+	<update id="updateByPrimaryKeySelective" parameterType="com.atzuche.order.detain.entity.RenterDetainReasonEntity">
+		update renter_detain_reason 
+		    <set>
+				<if test="orderNo != null">`order_no` = #{orderNo}, </if>
+				<if test="detainTypeCode != null">`detain_type_code` = #{detainTypeCode}, </if>
+				<if test="detainTypeName != null">`detain_type_name` = #{detainTypeName}, </if>
+				<if test="detainReasonCode != null">`detain_reason_code` = #{detainReasonCode}, </if>
+				<if test="detainReasonName != null">`detain_reason_name` = #{detainReasonName}, </if>
+				<if test="detainStatus != null">`detain_status` = #{detainStatus}, </if>
+				<if test="createTime != null">`create_time` = #{createTime}, </if>
+				<if test="createOp != null">`create_op` = #{createOp}, </if>
+				<if test="updateTime != null">`update_time` = #{updateTime}, </if>
+				<if test="updateOp != null">`update_op` = #{updateOp}, </if>
+				<if test="isDelete != null">`is_delete` = #{isDelete}, </if>
+			</set>
+		where id = #{id}
+	</update>
+	
+	<update id="updateByPrimaryKey" parameterType="com.atzuche.order.detain.entity.RenterDetainReasonEntity">
+		update renter_detain_reason 
+		    <set>
+				`order_no` = #{orderNo}, 		
+				`detain_type_code` = #{detainTypeCode}, 		
+				`detain_type_name` = #{detainTypeName}, 		
+				`detain_reason_code` = #{detainReasonCode}, 		
+				`detain_reason_name` = #{detainReasonName}, 		
+				`detain_status` = #{detainStatus}, 		
+				`create_op` = #{createOp},
+				`update_op` = #{updateOp}
+		</set>
+		where id = #{id}
+	</update>
+  	
+</mapper>

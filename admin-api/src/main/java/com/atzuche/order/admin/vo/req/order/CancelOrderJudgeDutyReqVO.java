@@ -16,6 +16,14 @@ public class CancelOrderJudgeDutyReqVO {
     @NotBlank(message = "订单号不能为空")
     private String orderNo;
 
+    @AutoDocProperty(value = "租客订单号", required = true)
+    @NotBlank(message = "租客订单号不能为空")
+    private String renterOrderNo;
+
+    @AutoDocProperty(value = "车主订单号", required = true)
+    @NotBlank(message = "车主订单号不能为空")
+    private String ownerOrderNo;
+
     @AutoDocProperty(value = "责任方:1,租客责任 2,车主责任 6,双方无责、平台承担保险", required = true)
     @NotBlank(message = "责任方不能为空")
     private String wrongdoer;

@@ -1,5 +1,7 @@
 package com.atzuche.order.renterwz.mapper;
 
+import com.atzuche.order.commons.vo.req.ViolationReqVO;
+import com.atzuche.order.commons.vo.res.ViolationResVO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -81,6 +83,16 @@ public interface RenterOrderWzStatusMapper{
 	 */
 	void updateTransWzDisposeStatus(@Param("orderNo") String orderNo,@Param("carNumber") String carNumber,@Param("status") int wzDisposeStatus);
 
+
+	/**
+	 * 根据订单号和车牌号 修改违章状态及查询状态
+	 * @param orderNo 订单号
+	 * @param carNumber 车牌号
+	 * @param wzDisposeStatus 状态
+	 */
+	void updateTransWzDisposeStatusAndQueryStatus(@Param("orderNo") String orderNo,@Param("carNumber") String carNumber,@Param("status") int wzDisposeStatus);
+
+
 	/**
 	 * 根据订单号查询 违章处理状态信息
 	 * @param orderNo 订单号
@@ -108,4 +120,15 @@ public interface RenterOrderWzStatusMapper{
 	 * @return
 	 */
 	RenterOrderWzStatusEntity getOrderInfoByOrderNo(@Param("orderNo") String orderNo);
+
+	/**
+	 * 修改违章信息
+	 * @param renterOrderWzStatusEntity
+	 */
+	void updateOrderWzStatus(RenterOrderWzStatusEntity renterOrderWzStatusEntity);
+	/**
+	 * 查询违章列表数据
+	 * @return 违章订单
+	 */
+	List<ViolationResVO> queryIllegalOrderList(ViolationReqVO violationReqVO);
 }

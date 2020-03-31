@@ -3,6 +3,8 @@
  */
 package com.atzuche.order.settle.service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 import org.springframework.beans.BeanUtils;
@@ -26,9 +28,11 @@ import com.atzuche.order.commons.service.OrderPayCallBack;
 import com.atzuche.order.commons.vo.req.income.AccountOwnerIncomeExamineReqVO;
 import com.atzuche.order.ownercost.entity.OwnerOrderIncrementDetailEntity;
 import com.atzuche.order.ownercost.entity.OwnerOrderPurchaseDetailEntity;
+import com.atzuche.order.settle.vo.req.AccountOldDebtReqVO;
 import com.atzuche.order.settle.vo.req.SettleOrders;
 import com.atzuche.order.settle.vo.req.SettleOrdersAccount;
 import com.atzuche.order.settle.vo.req.SettleOrdersDefinition;
+import com.atzuche.order.settle.vo.res.AccountOldDebtResVO;
 import com.autoyol.commons.utils.GsonUtils;
 import com.dianping.cat.Cat;
 
@@ -43,6 +47,8 @@ import lombok.extern.slf4j.Slf4j;
 public class OrderOwnerSettleNewService {
 	@Autowired
 	private CashierService cashierService;
+	@Autowired
+	private AccountDebtService accountDebtService;
 	
 	/**
      * 车主收益 结余处理 历史欠款
@@ -65,6 +71,41 @@ public class OrderOwnerSettleNewService {
             }
         }
     }
+    
+    
+    /**
+     * 车主收益抵扣老系统历史欠款
+     * @param settleOrdersAccount
+     * @return int saveOwnerIncomeDebt
+     */
+    public int oldRepayHistoryDebtOwner(SettleOrdersAccount settleOrdersAccount) {
+    	List<AccountOldDebtReqVO> oldDebtList = new ArrayList<AccountOldDebtReqVO>();
+    	if(settleOrdersAccount.getOwnerCostSurplusAmt() > 0) {
+    		AccountOldDebtReqVO accountOldDebtReqVO = new AccountOldDebtReqVO();
+    		accountOldDebtReqVO.setOrderNo(settleOrdersAccount.getOrderNo());
+    		accountOldDebtReqVO.setOwnerOrderNo(settleOrdersAccount.getOwnerOrderNo());
+    		accountOldDebtReqVO.setMemNo(settleOrdersAccount.getOwnerMemNo());
+    		accountOldDebtReqVO.setSurplusAmt(settleOrdersAccount.getOwnerCostSurplusAmt());
+    		accountOldDebtReqVO.setCahsCodeEnum(RenterCashCodeEnum.SETTLE_OWNER_INCOME_TO_OLD_HISTORY_AMT);
+    		oldDebtList.add(accountOldDebtReqVO);
+    	}
+    	// 抵扣老系统历史欠款
+    	List<AccountOldDebtResVO> debtResList = accountDebtService.deductOldDebt(oldDebtList);
+    	if (debtResList == null || debtResList.isEmpty()) {
+    		return 0;
+    	}
+    	int totalRealDebtAmt = 0;
+    	for (AccountOldDebtResVO debtRes:debtResList) {
+    		RenterCashCodeEnum cahsCodeEnum = debtRes.getCahsCodeEnum();
+    		totalRealDebtAmt += debtRes.getRealDebtAmt();
+    		if (cahsCodeEnum != null && cahsCodeEnum == RenterCashCodeEnum.SETTLE_OWNER_INCOME_TO_OLD_HISTORY_AMT) {
+    			// 车主收益
+    			cashierService.saveOwnerIncomeDebt(debtRes);
+    		}
+    	}
+    	settleOrdersAccount.setOwnerCostSurplusAmt(settleOrdersAccount.getOwnerCostSurplusAmt() - totalRealDebtAmt);
+    	return totalRealDebtAmt;
+    } 
 
     /**
      * 结算 产生 车主待审核记录
@@ -193,5 +234,23 @@ public class OrderOwnerSettleNewService {
         accountPlatformProfitDetail.setOrderNo(proxyExpense.getOrderNo());
         settleOrdersDefinition.addPlatformProfit(accountPlatformProfitDetail);
 
+    }
+    
+    /**
+     * 获取车主gps押金用平台端冲账
+     * @param gpsDeposit
+     * @param settleOrdersDefinition
+     */
+    public void addGpsDepositIncrementAmtToPlatform(OwnerOrderIncrementDetailEntity gpsDeposit, SettleOrdersDefinition settleOrdersDefinition) {
+        int totalAmount = gpsDeposit.getTotalAmount();
+        AccountPlatformProfitDetailEntity accountPlatformProfitDetail = new AccountPlatformProfitDetailEntity();
+        accountPlatformProfitDetail.setAmt(-totalAmount);
+        //renterOrderCostDetail.getCostCode()  //暂不处理
+        accountPlatformProfitDetail.setSourceCode(OwnerCashCodeEnum.HW_DEPOSIT_DEBT.getCashNo());
+        accountPlatformProfitDetail.setSourceDesc(OwnerCashCodeEnum.HW_DEPOSIT_DEBT.getTxt());
+        
+        //accountPlatformProfitDetail.setUniqueNo(String.valueOf(gpsDeposit.getId()));
+        accountPlatformProfitDetail.setOrderNo(gpsDeposit.getOrderNo());
+        settleOrdersDefinition.addPlatformProfit(accountPlatformProfitDetail);
     }
 }

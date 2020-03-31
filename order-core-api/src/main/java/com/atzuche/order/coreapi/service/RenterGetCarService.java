@@ -4,7 +4,7 @@ import com.atzuche.order.commons.enums.OrderStatusEnum;
 import com.atzuche.order.commons.vo.req.GetCarReqVO;
 import com.atzuche.order.coreapi.service.mq.OrderActionMqService;
 import com.atzuche.order.coreapi.service.mq.OrderStatusMqService;
-import com.atzuche.order.coreapi.submitOrder.exception.RefuseOrderCheckException;
+import com.atzuche.order.coreapi.submit.exception.RefuseOrderCheckException;
 import com.atzuche.order.flow.service.OrderFlowService;
 import com.atzuche.order.ownercost.entity.OwnerOrderEntity;
 import com.atzuche.order.ownercost.service.OwnerOrderService;

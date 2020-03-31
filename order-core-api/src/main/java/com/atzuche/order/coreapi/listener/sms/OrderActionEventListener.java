@@ -25,7 +25,6 @@ import java.util.Map;
 @Slf4j
 public class OrderActionEventListener extends OrderSendMessageManager {
 
-
     @RabbitListener(bindings = {@QueueBinding(value = @Queue(value = "order_action_08", durable = "true"),
             exchange = @Exchange(value = "auto-order-action", durable = "true", type = "topic"), key = "action.#")
     }, containerFactory = "orderRabbitListenerContainerFactory")
@@ -34,8 +33,8 @@ public class OrderActionEventListener extends OrderSendMessageManager {
         OrderMessage orderMessage = JSONObject.parseObject(message.getBody(), OrderMessage.class);
         log.info("新订单动作总事件监听,入参orderMessage:[{}]", orderMessage.toString());
         try {
-            sendSMSMessageData(orderMessage);
-            sendPushMessageData(orderMessage);
+//            sendSMSMessageData(orderMessage);
+//            sendPushMessageData(orderMessage);
         } catch (Exception e) {
             log.info("新订单动作总事件监听发生异常,msg：[{}]", e);
             Cat.logError("新订单动作总事件监听发生异常", e);

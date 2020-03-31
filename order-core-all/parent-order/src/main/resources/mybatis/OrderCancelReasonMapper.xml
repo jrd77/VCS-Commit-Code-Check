@@ -14,6 +14,8 @@
         <result property="cancelReason" column="cancel_reason"/>
 		<result property="appealFlag" column="appeal_flag"/>
         <result property="cancelReqTime" column="cancel_req_time"/>
+        <result property="fineAmt" column="default_fine_amt"/>
+        <result property="insuranceFineAmt" column="insurance_fine_amt"/>
         <result property="createTime" column="create_time"/>
         <result property="createOp" column="create_op"/>
         <result property="updateTime" column="update_time"/>
@@ -33,6 +35,8 @@
         `cancel_reason`,
         `appeal_flag`,
         `cancel_req_time`,
+        `default_fine_amt`,
+        `insurance_fine_amt`,
         `create_time`,
         `create_op`,
         `update_time`,
@@ -55,7 +59,9 @@
             `duty_source`,
             `cancel_reason`,
             `appeal_flag`,
-            `cancel_req_time`
+            `cancel_req_time`,
+            `default_fine_amt`,
+            `insurance_fine_amt`
         ) values (
             #{orderNo},
             #{renterOrderNo},
@@ -65,7 +71,9 @@
             #{dutySource},
             #{cancelReason},
             #{appealFlag},
-            #{cancelReqTime}
+            #{cancelReqTime},
+            #{fineAmt},
+            #{insuranceFineAmt}
         )
 	</insert>
 	
@@ -81,7 +89,9 @@
 				<if test="cancelReason != null">`cancel_reason`, </if>
 				<if test="appealFlag != null">`appeal_flag`, </if>
                 <if test="cancelReqTime != null">`cancel_req_time`, </if>
-				<if test="createTime != null">`create_time`, </if>
+                <if test="fineAmt != null">`default_fine_amt`, </if>
+                <if test="insuranceFineAmt != null">`insurance_fine_amt`, </if>
+                <if test="createTime != null">`create_time`, </if>
 				<if test="createOp != null">`create_op`, </if>
 				<if test="updateTime != null">`update_time`, </if>
 				<if test="updateOp != null">`update_op`, </if>
@@ -97,6 +107,8 @@
 				<if test="cancelReason != null">#{cancelReason},  </if>
 				<if test="appealFlag != null">#{appealFlag}, </if>
                 <if test="cancelReqTime != null">#{cancelReqTime}, </if>
+                <if test="fineAmt != null">#{fineAmt}, </if>
+                <if test="insuranceFineAmt != null">#{insuranceFineAmt}, </if>
 				<if test="createTime != null">#{createTime},  </if>
 				<if test="createOp != null">#{createOp},  </if>
 				<if test="updateTime != null">#{updateTime},  </if>
@@ -118,6 +130,8 @@
 				<if test="cancelReason != null">`cancel_reason` = #{cancelReason}, </if>
 				<if test="appealFlag != null">`appeal_flag` = #{appealFlag}, </if>
                 <if test="cancelReqTime != null">`cancel_req_time` = #{cancelReqTime}, </if>
+                <if test="fineAmt != null">`default_fine_amt` = #{fineAmt}, </if>
+                <if test="insuranceFineAmt != null">`insurance_fine_amt` = #{insuranceFineAmt}, </if>
 				<if test="createTime != null">`create_time` = #{createTime}, </if>
 				<if test="createOp != null">`create_op` = #{createOp}, </if>
 				<if test="updateTime != null">`update_time` = #{updateTime}, </if>
@@ -138,7 +152,9 @@
 				`duty_source` = #{dutySource}, 		
 				`cancel_reason` = #{cancelReason},
 				`appeal_flag` = #{appealFlag},
-                `cancel_req_time` = #{cancelReqTime}
+                `cancel_req_time` = #{cancelReqTime},
+                `default_fine_amt` = #{fineAmt},
+                `insurance_fine_amt` = #{insuranceFineAmt}
             </set>
 		where id = #{id}
 	</update>
@@ -148,9 +164,38 @@
         select
             <include refid="Base_Column_List"/>
         from order_cancel_reason
-        where order_no=#{orderNo}
-        and is_delete = 0
+        where
+            order_no=#{orderNo}
+            and `renter_order_no` = #{renterOrderNo}
+            and `owner_order_no` = #{ownerOrderNo}
+            and is_delete = 0
         order by id desc limit 1
+    </select>
+
+
+    <select id="selectListByOrderNo" resultMap="BaseResultMap">
+        select
+            <include refid="Base_Column_List"/>
+        from order_cancel_reason
+        where
+            order_no=#{orderNo}
+            and is_delete = 0
+        order by id desc
+    </select>
+    <select id="selectListByOrderNos" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from order_cancel_reason
+        where owner_order_no in 
+        <foreach collection="ownerOrderNos" item="ownerOrderNo" open="(" separator="," close=")">
+            #{ownerOrderNo}
+        </foreach>
+        order by field(owner_order_no,
+        <foreach collection="ownerOrderNos" item="ownerOrderNo" open="" separator="," close="">
+            #{ownerOrderNo}
+        </foreach>
+        )
+        and is_delete = 0
     </select>
 
 </mapper>

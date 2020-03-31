@@ -43,6 +43,35 @@ public class AccountDebtDetailNoTService {
         return result;
     }
     
+    public List<AccountDebtDetailEntity> getDebtListByMemNoAndOrderNos(String memNo,List<String> orderNoList){
+        List<AccountDebtDetailEntity> result = accountDebtDetailMapper.getDebtListByMemNoAndOrderNos(memNo,orderNoList);
+        if(CollectionUtils.isEmpty(result)){
+           return Collections.emptyList();
+        }
+        return result;
+    }
+    
+    
+    public List<AccountDebtDetailEntity> getDebtListByOrderNoMemNo(String orderNo,String memNo){
+        List<AccountDebtDetailEntity> result = accountDebtDetailMapper.getDebtListByOrderNo(orderNo,memNo);
+        if(CollectionUtils.isEmpty(result)){
+           return Collections.emptyList();
+        }
+        return result;
+    }
+    
+    public List<AccountDebtDetailEntity> getDebtListById(String id){
+        AccountDebtDetailEntity entity = accountDebtDetailMapper.selectByPrimaryKey(Integer.valueOf(id));
+        List<AccountDebtDetailEntity> result = new ArrayList<AccountDebtDetailEntity>();
+        result.add(entity);
+        if(CollectionUtils.isEmpty(result)){
+           return Collections.emptyList();
+        }
+        return result;
+    }
+    
+    
+    
     public List<AccountDebtDetailEntity> listAccountDebtDetailEntity(String orderNo,String memNo){
         List<AccountDebtDetailEntity> result = accountDebtDetailMapper.listAccountDebtDetailEntity(orderNo, memNo);
         if(CollectionUtils.isEmpty(result)){
@@ -151,7 +180,7 @@ public class AccountDebtDetailNoTService {
                 accountDebtDetailAll.setCurrentDebtAmt(NumberUtils.INTEGER_ZERO);
                 break;
             }
-            if(amt<0){
+            if(amt<0){  //部分抵扣
 
                 AccountDebtReceivableaDetailEntity entity = new AccountDebtReceivableaDetailEntity();
                 BeanUtils.copyProperties(accountDebtDetailAll,entity);

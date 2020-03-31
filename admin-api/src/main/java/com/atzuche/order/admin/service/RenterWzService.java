@@ -1,7 +1,9 @@
 package com.atzuche.order.admin.service;
 
 import com.atzuche.order.accountrenterdeposit.exception.AccountRenterDepositDBException;
+import com.atzuche.order.admin.common.AdminUser;
 import com.atzuche.order.admin.common.AdminUserUtil;
+import com.atzuche.order.admin.vo.req.renterWz.CarDepositTemporaryRefundReqVO;
 import com.atzuche.order.admin.vo.req.renterWz.RenterWzCostDetailReqVO;
 import com.atzuche.order.admin.vo.req.renterWz.TemporaryRefundReqVO;
 import com.atzuche.order.admin.vo.resp.renterWz.*;
@@ -10,8 +12,10 @@ import com.atzuche.order.cashieraccount.vo.res.WzDepositMsgResVO;
 import com.atzuche.order.commons.CompareHelper;
 import com.atzuche.order.commons.DateUtils;
 import com.atzuche.order.commons.NumberUtils;
+import com.atzuche.order.commons.constant.OrderConstant;
 import com.atzuche.order.commons.enums.ErrorCode;
 import com.atzuche.order.commons.enums.detain.DetailSourceEnum;
+import com.atzuche.order.detain.dto.CarDepositTemporaryRefundReqDTO;
 import com.atzuche.order.detain.service.RenterDetain;
 import com.atzuche.order.detain.vo.RenterDetainVO;
 import com.atzuche.order.detain.vo.UnfreezeRenterDetainVO;
@@ -28,9 +32,11 @@ import com.atzuche.order.renterwz.enums.WzCostEnums;
 import com.atzuche.order.renterwz.service.RenterOrderWzCostDetailService;
 import com.atzuche.order.renterwz.service.WzCostLogService;
 import com.atzuche.order.renterwz.service.WzTemporaryRefundLogService;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
@@ -43,6 +49,7 @@ import java.util.*;
  * @date 2020/1/6
  */
 @Service
+@Slf4j
 public class RenterWzService {
 
     @Resource
@@ -227,26 +234,98 @@ public class RenterWzService {
     public void addTemporaryRefund(TemporaryRefundReqVO req) {
         //违章押金暂扣状态 1：暂扣 2：取消暂扣
         Integer detainStatus = req.getDetainStatus();
+        OrderStatusEntity orderStatusEntity = null;
         if(DETAIN.equals(detainStatus)){
             RenterDetainVO renterDetainVO = new RenterDetainVO();
             renterDetainVO.setOrderNo(req.getOrderNo());
             renterDetainVO.setEventType(DetailSourceEnum.WZ_DEPOSIT);
             renterDetain.insertRenterDetain(renterDetainVO);
-        }else if(UN_DETAIN.equals(UN_DETAIN)){
+            //暂扣状态，暂扣
+            orderStatusEntity = new OrderStatusEntity();
+            orderStatusEntity.setIsDetainWz(OrderConstant.ONE);
+        }else if(UN_DETAIN.equals(detainStatus)){
             UnfreezeRenterDetainVO unfreezeRenterDetainVO = new UnfreezeRenterDetainVO();
             unfreezeRenterDetainVO.setOrderNo(req.getOrderNo());
             unfreezeRenterDetainVO.setEventType(DetailSourceEnum.WZ_DEPOSIT);
             renterDetain.unfreezeRenterDetain(unfreezeRenterDetainVO);
+            //暂扣状态，撤销
+            orderStatusEntity = new OrderStatusEntity();
+            orderStatusEntity.setIsDetainWz(OrderConstant.TWO);
         }
 
-        /*WzTemporaryRefundLogEntity dto = new WzTemporaryRefundLogEntity();
-        BeanUtils.copyProperties(req,dto);
-        dto.setCreateTime(new Date());
-        dto.setOperator(AdminUserUtil.getAdminUser().getAuthName());
-        dto.setAmount(convertIntString(req.getAmount()));
-        dto.setStatus(1);
-        wzTemporaryRefundLogService.save(dto);*/
+        //更新订单暂扣状态
+        if(null != orderStatusEntity) {
+            orderStatusEntity.setOrderNo(req.getOrderNo());
+            orderStatusService.updateRenterOrderByOrderNo(orderStatusEntity);
+        }
     }
+
+    /**
+     * 租车押金暂扣
+     *
+     * @param req 请求参数
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public void saveCarDepositTemporaryRefund(CarDepositTemporaryRefundReqVO req) {
+        if (null != AdminUserUtil.getAdminUser()) {
+            req.setOperator(AdminUserUtil.getAdminUser().getAuthName());
+        }
+        OrderStatusEntity orderStatusEntity = orderStatusService.getByOrderNo(req.getOrderNo());
+        OrderStatusEntity record = null;
+        if (getIsDetain(req) == OrderConstant.ONE) {
+            if (orderStatusEntity.getIsDetain() != OrderConstant.ONE) {
+                RenterDetainVO renterDetainVO = new RenterDetainVO();
+                renterDetainVO.setOrderNo(req.getOrderNo());
+                renterDetainVO.setEventType(DetailSourceEnum.RENT_DEPOSIT);
+                renterDetain.insertRenterDetain(renterDetainVO);
+                //暂扣状态，暂扣
+                record = new OrderStatusEntity();
+                record.setIsDetain(OrderConstant.ONE);
+            }
+        } else if (getIsDetain(req) == OrderConstant.TWO) {
+            if (orderStatusEntity.getIsDetain() == OrderConstant.ONE) {
+                UnfreezeRenterDetainVO unfreezeRenterDetainVO = new UnfreezeRenterDetainVO();
+                unfreezeRenterDetainVO.setOrderNo(req.getOrderNo());
+                unfreezeRenterDetainVO.setEventType(DetailSourceEnum.RENT_DEPOSIT);
+                renterDetain.unfreezeRenterDetain(unfreezeRenterDetainVO);
+                //暂扣状态,撤销
+                record = new OrderStatusEntity();
+                record.setIsDetain(OrderConstant.TWO);
+            }
+        } else {
+            log.warn("Car deposit temporary refund is empty.");
+        }
+
+        CarDepositTemporaryRefundReqDTO carDepositTemporaryRefund = new CarDepositTemporaryRefundReqDTO();
+        BeanUtils.copyProperties(req, carDepositTemporaryRefund);
+        renterDetain.saveRenterDetainReason(carDepositTemporaryRefund);
+
+        //更新订单暂扣状态
+        if(null != record) {
+            record.setOrderNo(req.getOrderNo());
+            orderStatusService.updateRenterOrderByOrderNo(record);
+        }
+    }
+
+    /**
+     * 获取是否暂扣租车押金表示
+     *
+     * @param req 请求参数
+     * @return Integer 0-否 1-是 2-撤销暂扣
+     */
+    private int getIsDetain(CarDepositTemporaryRefundReqVO req) {
+        if (null == req) {
+            return OrderConstant.ZERO;
+        }
+
+        if (Integer.parseInt(req.getFkDetainFlag()) == OrderConstant.YES ||
+                Integer.parseInt(req.getJyDetainFlag()) == OrderConstant.YES ||
+                Integer.parseInt(req.getLpDetainFlag()) == OrderConstant.YES) {
+            return OrderConstant.ONE;
+        }
+        return OrderConstant.TWO;
+    }
+
 
     private int convertIntString(String intStr){
         if(org.apache.commons.lang.StringUtils.isBlank(intStr)){
@@ -316,25 +395,26 @@ public class RenterWzService {
             result.setExpectSettleTimeStr(DateUtils.formate(renterOrder.getActRevertTime().plusDays(18L),DateUtils.DATE_DEFAUTE1));
         }
         int wzDepositAmt = wzDepositMsg.getWzDepositAmt();
+
+        result.setDetainStatus(orderStatus.getIsDetainWz().toString());
+        result.setActuallyProvisionalDeduction(orderStatus.getIsDetainWz() == OrderConstant.YES ?
+                String.valueOf(wzDepositAmt) : "0");
         if(UN_SETTLE.equals(settleStatus)){
             //未结算
             result.setShouldReturnDeposit(String.valueOf(wzDepositAmt - zanKouAmount));
             result.setProvisionalDeduction(String.valueOf(zanKouAmount));
             result.setYuJiDiKouZuCheFee(String.valueOf(wzDepositMsg.getDetainCostAmt()));
-            result.setActuallyProvisionalDeduction("0");
         }else{
             //已结算
             result.setShiJiZanKouJinE(String.valueOf(zanKouAmount));
             result.setShiJiYiTuiWeiZhangYaJin(String.valueOf(wzDepositAmt - zanKouAmount));
             result.setShiJiDiKouZuCheFee(String.valueOf(wzDepositMsg.getDetainCostAmt()));
             result.setJieSuanShiDiKouLiShiQianKuan(String.valueOf(wzDepositMsg.getDebtAmt()));
-            result.setActuallyProvisionalDeduction(String.valueOf(wzDepositMsg.getDetainAmt()));
-            if(orderStatus != null && orderStatus.getWzSettleTime() != null){
+            if(orderStatus.getWzSettleTime() != null){
                 result.setRealSettleTimeStr(DateUtils.formate(orderStatus.getWzSettleTime(),DateUtils.DATE_DEFAUTE1));
             }
         }
-        String renterDetainStatus = renterDetain.getRenterDetainStatus(orderNo);
-        result.setDetainStatus(renterDetainStatus);
+
         if(StringUtils.isNotBlank(wzDepositMsg.getDeductionTime())){
             result.setDeductionTimeStr(wzDepositMsg.getDeductionTime());
             result.setDeductionStatusStr(wzDepositMsg.getDebtStatus());

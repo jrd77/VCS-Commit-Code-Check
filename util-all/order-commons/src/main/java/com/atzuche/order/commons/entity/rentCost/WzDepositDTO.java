@@ -9,7 +9,7 @@ public class WzDepositDTO {
     public CostStatisticsDTO costStatisticsDTO;
 
     @AutoDocProperty(value = "违章押金")
-    public Integer wzDepositAmt;
+    public Integer wzDepositAmt=0;
     @AutoDocProperty(value = "协助违章处理费")
     public Integer wzFineAmt=0;
     @AutoDocProperty(value = "凹凸代办服务费")
@@ -26,4 +26,19 @@ public class WzDepositDTO {
     public Integer expDeductionRentCarAmt = 0;
     @AutoDocProperty("抵扣历史欠款")
     public Integer deductionRentHistoricalAmt = 0;
+
+
+    public Integer getTotal(WzDepositDTO wzDepositDTO){
+        return
+                 wzDepositDTO.wzDepositAmt +
+                wzDepositDTO.wzFineAmt +
+                wzDepositDTO.wzServiceCostAmt +
+                wzDepositDTO.wzDysFineAmt +
+                wzDepositDTO.wzStopCostAmt +
+                wzDepositDTO.wzOtherAmt +
+                wzDepositDTO.wzInsuranceAmt +
+                wzDepositDTO.expDeductionRentCarAmt +
+                wzDepositDTO.deductionRentHistoricalAmt;
+    }
+
 }

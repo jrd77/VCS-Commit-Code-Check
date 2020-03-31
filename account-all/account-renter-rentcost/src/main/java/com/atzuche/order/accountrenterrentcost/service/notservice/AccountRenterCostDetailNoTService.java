@@ -76,7 +76,7 @@ public class AccountRenterCostDetailNoTService {
         return amt;
     }
     /**
-     * 根据订单号 和会员号 查询 订单 消费支付金额
+     * 根据订单号 和会员号 查询 订单 消费支付金额     非钱包支付
      * @param orderNo
      * @param renterMemNo
      */

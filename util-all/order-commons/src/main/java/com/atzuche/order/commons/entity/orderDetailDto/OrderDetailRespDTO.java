@@ -22,7 +22,8 @@ public class OrderDetailRespDTO {
     public RenterOrderCostDTO renterOrderCost;
     public RenterHandoverCarInfoDTO renterHandoverCarInfo;
     public OwnerHandoverCarInfoDTO ownerHandoverCarInfo;
-    public OrderCancelReasonDTO orderCancelReason;
+    //public OrderCancelReasonDTO orderCancelReason;
+    public List<OrderCancelReasonDTO> orderCancelReasons;
     public List<OwnerMemberRightDTO> ownerMemberRightList;
     public List<RenterMemberRightDTO> renterMemberRightList;
     public List<RenterOrderCostDetailDTO> renterOrderCostDetailList;
@@ -37,6 +38,10 @@ public class OrderDetailRespDTO {
     public OwnerOrderCostDTO ownerOrderCostDTO;
     public List<AccountOwnerIncomeExamineDTO> accountOwnerIncomeExamineDTOS;
     public List<RenterOrderChangeApplyDTO> renterOrderChangeApplyDTOS;
+    public AccountRenterDepositDTO accountRenterDepositDTO;
+    public AccountRenterWzDepositDTO accountRenterWzDepositDTO;
+    public List<AccountRenterCostDetailDTO> accountRenterCostDetailDTO;
+    public OrderRefundRecordDTO orderRefundRecordDTO;
 
     //变更申请的租客子订单号（application_id）
     public String changeApplyRenterOrderNo;
@@ -48,8 +53,5 @@ public class OrderDetailRespDTO {
     public RenterOrderChangeApplyDTO renterOrderChangeApplyDTO;
     //预计收益金额
     public Integer changeApplyPreIncomAmt;
-
-
-
 
 }

@@ -139,6 +139,9 @@ public class OwnerOrderService {
        return ownerOrderMapper.queryCancelOwnerOrderByOrderNoIsEffective(orderNo);
     }
 
+    public int updateChildStatusByOwnerOrderNo(String ownerOrderNo,OwnerChildStatusEnum ownerChildStatusEnum){
+        return ownerOrderMapper.updateChildStatusByOwnerOrderNo(ownerOrderNo,ownerChildStatusEnum.getCode());
+    }
 
     public Integer updateChildStatusByOrderNo(String orderNo, Integer childStatus){
         return ownerOrderMapper.updateChildStatusByOrderNo(orderNo, childStatus);
@@ -154,5 +157,9 @@ public class OwnerOrderService {
 
     public int updateByMemeNo(String ownerMem) {
         return ownerOrderMapper.updateByMemeNo(ownerMem);
+    }
+
+    public List<OwnerOrderEntity> queryByOwnerOrderNoAndMemNo(String ownerOrderNo,String ownerMemNo) {
+        return ownerOrderMapper.queryByOwnerOrderNoAndMemNo(ownerOrderNo,ownerMemNo);
     }
 }

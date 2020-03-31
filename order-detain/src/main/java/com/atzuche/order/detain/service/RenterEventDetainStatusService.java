@@ -23,23 +23,20 @@ public class RenterEventDetainStatusService{
     private RenterEventDetainStatusMapper renterEventDetainStatusMapper;
 
     public int saveEventDetainStatus(RenterEventDetainStatusEntity entity) {
-        RenterEventDetainStatusEntity ent = renterEventDetainStatusMapper.selectByRentOrderNo(entity.getRenterOrderNo());
+        RenterEventDetainStatusEntity ent = renterEventDetainStatusMapper.selectByOrderNo(entity.getOrderNo());
         int result;
-        if(Objects.isNull(ent) || Objects.isNull(ent.getRenterOrderNo())){
+        if(Objects.isNull(ent)){
             result = renterEventDetainStatusMapper.insertSelective(entity);
         }else {
             entity.setId(ent.getId());
             entity.setVersion(ent.getVersion());
             result = renterEventDetainStatusMapper.updateByPrimaryKeySelective(entity);
         }
-        if(result==0){
-            throw new RuntimeException("插入暂扣事件异常");
-        }
         return result;
     }
 
     public void updateEventDetainStatus(RenterEventDetainEntity renterEventDetainEntity) {
-        RenterEventDetainStatusEntity ent = renterEventDetainStatusMapper.selectByRentOrderNo(renterEventDetainEntity.getRenterOrderNo());
+        RenterEventDetainStatusEntity ent = renterEventDetainStatusMapper.selectByOrderNo(renterEventDetainEntity.getOrderNo());
         ent.setStatus(DetainStatusEnum.DETAIN_CANCEL.getCode());
         renterEventDetainStatusMapper.updateByPrimaryKeySelective(ent);
     }

@@ -37,6 +37,11 @@ public interface RenterOrderMapper{
     Integer updateRenterOrderEffective(@Param("id") Integer id, @Param("effectiveFlag") Integer effectiveFlag);
     
     RenterOrderEntity getRenterOrderByOrderNoAndWaitPay(@Param("orderNo") String orderNo);
+    //列表
+    List<RenterOrderEntity> getRenterOrderByMemNoAndWaitPay(@Param("memNo") String memNo);
+    //
+    List<RenterOrderEntity> getRenterOrderByMemNoOrderNosAndWaitPay(@Param("memNo") String memNo,@Param("orderNoList")List<String> orderNoList);
+    
     
     Integer updateRenterOrderChildStatus(@Param("id") Integer id, @Param("childStatus") Integer childStatus);
 
@@ -55,5 +60,8 @@ public interface RenterOrderMapper{
 
     List<RenterOrderEntity> queryHostiryRenterOrderByOrderNo(@Param("orderNo") String orderNo);
 
-	
+    int updateChildStatusByRenterOrderNo(@Param("renterOrderNo") String renterOrderNo, @Param("childStatus") Integer childStatus);
+
+
+    RenterOrderEntity getRenterOrderNoByOrderNoAndFinish(@Param("orderNo")String orderNo);
 }

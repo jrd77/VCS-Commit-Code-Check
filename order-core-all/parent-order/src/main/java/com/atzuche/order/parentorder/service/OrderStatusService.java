@@ -1,6 +1,7 @@
 package com.atzuche.order.parentorder.service;
 
 import com.alibaba.fastjson.JSON;
+import com.atzuche.order.commons.constant.OrderConstant;
 import com.atzuche.order.parentorder.dto.OrderStatusDTO;
 import com.atzuche.order.parentorder.entity.OrderStatusEntity;
 import com.atzuche.order.parentorder.mapper.OrderStatusMapper;
@@ -57,6 +58,10 @@ public class OrderStatusService {
     }
 
 
+    public int updateByPrimaryKeySelective(OrderStatusEntity record) {
+        return orderStatusMapper.updateByPrimaryKeySelective(record);
+    }
+
     /**
      * 组装主订单状态信息
      *
@@ -68,8 +73,8 @@ public class OrderStatusService {
         BeanCopier beanCopier = BeanCopier.create(OrderStatusDTO.class, OrderStatusEntity.class, false);
         beanCopier.copy(orderStatusDTO, record, null);
 
-        record.setCreateOp("");
-        record.setUpdateOp("");
+        record.setCreateOp(OrderConstant.SYSTEM_OPERATOR);
+        record.setUpdateOp(OrderConstant.SYSTEM_OPERATOR);
 
         LOGGER.info("Build master order status information. result is, record:[{}]", JSON.toJSONString(record));
         return record;

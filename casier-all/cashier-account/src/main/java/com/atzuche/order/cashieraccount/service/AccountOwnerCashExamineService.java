@@ -65,6 +65,8 @@ public class AccountOwnerCashExamineService {
 		simpleMem.setMemNo(req.getMemNo());
 		if (memBalanceVO != null && memBalanceVO.getBalance() != null) {
 			simpleMem.setBalance(memBalanceVO.getBalance());
+		} else {
+			simpleMem.setBalance(0);
 		}
 		// 检验
 		check(req, bankCard, simpleMem, incomeEntity);
@@ -87,6 +89,23 @@ public class AccountOwnerCashExamineService {
 			record.setBalanceFlag(1);
 			// 保存提现记录
 			accountOwnerCashExamineMapper.insertSelective(record);
+		}
+		if (newDeductAmt > 0) {
+			// 抵扣新的balance
+			int incomeAmt = 0;
+			if (incomeEntity != null && incomeEntity.getIncomeAmt() != null) {
+				incomeAmt = incomeEntity.getIncomeAmt();
+			}
+			incomeAmt = incomeAmt - newDeductAmt;
+			if (incomeAmt < 0) {
+				throw new WithdrawalBalanceNotEnoughException();
+			}
+			incomeEntity.setIncomeAmt(incomeAmt);
+			accountOwnerIncomeNoTService.updateOwnerIncomeAmtForCashWith(incomeEntity);
+		}
+		if (oldDeductAmt > 0) {
+			// 调服务抵扣老的balance
+			remoteAccountService.deductBalance(req.getMemNo(), oldDeductAmt);
 		}
 	}
 	
@@ -114,10 +133,6 @@ public class AccountOwnerCashExamineService {
 				deductOldBalance = balance;
 			}
 		}
-		if (deductOldBalance > 0) {
-			// 调服务抵扣老的balance
-			remoteAccountService.deductBalance(req.getMemNo(), deductOldBalance);
-		}
 		return deductOldBalance;
 	}
 	
@@ -142,19 +157,6 @@ public class AccountOwnerCashExamineService {
 			surplusBalance = amt - balance;
 		} else if (balance >= amt) {
 			surplusBalance = 0;
-		}
-		if (surplusBalance > 0) {
-			// 抵扣新的balance
-			int incomeAmt = 0;
-			if (incomeEntity != null && incomeEntity.getIncomeAmt() != null) {
-				incomeAmt = incomeEntity.getIncomeAmt();
-			}
-			incomeAmt = incomeAmt - surplusBalance;
-			if (incomeAmt < 0) {
-				throw new WithdrawalBalanceNotEnoughException();
-			}
-			incomeEntity.setIncomeAmt(incomeAmt);
-			accountOwnerIncomeNoTService.updateOwnerIncomeAmtForCashWith(incomeEntity);
 		}
 		return surplusBalance;
 	}

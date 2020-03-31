@@ -298,5 +298,8 @@
             #{orderNo}
         </foreach>
     </select>
+    <select id="getorderNoAll" resultType="java.lang.String">
+        select `order_no` from `order`
+    </select>
 
 </mapper>

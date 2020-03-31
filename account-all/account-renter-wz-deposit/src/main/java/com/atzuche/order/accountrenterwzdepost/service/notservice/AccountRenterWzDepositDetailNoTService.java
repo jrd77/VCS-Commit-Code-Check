@@ -2,6 +2,7 @@ package com.atzuche.order.accountrenterwzdepost.service.notservice;
 
 import java.util.List;
 
+import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -96,5 +97,17 @@ public class AccountRenterWzDepositDetailNoTService {
         accountRenterWzDepositDetailMapper.updateByPrimaryKeySelective(entity);
 		
 	}
-    
+
+
+    /**
+     * 返回指定订单的违章押金的支付流水记录
+     * @param orderNo
+     * @return
+     */
+    public AccountRenterWzDepositDetailEntity findByOrderNoAndCode(String orderNo){
+        AccountRenterWzDepositDetailEntity accountRenterWzDepositDetailEntity = new AccountRenterWzDepositDetailEntity();
+        accountRenterWzDepositDetailEntity.setOrderNo(orderNo);
+        accountRenterWzDepositDetailEntity.setCostCode(RenterCashCodeEnum.SETTLE_WZ_DEPOSIT_TO_RETURN_AMT.getCashNo());
+        return accountRenterWzDepositDetailMapper.findByOrderNoAndCode(accountRenterWzDepositDetailEntity);
+    }
 }
