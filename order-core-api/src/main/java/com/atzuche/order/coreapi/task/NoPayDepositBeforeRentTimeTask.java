@@ -58,8 +58,9 @@ public class NoPayDepositBeforeRentTimeTask extends IJobHandler {
                 OrderStatusEntity orderStatusEntity = orderStatusService.getByOrderNo(violateBO.getOrderNo());
                 if (orderStatusEntity.getStatus().intValue() < 8 && (orderStatusEntity.getDepositPayStatus().intValue() == 0 || orderStatusEntity.getWzPayStatus().intValue() == 0)) {
                     if (LocalDateTime.now().isBefore(violateBO.getExpRentTime()) && LocalDateTime.now().plusMinutes(5).isAfter(violateBO.getExpRentTime()) ) {
-                        String typeName = orderStatusEntity.getDepositPayStatus().intValue() == 0 ? "租车押金" : "违章押金";
-                        remindPayIllegalCrashService.sendNoPayShortMessageData(violateBO.getOrderNo(), typeName);
+                        //String typeName = orderStatusEntity.getDepositPayStatus().intValue() == 0 ? "租车押金" : "违章押金";
+                        //remindPayIllegalCrashService.sendNoPayShortMessageData(violateBO.getOrderNo(), typeName);
+                        remindPayIllegalCrashService.sendNoPayIllegalDepositShortMessageData(violateBO.getOrderNo());
                         //取消订单
 //                        CancelOrderReqVO req = new CancelOrderReqVO();
 //                        req.setOrderNo(violateBO.getOrderNo());

@@ -92,6 +92,19 @@ public class RemindPayIllegalCrashService {
     }
 
     /**
+     * 未支付违章押金
+     * @param orderNo
+     */
+    public void sendNoPayIllegalDepositShortMessageData(String orderNo) {
+        Map map = SmsParamsMapUtil.getParamsMap(orderNo, ShortMessageTypeEnum.DISTRIBUTE_PAYILLEGAL_DEPOSIT_CANCEL_RENTER.getValue(), ShortMessageTypeEnum.PAY_ILLEGAL_DEPOSIT_CANCEL_OWNER.getValue(), null);
+        smsOrderBaseEventService.sendShortMessage(map);
+        //发送push
+        Map pushMap = SmsParamsMapUtil.getParamsMap(orderNo, PushMessageTypeEnum.RENTER_NO_PAY_ILLEGAL_CANCEL.getValue(), PushMessageTypeEnum.RENTER_NO_PAY_ILLEGAL_2_OWNER.getValue(), null);
+        orderSendMessageFactory.sendPushMessage(pushMap);
+    }
+
+
+    /**
      * 距离支付结束时间只有30分钟时，如还未支付租车费用
      * @param orderNo
      */
