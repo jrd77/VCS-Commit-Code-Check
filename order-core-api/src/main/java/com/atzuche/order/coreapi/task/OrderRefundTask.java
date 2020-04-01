@@ -15,7 +15,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.List;
 
@@ -36,7 +35,6 @@ public class OrderRefundTask extends IJobHandler {
     CashierPayService cashierPayService;
 
     @Override
-    @RequestMapping("execute")
     public ReturnT<String> execute(String s) throws Exception {
         logger.info("开始执行 退款订单任务");
         List<CashierRefundApplyEntity> list = cashierRefundApplyNoTService.selectorderNoWaitingAll();
