@@ -33,8 +33,8 @@ public class OrderStatusEventListener extends OrderSendMessageManager {
         OrderMessage orderMessage = JSONObject.parseObject(message.getBody(), OrderMessage.class);
         log.info("新订单状态总事件监听,入参orderMessage:[{}]", orderMessage.toString());
         try {
-//            sendSMSMessageData(orderMessage);
-//            sendPushMessageData(orderMessage);
+            sendSMSMessageData(orderMessage);
+            sendPushMessageData(orderMessage);
         } catch (Exception e) {
             log.info("订单的总status事件发生异常,msg：[{}]", e);
             Cat.logError("订单的总status事件发生异常", e);
