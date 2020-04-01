@@ -41,6 +41,8 @@ public enum ShortMessageTypeEnum {
     EXEMPT_PREORDER_REMIND_PAYRENT("ExemptPreOrderRemindPayRent", "您预订的($CarPlateNum$)的订单已被车主接受，取车时间：$ExpRentTime$。请在$Minute$分钟内支付租车押金，否则订单将被系统取消。您可以使用信用卡或者借记卡进行支付，如遇困难可以借用亲友的银行卡。如信用卡额度不够，可致电银行客服提高信用卡临时额度，申请后一般即时生效。"),
     NO_EXEMPT_PREORDER_REMIND_PAYRENT("NoExemptPreOrderRemindPayRent", "您预订的($CarPlateNum$)的订单已被车主接受，取车时间：$ExpRentTime$。请在$Minute$分钟内支付租车押金，否则订单将被系统取消。您可以使用信用卡或者借记卡进行支付，如遇困难可以借用亲友的银行卡。如信用卡额度不够，可致电银行客服提高信用卡临时额度，申请后一般即时生效。"),
     ILLAGE_MAX_SCORE_LIMIT_TEXT("illageMaxScoreLimitText", "尊敬的用户，您在订单时间$time$中产生$score$分违章，请在租期内尽快消除违章记录，完成后必须将处罚决定书及缴款凭证通过APP“违章查询” $linkUrl1$ 功能中上传，平台将暂扣您的所有押金待订单结束后15-20天再次查询，若无违章退还押金，请点击“违章内容” $linkUrl2$ 查看具体违章信息10100202"),
+    REFUND_COST_SUCCESS_2_RENTER("RefundCostSuccess2Renter", "你的车辆押金$RentCarDeposit$元已退还成功，银行转账可能需要1-3个工作日"),
+
     ;
 
     private String value;
