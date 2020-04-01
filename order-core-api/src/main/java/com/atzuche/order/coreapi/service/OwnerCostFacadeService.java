@@ -106,21 +106,21 @@ public class OwnerCostFacadeService {
             vo.setAdjustAmt(adjustAmt+adjustAmt2);
             
             //租金补贴
-            int subsidyAmt = getSettleAmtByCashCode(accountOwnerCostSettleDetails, OwnerCashCodeEnum.SUBSIDY_OWNER_TORENTER_RENTAMT);
+            int subsidyAmt = getSettleAmtByCashCode(accountOwnerCostSettleDetails, RenterCashCodeEnum.SUBSIDY_OWNER_TORENTER_RENTAMT);
             //车主券补贴  
-            int subsidyAmt2 = getSettleAmtByCashCode(accountOwnerCostSettleDetails, RenterCashCodeEnum.OWNER_COUPON_OFFSET_COST);
-            vo.setSubsidyToRenterAmt(subsidyAmt+subsidyAmt2);
+           // int subsidyAmt2 = getSettleAmtByCashCode(accountOwnerCostSettleDetails, RenterCashCodeEnum.OWNER_COUPON_OFFSET_COST);
+            vo.setSubsidyToRenterAmt(subsidyAmt/*+subsidyAmt2*/);
 
             //3获取车主补贴
-            int subsidyAmount = accountOwnerCostSettleDetails.stream().filter(obj ->{
+           /* int subsidyAmount = accountOwnerCostSettleDetails.stream().filter(obj ->{
                 return CostTypeEnum.OWNER_SUBSIDY.getCode().equals(obj.getCostType());
-            }).mapToInt(AccountOwnerCostSettleDetailEntity::getAmt).sum();
+            }).mapToInt(AccountOwnerCostSettleDetailEntity::getAmt).sum();*/
             //8 管理后台补贴
             int consoleSubsidyAmt =accountOwnerCostSettleDetails.stream().filter(obj ->{
                 return CostTypeEnum.CONSOLE_SUBSIDY.getCode().equals(obj.getCostType());
             }).mapToInt(AccountOwnerCostSettleDetailEntity::getAmt).sum();
             //平台给车主的补贴
-            vo.setFromPlatformSubsidyAmt(subsidyAmount+consoleSubsidyAmt);
+            vo.setFromPlatformSubsidyAmt(consoleSubsidyAmt);
             
             //4获取车主费用
 //            int purchaseAmt =accountOwnerCostSettleDetails.stream().filter(obj ->{return OwnerCashCodeEnum.ACCOUNT_OWNER_DEBT.getCashNo().equals(obj.getSourceCode());})
