@@ -63,7 +63,7 @@ public class AccountOwnerCashExamineService {
 			simpleMem = new CashWithdrawalSimpleMemberDTO();
 		}
 		simpleMem.setMemNo(req.getMemNo());
-		if (memBalanceVO != null && memBalanceVO.getBalance() != null) {
+		if (memBalanceVO != null && memBalanceVO.getBalance() != null && memBalanceVO.getBalance() > 0) {
 			simpleMem.setBalance(memBalanceVO.getBalance());
 		} else {
 			simpleMem.setBalance(0);
