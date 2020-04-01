@@ -37,7 +37,9 @@ public class ServicePointConfigSDK {
         }
         List<ServicePointEntity> servicePointEntities = getConfig(context);
         for(ServicePointEntity servicePointEntity:servicePointEntities){
-            if(address.equals(servicePointEntity.getAddressContent()) && lat.equals(servicePointEntity.getLat()) && lon.equals(servicePointEntity.getLon())){
+            if(address.equals(servicePointEntity.getAddressContent())
+                    && lat.equals(String.valueOf(servicePointEntity.getLat()))
+                    && lon.equals(String.valueOf(servicePointEntity.getLon()))){
                 return servicePointEntity;
             }
         }
