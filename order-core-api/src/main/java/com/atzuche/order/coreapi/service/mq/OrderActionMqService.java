@@ -13,6 +13,7 @@ import com.atzuche.order.mq.enums.ShortMessageTypeEnum;
 import com.atzuche.order.mq.util.SmsParamsMapUtil;
 import com.atzuche.order.search.dto.OrderInfoDTO;
 import com.autoyol.event.rabbit.neworder.*;
+import com.google.common.collect.Maps;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,6 +68,11 @@ public class OrderActionMqService {
                 NewOrderMQActionEventEnum.ORDER_CREATE.exchange,
                 NewOrderMQActionEventEnum.ORDER_CREATE.routingKey,
                 JSON.toJSON(orderMessage));
+        //发送套餐SMS
+        if ("2".equals(orderCreateMq.getCategory())) {
+            Map paramMaps = SmsParamsMapUtil.getParamsMap(orderNo, ShortMessageTypeEnum.NOTIFY_RENTER_TRANS_REQACCEPTEDPACKAGE.getValue(), null, null);
+            orderMessage.setMap(paramMaps);
+        }
         baseProducer.sendTopicMessage(NewOrderMQActionEventEnum.ORDER_CREATE.exchange,
                 NewOrderMQActionEventEnum.ORDER_CREATE.routingKey,
                 orderMessage);
@@ -124,7 +130,7 @@ public class OrderActionMqService {
         orderMessage.setMessage(orderCreateMq);
         logger.info("发送取消订单成功事件.mq:[exchange={},routingKey={}],message=[{}]", actionEventEnum.exchange, actionEventEnum.routingKey,
                 JSON.toJSON(orderMessage));
-       // orderMessage.setMap(map);
+        orderMessage.setMap(map);
         baseProducer.sendTopicMessage(actionEventEnum.exchange, actionEventEnum.routingKey, orderMessage);
     }
 

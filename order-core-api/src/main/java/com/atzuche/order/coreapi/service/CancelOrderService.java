@@ -362,9 +362,7 @@ public class CancelOrderService {
             if (StringUtils.equals(MemRoleEnum.RENTER.getCode(), memRole)) {
                 cancelSourceEnum = CancelSourceEnum.RENTER;
                 actionEventEnum = NewOrderMQActionEventEnum.ORDER_CANCEL;
-                Map paramMaps = Maps.newHashMap();
-                paramMaps.put("indexUrl","");
-                map = SmsParamsMapUtil.getParamsMap(orderNo, ShortMessageTypeEnum.EXEMPT_PREORDER_AUTO_CANCEL_ORDER_2_RENTER.getValue(), ShortMessageTypeEnum.EXEMPT_PREORDER_AUTO_CANCEL_ORDER_2_OWNER.getValue(), null);
+                map = SmsParamsMapUtil.getParamsMap(orderNo,null, ShortMessageTypeEnum.PAY_RENT_CAR_ILLEGAL_DEPOSIT_CANCEL_OWNER.getValue(), null);
             }
             orderActionMqService.sendCancelOrderSuccess(orderNo, cancelSourceEnum, actionEventEnum, map);
 
