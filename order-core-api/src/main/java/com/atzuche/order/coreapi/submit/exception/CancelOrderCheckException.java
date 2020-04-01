@@ -1,4 +1,4 @@
-package com.atzuche.order.coreapi.submitOrder.exception;
+package com.atzuche.order.coreapi.submit.exception;
 
 import com.atzuche.order.commons.OrderException;
 import com.autoyol.commons.web.ErrorCode;
@@ -10,6 +10,8 @@ import com.autoyol.commons.web.ErrorCode;
  * @date 2019/2/4 15:21
  */
 public class CancelOrderCheckException extends OrderException {
+
+    private static final long serialVersionUID = 5632333717087781519L;
 
     public CancelOrderCheckException(String errorCode, String errorMsg) {
         super(errorCode, errorMsg);

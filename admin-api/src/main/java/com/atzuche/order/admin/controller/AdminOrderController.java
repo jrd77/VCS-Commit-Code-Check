@@ -186,7 +186,9 @@ public class AdminOrderController {
         String renterNo = adminOrderService.getRenterMemNo(reqVO.getOrderNo());
 
         AdminModifyOrderFeeCompareVO compareVO = adminOrderService.preModifyOrderFee(reqVO,renterNo);
-
+        // 获取欠款
+        Integer debtAmt = adminOrderService.getDebtAmt(renterNo);
+        compareVO.setDebtAmt(debtAmt);
         return ResponseData.success(compareVO);
 
     }

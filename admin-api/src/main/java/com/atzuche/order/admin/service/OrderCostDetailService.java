@@ -22,6 +22,9 @@ import com.atzuche.order.commons.enums.cashcode.OwnerCashCodeEnum;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.mem.MemProxyService;
 import com.atzuche.order.open.service.FeignOrderCostService;
+import com.atzuche.order.owner.commodity.entity.OwnerGoodsEntity;
+import com.atzuche.order.owner.commodity.service.OwnerGoodsService;
+import com.atzuche.order.owner.mem.service.OwnerMemberService;
 import com.atzuche.order.ownercost.entity.ConsoleOwnerOrderFineDeatailEntity;
 import com.atzuche.order.ownercost.entity.OwnerOrderEntity;
 import com.atzuche.order.ownercost.entity.OwnerOrderSubsidyDetailEntity;
@@ -52,6 +55,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -109,7 +113,10 @@ public class OrderCostDetailService {
     RenterOrderCostService renterOrderCostService;
     @Autowired
     FeignOrderCostService feignOrderCostService;
-    
+    @Autowired
+    private OwnerGoodsService ownerGoodsService;
+    @Autowired
+    private OwnerMemberService ownerMemberService;
 	public ReductionDetailResVO findReductionDetailsListByOrderNo(RenterCostReqVO renterCostReqVO) throws Exception {
 		ReductionDetailResVO resVo = new ReductionDetailResVO();
 	     //根据订单号查询会员号
@@ -555,6 +562,7 @@ public class OrderCostDetailService {
 	 * @return
 	 * @throws Exception 
 	 */
+	@Transactional
 	public void updateRenterPriceAdjustmentByOrderNo(RenterAdjustCostReqVO renterCostReqVO) throws Exception {
 		//根据订单号查询会员号
 		//主订单  
@@ -596,18 +604,21 @@ public class OrderCostDetailService {
 			record.setCreateOp(userName);
 			record.setUpdateOp(userName);
 			record.setOperatorId(userName);
-	    	orderConsoleSubsidyDetailService.saveOrUpdateOrderConsoleSubsidyDetail(record);
-	    	
-	    	if(orderEntityOwner != null) {
+	    	//orderConsoleSubsidyDetailService.saveOrUpdateOrderConsoleSubsidyDetail(record);
+            orderConsoleSubsidyDetailService.saveOrUpdateOrderConsoleSubsidyDetailByMemNo(record);
+	    	/*if(orderEntityOwner != null) {*/
 		    	//反向记录
-	    		costBaseDTO.setMemNo(orderEntityOwner.getMemNo());
-		    	OrderConsoleSubsidyDetailEntity recordConvert = orderConsoleSubsidyDetailService.buildData(costBaseDTO, Integer.valueOf(renterCostReqVO.getRenterToOwnerAdjustAmt()), targetEnum, sourceEnum, SubsidyTypeCodeEnum.ADJUST_AMT, cash);
-		    	//
-		    	recordConvert.setCreateOp(userName);
-		    	recordConvert.setUpdateOp(userName);
-		    	recordConvert.setOperatorId(userName);
-		    	orderConsoleSubsidyDetailService.saveOrUpdateOrderConsoleSubsidyDetail(recordConvert);
-	    	}
+           RenterGoodsDetailDTO renterGoodsDetail = renterGoodsService.getRenterGoodsDetail(renterCostReqVO.getRenterOrderNo(), false);
+           OwnerGoodsEntity ownerGoodsEntity = ownerGoodsService.getOwnerGoodsByCarNoAndOrderNo(renterGoodsDetail.getCarNo(), renterCostReqVO.getOrderNo());
+           OwnerMemberDTO ownerMemberDTO = ownerMemberService.selectownerMemberByOwnerOrderNo(ownerGoodsEntity.getOwnerOrderNo(), false);
+           costBaseDTO.setMemNo(ownerMemberDTO.getMemNo());
+            OrderConsoleSubsidyDetailEntity recordConvert = orderConsoleSubsidyDetailService.buildData(costBaseDTO, Integer.valueOf(renterCostReqVO.getRenterToOwnerAdjustAmt()),targetEnum,sourceEnum, SubsidyTypeCodeEnum.ADJUST_AMT, cash);
+            //
+            recordConvert.setCreateOp(userName);
+            recordConvert.setUpdateOp(userName);
+            recordConvert.setOperatorId(userName);
+            orderConsoleSubsidyDetailService.saveOrUpdateOrderConsoleSubsidyDetailByMemNo(recordConvert);
+	    	/*}*/
 	   }
 	   
 	   /**
@@ -1104,10 +1115,13 @@ public class OrderCostDetailService {
 	        
 	        //统一设置修改人名称。20200205 huangjing
 	        String userName = AdminUserUtil.getAdminUser().getAuthName(); // 获取的管理后台的用户名。
-	        consoleRenterOrderFineDeatailEntity.setUpdateOp(userName);
-	        consoleRenterOrderFineDeatailEntity.setCreateOp(userName);
-	        consoleRenterOrderFineDeatailEntity.setOperatorId(userName);
-	        consoleRenterOrderFineDeatailService.saveOrUpdateConsoleRenterOrderFineDeatail(consoleRenterOrderFineDeatailEntity);
+            if(consoleRenterOrderFineDeatailEntity != null){
+                consoleRenterOrderFineDeatailEntity.setUpdateOp(userName);
+                consoleRenterOrderFineDeatailEntity.setCreateOp(userName);
+                consoleRenterOrderFineDeatailEntity.setOperatorId(userName);
+                consoleRenterOrderFineDeatailService.saveOrUpdateConsoleRenterOrderFineDeatail(consoleRenterOrderFineDeatailEntity);
+            }
+
 	        
 	        //当前存在的情况下，否则归平台。
 	        if(orderEntityOwner!=null) {
@@ -1115,11 +1129,13 @@ public class OrderCostDetailService {
 	        	ConsoleOwnerOrderFineDeatailEntity ownerEntity =
 	        			consoleOwnerOrderFineDeatailService.fineDataConvert(ownerCostDTO, Integer.valueOf(renterBeforeReturnCarFineAmt),
 		                        FineSubsidyCodeEnum.OWNER, FineSubsidySourceCodeEnum.PLATFORM, FineTypeEnum.MODIFY_ADVANCE);
-		        
-		        ownerEntity.setUpdateOp(userName);
-		        ownerEntity.setCreateOp(userName);
-		        ownerEntity.setOperatorId(userName);
-		        consoleOwnerOrderFineDeatailService.saveOrUpdateConsoleRenterOrderFineDeatail(ownerEntity);
+		        if(ownerEntity != null){
+                    ownerEntity.setUpdateOp(userName);
+                    ownerEntity.setCreateOp(userName);
+                    ownerEntity.setOperatorId(userName);
+                    consoleOwnerOrderFineDeatailService.saveOrUpdateConsoleRenterOrderFineDeatail(ownerEntity);
+                }
+
 	        }
 	        
 		}
@@ -1131,25 +1147,29 @@ public class OrderCostDetailService {
 	                        FineSubsidyCodeEnum.PLATFORM, FineSubsidySourceCodeEnum.RENTER, FineTypeEnum.DELAY_FINE);
 	        
 	        //统一设置修改人名称。20200205 huangjing
-	        String userName = AdminUserUtil.getAdminUser().getAuthName(); // 获取的管理后台的用户名。
-	        consoleRenterOrderFineDeatailEntity.setUpdateOp(userName);
-	        consoleRenterOrderFineDeatailEntity.setCreateOp(userName);
-	        consoleRenterOrderFineDeatailEntity.setOperatorId(userName);
-	        
-	        consoleRenterOrderFineDeatailService.saveOrUpdateConsoleRenterOrderFineDeatail(consoleRenterOrderFineDeatailEntity);
-	        
+            String userName = AdminUserUtil.getAdminUser().getAuthName(); // 获取的管理后台的用户名。
+            if(consoleRenterOrderFineDeatailEntity != null){
+
+                consoleRenterOrderFineDeatailEntity.setUpdateOp(userName);
+                consoleRenterOrderFineDeatailEntity.setCreateOp(userName);
+                consoleRenterOrderFineDeatailEntity.setOperatorId(userName);
+
+                consoleRenterOrderFineDeatailService.saveOrUpdateConsoleRenterOrderFineDeatail(consoleRenterOrderFineDeatailEntity);
+
+            }
+
 	        //当前存在的情况下，否则归平台。
 	        if(orderEntityOwner!=null) {
 		        //同时增加反向记录，算车主的收益  200217 通过平台中转
 		        ConsoleOwnerOrderFineDeatailEntity ownerEntity =
 	        			consoleOwnerOrderFineDeatailService.fineDataConvert(ownerCostDTO, Integer.valueOf(renterDelayReturnCarFineAmt),
 		                        FineSubsidyCodeEnum.OWNER, FineSubsidySourceCodeEnum.PLATFORM, FineTypeEnum.DELAY_FINE);
-		        
-		        ownerEntity.setUpdateOp(userName);
-		        ownerEntity.setCreateOp(userName);
-		        ownerEntity.setOperatorId(userName);
-		        consoleOwnerOrderFineDeatailService.saveOrUpdateConsoleRenterOrderFineDeatail(ownerEntity);
-		        
+		        if(ownerEntity != null){
+                    ownerEntity.setUpdateOp(userName);
+                    ownerEntity.setCreateOp(userName);
+                    ownerEntity.setOperatorId(userName);
+                    consoleOwnerOrderFineDeatailService.saveOrUpdateConsoleRenterOrderFineDeatail(ownerEntity);
+                }
 	        }
 	        
 		}

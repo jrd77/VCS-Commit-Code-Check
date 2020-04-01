@@ -531,6 +531,37 @@ public class CashierNoTService {
         vo.setAtpaySign(StringUtils.EMPTY);
         return vo;
     }
+    
+    public PayVo getPayVOForOrderSupplementDetail(String orderNo,CashierEntity cashierEntity,OrderPaySignReqVO orderPaySign,int amt ,String title,String payKind,String payIdStr ,String extendParams,int freeDepositType) {
+        PayVo vo = new PayVo();
+        Integer paySn = (Objects.isNull(cashierEntity)|| Objects.isNull(cashierEntity.getPaySn()))?0:cashierEntity.getPaySn();
+        vo.setInternalNo("1");
+        vo.setExtendParams(extendParams);
+        vo.setAtappId(DataAppIdConstant.APPID_SHORTRENT);
+        vo.setMemNo(orderPaySign.getMenNo());
+//        vo.setOrderNo(orderPaySign.getOrderNo());
+        //支持多订单号
+        vo.setOrderNo(orderNo);
+        vo.setOpenId(orderPaySign.getOpenId());
+        vo.setReqOs(orderPaySign.getReqOs());
+//        vo.setPayAmt(String.valueOf(Math.abs(amt)));
+        vo.setPayAmt(String.valueOf(amt));  //order_supplement_detailk考虑到是正负号
+        vo.setPayEnv(env);
+        vo.setPayId(payIdStr);
+        vo.setPayKind(payKind);
+        vo.setPaySn(String.valueOf(paySn));
+        vo.setPaySource(orderPaySign.getPaySource());
+        vo.setPayTitle(title);
+        if(freeDepositType == 2) {
+        	vo.setPayType(DataPayTypeConstant.PAY_PRE); //预授权的方式。
+        }else {
+        	vo.setPayType(orderPaySign.getPayType());
+        }
+        vo.setReqIp(IpUtil.getLocalIp());
+        vo.setAtpaySign(StringUtils.EMPTY);
+        return vo;
+    }
+    
 
 
 

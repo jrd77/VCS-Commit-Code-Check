@@ -210,4 +210,22 @@ public class AccountDebtService{
     	return receivalea;
     }
     
+    
+    /**
+     * 获取用户总欠款(新系统订单欠款+老系统订单欠款)
+     * @param memNo
+     * @return Integer
+     */
+    public Integer getTotalNewDebtAndOldDebtAmt(String memNo) {
+    	// 获取新系统总欠款
+    	int curDebtAmt = getAccountDebtNumByMemNo(memNo);
+    	curDebtAmt = Math.abs(curDebtAmt);
+    	// 获取老系统总欠款
+    	Integer oldDebtAmt = remoteOldSysDebtService.getMemBalance(memNo);
+    	if (oldDebtAmt != null) {
+    		curDebtAmt += oldDebtAmt;
+    	}
+    	return curDebtAmt;
+    }
+    
 }

@@ -139,7 +139,7 @@ public class OrderSupplementDetailService{
     /**
      * 更新补付支付状态
      * @param id
-     * @param payFlag
+     * @param payFlag   3 支付成功
      * @return Integer
      */
     public Integer updatePayFlagById(Integer id, Integer payFlag, Date payTime, Integer amt) {

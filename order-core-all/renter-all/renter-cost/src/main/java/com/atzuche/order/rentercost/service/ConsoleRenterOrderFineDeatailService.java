@@ -1,18 +1,17 @@
 package com.atzuche.order.rentercost.service;
 
-import java.util.List;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import com.atzuche.order.commons.entity.dto.CostBaseDTO;
 import com.atzuche.order.commons.enums.FineSubsidyCodeEnum;
 import com.atzuche.order.commons.enums.FineSubsidySourceCodeEnum;
 import com.atzuche.order.commons.enums.FineTypeEnum;
 import com.atzuche.order.rentercost.entity.ConsoleRenterOrderFineDeatailEntity;
 import com.atzuche.order.rentercost.mapper.ConsoleRenterOrderFineDeatailMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 
 
@@ -113,7 +112,7 @@ public class ConsoleRenterOrderFineDeatailService{
      * @return ConsoleRenterOrderFineDeatailEntity
      */
     public ConsoleRenterOrderFineDeatailEntity fineDataConvert(CostBaseDTO costBaseDTO, Integer fineAmt, FineSubsidyCodeEnum code, FineSubsidySourceCodeEnum source, FineTypeEnum type) {
-        if (fineAmt == null || fineAmt == 0) {
+        if (fineAmt == null/* || fineAmt == 0*/) {
             return null;
         }
         ConsoleRenterOrderFineDeatailEntity fineEntity = new ConsoleRenterOrderFineDeatailEntity();

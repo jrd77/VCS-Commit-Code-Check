@@ -71,7 +71,7 @@ public class CashWithdrawalService {
 		// 获取新订单系统的会员总收益
 		AccountOwnerIncomeEntity incomeEntity = accountOwnerIncomeNoTService.getOwnerIncome(req.getMemNo());
 		int balance = 0;
-		if (memBalanceVO != null && memBalanceVO.getBalance() != null) {
+		if (memBalanceVO != null && memBalanceVO.getBalance() != null && memBalanceVO.getBalance() > 0) {
 			balance += memBalanceVO.getBalance();
 		}
 		if (incomeEntity != null && incomeEntity.getIncomeAmt() != null) {

@@ -10,6 +10,6 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = false)
 public class AccountOwnerIncomeExamineRepeatException extends OrderException {
     public AccountOwnerIncomeExamineRepeatException() {
-        super(ErrorCode.OWNER_INCOM_AUDIT_REPEAT_FAIL.getCode(), ErrorCode.OWNER_INCOM_AUDIT_REPEAT_FAIL.getCode());
+        super(ErrorCode.OWNER_INCOM_AUDIT_REPEAT_FAIL.getCode(), ErrorCode.OWNER_INCOM_AUDIT_REPEAT_FAIL.getText());
     }
 }

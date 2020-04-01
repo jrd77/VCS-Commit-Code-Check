@@ -87,16 +87,23 @@ public class PayCallbackService implements OrderPayCallBack {
 	@Override
 	public void callBack(String orderNo, List<String> rentAmountAfterRenterOrderNo, List<NotifyDataVo> supplementIds, List<NotifyDataVo> debtIds) {
 		//rentAmountAfterRenterOrderNo  无需处理
-		log.info(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>补付回调通知处理:orderNo=[{}]",orderNo);
+		log.info(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>orderSupplementDetail补付回调通知处理:orderNo=[{}]",orderNo);
+		if(supplementIds != null) {
+			log.info(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>orderSupplementDetail补付回调通知处理:orderNo=[{}],size=[{}]",orderNo,supplementIds.size());
+		}
 		//更新supplement
 		for (NotifyDataVo vo : supplementIds) {
 			String id = vo.getExtendParams();
 			String settleAmt = vo.getSettleAmount();
 			String memNo = vo.getMemNo();
 			String qn = vo.getQn();
-			int i = orderSupplementDetailService.updatePayFlagById(Integer.valueOf(id), 3, new Date(), Integer.valueOf(settleAmt));
-			log.info("抵扣补付 result=[{}],params id=[{}],amt=[{}],memNo=[{}],qn=[{}]",i,id, Integer.valueOf(settleAmt), memNo, qn);
+			int i = orderSupplementDetailService.updatePayFlagById(Integer.valueOf(id), 3, new Date(), (-Integer.valueOf(settleAmt)));  //order_supplement_detail正负号 取反，根据金额来修改。
+			log.info("抵扣补付 result=[{}],params id=[{}],amt=[{}],memNo=[{}],qn=[{}]",i,id, (-Integer.valueOf(settleAmt)), memNo, qn);
 			
+		}
+		log.info(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>debt欠款回调通知处理:orderNo=[{}]",orderNo);
+		if(debtIds != null) {
+			log.info(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>debt欠款回调通知处理:orderNo=[{}],size=[{}]",orderNo,debtIds.size());
 		}
 		//更新欠款
 		for (NotifyDataVo vo : debtIds) {
