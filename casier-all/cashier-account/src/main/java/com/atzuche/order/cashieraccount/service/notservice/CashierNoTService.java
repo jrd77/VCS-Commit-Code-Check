@@ -1,11 +1,13 @@
 package com.atzuche.order.cashieraccount.service.notservice;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
+import com.atzuche.order.commons.enums.cashier.OrderRefundStatusEnum;
+import com.atzuche.order.mq.enums.ShortMessageTypeEnum;
+import com.atzuche.order.mq.util.SmsParamsMapUtil;
+import com.autoyol.autopay.gateway.vo.res.AutoPayResultVo;
+import com.google.common.collect.Maps;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.BeanUtils;
@@ -770,13 +772,18 @@ public class CashierNoTService {
      * 退款成功事件
      * @param orderNo
      */
-    public void sendOrderRefundSuccessMq(String orderNo, FineSubsidyCodeEnum type) {
+    public void sendOrderRefundSuccessMq(String orderNo, FineSubsidyCodeEnum type,AutoPayResultVo notifyDataVo) {
         OrderRefundMq orderSettlementMq = new OrderRefundMq();
         orderSettlementMq.setType(Integer.valueOf(type.getFineSubsidyCode()));
         orderSettlementMq.setOrderNo(orderNo);
         OrderMessage orderMessage = OrderMessage.builder().build();
         orderMessage.setMessage(orderSettlementMq);
-        //TODO 短信发送
+        if (DataPayKindConstant.RENT.equals(notifyDataVo.getPayKind())) {
+            Map paramsMap = Maps.newHashMap();
+            paramsMap.put("RentCarDeposit", notifyDataVo.getRefundAmt());
+            Map map = SmsParamsMapUtil.getParamsMap(notifyDataVo.getOrderNo(), ShortMessageTypeEnum.REFUND_COST_SUCCESS_2_RENTER.getValue(), null, paramsMap);
+            orderMessage.setMap(map);
+        }
         baseProducer.sendTopicMessage(NewOrderMQActionEventEnum.ORDER_REFUND_SUCCESS.exchange,NewOrderMQActionEventEnum.ORDER_REFUND_SUCCESS.routingKey,orderMessage);
     }
     /**

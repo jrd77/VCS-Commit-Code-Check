@@ -64,6 +64,7 @@ import com.autoyol.event.rabbit.neworder.NewOrderMQActionEventEnum;
 import com.autoyol.event.rabbit.neworder.OrderRenterPayAmtSuccessMq;
 import com.autoyol.event.rabbit.neworder.OrderRenterPaySuccessMq;
 import com.dianping.cat.Cat;
+import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -707,7 +708,7 @@ public class CashierService {
         }
         saveCancelOrderStatusInfo(orderStatusDTO);
         //TODO 退款回调成功 push/或者短信 怎么处理
-        cashierNoTService.sendOrderRefundSuccessMq(notifyDataVo.getOrderNo(), FineSubsidyCodeEnum.RENTER);
+        cashierNoTService.sendOrderRefundSuccessMq(notifyDataVo.getOrderNo(), FineSubsidyCodeEnum.RENTER,notifyDataVo);
     }
 
     /**
@@ -928,7 +929,7 @@ public class CashierService {
             String renterTextCode = type == 1 ? ShortMessageTypeEnum.PAY_ILLEGAL_DEPOSIT_2_RENTER.getValue() : ShortMessageTypeEnum.PAY_RENT_CAR_DEPOSIT_2_RENTER.getValue();
             String ownerTextCode = type == 1 ? ShortMessageTypeEnum.PAY_ILLEGAL_DEPOSIT_2_OWNERSERVICE.getValue() : ShortMessageTypeEnum.PAY_RENT_CAR_DEPOSIT_2_OWNER.getValue();
             Map map = SmsParamsMapUtil.getParamsMap(vo.getOrderNo(), renterTextCode, ownerTextCode, null);
-            orderMessage.setMap(map);
+            //orderMessage.setMap(map);
             baseProducer.sendTopicMessage(event.exchange, event.routingKey, orderMessage);
         } catch (Exception e) {
             log.error("支付押金成功，但事件发送失败 error [{}] ,[{}] ,[{}],[{}]", event, type, GsonUtils.toJson(vo), e);
@@ -948,7 +949,8 @@ public class CashierService {
         orderMessage.setMessage(orderRenterPay);
         //push车主租客已支付费用
         if (1 == type) {
-            //aotu自营车辆类型？
+            Map smsMap = SmsParamsMapUtil.getParamsMap(vo.getOrderNo(), ShortMessageTypeEnum.SELF_SUPPORT_RENT_DEPOSIT_PAID_NOTICE.getValue(),ShortMessageTypeEnum.PAY_RENT_CAR_DEPOSIT_2_OWNER.getValue(), null);
+            orderMessage.setMap(smsMap);
             Map map = SmsParamsMapUtil.getParamsMap(vo.getOrderNo(), null, PushMessageTypeEnum.RENTER_PAY_CAR_2_OWNER.getValue(), null);
             orderMessage.setPushMap(map);
         }
