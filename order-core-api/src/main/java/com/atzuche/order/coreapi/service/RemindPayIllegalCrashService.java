@@ -72,7 +72,7 @@ public class RemindPayIllegalCrashService {
 
     public void sendShortMessageData(boolean condition, String orderNo) {
         if (condition) {
-            Map map = SmsParamsMapUtil.getParamsMap(orderNo, ShortMessageTypeEnum.REMIND_PAY_ILLEGAL_DEPOSIT_2_RENTER.getValue(), null, null);
+            Map map = SmsParamsMapUtil.getParamsMap(orderNo, null, ShortMessageTypeEnum.REMIND_PAY_ILLEGAL_DEPOSITOWNER.getValue(), null);
             smsOrderBaseEventService.sendShortMessage(map);
         }
     }
