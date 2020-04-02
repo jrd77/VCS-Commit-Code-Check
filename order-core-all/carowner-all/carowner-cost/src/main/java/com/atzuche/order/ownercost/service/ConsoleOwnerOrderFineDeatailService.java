@@ -60,6 +60,8 @@ public class ConsoleOwnerOrderFineDeatailService{
         fineEntity.setFineSubsidySourceCode(source.getFineSubsidySourceCode());
         fineEntity.setFineSubsidySourceDesc(source.getFineSubsidySourceDesc());
         fineEntity.setFineType(type.getFineType());
+        fineEntity.setCostName(type.getFineTypeDesc());
+        fineEntity.setCostCode(type.getCode());
         fineEntity.setFineTypeDesc(type.getFineTypeDesc());
         fineEntity.setMemNo(costBaseDTO.getMemNo());
         fineEntity.setOrderNo(costBaseDTO.getOrderNo());
