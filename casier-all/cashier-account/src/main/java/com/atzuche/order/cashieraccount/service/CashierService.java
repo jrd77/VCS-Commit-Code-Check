@@ -64,6 +64,7 @@ import com.autoyol.event.rabbit.neworder.NewOrderMQActionEventEnum;
 import com.autoyol.event.rabbit.neworder.OrderRenterPayAmtSuccessMq;
 import com.autoyol.event.rabbit.neworder.OrderRenterPaySuccessMq;
 import com.dianping.cat.Cat;
+import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -707,7 +708,7 @@ public class CashierService {
         }
         saveCancelOrderStatusInfo(orderStatusDTO);
         //TODO 退款回调成功 push/或者短信 怎么处理
-        cashierNoTService.sendOrderRefundSuccessMq(notifyDataVo.getOrderNo(), FineSubsidyCodeEnum.RENTER);
+        cashierNoTService.sendOrderRefundSuccessMq(notifyDataVo.getOrderNo(), FineSubsidyCodeEnum.RENTER,notifyDataVo);
     }
 
     /**
@@ -785,6 +786,7 @@ public class CashierService {
 	        sendOrderPayDepositSuccess(NewOrderMQActionEventEnum.RENTER_ORDER_PAYFEESUCCESS,1,vo);
         }
         
+        // -------------------------------------------------------- 支付租车费用和APP修改订单补付组合,更新的是实收
         //1.3 租车费用 11
         if(Objects.nonNull(notifyDataVo) && DataPayKindConstant.RENT_AMOUNT.equals(notifyDataVo.getPayKind()) ){
             //1 对象初始化转换
@@ -808,6 +810,7 @@ public class CashierService {
 	        sendOrderPayRentCostSuccess(NewOrderMQActionEventEnum.RENTER_ORDER_PAYSUCCESS,vo,2);
         }
         
+        // -------------------------------------------------------- 三大补付组合,更新的都是实收
         //补充
         if(Objects.nonNull(notifyDataVo) && DataPayKindConstant.RENT_AMOUNT_AFTER.equals(notifyDataVo.getPayKind()) ){
             //1 对象初始化转换
@@ -926,7 +929,7 @@ public class CashierService {
             String renterTextCode = type == 1 ? ShortMessageTypeEnum.PAY_ILLEGAL_DEPOSIT_2_RENTER.getValue() : ShortMessageTypeEnum.PAY_RENT_CAR_DEPOSIT_2_RENTER.getValue();
             String ownerTextCode = type == 1 ? ShortMessageTypeEnum.PAY_ILLEGAL_DEPOSIT_2_OWNERSERVICE.getValue() : ShortMessageTypeEnum.PAY_RENT_CAR_DEPOSIT_2_OWNER.getValue();
             Map map = SmsParamsMapUtil.getParamsMap(vo.getOrderNo(), renterTextCode, ownerTextCode, null);
-            orderMessage.setMap(map);
+            //orderMessage.setMap(map);
             baseProducer.sendTopicMessage(event.exchange, event.routingKey, orderMessage);
         } catch (Exception e) {
             log.error("支付押金成功，但事件发送失败 error [{}] ,[{}] ,[{}],[{}]", event, type, GsonUtils.toJson(vo), e);
@@ -944,12 +947,6 @@ public class CashierService {
         orderRenterPay.setRenterMemNo(Integer.valueOf(vo.getMemNo()));
         OrderMessage orderMessage = OrderMessage.builder().build();
         orderMessage.setMessage(orderRenterPay);
-        //push车主租客已支付费用
-        if (1 == type) {
-            //aotu自营车辆类型？
-            Map map = SmsParamsMapUtil.getParamsMap(vo.getOrderNo(), null, PushMessageTypeEnum.RENTER_PAY_CAR_2_OWNER.getValue(), null);
-            orderMessage.setPushMap(map);
-        }
         log.info("发送订单支付成功事件 （支付押金/违章押金成功）.mq:,message=[{}]",event,
                 GsonUtils.toJson(orderMessage));
         try {
@@ -1052,5 +1049,9 @@ public class CashierService {
         entity.setAmt(-debtRes.getRealDebtAmt());
         int id = accountOwnerCostSettleDetailNoTService.insertAccountOwnerCostSettleDetail(entity);
     }
+
+
+
+
 
 }

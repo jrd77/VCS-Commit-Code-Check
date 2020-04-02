@@ -38,6 +38,7 @@ import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.commons.exceptions.*;
 import com.atzuche.order.coreapi.modifyorder.exception.NoEffectiveErrException;
 import com.atzuche.order.delivery.entity.OwnerHandoverCarInfoEntity;
+import com.atzuche.order.delivery.entity.RenterDeliveryAddrEntity;
 import com.atzuche.order.delivery.entity.RenterHandoverCarInfoEntity;
 import com.atzuche.order.delivery.entity.RenterOrderDeliveryEntity;
 import com.atzuche.order.delivery.enums.RenterHandoverCarTypeEnum;
@@ -518,7 +519,7 @@ public class OrderDetailService {
             consoleOwnerOrderFineDeatailDTOList.add(consoleOwnerOrderFineDeatailDTO);
         });
         //配送订单
-        List<RenterOrderDeliveryEntity> renterOrderDeliveryList = renterOrderDeliveryService.selectByRenterOrderNo(renterOrderNo);
+        List<RenterOrderDeliveryEntity> renterOrderDeliveryList = renterOrderDeliveryService.findRenterOrderListByOrderNo(orderNo);
         RenterOrderDeliveryEntity renterOrderDeliveryGet = filterDeliveryOrderByType(renterOrderDeliveryList, DeliveryOrderTypeEnum.GET_CAR);
         RenterOrderDeliveryEntity renterOrderDeliveryReturn = filterDeliveryOrderByType(renterOrderDeliveryList, DeliveryOrderTypeEnum.RETURN_CAR);
         RenterOrderDeliveryDTO renterOrderDeliveryGetDto = null;
@@ -531,6 +532,14 @@ public class OrderDetailService {
             renterOrderDeliveryReturnDto = new RenterOrderDeliveryDTO();
             BeanUtils.copyProperties(renterOrderDeliveryReturn,renterOrderDeliveryReturnDto);
         }
+        //配送地址表
+        RenterDeliveryAddrEntity renterDeliveryAddrEntity = renterOrderDeliveryService.selectAddrByRenterOrderNo(renterOrderNo);
+        RenterDeliveryAddrDTO renterDeliveryAddrDTO = null;
+        if(renterDeliveryAddrEntity != null){
+            renterDeliveryAddrDTO = new RenterDeliveryAddrDTO();
+            BeanUtils.copyProperties(renterDeliveryAddrEntity,renterDeliveryAddrDTO);
+        }
+
         //附加驾驶人
         List<RenterAdditionalDriverEntity> renterAdditionalDriverList = renterAdditionalDriverService.listDriversByRenterOrderNo(renterOrderNo);
         List<RenterAdditionalDriverDTO>  renterAdditionalDriverDTOList = new ArrayList<>();
@@ -672,6 +681,7 @@ public class OrderDetailService {
         orderDetailRespDTO.accountRenterWzDepositDTO = accountRenterWzDepositDTO;
         orderDetailRespDTO.accountRenterCostDetailDTO = accountRenterCostDetailDTOS;
         orderDetailRespDTO.orderRefundRecordDTO = orderRefundRecordDTO;
+        orderDetailRespDTO.renterDeliveryAddrDTO = renterDeliveryAddrDTO;
         return orderDetailRespDTO;
     }
 

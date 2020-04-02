@@ -5,6 +5,7 @@ import com.atzuche.order.accountownerincome.entity.AccountOwnerIncomeExamineEnti
 import com.atzuche.order.accountownerincome.exception.AccountOwnerIncomeExamineException;
 import com.atzuche.order.accountownerincome.mapper.AccountOwnerIncomeDetailMapper;
 import com.atzuche.order.commons.enums.account.income.AccountOwnerIncomeDetailType;
+import com.atzuche.order.commons.enums.account.income.AccountOwnerIncomeExamineStatus;
 import com.atzuche.order.commons.enums.cashcode.OwnerCashCodeEnum;
 import com.atzuche.order.commons.vo.req.income.AccountOwnerIncomeExamineOpReqVO;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +15,6 @@ import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Objects;
 
 
 /**
@@ -32,12 +32,15 @@ public class AccountOwnerIncomeDetailNoTService {
 
 
     public AccountOwnerIncomeDetailEntity insertAccountOwnerIncomeDetail(AccountOwnerIncomeExamineOpReqVO vo) {
-        //1 查询审核通过的  收益审核信息
-        List<AccountOwnerIncomeExamineEntity> accountOwnerIncomeExamines = accountOwnerIncomeExamineNoTService.getAccountOwnerIncomeExamineByOrderNo(vo.getOrderNo(),vo.getMemNo());
+        //1 根据exameId查询记录
+        List<AccountOwnerIncomeExamineEntity> accountOwnerIncomeExamines = accountOwnerIncomeExamineNoTService.getAccountOwnerIncomeExamineById(vo.getAccountOwnerIncomeExamineId());
         if(CollectionUtils.isEmpty(accountOwnerIncomeExamines)){
             throw new AccountOwnerIncomeExamineException();
         }
-        int amt  = accountOwnerIncomeExamines.stream().mapToInt(AccountOwnerIncomeExamineEntity::getAmt).sum();
+        int amt  = accountOwnerIncomeExamines.stream()
+                .filter(x-> AccountOwnerIncomeExamineStatus.PASS_EXAMINE.getStatus() == x.getStatus())
+                .mapToInt(AccountOwnerIncomeExamineEntity::getAmt)
+                .sum();
         Assert.isTrue(amt>0,"车主收益金额不合法");
         LocalDateTime now = LocalDateTime.now();
         AccountOwnerIncomeDetailEntity accountOwnerIncomeDetail = new AccountOwnerIncomeDetailEntity();

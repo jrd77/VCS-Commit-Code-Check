@@ -77,8 +77,12 @@ public class RenterAutoCancelTask extends IJobHandler {
                     try {
                         logger.info("执行 下单后1小时，租客未支付租车费用,自动取消 orderNo:[{}]",orderNo);
                         cancelOrderService.cancel(req);
-                        //发送push
+                        //发送sms/push
+                        Map paramMaps = Maps.newHashMap();
+                        paramMaps.put("indexUrl","http://t.cn/R72yPL2");
+                        Map smsMap = SmsParamsMapUtil.getParamsMap(orderNo, ShortMessageTypeEnum.EXEMPT_PREORDER_AUTO_CANCEL_ORDER_2_RENTER.getValue(), ShortMessageTypeEnum.EXEMPT_PREORDER_AUTO_CANCEL_ORDER_2_OWNER.getValue(), paramMaps);
                         Map map = SmsParamsMapUtil.getParamsMap(orderNo, PushMessageTypeEnum.RENTER_NO_PAY_CAR.getValue(), PushMessageTypeEnum.RENTER_NO_PAY_CAR_2_OWNER.getValue(), null);
+                        orderSendMessageFactory.sendShortMessage(smsMap);
                         orderSendMessageFactory.sendPushMessage(map);
 
                     } catch (Exception e) {

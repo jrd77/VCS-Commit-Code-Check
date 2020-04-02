@@ -142,7 +142,9 @@
 				<if test="returnCarUserName != null">`return_car_user_name`, </if>
 				<if test="returnCarUserPhone != null">`return_car_user_phone`, </if>
 				<if test="createOp != null">`create_op`, </if>
+			    <if test="isDelete != null">`is_delete`, </if>
 				<if test="updateOp != null">`update_op` </if>
+
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides="," >
 				<if test="orderNo != null">#{orderNo},  </if>
@@ -164,6 +166,7 @@
 				<if test="returnCarUserName != null">#{returnCarUserName},  </if>
 				<if test="returnCarUserPhone != null">#{returnCarUserPhone},  </if>
 				<if test="createOp != null">#{createOp},  </if>
+			    <if test="isDelete != null">#{isDelete},  </if>
 				<if test="updateOp != null">#{updateOp}  </if>
         </trim>
 	</insert>
@@ -231,7 +234,7 @@
 	</update>
 
     <select id="selectByRenterOrderNo" resultMap="BaseResultMap">
-        select id,order_no,renter_order_no from renter_delivery_addr where renter_order_no = #{renterOrderNo} and is_delete = 0
+        select  <include refid="Base_Column_List"/> from renter_delivery_addr where renter_order_no = #{renterOrderNo}
     </select>
   	
 </mapper>

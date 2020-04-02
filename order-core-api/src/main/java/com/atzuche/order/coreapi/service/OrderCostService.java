@@ -3,15 +3,6 @@
  */
 package com.atzuche.order.coreapi.service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import com.atzuche.order.accountownerincome.service.notservice.AccountOwnerIncomeExamineNoTService;
 import com.atzuche.order.accountrenterdeposit.service.AccountRenterDepositService;
 import com.atzuche.order.accountrenterdeposit.vo.res.AccountRenterDepositResVO;
@@ -42,18 +33,8 @@ import com.atzuche.order.delivery.service.RenterOrderDeliveryService;
 import com.atzuche.order.delivery.vo.delivery.rep.OwnerGetAndReturnCarDTO;
 import com.atzuche.order.delivery.vo.delivery.rep.RenterGetAndReturnCarDTO;
 import com.atzuche.order.ownercost.entity.ConsoleOwnerOrderFineDeatailEntity;
-import com.atzuche.order.rentercost.entity.OrderConsoleCostDetailEntity;
-import com.atzuche.order.rentercost.entity.OrderConsoleSubsidyDetailEntity;
-import com.atzuche.order.rentercost.entity.OrderSupplementDetailEntity;
-import com.atzuche.order.rentercost.entity.RenterOrderCostDetailEntity;
-import com.atzuche.order.rentercost.entity.RenterOrderFineDeatailEntity;
-import com.atzuche.order.rentercost.entity.RenterOrderSubsidyDetailEntity;
-import com.atzuche.order.rentercost.service.ConsoleRenterOrderFineDeatailService;
-import com.atzuche.order.rentercost.service.OrderConsoleCostDetailService;
-import com.atzuche.order.rentercost.service.OrderSupplementDetailService;
-import com.atzuche.order.rentercost.service.RenterOrderCostDetailService;
-import com.atzuche.order.rentercost.service.RenterOrderFineDeatailService;
-import com.atzuche.order.rentercost.service.RenterOrderSubsidyDetailService;
+import com.atzuche.order.rentercost.entity.*;
+import com.atzuche.order.rentercost.service.*;
 import com.atzuche.order.renterorder.entity.OrderCouponEntity;
 import com.atzuche.order.renterorder.entity.RenterDepositDetailEntity;
 import com.atzuche.order.renterorder.service.OrderCouponService;
@@ -64,8 +45,15 @@ import com.atzuche.order.settle.vo.req.RentCosts;
 import com.autoyol.doc.util.StringUtil;
 import com.autoyol.platformcost.CommonUtils;
 import com.autoyol.platformcost.model.FeeResult;
-
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * @author jing.huang
@@ -122,9 +110,7 @@ public class OrderCostService {
 			log.error("实际租车费用:",e);
 			resVo.setNeedIncrementAmt(0);
 		}
-		
-		
-		
+
         //违章押金
         AccountRenterWZDepositResVO wzVo =  accountRenterWzDepositService.getAccountRenterWZDeposit(orderNo, memNo);
         com.atzuche.order.commons.vo.res.account.AccountRenterWZDepositResVO wzVoReal = new com.atzuche.order.commons.vo.res.account.AccountRenterWZDepositResVO();
@@ -148,6 +134,7 @@ public class OrderCostService {
         	RenterDepositDetailEntity entity = renterDepositDetailService.queryByOrderNo(orderNo);
         	if(entity != null) {
         		rentVoReal.setReductionAmt(entity.getReductionDepositAmt());
+                rentVoReal.setOriginalDepositAmt(entity.getOriginalDepositAmt());
         	}
         }
         
@@ -157,7 +144,7 @@ public class OrderCostService {
         List<AccountRenterCostDetailEntity> lstCostDetail =  accountRenterCostSettleService.getAccountRenterCostDetailsByOrderNo(orderNo);
         AccountRenterCostDetailEntity walletCostDetail = null; //仅仅关心的是钱包的。
         for (AccountRenterCostDetailEntity accountRenterCostDetailEntity : lstCostDetail) {
-        	if(RenterCashCodeEnum.WALLET_DEDUCT.equals(accountRenterCostDetailEntity.getSourceCode())) {
+        	if(RenterCashCodeEnum.ACCOUNT_RENTER_RENT_COST.getCashNo().equals(accountRenterCostDetailEntity.getSourceCode()) && "00".equals(accountRenterCostDetailEntity.getPaySourceCode())) {
         		walletCostDetail = new AccountRenterCostDetailEntity();
         		BeanUtils.copyProperties(accountRenterCostDetailEntity,walletCostDetail);
         	}

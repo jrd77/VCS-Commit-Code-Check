@@ -5,6 +5,8 @@ import com.atzuche.order.coreapi.entity.vo.req.AutoCoinDeductReqVO;
 import com.atzuche.order.coreapi.entity.vo.req.OwnerCouponBindReqVO;
 import com.atzuche.order.renterorder.service.OwnerDiscountCouponService;
 import com.atzuche.order.renterorder.service.PlatformCouponService;
+import com.atzuche.order.renterorder.vo.owner.OwnerCouponLongReqVO;
+import com.atzuche.order.renterorder.vo.owner.OwnerCouponLongResVO;
 import com.atzuche.order.renterorder.vo.owner.OwnerDiscountCouponVO;
 import com.autoyol.coupon.api.MemAvailCoupon;
 import com.autoyol.coupon.api.MemAvailCouponRequest;
@@ -186,5 +188,14 @@ public class CouponAndCoinHandleService {
     }
 
 
+    /**
+     * 获取长租折扣信息
+     *
+     * @param reqVO 参数
+     * @return OwnerCouponLongResVO 长租折扣信息
+     */
+    public OwnerCouponLongResVO getLongOwnerCoupon(OwnerCouponLongReqVO reqVO) {
+        return ownerDiscountCouponService.getLongOwnerCoupon(reqVO);
+    }
 
 }

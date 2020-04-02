@@ -1,11 +1,13 @@
 package com.atzuche.order.cashieraccount.service.notservice;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
+import com.atzuche.order.commons.enums.cashier.OrderRefundStatusEnum;
+import com.atzuche.order.mq.enums.ShortMessageTypeEnum;
+import com.atzuche.order.mq.util.SmsParamsMapUtil;
+import com.autoyol.autopay.gateway.vo.res.AutoPayResultVo;
+import com.google.common.collect.Maps;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.BeanUtils;
@@ -531,6 +533,37 @@ public class CashierNoTService {
         vo.setAtpaySign(StringUtils.EMPTY);
         return vo;
     }
+    
+    public PayVo getPayVOForOrderSupplementDetail(String orderNo,CashierEntity cashierEntity,OrderPaySignReqVO orderPaySign,int amt ,String title,String payKind,String payIdStr ,String extendParams,int freeDepositType) {
+        PayVo vo = new PayVo();
+        Integer paySn = (Objects.isNull(cashierEntity)|| Objects.isNull(cashierEntity.getPaySn()))?0:cashierEntity.getPaySn();
+        vo.setInternalNo("1");
+        vo.setExtendParams(extendParams);
+        vo.setAtappId(DataAppIdConstant.APPID_SHORTRENT);
+        vo.setMemNo(orderPaySign.getMenNo());
+//        vo.setOrderNo(orderPaySign.getOrderNo());
+        //支持多订单号
+        vo.setOrderNo(orderNo);
+        vo.setOpenId(orderPaySign.getOpenId());
+        vo.setReqOs(orderPaySign.getReqOs());
+//        vo.setPayAmt(String.valueOf(Math.abs(amt)));
+        vo.setPayAmt(String.valueOf(amt));  //order_supplement_detailk考虑到是正负号
+        vo.setPayEnv(env);
+        vo.setPayId(payIdStr);
+        vo.setPayKind(payKind);
+        vo.setPaySn(String.valueOf(paySn));
+        vo.setPaySource(orderPaySign.getPaySource());
+        vo.setPayTitle(title);
+        if(freeDepositType == 2) {
+        	vo.setPayType(DataPayTypeConstant.PAY_PRE); //预授权的方式。
+        }else {
+        	vo.setPayType(orderPaySign.getPayType());
+        }
+        vo.setReqIp(IpUtil.getLocalIp());
+        vo.setAtpaySign(StringUtils.EMPTY);
+        return vo;
+    }
+    
 
 
 
@@ -739,13 +772,18 @@ public class CashierNoTService {
      * 退款成功事件
      * @param orderNo
      */
-    public void sendOrderRefundSuccessMq(String orderNo, FineSubsidyCodeEnum type) {
+    public void sendOrderRefundSuccessMq(String orderNo, FineSubsidyCodeEnum type,AutoPayResultVo notifyDataVo) {
         OrderRefundMq orderSettlementMq = new OrderRefundMq();
         orderSettlementMq.setType(Integer.valueOf(type.getFineSubsidyCode()));
         orderSettlementMq.setOrderNo(orderNo);
         OrderMessage orderMessage = OrderMessage.builder().build();
         orderMessage.setMessage(orderSettlementMq);
-        //TODO 短信发送
+        if (DataPayKindConstant.RENT.equals(notifyDataVo.getPayKind())) {
+            Map paramsMap = Maps.newHashMap();
+            paramsMap.put("RentCarDeposit", notifyDataVo.getRefundAmt());
+            Map map = SmsParamsMapUtil.getParamsMap(notifyDataVo.getOrderNo(), ShortMessageTypeEnum.REFUND_COST_SUCCESS_2_RENTER.getValue(), null, paramsMap);
+            orderMessage.setMap(map);
+        }
         baseProducer.sendTopicMessage(NewOrderMQActionEventEnum.ORDER_REFUND_SUCCESS.exchange,NewOrderMQActionEventEnum.ORDER_REFUND_SUCCESS.routingKey,orderMessage);
     }
     /**

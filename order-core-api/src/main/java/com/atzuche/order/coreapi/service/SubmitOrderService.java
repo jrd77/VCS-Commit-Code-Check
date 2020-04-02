@@ -282,6 +282,37 @@ public class SubmitOrderService {
         return orderResVO;
     }
 
+
+    /**
+     * 长租订单提交
+     *
+     * @param context 下单请求信息
+     * @return OrderResVO 下单返回结果
+     */
+    public OrderResVO submitLongOrder(OrderReqContext context) {
+        OrderReqVO orderReqVO = context.getOrderReqVO();
+        orderReqVO.setReqTime(LocalDateTime.now());
+        //提前延后时间计算
+        CarRentTimeRangeResVO carRentTimeRangeResVO =
+                carRentalTimeApiService.getCarRentTimeRange(carRentalTimeApiService.buildCarRentTimeRangeReqVO(orderReqVO));
+        //生成主订单号
+        String orderNo = uniqueOrderNoService.genOrderNo();
+        //生成租客订单号
+        String renterOrderNo = uniqueOrderNoService.genRenterOrderNo(orderNo);
+        //生成车主子订单号
+        String ownerOrderNo = uniqueOrderNoService.genOwnerOrderNo(orderNo);
+
+
+        OrderResVO orderResVO = new OrderResVO();
+        orderResVO.setOrderNo(orderNo);
+        orderResVO.setStatus(null);
+        return orderResVO;
+    }
+
+
+
+
+
     private OrderInfoDTO initOrderInfoDTO(OrderReqVO orderReqVO) {
         OrderInfoDTO orderInfoDTO = new OrderInfoDTO();
         orderInfoDTO.setOrderNo(null);

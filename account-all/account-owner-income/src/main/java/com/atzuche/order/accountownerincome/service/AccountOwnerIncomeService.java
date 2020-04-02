@@ -1,15 +1,15 @@
 package com.atzuche.order.accountownerincome.service;
 
+import com.atzuche.order.accountownerincome.entity.AccountOwnerIncomeDetailEntity;
 import com.atzuche.order.accountownerincome.entity.AccountOwnerIncomeExamineEntity;
 import com.atzuche.order.accountownerincome.service.notservice.AccountOwnerIncomeDetailNoTService;
 import com.atzuche.order.accountownerincome.service.notservice.AccountOwnerIncomeExamineNoTService;
 import com.atzuche.order.accountownerincome.service.notservice.AccountOwnerIncomeNoTService;
-import com.atzuche.order.accountownerincome.entity.AccountOwnerIncomeDetailEntity;
 import com.atzuche.order.commons.enums.account.income.AccountOwnerIncomeExamineStatus;
 import com.atzuche.order.commons.vo.req.income.AccountOwnerIncomeExamineOpReqVO;
 import com.atzuche.order.commons.vo.req.income.AccountOwnerIncomeExamineReqVO;
-import com.autoyol.cat.CatAnnotation;
 import com.autoyol.commons.web.ErrorCode;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
@@ -23,6 +23,7 @@ import java.util.List;
  * @author ZhangBin
  * @date 2019-12-11 17:44:19
  */
+@Slf4j
 @Service
 public class AccountOwnerIncomeService{
     @Autowired
@@ -61,7 +62,7 @@ public class AccountOwnerIncomeService{
         //2 更新审核表状态
         accountOwnerIncomeExamineNoTService.updateOwnerIncomeExamine(accountOwnerIncomeExamineOpReq);
         //3 更新车主收益表
-        if(AccountOwnerIncomeExamineStatus.PASS_EXAMINE.equals(accountOwnerIncomeExamineOpReq.getStatus())){
+        if(AccountOwnerIncomeExamineStatus.PASS_EXAMINE.getStatus() == accountOwnerIncomeExamineOpReq.getStatus()){
             //3.1 新增收益明细并返回
             AccountOwnerIncomeDetailEntity accountOwnerIncomeDetail = accountOwnerIncomeDetailNoTService.insertAccountOwnerIncomeDetail(accountOwnerIncomeExamineOpReq);
             //3.2 更新车主收益总和

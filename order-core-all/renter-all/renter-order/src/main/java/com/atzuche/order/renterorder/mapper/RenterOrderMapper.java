@@ -64,4 +64,6 @@ public interface RenterOrderMapper{
 
 
     RenterOrderEntity getRenterOrderNoByOrderNoAndFinish(@Param("orderNo")String orderNo);
+    
+    RenterOrderEntity getRenterOrderByOrderNoAndChildStatus(@Param("orderNo") String orderNo);
 }

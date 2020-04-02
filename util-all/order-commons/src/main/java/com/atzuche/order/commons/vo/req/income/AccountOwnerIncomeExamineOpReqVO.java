@@ -1,6 +1,5 @@
 package com.atzuche.order.commons.vo.req.income;
 
-import com.atzuche.order.commons.enums.account.income.AccountOwnerIncomeExamineStatus;
 import com.autoyol.commons.web.ErrorCode;
 import lombok.Data;
 import org.springframework.util.Assert;
@@ -31,7 +30,7 @@ public class AccountOwnerIncomeExamineOpReqVO {
     /**
      * 审核车主状态类型
      */
-    private AccountOwnerIncomeExamineStatus status;
+    private Integer status;
 
     /**
      * 收益审核描述

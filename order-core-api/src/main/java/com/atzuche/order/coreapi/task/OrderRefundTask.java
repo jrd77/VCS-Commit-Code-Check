@@ -38,7 +38,7 @@ public class OrderRefundTask extends IJobHandler {
     public ReturnT<String> execute(String s) throws Exception {
         logger.info("开始执行 退款订单任务");
         List<CashierRefundApplyEntity> list = cashierRefundApplyNoTService.selectorderNoWaitingAll();
-        logger.info("查询需要退换的 记录list={}", GsonUtils.toJson(list));
+        logger.info("开始执行 退款订单任务 查询需要退换的 记录list={}", GsonUtils.toJson(list));
         if (CollectionUtils.isNotEmpty(list)) {
             for (int i = 0; i < list.size(); i++) {
                 Cat.logEvent(CatConstants.XXL_JOB_PARAM, GsonUtils.toJson(list.get(i)));

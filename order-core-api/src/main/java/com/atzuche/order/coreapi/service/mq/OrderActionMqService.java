@@ -5,14 +5,22 @@ import com.alibaba.fastjson.JSONObject;
 import com.atzuche.order.commons.LocalDateTimeUtils;
 import com.atzuche.order.commons.constant.OrderConstant;
 import com.atzuche.order.commons.enums.CancelSourceEnum;
+import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
+import com.atzuche.order.commons.exceptions.OrderNotFoundException;
 import com.atzuche.order.commons.vo.req.OrderReqVO;
 import com.atzuche.order.coreapi.service.MqBuildService;
+import com.atzuche.order.coreapi.service.RenterCostFacadeService;
 import com.atzuche.order.mq.common.base.BaseProducer;
 import com.atzuche.order.mq.common.base.OrderMessage;
 import com.atzuche.order.mq.enums.ShortMessageTypeEnum;
 import com.atzuche.order.mq.util.SmsParamsMapUtil;
+import com.atzuche.order.parentorder.entity.OrderEntity;
+import com.atzuche.order.parentorder.service.OrderService;
+import com.atzuche.order.rentercost.entity.RenterOrderCostDetailEntity;
+import com.atzuche.order.rentercost.service.RenterOrderCostDetailService;
 import com.atzuche.order.search.dto.OrderInfoDTO;
 import com.autoyol.event.rabbit.neworder.*;
+import com.google.common.collect.Maps;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +32,7 @@ import org.springframework.util.CollectionUtils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 @Service
 public class OrderActionMqService {
@@ -36,8 +45,12 @@ public class OrderActionMqService {
 
     @Autowired
     private MqBuildService mqBuildService;
-
-
+    @Autowired
+    RenterOrderCostDetailService renterOrderCostDetailService;
+    @Autowired
+    private RenterCostFacadeService facadeService;
+    @Autowired
+    OrderService orderService;
     /**
      * 发送下单成功事件
      *
@@ -67,6 +80,11 @@ public class OrderActionMqService {
                 NewOrderMQActionEventEnum.ORDER_CREATE.exchange,
                 NewOrderMQActionEventEnum.ORDER_CREATE.routingKey,
                 JSON.toJSON(orderMessage));
+        //发送套餐SMS
+        if ("2".equals(orderCreateMq.getCategory())) {
+            Map paramMaps = SmsParamsMapUtil.getParamsMap(orderNo, ShortMessageTypeEnum.NOTIFY_RENTER_TRANS_REQACCEPTEDPACKAGE.getValue(), null, null);
+            orderMessage.setMap(paramMaps);
+        }
         baseProducer.sendTopicMessage(NewOrderMQActionEventEnum.ORDER_CREATE.exchange,
                 NewOrderMQActionEventEnum.ORDER_CREATE.routingKey,
                 orderMessage);
@@ -219,19 +237,17 @@ public class OrderActionMqService {
 
     /**
      * 发送订单车主确认还车成功事件
-     *
      * @param orderNo 订单号
      */
-    public void sendOrderOwnerReturnCarSuccess(String orderNo) {
+    public void sendOrderOwnerReturnCarSuccess(String orderNo,String renterOrderNo) {
         OrderBaseDataMq orderBaseDataMq = mqBuildService.buildOrderBaseDataMq(orderNo);
         OrderConfirmReturnCarMq orderCreateMq = new OrderConfirmReturnCarMq();
         BeanUtils.copyProperties(orderBaseDataMq, orderCreateMq);
         orderCreateMq.setType(2);
-
         OrderMessage orderMessage = OrderMessage.builder().build();
-
         //租客还车
-        Map map = SmsParamsMapUtil.getParamsMap(orderNo, ShortMessageTypeEnum.CAR_RENTALEND_2_RENTER.getValue(), null, null);
+        Map paramsMap = findRenterDetailCost(orderNo,renterOrderNo,String.valueOf(orderBaseDataMq.getRenterMemNo()));
+        Map map = SmsParamsMapUtil.getParamsMap(orderNo, ShortMessageTypeEnum.CAR_RENTALEND_2_RENTER.getValue(), null, paramsMap);
         orderMessage.setMap(map);
         logger.info("发送订单车主确认还车成功事件.mq:[exchange={},routingKey={}],message=[{}]",
                 NewOrderMQActionEventEnum.OWNER_CONFIRM_RETURNCAR.exchange,
@@ -242,6 +258,78 @@ public class OrderActionMqService {
                 orderMessage);
     }
 
+    /**
+     * 获取租客费用数据
+     * @param orderNo
+     * @param renterOrderNo
+     * @param memNo
+     * @return
+     */
+    public Map findRenterDetailCost(String orderNo, String renterOrderNo,String memNo) {
+        Map map = Maps.newHashMap();
+        map.put("Rent", "0");
+        map.put("SrvGetCost", "0");
+        map.put("SrvReturnCost", "0");
+        map.put("Insurance", "0");
+        map.put("AbatementAmt", "0");
+        map.put("ExtraDriverInsure", "0");
+        map.put("You2OwnerAdjust", "0");
+        map.put("Owner2YouAdjust", "0");
+        map.put("CouponOffset", "0");
+        map.put("WalletPay", "0");
+        map.put("RenterPayPlatformContent", "0");
+        int totalRentCostAmtWithoutFine = facadeService.getTotalRenterCostWithoutFine(orderNo, renterOrderNo, memNo);
+        map.put("TotalAmount", String.valueOf(totalRentCostAmtWithoutFine).contains("-") ? String.valueOf(totalRentCostAmtWithoutFine).replace("-","") : String.valueOf(totalRentCostAmtWithoutFine));
+        List<RenterOrderCostDetailEntity> list = renterOrderCostDetailService.listRenterOrderCostDetail(orderNo, renterOrderNo);
+        if (CollectionUtils.isEmpty(list)) {
+            return map;
+        }
+        //车辆租金
+        list.stream().filter(r -> r.getCostCode().equals(RenterCashCodeEnum.RENT_AMT.getCashNo())).findFirst().ifPresent(getCrashVO -> {
+            map.put("Rent", String.valueOf(getCrashVO.getUnitPrice() * getCrashVO.getCount()));
+        });
+        //取车费用
+        list.stream().filter(r -> r.getCostCode().equals(RenterCashCodeEnum.SRV_GET_COST.getCashNo())).findFirst().ifPresent(getCrashVO -> {
+            map.put("SrvGetCost", String.valueOf(getCrashVO.getUnitPrice() * getCrashVO.getCount()));
+        });
+        //还车费用
+        list.stream().filter(r -> r.getCostCode().equals(RenterCashCodeEnum.SRV_RETURN_COST.getCashNo())).findFirst().ifPresent(getCrashVO -> {
+            map.put("SrvReturnCost", String.valueOf(getCrashVO.getUnitPrice() * getCrashVO.getCount()));
+        });
+        //平台保障费
+        list.stream().filter(r -> r.getCostCode().equals(RenterCashCodeEnum.INSURE_TOTAL_PRICES.getCashNo())).findFirst().ifPresent(getCrashVO -> {
+            map.put("Insurance", String.valueOf(getCrashVO.getUnitPrice() * getCrashVO.getCount()));
+        });
+        //全面保障费
+        list.stream().filter(r -> r.getCostCode().equals(RenterCashCodeEnum.ABATEMENT_INSURE.getCashNo())).findFirst().ifPresent(getCrashVO -> {
+            map.put("AbatementAmt", String.valueOf(getCrashVO.getUnitPrice() * getCrashVO.getCount()));
+        });
+        //附加驾驶保险金额
+        list.stream().filter(r -> r.getCostCode().equals(RenterCashCodeEnum.EXTRA_DRIVER_INSURE.getCashNo())).findFirst().ifPresent(getCrashVO -> {
+            map.put("ExtraDriverInsure", String.valueOf(getCrashVO.getUnitPrice() * getCrashVO.getCount()));
+        });
+        //租客给车主的调价补贴
+        list.stream().filter(r -> r.getCostCode().equals(RenterCashCodeEnum.SUBSIDY_RENTERTOOWNER_ADJUST.getCashNo())).findFirst().ifPresent(getCrashVO -> {
+            map.put("You2OwnerAdjust", String.valueOf(getCrashVO.getUnitPrice() * getCrashVO.getCount()));
+        });
+        //车主给租客的调价补贴
+        list.stream().filter(r -> r.getCostCode().equals(RenterCashCodeEnum.SUBSIDY_OWNERTORENTER_ADJUST.getCashNo())).findFirst().ifPresent(getCrashVO -> {
+            map.put("Owner2YouAdjust", String.valueOf(getCrashVO.getUnitPrice() * getCrashVO.getCount()));
+        });
+        //优惠券抵扣金额
+        list.stream().filter(r -> r.getCostCode().equals(RenterCashCodeEnum.REAL_COUPON_OFFSET.getCashNo())).findFirst().ifPresent(getCrashVO -> {
+            map.put("CouponOffset", String.valueOf(getCrashVO.getUnitPrice() * getCrashVO.getCount()));
+        });
+        //钱包抵扣金额
+        list.stream().filter(r -> r.getCostCode().equals(RenterCashCodeEnum.WALLET_DEDUCT.getCashNo())).findFirst().ifPresent(getCrashVO -> {
+            map.put("WalletPay", String.valueOf(getCrashVO.getUnitPrice() * getCrashVO.getCount()));
+        });
+        //车主给租客的租金补贴金额
+        list.stream().filter(r -> r.getCostCode().equals(RenterCashCodeEnum.SUBSIDY_OWNER_TORENTER_RENTAMT.getCashNo())).findFirst().ifPresent(getCrashVO -> {
+            map.put("RenterPayPlatformContent", String.valueOf(getCrashVO.getUnitPrice() * getCrashVO.getCount()));
+        });
+        return map;
+    }
 
     /**
      * 发送取消订单收取节假日罚金成功事件

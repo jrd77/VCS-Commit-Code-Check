@@ -434,6 +434,8 @@ public class RenterOrderFineDeatailService{
 		fineEntity.setFineSubsidySourceCode(source.getFineSubsidySourceCode());
 		fineEntity.setFineSubsidySourceDesc(source.getFineSubsidySourceDesc());
 		fineEntity.setFineType(type.getFineType());
+        fineEntity.setCostCode(type.getCode());
+        fineEntity.setCostName(type.getFineTypeDesc());
 		fineEntity.setFineTypeDesc(type.getFineTypeDesc());
 		fineEntity.setMemNo(costBaseDTO.getMemNo());
 		fineEntity.setOrderNo(costBaseDTO.getOrderNo());

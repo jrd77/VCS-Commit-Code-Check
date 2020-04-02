@@ -1,7 +1,9 @@
 package com.atzuche.order.mq.common.sms;
 
+import com.atzuche.order.commons.DateUtils;
 import com.atzuche.order.mq.enums.PushMessageTypeEnum;
 import com.atzuche.order.mq.enums.PushParamsTypeEnum;
+import com.autoyol.commons.utils.DateUtil;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
@@ -10,6 +12,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Field;
+import java.time.LocalDateTime;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -65,7 +68,12 @@ public class ShortMessageSendService {
             fieldName = fieldName.substring(0, 1).toLowerCase() + fieldName.substring(1);
             Field field = object.getClass().getDeclaredField(fieldName);
             field.setAccessible(true);
-            return String.valueOf(field.get(object));
+            if (field.getType().isInstance(LocalDateTime.class)) {
+                LocalDateTime localDateTime = (LocalDateTime) field.get(object);
+                return DateUtils.formate(localDateTime, DateUtils.DATE_DEFAUTE1);
+            } else {
+                return String.valueOf(field.get(object));
+            }
         } catch (Exception e) {
             return null;
         }

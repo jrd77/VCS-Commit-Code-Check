@@ -378,5 +378,15 @@
         order by id desc
         limit 1
     </select>
+    
+    
+    <select id="getRenterOrderByOrderNoAndChildStatus" resultMap="BaseResultMap">
+		select <include refid="Base_Column_List" /> from renter_order where order_no = #{orderNo}
+		and child_status = 3
+		and is_effective = 1
+		and is_delete = 0
+		order by id desc
+		limit 1
+	</select>
 
 </mapper>

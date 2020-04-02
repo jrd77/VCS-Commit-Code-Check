@@ -284,6 +284,7 @@ public class DeliveryCarService {
                     .actReturnCarLat(orderReqVO.getSrvReturnLat()).actReturnCarLon(orderReqVO.getSrvReturnLon()).expGetCarAddr(orderReqVO.getSrvGetAddr()).expGetCarLat(orderReqVO.getSrvGetLat()).expGetCarLon(orderReqVO.getSrvGetLon()).expReturnCarAddr(orderReqVO.getSrvReturnAddr())
                     .expReturnCarLat(orderReqVO.getSrvReturnLat()).expReturnCarLon(orderReqVO.getSrvReturnLon()).orderNo(renterGoodsDetailDTO.getOrderNo()).renterOrderNo(renterGoodsDetailDTO.getRenterOrderNo()).createTime(LocalDateTime.now()).createOp("").build();
         }
+        renterDeliveryAddrDTO.setIsDelete(0);
         /**组装配送订单信息**/
         orderDeliveryDTO.setCityCode(orderReqVO.getCityCode());
         orderDeliveryDTO.setCityName(orderReqVO.getCityName());

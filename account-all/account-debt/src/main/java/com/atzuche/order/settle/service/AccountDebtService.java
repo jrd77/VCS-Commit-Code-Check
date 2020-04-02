@@ -23,6 +23,7 @@ import com.atzuche.order.settle.vo.req.AccountInsertDebtReqVO;
 import com.atzuche.order.settle.vo.req.AccountOldDebtReqVO;
 import com.atzuche.order.settle.vo.res.AccountDebtResVO;
 import com.atzuche.order.settle.vo.res.AccountOldDebtResVO;
+import com.atzuche.order.wallet.api.DebtDetailVO;
 import com.autoyol.commons.web.ErrorCode;
 
 import lombok.extern.slf4j.Slf4j;
@@ -208,6 +209,28 @@ public class AccountDebtService{
     		receivalea.setSourceDetail(cahsCodeEnum.getTxt());
     	}
     	return receivalea;
+    }
+    
+    
+    /**
+     * 获取用户总欠款(新系统订单欠款+老系统订单欠款)
+     * @param memNo
+     * @return Integer
+     */
+    public DebtDetailVO getTotalNewDebtAndOldDebtAmt(String memNo) {
+    	// 获取新系统总欠款
+    	int curDebtAmt = getAccountDebtNumByMemNo(memNo);
+    	curDebtAmt = Math.abs(curDebtAmt);
+    	// 获取老系统总欠款
+    	DebtDetailVO debtDetailVO = remoteOldSysDebtService.getDebtDetailVO(memNo);
+    	if (debtDetailVO == null) {
+    		debtDetailVO = new DebtDetailVO();
+    	}
+    	Integer historyDebtAmt = debtDetailVO.getHistoryDebtAmt() == null ? 0:debtDetailVO.getHistoryDebtAmt();
+    	Integer orderDebtAmt = debtDetailVO.getOrderDebtAmt() == null ? 0:debtDetailVO.getOrderDebtAmt();
+    	debtDetailVO.setOrderDebtAmt(curDebtAmt + orderDebtAmt);
+    	debtDetailVO.setHistoryDebtAmt(historyDebtAmt);
+    	return debtDetailVO;
     }
     
 }
