@@ -152,11 +152,12 @@ public class OrderOwnerSettleNewService {
         }).mapToInt(AccountOwnerCostSettleDetailEntity::getAmt).sum();
         //平台补贴油费
         int platFormAmt =0;
-        if(!CollectionUtils.isEmpty(settleOrdersDefinition.getAccountPlatformSubsidyDetails())){
-            platFormAmt = settleOrdersDefinition.getAccountPlatformSubsidyDetails().stream().filter(obj ->{
-                return RenterCashCodeEnum.SUBSIDY_OIL.getCashNo().equals(obj.getSourceCode());
-            }).mapToInt(AccountPlatformSubsidyDetailEntity::getAmt).sum();
-        }
+        //避免重复计算。
+//        if(!CollectionUtils.isEmpty(settleOrdersDefinition.getAccountPlatformSubsidyDetails())){
+//            platFormAmt = settleOrdersDefinition.getAccountPlatformSubsidyDetails().stream().filter(obj ->{
+//                return RenterCashCodeEnum.SUBSIDY_OIL.getCashNo().equals(obj.getSourceCode());
+//            }).mapToInt(AccountPlatformSubsidyDetailEntity::getAmt).sum();
+//        }
 
         int oilAmt = rentOilAmt + ownerOilAmt + platFormAmt;
         if(oilAmt!=0){
