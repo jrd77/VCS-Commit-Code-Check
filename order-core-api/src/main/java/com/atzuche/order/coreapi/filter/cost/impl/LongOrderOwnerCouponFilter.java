@@ -4,7 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.LocalDateTimeUtils;
 import com.atzuche.order.coreapi.common.conver.OrderCommonConver;
 import com.atzuche.order.coreapi.entity.dto.cost.OrderCostContext;
-import com.atzuche.order.coreapi.entity.dto.cost.OrderCostDeductAndSubsidyContext;
+import com.atzuche.order.coreapi.entity.dto.cost.OrderCostDetailContext;
 import com.atzuche.order.coreapi.entity.dto.cost.req.LongOrderOwnerCouponReqDTO;
 import com.atzuche.order.coreapi.entity.dto.cost.req.OrderCostBaseReqDTO;
 import com.atzuche.order.coreapi.entity.dto.cost.res.LongOrderOwnerCouponResDTO;
@@ -71,7 +71,7 @@ public class LongOrderOwnerCouponFilter implements OrderCostFilter {
         }
 
 
-        OrderCostDeductAndSubsidyContext deductAndSubsidyContext = context.getDeductAndSubsidyContext();
+        OrderCostDetailContext deductAndSubsidyContext = context.getDeductAndSubsidyContext();
         if (Objects.isNull(deductAndSubsidyContext)) {
             deductAndSubsidyContext = orderCommonConver.initOrderCostDeductAndSubsidyContext(context.getResContext());
         }

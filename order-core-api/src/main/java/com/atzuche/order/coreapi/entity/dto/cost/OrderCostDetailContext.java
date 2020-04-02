@@ -1,13 +1,15 @@
 package com.atzuche.order.coreapi.entity.dto.cost;
 
+import com.atzuche.order.rentercost.entity.RenterOrderCostDetailEntity;
 import com.atzuche.order.rentercost.entity.dto.OrderCouponDTO;
 import com.atzuche.order.rentercost.entity.dto.RenterOrderSubsidyDetailDTO;
 import lombok.Data;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
- * 租客订单抵扣和补贴计算公共参数抽取
+ * 订单费用明细(订单费用以及补贴等)
  * <p><font color=red>注:迭代处理租金和取还车服务费信息</font></p>
  *
  * <p>1. 送取服务券抵扣信息及补贴明细</p>
@@ -24,41 +26,47 @@ import java.util.List;
  */
 
 @Data
-public class OrderCostDeductAndSubsidyContext {
+public class OrderCostDetailContext implements Serializable {
 
+    private static final long serialVersionUID = -2038429673649358854L;
 
     /**
      * 原始租金
      */
     private Integer originalRentAmt;
-
     /**
      * 取车服务费(取送服务券包含超运能溢价)
      */
     private Integer srvGetCost;
-
     /**
      * 还车服务费(取送服务券包含超运能溢价)
      */
     private Integer srvReturnCost;
-
     /**
      * 剩余租金
      */
     private Integer surplusRentAmt;
-
     /**
      * 剩余取车服务费(取送服务券包含超运能溢价)
      */
     private Integer surplusSrvGetCost;
-
     /**
      * 剩余还车服务费(取送服务券包含超运能溢价)
      */
     private Integer surplusSrvReturnCost;
 
 
-
-    
+    /**
+     * 费用明细
+     */
+    private List<RenterOrderCostDetailEntity> costDetails;
+    /**
+     * 优惠券列表
+     */
+    private List<OrderCouponDTO> coupons;
+    /**
+     * 租客订单补贴明细
+     */
+    private List<RenterOrderSubsidyDetailDTO> subsidyDetails;
 
 }

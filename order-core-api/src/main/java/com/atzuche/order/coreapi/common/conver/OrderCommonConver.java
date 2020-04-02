@@ -14,11 +14,10 @@ import com.atzuche.order.commons.vo.res.order.DepositAmtVO;
 import com.atzuche.order.commons.vo.res.order.IllegalDepositVO;
 import com.atzuche.order.commons.vo.res.order.TotalCostVO;
 import com.atzuche.order.coreapi.entity.dto.CancelOrderResDTO;
-import com.atzuche.order.coreapi.entity.dto.cost.OrderCostDeductAndSubsidyContext;
+import com.atzuche.order.coreapi.entity.dto.cost.OrderCostDetailContext;
 import com.atzuche.order.coreapi.entity.dto.cost.OrderCostResContext;
 import com.atzuche.order.coreapi.entity.dto.cost.res.OrderGetAndReturnCarCostResDTO;
 import com.atzuche.order.coreapi.entity.dto.cost.res.OrderOverTransportCapacityPremiumResDTO;
-import com.atzuche.order.coreapi.entity.dto.cost.res.OrderRentAmtResDTO;
 import com.atzuche.order.coreapi.entity.vo.res.CarRentTimeRangeResVO;
 import com.atzuche.order.delivery.vo.delivery.CancelFlowOrderDTO;
 import com.atzuche.order.delivery.vo.delivery.CancelOrderDeliveryVO;
@@ -389,9 +388,9 @@ public class OrderCommonConver {
      * @param resContext 订单费用清单
      * @return OrderCostDeductAndSubsidyContext
      */
-    public OrderCostDeductAndSubsidyContext initOrderCostDeductAndSubsidyContext(OrderCostResContext resContext) {
+    public OrderCostDetailContext initOrderCostDeductAndSubsidyContext(OrderCostResContext resContext) {
         logger.info("初始化订单抵扣及补贴公共参数.resContext:[{}]", JSON.toJSONString(resContext));
-        OrderCostDeductAndSubsidyContext context = new OrderCostDeductAndSubsidyContext();
+        OrderCostDetailContext context = new OrderCostDetailContext();
         context.setOriginalRentAmt(resContext.getOrderRentAmtResDTO().getRentAmt());
         context.setSurplusRentAmt(context.getOriginalRentAmt());
 

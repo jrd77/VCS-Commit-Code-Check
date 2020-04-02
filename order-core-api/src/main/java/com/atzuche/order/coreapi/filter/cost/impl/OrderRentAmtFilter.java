@@ -40,9 +40,9 @@ public class OrderRentAmtFilter implements OrderCostFilter {
         log.info("计算订单租金.param is,baseReqDTO:[{}],rentAmtReqDTO:[{}]", JSON.toJSONString(baseReqDTO),
                 JSON.toJSONString(rentAmtReqDTO));
 
-        if(Objects.isNull(rentAmtReqDTO)) {
-            log.info("param is empty.");
-            return;
+        if(Objects.isNull(baseReqDTO) || Objects.isNull(rentAmtReqDTO)) {
+
+            throw new OrderCostFilterException("","");
         }
 
         //基础信息
