@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * 计算全面保障服务费
@@ -40,6 +41,10 @@ public class OrderAbatementAmtFilter implements OrderCostFilter {
         log.info("计算订单全面保障服务费.param is,baseReqDTO:[{}],abatementAmtReqDTO:[{}]", JSON.toJSONString(baseReqDTO),
                 JSON.toJSONString(abatementAmtReqDTO));
 
+        if (Objects.isNull(baseReqDTO) || Objects.isNull(abatementAmtReqDTO)) {
+            log.info("param is empty.");
+            return;
+        }
         //基础信息
         CostBaseDTO costBaseDTO = new CostBaseDTO();
         BeanUtils.copyProperties(baseReqDTO, costBaseDTO);

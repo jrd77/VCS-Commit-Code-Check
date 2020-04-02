@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * 计算租金
@@ -38,6 +39,11 @@ public class OrderRentAmtFilter implements OrderCostFilter {
         OrderCostRentAmtReqDTO rentAmtReqDTO = context.getReqContext().getRentAmtReqDTO();
         log.info("计算订单租金.param is,baseReqDTO:[{}],rentAmtReqDTO:[{}]", JSON.toJSONString(baseReqDTO),
                 JSON.toJSONString(rentAmtReqDTO));
+
+        if(Objects.isNull(rentAmtReqDTO)) {
+            log.info("param is empty.");
+            return;
+        }
 
         //基础信息
         CostBaseDTO costBaseDTO = new CostBaseDTO();

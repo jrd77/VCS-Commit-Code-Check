@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.atzuche.order.car.CarProxyService;
 import com.atzuche.order.commons.ListUtil;
 import com.atzuche.order.commons.OrderReqContext;
+import com.atzuche.order.commons.constant.OrderConstant;
 import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
 import com.atzuche.order.commons.entity.dto.RenterMemberDTO;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
@@ -13,6 +14,11 @@ import com.atzuche.order.commons.vo.res.order.DepositAmtVO;
 import com.atzuche.order.commons.vo.res.order.IllegalDepositVO;
 import com.atzuche.order.commons.vo.res.order.TotalCostVO;
 import com.atzuche.order.coreapi.entity.dto.CancelOrderResDTO;
+import com.atzuche.order.coreapi.entity.dto.cost.OrderCostDeductAndSubsidyContext;
+import com.atzuche.order.coreapi.entity.dto.cost.OrderCostResContext;
+import com.atzuche.order.coreapi.entity.dto.cost.res.OrderGetAndReturnCarCostResDTO;
+import com.atzuche.order.coreapi.entity.dto.cost.res.OrderOverTransportCapacityPremiumResDTO;
+import com.atzuche.order.coreapi.entity.dto.cost.res.OrderRentAmtResDTO;
 import com.atzuche.order.coreapi.entity.vo.res.CarRentTimeRangeResVO;
 import com.atzuche.order.delivery.vo.delivery.CancelFlowOrderDTO;
 import com.atzuche.order.delivery.vo.delivery.CancelOrderDeliveryVO;
@@ -24,7 +30,6 @@ import com.atzuche.order.renterorder.vo.RenterOrderIllegalResVO;
 import com.atzuche.order.renterorder.vo.RenterOrderReqVO;
 import com.atzuche.order.settle.vo.req.CancelOrderReqDTO;
 import com.autoyol.platformcost.CommonUtils;
-
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,6 +39,7 @@ import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author pengcheng.fu
@@ -374,6 +380,52 @@ public class OrderCommonConver {
         reqDTO.setRenterOrderNo(renterOrderNo);
         reqDTO.setOwnerOrderNo(ownerOrderNo);
         return reqDTO;
+    }
+
+
+    /**
+     * 初始化 OrderCostDeductAndSubsidyContext
+     *
+     * @param resContext 订单费用清单
+     * @return OrderCostDeductAndSubsidyContext
+     */
+    public OrderCostDeductAndSubsidyContext initOrderCostDeductAndSubsidyContext(OrderCostResContext resContext) {
+        logger.info("初始化订单抵扣及补贴公共参数.resContext:[{}]", JSON.toJSONString(resContext));
+        OrderCostDeductAndSubsidyContext context = new OrderCostDeductAndSubsidyContext();
+        context.setOriginalRentAmt(resContext.getOrderRentAmtResDTO().getRentAmt());
+        context.setSurplusRentAmt(context.getOriginalRentAmt());
+
+        OrderGetAndReturnCarCostResDTO getAndReturnCarCostResDTO = resContext.getOrderGetAndReturnCarCostResDTO();
+        if (!Objects.isNull(getAndReturnCarCostResDTO)) {
+            if (!Objects.isNull(getAndReturnCarCostResDTO.getGetCarCost())) {
+                context.setSrvGetCost(getAndReturnCarCostResDTO.getGetCarCost());
+            } else {
+                context.setSrvGetCost(OrderConstant.ZERO);
+            }
+            if (!Objects.isNull(getAndReturnCarCostResDTO.getReturnCarCost())) {
+                context.setSrvReturnCost(getAndReturnCarCostResDTO.getReturnCarCost());
+            } else {
+                context.setSrvReturnCost(OrderConstant.ZERO);
+            }
+        }
+        OrderOverTransportCapacityPremiumResDTO remiumResDTO =
+                resContext.getOrderOverTransportCapacityPremiumResDTO();
+        if (!Objects.isNull(remiumResDTO)) {
+            if (!Objects.isNull(remiumResDTO.getGetCarOverCost())) {
+                context.setSrvGetCost(context.getSrvReturnCost() + remiumResDTO.getGetCarOverCost());
+            }
+
+            if (!Objects.isNull(remiumResDTO.getReturnCarOverCost())) {
+                context.setSrvReturnCost(context.getSrvReturnCost() + remiumResDTO.getReturnCarOverCost());
+            }
+
+        }
+        context.setSrvGetCost(Objects.isNull(context.getSrvReturnCost()) ? OrderConstant.ZERO : context.getSrvReturnCost());
+        context.setSrvReturnCost(Objects.isNull(context.getSrvReturnCost()) ? OrderConstant.ZERO : context.getSrvReturnCost());
+        context.setSurplusSrvGetCost(context.getSrvGetCost());
+
+        logger.info("初始化订单抵扣及补贴公共参数.context:[{}]", JSON.toJSONString(context));
+        return context;
     }
 
 }

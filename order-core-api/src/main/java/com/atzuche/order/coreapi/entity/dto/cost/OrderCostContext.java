@@ -21,4 +21,9 @@ public class OrderCostContext {
      */
     private OrderCostResContext resContext;
 
+    /**
+     * 订单抵扣和补贴计算公共参数抽取
+     */
+    private OrderCostDeductAndSubsidyContext deductAndSubsidyContext;
+
 }

@@ -16,6 +16,8 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Objects;
+
 /**
  * 计算附加驾驶人保险费
  *
@@ -36,6 +38,10 @@ public class OrderExtraDriverInsureAmtFilter implements OrderCostFilter {
         log.info("计算订单附加驾驶人保险费.param is,baseReqDTO:[{}],extraDriverReqDTO:[{}]", JSON.toJSONString(baseReqDTO),
                 JSON.toJSONString(extraDriverReqDTO));
 
+        if (Objects.isNull(baseReqDTO) || Objects.isNull(extraDriverReqDTO)) {
+            log.info("param is empty.");
+            return;
+        }
         //基础信息
         CostBaseDTO costBaseDTO = new CostBaseDTO();
         BeanUtils.copyProperties(baseReqDTO, costBaseDTO);

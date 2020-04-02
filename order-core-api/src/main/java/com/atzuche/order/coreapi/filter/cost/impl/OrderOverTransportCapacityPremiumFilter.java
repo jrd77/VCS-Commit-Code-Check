@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * 计算超运能溢价金额
@@ -41,6 +42,11 @@ public class OrderOverTransportCapacityPremiumFilter implements OrderCostFilter 
                 context.getReqContext().getGetReturnCarOverCostReqDTO();
         log.info("计算超运能溢价金额.param is,baseReqDTO:[{}],orderCostGetReturnCarOverCostReqDTO:[{}]", JSON.toJSONString(baseReqDTO),
                 JSON.toJSONString(orderCostGetReturnCarOverCostReqDTO));
+
+        if (Objects.isNull(baseReqDTO) || Objects.isNull(orderCostGetReturnCarOverCostReqDTO)) {
+            log.info("param is empty.");
+            return;
+        }
 
         //基础信息
         CostBaseDTO costBaseDTO = new CostBaseDTO();

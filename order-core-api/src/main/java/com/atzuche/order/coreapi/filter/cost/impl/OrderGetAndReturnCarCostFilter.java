@@ -16,6 +16,8 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Objects;
+
 /**
  * 计算取还车服务费
  *
@@ -36,6 +38,10 @@ public class OrderGetAndReturnCarCostFilter implements OrderCostFilter {
         log.info("计算订单取还车服务费.param is,baseReqDTO:[{}],getReturnCarCostReqDTO:[{}]", JSON.toJSONString(baseReqDTO),
                 JSON.toJSONString(getReturnCarCostReqDTO));
 
+        if (Objects.isNull(baseReqDTO) || Objects.isNull(getReturnCarCostReqDTO)) {
+            log.info("param is empty.");
+            return;
+        }
         //基础信息
         CostBaseDTO costBaseDTO = new CostBaseDTO();
         BeanUtils.copyProperties(baseReqDTO, costBaseDTO);

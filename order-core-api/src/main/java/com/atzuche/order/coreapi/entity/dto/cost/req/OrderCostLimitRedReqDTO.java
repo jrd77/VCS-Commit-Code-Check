@@ -1,0 +1,13 @@
+package com.atzuche.order.coreapi.entity.dto.cost.req;
+
+import lombok.Data;
+
+/**
+ * 计算限时红包抵扣信息参数
+ *
+ * @author pengcheng.fu
+ * @date 2020/4/1 11:27
+ */
+@Data
+public class OrderCostLimitRedReqDTO {
+}

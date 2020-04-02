@@ -47,5 +47,39 @@ public class OrderCostReqContext {
      */
     private OrderCostGetReturnCarOverCostReqDTO getReturnCarOverCostReqDTO;
 
+    /**
+     * 计算长租订单抵扣租金参数
+     */
+    private LongOrderOwnerCouponReqDTO longOrderOwnerCouponReqDTO;
+
+    /**
+     * 计算车主券抵扣信息参数
+     */
+    private OrderCostOwnerCouponReqDTO ownerCouponReqDTO;
+
+    /**
+     * 计算优惠券抵扣信息参数
+     */
+    private OrderCostCouponReqDTO costCouponReqDTO;
+
+    /**
+     * 计算限时红包抵扣信息参数
+     */
+    private OrderCostLimitRedReqDTO limitRedReqDTO;
+
+    /**
+     * 计算凹凸币抵扣信息参数
+     */
+    private OrderCostAutoCoinReqDTO autoCoinReqDTO;
+
+    /**
+     * 计算车辆押金参数
+     */
+    private OrderCostCarDepositAmtReqDTO costCarDepositAmtReqDTO;
+
+    /**
+     * 计算违章押金参数
+     */
+    private OrderCostViolationDepositAmtReqDTO violationDepositAmtReqDTO;
 
 }

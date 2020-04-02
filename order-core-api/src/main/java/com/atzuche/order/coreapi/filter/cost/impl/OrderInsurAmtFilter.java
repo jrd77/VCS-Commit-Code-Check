@@ -16,6 +16,8 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Objects;
+
 /**
  * 计算基础保障费
  *
@@ -36,6 +38,10 @@ public class OrderInsurAmtFilter implements OrderCostFilter {
         log.info("计算订单基础保障费.param is,baseReqDTO:[{}],insurAmtReqDTO:[{}]", JSON.toJSONString(baseReqDTO),
                 JSON.toJSONString(insurAmtReqDTO));
 
+        if (Objects.isNull(baseReqDTO) || Objects.isNull(insurAmtReqDTO)) {
+            log.info("param is empty.");
+            return;
+        }
         //基础信息
         CostBaseDTO costBaseDTO = new CostBaseDTO();
         BeanUtils.copyProperties(baseReqDTO, costBaseDTO);
