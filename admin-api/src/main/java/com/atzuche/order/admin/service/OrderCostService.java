@@ -414,7 +414,7 @@ public class OrderCostService {
 
 	
 	private void putRenterOrderDeposit(OrderRenterCostResVO realVo, com.atzuche.order.commons.vo.res.OrderRenterCostResVO data, RenterCostVO costVo) {
-		realVo.setVehicleDeposit(data.getRentVo()!=null && data.getRentVo().getYingfuDepositAmt() != null?String.valueOf(NumberUtils.convertNumberToZhengshu(data.getRentVo().getYingfuDepositAmt())):"---");
+	    realVo.setVehicleDeposit(data.getRentVo()!=null && data.getRentVo().getOriginalDepositAmt() != null?String.valueOf(NumberUtils.convertNumberToZhengshu(data.getRentVo().getOriginalDepositAmt())):"---");
 		realVo.setViolationDeposit(data.getWzVo()!=null && data.getWzVo().getYingshouDeposit() != null?String.valueOf(NumberUtils.convertNumberToZhengshu(data.getWzVo().getYingshouDeposit())):"---");
 		
 		//任务减免金额
