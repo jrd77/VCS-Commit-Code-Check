@@ -2,14 +2,10 @@ package com.atzuche.order.coreapi.task;
 
 import com.atzuche.order.commons.CatConstants;
 import com.atzuche.order.commons.entity.orderDetailDto.OrderDTO;
-import com.atzuche.order.commons.entity.orderDetailDto.OrderStatusDTO;
-import com.atzuche.order.commons.vo.req.CancelOrderReqVO;
 import com.atzuche.order.coreapi.service.CancelOrderService;
 import com.atzuche.order.coreapi.service.RemindPayIllegalCrashService;
-import com.atzuche.order.open.service.FeignOrderDetailService;
 import com.atzuche.order.parentorder.entity.OrderStatusEntity;
 import com.atzuche.order.parentorder.service.OrderStatusService;
-import com.autoyol.search.entity.ViolateBO;
 import com.dianping.cat.Cat;
 import com.dianping.cat.message.Transaction;
 import com.xxl.job.core.biz.model.ReturnT;
@@ -39,8 +35,6 @@ public class NoPayDepositBeforeRentTimeTask extends IJobHandler {
     OrderStatusService orderStatusService;
     @Resource
     private RemindPayIllegalCrashService remindPayIllegalCrashService;
-    @Resource
-    private CancelOrderService cancelOrderService;
 
     @Override
     public ReturnT<String> execute(String s) throws Exception {
