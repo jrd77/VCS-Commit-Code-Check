@@ -91,9 +91,6 @@ public class DeliveryCarTask {
             return new AsyncResult(false);
         }
         orderDeliveryEntity.setStatus(3);
-        orderDeliveryEntity.setRenterGetReturnAddr(orderDeliveryEntity.getOwnerGetReturnAddr());
-        orderDeliveryEntity.setRenterGetReturnAddrLat(orderDeliveryEntity.getOwnerGetReturnAddrLat());
-        orderDeliveryEntity.setRenterGetReturnAddrLon(orderDeliveryEntity.getOwnerGetReturnAddrLon());
         renterOrderDeliveryService.updateDeliveryByPrimaryKey(orderDeliveryEntity);
        return cancelRenYunFlowOrderInfo(cancelOrderDeliveryVO.getCancelFlowOrderDTO());
     }
