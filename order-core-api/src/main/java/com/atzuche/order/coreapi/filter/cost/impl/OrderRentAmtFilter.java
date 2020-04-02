@@ -11,6 +11,7 @@ import com.atzuche.order.coreapi.filter.cost.OrderCostFilter;
 import com.atzuche.order.coreapi.submit.exception.OrderCostFilterException;
 import com.atzuche.order.rentercost.entity.RenterOrderCostDetailEntity;
 import com.atzuche.order.rentercost.service.RenterOrderCostCombineService;
+import com.autoyol.commons.web.ErrorCode;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.BeanUtils;
@@ -42,7 +43,7 @@ public class OrderRentAmtFilter implements OrderCostFilter {
 
         if(Objects.isNull(baseReqDTO) || Objects.isNull(rentAmtReqDTO)) {
 
-            throw new OrderCostFilterException("","");
+            throw new OrderCostFilterException(ErrorCode.PARAMETER_ERROR.getCode(),"");
         }
 
         //基础信息
