@@ -1,0 +1,350 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.atzuche.order.delivery.mapper.RenterOrderDeliveryMapper">
+
+    <resultMap type="com.atzuche.order.delivery.entity.RenterOrderDeliveryEntity" id="BaseResultMap">
+        <result property="id" column="id"/>
+        <result property="orderNo" column="order_no"/>
+        <result property="renterOrderNo" column="renter_order_no"/>
+        <result property="orderNoDelivery" column="order_no_delivery"/>
+        <result property="type" column="type"/>
+        <result property="rentTime" column="rent_time"/>
+        <result property="revertTime" column="revert_time"/>
+        <result property="cityCode" column="city_code"/>
+        <result property="ownerName" column="owner_name"/>
+        <result property="ownerPhone" column="owner_phone"/>
+        <result property="renterName" column="renter_name"/>
+        <result property="renterDealCount" column="renter_deal_count"/>
+        <result property="renterPhone" column="renter_phone"/>
+        <result property="cityName" column="city_name"/>
+        <result property="getReturnUserName" column="get_return_user_name"/>
+        <result property="getReturnUserPhone" column="get_return_user_phone"/>
+        <result property="renterGetReturnAddr" column="renter_get_return_addr"/>
+        <result property="renterGetReturnAddrLon" column="renter_get_return_addr_lon"/>
+        <result property="renterGetReturnAddrLat" column="renter_get_return_addr_lat"/>
+        <result property="ownerGetReturnAddr" column="owner_get_return_addr"/>
+        <result property="ownerGetReturnAddrLon" column="owner_get_return_addr_lon"/>
+        <result property="ownerGetReturnAddrLat" column="owner_get_return_addr_lat"/>
+        <result property="status" column="status"/>
+        <result property="isNotifyRenyun" column="is_notify_renyun"/>
+        <result property="aheadOrDelayTime" column="ahead_or_delay_time"/>
+        <result property="createTime" column="create_time"/>
+        <result property="createOp" column="create_op"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="updateOp" column="update_op"/>
+        <result property="isDelete" column="is_delete"/>
+        <result property="renterRealGetReturnRemark" column="renter_real_get_return_remark"/>
+        <result property="ownerRealGetReturnRemark" column="owner_real_get_return_remark"/>
+    </resultMap>
+
+
+	<sql id="Base_Column_List">
+	`id`, 	
+	`order_no`, 	
+	`renter_order_no`, 	
+	`order_no_delivery`, 	
+	`type`, 	
+	`rent_time`, 	
+	`revert_time`, 	
+	`city_code`, 	
+	`owner_name`, 	
+	`owner_phone`, 	
+	`renter_name`, 	
+	`renter_deal_count`, 	
+	`renter_phone`, 	
+	`city_name`, 	
+	`get_return_user_name`, 	
+	`get_return_user_phone`, 	
+	`renter_get_return_addr`, 	
+	`renter_get_return_addr_lon`, 	
+	`renter_get_return_addr_lat`, 	
+	`owner_get_return_addr`, 	
+	`owner_get_return_addr_lon`, 	
+	`owner_get_return_addr_lat`, 	
+	`status`, 	
+	`is_notify_renyun`, 	
+	`ahead_or_delay_time`, 	
+	`create_time`, 	
+	`create_op`, 	
+	`update_time`, 	
+	`update_op`, 	
+	`is_delete`, 	
+	`renter_real_get_return_remark`, 	
+	`owner_real_get_return_remark`	
+
+	</sql>
+
+
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap">
+		select <include refid="Base_Column_List" /> from renter_order_delivery where id = #{value}
+	</select>
+
+	<insert id="insert" parameterType="com.atzuche.order.delivery.entity.RenterOrderDeliveryEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into renter_order_delivery
+		(
+				`order_no`,		
+				`renter_order_no`,		
+				`order_no_delivery`,		
+				`type`,		
+				`rent_time`,		
+				`revert_time`,		
+				`city_code`,		
+				`owner_name`,		
+				`owner_phone`,		
+				`renter_name`,		
+				`renter_deal_count`,		
+				`renter_phone`,		
+				`city_name`,		
+				`get_return_user_name`,		
+				`get_return_user_phone`,		
+				`renter_get_return_addr`,		
+				`renter_get_return_addr_lon`,		
+				`renter_get_return_addr_lat`,		
+				`owner_get_return_addr`,		
+				`owner_get_return_addr_lon`,		
+				`owner_get_return_addr_lat`,		
+				`status`,		
+				`is_notify_renyun`,		
+				`ahead_or_delay_time`,		
+				`create_time`,		
+				`create_op`,		
+				`update_time`,		
+				`update_op`,		
+				`is_delete`,		
+				`renter_real_get_return_remark`,		
+				`owner_real_get_return_remark`		
+			)
+		values
+		(
+				#{orderNo}, 		
+				#{renterOrderNo}, 		
+				#{orderNoDelivery}, 		
+				#{type}, 		
+				#{rentTime}, 		
+				#{revertTime}, 		
+				#{cityCode}, 		
+				#{ownerName}, 		
+				#{ownerPhone}, 		
+				#{renterName}, 		
+				#{renterDealCount}, 		
+				#{renterPhone}, 		
+				#{cityName}, 		
+				#{getReturnUserName}, 		
+				#{getReturnUserPhone}, 		
+				#{renterGetReturnAddr}, 		
+				#{renterGetReturnAddrLon}, 		
+				#{renterGetReturnAddrLat}, 		
+				#{ownerGetReturnAddr}, 		
+				#{ownerGetReturnAddrLon}, 		
+				#{ownerGetReturnAddrLat}, 		
+				#{status}, 		
+				#{isNotifyRenyun}, 		
+				#{aheadOrDelayTime}, 		
+				#{createTime}, 		
+				#{createOp}, 		
+				#{updateTime}, 		
+				#{updateOp}, 		
+				#{isDelete}, 		
+				#{renterRealGetReturnRemark}, 		
+				#{ownerRealGetReturnRemark}		
+			)
+	</insert>
+	
+	<insert id="insertSelective" parameterType="com.atzuche.order.delivery.entity.RenterOrderDeliveryEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into renter_order_delivery
+            <trim prefix="(" suffix=")" suffixOverrides="," >
+				<if test="orderNo != null">`order_no`, </if>
+				<if test="renterOrderNo != null">`renter_order_no`, </if>
+				<if test="orderNoDelivery != null">`order_no_delivery`, </if>
+				<if test="type != null">`type`, </if>
+				<if test="rentTime != null">`rent_time`, </if>
+				<if test="revertTime != null">`revert_time`, </if>
+				<if test="cityCode != null">`city_code`, </if>
+				<if test="ownerName != null">`owner_name`, </if>
+				<if test="ownerPhone != null">`owner_phone`, </if>
+				<if test="renterName != null">`renter_name`, </if>
+				<if test="renterDealCount != null">`renter_deal_count`, </if>
+				<if test="renterPhone != null">`renter_phone`, </if>
+				<if test="cityName != null">`city_name`, </if>
+				<if test="getReturnUserName != null">`get_return_user_name`, </if>
+				<if test="getReturnUserPhone != null">`get_return_user_phone`, </if>
+				<if test="renterGetReturnAddr != null">`renter_get_return_addr`, </if>
+				<if test="renterGetReturnAddrLon != null">`renter_get_return_addr_lon`, </if>
+				<if test="renterGetReturnAddrLat != null">`renter_get_return_addr_lat`, </if>
+				<if test="ownerGetReturnAddr != null">`owner_get_return_addr`, </if>
+				<if test="ownerGetReturnAddrLon != null">`owner_get_return_addr_lon`, </if>
+				<if test="ownerGetReturnAddrLat != null">`owner_get_return_addr_lat`, </if>
+				<if test="status != null">`status`, </if>
+				<if test="isNotifyRenyun != null">`is_notify_renyun`, </if>
+				<if test="aheadOrDelayTime != null">`ahead_or_delay_time`, </if>
+				<if test="createTime != null">`create_time`, </if>
+				<if test="createOp != null">`create_op`, </if>
+				<if test="updateTime != null">`update_time`, </if>
+				<if test="updateOp != null">`update_op`, </if>
+				<if test="isDelete != null">`is_delete`, </if>
+				<if test="renterRealGetReturnRemark != null">`renter_real_get_return_remark`, </if>
+				<if test="ownerRealGetReturnRemark != null">`owner_real_get_return_remark` </if>
+	        </trim>
+            <trim prefix="values (" suffix=")" suffixOverrides="," >
+				<if test="orderNo != null">#{orderNo},  </if>
+				<if test="renterOrderNo != null">#{renterOrderNo},  </if>
+				<if test="orderNoDelivery != null">#{orderNoDelivery},  </if>
+				<if test="type != null">#{type},  </if>
+				<if test="rentTime != null">#{rentTime},  </if>
+				<if test="revertTime != null">#{revertTime},  </if>
+				<if test="cityCode != null">#{cityCode},  </if>
+				<if test="ownerName != null">#{ownerName},  </if>
+				<if test="ownerPhone != null">#{ownerPhone},  </if>
+				<if test="renterName != null">#{renterName},  </if>
+				<if test="renterDealCount != null">#{renterDealCount},  </if>
+				<if test="renterPhone != null">#{renterPhone},  </if>
+				<if test="cityName != null">#{cityName},  </if>
+				<if test="getReturnUserName != null">#{getReturnUserName},  </if>
+				<if test="getReturnUserPhone != null">#{getReturnUserPhone},  </if>
+				<if test="renterGetReturnAddr != null">#{renterGetReturnAddr},  </if>
+				<if test="renterGetReturnAddrLon != null">#{renterGetReturnAddrLon},  </if>
+				<if test="renterGetReturnAddrLat != null">#{renterGetReturnAddrLat},  </if>
+				<if test="ownerGetReturnAddr != null">#{ownerGetReturnAddr},  </if>
+				<if test="ownerGetReturnAddrLon != null">#{ownerGetReturnAddrLon},  </if>
+				<if test="ownerGetReturnAddrLat != null">#{ownerGetReturnAddrLat},  </if>
+				<if test="status != null">#{status},  </if>
+				<if test="isNotifyRenyun != null">#{isNotifyRenyun},  </if>
+				<if test="aheadOrDelayTime != null">#{aheadOrDelayTime},  </if>
+				<if test="createTime != null">#{createTime},  </if>
+				<if test="createOp != null">#{createOp},  </if>
+				<if test="updateTime != null">#{updateTime},  </if>
+				<if test="updateOp != null">#{updateOp},  </if>
+				<if test="isDelete != null">#{isDelete},  </if>
+				<if test="renterRealGetReturnRemark != null">#{renterRealGetReturnRemark},  </if>
+				<if test="ownerRealGetReturnRemark != null">#{ownerRealGetReturnRemark} </if>
+	        </trim>
+	</insert>
+	
+	 
+	<update id="updateByPrimaryKeySelective" parameterType="com.atzuche.order.delivery.entity.RenterOrderDeliveryEntity">
+		update renter_order_delivery 
+		<set>
+				<if test="orderNo != null">`order_no` = #{orderNo}, </if>
+				<if test="renterOrderNo != null">`renter_order_no` = #{renterOrderNo}, </if>
+				<if test="orderNoDelivery != null">`order_no_delivery` = #{orderNoDelivery}, </if>
+				<if test="type != null">`type` = #{type}, </if>
+				<if test="rentTime != null">`rent_time` = #{rentTime}, </if>
+				<if test="revertTime != null">`revert_time` = #{revertTime}, </if>
+				<if test="cityCode != null">`city_code` = #{cityCode}, </if>
+				<if test="ownerName != null">`owner_name` = #{ownerName}, </if>
+				<if test="ownerPhone != null">`owner_phone` = #{ownerPhone}, </if>
+				<if test="renterName != null">`renter_name` = #{renterName}, </if>
+				<if test="renterDealCount != null">`renter_deal_count` = #{renterDealCount}, </if>
+				<if test="renterPhone != null">`renter_phone` = #{renterPhone}, </if>
+				<if test="cityName != null">`city_name` = #{cityName}, </if>
+				<if test="getReturnUserName != null">`get_return_user_name` = #{getReturnUserName}, </if>
+				<if test="getReturnUserPhone != null">`get_return_user_phone` = #{getReturnUserPhone}, </if>
+				<if test="renterGetReturnAddr != null">`renter_get_return_addr` = #{renterGetReturnAddr}, </if>
+				<if test="renterGetReturnAddrLon != null">`renter_get_return_addr_lon` = #{renterGetReturnAddrLon}, </if>
+				<if test="renterGetReturnAddrLat != null">`renter_get_return_addr_lat` = #{renterGetReturnAddrLat}, </if>
+				<if test="ownerGetReturnAddr != null">`owner_get_return_addr` = #{ownerGetReturnAddr}, </if>
+				<if test="ownerGetReturnAddrLon != null">`owner_get_return_addr_lon` = #{ownerGetReturnAddrLon}, </if>
+				<if test="ownerGetReturnAddrLat != null">`owner_get_return_addr_lat` = #{ownerGetReturnAddrLat}, </if>
+				<if test="status != null">`status` = #{status}, </if>
+				<if test="isNotifyRenyun != null">`is_notify_renyun` = #{isNotifyRenyun}, </if>
+				<if test="aheadOrDelayTime != null">`ahead_or_delay_time` = #{aheadOrDelayTime}, </if>
+				<if test="createTime != null">`create_time` = #{createTime}, </if>
+				<if test="createOp != null">`create_op` = #{createOp}, </if>
+				<if test="updateTime != null">`update_time` = #{updateTime}, </if>
+				<if test="updateOp != null">`update_op` = #{updateOp}, </if>
+				<if test="isDelete != null">`is_delete` = #{isDelete}, </if>
+				<if test="renterRealGetReturnRemark != null">`renter_real_get_return_remark` = #{renterRealGetReturnRemark}, </if>
+				<if test="ownerRealGetReturnRemark != null">`owner_real_get_return_remark` = #{ownerRealGetReturnRemark}</if>
+			</set>
+		where id = #{id}
+	</update>
+	
+	<update id="updateByPrimaryKey" parameterType="com.atzuche.order.delivery.entity.RenterOrderDeliveryEntity">
+		update renter_order_delivery 
+		<set>
+				`order_no` = #{orderNo}, 		
+				`renter_order_no` = #{renterOrderNo}, 		
+				`order_no_delivery` = #{orderNoDelivery}, 		
+				`type` = #{type}, 		
+				`rent_time` = #{rentTime}, 		
+				`revert_time` = #{revertTime}, 		
+				`city_code` = #{cityCode}, 		
+				`owner_name` = #{ownerName}, 		
+				`owner_phone` = #{ownerPhone}, 		
+				`renter_name` = #{renterName}, 		
+				`renter_deal_count` = #{renterDealCount}, 		
+				`renter_phone` = #{renterPhone}, 		
+				`city_name` = #{cityName}, 		
+				`get_return_user_name` = #{getReturnUserName}, 		
+				`get_return_user_phone` = #{getReturnUserPhone}, 		
+				`renter_get_return_addr` = #{renterGetReturnAddr}, 		
+				`renter_get_return_addr_lon` = #{renterGetReturnAddrLon}, 		
+				`renter_get_return_addr_lat` = #{renterGetReturnAddrLat}, 		
+				`owner_get_return_addr` = #{ownerGetReturnAddr}, 		
+				`owner_get_return_addr_lon` = #{ownerGetReturnAddrLon}, 		
+				`owner_get_return_addr_lat` = #{ownerGetReturnAddrLat}, 		
+				`status` = #{status}, 		
+				`is_notify_renyun` = #{isNotifyRenyun}, 		
+				`ahead_or_delay_time` = #{aheadOrDelayTime}, 		
+				`create_time` = #{createTime}, 		
+				`create_op` = #{createOp}, 		
+				`update_time` = #{updateTime}, 		
+				`update_op` = #{updateOp}, 		
+				`is_delete` = #{isDelete}, 		
+				`renter_real_get_return_remark` = #{renterRealGetReturnRemark}, 		
+				`owner_real_get_return_remark` = #{ownerRealGetReturnRemark}		
+	
+		</set>
+		where id = #{id}
+	</update>
+
+	<select id="listRenterOrderDeliveryByRenterOrderNo" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List"/>
+		from renter_order_delivery where renter_order_no = #{renterOrderNo}
+		order by id desc
+	</select>
+
+	<update id="updateStatusById" parameterType="java.lang.Integer">
+		UPDATE renter_order_delivery
+		SET status = 3
+		WHERE id = #{id} AND is_delete = 0
+	</update>
+
+	<select id="findRenterOrderByRenterOrderNo" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List"/>
+		from renter_order_delivery where renter_order_no = #{renterOrderNo}
+		and type = #{type} and is_delete = 0
+	</select>
+	<select id="findRenterOrderByRenterOrderNoHistory" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List"/>
+		from renter_order_delivery where renter_order_no = #{renterOrderNo}
+		and type = #{type}
+	</select>
+	<select id="findRenterOrderByrOrderNo" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List"/>
+		from renter_order_delivery where order_no = #{orderNo}
+		and type = #{type} and is_delete = 0 order by id desc limit 1
+	</select>
+
+	<!--auto generated by MybatisCodeHelper on 2020-01-09-->
+	<select id="selectByRenterOrderNo" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List"/>
+		from renter_order_delivery
+		where renter_order_no=#{renterOrderNo}
+		and is_delete = 0
+	</select>
+
+	<select id="findRenterOrderListByorderNo" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List"/>
+		from renter_order_delivery where order_no = #{orderNo}
+	    and is_delete = 0
+	</select>
+  	
+</mapper>

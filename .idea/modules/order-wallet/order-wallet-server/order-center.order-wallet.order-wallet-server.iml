@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module external.linked.project.id=":order-wallet:order-wallet-server" external.linked.project.path="$MODULE_DIR$/../../../../order-wallet/order-wallet-server" external.root.project.path="$MODULE_DIR$/../../../.." external.system.id="GRADLE" external.system.module.group="com.atzuche" external.system.module.version="0.0.1-SNAPSHOT" type="JAVA_MODULE" version="4">
+  <component name="NewModuleRootManager" inherit-compiler-output="true">
+    <exclude-output />
+    <content url="file://$MODULE_DIR$/../../../../order-wallet/order-wallet-server">
+      <excludeFolder url="file://$MODULE_DIR$/../../../../order-wallet/order-wallet-server/.gradle" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../../order-wallet/order-wallet-server/build" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../../order-wallet/order-wallet-server/out" />
+    </content>
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+  </component>
+</module>
