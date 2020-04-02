@@ -56,6 +56,7 @@ public class CancelOrderController {
                                        BindingResult bindingResult) {
         LOGGER.info("Cancel order.param is,cancelOrderReqVO:[{}]", JSON.toJSONString(cancelOrderReqVO));
         BindingResultUtil.checkBindingResult(bindingResult);
+        cancelOrderReqVO.setOperatorName(OrderConstant.SYSTEM_OPERATOR);
         cancelOrderService.cancel(cancelOrderReqVO);
         return ResponseData.success();
     }
