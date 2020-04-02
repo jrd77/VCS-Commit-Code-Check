@@ -202,7 +202,7 @@ public class OrderCostDetailService {
         task.setReductionItemName("总计");
         task.setReductionItemRule("最高减免比例70%（总计超过70%，按70%计算）");
         task.setReductionOrderRatio(reductionOrderRatio);
-		
+        reductTaskList.add(task);
 	}
 	
 	
