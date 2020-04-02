@@ -234,7 +234,7 @@
 	</update>
 
     <select id="selectByRenterOrderNo" resultMap="BaseResultMap">
-        select id,order_no,renter_order_no from renter_delivery_addr where renter_order_no = #{renterOrderNo} and is_delete = 0
+        select  <include refid="Base_Column_List"/> from renter_delivery_addr where renter_order_no = #{renterOrderNo} and is_delete = 0
     </select>
   	
 </mapper>

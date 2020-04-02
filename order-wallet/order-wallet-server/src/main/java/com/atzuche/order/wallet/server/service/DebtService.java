@@ -1,5 +1,6 @@
 package com.atzuche.order.wallet.server.service;
 
+import com.atzuche.order.commons.vo.DebtDetailVO;
 import com.atzuche.order.wallet.server.entity.BalanceEntity;
 import com.atzuche.order.wallet.server.entity.TransSupplementDetailEntity;
 import com.atzuche.order.wallet.server.mapper.MemberMapper;
@@ -111,5 +112,30 @@ public class DebtService {
             return false;
         }
         return true;
+    }
+    
+    
+    /**
+     * 返回用户名下的欠款(区分历史欠款和订单欠款)
+     * @param memNo
+     * @return DebtDetailVO
+     */
+    public DebtDetailVO getDebtDetailVO(String memNo){
+        List<TransSupplementDetailEntity> detailEntityList = transSupplementDetailMapper.findDebtByMemNo(memNo);
+        int orderDebtAmt = 0;
+        if (detailEntityList != null && !detailEntityList.isEmpty()) {
+        	for(TransSupplementDetailEntity entity:detailEntityList){
+            	orderDebtAmt = orderDebtAmt + entity.getAmt();
+            }
+        }
+        BalanceEntity balanceEntity = memberMapper.getByMemNo(memNo);
+        int historyDebtAmt = 0;
+        if(balanceEntity!=null&&balanceEntity.getBalance()!=null&&balanceEntity.getBalance()<0){
+        	historyDebtAmt = -balanceEntity.getBalance();
+        }
+        DebtDetailVO debtDetailVO = new DebtDetailVO();
+        debtDetailVO.setHistoryDebtAmt(historyDebtAmt);
+        debtDetailVO.setOrderDebtAmt(orderDebtAmt);
+        return debtDetailVO;
     }
 }
