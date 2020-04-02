@@ -178,7 +178,7 @@ public class OrderCostDetailService {
 	private void putTaskRight(List<ReductionTaskResVO> reductTaskList,
 			List<RenterMemberRightDTO> renterMemberRightDTOList) {
 		
-		
+		int totalReductionOrderRatio = 0;
 		for (RenterMemberRightDTO renterMemberRightDTO : renterMemberRightDTOList) {
 			//任务
 			if(renterMemberRightDTO.getRightType().intValue() == RightTypeEnum.TASK.getCode().intValue()) {
@@ -189,8 +189,16 @@ public class OrderCostDetailService {
 				task.setReductionOrderRatio(renterMemberRightDTO.getRightValue());
 				///
 				reductTaskList.add(task);
+
+                totalReductionOrderRatio += renterMemberRightDTO.getRightValue()==null?0:Integer.valueOf(renterMemberRightDTO.getRightValue());
 			}
 		}
+        String reductionOrderRatio = String.valueOf(totalReductionOrderRatio>=70?70:totalReductionOrderRatio);
+        ReductionTaskResVO task = new ReductionTaskResVO();
+        //task.setReductionItemGetRatio(renterMemberRightDTO.getRightValue());
+        task.setReductionItemName("总计");
+        task.setReductionItemRule("最高减免比例70%（总计超过70%，按70%计算）");
+        task.setReductionOrderRatio(reductionOrderRatio);
 		
 	}
 	
