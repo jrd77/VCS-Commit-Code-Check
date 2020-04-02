@@ -267,8 +267,19 @@ public class OrderActionMqService {
      */
     public Map findRenterDetailCost(String orderNo, String renterOrderNo,String memNo) {
         Map map = Maps.newHashMap();
+        map.put("Rent", "0");
+        map.put("SrvGetCost", "0");
+        map.put("SrvReturnCost", "0");
+        map.put("Insurance", "0");
+        map.put("AbatementAmt", "0");
+        map.put("ExtraDriverInsure", "0");
+        map.put("You2OwnerAdjust", "0");
+        map.put("Owner2YouAdjust", "0");
+        map.put("CouponOffset", "0");
+        map.put("WalletPay", "0");
+        map.put("RenterPayPlatformContent", "0");
         int totalRentCostAmtWithoutFine = facadeService.getTotalRenterCostWithoutFine(orderNo, renterOrderNo, memNo);
-        map.put("TotalAmount", String.valueOf(totalRentCostAmtWithoutFine));
+        map.put("TotalAmount", String.valueOf(totalRentCostAmtWithoutFine).contains("-") ? String.valueOf(totalRentCostAmtWithoutFine).replace("-","") : String.valueOf(totalRentCostAmtWithoutFine));
         List<RenterOrderCostDetailEntity> list = renterOrderCostDetailService.listRenterOrderCostDetail(orderNo, renterOrderNo);
         if (CollectionUtils.isEmpty(list)) {
             return map;
