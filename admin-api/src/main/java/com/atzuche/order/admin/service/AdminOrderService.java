@@ -13,6 +13,7 @@ import com.atzuche.order.commons.entity.dto.SearchCashWithdrawalReqDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.OrderDetailReqDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.OrderDetailRespDTO;
 import com.atzuche.order.commons.exceptions.RemoteCallException;
+import com.atzuche.order.commons.vo.DebtDetailVO;
 import com.atzuche.order.commons.vo.req.*;
 import com.atzuche.order.commons.vo.res.AdminOrderJudgeDutyResVO;
 import com.atzuche.order.commons.vo.res.NormalOrderCostCalculateResVO;
@@ -513,10 +514,10 @@ public class AdminOrderService {
      * @param memNo
      * @return Integer
      */
-    public Integer getDebtAmt(String memNo){
+    public DebtDetailVO getDebtAmt(String memNo){
     	SearchCashWithdrawalReqDTO req = new SearchCashWithdrawalReqDTO();
     	req.setMemNo(memNo);
-        ResponseData<?> responseObject = null;
+        ResponseData<DebtDetailVO> responseObject = null;
         Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "订单CoreAPI服务");
         try{
             Cat.logEvent(CatConstants.FEIGN_METHOD,"feignOrderDetailService.getDebtAmt");
@@ -526,9 +527,7 @@ public class AdminOrderService {
             Cat.logEvent(CatConstants.FEIGN_RESULT,JSON.toJSONString(responseObject));
             checkResponse(responseObject);
             t.setStatus(Transaction.SUCCESS);
-            if (responseObject.getData() != null) {
-            	return Integer.valueOf(responseObject.getData().toString());
-            }
+            return responseObject.getData();
         }catch (Exception e){
             log.error("Feign 管理后台获取欠款,responseObject={},modifyOrderReq={}",JSON.toJSONString(responseObject),JSON.toJSONString(req),e);
             Cat.logError("Feign 管理后台获取欠款",e);
@@ -536,7 +535,7 @@ public class AdminOrderService {
         }finally {
             t.complete();
         }
-        return 0;
+        return null;
     }
 
 

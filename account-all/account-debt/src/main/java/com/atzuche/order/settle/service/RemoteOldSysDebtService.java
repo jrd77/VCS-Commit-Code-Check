@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 
 import com.atzuche.order.commons.CatConstants;
 import com.atzuche.order.commons.ResponseCheckUtil;
+import com.atzuche.order.wallet.api.DebtDetailVO;
 import com.atzuche.order.wallet.api.DebtFeignService;
 import com.atzuche.order.wallet.api.DeductDebtVO;
 import com.atzuche.order.wallet.api.MemDebtVO;
@@ -82,5 +83,33 @@ public class RemoteOldSysDebtService {
         }finally {
             t.complete();
         }
+    }
+    
+    
+    /**
+     * 返回用户名下的欠款(区分历史欠款和订单欠款)
+     * @param memNo
+     * @return Integer
+     */
+    public DebtDetailVO getDebtDetailVO(String memNo) {
+        ResponseData<DebtDetailVO> responseData = null;
+        log.info("Feign 获取用户的欠款,memNo={}",memNo);
+        Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "钱包服务");
+        try{
+            Cat.logEvent(CatConstants.FEIGN_METHOD,"RemoteOldSysDebtService.getDebtDetailVO");
+            String parameter = "memNo="+memNo;
+            Cat.logEvent(CatConstants.FEIGN_PARAM,parameter);
+            responseData = debtFeignService.getDebtDetailVO(memNo);
+            ResponseCheckUtil.checkResponse(responseData);
+            t.setStatus(Transaction.SUCCESS);
+        }catch (Exception e){
+            log.error("Feign 获取用户的欠款失败,ResponseData={},memNo={}",responseData,memNo,e);
+            Cat.logError("Feign 获取用户的欠款失败",e);
+            t.setStatus(e);
+        }finally {
+            t.complete();
+        }
+        DebtDetailVO debtDetailVO = responseData.getData();
+        return debtDetailVO;
     }
 }

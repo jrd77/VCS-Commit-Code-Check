@@ -1,6 +1,8 @@
 package com.atzuche.order.coreapi.listener.sms;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.TypeReference;
 import com.atzuche.order.commons.entity.dto.OwnerGoodsDetailDTO;
 import com.atzuche.order.commons.entity.dto.OwnerMemberDTO;
 import com.atzuche.order.commons.enums.CarOwnerTypeEnum;
@@ -71,7 +73,7 @@ public class OrderActionEventListener extends OrderSendMessageManager {
         if (!NewOrderMQActionEventEnum.RENTER_ORDER_PAYSUCCESS.routingKey.equals(routeKeyName)) {
             return orderMessage;
         }
-        OrderMessage<OrderRenterPaySuccessMq> orderRenterPayMessage = JSONObject.parseObject(message.getBody(), OrderMessage.class);
+        OrderMessage<OrderRenterPaySuccessMq> orderRenterPayMessage = JSON.parseObject(new String(message.getBody()), new TypeReference<OrderMessage<OrderRenterPaySuccessMq>>(){});
         log.info("----开始处理支付租车费用事件-----");
         if (1 == orderRenterPayMessage.getMessage().getType().intValue()) {
             if (CarOwnerTypeEnum.isAuToByCode(getCarOwnerType(orderRenterPayMessage.getMessage().getOrderNo()))) {
