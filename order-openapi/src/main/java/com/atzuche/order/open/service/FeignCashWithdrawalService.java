@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import com.atzuche.order.commons.entity.dto.AccountOwnerCashExamineDTO;
 import com.atzuche.order.commons.entity.dto.SearchCashWithdrawalReqDTO;
+import com.atzuche.order.commons.vo.DebtDetailVO;
 import com.atzuche.order.commons.vo.req.AccountOwnerCashExamineReqVO;
 import com.autoyol.commons.web.ResponseData;
 
@@ -29,5 +30,5 @@ public interface FeignCashWithdrawalService {
 	 * @return ResponseData<?>
 	 */
 	@GetMapping("/debt/get")
-    public ResponseData<?> getDebtAmt(@Valid @RequestBody SearchCashWithdrawalReqDTO req);
+    public ResponseData<DebtDetailVO> getDebtAmt(@Valid @RequestBody SearchCashWithdrawalReqDTO req);
 }

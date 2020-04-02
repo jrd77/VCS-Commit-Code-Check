@@ -10,6 +10,7 @@ import com.atzuche.order.commons.BindingResultUtil;
 import com.atzuche.order.commons.ResponseCheckUtil;
 import com.atzuche.order.commons.entity.orderDetailDto.OrderDetailReqDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.OrderDetailRespDTO;
+import com.atzuche.order.commons.vo.DebtDetailVO;
 import com.atzuche.order.commons.vo.req.ModifyOrderReqVO;
 import com.atzuche.order.commons.vo.res.AdminOrderJudgeDutyResVO;
 import com.atzuche.order.open.service.FeignOrderDetailService;
@@ -187,8 +188,8 @@ public class AdminOrderController {
 
         AdminModifyOrderFeeCompareVO compareVO = adminOrderService.preModifyOrderFee(reqVO,renterNo);
         // 获取欠款
-        Integer debtAmt = adminOrderService.getDebtAmt(renterNo);
-        compareVO.setDebtAmt(debtAmt);
+        DebtDetailVO debtDetailVO = adminOrderService.getDebtAmt(renterNo);
+        compareVO.setDebtDetailVO(debtDetailVO);
         return ResponseData.success(compareVO);
 
     }
