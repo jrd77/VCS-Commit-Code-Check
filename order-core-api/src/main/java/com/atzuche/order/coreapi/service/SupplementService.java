@@ -84,7 +84,7 @@ public class SupplementService {
         	return list;
         }
 		// 获取修改前有效租客子订单信息
-		RenterOrderEntity renterOrder = renterOrderService.getRenterOrderByOrderNoAndIsEffective(orderNo);
+		RenterOrderEntity renterOrder = renterOrderService.getRenterOrderByOrderNoAndChildStatus(orderNo);
 		List<PayableVO> payableVOs = renterOrderCostCombineService.listPayableGlobalVO(orderNo,renterOrder.getRenterOrderNo(),renterOrder.getRenterMemNo());
         //应付租车费用（已经求和）
         int rentAmtAfter = cashierNoTService.sumRentOrderCost(payableVOs);
