@@ -101,6 +101,11 @@ public class RenterDeliveryAddrDTO {
      */
     private String createOp;
 
+    /**
+     * 0-正常，1-已逻辑删除
+     */
+    private Integer isDelete;
+
 
     /**
      * 相互转换
