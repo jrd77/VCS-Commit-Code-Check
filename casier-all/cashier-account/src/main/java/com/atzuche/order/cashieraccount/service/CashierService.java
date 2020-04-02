@@ -947,13 +947,6 @@ public class CashierService {
         orderRenterPay.setRenterMemNo(Integer.valueOf(vo.getMemNo()));
         OrderMessage orderMessage = OrderMessage.builder().build();
         orderMessage.setMessage(orderRenterPay);
-        //push车主租客已支付费用
-        if (1 == type) {
-            Map smsMap = SmsParamsMapUtil.getParamsMap(vo.getOrderNo(), ShortMessageTypeEnum.SELF_SUPPORT_RENT_DEPOSIT_PAID_NOTICE.getValue(),ShortMessageTypeEnum.PAY_RENT_CAR_DEPOSIT_2_OWNER.getValue(), null);
-            orderMessage.setMap(smsMap);
-            Map map = SmsParamsMapUtil.getParamsMap(vo.getOrderNo(), null, PushMessageTypeEnum.RENTER_PAY_CAR_2_OWNER.getValue(), null);
-            orderMessage.setPushMap(map);
-        }
         log.info("发送订单支付成功事件 （支付押金/违章押金成功）.mq:,message=[{}]",event,
                 GsonUtils.toJson(orderMessage));
         try {
@@ -1056,5 +1049,9 @@ public class CashierService {
         entity.setAmt(-debtRes.getRealDebtAmt());
         int id = accountOwnerCostSettleDetailNoTService.insertAccountOwnerCostSettleDetail(entity);
     }
+
+
+
+
 
 }

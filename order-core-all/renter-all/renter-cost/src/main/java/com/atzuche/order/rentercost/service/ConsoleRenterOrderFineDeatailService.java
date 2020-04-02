@@ -124,6 +124,8 @@ public class ConsoleRenterOrderFineDeatailService{
         fineEntity.setFineSubsidySourceDesc(source.getFineSubsidySourceDesc());
         fineEntity.setFineType(type.getFineType());
         fineEntity.setFineTypeDesc(type.getFineTypeDesc());
+        fineEntity.setCostCode(type.getCode());
+        fineEntity.setCostName(type.getFineTypeDesc());
         fineEntity.setMemNo(costBaseDTO.getMemNo());
         fineEntity.setOrderNo(costBaseDTO.getOrderNo());
         return fineEntity;

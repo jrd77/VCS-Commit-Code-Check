@@ -55,7 +55,9 @@ public class RenterMemberService{
     public RenterMemberDTO selectrenterMemberByRenterOrderNo(String renterOrderNo, boolean isNeedRight){
         RenterMemberDTO renterMemberDto = new RenterMemberDTO();
         RenterMemberEntity renterMemberEntity = renterMemberMapper.selectByRenterOrderNo(renterOrderNo);
-        BeanUtils.copyProperties(renterMemberEntity,renterMemberDto);
+        if(renterMemberEntity != null){
+            BeanUtils.copyProperties(renterMemberEntity,renterMemberDto);
+        }
         if(!isNeedRight){
             return renterMemberDto;
         }

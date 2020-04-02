@@ -736,7 +736,7 @@ public class CashierPayService{
 	            long secondRent = ChronoUnit.SECONDS.between(LocalDateTime.now(),reqTimeNext);
 	            log.info("secondRent=" + secondRent);
 	            
-	            if (secondRent <= 60 * 60) {//小于等于1h
+	            if (0 <= secondRent && secondRent <= 60 * 60) {//小于等于1h
 	                countdown = secondRent;
 	            }
             }
@@ -753,7 +753,7 @@ public class CashierPayService{
             if(Objects.nonNull(renterOrderEntity) && Objects.nonNull(renterOrderEntity.getExpRentTime())){
             	LocalDateTime rentTime = renterOrderEntity.getExpRentTime(); 
                 long secondRent = ChronoUnit.SECONDS.between(LocalDateTime.now(), rentTime);
-                if (secondRent <= 60 * 60) {//小于等于1h
+                if (0 <= secondRent && secondRent <= 60 * 60) {//小于等于1h
                     countdown = secondRent;
                 }
             }
@@ -768,7 +768,7 @@ public class CashierPayService{
             if(Objects.nonNull(renterOrderEntity) && Objects.nonNull(renterOrderEntity.getExpRentTime())){
             	LocalDateTime rentTime = renterOrderEntity.getExpRentTime(); 
                 long secondRent = ChronoUnit.SECONDS.between(LocalDateTime.now(), rentTime);
-                if (secondRent <= 60 * 60) {//小于等于1h
+                if (0 <= secondRent && secondRent <= 60 * 60) {//小于等于1h
                     countdown = secondRent;
                 }
             }
