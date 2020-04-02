@@ -1,5 +1,6 @@
 package com.atzuche.order.rentercost.service;
 
+import com.atzuche.order.commons.constant.OrderConstant;
 import com.atzuche.order.commons.entity.dto.CostBaseDTO;
 import com.atzuche.order.commons.enums.FineSubsidyCodeEnum;
 import com.atzuche.order.commons.enums.FineSubsidySourceCodeEnum;
@@ -63,7 +64,7 @@ public class ConsoleRenterOrderFineDeatailService{
      * @return Integer
      */
     public Integer saveConsoleRenterOrderFineDeatail(ConsoleRenterOrderFineDeatailEntity consoleFine) {
-        if(null == consoleFine) {
+        if(null == consoleFine || null == consoleFine.getFineAmount() || consoleFine.getFineAmount() == OrderConstant.ZERO) {
             logger.warn("Not fund console renter order fine data.");
             return 0;
         }
