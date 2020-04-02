@@ -110,9 +110,7 @@ public class OrderCostService {
 			log.error("实际租车费用:",e);
 			resVo.setNeedIncrementAmt(0);
 		}
-		
-		
-		
+
         //违章押金
         AccountRenterWZDepositResVO wzVo =  accountRenterWzDepositService.getAccountRenterWZDeposit(orderNo, memNo);
         com.atzuche.order.commons.vo.res.account.AccountRenterWZDepositResVO wzVoReal = new com.atzuche.order.commons.vo.res.account.AccountRenterWZDepositResVO();
@@ -136,6 +134,7 @@ public class OrderCostService {
         	RenterDepositDetailEntity entity = renterDepositDetailService.queryByOrderNo(orderNo);
         	if(entity != null) {
         		rentVoReal.setReductionAmt(entity.getReductionDepositAmt());
+                rentVoReal.setOriginalDepositAmt(entity.getOriginalDepositAmt());
         	}
         }
         
