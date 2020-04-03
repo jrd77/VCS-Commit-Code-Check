@@ -549,4 +549,13 @@ public class RenterOrderService {
     public RenterOrderEntity getRenterOrderNoByOrderNoAndFinish(String orderNo) {
         return renterOrderMapper.getRenterOrderNoByOrderNoAndFinish(orderNo);
     }
+    
+    /**
+     * 获取进行中的有效子订单
+     * @param orderNo
+     * @return RenterOrderEntity
+     */
+    public RenterOrderEntity getRenterOrderByOrderNoAndChildStatus(String orderNo) {
+    	return renterOrderMapper.getRenterOrderByOrderNoAndChildStatus(orderNo);
+    }
 }

@@ -1,5 +1,6 @@
 package com.atzuche.order.ownercost.service;
 
+import com.atzuche.order.commons.constant.OrderConstant;
 import com.atzuche.order.commons.entity.dto.CostBaseDTO;
 import com.atzuche.order.commons.enums.FineSubsidyCodeEnum;
 import com.atzuche.order.commons.enums.FineSubsidySourceCodeEnum;
@@ -31,7 +32,7 @@ public class ConsoleOwnerOrderFineDeatailService{
 
 
     public int addFineRecord(ConsoleOwnerOrderFineDeatailEntity entity) {
-        if(null == entity) {
+        if(null == entity || null == entity.getFineAmount() || entity.getFineAmount() == OrderConstant.ZERO) {
             logger.warn("Not fund console owner order fine data.");
             return 0;
         }

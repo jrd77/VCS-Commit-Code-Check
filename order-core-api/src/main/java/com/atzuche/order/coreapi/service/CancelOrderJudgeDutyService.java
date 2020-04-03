@@ -114,9 +114,9 @@ public class CancelOrderJudgeDutyService {
                             consoleOwnerOrderFineDeatailService.fineDataConvert(cancelFineAmt.getCostBaseDTO(), penalty, FineSubsidyCodeEnum.OWNER,
                                     FineSubsidySourceCodeEnum.RENTER, FineTypeEnum.CANCEL_FINE);
                     //延时退款，等待车主同意
-                    if (null != consoleOwnerOrderFineDeatailEntity) {
+                    if (null != consoleOwnerOrderFineDeatailEntity && null != consoleOwnerOrderFineDeatailEntity.getFineAmount() && consoleOwnerOrderFineDeatailEntity.getFineAmount() != OrderConstant.ZERO) {
                         consoleOwnerOrderFineDeatailEntity.setMemNo(ownerOrderEntity.getMemNo());
-                        if(!cancelOrderReqDTO.getConsoleInvoke()) {
+                        if (!cancelOrderReqDTO.getConsoleInvoke()) {
                             OrderRefundRecordEntity orderRefundRecordEntity =
                                     orderRefundRecordService.orderRefundDataConvert(cancelOrderReqDTO.getOrderNo(),
                                             renterOrderEntity.getRenterOrderNo(), ownerOrderEntity.getOwnerOrderNo(), penalty);
