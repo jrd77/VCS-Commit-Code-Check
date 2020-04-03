@@ -143,7 +143,7 @@ public class SupplementService {
 			voList.add(vo);
 		}
 		if (suppDebtAmt > 0) {
-			OrderSupplementDetailEntity entity = orderSupplementDetailService.handleConsoleData(suppRentAmt, RenterCashCodeEnum.ACCOUNT_RENTER_DEBT_COST_AGAIN, afterList.get(0).getMemNo(), orderNo);
+			OrderSupplementDetailEntity entity = orderSupplementDetailService.handleConsoleData(suppDebtAmt, RenterCashCodeEnum.ACCOUNT_RENTER_DEBT_COST_AGAIN, afterList.get(0).getMemNo(), orderNo);
 			OrderSupplementDetailVO vo = new OrderSupplementDetailVO();
 			BeanUtils.copyProperties(entity,vo);
 			voList.add(vo);
