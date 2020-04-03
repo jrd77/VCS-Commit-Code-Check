@@ -1,7 +1,10 @@
 package com.atzuche.order.coreapi.service;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 import com.atzuche.order.commons.exceptions.OrderNotFoundException;
 import com.atzuche.order.commons.vo.OrderSupplementDetailVO;
@@ -12,6 +15,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.atzuche.order.accountrenterrentcost.service.AccountRenterCostSettleService;
+import com.atzuche.order.cashieraccount.entity.CashierEntity;
+import com.atzuche.order.cashieraccount.service.CashierService;
 import com.atzuche.order.cashieraccount.service.notservice.CashierNoTService;
 import com.atzuche.order.commons.entity.dto.OrderSupplementDetailDTO;
 import com.atzuche.order.commons.enums.OrderStatusEnum;
@@ -23,6 +28,7 @@ import com.atzuche.order.parentorder.entity.OrderEntity;
 import com.atzuche.order.parentorder.entity.OrderStatusEntity;
 import com.atzuche.order.parentorder.service.OrderService;
 import com.atzuche.order.rentercost.entity.OrderSupplementDetailEntity;
+import com.atzuche.order.rentercost.entity.RenterOrderFineDeatailEntity;
 import com.atzuche.order.rentercost.entity.vo.PayableVO;
 import com.atzuche.order.rentercost.service.OrderSupplementDetailService;
 import com.atzuche.order.rentercost.service.RenterOrderCostCombineService;
@@ -45,6 +51,8 @@ public class SupplementService {
 	private AccountRenterCostSettleService accountRenterCostSettleService;
 	@Autowired
 	private RenterOrderService renterOrderService;
+	@Autowired
+	private CashierService cashierService;
 	
 	/**
 	 * 保存补付记录
@@ -84,7 +92,10 @@ public class SupplementService {
         	return list;
         }
 		// 获取修改前有效租客子订单信息
-		RenterOrderEntity renterOrder = renterOrderService.getRenterOrderByOrderNoAndIsEffective(orderNo);
+		RenterOrderEntity renterOrder = renterOrderService.getRenterOrderByOrderNoAndChildStatus(orderNo);
+		if (renterOrder == null) {
+			return list;
+		}
 		List<PayableVO> payableVOs = renterOrderCostCombineService.listPayableGlobalVO(orderNo,renterOrder.getRenterOrderNo(),renterOrder.getRenterMemNo());
         //应付租车费用（已经求和）
         int rentAmtAfter = cashierNoTService.sumRentOrderCost(payableVOs);
@@ -108,6 +119,31 @@ public class SupplementService {
 		List<OrderSupplementDetailEntity>  entityList = orderSupplementDetailService.listOrderSupplementDetailByOrderNo(orderNo);
 		List<OrderSupplementDetailVO> voList = new ArrayList<>();
 		for(OrderSupplementDetailEntity entity:entityList){
+			if (entity.getPayFlag() != null && entity.getPayFlag() == 3) {
+				// 已支付的补付记录
+				OrderSupplementDetailVO vo = new OrderSupplementDetailVO();
+				BeanUtils.copyProperties(entity,vo);
+				voList.add(vo);
+			}
+		}
+		// 获取收银记录
+		List<CashierEntity> cashierList = cashierService.getCashierRentCostsByOrderNo(orderNo);
+		if (cashierList == null || cashierList.isEmpty()) {
+			return voList;
+		}
+		// 根据payMd5去重
+		List<CashierEntity> afterList = cashierList.stream().collect(Collectors.collectingAndThen(Collectors.toCollection(
+                () -> new TreeSet<>(Comparator.comparing(CashierEntity::getPayMd5))), ArrayList::new));
+		int suppRentAmt = afterList.stream().filter(cash -> {return "12".equals(cash.getPayKind());}).mapToInt(CashierEntity::getPayAmt).sum();
+		int suppDebtAmt = afterList.stream().filter(cash -> {return "07".equals(cash.getPayKind());}).mapToInt(CashierEntity::getPayAmt).sum();
+		if (suppRentAmt > 0) {
+			OrderSupplementDetailEntity entity = orderSupplementDetailService.handleConsoleData(suppRentAmt, RenterCashCodeEnum.ACCOUNT_RENTER_RENT_COST_AFTER, afterList.get(0).getMemNo(), orderNo);
+			OrderSupplementDetailVO vo = new OrderSupplementDetailVO();
+			BeanUtils.copyProperties(entity,vo);
+			voList.add(vo);
+		}
+		if (suppDebtAmt > 0) {
+			OrderSupplementDetailEntity entity = orderSupplementDetailService.handleConsoleData(suppDebtAmt, RenterCashCodeEnum.ACCOUNT_RENTER_DEBT_COST_AGAIN, afterList.get(0).getMemNo(), orderNo);
 			OrderSupplementDetailVO vo = new OrderSupplementDetailVO();
 			BeanUtils.copyProperties(entity,vo);
 			voList.add(vo);
