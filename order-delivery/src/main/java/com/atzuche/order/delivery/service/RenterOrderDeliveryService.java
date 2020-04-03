@@ -62,6 +62,16 @@ public class RenterOrderDeliveryService {
     }
 
     /**
+     * 根据子订单号获取配送订单地址信息
+     * @param orderNo
+     * @return
+     */
+    public RenterDeliveryAddrEntity selectAddrByOrderNo(String orderNo) {
+        RenterDeliveryAddrEntity renterDeliveryAddrEntity = renterDeliveryAddrMapper.selectByOrderNo(orderNo);
+        return renterDeliveryAddrEntity;
+    }
+
+    /**
      * 新增配送订单信息
      * @param renterOrderDeliveryEntity
      */

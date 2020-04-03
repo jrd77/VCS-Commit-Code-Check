@@ -24,4 +24,6 @@ public interface RenterDeliveryAddrMapper{
 
     RenterDeliveryAddrEntity selectByRenterOrderNo(String renterOrderNo);
 
+    RenterDeliveryAddrEntity selectByOrderNo(String orderNo);
+
 }
