@@ -533,7 +533,7 @@ public class OrderDetailService {
             BeanUtils.copyProperties(renterOrderDeliveryReturn,renterOrderDeliveryReturnDto);
         }
         //配送地址表
-        RenterDeliveryAddrEntity renterDeliveryAddrEntity = renterOrderDeliveryService.selectAddrByRenterOrderNo(renterOrderNo);
+        RenterDeliveryAddrEntity renterDeliveryAddrEntity = renterOrderDeliveryService.selectAddrByOrderNo(orderNo);
         RenterDeliveryAddrDTO renterDeliveryAddrDTO = null;
         if(renterDeliveryAddrEntity != null){
             renterDeliveryAddrDTO = new RenterDeliveryAddrDTO();
