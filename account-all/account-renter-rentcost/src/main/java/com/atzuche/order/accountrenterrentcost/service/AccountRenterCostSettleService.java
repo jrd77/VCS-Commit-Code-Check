@@ -1,14 +1,12 @@
 package com.atzuche.order.accountrenterrentcost.service;
 
 import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostDetailEntity;
-import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostSettleDetailEntity;
 import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostSettleEntity;
 import com.atzuche.order.accountrenterrentcost.exception.AccountRenterRentCostRefundException;
 import com.atzuche.order.accountrenterrentcost.mapper.AccountRenterCostSettleMapper;
 import com.atzuche.order.accountrenterrentcost.service.notservice.AccountRenterCostDetailNoTService;
 import com.atzuche.order.accountrenterrentcost.service.notservice.AccountRenterCostSettleDetailNoTService;
 import com.atzuche.order.accountrenterrentcost.service.notservice.AccountRenterCostSettleNoTService;
-import com.atzuche.order.accountrenterrentcost.vo.req.AccountRenterCostChangeReqVO;
 import com.atzuche.order.accountrenterrentcost.vo.req.AccountRenterCostDetailReqVO;
 import com.atzuche.order.accountrenterrentcost.vo.req.AccountRenterCostReqVO;
 import com.atzuche.order.accountrenterrentcost.vo.req.AccountRenterCostToFineReqVO;
@@ -16,7 +14,7 @@ import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.commons.enums.cashier.PaySourceEnum;
 import com.atzuche.order.commons.enums.cashier.PayTypeEnum;
 import com.autoyol.commons.web.ErrorCode;
-import org.springframework.beans.BeanUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
@@ -30,12 +28,13 @@ import java.util.Objects;
  * @author ZhangBin
  * @date 2019-12-13 16:49:57
  */
+@Slf4j
 @Service
 public class AccountRenterCostSettleService{
     @Autowired private AccountRenterCostSettleNoTService accountRenterCostSettleNoTService;
     @Autowired private AccountRenterCostDetailNoTService accountRenterCostDetailNoTService;
     @Autowired private AccountRenterCostSettleMapper accountRenterCostSettleMapper;
-    
+    @Autowired private AccountRenterCostSettleDetailNoTService accountRenterCostSettleDetailNoTService;
     /**
      * 查询订单 已付租车费用
      */
@@ -71,10 +70,25 @@ public class AccountRenterCostSettleService{
        if(Objects.isNull(accountRenterCostSettle)){
             throw new AccountRenterRentCostRefundException();
        }
-       //2 更新已退还金额
+       //2.1 更新已退还金额
         accountRenterCostSettleNoTService.refundRenterCostSettle(accountRenterCostSettle,accountRenterCostDetail.getAmt());
-       //3 记录退款费用记录
-       return accountRenterCostDetailNoTService.insertAccountRenterCostDetail(accountRenterCostDetail);
+       /*//2.2 记录结算明细记录
+        AccountRenterCostSettleDetailEntity accountRenterCostSettleDetailEntity = new AccountRenterCostSettleDetailEntity();
+        accountRenterCostSettleDetailEntity.setOrderNo(accountRenterCostDetail.getOrderNo());
+        accountRenterCostSettleDetailEntity.setRenterOrderNo(null);
+        accountRenterCostSettleDetailEntity.setMemNo(accountRenterCostDetail.getMemNo());
+        accountRenterCostSettleDetailEntity.setAmt(accountRenterCostDetail.getAmt());
+        accountRenterCostSettleDetailEntity.setCostCode(accountRenterCostDetail.getPaySourceCode());
+        accountRenterCostSettleDetailEntity.setUniqueNo(String.valueOf(accountRenterCostSettle.getId()));
+        accountRenterCostSettleDetailEntity.setType(null);
+        int settleDetail = accountRenterCostSettleDetailNoTService.insertAccountRenterCostSettleDetail(accountRenterCostSettleDetailEntity);
+        log.info("结算明细记录accountRenterCostSettleDetailEntity={}", JSON.toJSONString(accountRenterCostSettleDetailEntity));*/
+        //3 记录退款费用记录
+        accountRenterCostDetail.setPaySourceCode(accountRenterCostDetail.getPaySource());
+        accountRenterCostDetail.setPaySource(PaySourceEnum.getFlagText(accountRenterCostDetail.getPaySource()));
+        int renterCostDetail = accountRenterCostDetailNoTService.insertAccountRenterCostDetail(accountRenterCostDetail);
+
+        return renterCostDetail;
     }
 
     public List<AccountRenterCostDetailEntity> getAccountRenterCostDetailsByOrderNo(String orderNo){

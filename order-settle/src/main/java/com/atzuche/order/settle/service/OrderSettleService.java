@@ -1,5 +1,6 @@
 package com.atzuche.order.settle.service;
 
+import com.alibaba.fastjson.JSON;
 import com.atzuche.order.accountownercost.entity.AccountOwnerCostSettleDetailEntity;
 import com.atzuche.order.accountrenterdeposit.vo.res.AccountRenterDepositResVO;
 import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostDetailEntity;
@@ -374,6 +375,7 @@ public class OrderSettleService{
      **/
     @Transactional(rollbackFor=Exception.class)
     public void orderCancelSettleCombination(CancelOrderReqDTO cancelOrderReqDTO){
+        log.info("订单取消结算cancelOrderReqDTO={}", JSON.toJSONString(cancelOrderReqDTO));
         String orderNo = cancelOrderReqDTO.getOrderNo();
         String ownerOrderNo = cancelOrderReqDTO.getOwnerOrderNo();
         String renterOrderNo = cancelOrderReqDTO.getRenterOrderNo();
@@ -391,10 +393,10 @@ public class OrderSettleService{
         }
         if(cancelOrderReqDTO.isSettleRenterFlg()){
             OrderStatusEntity orderStatusEntity = orderStatusService.getByOrderNo(orderNo);
-            if(orderStatusEntity != null && SettleStatusEnum.SETTLED.getCode().equals(orderStatusEntity.getSettleStatus())){
+            /*if(orderStatusEntity != null && SettleStatusEnum.SETTLED.getCode().equals(orderStatusEntity.getSettleStatus())){
                 log.info("订单已经结算过orderNo={}",orderNo);
                 return;
-            }
+            }*/
             ownerOrderSettleService.settleOwnerOrderCancel(orderNo,ownerOrderNo);
             renterOrderSettleService.settleRenterOrderCancel(orderNo,renterOrderNo);
         }else{
