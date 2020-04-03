@@ -102,7 +102,7 @@ public class HandoverCarInfoService {
             renterHandoverCarService.updateHandoverCarOilMileageNum(handoverCarInfoReqDTO);
             //获取是否是取还车单子
             RenterOrderDeliveryEntity renterOrderDeliveryEntity = renterOrderDeliveryMapper.findRenterOrderByrOrderNo(handoverCarInfoReqDTO.getOrderNo(), 1);
-            if (Objects.nonNull(renterOrderDeliveryEntity) && renterOrderDeliveryEntity.getIsNotifyRenyun().intValue() == 1) {
+            if (Objects.nonNull(renterOrderDeliveryEntity) && renterOrderDeliveryEntity.getIsNotifyRenyun().intValue() == 0) {
                 HandoverCarInfoReqDTO ownerHandoverCarInfoReqDTO = handoverCarInfoReqDTO;
                 //更新车主交接车相关信息
                 ownerHandoverCarService.updateHandoverCarOilMileageNum(ownerHandoverCarInfoReqDTO);
@@ -116,7 +116,7 @@ public class HandoverCarInfoService {
             ownerHandoverCarService.updateHandoverCarOilMileageNum(handoverCarInfoReqDTO);
             //获取是否是取还车单子
             RenterOrderDeliveryEntity renterOrderDeliveryEntity = renterOrderDeliveryMapper.findRenterOrderByrOrderNo(handoverCarInfoReqDTO.getOrderNo(), 1);
-            if (Objects.nonNull(renterOrderDeliveryEntity) && renterOrderDeliveryEntity.getIsNotifyRenyun().intValue() == 1) {
+            if (Objects.nonNull(renterOrderDeliveryEntity) && renterOrderDeliveryEntity.getIsNotifyRenyun().intValue() == 0) {
                 HandoverCarInfoReqDTO renterHandoverCarInfoReqDTO = handoverCarInfoReqDTO;
                 //更新租客交接车相关信息
                 renterHandoverCarService.updateHandoverCarOilMileageNum(renterHandoverCarInfoReqDTO);
