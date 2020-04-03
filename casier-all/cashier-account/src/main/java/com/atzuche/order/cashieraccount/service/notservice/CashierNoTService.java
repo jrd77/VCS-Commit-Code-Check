@@ -778,12 +778,6 @@ public class CashierNoTService {
         orderSettlementMq.setOrderNo(orderNo);
         OrderMessage orderMessage = OrderMessage.builder().build();
         orderMessage.setMessage(orderSettlementMq);
-        if (DataPayKindConstant.RENT.equals(notifyDataVo.getPayKind())) {
-            Map paramsMap = Maps.newHashMap();
-            paramsMap.put("RentCarDeposit", notifyDataVo.getRefundAmt());
-            Map map = SmsParamsMapUtil.getParamsMap(notifyDataVo.getOrderNo(), ShortMessageTypeEnum.REFUND_COST_SUCCESS_2_RENTER.getValue(), null, paramsMap);
-            orderMessage.setMap(map);
-        }
         baseProducer.sendTopicMessage(NewOrderMQActionEventEnum.ORDER_REFUND_SUCCESS.exchange,NewOrderMQActionEventEnum.ORDER_REFUND_SUCCESS.routingKey,orderMessage);
     }
     /**
