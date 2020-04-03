@@ -37,6 +37,10 @@ public class AccountRenterWzDepositCostEntity implements Serializable {
 	 */
 	private Integer shifuAmt;
 	/**
+	 * 应扣违章费用
+	 */
+	private Integer yingkouAmt;
+	/**
 	 * 违章欠款金额
 	 */
 	private Integer debtAmt;

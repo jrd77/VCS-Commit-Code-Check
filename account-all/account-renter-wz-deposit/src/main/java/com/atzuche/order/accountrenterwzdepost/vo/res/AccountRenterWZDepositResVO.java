@@ -74,6 +74,27 @@ public class AccountRenterWZDepositResVO {
      * 枚举类型 SettleStatusEnum
      */
     private Integer settleStatus;
+    
+    /**
+     * 预授权金额
+     */
+    private Integer authorizeDepositAmt;
+    /**
+     * 信用支付金额
+     */
+    private Integer creditPayAmt;
+    /**
+     * 剩余押金总额
+     */
+    private Integer surplusDepositAmt;
+    /**
+     * 剩余预授权金额
+     */
+    private Integer surplusAuthorizeDepositAmt;
+    /**
+     * 剩余信用支付金额
+     */
+    private Integer surplusCreditPayAmt;
 
 
 }
