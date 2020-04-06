@@ -23,6 +23,7 @@
         <result property="updateTime" column="update_time"/>
         <result property="updateOp" column="update_op"/>
         <result property="isDelete" column="is_delete"/>
+        <result property="yingkouAmt" column="yingkou_amt"/>
     </resultMap>
 
 
@@ -45,7 +46,8 @@
 	`create_op`, 	
 	`update_time`, 	
 	`update_op`, 	
-	`is_delete`	
+	`is_delete`,
+	yingkou_amt	
 
 	</sql>
 

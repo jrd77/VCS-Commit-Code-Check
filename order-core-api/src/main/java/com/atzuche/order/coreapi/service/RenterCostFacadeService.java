@@ -317,11 +317,11 @@ public class RenterCostFacadeService {
         rentCarCostDTO.rentAmtSubsidy =  renterSubsidyDetail.getOwner2RenterRentSubsidyAmt();
         //1.5、统计
         CostStatisticsDTO rentCarCostStatics = new CostStatisticsDTO();
-        rentCarCostStatics.shouldReceiveAmt = renterCostVO.getRenterCostYingshou();
-        rentCarCostStatics.realReceiveAmt = renterCostVO.getRenterCostShishou();
-        rentCarCostStatics.shouldRetreatAmt = renterCostVO.getRenterCost();
+        rentCarCostStatics.shouldReceiveAmt = renterCostVO.getRenterCostFeeYingshou();
+        rentCarCostStatics.realReceiveAmt = renterCostVO.getRenterCostFeeShishou();
+        rentCarCostStatics.shouldRetreatAmt = renterCostVO.getRenterCostFeeYingtui();
         rentCarCostStatics.shouldDeductionAmt = rentAmtShouldDeductionAmt(rentCarCostStatics);
-        rentCarCostStatics.realRetreatAmt = renterCostVO.getRenterCostReal();
+        rentCarCostStatics.realRetreatAmt = renterCostVO.getRenterCostFeeShitui();
         rentCarCostStatics.realDeductionAmt = 0;
         rentCarCostDTO.costStatisticsDTO = rentCarCostStatics;
 
@@ -336,12 +336,12 @@ public class RenterCostFacadeService {
         carDepositDTO.DeductionRentHistoricalAmt = AccountSettleUtils.getDepositSettleDeductionDebtAmt(accountRenterCostSettleDetailList,RenterCashCodeEnum.SETTLE_DEPOSIT_TO_HISTORY_AMT);
         //2.2、统计
         CostStatisticsDTO carDepositStatisticsDTO = new CostStatisticsDTO();
-        carDepositStatisticsDTO.shouldReceiveAmt = renterCostVO.getDepositCostYingfu();
-        carDepositStatisticsDTO.realReceiveAmt = renterCostVO.getDepositCostShifu();
+        carDepositStatisticsDTO.shouldReceiveAmt = renterCostVO.getDepositCostYingshou();
+        carDepositStatisticsDTO.realReceiveAmt = renterCostVO.getDepositCostShishou();
         carDepositStatisticsDTO.freeAmt = getCarDepositFreeAmt(orderNo);
-        carDepositStatisticsDTO.shouldRetreatAmt = renterCostVO.getDepositCost();
+        carDepositStatisticsDTO.shouldRetreatAmt = renterCostVO.getDepositCostYingtui();
         //carDepositStatisticsDTO.shouldDeductionAmt = 0;
-        carDepositStatisticsDTO.realRetreatAmt = renterCostVO.getDepositCostReal();
+        carDepositStatisticsDTO.realRetreatAmt = renterCostVO.getDepositCostShitui();
         //carDepositStatisticsDTO.realDeductionAmt = 0;
         carDepositDTO.costStatisticsDTO = carDepositStatisticsDTO;
 
@@ -351,7 +351,7 @@ public class RenterCostFacadeService {
         RenterWzCostVO wzCostVO = wzCostFacadeService.getRenterWzCostDetail(orderNo);
         WzDepositDTO wzDepositDTO = new WzDepositDTO();
         //3.1、基础费用
-        wzDepositDTO.wzDepositAmt = renterCostVO.getDepositWzCostYingFu();//abs(wzDepositDetailVO.getYingshouDeposit());
+        wzDepositDTO.wzDepositAmt = renterCostVO.getDepositWzCostYingshou();//abs(wzDepositDetailVO.getYingshouDeposit());
         wzDepositDTO.wzFineAmt = wzCostVO.getWzFineAmt();
         wzDepositDTO.wzServiceCostAmt = wzCostVO.getWzServiceCostAmt();
         wzDepositDTO.wzDysFineAmt = wzCostVO.getWzDysFineAmt();
@@ -362,11 +362,11 @@ public class RenterCostFacadeService {
         wzDepositDTO.deductionRentHistoricalAmt = AccountSettleUtils.getDepositSettleDeductionDebtAmt(accountRenterCostSettleDetailList,RenterCashCodeEnum.SETTLE_WZ_TO_HISTORY_AMT);
         //3.2、统计
         CostStatisticsDTO wzCostStatisticsDTO = new CostStatisticsDTO();
-        wzCostStatisticsDTO.shouldReceiveAmt = renterCostVO.getDepositWzCostYingFu(); //wzDepositDetailVO.getYingshouDeposit();
+        wzCostStatisticsDTO.shouldReceiveAmt = renterCostVO.getDepositWzCostYingshou(); //wzDepositDetailVO.getYingshouDeposit();
         wzCostStatisticsDTO.freeAmt = getWzDepositFreeAmt(orderNo);
-        wzCostStatisticsDTO.realReceiveAmt = renterCostVO.getDepositWzCostShifu();  //wzDepositDetailVO.getShishouDeposit();
-        wzCostStatisticsDTO.shouldRetreatAmt = renterCostVO.getDepositWzCost();     //abs(wzDepositDetailVO.getShouldReturnDeposit());
-        wzCostStatisticsDTO.realRetreatAmt = renterCostVO.getDepositWzCostReal();   //wzDepositDetailVO.getRealReturnDeposit();
+        wzCostStatisticsDTO.realReceiveAmt = renterCostVO.getDepositWzCostShishou();  //wzDepositDetailVO.getShishouDeposit();
+        wzCostStatisticsDTO.shouldRetreatAmt = renterCostVO.getDepositWzCostYingtui();     //abs(wzDepositDetailVO.getShouldReturnDeposit());
+        wzCostStatisticsDTO.realRetreatAmt = renterCostVO.getDepositWzCostShitui();   //wzDepositDetailVO.getRealReturnDeposit();
         wzDepositDTO.costStatisticsDTO = wzCostStatisticsDTO;
 
 
@@ -374,7 +374,7 @@ public class RenterCostFacadeService {
         int needIncrementAmt = cashierPayService.getRentCostBufuNew(orderNo, memNo);
         SettleMakeUpDTO settleMakeUpDTO = new SettleMakeUpDTO();
         settleMakeUpDTO.shouldReveiveAmt = Math.abs(needIncrementAmt);
-        settleMakeUpDTO.realReveiveAmt = renterCostVO.getRenterCostBufuShifu();
+        settleMakeUpDTO.realReveiveAmt = renterCostVO.getRenterCostBufuShishou();
 
         //预计抵扣的租车费用/应扣/实扣
         DeductionRentAmtDTO deductionRentAmtDTO = deductionCarDdeposit(rentCarCostStatics, carDepositStatisticsDTO.realReceiveAmt, wzCostStatisticsDTO.realReceiveAmt);

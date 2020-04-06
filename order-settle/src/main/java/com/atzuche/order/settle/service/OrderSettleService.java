@@ -1,15 +1,27 @@
 package com.atzuche.order.settle.service;
 
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Objects;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
+
 import com.alibaba.fastjson.JSON;
 import com.atzuche.order.accountownercost.entity.AccountOwnerCostSettleDetailEntity;
 import com.atzuche.order.accountrenterdeposit.vo.res.AccountRenterDepositResVO;
-import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostDetailEntity;
 import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostSettleDetailEntity;
+import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostSettleEntity;
+import com.atzuche.order.accountrenterrentcost.service.AccountRenterCostSettleService;
+import com.atzuche.order.accountrenterwzdepost.entity.AccountRenterWzDepositCostEntity;
+import com.atzuche.order.accountrenterwzdepost.service.notservice.AccountRenterWzDepositCostNoTService;
 import com.atzuche.order.accountrenterwzdepost.vo.res.AccountRenterWZDepositResVO;
 import com.atzuche.order.cashieraccount.entity.CashierRefundApplyEntity;
-import com.atzuche.order.cashieraccount.service.CashierQueryService;
 import com.atzuche.order.cashieraccount.service.CashierService;
-import com.atzuche.order.cashieraccount.service.CashierSettleService;
 import com.atzuche.order.cashieraccount.service.notservice.CashierRefundApplyNoTService;
 import com.atzuche.order.commons.CatConstants;
 import com.atzuche.order.commons.constant.OrderConstant;
@@ -20,27 +32,23 @@ import com.atzuche.order.parentorder.entity.OrderStatusEntity;
 import com.atzuche.order.parentorder.service.OrderStatusService;
 import com.atzuche.order.rentercost.entity.OrderSupplementDetailEntity;
 import com.atzuche.order.rentercost.service.OrderSupplementDetailService;
-import com.atzuche.order.renterorder.service.RenterOrderService;
 import com.atzuche.order.settle.exception.CancelOrderSettleParamException;
 import com.atzuche.order.settle.exception.OrderSettleFlatAccountException;
 import com.atzuche.order.settle.service.notservice.OrderOwnerSettleNoTService;
 import com.atzuche.order.settle.service.notservice.OrderSettleNoTService;
-import com.atzuche.order.settle.vo.req.*;
+import com.atzuche.order.settle.vo.req.CancelOrderReqDTO;
+import com.atzuche.order.settle.vo.req.OwnerCosts;
+import com.atzuche.order.settle.vo.req.RentCosts;
+import com.atzuche.order.settle.vo.req.SettleCancelOrdersAccount;
+import com.atzuche.order.settle.vo.req.SettleOrders;
+import com.atzuche.order.settle.vo.req.SettleOrdersDefinition;
 import com.atzuche.order.settle.vo.res.RenterCostVO;
 import com.autoyol.autopay.gateway.constant.DataPayKindConstant;
 import com.autoyol.commons.utils.GsonUtils;
 import com.dianping.cat.Cat;
 import com.dianping.cat.message.Transaction;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
 
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Objects;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * 车辆结算
@@ -53,11 +61,11 @@ public class OrderSettleService{
     @Autowired private OrderSettleNoTService orderSettleNoTService;
     @Autowired private CashierService cashierService;
     @Autowired private OrderSettleNewService orderSettleNewService;
-    @Autowired private RenterOrderService renterOrderService;
-    @Autowired private CashierSettleService cashierSettleService;
+//    @Autowired private RenterOrderService renterOrderService;
+//    @Autowired private CashierSettleService cashierSettleService;
     @Autowired private CashierRefundApplyNoTService cashierRefundApplyNoTService;
 //    @Autowired private CashierPayService cashierPayService;
-    @Autowired private CashierQueryService cashierQueryService;
+//    @Autowired private CashierQueryService cashierQueryService;
     @Autowired private OrderSupplementDetailService orderSupplementDetailService;
     @Autowired private OwnerOrderSettleService ownerOrderSettleService;
     @Autowired private RenterOrderSettleService renterOrderSettleService;
@@ -65,28 +73,117 @@ public class OrderSettleService{
     private OrderOwnerSettleNoTService orderOwnerSettleNoTService;
     @Autowired
     private RemoteOldSysDebtService remoteOldSysDebtService;
+    @Autowired
+    private AccountRenterCostSettleService accountRenterCostSettleService;
+    @Autowired
+    private AccountRenterWzDepositCostNoTService accountRenterWzDepositCostNoTService;
     
     /**
      * 查询所以费用
      */
-    public RenterCostVO getRenterCostByOrderNo(String orderNo,String renterOrderNo,String renterNo,int yingfuAmt){
+    public RenterCostVO getRenterCostByOrderNo(String orderNo,String renterOrderNo,String renterNo,int renterCostAmtFinalForYingshou){
 //        RenterOrderEntity renterOrder = renterOrderService.getRenterOrderByOrderNoAndIsEffective(orderNo);
 //        Assert.notNull(renterOrder,"订单信息不存在");
 //        Assert.notNull(renterOrder.getRenterOrderNo(),"订单信息不存在");
 
         RenterCostVO vo = new RenterCostVO();
         vo.setOrderNo(orderNo);
-        AccountRenterDepositResVO accountRenterDepositResVO = cashierService.getRenterDepositEntity(orderNo,renterNo);
-        int rentWzDepositAmt = cashierSettleService.getSurplusWZDepositCostAmt(orderNo,renterNo);
-        AccountRenterWZDepositResVO accountRenterWZDeposit = cashierService.getRenterWZDepositEntity(orderNo,renterNo);
+        
+     // 实付 租车费用
+//      int renterCostAmtEd = cashierQueryService.getRenterCost(orderNo,renterNo);
+	  	AccountRenterCostSettleEntity accountRenterCostSettleEntity = accountRenterCostSettleService.selectByOrderNo(orderNo,renterNo);
+	  	int feeShishouOri = 0;
+	  	int feeYingkouOri = 0;
+	  	int feeYingtui = 0;
+	  	//renterCostAmtFinalForYingshou  yingshou
+	  	
+	  	//非空处理
+	  	if(accountRenterCostSettleEntity != null) {
+	  		feeShishouOri = accountRenterCostSettleEntity.getShifuAmt();
+	  		feeYingkouOri = accountRenterCostSettleEntity.getYingkouAmt();
+	  	}
+	  	//实收(必定是消费，无免押预授权的情况。)
+	      int feeShishou = Math.abs(feeShishouOri);
+	      //应扣
+	      int feeYingkou = Math.abs(feeYingkouOri);
+	      //计算应退
+	      if(feeShishou >= feeYingkou) {
+	      	feeYingtui = feeShishou - feeYingkou;
+	      }
+	      //应收
+	      vo.setRenterCostFeeYingshou(Math.abs(renterCostAmtFinalForYingshou));
+	      vo.setRenterCostFeeShishou(feeShishou);
+	      vo.setRenterCostFeeYingtui(feeYingtui);
+	      vo.setRenterCostFeeYingkou(feeYingkou);
+      
+      
         //车辆押金
-        vo.setDepositCost(Math.abs(accountRenterDepositResVO.getSurplusDepositAmt()));
-        vo.setDepositCostShifu(Math.abs(accountRenterDepositResVO.getShifuDepositAmt()));
-        vo.setDepositCostYingfu(Math.abs(accountRenterDepositResVO.getYingfuDepositAmt()));
+        AccountRenterDepositResVO accountRenterDepositResVO = cashierService.getRenterDepositEntity(orderNo,renterNo);
+//        vo.setDepositCost(Math.abs(accountRenterDepositResVO.getSurplusDepositAmt()));
+        int depositShishouOri = 0;
+        int depositYingshouOri = 0;
+        
+        int depositYingkouOri = 0; //应扣
+        int depositYingtuiOri = 0;
+        int depositShishouAuthOri = 0;
+        
+        if(accountRenterDepositResVO != null) {
+        	depositShishouOri = Math.abs(accountRenterDepositResVO.getShifuDepositAmt());
+        	depositYingshouOri = Math.abs(accountRenterDepositResVO.getYingfuDepositAmt());
+        	if(accountRenterDepositResVO.getIsAuthorize() != null && accountRenterDepositResVO.getIsAuthorize() == 1) {
+        		depositShishouAuthOri = Math.abs(accountRenterDepositResVO.getAuthorizeDepositAmt());
+        	}
+        }
+        //应扣取值
+        if(feeYingkouOri > feeShishou) {
+        	//费用不够的情况下从租车押金中扣除。
+        	depositYingkouOri = feeYingkouOri - feeShishou;
+        }
+        
+        //计算应退
+        if(depositShishouOri >= depositYingkouOri) {
+        	depositYingtuiOri = depositShishouOri - depositYingkouOri;
+        }
+        vo.setDepositCostShishou(depositShishouOri);
+        vo.setDepositCostYingshou(depositYingshouOri);
+        vo.setDepositCostYingkou(depositYingkouOri);
+        vo.setDepositCostYingtui(depositYingtuiOri);
+        vo.setDepositCostShishouAuth(depositShishouAuthOri);
+        
+        
         //违章押金
-        vo.setDepositWzCost(Math.abs(rentWzDepositAmt));
-        vo.setDepositWzCostShifu(Math.abs(accountRenterWZDeposit.getShishouDeposit()));
-        vo.setDepositWzCostYingFu(Math.abs(accountRenterWZDeposit.getYingshouDeposit()));
+//        int rentWzDepositAmt = cashierSettleService.getSurplusWZDepositCostAmt(orderNo,renterNo);
+        AccountRenterWZDepositResVO accountRenterWZDeposit = cashierService.getRenterWZDepositEntity(orderNo,renterNo);
+//        vo.setDepositWzCost(Math.abs(rentWzDepositAmt));
+        int wzShishouOri = 0;  //收银台落库的时候，做处理。
+        int wzYingshouOri = 0;
+        int wzYingkouOri = 0; //应扣
+        int wzYingtuiOri = 0;
+        int wzShishouAuthOri = 0;
+        if(accountRenterWZDeposit != null) {
+        	wzShishouOri = Math.abs(accountRenterWZDeposit.getShishouDeposit());
+        	wzYingshouOri = Math.abs(accountRenterWZDeposit.getYingshouDeposit());
+        	if(accountRenterWZDeposit.getIsAuthorize() != null && accountRenterWZDeposit.getIsAuthorize() == 1) {
+        		wzShishouAuthOri = Math.abs(accountRenterWZDeposit.getAuthorizeDepositAmt());
+        	}
+        }
+        //应扣
+        AccountRenterWzDepositCostEntity wzEntity = accountRenterWzDepositCostNoTService.queryWzDeposit(orderNo,renterNo);
+        if(wzEntity != null) {
+        	wzYingkouOri = wzEntity.getYingkouAmt();
+        }
+        //计算应退
+        if(wzShishouOri >= wzYingkouOri) {
+        	wzYingtuiOri = wzShishouOri - wzYingkouOri;
+        }
+        vo.setDepositWzCostShishou(wzShishouOri);
+        vo.setDepositWzCostYingshou(wzYingshouOri);
+        vo.setDepositWzCostYingkou(wzYingkouOri);
+        vo.setDepositWzCostYingtui(wzYingtuiOri);
+        //预授权
+        vo.setDepositWzCostShishouAuth(wzShishouAuthOri);
+        
+        
         
         //避免重复调用。200306
 //        RentCosts rentCosts = preRenterSettleOrder(orderNo, renterOrderNo);
@@ -98,55 +195,130 @@ public class OrderSettleService{
         	//代码重构 200309 huangjing
 //        	int yingfuAmt = rentCosts.getRenterCostAmtFinal();
         	
-            List<AccountRenterCostDetailEntity> renterCostDetails = cashierQueryService.getRenterCostDetails(orderNo);
-            // 实付
-            int renterCostAmtEd = cashierQueryService.getRenterCost(orderNo,renterNo);
-            if(!CollectionUtils.isEmpty(renterCostDetails)){
+            
+            
+            
+//            int renterCost = yingfuAmt + renterCostAmtEd;
+//            vo.setRenterCost(renterCost>0?renterCost:0);
+            
+            
+            //统计补付
+//            List<AccountRenterCostDetailEntity> renterCostDetails = cashierQueryService.getRenterCostDetails(orderNo);
+//            if(!CollectionUtils.isEmpty(renterCostDetails)){
+            
+            //补付
                 List<OrderSupplementDetailEntity> orderSupplementDetails = orderSupplementDetailService.listOrderSupplementDetailByOrderNo(orderNo);
                 if(!CollectionUtils.isEmpty(orderSupplementDetails)){
-                    int renterCostBufuShifu = orderSupplementDetails.stream().filter(obj ->{
+                    int renterCostBufuShishou = orderSupplementDetails.stream().filter(obj ->{
                         return Objects.nonNull(obj.getOpStatus()) && obj.getOpStatus()==1&&
-                                Objects.nonNull(obj.getCashType()) && obj.getCashType()==1&&
+//                                Objects.nonNull(obj.getCashType()) && obj.getCashType()==1&&
                                 Objects.nonNull(obj.getPayFlag()) && obj.getPayFlag()==3
                                 ;
                     }).mapToInt(OrderSupplementDetailEntity::getAmt).sum();
+                    
                     int renterCostBufuYingfu = orderSupplementDetails.stream().filter(obj ->{
                         return Objects.nonNull(obj.getOpStatus()) && obj.getOpStatus()==1&&
                                 Objects.nonNull(obj.getCashType()) && obj.getCashType()==1&&
-                                Objects.nonNull(obj.getPayFlag()) && obj.getPayFlag()==1&&
-                                Objects.nonNull(obj.getPayFlag()) && obj.getPayFlag()==2&&
-                                Objects.nonNull(obj.getPayFlag()) && obj.getPayFlag()==3&&
-                                Objects.nonNull(obj.getPayFlag()) && obj.getPayFlag()==4&&
-                                Objects.nonNull(obj.getPayFlag()) && obj.getPayFlag()==5
+                                Objects.nonNull(obj.getPayFlag()) && obj.getPayFlag()==1 &&
+                                Objects.nonNull(obj.getPayFlag()) && obj.getPayFlag()==0 &&
+//                                Objects.nonNull(obj.getPayFlag()) && obj.getPayFlag()==3&&
+                                Objects.nonNull(obj.getPayFlag()) && obj.getPayFlag()==4 &&
+                                Objects.nonNull(obj.getPayFlag()) && obj.getPayFlag()==5 
                                 ;
                     }).mapToInt(OrderSupplementDetailEntity::getAmt).sum();
-                    vo.setRenterCostBufu(renterCostBufuYingfu);
-                    vo.setRenterCostShishou(renterCostBufuShifu);
+                    
+                    vo.setRenterCostBufuYingshou(renterCostBufuYingfu);
+                    vo.setRenterCostBufuShishou(renterCostBufuShishou);
                 }
-            }
-            vo.setRenterCostYingshou(Math.abs(yingfuAmt));
-            vo.setRenterCostShishou(Math.abs(renterCostAmtEd));
-            int renterCost = yingfuAmt + renterCostAmtEd;
-            vo.setRenterCost(renterCost>0?renterCost:0);
+//            }
+            
 //        }
             
+        //===================================== 退款部分 yingtui shitui  =====================================
         List<CashierRefundApplyEntity> cashierRefundApplys = cashierRefundApplyNoTService.getRefundApplyByOrderNo(orderNo);
         if(!CollectionUtils.isEmpty(cashierRefundApplys)){
            // 获取实退 租车费用
-            int renterCostReal =  cashierRefundApplys.stream().filter(obj ->{
-                return DataPayKindConstant.RENT_AMOUNT.equals(obj.getPayKind()) || DataPayKindConstant.RENT_INCREMENT.equals(obj.getPayKind());
-            }).mapToInt(CashierRefundApplyEntity::getAmt).sum();
-            vo.setRenterCostReal(renterCostReal);
+//            int renterCostReal =  cashierRefundApplys.stream().filter(obj ->{
+//                return DataPayKindConstant.RENT_AMOUNT.equals(obj.getPayKind()) || DataPayKindConstant.RENT_INCREMENT.equals(obj.getPayKind()) || DataPayKindConstant.RENT_AMOUNT_AFTER.equals(obj.getPayKind());
+//            }).mapToInt(CashierRefundApplyEntity::getAmt).sum();
+            
+        	
+        	int feeShituiOri = 0;
+        	int feeShikouOri = 0;
+        	
+        	int wzShituiOri = 0;
+        	int wzShikouOri = 0;
+        	
+        	int depositShituiOri = 0;
+        	int depositShikouOri = 0;
+        	
+            for (CashierRefundApplyEntity obj : cashierRefundApplys) {
+            	//租车费用
+            	//消费方式
+				if("00".equals(obj.getStatus()) &&  ("04".equals(obj.getPayType()))  && DataPayKindConstant.RENT_AMOUNT.equals(obj.getPayKind()) || DataPayKindConstant.RENT_INCREMENT.equals(obj.getPayKind()) || DataPayKindConstant.RENT_AMOUNT_AFTER.equals(obj.getPayKind())){
+					feeShituiOri += Math.abs(obj.getAmt());
+				}
+				//预授权方式，实扣
+				if("00".equals(obj.getStatus()) &&  ("03".equals(obj.getPayType()))  && DataPayKindConstant.RENT_AMOUNT.equals(obj.getPayKind()) || DataPayKindConstant.RENT_INCREMENT.equals(obj.getPayKind()) || DataPayKindConstant.RENT_AMOUNT_AFTER.equals(obj.getPayKind())){
+					feeShikouOri += Math.abs(obj.getAmt());
+				}
+				//违章押金
+				//消费方式
+				if("00".equals(obj.getStatus()) &&  ("04".equals(obj.getPayType()))  && DataPayKindConstant.DEPOSIT.equals(obj.getPayKind())){
+					wzShituiOri += Math.abs(obj.getAmt());
+				}
+				//预授权方式，实扣
+				if("00".equals(obj.getStatus()) &&  ("03".equals(obj.getPayType()))  && DataPayKindConstant.DEPOSIT.equals(obj.getPayKind())){
+					wzShikouOri += Math.abs(obj.getAmt());
+				}
+				
+				//租车押金
+				//消费方式
+				if("00".equals(obj.getStatus()) &&  ("04".equals(obj.getPayType()))  && DataPayKindConstant.RENT.equals(obj.getPayKind())){
+					depositShituiOri += Math.abs(obj.getAmt());
+				}
+				//预授权方式，实扣
+				if("00".equals(obj.getStatus()) &&  ("03".equals(obj.getPayType()))  && DataPayKindConstant.RENT.equals(obj.getPayKind())){
+					depositShikouOri += Math.abs(obj.getAmt());
+				}
+			}
+            
+            //租车费用
+            //实扣
+            if(feeShituiOri > 0) {
+            	feeShikouOri += feeShishou - feeShituiOri;
+            }
+            vo.setRenterCostFeeShikou(feeShikouOri);
+            //实退
+            vo.setRenterCostFeeShitui(feeShituiOri); //预授权0
+           
+            //违章押金
+            //实扣
+            if(wzShituiOri > 0) {
+            	wzShikouOri += wzShishouOri - wzShituiOri;
+            }
+            vo.setDepositWzCostShikou(wzShikouOri);
+            vo.setDepositWzCostShitui(wzShituiOri);
+            
+            //租车押金
+            //实扣
+            if(depositShituiOri > 0) {
+            	depositShikouOri += depositShishouOri - depositShituiOri;
+            }
+            vo.setDepositCostShikou(depositShikouOri);
+            vo.setDepositCostShitui(depositShituiOri);
+            
             // 获取实退 车俩押金
-            int depositCostReal =  cashierRefundApplys.stream().filter(obj ->{
-                return DataPayKindConstant.RENT.equals(obj.getPayKind());
-            }).mapToInt(CashierRefundApplyEntity::getAmt).sum();
-            vo.setDepositCostReal(depositCostReal);
+//            int depositCostReal =  cashierRefundApplys.stream().filter(obj ->{
+//                return DataPayKindConstant.RENT.equals(obj.getPayKind());
+//            }).mapToInt(CashierRefundApplyEntity::getAmt).sum();
+//            vo.setDepositCostReal(depositCostReal);
+            
             // 获取实退 违章押金
-            int depositWzCostReal =  cashierRefundApplys.stream().filter(obj ->{
-                return DataPayKindConstant.DEPOSIT.equals(obj.getPayKind());
-            }).mapToInt(CashierRefundApplyEntity::getAmt).sum();
-            vo.setDepositWzCostReal(depositWzCostReal);
+//            int depositWzCostReal =  cashierRefundApplys.stream().filter(obj ->{
+//                return DataPayKindConstant.DEPOSIT.equals(obj.getPayKind());
+//            }).mapToInt(CashierRefundApplyEntity::getAmt).sum();
+//            vo.setDepositWzCostReal(depositWzCostReal);
         }
 
 
