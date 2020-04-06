@@ -131,7 +131,7 @@ public class OrderSettleService{
         if(accountRenterDepositResVO != null) {
         	depositShishouOri = Math.abs(accountRenterDepositResVO.getShifuDepositAmt());
         	depositYingshouOri = Math.abs(accountRenterDepositResVO.getYingfuDepositAmt());
-        	if(accountRenterDepositResVO.getIsAuthorize() == 1) {
+        	if(accountRenterDepositResVO.getIsAuthorize() != null && accountRenterDepositResVO.getIsAuthorize() == 1) {
         		depositShishouAuthOri = Math.abs(accountRenterDepositResVO.getAuthorizeDepositAmt());
         	}
         }
@@ -164,7 +164,7 @@ public class OrderSettleService{
         if(accountRenterWZDeposit != null) {
         	wzShishouOri = Math.abs(accountRenterWZDeposit.getShishouDeposit());
         	wzYingshouOri = Math.abs(accountRenterWZDeposit.getYingshouDeposit());
-        	if(accountRenterWZDeposit.getIsAuthorize() == 1) {
+        	if(accountRenterWZDeposit.getIsAuthorize() != null && accountRenterWZDeposit.getIsAuthorize() == 1) {
         		wzShishouAuthOri = Math.abs(accountRenterWZDeposit.getAuthorizeDepositAmt());
         	}
         }
