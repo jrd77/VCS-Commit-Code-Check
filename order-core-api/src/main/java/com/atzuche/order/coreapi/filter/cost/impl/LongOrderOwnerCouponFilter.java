@@ -63,11 +63,6 @@ public class LongOrderOwnerCouponFilter implements OrderCostFilter {
             throw new OrderCostFilterException(ErrorCode.PARAMETER_ERROR.getCode(), "计算长租订单车主券抵扣金额订单租金信息为空!");
         }
 
-        OrderCostDetailContext deductAndSubsidyContext = context.getCostDetailContext();
-        if (Objects.isNull(deductAndSubsidyContext)) {
-            deductAndSubsidyContext = orderCommonConver.initOrderCostDeductAndSubsidyContext(context.getResContext());
-        }
-
         List<RenterOrderCostDetailEntity> details = orderRentAmtResDTO.getDetails();
         List<RenterOrderSubsidyDetailDTO> subsidyDetails = new ArrayList<>();
         details.forEach(d -> {
@@ -85,14 +80,17 @@ public class LongOrderOwnerCouponFilter implements OrderCostFilter {
 
         int subsidyAmt = subsidyDetails.stream().mapToInt(RenterOrderSubsidyDetailDTO::getSubsidyAmount).sum();
         //更新剩余租金
-        deductAndSubsidyContext.setSurplusRentAmt(deductAndSubsidyContext.getSurplusRentAmt() + subsidyAmt);
-        log.info("Order surplusRentAmt:[{}]", deductAndSubsidyContext.getSurplusRentAmt());
+        OrderCostDetailContext orderCostDetailContext = context.getCostDetailContext();
+        orderCostDetailContext.setSurplusRentAmt(orderCostDetailContext.getSurplusRentAmt() + subsidyAmt);
+        log.info("Order surplusRentAmt:[{}]", orderCostDetailContext.getSurplusRentAmt());
 
         LongOrderOwnerCouponResDTO longOrderOwnerCouponResDTO = new LongOrderOwnerCouponResDTO();
         longOrderOwnerCouponResDTO.setSubsidyDetails(subsidyDetails);
         longOrderOwnerCouponResDTO.setSubsidyAmt(subsidyAmt);
         context.getResContext().setLongOrderOwnerCouponResDTO(longOrderOwnerCouponResDTO);
         log.info("计算长租订单车主券抵扣金额.result is,longOrderOwnerCouponResDTO:[{}]", JSON.toJSONString(longOrderOwnerCouponResDTO));
+
+        orderCostDetailContext.setSubsidyDetails(subsidyDetails);
     }
 
     /**
