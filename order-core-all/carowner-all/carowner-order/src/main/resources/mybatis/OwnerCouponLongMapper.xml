@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.atzuche.order.ownercost.mapper.OwnerCouponLongMapper">
+
+    <resultMap type="com.atzuche.order.ownercost.entity.OwnerCouponLongEntity" id="BaseResultMap">
+        <result property="id" column="id"/>
+        <result property="orderNo" column="order_no"/>
+        <result property="renterOrderNo" column="renter_order_no"/>
+        <result property="renterMemNo" column="renter_mem_no"/>
+        <result property="originalUnitPrice" column="original_unit_price"/>
+        <result property="couponCode" column="coupon_code"/>
+        <result property="actUnitPrice" column="act_unit_price"/>
+        <result property="reductionPrice" column="reduction_price"/>
+        <result property="discounRatio" column="discoun_ratio"/>
+        <result property="createTime" column="create_time"/>
+        <result property="createOp" column="create_op"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="updateOp" column="update_op"/>
+        <result property="isDelete" column="is_delete"/>
+    </resultMap>
+
+
+	<sql id="Base_Column_List">
+	`id`, 	
+	`order_no`, 	
+	`renter_order_no`, 	
+	`renter_mem_no`, 	
+	`original_unit_price`, 	
+	`coupon_code`, 	
+	`act_unit_price`, 	
+	`reduction_price`, 	
+	`discoun_ratio`, 	
+	`create_time`, 	
+	`create_op`, 	
+	`update_time`, 	
+	`update_op`, 	
+	`is_delete`	
+
+	</sql>
+
+
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap">
+		select <include refid="Base_Column_List" /> from owner_coupon_long where id = #{value}
+	</select>
+
+	<insert id="insert" parameterType="com.atzuche.order.ownercost.entity.OwnerCouponLongEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into owner_coupon_long
+		(
+				`order_no`,		
+				`renter_order_no`,		
+				`renter_mem_no`,		
+				`original_unit_price`,		
+				`coupon_code`,		
+				`act_unit_price`,		
+				`reduction_price`,		
+				`discoun_ratio`
+			)
+		values
+		(
+				#{orderNo}, 		
+				#{renterOrderNo}, 		
+				#{renterMemNo}, 		
+				#{originalUnitPrice}, 		
+				#{couponCode}, 		
+				#{actUnitPrice}, 		
+				#{reductionPrice}, 		
+				#{discounRatio}
+			)
+	</insert>
+	
+	<insert id="insertSelective" parameterType="com.atzuche.order.ownercost.entity.OwnerCouponLongEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into owner_coupon_long
+            <trim prefix="(" suffix=")" suffixOverrides="," >
+				<if test="orderNo != null">`order_no`, </if>
+				<if test="renterOrderNo != null">`renter_order_no`, </if>
+				<if test="renterMemNo != null">`renter_mem_no`, </if>
+				<if test="originalUnitPrice != null">`original_unit_price`, </if>
+				<if test="couponCode != null">`coupon_code`, </if>
+				<if test="actUnitPrice != null">`act_unit_price`, </if>
+				<if test="reductionPrice != null">`reduction_price`, </if>
+				<if test="discounRatio != null">`discoun_ratio` </if>
+
+	        </trim>
+            <trim prefix="values (" suffix=")" suffixOverrides="," >
+				<if test="orderNo != null">#{orderNo},  </if>
+				<if test="renterOrderNo != null">#{renterOrderNo},  </if>
+				<if test="renterMemNo != null">#{renterMemNo},  </if>
+				<if test="originalUnitPrice != null">#{originalUnitPrice},  </if>
+				<if test="couponCode != null">#{couponCode},  </if>
+				<if test="actUnitPrice != null">#{actUnitPrice},  </if>
+				<if test="reductionPrice != null">#{reductionPrice},  </if>
+				<if test="discounRatio != null">#{discounRatio}  </if>
+	        </trim>
+	</insert>
+	
+	 
+	<update id="updateByPrimaryKeySelective" parameterType="com.atzuche.order.ownercost.entity.OwnerCouponLongEntity">
+		update owner_coupon_long 
+		<set>
+				<if test="orderNo != null">`order_no` = #{orderNo}, </if>
+				<if test="renterOrderNo != null">`renter_order_no` = #{renterOrderNo}, </if>
+				<if test="renterMemNo != null">`renter_mem_no` = #{renterMemNo}, </if>
+				<if test="originalUnitPrice != null">`original_unit_price` = #{originalUnitPrice}, </if>
+				<if test="couponCode != null">`coupon_code` = #{couponCode}, </if>
+				<if test="actUnitPrice != null">`act_unit_price` = #{actUnitPrice}, </if>
+				<if test="reductionPrice != null">`reduction_price` = #{reductionPrice}, </if>
+				<if test="discounRatio != null">`discoun_ratio` = #{discounRatio} </if>
+			</set>
+		where id = #{id}
+	</update>
+	
+	<update id="updateByPrimaryKey" parameterType="com.atzuche.order.ownercost.entity.OwnerCouponLongEntity">
+		update owner_coupon_long 
+		<set>
+				`order_no` = #{orderNo}, 		
+				`renter_order_no` = #{renterOrderNo}, 		
+				`renter_mem_no` = #{renterMemNo}, 		
+				`original_unit_price` = #{originalUnitPrice}, 		
+				`coupon_code` = #{couponCode}, 		
+				`act_unit_price` = #{actUnitPrice}, 		
+				`reduction_price` = #{reductionPrice}, 		
+				`discoun_ratio` = #{discounRatio}
+	
+		</set>
+		where id = #{id}
+	</update>
+  	
+</mapper>
