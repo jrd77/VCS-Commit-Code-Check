@@ -47,6 +47,7 @@ import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author jing.huang
@@ -538,7 +539,19 @@ public class OrderCostService {
 	}
 
     private void longRentDeduct(OrderRenterCostResVO realVo, com.atzuche.order.commons.vo.res.OrderRenterCostResVO data) {
-
+        List<RenterOrderSubsidyDetailResVO> subsidyLst = data.getSubsidyLst();
+        int sum = Optional.ofNullable(subsidyLst)
+                .orElseGet(ArrayList::new)
+                .stream()
+                .filter(x -> RenterCashCodeEnum.LONG_OWNER_COUPON_OFFSET_COST.getCashNo().equals(x.getSubsidyCostCode()))
+                .mapToInt(RenterOrderSubsidyDetailResVO::getSubsidyAmount)
+                .sum();
+        int deductionAmount = realVo.getDeductionAmount() != null ? 0 : Integer.valueOf(realVo.getDeductionAmount());
+        deductionAmount = deductionAmount + (-sum);
+        realVo.setDeductionAmount(String.valueOf(NumberUtils.convertNumberToFushu(deductionAmount)));
+        //TODO 折扣表中查询
+        realVo.setOwnerLongRentDeduct("满一个月(30天)70%折扣");
+        realVo.setOwnerLongRentDeductAmt(String.valueOf(NumberUtils.convertNumberToFushu(sum)));
     }
 
 

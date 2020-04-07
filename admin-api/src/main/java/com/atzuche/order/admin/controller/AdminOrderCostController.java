@@ -86,18 +86,18 @@ public class AdminOrderCostController {
     @AutoDocMethod(description = "长租-计算租客子订单费用", value = "长租-计算租客子订单费用", response = OrderRenterCostResVO.class)
     @RequestMapping(value="calculateRenterOrderCost",method = RequestMethod.POST)
     public ResponseData calculateRenterOrderCostLongRent(@RequestBody @Validated RenterCostReqVO renterCostReqVO,BindingResult bindingResult) {
-        logger.info("calculateRenterOrderCost controller params={}",renterCostReqVO.toString());
+        logger.info("calculateRenterOrderCostLongRent controller params={}",renterCostReqVO.toString());
         if (bindingResult.hasErrors()) {
             return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), ErrorCode.INPUT_ERROR.getText());
         }
 
         try {
             OrderRenterCostResVO resp = orderCostService.calculateRenterOrderCostLongRent(renterCostReqVO);
-            logger.info("calculateRenterOrderCost resp[{}]", GsonUtils.toJson(resp));
+            logger.info("calculateRenterOrderCostLongRent resp[{}]", GsonUtils.toJson(resp));
             return ResponseData.success(resp);
         } catch (Exception e) {
-            Cat.logError("calculateRenterOrderCost exception params="+renterCostReqVO.toString(),e);
-            logger.error("calculateRenterOrderCost exception params="+renterCostReqVO.toString(),e);
+            Cat.logError("calculateRenterOrderCostLongRent exception params="+renterCostReqVO.toString(),e);
+            logger.error("calculateRenterOrderCostLongRent exception params="+renterCostReqVO.toString(),e);
             return ResponseData.error();
         }
 
