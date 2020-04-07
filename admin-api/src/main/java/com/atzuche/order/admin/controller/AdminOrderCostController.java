@@ -84,7 +84,7 @@ public class AdminOrderCostController {
 	}
 
     @AutoDocMethod(description = "长租-计算租客子订单费用", value = "长租-计算租客子订单费用", response = OrderRenterCostResVO.class)
-    @RequestMapping(value="calculateRenterOrderCost",method = RequestMethod.POST)
+    @RequestMapping(value="calculateRenterOrderCostLongRent",method = RequestMethod.POST)
     public ResponseData calculateRenterOrderCostLongRent(@RequestBody @Validated RenterCostReqVO renterCostReqVO,BindingResult bindingResult) {
         logger.info("calculateRenterOrderCostLongRent controller params={}",renterCostReqVO.toString());
         if (bindingResult.hasErrors()) {
