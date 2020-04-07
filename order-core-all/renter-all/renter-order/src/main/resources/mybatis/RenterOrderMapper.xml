@@ -366,9 +366,19 @@
         ORDER BY is_effective DESC,id DESC
     </select>
 
-    <delete id="updateChildStatusByRenterOrderNo">
+    <update id="updateChildStatusByRenterOrderNo">
         update renter_order set child_status = #{childStatus} where  `renter_order_no` = #{renterOrderNo}
-    </delete>
+    </update>
+
+
+    <update id="updateSrvGetAndReturnFlagByRenterOrderNo">
+        update renter_order
+            <set>
+                <if test="isGetCar != null">`is_get_car` = #{isGetCar}, </if>
+                <if test="isReturnCar != null">`is_return_car` = #{isReturnCar}, </if>
+            </set>
+        where  `renter_order_no` = #{renterOrderNo}
+    </update>
 
     <select id="getRenterOrderNoByOrderNoAndFinish" resultMap="BaseResultMap">
         select <include refid="Base_Column_List" /> from renter_order where order_no = #{orderNo}
