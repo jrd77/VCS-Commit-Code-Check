@@ -11,10 +11,13 @@ import com.atzuche.order.coreapi.filter.cost.OrderCostFilter;
 import com.atzuche.order.coreapi.submit.exception.OrderCostFilterException;
 import com.atzuche.order.rentercost.entity.RenterOrderCostDetailEntity;
 import com.atzuche.order.rentercost.service.RenterOrderCostCombineService;
+import com.autoyol.commons.web.ErrorCode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.Objects;
 
 /**
  * 计算附加驾驶人保险费
@@ -36,6 +39,9 @@ public class OrderExtraDriverInsureAmtFilter implements OrderCostFilter {
         log.info("计算订单附加驾驶人保险费.param is,baseReqDTO:[{}],extraDriverReqDTO:[{}]", JSON.toJSONString(baseReqDTO),
                 JSON.toJSONString(extraDriverReqDTO));
 
+        if (Objects.isNull(baseReqDTO) || Objects.isNull(extraDriverReqDTO)) {
+            throw new OrderCostFilterException(ErrorCode.PARAMETER_ERROR.getCode(), "计算订单附加驾驶人保险费参数为空!");
+        }
         //基础信息
         CostBaseDTO costBaseDTO = new CostBaseDTO();
         BeanUtils.copyProperties(baseReqDTO, costBaseDTO);

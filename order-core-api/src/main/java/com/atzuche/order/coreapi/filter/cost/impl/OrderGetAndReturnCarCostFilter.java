@@ -11,10 +11,13 @@ import com.atzuche.order.coreapi.filter.cost.OrderCostFilter;
 import com.atzuche.order.coreapi.submit.exception.OrderCostFilterException;
 import com.atzuche.order.rentercost.entity.dto.GetReturnCostDTO;
 import com.atzuche.order.rentercost.service.RenterOrderCostCombineService;
+import com.autoyol.commons.web.ErrorCode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.Objects;
 
 /**
  * 计算取还车服务费
@@ -36,6 +39,9 @@ public class OrderGetAndReturnCarCostFilter implements OrderCostFilter {
         log.info("计算订单取还车服务费.param is,baseReqDTO:[{}],getReturnCarCostReqDTO:[{}]", JSON.toJSONString(baseReqDTO),
                 JSON.toJSONString(getReturnCarCostReqDTO));
 
+        if (Objects.isNull(baseReqDTO) || Objects.isNull(getReturnCarCostReqDTO)) {
+            throw new OrderCostFilterException(ErrorCode.PARAMETER_ERROR.getCode(), "计算订单取还车服务费参数为空!");
+        }
         //基础信息
         CostBaseDTO costBaseDTO = new CostBaseDTO();
         BeanUtils.copyProperties(baseReqDTO, costBaseDTO);

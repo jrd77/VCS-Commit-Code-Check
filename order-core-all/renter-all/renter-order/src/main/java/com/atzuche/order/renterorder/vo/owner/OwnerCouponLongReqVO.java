@@ -32,9 +32,9 @@ public class OwnerCouponLongReqVO {
     private String carNo;
 
     /**
-     * 原始租金
+     * 原始租金单价
      */
-    private Integer rentOriginalAmt;
+    private Integer rentOriginalUnitPriceAmt;
 
     /**
      * 订单租期开始时间

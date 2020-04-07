@@ -24,10 +24,7 @@ import com.atzuche.order.renterorder.entity.OrderCouponEntity;
 import com.atzuche.order.renterorder.entity.dto.DeductContextDTO;
 import com.atzuche.order.renterorder.entity.dto.RenterOrderCostReqDTO;
 import com.atzuche.order.renterorder.entity.dto.RenterOrderCostRespDTO;
-import com.atzuche.order.renterorder.vo.owner.OwnerCouponGetAndValidReqVO;
-import com.atzuche.order.renterorder.vo.owner.OwnerCouponGetAndValidResultVO;
-import com.atzuche.order.renterorder.vo.owner.OwnerCouponReqVO;
-import com.atzuche.order.renterorder.vo.owner.OwnerDiscountCouponVO;
+import com.atzuche.order.renterorder.vo.owner.*;
 import com.atzuche.order.renterorder.vo.platform.MemAvailCouponRequestVO;
 import com.autoyol.auto.coin.service.vo.res.AutoCoinResponseVO;
 import com.autoyol.commons.web.ErrorCode;
@@ -722,10 +719,5 @@ public class RenterOrderCalCostService {
         }
         return availableDisCoupons;
     }
-
-
-
-
-
 
 }
