@@ -18,6 +18,7 @@ import com.atzuche.order.commons.entity.ownerOrderDetail.RenterRentDetailDTO;
 import com.atzuche.order.commons.entity.rentCost.RenterCostDetailDTO;
 import com.atzuche.order.commons.enums.*;
 import com.atzuche.order.commons.enums.cashcode.ConsoleCashCodeEnum;
+import com.atzuche.order.commons.enums.cashcode.FineTypeCashCodeEnum;
 import com.atzuche.order.commons.enums.cashcode.OwnerCashCodeEnum;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.mem.MemProxyService;
@@ -1023,15 +1024,15 @@ public class OrderCostDetailService {
 		List<ConsoleRenterOrderFineDeatailEntity> list = consoleRenterOrderFineDeatailService.listConsoleRenterOrderFineDeatail(renterCostReqVO.getOrderNo(), orderEntity.getMemNoRenter());
 		//累计求和
 		for (ConsoleRenterOrderFineDeatailEntity consoleRenterOrderFineDeatailEntity : list) {
-			if(consoleRenterOrderFineDeatailEntity.getFineType().intValue() == FineTypeEnum.MODIFY_GET_FINE.getFineType().intValue()) {
+			if(consoleRenterOrderFineDeatailEntity.getFineType().intValue() == FineTypeCashCodeEnum.MODIFY_GET_FINE.getFineType().intValue()) {
 				renterGetReturnCarFineAmount += consoleRenterOrderFineDeatailEntity.getFineAmount().intValue();
-			}else if(consoleRenterOrderFineDeatailEntity.getFineType().intValue() == FineTypeEnum.MODIFY_RETURN_FINE.getFineType().intValue()) {
+			}else if(consoleRenterOrderFineDeatailEntity.getFineType().intValue() == FineTypeCashCodeEnum.MODIFY_RETURN_FINE.getFineType().intValue()) {
 				renterGetReturnCarFineAmount += consoleRenterOrderFineDeatailEntity.getFineAmount().intValue();
-			}else if(consoleRenterOrderFineDeatailEntity.getFineType().intValue() == FineTypeEnum.MODIFY_ADVANCE.getFineType().intValue()) {
+			}else if(consoleRenterOrderFineDeatailEntity.getFineType().intValue() == FineTypeCashCodeEnum.MODIFY_ADVANCE.getFineType().intValue()) {
 				renterBeforeReturnCarFineAmount += consoleRenterOrderFineDeatailEntity.getFineAmount().intValue();
-			}else if(consoleRenterOrderFineDeatailEntity.getFineType().intValue() == FineTypeEnum.CANCEL_FINE.getFineType().intValue()) {
+			}else if(consoleRenterOrderFineDeatailEntity.getFineType().intValue() == FineTypeCashCodeEnum.CANCEL_FINE.getFineType().intValue()) {
 				renterFineAmount += consoleRenterOrderFineDeatailEntity.getFineAmount().intValue();
-			}else if(consoleRenterOrderFineDeatailEntity.getFineType().intValue() == FineTypeEnum.DELAY_FINE.getFineType().intValue()) {
+			}else if(consoleRenterOrderFineDeatailEntity.getFineType().intValue() == FineTypeCashCodeEnum.DELAY_FINE.getFineType().intValue()) {
 				renterDelayReturnCarFineAmount += consoleRenterOrderFineDeatailEntity.getFineAmount().intValue();
 			}
 		}
@@ -1041,15 +1042,15 @@ public class OrderCostDetailService {
 		List<RenterOrderFineDeatailEntity> fineLst = renterOrderFineDeatailService.listRenterOrderFineDeatail(renterCostReqVO.getOrderNo(), renterCostReqVO.getRenterOrderNo());
 		//累计求和
 		for (RenterOrderFineDeatailEntity renterOrderFineDeatailEntity : fineLst) {
-			if(renterOrderFineDeatailEntity.getFineType().intValue() == FineTypeEnum.MODIFY_GET_FINE.getFineType().intValue()) {
+			if(renterOrderFineDeatailEntity.getFineType().intValue() == FineTypeCashCodeEnum.MODIFY_GET_FINE.getFineType().intValue()) {
 				renterGetReturnCarFineAmount += renterOrderFineDeatailEntity.getFineAmount().intValue();
-			}else if(renterOrderFineDeatailEntity.getFineType().intValue() == FineTypeEnum.MODIFY_RETURN_FINE.getFineType().intValue()) {
+			}else if(renterOrderFineDeatailEntity.getFineType().intValue() == FineTypeCashCodeEnum.MODIFY_RETURN_FINE.getFineType().intValue()) {
 				renterGetReturnCarFineAmount += renterOrderFineDeatailEntity.getFineAmount().intValue();
-			}else if(renterOrderFineDeatailEntity.getFineType().intValue() == FineTypeEnum.MODIFY_ADVANCE.getFineType().intValue()) {
+			}else if(renterOrderFineDeatailEntity.getFineType().intValue() == FineTypeCashCodeEnum.MODIFY_ADVANCE.getFineType().intValue()) {
 //				renterBeforeReturnCarFineAmount += renterOrderFineDeatailEntity.getFineAmount().intValue();
 				//暂时先归到这个里面来。因为是不同的来源，console_ 否则修改的时候会有问题。 20200212
 				renterFineAmount += renterOrderFineDeatailEntity.getFineAmount().intValue();
-			}else if(renterOrderFineDeatailEntity.getFineType().intValue() == FineTypeEnum.CANCEL_FINE.getFineType().intValue()) {
+			}else if(renterOrderFineDeatailEntity.getFineType().intValue() == FineTypeCashCodeEnum.CANCEL_FINE.getFineType().intValue()) {
 				renterFineAmount += renterOrderFineDeatailEntity.getFineAmount().intValue();
 //			}else if(renterOrderFineDeatailEntity.getFineType().intValue() == FineTypeEnum.DELAY_FINE.getFineType().intValue()) {
 //				renterDelayReturnCarFineAmount += renterOrderFineDeatailEntity.getFineAmount().intValue();
@@ -1111,7 +1112,7 @@ public class OrderCostDetailService {
 		if(StringUtils.isNotBlank(renterBeforeReturnCarFineAmt)) {
 	        ConsoleRenterOrderFineDeatailEntity consoleRenterOrderFineDeatailEntity =
 	                consoleRenterOrderFineDeatailService.fineDataConvert(costBaseDTO, -Integer.valueOf(renterBeforeReturnCarFineAmt),
-	                        FineSubsidyCodeEnum.PLATFORM, FineSubsidySourceCodeEnum.RENTER, FineTypeEnum.MODIFY_ADVANCE);
+	                        FineSubsidyCodeEnum.PLATFORM, FineSubsidySourceCodeEnum.RENTER, FineTypeCashCodeEnum.MODIFY_ADVANCE);
 	        
 	        //统一设置修改人名称。20200205 huangjing
 	        String userName = AdminUserUtil.getAdminUser().getAuthName(); // 获取的管理后台的用户名。
@@ -1125,7 +1126,7 @@ public class OrderCostDetailService {
 		        //同时增加反向记录，算车主的收益  200217 通过平台中转
 	        	ConsoleOwnerOrderFineDeatailEntity ownerEntity =
 	        			consoleOwnerOrderFineDeatailService.fineDataConvert(ownerCostDTO, Integer.valueOf(renterBeforeReturnCarFineAmt),
-		                        FineSubsidyCodeEnum.OWNER, FineSubsidySourceCodeEnum.PLATFORM, FineTypeEnum.MODIFY_ADVANCE);
+		                        FineSubsidyCodeEnum.OWNER, FineSubsidySourceCodeEnum.PLATFORM, FineTypeCashCodeEnum.MODIFY_ADVANCE);
 		        
 		        ownerEntity.setUpdateOp(userName);
 		        ownerEntity.setCreateOp(userName);
@@ -1139,7 +1140,7 @@ public class OrderCostDetailService {
 		if(StringUtils.isNotBlank(renterDelayReturnCarFineAmt)) {
 	        ConsoleRenterOrderFineDeatailEntity consoleRenterOrderFineDeatailEntity =
 	                consoleRenterOrderFineDeatailService.fineDataConvert(costBaseDTO, -Integer.valueOf(renterDelayReturnCarFineAmt),
-	                        FineSubsidyCodeEnum.PLATFORM, FineSubsidySourceCodeEnum.RENTER, FineTypeEnum.DELAY_FINE);
+	                        FineSubsidyCodeEnum.PLATFORM, FineSubsidySourceCodeEnum.RENTER, FineTypeCashCodeEnum.DELAY_FINE);
 	        
 	        //统一设置修改人名称。20200205 huangjing
 	        String userName = AdminUserUtil.getAdminUser().getAuthName(); // 获取的管理后台的用户名。
@@ -1154,7 +1155,7 @@ public class OrderCostDetailService {
 		        //同时增加反向记录，算车主的收益  200217 通过平台中转
 		        ConsoleOwnerOrderFineDeatailEntity ownerEntity =
 	        			consoleOwnerOrderFineDeatailService.fineDataConvert(ownerCostDTO, Integer.valueOf(renterDelayReturnCarFineAmt),
-		                        FineSubsidyCodeEnum.OWNER, FineSubsidySourceCodeEnum.PLATFORM, FineTypeEnum.DELAY_FINE);
+		                        FineSubsidyCodeEnum.OWNER, FineSubsidySourceCodeEnum.PLATFORM, FineTypeCashCodeEnum.DELAY_FINE);
 		        
 		        ownerEntity.setUpdateOp(userName);
 		        ownerEntity.setCreateOp(userName);

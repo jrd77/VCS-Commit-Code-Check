@@ -11,7 +11,7 @@ import com.atzuche.order.cashieraccount.service.CashierPayService;
 import com.atzuche.order.coin.service.AutoCoinProxyService;
 import com.atzuche.order.commons.NumberUtils;
 import com.atzuche.order.commons.enums.CouponTypeEnum;
-import com.atzuche.order.commons.enums.FineTypeEnum;
+import com.atzuche.order.commons.enums.cashcode.FineTypeCashCodeEnum;
 import com.atzuche.order.commons.enums.cashcode.OwnerCashCodeEnum;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.commons.vo.req.OrderCostReqVO;
@@ -800,7 +800,7 @@ public class OrderCostService {
 		 List<ConsoleOwnerOrderFineDeatailEntity> consoleOwnerOrderFineDeatails = data.getConsoleOwnerOrderFineDeatails();
 		 for (ConsoleOwnerOrderFineDeatailEntity consoleOwnerOrderFineDeatailEntity : consoleOwnerOrderFineDeatails) {
 			 //罚金来源编码（车主/租客/平台）1-租客，2-车主，3-平台
-				if(FineTypeEnum.MODIFY_ADDRESS_FINE.getFineType().equals(consoleOwnerOrderFineDeatailEntity.getFineType())) {
+				if(FineTypeCashCodeEnum.MODIFY_ADDRESS_FINE.getFineType().equals(consoleOwnerOrderFineDeatailEntity.getFineType())) {
 					fineAmtInt += consoleOwnerOrderFineDeatailEntity.getFineAmount().intValue();
 				}
 		 }
@@ -1139,6 +1139,7 @@ public class OrderCostService {
             if(orderEntityOwner == null){
                 logger.error("获取订单数据(车主)为空orderNo={}",ownerCostReqVO.getOrderNo());
                 throw new Exception("获取订单数据(车主)为空");
+
             }
         }
         OrderCostReqVO req = new OrderCostReqVO();

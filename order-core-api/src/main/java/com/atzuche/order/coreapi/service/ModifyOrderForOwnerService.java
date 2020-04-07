@@ -2,7 +2,7 @@ package com.atzuche.order.coreapi.service;
 
 import com.atzuche.order.car.CarProxyService;
 import com.atzuche.order.commons.entity.dto.*;
-import com.atzuche.order.commons.enums.FineTypeEnum;
+import com.atzuche.order.commons.enums.cashcode.FineTypeCashCodeEnum;
 import com.atzuche.order.commons.enums.RenterChildStatusEnum;
 import com.atzuche.order.commons.enums.SrvGetReturnEnum;
 import com.atzuche.order.coreapi.entity.dto.ModifyOrderOwnerDTO;
@@ -153,7 +153,7 @@ public class ModifyOrderForOwnerService {
 		}
 		OwnerOrderFineDeatailEntity ownerOrderFineDeatailEntity = null;
 		for(RenterOrderFineDeatailEntity renterOrderFineDeatailEntity:renterOrderFineDeatailEntities){
-			if(FineTypeEnum.MODIFY_ADVANCE.getFineType().equals(renterOrderFineDeatailEntity.getFineType())) {
+			if(FineTypeCashCodeEnum.MODIFY_ADVANCE.getFineType().equals(renterOrderFineDeatailEntity.getFineType())) {
 				ownerOrderFineDeatailEntity = new OwnerOrderFineDeatailEntity();
 				BeanUtils.copyProperties(renterOrderFineDeatailEntity, ownerOrderFineDeatailEntity);
 				ownerOrderFineDeatailEntity.setCreateOp(null);

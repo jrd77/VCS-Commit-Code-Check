@@ -13,7 +13,7 @@ import com.atzuche.order.commons.entity.dto.CostBaseDTO;
 import com.atzuche.order.commons.entity.dto.OwnerGoodsDetailDTO;
 import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
 import com.atzuche.order.commons.entity.dto.RenterMemberDTO;
-import com.atzuche.order.commons.enums.FineTypeEnum;
+import com.atzuche.order.commons.enums.cashcode.FineTypeCashCodeEnum;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.coreapi.entity.dto.ModifyOrderDTO;
 import com.atzuche.order.coreapi.entity.dto.ModifyOrderOwnerDTO;
@@ -398,11 +398,11 @@ public class ModifyOrderFeeService {
 			return null;
 		}
 		// 提前还车违约金
-		Integer penaltyAmt = getFineAmtByCode(fineList, FineTypeEnum.MODIFY_ADVANCE.getFineType());
+		Integer penaltyAmt = getFineAmtByCode(fineList, FineTypeCashCodeEnum.MODIFY_ADVANCE.getFineType());
 		// 取车服务违约金 
-		Integer getFineAmt = getFineAmtByCode(fineList, FineTypeEnum.MODIFY_GET_FINE.getFineType());
+		Integer getFineAmt = getFineAmtByCode(fineList, FineTypeCashCodeEnum.MODIFY_GET_FINE.getFineType());
 		// 还车服务违约金
-		Integer returnFineAmt = getFineAmtByCode(fineList, FineTypeEnum.MODIFY_RETURN_FINE.getFineType());
+		Integer returnFineAmt = getFineAmtByCode(fineList, FineTypeCashCodeEnum.MODIFY_RETURN_FINE.getFineType());
 		// 封装罚金对象
 		ModifyOrderFineVO modifyOrderFineVO = new ModifyOrderFineVO();
 		modifyOrderFineVO.setGetFineAmt(getFineAmt);
