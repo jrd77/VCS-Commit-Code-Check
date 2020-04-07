@@ -17,6 +17,7 @@ import com.atzuche.order.rentercost.entity.dto.RenterOrderSubsidyDetailDTO;
 import com.atzuche.order.renterorder.service.RenterOrderCostHandleService;
 import com.atzuche.order.renterorder.vo.owner.OwnerCouponLongReqVO;
 import com.atzuche.order.renterorder.vo.owner.OwnerCouponLongResVO;
+import com.autoyol.commons.web.ErrorCode;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -54,28 +55,20 @@ public class LongOrderOwnerCouponFilter implements OrderCostFilter {
                 JSON.toJSONString(longOrderOwnerCouponReqDTO));
 
         if (Objects.isNull(longOrderOwnerCouponReqDTO) || StringUtils.isBlank(longOrderOwnerCouponReqDTO.getCouponCode())) {
-            log.info("param is empty.");
-            return;
+            throw new OrderCostFilterException(ErrorCode.PARAMETER_ERROR.getCode(),"计算长租订单车主券抵扣金额参数为空!");
         }
 
         OrderRentAmtResDTO orderRentAmtResDTO = context.getResContext().getOrderRentAmtResDTO();
-        if (Objects.isNull(orderRentAmtResDTO)) {
-            log.info("Order rentAmt is empty.");
-            return;
+        if (Objects.isNull(orderRentAmtResDTO) || CollectionUtils.isEmpty(orderRentAmtResDTO.getDetails())) {
+            throw new OrderCostFilterException(ErrorCode.PARAMETER_ERROR.getCode(), "计算长租订单车主券抵扣金额订单租金信息为空!");
         }
 
-        List<RenterOrderCostDetailEntity> details = orderRentAmtResDTO.getDetails();
-        if (CollectionUtils.isEmpty(details)) {
-            log.info("Order rentAmt detail is empty.");
-            return;
-        }
-
-
-        OrderCostDetailContext deductAndSubsidyContext = context.getDeductAndSubsidyContext();
+        OrderCostDetailContext deductAndSubsidyContext = context.getCostDetailContext();
         if (Objects.isNull(deductAndSubsidyContext)) {
             deductAndSubsidyContext = orderCommonConver.initOrderCostDeductAndSubsidyContext(context.getResContext());
         }
 
+        List<RenterOrderCostDetailEntity> details = orderRentAmtResDTO.getDetails();
         List<RenterOrderSubsidyDetailDTO> subsidyDetails = new ArrayList<>();
         details.forEach(d -> {
             OwnerCouponLongReqVO reqVO = buildOwnerCouponLongReqVO(baseReqDTO, longOrderOwnerCouponReqDTO);

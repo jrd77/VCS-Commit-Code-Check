@@ -42,8 +42,7 @@ public class OrderRentAmtFilter implements OrderCostFilter {
                 JSON.toJSONString(rentAmtReqDTO));
 
         if(Objects.isNull(baseReqDTO) || Objects.isNull(rentAmtReqDTO)) {
-
-            throw new OrderCostFilterException(ErrorCode.PARAMETER_ERROR.getCode(),"");
+            throw new OrderCostFilterException(ErrorCode.PARAMETER_ERROR.getCode(),"计算租金参数为空!");
         }
 
         //基础信息

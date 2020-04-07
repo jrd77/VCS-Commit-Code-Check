@@ -11,6 +11,7 @@ import com.atzuche.order.coreapi.filter.cost.OrderCostFilter;
 import com.atzuche.order.coreapi.submit.exception.OrderCostFilterException;
 import com.atzuche.order.rentercost.entity.dto.GetReturnCostDTO;
 import com.atzuche.order.rentercost.service.RenterOrderCostCombineService;
+import com.autoyol.commons.web.ErrorCode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,8 +40,7 @@ public class OrderGetAndReturnCarCostFilter implements OrderCostFilter {
                 JSON.toJSONString(getReturnCarCostReqDTO));
 
         if (Objects.isNull(baseReqDTO) || Objects.isNull(getReturnCarCostReqDTO)) {
-            log.info("param is empty.");
-            return;
+            throw new OrderCostFilterException(ErrorCode.PARAMETER_ERROR.getCode(), "计算订单取还车服务费参数为空!");
         }
         //基础信息
         CostBaseDTO costBaseDTO = new CostBaseDTO();

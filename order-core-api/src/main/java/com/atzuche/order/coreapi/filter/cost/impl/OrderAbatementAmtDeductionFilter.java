@@ -13,6 +13,7 @@ import com.atzuche.order.coreapi.submit.exception.OrderCostFilterException;
 import com.atzuche.order.rentercost.entity.RenterOrderCostDetailEntity;
 import com.atzuche.order.rentercost.entity.dto.RenterOrderSubsidyDetailDTO;
 import com.atzuche.order.renterorder.service.InsurAbamentDiscountService;
+import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.platformcost.CommonUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -21,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -41,10 +43,12 @@ public class OrderAbatementAmtDeductionFilter implements OrderCostFilter {
         OrderCostBaseReqDTO baseReqDTO = context.getReqContext().getBaseReqDTO();
         log.info("计算订单全面保障服务减免金额.param is,baseReqDTO:[{}]", JSON.toJSONString(baseReqDTO));
 
+        if(Objects.isNull(baseReqDTO)) {
+            throw new OrderCostFilterException(ErrorCode.PARAMETER_ERROR.getCode(), "计算订单全面保障服务减免金额参数为空!");
+        }
         OrderAbatementAmtResDTO orderAbatementAmtResDTO = context.getResContext().getOrderAbatementAmtResDTO();
         if (null == orderAbatementAmtResDTO || CollectionUtils.isEmpty(orderAbatementAmtResDTO.getDetails())) {
-            log.info("计算订单全面保障服务减免金额:details is empty.");
-            return;
+            throw new OrderCostFilterException(ErrorCode.PARAMETER_ERROR.getCode(),"计算订单全面保障服务减免金额全面保障服务信息为空!");
         }
 
         // 获取不计免赔的折扣

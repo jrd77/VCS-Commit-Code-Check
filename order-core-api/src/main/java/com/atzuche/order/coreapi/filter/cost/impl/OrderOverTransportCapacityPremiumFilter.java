@@ -13,6 +13,7 @@ import com.atzuche.order.coreapi.submit.exception.OrderCostFilterException;
 import com.atzuche.order.rentercost.entity.RenterOrderCostDetailEntity;
 import com.atzuche.order.rentercost.entity.dto.GetReturnOverCostDTO;
 import com.atzuche.order.rentercost.service.RenterOrderCostCombineService;
+import com.autoyol.commons.web.ErrorCode;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.BeanUtils;
@@ -44,8 +45,7 @@ public class OrderOverTransportCapacityPremiumFilter implements OrderCostFilter 
                 JSON.toJSONString(orderCostGetReturnCarOverCostReqDTO));
 
         if (Objects.isNull(baseReqDTO) || Objects.isNull(orderCostGetReturnCarOverCostReqDTO)) {
-            log.info("param is empty.");
-            return;
+            throw new OrderCostFilterException(ErrorCode.PARAMETER_ERROR.getCode(), "计算超运能溢价金额参数为空!");
         }
 
         //基础信息

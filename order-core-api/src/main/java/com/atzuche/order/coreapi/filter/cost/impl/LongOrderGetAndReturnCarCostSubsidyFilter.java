@@ -5,6 +5,7 @@ import com.atzuche.order.coreapi.entity.dto.cost.OrderCostContext;
 import com.atzuche.order.coreapi.entity.dto.cost.req.OrderCostBaseReqDTO;
 import com.atzuche.order.coreapi.filter.cost.OrderCostFilter;
 import com.atzuche.order.coreapi.submit.exception.OrderCostFilterException;
+import com.autoyol.commons.web.ErrorCode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -27,8 +28,7 @@ public class LongOrderGetAndReturnCarCostSubsidyFilter implements OrderCostFilte
         log.info("计算长租订单取还车服务费补贴金额.param is,baseReqDTO:[{}]", JSON.toJSONString(baseReqDTO));
 
         if (Objects.isNull(baseReqDTO)) {
-            log.info("param is empty.");
-            return;
+            throw new OrderCostFilterException(ErrorCode.PARAMETER_ERROR.getCode(),"计算长租订单取还车服务费补贴金额参数为空!");
         }
 
 

@@ -11,6 +11,7 @@ import com.atzuche.order.coreapi.filter.cost.OrderCostFilter;
 import com.atzuche.order.coreapi.submit.exception.OrderCostFilterException;
 import com.atzuche.order.rentercost.entity.RenterOrderCostDetailEntity;
 import com.atzuche.order.rentercost.service.RenterOrderCostCombineService;
+import com.autoyol.commons.web.ErrorCode;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.BeanUtils;
@@ -42,8 +43,7 @@ public class OrderAbatementAmtFilter implements OrderCostFilter {
                 JSON.toJSONString(abatementAmtReqDTO));
 
         if (Objects.isNull(baseReqDTO) || Objects.isNull(abatementAmtReqDTO)) {
-            log.info("param is empty.");
-            return;
+            throw new OrderCostFilterException(ErrorCode.PARAMETER_ERROR.getCode(), "计算订单全面保障服务参数为空!");
         }
         //基础信息
         CostBaseDTO costBaseDTO = new CostBaseDTO();
