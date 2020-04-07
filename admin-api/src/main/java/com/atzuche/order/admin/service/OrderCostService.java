@@ -714,7 +714,7 @@ public class OrderCostService {
 				
 				//给租客的优惠（车主券）和平台补贴   调价
 				putPlatformSubsidyAndOwnerCoupon(realVo,data);
-				
+
 				//扣款
 				putPlatformDeductAmt(realVo,data);
 				
@@ -1128,5 +1128,73 @@ public class OrderCostService {
         }
 
         return realVo;
+    }
+
+    public OrderOwnerCostResVO calculateOwnerOrderCostLong(OwnerCostReqVO ownerCostReqVO) throws Exception {
+        OrderOwnerCostResVO realVo = new OrderOwnerCostResVO();
+
+        OwnerOrderEntity orderEntityOwner = null;
+        if(StringUtils.isNotBlank(ownerCostReqVO.getOwnerOrderNo())) {
+            orderEntityOwner = ownerOrderService.getOwnerOrderByOwnerOrderNo(ownerCostReqVO.getOwnerOrderNo());
+            if(orderEntityOwner == null){
+                logger.error("获取订单数据(车主)为空orderNo={}",ownerCostReqVO.getOrderNo());
+                throw new Exception("获取订单数据(车主)为空");
+            }
+        }
+        OrderCostReqVO req = new OrderCostReqVO();
+        req.setOrderNo(ownerCostReqVO.getOrderNo());
+        req.setSubOrderNo(ownerCostReqVO.getOwnerOrderNo());
+        req.setMemNo(orderEntityOwner.getMemNo());
+        ResponseData<com.atzuche.order.commons.vo.res.OrderOwnerCostResVO> resData = feignOrderCostService.orderCostOwnerGet(req);
+
+        //子订单号
+        realVo.setOwnerOrderNo(ownerCostReqVO.getOwnerOrderNo());
+        //默认值处理  调价目前没有
+//		realVo.setAdjustAmt("0");
+        //加油服务费
+        realVo.setAddOilSrvAmt("0");
+        ///车主需支付给平台的费用
+//		realVo.setOwnerPayToPlatform("0");
+
+
+        if(resData != null) {
+            com.atzuche.order.commons.vo.res.OrderOwnerCostResVO data = resData.getData();
+            if(data != null) {
+                //租客支付给平台的费用。console  200214
+                putOwnerToPlatformCost(realVo,data);
+
+                //给租客的优惠（车主券）和平台补贴   调价
+                putPlatformSubsidyAndOwnerCoupon(realVo,data);
+                //长租折扣
+                putPlatformSubsidyAndOwnerCouponLong(realVo,data);
+
+                //扣款
+                putPlatformDeductAmt(realVo,data);
+
+                //收益
+                putBaseFee(realVo,data,ownerCostReqVO);
+
+                //最后算
+                putIncome(realVo,data);
+
+            }
+        }else {
+            logger.error("feign接口返回resData null!!! params={}",ownerCostReqVO.toString());
+        }
+
+        return realVo;
+    }
+
+    private void putPlatformSubsidyAndOwnerCouponLong(OrderOwnerCostResVO realVo, com.atzuche.order.commons.vo.res.OrderOwnerCostResVO data) {
+        List<OwnerOrderSubsidyDetailEntity> ownerOrderSubsidyDetail = data.getOwnerOrderSubsidyDetail();
+        int sum = Optional.ofNullable(ownerOrderSubsidyDetail)
+                .orElseGet(ArrayList::new)
+                .stream()
+                .filter(x -> RenterCashCodeEnum.LONG_OWNER_COUPON_OFFSET_COST.getCashNo().equals(x.getSubsidyCostCode()))
+                .mapToInt(OwnerOrderSubsidyDetailEntity::getSubsidyAmount)
+                .sum();
+        //TODO 折扣表中查询
+        realVo.setOwnerLongRentDeduct("满一个月(30天)70%折扣");
+        realVo.setOwnerLongRentDeductAmt(String.valueOf(NumberUtils.convertNumberToFushu(sum)));
     }
 }

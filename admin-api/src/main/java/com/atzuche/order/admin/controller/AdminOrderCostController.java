@@ -122,7 +122,26 @@ public class AdminOrderCostController {
 		}
 		
 	}
+    @AutoDocMethod(description = "长租-计算车主子订单费用", value = "长租-计算车主子订单费用", response = OrderOwnerCostResVO.class)
+    @RequestMapping(value="calculateOwnerOrderCostLong",method = RequestMethod.POST)
+    public ResponseData calculateOwnerOrderCostLong(@RequestBody @Validated OwnerCostReqVO ownerCostReqVO, HttpServletRequest request, HttpServletResponse response,BindingResult bindingResult) {
+        logger.info("calculateOwnerOrderCost controller params={}",ownerCostReqVO.toString());
+        if (bindingResult.hasErrors()) {
+            return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), ErrorCode.INPUT_ERROR.getText());
+        }
 
+        try {
+            OrderOwnerCostResVO resp = orderCostService.calculateOwnerOrderCostLong(ownerCostReqVO);
+            //TODO 车载押金 没有
+            logger.info("resp = " + resp.toString());
+            return ResponseData.success(resp);
+        } catch (Exception e) {
+            Cat.logError("calculateOwnerOrderCost exception params="+ownerCostReqVO.toString(),e);
+            logger.error("calculateOwnerOrderCost exception params="+ownerCostReqVO.toString(),e);
+            return ResponseData.error();
+        }
+
+    }
 //	private DeliveryCarVO getDeliveryCarVO(String orderNo){
 //        DeliveryCarRepVO deliveryCarDTO = new DeliveryCarRepVO();
 //        deliveryCarDTO.setOrderNo(orderNo);
