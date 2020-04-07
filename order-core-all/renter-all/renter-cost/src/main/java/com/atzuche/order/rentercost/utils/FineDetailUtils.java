@@ -1,7 +1,7 @@
 package com.atzuche.order.rentercost.utils;
 
 import com.atzuche.order.commons.enums.FineSubsidyCodeEnum;
-import com.atzuche.order.commons.enums.FineTypeEnum;
+import com.atzuche.order.commons.enums.cashcode.FineTypeCashCodeEnum;
 import com.atzuche.order.commons.enums.SubsidySourceCodeEnum;
 import com.atzuche.order.rentercost.entity.ConsoleRenterOrderFineDeatailEntity;
 import com.atzuche.order.rentercost.entity.RenterOrderFineDeatailEntity;
@@ -18,13 +18,13 @@ public class FineDetailUtils {
     /**
      * 获得后台操作的罚金列表中指定罚金总额
      * @param entityList
-     * @param fineTypeEnum
+     * @param fineTypeCashCodeEnum
      * @return
      */
-    public static int getRenterConsoleFineAmt(List<ConsoleRenterOrderFineDeatailEntity> entityList, FineTypeEnum fineTypeEnum){
+    public static int getRenterConsoleFineAmt(List<ConsoleRenterOrderFineDeatailEntity> entityList, FineTypeCashCodeEnum fineTypeCashCodeEnum){
         int total =0;
         for(ConsoleRenterOrderFineDeatailEntity entity:entityList){
-            if(fineTypeEnum.getFineType().equals(entity.getFineType())&&entity.getFineAmount()!=null){
+            if(fineTypeCashCodeEnum.getFineType().equals(entity.getFineType())&&entity.getFineAmount()!=null){
                 if(entity.getFineSubsidySourceCode().equals(SubsidySourceCodeEnum.RENTER.getCode())) {
                     total = total + entity.getFineAmount();
                 }
@@ -39,7 +39,7 @@ public class FineDetailUtils {
      * @return
      */
     public static int getRenterConsoleModifyGetFineAmt(List<ConsoleRenterOrderFineDeatailEntity> entityList){
-        return getRenterConsoleFineAmt(entityList,FineTypeEnum.MODIFY_GET_FINE);
+        return getRenterConsoleFineAmt(entityList, FineTypeCashCodeEnum.MODIFY_GET_FINE);
     }
 
     /**
@@ -48,7 +48,7 @@ public class FineDetailUtils {
      * @return
      */
     public static int getRenterConsoleModifyReturnFineAmt(List<ConsoleRenterOrderFineDeatailEntity> entityList){
-        return getRenterConsoleFineAmt(entityList,FineTypeEnum.MODIFY_RETURN_FINE);
+        return getRenterConsoleFineAmt(entityList, FineTypeCashCodeEnum.MODIFY_RETURN_FINE);
     }
 
     /**
@@ -57,7 +57,7 @@ public class FineDetailUtils {
      * @return
      */
     public static int getRenterConsoleModifyAdvanceFineAmt(List<ConsoleRenterOrderFineDeatailEntity> entityList){
-        return getRenterConsoleFineAmt(entityList,FineTypeEnum.MODIFY_ADVANCE);
+        return getRenterConsoleFineAmt(entityList, FineTypeCashCodeEnum.MODIFY_ADVANCE);
     }
 
     /**
@@ -66,7 +66,7 @@ public class FineDetailUtils {
      * @return
      */
     public static int getRenterConsoleCancelFineAmt(List<ConsoleRenterOrderFineDeatailEntity> entityList){
-        return getRenterConsoleFineAmt(entityList,FineTypeEnum.CANCEL_FINE);
+        return getRenterConsoleFineAmt(entityList, FineTypeCashCodeEnum.CANCEL_FINE);
     }
 
     /**
@@ -75,7 +75,7 @@ public class FineDetailUtils {
      * @return
      */
     public static int getRenterConsoleDelayFineAmt(List<ConsoleRenterOrderFineDeatailEntity> entityList){
-        return getRenterConsoleFineAmt(entityList,FineTypeEnum.DELAY_FINE);
+        return getRenterConsoleFineAmt(entityList, FineTypeCashCodeEnum.DELAY_FINE);
     }
 
     /**
@@ -84,7 +84,7 @@ public class FineDetailUtils {
      * @return
      */
     public static int getRenterConsoleAdvanceReturnFineAmt(List<ConsoleRenterOrderFineDeatailEntity> entityList){
-        return getRenterConsoleFineAmt(entityList,FineTypeEnum.RENTER_ADVANCE_RETURN);
+        return getRenterConsoleFineAmt(entityList, FineTypeCashCodeEnum.RENTER_ADVANCE_RETURN);
     }
 
 
@@ -103,7 +103,7 @@ public class FineDetailUtils {
      * @return
      */
     public static int getRenterConsoleGetReturnCarFineAmt(List<ConsoleRenterOrderFineDeatailEntity> entityList){
-        return getRenterConsoleFineAmt(entityList,FineTypeEnum.GET_RETURN_CAR);
+        return getRenterConsoleFineAmt(entityList, FineTypeCashCodeEnum.GET_RETURN_CAR);
     }
 
 
@@ -112,13 +112,13 @@ public class FineDetailUtils {
     /**
      * 获取订单相关的罚金列表中指定的罚金类型总额
      * @param entityList
-     * @param fineTypeEnum
+     * @param fineTypeCashCodeEnum
      * @return
      */
-    public static int getRenterOrderFineAmt(List<RenterOrderFineDeatailEntity> entityList,FineTypeEnum fineTypeEnum){
+    public static int getRenterOrderFineAmt(List<RenterOrderFineDeatailEntity> entityList, FineTypeCashCodeEnum fineTypeCashCodeEnum){
         int total =0;
         for(RenterOrderFineDeatailEntity entity:entityList){
-            if(fineTypeEnum.getFineType().equals(entity.getFineType())&&entity.getFineAmount()!=null){
+            if(fineTypeCashCodeEnum.getFineType().equals(entity.getFineType())&&entity.getFineAmount()!=null){
                 if(entity.getFineSubsidySourceCode().equals(FineSubsidyCodeEnum.RENTER.getFineSubsidyCode())) {
                     total = total + entity.getFineAmount();
                 }
@@ -134,7 +134,7 @@ public class FineDetailUtils {
      * @return
      */
     public static int getRenterOrderModifyGetFineAmt(List<RenterOrderFineDeatailEntity> entityList){
-        return getRenterOrderFineAmt(entityList,FineTypeEnum.MODIFY_GET_FINE);
+        return getRenterOrderFineAmt(entityList, FineTypeCashCodeEnum.MODIFY_GET_FINE);
     }
 
     /**
@@ -143,7 +143,7 @@ public class FineDetailUtils {
      * @return
      */
     public static int getRenterOrderModifyReturnFineAmt(List<RenterOrderFineDeatailEntity> entityList){
-        return getRenterOrderFineAmt(entityList,FineTypeEnum.MODIFY_RETURN_FINE);
+        return getRenterOrderFineAmt(entityList, FineTypeCashCodeEnum.MODIFY_RETURN_FINE);
     }
 
     /**
@@ -152,7 +152,7 @@ public class FineDetailUtils {
      * @return
      */
     public static int getRenterOrderModifyAdvanceFineAmt(List<RenterOrderFineDeatailEntity> entityList){
-        return getRenterOrderFineAmt(entityList,FineTypeEnum.MODIFY_ADVANCE);
+        return getRenterOrderFineAmt(entityList, FineTypeCashCodeEnum.MODIFY_ADVANCE);
     }
 
     /**
@@ -161,7 +161,7 @@ public class FineDetailUtils {
      * @return
      */
     public static int getRenterOrderCancelFineAmt(List<RenterOrderFineDeatailEntity> entityList){
-        return getRenterOrderFineAmt(entityList,FineTypeEnum.CANCEL_FINE);
+        return getRenterOrderFineAmt(entityList, FineTypeCashCodeEnum.CANCEL_FINE);
     }
 
     /**
@@ -170,7 +170,7 @@ public class FineDetailUtils {
      * @return
      */
     public static int getRenterOrderDelayFineAmt(List<RenterOrderFineDeatailEntity> entityList){
-        return getRenterOrderFineAmt(entityList,FineTypeEnum.DELAY_FINE);
+        return getRenterOrderFineAmt(entityList, FineTypeCashCodeEnum.DELAY_FINE);
     }
 
     /**
@@ -179,7 +179,7 @@ public class FineDetailUtils {
      * @return
      */
     public static int getRenterOrderAdvanceReturnFineAmt(List<RenterOrderFineDeatailEntity> entityList){
-        return getRenterOrderFineAmt(entityList,FineTypeEnum.RENTER_ADVANCE_RETURN);
+        return getRenterOrderFineAmt(entityList, FineTypeCashCodeEnum.RENTER_ADVANCE_RETURN);
     }
 
 
@@ -198,9 +198,9 @@ public class FineDetailUtils {
      * @return
      */
     public static int getRenterOrderGetReturnCarFineAmt(List<RenterOrderFineDeatailEntity> entityList){
-        return getRenterOrderFineAmt(entityList,FineTypeEnum.GET_RETURN_CAR);
+        return getRenterOrderFineAmt(entityList, FineTypeCashCodeEnum.GET_RETURN_CAR);
     }
     public static int getRenterOrderOwnerFineAmt(List<RenterOrderFineDeatailEntity> entityList){
-        return getRenterOrderFineAmt(entityList,FineTypeEnum.OWNER_FINE);
+        return getRenterOrderFineAmt(entityList, FineTypeCashCodeEnum.OWNER_FINE);
     }
 }

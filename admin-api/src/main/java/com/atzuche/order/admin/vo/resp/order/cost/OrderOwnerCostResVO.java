@@ -85,5 +85,11 @@ public class OrderOwnerCostResVO {
 	
 	@AutoDocProperty(value="平台给车主的补贴") ///
 	private String platformSubsidyAmt = "0";
+
+
+    @AutoDocProperty(value="车主长租折扣")
+    private String ownerLongRentDeduct;
+    @AutoDocProperty(value="车主长租折扣实际抵扣金额")
+    private String ownerLongRentDeductAmt;
 	
 }

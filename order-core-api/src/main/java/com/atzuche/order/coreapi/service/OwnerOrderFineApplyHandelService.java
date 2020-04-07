@@ -5,7 +5,7 @@ import com.atzuche.order.commons.entity.dto.CostBaseDTO;
 import com.atzuche.order.commons.enums.DispatcherStatusEnum;
 import com.atzuche.order.commons.enums.FineSubsidyCodeEnum;
 import com.atzuche.order.commons.enums.FineSubsidySourceCodeEnum;
-import com.atzuche.order.commons.enums.FineTypeEnum;
+import com.atzuche.order.commons.enums.cashcode.FineTypeCashCodeEnum;
 import com.atzuche.order.ownercost.entity.OwnerOrderFineApplyEntity;
 import com.atzuche.order.ownercost.entity.OwnerOrderFineDeatailEntity;
 import com.atzuche.order.ownercost.service.OwnerOrderFineApplyService;
@@ -83,7 +83,7 @@ public class OwnerOrderFineApplyHandelService {
                 ConsoleRenterOrderFineDeatailEntity consoleRenterOrderFineDeatailEntity =
                         consoleRenterOrderFineDeatailService.fineDataConvert(costBaseDTO,
                                 Math.abs(ownerOrderFineApplyEntity.getFineAmount()), FineSubsidyCodeEnum.RENTER,
-                                FineSubsidySourceCodeEnum.OWNER, FineTypeEnum.CANCEL_FINE);
+                                FineSubsidySourceCodeEnum.OWNER, FineTypeCashCodeEnum.CANCEL_FINE);
                 consoleRenterOrderFineDeatailService.saveConsoleRenterOrderFineDeatail(consoleRenterOrderFineDeatailEntity);
             } else {
                 entity.setFineSubsidyCode(FineSubsidyCodeEnum.PLATFORM.getFineSubsidyCode());

@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 import com.atzuche.order.commons.entity.dto.CostBaseDTO;
 import com.atzuche.order.commons.enums.FineSubsidyCodeEnum;
 import com.atzuche.order.commons.enums.FineSubsidySourceCodeEnum;
-import com.atzuche.order.commons.enums.FineTypeEnum;
+import com.atzuche.order.commons.enums.cashcode.FineTypeCashCodeEnum;
 import com.atzuche.order.rentercost.entity.ConsoleRenterOrderFineDeatailEntity;
 import com.atzuche.order.rentercost.mapper.ConsoleRenterOrderFineDeatailMapper;
 
@@ -112,7 +112,7 @@ public class ConsoleRenterOrderFineDeatailService{
      * @param type 罚金类型枚举
      * @return ConsoleRenterOrderFineDeatailEntity
      */
-    public ConsoleRenterOrderFineDeatailEntity fineDataConvert(CostBaseDTO costBaseDTO, Integer fineAmt, FineSubsidyCodeEnum code, FineSubsidySourceCodeEnum source, FineTypeEnum type) {
+    public ConsoleRenterOrderFineDeatailEntity fineDataConvert(CostBaseDTO costBaseDTO, Integer fineAmt, FineSubsidyCodeEnum code, FineSubsidySourceCodeEnum source, FineTypeCashCodeEnum type) {
         if (fineAmt == null || fineAmt == 0) {
             return null;
         }

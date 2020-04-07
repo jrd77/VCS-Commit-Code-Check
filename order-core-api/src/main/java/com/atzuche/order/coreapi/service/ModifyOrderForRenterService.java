@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.atzuche.order.commons.enums.ChangeSourceEnum;
-import com.atzuche.order.commons.enums.FineTypeEnum;
+import com.atzuche.order.commons.enums.cashcode.FineTypeCashCodeEnum;
 import com.atzuche.order.commons.enums.RenterChildStatusEnum;
 import com.atzuche.order.commons.enums.SrvGetReturnEnum;
 import com.atzuche.order.coreapi.entity.dto.ModifyCompareDTO;
@@ -153,8 +153,8 @@ public class ModifyOrderForRenterService {
 			return;
 		}
 		for (RenterOrderFineDeatailEntity fine:fineList) {
-			if (FineTypeEnum.MODIFY_GET_FINE.getFineType().equals(fine.getFineType()) || 
-					FineTypeEnum.MODIFY_RETURN_FINE.getFineType().equals(fine.getFineType())) {
+			if (FineTypeCashCodeEnum.MODIFY_GET_FINE.getFineType().equals(fine.getFineType()) ||
+					FineTypeCashCodeEnum.MODIFY_RETURN_FINE.getFineType().equals(fine.getFineType())) {
 				// 先删
 				renterOrderFineDeatailService.deleteGetReturnFineAfterAgree(fine.getId(), "转移到租客全局罚金表中");
 				// 后转移到租客全局罚金表中

@@ -2,7 +2,6 @@ package com.atzuche.order.ownercost.service;
 
 import java.util.List;
 
-import com.atzuche.order.commons.vo.res.rentcosts.RenterOrderFineDeatailEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +10,7 @@ import org.springframework.stereotype.Service;
 import com.atzuche.order.commons.entity.dto.CostBaseDTO;
 import com.atzuche.order.commons.enums.FineSubsidyCodeEnum;
 import com.atzuche.order.commons.enums.FineSubsidySourceCodeEnum;
-import com.atzuche.order.commons.enums.FineTypeEnum;
+import com.atzuche.order.commons.enums.cashcode.FineTypeCashCodeEnum;
 import com.atzuche.order.ownercost.entity.ConsoleOwnerOrderFineDeatailEntity;
 import com.atzuche.order.ownercost.mapper.ConsoleOwnerOrderFineDeatailMapper;
 
@@ -50,7 +49,7 @@ public class ConsoleOwnerOrderFineDeatailService{
      * @param type 罚金类型枚举
      * @return ConsoleOwnerOrderFineDeatailEntity
      */
-    public ConsoleOwnerOrderFineDeatailEntity fineDataConvert(CostBaseDTO costBaseDTO, Integer fineAmt, FineSubsidyCodeEnum code, FineSubsidySourceCodeEnum source, FineTypeEnum type) {
+    public ConsoleOwnerOrderFineDeatailEntity fineDataConvert(CostBaseDTO costBaseDTO, Integer fineAmt, FineSubsidyCodeEnum code, FineSubsidySourceCodeEnum source, FineTypeCashCodeEnum type) {
         if (fineAmt == null || fineAmt == 0) {
             return null;
         }
@@ -112,7 +111,7 @@ public class ConsoleOwnerOrderFineDeatailService{
 
 
 
-    public ConsoleOwnerOrderFineDeatailEntity selectByCondition(String orderNo, FineTypeEnum fineType,
+    public ConsoleOwnerOrderFineDeatailEntity selectByCondition(String orderNo, FineTypeCashCodeEnum fineType,
                                                           FineSubsidyCodeEnum fineSubsidyCode,
                                                           FineSubsidySourceCodeEnum fineSubsidySourceCode) {
 

@@ -15,7 +15,7 @@ import com.atzuche.order.commons.entity.dto.CostBaseDTO;
 import com.atzuche.order.commons.entity.dto.GetReturnAddressInfoDTO;
 import com.atzuche.order.commons.enums.FineSubsidyCodeEnum;
 import com.atzuche.order.commons.enums.FineSubsidySourceCodeEnum;
-import com.atzuche.order.commons.enums.FineTypeEnum;
+import com.atzuche.order.commons.enums.cashcode.FineTypeCashCodeEnum;
 import com.atzuche.order.rentercost.entity.RenterOrderFineDeatailEntity;
 import com.atzuche.order.rentercost.entity.dto.GetReturnFineDTO;
 import com.atzuche.order.rentercost.exception.RenterCostParameterException;
@@ -203,7 +203,7 @@ public class RenterOrderFineDeatailService{
 			GetReturnFineDTO init = new GetReturnFineDTO(initGetTime, initGetLon, initGetLat);
 			GetReturnFineDTO upd = new GetReturnFineDTO(getTime, getLon, getLat);
 			getFineAmt = getGetOrReturnFineAmt(init, upd, beforeHour, getCost);
-			RenterOrderFineDeatailEntity fineEntity = fineDataConvert(initBase, getFineAmt, FineSubsidyCodeEnum.PLATFORM, FineSubsidySourceCodeEnum.RENTER, FineTypeEnum.MODIFY_GET_FINE);
+			RenterOrderFineDeatailEntity fineEntity = fineDataConvert(initBase, getFineAmt, FineSubsidyCodeEnum.PLATFORM, FineSubsidySourceCodeEnum.RENTER, FineTypeCashCodeEnum.MODIFY_GET_FINE);
 			if (fineEntity != null) {
 				entityList.add(fineEntity);
 			}
@@ -213,7 +213,7 @@ public class RenterOrderFineDeatailService{
 			GetReturnFineDTO init = new GetReturnFineDTO(initReturnTime, initReturnLon, initReturnLat);
 			GetReturnFineDTO upd = new GetReturnFineDTO(returnTime, returnLon, returnLat);
 			returnFineAmt = getGetOrReturnFineAmt(init, upd, beforeHour, returnCost);
-			RenterOrderFineDeatailEntity fineEntity = fineDataConvert(initBase, returnFineAmt, FineSubsidyCodeEnum.PLATFORM, FineSubsidySourceCodeEnum.RENTER, FineTypeEnum.MODIFY_RETURN_FINE);
+			RenterOrderFineDeatailEntity fineEntity = fineDataConvert(initBase, returnFineAmt, FineSubsidyCodeEnum.PLATFORM, FineSubsidySourceCodeEnum.RENTER, FineTypeCashCodeEnum.MODIFY_RETURN_FINE);
 			if (fineEntity != null) {
 				entityList.add(fineEntity);
 			}
@@ -320,7 +320,7 @@ public class RenterOrderFineDeatailService{
         } else {
             fineAmt = Math.round((initRentAmt - updRentAmt) * CommonUtils.FINE_AMT_RATIO_SMALL);
         }
-        RenterOrderFineDeatailEntity entity = fineDataConvert(costBaseDTO, fineAmt, FineSubsidyCodeEnum.OWNER, FineSubsidySourceCodeEnum.RENTER, FineTypeEnum.MODIFY_ADVANCE);
+        RenterOrderFineDeatailEntity entity = fineDataConvert(costBaseDTO, fineAmt, FineSubsidyCodeEnum.OWNER, FineSubsidySourceCodeEnum.RENTER, FineTypeCashCodeEnum.MODIFY_ADVANCE);
         return entity;
     }
     
@@ -422,7 +422,7 @@ public class RenterOrderFineDeatailService{
 	 * @param type 罚金类型枚举
 	 * @return RenterOrderFineDeatailEntity
 	 */
-	public RenterOrderFineDeatailEntity fineDataConvert(CostBaseDTO costBaseDTO, Integer fineAmt, FineSubsidyCodeEnum code, FineSubsidySourceCodeEnum source, FineTypeEnum type) {
+	public RenterOrderFineDeatailEntity fineDataConvert(CostBaseDTO costBaseDTO, Integer fineAmt, FineSubsidyCodeEnum code, FineSubsidySourceCodeEnum source, FineTypeCashCodeEnum type) {
 		if (fineAmt == null || fineAmt == 0) {
 			return null;
 		}
@@ -446,7 +446,7 @@ public class RenterOrderFineDeatailService{
     }
 
 
-    public RenterOrderFineDeatailEntity selectByCondition(String renterOrderNo, FineTypeEnum fineType,
+    public RenterOrderFineDeatailEntity selectByCondition(String renterOrderNo, FineTypeCashCodeEnum fineType,
                                                           FineSubsidyCodeEnum fineSubsidyCode,
                                                           FineSubsidySourceCodeEnum fineSubsidySourceCode) {
 
