@@ -1,6 +1,6 @@
-package com.atzuche.order.ownercost.service;
+package com.atzuche.order.renterorder.service;
 
-import com.atzuche.order.ownercost.mapper.OwnerCouponLongMapper;
+import com.atzuche.order.renterorder.mapper.OwnerCouponLongMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

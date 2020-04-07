@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.atzuche.order.ownercost.mapper.OwnerCouponLongMapper">
+<mapper namespace="com.atzuche.order.renterorder.mapper.OwnerCouponLongMapper">
 
-    <resultMap type="com.atzuche.order.ownercost.entity.OwnerCouponLongEntity" id="BaseResultMap">
+    <resultMap type="com.atzuche.order.renterorder.entity.OwnerCouponLongEntity" id="BaseResultMap">
         <result property="id" column="id"/>
         <result property="orderNo" column="order_no"/>
         <result property="renterOrderNo" column="renter_order_no"/>
@@ -44,7 +44,7 @@
 		select <include refid="Base_Column_List" /> from owner_coupon_long where id = #{value}
 	</select>
 
-	<insert id="insert" parameterType="com.atzuche.order.ownercost.entity.OwnerCouponLongEntity" useGeneratedKeys="true" keyProperty="id">
+	<insert id="insert" parameterType="com.atzuche.order.renterorder.entity.OwnerCouponLongEntity" useGeneratedKeys="true" keyProperty="id">
 		insert into owner_coupon_long
 		(
 				`order_no`,		
@@ -69,7 +69,7 @@
 			)
 	</insert>
 	
-	<insert id="insertSelective" parameterType="com.atzuche.order.ownercost.entity.OwnerCouponLongEntity" useGeneratedKeys="true" keyProperty="id">
+	<insert id="insertSelective" parameterType="com.atzuche.order.renterorder.entity.OwnerCouponLongEntity" useGeneratedKeys="true" keyProperty="id">
 		insert into owner_coupon_long
             <trim prefix="(" suffix=")" suffixOverrides="," >
 				<if test="orderNo != null">`order_no`, </if>
@@ -95,7 +95,7 @@
 	</insert>
 	
 	 
-	<update id="updateByPrimaryKeySelective" parameterType="com.atzuche.order.ownercost.entity.OwnerCouponLongEntity">
+	<update id="updateByPrimaryKeySelective" parameterType="com.atzuche.order.renterorder.entity.OwnerCouponLongEntity">
 		update owner_coupon_long 
 		<set>
 				<if test="orderNo != null">`order_no` = #{orderNo}, </if>
@@ -110,7 +110,7 @@
 		where id = #{id}
 	</update>
 	
-	<update id="updateByPrimaryKey" parameterType="com.atzuche.order.ownercost.entity.OwnerCouponLongEntity">
+	<update id="updateByPrimaryKey" parameterType="com.atzuche.order.renterorder.entity.OwnerCouponLongEntity">
 		update owner_coupon_long 
 		<set>
 				`order_no` = #{orderNo}, 		

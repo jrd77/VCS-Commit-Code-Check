@@ -1,8 +1,9 @@
-package com.atzuche.order.ownercost.entity;
+package com.atzuche.order.renterorder.entity;
+
+import lombok.Data;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import lombok.Data;
 
 
 /**

@@ -1,6 +1,6 @@
-package com.atzuche.order.ownercost.mapper;
+package com.atzuche.order.renterorder.mapper;
 
-import com.atzuche.order.ownercost.entity.OwnerCouponLongEntity;
+import com.atzuche.order.renterorder.entity.OwnerCouponLongEntity;
 import org.apache.ibatis.annotations.Mapper;
 
 /**
