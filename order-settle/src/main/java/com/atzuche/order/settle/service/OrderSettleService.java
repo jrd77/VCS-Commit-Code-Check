@@ -100,7 +100,7 @@ public class OrderSettleService{
 	  	//非空处理
 	  	if(accountRenterCostSettleEntity != null) {
 	  		feeShishouOri = accountRenterCostSettleEntity.getShifuAmt();
-	  		feeYingkouOri = accountRenterCostSettleEntity.getYingkouAmt();
+	  		feeYingkouOri = Math.abs(accountRenterCostSettleEntity.getYingkouAmt());  //取绝对值。
 	  	}
 	  	//实收(必定是消费，无免押预授权的情况。)
 	      int feeShishou = Math.abs(feeShishouOri);
@@ -170,7 +170,7 @@ public class OrderSettleService{
         //应扣
         AccountRenterWzDepositCostEntity wzEntity = accountRenterWzDepositCostNoTService.queryWzDeposit(orderNo,renterNo);
         if(wzEntity != null) {
-        	wzYingkouOri = wzEntity.getYingkouAmt();
+        	wzYingkouOri = Math.abs(wzEntity.getYingkouAmt());  //负数 取绝对值
         }
         //计算应退
         if(wzShishouOri >= wzYingkouOri) {
@@ -440,12 +440,14 @@ public class OrderSettleService{
             orderOwnerSettleNoTService.settleOrderAfterSeparateOwner(settleOrders,settleOrdersDefinition,callBack);
             log.info("OrderSettleService settleOrderAfterSeparateOwner [{}]",GsonUtils.toJson(settleOrdersDefinition));
             Cat.logEvent("settleOrderAfterSeparateOwner",GsonUtils.toJson(settleOrdersDefinition));
+            
             // 调远程增加车辆gps押金
             orderOwnerSettleNoTService.updateCarDeposit(settleOrders);
             // 调远程抵扣老系统租客欠款
             remoteOldSysDebtService.deductBalance(settleOrders.getRenterMemNo(), settleOrders.getRenterTotalOldRealDebtAmt());
             // 调远程抵扣老系统车主欠款
             remoteOldSysDebtService.deductBalance(settleOrders.getOwnerMemNo(), settleOrders.getOwnerTotalOldRealDebtAmt());
+            
             orderSettleNewService.sendOrderSettleMq(orderNo,settleOrders.getRenterMemNo(),settleOrders.getRentCosts(),0,settleOrders.getOwnerMemNo());
             t.setStatus(Transaction.SUCCESS);
         } catch (Exception e) {

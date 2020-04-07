@@ -257,27 +257,32 @@ public class CashierPayService{
     private void orderPayCallBack(OrderPayCallBackSuccessVO vo, OrderPayCallBack callBack) {
         //支付成功更新 订单支付状态
         if(Objects.nonNull(vo)&&Objects.nonNull(vo.getOrderNo())){
-            OrderStatusDTO orderStatusDTO = new OrderStatusDTO();
-            BeanUtils.copyProperties(vo,orderStatusDTO);
-            //当支付成功（当车辆押金，违章押金，租车费用都支付成功，更新订单状态 待取车），更新主订单状态待取车
-            if(isChangeOrderStatus(orderStatusDTO)){
-                orderStatusDTO.setStatus(OrderStatusEnum.TO_GET_CAR.getStatus());
-                vo.setIsGetCar(YesNoEnum.YES);
-                //记录订单流程
-                orderFlowService.inserOrderStatusChangeProcessInfo(orderStatusDTO.getOrderNo(), OrderStatusEnum.TO_GET_CAR);
-            }
-            orderStatusService.saveOrderStatusInfo(orderStatusDTO);
-            
-            //更新配送 订单补付等信息 只有订单状态为已支付
-            //callback
-            if(isGetCar(vo)){
-                //异步通知处理类
-            	callBack.callBack(vo.getMemNo(),vo.getOrderNo(),vo.getRenterOrderNo(),vo.getIsPayAgain(),vo.getIsGetCar());
-                
-            } else {  //补付总和  vo.getMemNo(), vo.getIsPayAgain(),vo.getIsGetCar(),
-            	callBack.callBack(vo.getOrderNo(),vo.getRentAmountAfterRenterOrderNos(),vo.getSupplementIds(),vo.getDebtIds());
-            }
-            log.info("payOrderCallBackSuccess saveOrderStatusInfo :[{}]", GsonUtils.toJson(orderStatusDTO));
+        	//order_supplement_detail  支付欠款的逻辑处理,否则结算后补付会修改订单状态。分离。
+        	//rentAmountAfterRenterOrderNo 暂不处理。
+        	if( !CollectionUtils.isEmpty(vo.getSupplementIds()) || !CollectionUtils.isEmpty(vo.getDebtIds()) ) {
+        		////补付总和  vo.getMemNo(), vo.getIsPayAgain(),vo.getIsGetCar(),
+        		callBack.callBack(vo.getOrderNo(),vo.getRentAmountAfterRenterOrderNos(),vo.getSupplementIds(),vo.getDebtIds());
+        	}else {
+	            OrderStatusDTO orderStatusDTO = new OrderStatusDTO();
+	            BeanUtils.copyProperties(vo,orderStatusDTO);
+	            //当支付成功（当车辆押金，违章押金，租车费用都支付成功，更新订单状态 待取车），更新主订单状态待取车
+	            if(isChangeOrderStatus(orderStatusDTO)){
+	                orderStatusDTO.setStatus(OrderStatusEnum.TO_GET_CAR.getStatus());
+	                vo.setIsGetCar(YesNoEnum.YES);
+	                //记录订单流程
+	                orderFlowService.inserOrderStatusChangeProcessInfo(orderStatusDTO.getOrderNo(), OrderStatusEnum.TO_GET_CAR);
+	            }
+	            orderStatusService.saveOrderStatusInfo(orderStatusDTO);
+	            
+	            //更新配送 订单补付等信息 只有订单状态为已支付
+	            //callback
+	            if(isGetCar(vo)){
+	                //异步通知处理类
+	            	callBack.callBack(vo.getMemNo(),vo.getOrderNo(),vo.getRenterOrderNo(),vo.getIsPayAgain(),vo.getIsGetCar());
+	                
+	            }
+	            log.info("payOrderCallBackSuccess saveOrderStatusInfo :[{}]", GsonUtils.toJson(orderStatusDTO));
+        	}
         }
     }
     /**
