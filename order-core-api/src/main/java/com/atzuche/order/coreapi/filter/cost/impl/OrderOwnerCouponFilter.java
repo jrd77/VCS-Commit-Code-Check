@@ -17,5 +17,7 @@ public class OrderOwnerCouponFilter implements OrderCostFilter {
     @Override
     public void calculate(OrderCostContext context) throws OrderCostFilterException {
 
+
+
     }
 }

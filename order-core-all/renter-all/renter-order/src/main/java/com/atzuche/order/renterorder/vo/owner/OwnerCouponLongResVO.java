@@ -17,9 +17,9 @@ public class OwnerCouponLongResVO {
     private String orderNo;
 
     /**
-     * 原始租车金额
+     * 原始租车单价金额
      */
-    private Integer rentOriginalAmt;
+    private Integer rentOriginalUnitPriceAmt;
 
     /**
      * 抵扣比例
@@ -32,8 +32,8 @@ public class OwnerCouponLongResVO {
     private Integer reductionAmt;
 
     /**
-     * 实际租金
+     * 实际租金单价
      */
-    private Integer actRentAmt;
+    private Integer actRentUnitPriceAmt;
 
 }

@@ -160,6 +160,7 @@ public class RenterOrderService {
         // 获取平台保障费和全面保障费折扣补贴
   		List<RenterOrderSubsidyDetailDTO> insurDiscountSubsidyList = insurAbamentDiscountService.getInsureDiscountSubsidy(renterOrderCostReqDTO, null);
   		renterOrderCostReqDTO.setSubsidyOutList(insurDiscountSubsidyList);
+
         RenterOrderCostRespDTO renterOrderCostRespDTO =
                 renterOrderCalCostService.calcBasicRenterOrderCostAndDeailList(renterOrderCostReqDTO);
         renterOrderCostRespDTO.setMemNo(renterOrderReqVO.getMemNo());

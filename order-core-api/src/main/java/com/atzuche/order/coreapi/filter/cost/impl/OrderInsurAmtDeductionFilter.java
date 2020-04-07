@@ -15,11 +15,14 @@ import com.atzuche.order.coreapi.submit.exception.OrderCostFilterException;
 import com.atzuche.order.rentercost.entity.RenterOrderCostDetailEntity;
 import com.atzuche.order.rentercost.entity.dto.RenterOrderSubsidyDetailDTO;
 import com.atzuche.order.renterorder.service.InsurAbamentDiscountService;
+import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.platformcost.CommonUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.Objects;
 
 /**
  * 计算订单基础保险减免金额
@@ -40,10 +43,13 @@ public class OrderInsurAmtDeductionFilter implements OrderCostFilter {
         OrderCostBaseReqDTO baseReqDTO = context.getReqContext().getBaseReqDTO();
         log.info("计算订单基础保险减免金额.param is,baseReqDTO:[{}]", JSON.toJSONString(baseReqDTO));
 
+        if (Objects.isNull(baseReqDTO)) {
+            throw new OrderCostFilterException(ErrorCode.PARAMETER_ERROR.getCode(), "计算订单基础保险减免金额参数为空!");
+        }
+
         OrderInsurAmtResDTO orderInsurAmtResDTO = context.getResContext().getOrderInsurAmtResDTO();
         if (null == orderInsurAmtResDTO || null == orderInsurAmtResDTO.getDetail()) {
-            log.info("计算订单基础保险减免金额:detail is empty.");
-            return;
+            throw new OrderCostFilterException(ErrorCode.PARAMETER_ERROR.getCode(), "计算订单基础保险减免金额基础保障费信息为空!");
         }
 
         // 获取保险的折扣

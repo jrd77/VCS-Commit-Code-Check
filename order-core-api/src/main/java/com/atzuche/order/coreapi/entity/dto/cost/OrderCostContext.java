@@ -21,4 +21,9 @@ public class OrderCostContext {
      */
     private OrderCostResContext resContext;
 
+    /**
+     * 订单费用明细
+     */
+    private OrderCostDetailContext costDetailContext;
+
 }

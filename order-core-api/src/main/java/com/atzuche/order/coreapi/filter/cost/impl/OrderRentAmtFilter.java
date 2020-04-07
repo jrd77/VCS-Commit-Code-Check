@@ -11,6 +11,7 @@ import com.atzuche.order.coreapi.filter.cost.OrderCostFilter;
 import com.atzuche.order.coreapi.submit.exception.OrderCostFilterException;
 import com.atzuche.order.rentercost.entity.RenterOrderCostDetailEntity;
 import com.atzuche.order.rentercost.service.RenterOrderCostCombineService;
+import com.autoyol.commons.web.ErrorCode;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.BeanUtils;
@@ -18,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * 计算租金
@@ -38,6 +40,10 @@ public class OrderRentAmtFilter implements OrderCostFilter {
         OrderCostRentAmtReqDTO rentAmtReqDTO = context.getReqContext().getRentAmtReqDTO();
         log.info("计算订单租金.param is,baseReqDTO:[{}],rentAmtReqDTO:[{}]", JSON.toJSONString(baseReqDTO),
                 JSON.toJSONString(rentAmtReqDTO));
+
+        if(Objects.isNull(baseReqDTO) || Objects.isNull(rentAmtReqDTO)) {
+            throw new OrderCostFilterException(ErrorCode.PARAMETER_ERROR.getCode(),"计算租金参数为空!");
+        }
 
         //基础信息
         CostBaseDTO costBaseDTO = new CostBaseDTO();
