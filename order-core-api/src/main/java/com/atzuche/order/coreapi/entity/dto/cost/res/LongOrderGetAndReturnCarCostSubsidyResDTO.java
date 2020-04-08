@@ -25,6 +25,16 @@ public class LongOrderGetAndReturnCarCostSubsidyResDTO {
     private Integer returnCarSubsidyAmt;
 
     /**
+     * 取车服务超运能溢价补贴
+     */
+    private Integer getBlockedSubsidyAmt;
+
+    /**
+     * 还车服务超运能溢价补贴
+     */
+    private Integer returnBlockedSubsidyAmt;
+
+    /**
      * 补贴明细
      */
     private List<RenterOrderSubsidyDetailDTO> subsidyDetails;

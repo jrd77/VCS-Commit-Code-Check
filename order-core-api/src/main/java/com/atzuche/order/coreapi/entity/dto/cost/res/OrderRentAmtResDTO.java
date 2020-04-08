@@ -21,6 +21,11 @@ public class OrderRentAmtResDTO {
     private Integer rentAmt;
 
     /**
+     * 日均价
+     */
+    private Integer holidayAverage;
+
+    /**
      * 租金明细
      */
     private List<RenterOrderCostDetailEntity> details ;

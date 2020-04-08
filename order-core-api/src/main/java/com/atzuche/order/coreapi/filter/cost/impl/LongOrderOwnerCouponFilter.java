@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * 计算长租订单车主券抵扣金额
+ * 计算长租订单车主折扣信息
  * <p><font color = red>注:只抵扣租金且优先抵扣</font></p>
  *
  * @author pengcheng.fu
@@ -43,19 +43,18 @@ public class LongOrderOwnerCouponFilter implements OrderCostFilter {
     private CouponAndCoinHandleService couponAndCoinHandleService;
     @Autowired
     private RenterOrderCostHandleService renterOrderCostHandleService;
-    @Autowired
-    private OrderCommonConver orderCommonConver;
 
 
     @Override
     public void calculate(OrderCostContext context) throws OrderCostFilterException {
         OrderCostBaseReqDTO baseReqDTO = context.getReqContext().getBaseReqDTO();
         LongOrderOwnerCouponReqDTO longOrderOwnerCouponReqDTO = context.getReqContext().getLongOrderOwnerCouponReqDTO();
-        log.info("计算长租订单车主券抵扣金额.param is,baseReqDTO:[{}],longOrderOwnerCouponReqDTO:[{}]", JSON.toJSONString(baseReqDTO),
+        log.info("订单费用计算-->长租折扣.param is,baseReqDTO:[{}],longOrderOwnerCouponReqDTO:[{}]",
+                JSON.toJSONString(baseReqDTO),
                 JSON.toJSONString(longOrderOwnerCouponReqDTO));
 
         if (Objects.isNull(longOrderOwnerCouponReqDTO) || StringUtils.isBlank(longOrderOwnerCouponReqDTO.getCouponCode())) {
-            throw new OrderCostFilterException(ErrorCode.PARAMETER_ERROR.getCode(),"计算长租订单车主券抵扣金额参数为空!");
+            throw new OrderCostFilterException(ErrorCode.PARAMETER_ERROR.getCode(), "计算长租订单车主券抵扣金额参数为空!");
         }
 
         OrderRentAmtResDTO orderRentAmtResDTO = context.getResContext().getOrderRentAmtResDTO();

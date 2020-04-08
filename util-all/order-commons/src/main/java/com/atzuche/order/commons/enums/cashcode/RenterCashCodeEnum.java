@@ -30,9 +30,6 @@ public enum RenterCashCodeEnum {
     WALLET_DEDUCT("12110019", "钱包抵扣金额"),
     AUTO_COIN_DEDUCT("12110020", "凹凸币抵扣金额"),
     REAL_LIMIT_REDUCTI("12110021", "限时立减抵扣金额"),
-    LONG_OWNER_COUPON_OFFSET_COST("12110022", "长租订单车主折扣券抵扣金额"),
-    LONG_GET_CAR_OFFSET_COST("12110023", "长租订单取车费用抵扣金额"),
-    LONG_RETURN_CAR_OFFSET_COST("12110024", "长租订单还车费用抵扣金额"),
 
     
     //	//第二区域块 看第4位，从2开始。  后4位从0001开始

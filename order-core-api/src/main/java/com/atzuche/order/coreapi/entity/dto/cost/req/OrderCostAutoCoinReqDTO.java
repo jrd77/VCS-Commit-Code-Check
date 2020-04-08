@@ -10,4 +10,9 @@ import lombok.Data;
  */
 @Data
 public class OrderCostAutoCoinReqDTO {
+
+    /**
+     * 是否使用凹凸币:0,未使用 1,已使用
+     */
+    private Integer useAutoCoin;
 }

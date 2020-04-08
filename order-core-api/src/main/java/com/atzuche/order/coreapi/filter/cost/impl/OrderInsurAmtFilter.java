@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.entity.dto.CostBaseDTO;
 import com.atzuche.order.commons.entity.dto.InsurAmtDTO;
 import com.atzuche.order.coreapi.entity.dto.cost.OrderCostContext;
+import com.atzuche.order.coreapi.entity.dto.cost.OrderCostDetailContext;
 import com.atzuche.order.coreapi.entity.dto.cost.req.OrderCostBaseReqDTO;
 import com.atzuche.order.coreapi.entity.dto.cost.req.OrderCostInsurAmtReqDTO;
 import com.atzuche.order.coreapi.entity.dto.cost.res.OrderInsurAmtResDTO;
@@ -36,17 +37,17 @@ public class OrderInsurAmtFilter implements OrderCostFilter {
     public void calculate(OrderCostContext context) throws OrderCostFilterException {
         OrderCostBaseReqDTO baseReqDTO = context.getReqContext().getBaseReqDTO();
         OrderCostInsurAmtReqDTO insurAmtReqDTO = context.getReqContext().getInsurAmtReqDTO();
-        log.info("计算订单基础保障费.param is,baseReqDTO:[{}],insurAmtReqDTO:[{}]", JSON.toJSONString(baseReqDTO),
+        log.info("订单费用计算-->基础保障费.param is,baseReqDTO:[{}],insurAmtReqDTO:[{}]", JSON.toJSONString(baseReqDTO),
                 JSON.toJSONString(insurAmtReqDTO));
 
         if (Objects.isNull(baseReqDTO) || Objects.isNull(insurAmtReqDTO)) {
-            throw new OrderCostFilterException(ErrorCode.PARAMETER_ERROR.getCode(), "计算订单基础保障费参数为空!");
+            throw new OrderCostFilterException(ErrorCode.PARAMETER_ERROR.getCode(), "计算基础保障费参数为空!");
         }
         //基础信息
         CostBaseDTO costBaseDTO = new CostBaseDTO();
         BeanUtils.copyProperties(baseReqDTO, costBaseDTO);
 
-        //基础保险费计算相关信息
+        //计算基础保障费
         InsurAmtDTO insurAmtDTO = new InsurAmtDTO();
         insurAmtDTO.setCostBaseDTO(costBaseDTO);
         insurAmtDTO.setCarLabelIds(insurAmtReqDTO.getCarLabelIds());
@@ -57,11 +58,17 @@ public class OrderInsurAmtFilter implements OrderCostFilter {
         insurAmtDTO.setGuidPrice(insurAmtReqDTO.getGuidPrice());
 
         RenterOrderCostDetailEntity insurAmtEntity = renterOrderCostCombineService.getInsurAmtEntity(insurAmtDTO);
+        log.info("订单费用计算-->基础保障费.insurAmtEntity:[{}]", JSON.toJSONString(insurAmtEntity));
         OrderInsurAmtResDTO orderInsurAmtResDTO = new OrderInsurAmtResDTO();
-        orderInsurAmtResDTO.setInsurAmt(insurAmtEntity.getTotalAmount());
-        orderInsurAmtResDTO.setDetail(insurAmtEntity);
+        if (null != insurAmtEntity) {
+            orderInsurAmtResDTO.setInsurAmt(insurAmtEntity.getTotalAmount());
+            orderInsurAmtResDTO.setDetail(insurAmtEntity);
 
-        log.info("计算订单基础保障费.result is,orderInsurAmtResDTO = [{}]", JSON.toJSONString(orderInsurAmtResDTO));
+            //赋值OrderCostDetailContext
+            OrderCostDetailContext costDetailContext = context.getCostDetailContext();
+            costDetailContext.getCostDetails().add(insurAmtEntity);
+        }
+        log.info("订单费用计算-->基础保障费.result is,orderInsurAmtResDTO:[{}]", JSON.toJSONString(orderInsurAmtResDTO));
         context.getResContext().setOrderInsurAmtResDTO(orderInsurAmtResDTO);
     }
 }
