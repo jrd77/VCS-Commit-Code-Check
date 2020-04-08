@@ -44,6 +44,7 @@ import com.atzuche.order.commons.enums.OrderPayStatusEnum;
 import com.atzuche.order.commons.enums.OrderStatusEnum;
 import com.atzuche.order.commons.enums.YesNoEnum;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
+import com.atzuche.order.commons.enums.cashier.CashierRefundApplyStatus;
 import com.atzuche.order.commons.exceptions.OrderNotFoundException;
 import com.atzuche.order.commons.service.OrderPayCallBack;
 import com.atzuche.order.flow.service.OrderFlowService;
@@ -175,6 +176,39 @@ public class CashierPayService{
             orderPayCallBack(vo,callBack);
         }
     }
+    
+    public void refundCallBack(BatchNotifyDataVo batchNotifyDataVo, OrderPayCallBack callBack){
+        if(Objects.nonNull(batchNotifyDataVo) && !CollectionUtils.isEmpty(batchNotifyDataVo.getLstNotifyDataVo())){
+            // 1 支付信息落库
+        	OrderPayCallBackSuccessVO vo = cashierService.callBackSuccess(batchNotifyDataVo.getLstNotifyDataVo());
+            
+            //2 获取透传值 用户订单流程更新数据
+//            getExtendParamsParam(vo,batchNotifyDataVo);
+           // 3 订单流程 数据更新
+            log.info("(退款异步处理收银台)callBackSuccess:[{}]", GsonUtils.toJson(vo));
+//            orderPayCallBack(vo,callBack);
+            
+            //异步通知更新的是收银台的状态。 200408 
+            
+            //2.参考同步方法,同步方法更新是 退款申请表
+            if(!CollectionUtils.isEmpty(batchNotifyDataVo.getLstNotifyDataVo())){
+	            for(int i=0;i<batchNotifyDataVo.getLstNotifyDataVo().size();i++){
+	                NotifyDataVo notifyDataVo = batchNotifyDataVo.getLstNotifyDataVo().get(i);
+	                log.info("退款的notifyDataVo=[{}]",GsonUtils.toJson(notifyDataVo));
+	                AutoPayResultVo autoPayResultVo = new AutoPayResultVo();
+	                BeanUtils.copyProperties(notifyDataVo, autoPayResultVo);
+	                //退款ID
+	                autoPayResultVo.setRefundId(notifyDataVo.getPayId());
+	                log.info("退款的autoPayResultVo=[{}]",GsonUtils.toJson(autoPayResultVo));
+	                //退款调用成功操作
+	                cashierService.refundCallBackSuccess(autoPayResultVo);
+	                log.info("(退款异步处理退款申请表)refundCallBackSuccess:[{}]", GsonUtils.toJson(autoPayResultVo));
+	            }
+            }
+            
+        }
+    }
+    
 
     /**
      * 获取 透传值 set 到 OrderPayCallBackSuccessVO vo
@@ -256,7 +290,7 @@ public class CashierPayService{
      */
     private void orderPayCallBack(OrderPayCallBackSuccessVO vo, OrderPayCallBack callBack) {
         //支付成功更新 订单支付状态
-        if(Objects.nonNull(vo)&&Objects.nonNull(vo.getOrderNo())){
+        if(Objects.nonNull(vo) && Objects.nonNull(vo.getOrderNo())){
         	//order_supplement_detail  支付欠款的逻辑处理,否则结算后补付会修改订单状态。分离。
         	//rentAmountAfterRenterOrderNo 暂不处理。
         	if( !CollectionUtils.isEmpty(vo.getSupplementIds()) || !CollectionUtils.isEmpty(vo.getDebtIds()) ) {
@@ -1051,6 +1085,14 @@ public class CashierPayService{
             notifyDataVo.setSettleAmount(vo.getRefundAmt());
             //退款调用成功操作
             cashierService.refundCallBackSuccess(vo);
+            log.info("(退款同步处理退款申请表)refundCallBackSuccess:[{}]", GsonUtils.toJson(vo));
+            
+            //更新收银台
+            List<NotifyDataVo> lstNotifyDataVo = new ArrayList<NotifyDataVo>();
+            lstNotifyDataVo.add(notifyDataVo);
+            OrderPayCallBackSuccessVO orderPayCallBackSuccessVO = cashierService.callBackSuccess(lstNotifyDataVo);
+            log.info("(退款同步处理收银台)callBackSuccess:[{}]", GsonUtils.toJson(orderPayCallBackSuccessVO));
+            
         }else {
         	log.error("退款返回的结果vo为null异常,params=[{}]",GsonUtils.toJson(refundVo));
         }

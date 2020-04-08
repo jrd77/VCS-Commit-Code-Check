@@ -7,6 +7,6 @@ import lombok.Data;
 public class OrderPaySignFailException extends OrderException {
 
     public OrderPaySignFailException() {
-        super(ErrorCode.CASHIER_PAY_SIGN_PARAM_ERRER.getCode(), ErrorCode.CASHIER_PAY_SIGN_PARAM_ERRER.getCode());
+        super(ErrorCode.CASHIER_PAY_SIGN_PARAM_ERRER.getCode(), ErrorCode.CASHIER_PAY_SIGN_PARAM_ERRER.getText());
     }
 }

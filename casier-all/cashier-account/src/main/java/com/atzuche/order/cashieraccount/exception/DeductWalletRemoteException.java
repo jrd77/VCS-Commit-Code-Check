@@ -7,6 +7,6 @@ import lombok.Data;
 public class DeductWalletRemoteException extends OrderException {
 
     public DeductWalletRemoteException() {
-        super(ErrorCode.DEDUCT_WALLETR_MSG.getCode(), ErrorCode.DEDUCT_WALLETR_MSG.getCode());
+        super(ErrorCode.DEDUCT_WALLETR_MSG.getCode(), ErrorCode.DEDUCT_WALLETR_MSG.getText());
     }
 }

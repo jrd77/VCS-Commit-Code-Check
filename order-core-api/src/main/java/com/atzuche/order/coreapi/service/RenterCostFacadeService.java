@@ -262,7 +262,21 @@ public class RenterCostFacadeService {
         return totalRenterOrderFineAmt+totalConsoleFineAmt;
     }
 
-
+    
+    /**
+     * mock 
+     * @param orderNo
+     * @param renterOrderNo
+     * @param memNo
+     * @return
+     */
+    public RenterCostVO renterCostShishouDetail(String orderNo,String renterOrderNo,String memNo) {
+//    	RenterOrderCostEntity renterOrderCostEntity = renterOrderCostService.getByOrderNoAndRenterNo(orderNo, renterOrderNo);
+    	RentCosts rentCost = orderSettleService.preRenterSettleOrder(orderNo,renterOrderNo);
+    	RenterCostVO renterCostVO = orderSettleService.getRenterCostByOrderNo(orderNo,renterOrderNo,memNo,rentCost.getRenterCostAmtFinal());
+    	return renterCostVO;
+    }
+    
     public RenterCostDetailDTO renterCostDetail(String orderNo,String renterOrderNo,String memNo) {
         List<RenterOrderCostDetailEntity> renterOrderCostDetailEntityList = orderCostDetailService.getRenterOrderCostDetailList(orderNo,renterOrderNo);
         RenterOrderCostEntity renterOrderCostEntity = renterOrderCostService.getByOrderNoAndRenterNo(orderNo, renterOrderNo);

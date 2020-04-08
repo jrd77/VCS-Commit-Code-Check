@@ -6,6 +6,6 @@ import lombok.Data;
 public class CashierRefundApplyException extends OrderException {
 
     public CashierRefundApplyException() {
-        super(ErrorCode.CASHIER_REFUND_APPLY.getCode(), ErrorCode.CASHIER_REFUND_APPLY.getCode());
+        super(ErrorCode.CASHIER_REFUND_APPLY.getCode(), ErrorCode.CASHIER_REFUND_APPLY.getText());
     }
 }

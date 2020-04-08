@@ -7,6 +7,6 @@ import lombok.Data;
 public class SettleReturnWalletRemoteException extends OrderException {
 
     public SettleReturnWalletRemoteException() {
-        super(ErrorCode.DEDUCT_WALLETR_MSG.getCode(), ErrorCode.DEDUCT_WALLETR_MSG.getCode());
+        super(ErrorCode.DEDUCT_WALLETR_MSG.getCode(), ErrorCode.DEDUCT_WALLETR_MSG.getText());
     }
 }

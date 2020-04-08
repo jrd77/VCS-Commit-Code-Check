@@ -85,8 +85,10 @@ public class OrderPayCallBackRabbitListener {
             BatchNotifyDataVo batchNotifyDataVo = GsonUtils.convertObj(orderPayAsynStr, BatchNotifyDataVo.class);
             String reqContent = FasterJsonUtil.toJson(batchNotifyDataVo);
             String md5 =  MD5.MD5Encode(reqContent);
+            //mq消息落库
             rabbitMsgLogService.insertRabbitMsgLog(message, RabbitBusinessTypeEnum.ORDER_PAY_CALL_BACK,orderPayAsynStr,md5);
-            cashierPayService.payCallBack(batchNotifyDataVo,payCallbackService);
+            //回调处理,单独处理。
+            cashierPayService.refundCallBack(batchNotifyDataVo,payCallbackService);
             t.setStatus(Transaction.SUCCESS);
         } catch (Exception e) {
             log.error("OrderPayCallBack refundCallBack,e={},message={}",e,message);

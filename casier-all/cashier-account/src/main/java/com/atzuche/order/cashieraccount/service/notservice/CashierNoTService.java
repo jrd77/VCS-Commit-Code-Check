@@ -3,6 +3,7 @@ package com.atzuche.order.cashieraccount.service.notservice;
 import java.time.LocalDateTime;
 import java.util.*;
 
+import com.atzuche.order.commons.enums.cashier.CashierRefundApplyStatus;
 import com.atzuche.order.commons.enums.cashier.OrderRefundStatusEnum;
 import com.atzuche.order.mq.enums.ShortMessageTypeEnum;
 import com.atzuche.order.mq.util.SmsParamsMapUtil;
@@ -285,42 +286,51 @@ public class CashierNoTService {
         CashierEntity cashierEntity = cashierMapper.selectCashierEntity(notifyDataVo.getPayMd5());
         int result =0;
         if(Objects.nonNull(cashierEntity) && Objects.nonNull(cashierEntity.getId())){
-            CashierEntity cashier = new CashierEntity();
-            BeanUtils.copyProperties(notifyDataVo,cashier);
-            cashier.setId(cashierEntity.getId());
-            cashier.setVersion(cashierEntity.getVersion());
-            cashier.setPaySn(cashierEntity.getPaySn()+1);
-            cashier.setPayEvn(notifyDataVo.getPayEnv());
-            cashier.setOs(notifyDataVo.getReqOs());
-            cashier.setPayTransNo(notifyDataVo.getQn());
-            cashier.setPayTime(notifyDataVo.getOrderTime());
-            cashier.setPayTitle(getPayTitle(notifyDataVo.getOrderNo(),notifyDataVo.getPayKind()));
-            cashier.setPayChannel(notifyDataVo.getPayChannel());
-            cashier.setPayLine(notifyDataVo.getPayLine());
-            cashier.setVirtualAccountNo(notifyDataVo.getVirtualAccountNo());
-            String amtStr = notifyDataVo.getSettleAmount();
-            amtStr = Objects.isNull(amtStr)?"0":amtStr;
-            cashier.setPayAmt(Integer.valueOf(amtStr));
-            result = cashierMapper.updateByPrimaryKeySelective(cashier);
-            if(result == 0){
-                throw new OrderPayCallBackAsnyException();
-            }
-            return false;
+        	//解决重复操作
+        	if(!"00".equals(cashierEntity.getTransStatus())) {  //成功 00
+	            CashierEntity cashier = new CashierEntity(); 
+	            BeanUtils.copyProperties(notifyDataVo,cashier);
+	            cashier.setId(cashierEntity.getId());
+	            cashier.setVersion(cashierEntity.getVersion());
+	            cashier.setPaySn(cashierEntity.getPaySn()+1);
+	            cashier.setPayEvn(notifyDataVo.getPayEnv());
+	            cashier.setOs(notifyDataVo.getReqOs());
+	            cashier.setPayTransNo(notifyDataVo.getQn());
+	            cashier.setPayTime(notifyDataVo.getOrderTime());
+	            cashier.setPayTitle(getPayTitle(notifyDataVo.getOrderNo(),notifyDataVo.getPayKind()));
+	            cashier.setPayChannel(notifyDataVo.getPayChannel());
+	            cashier.setPayLine(notifyDataVo.getPayLine());
+	            cashier.setVirtualAccountNo(notifyDataVo.getVirtualAccountNo());
+	            String amtStr = notifyDataVo.getSettleAmount();
+	            amtStr = Objects.isNull(amtStr)?"0":amtStr;
+	            cashier.setPayAmt(Integer.valueOf(amtStr));
+	            result = cashierMapper.updateByPrimaryKeySelective(cashier);
+	            if(result == 0){
+	                throw new OrderPayCallBackAsnyException();
+	            }
+        	}else {
+        		log.info("当前状态已经为成功,orderNo=[{}],payMd5=[{}]",notifyDataVo.getOrderNo(),notifyDataVo.getPayMd5());
+        	}
+        	return false;
         }else {
-            CashierEntity cashier = new CashierEntity();
-            BeanUtils.copyProperties(notifyDataVo,cashier);
-            cashier.setPayEvn(notifyDataVo.getPayEnv());
-            cashier.setOs(notifyDataVo.getReqOs());
-            cashier.setPayTransNo(notifyDataVo.getQn());
-            cashier.setPayTime(notifyDataVo.getOrderTime());
-            cashier.setPayTitle(getPayTitle(notifyDataVo.getOrderNo(),notifyDataVo.getPayKind()));
-            String amtStr = notifyDataVo.getSettleAmount();
-            amtStr = Objects.isNull(amtStr)?"0":amtStr;
-            cashier.setPayAmt(Integer.valueOf(amtStr));
-            result = cashierMapper.insertSelective(cashier);
-            if(result == 0){
-                throw new OrderPayCallBackAsnyException();
-            }
+            try {
+            	CashierEntity cashier = new CashierEntity();
+                BeanUtils.copyProperties(notifyDataVo,cashier);
+                cashier.setPayEvn(notifyDataVo.getPayEnv());
+                cashier.setOs(notifyDataVo.getReqOs());
+                cashier.setPayTransNo(notifyDataVo.getQn());
+                cashier.setPayTime(notifyDataVo.getOrderTime());
+                cashier.setPayTitle(getPayTitle(notifyDataVo.getOrderNo(),notifyDataVo.getPayKind()));
+                String amtStr = notifyDataVo.getSettleAmount();
+                amtStr = Objects.isNull(amtStr)?"0":amtStr;
+                cashier.setPayAmt(Integer.valueOf(amtStr));
+                result = cashierMapper.insertSelective(cashier);
+                if(result == 0){
+                    throw new OrderPayCallBackAsnyException();
+                }
+			} catch (Exception e) {
+				log.error("收银台入库违反唯一约束：params=[{}]",GsonUtils.toJson(notifyDataVo),e);
+			}
             return true;
         }
 
