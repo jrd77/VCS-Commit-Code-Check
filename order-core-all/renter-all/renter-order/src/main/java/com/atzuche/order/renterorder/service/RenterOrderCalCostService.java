@@ -96,7 +96,7 @@ public class RenterOrderCalCostService {
         //获取租金
         List<RenterOrderCostDetailEntity> renterOrderCostDetailEntities = renterOrderCostCombineService.listRentAmtEntity(renterOrderCostReqDTO.getRentAmtDTO());
         List<RenterOrderSubsidyDetailDTO> rentAmtSubSidy = subsidyOutGroup.get(RenterCashCodeEnum.RENT_AMT.getCashNo());
-        int rentAmtSubsidyAmt = rentAmtSubSidy == null ? 0 : rentAmtSubSidy.get(0).getSubsidyAmount();
+        int rentAmtSubsidyAmt = rentAmtSubSidy == null ? 0 : rentAmtSubSidy.stream().collect(Collectors.summingInt(RenterOrderSubsidyDetailDTO::getSubsidyAmount));
         int rentAmt = renterOrderCostDetailEntities.stream().collect(Collectors.summingInt(RenterOrderCostDetailEntity::getTotalAmount));
         rentAmt = rentAmt + rentAmtSubsidyAmt;
         detailList.addAll(renterOrderCostDetailEntities);

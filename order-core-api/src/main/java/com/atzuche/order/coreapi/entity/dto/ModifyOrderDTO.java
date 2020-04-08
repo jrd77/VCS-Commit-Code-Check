@@ -166,4 +166,8 @@ public class ModifyOrderDTO {
      * 是否扫码还车的修改还车时间
      */
     private Boolean scanCodeFlag;
+    /**
+     * 长租优惠券码
+     */
+    private String longCouponCode;
 }

@@ -131,6 +131,10 @@ public class ModifyOrderService {
 	private ModifyOrderFeeService modifyOrderFeeService;
 	@Autowired
 	private AccountRenterCostSettleService accountRenterCostSettleService;
+	@Autowired
+	private LongRentSubsidyService longRentSubsidyService;
+	@Autowired
+	private LongRentCostHandleService longRentCostHandleService;
 	/**
 	 * 修改订单主逻辑（含换车）
 	 * @param modifyOrderReq
@@ -812,16 +816,34 @@ public class ModifyOrderService {
 	public RenterOrderCostRespDTO getRenterOrderCostRespDTO(ModifyOrderDTO modifyOrderDTO, RenterOrderReqVO renterOrderReqVO, List<RenterOrderCostDetailEntity> initCostList, List<RenterOrderSubsidyDetailEntity> initSubsidyList) {
 		// 构建参数
 		RenterOrderCostReqDTO renterOrderCostReqDTO = renterOrderService.buildRenterOrderCostReqDTO(renterOrderReqVO);
-		// 获取平台保障费和全面保障费折扣补贴
-		List<RenterOrderSubsidyDetailDTO> insurDiscountSubsidyList = insurAbamentDiscountService.getInsureDiscountSubsidy(renterOrderCostReqDTO, modifyOrderDTO.getRenterSubsidyList());
-		// 获取费用补贴列表
-		List<RenterOrderSubsidyDetailDTO> subsidyList = getRenterSubsidyList(modifyOrderDTO, renterOrderCostReqDTO, modifyOrderDTO.getRenterSubsidyList(), initCostList, initSubsidyList, insurDiscountSubsidyList);
-		if (insurDiscountSubsidyList != null && !insurDiscountSubsidyList.isEmpty()) {
-			subsidyList.addAll(insurDiscountSubsidyList);
+		List<RenterOrderSubsidyDetailDTO> subsidyList = new ArrayList<RenterOrderSubsidyDetailDTO>();
+		if (StringUtils.isNotBlank(modifyOrderDTO.getLongCouponCode())) {
+			// 长租订单
+			Integer carNo = modifyOrderDTO.getRenterGoodsDetailDTO() == null ? null:modifyOrderDTO.getRenterGoodsDetailDTO().getCarNo();
+			String carNoStr = carNo == null ? null:String.valueOf(carNo);
+			List<RenterOrderSubsidyDetailDTO> rentAmtSubsidyList = longRentSubsidyService.getLongRentAmtSubsidy(carNoStr, modifyOrderDTO.getLongCouponCode(), renterOrderCostReqDTO, modifyOrderDTO.getRenterSubsidyList());
+			if (rentAmtSubsidyList != null && !rentAmtSubsidyList.isEmpty()) {
+				subsidyList.addAll(rentAmtSubsidyList);
+			}
+			if (modifyOrderDTO.getRenterSubsidyList() != null && !modifyOrderDTO.getRenterSubsidyList().isEmpty()) {
+				subsidyList.addAll(modifyOrderDTO.getRenterSubsidyList());
+			}
+		} else {
+			// 获取平台保障费和全面保障费折扣补贴
+			List<RenterOrderSubsidyDetailDTO> insurDiscountSubsidyList = insurAbamentDiscountService.getInsureDiscountSubsidy(renterOrderCostReqDTO, modifyOrderDTO.getRenterSubsidyList());
+			// 获取费用补贴列表
+			subsidyList = getRenterSubsidyList(modifyOrderDTO, renterOrderCostReqDTO, modifyOrderDTO.getRenterSubsidyList(), initCostList, initSubsidyList, insurDiscountSubsidyList);
+			if (insurDiscountSubsidyList != null && !insurDiscountSubsidyList.isEmpty()) {
+				subsidyList.addAll(insurDiscountSubsidyList);
+			}
 		}
 		renterOrderCostReqDTO.setSubsidyOutList(subsidyList);
 		// 获取计算好的费用信息
 		RenterOrderCostRespDTO renterOrderCostRespDTO = renterOrderCalCostService.calcBasicRenterOrderCostAndDeailList(renterOrderCostReqDTO);
+		if (StringUtils.isNotBlank(modifyOrderDTO.getLongCouponCode())) {
+			// 长租订单逻辑处理
+			renterOrderCostRespDTO = longRentCostHandleService.handRentCost(renterOrderCostReqDTO, renterOrderCostRespDTO);
+		}
 		renterOrderCostRespDTO.setOrderNo(modifyOrderDTO.getOrderNo());
 		renterOrderCostRespDTO.setRenterOrderNo(modifyOrderDTO.getRenterOrderNo());
 		renterOrderCostRespDTO.setMemNo(modifyOrderDTO.getMemNo());

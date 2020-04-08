@@ -3,15 +3,6 @@
  */
 package com.atzuche.order.coreapi.service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import com.atzuche.order.accountownerincome.service.notservice.AccountOwnerIncomeExamineNoTService;
 import com.atzuche.order.accountrenterdeposit.service.AccountRenterDepositService;
 import com.atzuche.order.accountrenterdeposit.vo.res.AccountRenterDepositResVO;
@@ -21,6 +12,7 @@ import com.atzuche.order.accountrenterrentcost.service.AccountRenterCostSettleSe
 import com.atzuche.order.accountrenterwzdepost.service.AccountRenterWzDepositService;
 import com.atzuche.order.accountrenterwzdepost.vo.res.AccountRenterWZDepositResVO;
 import com.atzuche.order.cashieraccount.service.CashierPayService;
+import com.atzuche.order.commons.entity.dto.OwnerCouponLongDTO;
 import com.atzuche.order.commons.enums.DeliveryOrderTypeEnum;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.commons.vo.req.OrderCostReqVO;
@@ -42,21 +34,15 @@ import com.atzuche.order.delivery.service.RenterOrderDeliveryService;
 import com.atzuche.order.delivery.vo.delivery.rep.OwnerGetAndReturnCarDTO;
 import com.atzuche.order.delivery.vo.delivery.rep.RenterGetAndReturnCarDTO;
 import com.atzuche.order.ownercost.entity.ConsoleOwnerOrderFineDeatailEntity;
-import com.atzuche.order.rentercost.entity.OrderConsoleCostDetailEntity;
-import com.atzuche.order.rentercost.entity.OrderConsoleSubsidyDetailEntity;
-import com.atzuche.order.rentercost.entity.OrderSupplementDetailEntity;
-import com.atzuche.order.rentercost.entity.RenterOrderCostDetailEntity;
-import com.atzuche.order.rentercost.entity.RenterOrderFineDeatailEntity;
-import com.atzuche.order.rentercost.entity.RenterOrderSubsidyDetailEntity;
-import com.atzuche.order.rentercost.service.ConsoleRenterOrderFineDeatailService;
-import com.atzuche.order.rentercost.service.OrderConsoleCostDetailService;
-import com.atzuche.order.rentercost.service.OrderSupplementDetailService;
-import com.atzuche.order.rentercost.service.RenterOrderCostDetailService;
-import com.atzuche.order.rentercost.service.RenterOrderFineDeatailService;
-import com.atzuche.order.rentercost.service.RenterOrderSubsidyDetailService;
+import com.atzuche.order.ownercost.entity.OwnerOrderEntity;
+import com.atzuche.order.ownercost.service.OwnerOrderService;
+import com.atzuche.order.rentercost.entity.*;
+import com.atzuche.order.rentercost.service.*;
 import com.atzuche.order.renterorder.entity.OrderCouponEntity;
+import com.atzuche.order.renterorder.entity.OwnerCouponLongEntity;
 import com.atzuche.order.renterorder.entity.RenterDepositDetailEntity;
 import com.atzuche.order.renterorder.service.OrderCouponService;
+import com.atzuche.order.renterorder.service.OwnerCouponLongService;
 import com.atzuche.order.renterorder.service.RenterDepositDetailService;
 import com.atzuche.order.settle.service.OrderSettleService;
 import com.atzuche.order.settle.vo.req.OwnerCosts;
@@ -64,8 +50,15 @@ import com.atzuche.order.settle.vo.req.RentCosts;
 import com.autoyol.doc.util.StringUtil;
 import com.autoyol.platformcost.CommonUtils;
 import com.autoyol.platformcost.model.FeeResult;
-
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * @author jing.huang
@@ -104,6 +97,11 @@ public class OrderCostService {
 	private OrderConsoleCostDetailService orderConsoleCostDetailService;
 	@Autowired
 	private AccountOwnerIncomeExamineNoTService accountOwnerIncomeExamineNoTService;
+    @Autowired
+	private OwnerCouponLongService ownerCouponLongService;
+    @Autowired
+    private OwnerOrderService ownerOrderService;
+
 	
 	public OrderRenterCostResVO orderCostRenterGet(OrderCostReqVO req){
 		OrderRenterCostResVO resVo = new OrderRenterCostResVO();
@@ -122,9 +120,13 @@ public class OrderCostService {
 			log.error("实际租车费用:",e);
 			resVo.setNeedIncrementAmt(0);
 		}
-		
-		
-		
+
+        OwnerCouponLongEntity ownerCouponLongEntity = ownerCouponLongService.getByRenterOrderNo(renterOrderNo);
+        if(ownerCouponLongEntity != null){
+            OwnerCouponLongDTO ownerCouponLongDTO = new OwnerCouponLongDTO();
+            BeanUtils.copyProperties(ownerCouponLongEntity,ownerCouponLongDTO);
+            resVo.setOwnerCouponLongDTO(ownerCouponLongDTO);
+        }
         //违章押金
         AccountRenterWZDepositResVO wzVo =  accountRenterWzDepositService.getAccountRenterWZDeposit(orderNo, memNo);
         com.atzuche.order.commons.vo.res.account.AccountRenterWZDepositResVO wzVoReal = new com.atzuche.order.commons.vo.res.account.AccountRenterWZDepositResVO();
@@ -435,7 +437,17 @@ public class OrderCostService {
 		          });
 		      }
 			resVo.setOrderConsoleCostDetails(consoleCostLstReal);
-			
+            OwnerOrderEntity ownerOrderByOwnerOrderNo = ownerOrderService.getOwnerOrderByOwnerOrderNo(ownerOrderNo);
+            String renterOrderNo = ownerOrderByOwnerOrderNo.getRenterOrderNo();
+            if(renterOrderNo != null){
+                OwnerCouponLongEntity ownerCouponLongEntity = ownerCouponLongService.getByRenterOrderNo(renterOrderNo);
+                if(ownerCouponLongEntity != null){
+                    OwnerCouponLongDTO ownerCouponLongDTO = new OwnerCouponLongDTO();
+                    BeanUtils.copyProperties(ownerCouponLongEntity,ownerCouponLongDTO);
+                    resVo.setOwnerCouponLongDTO(ownerCouponLongDTO);
+                }
+            }
+
 			///车主的结算后收益 200215  结算收益有多条记录的情况。
 //			AccountOwnerIncomeExamineEntity examine = accountOwnerIncomeExamineNoTService.getAccountOwnerIncomeExamineByOrderNo(orderNo);
 //			if(examine != null) {
