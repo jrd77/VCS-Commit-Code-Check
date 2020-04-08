@@ -220,7 +220,7 @@
         where
             order_no = #{orderNo}
             and op_status = 1
-            and pay_flag in (1,4,5)
+            and pay_flag in (0,1,4,5)
             and is_delete = 0
         order by amt
     </select>

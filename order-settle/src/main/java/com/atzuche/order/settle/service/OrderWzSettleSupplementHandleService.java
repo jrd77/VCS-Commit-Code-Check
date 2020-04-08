@@ -25,6 +25,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 违章押金结算,补付记录处理
@@ -58,21 +59,72 @@ public class OrderWzSettleSupplementHandleService {
         if (CollectionUtils.isEmpty(entityList)) {
             logger.warn("No record of supplement was found.");
         } else {
-            List<OrderSupplementDetailEntity> debtList = new ArrayList<>();
+            List<OrderSupplementDetailEntity> debtList= new ArrayList<>();
             List<OrderSupplementDetailEntity> deductList = new ArrayList<>();
-            if (settleOrdersAccount.getDepositSurplusAmt() > OrderConstant.ZERO) {
-                int depositSurplusAmt = settleOrdersAccount.getDepositSurplusAmt();
-                int totalSupplementAmt = Math.abs(entityList.stream().mapToInt(OrderSupplementDetailEntity::getAmt).sum());
-                if (settleOrdersAccount.getDepositSurplusAmt() >= totalSupplementAmt) {
+            handleSupplementDetail(entityList, debtList, deductList, settleOrdersAccount);
+            if (CollectionUtils.isNotEmpty(debtList)) {
+                debtList.forEach(entity -> {
+                    orderSupplementDetailService.updatePayFlagById(entity.getId(),
+                            SupplementPayFlagEnum.PAY_FLAG_VIOLATION_DEPOSIT_SETTLE_INTO_DEBT.getCode(), null);
+                    AccountInsertDebtReqVO accountInsertDebt = buildAccountInsertDebtReqVO(settleOrders, entity.getAmt());
+                    cashierWzSettleService.createWzDebt(accountInsertDebt);
+                });
+            }
+            if (CollectionUtils.isNotEmpty(deductList)) {
+                deductList.forEach(entity -> {
+                    orderSupplementDetailService.updatePayFlagById(entity.getId(),
+                            SupplementPayFlagEnum.PAY_FLAG_VIOLATION_DEPOSIT_SETTLE_DEDUCT.getCode(), null);
+                    // 更新违章押金抵扣信息
+                    if(null != entity.getPayFlag() && entity.getPayFlag() != OrderConstant.ZERO) {
+                        PayedOrderRenterDepositWZDetailReqVO payedOrderRenterWzDepositDetail =
+                                buildPayedOrderRenterDepositWzDetailReqVO(settleOrders, Math.abs(entity.getAmt()));
+                        payedOrderRenterWzDepositDetail.setUniqueNo(String.valueOf(entity.getId()));
+                        accountRenterWzDepositService.updateRenterWZDepositChange(payedOrderRenterWzDepositDetail);
+                    }
+                });
+            }
+        }
+    }
+
+
+    /**
+     * 处理未支付的补付记录
+     *
+     * @param entityList 订单补付记录
+     * @param debtList   押金抵扣记录
+     * @param deductList 转款欠款记录
+     * @param settleOrdersAccount 结算信息
+     */
+    public void handleSupplementDetail(List<OrderSupplementDetailEntity> entityList,
+                                       List<OrderSupplementDetailEntity> debtList,
+                                       List<OrderSupplementDetailEntity> deductList,
+                                       SettleOrdersAccount settleOrdersAccount) {
+        List<OrderSupplementDetailEntity> noNeedPayList =
+                entityList.stream().filter(d -> null != d.getPayFlag() && d.getPayFlag() == OrderConstant.ZERO).collect(Collectors.toList());
+        List<OrderSupplementDetailEntity> noPayList =
+                entityList.stream().filter(d -> null != d.getPayFlag() && d.getPayFlag() != OrderConstant.ZERO).collect(Collectors.toList());
+        int noNeedPayAmt = noNeedPayList.stream().mapToInt(OrderSupplementDetailEntity::getAmt).sum();
+        int noPayAmt = noPayList.stream().mapToInt(OrderSupplementDetailEntity::getAmt).sum();
+        if (Math.abs(noNeedPayAmt) >= Math.abs(noPayAmt)) {
+            logger.warn("No need handle.noNeedPayAmt:[{}],noPayAmt:[{}]", noNeedPayAmt, noPayAmt);
+            entityList.forEach(entity ->
+                    orderSupplementDetailService.updatePayFlagById(entity.getId(),
+                            SupplementPayFlagEnum.PAY_FLAG_VIOLATION_DEPOSIT_SETTLE_DEDUCT.getCode(), null)
+            );
+        } else {
+            int depositSurplusAmt = settleOrdersAccount.getDepositSurplusAmt() + noNeedPayAmt;
+            if (depositSurplusAmt > OrderConstant.ZERO) {
+                if (depositSurplusAmt >= Math.abs(noPayAmt)) {
                     // 更新补付记录支付状态(已完成抵扣的改为:20,违章押金结算抵扣)
                     deductList.addAll(entityList);
-                    depositSurplusAmt = settleOrdersAccount.getDepositSurplusAmt() - totalSupplementAmt;
+                    depositSurplusAmt = depositSurplusAmt - Math.abs(noPayAmt);
                 } else {
-                    OrderSupplementDetailEntity splitCriticalPoint = getSplitCriticalPoint(entityList,
-                            settleOrdersAccount.getDepositSurplusAmt());
+                    deductList.addAll(noNeedPayList);
+                    OrderSupplementDetailEntity splitCriticalPoint = getSplitCriticalPoint(noPayList,
+                            depositSurplusAmt);
                     if (null != splitCriticalPoint) {
                         boolean mark = false;
-                        for (OrderSupplementDetailEntity entity : entityList) {
+                        for (OrderSupplementDetailEntity entity : noPayList) {
                             if (mark || entity.getId().intValue() == splitCriticalPoint.getId()) {
                                 if (mark) {
                                     // 临界点之后的数据直接记欠款
@@ -110,6 +162,8 @@ public class OrderWzSettleSupplementHandleService {
                             }
                         }
                     } else {
+                        //重置剩余押金
+                        depositSurplusAmt = settleOrdersAccount.getDepositSurplusAmt();
                         logger.warn("Split critical point is empty.");
                     }
                 }
@@ -117,26 +171,8 @@ public class OrderWzSettleSupplementHandleService {
             } else {
                 // 转入个人欠款(剩余押金不足抵扣补付金额)
                 // 更新补付记录支付状态(剩余押金不足抵扣补付金额):30,违章押金结算转欠款
-                debtList.addAll(entityList);
-            }
-            if (CollectionUtils.isNotEmpty(debtList)) {
-                debtList.forEach(entity -> {
-                    orderSupplementDetailService.updatePayFlagById(entity.getId(),
-                            SupplementPayFlagEnum.PAY_FLAG_VIOLATION_DEPOSIT_SETTLE_INTO_DEBT.getCode(), null);
-                    AccountInsertDebtReqVO accountInsertDebt = buildAccountInsertDebtReqVO(settleOrders, entity.getAmt());
-                    cashierWzSettleService.createWzDebt(accountInsertDebt);
-                });
-            }
-            if (CollectionUtils.isNotEmpty(deductList)) {
-                deductList.forEach(entity -> {
-                    orderSupplementDetailService.updatePayFlagById(entity.getId(),
-                            SupplementPayFlagEnum.PAY_FLAG_VIOLATION_DEPOSIT_SETTLE_DEDUCT.getCode(), null);
-                    // 更新违章押金抵扣信息
-                    PayedOrderRenterDepositWZDetailReqVO payedOrderRenterWzDepositDetail =
-                            buildPayedOrderRenterDepositWzDetailReqVO(settleOrders, Math.abs(entity.getAmt()));
-                    payedOrderRenterWzDepositDetail.setUniqueNo(String.valueOf(entity.getId()));
-                    accountRenterWzDepositService.updateRenterWZDepositChange(payedOrderRenterWzDepositDetail);
-                });
+                debtList.addAll(noPayList);
+                deductList.addAll(noNeedPayList);
             }
         }
     }
