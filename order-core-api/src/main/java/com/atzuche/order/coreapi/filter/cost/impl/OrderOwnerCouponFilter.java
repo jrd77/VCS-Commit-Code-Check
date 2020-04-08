@@ -2,8 +2,10 @@ package com.atzuche.order.coreapi.filter.cost.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.atzuche.order.coreapi.entity.dto.cost.OrderCostContext;
+import com.atzuche.order.coreapi.entity.dto.cost.OrderCostDetailContext;
 import com.atzuche.order.coreapi.entity.dto.cost.req.OrderCostBaseReqDTO;
 import com.atzuche.order.coreapi.entity.dto.cost.req.OrderCostOwnerCouponReqDTO;
+import com.atzuche.order.coreapi.entity.dto.cost.res.OrderOwnerCouponResDTO;
 import com.atzuche.order.coreapi.filter.cost.OrderCostFilter;
 import com.atzuche.order.coreapi.submit.exception.OrderCostFilterException;
 import com.atzuche.order.rentercost.entity.dto.OrderCouponDTO;
@@ -57,25 +59,31 @@ public class OrderOwnerCouponFilter implements OrderCostFilter {
 
         log.info("计算订单车主券抵扣金额-->优惠券信息.result is, ownerCoupon:[{}]", JSON.toJSONString(ownerCoupon));
         if (null != ownerCoupon) {
-            renterOrderResVO.setOwnerCoupon(ownerCoupon);
+            OrderCostDetailContext orderCostDetailContext = context.getCostDetailContext();
             //重置剩余租金
             int disAmt = null == ownerCoupon.getAmount() ? 0 : ownerCoupon.getAmount();
-            context.setSurplusRentAmt(context.getSurplusRentAmt() - disAmt);
+            orderCostDetailContext.setSurplusRentAmt(orderCostDetailContext.getSurplusRentAmt() - disAmt);
             //记录车主券
-            ownerCoupon.setOrderNo(context.getOrderNo());
-            ownerCoupon.setRenterOrderNo(context.getRenterOrderNo());
-            context.getOrderCouponList().add(ownerCoupon);
+            ownerCoupon.setOrderNo(baseReqDTO.getOrderNo());
+            ownerCoupon.setRenterOrderNo(baseReqDTO.getRenterOrderNo());
             //补贴明细
             RenterOrderSubsidyDetailDTO ownerCouponSubsidyInfo =
-                    renterOrderSubsidyDetailService.calOwnerCouponSubsidyInfo(Integer.valueOf(context.getMemNo()),
+                    renterOrderSubsidyDetailService.calOwnerCouponSubsidyInfo(Integer.valueOf(baseReqDTO.getMemNo()),
                             ownerCoupon);
-            ownerCouponSubsidyInfo.setOrderNo(context.getOrderNo());
-            ownerCouponSubsidyInfo.setRenterOrderNo(context.getRenterOrderNo());
-            context.getOrderSubsidyDetailList().add(ownerCouponSubsidyInfo);
+            ownerCouponSubsidyInfo.setOrderNo(baseReqDTO.getOrderNo());
+            ownerCouponSubsidyInfo.setRenterOrderNo(baseReqDTO.getRenterOrderNo());
 
-            LOGGER.info("车主券处理-->优惠券补贴信息.result is, ownerCouponSubsidyInfo:[{}]",
-                    JSON.toJSONString(ownerCouponSubsidyInfo));
-            return true;
+
+            OrderOwnerCouponResDTO orderOwnerCouponResDTO = new OrderOwnerCouponResDTO();
+            orderOwnerCouponResDTO.setGetCarFeeCoupon(ownerCoupon);
+            orderOwnerCouponResDTO.setSubsidyAmt(ownerCouponSubsidyInfo.getSubsidyAmount());
+            orderOwnerCouponResDTO.setSubsidyDetail(ownerCouponSubsidyInfo);
+            context.getResContext().setOrderOwnerCouponResDTO(orderOwnerCouponResDTO);
+
+            log.info("计算订单车主券抵扣金额-->优惠券补贴信息.result is, orderOwnerCouponResDTO:[{}]",
+                    JSON.toJSONString(orderOwnerCouponResDTO));
+            orderCostDetailContext.getCoupons().add(ownerCoupon);
+            orderCostDetailContext.getSubsidyDetails().add(ownerCouponSubsidyInfo);
         }
 
     }
