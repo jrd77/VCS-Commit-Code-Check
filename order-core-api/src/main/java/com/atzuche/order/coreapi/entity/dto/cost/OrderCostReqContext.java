@@ -53,6 +53,11 @@ public class OrderCostReqContext {
     private LongOrderOwnerCouponReqDTO longOrderOwnerCouponReqDTO;
 
     /**
+     * 计算送取服务券抵扣信息参数
+     */
+    private OrderCostGetCarFeeCouponReqDTO orderCostGetCarFeeCouponReqDTO;
+
+    /**
      * 计算车主券抵扣信息参数
      */
     private OrderCostOwnerCouponReqDTO ownerCouponReqDTO;
@@ -60,7 +65,7 @@ public class OrderCostReqContext {
     /**
      * 计算优惠券抵扣信息参数
      */
-    private OrderCostCouponReqDTO costCouponReqDTO;
+    private OrderCostPlatformCouponReqDTO costCouponReqDTO;
 
     /**
      * 计算限时红包抵扣信息参数

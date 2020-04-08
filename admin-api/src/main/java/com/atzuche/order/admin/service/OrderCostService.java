@@ -544,7 +544,7 @@ public class OrderCostService {
         int sum = Optional.ofNullable(subsidyLst)
                 .orElseGet(ArrayList::new)
                 .stream()
-                .filter(x -> RenterCashCodeEnum.LONG_OWNER_COUPON_OFFSET_COST.getCashNo().equals(x.getSubsidyCostCode()))
+                .filter(x -> RenterCashCodeEnum.RENT_AMT.getCashNo().equals(x.getSubsidyCostCode()))
                 .mapToInt(RenterOrderSubsidyDetailResVO::getSubsidyAmount)
                 .sum();
         int deductionAmount = realVo.getDeductionAmount() != null ? 0 : Integer.valueOf(realVo.getDeductionAmount());
@@ -1196,7 +1196,7 @@ public class OrderCostService {
         int sum = Optional.ofNullable(ownerOrderSubsidyDetail)
                 .orElseGet(ArrayList::new)
                 .stream()
-                .filter(x -> RenterCashCodeEnum.LONG_OWNER_COUPON_OFFSET_COST.getCashNo().equals(x.getSubsidyCostCode()))
+                .filter(x -> RenterCashCodeEnum.RENT_AMT.getCashNo().equals(x.getSubsidyCostCode()))
                 .mapToInt(OwnerOrderSubsidyDetailEntity::getSubsidyAmount)
                 .sum();
 

@@ -11,4 +11,20 @@ import lombok.Data;
 @Data
 public class OrderCostOwnerCouponReqDTO {
 
+
+    /**
+     * 车主券编码
+     */
+    private String couponNo;
+
+    /**
+     * 车辆注册号
+     */
+    private Integer carNo;
+
+    /**
+     * 备注
+     */
+    private Integer mark;
+
 }
