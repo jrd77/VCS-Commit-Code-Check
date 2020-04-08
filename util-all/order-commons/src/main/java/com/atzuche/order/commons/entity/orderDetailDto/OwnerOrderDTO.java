@@ -26,12 +26,18 @@ public class OwnerOrderDTO implements Serializable {
     	/**
          * 子订单号
          */
-        @AutoDocProperty(value="子订单号",required=true)
+        @AutoDocProperty(value="车主子订单号",required=true)
         private String ownerOrderNo;
+
+    /**
+     * 租客子订单号
+     */
+        @AutoDocProperty(value="租客子订单号",required=true)
+        private String renterOrderNo;
     	/**
          * 会员号
          */
-        @AutoDocProperty(value="会员号",required=true)
+        @AutoDocProperty(value="车主会员号",required=true)
         private String memNo;
     	/**
          * 显示起租时间

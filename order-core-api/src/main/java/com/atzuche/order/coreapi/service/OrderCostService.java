@@ -3,15 +3,6 @@
  */
 package com.atzuche.order.coreapi.service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import com.atzuche.order.accountownerincome.service.notservice.AccountOwnerIncomeExamineNoTService;
 import com.atzuche.order.accountrenterdeposit.service.AccountRenterDepositService;
 import com.atzuche.order.accountrenterdeposit.vo.res.AccountRenterDepositResVO;
@@ -42,21 +33,12 @@ import com.atzuche.order.delivery.service.RenterOrderDeliveryService;
 import com.atzuche.order.delivery.vo.delivery.rep.OwnerGetAndReturnCarDTO;
 import com.atzuche.order.delivery.vo.delivery.rep.RenterGetAndReturnCarDTO;
 import com.atzuche.order.ownercost.entity.ConsoleOwnerOrderFineDeatailEntity;
-import com.atzuche.order.rentercost.entity.OrderConsoleCostDetailEntity;
-import com.atzuche.order.rentercost.entity.OrderConsoleSubsidyDetailEntity;
-import com.atzuche.order.rentercost.entity.OrderSupplementDetailEntity;
-import com.atzuche.order.rentercost.entity.RenterOrderCostDetailEntity;
-import com.atzuche.order.rentercost.entity.RenterOrderFineDeatailEntity;
-import com.atzuche.order.rentercost.entity.RenterOrderSubsidyDetailEntity;
-import com.atzuche.order.rentercost.service.ConsoleRenterOrderFineDeatailService;
-import com.atzuche.order.rentercost.service.OrderConsoleCostDetailService;
-import com.atzuche.order.rentercost.service.OrderSupplementDetailService;
-import com.atzuche.order.rentercost.service.RenterOrderCostDetailService;
-import com.atzuche.order.rentercost.service.RenterOrderFineDeatailService;
-import com.atzuche.order.rentercost.service.RenterOrderSubsidyDetailService;
+import com.atzuche.order.rentercost.entity.*;
+import com.atzuche.order.rentercost.service.*;
 import com.atzuche.order.renterorder.entity.OrderCouponEntity;
 import com.atzuche.order.renterorder.entity.RenterDepositDetailEntity;
 import com.atzuche.order.renterorder.service.OrderCouponService;
+import com.atzuche.order.renterorder.service.OwnerCouponLongService;
 import com.atzuche.order.renterorder.service.RenterDepositDetailService;
 import com.atzuche.order.settle.service.OrderSettleService;
 import com.atzuche.order.settle.vo.req.OwnerCosts;
@@ -64,8 +46,15 @@ import com.atzuche.order.settle.vo.req.RentCosts;
 import com.autoyol.doc.util.StringUtil;
 import com.autoyol.platformcost.CommonUtils;
 import com.autoyol.platformcost.model.FeeResult;
-
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * @author jing.huang
@@ -104,6 +93,8 @@ public class OrderCostService {
 	private OrderConsoleCostDetailService orderConsoleCostDetailService;
 	@Autowired
 	private AccountOwnerIncomeExamineNoTService accountOwnerIncomeExamineNoTService;
+    @Autowired
+	private OwnerCouponLongService ownerCouponLongService;
 	
 	public OrderRenterCostResVO orderCostRenterGet(OrderCostReqVO req){
 		OrderRenterCostResVO resVo = new OrderRenterCostResVO();
@@ -435,7 +426,8 @@ public class OrderCostService {
 		          });
 		      }
 			resVo.setOrderConsoleCostDetails(consoleCostLstReal);
-			
+
+
 			///车主的结算后收益 200215  结算收益有多条记录的情况。
 //			AccountOwnerIncomeExamineEntity examine = accountOwnerIncomeExamineNoTService.getAccountOwnerIncomeExamineByOrderNo(orderNo);
 //			if(examine != null) {

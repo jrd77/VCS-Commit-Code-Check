@@ -3,17 +3,13 @@
  */
 package com.atzuche.order.commons.vo.res;
 
-import java.util.List;
-
-import com.atzuche.order.commons.vo.res.ownercosts.ConsoleOwnerOrderFineDeatailEntity;
-import com.atzuche.order.commons.vo.res.ownercosts.OwnerOrderFineDeatailEntity;
-import com.atzuche.order.commons.vo.res.ownercosts.OwnerOrderIncrementDetailEntity;
-import com.atzuche.order.commons.vo.res.ownercosts.OwnerOrderPurchaseDetailEntity;
-import com.atzuche.order.commons.vo.res.ownercosts.OwnerOrderSubsidyDetailEntity;
+import com.atzuche.order.commons.entity.dto.OwnerCouponLongDTO;
+import com.atzuche.order.commons.vo.res.ownercosts.*;
 import com.atzuche.order.commons.vo.res.rentcosts.OrderConsoleSubsidyDetailEntity;
 import com.atzuche.order.commons.vo.res.rentcosts.OrderCouponEntity;
-
 import lombok.Data;
+
+import java.util.List;
 
 /**
  * @author jing.huang
@@ -92,5 +88,9 @@ public class OrderOwnerCostResVO {
      * 交接车-获取超里程费用（车主端依托租客的参数来计算。）
      */
     private int mileageAmt;
+    /**
+     * 长租折扣
+     */
+    private OwnerCouponLongDTO ownerCouponLongDTO;
     
 }
