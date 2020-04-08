@@ -20,14 +20,14 @@ import java.util.List;
 
 /**
  * OrderRefundTask
- *
+ * 支付宝预授权扣款，4小时一次的循环扣款处理。
  * @date 2020/1/3
  */
 @Component
-@JobHandler("orderRefundTask")
-public class OrderRefundTask extends IJobHandler {
+@JobHandler("orderRefundPreAuthTask")
+public class OrderRefundPreAuthTask extends IJobHandler {
 
-    private Logger logger = LoggerFactory.getLogger(OrderRefundTask.class);
+    private Logger logger = LoggerFactory.getLogger(OrderRefundPreAuthTask.class);
 
     @Autowired
     CashierRefundApplyNoTService cashierRefundApplyNoTService;
@@ -36,10 +36,17 @@ public class OrderRefundTask extends IJobHandler {
 
     @Override
     public ReturnT<String> execute(String s) throws Exception {
-        logger.info("开始执行 退款订单任务");
-        List<CashierRefundApplyEntity> list = cashierRefundApplyNoTService.selectorderNoWaitingAll();
+        logger.info("开始执行 退款订单任务-预授权完成");
+        //限定条件，大于3次，4小时循环。且为预授权完成的操作。 预授权完成成功之后，才做预授权撤销。
+        //重新定义数据源。
+        ////更新退款申请表的状态。   02 ->01
+        //参考 cashierRefundApplyNoTService.updateRefundDepositSuccess(notifyDataVo);
+        
+        List<CashierRefundApplyEntity> list = cashierRefundApplyNoTService.selectorderNoWaitingAllForPreAuth();
+        
         if (CollectionUtils.isNotEmpty(list)) {
         	logger.info("开始执行 退款订单任务 查询需要退换的 记录list={}", GsonUtils.toJson(list));
+        	
         	for (int i = 0; i < list.size(); i++) {
                 Cat.logEvent(CatConstants.XXL_JOB_PARAM, GsonUtils.toJson(list.get(i)));
                 try {
@@ -53,9 +60,8 @@ public class OrderRefundTask extends IJobHandler {
         }else{
         	logger.info("开始执行 退款订单任务 未查询需要退换的 记录list=0");
         }
-        logger.info("结束执行 退款 ");
-        XxlJobLogger.log("结束执行 退款 ");
+        logger.info("结束执行 退款-预授权完成 ");
+        XxlJobLogger.log("结束执行 退款-预授权完成 ");
         return SUCCESS;
-
     }
 }

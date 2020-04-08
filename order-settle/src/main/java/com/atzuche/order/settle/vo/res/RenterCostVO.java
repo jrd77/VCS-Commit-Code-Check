@@ -93,11 +93,11 @@ public class RenterCostVO {
     
     // ------------------------------------------ 违章押金
     /**
-     * 实退违章押金
+     * 实扣违章押金
      */
     private int depositWzCostShikou;
     /**
-     * 应退违章押金
+     * 应扣违章押金
      */
     private int depositWzCostYingkou;
     

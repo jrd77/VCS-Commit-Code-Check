@@ -171,6 +171,13 @@
         select <include refid="Base_Column_List" /> from cashier_refund_apply
         <![CDATA[ where status ='01' and create_time < #{date} and num<3 limit 100 ]]>
     </select>
+    
+    <!-- 去掉  limit 100  -->
+    <select id="getCashierRefundApplyByTimeForPreAuth" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List" /> from cashier_refund_apply
+        <![CDATA[ where status ='01' and create_time &gt;= #{date} and num &gt;= 3 and pay_type = '03' ]]>
+    </select>
+    
     <select id="getRefundApplyByOrderNo" resultMap="BaseResultMap">
         select <include refid="Base_Column_List" /> from cashier_refund_apply
         where  order_no = #{orderNo}

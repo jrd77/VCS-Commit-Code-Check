@@ -110,7 +110,9 @@ public class CashierRefundApplyNoTService {
         int refundId = StringUtil.isBlank(refundIdStr)?0:Integer.valueOf(refundIdStr);
         CashierRefundApplyEntity cashierRefundApplyEntity = cashierRefundApplyMapper.selectByPrimaryKey(refundId);
         //2 回调退款是否成功判断 TODOD
-        if(Objects.nonNull(cashierRefundApplyEntity) && CashierRefundApplyStatus.RECEIVED_REFUND.getCode().equals(notifyDataVo.getTransStatus())){
+        if(Objects.nonNull(cashierRefundApplyEntity) 
+        		&& CashierRefundApplyStatus.WAITING_FOR_REFUND.getCode().equals(cashierRefundApplyEntity.getStatus()) //当前的状态，避免重复操作。
+        		&& CashierRefundApplyStatus.RECEIVED_REFUND.getCode().equals(notifyDataVo.getTransStatus())){  //退款成功
             //3 更新退款成功
             CashierRefundApplyEntity cashierRefundApplyUpdate = new CashierRefundApplyEntity();
             cashierRefundApplyUpdate.setStatus(notifyDataVo.getTransStatus());
@@ -121,6 +123,7 @@ public class CashierRefundApplyNoTService {
             if(result==0){
                 throw new OrderPayRefundCallBackAsnyException();
             }
+            
             //4.如果是预授权完成的操作成功，检测该订单是否存在预授权解冻的记录。修改status=01退款中。 todo huangjing  do  200302
             if(DataPayTypeConstant.PRE_FINISH.equals(cashierRefundApplyEntity.getPayType())) {
             	//当前是预授权完成的记录，同时查询该笔订单是否存在预授权解冻的记录，修改状态为01 退款中。
@@ -178,6 +181,16 @@ public class CashierRefundApplyNoTService {
         List<CashierRefundApplyEntity> result = cashierRefundApplyMapper.getCashierRefundApplyByTime(date);
         return result;
     }
+    
+    //
+    public List<CashierRefundApplyEntity> selectorderNoWaitingAllForPreAuth() {
+        //回去
+        long refundWatingDaysLong = Long.parseLong(refundWatingDays);
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime date = now.plusDays(-refundWatingDaysLong);
+        List<CashierRefundApplyEntity> result = cashierRefundApplyMapper.getCashierRefundApplyByTimeForPreAuth(date);
+        return result;
+    }    
     
     /**
      * 保存虚拟退款记录
