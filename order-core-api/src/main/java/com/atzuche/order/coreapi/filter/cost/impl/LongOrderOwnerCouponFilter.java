@@ -14,6 +14,8 @@ import com.atzuche.order.coreapi.service.CouponAndCoinHandleService;
 import com.atzuche.order.coreapi.submit.exception.OrderCostFilterException;
 import com.atzuche.order.rentercost.entity.RenterOrderCostDetailEntity;
 import com.atzuche.order.rentercost.entity.dto.RenterOrderSubsidyDetailDTO;
+import com.atzuche.order.rentercost.entity.vo.HolidayAverageDateTimeVO;
+import com.atzuche.order.rentercost.entity.vo.HolidayAverageResultVO;
 import com.atzuche.order.renterorder.service.RenterOrderCostHandleService;
 import com.atzuche.order.renterorder.vo.owner.OwnerCouponLongReqVO;
 import com.atzuche.order.renterorder.vo.owner.OwnerCouponLongResVO;
@@ -72,10 +74,20 @@ public class LongOrderOwnerCouponFilter implements OrderCostFilter {
         List<RenterOrderSubsidyDetailDTO> subsidyDetails = new ArrayList<>();
         details.forEach(d -> {
             OwnerCouponLongReqVO reqVO = buildOwnerCouponLongReqVO(baseReqDTO, longOrderOwnerCouponReqDTO);
-            reqVO.setRentOriginalUnitPriceAmt(d.getUnitPrice());
+            List<HolidayAverageDateTimeVO> ownerUnitPriceVOS = new ArrayList<HolidayAverageDateTimeVO>();
+            HolidayAverageDateTimeVO ownerUnitPrice = new HolidayAverageDateTimeVO();
+            ownerUnitPrice.setRentOriginalUnitPriceAmt(d.getUnitPrice());
+            ownerUnitPrice.setRevertTime(reqVO.getRevertTime());
+            ownerUnitPriceVOS.add(ownerUnitPrice);
+            reqVO.setOwnerUnitPriceVOS(ownerUnitPriceVOS);
             OwnerCouponLongResVO resVO = couponAndCoinHandleService.getLongOwnerCoupon(reqVO);
             if (!Objects.isNull(resVO)) {
-                RenterOrderSubsidyDetailDTO subsidyDetailDTO = renterOrderCostHandleService.handleLongOwnerCoupon(resVO.getActRentUnitPriceAmt(),
+            	List<HolidayAverageResultVO> holidayAverageResultList = resVO.getOwnerUnitPriceRespVOS();
+            	Integer actRentUnitPriceAmt = null;
+            	if (holidayAverageResultList != null && !holidayAverageResultList.isEmpty()) {
+            		actRentUnitPriceAmt = holidayAverageResultList.get(0).getActRentUnitPriceAmt();
+            	}
+                RenterOrderSubsidyDetailDTO subsidyDetailDTO = renterOrderCostHandleService.handleLongOwnerCoupon(actRentUnitPriceAmt,
                         d.getCount(), d.getTotalAmount());
                 if (null != subsidyDetailDTO) {
                     subsidyDetails.add(subsidyDetailDTO);
