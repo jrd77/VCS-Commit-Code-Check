@@ -64,7 +64,7 @@ public class PayPreCarCost4HoursTask extends IJobHandler {
             for (OrderDTO violateBO : orderNos) {
                 CashierEntity cashierEntity = cashierMapper.getPayDeposit(violateBO.getOrderNo(), violateBO.getMemNoRenter(), "01", "02");
                 if (Objects.isNull(cashierEntity)) {
-                    return SUCCESS;
+                   continue;
                 }
                 LocalDateTime localDateTime = DateUtils.parseLocalDateTime(cashierEntity.getPayTime(), DateUtils.DATE_DEFAUTE);
                 if (localDateTime.isBefore(LocalDateTime.now()) && localDateTime.plusHours(4).isAfter(localDateTime)) {
