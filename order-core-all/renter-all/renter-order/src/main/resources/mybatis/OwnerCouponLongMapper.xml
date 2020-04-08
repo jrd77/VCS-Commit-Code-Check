@@ -125,5 +125,8 @@
 		</set>
 		where id = #{id}
 	</update>
-  	
+    <select id="getByRenterOrderNo" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List"></include> from owner_coupon_long where renter_order_no = #{renterOrderNo} limit 1
+    </select>
+
 </mapper>

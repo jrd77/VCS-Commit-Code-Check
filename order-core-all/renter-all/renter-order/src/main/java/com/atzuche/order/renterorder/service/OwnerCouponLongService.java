@@ -1,5 +1,6 @@
 package com.atzuche.order.renterorder.service;
 
+import com.atzuche.order.renterorder.entity.OwnerCouponLongEntity;
 import com.atzuche.order.renterorder.mapper.OwnerCouponLongMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,4 +19,7 @@ public class OwnerCouponLongService{
     private OwnerCouponLongMapper ownerCouponLongMapper;
 
 
+    public OwnerCouponLongEntity getByRenterOrderNo(String renterOrderNo) {
+        return ownerCouponLongMapper.getByRenterOrderNo(renterOrderNo);
+    }
 }

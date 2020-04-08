@@ -10,6 +10,7 @@ import com.atzuche.order.admin.vo.resp.order.cost.OrderRenterCostResVO;
 import com.atzuche.order.cashieraccount.service.CashierPayService;
 import com.atzuche.order.coin.service.AutoCoinProxyService;
 import com.atzuche.order.commons.NumberUtils;
+import com.atzuche.order.commons.entity.dto.OwnerCouponLongDTO;
 import com.atzuche.order.commons.enums.CouponTypeEnum;
 import com.atzuche.order.commons.enums.cashcode.FineTypeCashCodeEnum;
 import com.atzuche.order.commons.enums.cashcode.OwnerCashCodeEnum;
@@ -549,8 +550,12 @@ public class OrderCostService {
         int deductionAmount = realVo.getDeductionAmount() != null ? 0 : Integer.valueOf(realVo.getDeductionAmount());
         deductionAmount = deductionAmount + (-sum);
         realVo.setDeductionAmount(String.valueOf(NumberUtils.convertNumberToFushu(deductionAmount)));
-        //TODO 折扣表中查询
-        realVo.setOwnerLongRentDeduct("满一个月(30天)70%折扣");
+
+        OwnerCouponLongDTO ownerCouponLongDTO = data.getOwnerCouponLongDTO();
+        if(ownerCouponLongDTO != null){
+            int discounRatio = ownerCouponLongDTO.getDiscounRatio() == null ? 0 : (int)(ownerCouponLongDTO.getDiscounRatio() * 100);
+            realVo.setOwnerLongRentDeduct(discounRatio+"%折扣");
+        }
         realVo.setOwnerLongRentDeductAmt(String.valueOf(NumberUtils.convertNumberToFushu(sum)));
     }
 
@@ -1194,8 +1199,12 @@ public class OrderCostService {
                 .filter(x -> RenterCashCodeEnum.LONG_OWNER_COUPON_OFFSET_COST.getCashNo().equals(x.getSubsidyCostCode()))
                 .mapToInt(OwnerOrderSubsidyDetailEntity::getSubsidyAmount)
                 .sum();
-        //TODO 折扣表中查询
-        realVo.setOwnerLongRentDeduct("满一个月(30天)70%折扣");
+
+        OwnerCouponLongDTO ownerCouponLongDTO = data.getOwnerCouponLongDTO();
+        if(ownerCouponLongDTO != null){
+            int discounRatio = ownerCouponLongDTO.getDiscounRatio() == null ? 0 : (int)(ownerCouponLongDTO.getDiscounRatio() * 100);
+            realVo.setOwnerLongRentDeduct(discounRatio+"%折扣");
+        }
         realVo.setOwnerLongRentDeductAmt(String.valueOf(NumberUtils.convertNumberToFushu(sum)));
     }
 }
