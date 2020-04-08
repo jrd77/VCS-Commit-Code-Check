@@ -102,6 +102,8 @@ public class OrderSettleService{
 	  		feeShishouOri = accountRenterCostSettleEntity.getShifuAmt();
 	  		feeYingkouOri = Math.abs(accountRenterCostSettleEntity.getYingkouAmt());  //取绝对值。
 	  	}
+	  	log.info("feeShishouOri=[{}],feeYingkouOri=[{}],orderNo=[{}],memNo=[{}]",feeShishouOri,feeYingkouOri,orderNo,renterNo);
+	  	
 	  	//实收(必定是消费，无免押预授权的情况。)
 	      int feeShishou = Math.abs(feeShishouOri);
 	      //应扣
@@ -110,6 +112,7 @@ public class OrderSettleService{
 	      if(feeShishou >= feeYingkou) {
 	      	feeYingtui = feeShishou - feeYingkou;
 	      }
+	      log.info("feeShishou=[{}],feeYingkou=[{}],feeYingshou=[{}],feeYingtui=[{}],orderNo=[{}],memNo=[{}]",feeShishou,feeYingkou,renterCostAmtFinalForYingshou,feeYingtui,orderNo,renterNo);
 	      //应收
 	      vo.setRenterCostFeeYingshou(Math.abs(renterCostAmtFinalForYingshou));
 	      vo.setRenterCostFeeShishou(feeShishou);
@@ -133,17 +136,23 @@ public class OrderSettleService{
         	if(accountRenterDepositResVO.getIsAuthorize() != null && accountRenterDepositResVO.getIsAuthorize() == 1) {
         		depositShishouAuthOri = Math.abs(accountRenterDepositResVO.getAuthorizeDepositAmt());
         	}
+        	
         }
+        log.info("depositShishouOri=[{}],depositYingshouOri=[{}],depositShishouAuthOri=[{}],orderNo=[{}],memNo=[{}]",depositShishouOri,depositYingshouOri,depositShishouAuthOri,orderNo,renterNo);
+        
         //应扣取值
         if(feeYingkouOri > feeShishou) {
         	//费用不够的情况下从租车押金中扣除。
         	depositYingkouOri = feeYingkouOri - feeShishou;
         }
+        log.info("depositShishouOri=[{}],depositYingshouOri=[{}],depositShishouAuthOri=[{}],depositYingkouOri=[{}],orderNo=[{}],memNo=[{}]",depositShishouOri,depositYingshouOri,depositShishouAuthOri,depositYingkouOri,orderNo,renterNo);
         
         //计算应退
         if(depositShishouOri >= depositYingkouOri) {
         	depositYingtuiOri = depositShishouOri - depositYingkouOri;
         }
+        log.info("depositShishouOri=[{}],depositYingshouOri=[{}],depositShishouAuthOri=[{}],depositYingkouOri=[{}],depositYingtuiOri=[{}],orderNo=[{}],memNo=[{}]",depositShishouOri,depositYingshouOri,depositShishouAuthOri,depositYingkouOri,depositYingtuiOri,orderNo,renterNo);
+
         vo.setDepositCostShishou(depositShishouOri);
         vo.setDepositCostYingshou(depositYingshouOri);
         vo.setDepositCostYingkou(depositYingkouOri);
@@ -167,15 +176,21 @@ public class OrderSettleService{
         		wzShishouAuthOri = Math.abs(accountRenterWZDeposit.getAuthorizeDepositAmt());
         	}
         }
+        log.info("wzShishouOri=[{}],wzYingshouOri=[{}],wzShishouAuthOri=[{}],orderNo=[{}],memNo=[{}]",wzShishouOri,wzYingshouOri,wzShishouAuthOri,orderNo,renterNo);
+        
         //应扣
         AccountRenterWzDepositCostEntity wzEntity = accountRenterWzDepositCostNoTService.queryWzDeposit(orderNo,renterNo);
         if(wzEntity != null) {
         	wzYingkouOri = Math.abs(wzEntity.getYingkouAmt());  //负数 取绝对值
         }
+        log.info("wzShishouOri=[{}],wzYingshouOri=[{}],wzShishouAuthOri=[{}],wzYingkouOri=[{}],orderNo=[{}],memNo=[{}]",wzShishouOri,wzYingshouOri,wzShishouAuthOri,wzYingkouOri,orderNo,renterNo);
+        
         //计算应退
         if(wzShishouOri >= wzYingkouOri) {
         	wzYingtuiOri = wzShishouOri - wzYingkouOri;
         }
+        log.info("wzShishouOri=[{}],wzYingshouOri=[{}],wzShishouAuthOri=[{}],wzYingkouOri=[{}],wzYingtuiOri=[{}],orderNo=[{}],memNo=[{}]",wzShishouOri,wzYingshouOri,wzShishouAuthOri,wzYingkouOri,wzYingtuiOri,orderNo,renterNo);
+        
         vo.setDepositWzCostShishou(wzShishouOri);
         vo.setDepositWzCostYingshou(wzYingshouOri);
         vo.setDepositWzCostYingkou(wzYingkouOri);
@@ -229,6 +244,9 @@ public class OrderSettleService{
                     
                     vo.setRenterCostBufuYingshou(renterCostBufuYingfu);
                     vo.setRenterCostBufuShishou(renterCostBufuShishou);
+                    
+                    log.info("renterCostBufuYingfu=[{}],renterCostBufuShishou=[{}],orderNo=[{}],memNo=[{}]",renterCostBufuYingfu,renterCostBufuShishou,orderNo,renterNo);
+                    
                 }
 //            }
             
@@ -288,6 +306,7 @@ public class OrderSettleService{
             if(feeShituiOri > 0) {
             	feeShikouOri += feeShishou - feeShituiOri;
             }
+            log.info("feeShikouOri=[{}],feeShituiOri=[{}],orderNo=[{}],memNo=[{}]",feeShikouOri,feeShituiOri,orderNo,renterNo);
             vo.setRenterCostFeeShikou(feeShikouOri);
             //实退
             vo.setRenterCostFeeShitui(feeShituiOri); //预授权0
@@ -297,6 +316,7 @@ public class OrderSettleService{
             if(wzShituiOri > 0) {
             	wzShikouOri += wzShishouOri - wzShituiOri;
             }
+            log.info("wzShikouOri=[{}],wzShituiOri=[{}],orderNo=[{}],memNo=[{}]",wzShikouOri,wzShituiOri,orderNo,renterNo);
             vo.setDepositWzCostShikou(wzShikouOri);
             vo.setDepositWzCostShitui(wzShituiOri);
             
@@ -305,6 +325,7 @@ public class OrderSettleService{
             if(depositShituiOri > 0) {
             	depositShikouOri += depositShishouOri - depositShituiOri;
             }
+            log.info("depositShikouOri=[{}],depositShituiOri=[{}],orderNo=[{}],memNo=[{}]",depositShikouOri,depositShituiOri,orderNo,renterNo);
             vo.setDepositCostShikou(depositShikouOri);
             vo.setDepositCostShitui(depositShituiOri);
             
