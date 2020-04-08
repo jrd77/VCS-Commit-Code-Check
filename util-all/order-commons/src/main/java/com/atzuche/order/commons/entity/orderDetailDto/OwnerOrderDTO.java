@@ -29,9 +29,9 @@ public class OwnerOrderDTO implements Serializable {
         @AutoDocProperty(value="车主子订单号",required=true)
         private String ownerOrderNo;
 
-    /**
-     * 租客子订单号
-     */
+        /**
+         * 租客子订单号
+         */
         @AutoDocProperty(value="租客子订单号",required=true)
         private String renterOrderNo;
     	/**
