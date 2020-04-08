@@ -68,7 +68,7 @@ public class ShortMessageSendService {
             fieldName = fieldName.substring(0, 1).toLowerCase() + fieldName.substring(1);
             Field field = object.getClass().getDeclaredField(fieldName);
             field.setAccessible(true);
-            if (field.getType().isInstance(LocalDateTime.class)) {
+            if (field.getType().getClass().isInstance(LocalDateTime.class)) {
                 LocalDateTime localDateTime = (LocalDateTime) field.get(object);
                 return DateUtils.formate(localDateTime, DateUtils.DATE_DEFAUTE1);
             } else {
