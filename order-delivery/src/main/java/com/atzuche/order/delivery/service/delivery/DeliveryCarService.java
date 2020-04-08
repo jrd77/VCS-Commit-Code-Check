@@ -109,20 +109,26 @@ public class DeliveryCarService {
      * @param renterOrderNo
      */
     public void sendDataMessageToRenYun(String renterOrderNo) {
-
-        List<OrderDeliveryFlowEntity> orderDeliveryFlowEntityList = deliveryFlowService.selectOrderDeliveryFlowByOrderNo(renterOrderNo);
-        if (CollectionUtils.isEmpty(orderDeliveryFlowEntityList)) {
+        List<RenterOrderDeliveryEntity> renterOrderDeliveryEntities = renterOrderDeliveryService.listRenterOrderDeliveryByRenterOrderNo(renterOrderNo);
+        if (CollectionUtils.isEmpty(renterOrderDeliveryEntities)) {
             //不抛异常，直接return
-            log.info("没有找到当前子订单的仁云配送订单信息：renterOrderNo：{}",renterOrderNo);
+            log.info("没有找到当前子订单的仁云配送订单信息：renterOrderNo：{}", renterOrderNo);
             return;
         }
-        for(OrderDeliveryFlowEntity orderDeliveryFlowEntity : orderDeliveryFlowEntityList) {
-            log.info("开始组装仁云数据进行发送----->>>params:[{}]",orderDeliveryFlowEntity.toString());
-            RenYunFlowOrderDTO renYunFlowOrderDTO = createRenYunDTO(orderDeliveryFlowEntity);
-            if (Objects.isNull(renYunFlowOrderDTO)) {
-                continue;
+        for (RenterOrderDeliveryEntity renterOrderDeliveryEntity : renterOrderDeliveryEntities) {
+            if (renterOrderDeliveryEntity.getIsNotifyRenyun().intValue() == 1) {
+                OrderDeliveryFlowEntity orderDeliveryFlowEntity = deliveryFlowService.selectOrderDeliveryFlowByOrderNo(renterOrderDeliveryEntity.getOrderNo(), renterOrderDeliveryEntity.getType().intValue() == 1 ? "take" : "back");
+                if (Objects.isNull(orderDeliveryFlowEntity)) {
+                    continue;
+                }
+                log.info("开始组装仁云数据进行发送----->>>params:[{}]", orderDeliveryFlowEntity.toString());
+                RenYunFlowOrderDTO renYunFlowOrderDTO = createRenYunDTO(orderDeliveryFlowEntity);
+                if (Objects.isNull(renYunFlowOrderDTO)) {
+                    continue;
+                }
+                deliveryCarTask.addRenYunFlowOrderInfo(renYunFlowOrderDTO);
             }
-            deliveryCarTask.addRenYunFlowOrderInfo(renYunFlowOrderDTO);
+
         }
     }
 
@@ -306,39 +312,37 @@ public class DeliveryCarService {
         orderDeliveryDTO.setType(orderType);
         orderDeliveryDTO.setParamsTypeValue(orderReqVO, orderType,renterGoodsDetailDTO);
         //如果没有使用取还车服务则不需要flow数据 暂加入
-        if (orderDeliveryDTO.getIsNotifyRenyun().intValue() == 1) {
-            orderDeliveryFlowEntity.setRenterOrderNo(renterGoodsDetailDTO.getRenterOrderNo());
-            orderDeliveryFlowEntity.setOrderNo(renterGoodsDetailDTO.getOrderNo());
-            orderDeliveryFlowEntity.setServiceTypeInfo(orderType, orderDeliveryDTO);
-            orderDeliveryFlowEntity.setTermTime(orderDeliveryDTO.getRentTime());
-            orderDeliveryFlowEntity.setReturnTime(orderDeliveryDTO.getRevertTime());
-            orderDeliveryFlowEntity.setCarNo(String.valueOf(renterGoodsDetailDTO.getCarPlateNum()));
-            orderDeliveryFlowEntity.setVehicleModel(renterGoodsDetailDTO.getCarBrandTxt());
-            orderDeliveryFlowEntity.setVehicleType(renterGoodsDetailDTO.getCarTypeTxt());
-            orderDeliveryFlowEntity.setDeliveryCarCity(orderReqVO.getCityName());
-            orderDeliveryFlowEntity.setDefaultPickupCarAddr(orderDeliveryDTO.getRenterGetReturnAddr());
-            orderDeliveryFlowEntity.setOwnerName(ownerMemberDTO.getRealName());
-            orderDeliveryFlowEntity.setOwnerPhone(ownerMemberDTO.getPhone());
-            orderDeliveryFlowEntity.setSuccessOrdeNumber(String.valueOf(ownerMemberDTO.getOrderSuccessCount()));
-            orderDeliveryFlowEntity.setTenantName(renterMemberDTO.getRealName());
-            orderDeliveryFlowEntity.setTenantPhone(renterMemberDTO.getPhone());
-            orderDeliveryFlowEntity.setTenantTurnoverNo(String.valueOf(renterMemberDTO.getOrderSuccessCount()));
-            orderDeliveryFlowEntity.setOwnerType(Integer.valueOf(ownerGoodsDetailDTO.getType()));
-            orderDeliveryFlowEntity.setSceneName(orderReqVO.getSceneCode());
-            orderDeliveryFlowEntity.setIsDelete(0);
-            if (StringUtils.isNotBlank(orderReqVO.getOrderCategory()) && "1".equals(orderReqVO.getOrderCategory())) {
-                orderDeliveryFlowEntity.setOrderType("0");
-            }
-            orderDeliveryFlowEntity.setCreateTime(LocalDateTime.now());
-            orderDeliveryFlowEntity.setUpdateTime(LocalDateTime.now());
-            orderDeliveryFlowEntity.setDisplacement(String.valueOf(ownerGoodsDetailDTO.getCarCylinderCapacity()));
-            orderDeliveryFlowEntity.setSource(orderReqVO.getSource());
-            orderDeliveryFlowEntity.setDayMileage(String.valueOf(renterGoodsDetailDTO.getCarDayMileage()));
-            orderDeliveryFlowEntity.setTankCapacity(String.valueOf(renterGoodsDetailDTO.getCarOilVolume()));
-            orderDeliveryFlowEntity.setOwnerGetAddr(renterGoodsDetailDTO.getCarRealAddr());
-            orderDeliveryFlowEntity.setOwnerReturnAddr(renterGoodsDetailDTO.getCarRealAddr());
-            orderDeliveryVO.setOrderDeliveryFlowEntity(orderDeliveryFlowEntity);
+        orderDeliveryFlowEntity.setRenterOrderNo(renterGoodsDetailDTO.getRenterOrderNo());
+        orderDeliveryFlowEntity.setOrderNo(renterGoodsDetailDTO.getOrderNo());
+        orderDeliveryFlowEntity.setServiceTypeInfo(orderType, orderDeliveryDTO);
+        orderDeliveryFlowEntity.setTermTime(orderDeliveryDTO.getRentTime());
+        orderDeliveryFlowEntity.setReturnTime(orderDeliveryDTO.getRevertTime());
+        orderDeliveryFlowEntity.setCarNo(String.valueOf(renterGoodsDetailDTO.getCarPlateNum()));
+        orderDeliveryFlowEntity.setVehicleModel(renterGoodsDetailDTO.getCarBrandTxt());
+        orderDeliveryFlowEntity.setVehicleType(renterGoodsDetailDTO.getCarTypeTxt());
+        orderDeliveryFlowEntity.setDeliveryCarCity(orderReqVO.getCityName());
+        orderDeliveryFlowEntity.setDefaultPickupCarAddr(orderDeliveryDTO.getRenterGetReturnAddr());
+        orderDeliveryFlowEntity.setOwnerName(ownerMemberDTO.getRealName());
+        orderDeliveryFlowEntity.setOwnerPhone(ownerMemberDTO.getPhone());
+        orderDeliveryFlowEntity.setSuccessOrdeNumber(String.valueOf(ownerMemberDTO.getOrderSuccessCount()));
+        orderDeliveryFlowEntity.setTenantName(renterMemberDTO.getRealName());
+        orderDeliveryFlowEntity.setTenantPhone(renterMemberDTO.getPhone());
+        orderDeliveryFlowEntity.setTenantTurnoverNo(String.valueOf(renterMemberDTO.getOrderSuccessCount()));
+        orderDeliveryFlowEntity.setOwnerType(Integer.valueOf(ownerGoodsDetailDTO.getType()));
+        orderDeliveryFlowEntity.setSceneName(orderReqVO.getSceneCode());
+        orderDeliveryFlowEntity.setIsDelete(0);
+        if (StringUtils.isNotBlank(orderReqVO.getOrderCategory()) && "1".equals(orderReqVO.getOrderCategory())) {
+            orderDeliveryFlowEntity.setOrderType("0");
         }
+        orderDeliveryFlowEntity.setCreateTime(LocalDateTime.now());
+        orderDeliveryFlowEntity.setUpdateTime(LocalDateTime.now());
+        orderDeliveryFlowEntity.setDisplacement(String.valueOf(ownerGoodsDetailDTO.getCarCylinderCapacity()));
+        orderDeliveryFlowEntity.setSource(orderReqVO.getSource());
+        orderDeliveryFlowEntity.setDayMileage(String.valueOf(renterGoodsDetailDTO.getCarDayMileage()));
+        orderDeliveryFlowEntity.setTankCapacity(String.valueOf(renterGoodsDetailDTO.getCarOilVolume()));
+        orderDeliveryFlowEntity.setOwnerGetAddr(renterGoodsDetailDTO.getCarRealAddr());
+        orderDeliveryFlowEntity.setOwnerReturnAddr(renterGoodsDetailDTO.getCarRealAddr());
+        orderDeliveryVO.setOrderDeliveryFlowEntity(orderDeliveryFlowEntity);
         orderDeliveryVO.setOrderDeliveryDTO(orderDeliveryDTO);
         orderDeliveryVO.setRenterDeliveryAddrDTO(renterDeliveryAddrDTO);
         return orderDeliveryVO;
