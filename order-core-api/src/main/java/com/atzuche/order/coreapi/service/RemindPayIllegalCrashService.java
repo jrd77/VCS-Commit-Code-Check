@@ -1,12 +1,14 @@
 package com.atzuche.order.coreapi.service;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.atzuche.order.commons.CatConstants;
 import com.atzuche.order.commons.entity.orderDetailDto.OrderDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.OrderStatusDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.ProcessRespDTO;
 import com.atzuche.order.coreapi.listener.push.OrderSendMessageFactory;
 import com.atzuche.order.coreapi.listener.sms.SMSOrderBaseEventService;
+import com.atzuche.order.coreapi.utils.SMSIcsocVoiceUtils;
 import com.atzuche.order.mq.enums.PushMessageTypeEnum;
 import com.atzuche.order.mq.enums.ShortMessageTypeEnum;
 import com.atzuche.order.mq.util.SmsParamsMapUtil;
@@ -23,10 +25,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * @author 胡春林
@@ -70,6 +70,11 @@ public class RemindPayIllegalCrashService {
         return new ArrayList<>();
     }
 
+    /**
+     * 違章未支付發送
+     * @param condition
+     * @param orderNo
+     */
     public void sendShortMessageData(boolean condition, String orderNo) {
         if (condition) {
             Map map = SmsParamsMapUtil.getParamsMap(orderNo, null, ShortMessageTypeEnum.REMIND_PAY_ILLEGAL_DEPOSITOWNER.getValue(), null);
@@ -120,6 +125,37 @@ public class RemindPayIllegalCrashService {
     public void sendNoPayCarCostShortMessageData(String orderNo,Map paramsMap) {
         Map map = SmsParamsMapUtil.getParamsMap(orderNo, ShortMessageTypeEnum.NO_EXEMPT_PREORDER_REMIND_PAYRENT.getValue(), null, paramsMap);
         smsOrderBaseEventService.sendShortMessage(map);
+    }
+
+    /**
+     * 發送用戶未支付違章押金語音提醒
+     * @param renterMobilePhone
+     */
+    public void sendVoiceRemindVoicePayIllegalCrashWithHoursData(boolean condition,String mainOrderNo,String renterMobilePhone,String expReterTime){
+        if (!condition) {
+            return;
+        }
+        Map<String,Object> paramMap=new HashMap<>();
+        String orderNo=mainOrderNo;
+        String jobId=mainOrderNo;
+        String renterPhone=renterMobilePhone;
+        StringBuilder content=new StringBuilder();
+        content.append("您还未支付预定车辆的押金，请在").append(expReterTime).append("前完成支付。否则该订单将被取消，并扣除您的违约费用");
+        paramMap.put("content", content.toString());
+        paramMap.put("renterPhone", renterPhone);
+        paramMap.put("orderNo", orderNo);
+        paramMap.put("type", 3);
+        String createTime = new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date());
+        paramMap.put("createTime", createTime);
+        paramMap.put("proId", 6);
+        paramMap.put("jobId", jobId);
+        paramMap.put("order_change_wel", "凹凸租车提醒您");
+        paramMap.put("delayTips", content.toString() );
+        ErrorCode errorCode = SMSIcsocVoiceUtils.getIcsocNewServer(paramMap);
+        logger.info("发送语音短信,参数--->>>>:", JSONObject.toJSONString(paramMap));
+        if (Objects.nonNull(errorCode) && errorCode.getCode().equals(ErrorCode.SUCCESS.getCode())) {
+            logger.info("发送语音短信成功--->>>>订单号：{},手机号：{}", orderNo, renterMobilePhone);
+        }
     }
 
 }

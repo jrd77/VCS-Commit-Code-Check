@@ -13,6 +13,8 @@ import com.atzuche.order.coreapi.mapper.SmsMsgSendLogMapper;
 import com.atzuche.order.coreapi.service.RemindPayIllegalCrashService;
 import com.atzuche.order.mq.enums.ShortMessageTypeEnum;
 import com.atzuche.order.mq.util.SmsParamsMapUtil;
+import com.atzuche.order.parentorder.entity.OrderStatusEntity;
+import com.atzuche.order.parentorder.service.OrderStatusService;
 import com.dianping.cat.Cat;
 import com.dianping.cat.message.Transaction;
 import com.google.common.collect.Maps;
@@ -48,6 +50,8 @@ public class PayPreCarCost4HoursTask extends IJobHandler {
     OrderSendMessageFactory orderSendMessageFactory;
     @Resource
     SmsMsgSendLogMapper smsMsgSendLogMapper;
+    @Autowired
+    OrderStatusService orderStatusService;
 
     @Override
     public ReturnT<String> execute(String s) throws Exception {
@@ -62,15 +66,18 @@ public class PayPreCarCost4HoursTask extends IJobHandler {
                 return SUCCESS;
             }
             for (OrderDTO violateBO : orderNos) {
+                OrderStatusEntity orderStatusEntity = orderStatusService.getByOrderNo(violateBO.getOrderNo());
+                if (Objects.isNull(orderStatusEntity) || orderStatusEntity.getStatus().intValue() != 0) {
+                    continue;
+                }
                 CashierEntity cashierEntity = cashierMapper.getPayDeposit(violateBO.getOrderNo(), violateBO.getMemNoRenter(), "01", "02");
                 if (Objects.isNull(cashierEntity)) {
-                   continue;
+                    continue;
                 }
                 LocalDateTime localDateTime = DateUtils.parseLocalDateTime(cashierEntity.getPayTime(), DateUtils.DATE_DEFAUTE);
                 if (localDateTime.isBefore(LocalDateTime.now()) && localDateTime.plusHours(4).isAfter(localDateTime)) {
                     SmsMsgSendLogEntity smsMsgSendLogEntity = smsMsgSendLogMapper.selectByOrderNoAndMemNo(violateBO.getOrderNo(), violateBO.getMemNoRenter(), ShortMessageCodeEnum.PRE_CAR_COST_4_HOURS.getValue().intValue());
-                    if(Objects.isNull(smsMsgSendLogEntity) || smsMsgSendLogEntity.getStatus().intValue() == 0)
-                    {
+                    if (Objects.isNull(smsMsgSendLogEntity) || smsMsgSendLogEntity.getStatus().intValue() == 0) {
                         Map paramsMap = Maps.newHashMap();
                         paramsMap.put("RentCarDeposit", cashierEntity.getPayAmt());
                         Map map = SmsParamsMapUtil.getParamsMap(violateBO.getOrderNo(), ShortMessageTypeEnum.REFUND_COST_SUCCESS_2_RENTER.getValue(), null, paramsMap);
@@ -83,7 +90,7 @@ public class PayPreCarCost4HoursTask extends IJobHandler {
                         smsMsgSendLog.setSendTime(LocalDateTime.now());
                         smsMsgSendLog.setStatus(1);
                         int count = smsMsgSendLog.getSendTotal() == null ? 0 : smsMsgSendLog.getSendTotal();
-                        smsMsgSendLog.setSendTotal(count+1);
+                        smsMsgSendLog.setSendTotal(count + 1);
                         smsMsgSendLogMapper.insertSelective(smsMsgSendLog);
                     }
                 }
