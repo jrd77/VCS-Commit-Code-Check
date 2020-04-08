@@ -2,6 +2,7 @@ package com.atzuche.order.renterorder.mapper;
 
 import com.atzuche.order.renterorder.entity.OwnerCouponLongEntity;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * 主订单表
@@ -22,4 +23,5 @@ public interface OwnerCouponLongMapper{
     
     int updateByPrimaryKeySelective(OwnerCouponLongEntity record);
 
+    OwnerCouponLongEntity getByRenterOrderNo(@Param("renterOrderNo")String renterOrderNo);
 }

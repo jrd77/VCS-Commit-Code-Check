@@ -3,8 +3,7 @@
  */
 package com.atzuche.order.commons.vo.res;
 
-import java.util.List;
-
+import com.atzuche.order.commons.entity.dto.OwnerCouponLongDTO;
 import com.atzuche.order.commons.vo.res.account.AccountRenterCostDetailResVO;
 import com.atzuche.order.commons.vo.res.account.AccountRenterCostSettleResVO;
 import com.atzuche.order.commons.vo.res.account.AccountRenterDepositResVO;
@@ -13,14 +12,10 @@ import com.atzuche.order.commons.vo.res.cost.RenterOrderCostDetailResVO;
 import com.atzuche.order.commons.vo.res.cost.RenterOrderDeliveryResVO;
 import com.atzuche.order.commons.vo.res.cost.RenterOrderFineDeatailResVO;
 import com.atzuche.order.commons.vo.res.cost.RenterOrderSubsidyDetailResVO;
-import com.atzuche.order.commons.vo.res.rentcosts.ConsoleRenterOrderFineDeatailEntity;
-import com.atzuche.order.commons.vo.res.rentcosts.OrderConsoleCostDetailEntity;
-import com.atzuche.order.commons.vo.res.rentcosts.OrderConsoleSubsidyDetailEntity;
-import com.atzuche.order.commons.vo.res.rentcosts.OrderCouponEntity;
-import com.atzuche.order.commons.vo.res.rentcosts.OrderSupplementDetailEntity;
-import com.atzuche.order.commons.vo.res.rentcosts.RenterOrderCostDetailEntity;
-
+import com.atzuche.order.commons.vo.res.rentcosts.*;
 import lombok.Data;
+
+import java.util.List;
 
 /**
  * @author jing.huang
@@ -111,5 +106,10 @@ public class OrderRenterCostResVO {
 	/**
 	     * 租客最终收益金额（应收）
 	*/
-	private int renterCostAmtFinal; 
+	private int renterCostAmtFinal;
+
+    /**
+     * 长租折扣
+     */
+    private OwnerCouponLongDTO ownerCouponLongDTO;
 }
