@@ -1,6 +1,7 @@
 package com.atzuche.order.delivery.service.handover;
 
 import com.atzuche.order.commons.CommonUtils;
+import com.atzuche.order.commons.constant.OrderConstant;
 import com.atzuche.order.commons.enums.SrvGetReturnEnum;
 import com.atzuche.order.commons.vo.req.handover.req.HandoverCarInfoReqDTO;
 import com.atzuche.order.commons.vo.req.handover.req.HandoverCarInfoReqVO;
@@ -20,6 +21,7 @@ import com.atzuche.order.delivery.vo.delivery.*;
 import com.atzuche.order.delivery.vo.delivery.req.CarConditionPhotoUploadVO;
 import com.atzuche.order.delivery.vo.delivery.req.DeliveryReqDTO;
 import com.atzuche.order.delivery.vo.delivery.req.DeliveryReqVO;
+import com.atzuche.order.renterorder.service.RenterOrderService;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,7 +59,8 @@ public class HandoverCarInfoService {
     RenterHandoverCarService renterHandoverCarService;
     @Autowired
     OrderDeliveryFlowService deliveryFlowService;
-
+    @Autowired
+    RenterOrderService renterOrderService;
 
     /**
      * 上传交接车
@@ -100,6 +103,14 @@ public class HandoverCarInfoService {
             HandoverCarInfoReqDTO handoverCarInfoReqDTO = handoverCarReqVO.getRenterHandoverCarDTO();
             //更新租客交接车相关信息
             renterHandoverCarService.updateHandoverCarOilMileageNum(handoverCarInfoReqDTO);
+            //获取是否是取还车单子
+            RenterOrderDeliveryEntity renterOrderDeliveryEntity = renterOrderDeliveryMapper.findRenterOrderByrOrderNo(handoverCarInfoReqDTO.getOrderNo(), 1);
+            if (Objects.nonNull(renterOrderDeliveryEntity) && renterOrderDeliveryEntity.getIsNotifyRenyun().intValue() == 0) {
+                HandoverCarInfoReqDTO ownerHandoverCarInfoReqDTO = handoverCarInfoReqDTO;
+                //更新车主交接车相关信息
+                ownerHandoverCarService.updateHandoverCarOilMileageNum(ownerHandoverCarInfoReqDTO);
+                return;
+            }
         }
         //车主取还车
         if (handoverCarReqVO.getOwnerHandoverCarDTO() != null) {
@@ -108,10 +119,11 @@ public class HandoverCarInfoService {
             ownerHandoverCarService.updateHandoverCarOilMileageNum(handoverCarInfoReqDTO);
             //获取是否是取还车单子
             RenterOrderDeliveryEntity renterOrderDeliveryEntity = renterOrderDeliveryMapper.findRenterOrderByrOrderNo(handoverCarInfoReqDTO.getOrderNo(), 1);
-            if (Objects.nonNull(renterOrderDeliveryEntity) && renterOrderDeliveryEntity.getIsNotifyRenyun().intValue() == 1) {
+            if (Objects.nonNull(renterOrderDeliveryEntity) && renterOrderDeliveryEntity.getIsNotifyRenyun().intValue() == 0) {
                 HandoverCarInfoReqDTO renterHandoverCarInfoReqDTO = handoverCarInfoReqDTO;
                 //更新租客交接车相关信息
                 renterHandoverCarService.updateHandoverCarOilMileageNum(renterHandoverCarInfoReqDTO);
+                return;
             }
         }
     }
@@ -145,6 +157,7 @@ public class HandoverCarInfoService {
      * @param deliveryReqDTO
      */
     public void updateDeliveryCarInfoByUsed(DeliveryReqDTO deliveryReqDTO, Integer type) {
+
         RenterOrderDeliveryEntity renterOrderDeliveryEntity = renterOrderDeliveryMapper.findRenterOrderByrOrderNo(deliveryReqDTO.getOrderNo(), type);
         if (renterOrderDeliveryEntity != null && String.valueOf(UsedDeliveryTypeEnum.NO_USED.getValue()).equals(deliveryReqDTO.getIsUsedGetAndReturnCar())) {
             if (renterOrderDeliveryEntity.getStatus().intValue() != 3 && renterOrderDeliveryEntity.getIsNotifyRenyun() == 1) {
@@ -171,6 +184,16 @@ public class HandoverCarInfoService {
                 deliveryCarTask.addRenYunFlowOrderInfo(renYunFlowOrderDTO);
             }
         }
+
+        //同步租客订单中取还车标识
+        if (type == OrderConstant.ONE) {
+            renterOrderService.updateSrvGetAndReturnFlagByRenterOrderNo(renterOrderDeliveryEntity.getRenterOrderNo(),
+                    Integer.valueOf(deliveryReqDTO.getIsUsedGetAndReturnCar()), null);
+        } else if (type == OrderConstant.TWO) {
+            renterOrderService.updateSrvGetAndReturnFlagByRenterOrderNo(renterOrderDeliveryEntity.getRenterOrderNo(),
+                    null, Integer.valueOf(deliveryReqDTO.getIsUsedGetAndReturnCar()));
+        }
+
     }
 
     /**

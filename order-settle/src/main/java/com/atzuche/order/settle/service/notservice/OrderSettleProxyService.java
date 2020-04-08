@@ -3,15 +3,6 @@
  */
 package com.atzuche.order.settle.service.notservice;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
-
 import com.atzuche.order.cashieraccount.entity.CashierEntity;
 import com.atzuche.order.cashieraccount.service.notservice.CashierNoTService;
 import com.atzuche.order.cashieraccount.vo.req.CashierRefundApplyReqVO;
@@ -28,8 +19,15 @@ import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.atzuche.order.settle.vo.req.RefundApplyVO;
 import com.atzuche.order.settle.vo.req.SettleOrders;
 import com.autoyol.autopay.gateway.constant.DataPayKindConstant;
-
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * @author jhuang
@@ -160,16 +158,17 @@ public class OrderSettleProxyService {
             if(!CollectionUtils.isEmpty(cashierEntitys)){
                 for(int i=0;i<cashierEntitys.size();i++){
                     if(refundAmt<0){
+                        CashierEntity cashierElement = cashierEntitys.get(i);
                         CashierRefundApplyReqVO vo = new CashierRefundApplyReqVO();
-                        BeanUtils.copyProperties(cashierEntity,vo);
+                        BeanUtils.copyProperties(cashierElement,vo);
                         vo.setFlag(RenterCashCodeEnum.ACCOUNT_RENTER_RENT_COST.getCashNo());
                         vo.setRenterCashCodeEnum(refundApplyVO.getRenterCashCodeEnum());
-                        vo.setPaySource(cashierEntity.getPaySource());
+                        vo.setPaySource(cashierElement.getPaySource());
                         vo.setRemake(refundApplyVO.getRemarke());
-                        int amt = refundAmt + cashierEntity.getPayAmt();
-                        vo.setAmt(amt>=0?refundAmt:-cashierEntity.getPayAmt());
+                        int amt = refundAmt + cashierElement.getPayAmt();
+                        vo.setAmt(amt>=0?refundAmt:-cashierElement.getPayAmt());
                         cashierRefundApplys.add(vo);
-                        refundAmt = refundAmt + cashierEntity.getPayAmt();
+                        refundAmt = refundAmt + cashierElement.getPayAmt();
                     }
 
                 }

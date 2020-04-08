@@ -185,6 +185,7 @@ public class OrderDetailService {
         ResponseData responseData = new ResponseData();
         try{
             OrderDetailRespDTO orderDetailRespDTO = renterOrderDetailTransProxy(orderDetailReqDTO);
+            log.info("准备获取订单详情.result is,orderDetailRespDTO:[{}]", JSON.toJSONString(orderDetailRespDTO));
             responseData.setResCode(ErrorCode.SUCCESS.getCode());
             responseData.setData(orderDetailRespDTO);
             responseData.setResMsg(ErrorCode.SUCCESS.getText());
@@ -291,7 +292,6 @@ public class OrderDetailService {
         orderDetailRespDTO.ownerGoods = ownerGoodsDTO;
         orderDetailRespDTO.renterGoods = renterGoodsDTO;
         orderDetailProxy(orderDetailRespDTO,orderNo,renterOrderNo,ownerOrderNo);
-
         return orderDetailRespDTO;
 
     }
@@ -533,7 +533,7 @@ public class OrderDetailService {
             BeanUtils.copyProperties(renterOrderDeliveryReturn,renterOrderDeliveryReturnDto);
         }
         //配送地址表
-        RenterDeliveryAddrEntity renterDeliveryAddrEntity = renterOrderDeliveryService.selectAddrByRenterOrderNo(renterOrderNo);
+        RenterDeliveryAddrEntity renterDeliveryAddrEntity = renterOrderDeliveryService.selectAddrByOrderNo(orderNo);
         RenterDeliveryAddrDTO renterDeliveryAddrDTO = null;
         if(renterDeliveryAddrEntity != null){
             renterDeliveryAddrDTO = new RenterDeliveryAddrDTO();

@@ -212,7 +212,7 @@ public class DeliveryCarService {
 
         if (orderDeliveryVO.getRenterDeliveryAddrDTO() != null) {
             RenterDeliveryAddrEntity deliveryAddrEntity = new RenterDeliveryAddrEntity();
-            RenterDeliveryAddrEntity renterDeliveryAddrEntity = renterOrderDeliveryService.selectAddrByRenterOrderNo(orderDeliveryVO.getRenterDeliveryAddrDTO().getRenterOrderNo());
+            RenterDeliveryAddrEntity renterDeliveryAddrEntity = renterOrderDeliveryService.selectAddrByOrderNo(orderDeliveryVO.getRenterDeliveryAddrDTO().getOrderNo());
             if (null == renterDeliveryAddrEntity) {
                 BeanUtils.copyProperties(orderDeliveryVO.getRenterDeliveryAddrDTO(), deliveryAddrEntity);
                 renterOrderDeliveryService.insertDeliveryAddr(deliveryAddrEntity);
@@ -309,8 +309,8 @@ public class DeliveryCarService {
         orderDeliveryFlowEntity.setRenterOrderNo(renterGoodsDetailDTO.getRenterOrderNo());
         orderDeliveryFlowEntity.setOrderNo(renterGoodsDetailDTO.getOrderNo());
         orderDeliveryFlowEntity.setServiceTypeInfo(orderType, orderDeliveryDTO);
-        orderDeliveryFlowEntity.setTermTime(renterGoodsDetailDTO.getRentTime());
-        orderDeliveryFlowEntity.setReturnTime(renterGoodsDetailDTO.getRevertTime());
+        orderDeliveryFlowEntity.setTermTime(orderDeliveryDTO.getRentTime());
+        orderDeliveryFlowEntity.setReturnTime(orderDeliveryDTO.getRevertTime());
         orderDeliveryFlowEntity.setCarNo(String.valueOf(renterGoodsDetailDTO.getCarPlateNum()));
         orderDeliveryFlowEntity.setVehicleModel(renterGoodsDetailDTO.getCarBrandTxt());
         orderDeliveryFlowEntity.setVehicleType(renterGoodsDetailDTO.getCarTypeTxt());

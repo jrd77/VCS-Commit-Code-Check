@@ -507,6 +507,10 @@ public class RenterOrderService {
         return renterOrderMapper.updateChildStatusByOrderNo(orderNo, childStatus);
     }
 
+    public Integer updateSrvGetAndReturnFlagByRenterOrderNo(String renterOrderNo, Integer isGetCar, Integer isReturnCar) {
+        return renterOrderMapper.updateSrvGetAndReturnFlagByRenterOrderNo(renterOrderNo, isGetCar, isReturnCar);
+    }
+
     /**
      * 修改租客订单信息
      *
