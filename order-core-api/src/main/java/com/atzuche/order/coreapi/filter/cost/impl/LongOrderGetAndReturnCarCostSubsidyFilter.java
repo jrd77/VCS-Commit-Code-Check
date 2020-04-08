@@ -100,7 +100,7 @@ public class LongOrderGetAndReturnCarCostSubsidyFilter implements OrderCostFilte
             longOrderGetAndReturnCarCostSubsidyResDTO.setSubsidyDetails(subsidyDetails);
 
             //赋值OrderCostDetailContext
-            orderCostDetailContext.setSubsidyDetails(subsidyDetails);
+            orderCostDetailContext.getSubsidyDetails().addAll(subsidyDetails);
         }
 
         log.info("订单费用计算-->长租订单取还车服务费补贴.result is,longOrderGetAndReturnCarCostSubsidyResDTO:[{}]", JSON.toJSONString(longOrderGetAndReturnCarCostSubsidyResDTO));

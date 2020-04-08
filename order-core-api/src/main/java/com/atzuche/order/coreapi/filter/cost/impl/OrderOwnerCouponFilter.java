@@ -39,30 +39,30 @@ public class OrderOwnerCouponFilter implements OrderCostFilter {
 
     @Override
     public void calculate(OrderCostContext context) throws OrderCostFilterException {
-
         OrderCostBaseReqDTO baseReqDTO = context.getReqContext().getBaseReqDTO();
         OrderCostOwnerCouponReqDTO orderCostOwnerCouponReqDTO = context.getReqContext().getOwnerCouponReqDTO();
+        log.info("订单费用计算-->车主券.param is,baseReqDTO:[{}],orderCostOwnerCouponReqDTO:[{}]", JSON.toJSONString(baseReqDTO),
+                JSON.toJSONString(orderCostOwnerCouponReqDTO));
+
         if (Objects.isNull(baseReqDTO) || Objects.isNull(orderCostOwnerCouponReqDTO)) {
-            throw new OrderCostFilterException(ErrorCode.PARAMETER_ERROR.getCode(), "计算订单车主券抵扣金额参数为空!");
+            throw new OrderCostFilterException(ErrorCode.PARAMETER_ERROR.getCode(), "计算车主券抵扣金额参数为空!");
         }
 
         if (StringUtils.isBlank(orderCostOwnerCouponReqDTO.getCouponNo())) {
-            log.info("计算订单车主券抵扣金额: couponCode is empty.");
+            log.info("订单费用计算-->车主券.couponCode is empty!");
             return;
         }
+
+        OrderCostDetailContext costDetailContext = context.getCostDetailContext();
 
         OwnerCouponGetAndValidReqVO ownerCouponGetAndValidReqVO = new OwnerCouponGetAndValidReqVO();
         BeanUtils.copyProperties(orderCostOwnerCouponReqDTO, ownerCouponGetAndValidReqVO);
         ownerCouponGetAndValidReqVO.setOrderNo(baseReqDTO.getOrderNo());
-        ownerCouponGetAndValidReqVO.setRentAmt(context.getCostDetailContext().getSurplusRentAmt());
+        ownerCouponGetAndValidReqVO.setRentAmt(costDetailContext.getSurplusRentAmt());
         OrderCouponDTO ownerCoupon = renterOrderCalCostService.calOwnerCouponDeductInfo(ownerCouponGetAndValidReqVO);
+        log.info("订单费用计算-->车主券.ownerCoupon:[{}]", JSON.toJSONString(ownerCoupon));
 
-        log.info("计算订单车主券抵扣金额-->优惠券信息.result is, ownerCoupon:[{}]", JSON.toJSONString(ownerCoupon));
         if (null != ownerCoupon) {
-            OrderCostDetailContext orderCostDetailContext = context.getCostDetailContext();
-            //重置剩余租金
-            int disAmt = null == ownerCoupon.getAmount() ? 0 : ownerCoupon.getAmount();
-            orderCostDetailContext.setSurplusRentAmt(orderCostDetailContext.getSurplusRentAmt() - disAmt);
             //记录车主券
             ownerCoupon.setOrderNo(baseReqDTO.getOrderNo());
             ownerCoupon.setRenterOrderNo(baseReqDTO.getRenterOrderNo());
@@ -73,17 +73,21 @@ public class OrderOwnerCouponFilter implements OrderCostFilter {
             ownerCouponSubsidyInfo.setOrderNo(baseReqDTO.getOrderNo());
             ownerCouponSubsidyInfo.setRenterOrderNo(baseReqDTO.getRenterOrderNo());
 
-
             OrderOwnerCouponResDTO orderOwnerCouponResDTO = new OrderOwnerCouponResDTO();
             orderOwnerCouponResDTO.setGetCarFeeCoupon(ownerCoupon);
             orderOwnerCouponResDTO.setSubsidyAmt(ownerCouponSubsidyInfo.getSubsidyAmount());
             orderOwnerCouponResDTO.setSubsidyDetail(ownerCouponSubsidyInfo);
-            context.getResContext().setOrderOwnerCouponResDTO(orderOwnerCouponResDTO);
 
-            log.info("计算订单车主券抵扣金额-->优惠券补贴信息.result is, orderOwnerCouponResDTO:[{}]",
+
+            //赋值OrderCostDetailContext
+            int disAmt = null == ownerCoupon.getAmount() ? 0 : ownerCoupon.getAmount();
+            costDetailContext.setSurplusRentAmt(costDetailContext.getSurplusRentAmt() + disAmt);
+            costDetailContext.getCoupons().add(ownerCoupon);
+            costDetailContext.getSubsidyDetails().add(ownerCouponSubsidyInfo);
+
+            log.info("订单费用计算-->车主券.result is, orderOwnerCouponResDTO:[{}]",
                     JSON.toJSONString(orderOwnerCouponResDTO));
-            orderCostDetailContext.getCoupons().add(ownerCoupon);
-            orderCostDetailContext.getSubsidyDetails().add(ownerCouponSubsidyInfo);
+            context.getResContext().setOrderOwnerCouponResDTO(orderOwnerCouponResDTO);
         }
 
     }
