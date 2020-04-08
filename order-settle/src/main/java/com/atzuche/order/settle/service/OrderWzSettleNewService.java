@@ -1,5 +1,6 @@
 package com.atzuche.order.settle.service;
 
+import com.alibaba.fastjson.JSON;
 import com.atzuche.order.accountrenterdetain.service.notservice.AccountRenterDetainDetailNoTService;
 import com.atzuche.order.accountrenterwzdepost.entity.AccountRenterWzDepositCostEntity;
 import com.atzuche.order.accountrenterwzdepost.entity.AccountRenterWzDepositCostSettleDetailEntity;
@@ -289,10 +290,18 @@ public class OrderWzSettleNewService {
 		log.info("OrderSettleService refundWzDepositAmt 退还违章押金。settleOrdersAccount [{}]", GsonUtils.toJson(settleOrdersAccount));
 		// 违章押金 退还
 		orderWzSettleNoTService.refundWzDepositAmt(settleOrdersAccount, orderStatusDTO);
-		
-		
 		log.info("OrderSettleService 结算结束 settleOrdersAccount [{}],orderStatusDTO [{}]", GsonUtils.toJson(settleOrdersAccount),GsonUtils.toJson(orderStatusDTO));
-		
+
+
+		//更新应扣违章押金
+        int yingkouAmt = settleOrdersAccount.getDepositAmt() - settleOrdersAccount.getDepositSurplusAmt();
+        AccountRenterWzDepositCostEntity entity = new AccountRenterWzDepositCostEntity();
+        entity.setOrderNo(settleOrders.getOrderNo());
+        entity.setMemNo(settleOrders.getRenterMemNo());
+        entity.setYingkouAmt(-yingkouAmt);
+        int result = cashierWzSettleService.updateAccountRenterWzDepositCostByOrderNo(entity);
+        log.info("CashierWzSettleService.updateAccountRenterWzDepositCostByOrderNo. param is,entity:[{}],result is," +
+                "[{}]", JSON.toJSONString(entity), result);
 		// 更新订单状态
 		settleOrdersAccount.setOrderStatusDTO(orderStatusDTO);
 		orderWzSettleNoTService.saveOrderStatusInfo(settleOrdersAccount);

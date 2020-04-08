@@ -11,8 +11,11 @@ import com.atzuche.order.admin.AdminSpringBoot;
 import com.atzuche.order.admin.vo.req.cost.OwnerCostReqVO;
 import com.atzuche.order.admin.vo.req.cost.RenterCostReqVO;
 import com.atzuche.order.admin.vo.resp.order.cost.OrderRenterCostResVO;
-import com.atzuche.order.commons.vo.res.OrderOwnerCostResVO;
+import com.autoyol.commons.utils.GsonUtils;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @RunWith(SpringJUnit4ClassRunner.class)
 //@RunWith(SpringRunner.class)
 @SpringBootTest(classes=AdminSpringBoot.class)
@@ -25,12 +28,17 @@ public class OrderCostServiceTest {
 		RenterCostReqVO renterCostReqVO = new RenterCostReqVO();
 //		renterCostReqVO.setOrderNo("28804131200299");
 //		renterCostReqVO.setRenterOrderNo("2880413120029910010");
-		renterCostReqVO.setOrderNo("28261181200299");
-		renterCostReqVO.setRenterOrderNo("2826118120029910010");
+		
+		//		req.setOrderNo("70916330400299");
+//		req.setSubOrderNo("7091633040029910010");
+		
+		renterCostReqVO.setOrderNo("70916330400299");
+		renterCostReqVO.setRenterOrderNo("7091633040029910010");
 		try {
 			//"28261181200299", "2826118120029910010"
 			OrderRenterCostResVO res = orderCostService.calculateRenterOrderCost(renterCostReqVO);
 			System.err.println("res toString="+res.toString());
+			log.info("admin res toString=" + GsonUtils.toJson(res));
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

@@ -65,6 +65,10 @@ public class AccountRenterCostSettleEntity implements Serializable {
 	 */
 	private Integer shifuAmt;
 	/**
+	 * 应扣费用
+	 */
+	private Integer yingkouAmt;
+	/**
 	 * 实退金额
 	 */
 	private Integer refundAmt;

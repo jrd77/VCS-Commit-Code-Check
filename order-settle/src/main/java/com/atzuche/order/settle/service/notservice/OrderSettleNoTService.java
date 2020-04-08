@@ -8,6 +8,7 @@ import com.atzuche.order.accountrenterdeposit.vo.req.OrderCancelRenterDepositReq
 import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostDetailEntity;
 import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostSettleDetailEntity;
 import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostSettleEntity;
+import com.atzuche.order.accountrenterrentcost.service.notservice.AccountRenterCostSettleNoTService;
 import com.atzuche.order.accountrenterrentcost.vo.req.AccountRenterCostDetailReqVO;
 import com.atzuche.order.accountrenterrentcost.vo.req.AccountRenterCostToFineReqVO;
 import com.atzuche.order.accountrenterwzdepost.vo.req.RenterCancelWZDepositCostReqVO;
@@ -748,6 +749,21 @@ public class OrderSettleNoTService {
         //16 退优惠卷 凹凸币(跟租客结算走)
         this.settleUndoCoupon(settleOrders.getOrderNo(),settleOrders.getRentCosts().getRenterOrderSubsidyDetails());
         log.info("OrderSettleService settleUndoCoupon settleUndoCoupon one [{}]", GsonUtils.toJson(settleOrdersAccount));
+        
+        //更新应扣account_renter_cost_settle yingkou_amt   200407
+        int yingkouAmt1 = settleOrdersAccount.getRentCostPayAmt() - settleOrdersAccount.getRentCostSurplusAmt();
+        int yingkouAmt2 = settleOrdersAccount.getDepositAmt() - settleOrdersAccount.getDepositSurplusAmt();
+        int yingkouAmt = yingkouAmt1 + yingkouAmt2;
+        //单独修改
+        AccountRenterCostSettleEntity entity = new AccountRenterCostSettleEntity();
+        //根据ID来修改
+        entity.setId(accountRenterCostSettle.getId());
+        entity.setOrderNo(settleOrders.getOrderNo());
+        entity.setMemNo(settleOrders.getRenterMemNo());
+        entity.setYingkouAmt(-yingkouAmt);
+        cashierSettleService.updateRentSettleCost(entity);
+        log.info("cashierSettleService.updateRentSettleCost. param is,entity:[{}]", GsonUtils.toJson(entity));
+        
         Cat.logEvent("settleUndoCoupon",GsonUtils.toJson(settleOrdersAccount));
     }
     
