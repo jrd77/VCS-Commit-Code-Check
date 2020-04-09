@@ -61,7 +61,7 @@ public class PayPreCarCost4HoursTask extends IJobHandler {
             Cat.logEvent(CatConstants.XXL_JOB_PARAM, null);
             logger.info("开始执行 预支付4小时内未完成订单退还租车押金  定时器");
             XxlJobLogger.log("开始执行 预支付4小时内未完成订单退还租车押金");
-            List<OrderDTO> orderNos = remindPayIllegalCrashService.findProcessOrderInfo();
+            List<OrderDTO> orderNos = remindPayIllegalCrashService.findCancelOrderInfo();
             if (CollectionUtils.isEmpty(orderNos)) {
                 return SUCCESS;
             }
