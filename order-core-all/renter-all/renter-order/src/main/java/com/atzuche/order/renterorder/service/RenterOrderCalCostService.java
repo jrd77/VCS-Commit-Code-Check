@@ -83,7 +83,6 @@ public class RenterOrderCalCostService {
         LOGGER.info("租客费用-费用聚合开始renterOrderCostReqDTO=[{}]", JSON.toJSONString(renterOrderCostReqDTO));
         CostBaseDTO costBaseDTO = renterOrderCostReqDTO.getCostBaseDTO();
         RenterOrderCostRespDTO renterOrderCostRespDTO = new RenterOrderCostRespDTO();
-        List<RenterOrderCostDetailEntity> detailList = new ArrayList<>();
         List<RenterOrderSubsidyDetailDTO> subsidyList = new ArrayList<>();
         List<RenterOrderSubsidyDetailDTO> subsidyOutList = renterOrderCostReqDTO.getSubsidyOutList();
         Map<String, List<RenterOrderSubsidyDetailDTO>> subsidyOutGroup = Optional
@@ -96,10 +95,11 @@ public class RenterOrderCalCostService {
         //获取租金
         List<RenterOrderCostDetailEntity> renterOrderCostDetailEntities = renterOrderCostCombineService.listRentAmtEntity(renterOrderCostReqDTO.getRentAmtDTO());
         List<RenterOrderSubsidyDetailDTO> rentAmtSubSidy = subsidyOutGroup.get(RenterCashCodeEnum.RENT_AMT.getCashNo());
-        int rentAmtSubsidyAmt = rentAmtSubSidy == null ? 0 : rentAmtSubSidy.stream().collect(Collectors.summingInt(RenterOrderSubsidyDetailDTO::getSubsidyAmount));
-        int rentAmt = renterOrderCostDetailEntities.stream().collect(Collectors.summingInt(RenterOrderCostDetailEntity::getTotalAmount));
+        int rentAmtSubsidyAmt = rentAmtSubSidy == null ? 0 :
+                rentAmtSubSidy.stream().mapToInt(RenterOrderSubsidyDetailDTO::getSubsidyAmount).sum();
+        int rentAmt = renterOrderCostDetailEntities.stream().mapToInt(RenterOrderCostDetailEntity::getTotalAmount).sum();
         rentAmt = rentAmt + rentAmtSubsidyAmt;
-        detailList.addAll(renterOrderCostDetailEntities);
+        List<RenterOrderCostDetailEntity> detailList = new ArrayList<>(renterOrderCostDetailEntities);
         if (rentAmtSubSidy != null) {
             subsidyList.addAll(rentAmtSubSidy);
         }
@@ -109,7 +109,8 @@ public class RenterOrderCalCostService {
         //获取平台保障费
         RenterOrderCostDetailEntity insurAmtEntity = renterOrderCostCombineService.getInsurAmtEntity(renterOrderCostReqDTO.getInsurAmtDTO());
         List<RenterOrderSubsidyDetailDTO> insurAmtSubSidy = subsidyOutGroup.get(RenterCashCodeEnum.INSURE_TOTAL_PRICES.getCashNo());
-        int insurAmtSubSidyAmt = insurAmtSubSidy == null ? 0 : insurAmtSubSidy.stream().collect(Collectors.summingInt(RenterOrderSubsidyDetailDTO::getSubsidyAmount));
+        int insurAmtSubSidyAmt = insurAmtSubSidy == null ? 0 :
+                insurAmtSubSidy.stream().mapToInt(RenterOrderSubsidyDetailDTO::getSubsidyAmount).sum();
         int insurAmt = insurAmtEntity.getTotalAmount();
         insurAmt = insurAmt + insurAmtSubSidyAmt;
         renterOrderCostRespDTO.setBasicEnsureAmount(insurAmt);
@@ -122,8 +123,10 @@ public class RenterOrderCalCostService {
         //获取全面保障费
         List<RenterOrderCostDetailEntity> comprehensiveEnsureList = renterOrderCostCombineService.listAbatementAmtEntity(renterOrderCostReqDTO.getAbatementAmtDTO());
         List<RenterOrderSubsidyDetailDTO> comprehensiveEnsureSubsidy = subsidyOutGroup.get(RenterCashCodeEnum.ABATEMENT_INSURE.getCashNo());
-        int comprehensiveEnsureSubsidyAmount = comprehensiveEnsureSubsidy == null ? 0 : comprehensiveEnsureSubsidy.stream().collect(Collectors.summingInt(RenterOrderSubsidyDetailDTO::getSubsidyAmount));
-        int comprehensiveEnsureAmount = comprehensiveEnsureList.stream().collect(Collectors.summingInt(RenterOrderCostDetailEntity::getTotalAmount));
+        int comprehensiveEnsureSubsidyAmount = comprehensiveEnsureSubsidy == null ? 0 :
+                comprehensiveEnsureSubsidy.stream().mapToInt(RenterOrderSubsidyDetailDTO::getSubsidyAmount).sum();
+        int comprehensiveEnsureAmount =
+                comprehensiveEnsureList.stream().mapToInt(RenterOrderCostDetailEntity::getTotalAmount).sum();
         comprehensiveEnsureAmount = comprehensiveEnsureAmount + comprehensiveEnsureSubsidyAmount;
         renterOrderCostRespDTO.setComprehensiveEnsureAmount(comprehensiveEnsureAmount);
         detailList.addAll(comprehensiveEnsureList);
@@ -170,7 +173,8 @@ public class RenterOrderCalCostService {
         List<RenterOrderSubsidyDetailDTO> returnSubsidy = subsidyOutGroup.get(RenterCashCodeEnum.SRV_RETURN_COST.getCashNo());
         int getSubsidyAmt = getSubsidy == null ? 0 : getSubsidy.get(0).getSubsidyAmount();
         int returnSubsidyAmt = returnSubsidy == null ? 0 : returnSubsidy.get(0).getSubsidyAmount();
-        int getReturnAmt = returnCarCost.getRenterOrderCostDetailEntityList().stream().collect(Collectors.summingInt(RenterOrderCostDetailEntity::getTotalAmount));
+        int getReturnAmt =
+                returnCarCost.getRenterOrderCostDetailEntityList().stream().mapToInt(RenterOrderCostDetailEntity::getTotalAmount).sum();
         getReturnAmt = getReturnAmt + getSubsidyAmt + returnSubsidyAmt;
         detailList.addAll(returnCarCost.getRenterOrderCostDetailEntityList());
         subsidyList.addAll(renterOrderSubsidyDetailDTOList);
@@ -194,10 +198,10 @@ public class RenterOrderCalCostService {
         int returnOverSubsidyAmt = returnOverSubsidy == null ? 0 : returnOverSubsidy.get(0).getSubsidyAmount();
         Integer getOverAmt = renterOrderCostDetailEntityList.stream()
                 .filter(x -> RenterCashCodeEnum.GET_BLOCKED_RAISE_AMT.getCashNo().equals(x.getCostCode()))
-                .collect(Collectors.summingInt(RenterOrderCostDetailEntity::getTotalAmount));
+                .mapToInt(RenterOrderCostDetailEntity::getTotalAmount).sum();
         Integer returnOverAmt = renterOrderCostDetailEntityList.stream()
                 .filter(x -> RenterCashCodeEnum.RETURN_BLOCKED_RAISE_AMT.getCashNo().equals(x.getCostCode()))
-                .collect(Collectors.summingInt(RenterOrderCostDetailEntity::getTotalAmount));
+                .mapToInt(RenterOrderCostDetailEntity::getTotalAmount).sum();
         int getReturnOverCostAmount = getOverAmt + returnOverAmt;
         getReturnOverCostAmount = getReturnOverCostAmount + getOverSubsidyAmt + returnOverSubsidyAmt;
         detailList.addAll(renterOrderCostDetailEntityList);
@@ -664,7 +668,7 @@ public class RenterOrderCalCostService {
         if (StringUtils.isNotBlank(osVal)) {
             List<MemAvailCoupon> availCoupons = response.getAvailCoupons();
             List<MemAvailCoupon> unAvailCoupons = response.getUnavailCoupons();
-            CopyOnWriteArrayList<MemAvailCoupon> copyOnWriteArrayList = new CopyOnWriteArrayList(availCoupons);
+            CopyOnWriteArrayList<MemAvailCoupon> copyOnWriteArrayList = new CopyOnWriteArrayList<>(availCoupons);
             for (MemAvailCoupon memAvailCoupon : copyOnWriteArrayList) {
                 if (memAvailCoupon != null && StringUtils.isNotBlank(memAvailCoupon.getPlatformType())) {
                     String platformTypes = memAvailCoupon.getPlatformType();
