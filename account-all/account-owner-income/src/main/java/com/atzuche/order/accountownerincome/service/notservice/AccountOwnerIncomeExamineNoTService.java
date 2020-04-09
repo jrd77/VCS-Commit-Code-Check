@@ -15,6 +15,7 @@ import com.atzuche.order.commons.vo.req.AdjustmentOwnerIncomeExamVO;
 import com.atzuche.order.commons.vo.req.income.AccountOwnerIncomeExamineOpReqVO;
 import com.atzuche.order.commons.vo.req.income.AccountOwnerIncomeExamineReqVO;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -177,7 +178,10 @@ public class AccountOwnerIncomeExamineNoTService {
     }
 
     public List<AccountOwnerIncomeExamineEntity> getIncomByOwnerMemAndStatus(String ownerMemeNo,List<AccountOwnerIncomeExamineStatus> statusList) {
-        List<Integer> status = statusList.stream().map(x -> x.getStatus()).collect(Collectors.toList());
+        List<Integer> status = new ArrayList<>();
+        if(CollectionUtils.isNotEmpty(statusList)){
+            status = statusList.stream().map(x -> x.getStatus()).collect(Collectors.toList());
+        }
         List<AccountOwnerIncomeExamineEntity> accountOwnerIncomeExamineEntityList = accountOwnerIncomeExamineMapper.getIncomByOwnerMemAndStatus(ownerMemeNo,status);
         return accountOwnerIncomeExamineEntityList;
     }
