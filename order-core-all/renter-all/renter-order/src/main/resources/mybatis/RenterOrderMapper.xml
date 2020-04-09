@@ -35,6 +35,7 @@
         <result property="isDelete" column="is_delete"/>
         <result property="changeSource" column="change_source"/>
         <result property="changeReason" column="change_reason"/>
+        <result property="supplementAmt" column="supplement_amt"/>
     </resultMap>
 
 
@@ -69,7 +70,8 @@
 	`is_delete`,
 	`change_source`,
 	`change_reason`,
-	`req_accept_time`
+	`req_accept_time`,
+	supplement_amt
 	</sql>
 
 
@@ -165,6 +167,7 @@
             <if test="isUseSpecialPrice != null">`is_use_special_price`, </if>
             <if test="changeSource != null">`change_source`, </if>
             <if test="changeReason != null">`change_reason`, </if>
+            <if test="supplementAmt != null">`supplement_amt`, </if>
             <if test="isCancle != null">`is_cancle`, </if>
             <if test="seeFlag != null">`see_flag`, </if>
             <if test="reqAcceptTime != null">`req_accept_time`, </if>
@@ -194,6 +197,7 @@
             <if test="isUseSpecialPrice != null">#{isUseSpecialPrice},  </if>
             <if test="changeSource != null">#{changeSource},  </if>
             <if test="changeReason != null">#{changeReason},  </if>
+            <if test="supplementAmt != null">#{supplementAmt},  </if>
             <if test="isCancle != null">#{isCancle},  </if>
             <if test="seeFlag != null">#{seeFlag},  </if>
             <if test="reqAcceptTime != null">#{reqAcceptTime},  </if>
