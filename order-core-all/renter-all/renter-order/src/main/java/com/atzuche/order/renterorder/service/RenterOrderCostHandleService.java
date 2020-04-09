@@ -396,7 +396,7 @@ public class RenterOrderCostHandleService {
         LOGGER.info("subsidyAmt:[{}] = Math.abs(rentAmt):[{}] - newRentAmt:[{}]", subsidyAmt, rentAmt, newRentAmt);
         RenterOrderSubsidyDetailDTO renterOrderSubsidyDetailDTO =
                 renterOrderSubsidyDetailService.calLongOwnerCouponSubsidyInfo(subsidyAmt,
-                        RenterCashCodeEnum.LONG_OWNER_COUPON_OFFSET_COST);
+                        RenterCashCodeEnum.RENT_AMT);
         LOGGER.info("处理长租订单补贴信息.result is,renterOrderSubsidyDetailDTO:[{}]", JSON.toJSONString(renterOrderSubsidyDetailDTO));
         return renterOrderSubsidyDetailDTO;
     }

@@ -6,6 +6,7 @@ import com.atzuche.order.rentercost.entity.dto.RenterOrderSubsidyDetailDTO;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -35,38 +36,57 @@ public class OrderCostDetailContext implements Serializable {
      */
     private Integer originalRentAmt;
     /**
-     * 取车服务费(取送服务券包含超运能溢价)
+     * 取车服务费
      */
     private Integer srvGetCost;
     /**
-     * 还车服务费(取送服务券包含超运能溢价)
+     * 还车服务费
      */
     private Integer srvReturnCost;
+
+    /**
+     * 取车超运能溢价
+     */
+    private Integer getBlockedRaiseAmt;
+    /**
+     * 还车超运能溢价
+     */
+    private Integer returnBlockedRaiseAmt;
+
+
     /**
      * 剩余租金
      */
     private Integer surplusRentAmt;
     /**
-     * 剩余取车服务费(取送服务券包含超运能溢价)
+     * 剩余取车服务费
      */
     private Integer surplusSrvGetCost;
     /**
-     * 剩余还车服务费(取送服务券包含超运能溢价)
+     * 剩余还车服务费
      */
     private Integer surplusSrvReturnCost;
+    /**
+     * 剩余取车超运能溢价
+     */
+    private Integer surplusGetBlockedRaiseAmt;
+    /**
+     * 剩余还车超运能溢价
+     */
+    private Integer surplusReturnBlockedRaiseAmt;
 
 
     /**
      * 费用明细
      */
-    private List<RenterOrderCostDetailEntity> costDetails;
+    private List<RenterOrderCostDetailEntity> costDetails = new ArrayList<>();
     /**
      * 优惠券列表
      */
-    private List<OrderCouponDTO> coupons;
+    private List<OrderCouponDTO> coupons = new ArrayList<>();
     /**
      * 租客订单补贴明细
      */
-    private List<RenterOrderSubsidyDetailDTO> subsidyDetails;
+    private List<RenterOrderSubsidyDetailDTO> subsidyDetails = new ArrayList<>();
 
 }

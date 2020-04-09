@@ -248,7 +248,7 @@ public class RenterOrderSubsidyDetailService {
         renterOrderSubsidyDetailDTO.setSubsidyTargetName(SubsidySourceCodeEnum.RENTER.getDesc());
         renterOrderSubsidyDetailDTO.setSubsidyCostCode(renterCashCodeEnum.getCashNo());
         renterOrderSubsidyDetailDTO.setSubsidyCostName(renterCashCodeEnum.getTxt());
-        renterOrderSubsidyDetailDTO.setSubsidyDesc("使用车主券抵扣租金");
+        renterOrderSubsidyDetailDTO.setSubsidyDesc("长租折扣抵扣租金");
         return renterOrderSubsidyDetailDTO;
     }
 

@@ -184,8 +184,7 @@ public class RenterFeeCalculatorUtils {
 	 * 平台手续费
 	 */
 	public static FeeResult calServiceChargeFee() {
-		FeeResult feeResult = new FeeResult(SERVICE_CHARGE_FEE, 1.0, SERVICE_CHARGE_FEE);
-		return feeResult;
+		return new FeeResult(SERVICE_CHARGE_FEE, 1.0, SERVICE_CHARGE_FEE);
 	}
 	
 	

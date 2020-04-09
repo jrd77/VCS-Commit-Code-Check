@@ -18,7 +18,6 @@ public class OrderCostGetReturnCarOverCostReqDTO {
      * 订单类型:1,短租订单 2,平台套餐订单
      */
     private Integer orderCategory;
-
     /**
      * 是否计算取车费用
      */

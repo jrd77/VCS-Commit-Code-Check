@@ -15,7 +15,6 @@ import java.util.List;
 @Data
 public class OrderCostRentAmtReqDTO {
 
-
     /**
      * 一天一价
      */

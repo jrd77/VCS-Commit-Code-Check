@@ -4,10 +4,10 @@ import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.constant.OrderConstant;
 import com.atzuche.order.commons.entity.dto.CostBaseDTO;
 import com.atzuche.order.coreapi.entity.dto.cost.OrderCostContext;
+import com.atzuche.order.coreapi.entity.dto.cost.OrderCostDetailContext;
 import com.atzuche.order.coreapi.entity.dto.cost.req.OrderCostBaseReqDTO;
 import com.atzuche.order.coreapi.entity.dto.cost.res.OrderAbatementAmtDeductionResDTO;
 import com.atzuche.order.coreapi.entity.dto.cost.res.OrderAbatementAmtResDTO;
-import com.atzuche.order.coreapi.entity.dto.cost.res.OrderInsurAmtResDTO;
 import com.atzuche.order.coreapi.filter.cost.OrderCostFilter;
 import com.atzuche.order.coreapi.submit.exception.OrderCostFilterException;
 import com.atzuche.order.rentercost.entity.RenterOrderCostDetailEntity;
@@ -41,38 +41,50 @@ public class OrderAbatementAmtDeductionFilter implements OrderCostFilter {
     @Override
     public void calculate(OrderCostContext context) throws OrderCostFilterException {
         OrderCostBaseReqDTO baseReqDTO = context.getReqContext().getBaseReqDTO();
-        log.info("计算订单全面保障服务减免金额.param is,baseReqDTO:[{}]", JSON.toJSONString(baseReqDTO));
+        log.info("订单费用计算-->全面保障服务折扣.param is,baseReqDTO:[{}]", JSON.toJSONString(baseReqDTO));
 
-        if(Objects.isNull(baseReqDTO)) {
-            throw new OrderCostFilterException(ErrorCode.PARAMETER_ERROR.getCode(), "计算订单全面保障服务减免金额参数为空!");
+        if (Objects.isNull(baseReqDTO)) {
+            throw new OrderCostFilterException(ErrorCode.PARAMETER_ERROR.getCode(), "计算全面保障服务折扣金额参数为空!");
         }
+
         OrderAbatementAmtResDTO orderAbatementAmtResDTO = context.getResContext().getOrderAbatementAmtResDTO();
         if (null == orderAbatementAmtResDTO || CollectionUtils.isEmpty(orderAbatementAmtResDTO.getDetails())) {
-            throw new OrderCostFilterException(ErrorCode.PARAMETER_ERROR.getCode(),"计算订单全面保障服务减免金额全面保障服务信息为空!");
+            throw new OrderCostFilterException(ErrorCode.PARAMETER_ERROR.getCode(), "计算全面保障服务减免金额全面保障服务信息为空!");
         }
 
         // 获取不计免赔的折扣
         double ratio = CommonUtils.getInsureDiscount(baseReqDTO.getStartTime(), baseReqDTO.getEndTime());
-        log.info("获取全面保障服务折扣比例.orderNo=[{}],ratio=[{}]", baseReqDTO.getOrderNo(), ratio);
+        log.info("订单费用计算-->全面保障服务折扣.orderNo=[{}],ratio=[{}]", baseReqDTO.getOrderNo(), ratio);
         if (ratio >= OrderConstant.D_ONE) {
-            log.info("计算订单全面保障服务减免金额:order no relief.");
+            log.info("订单费用计算-->全面保障服务折扣.order no relief!");
             return;
         }
 
-        List<RenterOrderCostDetailEntity> details = orderAbatementAmtResDTO.getDetails();
-
+        //基础信息
         CostBaseDTO costBaseDTO = new CostBaseDTO();
         BeanUtils.copyProperties(baseReqDTO, costBaseDTO);
-        List<RenterOrderSubsidyDetailDTO> abatementSubsidyList =
-                details.stream().map(fr -> insurAbamentDiscountService.getAbatementSubsidy(costBaseDTO, fr, ratio
-                        , "下单->全面保障服务打折")).collect(Collectors.toList());
-        int subsidyAmount =
-                abatementSubsidyList.stream().mapToInt(RenterOrderSubsidyDetailDTO::getSubsidyAmount).sum();
+
+        List<RenterOrderCostDetailEntity> details = orderAbatementAmtResDTO.getDetails();
+        List<RenterOrderSubsidyDetailDTO> abatementSubsidyList = null;
+        if (CollectionUtils.isNotEmpty(details)) {
+            abatementSubsidyList =
+                    details.stream().map(fr -> insurAbamentDiscountService.getAbatementSubsidy(costBaseDTO, fr, ratio
+                            , "全面保障服务折扣")).collect(Collectors.toList());
+        }
 
         OrderAbatementAmtDeductionResDTO orderAbatementAmtDeductionResDTO = new OrderAbatementAmtDeductionResDTO();
-        orderAbatementAmtDeductionResDTO.setSubsidyAmt(subsidyAmount);
-        orderAbatementAmtDeductionResDTO.setSubsidyDetails(abatementSubsidyList);
-        log.info("计算订单全面保障服务减免金额.result is,orderAbatementAmtDeductionResDTO:[{}]", JSON.toJSONString(orderAbatementAmtDeductionResDTO));
+        if (CollectionUtils.isNotEmpty(abatementSubsidyList)) {
+            int subsidyAmount =
+                    abatementSubsidyList.stream().filter(x -> null != x.getSubsidyAmount()).mapToInt(RenterOrderSubsidyDetailDTO::getSubsidyAmount).sum();
+            orderAbatementAmtDeductionResDTO.setSubsidyAmt(subsidyAmount);
+            orderAbatementAmtDeductionResDTO.setSubsidyDetails(abatementSubsidyList);
+
+            //赋值OrderCostDetailContext
+            OrderCostDetailContext costDetailContext = context.getCostDetailContext();
+            costDetailContext.getSubsidyDetails().addAll(abatementSubsidyList);
+        }
+
+        log.info("订单费用计算-->全面保障服务折扣.result is,orderAbatementAmtDeductionResDTO:[{}]", JSON.toJSONString(orderAbatementAmtDeductionResDTO));
         context.getResContext().setOrderAbatementAmtDeductionResDTO(orderAbatementAmtDeductionResDTO);
     }
 }
