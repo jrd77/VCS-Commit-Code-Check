@@ -19,4 +19,9 @@ public class CouponDeductionDTO {
     @AutoDocProperty(value = "凹凸币")
     public Integer autoCoinSubsidyAmt;
 
+    @AutoDocProperty(value="车主长租折扣")
+    public String ownerLongRentDeduct;
+    @AutoDocProperty(value="车主长租折扣实际抵扣金额")
+    public Integer ownerLongRentDeductAmt;
+
 }
