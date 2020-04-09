@@ -31,16 +31,16 @@ import org.springframework.util.Assert;
 public class DeliveryCarInfoPriceServiceTest {
 	@Autowired
 	DeliveryCarInfoPriceService deliveryCarInfoPriceService;
-	@Autowired
-    PayPreCarCost4HoursTask revertCar4HoursAutoSettleTask;
-	@Autowired
-    RenterOrderService renterOrderService;
-	@Autowired
-    ShortMessageSendService shortMessageSendService;
-	@Autowired
-    RemindPayIllegalCrashWithHoursTask remindPayIllegalCrashWithHoursTask;
-	@Autowired
-	RemindVoicePayIllegalCrashWithHoursTask remindVoicePayIllegalCrashWithHoursTask;
+//	@Autowired
+//    PayPreCarCost4HoursTask revertCar4HoursAutoSettleTask;
+//	@Autowired
+//    RenterOrderService renterOrderService;
+//	@Autowired
+//    ShortMessageSendService shortMessageSendService;
+//	@Autowired
+//    RemindPayIllegalCrashWithHoursTask remindPayIllegalCrashWithHoursTask;
+//	@Autowired
+//	RemindVoicePayIllegalCrashWithHoursTask remindVoicePayIllegalCrashWithHoursTask;
 	
 //	@Test
 //	public void testGetOwnerPlatFormOilServiceChargeByOrderNo() {
@@ -93,16 +93,16 @@ public class DeliveryCarInfoPriceServiceTest {
 		fail("Not yet implemented");
 	}
 
-	@Test
-	public void testRevertCar4HoursAutoSettleTask() throws Exception{
-	    //测试定时任务
-        revertCar4HoursAutoSettleTask.execute("");
-        //测试起租时间
-        RenterOrderEntity renterOrderEntity = renterOrderService.getRenterOrderByOrderNoAndIsEffective("59700170400299");
-        String fieldValue = shortMessageSendService.getFieldValueByFieldName("expRentTime",renterOrderEntity);
-	   //测试违章相关的短信定时任务
-        //remindPayIllegalCrashWithHoursTask.execute("");
-        //remindVoicePayIllegalCrashWithHoursTask.execute("");
-	}
+//	@Test
+//	public void testRevertCar4HoursAutoSettleTask() throws Exception{
+////	    //测试定时任务
+////        revertCar4HoursAutoSettleTask.execute("");
+////        //测试起租时间
+////        RenterOrderEntity renterOrderEntity = renterOrderService.getRenterOrderByOrderNoAndIsEffective("59700170400299");
+////        String fieldValue = shortMessageSendService.getFieldValueByFieldName("expRentTime",renterOrderEntity);
+//	   //测试违章相关的短信定时任务
+//        //remindPayIllegalCrashWithHoursTask.execute("");
+//        //remindVoicePayIllegalCrashWithHoursTask.execute("");
+//	}
 
 }
