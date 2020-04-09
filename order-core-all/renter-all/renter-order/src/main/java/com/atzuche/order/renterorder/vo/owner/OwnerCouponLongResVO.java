@@ -19,12 +19,13 @@ public class OwnerCouponLongResVO {
      * 主订单号
      */
     private String orderNo;
-
     /**
-     * 文案描述
+     * 折扣的文案信息
      */
     private String discountDesc;
-
+    /**
+     * 租金单价折扣后的集合
+     */
     private List<HolidayAverageResultVO> ownerUnitPriceRespVOS;
 
 }

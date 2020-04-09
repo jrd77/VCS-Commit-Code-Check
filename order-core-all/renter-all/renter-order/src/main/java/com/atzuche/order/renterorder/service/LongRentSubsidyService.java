@@ -21,6 +21,7 @@ import com.atzuche.order.rentercost.entity.dto.RenterOrderSubsidyDetailDTO;
 import com.atzuche.order.rentercost.entity.vo.HolidayAverageDateTimeVO;
 import com.atzuche.order.rentercost.entity.vo.HolidayAverageResultVO;
 import com.atzuche.order.rentercost.service.RenterOrderCostCombineService;
+import com.atzuche.order.renterorder.entity.OwnerCouponLongEntity;
 import com.atzuche.order.renterorder.entity.dto.RenterOrderCostReqDTO;
 import com.atzuche.order.renterorder.entity.dto.RenterOrderCostRespDTO;
 import com.atzuche.order.renterorder.vo.owner.OwnerCouponLongReqVO;
@@ -36,6 +37,8 @@ public class LongRentSubsidyService {
 	private RenterOrderCostCombineService renterOrderCostCombineService;
 	@Autowired
     private OwnerDiscountCouponService ownerDiscountCouponService;
+	@Autowired
+	private OwnerCouponLongService ownerCouponLongService;
 	@Value("${auto.cost.configHours}")
     private Integer configHours;
 	
@@ -191,6 +194,7 @@ public class LongRentSubsidyService {
 		req.setRevertTime(CommonUtils.formatTime(costBaseDTO.getEndTime(), CommonUtils.FORMAT_STR_DEFAULT));
 		OwnerCouponLongResVO res = ownerDiscountCouponService.getLongOwnerCoupon(req);
 		if (res != null) {
+			saveOwnerCouponLongBatch(longCouponCode, costBaseDTO, res);
 			return res.getOwnerUnitPriceRespVOS();
 		}
 		return null;
@@ -272,5 +276,50 @@ public class LongRentSubsidyService {
 		subd.setSubsidyTypeCode(type.getCode());
 		subd.setSubsidyTypeName(type.getDesc());
 		return subd;
+	}
+	
+	
+	/**
+	 * 数据转换
+	 * @param longCouponCode
+	 * @param costBaseDTO
+	 * @param res
+	 * @return List<OwnerCouponLongEntity>
+	 */
+	public List<OwnerCouponLongEntity> listOwnerCouponLongEntity(String longCouponCode, CostBaseDTO costBaseDTO, OwnerCouponLongResVO res) {
+		if (costBaseDTO == null || res == null) {
+			return null;
+		}
+		List<HolidayAverageResultVO> ownerUnitPriceRespVOS = res.getOwnerUnitPriceRespVOS();
+		if (ownerUnitPriceRespVOS == null || ownerUnitPriceRespVOS.isEmpty()) {
+			return null;
+		}
+		List<OwnerCouponLongEntity> list = new ArrayList<OwnerCouponLongEntity>();
+		for (HolidayAverageResultVO ha:ownerUnitPriceRespVOS) {
+			OwnerCouponLongEntity entity = new OwnerCouponLongEntity();
+			entity.setActUnitPrice(ha.getActRentUnitPriceAmt());
+			entity.setCouponCode(longCouponCode);
+			entity.setDiscounRatio(ha.getDiscounRatio());
+			entity.setDiscountDesc(res.getDiscountDesc());
+			entity.setOrderNo(costBaseDTO.getOrderNo());
+			entity.setOriginalUnitPrice(ha.getRentOriginalUnitPriceAmt());
+			entity.setReductionPrice(ha.getReductionAmt());
+			entity.setRenterMemNo(costBaseDTO.getMemNo());
+			entity.setRenterOrderNo(costBaseDTO.getRenterOrderNo());
+			list.add(entity);
+		}
+		return list;
+	}
+	
+	
+	/**
+	 * 比例保存长租折扣信息
+	 * @param longCouponCode
+	 * @param costBaseDTO
+	 * @param res
+	 */
+	public void saveOwnerCouponLongBatch(String longCouponCode, CostBaseDTO costBaseDTO, OwnerCouponLongResVO res) {
+		List<OwnerCouponLongEntity> list = listOwnerCouponLongEntity(longCouponCode, costBaseDTO, res);
+		ownerCouponLongService.saveOwnerCouponLongBatch(list);
 	}
 }

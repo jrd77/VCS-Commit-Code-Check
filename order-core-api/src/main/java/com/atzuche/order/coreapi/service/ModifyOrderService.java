@@ -24,8 +24,10 @@ import com.atzuche.order.delivery.vo.delivery.UpdateOrderDeliveryVO;
 import com.atzuche.order.mem.MemProxyService;
 import com.atzuche.order.open.vo.ModifyOrderFeeVO;
 import com.atzuche.order.parentorder.entity.OrderEntity;
+import com.atzuche.order.parentorder.entity.OrderSourceStatEntity;
 import com.atzuche.order.parentorder.entity.OrderStatusEntity;
 import com.atzuche.order.parentorder.service.OrderService;
+import com.atzuche.order.parentorder.service.OrderSourceStatService;
 import com.atzuche.order.parentorder.service.OrderStatusService;
 import com.atzuche.order.rentercommodity.service.RenterCommodityService;
 import com.atzuche.order.rentercommodity.service.RenterGoodsService;
@@ -133,6 +135,8 @@ public class ModifyOrderService {
 	private LongRentSubsidyService longRentSubsidyService;
 	@Autowired
 	private LongRentCostHandleService longRentCostHandleService;
+	@Autowired
+	private OrderSourceStatService orderSourceStatService;
 	/**
 	 * 修改订单主逻辑（含换车）
 	 * @param modifyOrderReq
@@ -598,6 +602,11 @@ public class ModifyOrderService {
 	public ModifyOrderDTO getModifyOrderDTO(ModifyOrderReq modifyOrderReq, String renterOrderNo, RenterOrderEntity initRenterOrder, List<RenterOrderDeliveryEntity> deliveryList) {
 		ModifyOrderDTO modifyOrderDTO = new ModifyOrderDTO();
 		BeanUtils.copyProperties(modifyOrderReq, modifyOrderDTO);
+		// 获取订单来源信息
+        OrderSourceStatEntity osse = orderSourceStatService.selectByOrderNo(modifyOrderReq.getOrderNo());
+        if (osse != null) {
+        	modifyOrderDTO.setLongCouponCode(osse.getLongRentCouponCode());
+        }
 		// 设置租客子单号
 		modifyOrderDTO.setRenterOrderNo(renterOrderNo);
 		// 设置管理后台修改原因
