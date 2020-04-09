@@ -1795,7 +1795,7 @@ public class OrderDetailService {
                 .stream()
                 .map(x -> x.getOrderNo())
                 .collect(Collectors.toList());
-        int maxLen = 1675;
+        int maxLen = 2000;
         int size = orderNos.size();
         log.info("当前订单条数size={}",size);
         int count = size%maxLen==0?(size / maxLen):(size / maxLen) + 1;
