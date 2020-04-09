@@ -67,8 +67,8 @@ public class OrderRentAmtFilter implements OrderCostFilter {
 
             //赋值OrderCostDetailContext
             OrderCostDetailContext costDetailContext = context.getCostDetailContext();
-            costDetailContext.setOriginalRentAmt(rentAmt);
-            costDetailContext.setSurplusRentAmt(rentAmt);
+            costDetailContext.setOriginalRentAmt(Math.abs(rentAmt));
+            costDetailContext.setSurplusRentAmt(Math.abs(rentAmt));
             costDetailContext.getCostDetails().addAll(list);
         }
         context.getResContext().setOrderRentAmtResDTO(orderRentAmtResDTO);

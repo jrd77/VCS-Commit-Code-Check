@@ -8,8 +8,10 @@ import com.atzuche.order.coreapi.entity.dto.cost.OrderCostDetailContext;
 import com.atzuche.order.coreapi.entity.dto.cost.req.OrderCostBaseReqDTO;
 import com.atzuche.order.coreapi.entity.dto.cost.req.OrderCostPlatformCouponReqDTO;
 import com.atzuche.order.coreapi.entity.dto.cost.res.OrderPlatformCouponResDTO;
+import com.atzuche.order.coreapi.entity.dto.cost.res.OrderRentAmtResDTO;
 import com.atzuche.order.coreapi.filter.cost.OrderCostFilter;
 import com.atzuche.order.coreapi.submit.exception.OrderCostFilterException;
+import com.atzuche.order.coreapi.utils.OrderCostDetailCalculationUtil;
 import com.atzuche.order.rentercost.entity.dto.OrderCouponDTO;
 import com.atzuche.order.rentercost.entity.dto.RenterOrderSubsidyDetailDTO;
 import com.atzuche.order.rentercost.service.RenterOrderSubsidyDetailService;
@@ -53,6 +55,11 @@ public class OrderPlatformCouponFilter implements OrderCostFilter {
             throw new OrderCostFilterException(ErrorCode.PARAMETER_ERROR.getCode(), "计算平台优惠券抵扣金额参数为空!");
         }
 
+        OrderRentAmtResDTO orderRentAmtResDTO = context.getResContext().getOrderRentAmtResDTO();
+        if (Objects.isNull(orderRentAmtResDTO)) {
+            throw new OrderCostFilterException(ErrorCode.PARAMETER_ERROR.getCode(), "计算平台优惠券抵扣金额租金信息为空!");
+        }
+
         if (StringUtils.isBlank(orderCostPlatformCouponReqDTO.getDisCouponId())) {
             log.info("订单费用计算-->平台优惠券.disCouponId is empty!");
             return;
@@ -61,19 +68,36 @@ public class OrderPlatformCouponFilter implements OrderCostFilter {
         OrderCostDetailContext costDetailContext = context.getCostDetailContext();
         MemAvailCouponRequestVO memAvailCouponRequestVO = new MemAvailCouponRequestVO();
         BeanUtils.copyProperties(orderCostPlatformCouponReqDTO, memAvailCouponRequestVO);
-
         memAvailCouponRequestVO.setOrderNo(baseReqDTO.getOrderNo());
         memAvailCouponRequestVO.setMemNo(Integer.valueOf(baseReqDTO.getMemNo()));
         memAvailCouponRequestVO.setRentTime(DateUtils.formateLong(baseReqDTO.getStartTime(), DateUtils.DATE_DEFAUTE));
         memAvailCouponRequestVO.setRevertTime(DateUtils.formateLong(baseReqDTO.getEndTime(), DateUtils.DATE_DEFAUTE));
+
         memAvailCouponRequestVO.setRentAmt(costDetailContext.getSurplusRentAmt());
         memAvailCouponRequestVO.setOriginalRentAmt(costDetailContext.getOriginalRentAmt());
-        memAvailCouponRequestVO.setSrvGetCost(costDetailContext.getSurplusSrvGetCost());
-        memAvailCouponRequestVO.setSrvReturnCost(costDetailContext.getSurplusSrvReturnCost());
-        memAvailCouponRequestVO.setInsureTotalPrices(0);
-        memAvailCouponRequestVO.setAbatement(0);
-        memAvailCouponRequestVO.setCounterFee(20);
-        memAvailCouponRequestVO.setHolidayAverage(0);
+
+        int srvGetCost = OrderCostDetailCalculationUtil.getSrvGetCostAmt(costDetailContext.getCostDetails(),
+                costDetailContext.getSubsidyDetails());
+        int getBlockedRaiseAmt = OrderCostDetailCalculationUtil.getGetBlockedRaiseAmt(costDetailContext.getCostDetails(),
+                costDetailContext.getSubsidyDetails());
+        memAvailCouponRequestVO.setSrvGetCost(Math.abs(srvGetCost + getBlockedRaiseAmt));
+
+        int srvReturnCost = OrderCostDetailCalculationUtil.getSrvReturnCostAmt(costDetailContext.getCostDetails(),
+                costDetailContext.getSubsidyDetails());
+        int returnBlockedRaiseAmt = OrderCostDetailCalculationUtil.getReturnBlockedRaiseAmt(costDetailContext.getCostDetails(),
+                costDetailContext.getSubsidyDetails());
+        memAvailCouponRequestVO.setSrvReturnCost(Math.abs(srvReturnCost + returnBlockedRaiseAmt));
+
+        int insurAmt = OrderCostDetailCalculationUtil.getInsuranceAmt(costDetailContext.getCostDetails(),
+                costDetailContext.getSubsidyDetails());
+        memAvailCouponRequestVO.setInsureTotalPrices(Math.abs(insurAmt));
+        int comprehensiveEnsureAmount = OrderCostDetailCalculationUtil.getAbatementAmt(costDetailContext.getCostDetails(),
+                costDetailContext.getSubsidyDetails());
+        memAvailCouponRequestVO.setAbatement(Math.abs(comprehensiveEnsureAmount));
+        int serviceAmount = OrderCostDetailCalculationUtil.getFeeAmt(costDetailContext.getCostDetails(),
+                costDetailContext.getSubsidyDetails());
+        memAvailCouponRequestVO.setCounterFee(Math.abs(serviceAmount));
+        memAvailCouponRequestVO.setHolidayAverage(orderRentAmtResDTO.getHolidayAverage());
 
         OrderCouponDTO platfromCoupon = renterOrderCalCostService.calPlatformCouponDeductInfo(memAvailCouponRequestVO);
         log.info("订单费用计算-->平台优惠券.platfromCoupon:[{}]", JSON.toJSONString(platfromCoupon));

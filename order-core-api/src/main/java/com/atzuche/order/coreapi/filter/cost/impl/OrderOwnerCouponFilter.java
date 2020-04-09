@@ -6,6 +6,7 @@ import com.atzuche.order.coreapi.entity.dto.cost.OrderCostDetailContext;
 import com.atzuche.order.coreapi.entity.dto.cost.req.OrderCostBaseReqDTO;
 import com.atzuche.order.coreapi.entity.dto.cost.req.OrderCostOwnerCouponReqDTO;
 import com.atzuche.order.coreapi.entity.dto.cost.res.OrderOwnerCouponResDTO;
+import com.atzuche.order.coreapi.entity.dto.cost.res.OrderRentAmtResDTO;
 import com.atzuche.order.coreapi.filter.cost.OrderCostFilter;
 import com.atzuche.order.coreapi.submit.exception.OrderCostFilterException;
 import com.atzuche.order.rentercost.entity.dto.OrderCouponDTO;
@@ -48,6 +49,11 @@ public class OrderOwnerCouponFilter implements OrderCostFilter {
             throw new OrderCostFilterException(ErrorCode.PARAMETER_ERROR.getCode(), "计算车主券抵扣金额参数为空!");
         }
 
+        OrderRentAmtResDTO orderRentAmtResDTO = context.getResContext().getOrderRentAmtResDTO();
+        if (Objects.isNull(orderRentAmtResDTO)) {
+            throw new OrderCostFilterException(ErrorCode.PARAMETER_ERROR.getCode(), "计算车主券抵扣金额租金信息为空!");
+        }
+
         if (StringUtils.isBlank(orderCostOwnerCouponReqDTO.getCouponNo())) {
             log.info("订单费用计算-->车主券.couponCode is empty!");
             return;
@@ -81,7 +87,7 @@ public class OrderOwnerCouponFilter implements OrderCostFilter {
 
             //赋值OrderCostDetailContext
             int disAmt = null == ownerCoupon.getAmount() ? 0 : ownerCoupon.getAmount();
-            costDetailContext.setSurplusRentAmt(costDetailContext.getSurplusRentAmt() + disAmt);
+            costDetailContext.setSurplusRentAmt(costDetailContext.getSurplusRentAmt() - disAmt);
             costDetailContext.getCoupons().add(ownerCoupon);
             costDetailContext.getSubsidyDetails().add(ownerCouponSubsidyInfo);
 

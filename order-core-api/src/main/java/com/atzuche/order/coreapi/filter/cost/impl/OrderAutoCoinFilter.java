@@ -8,6 +8,7 @@ import com.atzuche.order.coreapi.entity.dto.cost.OrderCostDetailContext;
 import com.atzuche.order.coreapi.entity.dto.cost.req.OrderCostAutoCoinReqDTO;
 import com.atzuche.order.coreapi.entity.dto.cost.req.OrderCostBaseReqDTO;
 import com.atzuche.order.coreapi.entity.dto.cost.res.OrderAutoCoinResDTO;
+import com.atzuche.order.coreapi.entity.dto.cost.res.OrderRentAmtResDTO;
 import com.atzuche.order.coreapi.filter.cost.OrderCostFilter;
 import com.atzuche.order.coreapi.submit.exception.OrderCostFilterException;
 import com.atzuche.order.rentercost.entity.dto.RenterOrderSubsidyDetailDTO;
@@ -47,6 +48,11 @@ public class OrderAutoCoinFilter implements OrderCostFilter {
 
         if (Objects.isNull(baseReqDTO) || Objects.isNull(orderCostAutoCoinReqDTO)) {
             throw new OrderCostFilterException(ErrorCode.PARAMETER_ERROR.getCode(), "计算凹凸币抵扣金额参数为空!");
+        }
+
+        OrderRentAmtResDTO orderRentAmtResDTO = context.getResContext().getOrderRentAmtResDTO();
+        if (Objects.isNull(orderRentAmtResDTO)) {
+            throw new OrderCostFilterException(ErrorCode.PARAMETER_ERROR.getCode(), "计算凹凸币抵扣金额租金信息为空!");
         }
 
         if (null == orderCostAutoCoinReqDTO.getUseAutoCoin() || OrderConstant.NO == orderCostAutoCoinReqDTO.getUseAutoCoin()) {
