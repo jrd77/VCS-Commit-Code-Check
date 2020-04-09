@@ -11,7 +11,6 @@ import com.atzuche.order.coreapi.entity.request.ModifyOrderReq;
 import com.atzuche.order.coreapi.entity.vo.CostDeductVO;
 import com.atzuche.order.coreapi.entity.vo.req.CarRentTimeRangeReqVO;
 import com.atzuche.order.coreapi.entity.vo.req.OwnerCouponBindReqVO;
-import com.atzuche.order.coreapi.entity.vo.res.CarRentTimeRangeResVO;
 import com.atzuche.order.coreapi.modifyorder.exception.ModifyOrderParameterException;
 import com.atzuche.order.coreapi.service.remote.CarRentalTimeApiProxyService;
 import com.atzuche.order.coreapi.service.remote.UniqueOrderNoProxyService;
@@ -22,6 +21,8 @@ import com.atzuche.order.delivery.service.delivery.DeliveryCarService;
 import com.atzuche.order.delivery.vo.delivery.OrderDeliveryDTO;
 import com.atzuche.order.delivery.vo.delivery.RenterDeliveryAddrDTO;
 import com.atzuche.order.delivery.vo.delivery.UpdateOrderDeliveryVO;
+import com.atzuche.order.mem.MemProxyService;
+import com.atzuche.order.open.vo.ModifyOrderFeeVO;
 import com.atzuche.order.parentorder.entity.OrderEntity;
 import com.atzuche.order.parentorder.entity.OrderStatusEntity;
 import com.atzuche.order.parentorder.service.OrderService;
@@ -49,9 +50,6 @@ import com.autoyol.coupon.api.CouponSettleRequest;
 import com.autoyol.platformcost.CommonUtils;
 import com.dianping.cat.Cat;
 import lombok.extern.slf4j.Slf4j;
-import com.atzuche.order.mem.MemProxyService;
-import com.atzuche.order.open.vo.ModifyOrderFeeVO;
-
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -184,7 +182,7 @@ public class ModifyOrderService {
 		// 获取修改前补贴信息
 		List<RenterOrderSubsidyDetailEntity> initSubsidyList = renterOrderSubsidyDetailService.listRenterOrderSubsidyDetail(modifyOrderDTO.getOrderNo(), initRenterOrder.getRenterOrderNo());
 		// 提前延后时间计算
-		CarRentTimeRangeResVO carRentTimeRangeResVO = getCarRentTimeRangeResVO(modifyOrderDTO);
+		CarRentTimeRangeDTO carRentTimeRangeResVO = getCarRentTimeRangeResVO(modifyOrderDTO);
 		// 设置提前延后时间
 		modifyOrderDTO.setCarRentTimeRangeResVO(carRentTimeRangeResVO);
 		// 封装计算用对象
@@ -378,7 +376,7 @@ public class ModifyOrderService {
 	 * @param modifyOrderDTO
 	 * @return CarRentTimeRangeResVO
 	 */
-	public CarRentTimeRangeResVO getCarRentTimeRangeResVO(ModifyOrderDTO modifyOrderDTO) {
+	public CarRentTimeRangeDTO getCarRentTimeRangeResVO(ModifyOrderDTO modifyOrderDTO) {
 		if (modifyOrderDTO == null) {
 			return null;
 		}
@@ -1407,7 +1405,10 @@ public class ModifyOrderService {
 	 * @param orderEntity
 	 * @return RenterOrderReqVO
 	 */
-	public RenterOrderReqVO convertToRenterOrderReqVO(ModifyOrderDTO modifyOrderDTO, RenterMemberDTO renterMemberDTO, RenterGoodsDetailDTO renterGoodsDetailDTO, OrderEntity orderEntity, CarRentTimeRangeResVO carRentTimeRangeResVO) {
+	public RenterOrderReqVO convertToRenterOrderReqVO(ModifyOrderDTO modifyOrderDTO, RenterMemberDTO renterMemberDTO,
+                                                      RenterGoodsDetailDTO renterGoodsDetailDTO,
+                                                      OrderEntity orderEntity,
+                                                      CarRentTimeRangeDTO carRentTimeRangeResVO) {
 		RenterOrderReqVO renterOrderReqVO = new RenterOrderReqVO();
 		renterOrderReqVO.setAbatement(modifyOrderDTO.getAbatementFlag() == null ? 0 :
                 modifyOrderDTO.getAbatementFlag());
@@ -1551,7 +1552,7 @@ public class ModifyOrderService {
 			return delivMap;
 		}
 		// 提前延后时间
-		CarRentTimeRangeResVO carRentTimeRangeResVO = modifyOrderDTO.getCarRentTimeRangeResVO();
+		CarRentTimeRangeDTO carRentTimeRangeResVO = modifyOrderDTO.getCarRentTimeRangeResVO();
 		OrderDeliveryDTO getDelivery = new OrderDeliveryDTO();
 		getDelivery.setRentTime(modifyOrderDTO.getRentTime());
 		getDelivery.setRevertTime(modifyOrderDTO.getRevertTime());

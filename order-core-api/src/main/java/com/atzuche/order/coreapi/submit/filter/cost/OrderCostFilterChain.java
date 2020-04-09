@@ -40,8 +40,12 @@ public class OrderCostFilterChain implements ApplicationContextAware {
         orderCostFilterList.add(applicationContext.getBean(OrderRentAmtFilter.class));
         //基础保险费
         orderCostFilterList.add(applicationContext.getBean(OrderInsurAmtFilter.class));
+        //基础保险费折扣
+        orderCostFilterList.add(applicationContext.getBean(OrderInsurAmtDeductionFilter.class));
         //全面保障费
         orderCostFilterList.add(applicationContext.getBean(OrderAbatementAmtFilter.class));
+        //全面保障费折扣
+        orderCostFilterList.add(applicationContext.getBean(OrderAbatementAmtDeductionFilter.class));
         //附加驾驶人保险费
         orderCostFilterList.add(applicationContext.getBean(OrderExtraDriverInsureAmtFilter.class));
         //手续费
@@ -50,6 +54,18 @@ public class OrderCostFilterChain implements ApplicationContextAware {
         orderCostFilterList.add(applicationContext.getBean(OrderGetAndReturnCarCostFilter.class));
         //超运能溢价
         orderCostFilterList.add(applicationContext.getBean(OrderOverTransportCapacityPremiumFilter.class));
+        //送取服务券
+        orderCostFilterList.add(applicationContext.getBean(OrderGetAndReturnCarCostFilter.class));
+        //车主券
+        orderCostFilterList.add(applicationContext.getBean(OrderOwnerCouponFilter.class));
+        //限时红包
+        orderCostFilterList.add(applicationContext.getBean(OrderLimitRedFilter.class));
+        //平台优惠券
+        orderCostFilterList.add(applicationContext.getBean(OrderPlatformCouponFilter.class));
+        //凹凸币
+        orderCostFilterList.add(applicationContext.getBean(OrderAutoCoinFilter.class));
+
+
     }
 
     public void calculate(OrderCostContext context) throws OrderFilterException {

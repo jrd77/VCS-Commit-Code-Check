@@ -15,4 +15,12 @@ public class OrderCostLimitRedReqDTO {
      * 限时后保抵扣金额
      */
     private Integer reductiAmt;
+
+
+    public OrderCostLimitRedReqDTO() {
+    }
+
+    public OrderCostLimitRedReqDTO(Integer reductiAmt) {
+        this.reductiAmt = reductiAmt;
+    }
 }
