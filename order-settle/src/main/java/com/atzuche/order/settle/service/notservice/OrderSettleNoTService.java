@@ -757,7 +757,8 @@ public class OrderSettleNoTService {
         //单独修改
         AccountRenterCostSettleEntity entity = new AccountRenterCostSettleEntity();
         //根据ID来修改
-        entity.setId(accountRenterCostSettle.getId());
+//        entity.setId(accountRenterCostSettle.getId());
+//        entity.setVersion(accountRenterCostSettle.getVersion());//根据版本号来修改。
         entity.setOrderNo(settleOrders.getOrderNo());
         entity.setMemNo(settleOrders.getRenterMemNo());
         entity.setYingkouAmt(-yingkouAmt);
