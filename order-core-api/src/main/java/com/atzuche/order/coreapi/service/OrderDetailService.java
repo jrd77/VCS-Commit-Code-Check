@@ -1795,15 +1795,29 @@ public class OrderDetailService {
                 .stream()
                 .map(x -> x.getOrderNo())
                 .collect(Collectors.toList());
-        List<OrderEntity> orderEntityList = orderService.getByOrderNos(orderNos);
+        int maxLen = 1675;
+        int size = orderNos.size();
+        log.info("当前订单条数size={}",size);
+        int count = size%maxLen==0?(size / maxLen):(size / maxLen) + 1;
         List<OrderDTO> orderDTOS = new ArrayList<>();
-        orderEntityList.stream().forEach(x->{
-            OrderDTO orderDTO = new OrderDTO();
-            BeanUtils.copyProperties(x,orderDTO);
-            orderDTOS.add(orderDTO);
-        });
+        for(int i=0;i<count;i++){
+            int toIndex = maxLen * i;
+            int fromIndex = (toIndex + maxLen)>=size?size:toIndex + maxLen;
+            List<String> curOrderNos = orderNos.subList(toIndex,fromIndex);
+            List<OrderEntity> orderEntityList = orderService.getByOrderNos(curOrderNos);
+            orderEntityList.stream().forEach(x->{
+                OrderDTO orderDTO = new OrderDTO();
+                BeanUtils.copyProperties(x,orderDTO);
+                orderDTOS.add(orderDTO);
+            });
+        }
         processRespDTO.setOrderDTOs(orderDTOS);
         processRespDTO.setOrderStatusDTOs(orderStatusDTOList);
         return processRespDTO;
     }
+
+    public static void main(String[] args) {
+        System.out.println(1001/1000);
+    }
+
 }
