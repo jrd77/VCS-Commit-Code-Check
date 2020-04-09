@@ -192,7 +192,9 @@ public class OrderSettleNoTService {
     	RenterOrderEntity renterOrder = settleOrders.getRenterOrder();
         // 1 订单校验是否可以结算
         OrderStatusEntity orderStatus = orderStatusService.getByOrderNo(renterOrder.getOrderNo());
-        if(OrderStatusEnum.TO_SETTLE.getStatus() != orderStatus.getStatus() || SettleStatusEnum.SETTLEING.getCode() != orderStatus.getSettleStatus()){
+        if(OrderStatusEnum.TO_SETTLE.getStatus() != orderStatus.getStatus() 
+        		|| SettleStatusEnum.SETTLEING.getCode() != orderStatus.getSettleStatus()
+        		|| SettleStatusEnum.SETTLEING.getCode() != orderStatus.getCarDepositSettleStatus() ){
             throw new RuntimeException("租客订单状态不是待结算，不能结算");
         }
 //        //2校验租客是否还车
@@ -723,6 +725,9 @@ public class OrderSettleNoTService {
         orderStatusDTO.setOrderNo(settleOrders.getOrderNo());
         orderStatusDTO.setStatus(OrderStatusEnum.TO_WZ_SETTLE.getStatus());
         orderStatusDTO.setSettleStatus(SettleStatusEnum.SETTLED.getCode());
+        //车辆押金的结算状态
+        orderStatusDTO.setCarDepositSettleStatus(SettleStatusEnum.SETTLED.getCode());
+        orderStatusDTO.setCarDepositSettleTime(LocalDateTime.now());
         
         //9 租客费用 结余处理
         orderSettleNewService.rentCostSettle(settleOrders,settleOrdersAccount,callBack);
@@ -906,6 +911,7 @@ public class OrderSettleNoTService {
      */
     public void saveOrderStatusInfo(SettleOrdersAccount settleOrdersAccount) {
         //1更新 订单流转状态
+    	
         orderStatusService.saveOrderStatusInfo(settleOrdersAccount.getOrderStatusDTO());
         //2记录订单流传信息
         orderFlowService.inserOrderStatusChangeProcessInfo(settleOrdersAccount.getOrderNo(), OrderStatusEnum.TO_WZ_SETTLE);

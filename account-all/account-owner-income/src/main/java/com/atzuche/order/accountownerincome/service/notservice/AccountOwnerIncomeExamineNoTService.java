@@ -14,7 +14,6 @@ import com.atzuche.order.commons.exceptions.OwnerIncomeExamineNotFoundException;
 import com.atzuche.order.commons.vo.req.AdjustmentOwnerIncomeExamVO;
 import com.atzuche.order.commons.vo.req.income.AccountOwnerIncomeExamineOpReqVO;
 import com.atzuche.order.commons.vo.req.income.AccountOwnerIncomeExamineReqVO;
-import com.atzuche.order.commons.vo.res.account.income.OwnerIncomeExamineListResVO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.BeanUtils;
@@ -26,6 +25,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 
@@ -178,14 +178,13 @@ public class AccountOwnerIncomeExamineNoTService {
     }
 
     public List<AccountOwnerIncomeExamineEntity> getIncomByOwnerMemAndStatus(String ownerMemeNo,List<AccountOwnerIncomeExamineStatus> statusList) {
-        List<Integer> status = statusList.stream().map(x -> x.getStatus()).collect(Collectors.toList());
+        List<Integer> status = Optional.ofNullable(statusList).orElseGet(ArrayList::new).stream().map(x -> x.getStatus()).collect(Collectors.toList());
         List<AccountOwnerIncomeExamineEntity> accountOwnerIncomeExamineEntityList = accountOwnerIncomeExamineMapper.getIncomByOwnerMemAndStatus(ownerMemeNo,status);
         return accountOwnerIncomeExamineEntityList;
     }
 
 
-    public OwnerIncomeExamineListResVO getIncomByOwnerMem(String ownerMemeNo) {
-        OwnerIncomeExamineListResVO ownerIncomeExamineListResVO = new OwnerIncomeExamineListResVO();
+    public List<AccountOwnerIncomeExamineDTO> getIncomByOwnerMem(String ownerMemeNo) {
         List<AccountOwnerIncomeExamineEntity> incomByOwnerMemAndStatus = getIncomByOwnerMemAndStatus(ownerMemeNo, null);
         List<AccountOwnerIncomeExamineDTO> accountOwnerIncomeExamineDTOS = new ArrayList<>();
         incomByOwnerMemAndStatus.stream().forEach(x->{
@@ -193,7 +192,6 @@ public class AccountOwnerIncomeExamineNoTService {
             BeanUtils.copyProperties(x,accountOwnerIncomeExamineDTO);
             accountOwnerIncomeExamineDTOS.add(accountOwnerIncomeExamineDTO);
         });
-        ownerIncomeExamineListResVO.setAccountOwnerIncomeExamineDTOS(accountOwnerIncomeExamineDTOS);
-        return ownerIncomeExamineListResVO;
+        return accountOwnerIncomeExamineDTOS;
     }
 }

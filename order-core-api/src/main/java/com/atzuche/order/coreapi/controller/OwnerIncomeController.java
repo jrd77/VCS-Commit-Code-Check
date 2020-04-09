@@ -1,14 +1,21 @@
 package com.atzuche.order.coreapi.controller;
 
+import com.alibaba.fastjson.JSON;
+import com.atzuche.order.accountownerincome.entity.AccountOwnerIncomeEntity;
 import com.atzuche.order.accountownerincome.entity.AccountOwnerIncomeExamineEntity;
 import com.atzuche.order.accountownerincome.service.notservice.AccountOwnerIncomeExamineNoTService;
+import com.atzuche.order.accountownerincome.service.notservice.AccountOwnerIncomeNoTService;
 import com.atzuche.order.cashieraccount.service.CashierQueryService;
 import com.atzuche.order.cashieraccount.service.CashierService;
 import com.atzuche.order.commons.BindingResultUtil;
+import com.atzuche.order.commons.entity.orderDetailDto.AccountOwnerIncomeExamineDTO;
 import com.atzuche.order.commons.vo.req.AdjustmentOwnerIncomeExamVO;
 import com.atzuche.order.commons.vo.req.income.AccountOwnerIncomeExamineOpReqVO;
 import com.atzuche.order.commons.vo.req.income.AccountOwnerIncomeExamineReqVO;
-import com.atzuche.order.commons.vo.res.account.income.*;
+import com.atzuche.order.commons.vo.res.account.income.AccountOwnerIncomeRealResVO;
+import com.atzuche.order.commons.vo.res.account.income.AdjustOwnerIncomeResVO;
+import com.atzuche.order.commons.vo.res.account.income.OwnerIncomeExamineDetailResVO;
+import com.atzuche.order.commons.vo.res.account.income.OwnerIncomeExamineDetailVO;
 import com.autoyol.commons.utils.GsonUtils;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.doc.annotation.AutoDocMethod;
@@ -38,6 +45,8 @@ public class OwnerIncomeController {
 	private CashierQueryService cashierQueryService;
     @Autowired
     private AccountOwnerIncomeExamineNoTService accountOwnerIncomeExamineNoTService;
+    @Autowired
+    private AccountOwnerIncomeNoTService accountOwnerIncomeNoTService;
     /**
      * 查询车主收益信息
      * @param orderNo
@@ -107,12 +116,22 @@ public class OwnerIncomeController {
         return ResponseData.success();
     }
 
-    @AutoDocMethod(value = "根据会员号查询车主全部收益审核信息", description = "根据会员号查询车主全部收益审核信息",response = OwnerIncomeExamineListResVO.class)
+    @AutoDocMethod(value = "根据会员号查询车主全部收益审核信息", description = "根据会员号查询车主全部收益审核信息",response = AccountOwnerIncomeExamineDTO.class)
     @GetMapping("/getIncomByOwnerMem")
-    public ResponseData<OwnerIncomeExamineListResVO> getIncomByOwnerMem(@RequestParam("ownerMemeNo") String ownerMemeNo){
+    public ResponseData<List<AccountOwnerIncomeExamineDTO>> getIncomByOwnerMem(@RequestParam("ownerMemeNo") String ownerMemeNo){
         log.info("OwnerIncomeController getIncomByOwnerMem start param [{}]", ownerMemeNo);
-        OwnerIncomeExamineListResVO  ownerIncomeExamineListResVO= accountOwnerIncomeExamineNoTService.getIncomByOwnerMem(ownerMemeNo);
+        List<AccountOwnerIncomeExamineDTO> incomByOwnerMem = accountOwnerIncomeExamineNoTService.getIncomByOwnerMem(ownerMemeNo);
         log.info("OwnerIncomeController getIncomByOwnerMem end param [{}]",ownerMemeNo);
-        return ResponseData.success(ownerIncomeExamineListResVO);
+        return ResponseData.success(incomByOwnerMem);
     }
+
+    @AutoDocMethod(value = "根据会员号查询车主总收益", description = "根据会员号查询车主总收益",response = AccountOwnerIncomeExamineDTO.class)
+    @GetMapping("/getIncomTotalByOwnerMem")
+    public ResponseData<Integer> getIncomTotalByOwnerMem(@RequestParam("ownerMemeNo") String ownerMemeNo){
+        log.info("OwnerIncomeController getIncomTotalByOwnerMem start param [{}]", ownerMemeNo);
+        AccountOwnerIncomeEntity ownerIncomeByMemNo = accountOwnerIncomeNoTService.getOwnerIncomeByMemNo(ownerMemeNo);
+        log.info("OwnerIncomeController getIncomTotalByOwnerMem end param [{}] result={}",ownerMemeNo, JSON.toJSONString(ownerIncomeByMemNo));
+        return ResponseData.success(ownerIncomeByMemNo.getIncomeAmt());
+    }
+
 }
