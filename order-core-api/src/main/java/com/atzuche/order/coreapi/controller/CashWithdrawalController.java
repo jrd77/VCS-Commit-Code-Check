@@ -52,7 +52,7 @@ public class CashWithdrawalController {
 	 * @return ResponseData<List<AccountOwnerCashExamine>>
 	 */
 	@GetMapping("/account/withdraw/list")
-    public ResponseData<List<AccountOwnerCashExamine>> listCashWithdrawal(@Valid @RequestBody SearchCashWithdrawalReqDTO req, BindingResult bindingResult) {
+    public ResponseData<List<AccountOwnerCashExamine>> listCashWithdrawal(@Valid SearchCashWithdrawalReqDTO req, BindingResult bindingResult) {
 		log.info("获取提现记录 req=[{}]", req);
 		BindingResultUtil.checkBindingResult(bindingResult);
 		List<AccountOwnerCashExamine> list = cashWithdrawalService.listCashWithdrawal(req);
@@ -66,7 +66,7 @@ public class CashWithdrawalController {
 	 * @return ResponseData<?>
 	 */
 	@GetMapping("/account/withdraw/getbalance")
-    public ResponseData<?> getBalance(@Valid @RequestBody SearchCashWithdrawalReqDTO req, BindingResult bindingResult) {
+    public ResponseData<?> getBalance(@Valid SearchCashWithdrawalReqDTO req, BindingResult bindingResult) {
 		log.info("获取可提现余额 req=[{}]", req);
 		BindingResultUtil.checkBindingResult(bindingResult);
 		Integer balance = cashWithdrawalService.getBalance(req);
@@ -80,7 +80,7 @@ public class CashWithdrawalController {
 	 * @return ResponseData<?>
 	 */
 	@GetMapping("/debt/get")
-    public ResponseData<DebtDetailVO> getDebtAmt(@Valid @RequestBody SearchCashWithdrawalReqDTO req, BindingResult bindingResult) {
+    public ResponseData<DebtDetailVO> getDebtAmt(@Valid SearchCashWithdrawalReqDTO req, BindingResult bindingResult) {
 		log.info("获取用户总欠款 req=[{}]", req);
 		BindingResultUtil.checkBindingResult(bindingResult);
 		DebtDetailVO debtDetailVO = accountDebtService.getTotalNewDebtAndOldDebtAmt(req.getMemNo());
