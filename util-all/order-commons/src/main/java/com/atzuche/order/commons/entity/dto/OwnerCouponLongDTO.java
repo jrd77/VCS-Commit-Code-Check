@@ -48,4 +48,6 @@ public class OwnerCouponLongDTO implements Serializable {
 	 */
 	private Double discounRatio;
 
+
+
 }

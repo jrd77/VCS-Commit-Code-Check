@@ -3,6 +3,8 @@ package com.atzuche.order.coreapi.service;
 import com.atzuche.order.car.CarProxyService;
 import com.atzuche.order.commons.entity.dto.*;
 import com.atzuche.order.commons.enums.cashcode.FineTypeCashCodeEnum;
+import com.atzuche.order.commons.enums.cashcode.OwnerCashCodeEnum;
+import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.commons.enums.RenterChildStatusEnum;
 import com.atzuche.order.commons.enums.SrvGetReturnEnum;
 import com.atzuche.order.coreapi.entity.dto.ModifyOrderOwnerDTO;
@@ -21,6 +23,7 @@ import com.atzuche.order.parentorder.entity.OrderEntity;
 import com.atzuche.order.parentorder.service.OrderService;
 import com.atzuche.order.rentercost.entity.RenterOrderFineDeatailEntity;
 import com.atzuche.order.rentercost.entity.RenterOrderSubsidyDetailEntity;
+import com.atzuche.order.rentercost.entity.dto.RenterOrderSubsidyDetailDTO;
 import com.atzuche.order.rentercost.service.RenterOrderFineDeatailService;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.autoyol.platformcost.CommonUtils;
@@ -78,8 +81,8 @@ public class ModifyOrderForOwnerService {
 	 * @param orderNo 主订单号
 	 * @return ResponseData
 	 */
-	public void modifyOrderForOwner(ModifyOrderOwnerDTO modifyOrderOwnerDTO, RenterOrderSubsidyDetailEntity renterSubsidy, String renterOrderNo) {
-		log.info("租客修改订单重新下车主订单modifyOrderOwnerDTO=[{}], renterSubsidy=[{}]", modifyOrderOwnerDTO, renterSubsidy);
+	public void modifyOrderForOwner(ModifyOrderOwnerDTO modifyOrderOwnerDTO, List<RenterOrderSubsidyDetailEntity> renterSubsidyList, String renterOrderNo) {
+		log.info("租客修改订单重新下车主订单modifyOrderOwnerDTO=[{}], renterSubsidyList=[{}]", modifyOrderOwnerDTO, renterSubsidyList);
 		if (modifyOrderOwnerDTO == null) {
 			throw new ModifyOrderParameterException();
 		}
@@ -113,12 +116,22 @@ public class ModifyOrderForOwnerService {
 		List<OwnerOrderPurchaseDetailEntity> purchaseList = getOwnerOrderPurchaseDetailEntityList(costBaseDTO, ownerGoodsDetailDTO);
 		// 获取增值服务费用信息
 		List<OwnerOrderIncrementDetailEntity> incrementList = getOwnerOrderIncrementDetailEntityList(costBaseDTO, modifyOrderOwnerDTO, ownerGoodsDetailDTO, purchaseList);
+		// 获取租客车主券补贴
+		RenterOrderSubsidyDetailEntity renterSubsidy = getOwnerCouponSubsidy(renterSubsidyList);
 		// 获取车主补贴（车主券）
 		OwnerOrderSubsidyDetailEntity subsidyEntity = getOwnerOrderSubsidyDetailEntity(modifyOrderOwnerDTO, ownerMemberDTO, renterSubsidy);
+		// 获取车主租金补贴
+		List<OwnerOrderSubsidyDetailEntity> ownerSubsidyList = listOwnerOrderSubsidyDetailEntity(modifyOrderOwnerDTO, ownerMemberDTO, renterSubsidyList);
+		int rentAmtSubsidyAmt = ownerSubsidyList == null ? 0 : ownerSubsidyList.stream().collect(Collectors.summingInt(OwnerOrderSubsidyDetailEntity::getSubsidyAmount));
+		if (subsidyEntity != null) {
+			ownerSubsidyList.add(subsidyEntity);
+		}
 		// 获取车主罚金
 		OwnerOrderFineDeatailEntity ownerOrderFineDeatailEntity = getOwnerOrderFineDeatailEntity(modifyOrderOwnerDTO, renterOrderNo);
 		// 获取车主费用总账信息
 		OwnerOrderCostEntity ownerOrderCostEntity = getOwnerOrderCostEntity(costBaseDTO, purchaseList, incrementList, subsidyEntity);
+		Integer purchaseAmount = ownerOrderCostEntity.getPurchaseAmount() == null ? 0:ownerOrderCostEntity.getPurchaseAmount();
+		ownerOrderCostEntity.setPurchaseAmount(purchaseAmount + rentAmtSubsidyAmt);
 		// 保存商品信息
 		ownerCommodityService.saveCommodity(ownerGoodsDetailDTO);
 		// 保存会员信息
@@ -128,7 +141,9 @@ public class ModifyOrderForOwnerService {
 		// 保存增值服务费用信息
 		ownerOrderIncrementDetailService.saveOwnerOrderIncrementDetailBatch(incrementList);
 		// 保存补贴费用信息
-		ownerOrderSubsidyDetailService.saveOwnerOrderSubsidyDetail(subsidyEntity);
+		// ownerOrderSubsidyDetailService.saveOwnerOrderSubsidyDetail(subsidyEntity);
+		// 保存租金补贴
+		ownerOrderSubsidyDetailService.saveOwnerOrderSubsidyDetailBatch(ownerSubsidyList);
 		// 保存车主罚金
 		ownerOrderFineDeatailService.addOwnerOrderFineRecord(ownerOrderFineDeatailEntity);
 		// 保存车主费用总表
@@ -137,6 +152,50 @@ public class ModifyOrderForOwnerService {
 		ownerOrderService.saveOwnerOrder(ownerOrderEffective);
 		// 更新车主子订单状态
 		updateOwnerOrderStatus(modifyOrderOwnerDTO, ownerOrderEntity.getId());
+	}
+	
+	
+	/**
+	 * 获取车主券补贴
+	 * @param renterSubsidyList
+	 * @return RenterOrderSubsidyDetailEntity
+	 */
+	public RenterOrderSubsidyDetailEntity getOwnerCouponSubsidy(List<RenterOrderSubsidyDetailEntity> renterSubsidyList) {
+		// 获取租客车主券补贴
+		RenterOrderSubsidyDetailEntity renterSubsidy = null;
+		if (renterSubsidyList == null || renterSubsidyList.isEmpty()) {
+			return null;
+		}
+		for (RenterOrderSubsidyDetailEntity subsidy:renterSubsidyList) {
+			if (RenterCashCodeEnum.OWNER_COUPON_OFFSET_COST.getCashNo().equals(subsidy.getSubsidyCostCode())) {
+				renterSubsidy = subsidy;
+				break;
+			}
+		}
+		return renterSubsidy;
+	}
+	
+	
+	/**
+	 * 获取车主租金补贴
+	 * @param modifyOrderOwnerDTO
+	 * @param ownerMemberDTO
+	 * @param renterSubsidyList
+	 * @return List<OwnerOrderSubsidyDetailEntity>
+	 */
+	public List<OwnerOrderSubsidyDetailEntity> listOwnerOrderSubsidyDetailEntity(ModifyOrderOwnerDTO modifyOrderOwnerDTO, OwnerMemberDTO ownerMemberDTO, List<RenterOrderSubsidyDetailEntity> renterSubsidyList) {
+		List<OwnerOrderSubsidyDetailEntity> ownerSubsidyList = new ArrayList<OwnerOrderSubsidyDetailEntity>();
+		if (renterSubsidyList == null || renterSubsidyList.isEmpty()) {
+			return ownerSubsidyList;
+		}
+		for (RenterOrderSubsidyDetailEntity subsidy:renterSubsidyList) {
+			if (RenterCashCodeEnum.RENT_AMT.getCashNo().equals(subsidy.getSubsidyCostCode())) {
+				subsidy.setSubsidyCostCode(OwnerCashCodeEnum.RENT_AMT.getCashNo());
+				OwnerOrderSubsidyDetailEntity ownerSubsidy = getOwnerOrderSubsidyDetailEntity(modifyOrderOwnerDTO, ownerMemberDTO, subsidy);
+				ownerSubsidyList.add(ownerSubsidy);
+			}
+		}
+		return ownerSubsidyList;
 	}
 	
 	
