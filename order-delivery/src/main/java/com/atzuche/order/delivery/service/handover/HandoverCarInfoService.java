@@ -187,13 +187,37 @@ public class HandoverCarInfoService {
     }
 
     /**
+     * 更新取还车备注信息
+     * @param deliveryReqVO
+     * @throws Exception
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public void updateDeliveryCarRemarkInfo(DeliveryReqDTO deliveryReqVO,Integer type) throws Exception {
+        if(Objects.nonNull(deliveryReqVO)){
+            RenterOrderDeliveryEntity renterOrderDeliveryEntity = renterOrderDeliveryMapper.findRenterOrderByrOrderNo(deliveryReqVO.getOrderNo(), type);
+            if(Objects.isNull(renterOrderDeliveryEntity))
+            {
+                return;
+            }
+            //车主租客备注
+            if(StringUtils.isBlank(deliveryReqVO.getOwnerRealGetAddrReamrk())){
+                renterOrderDeliveryEntity.setOwnerRealGetReturnRemark(deliveryReqVO.getOwnerRealGetAddrReamrk());
+            }
+            if(StringUtils.isBlank(deliveryReqVO.getRenterRealGetAddrReamrk())){
+                renterOrderDeliveryEntity.setRenterRealGetReturnRemark(deliveryReqVO.getRenterRealGetAddrReamrk());
+            }
+            renterOrderDeliveryMapper.updateByPrimaryKeySelective(renterOrderDeliveryEntity);
+        }
+    }
+
+    /**
      * 更新配送订单相关信息
      *
      * @param deliveryReqDTO
      */
     public void updateDeliveryCarInfoByUsed(DeliveryReqDTO deliveryReqDTO, Integer type) {
 
-        RenterOrderDeliveryEntity renterOrderDeliveryEntity = renterOrderDeliveryMapper.findRenterOrderByrOrderNo(deliveryReqDTO.getOrderNo(), type);
+            RenterOrderDeliveryEntity renterOrderDeliveryEntity = renterOrderDeliveryMapper.findRenterOrderByrOrderNo(deliveryReqDTO.getOrderNo(), type);
         if (renterOrderDeliveryEntity != null && String.valueOf(UsedDeliveryTypeEnum.NO_USED.getValue()).equals(deliveryReqDTO.getIsUsedGetAndReturnCar())) {
             if (renterOrderDeliveryEntity.getStatus().intValue() != 3 && renterOrderDeliveryEntity.getIsNotifyRenyun() == 1) {
                 deliveryCarInfoService.cancelRenYunFlowOrderInfo(new CancelOrderDeliveryVO().setCancelFlowOrderDTO(new CancelFlowOrderDTO().setServicetype(type == 1 ? "take" : "back").setOrdernumber(renterOrderDeliveryEntity.getOrderNo())).setRenterOrderNo(renterOrderDeliveryEntity.getRenterOrderNo()));
