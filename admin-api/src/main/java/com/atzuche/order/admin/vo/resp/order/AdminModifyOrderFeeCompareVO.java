@@ -19,4 +19,6 @@ public class AdminModifyOrderFeeCompareVO {
     private AdminModifyOrderFeeVO after;
     @AutoDocProperty(value = "用户总欠款")
     private DebtDetailVO debtDetailVO;
+    @AutoDocProperty(value = "需要补付金额")
+	private Integer needSupplementAmt; 
 }
