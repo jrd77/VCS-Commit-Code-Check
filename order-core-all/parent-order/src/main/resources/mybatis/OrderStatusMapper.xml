@@ -283,4 +283,10 @@
     <select id="queryInProcess" resultMap="BaseResultMap">
         SELECT  <include refid="Base_Column_List" /> FROM order_status WHERE `status` NOT IN(512,0) AND is_delete = 0
     </select>
+    <select id="queryByStatus" resultMap="BaseResultMap">
+        SELECT  <include refid="Base_Column_List" /> FROM order_status WHERE `status` IN
+        <foreach collection="statusList" item="status" open="(" separator="," close=")">
+            #{status}
+        </foreach>
+    </select>
 </mapper>

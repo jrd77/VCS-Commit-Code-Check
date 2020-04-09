@@ -1786,4 +1786,24 @@ public class OrderDetailService {
         orderNoListDTO.setOrderNo(orderNos);
         return orderNoListDTO;
     }
+
+    public ProcessRespDTO queryRefuse() {
+        ProcessRespDTO processRespDTO = new ProcessRespDTO();
+        List<OrderStatusEntity> orderStatusEntityList =  orderStatusService.queryByStatus(Arrays.asList(OrderStatusEnum.CLOSED));
+        List<OrderStatusDTO> orderStatusDTOList = new ArrayList<>();
+        List<String> orderNos = orderStatusEntityList
+                .stream()
+                .map(x -> x.getOrderNo())
+                .collect(Collectors.toList());
+        List<OrderEntity> orderEntityList = orderService.getByOrderNos(orderNos);
+        List<OrderDTO> orderDTOS = new ArrayList<>();
+        orderEntityList.stream().forEach(x->{
+            OrderDTO orderDTO = new OrderDTO();
+            BeanUtils.copyProperties(x,orderDTO);
+            orderDTOS.add(orderDTO);
+        });
+        processRespDTO.setOrderDTOs(orderDTOS);
+        processRespDTO.setOrderStatusDTOs(orderStatusDTOList);
+        return processRespDTO;
+    }
 }
