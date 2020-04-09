@@ -94,7 +94,7 @@ public class LongOrderOwnerCouponFilter implements OrderCostFilter {
             ownerCouponLongEntity.setActUnitPrice(holidayAverageResultList.get(0).getActRentUnitPriceAmt());
             ownerCouponLongEntity.setDiscounRatio(holidayAverageResultList.get(0).getDiscounRatio());
             ownerCouponLongEntity.setReductionPrice(holidayAverageResultList.get(0).getReductionAmt());
-
+            ownerCouponLongEntity.setDiscountDesc(resVO.getDiscountDesc());
 
             for (int i = 0; i < details.size(); i++) {
                 RenterOrderCostDetailEntity detailEntity = details.get(i);
@@ -122,7 +122,7 @@ public class LongOrderOwnerCouponFilter implements OrderCostFilter {
             orderCostDetailContext.getSubsidyDetails().addAll(subsidyDetails);
         }
 
-        if(Objects.nonNull(ownerCouponLongEntity)) {
+        if (Objects.nonNull(ownerCouponLongEntity)) {
             longOrderOwnerCouponResDTO.setOwnerCouponLongEntity(ownerCouponLongEntity);
         }
         log.info("订单费用计算-->长租订单租金折扣.result is,longOrderOwnerCouponResDTO:[{}]",
