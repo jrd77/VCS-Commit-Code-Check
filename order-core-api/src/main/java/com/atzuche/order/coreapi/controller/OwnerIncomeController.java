@@ -8,10 +8,7 @@ import com.atzuche.order.commons.BindingResultUtil;
 import com.atzuche.order.commons.vo.req.AdjustmentOwnerIncomeExamVO;
 import com.atzuche.order.commons.vo.req.income.AccountOwnerIncomeExamineOpReqVO;
 import com.atzuche.order.commons.vo.req.income.AccountOwnerIncomeExamineReqVO;
-import com.atzuche.order.commons.vo.res.account.income.AccountOwnerIncomeRealResVO;
-import com.atzuche.order.commons.vo.res.account.income.AdjustOwnerIncomeResVO;
-import com.atzuche.order.commons.vo.res.account.income.OwnerIncomeExamineDetailResVO;
-import com.atzuche.order.commons.vo.res.account.income.OwnerIncomeExamineDetailVO;
+import com.atzuche.order.commons.vo.res.account.income.*;
 import com.autoyol.commons.utils.GsonUtils;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.doc.annotation.AutoDocMethod;
@@ -108,5 +105,14 @@ public class OwnerIncomeController {
         accountOwnerIncomeExamineNoTService.adjustmentOwnerIncomeExam(adjustmentOwnerIncomeExamVO);
         log.info("OwnerIncomeController adjustmentOwnerIncome end param [{}]",GsonUtils.toJson(adjustmentOwnerIncomeExamVO));
         return ResponseData.success();
+    }
+
+    @AutoDocMethod(value = "根据会员号查询车主全部收益审核信息", description = "根据会员号查询车主全部收益审核信息",response = OwnerIncomeExamineListResVO.class)
+    @GetMapping("/getIncomByOwnerMem")
+    public ResponseData<OwnerIncomeExamineListResVO> getIncomByOwnerMem(@RequestParam("ownerMemeNo") String ownerMemeNo){
+        log.info("OwnerIncomeController getIncomByOwnerMem start param [{}]", ownerMemeNo);
+        OwnerIncomeExamineListResVO  ownerIncomeExamineListResVO= accountOwnerIncomeExamineNoTService.getIncomByOwnerMem(ownerMemeNo);
+        log.info("OwnerIncomeController getIncomByOwnerMem end param [{}]",ownerMemeNo);
+        return ResponseData.success(ownerIncomeExamineListResVO);
     }
 }

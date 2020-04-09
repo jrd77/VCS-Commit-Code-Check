@@ -6,13 +6,16 @@ import com.atzuche.order.accountownerincome.exception.AccountOwnerIncomeExamineE
 import com.atzuche.order.accountownerincome.exception.AccountOwnerIncomeExamineRepeatException;
 import com.atzuche.order.accountownerincome.exception.AccountOwnerIncomeSettleException;
 import com.atzuche.order.accountownerincome.mapper.AccountOwnerIncomeExamineMapper;
+import com.atzuche.order.commons.entity.orderDetailDto.AccountOwnerIncomeExamineDTO;
 import com.atzuche.order.commons.enums.account.income.AccountOwnerIncomeExamineStatus;
 import com.atzuche.order.commons.enums.account.income.AccountOwnerIncomeExamineType;
+import com.atzuche.order.commons.exceptions.InputErrorException;
 import com.atzuche.order.commons.exceptions.OwnerIncomeExamineInsertException;
 import com.atzuche.order.commons.exceptions.OwnerIncomeExamineNotFoundException;
 import com.atzuche.order.commons.vo.req.AdjustmentOwnerIncomeExamVO;
 import com.atzuche.order.commons.vo.req.income.AccountOwnerIncomeExamineOpReqVO;
 import com.atzuche.order.commons.vo.req.income.AccountOwnerIncomeExamineReqVO;
+import com.atzuche.order.commons.vo.res.account.income.OwnerIncomeExamineListResVO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.BeanUtils;
@@ -21,8 +24,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 
 /**
@@ -171,5 +177,28 @@ public class AccountOwnerIncomeExamineNoTService {
             accountOwnerIncomeDetailEntity.setAmt(currIncomAmt);
             accountOwnerIncomeNoTService.updateOwnerIncomeAmt(accountOwnerIncomeDetailEntity);
         }*/
+    }
+
+    public List<AccountOwnerIncomeExamineEntity> getIncomByOwnerMemAndStatus(String ownerMemeNo,List<AccountOwnerIncomeExamineStatus> statusList) {
+        if(statusList == null || statusList.size()<=0){
+            throw new InputErrorException();
+        }
+        List<Integer> status = statusList.stream().map(x -> x.getStatus()).collect(Collectors.toList());
+        List<AccountOwnerIncomeExamineEntity> accountOwnerIncomeExamineEntityList = accountOwnerIncomeExamineMapper.getIncomByOwnerMemAndStatus(ownerMemeNo,status);
+        return accountOwnerIncomeExamineEntityList;
+    }
+
+
+    public OwnerIncomeExamineListResVO getIncomByOwnerMem(String ownerMemeNo) {
+        OwnerIncomeExamineListResVO ownerIncomeExamineListResVO = new OwnerIncomeExamineListResVO();
+        List<AccountOwnerIncomeExamineEntity> incomByOwnerMemAndStatus = getIncomByOwnerMemAndStatus(ownerMemeNo, Arrays.asList(AccountOwnerIncomeExamineStatus.PASS_EXAMINE));
+        List<AccountOwnerIncomeExamineDTO> accountOwnerIncomeExamineDTOS = new ArrayList<>();
+        incomByOwnerMemAndStatus.stream().forEach(x->{
+            AccountOwnerIncomeExamineDTO accountOwnerIncomeExamineDTO = new AccountOwnerIncomeExamineDTO();
+            BeanUtils.copyProperties(x,accountOwnerIncomeExamineDTO);
+            accountOwnerIncomeExamineDTOS.add(accountOwnerIncomeExamineDTO);
+        });
+        ownerIncomeExamineListResVO.setAccountOwnerIncomeExamineDTOS(accountOwnerIncomeExamineDTOS);
+        return ownerIncomeExamineListResVO;
     }
 }
