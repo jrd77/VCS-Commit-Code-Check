@@ -134,6 +134,16 @@
     <select id="selectByExamineId" resultMap="BaseResultMap">
         select <include refid="Base_Column_List" /> from account_owner_income_examine where examine_id = #{examineId} or id = #{examineId}
     </select>
-
+    <select id="getIncomByOwnerMemAndStatus" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List" /> from account_owner_income_examine where
+        mem_no = #{ownerMemeNo}
+        <if test="statusList !=null and statusList.size()>0">
+            and status IN
+            <foreach collection="statusList" item="status" open="(" separator="," close=")">
+                #{status}
+            </foreach>
+        </if>
+        and is_delete = 0
+    </select>
 
 </mapper>
