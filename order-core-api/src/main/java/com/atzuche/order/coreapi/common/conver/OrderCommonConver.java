@@ -151,9 +151,9 @@ public class OrderCommonConver {
             }
             costItemList.add(vo);
         });
-
+        Integer inmsrpGuidePrice = renterOrderReqVO.getInmsrp() == null ? renterOrderReqVO.getGuidPrice():renterOrderReqVO.getInmsrp();
         // 获取保险和不计免赔的折扣
-        double insureDiscount = CommonUtils.getInsureDiscount(renterOrderReqVO.getRentTime(), renterOrderReqVO.getRevertTime());
+        double insureDiscount = CommonUtils.getInsureDiscount(renterOrderReqVO.getRentTime(), renterOrderReqVO.getRevertTime(), inmsrpGuidePrice);
         // 平台保障费用项
         costItemList.add(getInsurCostItemVO(renterOrderCostRespDTO, insureDiscount));
         // 全面保障费用项

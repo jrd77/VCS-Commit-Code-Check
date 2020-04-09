@@ -231,7 +231,9 @@ public class CashierSettleService {
      * @param accountRenterCostSettleEntity
      */
     public void updateRentSettleCost(AccountRenterCostSettleEntity accountRenterCostSettleEntity) {
-    	accountRenterCostSettleNoTService.updateAccountRenterCostSettle(accountRenterCostSettleEntity);
+    	AccountRenterCostSettleEntity entity = accountRenterCostSettleNoTService.getCostPaidRentSettle(accountRenterCostSettleEntity.getOrderNo(),accountRenterCostSettleEntity.getMemNo());
+    	entity.setYingkouAmt(accountRenterCostSettleEntity.getYingkouAmt());
+    	accountRenterCostSettleNoTService.updateAccountRenterCostSettle(entity);
     }
     
 
