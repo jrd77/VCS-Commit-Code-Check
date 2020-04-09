@@ -164,16 +164,16 @@ public class AdminDeliveryCarService {
         //更新租客配送地址数据
         ResponseData responseData = feignOrderModifyService.modifyOrderForConsole(createModifyOrderInfoParams(deliveryCarVO));
         if (!responseData.getResCode().equals(ErrorCode.SUCCESS.getCode()) || !responseData.getResCode().equals("400504")) {
-            logger.info("修改配送订单租客失败，orderNo：[{}],cause:[{}]", deliveryCarVO.getOrderNo(), responseData.getResMsg());
-            throw new DeliveryOrderException(responseData.getResCode(),responseData.getResMsg());
+            logger.info("修改配送订单租客失败，orderNo：[{}],cause:[{}]", deliveryCarVO.getOrderNo(), responseData.getResCode()+"--"+responseData.getResMsg());
+//            throw new DeliveryOrderException(responseData.getResCode(),responseData.getResMsg());
         }
         //更新车主配送地址数据
         OwnerTransAddressReqVO ownerTransAddressReqVO = createModifyOrderOwnerInfoParams(deliveryCarVO);
         if(Objects.nonNull(ownerTransAddressReqVO)) {
             ResponseData ownerResponseData = feignModifyOwnerAddrService.updateOwnerAddrInfo(ownerTransAddressReqVO);
             if (!responseData.getResCode().equals(ErrorCode.SUCCESS.getCode())) {
-                logger.info("修改配送订单车主失败，orderNo：[{}],cause:[{}]", deliveryCarVO.getOrderNo(), responseData.getResMsg());
-                throw new DeliveryOrderException(ownerResponseData.getResCode(), ownerResponseData.getResMsg());
+                logger.info("修改配送订单车主失败，orderNo：[{}],cause:[{}]", deliveryCarVO.getOrderNo(), responseData.getResCode()+"--"+responseData.getResMsg());
+               // throw new DeliveryOrderException(ownerResponseData.getResCode(), ownerResponseData.getResMsg());
             }
         }
         //更新配送备注数据
