@@ -137,8 +137,8 @@ public class ModifyOrderConfirmService {
 		OrderStatusEntity orderStatus = modifyOrderDTO.getOrderStatusEntity();
 		// 租车费用支付状态:0,待支付 1,已支付
 		Integer rentCarPayStatus = orderStatus == null ? null:orderStatus.getRentCarPayStatus();
-		if ((modifyOrderDTO.getScanCodeFlag() == null || !modifyOrderDTO.getScanCodeFlag()) && 
-				(rentCarPayStatus != null && rentCarPayStatus == 1)) {
+		modifyOrderOwnerDTO.setRentCarPayStatus(rentCarPayStatus);
+		if (modifyOrderDTO.getScanCodeFlag() == null || !modifyOrderDTO.getScanCodeFlag()) {
 			// 扫码还车不管
 			// 封装OrderReqContext对象
 			OrderReqContext reqContext = getOrderReqContext(modifyOrderDTO, modifyOrderOwnerDTO);
@@ -380,7 +380,9 @@ public class ModifyOrderConfirmService {
 			}
 			if (changeItemList.contains(OrderChangeItemEnum.MODIFY_SRVRETURNFLAG.getCode()) || 
 					changeItemList.contains(OrderChangeItemEnum.MODIFY_SRVGETFLAG.getCode())) {
-				if (sendRenyunFlag) {
+				// 租车费用支付状态:0,待支付 1,已支付
+				Integer rentCarPayStatus = modify.getRentCarPayStatus();
+				if (sendRenyunFlag && (rentCarPayStatus != null && rentCarPayStatus == 1)) {
 					// 发送给仁云
 					deliveryCarService.sendDataMessageToRenYun(renterOrderNo);
 				}

@@ -253,6 +253,7 @@ public class AdminOrderService {
 
 
             AdminModifyOrderFeeCompareVO adminModifyOrderFeeCompareVO = new AdminModifyOrderFeeCompareVO();
+            adminModifyOrderFeeCompareVO.setNeedSupplementAmt(modifyOrderCompareVO.getNeedSupplementAmt());
             AdminModifyOrderFeeVO before = new AdminModifyOrderFeeVO();
             if(initModifyOrderFeeVO.getModifyOrderCostVO()!=null) {
                 BeanUtils.copyProperties(initModifyOrderFeeVO.getModifyOrderCostVO(), before);

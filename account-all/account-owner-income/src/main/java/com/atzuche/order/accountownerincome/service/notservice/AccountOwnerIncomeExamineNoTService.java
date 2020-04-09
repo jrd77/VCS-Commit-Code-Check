@@ -9,7 +9,6 @@ import com.atzuche.order.accountownerincome.mapper.AccountOwnerIncomeExamineMapp
 import com.atzuche.order.commons.entity.orderDetailDto.AccountOwnerIncomeExamineDTO;
 import com.atzuche.order.commons.enums.account.income.AccountOwnerIncomeExamineStatus;
 import com.atzuche.order.commons.enums.account.income.AccountOwnerIncomeExamineType;
-import com.atzuche.order.commons.exceptions.InputErrorException;
 import com.atzuche.order.commons.exceptions.OwnerIncomeExamineInsertException;
 import com.atzuche.order.commons.exceptions.OwnerIncomeExamineNotFoundException;
 import com.atzuche.order.commons.vo.req.AdjustmentOwnerIncomeExamVO;
@@ -25,7 +24,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -180,9 +178,6 @@ public class AccountOwnerIncomeExamineNoTService {
     }
 
     public List<AccountOwnerIncomeExamineEntity> getIncomByOwnerMemAndStatus(String ownerMemeNo,List<AccountOwnerIncomeExamineStatus> statusList) {
-        if(statusList == null || statusList.size()<=0){
-            throw new InputErrorException();
-        }
         List<Integer> status = statusList.stream().map(x -> x.getStatus()).collect(Collectors.toList());
         List<AccountOwnerIncomeExamineEntity> accountOwnerIncomeExamineEntityList = accountOwnerIncomeExamineMapper.getIncomByOwnerMemAndStatus(ownerMemeNo,status);
         return accountOwnerIncomeExamineEntityList;
@@ -191,7 +186,7 @@ public class AccountOwnerIncomeExamineNoTService {
 
     public OwnerIncomeExamineListResVO getIncomByOwnerMem(String ownerMemeNo) {
         OwnerIncomeExamineListResVO ownerIncomeExamineListResVO = new OwnerIncomeExamineListResVO();
-        List<AccountOwnerIncomeExamineEntity> incomByOwnerMemAndStatus = getIncomByOwnerMemAndStatus(ownerMemeNo, Arrays.asList(AccountOwnerIncomeExamineStatus.PASS_EXAMINE));
+        List<AccountOwnerIncomeExamineEntity> incomByOwnerMemAndStatus = getIncomByOwnerMemAndStatus(ownerMemeNo, null);
         List<AccountOwnerIncomeExamineDTO> accountOwnerIncomeExamineDTOS = new ArrayList<>();
         incomByOwnerMemAndStatus.stream().forEach(x->{
             AccountOwnerIncomeExamineDTO accountOwnerIncomeExamineDTO = new AccountOwnerIncomeExamineDTO();
