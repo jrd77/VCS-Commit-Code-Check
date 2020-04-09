@@ -161,7 +161,7 @@ public class AdminDeliveryCarService {
         orderReqContext.setOrderReqVO(orderReqVo);
         cityLonLatFilter.validate(orderReqContext);
         ResponseData responseData = feignOrderModifyService.modifyOrderForConsole(createModifyOrderInfoParams(deliveryCarVO));
-        if (!responseData.getResCode().equals(ErrorCode.SUCCESS.getCode()) || !responseData.getResCode().equals("400504")) {
+        if (!responseData.getResCode().equals(ErrorCode.SUCCESS.getCode()) && !responseData.getResCode().equals("400504")) {
             logger.info("修改配送订单租客失败，orderNo：[{}],cause:[{}]", deliveryCarVO.getOrderNo(), responseData.getResCode()+"--"+responseData.getResMsg());
         }
         OwnerTransAddressReqVO ownerTransAddressReqVO = createModifyOrderOwnerInfoParams(deliveryCarVO);
