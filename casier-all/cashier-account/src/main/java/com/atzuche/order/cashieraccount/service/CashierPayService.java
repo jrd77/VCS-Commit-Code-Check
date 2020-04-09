@@ -529,7 +529,11 @@ public class CashierPayService{
       //实际待支付租车费用总额 即真实应付租车费用
         int amtRent = 0;
         if(orderPayReqVO.getPayKind().contains(DataPayKindConstant.RENT_AMOUNT)){  //修改订单的补付
-            List<PayableVO> payableVOs = renterOrderCostCombineService.listPayableGlobalVO(orderPayReqVO.getOrderNo(),renterOrderEntity.getRenterOrderNo(),orderPayReqVO.getMenNo());
+//            List<PayableVO> payableVOs = renterOrderCostCombineService.listPayableGlobalVO(orderPayReqVO.getOrderNo(),renterOrderEntity.getRenterOrderNo(),orderPayReqVO.getMenNo());
+        	//考虑到支付租车费用，不考虑管理后台补贴的方式。
+        	//会导致租客支付第一笔租车费用为0的情况。管理后台补贴在结算的时候处理。200409 
+        	List<PayableVO> payableVOs = renterOrderCostCombineService.listPayableIncrementVO(orderPayReqVO.getOrderNo(),renterOrderEntity.getRenterOrderNo(),orderPayReqVO.getMenNo());
+        	
             if(result.getPayableVOs() != null) {
             	result.getPayableVOs().addAll(payableVOs);
             }else {
