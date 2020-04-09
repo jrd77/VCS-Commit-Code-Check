@@ -47,6 +47,9 @@ public class OwnerOrderSubsidyDetailService {
 	 * @return Integer
 	 */
 	public Integer saveOwnerOrderSubsidyDetailBatch(List<OwnerOrderSubsidyDetailEntity> costList) {
+		if (costList == null || costList.isEmpty()) {
+			return 0;
+		}
 		return ownerOrderSubsidyDetailMapper.saveOwnerOrderSubsidyDetailBatch(costList);
 	}
 	
