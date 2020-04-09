@@ -5,6 +5,7 @@ import com.atzuche.order.accountownerincome.service.notservice.AccountOwnerIncom
 import com.atzuche.order.cashieraccount.service.CashierQueryService;
 import com.atzuche.order.cashieraccount.service.CashierService;
 import com.atzuche.order.commons.BindingResultUtil;
+import com.atzuche.order.commons.entity.orderDetailDto.AccountOwnerIncomeExamineDTO;
 import com.atzuche.order.commons.vo.req.AdjustmentOwnerIncomeExamVO;
 import com.atzuche.order.commons.vo.req.income.AccountOwnerIncomeExamineOpReqVO;
 import com.atzuche.order.commons.vo.req.income.AccountOwnerIncomeExamineReqVO;
@@ -107,12 +108,12 @@ public class OwnerIncomeController {
         return ResponseData.success();
     }
 
-    @AutoDocMethod(value = "根据会员号查询车主全部收益审核信息", description = "根据会员号查询车主全部收益审核信息",response = OwnerIncomeExamineListResVO.class)
+    @AutoDocMethod(value = "根据会员号查询车主全部收益审核信息", description = "根据会员号查询车主全部收益审核信息",response = AccountOwnerIncomeExamineDTO.class)
     @GetMapping("/getIncomByOwnerMem")
-    public ResponseData<OwnerIncomeExamineListResVO> getIncomByOwnerMem(@RequestParam("ownerMemeNo") String ownerMemeNo){
+    public ResponseData<List<AccountOwnerIncomeExamineDTO>> getIncomByOwnerMem(@RequestParam("ownerMemeNo") String ownerMemeNo){
         log.info("OwnerIncomeController getIncomByOwnerMem start param [{}]", ownerMemeNo);
-        OwnerIncomeExamineListResVO  ownerIncomeExamineListResVO= accountOwnerIncomeExamineNoTService.getIncomByOwnerMem(ownerMemeNo);
+        List<AccountOwnerIncomeExamineDTO> incomByOwnerMem = accountOwnerIncomeExamineNoTService.getIncomByOwnerMem(ownerMemeNo);
         log.info("OwnerIncomeController getIncomByOwnerMem end param [{}]",ownerMemeNo);
-        return ResponseData.success(ownerIncomeExamineListResVO);
+        return ResponseData.success(incomByOwnerMem);
     }
 }

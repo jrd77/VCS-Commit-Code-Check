@@ -485,6 +485,10 @@ public class OrderSettleService{
                 record.setId(entity.getId());
                 record.setSettleStatus(SettleStatusEnum.SETTL_FAIL.getCode());
                 record.setSettleTime(LocalDateTime.now());
+                //车辆押金状态
+                record.setCarDepositSettleStatus(SettleStatusEnum.SETTL_FAIL.getCode());
+                record.setCarDepositSettleTime(LocalDateTime.now());
+                
                 orderStatusService.updateByPrimaryKeySelective(record);
             }
             t.setStatus(e);
