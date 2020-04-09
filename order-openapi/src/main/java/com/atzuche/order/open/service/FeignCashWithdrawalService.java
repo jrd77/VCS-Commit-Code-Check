@@ -22,7 +22,7 @@ public interface FeignCashWithdrawalService {
 	public ResponseData<?> cashWithdraw(@Valid @RequestBody AccountOwnerCashExamineReqVO req);
 	
 	@GetMapping("/account/withdraw/list")
-    public ResponseData<List<AccountOwnerCashExamineDTO>> listCashWithdrawal(@Valid @RequestBody SearchCashWithdrawalReqDTO req);
+    public ResponseData<List<AccountOwnerCashExamineDTO>> listCashWithdrawal(@Valid SearchCashWithdrawalReqDTO req);
 
 	/**
 	 * 获取用户总欠款
@@ -30,5 +30,5 @@ public interface FeignCashWithdrawalService {
 	 * @return ResponseData<?>
 	 */
 	@GetMapping("/debt/get")
-    public ResponseData<DebtDetailVO> getDebtAmt(@Valid @RequestBody SearchCashWithdrawalReqDTO req);
+    public ResponseData<DebtDetailVO> getDebtAmt(@Valid SearchCashWithdrawalReqDTO req);
 }

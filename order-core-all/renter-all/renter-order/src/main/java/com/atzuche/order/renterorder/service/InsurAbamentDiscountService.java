@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.atzuche.order.commons.entity.dto.CostBaseDTO;
+import com.atzuche.order.commons.entity.dto.InsurAmtDTO;
 import com.atzuche.order.commons.enums.SubsidySourceCodeEnum;
 import com.atzuche.order.commons.enums.SubsidyTypeCodeEnum;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
@@ -43,8 +44,13 @@ public class InsurAbamentDiscountService {
 			log.error("获取平台保障费和全面保障费折扣补贴getInsureDiscountSubsidy costBaseDTO is null");
 			return renterSubsidyList;
 		}
+		Integer inmsrpGuidePrice = null;
+		InsurAmtDTO insurAmtDTO = renterOrderCostReqDTO.getInsurAmtDTO();
+		if (insurAmtDTO != null) {
+			inmsrpGuidePrice = insurAmtDTO.getInmsrp() == null ? insurAmtDTO.getGuidPrice():insurAmtDTO.getInmsrp();
+		}
 		// 获取保险和不计免赔的折扣
-		double insureDiscount = CommonUtils.getInsureDiscount(costBaseDTO.getStartTime(), costBaseDTO.getEndTime());
+		double insureDiscount = CommonUtils.getInsureDiscount(costBaseDTO.getStartTime(), costBaseDTO.getEndTime(), inmsrpGuidePrice);
 		log.info("获取平台保障费和全面保障费折扣补贴getInsureDiscountSubsidy orderNo=[{}],insureDiscount=[{}]",costBaseDTO.getOrderNo(), insureDiscount);
 		if (insureDiscount >= 1.0) {
 			return renterSubsidyList;

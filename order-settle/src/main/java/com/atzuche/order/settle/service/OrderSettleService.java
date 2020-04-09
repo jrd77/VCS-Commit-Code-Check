@@ -81,11 +81,15 @@ public class OrderSettleService{
     /**
      * 查询所以费用
      */
-    public RenterCostVO getRenterCostByOrderNo(String orderNo,String renterOrderNo,String renterNo,int renterCostAmtFinalForYingshou){
+    public RenterCostVO getRenterCostByOrderNo(String orderNo,String renterOrderNo,String renterNo,Integer renterCostAmtFinalForYingshou){
 //        RenterOrderEntity renterOrder = renterOrderService.getRenterOrderByOrderNoAndIsEffective(orderNo);
 //        Assert.notNull(renterOrder,"订单信息不存在");
 //        Assert.notNull(renterOrder.getRenterOrderNo(),"订单信息不存在");
-
+    	
+    	if(renterCostAmtFinalForYingshou == null) {
+    		renterCostAmtFinalForYingshou = 0;//设置默认值。
+    	}
+    	
         RenterCostVO vo = new RenterCostVO();
         vo.setOrderNo(orderNo);
         
@@ -99,8 +103,9 @@ public class OrderSettleService{
 	  	
 	  	//非空处理
 	  	if(accountRenterCostSettleEntity != null) {
-	  		feeShishouOri = accountRenterCostSettleEntity.getShifuAmt();
-	  		feeYingkouOri = Math.abs(accountRenterCostSettleEntity.getYingkouAmt());  //取绝对值。
+	  		feeShishouOri = accountRenterCostSettleEntity.getShifuAmt()!=null?accountRenterCostSettleEntity.getShifuAmt():0;
+	  		//结算前：应扣等于应收
+	  		feeYingkouOri = accountRenterCostSettleEntity.getYingkouAmt() != null?Math.abs(accountRenterCostSettleEntity.getYingkouAmt()):Math.abs(renterCostAmtFinalForYingshou);  //取绝对值。
 	  	}
 	  	log.info("feeShishouOri=[{}],feeYingkouOri=[{}],orderNo=[{}],memNo=[{}]",feeShishouOri,feeYingkouOri,orderNo,renterNo);
 	  	
@@ -131,10 +136,10 @@ public class OrderSettleService{
         int depositShishouAuthOri = 0;
         
         if(accountRenterDepositResVO != null) {
-        	depositShishouOri = Math.abs(accountRenterDepositResVO.getShifuDepositAmt());
-        	depositYingshouOri = Math.abs(accountRenterDepositResVO.getYingfuDepositAmt());
+        	depositShishouOri = accountRenterDepositResVO.getShifuDepositAmt()!=null?Math.abs(accountRenterDepositResVO.getShifuDepositAmt()):0;
+        	depositYingshouOri = accountRenterDepositResVO.getYingfuDepositAmt()!=null?Math.abs(accountRenterDepositResVO.getYingfuDepositAmt()):0;
         	if(accountRenterDepositResVO.getIsAuthorize() != null && accountRenterDepositResVO.getIsAuthorize() == 1) {
-        		depositShishouAuthOri = Math.abs(accountRenterDepositResVO.getAuthorizeDepositAmt());
+        		depositShishouAuthOri = accountRenterDepositResVO.getAuthorizeDepositAmt()!=null?Math.abs(accountRenterDepositResVO.getAuthorizeDepositAmt()):0;
         	}
         	
         }
@@ -170,10 +175,10 @@ public class OrderSettleService{
         int wzYingtuiOri = 0;
         int wzShishouAuthOri = 0;
         if(accountRenterWZDeposit != null) {
-        	wzShishouOri = Math.abs(accountRenterWZDeposit.getShishouDeposit());
-        	wzYingshouOri = Math.abs(accountRenterWZDeposit.getYingshouDeposit());
+        	wzShishouOri = accountRenterWZDeposit.getShishouDeposit()!=null?Math.abs(accountRenterWZDeposit.getShishouDeposit()):0;
+        	wzYingshouOri = accountRenterWZDeposit.getYingshouDeposit()!=null?Math.abs(accountRenterWZDeposit.getYingshouDeposit()):0;
         	if(accountRenterWZDeposit.getIsAuthorize() != null && accountRenterWZDeposit.getIsAuthorize() == 1) {
-        		wzShishouAuthOri = Math.abs(accountRenterWZDeposit.getAuthorizeDepositAmt());
+        		wzShishouAuthOri = accountRenterWZDeposit.getAuthorizeDepositAmt()!=null?Math.abs(accountRenterWZDeposit.getAuthorizeDepositAmt()):0;
         	}
         }
         log.info("wzShishouOri=[{}],wzYingshouOri=[{}],wzShishouAuthOri=[{}],orderNo=[{}],memNo=[{}]",wzShishouOri,wzYingshouOri,wzShishouAuthOri,orderNo,renterNo);
@@ -181,7 +186,8 @@ public class OrderSettleService{
         //应扣
         AccountRenterWzDepositCostEntity wzEntity = accountRenterWzDepositCostNoTService.queryWzDeposit(orderNo,renterNo);
         if(wzEntity != null) {
-        	wzYingkouOri = Math.abs(wzEntity.getYingkouAmt());  //负数 取绝对值
+        	//结算前：应扣等于应收
+        	wzYingkouOri = wzEntity.getYingkouAmt() !=null?Math.abs(wzEntity.getYingkouAmt()):wzYingshouOri;  //负数 取绝对值
         }
         log.info("wzShishouOri=[{}],wzYingshouOri=[{}],wzShishouAuthOri=[{}],wzYingkouOri=[{}],orderNo=[{}],memNo=[{}]",wzShishouOri,wzYingshouOri,wzShishouAuthOri,wzYingkouOri,orderNo,renterNo);
         
