@@ -54,9 +54,9 @@ public class SupplementController {
 		if (orderStatus != null) {
 			if (orderStatus.getStatus() != null && orderStatus.getStatus().intValue() == OrderStatusEnum.CLOSED.getStatus()) {
 				orderSupplementDetailDTO.setCashType(2);
-			} else if (orderStatus.getWzSettleStatus() != null && orderStatus.getWzSettleStatus() == 1) {
+			} else if (orderStatus.getWzSettleStatus() != null && orderStatus.getWzSettleStatus() != 0) {
 				orderSupplementDetailDTO.setCashType(2);
-			} else if (orderStatus.getCarDepositSettleStatus() != null && orderStatus.getCarDepositSettleStatus() == 1) {
+			} else if (orderStatus.getSettleStatus() != null && orderStatus.getSettleStatus() != 0) {
 				orderSupplementDetailDTO.setCashType(1);
 			} else {
 				throw new SupplementCanNotSupportException();

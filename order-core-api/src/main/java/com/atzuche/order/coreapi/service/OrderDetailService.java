@@ -1786,4 +1786,38 @@ public class OrderDetailService {
         orderNoListDTO.setOrderNo(orderNos);
         return orderNoListDTO;
     }
+
+    public ProcessRespDTO queryRefuse() {
+        ProcessRespDTO processRespDTO = new ProcessRespDTO();
+        List<OrderStatusEntity> orderStatusEntityList =  orderStatusService.queryByStatus(Arrays.asList(OrderStatusEnum.CLOSED));
+        List<OrderStatusDTO> orderStatusDTOList = new ArrayList<>();
+        List<String> orderNos = orderStatusEntityList
+                .stream()
+                .map(x -> x.getOrderNo())
+                .collect(Collectors.toList());
+        int maxLen = 2000;
+        int size = orderNos.size();
+        log.info("当前订单条数size={}",size);
+        int count = size%maxLen==0?(size / maxLen):(size / maxLen) + 1;
+        List<OrderDTO> orderDTOS = new ArrayList<>();
+        for(int i=0;i<count;i++){
+            int toIndex = maxLen * i;
+            int fromIndex = (toIndex + maxLen)>=size?size:toIndex + maxLen;
+            List<String> curOrderNos = orderNos.subList(toIndex,fromIndex);
+            List<OrderEntity> orderEntityList = orderService.getByOrderNos(curOrderNos);
+            orderEntityList.stream().forEach(x->{
+                OrderDTO orderDTO = new OrderDTO();
+                BeanUtils.copyProperties(x,orderDTO);
+                orderDTOS.add(orderDTO);
+            });
+        }
+        processRespDTO.setOrderDTOs(orderDTOS);
+        processRespDTO.setOrderStatusDTOs(orderStatusDTOList);
+        return processRespDTO;
+    }
+
+    public static void main(String[] args) {
+        System.out.println(1001/1000);
+    }
+
 }

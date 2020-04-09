@@ -1,9 +1,12 @@
 package com.atzuche.order.admin.service;
 
+import com.atzuche.order.admin.filter.CityLonLatFilter;
 import com.atzuche.order.admin.vo.resp.cost.DistributionCostVO;
+import com.atzuche.order.commons.OrderReqContext;
 import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.commons.vo.req.ModifyOrderReqVO;
+import com.atzuche.order.commons.vo.req.OrderReqVO;
 import com.atzuche.order.commons.vo.req.handover.req.HandoverCarInfoReqDTO;
 import com.atzuche.order.commons.vo.req.handover.req.HandoverCarInfoReqVO;
 import com.atzuche.order.delivery.common.DeliveryErrorCode;
@@ -21,6 +24,8 @@ import com.atzuche.order.delivery.vo.delivery.req.DeliveryCarRepVO;
 import com.atzuche.order.delivery.vo.delivery.req.DeliveryReqDTO;
 import com.atzuche.order.delivery.vo.delivery.req.DeliveryReqVO;
 import com.atzuche.order.open.service.FeignOrderModifyService;
+import com.atzuche.order.parentorder.entity.OrderEntity;
+import com.atzuche.order.parentorder.service.OrderService;
 import com.atzuche.order.rentercommodity.service.RenterCommodityService;
 import com.atzuche.order.rentercost.entity.RenterOrderCostDetailEntity;
 import com.atzuche.order.rentercost.service.RenterOrderCostDetailService;
@@ -69,6 +74,10 @@ public class AdminDeliveryCarService {
     RenterMemberService renterMemberService;
     @Autowired
     RenterOrderService renterOrderService;
+    @Autowired
+    CityLonLatFilter cityLonLatFilter;
+    @Autowired
+    OrderService orderService;
 
     protected final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -123,7 +132,27 @@ public class AdminDeliveryCarService {
      */
     public void updateDeliveryCarInfo(DeliveryCarVO deliveryCarVO) throws Exception {
         logger.info("入参deliveryReqVO：[{}]", deliveryCarVO.toString());
-        handoverCarInfoService.updateDeliveryCarInfo(createParams(deliveryCarVO));
+        OrderReqContext orderReqContext = new OrderReqContext();
+        OrderReqVO orderReqVo = new OrderReqVO();
+        //获取主订单数据
+        OrderEntity orderEntity = orderService.getOrderEntity(deliveryCarVO.getOrderNo());
+        if (Objects.isNull(orderEntity)) {
+            logger.info("没有找到对应的订单数据");
+            throw new DeliveryOrderException(DeliveryErrorCode.DELIVERY_PARAMS_ERROR);
+        }
+        DeliveryReqVO deliveryReqVO = createParams(deliveryCarVO);
+        orderReqVo.setCityCode(orderEntity.getCityCode());
+        orderReqVo.setSrvGetFlag(Integer.valueOf(deliveryReqVO.getGetDeliveryReqDTO().getIsUsedGetAndReturnCar()));
+        orderReqVo.setSrvReturnFlag(Integer.valueOf(deliveryReqVO.getRenterDeliveryReqDTO().getIsUsedGetAndReturnCar()));
+        orderReqVo.setSrvGetLat(deliveryReqVO.getGetDeliveryReqDTO().getRenterGetReturnLat());
+        orderReqVo.setSrvGetLon(deliveryReqVO.getGetDeliveryReqDTO().getRenterGetReturnLng());
+        orderReqVo.setSrvReturnLat(deliveryReqVO.getRenterDeliveryReqDTO().getRenterGetReturnLat());
+        orderReqVo.setSrvReturnLon(deliveryReqVO.getRenterDeliveryReqDTO().getRenterGetReturnLng());
+        orderReqVo.setSrvGetAddr(deliveryReqVO.getGetDeliveryReqDTO().getRenterGetReturnAddr());
+        orderReqVo.setSrvReturnAddr(deliveryReqVO.getRenterDeliveryReqDTO().getRenterGetReturnAddr());
+        orderReqContext.setOrderReqVO(orderReqVo);
+        cityLonLatFilter.validate(orderReqContext);
+        handoverCarInfoService.updateDeliveryCarInfo(deliveryReqVO);
 //        ResponseData responseData = feignOrderModifyService.modifyOrderForConsole(createModifyOrderInfoParams(deliveryCarVO));
 //        if (!responseData.getResCode().equals(ErrorCode.SUCCESS.getCode())) {
 //            logger.info("修改订单失败，orderNo：[{}],cause:[{}]", deliveryCarVO.getOrderNo(), responseData.getResMsg());

@@ -4,7 +4,6 @@ import com.alibaba.fastjson.JSONObject;
 import com.atzuche.order.commons.vo.req.handover.req.HandoverCarInfoReqDTO;
 import com.atzuche.order.delivery.entity.OwnerHandoverCarInfoEntity;
 import com.atzuche.order.delivery.entity.OwnerHandoverCarRemarkEntity;
-import com.atzuche.order.delivery.entity.RenterHandoverCarRemarkEntity;
 import com.atzuche.order.delivery.enums.RenterHandoverCarTypeEnum;
 import com.atzuche.order.delivery.mapper.OwnerHandoverCarInfoMapper;
 import com.atzuche.order.delivery.mapper.OwnerHandoverCarRemarkMapper;

@@ -126,4 +126,15 @@ public class OrderDetailController {
         OrderNoListDTO orderNoListDTO =  orderDetailService.getOrderNoAll();
         return ResponseData.success(orderNoListDTO);
     }
+    /*
+     * @Author ZhangBin
+     * @Date 2020/4/9 10:16
+     * @Description: 查询非正常结束的订单
+     *
+     **/
+    @GetMapping("/queryRefuse")
+    public ResponseData<ProcessRespDTO> queryRefuse(){
+        ProcessRespDTO processRespDTO = orderDetailService.queryRefuse();
+        return ResponseData.success(processRespDTO);
+    }
 }
