@@ -148,6 +148,7 @@ public class RemindPayIllegalCrashService {
         String createTime = new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date());
         paramMap.put("createTime", createTime);
         paramMap.put("proId", 6);
+        paramMap.put("platform", 1);
         paramMap.put("jobId", jobId);
         paramMap.put("order_change_wel", "凹凸租车提醒您");
         paramMap.put("delayTips", content.toString() );
