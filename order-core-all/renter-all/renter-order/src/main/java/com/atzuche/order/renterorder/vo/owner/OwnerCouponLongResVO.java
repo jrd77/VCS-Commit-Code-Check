@@ -20,6 +20,11 @@ public class OwnerCouponLongResVO {
      */
     private String orderNo;
 
+    /**
+     * 文案描述
+     */
+    private String discountDesc;
+
     private List<HolidayAverageResultVO> ownerUnitPriceRespVOS;
 
 }

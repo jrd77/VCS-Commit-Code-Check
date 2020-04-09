@@ -16,6 +16,7 @@ import com.atzuche.order.rentercost.entity.RenterOrderCostDetailEntity;
 import com.atzuche.order.rentercost.entity.dto.RenterOrderSubsidyDetailDTO;
 import com.atzuche.order.rentercost.entity.vo.HolidayAverageDateTimeVO;
 import com.atzuche.order.rentercost.entity.vo.HolidayAverageResultVO;
+import com.atzuche.order.renterorder.entity.OwnerCouponLongEntity;
 import com.atzuche.order.renterorder.service.RenterOrderCostHandleService;
 import com.atzuche.order.renterorder.vo.owner.OwnerCouponLongReqVO;
 import com.atzuche.order.renterorder.vo.owner.OwnerCouponLongResVO;
@@ -26,9 +27,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.BiConsumer;
 
 /**
  * 计算长租订单租金折扣信息
@@ -63,31 +66,46 @@ public class LongOrderOwnerCouponFilter implements OrderCostFilter {
         if (Objects.isNull(orderRentAmtResDTO) || CollectionUtils.isEmpty(orderRentAmtResDTO.getDetails())) {
             throw new OrderCostFilterException(ErrorCode.PARAMETER_ERROR.getCode(), "计算长租订单租金折扣信息租金信息为空!");
         }
-
-        List<RenterOrderCostDetailEntity> details = orderRentAmtResDTO.getDetails();
+        //获取折扣信息
         List<RenterOrderSubsidyDetailDTO> subsidyDetails = new ArrayList<>();
+        List<RenterOrderCostDetailEntity> details = orderRentAmtResDTO.getDetails();
         OwnerCouponLongReqVO reqVO = buildOwnerCouponLongReqVO(baseReqDTO, longOrderOwnerCouponReqDTO);
+        List<HolidayAverageDateTimeVO> ownerUnitPriceVOS = new ArrayList<HolidayAverageDateTimeVO>();
         details.forEach(d -> {
-            List<HolidayAverageDateTimeVO> ownerUnitPriceVOS = new ArrayList<HolidayAverageDateTimeVO>();
             HolidayAverageDateTimeVO ownerUnitPrice = new HolidayAverageDateTimeVO();
             ownerUnitPrice.setRentOriginalUnitPriceAmt(d.getUnitPrice());
             ownerUnitPrice.setRevertTime(reqVO.getRevertTime());
             ownerUnitPriceVOS.add(ownerUnitPrice);
-            reqVO.setOwnerUnitPriceVOS(ownerUnitPriceVOS);
-            OwnerCouponLongResVO resVO = couponAndCoinHandleService.getLongOwnerCoupon(reqVO);
-            if (Objects.nonNull(resVO)) {
-                List<HolidayAverageResultVO> holidayAverageResultList = resVO.getOwnerUnitPriceRespVOS();
-                Integer actRentUnitPriceAmt = null;
-                if (CollectionUtils.isNotEmpty(holidayAverageResultList)) {
-                    actRentUnitPriceAmt = holidayAverageResultList.get(0).getActRentUnitPriceAmt();
-                }
-                RenterOrderSubsidyDetailDTO subsidyDetailDTO = renterOrderCostHandleService.handleLongOwnerCoupon(actRentUnitPriceAmt,
-                        d.getCount(), d.getTotalAmount());
+        });
+        reqVO.setOwnerUnitPriceVOS(ownerUnitPriceVOS);
+        OwnerCouponLongResVO resVO = couponAndCoinHandleService.getLongOwnerCoupon(reqVO);
+
+        log.info("订单费用计算-->长租订单租金折扣.resVO:[{}]", JSON.toJSONString(resVO));
+        OwnerCouponLongEntity ownerCouponLongEntity = null;
+        if (Objects.nonNull(resVO) && CollectionUtils.isNotEmpty(resVO.getOwnerUnitPriceRespVOS())) {
+            List<HolidayAverageResultVO> holidayAverageResultList = resVO.getOwnerUnitPriceRespVOS();
+
+            ownerCouponLongEntity = new OwnerCouponLongEntity();
+            ownerCouponLongEntity.setOrderNo(baseReqDTO.getOrderNo());
+            ownerCouponLongEntity.setRenterOrderNo(baseReqDTO.getRenterOrderNo());
+            ownerCouponLongEntity.setRenterMemNo(baseReqDTO.getMemNo());
+            ownerCouponLongEntity.setCouponCode(longOrderOwnerCouponReqDTO.getCouponCode());
+            ownerCouponLongEntity.setOriginalUnitPrice(holidayAverageResultList.get(0).getRentOriginalUnitPriceAmt());
+            ownerCouponLongEntity.setActUnitPrice(holidayAverageResultList.get(0).getActRentUnitPriceAmt());
+            ownerCouponLongEntity.setDiscounRatio(holidayAverageResultList.get(0).getDiscounRatio());
+            ownerCouponLongEntity.setReductionPrice(holidayAverageResultList.get(0).getReductionAmt());
+            ownerCouponLongEntity.setDiscountDesc(resVO.getDiscountDesc());
+
+            for (int i = 0; i < details.size(); i++) {
+                RenterOrderCostDetailEntity detailEntity = details.get(i);
+                RenterOrderSubsidyDetailDTO subsidyDetailDTO =
+                        renterOrderCostHandleService.handleLongOwnerCoupon(holidayAverageResultList.get(i).getActRentUnitPriceAmt(),
+                                detailEntity.getCount(), detailEntity.getTotalAmount());
                 if (null != subsidyDetailDTO) {
                     subsidyDetails.add(subsidyDetailDTO);
                 }
             }
-        });
+        }
 
         log.info("订单费用计算-->长租订单租金折扣.subsidyDetails:[{}]", JSON.toJSONString(subsidyDetails));
         LongOrderOwnerCouponResDTO longOrderOwnerCouponResDTO = new LongOrderOwnerCouponResDTO();
@@ -99,8 +117,13 @@ public class LongOrderOwnerCouponFilter implements OrderCostFilter {
 
             //赋值OrderCostDetailContext
             OrderCostDetailContext orderCostDetailContext = context.getCostDetailContext();
-            orderCostDetailContext.setSurplusRentAmt(orderCostDetailContext.getSurplusRentAmt() + subsidyAmt);
+            orderCostDetailContext.setSurplusRentAmt(orderCostDetailContext.getSurplusRentAmt() - subsidyAmt);
+            orderCostDetailContext.setOriginalRentAmt(orderCostDetailContext.getOriginalRentAmt() - subsidyAmt);
             orderCostDetailContext.getSubsidyDetails().addAll(subsidyDetails);
+        }
+
+        if (Objects.nonNull(ownerCouponLongEntity)) {
+            longOrderOwnerCouponResDTO.setOwnerCouponLongEntity(ownerCouponLongEntity);
         }
         log.info("订单费用计算-->长租订单租金折扣.result is,longOrderOwnerCouponResDTO:[{}]",
                 JSON.toJSONString(longOrderOwnerCouponResDTO));
@@ -127,4 +150,5 @@ public class LongOrderOwnerCouponFilter implements OrderCostFilter {
         reqVO.setCouponCode(longOrderOwnerCouponReqDTO.getCouponCode());
         return reqVO;
     }
+
 }
