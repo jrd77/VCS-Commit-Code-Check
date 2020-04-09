@@ -106,13 +106,4 @@ public class OwnerIncomeController {
         log.info("OwnerIncomeController adjustmentOwnerIncome end param [{}]",GsonUtils.toJson(adjustmentOwnerIncomeExamVO));
         return ResponseData.success();
     }
-    @AutoDocMethod(value = "根据会员号查询车主全部收益审核信息", description = "根据会员号查询车主全部收益审核信息",response = OwnerIncomeExamineListResVO.class)
-    @GetMapping("/getIncomByOwnerMem")
-    public ResponseData<OwnerIncomeExamineListResVO> getIncomByOwnerMem(@RequestParam("ownerMemeNo") String ownerMemeNo){
-        log.info("OwnerIncomeController getIncomByOwnerMem start param [{}]", ownerMemeNo);
-        OwnerIncomeExamineListResVO  ownerIncomeExamineListResVO= accountOwnerIncomeExamineNoTService.getIncomByOwnerMem(ownerMemeNo);
-        log.info("OwnerIncomeController getIncomByOwnerMem end param [{}]",ownerMemeNo);
-        return ResponseData.success(ownerIncomeExamineListResVO);
-    }
-
 }
