@@ -13,6 +13,7 @@
         <result property="actUnitPrice" column="act_unit_price"/>
         <result property="reductionPrice" column="reduction_price"/>
         <result property="discounRatio" column="discoun_ratio"/>
+        <result property="discountDesc" column="discount_desc"/>
         <result property="createTime" column="create_time"/>
         <result property="createOp" column="create_op"/>
         <result property="updateTime" column="update_time"/>
@@ -30,7 +31,8 @@
 	`coupon_code`, 	
 	`act_unit_price`, 	
 	`reduction_price`, 	
-	`discoun_ratio`, 	
+	`discoun_ratio`,
+	`discount_desc`,
 	`create_time`, 	
 	`create_op`, 	
 	`update_time`, 	
@@ -53,7 +55,8 @@
 				`original_unit_price`,		
 				`coupon_code`,		
 				`act_unit_price`,		
-				`reduction_price`,		
+				`reduction_price`,
+                `discount_desc`,
 				`discoun_ratio`
 			)
 		values
@@ -64,7 +67,8 @@
 				#{originalUnitPrice}, 		
 				#{couponCode}, 		
 				#{actUnitPrice}, 		
-				#{reductionPrice}, 		
+				#{reductionPrice},
+                #{discountDesc},
 				#{discounRatio}
 			)
 	</insert>
@@ -79,6 +83,7 @@
 				<if test="couponCode != null">`coupon_code`, </if>
 				<if test="actUnitPrice != null">`act_unit_price`, </if>
 				<if test="reductionPrice != null">`reduction_price`, </if>
+                <if test="discountDesc != null">`discount_desc`, </if>
 				<if test="discounRatio != null">`discoun_ratio` </if>
 
 	        </trim>
@@ -90,6 +95,7 @@
 				<if test="couponCode != null">#{couponCode},  </if>
 				<if test="actUnitPrice != null">#{actUnitPrice},  </if>
 				<if test="reductionPrice != null">#{reductionPrice},  </if>
+                <if test="discountDesc != null">#{discountDesc},  </if>
 				<if test="discounRatio != null">#{discounRatio}  </if>
 	        </trim>
 	</insert>
@@ -105,6 +111,7 @@
 				<if test="couponCode != null">`coupon_code` = #{couponCode}, </if>
 				<if test="actUnitPrice != null">`act_unit_price` = #{actUnitPrice}, </if>
 				<if test="reductionPrice != null">`reduction_price` = #{reductionPrice}, </if>
+                <if test="discountDesc != null">`discount_desc` = #{discountDesc}, </if>
 				<if test="discounRatio != null">`discoun_ratio` = #{discounRatio} </if>
 			</set>
 		where id = #{id}
@@ -119,7 +126,8 @@
 				`original_unit_price` = #{originalUnitPrice}, 		
 				`coupon_code` = #{couponCode}, 		
 				`act_unit_price` = #{actUnitPrice}, 		
-				`reduction_price` = #{reductionPrice}, 		
+				`reduction_price` = #{reductionPrice},
+                `discount_desc` = #{discountDesc},
 				`discoun_ratio` = #{discounRatio}
 	
 		</set>
