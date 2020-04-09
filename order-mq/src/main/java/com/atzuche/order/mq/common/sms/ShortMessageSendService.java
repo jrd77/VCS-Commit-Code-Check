@@ -68,12 +68,13 @@ public class ShortMessageSendService {
             fieldName = fieldName.substring(0, 1).toLowerCase() + fieldName.substring(1);
             Field field = object.getClass().getDeclaredField(fieldName);
             field.setAccessible(true);
-            if (LocalDateTime.class.isInstance(field.get(object))) {
-                LocalDateTime localDateTime = (LocalDateTime) field.get(object);
-                return DateUtils.formate(localDateTime, DateUtils.DATE_DEFAUTE1);
-            } else {
-                return String.valueOf(field.get(object));
-            }
+//            if (LocalDateTime.class.isInstance(field.get(object))) {
+//                LocalDateTime localDateTime = (LocalDateTime) field.get(object);
+//                return DateUtils.formate(localDateTime, DateUtils.DATE_DEFAUTE1);
+//            } else {
+//                return String.valueOf(field.get(object));
+//            }
+            return String.valueOf(field.get(object));
         } catch (Exception e) {
             return null;
         }
