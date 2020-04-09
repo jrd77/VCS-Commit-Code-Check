@@ -45,9 +45,9 @@ public class OrderRefundTask extends IJobHandler {
                 try {
                     cashierPayService.refundOrderPay(list.get(i));
                 } catch (Exception e) {
-                    logger.error("执行 退款操作异常 异常 {},{}", GsonUtils.toJson(list.get(i)), e);
+                    logger.error("执行 退款操作异常 异常 {}", e); //GsonUtils.toJson(list.get(i)), 
                     Cat.logError("执行 退款操作异常 异常 {}", e);
-                    XxlJobLogger.log("执行 退款操作异常 异常 {},{}", GsonUtils.toJson(list.get(i)));
+                    XxlJobLogger.log("执行 退款操作异常 异常 {}",e);  //GsonUtils.toJson(list.get(i))
                 }
             }
         }else{
