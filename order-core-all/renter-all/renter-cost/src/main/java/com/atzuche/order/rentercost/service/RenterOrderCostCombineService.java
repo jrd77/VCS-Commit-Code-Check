@@ -545,7 +545,7 @@ public class RenterOrderCostCombineService {
 	 * @param memNo
 	 * @return
 	 */
-	public List<PayableVO> listPayableSupplementVO(String orderNo, String renterOrderNo, String memNo) {
+	public List<PayableVO> listPayableSupplementVO(String orderNo, String memNo) {  //String renterOrderNo,  跟子订单无关
 		List<PayableVO> payableList = new ArrayList<PayableVO>();
 		//补付
 		List<OrderSupplementDetailEntity> supplementList = orderSupplementDetailService.listOrderSupplementDetailByOrderNoAndMemNo(orderNo, memNo);
