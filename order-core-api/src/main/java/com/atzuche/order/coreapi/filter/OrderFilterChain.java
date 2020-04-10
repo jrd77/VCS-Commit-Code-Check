@@ -24,7 +24,7 @@ public class OrderFilterChain implements OrderFilter, ApplicationContextAware {
     private ApplicationContext applicationContext;
 
 
-    @PostConstruct
+   // @PostConstruct
     private void init() {
         /* 参数检测 */
         orderFilterList.add(applicationContext.getBean(ParamInputFilter.class));
