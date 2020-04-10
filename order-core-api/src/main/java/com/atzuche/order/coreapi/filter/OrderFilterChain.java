@@ -37,9 +37,9 @@ public class OrderFilterChain implements OrderFilter, ApplicationContextAware {
         /*平台显示校验*/
         orderFilterList.add(applicationContext.getBean(PlatformShowFilter.class));
         /*取还车时间校验*/
-        orderFilterList.add(applicationContext.getBean(RentRevertTimeCheckFilter.class));
+        //orderFilterList.add(applicationContext.getBean(RentRevertTimeCheckFilter.class));
         /*取还车服务起租时间需大于4小时校验*/
-        orderFilterList.add(applicationContext.getBean(RenterTime4HourFilter.class));
+        //orderFilterList.add(applicationContext.getBean(RenterTime4HourFilter.class));
         /*车辆设置校验*/
         orderFilterList.add(applicationContext.getBean(CarSettingCheckFilter.class));
         /*城市凹凸服务点判断*/
@@ -51,7 +51,7 @@ public class OrderFilterChain implements OrderFilter, ApplicationContextAware {
         /*准驾车型校验*/
         orderFilterList.add(applicationContext.getBean(CheckSuitCarAndDriLicFilter.class));
         /* 库存检查 */
-        orderFilterList.add(applicationContext.getBean(StockFilter.class));
+       // orderFilterList.add(applicationContext.getBean(StockFilter.class));
         /* 风控检查 */
         orderFilterList.add(applicationContext.getBean(RiskAuditFilter.class));
 
