@@ -163,7 +163,7 @@ public class CashierBatchPayService {
 	        
 	        //管理后台补付，等于管理后台的补付   08
 	        if(orderPayReqVO.getPayKind().contains(DataPayKindConstant.RENT_INCREMENT_CONSOLE)){  //修改订单的补付supplement
-	        	List<PayableVO> payableVOs = renterOrderCostCombineService.listPayableSupplementVO(orderNo,renterOrderEntity.getRenterOrderNo(),orderPayReqVO.getMenNo());
+	        	List<PayableVO> payableVOs = renterOrderCostCombineService.listPayableSupplementVO(orderNo,orderPayReqVO.getMenNo());
 	            result.setPayableVOs(payableVOs);
 	            //应付租车费用,保存为负数
 	            rentIncrementSupplementAmt = cashierNoTService.sumRentOrderCost(payableVOs);
