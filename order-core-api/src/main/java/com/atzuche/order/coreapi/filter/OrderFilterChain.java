@@ -53,7 +53,7 @@ public class OrderFilterChain implements OrderFilter, ApplicationContextAware {
         /* 库存检查 */
         // orderFilterList.add(applicationContext.getBean(StockFilter.class));
         /* 风控检查 */
-        orderFilterList.add(applicationContext.getBean(RiskAuditFilter.class));
+       // orderFilterList.add(applicationContext.getBean(RiskAuditFilter.class));
 
     }
 
