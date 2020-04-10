@@ -24,8 +24,8 @@ public class OrderFilterChain implements OrderFilter, ApplicationContextAware {
     private ApplicationContext applicationContext;
 
 
-   // @PostConstruct
-    private void init() {
+    @PostConstruct
+    private void init(){
         /* 参数检测 */
         orderFilterList.add(applicationContext.getBean(ParamInputFilter.class));
         /*经纬度转换校验*/
@@ -37,35 +37,35 @@ public class OrderFilterChain implements OrderFilter, ApplicationContextAware {
         /*平台显示校验*/
         orderFilterList.add(applicationContext.getBean(PlatformShowFilter.class));
         /*取还车时间校验*/
-        //orderFilterList.add(applicationContext.getBean(RentRevertTimeCheckFilter.class));
+        orderFilterList.add(applicationContext.getBean(RentRevertTimeCheckFilter.class));
         /*取还车服务起租时间需大于4小时校验*/
-        //orderFilterList.add(applicationContext.getBean(RenterTime4HourFilter.class));
+        orderFilterList.add(applicationContext.getBean(RenterTime4HourFilter.class));
         /*车辆设置校验*/
-       // orderFilterList.add(applicationContext.getBean(CarSettingCheckFilter.class));
+        orderFilterList.add(applicationContext.getBean(CarSettingCheckFilter.class));
         /*城市凹凸服务点判断*/
         orderFilterList.add(applicationContext.getBean(CityLonLatFilter.class));
         /*机场服务点校验*/
         orderFilterList.add(applicationContext.getBean(AirportServiceFilter.class));
         /*15分钟内重复下单校验*/
-        /* orderFilterList.add(applicationContext.getBean(WaitOwner15minuteReplyFilter.class));*/
+       /* orderFilterList.add(applicationContext.getBean(WaitOwner15minuteReplyFilter.class));*/
         /*准驾车型校验*/
         orderFilterList.add(applicationContext.getBean(CheckSuitCarAndDriLicFilter.class));
         /* 库存检查 */
-        // orderFilterList.add(applicationContext.getBean(StockFilter.class));
+        orderFilterList.add(applicationContext.getBean(StockFilter.class));
         /* 风控检查 */
-       // orderFilterList.add(applicationContext.getBean(RiskAuditFilter.class));
+        orderFilterList.add(applicationContext.getBean(RiskAuditFilter.class));
 
     }
 
 
     @Override
     public void validate(OrderReqContext context) throws OrderFilterException {
-        if (orderFilterList.size() == 0) {
-            throw new RuntimeException("cannot be init");
-        }
-        for (OrderFilter filter : orderFilterList) {
-            filter.validate(context);
-        }
+       if(orderFilterList.size()==0){
+           throw new RuntimeException("cannot be init");
+       }
+       for(OrderFilter filter:orderFilterList){
+           filter.validate(context);
+       }
     }
 
     @Override
