@@ -80,6 +80,7 @@ public class AccountOwnerCashExamineService {
 		if (oldDeductAmt > 0) {
 			record.setSerialNumber(nowDate+"1"+req.getMemNo()+req.getAmt());
 			record.setBalanceFlag(0);
+			record.setAmt(oldDeductAmt);
 			// 保存提现记录
 			accountOwnerCashExamineMapper.insertSelective(record);
 		}
@@ -87,6 +88,7 @@ public class AccountOwnerCashExamineService {
 			record.setId(null);
 			record.setSerialNumber(nowDate+"2"+req.getMemNo()+req.getAmt());
 			record.setBalanceFlag(1);
+			record.setAmt(newDeductAmt);
 			// 保存提现记录
 			accountOwnerCashExamineMapper.insertSelective(record);
 		}
@@ -212,7 +214,6 @@ public class AccountOwnerCashExamineService {
 	private AccountOwnerCashExamine convertAccountOwnerCashExamine(AccountOwnerCashExamineReqVO req, BankCardDTO bankCard, CashWithdrawalSimpleMemberDTO simpleMem) {
 		AccountOwnerCashExamine record = new AccountOwnerCashExamine();
 		if (req != null) {
-			record.setAmt(req.getAmt() == null ? null:Integer.valueOf(req.getAmt()));
 			record.setMemNo(req.getMemNo() == null ? null:Integer.valueOf(req.getMemNo()));
 		}
 		if (bankCard != null) {

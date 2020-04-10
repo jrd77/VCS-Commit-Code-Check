@@ -473,9 +473,13 @@ public class CashierPayService{
         Assert.notNull(orderPayReqVO, ErrorCode.PARAMETER_ERROR.getText());
         orderPayReqVO.check();
         //1 查询子单号
-        RenterOrderEntity renterOrderEntity = cashierNoTService.getRenterOrderNoByOrderNo(orderPayReqVO.getOrderNo());
-        if(StringUtils.isBlank(renterOrderEntity.getRenterOrderNo())) {
-        	 throw new OrderNotFoundException(orderPayReqVO.getOrderNo()+"支付子订单号");
+        RenterOrderEntity renterOrderEntity = null;
+        //查询子订单有关：进行中的子订单，其他的无关(针对结算后的补付功能。)。200410
+        if(orderPayReqVO.getPayKind().contains(DataPayKindConstant.RENT_AMOUNT_AFTER) || orderPayReqVO.getPayKind().contains(DataPayKindConstant.RENT_INCREMENT) || orderPayReqVO.getPayKind().contains(DataPayKindConstant.RENT_AMOUNT)){
+	        renterOrderEntity = cashierNoTService.getRenterOrderNoByOrderNo(orderPayReqVO.getOrderNo());
+	        if(StringUtils.isBlank(renterOrderEntity.getRenterOrderNo())) {
+	        	 throw new OrderNotFoundException(orderPayReqVO.getOrderNo()+"支付子订单号");
+	        }
         }
         
         OrderPayableAmountResVO result = new OrderPayableAmountResVO();
@@ -487,7 +491,9 @@ public class CashierPayService{
         if(!orderPayReqVO.getPayKind().contains(DataPayKindConstant.RENT_AMOUNT)) {
         	isUseWallet = 0;
         }else {
-        	isUseWallet = Objects.isNull(orderPayReqVO.getIsUseWallet())?renterOrderEntity.getIsUseWallet():orderPayReqVO.getIsUseWallet();
+        	if(renterOrderEntity != null) {
+        		isUseWallet = Objects.isNull(orderPayReqVO.getIsUseWallet())?renterOrderEntity.getIsUseWallet():orderPayReqVO.getIsUseWallet();
+        	}
         	//如果已经使用过钱包抵扣，不允许再次做抵扣。
         	int walletAmt = accountRenterCostDetailNoTService.getRentCostPayByWallet(orderPayReqVO.getOrderNo(), orderPayReqVO.getMenNo());
         	if(walletAmt > 0) {
@@ -596,7 +602,7 @@ public class CashierPayService{
            amtIncrementRent = rentIncrementAmt + rentAmtPayedIncrement;
         }
         
-        //---------------------------------------------------------------------------------------- 与RENT_AMOUNT分离
+        //---------------------------------------------------------------------------------------- 与RENT_AMOUNT分离 ---------------------------------- 三大块
         ///费用补付 
         int rentAmtAfter = 0;
         int rentAmtPayedAfter = 0;
@@ -634,7 +640,7 @@ public class CashierPayService{
         int rentIncrementSupplementAmt = 0;
         int amtRentIncrementSupplement = 0;
         if(orderPayReqVO.getPayKind().contains(DataPayKindConstant.RENT_INCREMENT_CONSOLE)){  //修改订单的补付
-        	List<PayableVO> payableVOs = renterOrderCostCombineService.listPayableSupplementVO(orderPayReqVO.getOrderNo(),renterOrderEntity.getRenterOrderNo(),orderPayReqVO.getMenNo());
+        	List<PayableVO> payableVOs = renterOrderCostCombineService.listPayableSupplementVO(orderPayReqVO.getOrderNo(),orderPayReqVO.getMenNo());
 //            result.setPayableVOs(payableVOs);
         	if(result.getPayableVOs() != null) {
             	result.getPayableVOs().addAll(payableVOs);
@@ -924,6 +930,8 @@ public class CashierPayService{
                 String orderNo = accountPayAbleResVO.getOrderNo();
                 //车辆押金
                 if(RenterCashCodeEnum.ACCOUNT_RENTER_DEPOSIT.equals(accountPayAbleResVO.getRenterCashCode())){
+                	//车辆押金
+                	////根据是否选择信用减免来处理是否信用预授权
                 	int amt = payVO.getAmtDeposit();
                     CashierEntity cashierEntity = cashierNoTService.getCashierEntity(orderNo,orderPaySign.getMenNo(), DataPayKindConstant.RENT);
                     AccountRenterDepositResVO accountRenterDeposit = cashierService.getRenterDepositEntity(orderNo,orderPaySign.getMenNo());
@@ -935,6 +943,7 @@ public class CashierPayService{
                     payVo.add(vo);
                 }else if(RenterCashCodeEnum.ACCOUNT_RENTER_WZ_DEPOSIT.equals(accountPayAbleResVO.getRenterCashCode())){
                     //违章押金
+                	//根据是否选择信用减免来处理是否信用预授权
                 	int amt = payVO.getAmtWzDeposit();
                 	CashierEntity cashierEntity = cashierNoTService.getCashierEntity(orderNo,orderPaySign.getMenNo(), DataPayKindConstant.DEPOSIT);
                     AccountRenterWZDepositResVO accountRenterWZDepositRes = cashierService.getRenterWZDepositEntity(orderNo,orderPaySign.getMenNo());
@@ -950,6 +959,7 @@ public class CashierPayService{
                 	
                     //待付租车费用
                     int amt = payVO.getAmtRent();
+                    //默认消费
                     orderPaySign.setPayType(DataPayTypeConstant.PAY_PUR);
                     //去掉该条件，根据入参来。
 //                    String payKind = YesNoEnum.YES.getCode().equals(payVO.getIsPayAgain())?DataPayKindConstant.RENT_INCREMENT:DataPayKindConstant.RENT_AMOUNT;
@@ -971,6 +981,7 @@ public class CashierPayService{
                     //待付租车费用  APP修改订单补付
                     int amt = payVO.getAmtIncrementRent();
                     //统一按消费来处理(忽略前端的来值),消费考虑到车主拒绝修改订单会退款。仍然保持老系统的。 考虑收款及补充租车费用。
+                    //默认消费
                     orderPaySign.setPayType(DataPayTypeConstant.PAY_PUR);
                     
                     //去掉该条件，根据入参来。
@@ -989,11 +1000,16 @@ public class CashierPayService{
                     vo.setPayMd5(payMd5);
                     payVo.add(vo);
                     
+                    
+                    //----------------------------------------------------------------------------------------------------------------- 以下为三大块 ---------------------------------------
+                    
+                    
                 } else if(RenterCashCodeEnum.ACCOUNT_RENTER_RENT_COST_AFTER.equals(accountPayAbleResVO.getRenterCashCode())){
                 	////待付租车费用   租车费用默认是消费
                 	
                     //待付租车费用
                     int amt = payVO.getAmtRentAfter();
+                    //默认消费
                     orderPaySign.setPayType(DataPayTypeConstant.PAY_PUR);
                     //去掉该条件，根据入参来。
 //                        String payKind = YesNoEnum.YES.getCode().equals(payVO.getIsPayAgain())?DataPayKindConstant.RENT_INCREMENT:DataPayKindConstant.RENT_AMOUNT;
@@ -1015,6 +1031,7 @@ public class CashierPayService{
                     //待付租车费用
                     int amt = accountPayAbleResVO.getAmt();
                     //统一按消费来处理(忽略前端的来值),消费考虑到车主拒绝修改订单会退款。仍然保持老系统的。 考虑收款及补充租车费用。
+                    //默认消费
                     orderPaySign.setPayType(DataPayTypeConstant.PAY_PUR);
                     
                     //去掉该条件，根据入参来。
@@ -1042,6 +1059,7 @@ public class CashierPayService{
                     //待付租车费用
                     int amt = accountPayAbleResVO.getAmt();
                     //统一按消费来处理(忽略前端的来值),消费考虑到车主拒绝修改订单会退款。仍然保持老系统的。 考虑收款及补充租车费用。
+                    //默认消费
                     orderPaySign.setPayType(DataPayTypeConstant.PAY_PUR);
                     
                     //去掉该条件，根据入参来。
