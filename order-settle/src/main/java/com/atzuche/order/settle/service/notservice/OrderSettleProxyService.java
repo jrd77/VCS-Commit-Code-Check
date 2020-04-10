@@ -171,6 +171,8 @@ public class OrderSettleProxyService {
                         vo.setFlag(RenterCashCodeEnum.ACCOUNT_RENTER_RENT_COST_AGAIN.getCashNo());
                         vo.setRenterCashCodeEnum(refundApplyVO.getRenterCashCodeEnum());
                         vo.setPaySource(cashierElement.getPaySource());
+                        //固定04 退货 200410
+                        vo.setPayType(DataPayTypeConstant.PUR_RETURN);
                         vo.setRemake(refundApplyVO.getRemarke());
                         int amt = refundAmt + cashierElement.getPayAmt();
                         vo.setAmt(amt>=0?refundAmt:-cashierElement.getPayAmt());
@@ -194,6 +196,8 @@ public class OrderSettleProxyService {
                         vo.setFlag(RenterCashCodeEnum.ACCOUNT_RENTER_RENT_COST_AFTER.getCashNo());
                         vo.setRenterCashCodeEnum(refundApplyVO.getRenterCashCodeEnum());
                         vo.setPaySource(cashierElement.getPaySource());
+                        //固定04 退货 200410
+                        vo.setPayType(DataPayTypeConstant.PUR_RETURN);
                         vo.setRemake(refundApplyVO.getRemarke());
                         int amt = refundAmt + cashierElement.getPayAmt();
                         vo.setAmt(amt>=0?refundAmt:-cashierElement.getPayAmt());

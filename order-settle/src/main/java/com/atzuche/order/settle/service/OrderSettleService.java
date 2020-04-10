@@ -104,7 +104,7 @@ public class OrderSettleService{
 	  	//非空处理
 	  	if(accountRenterCostSettleEntity != null) {
 	  		feeShishouOri = accountRenterCostSettleEntity.getShifuAmt()!=null?accountRenterCostSettleEntity.getShifuAmt():0;
-	  		//结算前：应扣等于应收
+	  		//结算前：租车费用应扣等于应收
 	  		feeYingkouOri = accountRenterCostSettleEntity.getYingkouAmt() != null?Math.abs(accountRenterCostSettleEntity.getYingkouAmt()):Math.abs(renterCostAmtFinalForYingshou);  //取绝对值。
 	  	}
 	  	log.info("feeShishouOri=[{}],feeYingkouOri=[{}],orderNo=[{}],memNo=[{}]",feeShishouOri,feeYingkouOri,orderNo,renterNo);
@@ -186,8 +186,8 @@ public class OrderSettleService{
         //应扣
         AccountRenterWzDepositCostEntity wzEntity = accountRenterWzDepositCostNoTService.queryWzDeposit(orderNo,renterNo);
         if(wzEntity != null) {
-        	//结算前：应扣等于应收
-        	wzYingkouOri = wzEntity.getYingkouAmt() !=null?Math.abs(wzEntity.getYingkouAmt()):wzYingshouOri;  //负数 取绝对值
+        	//结算前：应扣等于0，应收等于应退，默认押金是要退的。
+        	wzYingkouOri = wzEntity.getYingkouAmt() !=null?Math.abs(wzEntity.getYingkouAmt()):0;  //负数 取绝对值   wzYingshouOri
         }
         log.info("wzShishouOri=[{}],wzYingshouOri=[{}],wzShishouAuthOri=[{}],wzYingkouOri=[{}],orderNo=[{}],memNo=[{}]",wzShishouOri,wzYingshouOri,wzShishouAuthOri,wzYingkouOri,orderNo,renterNo);
         

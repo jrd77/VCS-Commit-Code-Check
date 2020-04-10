@@ -28,8 +28,8 @@ public class MemBalanceService {
 
     @Transactional(propagation = Propagation.REQUIRED,rollbackFor = RuntimeException.class)
     public void deductBalance(String memNo,Integer deduct){
+        logger.info("start to deduct [memNo={},deduct={}]",memNo,deduct);
         int count = memberMapper.deductBalance(memNo,deduct);
-
         logger.info("deductBalance,param=[memNo={},deduct={}],result=[{}]",memNo,deduct,count);
 
         if(count==0){
