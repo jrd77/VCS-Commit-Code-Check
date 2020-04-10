@@ -44,7 +44,7 @@ import java.util.Objects;
  * @author 胡春林
  */
 @Component
-@JobHandler("RemindPushPayDepositTask")
+@JobHandler("remindPushPayDepositTask")
 public class RemindPushPayDepositTask extends IJobHandler {
 
     private Logger logger = LoggerFactory.getLogger(RemindPushPayDepositTask.class);
