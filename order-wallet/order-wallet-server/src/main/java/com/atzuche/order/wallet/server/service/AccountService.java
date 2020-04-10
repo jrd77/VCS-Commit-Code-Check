@@ -68,7 +68,7 @@ public class AccountService {
             if(entity.getCardHolder()!=null) {
                 accountVO.setCardHolderPlain(AESEncrypter.decrypt(entity.getCardHolder()));
             }
-            if(entity.getCardNo()!=null) {
+            if(entity.getCertNo()!=null) {
                 accountVO.setCertNoPlain(AESEncrypter.decrypt(entity.getCertNo()));
             }
         }catch (Exception e){
