@@ -386,10 +386,6 @@ public class ViolationManageService {
         RenterOrderWzStatusEntity renterOrderWzStatusEntity = new RenterOrderWzStatusEntity();
         renterOrderWzStatusEntity.setOrderNo(violationAlterationRequestVO.getOrderNo());
         renterOrderWzStatusEntity.setCarPlateNum(violationAlterationRequestVO.getPlateNum());
-        String managementMode = violationAlterationRequestVO.getManagementMode();
-        if(!ObjectUtils.isEmpty(managementMode)){
-            renterOrderWzStatusEntity.setManagementMode(Integer.parseInt(managementMode));
-        }
 
         String wzRenterLastTime = violationAlterationRequestVO.getWzRenterLastTime();
         String wzPlatformLastTime = violationAlterationRequestVO.getWzPlatformLastTime();
@@ -411,20 +407,22 @@ public class ViolationManageService {
 
         renterOrderWzStatusEntity.setWzRemarks( violationAlterationRequestVO.getWzRemarks());
 
+        String managementMode = violationAlterationRequestVO.getManagementMode();
         if(!org.springframework.util.StringUtils.isEmpty(managementMode)){
-            if(managementMode == 1){
+            if(managementMode.equals("1")){
                 renterOrderWzStatusEntity.setStatus(25);
                 renterOrderWzStatusEntity.setStatusDesc(WzStatusEnums.getStatusDesc(25));
-            } else if (managementMode == 2) {
+            } else if (managementMode.equals("2")) {
                 renterOrderWzStatusEntity.setStatus(26);
                 renterOrderWzStatusEntity.setStatusDesc(WzStatusEnums.getStatusDesc(26));
-            } else if (managementMode == 3) {
+            } else if (managementMode.equals("3")) {
                 renterOrderWzStatusEntity.setStatus(40);
                 renterOrderWzStatusEntity.setStatusDesc(WzStatusEnums.getStatusDesc(40));
-            } else if (managementMode == 4) {
+            } else if (managementMode.equals("4")) {
                 renterOrderWzStatusEntity.setStatus(46);
                 renterOrderWzStatusEntity.setStatusDesc(WzStatusEnums.getStatusDesc(46));
             }
+            renterOrderWzStatusEntity.setManagementMode(Integer.parseInt(managementMode));
         }
 
 
