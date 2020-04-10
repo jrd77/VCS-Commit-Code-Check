@@ -2,7 +2,9 @@ package com.atzuche.order.coreapi.service;
 
 import com.atzuche.order.accountrenterdeposit.entity.AccountRenterDepositEntity;
 import com.atzuche.order.accountrenterdeposit.service.notservice.AccountRenterDepositNoTService;
+import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostDetailEntity;
 import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostSettleDetailEntity;
+import com.atzuche.order.accountrenterrentcost.service.notservice.AccountRenterCostDetailNoTService;
 import com.atzuche.order.accountrenterrentcost.service.notservice.AccountRenterCostSettleDetailNoTService;
 import com.atzuche.order.accountrenterrentcost.utils.AccountSettleUtils;
 import com.atzuche.order.accountrenterwzdepost.entity.AccountRenterWzDepositEntity;
@@ -13,11 +15,14 @@ import com.atzuche.order.cashieraccount.service.CashierSettleService;
 import com.atzuche.order.commons.entity.rentCost.*;
 import com.atzuche.order.commons.enums.SubsidySourceCodeEnum;
 import com.atzuche.order.commons.enums.account.FreeDepositTypeEnum;
+import com.atzuche.order.commons.enums.account.SettleStatusEnum;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
+import com.atzuche.order.commons.exceptions.OrderNotFoundException;
 import com.atzuche.order.commons.vo.DepostiDetailVO;
 import com.atzuche.order.commons.vo.OrderSupplementDetailVO;
 import com.atzuche.order.commons.vo.WzDepositDetailVO;
 import com.atzuche.order.commons.vo.res.*;
+import com.atzuche.order.parentorder.entity.OrderStatusEntity;
 import com.atzuche.order.parentorder.service.OrderStatusService;
 import com.atzuche.order.rentercost.entity.*;
 import com.atzuche.order.rentercost.service.*;
@@ -35,7 +40,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * 提供租客费用的对外接口服务
@@ -87,6 +95,8 @@ public class RenterCostFacadeService {
     private OrderStatusService orderStatusService;
     @Autowired
     private OrderConsoleCostDetailService orderConsoleCostDetailService;
+    @Autowired
+    private AccountRenterCostDetailNoTService accountRenterCostDetailNoTService;
 
     private final static Logger logger = LoggerFactory.getLogger(RenterCostFacadeService.class);
 
@@ -278,6 +288,11 @@ public class RenterCostFacadeService {
     }
     
     public RenterCostDetailDTO renterCostDetail(String orderNo,String renterOrderNo,String memNo) {
+        OrderStatusEntity orderStatusEntity = orderStatusService.getByOrderNo(orderNo);
+        if(orderStatusEntity == null){
+            logger.error("订单状态信息不存在orderNo={}",orderNo);
+            throw new OrderNotFoundException(orderNo);
+        }
         List<RenterOrderCostDetailEntity> renterOrderCostDetailEntityList = orderCostDetailService.getRenterOrderCostDetailList(orderNo,renterOrderNo);
         RenterOrderCostEntity renterOrderCostEntity = renterOrderCostService.getByOrderNoAndRenterNo(orderNo, renterOrderNo);
         RenterFineVO renterFineVO = getRenterFineDetail(orderNo,renterOrderNo,memNo);
@@ -289,6 +304,40 @@ public class RenterCostFacadeService {
         oilDifferenceCrash = StringUtil.isBlank(oilDifferenceCrash)?"0":oilDifferenceCrash;
         int extraMileageFee = (rentCost == null || rentCost.getMileageAmt() == null)?0:rentCost.getMileageAmt().getTotalFee();
         int oilFee = (int)Float.parseFloat(oilDifferenceCrash);
+
+
+        int carDeductionRentAmt = 0;//车辆抵扣的租车费用
+        int wzDeductionRentAmt = 0;//违章抵扣的租车费用
+
+        int wzDeductionRentHistoricalAmt = 0;
+        int carDeductionRentHistoricalAmt = 0;
+
+        int carExpAndActFlg = 1;
+        int wzExpAndActFlg = 1;
+        if(orderStatusEntity.getSettleStatus() == SettleStatusEnum.SETTLED.getCode()){//车辆押金已经结算
+            //车辆押金
+            List<AccountRenterCostDetailEntity> accountRenterCostDetailEntityList = accountRenterCostDetailNoTService.getAccountRenterCostDetailsByOrderNo(orderNo);
+            carDeductionRentAmt = Optional.ofNullable(accountRenterCostDetailEntityList).orElseGet(ArrayList::new).stream()
+                    .filter(x -> RenterCashCodeEnum.SETTLE_DEPOSIT_TO_RENT_COST.equals(x.getSourceCode()))
+                    .collect(Collectors.summingInt(x -> x.getAmt() == null ? 0 : x.getAmt()));
+            carExpAndActFlg = 2;
+
+            List<AccountRenterCostSettleDetailEntity> accountRenterCostSettleDetailList = accountRenterCostSettleService.getAccountRenterCostSettleDetail(orderNo);
+            carDeductionRentHistoricalAmt = AccountSettleUtils.getDepositSettleDeductionDebtAmt(accountRenterCostSettleDetailList,RenterCashCodeEnum.SETTLE_DEPOSIT_TO_HISTORY_AMT);
+
+            if(orderStatusEntity.getWzSettleStatus() == 1){//违章押金已经结算
+                wzExpAndActFlg = 2;
+                wzDeductionRentHistoricalAmt = AccountSettleUtils.getDepositSettleDeductionDebtAmt(accountRenterCostSettleDetailList,RenterCashCodeEnum.SETTLE_WZ_TO_HISTORY_AMT);
+                wzDeductionRentAmt = wzDeductionRentHistoricalAmt + renterCostVO.getDepositWzCostShikou();
+            }else{
+                wzDeductionRentAmt = renterCostVO.getDepositWzCostYingkou();
+            }
+
+        }else{//未结算
+            carDeductionRentAmt = renterCostVO.getDepositCostYingkou();
+            wzDeductionRentAmt = renterCostVO.getDepositWzCostYingkou();
+        }
+
         //1、租车费用
         RentCarCostDTO rentCarCostDTO = new RentCarCostDTO();
         //1.1、基础费用
@@ -342,11 +391,13 @@ public class RenterCostFacadeService {
         //2、车辆押金
         CarDepositDTO carDepositDTO = new CarDepositDTO();
         RenterDepositDetailEntity renterDepositDetailEntity = renterDepositDetailService.queryByOrderNo(orderNo);
-        List<AccountRenterCostSettleDetailEntity> accountRenterCostSettleDetailList = accountRenterCostSettleService.getAccountRenterCostSettleDetail(orderNo);
+
         //2.1、基础费用
         carDepositDTO.carDeposit = abs(renterDepositDetailEntity.getOriginalDepositAmt());
         carDepositDTO.platformTaskRelief = renterDepositDetailEntity.getReductionDepositAmt();
-        carDepositDTO.DeductionRentHistoricalAmt = AccountSettleUtils.getDepositSettleDeductionDebtAmt(accountRenterCostSettleDetailList,RenterCashCodeEnum.SETTLE_DEPOSIT_TO_HISTORY_AMT);
+        carDepositDTO.DeductionRentHistoricalAmt = carDeductionRentHistoricalAmt;
+        carDepositDTO.expDeductionRentAmt = carDeductionRentAmt;
+        carDepositDTO.expAndActFlg = carExpAndActFlg;
         //2.2、统计
         CostStatisticsDTO carDepositStatisticsDTO = new CostStatisticsDTO();
         carDepositStatisticsDTO.shouldReceiveAmt = renterCostVO.getDepositCostYingshou();
@@ -370,8 +421,9 @@ public class RenterCostFacadeService {
         wzDepositDTO.wzStopCostAmt = wzCostVO.getWzStopCostAmt();
         wzDepositDTO.wzOtherAmt = wzCostVO.getWzOtherAmt();
         wzDepositDTO.wzInsuranceAmt = wzCostVO.getWzInsuranceAmt();
-
-        wzDepositDTO.deductionRentHistoricalAmt = AccountSettleUtils.getDepositSettleDeductionDebtAmt(accountRenterCostSettleDetailList,RenterCashCodeEnum.SETTLE_WZ_TO_HISTORY_AMT);
+        wzDepositDTO.expDeductionRentCarAmt = wzDeductionRentAmt;
+        wzDepositDTO.expAndActFlg = wzExpAndActFlg;
+        wzDepositDTO.deductionRentHistoricalAmt = wzDeductionRentHistoricalAmt;
         //3.2、统计
         CostStatisticsDTO wzCostStatisticsDTO = new CostStatisticsDTO();
         wzCostStatisticsDTO.shouldReceiveAmt = renterCostVO.getDepositWzCostYingshou();
@@ -388,10 +440,6 @@ public class RenterCostFacadeService {
         settleMakeUpDTO.shouldReveiveAmt = Math.abs(needIncrementAmt);
         settleMakeUpDTO.realReveiveAmt = renterCostVO.getRenterCostBufuShishou();
 
-        //预计抵扣的租车费用
-        DeductionRentAmtDTO deductionRentAmtDTO = deductionCarDdeposit(rentCarCostStatics, carDepositStatisticsDTO.realReceiveAmt, wzCostStatisticsDTO.realReceiveAmt);
-        carDepositDTO.expDeductionRentAmt = deductionRentAmtDTO.getCarDepositDeductionAmt();
-        wzDepositDTO.expDeductionRentCarAmt = deductionRentAmtDTO.getWzDepositDeductionAmt();
 
         //5、统计费用
         CostStatisticsDTO costStatisticsDTO = getCostStatistics(rentCarCostStatics, carDepositStatisticsDTO, wzCostStatisticsDTO,settleMakeUpDTO);
@@ -460,30 +508,6 @@ public class RenterCostFacadeService {
             return amt;
         }
         return -amt;
-    }
-
-    /**
-     * 车辆押金抵预计抵扣的租车费用
-     * 违章押金预计抵扣租车费用
-     * @return
-     */
-    private DeductionRentAmtDTO deductionCarDdeposit(CostStatisticsDTO rentCarCostStatics,int depositCostShifu,int realReceiveAmt){
-        DeductionRentAmtDTO deductionRentAmtDTO = new DeductionRentAmtDTO();
-        int difference = rentCarCostStatics.shouldReceiveAmt - rentCarCostStatics.realReceiveAmt;
-        if(difference < 0){
-            if(depositCostShifu >= abs(difference)){
-                deductionRentAmtDTO.setCarDepositDeductionAmt(difference);
-            }else{
-                deductionRentAmtDTO.setCarDepositDeductionAmt(depositCostShifu);
-                int wzDiff = abs(difference) - abs(depositCostShifu);
-                if(realReceiveAmt >= wzDiff){
-                    deductionRentAmtDTO.setWzDepositDeductionAmt(wzDiff);
-                }else{
-                    deductionRentAmtDTO.setWzDepositDeductionAmt(realReceiveAmt);
-                }
-            }
-        }
-        return deductionRentAmtDTO;
     }
 
     /**

@@ -56,6 +56,14 @@ public class AccountOwnerIncomeExamineNoTService {
         accountOwnerIncomeExamineEntity.setIsDelete(NumberUtils.INTEGER_ZERO);
 
         int result = accountOwnerIncomeExamineMapper.insertSelective(accountOwnerIncomeExamineEntity);
+        Integer id = accountOwnerIncomeExamineEntity.getId();
+        AccountOwnerIncomeExamineEntity ownerIncomeExamineEntity = new AccountOwnerIncomeExamineEntity();
+        ownerIncomeExamineEntity.setExamineId(id);
+        ownerIncomeExamineEntity.setId(id);
+        ownerIncomeExamineEntity.setVersion(accountOwnerIncomeExamineEntity.getVersion());
+        int i = accountOwnerIncomeExamineMapper.updateByPrimaryKeySelective(ownerIncomeExamineEntity);
+        log.info("插入accountOwnerIncomeExamine之后，更新examineId ，ownerIncomeExamineEntity={},i={}",JSON.toJSONString(ownerIncomeExamineEntity),i);
+
         log.info("车主收益审核录入结果result={},accountOwnerIncomeExamineEntity={}",result, JSON.toJSONString(accountOwnerIncomeExamineEntity));
         if(result==0){
             log.error("车主收益审核录入失败result={},accountOwnerIncomeExamineEntity={}",result,JSON.toJSONString(accountOwnerIncomeExamineEntity));
