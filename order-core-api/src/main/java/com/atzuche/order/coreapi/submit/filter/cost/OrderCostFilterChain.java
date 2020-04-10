@@ -64,7 +64,10 @@ public class OrderCostFilterChain implements ApplicationContextAware {
         orderCostFilterList.add(applicationContext.getBean(OrderPlatformCouponFilter.class));
         //凹凸币
         orderCostFilterList.add(applicationContext.getBean(OrderAutoCoinFilter.class));
-
+        //车辆押金
+        orderCostFilterList.add(applicationContext.getBean(OrderCarDepositAmtFilter.class));
+        //违章押金
+        orderCostFilterList.add(applicationContext.getBean(OrderIllegalDepositAmtFilter.class));
 
     }
 

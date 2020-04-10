@@ -421,7 +421,10 @@ public class OrderCommonConver {
         reqContext.setLimitRedReqDTO(initOrderCostLimitRedReqDTO(context));
         //凹凸币参数
         reqContext.setAutoCoinReqDTO(initOrderCostAutoCoinReqDTO(context));
-
+        //车辆押金
+        reqContext.setCostCarDepositAmtReqDTO(initOrderCostCarDepositAmtReqDTO(context));
+        //违章押金
+        reqContext.setViolationDepositAmtReqDTO(initOrderCostViolationDepositAmtReqDTO(context));
         //费用清单
         OrderCostResContext resContext = new OrderCostResContext();
         //公共参数(用于费用迭代变更)
@@ -660,6 +663,43 @@ public class OrderCommonConver {
         orderCostAutoCoinReqDTO.setUseAutoCoin(context.getOrderReqVO().getUseAutoCoin());
         logger.info("Init OrderCostAutoCoinReqDTO.result is,orderCostAutoCoinReqDTO:[{}]", JSON.toJSONString(orderCostAutoCoinReqDTO));
         return orderCostAutoCoinReqDTO;
+    }
+
+    /**
+     * 初始化计算车辆押金参数
+     *
+     * @param context 请求参数
+     * @return OrderCostCarDepositAmtReqDTO
+     */
+    public OrderCostCarDepositAmtReqDTO initOrderCostCarDepositAmtReqDTO(OrderReqContext context) {
+        OrderCostCarDepositAmtReqDTO orderCostCarDepositAmtReqDTO = new OrderCostCarDepositAmtReqDTO();
+        orderCostCarDepositAmtReqDTO.setCityCode(Integer.valueOf(context.getOrderReqVO().getCityCode()));
+        orderCostCarDepositAmtReqDTO.setFreeDoubleTypeId(StringUtils.isBlank(context.getOrderReqVO().getFreeDoubleTypeId()) ? null : Integer.valueOf(context.getOrderReqVO().getFreeDoubleTypeId()));
+        orderCostCarDepositAmtReqDTO.setGuidPrice(context.getRenterGoodsDetailDto().getCarGuidePrice());
+        orderCostCarDepositAmtReqDTO.setSurplusPrice(context.getRenterGoodsDetailDto().getCarSurplusPrice());
+        orderCostCarDepositAmtReqDTO.setBrand(context.getRenterGoodsDetailDto().getBrand());
+        orderCostCarDepositAmtReqDTO.setType(context.getRenterGoodsDetailDto().getType());
+        orderCostCarDepositAmtReqDTO.setLicenseDay(context.getRenterGoodsDetailDto().getLicenseDay());
+        orderCostCarDepositAmtReqDTO.setRenterMemberRightDTOList(context.getRenterMemberDto().getRenterMemberRightDTOList());
+        logger.info("Init OrderCostCarDepositAmtReqDTO.result is,orderCostCarDepositAmtReqDTO:[{}]", JSON.toJSONString(orderCostCarDepositAmtReqDTO));
+        return orderCostCarDepositAmtReqDTO;
+    }
+
+    /**
+     * 初始化计算违章押金参数
+     *
+     * @param context 请求参数
+     * @return OrderCostViolationDepositAmtReqDTO
+     */
+    public OrderCostViolationDepositAmtReqDTO initOrderCostViolationDepositAmtReqDTO(OrderReqContext context) {
+        OrderCostViolationDepositAmtReqDTO violationDepositAmtReqDTO = new OrderCostViolationDepositAmtReqDTO();
+
+        violationDepositAmtReqDTO.setCityCode(Integer.valueOf(context.getOrderReqVO().getCityCode()));
+        violationDepositAmtReqDTO.setFreeDoubleTypeId(StringUtils.isBlank(context.getOrderReqVO().getFreeDoubleTypeId()) ? null : Integer.valueOf(context.getOrderReqVO().getFreeDoubleTypeId()));
+        violationDepositAmtReqDTO.setCarPlateNum(context.getRenterGoodsDetailDto().getCarPlateNum());
+        violationDepositAmtReqDTO.setRenterMemberRightDTOList(context.getRenterMemberDto().getRenterMemberRightDTOList());
+        logger.info("Init OrderCostViolationDepositAmtReqDTO.result is,violationDepositAmtReqDTO:[{}]", JSON.toJSONString(violationDepositAmtReqDTO));
+        return violationDepositAmtReqDTO;
     }
 
 }

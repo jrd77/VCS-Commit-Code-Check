@@ -1,6 +1,7 @@
 package com.atzuche.order.delivery.service.delivery;
 
 import com.atzuche.order.commons.OrderReqContext;
+import com.atzuche.order.commons.constant.OrderConstant;
 import com.atzuche.order.commons.entity.dto.*;
 import com.atzuche.order.commons.vo.req.OrderReqVO;
 import com.atzuche.order.delivery.common.DeliveryCarTask;
@@ -54,12 +55,19 @@ public class DeliveryCarService {
     /**
      * 添加配送相关信息(是否下单，是否推送仁云)
      */
-    public void addFlowOrderInfo(Integer getMinutes, Integer returnMinutes, OrderReqContext orderReqContext) {
+    public void addFlowOrderInfo(OrderReqContext orderReqContext) {
         if (null == orderReqContext || Objects.isNull(orderReqContext.getOrderReqVO())) {
             throw new DeliveryOrderException(DeliveryErrorCode.DELIVERY_PARAMS_ERROR);
         }
-        int getMinute = getMinutes == null ? 0 : getMinutes;
-        int returnMinute = returnMinutes == null ? 0 : returnMinutes;
+        int getMinute =
+                null == orderReqContext.getCarRentTimeRangeDTO() || null ==
+                        orderReqContext.getCarRentTimeRangeDTO().getGetMinutes() ? OrderConstant.ZERO :
+                        orderReqContext.getCarRentTimeRangeDTO().getGetMinutes();
+
+        int returnMinute = null == orderReqContext.getCarRentTimeRangeDTO() || null ==
+                orderReqContext.getCarRentTimeRangeDTO().getReturnMinutes() ? OrderConstant.ZERO :
+                orderReqContext.getCarRentTimeRangeDTO().getReturnMinutes();
+
         log.info("新增配送订单数据------>>>>> 租客地址信息 入参数：【{}】",
                 orderReqContext.getOrderReqVO().getSrvGetAddr());
         addRenYunFlowOrderInfo(getMinute, returnMinute, orderReqContext, UserTypeEnum.OWNER_TYPE.getValue().intValue());

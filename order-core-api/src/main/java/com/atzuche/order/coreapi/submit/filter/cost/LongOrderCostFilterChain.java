@@ -52,6 +52,10 @@ public class LongOrderCostFilterChain implements ApplicationContextAware {
         orderCostFilterList.add(applicationContext.getBean(LongOrderGetAndReturnCarCostSubsidyFilter.class));
         //平台优惠券抵扣
         orderCostFilterList.add(applicationContext.getBean(OrderPlatformCouponFilter.class));
+        //车辆押金
+        orderCostFilterList.add(applicationContext.getBean(OrderCarDepositAmtFilter.class));
+        //违章押金
+        orderCostFilterList.add(applicationContext.getBean(OrderIllegalDepositAmtFilter.class));
     }
 
     public void calculate(OrderCostContext context) throws OrderFilterException {

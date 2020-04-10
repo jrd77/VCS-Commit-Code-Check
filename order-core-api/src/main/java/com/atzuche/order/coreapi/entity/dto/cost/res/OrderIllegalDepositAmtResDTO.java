@@ -1,5 +1,6 @@
 package com.atzuche.order.coreapi.entity.dto.cost.res;
 
+import com.atzuche.order.renterorder.vo.RenterOrderIllegalResVO;
 import lombok.Data;
 
 /**
@@ -8,4 +9,14 @@ import lombok.Data;
  */
 @Data
 public class OrderIllegalDepositAmtResDTO {
+
+    /**
+     * 违章押金
+     */
+    private Integer illegalDepositAmt;
+
+    /**
+     * 违章押金明细(收银台使用)
+     */
+    private RenterOrderIllegalResVO illegalDeposit;
 }
