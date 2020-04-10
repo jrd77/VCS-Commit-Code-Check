@@ -9,6 +9,7 @@ import com.atzuche.order.commons.GlobalConstant;
 import com.atzuche.order.commons.LocalDateTimeUtils;
 import com.atzuche.order.commons.ResponseCheckUtil;
 import com.atzuche.order.commons.entity.orderDetailDto.*;
+import com.atzuche.order.commons.enums.account.SettleStatusEnum;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.commons.enums.cashier.PaySourceEnum;
 import com.atzuche.order.commons.enums.cashier.PayTypeEnum;
@@ -133,7 +134,7 @@ public class CarDepositReturnDetailService {
         RenterCostVO renterCostVO = orderSettleService.getRenterCostByOrderNo(orderNo,renterOrderNo,renterMemNo,rentCost.getRenterCostAmtFinal());
         CarDepositRespVo carDepositRespVo = new CarDepositRespVo();
         int expOrActFlag = 1;
-        if(1== orderStatusDTO.getCarDepositSettleStatus()){//车辆已经结算
+        if(SettleStatusEnum.SETTLED.getCode() == orderStatusDTO.getCarDepositSettleStatus()){//车辆已经结算
             expOrActFlag = 2;
             carDepositRespVo.setRealDeductionRentCarAmt(depositToCarAmt);
         }else{
