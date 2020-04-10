@@ -16,6 +16,10 @@ import com.atzuche.order.commons.enums.cashier.TransStatusEnum;
 import com.atzuche.order.commons.enums.detain.DetainStatusEnum;
 import com.atzuche.order.commons.enums.detain.DetainTypeEnum;
 import com.atzuche.order.open.service.FeignOrderDetailService;
+import com.atzuche.order.renterorder.service.RenterOrderService;
+import com.atzuche.order.settle.service.OrderSettleService;
+import com.atzuche.order.settle.vo.req.RentCosts;
+import com.atzuche.order.settle.vo.res.RenterCostVO;
 import com.autoyol.commons.web.ResponseData;
 import com.dianping.cat.Cat;
 import com.dianping.cat.message.Transaction;
@@ -36,10 +40,15 @@ import java.util.stream.Collectors;
 public class CarDepositReturnDetailService {
     @Autowired
     private FeignOrderDetailService feignOrderDetailService;
+    @Autowired
+    private OrderSettleService orderSettleService;
+    @Autowired
+    private RenterOrderService renterOrderService;
 
     public ResponseData<CarDepositRespVo> getCarDepositReturnDetail(CarDepositReqVO reqVo) {
+        String orderNo = reqVo.getOrderNo();
         OrderDetailReqDTO orderDetailReqDTO = new OrderDetailReqDTO();
-        orderDetailReqDTO.setOrderNo(reqVo.getOrderNo());
+        orderDetailReqDTO.setOrderNo(orderNo);
 
         ResponseData<OrderAccountDetailRespDTO> responseData = null;
         Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "获取费用详情");
@@ -62,16 +71,16 @@ public class CarDepositReturnDetailService {
         OrderAccountDetailRespDTO data = responseData.getData();
         OrderStatusDTO orderStatusDTO = data.orderStatusDTO;
         if(orderStatusDTO == null){
-            throw new RuntimeException("车辆押金获取失败:"+reqVo.getOrderNo());
+            throw new RuntimeException("车辆押金获取失败:"+ orderNo);
         }
-
+        RenterOrderDTO renterOrderDTO = data.getRenterOrderDTO();
+        String renterOrderNo = renterOrderDTO.getRenterOrderNo();
+        String renterMemNo = renterOrderDTO.getRenterMemNo();
         AccountRenterDepositDTO accountRenterDepositDTO = data.getAccountRenterDepositDTO();
         RenterDepositDetailDTO renterDepositDetailDTO = data.getRenterDepositDetailDTO();
         OrderDTO orderDTO = data.getOrderDTO();
-        AccountRenterDetainCostDTO accountRenterDetainCostDTO = data.getAccountRenterDetainCostDTO();
         List<AccountRenterDetainDetailDTO> accountRenterDetainDetailDTOList = data.getAccountRenterDetainDetailDTOList();
         List<AccountRenterCostDetailDTO> accountRenterCostDetailDTOS = data.getAccountRenterCostDetailDTOS();
-       // List<AccountRenterDepositDetailDTO> accountRenterDepositDetailDTOList = data.getAccountRenterDepositDetailDTOList();
         List<AccountDebtReceivableaDetailDTO> accountDebtReceivableaDetailDTOS = data.getAccountDebtReceivableaDetailDTOS();
         CashierDTO cashierDTO = data.getCashierDTO();
 
@@ -85,30 +94,18 @@ public class CarDepositReturnDetailService {
             detainAmt = rentCarAmtDtoList.stream().mapToInt(AccountRenterDetainDetailDTO::getAmt).sum();
         }
 
-        Integer depositToCarAmt = Optional.ofNullable(accountRenterCostDetailDTOS).orElseGet(ArrayList::new).stream()
+        int depositToCarAmt = Optional.ofNullable(accountRenterCostDetailDTOS).orElseGet(ArrayList::new).stream()
                 .filter(x -> RenterCashCodeEnum.SETTLE_DEPOSIT_TO_RENT_COST.equals(x.getSourceCode()))
-                .collect(Collectors.summingInt(AccountRenterCostDetailDTO::getAmt));
+                .collect(Collectors.summingInt(x -> x.getAmt() == null ? 0 : x.getAmt()));
 
-        /*Integer depositToHistoryAmt = Optional.ofNullable(accountRenterDepositDetailDTOList).orElseGet(ArrayList::new).stream()
-                .filter(x -> RenterCashCodeEnum.SETTLE_DEPOSIT_TO_HISTORY_AMT.equals(x.getSourceCode()))
-                .collect(Collectors.summingInt(AccountRenterDepositDetailDTO::getAmt));*/
-        Integer depositToHistoryAmt = Optional.ofNullable(accountDebtReceivableaDetailDTOS)
+        int depositToHistoryAmt = Optional.ofNullable(accountDebtReceivableaDetailDTOS)
                 .orElseGet(ArrayList::new)
                 .stream()
-                .filter(x->RenterCashCodeEnum.SETTLE_DEPOSIT_TO_HISTORY_AMT.getCashNo().equals(x.getSourceCode()))
-                .collect(Collectors.summingInt(AccountDebtReceivableaDetailDTO::getAmt));
+                .filter(x -> RenterCashCodeEnum.SETTLE_DEPOSIT_TO_HISTORY_AMT.getCashNo().equals(x.getSourceCode()))
+                .collect(Collectors.summingInt(x -> x.getAmt() == null ? 0 : x.getAmt()));
 
         String depositType = "";
         String payType = "";
-        /*if(accountRenterDepositDTO.getAuthorizeDepositAmt() != null && accountRenterDepositDTO.getAuthorizeDepositAmt()!= 0){
-            depositType = "预授权";
-            payType = "支付宝预授权支付";
-        }else if(accountRenterDepositDTO.getCreditPayAmt() != null && accountRenterDepositDTO.getCreditPayAmt() != 0){
-            depositType = "支付宝信用支付";
-        }else{
-            depositType = "消费";
-            payType = "支付宝/微信";
-        }*/
         if(cashierDTO != null){
             depositType = PaySourceEnum.getFlagText(cashierDTO.getPaySource());
             payType = PayTypeEnum.getFlagText(cashierDTO.getPayType());
@@ -132,8 +129,17 @@ public class CarDepositReturnDetailService {
         if(payTime != null){
             payTimeStr = LocalDateTimeUtils.formateLocalDateTimeStr(payTime, GlobalConstant.DATE_TIME_FORMAT_1);
         }
-
+        RentCosts rentCost = orderSettleService.preRenterSettleOrder(orderNo,renterOrderNo);
+        RenterCostVO renterCostVO = orderSettleService.getRenterCostByOrderNo(orderNo,renterOrderNo,renterMemNo,rentCost.getRenterCostAmtFinal());
         CarDepositRespVo carDepositRespVo = new CarDepositRespVo();
+        int expOrActFlag = 1;
+        if(1== orderStatusDTO.getCarDepositSettleStatus()){//车辆已经结算
+            expOrActFlag = 2;
+            carDepositRespVo.setRealDeductionRentCarAmt(depositToCarAmt);
+        }else{
+            carDepositRespVo.setExpDeductionRentCarAmt(renterCostVO.getDepositCostYingkou());
+        }
+
         carDepositRespVo.setCarDepositMonty(renterDepositDetailDTO.getOriginalDepositAmt());
         carDepositRespVo.setOriginalTotalAmt(renterDepositDetailDTO.getReductionDepositAmt());
         carDepositRespVo.setReceivableMonty(Math.abs(accountRenterDepositDTO.getYingfuDepositAmt()));
@@ -143,11 +149,9 @@ public class CarDepositReturnDetailService {
         carDepositRespVo.setReliefAmtStr(renterDepositDetailDTO.getReductionDepositAmt());
         carDepositRespVo.setPayDateStr(payTimeStr);
         carDepositRespVo.setPayStatusStr(TransStatusEnum.getFlagText(payStatus));
-
         carDepositRespVo.setSurplusDepositAmt(accountRenterDepositDTO.getSurplusDepositAmt());
-        carDepositRespVo.setRealDeductionRentCarAmt(depositToCarAmt);
-        carDepositRespVo.setExpDeductionRentCarAmt(0);
-        carDepositRespVo.setDeductionHistoryAmt(depositToHistoryAmt==null?0:depositToHistoryAmt);
+
+        carDepositRespVo.setDeductionHistoryAmt(depositToHistoryAmt);
         carDepositRespVo.setExpSettleTime(expSettleTime);
         carDepositRespVo.setActSettleTime(actSettleTime);
 
@@ -158,8 +162,9 @@ public class CarDepositReturnDetailService {
         }
         carDepositRespVo.setActDetainStatus(detainStatus.getMsg());
         carDepositRespVo.setActDetainTime(detainTime);
-
+        carDepositRespVo.setActDetainAmt(expOrActFlag);
         detainReasonHandle(carDepositRespVo, data.getDetainReasons());
+
         return ResponseData.success(carDepositRespVo);
     }
 

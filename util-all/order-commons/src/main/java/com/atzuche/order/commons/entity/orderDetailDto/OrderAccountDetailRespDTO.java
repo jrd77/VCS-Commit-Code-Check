@@ -29,5 +29,6 @@ public class OrderAccountDetailRespDTO {
     public CashierDTO cashierDTO;
     @AutoDocProperty(value = "租车押金暂扣原因列表")
     public  List<RenterDetainReasonDTO> detainReasons;
-
+    @AutoDocProperty(value = "有效租客子订单")
+    public RenterOrderDTO renterOrderDTO;
 }

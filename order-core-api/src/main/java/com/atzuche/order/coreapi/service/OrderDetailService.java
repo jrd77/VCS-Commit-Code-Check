@@ -1272,6 +1272,13 @@ public class OrderDetailService {
         //租车押金暂扣原因
         List<RenterDetainReasonDTO> dtos = renterDetainReasonService.getListByOrderNo(orderNo);
 
+        RenterOrderEntity renterOrderEntity = renterOrderService.getRenterOrderByOrderNoAndIsEffective(orderNo);
+        if(renterOrderEntity == null){
+            throw new RenterOrderEffectiveNotFoundException(orderNo);
+        }
+        RenterOrderDTO renterOrderDTO = new RenterOrderDTO();
+        BeanUtils.copyProperties(renterOrderEntity,renterOrderDTO);
+
         OrderAccountDetailRespDTO orderAccountDetailRespDTO = new OrderAccountDetailRespDTO();
         orderAccountDetailRespDTO.orderDTO = orderDTO;
         orderAccountDetailRespDTO.orderStatusDTO = orderStatusDTO;
@@ -1284,6 +1291,7 @@ public class OrderDetailService {
         orderAccountDetailRespDTO.accountDebtReceivableaDetailDTOS = accountDebtReceivableaDetailDTOist;
         orderAccountDetailRespDTO.cashierDTO = cashierDTO;
         orderAccountDetailRespDTO.detainReasons = dtos;
+        orderAccountDetailRespDTO.renterOrderDTO = renterOrderDTO;
         return orderAccountDetailRespDTO;
     }
 
