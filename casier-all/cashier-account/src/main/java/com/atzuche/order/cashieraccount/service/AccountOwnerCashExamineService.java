@@ -78,7 +78,7 @@ public class AccountOwnerCashExamineService {
 		AccountOwnerCashExamine record = convertAccountOwnerCashExamine(req, bankCard, simpleMem);
 		String nowDate = CommonUtils.formatTime(LocalDateTime.now(), CommonUtils.FORMAT_STR_LONG);
 		if (oldDeductAmt > 0) {
-			record.setSerialNumber(nowDate+"1"+req.getMemNo()+req.getAmt());
+			record.setSerialNumber(nowDate+"1"+req.getMemNo()+oldDeductAmt);
 			record.setBalanceFlag(0);
 			record.setAmt(oldDeductAmt);
 			// 保存提现记录
@@ -86,7 +86,7 @@ public class AccountOwnerCashExamineService {
 		}
 		if (newDeductAmt > 0) {
 			record.setId(null);
-			record.setSerialNumber(nowDate+"2"+req.getMemNo()+req.getAmt());
+			record.setSerialNumber(nowDate+"2"+req.getMemNo()+newDeductAmt);
 			record.setBalanceFlag(1);
 			record.setAmt(newDeductAmt);
 			// 保存提现记录
